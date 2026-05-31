@@ -184,23 +184,23 @@ html, body { height: 100%; background: var(--bg); color: var(--tx); font-family:
 /* KPI strip — intrinsic: auto-fits any count (3, 4, 5) at any width */
 .ov-kpis {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
-  gap: clamp(6px, 1.2vw, 10px);
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(4px, 1vw, 8px);
   margin-bottom: 24px;
 }
 .ov-kpi {
   background: var(--c2); border: 1px solid var(--bd); border-radius: 8px;
-  padding: 14px 15px;
+  padding: 10px 8px;
 }
 .ov-kpi-lbl {
   font-family: 'Syne', sans-serif; font-size: .48rem; font-weight: 700;
   letter-spacing: .25em; text-transform: uppercase; color: var(--t3); margin-bottom: 6px;
 }
 .ov-kpi-val {
-  font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; line-height: 1;
+  font-family: 'Syne', sans-serif; font-size: clamp(.9rem, 2.5vw, 1.4rem); font-weight: 800; line-height: 1;
   margin-bottom: 3px;
 }
-.ov-kpi-sub { font-family: 'Share Tech Mono', monospace; font-size: .56rem; color: var(--t3); }
+.ov-kpi-sub { font-family: 'Share Tech Mono', monospace; font-size: .44rem; color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Chart card */
 .ov-chart-card {
@@ -2330,8 +2330,8 @@ input:focus, textarea:focus, select:focus {
 
     <!-- STEP 1: Identity + goal -->
     <div id="w-step-1">
-      <div class="welcome-h2">Register as an alpha tester<br>for lifetime access.</div>
-      <div class="welcome-sub">Join the founding cohort shaping Vault·It. Your details unlock the full app and secure your Pioneer status.</div>
+      <div class="welcome-h2">Alpha testers get a free lifetime<br>Pro licence on beta release.</div>
+      <div class="welcome-sub">Register now to lock it in. Join the founding cohort shaping Vault·It — your profile unlocks the full app and secures your Pioneer status forever.</div>
       <div class="welcome-field">
         <label>First Name</label>
         <input type="text" class="welcome-inp" id="w-name" placeholder="Your first name" autocomplete="given-name">
@@ -2705,13 +2705,13 @@ input:focus, textarea:focus, select:focus {
 <div id="ov-page">
 
   <!-- Dev contact bento card -->
-  <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin-bottom:14px;position:relative;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin-bottom:14px;position:relative;overflow:hidden">
     <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--em)"></div>
-    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABGAFgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUAAwYHAgH/xAA1EAACAQMCAwYEBQMFAAAAAAABAgMABBEFIRIxYQYTQVFxgSIyQpEHFCOhwTNSYkNEsdHw/8QAGQEAAwEBAQAAAAAAAAAAAAAAAgMEAQUA/8QAIBEAAwACAgIDAQAAAAAAAAAAAAECAxESMQQhEzNBcf/aAAwDAQACEQMRAD8A5banMS9BiitJtu91ZpCNoxn3NCWO8betNrJltrC5n+o/CPXkKNvUmRPK9ID1ENcu959Hed2vUAf++9CqlG34EYgtB/oRgsP8m3P7YFVRqo3bA8s0GuM7Y62qtpHlLd5CAMDPLiOM1fJo9wi5JUt/aKeWmi315bo9raSGQHPeMnCB9xRL9m7yACW4uj3nMhRnFT/M9jl4+0Y4wsvNSK8lKeNbSd9JDM4JHy7Yz5UqaPFURXInuOLBGWqWFGOvShnFawCmpX01Kw8MLBf0fUmmNpG07xQkforLxyHz6UJp6/op6U001dyetM47WgJyOK5IobR725upLh2iBkcsRk+PtRGlWgXXIoHGVSZVJPIbgZPTenMa7V8srVJtcmt3Clbu2YANy4gM/wAZrM31sPBXLIkb+fVdNjUW352ASY2XjFINS1TTu9Mf5pSwznh3x9qtuOzoubyF5IWVAoV2MoKlcAYAz7UhuNOhh1SZILeMwtJlYwwUIenhjeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95co8WEh2RTc4GPXeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95coWKYYXGMHP4pq9nHHHIqL8CnAqtPp24hTgHzFPLRQkCgDGBitOHFqzElVpVJaHFr4rgnFX4OatjFGwzSb1R42cFYoUFY6f/Z" alt="Pete Thickett" style="width:72px;height:auto;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));flex-shrink:0;object-fit:cover">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABGAFgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUAAwYHAgH/xAA1EAACAQMCAwYEBQMFAAAAAAABAgMABBEFIRIxYQYTQVFxgSIyQpEHFCOhwTNSYkNEsdHw/8QAGQEAAwEBAQAAAAAAAAAAAAAAAgMEAQUA/8QAIBEAAwACAgIDAQAAAAAAAAAAAAECAxESMQQhEzNBcf/aAAwDAQACEQMRAD8A5banMS9BiitJtu91ZpCNoxn3NCWO8betNrJltrC5n+o/CPXkKNvUmRPK9ID1ENcu959Hed2vUAf++9CqlG34EYgtB/oRgsP8m3P7YFVRqo3bA8s0GuM7Y62qtpHlLd5CAMDPLiOM1fJo9wi5JUt/aKeWmi315bo9raSGQHPeMnCB9xRL9m7yACW4uj3nMhRnFT/M9jl4+0Y4wsvNSK8lKeNbSd9JDM4JHy7Yz5UqaPFURXInuOLBGWqWFGOvShnFawCmpX01Kw8MLBf0fUmmNpG07xQkforLxyHz6UJp6/op6U001dyetM47WgJyOK5IobR725upLh2iBkcsRk+PtRGlWgXXIoHGVSZVJPIbgZPTenMa7V8srVJtcmt3Clbu2YANy4gM/wAZrM31sPBXLIkb+fVdNjUW352ASY2XjFINS1TTu9Mf5pSwznh3x9qtuOzoubyF5IWVAoV2MoKlcAYAz7UhuNOhh1SZILeMwtJlYwwUIenhjeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95co8WEh2RTc4GPXeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95coWKYYXGMHP4pq9nHHHIqL8CnAqtPp24hTgHzFPLRQkCgDGBitOHFqzElVpVJaHFr4rgnFX4OatjFGwzSb1R42cFYoUFY6f/Z" alt="Pete Thickett" style="width:52px;height:52px;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));flex-shrink:0;object-fit:cover;object-position:center 20%">
     <div style="flex:1;min-width:0">
-      <div style="font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;color:var(--tx);margin-bottom:2px">Message the Dev</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:.52rem;color:var(--t2);margin-bottom:8px;line-height:1.4">Beta feedback shapes every release. Got an idea, bug, or just want to say hi?</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div style="font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;color:var(--tx);margin-bottom:1px">Message the Dev</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:.5rem;color:var(--t2);margin-bottom:6px;line-height:1.3">Beta feedback shapes every release. Got an idea, bug, or just want to say hi?</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <a href="mailto:pete@ptlive.design" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);text-decoration:none;padding:4px 8px;border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
           pete@ptlive.design
@@ -2719,6 +2719,14 @@ input:focus, textarea:focus, select:focus {
         <a href="https://wa.me/447470074133" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:#25d366;text-decoration:none;padding:4px 8px;border:1px solid rgba(37,211,102,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
           WhatsApp
+        </a>
+        <a href="https://www.linkedin.com/in/ptlivedesign/" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:#0077b5;text-decoration:none;padding:4px 8px;border:1px solid rgba(0,119,181,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+        <a href="https://ptlive.my.canva.site/" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);text-decoration:none;padding:4px 8px;border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Portfolio
         </a>
         <a href="https://instagram.com/petet_live" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:#e1306c;text-decoration:none;padding:4px 8px;border:1px solid rgba(225,48,108,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="currentColor"/></svg>
@@ -10610,27 +10618,7 @@ function showUpgrade() {
   if (m) m.classList.remove('hidden');
 }
 
-// Check on load
-function initWelcome() {
-  try {
-    var user = JSON.parse(localStorage.getItem('vi_user') || 'null');
-    if (user && user.email) {
-      _vaultItUser = user;
-      var ov=document.getElementById('welcome-overlay'); if(ov) ov.style.display='none';
-      applyPaywall();
-    }
-    // else: welcome overlay stays visible (default)
-  } catch(e) {
-    var ov=document.getElementById('welcome-overlay'); if(ov) ov.style.display='none';
-  }
-}
-
-// Run after DOM ready — first initWelcome stub (active one is below)
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() { initWelcome(); initProOffer(); });
-} else {
-  initWelcome(); initProOffer();
-}
+// initWelcome defined below — active definition handles new/returning users
 
 // Hook into showTab
 
@@ -11142,15 +11130,19 @@ function initDemoMode() {
 function initWelcome() {
   try {
     var overlay = document.getElementById('welcome-overlay');
+    // ?reset clears stored user so the onboarding quiz re-shows (dev/demo use)
+    if (new URLSearchParams(window.location.search).get('reset') !== null) {
+      localStorage.removeItem('vi_user');
+    }
     var user = JSON.parse(localStorage.getItem('vi_user') || 'null');
     if (user && user.email) {
-      // RETURNING USER — keep overlay hidden, fire pro offer
+      // RETURNING USER — keep overlay hidden
       _vaultItUser = user;
       if (overlay) overlay.style.display = 'none';
       applyPaywall();
       updateSidebar();
     } else {
-      // NEW USER — show welcome screen
+      // NEW USER — show onboarding quiz
       if (overlay) overlay.style.display = 'flex';
     }
   } catch(e) {
