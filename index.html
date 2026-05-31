@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.6.4';
+  var SW_VERSION = '0.6.5';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -139,14 +139,20 @@ html, body { height: 100%; background: var(--bg); color: var(--tx); font-family:
 /* ── COLLAPSIBLE LEFT SIDEBAR ── */
 #sidebar-toggle {
   position: fixed; left: 0; top: 50%; transform: translateY(-50%);
-  z-index: 200; width: 20px; height: 60px;
-  background: rgba(68,192,185,.18); border: 1px solid var(--bd);
-  border-left: none; border-radius: 0 6px 6px 0;
+  z-index: 200; width: 26px; height: 130px;
+  background: rgba(68,192,185,.22); border: 1px solid rgba(68,192,185,.5);
+  border-left: none; border-radius: 0 10px 10px 0;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: background .2s;
-  font-size: .6rem; color: var(--em);
+  cursor: pointer; transition: background .2s, width .2s, box-shadow .2s;
+  flex-direction: column; gap: 6px;
+  box-shadow: 2px 0 16px rgba(68,192,185,.18);
 }
-#sidebar-toggle:hover { background: rgba(68,192,185,.3); }
+#sidebar-toggle:hover { background: rgba(68,192,185,.38); width: 30px; box-shadow: 2px 0 24px rgba(68,192,185,.35); }
+@keyframes sb-pulse {
+  0%,100% { box-shadow: 2px 0 16px rgba(68,192,185,.18); }
+  50% { box-shadow: 2px 0 28px rgba(68,192,185,.5), 0 0 18px rgba(68,192,185,.18); }
+}
+#sidebar-toggle:not(.open) { animation: sb-pulse 2.8s ease-in-out infinite; }
 #left-sidebar {
   position: fixed; left: -240px; top: 48px; bottom: 0; width: 240px;
   background: rgba(8,12,18,.97); border-right: 1px solid var(--bd);
@@ -2292,7 +2298,10 @@ input:focus, textarea:focus, select:focus {
 
 <!-- TOP NAV -->
 <!-- ── LEFT SIDEBAR ── -->
-<div id="sidebar-toggle" onclick="toggleSidebar()" title="Toggle overview sidebar">›</div>
+<div id="sidebar-toggle" onclick="toggleSidebar()" title="Open profile &amp; stats">
+  <span id="sb-toggle-arrow" style="font-size:.85rem;font-weight:700;color:var(--em)">›</span>
+  <span style="font-family:'Syne',sans-serif;font-size:.28rem;font-weight:800;letter-spacing:.25em;text-transform:uppercase;color:var(--em);writing-mode:vertical-rl;text-orientation:mixed;opacity:.75;line-height:1">VAULT·IT</span>
+</div>
 <div id="left-sidebar">
   <div class="sb-section">
     <div class="sb-label">Net Worth</div>
@@ -2327,52 +2336,58 @@ input:focus, textarea:focus, select:focus {
   </div>
   <div class="sb-section" id="sb-profile-section">
     <div class="sb-label">Your Profile</div>
-    <!-- Avatar -->
-    <div style="text-align:center;margin-bottom:8px">
-      <div id="sb-avatar" style="width:52px;height:52px;border-radius:50%;background:rgba(68,192,185,.15);border:2px solid rgba(68,192,185,.3);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;overflow:hidden" onclick="document.getElementById('sb-avatar-upload').click()" title="Tap to upload photo">👤</div>
-      <input type="file" id="sb-avatar-upload" accept="image/*" style="display:none" onchange="uploadSbAvatar(this)">
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--t3);letter-spacing:.08em">TAP TO UPLOAD</div>
+    <!-- Profile fields — hidden when profile complete, shown in edit mode -->
+    <div id="sb-profile-fields">
+      <!-- Avatar -->
+      <div style="text-align:center;margin-bottom:8px">
+        <div id="sb-avatar" style="width:52px;height:52px;border-radius:50%;background:rgba(68,192,185,.15);border:2px solid rgba(68,192,185,.3);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;overflow:hidden" onclick="document.getElementById('sb-avatar-upload').click()" title="Tap to upload photo">👤</div>
+        <input type="file" id="sb-avatar-upload" accept="image/*" style="display:none" onchange="uploadSbAvatar(this)">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--t3);letter-spacing:.08em">TAP TO UPLOAD</div>
+      </div>
+      <!-- Basic info -->
+      <div style="margin-bottom:5px">
+        <label class="sb-field-lbl">Name</label>
+        <input type="text" id="sb-profile-name" class="al-inp" placeholder="Your name" style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
+      </div>
+      <div style="margin-bottom:5px">
+        <label class="sb-field-lbl">Email</label>
+        <input type="email" id="sb-profile-email" class="al-inp" placeholder="you@example.com" style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
+      </div>
+      <div style="margin-bottom:5px">
+        <label class="sb-field-lbl">Profession</label>
+        <input type="text" id="sb-profile-job" class="al-inp" placeholder="What do you do?" style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
+      </div>
+      <div style="margin-bottom:8px">
+        <label class="sb-field-lbl">Dream Profession</label>
+        <input type="text" id="sb-profile-dream" class="al-inp" placeholder="When Vault-It works..." style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
+      </div>
+      <!-- Archetypes -->
+      <div style="margin-bottom:5px">
+        <label class="sb-field-lbl">Saving Archetype</label>
+        <select id="sb-save-arch" class="sb-select" onchange="saveProfile()">
+          <option value="">— choose yours —</option>
+          <option value="🐿️ The Squirrel">🐿️ The Squirrel — Steady, habitual saver</option>
+          <option value="🎯 The Sniper">🎯 The Sniper — Goal-first, saves with a target</option>
+          <option value="📈 The Investor">📈 The Investor — Deploys savings, money works</option>
+          <option value="🌊 The Tidal Saver">🌊 The Tidal Saver — Saves hard when income spikes</option>
+        </select>
+      </div>
+      <div style="margin-bottom:10px">
+        <label class="sb-field-lbl">Spending Archetype</label>
+        <select id="sb-spend-arch" class="sb-select" onchange="saveProfile()">
+          <option value="">— choose yours —</option>
+          <option value="🧘 The Minimalist">🧘 The Minimalist — Only spends on what matters</option>
+          <option value="🎭 Experience Seeker">🎭 Experience Seeker — Memories, not things</option>
+          <option value="🛒 Comfort Spender">🛒 Comfort Spender — Quality of life first</option>
+          <option value="⚡ Impulse Reactor">⚡ Impulse Reactor — Spends freely, patches later</option>
+        </select>
+      </div>
     </div>
-    <!-- Basic info -->
-    <div style="margin-bottom:5px">
-      <label class="sb-field-lbl">Name</label>
-      <input type="text" id="sb-profile-name" class="al-inp" placeholder="Your name" style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
+    <!-- Pioneer card — with pencil edit button -->
+    <div style="position:relative">
+      <button id="sb-edit-btn" onclick="toggleProfileEdit()" title="Edit profile" style="display:none;position:absolute;top:-2px;right:0;z-index:10;background:rgba(68,192,185,.12);border:1px solid rgba(68,192,185,.28);border-radius:5px;color:var(--em);font-size:.58rem;padding:3px 7px;cursor:pointer;line-height:1;transition:background .18s" onmouseover="this.style.background='rgba(68,192,185,.25)'" onmouseout="this.style.background='rgba(68,192,185,.12)'">✏</button>
+      <div id="sb-pioneer-card"></div>
     </div>
-    <div style="margin-bottom:5px">
-      <label class="sb-field-lbl">Email</label>
-      <input type="email" id="sb-profile-email" class="al-inp" placeholder="you@example.com" style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
-    </div>
-    <div style="margin-bottom:5px">
-      <label class="sb-field-lbl">Profession</label>
-      <input type="text" id="sb-profile-job" class="al-inp" placeholder="What do you do?" style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
-    </div>
-    <div style="margin-bottom:8px">
-      <label class="sb-field-lbl">Dream Profession</label>
-      <input type="text" id="sb-profile-dream" class="al-inp" placeholder="When Vault-It works..." style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
-    </div>
-    <!-- Archetypes -->
-    <div style="margin-bottom:5px">
-      <label class="sb-field-lbl">Saving Archetype</label>
-      <select id="sb-save-arch" class="sb-select" onchange="saveProfile()">
-        <option value="">— choose yours —</option>
-        <option value="🐿️ The Squirrel">🐿️ The Squirrel — Steady, habitual saver</option>
-        <option value="🎯 The Sniper">🎯 The Sniper — Goal-first, saves with a target</option>
-        <option value="📈 The Investor">📈 The Investor — Deploys savings, money works</option>
-        <option value="🌊 The Tidal Saver">🌊 The Tidal Saver — Saves hard when income spikes</option>
-      </select>
-    </div>
-    <div style="margin-bottom:8px">
-      <label class="sb-field-lbl">Spending Archetype</label>
-      <select id="sb-spend-arch" class="sb-select" onchange="saveProfile()">
-        <option value="">— choose yours —</option>
-        <option value="🧘 The Minimalist">🧘 The Minimalist — Only spends on what matters</option>
-        <option value="🎭 Experience Seeker">🎭 Experience Seeker — Memories, not things</option>
-        <option value="🛒 Comfort Spender">🛒 Comfort Spender — Quality of life first</option>
-        <option value="⚡ Impulse Reactor">⚡ Impulse Reactor — Spends freely, patches later</option>
-      </select>
-    </div>
-    <!-- Pioneer card -->
-    <div id="sb-pioneer-card"></div>
   </div>
   <div style="margin-top:auto;padding-top:12px;border-top:1px solid rgba(68,192,185,.08)">
     <button onclick="showSettings()" title="Settings & API Keys" style="width:100%;background:rgba(13,21,32,0.92);border:1px solid rgba(68,192,185,0.25);border-radius:6px;padding:8px 11px;color:rgba(90,96,104,0.9);font-size:.62rem;cursor:pointer;white-space:nowrap;transition:border-color .2s,color .2s;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em" onmouseover="this.style.borderColor='rgba(68,192,185,0.6)';this.style.color='rgba(232,232,232,0.9)'" onmouseout="this.style.borderColor='rgba(68,192,185,0.25)';this.style.color='rgba(90,96,104,0.9)'">⚙ Settings</button>
@@ -4690,7 +4705,11 @@ function toggleSidebar(){
   var sb=document.getElementById('left-sidebar');
   var btn=document.getElementById('sidebar-toggle');
   if(sb)sb.classList.toggle('open',_sidebarOpen);
-  if(btn){btn.classList.toggle('open',_sidebarOpen);btn.textContent=_sidebarOpen?'‹':'›';}
+  if(btn){
+    btn.classList.toggle('open',_sidebarOpen);
+    var arr=document.getElementById('sb-toggle-arrow');
+    if(arr)arr.textContent=_sidebarOpen?'‹':'›';
+  }
   updateSidebar();
 }
 function _sbEl(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
@@ -11153,6 +11172,30 @@ function uploadSbAvatar(input) {
   reader.readAsDataURL(input.files[0]);
 }
 
+var _sbEditMode = false;
+
+function toggleProfileEdit() {
+  _sbEditMode = !_sbEditMode;
+  applySbProfileMode();
+  var btn = document.getElementById('sb-edit-btn');
+  if (btn) btn.textContent = _sbEditMode ? '✓' : '✏';
+}
+
+function applySbProfileMode() {
+  var u = null;
+  try { u = JSON.parse(localStorage.getItem('vi_user') || 'null'); } catch(e) {}
+  var isComplete = u && u.name && u.email;
+  var fields = document.getElementById('sb-profile-fields');
+  var editBtn = document.getElementById('sb-edit-btn');
+  if (isComplete && !_sbEditMode) {
+    if (fields) fields.style.display = 'none';
+    if (editBtn) editBtn.style.display = 'block';
+  } else {
+    if (fields) fields.style.display = 'block';
+    if (editBtn) editBtn.style.display = isComplete ? 'block' : 'none';
+  }
+}
+
 function renderPioneerCard() {
   var wrap = document.getElementById('sb-pioneer-card');
   if (!wrap) return;
@@ -11160,6 +11203,7 @@ function renderPioneerCard() {
     var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
     if (!u || !u.name) {
       wrap.innerHTML = '<div style="text-align:center;padding:10px 0;font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:var(--t3);letter-spacing:.08em">COMPLETE PROFILE TO UNLOCK CARD</div>';
+      applySbProfileMode();
       return;
     }
     var initials = (u.name || '?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
@@ -11192,6 +11236,7 @@ function renderPioneerCard() {
           '<div class="pc-footer" style="position:relative;z-index:1">VAULT·IT PIONEER · ' + joined + ' · ALPHA</div>' +
         '</div>' +
       '</div>';
+    applySbProfileMode();
   } catch(e) {}
 }
 
