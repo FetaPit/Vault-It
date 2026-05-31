@@ -29,8 +29,9 @@ if ('serviceWorker' in navigator) {
 <meta property="og:title" content="Vault·It — From Debt to Owning Your Home">
 <meta property="og:description" content="The only personal finance app built for the journey from debt to outright home ownership. Pioneer Edition.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://fetapit.github.io/Vault-It/">
-<meta property="og:image" content="https://fetapit.github.io/Vault-It/og-image.png">
+<meta property="og:url" content="https://vault-it.uk/">
+<meta property="og:image" content="https://vault-it.uk/og-image.png">
+<link rel="canonical" href="https://vault-it.uk/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Vault·It — From Debt to Owning Your Home">
 <meta name="twitter:description" content="From debt to owning your home outright. Pioneer Edition.">
@@ -1111,6 +1112,116 @@ body::before {
 .orbit-hint {
   display: none !important; /* replaced by HUD bar */
 }
+
+/* ── HUD pan D-pad cluster ── */
+.hud-pan-cluster {
+  display: grid;
+  grid-template-areas: ". u ." "l c r" ". d .";
+  grid-template-columns: 34px 34px 34px;
+  grid-template-rows: 34px 34px 34px;
+  gap: 2px;
+  align-items: center;
+}
+.hud-pan-cluster button { width: 34px; height: 34px; min-width: 34px; display: flex; align-items: center; justify-content: center; font-size: .7rem; }
+.hud-pan-u { grid-area: u; }
+.hud-pan-l { grid-area: l; }
+.hud-pan-c { grid-area: c; font-size: .5rem !important; }
+.hud-pan-r { grid-area: r; }
+.hud-pan-d { grid-area: d; }
+
+/* HUD buttons: proper touch targets */
+.hud-btn { min-width: 44px !important; min-height: 44px !important; height: 44px !important; font-size: .78rem !important; }
+@media (max-width: 600px) {
+  .hud-btn { min-width: 40px !important; min-height: 40px !important; height: 40px !important; }
+  .hud-pan-cluster button { width: 32px; height: 32px; min-width: 32px; }
+  .hud-pan-cluster { grid-template-columns: 32px 32px 32px; grid-template-rows: 32px 32px 32px; }
+}
+
+/* ── Three.js viewport nav overlay ── */
+.vi-3d-nav {
+  position: absolute;
+  bottom: 12px; right: 12px;
+  display: flex; flex-direction: column; gap: 4px;
+  z-index: 10;
+}
+.vi-3d-nav-row { display: flex; gap: 4px; }
+.vi-3d-btn {
+  width: 40px; height: 40px;
+  background: rgba(8,13,20,.88);
+  border: 1px solid rgba(68,192,185,.22);
+  border-radius: 6px;
+  color: rgba(68,192,185,.8);
+  font-size: .72rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(4px);
+}
+.vi-3d-btn:hover, .vi-3d-btn:active { background: rgba(68,192,185,.18); border-color: var(--em); color: var(--em); }
+.vi-3d-hint {
+  position: absolute;
+  bottom: 8px; left: 50%; transform: translateX(-50%);
+  background: rgba(8,13,20,.82);
+  border: 1px solid rgba(68,192,185,.12);
+  border-radius: 4px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .38rem; color: rgba(68,192,185,.55);
+  padding: 3px 8px; white-space: nowrap;
+  pointer-events: none; z-index: 10;
+  letter-spacing: .08em; text-transform: uppercase;
+  opacity: 1; transition: opacity .4s;
+}
+.vi-3d-hint.hidden { opacity: 0; }
+
+/* ── Background micro-animations ── */
+#vi-bg {
+  position: fixed; inset: 0; z-index: -2;
+  pointer-events: none; overflow: hidden;
+}
+.vi-bg-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(68,192,185,.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(68,192,185,.028) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: vi-bg-scroll 80s linear infinite;
+}
+@keyframes vi-bg-scroll {
+  from { background-position: 0 0; }
+  to   { background-position: 48px 48px; }
+}
+.vi-bg-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(4,4,8,.85) 100%);
+}
+/* Subtle scanlines */
+.vi-bg-scan {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.06) 3px, rgba(0,0,0,.06) 4px);
+  opacity: .6;
+}
+/* Floating blobs */
+.vi-bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  animation: vi-blob-drift 24s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.vi-bg-blob:nth-child(1) { width: 420px; height: 420px; top: -10%; left: -8%; background: radial-gradient(circle, rgba(68,192,185,.06), transparent 70%); animation-duration: 22s; }
+.vi-bg-blob:nth-child(2) { width: 320px; height: 320px; top: 40%; right: -6%; background: radial-gradient(circle, rgba(201,168,76,.05), transparent 70%); animation-duration: 28s; animation-delay: -8s; }
+.vi-bg-blob:nth-child(3) { width: 260px; height: 260px; bottom: -8%; left: 30%; background: radial-gradient(circle, rgba(62,207,142,.04), transparent 70%); animation-duration: 32s; animation-delay: -14s; }
+@keyframes vi-blob-drift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(30px,40px) scale(1.12); }
+}
+/* Nav bar ambient glow */
+@keyframes vi-nav-breath {
+  0%, 100% { box-shadow: 0 2px 20px rgba(68,192,185,.0); }
+  50%       { box-shadow: 0 2px 20px rgba(68,192,185,.07); }
+}
+#topnav { animation: vi-nav-breath 10s ease-in-out infinite; }
 
 .scene {
   border-top: none;
@@ -2219,8 +2330,8 @@ input:focus, textarea:focus, select:focus {
 
     <!-- STEP 1: Identity + goal -->
     <div id="w-step-1">
-      <div class="welcome-h2">The road from debt<br>to owning your home outright.</div>
-      <div class="welcome-sub">No jargon. No sales. Just a plan — built for the average person, not the average investor.</div>
+      <div class="welcome-h2">Register as an alpha tester<br>for lifetime access.</div>
+      <div class="welcome-sub">Join the founding cohort shaping Vault·It. Your details unlock the full app and secure your Pioneer status.</div>
       <div class="welcome-field">
         <label>First Name</label>
         <input type="text" class="welcome-inp" id="w-name" placeholder="Your first name" autocomplete="given-name">
@@ -2228,6 +2339,10 @@ input:focus, textarea:focus, select:focus {
       <div class="welcome-field">
         <label>Email Address</label>
         <input type="email" class="welcome-inp" id="w-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="welcome-field">
+        <label>WhatsApp / Phone</label>
+        <input type="tel" class="welcome-inp" id="w-phone-s1" placeholder="+44 7700 900000" autocomplete="tel">
       </div>
       <div class="welcome-question" style="margin-top:14px">What is your biggest financial challenge right now?</div>
       <div class="welcome-opts" id="w-opts">
@@ -2249,9 +2364,6 @@ input:focus, textarea:focus, select:focus {
         </button>
       </div>
       <button class="welcome-cta" onclick="wStep1Next()" style="margin-top:14px">Continue →</button>
-      <div style="text-align:center;margin-top:10px">
-        <button class="welcome-skip-link" onclick="skipWelcome()">Skip — explore the app first</button>
-      </div>
     </div>
 
     <!-- STEP 2: Profile setup (new users) -->
@@ -2276,14 +2388,7 @@ input:focus, textarea:focus, select:focus {
           <input type="number" class="welcome-inp" id="w-house" placeholder="e.g. 200000" min="0">
         </div>
       </div>
-      <div class="welcome-field">
-        <label>Phone <span style="color:var(--t3);font-weight:400">(optional · for account recovery)</span></label>
-        <input type="tel" class="welcome-inp" id="w-phone" placeholder="+44 7700 900000" autocomplete="tel">
-      </div>
       <button class="welcome-cta" onclick="wStep2Submit()" style="margin-top:14px">Start Vaulting →</button>
-      <div style="text-align:center;margin-top:8px">
-        <button class="welcome-skip-link" onclick="wStep2Skip()">Skip profile — fill in later</button>
-      </div>
     </div>
 
     <!-- STEP 3: First milestone -->
@@ -2317,6 +2422,94 @@ input:focus, textarea:focus, select:focus {
   </div>
 </div>
 
+
+<!-- ══ CAMPAIGN / CROWDFUNDER MODAL ══ -->
+<div id="vi-campaign-modal" class="hidden">
+  <div class="vi-camp-wrap">
+    <div class="vi-camp-hdr">
+      <button class="vi-camp-close" onclick="document.getElementById('vi-campaign-modal').classList.add('hidden')">✕</button>
+      <div class="vi-camp-eyebrow">⚡ Crowdfund · Open Now</div>
+      <div class="vi-camp-headline">Invest in you, via us.</div>
+      <p class="vi-camp-sub">Vault·It is the financial operating system you own. Back the build early — lock in your price forever, and help shape what gets built next.</p>
+    </div>
+    <div class="vi-camp-body">
+      <!-- Progress -->
+      <div class="vi-camp-progress">
+        <div class="vi-camp-stats">
+          <div class="vi-camp-stat">
+            <span class="vi-camp-stat-val" id="camp-backers">—</span>
+            <span class="vi-camp-stat-lbl">Backers</span>
+          </div>
+          <div class="vi-camp-stat">
+            <span class="vi-camp-stat-val" id="camp-pct">—</span>
+            <span class="vi-camp-stat-lbl">Funded</span>
+          </div>
+          <div class="vi-camp-stat">
+            <span class="vi-camp-stat-val" id="camp-days">—</span>
+            <span class="vi-camp-stat-lbl">Days left</span>
+          </div>
+        </div>
+        <div class="vi-camp-bar-track">
+          <div class="vi-camp-bar-fill" id="camp-bar-fill" style="width:0%"></div>
+        </div>
+        <div class="vi-camp-bar-lbl" id="camp-bar-lbl"></div>
+      </div>
+      <!-- Tier cards -->
+      <div class="vi-camp-tiers">
+        <!-- Free -->
+        <div class="vi-camp-tier">
+          <div class="vi-camp-tier-badge"></div>
+          <div class="vi-camp-tier-name">Free</div>
+          <div class="vi-camp-tier-price">£0</div>
+          <div class="vi-camp-tier-note">Always free. Core tools forever.</div>
+          <ul class="vi-camp-tier-features">
+            <li>Dashboard &amp; KPIs</li>
+            <li>Journey map</li>
+            <li>House builder</li>
+            <li>Debt tracker</li>
+            <li class="vi-dim">Entrepreneur tools</li>
+            <li class="vi-dim">NW History</li>
+            <li class="vi-dim">3D Vault</li>
+          </ul>
+          <button class="vi-camp-tier-cta vi-camp-cta-ghost" disabled>No commitment needed</button>
+        </div>
+        <!-- Pro Backer (featured) -->
+        <div class="vi-camp-tier vi-camp-featured">
+          <div class="vi-camp-tier-badge">Most Popular</div>
+          <div class="vi-camp-tier-name">Pro Backer</div>
+          <div class="vi-camp-tier-price">£49.99<span>/yr</span></div>
+          <div class="vi-camp-tier-note">Early backer rate — renews at same price as long as you stay subscribed.</div>
+          <ul class="vi-camp-tier-features">
+            <li>Everything in Free</li>
+            <li>Entrepreneur tab</li>
+            <li>NW History</li>
+            <li>3D Vault visualization</li>
+            <li>Full analytics suite</li>
+            <li>Backer credit</li>
+          </ul>
+          <button class="vi-camp-tier-cta vi-camp-cta-em" onclick="showUpgrade('annual'); document.getElementById('vi-campaign-modal').classList.add('hidden')">Invest in yourself — £49.99/yr →</button>
+        </div>
+        <!-- Founding Member -->
+        <div class="vi-camp-tier vi-camp-gold-tier">
+          <div class="vi-camp-tier-badge" id="camp-founder-slots">Limited spots</div>
+          <div class="vi-camp-tier-name">Founding Member</div>
+          <div class="vi-camp-tier-price">£149<span> once</span></div>
+          <div class="vi-camp-tier-note">Pay once, own it forever. Your name goes in the credits.</div>
+          <ul class="vi-camp-tier-features">
+            <li>Lifetime Pro access</li>
+            <li>Founding badge in app</li>
+            <li>Name in credits</li>
+            <li>Priority feature votes</li>
+            <li>Founders-only channel</li>
+            <li>Direct roadmap input</li>
+          </ul>
+          <button class="vi-camp-tier-cta vi-camp-cta-gold" onclick="showUpgrade('founder'); document.getElementById('vi-campaign-modal').classList.add('hidden')">Invest once. Own it forever →</button>
+        </div>
+      </div>
+      <p style="font-size:.44rem;color:var(--t3);text-align:center;line-height:1.6">Secure checkout via Stripe · Cancel anytime (Pro) · No recurring charge for Founders<br>Questions? <a href="mailto:connect@vault-it.uk" style="color:var(--em)">connect@vault-it.uk</a></p>
+    </div>
+  </div>
+</div>
 
 <!-- ══ PRO OFFER MODAL — returning user upsell ══ -->
 <div id="pro-offer-modal" class="vi-modal-overlay hidden">
@@ -2388,24 +2581,67 @@ input:focus, textarea:focus, select:focus {
         <div id="offer-task-list" class="vi-modal-task-list"></div>
       </div>
 
-      <!-- Pricing -->
-      <div class="vi-modal-pricing" id="offer-pricing-block">
-        <div class="vi-modal-price-row">
-          <div>
-            <div class="vi-modal-price" id="offer-price">£5.99/mo</div>
-            <div class="vi-modal-price-note" id="offer-saving"></div>
+      <!-- 3-tier comparison -->
+      <div class="vi-tier-wrap">
+        <div class="vi-tier-table">
+          <!-- Free -->
+          <div class="vi-tier-col">
+            <div class="vi-tier-popular"></div>
+            <div class="vi-tier-name">Free</div>
+            <div class="vi-tier-price">£0</div>
+            <div class="vi-tier-saving">Core tools, always free</div>
+            <ul class="vi-tier-features">
+              <li>Dashboard &amp; KPIs</li>
+              <li>Journey map</li>
+              <li>House builder</li>
+              <li>Debt tracker</li>
+              <li class="vi-no">Entrepreneur</li>
+              <li class="vi-no">NW History</li>
+              <li class="vi-no">3D Vault</li>
+            </ul>
+            <button class="vi-tier-cta vi-tier-cta-ghost" disabled>Current plan</button>
           </div>
-          <div style="text-align:right">
-            <div class="vi-modal-price vi-modal-price-annual" id="offer-annual-price">£59.99/yr</div>
-            <div class="vi-modal-price-note" id="offer-annual-note">Best value — early backer rate</div>
+          <!-- Pro (featured) -->
+          <div class="vi-tier-col vi-tier-featured">
+            <div class="vi-tier-popular">Most Popular</div>
+            <div class="vi-tier-name">Pro</div>
+            <div class="vi-tier-price" id="offer-price">£5.99<span>/mo</span></div>
+            <div class="vi-tier-saving" id="offer-saving" style="display:none"></div>
+            <ul class="vi-tier-features">
+              <li>Everything in Free</li>
+              <li>Entrepreneur tab</li>
+              <li>NW History</li>
+              <li>3D Vault</li>
+              <li>Analytics suite</li>
+              <li>Early access</li>
+              <li>Priority support</li>
+            </ul>
+            <button class="vi-tier-cta vi-tier-cta-primary" id="offer-cta-annual" onclick="showUpgrade('annual'); document.getElementById('pro-offer-modal').classList.add('hidden')">
+              <span id="offer-annual-price">£49.99/yr</span> — Annual
+            </button>
+            <button class="vi-tier-cta vi-tier-cta-secondary" id="offer-cta-monthly" onclick="showUpgrade('monthly'); document.getElementById('pro-offer-modal').classList.add('hidden')">Monthly billing</button>
+            <div class="vi-tier-annual-note" id="offer-annual-note">Early backer rate</div>
+            <div class="vi-modal-expires" id="offer-expires" style="text-align:center;margin-top:4px"></div>
+          </div>
+          <!-- Founding Member -->
+          <div class="vi-tier-col vi-tier-founder">
+            <div class="vi-tier-popular" style="color:var(--go)">Limited · Founder</div>
+            <div class="vi-tier-name">Founder</div>
+            <div class="vi-tier-price" style="color:var(--go)">£149<span> once</span></div>
+            <div class="vi-tier-saving">Lifetime · pay once</div>
+            <ul class="vi-tier-features">
+              <li>Everything in Pro</li>
+              <li>Lifetime access</li>
+              <li>Founder badge</li>
+              <li>Name in credits</li>
+              <li>Priority requests</li>
+              <li>Roadmap voting</li>
+              <li>Founders channel</li>
+            </ul>
+            <button class="vi-tier-cta vi-tier-cta-founder" onclick="showUpgrade('founder'); document.getElementById('pro-offer-modal').classList.add('hidden')">Invest once. Own it forever →</button>
           </div>
         </div>
-        <div class="vi-modal-expires" id="offer-expires"></div>
       </div>
-
-      <!-- CTAs -->
-      <button class="vi-cta-primary" id="offer-cta-annual" onclick="showUpgrade('annual'); document.getElementById('pro-offer-modal').classList.add('hidden')">Upgrade Annual — Best Value →</button>
-      <button class="vi-cta-secondary" id="offer-cta-monthly" onclick="showUpgrade('monthly'); document.getElementById('pro-offer-modal').classList.add('hidden')">Monthly billing instead</button>
       <button class="vi-cta-ghost" onclick="document.getElementById('pro-offer-modal').classList.add('hidden')">Continue on free tier</button>
     </div>
   </div>
@@ -2415,19 +2651,51 @@ input:focus, textarea:focus, select:focus {
     <div style="width:22px;height:22px;flex-shrink:0;animation:vi-logo-spin 12s linear infinite"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="nglow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#44c0b9" stop-opacity="0.15"/><stop offset="100%" stop-color="#44c0b9" stop-opacity="0"/></radialGradient></defs><circle cx="16" cy="16" r="16.5" fill="url(#nglow)"/><circle cx="16" cy="16" r="15" fill="#0a1a1a" stroke="#44c0b9" stroke-width="0.7"/><circle cx="16" cy="16" r="12.5" fill="#040c10"/><circle cx="16" cy="16" r="12.5" fill="none" stroke="#44c0b9" stroke-width="0.3" opacity="0.4"/><polyline points="9,11.5 16,21 23,11.5" fill="none" stroke="#44c0b9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.25"/><polyline points="9,11.5 16,21 23,11.5" fill="none" stroke="#44c0b9" stroke-width="1.0" stroke-linecap="square" stroke-linejoin="miter"/><circle cx="16" cy="16" r="0.9" fill="#44c0b9" opacity="0.5"/></svg></div>
     <span class="logo" style="margin:0">Vault<span>·It</span></span>
   </div>
-  <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
-  <button class="tab-btn" onclick="showTab('journey')">Journey</button>
-  <button class="tab-btn" onclick="showTab('house')">House Builder</button>
-  <button class="tab-btn" onclick="showTab('assets')">Assets &amp; Liabilities</button>
-  <button class="tab-btn" onclick="showTab('debt')">Debt Tracker</button>
-  <button class="tab-btn" onclick="showTab('biz');setTimeout(function(){var g=document.getElementById('pro-gate-biz');if(g&&g.style.display!=='none'){gateNudge('Entrepreneur','Income streams + CRM');}},100)">Entrepreneur<span class='pro-badge'>PRO</span></button>
-  <button class="tab-btn" onclick="showTab('achievements')">Achievements</button>
-  <button class="tab-btn" onclick="showTab('connections')">Connections</button>
+  <button class="tab-btn active" onclick="showTab('overview')">
+    <svg class="ti" viewBox="0 0 16 16"><rect x="1" y="1" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="1" width="5.5" height="5.5" rx="1"/><rect x="1" y="9.5" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1"/></svg>
+    <span>Overview</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('journey')">
+    <svg class="ti" viewBox="0 0 16 16"><path d="M3 14V3l8 3-8 3"/></svg>
+    <span>Journey</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('house')">
+    <svg class="ti" viewBox="0 0 16 16"><path d="M1.5 9L8 2.5 14.5 9V14.5H10V11H6v3.5H1.5V9z"/></svg>
+    <span>House Builder</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('assets')">
+    <svg class="ti" viewBox="0 0 16 16"><rect x="1" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="6" width="3" height="8" rx=".5"/><rect x="12" y="3" width="3" height="11" rx=".5"/></svg>
+    <span>Assets &amp; Liabilities</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('debt')">
+    <svg class="ti" viewBox="0 0 16 16"><polyline points="1,4.5 5,9.5 9,7 15,13"/><polyline points="11.5,13 15,13 15,9.5"/></svg>
+    <span>Debt Tracker</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('biz');setTimeout(function(){var g=document.getElementById('pro-gate-biz');if(g&&g.style.display!=='none'){gateNudge('Entrepreneur','Income streams + CRM');}},100)">
+    <svg class="ti" viewBox="0 0 16 16"><path d="M9.5 1.5L4 9h5.5L8 14.5l7.5-8.5H9.5z"/></svg>
+    <span>Entrepreneur<span class='pro-badge'>PRO</span></span>
+  </button>
+  <button class="tab-btn" onclick="showTab('achievements')">
+    <svg class="ti" viewBox="0 0 16 16"><path d="M4.5 1.5h7v5c0 3-3 4-3.5 4S4.5 9.5 4.5 6.5v-5z"/><path d="M2.5 6H4.5M11.5 6H13.5"/><line x1="8" y1="10.5" x2="8" y2="12.5"/><rect x="5" y="12.5" width="6" height="1.5" rx=".5"/></svg>
+    <span>Achievements</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('connections')">
+    <svg class="ti" viewBox="0 0 16 16"><circle cx="8" cy="3" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="13" cy="13" r="1.5"/><line x1="7.1" y1="4.4" x2="3.9" y2="11.6"/><line x1="8.9" y1="4.4" x2="12.1" y2="11.6"/><line x1="4.5" y1="13" x2="11.5" y2="13"/></svg>
+    <span>Connections</span>
+  </button>
   <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-left:10px;margin-left:auto">
     <span style="font-family:'Syne',sans-serif;font-size:.44rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--t3)">NET WORTH</span>
     <span id="nav-nw" style="font-family:'Share Tech Mono',monospace;font-size:.74rem;color:var(--em)">£0</span>
   </div>
-  <span style="padding:3px 9px;background:rgba(68,192,185,.1);border:1px solid rgba(68,192,185,.2);border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:rgba(68,192,185,.7);flex-shrink:0">α&nbsp;0.5</span>
+  <!-- Back Us campaign button -->
+  <button id="vi-back-us-btn" onclick="viShowCampaign()">⚡ Invest in You</button>
+  <!-- Density toggle -->
+  <div id="vi-density-btn" title="Layout density: Compact / Default / Wide">
+    <button class="vi-d-opt" data-d="compact" onclick="setDensity('compact')"><span class="vi-d-lbl">Compact</span><span class="vi-d-ico">▪</span></button>
+    <button class="vi-d-opt active" data-d="default" onclick="setDensity('default')"><span class="vi-d-lbl">Default</span><span class="vi-d-ico">▪▪</span></button>
+    <button class="vi-d-opt" data-d="wide" onclick="setDensity('wide')"><span class="vi-d-lbl">Wide</span><span class="vi-d-ico">▪▪▪</span></button>
+  </div>
+  <span style="padding:3px 9px;background:rgba(68,192,185,.1);border:1px solid rgba(68,192,185,.2);border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:rgba(68,192,185,.7);flex-shrink:0;margin-left:6px">α&nbsp;0.6</span>
 </nav>
 
 <!-- ═══════════════════════════════════════════
@@ -2435,6 +2703,30 @@ input:focus, textarea:focus, select:focus {
 ═══════════════════════════════════════════ -->
 <div id="tab-overview" class="tab-panel active">
 <div id="ov-page">
+
+  <!-- Dev contact bento card -->
+  <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin-bottom:14px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--em)"></div>
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABGAFgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUAAwYHAgH/xAA1EAACAQMCAwYEBQMFAAAAAAABAgMABBEFIRIxYQYTQVFxgSIyQpEHFCOhwTNSYkNEsdHw/8QAGQEAAwEBAQAAAAAAAAAAAAAAAgMEAQUA/8QAIBEAAwACAgIDAQAAAAAAAAAAAAECAxESMQQhEzNBcf/aAAwDAQACEQMRAD8A5banMS9BiitJtu91ZpCNoxn3NCWO8betNrJltrC5n+o/CPXkKNvUmRPK9ID1ENcu959Hed2vUAf++9CqlG34EYgtB/oRgsP8m3P7YFVRqo3bA8s0GuM7Y62qtpHlLd5CAMDPLiOM1fJo9wi5JUt/aKeWmi315bo9raSGQHPeMnCB9xRL9m7yACW4uj3nMhRnFT/M9jl4+0Y4wsvNSK8lKeNbSd9JDM4JHy7Yz5UqaPFURXInuOLBGWqWFGOvShnFawCmpX01Kw8MLBf0fUmmNpG07xQkforLxyHz6UJp6/op6U001dyetM47WgJyOK5IobR725upLh2iBkcsRk+PtRGlWgXXIoHGVSZVJPIbgZPTenMa7V8srVJtcmt3Clbu2YANy4gM/wAZrM31sPBXLIkb+fVdNjUW352ASY2XjFINS1TTu9Mf5pSwznh3x9qtuOzoubyF5IWVAoV2MoKlcAYAz7UhuNOhh1SZILeMwtJlYwwUIenhjeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95co8WEh2RTc4GPXeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95coWKYYXGMHP4pq9nHHHIqL8CnAqtPp24hTgHzFPLRQkCgDGBitOHFqzElVpVJaHFr4rgnFX4OatjFGwzSb1R42cFYoUFY6f/Z" alt="Pete Thickett" style="width:72px;height:auto;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));flex-shrink:0;object-fit:cover">
+    <div style="flex:1;min-width:0">
+      <div style="font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;color:var(--tx);margin-bottom:2px">Message the Dev</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:.52rem;color:var(--t2);margin-bottom:8px;line-height:1.4">Beta feedback shapes every release. Got an idea, bug, or just want to say hi?</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <a href="mailto:pete@ptlive.design" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);text-decoration:none;padding:4px 8px;border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          pete@ptlive.design
+        </a>
+        <a href="https://wa.me/447470074133" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:#25d366;text-decoration:none;padding:4px 8px;border:1px solid rgba(37,211,102,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+          WhatsApp
+        </a>
+        <a href="https://instagram.com/petet_live" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:#e1306c;text-decoration:none;padding:4px 8px;border:1px solid rgba(225,48,108,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="currentColor"/></svg>
+          @petet_live
+        </a>
+      </div>
+    </div>
+  </div>
 
   <!-- KPI Strip -->
   <div class="ov-kpis">
@@ -2513,6 +2805,16 @@ input:focus, textarea:focus, select:focus {
       <div id="nw-zoom-hint" style="position:absolute;top:6px;right:8px;font-size:.46rem;color:rgba(68,192,185,.4);font-family:'Share Tech Mono',monospace;pointer-events:none">Scroll=zoom · Drag=pan · Dbl-click=reset</div>
     </div>
     <div id="chart-tooltip" style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--t2);margin-top:8px;text-align:center;min-height:16px"></div>
+  </div>
+
+  <!-- Net Worth History entry card — Pro -->
+  <div class="ov-chart-card" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div style="flex:1;min-width:180px">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.7rem;color:var(--tx);margin-bottom:4px">📅 Net Worth History <span style="font-size:.44rem;color:var(--go);background:rgba(247,179,85,.12);border:1px solid rgba(247,179,85,.2);padding:2px 7px;font-family:'Share Tech Mono',monospace;letter-spacing:.08em;vertical-align:middle">PRO</span></div>
+      <div style="font-size:.55rem;color:var(--t2);line-height:1.5">Retroactively track your financial journey since 18 — see every high, low, and turning point.</div>
+      <div id="nwh-mini-wrap" style="margin-top:10px;height:36px;position:relative"></div>
+    </div>
+    <button onclick="openNwHistory()" style="flex-shrink:0;padding:9px 20px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:.58rem;cursor:pointer;letter-spacing:.06em">View Journey →</button>
   </div>
 
   <!-- LIVE BREAKDOWN -->
@@ -2764,9 +3066,17 @@ input:focus, textarea:focus, select:focus {
       <!-- HUD control bar -->
       <div class="hud-bar" id="hud-bar-house">
         <div class="hud-cluster">
-          <button class="hud-btn" id="hud-zoom-in"  onclick="houseZoomIn()"  title="Zoom In"  aria-label="Zoom in">+</button>
-          <button class="hud-btn" id="hud-zoom-out" onclick="houseZoomOut()" title="Zoom Out" aria-label="Zoom out">−</button>
+          <button class="hud-btn" id="hud-zoom-in"  onclick="houseZoomIn()"  title="Zoom In"  aria-label="Zoom in" style="font-size:1rem;font-weight:700">+</button>
+          <button class="hud-btn" id="hud-zoom-out" onclick="houseZoomOut()" title="Zoom Out" aria-label="Zoom out" style="font-size:1.1rem;font-weight:700">−</button>
           <button class="hud-btn" id="hud-reset"    onclick="resetView()"    title="Reset view" aria-label="Reset camera">↺</button>
+        </div>
+        <!-- Pan D-pad -->
+        <div class="hud-pan-cluster">
+          <button class="hud-btn hud-pan-btn hud-pan-u" onclick="housePan(0,-28)" title="Pan up" aria-label="Pan up">▲</button>
+          <button class="hud-btn hud-pan-btn hud-pan-l" onclick="housePan(-28,0)" title="Pan left" aria-label="Pan left">◀</button>
+          <button class="hud-btn hud-pan-btn hud-pan-c" onclick="resetView()" title="Centre" aria-label="Centre view" style="font-size:.5rem">⊙</button>
+          <button class="hud-btn hud-pan-btn hud-pan-r" onclick="housePan(28,0)"  title="Pan right" aria-label="Pan right">▶</button>
+          <button class="hud-btn hud-pan-btn hud-pan-d" onclick="housePan(0,28)"  title="Pan down" aria-label="Pan down">▼</button>
         </div>
         <div class="hud-mode-toggle">
           <button class="hud-btn hud-toggle" id="hud-orbit-toggle" onclick="toggleOrbitMode()" title="Toggle orbit/pan" aria-label="Toggle orbit mode">
@@ -2788,8 +3098,14 @@ input:focus, textarea:focus, select:focus {
         <span class="hud-readout-item" style="opacity:.55">1-FINGER ORBIT · 2-FINGER PAN · PINCH ZOOM</span>
         <span class="hud-mobile-hint" style="display:none;opacity:.55">Pinch to zoom · Drag to orbit</span>
       </div>
-      <div class="scene">
+      <div class="scene" style="position:relative">
         <svg id="houseSvg" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;min-height:360px"></svg>
+        <div id="house-pro-lock" style="position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,8,8,.82);backdrop-filter:blur(6px);text-align:center;padding:24px">
+          <div style="font-size:1.8rem;margin-bottom:10px">🔒</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;color:var(--tx);margin-bottom:6px">Your house fills as you save</div>
+          <div style="font-size:.58rem;color:var(--t2);line-height:1.6;max-width:260px;margin-bottom:16px">Every deposit adds bricks. Watch your home being built in real time. Pro only.</div>
+          <button onclick="showUpgrade('annual')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:.6rem;cursor:pointer;letter-spacing:.06em">Invest in yourself →</button>
+        </div>
       </div>
       <div class="scene-cap" id="sceneCap" style="display:none"></div>
     </div>
@@ -2884,17 +3200,36 @@ input:focus, textarea:focus, select:focus {
 <div style="max-width:1140px;margin:16px auto 0;padding:0 20px">
 <div class="g2" style="margin-top:12px">
   <div class="ov-chart-card">
-    <div class="ov-chart-title" style="margin-bottom:10px">Upload 3D Model</div>
+    <div class="ov-chart-title" style="margin-bottom:10px">Upload 3D Model <span style="font-size:.45rem;padding:2px 6px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:3px;color:var(--go);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em">PRO</span></div>
     <p style="font-size:.58rem;color:var(--t3);margin-bottom:8px">Load your own GLB/GLTF 3D house model to view in the viewport.</p>
     <input type="file" id="model-file-input" accept=".glb,.gltf" style="display:none" onchange="loadCustomModel(this)">
     <button class="btn-add-data" onclick="document.getElementById('model-file-input').click()" style="width:100%;margin-bottom:6px">📁 Upload GLB / GLTF</button>
     <button id="btn-close-3d" class="btn-add-data" style="display:none;width:100%;background:transparent;border-color:var(--t3);color:var(--t3)" onclick="closeCustomModel()">✕ Close 3D View</button>
-    <div id="threejs-viewport" style="display:none;width:100%;height:320px;border-radius:8px;overflow:hidden;margin-top:10px;border:1px solid var(--bd)">
+    <div id="threejs-viewport" style="display:none;width:100%;height:320px;border-radius:8px;overflow:hidden;margin-top:10px;border:1px solid var(--bd);position:relative">
       <canvas id="threejs-canvas" style="width:100%;height:100%;display:block"></canvas>
+      <!-- 3D nav overlay -->
+      <div class="vi-3d-nav">
+        <div class="vi-3d-nav-row">
+          <button class="vi-3d-btn" onclick="_threeOrbit('up')"    title="Orbit up">▲</button>
+        </div>
+        <div class="vi-3d-nav-row">
+          <button class="vi-3d-btn" onclick="_threeOrbit('left')"  title="Orbit left">◀</button>
+          <button class="vi-3d-btn" onclick="_threeReset()"        title="Reset view">↺</button>
+          <button class="vi-3d-btn" onclick="_threeOrbit('right')" title="Orbit right">▶</button>
+        </div>
+        <div class="vi-3d-nav-row">
+          <button class="vi-3d-btn" onclick="_threeOrbit('down')"  title="Orbit down">▼</button>
+        </div>
+        <div class="vi-3d-nav-row" style="margin-top:2px">
+          <button class="vi-3d-btn" onclick="_threeZoomIn()"  title="Zoom in"  style="flex:1">+</button>
+          <button class="vi-3d-btn" onclick="_threeZoomOut()" title="Zoom out" style="flex:1">−</button>
+        </div>
+      </div>
+      <div class="vi-3d-hint" id="vi-3d-hint-txt">1-finger rotate · 2-finger pan · pinch zoom</div>
     </div>
   </div>
   <div class="ov-chart-card">
-    <div class="ov-chart-title" style="margin-bottom:10px">Generate with AI</div>
+    <div class="ov-chart-title" style="margin-bottom:10px">Generate with AI <span style="font-size:.45rem;padding:2px 6px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:3px;color:var(--go);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em">PRO</span></div>
     <p style="font-size:.58rem;color:var(--t3);margin-bottom:8px">Describe your dream home and Meshy AI will generate a 3D model. Requires a Meshy API key (set in ⚙ Settings).</p>
     <textarea id="meshy-prompt" class="al-inp" rows="3" placeholder="e.g. A modern detached house with large windows, white render, flat roof and a double garage..." style="width:100%;resize:vertical"></textarea>
     <button class="btn-add-data" onclick="generateMeshyModel()" style="width:100%;margin-top:8px">✨ Generate 3D House</button>
@@ -2910,11 +3245,26 @@ input:focus, textarea:focus, select:focus {
 <div id="tab-assets" class="tab-panel" style="display:none">
   <div id="assets-page" style="max-width:1100px;margin:0 auto;padding:24px 20px 60px">
     <div class="subtab-nav" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-      <button class="subtab-btn active" onclick="showSubtab('assets','metals',this)">⚜️ Precious Metals</button>
-      <button class="subtab-btn" onclick="showSubtab('assets','crypto',this)">₿ Crypto</button>
-      <button class="subtab-btn" onclick="showSubtab('assets','cash',this)">🏦 Cash &amp; Savings</button>
-      <button class="subtab-btn" onclick="showSubtab('assets','other',this)">📦 Wealth Inventory</button>
-      <button class="subtab-btn" onclick="showSubtab('assets','liabilities',this)">⚠️ Liabilities</button>
+      <button class="subtab-btn active" onclick="showSubtab('assets','metals',this)">
+        <svg class="sti" viewBox="0 0 16 16"><rect x="2" y="5.5" width="12" height="5" rx="1"/><line x1="5.5" y1="5.5" x2="5.5" y2="10.5"/><line x1="8" y1="5.5" x2="8" y2="10.5"/><line x1="10.5" y1="5.5" x2="10.5" y2="10.5"/></svg>
+        <span>Precious Metals</span>
+      </button>
+      <button class="subtab-btn" onclick="showSubtab('assets','crypto',this)">
+        <svg class="sti" viewBox="0 0 16 16"><path d="M5 3.5h5c1.5 0 2.5.9 2.5 2.3S11.5 8 10 8H5m0 0h5.5c1.5 0 2.5.9 2.5 2.3S11 12.5 9.5 12.5H5"/><line x1="7" y1="2.5" x2="7" y2="13.5"/><line x1="9" y1="2.5" x2="9" y2="13.5"/></svg>
+        <span>Crypto</span>
+      </button>
+      <button class="subtab-btn" onclick="showSubtab('assets','cash',this)">
+        <svg class="sti" viewBox="0 0 16 16"><rect x="1" y="4" width="14" height="8" rx="1.5"/><circle cx="8" cy="8" r="2"/><circle cx="3.5" cy="8" r=".5" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r=".5" fill="currentColor" stroke="none"/></svg>
+        <span>Cash &amp; Savings</span>
+      </button>
+      <button class="subtab-btn" onclick="showSubtab('assets','other',this)">
+        <svg class="sti" viewBox="0 0 16 16"><path d="M8 1.5l6 3v6L8 14l-6-3.5v-6z"/><polyline points="2,4.5 8,7.5 14,4.5"/><line x1="8" y1="7.5" x2="8" y2="14"/></svg>
+        <span>Wealth Inventory</span>
+      </button>
+      <button class="subtab-btn" onclick="showSubtab('assets','liabilities',this)">
+        <svg class="sti" viewBox="0 0 16 16"><path d="M8 2L1.5 13.5h13L8 2z"/><line x1="8" y1="7" x2="8" y2="10"/><circle cx="8" cy="11.8" r=".6" fill="currentColor" stroke="none"/></svg>
+        <span>Liabilities</span>
+      </button>
       <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--em);white-space:nowrap">
         Total: <span id="tab-total-assets" style="font-weight:700">£0</span>
       </div>
@@ -3105,7 +3455,7 @@ input:focus, textarea:focus, select:focus {
         <div class="pro-gate-sub" style="margin-bottom:16px">Complete these 5 steps to unlock your Pro trial</div>
         <div id="pro-gate-tasklist" style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:280px;margin-bottom:16px"></div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--em);margin-bottom:14px">Alpha: £5.99/mo · £59.99/yr</div>
-        <button class="pro-gate-btn" id="pro-gate-main-btn" onclick="showUpgrade('annual')">Unlock Pro — Early Backer Rate →</button>
+        <button class="pro-gate-btn" id="pro-gate-main-btn" onclick="showUpgrade('annual')">Invest in yourself — early backer rate →</button>
       </div>
     </div>
     <div class="advisor-card orange">
@@ -3267,6 +3617,16 @@ input:focus, textarea:focus, select:focus {
   </div>
 </div>
 
+<!-- Background ambient layer -->
+<div id="vi-bg" aria-hidden="true">
+  <div class="vi-bg-grid"></div>
+  <div class="vi-bg-scan"></div>
+  <div class="vi-bg-blob"></div>
+  <div class="vi-bg-blob"></div>
+  <div class="vi-bg-blob"></div>
+  <div class="vi-bg-vignette"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- Settings Modal -->
@@ -3335,6 +3695,17 @@ input:focus, textarea:focus, select:focus {
       <input type="password" id="set-meshy-key" class="al-inp" placeholder="msy_..." style="width:100%;margin-bottom:6px">
       <div style="font-size:.52rem;color:var(--t3);line-height:1.5">
         Go to <span style="color:var(--em)">meshy.ai</span> → Sign up → API Keys. Used for AI-generated 3D house models in House Builder.
+      </div>
+    </div>
+
+    <!-- ConvertKit -->
+    <div style="margin-bottom:20px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--bd)">
+      <label class="ov-kpi-lbl" style="font-size:.55rem;display:block;margin-bottom:6px">ConvertKit Form ID <span style="color:var(--t3)">(email list)</span></label>
+      <input type="text" id="set-ck-form" class="al-inp" placeholder="e.g. 1234567" style="width:100%;margin-bottom:10px">
+      <label class="ov-kpi-lbl" style="font-size:.55rem;display:block;margin-bottom:6px">ConvertKit API Key</label>
+      <input type="password" id="set-ck-key" class="al-inp" placeholder="v3 API key" style="width:100%;margin-bottom:6px">
+      <div style="font-size:.52rem;color:var(--t3);line-height:1.5">
+        <span style="color:var(--em)">convertkit.com</span> → Forms → pick your form → copy the numeric ID from the URL. API key from Account Settings → API Keys. Pioneers are added to your list automatically on sign-up.
       </div>
     </div>
 
@@ -3550,6 +3921,445 @@ input:focus, textarea:focus, select:focus {
   to   { background-position: 0 80px; }
 }
 body::before { animation: vi-scanline-drift 6s linear infinite; }
+/* ── Net Worth History ── */
+.nwh-modal{position:fixed;inset:0;z-index:3000;background:rgba(4,4,4,.97);display:flex;flex-direction:column;overflow:hidden}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE OVERHAUL
+   1. Density system   → body.vi-compact | default | body.vi-wide
+   2. Unified breaks   → xs:320 sm:480 md:768 lg:1024
+   3. Scrollable nav   → mobile top-nav: overflow-x:auto, touch-friendly
+   4. Container quries → component-level adaptation
+   5. Fluid type       → clamp() on key text
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. DENSITY: COMPACT ── */
+body.vi-compact { --nav-h: 40px; }
+body.vi-compact #topnav { height: 40px; }
+body.vi-compact .tab-btn { height: 40px !important; padding: 0 10px !important; font-size: .52rem !important; letter-spacing: .08em !important; }
+body.vi-compact .ov-chart-card,
+body.vi-compact .ov-data-card,
+body.vi-compact .ov-ms-card { padding: 10px 12px !important; }
+body.vi-compact .ov-kpis { gap: 6px !important; }
+body.vi-compact .ov-kpi { padding: 8px 10px !important; }
+body.vi-compact .ov-kpi-val { font-size: .8rem !important; }
+body.vi-compact .ov-kpi-lbl { font-size: .44rem !important; }
+body.vi-compact .ov-kpi-sub { display: none !important; }
+body.vi-compact .advisor-card { padding: 10px 12px !important; font-size: .54rem !important; }
+body.vi-compact #ov-fire-banner { padding: 7px 12px !important; }
+body.vi-compact #nwChart { height: 160px !important; }
+body.vi-compact .ov-chart-hd { padding-bottom: 4px !important; }
+body.vi-compact .jrny-bento-item,
+body.vi-compact .jrny-gary-card { padding: 10px !important; }
+
+/* ── 1. DENSITY: WIDE ── */
+body.vi-wide #topnav { height: 56px; }
+body.vi-wide .tab-btn { height: 56px !important; padding: 0 22px !important; font-size: .72rem !important; }
+body.vi-wide .logo { font-size: 1rem !important; }
+body.vi-wide .ov-chart-card,
+body.vi-wide .ov-data-card { padding: 24px 28px !important; }
+body.vi-wide .ov-kpis { gap: 16px !important; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)) !important; }
+body.vi-wide .ov-kpi { padding: 16px 18px !important; }
+body.vi-wide .ov-kpi-val { font-size: 1.15rem !important; }
+body.vi-wide .ov-kpi-lbl { font-size: .58rem !important; }
+body.vi-wide .ov-kpi-sub { font-size: .54rem !important; }
+body.vi-wide .advisor-card { padding: 20px 24px !important; font-size: .68rem !important; line-height: 1.85; }
+body.vi-wide #nwChart { height: 300px !important; }
+
+/* ── Density toggle widget ── */
+#vi-density-btn {
+  display: flex; align-items: center; gap: 2px; flex-shrink: 0;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(68,192,185,.15);
+  border-radius: 4px; padding: 3px; margin-left: 8px;
+}
+.vi-d-opt {
+  background: transparent; border: none;
+  color: var(--t3); font-family: 'Share Tech Mono', monospace;
+  font-size: .42rem; cursor: pointer; padding: 3px 8px;
+  border-radius: 3px; letter-spacing: .08em;
+  transition: all .15s; white-space: nowrap; line-height: 1;
+}
+.vi-d-opt.active { background: var(--em); color: #080808; font-weight: 700; }
+.vi-d-opt:hover:not(.active) { color: var(--tx); background: rgba(255,255,255,.07); }
+/* collapse label text on small screens */
+@media (max-width: 600px) {
+  .vi-d-lbl { display: none; }
+  .vi-d-opt { padding: 3px 6px; }
+  .vi-d-ico { display: inline; }
+}
+@media (min-width: 601px) { .vi-d-ico { display: none; } }
+
+/* ── 3. SCROLLABLE MOBILE TOP NAV ── */
+@media (max-width: 767px) {
+  #topnav {
+    overflow-x: auto; overflow-y: hidden;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    padding: 0 8px; gap: 0;
+  }
+  #topnav::-webkit-scrollbar { display: none; }
+  .nav-brand { padding: 0 10px 0 2px !important; margin-right: 0 !important; }
+  .logo { font-size: .72rem !important; margin-right: 0 !important; }
+  .tab-btn {
+    padding: 0 12px !important; font-size: .54rem !important;
+    white-space: nowrap; flex-shrink: 0;
+    letter-spacing: .08em !important;
+  }
+  #vi-density-btn { margin-left: 6px; }
+}
+@media (max-width: 479px) {
+  .tab-btn { padding: 0 9px !important; font-size: .5rem !important; }
+  .tab-btn .pro-badge { display: none; }
+}
+
+/* ── 2. UNIFIED BREAKPOINTS (md 768, sm 480, xs 320) ── */
+/* remove the double-declaration hell: one source of truth here */
+@media (max-width: 1023px) {
+  .g2-ms           { grid-template-columns: 1fr !important; }
+  .ov-milestones-row{ grid-template-columns: 1fr !important; }
+}
+@media (max-width: 767px) {
+  .ov-data-row     { grid-template-columns: 1fr !important; }
+  #ov-breakdown-row{ grid-template-columns: 1fr !important; }
+  .jrny-bento      { grid-template-columns: 1fr !important; }
+  .jrny-gary       { grid-template-columns: 1fr !important; }
+  .al-grid         { grid-template-columns: 1fr !important; }
+  .debt-cols       { grid-template-columns: 1fr !important; }
+  .g2              { grid-template-columns: 1fr !important; }
+  .jrny-road-svg   { min-width: 100% !important; overflow-x: auto; }
+  #ov-fire-banner  { flex-wrap: wrap; gap: 8px !important; }
+}
+@media (max-width: 479px) {
+  .ov-kpis { grid-template-columns: 1fr 1fr !important; }
+  .g3, .g4 { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 320px) {
+  .ov-kpis, .g3, .g4 { grid-template-columns: 1fr !important; }
+}
+
+/* ── 4. CONTAINER QUERIES — component-level ── */
+/* already set container-type on chart cards above; extend here */
+.ov-data-card, .fire-roadmap-card, .jrny-gary-card { container-type: inline-size; }
+
+@container (max-width: 460px) {
+  .ov-chart-hd { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+  .chart-filter-group { flex-wrap: wrap; }
+  .ov-legend { flex-wrap: wrap; gap: 8px !important; font-size: .44rem !important; }
+}
+@container (max-width: 320px) {
+  .ov-kpi-val { font-size: .78rem !important; }
+  .ov-kpi-lbl { font-size: .4rem !important; }
+  .chart-filter-btn, .chart-metric-btn { padding: 2px 5px !important; font-size: .4rem !important; }
+}
+
+/* ── NWH table → card flip on mobile ── */
+@media (max-width: 767px) {
+  .nwh-year-table { display: none !important; }
+  .nwh-cards { display: block !important; }
+}
+.nwh-cards { display: none; }
+.nwh-card {
+  background: var(--c1); border: 1px solid var(--bd);
+  border-radius: 8px; padding: 12px 14px; margin-bottom: 10px;
+}
+.nwh-card-top {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 10px;
+}
+.nwh-card-yr { font-family:'Syne',sans-serif; font-weight:800; font-size:.78rem; color:var(--em); }
+.nwh-card-nw { font-family:'Share Tech Mono',monospace; font-size:.82rem; font-weight:700; }
+.nwh-card-fields { display:grid; grid-template-columns:1fr 1fr; gap:6px 10px; margin-top:6px; }
+.nwh-card-field { display:flex; flex-direction:column; gap:2px; }
+.nwh-card-field label { font-size:.4rem; color:var(--t3); text-transform:uppercase; letter-spacing:.1em; }
+.nwh-card-field input {
+  background:rgba(255,255,255,.04); border:1px solid var(--bd);
+  color:var(--tx); font-family:'Share Tech Mono',monospace;
+  font-size:.64rem; padding:5px 8px; outline:none; width:100%; box-sizing:border-box;
+}
+.nwh-card-field input:focus { border-color:rgba(68,192,185,.4); }
+
+/* ── 5. FLUID TYPE (clamp) ── */
+.ov-kpi-val { font-size: clamp(.82rem, 1.5vw + .5rem, 1.05rem); }
+.ov-kpi-lbl { font-size: clamp(.42rem, .5vw + .3rem, .54rem); }
+.ov-chart-title { font-size: clamp(.56rem, .8vw + .3rem, .72rem); }
+.logo { font-size: clamp(.72rem, 1.2vw + .35rem, .88rem) !important; }
+.ov-kpi-sub { font-size: clamp(.42rem, .4vw + .28rem, .52rem); }
+
+/* ── NWH modal internals ── */
+.nwh-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--bd);flex-wrap:wrap;gap:8px}
+.nwh-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;color:var(--tx);letter-spacing:.08em;text-transform:uppercase}
+.nwh-body{flex:1;overflow-y:auto;padding:20px}
+.nwh-wizard{max-width:480px;margin:0 auto}
+.nwh-q-text{font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--tx);margin-bottom:8px;line-height:1.4}
+.nwh-q-sub{font-size:.58rem;color:var(--t2);margin-bottom:12px;line-height:1.6}
+.nwh-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd);color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.72rem;padding:10px 14px;outline:none;box-sizing:border-box;margin-bottom:8px}
+.nwh-input:focus{border-color:rgba(68,192,185,.4)}
+.nwh-year-table{width:100%;border-collapse:collapse}
+.nwh-year-table th{font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;padding:5px 6px;text-align:right;border-bottom:1px solid var(--bd);white-space:nowrap}
+.nwh-year-table th:first-child,.nwh-year-table th:nth-child(2){text-align:left}
+.nwh-year-table td{padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.03)}
+.nwh-year-table tr:hover td{background:rgba(255,255,255,.02)}
+.nwh-td-input{background:transparent;border:none;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.6rem;width:70px;outline:none;text-align:right;padding:2px 0}
+.nwh-td-input:focus{background:rgba(68,192,185,.05);border-bottom:1px solid rgba(68,192,185,.3)}
+.nwh-td-notes{width:120px;text-align:left!important;color:var(--t2)!important}
+
+/* ═══ TIER TABLE (offer modal) ════════════════════════════ */
+.vi-tier-wrap { display: flex; justify-content: center; padding: 0 0 12px; }
+.vi-tier-table {
+  display: grid; grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 0; width: 100%; max-width: 580px;
+  border: 1px solid var(--bd); border-radius: 8px; overflow: hidden;
+}
+.vi-tier-col {
+  padding: 16px 14px;
+  border-right: 1px solid var(--bd);
+  display: flex; flex-direction: column; gap: 0;
+  background: rgba(255,255,255,.015);
+}
+.vi-tier-col:last-child { border-right: none; }
+.vi-tier-col.vi-tier-featured { background: rgba(68,192,185,.05); position: relative; }
+.vi-tier-col.vi-tier-founder  { background: rgba(201,168,76,.04); }
+.vi-tier-popular {
+  font-family:'Syne',sans-serif; font-weight:800;
+  font-size:.38rem; letter-spacing:.18em; text-transform:uppercase;
+  color: var(--em); margin-bottom: 6px; min-height: 14px;
+}
+.vi-tier-col.vi-tier-founder .vi-tier-popular { color: var(--go); }
+.vi-tier-name { font-family:'Syne',sans-serif; font-weight:800; font-size:.64rem; color:var(--tx); margin-bottom:4px; }
+.vi-tier-price { font-family:'Share Tech Mono',monospace; font-size:.96rem; font-weight:700; color:var(--em); line-height:1; }
+.vi-tier-col.vi-tier-founder .vi-tier-price { color: var(--go); }
+.vi-tier-price span { font-size:.52rem; opacity:.7; font-weight:400; }
+.vi-tier-saving { font-size:.42rem; color:var(--t3); margin: 3px 0 10px; min-height: 12px; }
+.vi-tier-features {
+  list-style: none; margin: 0 0 12px; padding: 0;
+  flex: 1; display: flex; flex-direction: column; gap: 4px;
+}
+.vi-tier-features li { font-size:.48rem; color:var(--t2); line-height:1.4; display:flex; align-items:flex-start; gap:4px; }
+.vi-tier-features li::before { content:'✓'; color:var(--gr); font-size:.46rem; flex-shrink:0; margin-top:1px; }
+.vi-tier-features li.vi-no::before { content:'✗'; color:var(--t3); }
+.vi-tier-features li.vi-no { color: var(--t3); }
+.vi-tier-cta {
+  width:100%; padding:8px 10px; font-family:'Syne',sans-serif;
+  font-size:.48rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  cursor:pointer; border-radius:4px; transition:all .18s; margin-top:4px;
+}
+.vi-tier-cta-ghost { background:transparent; border:1px solid var(--bd); color:var(--t3); cursor:default; }
+.vi-tier-cta-primary {
+  background: var(--em); border:1px solid var(--em); color:#080808;
+}
+.vi-tier-cta-primary:hover:not(:disabled) { background:var(--em2); border-color:var(--em2); }
+.vi-tier-cta-primary:disabled { opacity:.4; cursor:not-allowed; }
+.vi-tier-cta-secondary {
+  background:transparent; border:1px solid rgba(68,192,185,.3); color:var(--em);
+  margin-top:5px;
+}
+.vi-tier-cta-secondary:hover { background:rgba(68,192,185,.08); }
+.vi-tier-cta-founder {
+  background: linear-gradient(135deg,rgba(201,168,76,.18),rgba(201,168,76,.08));
+  border:1px solid rgba(201,168,76,.35); color:var(--go);
+}
+.vi-tier-cta-founder:hover { background:linear-gradient(135deg,rgba(201,168,76,.28),rgba(201,168,76,.14)); }
+.vi-tier-annual-note { font-size:.4rem; color:var(--t3); text-align:center; margin-top:4px; }
+@media (max-width:560px) {
+  .vi-tier-table { grid-template-columns: 1fr; }
+  .vi-tier-col { border-right:none; border-bottom:1px solid var(--bd); }
+  .vi-tier-col:last-child { border-bottom:none; }
+}
+
+/* ═══ CAMPAIGN / CROWDFUNDER MODAL ════════════════════════ */
+#vi-campaign-modal {
+  position: fixed; inset: 0; z-index: 3100;
+  background: rgba(4,4,4,.96);
+  display: flex; align-items: flex-start; justify-content: center;
+  overflow-y: auto; padding: 40px 16px 60px;
+}
+#vi-campaign-modal.hidden { display: none; }
+.vi-camp-wrap {
+  width: 100%; max-width: 660px;
+  background: rgba(8,13,20,.98);
+  border: 1px solid var(--bd); border-radius: 12px;
+  overflow: hidden;
+}
+.vi-camp-hdr {
+  background: linear-gradient(135deg, rgba(68,192,185,.1), rgba(201,168,76,.06));
+  border-bottom: 1px solid var(--bd);
+  padding: 28px 28px 22px;
+  position: relative;
+}
+.vi-camp-close {
+  position: absolute; top: 14px; right: 14px;
+  background: transparent; border: none; color: var(--t3);
+  font-size: .8rem; cursor: pointer; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; transition: color .15s;
+}
+.vi-camp-close:hover { color: var(--tx); }
+.vi-camp-eyebrow {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:.44rem;
+  letter-spacing:.22em; text-transform:uppercase;
+  color: var(--go); margin-bottom:8px;
+}
+.vi-camp-headline {
+  font-family:'Syne',sans-serif; font-weight:800;
+  font-size:clamp(1rem,2.5vw + .6rem,1.5rem);
+  color:var(--tx); line-height:1.2; margin-bottom:6px;
+}
+.vi-camp-sub { font-size:.58rem; color:var(--t2); line-height:1.6; max-width:480px; }
+.vi-camp-body { padding: 24px 28px; }
+/* Progress */
+.vi-camp-progress { margin-bottom: 24px; }
+.vi-camp-stats {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 12px; margin-bottom: 14px;
+}
+.vi-camp-stat {
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--bd); border-radius: 6px;
+  padding: 10px 12px; text-align: center;
+}
+.vi-camp-stat-val {
+  display: block; font-family:'Share Tech Mono',monospace;
+  font-size:1.1rem; font-weight:700; color:var(--em); line-height:1;
+}
+.vi-camp-stat-lbl {
+  display: block; font-family:'Syne',sans-serif;
+  font-size:.4rem; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--t3); margin-top:4px;
+}
+.vi-camp-bar-track {
+  height: 8px; background: rgba(255,255,255,.05);
+  border-radius: 4px; overflow: hidden; margin-bottom: 6px;
+}
+.vi-camp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--em) 0%, var(--go) 100%);
+  border-radius: 4px; transition: width .6s ease;
+}
+.vi-camp-bar-lbl { font-size:.44rem; color:var(--t3); text-align:right; }
+/* Tier cards */
+.vi-camp-tiers { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 20px; }
+.vi-camp-tier {
+  background: rgba(255,255,255,.025);
+  border: 1px solid var(--bd); border-radius: 8px;
+  padding: 16px 14px; display: flex; flex-direction: column; gap: 6px;
+}
+.vi-camp-tier.vi-camp-featured { border-color: rgba(68,192,185,.35); background: rgba(68,192,185,.06); }
+.vi-camp-tier.vi-camp-gold-tier{ border-color: rgba(201,168,76,.35); background: rgba(201,168,76,.05); }
+.vi-camp-tier-badge {
+  font-family:'Syne',sans-serif; font-size:.38rem; font-weight:800;
+  letter-spacing:.18em; text-transform:uppercase; min-height:14px;
+}
+.vi-camp-featured .vi-camp-tier-badge { color:var(--em); }
+.vi-camp-gold-tier .vi-camp-tier-badge { color:var(--go); }
+.vi-camp-tier-name { font-family:'Syne',sans-serif; font-weight:800; font-size:.7rem; color:var(--tx); }
+.vi-camp-tier-price { font-family:'Share Tech Mono',monospace; font-size:1rem; font-weight:700; color:var(--em); }
+.vi-camp-gold-tier .vi-camp-tier-price { color:var(--go); }
+.vi-camp-tier-price span { font-size:.5rem; opacity:.7; }
+.vi-camp-tier-note { font-size:.42rem; color:var(--t3); line-height:1.5; }
+.vi-camp-tier-features { list-style:none; padding:0; margin:4px 0 auto; display:flex; flex-direction:column; gap:3px; }
+.vi-camp-tier-features li { font-size:.46rem; color:var(--t2); display:flex; gap:4px; align-items:flex-start; }
+.vi-camp-tier-features li::before { content:'✓'; color:var(--gr); flex-shrink:0; font-size:.44rem; margin-top:1px; }
+.vi-camp-tier-features li.vi-dim { color:var(--t3); }
+.vi-camp-tier-features li.vi-dim::before { content:'·'; color:var(--t3); }
+.vi-camp-tier-cta {
+  margin-top:10px; width:100%; padding:8px 10px;
+  font-family:'Syne',sans-serif; font-size:.48rem; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+  cursor:pointer; border-radius:4px; transition:all .18s;
+}
+.vi-camp-cta-em { background:var(--em); border:1px solid var(--em); color:#080808; }
+.vi-camp-cta-em:hover { background:var(--em2); }
+.vi-camp-cta-gold {
+  background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.1));
+  border:1px solid rgba(201,168,76,.4); color:var(--go);
+}
+.vi-camp-cta-gold:hover { background:linear-gradient(135deg,rgba(201,168,76,.3),rgba(201,168,76,.16)); }
+.vi-camp-cta-ghost { background:transparent; border:1px solid var(--bd); color:var(--t3); cursor:default; }
+@media (max-width:540px) {
+  .vi-camp-tiers { grid-template-columns: 1fr; }
+  .vi-camp-body { padding:16px; }
+  .vi-camp-hdr { padding:20px 16px 16px; }
+}
+
+/* ── "Back Us" topnav button ── */
+#vi-back-us-btn {
+  flex-shrink:0;
+  background: linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.07));
+  border: 1px solid rgba(201,168,76,.32);
+  border-radius: 4px;
+  color: var(--go);
+  font-family:'Syne',sans-serif; font-size:.46rem; font-weight:800;
+  letter-spacing:.14em; text-transform:uppercase;
+  padding: 5px 12px; cursor:pointer; white-space:nowrap;
+  transition: all .2s;
+}
+#vi-back-us-btn:hover { background:linear-gradient(135deg,rgba(201,168,76,.26),rgba(201,168,76,.13)); border-color:rgba(201,168,76,.5); }
+
+/* ═══ TAB ICONOGRAPHY ══════════════════════════════════════
+   Colour-coded SVG icons on every nav tab + sub-tab
+   Micro-animations: enter bounce, idle glow, hover nudge
+   ════════════════════════════════════════════════════════ */
+
+/* Per-tab accent variables */
+.tab-btn[onclick*="overview"]     { --ta: #44c0b9; }
+.tab-btn[onclick*="journey"]      { --ta: #c9a84c; }
+.tab-btn[onclick*="house"]        { --ta: #e8c56a; }
+.tab-btn[onclick*="assets"]       { --ta: #3ecf8e; }
+.tab-btn[onclick*="debt"]         { --ta: #e05c5c; }
+.tab-btn[onclick*="biz"]          { --ta: #e0894a; }
+.tab-btn[onclick*="achievements"] { --ta: #c9a84c; }
+.tab-btn[onclick*="connections"]  { --ta: #9b7ec8; }
+
+/* Tab buttons: icon + label in a row */
+.tab-btn { display: flex; align-items: center; gap: 5px; }
+
+/* Tab icon */
+.ti {
+  width: 13px; height: 13px; flex-shrink: 0;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  overflow: visible; display: block;
+  transition: transform .2s ease, filter .2s ease, color .2s;
+}
+.tab-btn:hover .ti { transform: scale(1.22); color: var(--tx); }
+.tab-btn.active .ti {
+  color: var(--ta);
+  animation: vi-ti-enter .32s cubic-bezier(.34,1.56,.64,1) both,
+             vi-ti-glow  3s ease-in-out .32s infinite;
+}
+
+@keyframes vi-ti-enter {
+  from { transform: scale(.35) rotate(-18deg); opacity: 0; }
+  to   { transform: scale(1)   rotate(0deg);   opacity: 1; }
+}
+@keyframes vi-ti-glow {
+  0%, 100% { filter: drop-shadow(0 0 2px var(--ta, #44c0b9)); }
+  50%       { filter: drop-shadow(0 0 7px var(--ta, #44c0b9)); }
+}
+
+/* Sub-tab accent variables */
+.subtab-btn[onclick*="metals"]      { --sa: #e8c56a; }
+.subtab-btn[onclick*="crypto"]      { --sa: #44c0b9; }
+.subtab-btn[onclick*="cash"]        { --sa: #3ecf8e; }
+.subtab-btn[onclick*="other"]       { --sa: #9b7ec8; }
+.subtab-btn[onclick*="liabilities"] { --sa: #e05c5c; }
+
+/* Sub-tab buttons: icon + label */
+.subtab-btn { display: flex !important; align-items: center; gap: 5px; }
+.subtab-btn.active { color: var(--sa, var(--em)) !important; border-bottom-color: var(--sa, var(--em)) !important; }
+
+/* Sub-tab icon */
+.sti {
+  width: 12px; height: 12px; flex-shrink: 0;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  overflow: visible; display: block;
+  transition: transform .18s ease, color .18s;
+}
+.subtab-btn:hover .sti { transform: scale(1.2); }
+.subtab-btn.active .sti {
+  color: var(--sa, var(--em));
+  animation: vi-ti-enter .28s cubic-bezier(.34,1.56,.64,1) both;
+}
 </style>
 
 <script>
@@ -3557,6 +4367,16 @@ body::before { animation: vi-scanline-drift 6s linear infinite; }
 // TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════
 function showTab(id){
+  // Hard gate: require name + email + phone before using the app
+  try {
+    var _gu = JSON.parse(localStorage.getItem('vi_user') || 'null');
+    if (!_gu || !_gu.name || !_gu.email || !_gu.phone) {
+      var ov = document.getElementById('welcome-overlay');
+      if (ov) ov.style.display = 'flex';
+      showToast('Please complete your registration to access Vault·It');
+      return;
+    }
+  } catch(e) {}
   if(id!=='house'&&typeof _threeAnimId!=='undefined'&&_threeAnimId){cancelAnimationFrame(_threeAnimId);_threeAnimId=null;}
   // Always collapse the ISO expand when switching tabs
   if(typeof _isExpanded!=='undefined'&&_isExpanded) toggleExpand();
@@ -5083,7 +5903,20 @@ function drawApartment(p){
 }
 
 const DRAW={terraced:drawTerraced,semi:drawSemi,detached:drawDetached,mansion:drawMansion,flat:drawFlat,apartment:drawApartment};
-function redraw(){(DRAW[state.houseType]||drawTerraced)(pct());}
+function redraw(){
+  var rawP = _isPro() ? pct() : 0;
+  // Prevent pure wireframe: always show at least foundation when goal is set,
+  // or show a 15% demo building when nothing is configured yet.
+  var displayP = rawP;
+  if (state.target <= 0 && state.saved <= 0) {
+    displayP = 0.15; // demo state — shows a partial building as preview
+  } else if (state.target > 0 && rawP < 0.04) {
+    displayP = 0.04; // show slab/foundations even at zero savings
+  }
+  (DRAW[state.houseType]||drawTerraced)(displayP);
+  var lockEl = document.getElementById('house-pro-lock');
+  if (lockEl) lockEl.style.display = _isPro() ? 'none' : '';
+}
 
 function updateUI(){
   const p=pct();
@@ -5176,7 +6009,8 @@ document.getElementById('btnAdd').addEventListener('click',()=>{
   recordHabitContribution(v);
   save();checkMS(pct());updateUI();
   document.getElementById('savingsInput').value='';
-  toast(v<state.target*.005?`+£${v.toLocaleString('en-GB')} — brick by brick!`:`+£${v.toLocaleString('en-GB')} added!`);
+  if (!_isPro()) { showToast('Deposit saved! Upgrade to Pro to watch your house being built 🏗'); }
+  else { toast(v<state.target*.005?`+£${v.toLocaleString('en-GB')} — brick by brick!`:`+£${v.toLocaleString('en-GB')} added!`); }
 });
 
 // ── HABIT TRACKER ──
@@ -5372,7 +6206,13 @@ function toggleExpand(){
 
 function resetView(){
   _panX=0;_panY=0;_viewAngle=0;
+  _houseSetZoom(1);
   redraw();
+}
+
+function housePan(dx, dy) {
+  _panX += dx; _panY += dy;
+  _updateHUD(); redraw();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -6971,6 +7811,35 @@ function resetAllAchievements(){
   saveAch();renderAchievements();showToast('Achievements reset');
 }
 function renderAchievements(){
+  if (!_isPro()) {
+    var achTab = document.getElementById('tab-achievements');
+    if (achTab) {
+      // Show blurred content with overlay
+      if (!document.getElementById('ach-pro-overlay')) {
+        var ov = document.createElement('div');
+        ov.id = 'ach-pro-overlay';
+        ov.style.cssText = 'position:sticky;top:0;z-index:40;margin:0 0 16px;background:rgba(8,8,8,.88);border-bottom:1px solid rgba(201,168,76,.25);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;backdrop-filter:blur(8px)';
+        ov.innerHTML = '<div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:.72rem;color:var(--go);margin-bottom:4px">🏆 Achievements &amp; XP — Pro</div><div style="font-size:.55rem;color:var(--t2);line-height:1.5">Unlock badges, build streaks, level up from Pioneer to Homeowner. Every action earns XP.</div></div>'
+          + '<button onclick="showUpgrade(\'annual\')" style="flex-shrink:0;padding:8px 16px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));color:#080808;font-family:\'Syne\',sans-serif;font-weight:800;font-size:.55rem;cursor:pointer">Invest in yourself →</button>';
+        achTab.insertBefore(ov, achTab.firstChild);
+      }
+    }
+    // Blur the badges grid and XP bar
+    var bg = document.getElementById('badges-grid');
+    if (bg) { bg.style.filter = 'blur(5px)'; bg.style.pointerEvents = 'none'; }
+    var xpBar = document.getElementById('ach-xp-bar');
+    if (xpBar) xpBar.style.filter = 'blur(3px)';
+    var xpTotal = document.getElementById('ach-xp-total');
+    if (xpTotal) { xpTotal.textContent = '••• XP'; }
+    return; // don't render the detail
+  } else {
+    var existOv = document.getElementById('ach-pro-overlay');
+    if (existOv) existOv.remove();
+    var bg2 = document.getElementById('badges-grid');
+    if (bg2) { bg2.style.filter = ''; bg2.style.pointerEvents = ''; }
+    var xpBar2 = document.getElementById('ach-xp-bar');
+    if (xpBar2) xpBar2.style.filter = '';
+  }
   var lv=currentLevel(),nxt=nextLevel();
   var i=LVS.indexOf(lv)+1;
   var badge=document.getElementById('ach-level-badge');if(badge)badge.textContent=i;
@@ -7331,6 +8200,18 @@ function handleOAuthCallback() {
     showToast('🎉 Welcome to Pro! Entrepreneur tab unlocked.');
     return;
   }
+  if (params.get('founded') === '1') {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    var u = {};
+    try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
+    u.pro = true; u.founder = true; u.founderSince = new Date().toISOString();
+    try { localStorage.setItem('vi_user', JSON.stringify(u)); } catch(e) {}
+    if (typeof _vaultItUser !== 'undefined') { _vaultItUser = u; }
+    if (typeof applyPaywall === 'function') applyPaywall();
+    viApplyFounderBadge();
+    showToast('⚡ Welcome, Founding Member! Your name will be in the credits.');
+    return;
+  }
   var code = params.get('code');
   var state = params.get('state');
   var storedState = localStorage.getItem('vi_tl_state');
@@ -7437,6 +8318,8 @@ function showSettings(){
   var cgEl=document.getElementById('set-cg-key');if(cgEl)cgEl.value=localStorage.getItem('coingecko_api_key')||'';
   var avEl=document.getElementById('set-av-key');if(avEl)avEl.value=localStorage.getItem('alpha_vantage_key')||'';
   var mEl=document.getElementById('set-metals-key');if(mEl)mEl.value=localStorage.getItem('metals_api_key')||'';
+  var ckfEl=document.getElementById('set-ck-form');if(ckfEl)ckfEl.value=localStorage.getItem('convertkit_form_id')||'';
+  var ckkEl=document.getElementById('set-ck-key');if(ckkEl)ckkEl.value=localStorage.getItem('convertkit_api_key')||'';
   document.getElementById('settings-modal').style.display='flex';
 }
 function saveSettings(){
@@ -7445,11 +8328,15 @@ function saveSettings(){
   var cgk=(document.getElementById('set-cg-key')||{}).value||'';
   var avk=(document.getElementById('set-av-key')||{}).value||'';
   var metk=(document.getElementById('set-metals-key')||{}).value||'';
+  var ckf=(document.getElementById('set-ck-form')||{}).value||'';
+  var ckk=(document.getElementById('set-ck-key')||{}).value||'';
   if(ck)localStorage.setItem('claude_api_key',ck.trim());
   if(mk)localStorage.setItem('meshy_api_key',mk.trim());
   if(cgk)localStorage.setItem('coingecko_api_key',cgk.trim());
   if(avk)localStorage.setItem('alpha_vantage_key',avk.trim());
   if(metk)localStorage.setItem('metals_api_key',metk.trim());
+  if(ckf)localStorage.setItem('convertkit_form_id',ckf.trim());
+  if(ckk)localStorage.setItem('convertkit_api_key',ckk.trim());
   document.getElementById('settings-modal').style.display='none';
   showToast('API keys saved \u2713');
 }
@@ -7507,6 +8394,50 @@ function _initThreeScene(){
   animate();
 }
 
+// ── THREE.JS VIEWPORT NAV BUTTONS ─────────────────────────
+function _threeZoomIn() {
+  if (!_threeCamera) return;
+  _threeCamera.position.multiplyScalar(0.82);
+  if (_threeControls) _threeControls.update();
+}
+function _threeZoomOut() {
+  if (!_threeCamera) return;
+  _threeCamera.position.multiplyScalar(1.22);
+  if (_threeControls) _threeControls.update();
+}
+function _threeReset() {
+  if (!_threeCamera) return;
+  _threeCamera.position.set(0, 2, 5);
+  _threeCamera.lookAt(0, 0, 0);
+  if (_threeControls) { _threeControls.target.set(0,0,0); _threeControls.reset(); }
+  // Dismiss gesture hint after first manual interaction
+  var h = document.getElementById('vi-3d-hint-txt');
+  if (h) { h.classList.remove('hidden'); }
+}
+function _threeOrbit(dir) {
+  if (!_threeCamera || !_threeControls) return;
+  var step = 0.32; // radians
+  var pos = _threeCamera.position;
+  var r = pos.length();
+  var theta = Math.atan2(pos.x, pos.z); // azimuth
+  var phi   = Math.acos(Math.max(-1, Math.min(1, pos.y / r))); // polar
+  if (dir === 'left')  theta += step;
+  if (dir === 'right') theta -= step;
+  if (dir === 'up')    phi   = Math.max(0.1, phi - step * 0.7);
+  if (dir === 'down')  phi   = Math.min(Math.PI - 0.1, phi + step * 0.7);
+  _threeCamera.position.set(
+    r * Math.sin(phi) * Math.sin(theta),
+    r * Math.cos(phi),
+    r * Math.sin(phi) * Math.cos(theta)
+  );
+  _threeCamera.lookAt(0, 0, 0);
+  _threeControls.target.set(0,0,0);
+  _threeControls.update();
+  // Dismiss hint after first manual use
+  var h = document.getElementById('vi-3d-hint-txt');
+  if (h) setTimeout(function(){ h.classList.add('hidden'); }, 3000);
+}
+
 function _loadGLB(url){
   if(!window.THREE){showToast('Three.js not loaded');return;}
   var GLoader=THREE.GLTFLoader||window.GLTFLoader;
@@ -7530,6 +8461,11 @@ function _loadGLB(url){
 }
 
 function loadCustomModel(input){
+  if (!_isPro()) {
+    showUpgrade('annual');
+    showToast('Upload your own 3D house model — Pro feature');
+    return;
+  }
   if(!window.THREE){showToast('3D library loading — try again in a moment');return;}
   var file=input.files[0];if(!file)return;
   var GLoader=THREE.GLTFLoader||window.GLTFLoader;
@@ -7557,6 +8493,11 @@ function closeCustomModel(){
 
 // ── MESHY AI 3D GENERATION ────────────────────────────────────
 async function generateMeshyModel(){
+  if (!_isPro()) {
+    showUpgrade('annual');
+    showToast('AI 3D model generation — Pro feature');
+    return;
+  }
   var key=localStorage.getItem('meshy_api_key')||'';
   if(!key){showToast('Set Meshy API key in ⚙ Settings');return;}
   var prompt=(document.getElementById('meshy-prompt')||{}).value;
@@ -8985,6 +9926,33 @@ function renderJourney() {
   if (!journeyState.onboarded) {
     setTimeout(function() { showJrnyWizard(); }, 800);
   }
+
+  // Gate calculator outputs for free users
+  if (!_isPro()) {
+    // Blur and lock all date/calculator outputs
+    var calcEls = document.querySelectorAll('.jrny-calc-out, .jrny-date-out, .jrny-stage-detail, #jrny-dti, #jrny-ef-date, #jrny-debt-date, #jrny-deposit-date, #jrny-keys-date, #jrny-mortgage-ready');
+    calcEls.forEach(function(el) {
+      el.style.filter = 'blur(4px)';
+      el.style.userSelect = 'none';
+      el.style.pointerEvents = 'none';
+    });
+    // Show a single gate banner if not already present
+    var jrnyTab = document.getElementById('tab-journey');
+    if (jrnyTab && !jrnyTab.querySelector('#jrny-pro-gate')) {
+      var banner = document.createElement('div');
+      banner.id = 'jrny-pro-gate';
+      banner.style.cssText = 'position:sticky;bottom:16px;left:0;right:0;margin:16px;z-index:40;background:rgba(8,8,8,.9);border:1px solid rgba(201,168,76,.3);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;backdrop-filter:blur(8px)';
+      banner.innerHTML = '<div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:.68rem;color:var(--go);margin-bottom:3px">🔒 Exact dates are Pro</div><div style="font-size:.54rem;color:var(--t2);line-height:1.5">Your debt-free date, deposit date and keys date — calculated precisely from your numbers.</div></div>'
+        + '<button onclick="showUpgrade(\'annual\')" style="flex-shrink:0;padding:8px 16px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));color:#080808;font-family:\'Syne\',sans-serif;font-weight:800;font-size:.55rem;cursor:pointer;white-space:nowrap">Unlock →</button>';
+      jrnyTab.appendChild(banner);
+    }
+  } else {
+    // Remove gate if pro
+    var g = document.getElementById('jrny-pro-gate');
+    if (g) g.remove();
+    var calcEls2 = document.querySelectorAll('.jrny-calc-out, .jrny-date-out, .jrny-stage-detail, #jrny-dti, #jrny-ef-date, #jrny-debt-date, #jrny-deposit-date, #jrny-keys-date, #jrny-mortgage-ready');
+    calcEls2.forEach(function(el) { el.style.filter = ''; el.style.userSelect = ''; el.style.pointerEvents = ''; });
+  }
 }
 
 function renderJrnySVG(currentStage, selectedNode) {
@@ -9538,11 +10506,16 @@ function initProOffer() {
       if (taskList) taskList.innerHTML = incomplete.map(function(t){
         return '<div class="vi-task-item" onclick="document.getElementById(\'pro-offer-modal\').classList.add(\'hidden\');showTab(\''+t.tab+'\')">'+t.icon+' '+t.label+'<span class="vi-task-goto">→</span></div>';
       }).join('');
-      if (ctaAnnual) { ctaAnnual.disabled = true; ctaAnnual.style.opacity = '.4'; ctaAnnual.textContent = incomplete.length + ' tasks remaining'; }
+      if (ctaAnnual) { ctaAnnual.disabled = true; ctaAnnual.style.opacity = '.4'; ctaAnnual.innerHTML = incomplete.length + ' task' + (incomplete.length !== 1 ? 's' : '') + ' remaining'; }
       if (ctaMo)     { ctaMo.style.display = 'none'; }
     } else {
       if (taskGate) taskGate.style.display = 'none';
-      if (ctaAnnual) { ctaAnnual.disabled = false; ctaAnnual.style.opacity = ''; ctaAnnual.textContent = 'Upgrade Annual — Best Value →'; }
+      if (ctaAnnual) {
+        ctaAnnual.disabled = false; ctaAnnual.style.opacity = '';
+        var annualEl = document.getElementById('offer-annual-price');
+        var annualTxt = annualEl ? annualEl.textContent : '£49.99/yr';
+        ctaAnnual.innerHTML = '<span id="offer-annual-price">' + annualTxt + '</span> — Annual Best Value →';
+      }
     }
     // Show after 1.5s delay so app loads first
     setTimeout(function() {
@@ -9610,6 +10583,19 @@ function skipWelcome() {
   applyPaywall();
 }
 
+function _isPro() {
+  try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.pro); } catch(e) { return false; }
+}
+
+function _proLockOverlay(title, subtitle) {
+  return '<div style="position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,8,8,.82);backdrop-filter:blur(6px);text-align:center;padding:24px">'
+    + '<div style="font-size:1.8rem;margin-bottom:10px">🔒</div>'
+    + '<div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:.82rem;color:var(--tx);margin-bottom:6px">' + title + '</div>'
+    + '<div style="font-size:.58rem;color:var(--t2);line-height:1.6;max-width:260px;margin-bottom:16px">' + subtitle + '</div>'
+    + '<button onclick="showUpgrade(\'annual\')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:\'Syne\',sans-serif;font-weight:800;font-size:.6rem;cursor:pointer;letter-spacing:.06em">Invest in yourself →</button>'
+    + '</div>';
+}
+
 function applyPaywall() {
   var user = null;
   try { user = JSON.parse(localStorage.getItem('vi_user') || 'null'); } catch(e) {}
@@ -9653,13 +10639,13 @@ function submitWaitlist() {
   if (!email || !email.includes('@')) { showToast('Enter a valid email to join the waitlist'); return; }
   var wl = [];
   try { wl = JSON.parse(localStorage.getItem('vi_waitlist') || '[]'); } catch(e) {}
-  // Store richer record for alpha tester marketing
   var user = {};
   try { user = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
   var record = { email: email, name: user.name || '', goal: user.goal, joined: user.joined || new Date().toISOString(), signedUp: new Date().toISOString() };
   var exists = wl.some(function(r){ return (r.email || r) === email; });
   if (!exists) wl.push(record);
   try { localStorage.setItem('vi_waitlist', JSON.stringify(wl)); } catch(e) {}
+  captureEmailToList(email, user.name || '', 0);
   var m = document.getElementById('waitlist-modal');
   if (m) m.classList.add('hidden');
   showToast('✅ Alpha spot secured! We\'ll reach out when Pro launches.');
@@ -9681,18 +10667,31 @@ function selectWelcomeOpt(btn) {
 function wStep1Next() {
   var name  = (document.getElementById('w-name')  || {}).value || '';
   var email = (document.getElementById('w-email') || {}).value || '';
-  if (!email || !email.includes('@')) {
-    var el = document.getElementById('w-email');
+  var phone = (document.getElementById('w-phone-s1') || {}).value || '';
+  if (!name || name.trim().length < 2) {
+    var el = document.getElementById('w-name');
     if (el) el.style.borderColor = 'var(--re)';
+    showToast('Please enter your first name');
+    return;
+  }
+  if (!email || !email.includes('@')) {
+    var el2 = document.getElementById('w-email');
+    if (el2) el2.style.borderColor = 'var(--re)';
     showToast('Please enter a valid email address');
     return;
   }
+  if (!phone || phone.trim().length < 7) {
+    var el3 = document.getElementById('w-phone-s1');
+    if (el3) el3.style.borderColor = 'var(--re)';
+    showToast('WhatsApp number required — we\'ll use this to send your Pioneer updates');
+    return;
+  }
   if (!_wSelectedVal) {
-    showToast('Pick your biggest challenge to personalise your Journey Map');
+    showToast('Pick your biggest financial challenge to personalise your Journey Map');
     return;
   }
   // Save partial
-  _vaultItUser = { name: name.trim(), email: email.trim(), goal: _wSelectedVal, joined: new Date().toISOString(), pro: false, logins: 1 };
+  _vaultItUser = { name: name.trim(), email: email.trim(), phone: phone.trim(), goal: _wSelectedVal, joined: new Date().toISOString(), pro: false, logins: 1 };
   try { localStorage.setItem('vi_user', JSON.stringify(_vaultItUser)); } catch(e) {}
   captureEmailToList(email, name.trim(), parseInt(_wSelectedVal)||0);
   captureEmailMailchimp(email, name.trim(), parseInt(_wSelectedVal)||0);
@@ -9852,7 +10851,7 @@ function updateProGate() {
   var btn = document.getElementById('pro-gate-main-btn');
   if (btn) {
     var allDone = done === tasks.length;
-    btn.textContent = allDone ? 'Unlock Pro — All Tasks Complete →' : done + '/' + tasks.length + ' tasks complete · Keep going!';
+    btn.textContent = allDone ? 'Invest in yourself — all tasks complete →' : done + '/' + tasks.length + ' tasks complete · Keep going!';
     btn.style.opacity = allDone ? '1' : '0.7';
     btn.style.cursor = allDone ? 'pointer' : 'default';
     if (!allDone) btn.onclick = function(){ showToast('Complete all 5 tasks first — each one powers your journey data'); };
@@ -9860,46 +10859,53 @@ function updateProGate() {
   }
 }
 
+// ── STRIPE CONFIG ─────────────────────────────────────────
+// Replace placeholder IDs with live ones from your Stripe dashboard.
+// buy.stripe.com links: Product → Share → Buy link
+var VI_PRICES = {
+  monthly: 'price_1TbOhV9mgKf6HntykhBYBaHI',    // £5.99/mo
+  annual:  'price_1TbOha9mgKf6HntyZR0AEYvK',    // £49.99/yr
+  founder: 'price_FOUNDER_PLACEHOLDER'           // £149 one-time — create in Stripe, paste ID here
+};
+
+// ── CAMPAIGN CONFIG ────────────────────────────────────────
+// Update these numbers manually after each Stripe dashboard check.
+var VI_CAMPAIGN = {
+  backers:      0,       // total paying backers so far
+  goal:         200,     // founding member target
+  raisedGBP:    0,       // total £ raised
+  goalGBP:      9980,    // funding target (200 × £49.90 avg)
+  founderSlots: 50,      // max founding member spots
+  founderTaken: 0,       // founding member spots taken
+  deadline:     '2026-08-31'
+};
+
 function showUpgrade(plan) {
-  // Stripe price IDs (replace with live IDs when ready — these are the configured ones)
-  var STRIPE_MONTHLY = 'price_1TbOhV9mgKf6HntykhBYBaHI'; // £5.99/mo
-  var STRIPE_ANNUAL  = 'price_1TbOha9mgKf6HntyZR0AEYvK'; // £49.99/yr
-  // Check core tasks gate
-  if (!coreTasksComplete()) {
+  var priceId;
+  if (plan === 'annual')  priceId = VI_PRICES.annual;
+  else if (plan === 'founder') priceId = VI_PRICES.founder;
+  else priceId = VI_PRICES.monthly;
+
+  // Founder tier bypasses task gate — it's a direct pledge
+  if (plan !== 'founder' && !coreTasksComplete()) {
     showCoreTasksModal(); return;
   }
-  var priceId = (plan === 'annual') ? STRIPE_ANNUAL : STRIPE_MONTHLY;
+
   var user = {};
   try { user = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
-  // Build Stripe Checkout URL
-  // TODO: Replace YOUR_PUBLISHABLE_KEY with your Stripe publishable key (pk_live_... or pk_test_...)
-  var successUrl = encodeURIComponent(window.location.href.split('?')[0] + '?upgraded=1');
+
+  var successParam = (plan === 'founder') ? 'founded=1' : 'upgraded=1';
+  var successUrl = encodeURIComponent(window.location.href.split('?')[0] + '?' + successParam);
   var cancelUrl  = encodeURIComponent(window.location.href.split('?')[0]);
+
   var checkoutUrl = 'https://buy.stripe.com/' + priceId
     + '?prefilled_email=' + encodeURIComponent(user.email || '')
     + '&success_url=' + successUrl
     + '&cancel_url=' + cancelUrl;
-  // Open Stripe in new tab so user doesn't lose app state
-  window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-  showToast('Opening secure checkout...');
-}
-function submitWaitlist() {
-  var email = (document.getElementById('waitlist-email') || {}).value || '';
-  if (!email || !email.includes('@')) { showToast('Enter a valid email to join the waitlist'); return; }
-  var wl = [];
-  try { wl = JSON.parse(localStorage.getItem('vi_waitlist') || '[]'); } catch(e) {}
-  // Store richer record for alpha tester marketing
-  var user = {};
-  try { user = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
-  var record = { email: email, name: user.name || '', goal: user.goal, joined: user.joined || new Date().toISOString(), signedUp: new Date().toISOString() };
-  var exists = wl.some(function(r){ return (r.email || r) === email; });
-  if (!exists) wl.push(record);
-  try { localStorage.setItem('vi_waitlist', JSON.stringify(wl)); } catch(e) {}
-  var m = document.getElementById('waitlist-modal');
-  if (m) m.classList.add('hidden');
-  showToast('\u2705 Alpha spot secured! We\'ll reach out when Pro launches.');
-}
 
+  window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+  showToast(plan === 'founder' ? '⚡ Opening Founders checkout…' : 'Opening secure checkout…');
+}
 
 // ══════════════════════════════════════════════════════════════
 // DATA EXPORT / IMPORT
@@ -9977,7 +10983,7 @@ function showLegalModal(title, body) {
   document.body.appendChild(modal);
 }
 function showPrivacy() {
-  showLegalModal('Privacy Policy', '<p><strong>Vault·It</strong> is built by PT Live Design.</p><p>We collect your name and email address when you sign up as a Pioneer. This data is used to send you product updates and, with your consent, marketing communications. It is never sold to third parties.</p><p>All financial data you enter (income, expenses, savings, debts) is stored <strong>only in your browser\'s local storage</strong>. It never leaves your device. We have no access to it.</p><p>API keys you enter are stored in your browser only and are sent directly to those providers. We never see them.</p><p>For full GDPR requests: pete@ptlivedesign.com</p><p style="color:var(--t3);font-size:.52rem">Full policy coming with hosted backend in v1.0</p>');
+  showLegalModal('Privacy Policy', '<p><strong>Vault·It</strong> is built by PT Live Design.</p><p>We collect your name and email address when you sign up as a Pioneer. This data is used to send you product updates and, with your consent, marketing communications. It is never sold to third parties.</p><p>All financial data you enter (income, expenses, savings, debts) is stored <strong>only in your browser\'s local storage</strong>. It never leaves your device. We have no access to it.</p><p>API keys you enter are stored in your browser only and are sent directly to those providers. We never see them.</p><p>For full GDPR requests: connect@vault-it.uk</p><p style="color:var(--t3);font-size:.52rem">Full policy coming with hosted backend in v1.0</p>');
 }
 function showTerms() {
   showLegalModal('Terms of Service', '<p>Vault·It is provided as-is for informational and tracking purposes only.</p><p><strong>This is not financial advice.</strong> Nothing in this application constitutes regulated financial advice under the Financial Services and Markets Act 2000.</p><p>All projections (deposit dates, debt-free dates, FI numbers) are estimates based on data you provide. They may be inaccurate. Always consult a regulated financial adviser before making significant financial decisions.</p><p>PT Live Design is not FCA registered. This app is an organisational tool only.</p><p style="color:var(--t3);font-size:.52rem">Full terms coming with incorporated entity in v1.0</p>');
@@ -9986,20 +10992,17 @@ function showTerms() {
 // ── TASK 4: EMAIL CAPTURE ────────────────────────────────────────
 function captureEmailToList(email, name, goal) {
   if (!email || !email.includes('@')) return;
-  var CONVERTKIT_FORM_ID = 'YOUR_FORM_ID_HERE'; // TODO: replace with real ConvertKit form ID
-  var payload = { email_address: email, first_name: name || '', fields: { goal: ['debt','savings','deposit','wealth'][goal] || 'unknown', source: 'vault-it-pioneer', joined: new Date().toISOString() } };
-  fetch('https://api.convertkit.com/v3/forms/' + CONVERTKIT_FORM_ID + '/subscribe', {
+  var formId = localStorage.getItem('convertkit_form_id') || '';
+  var apiKey = localStorage.getItem('convertkit_api_key') || '';
+  if (!formId) return; // silently skip until user configures in Settings
+  var payload = { api_key: apiKey, email_address: email, first_name: name || '', fields: { goal: ['debt','savings','deposit','wealth'][goal] || 'unknown', source: 'vault-it-pioneer', joined: new Date().toISOString() } };
+  fetch('https://api.convertkit.com/v3/forms/' + formId + '/subscribe', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
   }).then(function(r){ if(r.ok) console.log('[Vault-It] Pioneer email captured'); })
     .catch(function(e){ console.log('[Vault-It] Email capture failed silently:', e.message); });
 }
 function captureEmailMailchimp(email, name, goal) {
-  var form = document.getElementById('mc-hidden-form');
-  if (!form) return;
-  document.getElementById('mc-email').value = email || '';
-  document.getElementById('mc-fname').value = name  || '';
-  document.getElementById('mc-goal').value  = ['debt','savings','deposit','wealth'][goal] || '';
-  form.submit();
+  // Mailchimp replaced by ConvertKit — captureEmailToList() handles all list sign-ups
 }
 
 // ── TASK 2: VI SETTINGS ──────────────────────────────────────────
@@ -10157,9 +11160,416 @@ function initWelcome() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() { initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); });
+  document.addEventListener('DOMContentLoaded', function() { initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); });
 } else {
-  initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback();
+  initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge();
+}
+
+// ─────────────────────────────────────────────────────────
+// NET WORTH HISTORY (Pro)
+// Storage key: vi_nw_history
+// Schema: { birthYear, setupDone, points: [{ year, age, netWorth,
+//           cash, stocks, metals, crypto, property, liabilities,
+//           notes, estimated }] }
+// ─────────────────────────────────────────────────────────
+var NWH_KEY = 'vi_nw_history';
+var _nwhWizData = {};
+
+function nwhLoad(){ try{ return JSON.parse(localStorage.getItem(NWH_KEY)||'null'); }catch(e){ return null; } }
+function nwhSave(d){ try{ localStorage.setItem(NWH_KEY,JSON.stringify(d)); }catch(e){} }
+function nwhFmt(n){ return (n>=0?'£':'-£')+Math.abs(Math.round(n)).toLocaleString(); }
+
+function openNwHistory(){
+  if(!_isPro()){ showUpgrade('annual'); return; }
+  document.getElementById('nwh-modal').style.display='flex';
+  var data=nwhLoad();
+  if(!data||!data.setupDone){ _nwhWizData={}; nwhRenderWizard(0); }
+  else nwhRenderHistory(data);
+}
+function closeNwHistory(){
+  document.getElementById('nwh-modal').style.display='none';
+  nwhRenderMini();
+}
+
+// ── WIZARD ─────────────────────────────────────────────
+var _nwhSteps=[
+  { n:'01/05', q:'What year were you born?',
+    sub:'We\'ll map your full financial journey from your 18th birthday to today.',
+    id:'birthYear', type:'number', ph:'e.g. 1990' },
+  { n:'02/05', q:'What was your net worth at age 18?',
+    sub:'Savings minus any debts. Student debt or overdraft? Go negative. Most people start near £0.',
+    id:'startNw', type:'number', ph:'e.g. 500 or -3500' },
+  { n:'03/05', q:'What was your financial low point?',
+    sub:'The year and amount when things were toughest — debt, redundancy, or rock bottom. Negative if in debt.',
+    id:'lowestNw', yid:'lowestYear', type:'number', ph:'Amount e.g. -12500', yph:'Year e.g. 2015' },
+  { n:'04/05', q:'What was your best financial year so far?',
+    sub:'A year you felt real momentum — a promotion, debt cleared, first investment, savings milestone.',
+    id:'bestNw', yid:'bestYear', type:'number', ph:'Amount e.g. 28000', yph:'Year e.g. 2022' },
+  { n:'05/05', q:'What\'s your #1 financial goal right now?',
+    sub:'One line. This becomes your north star on the journey map.',
+    id:'goal', type:'text', ph:'e.g. Own my home debt-free by 40' }
+];
+
+function nwhRenderWizard(step){
+  var body=document.getElementById('nwh-body'); if(!body) return;
+  var s=_nwhSteps[step];
+  var pct=Math.round(((step+1)/5)*100);
+  var html='<div class="nwh-wizard">'
+    +'<div style="margin-bottom:24px">'
+    +'<div style="height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:8px">'
+    +'<div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--em),var(--go));transition:width .4s ease"></div></div>'
+    +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:.46rem;color:var(--t3);letter-spacing:.12em">STEP '+s.n+'</div>'
+    +'</div>'
+    +'<div class="nwh-q-text">'+s.q+'</div>'
+    +'<div class="nwh-q-sub">'+s.sub+'</div>';
+  if(s.yid){
+    html+='<input class="nwh-input" type="number" id="nwh-y" placeholder="'+s.yph+'" min="1940" max="'+new Date().getFullYear()+'" value="'+(_nwhWizData[s.yid]||'')+'">';
+  }
+  html+='<input class="nwh-input" type="'+s.type+'" id="nwh-v" placeholder="'+s.ph+'" value="'+(_nwhWizData[s.id]!==undefined?_nwhWizData[s.id]:'')+'">';
+  html+='<div style="display:flex;gap:10px;margin-top:16px">';
+  if(step>0) html+='<button onclick="nwhWizBack('+step+')" style="padding:9px 18px;background:none;border:1px solid var(--bd);color:var(--t2);font-family:\'Syne\',sans-serif;font-weight:700;font-size:.58rem;cursor:pointer">← Back</button>';
+  html+='<button onclick="nwhWizNext('+step+')" style="flex:1;padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:\'Syne\',sans-serif;font-weight:800;font-size:.6rem;cursor:pointer;letter-spacing:.06em">'+(step<4?'Next →':'Build My Journey →')+'</button>';
+  html+='</div></div>';
+  body.innerHTML=html;
+  setTimeout(function(){ var el=document.getElementById('nwh-v'); if(el)el.focus(); },80);
+}
+
+function nwhWizNext(step){
+  var s=_nwhSteps[step];
+  var vEl=document.getElementById('nwh-v');
+  var yEl=document.getElementById('nwh-y');
+  var v=vEl?vEl.value.trim():'';
+  if(step<4&&v===''){showToast('Please fill in this field');return;}
+  if(step===0){var yr=parseInt(v); if(isNaN(yr)||yr<1930||yr>2008){showToast('Enter a valid birth year');return;}}
+  _nwhWizData[s.id]=(s.type==='number')?(parseFloat(v)||0):v;
+  if(yEl&&s.yid) _nwhWizData[s.yid]=parseInt(yEl.value)||0;
+  if(step<4) nwhRenderWizard(step+1);
+  else nwhWizComplete();
+}
+function nwhWizBack(step){ nwhRenderWizard(step-1); }
+
+function nwhWizComplete(){
+  var cy=new Date().getFullYear();
+  var by=Math.round(_nwhWizData.birthYear)||1990;
+  var sy=by+18;
+  if(_nwhWizData.goal){
+    try{ var u=JSON.parse(localStorage.getItem('vi_user')||'{}'); u.goal=_nwhWizData.goal; localStorage.setItem('vi_user',JSON.stringify(u)); }catch(e){}
+  }
+  // Anchors: start, low, best, current
+  var anchors={};
+  anchors[sy]=_nwhWizData.startNw||0;
+  if(_nwhWizData.lowestYear>=sy&&_nwhWizData.lowestYear<=cy) anchors[_nwhWizData.lowestYear]=_nwhWizData.lowestNw||0;
+  if(_nwhWizData.bestYear>=sy&&_nwhWizData.bestYear<=cy) anchors[_nwhWizData.bestYear]=_nwhWizData.bestNw||0;
+  // Live NW from overview state
+  var liveNw=0;
+  try{ var os=JSON.parse(localStorage.getItem('pos_ov1')||'null'); if(os){ liveNw=(os.assets||[]).reduce(function(a,r){return a+(+r.val||0);},0)-(os.debts||[]).reduce(function(a,r){return a+(+r.val||0);},0); } }catch(e){}
+  anchors[cy]=liveNw;
+  var aYrs=Object.keys(anchors).map(Number).sort(function(a,b){return a-b;});
+  // Generate all years with interpolation
+  var points=[];
+  for(var yr=sy;yr<=cy;yr++){
+    var nw=0;
+    if(anchors[yr]!==undefined){ nw=anchors[yr]; }
+    else{
+      var bef=null,aft=null;
+      for(var i=0;i<aYrs.length;i++){
+        if(aYrs[i]<yr) bef=aYrs[i];
+        if(aYrs[i]>yr&&aft===null) aft=aYrs[i];
+      }
+      if(bef!==null&&aft!==null){ var t=(yr-bef)/(aft-bef); nw=Math.round(anchors[bef]+t*(anchors[aft]-anchors[bef])); }
+      else if(bef!==null) nw=anchors[bef];
+    }
+    points.push({year:yr,age:yr-by,netWorth:nw,cash:0,stocks:0,metals:0,crypto:0,property:0,liabilities:0,notes:'',estimated:anchors[yr]===undefined});
+  }
+  var data={birthYear:by,setupDone:true,points:points};
+  nwhSave(data);
+  nwhRenderHistory(data);
+}
+
+// ── HISTORY VIEW ───────────────────────────────────────
+function nwhRenderHistory(data){
+  var body=document.getElementById('nwh-body'); if(!body) return;
+  var pts=data.points||[]; var cy=new Date().getFullYear();
+  var vals=pts.map(function(p){return p.netWorth;});
+  var minNw=vals.length?Math.min.apply(null,vals):0;
+  var maxNw=vals.length?Math.max.apply(null,vals):0;
+  var startNw=pts.length?pts[0].netWorth:0;
+  var endNw=pts.length?pts[pts.length-1].netWorth:0;
+  var rng=document.getElementById('nwh-year-range');
+  if(rng) rng.textContent=(pts.length?pts[0].year:'')+' – '+cy;
+  var html='';
+  // KPI strip
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:18px">';
+  html+='<div class="ov-kpi"><div class="ov-kpi-lbl">At 18</div><div class="ov-kpi-val" style="font-size:.78rem;color:var(--em)">'+nwhFmt(startNw)+'</div><div class="ov-kpi-sub">starting point</div></div>';
+  html+='<div class="ov-kpi"><div class="ov-kpi-lbl">All-Time Low</div><div class="ov-kpi-val" style="font-size:.78rem;color:var(--re)">'+nwhFmt(minNw)+'</div><div class="ov-kpi-sub">trough</div></div>';
+  html+='<div class="ov-kpi"><div class="ov-kpi-lbl">All-Time High</div><div class="ov-kpi-val" style="font-size:.78rem;color:var(--gr)">'+nwhFmt(maxNw)+'</div><div class="ov-kpi-sub">peak</div></div>';
+  html+='<div class="ov-kpi"><div class="ov-kpi-lbl">Total Growth</div><div class="ov-kpi-val" style="font-size:.78rem;color:'+(endNw-startNw>=0?'var(--go)':'var(--re)')+'">'+nwhFmt(endNw-startNw)+'</div><div class="ov-kpi-sub">since age 18</div></div>';
+  html+='</div>';
+  // Chart card
+  html+='<div class="ov-chart-card" style="margin-bottom:18px">'
+    +'<div class="ov-chart-hd" style="flex-wrap:wrap;gap:8px">'
+    +'<span class="ov-chart-title">Net Worth Timeline</span>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button onclick="nwhAddYear()" style="padding:5px 12px;background:rgba(68,192,185,.08);border:1px solid rgba(68,192,185,.2);color:var(--em);font-family:\'Share Tech Mono\',monospace;font-size:.48rem;cursor:pointer">+ Add Year</button>'
+    +'<button onclick="nwhResetWizard()" style="padding:5px 12px;background:rgba(255,255,255,.03);border:1px solid var(--bd);color:var(--t3);font-family:\'Share Tech Mono\',monospace;font-size:.48rem;cursor:pointer">↺ Redo</button>'
+    +'</div></div>'
+    +'<canvas id="nwh-chart" height="160" style="width:100%;display:block"></canvas>'
+    +'</div>';
+  // Year table
+  html+='<div style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Year-by-Year · tap any cell to edit · estimated rows marked ~</div>';
+  html+='<div style="overflow-x:auto"><table class="nwh-year-table"><thead><tr>'
+    +'<th style="text-align:left">Year</th><th style="text-align:left">Age</th>'
+    +'<th>Cash</th><th>Stocks</th><th>Metals</th><th>Crypto</th><th>Property</th>'
+    +'<th style="color:var(--re)">Liabilities</th>'
+    +'<th style="color:var(--em)">Net Worth</th>'
+    +'<th style="text-align:left">Notes</th><th></th>'
+    +'</tr></thead><tbody>';
+  pts.slice().reverse().forEach(function(p){
+    var nwCol=p.netWorth>=0?'var(--gr)':'var(--re)';
+    var isCy=p.year===cy;
+    html+='<tr>'
+      +'<td><span style="font-family:\'Share Tech Mono\',monospace;font-size:.6rem;'+(isCy?'color:var(--em);font-weight:700':'color:var(--t2)')+'">'+p.year+(p.estimated?' <span style="font-size:.4rem;color:var(--t3)">~</span>':'')+'</span></td>'
+      +'<td><span style="font-family:\'Share Tech Mono\',monospace;font-size:.54rem;color:var(--t3)">'+p.age+'</span></td>'
+      +'<td><input class="nwh-td-input" type="number" value="'+(p.cash||0)+'" onchange="nwhUpdate('+p.year+',\'cash\',this.value)"></td>'
+      +'<td><input class="nwh-td-input" type="number" value="'+(p.stocks||0)+'" onchange="nwhUpdate('+p.year+',\'stocks\',this.value)"></td>'
+      +'<td><input class="nwh-td-input" type="number" value="'+(p.metals||0)+'" onchange="nwhUpdate('+p.year+',\'metals\',this.value)"></td>'
+      +'<td><input class="nwh-td-input" type="number" value="'+(p.crypto||0)+'" onchange="nwhUpdate('+p.year+',\'crypto\',this.value)"></td>'
+      +'<td><input class="nwh-td-input" type="number" value="'+(p.property||0)+'" onchange="nwhUpdate('+p.year+',\'property\',this.value)"></td>'
+      +'<td><input class="nwh-td-input" type="number" value="'+(p.liabilities||0)+'" onchange="nwhUpdate('+p.year+',\'liabilities\',this.value)" style="color:var(--re)"></td>'
+      +'<td><input class="nwh-td-input" id="nwh-nw-'+p.year+'" type="number" value="'+(p.netWorth||0)+'" onchange="nwhUpdateNw('+p.year+',this.value)" style="color:'+nwCol+';font-weight:700"></td>'
+      +'<td><input class="nwh-td-input nwh-td-notes" type="text" value="'+(p.notes||'')+'" onchange="nwhUpdate('+p.year+',\'notes\',this.value)" placeholder="—"></td>'
+      +'<td><button onclick="nwhDeleteYear('+p.year+')" style="background:none;border:none;color:var(--re);font-size:.7rem;cursor:pointer;padding:2px 4px;opacity:.35" title="Delete row">×</button></td>'
+      +'</tr>';
+  });
+  html+='</tbody></table></div>';
+
+  // Card layout (shown on mobile, hidden on desktop via CSS)
+  html+='<div class="nwh-cards">';
+  pts.slice().reverse().forEach(function(p){
+    var nwCol=p.netWorth>=0?'var(--gr)':'var(--re)';
+    html+='<div class="nwh-card">'
+      +'<div class="nwh-card-top">'
+      +'<span class="nwh-card-yr">'+p.year+(p.age?' · age '+p.age:'')+(p.estimated?' <span style="font-size:.4rem;color:var(--t3)">~</span>':'')+'</span>'
+      +'<span class="nwh-card-nw" style="color:'+nwCol+'">'+nwhFmt(p.netWorth)+'</span>'
+      +'</div>'
+      +'<div class="nwh-card-fields">'
+      +'<div class="nwh-card-field"><label>Cash</label><input type="number" value="'+(p.cash||0)+'" onchange="nwhUpdate('+p.year+',\'cash\',this.value)"></div>'
+      +'<div class="nwh-card-field"><label>Stocks</label><input type="number" value="'+(p.stocks||0)+'" onchange="nwhUpdate('+p.year+',\'stocks\',this.value)"></div>'
+      +'<div class="nwh-card-field"><label>Metals</label><input type="number" value="'+(p.metals||0)+'" onchange="nwhUpdate('+p.year+',\'metals\',this.value)"></div>'
+      +'<div class="nwh-card-field"><label>Crypto</label><input type="number" value="'+(p.crypto||0)+'" onchange="nwhUpdate('+p.year+',\'crypto\',this.value)"></div>'
+      +'<div class="nwh-card-field"><label>Property</label><input type="number" value="'+(p.property||0)+'" onchange="nwhUpdate('+p.year+',\'property\',this.value)"></div>'
+      +'<div class="nwh-card-field"><label style="color:var(--re)">Liabilities</label><input type="number" value="'+(p.liabilities||0)+'" onchange="nwhUpdate('+p.year+',\'liabilities\',this.value)" style="color:var(--re)"></div>'
+      +'<div class="nwh-card-field" style="grid-column:1/-1"><label style="color:var(--em)">Net Worth (override)</label><input id="nwh-nw-'+p.year+'" type="number" value="'+(p.netWorth||0)+'" onchange="nwhUpdateNw('+p.year+',this.value)" style="color:'+nwCol+';font-weight:700"></div>'
+      +'<div class="nwh-card-field" style="grid-column:1/-1"><label>Notes</label><input type="text" value="'+(p.notes||'')+'" onchange="nwhUpdate('+p.year+',\'notes\',this.value)" placeholder="—"></div>'
+      +'</div>'
+      +'<div style="margin-top:8px;text-align:right"><button onclick="nwhDeleteYear('+p.year+')" style="background:none;border:1px solid rgba(224,92,92,.2);color:var(--re);font-family:\'Share Tech Mono\',monospace;font-size:.44rem;cursor:pointer;padding:3px 10px;opacity:.6">Delete year</button></div>'
+      +'</div>';
+  });
+  html+='</div>';
+
+  body.innerHTML=html;
+  setTimeout(function(){ nwhDrawChart(pts); },60);
+}
+
+function nwhUpdate(year,field,value){
+  var data=nwhLoad(); if(!data) return;
+  var p=data.points.find(function(x){return x.year===year;}); if(!p) return;
+  p[field]=field==='notes'?value:(parseFloat(value)||0);
+  if(field!=='notes'){
+    p.netWorth=(p.cash||0)+(p.stocks||0)+(p.metals||0)+(p.crypto||0)+(p.property||0)-(p.liabilities||0);
+    p.estimated=false;
+    var nwEl=document.getElementById('nwh-nw-'+year);
+    if(nwEl){ nwEl.value=p.netWorth; nwEl.style.color=p.netWorth>=0?'var(--gr)':'var(--re)'; }
+  }
+  nwhSave(data);
+  nwhDrawChart(data.points);
+}
+
+function nwhUpdateNw(year,value){
+  var data=nwhLoad(); if(!data) return;
+  var p=data.points.find(function(x){return x.year===year;}); if(!p) return;
+  p.netWorth=parseFloat(value)||0; p.estimated=false;
+  nwhSave(data); nwhDrawChart(data.points);
+}
+
+function nwhDeleteYear(year){
+  var data=nwhLoad(); if(!data) return;
+  if(year===new Date().getFullYear()){showToast('Cannot delete the current year');return;}
+  data.points=data.points.filter(function(p){return p.year!==year;});
+  nwhSave(data); nwhRenderHistory(data);
+}
+
+function nwhAddYear(){
+  var yr=parseInt(prompt('Enter a year to add (e.g. '+(new Date().getFullYear()-5)+'):'));
+  if(!yr||isNaN(yr)) return;
+  var data=nwhLoad(); if(!data) return;
+  var by=data.birthYear||1990; var cy=new Date().getFullYear();
+  if(yr<by+14||yr>cy+1){showToast('Year out of range');return;}
+  if(data.points.find(function(p){return p.year===yr;})){showToast('Year '+yr+' already exists — edit the row');return;}
+  data.points.push({year:yr,age:yr-by,netWorth:0,cash:0,stocks:0,metals:0,crypto:0,property:0,liabilities:0,notes:'',estimated:false});
+  data.points.sort(function(a,b){return a.year-b.year;});
+  nwhSave(data); nwhRenderHistory(data);
+}
+
+function nwhResetWizard(){
+  if(!confirm('Clear all history and redo setup?')) return;
+  localStorage.removeItem(NWH_KEY);
+  _nwhWizData={};
+  nwhRenderWizard(0);
+}
+
+// ── CHART ──────────────────────────────────────────────
+function nwhDrawChart(pts){
+  var canvas=document.getElementById('nwh-chart'); if(!canvas) return;
+  var W=canvas.offsetWidth||600; var H=160;
+  var dpr=window.devicePixelRatio||1;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  var ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  if(!pts||pts.length<2) return;
+  var pad={t:14,r:12,b:28,l:54};
+  var cW=W-pad.l-pad.r; var cH=H-pad.t-pad.b;
+  var vals=pts.map(function(p){return p.netWorth;});
+  var minV=Math.min.apply(null,vals); var maxV=Math.max.apply(null,vals);
+  var rng=maxV-minV||1; var p2=rng*0.12; minV-=p2; maxV+=p2; rng=maxV-minV;
+  var tx=function(i){return pad.l+(i/(pts.length-1))*cW;};
+  var ty=function(v){return pad.t+cH-((v-minV)/rng)*cH;};
+  // Grid + labels
+  ctx.font='8px Share Tech Mono,monospace'; ctx.textAlign='right';
+  for(var i=0;i<=4;i++){
+    var gy=pad.t+(cH/4)*i; var gv=maxV-(rng/4)*i;
+    ctx.strokeStyle='rgba(255,255,255,.04)'; ctx.lineWidth=1; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(pad.l,gy); ctx.lineTo(pad.l+cW,gy); ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.22)';
+    var gl=Math.abs(gv)>=1000?(gv>=0?'£':'-£')+Math.round(Math.abs(gv)/1000)+'k':(gv>=0?'£':'-£')+Math.abs(Math.round(gv));
+    ctx.fillText(gl,pad.l-4,gy+3);
+  }
+  // Zero line
+  var zy=ty(0);
+  if(zy>=pad.t&&zy<=pad.t+cH){
+    ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(pad.l,zy); ctx.lineTo(pad.l+cW,zy); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  // Gradient fill
+  var grad=ctx.createLinearGradient(0,pad.t,0,pad.t+cH);
+  grad.addColorStop(0,'rgba(68,192,185,.22)'); grad.addColorStop(1,'rgba(68,192,185,.02)');
+  ctx.beginPath();
+  ctx.moveTo(tx(0),pad.t+cH);
+  pts.forEach(function(p,i){ctx.lineTo(tx(i),ty(p.netWorth));});
+  ctx.lineTo(tx(pts.length-1),pad.t+cH); ctx.closePath();
+  ctx.fillStyle=grad; ctx.fill();
+  // Line
+  ctx.beginPath(); ctx.moveTo(tx(0),ty(pts[0].netWorth));
+  pts.forEach(function(p,i){if(i>0)ctx.lineTo(tx(i),ty(p.netWorth));});
+  ctx.strokeStyle='rgba(68,192,185,.9)'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
+  // Anchor dots
+  pts.forEach(function(p,i){
+    if(!p.estimated){
+      ctx.beginPath(); ctx.arc(tx(i),ty(p.netWorth),3,0,Math.PI*2);
+      ctx.fillStyle=p.netWorth>=0?'rgba(62,207,142,.9)':'rgba(224,92,92,.9)'; ctx.fill();
+    }
+  });
+  // Year labels every 5yr
+  ctx.fillStyle='rgba(255,255,255,.28)'; ctx.font='8px Share Tech Mono,monospace'; ctx.textAlign='center';
+  pts.forEach(function(p,i){ if(p.year%5===0) ctx.fillText(p.year,tx(i),pad.t+cH+16); });
+}
+
+// ── MINI PREVIEW in overview ───────────────────────────
+// ── FOUNDER BADGE ─────────────────────────────────────────
+function viApplyFounderBadge() {
+  try {
+    var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
+    if (!u || !u.founder) return;
+    // Inject badge next to logo if not already there
+    var logo = document.querySelector('.logo');
+    if (logo && !document.getElementById('vi-founder-badge-nav')) {
+      var badge = document.createElement('span');
+      badge.id = 'vi-founder-badge-nav';
+      badge.className = 'vi-founder-badge';
+      badge.textContent = 'FOUNDER';
+      logo.parentNode.insertBefore(badge, logo.nextSibling);
+    }
+  } catch(e) {}
+}
+
+// ── CAMPAIGN MODAL ─────────────────────────────────────────
+function viShowCampaign() {
+  var modal = document.getElementById('vi-campaign-modal');
+  if (!modal) return;
+  // Populate live stats from VI_CAMPAIGN config
+  var c = VI_CAMPAIGN;
+  var pct = c.goal > 0 ? Math.min(Math.round((c.backers / c.goal) * 100), 100) : 0;
+  var daysLeft = 0;
+  try {
+    var dl = new Date(c.deadline);
+    var now = new Date();
+    daysLeft = Math.max(0, Math.ceil((dl - now) / 86400000));
+  } catch(e) {}
+  var slotsLeft = Math.max(0, c.founderSlots - c.founderTaken);
+
+  var elB = document.getElementById('camp-backers');
+  var elP = document.getElementById('camp-pct');
+  var elD = document.getElementById('camp-days');
+  var elBar = document.getElementById('camp-bar-fill');
+  var elLbl = document.getElementById('camp-bar-lbl');
+  var elFS = document.getElementById('camp-founder-slots');
+
+  if (elB) elB.textContent = c.backers > 0 ? c.backers.toLocaleString() : '—';
+  if (elP) elP.textContent = c.backers > 0 ? pct + '%' : '—';
+  if (elD) elD.textContent = daysLeft > 0 ? daysLeft : '—';
+  if (elBar) setTimeout(function() { elBar.style.width = (c.backers > 0 ? pct : 0) + '%'; }, 100);
+  if (elLbl) elLbl.textContent = c.backers > 0
+    ? c.backers + ' of ' + c.goal + ' founding backers'
+    : 'Be among the first — campaign launching soon';
+  if (elFS) elFS.textContent = slotsLeft > 0 ? slotsLeft + ' spots left' : 'Sold out';
+
+  modal.classList.remove('hidden');
+}
+
+// ── DENSITY MODE ──────────────────────────────────────────
+function setDensity(mode) {
+  document.body.classList.remove('vi-compact','vi-wide');
+  if (mode === 'compact') document.body.classList.add('vi-compact');
+  if (mode === 'wide')    document.body.classList.add('vi-wide');
+  try { localStorage.setItem('vi_density', mode || 'default'); } catch(e) {}
+  document.querySelectorAll('.vi-d-opt').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-d') === (mode || 'default'));
+  });
+  // Redraw canvas charts — size may have changed
+  setTimeout(function() {
+    if (typeof drawChart === 'function') drawChart();
+    var nc = document.getElementById('nwh-chart');
+    if (nc && typeof nwhDrawChart === 'function') {
+      var d = nwhLoad(); if (d && d.points) nwhDrawChart(d.points);
+    }
+  }, 120);
+}
+function loadDensity() {
+  var saved = localStorage.getItem('vi_density') || 'default';
+  setDensity(saved === 'default' ? null : saved);
+}
+
+function nwhRenderMini(){
+  var wrap=document.getElementById('nwh-mini-wrap'); if(!wrap) return;
+  var data=nwhLoad();
+  if(!data||!data.setupDone||!data.points||data.points.length<2){
+    wrap.innerHTML='<div style="font-size:.5rem;color:var(--t3);line-height:36px">Set up your history to see your journey here</div>'; return;
+  }
+  wrap.innerHTML='<canvas id="nwh-mini" height="36" style="width:100%;height:36px;display:block"></canvas>';
+  setTimeout(function(){
+    var c=document.getElementById('nwh-mini'); if(!c) return;
+    var ctx=c.getContext('2d'); var W=c.offsetWidth||300; var dpr=window.devicePixelRatio||1;
+    c.width=W*dpr; c.height=36*dpr; ctx.scale(dpr,dpr);
+    var pts=data.points;
+    var vals=pts.map(function(p){return p.netWorth;});
+    var mn=Math.min.apply(null,vals); var mx=Math.max.apply(null,vals); var rng=mx-mn||1;
+    var tx=function(i){return (i/(pts.length-1))*W;};
+    var ty=function(v){return 32-((v-mn)/rng)*28;};
+    ctx.beginPath(); ctx.moveTo(tx(0),ty(pts[0].netWorth));
+    pts.forEach(function(p,i){if(i>0)ctx.lineTo(tx(i),ty(p.netWorth));});
+    ctx.strokeStyle='rgba(68,192,185,.55)'; ctx.lineWidth=1.5; ctx.stroke();
+  },40);
 }
 
 </script>
@@ -10262,14 +11672,19 @@ if (document.readyState === 'loading') {
   </div>
 </div>
 
-<!-- Hidden Mailchimp form — TODO: replace ACTION_URL with real Mailchimp form action -->
-<form id="mc-hidden-form" action="YOUR_MAILCHIMP_ACTION_URL" method="POST" target="mc-frame" style="display:none">
-  <input type="email" name="EMAIL" id="mc-email">
-  <input type="text" name="FNAME" id="mc-fname">
-  <input type="text" name="MERGE2" id="mc-goal">
-  <input type="hidden" name="b_TAG" value="1">
-</form>
-<iframe name="mc-frame" style="display:none" aria-hidden="true"></iframe>
+<!-- Email capture handled via ConvertKit API in captureEmailToList() — configure Form ID + API Key in Settings -->
+
+<!-- ══ NET WORTH HISTORY MODAL ══ -->
+<div id="nwh-modal" class="nwh-modal" style="display:none">
+  <div class="nwh-header">
+    <span class="nwh-title">📅 My Financial Journey</span>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <span id="nwh-year-range" style="font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--t2)"></span>
+      <button onclick="closeNwHistory()" style="background:none;border:1px solid var(--bd);color:var(--t2);font-family:'Share Tech Mono',monospace;font-size:.56rem;padding:5px 14px;cursor:pointer">✕ Close</button>
+    </div>
+  </div>
+  <div class="nwh-body" id="nwh-body"></div>
+</div>
 
 </body>
 </html>
