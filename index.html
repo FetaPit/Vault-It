@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.6.2';
+  var SW_VERSION = '0.6.3';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -730,6 +730,106 @@ body::before {
   .g3, .g4        { grid-template-columns: 1fr; }
 }
 
+/* ── PIONEER CARD (holographic) ── */
+@keyframes holo-cycle {
+  0%   { background-position: 0% 50%;   filter: hue-rotate(0deg)   brightness(1.05); }
+  50%  { background-position: 100% 50%; filter: hue-rotate(200deg) brightness(1.15); }
+  100% { background-position: 0% 50%;   filter: hue-rotate(360deg) brightness(1.05); }
+}
+@keyframes holo-glow {
+  0%,100%{ box-shadow: 0 0 10px 2px rgba(68,192,185,.45), 0 0 24px 4px rgba(68,192,185,.12); }
+  25%    { box-shadow: 0 0 10px 2px rgba(240,100,200,.45), 0 0 24px 4px rgba(240,100,200,.12); }
+  50%    { box-shadow: 0 0 10px 2px rgba(120,120,255,.45), 0 0 24px 4px rgba(120,120,255,.12); }
+  75%    { box-shadow: 0 0 10px 2px rgba(201,168,76,.55),  0 0 24px 4px rgba(201,168,76,.15); }
+}
+@keyframes holo-sheen {
+  0%   { background-position: -200% 50%; }
+  100% { background-position:  200% 50%; }
+}
+.pioneer-card-wrap {
+  padding: 2px;
+  border-radius: 10px;
+  background: linear-gradient(135deg,#44c0b9,#c9a84c,#e040fb,#4488ff,#44c0b9);
+  background-size: 300% 300%;
+  animation: holo-cycle 5s ease infinite, holo-glow 5s ease infinite;
+  margin-top: 12px;
+}
+.pioneer-card {
+  background: linear-gradient(160deg,#070c12 0%,#0c1820 60%,#060a10 100%);
+  border-radius: 8px;
+  padding: 12px 12px 10px;
+  position: relative;
+  overflow: hidden;
+}
+.pioneer-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg,transparent 30%,rgba(255,255,255,.07) 50%,transparent 70%);
+  background-size: 300% 100%;
+  animation: holo-sheen 4s linear infinite;
+  pointer-events: none;
+  border-radius: 8px;
+}
+.pioneer-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(68,192,185,.025) 3px, rgba(68,192,185,.025) 4px
+  );
+  pointer-events: none;
+  border-radius: 8px;
+}
+.pc-avatar-wrap {
+  width: 50px; height: 50px; border-radius: 50%;
+  background: linear-gradient(135deg,rgba(68,192,185,.3),rgba(201,168,76,.3));
+  border: 1.5px solid rgba(255,255,255,.25);
+  overflow: hidden; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; color: var(--em);
+}
+.pc-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.pc-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px;
+  background: rgba(201,168,76,.15);
+  border: 1px solid rgba(201,168,76,.4);
+  font-family: 'Syne', sans-serif; font-size: .38rem; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--go);
+  clip-path: polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px));
+}
+.pc-archetype {
+  display: inline-block; padding: 2px 7px;
+  background: rgba(68,192,185,.08);
+  border: 1px solid rgba(68,192,185,.2);
+  font-family: 'Share Tech Mono', monospace; font-size: .38rem;
+  color: var(--em); clip-path: polygon(0 0,calc(100% - 3px) 0,100% 3px,100% 100%,3px 100%,0 calc(100% - 3px));
+}
+.pc-footer {
+  border-top: 1px solid rgba(68,192,185,.12);
+  margin-top: 8px; padding-top: 6px;
+  font-family: 'Share Tech Mono', monospace; font-size: .36rem;
+  color: rgba(68,192,185,.35); letter-spacing: .1em; text-transform: uppercase;
+  text-align: center;
+}
+/* sidebar profile select/input styling */
+.sb-select {
+  width: 100%; background: var(--c3); border: 1px solid var(--bd);
+  color: var(--t2); font-family: 'Syne', sans-serif; font-size: .55rem;
+  padding: 5px 7px; outline: none; cursor: pointer;
+  clip-path: polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px));
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2344c0b9' opacity='.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center; background-size: 8px;
+  padding-right: 24px;
+}
+.sb-select:focus { border-color: var(--em); }
+.sb-field-lbl {
+  display: block; font-family: 'Syne', sans-serif; font-size: .4rem;
+  font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--t3); margin-bottom: 3px;
+}
+
 /* ── WELCOME SCREEN ── */
 #welcome-overlay {
   position: fixed; inset: 0; z-index: 10000;
@@ -777,8 +877,8 @@ body::before {
   line-height: 1.3;
 }
 .welcome-sub {
-  font-family: 'DM Sans', sans-serif;
-  font-size: .6rem;
+  font-family: 'Syne', sans-serif;
+  font-size: .58rem;
   color: var(--t2);
   line-height: 1.6;
   margin-bottom: 18px;
@@ -803,8 +903,8 @@ body::before {
   border-radius: 0;
   clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
   color: var(--tx);
-  font-family: 'DM Sans', sans-serif;
-  font-size: .7rem;
+  font-family: 'Syne', sans-serif;
+  font-size: .68rem;
   padding: 9px 12px;
   outline: none;
   transition: border-color .2s;
@@ -828,8 +928,8 @@ body::before {
   background: var(--c3);
   border: 1px solid var(--bd);
   clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
-  font-family: 'DM Sans', sans-serif;
-  font-size: .62rem;
+  font-family: 'Syne', sans-serif;
+  font-size: .6rem;
   color: var(--t2);
   cursor: pointer;
   transition: all .15s;
@@ -858,7 +958,7 @@ body::before {
 }
 .welcome-cta:hover { background: var(--em2); box-shadow: 0 0 20px rgba(68,192,185,.3); }
 .welcome-free-note {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Syne', sans-serif;
   font-size: .52rem;
   color: var(--t3);
   text-align: center;
@@ -2226,15 +2326,53 @@ input:focus, textarea:focus, select:focus {
     <div class="sb-row"><span style="color:var(--t2)">Clients</span><span class="sb-val" id="sb-clients">0</span></div>
   </div>
   <div class="sb-section" id="sb-profile-section">
-    <div class="sb-label">Profile</div>
-    <div style="display:flex;justify-content:center;align-items:center;padding:6px 0 2px;opacity:.6"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px"><circle cx="14" cy="14" r="13" fill="none" stroke="#44c0b9" stroke-width="0.9" opacity=".8"/><circle cx="14" cy="14" r="11.5" fill="#030c14"/><circle cx="14" cy="14" r="10.5" fill="none" stroke="#44c0b9" stroke-width="0.4" opacity=".3"/><line x1="14" y1="3.2" x2="14" y2="5.8" stroke="#44c0b9" stroke-width="0.8" opacity=".5"/><line x1="24.8" y1="14" x2="22.2" y2="14" stroke="#44c0b9" stroke-width="0.8" opacity=".5"/><line x1="14" y1="24.8" x2="14" y2="22.2" stroke="#44c0b9" stroke-width="0.8" opacity=".5"/><line x1="3.2" y1="14" x2="5.8" y2="14" stroke="#44c0b9" stroke-width="0.8" opacity=".5"/><polyline points="7,9.5 14,18 21,9.5" fill="none" stroke="#44c0b9" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"/></svg></div>
+    <div class="sb-label">Your Profile</div>
+    <!-- Avatar -->
     <div style="text-align:center;margin-bottom:8px">
-      <div id="sb-avatar" style="width:48px;height:48px;border-radius:50%;background:rgba(68,192,185,.15);border:2px solid var(--bd2);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer" onclick="document.getElementById('sb-avatar-upload').click()" title="Click to upload avatar">👤</div>
+      <div id="sb-avatar" style="width:52px;height:52px;border-radius:50%;background:rgba(68,192,185,.15);border:2px solid rgba(68,192,185,.3);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;overflow:hidden" onclick="document.getElementById('sb-avatar-upload').click()" title="Tap to upload photo">👤</div>
       <input type="file" id="sb-avatar-upload" accept="image/*" style="display:none" onchange="uploadSbAvatar(this)">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--t3);letter-spacing:.08em">TAP TO UPLOAD</div>
     </div>
-    <div style="margin-bottom:4px"><input type="text" id="sb-profile-name" class="al-inp" placeholder="Your name" style="font-size:.58rem;padding:4px 7px;width:100%" onchange="saveProfile()"></div>
-    <div style="margin-bottom:4px"><input type="email" id="sb-profile-email" class="al-inp" placeholder="Email" style="font-size:.58rem;padding:4px 7px;width:100%" onchange="saveProfile()"></div>
-    <div><input type="text" id="sb-profile-details" class="al-inp" placeholder="Bio / details" style="font-size:.58rem;padding:4px 7px;width:100%" onchange="saveProfile()"></div>
+    <!-- Basic info -->
+    <div style="margin-bottom:5px">
+      <label class="sb-field-lbl">Name</label>
+      <input type="text" id="sb-profile-name" class="al-inp" placeholder="Your name" style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
+    </div>
+    <div style="margin-bottom:5px">
+      <label class="sb-field-lbl">Email</label>
+      <input type="email" id="sb-profile-email" class="al-inp" placeholder="you@example.com" style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
+    </div>
+    <div style="margin-bottom:5px">
+      <label class="sb-field-lbl">Profession</label>
+      <input type="text" id="sb-profile-job" class="al-inp" placeholder="What do you do?" style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
+    </div>
+    <div style="margin-bottom:8px">
+      <label class="sb-field-lbl">Dream Profession</label>
+      <input type="text" id="sb-profile-dream" class="al-inp" placeholder="When Vault-It works..." style="font-size:.56rem;padding:4px 7px;width:100%" onchange="saveProfile()">
+    </div>
+    <!-- Archetypes -->
+    <div style="margin-bottom:5px">
+      <label class="sb-field-lbl">Saving Archetype</label>
+      <select id="sb-save-arch" class="sb-select" onchange="saveProfile()">
+        <option value="">— choose yours —</option>
+        <option value="🐿️ The Squirrel">🐿️ The Squirrel — Steady, habitual saver</option>
+        <option value="🎯 The Sniper">🎯 The Sniper — Goal-first, saves with a target</option>
+        <option value="📈 The Investor">📈 The Investor — Deploys savings, money works</option>
+        <option value="🌊 The Tidal Saver">🌊 The Tidal Saver — Saves hard when income spikes</option>
+      </select>
+    </div>
+    <div style="margin-bottom:8px">
+      <label class="sb-field-lbl">Spending Archetype</label>
+      <select id="sb-spend-arch" class="sb-select" onchange="saveProfile()">
+        <option value="">— choose yours —</option>
+        <option value="🧘 The Minimalist">🧘 The Minimalist — Only spends on what matters</option>
+        <option value="🎭 Experience Seeker">🎭 Experience Seeker — Memories, not things</option>
+        <option value="🛒 Comfort Spender">🛒 Comfort Spender — Quality of life first</option>
+        <option value="⚡ Impulse Reactor">⚡ Impulse Reactor — Spends freely, patches later</option>
+      </select>
+    </div>
+    <!-- Pioneer card -->
+    <div id="sb-pioneer-card"></div>
   </div>
   <div style="margin-top:auto;padding-top:12px;border-top:1px solid rgba(68,192,185,.08)">
     <button onclick="showSettings()" title="Settings & API Keys" style="width:100%;background:rgba(13,21,32,0.92);border:1px solid rgba(68,192,185,0.25);border-radius:6px;padding:8px 11px;color:rgba(90,96,104,0.9);font-size:.62rem;cursor:pointer;white-space:nowrap;transition:border-color .2s,color .2s;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em" onmouseover="this.style.borderColor='rgba(68,192,185,0.6)';this.style.color='rgba(232,232,232,0.9)'" onmouseout="this.style.borderColor='rgba(68,192,185,0.25)';this.style.color='rgba(90,96,104,0.9)'">⚙ Settings</button>
@@ -2737,7 +2875,7 @@ input:focus, textarea:focus, select:focus {
           <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
           LinkedIn
         </a>
-        <a href="https://ptlive.my.canva.site/" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);text-decoration:none;padding:4px 8px;border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+        <a href="https://ptlive.my.canva.site/pt-live-design" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);text-decoration:none;padding:4px 8px;border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
           Portfolio
         </a>
@@ -4557,20 +4695,26 @@ function toggleSidebar(){
 }
 function _sbEl(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
 function updateSidebar(){
-  // Populate profile from welcome screen data
+  // Populate profile from stored user data
   try {
     var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
     if (u) {
-      var nm = document.getElementById('sb-profile-name');
-      var em = document.getElementById('sb-profile-email');
-      var dt = document.getElementById('sb-profile-details');
-      if (nm) nm.value = u.name  || '';
-      if (em) em.value = u.email || '';
-      if (dt && u.bio) dt.value = u.bio;
-      // Update nav name if present
+      var _f = function(id, val) { var el = document.getElementById(id); if (el && val) el.value = val; };
+      _f('sb-profile-name',  u.name);
+      _f('sb-profile-email', u.email);
+      _f('sb-profile-job',   u.job);
+      _f('sb-profile-dream', u.dream);
+      _f('sb-save-arch',     u.saveArch);
+      _f('sb-spend-arch',    u.spendArch);
+      // Restore avatar
+      if (u.avatar) {
+        var av = document.getElementById('sb-avatar');
+        if (av) av.innerHTML = '<img src="' + u.avatar + '" style="width:100%;height:100%;object-fit:cover;object-position:center top">';
+      }
       var navName = document.getElementById('nav-user-name');
       if (navName && u.name) navName.textContent = u.name;
     }
+    renderPioneerCard();
   } catch(e) {}
 
   if(!_sidebarOpen)return;
@@ -10957,18 +11101,85 @@ function importData() {
   input.click();
 }
 
+function uploadSbAvatar(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var dataUrl = e.target.result;
+    var av = document.getElementById('sb-avatar');
+    if (av) { av.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;object-position:center top">'; }
+    try {
+      var user = JSON.parse(localStorage.getItem('vi_user') || '{}');
+      user.avatar = dataUrl;
+      localStorage.setItem('vi_user', JSON.stringify(user));
+      _vaultItUser = user;
+    } catch(e) {}
+    renderPioneerCard();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function renderPioneerCard() {
+  var wrap = document.getElementById('sb-pioneer-card');
+  if (!wrap) return;
+  try {
+    var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
+    if (!u || !u.name) {
+      wrap.innerHTML = '<div style="text-align:center;padding:10px 0;font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:var(--t3);letter-spacing:.08em">COMPLETE PROFILE TO UNLOCK CARD</div>';
+      return;
+    }
+    var initials = (u.name || '?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+    var avatarHtml = u.avatar
+      ? '<img src="' + u.avatar + '" style="width:100%;height:100%;object-fit:cover;object-position:center top">'
+      : '<span style="font-size:1.2rem;color:var(--em)">' + initials + '</span>';
+    var saveArch  = u.saveArch  || '';
+    var spendArch = u.spendArch || '';
+    var job       = u.job       || '';
+    var dream     = u.dream     || '';
+    var joined    = u.joined ? new Date(u.joined).getFullYear() : new Date().getFullYear();
+    wrap.innerHTML =
+      '<div class="pioneer-card-wrap">' +
+        '<div class="pioneer-card">' +
+          '<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px;position:relative;z-index:1">' +
+            '<div class="pc-avatar-wrap">' + avatarHtml + '</div>' +
+            '<div style="flex:1;min-width:0">' +
+              '<div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:.65rem;color:#fff;line-height:1.1;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (u.name||'Pioneer') + '</div>' +
+              '<div class="pc-badge">◈ Pioneer · Alpha · Lifetime Pro</div>' +
+            '</div>' +
+          '</div>' +
+          (job || dream ? '<div style="margin-bottom:7px;position:relative;z-index:1">' +
+            (job   ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:.4rem;color:var(--t2);margin-bottom:2px">▸ ' + job   + '</div>' : '') +
+            (dream ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:.4rem;color:var(--go)">◈ ' + dream + '</div>' : '') +
+          '</div>' : '') +
+          (saveArch || spendArch ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;position:relative;z-index:1">' +
+            (saveArch  ? '<span class="pc-archetype">' + saveArch.split(' ').slice(0,3).join(' ') + '</span>' : '') +
+            (spendArch ? '<span class="pc-archetype">' + spendArch.split(' ').slice(0,3).join(' ') + '</span>' : '') +
+          '</div>' : '') +
+          '<div class="pc-footer" style="position:relative;z-index:1">VAULT·IT PIONEER · ' + joined + ' · ALPHA</div>' +
+        '</div>' +
+      '</div>';
+  } catch(e) {}
+}
+
 function saveProfile() {
-  var nm = document.getElementById('sb-profile-name');
-  var em = document.getElementById('sb-profile-email');
-  var dt = document.getElementById('sb-profile-details');
+  var nm    = document.getElementById('sb-profile-name');
+  var em    = document.getElementById('sb-profile-email');
+  var job   = document.getElementById('sb-profile-job');
+  var dream = document.getElementById('sb-profile-dream');
+  var sa    = document.getElementById('sb-save-arch');
+  var sp    = document.getElementById('sb-spend-arch');
   try {
     var user = JSON.parse(localStorage.getItem('vi_user') || '{}');
-    if (nm && nm.value) user.name  = nm.value.trim();
-    if (em && em.value) user.email = em.value.trim();
-    if (dt && dt.value) user.bio   = dt.value.trim();
+    if (nm    && nm.value.trim())    user.name      = nm.value.trim();
+    if (em    && em.value.trim())    user.email     = em.value.trim();
+    if (job   && job.value.trim())   user.job       = job.value.trim();
+    if (dream && dream.value.trim()) user.dream     = dream.value.trim();
+    if (sa    && sa.value)           user.saveArch  = sa.value;
+    if (sp    && sp.value)           user.spendArch = sp.value;
     user.joined = user.joined || new Date().toISOString();
     localStorage.setItem('vi_user', JSON.stringify(user));
     _vaultItUser = user;
+    renderPioneerCard();
     showToast('Profile saved');
   } catch(e) {}
 }
