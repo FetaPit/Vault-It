@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.6.5';
+  var SW_VERSION = '0.6.6';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2336,6 +2336,11 @@ input:focus, textarea:focus, select:focus {
   </div>
   <div class="sb-section" id="sb-profile-section">
     <div class="sb-label">Your Profile</div>
+    <!-- XP CTA — hidden once profile complete -->
+    <div id="sb-profile-cta" style="background:linear-gradient(135deg,rgba(201,168,76,.14),rgba(201,168,76,.06));border:1px solid rgba(201,168,76,.32);border-radius:7px;padding:8px 10px;margin-bottom:9px;text-align:center">
+      <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:800;color:var(--go);letter-spacing:.12em;margin-bottom:2px">🎖 +100 XP AVAILABLE</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:var(--t2);line-height:1.45">Complete your profile to unlock your Pioneer card &amp; earn your founding badge</div>
+    </div>
     <!-- Profile fields — hidden when profile complete, shown in edit mode -->
     <div id="sb-profile-fields">
       <!-- Avatar -->
@@ -2871,9 +2876,13 @@ input:focus, textarea:focus, select:focus {
 <div id="ov-page">
 
   <!-- Dev contact bento card -->
-  <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin-bottom:14px;position:relative;overflow:hidden">
-    <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--em)"></div>
-    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABGAFgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUAAwYHAgH/xAA1EAACAQMCAwYEBQMFAAAAAAABAgMABBEFIRIxYQYTQVFxgSIyQpEHFCOhwTNSYkNEsdHw/8QAGQEAAwEBAQAAAAAAAAAAAAAAAgMEAQUA/8QAIBEAAwACAgIDAQAAAAAAAAAAAAECAxESMQQhEzNBcf/aAAwDAQACEQMRAD8A5banMS9BiitJtu91ZpCNoxn3NCWO8betNrJltrC5n+o/CPXkKNvUmRPK9ID1ENcu959Hed2vUAf++9CqlG34EYgtB/oRgsP8m3P7YFVRqo3bA8s0GuM7Y62qtpHlLd5CAMDPLiOM1fJo9wi5JUt/aKeWmi315bo9raSGQHPeMnCB9xRL9m7yACW4uj3nMhRnFT/M9jl4+0Y4wsvNSK8lKeNbSd9JDM4JHy7Yz5UqaPFURXInuOLBGWqWFGOvShnFawCmpX01Kw8MLBf0fUmmNpG07xQkforLxyHz6UJp6/op6U001dyetM47WgJyOK5IobR725upLh2iBkcsRk+PtRGlWgXXIoHGVSZVJPIbgZPTenMa7V8srVJtcmt3Clbu2YANy4gM/wAZrM31sPBXLIkb+fVdNjUW352ASY2XjFINS1TTu9Mf5pSwznh3x9qtuOzoubyF5IWVAoV2MoKlcAYAz7UhuNOhh1SZILeMwtJlYwwUIenhjeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95co8WEh2RTc4GPXeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95coWKYYXGMHP4pq9nHHHIqL8CnAqtPp24hTgHzFPLRQkCgDGBitOHFqzElVpVJaHFr4rgnFX4OatjFGwzSb1R42cFYoUFY6f/Z" alt="Pete Thickett" style="width:60px;height:52px;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));flex-shrink:0;object-fit:cover;object-position:left top">
+  <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 12px;background:var(--c1);border:1px solid rgba(201,168,76,.35);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin-bottom:14px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,#c9a84c,#f0d878,#c9a84c)"></div>
+    <div style="flex-shrink:0;padding:2px;border-radius:8px;background:linear-gradient(135deg,#b8902e 0%,#f0d878 40%,#c9a84c 70%,#b8902e 100%);box-shadow:0 0 16px rgba(201,168,76,.5),0 2px 6px rgba(0,0,0,.4)">
+      <div style="border-radius:6px;overflow:hidden;width:72px;height:72px;background:var(--c1)">
+        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABGAFgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUAAwYHAgH/xAA1EAACAQMCAwYEBQMFAAAAAAABAgMABBEFIRIxYQYTQVFxgSIyQpEHFCOhwTNSYkNEsdHw/8QAGQEAAwEBAQAAAAAAAAAAAAAAAgMEAQUA/8QAIBEAAwACAgIDAQAAAAAAAAAAAAECAxESMQQhEzNBcf/aAAwDAQACEQMRAD8A5banMS9BiitJtu91ZpCNoxn3NCWO8betNrJltrC5n+o/CPXkKNvUmRPK9ID1ENcu959Hed2vUAf++9CqlG34EYgtB/oRgsP8m3P7YFVRqo3bA8s0GuM7Y62qtpHlLd5CAMDPLiOM1fJo9wi5JUt/aKeWmi315bo9raSGQHPeMnCB9xRL9m7yACW4uj3nMhRnFT/M9jl4+0Y4wsvNSK8lKeNbSd9JDM4JHy7Yz5UqaPFURXInuOLBGWqWFGOvShnFawCmpX01Kw8MLBf0fUmmNpG07xQkforLxyHz6UJp6/op6U001dyetM47WgJyOK5IobR725upLh2iBkcsRk+PtRGlWgXXIoHGVSZVJPIbgZPTenMa7V8srVJtcmt3Clbu2YANy4gM/wAZrM31sPBXLIkb+fVdNjUW352ASY2XjFINS1TTu9Mf5pSwznh3x9qtuOzoubyF5IWVAoV2MoKlcAYAz7UhuNOhh1SZILeMwtJlYwwUIenhjeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95co8WEh2RTc4GPXeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95coWKYYXGMHP4pq9nHHHIqL8CnAqtPp24hTgHzFPLRQkCgDGBitOHFqzElVpVJaHFr4rgnFX4OatjFGwzSb1R42cFYoUFY6f/Z" alt="Pete Thickett" style="width:100%;height:100%;object-fit:cover;object-position:0% 5%;display:block">
+      </div>
+    </div>
     <div style="flex:1;min-width:0">
       <div style="font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;color:var(--tx);margin-bottom:1px">Message the Dev</div>
       <div style="font-family:'DM Sans',sans-serif;font-size:.5rem;color:var(--t2);margin-bottom:6px;line-height:1.3">Beta feedback shapes every release. Got an idea, bug, or just want to say hi?</div>
@@ -11187,12 +11196,15 @@ function applySbProfileMode() {
   var isComplete = u && u.name && u.email;
   var fields = document.getElementById('sb-profile-fields');
   var editBtn = document.getElementById('sb-edit-btn');
+  var cta = document.getElementById('sb-profile-cta');
   if (isComplete && !_sbEditMode) {
     if (fields) fields.style.display = 'none';
     if (editBtn) editBtn.style.display = 'block';
+    if (cta) cta.style.display = 'none';
   } else {
     if (fields) fields.style.display = 'block';
     if (editBtn) editBtn.style.display = isComplete ? 'block' : 'none';
+    if (cta) cta.style.display = isComplete ? 'none' : 'block';
   }
 }
 
@@ -11259,8 +11271,34 @@ function saveProfile() {
     localStorage.setItem('vi_user', JSON.stringify(user));
     _vaultItUser = user;
     renderPioneerCard();
-    showToast('Profile saved');
+    showToast('Profile saved ✓');
+    if (user.email) syncProfileToList(user);
   } catch(e) {}
+}
+
+function syncProfileToList(user) {
+  var formId = localStorage.getItem('convertkit_form_id') || '';
+  var apiKey = localStorage.getItem('convertkit_api_key') || '';
+  if (!formId) return;
+  // ConvertKit custom fields must be pre-created in the CK dashboard
+  var payload = {
+    api_key: apiKey,
+    email_address: user.email,
+    first_name: user.name || '',
+    fields: {
+      source:            'vault-it-profile',
+      profession:        user.job       || '',
+      dream_profession:  user.dream     || '',
+      saving_archetype:  user.saveArch  || '',
+      spending_archetype: user.spendArch || '',
+      joined:            user.joined    || new Date().toISOString()
+    }
+  };
+  fetch('https://api.convertkit.com/v3/forms/' + formId + '/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(function(){});
 }
 
 // ── TASK 5: PRIVACY + TERMS ─────────────────────────────────────
