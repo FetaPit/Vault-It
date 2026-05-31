@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.6.8';
+  var SW_VERSION = '0.6.9';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -3889,6 +3889,22 @@ input:focus, textarea:focus, select:focus {
       <input type="password" id="set-ck-key" class="al-inp" placeholder="v3 API key" style="width:100%;margin-bottom:6px">
       <div style="font-size:.52rem;color:var(--t3);line-height:1.5">
         <span style="color:var(--em)">convertkit.com</span> → Forms → pick your form → copy the numeric ID from the URL. API key from Account Settings → API Keys. Pioneers are added to your list automatically on sign-up.
+      </div>
+    </div>
+
+    <!-- Notion -->
+    <div style="margin-bottom:20px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid rgba(201,168,76,.2)">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--t2)"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg>
+        <span class="ov-kpi-lbl" style="font-size:.55rem;color:var(--go)">Notion Integration Token</span>
+        <span style="font-size:.42rem;color:var(--gr);font-family:'Share Tech Mono',monospace;margin-left:auto">Pioneer DB ✓ Created</span>
+      </div>
+      <input type="password" id="set-notion-token" class="al-inp" placeholder="secret_xxxxxxxxxxxxxxxx" style="width:100%;margin-bottom:6px">
+      <div style="font-size:.52rem;color:var(--t3);line-height:1.5">
+        1. Go to <span style="color:var(--go)">notion.so/my-integrations</span> → New Integration → give it any name → Submit<br>
+        2. Copy the Internal Integration Token (starts with <code style="color:var(--em)">secret_</code>)<br>
+        3. In Notion: open <span style="color:var(--go)">Vault·It Pioneer Signups</span> DB → ··· menu → Add connections → pick your integration<br>
+        All profile saves and sign-ups will auto-populate the database.
       </div>
     </div>
 
@@ -8547,6 +8563,7 @@ function showSettings(){
   var mEl=document.getElementById('set-metals-key');if(mEl)mEl.value=localStorage.getItem('metals_api_key')||'';
   var ckfEl=document.getElementById('set-ck-form');if(ckfEl)ckfEl.value=localStorage.getItem('convertkit_form_id')||'';
   var ckkEl=document.getElementById('set-ck-key');if(ckkEl)ckkEl.value=localStorage.getItem('convertkit_api_key')||'';
+  var ntEl=document.getElementById('set-notion-token');if(ntEl)ntEl.value=localStorage.getItem('notion_token')||'';
   document.getElementById('settings-modal').style.display='flex';
 }
 function saveSettings(){
@@ -8564,6 +8581,8 @@ function saveSettings(){
   if(metk)localStorage.setItem('metals_api_key',metk.trim());
   if(ckf)localStorage.setItem('convertkit_form_id',ckf.trim());
   if(ckk)localStorage.setItem('convertkit_api_key',ckk.trim());
+  var ntk=(document.getElementById('set-notion-token')||{}).value||'';
+  if(ntk)localStorage.setItem('notion_token',ntk.trim());
   document.getElementById('settings-modal').style.display='none';
   showToast('API keys saved \u2713');
 }
@@ -11279,25 +11298,47 @@ function saveProfile() {
 function syncProfileToList(user) {
   var formId = localStorage.getItem('convertkit_form_id') || '';
   var apiKey = localStorage.getItem('convertkit_api_key') || '';
-  if (!formId) return;
-  // ConvertKit custom fields must be pre-created in the CK dashboard
-  var payload = {
-    api_key: apiKey,
-    email_address: user.email,
-    first_name: user.name || '',
-    fields: {
-      source:            'vault-it-profile',
-      profession:        user.job       || '',
-      dream_profession:  user.dream     || '',
-      saving_archetype:  user.saveArch  || '',
-      spending_archetype: user.spendArch || '',
-      joined:            user.joined    || new Date().toISOString()
-    }
+  if (formId) {
+    var payload = { api_key: apiKey, email_address: user.email, first_name: user.name || '',
+      fields: { source: 'vault-it-profile', profession: user.job || '', dream_profession: user.dream || '',
+        saving_archetype: user.saveArch || '', spending_archetype: user.spendArch || '',
+        joined: user.joined || new Date().toISOString() } };
+    fetch('https://api.convertkit.com/v3/forms/' + formId + '/subscribe', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    }).catch(function(){});
+  }
+  syncToNotion(user, 'Profile Form');
+}
+
+var _NOTION_DB = '5521f7f5b75b4c588227240b97008c5f';
+function syncToNotion(user, source) {
+  var token = localStorage.getItem('notion_token') || '';
+  if (!token || !user || !user.email) return;
+  var goalMap = ['Debt Free', 'Build Savings', 'House Deposit', 'Wealth Building'];
+  var props = {
+    'Name':              { title: [{ text: { content: user.name || 'Unknown' } }] },
+    'Email':             { email: user.email },
+    'Profession':        { rich_text: [{ text: { content: user.job || '' } }] },
+    'Dream Profession':  { rich_text: [{ text: { content: user.dream || '' } }] },
+    'Source':            { select: { name: source || 'Profile Form' } },
+    'Status':            { select: { name: 'New' } },
+    'Joined':            { date: { start: (user.joined || new Date().toISOString()).split('T')[0] } }
   };
-  fetch('https://api.convertkit.com/v3/forms/' + formId + '/subscribe', {
+  if (user.saveArch)  props['Saving Archetype']  = { select: { name: user.saveArch } };
+  if (user.spendArch) props['Spending Archetype'] = { select: { name: user.spendArch } };
+  var goalIdx = parseInt(user.goal) || 0;
+  if (goalMap[goalIdx]) props['Goal'] = { select: { name: goalMap[goalIdx] } };
+  // Route through CORS proxy since Notion API blocks direct browser requests
+  fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.notion.com/v1/pages'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type':  'application/json',
+      'Notion-Version': '2022-06-28'
+    },
+    body: JSON.stringify({ parent: { database_id: _NOTION_DB }, properties: props })
+  }).then(function(r) {
+    if (r.ok) showToast('Pioneer synced to Notion ✓');
   }).catch(function(){});
 }
 
@@ -11329,6 +11370,9 @@ function captureEmailToList(email, name, goal) {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
   }).then(function(r){ if(r.ok) console.log('[Vault-It] Pioneer email captured'); })
     .catch(function(e){ console.log('[Vault-It] Email capture failed silently:', e.message); });
+  // Also sync to Notion
+  var u = null; try { u = JSON.parse(localStorage.getItem('vi_user')||'null'); } catch(e){}
+  if (u && u.email) syncToNotion(Object.assign({}, u, { goal: goal }), 'Welcome Quiz');
 }
 function captureEmailMailchimp(email, name, goal) {
   // Mailchimp replaced by ConvertKit — captureEmailToList() handles all list sign-ups
