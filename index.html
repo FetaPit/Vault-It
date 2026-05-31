@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.6.3';
+  var SW_VERSION = '0.6.4';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -269,10 +269,10 @@ html, body { height: 100%; background: var(--bg); color: var(--tx); font-family:
   letter-spacing: .22em; text-transform: uppercase; margin-bottom: 10px;
 }
 .data-input-row {
-  display: flex; gap: 6px; margin-bottom: 8px;
+  display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;
 }
 .data-input-row input {
-  flex: 1; background: var(--c3); border: 1px solid var(--bd);
+  flex: 1; min-width: 80px; background: var(--c3); border: 1px solid var(--bd);
   border-radius: 4px; color: var(--tx); font-family: 'Share Tech Mono', monospace;
   font-size: .72rem; padding: 6px 9px; outline: none;
 }
@@ -7144,10 +7144,7 @@ function renderAlTab(){
         } else if(iconDisplay){
           imgHtml='<span style="font-size:2.5rem">'+iconDisplay+'</span>';
         } else {
-          var rawTerm=l.imageSearch||cleanSearchTerm(l.name||'asset');
-          var searchTerm=encodeURIComponent(rawTerm.replace(/\s+/g,','));
-          var lockNum=Math.abs(l.id%1000)||1;
-          imgHtml='<img src="https://loremflickr.com/200/200/'+searchTerm+'?lock='+lockNum+'" alt="'+l.name+'" onerror="this.src=\'https://loremflickr.com/200/200/asset?lock='+lockNum+'\'">';
+          imgHtml=generateAssetISO(l.name);
         }
         var dv=depreciatedValue(l);
         return'<div class="wi-tile">'
@@ -7188,11 +7185,7 @@ function renderAlTab(){
         } else if(iconDisplay){
           imgHtml='<span style="font-size:2.5rem">'+iconDisplay+'</span>';
         } else {
-          // Auto-fetch from LoremFlickr using cleaned search term
-          var rawTerm=a.imageSearch||cleanSearchTerm(a.name||'asset');
-          var searchTerm=encodeURIComponent(rawTerm.replace(/\s+/g,','));
-          var lockNum=Math.abs(a.id%1000)||1;
-          imgHtml='<img src="https://loremflickr.com/200/200/'+searchTerm+'?lock='+lockNum+'" alt="'+a.name+'" onerror="this.src=\'https://loremflickr.com/200/200/wealth?lock='+lockNum+'\'">';
+          imgHtml=generateAssetISO(a.name);
         }
         return '<div class="wi-tile">'
           +'<div class="wi-img-area">'
@@ -7327,6 +7320,47 @@ function liabDoSearch(id){
     })(img,i,id,inp.value.trim());
     res.appendChild(img);
   }
+}
+
+function generateAssetISO(name) {
+  var n = (name || '').toLowerCase();
+  var emoji, tc, lc, rc, ac;
+  if (/car|vehicle|auto|bmw|tesla|audi|mercedes|ford|van|truck|bike|motor|suv/.test(n))
+    { emoji='🚗'; tc='#1e3a52'; lc='#152d42'; rc='#1a3448'; ac='#44c0b9'; }
+  else if (/house|flat|property|land|apartment|home|estate|build|resi|bungalow/.test(n))
+    { emoji='🏠'; tc='#2a3a1e'; lc='#203018'; rc='#263818'; ac='#c9a84c'; }
+  else if (/watch|rolex|omega|patek|timepiece|clock|hublot/.test(n))
+    { emoji='⌚'; tc='#2a1e3a'; lc='#201530'; rc='#261a38'; ac='#c9a84c'; }
+  else if (/laptop|computer|mac|desktop|pc|phone|tablet|iphone|tech|electron|device|ipad/.test(n))
+    { emoji='💻'; tc='#1e2a3a'; lc='#152030'; rc='#1a2838'; ac='#44c0b9'; }
+  else if (/art|paint|collect|print|poster|photo|canvas|sculpture/.test(n))
+    { emoji='🖼️'; tc='#3a1e2a'; lc='#2d1520'; rc='#381820'; ac='#e05c5c'; }
+  else if (/jewel|ring|necklace|diamond|gem|bracelet|pendant/.test(n))
+    { emoji='💎'; tc='#2a2a1e'; lc='#202018'; rc='#282818'; ac='#c9a84c'; }
+  else if (/biz|business|company|equity|share|startup|office|brand/.test(n))
+    { emoji='💼'; tc='#2a2010'; lc='#20180c'; rc='#281e0e'; ac='#e0894a'; }
+  else if (/invest|stock|bond|fund|pension|portfolio|etf|isa/.test(n))
+    { emoji='📈'; tc='#1e2a1e'; lc='#152015'; rc='#1a281a'; ac='#3ecf8e'; }
+  else if (/boat|yacht|ship|sail|vessel/.test(n))
+    { emoji='⛵'; tc='#1e2a3a'; lc='#152030'; rc='#1a2838'; ac='#44c0b9'; }
+  else if (/camera|lens|photo|drone|equipment|gear/.test(n))
+    { emoji='📷'; tc='#2a201e'; lc='#201815'; rc='#281e1a'; ac='#e0894a'; }
+  else
+    { emoji='📦'; tc='#1a2030'; lc='#121825'; rc='#161e2e'; ac='#44c0b9'; }
+
+  // Isometric cube — 100×100 viewBox
+  var id = 'g' + Math.random().toString(36).slice(2,6);
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">'
+    +'<defs><filter id="'+id+'"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'
+    +'<polygon points="50,14 80,32 50,50 20,32" fill="'+tc+'" stroke="'+ac+'" stroke-width="0.9" stroke-opacity="0.8"/>'
+    +'<polygon points="20,32 50,50 50,84 20,66" fill="'+lc+'" stroke="'+ac+'" stroke-width="0.9" stroke-opacity="0.5"/>'
+    +'<polygon points="50,50 80,32 80,66 50,84" fill="'+rc+'" stroke="'+ac+'" stroke-width="0.9" stroke-opacity="0.6"/>'
+    +'<line x1="50" y1="14" x2="50" y2="50" stroke="'+ac+'" stroke-width="0.5" stroke-opacity="0.35"/>'
+    +'<line x1="20" y1="66" x2="50" y2="84" stroke="'+ac+'" stroke-width="0.5" stroke-opacity="0.3"/>'
+    +'<line x1="80" y1="66" x2="50" y2="84" stroke="'+ac+'" stroke-width="0.5" stroke-opacity="0.3"/>'
+    +'<text x="65" y="60" text-anchor="middle" dominant-baseline="middle" font-size="14" style="user-select:none" filter="url(#'+id+')">'+emoji+'</text>'
+    +'<text x="50" y="95" text-anchor="middle" font-size="5.5" fill="'+ac+'" font-family="\'Share Tech Mono\',monospace" letter-spacing="0.4" opacity="0.85">'+name.substring(0,14).toUpperCase()+'</text>'
+    +'</svg>';
 }
 
 function cleanSearchTerm(name){
@@ -7623,10 +7657,10 @@ function renderDebtTab(){
         return '<div style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px">'
           +'<div style="font-size:.55rem;font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+d.name+'</div>'
           +'<div class="cc-wrap" style="flex:1"><div class="cc-portrait" style="width:100%;min-height:120px">'
-          +(pctNum>0?'<div class="cc-paid" style="height:'+pctNum+'%"><span class="cc-paid-pct">'+pctNum+'% paid</span></div>':'')
-          +'<div class="cc-cut" style="top:'+pctNum+'%"></div>'
-          +'<div class="cc-scissors" style="top:'+pctNum+'%">✂️</div>'
-          +'<div class="cc-remain" style="height:'+remainH+'%;min-height:20px">'
+          +(pctNum>0&&pctNum<100?'<div class="cc-paid" style="height:'+pctNum+'%"><span class="cc-paid-pct">'+pctNum+'% paid</span></div>':'')
+          +(pctNum>=100?'<div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(62,207,142,.18),rgba(62,207,142,.08));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;z-index:5"><div style="font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--gr);font-weight:700;letter-spacing:.18em;text-shadow:0 0 10px rgba(62,207,142,.7)">CLEARED</div><div style="font-size:1.4rem;filter:drop-shadow(0 0 6px rgba(62,207,142,.6))">✅</div></div>':'')
+          +(pctNum>0&&pctNum<100?'<div class="cc-cut" style="top:'+pctNum+'%"></div><div class="cc-scissors" style="top:'+pctNum+'%">✂️</div>':'')
+          +'<div class="cc-remain" style="height:'+remainH+'%;min-height:'+(pctNum>=100?'0':'20')+'px">'
           +(ccLogo?'<img src="'+ccLogo+'" style="width:22px;height:22px;object-fit:contain;border-radius:3px;margin-bottom:2px;background:rgba(255,255,255,.06)" onerror="this.style.display=\'none\'">':'')
           +'<div class="cc-chip"></div>'
           +'<div class="cc-num" style="font-size:.42rem">•••• •••• •••• '+ccNum+'</div>'
