@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.6.6';
+  var SW_VERSION = '0.6.7';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2876,34 +2876,34 @@ input:focus, textarea:focus, select:focus {
 <div id="ov-page">
 
   <!-- Dev contact bento card -->
-  <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 12px;background:var(--c1);border:1px solid rgba(201,168,76,.35);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin-bottom:14px;position:relative;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--c1);border:1px solid rgba(201,168,76,.35);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin-bottom:14px;position:relative;overflow:hidden">
     <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,#c9a84c,#f0d878,#c9a84c)"></div>
     <div style="flex-shrink:0;padding:2px;border-radius:8px;background:linear-gradient(135deg,#b8902e 0%,#f0d878 40%,#c9a84c 70%,#b8902e 100%);box-shadow:0 0 16px rgba(201,168,76,.5),0 2px 6px rgba(0,0,0,.4)">
-      <div style="border-radius:6px;overflow:hidden;width:72px;height:72px;background:var(--c1)">
+      <div style="border-radius:6px;overflow:hidden;width:48px;height:48px;background:var(--c1)">
         <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABGAFgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUAAwYHAgH/xAA1EAACAQMCAwYEBQMFAAAAAAABAgMABBEFIRIxYQYTQVFxgSIyQpEHFCOhwTNSYkNEsdHw/8QAGQEAAwEBAQAAAAAAAAAAAAAAAgMEAQUA/8QAIBEAAwACAgIDAQAAAAAAAAAAAAECAxESMQQhEzNBcf/aAAwDAQACEQMRAD8A5banMS9BiitJtu91ZpCNoxn3NCWO8betNrJltrC5n+o/CPXkKNvUmRPK9ID1ENcu959Hed2vUAf++9CqlG34EYgtB/oRgsP8m3P7YFVRqo3bA8s0GuM7Y62qtpHlLd5CAMDPLiOM1fJo9wi5JUt/aKeWmi315bo9raSGQHPeMnCB9xRL9m7yACW4uj3nMhRnFT/M9jl4+0Y4wsvNSK8lKeNbSd9JDM4JHy7Yz5UqaPFURXInuOLBGWqWFGOvShnFawCmpX01Kw8MLBf0fUmmNpG07xQkforLxyHz6UJp6/op6U001dyetM47WgJyOK5IobR725upLh2iBkcsRk+PtRGlWgXXIoHGVSZVJPIbgZPTenMa7V8srVJtcmt3Clbu2YANy4gM/wAZrM31sPBXLIkb+fVdNjUW352ASY2XjFINS1TTu9Mf5pSwznh3x9qtuOzoubyF5IWVAoV2MoKlcAYAz7UhuNOhh1SZILeMwtJlYwwUIenhjeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95co8WEh2RTc4GPXeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95coWKYYXGMHP4pq9nHHHIqL8CnAqtPp24hTgHzFPLRQkCgDGBitOHFqzElVpVJaHFr4rgnFX4OatjFGwzSb1R42cFYoUFY6f/Z" alt="Pete Thickett" style="width:100%;height:100%;object-fit:cover;object-position:0% 5%;display:block">
       </div>
     </div>
     <div style="flex:1;min-width:0">
       <div style="font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;color:var(--tx);margin-bottom:1px">Message the Dev</div>
       <div style="font-family:'DM Sans',sans-serif;font-size:.5rem;color:var(--t2);margin-bottom:6px;line-height:1.3">Beta feedback shapes every release. Got an idea, bug, or just want to say hi?</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <a href="mailto:pete@ptlive.design" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);text-decoration:none;padding:4px 8px;border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:4px">
+        <a href="mailto:pete@ptlive.design" style="display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Share Tech Mono',monospace;font-size:.48rem;text-decoration:none;padding:5px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--em);border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
           pete@ptlive.design
         </a>
-        <a href="https://wa.me/447470074133" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:#25d366;text-decoration:none;padding:4px 8px;border:1px solid rgba(37,211,102,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+        <a href="https://wa.me/447470074133" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Share Tech Mono',monospace;font-size:.48rem;text-decoration:none;padding:5px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#25d366;border:1px solid rgba(37,211,102,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
           WhatsApp
         </a>
-        <a href="https://www.linkedin.com/in/ptlivedesign/" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:#0077b5;text-decoration:none;padding:4px 8px;border:1px solid rgba(0,119,181,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+        <a href="https://www.linkedin.com/in/ptlivedesign/" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Share Tech Mono',monospace;font-size:.48rem;text-decoration:none;padding:5px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#0077b5;border:1px solid rgba(0,119,181,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
           LinkedIn
         </a>
-        <a href="https://ptlive.my.canva.site/pt-live-design" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);text-decoration:none;padding:4px 8px;border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+        <a href="https://ptlive.my.canva.site/pt-live-design" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Share Tech Mono',monospace;font-size:.48rem;text-decoration:none;padding:5px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--em);border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
           Portfolio
         </a>
-        <a href="https://instagram.com/petet_live" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:#e1306c;text-decoration:none;padding:4px 8px;border:1px solid rgba(225,48,108,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
+        <a href="https://instagram.com/petet_live" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Share Tech Mono',monospace;font-size:.48rem;text-decoration:none;padding:5px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e1306c;border:1px solid rgba(225,48,108,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="currentColor"/></svg>
           @petet_live
         </a>
