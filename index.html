@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.6.0';
+  var SW_VERSION = '0.6.2';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2245,7 +2245,20 @@ input:focus, textarea:focus, select:focus {
 <!-- ══════════════════════════════════════════════════════
      VAULT·IT WELCOME — New user onboarding + Returning upsell
 ══════════════════════════════════════════════════════ -->
-<div id="welcome-overlay" style="display:none">
+<script>
+/* Hide overlay synchronously for returning users — runs before first paint */
+(function(){
+  try {
+    var reset = new URLSearchParams(window.location.search).has('reset');
+    if (reset) { localStorage.removeItem('vi_user'); }
+    var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
+    if (u && u.email && !reset) {
+      document.write('<style>#welcome-overlay{display:none!important}</style>');
+    }
+  } catch(e) {}
+})();
+</script>
+<div id="welcome-overlay" style="display:flex">
   <div class="welcome-box">
 
     <!-- Pioneer welcome header -->
@@ -2707,7 +2720,7 @@ input:focus, textarea:focus, select:focus {
   <!-- Dev contact bento card -->
   <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin-bottom:14px;position:relative;overflow:hidden">
     <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--em)"></div>
-    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABGAFgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUAAwYHAgH/xAA1EAACAQMCAwYEBQMFAAAAAAABAgMABBEFIRIxYQYTQVFxgSIyQpEHFCOhwTNSYkNEsdHw/8QAGQEAAwEBAQAAAAAAAAAAAAAAAgMEAQUA/8QAIBEAAwACAgIDAQAAAAAAAAAAAAECAxESMQQhEzNBcf/aAAwDAQACEQMRAD8A5banMS9BiitJtu91ZpCNoxn3NCWO8betNrJltrC5n+o/CPXkKNvUmRPK9ID1ENcu959Hed2vUAf++9CqlG34EYgtB/oRgsP8m3P7YFVRqo3bA8s0GuM7Y62qtpHlLd5CAMDPLiOM1fJo9wi5JUt/aKeWmi315bo9raSGQHPeMnCB9xRL9m7yACW4uj3nMhRnFT/M9jl4+0Y4wsvNSK8lKeNbSd9JDM4JHy7Yz5UqaPFURXInuOLBGWqWFGOvShnFawCmpX01Kw8MLBf0fUmmNpG07xQkforLxyHz6UJp6/op6U001dyetM47WgJyOK5IobR725upLh2iBkcsRk+PtRGlWgXXIoHGVSZVJPIbgZPTenMa7V8srVJtcmt3Clbu2YANy4gM/wAZrM31sPBXLIkb+fVdNjUW352ASY2XjFINS1TTu9Mf5pSwznh3x9qtuOzoubyF5IWVAoV2MoKlcAYAz7UhuNOhh1SZILeMwtJlYwwUIenhjeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95co8WEh2RTc4GPXeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95coWKYYXGMHP4pq9nHHHIqL8CnAqtPp24hTgHzFPLRQkCgDGBitOHFqzElVpVJaHFr4rgnFX4OatjFGwzSb1R42cFYoUFY6f/Z" alt="Pete Thickett" style="width:52px;height:52px;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));flex-shrink:0;object-fit:cover;object-position:center 20%">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABGAFgDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUAAwYHAgH/xAA1EAACAQMCAwYEBQMFAAAAAAABAgMABBEFIRIxYQYTQVFxgSIyQpEHFCOhwTNSYkNEsdHw/8QAGQEAAwEBAQAAAAAAAAAAAAAAAgMEAQUA/8QAIBEAAwACAgIDAQAAAAAAAAAAAAECAxESMQQhEzNBcf/aAAwDAQACEQMRAD8A5banMS9BiitJtu91ZpCNoxn3NCWO8betNrJltrC5n+o/CPXkKNvUmRPK9ID1ENcu959Hed2vUAf++9CqlG34EYgtB/oRgsP8m3P7YFVRqo3bA8s0GuM7Y62qtpHlLd5CAMDPLiOM1fJo9wi5JUt/aKeWmi315bo9raSGQHPeMnCB9xRL9m7yACW4uj3nMhRnFT/M9jl4+0Y4wsvNSK8lKeNbSd9JDM4JHy7Yz5UqaPFURXInuOLBGWqWFGOvShnFawCmpX01Kw8MLBf0fUmmNpG07xQkforLxyHz6UJp6/op6U001dyetM47WgJyOK5IobR725upLh2iBkcsRk+PtRGlWgXXIoHGVSZVJPIbgZPTenMa7V8srVJtcmt3Clbu2YANy4gM/wAZrM31sPBXLIkb+fVdNjUW352ASY2XjFINS1TTu9Mf5pSwznh3x9qtuOzoubyF5IWVAoV2MoKlcAYAz7UhuNOhh1SZILeMwtJlYwwUIenhjeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95co8WEh2RTc4GPXeuZMo7Dd66BtStre7MctnIskq5QhW+U8xms3NCY5CjEE+Y5GttJ+Wt7Z0kCRCR+ItxctgBv51lb0rNdSyIPhLbelW4Nv1+EPkSktvsWSJtQcq4pnIm1AzrinNEoC3OpXpxvUoDw0hmjtYFMh34dgOZqu31a5Qnu+FRnxXNAFzISzczRdjp95coWKYYXGMHP4pq9nHHHIqL8CnAqtPp24hTgHzFPLRQkCgDGBitOHFqzElVpVJaHFr4rgnFX4OatjFGwzSb1R42cFYoUFY6f/Z" alt="Pete Thickett" style="width:60px;height:52px;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));flex-shrink:0;object-fit:cover;object-position:left top">
     <div style="flex:1;min-width:0">
       <div style="font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;color:var(--tx);margin-bottom:1px">Message the Dev</div>
       <div style="font-family:'DM Sans',sans-serif;font-size:.5rem;color:var(--t2);margin-bottom:6px;line-height:1.3">Beta feedback shapes every release. Got an idea, bug, or just want to say hi?</div>
@@ -11130,25 +11143,16 @@ function initDemoMode() {
 function initWelcome() {
   try {
     var overlay = document.getElementById('welcome-overlay');
-    // ?reset clears stored user so the onboarding quiz re-shows (dev/demo use)
-    if (new URLSearchParams(window.location.search).get('reset') !== null) {
-      localStorage.removeItem('vi_user');
-    }
     var user = JSON.parse(localStorage.getItem('vi_user') || 'null');
     if (user && user.email) {
-      // RETURNING USER — keep overlay hidden
+      // RETURNING USER — hide overlay, restore app state
       _vaultItUser = user;
       if (overlay) overlay.style.display = 'none';
       applyPaywall();
       updateSidebar();
-    } else {
-      // NEW USER — show onboarding quiz
-      if (overlay) overlay.style.display = 'flex';
     }
-  } catch(e) {
-    var overlay = document.getElementById('welcome-overlay');
-    if (overlay) overlay.style.display = 'flex';
-  }
+    // NEW USER — overlay already visible (display:flex in HTML)
+  } catch(e) {}
 }
 
 if (document.readyState === 'loading') {
