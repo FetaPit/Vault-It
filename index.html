@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.7.2';
+  var SW_VERSION = '0.7.3';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -743,80 +743,184 @@ body::before {
   100% { background-position: 0% 50%;   filter: hue-rotate(360deg) brightness(1.05); }
 }
 @keyframes holo-glow {
-  0%,100%{ box-shadow: 0 0 10px 2px rgba(68,192,185,.45), 0 0 24px 4px rgba(68,192,185,.12); }
-  25%    { box-shadow: 0 0 10px 2px rgba(240,100,200,.45), 0 0 24px 4px rgba(240,100,200,.12); }
-  50%    { box-shadow: 0 0 10px 2px rgba(120,120,255,.45), 0 0 24px 4px rgba(120,120,255,.12); }
-  75%    { box-shadow: 0 0 10px 2px rgba(201,168,76,.55),  0 0 24px 4px rgba(201,168,76,.15); }
+  0%,100%{ box-shadow: 0 0 14px 3px rgba(68,192,185,.5), 0 0 32px 6px rgba(68,192,185,.15); }
+  25%    { box-shadow: 0 0 14px 3px rgba(240,100,200,.5), 0 0 32px 6px rgba(240,100,200,.15); }
+  50%    { box-shadow: 0 0 14px 3px rgba(120,120,255,.5), 0 0 32px 6px rgba(120,120,255,.15); }
+  75%    { box-shadow: 0 0 14px 3px rgba(201,168,76,.6),  0 0 32px 6px rgba(201,168,76,.18); }
 }
 @keyframes holo-sheen {
   0%   { background-position: -200% 50%; }
   100% { background-position:  200% 50%; }
 }
+@keyframes holo-foil {
+  0%   { background-position: 0% 0%;   opacity:.7; }
+  50%  { background-position: 100% 100%; opacity:1; }
+  100% { background-position: 0% 0%;   opacity:.7; }
+}
+@keyframes card-num-pulse {
+  0%,100%{ opacity:.9; text-shadow:0 0 8px rgba(201,168,76,.4); }
+  50%    { opacity:1;  text-shadow:0 0 18px rgba(201,168,76,.9),0 0 4px rgba(201,168,76,.5); }
+}
 .pioneer-card-wrap {
   padding: 2px;
-  border-radius: 10px;
-  background: linear-gradient(135deg,#44c0b9,#c9a84c,#e040fb,#4488ff,#44c0b9);
-  background-size: 300% 300%;
-  animation: holo-cycle 5s ease infinite, holo-glow 5s ease infinite;
+  border-radius: 13px;
+  background: linear-gradient(135deg,#44c0b9,#c9a84c,#e040fb,#4488ff,#3ecf8e,#44c0b9);
+  background-size: 400% 400%;
+  animation: holo-cycle 6s ease infinite, holo-glow 6s ease infinite;
   margin-top: 12px;
+  position: relative;
 }
 .pioneer-card {
-  background: linear-gradient(160deg,#070c12 0%,#0c1820 60%,#060a10 100%);
-  border-radius: 8px;
-  padding: 12px 12px 10px;
+  background: linear-gradient(170deg,#04090f 0%,#07101a 40%,#050c14 100%);
+  border-radius: 11px;
+  padding: 0;
   position: relative;
   overflow: hidden;
 }
+/* Holographic foil rainbow overlay */
 .pioneer-card::before {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(105deg,transparent 30%,rgba(255,255,255,.07) 50%,transparent 70%);
-  background-size: 300% 100%;
-  animation: holo-sheen 4s linear infinite;
-  pointer-events: none;
-  border-radius: 8px;
+  background: repeating-linear-gradient(
+    105deg,
+    rgba(68,192,185,.0) 0%,
+    rgba(68,192,185,.05) 15%,
+    rgba(201,168,76,.07) 25%,
+    rgba(224,64,251,.05) 38%,
+    rgba(68,136,255,.06) 50%,
+    rgba(62,207,142,.05) 62%,
+    rgba(68,192,185,.04) 75%,
+    rgba(68,192,185,.0) 100%
+  );
+  background-size: 300% 300%;
+  animation: holo-foil 7s ease infinite;
+  pointer-events: none; z-index: 2; border-radius: 11px;
 }
+/* Scanline texture */
 .pioneer-card::after {
   content: '';
   position: absolute; inset: 0;
   background: repeating-linear-gradient(
-    0deg, transparent, transparent 3px,
-    rgba(68,192,185,.025) 3px, rgba(68,192,185,.025) 4px
+    0deg, transparent, transparent 2px,
+    rgba(68,192,185,.018) 2px, rgba(68,192,185,.018) 3px
   );
-  pointer-events: none;
-  border-radius: 8px;
+  pointer-events: none; z-index: 1; border-radius: 11px;
+}
+/* ── Header band ── */
+.pc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 10px 5px;
+  border-bottom: 1px solid rgba(201,168,76,.18);
+  position: relative; z-index: 3;
+  background: linear-gradient(90deg,rgba(4,9,15,.95),rgba(8,16,26,.95));
+}
+.pc-logo {
+  font-family: 'Syne', sans-serif; font-size: .48rem; font-weight: 900;
+  letter-spacing: .22em; text-transform: uppercase;
+  background: linear-gradient(90deg,#b8902e,#f0d878,#c9a84c);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.pc-rarity {
+  display: flex; align-items: center; gap: 4px;
+}
+.pc-rarity-stars { font-size: .52rem; letter-spacing: 1px; }
+.pc-rarity-label {
+  font-family: 'Share Tech Mono', monospace; font-size: .32rem;
+  letter-spacing: .18em; color: var(--go); opacity: .7;
+}
+/* ── Body ── */
+.pc-body {
+  padding: 9px 10px 7px;
+  display: flex; gap: 9px; align-items: flex-start;
+  position: relative; z-index: 3;
 }
 .pc-avatar-wrap {
-  width: 50px; height: 50px; border-radius: 50%;
-  background: linear-gradient(135deg,rgba(68,192,185,.3),rgba(201,168,76,.3));
-  border: 1.5px solid rgba(255,255,255,.25);
-  overflow: hidden; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem; color: var(--em);
+  flex-shrink: 0;
+  padding: 2px; border-radius: 7px;
+  background: linear-gradient(135deg,#b8902e,#f0d878,#c9a84c,#b8902e);
+  background-size: 200% 200%;
+  animation: holo-cycle 4s ease infinite;
+  box-shadow: 0 0 10px rgba(201,168,76,.4);
 }
-.pc-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-.pc-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 2px 7px;
-  background: rgba(201,168,76,.15);
-  border: 1px solid rgba(201,168,76,.4);
-  font-family: 'Syne', sans-serif; font-size: .38rem; font-weight: 800;
-  letter-spacing: .12em; text-transform: uppercase; color: var(--go);
-  clip-path: polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px));
+.pc-avatar-inner {
+  width: 52px; height: 52px; border-radius: 5px;
+  overflow: hidden; background: #060d16;
+  display: flex; align-items: center; justify-content: center;
+}
+.pc-avatar-inner img { width:100%; height:100%; object-fit:cover; object-position:50% 0%; display:block; }
+.pc-info { flex: 1; min-width: 0; }
+.pc-name {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: .62rem;
+  color: #fff; line-height: 1.1; margin-bottom: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pc-level-row {
+  display: flex; align-items: center; gap: 5px; margin-bottom: 5px;
+}
+.pc-level-badge {
+  font-family: 'Syne', sans-serif; font-size: .34rem; font-weight: 800;
+  letter-spacing: .12em; padding: 2px 6px; border-radius: 3px;
+  text-transform: uppercase;
+}
+.pc-xp-label {
+  font-family: 'Share Tech Mono', monospace; font-size: .38rem; color: var(--t2);
+}
+.pc-xp-track {
+  height: 4px; background: rgba(255,255,255,.07); border-radius: 2px;
+  overflow: hidden; margin-bottom: 3px;
+}
+.pc-xp-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg,#44c0b9,#c9a84c);
+  transition: width .5s ease;
+}
+.pc-xp-meta {
+  font-family: 'Share Tech Mono', monospace; font-size: .33rem;
+  color: rgba(68,192,185,.55); text-align: right;
+}
+/* ── Archetypes row ── */
+.pc-archetypes {
+  display: flex; gap: 4px; padding: 5px 10px 5px;
+  border-top: 1px solid rgba(68,192,185,.08);
+  position: relative; z-index: 3; flex-wrap: wrap;
 }
 .pc-archetype {
   display: inline-block; padding: 2px 7px;
-  background: rgba(68,192,185,.08);
-  border: 1px solid rgba(68,192,185,.2);
-  font-family: 'Share Tech Mono', monospace; font-size: .38rem;
-  color: var(--em); clip-path: polygon(0 0,calc(100% - 3px) 0,100% 3px,100% 100%,3px 100%,0 calc(100% - 3px));
+  background: rgba(68,192,185,.07);
+  border: 1px solid rgba(68,192,185,.18);
+  font-family: 'Share Tech Mono', monospace; font-size: .35rem;
+  color: var(--em);
+  clip-path: polygon(0 0,calc(100% - 3px) 0,100% 3px,100% 100%,3px 100%,0 calc(100% - 3px));
 }
+.pc-archetype.gold {
+  background: rgba(201,168,76,.07); border-color: rgba(201,168,76,.25); color: var(--go);
+}
+/* ── Job / dream ── */
+.pc-roles {
+  padding: 4px 10px 5px;
+  position: relative; z-index: 3;
+  border-top: 1px solid rgba(255,255,255,.04);
+}
+/* ── Adoption number footer ── */
 .pc-footer {
-  border-top: 1px solid rgba(68,192,185,.12);
-  margin-top: 8px; padding-top: 6px;
-  font-family: 'Share Tech Mono', monospace; font-size: .36rem;
-  color: rgba(68,192,185,.35); letter-spacing: .1em; text-transform: uppercase;
-  text-align: center;
+  border-top: 1px solid rgba(201,168,76,.2);
+  padding: 7px 10px 8px;
+  position: relative; z-index: 3;
+  background: linear-gradient(90deg,rgba(4,9,15,.9),rgba(8,16,26,.9));
+  display: flex; align-items: center; justify-content: space-between;
+}
+.pc-adoption-num {
+  font-family: 'Syne', sans-serif; font-weight: 900;
+  font-size: .95rem; letter-spacing: .06em;
+  color: #fff; line-height: 1;
+  animation: card-num-pulse 3s ease-in-out infinite;
+}
+.pc-adoption-denom {
+  font-size: .5rem; color: rgba(201,168,76,.55); font-weight: 400;
+}
+.pc-footer-meta {
+  font-family: 'Share Tech Mono', monospace; font-size: .33rem;
+  color: rgba(255,255,255,.25); letter-spacing: .12em; text-align: right; line-height: 1.6;
 }
 /* sidebar profile select/input styling */
 .sb-select {
@@ -11384,38 +11488,87 @@ function renderPioneerCard() {
       applySbProfileMode();
       return;
     }
-    var initials = (u.name || '?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
-    var avatarHtml = u.avatar
-      ? '<img src="' + u.avatar + '" style="width:100%;height:100%;object-fit:cover;object-position:center top">'
-      : '<span style="font-size:1.2rem;color:var(--em)">' + initials + '</span>';
+    // ── Level & XP ──
+    var xp      = (typeof achState !== 'undefined') ? (achState.xp || 0) : 0;
+    var lv      = (typeof currentLevel === 'function') ? currentLevel() : {n:'Scout',xp:0};
+    var nxt     = (typeof nextLevel   === 'function') ? nextLevel()    : null;
+    var lvIdx   = (typeof LVS !== 'undefined') ? LVS.findIndex(function(v){return v.n===lv.n;}) + 1 : 1;
+    var xpPct   = nxt ? Math.min(100,Math.round((xp-lv.xp)/(nxt.xp-lv.xp)*100)) : 100;
+    var xpToNxt = nxt ? (nxt.xp - xp) : 0;
+    var lvColors= ['#44c0b9','#44c0b9','#44c0b9','#c9a84c','#c9a84c','#e040fb','#e040fb','#f0d878','#f0d878'];
+    var lvColor = lvColors[Math.min(lvIdx-1, lvColors.length-1)] || '#44c0b9';
+    // ── Adoption number ──
+    var pioneerNum = u.pioneerNum || localStorage.getItem('vi_pioneer_num') || '';
+    var ALPHA_TOTAL = 33;
+    var numDisplay = pioneerNum
+      ? String(pioneerNum).padStart(3,'0')
+      : (isPioneer() ? '···' : '- -');
+    var denomDisplay = '/' + String(ALPHA_TOTAL).padStart(3,'0');
+    // ── Avatar ──
+    var initials = (u.name||'?').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+    var avatarContent = u.avatar
+      ? '<img src="' + u.avatar + '" alt="' + (u.name||'') + '">'
+      : '<span style="font-size:1.1rem;color:var(--em)">' + initials + '</span>';
+    // ── Rarity ──
+    var pioneer = isPioneer();
+    var rarityStars = pioneer ? '✦✦✦' : '✦';
+    var rarityLabel = pioneer ? 'GENESIS' : 'FREE';
+    var joined = u.joined ? new Date(u.joined).getFullYear() : new Date().getFullYear();
     var saveArch  = u.saveArch  || '';
     var spendArch = u.spendArch || '';
-    var job       = u.job       || '';
-    var dream     = u.dream     || '';
-    var joined    = u.joined ? new Date(u.joined).getFullYear() : new Date().getFullYear();
+    var job   = u.job   || '';
+    var dream = u.dream || '';
     wrap.innerHTML =
       '<div class="pioneer-card-wrap">' +
         '<div class="pioneer-card">' +
-          '<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px;position:relative;z-index:1">' +
-            '<div class="pc-avatar-wrap">' + avatarHtml + '</div>' +
-            '<div style="flex:1;min-width:0">' +
-              '<div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:.65rem;color:#fff;line-height:1.1;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (u.name||'Pioneer') + '</div>' +
-              '<div class="pc-badge">' + (isPioneer() ? '◆ Pioneer · Alpha · Lifetime Pro' : '◈ Vault Scout · Free Tier') + '</div>' +
+          // Header band
+          '<div class="pc-header">' +
+            '<span class="pc-logo">VAULT·IT</span>' +
+            '<div class="pc-rarity">' +
+              '<span class="pc-rarity-stars" style="color:' + lvColor + '">' + rarityStars + '</span>' +
+              '<span class="pc-rarity-label">' + rarityLabel + '</span>' +
             '</div>' +
           '</div>' +
-          (job || dream ? '<div style="margin-bottom:7px;position:relative;z-index:1">' +
-            (job   ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:.4rem;color:var(--t2);margin-bottom:2px">▸ ' + job   + '</div>' : '') +
-            (dream ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:.4rem;color:var(--go)">◈ ' + dream + '</div>' : '') +
+          // Body — avatar + info
+          '<div class="pc-body">' +
+            '<div class="pc-avatar-wrap">' +
+              '<div class="pc-avatar-inner">' + avatarContent + '</div>' +
+            '</div>' +
+            '<div class="pc-info">' +
+              '<div class="pc-name">' + (u.name||'Pioneer') + '</div>' +
+              '<div class="pc-level-row">' +
+                '<span class="pc-level-badge" style="background:' + lvColor + '22;color:' + lvColor + ';border:1px solid ' + lvColor + '55">LV.' + lvIdx + ' · ' + lv.n.toUpperCase() + '</span>' +
+              '</div>' +
+              '<div class="pc-xp-track"><div class="pc-xp-fill" style="width:' + xpPct + '%;background:linear-gradient(90deg,' + lvColor + ',#c9a84c)"></div></div>' +
+              '<div class="pc-xp-meta">' + xp.toLocaleString() + ' XP' + (nxt ? ' · ' + xpToNxt.toLocaleString() + ' to ' + nxt.n : ' · MAX') + '</div>' +
+            '</div>' +
+          '</div>' +
+          // Roles
+          (job || dream ? '<div class="pc-roles">' +
+            (job   ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:.38rem;color:var(--t2);margin-bottom:1px">▸ ' + job   + '</div>' : '') +
+            (dream ? '<div style="font-family:\'Share Tech Mono\',monospace;font-size:.38rem;color:var(--go)">◈ ' + dream + '</div>' : '') +
           '</div>' : '') +
-          (saveArch || spendArch ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;position:relative;z-index:1">' +
-            (saveArch  ? '<span class="pc-archetype">' + saveArch.split(' ').slice(0,3).join(' ') + '</span>' : '') +
+          // Archetypes
+          (saveArch || spendArch ? '<div class="pc-archetypes">' +
+            (saveArch  ? '<span class="pc-archetype gold">' + saveArch.split(' ').slice(0,3).join(' ') + '</span>' : '') +
             (spendArch ? '<span class="pc-archetype">' + spendArch.split(' ').slice(0,3).join(' ') + '</span>' : '') +
           '</div>' : '') +
-          '<div class="pc-footer" style="position:relative;z-index:1">' + (isPioneer()?'VAULT·IT PIONEER · '+joined+' · ALPHA':'VAULT·IT SCOUT · '+joined+' · FREE') + '</div>' +
+          // Adoption number footer
+          '<div class="pc-footer">' +
+            '<div>' +
+              '<div style="font-family:\'Share Tech Mono\',monospace;font-size:.28rem;color:rgba(201,168,76,.45);letter-spacing:.14em;margin-bottom:1px">ALPHA PIONEER</div>' +
+              '<div class="pc-adoption-num">' + numDisplay + '<span class="pc-adoption-denom">' + denomDisplay + '</span></div>' +
+            '</div>' +
+            '<div class="pc-footer-meta">' +
+              'VAULT·IT<br>' +
+              joined + ' · ALPHA<br>' +
+              (pioneer ? '◆ PIONEER' : '◈ SCOUT') +
+            '</div>' +
+          '</div>' +
         '</div>' +
       '</div>';
     applySbProfileMode();
-  } catch(e) {}
+  } catch(e) { console.warn('[Vault-It] renderPioneerCard error:', e); }
 }
 
 function saveProfile() {
@@ -11485,8 +11638,27 @@ function syncToNotion(user, source) {
     },
     body: JSON.stringify({ parent: { database_id: _NOTION_DB }, properties: props })
   }).then(function(r) {
-    if (r.ok) showToast('Pioneer synced to Notion ✓');
-    else r.text().then(function(t){ console.warn('[Vault-It] Notion sync failed:',r.status,t); showToast('Notion sync failed ('+r.status+') — check Settings'); });
+    if (r.ok) {
+      return r.json().then(function(data) {
+        showToast('Pioneer synced to Notion ✓');
+        // Extract auto-assigned Pioneer ID and store it on the user profile
+        try {
+          var pid = data && data.properties && data.properties['Pioneer ID'];
+          var num = pid && (pid.unique_id || pid.number);
+          var pioneerNum = num && (num.number !== undefined ? num.number : num);
+          if (pioneerNum) {
+            localStorage.setItem('vi_pioneer_num', String(pioneerNum));
+            var stored = JSON.parse(localStorage.getItem('vi_user') || '{}');
+            stored.pioneerNum = pioneerNum;
+            localStorage.setItem('vi_user', JSON.stringify(stored));
+            _vaultItUser = stored;
+            renderPioneerCard();
+          }
+        } catch(pe) {}
+      });
+    } else {
+      r.text().then(function(t){ console.warn('[Vault-It] Notion sync failed:',r.status,t); showToast('Notion sync failed ('+r.status+') — check Settings'); });
+    }
   }).catch(function(e){ console.warn('[Vault-It] Notion fetch error:',e.message); showToast('Notion sync error — check connection'); });
 }
 
