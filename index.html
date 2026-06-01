@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.6.9';
+  var SW_VERSION = '0.7.0';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -3899,10 +3899,10 @@ input:focus, textarea:focus, select:focus {
         <span class="ov-kpi-lbl" style="font-size:.55rem;color:var(--go)">Notion Integration Token</span>
         <span style="font-size:.42rem;color:var(--gr);font-family:'Share Tech Mono',monospace;margin-left:auto">Pioneer DB ✓ Created</span>
       </div>
-      <input type="password" id="set-notion-token" class="al-inp" placeholder="secret_xxxxxxxxxxxxxxxx" style="width:100%;margin-bottom:6px">
+      <input type="password" id="set-notion-token" class="al-inp" placeholder="ntn_xxxxxxxxxxxxxxxxxxxxxxxx" style="width:100%;margin-bottom:6px">
       <div style="font-size:.52rem;color:var(--t3);line-height:1.5">
         1. Go to <span style="color:var(--go)">notion.so/my-integrations</span> → New Integration → give it any name → Submit<br>
-        2. Copy the Internal Integration Token (starts with <code style="color:var(--em)">secret_</code>)<br>
+        2. Copy the Internal Integration Token (starts with <code style="color:var(--em)">ntn_</code> or <code style="color:var(--em)">secret_</code>)<br>
         3. In Notion: open <span style="color:var(--go)">Vault·It Pioneer Signups</span> DB → ··· menu → Add connections → pick your integration<br>
         All profile saves and sign-ups will auto-populate the database.
       </div>
