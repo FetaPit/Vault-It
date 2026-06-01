@@ -3012,13 +3012,13 @@ input:focus, textarea:focus, select:focus {
     <div class="vi-modal-duo-hdr">
       <div style="width:32px;height:32px;flex-shrink:0"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="">
   <defs>
-    <radialGradient id="vaultGlow" cx="50%" cy="50%" r="50%">
+    <radialGradient id="vaultGlow2" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#44c0b9" stop-opacity="0.12"/>
       <stop offset="100%" stop-color="#44c0b9" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <!-- Ambient glow -->
-  <circle cx="16.0" cy="16.0" r="16.5" fill="url(#vaultGlow)"/>
+  <circle cx="16.0" cy="16.0" r="16.5" fill="url(#vaultGlow2)"/>
   <!-- Outer bezel -->
   <circle cx="16.0" cy="16.0" r="15.0" fill="#0a1a1a" stroke="#44c0b9" stroke-width="0.6"/>
   <!-- Bezel inner shadow ring -->
@@ -12070,52 +12070,7 @@ function gateNudge(tabName, features) {
 // WELCOME SCREEN + PAYWALL LOGIC
 // ══════════════════════════════════════════════════════════════
 
-var _wSelectedVal = null;
-var _vaultItUser  = null;
-
-function selectWelcomeOpt(btn) {
-  document.querySelectorAll('.welcome-opt').forEach(function(b){ b.classList.remove('selected'); });
-  btn.classList.add('selected');
-  _wSelectedVal = btn.getAttribute('data-val');
-}
-
-function submitWelcome() {
-  var name  = (document.getElementById('w-name')  || {}).value || '';
-  var email = (document.getElementById('w-email') || {}).value || '';
-  if (!email || !email.includes('@')) {
-    var el = document.getElementById('w-email');
-    if (el) { el.style.borderColor = 'var(--re)'; el.focus(); }
-    showToast('Please enter a valid email address');
-    return;
-  }
-  if (!_wSelectedVal) {
-    showToast('Tell us your biggest challenge to personalise your journey');
-    return;
-  }
-  _vaultItUser = { name: name.trim(), email: email.trim(), goal: _wSelectedVal, joined: new Date().toISOString(), pro: false };
-  try { localStorage.setItem('vi_user', JSON.stringify(_vaultItUser)); } catch(e) {}
-
-  // Map goal to journey stage override
-  if (typeof journeyState !== 'undefined') {
-    journeyState.stageOverride = parseInt(_wSelectedVal);
-    if (name) journeyState.profile = journeyState.profile || {};
-    jrnySaveState();
-  }
-
-  var ov=document.getElementById('welcome-overlay'); if(ov) ov.style.display='none';
-  showToast('Welcome' + (name ? ', ' + name : '') + '. Your journey starts here.');
-
-  // Apply paywall state
-  applyPaywall();
-}
-
-function skipWelcome() {
-  var ov=document.getElementById('welcome-overlay'); if(ov) ov.style.display='none';
-  applyPaywall();
-}
-
 function _isPro() {
-  // Pioneer subscribers get full Pro access — checks both pathways
   if (isPioneer()) return true;
   try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.pro); } catch(e) { return false; }
 }
@@ -12128,24 +12083,6 @@ function _proLockOverlay(title, subtitle) {
     + '<button onclick="showUpgrade(\'annual\')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:\'Syne\',sans-serif;font-weight:800;font-size:.6rem;cursor:pointer;letter-spacing:.06em">Invest in yourself →</button>'
     + '</div>';
 }
-
-function applyPaywall() {
-  var user = null;
-  try { user = JSON.parse(localStorage.getItem('vi_user') || 'null'); } catch(e) {}
-  var isPro = user && user.pro;
-  // Gated tabs: biz (Pro), achievements (Pro)
-  var bizGate = document.getElementById('pro-gate-biz');
-  if (bizGate) bizGate.style.display = isPro ? 'none' : '';
-}
-
-function showUpgrade() {
-  var m = document.getElementById('waitlist-modal');
-  if (m) m.classList.remove('hidden');
-}
-
-// initWelcome defined below — active definition handles new/returning users
-
-// Hook into showTab
 
 function submitWaitlist() {
   var email = (document.getElementById('waitlist-email') || {}).value || '';
@@ -13295,15 +13232,15 @@ function nwhRenderMini(){
 <!-- ══ FOOTER ══ -->
 <div id="app-footer">
   <span class="footer-copy">© 2026 PT Live Design. All rights reserved. <button onclick="showPrivacy()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Privacy</button><span style="color:var(--t3);opacity:.4">·</span><button onclick="showTerms()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Terms</button></span>
-  <span class="footer-logo"><div style="width:14px;height:14px;flex-shrink:0;display:inline-block"><svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" style="">
+  <span class="footer-logo"><div style="width:14px;height:14px;flex-shrink:0;display:inline-block"><svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2020/svg" style="">
   <defs>
-    <radialGradient id="vaultGlow" cx="50%" cy="50%" r="50%">
+    <radialGradient id="vaultGlow3" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#44c0b9" stop-opacity="0.12"/>
       <stop offset="100%" stop-color="#44c0b9" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <!-- Ambient glow -->
-  <circle cx="7.0" cy="7.0" r="7.2" fill="url(#vaultGlow)"/>
+  <circle cx="7.0" cy="7.0" r="7.2" fill="url(#vaultGlow3)"/>
   <!-- Outer bezel -->
   <circle cx="7.0" cy="7.0" r="6.6" fill="#0a1a1a" stroke="#44c0b9" stroke-width="0.3"/>
   <!-- Bezel inner shadow ring -->
