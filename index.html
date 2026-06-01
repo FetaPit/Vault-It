@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.7.5';
+  var SW_VERSION = '0.7.7';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -394,9 +394,25 @@ html, body { height: 100%; background: var(--bg); color: var(--tx); font-family:
 .jrny-progress-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-top:6px}
 .jrny-progress-fill{height:100%;background:linear-gradient(90deg,var(--em),var(--go));border-radius:2px;transition:width .6s}
 
-/* Road */
-.jrny-road-wrap{background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:20px;margin-bottom:20px;overflow-x:auto}
-.jrny-road-svg{display:block;min-width:700px;width:100%}
+/* Road — vertical timeline */
+.jrny-road-wrap{background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:16px 12px 20px;margin-bottom:20px;overflow:hidden}
+.jrny-road-svg{display:block;width:100%;max-width:360px;margin:0 auto}
+/* Custom goal events */
+.jrny-ev-wrap{background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:20px}
+.jrny-ev-hdr{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:800;color:var(--em);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+.jrny-ev-item{display:flex;align-items:center;gap:9px;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:7px;margin-bottom:7px;transition:border-color .2s}
+.jrny-ev-item.done{border-color:rgba(68,192,185,.2);background:rgba(68,192,185,.04)}
+.jrny-ev-check{width:17px;height:17px;border:1.5px solid rgba(255,255,255,.22);border-radius:4px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s}
+.jrny-ev-check.done{border-color:rgba(68,192,185,.7);background:rgba(68,192,185,.25);color:var(--em)}
+.jrny-ev-name{font-family:'Syne',sans-serif;font-size:.56rem;font-weight:700;flex:1}
+.jrny-ev-date-lbl{font-family:'Share Tech Mono',monospace;font-size:.46rem;color:var(--t3);margin-top:2px}
+.jrny-ev-del{background:none;border:none;color:rgba(255,255,255,.15);font-size:.85rem;cursor:pointer;padding:0 3px;line-height:1;transition:color .2s}
+.jrny-ev-del:hover{color:rgba(224,92,92,.6)}
+.jrny-ev-form{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.jrny-ev-inp{background:var(--c3);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-size:.54rem;padding:7px 9px;outline:none;transition:border-color .2s}
+.jrny-ev-inp:focus{border-color:var(--em)}
+.jrny-ev-add{background:rgba(68,192,185,.1);border:1px solid rgba(68,192,185,.28);border-radius:5px;color:var(--em);font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;padding:7px 12px;cursor:pointer;white-space:nowrap;transition:all .18s}
+.jrny-ev-add:hover{background:rgba(68,192,185,.18)}
 
 /* Stage panel */
 .jrny-panel{background:var(--c2);border:1px solid var(--bd);border-radius:10px;margin-bottom:20px;overflow:hidden;transition:border-color .2s}
@@ -2024,6 +2040,105 @@ body::before {
   border-color: rgba(155,126,200,.3);
 }
 
+/* Network tab — teal/gold hybrid */
+#tab-network .ov-chart-card::before,
+#tab-network .nw-card::before {
+  background: linear-gradient(90deg, var(--em) 0%, rgba(201,168,76,.25) 50%, transparent 100%);
+}
+#tab-network .ov-chart-card::after,
+#tab-network .nw-card::after {
+  border-color: rgba(68,192,185,.3);
+}
+.nw-card {
+  background: var(--c2);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.nw-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--em), rgba(201,168,76,.6), transparent);
+}
+.nw-founding-card {
+  background: linear-gradient(135deg, rgba(201,168,76,.06), rgba(68,192,185,.04));
+  border: 1px solid rgba(201,168,76,.35);
+  border-radius: 12px;
+  padding: 22px 20px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.nw-founding-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--go), var(--em), transparent);
+}
+.nw-mint-card {
+  background: linear-gradient(135deg, rgba(68,192,185,.05), rgba(68,192,185,.02));
+  border: 1px solid rgba(68,192,185,.25);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.nw-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.nw-profile-chip {
+  background: var(--c2);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  padding: 12px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.nw-profile-chip:hover { border-color: var(--em); background: rgba(68,192,185,.06); }
+.nw-profile-chip .nw-pc-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--em), rgba(201,168,76,.7));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: .7rem;
+  color: #000; margin: 0 auto 6px;
+}
+.nw-profile-chip .nw-pc-name {
+  font-family: 'Syne', sans-serif; font-size: .48rem; font-weight: 700;
+  color: var(--tx); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nw-profile-chip .nw-pc-num {
+  font-family: 'Share Tech Mono', monospace; font-size: .4rem; color: var(--go); margin-top: 2px;
+}
+.nw-step-row {
+  display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;
+}
+.nw-step-num {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(68,192,185,.15); border: 1px solid rgba(68,192,185,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Share Tech Mono', monospace; font-size: .44rem; color: var(--em);
+}
+.nw-step-done .nw-step-num { background: rgba(68,192,185,.25); border-color: var(--em); color: var(--em); }
+.nw-chain-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(68,192,185,.1); border: 1px solid rgba(68,192,185,.25);
+  border-radius: 20px; padding: 3px 10px;
+  font-family: 'Share Tech Mono', monospace; font-size: .44rem; color: var(--em);
+}
+.nw-wallet-row {
+  background: rgba(0,0,0,.3); border: 1px solid var(--bd); border-radius: 6px;
+  padding: 8px 12px; font-family: 'Share Tech Mono', monospace; font-size: .44rem;
+  color: var(--t2); word-break: break-all; margin: 8px 0;
+}
+
 /* Journey tab — gold accent (it leads to the house) */
 #tab-journey .jrny-panel::before,
 #tab-journey .jrny-gary-card::before {
@@ -2606,11 +2721,18 @@ input:focus, textarea:focus, select:focus {
     if (sessionOk) {
       // Valid session — hide login overlay immediately (no flash)
       document.write('<style>#login-overlay{display:none!important}</style>');
-      var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
-      // Also hide welcome overlay if profile exists
-      if (u && u.email) {
-        document.write('<style>#welcome-overlay{display:none!important}</style>');
-      }
+    }
+    // Hide welcome overlay for any returning user who has already registered
+    var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
+    if (!reset && u && u.name && u.email) {
+      document.write('<style>#welcome-overlay{display:none!important}</style>');
+    }
+    // Belt-and-suspenders: also hide via JS after DOM is ready
+    if (!reset && u && u.name && u.email) {
+      document.addEventListener('DOMContentLoaded', function() {
+        var ov = document.getElementById('welcome-overlay');
+        if (ov) { ov.style.display = 'none'; ov.style.setProperty('display','none','important'); }
+      });
     }
   } catch(e) {}
 })();
@@ -2711,8 +2833,9 @@ input:focus, textarea:focus, select:focus {
         <input type="email" class="welcome-inp" id="w-email" placeholder="you@example.com" autocomplete="email">
       </div>
       <div class="welcome-field">
-        <label>WhatsApp / Phone</label>
+        <label>WhatsApp / Phone <span style="color:rgba(68,192,185,.5);font-weight:400;font-size:.42rem">(optional)</span></label>
         <input type="tel" class="welcome-inp" id="w-phone-s1" placeholder="+44 7700 900000" autocomplete="tel">
+        <div style="font-size:.46rem;color:var(--t3);margin-top:5px;line-height:1.55">Add your number to receive a <strong style="color:var(--go)">heavily discounted lifetime licence</strong> code when Vault·It launches on beta.</div>
       </div>
       <div class="welcome-question" style="margin-top:14px">What is your biggest financial challenge right now?</div>
       <div class="welcome-opts" id="w-opts">
@@ -3053,6 +3176,11 @@ input:focus, textarea:focus, select:focus {
     <svg class="ti" viewBox="0 0 16 16"><circle cx="8" cy="3" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="13" cy="13" r="1.5"/><line x1="7.1" y1="4.4" x2="3.9" y2="11.6"/><line x1="8.9" y1="4.4" x2="12.1" y2="11.6"/><line x1="4.5" y1="13" x2="11.5" y2="13"/></svg>
     <span>Connections</span>
   </button>
+  <button class="tab-btn" onclick="showTab('network')" style="position:relative">
+    <svg class="ti" viewBox="0 0 16 16"><polygon points="8,1 10.5,6 16,6.9 12,10.7 12.9,16 8,13.4 3.1,16 4,10.7 0,6.9 5.5,6"/></svg>
+    <span>◈ Network</span>
+    <span style="position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--go);box-shadow:0 0 4px var(--go)"></span>
+  </button>
   <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-left:10px;margin-left:auto">
     <span style="font-family:'Syne',sans-serif;font-size:.44rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--t3)">NET WORTH</span>
     <span id="nav-nw" style="font-family:'Share Tech Mono',monospace;font-size:.74rem;color:var(--em)">£0</span>
@@ -3392,10 +3520,12 @@ input:focus, textarea:focus, select:focus {
     <div class="jrny-keys-date" id="jrny-keys-headline">Keys in hand: calculating...</div>
     <div class="jrny-header-sub" id="jrny-hdr-sub">Add data to see your timeline</div>
   </div>
-  <!-- Journey road SVG -->
+  <!-- Journey vertical timeline -->
   <div class="jrny-road-wrap">
-    <svg class="jrny-road-svg" id="jrny-road-svg" height="140" viewBox="0 0 800 140" preserveAspectRatio="xMidYMid meet"></svg>
+    <svg class="jrny-road-svg" id="jrny-road-svg" viewBox="0 0 300 650" preserveAspectRatio="xMidYMin meet"></svg>
   </div>
+  <!-- Custom goal events -->
+  <div id="jrny-custom-events"></div>
   <!-- Active stage panel -->
   <div class="jrny-panel" id="jrny-stage-panel">
     <div class="jrny-panel-hdr">
@@ -3999,6 +4129,145 @@ input:focus, textarea:focus, select:focus {
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     VAULT NETWORK TAB
+════════════════════════════════════════════ -->
+<div id="tab-network" class="tab-panel" style="display:none">
+  <div style="max-width:680px;margin:0 auto;padding:24px 16px 80px">
+
+    <!-- Header -->
+    <div style="margin-bottom:22px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--go);letter-spacing:.08em">◈ VAULT NETWORK</span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--em);background:rgba(68,192,185,.1);border:1px solid rgba(68,192,185,.25);border-radius:20px;padding:2px 8px">ALPHA EXCLUSIVE</span>
+      </div>
+      <div style="font-size:.55rem;color:var(--t2);line-height:1.6">Own your slot. Mint your identity. Connect with the first 33 pioneers building wealth on Vault·It.</div>
+    </div>
+
+    <!-- ── Step 1: Founding Licence ───────────────────────────────── -->
+    <div class="nw-founding-card" id="nw-founding-card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span style="font-size:1.1rem">◆</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.62rem;color:var(--go);letter-spacing:.1em">FOUNDING MASTER LICENCE</span>
+        <span id="nw-founding-badge" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.4rem;color:var(--gr)"></span>
+      </div>
+      <div id="nw-founding-inactive" style="">
+        <div style="display:grid;grid-template-columns:1fr auto;align-items:start;gap:16px;margin-bottom:16px">
+          <div>
+            <div style="font-size:.55rem;color:var(--t2);line-height:1.7;margin-bottom:10px">
+              One founding slot. One payment. <strong style="color:var(--go)">£7.77</strong> — permanently locks in your position as a Vault·It original.
+              Includes a holographic NFT Pioneer card minted on <strong style="color:var(--em)">Shibarium</strong> and access to the live network grid.
+            </div>
+            <ul style="font-size:.5rem;color:var(--t3);line-height:1.9;list-style:none;padding:0;margin:0 0 14px">
+              <li>◈ Adoption number: <strong style="color:var(--go)" id="nw-adoption-num">#–</strong> of 33 founding slots</li>
+              <li>◈ Holographic NFT card on Shibarium blockchain</li>
+              <li>◈ Community profile visible to fellow founders</li>
+              <li>◈ Direct collaboration features with other alpha users</li>
+              <li>◈ Lifetime access — no recurring fee</li>
+            </ul>
+          </div>
+          <div style="text-align:center;flex-shrink:0">
+            <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:900;color:var(--go);line-height:1">£7.77</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--t3)">one-time</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button onclick="purchaseFoundingLicence()" style="flex:1;min-width:160px;background:linear-gradient(90deg,#b8902e,#c9a84c);border:none;border-radius:6px;color:#000;font-family:'Syne',sans-serif;font-size:.56rem;font-weight:800;padding:11px 18px;cursor:pointer;letter-spacing:.08em">
+            ◆ SECURE YOUR SLOT — £7.77
+          </button>
+          <button onclick="verifyFoundingPurchase()" style="background:transparent;border:1px solid rgba(201,168,76,.4);border-radius:6px;color:var(--go);font-family:'Syne',sans-serif;font-size:.48rem;font-weight:700;padding:10px 14px;cursor:pointer;white-space:nowrap">
+            Already purchased?
+          </button>
+        </div>
+        <div style="font-size:.44rem;color:var(--t3);margin-top:8px">Prepaid GBP cards accepted · Secure Stripe checkout · No subscription</div>
+      </div>
+      <div id="nw-founding-active" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:.9rem;color:var(--go)">◆</span>
+          <span style="font-family:'Syne',sans-serif;font-size:.58rem;font-weight:800;color:var(--gr)">Founding Licence Active</span>
+          <span id="nw-adoption-display" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--go)"></span>
+        </div>
+        <div style="font-size:.5rem;color:var(--t2);line-height:1.6">You are a Vault·It founding member. Your Pioneer card is ready to mint on Shibarium.</div>
+      </div>
+    </div>
+
+    <!-- ── Step 2: Mint on Shibarium ─────────────────────────────── -->
+    <div class="nw-mint-card" id="nw-mint-section">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:.85rem">⬡</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.58rem;color:var(--em);letter-spacing:.08em">MINT YOUR PIONEER CARD</span>
+        <div class="nw-chain-badge" style="margin-left:auto">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          Shibarium
+        </div>
+      </div>
+
+      <div id="nw-mint-locked" style="font-size:.5rem;color:var(--t3);padding:12px 0">
+        Purchase a Founding Licence above to unlock NFT minting.
+      </div>
+
+      <div id="nw-mint-steps" style="display:none">
+        <div id="nw-wallet-status">
+          <div class="nw-step-row" id="nw-step1-row">
+            <div class="nw-step-num">1</div>
+            <div style="flex:1">
+              <div style="font-size:.52rem;color:var(--t2);font-weight:600;margin-bottom:4px">Connect Web3 Wallet</div>
+              <div style="font-size:.47rem;color:var(--t3);margin-bottom:8px">MetaMask or any EVM-compatible wallet. Gas paid in BONE (Shibarium's native token).</div>
+              <button onclick="connectWeb3Wallet()" id="nw-connect-btn" style="background:rgba(68,192,185,.12);border:1px solid rgba(68,192,185,.35);border-radius:5px;color:var(--em);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;padding:7px 14px;cursor:pointer">Connect Wallet</button>
+              <div id="nw-wallet-addr" class="nw-wallet-row" style="display:none"></div>
+            </div>
+          </div>
+          <div class="nw-step-row" id="nw-step2-row">
+            <div class="nw-step-num">2</div>
+            <div style="flex:1">
+              <div style="font-size:.52rem;color:var(--t2);font-weight:600;margin-bottom:4px">Switch to Shibarium Network</div>
+              <div style="font-size:.47rem;color:var(--t3);margin-bottom:8px">Chain ID 109 · RPC: shibrpc.com · Gas: BONE</div>
+              <button onclick="switchToShibarium()" id="nw-switch-btn" style="background:rgba(68,192,185,.08);border:1px solid var(--bd);border-radius:5px;color:var(--t2);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;padding:7px 14px;cursor:pointer" disabled>Switch Network</button>
+            </div>
+          </div>
+          <div class="nw-step-row" id="nw-step3-row">
+            <div class="nw-step-num">3</div>
+            <div style="flex:1">
+              <div style="font-size:.52rem;color:var(--t2);font-weight:600;margin-bottom:4px">Mint Your Pioneer Card NFT</div>
+              <div style="font-size:.47rem;color:var(--t3);margin-bottom:8px">ERC-721 token encoding your adoption number, name, and Pioneer status.</div>
+              <button onclick="mintOnShibarium()" id="nw-mint-btn" style="background:linear-gradient(90deg,rgba(184,144,46,.15),rgba(201,168,76,.15));border:1px solid rgba(201,168,76,.3);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;padding:7px 14px;cursor:pointer" disabled>Mint Card</button>
+              <div id="nw-mint-result" style="font-size:.47rem;margin-top:6px;color:var(--t3)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Step 3: Vault Network opt-in ──────────────────────────── -->
+    <div class="nw-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.58rem;color:var(--tx);margin-bottom:3px">Join the Vault Network</div>
+          <div style="font-size:.48rem;color:var(--t3)">Show your profile to fellow founders. Opt out any time.</div>
+        </div>
+        <div onclick="toggleNetworkOptIn()" id="nw-optin-toggle" style="width:42px;height:24px;border-radius:12px;background:var(--c3);border:1px solid var(--bd);cursor:pointer;position:relative;transition:background .25s;flex-shrink:0">
+          <div id="nw-optin-thumb" style="width:18px;height:18px;border-radius:50%;background:var(--t3);position:absolute;top:2px;left:2px;transition:all .25s"></div>
+        </div>
+      </div>
+      <div id="nw-optin-msg" style="font-size:.46rem;color:var(--t3);margin-bottom:12px">Network opt-in is off — your profile is private.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="shareNetworkProfile()" style="background:rgba(68,192,185,.1);border:1px solid rgba(68,192,185,.3);border-radius:5px;color:var(--em);font-family:'Syne',sans-serif;font-size:.48rem;font-weight:700;padding:7px 13px;cursor:pointer">↗ Share Profile URL</button>
+        <button onclick="loadCommunityProfiles()" style="background:transparent;border:1px solid var(--bd);border-radius:5px;color:var(--t2);font-family:'Syne',sans-serif;font-size:.48rem;padding:7px 13px;cursor:pointer">↻ Refresh Grid</button>
+      </div>
+    </div>
+
+    <!-- ── Community grid ─────────────────────────────────────────── -->
+    <div class="nw-card">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.58rem;color:var(--tx);margin-bottom:6px">◈ Active Founders</div>
+      <div style="font-size:.47rem;color:var(--t3);margin-bottom:12px">Founders who opted into the network. Click a card to open a direct message.</div>
+      <div id="nw-community-grid">
+        <div style="font-size:.48rem;color:var(--t3);text-align:center;padding:24px 0">Loading network…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- Background ambient layer -->
 <div id="vi-bg" aria-hidden="true">
   <div class="vi-bg-grid"></div>
@@ -4134,6 +4403,16 @@ input:focus, textarea:focus, select:focus {
       <input type="text"     id="set-ejs-tpl"  class="al-inp" placeholder="Template ID (e.g. template_xxxxx)"  style="width:100%;margin-bottom:6px">
       <input type="password" id="set-ejs-key"  class="al-inp" placeholder="Public Key  (e.g. AbC1dEf2GhI3)"    style="width:100%;margin-bottom:6px">
       <div style="font-size:.48rem;color:var(--t3);line-height:1.6">Free at <span style="color:var(--em)">emailjs.com</span> (200 emails/mo). Create a template with variables <code style="color:var(--go)">{{otp_code}}</code> and <code style="color:var(--go)">{{to_email}}</code>. Without this, login codes are shown on screen.</div>
+    </div>
+
+    <!-- Vault Network / Founding Licence -->
+    <div style="margin-bottom:20px;padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.05),rgba(68,192,185,.03));border-radius:8px;border:1px solid rgba(201,168,76,.25)">
+      <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--go);margin-bottom:8px;letter-spacing:.06em">◈ Vault Network — Admin Config</div>
+      <label style="font-size:.48rem;color:var(--t2);display:block;margin-bottom:4px">Founding Licence Stripe Link (£7.77)</label>
+      <input type="text" id="set-founding-link" class="al-inp" placeholder="https://buy.stripe.com/..." style="width:100%;margin-bottom:8px">
+      <label style="font-size:.48rem;color:var(--t2);display:block;margin-bottom:4px">Pioneer NFT Contract Address (Shibarium)</label>
+      <input type="text" id="set-nft-contract" class="al-inp" placeholder="0x..." style="width:100%;margin-bottom:6px">
+      <div style="font-size:.46rem;color:var(--t3);line-height:1.6">Create a Payment Link in your Stripe Dashboard → set price to £7.77, one-time. Paste the link above. The NFT contract address is populated after deploying an ERC-721 to Shibarium mainnet.</div>
     </div>
 
     <!-- Danger zone -->
@@ -4508,7 +4787,7 @@ body.vi-wide #nwChart { height: 300px !important; }
   .al-grid         { grid-template-columns: 1fr !important; }
   .debt-cols       { grid-template-columns: 1fr !important; }
   .g2              { grid-template-columns: 1fr !important; }
-  .jrny-road-svg   { min-width: 100% !important; overflow-x: auto; }
+  .jrny-road-svg   { max-width: 100% !important; }
   #ov-fire-banner  { flex-wrap: wrap; gap: 8px !important; }
 }
 @media (max-width: 479px) {
@@ -4850,16 +5129,6 @@ body.vi-wide #nwChart { height: 300px !important; }
 // TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════
 function showTab(id){
-  // Hard gate: require name + email + phone before using the app
-  try {
-    var _gu = JSON.parse(localStorage.getItem('vi_user') || 'null');
-    if (!_gu || !_gu.name || !_gu.email || !_gu.phone) {
-      var ov = document.getElementById('welcome-overlay');
-      if (ov) ov.style.display = 'flex';
-      showToast('Please complete your registration to access Vault·It');
-      return;
-    }
-  } catch(e) {}
   if(id!=='house'&&typeof _threeAnimId!=='undefined'&&_threeAnimId){cancelAnimationFrame(_threeAnimId);_threeAnimId=null;}
   // Always collapse the ISO expand when switching tabs
   if(typeof _isExpanded!=='undefined'&&_isExpanded) toggleExpand();
@@ -4879,6 +5148,7 @@ function showTab(id){
   if(id==='achievements')renderAchievements();
   if(id==='connections')renderConnections();
   if(id==='journey'){jrnyLoadState();renderJourney();}
+  if(id==='network')renderNetworkTab();
   if (id === 'overview' && typeof refreshAllLiveConns === 'function') {
     // Only auto-refresh if at least one live connector is active
     var hasLive = achState && achState.connected && ['coingecko','metals_live','exchangerate','yahoo'].some(function(lid){ return achState.connected[lid]; });
@@ -8081,7 +8351,7 @@ function saveDebt(){
   var r=parseFloat(document.getElementById('df-rate').value)||0;
   var m=parseFloat(document.getElementById('df-min').value)||0;
   if(!n)return;
-  if(!isPioneer()&&(debtState.debts||[]).length>=FREE_LIMITS.debts){showPaywall('debts');return;}
+  if(!isPioneer()&&(debtState.debts||[]).filter(function(d){return !d._onboarding;}).length>=FREE_LIMITS.debts){showPaywall('debts');return;}
   var dtype=(document.getElementById('di-type')||{}).value||'other';
   debtState.debts.push({id:Date.now(),name:n,original:b,balance:b,rate:r,min:m,type:dtype});
   document.getElementById('df-name').value='';document.getElementById('df-balance').value='';document.getElementById('df-rate').value='';document.getElementById('df-min').value='';
@@ -9079,6 +9349,307 @@ function verifyPioneerPurchase(){
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// VAULT NETWORK — Founding Licence, Shibarium NFT, Community
+// ═══════════════════════════════════════════════════════════════
+
+function isFounder() { return localStorage.getItem('vi_founder') === 'true'; }
+
+function purchaseFoundingLicence() {
+  var link = VI_FOUNDING_LINK || localStorage.getItem('vi_founding_link') || '';
+  if (!link) {
+    showToast('Payment link not configured yet — check Settings → Vault Network');
+    return;
+  }
+  var u = {}; try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
+  var url = link + (u.email ? '?prefilled_email=' + encodeURIComponent(u.email) : '');
+  window.open(url, '_blank', 'noopener,noreferrer');
+  showToast('Opening secure checkout — £7.77 one-time · Prepaid cards accepted');
+}
+
+function verifyFoundingPurchase() {
+  var u = null; try { u = JSON.parse(localStorage.getItem('vi_user') || 'null'); } catch(e) {}
+  if (!u || !u.email) { showToast('Complete your profile first'); return; }
+  var code = window.prompt('Enter the email you used at checkout to verify your Founding Licence:');
+  if (!code) return;
+  if (code.trim().toLowerCase() === u.email.toLowerCase()) {
+    var taken = parseInt(localStorage.getItem('vi_founder_taken') || '0') + 1;
+    localStorage.setItem('vi_founder', 'true');
+    localStorage.setItem('vi_founder_email', u.email.toLowerCase());
+    localStorage.setItem('vi_founder_num', taken);
+    localStorage.setItem('vi_founder_taken', taken);
+    showToast('◈ Founding Licence verified — welcome, Pioneer #' + taken + '!');
+    renderNetworkTab();
+  } else {
+    showToast('Email doesn\'t match your profile. Update your profile email to match checkout.');
+  }
+}
+
+// ── ethers.js loader (lazy CDN) ───────────────────────────────
+function _loadEthers() {
+  return new Promise(function(resolve, reject) {
+    if (window.ethers) { resolve(window.ethers); return; }
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.5/ethers.umd.min.js';
+    s.onload = function() { resolve(window.ethers); };
+    s.onerror = function() { reject(new Error('ethers.js failed to load')); };
+    document.head.appendChild(s);
+  });
+}
+
+// ── Web3 wallet connection ────────────────────────────────────
+async function connectWeb3Wallet() {
+  if (!window.ethereum) {
+    showToast('No Web3 wallet detected — install MetaMask to continue');
+    return;
+  }
+  try {
+    var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    if (!accounts || !accounts[0]) { showToast('Wallet connection cancelled'); return; }
+    localStorage.setItem('vi_wallet_addr', accounts[0]);
+    var addrEl = document.getElementById('nw-wallet-addr');
+    if (addrEl) { addrEl.style.display = 'block'; addrEl.textContent = accounts[0]; }
+    var btn = document.getElementById('nw-connect-btn');
+    if (btn) { btn.textContent = '✓ Connected'; btn.style.color = 'var(--gr)'; btn.style.borderColor = 'var(--gr)'; }
+    var step1 = document.getElementById('nw-step1-row');
+    if (step1) step1.classList.add('nw-step-done');
+    var switchBtn = document.getElementById('nw-switch-btn');
+    if (switchBtn) { switchBtn.removeAttribute('disabled'); switchBtn.style.color = 'var(--em)'; switchBtn.style.borderColor = 'rgba(68,192,185,.35)'; }
+    showToast('Wallet connected: ' + accounts[0].slice(0,6) + '…' + accounts[0].slice(-4));
+  } catch(e) {
+    showToast('Wallet connection failed: ' + (e.message || e));
+  }
+}
+
+// ── Switch to Shibarium ───────────────────────────────────────
+async function switchToShibarium() {
+  if (!window.ethereum) { showToast('No Web3 wallet detected'); return; }
+  try {
+    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: SHIBARIUM_MAINNET.chainId }] });
+  } catch(e) {
+    if (e.code === 4902) {
+      try {
+        await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [SHIBARIUM_MAINNET] });
+      } catch(e2) { showToast('Failed to add Shibarium: ' + (e2.message || e2)); return; }
+    } else { showToast('Network switch failed: ' + (e.message || e)); return; }
+  }
+  var step2 = document.getElementById('nw-step2-row');
+  if (step2) step2.classList.add('nw-step-done');
+  var switchBtn = document.getElementById('nw-switch-btn');
+  if (switchBtn) { switchBtn.textContent = '✓ On Shibarium'; switchBtn.style.color = 'var(--gr)'; }
+  var mintBtn = document.getElementById('nw-mint-btn');
+  if (mintBtn) { mintBtn.removeAttribute('disabled'); mintBtn.style.opacity = '1'; }
+  showToast('Switched to Shibarium — ready to mint');
+}
+
+// ── Mint Pioneer Card NFT ─────────────────────────────────────
+async function mintOnShibarium() {
+  var resultEl = document.getElementById('nw-mint-result');
+  if (resultEl) resultEl.innerHTML = '<span style="color:var(--em)">Loading ethers.js…</span>';
+  try {
+    var ethers = await _loadEthers();
+    var addr = localStorage.getItem('vi_wallet_addr') || '';
+    if (!addr) { showToast('Connect your wallet first'); return; }
+    if (!VAULT_NFT_CONTRACT) {
+      showToast('NFT contract not deployed yet — add address in Settings → Vault Network');
+      if (resultEl) resultEl.innerHTML = '<span style="color:var(--t3)">Contract address not set. Add it in Settings → Vault Network.</span>';
+      return;
+    }
+    var u = {}; try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
+    var founderNum = localStorage.getItem('vi_founder_num') || '?';
+    // Minimal ERC-721 mint ABI
+    var abi = ['function mint(address to, string memory tokenURI) external returns (uint256)'];
+    var provider = new ethers.BrowserProvider(window.ethereum);
+    var signer = await provider.getSigner();
+    var contract = new ethers.Contract(VAULT_NFT_CONTRACT, abi, signer);
+    // Metadata encoded as data URI
+    var meta = JSON.stringify({
+      name: 'Vault·It Pioneer #' + founderNum,
+      description: 'Founding member of Vault·It — alpha adopter #' + founderNum + ' of 33.',
+      attributes: [
+        { trait_type: 'Name', value: u.name || 'Pioneer' },
+        { trait_type: 'Adoption Number', value: parseInt(founderNum) || 0 },
+        { trait_type: 'Status', value: 'Founding Master' }
+      ]
+    });
+    var tokenURI = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(meta)));
+    if (resultEl) resultEl.innerHTML = '<span style="color:var(--em)">Confirm in wallet…</span>';
+    var tx = await contract.mint(addr, tokenURI);
+    if (resultEl) resultEl.innerHTML = '<span style="color:var(--em)">Mining transaction…</span>';
+    var receipt = await tx.wait();
+    localStorage.setItem('vi_nft_tx', receipt.hash || tx.hash || '');
+    var step3 = document.getElementById('nw-step3-row');
+    if (step3) step3.classList.add('nw-step-done');
+    var mintBtn = document.getElementById('nw-mint-btn');
+    if (mintBtn) { mintBtn.textContent = '✓ Minted'; mintBtn.style.color = 'var(--gr)'; }
+    if (resultEl) resultEl.innerHTML = '<span style="color:var(--gr)">✓ NFT minted · Tx: ' + (receipt.hash||'').slice(0,10) + '…</span>';
+    showToast('Pioneer Card minted on Shibarium! 🎉');
+  } catch(e) {
+    var msg = e.message || String(e);
+    if (resultEl) resultEl.innerHTML = '<span style="color:var(--re)">Error: ' + msg.slice(0,80) + '</span>';
+    showToast('Mint failed — ' + msg.slice(0,60));
+  }
+}
+
+// ── Network opt-in toggle ─────────────────────────────────────
+function toggleNetworkOptIn() {
+  var current = localStorage.getItem('vi_network_optin') === 'true';
+  var next = !current;
+  localStorage.setItem('vi_network_optin', next ? 'true' : 'false');
+  _renderNetworkToggle(next);
+  showToast(next ? 'You\'re now visible on the Vault Network' : 'Network profile hidden');
+  _syncNetworkOptIn(next);
+}
+
+function _renderNetworkToggle(on) {
+  var toggle = document.getElementById('nw-optin-toggle');
+  var thumb = document.getElementById('nw-optin-thumb');
+  var msg = document.getElementById('nw-optin-msg');
+  if (toggle) toggle.style.background = on ? 'var(--em)' : 'var(--c3)';
+  if (thumb) { thumb.style.left = on ? '22px' : '2px'; thumb.style.background = on ? '#000' : 'var(--t3)'; }
+  if (msg) msg.textContent = on ? 'Your profile is visible to fellow founders on the Vault Network.' : 'Network opt-in is off — your profile is private.';
+}
+
+function _syncNetworkOptIn(on) {
+  var u = {}; try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
+  if (!u.email) return;
+  var token = localStorage.getItem('notion_token') || '';
+  if (!token) return;
+  var dbId = localStorage.getItem('vi_notion_db_id') || '';
+  if (!dbId) return;
+  var pageId = localStorage.getItem('vi_notion_page_id') || '';
+  if (!pageId) return;
+  var body = { properties: { 'Network Opt-In': { checkbox: on } } };
+  fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.notion.com/v1/pages/' + pageId), {
+    method: 'PATCH',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Notion-Version': '2022-06-28' },
+    body: JSON.stringify(body)
+  }).catch(function() {});
+}
+
+// ── Community profile grid ────────────────────────────────────
+function loadCommunityProfiles() {
+  var grid = document.getElementById('nw-community-grid');
+  if (!grid) return;
+  var token = localStorage.getItem('notion_token') || '';
+  var dbId = localStorage.getItem('vi_notion_db_id') || '';
+  if (!token || !dbId) {
+    grid.innerHTML = '<div style="font-size:.48rem;color:var(--t3);text-align:center;padding:20px 0">Connect Notion in Settings → Connections to see the live grid.</div>';
+    return;
+  }
+  grid.innerHTML = '<div style="font-size:.48rem;color:var(--t3);text-align:center;padding:20px 0">Loading founders…</div>';
+  fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.notion.com/v1/databases/' + dbId + '/query'), {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Notion-Version': '2022-06-28' },
+    body: JSON.stringify({ filter: { property: 'Network Opt-In', checkbox: { equals: true } }, page_size: 33 })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    var pages = (data.results || []);
+    if (!pages.length) {
+      grid.innerHTML = '<div style="font-size:.48rem;color:var(--t3);text-align:center;padding:20px 0">No founders have opted in yet — be the first!</div>';
+      return;
+    }
+    var html = '<div class="nw-profile-grid">';
+    pages.forEach(function(p, i) {
+      var props = p.properties || {};
+      var nameArr = (props['Name'] && props['Name'].title) || [];
+      var name = nameArr.length ? (nameArr[0].plain_text || 'Pioneer') : 'Pioneer';
+      var initials = name.split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase() || '?';
+      var numProp = props['Adoption Number'];
+      var num = numProp ? (numProp.number || (i+1)) : (i+1);
+      html += '<div class="nw-profile-chip" onclick="openNetworkProfile(\'' + name.replace(/'/g,'') + '\',' + num + ')">'
+        + '<div class="nw-pc-avatar">' + initials + '</div>'
+        + '<div class="nw-pc-name">' + name + '</div>'
+        + '<div class="nw-pc-num">#' + num + '</div>'
+        + '</div>';
+    });
+    html += '</div>';
+    grid.innerHTML = html;
+  })
+  .catch(function() {
+    grid.innerHTML = '<div style="font-size:.48rem;color:var(--t3);text-align:center;padding:20px 0">Could not load profiles — check your Notion token in Settings.</div>';
+  });
+}
+
+function openNetworkProfile(name, num) {
+  showToast('Direct collaboration features coming in v0.8 — ' + name + ' #' + num);
+}
+
+// ── Share profile URL ─────────────────────────────────────────
+function shareNetworkProfile() {
+  var u = {}; try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
+  var num = localStorage.getItem('vi_founder_num') || '?';
+  var url = window.location.origin + window.location.pathname + '?pioneer=' + encodeURIComponent(u.email || '') + '&num=' + num;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() { showToast('Profile URL copied to clipboard'); }).catch(function() { prompt('Copy your profile URL:', url); });
+  } else {
+    prompt('Copy your profile URL:', url);
+  }
+}
+
+// ── Main render ───────────────────────────────────────────────
+function renderNetworkTab() {
+  var founder = isFounder();
+  var optIn = localStorage.getItem('vi_network_optin') === 'true';
+  var founderNum = localStorage.getItem('vi_founder_num') || '?';
+
+  // Founding card state
+  var inactive = document.getElementById('nw-founding-inactive');
+  var active = document.getElementById('nw-founding-active');
+  var badge = document.getElementById('nw-founding-badge');
+  var adoptionNum = document.getElementById('nw-adoption-num');
+  var adoptionDisplay = document.getElementById('nw-adoption-display');
+  var taken = parseInt(localStorage.getItem('vi_founder_taken') || '0');
+  var remaining = Math.max(0, 33 - taken);
+
+  if (inactive) inactive.style.display = founder ? 'none' : 'block';
+  if (active)   active.style.display   = founder ? 'block' : 'none';
+  if (badge)    badge.innerHTML = founder
+    ? '<span style="color:var(--go);background:rgba(201,168,76,.12);padding:2px 7px;border-radius:10px;border:1px solid rgba(201,168,76,.3)">◆ ACTIVE</span>'
+    : '<span style="color:var(--t3);font-size:.38rem">' + remaining + ' slots remain</span>';
+  if (adoptionNum) adoptionNum.textContent = '#' + (founder ? founderNum : (taken + 1));
+  if (adoptionDisplay) adoptionDisplay.textContent = 'Pioneer #' + founderNum + ' of 33';
+
+  // Mint section
+  var mintLocked = document.getElementById('nw-mint-locked');
+  var mintSteps  = document.getElementById('nw-mint-steps');
+  if (mintLocked) mintLocked.style.display = founder ? 'none' : 'block';
+  if (mintSteps)  mintSteps.style.display  = founder ? 'block' : 'none';
+
+  // Restore wallet state if previously connected
+  var savedAddr = localStorage.getItem('vi_wallet_addr') || '';
+  if (founder && savedAddr) {
+    var addrEl = document.getElementById('nw-wallet-addr');
+    var btn = document.getElementById('nw-connect-btn');
+    var step1 = document.getElementById('nw-step1-row');
+    if (addrEl) { addrEl.style.display = 'block'; addrEl.textContent = savedAddr; }
+    if (btn) { btn.textContent = '✓ Connected'; btn.style.color = 'var(--gr)'; btn.style.borderColor = 'var(--gr)'; }
+    if (step1) step1.classList.add('nw-step-done');
+    var switchBtn = document.getElementById('nw-switch-btn');
+    if (switchBtn) { switchBtn.removeAttribute('disabled'); switchBtn.style.color = 'var(--em)'; switchBtn.style.borderColor = 'rgba(68,192,185,.35)'; }
+  }
+
+  // NFT minted state
+  var nftTx = localStorage.getItem('vi_nft_tx') || '';
+  if (nftTx) {
+    var mintBtn = document.getElementById('nw-mint-btn');
+    var resultEl = document.getElementById('nw-mint-result');
+    var step3 = document.getElementById('nw-step3-row');
+    if (mintBtn) { mintBtn.textContent = '✓ Minted'; mintBtn.style.color = 'var(--gr)'; }
+    if (resultEl) resultEl.innerHTML = '<span style="color:var(--gr)">✓ Minted · Tx: ' + nftTx.slice(0,10) + '…</span>';
+    if (step3) step3.classList.add('nw-step-done');
+    var step2Row = document.getElementById('nw-step2-row');
+    if (step2Row) step2Row.classList.add('nw-step-done');
+  }
+
+  // Opt-in toggle
+  _renderNetworkToggle(optIn);
+
+  // Load community grid
+  loadCommunityProfiles();
+}
+
 function _refreshPioneerSettingsUI(){
   var active=document.getElementById('set-pioneer-active');
   var inactive=document.getElementById('set-pioneer-inactive');
@@ -9103,6 +9674,8 @@ function showSettings(){
   var ejsS=document.getElementById('set-ejs-svc');if(ejsS)ejsS.value=localStorage.getItem('emailjs_service_id')||'';
   var ejsT=document.getElementById('set-ejs-tpl');if(ejsT)ejsT.value=localStorage.getItem('emailjs_template_id')||'';
   var ejsK=document.getElementById('set-ejs-key');if(ejsK)ejsK.value=localStorage.getItem('emailjs_public_key')||'';
+  var flEl=document.getElementById('set-founding-link');if(flEl)flEl.value=localStorage.getItem('vi_founding_link')||'';
+  var ncEl=document.getElementById('set-nft-contract');if(ncEl)ncEl.value=localStorage.getItem('vi_nft_contract')||'';
   _refreshPioneerSettingsUI();
   document.getElementById('settings-modal').style.display='flex';
 }
@@ -9129,6 +9702,10 @@ function saveSettings(){
   if(ejsS)localStorage.setItem('emailjs_service_id',ejsS.trim());
   if(ejsT)localStorage.setItem('emailjs_template_id',ejsT.trim());
   if(ejsK)localStorage.setItem('emailjs_public_key',ejsK.trim());
+  var fl=(document.getElementById('set-founding-link')||{}).value||'';
+  var nc=(document.getElementById('set-nft-contract')||{}).value||'';
+  if(fl){localStorage.setItem('vi_founding_link',fl.trim());VI_FOUNDING_LINK=fl.trim();}
+  if(nc){localStorage.setItem('vi_nft_contract',nc.trim());VAULT_NFT_CONTRACT=nc.trim();}
   document.getElementById('settings-modal').style.display='none';
   showToast('API keys saved \u2713');
 }
@@ -10503,12 +11080,12 @@ function jrnySaveState() {
 // ── CALCULATORS (all pure) ────────────────────────────────────
 
 function jrnyIncome() {
-  var fromCF = (ovState.income||[]).reduce(function(a,r){ return a + (+r.mo||0); }, 0);
+  var fromCF = (ovState.income||[]).reduce(function(a,r){ return a + (+r.amount||0); }, 0);
   return fromCF || journeyState.profile.monthlyTakeHome || 0;
 }
 
 function jrnyExpenses() {
-  return (ovState.expenses||[]).reduce(function(a,r){ return a + (+r.mo||0); }, 0);
+  return (ovState.expenses||[]).reduce(function(a,r){ return a + (+r.amount||0); }, 0);
 }
 
 function jrnySurplus() {
@@ -10578,12 +11155,12 @@ function jrnyDebtFreeMonths() {
   if (!debts.length) return 0;
   var income   = jrnyIncome();
   var expenses = jrnyExpenses();
-  var minPays  = debts.reduce(function(a,r){ return a + (+r.monthly||0); }, 0);
+  var minPays  = debts.reduce(function(a,r){ return a + (+r.min||0); }, 0);
   var surplus  = Math.max(0, income - expenses);
   var available = Math.max(0, surplus - minPays);
   var sorted = debts.slice().sort(function(a,b){ return (+b.rate||0) - (+a.rate||0); });
   var month = 0;
-  var rem = sorted.map(function(d){ return { bal: +d.balance||0, rate: +d.rate||0, mo: +d.monthly||0 }; });
+  var rem = sorted.map(function(d){ return { bal: +d.balance||0, rate: +d.rate||0, mo: +d.min||0 }; });
   while (rem.some(function(d){ return d.bal > 0; }) && month < 600) {
     month++;
     var extra = available;
@@ -10706,7 +11283,11 @@ function renderJourney() {
   }
 
   // Road SVG
+  // Vertical timeline
   renderJrnySVG(stage, selectedNode);
+
+  // Custom goal events
+  renderJrnyCustomEvents();
 
   // Stage panel
   renderJrnyPanel(selectedNode, stage);
@@ -10751,114 +11332,272 @@ function renderJrnySVG(currentStage, selectedNode) {
   var svg = document.getElementById('jrny-road-svg');
   if (!svg) return;
 
-  var W = svg.parentElement ? svg.parentElement.offsetWidth : 800;
-  W = Math.max(700, W);
-  var H = 140;
-  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-  svg.setAttribute('width', W);
+  // ── Layout constants ──────────────────────────────
+  var W = 300;
+  var mainX = 44;
+  var branchX = 235;
+  var topPad = 36;
+  var rowH = 90;
+  var r = 18;
 
-  var n = JRNY_STAGES.length;
-  var pad = 60;
-  var step = (W - pad * 2) / (n - 1);
-  var cy = 70;
-  var r = 20;
-
-  // Stage dates
-  var dm = jrnyDebtFreeMonths() || 0;
-  var em = jrnyEFMonths() || 0;
-  var dp = jrnyDepositMonths() || 0;
+  var dm = jrnyDebtFreeMonths();
+  var em = jrnyEFMonths();
+  var dp = jrnyDepositMonths();
   var now = new Date();
 
-  function stageDate(s) {
-    var d = new Date(now);
-    if (s === 0) return 'Now';
-    if (s === 1) { d.setMonth(d.getMonth() + Math.min(1, dm)); return jrnyFmtDate(d); }
-    if (s === 2) { d.setMonth(d.getMonth() + dm); return jrnyFmtDate(d); }
-    if (s === 3) { d.setMonth(d.getMonth() + dm + em); return jrnyFmtDate(d); }
-    if (s === 4) { d.setMonth(d.getMonth() + dm + Math.max(em - dm, 0) + dp); return jrnyFmtDate(d); }
-    if (s === 5) { d.setMonth(d.getMonth() + dm + Math.max(em - dm, 0) + dp + 3); return jrnyFmtDate(d); }
-    if (s === 6) {
-      var yrs = (typeof journeyState.profile.mortgageTermYears === 'number') ? journeyState.profile.mortgageTermYears : 25;
-      d.setFullYear(d.getFullYear() + yrs);
-      return jrnyFmtDate(d);
+  function addM(base, months) {
+    var d = new Date(base);
+    d.setMonth(d.getMonth() + months);
+    return d;
+  }
+
+  function stageDate(i) {
+    if (i === 0) return 'NOW';
+    if (i === 1) return (dm > 0) ? jrnyFmtDate(addM(now, Math.min(1, dm))) : 'Ongoing';
+    if (i === 2) return (dm !== null) ? jrnyFmtDate(addM(now, dm || 0)) : 'Add cashflow';
+    if (i === 3) {
+      if (dm === null || em === null) return 'Add cashflow';
+      return jrnyFmtDate(addM(now, (dm || 0) + (em || 0)));
     }
+    if (i === 4) {
+      var m4 = (dm || 0) + Math.max((em || 0) - (dm || 0), 0) + (dp || 0);
+      return (dp !== null) ? jrnyFmtDate(addM(now, m4)) : 'Add data';
+    }
+    if (i === 5) {
+      var m5 = (dm || 0) + Math.max((em || 0) - (dm || 0), 0) + (dp || 0) + 3;
+      return jrnyFmtDate(addM(now, m5));
+    }
+    if (i === 6) return jrnyFmtDate(addM(now, (journeyState.profile.mortgageTermYears || 25) * 12));
     return '';
   }
 
-  var out = '<defs><filter id="jrny-glow"><feGaussianBlur stdDeviation="3" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+  var n = JRNY_STAGES.length;
+  var ys = [];
+  for (var j = 0; j < n; j++) ys.push(topPad + j * rowH);
+  var totalH = ys[n - 1] + topPad + 10;
+  var branchY = Math.round((ys[2] + ys[3]) / 2);
 
-  // Connector lines
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + totalH);
+  svg.setAttribute('height', totalH);
+
+  var out = '<defs>'
+    + '<filter id="jg" x="-50%" y="-50%" width="200%" height="200%">'
+    + '<feGaussianBlur stdDeviation="3" result="c"/>'
+    + '<feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+    + '</defs>';
+
+  // ── Vertical connector lines ──────────────────────
   for (var i = 0; i < n - 1; i++) {
-    var x1 = pad + i * step + r;
-    var x2 = pad + (i + 1) * step - r;
-    var isPast = i < currentStage;
-    out += '<line x1="' + x1 + '" y1="' + cy + '" x2="' + x2 + '" y2="' + cy + '"'
-      + ' stroke="' + (isPast ? 'rgba(68,192,185,.6)' : 'rgba(68,192,185,.15)') + '"'
-      + ' stroke-width="2.5" stroke-dasharray="' + (isPast ? 'none' : '6 4') + '"/>';
+    if (i === 2) continue; // fork section drawn separately
+    var past = i < currentStage;
+    out += '<line x1="' + mainX + '" y1="' + (ys[i] + r + 2) + '" x2="' + mainX + '" y2="' + (ys[i + 1] - r - 2) + '"'
+      + ' stroke="' + (past ? 'rgba(68,192,185,.6)' : 'rgba(68,192,185,.1)') + '"'
+      + ' stroke-width="2" stroke-dasharray="' + (past ? '0' : '5 3') + '"/>';
   }
 
-  // Nodes
+  // ── Branch fork: Debt Free → Side Income → EF Built ───
+  var debtDone = currentStage > 2;
+  var forkTopY = ys[2] + r + 2;
+  var forkBotY = ys[3] - r - 2;
+  var mainForkCol = debtDone ? 'rgba(68,192,185,.6)' : 'rgba(68,192,185,.1)';
+  var bLineCol = debtDone ? 'rgba(201,168,76,.55)' : 'rgba(68,192,185,.08)';
+
+  // Main spine through fork zone
+  out += '<line x1="' + mainX + '" y1="' + forkTopY + '" x2="' + mainX + '" y2="' + forkBotY + '"'
+    + ' stroke="' + mainForkCol + '" stroke-width="2" stroke-dasharray="' + (debtDone ? '0' : '5 3') + '"/>';
+
+  // Curve out to branch node
+  var mid1 = forkTopY + (branchY - r - forkTopY) * 0.55;
+  out += '<path d="M' + mainX + ',' + forkTopY + ' C' + mainX + ',' + mid1 + ' ' + branchX + ',' + mid1 + ' ' + branchX + ',' + (branchY - r - 2) + '"'
+    + ' stroke="' + bLineCol + '" stroke-width="1.5" stroke-dasharray="' + (debtDone ? '4 2' : '5 4') + '" fill="none"/>';
+
+  // Curve back from branch node
+  var mid2 = (branchY + r + 2) + (forkBotY - (branchY + r + 2)) * 0.45;
+  out += '<path d="M' + branchX + ',' + (branchY + r + 2) + ' C' + branchX + ',' + mid2 + ' ' + mainX + ',' + mid2 + ' ' + mainX + ',' + forkBotY + '"'
+    + ' stroke="' + bLineCol + '" stroke-width="1.5" stroke-dasharray="' + (debtDone ? '4 2' : '5 4') + '" fill="none"/>';
+
+  // Branch node: Side Income
+  var bFill = debtDone ? 'rgba(201,168,76,.1)' : 'rgba(10,18,28,.95)';
+  var bStroke = debtDone ? 'rgba(201,168,76,.6)' : 'rgba(68,192,185,.12)';
+  var bTxtMain = debtDone ? '#c9a84c' : 'rgba(90,96,104,.38)';
+  var bTxtSub = debtDone ? 'rgba(201,168,76,.55)' : 'rgba(90,96,104,.28)';
+  var bW = 62; var bH = 44;
+  out += '<rect x="' + (branchX - bW / 2) + '" y="' + (branchY - bH / 2) + '"'
+    + ' width="' + bW + '" height="' + bH + '" rx="6"'
+    + ' fill="' + bFill + '" stroke="' + bStroke + '" stroke-width="1.2"'
+    + ' onclick="jrnySelectBranch()" style="cursor:pointer"/>';
+  out += '<text x="' + branchX + '" y="' + (branchY - 8) + '" text-anchor="middle" font-size="12"'
+    + ' fill="' + bTxtMain + '" style="pointer-events:none">💡</text>';
+  out += '<text x="' + branchX + '" y="' + (branchY + 7) + '" text-anchor="middle" font-size="5.8"'
+    + ' fill="' + bTxtMain + '" font-family="Syne,sans-serif" font-weight="800" style="pointer-events:none">SIDE INCOME</text>';
+  out += '<text x="' + branchX + '" y="' + (branchY + 18) + '" text-anchor="middle" font-size="5.5"'
+    + ' fill="' + bTxtSub + '" font-family="Share Tech Mono,monospace" style="pointer-events:none">'
+    + (debtDone ? 'Unlocked ✓' : 'Clr debt 1st') + '</text>';
+
+  // ── Main stage nodes ──────────────────────────────
   JRNY_STAGES.forEach(function(st, i) {
-    var cx = pad + i * step;
-    var isPast    = i < currentStage;
+    var cy = ys[i];
+    var isPast = i < currentStage;
     var isCurrent = i === currentStage;
     var isSelected = i === selectedNode;
+    var isMilestone = (i === 2 || i === 5 || i === 6);
     var col = st.colour;
 
-    // Glow ring for selected
+    // Selection halo
     if (isSelected) {
-      out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 8) + '"'
-        + ' fill="' + col + '18" stroke="' + col + '55" stroke-width="1.5"/>';
+      out += '<circle cx="' + mainX + '" cy="' + cy + '" r="' + (r + 9) + '"'
+        + ' fill="' + col + '09" stroke="' + col + '30" stroke-width="1"/>';
     }
-
-    // Outer pulse ring for current
+    // Animated pulse ring for current stage
     if (isCurrent) {
-      out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 4) + '"'
-        + ' fill="none" stroke="' + col + '66" stroke-width="2" class="jrny-node-now"/>';
+      out += '<circle cx="' + mainX + '" cy="' + cy + '" r="' + (r + 5) + '"'
+        + ' fill="none" stroke="' + col + '55" stroke-width="1.5" class="jrny-node-now"/>';
     }
 
-    // Main circle
-    var fill = isPast ? col + '33' : isCurrent ? col + '22' : 'rgba(13,21,32,.9)';
-    var strokeW = isCurrent || isSelected ? 2.5 : isPast ? 1.5 : 1;
-    var strokeC = isPast || isCurrent ? col : 'rgba(68,192,185,.18)';
-    out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '"'
-      + ' fill="' + fill + '" stroke="' + strokeC + '" stroke-width="' + strokeW + '"'
-      + ' style="cursor:pointer" onclick="jrnySelectNode(' + i + ')"'
-      + (isCurrent ? ' filter="url(#jrny-glow)"' : '') + '/>';
+    var fill = isPast ? col + '28' : isCurrent ? col + '15' : 'rgba(10,18,28,.95)';
+    var strokeCol = (isPast || isCurrent) ? col : 'rgba(68,192,185,.15)';
+    var strokeW = isCurrent ? 2.5 : isPast ? 1.8 : 1;
 
-    // Icon
-    out += '<text x="' + cx + '" y="' + (cy + 1) + '" text-anchor="middle" dominant-baseline="middle"'
-      + ' font-size="' + (isPast || isCurrent ? '14' : '13') + '"'
-      + ' style="cursor:pointer" onclick="jrnySelectNode(' + i + ')">' + st.icon + '</text>';
-
-    // Stage name below
-    var textCol = isPast || isCurrent ? col : 'rgba(90,96,104,.6)';
-    out += '<text x="' + cx + '" y="' + (cy + r + 16) + '" text-anchor="middle"'
-      + ' font-size="9" fill="' + textCol + '" font-family="Syne,sans-serif" font-weight="700">' + st.name + '</text>';
-
-    // Date below name
-    var dateStr = i <= currentStage + 3 ? stageDate(i) : '';
-    if (dateStr && i > 0) {
-      out += '<text x="' + cx + '" y="' + (cy + r + 27) + '" text-anchor="middle"'
-        + ' font-size="7.5" fill="rgba(90,96,104,.5)" font-family="Share Tech Mono,monospace">' + dateStr + '</text>';
+    out += '<g onclick="jrnySelectNode(' + i + ')" style="cursor:pointer"'
+      + (isCurrent ? ' filter="url(#jg)"' : '') + '>';
+    if (isMilestone) {
+      // Diamond for milestones (Debt Free, Keys In Hand, Free)
+      var d2 = r + 2;
+      out += '<polygon points="'
+        + mainX + ',' + (cy - d2) + ' '
+        + (mainX + d2) + ',' + cy + ' '
+        + mainX + ',' + (cy + d2) + ' '
+        + (mainX - d2) + ',' + cy + '"'
+        + ' fill="' + fill + '" stroke="' + strokeCol + '" stroke-width="' + strokeW + '"/>';
+    } else {
+      // Hexagon for regular stages
+      var pts = '';
+      for (var k = 0; k < 6; k++) {
+        var ang = k * Math.PI / 3 - Math.PI / 6;
+        pts += (mainX + r * Math.cos(ang)).toFixed(1) + ',' + (cy + r * Math.sin(ang)).toFixed(1) + (k < 5 ? ' ' : '');
+      }
+      out += '<polygon points="' + pts + '" fill="' + fill + '" stroke="' + strokeCol + '" stroke-width="' + strokeW + '"/>';
     }
+    out += '<text x="' + mainX + '" y="' + (cy + 1) + '" text-anchor="middle" dominant-baseline="middle"'
+      + ' font-size="11" style="pointer-events:none">' + st.icon + '</text>';
+    out += '</g>';
 
-    // YOU ARE HERE label
-    if (isCurrent) {
-      out += '<rect x="' + (cx - 34) + '" y="' + (cy - r - 28) + '" width="68" height="13" rx="3"'
-        + ' fill="' + col + '22" stroke="' + col + '55" stroke-width="0.8"/>'
-        + '<text x="' + cx + '" y="' + (cy - r - 19) + '" text-anchor="middle"'
-        + ' font-size="7" fill="' + col + '" font-family="Syne,sans-serif" font-weight="800">YOU ARE HERE</text>';
-    }
-
-    // Tick for past
+    // Completed tick (left of node)
     if (isPast) {
-      out += '<text x="' + cx + '" y="' + (cy - r - 5) + '" text-anchor="middle"'
-        + ' font-size="9" fill="' + col + '">&#10003;</text>';
+      out += '<text x="' + (mainX - r - 6) + '" y="' + (cy + 4) + '" text-anchor="middle"'
+        + ' font-size="9" fill="' + col + '" style="pointer-events:none">✓</text>';
+    }
+
+    // YOU ARE HERE badge (above label area)
+    if (isCurrent) {
+      out += '<rect x="' + (mainX + r + 4) + '" y="' + (cy - r - 1) + '" width="70" height="11" rx="2.5"'
+        + ' fill="' + col + '18" stroke="' + col + '44" stroke-width="0.8"/>';
+      out += '<text x="' + (mainX + r + 39) + '" y="' + (cy - r + 7) + '" text-anchor="middle"'
+        + ' font-size="5.8" fill="' + col + '" font-family="Syne,sans-serif" font-weight="800"'
+        + ' style="pointer-events:none">YOU ARE HERE</text>';
+    }
+
+    // Right-side label block
+    var lx = mainX + r + 10;
+    var nameCol = isPast ? col : isCurrent ? '#f0f4f8' : 'rgba(100,108,118,.6)';
+    out += '<text x="' + lx + '" y="' + (cy - 5) + '"'
+      + ' font-size="' + (isMilestone && (isPast || isCurrent) ? '11' : '10') + '"'
+      + ' fill="' + nameCol + '" font-family="Syne,sans-serif"'
+      + ' font-weight="' + (isMilestone ? '800' : '700') + '"'
+      + ' onclick="jrnySelectNode(' + i + ')" style="cursor:pointer">' + st.name + '</text>';
+
+    out += '<text x="' + lx + '" y="' + (cy + 7) + '"'
+      + ' font-size="6" fill="rgba(90,96,104,' + (isPast || isCurrent ? '.62' : '.38') + ')"'
+      + ' font-family="Share Tech Mono,monospace"'
+      + ' onclick="jrnySelectNode(' + i + ')" style="cursor:pointer">' + st.desc + '</text>';
+
+    var dt = stageDate(i);
+    if (dt) {
+      var dcol = isPast
+        ? (isMilestone ? 'rgba(201,168,76,.7)' : 'rgba(68,192,185,.65)')
+        : isCurrent
+          ? (isMilestone ? '#c9a84c' : 'var(--em)')
+          : 'rgba(90,96,104,.32)';
+      out += '<text x="' + lx + '" y="' + (cy + 20) + '"'
+        + ' font-size="7" fill="' + dcol + '" font-family="Share Tech Mono,monospace"'
+        + ' onclick="jrnySelectNode(' + i + ')" style="cursor:pointer">' + dt + '</text>';
     }
   });
 
   svg.innerHTML = out;
+}
+
+function jrnySelectBranch() {
+  showToast('Add income in the Cashflow tab — more surplus = faster journey');
+  setTimeout(function() { showTab('overview'); }, 1600);
+}
+
+// ── Custom goal events ─────────────────────────────────
+var JRNY_EVENTS_KEY = 'vi_jrny_events';
+
+function jrnyLoadEvents() {
+  try { return JSON.parse(localStorage.getItem(JRNY_EVENTS_KEY) || '[]'); } catch(e) { return []; }
+}
+function jrnySaveEvents(evs) {
+  try { localStorage.setItem(JRNY_EVENTS_KEY, JSON.stringify(evs)); } catch(e) {}
+}
+
+function jrnyAddEvent() {
+  var nameEl = document.getElementById('jrny-ev-name');
+  var dateEl = document.getElementById('jrny-ev-date');
+  var name = nameEl ? nameEl.value.trim() : '';
+  var date = dateEl ? dateEl.value : '';
+  if (!name) { showToast('Enter a goal name'); return; }
+  var evs = jrnyLoadEvents();
+  evs.push({ id: Date.now(), name: name, date: date, achieved: false });
+  jrnySaveEvents(evs);
+  if (nameEl) nameEl.value = '';
+  if (dateEl) dateEl.value = '';
+  renderJrnyCustomEvents();
+}
+
+function jrnyToggleEvent(id) {
+  var evs = jrnyLoadEvents();
+  var ev = evs.find(function(e) { return e.id === id; });
+  if (ev) { ev.achieved = !ev.achieved; if (ev.achieved) checkAchievements(); }
+  jrnySaveEvents(evs);
+  renderJrnyCustomEvents();
+}
+
+function jrnyDeleteEvent(id) {
+  jrnySaveEvents(jrnyLoadEvents().filter(function(e) { return e.id !== id; }));
+  renderJrnyCustomEvents();
+}
+
+function renderJrnyCustomEvents() {
+  var wrap = document.getElementById('jrny-custom-events');
+  if (!wrap) return;
+  var evs = jrnyLoadEvents();
+
+  var html = '<div class="jrny-ev-wrap">'
+    + '<div class="jrny-ev-hdr">◈ Custom Goals</div>';
+
+  evs.forEach(function(ev) {
+    var done = ev.achieved;
+    var dLabel = ev.date ? ev.date.replace('-', ' / ') : '';
+    html += '<div class="jrny-ev-item' + (done ? ' done' : '') + '">'
+      + '<div class="jrny-ev-check' + (done ? ' done' : '') + '" onclick="jrnyToggleEvent(' + ev.id + ')">' + (done ? '✓' : '') + '</div>'
+      + '<div style="flex:1">'
+      + '<div class="jrny-ev-name" style="' + (done ? 'text-decoration:line-through;opacity:.5' : '') + '">' + ev.name + '</div>'
+      + (dLabel ? '<div class="jrny-ev-date-lbl">Target: ' + dLabel + '</div>' : '')
+      + '</div>'
+      + '<button class="jrny-ev-del" onclick="jrnyDeleteEvent(' + ev.id + ')">×</button>'
+      + '</div>';
+  });
+
+  html += '<div class="jrny-ev-form">'
+    + '<input id="jrny-ev-name" class="jrny-ev-inp" type="text" placeholder="e.g. Pay off car loan…" style="flex:1;min-width:120px;font-family:\'DM Sans\',sans-serif">'
+    + '<input id="jrny-ev-date" class="jrny-ev-inp" type="month" style="width:118px;font-family:\'Share Tech Mono\',monospace;font-size:.5rem">'
+    + '<button class="jrny-ev-add" onclick="jrnyAddEvent()">+ Add</button>'
+    + '</div>'
+    + '</div>';
+
+  wrap.innerHTML = html;
 }
 
 function jrnySelectNode(idx) {
@@ -11024,7 +11763,7 @@ function jrnyRagGrid(ragObj) {
 function renderJrnyGary() {
   // Rent trap
   var rentExp = (ovState.expenses||[]).find(function(e){ return (e.name||'').toLowerCase().indexOf('rent') !== -1; });
-  var rentMo = rentExp ? (+rentExp.mo||0) : (journeyState.rentMonthly || 0);
+  var rentMo = rentExp ? (+rentExp.amount||0) : (journeyState.rentMonthly || 0);
   var rentYrs = journeyState.rentYears || 5;
   var totalRentPaid = rentMo * 12 * rentYrs;
   var estEquity = totalRentPaid * 0.35; // rough: ~35% of rent payments would have been equity
@@ -11454,12 +12193,6 @@ function wStep1Next() {
     showToast('Please enter a valid email address');
     return;
   }
-  if (!phone || phone.trim().length < 7) {
-    var el3 = document.getElementById('w-phone-s1');
-    if (el3) el3.style.borderColor = 'var(--re)';
-    showToast('WhatsApp number required — we\'ll use this to send your Pioneer updates');
-    return;
-  }
   if (!_wSelectedVal) {
     showToast('Pick your biggest financial challenge to personalise your Journey Map');
     return;
@@ -11503,7 +12236,7 @@ function wStep2Submit() {
   }
   if (debt > 0 && typeof debtState !== 'undefined') {
     if (!debtState.debts) debtState.debts = [];
-    if (debtState.debts.length === 0) debtState.debts.push({ id: Date.now(), name: 'Total Debt', balance: debt, original: debt, rate: 18, min: Math.round(debt * 0.02), type: 'other' });
+    if (debtState.debts.length === 0) debtState.debts.push({ id: Date.now(), name: 'Total Debt', balance: debt, original: debt, rate: 18, min: Math.round(debt * 0.02), type: 'other', _onboarding: true });
     if (typeof saveDebtState === 'function') saveDebtState();
   }
 
@@ -11526,16 +12259,15 @@ function wStep2Submit() {
   // Save all state
   if (typeof saveState === 'function') saveState();
 
-  var s2 = document.getElementById('w-step-2'); if (s2) s2.style.display = 'none';
-  var s3 = document.getElementById('w-step-3'); if (s3) s3.style.display = '';
-  var d2 = document.getElementById('wdot-s2'); if (d2) d2.style.background = 'rgba(68,192,185,.4)';
-  var d3 = document.getElementById('wdot-s3'); if (d3) d3.style.background = 'var(--em)';
+  // Hide overlay immediately — user is in the app
+  var ov = document.getElementById('welcome-overlay'); if (ov) ov.style.display = 'none';
   applyPaywall();
   updateSidebar();
   if (typeof renderJourney === 'function') renderJourney();
   if (_vaultItUser) { captureEmailToList(_vaultItUser.email, _vaultItUser.name, parseInt(_wSelectedVal)||0); }
   applyProgressiveNav();
   checkAchievements();
+  showToast('Welcome' + (_vaultItUser && _vaultItUser.name ? ', ' + _vaultItUser.name : '') + '. Your journey starts here 🚀');
 }
 
 // Step 2 skip — save what we have and enter app
@@ -11638,10 +12370,23 @@ function updateProGate() {
 // buy.stripe.com links: Product → Share → Buy link
 // Stripe Payment Link slugs (live, PT Live Design account)
 var VI_STRIPE_LINKS = {
-  monthly: 'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',  // £5.99/mo
-  annual:  'https://buy.stripe.com/3cIfZbddA6UV5yR4GG2VG01',  // £59.99/yr
-  founder: null  // reserved — add Founder payment link when created
+  monthly:  'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',  // £5.99/mo
+  annual:   'https://buy.stripe.com/3cIfZbddA6UV5yR4GG2VG01',  // £59.99/yr
+  founder:  null  // reserved — add Founder payment link when created
 };
+// Founding Master Licence — £7.77 one-time (set via Settings or paste here)
+var VI_FOUNDING_LINK = localStorage.getItem('vi_founding_link') || '';
+
+// Shibarium mainnet config (EVM-compatible L2, Shiba Inu ecosystem)
+var SHIBARIUM_MAINNET = {
+  chainId:         '0x6D',   // 109 decimal
+  chainName:       'Shibarium',
+  nativeCurrency:  { name: 'BONE', symbol: 'BONE', decimals: 18 },
+  rpcUrls:         ['https://www.shibrpc.com'],
+  blockExplorerUrls: ['https://shibariumscan.io']
+};
+// Placeholder — replace with deployed ERC-721 contract address on Shibarium
+var VAULT_NFT_CONTRACT = localStorage.getItem('vi_nft_contract') || '';
 
 // ── CAMPAIGN CONFIG ────────────────────────────────────────
 // Update these numbers manually after each Stripe dashboard check.
