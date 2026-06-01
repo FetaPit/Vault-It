@@ -25,7 +25,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(SW_URL).catch(function(){});
 }
 </script>
-<meta name="version" content="0.6-alpha">
+<meta name="version" content="0.7.7-alpha">
 <meta property="og:title" content="Vault·It — From Debt to Owning Your Home">
 <meta property="og:description" content="The only personal finance app built for the journey from debt to outright home ownership. Pioneer Edition.">
 <meta property="og:type" content="website">
@@ -3152,9 +3152,10 @@ input:focus, textarea:focus, select:focus {
     <svg class="ti" viewBox="0 0 16 16"><path d="M3 14V3l8 3-8 3"/></svg>
     <span>Journey</span>
   </button>
-  <button class="tab-btn" onclick="showTab('house')">
-    <svg class="ti" viewBox="0 0 16 16"><path d="M1.5 9L8 2.5 14.5 9V14.5H10V11H6v3.5H1.5V9z"/></svg>
-    <span>House Builder</span>
+  <button class="tab-btn" onclick="showTab('house')" style="position:relative;border-bottom:2px solid var(--go)!important" title="Vault·It's flagship feature">
+    <svg class="ti" viewBox="0 0 16 16" style="color:var(--go)"><path d="M1.5 9L8 2.5 14.5 9V14.5H10V11H6v3.5H1.5V9z"/></svg>
+    <span style="color:var(--go)">House Builder</span>
+    <span style="position:absolute;top:3px;right:3px;font-size:.32rem;background:var(--go);color:#000;font-family:'Syne',sans-serif;font-weight:800;padding:1px 4px;border-radius:2px;letter-spacing:.06em">USP</span>
   </button>
   <button class="tab-btn" onclick="showTab('assets')">
     <svg class="ti" viewBox="0 0 16 16"><rect x="1" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="6" width="3" height="8" rx=".5"/><rect x="12" y="3" width="3" height="11" rx=".5"/></svg>
@@ -6678,7 +6679,7 @@ function redraw(){
   }
   (DRAW[state.houseType]||drawTerraced)(displayP);
   var lockEl = document.getElementById('house-pro-lock');
-  if (lockEl) lockEl.style.display = _isPro() ? 'none' : '';
+  if (lockEl) lockEl.style.display = 'none'; // open for alpha — USP must be visible to all testers
 }
 
 function updateUI(){
@@ -11300,32 +11301,11 @@ function renderJourney() {
     setTimeout(function() { showJrnyWizard(); }, 800);
   }
 
-  // Gate calculator outputs for free users
-  if (!_isPro()) {
-    // Blur and lock all date/calculator outputs
-    var calcEls = document.querySelectorAll('.jrny-calc-out, .jrny-date-out, .jrny-stage-detail, #jrny-dti, #jrny-ef-date, #jrny-debt-date, #jrny-deposit-date, #jrny-keys-date, #jrny-mortgage-ready');
-    calcEls.forEach(function(el) {
-      el.style.filter = 'blur(4px)';
-      el.style.userSelect = 'none';
-      el.style.pointerEvents = 'none';
-    });
-    // Show a single gate banner if not already present
-    var jrnyTab = document.getElementById('tab-journey');
-    if (jrnyTab && !jrnyTab.querySelector('#jrny-pro-gate')) {
-      var banner = document.createElement('div');
-      banner.id = 'jrny-pro-gate';
-      banner.style.cssText = 'position:sticky;bottom:16px;left:0;right:0;margin:16px;z-index:40;background:rgba(8,8,8,.9);border:1px solid rgba(201,168,76,.3);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;backdrop-filter:blur(8px)';
-      banner.innerHTML = '<div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:.68rem;color:var(--go);margin-bottom:3px">🔒 Exact dates are Pro</div><div style="font-size:.54rem;color:var(--t2);line-height:1.5">Your debt-free date, deposit date and keys date — calculated precisely from your numbers.</div></div>'
-        + '<button onclick="showUpgrade(\'annual\')" style="flex-shrink:0;padding:8px 16px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));color:#080808;font-family:\'Syne\',sans-serif;font-weight:800;font-size:.55rem;cursor:pointer;white-space:nowrap">Unlock →</button>';
-      jrnyTab.appendChild(banner);
-    }
-  } else {
-    // Remove gate if pro
-    var g = document.getElementById('jrny-pro-gate');
-    if (g) g.remove();
-    var calcEls2 = document.querySelectorAll('.jrny-calc-out, .jrny-date-out, .jrny-stage-detail, #jrny-dti, #jrny-ef-date, #jrny-debt-date, #jrny-deposit-date, #jrny-keys-date, #jrny-mortgage-ready');
-    calcEls2.forEach(function(el) { el.style.filter = ''; el.style.userSelect = ''; el.style.pointerEvents = ''; });
-  }
+  // Alpha: all Journey dates and calculations visible to everyone
+  var calcEls = document.querySelectorAll('.jrny-calc-out, .jrny-date-out, .jrny-stage-detail, #jrny-dti, #jrny-ef-date, #jrny-debt-date, #jrny-deposit-date, #jrny-keys-date, #jrny-mortgage-ready');
+  calcEls.forEach(function(el) { el.style.filter = ''; el.style.userSelect = ''; el.style.pointerEvents = ''; });
+  var g = document.getElementById('jrny-pro-gate');
+  if (g) g.remove();
 }
 
 function renderJrnySVG(currentStage, selectedNode) {
@@ -13280,7 +13260,7 @@ function nwhRenderMini(){
   <!-- Centre dot -->
   <circle cx="7.0" cy="7.0" r="0.4" fill="#44c0b9" opacity="0.4"/>
 </svg></div> PT Live Design</span>
-  <span class="footer-version">Vault·It v0.6 Alpha · Released 28 May 2026</span>
+  <span class="footer-version">Vault·It v0.7.7 Alpha · Updated 1 Jun 2026</span>
 </div>
 
 <!-- ══ ALPHA ACCESS MODAL ══ -->
