@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.7.4';
+  var SW_VERSION = '0.7.5';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -9066,6 +9066,8 @@ function verifyPioneerPurchase(){
   if(profileEmail===entered){
     localStorage.setItem('vi_pioneer','true');
     localStorage.setItem('vi_pioneer_email',entered);
+    // Stamp vi_user.pro so _isPro() also resolves true via the legacy check
+    try { var _pu=JSON.parse(localStorage.getItem('vi_user')||'{}'); _pu.pro=true; localStorage.setItem('vi_user',JSON.stringify(_pu)); } catch(e){}
     if(msg)msg.innerHTML='<span style="color:var(--gr)">✓ Pioneer access unlocked — welcome to the vault!</span>';
     setTimeout(function(){
       closePaywall();
@@ -11374,6 +11376,8 @@ function skipWelcome() {
 }
 
 function _isPro() {
+  // Pioneer subscribers get full Pro access — checks both pathways
+  if (isPioneer()) return true;
   try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.pro); } catch(e) { return false; }
 }
 
@@ -11632,10 +11636,11 @@ function updateProGate() {
 // ── STRIPE CONFIG ─────────────────────────────────────────
 // Replace placeholder IDs with live ones from your Stripe dashboard.
 // buy.stripe.com links: Product → Share → Buy link
-var VI_PRICES = {
-  monthly: 'price_1TbOhV9mgKf6HntykhBYBaHI',    // £5.99/mo
-  annual:  'price_1TbOha9mgKf6HntyZR0AEYvK',    // £49.99/yr
-  founder: 'price_FOUNDER_PLACEHOLDER'           // £149 one-time — create in Stripe, paste ID here
+// Stripe Payment Link slugs (live, PT Live Design account)
+var VI_STRIPE_LINKS = {
+  monthly: 'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',  // £5.99/mo
+  annual:  'https://buy.stripe.com/3cIfZbddA6UV5yR4GG2VG01',  // £59.99/yr
+  founder: null  // reserved — add Founder payment link when created
 };
 
 // ── CAMPAIGN CONFIG ────────────────────────────────────────
@@ -11651,28 +11656,15 @@ var VI_CAMPAIGN = {
 };
 
 function showUpgrade(plan) {
-  var priceId;
-  if (plan === 'annual')  priceId = VI_PRICES.annual;
-  else if (plan === 'founder') priceId = VI_PRICES.founder;
-  else priceId = VI_PRICES.monthly;
-
-  // Founder tier bypasses task gate — it's a direct pledge
-  if (plan !== 'founder' && !coreTasksComplete()) {
-    showCoreTasksModal(); return;
+  var link = VI_STRIPE_LINKS[plan] || VI_STRIPE_LINKS.monthly;
+  if (!link) {
+    showToast('Founder tier coming soon — email pete@vault-it.app to reserve your spot.');
+    return;
   }
-
   var user = {};
   try { user = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
-
-  var successParam = (plan === 'founder') ? 'founded=1' : 'upgraded=1';
-  var successUrl = encodeURIComponent(window.location.href.split('?')[0] + '?' + successParam);
-  var cancelUrl  = encodeURIComponent(window.location.href.split('?')[0]);
-
-  var checkoutUrl = 'https://buy.stripe.com/' + priceId
-    + '?prefilled_email=' + encodeURIComponent(user.email || '')
-    + '&success_url=' + successUrl
-    + '&cancel_url=' + cancelUrl;
-
+  // Payment Links support prefilled_email as a query param
+  var checkoutUrl = link + (user.email ? '?prefilled_email=' + encodeURIComponent(user.email) : '');
   window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
   showToast(plan === 'founder' ? '⚡ Opening Founders checkout…' : 'Opening secure checkout…');
 }
@@ -11855,7 +11847,7 @@ function renderPioneerCard() {
             '<div class="pc-footer-meta">' +
               'VAULT·IT<br>' +
               joined + ' · ALPHA<br>' +
-              (pioneer ? '◆ PIONEER' : '◈ SCOUT') +
+              (pioneer ? '◆ PIONEER' : '◈ ' + lv.n.toUpperCase()) +
             '</div>' +
           '</div>' +
         '</div>' +
