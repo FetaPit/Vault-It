@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.7.1';
+  var SW_VERSION = '0.7.2';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -8671,7 +8671,11 @@ function verifyPioneerPurchase(){
   if(!entered){if(msg)msg.innerHTML='<span style="color:var(--re)">Please enter your checkout email.</span>';return;}
   var u=null;try{u=JSON.parse(localStorage.getItem('vi_user')||'null');}catch(e){}
   var profileEmail=(u&&u.email)?u.email.toLowerCase():'';
-  if(!profileEmail||profileEmail===entered){
+  if(!profileEmail){
+    if(msg)msg.innerHTML='<span style="color:var(--re)">Complete your profile with the email you used at checkout first.</span>';
+    return;
+  }
+  if(profileEmail===entered){
     localStorage.setItem('vi_pioneer','true');
     localStorage.setItem('vi_pioneer_email',entered);
     if(msg)msg.innerHTML='<span style="color:var(--gr)">✓ Pioneer access unlocked — welcome to the vault!</span>';
@@ -8681,7 +8685,7 @@ function verifyPioneerPurchase(){
       showToast('◆ PIONEER unlocked — thank you! 🎉');
     },1400);
   }else{
-    if(msg)msg.innerHTML='<span style="color:var(--re)">Email doesn\'t match your profile. Update your profile email first.</span>';
+    if(msg)msg.innerHTML='<span style="color:var(--re)">Email doesn\'t match your profile ('+profileEmail+'). Update your profile email to match your checkout email.</span>';
   }
 }
 
@@ -11482,7 +11486,8 @@ function syncToNotion(user, source) {
     body: JSON.stringify({ parent: { database_id: _NOTION_DB }, properties: props })
   }).then(function(r) {
     if (r.ok) showToast('Pioneer synced to Notion ✓');
-  }).catch(function(){});
+    else r.text().then(function(t){ console.warn('[Vault-It] Notion sync failed:',r.status,t); showToast('Notion sync failed ('+r.status+') — check Settings'); });
+  }).catch(function(e){ console.warn('[Vault-It] Notion fetch error:',e.message); showToast('Notion sync error — check connection'); });
 }
 
 // ── TASK 5: PRIVACY + TERMS ─────────────────────────────────────
