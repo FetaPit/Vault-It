@@ -2727,6 +2727,13 @@ input:focus, textarea:focus, select:focus {
     if (!reset && u && u.name && u.email) {
       document.write('<style>#welcome-overlay{display:none!important}</style>');
     }
+    // Belt-and-suspenders: also hide via JS after DOM is ready
+    if (!reset && u && u.name && u.email) {
+      document.addEventListener('DOMContentLoaded', function() {
+        var ov = document.getElementById('welcome-overlay');
+        if (ov) { ov.style.display = 'none'; ov.style.setProperty('display','none','important'); }
+      });
+    }
   } catch(e) {}
 })();
 </script>
@@ -5122,16 +5129,6 @@ body.vi-wide #nwChart { height: 300px !important; }
 // TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════
 function showTab(id){
-  // Hard gate: require name + email + phone before using the app
-  try {
-    var _gu = JSON.parse(localStorage.getItem('vi_user') || 'null');
-    if (!_gu || !_gu.name || !_gu.email) {
-      var ov = document.getElementById('welcome-overlay');
-      if (ov) ov.style.display = 'flex';
-      showToast('Please complete your registration to access Vault·It');
-      return;
-    }
-  } catch(e) {}
   if(id!=='house'&&typeof _threeAnimId!=='undefined'&&_threeAnimId){cancelAnimationFrame(_threeAnimId);_threeAnimId=null;}
   // Always collapse the ISO expand when switching tabs
   if(typeof _isExpanded!=='undefined'&&_isExpanded) toggleExpand();
@@ -12262,16 +12259,15 @@ function wStep2Submit() {
   // Save all state
   if (typeof saveState === 'function') saveState();
 
-  var s2 = document.getElementById('w-step-2'); if (s2) s2.style.display = 'none';
-  var s3 = document.getElementById('w-step-3'); if (s3) s3.style.display = '';
-  var d2 = document.getElementById('wdot-s2'); if (d2) d2.style.background = 'rgba(68,192,185,.4)';
-  var d3 = document.getElementById('wdot-s3'); if (d3) d3.style.background = 'var(--em)';
+  // Hide overlay immediately — user is in the app
+  var ov = document.getElementById('welcome-overlay'); if (ov) ov.style.display = 'none';
   applyPaywall();
   updateSidebar();
   if (typeof renderJourney === 'function') renderJourney();
   if (_vaultItUser) { captureEmailToList(_vaultItUser.email, _vaultItUser.name, parseInt(_wSelectedVal)||0); }
   applyProgressiveNav();
   checkAchievements();
+  showToast('Welcome' + (_vaultItUser && _vaultItUser.name ? ', ' + _vaultItUser.name : '') + '. Your journey starts here 🚀');
 }
 
 // Step 2 skip — save what we have and enter app
