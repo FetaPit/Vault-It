@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.7.7';
+  var SW_VERSION = '0.7.8';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -1232,22 +1232,57 @@ body::before {
 ══════════════════════════════════════════════════════════════ */
 
 .hud-bar {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 4px 8px;
-  background: rgba(4,10,20,.85);
-  border-bottom: 1px solid rgba(68,192,185,.18);
-  gap: 6px;
-  backdrop-filter: blur(4px);
-  position: relative;
-  z-index: 5;
+  gap: 3px;
+  padding: 6px 4px;
+  background: rgba(4,10,20,.88);
+  border: 1px solid rgba(68,192,185,.22);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
 }
 
 .hud-cluster {
   display: flex;
+  flex-direction: column;
   gap: 3px;
   align-items: center;
+}
+
+.hud-sep {
+  width: 22px;
+  height: 1px;
+  background: rgba(68,192,185,.15);
+  margin: 1px 0;
+}
+
+.vp-key {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  padding: 3px 12px;
+  background: rgba(4,8,16,.72);
+  border: 1px solid rgba(68,192,185,.12);
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  white-space: nowrap;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .4rem;
+  color: rgba(68,192,185,.45);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+@media (max-width: 480px) {
+  .vp-key { font-size: .35rem; padding: 2px 8px; }
 }
 
 .hud-btn {
@@ -1299,7 +1334,7 @@ body::before {
 }
 
 .hud-toggle {
-  min-width: 96px;
+  min-width: 44px;
 }
 
 /* HUD readout strip */
@@ -3576,30 +3611,6 @@ input:focus, textarea:focus, select:focus {
   <div class="grid">
     <div class="scene-card" id="houseSceneCard">
       <div class="scene-lbl" id="sceneLabel" style="display:none"></div>
-      <!-- HUD control bar -->
-      <div class="hud-bar" id="hud-bar-house">
-        <div class="hud-cluster">
-          <button class="hud-btn" id="hud-zoom-in"  onclick="houseZoomIn()"  title="Zoom In"  aria-label="Zoom in" style="font-size:1rem;font-weight:700">+</button>
-          <button class="hud-btn" id="hud-zoom-out" onclick="houseZoomOut()" title="Zoom Out" aria-label="Zoom out" style="font-size:1.1rem;font-weight:700">−</button>
-          <button class="hud-btn" id="hud-reset"    onclick="resetView()"    title="Reset view" aria-label="Reset camera">↺</button>
-        </div>
-        <!-- Pan D-pad -->
-        <div class="hud-pan-cluster">
-          <button class="hud-btn hud-pan-btn hud-pan-u" onclick="housePan(0,-28)" title="Pan up" aria-label="Pan up">▲</button>
-          <button class="hud-btn hud-pan-btn hud-pan-l" onclick="housePan(-28,0)" title="Pan left" aria-label="Pan left">◀</button>
-          <button class="hud-btn hud-pan-btn hud-pan-c" onclick="resetView()" title="Centre" aria-label="Centre view" style="font-size:.5rem">⊙</button>
-          <button class="hud-btn hud-pan-btn hud-pan-r" onclick="housePan(28,0)"  title="Pan right" aria-label="Pan right">▶</button>
-          <button class="hud-btn hud-pan-btn hud-pan-d" onclick="housePan(0,28)"  title="Pan down" aria-label="Pan down">▼</button>
-        </div>
-        <div class="hud-mode-toggle">
-          <button class="hud-btn hud-toggle" id="hud-orbit-toggle" onclick="toggleOrbitMode()" title="Toggle orbit/pan" aria-label="Toggle orbit mode">
-            <span id="hud-orbit-icon">⟳</span> <span id="hud-orbit-label">ORBIT</span>
-          </button>
-        </div>
-        <div class="hud-cluster">
-          <button class="hud-btn" onclick="toggleExpand()" title="Fullscreen" aria-label="Fullscreen">⛶</button>
-        </div>
-      </div>
       <!-- HUD readout strip -->
       <div class="hud-readout" id="hud-readout-house">
         <span class="hud-readout-item" id="hud-zoom-val">ZOOM 1.0×</span>
@@ -3607,18 +3618,29 @@ input:focus, textarea:focus, select:focus {
         <span class="hud-readout-item" id="hud-angle-val">YAW 0°</span>
         <span class="hud-readout-sep">·</span>
         <span class="hud-readout-item" id="hud-mode-val">PAN MODE</span>
-        <span class="hud-readout-sep">·</span>
-        <span class="hud-readout-item" style="opacity:.55">1-FINGER ORBIT · 2-FINGER PAN · PINCH ZOOM</span>
-        <span class="hud-mobile-hint" style="display:none;opacity:.55">Pinch to zoom · Drag to orbit</span>
       </div>
       <div class="scene" style="position:relative">
         <svg id="houseSvg" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;min-height:360px"></svg>
+        <!-- Control key overlay -->
+        <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
         <div id="house-pro-lock" style="position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,8,8,.82);backdrop-filter:blur(6px);text-align:center;padding:24px">
           <div style="font-size:1.8rem;margin-bottom:10px">🔒</div>
           <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;color:var(--tx);margin-bottom:6px">Your house fills as you save</div>
           <div style="font-size:.58rem;color:var(--t2);line-height:1.6;max-width:260px;margin-bottom:16px">Every deposit adds bricks. Watch your home being built in real time. Pro only.</div>
           <button onclick="showUpgrade('annual')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:.6rem;cursor:pointer;letter-spacing:.06em">Invest in yourself →</button>
         </div>
+      </div>
+      <!-- HUD control buttons — outer frame, right edge -->
+      <div class="hud-bar" id="hud-bar-house">
+        <button class="hud-btn" id="hud-zoom-in"  onclick="houseZoomIn()"  title="Zoom In"  aria-label="Zoom in"  style="font-size:1.1rem;font-weight:700;padding:0">+</button>
+        <button class="hud-btn" id="hud-zoom-out" onclick="houseZoomOut()" title="Zoom Out" aria-label="Zoom out" style="font-size:1.2rem;font-weight:700;padding:0">−</button>
+        <div class="hud-sep"></div>
+        <button class="hud-btn hud-toggle" id="hud-orbit-toggle" onclick="toggleOrbitMode()" title="Toggle mouse orbit mode" aria-label="Toggle orbit mode">
+          <span id="hud-orbit-icon">✥</span>
+        </button>
+        <div class="hud-sep"></div>
+        <button class="hud-btn" id="hud-reset"   onclick="resetView()"    title="Reset view"  aria-label="Reset camera">↺</button>
+        <button class="hud-btn" onclick="toggleExpand()"                   title="Fullscreen"  aria-label="Fullscreen">⛶</button>
       </div>
       <div class="scene-cap" id="sceneCap" style="display:none"></div>
     </div>
@@ -3738,7 +3760,7 @@ input:focus, textarea:focus, select:focus {
           <button class="vi-3d-btn" onclick="_threeZoomOut()" title="Zoom out" style="flex:1">−</button>
         </div>
       </div>
-      <div class="vi-3d-hint" id="vi-3d-hint-txt">1-finger rotate · 2-finger pan · pinch zoom</div>
+      <div class="vi-3d-hint" id="vi-3d-hint-txt">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
     </div>
   </div>
   <div class="ov-chart-card">
@@ -3788,12 +3810,26 @@ input:focus, textarea:focus, select:focus {
       </div>
       <div style="margin-top:4px">
         <div class="scene-card" id="metalsSceneCard">
-          <div class="scene-lbl">Precious Metals — ISO Vault</div>
-          <button class="btn-expand" id="btnMetalsExpand" onclick="toggleMetalsExpand()" title="Expand / Orbit">⛶</button>
-          <button class="btn-reset-view" id="btnMetalsReset" onclick="resetMetalsView()" title="Reset view">↺ Reset</button>
-          <div class="orbit-hint">Drag to orbit · Scroll to zoom</div>
+          <div class="hud-readout" id="hud-readout-metals">
+            <span class="hud-readout-item" id="hud-metals-zoom-val">ZOOM 1.0×</span>
+            <span class="hud-readout-sep">·</span>
+            <span class="hud-readout-item" id="hud-metals-angle-val">YAW 0°</span>
+          </div>
           <div class="scene">
             <svg id="metalsSvg" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;min-height:360px"></svg>
+            <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
+          </div>
+          <!-- Metals HUD buttons — outer frame, right edge -->
+          <div class="hud-bar" id="hud-bar-metals">
+            <button class="hud-btn" onclick="metalsZoomIn()"  title="Zoom In"  aria-label="Zoom in"  style="font-size:1.1rem;font-weight:700;padding:0">+</button>
+            <button class="hud-btn" onclick="metalsZoomOut()" title="Zoom Out" aria-label="Zoom out" style="font-size:1.2rem;font-weight:700;padding:0">−</button>
+            <div class="hud-sep"></div>
+            <button class="hud-btn hud-toggle" id="hud-metals-orbit-toggle" onclick="toggleMetalsOrbitMode()" title="Toggle mouse orbit mode" aria-label="Toggle orbit mode">
+              <span id="hud-metals-orbit-icon">✥</span>
+            </button>
+            <div class="hud-sep"></div>
+            <button class="hud-btn" onclick="resetMetalsView()" title="Reset view" aria-label="Reset camera">↺</button>
+            <button class="hud-btn" id="btnMetalsExpand" onclick="toggleMetalsExpand()" title="Fullscreen" aria-label="Fullscreen">⛶</button>
           </div>
           <div class="scene-cap" id="metalsCap">—</div>
         </div>
@@ -6982,8 +7018,8 @@ function housePan(dx, dy) {
 // ═══════════════════════════════════════════════════════════════
 // HOUSE ISO VIEWPORT — full gesture control
 //   Mouse:   drag = orbit (when orbit mode on) / pan (off)
-//   Touch:   1-finger = orbit, 2-finger = pan, pinch = zoom
-//   Buttons: +/- zoom, orbit toggle, reset
+//   Touch:   1-finger = pan, 2-finger = orbit, pinch = zoom
+//   Buttons: +/- zoom, orbit toggle (mouse-only), reset
 // ═══════════════════════════════════════════════════════════════
 
 var _houseZoom = 1;
@@ -7004,10 +7040,8 @@ function houseZoomOut() { _houseSetZoom(_houseZoom / 1.15); }
 function toggleOrbitMode() {
   _orbitMode = !_orbitMode;
   var btn = document.getElementById('hud-orbit-toggle');
-  var lbl = document.getElementById('hud-orbit-label');
   var ico = document.getElementById('hud-orbit-icon');
   if (btn) btn.classList.toggle('orbit-active', _orbitMode);
-  if (lbl) lbl.textContent = _orbitMode ? 'ORBIT' : 'PAN';
   if (ico) ico.textContent = _orbitMode ? '⟳' : '✥';
   _updateHUD();
 }
@@ -7032,7 +7066,7 @@ function _updateHUD() {
   window.addEventListener('mousemove', function(e) {
     if (!_isDragging) return;
     var dx = e.clientX - _dragX, dy = e.clientY - _dragY;
-    if (_orbitMode || _isExpanded) {
+    if (_orbitMode) {
       _viewAngle -= dx * 0.006;
       _panY      += dy * 0.35;
     } else {
@@ -7052,7 +7086,7 @@ function _updateHUD() {
   // ── TOUCH ──
   var _t0 = null, _t1 = null;
   var _pinchDist0 = 0, _pinchZoom0 = 1;
-  var _pan2X0 = 0, _pan2Y0 = 0, _panX0 = 0, _panY0 = 0;
+  var _orb2PrevX = 0, _orb2PrevY = 0;
 
   function touchDist(a, b) {
     var dx = a.clientX - b.clientX, dy = a.clientY - b.clientY;
@@ -7062,20 +7096,19 @@ function _updateHUD() {
   el.addEventListener('touchstart', function(e) {
     e.preventDefault();
     if (e.touches.length === 1) {
-      // 1-finger: orbit (or pan if orbit mode off)
+      // 1-finger: pan
       _t0 = e.touches[0];
       _isDragging = true;
       _dragX = _t0.clientX; _dragY = _t0.clientY;
       _t1 = null;
     } else if (e.touches.length === 2) {
-      // 2-finger: pan + pinch zoom
+      // 2-finger: orbit + pinch zoom
       _isDragging = false;
       _t0 = e.touches[0]; _t1 = e.touches[1];
       _pinchDist0 = touchDist(_t0, _t1);
       _pinchZoom0 = _houseZoom;
-      _pan2X0 = (_t0.clientX + _t1.clientX) / 2;
-      _pan2Y0 = (_t0.clientY + _t1.clientY) / 2;
-      _panX0 = _panX; _panY0 = _panY;
+      _orb2PrevX = (_t0.clientX + _t1.clientX) / 2;
+      _orb2PrevY = (_t0.clientY + _t1.clientY) / 2;
     }
   }, { passive: false });
 
@@ -7084,9 +7117,8 @@ function _updateHUD() {
     if (e.touches.length === 1 && _isDragging) {
       var t = e.touches[0];
       var dx = t.clientX - _dragX, dy = t.clientY - _dragY;
-      // 1-finger always orbits on touch (most natural for 3D)
-      _viewAngle -= dx * 0.006;
-      _panY      += dy * 0.35;
+      // 1-finger = pan
+      _panX += dx; _panY += dy;
       _dragX = t.clientX; _dragY = t.clientY;
       _updateHUD(); redraw();
     } else if (e.touches.length === 2) {
@@ -7094,11 +7126,11 @@ function _updateHUD() {
       // Pinch = zoom
       var newDist = touchDist(ta, tb);
       _houseSetZoom(_pinchZoom0 * (newDist / _pinchDist0));
-      // 2-finger drag = pan
+      // 2-finger drag midpoint = orbit
       var midX = (ta.clientX + tb.clientX) / 2;
       var midY = (ta.clientY + tb.clientY) / 2;
-      _panX = _panX0 + (midX - _pan2X0);
-      _panY = _panY0 + (midY - _pan2Y0);
+      _viewAngle -= (midX - _orb2PrevX) * 0.008;
+      _orb2PrevX = midX; _orb2PrevY = midY;
       _updateHUD(); redraw();
     }
   }, { passive: false });
@@ -7119,6 +7151,25 @@ function _updateHUD() {
 // ── METALS VIEWPORT STATE & CONTROLS ──────────────────────────────
 var _mPanX=0, _mPanY=0, _mAngle=0, _mIsExpanded=false, _mZoom=1;
 var _mDragging=false, _mDragX=0, _mDragY=0;
+var _mOrbitMode=false;
+
+function _updateMetalsHUD(){
+  var zEl=document.getElementById('hud-metals-zoom-val');
+  var aEl=document.getElementById('hud-metals-angle-val');
+  if(zEl)zEl.textContent='ZOOM '+(_mZoom||1).toFixed(1)+'×';
+  if(aEl)aEl.textContent='YAW '+Math.round((_mAngle*180/Math.PI)%360)+'°';
+}
+
+function toggleMetalsOrbitMode(){
+  _mOrbitMode=!_mOrbitMode;
+  var btn=document.getElementById('hud-metals-orbit-toggle');
+  var ico=document.getElementById('hud-metals-orbit-icon');
+  if(btn)btn.classList.toggle('orbit-active',_mOrbitMode);
+  if(ico)ico.textContent=_mOrbitMode?'⟳':'✥';
+}
+
+function metalsZoomIn(){_mZoom=Math.min(3.5,(_mZoom||1)*1.15);_updateMetalsHUD();renderMetalsISO();}
+function metalsZoomOut(){_mZoom=Math.max(0.3,(_mZoom||1)/1.15);_updateMetalsHUD();renderMetalsISO();}
 
 function toggleMetalsExpand(){
   _mIsExpanded=!_mIsExpanded;
@@ -7130,35 +7181,60 @@ function toggleMetalsExpand(){
   if(_mIsExpanded&&_isExpanded)toggleExpand();
   setTimeout(renderMetalsISO,30);
 }
-function resetMetalsView(){_mPanX=0;_mPanY=0;_mAngle=0;_mZoom=1;renderMetalsISO();}
+function resetMetalsView(){_mPanX=0;_mPanY=0;_mAngle=0;_mZoom=1;_updateMetalsHUD();renderMetalsISO();}
 
 (function(){
   function getEl(){return document.getElementById('metalsSvg');}
+  function mTouchDist(a,b){var dx=a.clientX-b.clientX,dy=a.clientY-b.clientY;return Math.sqrt(dx*dx+dy*dy);}
+  var _mPinchDist0=0,_mPinchZoom0=1,_mOrb2PrevX=0,_mOrb2PrevY=0;
+
   function setup(){
     var el=getEl();
     if(!el)return;
+    // Mouse: 1-click drag = pan by default, orbit mode toggle switches to orbit
     el.addEventListener('mousedown',function(e){_mDragging=true;_mDragX=e.clientX;_mDragY=e.clientY;el.style.cursor='grabbing';e.preventDefault();});
     window.addEventListener('mousemove',function(e){
       if(!_mDragging)return;
       var dx=e.clientX-_mDragX,dy=e.clientY-_mDragY;
-      if(_mIsExpanded){_mAngle-=dx*0.006;_mPanY+=dy*0.4;}
+      if(_mOrbitMode){_mAngle-=dx*0.006;_mPanY+=dy*0.4;}
       else{_mPanX+=dx;_mPanY+=dy;}
       _mDragX=e.clientX;_mDragY=e.clientY;
-      renderMetalsISO();
+      _updateMetalsHUD();renderMetalsISO();
     });
     window.addEventListener('mouseup',function(){_mDragging=false;var el2=getEl();if(el2)el2.style.cursor='grab';});
-    el.addEventListener('touchstart',function(e){var t=e.touches[0];_mDragging=true;_mDragX=t.clientX;_mDragY=t.clientY;e.preventDefault();},{passive:false});
-    el.addEventListener('touchmove',function(e){
-      if(!_mDragging)return;
-      var t=e.touches[0],dx=t.clientX-_mDragX,dy=t.clientY-_mDragY;
-      if(_mIsExpanded){_mAngle-=dx*0.006;_mPanY+=dy*0.4;}
-      else{_mPanX+=dx;_mPanY+=dy;}
-      _mDragX=t.clientX;_mDragY=t.clientY;
-      renderMetalsISO();e.preventDefault();
+    // Touch: 1-finger = pan, 2-finger = orbit + pinch zoom
+    el.addEventListener('touchstart',function(e){
+      e.preventDefault();
+      if(e.touches.length===1){
+        _mDragging=true;_mDragX=e.touches[0].clientX;_mDragY=e.touches[0].clientY;
+      } else if(e.touches.length===2){
+        _mDragging=false;
+        var ta=e.touches[0],tb=e.touches[1];
+        _mPinchDist0=mTouchDist(ta,tb);_mPinchZoom0=_mZoom||1;
+        _mOrb2PrevX=(ta.clientX+tb.clientX)/2;_mOrb2PrevY=(ta.clientY+tb.clientY)/2;
+      }
     },{passive:false});
-    el.addEventListener('touchend',function(){_mDragging=false;});
-    el.addEventListener('wheel',function(e){_mZoom=Math.max(0.3,Math.min(3.5,(_mZoom||1)-e.deltaY*0.001));renderMetalsISO();e.preventDefault();},{passive:false});
+    el.addEventListener('touchmove',function(e){
+      e.preventDefault();
+      if(e.touches.length===1&&_mDragging){
+        var t=e.touches[0],dx=t.clientX-_mDragX,dy=t.clientY-_mDragY;
+        _mPanX+=dx;_mPanY+=dy;
+        _mDragX=t.clientX;_mDragY=t.clientY;
+        _updateMetalsHUD();renderMetalsISO();
+      } else if(e.touches.length===2){
+        var ta=e.touches[0],tb=e.touches[1];
+        var newDist=mTouchDist(ta,tb);
+        _mZoom=Math.max(0.3,Math.min(3.5,_mPinchZoom0*(newDist/_mPinchDist0)));
+        var midX=(ta.clientX+tb.clientX)/2,midY=(ta.clientY+tb.clientY)/2;
+        _mAngle-=(midX-_mOrb2PrevX)*0.008;
+        _mOrb2PrevX=midX;_mOrb2PrevY=midY;
+        _updateMetalsHUD();renderMetalsISO();
+      }
+    },{passive:false});
+    el.addEventListener('touchend',function(e){if(e.touches.length===0)_mDragging=false;});
+    el.addEventListener('wheel',function(e){_mZoom=Math.max(0.3,Math.min(3.5,(_mZoom||1)-e.deltaY*0.001));_updateMetalsHUD();renderMetalsISO();e.preventDefault();},{passive:false});
     window.addEventListener('keydown',function(e){if(e.key==='Escape'&&_mIsExpanded)toggleMetalsExpand();});
+    _updateMetalsHUD();
   }
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',setup);}
   else{setTimeout(setup,100);}
@@ -13260,7 +13336,7 @@ function nwhRenderMini(){
   <!-- Centre dot -->
   <circle cx="7.0" cy="7.0" r="0.4" fill="#44c0b9" opacity="0.4"/>
 </svg></div> PT Live Design</span>
-  <span class="footer-version">Vault·It v0.7.7 Alpha · Updated 1 Jun 2026</span>
+  <span class="footer-version">Vault·It v0.7.8 Alpha · Updated 1 Jun 2026</span>
 </div>
 
 <!-- ══ ALPHA ACCESS MODAL ══ -->
