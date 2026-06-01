@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.7.0';
+  var SW_VERSION = '0.7.1';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2283,6 +2283,16 @@ input:focus, textarea:focus, select:focus {
 .advisor-card.gold .advisor-name{color:var(--go)}
 .advisor-card.orange{border-left-color:var(--or);background:rgba(224,137,74,.04)}
 .advisor-card.orange .advisor-name{color:var(--or)}
+/* ── PAYWALL ───────────────────────────────────────────────────── */
+.paywall-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.paywall-card{background:var(--c2);border-radius:16px;padding:28px 24px;max-width:420px;width:100%;position:relative;border:1px solid rgba(201,168,76,.45);box-shadow:0 0 80px rgba(201,168,76,.12),0 8px 40px rgba(0,0,0,.7)}
+.pw-plan{background:var(--c3);border-radius:10px;padding:14px;border:1px solid var(--bd);text-decoration:none;display:flex;flex-direction:column;gap:3px;transition:border-color .2s,box-shadow .2s,transform .15s}
+.pw-plan:hover{border-color:var(--go);box-shadow:0 0 20px rgba(201,168,76,.22);transform:translateY(-1px)}
+.pw-plan-annual{border-color:rgba(201,168,76,.35);background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02))}
+.pw-best-badge{background:linear-gradient(90deg,#b8902e,#f0d878,#c9a84c);color:#000;font-family:'Syne',sans-serif;font-size:.34rem;font-weight:900;letter-spacing:.15em;padding:2px 8px;border-radius:20px;width:fit-content;text-transform:uppercase}
+.pw-usage-pill{font-family:'Share Tech Mono',monospace;font-size:.38rem;padding:2px 7px;border-radius:10px;background:rgba(68,192,185,.08);color:var(--em);border:1px solid rgba(68,192,185,.2);vertical-align:middle}
+.pw-usage-pill.at-limit{background:rgba(231,76,60,.1);color:#e74c3c;border-color:rgba(231,76,60,.28)}
+@keyframes pw-pulse{0%,100%{filter:drop-shadow(0 0 4px rgba(201,168,76,.5))}50%{filter:drop-shadow(0 0 12px rgba(201,168,76,.9))}}
 </style>
 <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Vault·It&quot;,&quot;short_name&quot;:&quot;Vault·It&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23080808&quot;,&quot;theme_color&quot;:&quot;%2344c0b9&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23080808'/><text y='75' x='50' text-anchor='middle' font-size='70'>🔒</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;}]}">
 </head>
@@ -3908,6 +3918,22 @@ input:focus, textarea:focus, select:focus {
       </div>
     </div>
 
+    <!-- Pioneer Status -->
+    <div style="margin-bottom:20px;padding:16px;background:linear-gradient(135deg,rgba(201,168,76,.07),rgba(201,168,76,.02));border-radius:10px;border:1px solid rgba(201,168,76,.35)">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">
+        <span style="font-size:.9rem;animation:pw-pulse 2.5s ease-in-out infinite;display:inline-block">◆</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.58rem;color:var(--go);letter-spacing:.1em">PIONEER STATUS</span>
+        <span id="set-pioneer-badge" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.4rem"></span>
+      </div>
+      <div id="set-pioneer-active" style="display:none;font-size:.5rem;color:var(--gr);margin-bottom:10px;line-height:1.5">✓ Pioneer access active · Alpha pricing locked in for life<br>Your Beta Lifetime Licence code will be emailed on launch.</div>
+      <div id="set-pioneer-inactive" style="font-size:.5rem;color:var(--t2);margin-bottom:10px;line-height:1.5">Upgrade to Pioneer — unlimited tracking, export, projections,<br>and a Lifetime Beta Licence. Alpha: 50% off forever.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:7px">
+        <button onclick="window.open('https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00','_blank')" style="background:var(--c3);border:1px solid rgba(201,168,76,.4);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:7px 6px;cursor:pointer">£5.99/mo</button>
+        <button onclick="window.open('https://buy.stripe.com/3cIfZbddA6UV5yR4GG2VG01','_blank')" style="background:linear-gradient(90deg,rgba(184,144,46,.15),rgba(201,168,76,.15));border:1px solid rgba(201,168,76,.5);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:7px 6px;cursor:pointer">£59.99/yr ★</button>
+        <button onclick="closeSettings();showPaywall('assets')" style="background:none;border:1px solid var(--bd);border-radius:5px;color:var(--t3);font-size:.44rem;padding:7px 9px;cursor:pointer;white-space:nowrap">Already paid?</button>
+      </div>
+    </div>
+
     <div style="font-size:.5rem;color:var(--t3);margin-bottom:16px;padding:10px;background:rgba(68,192,185,.04);border-radius:6px;border:1px solid var(--bd)">
       🔒 All API keys are stored <strong>only in your browser's localStorage</strong>. They are never sent to any server other than the respective API provider. When you host this app publicly, add a backend proxy to keep keys secure.
     </div>
@@ -3915,6 +3941,55 @@ input:focus, textarea:focus, select:focus {
     <div style="display:flex;gap:10px">
       <button class="btn-add-data" onclick="saveSettings()" style="flex:1">Save Keys</button>
       <button class="btn-add-data" onclick="document.getElementById('settings-modal').style.display='none'" style="flex:1;background:transparent;border-color:var(--t3);color:var(--t3)">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PAYWALL MODAL ═══════════════════ -->
+<div id="paywall-modal" class="paywall-overlay" style="display:none" onclick="if(event.target===this)closePaywall()">
+  <div class="paywall-card">
+    <button onclick="closePaywall()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:.9rem;line-height:1">✕</button>
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:1.05rem;letter-spacing:.18em;background:linear-gradient(90deg,#b8902e,#f0d878,#c9a84c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">VAULT·IT PIONEER</div>
+      <div style="font-size:.48rem;color:var(--t2);margin-top:5px;letter-spacing:.04em">Alpha pricing · 50% off · locked in for life</div>
+    </div>
+    <div style="margin-bottom:16px;padding:12px 14px;background:rgba(0,0,0,.25);border-radius:8px;border-left:2px solid var(--em)">
+      <div id="paywall-feature-msg" style="font-size:.5rem;color:var(--em);margin-bottom:8px;font-family:'Share Tech Mono',monospace;letter-spacing:.03em"></div>
+      <div style="font-size:.48rem;color:var(--t2);line-height:1.9">
+        ✦ Unlimited assets &amp; liabilities<br>
+        ✦ Unlimited debt tracking + full payoff charts<br>
+        ✦ Full isometric portfolio visualisations<br>
+        ✦ Financial velocity scoring &amp; projections<br>
+        ✦ Data export (CSV)<br>
+        ✦ Pioneer badge + Beta Lifetime Licence code on launch
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <a href="https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00" target="_blank" class="pw-plan">
+        <div style="font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;color:var(--t2)">Monthly</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:900;color:var(--go);line-height:1">£5.99</div>
+        <div style="font-size:.38rem;color:var(--t3);text-decoration:line-through">was £11.99/mo</div>
+        <div style="font-size:.42rem;color:var(--em);margin-top:2px">per month · cancel anytime</div>
+      </a>
+      <a href="https://buy.stripe.com/3cIfZbddA6UV5yR4GG2VG01" target="_blank" class="pw-plan pw-plan-annual">
+        <div class="pw-best-badge" style="margin-bottom:3px">Best Value</div>
+        <div style="font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;color:var(--t2)">Annual</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:900;color:var(--go);line-height:1">£59.99</div>
+        <div style="font-size:.38rem;color:var(--t3);text-decoration:line-through">was £119.99/yr</div>
+        <div style="font-size:.42rem;color:var(--em);margin-top:2px">billed annually · +lifetime licence</div>
+      </a>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
+      <div style="font-size:.45rem;color:var(--t3);margin-bottom:8px">Already upgraded? Verify your purchase:</div>
+      <div style="display:flex;gap:6px">
+        <input type="email" id="pw-verify-email" class="al-inp" placeholder="Email used at checkout" style="flex:1;font-size:.56rem">
+        <button onclick="verifyPioneerPurchase()" style="background:linear-gradient(90deg,#b8902e,#c9a84c);border:none;border-radius:5px;color:#000;font-family:'Syne',sans-serif;font-size:.5rem;font-weight:800;padding:7px 13px;cursor:pointer;white-space:nowrap;letter-spacing:.05em">VERIFY</button>
+      </div>
+      <div id="pw-verify-msg" style="font-size:.44rem;margin-top:7px;min-height:14px;line-height:1.4"></div>
+    </div>
+    <div style="font-size:.36rem;color:var(--t3);margin-top:12px;text-align:center;line-height:1.6">
+      Alpha Pioneer pricing locked forever · Beta licence issued on launch<br>
+      Subscriptions via Stripe · Cancel anytime from your Stripe portal
     </div>
   </div>
 </div>
@@ -7275,6 +7350,7 @@ function addOtherAsset(){
   var n=document.getElementById('oa-name').value.trim();
   var v=parseFloat(document.getElementById('oa-val').value)||0;
   if(!n)return;
+  if(!isPioneer()&&(alState.otherAssets||[]).length>=FREE_LIMITS.assets){showPaywall('assets');return;}
   alState.otherAssets.push({id:Date.now(),name:n,value:v,image:null,svgIcon:null,imageSearch:null});
   document.getElementById('oa-name').value='';document.getElementById('oa-val').value='';
   saveAL();renderAlTab();updateKPIs();
@@ -7595,6 +7671,7 @@ function addLiability(){
   var dep=parseFloat((document.getElementById('li-dep')||{}).value)||0;
   var run=parseFloat((document.getElementById('li-run')||{}).value)||0;
   if(!n)return;
+  if(!isPioneer()&&(alState.liabilities||[]).length>=FREE_LIMITS.liabilities){showPaywall('liabilities');return;}
   alState.liabilities.push({id:Date.now(),name:n,value:v,rate:r,depRate:dep,runningCost:run,addedDate:new Date().toISOString()});
   document.getElementById('li-name').value='';document.getElementById('li-val').value='';document.getElementById('li-rate').value='';
   var lid=document.getElementById('li-dep');if(lid)lid.value='';
@@ -7616,6 +7693,7 @@ function saveDebt(){
   var r=parseFloat(document.getElementById('df-rate').value)||0;
   var m=parseFloat(document.getElementById('df-min').value)||0;
   if(!n)return;
+  if(!isPioneer()&&(debtState.debts||[]).length>=FREE_LIMITS.debts){showPaywall('debts');return;}
   var dtype=(document.getElementById('di-type')||{}).value||'other';
   debtState.debts.push({id:Date.now(),name:n,original:b,balance:b,rate:r,min:m,type:dtype});
   document.getElementById('df-name').value='';document.getElementById('df-balance').value='';document.getElementById('df-rate').value='';document.getElementById('df-min').value='';
@@ -8555,6 +8633,70 @@ window.addEventListener('resize', function() {
 });
 
 // ── SETTINGS MODAL ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// PIONEER / PAYWALL
+// ═══════════════════════════════════════════════════════════════
+var _STRIPE_MONTHLY='https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00';
+var _STRIPE_ANNUAL ='https://buy.stripe.com/3cIfZbddA6UV5yR4GG2VG01';
+var FREE_LIMITS    ={assets:3,liabilities:2,debts:1};
+
+function isPioneer(){return localStorage.getItem('vi_pioneer')==='true';}
+
+function showPaywall(feature){
+  var msgs={
+    assets:      '🔒 Free tier: up to 3 assets. Pioneer = unlimited.',
+    liabilities: '🔒 Free tier: up to 2 liabilities. Pioneer = unlimited.',
+    debts:       '🔒 Free tier: 1 debt tracked. Pioneer = unlimited.',
+    export:      '🔒 Data export is a Pioneer feature.',
+    analytics:   '🔒 Advanced analytics is a Pioneer feature.'
+  };
+  var msg=document.getElementById('paywall-feature-msg');
+  if(msg)msg.textContent=msgs[feature]||'🔒 This is a Pioneer feature.';
+  document.getElementById('paywall-modal').style.display='flex';
+}
+
+function closePaywall(){
+  document.getElementById('paywall-modal').style.display='none';
+  var m=document.getElementById('pw-verify-msg');if(m)m.textContent='';
+}
+
+function closeSettings(){
+  var sm=document.getElementById('settings-modal');if(sm)sm.style.display='none';
+}
+
+function verifyPioneerPurchase(){
+  var inp=document.getElementById('pw-verify-email');
+  var msg=document.getElementById('pw-verify-msg');
+  var entered=(inp?inp.value.trim().toLowerCase():'');
+  if(!entered){if(msg)msg.innerHTML='<span style="color:var(--re)">Please enter your checkout email.</span>';return;}
+  var u=null;try{u=JSON.parse(localStorage.getItem('vi_user')||'null');}catch(e){}
+  var profileEmail=(u&&u.email)?u.email.toLowerCase():'';
+  if(!profileEmail||profileEmail===entered){
+    localStorage.setItem('vi_pioneer','true');
+    localStorage.setItem('vi_pioneer_email',entered);
+    if(msg)msg.innerHTML='<span style="color:var(--gr)">✓ Pioneer access unlocked — welcome to the vault!</span>';
+    setTimeout(function(){
+      closePaywall();
+      renderPioneerCard();
+      showToast('◆ PIONEER unlocked — thank you! 🎉');
+    },1400);
+  }else{
+    if(msg)msg.innerHTML='<span style="color:var(--re)">Email doesn\'t match your profile. Update your profile email first.</span>';
+  }
+}
+
+function _refreshPioneerSettingsUI(){
+  var active=document.getElementById('set-pioneer-active');
+  var inactive=document.getElementById('set-pioneer-inactive');
+  var badge=document.getElementById('set-pioneer-badge');
+  var pioneer=isPioneer();
+  if(active)active.style.display=pioneer?'block':'none';
+  if(inactive)inactive.style.display=pioneer?'none':'block';
+  if(badge)badge.innerHTML=pioneer
+    ?'<span style="color:var(--go);background:rgba(201,168,76,.12);padding:2px 7px;border-radius:10px;border:1px solid rgba(201,168,76,.3)">◆ ACTIVE</span>'
+    :'<span style="color:var(--t3);background:var(--c3);padding:2px 7px;border-radius:10px;border:1px solid var(--bd)">FREE TIER</span>';
+}
+
 function showSettings(){
   document.getElementById('set-claude-key').value=localStorage.getItem('claude_api_key')||'';
   document.getElementById('set-meshy-key').value=localStorage.getItem('meshy_api_key')||'';
@@ -8564,6 +8706,7 @@ function showSettings(){
   var ckfEl=document.getElementById('set-ck-form');if(ckfEl)ckfEl.value=localStorage.getItem('convertkit_form_id')||'';
   var ckkEl=document.getElementById('set-ck-key');if(ckkEl)ckkEl.value=localStorage.getItem('convertkit_api_key')||'';
   var ntEl=document.getElementById('set-notion-token');if(ntEl)ntEl.value=localStorage.getItem('notion_token')||'';
+  _refreshPioneerSettingsUI();
   document.getElementById('settings-modal').style.display='flex';
 }
 function saveSettings(){
@@ -11253,7 +11396,7 @@ function renderPioneerCard() {
             '<div class="pc-avatar-wrap">' + avatarHtml + '</div>' +
             '<div style="flex:1;min-width:0">' +
               '<div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:.65rem;color:#fff;line-height:1.1;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (u.name||'Pioneer') + '</div>' +
-              '<div class="pc-badge">◈ Pioneer · Alpha · Lifetime Pro</div>' +
+              '<div class="pc-badge">' + (isPioneer() ? '◆ Pioneer · Alpha · Lifetime Pro' : '◈ Vault Scout · Free Tier') + '</div>' +
             '</div>' +
           '</div>' +
           (job || dream ? '<div style="margin-bottom:7px;position:relative;z-index:1">' +
@@ -11264,7 +11407,7 @@ function renderPioneerCard() {
             (saveArch  ? '<span class="pc-archetype">' + saveArch.split(' ').slice(0,3).join(' ') + '</span>' : '') +
             (spendArch ? '<span class="pc-archetype">' + spendArch.split(' ').slice(0,3).join(' ') + '</span>' : '') +
           '</div>' : '') +
-          '<div class="pc-footer" style="position:relative;z-index:1">VAULT·IT PIONEER · ' + joined + ' · ALPHA</div>' +
+          '<div class="pc-footer" style="position:relative;z-index:1">' + (isPioneer()?'VAULT·IT PIONEER · '+joined+' · ALPHA':'VAULT·IT SCOUT · '+joined+' · FREE') + '</div>' +
         '</div>' +
       '</div>';
     applySbProfileMode();
