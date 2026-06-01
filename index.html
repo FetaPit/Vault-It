@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.7.3';
+  var SW_VERSION = '0.7.4';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2397,10 +2397,88 @@ input:focus, textarea:focus, select:focus {
 .pw-usage-pill{font-family:'Share Tech Mono',monospace;font-size:.38rem;padding:2px 7px;border-radius:10px;background:rgba(68,192,185,.08);color:var(--em);border:1px solid rgba(68,192,185,.2);vertical-align:middle}
 .pw-usage-pill.at-limit{background:rgba(231,76,60,.1);color:#e74c3c;border-color:rgba(231,76,60,.28)}
 @keyframes pw-pulse{0%,100%{filter:drop-shadow(0 0 4px rgba(201,168,76,.5))}50%{filter:drop-shadow(0 0 12px rgba(201,168,76,.9))}}
+/* ── LOGIN / AUTH ──────────────────────────────────────────────── */
+#login-overlay{position:fixed;inset:0;z-index:10000;background:radial-gradient(ellipse at 60% 30%,rgba(68,192,185,.06) 0%,rgba(4,9,15,1) 70%),#04090f;display:flex;align-items:center;justify-content:center;padding:16px}
+.auth-card{background:rgba(8,16,26,.95);border:1px solid rgba(201,168,76,.35);border-radius:16px;padding:32px 28px;max-width:360px;width:100%;position:relative;box-shadow:0 0 60px rgba(201,168,76,.08),0 24px 60px rgba(0,0,0,.8)}
+.auth-logo{font-family:'Syne',sans-serif;font-weight:900;font-size:1.3rem;letter-spacing:.25em;background:linear-gradient(90deg,#b8902e,#f0d878,#c9a84c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:4px}
+.auth-sub{font-family:'Share Tech Mono',monospace;font-size:.42rem;color:var(--t3);letter-spacing:.12em;text-align:center;margin-bottom:24px;text-transform:uppercase}
+.auth-step{display:none}
+.auth-step.active{display:block}
+.auth-label{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;color:var(--t2);margin-bottom:6px;letter-spacing:.06em}
+.auth-inp{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(68,192,185,.25);border-radius:6px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.78rem;padding:10px 12px;outline:none;box-sizing:border-box;letter-spacing:.12em;transition:border-color .2s}
+.auth-inp:focus{border-color:var(--em);box-shadow:0 0 0 2px rgba(68,192,185,.1)}
+.auth-btn{width:100%;margin-top:12px;padding:11px;background:linear-gradient(90deg,rgba(201,168,76,.9),rgba(184,144,46,.9));border:none;border-radius:6px;color:#000;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:800;letter-spacing:.14em;cursor:pointer;text-transform:uppercase;transition:opacity .2s,transform .1s}
+.auth-btn:hover{opacity:.92;transform:translateY(-1px)}
+.auth-btn.secondary{background:transparent;border:1px solid rgba(68,192,185,.3);color:var(--em);margin-top:8px}
+.auth-code-box{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:14px;margin-bottom:14px;text-align:center}
+.auth-code-num{font-family:'Syne',sans-serif;font-weight:900;font-size:1.8rem;letter-spacing:.25em;color:#fff;animation:card-num-pulse 2s ease-in-out infinite}
+.auth-code-hint{font-family:'Share Tech Mono',monospace;font-size:.4rem;color:var(--t3);margin-top:4px}
+.auth-err{font-family:'Share Tech Mono',monospace;font-size:.44rem;color:#e74c3c;margin-top:8px;min-height:14px;text-align:center;display:none}
+.auth-info{font-family:'Share Tech Mono',monospace;font-size:.42rem;color:var(--t3);text-align:center;margin-top:10px;line-height:1.6}
+.auth-divider{border:none;border-top:1px solid rgba(255,255,255,.06);margin:18px 0}
+.auth-footer{font-family:'Share Tech Mono',monospace;font-size:.36rem;color:rgba(255,255,255,.18);text-align:center;margin-top:20px;letter-spacing:.08em}
 </style>
 <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Vault·It&quot;,&quot;short_name&quot;:&quot;Vault·It&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23080808&quot;,&quot;theme_color&quot;:&quot;%2344c0b9&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23080808'/><text y='75' x='50' text-anchor='middle' font-size='70'>🔒</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;}]}">
 </head>
 <body>
+<!-- ═══════════════════════════════════════════════════════════════
+     LOGIN / AUTH OVERLAY  (z-index 10000, shown by default,
+     hidden by pre-paint script when session is valid)
+═══════════════════════════════════════════════════════════════ -->
+<div id="login-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">VAULT·IT</div>
+    <div class="auth-sub">Secure Financial Intelligence</div>
+
+    <!-- Step 1: email -->
+    <div id="auth-email-step" class="auth-step active">
+      <div class="auth-label">Your email address</div>
+      <input id="auth-email" class="auth-inp" type="email" placeholder="you@example.com" autocomplete="email"
+        onkeydown="if(event.key==='Enter')authSubmitEmail()">
+      <button class="auth-btn" onclick="authSubmitEmail()">Continue →</button>
+      <div class="auth-info">Alpha · 33 Pioneer spots · Your data stays on your device</div>
+    </div>
+
+    <!-- Step 2a: OTP verification -->
+    <div id="auth-otp-step" class="auth-step">
+      <div class="auth-code-box">
+        <div class="auth-code-hint">YOUR ONE-TIME CODE</div>
+        <div class="auth-code-num" id="auth-otp-display">——</div>
+        <div class="auth-code-hint">Tap to copy · valid 10 min</div>
+      </div>
+      <div class="auth-label">Enter the 6-digit code sent to <span id="auth-otp-email" style="color:var(--em)"></span></div>
+      <input id="auth-otp-inp" class="auth-inp" type="text" inputmode="numeric" maxlength="6" placeholder="000000"
+        onkeydown="if(event.key==='Enter')authVerifyOTP()">
+      <button class="auth-btn" onclick="authVerifyOTP()">Verify Code →</button>
+      <button class="auth-btn secondary" onclick="authGoBack()">← Use different email</button>
+    </div>
+
+    <!-- Step 2b: PIN entry (returning user) -->
+    <div id="auth-pin-step" class="auth-step">
+      <div class="auth-label">Welcome back — enter your PIN for <span id="auth-pin-email" style="color:var(--em)"></span></div>
+      <input id="auth-pin-inp" class="auth-inp" type="password" inputmode="numeric" maxlength="6" placeholder="••••"
+        onkeydown="if(event.key==='Enter')authVerifyPin()">
+      <button class="auth-btn" onclick="authVerifyPin()">Unlock Vault →</button>
+      <button class="auth-btn secondary" onclick="authForgotPin()">Forgot PIN? Send new code</button>
+    </div>
+
+    <!-- Step 3: set PIN (after first OTP) -->
+    <div id="auth-setpin-step" class="auth-step">
+      <div class="auth-label">Create a PIN to speed up future logins</div>
+      <input id="auth-pin1" class="auth-inp" type="password" inputmode="numeric" maxlength="6" placeholder="4–6 digits" style="margin-bottom:8px"
+        onkeydown="if(event.key==='Enter')document.getElementById('auth-pin2').focus()">
+      <input id="auth-pin2" class="auth-inp" type="password" inputmode="numeric" maxlength="6" placeholder="Confirm PIN"
+        onkeydown="if(event.key==='Enter')authSetPin()">
+      <button class="auth-btn" onclick="authSetPin()">Enter the Vault →</button>
+      <button class="auth-btn secondary" onclick="authSkipPin()">Skip — use code each time</button>
+    </div>
+
+    <div id="auth-err" class="auth-err"></div>
+    <hr class="auth-divider">
+    <div class="auth-footer">ALPHA · 2026 · VAULT·IT INC</div>
+  </div>
+</div>
+
 <div id="demo-chip" class="demo-chip" style="display:none">⚡ DEMO DATA — <button onclick="clearDemoData()">Replace with your data →</button></div>
 <div id="pwa-install-banner" style="display:none">
   <span>⬇ Install Vault·It — works offline, opens like an app</span>
@@ -2518,14 +2596,21 @@ input:focus, textarea:focus, select:focus {
      VAULT·IT WELCOME — New user onboarding + Returning upsell
 ══════════════════════════════════════════════════════ -->
 <script>
-/* Hide overlay synchronously for returning users — runs before first paint */
+/* Pre-paint: hide overlays for users with valid sessions */
 (function(){
   try {
     var reset = new URLSearchParams(window.location.search).has('reset');
-    if (reset) { localStorage.removeItem('vi_user'); }
-    var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
-    if (u && u.email && !reset) {
-      document.write('<style>#welcome-overlay{display:none!important}</style>');
+    if (reset) { localStorage.removeItem('vi_user'); localStorage.removeItem('vi_session'); }
+    var s = JSON.parse(localStorage.getItem('vi_session') || 'null');
+    var sessionOk = !reset && s && s.expiry > Date.now() && s.email;
+    if (sessionOk) {
+      // Valid session — hide login overlay immediately (no flash)
+      document.write('<style>#login-overlay{display:none!important}</style>');
+      var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
+      // Also hide welcome overlay if profile exists
+      if (u && u.email) {
+        document.write('<style>#welcome-overlay{display:none!important}</style>');
+      }
     }
   } catch(e) {}
 })();
@@ -4040,6 +4125,26 @@ input:focus, textarea:focus, select:focus {
 
     <div style="font-size:.5rem;color:var(--t3);margin-bottom:16px;padding:10px;background:rgba(68,192,185,.04);border-radius:6px;border:1px solid var(--bd)">
       🔒 All API keys are stored <strong>only in your browser's localStorage</strong>. They are never sent to any server other than the respective API provider. When you host this app publicly, add a backend proxy to keep keys secure.
+    </div>
+
+    <!-- EmailJS (optional — enables real OTP email delivery) -->
+    <div style="margin-bottom:20px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid rgba(68,192,185,.15)">
+      <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--em);margin-bottom:8px;letter-spacing:.06em">✉ EmailJS — OTP Email Delivery (optional)</div>
+      <input type="text"     id="set-ejs-svc"  class="al-inp" placeholder="Service ID  (e.g. service_xxxxx)"   style="width:100%;margin-bottom:6px">
+      <input type="text"     id="set-ejs-tpl"  class="al-inp" placeholder="Template ID (e.g. template_xxxxx)"  style="width:100%;margin-bottom:6px">
+      <input type="password" id="set-ejs-key"  class="al-inp" placeholder="Public Key  (e.g. AbC1dEf2GhI3)"    style="width:100%;margin-bottom:6px">
+      <div style="font-size:.48rem;color:var(--t3);line-height:1.6">Free at <span style="color:var(--em)">emailjs.com</span> (200 emails/mo). Create a template with variables <code style="color:var(--go)">{{otp_code}}</code> and <code style="color:var(--go)">{{to_email}}</code>. Without this, login codes are shown on screen.</div>
+    </div>
+
+    <!-- Danger zone -->
+    <div style="margin-bottom:20px;padding:14px;background:rgba(231,76,60,.04);border-radius:8px;border:1px solid rgba(231,76,60,.2)">
+      <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:#e74c3c;margin-bottom:10px;letter-spacing:.06em">⚠ Danger Zone</div>
+      <button onclick="resetVaultData()" style="width:100%;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.35);border-radius:5px;color:#e74c3c;font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;padding:9px;cursor:pointer;margin-bottom:8px;letter-spacing:.06em">
+        🗑 Reset Financial Data — keep profile &amp; Pioneer status
+      </button>
+      <button onclick="signOut()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:5px;color:var(--t3);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;padding:9px;cursor:pointer;letter-spacing:.06em">
+        🔒 Sign Out of this Device
+      </button>
     </div>
 
     <div style="display:flex;gap:10px">
@@ -6925,6 +7030,185 @@ state.target=state.prices[state.houseType]||200000;
 updatePriceLabels();updatePriceInput();updateMilestoneLabels();prevP=pct();updateUI();
 
 // ═══════════════════════════════════════════════════════════════
+// AUTH / SESSION  (login gate, OTP, PIN, sign-out, data reset)
+// ═══════════════════════════════════════════════════════════════
+var _authOTP = null; // { code, expiry, email }
+
+function _hashStr(str) {
+  var h = 0;
+  for (var i = 0; i < str.length; i++) { h = Math.imul(31, h) + str.charCodeAt(i) | 0; }
+  return (h >>> 0).toString(36);
+}
+
+function hasValidSession() {
+  try {
+    var s = JSON.parse(localStorage.getItem('vi_session') || 'null');
+    return !!(s && s.expiry > Date.now() && s.email);
+  } catch(e) { return false; }
+}
+
+function _createSession(email) {
+  localStorage.setItem('vi_session', JSON.stringify({
+    email: email.toLowerCase(),
+    expiry: Date.now() + 7 * 24 * 60 * 60 * 1000
+  }));
+}
+
+function signOut() {
+  if (!confirm('Sign out? You will need your email and PIN to get back in.')) return;
+  localStorage.removeItem('vi_session');
+  location.reload();
+}
+
+function _showAuthStep(step) {
+  ['email','otp','pin','setpin'].forEach(function(s) {
+    var el = document.getElementById('auth-' + s + '-step');
+    if (el) el.classList.toggle('active', s === step);
+  });
+  _clearAuthErr();
+}
+
+function _authErr(msg) {
+  var el = document.getElementById('auth-err');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+function _clearAuthErr() {
+  var el = document.getElementById('auth-err'); if (el) { el.textContent = ''; el.style.display = 'none'; }
+}
+
+function authSubmitEmail() {
+  var emailEl = document.getElementById('auth-email');
+  var email   = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    _authErr('Please enter a valid email address.'); return;
+  }
+  // If PIN exists for this email → PIN entry
+  if (localStorage.getItem('vi_pin_' + _hashStr(email))) {
+    var emailDisp = document.getElementById('auth-pin-email');
+    if (emailDisp) emailDisp.textContent = email;
+    _showAuthStep('pin');
+  } else {
+    // Send OTP
+    _sendOTP(email);
+  }
+}
+
+function _sendOTP(email) {
+  var code = String(Math.floor(100000 + Math.random() * 900000));
+  _authOTP = { code: code, expiry: Date.now() + 10 * 60 * 1000, email: email };
+  var disp = document.getElementById('auth-otp-display');
+  var emailDisp = document.getElementById('auth-otp-email');
+  if (disp) {
+    disp.textContent = code;
+    disp.onclick = function() {
+      try { navigator.clipboard.writeText(code); showToast('Code copied ✓'); } catch(e) {}
+    };
+    disp.style.cursor = 'pointer';
+    disp.title = 'Tap to copy';
+  }
+  if (emailDisp) emailDisp.textContent = email;
+  _showAuthStep('otp');
+  // Optional: send via EmailJS if configured
+  _tryEmailJSOTP(email, code);
+}
+
+function _tryEmailJSOTP(email, code) {
+  var svcId  = localStorage.getItem('emailjs_service_id') || '';
+  var tplId  = localStorage.getItem('emailjs_template_id') || '';
+  var pubKey = localStorage.getItem('emailjs_public_key') || '';
+  if (!svcId || !tplId || !pubKey) return; // not configured — code shown on screen
+  if (typeof emailjs === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+    s.onload = function() {
+      emailjs.init(pubKey);
+      emailjs.send(svcId, tplId, { to_email: email, otp_code: code, app_name: 'Vault·It' })
+        .then(function() { showToast('Code emailed to ' + email + ' ✓'); })
+        .catch(function() { /* screen code is the fallback */ });
+    };
+    document.head.appendChild(s);
+  } else {
+    emailjs.send(svcId, tplId, { to_email: email, otp_code: code, app_name: 'Vault·It' })
+      .catch(function() {});
+  }
+}
+
+function authVerifyOTP() {
+  var entered = (document.getElementById('auth-otp-inp') || {}).value || '';
+  if (!_authOTP) { _authErr('Session expired. Refresh and try again.'); return; }
+  if (Date.now() > _authOTP.expiry) { _authErr('Code expired. Go back and request a new one.'); return; }
+  if (entered.trim() !== _authOTP.code) { _authErr('Incorrect code — check the box above and try again.'); return; }
+  // OTP correct — set PIN
+  _showAuthStep('setpin');
+}
+
+function authVerifyPin() {
+  var emailEl = document.getElementById('auth-email');
+  var email   = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  var pin     = (document.getElementById('auth-pin-inp') || {}).value || '';
+  if (!pin) { _authErr('Enter your PIN.'); return; }
+  var stored  = localStorage.getItem('vi_pin_' + _hashStr(email));
+  if (stored === _hashStr(email + ':' + pin)) {
+    _createSession(email);
+    _completeAuth(email);
+  } else {
+    _authErr('Incorrect PIN. Try again, or use "Forgot PIN" to reset via code.');
+    var inp = document.getElementById('auth-pin-inp'); if (inp) inp.value = '';
+  }
+}
+
+function authSetPin() {
+  var pin1 = (document.getElementById('auth-pin1') || {}).value || '';
+  var pin2 = (document.getElementById('auth-pin2') || {}).value || '';
+  if (!pin1 || !/^\d{4,6}$/.test(pin1)) { _authErr('PIN must be 4–6 digits.'); return; }
+  if (pin1 !== pin2) { _authErr('PINs do not match.'); return; }
+  var email = _authOTP ? _authOTP.email : '';
+  if (!email) { _authErr('Session lost — go back and try again.'); return; }
+  localStorage.setItem('vi_pin_' + _hashStr(email), _hashStr(email + ':' + pin1));
+  _createSession(email);
+  _completeAuth(email);
+}
+
+function authSkipPin() {
+  var email = _authOTP ? _authOTP.email : '';
+  if (!email) { _authErr('Session lost — go back and try again.'); return; }
+  _createSession(email);
+  _completeAuth(email);
+}
+
+function authForgotPin() {
+  var emailEl = document.getElementById('auth-email');
+  var email   = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  if (!email) { _authErr('Enter your email first.'); return; }
+  // Remove old PIN so OTP flow starts fresh
+  localStorage.removeItem('vi_pin_' + _hashStr(email));
+  _sendOTP(email);
+}
+
+function authGoBack() { _showAuthStep('email'); }
+
+function _completeAuth(email) {
+  // Pre-fill profile email if first time
+  try {
+    var u = JSON.parse(localStorage.getItem('vi_user') || '{}');
+    if (!u.email) { u.email = email; localStorage.setItem('vi_user', JSON.stringify(u)); }
+  } catch(e) {}
+  var overlay = document.getElementById('login-overlay');
+  if (overlay) overlay.style.display = 'none';
+  // If no profile yet, welcome overlay will show; otherwise app is live
+  try { renderPioneerCard(); } catch(e) {}
+}
+
+// ── DATA RESET ────────────────────────────────────────────────
+function resetVaultData() {
+  if (!confirm('RESET FINANCIAL DATA\n\nThis will permanently delete:\n• All assets & liabilities\n• All debts\n• Cashflow history\n• Business data\n• Achievements & XP\n\nYour profile, Pioneer status, and API keys are kept.\n\nContinue?')) return;
+  var dataKeys = ['pos_al1','pos_debt1','pos_ov1','pos_biz1','pos_ach1','pos4','pos_house','pos_journey','vi_debt','vi_ov'];
+  dataKeys.forEach(function(k) { localStorage.removeItem(k); });
+  showToast('Financial data cleared ✓');
+  setTimeout(function() { location.reload(); }, 1000);
+}
+
+// ═══════════════════════════════════════════════════════════════
 // CASHFLOW JS
 // ═══════════════════════════════════════════════════════════════
 function cfTotalIn(){return(ovState.income||[]).reduce(function(s,r){return s+(+r.amount||0);},0);}
@@ -8814,6 +9098,9 @@ function showSettings(){
   var ckfEl=document.getElementById('set-ck-form');if(ckfEl)ckfEl.value=localStorage.getItem('convertkit_form_id')||'';
   var ckkEl=document.getElementById('set-ck-key');if(ckkEl)ckkEl.value=localStorage.getItem('convertkit_api_key')||'';
   var ntEl=document.getElementById('set-notion-token');if(ntEl)ntEl.value=localStorage.getItem('notion_token')||'';
+  var ejsS=document.getElementById('set-ejs-svc');if(ejsS)ejsS.value=localStorage.getItem('emailjs_service_id')||'';
+  var ejsT=document.getElementById('set-ejs-tpl');if(ejsT)ejsT.value=localStorage.getItem('emailjs_template_id')||'';
+  var ejsK=document.getElementById('set-ejs-key');if(ejsK)ejsK.value=localStorage.getItem('emailjs_public_key')||'';
   _refreshPioneerSettingsUI();
   document.getElementById('settings-modal').style.display='flex';
 }
@@ -8834,6 +9121,12 @@ function saveSettings(){
   if(ckk)localStorage.setItem('convertkit_api_key',ckk.trim());
   var ntk=(document.getElementById('set-notion-token')||{}).value||'';
   if(ntk)localStorage.setItem('notion_token',ntk.trim());
+  var ejsS=(document.getElementById('set-ejs-svc')||{}).value||'';
+  var ejsT=(document.getElementById('set-ejs-tpl')||{}).value||'';
+  var ejsK=(document.getElementById('set-ejs-key')||{}).value||'';
+  if(ejsS)localStorage.setItem('emailjs_service_id',ejsS.trim());
+  if(ejsT)localStorage.setItem('emailjs_template_id',ejsT.trim());
+  if(ejsK)localStorage.setItem('emailjs_public_key',ejsK.trim());
   document.getElementById('settings-modal').style.display='none';
   showToast('API keys saved \u2713');
 }
