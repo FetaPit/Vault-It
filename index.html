@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.7.8';
+  var SW_VERSION = '0.7.9';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -1263,26 +1263,21 @@ body::before {
 }
 
 .vp-key {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 8;
-  padding: 3px 12px;
-  background: rgba(4,8,16,.72);
-  border: 1px solid rgba(68,192,185,.12);
-  border-radius: 20px;
-  backdrop-filter: blur(6px);
-  pointer-events: none;
-  white-space: nowrap;
+  display: block;
+  text-align: center;
+  padding: 5px 8px;
   font-family: 'Share Tech Mono', monospace;
   font-size: .4rem;
-  color: rgba(68,192,185,.45);
+  color: rgba(68,192,185,.38);
   letter-spacing: .06em;
   text-transform: uppercase;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 @media (max-width: 480px) {
-  .vp-key { font-size: .35rem; padding: 2px 8px; }
+  .vp-key { font-size: .34rem; }
 }
 
 .hud-btn {
@@ -3611,18 +3606,10 @@ input:focus, textarea:focus, select:focus {
   <div class="grid">
     <div class="scene-card" id="houseSceneCard">
       <div class="scene-lbl" id="sceneLabel" style="display:none"></div>
-      <!-- HUD readout strip -->
-      <div class="hud-readout" id="hud-readout-house">
-        <span class="hud-readout-item" id="hud-zoom-val">ZOOM 1.0×</span>
-        <span class="hud-readout-sep">·</span>
-        <span class="hud-readout-item" id="hud-angle-val">YAW 0°</span>
-        <span class="hud-readout-sep">·</span>
-        <span class="hud-readout-item" id="hud-mode-val">PAN MODE</span>
-      </div>
+
       <div class="scene" style="position:relative">
         <svg id="houseSvg" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;min-height:360px"></svg>
-        <!-- Control key overlay -->
-        <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
+
         <div id="house-pro-lock" style="position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,8,8,.82);backdrop-filter:blur(6px);text-align:center;padding:24px">
           <div style="font-size:1.8rem;margin-bottom:10px">🔒</div>
           <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;color:var(--tx);margin-bottom:6px">Your house fills as you save</div>
@@ -3642,6 +3629,7 @@ input:focus, textarea:focus, select:focus {
         <button class="hud-btn" id="hud-reset"   onclick="resetView()"    title="Reset view"  aria-label="Reset camera">↺</button>
         <button class="hud-btn" onclick="toggleExpand()"                   title="Fullscreen"  aria-label="Fullscreen">⛶</button>
       </div>
+      <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
       <div class="scene-cap" id="sceneCap" style="display:none"></div>
     </div>
     <div class="panel">
@@ -3810,14 +3798,9 @@ input:focus, textarea:focus, select:focus {
       </div>
       <div style="margin-top:4px">
         <div class="scene-card" id="metalsSceneCard">
-          <div class="hud-readout" id="hud-readout-metals">
-            <span class="hud-readout-item" id="hud-metals-zoom-val">ZOOM 1.0×</span>
-            <span class="hud-readout-sep">·</span>
-            <span class="hud-readout-item" id="hud-metals-angle-val">YAW 0°</span>
-          </div>
+
           <div class="scene">
             <svg id="metalsSvg" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;min-height:360px"></svg>
-            <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
           </div>
           <!-- Metals HUD buttons — outer frame, right edge -->
           <div class="hud-bar" id="hud-bar-metals">
@@ -3831,6 +3814,7 @@ input:focus, textarea:focus, select:focus {
             <button class="hud-btn" onclick="resetMetalsView()" title="Reset view" aria-label="Reset camera">↺</button>
             <button class="hud-btn" id="btnMetalsExpand" onclick="toggleMetalsExpand()" title="Fullscreen" aria-label="Fullscreen">⛶</button>
           </div>
+          <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
           <div class="scene-cap" id="metalsCap">—</div>
         </div>
         <div class="g2" style="margin-top:12px">
@@ -7117,8 +7101,12 @@ function _updateHUD() {
     if (e.touches.length === 1 && _isDragging) {
       var t = e.touches[0];
       var dx = t.clientX - _dragX, dy = t.clientY - _dragY;
-      // 1-finger = pan
-      _panX += dx; _panY += dy;
+      if (_orbitMode) {
+        _viewAngle -= dx * 0.008;
+        _panY      += dy * 0.35;
+      } else {
+        _panX += dx; _panY += dy;
+      }
       _dragX = t.clientX; _dragY = t.clientY;
       _updateHUD(); redraw();
     } else if (e.touches.length === 2) {
@@ -7218,7 +7206,8 @@ function resetMetalsView(){_mPanX=0;_mPanY=0;_mAngle=0;_mZoom=1;_updateMetalsHUD
       e.preventDefault();
       if(e.touches.length===1&&_mDragging){
         var t=e.touches[0],dx=t.clientX-_mDragX,dy=t.clientY-_mDragY;
-        _mPanX+=dx;_mPanY+=dy;
+        if(_mOrbitMode){_mAngle-=dx*0.008;_mPanY+=dy*0.4;}
+        else{_mPanX+=dx;_mPanY+=dy;}
         _mDragX=t.clientX;_mDragY=t.clientY;
         _updateMetalsHUD();renderMetalsISO();
       } else if(e.touches.length===2){
@@ -9435,7 +9424,15 @@ function isFounder() { return localStorage.getItem('vi_founder') === 'true'; }
 function purchaseFoundingLicence() {
   var link = VI_FOUNDING_LINK || localStorage.getItem('vi_founding_link') || '';
   if (!link) {
-    showToast('Payment link not configured yet — check Settings → Vault Network');
+    showToast('Paste your Stripe £7.77 link in ⚙ Settings → Vault Network');
+    var sm = document.getElementById('settings-modal');
+    if (sm) {
+      showSettings();
+      setTimeout(function() {
+        var flEl = document.getElementById('set-founding-link');
+        if (flEl) { flEl.focus(); flEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      }, 350);
+    }
     return;
   }
   var u = {}; try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
@@ -13336,7 +13333,7 @@ function nwhRenderMini(){
   <!-- Centre dot -->
   <circle cx="7.0" cy="7.0" r="0.4" fill="#44c0b9" opacity="0.4"/>
 </svg></div> PT Live Design</span>
-  <span class="footer-version">Vault·It v0.7.8 Alpha · Updated 1 Jun 2026</span>
+  <span class="footer-version">Vault·It v0.7.9 Alpha · Updated 2 Jun 2026</span>
 </div>
 
 <!-- ══ ALPHA ACCESS MODAL ══ -->
