@@ -1262,6 +1262,22 @@ body::before {
   margin: 1px 0;
 }
 
+/* ── Viewport guide panel — left-edge collapsible ────────────────── */
+.vp-guide{position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:15;display:flex;flex-direction:row;pointer-events:all}
+.vp-guide-tab{width:18px;background:rgba(4,10,20,.82);border:1px solid rgba(68,192,185,.2);border-radius:6px 0 0 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:10px 0;gap:4px;backdrop-filter:blur(10px);transition:background .15s;user-select:none;-webkit-user-select:none}
+.vp-guide-tab:hover,.vp-guide-tab:active{background:rgba(68,192,185,.14)}
+.vp-guide-tab svg{transition:opacity .15s;opacity:.45}
+.vp-guide-tab:hover svg,.vp-guide.open .vp-guide-tab svg{opacity:.85}
+.vp-guide-panel{width:0;overflow:hidden;transition:width .24s cubic-bezier(.4,0,.2,1);background:rgba(4,10,20,.9);border:1px solid rgba(68,192,185,.2);border-left:none;border-radius:0 6px 6px 0;backdrop-filter:blur(12px)}
+.vp-guide.open .vp-guide-panel{width:108px}
+.vp-gi{width:108px;padding:9px 10px 10px 9px;display:flex;flex-direction:column;gap:0}
+.vp-gi-hd{font-family:'Share Tech Mono',monospace;font-size:.33rem;letter-spacing:.24em;color:rgba(68,192,185,.35);text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid rgba(68,192,185,.1);margin-bottom:5px}
+.vp-gi-row{display:flex;align-items:center;gap:7px;padding:4px 0}
+.vp-gi-ico{width:22px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:rgba(68,192,185,.75)}
+.vp-gi-lbl{font-family:'Share Tech Mono',monospace;font-size:.32rem;line-height:1.5;color:rgba(68,192,185,.42)}
+.vp-gi-lbl b{display:block;font-size:.38rem;font-weight:400;color:rgba(68,192,185,.82);letter-spacing:.05em}
+.vp-gi-sep{height:1px;background:rgba(68,192,185,.08);margin:2px 0}
+
 .vp-key {
   display: block;
   text-align: center;
@@ -3623,6 +3639,41 @@ input:focus, textarea:focus, select:focus {
           <div style="font-size:.58rem;color:var(--t2);line-height:1.6;max-width:260px;margin-bottom:16px">Every deposit adds bricks. Watch your home being built in real time. Pro only.</div>
           <button onclick="showUpgrade('annual')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:.6rem;cursor:pointer;letter-spacing:.06em">Invest in yourself →</button>
         </div>
+        <!-- Left-edge collapsible guide -->
+        <div class="vp-guide" id="vp-guide-house">
+          <div class="vp-guide-tab" onclick="toggleVpGuide('house')" title="Controls guide">
+            <svg width="10" height="9" viewBox="0 0 10 9" fill="none"><line x1="1" y1="1.5" x2="9" y2="1.5" stroke="#44c0b9" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="4.5" x2="9" y2="4.5" stroke="#44c0b9" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="7.5" x2="9" y2="7.5" stroke="#44c0b9" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="vp-guide-panel">
+            <div class="vp-gi">
+              <div class="vp-gi-hd">CONTROLS</div>
+              <div class="vp-gi-row">
+                <div class="vp-gi-ico"><svg width="16" height="20" viewBox="0 0 16 20" fill="none"><path d="M8 10 L8 3 Q8 1.5 9.2 1.5 Q10.5 1.5 10.5 3 L10.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5.5 10 L5.5 5 Q5.5 3.8 6.8 3.8 Q8 3.8 8 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M10.5 8 L10.5 6 Q10.5 4.8 11.8 4.8 Q13 4.8 13 6 L13 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13 10 L13 8 Q13 7 14 7 Q15 7 15 8 L15 12 Q15 17 8 18 Q1 18 1 12 L1 10 Q1 8.5 3.2 8.5 Q5.5 8.5 5.5 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 0 L7 1.5 M8 0 L9 1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+                <div class="vp-gi-lbl"><b>DRAG</b>pan view</div>
+              </div>
+              <div class="vp-gi-sep"></div>
+              <div class="vp-gi-row">
+                <div class="vp-gi-ico"><svg width="18" height="20" viewBox="0 0 18 20" fill="none"><path d="M5 10 L5 3 Q5 1.5 6.5 1.5 Q8 1.5 8 3 L8 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M10 10 L10 3 Q10 1.5 11.5 1.5 Q13 1.5 13 3 L13 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M3 10 Q3 8.5 5 8.5 L8 8.5 L10 8.5 L13 8.5 Q15 8.5 15 10 L15 13 Q15 17.5 9 18 Q3 18 3 13 Z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M0.5 7 Q-0.5 10 1 13" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M0.5 7 L1.5 8 M0.5 7 L1.8 7.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+                <div class="vp-gi-lbl"><b>2 FINGERS</b>orbit angle</div>
+              </div>
+              <div class="vp-gi-sep"></div>
+              <div class="vp-gi-row">
+                <div class="vp-gi-ico"><svg width="18" height="16" viewBox="0 0 18 16" fill="none"><path d="M3 12 L3 4 Q3 2 5 2 Q7 2 7 4 L7 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M15 12 L15 4 Q15 2 13 2 Q11 2 11 4 L11 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8.2 9 L5.5 9" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M6.5 8 L5.5 9 L6.5 10" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.8 9 L12.5 9" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M11.5 8 L12.5 9 L11.5 10" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="vp-gi-lbl"><b>PINCH</b>zoom in/out</div>
+              </div>
+              <div class="vp-gi-sep"></div>
+              <div class="vp-gi-row">
+                <div class="vp-gi-ico"><svg width="12" height="17" viewBox="0 0 12 17" fill="none"><rect x="1" y="1" width="10" height="15" rx="5" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="4" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4.5 3 L6 1.5 L7.5 3" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 8.5 L6 10 L7.5 8.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="vp-gi-lbl"><b>SCROLL</b>zoom in/out</div>
+              </div>
+              <div class="vp-gi-sep"></div>
+              <div class="vp-gi-row">
+                <div class="vp-gi-ico" style="font-size:.9rem;color:rgba(68,192,185,.72)">✥</div>
+                <div class="vp-gi-lbl"><b>✥ BUTTON</b>orbit mode</div>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- HUD control buttons — inside scene, positioned correctly relative to it -->
         <div class="hud-bar" id="hud-bar-house">
           <button class="hud-btn" id="hud-zoom-in"  onclick="houseZoomIn()"  title="Zoom In"  aria-label="Zoom in"  style="font-size:1.1rem;font-weight:700;padding:0">+</button>
@@ -3812,6 +3863,41 @@ input:focus, textarea:focus, select:focus {
 
           <div class="scene" id="metals-scene">
             <svg id="metalsSvg" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block"></svg>
+            <!-- Left-edge collapsible guide -->
+            <div class="vp-guide" id="vp-guide-metals">
+              <div class="vp-guide-tab" onclick="toggleVpGuide('metals')" title="Controls guide">
+                <svg width="10" height="9" viewBox="0 0 10 9" fill="none"><line x1="1" y1="1.5" x2="9" y2="1.5" stroke="#44c0b9" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="4.5" x2="9" y2="4.5" stroke="#44c0b9" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="7.5" x2="9" y2="7.5" stroke="#44c0b9" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </div>
+              <div class="vp-guide-panel">
+                <div class="vp-gi">
+                  <div class="vp-gi-hd">CONTROLS</div>
+                  <div class="vp-gi-row">
+                    <div class="vp-gi-ico"><svg width="16" height="20" viewBox="0 0 16 20" fill="none"><path d="M8 10 L8 3 Q8 1.5 9.2 1.5 Q10.5 1.5 10.5 3 L10.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5.5 10 L5.5 5 Q5.5 3.8 6.8 3.8 Q8 3.8 8 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M10.5 8 L10.5 6 Q10.5 4.8 11.8 4.8 Q13 4.8 13 6 L13 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13 10 L13 8 Q13 7 14 7 Q15 7 15 8 L15 12 Q15 17 8 18 Q1 18 1 12 L1 10 Q1 8.5 3.2 8.5 Q5.5 8.5 5.5 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 0 L7 1.5 M8 0 L9 1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+                    <div class="vp-gi-lbl"><b>DRAG</b>pan view</div>
+                  </div>
+                  <div class="vp-gi-sep"></div>
+                  <div class="vp-gi-row">
+                    <div class="vp-gi-ico"><svg width="18" height="20" viewBox="0 0 18 20" fill="none"><path d="M5 10 L5 3 Q5 1.5 6.5 1.5 Q8 1.5 8 3 L8 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M10 10 L10 3 Q10 1.5 11.5 1.5 Q13 1.5 13 3 L13 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M3 10 Q3 8.5 5 8.5 L8 8.5 L10 8.5 L13 8.5 Q15 8.5 15 10 L15 13 Q15 17.5 9 18 Q3 18 3 13 Z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M0.5 7 Q-0.5 10 1 13" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M0.5 7 L1.5 8 M0.5 7 L1.8 7.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+                    <div class="vp-gi-lbl"><b>2 FINGERS</b>orbit angle</div>
+                  </div>
+                  <div class="vp-gi-sep"></div>
+                  <div class="vp-gi-row">
+                    <div class="vp-gi-ico"><svg width="18" height="16" viewBox="0 0 18 16" fill="none"><path d="M3 12 L3 4 Q3 2 5 2 Q7 2 7 4 L7 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M15 12 L15 4 Q15 2 13 2 Q11 2 11 4 L11 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8.2 9 L5.5 9" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M6.5 8 L5.5 9 L6.5 10" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.8 9 L12.5 9" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M11.5 8 L12.5 9 L11.5 10" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="vp-gi-lbl"><b>PINCH</b>zoom in/out</div>
+                  </div>
+                  <div class="vp-gi-sep"></div>
+                  <div class="vp-gi-row">
+                    <div class="vp-gi-ico"><svg width="12" height="17" viewBox="0 0 12 17" fill="none"><rect x="1" y="1" width="10" height="15" rx="5" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="4" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4.5 3 L6 1.5 L7.5 3" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 8.5 L6 10 L7.5 8.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="vp-gi-lbl"><b>SCROLL</b>zoom in/out</div>
+                  </div>
+                  <div class="vp-gi-sep"></div>
+                  <div class="vp-gi-row">
+                    <div class="vp-gi-ico" style="font-size:.9rem;color:rgba(68,192,185,.72)">✥</div>
+                    <div class="vp-gi-lbl"><b>✥ BUTTON</b>orbit mode</div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <!-- HUD inside scene — positions correctly relative to viewport -->
             <div class="hud-bar" id="hud-bar-metals">
               <button class="hud-btn" onclick="metalsZoomIn()"  title="Zoom In"  aria-label="Zoom in"  style="font-size:1.1rem;font-weight:700;padding:0">+</button>
@@ -7292,6 +7378,11 @@ function toggleOrbitMode() {
   _updateHUD();
 }
 
+function toggleVpGuide(id) {
+  var el = document.getElementById('vp-guide-' + id);
+  if (el) el.classList.toggle('open');
+}
+
 function _updateHUD() {
   var zEl = document.getElementById('hud-zoom-val');
   var aEl = document.getElementById('hud-angle-val');
@@ -7321,7 +7412,7 @@ function _updateHUD() {
 
     el.addEventListener('pointerdown', function(e) {
       // Ignore clicks on HUD buttons — let them bubble to onclick
-      if (e.target !== el && e.target.closest && e.target.closest('.hud-bar')) return;
+      if (e.target !== el && e.target.closest && (e.target.closest('.hud-bar') || e.target.closest('.vp-guide'))) return;
       e.preventDefault();
       el.setPointerCapture(e.pointerId);
       ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -7446,7 +7537,7 @@ function resetMetalsView(){_mPanX=0;_mPanY=0;_mAngle=0;_mZoom=1;_updateMetalsHUD
     }
 
     el.addEventListener('pointerdown', function(e) {
-      if (e.target !== el && e.target.closest && e.target.closest('.hud-bar')) return;
+      if (e.target !== el && e.target.closest && (e.target.closest('.hud-bar') || e.target.closest('.vp-guide'))) return;
       e.preventDefault();
       el.setPointerCapture(e.pointerId);
       ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
