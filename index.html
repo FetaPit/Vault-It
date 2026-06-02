@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.8.0';
+  var SW_VERSION = '0.8.1';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -25,7 +25,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(SW_URL).catch(function(){});
 }
 </script>
-<meta name="version" content="0.7.7-alpha">
+<meta name="version" content="0.8.0-alpha">
 <meta property="og:title" content="Vault·It — From Debt to Owning Your Home">
 <meta property="og:description" content="The only personal finance app built for the journey from debt to outright home ownership. Pioneer Edition.">
 <meta property="og:type" content="website">
@@ -2600,6 +2600,7 @@ input:focus, textarea:focus, select:focus {
 
     <!-- Step 2b: PIN entry (returning user) -->
     <div id="auth-pin-step" class="auth-step">
+      <div id="auth-returning-name" style="font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--tx);text-align:center;margin-bottom:4px;letter-spacing:.02em"></div>
       <div class="auth-label">Welcome back — enter your PIN for <span id="auth-pin-email" style="color:var(--em)"></span></div>
       <input id="auth-pin-inp" class="auth-inp" type="password" inputmode="numeric" maxlength="6" placeholder="••••"
         onkeydown="if(event.key==='Enter')authVerifyPin()">
@@ -3622,18 +3623,18 @@ input:focus, textarea:focus, select:focus {
           <div style="font-size:.58rem;color:var(--t2);line-height:1.6;max-width:260px;margin-bottom:16px">Every deposit adds bricks. Watch your home being built in real time. Pro only.</div>
           <button onclick="showUpgrade('annual')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:.6rem;cursor:pointer;letter-spacing:.06em">Invest in yourself →</button>
         </div>
-      </div>
-      <!-- HUD control buttons — outer frame, right edge -->
-      <div class="hud-bar" id="hud-bar-house">
-        <button class="hud-btn" id="hud-zoom-in"  onclick="houseZoomIn()"  title="Zoom In"  aria-label="Zoom in"  style="font-size:1.1rem;font-weight:700;padding:0">+</button>
-        <button class="hud-btn" id="hud-zoom-out" onclick="houseZoomOut()" title="Zoom Out" aria-label="Zoom out" style="font-size:1.2rem;font-weight:700;padding:0">−</button>
-        <div class="hud-sep"></div>
-        <button class="hud-btn hud-toggle" id="hud-orbit-toggle" onclick="toggleOrbitMode()" title="Toggle mouse orbit mode" aria-label="Toggle orbit mode">
-          <span id="hud-orbit-icon">✥</span>
-        </button>
-        <div class="hud-sep"></div>
-        <button class="hud-btn" id="hud-reset"   onclick="resetView()"    title="Reset view"  aria-label="Reset camera">↺</button>
-        <button class="hud-btn" onclick="toggleExpand()"                   title="Fullscreen"  aria-label="Fullscreen">⛶</button>
+        <!-- HUD control buttons — inside scene, positioned correctly relative to it -->
+        <div class="hud-bar" id="hud-bar-house">
+          <button class="hud-btn" id="hud-zoom-in"  onclick="houseZoomIn()"  title="Zoom In"  aria-label="Zoom in"  style="font-size:1.1rem;font-weight:700;padding:0">+</button>
+          <button class="hud-btn" id="hud-zoom-out" onclick="houseZoomOut()" title="Zoom Out" aria-label="Zoom out" style="font-size:1.2rem;font-weight:700;padding:0">−</button>
+          <div class="hud-sep"></div>
+          <button class="hud-btn hud-toggle" id="hud-orbit-toggle" onclick="toggleOrbitMode()" title="Toggle orbit mode" aria-label="Toggle orbit mode">
+            <span id="hud-orbit-icon">✥</span>
+          </button>
+          <div class="hud-sep"></div>
+          <button class="hud-btn" id="hud-reset"   onclick="resetView()"    title="Reset view"  aria-label="Reset camera">↺</button>
+          <button class="hud-btn" onclick="toggleExpand()"                   title="Fullscreen"  aria-label="Fullscreen">⛶</button>
+        </div>
       </div>
       <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
       <div class="scene-cap" id="sceneCap" style="display:none"></div>
@@ -3811,18 +3812,18 @@ input:focus, textarea:focus, select:focus {
 
           <div class="scene" id="metals-scene">
             <svg id="metalsSvg" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block"></svg>
-          </div>
-          <!-- Metals HUD buttons — outer frame, right edge -->
-          <div class="hud-bar" id="hud-bar-metals">
-            <button class="hud-btn" onclick="metalsZoomIn()"  title="Zoom In"  aria-label="Zoom in"  style="font-size:1.1rem;font-weight:700;padding:0">+</button>
-            <button class="hud-btn" onclick="metalsZoomOut()" title="Zoom Out" aria-label="Zoom out" style="font-size:1.2rem;font-weight:700;padding:0">−</button>
-            <div class="hud-sep"></div>
-            <button class="hud-btn hud-toggle" id="hud-metals-orbit-toggle" onclick="toggleMetalsOrbitMode()" title="Toggle mouse orbit mode" aria-label="Toggle orbit mode">
-              <span id="hud-metals-orbit-icon">✥</span>
-            </button>
-            <div class="hud-sep"></div>
-            <button class="hud-btn" onclick="resetMetalsView()" title="Reset view" aria-label="Reset camera">↺</button>
-            <button class="hud-btn" id="btnMetalsExpand" onclick="toggleMetalsExpand()" title="Fullscreen" aria-label="Fullscreen">⛶</button>
+            <!-- HUD inside scene — positions correctly relative to viewport -->
+            <div class="hud-bar" id="hud-bar-metals">
+              <button class="hud-btn" onclick="metalsZoomIn()"  title="Zoom In"  aria-label="Zoom in"  style="font-size:1.1rem;font-weight:700;padding:0">+</button>
+              <button class="hud-btn" onclick="metalsZoomOut()" title="Zoom Out" aria-label="Zoom out" style="font-size:1.2rem;font-weight:700;padding:0">−</button>
+              <div class="hud-sep"></div>
+              <button class="hud-btn hud-toggle" id="hud-metals-orbit-toggle" onclick="toggleMetalsOrbitMode()" title="Toggle orbit mode" aria-label="Toggle orbit mode">
+                <span id="hud-metals-orbit-icon">✥</span>
+              </button>
+              <div class="hud-sep"></div>
+              <button class="hud-btn" onclick="resetMetalsView()" title="Reset view" aria-label="Reset camera">↺</button>
+              <button class="hud-btn" id="btnMetalsExpand" onclick="toggleMetalsExpand()" title="Fullscreen" aria-label="Fullscreen">⛶</button>
+            </div>
           </div>
           <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
           <div class="scene-cap" id="metalsCap">—</div>
@@ -4734,7 +4735,7 @@ input:focus, textarea:focus, select:focus {
 @media(max-width:600px){.grid .panel{grid-template-columns:1fr}}
 .scene-card{position:relative;background:rgba(4,8,16,.95);border:1px solid rgba(68,192,185,.15);border-radius:6px;padding:16px}
 .scene-lbl{font-family:'Syne',sans-serif;font-size:.5rem;letter-spacing:.3em;text-transform:uppercase;color:#44c0b9;opacity:.5;margin-bottom:8px;text-align:center}
-.scene{position:relative;width:100%;aspect-ratio:unset;min-height:320px;height:clamp(320px,45vw,520px);overflow:hidden;border-radius:3px;cursor:grab;-webkit-user-select:none;user-select:none}
+.scene{position:relative;width:100%;aspect-ratio:unset;min-height:320px;height:clamp(320px,45vw,520px);overflow:hidden;border-radius:3px;cursor:grab;-webkit-user-select:none;user-select:none;touch-action:none;will-change:transform}
 .scene:active{cursor:grabbing}
 .btn-expand{position:absolute;top:10px;right:10px;background:rgba(68,192,185,.12);border:1px solid rgba(68,192,185,.3);border-radius:3px;color:#44c0b9;font-size:.72rem;padding:4px 9px;cursor:pointer;z-index:10;font-family:'Share Tech Mono',monospace;transition:all .2s;line-height:1}
 .btn-expand:hover{background:rgba(68,192,185,.28)}
@@ -6145,7 +6146,6 @@ let _ox=300, _oy=200, _tx=28, _ty=14, _tz=30;
 
 // Pan & orbit state
 let _panX=0, _panY=0, _viewAngle=0, _isExpanded=false;
-let _isDragging=false, _dragX=0, _dragY=0;
 
 function _iso(x,y,z){
   let rx=x, ry=y;
@@ -7301,107 +7301,104 @@ function _updateHUD() {
   if (mEl) mEl.textContent = _orbitMode ? 'ORBIT MODE' : 'PAN MODE';
 }
 
-(function() {
-  var sceneEl = document.getElementById('house-scene') || S;
-  const el = sceneEl;
+// ── HOUSE BUILDER GESTURE SYSTEM (Pointer Events API) ─────────────────────────
+// Unified mouse+touch+stylus via PointerEvents — setPointerCapture ensures
+// events continue when pointer leaves the element boundary. touch-action:none
+// in CSS tells the browser not to intercept the touch stream for scrolling.
+(function initHouseGestures() {
+  function attach() {
+    var el = document.getElementById('house-scene');
+    if (!el) return;
 
-  // ── MOUSE ──
-  el.addEventListener('mousedown', function(e) {
-    _isDragging = true; _dragX = e.clientX; _dragY = e.clientY;
-    el.style.cursor = 'grabbing'; e.preventDefault();
-  });
-  window.addEventListener('mousemove', function(e) {
-    if (!_isDragging) return;
-    var dx = e.clientX - _dragX, dy = e.clientY - _dragY;
-    if (_orbitMode) {
-      _viewAngle -= dx * 0.006;
-      _panY      += dy * 0.35;
-    } else {
-      _panX += dx; _panY += dy;
+    var ptrs = new Map(); // pointerId → {x,y}
+    var _pinchStartDist = 0, _pinchStartZoom = 1;
+    var _orb2PrevX = 0;
+
+    function pDist(a, b) {
+      var dx = a.x - b.x, dy = a.y - b.y;
+      return Math.sqrt(dx * dx + dy * dy);
     }
-    _dragX = e.clientX; _dragY = e.clientY;
-    _updateHUD(); redraw();
-  });
-  window.addEventListener('mouseup', function() {
-    _isDragging = false; el.style.cursor = 'grab';
-  });
-  el.addEventListener('wheel', function(e) {
-    e.preventDefault();
-    _houseSetZoom(_houseZoom - e.deltaY * 0.0012);
-  }, { passive: false });
 
-  // ── TOUCH ──
-  var _t0 = null, _t1 = null;
-  var _pinchDist0 = 0, _pinchZoom0 = 1;
-  var _orb2PrevX = 0, _orb2PrevY = 0;
+    el.addEventListener('pointerdown', function(e) {
+      // Ignore clicks on HUD buttons — let them bubble to onclick
+      if (e.target !== el && e.target.closest && e.target.closest('.hud-bar')) return;
+      e.preventDefault();
+      el.setPointerCapture(e.pointerId);
+      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      el.style.cursor = 'grabbing';
 
-  function touchDist(a, b) {
-    var dx = a.clientX - b.clientX, dy = a.clientY - b.clientY;
-    return Math.sqrt(dx*dx + dy*dy);
-  }
-
-  el.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    if (e.touches.length === 1) {
-      // 1-finger: pan
-      _t0 = e.touches[0];
-      _isDragging = true;
-      _dragX = _t0.clientX; _dragY = _t0.clientY;
-      _t1 = null;
-    } else if (e.touches.length === 2) {
-      // 2-finger: orbit + pinch zoom
-      _isDragging = false;
-      _t0 = e.touches[0]; _t1 = e.touches[1];
-      _pinchDist0 = touchDist(_t0, _t1);
-      _pinchZoom0 = _houseZoom;
-      _orb2PrevX = (_t0.clientX + _t1.clientX) / 2;
-      _orb2PrevY = (_t0.clientY + _t1.clientY) / 2;
-    }
-  }, { passive: false });
-
-  el.addEventListener('touchmove', function(e) {
-    e.preventDefault();
-    if (e.touches.length === 1 && _isDragging) {
-      var t = e.touches[0];
-      var dx = t.clientX - _dragX, dy = t.clientY - _dragY;
-      if (_orbitMode) {
-        _viewAngle -= dx * 0.008;
-        _panY      += dy * 0.35;
-      } else {
-        _panX += dx; _panY += dy;
+      if (ptrs.size === 2) {
+        var pts = Array.from(ptrs.values());
+        _pinchStartDist = pDist(pts[0], pts[1]);
+        _pinchStartZoom = _houseZoom;
+        _orb2PrevX = (pts[0].x + pts[1].x) / 2;
       }
-      _dragX = t.clientX; _dragY = t.clientY;
-      _updateHUD(); redraw();
-    } else if (e.touches.length === 2) {
-      var ta = e.touches[0], tb = e.touches[1];
-      // Pinch = zoom
-      var newDist = touchDist(ta, tb);
-      _houseSetZoom(_pinchZoom0 * (newDist / _pinchDist0));
-      // 2-finger drag midpoint = orbit
-      var midX = (ta.clientX + tb.clientX) / 2;
-      var midY = (ta.clientY + tb.clientY) / 2;
-      _viewAngle -= (midX - _orb2PrevX) * 0.008;
-      _orb2PrevX = midX; _orb2PrevY = midY;
-      _updateHUD(); redraw();
+    });
+
+    el.addEventListener('pointermove', function(e) {
+      if (!ptrs.has(e.pointerId)) return;
+      var prev = ptrs.get(e.pointerId);
+      var cur = { x: e.clientX, y: e.clientY };
+      ptrs.set(e.pointerId, cur);
+
+      if (ptrs.size === 1) {
+        var dx = cur.x - prev.x, dy = cur.y - prev.y;
+        if (_orbitMode) {
+          _viewAngle -= dx * 0.007;
+          _viewAngle = _viewAngle % (2 * Math.PI); // normalise — Bug 6 fix
+          _panY += dy * 0.35;
+        } else {
+          _panX += dx; _panY += dy;
+        }
+        _updateHUD(); redraw();
+      } else if (ptrs.size === 2) {
+        var pts = Array.from(ptrs.values());
+        var dist = pDist(pts[0], pts[1]);
+        if (_pinchStartDist > 0) _houseSetZoom(_pinchStartZoom * (dist / _pinchStartDist));
+        var midX = (pts[0].x + pts[1].x) / 2;
+        _viewAngle -= (midX - _orb2PrevX) * 0.007;
+        _viewAngle = _viewAngle % (2 * Math.PI);
+        _orb2PrevX = midX;
+        _updateHUD(); redraw();
+      }
+    });
+
+    function onUp(e) {
+      ptrs.delete(e.pointerId);
+      try { el.releasePointerCapture(e.pointerId); } catch(_) {}
+      if (ptrs.size === 0) el.style.cursor = 'grab';
+      // Reset pinch baseline when going from 2→1 fingers
+      if (ptrs.size === 1) {
+        var pts = Array.from(ptrs.values());
+        _pinchStartZoom = _houseZoom;
+        _orb2PrevX = pts[0].x;
+      }
     }
-  }, { passive: false });
+    el.addEventListener('pointerup',     onUp);
+    el.addEventListener('pointercancel', onUp);
 
-  el.addEventListener('touchend', function(e) {
-    if (e.touches.length < 2) { _t1 = null; }
-    if (e.touches.length === 0) { _isDragging = false; }
-  }, { passive: false });
+    el.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      _houseSetZoom(_houseZoom - e.deltaY * 0.0012);
+      _updateHUD(); redraw();
+    }, { passive: false });
 
-  // Escape key closes expand
-  window.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && _isExpanded) toggleExpand();
-  });
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && _isExpanded) toggleExpand();
+    });
 
-  _updateHUD();
-})();
+    _updateHUD();
+  }
+  // Guarantee DOM is ready — no setTimeout guesswork
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attach);
+  } else {
+    attach();
+  }
+}());
 
 // ── METALS VIEWPORT STATE & CONTROLS ──────────────────────────────
 var _mPanX=0, _mPanY=0, _mAngle=0, _mIsExpanded=false, _mZoom=1;
-var _mDragging=false, _mDragX=0, _mDragY=0;
 var _mOrbitMode=false;
 
 function _updateMetalsHUD(){
@@ -7434,64 +7431,88 @@ function toggleMetalsExpand(){
 }
 function resetMetalsView(){_mPanX=0;_mPanY=0;_mAngle=0;_mZoom=1;_updateMetalsHUD();renderMetalsISO();}
 
-(function(){
-  function getEl(){return document.getElementById('metalsSvg');}
-  function mTouchDist(a,b){var dx=a.clientX-b.clientX,dy=a.clientY-b.clientY;return Math.sqrt(dx*dx+dy*dy);}
-  var _mPinchDist0=0,_mPinchZoom0=1,_mOrb2PrevX=0,_mOrb2PrevY=0;
+// ── METALS GESTURE SYSTEM (Pointer Events API) ────────────────────────────────
+(function initMetalsGestures() {
+  function attach() {
+    var el = document.getElementById('metals-scene');
+    if (!el) return;
 
-  function setup(){
-    var sceneDiv=document.getElementById('metals-scene');
-    var el=sceneDiv||getEl();
-    if(!el)return;
-    // Mouse: 1-click drag = pan by default, orbit mode toggle switches to orbit
-    el.addEventListener('mousedown',function(e){_mDragging=true;_mDragX=e.clientX;_mDragY=e.clientY;el.style.cursor='grabbing';e.preventDefault();});
-    window.addEventListener('mousemove',function(e){
-      if(!_mDragging)return;
-      var dx=e.clientX-_mDragX,dy=e.clientY-_mDragY;
-      if(_mOrbitMode){_mAngle-=dx*0.006;_mPanY+=dy*0.4;}
-      else{_mPanX+=dx;_mPanY+=dy;}
-      _mDragX=e.clientX;_mDragY=e.clientY;
-      _updateMetalsHUD();renderMetalsISO();
+    var ptrs = new Map();
+    var _mPinchStartDist = 0, _mPinchStartZoom = 1, _mOrb2PrevX = 0;
+
+    function pDist(a, b) {
+      var dx = a.x - b.x, dy = a.y - b.y;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    el.addEventListener('pointerdown', function(e) {
+      if (e.target !== el && e.target.closest && e.target.closest('.hud-bar')) return;
+      e.preventDefault();
+      el.setPointerCapture(e.pointerId);
+      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      el.style.cursor = 'grabbing';
+
+      if (ptrs.size === 2) {
+        var pts = Array.from(ptrs.values());
+        _mPinchStartDist = pDist(pts[0], pts[1]);
+        _mPinchStartZoom = _mZoom || 1;
+        _mOrb2PrevX = (pts[0].x + pts[1].x) / 2;
+      }
     });
-    window.addEventListener('mouseup',function(){_mDragging=false;var el2=getEl();if(el2)el2.style.cursor='grab';});
-    // Touch: 1-finger = pan, 2-finger = orbit + pinch zoom
-    el.addEventListener('touchstart',function(e){
-      e.preventDefault();
-      if(e.touches.length===1){
-        _mDragging=true;_mDragX=e.touches[0].clientX;_mDragY=e.touches[0].clientY;
-      } else if(e.touches.length===2){
-        _mDragging=false;
-        var ta=e.touches[0],tb=e.touches[1];
-        _mPinchDist0=mTouchDist(ta,tb);_mPinchZoom0=_mZoom||1;
-        _mOrb2PrevX=(ta.clientX+tb.clientX)/2;_mOrb2PrevY=(ta.clientY+tb.clientY)/2;
+
+    el.addEventListener('pointermove', function(e) {
+      if (!ptrs.has(e.pointerId)) return;
+      var prev = ptrs.get(e.pointerId);
+      var cur = { x: e.clientX, y: e.clientY };
+      ptrs.set(e.pointerId, cur);
+
+      if (ptrs.size === 1) {
+        var dx = cur.x - prev.x, dy = cur.y - prev.y;
+        if (_mOrbitMode) { _mAngle -= dx * 0.007; _mAngle = _mAngle % (2 * Math.PI); _mPanY += dy * 0.4; }
+        else { _mPanX += dx; _mPanY += dy; }
+        _updateMetalsHUD(); renderMetalsISO();
+      } else if (ptrs.size === 2) {
+        var pts = Array.from(ptrs.values());
+        var dist = pDist(pts[0], pts[1]);
+        if (_mPinchStartDist > 0) _mZoom = Math.max(0.3, Math.min(3.5, _mPinchStartZoom * (dist / _mPinchStartDist)));
+        var midX = (pts[0].x + pts[1].x) / 2;
+        _mAngle -= (midX - _mOrb2PrevX) * 0.007;
+        _mAngle = _mAngle % (2 * Math.PI);
+        _mOrb2PrevX = midX;
+        _updateMetalsHUD(); renderMetalsISO();
       }
-    },{passive:false});
-    el.addEventListener('touchmove',function(e){
-      e.preventDefault();
-      if(e.touches.length===1&&_mDragging){
-        var t=e.touches[0],dx=t.clientX-_mDragX,dy=t.clientY-_mDragY;
-        if(_mOrbitMode){_mAngle-=dx*0.008;_mPanY+=dy*0.4;}
-        else{_mPanX+=dx;_mPanY+=dy;}
-        _mDragX=t.clientX;_mDragY=t.clientY;
-        _updateMetalsHUD();renderMetalsISO();
-      } else if(e.touches.length===2){
-        var ta=e.touches[0],tb=e.touches[1];
-        var newDist=mTouchDist(ta,tb);
-        _mZoom=Math.max(0.3,Math.min(3.5,_mPinchZoom0*(newDist/_mPinchDist0)));
-        var midX=(ta.clientX+tb.clientX)/2,midY=(ta.clientY+tb.clientY)/2;
-        _mAngle-=(midX-_mOrb2PrevX)*0.008;
-        _mOrb2PrevX=midX;_mOrb2PrevY=midY;
-        _updateMetalsHUD();renderMetalsISO();
+    });
+
+    function onUp(e) {
+      ptrs.delete(e.pointerId);
+      try { el.releasePointerCapture(e.pointerId); } catch(_) {}
+      if (ptrs.size === 0) el.style.cursor = 'grab';
+      if (ptrs.size === 1) {
+        _mPinchStartZoom = _mZoom;
+        _mOrb2PrevX = Array.from(ptrs.values())[0].x;
       }
-    },{passive:false});
-    el.addEventListener('touchend',function(e){if(e.touches.length===0)_mDragging=false;});
-    el.addEventListener('wheel',function(e){_mZoom=Math.max(0.3,Math.min(3.5,(_mZoom||1)-e.deltaY*0.001));_updateMetalsHUD();renderMetalsISO();e.preventDefault();},{passive:false});
-    window.addEventListener('keydown',function(e){if(e.key==='Escape'&&_mIsExpanded)toggleMetalsExpand();});
+    }
+    el.addEventListener('pointerup',     onUp);
+    el.addEventListener('pointercancel', onUp);
+
+    el.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      _mZoom = Math.max(0.3, Math.min(3.5, (_mZoom || 1) - e.deltaY * 0.001));
+      _updateMetalsHUD(); renderMetalsISO();
+    }, { passive: false });
+
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && _mIsExpanded) toggleMetalsExpand();
+    });
+
     _updateMetalsHUD();
   }
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',setup);}
-  else{setTimeout(setup,100);}
-})();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attach);
+  } else {
+    attach();
+  }
+}());
 
 // ── INCOME STREAM BUILDER CONSTANTS (must be before init block) ──
 var _ISB_TYPES={passive:'Passive',active:'Active','portfolio':'Portfolio'};
@@ -7686,6 +7707,12 @@ function authSubmitEmail() {
   if (localStorage.getItem('vi_pin_' + _hashStr(email))) {
     var emailDisp = document.getElementById('auth-pin-email');
     if (emailDisp) emailDisp.textContent = email;
+    // Personalise with stored first name
+    try {
+      var _ru = JSON.parse(localStorage.getItem('vi_user') || '{}');
+      var _rn = document.getElementById('auth-returning-name');
+      if (_rn) _rn.textContent = _ru.name ? 'Your vault is here, ' + _ru.name + '.' : '';
+    } catch(e) {}
     _showAuthStep('pin');
   } else {
     // Send OTP
@@ -13137,9 +13164,140 @@ function initWelcome() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() { initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); });
+  document.addEventListener('DOMContentLoaded', function() { initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); });
 } else {
-  initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge();
+  initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed();
+}
+
+// ─── ALPHA TEST SEEDER ────────────────────────────────────────────────────────
+// Trigger: append ?alpha=kajal69 to URL  (or call _seedKajalAlpha() in console)
+// Simulates Alpha Pioneer 001/033 — Kajal Six Nine — Indian median resident
+function _seedKajalAlpha() {
+  var now = Date.now();
+  // ── Identity ──
+  var user = {
+    name:       'Kajal',
+    email:      'kajal69@vault-it.alpha',
+    phone:      '+91 98765 43210',
+    job:        'Junior Software Engineer',
+    dream:      'Financial Independence & Passive Income by 35',
+    goal:       3, // Wealth Building
+    saveArch:   'The Measured Saver',
+    spendArch:  'The Pragmatist',
+    joined:     '2026-06-02T00:00:00.000Z',
+    pioneerNum: 1,
+    currency:   'INR',
+    income:     491,  // £491/mo ≈ ₹52,000
+    expenses:   330,  // £330/mo ≈ ₹35,000
+    pro:        false
+  };
+  localStorage.setItem('vi_user', JSON.stringify(user));
+
+  // ── Session (7 days) ──
+  localStorage.setItem('vi_session', JSON.stringify({ email: user.email, expiry: now + 7*24*60*60*1000 }));
+
+  // ── Pioneer / Founder status ──
+  localStorage.setItem('vi_pioneer',       'true');
+  localStorage.setItem('vi_pioneer_email', user.email);
+  localStorage.setItem('vi_pioneer_num',   '1');
+  localStorage.setItem('vi_founder',       'true');
+  localStorage.setItem('vi_founder_email', user.email);
+  localStorage.setItem('vi_founder_num',   '1');
+  localStorage.setItem('vi_founder_taken', '1');
+
+  // ── Settings: INR, dark ──
+  localStorage.setItem('vi_settings', JSON.stringify({ theme:'dark', currency:'INR', density:'default' }));
+
+  // ── Assets & Liabilities (stored in GBP base; display ×106 in INR) ──
+  // Cash: HDFC savings £424 = ₹44,944 | SBI Fixed Deposit £1,698 = ₹179,988
+  // Metals: 20g gold @ £1,950/oz (1oz=31.1g → 20g = 0.6435oz → £1,255)
+  // Crypto: 0.0012 BTC @ £67,000 = £80
+  // Other: EPF £896 = ₹94,976 | LIC Endowment £283 = ₹29,998
+  // Liabilities: Personal Loan £2,358 = ₹249,948 | Credit Card £222 = ₹23,532
+  var alData = {
+    metals: { gold: 0.6435, silver: 0, platinum: 0, palladium: 0 },
+    metalPrices: { gold: 1950, silver: 23.5, platinum: 1020, palladium: 1100 },
+    crypto: [
+      { id: 1, sym: 'BTC', amount: 0.0012, price: 67000 },
+      { id: 2, sym: 'ETH', amount: 0,      price: 3200  }
+    ],
+    cashAccounts: [
+      { id: now+1, name: 'HDFC Bank — Savings', type: 'Current', balance: 424  },
+      { id: now+2, name: 'SBI Fixed Deposit 7.1% p.a.', type: 'Savings', balance: 1698 }
+    ],
+    otherAssets: [
+      { id: now+3, name: 'EPF / Employees Provident Fund', value: 896, image: null, svgIcon: null, imageSearch: null },
+      { id: now+4, name: 'LIC Endowment Policy (surrender value)', value: 283, image: null, svgIcon: null, imageSearch: null }
+    ],
+    liabilities: [
+      { id: now+5, name: 'HDFC Personal Loan', value: 2358, rate: 14, depRate: 0, runningCost: 54.7, addedDate: '2026-06-02T00:00:00.000Z' },
+      { id: now+6, name: 'Axis Bank Credit Card', value: 222, rate: 42, depRate: 0, runningCost: 18.9, addedDate: '2026-06-02T00:00:00.000Z' }
+    ]
+  };
+  localStorage.setItem('pos_al1', JSON.stringify(alData));
+
+  // ── Debts ──
+  var debtData = { debts: [
+    { id: now+7,  name: 'HDFC Personal Loan', type: 'Personal Loan', balance: 2358, original: 2358, rate: 14, min: 54.7,  color: '#e05c5c', startDate: '2025-01-15' },
+    { id: now+8,  name: 'Axis Bank Credit Card', type: 'Credit Card', balance: 222, original: 222, rate: 42, min: 18.9,  color: '#c9a84c', startDate: '2026-02-01' }
+  ]};
+  localStorage.setItem('pos_debt1', JSON.stringify(debtData));
+
+  // ── Cashflow (Overarching) ──
+  var ovData = {
+    income:   [{ id: now+9,  name: 'Monthly Take-Home (TCS)',  amount: 491 }],
+    expenses: [
+      { id: now+10, name: 'Rent (PG / Flat share)', amount: 94  },
+      { id: now+11, name: 'Food & Groceries',        amount: 76  },
+      { id: now+12, name: 'Transport (metro + auto)',amount: 28  },
+      { id: now+13, name: 'Loan EMI',                amount: 55  },
+      { id: now+14, name: 'Subscriptions & Phone',   amount: 18  },
+      { id: now+15, name: 'Eating Out & Social',     amount: 38  }
+    ],
+    snapshots: [
+      { date: '2025-09-01', nw: -680  },
+      { date: '2025-10-01', nw: -510  },
+      { date: '2025-11-01', nw: -290  },
+      { date: '2025-12-01', nw:  140  },
+      { date: '2026-01-01', nw:  580  },
+      { date: '2026-02-01', nw:  940  },
+      { date: '2026-03-01', nw: 1200  },
+      { date: '2026-04-01', nw: 1540  },
+      { date: '2026-05-01', nw: 1820  }
+    ]
+  };
+  localStorage.setItem('pos4', JSON.stringify(ovData));
+
+  // ── Journey ──
+  var jrnyData = {
+    profile: { monthlyTakeHome: 491, mortgageTermYears: 20, interestRateEst: 8.5, depositTargetPct: 20, creditHealth: 'fair', efMonths: 3 },
+    onboarded: true, stageOverride: 3, mortgageActive: false, mortgageBalance: 0, rentMonthly: 94, rentYears: 2
+  };
+  localStorage.setItem('pos_journey', JSON.stringify(jrnyData));
+
+  // ── Achievements ──
+  var achData = { xp: 285, unlocked: ['nw100','nw500','nw1k','nw2k','debtstart','ef1k'], connected: {} };
+  localStorage.setItem('pos_ach1', JSON.stringify(achData));
+
+  // ── Net Worth History (last 9 months) ──
+  var nwhData = {
+    birthYear: 1998, setupDone: true,
+    points: [
+      { year: 2025, age: 27, netWorth: -680,  cash: 200,  stocks: 0, metals: 800, crypto: 50,  property: 0, liabilities: 1730, notes: 'Started tracking', estimated: false },
+      { year: 2026, age: 28, netWorth: 1820,  cash: 2122, stocks: 0, metals: 1255, crypto: 80, property: 0, liabilities: 2580, notes: 'Pioneer Alpha 001', estimated: false }
+    ]
+  };
+  localStorage.setItem('vi_nw_history', JSON.stringify(nwhData));
+
+  showToast('Alpha test profile loaded — Kajal Six Nine · Pioneer 001/033');
+  setTimeout(function() { location.reload(); }, 1200);
+}
+
+function _checkAlphaTestSeed() {
+  if (new URLSearchParams(window.location.search).has('alpha') &&
+      new URLSearchParams(window.location.search).get('alpha') === 'kajal69') {
+    setTimeout(_seedKajalAlpha, 400);
+  }
 }
 
 // ─────────────────────────────────────────────────────────
@@ -13602,7 +13760,7 @@ function nwhRenderMini(){
   <!-- Centre dot -->
   <circle cx="7.0" cy="7.0" r="0.4" fill="#44c0b9" opacity="0.4"/>
 </svg></div> PT Live Design</span>
-  <span class="footer-version">Vault·It v0.8.0 Alpha · Updated 2 Jun 2026</span>
+  <span class="footer-version">Vault·It v0.8.1 Alpha · Updated 2 Jun 2026</span>
 </div>
 
 <!-- ══ ALPHA ACCESS MODAL ══ -->
