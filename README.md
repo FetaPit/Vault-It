@@ -8,8 +8,6 @@
 
 **[fetapit.github.io/Vault-It/](https://fetapit.github.io/Vault-It/)**
 
-Custom domain: `vault-it.com` *(coming soon)*
-
 ## What It Does
 
 A single-file web app that takes you from debt to owning your home — one stage at a time.
