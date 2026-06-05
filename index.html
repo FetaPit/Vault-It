@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.9.0';
+  var SW_VERSION = '0.9.1';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -25,7 +25,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(SW_URL).catch(function(){});
 }
 </script>
-<meta name="version" content="0.9.0-alpha">
+<meta name="version" content="0.9.1-alpha">
 <meta property="og:title" content="Vault·It — From Debt to Owning Your Home">
 <meta property="og:description" content="The only personal finance app built for the journey from debt to outright home ownership. Pioneer Edition.">
 <meta property="og:type" content="website">
@@ -2889,6 +2889,15 @@ input:focus, textarea:focus, select:focus {
           <span><b>Building wealth</b> — I own a home and want financial freedom</span>
         </button>
       </div>
+      <div style="margin-bottom:12px">
+        <div class="w-label">Your currency</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" class="w-curr-btn active" data-c="GBP" onclick="wSetCurrency('GBP')" style="flex:1;padding:8px 4px;background:rgba(68,192,185,.15);border:1px solid rgba(68,192,185,.4);border-radius:6px;color:var(--em);font-family:'Share Tech Mono',monospace;font-size:.5rem;cursor:pointer">£ GBP</button>
+          <button type="button" class="w-curr-btn" data-c="USD" onclick="wSetCurrency('USD')" style="flex:1;padding:8px 4px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.15);border-radius:6px;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.5rem;cursor:pointer">$ USD</button>
+          <button type="button" class="w-curr-btn" data-c="EUR" onclick="wSetCurrency('EUR')" style="flex:1;padding:8px 4px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.15);border-radius:6px;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.5rem;cursor:pointer">€ EUR</button>
+          <button type="button" class="w-curr-btn" data-c="INR" onclick="wSetCurrency('INR')" style="flex:1;padding:8px 4px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.15);border-radius:6px;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.5rem;cursor:pointer">₹ INR</button>
+        </div>
+      </div>
       <button class="welcome-cta" onclick="wStep1Next()" style="margin-top:14px">Continue →</button>
     </div>
 
@@ -2898,19 +2907,19 @@ input:focus, textarea:focus, select:focus {
       <div class="welcome-sub">These numbers power your Journey Map from day one. You can update them any time.</div>
       <div class="g-form">
         <div class="welcome-field" style="margin:0">
-          <label>Monthly Take-Home (£)</label>
+          <label>Monthly Take-Home (<span class="w-currency-label">£</span>)</label>
           <input type="number" class="welcome-inp" id="w-income" placeholder="e.g. 2200" min="0">
         </div>
         <div class="welcome-field" style="margin:0">
-          <label>Monthly Expenses (£)</label>
+          <label>Monthly Expenses (<span class="w-currency-label">£</span>)</label>
           <input type="number" class="welcome-inp" id="w-expenses" placeholder="e.g. 1600" min="0">
         </div>
         <div class="welcome-field" style="margin:0">
-          <label>Total Debt (£)</label>
+          <label>Total Debt (<span class="w-currency-label">£</span>)</label>
           <input type="number" class="welcome-inp" id="w-debt" placeholder="0 if debt-free" min="0">
         </div>
         <div class="welcome-field" style="margin:0">
-          <label>Dream Home Target (£)</label>
+          <label>Dream Home Target (<span class="w-currency-label">£</span>)</label>
           <input type="number" class="welcome-inp" id="w-house" placeholder="e.g. 200000" min="0">
         </div>
       </div>
@@ -7784,7 +7793,14 @@ async function _initSupabaseSession() {
       var ov = document.getElementById('login-overlay');
       if (ov) ov.style.display = 'none';
     }
-    if (hydrated) { try { renderAll(); } catch(e) {} }
+    if (hydrated) {
+      try { if(typeof loadState==='function') loadState(); } catch(e) {}
+      try { if(typeof updateKPIs==='function') updateKPIs(); } catch(e) {}
+      try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
+      try { if(typeof renderCashflow==='function') renderCashflow(); } catch(e) {}
+      try { if(typeof renderDebtTab==='function') renderDebtTab(); } catch(e) {}
+      try { if(typeof renderPioneerCard==='function') renderPioneerCard(); } catch(e) {}
+    }
   } catch(e) {}
 }
 // ─────────────────────────────────────────────────────────────
@@ -7983,7 +7999,13 @@ function _completeAuth(email) {
   }
   var overlay = document.getElementById('login-overlay');
   if (overlay) overlay.style.display = 'none';
-  try { renderPioneerCard(); } catch(e) {}
+  // Re-render UI with restored data
+  setTimeout(function() {
+    try { if(typeof updateKPIs==='function') updateKPIs(); } catch(e) {}
+    try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
+    try { if(typeof renderCashflow==='function') renderCashflow(); } catch(e) {}
+    try { if(typeof renderPioneerCard==='function') renderPioneerCard(); } catch(e) {}
+  }, 100);
 }
 
 // ── DATA RESET ────────────────────────────────────────────────
@@ -8005,7 +8027,7 @@ function addIncome(){
   var a=parseFloat(document.getElementById('cf-inc-amt').value);
   if(!n||isNaN(a)){showToast('Enter name and amount');return;}
   if(!ovState.income)ovState.income=[];
-  ovState.income.push({id:Date.now(),name:n,amount:a});
+  ovState.income.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1)});
   document.getElementById('cf-inc-name').value='';
   document.getElementById('cf-inc-amt').value='';
   saveState();renderCashflow();updateKPIs();
@@ -8016,7 +8038,7 @@ function addExpense(){
   if(!n||isNaN(a)){showToast('Enter name and amount');return;}
   if(!ovState.expenses)ovState.expenses=[];
   var cat=(document.getElementById('cf-exp-cat')||{}).value||'necessity';
-  ovState.expenses.push({id:Date.now(),name:n,amount:a,category:cat});
+  ovState.expenses.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),category:cat});
   document.getElementById('cf-exp-name').value='';
   document.getElementById('cf-exp-amt').value='';
   saveState();renderCashflow();updateKPIs();
@@ -8514,7 +8536,7 @@ function updateCryptoAmount(id,val){var c=alState.crypto.find(function(x){return
 function addCashAccount(){
   var n=document.getElementById('ca-name').value.trim();
   var t=document.getElementById('ca-type').value;
-  var b=parseFloat(document.getElementById('ca-bal').value)||0;
+  var b=(parseFloat(document.getElementById('ca-bal').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
   alState.cashAccounts.push({id:Date.now(),name:n,type:t,balance:b});
   document.getElementById('ca-name').value='';document.getElementById('ca-bal').value='';
@@ -8523,7 +8545,7 @@ function addCashAccount(){
 function delCashAccount(id){alState.cashAccounts=alState.cashAccounts.filter(function(a){return a.id!==id;});saveAL();renderAlTab();updateKPIs();renderCashISO();}
 function addOtherAsset(){
   var n=document.getElementById('oa-name').value.trim();
-  var v=parseFloat(document.getElementById('oa-val').value)||0;
+  var v=(parseFloat(document.getElementById('oa-val').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
   if(!isPioneer()&&(alState.otherAssets||[]).length>=FREE_LIMITS.assets){showPaywall('assets');return;}
   alState.otherAssets.push({id:Date.now(),name:n,value:v,image:null,svgIcon:null,imageSearch:null});
@@ -8841,10 +8863,10 @@ function wiSetIcon(id,icon,targetList){
 
 function addLiability(){
   var n=document.getElementById('li-name').value.trim();
-  var v=parseFloat(document.getElementById('li-val').value)||0;
+  var v=(parseFloat(document.getElementById('li-val').value)||0)/(window.VI_CURRENCY_RATE||1);
   var r=parseFloat(document.getElementById('li-rate').value)||0;
   var dep=parseFloat((document.getElementById('li-dep')||{}).value)||0;
-  var run=parseFloat((document.getElementById('li-run')||{}).value)||0;
+  var run=(parseFloat((document.getElementById('li-run')||{}).value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
   if(!isPioneer()&&(alState.liabilities||[]).length>=FREE_LIMITS.liabilities){showPaywall('liabilities');return;}
   alState.liabilities.push({id:Date.now(),name:n,value:v,rate:r,depRate:dep,runningCost:run,addedDate:new Date().toISOString()});
@@ -8864,9 +8886,9 @@ function debtTotal(){return debtState.debts.reduce(function(s,d){return s+d.bala
 function showDebtForm(){document.getElementById('debt-form-card').style.display='block';}
 function saveDebt(){
   var n=document.getElementById('df-name').value.trim();
-  var b=parseFloat(document.getElementById('df-balance').value)||0;
+  var b=(parseFloat(document.getElementById('df-balance').value)||0)/(window.VI_CURRENCY_RATE||1);
   var r=parseFloat(document.getElementById('df-rate').value)||0;
-  var m=parseFloat(document.getElementById('df-min').value)||0;
+  var m=(parseFloat(document.getElementById('df-min').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
   if(!isPioneer()&&(debtState.debts||[]).filter(function(d){return !d._onboarding;}).length>=FREE_LIMITS.debts){showPaywall('debts');return;}
   var dtype=(document.getElementById('di-type')||{}).value||'other';
@@ -12618,6 +12640,18 @@ function selectWelcomeOpt(btn) {
 }
 
 // Step 1 → Step 2
+function wSetCurrency(c) {
+  document.querySelectorAll('.w-curr-btn').forEach(function(b) {
+    var isActive = b.getAttribute('data-c') === c;
+    b.style.background = isActive ? 'rgba(68,192,185,.15)' : 'rgba(68,192,185,.05)';
+    b.style.borderColor = isActive ? 'rgba(68,192,185,.4)' : 'rgba(68,192,185,.15)';
+    b.style.color = isActive ? 'var(--em)' : 'var(--t3)';
+  });
+  switchCurrency(c);
+  // Update Step 2 labels to show correct symbol
+  var sym = {GBP:'£',USD:'$',EUR:'€',INR:'₹'}[c] || '£';
+  document.querySelectorAll('.w-currency-label').forEach(function(el){ el.textContent = sym; });
+}
 function wStep1Next() {
   var name  = (document.getElementById('w-name')  || {}).value || '';
   var email = (document.getElementById('w-email') || {}).value || '';
@@ -13426,7 +13460,7 @@ function _seedKajalAlpha() {
       { date: '2026-05-01', nw: 1820  }
     ]
   };
-  localStorage.setItem('pos4', JSON.stringify(ovData));
+  localStorage.setItem('pos_ov1', JSON.stringify(ovData));
 
   // ── Journey ──
   var jrnyData = {
@@ -13920,7 +13954,7 @@ function nwhRenderMini(){
   <!-- Centre dot -->
   <circle cx="7.0" cy="7.0" r="0.4" fill="#44c0b9" opacity="0.4"/>
 </svg></div> PT Live Design</span>
-  <span class="footer-version">Vault·It v0.9.0 Alpha · Updated 2 Jun 2026</span>
+  <span class="footer-version">Vault·It v0.9.1 Alpha · Updated 2 Jun 2026</span>
 </div>
 
 <!-- ══ ALPHA ACCESS MODAL ══ -->
