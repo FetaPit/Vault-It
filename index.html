@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.9.2';
+  var SW_VERSION = '0.9.3';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2601,18 +2601,20 @@ input:focus, textarea:focus, select:focus {
       <div class="auth-info">Alpha · 33 Pioneer spots · Your data is end-to-end encrypted &amp; synced</div>
     </div>
 
-    <!-- Step 2: OTP verification -->
+    <!-- Step 2: Magic link / OTP verification -->
     <div id="auth-otp-step" class="auth-step">
       <div style="text-align:center;margin-bottom:12px">
         <div style="font-size:1.6rem;margin-bottom:6px">📧</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);letter-spacing:.1em">CODE SENT</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);letter-spacing:.1em">LINK SENT</div>
       </div>
-      <div class="auth-label">Enter the 6-digit code sent to <span id="auth-otp-email" style="color:var(--em)"></span></div>
+      <div class="auth-label">Check your inbox at <span id="auth-otp-email" style="color:var(--em)"></span></div>
+      <div style="font-size:.45rem;color:var(--t3);text-align:center;margin-bottom:14px;line-height:1.5">Click the sign-in link in your email.<br>This page will update automatically.</div>
+      <div style="font-size:.4rem;color:var(--t3);text-align:center;margin-bottom:8px;opacity:.5;letter-spacing:.06em;text-transform:uppercase">— or enter 6-digit code if you received one —</div>
       <input id="auth-otp-inp" class="auth-inp" type="text" inputmode="numeric" maxlength="6" placeholder="000000"
         onkeydown="if(event.key==='Enter')authVerifyOTP()">
       <button class="auth-btn" onclick="authVerifyOTP()">Verify Code →</button>
       <button class="auth-btn secondary" onclick="authGoBack()">← Use different email</button>
-      <button class="auth-btn secondary" onclick="authResendOTP()" style="margin-top:4px;opacity:.6">Resend code</button>
+      <button class="auth-btn secondary" onclick="authResendOTP()" style="margin-top:4px;opacity:.6">Resend link</button>
     </div>
 
     <div id="auth-err" class="auth-err"></div>
@@ -7749,6 +7751,30 @@ function _initSupabase() {
     'https://legpubblzgknxdtvsant.supabase.co',
     'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz'
   );
+  // Handle magic link returns and token refresh — fires when user clicks email link
+  _supaClient.auth.onAuthStateChange(async function(event, session) {
+    if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && session.user) {
+      if (_supaUser && _supaUser.id === session.user.id) return;
+      _supaUser = session.user;
+      var hydrated = await _hydrateFromSupabase(_supaUser.id);
+      if (!hasValidSession()) _createSession(_supaUser.email);
+      var ov = document.getElementById('login-overlay');
+      if (ov) ov.style.display = 'none';
+      if (hydrated) {
+        setTimeout(function() {
+          try { if(typeof loadState==='function') loadState(); } catch(e) {}
+          try { if(typeof updateKPIs==='function') updateKPIs(); } catch(e) {}
+          try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
+          try { if(typeof renderCashflow==='function') renderCashflow(); } catch(e) {}
+          try { if(typeof renderDebtTab==='function') renderDebtTab(); } catch(e) {}
+          try { if(typeof renderPioneerCard==='function') renderPioneerCard(); } catch(e) {}
+        }, 150);
+        showToast('Vault restored ✓');
+      } else {
+        showToast('Vault ready ✓');
+      }
+    }
+  });
   // Patch localStorage.setItem to auto-sync vault keys after auth
   localStorage.setItem = function(key, value) {
     _lsOrig.call(localStorage, key, value);
