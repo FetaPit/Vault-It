@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.9.1';
+  var SW_VERSION = '0.9.2';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -25,7 +25,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(SW_URL).catch(function(){});
 }
 </script>
-<meta name="version" content="0.9.1-alpha">
+<meta name="version" content="0.9.2-alpha">
 <meta property="og:title" content="Vault·It — From Debt to Owning Your Home">
 <meta property="og:description" content="The only personal finance app built for the journey from debt to outright home ownership. Pioneer Edition.">
 <meta property="og:type" content="website">
@@ -7611,22 +7611,22 @@ var ACH_KEY='pos_ach1';
 var achState={xp:0,unlocked:[],connected:{}};
 var LVS=[{n:'Seeker',xp:0},{n:'Sapling',xp:200},{n:'Grounded',xp:500},{n:'Builder',xp:1000},{n:'Investor',xp:2000},{n:'Coasting',xp:3500},{n:'Free',xp:5500},{n:'Archon',xp:8000},{n:'Legacy',xp:12000}];
 var BADGES=[
-  {id:'nw100',    icon:'🌱', name:'First £100',       desc:'Net worth reaches £100',           xp:10},
-  {id:'nw500',    icon:'🪙', name:'First £500',       desc:'Net worth reaches £500',           xp:20},
-  {id:'nw1k',     icon:'💷', name:'First £1,000',     desc:'Net worth reaches £1,000',         xp:35},
-  {id:'nw2k',     icon:'💰', name:'£2,000 Club',      desc:'Net worth reaches £2,000',         xp:50},
-  {id:'nw5k',     icon:'📈', name:'£5k Milestone',    desc:'Net worth reaches £5,000',         xp:75},
-  {id:'nw10k',    icon:'🔟', name:'Five Figures',     desc:'Net worth reaches £10,000',        xp:100},
-  {id:'nw25k',    icon:'🎯', name:'Quarter Ton',      desc:'Net worth reaches £25,000',        xp:150},
-  {id:'nw50k',    icon:'💎', name:'£50k Club',        desc:'Net worth reaches £50,000',        xp:200},
-  {id:'nw75k',    icon:'⚡', name:'£75k Strong',      desc:'Net worth reaches £75,000',        xp:275},
-  {id:'nw100k',   icon:'💡', name:'Six Figures',      desc:'Net worth reaches £100,000',       xp:350},
-  {id:'nw150k',   icon:'🌟', name:'£150k',            desc:'Net worth reaches £150,000',       xp:450},
-  {id:'nw200k',   icon:'🏅', name:'£200k',            desc:'Net worth reaches £200,000',       xp:550},
-  {id:'nw250k',   icon:'👑', name:'Quarter Mil',      desc:'Net worth reaches £250,000',       xp:700},
-  {id:'nw500k',   icon:'🔮', name:'Half Million',     desc:'Net worth reaches £500,000',       xp:900},
-  {id:'nw750k',   icon:'🏆', name:'£750k',            desc:'Net worth reaches £750,000',       xp:1100},
-  {id:'nw1m',     icon:'🎖', name:'Millionaire',      desc:'Net worth reaches £1,000,000',     xp:1500},
+  {id:'nw100',    icon:'🌱', get name(){return 'First '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(100*(window.VI_CURRENCY_RATE||1)).toLocaleString();},       get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(100*(window.VI_CURRENCY_RATE||1)).toLocaleString();},           xp:10},
+  {id:'nw500',    icon:'🪙', get name(){return 'First '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(500*(window.VI_CURRENCY_RATE||1)).toLocaleString();},       get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(500*(window.VI_CURRENCY_RATE||1)).toLocaleString();},           xp:20},
+  {id:'nw1k',     icon:'💷', get name(){return 'First '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(1000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},     get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(1000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},         xp:35},
+  {id:'nw2k',     icon:'💰', get name(){return (window.VI_CURRENCY_SYMBOL||'£')+Math.round(2000*(window.VI_CURRENCY_RATE||1)).toLocaleString()+' Club';},      get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(2000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},         xp:50},
+  {id:'nw5k',     icon:'📈', get name(){return (window.VI_CURRENCY_SYMBOL||'£')+Math.round(5000*(window.VI_CURRENCY_RATE||1)).toLocaleString()+' Milestone';}, get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(5000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},         xp:75},
+  {id:'nw10k',    icon:'🔟', name:'Five Figures',     get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(10000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},        xp:100},
+  {id:'nw25k',    icon:'🎯', name:'Quarter Ton',      get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(25000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},        xp:150},
+  {id:'nw50k',    icon:'💎', get name(){return (window.VI_CURRENCY_SYMBOL||'£')+Math.round(50000*(window.VI_CURRENCY_RATE||1)).toLocaleString()+' Club';},     get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(50000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},        xp:200},
+  {id:'nw75k',    icon:'⚡', get name(){return (window.VI_CURRENCY_SYMBOL||'£')+Math.round(75000*(window.VI_CURRENCY_RATE||1)).toLocaleString()+' Strong';},   get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(75000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},        xp:275},
+  {id:'nw100k',   icon:'💡', name:'Six Figures',      get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(100000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},       xp:350},
+  {id:'nw150k',   icon:'🌟', get name(){return (window.VI_CURRENCY_SYMBOL||'£')+Math.round(150000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},            get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(150000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},        xp:450},
+  {id:'nw200k',   icon:'🏅', get name(){return (window.VI_CURRENCY_SYMBOL||'£')+Math.round(200000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},            get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(200000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},        xp:550},
+  {id:'nw250k',   icon:'👑', name:'Quarter Mil',      get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(250000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},       xp:700},
+  {id:'nw500k',   icon:'🔮', name:'Half Million',     get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(500000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},       xp:900},
+  {id:'nw750k',   icon:'🏆', get name(){return (window.VI_CURRENCY_SYMBOL||'£')+Math.round(750000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},            get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(750000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},        xp:1100},
+  {id:'nw1m',     icon:'🎖', name:'Millionaire',      get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(1000000*(window.VI_CURRENCY_RATE||1)).toLocaleString();},      xp:1500},
   {id:'save10',   icon:'💳', name:'Saver 10%',        desc:'Monthly save rate ≥ 10%',          xp:50},
   {id:'save25',   icon:'🏦', name:'Saver 25%',        desc:'Monthly save rate ≥ 25%',          xp:150},
   {id:'save50',   icon:'🔑', name:'Half & Half',      desc:'Monthly save rate ≥ 50%',          xp:300},
@@ -7640,7 +7640,7 @@ var BADGES=[
   {id:'gold',     icon:'🥇', name:'Gold Holder',      desc:'Hold 1+ oz of gold',              xp:100},
   {id:'stream1',  icon:'🚀', name:'Income Stream',    desc:'Add first income stream',          xp:75},
   {id:'fullfi',   icon:'🔥', name:'Financially Free', desc:'25× annual expenses invested',     xp:1000},
-  {id:'ef1k',     icon:'🛡', name:'Emergency Shield', desc:'£1,000 emergency fund saved',      xp:50},
+  {id:'ef1k',     icon:'🛡', name:'Emergency Shield', get desc(){return (window.VI_CURRENCY_SYMBOL||'£')+Math.round(1000*(window.VI_CURRENCY_RATE||1)).toLocaleString()+' emergency fund saved';},      xp:50},
   {id:'coast',    icon:'⛵', name:'Coasting to FIRE', desc:'Reached Coast FI milestone',       xp:400},
 ];
 var CONNS=[
@@ -7912,8 +7912,18 @@ async function authVerifyOTP() {
     var hydrated = await _hydrateFromSupabase(_supaUser.id);
     _createSession(_authOTP.email);
     _completeAuth(_authOTP.email);
-    if (hydrated) showToast('Vault restored ✓');
-    else showToast('Vault ready ✓');
+    if (hydrated) {
+      setTimeout(function() {
+        try { if(typeof loadState==='function') loadState(); } catch(e) {}
+        try { if(typeof updateKPIs==='function') updateKPIs(); } catch(e) {}
+        try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
+        try { if(typeof renderCashflow==='function') renderCashflow(); } catch(e) {}
+        try { if(typeof renderDebtTab==='function') renderDebtTab(); } catch(e) {}
+      }, 150);
+      showToast('Vault restored ✓');
+    } else {
+      showToast('Vault ready ✓');
+    }
   } catch(e) { _authErr('Verification failed. Please try again.'); }
   finally {
     if (btn) { btn.textContent = 'Verify Code →'; btn.disabled = false; }
@@ -8324,7 +8334,7 @@ function renderMetalsISO(){
   // Total value footer
   var tv=alTotalMetals();
   mE('text',{x:300,y:412,'font-size':9,'font-family':'Share Tech Mono,monospace',fill:'rgba(68,192,185,.55)','text-anchor':'middle','pointer-events':'none'},MS)
-    .textContent='TOTAL METALS VALUE: £'+Math.round(tv).toLocaleString('en-GB')+' · Each bar = 1 troy oz';
+    .textContent='TOTAL METALS VALUE: '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(tv).toLocaleString('en-GB')+' · Each bar = 1 troy oz';
 
   // Caption
   var cap=document.getElementById('metalsCap');
@@ -8334,7 +8344,7 @@ function renderMetalsISO(){
     if(silvBars>0)parts.push(silvBars+' silver bar'+(silvBars!==1?'s':''));
     if(platBars>0)parts.push(platBars+' Pt wafer'+(platBars!==1?'s':''));
     if(palBars>0)parts.push(palBars+' Pd wafer'+(palBars!==1?'s':''));
-    cap.textContent=(parts.length?parts.join(' \u00b7 '):alState.metals.gold>0||alState.metals.silver>0?'Bars visible when \u226510oz':'Add holdings below')+' \u00b7 \u00a3'+gbpFmt(tv);
+    cap.textContent=(parts.length?parts.join(' \u00b7 '):alState.metals.gold>0||alState.metals.silver>0?'Bars visible when \u226510oz':'Add holdings below')+' \u00b7 '+gbpFmt(tv);
   }
 
   // Render inputs
@@ -8353,14 +8363,14 @@ function renderMetalsInputs(){
   if(pi)pi.innerHTML=metals.map(function(m){
     return'<div class="metal-row"><span class="metal-lbl" style="color:'+m.col+'">'+m.lbl+'</span>'
       +'<input class="metal-inp" type="number" min="0" step="0.01" value="'+(alState.metalPrices[m.k]||0)+'" onchange="updateMetalPrice(\''+m.k+'\',this.value)">'
-      +'<span class="metal-unit">\u00a3</span></div>';
+      +'<span class="metal-unit">'+(window.VI_CURRENCY_SYMBOL||'\u00a3')+'</span></div>';
   }).join('');
   var mk=document.getElementById('metals-kpis');
   if(mk)mk.innerHTML=metals.map(function(m){
     var v=(alState.metals[m.k]||0)*(alState.metalPrices[m.k]||0);
     return'<div class="ov-kpi" style="padding:10px 12px"><div class="ov-kpi-lbl" style="color:'+m.col+'">'+m.lbl+'</div>'
-      +'<div class="ov-kpi-val" style="font-size:.9rem;color:'+m.col+'">\u00a3'+Math.round(v).toLocaleString('en-GB')+'</div>'
-      +'<div class="ov-kpi-sub">'+(alState.metals[m.k]||0).toFixed(2)+' oz @ \u00a3'+(alState.metalPrices[m.k]||0).toLocaleString('en-GB')+'</div></div>';
+      +'<div class="ov-kpi-val" style="font-size:.9rem;color:'+m.col+'">'+(window.VI_CURRENCY_SYMBOL||'\u00a3')+Math.round(v).toLocaleString('en-GB')+'</div>'
+      +'<div class="ov-kpi-sub">'+(alState.metals[m.k]||0).toFixed(2)+' oz @ '+(window.VI_CURRENCY_SYMBOL||'\u00a3')+(alState.metalPrices[m.k]||0).toLocaleString('en-GB')+'</div></div>';
   }).join('');
 }
 function updateMetal(k,v){alState.metals[k]=parseFloat(v)||0;saveAL();renderMetalsISO();updateKPIs();checkAchievements();}
@@ -13954,7 +13964,7 @@ function nwhRenderMini(){
   <!-- Centre dot -->
   <circle cx="7.0" cy="7.0" r="0.4" fill="#44c0b9" opacity="0.4"/>
 </svg></div> PT Live Design</span>
-  <span class="footer-version">Vault·It v0.9.1 Alpha · Updated 2 Jun 2026</span>
+  <span class="footer-version">Vault·It v0.9.2 Alpha · Updated 2 Jun 2026</span>
 </div>
 
 <!-- ══ ALPHA ACCESS MODAL ══ -->
