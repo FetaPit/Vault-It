@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.9.3';
+  var SW_VERSION = '0.9.4';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2578,6 +2578,13 @@ input:focus, textarea:focus, select:focus {
 .auth-info{font-family:'Share Tech Mono',monospace;font-size:.42rem;color:var(--t3);text-align:center;margin-top:10px;line-height:1.6}
 .auth-divider{border:none;border-top:1px solid rgba(255,255,255,.06);margin:18px 0}
 .auth-footer{font-family:'Share Tech Mono',monospace;font-size:.36rem;color:rgba(255,255,255,.18);text-align:center;margin-top:20px;letter-spacing:.08em}
+.auth-pin-dots{display:flex;justify-content:center;gap:14px;margin:18px 0}
+.auth-pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid rgba(68,192,185,.35);background:transparent;transition:all .15s}
+.auth-pin-dot.filled{background:var(--em);border-color:var(--em);box-shadow:0 0 6px rgba(68,192,185,.4)}
+.auth-pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.auth-pin-key{background:rgba(255,255,255,.04);border:1px solid rgba(68,192,185,.15);border-radius:8px;color:var(--tx);font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;padding:14px 0;cursor:pointer;transition:background .1s,transform .08s;letter-spacing:.06em}
+.auth-pin-key:active{background:rgba(68,192,185,.15);transform:scale(.96)}
+.auth-pin-key.del{color:var(--em);font-size:.6rem}
 </style>
 <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Vault·It&quot;,&quot;short_name&quot;:&quot;Vault·It&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23080808&quot;,&quot;theme_color&quot;:&quot;%2344c0b9&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23080808'/><text y='75' x='50' text-anchor='middle' font-size='70'>🔒</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;}]}">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2615,6 +2622,66 @@ input:focus, textarea:focus, select:focus {
       <button class="auth-btn" onclick="authVerifyOTP()">Verify Code →</button>
       <button class="auth-btn secondary" onclick="authGoBack()">← Use different email</button>
       <button class="auth-btn secondary" onclick="authResendOTP()" style="margin-top:4px;opacity:.6">Resend link</button>
+    </div>
+
+    <!-- Step 3: Set PIN (shown after first successful auth) -->
+    <div id="auth-setpin-step" class="auth-step">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:1.6rem;margin-bottom:6px">🔐</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);letter-spacing:.1em">SECURE YOUR VAULT</div>
+      </div>
+      <div class="auth-label" style="text-align:center" id="auth-setpin-label">Set a 4-digit PIN for quick access</div>
+      <div class="auth-pin-dots">
+        <div class="auth-pin-dot" id="spd0"></div>
+        <div class="auth-pin-dot" id="spd1"></div>
+        <div class="auth-pin-dot" id="spd2"></div>
+        <div class="auth-pin-dot" id="spd3"></div>
+      </div>
+      <div class="auth-pin-pad">
+        <button class="auth-pin-key" onclick="_setPinKey('1')">1</button>
+        <button class="auth-pin-key" onclick="_setPinKey('2')">2</button>
+        <button class="auth-pin-key" onclick="_setPinKey('3')">3</button>
+        <button class="auth-pin-key" onclick="_setPinKey('4')">4</button>
+        <button class="auth-pin-key" onclick="_setPinKey('5')">5</button>
+        <button class="auth-pin-key" onclick="_setPinKey('6')">6</button>
+        <button class="auth-pin-key" onclick="_setPinKey('7')">7</button>
+        <button class="auth-pin-key" onclick="_setPinKey('8')">8</button>
+        <button class="auth-pin-key" onclick="_setPinKey('9')">9</button>
+        <button class="auth-pin-key" style="visibility:hidden" aria-hidden="true"></button>
+        <button class="auth-pin-key" onclick="_setPinKey('0')">0</button>
+        <button class="auth-pin-key del" onclick="_setPinDel()">⌫</button>
+      </div>
+      <button class="auth-btn secondary" onclick="_skipPin()" style="margin-top:10px;opacity:.55;font-size:.48rem">Skip — I'll do this later</button>
+    </div>
+
+    <!-- Step 3b: Enter PIN (return visits after localStorage session expires) -->
+    <div id="auth-pin-step" class="auth-step">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:1.6rem;margin-bottom:6px">🔒</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);letter-spacing:.1em">VAULT LOCKED</div>
+      </div>
+      <div class="auth-label" style="text-align:center">Enter your PIN</div>
+      <div class="auth-pin-dots">
+        <div class="auth-pin-dot" id="pd0"></div>
+        <div class="auth-pin-dot" id="pd1"></div>
+        <div class="auth-pin-dot" id="pd2"></div>
+        <div class="auth-pin-dot" id="pd3"></div>
+      </div>
+      <div class="auth-pin-pad">
+        <button class="auth-pin-key" onclick="_enterPinKey('1')">1</button>
+        <button class="auth-pin-key" onclick="_enterPinKey('2')">2</button>
+        <button class="auth-pin-key" onclick="_enterPinKey('3')">3</button>
+        <button class="auth-pin-key" onclick="_enterPinKey('4')">4</button>
+        <button class="auth-pin-key" onclick="_enterPinKey('5')">5</button>
+        <button class="auth-pin-key" onclick="_enterPinKey('6')">6</button>
+        <button class="auth-pin-key" onclick="_enterPinKey('7')">7</button>
+        <button class="auth-pin-key" onclick="_enterPinKey('8')">8</button>
+        <button class="auth-pin-key" onclick="_enterPinKey('9')">9</button>
+        <button class="auth-pin-key" style="visibility:hidden" aria-hidden="true"></button>
+        <button class="auth-pin-key" onclick="_enterPinKey('0')">0</button>
+        <button class="auth-pin-key del" onclick="_enterPinDel()">⌫</button>
+      </div>
+      <button class="auth-btn secondary" onclick="authGoBack()" style="margin-top:14px;opacity:.55;font-size:.48rem">Use email instead</button>
     </div>
 
     <div id="auth-err" class="auth-err"></div>
@@ -7759,7 +7826,18 @@ function _initSupabase() {
       var hydrated = await _hydrateFromSupabase(_supaUser.id);
       if (!hasValidSession()) _createSession(_supaUser.email);
       var ov = document.getElementById('login-overlay');
-      if (ov) ov.style.display = 'none';
+      if (ov && ov.style.display !== 'none') {
+        var pinHash = localStorage.getItem('vi_pin_hash');
+        if (!pinHash) {
+          _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
+          _updatePinDots(0, 'spd');
+          var lbl = document.getElementById('auth-setpin-label');
+          if (lbl) lbl.textContent = 'Set a 4-digit PIN for quick access';
+          _showAuthStep('setpin');
+        } else {
+          ov.style.display = 'none';
+        }
+      }
       if (hydrated) {
         setTimeout(function() {
           try { if(typeof loadState==='function') loadState(); } catch(e) {}
@@ -7781,6 +7859,11 @@ function _initSupabase() {
     if (_supaUser && _VAULT_KEYS.indexOf(key) > -1) _supaSync(key, value);
   };
 }
+
+// Belt-and-suspenders: re-try init if CDN loaded after DOMContentLoaded
+window.addEventListener('load', function() {
+  if (!_supaClient) { _initSupabase(); _initSupabaseSession(); }
+});
 
 async function _supaSync(key, value) {
   if (!_supaClient || !_supaUser) return;
@@ -7817,7 +7900,15 @@ async function _initSupabaseSession() {
     if (!hasValidSession() && _supaUser.email) {
       _createSession(_supaUser.email);
       var ov = document.getElementById('login-overlay');
-      if (ov) ov.style.display = 'none';
+      if (ov && ov.style.display !== 'none') {
+        var pinHash = localStorage.getItem('vi_pin_hash');
+        if (pinHash) {
+          _pinEnterBuf = ''; _updatePinDots(0, 'pd');
+          _showAuthStep('pin');
+        } else {
+          ov.style.display = 'none';
+        }
+      }
     }
     if (hydrated) {
       try { if(typeof loadState==='function') loadState(); } catch(e) {}
@@ -7884,7 +7975,8 @@ function authSubmitEmail() {
 }
 
 async function _sendOTP(email) {
-  if (!_supaClient) { _authErr('Auth service not ready — please refresh.'); return; }
+  if (!_supaClient) _initSupabase(); // CDN may have loaded after DOMContentLoaded
+  if (!_supaClient) { _authErr('Connection issue — check signal and tap Continue again.'); return; }
   _authOTP = { email: email };
   var emailDisp = document.getElementById('auth-otp-email');
   if (emailDisp) emailDisp.textContent = email;
@@ -8006,6 +8098,82 @@ async function authResendOTP() {
   await _sendOTP(_authOTP.email);
 }
 
+// ── PIN MANAGEMENT ─────────────────────────────────────────────
+var _pinSetBuf = '';
+var _pinSetFirst = '';
+var _pinSetPhase = 'enter'; // 'enter' | 'confirm'
+var _pinEnterBuf = '';
+
+function _updatePinDots(n, prefix) {
+  for (var i = 0; i < 4; i++) {
+    var d = document.getElementById(prefix + i);
+    if (d) d.classList.toggle('filled', i < n);
+  }
+}
+
+function _setPinKey(d) {
+  if (_pinSetBuf.length >= 4) return;
+  _pinSetBuf += d;
+  _updatePinDots(_pinSetBuf.length, 'spd');
+  if (_pinSetBuf.length < 4) return;
+  var buf = _pinSetBuf;
+  setTimeout(function() {
+    if (_pinSetPhase === 'enter') {
+      _pinSetFirst = buf;
+      _pinSetBuf = '';
+      _pinSetPhase = 'confirm';
+      var lbl = document.getElementById('auth-setpin-label');
+      if (lbl) lbl.textContent = 'Confirm your PIN';
+      _updatePinDots(0, 'spd');
+    } else {
+      if (buf === _pinSetFirst) {
+        _lsOrig.call(localStorage, 'vi_pin_hash', _hashStr(buf));
+        showToast('PIN set ✓');
+        _skipPin();
+      } else {
+        _authErr('PINs don\'t match — try again');
+        _pinSetFirst = ''; _pinSetBuf = ''; _pinSetPhase = 'enter';
+        _updatePinDots(0, 'spd');
+        var lbl = document.getElementById('auth-setpin-label');
+        if (lbl) lbl.textContent = 'Set a 4-digit PIN for quick access';
+      }
+    }
+  }, 180);
+}
+
+function _setPinDel() {
+  if (_pinSetBuf.length > 0) { _pinSetBuf = _pinSetBuf.slice(0,-1); _updatePinDots(_pinSetBuf.length, 'spd'); }
+}
+
+function _skipPin() {
+  var ov = document.getElementById('login-overlay');
+  if (ov) ov.style.display = 'none';
+}
+
+function _enterPinKey(d) {
+  if (_pinEnterBuf.length >= 4) return;
+  _pinEnterBuf += d;
+  _updatePinDots(_pinEnterBuf.length, 'pd');
+  if (_pinEnterBuf.length < 4) return;
+  var buf = _pinEnterBuf;
+  setTimeout(function() {
+    var stored = ''; try { stored = localStorage.getItem('vi_pin_hash') || ''; } catch(e) {}
+    if (_hashStr(buf) === stored) {
+      var ov = document.getElementById('login-overlay');
+      if (ov) ov.style.display = 'none';
+    } else {
+      _authErr('Incorrect PIN');
+      _pinEnterBuf = '';
+      _updatePinDots(0, 'pd');
+    }
+  }, 180);
+}
+
+function _enterPinDel() {
+  if (_pinEnterBuf.length > 0) { _pinEnterBuf = _pinEnterBuf.slice(0,-1); _updatePinDots(_pinEnterBuf.length, 'pd'); }
+}
+// ──────────────────────────────────────────────────────────────
+
 function _completeAuth(email) {
   try {
     var u = JSON.parse(localStorage.getItem('vi_user') || '{}');
@@ -8034,7 +8202,16 @@ function _completeAuth(email) {
     } catch(e) {}
   }
   var overlay = document.getElementById('login-overlay');
-  if (overlay) overlay.style.display = 'none';
+  var pinHash = localStorage.getItem('vi_pin_hash');
+  if (!pinHash) {
+    _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
+    _updatePinDots(0, 'spd');
+    var lbl = document.getElementById('auth-setpin-label');
+    if (lbl) lbl.textContent = 'Set a 4-digit PIN for quick access';
+    _showAuthStep('setpin');
+  } else {
+    if (overlay) overlay.style.display = 'none';
+  }
   // Re-render UI with restored data
   setTimeout(function() {
     try { if(typeof updateKPIs==='function') updateKPIs(); } catch(e) {}
