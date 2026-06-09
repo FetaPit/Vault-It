@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.9.4';
+  var SW_VERSION = '0.9.5';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2615,7 +2615,7 @@ input:focus, textarea:focus, select:focus {
         <div style="font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);letter-spacing:.1em">LINK SENT</div>
       </div>
       <div class="auth-label">Check your inbox at <span id="auth-otp-email" style="color:var(--em)"></span></div>
-      <div style="font-size:.45rem;color:var(--t3);text-align:center;margin-bottom:14px;line-height:1.5">Click the sign-in link in your email.<br>This page will update automatically.</div>
+      <div style="font-size:.45rem;color:var(--t3);text-align:center;margin-bottom:14px;line-height:1.5">Click the sign-in link in your email.<br>This page will update automatically.<br><span style="opacity:.6">Not seeing it? Check your spam folder.</span></div>
       <div style="font-size:.4rem;color:var(--t3);text-align:center;margin-bottom:8px;opacity:.5;letter-spacing:.06em;text-transform:uppercase">— or enter 6-digit code if you received one —</div>
       <input id="auth-otp-inp" class="auth-inp" type="text" inputmode="numeric" maxlength="6" placeholder="000000"
         onkeydown="if(event.key==='Enter')authVerifyOTP()">
@@ -7110,12 +7110,13 @@ function redraw(){
 
 function updateUI(){
   const p=pct();
+  const _sym=window.VI_CURRENCY_SYMBOL||'£';
   document.getElementById('pbarFill').style.width=(p*100)+'%';
   document.getElementById('ppct').textContent=(p*100).toFixed(1)+'%';
-  document.getElementById('savedAmt').textContent='£'+Math.round(state.saved).toLocaleString('en-GB');
-  document.getElementById('tgtAmt').textContent='of £'+state.target.toLocaleString('en-GB');
-  document.getElementById('stRemain').textContent='£'+Math.max(0,Math.round(state.target-state.saved)).toLocaleString('en-GB');
-  document.getElementById('stDeposit').textContent='£'+Math.round(state.target*.10).toLocaleString('en-GB');
+  document.getElementById('savedAmt').textContent=gbpFmt(state.saved);
+  document.getElementById('tgtAmt').textContent='of '+gbpFmt(state.target);
+  document.getElementById('stRemain').textContent=gbpFmt(Math.max(0,state.target-state.saved));
+  document.getElementById('stDeposit').textContent=gbpFmt(state.target*.10);
   [{id:'ms1',t:.01},{id:'ms5',t:.05},{id:'ms15',t:.15},{id:'ms30',t:.30},{id:'ms50',t:.50},{id:'ms65',t:.65},{id:'ms80',t:.80},{id:'ms90',t:.90},{id:'ms95',t:.95},{id:'ms100',t:1}].forEach(m=>{const el=document.getElementById(m.id);if(el)el.classList.toggle('hit',p>=m.t);});
   const cap=document.getElementById('sceneCap');
   if(p===0)cap.textContent='Foundations being laid…';
@@ -7127,14 +7128,14 @@ function updateUI(){
   else cap.textContent='🎉 The house is yours!';
   const list=document.getElementById('logList');
   if(!state.deposits.length){list.innerHTML='<div style="font-size:.58rem;color:rgba(255,255,255,.18);text-align:center;padding:10px 0">No deposits yet</div>';}
-  else list.innerHTML=[...state.deposits].reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date}</span><span class="la">+£${Number(d.amount).toLocaleString('en-GB')}</span></div>`).join('');
+  else list.innerHTML=[...state.deposits].reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date}</span><span class="la">+${gbpFmt(Number(d.amount))}</span></div>`).join('');
   renderHabitTracker();
   updateFloorSelector();
   redraw();
 }
 
 function updatePriceLabels(){
-  Object.entries(state.prices).forEach(([t,pr])=>{const e=document.getElementById('pr-'+t);if(e)e.textContent='£'+pr.toLocaleString('en-GB');});
+  Object.entries(state.prices).forEach(([t,pr])=>{const e=document.getElementById('pr-'+t);if(e)e.textContent=gbpFmt(pr);});
 }
 function updatePriceInput(){document.getElementById('priceInput').value=state.prices[state.houseType]||'';}
 
@@ -7185,22 +7186,26 @@ document.getElementById('htypes').addEventListener('click',e=>{
 document.getElementById('btnSP').addEventListener('click',()=>{
   const v=parseInt(document.getElementById('priceInput').value);
   if(!v||v<1000){toast('Enter a valid price');return;}
-  state.prices[state.houseType]=v;state.target=v;
+  const vBase=Math.round(v/(window.VI_CURRENCY_RATE||1));
+  state.prices[state.houseType]=vBase;state.target=vBase;
   updatePriceLabels();save();updateUI();
-  toast(`${state.houseType[0].toUpperCase()+state.houseType.slice(1)} price set to £${v.toLocaleString('en-GB')}`);
+  const sym=window.VI_CURRENCY_SYMBOL||'£';
+  toast(`${state.houseType[0].toUpperCase()+state.houseType.slice(1)} price set to ${sym}${v.toLocaleString()}`);
 });
 document.getElementById('priceInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnSP').click();});
 
 document.getElementById('btnAdd').addEventListener('click',()=>{
   const v=parseFloat(document.getElementById('savingsInput').value);
   if(!v||v<=0){toast('Enter a valid amount');return;}
-  state.saved+=v;
-  state.deposits.push({amount:v,date:new Date().toLocaleDateString('en-GB')});
-  recordHabitContribution(v);
+  const vBase=v/(window.VI_CURRENCY_RATE||1);
+  state.saved+=vBase;
+  state.deposits.push({amount:vBase,date:new Date().toLocaleDateString('en-GB')});
+  recordHabitContribution(vBase);
   save();checkMS(pct());updateUI();
   document.getElementById('savingsInput').value='';
+  const sym=window.VI_CURRENCY_SYMBOL||'£';
   if (!_isPro()) { showToast('Deposit saved! Upgrade to Pro to watch your house being built 🏗'); }
-  else { toast(v<state.target*.005?`+£${v.toLocaleString('en-GB')} — brick by brick!`:`+£${v.toLocaleString('en-GB')} added!`); }
+  else { toast(vBase<state.target*.005?`+${sym}${v.toLocaleString()} — brick by brick!`:`+${sym}${v.toLocaleString()} added!`); }
 });
 
 // ── HABIT TRACKER ──
