@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.9.6';
+  var SW_VERSION = '0.9.7';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -5551,7 +5551,7 @@ var ovState = {
   assets:    [],   // [{name, val}]
   debts:     [],   // [{name, val}]
   snapshots: [],   // [{month, nw, debt, liab}]  e.g. month='2026-03'
-  milestones: [2000, 0, 20000, 391872, 100000]
+  milestones: [1000, 0, 5000, 20000, 50000]
 };
 
 function loadState() {
@@ -5645,7 +5645,7 @@ function switchCurrency(c) {
 function gbpFmt(n) {
   var rate = window.VI_CURRENCY_RATE || 1;
   var sym  = window.VI_CURRENCY_SYMBOL || '£';
-  var conv = n * rate;
+  var conv = (isNaN(n) || n == null ? 0 : n) * rate;
   var abs  = Math.abs(conv);
   var sign = conv < 0 ? '-' : '';
   if (abs >= 1000000) return sign + sym + (abs/1000000).toFixed(1) + 'M';
@@ -6207,6 +6207,7 @@ function addAsset() {
   var name = document.getElementById('asset-name').value.trim();
   var val  = parseFloat(document.getElementById('asset-val').value);
   if (!name || isNaN(val)) { showToast('Enter name and value'); return; }
+  if (!isPioneer() && ovState.assets.length >= FREE_LIMITS.assets) { showPaywall('assets'); return; }
   ovState.assets.push({ id: Date.now(), name: name, val: val });
   document.getElementById('asset-name').value = '';
   document.getElementById('asset-val').value  = '';
@@ -6215,12 +6216,16 @@ function addAsset() {
 }
 
 function addDebt() {
-  var name = document.getElementById('debt-name').value.trim();
-  var val  = parseFloat(document.getElementById('debt-val').value);
+  var nameEl = document.getElementById('debt-name');
+  var valEl  = document.getElementById('debt-val');
+  if (!nameEl || !valEl) return;
+  var name = nameEl.value.trim();
+  var val  = parseFloat(valEl.value);
   if (!name || isNaN(val)) { showToast('Enter name and value'); return; }
+  if (!isPioneer() && ovState.debts.length >= FREE_LIMITS.debts) { showPaywall('debts'); return; }
   ovState.debts.push({ id: Date.now(), name: name, val: val });
-  document.getElementById('debt-name').value = '';
-  document.getElementById('debt-val').value  = '';
+  nameEl.value = '';
+  valEl.value  = '';
   saveState(); renderLists(); updateKPIs(); drawChart();
   showToast(name + ' added');
 }
@@ -7184,7 +7189,7 @@ document.getElementById('htypes').addEventListener('click',e=>{
 });
 
 document.getElementById('btnSP').addEventListener('click',()=>{
-  const v=parseInt(document.getElementById('priceInput').value);
+  const v=parseInt((document.getElementById('priceInput').value||'').replace(/,/g,''));
   if(!v||v<1000){toast('Enter a valid price');return;}
   const vBase=Math.round(v/(window.VI_CURRENCY_RATE||1));
   state.prices[state.houseType]=vBase;state.target=vBase;
@@ -8072,8 +8077,12 @@ async function authVerifyOTP() {
 }
 
 function authVerifyPin() {
-  var emailEl = document.getElementById('auth-email');
-  var email   = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  var email = (_authOTP && _authOTP.email) ? _authOTP.email
+    : ((_supaUser && _supaUser.email) ? _supaUser.email.toLowerCase() : '');
+  if (!email) {
+    var emailEl = document.getElementById('auth-email');
+    email = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  }
   var pin     = (document.getElementById('auth-pin-inp') || {}).value || '';
   if (!pin) { _authErr('Enter your PIN.'); return; }
   var stored  = localStorage.getItem('vi_pin_' + _hashStr(email));
@@ -8154,7 +8163,9 @@ function _setPinKey(d) {
       if (buf === _pinSetFirst) {
         _lsOrig.call(localStorage, 'vi_pin_hash', _hashStr(buf));
         showToast('PIN set ✓');
-        _skipPin();
+        var _pinEmail = (_authOTP && _authOTP.email) ? _authOTP.email
+          : ((_supaUser && _supaUser.email) ? _supaUser.email : '');
+        if (_pinEmail) { _completeAuth(_pinEmail); } else { _skipPin(); }
       } else {
         _authErr('PINs don\'t match — try again');
         _pinSetFirst = ''; _pinSetBuf = ''; _pinSetPhase = 'enter';
@@ -8186,6 +8197,9 @@ function _enterPinKey(d) {
     if (_hashStr(buf) === stored) {
       var ov = document.getElementById('login-overlay');
       if (ov) ov.style.display = 'none';
+      try { if(typeof updateKPIs==='function') updateKPIs(); } catch(e) {}
+      try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
+      try { if(typeof renderPioneerCard==='function') renderPioneerCard(); } catch(e) {}
     } else {
       _authErr('Incorrect PIN');
       _pinEnterBuf = '';
@@ -10104,11 +10118,13 @@ function showPaywall(feature){
   };
   var msg=document.getElementById('paywall-feature-msg');
   if(msg)msg.textContent=msgs[feature]||'🔒 This is a Pioneer feature.';
-  document.getElementById('paywall-modal').style.display='flex';
+  var modal=document.getElementById('paywall-modal');
+  if(modal)modal.style.display='flex';
 }
 
 function closePaywall(){
-  document.getElementById('paywall-modal').style.display='none';
+  var modal=document.getElementById('paywall-modal');
+  if(modal)modal.style.display='none';
   var m=document.getElementById('pw-verify-msg');if(m)m.textContent='';
 }
 
@@ -13131,11 +13147,15 @@ var VI_CAMPAIGN = {
 };
 
 function showUpgrade(plan) {
-  var link = VI_STRIPE_LINKS[plan] || VI_STRIPE_LINKS.monthly;
+  var link = VI_STRIPE_LINKS[plan];
   if (!link) {
-    showToast('Founder tier coming soon — email pete@vault-it.app to reserve your spot.');
-    return;
+    if (plan === 'founder') {
+      showToast('Founder tier coming soon — email pete@vault-it.app to reserve your spot.');
+    } else {
+      link = VI_STRIPE_LINKS.monthly;
+    }
   }
+  if (!link) return;
   var user = {};
   try { user = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
   // Payment Links support prefilled_email as a query param
@@ -13508,6 +13528,7 @@ function applyViSettings() {
   var nav = document.getElementById('topnav');
   if (nav) nav.classList.toggle('compact-nav', !!viSettings.compactNav);
   window.VI_CURRENCY = viSettings.currency || 'GBP';
+  if (typeof _applyCurrency === 'function') _applyCurrency();
   if (typeof fetchExchangeRates === 'function') setTimeout(fetchExchangeRates, 800);
 }
 

@@ -801,7 +801,7 @@
       e.preventDefault();
       var input=document.getElementById(inputId);
       var msg=document.getElementById(msgId);
-      var email=(input.value||'').trim();
+      var email=(input?input.value:'').trim();
       if(!email||email.indexOf('@')<0){ if(msg){msg.style.color='var(--red)';msg.textContent='Please enter a valid email.';} return; }
       if(msg){ msg.style.color='var(--muted)'; msg.textContent='Saving your spot…'; }
       function done(ok){
