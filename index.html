@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.9.5';
+  var SW_VERSION = '0.9.6';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -7825,10 +7825,17 @@ function _initSupabase() {
   );
   // Handle magic link returns and token refresh — fires when user clicks email link
   _supaClient.auth.onAuthStateChange(async function(event, session) {
+    if (event === 'SIGNED_OUT') {
+      _supaUser = null;
+      var ov = document.getElementById('login-overlay');
+      if (ov) { ov.style.display = ''; _showAuthStep('email'); }
+      return;
+    }
     if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && session.user) {
       if (_supaUser && _supaUser.id === session.user.id) return;
       _supaUser = session.user;
       var hydrated = await _hydrateFromSupabase(_supaUser.id);
+      await _syncPioneerFromProfile(_supaUser.id);
       if (!hasValidSession()) _createSession(_supaUser.email);
       var ov = document.getElementById('login-overlay');
       if (ov && ov.style.display !== 'none') {
@@ -7894,6 +7901,16 @@ async function _hydrateFromSupabase(uid) {
   } catch(e) { return false; }
 }
 
+async function _syncPioneerFromProfile(uid) {
+  if (!_supaClient) return;
+  try {
+    var res = await _supaClient.from('profiles').select('is_pioneer').eq('id', uid).single();
+    if (res.data && res.data.is_pioneer && localStorage.getItem('vi_pioneer') !== 'true') {
+      _lsOrig.call(localStorage, 'vi_pioneer', 'true');
+    }
+  } catch(e) {}
+}
+
 async function _initSupabaseSession() {
   if (!_supaClient) return;
   try {
@@ -7902,6 +7919,7 @@ async function _initSupabaseSession() {
     if (!session || !session.user) return;
     _supaUser = session.user;
     var hydrated = await _hydrateFromSupabase(_supaUser.id);
+    await _syncPioneerFromProfile(_supaUser.id);
     if (!hasValidSession() && _supaUser.email) {
       _createSession(_supaUser.email);
       var ov = document.getElementById('login-overlay');
@@ -8088,11 +8106,13 @@ function authSkipPin() {
 }
 
 function authForgotPin() {
-  var emailEl = document.getElementById('auth-email');
-  var email   = emailEl ? emailEl.value.trim().toLowerCase() : '';
-  if (!email) { _authErr('Enter your email first.'); return; }
-  // Remove old PIN so OTP flow starts fresh
-  localStorage.removeItem('vi_pin_' + _hashStr(email));
+  localStorage.removeItem('vi_pin_hash');
+  var email = (_supaUser && _supaUser.email) ? _supaUser.email : '';
+  if (!email) {
+    var emailEl = document.getElementById('auth-email');
+    email = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  }
+  if (!email) { _showAuthStep('email'); return; }
   _sendOTP(email);
 }
 
@@ -9931,9 +9951,17 @@ function handleOAuthCallback() {
     try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
     u.pro = true;
     try { localStorage.setItem('vi_user', JSON.stringify(u)); } catch(e) {}
+    localStorage.setItem('vi_pioneer', 'true');
+    if (_supaClient && _supaUser) {
+      _supaClient.from('profiles').upsert(
+        { id: _supaUser.id, is_pioneer: true, updated_at: new Date().toISOString() },
+        { onConflict: 'id' }
+      ).catch(function(){});
+    }
     if (typeof _vaultItUser !== 'undefined') { _vaultItUser = u; }
     if (typeof applyPaywall === 'function') applyPaywall();
-    showToast('🎉 Welcome to Pro! Entrepreneur tab unlocked.');
+    if (typeof renderPioneerCard === 'function') renderPioneerCard();
+    showToast('🎉 Welcome, Pioneer! All modules unlocked.');
     return;
   }
   if (params.get('founded') === '1') {
@@ -9942,10 +9970,19 @@ function handleOAuthCallback() {
     try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
     u.pro = true; u.founder = true; u.founderSince = new Date().toISOString();
     try { localStorage.setItem('vi_user', JSON.stringify(u)); } catch(e) {}
+    localStorage.setItem('vi_pioneer', 'true');
+    localStorage.setItem('vi_founder', 'true');
+    if (_supaClient && _supaUser) {
+      _supaClient.from('profiles').upsert(
+        { id: _supaUser.id, is_pioneer: true, updated_at: new Date().toISOString() },
+        { onConflict: 'id' }
+      ).catch(function(){});
+    }
     if (typeof _vaultItUser !== 'undefined') { _vaultItUser = u; }
     if (typeof applyPaywall === 'function') applyPaywall();
+    if (typeof renderPioneerCard === 'function') renderPioneerCard();
     viApplyFounderBadge();
-    showToast('⚡ Welcome, Founding Member! Your name will be in the credits.');
+    showToast('⚡ Welcome, Founding Member! Pioneer status locked in permanently.');
     return;
   }
   var code = params.get('code');

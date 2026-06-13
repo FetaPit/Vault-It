@@ -785,9 +785,9 @@
 
   function loadSpots(){
     if(!supa){ renderSpots(FALLBACK); return; }
-    supa.from('waitlist').select('*',{count:'exact',head:true})
+    supa.rpc('waitlist_count')
       .then(function(res){
-        if(res && typeof res.count==='number'){ renderSpots(res.count); }
+        if(res && typeof res.data==='number'){ renderSpots(res.data); }
         else { renderSpots(FALLBACK); }
       })
       .catch(function(){ renderSpots(FALLBACK); });
