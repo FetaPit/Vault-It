@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.9.7';
+  var SW_VERSION = '0.9.8';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2681,7 +2681,7 @@ input:focus, textarea:focus, select:focus {
         <button class="auth-pin-key" onclick="_enterPinKey('0')">0</button>
         <button class="auth-pin-key del" onclick="_enterPinDel()">⌫</button>
       </div>
-      <button class="auth-btn secondary" onclick="authGoBack()" style="margin-top:14px;opacity:.55;font-size:.48rem">Use email instead</button>
+      <button class="auth-btn secondary" onclick="authForgotPin()" style="margin-top:14px;opacity:.55;font-size:.48rem">Forgot PIN? Use email</button>
     </div>
 
     <div id="auth-err" class="auth-err"></div>
@@ -7893,6 +7893,14 @@ async function _supaSync(key, value) {
   } catch(e) {}
 }
 
+function _reloadAllState() {
+  try { var _s=localStorage.getItem(OV_KEY); if(_s){ var _sp=JSON.parse(_s); ovState=Object.assign(ovState,_sp); } } catch(e) {}
+  try { var _als=localStorage.getItem(AL_KEY); if(_als){ var _alp=JSON.parse(_als); alState=Object.assign(alState,_alp); if(_alp.metals)alState.metals=Object.assign(alState.metals,_alp.metals); if(_alp.metalPrices)alState.metalPrices=Object.assign(alState.metalPrices,_alp.metalPrices); if(_alp.crypto)alState.crypto=_alp.crypto; if(_alp.cashAccounts)alState.cashAccounts=_alp.cashAccounts; if(_alp.otherAssets)alState.otherAssets=_alp.otherAssets; if(_alp.liabilities)alState.liabilities=_alp.liabilities; } } catch(e) {}
+  try { var _dsr=localStorage.getItem(DEBT_KEY); if(_dsr) debtState=JSON.parse(_dsr); } catch(e) {}
+  try { var _bsr=localStorage.getItem(BIZ_KEY); if(_bsr) bizState=JSON.parse(_bsr); if(!bizState.leads)bizState.leads=[]; } catch(e) {}
+  try { var _asr=localStorage.getItem(ACH_KEY); if(_asr){ var _asp=JSON.parse(_asr); achState=Object.assign(achState,_asp); } } catch(e) {}
+}
+
 async function _hydrateFromSupabase(uid) {
   if (!_supaClient) return false;
   try {
@@ -7902,6 +7910,7 @@ async function _hydrateFromSupabase(uid) {
       _lsOrig.call(localStorage, row.key,
         typeof row.value === 'object' ? JSON.stringify(row.value) : String(row.value));
     });
+    _reloadAllState();
     return true;
   } catch(e) { return false; }
 }
