@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.9.8';
+  var SW_VERSION = '0.9.9';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -8012,7 +8012,7 @@ function authSubmitEmail() {
 }
 
 async function _sendOTP(email) {
-  if (!_supaClient) _initSupabase(); // CDN may have loaded after DOMContentLoaded
+  if (!_supaClient) _initSupabase();
   if (!_supaClient) { _authErr('Connection issue — check signal and tap Continue again.'); return; }
   _authOTP = { email: email };
   var emailDisp = document.getElementById('auth-otp-email');
@@ -8020,13 +8020,37 @@ async function _sendOTP(email) {
   var btn = document.querySelector('#auth-email-step .auth-btn');
   if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
   try {
-    var res = await _supaClient.auth.signInWithOtp({
-      email: email, options: { shouldCreateUser: true }
-    });
-    if (res.error) { _authErr('Could not send code: ' + res.error.message); }
-    else { _showAuthStep('otp'); }
-  } catch(e) { _authErr('Could not send code. Check connection and retry.'); }
-  finally {
+    // Try Edge Function first (Resend API, branded template, no SMTP dependency)
+    var sent = false;
+    try {
+      var fnRes = await _supaClient.functions.invoke('send-auth-email', {
+        body: { email: email }
+      });
+      if (!fnRes.error && fnRes.data && fnRes.data.success) sent = true;
+    } catch(fnErr) { /* Edge Function not deployed yet — fall through */ }
+
+    if (!sent) {
+      // Fallback: Supabase built-in signInWithOtp
+      var res = await _supaClient.auth.signInWithOtp({
+        email: email, options: { shouldCreateUser: true }
+      });
+      if (res.error) {
+        // Give a clear, actionable error rather than raw Supabase message
+        var msg = res.error.message || '';
+        if (msg.toLowerCase().includes('email') || msg.toLowerCase().includes('smtp') || msg.toLowerCase().includes('sending')) {
+          _authErr('Email delivery issue — check your inbox including spam, or contact pete@vault-it.app');
+        } else if (msg.toLowerCase().includes('rate')) {
+          _authErr('Too many attempts — wait a minute and try again.');
+        } else {
+          _authErr('Could not send link. Check your connection and try again.');
+        }
+        return;
+      }
+    }
+    _showAuthStep('otp');
+  } catch(e) {
+    _authErr('Could not send link. Check your connection and try again.');
+  } finally {
     if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
   }
 }
