@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '0.9.9';
+  var SW_VERSION = '1.0.0';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2616,8 +2616,8 @@ input:focus, textarea:focus, select:focus {
       </div>
       <div class="auth-label">Check your inbox at <span id="auth-otp-email" style="color:var(--em)"></span></div>
       <div style="font-size:.45rem;color:var(--t3);text-align:center;margin-bottom:14px;line-height:1.5">Click the sign-in link in your email.<br>This page will update automatically.<br><span style="opacity:.6">Not seeing it? Check your spam folder.</span></div>
-      <div style="font-size:.4rem;color:var(--t3);text-align:center;margin-bottom:8px;opacity:.5;letter-spacing:.06em;text-transform:uppercase">— or enter 6-digit code if you received one —</div>
-      <input id="auth-otp-inp" class="auth-inp" type="text" inputmode="numeric" maxlength="6" placeholder="000000"
+      <div style="font-size:.4rem;color:var(--t3);text-align:center;margin-bottom:8px;opacity:.5;letter-spacing:.06em;text-transform:uppercase">— or enter the code from your email —</div>
+      <input id="auth-otp-inp" class="auth-inp" type="text" inputmode="numeric" maxlength="8" placeholder="00000000"
         onkeydown="if(event.key==='Enter')authVerifyOTP()">
       <button class="auth-btn" onclick="authVerifyOTP()">Verify Code →</button>
       <button class="auth-btn secondary" onclick="authGoBack()">← Use different email</button>
@@ -8079,7 +8079,7 @@ function _tryEmailJSOTP(email, code) {
 async function authVerifyOTP() {
   var entered = (document.getElementById('auth-otp-inp') || {}).value || '';
   if (!_authOTP || !_authOTP.email) { _authErr('Session expired. Go back and try again.'); return; }
-  if (!entered || entered.trim().length !== 6) { _authErr('Enter the 6-digit code from your email.'); return; }
+  if (!entered || entered.trim().length < 6 || entered.trim().length > 8) { _authErr('Enter the code from your email (6–8 digits).'); return; }
   var btn = document.querySelector('#auth-otp-step .auth-btn');
   if (btn) { btn.textContent = 'Verifying…'; btn.disabled = true; }
   try {
