@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '1.0.0';
+  var SW_VERSION = '1.0.1';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2587,7 +2587,7 @@ input:focus, textarea:focus, select:focus {
 .auth-pin-key.del{color:var(--em);font-size:.6rem}
 </style>
 <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Vault·It&quot;,&quot;short_name&quot;:&quot;Vault·It&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23080808&quot;,&quot;theme_color&quot;:&quot;%2344c0b9&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23080808'/><text y='75' x='50' text-anchor='middle' font-size='70'>🔒</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;}]}">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 <!-- ═══════════════════════════════════════════════════════════════
@@ -8008,6 +8008,18 @@ function authSubmitEmail() {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     _authErr('Please enter a valid email address.'); return;
   }
+  // Returning user shortcut: if PIN is set and email matches stored profile, go straight to PIN
+  var pinHash = localStorage.getItem('vi_pin_hash');
+  if (pinHash) {
+    var storedEmail = '';
+    try { var _sv = JSON.parse(localStorage.getItem('vi_session') || 'null'); storedEmail = (_sv && _sv.email) ? _sv.email : ''; } catch(e) {}
+    if (!storedEmail) { try { var _su = JSON.parse(localStorage.getItem('vi_user') || 'null'); storedEmail = (_su && _su.email) ? _su.email.toLowerCase() : ''; } catch(e) {} }
+    if (storedEmail && storedEmail === email) {
+      _authOTP = { email: email };
+      _showAuthStep('pin');
+      return;
+    }
+  }
   _sendOTP(email);
 }
 
@@ -8035,21 +8047,24 @@ async function _sendOTP(email) {
         email: email, options: { shouldCreateUser: true }
       });
       if (res.error) {
-        // Give a clear, actionable error rather than raw Supabase message
         var msg = res.error.message || '';
-        if (msg.toLowerCase().includes('email') || msg.toLowerCase().includes('smtp') || msg.toLowerCase().includes('sending')) {
+        console.error('[Vault-It] signInWithOtp error:', res.error);
+        if (msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('limit')) {
+          _authErr('Too many attempts — wait 60 seconds and try again.');
+        } else if (msg.toLowerCase().includes('email') || msg.toLowerCase().includes('smtp') || msg.toLowerCase().includes('sending')) {
           _authErr('Email delivery issue — check your inbox including spam, or contact pete@vault-it.app');
-        } else if (msg.toLowerCase().includes('rate')) {
-          _authErr('Too many attempts — wait a minute and try again.');
+        } else if (msg.toLowerCase().includes('signup') || msg.toLowerCase().includes('disabled')) {
+          _authErr('Sign-up is currently restricted. Contact pete@vault-it.app to get access.');
         } else {
-          _authErr('Could not send link. Check your connection and try again.');
+          _authErr('Auth error: ' + msg + '. Contact pete@vault-it.app if this persists.');
         }
         return;
       }
     }
     _showAuthStep('otp');
   } catch(e) {
-    _authErr('Could not send link. Check your connection and try again.');
+    console.error('[Vault-It] _sendOTP exception:', e);
+    _authErr('Connection error (' + (e && e.message ? e.message : 'unknown') + '). Check your signal and try again.');
   } finally {
     if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
   }
