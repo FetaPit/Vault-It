@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '1.0.2';
+  var SW_VERSION = '1.0.3';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -2816,8 +2816,22 @@ input:focus, textarea:focus, select:focus {
 /* Pre-paint: hide overlays for users with valid sessions */
 (function(){
   try {
-    var reset = new URLSearchParams(window.location.search).has('reset');
+    var params = new URLSearchParams(window.location.search);
+    var reset = params.has('reset');
     if (reset) { localStorage.removeItem('vi_user'); localStorage.removeItem('vi_session'); }
+
+    // Demo bypass — ?bypass=websummit creates a 24h session from stored profile
+    // Use this URL during live demos to skip the login screen
+    if (!reset && params.get('bypass') === 'websummit') {
+      var _bu = JSON.parse(localStorage.getItem('vi_user') || 'null');
+      var _be = (_bu && _bu.email) ? _bu.email.toLowerCase() : 'demo@vault-it.app';
+      localStorage.setItem('vi_session', JSON.stringify({ email: _be, expiry: Date.now() + 24*60*60*1000 }));
+      localStorage.setItem('vi_demo_mode', 'true');
+      document.write('<style>#login-overlay{display:none!important}</style>');
+      // Strip bypass param from URL without reload
+      window.history && window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     var s = JSON.parse(localStorage.getItem('vi_session') || 'null');
     var sessionOk = !reset && s && s.expiry > Date.now() && s.email;
     if (sessionOk) {
@@ -13645,39 +13659,85 @@ function checkStreak() {
 // ── TASK 1: DEMO MODE ────────────────────────────────────────────
 function loadDemoData() {
   localStorage.setItem('vi_demo_mode', 'true');
+  // Rich UK demo persona — used when no user data exists
+  if (!localStorage.getItem('vi_user')) {
+    localStorage.setItem('vi_user', JSON.stringify({
+      name: 'Alex Morgan', email: 'demo@vault-it.app',
+      job: 'Senior Product Manager', dream: 'Financial independence by 45',
+      saveArch: 'The Strategic Investor', spendArch: 'The Measured Spender',
+      joined: new Date().toISOString(), pioneerNum: 7
+    }));
+    localStorage.setItem('vi_pioneer', 'true');
+  }
+  if (!localStorage.getItem('pos_ov1')) {
+    localStorage.setItem('pos_ov1', JSON.stringify({
+      assets: [
+        { id: 1, name: 'Stocks & Shares ISA', val: 32400 },
+        { id: 2, name: 'Cash Savings', val: 14800 },
+        { id: 3, name: 'LISA', val: 8200 }
+      ],
+      debts: [
+        { id: 4, name: 'Student Loan', val: 24300 },
+        { id: 5, name: 'Credit Card', val: 1850 }
+      ],
+      milestones: [10000, 0, 25000, 50000, 100000],
+      monthlyIncome: 3800, monthlyExpenses: 2100
+    }));
+  }
+  if (!localStorage.getItem('pos_al1')) {
+    localStorage.setItem('pos_al1', JSON.stringify({
+      metals: { gold: 2.5, silver: 0, platinum: 0 },
+      crypto: [{ sym: 'ETH', qty: 1.4, name: 'Ethereum' }, { sym: 'BTC', qty: 0.05, name: 'Bitcoin' }],
+      cashAccounts: [{ id: 1, name: 'Marcus Savings', balance: 14800, rate: 4.7 }, { id: 2, name: 'Current Account', balance: 2300, rate: 0 }],
+      otherAssets: [{ id: 3, name: 'Car — Honda Civic', value: 12500 }],
+      liabilities: [{ id: 4, name: 'Car Finance', value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z' }]
+    }));
+  }
   if (!localStorage.getItem('pos_house')) {
     localStorage.setItem('pos_house', JSON.stringify({
-      saved: 16000, target: 200000, type: 'terraced',
+      saved: 22500, target: 240000, type: 'terraced',
       deposits: [
-        { amt: 5000, date: '01/01/2025' },
-        { amt: 4500, date: '01/02/2025' },
-        { amt: 3500, date: '01/03/2025' },
-        { amt: 3000, date: '01/04/2025' }
+        { amt: 5000, date: '01/10/2024' }, { amt: 4500, date: '01/11/2024' },
+        { amt: 3500, date: '01/12/2024' }, { amt: 4000, date: '01/01/2025' },
+        { amt: 3200, date: '01/02/2025' }, { amt: 2300, date: '01/03/2025' }
       ]
     }));
   }
   if (!localStorage.getItem('pos_journey')) {
     localStorage.setItem('pos_journey', JSON.stringify({
-      profile: { monthlyTakeHome: 2400, mortgageTermYears: 25, interestRateEst: 4.5, depositTargetPct: 10, creditHealth: 'fair', efMonths: 3 },
-      onboarded: true, stageOverride: 1, mortgageActive: false, mortgageBalance: 0, rentMonthly: 900, rentYears: 4
+      profile: { monthlyTakeHome: 3800, mortgageTermYears: 25, interestRateEst: 4.5, depositTargetPct: 10, creditHealth: 'good', efMonths: 4 },
+      onboarded: true, stageOverride: 1, mortgageActive: false, mortgageBalance: 0, rentMonthly: 1200, rentYears: 3
     }));
   }
   if (!localStorage.getItem('pos4')) {
     localStorage.setItem('pos4', JSON.stringify({
-      income:   [{ id: 1, name: 'Salary', mo: 2400, type: 'employment' }],
+      income: [
+        { id: 1, name: 'Salary', mo: 3800, type: 'employment' },
+        { id: 2, name: 'Side Projects', mo: 350, type: 'freelance' }
+      ],
       expenses: [
-        { id: 2, name: 'Rent',           mo: 900,  ess: true  },
-        { id: 3, name: 'Food & Grocery', mo: 320,  ess: true  },
-        { id: 4, name: 'Transport',      mo: 110,  ess: true  },
-        { id: 5, name: 'Subscriptions',  mo: 45,   ess: false },
-        { id: 6, name: 'Eating Out',     mo: 85,   ess: false }
+        { id: 3, name: 'Rent',           mo: 1200, ess: true  },
+        { id: 4, name: 'Food & Grocery', mo: 380,  ess: true  },
+        { id: 5, name: 'Transport',      mo: 130,  ess: true  },
+        { id: 6, name: 'Subscriptions',  mo: 62,   ess: false },
+        { id: 7, name: 'Gym & Health',   mo: 45,   ess: false },
+        { id: 8, name: 'Eating Out',     mo: 95,   ess: false }
       ],
       snapshots: [
-        { date: '2025-01-01', nw: -4200 },
-        { date: '2025-02-01', nw: -3700 },
-        { date: '2025-03-01', nw: -2900 },
-        { date: '2025-04-01', nw: -2100 },
-        { date: '2025-05-01', nw: -800  }
+        { date: '2025-01-01', nw: 8400  },
+        { date: '2025-02-01', nw: 10200 },
+        { date: '2025-03-01', nw: 12800 },
+        { date: '2025-04-01', nw: 15300 },
+        { date: '2025-05-01', nw: 17600 },
+        { date: '2025-06-01', nw: 20100 }
+      ]
+    }));
+  }
+  if (!localStorage.getItem('pos_debt1')) {
+    localStorage.setItem('pos_debt1', JSON.stringify({
+      debts: [
+        { id: 1, name: 'Student Loan Plan 2', balance: 24300, original: 38000, rate: 7.1, minPay: 180, type: 'loan', color: '#c9a84c' },
+        { id: 2, name: 'Barclaycard', balance: 1850, original: 3200, rate: 24.9, minPay: 55, type: 'credit', color: '#44c0b9' }
       ]
     }));
   }
