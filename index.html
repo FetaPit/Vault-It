@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <script>
 if ('serviceWorker' in navigator) {
-  var SW_VERSION = '1.0.1';
+  var SW_VERSION = '1.0.2';
   var SW_BLOB = new Blob([
     'var CACHE="vault-it-' + SW_VERSION + '";' +
     'var ASSETS=["./","./index.html"];' +
@@ -8173,7 +8173,14 @@ function authForgotPin() {
   _sendOTP(email);
 }
 
-function authGoBack() { _showAuthStep('email'); }
+function authGoBack() {
+  _authOTP = null;
+  var inp = document.getElementById('auth-otp-inp');
+  if (inp) inp.value = '';
+  var btn = document.querySelector('#auth-email-step .auth-btn');
+  if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
+  _showAuthStep('email');
+}
 
 async function authResendOTP() {
   if (!_authOTP || !_authOTP.email) { authGoBack(); return; }
@@ -8243,8 +8250,26 @@ function _enterPinKey(d) {
   setTimeout(function() {
     var stored = ''; try { stored = localStorage.getItem('vi_pin_hash') || ''; } catch(e) {}
     if (_hashStr(buf) === stored) {
+      // Renew local session so overlay doesn't reappear on next visit
+      var _pinEmail = '';
+      try { var _pse = JSON.parse(localStorage.getItem('vi_session') || 'null'); _pinEmail = (_pse && _pse.email) ? _pse.email : ''; } catch(e) {}
+      if (!_pinEmail) { try { var _pue = JSON.parse(localStorage.getItem('vi_user') || 'null'); _pinEmail = (_pue && _pue.email) ? _pue.email.toLowerCase() : ''; } catch(e) {} }
+      if (_pinEmail) _createSession(_pinEmail);
       var ov = document.getElementById('login-overlay');
       if (ov) ov.style.display = 'none';
+      // If Supabase already has a valid JWT, hydrate — otherwise UI uses localStorage data
+      if (_supaClient && !_supaUser) {
+        _supaClient.auth.getSession().then(function(r) {
+          var s = r.data && r.data.session;
+          if (s && s.user) {
+            _supaUser = s.user;
+            _hydrateFromSupabase(_supaUser.id).then(function(h) {
+              if (h) { try{updateKPIs();}catch(e){} try{updateSidebar();}catch(e){} try{renderPioneerCard();}catch(e){} }
+            });
+          }
+        }).catch(function(){});
+      }
+      try { if(typeof applyPaywall==='function') applyPaywall(); } catch(e) {}
       try { if(typeof updateKPIs==='function') updateKPIs(); } catch(e) {}
       try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
       try { if(typeof renderPioneerCard==='function') renderPioneerCard(); } catch(e) {}
@@ -13140,11 +13165,9 @@ function getCoreTaskStatus() {
 }
 
 function applyPaywall() {
-  var user = null;
-  try { user = JSON.parse(localStorage.getItem('vi_user') || 'null'); } catch(e) {}
-  var isPro = user && user.pro;
+  var pioneer = isPioneer();
   var bizGate = document.getElementById('pro-gate-biz');
-  if (bizGate) bizGate.style.display = isPro ? 'none' : '';
+  if (bizGate) bizGate.style.display = pioneer ? 'none' : '';
   updateProGate();
 }
 function updateProGate() {
