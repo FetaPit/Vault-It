@@ -9147,15 +9147,18 @@ function wiSetIcon(id,icon,targetList){
 }
 
 function addLiability(){
-  var n=document.getElementById('li-name').value.trim();
-  var v=(parseFloat(document.getElementById('li-val').value)||0)/(window.VI_CURRENCY_RATE||1);
-  var r=parseFloat(document.getElementById('li-rate').value)||0;
+  var liNameEl=document.getElementById('li-name');
+  var liValEl=document.getElementById('li-val');
+  if(!liNameEl||!liValEl)return;
+  var n=liNameEl.value.trim();
+  var v=(parseFloat(liValEl.value)||0)/(window.VI_CURRENCY_RATE||1);
+  var r=parseFloat((document.getElementById('li-rate')||{}).value)||0;
   var dep=parseFloat((document.getElementById('li-dep')||{}).value)||0;
   var run=(parseFloat((document.getElementById('li-run')||{}).value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
   if(!isPioneer()&&(alState.liabilities||[]).length>=FREE_LIMITS.liabilities){showPaywall('liabilities');return;}
   alState.liabilities.push({id:Date.now(),name:n,value:v,rate:r,depRate:dep,runningCost:run,addedDate:new Date().toISOString()});
-  document.getElementById('li-name').value='';document.getElementById('li-val').value='';document.getElementById('li-rate').value='';
+  liNameEl.value='';liValEl.value='';var liRateEl=document.getElementById('li-rate');if(liRateEl)liRateEl.value='';
   var lid=document.getElementById('li-dep');if(lid)lid.value='';
   var lir=document.getElementById('li-run');if(lir)lir.value='';
   saveAL();renderAlTab();updateKPIs();
@@ -10181,9 +10184,17 @@ function verifyPioneerPurchase(){
     localStorage.setItem('vi_pioneer_email',entered);
     // Stamp vi_user.pro so _isPro() also resolves true via the legacy check
     try { var _pu=JSON.parse(localStorage.getItem('vi_user')||'{}'); _pu.pro=true; localStorage.setItem('vi_user',JSON.stringify(_pu)); } catch(e){}
+    // Sync to Supabase profiles so other devices pick this up via _syncPioneerFromProfile
+    if (_supaClient && _supaUser) {
+      _supaClient.from('profiles').upsert(
+        { id: _supaUser.id, is_pioneer: true, updated_at: new Date().toISOString() },
+        { onConflict: 'id' }
+      ).catch(function(){});
+    }
     if(msg)msg.innerHTML='<span style="color:var(--gr)">✓ Pioneer access unlocked — welcome to the vault!</span>';
     setTimeout(function(){
       closePaywall();
+      if (typeof applyPaywall === 'function') applyPaywall();
       renderPioneerCard();
       showToast('◆ PIONEER unlocked — thank you! 🎉');
     },1400);
