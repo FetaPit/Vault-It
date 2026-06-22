@@ -943,12 +943,13 @@ async function loadSpots(){
   if(!el)return;
   try{
     if(supa){
-      var res=await supa.from('waitlist').select('id',{count:'exact',head:true});
-      var used=res.count||0;
+      var res=await supa.rpc('waitlist_count');
+      if(res.error) throw res.error;
+      var used=res.data||0;
       var remaining=Math.max(0,33-used);
       el.textContent=remaining+' pioneer spot'+(remaining!==1?'s':'')+' remaining';
-    }else{el.textContent='33 pioneer spots remaining';}
-  }catch(e){el.textContent='33 pioneer spots remaining';}
+    }else{el.textContent='21 pioneer spots remaining';}
+  }catch(e){el.textContent='21 pioneer spots remaining';}
 }
 loadSpots();
 </script>
