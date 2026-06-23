@@ -2605,20 +2605,19 @@ input:focus, textarea:focus, select:focus {
       <div class="auth-info">Pioneer Edition · 33 founding spots · End-to-end encrypted &amp; synced</div>
     </div>
 
-    <!-- Step 2: Magic link / OTP verification -->
+    <!-- Step 2: OTP code verification -->
     <div id="auth-otp-step" class="auth-step">
       <div style="text-align:center;margin-bottom:12px">
         <div style="font-size:1.6rem;margin-bottom:6px">📧</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);letter-spacing:.1em">LINK SENT</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);letter-spacing:.1em">CODE SENT</div>
       </div>
       <div class="auth-label">Check your inbox at <span id="auth-otp-email" style="color:var(--em)"></span></div>
-      <div style="font-size:.45rem;color:var(--t3);text-align:center;margin-bottom:14px;line-height:1.5">Click the sign-in link in your email.<br>This page will update automatically.<br><span style="opacity:.6">Not seeing it? Check your spam folder.</span></div>
-      <div style="font-size:.4rem;color:var(--t3);text-align:center;margin-bottom:8px;opacity:.5;letter-spacing:.06em;text-transform:uppercase">— or enter the code from your email —</div>
-      <input id="auth-otp-inp" class="auth-inp" type="text" inputmode="numeric" maxlength="8" placeholder="00000000"
+      <div style="font-size:.45rem;color:var(--t3);text-align:center;margin-bottom:14px;line-height:1.5">Enter the 6-digit code from your email below.<br><span style="opacity:.6">Not seeing it? Check your spam folder.</span></div>
+      <input id="auth-otp-inp" class="auth-inp" type="text" inputmode="numeric" maxlength="8" placeholder="000000"
         onkeydown="if(event.key==='Enter')authVerifyOTP()">
       <button class="auth-btn" onclick="authVerifyOTP()">Verify Code →</button>
       <button class="auth-btn secondary" onclick="authGoBack()">← Use different email</button>
-      <button class="auth-btn secondary" onclick="authResendOTP()" style="margin-top:4px;opacity:.6">Resend link</button>
+      <button class="auth-btn secondary" onclick="authResendOTP()" style="margin-top:4px;opacity:.6">Resend code</button>
     </div>
 
     <!-- Step 3: Set PIN (shown after first successful auth) -->
@@ -2835,13 +2834,14 @@ input:focus, textarea:focus, select:focus {
       // Valid session — hide login overlay immediately (no flash)
       document.write('<style>#login-overlay{display:none!important}</style>');
     }
-    // Hide welcome overlay for any returning user who has already registered
+    // Hide welcome overlay only for real returning users (not demo-mode visitors)
     var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
-    if (!reset && u && u.name && u.email) {
+    var isDemo = localStorage.getItem('vi_demo_mode') === 'true';
+    if (!reset && u && u.name && u.email && !isDemo) {
       document.write('<style>#welcome-overlay{display:none!important}</style>');
     }
     // Belt-and-suspenders: also hide via JS after DOM is ready
-    if (!reset && u && u.name && u.email) {
+    if (!reset && u && u.name && u.email && !isDemo) {
       document.addEventListener('DOMContentLoaded', function() {
         var ov = document.getElementById('welcome-overlay');
         if (ov) { ov.style.display = 'none'; ov.style.setProperty('display','none','important'); }
@@ -3758,6 +3758,19 @@ input:focus, textarea:focus, select:focus {
       </div>
       <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
       <div class="scene-cap" id="sceneCap" style="display:none"></div>
+      <!-- House Purchased CTA — shown when deposit goal reached -->
+      <div id="house-purchased-banner" style="display:none;text-align:center;padding:16px 20px;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(68,192,185,.06));border:1px solid rgba(201,168,76,.3);border-radius:10px;margin-top:12px">
+        <div style="font-size:1.3rem;margin-bottom:5px">🎉</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;color:#c9a84c;letter-spacing:.06em;margin-bottom:4px">Deposit Goal Reached!</div>
+        <div style="font-size:.5rem;color:rgba(255,255,255,.45);margin-bottom:12px;line-height:1.5">Your house is fully funded — time to make it official.</div>
+        <button onclick="markHousePurchased()" style="padding:10px 26px;background:linear-gradient(135deg,#c9a84c,#e0bb6a);border:none;border-radius:8px;color:#04090f;font-family:'Syne',sans-serif;font-weight:800;font-size:.62rem;cursor:pointer;letter-spacing:.06em">House Purchased →</button>
+      </div>
+      <!-- Mortgage complete banner — shown when mortgage is paid off -->
+      <div id="house-mortgage-complete" style="display:none;text-align:center;padding:16px 20px;background:linear-gradient(135deg,rgba(68,192,185,.12),rgba(201,168,76,.06));border:1px solid rgba(68,192,185,.35);border-radius:10px;margin-top:12px">
+        <div style="font-size:1.3rem;margin-bottom:5px">🏠</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;color:#44c0b9;letter-spacing:.06em;margin-bottom:4px">Mortgage Free!</div>
+        <div style="font-size:.5rem;color:rgba(255,255,255,.45);line-height:1.5">Your home is truly yours — debt free and fully owned.</div>
+      </div>
     </div>
     <div class="panel">
       <div class="card">
@@ -7109,19 +7122,41 @@ function drawApartment(p){
 }
 
 const DRAW={terraced:drawTerraced,semi:drawSemi,detached:drawDetached,mansion:drawMansion,flat:drawFlat,apartment:drawApartment};
+function _drawBlankPlot(){
+  S.innerHTML=''; getDefs(); _bgRect();
+  _ox=280; _oy=245; _tx=27; _ty=13.5; _tz=31;
+  _grid(-14,-4,18,16,0);
+  // Dashed plot boundary
+  _line([-.3,-.3,0],[2.7,-.3,0],'rgba(201,168,76,.3)',.9,'6,4');
+  _line([2.7,-.3,0],[2.7,2.7,0],'rgba(201,168,76,.3)',.9,'6,4');
+  _line([2.7,2.7,0],[-.3,2.7,0],'rgba(201,168,76,.3)',.9,'6,4');
+  _line([-.3,2.7,0],[-.3,-.3,0],'rgba(201,168,76,.3)',.9,'6,4');
+  // Corner pegs
+  [[-.3,-.3,0],[2.7,-.3,0],[2.7,2.7,0],[-.3,2.7,0]].forEach(function(c){
+    var pt=_iso(c[0],c[1],c[2]);
+    E('circle',{cx:pt.x,cy:pt.y,r:3,fill:'#c9a84c',stroke:'none',opacity:'.45'},S);
+  });
+  // Centre prompt
+  var cp=_iso(1.2,1.2,0);
+  E('text',{x:cp.x,y:cp.y-14,'font-size':11,'font-family':'Syne,sans-serif','font-weight':'800',fill:'rgba(68,192,185,.4)','text-anchor':'middle','letter-spacing':2},S).textContent='YOUR PLOT';
+  E('text',{x:cp.x,y:cp.y+3,'font-size':7,'font-family':'Share Tech Mono,monospace',fill:'rgba(255,255,255,.18)','text-anchor':'middle','letter-spacing':.5},S).textContent='add a deposit to break ground';
+}
 function redraw(){
-  var rawP = _isPro() ? pct() : 0;
-  // Prevent pure wireframe: always show at least foundation when goal is set,
-  // or show a 15% demo building when nothing is configured yet.
-  var displayP = rawP;
-  if (state.target <= 0 && state.saved <= 0) {
-    displayP = 0.15; // demo state — shows a partial building as preview
-  } else if (state.target > 0 && rawP < 0.04) {
-    displayP = 0.04; // show slab/foundations even at zero savings
-  }
-  (DRAW[state.houseType]||drawTerraced)(displayP);
   var lockEl = document.getElementById('house-pro-lock');
-  if (lockEl) lockEl.style.display = 'none'; // open for alpha — USP must be visible to all testers
+  if (lockEl) lockEl.style.display = 'none';
+  // Blank state: no deposits recorded yet — show empty plot
+  if (state.saved <= 0 && (!state.deposits || state.deposits.length === 0)) {
+    _drawBlankPlot();
+    return;
+  }
+  // Mortgage paid off — show fully completed solid house
+  if (state.houseMode === 'purchased' && state.mortgageBalance <= 0) {
+    (DRAW[state.houseType]||drawTerraced)(1.0);
+    return;
+  }
+  var rawP = _isPro() ? pct() : 0;
+  var displayP = rawP < 0.04 ? 0.04 : rawP;
+  (DRAW[state.houseType]||drawTerraced)(displayP);
 }
 
 function updateUI(){
@@ -7135,13 +7170,21 @@ function updateUI(){
   document.getElementById('stDeposit').textContent=gbpFmt(state.target*.10);
   [{id:'ms1',t:.01},{id:'ms5',t:.05},{id:'ms15',t:.15},{id:'ms30',t:.30},{id:'ms50',t:.50},{id:'ms65',t:.65},{id:'ms80',t:.80},{id:'ms90',t:.90},{id:'ms95',t:.95},{id:'ms100',t:1}].forEach(m=>{const el=document.getElementById(m.id);if(el)el.classList.toggle('hit',p>=m.t);});
   const cap=document.getElementById('sceneCap');
-  if(p===0)cap.textContent='Foundations being laid…';
+  var purchasedBanner=document.getElementById('house-purchased-banner');
+  var mortgageComplete=document.getElementById('house-mortgage-complete');
+  var noDeposits=state.saved<=0&&(!state.deposits||state.deposits.length===0);
+  if(noDeposits){cap.textContent='Set your deposit goal to break ground';}
+  else if(state.houseMode==='purchased'&&state.mortgageBalance<=0){cap.textContent='🏠 Mortgage free — your home is fully yours!';}
+  else if(state.houseMode==='purchased'){cap.textContent='🏠 In your home — mortgage tracker active';}
+  else if(p===0)cap.textContent='Foundations being laid…';
   else if(p<.20)cap.textContent='Bricks going up, row by row…';
   else if(p<.40)cap.textContent='The walls are rising…';
   else if(p<.60)cap.textContent='Roof timbers in place…';
   else if(p<.80)cap.textContent='Tiling the roof…';
   else if(p<1)cap.textContent='Almost home — lights are on!';
-  else cap.textContent='🎉 The house is yours!';
+  else cap.textContent='🎉 Deposit goal reached!';
+  if(purchasedBanner)purchasedBanner.style.display=(p>=1&&!state.houseMode&&!noDeposits)?'block':'none';
+  if(mortgageComplete)mortgageComplete.style.display=(state.houseMode==='purchased'&&state.mortgageBalance<=0)?'block':'none';
   const list=document.getElementById('logList');
   if(!state.deposits.length){list.innerHTML='<div style="font-size:.58rem;color:rgba(255,255,255,.18);text-align:center;padding:10px 0">No deposits yet</div>';}
   else list.innerHTML=[...state.deposits].reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date}</span><span class="la">+${gbpFmt(Number(d.amount))}</span></div>`).join('');
@@ -7157,6 +7200,18 @@ function updatePriceInput(){document.getElementById('priceInput').value=state.pr
 
 let tT2;
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT2);tT2=setTimeout(()=>t.classList.remove('show'),3000);}
+
+function markHousePurchased(){
+  state.houseMode='purchased';
+  state.mortgageActive=true;
+  // Estimate mortgage balance as 90% of target (10% deposit assumption)
+  if(!state.mortgageBalance||state.mortgageBalance<=0){
+    state.mortgageBalance=Math.round(state.target*0.9);
+  }
+  save();
+  toast('🏠 Congratulations — welcome home!');
+  updateUI();
+}
 
 let prevP=0;
 function checkMS(np){
@@ -8298,6 +8353,10 @@ function _enterPinDel() {
 // ──────────────────────────────────────────────────────────────
 
 function _completeAuth(email) {
+  // Clear demo mode — user is now a real authenticated account
+  localStorage.removeItem('vi_demo_mode');
+  var chip = document.getElementById('demo-chip');
+  if (chip) chip.style.display = 'none';
   try {
     var u = JSON.parse(localStorage.getItem('vi_user') || '{}');
     if (!u.email) { u.email = email; localStorage.setItem('vi_user', JSON.stringify(u)); }
@@ -13762,14 +13821,15 @@ function initWelcome() {
   try {
     var overlay = document.getElementById('welcome-overlay');
     var user = JSON.parse(localStorage.getItem('vi_user') || 'null');
-    if (user && user.email) {
-      // RETURNING USER — hide overlay, restore app state
+    var isDemo = localStorage.getItem('vi_demo_mode') === 'true';
+    if (user && user.name && user.email && !isDemo) {
+      // RETURNING REAL USER — hide overlay, restore app state
       _vaultItUser = user;
       if (overlay) overlay.style.display = 'none';
       applyPaywall();
       updateSidebar();
     }
-    // NEW USER — overlay already visible (display:flex in HTML)
+    // NEW or DEMO user — overlay stays visible for onboarding
   } catch(e) {}
 }
 
