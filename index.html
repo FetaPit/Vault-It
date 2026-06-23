@@ -52,8 +52,11 @@ if ('serviceWorker' in navigator) {
 .waitlist-email-input{width:100%;padding:10px 14px;background:var(--c3);border:1px solid var(--bd2);border-radius:5px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.8rem;margin-bottom:12px;box-sizing:border-box}
 .waitlist-email-input:focus{outline:none;border-color:var(--em);box-shadow:0 0 0 2px rgba(68,192,185,.1)}
 /* ── DEMO CHIP ───────────────────────────────────────── */
-.demo-chip{background:rgba(201,168,76,.1);border-bottom:1px solid rgba(201,168,76,.2);padding:5px 16px;font-family:'Share Tech Mono',monospace;font-size:.46rem;color:rgba(201,168,76,.7);letter-spacing:.1em;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:500}
+.demo-chip{background:rgba(201,168,76,.12);border-bottom:1px solid rgba(201,168,76,.25);padding:7px 16px;font-family:'Share Tech Mono',monospace;font-size:12px;color:rgba(201,168,76,.85);letter-spacing:.08em;display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;z-index:500}
+.demo-chip .demo-chip-left{display:flex;align-items:center;gap:8px}
 .demo-chip button{background:none;border:none;color:var(--go);font-family:inherit;font-size:inherit;cursor:pointer;text-decoration:underline;padding:0}
+.demo-chip .demo-signup-btn{background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4);color:#c9a84c;font-family:'Share Tech Mono',monospace;font-size:11px;padding:4px 12px;border-radius:4px;cursor:pointer;letter-spacing:.08em;text-decoration:none;white-space:nowrap}
+.demo-chip .demo-signup-btn:hover{background:rgba(201,168,76,.28)}
 /* ── PWA INSTALL BANNER ──────────────────────────────── */
 #pwa-install-banner{background:rgba(68,192,185,.08);border-bottom:1px solid rgba(68,192,185,.15);padding:6px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:'Share Tech Mono',monospace;font-size:.46rem;color:var(--t2)}
 #pwa-install-banner button.install-btn{padding:4px 12px;background:var(--em);border:none;color:#080808;font-family:'Syne',sans-serif;font-size:.5rem;font-weight:800;cursor:pointer;clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))}
@@ -2684,7 +2687,7 @@ input:focus, textarea:focus, select:focus {
   </div>
 </div>
 
-<div id="demo-chip" class="demo-chip" style="display:none">⚡ DEMO DATA — <button onclick="clearDemoData()">Replace with your data →</button></div>
+<div id="demo-chip" class="demo-chip" style="display:none"><span class="demo-chip-left">⚡ DEMO MODE &mdash; You&rsquo;re viewing sample data. <button onclick="clearDemoData()">Start with your own data</button></span><a class="demo-signup-btn" href="https://fetapit.github.io/Vault-It/" onclick="localStorage.removeItem('vi_demo_mode');localStorage.removeItem('vi_session');">Sign up free &rarr;</a></div>
 <div id="pwa-install-banner" style="display:none">
   <span>⬇ Install Vault·It — works offline, opens like an app</span>
   <div style="display:flex;gap:6px;align-items:center">

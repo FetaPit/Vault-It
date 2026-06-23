@@ -326,7 +326,7 @@ footer{border-top:1px solid rgba(255,255,255,.05);padding:40px 0 26px;margin-top
 <section class="hero-section">
   <div class="hero-overlay">
     <div class="eyebrow-wrap reveal">
-      <span class="eyebrow"><span class="dot"></span> Early Access &middot; 33 Pioneer Spots Remaining</span>
+      <span class="eyebrow"><span class="dot"></span> Early Access &middot; <span id="eyebrowSpots">33 Pioneer Spots Remaining</span></span>
     </div>
     <h1 class="reveal">From debt to owning your <em>home outright.</em></h1>
     <p class="sub reveal">One dark, beautiful dashboard for the whole climb — clear your debt, build your deposit, track metals and cashflow, all the way to holding the keys.</p>
@@ -940,16 +940,24 @@ if(wForm){
 // Spots counter
 async function loadSpots(){
   var el=document.getElementById('spotsLeft');
-  if(!el)return;
+  var eyebrow=document.getElementById('eyebrowSpots');
   try{
     if(supa){
       var res=await supa.rpc('waitlist_count');
       if(res.error) throw res.error;
       var used=res.data||0;
       var remaining=Math.max(0,33-used);
-      el.textContent=remaining+' pioneer spot'+(remaining!==1?'s':'')+' remaining';
-    }else{el.textContent='21 pioneer spots remaining';}
-  }catch(e){el.textContent='21 pioneer spots remaining';}
+      var txt=remaining+' Pioneer Spot'+(remaining!==1?'s':'')+' Remaining';
+      if(el) el.textContent=remaining+' pioneer spot'+(remaining!==1?'s':'')+' remaining';
+      if(eyebrow) eyebrow.textContent=txt;
+    }else{
+      if(el) el.textContent='21 pioneer spots remaining';
+      if(eyebrow) eyebrow.textContent='21 Pioneer Spots Remaining';
+    }
+  }catch(e){
+    if(el) el.textContent='21 pioneer spots remaining';
+    if(eyebrow) eyebrow.textContent='21 Pioneer Spots Remaining';
+  }
 }
 loadSpots();
 </script>
