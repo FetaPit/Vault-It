@@ -19,7 +19,7 @@ function err(msg: string, status = 400) {
   return new Response(JSON.stringify({ error: msg }), { status, headers: { ...CORS, 'Content-Type': 'application/json' } })
 }
 
-function emailHtml(magicLink: string, email: string): string {
+function emailHtml(otpCode: string, email: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,19 +38,22 @@ function emailHtml(magicLink: string, email: string): string {
       </td></tr>
       <!-- Body -->
       <tr><td style="padding:36px 40px">
-        <p style="margin:0 0 8px;font-size:13px;color:rgba(255,255,255,.45);letter-spacing:.06em">YOUR SIGN-IN LINK</p>
-        <h1 style="margin:0 0 20px;font-size:24px;font-weight:700;color:#f0f4f8;line-height:1.3">One tap to open your Vault</h1>
+        <p style="margin:0 0 8px;font-size:13px;color:rgba(255,255,255,.45);letter-spacing:.06em">YOUR SIGN-IN CODE</p>
+        <h1 style="margin:0 0 20px;font-size:24px;font-weight:700;color:#f0f4f8;line-height:1.3">Open your Vault</h1>
         <p style="margin:0 0 28px;font-size:15px;color:rgba(255,255,255,.6);line-height:1.6">
-          Click the button below to sign in to <strong style="color:#e8edf2">${email}</strong>.<br>
-          This link expires in <strong style="color:#44c0b9">60 minutes</strong> and can only be used once.
+          Enter this code on the Vault·It sign-in screen for <strong style="color:#e8edf2">${email}</strong>.<br>
+          The code expires in <strong style="color:#44c0b9">60 minutes</strong> and can only be used once.
         </p>
-        <table cellpadding="0" cellspacing="0" style="margin:0 auto 28px">
-          <tr><td style="background:linear-gradient(135deg,#c9a84c,#e0bb6a);border-radius:10px">
-            <a href="${magicLink}" style="display:inline-block;padding:16px 40px;font-size:14px;font-weight:700;color:#04090f;text-decoration:none;letter-spacing:.08em">OPEN MY VAULT →</a>
+        <!-- OTP Code Block -->
+        <table cellpadding="0" cellspacing="0" style="margin:0 auto 28px;width:100%">
+          <tr><td style="text-align:center">
+            <div style="display:inline-block;background:rgba(68,192,185,.08);border:2px solid rgba(68,192,185,.35);border-radius:12px;padding:20px 40px">
+              <div style="font-size:11px;color:rgba(68,192,185,.6);letter-spacing:.18em;margin-bottom:10px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">ENTER THIS CODE</div>
+              <div style="font-size:40px;font-weight:800;letter-spacing:.25em;color:#f0f4f8;font-family:'Courier New',Courier,monospace;line-height:1">${otpCode}</div>
+            </div>
           </td></tr>
         </table>
-        <p style="margin:0 0 6px;font-size:12px;color:rgba(255,255,255,.3);text-align:center">Or copy this link into your browser:</p>
-        <p style="margin:0;font-size:11px;color:rgba(68,192,185,.5);text-align:center;word-break:break-all;font-family:monospace">${magicLink}</p>
+        <p style="margin:0;font-size:12px;color:rgba(255,255,255,.3);text-align:center">Type or copy the code above into the Vault·It app</p>
       </td></tr>
       <!-- Footer -->
       <tr><td style="padding:20px 40px 28px;border-top:1px solid rgba(68,192,185,.08);text-align:center">
@@ -80,7 +83,7 @@ Deno.serve(async (req: Request) => {
     return err('Invalid request body')
   }
 
-  // Generate magic link via Supabase admin API
+  // Generate OTP via Supabase admin API (magiclink type also produces email_otp)
   const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
     auth: { autoRefreshToken: false, persistSession: false }
   })
@@ -91,12 +94,12 @@ Deno.serve(async (req: Request) => {
     options: { redirectTo: APP_URL },
   })
 
-  if (linkErr || !data?.properties?.action_link) {
+  if (linkErr || !data?.properties?.email_otp) {
     console.error('generateLink error:', linkErr)
-    return err(linkErr?.message ?? 'Failed to generate sign-in link', 500)
+    return err(linkErr?.message ?? 'Failed to generate sign-in code', 500)
   }
 
-  const magicLink = data.properties.action_link
+  const otpCode = data.properties.email_otp
 
   // Send via Resend HTTP API
   const resendRes = await fetch('https://api.resend.com/emails', {
@@ -108,8 +111,8 @@ Deno.serve(async (req: Request) => {
     body: JSON.stringify({
       from:    FROM_EMAIL,
       to:      [email],
-      subject: 'Sign in to Vault·It',
-      html:    emailHtml(magicLink, email),
+      subject: 'Your Vault·It sign-in code',
+      html:    emailHtml(otpCode, email),
     }),
   })
 

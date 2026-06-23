@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vault·It — Loading demo</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#04090f;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+  .wrap{text-align:center;padding:40px}
+  .logo{font-size:28px;font-weight:800;letter-spacing:.12em;color:#c9a84c;margin-bottom:8px}
+  .logo span{color:#44c0b9}
+  .sub{font-size:12px;letter-spacing:.18em;color:rgba(68,192,185,.6);text-transform:uppercase;margin-bottom:40px}
+  .bar-wrap{width:220px;height:3px;background:rgba(68,192,185,.12);border-radius:2px;margin:0 auto}
+  .bar{height:100%;background:linear-gradient(90deg,#44c0b9,#c9a84c);border-radius:2px;animation:fill 1.1s ease-out forwards}
+  @keyframes fill{from{width:0}to{width:100%}}
+  .msg{margin-top:20px;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">VAULT<span>·IT</span></div>
+  <div class="sub">Pioneer Edition</div>
+  <div class="bar-wrap"><div class="bar"></div></div>
+  <div class="msg">Loading your vault&hellip;</div>
+</div>
+
+<script>
+(function(){
+  var now = new Date().toISOString();
+  var expiry = Date.now() + 7 * 24 * 60 * 60 * 1000;
+
+  // ── Session (7 days, no auth needed) ─────────────────────────────
+  localStorage.setItem('vi_session', JSON.stringify({ email: 'alex@vault-it.app', expiry: expiry }));
+
+  // ── User profile ──────────────────────────────────────────────────
+  localStorage.setItem('vi_user', JSON.stringify({
+    name: 'Alex Morgan',
+    email: 'alex@vault-it.app',
+    job: 'Senior Product Manager',
+    dream: 'Financial independence by 45',
+    saveArch: 'The Strategic Investor',
+    spendArch: 'The Measured Spender',
+    joined: now,
+    pioneerNum: 7
+  }));
+
+  // ── Pioneer access ────────────────────────────────────────────────
+  localStorage.setItem('vi_pioneer', 'true');
+
+  // ── Overview (net worth) ──────────────────────────────────────────
+  localStorage.setItem('pos_ov1', JSON.stringify({
+    assets: [
+      { id: 1, name: 'Stocks & Shares ISA', val: 32400 },
+      { id: 2, name: 'Cash Savings',         val: 14800 },
+      { id: 3, name: 'LISA',                 val: 8200  }
+    ],
+    debts: [
+      { id: 4, name: 'Student Loan',  val: 24300 },
+      { id: 5, name: 'Credit Card',   val: 1850  }
+    ],
+    milestones: [10000, 0, 25000, 50000, 100000],
+    monthlyIncome: 3800, monthlyExpenses: 2100
+  }));
+
+  // ── Assets (metals / crypto / cash / liabilities) ────────────────
+  localStorage.setItem('pos_al1', JSON.stringify({
+    metals: { gold: 2.5, silver: 0, platinum: 0 },
+    crypto: [
+      { sym: 'ETH', qty: 1.4, name: 'Ethereum' },
+      { sym: 'BTC', qty: 0.05, name: 'Bitcoin' }
+    ],
+    cashAccounts: [
+      { id: 1, name: 'Marcus Savings',  balance: 14800, rate: 4.7 },
+      { id: 2, name: 'Current Account', balance: 2300,  rate: 0   }
+    ],
+    otherAssets: [
+      { id: 3, name: 'Car — Honda Civic', value: 12500 }
+    ],
+    liabilities: [
+      { id: 4, name: 'Car Finance', value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z' }
+    ]
+  }));
+
+  // ── House builder ─────────────────────────────────────────────────
+  localStorage.setItem('pos_house', JSON.stringify({
+    saved: 22500, target: 240000, type: 'terraced',
+    deposits: [
+      { amt: 5000, date: '01/10/2024' },
+      { amt: 4500, date: '01/11/2024' },
+      { amt: 3500, date: '01/12/2024' },
+      { amt: 4000, date: '01/01/2025' },
+      { amt: 3200, date: '01/02/2025' },
+      { amt: 2300, date: '01/03/2025' }
+    ]
+  }));
+
+  // ── Journey / life stage ──────────────────────────────────────────
+  localStorage.setItem('pos_journey', JSON.stringify({
+    profile: {
+      monthlyTakeHome: 3800, mortgageTermYears: 25,
+      interestRateEst: 4.5, depositTargetPct: 10,
+      creditHealth: 'good', efMonths: 4
+    },
+    onboarded: true, stageOverride: 1,
+    mortgageActive: false, mortgageBalance: 0,
+    rentMonthly: 1200, rentYears: 3
+  }));
+
+  // ── Cashflow ──────────────────────────────────────────────────────
+  localStorage.setItem('pos4', JSON.stringify({
+    income: [
+      { id: 1, name: 'Salary',        mo: 3800, type: 'employment' },
+      { id: 2, name: 'Side Projects', mo: 350,  type: 'freelance'  }
+    ],
+    expenses: [
+      { id: 3, name: 'Rent',           mo: 1200, ess: true  },
+      { id: 4, name: 'Food & Grocery', mo: 380,  ess: true  },
+      { id: 5, name: 'Transport',      mo: 130,  ess: true  },
+      { id: 6, name: 'Subscriptions',  mo: 62,   ess: false },
+      { id: 7, name: 'Gym & Health',   mo: 45,   ess: false },
+      { id: 8, name: 'Eating Out',     mo: 95,   ess: false }
+    ],
+    snapshots: [
+      { date: '2025-01-01', nw: 8400  },
+      { date: '2025-02-01', nw: 10200 },
+      { date: '2025-03-01', nw: 12800 },
+      { date: '2025-04-01', nw: 15300 },
+      { date: '2025-05-01', nw: 17600 },
+      { date: '2025-06-01', nw: 20100 }
+    ]
+  }));
+
+  // ── Debt tracker ──────────────────────────────────────────────────
+  localStorage.setItem('pos_debt1', JSON.stringify({
+    debts: [
+      { id: 1, name: 'Student Loan Plan 2', balance: 24300, original: 38000, rate: 7.1,  minPay: 180, type: 'loan',   color: '#c9a84c' },
+      { id: 2, name: 'Barclaycard',         balance: 1850,  original: 3200,  rate: 24.9, minPay: 55,  type: 'credit', color: '#44c0b9' }
+    ]
+  }));
+
+  // ── Redirect to main app ──────────────────────────────────────────
+  setTimeout(function(){ window.location.replace('../'); }, 1200);
+})();
+</script>
+</body>
+</html>
