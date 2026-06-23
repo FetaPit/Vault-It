@@ -12042,6 +12042,7 @@ function jrnyMaxMortgage() {
 
 function jrnyCalcStage() {
   var J = journeyState;
+  if (!J) return 0;
   if (J.stageOverride !== null && J.stageOverride !== undefined) return J.stageOverride;
   if (J.mortgageBalance === 0 && J.mortgageActive) return 6;
   if (J.mortgageActive) return 5;
@@ -13754,7 +13755,7 @@ function initDemoMode() {
   var isDemo  = localStorage.getItem('vi_demo_mode') === 'true';
   if (!hasUser && !hasData) { loadDemoData(); isDemo = true; }
   var chip = document.getElementById('demo-chip');
-  if (chip) chip.style.display = isDemo ? '' : 'none';
+  if (chip) chip.style.display = isDemo ? 'flex' : 'none';
 }
 
 function initWelcome() {
