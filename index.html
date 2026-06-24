@@ -3270,10 +3270,6 @@ input:focus, textarea:focus, select:focus {
     <svg class="ti" viewBox="0 0 16 16"><rect x="1" y="1" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="1" width="5.5" height="5.5" rx="1"/><rect x="1" y="9.5" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1"/></svg>
     <span>Overview</span>
   </button>
-  <button class="tab-btn" onclick="showTab('journey')">
-    <svg class="ti" viewBox="0 0 16 16"><path d="M3 14V3l8 3-8 3"/></svg>
-    <span>Journey</span>
-  </button>
   <button class="tab-btn" onclick="showTab('house')" style="position:relative;border-bottom:2px solid var(--go)!important" title="Vault·It's flagship feature">
     <svg class="ti" viewBox="0 0 16 16" style="color:var(--go)"><path d="M1.5 9L8 2.5 14.5 9V14.5H10V11H6v3.5H1.5V9z"/></svg>
     <span style="color:var(--go)">House Builder</span>
@@ -3388,18 +3384,6 @@ input:focus, textarea:focus, select:focus {
       <div class="ov-kpi-val" id="kpi-debt" style="color:var(--em)">£0</div>
       <div class="ov-kpi-sub" id="kpi-debt-sub">monthly surplus</div>
     </div>
-  </div>
-
-  <!-- FIRE stage progress banner -->
-  <div id="ov-fire-banner" style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(90deg,rgba(68,192,185,.07),transparent);border:1px solid rgba(68,192,185,.15);border-radius:6px;margin-top:12px;flex-wrap:wrap">
-    <div id="ov-banner-stage" style="font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--em);padding:3px 10px;background:rgba(68,192,185,.1);border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">STAGE 0</div>
-    <div style="flex:1;min-width:120px">
-      <div id="ov-banner-label" style="font-size:.58rem;color:var(--tx);font-weight:600;margin-bottom:2px">Foundation — Debt is your priority</div>
-      <div style="height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden">
-        <div id="ov-banner-bar" style="height:100%;background:linear-gradient(90deg,var(--em),var(--go));border-radius:2px;transition:width .5s ease;width:0%"></div>
-      </div>
-    </div>
-    <div id="ov-banner-next" style="font-size:.52rem;color:var(--t3);white-space:nowrap"></div>
   </div>
 
   <div class="advisor-card gold" style="margin-top:16px">
@@ -3607,77 +3591,7 @@ input:focus, textarea:focus, select:focus {
 <!-- ═══════════════════════════════════════════
      JOURNEY MAP TAB
 ═══════════════════════════════════════════ -->
-<div id="tab-journey" class="tab-panel">
-
-<!-- Onboarding wizard overlay -->
-<div class="jrny-wizard-overlay hidden" id="jrny-wizard">
-  <div class="jrny-wizard-box">
-    <div class="jrny-wizard-progress" id="jrny-wiz-prog">
-      <div class="jrny-wizard-dot active" id="wdot-0"></div>
-      <div class="jrny-wizard-dot" id="wdot-1"></div>
-      <div class="jrny-wizard-dot" id="wdot-2"></div>
-      <div class="jrny-wizard-dot" id="wdot-3"></div>
-      <div class="jrny-wizard-dot" id="wdot-4"></div>
-    </div>
-    <div class="jrny-wizard-title" id="jrny-wiz-title">Let's map your journey.</div>
-    <div class="jrny-wizard-sub" id="jrny-wiz-sub">Five questions. Under a minute. Unlocks your personal road from where you are now to owning your home outright.</div>
-    <div class="jrny-wizard-q" id="jrny-wiz-q"></div>
-    <div id="jrny-wiz-body"></div>
-    <div class="jrny-wizard-btns">
-      <button class="jrny-btn-skip" onclick="jrnyWizSkip()">Skip for now</button>
-      <button class="jrny-btn-primary" onclick="jrnyWizNext()" id="jrny-wiz-next-btn">Next</button>
-    </div>
-  </div>
-</div>
-
-<div class="advisor-card gold" style="margin:16px 16px 0">
-  <div class="advisor-name">⚔️ Simon Squibb — COO, Vault·It</div>
-  "What's your dream? Not the sensible answer — the real one. Owning your home is the foundation that lets every other dream breathe. Map the journey. Walk the road."
-  <div style="font-size:.56rem;color:var(--t3);margin-top:6px">Advisory board · Future collaboration · Not financial advice</div>
-</div>
-
-<div class="jrny-wrap">
-  <!-- Header strip -->
-  <div class="jrny-header" id="jrny-hdr">
-    <div class="jrny-stage-badge" id="jrny-badge">Stage 0 - Survival</div>
-    <div class="jrny-keys-date" id="jrny-keys-headline">Keys in hand: calculating...</div>
-    <div class="jrny-header-sub" id="jrny-hdr-sub">Add data to see your timeline</div>
-  </div>
-  <!-- Journey vertical timeline -->
-  <div class="jrny-road-wrap">
-    <svg class="jrny-road-svg" id="jrny-road-svg" viewBox="0 0 300 650" preserveAspectRatio="xMidYMin meet"></svg>
-  </div>
-  <!-- Custom goal events -->
-  <div id="jrny-custom-events"></div>
-  <!-- Active stage panel -->
-  <div class="jrny-panel" id="jrny-stage-panel">
-    <div class="jrny-panel-hdr">
-      <div class="jrny-panel-icon" id="jrny-panel-icon">Map</div>
-      <div class="jrny-panel-title" id="jrny-panel-title">Your Current Stage</div>
-      <div class="jrny-panel-sub" id="jrny-panel-sub">Click a stage node above to explore</div>
-    </div>
-    <div class="jrny-bento" id="jrny-bento"></div>
-  </div>
-  <!-- Gary Stevenson trio -->
-  <div class="jrny-gary" id="jrny-gary">
-    <div class="jrny-gary-card trap">
-      <div class="jrny-gary-title" style="color:var(--re)">The Rent Trap</div>
-      <div class="jrny-gary-val" id="gary-rent-val" style="color:var(--re)">Add rent expenses to unlock</div>
-      <div class="jrny-gary-body" id="gary-rent-body">Track your expenses in the Cashflow section to see what renting has really cost you and what ownership could have built instead.</div>
-    </div>
-    <div class="jrny-gary-card wait">
-      <div class="jrny-gary-title" style="color:var(--go)">The Cost of Waiting</div>
-      <div class="jrny-gary-val" id="gary-wait-val" style="color:var(--go)">~60 per day</div>
-      <div class="jrny-gary-body" id="gary-wait-body">The UK average house price grows roughly <b>22,000 per year</b> (ONS 10yr avg). Every month without a deposit, the gap widens. Not to scare you. To motivate you. <b>Every pound you save today is worth more tomorrow.</b></div>
-    </div>
-    <div class="jrny-gary-card system">
-      <div class="jrny-gary-title" style="color:var(--em)">The System, Briefly</div>
-      <div class="jrny-gary-val" style="color:var(--em)">How it actually works</div>
-      <div class="jrny-gary-body">Banks make money from your debt. Landlords build wealth from your rent. The way out is the same for everyone: <b>clear the debt, build the deposit, own the asset.</b> No shortcuts. No tricks. Just a plan and consistent action. That's what this tab is for.</div>
-    </div>
-  </div>
-</div>
-</div><!-- /tab-journey -->
+<!-- Journey tab removed -->
 
 
 

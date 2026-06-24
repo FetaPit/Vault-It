@@ -48,7 +48,7 @@
   // ── Pioneer access ────────────────────────────────────────────────
   localStorage.setItem('vi_pioneer', 'true');
 
-  // ── Overview (net worth) ──────────────────────────────────────────
+  // ── Overview (net worth + snapshots) ─────────────────────────────
   localStorage.setItem('pos_ov1', JSON.stringify({
     assets: [
       { id: 1, name: 'Stocks & Shares ISA', val: 32400 },
@@ -60,39 +60,59 @@
       { id: 5, name: 'Credit Card',   val: 1850  }
     ],
     milestones: [10000, 0, 25000, 50000, 100000],
-    monthlyIncome: 3800, monthlyExpenses: 2100
+    monthlyIncome: 4150, monthlyExpenses: 2170,
+    snapshots: [
+      { date: '2025-01-01', nw: 8400  },
+      { date: '2025-02-01', nw: 10200 },
+      { date: '2025-03-01', nw: 12800 },
+      { date: '2025-04-01', nw: 15300 },
+      { date: '2025-05-01', nw: 17600 },
+      { date: '2025-06-01', nw: 20100 },
+      { date: '2025-07-01', nw: 22500 },
+      { date: '2025-08-01', nw: 24900 }
+    ]
   }));
 
-  // ── Assets (metals / crypto / cash / liabilities) ────────────────
+  // ── Assets tab (metals / crypto / cash / other / liabilities) ────
   localStorage.setItem('pos_al1', JSON.stringify({
-    metals: { gold: 2.5, silver: 0, platinum: 0 },
+    metals: { gold: 2.5, silver: 15, platinum: 0 },
     crypto: [
-      { sym: 'ETH', qty: 1.4, name: 'Ethereum' },
-      { sym: 'BTC', qty: 0.05, name: 'Bitcoin' }
+      { sym: 'ETH', qty: 1.4,  name: 'Ethereum' },
+      { sym: 'BTC', qty: 0.05, name: 'Bitcoin'  },
+      { sym: 'SOL', qty: 8,    name: 'Solana'   }
     ],
     cashAccounts: [
-      { id: 1, name: 'Marcus Savings',  balance: 14800, rate: 4.7 },
-      { id: 2, name: 'Current Account', balance: 2300,  rate: 0   }
+      { id: 1, name: 'Marcus Savings', balance: 14800, rate: 4.7 },
+      { id: 2, name: 'Monzo Current',  balance: 2300,  rate: 0   },
+      { id: 3, name: 'LISA',           balance: 8200,  rate: 3.5 }
     ],
     otherAssets: [
-      { id: 3, name: 'Car — Honda Civic', value: 12500 }
+      { id: 4, name: 'Car — Honda Civic', value: 12500, image: null, svgIcon: null, imageSearch: null },
+      { id: 5, name: 'MacBook Pro 16"',   value: 1800,  image: null, svgIcon: null, imageSearch: null }
     ],
     liabilities: [
-      { id: 4, name: 'Car Finance', value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z' }
+      { id: 6, name: 'Car Finance',  value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z', runningCost: 180, depRate: 12 },
+      { id: 7, name: 'MacBook Loan', value: 1200, rate: 0,   addedDate: '2025-01-01T00:00:00.000Z', runningCost: 0,   depRate: 25 }
     ]
   }));
 
-  // ── House builder ─────────────────────────────────────────────────
-  localStorage.setItem('pos_house', JSON.stringify({
-    saved: 22500, target: 240000, type: 'terraced',
+  // ── House Builder (ht3 — the key the app actually reads) ──────────
+  localStorage.setItem('ht3', JSON.stringify({
+    saved: 22500,
+    target: 240000,
+    houseType: 'terraced',
     deposits: [
-      { amt: 5000, date: '01/10/2024' },
-      { amt: 4500, date: '01/11/2024' },
-      { amt: 3500, date: '01/12/2024' },
-      { amt: 4000, date: '01/01/2025' },
-      { amt: 3200, date: '01/02/2025' },
-      { amt: 2300, date: '01/03/2025' }
-    ]
+      { date: '01/10/2024', amount: 5000 },
+      { date: '01/11/2024', amount: 4500 },
+      { date: '01/12/2024', amount: 3500 },
+      { date: '01/01/2025', amount: 4000 },
+      { date: '01/02/2025', amount: 3200 },
+      { date: '01/03/2025', amount: 2300 }
+    ],
+    prices: { terraced: 240000, semi: 320000, detached: 500000, mansion: 1500000, flat: 80000, apartment: 300000 },
+    apartmentFloor: 5,
+    houseMode: null,
+    mortgageBalance: 0
   }));
 
   // ── Journey / life stage ──────────────────────────────────────────
@@ -102,7 +122,7 @@
       interestRateEst: 4.5, depositTargetPct: 10,
       creditHealth: 'good', efMonths: 4
     },
-    onboarded: true, stageOverride: 1,
+    onboarded: true, stageOverride: 2,
     mortgageActive: false, mortgageBalance: 0,
     rentMonthly: 1200, rentYears: 3
   }));
@@ -110,16 +130,17 @@
   // ── Cashflow ──────────────────────────────────────────────────────
   localStorage.setItem('pos4', JSON.stringify({
     income: [
-      { id: 1, name: 'Salary',        mo: 3800, type: 'employment' },
-      { id: 2, name: 'Side Projects', mo: 350,  type: 'freelance'  }
+      { id: 1, name: 'Salary',        amount: 3800, type: 'employment' },
+      { id: 2, name: 'Side Projects', amount: 350,  type: 'freelance'  }
     ],
     expenses: [
-      { id: 3, name: 'Rent',           mo: 1200, ess: true  },
-      { id: 4, name: 'Food & Grocery', mo: 380,  ess: true  },
-      { id: 5, name: 'Transport',      mo: 130,  ess: true  },
-      { id: 6, name: 'Subscriptions',  mo: 62,   ess: false },
-      { id: 7, name: 'Gym & Health',   mo: 45,   ess: false },
-      { id: 8, name: 'Eating Out',     mo: 95,   ess: false }
+      { id: 3, name: 'Rent',           amount: 1200, category: 'necessity' },
+      { id: 4, name: 'Food & Grocery', amount: 380,  category: 'necessity' },
+      { id: 5, name: 'Transport',      amount: 130,  category: 'necessity' },
+      { id: 6, name: 'Subscriptions',  amount: 62,   category: 'lifestyle' },
+      { id: 7, name: 'Gym & Health',   amount: 45,   category: 'lifestyle' },
+      { id: 8, name: 'Eating Out',     amount: 95,   category: 'lifestyle' },
+      { id: 9, name: 'House Deposit',  amount: 258,  category: 'savings'   }
     ],
     snapshots: [
       { date: '2025-01-01', nw: 8400  },
@@ -127,16 +148,52 @@
       { date: '2025-03-01', nw: 12800 },
       { date: '2025-04-01', nw: 15300 },
       { date: '2025-05-01', nw: 17600 },
-      { date: '2025-06-01', nw: 20100 }
+      { date: '2025-06-01', nw: 20100 },
+      { date: '2025-07-01', nw: 22500 },
+      { date: '2025-08-01', nw: 24900 }
     ]
   }));
 
-  // ── Debt tracker ──────────────────────────────────────────────────
+  // ── Debt Tracker ──────────────────────────────────────────────────
   localStorage.setItem('pos_debt1', JSON.stringify({
     debts: [
       { id: 1, name: 'Student Loan Plan 2', balance: 24300, original: 38000, rate: 7.1,  minPay: 180, type: 'loan',   color: '#c9a84c' },
-      { id: 2, name: 'Barclaycard',         balance: 1850,  original: 3200,  rate: 24.9, minPay: 55,  type: 'credit', color: '#44c0b9' }
+      { id: 2, name: 'Barclaycard',         balance: 1850,  original: 3200,  rate: 24.9, minPay: 55,  type: 'credit', color: '#44c0b9' },
+      { id: 3, name: 'Car Finance',         balance: 6800,  original: 9500,  rate: 7.9,  minPay: 180, type: 'loan',   color: '#e05c5c' }
     ]
+  }));
+
+  // ── Entrepreneur / Business tab (pos_biz1) ────────────────────────
+  localStorage.setItem('pos_biz1', JSON.stringify({
+    revenueGoal: 1500,
+    clients: [
+      { id: 1, name: 'Acme Tech Ltd',   monthly: 600, status: 'Active',   notes: 'Product consultancy retainer', email: 'cto@acmetech.co.uk', phone: '', website: 'acmetech.co.uk' },
+      { id: 2, name: 'BlueSkye Agency', monthly: 350, status: 'Active',   notes: 'UX audit & roadmap',           email: 'hello@blueskye.co',  phone: '', website: 'blueskye.co'    },
+      { id: 3, name: 'FinEdge Capital', monthly: 200, status: 'Prospect', notes: 'Pitch deck delivered',         email: 'hello@finedge.co.uk',phone: '', website: ''               }
+    ],
+    leads: [
+      { id: 4, name: 'Nova Retail', email: 'ops@novaretail.co.uk', phone: '', website: 'novaretail.co.uk', stage: 'warm', value: 400, notes: 'Intro call booked' },
+      { id: 5, name: 'DataPulse',   email: '',                     phone: '', website: 'datapulse.io',     stage: 'cold', value: 250, notes: 'LinkedIn connection' }
+    ],
+    streams: [
+      { id: 6, name: 'Gumroad — PM Templates', monthly: 95 },
+      { id: 7, name: 'Affiliate — Notion',      monthly: 28 }
+    ],
+    incomeStreams: [
+      { id: 8,  name: 'PM Templates Pack', type: 'passive',   monthlyIncome: 95,  status: 'active',   steps: ['Build template','Upload to Gumroad','Market on LinkedIn'], progress: 100 },
+      { id: 9,  name: 'Notion Affiliates', type: 'passive',   monthlyIncome: 28,  status: 'active',   steps: ['Sign up','Share link'], progress: 100 },
+      { id: 10, name: 'YouTube — Finance', type: 'active',    monthlyIncome: 0,   status: 'building', steps: ['Script 3 videos','Record','Publish'], progress: 30  },
+      { id: 11, name: 'Dividends (ISA)',   type: 'portfolio', monthlyIncome: 14,  status: 'active',   steps: ['Open account','Invest monthly'], progress: 100 }
+    ]
+  }));
+
+  // ── Achievements (pos_ach1) ───────────────────────────────────────
+  localStorage.setItem('pos_ach1', JSON.stringify({
+    xp: 850,
+    unlocked: ['first_asset', 'first_debt', 'cashflow_complete', 'house_started', 'stream1'],
+    connected: {},
+    snapshots: [],
+    streak: 5
   }));
 
   // ── Redirect to main app ──────────────────────────────────────────
