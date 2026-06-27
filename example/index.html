@@ -30,6 +30,11 @@
   var now = new Date().toISOString();
   var expiry = Date.now() + 7 * 24 * 60 * 60 * 1000;
 
+  // ── Clear any stale demo / onboarding flags from a previous visit ─
+  // Alex Morgan is presented as a real returning user, so the welcome
+  // questionnaire and demo chip must NOT show.
+  localStorage.removeItem('vi_demo_mode');
+
   // ── Session (7 days, no auth needed) ─────────────────────────────
   localStorage.setItem('vi_session', JSON.stringify({ email: 'alex@vault-it.app', expiry: expiry }));
 
