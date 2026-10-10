@@ -2692,6 +2692,14 @@ button.bd-ic{cursor:pointer}
 .bd-edit select{grid-column:span 1}
 .bd-edit-btns{grid-column:1/-1;display:flex;gap:6px}
 #cf-income-list,#cf-expense-list{max-height:none;overflow:visible}
+/* Dashboard summary cards: Assets · Liabilities · Debt always sit in ONE row (tablet + desktop) */
+#ov-summary-row{align-items:stretch}
+@media (min-width:600px){#ov-summary-row{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media (max-width:599px){#ov-summary-row{grid-template-columns:1fr!important}}
+#ov-summary-row .ov-chart-card{min-width:0}
+.tab-btn[onclick*="cashflow"].active{color:#b794f4!important;border-bottom-color:#b794f4!important;text-shadow:0 0 12px rgba(183,148,244,.5)}
+.tab-btn[onclick*="cashflow"]::before{background:#b794f4}
+.tab-btn[onclick*="cashflow"]{--ta:#b794f4}
 </style>
 </head>
 <body>
@@ -3380,6 +3388,10 @@ button.bd-ic{cursor:pointer}
     <svg class="ti" viewBox="0 0 16 16"><rect x="1.5" y="3.5" width="13" height="9.5" rx="1.6"/><path d="M1.5 6.5h13"/><path d="M10.6 9.8h1.9"/></svg>
     <span>Budget<i id="budget-badge"></i></span>
   </button>
+  <button class="tab-btn" onclick="showTab('cashflow')">
+    <svg class="ti" viewBox="0 0 16 16"><path d="M1.5 3.5h4c3 0 3 9 7 9h1.5"/><path d="M12 10.3l2.3 2.2L12 14.7"/><path d="M1.5 12.5h3"/></svg>
+    <span>Cash Flow</span>
+  </button>
   <button class="tab-btn" onclick="showTab('house')" style="position:relative;border-bottom:2px solid var(--go)!important" title="Vault·It's flagship feature">
     <svg class="ti" viewBox="0 0 16 16" style="color:var(--go)"><path d="M1.5 9L8 2.5 14.5 9V14.5H10V11H6v3.5H1.5V9z"/></svg>
     <span style="color:var(--go)">House Builder</span>
@@ -3544,23 +3556,6 @@ button.bd-ic{cursor:pointer}
     <button onclick="openNwHistory()" style="flex-shrink:0;padding:9px 20px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:.58rem;cursor:pointer;letter-spacing:.06em">View Journey →</button>
   </div>
 
-  <!-- LIVE BREAKDOWN -->
-  <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:20px" id="ov-breakdown-row">
-    <div class="ov-data-card">
-      <div class="ov-data-title" style="color:var(--gr)">Assets Breakdown</div>
-      <div id="ov-assets-breakdown"></div>
-      <div style="border-top:1px solid var(--bd);padding-top:8px;margin-top:8px">
-        <div style="font-size:.55rem;color:var(--t3);margin-bottom:4px;letter-spacing:.1em;text-transform:uppercase">Additional Assets</div>
-        <div class="data-input-row">
-          <input type="text" id="asset-name" placeholder="Name (e.g. Savings)">
-          <input type="number" id="asset-val" placeholder="£ Value">
-          <button class="btn-add-data" onclick="addAsset()">+</button>
-        </div>
-        <div class="data-list" id="asset-list"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- Milestones + FIRE Roadmap -->
   <div class="g2-ms">
 
@@ -3660,14 +3655,14 @@ button.bd-ic{cursor:pointer}
       <div class="cf-sub">WHERE EVERY POUND GOES &mdash; PER MONTH</div>
       <div id="cf-histo" class="cf-scroll"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
-        <span style="font-size:.5rem;color:var(--t3);line-height:1.5">Plan this in your <b style="color:#64b5f6">Budget</b> — income, categories and the zero-based method live there.</span>
-        <button class="btn-add-data" onclick="showTab('budget')">Open Budget →</button>
+        <span style="font-size:.5rem;color:var(--t3);line-height:1.5">Plan it in <b style="color:#64b5f6">Budget</b> · follow it through in <b style="color:#b794f4">Cash Flow</b>.</span>
+        <span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn-add-data" onclick="showTab('cashflow')">Cash Flow →</button><button class="btn-add-data" onclick="showTab('budget')">Open Budget →</button></span>
       </div>
     </div>
   </div>
 
   <!-- Summary Cards Row -->
-  <div class="g3" style="margin-top:12px">
+  <div class="g3" id="ov-summary-row" style="margin-top:12px">
     <div class="ov-chart-card" id="ov-assets-summary-card">
       <div class="ov-chart-title" style="margin-bottom:8px">Assets Summary</div>
       <div id="ov-assets-summary"></div>
@@ -3688,6 +3683,34 @@ button.bd-ic{cursor:pointer}
 
 </div>
 </div><!-- /tab-overview -->
+
+<!-- ═══════════════════════════ CASH FLOW ═══════════════════════════ -->
+<div id="tab-cashflow" class="tab-panel" style="display:none">
+  <div style="max-width:1040px;margin:0 auto;padding:24px 20px 60px">
+    <div style="margin-bottom:14px">
+      <div style="font-family:'Syne',sans-serif;font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:#b794f4;opacity:.85;margin-bottom:6px">Vault·It · Cash Flow</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:800;color:var(--tx);letter-spacing:-.01em">Follow every pound <span style="color:#b794f4">through</span></h2>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--t3);letter-spacing:.08em;margin-top:4px">INCOME SOURCES → COMMITTED · OPTIONAL · SAVED &amp; INVESTED → EACH CATEGORY</div>
+    </div>
+    <div class="ov-chart-card">
+      <div class="ov-chart-hd" style="flex-wrap:wrap;gap:10px"><span class="ov-chart-title">Cash Flow</span><div id="cf2-summary" style="display:flex;gap:14px;flex-wrap:wrap"></div></div>
+      <div class="cf-legend">
+        <span><i style="background:#e05c5c"></i>Committed <em>basics to live</em></span>
+        <span><i style="background:#e8a23c"></i>Optional <em>regular, flexible</em></span>
+        <span><i style="background:#3ecf8e"></i>Saved &amp; invested <em>building wealth</em></span>
+      </div>
+      <div id="cf-sankey" class="cf-scroll"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
+        <span style="font-size:.5rem;color:var(--t3);line-height:1.5">Change any of this in your <b style="color:#64b5f6">Budget</b>.</span>
+        <button class="btn-add-data" onclick="showTab('budget')">Open Budget →</button>
+      </div>
+    </div>
+    <div class="ov-chart-card" style="margin-top:14px">
+      <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:10px;letter-spacing:.06em">SPENDING MIX vs INCOME</div>
+      <div id="cf-categories"></div>
+    </div>
+  </div>
+</div><!-- /tab-cashflow -->
 
 <!-- ═══════════════════════════ BUDGET (zero-based) ═══════════════════════════ -->
 <div id="tab-budget" class="tab-panel" style="display:none">
@@ -3730,14 +3753,7 @@ button.bd-ic{cursor:pointer}
         <div style="font-size:.46rem;color:var(--t3);margin-top:6px;line-height:1.5">Tap a line’s icon to switch it between <b style="color:#e05c5c">committed</b>, <b style="color:#e8a23c">optional</b> and <b style="color:#3ecf8e">saved</b>; ✎ edits its amount or category.</div>
       </div>
     </div>
-    <div class="ov-chart-card" style="margin-top:14px">
-      <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:10px;letter-spacing:.06em">SPENDING MIX vs INCOME</div>
-      <div id="cf-categories"></div>
-    </div>
-    <div class="ov-chart-card" style="margin-top:14px">
-      <div class="ov-chart-hd"><span class="ov-chart-title">Where your income flows</span></div>
-      <div id="cf-sankey" class="cf-scroll"></div>
-    </div>
+    <div style="margin-top:14px;font-size:.52rem;color:var(--t3);text-align:center;line-height:1.6">See where it all goes in the <a href="#" onclick="showTab('cashflow');return false" style="color:#b794f4">Cash Flow</a> tab.</div>
   </div>
 </div><!-- /tab-budget -->
 
@@ -5080,7 +5096,6 @@ body.vi-wide #nwChart { height: 300px !important; }
 }
 @media (max-width: 767px) {
   .ov-data-row     { grid-template-columns: 1fr !important; }
-  #ov-breakdown-row{ grid-template-columns: 1fr !important; }
   .jrny-bento      { grid-template-columns: 1fr !important; }
   .jrny-gary       { grid-template-columns: 1fr !important; }
   .al-grid         { grid-template-columns: 1fr !important; }
@@ -5439,8 +5454,8 @@ function showTab(id){
   document.querySelectorAll('.tab-btn').forEach(b=>{
     if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'"))b.classList.add('active');
   });
-  if(id==='overview'){updateKPIs();drawChart();renderCashflow();renderOverviewBreakdown();renderSummaryCards();}
-  if(id==='budget'){renderCashflow();}
+  if(id==='overview'){updateKPIs();drawChart();renderCashflow();renderSummaryCards();}
+  if(id==='budget'||id==='cashflow'){renderCashflow();}
   if(id==='house')setTimeout(redraw,30);
   if(id==='assets'){setTimeout(()=>{renderMetalsISO();renderAlTab();},30);}
   if(id==='debt'){renderDebtTab();setTimeout(function(){drawDebtHistogram();drawDebtDonut();},80);}
@@ -5498,7 +5513,36 @@ function loadState() {
     var el = document.getElementById('ms-' + i);
     if (el) el.value = ovState.milestones[i] || 0;
   }
+  migrateOverviewLedgers();
 }
+
+// Legacy: the Overview "Additional assets" list was a hidden second ledger. Move anything in it
+// (and ovState.debts) into the real tabs once, then keep it empty.
+function migrateOverviewLedgers() {
+  try {
+    if (typeof alState === 'undefined' || typeof debtState === 'undefined') return;
+    var moved = false;
+    if (ovState.assets && ovState.assets.length) {
+      if (!alState.otherAssets) alState.otherAssets = [];
+      ovState.assets.forEach(function(a, i) {
+        alState.otherAssets.push({ id: a.id || (Date.now() + i), name: a.name || 'Asset', value: +a.val || 0, image: null, svgIcon: null, imageSearch: null });
+      });
+      ovState.assets = []; moved = true;
+    }
+    if (ovState.debts && ovState.debts.length) {
+      if (!debtState.debts) debtState.debts = [];
+      ovState.debts.forEach(function(d, i) {
+        var v = +d.val || 0;
+        debtState.debts.push({ id: d.id || (Date.now() + 100 + i), name: d.name || 'Debt', original: v, balance: v, rate: 0, min: 0, type: 'other', _migrated: true });
+      });
+      ovState.debts = []; moved = true;
+    }
+    if (moved) { saveState(); if (typeof saveAL === 'function') saveAL(); if (typeof saveDebtState === 'function') saveDebtState(); }
+  } catch (e) { console.error('[Vault-It] migrateOverviewLedgers', e); }
+}
+
+// Overview quick-add lists were retired — assets and debts live in their own tabs.
+function renderLists() {}
 
 function saveState() {
   // Read milestones from inputs
@@ -5614,7 +5658,6 @@ function updateKPIs() {
     var chk = document.getElementById('mschk-' + i);
     if (chk) chk.textContent = hit ? '✓' : '';
   }
-  renderOverviewBreakdown();
   renderSummaryCards();
   updateSidebar();
   updateFireBanner();
@@ -5695,25 +5738,6 @@ function updateSidebar(){
   _sbEl('sb-clients',typeof bizState!=='undefined'?(bizState.clients||[]).filter(function(c){return c.status==='Active';}).length:0);
 }
 
-function renderOverviewBreakdown(){
-  var aEl=document.getElementById('ov-assets-breakdown');
-  if(!aEl)return;
-  var aRows=[
-    {label:'House Deposit Progress',val:state?state.saved:0,color:'var(--em)'},
-    {label:'Precious Metals',val:alTotalMetals(),color:'var(--go)'},
-    {label:'Crypto',val:alTotalCrypto(),color:'#f7931a'},
-    {label:'Cash & Savings',val:alTotalCash(),color:'var(--gr)'},
-    {label:'Stocks & Funds',val:alTotalStocks(),color:'#9b7ec8'},
-    {label:'Wealth Inventory',val:alTotalOther(),color:'var(--t2)'},
-    {label:'Physical Assets (Liabilities)',val:alLiabAssetTotal(),color:'var(--t3)'},
-    {label:'Manual Assets',val:totalAssets(),color:'var(--t2)'}
-  ];
-  aEl.innerHTML=aRows.filter(function(r){return r.val>0;}).map(function(r){
-    return'<div class="data-item"><span style="color:'+r.color+'">'+r.label+'</span>'
-      +'<span class="data-item-val" style="color:'+r.color+'">'+gbpFmt(r.val)+'</span></div>';
-  }).join('')||'<div style="font-size:.58rem;color:var(--t3);padding:4px 0">No assets tracked yet \u2014 add values across tabs</div>';
-}
-
 // ═══════════════════════════════════════════════════════════════
 // LINE CHART  (fixed: date-based x-axis, correct NW, forecast)
 // ═══════════════════════════════════════════════════════════════
@@ -5755,7 +5779,9 @@ function drawChart() {
   // ── Determine x-axis date range ──
   var hasForecast = chartState && chartState.metrics && chartState.metrics.proj;
   var xEnd = new Date(now);
-  xEnd.setMonth(xEnd.getMonth() + PROJ_MO); // right half always reserved for projection
+  if (hasForecast) xEnd.setMonth(xEnd.getMonth() + PROJ_MO); // forecast area only when Forecast is switched on
+  // Share of the plot width given to history. Without a forecast the history uses the FULL width.
+  var NOW_FRAC = hasForecast ? 0.72 : 1;
 
   var xStart;
   if (chartState && chartState.range !== 'all') {
@@ -5768,8 +5794,7 @@ function drawChart() {
   } else {
     // "All": start from earliest snapshot or 12 months back
     if (points.length > 1) {
-      xStart = new Date(points[0].month + '-01');
-      xStart.setMonth(xStart.getMonth() - 1);
+      xStart = new Date(new Date(points[0].month + '-15').getTime() - 10 * 86400000);
     } else {
       xStart = new Date(now);
       xStart.setMonth(xStart.getMonth() - 11);
@@ -5791,11 +5816,12 @@ function drawChart() {
 
   function monthToTs(yyyymm) { return new Date(yyyymm + '-15').getTime(); }
   function dateToX(ts) {
-    var mid = PAD.l + cW * 0.5;
+    var mid = PAD.l + cW * NOW_FRAC;
     if (ts <= nowTs) {
-      return PAD.l + Math.max(0, Math.min(1, (ts - xStart.getTime()) / leftSpan)) * cW * 0.5;
+      return PAD.l + Math.max(0, Math.min(1, (ts - xStart.getTime()) / leftSpan)) * cW * NOW_FRAC;
     }
-    return mid + Math.max(0, Math.min(1, (ts - nowTs) / rightSpan)) * cW * 0.5;
+    if (NOW_FRAC >= 1) return mid; // nothing is drawn after "now" without a forecast
+    return mid + Math.max(0, Math.min(1, (ts - nowTs) / rightSpan)) * cW * (1 - NOW_FRAC);
   }
   function xp(i) { return dateToX(monthToTs(points[i].month)); }
 
@@ -5854,7 +5880,7 @@ function drawChart() {
 
   // ── TODAY centre line ──
   (function(){
-    var mid = PAD.l + cW * 0.5;
+    var mid = PAD.l + cW * NOW_FRAC;
     ctx.save();
     ctx.strokeStyle = 'rgba(68,192,185,0.45)';
     ctx.lineWidth = 1.5;
@@ -5863,8 +5889,8 @@ function drawChart() {
     ctx.setLineDash([]);
     ctx.fillStyle = 'rgba(68,192,185,0.75)';
     ctx.font = "bold 9px 'Syne',sans-serif";
-    ctx.textAlign = 'center';
-    ctx.fillText('TODAY', mid, PAD.t - 4);
+    ctx.textAlign = NOW_FRAC >= 1 ? 'right' : 'center';
+    ctx.fillText('TODAY', NOW_FRAC >= 1 ? mid + 2 : mid, PAD.t - 4);
     ctx.restore();
   })();
 
@@ -6042,8 +6068,8 @@ document.getElementById('nwChart').addEventListener('mousemove', function(e) {
   var W = this._W || rect2.width;
   var PAD = this._PAD;
   var cW = W - PAD.l - PAD.r;
-  var idx = Math.round((mx - PAD.l) / cW * (this._points.length - 1));
-  idx = Math.max(0, Math.min(this._points.length - 1, idx));
+  var idx = 0, best = Infinity, self = this;
+  this._points.forEach(function(pt, i) { var d = Math.abs(self._xp(i) - mx); if (d < best) { best = d; idx = i; } });
   var p = this._points[idx];
   var tt = document.getElementById('chart-tooltip');
   if (tt) tt.textContent = p.month + ' \u2014 NW: ' + gbpFmt(p.nw) + ' \u00b7 Debt: ' + gbpFmt(p.debt) + (p.income?' \u00b7 Income: '+gbpFmt(p.income)+'/mo':'');
@@ -6129,54 +6155,6 @@ function addSnapshot() {
 // ═══════════════════════════════════════════════════════════════
 // ASSETS & DEBTS
 // ═══════════════════════════════════════════════════════════════
-function addAsset() {
-  var name = document.getElementById('asset-name').value.trim();
-  var val  = parseFloat(document.getElementById('asset-val').value);
-  if (!name || isNaN(val)) { showToast('Enter name and value'); return; }
-  if (!isPioneer() && ovState.assets.length >= FREE_LIMITS.assets) { showPaywall('assets'); return; }
-  ovState.assets.push({ id: Date.now(), name: name, val: val });
-  document.getElementById('asset-name').value = '';
-  document.getElementById('asset-val').value  = '';
-  saveState(); renderLists(); updateKPIs(); drawChart();
-  showToast(name + ' added');
-}
-
-function addDebt() {
-  var nameEl = document.getElementById('debt-name');
-  var valEl  = document.getElementById('debt-val');
-  if (!nameEl || !valEl) return;
-  var name = nameEl.value.trim();
-  var val  = parseFloat(valEl.value);
-  if (!name || isNaN(val)) { showToast('Enter name and value'); return; }
-  if (!isPioneer() && ovState.debts.length >= FREE_LIMITS.debts) { showPaywall('debts'); return; }
-  ovState.debts.push({ id: Date.now(), name: name, val: val });
-  nameEl.value = '';
-  valEl.value  = '';
-  saveState(); renderLists(); updateKPIs(); drawChart();
-  showToast(name + ' added');
-}
-
-function delAsset(id) {
-  ovState.assets = ovState.assets.filter(function(a) { return a.id !== id; });
-  saveState(); renderLists(); updateKPIs(); drawChart();
-}
-
-function delDebt(id) {
-  ovState.debts = ovState.debts.filter(function(d) { return d.id !== id; });
-  saveState(); renderLists(); updateKPIs(); drawChart();
-}
-
-function renderLists() {
-  var al = document.getElementById('asset-list');
-  var dl = document.getElementById('debt-list');
-  if(al) al.innerHTML = ovState.assets.map(function(a) {
-    return '<div class="data-item"><span>' + a.name + '</span><span class="data-item-val" style="color:var(--gr)">' + gbpFmt(a.val) + '</span><button class="data-item-del" onclick="delAsset(' + a.id + ')">✕</button></div>';
-  }).join('') || '<div style="font-size:.58rem;color:var(--t3);padding:4px 0;text-align:center">None added yet</div>';
-  if(dl) dl.innerHTML = ovState.debts.map(function(d) {
-    return '<div class="data-item"><span>' + d.name + '</span><span class="data-item-val" style="color:var(--re)">' + gbpFmt(d.val) + '</span><button class="data-item-del" onclick="delDebt(' + d.id + ')">✕</button></div>';
-  }).join('') || '<div style="font-size:.58rem;color:var(--t3);padding:4px 0;text-align:center">None added yet</div>';
-}
-
 // ═══════════════════════════════════════════════════════════════
 // TOAST (shared)
 // ═══════════════════════════════════════════════════════════════
@@ -8833,6 +8811,20 @@ function bdRender(){
     var lump=exp.length===1&&(exp[0]._onboarding||/^monthly expenses$/i.test(exp[0].name||''));
     nd.innerHTML=lump?'<div class="cf-nudge"><b>One lump-sum so far.</b> Break “'+cfEsc(exp[0].name)+'” down by category below, then remove the lump sum.</div>':'';
   }
+}
+// Cash Flow tab: KPI strip + income-flow diagram + spending mix
+function cfTabRender(){
+  var m=cfModel(),s=bdState();
+  var rate=m.tIn>0?Math.max(-999,Math.round((m.surplus/m.tIn)*100)):0;
+  var mono='font-family:\'Share Tech Mono\',monospace;font-size:.65rem;';
+  var sum=document.getElementById('cf2-summary');
+  if(sum)sum.innerHTML=
+    '<span style="'+mono+'color:var(--gr)">In: '+cfMoney(m.tIn)+'/mo</span>'+
+    '<span style="'+mono+'color:var(--re)">Spend: '+cfMoney(m.spend)+'/mo</span>'+
+    '<span style="'+mono+'color:#3ecf8e">Saved: '+cfMoney(m.growth)+'/mo</span>'+
+    '<span style="'+mono+'color:'+(m.surplus>=0?'var(--em)':'var(--re)')+'">Surplus: '+cfMoney(m.surplus)+'/mo</span>'+
+    '<span style="'+mono+'color:var(--go)">Save rate: '+rate+'%</span>'+
+    (s.st==='under'?'<span style="'+mono+'color:#e8a23c">Unassigned: '+cfMoney(s.left)+'</span>':'');
   renderCashflowCategories();
   drawCashflowDiagram();
 }
@@ -8856,6 +8848,7 @@ function renderCashflow(){
   }
   setTimeout(function(){drawCashflowHistogram(m);},50);
   if(document.getElementById('bd-zero'))bdRender();
+  if(document.getElementById('cf2-summary'))cfTabRender();
   bdUpdateBadge();
 }
 
