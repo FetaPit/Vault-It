@@ -25,3 +25,7 @@ jobs:
           supabase functions deploy send-auth-email \
             --project-ref legpubblzgknxdtvsant \
             --no-verify-jwt
+
+          supabase functions deploy stock-quotes \
+            --project-ref legpubblzgknxdtvsant \
+            --no-verify-jwt

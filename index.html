@@ -2585,6 +2585,80 @@ input:focus, textarea:focus, select:focus {
 </style>
 <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Vault·It&quot;,&quot;short_name&quot;:&quot;Vault·It&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23080808&quot;,&quot;theme_color&quot;:&quot;%2344c0b9&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23080808'/><text y='75' x='50' text-anchor='middle' font-size='70'>🔒</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;}]}">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
+<style id="vi-v3-css">
+/* ── Cash flow v3 ── */
+.cf-legend{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 6px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--t2)}
+.cf-legend span{display:inline-flex;align-items:center;gap:6px}
+.cf-legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.cf-legend em{font-style:normal;color:var(--t3)}
+.cf-scroll{overflow-x:auto;border-radius:8px;background:rgba(4,12,24,.45);-webkit-overflow-scrolling:touch}
+.cf-scroll svg{display:block}
+.cf-sub{font-family:'Syne',sans-serif;font-size:.52rem;font-weight:800;letter-spacing:.16em;color:var(--t3);margin:14px 0 6px}
+.cf-empty{padding:34px 12px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--t3)}
+.cf-presets{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.cf-chip{font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:3px 8px;border-radius:99px;cursor:pointer;background:transparent;border:1px solid;letter-spacing:.03em;transition:background .15s}
+.cf-chip:hover{background:rgba(255,255,255,.07)}
+.cf-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;cursor:pointer;border:0;padding:0;box-shadow:0 0 0 2px rgba(255,255,255,.06)}
+.cf-row{display:flex;align-items:center;gap:8px}
+.cf-row .cf-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cf-edit{background:none;border:none;color:var(--t3);cursor:pointer;font-size:.7rem;padding:0 3px}
+.cf-edit:hover{color:var(--em)}
+.cf-nudge{margin:8px 0;padding:9px 12px;background:rgba(232,162,60,.08);border:1px solid rgba(232,162,60,.3);border-radius:8px;font-size:.55rem;color:var(--t2);line-height:1.5}
+.cf-nudge b{color:#e8a23c}
+.fr-legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:6px 4px 8px;font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--t2)}
+.fr-legend span{display:inline-flex;align-items:center;gap:6px}
+/* ── Stocks & Funds (portfolio pies) ── */
+.stk-wrap{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+.stk-pies{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.stk-pie{font-family:'Syne',sans-serif;font-size:.54rem;font-weight:700;padding:6px 12px;border-radius:99px;cursor:pointer;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.22);color:var(--t2);display:inline-flex;gap:8px;align-items:center}
+.stk-pie span{font-family:'Share Tech Mono',monospace;font-weight:400;color:var(--t3);font-size:.5rem}
+.stk-pie.on{background:rgba(155,126,200,.16);border-color:#9b7ec8;color:#d9c9f2}
+.stk-pie.add{border-style:dashed;color:var(--em)}
+.stk-mini{background:none;border:none;color:var(--t3);cursor:pointer;font-size:.7rem;padding:2px 4px}
+.stk-mini:hover{color:var(--em)}
+.stk-card{background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.16);border-radius:10px;padding:14px}
+.stk-main{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.18);border-radius:10px;padding:18px}
+@media(max-width:620px){.stk-main{grid-template-columns:1fr;justify-items:center}}
+.stk-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.stk-stat{background:rgba(68,192,185,.06);border-radius:6px;padding:8px 10px}
+.stk-stat .l{font-family:'Share Tech Mono',monospace;font-size:.4rem;color:var(--t3);letter-spacing:.06em;margin-bottom:3px;text-transform:uppercase}
+.stk-stat .v{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:800;color:var(--tx)}
+.stk-stat .s{font-size:.4rem;color:var(--t3);margin-top:1px}
+.stk-status{font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--t2);display:flex;gap:8px;align-items:center;flex-wrap:wrap;line-height:1.5}
+.stk-status i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.stk-hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-family:'Syne',sans-serif;font-size:.62rem;font-weight:800;color:var(--tx);margin-bottom:10px}
+.stk-actions{display:flex;gap:6px;flex-wrap:wrap}
+.stk-btn{font-family:'Syne',sans-serif;font-size:.48rem;font-weight:700;padding:4px 10px;border-radius:4px;cursor:pointer;background:rgba(68,192,185,.08);border:1px solid rgba(68,192,185,.3);color:var(--em)}
+.stk-btn:hover{background:rgba(68,192,185,.16)}
+.stk-tbl{overflow-x:auto}
+.stk-row{display:grid;grid-template-columns:minmax(120px,1.6fr) 84px 92px 96px 96px 74px 26px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);min-width:640px}
+.stk-row.h{font-family:'Share Tech Mono',monospace;font-size:.42rem;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--bd)}
+.stk-tk{font-family:'Share Tech Mono',monospace;font-size:.62rem;font-weight:700;color:var(--em);display:flex;align-items:center;gap:6px;min-width:0}
+.stk-tk i{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.stk-nm{font-size:.46rem;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stk-inp{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:4px 6px}
+.stk-inp:focus{outline:none;border-color:var(--em)}
+.stk-val{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--tx);text-align:right}
+.stk-pl{font-family:'Share Tech Mono',monospace;font-size:.56rem;text-align:right}
+.stk-src{font-size:.4rem;color:var(--t3);margin-top:2px;font-family:'Share Tech Mono',monospace}
+.stk-add{display:grid;grid-template-columns:1.4fr .8fr 1fr auto;gap:8px;margin-top:12px}
+@media(max-width:620px){.stk-add{grid-template-columns:1fr 1fr}}
+.stk-note{font-size:.46rem;color:var(--t3);line-height:1.6;margin-top:8px}
+.stk-lb{display:none;font-family:'Share Tech Mono',monospace;font-size:.4rem;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.stk-row .c-va{text-align:right}
+@media(max-width:620px){
+  .stk-row.h{display:none}
+  .stk-row{min-width:0;grid-template-columns:1fr 1fr 1fr 28px;grid-template-areas:"tk tk tk x" "un av pr pr" "va va pl pl";row-gap:8px;padding:12px 0}
+  .c-tk{grid-area:tk}.c-un{grid-area:un}.c-av{grid-area:av}.c-pr{grid-area:pr}.c-va{grid-area:va;text-align:left!important;font-size:.7rem!important}.c-pl{grid-area:pl;text-align:right!important;align-self:end}.c-x{grid-area:x;justify-self:end}
+  .stk-lb{display:block}
+  .c-va .stk-lb{display:inline;margin-right:8px}
+}
+.stk-bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.52rem}
+.stk-bar .t{width:78px;font-family:'Share Tech Mono',monospace;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stk-bar .b{flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.stk-bar .b div{height:100%;border-radius:4px}
+.stk-bar .p{width:46px;text-align:right;font-family:'Share Tech Mono',monospace;color:var(--t2)}
+</style>
 </head>
 <body>
 <!-- ═══════════════════════════════════════════════════════════════
@@ -2726,6 +2800,7 @@ input:focus, textarea:focus, select:focus {
     <div class="sb-row"><span style="color:var(--go)">Metals</span><span class="sb-val" id="sb-metals">£0</span></div>
     <div class="sb-row"><span style="color:#f7931a">Crypto</span><span class="sb-val" id="sb-crypto">£0</span></div>
     <div class="sb-row"><span style="color:var(--gr)">Cash</span><span class="sb-val" id="sb-cash">£0</span></div>
+    <div class="sb-row"><span style="color:#9b7ec8">Stocks &amp; Funds</span><span class="sb-val" id="sb-stocks">£0</span></div>
     <div class="sb-row"><span style="color:var(--t2)">Inventory</span><span class="sb-val" id="sb-other">£0</span></div>
   </div>
   <div class="sb-section">
@@ -2995,14 +3070,11 @@ input:focus, textarea:focus, select:focus {
           <input type="number" class="welcome-inp" id="w-expenses" placeholder="e.g. 1600" min="0">
         </div>
         <div class="welcome-field" style="margin:0">
-          <label>Total Debt (<span class="w-currency-label">£</span>)</label>
-          <input type="number" class="welcome-inp" id="w-debt" placeholder="0 if debt-free" min="0">
-        </div>
-        <div class="welcome-field" style="margin:0">
           <label>Dream Home Target (<span class="w-currency-label">£</span>)</label>
           <input type="number" class="welcome-inp" id="w-house" placeholder="e.g. 200000" min="0">
         </div>
       </div>
+      <div style="font-size:.5rem;color:var(--t3);line-height:1.55;margin-top:10px;text-align:center">Got debts? You'll add each one separately — with its type, interest rate and minimum payment — in the <b style="color:var(--em)">Debt Tracker</b>, so your payoff plan is accurate.</div>
       <button class="welcome-cta" onclick="wStep2Submit()" style="margin-top:14px">Start Vaulting →</button>
     </div>
 
@@ -3512,8 +3584,14 @@ input:focus, textarea:focus, select:focus {
         </div>
         <div style="display:flex;gap:6px;align-items:center">
           <div id="fire-current-label" style="font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--em);padding:3px 10px;background:rgba(68,192,185,.08);border:1px solid rgba(68,192,185,.25);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))">STAGE 0</div>
-          <button onclick="toggleFireReset()" id="fire-reset-btn" style="font-size:.48rem;padding:3px 10px;background:rgba(68,192,185,.07);border:1px solid rgba(68,192,185,.22);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px));color:var(--em);cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;white-space:nowrap">↺ RESET</button>
+          <button onclick="fireJumpToCurrent()" id="fire-jump-btn" style="font-size:.48rem;padding:3px 10px;background:rgba(68,192,185,.07);border:1px solid rgba(68,192,185,.22);clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px));color:var(--em);cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;white-space:nowrap">◎ CURRENT STAGE</button>
         </div>
+      </div>
+      <div class="fr-legend">
+        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#44c0b9"/><path d="M4.6 8.2l2.3 2.3 4.4-4.9" fill="none" stroke="#030810" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Achieved</span>
+        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#44c0b9" stroke-width="1.6"/><circle cx="8" cy="8" r="2.4" fill="#44c0b9"/></svg>Next up</span>
+        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#7d8793" stroke-width="1.2" stroke-dasharray="2.5 2.5"/><rect x="5.6" y="7.6" width="4.8" height="3.8" rx=".8" fill="#7d8793"/><path d="M6.6 7.6V6.4a1.4 1.4 0 0 1 2.8 0v1.2" fill="none" stroke="#7d8793" stroke-width="1"/></svg>Locked — finish earlier stages first</span>
+        <span id="fire-progress-txt" style="margin-left:auto;color:var(--em)">0 of 30 achieved</span>
       </div>
       <!-- Horizontal scrolling SVG timeline -->
       <div class="fire-timeline-scroll" id="fire-timeline-scroll">
@@ -3535,9 +3613,17 @@ input:focus, textarea:focus, select:focus {
         <span class="ov-chart-title">Cash Flow</span>
         <div id="cf-summary" style="display:flex;gap:14px;flex-wrap:wrap"></div>
       </div>
-      <!-- Sankey flow diagram -->
-      <canvas id="cf-sankey" style="width:100%;display:block;margin:10px 0 6px;border-radius:6px;background:rgba(4,12,24,0.4)" height="200"></canvas>
-      <div class="g2" style="margin-top:4px">
+      <div id="cf-nudge"></div>
+      <div class="cf-legend">
+        <span><i style="background:#e05c5c"></i>Committed <em>basics to live</em></span>
+        <span><i style="background:#e8a23c"></i>Optional <em>regular, flexible</em></span>
+        <span><i style="background:#3ecf8e"></i>Saved &amp; invested <em>incl. overflow</em></span>
+      </div>
+      <!-- Sankey flow diagram: income sources → income → committed / optional / saved → each category -->
+      <div id="cf-sankey" class="cf-scroll"></div>
+      <div class="cf-sub">WHERE EVERY POUND GOES &mdash; PER MONTH</div>
+      <div id="cf-histo" class="cf-scroll"></div>
+      <div class="g2" style="margin-top:14px">
         <div>
           <div class="ov-ms-title" style="color:var(--gr);margin-bottom:8px">Income</div>
           <div id="cf-income-list" class="data-list"></div>
@@ -3548,18 +3634,20 @@ input:focus, textarea:focus, select:focus {
           </div>
         </div>
         <div>
-          <div class="ov-ms-title" style="color:var(--re);margin-bottom:8px">Expenses</div>
+          <div class="ov-ms-title" style="color:var(--t2);margin-bottom:8px">Spending &amp; saving</div>
           <div id="cf-expense-list" class="data-list"></div>
+          <div class="cf-presets" id="cf-presets"></div>
           <div class="data-input-row" style="margin-top:8px">
-            <input type="text" id="cf-exp-name" placeholder="Category (e.g. Housing)">
+            <input type="text" id="cf-exp-name" placeholder="Category (e.g. Groceries)">
             <input type="number" id="cf-exp-amt" placeholder="£/mo">
-            <select id="cf-exp-cat" class="al-inp" style="max-width:130px"><option value="necessity">Necessity</option><option value="fixed">Fixed</option><option value="discretionary">Discretionary</option></select>
+            <select id="cf-exp-cat" class="al-inp" style="max-width:150px"><option value="necessity">Committed</option><option value="discretionary">Optional</option><option value="investment">Saved / invested</option></select>
             <button class="btn-add-data" onclick="addExpense()">+</button>
           </div>
+          <div style="font-size:.46rem;color:var(--t3);margin-top:6px;line-height:1.5">Tap a coloured dot to switch a line between <b style="color:#e05c5c">committed</b>, <b style="color:#e8a23c">optional</b> and <b style="color:#3ecf8e">saved</b>.</div>
         </div>
       </div>
       <div style="border-top:1px solid var(--bd);margin-top:12px;padding-top:12px">
-        <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:10px;letter-spacing:.06em">EXPENSE CATEGORIES</div>
+        <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:10px;letter-spacing:.06em">SPENDING MIX vs INCOME</div>
         <div id="cf-categories"></div>
       </div>
     </div>
@@ -4001,203 +4089,33 @@ input:focus, textarea:focus, select:focus {
     </div>
     <!-- ── Stocks & Funds subtab ─────────────────────────────────────── -->
     <div class="subtab-panel" id="assets-stocks">
-      <div style="margin-top:12px">
-
-        <!-- T212 Pie Header -->
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-          <div style="background:linear-gradient(135deg,rgba(68,192,185,.12),rgba(68,192,185,.04));border:1px solid rgba(68,192,185,.25);border-radius:6px;padding:4px 10px;font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--em);letter-spacing:.08em">TRADING 212 PIE</div>
-          <div style="font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;color:var(--tx)">Fully Future Focused</div>
-          <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.42rem;color:var(--t3)">13 holdings · Auto £100/wk</div>
+      <div style="display:flex;justify-content:flex-end;margin:10px 0 2px">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:#9b7ec8">Stocks &amp; Funds: <span id="subtab-total-stocks" style="font-weight:700">£0</span></span>
+      </div>
+      <div class="stk-wrap">
+        <div class="stk-pies" id="stk-pies"></div>
+        <div class="stk-main" id="stk-main"></div>
+        <div class="stk-status" id="stk-status"></div>
+        <div class="stk-card">
+          <div class="stk-hd">
+            <span>Holdings</span>
+            <span class="stk-actions">
+              <button class="stk-btn" onclick="stkRefresh(false)" title="Fetch the latest prices">↻ Refresh prices</button>
+              <button class="stk-btn" onclick="document.getElementById('stk-csv').click()" title="Import holdings from a CSV (Trading 212 history export or ticker,units,avg cost)">⇪ Import CSV</button>
+            </span>
+          </div>
+          <div id="stk-holdings"></div>
+          <div class="stk-add">
+            <input type="text" id="stk-sym" class="al-inp" placeholder="Ticker  e.g. VUSA.L · AAPL" autocapitalize="characters" onkeydown="if(event.key==='Enter')stkAdd()">
+            <input type="number" id="stk-units" class="al-inp" placeholder="Units" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
+            <input type="number" id="stk-cost" class="al-inp" placeholder="Avg cost £ (optional)" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
+            <button class="btn-add-data" onclick="stkAdd()">+ Add holding</button>
+          </div>
+          <div class="stk-note">UK-listed funds &amp; ETFs end in <b>.L</b> (VUSA.L, VWRL.L). US shares are plain (AAPL, MSFT). Prices convert to £ automatically. Edit units, cost or price any time — everything here counts towards your net worth.</div>
+          <input type="file" id="stk-csv" accept=".csv,text/csv" style="display:none" onchange="stkImportCSV(this)">
         </div>
-
-        <!-- Main card: chart + stats -->
-        <div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.18);border-radius:10px;padding:18px;margin-bottom:12px">
-          <!-- Donut chart -->
-          <div style="position:relative;width:130px;height:130px;flex-shrink:0">
-            <div style="width:130px;height:130px;border-radius:50%;background:conic-gradient(#44c0b9 0% 68.3%, #c9a84c 68.3% 76.3%, #2ecc71 76.3% 81.3%, #9b59b6 81.3% 86.3%, #64b5f6 86.3% 91.3%, #e67e22 91.3% 100%);position:relative">
-              <div style="position:absolute;inset:20px;border-radius:50%;background:#060d16;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
-                <div style="font-family:'Syne',sans-serif;font-size:.72rem;font-weight:900;color:#fff;line-height:1">£1,838</div>
-                <div style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:#2ecc71">+11.85%</div>
-              </div>
-            </div>
-          </div>
-          <!-- Stats -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div style="background:rgba(68,192,185,.06);border-radius:6px;padding:8px 10px">
-              <div style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--t3);letter-spacing:.06em;margin-bottom:2px">CURRENT VALUE</div>
-              <div style="font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;color:var(--tx)">£1,838.48</div>
-            </div>
-            <div style="background:rgba(46,204,113,.07);border-radius:6px;padding:8px 10px">
-              <div style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--t3);letter-spacing:.06em;margin-bottom:2px">TOTAL RETURN</div>
-              <div style="font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;color:#2ecc71">+£194.84</div>
-            </div>
-            <div style="background:rgba(201,168,76,.06);border-radius:6px;padding:8px 10px">
-              <div style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--t3);letter-spacing:.06em;margin-bottom:2px">AVG YEARLY GROWTH</div>
-              <div style="font-family:'Syne',sans-serif;font-size:.68rem;font-weight:800;color:var(--go)">18.23%</div>
-            </div>
-            <div style="background:rgba(68,192,185,.06);border-radius:6px;padding:8px 10px">
-              <div style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--t3);letter-spacing:.06em;margin-bottom:2px">AUTO-INVEST GOAL</div>
-              <div style="font-family:'Syne',sans-serif;font-size:.68rem;font-weight:800;color:var(--em)">4.35%</div>
-              <div style="font-size:.36rem;color:var(--t3)">of £42,272</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Risk metrics row -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-          <div style="flex:1;min-width:80px;background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.12);border-radius:8px;padding:8px 10px;text-align:center">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.34rem;color:var(--t3);margin-bottom:2px">BETA</div>
-            <div style="font-family:'Syne',sans-serif;font-size:.62rem;font-weight:800;color:var(--em)">0.68</div>
-            <div style="font-size:.34rem;color:var(--t3)">Low-mod risk</div>
-          </div>
-          <div style="flex:1;min-width:80px;background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.12);border-radius:8px;padding:8px 10px;text-align:center">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.34rem;color:var(--t3);margin-bottom:2px">P/E RATIO</div>
-            <div style="font-family:'Syne',sans-serif;font-size:.62rem;font-weight:800;color:var(--go)">65.27</div>
-            <div style="font-size:.34rem;color:var(--t3)">Growth priced in</div>
-          </div>
-          <div style="flex:1;min-width:80px;background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.12);border-radius:8px;padding:8px 10px;text-align:center">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.34rem;color:var(--t3);margin-bottom:2px">SHARPE</div>
-            <div style="font-family:'Syne',sans-serif;font-size:.62rem;font-weight:800;color:var(--em)">0.17</div>
-            <div style="font-size:.34rem;color:var(--t3)">Risk-adj return</div>
-          </div>
-          <div style="flex:1;min-width:80px;background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.12);border-radius:8px;padding:8px 10px;text-align:center">
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.34rem;color:var(--t3);margin-bottom:2px">DIVIDEND</div>
-            <div style="font-family:'Syne',sans-serif;font-size:.62rem;font-weight:800;color:var(--gr)">0.39%</div>
-            <div style="font-size:.34rem;color:var(--t3)">£0.61 earned</div>
-          </div>
-        </div>
-
-        <!-- Sector breakdown -->
-        <div style="background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.12);border-radius:10px;padding:14px;margin-bottom:12px">
-          <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--tx);margin-bottom:10px">Sector Exposure</div>
-          <div style="display:flex;flex-direction:column;gap:5px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:8px;height:8px;border-radius:50%;background:#44c0b9;flex-shrink:0"></div>
-              <div style="font-size:.46rem;color:var(--t2);flex:1">Technology / AI</div>
-              <div style="font-family:'Share Tech Mono',monospace;font-size:.46rem;color:var(--em);font-weight:700">68.3%</div>
-              <div style="flex:2;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden"><div style="width:68.3%;height:100%;background:#44c0b9;border-radius:2px"></div></div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:8px;height:8px;border-radius:50%;background:#c9a84c;flex-shrink:0"></div>
-              <div style="font-size:.46rem;color:var(--t2);flex:1">Financial</div>
-              <div style="font-family:'Share Tech Mono',monospace;font-size:.46rem;color:var(--go);font-weight:700">8.0%</div>
-              <div style="flex:2;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden"><div style="width:8%;height:100%;background:#c9a84c;border-radius:2px"></div></div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:8px;height:8px;border-radius:50%;background:#2ecc71;flex-shrink:0"></div>
-              <div style="font-size:.46rem;color:var(--t2);flex:1">Consumer Non-Cyclical</div>
-              <div style="font-family:'Share Tech Mono',monospace;font-size:.46rem;color:#2ecc71;font-weight:700">5.0%</div>
-              <div style="flex:2;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden"><div style="width:5%;height:100%;background:#2ecc71;border-radius:2px"></div></div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:8px;height:8px;border-radius:50%;background:#9b59b6;flex-shrink:0"></div>
-              <div style="font-size:.46rem;color:var(--t2);flex:1">Utilities</div>
-              <div style="font-family:'Share Tech Mono',monospace;font-size:.46rem;color:#9b59b6;font-weight:700">5.0%</div>
-              <div style="flex:2;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden"><div style="width:5%;height:100%;background:#9b59b6;border-radius:2px"></div></div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:8px;height:8px;border-radius:50%;background:#64b5f6;flex-shrink:0"></div>
-              <div style="font-size:.46rem;color:var(--t2);flex:1">Communications</div>
-              <div style="font-family:'Share Tech Mono',monospace;font-size:.46rem;color:#64b5f6;font-weight:700">5.0%</div>
-              <div style="flex:2;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden"><div style="width:5%;height:100%;background:#64b5f6;border-radius:2px"></div></div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:8px;height:8px;border-radius:50%;background:#e67e22;flex-shrink:0"></div>
-              <div style="font-size:.46rem;color:var(--t2);flex:1">Other</div>
-              <div style="font-family:'Share Tech Mono',monospace;font-size:.46rem;color:#e67e22;font-weight:700">8.7%</div>
-              <div style="flex:2;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden"><div style="width:8.7%;height:100%;background:#e67e22;border-radius:2px"></div></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Notable Holdings -->
-        <div style="background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.12);border-radius:10px;padding:14px;margin-bottom:12px">
-          <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--tx);margin-bottom:10px">Notable Holdings</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-            <div style="padding:7px 9px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.1);border-radius:6px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--em);font-weight:700">NBIS</span>
-                <span style="font-size:.42rem;font-weight:700;color:#2ecc71">+127%</span>
-              </div>
-              <div style="font-size:.4rem;color:var(--t3)">Nebius Group · High vol</div>
-            </div>
-            <div style="padding:7px 9px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.1);border-radius:6px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--em);font-weight:700">AIQ</span>
-                <span style="font-size:.42rem;font-weight:700;color:#2ecc71">+35%</span>
-              </div>
-              <div style="font-size:.4rem;color:var(--t3)">Global X AI ETF · Strong</div>
-            </div>
-            <div style="padding:7px 9px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.1);border-radius:6px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--em);font-weight:700">NVDA</span>
-                <span style="font-size:.42rem;font-weight:700;color:#2ecc71">Solid ↑</span>
-              </div>
-              <div style="font-size:.4rem;color:var(--t3)">Nvidia · Beta 1.71</div>
-            </div>
-            <div style="padding:7px 9px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.1);border-radius:6px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--em);font-weight:700">FIGM</span>
-                <span style="font-size:.42rem;font-weight:700;color:#2ecc71">Strong ↑</span>
-              </div>
-              <div style="font-size:.4rem;color:var(--t3)">Figma · High momentum</div>
-            </div>
-            <div style="padding:7px 9px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.1);border-radius:6px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--em);font-weight:700">MSFT</span>
-                <span style="font-size:.42rem;font-weight:700;color:#2ecc71">Steady ↑</span>
-              </div>
-              <div style="font-size:.4rem;color:var(--t3)">Microsoft · Dividend</div>
-            </div>
-            <div style="padding:7px 9px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.1);border-radius:6px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--em);font-weight:700">TTWO</span>
-                <span style="font-size:.42rem;font-weight:700;color:var(--t2)">Moderate</span>
-              </div>
-              <div style="font-size:.4rem;color:var(--t3)">Take-Two Interactive</div>
-            </div>
-            <div style="padding:7px 9px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.1);border-radius:6px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--em);font-weight:700">NEE</span>
-                <span style="font-size:.42rem;font-weight:700;color:#e74c3c">-8%</span>
-              </div>
-              <div style="font-size:.4rem;color:var(--t3)">NextEra Energy · Div ↑</div>
-            </div>
-            <div style="padding:7px 9px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.1);border-radius:6px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--em);font-weight:700">GMED</span>
-                <span style="font-size:.42rem;font-weight:700;color:#e74c3c">-10%</span>
-              </div>
-              <div style="font-size:.4rem;color:var(--t3)">Globus Medical · Weak</div>
-            </div>
-          </div>
-          <div style="margin-top:6px;font-size:.4rem;color:var(--t3);text-align:center">+ BX, BLK, and 2 additional holdings not shown</div>
-        </div>
-
-        <!-- Auto-invest goal bar -->
-        <div style="background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.12);border-radius:10px;padding:14px;margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--tx)">Auto-Invest Goal</div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--em)">£100 / week</div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:.42rem;color:var(--t3);margin-bottom:5px">
-            <span>£1,838.48 invested</span>
-            <span style="color:var(--go)">£42,272 goal</span>
-          </div>
-          <div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
-            <div style="width:4.35%;height:100%;background:linear-gradient(90deg,var(--em),var(--go));border-radius:3px"></div>
-          </div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--t3);margin-top:4px;text-align:right">4.35% · At current rate + contributions, several years to target</div>
-        </div>
-
-        <!-- Pro CTA -->
-        <div style="background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(68,192,185,.05));border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:14px;text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:.58rem;font-weight:800;color:var(--go);margin-bottom:6px">◆ Pioneer Exclusive</div>
-          <div style="font-size:.48rem;color:var(--t2);line-height:1.6;margin-bottom:12px">Full portfolio transparency, real-time performance tracking,<br>and the ability to mirror this pie strategy in your own account.</div>
-          <button onclick="_isPro()?showToast('Pioneer access active — Trading 212 sync coming in v0.8'):showUpgrade('annual')" style="padding:10px 22px;background:linear-gradient(90deg,#b8902e,#c9a84c);border:none;border-radius:6px;color:#000;font-family:'Syne',sans-serif;font-size:.54rem;font-weight:800;cursor:pointer;letter-spacing:.06em">Mirror This Pie Strategy →</button>
-          <div style="font-size:.4rem;color:var(--t3);margin-top:6px">Not financial advice · Past performance ≠ future results</div>
-        </div>
-
+        <div class="stk-card" id="stk-alloc"></div>
+        <div class="stk-note" style="text-align:center">Not financial advice · Prices may be delayed · Past performance ≠ future results</div>
       </div>
     </div>
   </div>
@@ -4261,7 +4179,7 @@ input:focus, textarea:focus, select:focus {
         <div><label class="ov-kpi-lbl">Balance £</label><input type="number" id="df-balance" class="al-inp"></div>
         <div><label class="ov-kpi-lbl">Interest Rate %</label><input type="number" id="df-rate" step="0.1" class="al-inp"></div>
         <div><label class="ov-kpi-lbl">Min Payment £/mo</label><input type="number" id="df-min" class="al-inp"></div>
-        <div><label class="ov-kpi-lbl">Type</label><select id="di-type" class="al-inp"><option value="other">Loan / Other</option><option value="credit">Credit Card</option><option value="bnpl">Buy Now Pay Later</option></select></div>
+        <div><label class="ov-kpi-lbl">Type</label><select id="di-type" class="al-inp"><option value="credit">Credit Card</option><option value="personal">Personal Loan</option><option value="student">Student Loan</option><option value="car">Car / Vehicle Finance</option><option value="bnpl">Buy Now Pay Later</option><option value="overdraft">Overdraft</option><option value="mortgage">Mortgage</option><option value="other">Other</option></select></div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn-add-data" onclick="saveDebt()">Save Debt</button>
@@ -5478,6 +5396,7 @@ function showSubtab(group,id,btn){
   if(btn)btn.classList.add('active');
   if(group==='assets'&&id==='metals')setTimeout(renderMetalsISO,30);
   if(group==='assets'&&id==='cash')setTimeout(renderCashISO,80);
+  if(group==='assets'&&id==='stocks'){try{stkRender();}catch(e){}setTimeout(stkAutoRefresh,100);}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -5697,6 +5616,7 @@ function updateSidebar(){
   _sbEl('sb-metals',gbpFmt(alTotalMetals()));
   _sbEl('sb-crypto',gbpFmt(alTotalCrypto()));
   _sbEl('sb-cash',gbpFmt(alTotalCash()+(state?state.saved:0)));
+  _sbEl('sb-stocks',gbpFmt(alTotalStocks()));
   _sbEl('sb-other',gbpFmt(alTotalOther()));
   var inc=cfTotalIn(),exp=cfTotalOut();
   _sbEl('sb-income',gbpFmt(inc)+'/mo');
@@ -5716,6 +5636,7 @@ function renderOverviewBreakdown(){
     {label:'Precious Metals',val:alTotalMetals(),color:'var(--go)'},
     {label:'Crypto',val:alTotalCrypto(),color:'#f7931a'},
     {label:'Cash & Savings',val:alTotalCash(),color:'var(--gr)'},
+    {label:'Stocks & Funds',val:alTotalStocks(),color:'#9b7ec8'},
     {label:'Wealth Inventory',val:alTotalOther(),color:'var(--t2)'},
     {label:'Physical Assets (Liabilities)',val:alLiabAssetTotal(),color:'var(--t3)'},
     {label:'Manual Assets',val:totalAssets(),color:'var(--t2)'}
@@ -7660,6 +7581,65 @@ var _ISB_STATUS_COLOR={idea:'var(--t3)',building:'var(--go)',active:'var(--gr)'}
 // ── STATE DEFAULTS (must be before INIT block) ──
 var chartState={range:'all',metrics:{nw:true,debt:true,income:true,proj:false}};
 var _nwZoom=1, _nwPanMs=0; // net worth chart zoom (1=default) and pan offset in milliseconds
+// ── Constants used by init-time renders — must be declared BEFORE the init block runs ──
+var CF_GROUPS={
+  committed:{label:'Committed',        col:'#e05c5c'},
+  optional: {label:'Optional',         col:'#e8a23c'},
+  growth:   {label:'Saved & Invested', col:'#3ecf8e'}
+};
+var CF_GROUP_ORDER=['committed','optional','growth'];
+var CF_PRESETS=[
+  {n:'Rent / Mortgage',c:'necessity'},{n:'Council tax',c:'necessity'},{n:'Utilities & bills',c:'necessity'},
+  {n:'Groceries',c:'necessity'},{n:'Transport',c:'necessity'},{n:'Insurance',c:'necessity'},
+  {n:'Phone & internet',c:'necessity'},{n:'Childcare',c:'necessity'},{n:'Debt repayments',c:'necessity'},
+  {n:'Subscriptions',c:'discretionary'},{n:'Eating out',c:'discretionary'},{n:'Entertainment',c:'discretionary'},
+  {n:'Shopping',c:'discretionary'},{n:'Holidays',c:'discretionary'},{n:'Gym & health',c:'discretionary'},
+  {n:'Emergency savings',c:'investment'},{n:'ISA / investments',c:'investment'},{n:'Pension',c:'investment'},{n:'House deposit',c:'investment'}
+];
+var DEBT_TYPE_LABELS={credit:'Credit card',personal:'Personal loan',student:'Student loan',car:'Car finance',bnpl:'BNPL',overdraft:'Overdraft',mortgage:'Mortgage',other:'Loan'};
+// ── Roadmap iconography: inline duo-tone icons on a 24×24 grid (f = tinted fill, d = stroke) ──
+var _FSH='M12 3l7 2.5v6c0 4.4-3 7.7-7 9.5-4-1.8-7-5.1-7-9.5v-6z';
+var _FFL='M12 3c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-4-1-6 1-9z';
+var _FGEM='M6 4h12l3 5-9 11L3 9z';
+var _FHOUSE='M2.8 11.2L12 3.2l9.2 8';
+var FIRE_ICONS={
+  snapshot:{f:['M7 4h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z'],d:['M7 4h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z','M9.5 2.5h5v3h-5z','M8.5 16l2.5-3.2 2 2 3-4.3']},
+  map:{f:['M9 4l6 2v14l-6-2z'],d:['M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z','M9 4v14','M15 6v14']},
+  flow:{f:['M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z'],d:['M4.2 12a7.8 7.8 0 0 1 13.4-5.4','M19.8 12a7.8 7.8 0 0 1-13.4 5.4','M17.8 2.8v4h-4','M6.2 21.2v-4h4']},
+  coin:{f:['M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z'],d:['M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z','M14.8 8.6c-.5-.8-1.5-1.3-2.6-1.3-1.7 0-2.8 1.1-2.8 2.7 0 2.6 1 3.3 1 5.1 0 .8-.5 1.3-1.4 1.6h6.4','M8.7 12.2h5']},
+  shield:{f:[_FSH],d:[_FSH,'M9 12h6']},
+  shieldCheck:{f:[_FSH],d:[_FSH,'M8.6 12l2.4 2.4 4.4-4.8']},
+  scissors:{f:['M6 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z','M6 15.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z'],d:['M6 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z','M6 15.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z','M8 8l12 10','M8 16L20 6']},
+  halfPie:{f:['M12 3a9 9 0 0 0 0 18z'],d:['M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z','M12 3v18']},
+  gem:{f:['M6 4h12l3 5H3z'],d:[_FGEM,'M3 9h18','M9 4l-1.5 5L12 20','M15 4l1.5 5L12 20']},
+  gem2:{f:['M6 5h12l3 5H3z'],d:['M6 5h12l3 5-9 11L3 10z','M3 10h18','M9 5l-1.5 5L12 21','M15 5l1.5 5L12 21','M20 1.2v3.2','M18.4 2.8h3.2']},
+  unlock:{f:['M5 11h14v10H5z'],d:['M5 11h14v10H5z','M8 11V7a4 4 0 0 1 7.6-1.7','M12 15v2.5']},
+  umbrella:{f:['M3 12a9 9 0 0 1 18 0z'],d:['M3 12a9 9 0 0 1 18 0z','M12 3V2','M12 12v6.2a2 2 0 0 1-4 0','M7.6 12a4.4 4.4 0 0 1 4.4-9','M16.4 12A4.4 4.4 0 0 0 12 3']},
+  safe:{f:['M4 4h16v14H4z'],d:['M4 4h16v14H4z','M7 18v2','M17 18v2','M12 7.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z','M12 9.2v3.1','M10.4 10.8h3.2']},
+  sprout:{f:['M12 14c0-3.5 2.5-5.7 7-5.7 0 3.5-2.5 5.7-7 5.7z','M12 16c0-3-2-4.8-6-4.8 0 3 2 4.8 6 4.8z'],d:['M12 21v-8','M12 14c0-3.5 2.5-5.7 7-5.7 0 3.5-2.5 5.7-7 5.7z','M12 16c0-3-2-4.8-6-4.8 0 3 2 4.8 6 4.8z','M8 21h8']},
+  foundation:{f:['M5 16h14v4H5z'],d:['M3 20h18','M5 20v-4h14v4','M9.5 16v-4h5v4']},
+  bricks:{f:['M3 14h18v4H3z','M3 10h9v4H3z'],d:['M3 6h18v12H3z','M3 10h18','M3 14h18','M12 6v4','M8 10v4','M16 10v4','M12 14v4']},
+  house:{f:['M5 10v11h14V10l-7-6z'],d:[_FHOUSE,'M5 9.5V21h14V9.5','M10 21v-6h4v6']},
+  coins:{f:['M4 8c0 1.4 3.6 2.5 8 2.5S20 9.4 20 8s-3.6-2.5-8-2.5S4 6.6 4 8z'],d:['M4 8c0 1.4 3.6 2.5 8 2.5S20 9.4 20 8s-3.6-2.5-8-2.5S4 6.6 4 8z','M4 8v4c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V8','M4 12v4c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5v-4']},
+  doc:{f:['M6 3h9l4 4v14H6z'],d:['M6 3h9l4 4v14H6z','M15 3v4h4','M9 12h7','M9 15.5h5']},
+  exchange:{f:['M4 5.5h14v5H4z','M6 13.5h14v5H6z'],d:['M4 8h14','M14.5 4.5L18 8l-3.5 3.5','M20 16H6','M9.5 12.5L6 16l3.5 3.5']},
+  key:{f:['M8 4a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z'],d:['M8 4a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z','M11.2 11.2L20.5 20.5','M16.5 16.5l2.5-2.5','M13.8 13.8l2-2']},
+  bars:{f:['M5 20v-5h3v5z','M10.5 20V11h3v9z','M16 20V6h3v14z'],d:['M5 20v-5h3v5z','M10.5 20V11h3v9z','M16 20V6h3v14z','M3 20.5h18']},
+  barsUp:{f:['M5 20v-4h2v4z','M10 20v-7h2v7z','M15 20V10h2v10z'],d:['M3 20.5h18','M6 20v-4','M11 20v-7','M16 20v-10','M3.5 11l5-5 3 3 6-6','M14.5 3.5h4v4']},
+  medal:{f:['M12 9a6 6 0 1 1 0 12 6 6 0 0 1 0-12z'],d:['M8 3l4 6 4-6','M12 9a6 6 0 1 1 0 12 6 6 0 0 1 0-12z','M12 12.4l.9 1.9 2.1.3-1.5 1.5.4 2.1-1.9-1-1.9 1 .4-2.1L9 14.6l2.1-.3z']},
+  sail:{f:['M12 4v11H5z'],d:['M12 3v13','M12 3l8 12.5H12','M12 6.5L5.5 15H12','M3.5 19h17','M6 19l2 2h8l2-2']},
+  houseSolid:{f:['M5 10v11h14V10l-7-6z'],solid:1,d:[_FHOUSE,'M5 9.5V21h14V9.5','M8.8 15l2.3 2.3 4.2-4.6']},
+  mountain:{f:['M2 20l7-13 4 7 3-4 6 10z'],d:['M2 20l7-13 4 7 3-4 6 10z','M7.2 10l1.8-3.2 1.8 3.2']},
+  flame:{f:[_FFL],d:[_FFL]},
+  flame2:{f:['M10 3c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-4-1-6 1-9z'],d:['M10 3c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-4-1-6 1-9z','M18.5 11c.6 2 2.3 2.8 2.3 5.3a2.4 2.4 0 0 1-4.8 0']},
+  tree:{f:['M12 3C8.5 3 6 5.5 6 8.5S8 14 12 14s6-2.5 6-5.5S15.5 3 12 3z'],d:['M12 3C8.5 3 6 5.5 6 8.5S8 14 12 14s6-2.5 6-5.5S15.5 3 12 3z','M12 14v7','M12 14l-3-3','M12 12l3-2.5','M9 21h6']}
+};
+var FIRE_LONG=['Record your first net worth snapshot to start your roadmap.','List every debt — amount, interest rate, minimum monthly payment.','Add at least one income source and one expense category.','Get your first pound into a savings account.','Build a £500 emergency starter fund.','Build a £1,000 emergency fund before attacking debt harder.','Pay off one debt in full — the smallest balance first.','Clear 50% of total debt by value.','Net worth crosses £1,000 positive.','Reach zero consumer debt.','Save 3 months of expenses in accessible cash.','Save 6 months of expenses — fully buffered against emergencies.','Open a Stocks & Shares ISA or Lifetime ISA.','Save 1% of your house target price.','Save 5% of your house target — halfway to a 10% deposit.','Net worth reaches £5,000.','Full deposit saved. Time to talk to a mortgage broker.','Net worth reaches £10,000.','Submit your mortgage application.','Exchange contracts on your property.','Keys in hand. You own it.','Net worth reaches £25,000.','Net worth reaches £50,000.','Net worth crosses £100,000 — six figures.','Investments alone can grow to FI target — coast from here.','Mortgage paid off. Outright ownership.','Net worth reaches £250,000.','25× annual expenses invested — full financial independence.','33× annual expenses — Fat FIRE.','50× annual expenses — enough for the next generation.'];
+var FIRE_PHASES=[
+  {label:'FOUNDATION',col:'#44c0b9'},{label:'STABILISE',col:'#c9a84c'},{label:'SAVE',col:'#e8c56a'},
+  {label:'BUY',col:'#9b7ec8'},{label:'OWN',col:'#3ecf8e'},{label:'FREE',col:'#c9a84c'}
+];
+var STK_COLORS=['#44c0b9','#c9a84c','#3ecf8e','#9b7ec8','#64b5f6','#e0894a','#e05c5c','#e8c56a'];
 var AL_KEY='pos_al1';
 var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
@@ -8381,7 +8361,26 @@ function resetVaultData() {
 // CASHFLOW JS
 // ═══════════════════════════════════════════════════════════════
 function cfTotalIn(){return(ovState.income||[]).reduce(function(s,r){return s+(+r.amount||0);},0);}
-function cfTotalOut(){return(ovState.expenses||[]).reduce(function(s,r){return s+(+r.amount||0);},0);}
+// ── Cash flow groups: committed (red) · optional (amber) · saved & invested (green) ──
+// Legacy categories (necessity / fixed) are all "committed"; discretionary = "optional".
+function cfGroup(cat){
+  cat=String(cat||'').toLowerCase();
+  if(cat==='discretionary'||cat==='optional')return 'optional';
+  if(cat==='investment'||cat==='saving'||cat==='savings'||cat==='growth')return 'growth';
+  return 'committed';
+}
+function cfGroupToCat(g){return g==='optional'?'discretionary':g==='growth'?'investment':'necessity';}
+function cfItemsByGroup(){
+  var o={committed:[],optional:[],growth:[]};
+  (ovState.expenses||[]).forEach(function(e){if((+e.amount||0)>0)o[cfGroup(e.category)].push(e);});
+  CF_GROUP_ORDER.forEach(function(g){o[g].sort(function(a,b){return (+b.amount||0)-(+a.amount||0);});});
+  return o;
+}
+function cfSum(list){return list.reduce(function(s,r){return s+(+r.amount||0);},0);}
+// "Out" = money actually spent (committed + optional). Money put into savings/investments is
+// not spending — it is what the surplus is turned into.
+function cfTotalOut(){return(ovState.expenses||[]).reduce(function(s,r){return cfGroup(r.category)==='growth'?s:s+(+r.amount||0);},0);}
+function cfTotalGrowth(){return(ovState.expenses||[]).reduce(function(s,r){return cfGroup(r.category)==='growth'?s+(+r.amount||0):s;},0);}
 function addIncome(){
   var n=document.getElementById('cf-inc-name').value.trim();
   var a=parseFloat(document.getElementById('cf-inc-amt').value);
@@ -8405,140 +8404,245 @@ function addExpense(){
 }
 function delIncome(id){ovState.income=(ovState.income||[]).filter(function(r){return r.id!==id;});saveState();renderCashflow();updateKPIs();}
 function delExpense(id){ovState.expenses=(ovState.expenses||[]).filter(function(r){return r.id!==id;});saveState();renderCashflow();updateKPIs();}
-function drawCashflowDiagram(){
-  var canvas=document.getElementById('cf-sankey');
-  if(!canvas)return;
-  var dpr=window.devicePixelRatio||1;
-  var W=canvas.offsetWidth||600;
-  var H=200;
-  canvas.width=Math.round(W*dpr); canvas.height=Math.round(H*dpr);
-  canvas.style.height=H+'px';
-  var ctx=canvas.getContext('2d');
-  ctx.scale(dpr,dpr);
-  ctx.clearRect(0,0,W,H);
-
-  var inc=ovState.income||[],exp=ovState.expenses||[];
-  var tIn=cfTotalIn(),tOut=cfTotalOut(),surplus=tIn-tOut;
-
-  if(tIn<=0&&tOut<=0){
-    ctx.fillStyle='rgba(90,96,104,0.4)'; ctx.font="11px 'Share Tech Mono',monospace"; ctx.textAlign='center';
-    ctx.fillText('Add income & expenses to see the flow diagram',W/2,H/2); return;
-  }
-
-  var TOP=18,BOT=18,usableH=H-TOP-BOT;
-  var maxVal=Math.max(tIn,tOut,1);
-  function sc(v){return Math.max(3,(v/maxVal)*usableH);}
-
-  var BW=14; // bar width
-  var LX=W*0.28; // right edge of income bars
-  var RX=W*0.72; // left edge of expense bars
-  var CX=W*0.5;  // centre of flow
-  var CW=22;     // centre bar half-width
-
-  // Vertical centres for income/expense blocks
-  var incH=sc(tIn), expH=sc(tOut);
-  var incTop=TOP+(usableH-incH)/2;
-  var expTop=TOP+(usableH-expH)/2;
-
-  // ── Draw Bezier flow band: income → centre ──
-  var grad1=ctx.createLinearGradient(LX,0,CX-CW,0);
-  grad1.addColorStop(0,'rgba(68,192,185,0.15)'); grad1.addColorStop(1,'rgba(68,192,185,0.07)');
-  ctx.beginPath();
-  ctx.moveTo(LX,incTop); ctx.bezierCurveTo(LX+40,incTop,CX-CW-40,TOP+(usableH-incH)/2,CX-CW,TOP+(usableH-incH)/2);
-  ctx.lineTo(CX-CW,TOP+(usableH-incH)/2+incH);
-  ctx.bezierCurveTo(CX-CW-40,TOP+(usableH-incH)/2+incH,LX+40,incTop+incH,LX,incTop+incH);
-  ctx.closePath(); ctx.fillStyle=grad1; ctx.fill();
-
-  // ── Draw Bezier flow band: centre → expenses ──
-  var grad2=ctx.createLinearGradient(CX+CW,0,RX,0);
-  grad2.addColorStop(0,'rgba(224,92,92,0.07)'); grad2.addColorStop(1,'rgba(224,92,92,0.15)');
-  ctx.beginPath();
-  ctx.moveTo(CX+CW,expTop); ctx.bezierCurveTo(CX+CW+40,expTop,RX-40,expTop,RX,expTop);
-  ctx.lineTo(RX,expTop+expH);
-  ctx.bezierCurveTo(RX-40,expTop+expH,CX+CW+40,expTop+expH,CX+CW,expTop+expH);
-  ctx.closePath(); ctx.fillStyle=grad2; ctx.fill();
-
-  // ── Centre bar ──
-  var centreTop=TOP+(usableH-incH)/2;
-  // Income in (teal top portion)
-  ctx.fillStyle='rgba(68,192,185,0.35)';
-  ctx.fillRect(CX-CW,centreTop,CW*2,sc(Math.min(tIn,tOut)));
-  // Surplus (bright teal)
-  if(surplus>0){
-    ctx.fillStyle='rgba(68,192,185,0.7)';
-    ctx.fillRect(CX-CW,centreTop+sc(Math.min(tIn,tOut)),CW*2,sc(surplus));
-    ctx.fillStyle='#44c0b9'; ctx.font="bold 8px 'Syne',sans-serif"; ctx.textAlign='center';
-    ctx.fillText('SURPLUS',CX,centreTop+sc(Math.min(tIn,tOut))+sc(surplus)/2+3);
-    ctx.font="7.5px 'Share Tech Mono',monospace";
-    ctx.fillText(gbpFmt(surplus),CX,centreTop+sc(Math.min(tIn,tOut))+sc(surplus)/2+12);
-  } else if(surplus<0){
-    ctx.fillStyle='rgba(224,92,92,0.5)';
-    var defH=sc(Math.abs(surplus));
-    ctx.fillRect(CX-CW,centreTop+incH,CW*2,defH);
-    ctx.fillStyle='rgba(224,92,92,0.85)'; ctx.font="bold 8px 'Syne',sans-serif"; ctx.textAlign='center';
-    ctx.fillText('DEFICIT',CX,centreTop+incH+defH/2+3);
-  }
-  // Centre labels
-  ctx.fillStyle='rgba(68,192,185,0.75)'; ctx.font="bold 7.5px 'Syne',sans-serif"; ctx.textAlign='center';
-  ctx.fillText('INCOME',CX,centreTop-7);
-  ctx.fillText(gbpFmt(tIn),CX,TOP-2);
-
-  // ── Income source bars + labels (left side) ──
-  var iy=incTop;
-  inc.forEach(function(r,i){
-    var h=sc(r.amount);
-    var cols=['rgba(68,192,185,','rgba(80,200,175,','rgba(55,175,165,','rgba(95,210,190,'];
-    var c=cols[i%cols.length];
-    ctx.fillStyle=c+'0.75)';
-    ctx.fillRect(LX-BW,iy,BW,h);
-    // label
-    ctx.fillStyle=c+'0.9)'; ctx.font="8.5px 'Syne',sans-serif"; ctx.textAlign='right';
-    ctx.fillText(r.name,LX-BW-5,iy+h/2+3);
-    ctx.font="7.5px 'Share Tech Mono',monospace"; ctx.fillStyle=c+'0.65)';
-    ctx.fillText(gbpFmt(r.amount),LX-BW-5,iy+h/2+12);
-    iy+=h+3;
-  });
-
-  // ── Expense bars + labels (right side) ──
-  var catCols={necessity:'rgba(255,160,50,',fixed:'rgba(224,92,92,',discretionary:'rgba(180,80,200,'};
-  var ey=expTop;
-  exp.forEach(function(r){
-    var h=sc(r.amount);
-    var c=catCols[r.category]||'rgba(200,80,80,';
-    ctx.fillStyle=c+'0.75)';
-    ctx.fillRect(RX,ey,BW,h);
-    ctx.fillStyle=c+'0.9)'; ctx.font="8.5px 'Syne',sans-serif"; ctx.textAlign='left';
-    ctx.fillText(r.name,RX+BW+5,ey+h/2+3);
-    ctx.font="7.5px 'Share Tech Mono',monospace"; ctx.fillStyle=c+'0.65)';
-    ctx.fillText(gbpFmt(r.amount),RX+BW+5,ey+h/2+12);
-    ey+=h+3;
-  });
-
-  // OUT label
-  if(tOut>0){
-    ctx.fillStyle='rgba(224,92,92,0.7)'; ctx.font="bold 7.5px 'Syne',sans-serif"; ctx.textAlign='center';
-    ctx.fillText('EXPENSES',CX,expTop+expH+13);
-    ctx.font="7.5px 'Share Tech Mono',monospace";
-    ctx.fillText(gbpFmt(tOut),CX,expTop+expH+23);
-  }
+function cfMoney(n){
+  var rate=window.VI_CURRENCY_RATE||1,sym=window.VI_CURRENCY_SYMBOL||'£';
+  var v=(isNaN(n)||n==null?0:n)*rate;
+  return (v<0?'-':'')+sym+Math.round(Math.abs(v)).toLocaleString('en-GB');
 }
-
+function cfEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function cfShort(s,n){s=String(s||'');return s.length>n?s.slice(0,n-1)+'…':s;}
+function cfLink(x0,y0,x1,y1,w,fill,op){
+  var xm=(x0+x1)/2;
+  return '<path d="M'+x0+' '+y0+' C'+xm+' '+y0+','+xm+' '+y1+','+x1+' '+y1+' L'+x1+' '+(y1+w)+' C'+xm+' '+(y1+w)+','+xm+' '+(y0+w)+','+x0+' '+(y0+w)+' Z" fill="'+fill+'" fill-opacity="'+op+'"/>';
+}
+// Shared model so the Sankey, histogram and summary all agree.
+function cfModel(){
+  var inc=(ovState.income||[]).filter(function(r){return(+r.amount||0)>0;});
+  var by=cfItemsByGroup();
+  var tIn=cfTotalIn(),spend=cfTotalOut(),growth=cfTotalGrowth();
+  var surplus=tIn-spend;
+  var overflow=Math.max(0,surplus-growth);
+  var shortfall=Math.max(0,spend+growth-tIn);
+  return {inc:inc,by:by,tIn:tIn,spend:spend,growth:growth,surplus:surplus,overflow:overflow,shortfall:shortfall,
+          total:Math.max(tIn,spend+growth)};
+}
+// ── Sankey: income sources → Income → Committed / Optional / Saved → each category ──
+function drawCashflowDiagram(){
+  var host=document.getElementById('cf-sankey');
+  if(!host)return;
+  var m=cfModel();
+  if(m.total<=0){host.innerHTML='<div class="cf-empty">Add your income and spending to see where every pound goes</div>';return;}
+  var T=m.total;
+  // sources (+ shortfall when spending exceeds income)
+  var sources=m.inc.map(function(r){return{name:r.name,amt:+r.amount,col:'#44c0b9'};});
+  if(m.shortfall>0)sources.push({name:'Shortfall',amt:m.shortfall,col:'#8a93a6',dash:true});
+  // groups and their item nodes
+  var groups=CF_GROUP_ORDER.map(function(g){
+    var items=m.by[g].map(function(r){return{name:r.name,amt:+r.amount};});
+    if(g==='growth'&&m.overflow>0)items.push({name:'Unallocated surplus',amt:m.overflow,overflow:true});
+    return{key:g,col:CF_GROUPS[g].col,label:CF_GROUPS[g].label,items:items,sum:items.reduce(function(a,it){return a+it.amt;},0)};
+  }).filter(function(g){return g.sum>0;});
+  var nItems=groups.reduce(function(n,g){return n+g.items.length;},0);
+  var W=960,padT=30,padB=14,nodeW=14,gapItem=6,gapGroup=22,gapSrc=6,MINSLOT=28;
+  var XS=190,XI=395,XG=590,XT=785;
+  var usable=Math.max(300,60+nItems*34);
+  var gaps=(nItems-groups.length)*gapItem+(groups.length-1)*gapGroup;
+  var k=(usable-gaps)/T;
+  // item column
+  var y=padT,itemNodes=[],groupNodes=[];
+  groups.forEach(function(g){
+    var top=y;
+    g.items.forEach(function(it){
+      var h=Math.max(4,it.amt*k);
+      itemNodes.push({g:g,it:it,y:y,h:h,slot:Math.max(h,MINSLOT)});
+      y+=Math.max(h,MINSLOT)+gapItem;
+    });
+    var bottom=y-gapItem;
+    groupNodes.push({g:g,y:top,h:Math.max(4,g.sum*k),top:top,bottom:bottom});
+    y+=gapGroup-gapItem;
+  });
+  var itemsBottom=y-(gapGroup-gapItem);
+  var spanTop=groupNodes[0].top,spanBottom=groupNodes[groupNodes.length-1].bottom;
+  var incH=T*k,cy=(spanTop+spanBottom)/2;
+  var incY=Math.max(padT,cy-incH/2);
+  var srcTotal=sources.reduce(function(a,s){return a+Math.max(s.amt*k,MINSLOT);},0)+(sources.length-1)*gapSrc;
+  var srcY=Math.max(padT,cy-srcTotal/2);
+  var H=Math.max(itemsBottom,incY+incH,srcY+srcTotal)+padB;
+  var out='<svg viewBox="0 0 '+W+' '+H.toFixed(0)+'" width="100%" style="min-width:760px" font-family="Syne,DM Sans,sans-serif" role="img" aria-label="Cash flow diagram">';
+  // -- links
+  var sy=srcY,io=0;
+  sources.forEach(function(s){
+    var w=s.amt*k;
+    out+=cfLink(XS+nodeW,sy,XI,incY+io,w,s.col,.28);
+    sy+=Math.max(w,MINSLOT)+gapSrc;io+=w;
+  });
+  var go=0;
+  groupNodes.forEach(function(gn){
+    var w=gn.g.sum*k;
+    out+=cfLink(XI+nodeW,incY+go,XG,gn.y,w,gn.g.col,.30);
+    go+=w;
+  });
+  groupNodes.forEach(function(gn){
+    var off=0;
+    itemNodes.filter(function(n){return n.g===gn.g;}).forEach(function(n){
+      var w=n.it.amt*k;
+      out+=cfLink(XG+nodeW,gn.y+off,XT,n.y,w,gn.g.col,n.it.overflow?.18:.30);
+      off+=w;
+    });
+  });
+  // -- nodes
+  var halo='paint-order="stroke" stroke="#050c14" stroke-width="3" stroke-linejoin="round"';
+  function pct(v){return (v/T*100).toFixed(1)+'%';}
+  sy=srcY;
+  sources.forEach(function(s){
+    var h=Math.max(4,s.amt*k);
+    out+='<rect x="'+XS+'" y="'+sy.toFixed(1)+'" width="'+nodeW+'" height="'+h.toFixed(1)+'" fill="'+s.col+'" fill-opacity="'+(s.dash?.5:.9)+'"/>';
+    out+='<text x="'+(XS-8)+'" y="'+(sy+h/2-2).toFixed(1)+'" text-anchor="end" font-size="11.5" font-weight="700" fill="#cfe9e7" '+halo+'>'+cfEsc(cfShort(s.name,26))+'</text>';
+    out+='<text x="'+(XS-8)+'" y="'+(sy+h/2+11).toFixed(1)+'" text-anchor="end" font-size="10.5" font-family="Share Tech Mono,monospace" fill="#8fb4b1" '+halo+'>'+cfMoney(s.amt)+' ('+pct(s.amt)+')</text>';
+    sy+=Math.max(s.amt*k,MINSLOT)+gapSrc;
+  });
+  out+='<rect x="'+XI+'" y="'+incY.toFixed(1)+'" width="'+nodeW+'" height="'+incH.toFixed(1)+'" fill="#44c0b9"/>';
+  out+='<text x="'+(XI+nodeW/2)+'" y="'+(incY-9).toFixed(1)+'" text-anchor="middle" font-size="11.5" font-weight="800" fill="#44c0b9" letter-spacing="1.5" '+halo+'>INCOME '+cfMoney(m.tIn)+'</text>';
+  groupNodes.forEach(function(gn){
+    out+='<rect x="'+XG+'" y="'+gn.y.toFixed(1)+'" width="'+nodeW+'" height="'+gn.h.toFixed(1)+'" fill="'+gn.g.col+'"/>';
+    out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2-2).toFixed(1)+'" font-size="12" font-weight="800" fill="'+gn.g.col+'" '+halo+'>'+gn.g.label+'</text>';
+    out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2+12).toFixed(1)+'" font-size="10.5" font-family="Share Tech Mono,monospace" fill="#b9c4cf" '+halo+'>'+cfMoney(gn.g.sum)+' ('+pct(gn.g.sum)+')</text>';
+  });
+  itemNodes.forEach(function(n){
+    out+='<rect x="'+XT+'" y="'+n.y.toFixed(1)+'" width="'+nodeW+'" height="'+n.h.toFixed(1)+'" fill="'+n.g.col+'" fill-opacity="'+(n.it.overflow?.45:.95)+'"'+(n.it.overflow?' stroke="'+n.g.col+'" stroke-dasharray="3 2"':'')+'/>';
+    out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2-1).toFixed(1)+'" font-size="11" font-weight="700" fill="#dfe6ec" '+halo+'>'+cfEsc(cfShort(n.it.name,20))+'</text>';
+    out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2+11).toFixed(1)+'" font-size="10" font-family="Share Tech Mono,monospace" fill="#8f9bab" '+halo+'>'+cfMoney(n.it.amt)+' ('+pct(n.it.amt)+')</text>';
+  });
+  out+='</svg>';
+  host.innerHTML=out;
+  drawCashflowHistogram(m);
+}
+// ── Histogram: one coloured column per category ──
+function drawCashflowHistogram(m){
+  var host=document.getElementById('cf-histo');
+  if(!host)return;
+  m=m||cfModel();
+  var bars=[];
+  CF_GROUP_ORDER.forEach(function(g){
+    m.by[g].forEach(function(r){bars.push({name:r.name,amt:+r.amount,col:CF_GROUPS[g].col,g:g});});
+  });
+  if(m.overflow>0)bars.push({name:'Unallocated surplus',amt:m.overflow,col:CF_GROUPS.growth.col,g:'growth',overflow:true});
+  if(m.shortfall>0)bars.push({name:'Shortfall',amt:m.shortfall,col:'#8a93a6',g:'short',overflow:true});
+  if(!(m.tIn>0&&bars.length)){host.innerHTML='<div class="cf-empty">Add income and at least one spending line to see your histogram</div>';return;}
+  var padL=58,padR=14,padT=26,plotH=190,padB=96;
+  var cw=host.clientWidth||760;
+  var slot=Math.max(64,Math.min(110,(cw-padL-padR)/bars.length)),bw=Math.round(slot*0.66),gap=slot-bw;
+  var W=Math.round(padL+padR+bars.length*slot),H=padT+plotH+padB;
+  var maxV=Math.max.apply(null,bars.map(function(b){return b.amt;}).concat([m.tIn*0.0001,1]));
+  var nice=Math.pow(10,Math.floor(Math.log(maxV)/Math.LN10));
+  var top=Math.ceil(maxV/nice)*nice; if(top/maxV>1.6)top=Math.ceil(maxV/(nice/2))*(nice/2);
+  var out='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" font-family="Syne,DM Sans,sans-serif" role="img" aria-label="Spending histogram">';
+  for(var t=0;t<=4;t++){
+    var v=top*t/4,yy=padT+plotH-(v/top)*plotH;
+    out+='<line x1="'+padL+'" x2="'+(W-padR)+'" y1="'+yy+'" y2="'+yy+'" stroke="rgba(255,255,255,'+(t?'.06':'.18')+')"/>';
+    out+='<text x="'+(padL-8)+'" y="'+(yy+3)+'" text-anchor="end" font-size="9.5" font-family="Share Tech Mono,monospace" fill="#6b7785">'+cfMoney(v)+'</text>';
+  }
+  bars.forEach(function(b,i){
+    var x=padL+gap/2+i*(bw+gap),h=Math.max(2,(b.amt/top)*plotH),y=padT+plotH-h;
+    out+='<g><title>'+cfEsc(b.name)+': '+cfMoney(b.amt)+'/mo ('+(b.amt/m.total*100).toFixed(1)+'% of income)</title>'
+      +'<rect x="'+x+'" y="'+y.toFixed(1)+'" width="'+bw+'" height="'+h.toFixed(1)+'" rx="3" fill="'+b.col+'" fill-opacity="'+(b.overflow?.35:.88)+'"'+(b.overflow?' stroke="'+b.col+'" stroke-dasharray="4 3"':'')+'/>'
+      +'<text x="'+(x+bw/2)+'" y="'+(y-6).toFixed(1)+'" text-anchor="middle" font-size="10" font-family="Share Tech Mono,monospace" fill="#cfd8e0">'+cfMoney(b.amt)+'</text>'
+      +'<text transform="translate('+(x+bw/2+4)+','+(padT+plotH+14)+') rotate(-38)" text-anchor="end" font-size="10.5" font-weight="700" fill="'+b.col+'">'+cfEsc(cfShort(b.name,18))+'</text></g>';
+  });
+  out+='</svg>';
+  host.innerHTML=out;
+}
+function cfRow(r,kind){
+  var isExp=kind==='exp';
+  var g=isExp?cfGroup(r.category):null;
+  var col=isExp?CF_GROUPS[g].col:'var(--gr)';
+  var dot=isExp?'<button class="cf-dot" style="background:'+col+'" title="'+CF_GROUPS[g].label+' — tap to change type" onclick="cycleExpenseGroup('+r.id+')"></button>':'<span class="cf-dot" style="background:#44c0b9;cursor:default"></span>';
+  return '<div class="data-item cf-row">'+dot+'<span class="cf-nm">'+cfEsc(r.name)+'</span>'
+    +'<span class="data-item-val" style="color:'+col+'">'+cfMoney(r.amount)+'/mo</span>'
+    +'<button class="cf-edit" title="Edit amount" onclick="editCfItem(\''+kind+'\','+r.id+')">✎</button>'
+    +'<button class="data-item-del" onclick="'+(isExp?'delExpense':'delIncome')+'('+r.id+')">✕</button></div>';
+}
 function renderCashflow(){
   var inc=ovState.income||[],exp=ovState.expenses||[];
-  var tIn=cfTotalIn(),tOut=cfTotalOut(),surplus=tIn-tOut;
-  var rate=tIn>0?((surplus/tIn)*100).toFixed(0):0;
+  var m=cfModel();
+  var tIn=m.tIn,tOut=m.spend,surplus=m.surplus;
+  var rate=tIn>0?Math.max(-999,Math.round((surplus/tIn)*100)):0;
   var sum=document.getElementById('cf-summary');
+  var mono='font-family:\'Share Tech Mono\',monospace;font-size:.65rem;';
   if(sum)sum.innerHTML=
-    '<span style="font-family:\'Share Tech Mono\',monospace;font-size:.65rem;color:var(--gr)">In: '+gbpFmt(tIn)+'/mo</span>'+
-    '<span style="font-family:\'Share Tech Mono\',monospace;font-size:.65rem;color:var(--re)">Out: '+gbpFmt(tOut)+'/mo</span>'+
-    '<span style="font-family:\'Share Tech Mono\',monospace;font-size:.65rem;color:'+(surplus>=0?'var(--em)':'var(--re)')+'">Surplus: '+gbpFmt(surplus)+'/mo</span>'+
-    '<span style="font-family:\'Share Tech Mono\',monospace;font-size:.65rem;color:var(--go)">Save rate: '+rate+'%</span>';
+    '<span style="'+mono+'color:var(--gr)">In: '+gbpFmt(tIn)+'/mo</span>'+
+    '<span style="'+mono+'color:var(--re)">Spend: '+gbpFmt(tOut)+'/mo</span>'+
+    '<span style="'+mono+'color:'+(surplus>=0?'var(--em)':'var(--re)')+'">Surplus: '+gbpFmt(surplus)+'/mo</span>'+
+    '<span style="'+mono+'color:var(--go)">Save rate: '+rate+'%</span>';
   var il=document.getElementById('cf-income-list');
-  if(il)il.innerHTML=inc.map(function(r){return'<div class="data-item"><span>'+r.name+'</span><span class="data-item-val" style="color:var(--gr)">'+gbpFmt(r.amount)+'/mo</span><button class="data-item-del" onclick="delIncome('+r.id+')">✕</button></div>';}).join('')||'<div style="font-size:.58rem;color:var(--t3);padding:4px 0">None added</div>';
+  if(il)il.innerHTML=inc.map(function(r){return cfRow(r,'inc');}).join('')||'<div style="font-size:.58rem;color:var(--t3);padding:4px 0">None added</div>';
   var el2=document.getElementById('cf-expense-list');
-  if(el2)el2.innerHTML=exp.map(function(r){return'<div class="data-item"><span>'+r.name+'</span><span class="data-item-val" style="color:var(--re)">'+gbpFmt(r.amount)+'/mo</span><button class="data-item-del" onclick="delExpense('+r.id+')">✕</button></div>';}).join('')||'<div style="font-size:.58rem;color:var(--t3);padding:4px 0">None added</div>';
+  var sorted=exp.slice().sort(function(a,b){return CF_GROUP_ORDER.indexOf(cfGroup(a.category))-CF_GROUP_ORDER.indexOf(cfGroup(b.category))||(+b.amount||0)-(+a.amount||0);});
+  if(el2)el2.innerHTML=sorted.map(function(r){return cfRow(r,'exp');}).join('')||'<div style="font-size:.58rem;color:var(--t3);padding:4px 0">None added</div>';
+  // presets
+  var pe=document.getElementById('cf-presets');
+  if(pe&&!pe.dataset.ready){
+    pe.innerHTML='<span style="font-size:.46rem;color:var(--t3);width:100%">Quick add:</span>'+CF_PRESETS.map(function(p,i){
+      var c=CF_GROUPS[cfGroup(p.c)].col;
+      return '<button class="cf-chip" style="color:'+c+';border-color:'+c+'66" onclick="cfPreset('+i+')">'+cfEsc(p.n)+'</button>';
+    }).join('');
+    pe.dataset.ready='1';
+  }
+  // nudge: a single lump-sum from the old questionnaire hides the real picture
+  var nd=document.getElementById('cf-nudge');
+  if(nd){
+    var lump=exp.length===1&&(exp[0]._onboarding||/^monthly expenses$/i.test(exp[0].name||''));
+    nd.innerHTML=lump?'<div class="cf-nudge"><b>One lump-sum so far.</b> Break "'+cfEsc(exp[0].name)+'" down below — rent, groceries, transport, savings — to see exactly where each pound goes. Tap <b>✕</b> on the lump sum once you have.</div>':'';
+  }
   renderCashflowCategories();
   setTimeout(drawCashflowDiagram, 50);
+}
+function cfPreset(i){
+  var p=CF_PRESETS[i];if(!p)return;
+  var n=document.getElementById('cf-exp-name'),c=document.getElementById('cf-exp-cat'),a=document.getElementById('cf-exp-amt');
+  if(n)n.value=p.n;if(c)c.value=p.c;if(a)a.focus();
+}
+function cycleExpenseGroup(id){
+  var r=(ovState.expenses||[]).find(function(x){return x.id===id;});
+  if(!r)return;
+  var next=CF_GROUP_ORDER[(CF_GROUP_ORDER.indexOf(cfGroup(r.category))+1)%CF_GROUP_ORDER.length];
+  r.category=cfGroupToCat(next);
+  saveState();renderCashflow();updateKPIs();
+  showToast(r.name+' → '+CF_GROUPS[next].label);
+}
+function editCfItem(kind,id){
+  var list=kind==='exp'?ovState.expenses:ovState.income;
+  var r=(list||[]).find(function(x){return x.id===id;});
+  if(!r)return;
+  var rate=window.VI_CURRENCY_RATE||1;
+  var v=prompt('New monthly amount for "'+r.name+'"',Math.round(r.amount*rate*100)/100);
+  if(v===null)return;
+  v=parseFloat(v);
+  if(isNaN(v)||v<0){showToast('Enter a valid amount');return;}
+  r.amount=v/rate;
+  saveState();renderCashflow();updateKPIs();
+}
+function renderCashflowCategories(){
+  var el=document.getElementById('cf-categories');
+  if(!el)return;
+  var m=cfModel();
+  if(m.total<=0){el.innerHTML='<div style="font-size:.58rem;color:var(--t3)">Add income and spending to see how your money splits.</div>';return;}
+  var totals={committed:cfSum(m.by.committed),optional:cfSum(m.by.optional),growth:m.growth+m.overflow};
+  var guide={committed:'aim ≤ 50%',optional:'aim ≤ 30%',growth:'aim ≥ 20%'};
+  var target={committed:50,optional:30,growth:20};
+  el.innerHTML=CF_GROUP_ORDER.map(function(g){
+    var pct=Math.round(totals[g]/m.total*100);
+    var bad=g==='growth'?pct<target[g]:pct>target[g];
+    var c=CF_GROUPS[g].col;
+    return '<div style="margin-bottom:11px">'
+      +'<div style="display:flex;justify-content:space-between;gap:8px;font-size:.58rem;margin-bottom:4px">'
+      +'<span style="color:'+c+';font-weight:700">'+CF_GROUPS[g].label+' <span style="color:var(--t3);font-weight:400">· '+guide[g]+'</span></span>'
+      +'<span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(totals[g])+'/mo &nbsp;<b style="color:'+(bad?'#e8a23c':c)+'">'+pct+'%</b></span></div>'
+      +'<div style="position:relative;height:6px;background:rgba(255,255,255,.06);border-radius:3px">'
+      +'<div style="height:100%;width:'+Math.min(100,pct)+'%;background:'+c+';border-radius:3px;transition:width .4s ease"></div>'
+      +'<div title="Guide: '+target[g]+'%" style="position:absolute;top:-3px;bottom:-3px;left:'+target[g]+'%;width:2px;background:rgba(255,255,255,.35)"></div>'
+      +'</div></div>';
+  }).join('')+(m.shortfall>0?'<div style="font-size:.55rem;color:#e05c5c;margin-top:4px">⚠ You are planning to spend '+gbpFmt(m.shortfall)+'/mo more than you earn.</div>':'');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -8550,6 +8654,337 @@ function alTotalMetals(){var m=alState.metals,p=alState.metalPrices;return m.gol
 function alTotalCrypto(){return alState.crypto.reduce(function(s,c){var a=(c.amount!=null?c.amount:(c.qty!=null?c.qty:0))||0;var p=c.price||0;return s+a*p;},0);}
 function alTotalCash(){return alState.cashAccounts.reduce(function(s,a){return s+a.balance;},0);}
 function alTotalOther(){return alState.otherAssets.reduce(function(s,a){return s+a.value;},0);}
+// ═══════════════════════════════════════════════════════════════
+// STOCKS & FUNDS — editable portfolios ("pies") with live prices
+// ═══════════════════════════════════════════════════════════════
+function stkEnsure(){
+  if(!alState.stocks)alState.stocks=[];
+  if(!alState.stockPies||!alState.stockPies.length)alState.stockPies=[{id:1,name:'My Portfolio'}];
+  if(alState.activePie!=='all'&&!alState.stockPies.some(function(p){return p.id===alState.activePie;}))alState.activePie=alState.stockPies[0].id;
+}
+function stkEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// Holdings with no live price fall back to cost so net worth never silently drops to £0.
+function stkPrice(h){return (+h.price>0)?+h.price:((+h.avgCost>0)?+h.avgCost:0);}
+function stkValue(h){return (+h.units||0)*stkPrice(h);}
+function alTotalStocks(){return (alState.stocks||[]).reduce(function(s,h){return s+stkValue(h);},0);}
+function stkVisible(){
+  stkEnsure();
+  return alState.activePie==='all'?alState.stocks:alState.stocks.filter(function(h){return h.pie===alState.activePie;});
+}
+function stkPieName(id){var p=(alState.stockPies||[]).find(function(x){return x.id===id;});return p?p.name:'';}
+function stkToGBP(px,ccy){
+  px=+px;if(!(px>0))return null;
+  if(ccy==='GBp'||ccy==='GBX')return px/100;
+  if(!ccy||ccy==='GBP')return px;
+  var rates={};try{rates=JSON.parse(localStorage.getItem('vi_fx_rates')||'{}');}catch(e){}
+  var r=rates[ccy]||(typeof _fxRates!=='undefined'?_fxRates[ccy]:0);
+  return r>0?px/r:null;
+}
+function stkAgo(ts){
+  if(!ts)return '';
+  var m=Math.round((Date.now()-ts)/60000);
+  return m<1?'just now':m<60?m+'m ago':m<1440?Math.round(m/60)+'h ago':Math.round(m/1440)+'d ago';
+}
+function stkSave(){saveAL();if(typeof updateKPIs==='function')updateKPIs();stkRender();if(typeof renderSummaryCards==='function')try{renderSummaryCards();}catch(e){}}
+
+// ── donut ──
+function stkDonut(slices,total,top,sub,subCol){
+  var R=52,C=2*Math.PI*R,off=0,out='<svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="Portfolio allocation">'
+    +'<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="22"/>';
+  if(total>0)slices.forEach(function(s){
+    var len=s.v/total*C;
+    out+='<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="'+s.c+'" stroke-width="22" stroke-dasharray="'+Math.max(0,len-1.5).toFixed(2)+' '+(C-Math.max(0,len-1.5)).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 75 75)"><title>'+stkEsc(s.t)+' '+(s.v/total*100).toFixed(1)+'%</title></circle>';
+    off+=len;
+  });
+  out+='<text x="75" y="'+(sub?72:78)+'" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="15" fill="#fff">'+top+'</text>';
+  if(sub)out+='<text x="75" y="88" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="9" fill="'+(subCol||'#8fb4b1')+'">'+sub+'</text>';
+  return out+'</svg>';
+}
+function stkRender(){
+  stkEnsure();
+  var pies=document.getElementById('stk-pies');
+  if(!pies)return;
+  var tot=document.getElementById('subtab-total-stocks');if(tot)tot.textContent=gbpFmt(alTotalStocks());
+  // pie chips
+  var chips='<button class="stk-pie'+(alState.activePie==='all'?' on':'')+'" onclick="stkSelectPie(\'all\')">All pies <span>'+gbpFmt(alTotalStocks())+'</span></button>';
+  alState.stockPies.forEach(function(p){
+    var v=alState.stocks.filter(function(h){return h.pie===p.id;}).reduce(function(s,h){return s+stkValue(h);},0);
+    chips+='<button class="stk-pie'+(alState.activePie===p.id?' on':'')+'" onclick="stkSelectPie('+p.id+')">'+stkEsc(p.name)+' <span>'+gbpFmt(v)+'</span></button>';
+  });
+  chips+='<button class="stk-pie add" onclick="stkNewPie()">+ New pie</button>';
+  if(alState.activePie!=='all')chips+='<button class="stk-mini" title="Rename this pie" onclick="stkRenamePie()">✎</button><button class="stk-mini" title="Delete this pie" onclick="stkDeletePie()">✕</button>';
+  pies.innerHTML=chips;
+
+  var hs=stkVisible().slice().sort(function(a,b){return stkValue(b)-stkValue(a);});
+  var total=hs.reduce(function(s,h){return s+stkValue(h);},0);
+  // returns: only over holdings that have a cost basis
+  var withCost=hs.filter(function(h){return +h.avgCost>0&&(+h.units||0)>0;});
+  var cost=withCost.reduce(function(s,h){return s+h.units*h.avgCost;},0);
+  var valC=withCost.reduce(function(s,h){return s+stkValue(h);},0);
+  var ret=valC-cost,retPct=cost>0?ret/cost*100:0;
+  var dayChg=hs.reduce(function(s,h){var v=stkValue(h),c=+h.change||0;return s+(c?v-v/(1+c/100):0);},0);
+  var dayPct=total>0?dayChg/(total-dayChg)*100:0;
+  var slices=hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){return{v:stkValue(h),c:STK_COLORS[i%STK_COLORS.length],t:h.sym};});
+  var main=document.getElementById('stk-main');
+  if(main){
+    var up=ret>=0,dUp=dayChg>=0;
+    main.innerHTML='<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
+      +'<div class="stk-stats">'
+      +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+cfMoney(total)+'</div><div class="s">'+hs.length+' holding'+(hs.length===1?'':'s')+' · counts towards net worth</div></div>'
+      +'<div class="stk-stat" style="background:'+(withCost.length?(up?'rgba(62,207,142,.07)':'rgba(224,92,92,.08)'):'rgba(68,192,185,.06)')+'"><div class="l">Total return</div><div class="v" style="color:'+(withCost.length?(up?'#3ecf8e':'#e05c5c'):'var(--t3)')+'">'+(withCost.length?((up?'+':'−')+cfMoney(Math.abs(ret))):'—')+'</div><div class="s">'+(withCost.length?(withCost.length<hs.length?'on '+withCost.length+' of '+hs.length+' with a cost basis':'vs your average cost'):'add an average cost to see returns')+'</div></div>'
+      +'<div class="stk-stat"><div class="l">Today</div><div class="v" style="color:'+(dayChg?(dUp?'#3ecf8e':'#e05c5c'):'var(--t3)')+'">'+(dayChg?((dUp?'+':'−')+cfMoney(Math.abs(dayChg))):'—')+'</div><div class="s">'+(dayChg?((dUp?'+':'')+dayPct.toFixed(2)+'% since yesterday'):'refresh for live moves')+'</div></div>'
+      +'<div class="stk-stat"><div class="l">Invested</div><div class="v">'+(withCost.length?cfMoney(cost):'—')+'</div><div class="s">cost basis of tracked holdings</div></div>'
+      +'</div>';
+  }
+  // status
+  var st=document.getElementById('stk-status');
+  if(st){
+    var live=hs.filter(function(h){return h.updated&&!h.manualPrice;});
+    var latest=live.reduce(function(m,h){return Math.max(m,h.updated);},0);
+    if(!hs.length)st.innerHTML='<i style="background:#7d8793"></i><span>Add your first holding below — or import a CSV from Trading 212 — to start tracking live prices.</span>';
+    else if(window._stkBusy)st.innerHTML='<i style="background:#e8c56a"></i><span>Fetching live prices…</span>';
+    else if(latest)st.innerHTML='<i style="background:#3ecf8e"></i><span>Live prices via '+stkEsc(alState.stockSrc||'price feed')+' · updated '+stkAgo(latest)+'</span>';
+    else st.innerHTML='<i style="background:#e0894a"></i><span>No live price yet — valued at cost until prices load. Tap “Refresh prices”, or type a price yourself.</span>';
+  }
+  // holdings table
+  var ht=document.getElementById('stk-holdings');
+  if(ht){
+    if(!hs.length)ht.innerHTML='<div style="font-size:.58rem;color:var(--t3);text-align:center;padding:18px">No holdings in '+(alState.activePie==='all'?'any pie':'this pie')+' yet.</div>';
+    else ht.innerHTML='<div class="stk-tbl"><div class="stk-row h"><span>Holding</span><span>Units</span><span>Avg cost £</span><span>Price £</span><span style="text-align:right">Value</span><span style="text-align:right">P/L</span><span></span></div>'
+      +hs.map(function(h,i){
+        var v=stkValue(h),c=(+h.avgCost>0)?(h.units*h.avgCost):0,pl=c>0?(v-c)/c*100:null;
+        var srcTxt=h.manualPrice?'manual price':(h.updated?'live · '+stkAgo(h.updated):(+h.price>0?'saved price':(+h.avgCost>0?'valued at cost':'no price')));
+        var ch=+h.change||0;
+        return '<div class="stk-row">'
+          +'<div class="c-tk"><div class="stk-tk"><i style="background:'+STK_COLORS[i%STK_COLORS.length]+'"></i>'+stkEsc(h.sym)+(alState.activePie==='all'?' <span style="color:var(--t3);font-weight:400;font-size:.44rem">· '+stkEsc(stkPieName(h.pie))+'</span>':'')+'</div><div class="stk-nm">'+stkEsc(h.name||'')+'</div></div>'
+          +'<div class="c-un"><span class="stk-lb">Units</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.units||0)+'" onchange="stkSet('+h.id+',\'units\',this.value)" title="Units held"></div>'
+          +'<div class="c-av"><span class="stk-lb">Avg cost £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.avgCost>0?(+h.avgCost).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="—" onchange="stkSet('+h.id+',\'avgCost\',this.value)" title="Your average buy price in £"></div>'
+          +'<div class="c-pr"><span class="stk-lb">Price £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.price>0?(+h.price).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="live" onchange="stkSet('+h.id+',\'price\',this.value)" title="Price in £ — type one to override the live price, clear it to go back to live"><div class="stk-src">'+srcTxt+(ch&&!h.manualPrice?' · <span style="color:'+(ch>=0?'#3ecf8e':'#e05c5c')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
+          +'<div class="stk-val c-va"><span class="stk-lb">Value</span>'+cfMoney(v)+'</div>'
+          +'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'#3ecf8e':'#e05c5c')+'">'+(pl==null?'—':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>'
+          +'<button class="data-item-del c-x" onclick="stkRemove('+h.id+')" title="Remove holding">✕</button></div>';
+      }).join('')+'</div>';
+  }
+  // allocation
+  var al=document.getElementById('stk-alloc');
+  if(al){
+    al.style.display=hs.length?'':'none';
+    al.innerHTML='<div class="stk-hd"><span>Allocation</span></div>'+hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){
+      var p=total>0?stkValue(h)/total*100:0,c=STK_COLORS[i%STK_COLORS.length];
+      return '<div class="stk-bar"><span class="t" title="'+stkEsc(h.name||h.sym)+'">'+stkEsc(h.sym)+'</span><span class="b"><div style="width:'+p.toFixed(1)+'%;background:'+c+'"></div></span><span class="p">'+p.toFixed(1)+'%</span></div>';
+    }).join('');
+  }
+}
+
+// ── pies ──
+function stkSelectPie(id){alState.activePie=id;saveAL();stkRender();}
+function stkNewPie(){
+  var n=prompt('Name your pie (e.g. “Trading 212 Pie”, “Stocks & Shares ISA”)');
+  if(!n||!n.trim())return;
+  stkEnsure();
+  var id=Date.now();
+  alState.stockPies.push({id:id,name:n.trim().slice(0,40)});
+  alState.activePie=id;
+  saveAL();stkRender();
+}
+function stkRenamePie(){
+  var p=alState.stockPies.find(function(x){return x.id===alState.activePie;});
+  if(!p)return;
+  var n=prompt('Rename pie',p.name);
+  if(!n||!n.trim())return;
+  p.name=n.trim().slice(0,40);saveAL();stkRender();
+}
+function stkDeletePie(){
+  var p=alState.stockPies.find(function(x){return x.id===alState.activePie;});
+  if(!p)return;
+  var n=alState.stocks.filter(function(h){return h.pie===p.id;}).length;
+  if(!confirm('Delete “'+p.name+'”'+(n?' and its '+n+' holding'+(n===1?'':'s'):'')+'?'))return;
+  alState.stocks=alState.stocks.filter(function(h){return h.pie!==p.id;});
+  alState.stockPies=alState.stockPies.filter(function(x){return x.id!==p.id;});
+  stkEnsure();
+  stkSave();
+}
+
+// ── add / edit / remove ──
+function stkTargetPie(){stkEnsure();return alState.activePie==='all'?alState.stockPies[0].id:alState.activePie;}
+function stkAdd(){
+  var sym=((document.getElementById('stk-sym')||{}).value||'').trim().toUpperCase();
+  var units=parseFloat((document.getElementById('stk-units')||{}).value);
+  var cost=parseFloat((document.getElementById('stk-cost')||{}).value);
+  if(!/^[A-Z0-9.\-^=]{1,15}$/.test(sym)){showToast('Enter a ticker, e.g. VUSA.L or AAPL');return;}
+  if(!(units>0)){showToast('Enter how many units you hold');return;}
+  stkEnsure();
+  var pie=stkTargetPie();
+  var ex=alState.stocks.find(function(h){return h.pie===pie&&h.sym===sym;});
+  var h=ex;
+  if(ex){ // merge into the existing position (weighted average cost)
+    var tc=(ex.avgCost>0?ex.units*ex.avgCost:0)+(cost>0?units*cost:0);
+    ex.units=+(ex.units+units).toFixed(8);
+    if(ex.avgCost>0&&cost>0)ex.avgCost=tc/ex.units;else if(cost>0&&!(ex.avgCost>0))ex.avgCost=cost;
+  } else {
+    h={id:Date.now(),pie:pie,sym:sym,name:'',units:units,avgCost:cost>0?cost:0,price:0};
+    alState.stocks.push(h);
+  }
+  ['stk-sym','stk-units','stk-cost'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  stkSave();
+  showToast(sym+' added');
+  stkRefresh(true);
+}
+function stkSet(id,field,val){
+  var h=alState.stocks.find(function(x){return x.id===id;});
+  if(!h)return;
+  var v=parseFloat(val);
+  if(field==='units'){h.units=v>0?v:0;}
+  else if(field==='avgCost'){h.avgCost=v>0?v:0;}
+  else if(field==='price'){
+    if(v>0){h.price=v;h.manualPrice=true;h.updated=0;h.change=0;}
+    else{h.manualPrice=false;h.price=0;stkSave();stkRefresh(true);return;}
+  }
+  stkSave();
+}
+function stkRemove(id){
+  var h=alState.stocks.find(function(x){return x.id===id;});
+  if(!h)return;
+  alState.stocks=alState.stocks.filter(function(x){return x.id!==id;});
+  stkSave();
+  showToast(h.sym+' removed');
+}
+
+// ── live prices ──
+// 1) Vault·It price feed (Supabase edge function)  2) the user's own Alpha Vantage key  3) manual prices
+async function stkFetchQuotes(symbols){
+  if(!_supaClient){try{_initSupabase();}catch(e){}}
+  if(_supaClient){
+    try{
+      var r=await _supaClient.functions.invoke('stock-quotes',{body:{symbols:symbols}});
+      if(!r.error&&r.data&&r.data.quotes&&Object.keys(r.data.quotes).length)return{quotes:r.data.quotes,source:'Vault·It price feed'};
+    }catch(e){}
+  }
+  var key=localStorage.getItem('alpha_vantage_key');
+  if(key){
+    var q={};
+    for(var i=0;i<Math.min(symbols.length,5);i++){
+      var s=symbols[i],av=/\.L$/.test(s)?s.replace(/\.L$/,'.LON'):s;
+      try{
+        var res=await fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+encodeURIComponent(av)+'&apikey='+encodeURIComponent(key));
+        var j=await res.json(),g=j&&j['Global Quote'];
+        if(g&&parseFloat(g['05. price'])>0)q[s]={price:parseFloat(g['05. price']),currency:/\.L$/.test(s)?'GBp':'USD',name:s,changePct:parseFloat(g['10. change percent'])||0};
+      }catch(e){}
+    }
+    if(Object.keys(q).length)return{quotes:q,source:'Alpha Vantage'};
+  }
+  return null;
+}
+async function stkRefresh(silent){
+  stkEnsure();
+  var targets=alState.stocks.filter(function(h){return !h.manualPrice;});
+  var syms=[];targets.forEach(function(h){if(syms.indexOf(h.sym)<0)syms.push(h.sym);});
+  if(!syms.length){if(!silent)showToast('Add a holding first');return;}
+  if(window._stkBusy)return;
+  window._stkBusy=true;stkRender();
+  try{
+    if(!localStorage.getItem('vi_fx_rates')&&typeof fetchExchangeRates==='function')await new Promise(function(res){try{fetchExchangeRates(function(){res();});setTimeout(res,2500);}catch(e){res();}});
+    var res=await stkFetchQuotes(syms);
+    if(!res){if(!silent)showToast('Live prices unavailable — type a price manually, or add an Alpha Vantage key in Settings');window._stkBusy=false;stkRender();return;}
+    var n=0;
+    targets.forEach(function(h){
+      var q=res.quotes[h.sym];if(!q)return;
+      var gbp=stkToGBP(q.price,q.currency);
+      if(gbp==null)return;
+      h.price=gbp;h.px=q.price;h.ccy=q.currency;h.change=+q.changePct||0;h.updated=Date.now();
+      if(q.name&&(!h.name||h.name===h.sym))h.name=q.name;
+      n++;
+    });
+    alState.stockSrc=res.source;
+    window._stkBusy=false;
+    stkSave();
+    if(!silent)showToast(n?('Updated '+n+' price'+(n===1?'':'s')+' ✓'):'No matching tickers found — check the symbols');
+  }catch(e){window._stkBusy=false;stkRender();if(!silent)showToast('Could not refresh prices');}
+}
+function stkAutoRefresh(){
+  try{
+    stkEnsure();
+    if(!alState.stocks.length)return;
+    var stale=alState.stocks.some(function(h){return !h.manualPrice&&(!h.updated||Date.now()-h.updated>15*60*1000);});
+    if(stale)stkRefresh(true);
+  }catch(e){}
+}
+
+// ── CSV import (Trading 212 history export or ticker,units,avg cost) ──
+function stkParseCSV(text){
+  var rows=[],row=[],cur='',q=false;
+  for(var i=0;i<text.length;i++){
+    var ch=text[i];
+    if(q){if(ch==='"'){if(text[i+1]==='"'){cur+='"';i++;}else q=false;}else cur+=ch;}
+    else if(ch==='"')q=true;
+    else if(ch===','){row.push(cur);cur='';}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cur);cur='';if(row.length>1||row[0]!=='')rows.push(row);row=[];}
+    else cur+=ch;
+  }
+  if(cur!==''||row.length){row.push(cur);rows.push(row);}
+  return rows;
+}
+function stkRowsToHoldings(rows){
+  if(!rows.length)return null;
+  var head=rows[0].map(function(h){return String(h).replace(/^﻿/,'').trim().toLowerCase();});
+  function col(names){
+    for(var n=0;n<names.length;n++){var i=head.indexOf(names[n]);if(i>=0)return i;}
+    for(var m=0;m<names.length;m++){for(var j=0;j<head.length;j++)if(head[j].indexOf(names[m])===0)return j;}
+    return -1;
+  }
+  var iT=col(['ticker','symbol','instrument']),iName=col(['name']);
+  var iAct=col(['action']),iSh=col(['no. of shares','shares','quantity','units','qty']);
+  if(iT<0||iSh<0)return null;
+  var out=[];
+  if(iAct>=0){ // Trading 212 history: replay buys/sells into a current position
+    var iTot=col(['total']),iTotCcy=col(['currency (total)']),map={};
+    rows.slice(1).forEach(function(r){
+      var act=String(r[iAct]||'').toLowerCase(),buy=/buy/.test(act),sell=/sell/.test(act);
+      if(!buy&&!sell)return;
+      var t=String(r[iT]||'').trim().toUpperCase();if(!t)return;
+      var n=parseFloat(r[iSh]);if(!(n>0))return;
+      var tot=Math.abs(parseFloat(r[iTot])),gbp=iTotCcy<0||!r[iTotCcy]||String(r[iTotCcy]).toUpperCase()==='GBP';
+      var m=map[t]=map[t]||{sym:t,name:iName>=0?r[iName]:'',units:0,bought:0,cost:0};
+      if(buy){m.units+=n;m.bought+=n;if(tot>0&&gbp)m.cost+=tot;}else m.units-=n;
+    });
+    Object.keys(map).forEach(function(k){var m=map[k];if(m.units>0.000001)out.push({sym:m.sym,name:m.name,units:+m.units.toFixed(8),avgCost:(m.bought>0&&m.cost>0)?m.cost/m.bought:0});});
+    return{pie:'Trading 212',holdings:out};
+  }
+  var iC=col(['avg cost','average cost','avg price','average price','cost per share','buy price','price']);
+  rows.slice(1).forEach(function(r){
+    var t=String(r[iT]||'').trim().toUpperCase(),n=parseFloat(r[iSh]);
+    if(!t||!(n>0))return;
+    var c=iC>=0?parseFloat(String(r[iC]).replace(/[£$,]/g,'')):0;
+    out.push({sym:t,name:iName>=0?r[iName]:'',units:n,avgCost:c>0?c:0});
+  });
+  return{pie:'Imported',holdings:out};
+}
+function stkImportCSV(inp){
+  var f=inp.files&&inp.files[0];
+  if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var res=stkRowsToHoldings(stkParseCSV(String(rd.result||'')));
+      if(!res||!res.holdings.length){showToast('Could not find holdings in that CSV — needs Ticker + Units columns');inp.value='';return;}
+      stkEnsure();
+      var pie=alState.stockPies.find(function(p){return p.name===res.pie;});
+      if(!pie){pie={id:Date.now(),name:res.pie};alState.stockPies.push(pie);}
+      res.holdings.forEach(function(h){
+        var ex=alState.stocks.find(function(x){return x.pie===pie.id&&x.sym===h.sym;});
+        if(ex){ex.units=h.units;if(h.avgCost>0)ex.avgCost=h.avgCost;if(h.name&&!ex.name)ex.name=h.name;}
+        else alState.stocks.push({id:Date.now()+Math.floor(Math.random()*1e6),pie:pie.id,sym:h.sym,name:h.name||'',units:h.units,avgCost:h.avgCost||0,price:0});
+      });
+      alState.activePie=pie.id;
+      stkSave();
+      showToast('Imported '+res.holdings.length+' holding'+(res.holdings.length===1?'':'s')+' into “'+pie.name+'” ✓');
+      stkRefresh(true);
+    }catch(e){showToast('That file could not be read');}
+    inp.value='';
+  };
+  rd.readAsText(f);
+}
+
 // Liabilities: their current asset value ADDS to NW; only running costs detract
 function alLiabAssetTotal(){return alState.liabilities.reduce(function(s,l){return s+depreciatedValue(l);},0);}
 function alTotalLiab(){
@@ -8562,7 +8997,7 @@ function alTotalLiab(){
 }
 function alTotalAssets(){
   var liabAssets=alLiabAssetTotal();
-  return alTotalMetals()+alTotalCrypto()+alTotalCash()+alTotalOther()+(state?state.saved:0)+liabAssets;
+  return alTotalMetals()+alTotalCrypto()+alTotalCash()+alTotalOther()+alTotalStocks()+(state?state.saved:0)+liabAssets;
 }
 function computeNetWorth(){return alTotalAssets()+totalAssets()-alTotalLiab()-debtTotal()-totalDebts();}
 
@@ -8770,6 +9205,7 @@ function renderAlTab(){
   var stc=document.getElementById('subtab-total-crypto');if(stc)stc.textContent=gbpFmt(alTotalCrypto());
   var stca=document.getElementById('subtab-total-cash');if(stca)stca.textContent=gbpFmt(alTotalCash());
   var sto=document.getElementById('subtab-total-other');if(sto)sto.textContent=gbpFmt(alTotalOther());
+  try{stkRender();}catch(e){console.error('[Vault-It] stkRender',e);}
   // Liabilities: show depreciated asset value (what physical assets are currently worth)
   var stl=document.getElementById('subtab-total-liab');if(stl)stl.textContent=gbpFmt(alLiabAssetTotal());
   renderMetalsISO();
@@ -9262,9 +9698,16 @@ function saveDebt(){
   var dtype=(document.getElementById('di-type')||{}).value||'other';
   debtState.debts.push({id:Date.now(),name:n,original:b,balance:b,rate:r,min:m,type:dtype});
   document.getElementById('df-name').value='';document.getElementById('df-balance').value='';document.getElementById('df-rate').value='';document.getElementById('df-min').value='';
-  var dit=document.getElementById('di-type');if(dit)dit.value='other';
+  var dit=document.getElementById('di-type');if(dit)dit.value='credit';
   document.getElementById('debt-form-card').style.display='none';
   saveDebtState();renderDebtTab();updateKPIs();checkAchievements();
+}
+// Placeholder total created by the old onboarding questionnaire — let users replace it with real, separate debts.
+function removeOnboardingDebt(){
+  debtState.debts=debtState.debts.filter(function(d){return !d._onboarding;});
+  saveDebtState();renderDebtTab();updateKPIs();
+  showToast('Placeholder removed — add each debt below');
+  showDebtForm();
 }
 function deleteDebt(id){debtState.debts=debtState.debts.filter(function(d){return d.id!==id;});saveDebtState();renderDebtTab();updateKPIs();}
 var CC_LOGOS={
@@ -9329,7 +9772,10 @@ function renderDebtTab(){
   }
 
   // 5-across tile grid
-  dl.innerHTML='<div class="debt-card-grid">'
+  var _obBanner=sorted.some(function(d){return d._onboarding;})
+    ?'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;background:rgba(224,137,74,.08);border:1px solid rgba(224,137,74,.3);border-radius:8px;font-size:.55rem;color:var(--t2);line-height:1.5"><span style="flex:1;min-width:200px"><b style="color:var(--or)">One lump-sum entered at setup.</b> Replace it with each separate debt (type, interest rate, minimum payment) so your payoff plan is accurate.</span><button class="btn-add-data" style="padding:5px 12px;font-size:.52rem" onclick="removeOnboardingDebt()">Replace it →</button></div>'
+    :'';
+  dl.innerHTML=_obBanner+'<div class="debt-card-grid">'
     +sorted.map(function(d){
       var orig=d.original||d.total||d.balance;
       var paidPct=orig>0?Math.max(0,Math.min(1,(orig-d.balance)/orig)):0;
@@ -9382,7 +9828,7 @@ function renderDebtTab(){
           +'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap" onclick="makePayment('+d.id+')">Pay</button>'
           +'</div>'
           +'<div style="display:flex;justify-content:space-between;align-items:center">'
-          +'<span style="font-size:.46rem;color:var(--t3)">'+d.rate+'% · Min '+gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0)+'/mo</span>'
+          +'<span style="font-size:.46rem;color:var(--t3)">'+(DEBT_TYPE_LABELS[d.type]||'Debt')+' · '+d.rate+'% · Min '+gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0)+'/mo</span>'
           +'<button class="data-item-del" style="font-size:.48rem;padding:2px 5px" onclick="deleteDebt('+d.id+')">✕</button>'
           +'</div>'
           +'</div>';
@@ -9859,23 +10305,13 @@ function fetchExchangeRates(cb) {
 }
 
 function fetchYahooFinance(cb) {
-  var tickers = ['AAPL','MSFT','GOOGL','AMZN','TSLA','VOO','ISF.L','VUSA.L'];
-  var url = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + tickers.join(',');
-  var proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
-  fetch(proxy)
-    .then(function(r){ return r.json(); })
-    .then(function(raw) {
-      var data = JSON.parse(raw.contents || '{}');
-      if (data.quoteResponse && data.quoteResponse.result) {
-        if (!alState.stockPrices) alState.stockPrices = {};
-        data.quoteResponse.result.forEach(function(q) {
-          alState.stockPrices[q.symbol] = { price: q.regularMarketPrice, currency: q.currency, name: q.shortName, change: q.regularMarketChangePercent };
-        });
-        saveAL(); updateKPIs();
-        if (cb) cb(true, 'Yahoo Finance: ' + data.quoteResponse.result.length + ' quotes fetched');
-      } else { if (cb) cb(false, 'Yahoo Finance returned no quotes'); }
-    })
-    .catch(function(e){ if (cb) cb(false, 'Yahoo Finance error: ' + e.message); });
+  // Prices now track YOUR holdings (Stocks & Funds) instead of a fixed ticker list.
+  stkEnsure();
+  if (!alState.stocks.length) { if (cb) cb(false, 'Add holdings in Assets → Stocks & Funds first'); return Promise.resolve(); }
+  return stkRefresh(true).then(function() {
+    var n = alState.stocks.filter(function(h){ return h.updated; }).length;
+    if (cb) cb(n > 0, n > 0 ? 'Stock prices updated for ' + n + ' holding' + (n === 1 ? '' : 's') : 'Live prices unavailable right now');
+  });
 }
 
 function connectLiveFeed(id, fetchFn) {
@@ -11056,335 +11492,245 @@ function cryptoLogoUrl(sym){
 }
 
 // ── CASHFLOW CATEGORIES ───────────────────────────────────────
-function renderCashflowCategories(){
-  var el=document.getElementById('cf-categories');
-  if(!el)return;
-  var cats={fixed:0,necessity:0,discretionary:0};
-  (ovState.expenses||[]).forEach(function(e){cats[e.category||'necessity']+=e.amount||0;});
-  var total=cfTotalOut()||1;
-  var config=[
-    {key:'fixed',label:'Fixed Costs',color:'var(--re)'},
-    {key:'necessity',label:'Necessities',color:'var(--go)'},
-    {key:'discretionary',label:'Discretionary',color:'var(--em)'}
-  ];
-  el.innerHTML=config.map(function(c){
-    var pct=Math.round(cats[c.key]/total*100);
-    return '<div style="margin-bottom:9px">'
-      +'<div style="display:flex;justify-content:space-between;font-size:.58rem;margin-bottom:3px">'
-      +'<span style="color:'+c.color+'">'+c.label+'</span>'
-      +'<span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(cats[c.key])+'/mo &nbsp;'+pct+'%</span>'
-      +'</div>'
-      +'<div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px">'
-      +'<div style="height:100%;width:'+pct+'%;background:'+c.color+';border-radius:2px;transition:width .4s ease"></div>'
-      +'</div></div>';
-  }).join('');
-}
 
 // ── FIRE ROADMAP ──────────────────────────────────────────────
-var _fireReset=false;
-function toggleFireReset(){
-  _fireReset=!_fireReset;
-  var btn=document.getElementById('fire-reset-btn');
-  if(btn)btn.textContent=_fireReset?'✅ Live View':'🔄 Reset View';
-  renderFIREroadmap();
+// Strictly sequential: a stage only counts once every stage before it is achieved,
+// so a new user always starts at stage 1 and the journey reads left → right.
+function fireMan(k){return !!(ovState.manual&&ovState.manual[k]);}
+function fireBuildStages(){
+  var nw=computeNetWorth();
+  var annualExp=cfTotalOut()*12||24000;
+  var cashSaved=alTotalCash()+(state?state.saved:0);
+  var debts=debtState.debts||[];
+  var totalDebt=debtTotal();
+  var origDebt=debts.reduce(function(s,d){return s+(d.original||d.balance||0);},0);
+  var cleared=origDebt>0?Math.max(0,Math.min(1,1-totalDebt/origDebt)):(fireMan('noDebt')?1:0);
+  var noDebt=debts.length===0&&fireMan('noDebt');
+  var hasState=typeof state!=='undefined'&&state;
+  var dep=hasState&&state.target>0?pct():0;
+  function ratio(v,t){return t>0?Math.max(0,Math.min(1,v/t)):0;}
+  var S=[
+    // P1 Foundation
+    {phase:0,ic:'snapshot',name:'First Log',    desc:'Net worth snapshot',      col:'#44c0b9',check:function(){return (ovState.snapshots||[]).length>=1;},
+      hint:'Use “Add Data Point” on the Net Worth chart to record your first snapshot.'},
+    {phase:0,ic:'map',     name:'Map Debts',    desc:'List every debt',         col:'#44c0b9',check:function(){return debts.length>0||noDebt;},manual:'noDebt',manualLbl:'I have no debts',
+      hint:'Add each debt separately (with its type and interest rate) in the Debt Tracker — or confirm you have none.'},
+    {phase:0,ic:'flow',    name:'Cashflow',     desc:'Track income + expenses', col:'#44c0b9',check:function(){return (ovState.income||[]).length>0&&(ovState.expenses||[]).length>0;},
+      hint:'Add at least one income source and one spending line in Cash Flow.'},
+    {phase:0,ic:'coin',    name:'First £ Saved',desc:'Cash balance ≥ £1',       col:'#44c0b9',check:function(){return cashSaved>=1;},
+      hint:'Add a cash or savings account in Assets & Liabilities.'},
+    // P2 Stabilise
+    {phase:1,ic:'shield',      name:'£500 Buffer', desc:'Emergency starter',col:'#c9a84c',check:function(){return cashSaved>=500;},prog:function(){return ratio(cashSaved,500);},cur:function(){return cashSaved;},target:500},
+    {phase:1,ic:'shieldCheck', name:'£1k Buffer',  desc:'Emergency fund',   col:'#c9a84c',check:function(){return cashSaved>=1000;},prog:function(){return ratio(cashSaved,1000);},cur:function(){return cashSaved;},target:1000},
+    {phase:1,ic:'scissors',    name:'First Debt Cut',desc:'One debt cleared',col:'#e05c5c',check:function(){return noDebt||debts.some(function(d){return d.balance<=0&&(d.original||0)>0;});},prog:function(){return noDebt?1:(debts.length?Math.max.apply(null,debts.map(function(d){return d.original>0?Math.max(0,Math.min(1,1-d.balance/d.original)):0;})):0);}},
+    {phase:1,ic:'halfPie',     name:'Debt Halved', desc:'50% cleared',      col:'#e0894a',check:function(){return noDebt||(origDebt>0&&totalDebt<=origDebt*0.5);},prog:function(){return noDebt?1:Math.min(1,cleared/0.5);}},
+    {phase:1,ic:'gem',         name:'£1k Net Worth',desc:'NW ≥ £1,000',     col:'#44c0b9',check:function(){return nw>=1000;},prog:function(){return ratio(nw,1000);},cur:function(){return nw;},target:1000},
+    {phase:1,ic:'unlock',      name:'Debt Free',   desc:'Zero consumer debt',col:'#3ecf8e',check:function(){return noDebt||(debts.length>0&&totalDebt<=0);},prog:function(){return noDebt?1:cleared;}},
+    // P3 Save
+    {phase:2,ic:'umbrella',  name:'3-Month EF', desc:'3 months expenses',col:'#c9a84c',check:function(){return cashSaved>=annualExp/4;},prog:function(){return ratio(cashSaved,annualExp/4);},cur:function(){return cashSaved;},target:annualExp/4},
+    {phase:2,ic:'safe',      name:'6-Month EF', desc:'Fully buffered',   col:'#c9a84c',check:function(){return cashSaved>=annualExp/2;},prog:function(){return ratio(cashSaved,annualExp/2);},cur:function(){return cashSaved;},target:annualExp/2},
+    {phase:2,ic:'sprout',    name:'ISA Opened', desc:'ISA or LISA open', col:'#9b7ec8',check:function(){
+        var cash=(alState.cashAccounts||[]).some(function(c){var t=(c.type||c.name||'').toUpperCase();return /\bL?ISA\b/.test(t);});
+        var pies=(alState.stockPies||[]).some(function(p){return /\bL?ISA\b/i.test(p.name||'');});
+        return cash||pies;},hint:'Add an ISA / LISA cash account, or name a Stocks & Funds pie “ISA”.'},
+    {phase:2,ic:'foundation',name:'1% Deposit', desc:'1% of target saved',col:'#e8c56a',check:function(){return hasState&&state.target>0&&state.saved>=state.target*0.01;},prog:function(){return ratio(dep,0.01);}},
+    {phase:2,ic:'bricks',    name:'5% Deposit', desc:'5% of target',      col:'#e8c56a',check:function(){return hasState&&state.target>0&&state.saved>=state.target*0.05;},prog:function(){return ratio(dep,0.05);}},
+    {phase:2,ic:'gem2',      name:'£5k Net Worth',desc:'NW ≥ £5,000',     col:'#44c0b9',check:function(){return nw>=5000;},prog:function(){return ratio(nw,5000);},cur:function(){return nw;},target:5000},
+    // P4 Buy
+    {phase:3,ic:'house',   name:'Deposit Ready',desc:'Full deposit saved',col:'#9b7ec8',check:function(){return hasState&&state.target>0&&pct()>=1;},prog:function(){return dep;}},
+    {phase:3,ic:'coins',   name:'£10k Net Worth',desc:'NW ≥ £10,000',    col:'#44c0b9',check:function(){return nw>=10000;},prog:function(){return ratio(nw,10000);},cur:function(){return nw;},target:10000},
+    {phase:3,ic:'doc',     name:'Applied',      desc:'Mortgage application',col:'#9b7ec8',check:function(){return fireMan('applied');},manual:'applied',manualLbl:'Mark mortgage application as submitted'},
+    {phase:3,ic:'exchange',name:'Exchanged',    desc:'Contracts signed',  col:'#9b7ec8',check:function(){return fireMan('exchanged');},manual:'exchanged',manualLbl:'Mark contracts as exchanged'},
+    {phase:3,ic:'key',     name:'Keys!',        desc:'Property owned',    col:'#3ecf8e',check:function(){return (hasState&&state.houseMode==='purchased')||fireMan('keys');},manual:'keys',manualLbl:'I have the keys',
+      hint:'Press “House Purchased” in the House Builder once your deposit goal is met.'},
+    // P5 Own
+    {phase:4,ic:'bars',      name:'£25k',         desc:'NW ≥ £25,000',     col:'#44c0b9',check:function(){return nw>=25000;},prog:function(){return ratio(nw,25000);},cur:function(){return nw;},target:25000},
+    {phase:4,ic:'barsUp',    name:'£50k',         desc:'NW ≥ £50,000',     col:'#44c0b9',check:function(){return nw>=50000;},prog:function(){return ratio(nw,50000);},cur:function(){return nw;},target:50000},
+    {phase:4,ic:'medal',     name:'£100k',        desc:'Six figures',      col:'#c9a84c',check:function(){return nw>=100000;},prog:function(){return ratio(nw,100000);},cur:function(){return nw;},target:100000},
+    {phase:4,ic:'sail',      name:'Coast FI',     desc:'12.5× exp invested',col:'#3ecf8e',check:function(){return nw>=annualExp*12.5;},prog:function(){return ratio(nw,annualExp*12.5);},cur:function(){return nw;},target:annualExp*12.5},
+    {phase:4,ic:'houseSolid',name:'Mortgage Free',desc:'Outright ownership',col:'#e8c56a',check:function(){return (hasState&&state.houseMode==='purchased'&&(state.mortgageBalance||0)<=0)||fireMan('mortgageFree');},manual:'mortgageFree',manualLbl:'My mortgage is paid off'},
+    // P6 Free
+    {phase:5,ic:'mountain',name:'£250k',    desc:'Quarter million',    col:'#c9a84c',check:function(){return nw>=250000;},prog:function(){return ratio(nw,250000);},cur:function(){return nw;},target:250000},
+    {phase:5,ic:'flame',   name:'Full FI',  desc:'25× expenses invested',col:'#3ecf8e',check:function(){return nw>=annualExp*25;},prog:function(){return ratio(nw,annualExp*25);},cur:function(){return nw;},target:annualExp*25},
+    {phase:5,ic:'flame2',  name:'Fat FIRE', desc:'33× expenses',       col:'#c9a84c',check:function(){return nw>=annualExp*33;},prog:function(){return ratio(nw,annualExp*33);},cur:function(){return nw;},target:annualExp*33},
+    {phase:5,ic:'tree',    name:'Legacy',   desc:'50× — next gen',     col:'#c9a84c',check:function(){return nw>=annualExp*50;},prog:function(){return ratio(nw,annualExp*50);},cur:function(){return nw;},target:annualExp*50}
+  ];
+  // sequential evaluation
+  var run=true,current=-1;
+  S.forEach(function(s,i){
+    s.raw=!!s.check();
+    s.done=run&&s.raw;
+    if(s.done)current=i; else run=false;
+  });
+  var next=Math.min(S.length-1,current+1);
+  S.currentIdx=current;S.nextIdx=(current>=S.length-1)?-1:next;
+  return S;
+}
+// Draw a stage icon (duo-tone) centred on cx,cy
+function fireIcon(key,cx,cy,size,col,strokeOp,fillOp){
+  var ic=FIRE_ICONS[key]||FIRE_ICONS.gem,sc=size/24;
+  var f=ic.f.map(function(d){return '<path d="'+d+'"/>';}).join('');
+  var d=ic.d.map(function(d){return '<path d="'+d+'"/>';}).join('');
+  return '<g transform="translate('+(cx-size/2).toFixed(1)+' '+(cy-size/2).toFixed(1)+') scale('+sc.toFixed(3)+')" style="pointer-events:none">'
+    +'<g fill="'+col+'" fill-opacity="'+(ic.solid?Math.min(.75,fillOp*3):fillOp)+'" stroke="none">'+f+'</g>'
+    +'<g fill="none" stroke="'+col+'" stroke-opacity="'+strokeOp+'" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</g></g>';
+}
+var _fireFirstPaint=true,_fireDetailIdx=-1;
+function fireJumpToCurrent(){
+  var sc=document.getElementById('fire-timeline-scroll');
+  var S=renderFIREroadmap._stages||[];
+  if(!sc||!S.length)return;
+  var idx=S.nextIdx>=0?S.nextIdx:S.length-1;
+  sc.scrollTo?sc.scrollTo({left:Math.max(0,idx*108+60-sc.offsetWidth/2),behavior:'smooth'}):(sc.scrollLeft=Math.max(0,idx*108+60-sc.offsetWidth/2));
+  fireShowDetail(idx);
 }
 function renderFIREroadmap(){
-  var svgEl = document.getElementById('fire-roadmap-svg');
-  if (!svgEl) return;
+  var svgEl=document.getElementById('fire-roadmap-svg');
+  if(!svgEl)return;
+  var phases=FIRE_PHASES;
+  var stages=fireBuildStages();
+  renderFIREroadmap._stages=stages;
+  var currentIdx=stages.currentIdx,nextIdx=stages.nextIdx;
+  var doneCount=currentIdx+1;
 
-  var nw        = computeNetWorth();
-  var annualExp = cfTotalOut() * 12 || 24000;
-  var cashSaved = alTotalCash() + (state ? state.saved : 0);
-  var debts     = debtState.debts || [];
-  var totalDebt = debtTotal();
+  var SCROLL_W=document.getElementById('fire-timeline-scroll');
+  var containerW=SCROLL_W?SCROLL_W.offsetWidth:900;
+  var NODE_SPACING=108,NODE_R=22,LEFT=60;
+  var TOTAL_W=Math.max(containerW,stages.length*NODE_SPACING+120);
+  var H=280,LINE_Y=148,PH_BAND=24;
+  svgEl.setAttribute('viewBox','0 0 '+TOTAL_W+' '+H);
+  svgEl.setAttribute('width',TOTAL_W);
+  svgEl.setAttribute('height',H);
+  svgEl.style.minWidth=TOTAL_W+'px';
+  // Always open at stage one; afterwards keep wherever the user has scrolled to
+  if(SCROLL_W&&_fireFirstPaint){SCROLL_W.scrollLeft=0;_fireFirstPaint=false;}
 
-  // ── PHASES ──────────────────────────────────────────────────
-  var phases = [
-    { id: 'P1', label: 'FOUNDATION', col: '#44c0b9', col2: '#2a8a85' },
-    { id: 'P2', label: 'STABILISE',  col: '#c9a84c', col2: '#8a7030' },
-    { id: 'P3', label: 'SAVE',       col: '#e8c56a', col2: '#9a7f38' },
-    { id: 'P4', label: 'BUY',        col: '#9b7ec8', col2: '#604898' },
-    { id: 'P5', label: 'OWN',        col: '#3ecf8e', col2: '#228852' },
-    { id: 'P6', label: 'FREE',       col: '#e8c56a', col2: '#c9a84c' },
-  ];
-
-  // ── STAGES ──────────────────────────────────────────────────
-  var stages = [
-    // P1 Foundation
-    { phase:0, icon:'◉', name:'First Log',       desc:'Net worth snapshot',         col:'#44c0b9', check:function(){return (ovState.snapshots||[]).length>=1;}},
-    { phase:0, icon:'⊘', name:'Map Debts',        desc:'List every debt',            col:'#44c0b9', check:function(){return debts.length>0||totalDebt===0;}},
-    { phase:0, icon:'⟳', name:'Cashflow',         desc:'Track income + expenses',    col:'#44c0b9', check:function(){var i=ovState.income||[];var e=ovState.expenses||[];return i.length>0&&e.length>0;}},
-    { phase:0, icon:'▲', name:'First £ Saved',    desc:'Cash balance ≥ £1',          col:'#44c0b9', check:function(){return cashSaved>=1;}},
-    // P2 Stabilise
-    { phase:1, icon:'◈', name:'£500 Buffer',      desc:'Emergency starter',          col:'#c9a84c', target:500,            check:function(){return cashSaved>=500;}},
-    { phase:1, icon:'◈', name:'£1k Buffer',       desc:'Emergency fund',             col:'#c9a84c', target:1000,           check:function(){return cashSaved>=1000;}},
-    { phase:1, icon:'✕', name:'First Debt Cut',   desc:'One debt cleared',           col:'#e05c5c', check:function(){return debts.some(function(d){return d.balance===0&&d.original>0;});}},
-    { phase:1, icon:'↓', name:'Debt Halved',      desc:'50% cleared',                col:'#e0894a', check:function(){return totalDebt===0||debts.some(function(d){return d.original>0&&(1-d.balance/d.original)>=0.5;});}},
-    { phase:1, icon:'◆', name:'£1k Net Worth',    desc:'NW ≥ £1,000',               col:'#44c0b9', target:1000,           check:function(){return nw>=1000;}},
-    { phase:1, icon:'○', name:'Debt Free',         desc:'Zero consumer debt',         col:'#3ecf8e', check:function(){return totalDebt===0&&debts.length>0;}},
-    // P3 Save
-    { phase:2, icon:'◎', name:'3-Month EF',       desc:'3 months expenses',          col:'#c9a84c', target:annualExp/4,    check:function(){return cashSaved>=annualExp/4;}},
-    { phase:2, icon:'◉', name:'6-Month EF',       desc:'Fully buffered',             col:'#c9a84c', target:annualExp/2,    check:function(){return cashSaved>=annualExp/2;}},
-    { phase:2, icon:'▣', name:'ISA Opened',        desc:'ISA or LISA open',           col:'#9b7ec8', check:function(){return (alState.cashAccounts||[]).some(function(c){var t=(c.type||'').toUpperCase();return t==='ISA'||t==='LISA';});}},
-    { phase:2, icon:'△', name:'1% Deposit',        desc:'1% of target saved',         col:'#e8c56a', check:function(){return typeof state!=='undefined'&&state&&state.target>0&&state.saved>=state.target*0.01;}},
-    { phase:2, icon:'△', name:'5% Deposit',        desc:'5% of target',               col:'#e8c56a', check:function(){return typeof state!=='undefined'&&state&&state.target>0&&state.saved>=state.target*0.05;}},
-    { phase:2, icon:'◆', name:'£5k Net Worth',     desc:'NW ≥ £5,000',               col:'#44c0b9', target:5000,           check:function(){return nw>=5000;}},
-    // P4 Buy
-    { phase:3, icon:'▲', name:'Deposit Ready',     desc:'Full deposit saved',         col:'#9b7ec8', target:state?state.target*0.1:20000, check:function(){return typeof state!=='undefined'&&pct()>=1;}},
-    { phase:3, icon:'◆', name:'£10k Net Worth',    desc:'NW ≥ £10,000',              col:'#44c0b9', target:10000,          check:function(){return nw>=10000;}},
-    { phase:3, icon:'▣', name:'Applied',            desc:'Mortgage application',       col:'#9b7ec8', check:function(){return false;}},
-    { phase:3, icon:'◈', name:'Exchanged',          desc:'Contracts signed',           col:'#9b7ec8', check:function(){return false;}},
-    { phase:3, icon:'⌂', name:'Keys!',              desc:'Property owned',             col:'#3ecf8e', check:function(){return false;}},
-    // P5 Own
-    { phase:4, icon:'◆', name:'£25k',              desc:'NW ≥ £25,000',              col:'#44c0b9', target:25000,          check:function(){return nw>=25000;}},
-    { phase:4, icon:'◆', name:'£50k',              desc:'NW ≥ £50,000',              col:'#44c0b9', target:50000,          check:function(){return nw>=50000;}},
-    { phase:4, icon:'◉', name:'£100k',             desc:'Six figures',                col:'#c9a84c', target:100000,         check:function(){return nw>=100000;}},
-    { phase:4, icon:'∞', name:'Coast FI',           desc:'12.5× exp invested',         col:'#3ecf8e', target:annualExp*12.5, check:function(){return nw>=annualExp*12.5;}},
-    { phase:4, icon:'⌂', name:'Mortgage Free',     desc:'Outright ownership',         col:'#e8c56a', check:function(){return false;}},
-    // P6 Free
-    { phase:5, icon:'◉', name:'£250k',             desc:'Quarter million',            col:'#c9a84c', target:250000,         check:function(){return nw>=250000;}},
-    { phase:5, icon:'◉', name:'Full FI',            desc:'25× expenses invested',      col:'#3ecf8e', target:annualExp*25,   check:function(){return nw>=annualExp*25;}},
-    { phase:5, icon:'◉', name:'Fat FIRE',           desc:'33× expenses',               col:'#c9a84c', target:annualExp*33,   check:function(){return nw>=annualExp*33;}},
-    { phase:5, icon:'◈', name:'Legacy',             desc:'50× — next gen',             col:'#c9a84c', target:annualExp*50,   check:function(){return nw>=annualExp*50;}},
-  ];
-
-  // Evaluate
-  var currentIdx = _fireReset ? -1 : -1;
-  if (!_fireReset) stages.forEach(function(s,i){ if(s.check&&s.check()) currentIdx=i; });
-  var nextIdx = currentIdx + 1;
-
-  // ── LAYOUT CONSTANTS ─────────────────────────────────────
-  var SCROLL_W = document.getElementById('fire-timeline-scroll');
-  var containerW = SCROLL_W ? SCROLL_W.offsetWidth : 900;
-
-  // Fixed node spacing — scrolls horizontally
-  var NODE_SPACING = 108;  // px between nodes
-  var NODE_R   = 22;
-  var TOTAL_W  = Math.max(containerW, stages.length * NODE_SPACING + 120);
-  var H        = 280;
-  var LINE_Y   = 148;   // centre of the timeline line
-  var LABEL_Y_ABOVE = LINE_Y - NODE_R - 28;  // stage name above the line
-  var LABEL_Y_BELOW = LINE_Y + NODE_R + 18;  // desc below the line (alternating)
-  var PHASE_BAND_H = 24;  // height of phase label band at bottom
-
-  svgEl.setAttribute('viewBox', '0 0 ' + TOTAL_W + ' ' + H);
-  svgEl.setAttribute('width',   TOTAL_W);
-  svgEl.setAttribute('height',  H);
-  svgEl.style.minWidth = TOTAL_W + 'px';
-
-  // Scroll to current node
-  if (SCROLL_W && currentIdx >= 0) {
-    var targetScroll = (currentIdx * NODE_SPACING + 60) - containerW / 2;
-    SCROLL_W.scrollLeft = Math.max(0, targetScroll);
-  }
-
-  // ── PHASE BAND positions ─────────────────────────────────
-  // Build phase X spans
-  var phaseSpans = phases.map(function(p, pi) {
-    var nodes = stages.filter(function(s){ return s.phase === pi; });
-    var idxs  = stages.map(function(s,i){ return s.phase === pi ? i : -1; }).filter(function(x){return x>=0;});
-    var x0 = idxs[0] * NODE_SPACING + 60 - NODE_SPACING/2;
-    var x1 = idxs[idxs.length-1] * NODE_SPACING + 60 + NODE_SPACING/2;
-    return { x0:x0, x1:x1, col:p.col, label:p.label };
+  var phaseSpans=phases.map(function(p,pi){
+    var idxs=stages.map(function(s,i){return s.phase===pi?i:-1;}).filter(function(x){return x>=0;});
+    return{x0:idxs[0]*NODE_SPACING+LEFT-NODE_SPACING/2,x1:idxs[idxs.length-1]*NODE_SPACING+LEFT+NODE_SPACING/2,col:p.col,label:p.label,
+      done:idxs.every(function(i){return stages[i].done;})};
   });
 
-  // ── BUILD SVG ─────────────────────────────────────────────
-  var out = '<defs>'
-    + '<filter id="fr-glow"><feGaussianBlur stdDeviation="3" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
-    + '<filter id="fr-glow-sm"><feGaussianBlur stdDeviation="2" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
-    + '</defs>';
+  var out='<defs>'
+    +'<filter id="fr-glow"><feGaussianBlur stdDeviation="3" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+    +'<filter id="fr-glow-sm"><feGaussianBlur stdDeviation="2" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+    +'</defs>';
+  out+='<rect x="0" y="0" width="'+TOTAL_W+'" height="'+H+'" fill="#030810"/>';
 
-  // Background
-  out += '<rect x="0" y="0" width="' + TOTAL_W + '" height="' + H + '" fill="#030810"/>';
-
-  // Phase bands at the bottom
-  phaseSpans.forEach(function(sp, pi) {
-    var alpha = pi % 2 === 0 ? '0.07' : '0.04';
-    out += '<rect x="' + sp.x0 + '" y="0" width="' + (sp.x1-sp.x0) + '" height="' + H + '" fill="' + sp.col + '" opacity="' + alpha + '"/>';
-    // Phase divider line
-    if (pi > 0) {
-      out += '<line x1="' + sp.x0 + '" y1="0" x2="' + sp.x0 + '" y2="' + H + '"'
-        + ' stroke="' + sp.col + '" stroke-width="0.8" opacity="0.25" stroke-dasharray="4 3"/>';
-    }
-    // Phase label at bottom
-    out += '<text x="' + ((sp.x0+sp.x1)/2) + '" y="' + (H-6) + '"'
-      + ' text-anchor="middle" font-size="7.5" font-family="Syne,sans-serif" font-weight="800"'
-      + ' fill="' + sp.col + '" opacity="0.6" letter-spacing="2.5">' + sp.label + '</text>';
-    // Phase bracket line
-    out += '<line x1="' + (sp.x0+4) + '" y1="' + (H-16) + '" x2="' + (sp.x1-4) + '" y2="' + (H-16) + '"'
-      + ' stroke="' + sp.col + '" stroke-width="0.6" opacity="0.25"/>';
+  phaseSpans.forEach(function(sp,pi){
+    out+='<rect x="'+sp.x0+'" y="0" width="'+(sp.x1-sp.x0)+'" height="'+H+'" fill="'+sp.col+'" opacity="'+(pi%2===0?'0.07':'0.04')+'"/>';
+    if(pi>0)out+='<line x1="'+sp.x0+'" y1="0" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="0.8" opacity="0.25" stroke-dasharray="4 3"/>';
+    out+='<text x="'+((sp.x0+sp.x1)/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="7.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.6')+'" letter-spacing="2.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
+    out+='<line x1="'+(sp.x0+4)+'" y1="'+(H-16)+'" x2="'+(sp.x1-4)+'" y2="'+(H-16)+'" stroke="'+sp.col+'" stroke-width="'+(sp.done?'1.6':'0.6')+'" opacity="'+(sp.done?'0.7':'0.25')+'"/>';
   });
 
-  // Main timeline rail
-  var railX0 = 60, railX1 = (stages.length-1) * NODE_SPACING + 60;
-  // Completed portion
-  if (currentIdx >= 0) {
-    var completedX = currentIdx * NODE_SPACING + 60;
-    out += '<line x1="' + railX0 + '" y1="' + LINE_Y + '" x2="' + completedX + '" y2="' + LINE_Y + '"'
-      + ' stroke="rgba(68,192,185,0.7)" stroke-width="2.5"/>';
-  }
-  // Remaining (dashed)
-  var remainX0 = currentIdx >= 0 ? currentIdx * NODE_SPACING + 60 : railX0;
-  out += '<line x1="' + remainX0 + '" y1="' + LINE_Y + '" x2="' + railX1 + '" y2="' + LINE_Y + '"'
-    + ' stroke="rgba(68,192,185,0.15)" stroke-width="2" stroke-dasharray="6 4"/>';
+  // rail: solid up to the last achieved stage, dashed beyond
+  var railX0=LEFT,railX1=(stages.length-1)*NODE_SPACING+LEFT;
+  var doneX=currentIdx>=0?currentIdx*NODE_SPACING+LEFT:railX0;
+  out+='<line x1="'+railX0+'" y1="'+LINE_Y+'" x2="'+railX1+'" y2="'+LINE_Y+'" stroke="rgba(68,192,185,0.15)" stroke-width="2" stroke-dasharray="6 4"/>';
+  if(currentIdx>0)out+='<line x1="'+railX0+'" y1="'+LINE_Y+'" x2="'+doneX+'" y2="'+LINE_Y+'" stroke="rgba(68,192,185,0.85)" stroke-width="3"/>';
 
-  // Connector arcs between phase transitions
-  phaseSpans.forEach(function(sp, pi) {
-    if (pi === 0) return;
-    var tx = sp.x0;
-    out += '<line x1="' + tx + '" y1="' + (LINE_Y - NODE_R - 4) + '" x2="' + tx + '" y2="' + (LINE_Y + NODE_R + 4) + '"'
-      + ' stroke="' + sp.col + '" stroke-width="1" opacity="0.5" stroke-dasharray="2 2"/>';
-  });
+  stages.forEach(function(s,i){
+    var cx=i*NODE_SPACING+LEFT;
+    var done=s.done,isNext=i===nextIdx,locked=!done&&!isNext;
+    var col=s.col||'#44c0b9';
+    var above=i%2===0;
+    var namY=above?(LINE_Y-NODE_R-10):(LINE_Y+NODE_R+26);
+    var descY=above?(LINE_Y-NODE_R-21):(LINE_Y+NODE_R+36);
+    var click=' style="cursor:pointer" onclick="fireShowDetail('+i+')"';
 
-  // Nodes
-  stages.forEach(function(s, i) {
-    var cx  = i * NODE_SPACING + 60;
-    var hit    = !_fireReset && s.check && s.check();
-    var isNext = i === nextIdx;
-    var locked = i > nextIdx;
-    var col    = s.col || '#44c0b9';
+    out+='<line x1="'+cx+'" y1="'+(above?LINE_Y-NODE_R:LINE_Y+3)+'" x2="'+cx+'" y2="'+(above?LINE_Y-3:LINE_Y+NODE_R)+'" stroke="'+(done?col:'rgba(68,192,185,0.12)')+'" stroke-width="1"/>';
 
-    var above = i % 2 === 0;  // alternate name labels above/below
-    var namY  = above ? (LINE_Y - NODE_R - 10) : (LINE_Y + NODE_R + 26);
-    var descY = above ? (LINE_Y - NODE_R - 21) : (LINE_Y + NODE_R + 36);
-
-    // Connector stem (node to rail)
-    if (above) {
-      out += '<line x1="' + cx + '" y1="' + (LINE_Y - NODE_R) + '" x2="' + cx + '" y2="' + (LINE_Y - 3) + '"'
-        + ' stroke="' + (hit ? col : 'rgba(68,192,185,0.12)') + '" stroke-width="1"/>';
-    } else {
-      out += '<line x1="' + cx + '" y1="' + (LINE_Y + 3) + '" x2="' + cx + '" y2="' + (LINE_Y + NODE_R) + '"'
-        + ' stroke="' + (hit ? col : 'rgba(68,192,185,0.12)') + '" stroke-width="1"/>';
+    if(isNext){
+      out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+7)+'" fill="none" stroke="'+col+'" stroke-width="1.2" opacity="0.5" filter="url(#fr-glow)">'
+        +'<animate attributeName="r" values="'+(NODE_R+5)+';'+(NODE_R+10)+';'+(NODE_R+5)+'" dur="2.6s" repeatCount="indefinite"/>'
+        +'<animate attributeName="opacity" values="0.6;0.12;0.6" dur="2.6s" repeatCount="indefinite"/></circle>';
     }
-
-    // Glow ring on next
-    if (isNext) {
-      out += '<circle cx="' + cx + '" cy="' + LINE_Y + '" r="' + (NODE_R+7) + '"'
-        + ' fill="none" stroke="' + col + '" stroke-width="1" opacity="0.35" filter="url(#fr-glow)"/>';
-    }
-
-    // Node circle
-    var fill   = hit ? (col + '2a') : 'rgba(6,12,22,0.92)';
-    var stroke = hit ? col : isNext ? (col + 'aa') : 'rgba(68,192,185,0.12)';
-    var sw     = isNext ? 2.5 : hit ? 2 : 1;
-    out += '<circle cx="' + cx + '" cy="' + LINE_Y + '" r="' + NODE_R + '"'
-      + ' fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + sw + '"'
-      + ' style="cursor:pointer" onclick="fireShowDetail(' + i + ')"'
-      + (hit ? ' filter="url(#fr-glow-sm)"' : '')
-      + (locked ? ' opacity="0.35"' : '') + '/>';
-
-    // Progress arc for next node with numeric target
-    if (isNext && s.target && s.target > 1) {
-      var prog = 0;
-      if (['s9','s16','s18','s22','s23','s24','s25','s27','s28','s29','s30'].indexOf('s'+(i+1)) !== -1) prog = Math.min(1, nw / s.target);
-      else if (['s5','s6','s11','s12'].indexOf('s'+(i+1)) !== -1) prog = Math.min(1, cashSaved / s.target);
-      else if (i === 16) prog = typeof pct === 'function' ? pct() : 0;
-      if (prog > 0 && prog < 1) {
-        var ang = -Math.PI/2 + prog * 2 * Math.PI;
-        var ex  = cx + NODE_R * Math.cos(ang);
-        var ey  = LINE_Y + NODE_R * Math.sin(ang);
-        var laf = prog > 0.5 ? 1 : 0;
-        out += '<path d="M' + cx + ' ' + (LINE_Y - NODE_R) + ' A' + NODE_R + ' ' + NODE_R + ' 0 ' + laf + ' 1 ' + ex.toFixed(1) + ' ' + ey.toFixed(1) + '"'
-          + ' fill="none" stroke="' + col + '" stroke-width="3" stroke-linecap="round"/>';
+    // node body
+    out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+NODE_R+'" fill="'+(done?col+'38':isNext?'rgba(10,18,30,0.95)':'rgba(6,12,22,0.92)')+'"'
+      +' stroke="'+(done?col:isNext?col:'rgba(68,192,185,0.14)')+'" stroke-width="'+(done?2.4:isNext?2.2:1)+'"'
+      +(done?' filter="url(#fr-glow-sm)"':'')+(locked?' stroke-dasharray="3 3"':'')+click+'/>';
+    // progress ring on the next stage
+    if(isNext&&s.prog){
+      var prog=Math.max(0,Math.min(1,s.prog()));
+      if(prog>0&&prog<1){
+        var ang=-Math.PI/2+prog*2*Math.PI;
+        out+='<path d="M'+cx+' '+(LINE_Y-NODE_R)+' A'+NODE_R+' '+NODE_R+' 0 '+(prog>0.5?1:0)+' 1 '+(cx+NODE_R*Math.cos(ang)).toFixed(1)+' '+(LINE_Y+NODE_R*Math.sin(ang)).toFixed(1)+'" fill="none" stroke="'+col+'" stroke-width="3.2" stroke-linecap="round" style="pointer-events:none"/>';
       }
     }
-
-    // Icon (geometric, small)
-    var iconSize = hit ? 14 : 12;
-    var iconCol  = hit ? col : isNext ? col : 'rgba(90,96,104,0.5)';
-    out += '<text x="' + cx + '" y="' + (LINE_Y + 4.5) + '"'
-      + ' text-anchor="middle" dominant-baseline="middle"'
-      + ' font-size="' + iconSize + '" fill="' + iconCol + '"'
-      + ' style="cursor:pointer;font-family:monospace" onclick="fireShowDetail(' + i + ')">' + s.icon + '</text>';
-
-    // Tick on completed
-    if (hit) {
-      out += '<text x="' + (cx + NODE_R - 2) + '" y="' + (LINE_Y - NODE_R + 4) + '"'
-        + ' text-anchor="middle" font-size="8" fill="' + col + '" font-weight="900">✓</text>';
+    // the stage's own icon
+    out+=fireIcon(s.ic,cx,LINE_Y,done?24:22,done?col:isNext?col:'#7d8793',done?1:isNext?0.95:0.62,done?0.30:isNext?0.2:0.1);
+    // achieved: bold tick badge
+    if(done){
+      out+='<g style="pointer-events:none"><circle cx="'+(cx+NODE_R-2)+'" cy="'+(LINE_Y-NODE_R+3)+'" r="8" fill="'+col+'" stroke="#030810" stroke-width="2"/>'
+        +'<path d="M'+(cx+NODE_R-5.6)+' '+(LINE_Y-NODE_R+3.2)+'l2.6 2.6 4.6-5.2" fill="none" stroke="#030810" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>';
     }
-
-    // Lock on locked
-    if (locked) {
-      out += '<text x="' + cx + '" y="' + (LINE_Y + 4) + '"'
-        + ' text-anchor="middle" dominant-baseline="middle" font-size="10" opacity="0.4">🔒</text>';
+    // locked: small padlock badge (icon stays visible underneath)
+    if(locked){
+      out+='<g style="pointer-events:none" transform="translate('+(cx+NODE_R-3)+' '+(LINE_Y+NODE_R-3)+')"><circle r="7.5" fill="#050c14" stroke="rgba(125,135,147,0.55)" stroke-width="1"/>'
+        +'<rect x="-3" y="-0.6" width="6" height="4.6" rx="1" fill="rgba(125,135,147,0.7)"/><path d="M-1.8 -0.6v-1.5a1.8 1.8 0 0 1 3.6 0v1.5" fill="none" stroke="rgba(125,135,147,0.8)" stroke-width="1.1"/></g>';
     }
-
-    // Stage name (alternating above/below)
-    var nameCol = hit ? col : isNext ? col : 'rgba(154,160,166,0.6)';
-    out += '<text x="' + cx + '" y="' + namY + '" text-anchor="middle"'
-      + ' font-size="7.5" font-family="Syne,sans-serif" font-weight="800"'
-      + ' fill="' + nameCol + '" style="cursor:pointer" onclick="fireShowDetail(' + i + ')">' + s.name + '</text>';
-
-    // Desc
-    out += '<text x="' + cx + '" y="' + descY + '" text-anchor="middle"'
-      + ' font-size="6" font-family="DM Sans,sans-serif" fill="rgba(90,96,104,0.65)">' + s.desc + '</text>';
-
-    // YOU ARE HERE
-    if (i === currentIdx) {
-      out += '<rect x="' + (cx-22) + '" y="' + (LINE_Y - NODE_R - 44) + '" width="44" height="11" rx="0"'
-        + ' fill="rgba(68,192,185,0.15)" stroke="rgba(68,192,185,0.5)" stroke-width="0.8"'
-        + ' clip-path="polygon(0 0,calc(100% - 3px) 0,100% 3px,100% 100%,3px 100%,0 calc(100% - 3px))"/>'
-        + '<text x="' + cx + '" y="' + (LINE_Y - NODE_R - 37) + '" text-anchor="middle"'
-        + ' font-size="6" font-family="Share Tech Mono,monospace" fill="#44c0b9" letter-spacing="1">YOU ARE HERE</text>';
+    // labels
+    var nameCol=done?col:isNext?'#e9f1f1':'rgba(154,160,166,0.55)';
+    out+='<text x="'+cx+'" y="'+namY+'" text-anchor="middle" font-size="7.5" font-family="Syne,sans-serif" font-weight="800" fill="'+nameCol+'"'+click+'>'+s.name+'</text>';
+    out+='<text x="'+cx+'" y="'+descY+'" text-anchor="middle" font-size="6" font-family="DM Sans,sans-serif" fill="rgba(110,120,132,'+(done?0.9:0.65)+')">'+s.desc+'</text>';
+    // tag for the stage to work on now
+    if(isNext){
+      var tag=(i===0)?'START HERE':'NEXT UP';
+      out+='<rect x="'+(cx-27)+'" y="'+(LINE_Y-NODE_R-48)+'" width="54" height="12" fill="'+col+'26" stroke="'+col+'" stroke-width="0.8"/>'
+        +'<text x="'+cx+'" y="'+(LINE_Y-NODE_R-39.5)+'" text-anchor="middle" font-size="6.2" font-family="Share Tech Mono,monospace" fill="'+col+'" letter-spacing="1.2" font-weight="700">'+tag+'</text>';
     }
-
-    // Sequence number
-    out += '<text x="' + (cx - NODE_R + 3) + '" y="' + (LINE_Y + NODE_R - 2) + '"'
-      + ' font-size="5.5" font-family="Share Tech Mono,monospace"'
-      + ' fill="rgba(68,192,185,0.25)">' + String(i+1).padStart(2,'0') + '</text>';
+    out+='<text x="'+(cx-NODE_R+3)+'" y="'+(LINE_Y+NODE_R-2)+'" font-size="5.5" font-family="Share Tech Mono,monospace" fill="rgba(68,192,185,0.3)" style="pointer-events:none">'+String(i+1).padStart(2,'0')+'</text>';
   });
+  svgEl.innerHTML=out;
 
-  svgEl.innerHTML = out;
-
-  // Update current stage label in header
-  var lbl = document.getElementById('fire-current-label');
-  if (lbl) {
-    var ph = currentIdx >= 0 ? phases[stages[currentIdx].phase] : phases[0];
-    lbl.textContent = ph.label;
-    lbl.style.color = ph.col;
-    lbl.style.borderColor = ph.col + '44';
-    lbl.style.background  = ph.col + '11';
+  var focus=stages[nextIdx>=0?nextIdx:stages.length-1];
+  var lbl=document.getElementById('fire-current-label');
+  if(lbl){
+    var ph=phases[focus.phase];
+    lbl.textContent=(nextIdx>=0?'STAGE '+(nextIdx+1)+'/30 · ':'COMPLETE · ')+ph.label;
+    lbl.style.color=ph.col;lbl.style.borderColor=ph.col+'44';lbl.style.background=ph.col+'11';
   }
+  var pt=document.getElementById('fire-progress-txt');
+  if(pt)pt.textContent=doneCount+' of '+stages.length+' achieved';
+  if(_fireDetailIdx>=0&&document.getElementById('fire-detail-panel')&&document.getElementById('fire-detail-panel').style.display!=='none')fireShowDetail(_fireDetailIdx);
 }
-
-// Show stage detail panel
-function fireShowDetail(idx) {
-  var nw        = computeNetWorth();
-  var annualExp = cfTotalOut() * 12 || 24000;
-  var cashSaved = alTotalCash() + (state ? state.saved : 0);
-  var debts     = debtState.debts || [];
-  var totalDebt = debtTotal();
-  var phases = [
-    {label:'FOUNDATION',col:'#44c0b9'},{label:'STABILISE',col:'#c9a84c'},
-    {label:'SAVE',col:'#e8c56a'},{label:'BUY',col:'#9b7ec8'},
-    {label:'OWN',col:'#3ecf8e'},{label:'FREE',col:'#c9a84c'}
-  ];
-  var stages = renderFIREroadmap._stages || [];
-  // Minimal detail from idx
-  var panel = document.getElementById('fire-detail-panel');
-  var inner = document.getElementById('fire-detail-inner');
-  if (!panel || !inner) return;
-
-  var phaseNames = ['Foundation','Stabilise','Save','Buy','Own','Free'];
-  var phaseMap = [0,0,0,0, 1,1,1,1,1,1, 2,2,2,2,2,2, 3,3,3,3,3, 4,4,4,4,4, 5,5,5,5];
-  var ph  = phaseMap[idx] || 0;
-  var col = phases[ph].col;
-  var seq = String(idx+1).padStart(2,'0');
-  var names = ['First Log','Map Debts','Cashflow','First £ Saved','£500 Buffer','£1k Buffer','First Debt Cut','Debt Halved','£1k Net Worth','Debt Free','3-Month EF','6-Month EF','ISA Opened','1% Deposit','5% Deposit','£5k Net Worth','Deposit Ready','£10k Net Worth','Applied','Exchanged','Keys!','£25k','£50k','£100k','Coast FI','Mortgage Free','£250k','Full FI','Fat FIRE','Legacy'];
-  var descs = ['Record your first net worth snapshot to start your roadmap.','List every debt — amount, interest rate, minimum monthly payment.','Add at least one income source and one expense category.','Get your first pound into a savings account.','Build a £500 emergency starter fund.','Build a £1,000 emergency fund before attacking debt harder.','Pay off one debt in full — the smallest balance first.','Clear 50% of total debt by value.','Net worth crosses £1,000 positive.','Reach zero consumer debt.','Save 3 months of expenses in accessible cash.','Save 6 months of expenses — fully buffered against emergencies.','Open a Stocks & Shares ISA or Lifetime ISA.','Save 1% of your house target price.','Save 5% of your house target — halfway to a 10% deposit.','Net worth reaches £5,000.','Full deposit saved. Time to talk to a mortgage broker.','Net worth reaches £10,000.','Submit your mortgage application.','Exchange contracts on your property.','Keys in hand. You own it.','Net worth reaches £25,000.','Net worth reaches £50,000.','Net worth crosses £100,000 — six figures.','Investments alone can grow to FI target — coast from here.','Mortgage paid off. Outright ownership.','Net worth reaches £250,000.','25× annual expenses invested — full financial independence.','33× annual expenses — Fat FIRE.','50× annual expenses — enough for the next generation.'];
-
-  inner.innerHTML = ''
-    + '<div style="font-size:1.1rem;color:' + col + ';flex-shrink:0">' + seq + '</div>'
-    + '<div>'
-    + '<div style="font-family:\'Syne\',sans-serif;font-size:.72rem;font-weight:800;color:' + col + ';margin-bottom:3px">' + (names[idx]||'') + '</div>'
-    + '<div style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:rgba(68,192,185,.4);letter-spacing:.1em;margin-bottom:4px">' + phaseNames[ph].toUpperCase() + ' PHASE · STEP ' + seq + '</div>'
-    + '<div style="font-family:\'DM Sans\',sans-serif;font-size:.58rem;color:var(--t2);line-height:1.5">' + (descs[idx]||'') + '</div>'
-    + '</div>'
-    + '<div style="font-family:\'Share Tech Mono\',monospace;font-size:.52rem;color:' + col + ';text-align:right;flex-shrink:0;min-width:60px">'
-    + (idx < 20 ? 'STAGE<br>' + String(idx+1) + '/30' : 'STAGE<br>' + String(idx+1) + '/30')
-    + '</div>';
-
-  panel.style.display = '';
+function fireToggleManual(key){
+  if(!ovState.manual)ovState.manual={};
+  ovState.manual[key]=!ovState.manual[key];
+  saveState();
+  renderFIREroadmap();
+  try{checkAchievements();}catch(e){}
+}
+function fireShowDetail(idx){
+  var S=renderFIREroadmap._stages||fireBuildStages();
+  var s=S[idx];
+  var panel=document.getElementById('fire-detail-panel'),inner=document.getElementById('fire-detail-inner');
+  if(!s||!panel||!inner)return;
+  _fireDetailIdx=idx;
+  var ph=FIRE_PHASES[s.phase],col=s.col||ph.col;
+  var seq=String(idx+1).padStart(2,'0');
+  var state_=s.done?'ACHIEVED':(idx===S.nextIdx?'IN PROGRESS':'LOCKED');
+  var stCol=s.done?'#3ecf8e':(idx===S.nextIdx?col:'#7d8793');
+  var long=(FIRE_LONG[idx]||s.desc);
+  var progTxt='';
+  if(!s.done&&s.cur&&s.target)progTxt='<div style="font-family:\'Share Tech Mono\',monospace;font-size:.5rem;color:'+col+';margin-top:6px">'+gbpFmt(Math.max(0,s.cur()))+' of '+gbpFmt(s.target)+' · '+Math.round(Math.max(0,Math.min(1,s.prog()))*100)+'%</div>';
+  else if(!s.done&&s.prog&&idx===S.nextIdx)progTxt='<div style="font-family:\'Share Tech Mono\',monospace;font-size:.5rem;color:'+col+';margin-top:6px">'+Math.round(Math.max(0,Math.min(1,s.prog()))*100)+'% there</div>';
+  var lockTxt=(!s.done&&idx!==S.nextIdx)?'<div style="font-size:.52rem;color:var(--t3);margin-top:6px">Unlocks after “'+S[S.nextIdx>=0?S.nextIdx:0].name+'”.</div>':'';
+  var hint=(!s.done&&s.hint)?'<div style="font-size:.52rem;color:var(--t2);margin-top:6px;line-height:1.5">▸ '+s.hint+'</div>':'';
+  var btn='';
+  if(s.manual&&(idx===S.nextIdx||s.done||s.raw)){
+    var on=fireMan(s.manual);
+    btn='<button onclick="fireToggleManual(\''+s.manual+'\')" style="margin-top:8px;padding:5px 12px;font-size:.5rem;font-family:\'Syne\',sans-serif;font-weight:700;cursor:pointer;color:'+(on?'var(--t2)':col)+';background:'+(on?'transparent':col+'18')+';border:1px solid '+(on?'var(--bd)':col+'88')+';border-radius:4px">'+(on?'↺ Undo':'✓ '+s.manualLbl)+'</button>';
+  }
+  inner.innerHTML='<div style="flex-shrink:0;width:46px;height:46px;border-radius:50%;border:2px solid '+(s.done?col:'rgba(68,192,185,.25)')+';background:'+(s.done?col+'26':'rgba(6,12,22,.9)')+';display:flex;align-items:center;justify-content:center">'
+      +'<svg width="28" height="28" viewBox="0 0 28 28">'+fireIcon(s.ic,14,14,24,s.done||idx===S.nextIdx?col:'#7d8793',s.done||idx===S.nextIdx?1:.6,.25)+'</svg></div>'
+    +'<div style="flex:1;min-width:0">'
+    +'<div style="font-family:\'Syne\',sans-serif;font-size:.74rem;font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+(s.done?'✓ ':'')+state_+'</span></div>'
+    +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:rgba(68,192,185,.45);letter-spacing:.1em;margin-bottom:4px">'+ph.label+' PHASE · STEP '+seq+' OF 30</div>'
+    +'<div style="font-family:\'DM Sans\',sans-serif;font-size:.58rem;color:var(--t2);line-height:1.5">'+long+'</div>'
+    +progTxt+hint+lockTxt+btn+'</div>';
+  panel.style.display='';
 }
 
 // ── SUMMARY CARDS ─────────────────────────────────────────────
@@ -11397,6 +11743,7 @@ function renderSummaryCards(){
       {l:'Crypto',v:alTotalCrypto(),c:'#f7931a'},
       {l:'Cash & Savings',v:alTotalCash(),c:'var(--gr)'},
       {l:'House Deposit',v:state?state.saved:0,c:'var(--em)'},
+      {l:'Stocks & Funds',v:alTotalStocks(),c:'#9b7ec8'},
       {l:'Wealth Inventory',v:alTotalOther(),c:'var(--t2)'}
     ];
     aEl.innerHTML=rows.filter(function(r){return r.v>0;}).map(function(r){
@@ -13088,29 +13435,22 @@ function wStep1Next() {
 function wStep2Submit() {
   var income   = parseFloat(document.getElementById('w-income')   && document.getElementById('w-income').value)   || 0;
   var expenses = parseFloat(document.getElementById('w-expenses') && document.getElementById('w-expenses').value) || 0;
-  var debt     = parseFloat(document.getElementById('w-debt')     && document.getElementById('w-debt').value)     || 0;
   var house    = parseFloat(document.getElementById('w-house')    && document.getElementById('w-house').value)    || 0;
   var phone    = (document.getElementById('w-phone') || {}).value || '';
 
   // Persist profile into app state
   if (income > 0 && typeof ovState !== 'undefined') {
     if (!ovState.income) ovState.income = [];
-    if (ovState.income.length === 0) ovState.income.push({ id: Date.now(), name: 'Monthly Take-Home', amount: income });
+    if (ovState.income.length === 0) ovState.income.push({ id: Date.now(), name: 'Monthly Take-Home', amount: income, _onboarding: true });
   }
   if (expenses > 0 && typeof ovState !== 'undefined') {
     if (!ovState.expenses) ovState.expenses = [];
-    if (ovState.expenses.length === 0) ovState.expenses.push({ id: Date.now(), name: 'Monthly Expenses', amount: expenses });
+    if (ovState.expenses.length === 0) ovState.expenses.push({ id: Date.now() + 1, name: 'Monthly Expenses', amount: expenses, category: 'necessity', _onboarding: true });
   }
   if (house > 0 && typeof state !== 'undefined' && state) {
     state.target = house;
     if (typeof saveHouse === 'function') saveHouse();
   }
-  if (debt > 0 && typeof debtState !== 'undefined') {
-    if (!debtState.debts) debtState.debts = [];
-    if (debtState.debts.length === 0) debtState.debts.push({ id: Date.now(), name: 'Total Debt', balance: debt, original: debt, rate: 18, min: Math.round(debt * 0.02), type: 'other', _onboarding: true });
-    if (typeof saveDebtState === 'function') saveDebtState();
-  }
-
   // Update user profile
   if (_vaultItUser) {
     _vaultItUser.phone    = phone.trim();
@@ -13697,37 +14037,59 @@ function loadDemoData() {
     localStorage.setItem('vi_pioneer', 'true');
   }
   if (!localStorage.getItem('pos_ov1')) {
+    // Assets & debts live in their own tabs, so the Overview quick-add lists stay empty here
+    // (otherwise the demo would count them twice). Cash flow + history use the real key/shape.
+    var _dm = [], _nw = [38500, 43200, 48100, 53400, 58700, 63900, 68000, 71000], _dd = new Date();
+    for (var _i = 7; _i >= 0; _i--) {
+      var _m = new Date(_dd.getFullYear(), _dd.getMonth() - _i, 1);
+      _dm.push({ month: _m.getFullYear() + '-' + String(_m.getMonth() + 1).padStart(2, '0'), nw: _nw[7 - _i], debt: 32950 + _i * 450, liab: 400, income: 4150 });
+    }
     localStorage.setItem('pos_ov1', JSON.stringify({
-      assets: [
-        { id: 1, name: 'Stocks & Shares ISA', val: 32400 },
-        { id: 2, name: 'Cash Savings', val: 14800 },
-        { id: 3, name: 'LISA', val: 8200 }
-      ],
-      debts: [
-        { id: 4, name: 'Student Loan', val: 24300 },
-        { id: 5, name: 'Credit Card', val: 1850 }
-      ],
+      assets: [], debts: [], snapshots: _dm,
       milestones: [10000, 0, 25000, 50000, 100000],
-      monthlyIncome: 3800, monthlyExpenses: 2100
+      income: [ { id: 1, name: 'Salary', amount: 3800 }, { id: 2, name: 'Side Projects', amount: 350 } ],
+      expenses: [
+        { id: 3,  name: 'Rent',              amount: 1200, category: 'necessity'     },
+        { id: 4,  name: 'Groceries',         amount: 380,  category: 'necessity'     },
+        { id: 5,  name: 'Transport',         amount: 130,  category: 'necessity'     },
+        { id: 6,  name: 'Utilities & bills', amount: 165,  category: 'necessity'     },
+        { id: 7,  name: 'Subscriptions',     amount: 62,   category: 'discretionary' },
+        { id: 8,  name: 'Eating out',        amount: 95,   category: 'discretionary' },
+        { id: 9,  name: 'House deposit',     amount: 258,  category: 'investment'    },
+        { id: 10, name: 'ISA / investments', amount: 400,  category: 'investment'    }
+      ]
     }));
   }
   if (!localStorage.getItem('pos_al1')) {
     localStorage.setItem('pos_al1', JSON.stringify({
-      metals: { gold: 2.5, silver: 0, platinum: 0 },
+      metals: { gold: 2.5, silver: 15, platinum: 0, palladium: 0 },
       crypto: [{ id: 1, sym: 'ETH', amount: 1.4, price: 2200 }, { id: 2, sym: 'BTC', amount: 0.05, price: 42000 }],
-      cashAccounts: [{ id: 1, name: 'Marcus Savings', balance: 14800, rate: 4.7 }, { id: 2, name: 'Current Account', balance: 2300, rate: 0 }],
-      otherAssets: [{ id: 3, name: 'Car — Honda Civic', value: 12500 }],
-      liabilities: [{ id: 4, name: 'Car Finance', value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z' }]
+      cashAccounts: [
+        { id: 1, name: 'Marcus Savings', type: 'Savings', balance: 14800, rate: 4.7 },
+        { id: 2, name: 'Current Account', type: 'Current', balance: 2300, rate: 0 },
+        { id: 3, name: 'Lifetime ISA', type: 'LISA', balance: 8200, rate: 3.5 }
+      ],
+      otherAssets: [{ id: 4, name: 'Car — Honda Civic', value: 12500 }],
+      liabilities: [{ id: 5, name: 'Car Finance', value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z', runningCost: 180, depRate: 12 }],
+      stockPies: [{ id: 1, name: 'Stocks & Shares ISA' }], activePie: 1,
+      stocks: [
+        { id: 1, pie: 1, sym: 'VUSA.L', name: 'Vanguard S&P 500 UCITS ETF',  units: 180, avgCost: 62.4, price: 78.1,  change: 0 },
+        { id: 2, pie: 1, sym: 'VWRL.L', name: 'Vanguard FTSE All-World ETF', units: 95,  avgCost: 98,   price: 108.6, change: 0 },
+        { id: 3, pie: 1, sym: 'AAPL',   name: 'Apple Inc.',                  units: 12,  avgCost: 140,  price: 196.4, change: 0 }
+      ]
     }));
   }
-  if (!localStorage.getItem('pos_house')) {
-    localStorage.setItem('pos_house', JSON.stringify({
-      saved: 22500, target: 240000, type: 'terraced',
+  if (!localStorage.getItem('ht3')) {
+    // House Builder reads "ht3" (the old demo wrote an unused key, so the house stayed blank)
+    localStorage.setItem('ht3', JSON.stringify({
+      saved: 22500, target: 240000, houseType: 'terraced',
       deposits: [
-        { amt: 5000, date: '01/10/2024' }, { amt: 4500, date: '01/11/2024' },
-        { amt: 3500, date: '01/12/2024' }, { amt: 4000, date: '01/01/2025' },
-        { amt: 3200, date: '01/02/2025' }, { amt: 2300, date: '01/03/2025' }
-      ]
+        { date: '01/10/2025', amount: 5000 }, { date: '01/11/2025', amount: 4500 },
+        { date: '01/12/2025', amount: 3500 }, { date: '01/01/2026', amount: 4000 },
+        { date: '01/02/2026', amount: 3200 }, { date: '01/03/2026', amount: 2300 }
+      ],
+      prices: { terraced: 240000, semi: 320000, detached: 500000, mansion: 1500000, flat: 80000, apartment: 300000 },
+      apartmentFloor: 5, houseMode: null, mortgageBalance: 0
     }));
   }
   if (!localStorage.getItem('pos_journey')) {
@@ -13780,9 +14142,9 @@ function initWelcome() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() { _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); });
+  document.addEventListener('DOMContentLoaded', function() { _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); setTimeout(stkAutoRefresh, 4000); });
 } else {
-  _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed();
+  _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); setTimeout(stkAutoRefresh, 4000);
 }
 
 // ─── ALPHA TEST SEEDER ────────────────────────────────────────────────────────

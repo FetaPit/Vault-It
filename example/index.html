@@ -53,43 +53,53 @@
   // ── Pioneer access ────────────────────────────────────────────────
   localStorage.setItem('vi_pioneer', 'true');
 
-  // ── Overview (net worth + snapshots) ─────────────────────────────
+  // ── Overview: cash flow + net-worth history (this is the key the app actually reads) ──
+  // Assets & debts live in their own tabs (Assets & Liabilities, Debt Tracker), so the
+  // Overview quick-add lists stay empty — otherwise they would be counted twice.
+  var months = [], snaps = [], d = new Date();
+  var nwSeries = [38500, 43200, 48100, 53400, 58700, 63900, 68000, 71000];
+  for (var i = 7; i >= 0; i--) {
+    var m = new Date(d.getFullYear(), d.getMonth() - i, 1);
+    var ym = m.getFullYear() + '-' + String(m.getMonth() + 1).padStart(2, '0');
+    snaps.push({ month: ym, nw: nwSeries[7 - i] || nwSeries[0], debt: 32950 + i * 450, liab: 400, income: 4150 });
+  }
   localStorage.setItem('pos_ov1', JSON.stringify({
-    assets: [
-      { id: 1, name: 'Stocks & Shares ISA', val: 32400 },
-      { id: 2, name: 'Cash Savings',         val: 14800 },
-      { id: 3, name: 'LISA',                 val: 8200  }
-    ],
-    debts: [
-      { id: 4, name: 'Student Loan',  val: 24300 },
-      { id: 5, name: 'Credit Card',   val: 1850  }
-    ],
+    assets: [], debts: [],
+    snapshots: snaps,
     milestones: [10000, 0, 25000, 50000, 100000],
-    monthlyIncome: 4150, monthlyExpenses: 2170,
-    snapshots: [
-      { date: '2025-01-01', nw: 8400  },
-      { date: '2025-02-01', nw: 10200 },
-      { date: '2025-03-01', nw: 12800 },
-      { date: '2025-04-01', nw: 15300 },
-      { date: '2025-05-01', nw: 17600 },
-      { date: '2025-06-01', nw: 20100 },
-      { date: '2025-07-01', nw: 22500 },
-      { date: '2025-08-01', nw: 24900 }
+    income: [
+      { id: 1, name: 'Salary',        amount: 3800 },
+      { id: 2, name: 'Side Projects', amount: 350  }
+    ],
+    expenses: [
+      { id: 3,  name: 'Rent',              amount: 1200, category: 'necessity'     },
+      { id: 4,  name: 'Groceries',         amount: 380,  category: 'necessity'     },
+      { id: 5,  name: 'Transport',         amount: 130,  category: 'necessity'     },
+      { id: 6,  name: 'Utilities & bills', amount: 165,  category: 'necessity'     },
+      { id: 7,  name: 'Phone & internet',  amount: 45,   category: 'necessity'     },
+      { id: 8,  name: 'Insurance',         amount: 60,   category: 'necessity'     },
+      { id: 9,  name: 'Subscriptions',     amount: 62,   category: 'discretionary' },
+      { id: 10, name: 'Gym & health',      amount: 45,   category: 'discretionary' },
+      { id: 11, name: 'Eating out',        amount: 95,   category: 'discretionary' },
+      { id: 12, name: 'Entertainment',     amount: 80,   category: 'discretionary' },
+      { id: 13, name: 'House deposit',     amount: 258,  category: 'investment'    },
+      { id: 14, name: 'ISA / investments', amount: 400,  category: 'investment'    },
+      { id: 15, name: 'Pension',           amount: 190,  category: 'investment'    }
     ]
   }));
 
-  // ── Assets tab (metals / crypto / cash / other / liabilities) ────
+  // ── Assets tab: metals / crypto / cash / inventory / liabilities / stocks ──
   localStorage.setItem('pos_al1', JSON.stringify({
-    metals: { gold: 2.5, silver: 15, platinum: 0 },
+    metals: { gold: 2.5, silver: 15, platinum: 0, palladium: 0 },
     crypto: [
-      { sym: 'ETH', qty: 1.4,  name: 'Ethereum' },
-      { sym: 'BTC', qty: 0.05, name: 'Bitcoin'  },
-      { sym: 'SOL', qty: 8,    name: 'Solana'   }
+      { id: 1, sym: 'ETH', amount: 1.4,  price: 2200  },
+      { id: 2, sym: 'BTC', amount: 0.05, price: 42000 },
+      { id: 3, sym: 'SOL', amount: 8,    price: 110   }
     ],
     cashAccounts: [
-      { id: 1, name: 'Marcus Savings', balance: 14800, rate: 4.7 },
-      { id: 2, name: 'Monzo Current',  balance: 2300,  rate: 0   },
-      { id: 3, name: 'LISA',           balance: 8200,  rate: 3.5 }
+      { id: 1, name: 'Marcus Savings', type: 'Savings', balance: 14800, rate: 4.7 },
+      { id: 2, name: 'Monzo Current',  type: 'Current', balance: 2300,  rate: 0   },
+      { id: 3, name: 'Lifetime ISA',   type: 'LISA',    balance: 8200,  rate: 3.5 }
     ],
     otherAssets: [
       { id: 4, name: 'Car — Honda Civic', value: 12500, image: null, svgIcon: null, imageSearch: null },
@@ -98,26 +108,29 @@
     liabilities: [
       { id: 6, name: 'Car Finance',  value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z', runningCost: 180, depRate: 12 },
       { id: 7, name: 'MacBook Loan', value: 1200, rate: 0,   addedDate: '2025-01-01T00:00:00.000Z', runningCost: 0,   depRate: 25 }
+    ],
+    stockPies: [ { id: 1, name: 'Stocks & Shares ISA' }, { id: 2, name: 'Trading 212 Pie' } ],
+    activePie: 1,
+    stocks: [
+      { id: 1, pie: 1, sym: 'VUSA.L', name: 'Vanguard S&P 500 UCITS ETF',  units: 180, avgCost: 62.4, price: 78.1,  change: 0 },
+      { id: 2, pie: 1, sym: 'VWRL.L', name: 'Vanguard FTSE All-World ETF', units: 95,  avgCost: 98,   price: 108.6, change: 0 },
+      { id: 3, pie: 1, sym: 'AAPL',   name: 'Apple Inc.',                  units: 12,  avgCost: 140,  price: 196.4, change: 0 },
+      { id: 4, pie: 1, sym: 'MSFT',   name: 'Microsoft Corp.',             units: 6,   avgCost: 270,  price: 330,   change: 0 },
+      { id: 5, pie: 2, sym: 'NVDA',   name: 'NVIDIA Corp.',                units: 14,  avgCost: 82,   price: 120,   change: 0 },
+      { id: 6, pie: 2, sym: 'AIQ',    name: 'Global X AI & Tech ETF',      units: 40,  avgCost: 24,   price: 32.5,  change: 0 }
     ]
   }));
 
-  // ── House Builder (ht3 — the key the app actually reads) ──────────
+  // ── House Builder (the app reads "ht3") ──
   localStorage.setItem('ht3', JSON.stringify({
-    saved: 22500,
-    target: 240000,
-    houseType: 'terraced',
+    saved: 22500, target: 240000, houseType: 'terraced',
     deposits: [
-      { date: '01/10/2024', amount: 5000 },
-      { date: '01/11/2024', amount: 4500 },
-      { date: '01/12/2024', amount: 3500 },
-      { date: '01/01/2025', amount: 4000 },
-      { date: '01/02/2025', amount: 3200 },
-      { date: '01/03/2025', amount: 2300 }
+      { date: '01/10/2025', amount: 5000 }, { date: '01/11/2025', amount: 4500 },
+      { date: '01/12/2025', amount: 3500 }, { date: '01/01/2026', amount: 4000 },
+      { date: '01/02/2026', amount: 3200 }, { date: '01/03/2026', amount: 2300 }
     ],
     prices: { terraced: 240000, semi: 320000, detached: 500000, mansion: 1500000, flat: 80000, apartment: 300000 },
-    apartmentFloor: 5,
-    houseMode: null,
-    mortgageBalance: 0
+    apartmentFloor: 5, houseMode: null, mortgageBalance: 0
   }));
 
   // ── Journey / life stage ──────────────────────────────────────────
@@ -130,33 +143,6 @@
     onboarded: true, stageOverride: 2,
     mortgageActive: false, mortgageBalance: 0,
     rentMonthly: 1200, rentYears: 3
-  }));
-
-  // ── Cashflow ──────────────────────────────────────────────────────
-  localStorage.setItem('pos4', JSON.stringify({
-    income: [
-      { id: 1, name: 'Salary',        amount: 3800, type: 'employment' },
-      { id: 2, name: 'Side Projects', amount: 350,  type: 'freelance'  }
-    ],
-    expenses: [
-      { id: 3, name: 'Rent',           amount: 1200, category: 'necessity' },
-      { id: 4, name: 'Food & Grocery', amount: 380,  category: 'necessity' },
-      { id: 5, name: 'Transport',      amount: 130,  category: 'necessity' },
-      { id: 6, name: 'Subscriptions',  amount: 62,   category: 'lifestyle' },
-      { id: 7, name: 'Gym & Health',   amount: 45,   category: 'lifestyle' },
-      { id: 8, name: 'Eating Out',     amount: 95,   category: 'lifestyle' },
-      { id: 9, name: 'House Deposit',  amount: 258,  category: 'savings'   }
-    ],
-    snapshots: [
-      { date: '2025-01-01', nw: 8400  },
-      { date: '2025-02-01', nw: 10200 },
-      { date: '2025-03-01', nw: 12800 },
-      { date: '2025-04-01', nw: 15300 },
-      { date: '2025-05-01', nw: 17600 },
-      { date: '2025-06-01', nw: 20100 },
-      { date: '2025-07-01', nw: 22500 },
-      { date: '2025-08-01', nw: 24900 }
-    ]
   }));
 
   // ── Debt Tracker ──────────────────────────────────────────────────
