@@ -2703,6 +2703,27 @@ button.bd-ic{cursor:pointer}
   #ov-summary-row .ov-chart-title{font-size:.6rem;letter-spacing:.08em}
   #ov-summary-row [id$="-next"]{font-size:.48rem!important;line-height:1.45}
 }
+.bd-row{flex-wrap:wrap}
+.bd-sel{flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap;padding:2px 0 4px 39px}
+.bd-s{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:5px;color:var(--t2);font-family:'DM Sans',sans-serif;font-size:.5rem;padding:3px 6px;max-width:100%;min-width:0;flex:1 1 130px}
+.bd-s.bd-type{color:var(--c);border-color:color-mix(in srgb,var(--c) 45%,transparent);font-weight:700}
+.bd-s:focus{outline:none;border-color:#64b5f6}
+.bd-grp em{display:block;font-family:'DM Sans',sans-serif;font-style:normal;font-weight:400;letter-spacing:0;text-transform:none;font-size:.44rem;color:var(--t3);margin-top:1px}
+.bd-grp{border-left-color:var(--c);color:var(--t)}
+.bd-iconpick{flex-basis:100%;padding:6px 0 8px 39px}
+.bd-icons{display:flex;flex-wrap:wrap;gap:4px}
+.bd-ibtn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:7px;cursor:pointer;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:0}
+.bd-ibtn:hover{border-color:#64b5f6}
+.bd-ibtn.on{background:rgba(100,181,246,.16);border-color:#64b5f6}
+.bd-chip.add{border-style:dashed}
+.bd-x{margin-left:2px;padding:0 3px;border-radius:50%;color:var(--t3);font-size:.7rem;line-height:1}
+.bd-x:hover{color:#e05c5c}
+.bd-new{margin-top:10px;padding:12px;border:1px dashed rgba(100,181,246,.4);border-radius:10px;background:rgba(100,181,246,.04)}
+.bd-new-t{font-family:'Syne',sans-serif;font-size:.6rem;font-weight:800;color:#64b5f6;margin-bottom:8px}
+.bd-new-row{display:flex;gap:8px;flex-wrap:wrap}
+.bd-new-row .al-inp{flex:1 1 150px;min-width:0}
+.bd-new-lbl{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin:10px 0 6px}
+.cf-legend{gap:8px 14px}
 </style>
 </head>
 <body>
@@ -3391,10 +3412,6 @@ button.bd-ic{cursor:pointer}
     <svg class="ti" viewBox="0 0 16 16"><rect x="1.5" y="3.5" width="13" height="9.5" rx="1.6"/><path d="M1.5 6.5h13"/><path d="M10.6 9.8h1.9"/></svg>
     <span>Budget<i id="budget-badge"></i></span>
   </button>
-  <button class="tab-btn" onclick="showTab('cashflow')">
-    <svg class="ti" viewBox="0 0 16 16"><path d="M1.5 3.5h4c3 0 3 9 7 9h1.5"/><path d="M12 10.3l2.3 2.2L12 14.7"/><path d="M1.5 12.5h3"/></svg>
-    <span>Cash Flow</span>
-  </button>
   <button class="tab-btn" onclick="showTab('house')" style="position:relative;border-bottom:2px solid var(--go)!important" title="Vault·It's flagship feature">
     <svg class="ti" viewBox="0 0 16 16" style="color:var(--go)"><path d="M1.5 9L8 2.5 14.5 9V14.5H10V11H6v3.5H1.5V9z"/></svg>
     <span style="color:var(--go)">House Builder</span>
@@ -3650,15 +3667,11 @@ button.bd-ic{cursor:pointer}
         <div id="cf-summary" style="display:flex;gap:14px;flex-wrap:wrap"></div>
       </div>
       <div id="cf-nudge"></div>
-      <div class="cf-legend">
-        <span><i style="background:#e05c5c"></i>Committed <em>basics to live</em></span>
-        <span><i style="background:#e8a23c"></i>Optional <em>regular, flexible</em></span>
-        <span><i style="background:#3ecf8e"></i>Saved &amp; invested <em>incl. unassigned</em></span>
-      </div>
+      <div class="cf-legend" id="cf-legend"></div>
       <div id="cf-sankey" class="cf-scroll"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
-        <span style="font-size:.5rem;color:var(--t3);line-height:1.5">Plan it in <b style="color:#64b5f6">Budget</b> · follow it through in <b style="color:#b794f4">Cash Flow</b>.</span>
-        <span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn-add-data" onclick="showTab('cashflow')">Cash Flow →</button><button class="btn-add-data" onclick="showTab('budget')">Open Budget →</button></span>
+        <span style="font-size:.5rem;color:var(--t3);line-height:1.5">Plan every pound in your <b style="color:#64b5f6">Budget</b>.</span>
+        <button class="btn-add-data" onclick="showTab('budget')">Open Budget →</button>
       </div>
     </div>
   </div>
@@ -3686,36 +3699,6 @@ button.bd-ic{cursor:pointer}
 </div>
 </div><!-- /tab-overview -->
 
-<!-- ═══════════════════════════ CASH FLOW ═══════════════════════════ -->
-<div id="tab-cashflow" class="tab-panel" style="display:none">
-  <div style="max-width:1040px;margin:0 auto;padding:24px 20px 60px">
-    <div style="margin-bottom:14px">
-      <div style="font-family:'Syne',sans-serif;font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:#b794f4;opacity:.85;margin-bottom:6px">Vault·It · Cash Flow</div>
-      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:800;color:var(--tx);letter-spacing:-.01em">Follow every pound <span style="color:#b794f4">through</span></h2>
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--t3);letter-spacing:.08em;margin-top:4px">INCOME SOURCES → COMMITTED · OPTIONAL · SAVED &amp; INVESTED → EACH CATEGORY</div>
-    </div>
-    <div class="ov-chart-card">
-      <div class="ov-chart-hd" style="flex-wrap:wrap;gap:10px"><span class="ov-chart-title">Cash Flow</span><div id="cf2-summary" style="display:flex;gap:14px;flex-wrap:wrap"></div></div>
-      <div class="cf-legend">
-        <span><i style="background:#e05c5c"></i>Committed <em>basics to live</em></span>
-        <span><i style="background:#e8a23c"></i>Optional <em>regular, flexible</em></span>
-        <span><i style="background:#3ecf8e"></i>Saved &amp; invested <em>building wealth</em></span>
-      </div>
-      <div id="cf2-sankey" class="cf-scroll"></div>
-      <div class="cf-sub">EVERY CATEGORY, SIDE BY SIDE &mdash; PER MONTH</div>
-      <div id="cf-histo" class="cf-scroll"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
-        <span style="font-size:.5rem;color:var(--t3);line-height:1.5">Change any of this in your <b style="color:#64b5f6">Budget</b>.</span>
-        <button class="btn-add-data" onclick="showTab('budget')">Open Budget →</button>
-      </div>
-    </div>
-    <div class="ov-chart-card" style="margin-top:14px">
-      <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:10px;letter-spacing:.06em">SPENDING MIX vs INCOME</div>
-      <div id="cf-categories"></div>
-    </div>
-  </div>
-</div><!-- /tab-cashflow -->
-
 <!-- ═══════════════════════════ BUDGET (zero-based) ═══════════════════════════ -->
 <div id="tab-budget" class="tab-panel" style="display:none">
   <div style="max-width:1040px;margin:0 auto;padding:24px 20px 60px">
@@ -3726,17 +3709,14 @@ button.bd-ic{cursor:pointer}
     </div>
     <div class="ov-chart-card" style="margin-bottom:14px"><div id="bd-zero"></div></div>
     <div id="bd-nudge"></div>
-    <div class="cf-legend">
-      <span><i style="background:#e05c5c"></i>Committed <em>basics to live</em></span>
-      <span><i style="background:#e8a23c"></i>Optional <em>regular, flexible</em></span>
-      <span><i style="background:#3ecf8e"></i>Saved &amp; invested <em>building wealth</em></span>
-    </div>
+    <div class="cf-legend" id="bd-legend"></div>
     <div class="g2" style="margin-top:8px;align-items:start">
       <div class="ov-chart-card">
         <div class="ov-ms-title" style="color:var(--gr);margin-bottom:10px">Income <span style="color:var(--t3);font-weight:400">· per month</span></div>
         <div id="cf-income-list" class="data-list"></div>
         <div class="bd-pick-lbl">Choose a category</div>
         <div id="bd-pick-inc" class="bd-picks"></div>
+        <div id="bd-new-inc" class="bd-new" style="display:none"></div>
         <div class="data-input-row" style="margin-top:8px">
           <input type="text" id="cf-inc-name" placeholder="Name (e.g. Salary)" onkeydown="if(event.key==='Enter')addIncome()">
           <input type="number" id="cf-inc-amt" placeholder="£/mo" min="0" onkeydown="if(event.key==='Enter')addIncome()">
@@ -3748,18 +3728,23 @@ button.bd-ic{cursor:pointer}
         <div id="cf-expense-list" class="data-list"></div>
         <div class="bd-pick-lbl">Choose a category</div>
         <div id="bd-pick-exp" class="bd-picks"></div>
+        <div id="bd-new-exp" class="bd-new" style="display:none"></div>
         <div class="data-input-row" style="margin-top:8px">
           <input type="text" id="cf-exp-name" placeholder="Name (e.g. Groceries)" onkeydown="if(event.key==='Enter')addExpense()">
           <input type="number" id="cf-exp-amt" placeholder="£/mo" min="0" onkeydown="if(event.key==='Enter')addExpense()">
-          <select id="cf-exp-cat" class="al-inp" style="max-width:150px" title="Committed = basics to live · Optional = regular but flexible · Saved = savings &amp; investments"><option value="necessity">Committed</option><option value="discretionary">Optional</option><option value="investment">Saved / invested</option></select>
+          <select id="cf-exp-cat" class="al-inp" style="max-width:190px" onchange="this.dataset.touched=1" title="Spending type — committed (same every month) or variable, essential or not, savings or investments"><option value="ce">Committed essential</option><option value="ve">Variable essential</option><option value="cn">Committed non-essential</option><option value="vn">Variable non-essential</option><option value="sv">Savings</option><option value="iv">Investments</option></select>
           <button class="btn-add-data" onclick="addExpense()">+ Add</button>
         </div>
-        <div style="font-size:.46rem;color:var(--t3);margin-top:6px;line-height:1.5">Tap a line’s icon to switch it between <b style="color:#e05c5c">committed</b>, <b style="color:#e8a23c">optional</b> and <b style="color:#3ecf8e">saved</b>; ✎ edits its amount or category.</div>
+        <div style="font-size:.46rem;color:var(--t3);margin-top:6px;line-height:1.6">Every line has its own <b>category</b> and <b>type</b> drop-downs. Tap a line’s icon to give it a different icon; ✎ edits its name or amount. <b style="color:var(--tx)">Committed</b> = same every month · <b style="color:var(--tx)">Variable</b> = changes month to month.</div>
       </div>
     </div>
     <div class="ov-chart-card" style="margin-top:14px">
-      <div class="ov-chart-hd" style="flex-wrap:wrap;gap:10px"><span class="ov-chart-title">Where your income flows</span><a href="#" onclick="showTab('cashflow');return false" style="font-size:.5rem;color:#b794f4;font-family:'Share Tech Mono',monospace">Full Cash Flow →</a></div>
+      <div class="ov-chart-hd" style="flex-wrap:wrap;gap:10px"><span class="ov-chart-title">Where your income flows</span></div>
       <div id="bd-sankey" class="cf-scroll"></div>
+    </div>
+    <div class="ov-chart-card" style="margin-top:14px">
+      <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:10px;letter-spacing:.06em">SPENDING MIX vs INCOME</div>
+      <div id="cf-categories"></div>
     </div>
   </div>
 </div><!-- /tab-budget -->
@@ -5462,7 +5447,7 @@ function showTab(id){
     if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'"))b.classList.add('active');
   });
   if(id==='overview'){updateKPIs();drawChart();renderCashflow();renderSummaryCards();}
-  if(id==='budget'||id==='cashflow'){renderCashflow();}
+  if(id==='budget'){renderCashflow();}
   if(id==='house')setTimeout(redraw,30);
   if(id==='assets'){setTimeout(()=>{renderMetalsISO();renderAlTab();},30);}
   if(id==='debt'){renderDebtTab();setTimeout(function(){drawDebtHistogram();drawDebtDonut();},80);}
@@ -7634,12 +7619,17 @@ var _ISB_STATUS_COLOR={idea:'var(--t3)',building:'var(--go)',active:'var(--gr)'}
 var chartState={range:'all',metrics:{nw:true,debt:true,income:true,proj:false}};
 var _nwZoom=1, _nwPanMs=0; // net worth chart zoom (1=default) and pan offset in milliseconds
 // ── Constants used by init-time renders — must be declared BEFORE the init block runs ──
+// ── Spending types: committed vs variable × essential vs non-essential, plus savings & investments ──
 var CF_GROUPS={
-  committed:{label:'Committed',        col:'#e05c5c'},
-  optional: {label:'Optional',         col:'#e8a23c'},
-  growth:   {label:'Saved & Invested', col:'#3ecf8e'}
+  ce:{label:'Committed · essential',     short:'Committed essential',     col:'#a3202c',tx:'#e5535f',ex:'Rent, mortgage, insurance'},
+  ve:{label:'Variable · essential',      short:'Variable essential',      col:'#ee7d7d',tx:'#ee7d7d',ex:'Groceries, fuel, utilities'},
+  cn:{label:'Committed · non-essential', short:'Committed non-essential', col:'#f59e0b',tx:'#f59e0b',ex:'Subscriptions, gym — same every month'},
+  vn:{label:'Variable · non-essential',  short:'Variable non-essential',  col:'#f5dc4a',tx:'#f5dc4a',ex:'Takeaways, shopping, days out'},
+  sv:{label:'Savings',                   short:'Savings',                 col:'#3ecf8e',tx:'#3ecf8e',ex:'Emergency fund, house deposit'},
+  iv:{label:'Investments',               short:'Investments',             col:'#17805a',tx:'#3fb585',ex:'ISA, pension, shares'}
 };
-var CF_GROUP_ORDER=['committed','optional','growth'];
+var CF_GROUP_ORDER=['ce','ve','cn','vn','sv','iv'];
+var CF_LEGACY={ce:'necessity',ve:'necessity',cn:'discretionary',vn:'discretionary',sv:'investment',iv:'investment'};
 var DEBT_TYPE_LABELS={credit:'Credit card',personal:'Personal loan',student:'Student loan',car:'Car finance',bnpl:'BNPL',overdraft:'Overdraft',mortgage:'Mortgage',other:'Loan'};
 // ── Roadmap iconography: inline duo-tone icons on a 24×24 grid (f = tinted fill, d = stroke) ──
 var _FSH='M12 3l7 2.5v6c0 4.4-3 7.7-7 9.5-4-1.8-7-5.1-7-9.5v-6z';
@@ -7707,56 +7697,68 @@ var BD_ICONS={
   trend:{f:['M4 16l5-5 4 3 7-8v14.5H4z'],d:['M3 20.5h18','M4 16l5-5 4 3 7-8','M15 6h5v5']},
   dots:{f:['M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z','M10.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z','M16.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'],d:['M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z','M10.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z','M16.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z']},
   briefcase:{f:['M3 8h18v12H3z'],d:['M3 8h18v12H3z','M9 8V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V8','M3 13h18','M10.5 12v2.4h3V12']},
-  rocket:{f:['M12 2.5c3.5 2.5 5 6 4.5 11l-4.5 3-4.5-3c-.5-5 1-8.5 4.5-11z'],d:['M12 2.5c3.5 2.5 5 6 4.5 11l-4.5 3-4.5-3c-.5-5 1-8.5 4.5-11z','M12 9.4a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2z','M7.5 13.5L4.5 16l2.2.5','M16.5 13.5l3 2.5-2.2.5','M10 19.5c.5 1.5 1.5 2.5 2 2.5s1.5-1 2-2.5']}
+  rocket:{f:['M12 2.5c3.5 2.5 5 6 4.5 11l-4.5 3-4.5-3c-.5-5 1-8.5 4.5-11z'],d:['M12 2.5c3.5 2.5 5 6 4.5 11l-4.5 3-4.5-3c-.5-5 1-8.5 4.5-11z','M12 9.4a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2z','M7.5 13.5L4.5 16l2.2.5','M16.5 13.5l3 2.5-2.2.5','M10 19.5c.5 1.5 1.5 2.5 2 2.5s1.5-1 2-2.5']},
+  paw:{f:['M12 14c-2.5 0-4.5 1.8-4.5 3.8 0 1.4 1 2.2 2.3 2.2 1 0 1.4-.4 2.2-.4s1.2.4 2.2.4c1.3 0 2.3-.8 2.3-2.2 0-2-2-3.8-4.5-3.8z'],d:['M12 14c-2.5 0-4.5 1.8-4.5 3.8 0 1.4 1 2.2 2.3 2.2 1 0 1.4-.4 2.2-.4s1.2.4 2.2.4c1.3 0 2.3-.8 2.3-2.2 0-2-2-3.8-4.5-3.8z','M3.6 10.5a1.5 2 0 1 1 3 0 1.5 2 0 0 1-3 0z','M7.5 7a1.5 2.1 0 1 1 3 0 1.5 2.1 0 0 1-3 0z','M13.5 7a1.5 2.1 0 1 1 3 0 1.5 2.1 0 0 1-3 0z','M17.4 10.5a1.5 2 0 1 1 3 0 1.5 2 0 0 1-3 0z']},
+  book:{f:['M4 5h7a1 1 0 0 1 1 1v13a2 2 0 0 0-2-1.5H4z'],d:['M12 6a1 1 0 0 0-1-1H4v13h6a2 2 0 0 1 2 1.5','M12 6a1 1 0 0 1 1-1h7v13h-6a2 2 0 0 0-2 1.5','M12 6v13.5']},
+  wrench:{f:['M14.5 6a4 4 0 0 0-5 5.2L4 17l3 3 5.8-5.5A4 4 0 0 0 18 9.5l-2.5 2.5-2.2-.5-.5-2.2z'],d:['M14.5 6a4 4 0 0 0-5 5.2L4 17l3 3 5.8-5.5A4 4 0 0 0 18 9.5l-2.5 2.5-2.2-.5-.5-2.2z']},
+  shirt:{f:['M8.5 4L3.5 7l2 3.5L8 9.5V20h8V9.5l2.5 1 2-3.5-5-3a3.5 3.5 0 0 1-7 0z'],d:['M8.5 4L3.5 7l2 3.5L8 9.5V20h8V9.5l2.5 1 2-3.5-5-3a3.5 3.5 0 0 1-7 0z']},
+  coffee:{f:['M4.5 9h11v6a4 4 0 0 1-4 4h-3a4 4 0 0 1-4-4z'],d:['M4.5 9h11v6a4 4 0 0 1-4 4h-3a4 4 0 0 1-4-4z','M15.5 10.5h1.5a2.5 2.5 0 0 1 0 5h-1.5','M8 3.5c-.8 1 .8 1.8 0 3','M11.5 3.5c-.8 1 .8 1.8 0 3']}
 };
-// k = key · n = label · ic = icon · g = budget group (necessity=committed, discretionary=optional, investment=saved)
+// k = key · n = label · ic = default icon · t = default spending type
 var BD_EXP_CATS=[
-  {k:'housing',  n:'Rent / Mortgage',  ic:'house',    g:'necessity'},
-  {k:'utilities',n:'Utilities & bills',ic:'bolt',     g:'necessity'},
-  {k:'council',  n:'Council tax',      ic:'bank',     g:'necessity'},
-  {k:'groceries',n:'Groceries',        ic:'basket',   g:'necessity'},
-  {k:'transport',n:'Transport',        ic:'car',      g:'necessity'},
-  {k:'insurance',n:'Insurance',        ic:'shield',   g:'necessity'},
-  {k:'phone',    n:'Phone & internet', ic:'wifi',     g:'necessity'},
-  {k:'childcare',n:'Childcare',        ic:'baby',     g:'necessity'},
-  {k:'health',   n:'Health',           ic:'heart',    g:'necessity'},
-  {k:'debt',     n:'Debt payments',    ic:'card',     g:'necessity'},
-  {k:'subs',     n:'Subscriptions',    ic:'repeat',   g:'discretionary'},
-  {k:'dining',   n:'Eating out',       ic:'fork',     g:'discretionary'},
-  {k:'fun',      n:'Entertainment',    ic:'ticket',   g:'discretionary'},
-  {k:'shopping', n:'Shopping',         ic:'bag',      g:'discretionary'},
-  {k:'travel',   n:'Holidays',         ic:'plane',    g:'discretionary'},
-  {k:'fitness',  n:'Gym & fitness',    ic:'dumbbell', g:'discretionary'},
-  {k:'personal', n:'Personal care',    ic:'sparkle',  g:'discretionary'},
-  {k:'gifts',    n:'Gifts & giving',   ic:'gift',     g:'discretionary'},
-  {k:'emergency',n:'Emergency fund',   ic:'lifebuoy', g:'investment'},
-  {k:'savings',  n:'Savings',          ic:'piggy',    g:'investment'},
-  {k:'invest',   n:'Investments / ISA',ic:'trend',    g:'investment'},
-  {k:'pension',  n:'Pension',          ic:'umbrella', g:'investment'},
-  {k:'deposit',  n:'House deposit',    ic:'bricks',   g:'investment'},
-  {k:'other',    n:'Other',            ic:'dots',     g:'necessity'}
+  {k:'housing',  n:'Rent / Mortgage',       ic:'house',    t:'ce'},
+  {k:'council',  n:'Council tax',           ic:'bank',     t:'ce'},
+  {k:'insurance',n:'Insurance',             ic:'shield',   t:'ce'},
+  {k:'debt',     n:'Debt payments',         ic:'card',     t:'ce'},
+  {k:'childcare',n:'Childcare',             ic:'baby',     t:'ce'},
+  {k:'phone',    n:'Phone & internet',      ic:'wifi',     t:'ce'},
+  {k:'utilities',n:'Utilities & bills',     ic:'bolt',     t:'ve'},
+  {k:'groceries',n:'Groceries',             ic:'basket',   t:'ve'},
+  {k:'transport',n:'Transport & fuel',      ic:'car',      t:'ve'},
+  {k:'health',   n:'Health',                ic:'heart',    t:'ve'},
+  {k:'pets',     n:'Pets',                  ic:'paw',      t:'ve'},
+  {k:'home',     n:'Home & garden',         ic:'wrench',   t:'ve'},
+  {k:'education',n:'Education & courses',   ic:'book',     t:'ve'},
+  {k:'subs',     n:'Subscriptions',         ic:'repeat',   t:'cn'},
+  {k:'fitness',  n:'Gym & fitness',         ic:'dumbbell', t:'cn'},
+  {k:'dining',   n:'Eating out & takeaways',ic:'fork',     t:'vn'},
+  {k:'coffee',   n:'Coffee & lunches',      ic:'coffee',   t:'vn'},
+  {k:'fun',      n:'Entertainment',         ic:'ticket',   t:'vn'},
+  {k:'shopping', n:'Shopping',              ic:'bag',      t:'vn'},
+  {k:'clothing', n:'Clothing',              ic:'shirt',    t:'vn'},
+  {k:'travel',   n:'Holidays',              ic:'plane',    t:'vn'},
+  {k:'personal', n:'Personal care',         ic:'sparkle',  t:'vn'},
+  {k:'gifts',    n:'Gifts & giving',        ic:'gift',     t:'vn'},
+  {k:'emergency',n:'Emergency fund',        ic:'lifebuoy', t:'sv'},
+  {k:'savings',  n:'Savings',               ic:'piggy',    t:'sv'},
+  {k:'deposit',  n:'House deposit',         ic:'bricks',   t:'sv'},
+  {k:'invest',   n:'Investments / ISA',     ic:'trend',    t:'iv'},
+  {k:'pension',  n:'Pension',               ic:'umbrella', t:'iv'},
+  {k:'other',    n:'Other',                 ic:'dots',     t:'ve'}
 ];
 var BD_INC_CATS=[
-  {k:'salary',   n:'Salary',            ic:'briefcase'},
-  {k:'business', n:'Side hustle / business',ic:'rocket'},
-  {k:'benefits', n:'Benefits & pensions',ic:'bank'},
-  {k:'dividends',n:'Interest & dividends',ic:'coins'},
-  {k:'rental',   n:'Rental income',     ic:'house'},
-  {k:'gifts',    n:'Gifts & other',     ic:'gift'},
-  {k:'other',    n:'Other',             ic:'dots'}
+  {k:'salary',   n:'Salary',                 ic:'briefcase'},
+  {k:'business', n:'Side hustle / business', ic:'rocket'},
+  {k:'benefits', n:'Benefits & pensions',    ic:'bank'},
+  {k:'dividends',n:'Interest & dividends',   ic:'coins'},
+  {k:'rental',   n:'Rental income',          ic:'house'},
+  {k:'gifts',    n:'Gifts & other',          ic:'gift'},
+  {k:'other',    n:'Other',                  ic:'dots'}
 ];
-// Name → category guesses for lines that were typed freehand or created before categories existed
+// Icons any line or custom category can be given
+var BD_PICK_ICONS=['house','bolt','bank','basket','car','shield','wifi','baby','heart','card','repeat','fork','coffee','ticket','bag','shirt','plane','dumbbell','sparkle','gift','paw','book','wrench','lifebuoy','piggy','trend','umbrella','bricks','coins','gem','key','bars','barsUp','medal','flame','tree','sprout','safe','briefcase','rocket','doc','map','sail','mountain','dots'];
 var BD_GUESS=[
-  ['housing',/rent|mortgage|landlord/i],['council',/council/i],['utilities',/utilit|bill|energy|gas|electric|water|broadband/i],
-  ['groceries',/grocer|food|supermarket|tesco|sainsbury|aldi|lidl/i],['transport',/transport|commut|travel card|petrol|fuel|train|bus|tfl|car(?! finance)|parking/i],
-  ['insurance',/insur/i],['phone',/phone|mobile|internet|wifi/i],['childcare',/child|nursery|school/i],['health',/health|dent|optic|medic|pharm/i],
-  ['debt',/debt|loan|finance|credit card|repay/i],['subs',/subscri|netflix|spotify|prime/i],['dining',/eating|dining|restaurant|takeaway|coffee|pub/i],
-  ['fun',/entertain|cinema|gaming|hobby/i],['shopping',/shop|cloth|amazon/i],['travel',/holiday|trip|vacation/i],['fitness',/gym|fitness|sport/i],
+  ['housing',/rent|mortgage|landlord/i],['council',/council/i],['utilities',/utilit|bill|energy|\bgas\b|electric|water|broadband/i],
+  ['groceries',/grocer|food shop|supermarket|tesco|sainsbury|aldi|lidl|housekeeping|^food/i],['transport',/transport|commut|travel card|petrol|fuel|diesel|\boil\b|\btrain\b|\bbus\b|\btfl\b|\bcar\b(?! finance)|parking|road tax|\bmot\b/i],
+  ['insurance',/insur/i],['phone',/phone|mobile|telephone|internet|wifi/i],['childcare',/child|nursery|school/i],['health',/health|dent|optic|medic|pharm/i],
+  ['debt',/debt|loan|finance|credit|store card|repay/i],['pets',/\bpet|vet\b|dog|cat food/i],['education',/course|tuition|study|education|university/i],['home',/garden|repair|maintenance|diy|furnitur/i],
+  ['subs',/subscri|netflix|spotify|prime|disney|apple tv/i],['coffee',/coffee|lunch|cafe/i],['dining',/eating|dining|restaurant|takeaway|pub\b/i],
+  ['fun',/entertain|cinema|gaming|hobby/i],['clothing',/cloth|shoe|fashion/i],['shopping',/shop|amazon/i],['travel',/holiday|trip|vacation/i],['fitness',/gym|fitness|sport/i],
   ['personal',/hygiene|personal|beauty|hair/i],['gifts',/gift|charity|donat/i],['emergency',/emergency|rainy/i],['invest',/invest|isa|stocks|shares|crypto/i],
   ['pension',/pension/i],['deposit',/deposit|house fund/i],['savings',/saving/i]
 ];
 var BD_INC_GUESS=[['salary',/salary|wage|pay|take-home|take home|job/i],['business',/side|freelance|business|client|project/i],['benefits',/benefit|universal|child benefit|pension|allowance/i],['dividends',/dividend|interest|cashback/i],['rental',/rent/i]];
-var _bdSel={inc:null,exp:null},_bdAuto={inc:'',exp:''},_bdEdit=null;
+var _bdSel={inc:null,exp:null},_bdAuto={inc:'',exp:''},_bdEdit=null,_bdIconFor=null,_bdNewOpen={inc:false,exp:false},_bdNewIcon={inc:'dots',exp:'dots'};
 var AL_KEY='pos_al1';
 var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
@@ -8479,53 +8481,115 @@ function resetVaultData() {
 // ═══════════════════════════════════════════════════════════════
 function cfTotalIn(){return(ovState.income||[]).reduce(function(s,r){return s+(+r.amount||0);},0);}
 // ── Cash flow groups: committed (red) · optional (amber) · saved & invested (green) ──
-// Legacy categories (necessity / fixed) are all "committed"; discretionary = "optional".
-function cfGroup(cat){
-  cat=String(cat||'').toLowerCase();
-  if(cat==='discretionary'||cat==='optional')return 'optional';
-  if(cat==='investment'||cat==='saving'||cat==='savings'||cat==='growth')return 'growth';
-  return 'committed';
+// Types are stored on each line as `type`. Older lines only have `category`
+// (necessity / discretionary / investment) — map those onto the closest new type.
+function cfType(item){
+  if(!item)return 've';
+  if(typeof item==='string')item={category:item};
+  if(item.type&&CF_GROUPS[item.type])return item.type;
+  var c=String(item.category||'').toLowerCase();
+  var cat=bdFind('exp',item.cat||bdGuess('exp',item.name||'')),def=cat&&cat.t||'ve';
+  if(/^(investment|saving|savings|growth)$/.test(c))return(def==='sv'||def==='iv')?def:'iv';
+  if(/^(discretionary|optional)$/.test(c))return(def==='cn'||def==='vn')?def:'vn';
+  return(def==='ce'||def==='ve')?def:'ce';
 }
-function cfGroupToCat(g){return g==='optional'?'discretionary':g==='growth'?'investment':'necessity';}
+var cfGroup=cfType;
+function cfGroupToCat(t){return CF_LEGACY[t]||'necessity';}
+function cfIsSaving(t){return t==='sv'||t==='iv';}
 function cfItemsByGroup(){
-  var o={committed:[],optional:[],growth:[]};
-  (ovState.expenses||[]).forEach(function(e){if((+e.amount||0)>0)o[cfGroup(e.category)].push(e);});
+  var o={};CF_GROUP_ORDER.forEach(function(g){o[g]=[];});
+  (ovState.expenses||[]).forEach(function(e){if((+e.amount||0)>0)o[cfType(e)].push(e);});
   CF_GROUP_ORDER.forEach(function(g){o[g].sort(function(a,b){return (+b.amount||0)-(+a.amount||0);});});
   return o;
 }
 function cfSum(list){return list.reduce(function(s,r){return s+(+r.amount||0);},0);}
-// "Out" = money actually spent (committed + optional). Money put into savings/investments is
-// not spending — it is what the surplus is turned into.
-function cfTotalOut(){return(ovState.expenses||[]).reduce(function(s,r){return cfGroup(r.category)==='growth'?s:s+(+r.amount||0);},0);}
-function cfTotalGrowth(){return(ovState.expenses||[]).reduce(function(s,r){return cfGroup(r.category)==='growth'?s+(+r.amount||0):s;},0);}
-// ── add income / spending (each line carries a category → icon) ──
-function bdFind(kind,key){var L=kind==='inc'?BD_INC_CATS:BD_EXP_CATS;return L.find(function(c){return c.k===key;})||L[L.length-1];}
-function bdGuess(kind,name){var G=kind==='inc'?BD_INC_GUESS:BD_GUESS;for(var i=0;i<G.length;i++)if(G[i][1].test(name||''))return G[i][0];return 'other';}
+// "Out" = money actually spent (all four spending types). Savings and investments are
+// not spending — they are what the surplus is turned into.
+function cfTotalOut(){return(ovState.expenses||[]).reduce(function(s,r){return cfIsSaving(cfType(r))?s:s+(+r.amount||0);},0);}
+function cfTotalGrowth(){return(ovState.expenses||[]).reduce(function(s,r){return cfIsSaving(cfType(r))?s+(+r.amount||0):s;},0);}
+// ── categories (built-in + the user's own) and icons ──
+function bdCats(kind){
+  var base=kind==='inc'?BD_INC_CATS:BD_EXP_CATS;
+  return base.concat((ovState.customCats||[]).filter(function(c){return c.kind===kind;}));
+}
+function bdFind(kind,key){
+  var L=bdCats(kind);
+  return L.find(function(c){return c.k===key;})||L.find(function(c){return c.k==='other';})||L[L.length-1];
+}
+function bdGuess(kind,name){
+  var n=String(name||'').trim().toLowerCase();
+  var own=(ovState.customCats||[]).find(function(c){return c.kind===kind&&c.n.toLowerCase()===n;});
+  if(own)return own.k;
+  var G=kind==='inc'?BD_INC_GUESS:BD_GUESS;
+  for(var i=0;i<G.length;i++)if(G[i][1].test(name||''))return G[i][0];
+  return 'other';
+}
 function bdCatOf(kind,item){return item.cat||bdGuess(kind,item.name);}
+function bdIconKey(kind,r){return r.icon||bdFind(kind,bdCatOf(kind,r)).ic;}
 function bdIcon(key,size,col,fillOp){
   var ic=BD_ICONS[key]||FIRE_ICONS[key]||BD_ICONS.dots;
   return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" aria-hidden="true">'
     +'<g fill="'+col+'" fill-opacity="'+(fillOp==null?.22:fillOp)+'" stroke="none">'+ic.f.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g>'
     +'<g fill="none" stroke="'+col+'" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+ic.d.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g></svg>';
 }
+function bdTypeOptions(sel){
+  return CF_GROUP_ORDER.map(function(t){return '<option value="'+t+'"'+(t===sel?' selected':'')+'>'+CF_GROUPS[t].short+'</option>';}).join('');
+}
 function bdPick(kind,key){
   _bdSel[kind]=key;
   var c=bdFind(kind,key),nm=document.getElementById(kind==='inc'?'cf-inc-name':'cf-exp-name');
   // fill the name from the category unless the user has typed their own
   if(nm&&(!nm.value.trim()||nm.value===_bdAuto[kind])){nm.value=c.n;_bdAuto[kind]=c.n;}
-  if(kind==='exp'){var s=document.getElementById('cf-exp-cat');if(s)s.value=c.g;}
+  if(kind==='exp'){var s=document.getElementById('cf-exp-cat');if(s)s.value=c.t||'ve';}
   bdRenderPickers();
   var a=document.getElementById(kind==='inc'?'cf-inc-amt':'cf-exp-amt');if(a)a.focus();
 }
 function bdRenderPickers(){
-  [['inc',BD_INC_CATS],['exp',BD_EXP_CATS]].forEach(function(p){
-    var el=document.getElementById('bd-pick-'+p[0]);if(!el)return;
-    el.innerHTML=p[1].map(function(c){
-      var col=p[0]==='inc'?'#44c0b9':CF_GROUPS[cfGroup(c.g)].col,on=_bdSel[p[0]]===c.k;
-      return '<button type="button" class="bd-chip'+(on?' on':'')+'" style="--c:'+col+'" onclick="bdPick(\''+p[0]+'\',\''+c.k+'\')" title="'+cfEsc(c.n)+'">'+bdIcon(c.ic,18,col)+'<span>'+cfEsc(c.n)+'</span></button>';
-    }).join('');
+  ['inc','exp'].forEach(function(kind){
+    var el=document.getElementById('bd-pick-'+kind);if(!el)return;
+    el.innerHTML=bdCats(kind).map(function(c){
+      var col=kind==='inc'?'#44c0b9':CF_GROUPS[c.t||'ve'].tx,on=_bdSel[kind]===c.k,own=String(c.k).indexOf('c_')===0;
+      return '<button type="button" class="bd-chip'+(on?' on':'')+'" style="--c:'+col+'" onclick="bdPick(\''+kind+'\',\''+c.k+'\')" title="'+cfEsc(c.n)+'">'+bdIcon(c.ic,18,col)+'<span>'+cfEsc(c.n)+'</span>'
+        +(own?'<span class="bd-x" title="Delete this category" onclick="event.stopPropagation();bdDelCat(\''+kind+'\',\''+c.k+'\')">×</span>':'')+'</button>';
+    }).join('')+'<button type="button" class="bd-chip add" style="--c:#8fb4b1" onclick="bdToggleNew(\''+kind+'\')"><span>＋ New category</span></button>';
   });
 }
+// ── create your own category (name · icon · type) ──
+function bdToggleNew(kind){_bdNewOpen[kind]=!_bdNewOpen[kind];bdRenderNew();}
+function bdNewIconPick(kind,ic){_bdNewIcon[kind]=ic;bdRenderNew();}
+function bdRenderNew(){
+  ['inc','exp'].forEach(function(kind){
+    var el=document.getElementById('bd-new-'+kind);if(!el)return;
+    el.style.display=_bdNewOpen[kind]?'':'none';
+    if(!_bdNewOpen[kind])return;
+    var keep=(document.getElementById('bd-new-name-'+kind)||{}).value||'';
+    el.innerHTML='<div class="bd-new-t">New '+(kind==='inc'?'income':'spending')+' category</div>'
+      +'<div class="bd-new-row"><input id="bd-new-name-'+kind+'" class="al-inp" placeholder="Name (e.g. Piano lessons)" value="'+cfEsc(keep)+'" maxlength="30">'
+      +(kind==='exp'?'<select id="bd-new-type-exp" class="al-inp" title="Spending type">'+bdTypeOptions('vn')+'</select>':'')+'</div>'
+      +'<div class="bd-new-lbl">Choose an icon</div><div class="bd-icons">'
+      +BD_PICK_ICONS.map(function(k){return '<button type="button" class="bd-ibtn'+(_bdNewIcon[kind]===k?' on':'')+'" onclick="bdNewIconPick(\''+kind+'\',\''+k+'\')">'+bdIcon(k,20,_bdNewIcon[kind]===k?'#64b5f6':'#8fb4b1')+'</button>';}).join('')+'</div>'
+      +'<div class="bd-new-row" style="margin-top:8px"><button class="btn-add-data" onclick="bdSaveNew(\''+kind+'\')">Save category</button><button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="bdToggleNew(\''+kind+'\')">Cancel</button></div>';
+  });
+}
+function bdSaveNew(kind){
+  var n=((document.getElementById('bd-new-name-'+kind)||{}).value||'').trim();
+  if(!n){showToast('Give your category a name');return;}
+  if(!ovState.customCats)ovState.customCats=[];
+  var c={k:'c_'+Date.now().toString(36),kind:kind,n:n,ic:_bdNewIcon[kind]||'dots'};
+  if(kind==='exp')c.t=(document.getElementById('bd-new-type-exp')||{}).value||'vn';
+  ovState.customCats.push(c);
+  _bdNewOpen[kind]=false;_bdNewIcon[kind]='dots';
+  saveState();bdRender();bdPick(kind,c.k);
+  showToast('“'+n+'” added');
+}
+function bdDelCat(kind,key){
+  var c=(ovState.customCats||[]).find(function(x){return x.k===key;});
+  if(!c||!confirm('Delete the category “'+c.n+'”? Lines using it become “Other”.'))return;
+  ovState.customCats=ovState.customCats.filter(function(x){return x.k!==key;});
+  if(_bdSel[kind]===key)_bdSel[kind]=null;
+  saveState();bdRender();
+}
+// ── add income / spending ──
 function addIncome(){
   var nEl=document.getElementById('cf-inc-name'),aEl=document.getElementById('cf-inc-amt');
   var a=parseFloat(aEl.value),n=nEl.value.trim();
@@ -8543,11 +8607,12 @@ function addExpense(){
   if(!n||!(a>0)){showToast('Pick a category (or type a name) and enter a monthly amount');return;}
   if(!ovState.expenses)ovState.expenses=[];
   var key=_bdSel.exp||bdGuess('exp',n);
-  // group: what the user chose in the dropdown if they picked/typed freehand, else the category's default
-  var grp=(document.getElementById('cf-exp-cat')||{}).value||bdFind('exp',key).g;
-  ovState.expenses.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),category:grp,cat:key});
+  var sel=document.getElementById('cf-exp-cat');
+  // the type the user left in the dropdown wins; otherwise the category's default
+  var t=(sel&&CF_GROUPS[sel.value]&&(_bdSel.exp||sel.dataset.touched))?sel.value:(bdFind('exp',key).t||'ve');
+  ovState.expenses.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),category:cfGroupToCat(t),type:t,cat:key});
   nEl.value='';aEl.value='';_bdSel.exp=null;_bdAuto.exp='';
-  var s=document.getElementById('cf-exp-cat');if(s)s.value='necessity';
+  if(sel){sel.value='ce';delete sel.dataset.touched;}
   saveState();renderCashflow();updateKPIs();
 }
 function delIncome(id){ovState.income=(ovState.income||[]).filter(function(r){return r.id!==id;});saveState();renderCashflow();updateKPIs();}
@@ -8576,7 +8641,7 @@ function cfModel(){
 }
 // ── Sankey: income sources → Income → Committed / Optional / Saved → each category ──
 function drawCashflowDiagram(){
-  var hosts=['cf-sankey','bd-sankey','cf2-sankey'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var hosts=['cf-sankey','bd-sankey'].map(function(id){return document.getElementById(id);}).filter(Boolean);
   if(!hosts.length)return;
   var m=cfModel();
   if(m.total<=0){hosts.forEach(function(h){h.innerHTML='<div class="cf-empty">Add your income and spending to see where every pound goes</div>';});return;}
@@ -8587,12 +8652,12 @@ function drawCashflowDiagram(){
   // groups and their item nodes
   var groups=CF_GROUP_ORDER.map(function(g){
     var items=m.by[g].map(function(r){return{name:r.name,amt:+r.amount};});
-    if(g==='growth'&&m.overflow>0)items.push({name:'Unassigned',amt:m.overflow,overflow:true});
-    return{key:g,col:CF_GROUPS[g].col,label:CF_GROUPS[g].label,items:items,sum:items.reduce(function(a,it){return a+it.amt;},0)};
+    if(g==='sv'&&m.overflow>0)items.push({name:'Unassigned',amt:m.overflow,overflow:true});
+    return{key:g,col:CF_GROUPS[g].col,tx:CF_GROUPS[g].tx,label:CF_GROUPS[g].short,items:items,sum:items.reduce(function(a,it){return a+it.amt;},0)};
   }).filter(function(g){return g.sum>0;});
   var nItems=groups.reduce(function(n,g){return n+g.items.length;},0);
   var W=960,padT=30,padB=14,nodeW=14,gapItem=6,gapGroup=22,gapSrc=6,MINSLOT=28;
-  var XS=190,XI=395,XG=590,XT=785;
+  var XS=190,XI=370,XG=535,XT=795;
   var usable=Math.max(300,60+nItems*34);
   var gaps=(nItems-groups.length)*gapItem+(groups.length-1)*gapGroup;
   var k=(usable-gaps)/T;
@@ -8653,7 +8718,7 @@ function drawCashflowDiagram(){
   out+='<text x="'+(XI+nodeW/2)+'" y="'+(incY-9).toFixed(1)+'" text-anchor="middle" font-size="11.5" font-weight="800" fill="#44c0b9" letter-spacing="1.5" '+halo+'>INCOME '+cfMoney(m.tIn)+'</text>';
   groupNodes.forEach(function(gn){
     out+='<rect x="'+XG+'" y="'+gn.y.toFixed(1)+'" width="'+nodeW+'" height="'+gn.h.toFixed(1)+'" fill="'+gn.g.col+'"/>';
-    out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2-2).toFixed(1)+'" font-size="12" font-weight="800" fill="'+gn.g.col+'" '+halo+'>'+gn.g.label+'</text>';
+    out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2-2).toFixed(1)+'" font-size="12" font-weight="800" fill="'+gn.g.tx+'" '+halo+'>'+gn.g.label+'</text>';
     out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2+12).toFixed(1)+'" font-size="10.5" font-family="Share Tech Mono,monospace" fill="#b9c4cf" '+halo+'>'+cfMoney(gn.g.sum)+' ('+pct(gn.g.sum)+')</text>';
   });
   itemNodes.forEach(function(n){
@@ -8664,64 +8729,52 @@ function drawCashflowDiagram(){
   out+='</svg>';
   hosts.forEach(function(h){h.innerHTML=out;});
 }
-// ── Histogram: one coloured column per category ──
-function drawCashflowHistogram(m){
-  var host=document.getElementById('cf-histo');
-  if(!host)return;
-  m=m||cfModel();
-  var bars=[];
-  CF_GROUP_ORDER.forEach(function(g){
-    m.by[g].forEach(function(r){bars.push({name:r.name,amt:+r.amount,col:CF_GROUPS[g].col,g:g});});
-  });
-  if(m.overflow>0)bars.push({name:'Unassigned',amt:m.overflow,col:CF_GROUPS.growth.col,g:'growth',overflow:true});
-  if(m.shortfall>0)bars.push({name:'Shortfall',amt:m.shortfall,col:'#8a93a6',g:'short',overflow:true});
-  if(!(m.tIn>0&&bars.length)){host.innerHTML='<div class="cf-empty">Add income and at least one spending line to see your histogram</div>';return;}
-  var padL=58,padR=14,padT=26,plotH=190,padB=96;
-  var cw=host.clientWidth||760;
-  var slot=Math.max(64,Math.min(110,(cw-padL-padR)/bars.length)),bw=Math.round(slot*0.66),gap=slot-bw;
-  var W=Math.round(padL+padR+bars.length*slot),H=padT+plotH+padB;
-  var maxV=Math.max.apply(null,bars.map(function(b){return b.amt;}).concat([m.tIn*0.0001,1]));
-  var nice=Math.pow(10,Math.floor(Math.log(maxV)/Math.LN10));
-  var top=Math.ceil(maxV/nice)*nice; if(top/maxV>1.6)top=Math.ceil(maxV/(nice/2))*(nice/2);
-  var out='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" font-family="Syne,DM Sans,sans-serif" role="img" aria-label="Spending histogram">';
-  for(var t=0;t<=4;t++){
-    var v=top*t/4,yy=padT+plotH-(v/top)*plotH;
-    out+='<line x1="'+padL+'" x2="'+(W-padR)+'" y1="'+yy+'" y2="'+yy+'" stroke="rgba(255,255,255,'+(t?'.06':'.18')+')"/>';
-    out+='<text x="'+(padL-8)+'" y="'+(yy+3)+'" text-anchor="end" font-size="9.5" font-family="Share Tech Mono,monospace" fill="#6b7785">'+cfMoney(v)+'</text>';
-  }
-  bars.forEach(function(b,i){
-    var x=padL+gap/2+i*(bw+gap),h=Math.max(2,(b.amt/top)*plotH),y=padT+plotH-h;
-    out+='<g><title>'+cfEsc(b.name)+': '+cfMoney(b.amt)+'/mo ('+(b.amt/m.total*100).toFixed(1)+'% of income)</title>'
-      +'<rect x="'+x+'" y="'+y.toFixed(1)+'" width="'+bw+'" height="'+h.toFixed(1)+'" rx="3" fill="'+b.col+'" fill-opacity="'+(b.overflow?.35:.88)+'"'+(b.overflow?' stroke="'+b.col+'" stroke-dasharray="4 3"':'')+'/>'
-      +'<text x="'+(x+bw/2)+'" y="'+(y-6).toFixed(1)+'" text-anchor="middle" font-size="10" font-family="Share Tech Mono,monospace" fill="#cfd8e0">'+cfMoney(b.amt)+'</text>'
-      +'<text transform="translate('+(x+bw/2+4)+','+(padT+plotH+14)+') rotate(-38)" text-anchor="end" font-size="10.5" font-weight="700" fill="'+b.col+'">'+cfEsc(cfShort(b.name,18))+'</text></g>';
-  });
-  out+='</svg>';
-  host.innerHTML=out;
-}
 // ── Budget tab rendering ──
 function bdRowHTML(kind,r){
   var rate=window.VI_CURRENCY_RATE||1;
   if(_bdEdit&&_bdEdit.kind===kind&&_bdEdit.id===r.id){
-    var cats=(kind==='inc'?BD_INC_CATS:BD_EXP_CATS),cur=bdCatOf(kind,r);
     return '<div class="bd-edit">'
       +'<input id="bd-e-name" class="al-inp" value="'+cfEsc(r.name)+'" placeholder="Name">'
       +'<input id="bd-e-amt" class="al-inp" type="number" min="0" step="any" value="'+(Math.round(r.amount*rate*100)/100)+'">'
-      +'<select id="bd-e-cat" class="al-inp">'+cats.map(function(c){return '<option value="'+c.k+'"'+(c.k===cur?' selected':'')+'>'+cfEsc(c.n)+'</option>';}).join('')+'</select>'
-      +(kind==='exp'?'<select id="bd-e-grp" class="al-inp">'+CF_GROUP_ORDER.map(function(g){return '<option value="'+cfGroupToCat(g)+'"'+(cfGroup(r.category)===g?' selected':'')+'>'+CF_GROUPS[g].label+'</option>';}).join('')+'</select>':'')
       +'<span class="bd-edit-btns"><button class="btn-add-data" onclick="bdSaveEdit()">Save</button><button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="bdCancelEdit()">Cancel</button></span></div>';
   }
-  var c=bdFind(kind,bdCatOf(kind,r));
-  var g=kind==='exp'?cfGroup(r.category):null;
-  var col=kind==='exp'?CF_GROUPS[g].col:'#44c0b9';
-  var sub=(c.n!==r.name)?'<span class="bd-cat">'+cfEsc(c.n)+'</span>':'';
-  var bubble=kind==='exp'
-    ?'<button class="bd-ic" style="--c:'+col+'" title="'+CF_GROUPS[g].label+' — tap to change type" onclick="cycleExpenseGroup('+r.id+')">'+bdIcon(c.ic,18,col)+'</button>'
-    :'<span class="bd-ic" style="--c:'+col+'">'+bdIcon(c.ic,18,col)+'</span>';
-  return '<div class="bd-row">'+bubble+'<span class="bd-nm">'+cfEsc(r.name)+sub+'</span>'
+  var ck=bdCatOf(kind,r),t=kind==='exp'?cfType(r):null;
+  var col=kind==='exp'?CF_GROUPS[t].tx:'#44c0b9';
+  var fillc=kind==='exp'?CF_GROUPS[t].col:'#44c0b9';
+  var open=_bdIconFor&&_bdIconFor.kind===kind&&_bdIconFor.id===r.id;
+  var h='<div class="bd-row">'
+    +'<button class="bd-ic" style="--c:'+fillc+'" title="Change icon" onclick="bdIconOpen(\''+kind+'\','+r.id+')">'+bdIcon(bdIconKey(kind,r),18,col)+'</button>'
+    +'<span class="bd-nm">'+cfEsc(r.name)+'</span>'
     +'<span class="bd-amt" style="color:'+col+'">'+cfMoney(r.amount)+'<em>/mo</em></span>'
-    +'<button class="cf-edit" title="Edit" onclick="bdEdit(\''+kind+'\','+r.id+')">✎</button>'
-    +'<button class="data-item-del" onclick="'+(kind==='exp'?'delExpense':'delIncome')+'('+r.id+')">✕</button></div>';
+    +'<button class="cf-edit" title="Edit name / amount" onclick="bdEdit(\''+kind+'\','+r.id+')">✎</button>'
+    +'<button class="data-item-del" onclick="'+(kind==='exp'?'delExpense':'delIncome')+'('+r.id+')">✕</button>'
+    +'<div class="bd-sel"><select class="bd-s" title="Category" onchange="bdSetCat(\''+kind+'\','+r.id+',this.value)">'
+    +bdCats(kind).map(function(c){return '<option value="'+c.k+'"'+(c.k===ck?' selected':'')+'>'+cfEsc(c.n)+'</option>';}).join('')+'</select>'
+    +(kind==='exp'?'<select class="bd-s bd-type" style="--c:'+col+'" title="Spending type" onchange="bdSetType('+r.id+',this.value)">'+bdTypeOptions(t)+'</select>':'')
+    +'</div>';
+  if(open){
+    h+='<div class="bd-iconpick"><div class="bd-icons">'+BD_PICK_ICONS.map(function(k){return '<button type="button" class="bd-ibtn'+(bdIconKey(kind,r)===k?' on':'')+'" onclick="bdIconSet(\''+kind+'\','+r.id+',\''+k+'\')">'+bdIcon(k,20,bdIconKey(kind,r)===k?'#64b5f6':'#8fb4b1')+'</button>';}).join('')+'</div>'
+      +'<button class="btn-add-data" style="margin-top:6px;background:transparent;border-color:var(--t3);color:var(--t3)" onclick="bdIconSet(\''+kind+'\','+r.id+',null)">Use the category’s icon</button></div>';
+  }
+  return h+'</div>';
+}
+function bdItem(kind,id){return ((kind==='exp'?ovState.expenses:ovState.income)||[]).find(function(x){return x.id===id;});}
+function bdSetCat(kind,id,key){
+  var r=bdItem(kind,id);if(!r)return;
+  r.cat=key;delete r.icon;
+  if(kind==='exp'&&!r.typeLocked){var t=bdFind('exp',key).t||'ve';r.type=t;r.category=cfGroupToCat(t);}
+  saveState();renderCashflow();updateKPIs();
+}
+function bdSetType(id,t){
+  var r=bdItem('exp',id);if(!r||!CF_GROUPS[t])return;
+  r.type=t;r.category=cfGroupToCat(t);r.typeLocked=true;
+  saveState();renderCashflow();updateKPIs();
+}
+function bdIconOpen(kind,id){_bdIconFor=(_bdIconFor&&_bdIconFor.kind===kind&&_bdIconFor.id===id)?null:{kind:kind,id:id};bdRenderLists();}
+function bdIconSet(kind,id,key){
+  var r=bdItem(kind,id);if(!r)return;
+  if(key)r.icon=key;else delete r.icon;
+  _bdIconFor=null;saveState();bdRenderLists();
 }
 function bdRenderLists(){
   var m=cfModel();
@@ -8731,10 +8784,10 @@ function bdRenderLists(){
   if(!el)return;
   var exp=(ovState.expenses||[]),html='';
   CF_GROUP_ORDER.forEach(function(g){
-    var items=exp.filter(function(r){return cfGroup(r.category)===g;}).sort(function(a,b){return (+b.amount||0)-(+a.amount||0);});
+    var items=exp.filter(function(r){return cfType(r)===g;}).sort(function(a,b){return (+b.amount||0)-(+a.amount||0);});
     if(!items.length)return;
     var sum=cfSum(items);
-    html+='<div class="bd-grp" style="--c:'+CF_GROUPS[g].col+'"><span>'+CF_GROUPS[g].label+'</span><span>'+cfMoney(sum)+(m.tIn>0?' · '+Math.round(sum/m.tIn*100)+'%':'')+'</span></div>'+items.map(function(r){return bdRowHTML('exp',r);}).join('');
+    html+='<div class="bd-grp" style="--c:'+CF_GROUPS[g].col+';--t:'+CF_GROUPS[g].tx+'"><span>'+CF_GROUPS[g].label+'<em>'+CF_GROUPS[g].ex+'</em></span><span>'+cfMoney(sum)+(m.tIn>0?' · '+Math.round(sum/m.tIn*100)+'%':'')+'</span></div>'+items.map(function(r){return bdRowHTML('exp',r);}).join('');
   });
   el.innerHTML=html||'<div class="bd-empty">Nothing assigned yet — every pound of income needs a job.</div>';
 }
@@ -8742,23 +8795,13 @@ function bdEdit(kind,id){_bdEdit={kind:kind,id:id};bdRenderLists();}
 function bdCancelEdit(){_bdEdit=null;bdRenderLists();}
 function bdSaveEdit(){
   if(!_bdEdit)return;
-  var list=_bdEdit.kind==='exp'?ovState.expenses:ovState.income;
-  var r=(list||[]).find(function(x){return x.id===_bdEdit.id;});
+  var r=bdItem(_bdEdit.kind,_bdEdit.id);
   if(!r){_bdEdit=null;return;}
   var rate=window.VI_CURRENCY_RATE||1;
   var n=(document.getElementById('bd-e-name')||{}).value||'',a=parseFloat((document.getElementById('bd-e-amt')||{}).value);
   if(!n.trim()||!(a>=0)){showToast('Enter a name and amount');return;}
-  r.name=n.trim();r.amount=a/rate;r.cat=(document.getElementById('bd-e-cat')||{}).value||r.cat;
-  var g=document.getElementById('bd-e-grp');if(g)r.category=g.value;
+  r.name=n.trim();r.amount=a/rate;
   _bdEdit=null;saveState();renderCashflow();updateKPIs();
-}
-function cycleExpenseGroup(id){
-  var r=(ovState.expenses||[]).find(function(x){return x.id===id;});
-  if(!r)return;
-  var next=CF_GROUP_ORDER[(CF_GROUP_ORDER.indexOf(cfGroup(r.category))+1)%CF_GROUP_ORDER.length];
-  r.category=cfGroupToCat(next);
-  saveState();renderCashflow();updateKPIs();
-  showToast(r.name+' → '+CF_GROUPS[next].label);
 }
 // ── Zero-based budget: income − every pound assigned = 0 ──
 function bdLeft(){var m=cfModel();return m.tIn-(m.spend+m.growth);}
@@ -8771,31 +8814,30 @@ function bdRenderZero(){
   var el=document.getElementById('bd-zero');if(!el)return;
   var s=bdState(),m=s.m;
   var denom=Math.max(m.tIn,s.assigned,1);
-  var seg=function(v,c){return '<div style="width:'+(v/denom*100).toFixed(2)+'%;background:'+c+'"></div>';};
   var col=s.st==='zero'?'#3ecf8e':s.st==='under'?'#e8a23c':s.st==='over'?'#e05c5c':'#7d8793';
   var big=s.st==='none'?'Add your income':s.st==='zero'?'Every pound accounted for ✓':cfMoney(Math.abs(s.left))+(s.st==='under'?' left to assign':' over-assigned');
   var msg=s.st==='none'?'Start with what comes in each month — then give every pound a job.'
     :s.st==='zero'?'Income − spending − saving = £0. That’s a zero-based budget. Nothing is left to chance.'
     :s.st==='under'?'Zero-based budgeting means every pound has a job — spending, saving or investing. Assign the rest below.'
-    :'You’ve planned to use more than you earn. Trim an optional line or lower a saving until it reaches £0.';
+    :'You’ve planned to use more than you earn. Trim a non-essential line or lower a saving until it reaches £0.';
   var rem='';
   if(s.st==='under'){
     var opts=['emergency','savings','invest','deposit'];
-    rem='<div class="bd-assign"><span>Give it a job:</span>'+opts.map(function(k){var c=bdFind('exp',k);return '<button class="bd-chip on" style="--c:#3ecf8e" onclick="bdAssignRemainder(\''+k+'\')">'+bdIcon(c.ic,16,'#3ecf8e')+'<span>→ '+cfEsc(c.n)+'</span></button>';}).join('')
+    rem='<div class="bd-assign"><span>Give it a job:</span>'+opts.map(function(k){var c=bdFind('exp',k),tc=CF_GROUPS[c.t].tx;return '<button class="bd-chip on" style="--c:'+tc+'" onclick="bdAssignRemainder(\''+k+'\')">'+bdIcon(c.ic,16,tc)+'<span>→ '+cfEsc(c.n)+'</span></button>';}).join('')
       +'<button class="bd-chip" style="--c:#8fb4b1" onclick="bdFocusAdd()"><span>Choose another…</span></button></div>';
   }
+  var segs=CF_GROUP_ORDER.map(function(t){var v=cfSum(m.by[t]);return v>0?'<div title="'+CF_GROUPS[t].short+' '+cfMoney(v)+'" style="width:'+(v/denom*100).toFixed(2)+'%;background:'+CF_GROUPS[t].col+'"></div>':'';}).join('');
   el.innerHTML='<div class="bd-zero-top"><div><div class="bd-big" style="color:'+col+'">'+big+'</div><div class="bd-msg">'+msg+'</div></div>'
     +'<div class="bd-stats"><div><label>Income</label><b>'+cfMoney(m.tIn)+'</b></div><div><label>Assigned</label><b>'+cfMoney(s.assigned)+'</b></div><div><label>Left</label><b style="color:'+col+'">'+(s.left<0?'−':'')+cfMoney(Math.abs(s.left))+'</b></div></div></div>'
-    +'<div class="bd-bar" title="Committed · Optional · Saved & invested">'+seg(cfSum(m.by.committed),CF_GROUPS.committed.col)+seg(cfSum(m.by.optional),CF_GROUPS.optional.col)+seg(m.growth,CF_GROUPS.growth.col)
-    +(s.st==='under'?'<div class="bd-rest" style="width:'+(s.left/denom*100).toFixed(2)+'%"></div>':'')+'</div>'+rem;
+    +'<div class="bd-bar">'+segs+(s.st==='under'?'<div class="bd-rest" style="width:'+(s.left/denom*100).toFixed(2)+'%"></div>':'')+'</div>'+rem;
 }
 function bdAssignRemainder(catKey){
   var left=Math.round(bdLeft()*100)/100;
   if(!(left>0)){return;}
   var c=bdFind('exp',catKey);
-  var ex=(ovState.expenses||[]).find(function(e){return bdCatOf('exp',e)===catKey&&cfGroup(e.category)===cfGroup(c.g);});
+  var ex=(ovState.expenses||[]).find(function(e){return bdCatOf('exp',e)===catKey&&cfType(e)===c.t;});
   if(ex)ex.amount=(+ex.amount||0)+left;
-  else{if(!ovState.expenses)ovState.expenses=[];ovState.expenses.push({id:Date.now(),name:c.n,amount:left,category:c.g,cat:catKey});}
+  else{if(!ovState.expenses)ovState.expenses=[];ovState.expenses.push({id:Date.now(),name:c.n,amount:left,category:cfGroupToCat(c.t),type:c.t,cat:catKey});}
   saveState();renderCashflow();updateKPIs();
   showToast(cfMoney(left)+' assigned to '+c.n+' ✓ — zero-based!');
 }
@@ -8810,29 +8852,17 @@ function bdUpdateBadge(){
   b.title=show?(s.st==='under'?cfMoney(s.left)+' still unassigned':'Over-assigned by '+cfMoney(-s.left)):'';
   b.style.background=s.st==='over'?'#e05c5c':'#e8a23c';
 }
+function cfLegendHTML(){
+  return CF_GROUP_ORDER.map(function(t){return '<span title="'+cfEsc(CF_GROUPS[t].ex)+'"><i style="background:'+CF_GROUPS[t].col+'"></i>'+CF_GROUPS[t].short+'</span>';}).join('');
+}
 function bdRender(){
-  bdRenderZero();bdRenderLists();bdRenderPickers();
+  bdRenderZero();bdRenderLists();bdRenderPickers();bdRenderNew();renderCashflowCategories();
   var nd=document.getElementById('bd-nudge');
   if(nd){
     var exp=ovState.expenses||[];
     var lump=exp.length===1&&(exp[0]._onboarding||/^monthly expenses$/i.test(exp[0].name||''));
     nd.innerHTML=lump?'<div class="cf-nudge"><b>One lump-sum so far.</b> Break “'+cfEsc(exp[0].name)+'” down by category below, then remove the lump sum.</div>':'';
   }
-}
-// Cash Flow tab: KPI strip + income-flow diagram + spending mix
-function cfTabRender(){
-  var m=cfModel(),s=bdState();
-  var rate=m.tIn>0?Math.max(-999,Math.round((m.surplus/m.tIn)*100)):0;
-  var mono='font-family:\'Share Tech Mono\',monospace;font-size:.65rem;';
-  var sum=document.getElementById('cf2-summary');
-  if(sum)sum.innerHTML=
-    '<span style="'+mono+'color:var(--gr)">In: '+cfMoney(m.tIn)+'/mo</span>'+
-    '<span style="'+mono+'color:var(--re)">Spend: '+cfMoney(m.spend)+'/mo</span>'+
-    '<span style="'+mono+'color:#3ecf8e">Saved: '+cfMoney(m.growth)+'/mo</span>'+
-    '<span style="'+mono+'color:'+(m.surplus>=0?'var(--em)':'var(--re)')+'">Surplus: '+cfMoney(m.surplus)+'/mo</span>'+
-    '<span style="'+mono+'color:var(--go)">Save rate: '+rate+'%</span>'+
-    (s.st==='under'?'<span style="'+mono+'color:#e8a23c">Unassigned: '+cfMoney(s.left)+'</span>':'');
-  renderCashflowCategories();
 }
 function renderCashflow(){
   var m=cfModel(),s=bdState();
@@ -8845,41 +8875,40 @@ function renderCashflow(){
     '<span style="'+mono+'color:var(--re)">Spend: '+gbpFmt(tOut)+'/mo</span>'+
     '<span style="'+mono+'color:'+(surplus>=0?'var(--em)':'var(--re)')+'">Surplus: '+gbpFmt(surplus)+'/mo</span>'+
     '<span style="'+mono+'color:var(--go)">Save rate: '+rate+'%</span>';
-  // overview nudge: unassigned pounds → Budget tab
+  ['cf-legend','bd-legend'].forEach(function(id){var e=document.getElementById(id);if(e)e.innerHTML=cfLegendHTML();});
+  // dashboard nudge: unassigned pounds → Budget tab
   var nd=document.getElementById('cf-nudge');
   if(nd){
     nd.innerHTML=(s.st==='under'||s.st==='over')
       ?'<div class="cf-nudge">'+(s.st==='under'?'<b>'+cfMoney(s.left)+' of your monthly income has no job yet.</b> Zero-based budgeting gives every pound a purpose.':'<b>You’ve assigned '+cfMoney(-s.left)+' more than you earn.</b>')+' <a href="#" onclick="showTab(\'budget\');return false">Open Budget →</a></div>'
       :(s.st==='zero'?'<div class="cf-nudge" style="background:rgba(62,207,142,.07);border-color:rgba(62,207,142,.3)"><b style="color:#3ecf8e">Every pound accounted for ✓</b> — your zero-based budget is balanced.</div>':'');
   }
-  setTimeout(function(){drawCashflowDiagram();drawCashflowHistogram(m);},50);
+  setTimeout(drawCashflowDiagram,50);
   if(document.getElementById('bd-zero'))bdRender();
-  if(document.getElementById('cf2-summary'))cfTabRender();
   bdUpdateBadge();
 }
-
 function renderCashflowCategories(){
   var el=document.getElementById('cf-categories');
   if(!el)return;
   var m=cfModel();
   if(m.total<=0){el.innerHTML='<div style="font-size:.58rem;color:var(--t3)">Add income and spending to see how your money splits.</div>';return;}
-  var totals={committed:cfSum(m.by.committed),optional:cfSum(m.by.optional),growth:m.growth};
-  var guide={committed:'aim ≤ 50%',optional:'aim ≤ 30%',growth:'aim ≥ 20%'};
-  var target={committed:50,optional:30,growth:20};
-  el.innerHTML=CF_GROUP_ORDER.map(function(g){
-    var pct=Math.round(totals[g]/m.total*100);
-    var bad=g==='growth'?pct<target[g]:pct>target[g];
-    var c=CF_GROUPS[g].col;
-    return '<div style="margin-bottom:11px">'
-      +'<div style="display:flex;justify-content:space-between;gap:8px;font-size:.58rem;margin-bottom:4px">'
-      +'<span style="color:'+c+';font-weight:700">'+CF_GROUPS[g].label+' <span style="color:var(--t3);font-weight:400">· '+guide[g]+'</span></span>'
-      +'<span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(totals[g])+'/mo &nbsp;<b style="color:'+(bad?'#e8a23c':c)+'">'+pct+'%</b></span></div>'
-      +'<div style="position:relative;height:6px;background:rgba(255,255,255,.06);border-radius:3px">'
-      +'<div style="height:100%;width:'+Math.min(100,pct)+'%;background:'+c+';border-radius:3px;transition:width .4s ease"></div>'
-      +'<div title="Guide: '+target[g]+'%" style="position:absolute;top:-3px;bottom:-3px;left:'+target[g]+'%;width:2px;background:rgba(255,255,255,.35)"></div>'
-      +'</div></div>';
+  var bands=[
+    {label:'Essentials',  types:['ce','ve'],guide:'aim ≤ 50%',target:50,under:false},
+    {label:'Non-essentials',types:['cn','vn'],guide:'aim ≤ 30%',target:30,under:false},
+    {label:'Saving & investing',types:['sv','iv'],guide:'aim ≥ 20%',target:20,under:true}
+  ];
+  el.innerHTML=bands.map(function(b){
+    var sum=b.types.reduce(function(a,t){return a+cfSum(m.by[t]);},0),pct=Math.round(sum/m.total*100);
+    var bad=b.under?pct<b.target:pct>b.target;
+    var segs=b.types.map(function(t){var v=cfSum(m.by[t]);return v>0?'<div title="'+CF_GROUPS[t].short+' '+cfMoney(v)+'" style="width:'+Math.min(100,v/m.total*100).toFixed(2)+'%;background:'+CF_GROUPS[t].col+'"></div>':'';}).join('');
+    return '<div style="margin-bottom:12px">'
+      +'<div style="display:flex;justify-content:space-between;gap:8px;font-size:.58rem;margin-bottom:4px"><span style="color:var(--tx);font-weight:700">'+b.label+' <span style="color:var(--t3);font-weight:400">· '+b.guide+'</span></span>'
+      +'<span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(sum)+'/mo &nbsp;<b style="color:'+(bad?'#e8a23c':'var(--tx)')+'">'+pct+'%</b></span></div>'
+      +'<div style="position:relative;display:flex;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:visible">'
+      +'<div style="display:flex;width:100%;border-radius:4px;overflow:hidden">'+segs+'</div>'
+      +'<div title="Guide: '+b.target+'%" style="position:absolute;top:-3px;bottom:-3px;left:'+b.target+'%;width:2px;background:rgba(255,255,255,.4)"></div></div></div>';
   }).join('')
-  +(m.overflow>0.5?'<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;gap:8px;font-size:.58rem;margin-bottom:4px"><span style="color:#e8a23c;font-weight:700">Unassigned <span style="color:var(--t3);font-weight:400">· give every pound a job</span></span><span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(m.overflow)+'/mo &nbsp;<b style="color:#e8a23c">'+Math.round(m.overflow/m.total*100)+'%</b></span></div><div style="height:6px;border-radius:3px;background:rgba(255,255,255,.06)"><div style="height:100%;width:'+Math.min(100,m.overflow/m.total*100)+'%;border-radius:3px" class="bd-rest"></div></div></div>':'')
+  +(m.overflow>0.5?'<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;gap:8px;font-size:.58rem;margin-bottom:4px"><span style="color:#e8a23c;font-weight:700">Unassigned <span style="color:var(--t3);font-weight:400">· give every pound a job</span></span><span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(m.overflow)+'/mo &nbsp;<b style="color:#e8a23c">'+Math.round(m.overflow/m.total*100)+'%</b></span></div><div style="height:8px;border-radius:4px;background:rgba(255,255,255,.06)"><div style="height:100%;width:'+Math.min(100,m.overflow/m.total*100)+'%;border-radius:4px" class="bd-rest"></div></div></div>':'')
   +(m.shortfall>0?'<div style="font-size:.55rem;color:#e05c5c;margin-top:4px">⚠ You are planning to spend '+gbpFmt(m.shortfall)+'/mo more than you earn.</div>':'');
 }
 
@@ -14290,23 +14319,23 @@ function loadDemoData() {
         { id: 2, name: 'Side Projects', amount: 350,  cat: 'business' }
       ],
       expenses: [
-        { id: 3, name: 'Rent', amount: 1200, category: 'necessity', cat: 'housing' },
-        { id: 4, name: 'Groceries', amount: 380, category: 'necessity', cat: 'groceries' },
-        { id: 5, name: 'Transport', amount: 130, category: 'necessity', cat: 'transport' },
-        { id: 6, name: 'Utilities & bills', amount: 165, category: 'necessity', cat: 'utilities' },
-        { id: 7, name: 'Phone & internet', amount: 45, category: 'necessity', cat: 'phone' },
-        { id: 8, name: 'Insurance', amount: 60, category: 'necessity', cat: 'insurance' },
-        { id: 9, name: 'Subscriptions', amount: 62, category: 'discretionary', cat: 'subs' },
-        { id: 10, name: 'Gym & health', amount: 45, category: 'discretionary', cat: 'fitness' },
-        { id: 11, name: 'Eating out', amount: 95, category: 'discretionary', cat: 'dining' },
-        { id: 12, name: 'Entertainment', amount: 80, category: 'discretionary', cat: 'fun' },
-        { id: 13, name: 'Holidays', amount: 200, category: 'discretionary', cat: 'travel' },
-        { id: 14, name: 'Gifts & giving', amount: 100, category: 'discretionary', cat: 'gifts' },
-        { id: 15, name: 'House deposit', amount: 258, category: 'investment', cat: 'deposit' },
-        { id: 16, name: 'ISA / investments', amount: 400, category: 'investment', cat: 'invest' },
-        { id: 17, name: 'Pension', amount: 190, category: 'investment', cat: 'pension' },
-        { id: 18, name: 'Emergency fund', amount: 300, category: 'investment', cat: 'emergency' },
-        { id: 19, name: 'Savings', amount: 440, category: 'investment', cat: 'savings' }
+        { id: 3, name: 'Rent', amount: 1200, category: 'necessity', cat: 'housing', type: 'ce' },
+        { id: 4, name: 'Groceries', amount: 380, category: 'necessity', cat: 'groceries', type: 've' },
+        { id: 5, name: 'Transport', amount: 130, category: 'necessity', cat: 'transport', type: 've' },
+        { id: 6, name: 'Utilities & bills', amount: 165, category: 'necessity', cat: 'utilities', type: 've' },
+        { id: 7, name: 'Phone & internet', amount: 45, category: 'necessity', cat: 'phone', type: 'ce' },
+        { id: 8, name: 'Insurance', amount: 60, category: 'necessity', cat: 'insurance', type: 'ce' },
+        { id: 9, name: 'Subscriptions', amount: 62, category: 'discretionary', cat: 'subs', type: 'cn' },
+        { id: 10, name: 'Gym & health', amount: 45, category: 'discretionary', cat: 'fitness', type: 'cn' },
+        { id: 11, name: 'Eating out', amount: 95, category: 'discretionary', cat: 'dining', type: 'vn' },
+        { id: 12, name: 'Entertainment', amount: 80, category: 'discretionary', cat: 'fun', type: 'vn' },
+        { id: 13, name: 'Holidays', amount: 200, category: 'discretionary', cat: 'travel', type: 'vn' },
+        { id: 14, name: 'Gifts & giving', amount: 100, category: 'discretionary', cat: 'gifts', type: 'vn' },
+        { id: 15, name: 'House deposit', amount: 258, category: 'investment', cat: 'deposit', type: 'sv' },
+        { id: 16, name: 'ISA / investments', amount: 400, category: 'investment', cat: 'invest', type: 'iv' },
+        { id: 17, name: 'Pension', amount: 190, category: 'investment', cat: 'pension', type: 'iv' },
+        { id: 18, name: 'Emergency fund', amount: 300, category: 'investment', cat: 'emergency', type: 'sv' },
+        { id: 19, name: 'Savings', amount: 440, category: 'investment', cat: 'savings', type: 'sv' }
       ]
     }));
   }
