@@ -2692,14 +2692,17 @@ button.bd-ic{cursor:pointer}
 .bd-edit select{grid-column:span 1}
 .bd-edit-btns{grid-column:1/-1;display:flex;gap:6px}
 #cf-income-list,#cf-expense-list{max-height:none;overflow:visible}
-/* Dashboard summary cards: Assets · Liabilities · Debt always sit in ONE row (tablet + desktop) */
-#ov-summary-row{align-items:stretch}
-@media (min-width:600px){#ov-summary-row{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
-@media (max-width:599px){#ov-summary-row{grid-template-columns:1fr!important}}
-#ov-summary-row .ov-chart-card{min-width:0}
-.tab-btn[onclick*="cashflow"].active{color:#b794f4!important;border-bottom-color:#b794f4!important;text-shadow:0 0 12px rgba(183,148,244,.5)}
-.tab-btn[onclick*="cashflow"]::before{background:#b794f4}
-.tab-btn[onclick*="cashflow"]{--ta:#b794f4}
+/* Dashboard summary cards: Assets · Liabilities · Debt stay in ONE row on tablets + desktop, condensed to fit the screen */
+#ov-summary-row{align-items:stretch;gap:clamp(6px,1.4vw,12px)}
+@media (min-width:520px){#ov-summary-row{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media (max-width:519px){#ov-summary-row{grid-template-columns:1fr!important}}
+#ov-summary-row .ov-chart-card{min-width:0;overflow:hidden}
+#ov-summary-row .ov-chart-title{overflow-wrap:anywhere}
+@media (max-width:900px) and (min-width:520px){
+  #ov-summary-row .ov-chart-card{padding:12px 10px}
+  #ov-summary-row .ov-chart-title{font-size:.6rem;letter-spacing:.08em}
+  #ov-summary-row [id$="-next"]{font-size:.48rem!important;line-height:1.45}
+}
 </style>
 </head>
 <body>
@@ -3652,8 +3655,7 @@ button.bd-ic{cursor:pointer}
         <span><i style="background:#e8a23c"></i>Optional <em>regular, flexible</em></span>
         <span><i style="background:#3ecf8e"></i>Saved &amp; invested <em>incl. unassigned</em></span>
       </div>
-      <div class="cf-sub">WHERE EVERY POUND GOES &mdash; PER MONTH</div>
-      <div id="cf-histo" class="cf-scroll"></div>
+      <div id="cf-sankey" class="cf-scroll"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
         <span style="font-size:.5rem;color:var(--t3);line-height:1.5">Plan it in <b style="color:#64b5f6">Budget</b> · follow it through in <b style="color:#b794f4">Cash Flow</b>.</span>
         <span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn-add-data" onclick="showTab('cashflow')">Cash Flow →</button><button class="btn-add-data" onclick="showTab('budget')">Open Budget →</button></span>
@@ -3699,7 +3701,9 @@ button.bd-ic{cursor:pointer}
         <span><i style="background:#e8a23c"></i>Optional <em>regular, flexible</em></span>
         <span><i style="background:#3ecf8e"></i>Saved &amp; invested <em>building wealth</em></span>
       </div>
-      <div id="cf-sankey" class="cf-scroll"></div>
+      <div id="cf2-sankey" class="cf-scroll"></div>
+      <div class="cf-sub">EVERY CATEGORY, SIDE BY SIDE &mdash; PER MONTH</div>
+      <div id="cf-histo" class="cf-scroll"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
         <span style="font-size:.5rem;color:var(--t3);line-height:1.5">Change any of this in your <b style="color:#64b5f6">Budget</b>.</span>
         <button class="btn-add-data" onclick="showTab('budget')">Open Budget →</button>
@@ -3753,7 +3757,10 @@ button.bd-ic{cursor:pointer}
         <div style="font-size:.46rem;color:var(--t3);margin-top:6px;line-height:1.5">Tap a line’s icon to switch it between <b style="color:#e05c5c">committed</b>, <b style="color:#e8a23c">optional</b> and <b style="color:#3ecf8e">saved</b>; ✎ edits its amount or category.</div>
       </div>
     </div>
-    <div style="margin-top:14px;font-size:.52rem;color:var(--t3);text-align:center;line-height:1.6">See where it all goes in the <a href="#" onclick="showTab('cashflow');return false" style="color:#b794f4">Cash Flow</a> tab.</div>
+    <div class="ov-chart-card" style="margin-top:14px">
+      <div class="ov-chart-hd" style="flex-wrap:wrap;gap:10px"><span class="ov-chart-title">Where your income flows</span><a href="#" onclick="showTab('cashflow');return false" style="font-size:.5rem;color:#b794f4;font-family:'Share Tech Mono',monospace">Full Cash Flow →</a></div>
+      <div id="bd-sankey" class="cf-scroll"></div>
+    </div>
   </div>
 </div><!-- /tab-budget -->
 
@@ -8569,10 +8576,10 @@ function cfModel(){
 }
 // ── Sankey: income sources → Income → Committed / Optional / Saved → each category ──
 function drawCashflowDiagram(){
-  var host=document.getElementById('cf-sankey');
-  if(!host)return;
+  var hosts=['cf-sankey','bd-sankey','cf2-sankey'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  if(!hosts.length)return;
   var m=cfModel();
-  if(m.total<=0){host.innerHTML='<div class="cf-empty">Add your income and spending to see where every pound goes</div>';return;}
+  if(m.total<=0){hosts.forEach(function(h){h.innerHTML='<div class="cf-empty">Add your income and spending to see where every pound goes</div>';});return;}
   var T=m.total;
   // sources (+ shortfall when spending exceeds income)
   var sources=m.inc.map(function(r){return{name:r.name,amt:+r.amount,col:'#44c0b9'};});
@@ -8609,7 +8616,7 @@ function drawCashflowDiagram(){
   var srcTotal=sources.reduce(function(a,s){return a+Math.max(s.amt*k,MINSLOT);},0)+(sources.length-1)*gapSrc;
   var srcY=Math.max(padT,cy-srcTotal/2);
   var H=Math.max(itemsBottom,incY+incH,srcY+srcTotal)+padB;
-  var out='<svg viewBox="0 0 '+W+' '+H.toFixed(0)+'" width="100%" style="min-width:760px" font-family="Syne,DM Sans,sans-serif" role="img" aria-label="Cash flow diagram">';
+  var out='<svg viewBox="0 0 '+W+' '+H.toFixed(0)+'" width="100%" style="min-width:640px" font-family="Syne,DM Sans,sans-serif" role="img" aria-label="Cash flow diagram">';
   // -- links
   var sy=srcY,io=0;
   sources.forEach(function(s){
@@ -8655,7 +8662,7 @@ function drawCashflowDiagram(){
     out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2+11).toFixed(1)+'" font-size="10" font-family="Share Tech Mono,monospace" fill="#8f9bab" '+halo+'>'+cfMoney(n.it.amt)+' ('+pct(n.it.amt)+')</text>';
   });
   out+='</svg>';
-  host.innerHTML=out;
+  hosts.forEach(function(h){h.innerHTML=out;});
 }
 // ── Histogram: one coloured column per category ──
 function drawCashflowHistogram(m){
@@ -8826,7 +8833,6 @@ function cfTabRender(){
     '<span style="'+mono+'color:var(--go)">Save rate: '+rate+'%</span>'+
     (s.st==='under'?'<span style="'+mono+'color:#e8a23c">Unassigned: '+cfMoney(s.left)+'</span>':'');
   renderCashflowCategories();
-  drawCashflowDiagram();
 }
 function renderCashflow(){
   var m=cfModel(),s=bdState();
@@ -8846,7 +8852,7 @@ function renderCashflow(){
       ?'<div class="cf-nudge">'+(s.st==='under'?'<b>'+cfMoney(s.left)+' of your monthly income has no job yet.</b> Zero-based budgeting gives every pound a purpose.':'<b>You’ve assigned '+cfMoney(-s.left)+' more than you earn.</b>')+' <a href="#" onclick="showTab(\'budget\');return false">Open Budget →</a></div>'
       :(s.st==='zero'?'<div class="cf-nudge" style="background:rgba(62,207,142,.07);border-color:rgba(62,207,142,.3)"><b style="color:#3ecf8e">Every pound accounted for ✓</b> — your zero-based budget is balanced.</div>':'');
   }
-  setTimeout(function(){drawCashflowHistogram(m);},50);
+  setTimeout(function(){drawCashflowDiagram();drawCashflowHistogram(m);},50);
   if(document.getElementById('bd-zero'))bdRender();
   if(document.getElementById('cf2-summary'))cfTabRender();
   bdUpdateBadge();
@@ -14982,7 +14988,7 @@ function nwhRenderMini(){
   <!-- Centre dot -->
   <circle cx="7.0" cy="7.0" r="0.4" fill="#44c0b9" opacity="0.4"/>
 </svg></div> PT Live Design</span>
-  <span class="footer-version">Vault·It v0.9.2 Alpha · Updated 2 Jun 2026</span>
+  <span class="footer-version">Vault·It v0.9.2 Alpha · build flow-dash-1</span>
 </div>
 
 <!-- ══ ALPHA ACCESS MODAL ══ -->
