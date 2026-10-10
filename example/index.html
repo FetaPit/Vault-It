@@ -68,23 +68,27 @@
     snapshots: snaps,
     milestones: [10000, 0, 25000, 50000, 100000],
     income: [
-      { id: 1, name: 'Salary',        amount: 3800 },
-      { id: 2, name: 'Side Projects', amount: 350  }
+      { id: 1, name: 'Salary',        amount: 3800, cat: 'salary'   },
+      { id: 2, name: 'Side Projects', amount: 350,  cat: 'business' }
     ],
     expenses: [
-      { id: 3,  name: 'Rent',              amount: 1200, category: 'necessity'     },
-      { id: 4,  name: 'Groceries',         amount: 380,  category: 'necessity'     },
-      { id: 5,  name: 'Transport',         amount: 130,  category: 'necessity'     },
-      { id: 6,  name: 'Utilities & bills', amount: 165,  category: 'necessity'     },
-      { id: 7,  name: 'Phone & internet',  amount: 45,   category: 'necessity'     },
-      { id: 8,  name: 'Insurance',         amount: 60,   category: 'necessity'     },
-      { id: 9,  name: 'Subscriptions',     amount: 62,   category: 'discretionary' },
-      { id: 10, name: 'Gym & health',      amount: 45,   category: 'discretionary' },
-      { id: 11, name: 'Eating out',        amount: 95,   category: 'discretionary' },
-      { id: 12, name: 'Entertainment',     amount: 80,   category: 'discretionary' },
-      { id: 13, name: 'House deposit',     amount: 258,  category: 'investment'    },
-      { id: 14, name: 'ISA / investments', amount: 400,  category: 'investment'    },
-      { id: 15, name: 'Pension',           amount: 190,  category: 'investment'    }
+      { id: 3, name: 'Rent', amount: 1200, category: 'necessity', cat: 'housing' },
+      { id: 4, name: 'Groceries', amount: 380, category: 'necessity', cat: 'groceries' },
+      { id: 5, name: 'Transport', amount: 130, category: 'necessity', cat: 'transport' },
+      { id: 6, name: 'Utilities & bills', amount: 165, category: 'necessity', cat: 'utilities' },
+      { id: 7, name: 'Phone & internet', amount: 45, category: 'necessity', cat: 'phone' },
+      { id: 8, name: 'Insurance', amount: 60, category: 'necessity', cat: 'insurance' },
+      { id: 9, name: 'Subscriptions', amount: 62, category: 'discretionary', cat: 'subs' },
+      { id: 10, name: 'Gym & health', amount: 45, category: 'discretionary', cat: 'fitness' },
+      { id: 11, name: 'Eating out', amount: 95, category: 'discretionary', cat: 'dining' },
+      { id: 12, name: 'Entertainment', amount: 80, category: 'discretionary', cat: 'fun' },
+      { id: 13, name: 'Holidays', amount: 200, category: 'discretionary', cat: 'travel' },
+      { id: 14, name: 'Gifts & giving', amount: 100, category: 'discretionary', cat: 'gifts' },
+      { id: 15, name: 'House deposit', amount: 258, category: 'investment', cat: 'deposit' },
+      { id: 16, name: 'ISA / investments', amount: 400, category: 'investment', cat: 'invest' },
+      { id: 17, name: 'Pension', amount: 190, category: 'investment', cat: 'pension' },
+      { id: 18, name: 'Emergency fund', amount: 300, category: 'investment', cat: 'emergency' },
+      { id: 19, name: 'Savings', amount: 440, category: 'investment', cat: 'savings' }
     ]
   }));
 

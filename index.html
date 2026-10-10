@@ -2658,6 +2658,40 @@ input:focus, textarea:focus, select:focus {
 .stk-bar .b{flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
 .stk-bar .b div{height:100%;border-radius:4px}
 .stk-bar .p{width:46px;text-align:right;font-family:'Share Tech Mono',monospace;color:var(--t2)}
+/* ── Budget tab ── */
+.tab-btn[onclick*="budget"].active{color:#64b5f6!important;border-bottom-color:#64b5f6!important;text-shadow:0 0 12px rgba(100,181,246,.55)}
+.tab-btn[onclick*="budget"]::before{background:#64b5f6}
+.tab-btn[onclick*="budget"]{--ta:#64b5f6}
+#budget-badge{display:none;width:7px;height:7px;border-radius:50%;background:#e8a23c;margin-left:5px;box-shadow:0 0 8px #e8a23c;vertical-align:middle}
+.bd-zero-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.bd-big{font-family:'Syne',sans-serif;font-size:clamp(1.3rem,3.2vw,2rem);font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.bd-msg{font-size:.58rem;color:var(--t2);margin-top:6px;max-width:520px;line-height:1.55}
+.bd-stats{display:flex;gap:18px}
+.bd-stats label{display:block;font-family:'Share Tech Mono',monospace;font-size:.42rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.bd-stats b{font-family:'Share Tech Mono',monospace;font-size:.85rem;font-weight:700;color:var(--tx)}
+.bd-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.06)}
+.bd-rest{background:repeating-linear-gradient(45deg,rgba(232,162,60,.55) 0 5px,rgba(232,162,60,.18) 5px 10px)}
+.bd-assign{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--t2)}
+.bd-picks{display:flex;flex-wrap:wrap;gap:6px}
+.bd-pick-lbl{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin:12px 0 6px}
+.bd-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 6px;border-radius:99px;cursor:pointer;background:transparent;border:1px solid color-mix(in srgb,var(--c) 40%,transparent);color:var(--t2);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;transition:background .15s,border-color .15s}
+.bd-chip:hover{background:color-mix(in srgb,var(--c) 14%,transparent)}
+.bd-chip.on{background:color-mix(in srgb,var(--c) 20%,transparent);border-color:var(--c);color:var(--tx)}
+.bd-row{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.bd-ic{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--c) 12%,transparent);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);padding:0}
+button.bd-ic{cursor:pointer}
+.bd-nm{flex:1;min-width:0;font-size:.66rem;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd-cat{display:block;font-size:.44rem;color:var(--t3)}
+.bd-amt{font-family:'Share Tech Mono',monospace;font-size:.66rem;font-weight:700;white-space:nowrap}
+.bd-amt em{font-style:normal;font-weight:400;color:var(--t3);font-size:.46rem;margin-left:2px}
+.bd-grp{display:flex;justify-content:space-between;margin:12px 0 2px;padding-left:8px;border-left:3px solid var(--c);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
+.bd-grp span:last-child{font-family:'Share Tech Mono',monospace;font-weight:400;color:var(--t2);letter-spacing:0}
+.bd-grp:first-child{margin-top:0}
+.bd-empty{font-size:.58rem;color:var(--t3);padding:10px 0;line-height:1.5}
+.bd-edit{display:grid;grid-template-columns:1fr 90px;gap:6px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.bd-edit select{grid-column:span 1}
+.bd-edit-btns{grid-column:1/-1;display:flex;gap:6px}
+#cf-income-list,#cf-expense-list{max-height:none;overflow:visible}
 </style>
 </head>
 <body>
@@ -3066,7 +3100,7 @@ input:focus, textarea:focus, select:focus {
           <input type="number" class="welcome-inp" id="w-income" placeholder="e.g. 2200" min="0">
         </div>
         <div class="welcome-field" style="margin:0">
-          <label>Monthly Expenses (<span class="w-currency-label">£</span>)</label>
+          <label>Rough Monthly Spending (<span class="w-currency-label">£</span>) <span style="opacity:.55;text-transform:none">· a guide — you’ll budget it line by line next</span></label>
           <input type="number" class="welcome-inp" id="w-expenses" placeholder="e.g. 1600" min="0">
         </div>
         <div class="welcome-field" style="margin:0">
@@ -3341,6 +3375,10 @@ input:focus, textarea:focus, select:focus {
   <button class="tab-btn active" onclick="showTab('overview')">
     <svg class="ti" viewBox="0 0 16 16"><rect x="1" y="1" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="1" width="5.5" height="5.5" rx="1"/><rect x="1" y="9.5" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1"/></svg>
     <span>Overview</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('budget')" style="position:relative">
+    <svg class="ti" viewBox="0 0 16 16"><rect x="1.5" y="3.5" width="13" height="9.5" rx="1.6"/><path d="M1.5 6.5h13"/><path d="M10.6 9.8h1.9"/></svg>
+    <span>Budget<i id="budget-badge"></i></span>
   </button>
   <button class="tab-btn" onclick="showTab('house')" style="position:relative;border-bottom:2px solid var(--go)!important" title="Vault·It's flagship feature">
     <svg class="ti" viewBox="0 0 16 16" style="color:var(--go)"><path d="M1.5 9L8 2.5 14.5 9V14.5H10V11H6v3.5H1.5V9z"/></svg>
@@ -3617,38 +3655,13 @@ input:focus, textarea:focus, select:focus {
       <div class="cf-legend">
         <span><i style="background:#e05c5c"></i>Committed <em>basics to live</em></span>
         <span><i style="background:#e8a23c"></i>Optional <em>regular, flexible</em></span>
-        <span><i style="background:#3ecf8e"></i>Saved &amp; invested <em>incl. overflow</em></span>
+        <span><i style="background:#3ecf8e"></i>Saved &amp; invested <em>incl. unassigned</em></span>
       </div>
-      <!-- Sankey flow diagram: income sources → income → committed / optional / saved → each category -->
-      <div id="cf-sankey" class="cf-scroll"></div>
       <div class="cf-sub">WHERE EVERY POUND GOES &mdash; PER MONTH</div>
       <div id="cf-histo" class="cf-scroll"></div>
-      <div class="g2" style="margin-top:14px">
-        <div>
-          <div class="ov-ms-title" style="color:var(--gr);margin-bottom:8px">Income</div>
-          <div id="cf-income-list" class="data-list"></div>
-          <div class="data-input-row" style="margin-top:8px">
-            <input type="text" id="cf-inc-name" placeholder="Source (e.g. Salary)">
-            <input type="number" id="cf-inc-amt" placeholder="£/mo">
-            <button class="btn-add-data" onclick="addIncome()">+</button>
-          </div>
-        </div>
-        <div>
-          <div class="ov-ms-title" style="color:var(--t2);margin-bottom:8px">Spending &amp; saving</div>
-          <div id="cf-expense-list" class="data-list"></div>
-          <div class="cf-presets" id="cf-presets"></div>
-          <div class="data-input-row" style="margin-top:8px">
-            <input type="text" id="cf-exp-name" placeholder="Category (e.g. Groceries)">
-            <input type="number" id="cf-exp-amt" placeholder="£/mo">
-            <select id="cf-exp-cat" class="al-inp" style="max-width:150px"><option value="necessity">Committed</option><option value="discretionary">Optional</option><option value="investment">Saved / invested</option></select>
-            <button class="btn-add-data" onclick="addExpense()">+</button>
-          </div>
-          <div style="font-size:.46rem;color:var(--t3);margin-top:6px;line-height:1.5">Tap a coloured dot to switch a line between <b style="color:#e05c5c">committed</b>, <b style="color:#e8a23c">optional</b> and <b style="color:#3ecf8e">saved</b>.</div>
-        </div>
-      </div>
-      <div style="border-top:1px solid var(--bd);margin-top:12px;padding-top:12px">
-        <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:10px;letter-spacing:.06em">SPENDING MIX vs INCOME</div>
-        <div id="cf-categories"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
+        <span style="font-size:.5rem;color:var(--t3);line-height:1.5">Plan this in your <b style="color:#64b5f6">Budget</b> — income, categories and the zero-based method live there.</span>
+        <button class="btn-add-data" onclick="showTab('budget')">Open Budget →</button>
       </div>
     </div>
   </div>
@@ -3675,6 +3688,59 @@ input:focus, textarea:focus, select:focus {
 
 </div>
 </div><!-- /tab-overview -->
+
+<!-- ═══════════════════════════ BUDGET (zero-based) ═══════════════════════════ -->
+<div id="tab-budget" class="tab-panel" style="display:none">
+  <div style="max-width:1040px;margin:0 auto;padding:24px 20px 60px">
+    <div style="margin-bottom:14px">
+      <div style="font-family:'Syne',sans-serif;font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:#64b5f6;opacity:.8;margin-bottom:6px">Vault·It · Budget</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:800;color:var(--tx);letter-spacing:-.01em">Give every pound a <span style="color:#64b5f6">job</span></h2>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--t3);letter-spacing:.08em;margin-top:4px">ZERO-BASED BUDGET &nbsp;·&nbsp; INCOME − SPENDING − SAVING = £0</div>
+    </div>
+    <div class="ov-chart-card" style="margin-bottom:14px"><div id="bd-zero"></div></div>
+    <div id="bd-nudge"></div>
+    <div class="cf-legend">
+      <span><i style="background:#e05c5c"></i>Committed <em>basics to live</em></span>
+      <span><i style="background:#e8a23c"></i>Optional <em>regular, flexible</em></span>
+      <span><i style="background:#3ecf8e"></i>Saved &amp; invested <em>building wealth</em></span>
+    </div>
+    <div class="g2" style="margin-top:8px;align-items:start">
+      <div class="ov-chart-card">
+        <div class="ov-ms-title" style="color:var(--gr);margin-bottom:10px">Income <span style="color:var(--t3);font-weight:400">· per month</span></div>
+        <div id="cf-income-list" class="data-list"></div>
+        <div class="bd-pick-lbl">Choose a category</div>
+        <div id="bd-pick-inc" class="bd-picks"></div>
+        <div class="data-input-row" style="margin-top:8px">
+          <input type="text" id="cf-inc-name" placeholder="Name (e.g. Salary)" onkeydown="if(event.key==='Enter')addIncome()">
+          <input type="number" id="cf-inc-amt" placeholder="£/mo" min="0" onkeydown="if(event.key==='Enter')addIncome()">
+          <button class="btn-add-data" onclick="addIncome()">+ Add</button>
+        </div>
+      </div>
+      <div class="ov-chart-card">
+        <div class="ov-ms-title" style="color:var(--t2);margin-bottom:10px">Spending &amp; saving <span style="color:var(--t3);font-weight:400">· per month</span></div>
+        <div id="cf-expense-list" class="data-list"></div>
+        <div class="bd-pick-lbl">Choose a category</div>
+        <div id="bd-pick-exp" class="bd-picks"></div>
+        <div class="data-input-row" style="margin-top:8px">
+          <input type="text" id="cf-exp-name" placeholder="Name (e.g. Groceries)" onkeydown="if(event.key==='Enter')addExpense()">
+          <input type="number" id="cf-exp-amt" placeholder="£/mo" min="0" onkeydown="if(event.key==='Enter')addExpense()">
+          <select id="cf-exp-cat" class="al-inp" style="max-width:150px" title="Committed = basics to live · Optional = regular but flexible · Saved = savings &amp; investments"><option value="necessity">Committed</option><option value="discretionary">Optional</option><option value="investment">Saved / invested</option></select>
+          <button class="btn-add-data" onclick="addExpense()">+ Add</button>
+        </div>
+        <div style="font-size:.46rem;color:var(--t3);margin-top:6px;line-height:1.5">Tap a line’s icon to switch it between <b style="color:#e05c5c">committed</b>, <b style="color:#e8a23c">optional</b> and <b style="color:#3ecf8e">saved</b>; ✎ edits its amount or category.</div>
+      </div>
+    </div>
+    <div class="ov-chart-card" style="margin-top:14px">
+      <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:10px;letter-spacing:.06em">SPENDING MIX vs INCOME</div>
+      <div id="cf-categories"></div>
+    </div>
+    <div class="ov-chart-card" style="margin-top:14px">
+      <div class="ov-chart-hd"><span class="ov-chart-title">Where your income flows</span></div>
+      <div id="cf-sankey" class="cf-scroll"></div>
+    </div>
+  </div>
+</div><!-- /tab-budget -->
+
 
 <!-- ═══════════════════════════════════════════
      JOURNEY MAP TAB
@@ -5374,6 +5440,7 @@ function showTab(id){
     if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'"))b.classList.add('active');
   });
   if(id==='overview'){updateKPIs();drawChart();renderCashflow();renderOverviewBreakdown();renderSummaryCards();}
+  if(id==='budget'){renderCashflow();}
   if(id==='house')setTimeout(redraw,30);
   if(id==='assets'){setTimeout(()=>{renderMetalsISO();renderAlTab();},30);}
   if(id==='debt'){renderDebtTab();setTimeout(function(){drawDebtHistogram();drawDebtDonut();},80);}
@@ -7588,14 +7655,6 @@ var CF_GROUPS={
   growth:   {label:'Saved & Invested', col:'#3ecf8e'}
 };
 var CF_GROUP_ORDER=['committed','optional','growth'];
-var CF_PRESETS=[
-  {n:'Rent / Mortgage',c:'necessity'},{n:'Council tax',c:'necessity'},{n:'Utilities & bills',c:'necessity'},
-  {n:'Groceries',c:'necessity'},{n:'Transport',c:'necessity'},{n:'Insurance',c:'necessity'},
-  {n:'Phone & internet',c:'necessity'},{n:'Childcare',c:'necessity'},{n:'Debt repayments',c:'necessity'},
-  {n:'Subscriptions',c:'discretionary'},{n:'Eating out',c:'discretionary'},{n:'Entertainment',c:'discretionary'},
-  {n:'Shopping',c:'discretionary'},{n:'Holidays',c:'discretionary'},{n:'Gym & health',c:'discretionary'},
-  {n:'Emergency savings',c:'investment'},{n:'ISA / investments',c:'investment'},{n:'Pension',c:'investment'},{n:'House deposit',c:'investment'}
-];
 var DEBT_TYPE_LABELS={credit:'Credit card',personal:'Personal loan',student:'Student loan',car:'Car finance',bnpl:'BNPL',overdraft:'Overdraft',mortgage:'Mortgage',other:'Loan'};
 // ── Roadmap iconography: inline duo-tone icons on a 24×24 grid (f = tinted fill, d = stroke) ──
 var _FSH='M12 3l7 2.5v6c0 4.4-3 7.7-7 9.5-4-1.8-7-5.1-7-9.5v-6z';
@@ -7634,12 +7693,85 @@ var FIRE_ICONS={
   flame2:{f:['M10 3c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-4-1-6 1-9z'],d:['M10 3c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-4-1-6 1-9z','M18.5 11c.6 2 2.3 2.8 2.3 5.3a2.4 2.4 0 0 1-4.8 0']},
   tree:{f:['M12 3C8.5 3 6 5.5 6 8.5S8 14 12 14s6-2.5 6-5.5S15.5 3 12 3z'],d:['M12 3C8.5 3 6 5.5 6 8.5S8 14 12 14s6-2.5 6-5.5S15.5 3 12 3z','M12 14v7','M12 14l-3-3','M12 12l3-2.5','M9 21h6']}
 };
-var FIRE_LONG=['Record your first net worth snapshot to start your roadmap.','List every debt — amount, interest rate, minimum monthly payment.','Add at least one income source and one expense category.','Get your first pound into a savings account.','Build a £500 emergency starter fund.','Build a £1,000 emergency fund before attacking debt harder.','Pay off one debt in full — the smallest balance first.','Clear 50% of total debt by value.','Net worth crosses £1,000 positive.','Reach zero consumer debt.','Save 3 months of expenses in accessible cash.','Save 6 months of expenses — fully buffered against emergencies.','Open a Stocks & Shares ISA or Lifetime ISA.','Save 1% of your house target price.','Save 5% of your house target — halfway to a 10% deposit.','Net worth reaches £5,000.','Full deposit saved. Time to talk to a mortgage broker.','Net worth reaches £10,000.','Submit your mortgage application.','Exchange contracts on your property.','Keys in hand. You own it.','Net worth reaches £25,000.','Net worth reaches £50,000.','Net worth crosses £100,000 — six figures.','Investments alone can grow to FI target — coast from here.','Mortgage paid off. Outright ownership.','Net worth reaches £250,000.','25× annual expenses invested — full financial independence.','33× annual expenses — Fat FIRE.','50× annual expenses — enough for the next generation.'];
+var FIRE_LONG=['Record your first net worth snapshot to start your roadmap.','List every debt — amount, interest rate, minimum monthly payment.','Build a zero-based budget: add your income, then give every pound a job — spending, saving or investing — until nothing is left unassigned.','Get your first pound into a savings account.','Build a £500 emergency starter fund.','Build a £1,000 emergency fund before attacking debt harder.','Pay off one debt in full — the smallest balance first.','Clear 50% of total debt by value.','Net worth crosses £1,000 positive.','Reach zero consumer debt.','Save 3 months of expenses in accessible cash.','Save 6 months of expenses — fully buffered against emergencies.','Open a Stocks & Shares ISA or Lifetime ISA.','Save 1% of your house target price.','Save 5% of your house target — halfway to a 10% deposit.','Net worth reaches £5,000.','Full deposit saved. Time to talk to a mortgage broker.','Net worth reaches £10,000.','Submit your mortgage application.','Exchange contracts on your property.','Keys in hand. You own it.','Net worth reaches £25,000.','Net worth reaches £50,000.','Net worth crosses £100,000 — six figures.','Investments alone can grow to FI target — coast from here.','Mortgage paid off. Outright ownership.','Net worth reaches £250,000.','25× annual expenses invested — full financial independence.','33× annual expenses — Fat FIRE.','50× annual expenses — enough for the next generation.'];
 var FIRE_PHASES=[
   {label:'FOUNDATION',col:'#44c0b9'},{label:'STABILISE',col:'#c9a84c'},{label:'SAVE',col:'#e8c56a'},
   {label:'BUY',col:'#9b7ec8'},{label:'OWN',col:'#3ecf8e'},{label:'FREE',col:'#c9a84c'}
 ];
 var STK_COLORS=['#44c0b9','#c9a84c','#3ecf8e','#9b7ec8','#64b5f6','#e0894a','#e05c5c','#e8c56a'];
+// ── Budget categories + icons (declared before the init block runs) ──
+var BD_ICONS={
+  bolt:{f:['M13 2.5L5 13.5h6l-1 8 8-11h-6z'],d:['M13 2.5L5 13.5h6l-1 8 8-11h-6z']},
+  bank:{f:['M3 9l9-5 9 5z'],d:['M3 9l9-5 9 5z','M5.5 9.5v7','M9.8 9.5v7','M14.2 9.5v7','M18.5 9.5v7','M3.5 20h17','M4.5 16.8h15']},
+  basket:{f:['M4 9h16l-2 10.2H6z'],d:['M3 9h18l-2 10.2a1 1 0 0 1-1 .8H6a1 1 0 0 1-1-.8z','M8 9l4-6 4 6','M9.2 13v3.5','M12 13v3.5','M14.8 13v3.5']},
+  car:{f:['M3.5 11h17a1 1 0 0 1 1 1v4.5h-19V12a1 1 0 0 1 1-1z'],d:['M5 11l1.6-4h10.8L19 11','M3.5 11h17a1 1 0 0 1 1 1v4.5h-19V12a1 1 0 0 1 1-1z','M6.5 19v-2.5','M17.5 19v-2.5','M6.8 14h1.4','M15.8 14h1.4']},
+  wifi:{f:['M12 18.4a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z'],d:['M2.5 9a14 14 0 0 1 19 0','M5.5 12.5a9.5 9.5 0 0 1 13 0','M8.6 16a5 5 0 0 1 6.8 0']},
+  baby:{f:['M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z'],d:['M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z','M9 11v.4','M15 11v.4','M9.4 15c1.5 1.4 3.7 1.4 5.2 0','M12 3c0 1.6 1.4 2.4 2.4 2.1']},
+  heart:{f:['M12 20s-8-4.7-8-10.3A4.7 4.7 0 0 1 12 7a4.7 4.7 0 0 1 8 2.7C20 15.3 12 20 12 20z'],d:['M12 20s-8-4.7-8-10.3A4.7 4.7 0 0 1 12 7a4.7 4.7 0 0 1 8 2.7C20 15.3 12 20 12 20z']},
+  card:{f:['M3 6h18v4H3z'],d:['M3 6h18v12H3z','M3 10h18','M6.5 15h4']},
+  repeat:{f:['M9 9h6v6H9z'],d:['M17 3l3 3-3 3','M4 11V9a3 3 0 0 1 3-3h13','M7 21l-3-3 3-3','M20 13v2a3 3 0 0 1-3 3H4']},
+  fork:{f:['M5 3h4v6a2 2 0 0 1-4 0z'],d:['M7 3v18','M5 3v6a2 2 0 0 0 4 0V3','M17 21V3c-2.5 1.5-3.5 4-3.5 8H17']},
+  ticket:{f:['M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z'],d:['M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z','M14.5 7.5v2','M14.5 11v2','M14.5 14.5v2']},
+  bag:{f:['M5 8h14l-1 12H6z'],d:['M5 8h14l-1 12H6z','M9 8V6a3 3 0 0 1 6 0v2']},
+  plane:{f:['M21 3l-6.5 18-3.8-7.2L3.5 10z'],d:['M21 3l-6.5 18-3.8-7.2L3.5 10z','M21 3L10.7 13.8']},
+  dumbbell:{f:['M4.5 7h2v10h-2z','M17.5 7h2v10h-2z'],d:['M2.5 9.5v5','M4.5 7h2v10h-2z','M17.5 7h2v10h-2z','M21.5 9.5v5','M6.5 12h11']},
+  sparkle:{f:['M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z'],d:['M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z','M19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z']},
+  gift:{f:['M4 11h16v9H4z'],d:['M4 11h16v9H4z','M3 8h18v3H3z','M12 8v12','M12 8c-1.5-4-5-4-5-1.7C7 8 12 8 12 8z','M12 8c1.5-4 5-4 5-1.7C17 8 12 8 12 8z']},
+  lifebuoy:{f:['M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z'],d:['M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z','M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8z','M5.7 5.7l3.5 3.5','M18.3 5.7l-3.5 3.5','M5.7 18.3l3.5-3.5','M18.3 18.3l-3.5-3.5']},
+  piggy:{f:['M5 12.5a7 5.4 0 0 1 13.4-2.3L21 9.5v4l-1.8.8a5 5 0 0 1-2 3V20h-2.7v-1.6h-4.6V20H7.2v-3A5.3 5.3 0 0 1 5 12.5z'],d:['M5 12.5a7 5.4 0 0 1 13.4-2.3L21 9.5v4l-1.8.8a5 5 0 0 1-2 3V20h-2.7v-1.6h-4.6V20H7.2v-3A5.3 5.3 0 0 1 5 12.5z','M9.5 9.2h4','M16.3 12.4v.2','M2.5 11.5c.4 1 1.2 1.5 2.4 1.5']},
+  trend:{f:['M4 16l5-5 4 3 7-8v14.5H4z'],d:['M3 20.5h18','M4 16l5-5 4 3 7-8','M15 6h5v5']},
+  dots:{f:['M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z','M10.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z','M16.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'],d:['M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z','M10.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z','M16.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z']},
+  briefcase:{f:['M3 8h18v12H3z'],d:['M3 8h18v12H3z','M9 8V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V8','M3 13h18','M10.5 12v2.4h3V12']},
+  rocket:{f:['M12 2.5c3.5 2.5 5 6 4.5 11l-4.5 3-4.5-3c-.5-5 1-8.5 4.5-11z'],d:['M12 2.5c3.5 2.5 5 6 4.5 11l-4.5 3-4.5-3c-.5-5 1-8.5 4.5-11z','M12 9.4a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2z','M7.5 13.5L4.5 16l2.2.5','M16.5 13.5l3 2.5-2.2.5','M10 19.5c.5 1.5 1.5 2.5 2 2.5s1.5-1 2-2.5']}
+};
+// k = key · n = label · ic = icon · g = budget group (necessity=committed, discretionary=optional, investment=saved)
+var BD_EXP_CATS=[
+  {k:'housing',  n:'Rent / Mortgage',  ic:'house',    g:'necessity'},
+  {k:'utilities',n:'Utilities & bills',ic:'bolt',     g:'necessity'},
+  {k:'council',  n:'Council tax',      ic:'bank',     g:'necessity'},
+  {k:'groceries',n:'Groceries',        ic:'basket',   g:'necessity'},
+  {k:'transport',n:'Transport',        ic:'car',      g:'necessity'},
+  {k:'insurance',n:'Insurance',        ic:'shield',   g:'necessity'},
+  {k:'phone',    n:'Phone & internet', ic:'wifi',     g:'necessity'},
+  {k:'childcare',n:'Childcare',        ic:'baby',     g:'necessity'},
+  {k:'health',   n:'Health',           ic:'heart',    g:'necessity'},
+  {k:'debt',     n:'Debt payments',    ic:'card',     g:'necessity'},
+  {k:'subs',     n:'Subscriptions',    ic:'repeat',   g:'discretionary'},
+  {k:'dining',   n:'Eating out',       ic:'fork',     g:'discretionary'},
+  {k:'fun',      n:'Entertainment',    ic:'ticket',   g:'discretionary'},
+  {k:'shopping', n:'Shopping',         ic:'bag',      g:'discretionary'},
+  {k:'travel',   n:'Holidays',         ic:'plane',    g:'discretionary'},
+  {k:'fitness',  n:'Gym & fitness',    ic:'dumbbell', g:'discretionary'},
+  {k:'personal', n:'Personal care',    ic:'sparkle',  g:'discretionary'},
+  {k:'gifts',    n:'Gifts & giving',   ic:'gift',     g:'discretionary'},
+  {k:'emergency',n:'Emergency fund',   ic:'lifebuoy', g:'investment'},
+  {k:'savings',  n:'Savings',          ic:'piggy',    g:'investment'},
+  {k:'invest',   n:'Investments / ISA',ic:'trend',    g:'investment'},
+  {k:'pension',  n:'Pension',          ic:'umbrella', g:'investment'},
+  {k:'deposit',  n:'House deposit',    ic:'bricks',   g:'investment'},
+  {k:'other',    n:'Other',            ic:'dots',     g:'necessity'}
+];
+var BD_INC_CATS=[
+  {k:'salary',   n:'Salary',            ic:'briefcase'},
+  {k:'business', n:'Side hustle / business',ic:'rocket'},
+  {k:'benefits', n:'Benefits & pensions',ic:'bank'},
+  {k:'dividends',n:'Interest & dividends',ic:'coins'},
+  {k:'rental',   n:'Rental income',     ic:'house'},
+  {k:'gifts',    n:'Gifts & other',     ic:'gift'},
+  {k:'other',    n:'Other',             ic:'dots'}
+];
+// Name → category guesses for lines that were typed freehand or created before categories existed
+var BD_GUESS=[
+  ['housing',/rent|mortgage|landlord/i],['council',/council/i],['utilities',/utilit|bill|energy|gas|electric|water|broadband/i],
+  ['groceries',/grocer|food|supermarket|tesco|sainsbury|aldi|lidl/i],['transport',/transport|commut|travel card|petrol|fuel|train|bus|tfl|car(?! finance)|parking/i],
+  ['insurance',/insur/i],['phone',/phone|mobile|internet|wifi/i],['childcare',/child|nursery|school/i],['health',/health|dent|optic|medic|pharm/i],
+  ['debt',/debt|loan|finance|credit card|repay/i],['subs',/subscri|netflix|spotify|prime/i],['dining',/eating|dining|restaurant|takeaway|coffee|pub/i],
+  ['fun',/entertain|cinema|gaming|hobby/i],['shopping',/shop|cloth|amazon/i],['travel',/holiday|trip|vacation/i],['fitness',/gym|fitness|sport/i],
+  ['personal',/hygiene|personal|beauty|hair/i],['gifts',/gift|charity|donat/i],['emergency',/emergency|rainy/i],['invest',/invest|isa|stocks|shares|crypto/i],
+  ['pension',/pension/i],['deposit',/deposit|house fund/i],['savings',/saving/i]
+];
+var BD_INC_GUESS=[['salary',/salary|wage|pay|take-home|take home|job/i],['business',/side|freelance|business|client|project/i],['benefits',/benefit|universal|child benefit|pension|allowance/i],['dividends',/dividend|interest|cashback/i],['rental',/rent/i]];
+var _bdSel={inc:null,exp:null},_bdAuto={inc:'',exp:''},_bdEdit=null;
 var AL_KEY='pos_al1';
 var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
@@ -8381,25 +8513,56 @@ function cfSum(list){return list.reduce(function(s,r){return s+(+r.amount||0);},
 // not spending — it is what the surplus is turned into.
 function cfTotalOut(){return(ovState.expenses||[]).reduce(function(s,r){return cfGroup(r.category)==='growth'?s:s+(+r.amount||0);},0);}
 function cfTotalGrowth(){return(ovState.expenses||[]).reduce(function(s,r){return cfGroup(r.category)==='growth'?s+(+r.amount||0):s;},0);}
+// ── add income / spending (each line carries a category → icon) ──
+function bdFind(kind,key){var L=kind==='inc'?BD_INC_CATS:BD_EXP_CATS;return L.find(function(c){return c.k===key;})||L[L.length-1];}
+function bdGuess(kind,name){var G=kind==='inc'?BD_INC_GUESS:BD_GUESS;for(var i=0;i<G.length;i++)if(G[i][1].test(name||''))return G[i][0];return 'other';}
+function bdCatOf(kind,item){return item.cat||bdGuess(kind,item.name);}
+function bdIcon(key,size,col,fillOp){
+  var ic=BD_ICONS[key]||FIRE_ICONS[key]||BD_ICONS.dots;
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" aria-hidden="true">'
+    +'<g fill="'+col+'" fill-opacity="'+(fillOp==null?.22:fillOp)+'" stroke="none">'+ic.f.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g>'
+    +'<g fill="none" stroke="'+col+'" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+ic.d.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g></svg>';
+}
+function bdPick(kind,key){
+  _bdSel[kind]=key;
+  var c=bdFind(kind,key),nm=document.getElementById(kind==='inc'?'cf-inc-name':'cf-exp-name');
+  // fill the name from the category unless the user has typed their own
+  if(nm&&(!nm.value.trim()||nm.value===_bdAuto[kind])){nm.value=c.n;_bdAuto[kind]=c.n;}
+  if(kind==='exp'){var s=document.getElementById('cf-exp-cat');if(s)s.value=c.g;}
+  bdRenderPickers();
+  var a=document.getElementById(kind==='inc'?'cf-inc-amt':'cf-exp-amt');if(a)a.focus();
+}
+function bdRenderPickers(){
+  [['inc',BD_INC_CATS],['exp',BD_EXP_CATS]].forEach(function(p){
+    var el=document.getElementById('bd-pick-'+p[0]);if(!el)return;
+    el.innerHTML=p[1].map(function(c){
+      var col=p[0]==='inc'?'#44c0b9':CF_GROUPS[cfGroup(c.g)].col,on=_bdSel[p[0]]===c.k;
+      return '<button type="button" class="bd-chip'+(on?' on':'')+'" style="--c:'+col+'" onclick="bdPick(\''+p[0]+'\',\''+c.k+'\')" title="'+cfEsc(c.n)+'">'+bdIcon(c.ic,18,col)+'<span>'+cfEsc(c.n)+'</span></button>';
+    }).join('');
+  });
+}
 function addIncome(){
-  var n=document.getElementById('cf-inc-name').value.trim();
-  var a=parseFloat(document.getElementById('cf-inc-amt').value);
-  if(!n||isNaN(a)){showToast('Enter name and amount');return;}
+  var nEl=document.getElementById('cf-inc-name'),aEl=document.getElementById('cf-inc-amt');
+  var a=parseFloat(aEl.value),n=nEl.value.trim();
+  if(!n&&_bdSel.inc)n=bdFind('inc',_bdSel.inc).n;
+  if(!n||!(a>0)){showToast('Pick a category (or type a name) and enter a monthly amount');return;}
   if(!ovState.income)ovState.income=[];
-  ovState.income.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1)});
-  document.getElementById('cf-inc-name').value='';
-  document.getElementById('cf-inc-amt').value='';
+  ovState.income.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),cat:_bdSel.inc||bdGuess('inc',n)});
+  nEl.value='';aEl.value='';_bdSel.inc=null;_bdAuto.inc='';
   saveState();renderCashflow();updateKPIs();
 }
 function addExpense(){
-  var n=document.getElementById('cf-exp-name').value.trim();
-  var a=parseFloat(document.getElementById('cf-exp-amt').value);
-  if(!n||isNaN(a)){showToast('Enter name and amount');return;}
+  var nEl=document.getElementById('cf-exp-name'),aEl=document.getElementById('cf-exp-amt');
+  var a=parseFloat(aEl.value),n=nEl.value.trim();
+  if(!n&&_bdSel.exp)n=bdFind('exp',_bdSel.exp).n;
+  if(!n||!(a>0)){showToast('Pick a category (or type a name) and enter a monthly amount');return;}
   if(!ovState.expenses)ovState.expenses=[];
-  var cat=(document.getElementById('cf-exp-cat')||{}).value||'necessity';
-  ovState.expenses.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),category:cat});
-  document.getElementById('cf-exp-name').value='';
-  document.getElementById('cf-exp-amt').value='';
+  var key=_bdSel.exp||bdGuess('exp',n);
+  // group: what the user chose in the dropdown if they picked/typed freehand, else the category's default
+  var grp=(document.getElementById('cf-exp-cat')||{}).value||bdFind('exp',key).g;
+  ovState.expenses.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),category:grp,cat:key});
+  nEl.value='';aEl.value='';_bdSel.exp=null;_bdAuto.exp='';
+  var s=document.getElementById('cf-exp-cat');if(s)s.value='necessity';
   saveState();renderCashflow();updateKPIs();
 }
 function delIncome(id){ovState.income=(ovState.income||[]).filter(function(r){return r.id!==id;});saveState();renderCashflow();updateKPIs();}
@@ -8439,7 +8602,7 @@ function drawCashflowDiagram(){
   // groups and their item nodes
   var groups=CF_GROUP_ORDER.map(function(g){
     var items=m.by[g].map(function(r){return{name:r.name,amt:+r.amount};});
-    if(g==='growth'&&m.overflow>0)items.push({name:'Unallocated surplus',amt:m.overflow,overflow:true});
+    if(g==='growth'&&m.overflow>0)items.push({name:'Unassigned',amt:m.overflow,overflow:true});
     return{key:g,col:CF_GROUPS[g].col,label:CF_GROUPS[g].label,items:items,sum:items.reduce(function(a,it){return a+it.amt;},0)};
   }).filter(function(g){return g.sum>0;});
   var nItems=groups.reduce(function(n,g){return n+g.items.length;},0);
@@ -8515,7 +8678,6 @@ function drawCashflowDiagram(){
   });
   out+='</svg>';
   host.innerHTML=out;
-  drawCashflowHistogram(m);
 }
 // ── Histogram: one coloured column per category ──
 function drawCashflowHistogram(m){
@@ -8526,7 +8688,7 @@ function drawCashflowHistogram(m){
   CF_GROUP_ORDER.forEach(function(g){
     m.by[g].forEach(function(r){bars.push({name:r.name,amt:+r.amount,col:CF_GROUPS[g].col,g:g});});
   });
-  if(m.overflow>0)bars.push({name:'Unallocated surplus',amt:m.overflow,col:CF_GROUPS.growth.col,g:'growth',overflow:true});
+  if(m.overflow>0)bars.push({name:'Unassigned',amt:m.overflow,col:CF_GROUPS.growth.col,g:'growth',overflow:true});
   if(m.shortfall>0)bars.push({name:'Shortfall',amt:m.shortfall,col:'#8a93a6',g:'short',overflow:true});
   if(!(m.tIn>0&&bars.length)){host.innerHTML='<div class="cf-empty">Add income and at least one spending line to see your histogram</div>';return;}
   var padL=58,padR=14,padT=26,plotH=190,padB=96;
@@ -8552,55 +8714,58 @@ function drawCashflowHistogram(m){
   out+='</svg>';
   host.innerHTML=out;
 }
-function cfRow(r,kind){
-  var isExp=kind==='exp';
-  var g=isExp?cfGroup(r.category):null;
-  var col=isExp?CF_GROUPS[g].col:'var(--gr)';
-  var dot=isExp?'<button class="cf-dot" style="background:'+col+'" title="'+CF_GROUPS[g].label+' — tap to change type" onclick="cycleExpenseGroup('+r.id+')"></button>':'<span class="cf-dot" style="background:#44c0b9;cursor:default"></span>';
-  return '<div class="data-item cf-row">'+dot+'<span class="cf-nm">'+cfEsc(r.name)+'</span>'
-    +'<span class="data-item-val" style="color:'+col+'">'+cfMoney(r.amount)+'/mo</span>'
-    +'<button class="cf-edit" title="Edit amount" onclick="editCfItem(\''+kind+'\','+r.id+')">✎</button>'
-    +'<button class="data-item-del" onclick="'+(isExp?'delExpense':'delIncome')+'('+r.id+')">✕</button></div>';
+// ── Budget tab rendering ──
+function bdRowHTML(kind,r){
+  var rate=window.VI_CURRENCY_RATE||1;
+  if(_bdEdit&&_bdEdit.kind===kind&&_bdEdit.id===r.id){
+    var cats=(kind==='inc'?BD_INC_CATS:BD_EXP_CATS),cur=bdCatOf(kind,r);
+    return '<div class="bd-edit">'
+      +'<input id="bd-e-name" class="al-inp" value="'+cfEsc(r.name)+'" placeholder="Name">'
+      +'<input id="bd-e-amt" class="al-inp" type="number" min="0" step="any" value="'+(Math.round(r.amount*rate*100)/100)+'">'
+      +'<select id="bd-e-cat" class="al-inp">'+cats.map(function(c){return '<option value="'+c.k+'"'+(c.k===cur?' selected':'')+'>'+cfEsc(c.n)+'</option>';}).join('')+'</select>'
+      +(kind==='exp'?'<select id="bd-e-grp" class="al-inp">'+CF_GROUP_ORDER.map(function(g){return '<option value="'+cfGroupToCat(g)+'"'+(cfGroup(r.category)===g?' selected':'')+'>'+CF_GROUPS[g].label+'</option>';}).join('')+'</select>':'')
+      +'<span class="bd-edit-btns"><button class="btn-add-data" onclick="bdSaveEdit()">Save</button><button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="bdCancelEdit()">Cancel</button></span></div>';
+  }
+  var c=bdFind(kind,bdCatOf(kind,r));
+  var g=kind==='exp'?cfGroup(r.category):null;
+  var col=kind==='exp'?CF_GROUPS[g].col:'#44c0b9';
+  var sub=(c.n!==r.name)?'<span class="bd-cat">'+cfEsc(c.n)+'</span>':'';
+  var bubble=kind==='exp'
+    ?'<button class="bd-ic" style="--c:'+col+'" title="'+CF_GROUPS[g].label+' — tap to change type" onclick="cycleExpenseGroup('+r.id+')">'+bdIcon(c.ic,18,col)+'</button>'
+    :'<span class="bd-ic" style="--c:'+col+'">'+bdIcon(c.ic,18,col)+'</span>';
+  return '<div class="bd-row">'+bubble+'<span class="bd-nm">'+cfEsc(r.name)+sub+'</span>'
+    +'<span class="bd-amt" style="color:'+col+'">'+cfMoney(r.amount)+'<em>/mo</em></span>'
+    +'<button class="cf-edit" title="Edit" onclick="bdEdit(\''+kind+'\','+r.id+')">✎</button>'
+    +'<button class="data-item-del" onclick="'+(kind==='exp'?'delExpense':'delIncome')+'('+r.id+')">✕</button></div>';
 }
-function renderCashflow(){
-  var inc=ovState.income||[],exp=ovState.expenses||[];
+function bdRenderLists(){
   var m=cfModel();
-  var tIn=m.tIn,tOut=m.spend,surplus=m.surplus;
-  var rate=tIn>0?Math.max(-999,Math.round((surplus/tIn)*100)):0;
-  var sum=document.getElementById('cf-summary');
-  var mono='font-family:\'Share Tech Mono\',monospace;font-size:.65rem;';
-  if(sum)sum.innerHTML=
-    '<span style="'+mono+'color:var(--gr)">In: '+gbpFmt(tIn)+'/mo</span>'+
-    '<span style="'+mono+'color:var(--re)">Spend: '+gbpFmt(tOut)+'/mo</span>'+
-    '<span style="'+mono+'color:'+(surplus>=0?'var(--em)':'var(--re)')+'">Surplus: '+gbpFmt(surplus)+'/mo</span>'+
-    '<span style="'+mono+'color:var(--go)">Save rate: '+rate+'%</span>';
   var il=document.getElementById('cf-income-list');
-  if(il)il.innerHTML=inc.map(function(r){return cfRow(r,'inc');}).join('')||'<div style="font-size:.58rem;color:var(--t3);padding:4px 0">None added</div>';
-  var el2=document.getElementById('cf-expense-list');
-  var sorted=exp.slice().sort(function(a,b){return CF_GROUP_ORDER.indexOf(cfGroup(a.category))-CF_GROUP_ORDER.indexOf(cfGroup(b.category))||(+b.amount||0)-(+a.amount||0);});
-  if(el2)el2.innerHTML=sorted.map(function(r){return cfRow(r,'exp');}).join('')||'<div style="font-size:.58rem;color:var(--t3);padding:4px 0">None added</div>';
-  // presets
-  var pe=document.getElementById('cf-presets');
-  if(pe&&!pe.dataset.ready){
-    pe.innerHTML='<span style="font-size:.46rem;color:var(--t3);width:100%">Quick add:</span>'+CF_PRESETS.map(function(p,i){
-      var c=CF_GROUPS[cfGroup(p.c)].col;
-      return '<button class="cf-chip" style="color:'+c+';border-color:'+c+'66" onclick="cfPreset('+i+')">'+cfEsc(p.n)+'</button>';
-    }).join('');
-    pe.dataset.ready='1';
-  }
-  // nudge: a single lump-sum from the old questionnaire hides the real picture
-  var nd=document.getElementById('cf-nudge');
-  if(nd){
-    var lump=exp.length===1&&(exp[0]._onboarding||/^monthly expenses$/i.test(exp[0].name||''));
-    nd.innerHTML=lump?'<div class="cf-nudge"><b>One lump-sum so far.</b> Break "'+cfEsc(exp[0].name)+'" down below — rent, groceries, transport, savings — to see exactly where each pound goes. Tap <b>✕</b> on the lump sum once you have.</div>':'';
-  }
-  renderCashflowCategories();
-  setTimeout(drawCashflowDiagram, 50);
+  if(il)il.innerHTML=(ovState.income||[]).map(function(r){return bdRowHTML('inc',r);}).join('')||'<div class="bd-empty">No income yet — pick a category below and add what comes in each month.</div>';
+  var el=document.getElementById('cf-expense-list');
+  if(!el)return;
+  var exp=(ovState.expenses||[]),html='';
+  CF_GROUP_ORDER.forEach(function(g){
+    var items=exp.filter(function(r){return cfGroup(r.category)===g;}).sort(function(a,b){return (+b.amount||0)-(+a.amount||0);});
+    if(!items.length)return;
+    var sum=cfSum(items);
+    html+='<div class="bd-grp" style="--c:'+CF_GROUPS[g].col+'"><span>'+CF_GROUPS[g].label+'</span><span>'+cfMoney(sum)+(m.tIn>0?' · '+Math.round(sum/m.tIn*100)+'%':'')+'</span></div>'+items.map(function(r){return bdRowHTML('exp',r);}).join('');
+  });
+  el.innerHTML=html||'<div class="bd-empty">Nothing assigned yet — every pound of income needs a job.</div>';
 }
-function cfPreset(i){
-  var p=CF_PRESETS[i];if(!p)return;
-  var n=document.getElementById('cf-exp-name'),c=document.getElementById('cf-exp-cat'),a=document.getElementById('cf-exp-amt');
-  if(n)n.value=p.n;if(c)c.value=p.c;if(a)a.focus();
+function bdEdit(kind,id){_bdEdit={kind:kind,id:id};bdRenderLists();}
+function bdCancelEdit(){_bdEdit=null;bdRenderLists();}
+function bdSaveEdit(){
+  if(!_bdEdit)return;
+  var list=_bdEdit.kind==='exp'?ovState.expenses:ovState.income;
+  var r=(list||[]).find(function(x){return x.id===_bdEdit.id;});
+  if(!r){_bdEdit=null;return;}
+  var rate=window.VI_CURRENCY_RATE||1;
+  var n=(document.getElementById('bd-e-name')||{}).value||'',a=parseFloat((document.getElementById('bd-e-amt')||{}).value);
+  if(!n.trim()||!(a>=0)){showToast('Enter a name and amount');return;}
+  r.name=n.trim();r.amount=a/rate;r.cat=(document.getElementById('bd-e-cat')||{}).value||r.cat;
+  var g=document.getElementById('bd-e-grp');if(g)r.category=g.value;
+  _bdEdit=null;saveState();renderCashflow();updateKPIs();
 }
 function cycleExpenseGroup(id){
   var r=(ovState.expenses||[]).find(function(x){return x.id===id;});
@@ -8610,24 +8775,96 @@ function cycleExpenseGroup(id){
   saveState();renderCashflow();updateKPIs();
   showToast(r.name+' → '+CF_GROUPS[next].label);
 }
-function editCfItem(kind,id){
-  var list=kind==='exp'?ovState.expenses:ovState.income;
-  var r=(list||[]).find(function(x){return x.id===id;});
-  if(!r)return;
-  var rate=window.VI_CURRENCY_RATE||1;
-  var v=prompt('New monthly amount for "'+r.name+'"',Math.round(r.amount*rate*100)/100);
-  if(v===null)return;
-  v=parseFloat(v);
-  if(isNaN(v)||v<0){showToast('Enter a valid amount');return;}
-  r.amount=v/rate;
-  saveState();renderCashflow();updateKPIs();
+// ── Zero-based budget: income − every pound assigned = 0 ──
+function bdLeft(){var m=cfModel();return m.tIn-(m.spend+m.growth);}
+function bdState(){
+  var m=cfModel(),assigned=m.spend+m.growth,left=m.tIn-assigned;
+  var st=m.tIn<=0?'none':(Math.abs(left)<0.5?'zero':(left>0?'under':'over'));
+  return{m:m,assigned:assigned,left:left,st:st};
 }
+function bdRenderZero(){
+  var el=document.getElementById('bd-zero');if(!el)return;
+  var s=bdState(),m=s.m;
+  var denom=Math.max(m.tIn,s.assigned,1);
+  var seg=function(v,c){return '<div style="width:'+(v/denom*100).toFixed(2)+'%;background:'+c+'"></div>';};
+  var col=s.st==='zero'?'#3ecf8e':s.st==='under'?'#e8a23c':s.st==='over'?'#e05c5c':'#7d8793';
+  var big=s.st==='none'?'Add your income':s.st==='zero'?'Every pound accounted for ✓':cfMoney(Math.abs(s.left))+(s.st==='under'?' left to assign':' over-assigned');
+  var msg=s.st==='none'?'Start with what comes in each month — then give every pound a job.'
+    :s.st==='zero'?'Income − spending − saving = £0. That’s a zero-based budget. Nothing is left to chance.'
+    :s.st==='under'?'Zero-based budgeting means every pound has a job — spending, saving or investing. Assign the rest below.'
+    :'You’ve planned to use more than you earn. Trim an optional line or lower a saving until it reaches £0.';
+  var rem='';
+  if(s.st==='under'){
+    var opts=['emergency','savings','invest','deposit'];
+    rem='<div class="bd-assign"><span>Give it a job:</span>'+opts.map(function(k){var c=bdFind('exp',k);return '<button class="bd-chip on" style="--c:#3ecf8e" onclick="bdAssignRemainder(\''+k+'\')">'+bdIcon(c.ic,16,'#3ecf8e')+'<span>→ '+cfEsc(c.n)+'</span></button>';}).join('')
+      +'<button class="bd-chip" style="--c:#8fb4b1" onclick="bdFocusAdd()"><span>Choose another…</span></button></div>';
+  }
+  el.innerHTML='<div class="bd-zero-top"><div><div class="bd-big" style="color:'+col+'">'+big+'</div><div class="bd-msg">'+msg+'</div></div>'
+    +'<div class="bd-stats"><div><label>Income</label><b>'+cfMoney(m.tIn)+'</b></div><div><label>Assigned</label><b>'+cfMoney(s.assigned)+'</b></div><div><label>Left</label><b style="color:'+col+'">'+(s.left<0?'−':'')+cfMoney(Math.abs(s.left))+'</b></div></div></div>'
+    +'<div class="bd-bar" title="Committed · Optional · Saved & invested">'+seg(cfSum(m.by.committed),CF_GROUPS.committed.col)+seg(cfSum(m.by.optional),CF_GROUPS.optional.col)+seg(m.growth,CF_GROUPS.growth.col)
+    +(s.st==='under'?'<div class="bd-rest" style="width:'+(s.left/denom*100).toFixed(2)+'%"></div>':'')+'</div>'+rem;
+}
+function bdAssignRemainder(catKey){
+  var left=Math.round(bdLeft()*100)/100;
+  if(!(left>0)){return;}
+  var c=bdFind('exp',catKey);
+  var ex=(ovState.expenses||[]).find(function(e){return bdCatOf('exp',e)===catKey&&cfGroup(e.category)===cfGroup(c.g);});
+  if(ex)ex.amount=(+ex.amount||0)+left;
+  else{if(!ovState.expenses)ovState.expenses=[];ovState.expenses.push({id:Date.now(),name:c.n,amount:left,category:c.g,cat:catKey});}
+  saveState();renderCashflow();updateKPIs();
+  showToast(cfMoney(left)+' assigned to '+c.n+' ✓ — zero-based!');
+}
+function bdFocusAdd(){
+  var a=document.getElementById('cf-exp-amt'),l=Math.round(bdLeft()*100)/100;
+  if(a){if(l>0)a.value=l;a.scrollIntoView({behavior:'smooth',block:'center'});a.focus();}
+}
+function bdUpdateBadge(){
+  var b=document.getElementById('budget-badge');if(!b)return;
+  var s=bdState(),show=s.st==='under'||s.st==='over';
+  b.style.display=show?'inline-block':'none';
+  b.title=show?(s.st==='under'?cfMoney(s.left)+' still unassigned':'Over-assigned by '+cfMoney(-s.left)):'';
+  b.style.background=s.st==='over'?'#e05c5c':'#e8a23c';
+}
+function bdRender(){
+  bdRenderZero();bdRenderLists();bdRenderPickers();
+  var nd=document.getElementById('bd-nudge');
+  if(nd){
+    var exp=ovState.expenses||[];
+    var lump=exp.length===1&&(exp[0]._onboarding||/^monthly expenses$/i.test(exp[0].name||''));
+    nd.innerHTML=lump?'<div class="cf-nudge"><b>One lump-sum so far.</b> Break “'+cfEsc(exp[0].name)+'” down by category below, then remove the lump sum.</div>':'';
+  }
+  renderCashflowCategories();
+  drawCashflowDiagram();
+}
+function renderCashflow(){
+  var m=cfModel(),s=bdState();
+  var tIn=m.tIn,tOut=m.spend,surplus=m.surplus;
+  var rate=tIn>0?Math.max(-999,Math.round((surplus/tIn)*100)):0;
+  var sum=document.getElementById('cf-summary');
+  var mono='font-family:\'Share Tech Mono\',monospace;font-size:.65rem;';
+  if(sum)sum.innerHTML=
+    '<span style="'+mono+'color:var(--gr)">In: '+gbpFmt(tIn)+'/mo</span>'+
+    '<span style="'+mono+'color:var(--re)">Spend: '+gbpFmt(tOut)+'/mo</span>'+
+    '<span style="'+mono+'color:'+(surplus>=0?'var(--em)':'var(--re)')+'">Surplus: '+gbpFmt(surplus)+'/mo</span>'+
+    '<span style="'+mono+'color:var(--go)">Save rate: '+rate+'%</span>';
+  // overview nudge: unassigned pounds → Budget tab
+  var nd=document.getElementById('cf-nudge');
+  if(nd){
+    nd.innerHTML=(s.st==='under'||s.st==='over')
+      ?'<div class="cf-nudge">'+(s.st==='under'?'<b>'+cfMoney(s.left)+' of your monthly income has no job yet.</b> Zero-based budgeting gives every pound a purpose.':'<b>You’ve assigned '+cfMoney(-s.left)+' more than you earn.</b>')+' <a href="#" onclick="showTab(\'budget\');return false">Open Budget →</a></div>'
+      :(s.st==='zero'?'<div class="cf-nudge" style="background:rgba(62,207,142,.07);border-color:rgba(62,207,142,.3)"><b style="color:#3ecf8e">Every pound accounted for ✓</b> — your zero-based budget is balanced.</div>':'');
+  }
+  setTimeout(function(){drawCashflowHistogram(m);},50);
+  if(document.getElementById('bd-zero'))bdRender();
+  bdUpdateBadge();
+}
+
 function renderCashflowCategories(){
   var el=document.getElementById('cf-categories');
   if(!el)return;
   var m=cfModel();
   if(m.total<=0){el.innerHTML='<div style="font-size:.58rem;color:var(--t3)">Add income and spending to see how your money splits.</div>';return;}
-  var totals={committed:cfSum(m.by.committed),optional:cfSum(m.by.optional),growth:m.growth+m.overflow};
+  var totals={committed:cfSum(m.by.committed),optional:cfSum(m.by.optional),growth:m.growth};
   var guide={committed:'aim ≤ 50%',optional:'aim ≤ 30%',growth:'aim ≥ 20%'};
   var target={committed:50,optional:30,growth:20};
   el.innerHTML=CF_GROUP_ORDER.map(function(g){
@@ -8642,7 +8879,9 @@ function renderCashflowCategories(){
       +'<div style="height:100%;width:'+Math.min(100,pct)+'%;background:'+c+';border-radius:3px;transition:width .4s ease"></div>'
       +'<div title="Guide: '+target[g]+'%" style="position:absolute;top:-3px;bottom:-3px;left:'+target[g]+'%;width:2px;background:rgba(255,255,255,.35)"></div>'
       +'</div></div>';
-  }).join('')+(m.shortfall>0?'<div style="font-size:.55rem;color:#e05c5c;margin-top:4px">⚠ You are planning to spend '+gbpFmt(m.shortfall)+'/mo more than you earn.</div>':'');
+  }).join('')
+  +(m.overflow>0.5?'<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;gap:8px;font-size:.58rem;margin-bottom:4px"><span style="color:#e8a23c;font-weight:700">Unassigned <span style="color:var(--t3);font-weight:400">· give every pound a job</span></span><span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(m.overflow)+'/mo &nbsp;<b style="color:#e8a23c">'+Math.round(m.overflow/m.total*100)+'%</b></span></div><div style="height:6px;border-radius:3px;background:rgba(255,255,255,.06)"><div style="height:100%;width:'+Math.min(100,m.overflow/m.total*100)+'%;border-radius:3px" class="bd-rest"></div></div></div>':'')
+  +(m.shortfall>0?'<div style="font-size:.55rem;color:#e05c5c;margin-top:4px">⚠ You are planning to spend '+gbpFmt(m.shortfall)+'/mo more than you earn.</div>':'');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -11499,7 +11738,8 @@ function cryptoLogoUrl(sym){
 function fireMan(k){return !!(ovState.manual&&ovState.manual[k]);}
 function fireBuildStages(){
   var nw=computeNetWorth();
-  var annualExp=cfTotalOut()*12||24000;
+  var _vu={};try{_vu=JSON.parse(localStorage.getItem('vi_user')||'{}')||{};}catch(e){}
+  var annualExp=cfTotalOut()*12||((+_vu.expenses||0)*12)||24000;
   var cashSaved=alTotalCash()+(state?state.saved:0);
   var debts=debtState.debts||[];
   var totalDebt=debtTotal();
@@ -11515,8 +11755,9 @@ function fireBuildStages(){
       hint:'Use “Add Data Point” on the Net Worth chart to record your first snapshot.'},
     {phase:0,ic:'map',     name:'Map Debts',    desc:'List every debt',         col:'#44c0b9',check:function(){return debts.length>0||noDebt;},manual:'noDebt',manualLbl:'I have no debts',
       hint:'Add each debt separately (with its type and interest rate) in the Debt Tracker — or confirm you have none.'},
-    {phase:0,ic:'flow',    name:'Cashflow',     desc:'Track income + expenses', col:'#44c0b9',check:function(){return (ovState.income||[]).length>0&&(ovState.expenses||[]).length>0;},
-      hint:'Add at least one income source and one spending line in Cash Flow.'},
+    {phase:0,ic:'flow',    name:'Zero Budget',  desc:'Every £ given a job',     col:'#44c0b9',check:function(){var b=bdState();return b.m.tIn>0&&(ovState.expenses||[]).length>0&&b.st==='zero';},
+      prog:function(){var b=bdState();return b.m.tIn>0?Math.max(0,Math.min(1,b.assigned/b.m.tIn)):0;},
+      hint:'Open the Budget tab: add your income, then assign every pound to spending, saving or investing until “left to assign” hits £0.'},
     {phase:0,ic:'coin',    name:'First £ Saved',desc:'Cash balance ≥ £1',       col:'#44c0b9',check:function(){return cashSaved>=1;},
       hint:'Add a cash or savings account in Assets & Liabilities.'},
     // P2 Stabilise
@@ -13441,12 +13682,9 @@ function wStep2Submit() {
   // Persist profile into app state
   if (income > 0 && typeof ovState !== 'undefined') {
     if (!ovState.income) ovState.income = [];
-    if (ovState.income.length === 0) ovState.income.push({ id: Date.now(), name: 'Monthly Take-Home', amount: income, _onboarding: true });
+    if (ovState.income.length === 0) ovState.income.push({ id: Date.now(), name: 'Salary / take-home', amount: income, cat: 'salary', _onboarding: true });
   }
-  if (expenses > 0 && typeof ovState !== 'undefined') {
-    if (!ovState.expenses) ovState.expenses = [];
-    if (ovState.expenses.length === 0) ovState.expenses.push({ id: Date.now() + 1, name: 'Monthly Expenses', amount: expenses, category: 'necessity', _onboarding: true });
-  }
+  // Expenses are NOT pre-filled: the Budget tab walks the user through giving every pound a job.
   if (house > 0 && typeof state !== 'undefined' && state) {
     state.target = house;
     if (typeof saveHouse === 'function') saveHouse();
@@ -13478,7 +13716,8 @@ function wStep2Submit() {
   if (_vaultItUser) { captureEmailToList(_vaultItUser.email, _vaultItUser.name, parseInt(_wSelectedVal)||0); }
   applyProgressiveNav();
   checkAchievements();
-  showToast('Welcome' + (_vaultItUser && _vaultItUser.name ? ', ' + _vaultItUser.name : '') + '. Your journey starts here 🚀');
+  showToast('Welcome' + (_vaultItUser && _vaultItUser.name ? ', ' + _vaultItUser.name : '') + '. Now give every pound a job 🚀');
+  if (income > 0) setTimeout(function(){ try { showTab('budget'); } catch(e) {} }, 250);
 }
 
 // Step 2 skip — save what we have and enter app
@@ -14047,16 +14286,28 @@ function loadDemoData() {
     localStorage.setItem('pos_ov1', JSON.stringify({
       assets: [], debts: [], snapshots: _dm,
       milestones: [10000, 0, 25000, 50000, 100000],
-      income: [ { id: 1, name: 'Salary', amount: 3800 }, { id: 2, name: 'Side Projects', amount: 350 } ],
+      income: [
+        { id: 1, name: 'Salary',        amount: 3800, cat: 'salary'   },
+        { id: 2, name: 'Side Projects', amount: 350,  cat: 'business' }
+      ],
       expenses: [
-        { id: 3,  name: 'Rent',              amount: 1200, category: 'necessity'     },
-        { id: 4,  name: 'Groceries',         amount: 380,  category: 'necessity'     },
-        { id: 5,  name: 'Transport',         amount: 130,  category: 'necessity'     },
-        { id: 6,  name: 'Utilities & bills', amount: 165,  category: 'necessity'     },
-        { id: 7,  name: 'Subscriptions',     amount: 62,   category: 'discretionary' },
-        { id: 8,  name: 'Eating out',        amount: 95,   category: 'discretionary' },
-        { id: 9,  name: 'House deposit',     amount: 258,  category: 'investment'    },
-        { id: 10, name: 'ISA / investments', amount: 400,  category: 'investment'    }
+        { id: 3, name: 'Rent', amount: 1200, category: 'necessity', cat: 'housing' },
+        { id: 4, name: 'Groceries', amount: 380, category: 'necessity', cat: 'groceries' },
+        { id: 5, name: 'Transport', amount: 130, category: 'necessity', cat: 'transport' },
+        { id: 6, name: 'Utilities & bills', amount: 165, category: 'necessity', cat: 'utilities' },
+        { id: 7, name: 'Phone & internet', amount: 45, category: 'necessity', cat: 'phone' },
+        { id: 8, name: 'Insurance', amount: 60, category: 'necessity', cat: 'insurance' },
+        { id: 9, name: 'Subscriptions', amount: 62, category: 'discretionary', cat: 'subs' },
+        { id: 10, name: 'Gym & health', amount: 45, category: 'discretionary', cat: 'fitness' },
+        { id: 11, name: 'Eating out', amount: 95, category: 'discretionary', cat: 'dining' },
+        { id: 12, name: 'Entertainment', amount: 80, category: 'discretionary', cat: 'fun' },
+        { id: 13, name: 'Holidays', amount: 200, category: 'discretionary', cat: 'travel' },
+        { id: 14, name: 'Gifts & giving', amount: 100, category: 'discretionary', cat: 'gifts' },
+        { id: 15, name: 'House deposit', amount: 258, category: 'investment', cat: 'deposit' },
+        { id: 16, name: 'ISA / investments', amount: 400, category: 'investment', cat: 'invest' },
+        { id: 17, name: 'Pension', amount: 190, category: 'investment', cat: 'pension' },
+        { id: 18, name: 'Emergency fund', amount: 300, category: 'investment', cat: 'emergency' },
+        { id: 19, name: 'Savings', amount: 440, category: 'investment', cat: 'savings' }
       ]
     }));
   }
