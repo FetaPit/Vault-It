@@ -7799,8 +7799,36 @@ var _supaClient = null;
 var _supaUser   = null;
 var _lsOrig     = Storage.prototype.setItem; // save original before patch
 var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
-  'pos4','pos_house','pos_journey','vi_jrny_events','vi_nw_history',
+  'pos_house','pos_journey','vi_jrny_events','vi_nw_history',
   'vi_settings','vi_user','vi_pioneer','vi_founder','vi_debt','vi_ov'];
+
+// Financial/data keys that demo mode seeds. On a demo→real-signup conversion
+// these MUST be wiped so the new account starts genuinely empty and demo values
+// never sync to Supabase under the real user_id (QC-2).
+var _DEMO_DATA_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
+  'pos4','pos_house','pos_journey','ht3','vi_jrny_events','vi_nw_history',
+  'vi_debt','vi_ov'];
+
+// Clear all demo-seeded data. Pass the real email when converting a demo
+// visitor into a signed-up account (keeps them as a real user so demo data
+// can't auto-reload); omit it when a user clicks "start with my own data".
+function _wipeDemoData(realEmail){
+  try { _DEMO_DATA_KEYS.forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
+  try { localStorage.removeItem('vi_demo_mode'); } catch(e){}
+  // Demo sets vi_pioneer; real pioneer status is re-synced from the profile row.
+  try { localStorage.removeItem('vi_pioneer'); } catch(e){}
+  try {
+    if (realEmail) {
+      // Replace the demo persona with the real identity (strips name/job/etc.)
+      localStorage.setItem('vi_user', JSON.stringify({ email: String(realEmail).toLowerCase() }));
+    } else {
+      var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
+      if (u && u.email === 'demo@vault-it.app') localStorage.removeItem('vi_user');
+      // Prevent demo data auto-reloading for a visitor who opted out.
+      localStorage.setItem('vi_declined_demo', 'true');
+    }
+  } catch(e){}
+}
 
 function _initSupabase() {
   if (typeof window.supabase === 'undefined') return;
@@ -7820,6 +7848,12 @@ function _initSupabase() {
       if (_supaUser && _supaUser.id === session.user.id) return;
       _supaUser = session.user;
       var hydrated = await _hydrateFromSupabase(_supaUser.id);
+      if (localStorage.getItem('vi_demo_mode') === 'true' && !hydrated) {
+        _wipeDemoData(_supaUser.email);
+        try { _createSession(_supaUser.email); } catch(e){}
+        location.reload();
+        return;
+      }
       await _syncPioneerFromProfile(_supaUser.id);
       if (!hasValidSession()) _createSession(_supaUser.email);
       var ov = document.getElementById('login-overlay');
@@ -7842,6 +7876,7 @@ function _initSupabase() {
           try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
           try { if(typeof renderCashflow==='function') renderCashflow(); } catch(e) {}
           try { if(typeof renderDebtTab==='function') renderDebtTab(); } catch(e) {}
+          try { if(typeof renderAlTab==='function') renderAlTab(); } catch(e) {}
           try { if(typeof renderPioneerCard==='function') renderPioneerCard(); } catch(e) {}
         }, 150);
         showToast('Vault restored ✓');
@@ -7913,6 +7948,12 @@ async function _initSupabaseSession() {
     if (!session || !session.user) return;
     _supaUser = session.user;
     var hydrated = await _hydrateFromSupabase(_supaUser.id);
+    if (localStorage.getItem('vi_demo_mode') === 'true' && !hydrated) {
+      _wipeDemoData(_supaUser.email);
+      try { _createSession(_supaUser.email); } catch(e){}
+      location.reload();
+      return;
+    }
     await _syncPioneerFromProfile(_supaUser.id);
     if (!hasValidSession() && _supaUser.email) {
       _createSession(_supaUser.email);
@@ -7933,6 +7974,7 @@ async function _initSupabaseSession() {
       try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
       try { if(typeof renderCashflow==='function') renderCashflow(); } catch(e) {}
       try { if(typeof renderDebtTab==='function') renderDebtTab(); } catch(e) {}
+      try { if(typeof renderAlTab==='function') renderAlTab(); } catch(e) {}
       try { if(typeof renderPioneerCard==='function') renderPioneerCard(); } catch(e) {}
     }
   } catch(e) {}
@@ -8084,6 +8126,14 @@ async function authVerifyOTP() {
     if (res.error) { _authErr('Incorrect or expired code. Try again.'); return; }
     _supaUser = res.data.user;
     var hydrated = await _hydrateFromSupabase(_supaUser.id);
+    // QC-2: demo visitor signing up for the first time — wipe sample data so
+    // the new account starts clean and demo values never sync to Supabase.
+    if (localStorage.getItem('vi_demo_mode') === 'true' && !hydrated) {
+      _wipeDemoData(_authOTP.email);
+      try { _createSession(_authOTP.email); } catch(e){}
+      location.reload();
+      return;
+    }
     _createSession(_authOTP.email);
     _completeAuth(_authOTP.email);
     if (hydrated) {
@@ -8093,6 +8143,7 @@ async function authVerifyOTP() {
         try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
         try { if(typeof renderCashflow==='function') renderCashflow(); } catch(e) {}
         try { if(typeof renderDebtTab==='function') renderDebtTab(); } catch(e) {}
+        try { if(typeof renderAlTab==='function') renderAlTab(); } catch(e) {}
       }, 150);
       showToast('Vault restored ✓');
     } else {
@@ -8496,7 +8547,7 @@ function renderCashflow(){
 // alState declared above init block
 function saveAL(){try{localStorage.setItem(AL_KEY,JSON.stringify(alState));}catch(e){}if(typeof checkAchievements==='function')checkAchievements();}
 function alTotalMetals(){var m=alState.metals,p=alState.metalPrices;return m.gold*p.gold+m.silver*p.silver+m.platinum*p.platinum+m.palladium*p.palladium;}
-function alTotalCrypto(){return alState.crypto.reduce(function(s,c){return s+c.amount*c.price;},0);}
+function alTotalCrypto(){return alState.crypto.reduce(function(s,c){var a=(c.amount!=null?c.amount:(c.qty!=null?c.qty:0))||0;var p=c.price||0;return s+a*p;},0);}
 function alTotalCash(){return alState.cashAccounts.reduce(function(s,a){return s+a.balance;},0);}
 function alTotalOther(){return alState.otherAssets.reduce(function(s,a){return s+a.value;},0);}
 // Liabilities: their current asset value ADDS to NW; only running costs detract
@@ -8727,26 +8778,31 @@ function renderAlTab(){
   if(ct){
     var cryptoTotal=alTotalCrypto();
     ct.innerHTML='<div class="wi-grid">'+alState.crypto.map(function(c){
+        // Defensive: tolerate legacy/demo shapes ({sym,qty,name}) so one bad
+        // entry degrades gracefully instead of throwing and killing the render.
+        var cid=c.id||(Date.now()+Math.floor(Math.random()*1e6));
+        var camount=(c.amount!=null?c.amount:(c.qty!=null?c.qty:0))||0;
+        var cprice=c.price||0;
         var logo=cryptoLogoUrl(c.sym||c.symbol||'');
         var change=c.change24h||0;
         var changeCol=change>=0?'var(--gr)':'var(--re)';
         var changeStr=(change>=0?'+':'')+change.toFixed(2)+'%';
-        var val=c.amount*c.price;
+        var val=camount*cprice;
         return'<div class="wi-tile" style="min-height:0">'
           +'<div class="wi-img-area" style="background:rgba(8,14,26,.9);flex-direction:column;gap:6px;padding:12px">'
           +(logo?'<img src="'+logo+'" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.06)" onerror="this.style.display=\'none\'">'
                :'<div style="font-size:1.8rem">'+(c.sym==='BTC'?'₿':c.sym==='ETH'?'Ξ':'🪙')+'</div>')
           +'<div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:1rem;color:var(--go)">'+(c.sym||c.symbol||'')+'</div>'
-          +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--t2)">£'+c.price.toLocaleString('en-GB')+'</div>'
+          +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--t2)">£'+cprice.toLocaleString('en-GB')+'</div>'
           +'<div style="font-size:.55rem;color:'+changeCol+'">'+(change!==0?changeStr:'')+'</div>'
           +'</div>'
           +'<div class="wi-info" style="padding:8px 10px">'
           +'<div style="font-family:\'Syne\',sans-serif;font-size:.68rem;font-weight:700;color:var(--em);margin-bottom:4px">£'+Math.round(val).toLocaleString('en-GB')+'</div>'
           +'<div style="display:flex;align-items:center;gap:4px;margin-bottom:6px">'
           +'<span style="font-size:.52rem;color:var(--t3)">Amount:</span>'
-          +'<input type="number" class="al-inp" style="flex:1;font-size:.62rem;padding:3px 6px" min="0" step="any" value="'+c.amount+'" onchange="updateCryptoAmount('+c.id+',this.value)" title="Editable: your holdings">'
+          +'<input type="number" class="al-inp" style="flex:1;font-size:.62rem;padding:3px 6px" min="0" step="any" value="'+camount+'" onchange="updateCryptoAmount('+cid+',this.value)" title="Editable: your holdings">'
           +'</div>'
-          +'<button class="data-item-del" style="font-size:.55rem;padding:2px 6px;border:1px solid var(--bd);border-radius:3px" onclick="delCrypto('+c.id+')">✕ Remove</button>'
+          +'<button class="data-item-del" style="font-size:.55rem;padding:2px 6px;border:1px solid var(--bd);border-radius:3px" onclick="delCrypto('+cid+')">✕ Remove</button>'
           +'</div>'
           +'</div>';
       }).join('')+'</div>';
@@ -13237,7 +13293,7 @@ function showUpgrade(plan) {
 
 function exportData() {
   try {
-    var keys = ['pos4', 'pos_house', 'pos_journey', 'vi_user', 'vi_debt', 'vi_ov'];
+    var keys = ['pos_ov1', 'pos_al1', 'pos_debt1', 'pos_biz1', 'pos_ach1', 'pos_house', 'pos_journey', 'vi_user', 'vi_debt', 'vi_ov'];
     var bundle = {};
     keys.forEach(function(k) {
       var v = localStorage.getItem(k);
@@ -13602,7 +13658,7 @@ function applyViSettings() {
 // ── TASK 7: PROGRESSIVE NAV ──────────────────────────────────────
 function applyProgressiveNav() {
   var hasCompletedWelcome = !!localStorage.getItem('vi_user');
-  var isDemoOrData = !!localStorage.getItem('pos4') || localStorage.getItem('vi_demo_mode') === 'true';
+  var isDemoOrData = !!localStorage.getItem('pos_ov1') || localStorage.getItem('vi_demo_mode') === 'true';
   var show = hasCompletedWelcome || isDemoOrData;
   ['assets','biz','connections'].forEach(function(tab) {
     var btns = document.querySelectorAll('[onclick*="showTab(\'' + tab + '\')"], [onclick*=\'showTab("' + tab + '"\']');
@@ -13658,7 +13714,7 @@ function loadDemoData() {
   if (!localStorage.getItem('pos_al1')) {
     localStorage.setItem('pos_al1', JSON.stringify({
       metals: { gold: 2.5, silver: 0, platinum: 0 },
-      crypto: [{ sym: 'ETH', qty: 1.4, name: 'Ethereum' }, { sym: 'BTC', qty: 0.05, name: 'Bitcoin' }],
+      crypto: [{ id: 1, sym: 'ETH', amount: 1.4, price: 2200 }, { id: 2, sym: 'BTC', amount: 0.05, price: 42000 }],
       cashAccounts: [{ id: 1, name: 'Marcus Savings', balance: 14800, rate: 4.7 }, { id: 2, name: 'Current Account', balance: 2300, rate: 0 }],
       otherAssets: [{ id: 3, name: 'Car — Honda Civic', value: 12500 }],
       liabilities: [{ id: 4, name: 'Car Finance', value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z' }]
@@ -13680,30 +13736,7 @@ function loadDemoData() {
       onboarded: true, stageOverride: 1, mortgageActive: false, mortgageBalance: 0, rentMonthly: 1200, rentYears: 3
     }));
   }
-  if (!localStorage.getItem('pos4')) {
-    localStorage.setItem('pos4', JSON.stringify({
-      income: [
-        { id: 1, name: 'Salary', mo: 3800, type: 'employment' },
-        { id: 2, name: 'Side Projects', mo: 350, type: 'freelance' }
-      ],
-      expenses: [
-        { id: 3, name: 'Rent',           mo: 1200, ess: true  },
-        { id: 4, name: 'Food & Grocery', mo: 380,  ess: true  },
-        { id: 5, name: 'Transport',      mo: 130,  ess: true  },
-        { id: 6, name: 'Subscriptions',  mo: 62,   ess: false },
-        { id: 7, name: 'Gym & Health',   mo: 45,   ess: false },
-        { id: 8, name: 'Eating Out',     mo: 95,   ess: false }
-      ],
-      snapshots: [
-        { date: '2025-01-01', nw: 8400  },
-        { date: '2025-02-01', nw: 10200 },
-        { date: '2025-03-01', nw: 12800 },
-        { date: '2025-04-01', nw: 15300 },
-        { date: '2025-05-01', nw: 17600 },
-        { date: '2025-06-01', nw: 20100 }
-      ]
-    }));
-  }
+  // (QC-3) pos4 removed — it was never read; cashflow reads pos_ov1 / ovState.
   if (!localStorage.getItem('pos_debt1')) {
     localStorage.setItem('pos_debt1', JSON.stringify({
       debts: [
@@ -13715,18 +13748,17 @@ function loadDemoData() {
 }
 
 function clearDemoData() {
-  localStorage.removeItem('vi_demo_mode');
-  localStorage.removeItem('pos4');
-  localStorage.removeItem('pos_house');
-  localStorage.removeItem('pos_journey');
+  // Full wipe (was incomplete — left pos_ov1/pos_al1/vi_user demo values behind).
+  _wipeDemoData();
   location.reload();
 }
 
 function initDemoMode() {
   var hasUser = !!localStorage.getItem('vi_user');
-  var hasData = !!localStorage.getItem('pos4');
+  var hasData = !!localStorage.getItem('pos_ov1');
+  var declined = localStorage.getItem('vi_declined_demo') === 'true';
   var isDemo  = localStorage.getItem('vi_demo_mode') === 'true';
-  if (!hasUser && !hasData) { loadDemoData(); isDemo = true; }
+  if (!hasUser && !hasData && !declined) { loadDemoData(); isDemo = true; }
   var chip = document.getElementById('demo-chip');
   if (chip) chip.style.display = isDemo ? 'flex' : 'none';
 }
