@@ -2728,6 +2728,39 @@ button.bd-ic{cursor:pointer}
 .bd-new-row .al-inp{flex:1 1 150px;min-width:0}
 .bd-new-lbl{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin:10px 0 6px}
 .cf-legend{gap:8px 14px}
+/* ── Wealth Inventory 3D viewer ── */
+.wi-img-area canvas.inv-spin{position:absolute;inset:0;width:100%;height:100%;display:block}
+.wi-img-area.inv-missing canvas.inv-spin{display:none}
+.inv-badge{position:absolute;top:6px;left:6px;z-index:2;font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:.08em;padding:2px 6px;border-radius:99px;background:rgba(100,181,246,.2);border:1px solid rgba(100,181,246,.5);color:#9bd0ff;pointer-events:none}
+.inv-exp{position:absolute;top:5px;right:26px;z-index:3;width:20px;height:20px;border-radius:4px;border:1px solid rgba(100,181,246,.5);background:rgba(0,0,0,.55);color:#9bd0ff;font-size:.7rem;line-height:1;cursor:pointer;padding:0}
+.inv-exp:hover{background:rgba(100,181,246,.25)}
+.wi-img-overlay{pointer-events:none}
+.wi-img-overlay .wi-img-btn{pointer-events:auto}
+.inv-modal{position:fixed;inset:0;z-index:9000;background:rgba(2,6,12,.94);display:flex;align-items:center;justify-content:center;padding:14px;outline:none}
+.inv-card{width:min(900px,100%);max-height:100%;display:flex;flex-direction:column;gap:10px;background:#07101a;border:1px solid rgba(100,181,246,.3);border-radius:14px;padding:14px;overflow:auto}
+.inv-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.inv-t{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--tx)}
+.inv-s{font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--t2);margin-top:2px}
+.inv-x{background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:30px;height:30px;cursor:pointer}
+.inv-x:hover{color:#fff;border-color:#64b5f6}
+.inv-stage{position:relative;width:100%;aspect-ratio:4/3;max-height:58vh;border-radius:10px;overflow:hidden;background:#0b1420;border:1px solid rgba(255,255,255,.06)}
+.inv-stage canvas{width:100%;height:100%;display:block}
+.inv-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--t3);pointer-events:none}
+.inv-ctl{position:absolute;bottom:8px;right:8px;display:flex;gap:4px}
+.inv-ctl button{width:30px;height:30px;border-radius:7px;border:1px solid rgba(100,181,246,.4);background:rgba(0,0,0,.6);color:#9bd0ff;font-size:.8rem;cursor:pointer;padding:0}
+.inv-ctl button:hover{background:rgba(100,181,246,.25)}
+.inv-hint{font-size:.52rem;color:var(--t2);line-height:1.5}
+.inv-strip{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px}
+.inv-th{position:relative;flex:0 0 74px;height:74px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.1)}
+.inv-th img{width:100%;height:100%;object-fit:cover;display:block}
+.inv-n{position:absolute;top:2px;left:4px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:#fff;text-shadow:0 0 3px #000}
+.inv-tb{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;background:rgba(0,0,0,.65)}
+.inv-tb button{background:none;border:none;color:#cfe;font-size:.55rem;cursor:pointer;padding:2px 5px}
+.inv-tb button:disabled{opacity:.25;cursor:default}
+.inv-tb button:hover:not(:disabled){color:#64b5f6}
+.inv-add{flex:0 0 74px;height:74px;border-radius:8px;border:1px dashed rgba(100,181,246,.5);color:#9bd0ff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:1.1rem;cursor:pointer;text-align:center}
+.inv-add span{font-family:'Syne',sans-serif;font-size:.42rem;font-weight:700}
+.inv-add:hover{background:rgba(100,181,246,.1)}
 </style>
 </head>
 <body>
@@ -7772,6 +7805,8 @@ var BD_GUESS=[
 ];
 var BD_INC_GUESS=[['salary',/salary|wage|pay|take-home|take home|job/i],['business',/side|freelance|business|client|project/i],['benefits',/benefit|universal|child benefit|pension|allowance/i],['dividends',/dividend|interest|cashback/i],['rental',/rent/i]];
 var _bdSel={inc:null,exp:null},_bdAuto={inc:'',exp:''},_bdEdit=null,_bdIconFor=null,_bdNewOpen={inc:false,exp:false},_bdNewIcon={inc:'dots',exp:'dots'};
+var INV_MAX=36,INV_SIZE=800,INV_THUMB=320;
+var _invDB=null,_invCache={},_invViews=[],_invSpin=null,_invOpen=null;
 var AL_KEY='pos_al1';
 var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
@@ -7926,6 +7961,7 @@ var _DEMO_DATA_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
 // can't auto-reload); omit it when a user clicks "start with my own data".
 function _wipeDemoData(realEmail){
   try { _DEMO_DATA_KEYS.forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
+  try { invClearAll(); } catch(e){}
   try { localStorage.removeItem('vi_demo_mode'); } catch(e){}
   // Demo sets vi_pioneer; real pioneer status is re-synced from the profile row.
   try { localStorage.removeItem('vi_pioneer'); } catch(e){}
@@ -8485,6 +8521,7 @@ function resetVaultData() {
   if (!confirm('RESET FINANCIAL DATA\n\nThis will permanently delete:\n• All assets & liabilities\n• All debts\n• Cashflow history\n• Business data\n• Achievements & XP\n\nYour profile, Pioneer status, and API keys are kept.\n\nContinue?')) return;
   var dataKeys = ['pos_al1','pos_debt1','pos_ov1','pos_biz1','pos_ach1','pos4','pos_house','pos_journey','vi_debt','vi_ov'];
   dataKeys.forEach(function(k) { localStorage.removeItem(k); });
+  try { invClearAll(); } catch(e) {}
   showToast('Financial data cleared ✓');
   setTimeout(function() { location.reload(); }, 1000);
 }
@@ -9576,19 +9613,21 @@ function renderAlTab(){
       oaEl.innerHTML='<div class="wi-grid">'+alState.otherAssets.map(function(a){
         var imgSrc=a.image||null;
         var iconDisplay=a.svgIcon||null;
-        var imgHtml='';
+        var imgHtml='',spin=(a.photos||0)>=2;
         if(imgSrc){
-          imgHtml='<img src="'+imgSrc+'" alt="'+a.name+'" onerror="this.style.display=\'none\'">';
+          imgHtml='<img src="'+imgSrc+'" alt="'+cfEsc(a.name)+'" onerror="this.style.display=\'none\'">';
         } else if(iconDisplay){
           imgHtml='<span style="font-size:2.5rem">'+iconDisplay+'</span>';
         } else {
           imgHtml=generateAssetISO(a.name);
         }
+        if(spin)imgHtml+='<canvas class="inv-spin" data-id="'+a.id+'" aria-label="3D view of '+cfEsc(a.name)+' — drag to rotate"></canvas><span class="inv-badge">3D · '+a.photos+'</span>';
+        if((a.photos||0)>=1)imgHtml+='<button class="inv-exp" title="Open the 3D viewer" onclick="invOpenViewer('+a.id+')">⤢</button>';
         return '<div class="wi-tile">'
           +'<div class="wi-img-area">'
           +imgHtml
           +'<div class="wi-img-overlay">'
-          +'<label class="wi-img-btn" title="Upload photo">📷<input type="file" accept="image/*" style="display:none" onchange="wiUpload('+a.id+',this)"></label>'
+          +'<label class="wi-img-btn" title="Add photos — several angles make a 3D view">📷<input type="file" accept="image/*" multiple style="display:none" onchange="wiUpload('+a.id+',this)"></label>'
           +'<button class="wi-img-btn" onclick="wiSearch('+a.id+')" title="Search image">🔍</button>'
           +'<button class="wi-img-btn" onclick="wiIcon('+a.id+')" title="Pick icon">🎨</button>'
           +'</div>'
@@ -9600,6 +9639,7 @@ function renderAlTab(){
           +'<button class="wi-del" onclick="delOtherAsset('+a.id+')">✕</button>'
           +'</div>';
       }).join('')+'</div>';
+      try{invHydrate();}catch(e){console.error('[Vault-It] invHydrate',e);}
     }
   }
 }
@@ -9633,19 +9673,206 @@ function addOtherAsset(){
   document.getElementById('oa-name').value='';document.getElementById('oa-val').value='';
   saveAL();renderAlTab();updateKPIs();
 }
-function delOtherAsset(id){alState.otherAssets=alState.otherAssets.filter(function(a){return a.id!==id;});saveAL();renderAlTab();updateKPIs();}
+function delOtherAsset(id){alState.otherAssets=alState.otherAssets.filter(function(a){return a.id!==id;});try{if(_invOpen===id)invCloseViewer();invDel(id);}catch(e){}saveAL();renderAlTab();updateKPIs();}
 
-function wiUpload(id,input){
-  var a=(alState.otherAssets||[]).find(function(x){return x.id===id;});
-  if(!a||!input.files||!input.files[0])return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    a.image=e.target.result;
-    a.svgIcon=null;
-    saveAL();renderAlTab();
-  };
-  reader.readAsDataURL(input.files[0]);
+// ═══════════════════════════════════════════════════════════════
+// WEALTH INVENTORY — multi-photo 3D viewer (photo turntable)
+// Photos are compressed and stored in IndexedDB on this device; the item keeps only a count
+// and a small cover thumbnail, so nothing heavy is synced or crammed into localStorage.
+// ═══════════════════════════════════════════════════════════════
+function invDB(){
+  return new Promise(function(res,rej){
+    if(_invDB)return res(_invDB);
+    if(!window.indexedDB)return rej(new Error('IndexedDB unavailable'));
+    var rq=indexedDB.open('vi_photos',1);
+    rq.onupgradeneeded=function(){rq.result.createObjectStore('sets');};
+    rq.onsuccess=function(){_invDB=rq.result;res(_invDB);};
+    rq.onerror=function(){rej(rq.error);};
+  });
 }
+function invTx(mode,fn){return invDB().then(function(db){return new Promise(function(res,rej){var st=db.transaction('sets',mode).objectStore('sets'),r=fn(st);r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};});});}
+function invGet(id){return invTx('readonly',function(s){return s.get(String(id));}).then(function(v){return (v&&v.frames)||[];});}
+function invPut(id,frames){delete _invCache[id];return invTx('readwrite',function(s){return s.put({frames:frames,updated:Date.now()},String(id));});}
+function invDel(id){delete _invCache[id];return invTx('readwrite',function(s){return s.delete(String(id));});}
+function invClearAll(){_invCache={};return invTx('readwrite',function(s){return s.clear();});}
+function invItem(id){return (alState.otherAssets||[]).find(function(x){return x.id===id;});}
+
+// resize + compress a photo (keeps orientation); returns a JPEG Blob
+function invProcess(file,max,q){
+  return new Promise(function(res,rej){
+    var fin=function(src,w,h){
+      var k=Math.min(1,max/Math.max(w,h)),cw=Math.max(1,Math.round(w*k)),ch=Math.max(1,Math.round(h*k));
+      var c=document.createElement('canvas');c.width=cw;c.height=ch;
+      var x=c.getContext('2d');x.fillStyle='#0b1420';x.fillRect(0,0,cw,ch);x.drawImage(src,0,0,cw,ch);
+      c.toBlob(function(b){b?res(b):rej(new Error('encode failed'));},'image/jpeg',q||0.78);
+    };
+    if(window.createImageBitmap){
+      createImageBitmap(file,{imageOrientation:'from-image'}).then(function(bm){fin(bm,bm.width,bm.height);}).catch(function(){viaImg();});
+    } else viaImg();
+    function viaImg(){
+      var u=URL.createObjectURL(file),im=new Image();
+      im.onload=function(){fin(im,im.naturalWidth,im.naturalHeight);URL.revokeObjectURL(u);};
+      im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('not an image'));};
+      im.src=u;
+    }
+  });
+}
+function invThumb(blob){
+  return invProcess(blob,INV_THUMB,0.72).then(function(b){return new Promise(function(res){var r=new FileReader();r.onload=function(){res(r.result);};r.readAsDataURL(b);});});
+}
+function invDecode(blob){
+  if(window.createImageBitmap)return createImageBitmap(blob);
+  return new Promise(function(res,rej){var u=URL.createObjectURL(blob),im=new Image();im.onload=function(){res(im);};im.onerror=rej;im.src=u;});
+}
+function invFrames(id){ // decoded frames, cached per item
+  if(_invCache[id])return _invCache[id];
+  return (_invCache[id]=invGet(id).then(function(blobs){return Promise.all(blobs.map(invDecode));}).catch(function(){delete _invCache[id];return [];}));
+}
+async function invAddPhotos(id,files){
+  var a=invItem(id);files=Array.prototype.slice.call(files||[]).filter(function(f){return /^image\//.test(f.type)||/\.(jpe?g|png|webp|heic)$/i.test(f.name||'');});
+  if(!a||!files.length)return;
+  try{
+    var have=await invGet(id),room=INV_MAX-have.length;
+    if(room<=0){showToast('Up to '+INV_MAX+' photos per item');return;}
+    if(files.length>room){showToast('Only the first '+room+' photos were added (max '+INV_MAX+')');files=files.slice(0,room);}
+    showToast('Processing '+files.length+' photo'+(files.length===1?'':'s')+'…');
+    var blobs=[];for(var i=0;i<files.length;i++){try{blobs.push(await invProcess(files[i],INV_SIZE,0.78));}catch(e){}}
+    if(!blobs.length){showToast('Those files could not be read as images');return;}
+    var all=have.concat(blobs);
+    await invPut(id,all);
+    a.photos=all.length;
+    a.image=await invThumb(all[0]);a.svgIcon=null;
+    saveAL();renderAlTab();
+    if(_invOpen===id)invRenderModal(id);
+    showToast(all.length>=2?('✓ '+all.length+' photos — drag the item to spin it in 3D'):'✓ Photo added — add more angles to make it 3D');
+  }catch(e){console.error('[Vault-It] photos',e);showToast('Could not save photos on this device');}
+}
+function wiUpload(id,input){invAddPhotos(id,input.files);try{input.value='';}catch(e){}}
+async function invRemoveFrame(id,idx){
+  var a=invItem(id),fr=await invGet(id);if(!a||idx<0||idx>=fr.length)return;
+  fr.splice(idx,1);
+  if(fr.length){await invPut(id,fr);a.photos=fr.length;if(idx===0)a.image=await invThumb(fr[0]);}
+  else{await invDel(id);a.photos=0;a.image=null;}
+  saveAL();renderAlTab();invRenderModal(id);
+}
+async function invMoveFrame(id,idx,dir){
+  var a=invItem(id),fr=await invGet(id),j=idx+dir;if(!a||j<0||j>=fr.length)return;
+  var t=fr[idx];fr[idx]=fr[j];fr[j]=t;
+  await invPut(id,fr);if(idx===0||j===0)a.image=await invThumb(fr[0]);
+  saveAL();renderAlTab();invRenderModal(id);
+}
+
+// ── turntable viewer: drag / swipe to spin between frames, wheel or pinch to zoom ──
+function InvSpin(canvas,frames,opt){
+  opt=opt||{};
+  var me=this;me.c=canvas;me.f=frames;me.ang=0;me.vel=0;me.zoom=1;me.auto=!!opt.auto;me.ptr={};me.pinch=0;me.raf=0;me.last=0;me.idle=0;me.dead=false;
+  me.c.style.touchAction='pan-y';me.c.style.cursor='grab';
+  function cssW(){return me.c.getBoundingClientRect().width||me.c.clientWidth||200;}
+  me.c.addEventListener('pointerdown',function(e){
+    me.ptr[e.pointerId]={x:e.clientX,y:e.clientY};me.auto=false;me.vel=0;
+    try{me.c.setPointerCapture(e.pointerId);}catch(_){}
+    me.c.style.cursor='grabbing';
+    if(Object.keys(me.ptr).length===2){var p=Object.keys(me.ptr).map(function(k){return me.ptr[k];});me.pinch=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);}
+  });
+  me.c.addEventListener('pointermove',function(e){
+    var p=me.ptr[e.pointerId];if(!p)return;
+    var ids=Object.keys(me.ptr);
+    if(ids.length===2){
+      me.ptr[e.pointerId]={x:e.clientX,y:e.clientY};
+      var q=ids.map(function(k){return me.ptr[k];}),d=Math.hypot(q[0].x-q[1].x,q[0].y-q[1].y);
+      if(me.pinch>0)me.setZoom(me.zoom*d/me.pinch);me.pinch=d;
+    } else {
+      var dx=e.clientX-p.x;p.x=e.clientX;p.y=e.clientY;
+      var d2=-dx/cssW()*me.f.length*(opt.gain||1);
+      me.ang+=d2;me.vel=d2;me.draw();
+    }
+  });
+  var up=function(e){delete me.ptr[e.pointerId];me.pinch=0;me.c.style.cursor='grab';if(!Object.keys(me.ptr).length&&Math.abs(me.vel)>0.02)me.kick();};
+  me.c.addEventListener('pointerup',up);me.c.addEventListener('pointercancel',up);
+  me.c.addEventListener('wheel',function(e){if(!opt.wheel)return;e.preventDefault();me.setZoom(me.zoom*(1-e.deltaY*0.0015));},{passive:false});
+  me.draw();if(me.auto)me.kick();
+}
+InvSpin.prototype.setZoom=function(z){this.zoom=Math.max(1,Math.min(4,z));this.draw();};
+InvSpin.prototype.kick=function(){var me=this;if(me.raf)return;me.last=performance.now();me.raf=requestAnimationFrame(function t(now){
+  me.raf=0;if(me.dead||!document.body.contains(me.c))return;
+  var dt=Math.min(50,now-me.last)/16.7;me.last=now;
+  if(me.auto){me.ang+=0.025*dt*Math.max(1,me.f.length/12);}
+  else if(Math.abs(me.vel)>0.005&&!Object.keys(me.ptr).length){me.ang+=me.vel*dt;me.vel*=Math.pow(0.93,dt);}
+  else return;
+  me.draw();me.raf=requestAnimationFrame(t);
+});};
+InvSpin.prototype.step=function(n){this.auto=false;this.ang=Math.round(this.ang)+n;this.draw();};
+InvSpin.prototype.draw=function(){
+  var c=this.c,r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;
+  var W=Math.max(40,Math.round((r.width||c.clientWidth||200)*d)),H=Math.max(40,Math.round((r.height||c.clientHeight||200)*d));
+  if(c.width!==W||c.height!==H){c.width=W;c.height=H;}
+  var x=c.getContext('2d'),N=this.f.length;
+  x.globalAlpha=1;x.fillStyle='#0b1420';x.fillRect(0,0,W,H);
+  if(!N)return;
+  var a=((this.ang%N)+N)%N,i=Math.floor(a),t=a-i,j=(i+1)%N,z=this.zoom;
+  var put=function(im,al){var s=Math.min(W/im.width,H/im.height)*z,dw=im.width*s,dh=im.height*s;x.globalAlpha=al;x.drawImage(im,(W-dw)/2,(H-dh)/2,dw,dh);};
+  put(this.f[i],1);if(N>1&&t>0.001)put(this.f[j],t);
+  x.globalAlpha=1;this.frame=i;
+};
+// small live viewers inside the inventory tiles
+function invHydrate(){
+  _invViews=_invViews.filter(function(v){if(!document.body.contains(v.c)){v.dead=true;return false;}return true;});
+  var cs=document.querySelectorAll('canvas.inv-spin');
+  if(!cs.length)return;
+  var load=function(c){
+    if(c._inv)return;c._inv=1;
+    var id=+c.getAttribute('data-id');
+    invFrames(id).then(function(fr){
+      if(!document.body.contains(c))return;
+      if(!fr.length){c.parentNode&&c.parentNode.classList.add('inv-missing');return;}
+      var v=new InvSpin(c,fr,{});_invViews.push(v);
+    });
+  };
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){io.unobserve(e.target);load(e.target);}});},{rootMargin:'120px'});
+    cs.forEach(function(c){io.observe(c);});
+  } else cs.forEach(load);
+}
+// ── expanded viewport ──
+async function invOpenViewer(id){
+  var a=invItem(id);if(!a)return;
+  invCloseViewer();
+  _invOpen=id;
+  var o=document.createElement('div');o.id='inv-modal';o.className='inv-modal';
+  o.addEventListener('keydown',function(e){if(e.key==='Escape')invCloseViewer();else if(e.key==='ArrowLeft'&&_invSpin)_invSpin.step(-1);else if(e.key==='ArrowRight'&&_invSpin)_invSpin.step(1);});
+  o.setAttribute('tabindex','-1');
+  document.body.appendChild(o);o.focus();
+  await invRenderModal(id);
+}
+function invCloseViewer(){
+  var o=document.getElementById('inv-modal');if(o)o.remove();
+  if(_invSpin){_invSpin.dead=true;_invSpin=null;}
+  _invOpen=null;
+}
+async function invRenderModal(id){
+  var o=document.getElementById('inv-modal'),a=invItem(id);if(!o||!a)return;
+  var blobs=await invGet(id),frames=await invFrames(id);
+  var urls=blobs.map(function(b){return URL.createObjectURL(b);});
+  var n=blobs.length;
+  var hint=n===0?'Add photos taken from all around the object — keep the same distance and height, moving in order.':n===1?'One photo so far. Add more angles (12–24 around the object works best) to unlock the 3D spin.':n<8?'Add a few more angles for a smoother spin — 12–24 works best.':'Drag left/right to spin · scroll or pinch to zoom · arrow keys step frame by frame.';
+  var prev=_invSpin;
+  o.innerHTML='<div class="inv-card">'
+    +'<div class="inv-hd"><div><div class="inv-t">'+cfEsc(a.name)+'</div><div class="inv-s">£'+(a.value||0).toLocaleString('en-GB')+' · '+n+' photo'+(n===1?'':'s')+(n>=2?' · 3D view':'')+'</div></div>'
+    +'<button class="inv-x" onclick="invCloseViewer()" title="Close">✕</button></div>'
+    +'<div class="inv-stage"><canvas id="inv-big"></canvas>'+(n===0?'<div class="inv-empty">No photos yet</div>':'')
+    +'<div class="inv-ctl"><button title="Auto-rotate" onclick="invToggleAuto()" id="inv-auto">⟳</button><button title="Zoom in" onclick="invZoom(0.35)">＋</button><button title="Zoom out" onclick="invZoom(-0.35)">－</button><button title="Previous frame" onclick="_invSpin&&_invSpin.step(-1)">◀</button><button title="Next frame" onclick="_invSpin&&_invSpin.step(1)">▶</button></div></div>'
+    +'<div class="inv-hint">'+hint+'</div>'
+    +'<div class="inv-strip">'+urls.map(function(u,i){return '<div class="inv-th"><img src="'+u+'" alt="photo '+(i+1)+'"><span class="inv-n">'+(i+1)+'</span>'
+      +'<span class="inv-tb"><button onclick="invMoveFrame('+id+','+i+',-1)" title="Move earlier"'+(i===0?' disabled':'')+'>◀</button><button onclick="invRemoveFrame('+id+','+i+')" title="Delete photo">✕</button><button onclick="invMoveFrame('+id+','+i+',1)" title="Move later"'+(i===n-1?' disabled':'')+'>▶</button></span></div>';}).join('')
+    +'<label class="inv-add">＋<span>Add photos</span><input type="file" accept="image/*" multiple style="display:none" onchange="invAddPhotos('+id+',this.files);this.value=\'\'"></label></div>'
+    +'</div>';
+  var cv=document.getElementById('inv-big');
+  if(prev)prev.dead=true;
+  _invSpin=n?new InvSpin(cv,frames,{auto:n>=2,wheel:true,gain:1.15}):null;
+  if(!n&&cv)new InvSpin(cv,[],{});
+}
+function invToggleAuto(){if(!_invSpin)return;_invSpin.auto=!_invSpin.auto;if(_invSpin.auto)_invSpin.kick();}
+function invZoom(d){if(_invSpin)_invSpin.setZoom(_invSpin.zoom+d);}
 
 function wiSearch(id){
   var a=(alState.otherAssets||[]).find(function(x){return x.id===id;});
