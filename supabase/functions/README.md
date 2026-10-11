@@ -55,3 +55,17 @@ add and verify your own domain in Resend → Domains.
 
 If the Edge Function is not deployed, the app automatically falls back to
 Supabase's built-in `signInWithOtp` (rate-limited to ~4 emails/hour per project).
+
+
+## pin-auth
+
+Email + PIN sign-in for returning users on any device.
+
+1. Run `supabase/migrations/004_user_pins.sql` once (SQL Editor, or `supabase db push`). It creates the
+   locked-down `user_pins` table and the atomic `pin_begin_attempt` / `pin_reset_attempts` functions.
+2. Deploy: `supabase functions deploy pin-auth --no-verify-jwt`
+   (optional: `supabase secrets set PIN_PEPPER=<random>`; defaults to the service-role key).
+
+Actions: `status` (does this email have a PIN?), `set` / `remove` (need the signed-in user's JWT) and
+`login` (email + 6-digit PIN → one-time code the app exchanges for a real session).
+PINs are PBKDF2-hashed server-side; 5 wrong tries lock the account for 15 min, doubling every further 5.

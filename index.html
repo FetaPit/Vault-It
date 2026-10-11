@@ -2803,13 +2803,8 @@ button.bd-ic{cursor:pointer}
         <div style="font-size:1.6rem;margin-bottom:6px">🔐</div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);letter-spacing:.1em">SECURE YOUR VAULT</div>
       </div>
-      <div class="auth-label" style="text-align:center" id="auth-setpin-label">Set a 4-digit PIN for quick access</div>
-      <div class="auth-pin-dots">
-        <div class="auth-pin-dot" id="spd0"></div>
-        <div class="auth-pin-dot" id="spd1"></div>
-        <div class="auth-pin-dot" id="spd2"></div>
-        <div class="auth-pin-dot" id="spd3"></div>
-      </div>
+      <div class="auth-label" style="text-align:center" id="auth-setpin-label">Set a 6-digit PIN — then sign in anywhere with just your email + PIN</div>
+      <div class="auth-pin-dots" id="spin-dots"></div>
       <div class="auth-pin-pad">
         <button class="auth-pin-key" onclick="_setPinKey('1')">1</button>
         <button class="auth-pin-key" onclick="_setPinKey('2')">2</button>
@@ -2834,12 +2829,9 @@ button.bd-ic{cursor:pointer}
         <div style="font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);letter-spacing:.1em">VAULT LOCKED</div>
       </div>
       <div class="auth-label" style="text-align:center">Enter your PIN</div>
-      <div class="auth-pin-dots">
-        <div class="auth-pin-dot" id="pd0"></div>
-        <div class="auth-pin-dot" id="pd1"></div>
-        <div class="auth-pin-dot" id="pd2"></div>
-        <div class="auth-pin-dot" id="pd3"></div>
-      </div>
+      <div id="auth-pin-email" style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--em);margin-top:-4px"></div>
+      <div class="auth-pin-dots" id="pin-dots"></div>
+      <div id="auth-pin-status" style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--t3);min-height:14px"></div>
       <div class="auth-pin-pad">
         <button class="auth-pin-key" onclick="_enterPinKey('1')">1</button>
         <button class="auth-pin-key" onclick="_enterPinKey('2')">2</button>
@@ -2854,7 +2846,8 @@ button.bd-ic{cursor:pointer}
         <button class="auth-pin-key" onclick="_enterPinKey('0')">0</button>
         <button class="auth-pin-key del" onclick="_enterPinDel()">⌫</button>
       </div>
-      <button class="auth-btn secondary" onclick="authForgotPin()" style="margin-top:14px;opacity:.55;font-size:.48rem">Forgot PIN? Use email</button>
+      <button class="auth-btn secondary" onclick="authGoBack()" style="margin-top:10px;opacity:.55;font-size:.48rem">← Use a different email</button>
+      <button class="auth-btn secondary" onclick="authForgotPin()" style="margin-top:4px;opacity:.55;font-size:.48rem">Forgot PIN? Get an email code</button>
     </div>
 
     <div id="auth-err" class="auth-err"></div>
@@ -4757,6 +4750,16 @@ button.bd-ic{cursor:pointer}
       <label style="font-size:.48rem;color:var(--t2);display:block;margin-bottom:4px">Pioneer NFT Contract Address (Shibarium)</label>
       <input type="text" id="set-nft-contract" class="al-inp" placeholder="0x..." style="width:100%;margin-bottom:6px">
       <div style="font-size:.46rem;color:var(--t3);line-height:1.6">Create a Payment Link in your Stripe Dashboard → set price to £7.77, one-time. Paste the link above. The NFT contract address is populated after deploying an ERC-721 to Shibarium mainnet.</div>
+    </div>
+
+    <!-- Security -->
+    <div style="margin-bottom:20px;padding:14px;background:rgba(68,192,185,.04);border-radius:8px;border:1px solid rgba(68,192,185,.2)">
+      <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--em);margin-bottom:6px;letter-spacing:.06em">🔐 Sign-in PIN</div>
+      <div style="font-size:.48rem;color:var(--t3);line-height:1.6;margin-bottom:10px">Set a 6-digit PIN to sign back in on any device with just your email + PIN — no email code needed. Five wrong tries lock it for 15 minutes (an email code always works).</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-add-data" onclick="authChangePin()">Set / change PIN</button>
+        <button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="authRemovePin()">Remove PIN</button>
+      </div>
     </div>
 
     <!-- Danger zone -->
@@ -7807,6 +7810,8 @@ var BD_INC_GUESS=[['salary',/salary|wage|pay|take-home|take home|job/i],['busine
 var _bdSel={inc:null,exp:null},_bdAuto={inc:'',exp:''},_bdEdit=null,_bdIconFor=null,_bdNewOpen={inc:false,exp:false},_bdNewIcon={inc:'dots',exp:'dots'};
 var INV_MAX=36,INV_SIZE=800,INV_THUMB=320;
 var _invDB=null,_invCache={},_invViews=[],_invSpin=null,_invOpen=null;
+var PIN_LEN=6,_SETPIN_LABEL='Set a 6-digit PIN — then sign in anywhere with just your email + PIN';
+var _authForgot=false,_needPin=null,_pinMode='local',_pinEnterLen=4,_pinBusy=false,_pinChange=false;
 var AL_KEY='pos_al1';
 var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
@@ -8006,12 +8011,11 @@ function _initSupabase() {
       if (!hasValidSession()) _createSession(_supaUser.email);
       var ov = document.getElementById('login-overlay');
       if (ov && ov.style.display !== 'none') {
-        var pinHash = localStorage.getItem('vi_pin_hash');
-        if (!pinHash) {
+        if (_pinPromptNeeded()) {
           _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
           _updatePinDots(0, 'spd');
           var lbl = document.getElementById('auth-setpin-label');
-          if (lbl) lbl.textContent = 'Set a 4-digit PIN for quick access';
+          if (lbl) lbl.textContent = _SETPIN_LABEL;
           _showAuthStep('setpin');
         } else {
           ov.style.display = 'none';
@@ -8109,7 +8113,7 @@ async function _initSupabaseSession() {
       if (ov && ov.style.display !== 'none') {
         var pinHash = localStorage.getItem('vi_pin_hash');
         if (pinHash) {
-          _pinEnterBuf = ''; _updatePinDots(0, 'pd');
+          _pinMode = 'local'; _pinEnterLen = _localPinLen(); _pinEnterBuf = '';
           _showAuthStep('pin');
         } else {
           ov.style.display = 'none';
@@ -8150,7 +8154,7 @@ function _createSession(email) {
 }
 
 function signOut() {
-  if (!confirm('Sign out? You will need your email to get back in.')) return;
+  if (!confirm('Sign out? You can get back in with just your email and PIN.')) return;
   if (_supaClient) _supaClient.auth.signOut().catch(function(){});
   localStorage.removeItem('vi_session');
   location.reload();
@@ -8161,6 +8165,12 @@ function _showAuthStep(step) {
     var el = document.getElementById('auth-' + s + '-step');
     if (el) el.classList.toggle('active', s === step);
   });
+  if (step === 'setpin') _renderPinDots('spin-dots', 'spd', PIN_LEN);
+  if (step === 'pin') {
+    _renderPinDots('pin-dots', 'pd', _pinEnterLen);
+    var pe = document.getElementById('auth-pin-email'); if (pe) pe.textContent = (_authOTP && _authOTP.email) || '';
+    var ps = document.getElementById('auth-pin-status'); if (ps) ps.textContent = '';
+  }
   _clearAuthErr();
 }
 
@@ -8172,25 +8182,41 @@ function _clearAuthErr() {
   var el = document.getElementById('auth-err'); if (el) { el.textContent = ''; el.style.display = 'none'; }
 }
 
-function authSubmitEmail() {
+async function authSubmitEmail() {
   var emailEl = document.getElementById('auth-email');
   var email   = emailEl ? emailEl.value.trim().toLowerCase() : '';
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     _authErr('Please enter a valid email address.'); return;
   }
-  // Returning user shortcut: if PIN is set and email matches stored profile, go straight to PIN
-  var pinHash = localStorage.getItem('vi_pin_hash');
-  if (pinHash) {
-    var storedEmail = '';
-    try { var _sv = JSON.parse(localStorage.getItem('vi_session') || 'null'); storedEmail = (_sv && _sv.email) ? _sv.email : ''; } catch(e) {}
-    if (!storedEmail) { try { var _su = JSON.parse(localStorage.getItem('vi_user') || 'null'); storedEmail = (_su && _su.email) ? _su.email.toLowerCase() : ''; } catch(e) {} }
-    if (storedEmail && storedEmail === email) {
-      _authOTP = { email: email };
+  var btn = document.querySelector('#auth-email-step .auth-btn');
+  if (btn) { btn.textContent = 'Checking…'; btn.disabled = true; }
+  try {
+    _authOTP = { email: email }; _authForgot = false; _needPin = null; _pinBusy = false;
+    // Returning user with a PIN (set on any device): e-mail + PIN signs them in
+    var st = await _pinStatus(email);
+    if (st.pin === true) {
+      _pinMode = 'server'; _pinEnterLen = PIN_LEN; _pinEnterBuf = '';
       _showAuthStep('pin');
       return;
     }
+    // Legacy: a PIN that only exists on this device AND a live session → local lock screen
+    var pinHash = localStorage.getItem('vi_pin_hash');
+    if (pinHash) {
+      var storedEmail = '';
+      try { var _sv = JSON.parse(localStorage.getItem('vi_session') || 'null'); storedEmail = (_sv && _sv.email) ? _sv.email : ''; } catch(e) {}
+      if (!storedEmail) { try { var _su = JSON.parse(localStorage.getItem('vi_user') || 'null'); storedEmail = (_su && _su.email) ? _su.email.toLowerCase() : ''; } catch(e) {} }
+      var live = false;
+      try { if (_supaClient) { var g = await _supaClient.auth.getSession(); live = !!(g.data && g.data.session); } } catch(e) {}
+      if (storedEmail && storedEmail === email && live) {
+        _pinMode = 'local'; _pinEnterLen = _localPinLen(); _pinEnterBuf = '';
+        _showAuthStep('pin');
+        return;
+      }
+    }
+    _sendOTP(email);
+  } finally {
+    if (btn && !document.getElementById('auth-email-step').classList.contains('active')) { btn.textContent = 'Continue →'; btn.disabled = false; }
   }
-  _sendOTP(email);
 }
 
 async function _sendOTP(email) {
@@ -8261,6 +8287,35 @@ function _tryEmailJSOTP(email, code) {
   }
 }
 
+// Everything that happens once a Supabase session exists (e-mail code OR e-mail + PIN)
+async function _afterVerified(user, email) {
+  _supaUser = user;
+  var hydrated = await _hydrateFromSupabase(_supaUser.id);
+  // QC-2: demo visitor signing up for the first time — wipe sample data so
+  // the new account starts clean and demo values never sync to Supabase.
+  if (localStorage.getItem('vi_demo_mode') === 'true' && !hydrated) {
+    _wipeDemoData(email);
+    try { _createSession(email); } catch(e){}
+    location.reload();
+    return;
+  }
+  _createSession(email);
+  _completeAuth(email);
+  if (hydrated) {
+    setTimeout(function() {
+      try { if(typeof loadState==='function') loadState(); } catch(e) {}
+      try { if(typeof updateKPIs==='function') updateKPIs(); } catch(e) {}
+      try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
+      try { if(typeof renderCashflow==='function') renderCashflow(); } catch(e) {}
+      try { if(typeof renderDebtTab==='function') renderDebtTab(); } catch(e) {}
+      try { if(typeof renderAlTab==='function') renderAlTab(); } catch(e) {}
+    }, 150);
+    showToast('Vault restored ✓');
+  } else {
+    showToast('Vault ready ✓');
+  }
+}
+
 async function authVerifyOTP() {
   var entered = (document.getElementById('auth-otp-inp') || {}).value || '';
   if (!_authOTP || !_authOTP.email) { _authErr('Session expired. Go back and try again.'); return; }
@@ -8268,36 +8323,17 @@ async function authVerifyOTP() {
   var btn = document.querySelector('#auth-otp-step .auth-btn');
   if (btn) { btn.textContent = 'Verifying…'; btn.disabled = true; }
   try {
+    var email = _authOTP.email;
+    // Decide whether to ask for a PIN BEFORE signing in (the sign-in event fires immediately):
+    // new users, people who forgot their PIN, and anyone without one on the server.
+    var st = await _pinStatus(email);
+    _needPin = (st.pin === null) ? (_authForgot ? true : null) : (!st.pin || _authForgot);
     var res = await _supaClient.auth.verifyOtp({
-      email: _authOTP.email, token: entered.trim(), type: 'email'
+      email: email, token: entered.trim(), type: 'email'
     });
-    if (res.error) { _authErr('Incorrect or expired code. Try again.'); return; }
-    _supaUser = res.data.user;
-    var hydrated = await _hydrateFromSupabase(_supaUser.id);
-    // QC-2: demo visitor signing up for the first time — wipe sample data so
-    // the new account starts clean and demo values never sync to Supabase.
-    if (localStorage.getItem('vi_demo_mode') === 'true' && !hydrated) {
-      _wipeDemoData(_authOTP.email);
-      try { _createSession(_authOTP.email); } catch(e){}
-      location.reload();
-      return;
-    }
-    _createSession(_authOTP.email);
-    _completeAuth(_authOTP.email);
-    if (hydrated) {
-      setTimeout(function() {
-        try { if(typeof loadState==='function') loadState(); } catch(e) {}
-        try { if(typeof updateKPIs==='function') updateKPIs(); } catch(e) {}
-        try { if(typeof updateSidebar==='function') updateSidebar(); } catch(e) {}
-        try { if(typeof renderCashflow==='function') renderCashflow(); } catch(e) {}
-        try { if(typeof renderDebtTab==='function') renderDebtTab(); } catch(e) {}
-        try { if(typeof renderAlTab==='function') renderAlTab(); } catch(e) {}
-      }, 150);
-      showToast('Vault restored ✓');
-    } else {
-      showToast('Vault ready ✓');
-    }
-  } catch(e) { _authErr('Verification failed. Please try again.'); }
+    if (res.error) { _needPin = null; _authErr('Incorrect or expired code. Try again.'); return; }
+    await _afterVerified(res.data.user, email);
+  } catch(e) { _needPin = null; _authErr('Verification failed. Please try again.'); }
   finally {
     if (btn) { btn.textContent = 'Verify Code →'; btn.disabled = false; }
   }
@@ -8342,18 +8378,20 @@ function authSkipPin() {
 }
 
 function authForgotPin() {
-  localStorage.removeItem('vi_pin_hash');
-  var email = (_supaUser && _supaUser.email) ? _supaUser.email : '';
+  // reset path: prove the e-mail with a code, then choose a new PIN
+  _authForgot = true;
+  localStorage.removeItem('vi_pin_hash'); localStorage.removeItem('vi_pin_len');
+  var email = (_authOTP && _authOTP.email) ? _authOTP.email : ((_supaUser && _supaUser.email) ? _supaUser.email : '');
   if (!email) {
     var emailEl = document.getElementById('auth-email');
     email = emailEl ? emailEl.value.trim().toLowerCase() : '';
   }
   if (!email) { _showAuthStep('email'); return; }
-  _sendOTP(email);
+  _sendOTP(email.toLowerCase());
 }
 
 function authGoBack() {
-  _authOTP = null;
+  _authOTP = null; _authForgot = false; _needPin = null; _pinBusy = false; _pinMode = 'local';
   var inp = document.getElementById('auth-otp-inp');
   if (inp) inp.value = '';
   var btn = document.querySelector('#auth-email-step .auth-btn');
@@ -8367,23 +8405,51 @@ async function authResendOTP() {
 }
 
 // ── PIN MANAGEMENT ─────────────────────────────────────────────
+// The PIN is a 6-digit account PIN verified on the server (edge function `pin-auth`): after the
+// first e-mail-code sign-in, returning users sign in on ANY device with just e-mail + PIN.
+// A legacy 4-digit PIN that only exists on this device still works as a local lock.
 var _pinSetBuf = '';
 var _pinSetFirst = '';
 var _pinSetPhase = 'enter'; // 'enter' | 'confirm'
 var _pinEnterBuf = '';
 
+function _localPinLen() { var n = parseInt(localStorage.getItem('vi_pin_len') || '4', 10); return (n >= 4 && n <= 6) ? n : 4; }
+function _pinPromptNeeded() { return _needPin !== null ? _needPin : !localStorage.getItem('vi_pin_hash'); }
+
+function _renderPinDots(boxId, prefix, n) {
+  var box = document.getElementById(boxId); if (!box) return;
+  var h = ''; for (var i = 0; i < n; i++) h += '<div class="auth-pin-dot" id="' + prefix + i + '"></div>';
+  box.innerHTML = h;
+}
 function _updatePinDots(n, prefix) {
-  for (var i = 0; i < 4; i++) {
-    var d = document.getElementById(prefix + i);
-    if (d) d.classList.toggle('filled', i < n);
-  }
+  var i = 0, d;
+  while ((d = document.getElementById(prefix + i))) { d.classList.toggle('filled', i < n); i++; }
+}
+
+// call the pin-auth edge function; returns the parsed JSON body (also for 4xx answers) or null if unreachable
+async function _pinCall(body) {
+  if (!_supaClient) _initSupabase();
+  if (!_supaClient) return null;
+  try {
+    var r = await _supaClient.functions.invoke('pin-auth', { body: body });
+    if (r.data) return r.data;
+    if (r.error && r.error.context && typeof r.error.context.json === 'function') { try { return await r.error.context.json(); } catch (e) {} }
+  } catch (e) {}
+  return null;
+}
+async function _pinStatus(email) {
+  try {
+    var r = await Promise.race([_pinCall({ action: 'status', email: email }), new Promise(function(res) { setTimeout(function() { res(null); }, 4000); })]);
+    if (r && typeof r.pin === 'boolean') return { pin: r.pin };
+  } catch (e) {}
+  return { pin: null }; // unknown (function not reachable) → fall back to the old behaviour
 }
 
 function _setPinKey(d) {
-  if (_pinSetBuf.length >= 4) return;
+  if (_pinBusy || _pinSetBuf.length >= PIN_LEN) return;
   _pinSetBuf += d;
   _updatePinDots(_pinSetBuf.length, 'spd');
-  if (_pinSetBuf.length < 4) return;
+  if (_pinSetBuf.length < PIN_LEN) return;
   var buf = _pinSetBuf;
   setTimeout(function() {
     if (_pinSetPhase === 'enter') {
@@ -8393,40 +8459,50 @@ function _setPinKey(d) {
       var lbl = document.getElementById('auth-setpin-label');
       if (lbl) lbl.textContent = 'Confirm your PIN';
       _updatePinDots(0, 'spd');
+    } else if (buf === _pinSetFirst) {
+      _finishSetPin(buf);
     } else {
-      if (buf === _pinSetFirst) {
-        _lsOrig.call(localStorage, 'vi_pin_hash', _hashStr(buf));
-        showToast('PIN set ✓');
-        var _pinEmail = (_authOTP && _authOTP.email) ? _authOTP.email
-          : ((_supaUser && _supaUser.email) ? _supaUser.email : '');
-        if (_pinEmail) { _completeAuth(_pinEmail); } else { _skipPin(); }
-      } else {
-        _authErr('PINs don\'t match — try again');
-        _pinSetFirst = ''; _pinSetBuf = ''; _pinSetPhase = 'enter';
-        _updatePinDots(0, 'spd');
-        var lbl = document.getElementById('auth-setpin-label');
-        if (lbl) lbl.textContent = 'Set a 4-digit PIN for quick access';
-      }
+      _authErr('PINs don\'t match — try again');
+      _pinSetFirst = ''; _pinSetBuf = ''; _pinSetPhase = 'enter';
+      _updatePinDots(0, 'spd');
+      var lbl2 = document.getElementById('auth-setpin-label');
+      if (lbl2) lbl2.textContent = _SETPIN_LABEL;
     }
   }, 180);
 }
-
+async function _finishSetPin(pin) {
+  _pinBusy = true;
+  var email = (_authOTP && _authOTP.email) ? _authOTP.email : ((_supaUser && _supaUser.email) ? _supaUser.email.toLowerCase() : '');
+  var r = await _pinCall({ action: 'set', pin: pin });
+  var onServer = !!(r && r.ok);
+  _lsOrig.call(localStorage, 'vi_pin_hash', _hashStr(pin));
+  _lsOrig.call(localStorage, 'vi_pin_len', String(PIN_LEN));
+  _needPin = false; _authForgot = false; _pinBusy = false;
+  _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
+  showToast(onServer ? 'PIN set ✓ — sign in anywhere with just your email + PIN' : 'PIN saved on this device only — the PIN service could not be reached');
+  if (_pinChange) { _pinChange = false; _hideAuthOverlay(); return; }
+  if (email) { _completeAuth(email); } else { _skipPin(); }
+}
 function _setPinDel() {
   if (_pinSetBuf.length > 0) { _pinSetBuf = _pinSetBuf.slice(0,-1); _updatePinDots(_pinSetBuf.length, 'spd'); }
 }
-
-function _skipPin() {
+function _hideAuthOverlay() {
   var ov = document.getElementById('login-overlay');
-  if (ov) ov.style.display = 'none';
+  if (ov) ov.style.setProperty('display', 'none', 'important');
+}
+function _skipPin() {
+  _pinChange = false;
+  _hideAuthOverlay();
 }
 
 function _enterPinKey(d) {
-  if (_pinEnterBuf.length >= 4) return;
+  if (_pinBusy || _pinEnterBuf.length >= _pinEnterLen) return;
   _pinEnterBuf += d;
   _updatePinDots(_pinEnterBuf.length, 'pd');
-  if (_pinEnterBuf.length < 4) return;
+  if (_pinEnterBuf.length < _pinEnterLen) return;
   var buf = _pinEnterBuf;
   setTimeout(function() {
+    if (_pinMode === 'server') { _pinServerLogin(buf); return; }
     var stored = ''; try { stored = localStorage.getItem('vi_pin_hash') || ''; } catch(e) {}
     if (_hashStr(buf) === stored) {
       // Renew local session so overlay doesn't reappear on next visit
@@ -8434,8 +8510,7 @@ function _enterPinKey(d) {
       try { var _pse = JSON.parse(localStorage.getItem('vi_session') || 'null'); _pinEmail = (_pse && _pse.email) ? _pse.email : ''; } catch(e) {}
       if (!_pinEmail) { try { var _pue = JSON.parse(localStorage.getItem('vi_user') || 'null'); _pinEmail = (_pue && _pue.email) ? _pue.email.toLowerCase() : ''; } catch(e) {} }
       if (_pinEmail) _createSession(_pinEmail);
-      var ov = document.getElementById('login-overlay');
-      if (ov) ov.style.display = 'none';
+      _hideAuthOverlay();
       // If Supabase already has a valid JWT, hydrate — otherwise UI uses localStorage data
       if (_supaClient && !_supaUser) {
         _supaClient.auth.getSession().then(function(r) {
@@ -8459,9 +8534,66 @@ function _enterPinKey(d) {
     }
   }, 180);
 }
-
+// e-mail + PIN → the server checks the PIN and releases a one-time code that becomes a real session
+async function _pinServerLogin(pin) {
+  var email = (_authOTP && _authOTP.email) || '';
+  if (!email) { _showAuthStep('email'); return; }
+  _pinBusy = true; _clearAuthErr();
+  var lbl = document.getElementById('auth-pin-status'); if (lbl) lbl.textContent = 'Checking…';
+  var reset = function() { _pinBusy = false; _pinEnterBuf = ''; _updatePinDots(0, 'pd'); if (lbl) lbl.textContent = ''; };
+  var r = await _pinCall({ action: 'login', email: email, pin: pin });
+  if (!r) { reset(); _authErr('Couldn\'t reach the server — check your signal, or get an email code instead.'); return; }
+  if (r.error === 'locked') {
+    var m = Math.max(1, Math.ceil((r.retryAfter || 900) / 60));
+    reset(); _authErr('Too many attempts. Try again in ' + m + ' min — or get an email code instead.'); return;
+  }
+  if (!r.ok || !r.token) {
+    reset();
+    _authErr(r.remaining ? 'Incorrect PIN — ' + r.remaining + ' attempt' + (r.remaining === 1 ? '' : 's') + ' left.' : 'Incorrect PIN. Try again, or get an email code instead.');
+    return;
+  }
+  // PIN accepted: exchange the one-time code for a session. Mark the PIN as set BEFORE the
+  // sign-in event fires so no "set a PIN" prompt appears.
+  _lsOrig.call(localStorage, 'vi_pin_hash', _hashStr(pin));
+  _lsOrig.call(localStorage, 'vi_pin_len', String(PIN_LEN));
+  _needPin = false;
+  try {
+    var res = await _supaClient.auth.verifyOtp({ email: email, token: r.token, type: 'email' });
+    if (res.error || !res.data || !res.data.user) { reset(); _authErr('Sign-in failed — please use an email code instead.'); return; }
+    _pinBusy = false; _pinEnterBuf = '';
+    await _afterVerified(res.data.user, email);
+  } catch (e) { reset(); _authErr('Sign-in failed — please use an email code instead.'); }
+}
 function _enterPinDel() {
   if (_pinEnterBuf.length > 0) { _pinEnterBuf = _pinEnterBuf.slice(0,-1); _updatePinDots(_pinEnterBuf.length, 'pd'); }
+}
+// type the PIN on a keyboard as well as the on-screen pad
+document.addEventListener('keydown', function(e) {
+  var ov = document.getElementById('login-overlay');
+  if (!ov || getComputedStyle(ov).display === 'none') return;
+  var pinStep = document.getElementById('auth-pin-step'), setStep = document.getElementById('auth-setpin-step');
+  var onPin = pinStep && pinStep.classList.contains('active'), onSet = setStep && setStep.classList.contains('active');
+  if (!onPin && !onSet) return;
+  if (/^\d$/.test(e.key)) { e.preventDefault(); onPin ? _enterPinKey(e.key) : _setPinKey(e.key); }
+  else if (e.key === 'Backspace') { e.preventDefault(); onPin ? _enterPinDel() : _setPinDel(); }
+});
+
+// ── Settings: change / remove the PIN (needs a live session) ──
+function authChangePin() {
+  if (!_supaUser) { showToast('Sign in with an email code first, then set your PIN'); return; }
+  _pinChange = true;
+  _authOTP = { email: (_supaUser.email || '').toLowerCase() };
+  _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
+  var lbl = document.getElementById('auth-setpin-label'); if (lbl) lbl.textContent = _SETPIN_LABEL;
+  var sm = document.getElementById('settings-modal'); if (sm) sm.style.display = 'none';
+  var ov = document.getElementById('login-overlay'); if (ov) ov.style.setProperty('display', 'flex', 'important');
+  _showAuthStep('setpin');
+}
+async function authRemovePin() {
+  if (!confirm('Remove your PIN? You will sign in with an email code each time.')) return;
+  var r = await _pinCall({ action: 'remove' });
+  localStorage.removeItem('vi_pin_hash'); localStorage.removeItem('vi_pin_len');
+  showToast(r && r.ok ? 'PIN removed' : 'PIN removed on this device (the PIN service could not be reached)');
 }
 // ──────────────────────────────────────────────────────────────
 
@@ -8497,12 +8629,12 @@ function _completeAuth(email) {
     } catch(e) {}
   }
   var overlay = document.getElementById('login-overlay');
-  var pinHash = localStorage.getItem('vi_pin_hash');
-  if (!pinHash) {
+  var _askPin = _pinPromptNeeded(); _needPin = null;
+  if (_askPin) {
     _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
     _updatePinDots(0, 'spd');
     var lbl = document.getElementById('auth-setpin-label');
-    if (lbl) lbl.textContent = 'Set a 4-digit PIN for quick access';
+    if (lbl) lbl.textContent = _SETPIN_LABEL;
     _showAuthStep('setpin');
   } else {
     if (overlay) overlay.style.display = 'none';
