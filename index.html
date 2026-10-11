@@ -104,7 +104,11 @@ if ('serviceWorker' in navigator) {
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; background: var(--bg); color: var(--tx); font-family: 'Finance', 'DM Sans', sans-serif; }
+html { height: 100%; }
+/* body must GROW with its content (min-height, not height) — otherwise the sticky top nav's containing
+   block ends after one screenful and the whole nav scrolls away on long tabs. */
+body { min-height: 100%; }
+html, body { background: var(--bg); color: var(--tx); font-family: 'Finance', 'DM Sans', sans-serif; }
 
 /* ── TOP NAV ── */
 #topnav {
@@ -5448,6 +5452,7 @@ function showTab(id){
   });
   if(id==='overview'){updateKPIs();drawChart();renderCashflow();renderSummaryCards();}
   if(id==='budget'){renderCashflow();}
+  try{viNavReveal();}catch(e){}
   if(id==='house')setTimeout(redraw,30);
   if(id==='assets'){setTimeout(()=>{renderMetalsISO();renderAlTab();},30);}
   if(id==='debt'){renderDebtTab();setTimeout(function(){drawDebtHistogram();drawDebtDonut();},80);}
@@ -5461,6 +5466,14 @@ function showTab(id){
     var hasLive = achState && achState.connected && ['coingecko','metals_live','exchangerate','yahoo'].some(function(lid){ return achState.connected[lid]; });
     if (hasLive) refreshAllLiveConns();
   }
+}
+// Scroll the (horizontally scrollable) top nav so the active tab is fully visible
+function viNavReveal(){
+  var nav=document.getElementById('topnav'),b=nav&&nav.querySelector('.tab-btn.active');
+  if(!nav||!b)return;
+  var l=b.offsetLeft,r=l+b.offsetWidth,pad=48;
+  if(l<nav.scrollLeft+pad)nav.scrollTo?nav.scrollTo({left:Math.max(0,l-pad),behavior:'smooth'}):(nav.scrollLeft=Math.max(0,l-pad));
+  else if(r>nav.scrollLeft+nav.clientWidth-pad){var x=r-nav.clientWidth+pad;nav.scrollTo?nav.scrollTo({left:x,behavior:'smooth'}):(nav.scrollLeft=x);}
 }
 function showSubtab(group,id,btn){
   document.querySelectorAll('#'+group+'-page .subtab-panel').forEach(p=>{p.classList.remove('active');p.style.display='none';});
