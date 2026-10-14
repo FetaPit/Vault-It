@@ -7951,7 +7951,7 @@ var _supaClient = null;
 var _supaUser   = null;
 var _lsOrig     = Storage.prototype.setItem; // save original before patch
 var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
-  'pos_house','pos_journey','vi_jrny_events','vi_nw_history',
+  'ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history',
   'vi_settings','vi_user','vi_pioneer','vi_founder','vi_debt','vi_ov'];
 
 // Financial/data keys that demo mode seeds. On a demo→real-signup conversion
@@ -8061,6 +8061,11 @@ async function _supaSync(key, value) {
 }
 
 function _reloadAllState() {
+  // House Builder (deposit saved, target, type, mortgage) — was missing from sync + reload
+  try {
+    var _hs=localStorage.getItem('ht3');
+    if(_hs){ var _hp=JSON.parse(_hs); state=Object.assign(state,_hp); state.prices=Object.assign({},DEFAULTS,_hp.prices||{}); if(!state.apartmentFloor)state.apartmentFloor=5; if(typeof updateUI==='function')updateUI(); }
+  } catch(e) {}
   try { var _s=localStorage.getItem(OV_KEY); if(_s){ var _sp=JSON.parse(_s); ovState=Object.assign(ovState,_sp); } } catch(e) {}
   try { var _als=localStorage.getItem(AL_KEY); if(_als){ var _alp=JSON.parse(_als); alState=Object.assign(alState,_alp); if(_alp.metals)alState.metals=Object.assign(alState.metals,_alp.metals); if(_alp.metalPrices)alState.metalPrices=Object.assign(alState.metalPrices,_alp.metalPrices); if(_alp.crypto)alState.crypto=_alp.crypto; if(_alp.cashAccounts)alState.cashAccounts=_alp.cashAccounts; if(_alp.otherAssets)alState.otherAssets=_alp.otherAssets; if(_alp.liabilities)alState.liabilities=_alp.liabilities; } } catch(e) {}
   try { var _dsr=localStorage.getItem(DEBT_KEY); if(_dsr) debtState=JSON.parse(_dsr); } catch(e) {}
