@@ -8009,6 +8009,7 @@ function _initSupabase() {
       }
       await _syncPioneerFromProfile(_supaUser.id);
       if (!hasValidSession()) _createSession(_supaUser.email);
+      viMarkOnboardedUI();
       var ov = document.getElementById('login-overlay');
       if (ov && ov.style.display !== 'none') {
         if (_pinPromptNeeded()) {
@@ -8151,11 +8152,44 @@ function hasValidSession() {
   } catch(e) { return false; }
 }
 
+var SESSION_MS = 30 * 24 * 60 * 60 * 1000;   // rolling: renewed every time the app is opened
 function _createSession(email) {
   localStorage.setItem('vi_session', JSON.stringify({
     email: email.toLowerCase(),
-    expiry: Date.now() + 7 * 24 * 60 * 60 * 1000
+    expiry: Date.now() + SESSION_MS
   }));
+  try { localStorage.setItem('vi_last_email', email.toLowerCase()); } catch(e) {}
+}
+// Once a user is known (name + email, from this device or restored from the cloud) the intro
+// questionnaire must never appear again.
+function viMarkOnboardedUI() {
+  try {
+    var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
+    if (!u || !u.name || !u.email || localStorage.getItem('vi_demo_mode') === 'true') return false;
+    _vaultItUser = u;
+    var ov = document.getElementById('welcome-overlay');
+    if (ov) ov.style.setProperty('display', 'none', 'important');
+    try { applyPaywall(); } catch(e) {}
+    try { updateSidebar(); } catch(e) {}
+    try { applyProgressiveNav(); } catch(e) {}
+    return true;
+  } catch(e) { return false; }
+}
+// Open the app: keep a valid session rolling, or go straight to the PIN pad for a known e-mail.
+async function initQuickLogin() {
+  try {
+    var s = JSON.parse(localStorage.getItem('vi_session') || 'null');
+    if (s && s.expiry > Date.now() && s.email) { _createSession(s.email); return; }   // renew
+    var last = (localStorage.getItem('vi_last_email') || '').toLowerCase();
+    if (!last || localStorage.getItem('vi_demo_mode') === 'true') return;
+    var inp = document.getElementById('auth-email'); if (inp) inp.value = last;
+    var st = await _pinStatus(last);
+    if (st && st.pin === true && !hasValidSession()) {
+      _authOTP = { email: last };
+      _pinMode = 'server'; _pinEnterLen = PIN_LEN; _pinEnterBuf = '';
+      _showAuthStep('pin');
+    }
+  } catch(e) {}
 }
 
 function signOut() {
@@ -8306,6 +8340,7 @@ async function _afterVerified(user, email) {
   }
   _createSession(email);
   _completeAuth(email);
+  viMarkOnboardedUI();
   if (hydrated) {
     setTimeout(function() {
       try { if(typeof loadState==='function') loadState(); } catch(e) {}
@@ -14798,9 +14833,9 @@ function initWelcome() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() { _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); setTimeout(stkAutoRefresh, 4000); });
+  document.addEventListener('DOMContentLoaded', function() { _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); initQuickLogin(); setTimeout(stkAutoRefresh, 4000); });
 } else {
-  _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); setTimeout(stkAutoRefresh, 4000);
+  _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); initQuickLogin(); setTimeout(stkAutoRefresh, 4000);
 }
 
 // ─── ALPHA TEST SEEDER ────────────────────────────────────────────────────────
