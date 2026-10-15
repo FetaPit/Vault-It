@@ -7969,6 +7969,72 @@ var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
   'ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history',
   'vi_settings','vi_user','vi_pioneer','vi_founder','vi_debt','vi_ov'];
 
+// ── SAFE SYNC ─────────────────────────────────────────────────
+// Every edit to a vault key is time-stamped (vi_ts) and queued (vi_dirty) until the cloud confirms it.
+// Signing in never overwrites newer local work: see _hydrateFromSupabase.
+var _hydrating = false, _flushT = null, _flushing = false;
+var _devEstablished = (function() {   // a device that already belongs to a real user (decided before anything runs)
+  try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.name && u.email) && localStorage.getItem('vi_demo_mode') !== 'true'; } catch (e) { return false; }
+})();
+function _lsJSON(k, d) { try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } }
+function _markDirty(key) {
+  var d = _lsJSON('vi_dirty', []);
+  if (d.indexOf(key) < 0) { d.push(key); try { _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(d)); } catch (e) {} }
+}
+localStorage.setItem = function(key, value) {
+  _lsOrig.call(localStorage, key, value);
+  if (!_hydrating && _VAULT_KEYS.indexOf(key) > -1) {
+    try { var ts = _lsJSON('vi_ts', {}); ts[key] = Date.now(); _lsOrig.call(localStorage, 'vi_ts', JSON.stringify(ts)); } catch (e) {}
+    _markDirty(key);
+    if (_supaUser) { clearTimeout(_flushT); _flushT = setTimeout(_flushDirty, 250); }
+  }
+};
+async function _upsertRows(rows) {
+  if (!rows.length) return true;
+  if (_supaClient && !_sjsStalled) {
+    var r;
+    try { r = await _withTimeout(_supaClient.from('vault_data').upsert(rows, { onConflict: 'user_id,key' }).then(function(x) { return x; }, function(e) { return { error: e }; }), 8000, null); }
+    catch (e) { r = { error: e }; }
+    if (r && !r.error) return true;
+    if (!r) _sjsStalled = true;
+  }
+  try {   // supabase-js stalled or failed: write straight to the REST API with the saved session token
+    var tok = _localAccessToken(); if (!tok) return false;
+    var ctl = new AbortController(), t = setTimeout(function() { ctl.abort(); }, 15000);
+    var res = await fetch(_SUPA_URL + '/rest/v1/vault_data?on_conflict=user_id,key', {
+      method: 'POST', signal: ctl.signal,
+      headers: { 'content-type': 'application/json', apikey: _SUPA_KEY, authorization: 'Bearer ' + tok, prefer: 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify(rows)
+    });
+    clearTimeout(t);
+    return res.ok;
+  } catch (e) { return false; }
+}
+async function _flushDirty() {
+  if (_flushing || !_supaUser) return;
+  _flushing = true;
+  try {
+    var t0 = Date.now();
+    var dirty = _lsJSON('vi_dirty', []).filter(function(k) { return _VAULT_KEYS.indexOf(k) > -1; });
+    var rows = [];
+    dirty.forEach(function(k) {
+      var v = localStorage.getItem(k); if (v == null) return;
+      var p; try { p = JSON.parse(v); } catch (e) { p = v; }
+      rows.push({ user_id: _supaUser.id, key: k, value: p, updated_at: new Date(_lsJSON('vi_ts', {})[k] || t0).toISOString() });
+    });
+    if (!rows.length) { try { _lsOrig.call(localStorage, 'vi_dirty', '[]'); } catch (e) {} return; }
+    if (await _upsertRows(rows)) {
+      var ts = _lsJSON('vi_ts', {}), sent = rows.map(function(r) { return r.key; });
+      var left = _lsJSON('vi_dirty', []).filter(function(k) { return sent.indexOf(k) < 0 || (ts[k] || 0) > t0; });
+      _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(left));
+      try { _lsOrig.call(localStorage, 'vi_last_sync', String(Date.now())); } catch (e) {}
+    }
+  } catch (e) {} finally { _flushing = false; }
+}
+setInterval(function() { try { _flushDirty(); } catch (e) {} }, 60000);
+window.addEventListener('online', function() { try { _flushDirty(); } catch (e) {} });
+document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') { try { _flushDirty(); } catch (e) {} } });
+
 // Financial/data keys that demo mode seeds. On a demo→real-signup conversion
 // these MUST be wiped so the new account starts genuinely empty and demo values
 // never sync to Supabase under the real user_id (QC-2).
@@ -8002,7 +8068,8 @@ function _initSupabase() {
   if (typeof window.supabase === 'undefined') return;
   _supaClient = window.supabase.createClient(
     'https://legpubblzgknxdtvsant.supabase.co',
-    'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz'
+    'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz',
+    { auth: { lock: function(name, acquireTimeout, fn) { return fn(); } } }   // a stuck cross-tab lock froze sign-in; the session is only used by this tab
   );
   // Handle magic link returns and token refresh — fires when user clicks email link
   _supaClient.auth.onAuthStateChange(async function(event, session) {
@@ -8053,11 +8120,6 @@ function _initSupabase() {
       }
     }
   });
-  // Patch localStorage.setItem to auto-sync vault keys after auth
-  localStorage.setItem = function(key, value) {
-    _lsOrig.call(localStorage, key, value);
-    if (_supaUser && _VAULT_KEYS.indexOf(key) > -1) _supaSync(key, value);
-  };
 }
 
 // Belt-and-suspenders: re-try init if CDN loaded after DOMContentLoaded
@@ -8065,16 +8127,7 @@ window.addEventListener('load', function() {
   if (!_supaClient) { _initSupabase(); _initSupabaseSession(); }
 });
 
-async function _supaSync(key, value) {
-  if (!_supaClient || !_supaUser) return;
-  try {
-    var parsed; try { parsed = JSON.parse(value); } catch(e) { parsed = value; }
-    await _supaClient.from('vault_data').upsert(
-      { user_id: _supaUser.id, key: key, value: parsed, updated_at: new Date().toISOString() },
-      { onConflict: 'user_id,key' }
-    );
-  } catch(e) {}
-}
+function _supaSync(key) { _markDirty(key); _flushDirty(); }
 
 function _reloadAllState() {
   // House Builder (deposit saved, target, type, mortgage) — was missing from sync + reload
@@ -8092,15 +8145,35 @@ function _reloadAllState() {
 async function _hydrateFromSupabase(uid) {
   if (!_supaClient) return false;
   try {
-    var resp = await _supaClient.from('vault_data').select('key,value').eq('user_id', uid);
-    if (!resp.data || !resp.data.length) return false;
-    resp.data.forEach(function(row) {
-      _lsOrig.call(localStorage, row.key,
-        typeof row.value === 'object' ? JSON.stringify(row.value) : String(row.value));
-    });
+    var resp = await _withTimeout(_supaClient.from('vault_data').select('key,value,updated_at').eq('user_id', uid).then(function(x) { return x; }, function(e) { return { error: e }; }), 10000, null);
+    if (!resp || resp.error || !resp.data) return false;      // cloud unreachable: leave local data exactly as it is
+    var rows = resp.data, have = {}, ts = _lsJSON('vi_ts', {}), pulled = +localStorage.getItem('vi_last_pull') || 0, dirty = _lsJSON('vi_dirty', []);
+    _hydrating = true;
+    try {
+      rows.forEach(function(row) {
+        have[row.key] = 1;
+        var cloud = (row.value !== null && typeof row.value === 'object') ? JSON.stringify(row.value) : String(row.value);
+        var local = localStorage.getItem(row.key);
+        if (local === cloud) return;
+        var hasLocal = local != null && local !== '';
+        var localWins = false;
+        if (hasLocal && _devEstablished && _VAULT_KEYS.indexOf(row.key) > -1) {
+          var cloudMs = Date.parse(row.updated_at) || 0;
+          if (dirty.indexOf(row.key) > -1) localWins = true;                 // edited here, not yet confirmed by the cloud
+          else if (ts[row.key]) localWins = ts[row.key] > cloudMs;            // edited here after the cloud copy was written
+          else localWins = !pulled;                                           // older device that predates sync tracking: its data is the only copy
+        }
+        if (localWins) { _markDirty(row.key); return; }
+        if (hasLocal) { try { _lsOrig.call(localStorage, 'vi_bak_' + row.key, JSON.stringify({ at: Date.now(), value: local })); } catch (e) {} }   // never lose what we replace
+        _lsOrig.call(localStorage, row.key, cloud);
+      });
+      _VAULT_KEYS.forEach(function(k) { if (!have[k] && localStorage.getItem(k) != null) _markDirty(k); });   // local-only → push up
+      _lsOrig.call(localStorage, 'vi_last_pull', String(Date.now()));
+    } finally { _hydrating = false; }
     _reloadAllState();
-    return true;
-  } catch(e) { return false; }
+    _flushDirty();
+    return rows.length > 0;
+  } catch(e) { _hydrating = false; return false; }
 }
 
 async function _syncPioneerFromProfile(uid) {
@@ -8116,8 +8189,8 @@ async function _syncPioneerFromProfile(uid) {
 async function _initSupabaseSession() {
   if (!_supaClient) return;
   try {
-    var res = await _supaClient.auth.getSession();
-    var session = res.data && res.data.session;
+    var res = await _withTimeout(_supaClient.auth.getSession(), 6000, null);
+    var session = res && res.data && res.data.session;
     if (!session || !session.user) return;
     _supaUser = session.user;
     var hydrated = await _hydrateFromSupabase(_supaUser.id);
@@ -8714,11 +8787,7 @@ function _completeAuth(email) {
         currency: s.currency || 'GBP',
         updated_at: new Date().toISOString()
       }, { onConflict: 'id' });
-      // Push all current vault data to Supabase on first login
-      _VAULT_KEYS.forEach(function(k) {
-        var v = localStorage.getItem(k);
-        if (v) _supaSync(k, v);
-      });
+      _flushDirty();   // push anything not yet confirmed by the cloud
     } catch(e) {}
   }
   var overlay = document.getElementById('login-overlay');
