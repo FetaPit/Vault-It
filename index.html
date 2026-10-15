@@ -7980,7 +7980,20 @@ var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
 // ── SAFE SYNC ─────────────────────────────────────────────────
 // Every edit to a vault key is time-stamped (vi_ts) and queued (vi_dirty) until the cloud confirms it.
 // Signing in never overwrites newer local work: see _hydrateFromSupabase.
-var _hydrating = false, _flushT = null, _flushing = false;
+var _cloudSeen = {};   // what the cloud held when we last read/wrote it
+function _isBlankArea(key, v) {   // an area with nothing in it (new-device defaults) must never replace one that has data
+  try {
+    var o = typeof v === 'string' ? JSON.parse(v) : v; if (!o) return true;
+    var n = function(a) { return a && a.length; };
+    if (key === 'pos_ov1') return !(n(o.income) || n(o.expenses));
+    if (key === 'pos_al1') return !(n(o.cashAccounts) || n(o.stocks) || n(o.otherAssets) || n(o.crypto) || n(o.liabilities) || (o.metals && Object.keys(o.metals).some(function(m) { return +o.metals[m] > 0; })));
+    if (key === 'pos_debt1') return !n(o.debts);
+    if (key === 'ht3') return !(+o.saved > 0);
+    if (key === 'pos_biz1') return !(n(o.clients) || n(o.leads) || n(o.streams));
+  } catch (e) {}
+  return false;
+}
+var _hydrating = false, _flushT = null, _flushing = false, _syncReady = false;   // _syncReady: this session has read the cloud copy, so uploading can no longer clobber it
 var _devEstablished = (function() {   // a device that already belongs to a real user (decided before anything runs)
   try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.name && u.email) && localStorage.getItem('vi_demo_mode') !== 'true'; } catch (e) { return false; }
 })();
@@ -8021,7 +8034,7 @@ async function _upsertRows(rows) {
 }
 var _lastSyncErr = '';
 async function _flushDirty() {
-  if (_flushing || !_supaUser) return;
+  if (_flushing || !_supaUser || !_syncReady) return;
   _flushing = true;
   try {
     var t0 = Date.now();
@@ -8030,10 +8043,12 @@ async function _flushDirty() {
     dirty.forEach(function(k) {
       var v = localStorage.getItem(k); if (v == null) return;
       var p; try { p = JSON.parse(v); } catch (e) { p = v; }
+      if (!_devEstablished && _cloudSeen[k] != null && _isBlankArea(k, p) && !_isBlankArea(k, _cloudSeen[k])) return;   // never overwrite real data with blank defaults
       rows.push({ user_id: _supaUser.id, key: k, value: p, updated_at: new Date(_lsJSON('vi_ts', {})[k] || t0).toISOString() });
     });
     if (!rows.length) { try { _lsOrig.call(localStorage, 'vi_dirty', '[]'); } catch (e) {} return; }
     if (await _upsertRows(rows)) {
+      rows.forEach(function(r) { _cloudSeen[r.key] = r.value; });
       var ts = _lsJSON('vi_ts', {}), sent = rows.map(function(r) { return r.key; });
       var left = _lsJSON('vi_dirty', []).filter(function(k) { return sent.indexOf(k) < 0 || (ts[k] || 0) > t0; });
       _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(left));
@@ -8041,7 +8056,7 @@ async function _flushDirty() {
     }
   } catch (e) {} finally { _flushing = false; }
 }
-setInterval(function() { try { _flushDirty(); } catch (e) {} }, 60000);
+setInterval(function() { try { if (_supaUser && !_syncReady && !_hydrating) _hydrateFromSupabase(_supaUser.id); else _flushDirty(); } catch (e) {} }, 60000);
 // ── Sync status, "Sync now" and the not-backed-up banner ──
 function viSyncStatus() {
   var d = _lsJSON('vi_dirty', []).length, last = +localStorage.getItem('vi_last_sync') || 0;
@@ -8075,9 +8090,17 @@ function viReauth() {
 }
 async function viSyncNow() {
   if (!_supaUser) { showToast('Sign in first, then everything on this device is uploaded'); viReauth(); return; }
-  _VAULT_KEYS.forEach(function(k) { if (localStorage.getItem(k) != null) _markDirty(k); });
   var el = document.getElementById('sync-status'); if (el) el.textContent = '⏳ Uploading…';
+  if (!_syncReady) { await _hydrateFromSupabase(_supaUser.id); }
+  if (!_syncReady) { viSyncStatus(); showToast('Could not read your cloud copy yet, so nothing was uploaded (this protects your data). Try again in a moment.'); return; }
+  var skipped = [];
+  _VAULT_KEYS.forEach(function(k) {
+    var v = localStorage.getItem(k); if (v == null) return;
+    if (_cloudSeen[k] != null && _isBlankArea(k, v) && !_isBlankArea(k, _cloudSeen[k])) { skipped.push(k); return; }   // blank here, but the cloud has real data: leave the cloud alone
+    _markDirty(k);
+  });
   _flushing = false; await _flushDirty(); viSyncStatus();
+  if (skipped.length) { showToast('Skipped ' + skipped.join(', ') + ': this device has nothing there but your account does, so it was left alone.'); return; }
   showToast(_lsJSON('vi_dirty', []).length ? 'Upload failed: ' + (_lastSyncErr || 'unknown') + '. It will keep retrying.' : 'Uploaded ✓ Everything on this device is now in your account');
 }
 setInterval(function() { try { viSyncStatus(); } catch (e) {} }, 5000);
@@ -8124,7 +8147,7 @@ function _initSupabase() {
   // Handle magic link returns and token refresh — fires when user clicks email link
   _supaClient.auth.onAuthStateChange(async function(event, session) {
     if (event === 'SIGNED_OUT') {
-      _supaUser = null;
+      _supaUser = null; _syncReady = false;
       var ov = document.getElementById('login-overlay');
       if (ov) { ov.style.display = ''; _showAuthStep('email'); }
       return;
@@ -8198,13 +8221,14 @@ async function _hydrateFromSupabase(uid) {
     var resp = await _withTimeout(_supaClient.from('vault_data').select('key,value,updated_at').eq('user_id', uid).then(function(x) { return x; }, function(e) { return { error: e }; }), 10000, null);
     if (!resp || resp.error || !resp.data) return false;      // cloud unreachable: leave local data exactly as it is
     var rows = resp.data, have = {}, ts = _lsJSON('vi_ts', {}), pulled = +localStorage.getItem('vi_last_pull') || 0, dirty = _lsJSON('vi_dirty', []);
+    var cloudWon = [];
     _hydrating = true;
     try {
       rows.forEach(function(row) {
-        have[row.key] = 1;
+        have[row.key] = 1; _cloudSeen[row.key] = row.value;
         var cloud = (row.value !== null && typeof row.value === 'object') ? JSON.stringify(row.value) : String(row.value);
         var local = localStorage.getItem(row.key);
-        if (local === cloud) return;
+        if (local === cloud) { cloudWon.push(row.key); return; }
         var hasLocal = local != null && local !== '';
         var localWins = false;
         if (hasLocal && _devEstablished && _VAULT_KEYS.indexOf(row.key) > -1) {
@@ -8216,11 +8240,15 @@ async function _hydrateFromSupabase(uid) {
         if (localWins) { _markDirty(row.key); return; }
         if (hasLocal) { try { _lsOrig.call(localStorage, 'vi_bak_' + row.key, JSON.stringify({ at: Date.now(), value: local })); } catch (e) {} }   // never lose what we replace
         _lsOrig.call(localStorage, row.key, cloud);
+        cloudWon.push(row.key);
       });
+      // what the cloud already has (and we just adopted) is not an unsent edit: this stops a new device's blank defaults from being uploaded over it
+      try { _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(_lsJSON('vi_dirty', []).filter(function(k) { return cloudWon.indexOf(k) < 0; }))); } catch (e) {}
       _VAULT_KEYS.forEach(function(k) { if (!have[k] && localStorage.getItem(k) != null) _markDirty(k); });   // local-only → push up
       _lsOrig.call(localStorage, 'vi_last_pull', String(Date.now()));
     } finally { _hydrating = false; }
     _reloadAllState();
+    _syncReady = true;
     _flushDirty();
     return rows.length > 0;
   } catch(e) { _hydrating = false; return false; }
