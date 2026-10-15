@@ -103,5 +103,30 @@ const OLD={income:[{id:1,name:'Salary',amount:3000,cat:'salary'}],expenses:[]}, 
   ok(!r.writes.includes('pos_ov1')&&!r.writes.includes('pos_al1')&&!r.writes.includes('pos_debt1'),'K: sample data never uploaded ('+r.writes+')');
   ok(JSON.stringify(r.local)===JSON.stringify(r.cloud),'K: after sign-in the device shows the account\'s real data '+JSON.stringify(r.local));
   await ctx.close();
+
+  // L: established device holds BLANK defaults (dirty, newer) while the account has real data → account wins, nothing blank is uploaded
+  ({ctx,page}=await newCtx(b,`localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_user',JSON.stringify({name:'Pete',email:'t@t.com'}));localStorage.setItem('vi_last_pull',String(Date.now()-3600e3));`,{pos_ov1:{value:NEW,updated_at:new Date(Date.now()-60e3).toISOString()}}));
+  r=await page.evaluate(async()=>{
+    window._w=[]; const up=_supaClient&&_supaClient.from; 
+    _supaClient={auth:{},functions:{invoke:async()=>({})},from:()=>({upsert:(rows)=>{[].concat(rows).forEach(r=>{_w.push(r.key+':'+JSON.stringify(r.value).length);_cloud[r.key]={value:r.value,updated_at:r.updated_at};});return Promise.resolve({});},
+      select:()=>({eq:()=>Promise.resolve({data:Object.keys(_cloud).map(k=>({key:k,value:_cloud[k].value,updated_at:_cloud[k].updated_at}))}),single:async()=>({data:null})})})};
+    localStorage.setItem('pos_ov1',JSON.stringify({income:[],expenses:[]}));   // app's blank defaults: dirty + newer timestamp
+    _supaUser={id:'u1',email:'t@t.com'}; await _hydrateFromSupabase('u1'); await new Promise(r=>setTimeout(r,700));
+    return{local:JSON.parse(localStorage.getItem('pos_ov1')).income.length,cloud:_cloud.pos_ov1.value.income.length,w:_w.filter(x=>/pos_ov1/.test(x))};});
+  ok(r.local===2&&r.cloud===2&&r.w.length===0,'L: blank defaults on an established device lose to the account ('+JSON.stringify(r)+')');
+  // M: stale view — device read the account while it was empty, someone else then filled it, device flushes blank defaults
+  r=await page.evaluate(async()=>{
+    _cloud={}; _cloudSeen={}; _emptiedByUser={}; _syncReady=true; localStorage.removeItem('vi_dirty'); localStorage.removeItem('pos_ov1'); localStorage.setItem('pos_ov1',JSON.stringify({income:[],expenses:[]}));
+    _cloud.pos_ov1={value:{income:[{id:1,name:'UC',amount:381}],expenses:[]},updated_at:new Date().toISOString()};   // filled elsewhere AFTER our last read
+    _markDirty('pos_ov1'); _w.length=0; await _flushDirty(); await new Promise(r=>setTimeout(r,500));
+    return{cloud:_cloud.pos_ov1.value.income.length,w:_w.filter(x=>/pos_ov1/.test(x)),dirty:JSON.parse(localStorage.getItem('vi_dirty')||'[]')};});
+  ok(r.cloud===1&&r.w.length===0,'M: blank defaults are checked against the account right before upload — nothing overwritten');
+  // N: the user really does delete their last income line → that empty state IS uploaded
+  r=await page.evaluate(async()=>{
+    _cloud={}; _syncReady=true; localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'X',amount:5}],expenses:[]})); await _flushDirty();
+    _cloud.pos_ov1.value.income.length; ovState.income=[]; saveState(); await new Promise(r=>setTimeout(r,900));
+    return{cloud:_cloud.pos_ov1.value.income.length};});
+  ok(r.cloud===0,'N: deliberately emptying a list still syncs');
+  await ctx.close();
   await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
 })();

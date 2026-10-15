@@ -8006,7 +8006,7 @@ var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
 // ── SAFE SYNC ─────────────────────────────────────────────────
 // Every edit to a vault key is time-stamped (vi_ts) and queued (vi_dirty) until the cloud confirms it.
 // Signing in never overwrites newer local work: see _hydrateFromSupabase.
-var _cloudSeen = {};   // what the cloud held when we last read/wrote it
+var _cloudSeen = {}, _emptiedByUser = {};   // _emptiedByUser: areas the user deliberately emptied this session (so an empty result may be uploaded)   // what the cloud held when we last read/wrote it
 function _isBlankArea(key, v) {   // an area with nothing in it (new-device defaults) must never replace one that has data
   try {
     var o = typeof v === 'string' ? JSON.parse(v) : v; if (!o) return true;
@@ -8030,6 +8030,7 @@ function _markDirty(key) {
 }
 localStorage.setItem = function(key, value) {
   if (_VAULT_KEYS.indexOf(key) > -1 && typeof value === 'string') value = viCleanJSON(value);
+  if (_VAULT_KEYS.indexOf(key) > -1) { try { var _prev = localStorage.getItem(key); if (_prev != null && !_isBlankArea(key, _prev) && _isBlankArea(key, value)) _emptiedByUser[key] = true; else if (!_isBlankArea(key, value)) delete _emptiedByUser[key]; } catch (e) {} }
   _lsOrig.call(localStorage, key, value);
   if (!_hydrating && _VAULT_KEYS.indexOf(key) > -1 && localStorage.getItem('vi_demo_mode') !== 'true') {   // sample (demo) data is never treated as the user's
     try { var ts = _lsJSON('vi_ts', {}); ts[key] = Date.now(); _lsOrig.call(localStorage, 'vi_ts', JSON.stringify(ts)); } catch (e) {}
@@ -8069,14 +8070,25 @@ async function _flushDirty() {
   try {
     var t0 = Date.now();
     var dirty = _lsJSON('vi_dirty', []).filter(function(k) { return _VAULT_KEYS.indexOf(k) > -1; });
-    var rows = [];
+    var rows = [], blanks = [];
     dirty.forEach(function(k) {
       var v = localStorage.getItem(k); if (v == null) return;
       var p; try { p = JSON.parse(v); } catch (e) { p = v; }
-      if (!_devEstablished && _cloudSeen[k] != null && _isBlankArea(k, p) && !_isBlankArea(k, _cloudSeen[k])) return;   // never overwrite real data with blank defaults
+      if (_isBlankArea(k, p) && !_emptiedByUser[k]) { blanks.push(k); return; }   // blank defaults: verified against the account below
       rows.push({ user_id: _supaUser.id, key: k, value: p, updated_at: new Date(_lsJSON('vi_ts', {})[k] || t0).toISOString() });
     });
-    if (!rows.length) { try { _lsOrig.call(localStorage, 'vi_dirty', '[]'); } catch (e) {} return; }
+    if (blanks.length) {   // only upload blank defaults if the account really has nothing there
+      var live = await _selectRows(_supaUser.id);
+      if (!live.data) { _lastSyncErr = 'could not verify'; return; }
+      live.data.forEach(function(r) { _cloudSeen[r.key] = r.value; });
+      blanks.forEach(function(k) {
+        var theirs = live.data.find(function(r) { return r.key === k; });
+        if (theirs && !_isBlankArea(k, theirs.value)) { try { _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(_lsJSON('vi_dirty', []).filter(function(x) { return x !== k; }))); } catch (e) {} _needPull = true; return; }
+        var v = localStorage.getItem(k), p; try { p = JSON.parse(v); } catch (e) { p = v; }
+        rows.push({ user_id: _supaUser.id, key: k, value: p, updated_at: new Date(_lsJSON('vi_ts', {})[k] || t0).toISOString() });
+      });
+    }
+    if (!rows.length) { try { _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(_lsJSON('vi_dirty', []).filter(function(k) { return blanks.indexOf(k) < 0 || _emptiedByUser[k]; }))); } catch (e) {} if (_needPull) { _needPull = false; setTimeout(viBackgroundPull, 200); } return; }
     if (await _upsertRows(rows)) {
       rows.forEach(function(r) { _cloudSeen[r.key] = r.value; });
       var ts = _lsJSON('vi_ts', {}), sent = rows.map(function(r) { return r.key; });
@@ -8122,7 +8134,7 @@ function viReauth() {
 async function viSyncNow() {
   if (!_supaUser) { showToast('Sign in first, then everything on this device is uploaded'); viReauth(); return; }
   var el = document.getElementById('sync-status'); if (el) el.textContent = '⏳ Uploading…';
-  if (!_syncReady) { await _hydrateFromSupabase(_supaUser.id); }
+  _syncReady = false; await _hydrateFromSupabase(_supaUser.id);   // always read the account's current copy first
   if (!_syncReady) { viSyncStatus(); showToast('Could not read your cloud copy (' + (_hydrateErr || 'unknown') + '), so nothing was uploaded to protect your data. Try again in a moment.'); return; }
   var skipped = [];
   _VAULT_KEYS.forEach(function(k) {
@@ -8368,7 +8380,7 @@ function _reloadAllState() {
   try { var _asr=localStorage.getItem(ACH_KEY); if(_asr){ var _asp=JSON.parse(_asr); achState=Object.assign(achState,_asp); } } catch(e) {}
 }
 
-var _hydrateErr = '', _hydChanged = false;
+var _hydrateErr = '', _hydChanged = false, _needPull = false;
 // Signing in on a device that is showing the sample (demo) data: throw the sample away first, so the
 // account's real data is loaded and the sample can never be uploaded over it.
 function _dropDemoBeforeSync(email) {
@@ -8427,6 +8439,7 @@ async function _hydrateFromSupabase(uid) {
           else localWins = !pulled;                                           // older device that predates sync tracking: its data is the only copy
         }
         if (hasLocal && !_isBlankArea(row.key, local) && _isBlankArea(row.key, row.value)) localWins = true;   // an empty cloud copy (new-device defaults) must never erase real data
+        if (hasLocal && _isBlankArea(row.key, local) && !_isBlankArea(row.key, row.value) && !_emptiedByUser[row.key]) localWins = false;   // …and empty defaults here must never beat real data in the account
         if (localWins) { _markDirty(row.key); return; }
         if (hasLocal) { try { _lsOrig.call(localStorage, 'vi_bak_' + row.key, JSON.stringify({ at: Date.now(), value: local })); } catch (e) {} }   // never lose what we replace
         _lsOrig.call(localStorage, row.key, cloud); _hydChanged = true;
@@ -9083,7 +9096,7 @@ function _completeAuth(email) {
 // ── DATA RESET ────────────────────────────────────────────────
 function resetVaultData() {
   if (!confirm('RESET FINANCIAL DATA\n\nThis will permanently delete:\n• All assets & liabilities\n• All debts\n• Cashflow history\n• Business data\n• Achievements & XP\n\nYour profile, Pioneer status, and API keys are kept.\n\nContinue?')) return;
-  var dataKeys = ['pos_al1','pos_debt1','pos_ov1','pos_biz1','pos_ach1','pos4','pos_house','pos_journey','vi_debt','vi_ov'];
+  var dataKeys = ['pos_al1','pos_debt1','pos_ov1','pos_biz1','pos_ach1','pos4','pos_house','ht3','pos_journey','vi_jrny_events','vi_nw_history','vi_debt','vi_ov'];
   // clear the account's cloud copy too — otherwise signing in brings the old figures straight back
   _resetCloudKeys(dataKeys).then(function(cloudOk) {
     dataKeys.forEach(function(k) { localStorage.removeItem(k); });
