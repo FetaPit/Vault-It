@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vault·It data rescue</title>
+<style>
+:root{--bg:#06101c;--card:#0b1a2b;--line:rgba(68,192,185,.28);--em:#44c0b9;--t:#e6eef7;--t2:#9fb3c8;--warn:#e0b44a;--bad:#e06c6c;--good:#4cd08a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:16px}
+main{max-width:720px;margin:0 auto}
+h1{font-size:20px;margin:6px 0 2px;color:var(--em)}
+h2{font-size:15px;margin:0 0 8px}
+p{margin:6px 0;color:var(--t2)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:6px 6px;border-top:1px solid rgba(255,255,255,.07);vertical-align:top}
+th{color:var(--t2);font-weight:500;border-top:0}
+button,input{font:inherit}
+button{background:var(--em);color:#04121a;border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;margin:6px 8px 0 0}
+button.alt{background:transparent;color:var(--em);border:1px solid var(--line)}
+button:disabled{opacity:.5;cursor:default}
+input{width:100%;background:#04101c;border:1px solid var(--line);border-radius:8px;color:var(--t);padding:11px;margin:4px 0 8px}
+.ok{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+#log{white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,monospace;color:var(--t2)}
+.small{font-size:12px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Vault·It data rescue</h1>
+  <p>This page only <b>reads this browser's saved Vault·It data</b> and, if you ask, copies it to your cloud vault. It never deletes anything.</p>
+
+  <div class="card">
+    <h2>1 · What this browser has saved</h2>
+    <div id="summary">Reading…</div>
+    <button class="alt" id="dl">⬇ Download a backup file</button>
+    <p class="small">Do this first if you can. The file stays on your phone.</p>
+  </div>
+
+  <div class="card">
+    <h2>2 · Copy it to your cloud vault</h2>
+    <p>Sign in with your email and 6-digit PIN. Nothing is sent until you tap <b>Send</b>.</p>
+    <label class="small">Email</label>
+    <input id="email" type="email" autocomplete="email" inputmode="email">
+    <label class="small">PIN</label>
+    <input id="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off">
+    <button id="check">Check against my cloud vault</button>
+    <div id="cmp"></div>
+    <button id="send" style="display:none">Send this browser's data to the cloud</button>
+  </div>
+
+  <div class="card"><h2>Progress</h2><div id="log">Waiting.</div></div>
+</main>
+<script>
+(function () {
+  var URL_ = 'https://legpubblzgknxdtvsant.supabase.co', KEY = 'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz';
+  var KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1','ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history','vi_settings','vi_user','vi_pioneer','vi_founder','vi_debt','vi_ov'];
+  var session = null, cloud = {};
+  function $(id) { return document.getElementById(id); }
+  function log(m, cls) { var d = document.createElement('div'); d.textContent = m; if (cls) d.className = cls; $('log').appendChild(d); }
+  function J(v) { try { return JSON.parse(v); } catch (e) { return null; } }
+  function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function gbp(n) { return '£' + (Math.round(n * 100) / 100).toLocaleString('en-GB'); }
+  function sum(a, f) { return (a || []).reduce(function (s, x) { return s + (+x[f] || 0); }, 0); }
+
+  // one-line description of each saved area
+  function describe(key, v) {
+    if (v == null) return '—';
+    var o = typeof v === 'string' ? J(v) : v;
+    if (o == null) return String(v).slice(0, 40);
+    if (key === 'pos_ov1') return 'income ' + (o.income || []).length + ' lines (' + gbp(sum(o.income, 'amount')) + '/mo) · spending ' + (o.expenses || []).length + ' lines (' + gbp(sum(o.expenses, 'amount')) + '/mo)';
+    if (key === 'pos_al1') return 'cash ' + (o.cashAccounts || []).length + ' · stocks ' + (o.stocks || []).length + ' · other assets ' + (o.otherAssets || []).length + ' · crypto ' + (o.crypto || []).length + ' · liabilities ' + (o.liabilities || []).length;
+    if (key === 'pos_debt1') return (o.debts || []).length + ' debts';
+    if (key === 'pos_biz1') return (o.clients || []).length + ' clients';
+    if (key === 'ht3') return 'house saved ' + gbp(+o.saved || 0) + ' of ' + gbp(+o.target || 0);
+    if (key === 'vi_user') return (o.name || '—') + ' · ' + (o.email || '');
+    return Array.isArray(o) ? o.length + ' items' : Object.keys(o).length + ' fields';
+  }
+  function ago(ms) { if (!ms) return 'unknown'; var m = Math.round((Date.now() - ms) / 60000); return m < 90 ? m + ' min ago' : m < 2880 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' days ago'; }
+
+  function renderSummary() {
+    var ts = J(ls('vi_ts')) || {}, dirty = J(ls('vi_dirty')) || [], rows = '', found = 0;
+    KEYS.forEach(function (k) {
+      var v = ls(k); if (v == null) return; found++;
+      rows += '<tr><td>' + k + '</td><td></td><td>' + ago(ts[k]) + '</td></tr>';
+    });
+    var t = document.createElement('table');
+    t.innerHTML = '<tr><th>Saved area</th><th>Contents</th><th>Last edited here</th></tr>';
+    KEYS.forEach(function (k) {
+      var v = ls(k); if (v == null) return;
+      var tr = document.createElement('tr');
+      [k, describe(k, v), ago(ts[k])].forEach(function (x) { var td = document.createElement('td'); td.textContent = x; tr.appendChild(td); });
+      t.appendChild(tr);
+    });
+    $('summary').innerHTML = '';
+    if (!found) { $('summary').innerHTML = '<p class="bad">No Vault·It data found in this browser at this web address. If you used the app at a different address (for example fetapit.github.io), open this page there instead.</p>'; return; }
+    $('summary').appendChild(t);
+    var note = document.createElement('p'); note.className = 'small' + (dirty.length ? ' warn' : '');
+    note.textContent = dirty.length ? 'Not yet saved to the cloud: ' + dirty.join(', ') : 'No unsynced edits recorded (older versions did not track this, so use the comparison in step 2).';
+    $('summary').appendChild(note);
+    var baks = []; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (/^vi_(bak|cloudbak)_/.test(k)) baks.push(k); }
+    if (baks.length) { var b = document.createElement('p'); b.className = 'small'; b.textContent = 'Older copies kept on this device: ' + baks.join(', '); $('summary').appendChild(b); }
+  }
+
+  function allData() {
+    var out = {}; for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (KEYS.indexOf(k) > -1 || /^vi_(bak|cloudbak)_/.test(k) || k === 'vi_ts' || k === 'vi_dirty') out[k] = localStorage.getItem(k);
+    }
+    return out;
+  }
+  $('dl').onclick = function () {
+    var blob = new Blob([JSON.stringify({ exported: new Date().toISOString(), origin: location.origin, data: allData() }, null, 1)], { type: 'application/json' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'vault-it-backup-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); a.remove();
+    log('Backup file created.', 'ok');
+  };
+
+  function fetchJSON(url, opts, ms) {
+    var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, ms || 20000);
+    opts.signal = ctl.signal;
+    return fetch(url, opts).then(function (r) { clearTimeout(t); return r.json().catch(function () { return null; }).then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); });
+  }
+
+  $('check').onclick = function () {
+    var email = $('email').value.trim().toLowerCase(), pin = $('pin').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(pin)) { log('Enter your email and your 6-digit PIN.', 'bad'); return; }
+    $('check').disabled = true; $('cmp').innerHTML = ''; $('send').style.display = 'none';
+    log('Checking your PIN…');
+    fetchJSON(URL_ + '/functions/v1/pin-auth', { method: 'POST', headers: { 'content-type': 'application/json', apikey: KEY, authorization: 'Bearer ' + KEY }, body: JSON.stringify({ action: 'login', email: email, pin: pin }) })
+      .then(function (r) {
+        if (!r.ok || !r.body || !r.body.token) {
+          var b = r.body || {};
+          throw new Error(b.error === 'locked' ? 'Too many wrong PINs. Try again in ' + Math.ceil((b.retryAfter || 900) / 60) + ' minutes.' : b.error === 'invalid' ? 'That email/PIN is not right' + (b.remaining != null ? ' (' + b.remaining + ' tries left).' : '.') : 'Could not sign in (' + r.status + ').');
+        }
+        log('PIN accepted. Opening a session…');
+        return fetchJSON(URL_ + '/auth/v1/verify', { method: 'POST', headers: { 'content-type': 'application/json', apikey: KEY }, body: JSON.stringify({ type: 'email', email: email, token: r.body.token }) });
+      })
+      .then(function (r) {
+        if (!r.ok || !r.body || !r.body.access_token) throw new Error('Could not open a session (' + r.status + '). Try again.');
+        session = { token: r.body.access_token, uid: r.body.user && r.body.user.id };
+        log('Signed in. Reading your cloud vault…');
+        return fetchJSON(URL_ + '/rest/v1/vault_data?select=key,value,updated_at&user_id=eq.' + encodeURIComponent(session.uid), { method: 'GET', headers: { apikey: KEY, authorization: 'Bearer ' + session.token } });
+      })
+      .then(function (r) {
+        if (!r.ok || !Array.isArray(r.body)) throw new Error('Could not read the cloud vault (' + r.status + ').');
+        cloud = {}; r.body.forEach(function (row) { cloud[row.key] = row; });
+        var t = document.createElement('table'); t.innerHTML = '<tr><th>Area</th><th>This browser</th><th>Cloud now</th></tr>';
+        var diff = 0;
+        KEYS.forEach(function (k) {
+          var l = ls(k); if (l == null) return;
+          var c = cloud[k] ? cloud[k].value : null;
+          var same = c != null && JSON.stringify(c) === JSON.stringify(J(l) != null ? J(l) : l);
+          if (!same) diff++;
+          var tr = document.createElement('tr');
+          [k + (same ? ' ✓ same' : ''), describe(k, l), c == null ? 'nothing' : describe(k, c) + ' (saved ' + ago(Date.parse(cloud[k].updated_at)) + ')'].forEach(function (x) { var td = document.createElement('td'); td.textContent = x; tr.appendChild(td); });
+          t.appendChild(tr);
+        });
+        $('cmp').appendChild(t);
+        var p = document.createElement('p');
+        if (!diff) { p.className = 'ok'; p.textContent = 'Your cloud vault already matches this browser. Nothing to send.'; log('Already in sync.', 'ok'); }
+        else { p.className = 'warn'; p.textContent = diff + ' area(s) differ. Sending will replace the cloud copy of those areas with this browser\'s copy. The current cloud copies are first saved on this device, so nothing is lost.'; $('send').style.display = ''; log('Compared. Review the table, then tap Send.'); }
+        $('cmp').appendChild(p);
+      })
+      .catch(function (e) { log(String(e && e.message || e), 'bad'); })
+      .then(function () { $('check').disabled = false; });
+  };
+
+  $('send').onclick = function () {
+    if (!session) return;
+    $('send').disabled = true;
+    var rows = [], now = new Date().toISOString();
+    KEYS.forEach(function (k) {
+      var l = ls(k); if (l == null) return;
+      var parsed = J(l); if (parsed == null) parsed = l;
+      if (cloud[k] && JSON.stringify(cloud[k].value) === JSON.stringify(parsed)) return;     // already identical
+      if (cloud[k]) { try { localStorage.setItem('vi_cloudbak_' + k, JSON.stringify({ at: Date.now(), value: cloud[k].value })); } catch (e) {} }
+      rows.push({ user_id: session.uid, key: k, value: parsed, updated_at: now });
+    });
+    if (!rows.length) { log('Nothing to send.', 'ok'); $('send').disabled = false; return; }
+    log('Sending ' + rows.length + ' area(s)…');
+    fetchJSON(URL_ + '/rest/v1/vault_data?on_conflict=user_id,key', { method: 'POST', headers: { 'content-type': 'application/json', apikey: KEY, authorization: 'Bearer ' + session.token, prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(rows) })
+      .then(function (r) {
+        if (!r.ok) throw new Error('The cloud refused the upload (' + r.status + '). Nothing was changed. Download the backup file and send it to support.');
+        log('Done ✓ Your data is now in your cloud vault. Sign in to Vault·It from any browser and it will appear.', 'ok');
+        try { localStorage.setItem('vi_dirty', '[]'); localStorage.setItem('vi_last_sync', String(Date.now())); } catch (e) {}
+        $('send').style.display = 'none';
+      })
+      .catch(function (e) { log(String(e && e.message || e), 'bad'); $('send').disabled = false; });
+  };
+
+  var u = J(ls('vi_user')) || {};
+  $('email').value = u.email || ls('vi_last_email') || '';
+  renderSummary();
+})();
+</script>
+</body>
+</html>
