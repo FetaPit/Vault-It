@@ -69,3 +69,15 @@ Email + PIN sign-in for returning users on any device.
 Actions: `status` (does this email have a PIN?), `set` / `remove` (need the signed-in user's JWT) and
 `login` (email + 6-digit PIN → one-time code the app exchanges for a real session).
 PINs are PBKDF2-hashed server-side; 5 wrong tries lock the account for 15 min, doubling every further 5.
+
+
+## portfolio-vision
+
+Reads holdings out of screenshots of an investing app, as an alternative to connecting a platform.
+
+1. Run `supabase/migrations/005_vision_usage.sql` once (daily per-user cap table + `vision_take()`).
+2. Set the secret: `supabase secrets set ANTHROPIC_API_KEY=<key>` (optional: `VISION_MODEL`, `VISION_DAILY_CAP`, default 30 images/user/day).
+3. Deploy: `supabase functions deploy portfolio-vision --no-verify-jwt`
+
+Needs the signed-in user's JWT. Sends 1–4 images to Claude (vision, forced tool call), then looks up ticker
+candidates on Yahoo Finance. Nothing is stored. The app turns value ÷ live price into a share count.

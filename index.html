@@ -2634,6 +2634,19 @@ input:focus, textarea:focus, select:focus {
 .stk-actions{display:flex;gap:6px;flex-wrap:wrap}
 .stk-btn{font-family:'Syne',sans-serif;font-size:.48rem;font-weight:700;padding:4px 10px;border-radius:4px;cursor:pointer;background:rgba(68,192,185,.08);border:1px solid rgba(68,192,185,.3);color:var(--em)}
 .stk-btn:hover{background:rgba(68,192,185,.16)}
+.stk-shot-ov{position:fixed;inset:0;z-index:10050;background:rgba(2,6,12,.82);display:flex;align-items:center;justify-content:center;padding:14px}
+.stk-shot{background:#06101c;border:1px solid rgba(68,192,185,.3);border-radius:12px;width:min(760px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+.stk-shot-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(68,192,185,.16);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--em)}
+.stk-shot-bd{padding:14px 16px;overflow:auto;font-size:12px;color:var(--t2,#9fb3c8);line-height:1.5}
+.stk-shot-ft{font-size:12px;color:var(--t2,#9fb3c8);display:flex;gap:8px;justify-content:flex-end;align-items:center;padding:12px 16px;border-top:1px solid rgba(68,192,185,.16)}
+.stk-shot-tbl{width:100%;border-collapse:collapse;margin-top:8px}
+.stk-shot-tbl th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--t3,#6b8197);text-align:left;padding:4px 6px;font-weight:400}
+.stk-shot-tbl td{padding:5px 6px;border-top:1px solid rgba(255,255,255,.05);vertical-align:middle}
+.stk-shot-tbl input[type=number],.stk-shot-tbl input[type=text],.stk-shot-tbl select{width:100%;min-width:60px;background:rgba(4,10,20,.8);border:1px solid rgba(68,192,185,.25);border-radius:4px;color:#e6eef7;font-size:12px;padding:5px 6px}
+#stk-shot-pie{width:100%;background:rgba(4,10,20,.8);border:1px solid rgba(68,192,185,.25);border-radius:4px;color:#e6eef7;font-size:12px;padding:5px 6px}
+.stk-shot-warn{color:#e0b44a}.stk-shot-err{color:#e06c6c}
+@media(max-width:600px){.stk-shot-tbl .hide-m{display:none}}
+
 .stk-tbl{overflow-x:auto}
 .stk-row{display:grid;grid-template-columns:minmax(120px,1.6fr) 84px 92px 96px 96px 74px 26px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);min-width:640px}
 .stk-row.h{font-family:'Share Tech Mono',monospace;font-size:.42rem;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--bd)}
@@ -4205,6 +4218,7 @@ button.bd-ic{cursor:pointer}
             <span>Holdings</span>
             <span class="stk-actions">
               <button class="stk-btn" onclick="stkRefresh(false)" title="Fetch the latest prices">↻ Refresh prices</button>
+              <button class="stk-btn" onclick="stkShotStart()" title="Upload screenshots of your pie or portfolio — no platform connection needed">📷 Import screenshots</button>
               <button class="stk-btn" onclick="document.getElementById('stk-csv').click()" title="Import holdings from a CSV (Trading 212 history export or ticker,units,avg cost)">⇪ Import CSV</button>
             </span>
           </div>
@@ -4217,6 +4231,7 @@ button.bd-ic{cursor:pointer}
           </div>
           <div class="stk-note">UK-listed funds &amp; ETFs end in <b>.L</b> (VUSA.L, VWRL.L). US shares are plain (AAPL, MSFT). Prices convert to £ automatically. Edit units, cost or price any time — everything here counts towards your net worth.</div>
           <input type="file" id="stk-csv" accept=".csv,text/csv" style="display:none" onchange="stkImportCSV(this)">
+          <input type="file" id="stk-shot" accept="image/*" multiple style="display:none" onchange="stkShotPicked(this)">
         </div>
         <div class="stk-card" id="stk-alloc"></div>
         <div class="stk-note" style="text-align:center">Not financial advice · Prices may be delayed · Past performance ≠ future results</div>
@@ -9472,6 +9487,151 @@ function stkImportCSV(inp){
     inp.value='';
   };
   rd.readAsText(f);
+}
+
+
+// ── Screenshot import: read tickers + values from pie/portfolio screenshots (no platform connection) ──
+var _shot={rows:[],portfolio:'',busy:false};
+function stkShotStart(){
+  if(!_supaUser){showToast('Sign in first — screenshot reading is for signed-in accounts');return;}
+  var i=document.getElementById('stk-shot');if(i)i.click();
+}
+function stkShotClose(){var o=document.getElementById('stk-shot-ov');if(o)o.remove();_shot={rows:[],portfolio:'',busy:false};}
+function stkShotModal(title,body,foot){
+  var o=document.getElementById('stk-shot-ov');
+  if(!o){o=document.createElement('div');o.id='stk-shot-ov';o.className='stk-shot-ov';document.body.appendChild(o);}
+  o.innerHTML='<div class="stk-shot"><div class="stk-shot-hd"><span>'+title+'</span><span style="cursor:pointer" onclick="stkShotClose()">✕</span></div><div class="stk-shot-bd">'+body+'</div><div class="stk-shot-ft">'+(foot||'')+'</div></div>';
+}
+function stkShotDownscale(file){
+  return new Promise(function(res,rej){
+    var img=new Image(),url=URL.createObjectURL(file);
+    img.onload=function(){
+      var m=1800,sc=Math.min(1,m/Math.max(img.width,img.height)),c=document.createElement('canvas');
+      c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);
+      res({media_type:'image/jpeg',data:c.toDataURL('image/jpeg',0.85).split(',')[1]});
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);rej(new Error('bad image'));};
+    img.src=url;
+  });
+}
+function stkShotNorm(n){return String(n||'').toLowerCase().replace(/[^a-z0-9]+/g,'').replace(/(inc|corp|corporation|plc|ltd|group|holdings|co)$/,'');}
+async function stkShotPicked(inp){
+  var files=Array.prototype.slice.call(inp.files||[],0,4);inp.value='';
+  if(!files.length)return;
+  stkShotModal('📷 Reading your screenshots','<div style="text-align:center;padding:28px 0">Reading '+files.length+' screenshot'+(files.length===1?'':'s')+'… this takes a few seconds.<br><span style="opacity:.6">Sent securely to be read; never stored.</span></div>','');
+  try{
+    var images=[];for(var i=0;i<files.length;i++)images.push(await stkShotDownscale(files[i]));
+    var r=await _supaClient.functions.invoke('portfolio-vision',{body:{images:images}});
+    var d=r.data;
+    if(r.error||!d||!d.holdings){
+      var eb=null;try{if(r.error&&r.error.context&&r.error.context.json)eb=await r.error.context.json();}catch(e){}
+      var code=(eb&&eb.error)||'';
+      var msg=code==='limit'?(eb.message||'Daily screenshot limit reached — try again tomorrow.'):
+        code==='not_configured'?'Screenshot reading isn’t switched on for this app yet. You can still add holdings by ticker or CSV.':
+        code==='unreadable'?'I couldn’t find any holdings in those screenshots. Try a clearer screenshot of the holdings list.':
+        'Couldn’t read the screenshots right now. Please try again, or add holdings by ticker.';
+      stkShotModal('📷 Import screenshots','<div class="stk-shot-err">'+stkEsc(msg)+'</div>','<button class="stk-btn" onclick="stkShotClose()">Close</button>');
+      return;
+    }
+    // merge duplicates (overlapping scrolled screenshots): keep the row that has a value
+    var seen={},rows=[];
+    d.holdings.forEach(function(h){
+      var k=stkShotNorm(h.name);if(!k)return;
+      if(seen[k]!==undefined){var o=rows[seen[k]];if(!(o.value>0)&&h.value>0)rows[seen[k]]=h;return;}
+      seen[k]=rows.length;rows.push(h);
+    });
+    rows=rows.filter(function(h){return h.value>0||h.shares>0;}).map(function(h){
+      var cands=(h.candidates||[]).slice();
+      if(h.ticker&&!cands.some(function(c){return c.symbol===h.ticker;}))cands.unshift({symbol:h.ticker,name:h.name,exchange:'',type:''});
+      return{name:h.name,value:h.value,shares:h.shares,pl:h.pl,cands:cands,sym:(cands[0]&&cands[0].symbol)||'',inc:false,price:null,ccy:null};
+    });
+    if(!rows.length){stkShotModal('📷 Import screenshots','<div class="stk-shot-err">No holdings with values were found in those screenshots.</div>','<button class="stk-btn" onclick="stkShotClose()">Close</button>');return;}
+    _shot.rows=rows;_shot.portfolio=d.portfolio||'';
+    stkShotModal('📷 Reading prices…','<div style="text-align:center;padding:28px 0">Found '+rows.length+' holdings. Fetching live prices…</div>','');
+    await stkShotPrice();
+    stkShotReview();
+  }catch(e){
+    stkShotModal('📷 Import screenshots','<div class="stk-shot-err">Something went wrong reading those images. Please try again.</div>','<button class="stk-btn" onclick="stkShotClose()">Close</button>');
+  }
+}
+async function stkShotPrice(){
+  var syms=[];_shot.rows.forEach(function(r){if(r.sym&&syms.indexOf(r.sym)<0)syms.push(r.sym);});
+  if(!syms.length)return;
+  if(!localStorage.getItem('vi_fx_rates')&&typeof fetchExchangeRates==='function')await new Promise(function(res){try{fetchExchangeRates(function(){res();});setTimeout(res,2500);}catch(e){res();}});
+  var res=await stkFetchQuotes(syms);
+  _shot.quotes=(res&&res.quotes)||{};
+  _shot.rows.forEach(function(r){stkShotCalc(r);r.inc=r.units>0;});
+}
+// units: stated in the screenshot, else value ÷ live £ price. cost basis: value − P/L.
+function stkShotCalc(r){
+  var q=(_shot.quotes||{})[r.sym];
+  r.price=null;r.ccy=null;
+  if(q){var g=stkToGBP(q.price,q.currency);if(g>0){r.price=g;r.ccy=q.currency;}}
+  if(r.userUnits){r.units=r.userUnits;}
+  else if(r.shares>0)r.units=r.shares;
+  else if(r.price>0&&r.value>0)r.units=+(r.value/r.price).toFixed(6);
+  else r.units=0;
+  r.avgCost=(r.units>0&&r.pl!=null&&r.value>0&&r.value-r.pl>0)?(r.value-r.pl)/r.units:0;
+}
+function stkShotReview(){
+  var prevSel=(document.getElementById('stk-shot-pie')||{}).value;
+  var pies=alState.stockPies||[],dflt=_shot.portfolio?pies.find(function(p){return p.name.toLowerCase()===_shot.portfolio.toLowerCase();}):null;
+  var pieSel='<select id="stk-shot-pie">'+pies.map(function(p){return'<option value="'+p.id+'"'+((prevSel?String(p.id)===prevSel:(dflt?dflt.id===p.id:p.id===alState.activePie))?' selected':'')+'>'+stkEsc(p.name)+'</option>';}).join('')+(_shot.portfolio&&!dflt?'<option value="new" selected>＋ New pie: '+stkEsc(_shot.portfolio)+'</option>':'')+'<option value="newcustom">＋ New pie…</option></select>';
+  var noPrice=0;
+  var body='<div>Check each row — pick the right ticker if it guessed wrong. Shares are worked out from the value in your screenshot ÷ the live price, so they’re accurate to the pennies shown. Edit any number.</div>'+
+    '<div style="margin:10px 0;display:flex;gap:8px;align-items:center">Add to: <span style="flex:1;max-width:260px">'+pieSel+'</span></div>'+
+    '<table class="stk-shot-tbl"><thead><tr><th></th><th>HOLDING</th><th>TICKER</th><th class="hide-m">VALUE £</th><th>SHARES</th></tr></thead><tbody>';
+  _shot.rows.forEach(function(r,i){
+    if(!(r.price>0))noPrice++;
+    var opts=r.cands.map(function(c){return'<option value="'+stkEsc(c.symbol)+'"'+(c.symbol===r.sym?' selected':'')+'>'+stkEsc(c.symbol+(c.exchange?' · '+c.exchange:''))+'</option>';}).join('')+'<option value="__custom">Other…</option>';
+    body+='<tr><td><input type="checkbox" '+(r.inc?'checked':'')+' onchange="_shot.rows['+i+'].inc=this.checked;stkShotFoot()"></td>'+
+      '<td>'+stkEsc(r.name)+(r.price>0?'':'<div class="stk-shot-warn">no live price found</div>')+'</td>'+
+      '<td><select onchange="stkShotTicker('+i+',this)">'+opts+'</select></td>'+
+      '<td class="hide-m">'+(r.value>0?'£'+r.value.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'—')+'</td>'+
+      '<td><input type="number" step="any" min="0" value="'+(r.units>0?r.units:'')+'" onchange="stkShotUnits('+i+',this)"></td></tr>';
+  });
+  body+='</tbody></table>'+(noPrice?'<div class="stk-shot-warn" style="margin-top:8px">'+noPrice+' holding'+(noPrice===1?'':'s')+' have no live price yet — choose another ticker or type the shares yourself.</div>':'');
+  stkShotModal('📷 Review holdings',body,'<span id="stk-shot-count" style="margin-right:auto"></span><button class="stk-btn" onclick="stkShotClose()">Cancel</button><button class="btn-add-data" onclick="stkShotConfirm()">Add to my portfolio</button>');
+  stkShotFoot();
+}
+function stkShotFoot(){
+  var n=_shot.rows.filter(function(r){return r.inc&&r.units>0&&r.sym;}).length;
+  var t=_shot.rows.reduce(function(s,r){return s+((r.inc&&r.units>0&&r.price>0)?r.units*r.price:0);},0);
+  var el=document.getElementById('stk-shot-count');
+  if(el)el.textContent=n+' selected · ≈ £'+t.toLocaleString('en-GB',{maximumFractionDigits:0});
+}
+async function stkShotTicker(i,sel){
+  var r=_shot.rows[i],v=sel.value;
+  if(v==='__custom'){v=(prompt('Ticker symbol, e.g. VUSA.L or AAPL')||'').trim().toUpperCase();if(!/^[A-Z0-9.\-^=]{1,15}$/.test(v)){stkShotReview();return;}if(!r.cands.some(function(c){return c.symbol===v;}))r.cands.unshift({symbol:v,name:r.name,exchange:'',type:''});}
+  r.sym=v;r.userUnits=0;
+  if(!(_shot.quotes||{})[v]){var res=await stkFetchQuotes([v]);if(res&&res.quotes){_shot.quotes=Object.assign(_shot.quotes||{},res.quotes);}}
+  stkShotCalc(r);r.inc=r.units>0;stkShotReview();
+}
+function stkShotUnits(i,inp){var r=_shot.rows[i];r.userUnits=parseFloat(inp.value)||0;stkShotCalc(r);if(r.units>0)r.inc=true;stkShotFoot();}
+function stkShotConfirm(){
+  stkEnsure();
+  var sel=(document.getElementById('stk-shot-pie')||{}).value,pie;
+  if(sel==='new'||sel==='newcustom'){
+    var nm=sel==='new'?_shot.portfolio:(prompt('Name for the new pie')||'').trim();
+    if(!nm)return;
+    pie={id:Date.now(),name:nm.slice(0,40)};alState.stockPies.push(pie);
+  } else pie=alState.stockPies.find(function(p){return String(p.id)===String(sel);})||alState.stockPies[0];
+  var n=0;
+  _shot.rows.forEach(function(r){
+    if(!r.inc||!(r.units>0)||!r.sym)return;
+    var ex=alState.stocks.find(function(x){return x.pie===pie.id&&x.sym===r.sym;});
+    if(ex){ex.units=r.units;if(r.avgCost>0)ex.avgCost=r.avgCost;if(!ex.name)ex.name=r.name;}
+    else alState.stocks.push({id:Date.now()+Math.floor(Math.random()*1e6),pie:pie.id,sym:r.sym,name:r.name,units:r.units,avgCost:r.avgCost>0?r.avgCost:0,price:r.price>0?r.price:0,src:'screenshot'});
+    n++;
+  });
+  alState.activePie=pie.id;
+  stkShotClose();
+  if(!n){showToast('Nothing selected to add');return;}
+  stkSave();
+  showToast('Added '+n+' holding'+(n===1?'':'s')+' to “'+pie.name+'” ✓');
+  stkRefresh(true);
 }
 
 // Liabilities: their current asset value ADDS to NW; only running costs detract
