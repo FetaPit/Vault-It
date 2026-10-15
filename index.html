@@ -8936,10 +8936,27 @@ function _completeAuth(email) {
 function resetVaultData() {
   if (!confirm('RESET FINANCIAL DATA\n\nThis will permanently delete:\n• All assets & liabilities\n• All debts\n• Cashflow history\n• Business data\n• Achievements & XP\n\nYour profile, Pioneer status, and API keys are kept.\n\nContinue?')) return;
   var dataKeys = ['pos_al1','pos_debt1','pos_ov1','pos_biz1','pos_ach1','pos4','pos_house','pos_journey','vi_debt','vi_ov'];
-  dataKeys.forEach(function(k) { localStorage.removeItem(k); });
-  try { invClearAll(); } catch(e) {}
-  showToast('Financial data cleared ✓');
-  setTimeout(function() { location.reload(); }, 1000);
+  // clear the account's cloud copy too — otherwise signing in brings the old figures straight back
+  _resetCloudKeys(dataKeys).then(function(cloudOk) {
+    dataKeys.forEach(function(k) { localStorage.removeItem(k); });
+    try { var d = _lsJSON('vi_dirty', []).filter(function(k) { return dataKeys.indexOf(k) < 0; }); _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(d)); } catch (e) {}
+    try { invClearAll(); } catch(e) {}
+    showToast(cloudOk ? 'Financial data cleared here and in your account ✓' : 'Cleared on this device. Your account copy could not be reached — sign in and reset again to clear it there too.');
+    setTimeout(function() { location.reload(); }, 1600);
+  });
+}
+async function _resetCloudKeys(keys) {
+  if (!_supaUser) return false;
+  var inList = '(' + keys.map(function(k) { return '"' + k + '"'; }).join(',') + ')';
+  try {
+    if (_supaClient && !_sjsStalled) {
+      var r = await _withTimeout(_supaClient.from('vault_data').delete().eq('user_id', _supaUser.id).in('key', keys).then(function(x) { return x; }, function(e) { return { error: e }; }), 8000, null);
+      if (r && !r.error) return true;
+    }
+    var tok = _localAccessToken(); if (!tok) return false;
+    var res = await fetch(_SUPA_URL + '/rest/v1/vault_data?user_id=eq.' + encodeURIComponent(_supaUser.id) + '&key=in.' + encodeURIComponent(inList), { method: 'DELETE', headers: { apikey: _SUPA_KEY, authorization: 'Bearer ' + tok } });
+    return res.ok;
+  } catch (e) { return false; }
 }
 
 // ═══════════════════════════════════════════════════════════════
