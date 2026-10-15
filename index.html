@@ -8016,6 +8016,9 @@ async function _upsertRows(rows) {
     var r;
     try { r = await _withTimeout(_supaClient.from('vault_data').upsert(rows, { onConflict: 'user_id,key' }).then(function(x) { return x; }, function(e) { return { error: e }; }), 8000, null); }
     catch (e) { r = { error: e }; }
+    if (r && r.error && /jwt|expired|401/i.test(String(r.error.message || r.error.code || '')) && await _refreshAuth()) {
+      try { r = await _withTimeout(_supaClient.from('vault_data').upsert(rows, { onConflict: 'user_id,key' }).then(function(x) { return x; }, function(e) { return { error: e }; }), 8000, null); } catch (e) { r = { error: e }; }
+    }
     if (r && !r.error) { _lastSyncErr = ''; return true; }
     if (!r) { _sjsStalled = true; _lastSyncErr = 'connection stalled'; } else { _lastSyncErr = String((r.error && (r.error.message || r.error.code)) || 'rejected'); return false; }
   }
@@ -8062,6 +8065,7 @@ function viSyncStatus() {
   var d = _lsJSON('vi_dirty', []).length, last = +localStorage.getItem('vi_last_sync') || 0;
   var ago = last ? Math.max(1, Math.round((Date.now() - last) / 60000)) + ' min ago' : 'never on this device';
   var txt = !_supaUser ? '⚠ Not signed in to your account on this device — changes are saved here only.'
+    : !_syncReady ? '⏳ Connecting to your cloud copy…' + (_hydrateErr ? ' (' + _hydrateErr + ')' : '')
     : !last && !d && !_lastSyncErr && localStorage.getItem('pos_ov1') != null ? '⏳ This device has never uploaded. Tap the button below to back everything up.'
     : d ? '⏳ ' + d + ' change' + (d === 1 ? '' : 's') + ' waiting to upload' + (_lastSyncErr ? ' (' + _lastSyncErr + ')' : '') + ' · last upload ' + ago
     : '✓ Everything is backed up · last upload ' + ago;
@@ -8092,7 +8096,7 @@ async function viSyncNow() {
   if (!_supaUser) { showToast('Sign in first, then everything on this device is uploaded'); viReauth(); return; }
   var el = document.getElementById('sync-status'); if (el) el.textContent = '⏳ Uploading…';
   if (!_syncReady) { await _hydrateFromSupabase(_supaUser.id); }
-  if (!_syncReady) { viSyncStatus(); showToast('Could not read your cloud copy yet, so nothing was uploaded (this protects your data). Try again in a moment.'); return; }
+  if (!_syncReady) { viSyncStatus(); showToast('Could not read your cloud copy (' + (_hydrateErr || 'unknown') + '), so nothing was uploaded to protect your data. Try again in a moment.'); return; }
   var skipped = [];
   _VAULT_KEYS.forEach(function(k) {
     var v = localStorage.getItem(k); if (v == null) return;
@@ -8215,11 +8219,40 @@ function _reloadAllState() {
   try { var _asr=localStorage.getItem(ACH_KEY); if(_asr){ var _asp=JSON.parse(_asr); achState=Object.assign(achState,_asp); } } catch(e) {}
 }
 
-async function _hydrateFromSupabase(uid) {
-  if (!_supaClient) return false;
+var _hydrateErr = '';
+async function _refreshAuth() {   // an expired access token is the most common reason a read/write is refused
+  try { if (_supaClient && _supaClient.auth && _supaClient.auth.refreshSession) { var r = await _withTimeout(_supaClient.auth.refreshSession(), 8000, null); return !!(r && r.data && r.data.session); } } catch (e) {}
+  return false;
+}
+// read the user's rows: supabase-js first, then a direct REST request (with the saved session token)
+async function _selectRows(uid) {
+  var why = '';
+  if (_supaClient && !_sjsStalled) {
+    var r;
+    try { r = await _withTimeout(_supaClient.from('vault_data').select('key,value,updated_at').eq('user_id', uid).then(function(x) { return x; }, function(e) { return { error: e }; }), 8000, null); }
+    catch (e) { r = { error: e }; }
+    if (r && r.error && /jwt|expired|401/i.test(String(r.error.message || r.error.code || '')) && await _refreshAuth()) {
+      try { r = await _withTimeout(_supaClient.from('vault_data').select('key,value,updated_at').eq('user_id', uid).then(function(x) { return x; }, function(e) { return { error: e }; }), 8000, null); } catch (e) { r = { error: e }; }
+    }
+    if (r && !r.error && r.data) return { data: r.data };
+    why = !r ? 'connection stalled' : String((r.error && (r.error.message || r.error.code)) || 'no data');
+    if (!r) _sjsStalled = true;
+  } else if (!_supaClient) why = 'sync library not loaded';
   try {
-    var resp = await _withTimeout(_supaClient.from('vault_data').select('key,value,updated_at').eq('user_id', uid).then(function(x) { return x; }, function(e) { return { error: e }; }), 10000, null);
-    if (!resp || resp.error || !resp.data) return false;      // cloud unreachable: leave local data exactly as it is
+    var tok = _localAccessToken(); if (!tok) return { err: why || 'no saved session on this device' };
+    var ctl = new AbortController(), t = setTimeout(function() { ctl.abort(); }, 12000);
+    var res = await fetch(_SUPA_URL + '/rest/v1/vault_data?select=key,value,updated_at&user_id=eq.' + encodeURIComponent(uid), { headers: { apikey: _SUPA_KEY, authorization: 'Bearer ' + tok }, signal: ctl.signal });
+    clearTimeout(t);
+    if (!res.ok) return { err: (why ? why + '; ' : '') + 'server said ' + res.status };
+    var j = await res.json(); return Array.isArray(j) ? { data: j } : { err: 'unexpected reply' };
+  } catch (e) { return { err: (why ? why + '; ' : '') + 'no connection' }; }
+}
+async function _hydrateFromSupabase(uid) {
+  if (!_supaClient && !_localAccessToken()) { _hydrateErr = 'sync library not loaded'; return false; }
+  try {
+    var resp = await _selectRows(uid);
+    if (!resp.data) { _hydrateErr = resp.err || 'unknown'; return false; }      // cloud unreachable: leave local data exactly as it is
+    _hydrateErr = '';
     var rows = resp.data, have = {}, ts = _lsJSON('vi_ts', {}), pulled = +localStorage.getItem('vi_last_pull') || 0, dirty = _lsJSON('vi_dirty', []);
     var cloudWon = [];
     _hydrating = true;
