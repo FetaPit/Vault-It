@@ -4767,6 +4767,14 @@ button.bd-ic{cursor:pointer}
       <div style="font-size:.46rem;color:var(--t3);line-height:1.6">Create a Payment Link in your Stripe Dashboard → set price to £7.77, one-time. Paste the link above. The NFT contract address is populated after deploying an ERC-721 to Shibarium mainnet.</div>
     </div>
 
+    <!-- Cloud sync -->
+    <div style="margin-bottom:20px;padding:14px;background:rgba(68,192,185,.04);border-radius:8px;border:1px solid rgba(68,192,185,.2)">
+      <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--em);margin-bottom:6px;letter-spacing:.06em">☁ Cloud sync</div>
+      <div id="sync-status" style="font-size:.5rem;color:var(--t2);line-height:1.6;margin-bottom:10px">Checking…</div>
+      <div style="font-size:.46rem;color:var(--t3);line-height:1.6;margin-bottom:10px">“Upload everything” sends all the data on this device to your account, so it appears when you sign in anywhere else.</div>
+      <button class="btn-add-data" onclick="viSyncNow()">Upload everything from this device</button>
+    </div>
+
     <!-- Security -->
     <div style="margin-bottom:20px;padding:14px;background:rgba(68,192,185,.04);border-radius:8px;border:1px solid rgba(68,192,185,.2)">
       <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--em);margin-bottom:6px;letter-spacing:.06em">🔐 Sign-in PIN</div>
@@ -7995,11 +8003,11 @@ async function _upsertRows(rows) {
     var r;
     try { r = await _withTimeout(_supaClient.from('vault_data').upsert(rows, { onConflict: 'user_id,key' }).then(function(x) { return x; }, function(e) { return { error: e }; }), 8000, null); }
     catch (e) { r = { error: e }; }
-    if (r && !r.error) return true;
-    if (!r) _sjsStalled = true;
+    if (r && !r.error) { _lastSyncErr = ''; return true; }
+    if (!r) { _sjsStalled = true; _lastSyncErr = 'connection stalled'; } else { _lastSyncErr = String((r.error && (r.error.message || r.error.code)) || 'rejected'); return false; }
   }
   try {   // supabase-js stalled or failed: write straight to the REST API with the saved session token
-    var tok = _localAccessToken(); if (!tok) return false;
+    var tok = _localAccessToken(); if (!tok) { _lastSyncErr = 'not signed in'; return false; }
     var ctl = new AbortController(), t = setTimeout(function() { ctl.abort(); }, 15000);
     var res = await fetch(_SUPA_URL + '/rest/v1/vault_data?on_conflict=user_id,key', {
       method: 'POST', signal: ctl.signal,
@@ -8007,9 +8015,11 @@ async function _upsertRows(rows) {
       body: JSON.stringify(rows)
     });
     clearTimeout(t);
+    _lastSyncErr = res.ok ? '' : 'server said ' + res.status;
     return res.ok;
-  } catch (e) { return false; }
+  } catch (e) { _lastSyncErr = 'no connection'; return false; }
 }
+var _lastSyncErr = '';
 async function _flushDirty() {
   if (_flushing || !_supaUser) return;
   _flushing = true;
@@ -8032,6 +8042,46 @@ async function _flushDirty() {
   } catch (e) {} finally { _flushing = false; }
 }
 setInterval(function() { try { _flushDirty(); } catch (e) {} }, 60000);
+// ── Sync status, "Sync now" and the not-backed-up banner ──
+function viSyncStatus() {
+  var d = _lsJSON('vi_dirty', []).length, last = +localStorage.getItem('vi_last_sync') || 0;
+  var ago = last ? Math.max(1, Math.round((Date.now() - last) / 60000)) + ' min ago' : 'never on this device';
+  var txt = !_supaUser ? '⚠ Not signed in to your account on this device — changes are saved here only.'
+    : !last && !d && !_lastSyncErr && localStorage.getItem('pos_ov1') != null ? '⏳ This device has never uploaded. Tap the button below to back everything up.'
+    : d ? '⏳ ' + d + ' change' + (d === 1 ? '' : 's') + ' waiting to upload' + (_lastSyncErr ? ' (' + _lastSyncErr + ')' : '') + ' · last upload ' + ago
+    : '✓ Everything is backed up · last upload ' + ago;
+  var el = document.getElementById('sync-status'); if (el) el.textContent = txt;
+  var bn = document.getElementById('sync-banner');
+  var unsynced = d > 0 || (!localStorage.getItem('vi_last_sync') && localStorage.getItem('pos_ov1') != null);   // older devices never tracked this
+  var need = !_supaUser && unsynced && !!hasValidSession() && (Date.now() - _pageT0 > 4000) && !_syncBannerOff;
+  var lo = document.getElementById('login-overlay'), loginOpen = lo && getComputedStyle(lo).display !== 'none';
+  if (need && !loginOpen) {
+    if (!bn) {
+      bn = document.createElement('div'); bn.id = 'sync-banner';
+      bn.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:10002;background:#2a1d05;border:1px solid #e0b44a;color:#f3d58a;border-radius:10px;padding:10px 12px;font-size:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap';
+      bn.innerHTML = '<span style="flex:1;min-width:200px">⚠ Your latest changes are only on this device. Sign in to back them up to your account.</span><button class="btn-add-data" onclick="viReauth()">Sign in to back up</button><span style="cursor:pointer;padding:4px" onclick="_syncBannerOff=true;viSyncStatus()">✕</span>';
+      document.body.appendChild(bn);
+    }
+  } else if (bn) bn.remove();
+}
+var _syncBannerOff = false, _pageT0 = Date.now();
+function viReauth() {
+  var sm = document.getElementById('settings-modal'); if (sm) sm.style.display = 'none';
+  var last = localStorage.getItem('vi_last_email') || (_lsJSON('vi_user', {}).email) || '';
+  var inp = document.getElementById('auth-email'); if (inp) inp.value = last;
+  _authOTP = null; _showAuthStep('email');
+  var ov = document.getElementById('login-overlay'); if (ov) ov.style.setProperty('display', 'flex', 'important');
+  if (last) { setTimeout(function() { try { authSubmitEmail(); } catch (e) {} }, 150); }
+}
+async function viSyncNow() {
+  if (!_supaUser) { showToast('Sign in first, then everything on this device is uploaded'); viReauth(); return; }
+  _VAULT_KEYS.forEach(function(k) { if (localStorage.getItem(k) != null) _markDirty(k); });
+  var el = document.getElementById('sync-status'); if (el) el.textContent = '⏳ Uploading…';
+  _flushing = false; await _flushDirty(); viSyncStatus();
+  showToast(_lsJSON('vi_dirty', []).length ? 'Upload failed: ' + (_lastSyncErr || 'unknown') + '. It will keep retrying.' : 'Uploaded ✓ Everything on this device is now in your account');
+}
+setInterval(function() { try { viSyncStatus(); } catch (e) {} }, 5000);
+
 window.addEventListener('online', function() { try { _flushDirty(); } catch (e) {} });
 document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') { try { _flushDirty(); } catch (e) {} } });
 
