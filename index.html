@@ -4772,7 +4772,10 @@ button.bd-ic{cursor:pointer}
       <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--em);margin-bottom:6px;letter-spacing:.06em">☁ Cloud sync</div>
       <div id="sync-status" style="font-size:.5rem;color:var(--t2);line-height:1.6;margin-bottom:10px">Checking…</div>
       <div style="font-size:.46rem;color:var(--t3);line-height:1.6;margin-bottom:10px">“Upload everything” sends all the data on this device to your account, so it appears when you sign in anywhere else.</div>
-      <button class="btn-add-data" onclick="viSyncNow()">Upload everything from this device</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-add-data" onclick="viSyncNow()">Upload everything from this device</button>
+        <button class="btn-add-data" style="background:transparent;border-color:var(--em);color:var(--em)" onclick="viOpenHistory()">🕘 Version history &amp; restore</button>
+      </div>
     </div>
 
     <!-- Security -->
@@ -8109,6 +8112,127 @@ async function viSyncNow() {
 }
 setInterval(function() { try { viSyncStatus(); } catch (e) {} }, 5000);
 
+// ── Keep every device current, and make every version retrievable ─────────────
+var VI_AREA_LABEL = { pos_ov1: 'Budget — income & spending', pos_al1: 'Assets & liabilities', pos_debt1: 'Debts', ht3: 'House builder', pos_house: 'House builder (old)', pos_biz1: 'Business', pos_ach1: 'Achievements', pos_journey: 'Journey', vi_user: 'Profile', vi_settings: 'Settings', vi_nw_history: 'Net-worth history', vi_jrny_events: 'Journey events', vi_pioneer: 'Pioneer', vi_founder: 'Founder', vi_debt: 'Debts (old)', vi_ov: 'Overview (old)' };
+function _areaSummary(key, v) {
+  try {
+    var o = typeof v === 'string' ? JSON.parse(v) : v; if (o == null) return '—';
+    var sum = function(a, f) { return (a || []).reduce(function(s, x) { return s + (+x[f] || 0); }, 0); };
+    var gbp = function(n) { return '£' + Math.round(n).toLocaleString('en-GB'); };
+    if (key === 'pos_ov1') return (o.income || []).length + ' income (' + gbp(sum(o.income, 'amount')) + '/mo) · ' + (o.expenses || []).length + ' spending (' + gbp(sum(o.expenses, 'amount')) + '/mo)';
+    if (key === 'pos_al1') return (o.cashAccounts || []).length + ' cash · ' + (o.stocks || []).length + ' stocks · ' + (o.otherAssets || []).length + ' items · ' + (o.crypto || []).length + ' crypto · ' + (o.liabilities || []).length + ' liabilities';
+    if (key === 'pos_debt1') return (o.debts || []).length + ' debts (' + gbp(sum(o.debts, 'balance')) + ')';
+    if (key === 'ht3') return 'saved ' + gbp(+o.saved || 0) + ' of ' + gbp(+o.target || 0);
+    if (key === 'vi_user') return (o.name || '') + ' ' + (o.email || '');
+    return Array.isArray(o) ? o.length + ' items' : Object.keys(o).length + ' fields';
+  } catch (e) { return '—'; }
+}
+function _rerenderAll() {
+  ['loadState', 'updateUI', 'updateKPIs', 'updateSidebar', 'renderCashflow', 'renderDebtTab', 'renderAlTab', 'stkRender', 'renderSummaryCards', 'renderPioneerCard', 'nwhRenderMini'].forEach(function(f) {
+    try { if (typeof window[f] === 'function') window[f](); } catch (e) {}
+  });
+}
+// pull changes made on the user's other devices (app ↔ browser) whenever this one is opened, and every 3 minutes
+async function viBackgroundPull() {
+  if (!_supaUser || !_syncReady || _hydrating || document.visibilityState !== 'visible') return;
+  try {
+    await _flushDirty();
+    _hydChanged = false;
+    await _hydrateFromSupabase(_supaUser.id);
+    if (_hydChanged) { _rerenderAll(); showToast('Updated with changes from your other device ✓'); }
+  } catch (e) {}
+}
+document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'visible') viBackgroundPull(); });
+setInterval(viBackgroundPull, 180000);
+
+// daily snapshot of everything on this device (last 7 days) — restorable even without a connection
+function viLocalSnapshot() {
+  try {
+    if (localStorage.getItem('vi_demo_mode') === 'true') return;
+    var data = {}, real = false;
+    _VAULT_KEYS.forEach(function(k) { var v = localStorage.getItem(k); if (v != null) data[k] = v; });
+    ['pos_ov1', 'pos_al1', 'pos_debt1', 'ht3'].forEach(function(k) { if (data[k] && !_isBlankArea(k, data[k])) real = true; });
+    if (!real) return;                                       // never snapshot an empty vault
+    var key = 'vi_snap_' + new Date().toISOString().slice(0, 10);
+    _lsOrig.call(localStorage, key, JSON.stringify({ at: Date.now(), data: data }));
+    var snaps = []; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (/^vi_snap_\d{4}-\d\d-\d\d$/.test(k)) snaps.push(k); }
+    snaps.sort().slice(0, Math.max(0, snaps.length - 7)).forEach(function(k) { localStorage.removeItem(k); });
+  } catch (e) {}
+}
+setTimeout(viLocalSnapshot, 8000); setInterval(viLocalSnapshot, 3600000);
+
+async function _rpc(fn, args) {
+  if (_supaClient && !_sjsStalled) {
+    try { var r = await _withTimeout(_supaClient.rpc(fn, args).then(function(x) { return x; }, function(e) { return { error: e }; }), 8000, null); if (r) return r; } catch (e) {}
+  }
+  try {
+    var tok = _localAccessToken(); if (!tok) return { error: { message: 'not signed in' } };
+    var res = await fetch(_SUPA_URL + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { 'content-type': 'application/json', apikey: _SUPA_KEY, authorization: 'Bearer ' + tok }, body: JSON.stringify(args || {}) });
+    var j = null; try { j = await res.json(); } catch (e) {}
+    return res.ok ? { data: j } : { error: { message: (j && (j.message || j.hint)) || ('server said ' + res.status), code: j && j.code } };
+  } catch (e) { return { error: { message: 'no connection' } }; }
+}
+function viCloseHistory() { var m = document.getElementById('vi-hist'); if (m) m.remove(); }
+async function viOpenHistory() {
+  var sm = document.getElementById('settings-modal'); if (sm) sm.style.display = 'none';
+  viCloseHistory();
+  var m = document.createElement('div'); m.id = 'vi-hist';
+  m.style.cssText = 'position:fixed;inset:0;z-index:10060;background:rgba(2,6,12,.85);display:flex;align-items:center;justify-content:center;padding:14px';
+  m.innerHTML = '<div style="background:#06101c;border:1px solid rgba(68,192,185,.3);border-radius:12px;width:min(720px,100%);max-height:92vh;overflow:auto;padding:16px;font-size:13px;color:#cfdbe8">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="color:var(--em);font-size:15px">🕘 Version history</b><span style="cursor:pointer;font-size:18px" onclick="viCloseHistory()">✕</span></div>' +
+    '<div style="opacity:.75;margin-bottom:10px">Every change to your vault is kept. Restore any earlier version — the current one is kept too, so restoring can always be undone.</div>' +
+    '<div id="vi-hist-cloud">Loading your account history…</div><div id="vi-hist-local" style="margin-top:16px"></div></div>';
+  document.body.appendChild(m);
+  // this device's daily snapshots
+  var snaps = []; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (/^vi_snap_/.test(k)) snaps.push(k); }
+  snaps.sort().reverse();
+  var lh = '<b>On this device (daily copies)</b>';
+  if (!snaps.length) lh += '<div style="opacity:.7">None yet — one is made each day you use the app.</div>';
+  snaps.forEach(function(k) {
+    var o = _lsJSON(k, {}); var d = o.data || {};
+    lh += '<div style="border-top:1px solid rgba(255,255,255,.07);padding:8px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px"><div>' + new Date(o.at || 0).toLocaleString('en-GB') + '</div><div style="opacity:.75">' +
+      stkEsc(_areaSummary('pos_ov1', d.pos_ov1)) + '<br>' + stkEsc(_areaSummary('pos_al1', d.pos_al1)) + '</div></div><button class="btn-add-data" onclick="viRestoreSnapshot(\'' + k + '\')">Restore all</button></div>';
+  });
+  document.getElementById('vi-hist-local').innerHTML = lh;
+  // account (cloud) versions
+  var el = document.getElementById('vi-hist-cloud');
+  if (!_supaUser) { el.innerHTML = '<b>In your account</b><div style="opacity:.7">Sign in to see your account history.</div>'; return; }
+  var r = await _rpc('vault_history_list', { p_limit: 80 });
+  if (r.error || !Array.isArray(r.data)) {
+    var notOn = /vault_history_list|function|PGRST202|404/i.test(String(r.error && (r.error.message + ' ' + r.error.code)));
+    el.innerHTML = '<b>In your account</b><div style="opacity:.75">' + (notOn ? 'Account history is not switched on yet for this app.' : 'Could not load it (' + stkEsc(r.error && r.error.message || 'unknown') + ').') + '</div>';
+    return;
+  }
+  var h = '<b>In your account</b>';
+  if (!r.data.length) h += '<div style="opacity:.7">No earlier versions yet.</div>';
+  r.data.forEach(function(v) {
+    h += '<div style="border-top:1px solid rgba(255,255,255,.07);padding:8px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px"><div><b>' + stkEsc(VI_AREA_LABEL[v.key] || v.key) + '</b> · ' + new Date(v.archived_at).toLocaleString('en-GB') + (v.reason === 'deleted' ? ' · before reset' : v.reason === 'shrunk' ? ' · before a big change' : '') + '</div><div style="opacity:.75">' + stkEsc(_areaSummary(v.key, v.value)) + '</div></div>' +
+      '<button class="btn-add-data" onclick="viRestoreVersion(' + (+v.id) + ',\'' + stkEsc(v.key) + '\')">Restore</button></div>';
+  });
+  el.innerHTML = h;
+}
+async function viRestoreVersion(id, key) {
+  if (!confirm('Restore this earlier version of ' + (VI_AREA_LABEL[key] || key) + '? The current version is kept in the history.')) return;
+  var r = await _rpc('vault_history_restore', { p_id: id });
+  if (r.error) { showToast('Restore failed: ' + (r.error.message || 'unknown')); return; }
+  try {   // the account copy is now the one to use on this device
+    _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(_lsJSON('vi_dirty', []).filter(function(k) { return k !== key; })));
+    var ts = _lsJSON('vi_ts', {}); delete ts[key]; _lsOrig.call(localStorage, 'vi_ts', JSON.stringify(ts));
+    var cur = localStorage.getItem(key); if (cur != null) _lsOrig.call(localStorage, 'vi_bak_' + key, JSON.stringify({ at: Date.now(), value: cur }));
+    localStorage.removeItem(key);
+  } catch (e) {}
+  _syncReady = false; await _hydrateFromSupabase(_supaUser.id); _rerenderAll();
+  viCloseHistory(); showToast((VI_AREA_LABEL[key] || key) + ' restored ✓ — it will appear on your other devices too');
+}
+function viRestoreSnapshot(k) {
+  var o = _lsJSON(k, null); if (!o || !o.data) return;
+  if (!confirm('Restore everything from ' + new Date(o.at).toLocaleString('en-GB') + '? This replaces what is on this device and in your account (the current version stays in the history).')) return;
+  Object.keys(o.data).forEach(function(key) { if (_VAULT_KEYS.indexOf(key) > -1) localStorage.setItem(key, o.data[key]); });   // tracked → uploaded
+  _reloadAllState(); _rerenderAll(); viCloseHistory();
+  showToast('Restored ✓ Uploading to your account…');
+}
+
+
 window.addEventListener('online', function() { try { _flushDirty(); } catch (e) {} });
 document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') { try { _flushDirty(); } catch (e) {} } });
 
@@ -8220,7 +8344,7 @@ function _reloadAllState() {
   try { var _asr=localStorage.getItem(ACH_KEY); if(_asr){ var _asp=JSON.parse(_asr); achState=Object.assign(achState,_asp); } } catch(e) {}
 }
 
-var _hydrateErr = '';
+var _hydrateErr = '', _hydChanged = false;
 // Signing in on a device that is showing the sample (demo) data: throw the sample away first, so the
 // account's real data is loaded and the sample can never be uploaded over it.
 function _dropDemoBeforeSync(email) {
@@ -8281,7 +8405,7 @@ async function _hydrateFromSupabase(uid) {
         if (hasLocal && !_isBlankArea(row.key, local) && _isBlankArea(row.key, row.value)) localWins = true;   // an empty cloud copy (new-device defaults) must never erase real data
         if (localWins) { _markDirty(row.key); return; }
         if (hasLocal) { try { _lsOrig.call(localStorage, 'vi_bak_' + row.key, JSON.stringify({ at: Date.now(), value: local })); } catch (e) {} }   // never lose what we replace
-        _lsOrig.call(localStorage, row.key, cloud);
+        _lsOrig.call(localStorage, row.key, cloud); _hydChanged = true;
         cloudWon.push(row.key);
       });
       // what the cloud already has (and we just adopted) is not an unsent edit: this stops a new device's blank defaults from being uploaded over it
