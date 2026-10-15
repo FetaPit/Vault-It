@@ -34,7 +34,10 @@ input{width:100%;background:#04101c;border:1px solid var(--line);border-radius:8
   <div class="card">
     <h2>1 · What this browser has saved</h2>
     <div id="summary">Reading…</div>
+    <h2 style="margin-top:14px">Older copies on this device</h2>
+    <div id="baks"></div>
     <button class="alt" id="dl">⬇ Download a backup file</button>
+    <label class="alt" style="display:inline-block;margin-top:6px;cursor:pointer;color:var(--em);border:1px solid var(--line);border-radius:8px;padding:10px 14px">⬆ Load a backup file<input type="file" id="ul" accept=".json,application/json" style="display:none"></label>
     <p class="small">Do this first if you can. The file stays on your phone.</p>
   </div>
 
@@ -99,8 +102,30 @@ input{width:100%;background:#04101c;border:1px solid var(--line);border-radius:8
     var note = document.createElement('p'); note.className = 'small' + (dirty.length ? ' warn' : '');
     note.textContent = dirty.length ? 'Not yet saved to the cloud: ' + dirty.join(', ') : 'No unsynced edits recorded (older versions did not track this, so use the comparison in step 2).';
     $('summary').appendChild(note);
-    var baks = []; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (/^vi_(bak|cloudbak)_/.test(k)) baks.push(k); }
-    if (baks.length) { var b = document.createElement('p'); b.className = 'small'; b.textContent = 'Older copies kept on this device: ' + baks.join(', '); $('summary').appendChild(b); }
+    renderBaks();
+  }
+
+  // Older copies the app saved before replacing something: show what's in each and allow restoring it
+  function renderBaks() {
+    var box = $('baks'); box.innerHTML = '';
+    var list = [];
+    for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); var m = /^vi_(bak_replaced|bak_filec|bak_file|cloudbak|bak)_(.+)$/.exec(k); if (m && KEYS.indexOf(m[2]) > -1) list.push({ k: k, area: m[2], kind: m[1] }); }
+    if (!list.length) { box.innerHTML = '<p class="small">No older copies on this device.</p>'; return; }
+    var t = document.createElement('table'); t.innerHTML = '<tr><th>Older copy</th><th>Contents</th><th></th></tr>';
+    list.forEach(function (it) {
+      var o = J(ls(it.k)) || {}, tr = document.createElement('tr');
+      var td1 = document.createElement('td'); td1.textContent = it.area + (it.kind === 'cloudbak' ? ' (cloud copy)' : /file/.test(it.kind) ? ' (from file)' : it.kind === 'bak_replaced' ? ' (before your last restore)' : ' (this device)') + ' · ' + (o.at ? ago(o.at) : '');
+      var td2 = document.createElement('td'); td2.textContent = describe(it.area, o.value);
+      var td3 = document.createElement('td'); var btn = document.createElement('button'); btn.className = 'alt'; btn.textContent = 'Restore';
+      btn.onclick = function () {
+        if (!confirm('Put this older copy of ' + it.area + ' back on this device? (The current one is kept as an older copy.)')) return;
+        var cur = ls(it.area); if (cur != null) { try { localStorage.setItem('vi_bak_replaced_' + it.area, JSON.stringify({ at: Date.now(), value: J(cur) != null ? J(cur) : cur })); } catch (e) {} }   // (kept under its own name, never over the copy being restored)
+        localStorage.setItem(it.area, typeof o.value === 'string' ? o.value : JSON.stringify(o.value));
+        log('Restored ' + it.area + ' on this device. Now use step 2 to send it to your account.', 'ok'); renderSummary();
+      };
+      td3.appendChild(btn); tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); t.appendChild(tr);
+    });
+    box.appendChild(t);
   }
 
   function allData() {
@@ -114,6 +139,23 @@ input{width:100%;background:#04101c;border:1px solid var(--line);border-radius:8
     var blob = new Blob([JSON.stringify({ exported: new Date().toISOString(), origin: location.origin, data: allData() }, null, 1)], { type: 'application/json' });
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'vault-it-backup-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); a.remove();
     log('Backup file created.', 'ok');
+  };
+
+  $('ul').onchange = function () {
+    var f = this.files && this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var j = JSON.parse(rd.result), d = j.data || {}, n = 0;
+        Object.keys(d).forEach(function (k) {
+          var m = /^vi_(bak|cloudbak)_(.+)$/.exec(k);
+          if (KEYS.indexOf(k) > -1) { localStorage.setItem('vi_bak_file_' + k, JSON.stringify({ at: Date.parse(j.exported) || Date.now(), value: J(d[k]) != null ? J(d[k]) : d[k] })); n++; }
+          else if (m) { localStorage.setItem(k.replace(/^vi_(bak|cloudbak)_/, 'vi_bak_file' + (m[1] === 'cloudbak' ? 'c' : '') + '_'), d[k]); n++; }
+        });
+        log('Loaded ' + n + ' item(s) from the file as older copies. Use Restore on the ones you want.', 'ok'); renderBaks();
+      } catch (e) { log('That file could not be read.', 'bad'); }
+    };
+    rd.readAsText(f);
   };
 
   function fetchJSON(url, opts, ms) {
