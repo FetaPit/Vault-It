@@ -8237,6 +8237,7 @@ async function _hydrateFromSupabase(uid) {
           else if (ts[row.key]) localWins = ts[row.key] > cloudMs;            // edited here after the cloud copy was written
           else localWins = !pulled;                                           // older device that predates sync tracking: its data is the only copy
         }
+        if (hasLocal && !_isBlankArea(row.key, local) && _isBlankArea(row.key, row.value)) localWins = true;   // an empty cloud copy (new-device defaults) must never erase real data
         if (localWins) { _markDirty(row.key); return; }
         if (hasLocal) { try { _lsOrig.call(localStorage, 'vi_bak_' + row.key, JSON.stringify({ at: Date.now(), value: local })); } catch (e) {} }   // never lose what we replace
         _lsOrig.call(localStorage, row.key, cloud);
