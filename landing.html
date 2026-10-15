@@ -131,7 +131,7 @@ section{padding:80px 0}
 .panel-h .pill{font-family:'Share Tech Mono';font-size:10px;color:var(--teal);background:rgba(68,192,185,.1);padding:3px 9px;border-radius:7px}
 
 /* FEATURE ALTERNATING */
-.feat{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-bottom:96px}
+.feat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:60px;align-items:center;margin-bottom:96px}
 .feat:last-child{margin-bottom:0}
 .feat.rev .feat-copy{order:2}
 .feat-copy .modnum{font-family:'Share Tech Mono';font-size:12px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
@@ -237,7 +237,7 @@ section{padding:80px 0}
 .testi cite{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted);font-style:normal}
 
 /* PRICING */
-.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
+.price-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:stretch}
 .plan{position:relative;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px 26px;display:flex;flex-direction:column}
 .plan.feat-plan{border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,168,76,.4),0 24px 60px rgba(201,168,76,.14);background:linear-gradient(180deg,rgba(201,168,76,.06),rgba(8,16,26,.95))}
 .plan .ptag{font-family:'Share Tech Mono';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -288,6 +288,7 @@ footer{border-top:1px solid rgba(255,255,255,.05);padding:40px 0 26px;margin-top
 /* RESPONSIVE */
 @media(max-width:900px){
   .founder{grid-template-columns:1fr;text-align:center;padding:34px}
+  .price-grid{grid-template-columns:minmax(0,1fr)}
   .founder-av{margin:0 auto}
   .founder p{margin-left:auto;margin-right:auto}
 }
@@ -295,7 +296,8 @@ footer{border-top:1px solid rgba(255,255,255,.05);padding:40px 0 26px;margin-top
   .nav-links{display:none}
   .prob-grid,.steps,.price-grid,.testi-grid{grid-template-columns:1fr}
   .steps::before{display:none}
-  .feat{grid-template-columns:1fr;gap:32px;margin-bottom:64px}
+  .feat{grid-template-columns:minmax(0,1fr);gap:32px;margin-bottom:64px}
+  .feat>*{min-width:0}
   .feat.rev .feat-copy{order:0}
   .signup-form{flex-direction:column}
   .cf-grid{grid-template-columns:1fr}
@@ -698,7 +700,7 @@ footer{border-top:1px solid rgba(255,255,255,.05);padding:40px 0 26px;margin-top
           <li>Direct influence on the roadmap</li>
           <li>1-to-1 onboarding with Pete</li>
         </ul>
-        <a class="btn btn-ghost" href="mailto:pete@vault-it.app?subject=Founding Member">Email pete@vault-it.app</a>
+        <a class="btn btn-ghost" href="mailto:pete@ptlive.design?subject=Founding Member">Email pete@ptlive.design</a>
         <div class="price-note">Only 33 spots &mdash; first come, first served</div>
       </div>
 
@@ -749,13 +751,13 @@ footer{border-top:1px solid rgba(255,255,255,.05);padding:40px 0 26px;margin-top
         <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
         <a href="#founder">Founder</a>
-        <a href="mailto:pete@vault-it.app">Contact</a>
+        <a href="mailto:pete@ptlive.design">Contact</a>
         <a href="https://fetapit.github.io/Vault-It/">Open App</a>
       </div>
     </div>
     <div class="disclaimer">
       Not regulated by the FCA. Not financial advice. Vault&middot;It is a personal finance tracking tool only.<br/>
-      Privacy: <a href="mailto:pete@vault-it.app" style="color:inherit;text-decoration:underline">pete@vault-it.app</a> &nbsp;&middot;&nbsp; &copy; 2026 Vault&middot;It
+      Privacy: <a href="mailto:pete@ptlive.design" style="color:inherit;text-decoration:underline">pete@ptlive.design</a> &nbsp;&middot;&nbsp; &copy; 2026 Vault&middot;It
     </div>
   </div>
 </footer>
@@ -927,11 +929,11 @@ if(wForm){
         var res = await supa.from('waitlist').insert([{email:email}]);
         if(res.error && res.error.code!=='23505'){throw res.error;}
       }
-      wMsg.textContent='\u2728 You'\''re in! We'\''ll be in touch.';
+      wMsg.textContent="\u2728 You\u2019re in! We\u2019ll be in touch.";
       wMsg.style.color='var(--teal)';
       wForm.reset();
     }catch(err){
-      wMsg.textContent='Something went wrong. Email pete@vault-it.app directly.';
+      wMsg.textContent='Something went wrong. Email pete@ptlive.design directly.';
       wMsg.style.color='var(--red)';
     }
   });

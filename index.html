@@ -25,6 +25,29 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(SW_URL).catch(function(){});
 }
 </script>
+<script>
+// ── Input safety: user-entered text is rendered into the page in many places, so markup characters are
+// neutralised on the way IN (typing, imports, cloud sync, already-saved data) — nothing can inject script.
+var VI_KEYS_EARLY = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1','ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history','vi_settings','vi_user','vi_pioneer','vi_founder','vi_debt','vi_ov'];
+function viClean(t) { return String(t).replace(/[<>`]/g, '').replace(/"/g, '\u201D').replace(/'/g, '\u2019'); }
+function viCleanDeep(o) {
+  if (typeof o === 'string') return /^data:(image|application)\//.test(o) ? o : viClean(o);
+  if (Array.isArray(o)) { for (var i = 0; i < o.length; i++) o[i] = viCleanDeep(o[i]); return o; }
+  if (o && typeof o === 'object') { Object.keys(o).forEach(function(k) { o[k] = viCleanDeep(o[k]); }); return o; }
+  return o;
+}
+function viCleanJSON(str) {   // returns the cleaned JSON text, or the original if it is not JSON
+  try { var j = JSON.parse(str); var c = JSON.stringify(viCleanDeep(j)); return c; } catch (e) { return typeof str === 'string' ? viClean(str) : str; }
+}
+(function() {
+  try { VI_KEYS_EARLY.forEach(function(k) { var v = localStorage.getItem(k); if (v != null && /[<>`"']/.test(v.replace(/"[^"\\]*"\s*:/g, ''))) { var c = viCleanJSON(v); if (c !== v) Storage.prototype.setItem.call(localStorage, k, c); } }); } catch (e) {}
+  document.addEventListener('input', function(e) {
+    var t = e.target; if (!t || (t.tagName !== 'INPUT' && t.tagName !== 'TEXTAREA')) return;
+    var ty = (t.type || 'text').toLowerCase(); if (ty !== 'text' && ty !== 'search' && ty !== 'url' && ty !== 'tel' && ty !== 'email' && t.tagName !== 'TEXTAREA') return;
+    if (/[<>`]/.test(t.value)) { var p = t.selectionStart; t.value = t.value.replace(/[<>`]/g, ''); try { t.setSelectionRange(p - 1, p - 1); } catch (x) {} }
+  }, true);
+})();
+</script>
 <meta name="version" content="1.0.3">
 <meta property="og:title" content="Vault·It — From Debt to Owning Your Home">
 <meta property="og:description" content="The only personal finance app built for the journey from debt to outright home ownership. Pioneer Edition.">
@@ -8006,6 +8029,7 @@ function _markDirty(key) {
   if (d.indexOf(key) < 0) { d.push(key); try { _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(d)); } catch (e) {} }
 }
 localStorage.setItem = function(key, value) {
+  if (_VAULT_KEYS.indexOf(key) > -1 && typeof value === 'string') value = viCleanJSON(value);
   _lsOrig.call(localStorage, key, value);
   if (!_hydrating && _VAULT_KEYS.indexOf(key) > -1 && localStorage.getItem('vi_demo_mode') !== 'true') {   // sample (demo) data is never treated as the user's
     try { var ts = _lsJSON('vi_ts', {}); ts[key] = Date.now(); _lsOrig.call(localStorage, 'vi_ts', JSON.stringify(ts)); } catch (e) {}
@@ -8391,7 +8415,7 @@ async function _hydrateFromSupabase(uid) {
     try {
       rows.forEach(function(row) {
         have[row.key] = 1; _cloudSeen[row.key] = row.value;
-        var cloud = (row.value !== null && typeof row.value === 'object') ? JSON.stringify(row.value) : String(row.value);
+        var cloud = (row.value !== null && typeof row.value === 'object') ? JSON.stringify(viCleanDeep(row.value)) : String(row.value);
         var local = localStorage.getItem(row.key);
         if (local === cloud) { cloudWon.push(row.key); return; }
         var hasLocal = local != null && local !== '';
@@ -8658,11 +8682,11 @@ async function _sendOTP(email) {
         if (msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('limit')) {
           _authErr('Too many attempts — wait 60 seconds and try again.');
         } else if (msg.toLowerCase().includes('email') || msg.toLowerCase().includes('smtp') || msg.toLowerCase().includes('sending')) {
-          _authErr('Email delivery issue — check your inbox including spam, or contact pete@vault-it.app');
+          _authErr('Email delivery issue — check your inbox including spam, or contact pete@ptlive.design');
         } else if (msg.toLowerCase().includes('signup') || msg.toLowerCase().includes('disabled')) {
-          _authErr('Sign-up is currently restricted. Contact pete@vault-it.app to get access.');
+          _authErr('Sign-up is currently restricted. Contact pete@ptlive.design to get access.');
         } else {
-          _authErr('Auth error: ' + msg + '. Contact pete@vault-it.app if this persists.');
+          _authErr('Auth error: ' + msg + '. Contact pete@ptlive.design if this persists.');
         }
         return;
       }
@@ -14822,7 +14846,7 @@ function showUpgrade(plan) {
   var link = VI_STRIPE_LINKS[plan];
   if (!link) {
     if (plan === 'founder') {
-      showToast('Founder tier coming soon — email pete@vault-it.app to reserve your spot.');
+      showToast('Founder tier coming soon — email pete@ptlive.design to reserve your spot.');
     } else {
       link = VI_STRIPE_LINKS.monthly;
     }
