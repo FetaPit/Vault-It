@@ -8004,7 +8004,7 @@ function _markDirty(key) {
 }
 localStorage.setItem = function(key, value) {
   _lsOrig.call(localStorage, key, value);
-  if (!_hydrating && _VAULT_KEYS.indexOf(key) > -1) {
+  if (!_hydrating && _VAULT_KEYS.indexOf(key) > -1 && localStorage.getItem('vi_demo_mode') !== 'true') {   // sample (demo) data is never treated as the user's
     try { var ts = _lsJSON('vi_ts', {}); ts[key] = Date.now(); _lsOrig.call(localStorage, 'vi_ts', JSON.stringify(ts)); } catch (e) {}
     _markDirty(key);
     if (_supaUser) { clearTimeout(_flushT); _flushT = setTimeout(_flushDirty, 250); }
@@ -8037,7 +8037,7 @@ async function _upsertRows(rows) {
 }
 var _lastSyncErr = '';
 async function _flushDirty() {
-  if (_flushing || !_supaUser || !_syncReady) return;
+  if (_flushing || !_supaUser || !_syncReady || localStorage.getItem('vi_demo_mode') === 'true') return;
   _flushing = true;
   try {
     var t0 = Date.now();
@@ -8159,6 +8159,7 @@ function _initSupabase() {
     if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && session.user) {
       if (_supaUser && _supaUser.id === session.user.id) return;
       _supaUser = session.user;
+      _dropDemoBeforeSync(_supaUser.email);
       var hydrated = await _hydrateFromSupabase(_supaUser.id);
       if (localStorage.getItem('vi_demo_mode') === 'true' && !hydrated) {
         _wipeDemoData(_supaUser.email);
@@ -8220,6 +8221,13 @@ function _reloadAllState() {
 }
 
 var _hydrateErr = '';
+// Signing in on a device that is showing the sample (demo) data: throw the sample away first, so the
+// account's real data is loaded and the sample can never be uploaded over it.
+function _dropDemoBeforeSync(email) {
+  if (localStorage.getItem('vi_demo_mode') !== 'true') return;
+  try { _wipeDemoData(email); } catch (e) {}
+  try { _lsOrig.call(localStorage, 'vi_dirty', '[]'); _lsOrig.call(localStorage, 'vi_ts', '{}'); } catch (e) {}
+}
 async function _refreshAuth() {   // an expired access token is the most common reason a read/write is refused
   try { if (_supaClient && _supaClient.auth && _supaClient.auth.refreshSession) { var r = await _withTimeout(_supaClient.auth.refreshSession(), 8000, null); return !!(r && r.data && r.data.session); } } catch (e) {}
   return false;
@@ -8305,6 +8313,7 @@ async function _initSupabaseSession() {
     var session = res && res.data && res.data.session;
     if (!session || !session.user) return;
     _supaUser = session.user;
+    _dropDemoBeforeSync(_supaUser.email);
     var hydrated = await _hydrateFromSupabase(_supaUser.id);
     if (localStorage.getItem('vi_demo_mode') === 'true' && !hydrated) {
       _wipeDemoData(_supaUser.email);
@@ -8567,6 +8576,7 @@ function _tryEmailJSOTP(email, code) {
 // Everything that happens once a Supabase session exists (e-mail code OR e-mail + PIN)
 async function _afterVerified(user, email) {
   _supaUser = user;
+  _dropDemoBeforeSync(email);
   var hydrated = await _hydrateFromSupabase(_supaUser.id);
   // QC-2: demo visitor signing up for the first time — wipe sample data so
   // the new account starts clean and demo values never sync to Supabase.
