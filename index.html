@@ -8167,6 +8167,46 @@ function hasValidSession() {
   } catch(e) { return false; }
 }
 
+var _sjsStalled = false;
+var _SUPA_URL = 'https://legpubblzgknxdtvsant.supabase.co', _SUPA_KEY = 'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz';
+function _withTimeout(p, ms, fallback) {
+  return Promise.race([p, new Promise(function(res) { setTimeout(function() { res(fallback); }, ms); })]);
+}
+function _localAccessToken() {
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (/^sb-.+-auth-token$/.test(k)) { var v = JSON.parse(localStorage.getItem(k) || 'null'); if (v && v.access_token) return v.access_token; }
+    }
+  } catch (e) {}
+  return null;
+}
+// Call an edge function without ever hanging the UI: supabase-js first (8 s), then a direct request.
+// (supabase-js waits on its own auth lock before every call, so one stalled refresh can freeze it.)
+async function _fnInvoke(name, body, ms, direct) {
+  if (!_supaClient) { try { _initSupabase(); } catch (e) {} }
+  var tok = null;
+  if (direct) {   // one-shot, costs money: never send it twice — go straight out with the user's own token
+    try { var g = _supaClient && await _withTimeout(_supaClient.auth.getSession(), 3000, null); tok = g && g.data && g.data.session && g.data.session.access_token; } catch (e) {}
+  }
+  if (_supaClient && !direct && !_sjsStalled) {
+    var r = await _withTimeout(_supaClient.functions.invoke(name, { body: body }).catch(function(e) { return { data: null, error: e }; }), ms || 8000, null);
+    if (r) return r;
+    _sjsStalled = true;   // supabase-js is not answering: go direct from now on
+  }
+  try {
+    var ctl = new AbortController(), t = setTimeout(function() { ctl.abort(); }, direct ? (ms || 45000) : 15000);
+    var res = await fetch(_SUPA_URL + '/functions/v1/' + name, {
+      method: 'POST', signal: ctl.signal,
+      headers: { 'content-type': 'application/json', apikey: _SUPA_KEY, authorization: 'Bearer ' + (tok || _localAccessToken() || _SUPA_KEY) },
+      body: JSON.stringify(body)
+    });
+    clearTimeout(t);
+    var j = null; try { j = await res.json(); } catch (e) {}
+    return res.ok ? { data: j, error: null } : { data: null, error: { context: { json: async function() { return j; }, status: res.status } } };
+  } catch (e) { return { data: null, error: { message: String(e) } }; }
+}
+
 var SESSION_MS = 30 * 24 * 60 * 60 * 1000;   // rolling: renewed every time the app is opened
 function _createSession(email) {
   localStorage.setItem('vi_session', JSON.stringify({
@@ -8260,7 +8300,7 @@ async function authSubmitEmail() {
       try { var _sv = JSON.parse(localStorage.getItem('vi_session') || 'null'); storedEmail = (_sv && _sv.email) ? _sv.email : ''; } catch(e) {}
       if (!storedEmail) { try { var _su = JSON.parse(localStorage.getItem('vi_user') || 'null'); storedEmail = (_su && _su.email) ? _su.email.toLowerCase() : ''; } catch(e) {} }
       var live = false;
-      try { if (_supaClient) { var g = await _supaClient.auth.getSession(); live = !!(g.data && g.data.session); } } catch(e) {}
+      try { if (_supaClient) { var g = await _withTimeout(_supaClient.auth.getSession(), 2500, null); live = !!(g && g.data && g.data.session); } } catch(e) {}
       if (storedEmail && storedEmail === email && live) {
         _pinMode = 'local'; _pinEnterLen = _localPinLen(); _pinEnterBuf = '';
         _showAuthStep('pin');
@@ -8285,9 +8325,7 @@ async function _sendOTP(email) {
     // Try Edge Function first (Resend API, branded template, no SMTP dependency)
     var sent = false;
     try {
-      var fnRes = await _supaClient.functions.invoke('send-auth-email', {
-        body: { email: email }
-      });
+      var fnRes = await _fnInvoke('send-auth-email', { email: email }, 5000);
       if (!fnRes.error && fnRes.data && fnRes.data.success) sent = true;
     } catch(fnErr) { /* Edge Function not deployed yet — fall through */ }
 
@@ -8383,9 +8421,9 @@ async function authVerifyOTP() {
     // new users, people who forgot their PIN, and anyone without one on the server.
     var st = await _pinStatus(email);
     _needPin = (st.pin === null) ? (_authForgot ? true : null) : (!st.pin || _authForgot);
-    var res = await _supaClient.auth.verifyOtp({
+    var res = await _withTimeout(_supaClient.auth.verifyOtp({
       email: email, token: entered.trim(), type: 'email'
-    });
+    }), 20000, { error: { message: 'timeout' } });
     if (res.error) { _needPin = null; _authErr('Incorrect or expired code. Try again.'); return; }
     await _afterVerified(res.data.user, email);
   } catch(e) { _needPin = null; _authErr('Verification failed. Please try again.'); }
@@ -8482,11 +8520,11 @@ function _updatePinDots(n, prefix) {
 }
 
 // call the pin-auth edge function; returns the parsed JSON body (also for 4xx answers) or null if unreachable
-async function _pinCall(body) {
+async function _pinCall(body, ms) {
   if (!_supaClient) _initSupabase();
   if (!_supaClient) return null;
   try {
-    var r = await _supaClient.functions.invoke('pin-auth', { body: body });
+    var r = await _fnInvoke('pin-auth', body, ms || 8000);
     if (r.data) return r.data;
     if (r.error && r.error.context && typeof r.error.context.json === 'function') { try { return await r.error.context.json(); } catch (e) {} }
   } catch (e) {}
@@ -8494,7 +8532,7 @@ async function _pinCall(body) {
 }
 async function _pinStatus(email) {
   try {
-    var r = await Promise.race([_pinCall({ action: 'status', email: email }), new Promise(function(res) { setTimeout(function() { res(null); }, 4000); })]);
+    var r = await Promise.race([_pinCall({ action: 'status', email: email }, 3500), new Promise(function(res) { setTimeout(function() { res(null); }, 12000); })]);
     if (r && typeof r.pin === 'boolean') return { pin: r.pin };
   } catch (e) {}
   return { pin: null }; // unknown (function not reachable) → fall back to the old behaviour
@@ -8613,7 +8651,7 @@ async function _pinServerLogin(pin) {
   _lsOrig.call(localStorage, 'vi_pin_len', String(PIN_LEN));
   _needPin = false;
   try {
-    var res = await _supaClient.auth.verifyOtp({ email: email, token: r.token, type: 'email' });
+    var res = await _withTimeout(_supaClient.auth.verifyOtp({ email: email, token: r.token, type: 'email' }), 20000, { error: { message: 'timeout' } });
     if (res.error || !res.data || !res.data.user) { reset(); _authErr('Sign-in failed — please use an email code instead.'); return; }
     _pinBusy = false; _pinEnterBuf = '';
     await _afterVerified(res.data.user, email);
@@ -9360,7 +9398,7 @@ async function stkFetchQuotes(symbols){
   if(!_supaClient){try{_initSupabase();}catch(e){}}
   if(_supaClient){
     try{
-      var r=await _supaClient.functions.invoke('stock-quotes',{body:{symbols:symbols}});
+      var r=await _fnInvoke('stock-quotes',{symbols:symbols},8000);
       if(!r.error&&r.data&&r.data.quotes&&Object.keys(r.data.quotes).length)return{quotes:r.data.quotes,source:'Vault·It price feed'};
     }catch(e){}
   }
@@ -9523,7 +9561,7 @@ async function stkShotPicked(inp){
   stkShotModal('📷 Reading your screenshots','<div style="text-align:center;padding:28px 0">Reading '+files.length+' screenshot'+(files.length===1?'':'s')+'… this takes a few seconds.<br><span style="opacity:.6">Sent securely to be read; never stored.</span></div>','');
   try{
     var images=[];for(var i=0;i<files.length;i++)images.push(await stkShotDownscale(files[i]));
-    var r=await _supaClient.functions.invoke('portfolio-vision',{body:{images:images}});
+    var r=await _fnInvoke('portfolio-vision',{images:images},60000,true);
     var d=r.data;
     if(r.error||!d||!d.holdings){
       var eb=null;try{if(r.error&&r.error.context&&r.error.context.json)eb=await r.error.context.json();}catch(e){}
