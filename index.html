@@ -2660,6 +2660,10 @@ input:focus, textarea:focus, select:focus {
 .stk-plat img{width:100%;height:100%;object-fit:contain;display:block}
 .stk-mono{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:9px;letter-spacing:-.02em;font-family:'Syne',sans-serif}
 .stk-main{position:relative}
+.stk-fundset{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end}
+.stk-fundset label{display:block;font-family:'Share Tech Mono',monospace;font-size:.4rem;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.stk-fs-btns{display:flex;gap:6px;flex-wrap:wrap}
+@media(max-width:700px){.stk-fundset{grid-template-columns:1fr 1fr}.stk-fs-btns{grid-column:1/-1}}
 .stk-toolbar{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-right:130px}
 .stk-toolbar .stk-tb-t{font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;color:var(--t);margin-right:auto}
 .stk-main-logo{top:50px}
@@ -9802,7 +9806,7 @@ function stkRender(){
   if(main){
     var up=ret>=0,dUp=dayChg>=0;
     var _ap=alState.activePie!=='all'?alState.stockPies.find(function(x){return x.id===alState.activePie;}):null;
-    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()">✎ Rename</button><button class="stk-btn" style="border-color:rgba(224,92,92,.5);color:#e05c5c" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>':'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
+    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()">✎ Rename</button><button class="stk-btn" style="border-color:rgba(224,92,92,.5);color:#e05c5c" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>'+stkFundControls(_ap,hs):'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
       +'<div class="stk-stats">'
       +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+cfMoney(total)+'</div><div class="s">'+((_ap&&_ap.kind==='fund'&&hs.length===1)?'<b style="color:#e8c56a">'+(+hs[0].units||0).toLocaleString('en-GB',{maximumFractionDigits:4})+' units owned</b>'+(stkPrice(hs[0])>0?' × £'+stkPrice(hs[0]).toFixed(2):''):hs.length+' holding'+(hs.length===1?'':'s'))+' · counts towards net worth</div></div>'
       +'<div class="stk-stat" style="background:'+(withCost.length?(up?'rgba(62,207,142,.07)':'rgba(224,92,92,.08)'):'rgba(68,192,185,.06)')+'"><div class="l">Total return</div><div class="v" style="color:'+(withCost.length?(up?'#3ecf8e':'#e05c5c'):'var(--t3)')+'">'+(withCost.length?((up?'+':'−')+cfMoney(Math.abs(ret))):'—')+'</div><div class="s">'+(withCost.length?(withCost.length<hs.length?'on '+withCost.length+' of '+hs.length+' with a cost basis':'vs your average cost'):'add an average cost to see returns')+'</div></div>'
@@ -9818,6 +9822,7 @@ function stkRender(){
     if(!hs.length)st.innerHTML='<i style="background:#7d8793"></i><span>Add your first holding below — or import a CSV from Trading 212 — to start tracking live prices.</span>';
     else if(window._stkBusy)st.innerHTML='<i style="background:#e8c56a"></i><span>Fetching live prices…</span>';
     else if(latest)st.innerHTML='<i style="background:#3ecf8e"></i><span>Live prices via '+stkEsc(alState.stockSrc||'price feed')+' · updated '+stkAgo(latest)+'</span>';
+    else if(hs.some(function(h){return h.manualPrice&&+h.price>0;}))st.innerHTML='<i style="background:#e8c56a"></i><span>Using your manual price for '+hs.filter(function(h){return h.manualPrice&&+h.price>0;}).map(function(h){return stkEsc(h.sym);}).join(', ')+' — it counts towards your totals and net worth.</span>';
     else st.innerHTML='<i style="background:#e0894a"></i><span>No live price yet — valued at cost until prices load. Tap “Refresh prices”, or type a price yourself.</span>';
   }
   // holdings table
@@ -10011,6 +10016,32 @@ async function stkAddFundConfirm(){
     await stkAddFinish(r,!(units>0));
   }finally{_stkAddBusy=false;}
 }
+
+// price + amount controls on a fund's overview: a manual price counts straight into the totals
+function stkFundControls(pie,hs){
+  if(!pie||pie.kind!=='fund'||!hs.length)return '';
+  var h=hs[0],px=stkPrice(h),man=!!h.manualPrice;
+  var inp='background:rgba(4,10,20,.8);border:1px solid rgba(68,192,185,.3);border-radius:4px;color:#e6eef7;font-size:12px;padding:6px 8px;width:100%';
+  return '<div class="stk-fundset"><div><label>Unit price £ '+(man?'<b style="color:#e8c56a">· manual</b>':(h.updated?'<b style="color:#3ecf8e">· live</b>':'<b style="color:#e0894a">· none yet</b>'))+'</label>'
+    +'<input id="stk-fs-px" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 11.24" value="'+(px>0?(+px).toFixed(4).replace(/\.?0+$/,''):'')+'" onkeydown="if(event.key===\'Enter\')stkFundSetPrice('+h.id+')"></div>'
+    +'<div><label>Units owned</label><input id="stk-fs-un" type="number" min="0" step="any" style="'+inp+'" value="'+(+h.units>0?+h.units:'')+'" placeholder="units" onkeydown="if(event.key===\'Enter\')stkFundSetUnits('+h.id+')"></div>'
+    +'<div><label>…or £ you hold</label><input id="stk-fs-amt" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 224.80" onkeydown="if(event.key===\'Enter\')stkFundSetAmount('+h.id+')"></div>'
+    +'<div class="stk-fs-btns"><button class="btn-add-data" onclick="stkFundApply('+h.id+')">Save</button>'+(man?'<button class="stk-btn" onclick="stkFundLive('+h.id+')">Use live price</button>':'')+'</div></div>';
+}
+function stkFundApply(id){
+  var h=alState.stocks.find(function(x){return x.id===id;});if(!h)return;
+  var g=function(i){return parseFloat((document.getElementById(i)||{}).value);};
+  var px=g('stk-fs-px'),un=g('stk-fs-un'),amt=g('stk-fs-amt');
+  if(px>0&&px!==stkPrice(h)){h.price=px;h.manualPrice=true;h.updated=0;h.change=0;}   // typed a new price → manual price
+  var price=stkPrice(h);
+  if(amt>0){
+    if(!(price>0)){showToast('Enter a unit price first, so the units can be worked out from the £ you hold');return;}
+    h.units=+(amt/price).toFixed(6);
+  } else if(un>=0&&un!==(+h.units||0)){h.units=un;}
+  stkSave();
+  showToast('Saved · '+(+h.units).toLocaleString('en-GB',{maximumFractionDigits:4})+' units'+(price>0?' = £'+(h.units*price).toLocaleString('en-GB',{maximumFractionDigits:2}):''));
+}
+function stkFundLive(id){var h=alState.stocks.find(function(x){return x.id===id;});if(!h)return;h.manualPrice=false;h.price=0;stkSave();stkRefresh(false);}
 function stkSet(id,field,val){
   var h=alState.stocks.find(function(x){return x.id===id;});
   if(!h)return;
