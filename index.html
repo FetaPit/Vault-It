@@ -9938,7 +9938,7 @@ async function stkShotPicked(inp){
       var msg=code==='limit'?(eb.message||'Daily screenshot limit reached — try again tomorrow.'):
         code==='not_configured'?'Screenshot reading isn’t switched on for this app yet. You can still add holdings by ticker or CSV.':
         code==='unreadable'?'I couldn’t find any holdings in those screenshots. Try a clearer screenshot of the holdings list.':
-        'Couldn’t read the screenshots right now. Please try again, or add holdings by ticker.';
+        'Couldn’t read the screenshots right now. Please try again, or add holdings by ticker.'+((eb&&(eb.detail||eb.upstream))?' ('+(eb.upstream?eb.upstream+': ':'')+(eb.detail||'')+')':(r.error&&r.error.message?' ('+r.error.message+')':''));
       stkShotModal('📷 Import screenshots','<div class="stk-shot-err">'+stkEsc(msg)+'</div>','<button class="stk-btn" onclick="stkShotClose()">Close</button>');
       return;
     }

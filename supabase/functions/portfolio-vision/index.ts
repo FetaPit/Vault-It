@@ -125,10 +125,16 @@ async function handle(req: Request): Promise<Response> {
         ] }],
       }),
     })
-    if (!r.ok) return json({ error: 'vision_failed' }, 502)
+    if (!r.ok) {
+      // surface WHY (never the key): Anthropic's own error type/message, e.g. invalid key, no credit, bad model
+      let detail = ''
+      try { const e = await r.json(); detail = String(e?.error?.message ?? e?.error?.type ?? '').slice(0, 200) } catch { /* no body */ }
+      console.error('anthropic', r.status, detail)
+      return json({ error: 'vision_failed', upstream: r.status, detail }, 502)
+    }
     const j = await r.json()
     result = (j?.content ?? []).find((c: any) => c.type === 'tool_use')?.input
-  } catch { return json({ error: 'vision_failed' }, 502) }
+  } catch (e) { console.error('anthropic fetch failed', String(e)); return json({ error: 'vision_failed', detail: 'could not reach the AI service' }, 502) }
   if (!result || !Array.isArray(result.holdings)) return json({ error: 'unreadable' }, 422)
 
   const num = (v: unknown) => (typeof v === 'number' && isFinite(v) ? v : null)
