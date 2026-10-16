@@ -19,6 +19,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const API_KEY      = Deno.env.get('ANTHROPIC_API_KEY') ?? ''
 const MODEL        = Deno.env.get('VISION_MODEL') ?? 'claude-sonnet-5-5'
+const WORKSPACE    = Deno.env.get('ANTHROPIC_WORKSPACE_ID') ?? ''   // only needed when the API key is not scoped to one workspace
 const DAILY_CAP    = parseInt(Deno.env.get('VISION_DAILY_CAP') ?? '30', 10) || 30
 const MAX_IMAGES   = 4
 const MAX_B64      = 2_800_000            // ≈ 2 MB per image after base64
@@ -111,11 +112,13 @@ async function handle(req: Request): Promise<Response> {
   const { data: allowed } = await admin.rpc('vision_take', { p_user: u.user.id, p_cost: images.length, p_max: DAILY_CAP })
   if (allowed === false) return json({ error: 'limit', message: 'Daily screenshot limit reached — try again tomorrow.' }, 429)
 
+  // a read that produced nothing doesn't count against the daily allowance
+  const refund = async () => { try { await admin.rpc('vision_take', { p_user: u.user.id, p_cost: -images.length, p_max: DAILY_CAP }) } catch { /* best effort */ } }
   let result: any
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      headers: { 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', ...(WORKSPACE ? { 'anthropic-workspace-id': WORKSPACE } : {}) },
       body: JSON.stringify({
         model: MODEL, max_tokens: 4096,
         tools: [TOOL], tool_choice: { type: 'tool', name: 'report_holdings' },
@@ -130,12 +133,13 @@ async function handle(req: Request): Promise<Response> {
       let detail = ''
       try { const e = await r.json(); detail = String(e?.error?.message ?? e?.error?.type ?? '').slice(0, 200) } catch { /* no body */ }
       console.error('anthropic', r.status, detail)
+      await refund()
       return json({ error: 'vision_failed', upstream: r.status, detail }, 502)
     }
     const j = await r.json()
     result = (j?.content ?? []).find((c: any) => c.type === 'tool_use')?.input
-  } catch (e) { console.error('anthropic fetch failed', String(e)); return json({ error: 'vision_failed', detail: 'could not reach the AI service' }, 502) }
-  if (!result || !Array.isArray(result.holdings)) return json({ error: 'unreadable' }, 422)
+  } catch (e) { console.error('anthropic fetch failed', String(e)); await refund(); return json({ error: 'vision_failed', detail: 'could not reach the AI service' }, 502) }
+  if (!result || !Array.isArray(result.holdings)) { await refund(); return json({ error: 'unreadable' }, 422) }
 
   const num = (v: unknown) => (typeof v === 'number' && isFinite(v) ? v : null)
   const rows = result.holdings.filter((h: any) => h && typeof h.name === 'string' && h.name.trim()).slice(0, 60)

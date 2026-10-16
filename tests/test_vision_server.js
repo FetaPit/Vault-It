@@ -35,6 +35,8 @@ const img={media_type:'image/jpeg',data:'QUJD'};
   ok(f.ticker==='FIG'&&f.value===277.79&&f.pl===-6.08&&f.candidates[0].symbol==='FIG'&&f.candidates.length===2,'model ticker first, Yahoo alternatives after');
   ok(t.ticker===null&&t.candidates.length===1&&t.candidates[0].symbol==='TTWO','name-only row resolved via search; non-equity filtered');
   ok(j.value===null,'non-numeric value → null');
+  { const real=globalThis.fetch; globalThis.fetch=async(u,o)=>String(u).includes('anthropic')?new Response(JSON.stringify({error:{type:'invalid_request_error',message:'Your credit balance is too low to access the Anthropic API.'}}),{status:400}):real(u,o);
+    spent=0; r=await call({images:[img]}); ok(spent===0,'a failed read is refunded'); ok(r.s===502&&r.b.upstream===400&&/credit balance/.test(r.b.detail)&&!JSON.stringify(r.b).includes('sk-test'),'upstream failure explains why (never the key): '+JSON.stringify(r.b)); globalThis.fetch=real; }
   spent=29; r=await call({images:[img,img]}); ok(r.s===429&&r.b.error==='limit'&&anthropicCalls===1,'daily cap blocks before any model call');
   env.ANTHROPIC_API_KEY=''; new Function('require','module','exports',js)(require,{exports:{}},{}); r=await call({images:[img]}); ok(r.s===503&&r.b.error==='not_configured','no API key → 503 not_configured');
   r=await call(null,'good','GET'); ok(r.s===405,'GET refused');
