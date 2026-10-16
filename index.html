@@ -8861,9 +8861,22 @@ var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
 // Every edit to a vault key is time-stamped (vi_ts) and queued (vi_dirty) until the cloud confirms it.
 // Signing in never overwrites newer local work: see _hydrateFromSupabase.
 var _cloudSeen = {}, _emptiedByUser = {};   // _emptiedByUser: areas the user deliberately emptied this session (so an empty result may be uploaded)   // what the cloud held when we last read/wrote it
+// Fingerprints of the built-in sample (demo) data. If it ever ends up outside demo mode (e.g. a stale device) it counts as "nothing here",
+// so it can neither upload over the account's real figures nor win when the account's data is pulled down.
+function _isDemoSample(key, o) {
+  try {
+    if (key === 'pos_debt1') return (o.debts || []).some(function(d) { return d && d.name === 'Student Loan Plan 2' && +d.original === 38000; });
+    if (key === 'pos_house') return !!(o.deposits && o.deposits[0] && o.deposits[0].amt === 5000 && o.saved === 22500);
+    if (key === 'ht3') return !!(o.deposits && o.deposits.length >= 6 && o.deposits[0].amount === 5000 && o.deposits[1].amount === 4500 && o.deposits[2].amount === 3500);
+    if (key === 'pos_al1') return (o.crypto || []).some(function(c) { return c && c.sym === 'ETH' && (+c.amount === 1.4 || +c.qty === 1.4); }) && (o.crypto || []).some(function(c) { return c && c.sym === 'BTC' && (+c.amount === 0.05 || +c.qty === 0.05); });
+    if (key === 'pos_biz1') return (o.leads || []).some(function(l) { return l && l.name === 'Nova Retail'; });
+  } catch (e) {}
+  return false;
+}
 function _isBlankArea(key, v) {   // an area with nothing in it (new-device defaults) must never replace one that has data
   try {
     var o = typeof v === 'string' ? JSON.parse(v) : v; if (!o) return true;
+    if (_isDemoSample(key, o)) return true;   // the built-in sample persona is never the user's own data: it must not replace real figures
     var n = function(a) { return a && a.length; };
     if (key === 'pos_ov1') return !(n(o.income) || n(o.expenses));
     if (key === 'pos_al1') return !(n(o.cashAccounts) || n(o.stocks) || n(o.otherAssets) || n(o.crypto) || n(o.liabilities) || (o.metals && Object.keys(o.metals).some(function(m) { return +o.metals[m] > 0; })));
@@ -9901,6 +9914,13 @@ async function authRemovePin() {
 // ──────────────────────────────────────────────────────────────
 
 function _completeAuth(email) {
+  // Sample data still on this device must be discarded (not adopted as the user's own) before the account is read
+  if (localStorage.getItem('vi_demo_mode') === 'true') {
+    _dropDemoBeforeSync(email);
+    try { _createSession(email); } catch (e) {}
+    location.reload();
+    return;
+  }
   // Clear demo mode — user is now a real authenticated account
   localStorage.removeItem('vi_demo_mode');
   var chip = document.getElementById('demo-chip');
