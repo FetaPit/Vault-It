@@ -2664,6 +2664,36 @@ input:focus, textarea:focus, select:focus {
 .hb-tip td:last-child{text-align:right;color:#f1d98b}
 @media(max-width:560px){.hb-st{grid-template-columns:repeat(2,1fr)}}
 
+
+/* ── Mortgage calculator ── */
+.hbc-ov{position:fixed;inset:0;z-index:10050;background:rgba(2,6,12,.88);display:flex;align-items:flex-start;justify-content:center;padding:14px;overflow:auto}
+.hbc{background:#06101c;border:1px solid rgba(68,192,185,.3);border-radius:12px;width:min(1120px,100%);color:#cfdbe8;font-size:12px}
+.hbc-hd{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid rgba(68,192,185,.16);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--em);position:sticky;top:0;background:#06101c;z-index:2;border-radius:12px 12px 0 0}
+.hbc-body{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:16px;padding:14px 16px}
+@media(max-width:860px){.hbc-body{grid-template-columns:1fr}}
+.hbc details{border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:8px;background:rgba(4,12,24,.6)}
+.hbc summary{cursor:pointer;padding:9px 12px;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8fe0da}
+.hbc details>div{padding:4px 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hbc label{display:block;font-size:10px;color:var(--t3);margin-bottom:3px;letter-spacing:.03em}
+.hbc input[type=number],.hbc input[type=text],.hbc input[type=date],.hbc select{width:100%;background:rgba(4,10,20,.85);border:1px solid rgba(68,192,185,.25);border-radius:5px;color:#e6eef7;font-size:13px;padding:7px 8px}
+.hbc .full{grid-column:1/-1}
+.hbc .chk{display:flex;align-items:center;gap:6px;font-size:11px;color:#cfdbe8;margin:0}
+.hbc .chk input{width:auto}
+.hbc-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:10px}
+.hbc-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px}
+.hbc-card .l{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.hbc-card .v{font-family:'Share Tech Mono',monospace;font-size:17px;color:#e8f0ef;margin:3px 0}
+.hbc-card .s{font-size:10.5px;color:var(--t2)}
+.hbc-good{color:#3ecf8e!important}.hbc-warn{color:#e0b44a!important}
+.hbc-chart{background:rgba(4,10,20,.6);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:8px;margin-bottom:10px}
+.hbc table{width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:11px}
+.hbc th{color:var(--t3);font-weight:400;text-align:right;padding:4px 6px;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.hbc th:first-child,.hbc td:first-child{text-align:left}
+.hbc td{padding:4px 6px;border-top:1px solid rgba(255,255,255,.05);text-align:right}
+.hbc-pre{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.hbc-note{font-size:10.5px;color:var(--t3);line-height:1.55;margin-top:8px}
+.hbc-lump{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:end;margin-top:6px}
+
 .stk-pie{position:relative}
 .stk-pie:has(.stk-plat){padding-right:24px}
 .stk-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;font-size:.44rem;color:var(--t3)}
@@ -7192,7 +7222,7 @@ function redraw(){
     (DRAW[state.houseType]||drawTerraced)(1.0);
     return;
   }
-  var rawP = _isPro() ? pct() : 0;
+  var rawP = state.houseMode==='purchased' ? 1 : (_isPro() ? pct() : 0);   // once bought, the whole house exists — equity shading shows what you own
   var displayP = rawP < 0.04 ? 0.04 : rawP;
   (DRAW[state.houseType]||drawTerraced)(displayP);
 }
@@ -7552,6 +7582,7 @@ function hbRenderHUD(){
       +'<div class="hb-st"><div><b>'+Math.floor((state.saved||0)/perBrick).toLocaleString('en-GB')+'</b><span>of 1,000 bricks</span></div><div><b>'+gbpFmt(rem)+'</b><span>to go</span></div><div><b>'+hbXP().toLocaleString('en-GB')+'</b><span>XP</span></div><div><b>'+hbStreak()+'🔥</b><span>streak</span></div></div>'
       +'<div style="font-size:.46rem;color:var(--t3)">Each brick = '+gbpFmt(perBrick)+'</div>'
       +'<div class="hb-badges">'+HB_BADGES.map(function(b,i){return '<span class="hb-bd'+(p>=b[0]?' got':'')+'">'+(p>=b[0]?'🏅 ':'')+(b[0]*100)+'% · '+b[1]+'</span>';}).join('')+'</div>'
+      +'<div style="margin-top:10px"><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Preview your mortgage</button></div>'
       +tip;
   } else if(view===2){
     hbRenderL2(el);
@@ -7566,9 +7597,306 @@ function hbBadgeToasts(p){
   if(g.seen===null){g.seen=now;if((state.deposits||[]).length||state.saved>0)save();return;}   // first run: no toast spam for what is already earned (and nothing written for a brand-new user)
   now.forEach(function(n){if(g.seen.indexOf(n)<0){g.seen.push(n);toast('🏅 Badge unlocked: '+n+'!');save();}});
 }
-// L2 / L3 panels are filled in by the mortgage engine
-function hbRenderL2(el){el.innerHTML='<div class="card-lbl">LEVEL 2 · DELETE THE MORTGAGE</div><div style="font-size:.56rem;color:var(--t2)">Balance '+gbpFmt(state.mortgageBalance||0)+' · equity '+gbpFmt(Math.max(0,(state.valuation||state.target||0)-(state.mortgageBalance||0)))+'</div>';}
+// L2 / L3 panels
+function hbSetOver(v){var cur=hbcRead().raw;cur.over=Math.max(0,Math.round(v));state.calc=cur;save();updateUI();toast('Plan: overpay '+hbMoney(cur.over)+' a month');}
+function hbL2Sims(){var c=hbcRead();return{c:c,base:hbSimulate(c.base),scn:hbSimulate(c.scn)};}
+function hbRenderL2(el){
+  var bal=state.mortgageBalance||0,val=state.valuation||state.target||0,eq=Math.max(0,val-bal),eqp=val>0?eq/val*100:0;
+  var S2=hbL2Sims(),base=S2.base,scn=S2.scn,cmp=hbCompare(base,scn),bud=hbBudget(),u=Math.round(bud.unassigned),sv=Math.round(bud.saving);
+  var rows='';
+  [[u,'your unassigned '+hbMoney(u)],[u+sv,'unassigned + savings '+hbMoney(u+sv)]].forEach(function(x,i){
+    if(!(x[0]>0)||(i===1&&!(sv>0)))return;
+    var sc=hbSimulate(Object.assign({},S2.c.base,{over:{monthly:x[0],stepUpPct:0,lumps:[],roundUp:false}})),cm=hbCompare(base,sc);
+    rows+='<tr><td>+'+hbMoney(x[0])+'/mo ('+x[1].split(' ').slice(0,-1).join(' ')+')</td><td>'+hbYM(cm.monthsSaved)+' sooner</td><td>'+hbMoney(cm.interestSaved)+' less interest</td></tr>';
+  });
+  var tip=rows?'<div class="hb-tip">💡 <b>What your Budget could do for this mortgage</b><br>Unassigned <b>'+hbMoney(u)+'</b>/mo · already saving <b>'+hbMoney(sv)+'</b>/mo.<table>'+rows+'</table><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+(u>0?'<button class="stk-btn" onclick="hbSetOver('+u+')">Plan: overpay '+hbMoney(u)+'</button>':'')+(u+sv>0&&sv>0?'<button class="stk-btn" onclick="hbSetOver('+(u+sv)+')">Plan: overpay '+hbMoney(u+sv)+'</button>':'')+'</div></div>':'';
+  el.innerHTML='<div class="card-lbl">LEVEL 2 · DELETE THE MORTGAGE</div>'
+    +'<div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:#e8f0ef"><span>You own '+hbMoney(eq)+'</span><span>'+eqp.toFixed(1)+'% of '+hbMoney(val)+'</span></div>'
+    +'<div class="hb-xp"><div style="width:'+eqp.toFixed(1)+'%"></div></div>'
+    +'<div class="hb-st"><div><b>'+hbMoney(bal)+'</b><span>still owed</span></div><div><b>'+(scn.balloon>0?'—':hbFmtDate(scn.payoffDate))+'</b><span>mortgage-free</span></div><div><b class="'+(cmp.interestSaved>0?'hbc-good':'')+'">'+hbMoney(cmp.interestSaved)+'</b><span>interest slain</span></div><div><b>'+hbYM(Math.max(0,cmp.monthsSaved))+'</b><span>months shaved</span></div></div>'
+    +'<div style="font-size:.5rem;color:var(--t3)">Solid bricks = the part of the house you own. Ghost bricks = what the lender still owns.</div>'
+    +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Open mortgage calculator</button></div>'
+    +tip;
+}
 function hbRenderL3(el){el.innerHTML='<div class="card-lbl">LEVEL 3 · UPGRADE</div><div style="font-size:.56rem;color:var(--t2)">Plan your second property.</div>';}
+
+// <<HB_MORTGAGE_ENGINE
+// ═══════════════════════════════════════════════════════════════
+// MORTGAGE ENGINE — pure functions, no DOM. Illustrative only.
+// Models UK behaviour: daily interest charged monthly (default), monthly or annual rest, offset,
+// repayment / interest-only / part-and-part, fixed→reversion products, overpayments (monthly, step-up,
+// lumps, round-up), term- vs payment-reduction, overpayment allowance + early-repayment charges, fees.
+// ═══════════════════════════════════════════════════════════════
+function hbDaysIn(y,m){return new Date(Date.UTC(y,m+1,0)).getUTCDate();}
+function hbAddMonths(d,n){var x=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+n,1));x.setUTCDate(Math.min(d.getUTCDate(),hbDaysIn(x.getUTCFullYear(),x.getUTCMonth())));return x;}
+function hbPmt(B,r,n){if(n<=0)return B;if(r<=0)return B/n;return B*r/(1-Math.pow(1+r,-n));}   // annuity: r = periodic rate
+function hbNum(v,d){v=parseFloat(v);return isFinite(v)?v:(d||0);}
+function hbNormalise(o){
+  o=o||{};
+  var n={
+    loan:Math.max(0,hbNum(o.loan)),termMonths:Math.max(1,Math.round(hbNum(o.termMonths,300))),
+    start:o.start||new Date().toISOString().slice(0,10),
+    repayment:o.repayment||'repayment',ioAmount:Math.max(0,hbNum(o.ioAmount)),
+    products:(o.products&&o.products.length?o.products:[{months:null,type:'fixed',rate:5}]).map(function(p){return{months:p.months==null||p.months===''?null:Math.max(1,Math.round(hbNum(p.months))),type:p.type||'fixed',rate:hbNum(p.rate),base:hbNum(p.base),margin:hbNum(p.margin)};}),
+    interestMode:o.interestMode||'daily',stress:hbNum(o.stress),
+    offset:{enabled:!!(o.offset&&o.offset.enabled),balance:Math.max(0,hbNum(o.offset&&o.offset.balance)),monthlyAdd:hbNum(o.offset&&o.offset.monthlyAdd)},
+    over:{monthly:Math.max(0,hbNum(o.over&&o.over.monthly)),stepUpPct:hbNum(o.over&&o.over.stepUpPct),lumps:((o.over&&o.over.lumps)||[]).map(function(l){return{month:Math.max(1,Math.round(hbNum(l.month,1))),amount:Math.max(0,hbNum(l.amount))};}),roundUp:!!(o.over&&o.over.roundUp)},
+    outcome:o.outcome||'term',
+    allowance:{pct:hbNum(o.allowance&&o.allowance.pct,10),basis:(o.allowance&&o.allowance.basis)||'anniversary',enforce:o.allowance?o.allowance.enforce!==false:false,cap:!!(o.allowance&&o.allowance.cap)},
+    erc:(o.erc||[]).map(hbNum),
+    fees:{arrangement:Math.max(0,hbNum(o.fees&&o.fees.arrangement)),addToLoan:!!(o.fees&&o.fees.addToLoan),other:Math.max(0,hbNum(o.fees&&o.fees.other))},
+    valuation:hbNum(o.valuation),growthPct:hbNum(o.growthPct)
+  };
+  return n;
+}
+function hbProductAt(o,m){var cum=0;for(var i=0;i<o.products.length;i++){var p=o.products[i];if(p.months==null)return{p:p,i:i,from:cum+1};cum+=p.months;if(m<=cum)return{p:p,i:i,from:cum-p.months+1};}var last=o.products[o.products.length-1];return{p:last,i:o.products.length-1,from:1};}
+function hbRateOf(o,pr){var p=pr.p,r=(p.type==='tracker')?(p.base+p.margin):p.rate;return Math.max(0,(r+o.stress))/100;}
+function hbSimulate(opts){
+  var o=hbNormalise(opts),out={schedule:[],warnings:[],totalInterest:0,totalPaid:0,ercTotal:0,upfront:0,balloon:0,payment0:0};
+  var start=new Date(o.start+'T00:00:00Z');
+  var loan=o.loan+(o.fees.addToLoan?o.fees.arrangement:0);
+  out.upfront=(o.fees.addToLoan?0:o.fees.arrangement)+o.fees.other;
+  var term=o.termMonths,io=o.repayment==='interest-only'?loan:(o.repayment==='part'?Math.min(o.ioAmount,loan):0);
+  var Brep=loan-io,Bio=io,Bref=Brep,off=o.offset.enabled?o.offset.balance:0;
+  var payRep=0,lastProdIdx=-1,annualBal=loan,yearKey=null,allowBal=loan,overYear=0,m=0;
+  var p0months=o.products[0].months;
+  while(m<term&&(Brep+Bio)>0.005){
+    m++;
+    var B=Brep+Bio,date=hbAddMonths(start,m-1),next=hbAddMonths(start,m),days=Math.round((next-date)/864e5);
+    var pr=hbProductAt(o,m),r=hbRateOf(o,pr);
+    var yIdx=Math.floor((m-1)/12);
+    // allowance year: anniversary of the start, or calendar year
+    var yk=o.allowance.basis==='calendar'?date.getUTCFullYear():yIdx;
+    if(yk!==yearKey){yearKey=yk;overYear=0;allowBal=B;}
+    if(m===1||(m-1)%12===0)annualBal=B;
+    // payment basis: recalculated when the rate changes (term mode) or every month (payment mode)
+    if(o.outcome!=='payment'&&pr.i!==lastProdIdx){payRep=hbPmt(Bref,r/12,term-m+1);lastProdIdx=pr.i;}
+    // lump sums at the start of the month
+    var ercM=0,overM=0,lumpM=0;
+    var inErc=(o.erc.length>0)&&(p0months!=null)&&(pr.i===0)&&(m<=p0months);
+    var yearsIn=Math.min(o.erc.length-1,Math.floor((m-1)/12));
+    function applyOver(amount){
+      amount=Math.min(amount,Brep+Bio);if(amount<=0)return 0;
+      if(inErc||(o.allowance.enforce&&inErc)){
+        var allowLeft=Math.max(0,allowBal*o.allowance.pct/100-overYear);
+        if(amount>allowLeft+0.005){
+          if(o.allowance.cap){amount=allowLeft;}
+          else{var ex=amount-allowLeft;ercM+=ex*(o.erc[yearsIn]||0)/100;out.warnings.push('Month '+m+': overpayment above the '+o.allowance.pct+'% allowance — early repayment charge applies to £'+Math.round(ex));}
+        }
+      }
+      overYear+=amount;
+      var fromRep=Math.min(amount,Brep);Brep-=fromRep;Bio-=Math.min(amount-fromRep,Bio);
+      return amount;
+    }
+    o.over.lumps.forEach(function(l){if(l.month===m){lumpM+=applyOver(l.amount);}});
+    if(o.outcome==='payment')payRep=hbPmt(Brep,r/12,term-m+1);   // "reduce payment": re-set over the remaining term after any lump
+    B=Brep+Bio;
+    // interest for the month
+    var offEff=o.offset.enabled?Math.min(off,B):0,interest;
+    if(o.interestMode==='monthly')interest=Math.max(0,B-offEff)*r/12;
+    else if(o.interestMode==='annual')interest=Math.max(0,annualBal-offEff)*r/12;   // annual rest: interest runs on the balance at the start of the year; payments only count from the next charge date
+    else {var yd=(new Date(Date.UTC(date.getUTCFullYear(),11,31))-new Date(Date.UTC(date.getUTCFullYear()-1,11,31)))/864e5;interest=Math.max(0,B-offEff)*r*days/yd;}
+    // contractual payment
+    var pay;
+    if(o.repayment==='interest-only')pay=interest;
+    else pay=payRep+(Bio>0?Bio*r/12:0);
+    var final=false,clearAmt=(o.repayment==='repayment')?B:Brep;   // part-and-part: only the repayment slice is cleared
+    if(o.repayment!=='interest-only'&&(pay>=clearAmt+interest-0.005||m===term)){pay=clearAmt+interest;final=true;}
+    var principal=Math.max(0,pay-interest);
+    var pRep=Math.min(principal,Brep);Brep-=pRep;var pIo=Math.min(principal-pRep,Bio);Bio-=pIo;
+    // reference path (no overpayments) for term mode
+    if(o.outcome==='term'&&Bref>0){var refInt=Bref*r/12;Bref=Math.max(0,Bref-Math.max(0,hbPmt(Bref+0,r/12,term-m+1)-refInt));}
+    // monthly overpayment (end of month)
+    if(!final){
+      var ov=o.over.monthly*Math.pow(1+o.over.stepUpPct/100,yIdx);
+      if(o.over.roundUp){var up=Math.ceil(pay)-pay;ov+=up;}
+      if(ov>0)overM+=applyOver(ov);
+    }
+    if(o.offset.enabled)off=Math.max(0,off+o.offset.monthlyAdd);
+    var close=Math.max(0,Brep+Bio);if(close<0.005){Brep=0;Bio=0;close=0;}
+    out.totalInterest+=interest;out.totalPaid+=pay+overM+lumpM+ercM;out.ercTotal+=ercM;
+    if(m===1)out.payment0=pay;
+    out.schedule.push({m:m,date:date.toISOString().slice(0,10),open:B+lumpM,interest:interest,principal:pRep+pIo,pay:pay,overpay:overM+lumpM,erc:ercM,close:close,rate:r*100,offset:off});
+    if(close<=0)break;
+  }
+  var rem=Brep+Bio;if(rem>0.005){out.balloon=rem;out.warnings.push(o.repayment==='repayment'?'Balance not cleared by the end of the term.':'Interest-only: £'+Math.round(rem).toLocaleString('en-GB')+' is still owed at the end of the term and must be repaid from another source.');}
+  out.months=out.schedule.length;
+  var last=out.schedule[out.schedule.length-1];
+  out.payoffDate=last?hbAddMonths(start,out.months).toISOString().slice(0,10):o.start;
+  out.totalCost=out.totalInterest+out.ercTotal+out.upfront;
+  out.opts=o;return out;
+}
+// property value after m months and equity (value − balance)
+function hbEquityAt(sim,m){
+  var o=sim.opts,val=(o.valuation>0?o.valuation:0)*Math.pow(1+o.growthPct/100,m/12);
+  var row=m<=0?null:sim.schedule[Math.min(m,sim.schedule.length)-1];
+  var bal=m<=0?(o.loan+(o.fees.addToLoan?o.fees.arrangement:0)):(m>sim.schedule.length?0:row.close);
+  return{value:val,balance:bal,equity:Math.max(0,val-bal)};
+}
+function hbCompare(base,scn){
+  return{interestSaved:base.totalInterest-scn.totalInterest,monthsSaved:base.months-scn.months,costSaved:base.totalCost-scn.totalCost,
+    base:base,scn:scn};
+}
+// HB_MORTGAGE_ENGINE>>
+
+
+// ═══════════════════════════════════════════════════════════════
+// MORTGAGE CALCULATOR — modal UI over the engine above
+// ═══════════════════════════════════════════════════════════════
+var HBC_DEF={price:0,dep:0,bal:0,termY:25,termM:0,start:'',p1type:'fixed',p1rate:4.8,p1base:4,p1margin:0.8,p1months:60,p2type:'variable',p2rate:7,
+  repay:'repayment',io:0,mode:'daily',stress:0,over:0,step:0,round:false,lumps:[],outcome:'term',off:false,offbal:0,offadd:0,
+  allow:10,basis:'anniversary',ercon:true,erc:'5,4,3,2,1',cap:false,fee:0,feeadd:false,other:0,val:0,growth:0,sav:4.5};
+var _hbcT=null;
+function hbRound(n,d){var f=Math.pow(10,d||0);return Math.round(n*f)/f;}
+function hbMoney(n){n=+n||0;return (n<0?'−':'')+'£'+Math.abs(Math.round(n)).toLocaleString('en-GB');}
+function hbYM(m){m=Math.max(0,Math.round(m));var y=Math.floor(m/12),mm=m%12;return (y?y+'y ':'')+(mm||!y?mm+'m':'');}
+function hbFmtDate(iso){return new Date(iso+'T00:00:00Z').toLocaleDateString('en-GB',{month:'short',year:'numeric',timeZone:'UTC'});}
+function hbcFields(){
+  var d=Object.assign({},HBC_DEF,state.calc||{});
+  var inL2=hbLevel()>=2;
+  if(!(state.calc&&state.calc.price>0))d.price=state.target||200000;
+  if(!(state.calc&&state.calc.dep>=0&&state.calc._set))d.dep=inL2?((state.purchase&&state.purchase.deposit)||state.saved||0):depositTarget();
+  if(!(state.calc&&state.calc._set))d.bal=inL2?(state.mortgageBalance||Math.max(0,d.price-d.dep)):Math.max(0,d.price-d.dep);
+  if(!d.start)d.start=new Date().toISOString().slice(0,10);
+  if(!(state.calc&&state.calc.val>0))d.val=inL2?(state.valuation||d.price):d.price;
+  d.lumps=(d.lumps||[]).slice();
+  return d;
+}
+function hbcGet(id){var e=document.getElementById('hbc-'+id);if(!e)return null;return e.type==='checkbox'?e.checked:e.value;}
+function hbcRead(){
+  var d=hbcFields(),g=function(k){var v=hbcGet(k);return v===null?d[k]:v;},n=function(k){var v=parseFloat(g(k));return isFinite(v)?v:(+d[k]||0);};
+  var raw={price:n('price'),dep:n('dep'),bal:n('bal'),termY:n('termY'),termM:n('termM'),start:g('start')||d.start,p1type:g('p1type'),p1rate:n('p1rate'),p1base:n('p1base'),p1margin:n('p1margin'),p1months:n('p1months'),
+    p2type:g('p2type'),p2rate:n('p2rate'),repay:g('repay'),io:n('io'),mode:g('mode'),stress:n('stress'),over:n('over'),step:n('step'),round:!!g('round'),lumps:d.lumps,outcome:g('outcome'),
+    off:!!g('off'),offbal:n('offbal'),offadd:n('offadd'),allow:n('allow'),basis:g('basis'),ercon:!!g('ercon'),erc:String(g('erc')||''),cap:!!g('cap'),fee:n('fee'),feeadd:!!g('feeadd'),other:n('other'),val:n('val'),growth:n('growth'),sav:n('sav'),_set:true};
+  var term=Math.max(1,Math.round(raw.termY*12+raw.termM));
+  var ercs=raw.ercon?raw.erc.split(/[ ,]+/).map(parseFloat).filter(isFinite):[];
+  var products=[{months:Math.max(1,Math.round(raw.p1months)),type:raw.p1type,rate:raw.p1rate,base:raw.p1base,margin:raw.p1margin},{months:null,type:raw.p2type==='fixed'?'fixed':raw.p2type,rate:raw.p2rate,base:raw.p1base,margin:raw.p1margin}];
+  if(raw.p1months<=0||raw.p1months>=term)products=[products[0]].map(function(p){p.months=null;return p;});
+  var common={loan:raw.bal,termMonths:term,start:raw.start,repayment:raw.repay,ioAmount:raw.io,products:products,interestMode:raw.mode,stress:raw.stress,outcome:raw.outcome,
+    allowance:{pct:raw.allow,basis:raw.basis,enforce:raw.ercon,cap:raw.cap},erc:ercs,fees:{arrangement:raw.fee,addToLoan:raw.feeadd,other:raw.other},valuation:raw.val,growthPct:raw.growth};
+  var scn=Object.assign({},common,{over:{monthly:raw.over,stepUpPct:raw.step,lumps:raw.lumps,roundUp:raw.round},offset:{enabled:raw.off,balance:raw.offbal,monthlyAdd:raw.offadd}});
+  var base=Object.assign({},common,{over:{monthly:0,stepUpPct:0,lumps:[],roundUp:false},offset:{enabled:false,balance:0,monthlyAdd:0}});
+  return{raw:raw,scn:scn,base:base,common:common};
+}
+function hbcFieldHTML(k,label,val,opts){
+  opts=opts||{};var t=opts.type||'number';
+  if(t==='select')return '<div><label for="hbc-'+k+'">'+label+'</label><select id="hbc-'+k+'">'+opts.options.map(function(o){return '<option value="'+o[0]+'"'+(String(val)===String(o[0])?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></div>';
+  if(t==='checkbox')return '<div class="full"><label class="chk"><input type="checkbox" id="hbc-'+k+'"'+(val?' checked':'')+'> '+label+'</label></div>';
+  return '<div'+(opts.full?' class="full"':'')+'><label for="hbc-'+k+'">'+label+'</label><input id="hbc-'+k+'" type="'+t+'" '+(t==='number'?'step="'+(opts.step||'any')+'" min="'+(opts.min!=null?opts.min:0)+'"':'')+' value="'+(val==null?'':val)+'"'+(opts.ph?' placeholder="'+opts.ph+'"':'')+'></div>';
+}
+function hbOpenCalc(){
+  var d=hbcFields();
+  var o=document.getElementById('hbc-ov');if(o)o.remove();
+  o=document.createElement('div');o.id='hbc-ov';o.className='hbc-ov';
+  var F=hbcFieldHTML;
+  o.innerHTML='<div class="hbc" role="dialog" aria-label="Mortgage calculator"><div class="hbc-hd"><span>🏠 Mortgage calculator <span style="font-weight:400;font-size:11px;color:var(--t3)">· illustrative, not advice</span></span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="hbCloseCalc()" aria-label="Close">✕</span></div>'
+  +'<div class="hbc-body"><div id="hbc-in">'
+  +'<details open><summary>1 · Loan</summary><div>'+F('price','Property price £',d.price)+F('dep','Deposit £',d.dep)+F('bal','Mortgage balance £',d.bal)+F('termY','Years remaining',d.termY,{step:1})+F('termM','+ months',d.termM,{step:1})+F('start','Start / today',d.start,{type:'date'})
+    +'<div class="full" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="stk-btn" onclick="hbcFromPrice()">Loan = price − deposit</button>'+(hbLevel()>=2?'<button type="button" class="stk-btn" onclick="hbcSaveBalance()">Save as my current balance</button>':'')+'</div></div></details>'
+  +'<details open><summary>2 · Rate &amp; product</summary><div>'+F('p1type','First deal',d.p1type,{type:'select',options:[['fixed','Fixed'],['tracker','Tracker (base + margin)'],['variable','Variable / SVR']]})+F('p1months','Deal length (months)',d.p1months,{step:1})
+    +'<div id="hbc-p1fixed" class="full" style="display:contents">'+F('p1rate','Rate % (fixed / variable)',d.p1rate,{step:0.01})+'</div>'+F('p1base','Base rate % (tracker)',d.p1base,{step:0.01})+F('p1margin','Margin % (tracker)',d.p1margin,{step:0.01})
+    +F('p2type','After the deal',d.p2type,{type:'select',options:[['variable','Reverts to variable'],['fixed','New fixed rate'],['tracker','Tracker']]})+F('p2rate','…at rate %',d.p2rate,{step:0.01})
+    +F('mode','Interest method',d.mode,{type:'select',options:[['daily','Daily (most UK lenders)'],['monthly','Monthly'],['annual','Annual rest (older products)']]})+F('stress','Stress test: add % to every rate',d.stress,{step:0.1,min:-5})+'</div></details>'
+  +'<details><summary>3 · Repayment type</summary><div>'+F('repay','Type',d.repay,{type:'select',options:[['repayment','Repayment (capital + interest)'],['interest-only','Interest-only'],['part','Part-and-part']]})+F('io','£ on interest-only (part-and-part)',d.io)+'</div></details>'
+  +'<details open><summary>4 · Overpayments</summary><div>'+F('over','Extra per month £',d.over)+F('step','Increase it by % each year',d.step,{step:0.5})+F('outcome','Use overpayments to',d.outcome,{type:'select',options:[['term','Reduce the term (keep payment)'],['payment','Reduce the payment (keep term)']]})+F('round','Round payments up to the next £',d.round,{type:'checkbox'})
+    +'<div class="full"><label>Lump sums (one-off)</label><div id="hbc-lumps"></div><div class="hbc-lump"><div><label for="hbc-lm">In month #</label><input id="hbc-lm" type="number" min="1" step="1" value="1"></div><div><label for="hbc-la">Amount £</label><input id="hbc-la" type="number" min="0" step="100" placeholder="e.g. 5000"></div><button type="button" class="stk-btn" onclick="hbcAddLump()">＋ Add</button></div></div></div></details>'
+  +'<details><summary>5 · Offset savings</summary><div>'+F('off','Offset mortgage: my savings reduce the interest-bearing balance',d.off,{type:'checkbox'})+F('offbal','Savings in the offset account £',d.offbal)+F('offadd','Add to it each month £',d.offadd)+'</div></details>'
+  +'<details><summary>6 · Fees &amp; lender limits</summary><div>'+F('allow','Penalty-free overpayment allowance % / year',d.allow,{step:1})+F('basis','Allowance year',d.basis,{type:'select',options:[['anniversary','From your start date'],['calendar','Calendar year']]})
+    +F('ercon','Early repayment charges apply during the first deal',d.ercon,{type:'checkbox'})+F('erc','ERC % by year (comma-separated)',d.erc,{type:'text',full:true,ph:'5,4,3,2,1'})+F('cap','Cap overpayments at the allowance (avoid ERC)',d.cap,{type:'checkbox'})
+    +F('fee','Arrangement fee £',d.fee)+F('feeadd','Add the fee to the loan',d.feeadd,{type:'checkbox'})+F('other','Other upfront costs £ (legal, valuation)',d.other)+'</div></details>'
+  +'<details><summary>7 · Property value &amp; savings alternative</summary><div>'+F('val','Property value now £',d.val)+F('growth','Value growth % / year',d.growth,{step:0.1,min:-20})+F('sav','Savings rate % (to compare)',d.sav,{step:0.1})+'<div class="hbc-note full">Growth defaults to 0% so equity figures are cautious.</div></div></details>'
+  +'</div><div id="hbc-out"></div></div></div>';
+  document.body.appendChild(o);
+  o.addEventListener('input',function(e){if(e.target.closest('#hbc-in'))hbcSchedule();});
+  o.addEventListener('change',function(e){if(e.target.closest('#hbc-in'))hbcSchedule(true);});
+  hbcRenderLumps();hbcUpdate();
+}
+function hbCloseCalc(){var o=document.getElementById('hbc-ov');if(o)o.remove();}
+function hbcSchedule(save_){clearTimeout(_hbcT);_hbcT=setTimeout(function(){hbcUpdate();if(save_)hbcPersist();},120);}
+function hbcPersist(){try{state.calc=hbcRead().raw;save();}catch(e){}}
+function hbcSet(id,v){var e=document.getElementById('hbc-'+id);if(!e)return;if(e.type==='checkbox')e.checked=!!v;else e.value=v;}
+function hbcFromPrice(){var p=parseFloat(hbcGet('price'))||0,d=parseFloat(hbcGet('dep'))||0;hbcSet('bal',Math.max(0,Math.round(p-d)));hbcUpdate();hbcPersist();}
+function hbcSaveBalance(){var b=parseFloat(hbcGet('bal'))||0;state.mortgageBalance=Math.round(b);var v=parseFloat(hbcGet('val'));if(v>0)state.valuation=v;hbcPersist();save();updateUI();toast('Current balance saved: '+hbMoney(b));}
+function hbcAddLump(){
+  var m=parseInt(document.getElementById('hbc-lm').value),a=parseFloat(document.getElementById('hbc-la').value);
+  if(!(m>=1)||!(a>0)){toast('Enter the month number and an amount');return;}
+  var cur=hbcRead().raw;cur.lumps=(cur.lumps||[]).concat([{month:m,amount:a}]).sort(function(x,y){return x.month-y.month;});
+  state.calc=cur;save();document.getElementById('hbc-la').value='';hbcRenderLumps();hbcUpdate();
+}
+function hbcDelLump(i){var cur=hbcRead().raw;cur.lumps.splice(i,1);state.calc=cur;save();hbcRenderLumps();hbcUpdate();}
+function hbcRenderLumps(){
+  var el=document.getElementById('hbc-lumps');if(!el)return;var l=(hbcFields().lumps)||[];
+  el.innerHTML=l.length?l.map(function(x,i){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-top:1px solid rgba(255,255,255,.06)"><span>Month '+x.month+' · <b>'+hbMoney(x.amount)+'</b></span><button type="button" class="stk-btn" onclick="hbcDelLump('+i+')">✕</button></div>';}).join(''):'<div style="color:var(--t3);font-size:11px">None yet</div>';
+}
+function hbcPreset(name){
+  var b=hbBudget(),u=Math.round(b.unassigned),sv=Math.round(b.saving);
+  if(name==='none'){hbcSet('over',0);hbcSet('off',false);var cur=hbcRead().raw;cur.lumps=[];state.calc=cur;save();hbcRenderLumps();}
+  else if(name==='unassigned'){hbcSet('over',u);}
+  else if(name==='all'){hbcSet('over',u+sv);}
+  else if(name==='offset'){hbcSet('off',true);if(!(parseFloat(hbcGet('offbal'))>0))hbcSet('offbal',Math.round(typeof alTotalCash==='function'?(alTotalCash()||5000):5000));}
+  else if(name==='step'){hbcSet('over',Math.max(50,Math.round(u/2)));hbcSet('step',5);}
+  hbcUpdate();hbcPersist();
+}
+function hbcChart(base,scn,common){
+  var W=640,H=222,L=52,R=10,T=10,B=40,n=Math.max(base.months,scn.months,1),top=Math.max(base.opts.loan+(base.opts.fees.addToLoan?base.opts.fees.arrangement:0),(scn.opts.valuation>0?hbEquityAt(scn,n).value:0),1);
+  var X=function(m){return L+(m/n)*(W-L-R);},Y=function(v){return T+(1-v/top)*(H-T-B);};
+  function path(sim,key){var d='M'+X(0).toFixed(1)+' '+Y(sim.opts.loan+(sim.opts.fees.addToLoan?sim.opts.fees.arrangement:0)).toFixed(1);sim.schedule.forEach(function(r){d+=' L'+X(r.m).toFixed(1)+' '+Y(r[key]).toFixed(1);});return d;}
+  var grid='',i;for(i=0;i<=3;i++){var v=top*i/3;grid+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v).toFixed(1)+'" y2="'+Y(v).toFixed(1)+'" stroke="rgba(255,255,255,.07)"/><text x="'+(L-6)+'" y="'+(Y(v)+3).toFixed(1)+'" text-anchor="end" fill="#6b8197" font-size="9" font-family="Share Tech Mono,monospace">£'+(v>=1000?Math.round(v/1000)+'k':Math.round(v))+'</text>';}
+  for(i=0;i<=4;i++){var m=Math.round(n*i/4);grid+='<text x="'+X(m).toFixed(1)+'" y="'+(H-8)+'" text-anchor="'+(i===0?'start':i===4?'end':'middle')+'" fill="#6b8197" font-size="9" font-family="Share Tech Mono,monospace">'+(m/12).toFixed(m%12?1:0)+'y</text>';}
+  // equity (scenario)
+  var eq='';if(scn.opts.valuation>0){eq='M'+X(0).toFixed(1)+' '+Y(hbEquityAt(scn,0).equity).toFixed(1);for(var k=12;k<=n;k+=12)eq+=' L'+X(k).toFixed(1)+' '+Y(Math.min(top,hbEquityAt(scn,k).equity)).toFixed(1);}
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;height:230px">'+grid
+    +'<path d="'+path(base,'close')+'" fill="none" stroke="#8b97a3" stroke-width="1.6" stroke-dasharray="4 3"/>'
+    +'<path d="'+path(scn,'close')+'" fill="none" stroke="#44c0b9" stroke-width="2.2"/>'
+    +(eq?'<path d="'+eq+'" fill="none" stroke="#e8c56a" stroke-width="1.6" opacity=".85"/>':'')
+    +'<g font-size="10" font-family="Share Tech Mono,monospace"><text x="'+L+'" y="'+(H-3)+'" fill="#8b97a3">- - balance, no extras</text><text x="'+(L+150)+'" y="'+(H-3)+'" fill="#44c0b9">— balance, your plan</text>'+(eq?'<text x="'+(L+290)+'" y="'+(H-3)+'" fill="#e8c56a">— equity (value − balance)</text>':'')+'</g></svg>';
+}
+function hbcUpdate(){
+  var out=document.getElementById('hbc-out');if(!out)return;
+  var c=hbcRead(),base=hbSimulate(c.base),scn=hbSimulate(c.scn),cmp=hbCompare(base,scn),r=c.raw;
+  var bud=hbBudget(),u=Math.round(bud.unassigned),sv=Math.round(bud.saving);
+  var pay=scn.schedule.length?scn.schedule[0].pay:0,basePay=base.schedule.length?base.schedule[0].pay:0;
+  var rate0=scn.schedule.length?scn.schedule[0].rate:0;
+  // cards
+  var sooner=cmp.monthsSaved>0?'<span class="hbc-good">'+hbYM(cmp.monthsSaved)+' sooner</span>':(cmp.monthsSaved<0?'<span class="hbc-warn">'+hbYM(-cmp.monthsSaved)+' later</span>':'no change');
+  var cards='<div class="hbc-cards">'
+    +'<div class="hbc-card"><div class="l">Monthly payment</div><div class="v">'+hbMoney(pay)+'</div><div class="s">'+(Math.abs(pay-basePay)>0.5?'was '+hbMoney(basePay)+' · ':'')+'first deal @ '+rate0.toFixed(2)+'%</div></div>'
+    +'<div class="hbc-card"><div class="l">Mortgage-free</div><div class="v">'+(scn.balloon>0?'—':hbFmtDate(scn.payoffDate))+'</div><div class="s">'+(scn.balloon>0?'not cleared by the end of the term':hbYM(scn.months)+' · '+sooner+' vs '+hbFmtDate(base.payoffDate))+'</div></div>'
+    +'<div class="hbc-card"><div class="l">Total interest</div><div class="v">'+hbMoney(scn.totalInterest)+'</div><div class="s">'+(cmp.interestSaved>0.5?'<span class="hbc-good">saves '+hbMoney(cmp.interestSaved)+'</span> vs '+hbMoney(base.totalInterest):'vs '+hbMoney(base.totalInterest)+' with no extras')+'</div></div>'
+    +'<div class="hbc-card"><div class="l">Total cost of borrowing</div><div class="v">'+hbMoney(scn.totalCost)+'</div><div class="s">interest'+(scn.ercTotal>0?' + <span class="hbc-warn">'+hbMoney(scn.ercTotal)+' ERC</span>':'')+(scn.upfront>0?' + '+hbMoney(scn.upfront)+' upfront':'')+'</div></div>'
+    +'</div>';
+  // equity cards
+  var eqRows='';[1,5,10].forEach(function(y){var m=y*12,a=hbEquityAt(base,m),b=hbEquityAt(scn,m),ownB=a.value>0?b.equity/a.value*100:0;if(m<=Math.max(base.months,scn.months)+12)eqRows+='<tr><td>+'+y+' year'+(y>1?'s':'')+'</td><td>'+hbMoney(a.balance)+'</td><td>'+hbMoney(b.balance)+'</td><td>'+hbMoney(b.equity)+(a.value>0?' ('+ownB.toFixed(0)+'%)':'')+'</td><td class="hbc-good">'+(b.equity-a.equity>0.5?'+'+hbMoney(b.equity-a.equity):'—')+'</td></tr>';});
+  var warn=(scn.warnings.length?'<div class="hbc-card hbc-warn" style="margin-bottom:10px">⚠ '+scn.warnings.slice(0,4).map(function(w){return w.replace(/</g,'&lt;');}).join('<br>⚠ ')+(scn.warnings.length>4?'<br>…and '+(scn.warnings.length-4)+' more':'')+'</div>':'');
+  // presets
+  var pre='<div class="hbc-pre"><button class="stk-btn" onclick="hbcPreset(\'none\')">No extras</button>'+(u>0?'<button class="stk-btn" onclick="hbcPreset(\'unassigned\')">Overpay my unassigned '+hbMoney(u)+'/mo</button>':'')+(u+sv>0&&sv>0?'<button class="stk-btn" onclick="hbcPreset(\'all\')">Unassigned + savings '+hbMoney(u+sv)+'/mo</button>':'')+'<button class="stk-btn" onclick="hbcPreset(\'offset\')">Offset my savings</button><button class="stk-btn" onclick="hbcPreset(\'step\')">Overpay + 5% yearly step-up</button></div>';
+  // optimiser: what would an extra £X a month do
+  var amounts=[50,100,250,500];if(u>0&&amounts.indexOf(u)<0)amounts.push(u);if(u+sv>0&&sv>0)amounts.push(u+sv);amounts=amounts.filter(function(x,i,a){return a.indexOf(x)===i;}).sort(function(x,y){return x-y;});
+  var opt=amounts.map(function(x){var sc=hbSimulate(Object.assign({},c.base,{over:{monthly:x,stepUpPct:0,lumps:[],roundUp:false}}));var cm=hbCompare(base,sc);
+    // alternative: same cash in a saver at r.sav% for the same months
+    var N=sc.months,i=r.sav/100/12,fv=i>0?x*(Math.pow(1+i,N)-1)/i:x*N,earned=fv-x*N;
+    return '<tr><td>'+hbMoney(x)+'/mo'+((x===u&&u>0)?' <span style="color:var(--t3)">(your unassigned)</span>':(x===u+sv&&sv>0?' <span style="color:var(--t3)">(unassigned + savings)</span>':''))+'</td><td>'+hbYM(cm.monthsSaved)+'</td><td class="hbc-good">'+hbMoney(cm.interestSaved)+'</td><td>'+hbMoney(earned)+'</td></tr>';}).join('');
+  var rateTxt=rate0.toFixed(2),better=rate0>r.sav;
+  var optHTML='<div class="hbc-card" style="margin-bottom:10px"><div class="l">What would an extra £ a month do? (overpay vs a '+r.sav+'% saver)</div><table style="margin-top:6px"><tr><th>Extra</th><th>Time saved</th><th>Interest saved</th><th>Saver would earn</th></tr>'+opt+'</table>'
+    +'<div class="hbc-note">'+(better?'Your mortgage costs '+rateTxt+'% — more than a '+r.sav+'% saver pays — so overpaying is a guaranteed, tax-free return of '+rateTxt+'%. ':'A '+r.sav+'% saver pays at least as much as your '+rateTxt+'% mortgage costs, so saving can beat overpaying right now. ')+'Overpayments can’t be taken back, so build an emergency fund first, and check your lender’s limits (<b>'+r.allow+'%/yr</b> without charges).</div></div>';
+  // yearly table
+  var yr='';for(var y=0;y*12<scn.schedule.length&&y<40;y++){var rows=scn.schedule.slice(y*12,y*12+12),I=0,P=0,O=0;rows.forEach(function(x){I+=x.interest;P+=x.principal;O+=x.overpay;});var last=rows[rows.length-1];if(y<10||y%5===0||(y+1)*12>=scn.schedule.length)yr+='<tr><td>Year '+(y+1)+'</td><td>'+hbMoney(I)+'</td><td>'+hbMoney(P)+'</td><td>'+hbMoney(O)+'</td><td>'+hbMoney(last.close)+'</td></tr>';}
+  // working
+  var f=scn.schedule[0],wk='';
+  if(f){var rr=f.rate/100;
+    wk='<details style="margin-top:10px"><summary>Show working</summary><div style="display:block;font-size:11px;line-height:1.7;color:var(--t2)">'
+     +'<b>Payment</b> (repayment mortgage) = B·r ÷ (1 − (1+r)<sup>−n</sup>), with B = '+hbMoney(scn.opts.loan)+', r = '+f.rate.toFixed(2)+'% ÷ 12 = '+(rr/12*100).toFixed(4)+'% a month, n = '+scn.opts.termMonths+' months → <b>'+hbMoney(hbPmt(scn.opts.loan,rr/12,scn.opts.termMonths))+'</b>.<br>'
+     +'<b>Interest for month 1</b> ('+({daily:'daily method',monthly:'monthly method',annual:'annual-rest method'}[scn.opts.interestMode])+'): '+(scn.opts.interestMode==='daily'?'balance × '+f.rate.toFixed(2)+'% ÷ '+(f.date.slice(0,4)%4===0?366:365)+' × days in the month':'balance × '+f.rate.toFixed(2)+'% ÷ 12')+' = <b>'+hbMoney(f.interest)+'</b>; the rest of your payment ('+hbMoney(f.pay-f.interest)+') repays capital.<br>'
+     +'<b>Why overpaying works:</b> every £ you repay stops earning interest from that day, and the saving compounds for the rest of the term.<br>'
+     +'<b>Assumptions:</b> rates after the first deal as entered; payments on time; no changes to your lender’s rules. Not advice — check your offer document.</div></details>';}
+  out.innerHTML=pre+cards+warn+'<div class="hbc-chart">'+hbcChart(base,scn,c.common)+'</div>'
+    +(eqRows?'<div class="hbc-card" style="margin-bottom:10px"><div class="l">Equity — what you own'+(r.growth?' (value growing '+r.growth+'%/yr)':'')+'</div><table style="margin-top:6px"><tr><th></th><th>Balance, no extras</th><th>Balance, your plan</th><th>Equity, your plan</th><th>Extra equity</th></tr>'+eqRows+'</table></div>':'')
+    +optHTML
+    +'<div class="hbc-card"><div class="l">Year by year (your plan)</div><div style="overflow-x:auto"><table style="margin-top:6px"><tr><th></th><th>Interest</th><th>Capital</th><th>Overpaid</th><th>Balance</th></tr>'+yr+'</table></div></div>'
+    +wk
+    +'<div class="hbc-note">Illustrative only. Not financial advice or a mortgage offer. Lender terms, rates, early repayment charges and your circumstances will differ — check your offer document or speak to an independent adviser (e.g. MoneyHelper).</div>';
+  window._hbcLast={base:base,scn:scn,cmp:cmp};
+}
 
 // ghost build: Level 1 draws the whole house translucent; solid bricks arrive in Level 2
 function hbGhostWrap(){
@@ -7580,6 +7908,47 @@ function hbGhostWrap(){
   });
   S.appendChild(g);
 }
+
+// Level 2/3: the whole house is drawn; solid bricks (clipped from the ground up) = equity, ghost = what the lender owns.
+// The remaining interest is a separate bar beside the house.
+function hbShadeEquity(){
+  if(S.querySelector('#hb-solid'))return;
+  var kids=Array.prototype.slice.call(S.childNodes).filter(function(n){return !(n.nodeName==='defs'||(n.nodeName==='rect'&&n.getAttribute('width')==='700')||(n.getAttribute&&n.getAttribute('data-g')));});   // the ground grid is left alone
+  if(!kids.length)return;
+  var val=+state.valuation||+state.target||0,bal=Math.max(0,+state.mortgageBalance||0),eqF=val>0?Math.min(1,Math.max(0,(val-bal)/val)):0;
+  var solid=E('g',{id:'hb-solid'}),ghost=E('g',{id:'hb-ghostL2',opacity:'.30'});ghost.style.filter='drop-shadow(0 0 3px rgba(68,192,185,.4)) saturate(.6)';
+  kids.forEach(function(n){ghost.appendChild(n.cloneNode(true));solid.appendChild(n);});
+  Array.prototype.forEach.call(ghost.querySelectorAll('[id]'),function(e){e.removeAttribute('id');});
+  S.appendChild(ghost);S.appendChild(solid);
+  var bb;try{bb=solid.getBBox();}catch(e){bb=null;}
+  if(!bb||!bb.height)return;
+  var h=bb.height*eqF,y0=bb.y+bb.height-h,defs=getDefs();
+  var cp=E('clipPath',{id:'hb-eqclip'},defs);E('rect',{x:bb.x-6,y:y0,width:bb.width+12,height:h+8},cp);
+  solid.setAttribute('clip-path','url(#hb-eqclip)');
+  // equity line + label
+  E('line',{x1:bb.x-10,x2:bb.x+bb.width+10,y1:y0,y2:y0,stroke:'#e8c56a','stroke-width':1,'stroke-dasharray':'5 4',opacity:.9},S);
+  var t=E('text',{x:bb.x-12,y:y0-5,'font-size':10,'font-family':'Share Tech Mono,monospace',fill:'#e8c56a','text-anchor':'start'},S);t.textContent='YOU OWN '+(eqF*100).toFixed(0)+'%';
+  hbDrawInterestBar();
+}
+function hbDrawInterestBar(){
+  try{
+    var S2=hbL2Sims(),base=S2.base,scn=S2.scn;
+    var tot=Math.max(1,base.totalInterest),rem=Math.min(tot,scn.totalInterest),slain=Math.max(0,tot-rem);
+    var x=654,y=96,w=22,h=290,remH=h*rem/tot,slH=h-remH;
+    var g=E('g',{id:'hb-intbar'},S);
+    E('rect',{x:x,y:y,width:w,height:h,rx:4,fill:'rgba(255,255,255,.05)',stroke:'rgba(255,255,255,.14)','stroke-width':.8},g);
+    if(slH>0.5)E('rect',{x:x,y:y,width:w,height:slH,rx:4,fill:'rgba(62,207,142,.55)'},g);
+    E('rect',{x:x,y:y+slH,width:w,height:remH,rx:4,fill:'rgba(224,92,92,.6)'},g);
+    var lab=function(tx,ty,txt,col,anchor,sz){var e=E('text',{x:tx,y:ty,'font-size':sz||8.5,'font-family':'Share Tech Mono,monospace',fill:col,'text-anchor':anchor||'middle'},g);e.textContent=txt;};
+    lab(x+w/2,y-26,'INTEREST','#c9d6e3');lab(x+w/2,y-14,'to pay','#8fa3b5');
+    lab(x+w/2,y+h+14,hbMoney(rem),'#e05c5c');lab(x+w/2,y+h+26,'left','#8fa3b5');
+    if(slain>0.5){lab(x+w/2,y+h+42,'−'+hbMoney(slain),'#3ecf8e');lab(x+w/2,y+h+54,'slain','#8fa3b5');}
+  }catch(e){}
+}
+
+(function(){   // tag the ground grid so the equity shading measures the HOUSE, not the plot
+  var _g=_grid;_grid=function(){var n0=S.childNodes.length;_g.apply(this,arguments);for(var i=n0;i<S.childNodes.length;i++){var c=S.childNodes[i];if(c.setAttribute)c.setAttribute('data-g','1');}};
+})();
 (function(){
   var _r=redraw;redraw=function(){_r.apply(this,arguments);try{hbAfterDraw();}catch(e){console.error('[Vault-It] hbAfterDraw',e);}};
   var _u=updateUI;updateUI=function(){_u.apply(this,arguments);try{hbRenderLevels();hbRenderHUD();}catch(e){console.error('[Vault-It] hbRender',e);}};
