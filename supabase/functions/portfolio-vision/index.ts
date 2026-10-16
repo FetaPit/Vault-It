@@ -68,7 +68,7 @@ const PROMPT =
   '(2) Screenshots may overlap (scrolled list): never list the same holding twice. ' +
   '(3) Numbers are plain numbers: "£1,619.66" → 1619.66, "-£2.26 (41.17%)" → pl -2.26. ' +
   '(4) Do not invent share counts; give shares only if printed. (5) Give a Yahoo Finance ticker only when you are confident. ' +
-  'Call report_holdings once.'
+  'Call the report_holdings tool exactly once with everything you found. Do not answer in prose.'
 
 async function candidates(name: string, hint: string | null) {
   const out: { symbol: string; name: string; exchange: string; type: string }[] = []
@@ -121,7 +121,7 @@ async function handle(req: Request): Promise<Response> {
       headers: { 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', ...(WORKSPACE ? { 'anthropic-workspace-id': WORKSPACE } : {}) },
       body: JSON.stringify({
         model: MODEL, max_tokens: 4096,
-        tools: [TOOL], tool_choice: { type: 'tool', name: 'report_holdings' },
+        tools: [TOOL],   // newer models reject a forced tool_choice, so the prompt asks for the tool call and a JSON reply is accepted as a fallback
         messages: [{ role: 'user', content: [
           ...images.map((im) => ({ type: 'image', source: { type: 'base64', media_type: im.media_type, data: im.data } })),
           { type: 'text', text: PROMPT },
@@ -138,6 +138,11 @@ async function handle(req: Request): Promise<Response> {
     }
     const j = await r.json()
     result = (j?.content ?? []).find((c: any) => c.type === 'tool_use')?.input
+    if (!result) {   // fallback: a JSON object in a text reply
+      const txt = (j?.content ?? []).filter((c: any) => c.type === 'text').map((c: any) => c.text).join('\n')
+      const m = txt.match(/\{[\s\S]*\}/)
+      if (m) { try { result = JSON.parse(m[0]) } catch { /* unreadable */ } }
+    }
   } catch (e) { console.error('anthropic fetch failed', String(e)); await refund(); return json({ error: 'vision_failed', detail: 'could not reach the AI service' }, 502) }
   if (!result || !Array.isArray(result.holdings)) { await refund(); return json({ error: 'unreadable' }, 422) }
 
