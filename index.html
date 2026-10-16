@@ -6384,6 +6384,14 @@ function removeById(id){const e=S.getElementById(id);if(e)e.parentNode.removeChi
 
 // ── ISO COORDINATE SYSTEM ────────────────────────────────────────
 let _ox=300, _oy=200, _tx=28, _ty=14, _tz=30;
+const _HZ_DEFAULT=1.2, _VX=335, _VY=255;   // default zoom multiplier; the model is centred on (_VX,_VY), left of the zoom buttons
+// per model, keyed by its base origin x: [centre x, centre y, width, height] of the full model at scale 1 → auto-fit so each fills the view
+const _HFIT={280:[239,261,452,300],265:[197,262,430,338],220:[177,209,470,381],250:[222,203,450,374],200:[239,175,217,248],175:[191,135,295,331]};
+let _houseZoom=_HZ_DEFAULT;   // pinch / wheel / +/- multiply the auto-fit
+function _setView(ox,oy,tx,ty,tz){   // every house model sets its base view here
+  const f=_HFIT[ox]||_HFIT[280], fit=Math.max(.9,Math.min(2.1,Math.min(600/f[2],440/f[3]))), s=fit*_houseZoom;
+  _ox=_VX+(ox-f[0])*s; _oy=_VY+(oy-f[1])*s; _tx=tx*s; _ty=ty*s; _tz=tz*s;
+}
 
 // Pan & orbit state
 let _panX=0, _panY=0, _viewAngle=0, _isExpanded=false;
@@ -6813,7 +6821,7 @@ function _flatRoof(x,y,z,w,d,p){
 
 function drawTerraced(p){
   S.innerHTML='';getDefs();_bgRect();
-  _ox=280; _oy=245; _tx=27; _ty=13.5; _tz=31;
+  _setView(280,245,27,13.5,31);
   const gl=p>=.80;
   const W=2.4, D=2.4, WH=3.0, RH=1.85; // terraced with pitched roof
 
@@ -6876,7 +6884,7 @@ function drawTerraced(p){
 
 function drawSemi(p){
   S.innerHTML='';getDefs();_bgRect();
-  _ox=265; _oy=250; _tx=28; _ty=14; _tz=32;
+  _setView(265,250,28,14,32);
   const gl=p>=.80;
   const W=2.8, D=2.6, WH=2.8, RH=1.7; // half the footprint of detached
 
@@ -6927,7 +6935,7 @@ function drawSemi(p){
 
 function drawDetached(p){
   S.innerHTML='';getDefs();_bgRect();
-  _ox=220; _oy=195; _tx=26; _ty=13; _tz=31;
+  _setView(220,195,26,13,31);
   const gl=p>=.80;
   const W=5.0, D=3.2, WH=3.2, RH=2.2;
 
@@ -6991,7 +6999,7 @@ function drawDetached(p){
 
 function drawMansion(p){
   S.innerHTML='';getDefs();_bgRect();
-  _ox=250; _oy=200; _tx=23; _ty=11.5; _tz=27;
+  _setView(250,200,23,11.5,27);
   const gl=p>=.80;
   // Central block
   const CW=5.5, CD=3.5, CWH=4.0, CRH=2.5;
@@ -7086,7 +7094,7 @@ function drawFlat(p){
   S.innerHTML='';getDefs();_bgRect();
   const TOTAL=10, FH=0.52;
   const W=3.2, D=2.0, WH=TOTAL*FH;
-  _ox=200; _oy=200; _tx=24; _ty=12; _tz=28;
+  _setView(200,200,24,12,28);
   const myFloor=Math.max(0,Math.min(TOTAL-1,(state.apartmentFloor||5)-1)); // 0-indexed
   const gl=p>=.80;
 
@@ -7137,7 +7145,7 @@ function drawApartment(p){
   S.innerHTML='';getDefs();_bgRect();
   const TOTAL=30, FH=0.38;
   const W=5.0, D=2.6, WH=TOTAL*FH;
-  _ox=175;_oy=200;_tx=18;_ty=9;_tz=20;
+  _setView(175,200,18,9,20);
   const myFloor=Math.max(0,Math.min(TOTAL-1,(state.apartmentFloor||15)-1)); // 0-indexed
   const gl=p>=.80;
 
@@ -7192,7 +7200,7 @@ function drawApartment(p){
 const DRAW={terraced:drawTerraced,semi:drawSemi,detached:drawDetached,mansion:drawMansion,flat:drawFlat,apartment:drawApartment};
 function _drawBlankPlot(){
   S.innerHTML=''; getDefs(); _bgRect();
-  _ox=280; _oy=245; _tx=27; _ty=13.5; _tz=31;
+  _setView(280,245,27,13.5,31);
   _grid(-14,-4,18,16,0);
   // Dashed plot boundary
   _line([-.3,-.3,0],[2.7,-.3,0],'rgba(201,168,76,.3)',.9,'6,4');
@@ -8007,14 +8015,14 @@ function hbShadeEquity(){
   solid.setAttribute('clip-path','url(#hb-eqclip)');
   // equity line + label
   E('line',{x1:bb.x-10,x2:bb.x+bb.width+10,y1:y0,y2:y0,stroke:'#e8c56a','stroke-width':1,'stroke-dasharray':'5 4',opacity:.9},S);
-  var t=E('text',{x:bb.x-12,y:y0-5,'font-size':10,'font-family':'Share Tech Mono,monospace',fill:'#e8c56a','text-anchor':'start'},S);t.textContent='YOU OWN '+(eqF*100).toFixed(0)+'%';
+  var t=E('text',{x:Math.max(10,bb.x-12),y:y0<24?y0+14:y0-5,'font-size':10,'font-family':'Share Tech Mono,monospace',fill:'#e8c56a','text-anchor':'start'},S);t.textContent='YOU OWN '+(eqF*100).toFixed(0)+'%';
   hbDrawInterestBar();
 }
 function hbDrawInterestBar(){
   try{
     var S2=hbL2Sims(),base=S2.base,scn=S2.scn;
     var tot=Math.max(1,base.totalInterest),rem=Math.min(tot,scn.totalInterest),slain=Math.max(0,tot-rem);
-    var x=654,y=96,w=22,h=290,remH=h*rem/tot,slH=h-remH;
+    var x=596,y=96,w=22,h=290,remH=h*rem/tot,slH=h-remH;
     var g=E('g',{id:'hb-intbar'},S);
     E('rect',{x:x,y:y,width:w,height:h,rx:4,fill:'rgba(255,255,255,.05)',stroke:'rgba(255,255,255,.14)','stroke-width':.8},g);
     if(slH>0.5)E('rect',{x:x,y:y,width:w,height:slH,rx:4,fill:'rgba(62,207,142,.55)'},g);
@@ -8212,7 +8220,7 @@ function toggleExpand(){
 
 function resetView(){
   _panX=0;_panY=0;_viewAngle=0;
-  _houseSetZoom(1);
+  _houseZoom=_HZ_DEFAULT;_updateHUD();
   redraw();
 }
 
@@ -8228,20 +8236,24 @@ function housePan(dx, dy) {
 //   Buttons: +/- zoom, orbit toggle (mouse-only), reset
 // ═══════════════════════════════════════════════════════════════
 
-var _houseZoom = 1;
 var _orbitMode = false; // toggled by HUD button
 
-function _houseSetZoom(z) {
-  _houseZoom = Math.max(0.25, Math.min(4, z));
-  _tx = 27 * _houseZoom;
-  _ty = 13.5 * _houseZoom;
-  _tz = 31 * _houseZoom;
+function _houseSetZoom(z, ax, ay) {
+  var nz = Math.max(0.5, Math.min(6, z)), f = nz / _houseZoom;
+  if (ax == null) { ax = _VX; ay = _VY; }
+  _panX = _panX * f + (ax - _VX) * (1 - f);   // keep the point under the fingers/cursor fixed
+  _panY = _panY * f + (ay - _VY) * (1 - f);
+  _houseZoom = nz;
   _updateHUD();
   redraw();
 }
+function _svgPt(cx, cy) {
+  var r = document.getElementById('houseSvg').getBoundingClientRect(), sc = Math.min(r.width / 700, r.height / 500);
+  return [350 + (cx - (r.left + r.width / 2)) / sc, 250 + (cy - (r.top + r.height / 2)) / sc];
+}
 
-function houseZoomIn()  { _houseSetZoom(_houseZoom * 1.15); }
-function houseZoomOut() { _houseSetZoom(_houseZoom / 1.15); }
+function houseZoomIn()  { _houseSetZoom(_houseZoom * 1.2); }
+function houseZoomOut() { _houseSetZoom(_houseZoom / 1.2); }
 
 function toggleOrbitMode() {
   _orbitMode = !_orbitMode;
@@ -8319,7 +8331,7 @@ function _updateHUD() {
       } else if (ptrs.size === 2) {
         var pts = Array.from(ptrs.values());
         var dist = pDist(pts[0], pts[1]);
-        if (_pinchStartDist > 0) _houseSetZoom(_pinchStartZoom * (dist / _pinchStartDist));
+        if (_pinchStartDist > 0) { var _a = _svgPt((pts[0].x + pts[1].x) / 2, (pts[0].y + pts[1].y) / 2); _houseSetZoom(_pinchStartZoom * (dist / _pinchStartDist), _a[0], _a[1]); }
         var midX = (pts[0].x + pts[1].x) / 2;
         _viewAngle -= (midX - _orb2PrevX) * 0.007;
         _viewAngle = _viewAngle % (2 * Math.PI);
@@ -8344,8 +8356,8 @@ function _updateHUD() {
 
     el.addEventListener('wheel', function(e) {
       e.preventDefault();
-      _houseSetZoom(_houseZoom - e.deltaY * 0.0012);
-      _updateHUD(); redraw();
+      var _a = _svgPt(e.clientX, e.clientY);
+      _houseSetZoom(_houseZoom * Math.exp(-e.deltaY * 0.0015), _a[0], _a[1]);
     }, { passive: false });
 
     window.addEventListener('keydown', function(e) {
