@@ -708,6 +708,50 @@ body::before {
   gap: 8px;
   margin-bottom: 10px;
 }
+/* ── 3D credit card (ID-1: 85.60 × 53.98 mm) ── */
+.cc3{container-type:inline-size;width:100%;aspect-ratio:85.6/53.98;perspective:900px;touch-action:pan-y;cursor:grab;-webkit-user-select:none;user-select:none}
+.cc3-body{position:relative;width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(var(--rx,6deg)) rotateY(var(--ry,-16deg));transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.cc3-body.drag{transition:none}
+.cc3-face{position:absolute;inset:0;border-radius:3.7cqw;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 1cqw 3cqw rgba(0,0,0,.45)}
+.cc3-front{transform:translateZ(.45cqw)}
+.cc3-back{transform:rotateY(180deg) translateZ(.45cqw);background:linear-gradient(135deg,#2b3138,#12161a);color:#dfe8ea}
+.cc3-edge{position:absolute;background:linear-gradient(#cfd3d6,#8c9296)}
+.cc3-e-t,.cc3-e-b{left:3.7cqw;right:3.7cqw;height:.9cqw}
+.cc3-e-t{top:-.45cqw;transform:rotateX(90deg)}
+.cc3-e-b{bottom:-.45cqw;transform:rotateX(90deg)}
+.cc3-e-l,.cc3-e-r{top:3.7cqw;bottom:3.7cqw;width:.9cqw}
+.cc3-e-l{left:-.45cqw;transform:rotateY(90deg)}
+.cc3-e-r{right:-.45cqw;transform:rotateY(90deg)}
+.cc3-sheen{position:absolute;inset:0;background:radial-gradient(120% 90% at 0% 0%,rgba(255,255,255,.22),transparent 55%),radial-gradient(90% 70% at 100% 100%,rgba(0,0,0,.28),transparent 60%)}
+.cc3-acc{position:absolute;left:0;right:0;bottom:0;height:7cqw;opacity:.9}
+.cc3-gloss{position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.16) 50%,transparent 60%);pointer-events:none}
+.cc3-logo{position:absolute;left:6cqw;top:6cqw;width:11cqw;height:11cqw;border-radius:2.4cqw;background:#fff;box-shadow:0 .4cqw 1.2cqw rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cc3-logo img{position:absolute;inset:1.2cqw;width:calc(100% - 2.4cqw);height:calc(100% - 2.4cqw);object-fit:contain}
+.cc3-logo span{font:800 6cqw 'Syne',sans-serif;color:#223}
+.cc3-chip{position:absolute;left:6cqw;top:36%;width:13cqw;height:10cqw;border-radius:1.6cqw;background:linear-gradient(135deg,#e6c566,#a47a22);box-shadow:inset 0 0 0 .3cqw rgba(0,0,0,.25);display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5cqw;padding:1.2cqw}
+.cc3-chip i{border:.3cqw solid rgba(0,0,0,.28);border-radius:.6cqw}
+.cc3-chip i:nth-child(2){border-radius:1cqw}
+.cc3-nfc{position:absolute;left:21cqw;top:38%;width:7.5cqw;height:7.5cqw;opacity:.85}
+.cc3-num{position:absolute;left:6cqw;right:6cqw;bottom:20%;font:500 6.2cqw 'Share Tech Mono',monospace;letter-spacing:.14em;text-shadow:0 .2cqw .5cqw rgba(0,0,0,.45);white-space:nowrap;overflow:hidden}
+.cc3-name{position:absolute;left:6cqw;right:26cqw;bottom:10%;font:700 4.6cqw 'Syne',sans-serif;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.92}
+.cc3-net{position:absolute;right:6cqw;bottom:7%;display:flex;align-items:center}
+.cc3-visa{font:italic 800 9cqw 'Syne',sans-serif;letter-spacing:-.02em;color:#fff;text-shadow:0 .2cqw .6cqw rgba(0,0,0,.4)}
+.cc3-mc i{width:8cqw;height:8cqw;border-radius:50%;background:#eb001b;display:block}
+.cc3-mc i+i{background:#f79e1b;margin-left:-3.2cqw;mix-blend-mode:screen}
+.cc3-amex{font:800 4.6cqw 'Syne',sans-serif;color:#fff;background:#1d6fb8;padding:.8cqw 1.6cqw;border-radius:.8cqw;letter-spacing:.06em}
+.cc3-paid{position:absolute;left:0;right:0;bottom:0;height:1.6cqw;background:rgba(0,0,0,.3)}
+.cc3-paid span{display:block;height:100%;background:#3ecf8e}
+.cc3-pct{position:absolute;right:6cqw;top:6cqw;font:700 3.8cqw 'Share Tech Mono',monospace;color:#fff;background:rgba(0,0,0,.42);border-radius:5cqw;padding:.8cqw 2.4cqw}
+.cc3-stripe{position:absolute;left:0;right:0;top:11%;height:17%;background:#0a0a0a}
+.cc3-sig{position:absolute;left:6cqw;right:30cqw;top:38%;height:13%;background:repeating-linear-gradient(135deg,#f4f1ea 0 1.2cqw,#e6e1d6 1.2cqw 2.4cqw);border-radius:.6cqw;display:flex;justify-content:space-between;align-items:center;padding:0 2cqw;color:#555}
+.cc3-sig span{font:500 3cqw 'DM Sans',sans-serif}.cc3-sig b{font:italic 700 4.4cqw 'Share Tech Mono',monospace;color:#111}
+.cc3-bk-info{position:absolute;left:6cqw;right:6cqw;bottom:9%;display:flex;gap:5cqw;font-family:'Share Tech Mono',monospace}
+.cc3-bk-info span{display:block;font-size:3cqw;opacity:.6;text-transform:uppercase;letter-spacing:.1em}
+.cc3-bk-info b{font-size:4.6cqw;font-weight:500}
+.cc3-back .cc3-net{bottom:8%}
+.cc-tile-actions{display:flex;gap:4px}
+.debt-card-grid.has-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))}
+
 .debt-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
@@ -8646,6 +8690,34 @@ var _authForgot=false,_needPin=null,_pinMode='local',_pinEnterLen=4,_pinBusy=fal
 var AL_KEY='pos_al1';
 var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
+var CC_BRANDS=[
+ {n:'American Express',d:'americanexpress.com',g:['#3b7fc4','#12467f'],fg:'#fff',net:'amex',re:/amex|american\s*express/i},
+ {n:'Barclaycard',d:'barclaycard.co.uk',g:['#00aeef','#00395d'],fg:'#fff',re:/barclay/i},
+ {n:'Monzo',d:'monzo.com',g:['#ff6a57','#e23b2b'],fg:'#fff',re:/monzo/i},
+ {n:'Starling',d:'starlingbank.com',g:['#7d4be0','#3b1d8a'],fg:'#fff',re:/starling/i},
+ {n:'HSBC',d:'hsbc.co.uk',g:['#2b2b2b','#0e0e0e'],fg:'#fff',acc:'#db0011',re:/hsbc/i},
+ {n:'Lloyds',d:'lloydsbank.com',g:['#0b8a63','#00372a'],fg:'#fff',re:/lloyds/i},
+ {n:'Halifax',d:'halifax.co.uk',g:['#1a86d0','#003c6a'],fg:'#fff',re:/halifax/i},
+ {n:'NatWest',d:'natwest.com',g:['#7a3aa6','#3a1654'],fg:'#fff',re:/natwest/i},
+ {n:'Santander',d:'santander.co.uk',g:['#f02b2b','#8f0000'],fg:'#fff',re:/santander/i},
+ {n:'Capital One',d:'capitalone.co.uk',g:['#123a63','#071a2e'],fg:'#fff',acc:'#d03027',re:/capital\s*one/i},
+ {n:'Aqua',d:'aquacard.co.uk',g:['#19c3c6','#00696c'],fg:'#fff',re:/\baqua\b/i},
+ {n:'Vanquis',d:'vanquis.co.uk',g:['#5b2380','#1c0a2a'],fg:'#fff',re:/vanquis/i},
+ {n:'Tesco Bank',d:'tescobank.com',g:['#1a6fc2','#002b54'],fg:'#fff',acc:'#e5142b',re:/tesco/i},
+ {n:'John Lewis',d:'johnlewis.com',g:['#3a3a3a','#101010'],fg:'#fff',re:/john\s*lewis/i},
+ {n:'Virgin Money',d:'virginmoney.com',g:['#ee1c1c','#860404'],fg:'#fff',re:/virgin/i},
+ {n:'Klarna',d:'klarna.com',g:['#ffc2d4','#ff94b6'],fg:'#17120f',re:/klarna/i},
+ {n:'Clearpay',d:'clearpay.co.uk',g:['#c4fbe9','#7eead0'],fg:'#111',re:/clearpay|afterpay/i},
+ {n:'PayPal',d:'paypal.com',g:['#0a3ea0','#0070e0'],fg:'#fff',re:/paypal/i},
+ {n:'Creation',d:'creation.co.uk',g:['#7d2c8a','#3a1042'],fg:'#fff',re:/creation/i},
+ {n:'Nationwide',d:'nationwide.co.uk',g:['#1d3f8f','#00153a'],fg:'#fff',re:/nationwide/i},
+ {n:'M&S Bank',d:'marksandspencer.com',g:['#1a1a1a','#050505'],fg:'#fff',acc:'#3f9a67',re:/m\s*&\s*s|marks\s*(and|&)?\s*spencer/i},
+ {n:'MBNA',d:'mbna.co.uk',g:['#1a5da8','#082b52'],fg:'#fff',re:/mbna/i},
+ {n:'Axis Bank',d:'axisbank.com',g:['#a8185a','#5c0b2e'],fg:'#fff',re:/axis/i},
+ {n:'Visa',d:'visa.com',g:['#1a2f8f','#0b1650'],fg:'#fff',net:'visa',re:/\bvisa\b/i},
+ {n:'Mastercard',d:'mastercard.com',g:['#2a2a33','#101014'],fg:'#fff',net:'mc',re:/master\s*card/i}
+];
+var CC_GENERIC={n:'',g:['#1d3b46','#0b1b22'],fg:'#e8f0ef'};
 var debtState={debts:[]};
 var BIZ_KEY='pos_biz1';
 var bizState={clients:[],streams:[],incomeStreams:[],leads:[]};
@@ -12128,6 +12200,134 @@ function getCreditCardLogo(name){
   for(var k in CC_LOGOS){if(n.indexOf(k)!==-1)return CC_LOGOS[k];}
   return null;
 }
+// ═══════════════════════════════════════════════════════════════
+// 3D CREDIT CARDS — real ID-1 proportions (85.60 × 53.98 mm, 0.76 mm thick, 3.18 mm corner radius).
+// The issuer is read from the card's name (and an optional issuer/network the user sets); the card gets that issuer's
+// brand colours, logo and network mark. A photo of the user's own card can be imprinted as the front for the exact design.
+// ═══════════════════════════════════════════════════════════════
+function ccBrand(d){   // scan the card's text (name, issuer the user typed) for a known company
+  var c=(d&&d.card)||{},txt=[c.issuer,d&&d.name].filter(Boolean).join(' ');
+  for(var i=0;i<CC_BRANDS.length;i++)if(CC_BRANDS[i].re.test(txt))return CC_BRANDS[i];
+  return null;
+}
+function ccNetwork(d,b){
+  var c=(d&&d.card)||{};if(c.network&&c.network!=='auto')return c.network==='none'?null:c.network;
+  var t=String((c.issuer||'')+' '+(d&&d.name||''));
+  if(/amex|american\s*express/i.test(t))return 'amex';if(/master\s*card/i.test(t))return 'mc';if(/\bvisa\b/i.test(t))return 'visa';
+  return (b&&b.net&&b.net!=='visa'&&b.net!=='mc')?b.net:null;
+}
+function ccNetMark(n){
+  if(n==='visa')return '<span class="cc3-net cc3-visa">VISA</span>';
+  if(n==='mc')return '<span class="cc3-net cc3-mc"><i></i><i></i></span>';
+  if(n==='amex')return '<span class="cc3-net cc3-amex">AMEX</span>';
+  return '';
+}
+function ccEsc(t){return viClean(String(t==null?'':t));}
+function cc3dHTML(d,pctNum){
+  var b=ccBrand(d)||CC_GENERIC,c=d.card||{},net=ccNetwork(d,b),fg=b.fg;
+  var front=c.art?'background:#000 url('+c.art+') center/cover':'background:linear-gradient(135deg,'+b.g[0]+','+b.g[1]+')';
+  var domain=b.d,logo=c.logo?'<img alt="" src="'+c.logo+'">':(domain?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=64" onerror="this.style.display=\'none\'">':'');
+  var mono=ccEsc((b.n||d.name||'?').trim().charAt(0).toUpperCase());
+  var last4=/^\d{4}$/.test(c.last4||'')?c.last4:'••••';
+  var shown=ccEsc(d.name);
+  var bal=gbpFmt(d.balance),apr=(+d.rate||0)+'% APR',minp=gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0);
+  var art=!!c.art;
+  var f='<div class="cc3-face cc3-front" style="'+front+';color:'+fg+'">'
+    +(art?'':'<div class="cc3-sheen"></div>'+(b.acc?'<div class="cc3-acc" style="background:'+b.acc+'"></div>':''))
+    +(art?'':'<div class="cc3-logo"><span>'+mono+'</span>'+logo+'</div>')
+    +(art?'':'<div class="cc3-chip"><i></i><i></i><i></i></div><svg class="cc3-nfc" viewBox="0 0 24 24" fill="none" stroke="'+fg+'" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.500 0 12M12 4c4.500 5 4.500 11 0 16M16 2c6 6.500 6 13.500 0 20"/></svg>')
+    +(art?'':'<div class="cc3-num">•••• •••• •••• '+last4+'</div><div class="cc3-name">'+shown+'</div>'+ccNetMark(net))
+    +'<div class="cc3-paid"><span style="width:'+pctNum+'%"></span></div>'
+    +(pctNum>0?'<div class="cc3-pct">'+pctNum+'% paid</div>':'')
+    +'<div class="cc3-gloss"></div></div>';
+  var back='<div class="cc3-face cc3-back">'
+    +'<div class="cc3-stripe"></div><div class="cc3-sig"><span>Authorised signature</span><b>•••</b></div>'
+    +'<div class="cc3-bk-info"><div><span>Owed</span><b>'+bal+'</b></div><div><span>Rate</span><b>'+apr+'</b></div><div><span>Min</span><b>'+minp+'/mo</b></div></div>'
+    +ccNetMark(net)+'<div class="cc3-gloss"></div></div>';
+  return '<div class="cc3" data-id="'+d.id+'" role="img" aria-label="'+ccEsc(d.name)+' credit card — drag to rotate, double-click to flip">'
+    +'<div class="cc3-body" style="--ry:-16deg;--rx:6deg">'+f+back
+    +'<div class="cc3-edge cc3-e-t"></div><div class="cc3-edge cc3-e-b"></div><div class="cc3-edge cc3-e-l"></div><div class="cc3-edge cc3-e-r"></div></div></div>';
+}
+// drag / swipe to rotate, double-tap or the flip button to turn it over
+(function(){
+  var cur=null,sx=0,sy=0,ry0=0,rx0=0,moved=false,lastTap=0;
+  function ang(el,k){return parseFloat(el.style.getPropertyValue(k))||0;}
+  document.addEventListener('pointerdown',function(e){
+    var c=e.target.closest&&e.target.closest('.cc3');if(!c)return;
+    var b=c.querySelector('.cc3-body');cur={c:c,b:b};sx=e.clientX;sy=e.clientY;ry0=ang(b,'--ry');rx0=ang(b,'--rx');moved=false;b.classList.add('drag');
+    try{c.setPointerCapture(e.pointerId);}catch(_){}
+  });
+  document.addEventListener('pointermove',function(e){
+    if(!cur)return;var dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>4)moved=true;
+    cur.b.style.setProperty('--ry',(ry0+dx*0.6)+'deg');
+    if(e.pointerType==='mouse')cur.b.style.setProperty('--rx',Math.max(-60,Math.min(60,rx0-dy*0.4))+'deg');
+  });
+  function up(e){
+    if(!cur)return;cur.b.classList.remove('drag');
+    if(!moved){var t=Date.now();if(t-lastTap<350){ccFlip(cur.c);lastTap=0;}else lastTap=t;}
+    cur=null;
+  }
+  document.addEventListener('pointerup',up);document.addEventListener('pointercancel',up);
+  document.addEventListener('dblclick',function(e){var c=e.target.closest&&e.target.closest('.cc3');if(c&&!('ontouchstart' in window))ccFlip(c);});
+})();
+function ccFlip(c){
+  var b=c.querySelector('.cc3-body'),y=parseFloat(b.style.getPropertyValue('--ry'))||0;
+  var n=Math.round((y-0)/180);var target=(Math.abs(((y%360)+360)%360-180)<90)?Math.round(y/360)*360:Math.round((y-180)/360)*360+180;
+  b.classList.remove('drag');b.style.setProperty('--ry',target+'deg');b.style.setProperty('--rx','6deg');
+}
+function ccFlipId(id){var c=document.querySelector('.cc3[data-id="'+id+'"]');if(c)ccFlip(c);}
+// ── edit the card: issuer text (scanned for a company), network, last 4, photo of the real card ──
+var _ccEdit=null;
+function ccOpenEdit(id){
+  var d=debtState.debts.find(function(x){return x.id===id;});if(!d)return;
+  _ccEdit={id:id,art:(d.card&&d.card.art)||'',logo:(d.card&&d.card.logo)||''};
+  var c=d.card||{},o=document.getElementById('cc-ov');if(o)o.remove();
+  o=document.createElement('div');o.id='cc-ov';o.className='hbc-ov';
+  o.innerHTML='<div class="hbc" style="width:min(520px,100%)" role="dialog" aria-label="Card design"><div class="hbc-hd"><span>💳 Card design</span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="ccCloseEdit()" aria-label="Close">✕</span></div>'
+   +'<div style="padding:14px 16px"><div id="cc-prev" style="max-width:340px;margin:0 auto 12px"></div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+   +'<div style="grid-column:1/-1"><label style="display:block;font-size:10px;color:var(--t3);margin-bottom:3px">Issuer / company on the card (we scan this and the card name for a known company)</label><input id="cc-issuer" type="text" maxlength="40" class="al-inp" style="width:100%" value="'+ccEsc(c.issuer||'')+'" placeholder="e.g. Barclaycard, Monzo, Amex"></div>'
+   +'<div><label style="display:block;font-size:10px;color:var(--t3);margin-bottom:3px">Network</label><select id="cc-net" class="al-inp" style="width:100%"><option value="auto">Auto-detect</option><option value="visa">Visa</option><option value="mc">Mastercard</option><option value="amex">Amex</option><option value="none">None</option></select></div>'
+   +'<div><label style="display:block;font-size:10px;color:var(--t3);margin-bottom:3px">Last 4 digits (optional)</label><input id="cc-last4" type="text" inputmode="numeric" maxlength="4" class="al-inp" style="width:100%" value="'+ccEsc(c.last4||'')+'"></div>'
+   +'</div>'
+   +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><label class="stk-btn" style="cursor:pointer">📷 Imprint a photo of my card<input type="file" accept="image/*" style="display:none" onchange="ccArtFile(this,\'art\')"></label><label class="stk-btn" style="cursor:pointer">🖼 Upload a logo<input type="file" accept="image/*" style="display:none" onchange="ccArtFile(this,\'logo\')"></label><button class="stk-btn" onclick="ccClearArt()">Use brand design</button></div>'
+   +'<div style="font-size:10.5px;color:var(--t3);line-height:1.5;margin-top:8px">Brand designs use each company’s colours and logo, not the official card artwork. For the exact design, photograph the front of your card and imprint it. The photo stays in your account only — hide the card number first if you prefer.</div>'
+   +'<div style="margin-top:12px;display:flex;gap:6px;justify-content:flex-end"><button class="stk-btn" onclick="ccCloseEdit()">Cancel</button><button class="btn-add-data" onclick="ccSaveEdit()">Save</button></div></div></div>';
+  document.body.appendChild(o);
+  document.getElementById('cc-net').value=c.network||'auto';
+  ['cc-issuer','cc-net','cc-last4'].forEach(function(i){document.getElementById(i).addEventListener('input',ccPreview);});
+  ccPreview();
+}
+function ccDraft(){
+  var d=debtState.debts.find(function(x){return x.id===_ccEdit.id;});
+  var g=function(i){return (document.getElementById(i)||{}).value||'';};
+  return Object.assign({},d,{card:{issuer:viClean(g('cc-issuer')).trim().slice(0,40),network:g('cc-net')||'auto',last4:g('cc-last4').replace(/\D/g,'').slice(0,4),art:_ccEdit.art,logo:_ccEdit.logo}});
+}
+function ccPreview(){var p=document.getElementById('cc-prev');if(p&&_ccEdit){var d=ccDraft(),o=d.original||d.balance,pc=o>0?Math.round(Math.max(0,Math.min(1,(o-d.balance)/o))*100):0;p.innerHTML=cc3dHTML(d,pc);}}
+function ccArtFile(inp,kind){
+  var f=inp.files&&inp.files[0];inp.value='';if(!f)return;
+  var img=new Image(),u=URL.createObjectURL(f);
+  img.onload=function(){
+    var c=document.createElement('canvas'),ctx;
+    if(kind==='art'){   // cover-crop to the real card ratio
+      var W=640,H=Math.round(W*53.98/85.6),r=W/H,sr=img.width/img.height,sw,sh,sx,sy;
+      if(sr>r){sh=img.height;sw=sh*r;sx=(img.width-sw)/2;sy=0;}else{sw=img.width;sh=sw/r;sx=0;sy=(img.height-sh)/2;}
+      c.width=W;c.height=H;ctx=c.getContext('2d');ctx.drawImage(img,sx,sy,sw,sh,0,0,W,H);_ccEdit.art=c.toDataURL('image/jpeg',0.82);
+    }else{var sc=Math.min(1,96/Math.max(img.width,img.height));c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext('2d').drawImage(img,0,0,c.width,c.height);var dd=c.toDataURL('image/png');_ccEdit.logo=dd.length>60000?c.toDataURL('image/jpeg',0.8):dd;}
+    URL.revokeObjectURL(u);ccPreview();
+  };
+  img.onerror=function(){URL.revokeObjectURL(u);showToast('That image could not be read');};
+  img.src=u;
+}
+function ccClearArt(){_ccEdit.art='';_ccEdit.logo='';ccPreview();}
+function ccCloseEdit(){var o=document.getElementById('cc-ov');if(o)o.remove();_ccEdit=null;}
+function ccSaveEdit(){
+  var d=debtState.debts.find(function(x){return x.id===_ccEdit.id;});if(!d)return;
+  var nd=ccDraft().card;
+  if(!nd.issuer&&nd.network==='auto'&&!nd.last4&&!nd.art&&!nd.logo)delete d.card;else d.card=nd;
+  ccCloseEdit();saveDebtState();renderDebtTab();showToast('Card design saved ✓');
+}
+
 function makePayment(id){
   var d=debtState.debts.find(function(x){return x.id===id;});
   if(!d)return;
@@ -12162,39 +12362,28 @@ function renderDebtTab(){
   var _obBanner=sorted.some(function(d){return d._onboarding;})
     ?'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;background:rgba(224,137,74,.08);border:1px solid rgba(224,137,74,.3);border-radius:8px;font-size:.55rem;color:var(--t2);line-height:1.5"><span style="flex:1;min-width:200px"><b style="color:var(--or)">One lump-sum entered at setup.</b> Replace it with each separate debt (type, interest rate, minimum payment) so your payoff plan is accurate.</span><button class="btn-add-data" style="padding:5px 12px;font-size:.52rem" onclick="removeOnboardingDebt()">Replace it →</button></div>'
     :'';
-  dl.innerHTML=_obBanner+'<div class="debt-card-grid">'
+  dl.innerHTML=_obBanner+'<div class="debt-card-grid'+(sorted.some(function(d){return d.type==='credit'||d.type==='bnpl';})?' has-cards':'')+'">'
     +sorted.map(function(d){
       var orig=d.original||d.total||d.balance;
       var paidPct=orig>0?Math.max(0,Math.min(1,(orig-d.balance)/orig)):0;
       var pctNum=Math.round(paidPct*100);
       var remainH=100-pctNum; // % of card still "owed"
       var isCard=d.type==='credit'||d.type==='bnpl';
-      var ccNum=d._ccNum||(d._ccNum=Math.floor(Math.random()*9000+1000));
       var ccLogo=getCreditCardLogo(d.name);
 
       if(isCard){
-        // Credit card portrait — horizontal cut shows paid portion sliced off bottom
+        // real-proportion 3D card (drag to rotate, double-tap to flip); progress shown on the card's bottom edge
         return '<div style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px">'
-          +'<div style="font-size:.55rem;font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+d.name+'</div>'
-          +'<div class="cc-wrap" style="flex:1"><div class="cc-portrait" style="width:100%;min-height:120px">'
-          +(pctNum>0&&pctNum<100?'<div class="cc-paid" style="height:'+pctNum+'%"><span class="cc-paid-pct">'+pctNum+'% paid</span></div>':'')
-          +(pctNum>=100?'<div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(62,207,142,.18),rgba(62,207,142,.08));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;z-index:5"><div style="font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--gr);font-weight:700;letter-spacing:.18em;text-shadow:0 0 10px rgba(62,207,142,.7)">CLEARED</div><div style="font-size:1.4rem;filter:drop-shadow(0 0 6px rgba(62,207,142,.6))">✅</div></div>':'')
-          +(pctNum>0&&pctNum<100?'<div class="cc-cut" style="top:'+pctNum+'%"></div><div class="cc-scissors" style="top:'+pctNum+'%">✂️</div>':'')
-          +'<div class="cc-remain" style="height:'+remainH+'%;min-height:'+(pctNum>=100?'0':'20')+'px">'
-          +(ccLogo?'<img src="'+ccLogo+'" style="width:22px;height:22px;object-fit:contain;border-radius:3px;margin-bottom:2px;background:rgba(255,255,255,.06)" onerror="this.style.display=\'none\'">':'')
-          +'<div class="cc-chip"></div>'
-          +'<div class="cc-num" style="font-size:.42rem">•••• •••• •••• '+ccNum+'</div>'
-          +'<div class="cc-dname" style="font-size:.46rem">'+d.name+'</div>'
-          +'</div>'
-          +'</div></div>'
-          +'<div style="font-size:.52rem;color:var(--re);font-family:\'Share Tech Mono\',monospace;font-weight:700">'+gbpFmt(d.balance)+'</div>'
+          +'<div style="font-size:.55rem;font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</div>'
+          +cc3dHTML(d,pctNum)
+          +'<div style="font-size:.52rem;color:var(--re);font-family:\'Share Tech Mono\',monospace;font-weight:700;display:flex;justify-content:space-between"><span>'+gbpFmt(d.balance)+'</span><span style="color:var(--gr);font-weight:400">'+pctNum+'% paid</span></div>'
           +'<div style="display:flex;align-items:center;gap:4px">'
           +'<input type="number" id="debt-pay-inp-'+d.id+'" class="al-inp" placeholder="£ pay" style="flex:1;font-size:.52rem;padding:3px 6px;min-width:0">'
           +'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap" onclick="makePayment('+d.id+')">Pay</button>'
           +'</div>'
           +'<div style="display:flex;justify-content:space-between;align-items:center">'
           +'<span style="font-size:.46rem;color:var(--t3)">'+d.rate+'% APR</span>'
-          +'<button class="data-item-del" style="font-size:.48rem;padding:2px 5px" onclick="deleteDebt('+d.id+')">✕</button>'
+          +'<span class="cc-tile-actions"><button class="data-item-del" style="font-size:.48rem;padding:2px 5px" title="Flip card" onclick="ccFlipId('+d.id+')">⟲</button><button class="data-item-del" style="font-size:.48rem;padding:2px 5px" title="Card design" onclick="ccOpenEdit('+d.id+')">🎨</button><button class="data-item-del" style="font-size:.48rem;padding:2px 5px" onclick="deleteDebt('+d.id+')">✕</button></span>'
           +'</div>'
           +'</div>';
       } else {
