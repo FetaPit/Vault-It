@@ -7616,9 +7616,8 @@ function hbRenderL2(el){
     +'<div class="hb-st"><div><b>'+hbMoney(bal)+'</b><span>still owed</span></div><div><b>'+(scn.balloon>0?'—':hbFmtDate(scn.payoffDate))+'</b><span>mortgage-free</span></div><div><b class="'+(cmp.interestSaved>0?'hbc-good':'')+'">'+hbMoney(cmp.interestSaved)+'</b><span>interest slain</span></div><div><b>'+hbYM(Math.max(0,cmp.monthsSaved))+'</b><span>months shaved</span></div></div>'
     +'<div style="font-size:.5rem;color:var(--t3)">Solid bricks = the part of the house you own. Ghost bricks = what the lender still owns.</div>'
     +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Open mortgage calculator</button></div>'
-    +tip;
+    +tip+hbL3Card();
 }
-function hbRenderL3(el){el.innerHTML='<div class="card-lbl">LEVEL 3 · UPGRADE</div><div style="font-size:.56rem;color:var(--t2)">Plan your second property.</div>';}
 
 // <<HB_MORTGAGE_ENGINE
 // ═══════════════════════════════════════════════════════════════
@@ -7738,6 +7737,87 @@ function hbCompare(base,scn){
     base:base,scn:scn};
 }
 // HB_MORTGAGE_ENGINE>>
+
+// <<HB_UPGRADE_ENGINE
+// ═══════════════════════════════════════════════════════════════
+// LEVEL 3 — UPGRADE ENGINE (pure). Stamp-duty tables are the rates last checked (Apr 2025) from
+// gov.uk / revenue.scot / gov.wales and MUST be re-checked before relying on them. Illustrative only, not advice.
+var HB_TAX_ASOF='rates last checked Apr 2025 — verify on gov.uk (England/NI), revenue.scot or gov.wales';
+var HB_TAX={
+  eng:{name:'England',tax:'SDLT',
+    standard:[[125000,0],[250000,2],[925000,5],[1500000,10],[Infinity,12]],
+    ftb:[[300000,0],[500000,5]],ftbMax:500000,
+    additional:[[125000,5],[250000,7],[925000,10],[1500000,15],[Infinity,17]]},
+  ni:{name:'Northern Ireland',tax:'SDLT',alias:'eng'},
+  sco:{name:'Scotland',tax:'LBTT',
+    standard:[[145000,0],[250000,2],[325000,5],[750000,10],[Infinity,12]],
+    ftb:[[175000,0],[250000,2],[325000,5],[750000,10],[Infinity,12]],ftbMax:Infinity,
+    additional:[[145000,8],[250000,10],[325000,13],[750000,18],[Infinity,20]]},
+  wal:{name:'Wales',tax:'LTT',
+    standard:[[225000,0],[400000,6],[750000,7.5],[1500000,10],[Infinity,12]],
+    additional:[[180000,5],[250000,8.5],[400000,10],[750000,12.5],[1500000,15],[Infinity,17]]}
+};
+function hbBands(price,bands){var tax=0,lo=0;for(var i=0;i<bands.length;i++){var hi=bands[i][0];if(price>lo)tax+=(Math.min(price,hi)-lo)*bands[i][1]/100;lo=hi;if(price<=hi)break;}return tax;}
+// buyer: 'standard' | 'ftb' | 'additional'
+function hbStampDuty(region,price,buyer){
+  var t=HB_TAX[region]||HB_TAX.eng;if(t.alias)t=HB_TAX[t.alias];
+  price=Math.max(0,+price||0);buyer=buyer||'standard';
+  var bands=t.standard;
+  if(buyer==='additional')bands=t.additional;
+  else if(buyer==='ftb'&&t.ftb&&price<=t.ftbMax)bands=t.ftb;
+  return Math.round(hbBands(price,bands));
+}
+var HB_RATE_BANDS=[[60,4.08],[75,4.37],[85,4.44],[90,4.67],[95,5.16]];   // indicative average 2-yr fixed by LTV (Rightmove, Oct 2025)
+function hbRateBand(ltv){for(var i=0;i<HB_RATE_BANDS.length;i++)if(ltv<=HB_RATE_BANDS[i][0])return HB_RATE_BANDS[i];return HB_RATE_BANDS[HB_RATE_BANDS.length-1];}
+// st = {value, balance, cash}. u = upgrade plan (see hbUpDefaults).
+function hbUpgradeAt(u,st){
+  var r={};
+  var buyer=u.mode==='let'?'additional':'standard';
+  r.stamp=hbStampDuty(u.region,u.price,buyer);
+  r.buyCosts=(+u.buyLegal||0)+(+u.survey||0)+(+u.moving||0);
+  r.wantDeposit=u.price*(u.depPct/100);
+  if(u.mode==='let'){
+    r.saleNet=0;r.erc=0;r.netEquity=0;r.funds=Math.max(0,st.cash);
+  }else{
+    var agent=st.value*(u.agentPct/100);
+    r.saleNet=st.value-agent-(+u.saleLegal||0)-(+u.saleOther||0);
+    r.erc=Math.max(0,st.balance)*((+u.ercPct||0)/100);
+    r.netEquity=r.saleNet-st.balance-r.erc;
+    r.funds=Math.max(0,r.netEquity+st.cash);
+  }
+  r.depositAvail=r.funds-r.stamp-r.buyCosts;
+  r.deposit=Math.min(u.price,Math.max(0,r.depositAvail));
+  r.shortfall=Math.max(0,r.wantDeposit-r.depositAvail);
+  r.ready=r.depositAvail>=r.wantDeposit-0.005;
+  r.readiness=r.wantDeposit>0?Math.max(0,Math.min(1,r.depositAvail/r.wantDeposit)):0;
+  r.loan=Math.max(0,u.price-r.deposit);
+  r.ltv=u.price>0?r.loan/u.price*100:0;
+  r.band=hbRateBand(r.ltv);
+  var n=Math.max(1,Math.round((+u.termY||25)*12));
+  r.payment=hbPmt(r.loan,(+u.rate||0)/1200,n);
+  r.stressPayment=hbPmt(r.loan,((+u.rate||0)+3)/1200,n);
+  r.lti=u.income>0?r.loan/u.income:null;
+  r.ltiOk=r.lti===null?null:r.lti<=(+u.ltiCap||4.5);
+  r.maxLoan=u.income>0?u.income*(+u.ltiCap||4.5):null;
+  return r;
+}
+// walk the current mortgage's schedule: when does the plan first become affordable?
+function hbUpgradeWalk(u,sim){
+  var len=Math.min(sim.schedule.length,600),res=null;
+  for(var m=0;m<=len;m++){
+    var e=hbEquityAt(sim,m),st={value:e.value,balance:e.balance,cash:(+u.cashExtra||0)+(+u.saveMonthly||0)*m};
+    var r=hbUpgradeAt(u,st);
+    if(r.ready){res={months:m,at:r,state:st};break;}
+  }
+  return{ready:res};
+}
+// keep-and-let: can the rent carry the existing mortgage? (lender ICR test: rent ≥ 125% of interest at ~5.5%)
+function hbLetCover(rent,balance,payment,icrRate,icrPct){
+  icrRate=icrRate||5.5;icrPct=icrPct||125;
+  var need=balance*icrRate/100/12*icrPct/100;
+  return{needed:need,icrOk:rent>=need,cover:payment>0?rent/payment:null,surplus:rent-payment};
+}
+// HB_UPGRADE_ENGINE>>
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -7954,8 +8034,161 @@ function hbDrawInterestBar(){
   var _u=updateUI;updateUI=function(){_u.apply(this,arguments);try{hbRenderLevels();hbRenderHUD();}catch(e){console.error('[Vault-It] hbRender',e);}};
 })();
 function hbAfterDraw(){
+  if(hbLevel()>=3&&hbView()===3){hbDrawL3();return;}
   if(hbLevel()===1&&!(state.saved<=0&&(!state.deposits||!state.deposits.length)))hbGhostWrap();
   else if(hbLevel()>=2&&typeof hbShadeEquity==='function')hbShadeEquity();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LEVEL 3 — UPGRADE PLANNER (modal over the engine above)
+// ═══════════════════════════════════════════════════════════════
+var HBU_DEF={mode:'sell',region:'eng',type:'',price:0,sale:0,agentPct:1.5,saleLegal:1500,saleOther:500,ercPct:0,buyLegal:1500,survey:600,moving:800,
+  depPct:15,rate:4.6,termY:25,income:0,ltiCap:4.5,cashExtra:0,saveMonthly:0,rent:0,threshold:25};
+var HBU_TYPES=[['terraced','Terraced'],['semi','Semi-detached'],['detached','Detached'],['mansion','Mansion'],['flat','Flat'],['apartment','Apartment']];
+var _hbuT=null;
+function hbUpGet(){
+  var d=Object.assign({},HBU_DEF,state.up||{});
+  if(!d.type)d.type=state.houseType||'terraced';
+  if(!(d.price>0))d.price=Math.round(state.valuation||state.target||0);
+  if(!(d.sale>0))d.sale=Math.round(state.valuation||state.target||0);
+  return d;
+}
+function hbuGet(id){var e=document.getElementById('hbu-'+id);return e?e.value:null;}
+function hbUpRead(){
+  var d=hbUpGet();if(!document.getElementById('hbu-ov'))return d;
+  var out=Object.assign({},d);
+  Object.keys(HBU_DEF).forEach(function(k){var v=hbuGet(k);if(v===null)return;if(typeof HBU_DEF[k]==='number'){var f=parseFloat(v);out[k]=isFinite(f)?f:d[k];}else out[k]=v;});
+  out.sale=parseFloat(hbuGet('sale'));if(!isFinite(out.sale))out.sale=d.sale;
+  return out;
+}
+// the user's current-home value for the Level 3 maths: the sale-price estimate they typed overrides the valuation
+function hbUpSim(){var c=hbcRead();return{c:c,base:hbSimulate(c.base),scn:hbSimulate(c.scn)};}
+function hbUpNow(u){
+  var val=u.sale>0?u.sale:(+state.valuation||+state.target||0);
+  return hbUpgradeAt(u,{value:val,balance:Math.max(0,+state.mortgageBalance||0),cash:(+u.cashExtra||0)});
+}
+function hbUpWalk(u,sim){
+  // the sale-price estimate replaces the valuation at month 0 and grows with the calculator's growth assumption
+  var so=Object.assign({},sim.opts);so.valuation=u.sale>0?u.sale:so.valuation;
+  return hbUpgradeWalk(u,{opts:so,schedule:sim.schedule});
+}
+function hbuF(k,label,val,o){
+  o=o||{};
+  if(o.options)return '<div><label for="hbu-'+k+'">'+label+'</label><select id="hbu-'+k+'">'+o.options.map(function(x){return '<option value="'+x[0]+'"'+(String(val)===String(x[0])?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select></div>';
+  return '<div'+(o.full?' class="full"':'')+'><label for="hbu-'+k+'">'+label+'</label><input id="hbu-'+k+'" type="number" step="'+(o.step||'any')+'" min="'+(o.min!=null?o.min:0)+'" value="'+(val==null?'':val)+'"></div>';
+}
+function hbOpenUpgrade(){
+  var d=hbUpGet(),o=document.getElementById('hbu-ov');if(o)o.remove();
+  o=document.createElement('div');o.id='hbu-ov';o.className='hbc-ov';
+  var F=hbuF;
+  o.innerHTML='<div class="hbc" role="dialog" aria-label="Upgrade planner"><div class="hbc-hd"><span>🚀 Level 3 · Upgrade planner <span style="font-weight:400;font-size:11px;color:var(--t3)">· illustrative, not advice</span></span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="hbCloseUpgrade()" aria-label="Close">✕</span></div>'
+  +'<div class="hbc-body"><div id="hbu-in">'
+  +'<details open><summary>1 · The plan</summary><div>'+F('mode','What happens to your current home?',d.mode,{options:[['sell','Sell it and move'],['let','Keep it and let it out']],full:true})
+    +F('region','Where is the new home?',d.region,{options:[['eng','England (SDLT)'],['ni','Northern Ireland (SDLT)'],['sco','Scotland (LBTT)'],['wal','Wales (LTT)']]})+F('type','Type of home',d.type,{options:HBU_TYPES})
+    +F('price','Target price £',d.price)+F('depPct','Deposit you want %',d.depPct,{step:0.5})+'</div></details>'
+  +'<details open><summary>2 · Selling your current home</summary><div>'+F('sale','Expected sale price £',d.sale)+F('agentPct','Agent fee % (incl. VAT)',d.agentPct,{step:0.05})+F('saleLegal','Conveyancing £',d.saleLegal)+F('saleOther','EPC, removals etc. £',d.saleOther)+F('ercPct','Early repayment charge % of balance',d.ercPct,{step:0.5})+'</div></details>'
+  +'<details open><summary>3 · Buying costs &amp; cash</summary><div>'+F('buyLegal','Conveyancing £',d.buyLegal)+F('survey','Survey / valuation £',d.survey)+F('moving','Moving costs £',d.moving)+F('cashExtra','Extra cash you hold today £',d.cashExtra)+F('saveMonthly','Cash you will add each month £',d.saveMonthly,{full:true})
+    +'<div class="full" id="hbu-budbtns"></div></div></details>'
+  +'<details open><summary>4 · The new mortgage</summary><div>'+F('rate','Expected rate %',d.rate,{step:0.01})+F('termY','Term (years)',d.termY,{step:1})+F('income','Gross household income £/yr (affordability)',d.income)+F('ltiCap','Lender income multiple (×)',d.ltiCap,{step:0.1})+'</div></details>'
+  +'<details'+(d.mode==='let'?' open':'')+'><summary>5 · Keep &amp; let</summary><div>'+F('rent','Expected rent £/month',d.rent)+'</div></details>'
+  +'<details><summary>6 · Unlock threshold</summary><div>'+F('threshold','Unlock Level 3 at equity %',d.threshold,{step:1})+'</div></details>'
+  +'</div><div id="hbu-out"></div></div></div>';
+  document.body.appendChild(o);
+  o.addEventListener('input',function(e){if(e.target.closest('#hbu-in'))hbuSchedule();});
+  o.addEventListener('change',function(e){if(e.target.closest('#hbu-in'))hbuSchedule(true);});
+  hbuUpdate();
+}
+function hbCloseUpgrade(){var o=document.getElementById('hbu-ov');if(o)o.remove();hbuPersist();updateUI();}
+function hbuSchedule(save_){clearTimeout(_hbuT);_hbuT=setTimeout(function(){hbuUpdate();if(save_)hbuPersist();},120);}
+function hbuPersist(){try{if(!document.getElementById('hbu-ov'))return;state.up=hbUpRead();if(state.up.type&&state.up.type!==state.houseType)state.up.type=state.up.type;save();}catch(e){}}
+function hbuBudgetUse(v){var e=document.getElementById('hbu-saveMonthly');if(e){e.value=Math.round(v);hbuUpdate();hbuPersist();}}
+function hbuCard(l,v,s,cls){return '<div class="hbc-card"><div class="l">'+l+'</div><div class="v'+(cls?' '+cls:'')+'">'+v+'</div><div class="s">'+(s||'')+'</div></div>';}
+function hbuUpdate(){
+  var out=document.getElementById('hbu-out');if(!out)return;
+  var u=hbUpRead(),S2=hbUpSim(),now=hbUpNow(u),walkP=hbUpWalk(u,S2.scn),walkB=hbUpWalk(Object.assign({},u,{saveMonthly:0,cashExtra:u.cashExtra}),S2.base);
+  var region=HB_TAX[u.region]||HB_TAX.eng,rname=(region.alias?HB_TAX[region.alias]:region).tax;
+  var bud=hbBudget(),ub=Math.round(bud.unassigned),sv=Math.round(bud.saving);
+  var bb=document.getElementById('hbu-budbtns');
+  if(bb)bb.innerHTML=(ub>0?'<button type="button" class="stk-btn" onclick="hbuBudgetUse('+ub+')">Use my unassigned '+hbMoney(ub)+'/mo</button> ':'')+(ub+sv>0&&sv>0?'<button type="button" class="stk-btn" onclick="hbuBudgetUse('+(ub+sv)+')">Use unassigned + savings '+hbMoney(ub+sv)+'/mo</button>':'');
+  var when=function(w){if(!w.ready)return 'not within the mortgage term';if(w.ready.months===0)return 'now';var d=new Date();d.setMonth(d.getMonth()+w.ready.months);return hbYM(w.ready.months)+' · '+d.toLocaleDateString('en-GB',{month:'short',year:'numeric'});};
+  var h='';
+  h+='<div class="hbc-cards">'
+    +hbuCard('Funds towards the move',hbMoney(now.funds),u.mode==='sell'?'net equity '+hbMoney(now.netEquity)+' + cash '+hbMoney(u.cashExtra):'cash only (home kept)')
+    +hbuCard(rname+' (stamp duty)',hbMoney(now.stamp),(u.mode==='let'?'additional-property rates':'standard rates')+' · '+(region.alias?HB_TAX[region.alias]:region).name)
+    +hbuCard('Deposit possible',hbMoney(now.deposit),(u.price>0?(now.deposit/u.price*100).toFixed(1):0)+'% of price · wanted '+hbMoney(now.wantDeposit),now.ready?'hbc-good':'hbc-warn')
+    +hbuCard('New mortgage',hbMoney(now.loan),'LTV '+now.ltv.toFixed(0)+'% · typical rate ≈ '+now.band[1]+'% (≤'+now.band[0]+'% LTV)')
+    +hbuCard('Monthly payment',hbMoney(now.payment),'at '+u.rate+'% · stress +3%: '+hbMoney(now.stressPayment))
+    +hbuCard('Ready to move',now.ready?'Now ✓':when(walkP),'with your plan'+(walkB.ready&&walkP.ready&&walkB.ready.months>walkP.ready.months?' · '+hbYM(walkB.ready.months-walkP.ready.months)+' sooner than the no-extras plan':''),now.ready?'hbc-good':'')
+    +'</div>';
+  // affordability
+  if(u.income>0){
+    h+='<div class="hbc-note" style="margin:0 0 8px">Affordability: loan is <b>'+now.lti.toFixed(2)+'×</b> income (illustrative cap '+u.ltiCap+'×, max loan ≈ '+hbMoney(now.maxLoan)+') — <b class="'+(now.ltiOk?'hbc-good':'hbc-warn')+'">'+(now.ltiOk?'within the cap':'over the cap')+'</b>. Payment is '+(u.income>0?(now.payment/(u.income/12)*100).toFixed(0):0)+'% of gross monthly income.</div>';
+  } else h+='<div class="hbc-note" style="margin:0 0 8px">Add your household income in section 4 for an affordability check.</div>';
+  // working
+  if(u.mode==='sell'){
+    h+='<table><tr><th>Sale working</th><th>£</th></tr>'
+      +'<tr><td>Sale price</td><td>'+hbMoney(u.sale)+'</td></tr>'
+      +'<tr><td>Agent ('+u.agentPct+'%)</td><td>−'+hbMoney(u.sale*u.agentPct/100)+'</td></tr>'
+      +'<tr><td>Conveyancing + other</td><td>−'+hbMoney((+u.saleLegal||0)+(+u.saleOther||0))+'</td></tr>'
+      +'<tr><td>Mortgage balance</td><td>−'+hbMoney(state.mortgageBalance||0)+'</td></tr>'
+      +'<tr><td>Early repayment charge</td><td>−'+hbMoney(now.erc)+'</td></tr>'
+      +'<tr><td><b>Net equity released</b></td><td><b>'+hbMoney(now.netEquity)+'</b></td></tr>'
+      +'<tr><td>+ extra cash</td><td>'+hbMoney(u.cashExtra)+'</td></tr>'
+      +'<tr><td>− '+rname+'</td><td>−'+hbMoney(now.stamp)+'</td></tr>'
+      +'<tr><td>− buying costs</td><td>−'+hbMoney(now.buyCosts)+'</td></tr>'
+      +'<tr><td><b>Available as deposit</b></td><td><b>'+hbMoney(now.depositAvail)+'</b></td></tr></table>';
+  } else {
+    var lc=hbLetCover(u.rent,state.mortgageBalance||0,S2.scn.payment0);
+    h+='<table><tr><th>Keep &amp; let</th><th></th></tr>'
+      +'<tr><td>Current mortgage payment</td><td>'+hbMoney(S2.scn.payment0)+'/mo</td></tr>'
+      +'<tr><td>Expected rent</td><td>'+hbMoney(u.rent)+'/mo</td></tr>'
+      +'<tr><td>Rent covers the payment</td><td class="'+((lc.cover||0)>=1?'hbc-good':'hbc-warn')+'">'+(u.rent>0&&lc.cover?lc.cover.toFixed(2)+'×':'—')+'</td></tr>'
+      +'<tr><td>Rent a lender usually wants (125% at 5.5%)</td><td>'+hbMoney(lc.needed)+'/mo</td></tr>'
+      +'<tr><td>Meets that test?</td><td class="'+(lc.icrOk?'hbc-good':'hbc-warn')+'">'+(u.rent>0?(lc.icrOk?'yes':'no'):'—')+'</td></tr>'
+      +'<tr><td>Cash for the new deposit</td><td>'+hbMoney(now.funds)+'</td></tr>'
+      +'<tr><td>− '+rname+' (higher rates)</td><td>−'+hbMoney(now.stamp)+'</td></tr>'
+      +'<tr><td>− buying costs</td><td>−'+hbMoney(now.buyCosts)+'</td></tr></table>'
+      +'<div class="hbc-note">Letting your home usually needs your lender’s consent or a buy-to-let mortgage, landlord insurance, and rental income is taxable. Higher-rate stamp duty applies to the new home while you still own the old one (some can be reclaimed if you sell the old one within 3 years).</div>';
+  }
+  // budget effect
+  var rows='';
+  [[0,'Right now'],[ub,'+ unassigned '+hbMoney(ub)],[ub+sv,'+ unassigned + savings '+hbMoney(ub+sv)]].forEach(function(x,i){
+    if(i>0&&!(x[0]>0))return;if(i===2&&!(sv>0))return;
+    var w=hbUpWalk(Object.assign({},u,{saveMonthly:(+u.saveMonthly||0)+x[0]}),S2.scn);
+    rows+='<tr><td>'+x[1]+(i?'/mo':'')+'</td><td>'+when(w)+'</td></tr>';
+  });
+  h+='<div class="hb-tip" style="margin-top:12px">💡 <b>What your Budget could do</b><br>Months until the move is affordable if you add:<table>'+rows+'</table></div>';
+  h+='<div class="hbc-note">Stamp duty: '+HB_TAX_ASOF+'. Indicative rates by LTV are Rightmove averages (Oct 2025) and lenders vary. Affordability uses a simple income multiple; real lenders also assess outgoings and credit. This is a planning aid, not mortgage advice.</div>';
+  out.innerHTML=h;
+}
+function hbRenderL3(el){
+  var u=hbUpGet(),now=hbUpNow(u),p=now.readiness;
+  var S2=hbUpSim(),w=hbUpWalk(u,S2.scn);
+  el.innerHTML='<div class="card-lbl">LEVEL 3 · UPGRADE <span style="opacity:.6">· '+(u.mode==='sell'?'sell &amp; move':'keep &amp; let')+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:#e8f0ef"><span>'+hbMoney(Math.max(0,now.depositAvail))+' of '+hbMoney(now.wantDeposit)+' deposit</span><span>'+(p*100).toFixed(0)+'%</span></div>'
+    +'<div class="hb-xp"><div style="width:'+(p*100).toFixed(1)+'%"></div></div>'
+    +'<div class="hb-st"><div><b>'+hbMoney(u.price)+'</b><span>target home</span></div><div><b>'+hbMoney(now.stamp)+'</b><span>'+(HB_TAX[u.region].tax||'tax')+'</span></div><div><b>'+now.ltv.toFixed(0)+'%</b><span>LTV</span></div><div><b>'+hbMoney(now.payment)+'</b><span>per month</span></div></div>'
+    +'<div style="font-size:.5rem;color:var(--t3)">'+(now.ready?'You could afford the upgrade today.':'Ready '+(w.ready?(w.ready.months===0?'now':'in '+hbYM(w.ready.months)):'beyond the mortgage term')+' on your current plan.')+' The new home is shown as a ghost build.</div>'
+    +'<div style="margin-top:10px"><button class="btn-add-data" onclick="hbOpenUpgrade()">🚀 Open upgrade planner</button></div>';
+}
+function hbUnlockL3(){
+  if(state.houseMode!=='purchased'){toast('Buy your first home to unlock Level 3');return;}
+  state.level3=true;state.viewLevel=3;
+  if(!state.up)state.up=hbUpGet();
+  save();updateUI();toast('🚀 Level 3 unlocked: Upgrade');
+}
+function hbL3Card(){
+  if(state.level3||state.houseMode!=='purchased')return '';
+  var val=+state.valuation||+state.target||0,bal=Math.max(0,+state.mortgageBalance||0),eqp=val>0?(val-bal)/val*100:0,th=hbUpGet().threshold;
+  if(eqp>=th)return '<div class="hb-tip" style="border-color:rgba(232,197,106,.6)">🚀 <b>Level 3 is ready</b> — you own '+eqp.toFixed(0)+'% (threshold '+th+'%). Time to plan your upgrade.<div style="margin-top:8px"><button class="btn-add-data" onclick="hbUnlockL3()">Unlock Level 3</button></div></div>';
+  return '<div class="hb-tip">🔒 Level 3 unlocks at <b>'+th+'%</b> equity (you have '+eqp.toFixed(0)+'%). <button class="stk-btn" onclick="hbUnlockL3()">Unlock early</button></div>';
+}
+function hbDrawL3(){
+  var u=hbUpGet(),now=hbUpNow(u),p=Math.max(.04,now.readiness);
+  (DRAW[u.type]||drawTerraced)(p);
+  hbGhostWrap();
+  var t=E('text',{x:20,y:26,'font-size':11,'font-family':'Share Tech Mono,monospace',fill:'#e8c56a'},S);t.textContent='UPGRADE '+(now.readiness*100).toFixed(0)+'% FUNDED';
+  var t2=E('text',{x:20,y:40,'font-size':8.5,'font-family':'Share Tech Mono,monospace',fill:'#8fa3b5'},S);t2.textContent=(u.mode==='sell'?'sell & move':'keep & let')+' · target '+hbMoney(u.price);
 }
 
 function updateMilestoneLabels(){

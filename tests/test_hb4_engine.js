@@ -1,0 +1,37 @@
+const fs=require('fs'); let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
+const html=fs.readFileSync('/home/user/Vault-It/index.html','utf8');
+const a=html.split('// <<HB_MORTGAGE_ENGINE')[1].split('// HB_MORTGAGE_ENGINE>>')[0];
+const b=html.split('// <<HB_UPGRADE_ENGINE')[1].split('// HB_UPGRADE_ENGINE>>')[0];
+const E=new Function(a+b+';return{hbStampDuty,hbUpgradeAt,hbUpgradeWalk,hbSimulate,hbLetCover};')();
+const sd=E.hbStampDuty;
+// hand calculations
+ok(sd('eng',300000,'standard')===5000,'England £300k standard = £5,000');
+ok(sd('eng',300000,'additional')===20000,'England £300k additional = £20,000 (5%+ bands)');
+ok(sd('eng',300000,'ftb')===0&&sd('eng',400000,'ftb')===5000,'England FTB £300k = 0, £400k = £5,000');
+ok(sd('eng',600000,'ftb')===sd('eng',600000,'standard'),'FTB relief not available above £500k');
+ok(sd('eng',1000000,'standard')===43750,'England £1m = £43,750');
+ok(sd('ni',300000,'standard')===5000,'NI uses SDLT');
+ok(sd('sco',300000,'standard')===4600,'Scotland LBTT £300k = £4,600');
+ok(sd('sco',300000,'additional')===28600,'Scotland £300k with ADS = £28,600');
+ok(sd('sco',300000,'ftb')===4000,'Scotland FTB £300k = £4,000');
+ok(sd('wal',300000,'standard')===4500,'Wales LTT £300k = £4,500');
+ok(sd('wal',300000,'additional')===19950,'Wales higher rates £300k = £19,950');
+ok(sd('eng',0,'standard')===0,'zero price = 0');
+const u={mode:'sell',region:'eng',price:300000,depPct:10,agentPct:1.5,saleLegal:1500,saleOther:500,ercPct:0,buyLegal:1500,survey:600,moving:800,rate:5,termY:25,income:60000,ltiCap:4.5};
+const r=E.hbUpgradeAt(u,{value:250000,balance:180000,cash:0});
+ok(Math.round(r.netEquity)===64250&&Math.round(r.depositAvail)===56350,'net equity and deposit available');
+ok(r.ready&&Math.round(r.loan)===243650,'ready, loan £243,650');
+ok(Math.abs(r.payment-243650*0.05/12/(1-Math.pow(1+0.05/12,-300)))<1,'payment is the annuity formula');
+ok(r.ltiOk===true&&Math.abs(r.lti-243650/60000)<1e-9,'income multiple');
+const ru=E.hbUpgradeAt({...u,mode:'let'},{value:250000,balance:180000,cash:30000});
+ok(ru.funds===30000&&ru.stamp===20000&&!ru.ready,'keep & let: only cash counts, higher stamp duty, not ready');
+ok(E.hbUpgradeAt({...u,ercPct:3},{value:250000,balance:180000,cash:0}).erc===5400,'ERC = 3% of balance');
+// walk: balance falls over time so readiness arrives
+const sim=E.hbSimulate({loan:200000,termMonths:300,start:'2026-11-01',products:[{months:null,type:'fixed',rate:5}],interestMode:'monthly',valuation:250000,growthPct:0});
+const w=E.hbUpgradeWalk({...u,price:300000,depPct:15},sim);
+ok(w.ready&&w.ready.months>0,'walk finds a future month the plan becomes affordable ('+(w.ready&&w.ready.months)+')');
+const w2=E.hbUpgradeWalk({...u,price:300000,depPct:15,saveMonthly:500},sim);
+ok(w2.ready.months<w.ready.months,'adding savings makes it sooner');
+const lc=E.hbLetCover(900,150000,800);
+ok(Math.abs(lc.needed-150000*0.055/12*1.25)<0.01&&!lc.icrOk===(900<lc.needed),'let cover ICR');
+console.log(fails?'FAILURES '+fails:'ALL PASSED');
