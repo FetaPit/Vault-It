@@ -119,7 +119,7 @@ Deno.serve(async (req: Request) => {
     // Bare tickers (e.g. Trading 212 exports "VUAG") may be LSE-listed: retry with the .L suffix.
     const why: string[] = []
     const q = (await quote(sym, why)) ?? (!sym.includes('.') ? await quote(`${sym}.L`, why) : null)
-    if (q) quotes[sym] = q; else misses[sym] = why
+    if (q) quotes[sym] = q; else { misses[sym] = why; console.error('no quote', why.join(' | ')) }
   }))
 
   return json({ quotes, misses })

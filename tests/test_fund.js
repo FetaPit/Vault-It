@@ -41,6 +41,10 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   await page.click('#stk-pies button:has-text("Add fund / share")'); await page.fill('#afs-sym','IE00B4L5Y983'); await page.waitForSelector('#afs-suggest div'); await page.click('#afs-suggest div:first-child'); await page.fill('#afs-units','5'); await page.click('.stk-shot-ft .btn-add-data'); await page.waitForTimeout(1200);
   ok(await page.evaluate(()=>alState.stocks.some(x=>x.sym==='IE00B4L5Y983'&&x.units===5)),'an ISIN holding with no live price is still added');
   ok(/no live price was found/.test(await page.evaluate(()=>[...document.querySelectorAll('#toast, .toast')].map(e=>e.textContent).join(' '))),'…and the app tells you there is no live price (instead of silently showing £0)');
+  // no live price anywhere, but you know the unit price from your platform → £ held ÷ your price, and it is kept
+  await page.click('#stk-pies button:has-text("Add fund / share")'); await page.fill('#afs-sym','NOPRICEFUND'); await page.fill('#afs-amt','112.40'); await page.fill('#afs-px','11.24'); await page.click('.stk-shot-ft .btn-add-data'); await page.waitForTimeout(1200);
+  const mp=await page.evaluate(()=>alState.stocks.find(x=>x.sym==='NOPRICEFUND'));
+  ok(mp&&Math.abs(mp.units-10)<0.001&&mp.manualPrice===true&&mp.price===11.24,'your own unit price: £112.40 ÷ £11.24 = 10 units, kept as a manual price ('+JSON.stringify(mp&&{u:mp.units,p:mp.price,m:mp.manualPrice})+')');
   // inline row at the bottom still works
   await page.evaluate(()=>{stkSelectPie(alState.stockPies[0].id);});
   // units path still works; unknown ticker with £ held explains

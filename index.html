@@ -9916,6 +9916,8 @@ async function stkAddCore(o){
   var sym=String(o.sym||'').trim().toUpperCase(),units=o.units,amt=o.amt,cost=o.cost;
   if(!/^[A-Z0-9.\-^=]{1,15}$/.test(sym))return{err:'Search for a fund or share, or enter a ticker, e.g. VUSA.L or AAPL'};
   if(!(units>0)&&!(amt>0))return{err:'Enter how many units you hold — or the £ value you hold'};
+  var mpx=+o.manualPrice>0?+o.manualPrice:0;
+  if(!(units>0)&&mpx>0)units=+(amt/mpx).toFixed(6);   // your own unit price
   if(!(units>0)){   // worked out from the £ you hold ÷ the live price
     showToast('Looking up the live price…');
     try{
@@ -9956,6 +9958,7 @@ async function stkAddCore(o){
     h={id:Date.now(),pie:pie.id,sym:sym,name:nm,units:units,avgCost:cost>0?cost:0,price:0};
     alState.stocks.push(h);
   }
+  if(mpx>0){h.price=mpx;h.manualPrice=true;h.updated=0;}   // your price, kept until you clear it
   if(provider)h.provider=provider;
   if(platform)h.platform=platform;
   _stkPick=null;
@@ -9990,6 +9993,7 @@ function stkAddFundOpen(){
   o.innerHTML='<div class="stk-shot" style="width:min(520px,100%)"><div class="stk-shot-hd"><span>＋ Add a fund, ETF or share</span><span style="cursor:pointer" onclick="stkShotClose()">✕</span></div><div class="stk-shot-bd">'
    +'<label>Fund or share</label><div style="position:relative"><input id="afs-sym" style="'+inp+'" placeholder="Search by name, ticker or ISIN" autocomplete="off" oninput="stkSuggest(this.value,\'afs-sym\',\'afs-suggest\')"><div id="afs-suggest" class="stk-suggest"></div></div>'
    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><label>Units</label><input id="afs-units" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 10"></div><div><label>…or £ held</label><input id="afs-amt" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 112.40"></div><div><label>Avg cost £</label><input id="afs-cost" type="number" min="0" step="any" style="'+inp+'" placeholder="optional"></div></div>'
+   +'<label>Unit price £ <span style="opacity:.6">(only if there is no live price — from your platform’s fund page)</span></label><input id="afs-px" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 11.24 — leave empty to use the live price">'
    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label>Provider (who runs the fund)</label><input id="afs-prov" list="afs-provs" maxlength="40" style="'+inp+'" placeholder="e.g. BlackRock"><datalist id="afs-provs">'+STK_PROVIDERS.map(function(x){return'<option value="'+stkEsc(x.n)+'">';}).join('')+'</datalist></div>'
    +'<div><label>Platform (where you hold it)</label><input id="afs-plat" list="afs-plats" maxlength="40" style="'+inp+'" placeholder="e.g. Monzo" value="'+stkEsc((cp.platform&&cp.platform.name)||'')+'"><datalist id="afs-plats">'+STK_PLATFORMS.map(function(x){return'<option value="'+stkEsc(x.n)+'">';}).join('')+'</datalist></div></div>'
    +'<div style="opacity:.75;font-size:11px;line-height:1.5">A fund gets its own pie, labelled <b style="color:#e8c56a">FUND</b>, shown beside your other pies and counted in <b>All investments</b>. Not sure of the units? Enter the £ you hold and they’re worked out from the live price.</div></div>'
@@ -10001,7 +10005,7 @@ async function stkAddFundConfirm(){
   try{
     var g=function(id){return(document.getElementById(id)||{}).value;};
     var units=parseFloat(g('afs-units'));
-    var r=await stkAddCore({sym:g('afs-sym'),units:units,amt:parseFloat(g('afs-amt')),cost:parseFloat(g('afs-cost')),provider:g('afs-prov'),platform:g('afs-plat'),asFund:true});
+    var r=await stkAddCore({sym:g('afs-sym'),units:units,amt:parseFloat(g('afs-amt')),cost:parseFloat(g('afs-cost')),provider:g('afs-prov'),platform:g('afs-plat'),asFund:true,manualPrice:parseFloat(g('afs-px'))});
     if(r.err){showToast(r.err);return;}
     stkShotClose();
     await stkAddFinish(r,!(units>0));
