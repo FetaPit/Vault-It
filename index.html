@@ -7563,7 +7563,7 @@ function hbRenderHUD(){
 function hbBadgeToasts(p){
   var g=state.gam=state.gam||{seen:null};
   var now=HB_BADGES.filter(function(b){return p>=b[0];}).map(function(b){return b[1];});
-  if(g.seen===null){g.seen=now;save();return;}   // first run: no toast spam for what is already earned
+  if(g.seen===null){g.seen=now;if((state.deposits||[]).length||state.saved>0)save();return;}   // first run: no toast spam for what is already earned (and nothing written for a brand-new user)
   now.forEach(function(n){if(g.seen.indexOf(n)<0){g.seen.push(n);toast('🏅 Badge unlocked: '+n+'!');save();}});
 }
 // L2 / L3 panels are filled in by the mortgage engine
