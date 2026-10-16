@@ -12649,7 +12649,7 @@ function setDebtMethod(m) {
       { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(1)', boxShadow: '0 0 0 rgba(0,0,0,0)' },
       { transform: 'translate(' + dx * .5 + 'px,' + dy * .5 + 'px) scale(1.04)', boxShadow: '0 14px 30px rgba(0,0,0,.45)', offset: .45 },
       { transform: 'translate(0,0) scale(1)', boxShadow: '0 0 0 rgba(0,0,0,0)' }
-    ], { duration: 1100, easing: 'cubic-bezier(.4,.05,.2,1)', delay: Math.min(250, n * 40) });
+    ], { duration: 1100, easing: 'cubic-bezier(.4,.05,.2,1)', delay: Math.min(250, n * 40), fill: 'backwards' });
     a.onfinish = a.oncancel = function() { e.style.zIndex = ''; e.style.position = ''; };
   });
   var note = dl.querySelector('.debt-rank-note');
