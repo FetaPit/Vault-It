@@ -16,7 +16,9 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   ok(await page.locator('#hb-levels .hb-lv.lock').count()===2,'Levels 2 and 3 are locked');
   ok(await page.locator('#houseSvg #hb-ghost').count()===1&&(await page.getAttribute('#hb-ghost','opacity'))==='0.58'.replace('0.58','.58')||true,'house is wrapped in the translucent ghost layer');
   ok(+(await page.getAttribute('#hb-ghost','opacity'))<1,'ghost layer opacity < 1');
-  ok(/Each brick = £50/.test(t),'each brick = £50 (deposit £50,000 ÷ 1,000)');
+  await page.waitForFunction(()=>!!hbBrickInfo(),null,{timeout:10000}); await page.evaluate(()=>hbRenderHUD()); t=await page.innerText('#hb-hud');
+  const ebr=await page.evaluate(()=>{const i=hbBrickInfo();return{per:'£'+i.perBrick.toFixed(2),total:i.total.toLocaleString('en-GB')};});
+  ok(t.includes('Each brick ≈ '+ebr.per)&&new RegExp('of '+ebr.total+' UK bricks','i').test(t),'each brick = deposit ÷ the real UK brick count of the model ('+ebr.per+', '+ebr.total+' bricks)');
   // budget prompt: unassigned 700 + saving 100
   ok(/700/.test(t)&&/100/.test(t)&&/unassigned/.test(t),'budget prompt shows unassigned £ and savings £');
   ok(/months|mo ·/.test(t),'projections shown');
