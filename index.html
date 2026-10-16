@@ -2697,7 +2697,12 @@ input:focus, textarea:focus, select:focus {
 .stk-val{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--tx);text-align:right}
 .stk-pl{font-family:'Share Tech Mono',monospace;font-size:.56rem;text-align:right}
 .stk-src{font-size:.4rem;color:var(--t3);margin-top:2px;font-family:'Share Tech Mono',monospace}
-.stk-add{display:grid;grid-template-columns:1.4fr .8fr 1fr auto;gap:8px;margin-top:12px}
+.stk-add{display:grid;grid-template-columns:2fr .7fr .8fr 1fr auto;gap:8px;margin-top:12px}
+@media(max-width:700px){.stk-add{grid-template-columns:1fr 1fr}.stk-add>div:first-child{grid-column:1/-1}}
+.stk-suggest{display:none;position:absolute;left:0;right:0;top:100%;z-index:50;background:#06101c;border:1px solid rgba(68,192,185,.35);border-radius:6px;max-height:260px;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.stk-suggest div{padding:8px 10px;cursor:pointer;font-size:12px;color:#e6eef7;border-top:1px solid rgba(255,255,255,.05)}
+.stk-suggest div:first-child{border-top:0}.stk-suggest div:hover{background:rgba(68,192,185,.14)}
+.stk-suggest small{display:block;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:10px;margin-top:2px}
 @media(max-width:620px){.stk-add{grid-template-columns:1fr 1fr}}
 .stk-note{font-size:.46rem;color:var(--t3);line-height:1.6;margin-top:8px}
 .stk-lb{display:none;font-family:'Share Tech Mono',monospace;font-size:.4rem;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
@@ -4264,12 +4269,13 @@ button.bd-ic{cursor:pointer}
           </div>
           <div id="stk-holdings"></div>
           <div class="stk-add">
-            <input type="text" id="stk-sym" class="al-inp" placeholder="Ticker  e.g. VUSA.L · AAPL" autocapitalize="characters" onkeydown="if(event.key==='Enter')stkAdd()">
+            <div style="position:relative"><input type="text" id="stk-sym" class="al-inp" style="width:100%" placeholder="Search a fund, ETF or share — name, ticker or ISIN" autocomplete="off" oninput="stkSuggest(this.value)" onkeydown="if(event.key==='Enter')stkAdd()"><div id="stk-suggest" class="stk-suggest"></div></div>
             <input type="number" id="stk-units" class="al-inp" placeholder="Units" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
+            <input type="number" id="stk-amt" class="al-inp" placeholder="…or £ held" min="0" step="any" title="Don't know the units? Enter the £ value you hold and the units are worked out from the live price" onkeydown="if(event.key==='Enter')stkAdd()">
             <input type="number" id="stk-cost" class="al-inp" placeholder="Avg cost £ (optional)" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
             <button class="btn-add-data" onclick="stkAdd()">+ Add holding</button>
           </div>
-          <div class="stk-note">UK-listed funds &amp; ETFs end in <b>.L</b> (VUSA.L, VWRL.L). US shares are plain (AAPL, MSFT). Prices convert to £ automatically. Edit units, cost or price any time — everything here counts towards your net worth.</div>
+          <div class="stk-note">UK-listed funds &amp; ETFs end in <b>.L</b> (VUSA.L, VWRL.L). US shares are plain (AAPL, MSFT). Or just <b>search by name or ISIN</b> and pick the fund. Prices convert to £ automatically. Edit units, cost or price any time — everything here counts towards your net worth.</div>
           <input type="file" id="stk-csv" accept=".csv,text/csv" style="display:none" onchange="stkImportCSV(this)">
           <input type="file" id="stk-shot" accept="image/*" multiple style="display:none" onchange="stkShotPicked(this)">
         </div>
@@ -9824,27 +9830,65 @@ function stkDeletePie(){
 
 // ── add / edit / remove ──
 function stkTargetPie(){stkEnsure();return alState.activePie==='all'?alState.stockPies[0].id:alState.activePie;}
-function stkAdd(){
+var _stkPick=null,_stkSugT=null,_stkSugCache={},_stkSugList=[],_stkAddBusy=false;
+function stkSuggest(q){
+  q=String(q||'').trim();var box=document.getElementById('stk-suggest');if(!box)return;
+  if(_stkPick&&_stkPick.sym!==q.toUpperCase())_stkPick=null;
+  clearTimeout(_stkSugT);
+  if(q.length<2){box.style.display='none';return;}
+  _stkSugT=setTimeout(async function(){
+    var res=_stkSugCache[q.toLowerCase()];
+    if(!res){var r=await _fnInvoke('stock-quotes',{search:q},9000);res=(r&&r.data&&r.data.results)||[];_stkSugCache[q.toLowerCase()]=res;}
+    if((document.getElementById('stk-sym')||{}).value!==q&&String((document.getElementById('stk-sym')||{}).value||'').trim()!==q)return;   // typed on since
+    _stkSugList=res;
+    box.innerHTML=res.length?res.map(function(x,i){return'<div onclick="stkPick('+i+')">'+stkEsc(x.name)+'<small>'+stkEsc(x.symbol)+' · '+stkEsc(x.exchange)+' · '+stkEsc(x.type==='MUTUALFUND'?'fund':x.type==='ETF'?'ETF':'share')+'</small></div>';}).join(''):'<div style="cursor:default;color:var(--t3)">No match — type the exact ticker (e.g. VUSA.L) instead</div>';
+    box.style.display='block';
+  },320);
+}
+function stkPick(i){
+  var x=_stkSugList[i];if(!x)return;
+  var inp=document.getElementById('stk-sym');if(inp)inp.value=x.symbol;
+  _stkPick={sym:x.symbol.toUpperCase(),name:viClean(x.name)};
+  var box=document.getElementById('stk-suggest');if(box)box.style.display='none';
+  var u=document.getElementById('stk-units');if(u)u.focus();
+}
+document.addEventListener('click',function(e){var box=document.getElementById('stk-suggest');if(box&&!e.target.closest('#stk-sym,#stk-suggest'))box.style.display='none';});
+async function stkAdd(){
+  if(_stkAddBusy)return;
   var sym=((document.getElementById('stk-sym')||{}).value||'').trim().toUpperCase();
   var units=parseFloat((document.getElementById('stk-units')||{}).value);
+  var amt=parseFloat((document.getElementById('stk-amt')||{}).value);
   var cost=parseFloat((document.getElementById('stk-cost')||{}).value);
-  if(!/^[A-Z0-9.\-^=]{1,15}$/.test(sym)){showToast('Enter a ticker, e.g. VUSA.L or AAPL');return;}
-  if(!(units>0)){showToast('Enter how many units you hold');return;}
+  if(!/^[A-Z0-9.\-^=]{1,15}$/.test(sym)){showToast('Search for a fund or share, or enter a ticker, e.g. VUSA.L or AAPL');return;}
+  if(!(units>0)&&!(amt>0)){showToast('Enter how many units you hold — or the £ value you hold');return;}
+  if(!(units>0)){   // worked out from the £ you hold ÷ the live price
+    _stkAddBusy=true;showToast('Looking up the live price…');
+    try{
+      if(!localStorage.getItem('vi_fx_rates')&&typeof fetchExchangeRates==='function')await new Promise(function(res){try{fetchExchangeRates(function(){res();});setTimeout(res,2500);}catch(e){res();}});
+      var res=await stkFetchQuotes([sym]),q=res&&res.quotes&&res.quotes[sym],g=q?stkToGBP(q.price,q.currency):null;
+      if(!(g>0)){_stkAddBusy=false;showToast('No live price found for '+sym+' — enter the units instead');return;}
+      units=+(amt/g).toFixed(6);
+    }catch(e){_stkAddBusy=false;showToast('Could not look up the price — enter the units instead');return;}
+    _stkAddBusy=false;
+  }
   stkEnsure();
   var pie=stkTargetPie();
   var ex=alState.stocks.find(function(h){return h.pie===pie&&h.sym===sym;});
-  var h=ex;
+  var h=ex,nm=(_stkPick&&_stkPick.sym===sym)?_stkPick.name:'';
   if(ex){ // merge into the existing position (weighted average cost)
     var tc=(ex.avgCost>0?ex.units*ex.avgCost:0)+(cost>0?units*cost:0);
     ex.units=+(ex.units+units).toFixed(8);
     if(ex.avgCost>0&&cost>0)ex.avgCost=tc/ex.units;else if(cost>0&&!(ex.avgCost>0))ex.avgCost=cost;
+    if(!ex.name&&nm)ex.name=nm;
   } else {
-    h={id:Date.now(),pie:pie,sym:sym,name:'',units:units,avgCost:cost>0?cost:0,price:0};
+    h={id:Date.now(),pie:pie,sym:sym,name:nm,units:units,avgCost:cost>0?cost:0,price:0};
     alState.stocks.push(h);
   }
-  ['stk-sym','stk-units','stk-cost'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  _stkPick=null;
+  ['stk-sym','stk-units','stk-amt','stk-cost'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  var bx=document.getElementById('stk-suggest');if(bx)bx.style.display='none';
   stkSave();
-  showToast(sym+' added');
+  showToast((nm||sym)+' added'+(amt>0&&!(parseFloat((document.getElementById('stk-units')||{}).value)>0)?' · '+units+' units':''));
   stkRefresh(true);
 }
 function stkSet(id,field,val){

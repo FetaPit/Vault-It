@@ -1,6 +1,7 @@
 // stock-quotes — read-only live price lookup for Vault·It's Stocks & Funds tab.
 // Body: { symbols: ["VUSA.L", "AAPL", ...] }  →  { quotes: { "AAPL": { price, currency, name, changePct } } }
 // History:  { history: { symbols: [...], range: '1mo'|'3mo'|'6mo'|'1y'|'5y'|'max' } } → { series: { SYM: { currency, t: [unix…], c: [close…] } } }
+// Search:   { search: 'blockchain etf' | 'IE00BYZK4552' | 'VUSA' } → { results: [{ symbol, name, exchange, type }] }   (shares, ETFs and funds)
 // Deployed with --no-verify-jwt (the app calls it with the public anon key). Max 30 symbols per call.
 
 const CORS = {
@@ -58,19 +59,38 @@ async function history(sym: string, range: string) {
   } catch { return null }
 }
 
+async function search(q: string) {
+  try {
+    const r = await fetch(
+      `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=10&newsCount=0&listsCount=0`,
+      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; VaultIt/1.0)', 'Accept': 'application/json' } },
+    )
+    if (!r.ok) return []
+    const j = await r.json()
+    return (j?.quotes ?? [])
+      .filter((x: any) => ['EQUITY', 'ETF', 'MUTUALFUND'].includes(x.quoteType))
+      .slice(0, 8)
+      .map((x: any) => ({ symbol: String(x.symbol), name: String(x.longname ?? x.shortname ?? x.symbol), exchange: String(x.exchDisp ?? x.exchange ?? ''), type: String(x.quoteType) }))
+  } catch { return [] }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
 
   let symbols: string[] = []
   let hist: { symbols?: unknown; range?: unknown } | null = null
+  let q = ''
   try {
     const body = await req.json()
     symbols = Array.isArray(body?.symbols) ? body.symbols : []
     hist = body?.history && typeof body.history === 'object' ? body.history : null
+    q = typeof body?.search === 'string' ? body.search.trim().slice(0, 60) : ''
   } catch {
     return json({ error: 'Invalid request body' }, 400)
   }
+
+  if (q) return json({ results: q.length >= 2 ? await search(q) : [] })
 
   if (hist) {
     const range = RANGES[String(hist.range)] ? String(hist.range) : '6mo'
