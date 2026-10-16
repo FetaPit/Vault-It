@@ -4262,6 +4262,7 @@ button.bd-ic{cursor:pointer}
           <div class="stk-hd">
             <span>Holdings</span>
             <span class="stk-actions">
+              <button class="stk-btn" onclick="stkFocusAdd()" title="Search for a fund, ETF or share by name or ISIN and add it to this pie">＋ Add fund / share</button>
               <button class="stk-btn" onclick="stkRefresh(false)" title="Fetch the latest prices">↻ Refresh prices</button>
               <button class="stk-btn" onclick="stkShotStart()" title="Upload screenshots of your pie or portfolio — no platform connection needed">📷 Import screenshots</button>
               <button class="stk-btn" onclick="document.getElementById('stk-csv').click()" title="Import holdings from a CSV (Trading 212 history export or ticker,units,avg cost)">⇪ Import CSV</button>
@@ -9830,6 +9831,7 @@ function stkDeletePie(){
 
 // ── add / edit / remove ──
 function stkTargetPie(){stkEnsure();return alState.activePie==='all'?alState.stockPies[0].id:alState.activePie;}
+function stkFocusAdd(){var r=document.querySelector('#assets-stocks .stk-add'),i=document.getElementById('stk-sym');if(r)r.scrollIntoView({behavior:'smooth',block:'center'});if(i)setTimeout(function(){i.focus();},350);}
 var _stkPick=null,_stkSugT=null,_stkSugCache={},_stkSugList=[],_stkAddBusy=false;
 function stkSuggest(q){
   q=String(q||'').trim();var box=document.getElementById('stk-suggest');if(!box)return;

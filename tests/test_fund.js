@@ -10,6 +10,8 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
       if(o.body.history)return{data:{series:{}},error:null};
       const q={};(o.body.symbols||[]).forEach(x=>{q[x]={price:x==='BCHN.L'?1124:100,currency:x==='BCHN.L'?'GBp':'GBP',name:x,changePct:0};});return{data:{quotes:q},error:null};}}};
     showTab('assets');showSubtab('assets','stocks',null);});
+  await page.click('button:has-text("Add fund / share")'); await page.waitForTimeout(600);
+  ok(await page.evaluate(()=>document.activeElement&&document.activeElement.id==='stk-sym'),'the Add fund / share button jumps to the search box and focuses it');
   await page.fill('#stk-sym','blockchain'); await page.waitForSelector('#stk-suggest div',{timeout:4000});
   const sug=await page.innerText('#stk-suggest'); console.log(sug.replace(/\n+/g,' | '));
   ok(/iShares Blockchain Technology UCITS ETF/.test(sug)&&/BCHN\.L · London · ETF/.test(sug)&&/fund/.test(sug),'typing a name suggests matching funds / ETFs / shares with type');
