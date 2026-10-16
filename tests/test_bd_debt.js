@@ -25,6 +25,15 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   const h1=await p.evaluate(()=>({h:document.querySelector('.bd-tile[data-g="ce"] .bd-tile-body').getBoundingClientRect().height,saved:localStorage.getItem('vi_bd_fold')}));
   ok(h0>20&&h1.h===0&&/ce/.test(h1.saved),'a tile collapses and remembers it'); await p.evaluate(()=>bdFoldAll(false));
   await p.evaluate(()=>bdFoldAll(true)); ok(await p.evaluate(()=>[...document.querySelectorAll('.bd-tile.folded')].length)===6,'collapse all'); await p.evaluate(()=>bdFoldAll(false));
+  // tiles in a row share a height; quick-add fills the spare room; "give every pound a job" copy is gone
+  const th=await p.evaluate(()=>{const t=[...document.querySelectorAll('.bd-tile')].map(x=>Math.round(x.getBoundingClientRect().height));return{rows:[[t[0],t[1]],[t[2],t[3]],[t[4],t[5]]],qa:document.querySelectorAll('.bd-qa').length,txt:/give every pound|give it a job/i.test(document.getElementById('tab-budget').innerText),line:getComputedStyle(document.querySelector('.bd-split'),'::before').borderLeftStyle+' '+getComputedStyle(document.querySelector('.bd-split'),'::before').borderLeftColor}});
+  console.log(JSON.stringify(th));
+  ok(th.rows.every(r=>Math.abs(r[0]-r[1])<=1),'tiles side by side have equal heights (no empty space beside the shorter one)');
+  ok(th.qa===6,'every tile has a quick-add in its spare room'); ok(!th.txt,'"give every pound a job" copy removed');
+  ok(/dashed/.test(th.line)&&/62, 207, 142|rgb\(62/.test(th.line),'divider is dashed and income-green ('+th.line+')');
+  await p.fill('#bd-qa-n-vn','Cinema'); await p.fill('#bd-qa-a-vn','12'); await p.evaluate(()=>bdQuickAdd('vn')); await p.waitForTimeout(300);
+  ok(await p.evaluate(()=>(ovState.expenses||[]).some(e=>e.name==='Cinema'&&e.type==='vn'&&e.amount===12)),'quick-add puts the line in that tile\'s type');
+  ok(await p.evaluate(()=>document.querySelectorAll('#bd-per100 .bd-p100-row').length>=4),'"every £100 of income" fills the income column');
   // ---- debt
   await p.evaluate(()=>showTab('debt')); await p.waitForTimeout(1200);
   const d=await p.evaluate(()=>{const pal=debtState.debts.map(x=>debtPalette(x));return{pal:pal.map(x=>x.c1),brand:[ccBrand(debtState.debts[0])&&ccBrand(debtState.debts[0]).g[0],ccBrand(debtState.debts[1])&&ccBrand(debtState.debts[1]).g[0],ccBrand(debtState.debts[2])&&ccBrand(debtState.debts[2]).g[0]],h:document.getElementById('debt-bar-chart').getBoundingClientRect().height};});
