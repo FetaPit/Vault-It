@@ -714,7 +714,9 @@ body::before {
 .cc3-body.drag{transition:none}
 .cc3-face{position:absolute;inset:0;border-radius:3.7cqw;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 1cqw 3cqw rgba(0,0,0,.45)}
 .cc3-front{transform:translateZ(.45cqw)}
-.cc3-back{transform:rotateY(180deg) translateZ(.45cqw);background:linear-gradient(135deg,#2b3138,#12161a);color:#dfe8ea}
+.cc3-back{transform:rotateY(180deg) translateZ(.45cqw);color:#dfe8ea;background:none!important;overflow:visible;box-shadow:none;border-radius:0}
+.cc3-bbase,.cc3-bpiece{background:linear-gradient(135deg,#2b3138,#12161a)}
+.cc3-bpiece{background:linear-gradient(135deg,#6a7076,#4a4f55);filter:grayscale(1) brightness(.75);transform:translate(-.8cqw,.5cqw) rotate(-1.1deg);transform-origin:0 100%;box-shadow:none}
 .cc3-edge{position:absolute;background:linear-gradient(#cfd3d6,#8c9296)}
 .cc3-e-t,.cc3-e-b{left:3.7cqw;right:3.7cqw;height:.9cqw}
 .cc3-e-t{top:-.45cqw;transform:rotateX(90deg)}
@@ -749,6 +751,7 @@ body::before {
 .cc3-bk-info span{display:block;font-size:3cqw;opacity:.6;text-transform:uppercase;letter-spacing:.1em}
 .cc3-bk-info b{font-size:4.6cqw;font-weight:500}
 .cc3-back .cc3-net{bottom:8%}
+.cc3-bcl{border-left:.5cqw dashed rgba(255,255,255,.7)}
 
 /* the card is cut along its x axis as it is paid off */
 .cc3-front{background:none!important;overflow:visible;box-shadow:none;border-radius:0}
@@ -762,7 +765,6 @@ body::before {
 .cc3-scis.snip .cc3-bl.b{animation:ccSnipB .5s ease-in-out infinite}
 @keyframes ccSnipA{0%,100%{transform:rotate(0)}50%{transform:rotate(-13deg)}}
 @keyframes ccSnipB{0%,100%{transform:rotate(0)}50%{transform:rotate(13deg)}}
-.cc3-bk-cut{position:absolute;top:0;right:0;bottom:0;background:rgba(150,150,150,.55);mix-blend-mode:saturation;border-left:.4cqw dashed rgba(255,255,255,.5);pointer-events:none}
 .cc3-pct{z-index:5}
 .cc3-gloss{z-index:2}
 
@@ -12290,10 +12292,14 @@ function cc3dHTML(d,pctNum,shown){
     +'<div class="cc3-scis" aria-hidden="true"><svg viewBox="-12 -14 24 32"><g class="cc3-bl a"><path d="M0 0 L-2.600 15 L-.8 15.500 L1.200 0Z" fill="#dfe6ea" stroke="#6b7780" stroke-width=".5"/><circle cx="-5.500" cy="-9" r="3.600" fill="none" stroke="#e05c5c" stroke-width="2"/><path d="M-4 -6.500 L0 0" stroke="#6b7780" stroke-width="1.400"/></g><g class="cc3-bl b"><path d="M0 0 L2.600 15 L.8 15.500 L-1.200 0Z" fill="#dfe6ea" stroke="#6b7780" stroke-width=".5"/><circle cx="5.500" cy="-9" r="3.600" fill="none" stroke="#e05c5c" stroke-width="2"/><path d="M4 -6.500 L0 0" stroke="#6b7780" stroke-width="1.400"/></g><circle r="1.200" fill="#6b7780"/></svg></div>'
     +(pctNum>0?'<div class="cc3-pct">'+pctNum+'% paid</div>':'')
     +'<div class="cc3-gloss"></div></div>';
+  var binner='<div class="cc3-stripe"></div><div class="cc3-sig"><span>Authorised signature</span><b>•••</b></div>'
+    +'<div class="cc3-bk-info"><div><span>Owed</span><b>'+bal+'</b></div><div><span>Rate</span><b>'+apr+'</b></div><div><span>Min</span><b>'+minp+'/mo</b></div></div>'+ccNetMark(net);
+  // seen from behind the x axis is mirrored, so the cut-off (paid) part is on the left of the back
   var back='<div class="cc3-face cc3-back">'
-    +'<div class="cc3-stripe"></div><div class="cc3-sig"><span>Authorised signature</span><b>•••</b></div>'
-    +'<div class="cc3-bk-info"><div><span>Owed</span><b>'+bal+'</b></div><div><span>Rate</span><b>'+apr+'</b></div><div><span>Min</span><b>'+minp+'/mo</b></div></div>'
-    +ccNetMark(net)+(pctNum>0?'<div class="cc3-bk-cut" style="width:'+Math.min(100,pctNum)+'%"></div>':'')+'<div class="cc3-gloss"></div></div>';
+    +'<div class="cc3-lay cc3-bbase" style="clip-path:inset(0 0 0 '+P+'%)">'+binner+'</div>'
+    +'<div class="cc3-lay cc3-bpiece" style="clip-path:inset(0 '+(100-P)+'% 0 0)">'+binner+'</div>'
+    +(P>0&&P<100?'<div class="cc3-cutline cc3-bcl" style="left:'+P+'%"></div>':'')
+    +'<div class="cc3-gloss"></div></div>';
   return '<div class="cc3" data-id="'+d.id+'" data-from="'+shown+'" data-to="'+pctNum+'" role="img" aria-label="'+ccEsc(d.name)+' credit card — drag to rotate, double-click to flip">'
     +'<div class="cc3-body" style="--ry:-16deg;--rx:6deg">'+f+back
     +'<div class="cc3-edge cc3-e-t"></div><div class="cc3-edge cc3-e-b"></div><div class="cc3-edge cc3-e-l"></div><div class="cc3-edge cc3-e-r"></div></div></div>';
@@ -12395,7 +12401,9 @@ function ccCut(c,a,b,instant){
   var id=c.getAttribute('data-id');_ccPct[id]=b;
   var base=c.querySelector('.cc3-base'),piece=c.querySelector('.cc3-piece'),olds=c.querySelector('.cc3-cl-old'),nw=c.querySelector('.cc3-cl-new'),sc=c.querySelector('.cc3-scis');
   if(!base||!piece)return;
-  var fin=function(){base.style.clipPath='inset(0 '+b+'% 0 0)';piece.style.clipPath='inset(0 0 0 '+(100-b)+'%)';
+  var bb=c.querySelector('.cc3-bbase'),bp=c.querySelector('.cc3-bpiece'),bcl=c.querySelector('.cc3-bcl');
+  var bclip=function(P){if(bb)bb.style.clipPath='inset(0 0 0 '+P+'%)';if(bp)bp.style.clipPath='inset(0 '+(100-P)+'% 0 0)';if(bcl){bcl.style.display=(P>0&&P<100)?'':'none';bcl.style.left=P+'%';}};
+  var fin=function(){bclip(b);base.style.clipPath='inset(0 '+b+'% 0 0)';piece.style.clipPath='inset(0 0 0 '+(100-b)+'%)';
     if(olds)olds.style.display='none';if(nw){nw.style.display=(b>0&&b<100)?'':'none';nw.style.left=(100-b)+'%';nw.style.opacity='1';}if(sc)sc.style.opacity='0';c.setAttribute('data-from',b);c._ccBusy=false;};
   if(instant){fin();return;}
   c._ccBusy=true;
@@ -12405,7 +12413,8 @@ function ccCut(c,a,b,instant){
     var pa=piece.animate([{clipPath:'inset(0 0 0 '+(100-a)+'%)'},{clipPath:'inset(0 0 0 '+(100-b)+'%)'}],o);
     if(olds)olds.animate([{opacity:1},{opacity:0}],{duration:T2*.6,fill:'forwards'});
     if(nw&&b>0&&b<100){nw.style.display='';nw.style.left=(100-b)+'%';nw.animate([{opacity:b>a?1:0},{opacity:1}],{duration:T2*.4,fill:'forwards'});}
-    pa.onfinish=function(){try{base.getAnimations().forEach(function(x){x.cancel();});piece.getAnimations().forEach(function(x){x.cancel();});}catch(e){}fin();};
+    if(bb&&bp){bb.animate([{clipPath:'inset(0 0 0 '+a+'%)'},{clipPath:'inset(0 0 0 '+b+'%)'}],o);bp.animate([{clipPath:'inset(0 '+(100-a)+'% 0 0)'},{clipPath:'inset(0 '+(100-b)+'% 0 0)'}],o);}
+    pa.onfinish=function(){try{[bb,bp].forEach(function(e){if(e)e.getAnimations().forEach(function(x){x.cancel();});});base.getAnimations().forEach(function(x){x.cancel();});piece.getAnimations().forEach(function(x){x.cancel();});}catch(e){}fin();};
   };
   if(b>a&&b<100&&sc&&nw){   // cutting: scissors snip down the new cut line, drawing it as they go
     sc.style.left=(100-b)+'%';nw.style.display='';nw.style.left=(100-b)+'%';

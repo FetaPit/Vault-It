@@ -19,6 +19,12 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   ok(/inset\(0px 45%|inset\(0 45%|45%/.test(c3.cs),'55% left in colour, 45% cut: '+c3.cs);
   const ct=await page.evaluate(()=>getComputedStyle(document.querySelector('.cc3[data-id="1"] .cc3-piece')).filter);
   ok(/grayscale/.test(ct),'cut-off part is greyed');
+  // the reverse is cut/greyed too (mirrored: paid part on the left of the back)
+  const back=await page.evaluate(()=>{const b=document.querySelector('.cc3[data-id="1"] .cc3-bbase'),p=document.querySelector('.cc3[data-id="1"] .cc3-bpiece');return{b:getComputedStyle(b).clipPath,p:getComputedStyle(p).clipPath,f:getComputedStyle(p).filter};});
+  console.log('back',JSON.stringify(back));
+  ok(/45%/.test(back.b)&&/55%/.test(back.p)&&/grayscale/.test(back.f),'back: 55% in colour, 45% cut and greyed (mirrored)');
+  await page.evaluate(()=>ccFlipId(1)); await page.waitForTimeout(1400); await page.locator('.cc3[data-id="1"]').screenshot({path:'shots/cut_back.png'});
+  await page.evaluate(()=>ccFlipId(1)); await page.waitForTimeout(700);
   // pay £200 → 55% paid; undo → back to 45
   await page.fill('#debt-pay-inp-1','200'); await page.evaluate(()=>makePayment(1)); await page.waitForTimeout(500);
   let d=await page.evaluate(()=>debtState.debts.find(x=>x.id===1)); ok(d.balance===900&&d.payments.length===1,'payment recorded (balance £900)');
