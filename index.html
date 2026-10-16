@@ -2641,6 +2641,29 @@ input:focus, textarea:focus, select:focus {
 .stk-pie span{font-family:'Share Tech Mono',monospace;font-weight:400;color:var(--t3);font-size:.5rem}
 .stk-pie.on{background:rgba(155,126,200,.16);border-color:#9b7ec8;color:#d9c9f2}
 .stk-pie.add{border-style:dashed;color:var(--em)}
+
+/* ── House Builder levels ── */
+.hb-levels{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:-18px 0 22px}
+.hb-lv{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:99px;border:1px solid rgba(68,192,185,.25);background:rgba(4,12,24,.7);color:#8fb4b1;font-family:'Syne',sans-serif;font-weight:700;font-size:.58rem;letter-spacing:.04em;cursor:pointer}
+.hb-lv b{font-family:'Share Tech Mono',monospace;font-weight:400;opacity:.7}
+.hb-lv.on{border-color:#c9a84c;color:#f1d98b;background:rgba(201,168,76,.12);box-shadow:0 0 14px rgba(201,168,76,.18)}
+.hb-lv.done{border-color:rgba(62,207,142,.5);color:#3ecf8e}
+.hb-lv.lock{opacity:.45;cursor:not-allowed}
+.hb-xp{height:8px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;margin:8px 0 6px}
+.hb-xp>div{height:100%;border-radius:99px;background:linear-gradient(90deg,#44c0b9,#c9a84c);transition:width .5s}
+.hb-st{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+.hb-st div{background:rgba(255,255,255,.04);border-radius:5px;padding:7px 6px;text-align:center}
+.hb-st b{display:block;font-family:'Share Tech Mono',monospace;font-size:.7rem;color:#e8f0ef}
+.hb-st span{font-size:.4rem;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.hb-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.hb-bd{font-family:'Share Tech Mono',monospace;font-size:.46rem;padding:4px 8px;border-radius:99px;border:1px dashed rgba(255,255,255,.18);color:var(--t3)}
+.hb-bd.got{border:1px solid #c9a84c;color:#f1d98b;background:rgba(201,168,76,.1)}
+.hb-tip{margin-top:12px;padding:10px 12px;border:1px solid rgba(68,192,185,.3);border-radius:8px;background:rgba(68,192,185,.06);font-size:.54rem;line-height:1.55;color:var(--t2)}
+.hb-tip table{width:100%;border-collapse:collapse;margin-top:6px;font-family:'Share Tech Mono',monospace;font-size:.5rem}
+.hb-tip td{padding:3px 4px;border-top:1px solid rgba(255,255,255,.06)}
+.hb-tip td:last-child{text-align:right;color:#f1d98b}
+@media(max-width:560px){.hb-st{grid-template-columns:repeat(2,1fr)}}
+
 .stk-pie{position:relative}
 .stk-pie:has(.stk-plat){padding-right:24px}
 .stk-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;font-size:.44rem;color:var(--t3)}
@@ -3871,6 +3894,7 @@ button.bd-ic{cursor:pointer}
     <h1 style="font-family:'Syne',sans-serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:800;color:#e8f0ef;letter-spacing:-.02em">Build Your <span style="color:#44c0b9">Dream Home</span></h1>
     <div style="font-family:'Share Tech Mono',monospace;font-size:.72rem;color:#5a8888;opacity:.7;margin-top:5px;letter-spacing:.08em">Every pound saved builds your future</div>
   </header>
+  <div id="hb-levels" class="hb-levels"></div>
   <div class="grid">
     <div class="scene-card" id="houseSceneCard">
       <div class="scene-lbl" id="sceneLabel" style="display:none"></div>
@@ -3949,6 +3973,7 @@ button.bd-ic{cursor:pointer}
       </div>
     </div>
     <div class="panel">
+      <div class="card" id="hb-hud"></div>
       <div class="card">
         <div class="card-lbl">House Type</div>
         <div class="htypes" id="htypes">
@@ -3963,6 +3988,11 @@ button.bd-ic{cursor:pointer}
           <label>Set Price</label>
           <div class="price-iw"><span class="sym">£</span><input type="number" id="priceInput" placeholder="e.g. 250000" min="1000" step="1000"></div>
           <button class="btn-sp" id="btnSP">Update</button>
+        </div>
+        <div class="price-edit-row" style="margin-top:8px">
+          <label>Deposit target</label>
+          <div class="price-iw"><input type="number" id="depositPctInput" min="1" max="60" step="1" value="20" onchange="hbSetDepositPct(this.value)"><span class="sym" style="border-right:none;border-left:1px solid rgba(255,255,255,.08)">%</span></div>
+          <span id="depositPctAmt" style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--go)"></span>
         </div>
         <!-- Floor selector for flat/apartment -->
         <div id="floor-selector-card" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(68,192,185,.05);border:1px solid rgba(68,192,185,.18);border-radius:8px">
@@ -6298,8 +6328,10 @@ function showToast(msg) {
 const DEFAULTS={terraced:200000,semi:320000,detached:500000,mansion:1500000,flat:80000,apartment:300000};
 let state={saved:0,target:200000,houseType:'terraced',deposits:[],prices:{...DEFAULTS},apartmentFloor:5};
 try{const s=localStorage.getItem('ht3');if(s){const p=JSON.parse(s);state={...state,...p};state.prices={...DEFAULTS,...(p.prices||{})};if(!state.apartmentFloor)state.apartmentFloor=5;}}catch(e){}
+if(!(state.depositPct>0))state.depositPct=20;   // Level 1: deposit target as % of the first property's value (default 20%)
 function save(){try{localStorage.setItem('ht3',JSON.stringify(state));}catch(e){}}
-function pct(){return Math.min(state.saved/state.target,1);}
+function depositTarget(){return Math.max(1,(+state.target||0)*((+state.depositPct||20)/100));}
+function pct(){return Math.min(state.saved/depositTarget(),1);}
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -7171,9 +7203,9 @@ function updateUI(){
   document.getElementById('pbarFill').style.width=(p*100)+'%';
   document.getElementById('ppct').textContent=(p*100).toFixed(1)+'%';
   document.getElementById('savedAmt').textContent=gbpFmt(state.saved);
-  document.getElementById('tgtAmt').textContent='of '+gbpFmt(state.target);
-  document.getElementById('stRemain').textContent=gbpFmt(Math.max(0,state.target-state.saved));
-  document.getElementById('stDeposit').textContent=gbpFmt(state.target*.10);
+  document.getElementById('tgtAmt').textContent='of '+gbpFmt(depositTarget())+' deposit ('+state.depositPct+'% of '+gbpFmt(state.target)+')';
+  document.getElementById('stRemain').textContent=gbpFmt(Math.max(0,depositTarget()-state.saved));
+  document.getElementById('stDeposit').textContent=gbpFmt(depositTarget());
   [{id:'ms1',t:.01},{id:'ms5',t:.05},{id:'ms15',t:.15},{id:'ms30',t:.30},{id:'ms50',t:.50},{id:'ms65',t:.65},{id:'ms80',t:.80},{id:'ms90',t:.90},{id:'ms95',t:.95},{id:'ms100',t:1}].forEach(m=>{const el=document.getElementById(m.id);if(el)el.classList.toggle('hit',p>=m.t);});
   const cap=document.getElementById('sceneCap');
   var purchasedBanner=document.getElementById('house-purchased-banner');
@@ -7210,10 +7242,12 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function markHousePurchased(){
   state.houseMode='purchased';
   state.mortgageActive=true;
-  // Estimate mortgage balance as 90% of target (10% deposit assumption)
+  // Loan = price − the deposit actually saved (not a fixed 90%)
   if(!state.mortgageBalance||state.mortgageBalance<=0){
-    state.mortgageBalance=Math.round(state.target*0.9);
+    state.mortgageBalance=Math.max(0,Math.round(state.target-state.saved));
   }
+  state.purchase={price:state.target,deposit:Math.round(state.saved),date:new Date().toISOString().slice(0,10)};
+  state.valuation=state.target;
   save();
   toast('🏠 Congratulations — welcome home!');
   updateUI();
@@ -7457,6 +7491,104 @@ const MS_LABELS={
 };
 const MS_IDS=['1','5','15','30','50','65','80','90','95','100'];
 const MS_PCTS=[1,5,15,30,50,65,80,90,95,100];
+
+// ═══════════════════════════════════════════════════════════════
+// HOUSE BUILDER — LEVELS, GHOST BUILD, GAMIFICATION
+// L1 First Deposit (ghost) → L2 Delete the Mortgage → L3 Upgrade
+// ═══════════════════════════════════════════════════════════════
+var HB_LEVELS=[{n:1,name:'First Deposit',ic:'🧱'},{n:2,name:'Delete the Mortgage',ic:'🏠'},{n:3,name:'Upgrade',ic:'🚀'}];
+var HB_BADGES=[[.01,'Site cleared'],[.05,'Foundations'],[.10,'10%'],[.25,'Quarter'],[.50,'Halfway'],[.75,'Three-quarters'],[1,'Deposit ready']];
+function hbLevel(){if(state.houseMode==='purchased')return state.level3?3:2;return 1;}
+function hbView(){var v=+state.viewLevel,c=hbLevel();return(v>=1&&v<=c)?v:c;}
+function hbSetView(n){if(n>hbLevel()){toast('Finish Level '+(n-1)+' to unlock Level '+n);return;}state.viewLevel=n;save();updateUI();}
+function hbSetDepositPct(v){
+  v=parseFloat(v);var inp=document.getElementById('depositPctInput');
+  if(!(v>=1&&v<=60)){toast('Choose a deposit between 1% and 60%');if(inp)inp.value=state.depositPct;return;}
+  state.depositPct=Math.round(v*10)/10;save();updateUI();
+  toast('Deposit target: '+state.depositPct+'% = '+gbpFmt(depositTarget()));
+}
+function hbXP(){return (state.deposits||[]).length*20+Math.floor((state.saved||0)/100)+(state.houseMode==='purchased'?500:0);}
+function hbStreak(){var el=document.getElementById('habit-streak-label');return el?(parseInt(String(el.textContent).replace(/\D/g,''))||0):0;}
+// money the Budget could put towards the house: unassigned £ + what is already assigned to savings/investing
+function hbBudget(){
+  try{
+    var s=bdState(),m=s.m;
+    return{unassigned:Math.max(0,Math.round(s.left*100)/100),saving:Math.round((cfSum(m.by.sv||[])+cfSum(m.by.iv||[]))*100)/100,income:m.tIn};
+  }catch(e){return{unassigned:0,saving:0,income:0};}
+}
+function hbMonthsTo(rem,monthly){if(rem<=0)return 0;if(!(monthly>0))return null;return Math.ceil(rem/monthly);}
+function hbMonthsTxt(n){if(n===null)return '—';if(n===0)return 'done';var d=new Date();d.setMonth(d.getMonth()+n);return n+' mo · '+d.toLocaleDateString('en-GB',{month:'short',year:'numeric'});}
+function hbUseMonthly(v){state.monthly=Math.max(0,Math.round(v));save();updateUI();toast('Plan set to '+gbpFmt(state.monthly)+' a month');}
+
+function hbRenderLevels(){
+  var el=document.getElementById('hb-levels');if(!el)return;
+  var cur=hbLevel(),view=hbView();
+  el.innerHTML=HB_LEVELS.map(function(l){
+    var cls='hb-lv'+(l.n===view?' on':'')+(l.n<cur?' done':'')+(l.n>cur?' lock':'');
+    return '<button class="'+cls+'" onclick="hbSetView('+l.n+')" title="'+(l.n>cur?'Locked — finish Level '+(l.n-1):'')+'"><span>'+(l.n>cur?'🔒':l.ic)+'</span>Level '+l.n+' · '+l.name+(l.n<cur?' <b>✓</b>':'')+'</button>';
+  }).join('');
+}
+function hbRenderHUD(){
+  var el=document.getElementById('hb-hud');if(!el)return;
+  var view=hbView(),p=pct(),dt=depositTarget(),rem=Math.max(0,dt-(state.saved||0)),perBrick=dt/1000;
+  var inp=document.getElementById('depositPctInput');if(inp&&document.activeElement!==inp)inp.value=state.depositPct;
+  var amt=document.getElementById('depositPctAmt');if(amt)amt.textContent='= '+gbpFmt(dt);
+  var sl=document.querySelector('#stDeposit');if(sl&&sl.nextElementSibling)sl.nextElementSibling.textContent=state.depositPct+'% Deposit';
+  if(view===1){
+    var got=HB_BADGES.filter(function(b){return p>=b[0];}).length;
+    var bud=hbBudget(),cur=+state.monthly>0?+state.monthly:0;
+    var rows='',tip='';
+    if(rem>0&&(bud.unassigned>0||bud.saving>0)){
+      var sc=[['Right now',cur],['+ your £'+Math.round(bud.unassigned).toLocaleString('en-GB')+' unassigned',cur+bud.unassigned],['+ unassigned + £'+Math.round(bud.saving).toLocaleString('en-GB')+' already saving',cur+bud.unassigned+bud.saving]];
+      if(bud.saving<=0)sc.pop();
+      rows=sc.map(function(r){return '<tr><td>'+r[0]+' ('+gbpFmt(r[1])+'/mo)</td><td>'+hbMonthsTxt(hbMonthsTo(rem,r[1]))+'</td></tr>';}).join('');
+      tip='<div class="hb-tip">💡 <b>What your Budget could do for this deposit</b><br>You have <b>'+gbpFmt(bud.unassigned)+'</b> a month unassigned and <b>'+gbpFmt(bud.saving)+'</b> a month assigned to saving/investing. Time to reach your '+gbpFmt(dt)+' deposit:<table>'+rows+'</table>'
+        +'<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+(bud.unassigned>0?'<button class="stk-btn" onclick="hbUseMonthly('+Math.round(cur+bud.unassigned)+')">Plan with +'+gbpFmt(bud.unassigned)+'</button>':'')+(bud.saving>0&&bud.unassigned>0?'<button class="stk-btn" onclick="hbUseMonthly('+Math.round(cur+bud.unassigned+bud.saving)+')">Plan with all '+gbpFmt(bud.unassigned+bud.saving)+'</button>':'')+'</div></div>';
+    }
+    el.innerHTML='<div class="card-lbl">LEVEL 1 · FIRST DEPOSIT <span style="opacity:.6">· ghost build</span></div>'
+      +'<div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:#e8f0ef"><span>'+gbpFmt(state.saved||0)+' saved</span><span>'+(p*100).toFixed(1)+'% of '+gbpFmt(dt)+'</span></div>'
+      +'<div class="hb-xp"><div style="width:'+(p*100).toFixed(1)+'%"></div></div>'
+      +'<div style="font-size:.5rem;color:var(--t3)">Your house is shown in <b style="color:var(--em)">ghost</b> form — each deposit lays more bricks until the full '+state.depositPct+'% deposit is funded.</div>'
+      +'<div class="hb-st"><div><b>'+Math.floor((state.saved||0)/perBrick).toLocaleString('en-GB')+'</b><span>of 1,000 bricks</span></div><div><b>'+gbpFmt(rem)+'</b><span>to go</span></div><div><b>'+hbXP().toLocaleString('en-GB')+'</b><span>XP</span></div><div><b>'+hbStreak()+'🔥</b><span>streak</span></div></div>'
+      +'<div style="font-size:.46rem;color:var(--t3)">Each brick = '+gbpFmt(perBrick)+'</div>'
+      +'<div class="hb-badges">'+HB_BADGES.map(function(b,i){return '<span class="hb-bd'+(p>=b[0]?' got':'')+'">'+(p>=b[0]?'🏅 ':'')+(b[0]*100)+'% · '+b[1]+'</span>';}).join('')+'</div>'
+      +tip;
+  } else if(view===2){
+    hbRenderL2(el);
+  } else {
+    hbRenderL3(el);
+  }
+  hbBadgeToasts(p);
+}
+function hbBadgeToasts(p){
+  var g=state.gam=state.gam||{seen:null};
+  var now=HB_BADGES.filter(function(b){return p>=b[0];}).map(function(b){return b[1];});
+  if(g.seen===null){g.seen=now;save();return;}   // first run: no toast spam for what is already earned
+  now.forEach(function(n){if(g.seen.indexOf(n)<0){g.seen.push(n);toast('🏅 Badge unlocked: '+n+'!');save();}});
+}
+// L2 / L3 panels are filled in by the mortgage engine
+function hbRenderL2(el){el.innerHTML='<div class="card-lbl">LEVEL 2 · DELETE THE MORTGAGE</div><div style="font-size:.56rem;color:var(--t2)">Balance '+gbpFmt(state.mortgageBalance||0)+' · equity '+gbpFmt(Math.max(0,(state.valuation||state.target||0)-(state.mortgageBalance||0)))+'</div>';}
+function hbRenderL3(el){el.innerHTML='<div class="card-lbl">LEVEL 3 · UPGRADE</div><div style="font-size:.56rem;color:var(--t2)">Plan your second property.</div>';}
+
+// ghost build: Level 1 draws the whole house translucent; solid bricks arrive in Level 2
+function hbGhostWrap(){
+  if(S.querySelector('#hb-ghost'))return;
+  var g=E('g',{id:'hb-ghost',opacity:'.58'});g.style.filter='drop-shadow(0 0 3px rgba(68,192,185,.5))';
+  Array.prototype.slice.call(S.childNodes).forEach(function(n){
+    if(n.nodeName==='defs'||(n.nodeName==='rect'&&n.getAttribute('width')==='700'))return;
+    g.appendChild(n);
+  });
+  S.appendChild(g);
+}
+(function(){
+  var _r=redraw;redraw=function(){_r.apply(this,arguments);try{hbAfterDraw();}catch(e){console.error('[Vault-It] hbAfterDraw',e);}};
+  var _u=updateUI;updateUI=function(){_u.apply(this,arguments);try{hbRenderLevels();hbRenderHUD();}catch(e){console.error('[Vault-It] hbRender',e);}};
+})();
+function hbAfterDraw(){
+  if(hbLevel()===1&&!(state.saved<=0&&(!state.deposits||!state.deposits.length)))hbGhostWrap();
+  else if(hbLevel()>=2&&typeof hbShadeEquity==='function')hbShadeEquity();
+}
+
 function updateMilestoneLabels(){
   const lbl=MS_LABELS[state.houseType]||MS_LABELS.terraced;
   MS_IDS.forEach((id,i)=>{
