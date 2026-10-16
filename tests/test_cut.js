@@ -35,6 +35,15 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   d=await page.evaluate(()=>debtState.debts.find(x=>x.id===1)); ok(d.balance===1100&&!d.payments,'undo restores £1,100 and removes the record');
   ok(/45%/.test((await clip()).cs),'cut shrinks back to 45%');
   ok(await page.locator('#debt-list-el button:has-text("Undo")').count()===0,'no undo button when nothing to undo');
+  // paying it off → ghost mode
+  await page.fill('#debt-pay-inp-2','500'); await page.evaluate(()=>makePayment(2)); await page.waitForTimeout(1000);
+  await page.locator('.cc3[data-id="2"]').screenshot({path:'shots/ghost_a.png'});
+  await page.waitForTimeout(7500);
+  const g=await page.evaluate(()=>{const c=document.querySelector('.cc3[data-id="2"]');return{cls:c.className,op:getComputedStyle(c.querySelector('.cc3-piece')).opacity,stamp:getComputedStyle(c.querySelector('.cc3-stamp')).opacity,base:getComputedStyle(c.querySelector('.cc3-base')).clipPath};});
+  console.log('ghost',JSON.stringify(g)); await page.locator('.cc3[data-id="2"]').screenshot({path:'shots/ghost_b.png'});
+  ok(/cc3-ghost/.test(g.cls)&&+g.op<0.5&&+g.stamp>0.8,'fully paid card becomes a translucent ghost with a PAID OFF stamp');
+  await page.evaluate(()=>undoPayment(2)); await page.waitForTimeout(3500);
+  ok(!/cc3-ghost/.test(await page.evaluate(()=>document.querySelector('.cc3[data-id="2"]').className)),'undo brings the card back to solid');
   ok(errs.length===0,'no page errors');
   await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
 })();

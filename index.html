@@ -772,6 +772,14 @@ body::before {
 .debt-rank.done{background:rgba(62,207,142,.25);color:#3ecf8e}
 .debt-rank.sm{font-size:.5rem;vertical-align:middle}
 .debt-rank-note{font-size:.5rem;color:var(--t3);margin:0 0 10px;font-family:'Share Tech Mono',monospace}
+
+/* paid off: the card becomes a ghost, like the House Builder's ghost build */
+.cc3-piece,.cc3-bpiece{transition:filter 2s ease,opacity 2s ease,transform 2s ease,background-color 2s ease}
+.cc3-ghost .cc3-piece,.cc3-ghost .cc3-bpiece{filter:none;opacity:.34;transform:none;background:rgba(68,192,185,.07)!important;box-shadow:inset 0 0 0 .5cqw rgba(68,192,185,.85),0 0 3.5cqw rgba(68,192,185,.5)}
+.cc3-ghost .cc3-piece>*,.cc3-ghost .cc3-bpiece>*{filter:drop-shadow(0 0 .8cqw rgba(68,192,185,.6))}
+.cc3-stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg) scale(1.4);font:800 6.5cqw 'Syne',sans-serif;letter-spacing:.12em;color:#7ff0e8;border:.7cqw solid #7ff0e8;border-radius:2cqw;padding:1.2cqw 3cqw;opacity:0;text-shadow:0 0 2cqw rgba(68,192,185,.8);box-shadow:0 0 3cqw rgba(68,192,185,.5),inset 0 0 2cqw rgba(68,192,185,.3);z-index:5;pointer-events:none;transition:opacity 1.6s ease .6s,transform 1.6s cubic-bezier(.2,1.4,.3,1) .6s;white-space:nowrap}
+.cc3-ghost .cc3-stamp{opacity:.95;transform:translate(-50%,-50%) rotate(-8deg) scale(1)}
+.cc3-ghost .cc3-gloss{opacity:.4}
 .cc-tile-actions{display:flex;gap:4px}
 .debt-card-grid.has-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))}
 
@@ -12290,7 +12298,8 @@ function cc3dHTML(d,pctNum,shown){
     +(P>0&&P<100?'<div class="cc3-cutline cc3-cl-old" style="left:'+(100-P)+'%"></div>':'')
     +'<div class="cc3-cutline cc3-cl-new" style="left:'+(100-P)+'%;'+(P>0&&P<100?'display:none':'display:none')+'"></div>'
     +'<div class="cc3-scis" aria-hidden="true"><svg viewBox="-12 -14 24 32"><g class="cc3-bl a"><path d="M0 0 L-2.600 15 L-.8 15.500 L1.200 0Z" fill="#dfe6ea" stroke="#6b7780" stroke-width=".5"/><circle cx="-5.500" cy="-9" r="3.600" fill="none" stroke="#e05c5c" stroke-width="2"/><path d="M-4 -6.500 L0 0" stroke="#6b7780" stroke-width="1.400"/></g><g class="cc3-bl b"><path d="M0 0 L2.600 15 L.8 15.500 L-1.200 0Z" fill="#dfe6ea" stroke="#6b7780" stroke-width=".5"/><circle cx="5.500" cy="-9" r="3.600" fill="none" stroke="#e05c5c" stroke-width="2"/><path d="M4 -6.500 L0 0" stroke="#6b7780" stroke-width="1.400"/></g><circle r="1.200" fill="#6b7780"/></svg></div>'
-    +(pctNum>0?'<div class="cc3-pct">'+pctNum+'% paid</div>':'')
+    +(pctNum>0&&pctNum<100?'<div class="cc3-pct">'+pctNum+'% paid</div>':'')
+    +'<div class="cc3-stamp">PAID OFF ✓</div>'
     +'<div class="cc3-gloss"></div></div>';
   var binner='<div class="cc3-stripe"></div><div class="cc3-sig"><span>Authorised signature</span><b>•••</b></div>'
     +'<div class="cc3-bk-info"><div><span>Owed</span><b>'+bal+'</b></div><div><span>Rate</span><b>'+apr+'</b></div><div><span>Min</span><b>'+minp+'/mo</b></div></div>'+ccNetMark(net);
@@ -12300,7 +12309,7 @@ function cc3dHTML(d,pctNum,shown){
     +'<div class="cc3-lay cc3-bpiece" style="clip-path:inset(0 '+(100-P)+'% 0 0)">'+binner+'</div>'
     +(P>0&&P<100?'<div class="cc3-cutline cc3-bcl" style="left:'+P+'%"></div>':'')
     +'<div class="cc3-gloss"></div></div>';
-  return '<div class="cc3" data-id="'+d.id+'" data-from="'+shown+'" data-to="'+pctNum+'" role="img" aria-label="'+ccEsc(d.name)+' credit card — drag to rotate, double-click to flip">'
+  return '<div class="cc3'+(P>=100?' cc3-ghost':'')+'" data-id="'+d.id+'" data-from="'+shown+'" data-to="'+pctNum+'" role="img" aria-label="'+ccEsc(d.name)+' credit card — drag to rotate, double-click to flip">'
     +'<div class="cc3-body" style="--ry:-16deg;--rx:6deg">'+f+back
     +'<div class="cc3-edge cc3-e-t"></div><div class="cc3-edge cc3-e-b"></div><div class="cc3-edge cc3-e-l"></div><div class="cc3-edge cc3-e-r"></div></div></div>';
 }
@@ -12403,11 +12412,12 @@ function ccCut(c,a,b,instant){
   if(!base||!piece)return;
   var bb=c.querySelector('.cc3-bbase'),bp=c.querySelector('.cc3-bpiece'),bcl=c.querySelector('.cc3-bcl');
   var bclip=function(P){if(bb)bb.style.clipPath='inset(0 0 0 '+P+'%)';if(bp)bp.style.clipPath='inset(0 '+(100-P)+'% 0 0)';if(bcl){bcl.style.display=(P>0&&P<100)?'':'none';bcl.style.left=P+'%';}};
-  var fin=function(){bclip(b);base.style.clipPath='inset(0 '+b+'% 0 0)';piece.style.clipPath='inset(0 0 0 '+(100-b)+'%)';
+  var fin=function(){c.classList.toggle('cc3-ghost',b>=100);bclip(b);base.style.clipPath='inset(0 '+b+'% 0 0)';piece.style.clipPath='inset(0 0 0 '+(100-b)+'%)';
     if(olds)olds.style.display='none';if(nw){nw.style.display=(b>0&&b<100)?'':'none';nw.style.left=(100-b)+'%';nw.style.opacity='1';}if(sc)sc.style.opacity='0';c.setAttribute('data-from',b);c._ccBusy=false;};
   if(instant){fin();return;}
   c._ccBusy=true;
   var T1=3200,T2=2000,ease='cubic-bezier(.45,.05,.25,1)',phase2=function(){
+    c.classList.toggle('cc3-ghost',b>=100);
     var o={duration:T2,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'};
     base.animate([{clipPath:'inset(0 '+a+'% 0 0)'},{clipPath:'inset(0 '+b+'% 0 0)'}],o);
     var pa=piece.animate([{clipPath:'inset(0 0 0 '+(100-a)+'%)'},{clipPath:'inset(0 0 0 '+(100-b)+'%)'}],o);
