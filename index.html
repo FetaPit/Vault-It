@@ -2660,6 +2660,9 @@ input:focus, textarea:focus, select:focus {
 .stk-plat img{width:100%;height:100%;object-fit:contain;display:block}
 .stk-mono{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:9px;letter-spacing:-.02em;font-family:'Syne',sans-serif}
 .stk-main{position:relative}
+.stk-toolbar{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-right:130px}
+.stk-toolbar .stk-tb-t{font-family:'Syne',sans-serif;font-weight:700;font-size:.6rem;color:var(--t);margin-right:auto}
+.stk-main-logo{top:50px}
 .stk-main-logo{position:absolute;top:12px;right:14px;display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;color:var(--t2)}
 .stk-main-logo .stk-plat{position:static;width:42px;height:42px;border-radius:11px}
 .stk-main-logo .stk-mono{font-size:15px}
@@ -2693,7 +2696,7 @@ input:focus, textarea:focus, select:focus {
 @media(max-width:600px){.stk-shot-tbl .hide-m{display:none}}
 
 .stk-tbl{overflow-x:auto}
-.stk-row{display:grid;grid-template-columns:minmax(120px,1.6fr) 84px 92px 96px 96px 74px 26px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);min-width:640px}
+.stk-row{display:grid;grid-template-columns:minmax(120px,1.6fr) 84px 92px 96px 96px 74px auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);min-width:640px}
 .stk-row.h{font-family:'Share Tech Mono',monospace;font-size:.42rem;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--bd)}
 .stk-tk{font-family:'Share Tech Mono',monospace;font-size:.62rem;font-weight:700;color:var(--em);display:flex;align-items:center;gap:6px;min-width:0}
 .stk-tk i{width:8px;height:8px;border-radius:2px;flex-shrink:0}
@@ -2713,9 +2716,9 @@ input:focus, textarea:focus, select:focus {
 .stk-note{font-size:.46rem;color:var(--t3);line-height:1.6;margin-top:8px}
 .stk-lb{display:none;font-family:'Share Tech Mono',monospace;font-size:.4rem;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
 .stk-row .c-va{text-align:right}
-@media(max-width:620px){
+@media(max-width:900px){
   .stk-row.h{display:none}
-  .stk-row{min-width:0;grid-template-columns:1fr 1fr 1fr 28px;grid-template-areas:"tk tk tk x" "un av pr pr" "va va pl pl";row-gap:8px;padding:12px 0}
+  .stk-row{min-width:0;grid-template-columns:1fr 1fr 1fr auto;grid-template-areas:"tk tk tk x" "un av pr pr" "va va pl pl";row-gap:8px;padding:12px 0}
   .c-tk{grid-area:tk}.c-un{grid-area:un}.c-av{grid-area:av}.c-pr{grid-area:pr}.c-va{grid-area:va;text-align:left!important;font-size:.7rem!important}.c-pl{grid-area:pl;text-align:right!important;align-self:end}.c-x{grid-area:x;justify-self:end}
   .stk-lb{display:block}
   .c-va .stk-lb{display:inline;margin-right:8px}
@@ -9799,7 +9802,7 @@ function stkRender(){
   if(main){
     var up=ret>=0,dUp=dayChg>=0;
     var _ap=alState.activePie!=='all'?alState.stockPies.find(function(x){return x.id===alState.activePie;}):null;
-    main.innerHTML=(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
+    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()">✎ Rename</button><button class="stk-btn" style="border-color:rgba(224,92,92,.5);color:#e05c5c" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>':'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
       +'<div class="stk-stats">'
       +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+cfMoney(total)+'</div><div class="s">'+((_ap&&_ap.kind==='fund'&&hs.length===1)?'<b style="color:#e8c56a">'+(+hs[0].units||0).toLocaleString('en-GB',{maximumFractionDigits:4})+' units owned</b>'+(stkPrice(hs[0])>0?' × £'+stkPrice(hs[0]).toFixed(2):''):hs.length+' holding'+(hs.length===1?'':'s'))+' · counts towards net worth</div></div>'
       +'<div class="stk-stat" style="background:'+(withCost.length?(up?'rgba(62,207,142,.07)':'rgba(224,92,92,.08)'):'rgba(68,192,185,.06)')+'"><div class="l">Total return</div><div class="v" style="color:'+(withCost.length?(up?'#3ecf8e':'#e05c5c'):'var(--t3)')+'">'+(withCost.length?((up?'+':'−')+cfMoney(Math.abs(ret))):'—')+'</div><div class="s">'+(withCost.length?(withCost.length<hs.length?'on '+withCost.length+' of '+hs.length+' with a cost basis':'vs your average cost'):'add an average cost to see returns')+'</div></div>'
@@ -9833,7 +9836,7 @@ function stkRender(){
           +'<div class="c-pr"><span class="stk-lb">Price £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.price>0?(+h.price).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="live" onchange="stkSet('+h.id+',\'price\',this.value)" title="Price in £ — type one to override the live price, clear it to go back to live"><div class="stk-src">'+srcTxt+(ch&&!h.manualPrice?' · <span style="color:'+(ch>=0?'#3ecf8e':'#e05c5c')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
           +'<div class="stk-val c-va"><span class="stk-lb">Value</span>'+cfMoney(v)+'</div>'
           +'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'#3ecf8e':'#e05c5c')+'">'+(pl==null?'—':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>'
-          +'<button class="data-item-del c-x" onclick="stkRemove('+h.id+')" title="Remove holding">✕</button></div>';
+          +'<button class="data-item-del c-x" style="width:auto;padding:4px 8px;font-size:.5rem;white-space:nowrap;opacity:1;border:1px solid rgba(224,92,92,.45);border-radius:4px" onclick="stkRemove('+h.id+')" title="Remove this holding">🗑 Remove</button></div>';
       }).join('')+'</div>';
   }
   // allocation
@@ -9873,8 +9876,10 @@ function stkDeletePie(){
   if(!confirm('Delete “'+p.name+'”'+(n?' and its '+n+' holding'+(n===1?'':'s'):'')+'?'))return;
   alState.stocks=alState.stocks.filter(function(h){return h.pie!==p.id;});
   alState.stockPies=alState.stockPies.filter(function(x){return x.id!==p.id;});
+  alState.activePie='all';
   stkEnsure();
   stkSave();
+  showToast('“'+p.name+'” deleted');
 }
 
 // ── add / edit / remove ──
