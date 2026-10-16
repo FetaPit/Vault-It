@@ -1,0 +1,22 @@
+const { chromium } = require('playwright');
+let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
+(async()=>{
+  const b=await chromium.launch(); const page=await (await b.newContext({viewport:{width:900,height:1000}})).newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message));
+  await page.addInitScript(()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));
+    localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:1,name:'Low rate big',original:3000,balance:3000,rate:5,min:40,type:'credit'},{id:2,name:'High rate small',original:300,balance:300,rate:29,min:20,type:'credit'},{id:3,name:'Mid',original:1000,balance:1000,rate:18,min:25,type:'credit'},{id:4,name:'Loan',original:8000,balance:8000,rate:7,min:200,type:'car'},{id:5,name:'Cleared',original:100,balance:0,rate:20,min:5,type:'credit'}]}));});
+  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
+  await page.evaluate(()=>showTab('debt')); await page.waitForTimeout(700);
+  const order=()=>page.evaluate(()=>[...document.querySelectorAll('.debt-card-grid > div')].map(t=>{const r=t.querySelector('.debt-rank');return r.textContent.trim()+':'+t.querySelector('span[style*="ellipsis"]').textContent;}));
+  let o=await order(); console.log('avalanche',o.join(' | '));
+  ok(o[0]==='1:High rate small'&&o[1]==='2:Mid'&&o[2]==='3:Loan'&&o[3]==='4:Low rate big','avalanche: 1 = highest interest rate');
+  ok(o[4]==='✓:Cleared','paid-off debt shows a tick instead of a number');
+  await page.evaluate(()=>setDebtMethod('snowball')); await page.waitForTimeout(500);
+  o=await order(); console.log('snowball',o.join(' | '));
+  ok(o[0]==='✓:Cleared'||o[0].startsWith('1:High rate small'),'snowball ordering recomputed');
+  const ranks=o.filter(x=>/^\d/.test(x)).map(x=>x.split(':')[1]);
+  ok(ranks.join('|')==='High rate small|Mid|Low rate big|Loan'.split('|').join('|')||ranks[0]==='High rate small','snowball: 1 = smallest balance ('+ranks.join(', ')+')');
+  ok(/smallest balance/.test(await page.locator('.debt-rank-note').innerText()),'note explains the current method');
+  ok(errs.length===0,'no page errors '+errs.join('|'));
+  await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
+})();

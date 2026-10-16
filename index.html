@@ -765,6 +765,11 @@ body::before {
 .cc3-bk-cut{position:absolute;top:0;right:0;bottom:0;background:rgba(150,150,150,.55);mix-blend-mode:saturation;border-left:.4cqw dashed rgba(255,255,255,.5);pointer-events:none}
 .cc3-pct{z-index:5}
 .cc3-gloss{z-index:2}
+
+.debt-rank{flex:none;display:inline-flex;align-items:center;justify-content:center;min-width:1.5em;height:1.5em;padding:0 .3em;border-radius:50%;background:linear-gradient(135deg,#e8c56a,#b88a2a);color:#1a1405;font:800 .62rem 'Share Tech Mono',monospace;box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+.debt-rank.done{background:rgba(62,207,142,.25);color:#3ecf8e}
+.debt-rank.sm{font-size:.5rem;vertical-align:middle}
+.debt-rank-note{font-size:.5rem;color:var(--t3);margin:0 0 10px;font-family:'Share Tech Mono',monospace}
 .cc-tile-actions{display:flex;gap:4px}
 .debt-card-grid.has-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))}
 
@@ -12437,6 +12442,7 @@ function undoPayment(id){
 }
 function renderDebtTab(){
   var sorted=[].concat(debtState.debts).sort(function(a,b){
+    if((a.balance>0)!==(b.balance>0))return a.balance>0?-1:1;   // cleared debts go last
     return _debtMethod==='avalanche' ? (+b.rate||0)-(+a.rate||0) : (+a.balance||0)-(+b.balance||0);
   });
   var total=sorted.reduce(function(s,d){return s+d.balance;},0);
@@ -12457,7 +12463,10 @@ function renderDebtTab(){
   var _obBanner=sorted.some(function(d){return d._onboarding;})
     ?'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;background:rgba(224,137,74,.08);border:1px solid rgba(224,137,74,.3);border-radius:8px;font-size:.55rem;color:var(--t2);line-height:1.5"><span style="flex:1;min-width:200px"><b style="color:var(--or)">One lump-sum entered at setup.</b> Replace it with each separate debt (type, interest rate, minimum payment) so your payoff plan is accurate.</span><button class="btn-add-data" style="padding:5px 12px;font-size:.52rem" onclick="removeOnboardingDebt()">Replace it →</button></div>'
     :'';
-  dl.innerHTML=_obBanner+'<div class="debt-card-grid'+(sorted.some(function(d){return d.type==='credit'||d.type==='bnpl';})?' has-cards':'')+'">'
+  var _rank={},_rk=0;sorted.forEach(function(d){if(d.balance>0)_rank[d.id]=++_rk;});   // payoff order: Avalanche = highest rate first, Snowball = smallest balance first
+  var _rankBadge=function(d){return _rank[d.id]?'<span class="debt-rank" title="Payoff order #'+_rank[d.id]+' ('+(_debtMethod==='avalanche'?'Avalanche: highest interest rate first':'Snowball: smallest balance first')+')">'+_rank[d.id]+'</span>':'<span class="debt-rank done" title="Paid off">✓</span>';};
+  var _rankNote='<div class="debt-rank-note"><b>Payoff order</b> — <span class="debt-rank sm">1</span> = '+(_debtMethod==='avalanche'?'highest interest rate (Avalanche): clear this first':'smallest balance (Snowball): clear this first')+'</div>';
+  dl.innerHTML=_obBanner+_rankNote+'<div class="debt-card-grid'+(sorted.some(function(d){return d.type==='credit'||d.type==='bnpl';})?' has-cards':'')+'">'
     +sorted.map(function(d){
       var orig=d.original||d.total||d.balance;
       var paidPct=orig>0?Math.max(0,Math.min(1,(orig-d.balance)/orig)):0;
@@ -12469,7 +12478,7 @@ function renderDebtTab(){
       if(isCard){
         // real-proportion 3D card (drag to rotate, double-tap to flip); progress shown on the card's bottom edge
         return '<div style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px">'
-          +'<div style="font-size:.55rem;font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</div>'
+          +'<div style="font-size:.55rem;font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px">'+_rankBadge(d)+'<span style="overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</span></div>'
           +cc3dHTML(d,pctNum,ccReduced()?pctNum:(_ccPct[d.id]!=null?_ccPct[d.id]:0))
           +'<div style="font-size:.52rem;color:var(--re);font-family:\'Share Tech Mono\',monospace;font-weight:700;display:flex;justify-content:space-between"><span>'+gbpFmt(d.balance)+'</span><span style="color:var(--gr);font-weight:400">'+pctNum+'% paid</span></div>'
           +'<div style="display:flex;align-items:center;gap:4px">'
@@ -12485,7 +12494,7 @@ function renderDebtTab(){
       } else {
         // Loan / other — vertical progress bar (y-axis = monetary value, bar shrinks from top as paid)
         return '<div style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px">'
-          +'<div style="font-size:.55rem;font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+d.name+'</div>'
+          +'<div style="font-size:.55rem;font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px">'+_rankBadge(d)+'<span style="overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</span></div>'
           +'<div style="flex:1;background:rgba(255,255,255,.04);border-radius:5px;overflow:hidden;position:relative;min-height:100px">'
           +'<div style="position:absolute;bottom:0;left:0;right:0;height:'+pctNum+'%;background:linear-gradient(to top,rgba(62,207,142,.35),rgba(62,207,142,.15));border-radius:5px;transition:height .5s ease"></div>'
           +'<div style="position:absolute;top:0;left:0;right:0;height:'+(100-pctNum)+'%;background:linear-gradient(to bottom,rgba(224,92,92,.25),rgba(224,92,92,.12));border-radius:5px"></div>'
