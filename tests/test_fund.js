@@ -21,14 +21,21 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   await page.click('#afs-suggest div:first-child');
   ok((await page.inputValue('#afs-sym'))==='BCHN.L'&&(await page.inputValue('#afs-prov'))==='BlackRock (iShares)','picking a result fills the ticker and detects the provider (BlackRock)');
   await page.fill('#afs-amt','112.40'); await page.fill('#afs-plat','Monzo');
-  await page.evaluate(()=>{document.getElementById('afs-pie').value='new';document.getElementById('afs-pie').dispatchEvent(new Event('change'));}); await page.fill('#afs-newpie','Blockchain Creators');
+  ok(await page.locator('#afs-pie').count()===0,'no "add to existing pie" question: a fund is its own pie');
   await page.click('.stk-shot-ft .btn-add-data'); await page.waitForTimeout(900);
-  const h=await page.evaluate(()=>({h:alState.stocks.find(x=>x.sym==='BCHN.L'),pie:alState.stockPies.find(p=>p.name==='Blockchain Creators'),active:alState.activePie}));
+  const h=await page.evaluate(()=>{const hh=alState.stocks.find(x=>x.sym==='BCHN.L');return{h:hh,pie:alState.stockPies.find(p=>hh&&p.id===hh.pie),active:alState.activePie,n:alState.stockPies.length};});
   ok(h.h&&Math.abs(h.h.units-10)<0.001,'£ held ÷ live price = units ('+(h.h&&h.h.units)+')');
   ok(h.h.provider==='BlackRock (iShares)'&&h.h.platform==='Monzo','provider and platform saved on the holding');
-  ok(h.pie&&h.pie.platform&&h.pie.platform.name==='Monzo'&&h.active===h.pie.id,'new pie created with platform Monzo and selected');
+  ok(h.pie&&h.pie.kind==='fund'&&h.pie.name==='iShares Blockchain Technology UCITS ETF'&&h.pie.platform.name==='Monzo'&&h.active===h.pie.id,'fund got its own pie named after the fund, kind=fund, platform Monzo, selected');
+  ok(/FUND/.test(await page.innerHTML('#stk-pies'))&&/All investments/.test(await page.innerText('#stk-pies')),'FUND tag on the tile; "All pies" now reads "All investments"');
+  ok(/10 units owned/.test(await page.innerText('#stk-main')),'summary shows the units owned worked out from the £ held');
   const tx=await page.innerText('#stk-holdings'); ok(/iShares Blockchain/.test(tx)&&/BlackRock \(iShares\)[\s\S]*on[\s\S]*Monzo/.test(tx),'holdings row shows name, provider and "on Monzo"');
   ok(/Monzo/.test(await page.innerHTML('#stk-pies')),'Monzo badge on the pie tile');
+  // picked listing has no price but another listing of the same fund does → it is used automatically
+  await page.evaluate(()=>{_supaClient.functions.invoke=async(n,o)=>{ if(o.body.search)return{data:{results:[{symbol:'BLKC.AS',name:'iShares Blockchain Technology UCITS ETF',exchange:'Amsterdam',type:'ETF'},{symbol:'BLKC.L',name:'iShares Blockchain Technology UCITS ETF',exchange:'London',type:'ETF'}]},error:null}; if(o.body.history)return{data:{series:{}},error:null}; const q={};(o.body.symbols||[]).forEach(x=>{if(x==='BLKC.L')q[x]={price:1124,currency:'GBp',name:x,changePct:0};});return{data:{quotes:q},error:null};};});
+  await page.click('#stk-pies button:has-text("Add fund / share")'); await page.fill('#afs-sym','ishares blockchain'); await page.waitForSelector('#afs-suggest div'); await page.click('#afs-suggest div:first-child'); await page.fill('#afs-amt','224.80'); await page.click('.stk-shot-ft .btn-add-data'); await page.waitForTimeout(1200);
+  const al=await page.evaluate(()=>alState.stocks.find(x=>x.sym==='BLKC.L'));
+  ok(al&&Math.abs(al.units-20)<0.001,'no price on Amsterdam listing → London listing used, £224.80 ÷ £11.24 = 20 units ('+(al&&al.units)+')');
   // ISIN with no live price: still added, and says so
   await page.evaluate(()=>{_supaClient.functions.invoke=async(n,o)=>{ if(o.body.search)return{data:{results:[{symbol:'IE00B4L5Y983',name:'iShares Core MSCI World',exchange:'Frankfurt',type:'MUTUALFUND'}]},error:null}; if(o.body.history)return{data:{series:{}},error:null}; return{data:{quotes:{}},error:null};};});
   await page.click('#stk-pies button:has-text("Add fund / share")'); await page.fill('#afs-sym','IE00B4L5Y983'); await page.waitForSelector('#afs-suggest div'); await page.click('#afs-suggest div:first-child'); await page.fill('#afs-units','5'); await page.click('.stk-shot-ft .btn-add-data'); await page.waitForTimeout(1200);
