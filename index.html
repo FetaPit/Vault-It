@@ -3926,8 +3926,8 @@ button.bd-ic{cursor:pointer}
     <div class="ov-chart-card" style="margin-bottom:14px"><div id="bd-zero"></div></div>
     <div id="bd-nudge"></div>
     <div class="cf-legend" id="bd-legend"></div>
-    <div class="g2" style="margin-top:8px;align-items:start">
-      <div class="ov-chart-card">
+    <div class="bd-split" style="margin-top:8px">
+      <div class="ov-chart-card bd-inc">
         <div class="ov-ms-title" style="color:var(--gr);margin-bottom:10px">Income <span style="color:var(--t3);font-weight:400">· per month</span></div>
         <div id="cf-income-list" class="data-list"></div>
         <div class="bd-pick-lbl">Choose a category</div>
@@ -3938,9 +3938,13 @@ button.bd-ic{cursor:pointer}
           <input type="number" id="cf-inc-amt" placeholder="£/mo" min="0" onkeydown="if(event.key==='Enter')addIncome()">
           <button class="btn-add-data" onclick="addIncome()">+ Add</button>
         </div>
+        <div class="bd-mix">
+          <div style="font-size:.64rem;font-weight:700;color:var(--t2);margin:18px 0 10px;letter-spacing:.06em">SPENDING MIX vs INCOME</div>
+          <div id="cf-categories"></div>
+        </div>
       </div>
-      <div class="ov-chart-card">
-        <div class="ov-ms-title" style="color:var(--t2);margin-bottom:10px">Spending &amp; saving <span style="color:var(--t3);font-weight:400">· per month</span></div>
+      <div class="ov-chart-card bd-exp">
+        <div class="ov-ms-title bd-exp-hd" style="color:var(--t2);margin-bottom:10px"><span>Spending &amp; saving <span style="color:var(--t3);font-weight:400">· per month</span></span><span class="bd-fold-btns"><button type="button" onclick="bdFoldAll(true)">Collapse all</button><button type="button" onclick="bdFoldAll(false)">Expand all</button></span></div>
         <div id="cf-expense-list" class="data-list"></div>
         <div class="bd-pick-lbl">Choose a category</div>
         <div id="bd-pick-exp" class="bd-picks"></div>
@@ -3954,13 +3958,9 @@ button.bd-ic{cursor:pointer}
         <div style="font-size:.46rem;color:var(--t3);margin-top:6px;line-height:1.6">Every line has its own <b>category</b> and <b>type</b> drop-downs. Tap a line’s icon to give it a different icon; ✎ edits its name or amount. <b style="color:var(--tx)">Committed</b> = same every month · <b style="color:var(--tx)">Variable</b> = changes month to month.</div>
       </div>
     </div>
-    <div class="ov-chart-card" style="margin-top:14px">
-      <div class="ov-chart-hd" style="flex-wrap:wrap;gap:10px"><span class="ov-chart-title">Where your income flows</span></div>
+    <div class="ov-chart-card bd-sankey-card" style="margin-top:14px">
+      <div class="ov-chart-hd" style="flex-wrap:wrap;gap:10px;padding:0 16px"><span class="ov-chart-title">Where your income flows</span></div>
       <div id="bd-sankey" class="cf-scroll"></div>
-    </div>
-    <div class="ov-chart-card" style="margin-top:14px">
-      <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:10px;letter-spacing:.06em">SPENDING MIX vs INCOME</div>
-      <div id="cf-categories"></div>
     </div>
   </div>
 </div><!-- /tab-budget -->
@@ -4447,14 +4447,21 @@ button.bd-ic{cursor:pointer}
       </div>
       <div id="debt-list-el"></div>
     </div>
-    <div class="g2" style="margin-top:16px">
+    <div class="g2 debt-charts" style="margin-top:16px">
       <div class="ov-chart-card">
-        <div class="ov-chart-title" style="margin-bottom:8px">Debt Histogram</div>
-        <canvas id="debt-bar-chart" height="180" style="width:100%;display:block"></canvas>
+        <div class="ov-chart-title" style="margin-bottom:10px">Debt Histogram</div>
+        <canvas id="debt-bar-chart" height="260" style="width:100%;display:block"></canvas>
       </div>
       <div class="ov-chart-card">
-        <div class="ov-chart-title" style="margin-bottom:8px">Debt Breakdown</div>
-        <canvas id="debt-donut-chart" height="180" style="width:100%;display:block"></canvas>
+        <div class="ov-chart-hd" style="margin-bottom:10px;gap:10px;flex-wrap:wrap">
+          <span class="ov-chart-title">Debt Breakdown</span>
+          <div class="chart-filter-group">
+            <button id="debt-view-donut" class="chart-filter-btn on" onclick="setDebtView('donut')">◔ Donut</button>
+            <button id="debt-view-tree" class="chart-filter-btn" onclick="setDebtView('tree')">▦ Tree map</button>
+          </div>
+        </div>
+        <canvas id="debt-donut-chart" height="260" style="width:100%;display:block"></canvas>
+        <div id="debt-treemap" class="dtm" style="display:none"></div>
       </div>
     </div>
     <div id="debt-interest-panel" class="ov-chart-card" style="margin-top:16px">
@@ -5824,6 +5831,61 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .ov-sum-bar{height:4px;background:rgba(255,255,255,.07);border-radius:2px;margin:0 0 6px 30px}
 .ov-sum-bar div{height:100%;background:var(--gr);border-radius:2px}
 #ov-summary-row [id$="-next"]{font-size:.62rem!important;line-height:1.5}
+
+/* ═══ Debt tab: charts inherit each card's colours; bigger on desktop ═══ */
+.dtm{position:relative;border-radius:10px;overflow:hidden}
+.dtm-cell{position:absolute;border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 2px 10px rgba(0,0,0,.35);transition:transform .2s,filter .2s}
+.dtm-cell:hover{filter:brightness(1.12);transform:scale(1.015);z-index:2}
+.dtm-cell::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.18),transparent 45%);pointer-events:none}
+.dtm-n{font:700 clamp(.62rem,1vw,.95rem) 'Syne',sans-serif;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dtm-v{font:700 clamp(.7rem,1.2vw,1.15rem) 'Share Tech Mono',monospace}
+.dtm-s{font:clamp(.5rem,.7vw,.68rem) 'Share Tech Mono',monospace;opacity:.85;margin-top:auto}
+.dtm-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3)}
+.chart-filter-btn.on{background:rgba(68,192,185,.18);color:var(--em)}
+@media(min-width:1100px){.debt-card-grid.has-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))!important;gap:16px}}
+
+/* ═══ Budget: income | expenditure split, tiles side by side, colour-coded, collapsible ═══ */
+.cf-legend{gap:10px 22px!important;font-size:.78rem!important;margin:12px 0 10px!important;font-family:'DM Sans',sans-serif!important;color:var(--t1)!important}
+.cf-legend span{gap:9px!important;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.03);border:1px solid color-mix(in srgb,var(--c,#8899aa) 35%,transparent)}
+.cf-legend i{width:18px!important;height:18px!important;border-radius:5px!important}
+.cf-legend s{text-decoration:none;display:inline-flex;color:var(--c,#aab)}
+.bd-split{position:relative;display:grid;grid-template-columns:1fr;gap:14px}
+.bd-split>.ov-chart-card{min-width:0}
+@media(min-width:1000px){
+  .bd-split{grid-template-columns:40% 60%;gap:0}
+  .bd-split>.ov-chart-card{background:none!important;border:0!important;box-shadow:none!important;clip-path:none!important;padding-top:4px}
+  .bd-split>.bd-inc{padding-right:clamp(16px,2vw,32px)}
+  .bd-split>.bd-exp{padding-left:clamp(16px,2vw,32px)}
+  .bd-split::before{content:'';position:absolute;top:0;bottom:0;left:40%;width:2px;margin-left:-1px;background:linear-gradient(180deg,transparent,rgba(100,181,246,.7) 6%,rgba(100,181,246,.7) 94%,transparent);box-shadow:0 0 14px rgba(100,181,246,.35)}
+  .bd-sankey-card{position:relative;padding-left:0!important;padding-right:0!important}
+  .bd-sankey-card::after{content:'';position:absolute;top:54px;bottom:10px;left:40%;width:0;border-left:2px dashed rgba(100,181,246,.5);pointer-events:none;z-index:3}
+  #bd-sankey svg{max-height:none!important;width:100%!important}
+}
+.bd-exp-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.bd-fold-btns{display:flex;gap:6px}
+.bd-fold-btns button{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:6px;color:var(--t2);font:600 .56rem 'DM Sans',sans-serif;padding:5px 10px;cursor:pointer}
+.bd-fold-btns button:hover{color:var(--tx);border-color:var(--em)}
+.bd-tiles{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}
+@media(min-width:1000px){.bd-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bd-tile{border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:12px;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 12%,#0a1018),#0a1018 55%);overflow:hidden}
+.bd-tile-hd{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;background:none;border:0;cursor:pointer;color:var(--t1);text-align:left;border-bottom:1px solid color-mix(in srgb,var(--c) 28%,transparent)}
+.bd-tile.folded .bd-tile-hd{border-bottom-color:transparent}
+.bd-tile-ic{flex:none;width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--t);background:color-mix(in srgb,var(--c) 22%,transparent);border:1px solid color-mix(in srgb,var(--c) 55%,transparent)}
+.bd-tile-tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.bd-tile-tt b{font:800 .68rem 'Syne',sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--t)}
+.bd-tile-tt em{font:normal .56rem 'DM Sans',sans-serif;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd-tile-sum{display:flex;flex-direction:column;align-items:flex-end;font:700 .92rem 'Share Tech Mono',monospace;color:var(--tx)}
+.bd-tile-sum small{font:.5rem 'Share Tech Mono',monospace;color:var(--t3);font-weight:400}
+.bd-chev{flex:none;color:var(--t);font-size:.9rem;transition:transform .25s}
+.bd-tile.folded .bd-chev{transform:rotate(-90deg)}
+.bd-tile-body{padding:4px 14px 12px}
+.bd-tile.folded .bd-tile-body{display:none}
+.bd-tile-empty{font:.58rem 'DM Sans',sans-serif;color:var(--t3);padding:12px 2px}
+
+/* 3D viewports (house builder, metals, crypto, cash…) take about three quarters of the screen height */
+@media(min-width:900px){.scene{height:max(440px,75vh)!important;min-height:440px}}
+@media(max-width:899px){.scene{height:max(340px,58vh)!important}}
+.scene.expanded,#houseSceneCard.expanded .scene{height:auto!important}
 /* ── pop-ups can always be left: scrolls inside the screen, close button stays in view ── */
 .paywall-overlay{align-items:flex-start!important;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .paywall-card{margin:auto;max-height:none}
@@ -8909,6 +8971,8 @@ var _authForgot=false,_needPin=null,_pinMode='local',_pinEnterLen=4,_pinBusy=fal
 var AL_KEY='pos_al1';
 var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
+var DEBT_PAL=[['#e05c5c','#8f2530'],['#c9a84c','#7a5f1a'],['#44c0b9','#1f6e6a'],['#9b7ec8','#563a86'],['#3ecf8e','#1a7d55'],['#f59e0b','#9a5f06']];
+var _bdFold=(function(){try{return JSON.parse(localStorage.getItem('vi_bd_fold')||'{}')||{};}catch(e){return {};}})();
 var OV_ICO={
   metals:'<rect x="2" y="9" width="20" height="8" rx="1.5"/><path d="M7 9v8M12 9v8M17 9v8"/>',
   crypto:'<path d="M8 5h6a3 3 0 0 1 0 6H8m0 0h7a3 3 0 0 1 0 6H8"/><path d="M10 3v18M14 3v18"/>',
@@ -10535,11 +10599,30 @@ function bdRenderLists(){
   var exp=(ovState.expenses||[]),html='';
   CF_GROUP_ORDER.forEach(function(g){
     var items=exp.filter(function(r){return cfType(r)===g;}).sort(function(a,b){return (+b.amount||0)-(+a.amount||0);});
-    if(!items.length)return;
-    var sum=cfSum(items);
-    html+='<div class="bd-grp" style="--c:'+CF_GROUPS[g].col+';--t:'+CF_GROUPS[g].tx+'"><span>'+CF_GROUPS[g].label+'<em>'+CF_GROUPS[g].ex+'</em></span><span>'+cfMoney(sum)+(m.tIn>0?' · '+Math.round(sum/m.tIn*100)+'%':'')+'</span></div>'+items.map(function(r){return bdRowHTML('exp',r);}).join('');
+    var sum=cfSum(items),folded=!!_bdFold[g],G=CF_GROUPS[g];
+    html+='<section class="bd-tile'+(folded?' folded':'')+'" data-g="'+g+'" style="--c:'+G.col+';--t:'+G.tx+'">'
+      +'<button type="button" class="bd-tile-hd" onclick="bdFold(\''+g+'\')" aria-expanded="'+(!folded)+'">'
+      +'<span class="bd-tile-ic">'+bdGroupIcon(g,34)+'</span>'
+      +'<span class="bd-tile-tt"><b>'+G.label+'</b><em>'+G.ex+'</em></span>'
+      +'<span class="bd-tile-sum">'+cfMoney(sum)+'<small>'+(m.tIn>0?Math.round(sum/m.tIn*100)+'% of income':items.length+' item'+(items.length===1?'':'s'))+'</small></span>'
+      +'<span class="bd-chev">▾</span></button>'
+      +'<div class="bd-tile-body">'+(items.length?items.map(function(r){return bdRowHTML('exp',r);}).join(''):'<div class="bd-tile-empty">Nothing here yet — pick a category below and choose “'+G.short+'”.</div>')+'</div></section>';
   });
-  el.innerHTML=html||'<div class="bd-empty">Nothing assigned yet — every pound of income needs a job.</div>';
+  el.innerHTML='<div class="bd-tiles">'+html+'</div>';
+}
+function bdFold(g){_bdFold[g]=!_bdFold[g];try{localStorage.setItem('vi_bd_fold',JSON.stringify(_bdFold));}catch(e){}bdRenderLists();}
+function bdFoldAll(v){CF_GROUP_ORDER.forEach(function(g){_bdFold[g]=!!v;});try{localStorage.setItem('vi_bd_fold',JSON.stringify(_bdFold));}catch(e){}bdRenderLists();}
+// group icons: lock = committed (same every month), open lock = variable; roof = essential, star = non-essential
+function bdGroupIcon(g,px){
+  var lock=function(open){return '<rect x="13" y="14.500" width="9.500" height="7.500" rx="1.600" fill="currentColor" fill-opacity=".22"/><path d="'+(open?'M15 14.500v-3a2.800 2.800 0 0 1 5.300-1.200':'M15 14.500v-3a2.800 2.800 0 0 1 5.600 0v3')+'"/>';};
+  var roof='<path d="M1.500 11.500 9 4.500l7.500 7"/><path d="M3.500 10.200v7.300h11V10.200"/>';
+  var star='<path d="M9 3.500l1.900 3.900 4.300.6-3.100 3 .7 4.300L9 13.300l-3.800 2 .7-4.300-3.100-3 4.300-.6z" fill="currentColor" fill-opacity=".18"/>';
+  var body;
+  if(g==='ce')body=roof+lock(false);else if(g==='ve')body=roof+lock(true);
+  else if(g==='cn')body=star+lock(false);else if(g==='vn')body=star+lock(true);
+  else if(g==='sv')body='<rect x="3" y="4" width="18" height="16" rx="2.500" fill="currentColor" fill-opacity=".16"/><circle cx="12" cy="12" r="3.600"/><path d="M12 8.200v1.400M12 14.400v1.400M8.200 12h1.400M14.400 12h1.400"/><path d="M6 20v1.500M18 20v1.500"/>';
+  else body='<path d="M3 17.500 9 11.500l4 4 8-9"/><path d="M15 6.500h6v6"/><path d="M3 21h18" opacity=".5"/>';
+  return '<svg viewBox="0 0 24 24" width="'+px+'" height="'+px+'" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+body+'</svg>';
 }
 function bdEdit(kind,id){_bdEdit={kind:kind,id:id};bdRenderLists();}
 function bdCancelEdit(){_bdEdit=null;bdRenderLists();}
@@ -10603,7 +10686,7 @@ function bdUpdateBadge(){
   b.style.background=s.st==='over'?'#e05c5c':'#e8a23c';
 }
 function cfLegendHTML(){
-  return CF_GROUP_ORDER.map(function(t){return '<span title="'+cfEsc(CF_GROUPS[t].ex)+'"><i style="background:'+CF_GROUPS[t].col+'"></i>'+CF_GROUPS[t].short+'</span>';}).join('');
+  return CF_GROUP_ORDER.map(function(t){return '<span title="'+cfEsc(CF_GROUPS[t].ex)+'" style="--c:'+CF_GROUPS[t].tx+'"><i style="background:'+CF_GROUPS[t].col+'"></i><s>'+bdGroupIcon(t,22)+'</s>'+CF_GROUPS[t].short+'</span>';}).join('');
 }
 function bdRender(){
   bdRenderZero();bdRenderLists();bdRenderPickers();bdRenderNew();renderCashflowCategories();
@@ -12710,12 +12793,13 @@ function renderDebtTab(){
           +'</div>'
           +'</div>';
       } else {
+        var _lp=debtPalette(d);
         // Loan / other — vertical progress bar (y-axis = monetary value, bar shrinks from top as paid)
         return '<div data-did="'+d.id+'" style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px">'
           +'<div style="font-size:.55rem;font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px">'+_rankBadge(d)+'<span style="overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</span></div>'
           +'<div style="flex:1;background:rgba(255,255,255,.04);border-radius:5px;overflow:hidden;position:relative;min-height:100px">'
           +'<div style="position:absolute;bottom:0;left:0;right:0;height:'+pctNum+'%;background:linear-gradient(to top,rgba(62,207,142,.35),rgba(62,207,142,.15));border-radius:5px;transition:height .5s ease"></div>'
-          +'<div style="position:absolute;top:0;left:0;right:0;height:'+(100-pctNum)+'%;background:linear-gradient(to bottom,rgba(224,92,92,.25),rgba(224,92,92,.12));border-radius:5px"></div>'
+          +'<div style="position:absolute;top:0;left:0;right:0;height:'+(100-pctNum)+'%;background:linear-gradient(to bottom,'+_lp.c1+','+_lp.c2+');opacity:.55;border-radius:5px"></div>'
           // Horizontal "cut" line showing how much paid
           +'<div style="position:absolute;left:0;right:0;top:'+(100-pctNum)+'%;height:2px;background:rgba(62,207,142,.7);box-shadow:0 0 6px rgba(62,207,142,.5)"></div>'
           +'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px">'
@@ -14329,110 +14413,155 @@ function _drawCompletionExtras(svg,x,y,z,W,D,WH){
 }
 
 // ── DEBT CHARTS ───────────────────────────────────────────────
+// each debt keeps the colours of its credit card (issuer brand); other debts get a palette colour
+function debtPalette(d){
+  var b=null;try{b=ccBrand(d);}catch(e){}
+  if(b&&b.g)return{c1:b.g[0],c2:b.g[1],fg:b.fg||'#fff'};
+  var k=Math.abs(+d.id||0)%DEBT_PAL.length,pl=DEBT_PAL[k];
+  return{c1:pl[0],c2:pl[1],fg:'#fff'};
+}
+function debtChartSize(){return window.innerWidth>=900?Math.round(Math.max(260,Math.min(480,window.innerHeight*0.4))):210;}
 function drawDebtHistogram(){
   var canvas=document.getElementById('debt-bar-chart');
   if(!canvas)return;
   var debts=debtState.debts.filter(function(d){return d.balance>0;});
   var dpr=window.devicePixelRatio||1;
-  var W=canvas.offsetWidth||300,H=180;
+  var W=canvas.parentElement?canvas.parentElement.clientWidth-(parseFloat(getComputedStyle(canvas.parentElement).paddingLeft)||0)*2:canvas.offsetWidth;
+  if(!(W>80))W=canvas.offsetWidth;
+  if(!(W>80))return;   // tab not on screen yet: it is redrawn when shown
+  var H=debtChartSize();
   canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
   canvas.style.width=W+'px';canvas.style.height=H+'px';
   var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
   ctx.clearRect(0,0,W,H);
+  var fs=Math.max(9,Math.min(15,W/62));
   if(!debts.length){
-    ctx.fillStyle='rgba(90,96,104,0.4)';ctx.font="11px 'DM Sans',sans-serif";ctx.textAlign='center';
+    ctx.fillStyle='rgba(90,96,104,0.5)';ctx.font=fs*1.3+"px 'DM Sans',sans-serif";ctx.textAlign='center';
     ctx.fillText('No active debts',W/2,H/2);return;
   }
   var sorted=[].concat(debts).sort(function(a,b){return b.balance-a.balance;});
   var maxB=sorted[0].balance||1;
-  var pad={l:8,r:8,t:10,b:40};
+  var pad={l:fs*4.2,r:10,t:fs*2.6,b:fs*4.4};
   var bW=(W-pad.l-pad.r)/sorted.length;
-  var colors=['#e05c5c','#c9a84c','#44c0b9','#3ecf8e','#9b59b6'];
-  // Grid lines
-  ctx.save();ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
-  for(var gi=1;gi<=4;gi++){
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+  for(var gi=0;gi<=4;gi++){
     var gy=pad.t+(H-pad.t-pad.b)*(gi/4);
     ctx.beginPath();ctx.moveTo(pad.l,gy);ctx.lineTo(W-pad.r,gy);ctx.stroke();
-    ctx.fillStyle='rgba(90,96,104,0.4)';ctx.font="7px 'Share Tech Mono',monospace";ctx.textAlign='right';
-    ctx.fillText('£'+Math.round(maxB*(1-gi/4)/1000*10)/10+'k',pad.l-1,gy+3);
+    ctx.fillStyle='rgba(140,150,160,0.7)';ctx.font=fs*0.85+"px 'Share Tech Mono',monospace";ctx.textAlign='right';
+    ctx.fillText('£'+Math.round(maxB*(1-gi/4)/100)/10+'k',pad.l-6,gy+fs*0.3);
   }
   ctx.restore();
-
   sorted.forEach(function(d,i){
+    var pal=debtPalette(d);
     var bH=((d.balance/maxB)*(H-pad.t-pad.b));
-    var bx=pad.l+i*bW+bW*0.12;
-    var by=H-pad.b-bH;
-    var bww=bW*0.76;
-    // Paid portion as lighter section at bottom
-    var orig=d.original||d.total||d.balance;
-    var paidPct=orig>0?Math.max(0,1-d.balance/orig):0;
-    var paidH=bH*paidPct/(1-paidPct+0.001);
-    if(paidPct>0&&paidH>2){
-      ctx.fillStyle='rgba(62,207,142,0.2)';
-      ctx.fillRect(bx,H-pad.b-bH-paidH,bww,paidH);
-    }
-    // Remaining balance bar
-    ctx.fillStyle=colors[i%colors.length];
-    ctx.globalAlpha=0.8;
-    ctx.fillRect(bx,by,bww,bH);
-    ctx.globalAlpha=1;
-    // Balance label
-    ctx.fillStyle='rgba(232,232,232,0.85)';
-    ctx.font="8px 'Share Tech Mono',monospace";ctx.textAlign='center';
-    ctx.fillText('£'+Math.round(d.balance/1000*10)/10+'k',bx+bww/2,by-3);
-    // APR label
-    if(d.rate){
-      ctx.fillStyle='rgba(224,92,92,0.6)';ctx.font="6.5px 'Share Tech Mono',monospace";
-      ctx.fillText(d.rate+'%',bx+bww/2,by-12);
-    }
-    // Name label (rotated)
-    ctx.save();ctx.translate(bx+bww/2,H-pad.b+6);ctx.rotate(-Math.PI/5);
-    ctx.fillStyle='rgba(90,96,104,0.8)';ctx.font="8px 'DM Sans',sans-serif";ctx.textAlign='right';
-    ctx.fillText(d.name.length>10?d.name.slice(0,9)+'…':d.name,0,0);
-    ctx.restore();
+    var bww=Math.min(bW*0.74,fs*9),bx=pad.l+i*bW+(bW-bww)/2,by=H-pad.b-bH;
+    var g=ctx.createLinearGradient(0,by,0,by+bH);g.addColorStop(0,pal.c1);g.addColorStop(1,pal.c2);
+    var orig=d.original||d.total||d.balance,paidPct=orig>0?Math.max(0,1-d.balance/orig):0;
+    // the part already paid off stays as a ghost on top of the bar
+    if(paidPct>0.005){var ghostH=bH*paidPct/Math.max(0.001,1-paidPct);
+      ctx.save();ctx.strokeStyle=pal.c1;ctx.globalAlpha=0.55;ctx.setLineDash([4,3]);ctx.lineWidth=1.2;ctx.strokeRect(bx+.5,by-ghostH+.5,bww-1,ghostH-1);ctx.fillStyle=pal.c1;ctx.globalAlpha=0.08;ctx.fillRect(bx,by-ghostH,bww,ghostH);ctx.restore();}
+    ctx.fillStyle=g;
+    ctx.beginPath();var r=Math.min(6,bww/4);ctx.moveTo(bx,by+bH);ctx.lineTo(bx,by+r);ctx.quadraticCurveTo(bx,by,bx+r,by);ctx.lineTo(bx+bww-r,by);ctx.quadraticCurveTo(bx+bww,by,bx+bww,by+r);ctx.lineTo(bx+bww,by+bH);ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.14)';ctx.fillRect(bx,by,bww*0.28,bH);
+    ctx.fillStyle='#f1f4f6';ctx.font='bold '+fs+"px 'Share Tech Mono',monospace";ctx.textAlign='center';
+    ctx.fillText(gbpFmt(d.balance),bx+bww/2,by-fs*0.5);
+    if(d.rate){ctx.fillStyle=pal.c1;ctx.font=fs*0.82+"px 'Share Tech Mono',monospace";ctx.fillText(d.rate+'% APR',bx+bww/2,by-fs*1.55);}
+    ctx.fillStyle='#c5ced6';ctx.font=fs*0.95+"px 'DM Sans',sans-serif";ctx.textAlign='center';
+    var nm=String(d.name),mx=Math.max(8,Math.floor(bW/(fs*0.55)));
+    ctx.fillText(nm.length>mx?nm.slice(0,mx-1)+'…':nm,bx+bww/2,H-pad.b+fs*1.5);
   });
 }
 
 function drawDebtDonut(){
   var canvas=document.getElementById('debt-donut-chart');
+  var tm=document.getElementById('debt-treemap');
+  var view=(function(){try{return localStorage.getItem('vi_debt_view')||'donut';}catch(e){return 'donut';}})();
+  var bd=document.getElementById('debt-view-donut'),bt=document.getElementById('debt-view-tree');
+  if(bd)bd.classList.toggle('on',view==='donut');if(bt)bt.classList.toggle('on',view==='tree');
+  if(canvas)canvas.style.display=view==='donut'?'block':'none';
+  if(tm)tm.style.display=view==='tree'?'block':'none';
+  if(view==='tree'){drawDebtTreemap();return;}
   if(!canvas)return;
   var debts=debtState.debts.filter(function(d){return d.balance>0;});
   var dpr=window.devicePixelRatio||1;
-  var W=canvas.offsetWidth||300,H=180;
+  var W=canvas.parentElement?canvas.parentElement.clientWidth-(parseFloat(getComputedStyle(canvas.parentElement).paddingLeft)||0)*2:canvas.offsetWidth;
+  if(!(W>80))W=canvas.offsetWidth;
+  if(!(W>80))return;   // tab not on screen yet: it is redrawn when shown
+  var H=debtChartSize();
   canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
   canvas.style.width=W+'px';canvas.style.height=H+'px';
   var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
   ctx.clearRect(0,0,W,H);
   var total=debts.reduce(function(s,d){return s+d.balance;},0);
+  var fs=Math.max(9,Math.min(15,W/50));
   if(!total){
-    ctx.fillStyle='rgba(90,96,104,0.4)';ctx.font="11px 'DM Sans',sans-serif";ctx.textAlign='center';
+    ctx.fillStyle='rgba(90,96,104,0.5)';ctx.font=fs*1.3+"px 'DM Sans',sans-serif";ctx.textAlign='center';
     ctx.fillText('Debt free!',W/2,H/2);return;
   }
-  var cx=W/2,cy=H/2-8,r=Math.min(cx,cy)*0.78,inner=r*0.56;
-  var colors=['#e05c5c','#c9a84c','#44c0b9','#3ecf8e','#9b59b6'];
+  var legendW=W>560?Math.min(W*0.42,260):0;
+  var cx=(W-legendW)/2,cy=H/2,r=Math.min(cx,cy)*0.92,inner=r*0.58;
   var angle=-Math.PI/2;
-  debts.forEach(function(d,i){
-    var slice=(d.balance/total)*Math.PI*2;
-    ctx.beginPath();ctx.moveTo(cx,cy);
-    ctx.arc(cx,cy,r,angle,angle+slice);
-    ctx.closePath();ctx.fillStyle=colors[i%colors.length];ctx.globalAlpha=0.85;ctx.fill();
-    ctx.globalAlpha=1;
+  debts.forEach(function(d){
+    var pal=debtPalette(d),slice=(d.balance/total)*Math.PI*2;
+    var mid=angle+slice/2,g=ctx.createLinearGradient(cx+Math.cos(mid)*inner,cy+Math.sin(mid)*inner,cx+Math.cos(mid)*r,cy+Math.sin(mid)*r);
+    g.addColorStop(0,pal.c2);g.addColorStop(1,pal.c1);
+    ctx.beginPath();ctx.arc(cx,cy,r,angle,angle+slice);ctx.arc(cx,cy,inner,angle+slice,angle,true);ctx.closePath();
+    ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#0d1520';ctx.lineWidth=2;ctx.stroke();
     angle+=slice;
   });
-  ctx.beginPath();ctx.arc(cx,cy,inner,0,Math.PI*2);
-  ctx.fillStyle='#0d1520';ctx.fill();
-  ctx.fillStyle='rgba(232,232,232,0.9)';ctx.font="bold 13px 'Share Tech Mono',monospace";ctx.textAlign='center';
-  ctx.fillText(gbpFmt(total),cx,cy+4);
-  ctx.fillStyle='rgba(90,96,104,0.7)';ctx.font="8px 'DM Sans',sans-serif";
-  ctx.fillText('total debt',cx,cy+16);
-  var ly=H-6;
-  debts.forEach(function(d,i){
-    var lx=8+i*(W/Math.max(debts.length,1));
-    ctx.fillStyle=colors[i%colors.length];ctx.fillRect(lx,ly-7,7,7);
-    ctx.fillStyle='rgba(90,96,104,0.7)';ctx.font="7px 'DM Sans',sans-serif";ctx.textAlign='left';
-    ctx.fillText(d.name.length>8?d.name.slice(0,7)+'…':d.name,lx+9,ly);
-  });
+  ctx.fillStyle='rgba(232,232,232,0.95)';ctx.font='bold '+Math.max(13,r*0.2)+"px 'Share Tech Mono',monospace";ctx.textAlign='center';
+  ctx.fillText(gbpFmt(total),cx,cy+fs*0.3);
+  ctx.fillStyle='rgba(150,160,170,0.85)';ctx.font=fs*0.9+"px 'DM Sans',sans-serif";
+  ctx.fillText('total debt',cx,cy+fs*1.6);
+  // legend: swatches carry each card's colours
+  var items=debts.slice().sort(function(a,b){return b.balance-a.balance;});
+  if(legendW){
+    var lx=W-legendW+8,ly=Math.max(fs*1.6,(H-items.length*fs*2.1)/2);
+    items.forEach(function(d,i){
+      var pal=debtPalette(d),y=ly+i*fs*2.1,g=ctx.createLinearGradient(lx,y,lx+fs*1.6,y+fs*1.1);g.addColorStop(0,pal.c1);g.addColorStop(1,pal.c2);
+      ctx.fillStyle=g;ctx.fillRect(lx,y-fs*0.85,fs*1.6,fs*1.1);
+      ctx.fillStyle='#d8dfe5';ctx.font=fs+"px 'DM Sans',sans-serif";ctx.textAlign='left';
+      var nm=String(d.name);ctx.fillText((nm.length>16?nm.slice(0,15)+'…':nm),lx+fs*2.1,y);
+      ctx.fillStyle='rgba(150,160,170,.9)';ctx.font=fs*0.88+"px 'Share Tech Mono',monospace";ctx.fillText(Math.round(d.balance/total*100)+'% · '+gbpFmt(d.balance),lx+fs*2.1,y+fs*0.95);
+    });
+  }
 }
+// ── tree map: every debt a square sized by what is owed, in its own card colours ──
+function dtmSquarify(items,x,y,w,h){   // items: [{v,d}] sorted desc; returns [{d,x,y,w,h}]
+  var out=[],total=items.reduce(function(a,i){return a+i.v;},0);if(total<=0)return out;
+  var rest=items.map(function(i){return{v:i.v/total*w*h,d:i.d};});
+  function worst(row,side){var s=row.reduce(function(a,r){return a+r.v;},0),mx=Math.max.apply(null,row.map(function(r){return r.v;})),mn=Math.min.apply(null,row.map(function(r){return r.v;}));return Math.max(side*side*mx/(s*s),s*s/(side*side*mn));}
+  while(rest.length){
+    var side=Math.min(w,h),row=[rest[0]],k=1;
+    while(k<rest.length&&worst(row.concat([rest[k]]),side)<=worst(row,side)){row.push(rest[k]);k++;}
+    var s=row.reduce(function(a,r){return a+r.v;},0);
+    if(w>=h){var rw=s/h,yy=y;row.forEach(function(r){var rh=r.v/rw;out.push({d:r.d,x:x,y:yy,w:rw,h:rh});yy+=rh;});x+=rw;w-=rw;}
+    else{var rh2=s/w,xx=x;row.forEach(function(r){var rw2=r.v/rh2;out.push({d:r.d,x:xx,y:y,w:rw2,h:rh2});xx+=rw2;});y+=rh2;h-=rh2;}
+    rest=rest.slice(row.length);
+  }
+  return out;
+}
+function drawDebtTreemap(){
+  var el=document.getElementById('debt-treemap');if(!el)return;
+  var debts=debtState.debts.filter(function(d){return d.balance>0;}).sort(function(a,b){return b.balance-a.balance;});
+  var W=el.parentElement.clientWidth-(parseFloat(getComputedStyle(el.parentElement).paddingLeft)||0)*2;
+  if(!(W>80))return;
+  var H=debtChartSize();
+  el.style.height=H+'px';el.style.width=W+'px';
+  if(!debts.length){el.innerHTML='<div class="dtm-empty">Debt free!</div>';return;}
+  var total=debts.reduce(function(a,d){return a+d.balance;},0),gap=3;
+  var cells=dtmSquarify(debts.map(function(d){return{v:d.balance,d:d};}),0,0,W,H);
+  el.innerHTML=cells.map(function(c){
+    var pal=debtPalette(c.d),big=c.w>110&&c.h>70,mid=c.w>70&&c.h>46,pct=Math.round(c.d.balance/total*100);
+    return '<div class="dtm-cell" title="'+ccEsc(c.d.name)+' — '+gbpFmt(c.d.balance)+' ('+pct+'%) · '+(+c.d.rate||0)+'% APR" style="left:'+(c.x+gap/2)+'px;top:'+(c.y+gap/2)+'px;width:'+(c.w-gap)+'px;height:'+(c.h-gap)+'px;background:linear-gradient(135deg,'+pal.c1+','+pal.c2+');color:'+pal.fg+'">'
+      +(mid?'<b class="dtm-n">'+ccEsc(c.d.name)+'</b>':'')
+      +(mid?'<span class="dtm-v">'+gbpFmt(c.d.balance)+'</span>':'')
+      +(big?'<span class="dtm-s">'+pct+'% of debt · '+(+c.d.rate||0)+'% APR</span>':'')
+      +'</div>';
+  }).join('');
+}
+function setDebtView(v){try{localStorage.setItem('vi_debt_view',v);}catch(e){}drawDebtDonut();}
+window.addEventListener('resize',function(){clearTimeout(window._dvT);window._dvT=setTimeout(function(){var t=document.getElementById('tab-debt');if(t&&t.style.display!=='none'){drawDebtHistogram();drawDebtDonut();}},150);});
 
 // ── DEPRECIATION ──────────────────────────────────────────────
 function depreciatedValue(l){
