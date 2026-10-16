@@ -24,6 +24,7 @@
     block:        { color: 0xffffff, rough: 0.95, inst: true },
     mortar:       { color: 0xb9b2a5, rough: 1.0 },
     mortarDark:   { color: 0x8f8a80, rough: 1.0 },
+    mortarLime:   { color: 0xd0c4a8, rough: 1.0 },
     insulation:   { color: 0xe6d9a2, rough: 0.9 },
     closer:       { color: 0xd8d2c0, rough: 0.9 },
     concrete:     { color: 0x9c9a94, rough: 0.95 },
@@ -122,7 +123,8 @@
     var d = MATS[key] || MATS.concrete;
     var params = { color: col(d.color), roughness: d.rough == null ? 0.8 : d.rough, metalness: d.metal || 0 };
     if (d.emissive) params.emissive = col(d.emissive);
-    var solid = new THREE.MeshStandardMaterial(params);
+    var lambert = !d.glass && !(d.metal > 0.25) && (d.rough == null || d.rough >= 0.6);   // matt surfaces: Lambert is ~20% cheaper per vertex
+    var solid = lambert ? new THREE.MeshLambertMaterial({ color: params.color, emissive: params.emissive || col(0x000000) }) : new THREE.MeshStandardMaterial(params);
     if (d.glass) { solid.transparent = true; solid.opacity = d.opacity; solid.depthWrite = false; solid.envMapIntensity = 1; }
     if (d.brickslip) {
       solid.map = brickTexture();
@@ -136,10 +138,11 @@
     ghost.emissive = col(0x0d3a38); ghost.emissiveIntensity = 0.35;
     var blue = new THREE.MeshLambertMaterial({ color: col(0x2a8f8a), emissive: col(0x0f4a47), transparent: true, opacity: 0.16, depthWrite: true });   // blueprint ghost: only the nearest surface shows, no additive glare
     var nb = blue.clone(); nb.opacity = 0.07;   // neighbours: fainter still
-    [solid, ghost, blue, nb].forEach(function (m) { m.clippingPlanes = []; m.clipShadows = true; });
+    [solid, ghost, blue, nb].forEach(function (m) { m.clippingPlanes = [IDLE_PLANE]; m.clipShadows = true; });
     return { solid: solid, ghost: ghost, blue: blue, nb: nb, def: d };
   }
 
+  var IDLE_PLANE = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e5);   // keeps every material on one clipping plane at all times
   var tmpM = new THREE.Matrix4(), tmpQ = new THREE.Quaternion(), tmpE = new THREE.Euler(0, 0, 0, 'YZX'), tmpP = new THREE.Vector3(), tmpS = new THREE.Vector3(), tmpC = new THREE.Color();
 
   function Viewer(container, opts) {
@@ -148,20 +151,21 @@
     this.opts = opts;
     var w = Math.max(1, container.clientWidth), h = Math.max(1, container.clientHeight);
     var r = this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.preserve });
-    r.setPixelRatio(Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2));
+    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, Math.sqrt(budget / Math.max(1, w * h)))); };
+    r.setPixelRatio(this._dprFor(w, h));
     r.setSize(w, h, false);
     r.outputEncoding = THREE.sRGBEncoding;
     r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.05;
     r.localClippingEnabled = true;
     this.mobile = !!opts.mobile;
-    r.shadowMap.enabled = !this.mobile; r.shadowMap.type = THREE.PCFSoftShadowMap;
+    r.shadowMap.enabled = !this.mobile; r.shadowMap.type = THREE.PCFSoftShadowMap; r.shadowMap.autoUpdate = false;
     var cv = r.domElement; cv.className = 'hb3d-canvas'; cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', '3D house model');
     cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none';
     container.insertBefore(cv, container.firstChild);
 
     var sc = this.scene = new THREE.Scene();
-    sc.background = col(0x05101b);
-    sc.fog = new THREE.Fog(col(0x05101b), 60, 160);
+    sc.background = new THREE.Color(0x05101b);
+    sc.fog = new THREE.Fog(0x05101b, 60, 160);
     var cam = this.camera = new THREE.PerspectiveCamera(36, w / h, 0.05, 600);
     // lights: cool sky + warm key light (late-afternoon sun) with soft shadows
     sc.add(new THREE.HemisphereLight(col(0xbcd6ea), col(0x1d2a22), 0.62));
@@ -206,7 +210,7 @@
       this._ro.observe(container);
     }
     cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); self.lost = true; self.stop(); });
-    cv.addEventListener('webglcontextrestored', function () { self.lost = false; if (self.model) self.show(self.model, true); self.start(); });
+    cv.addEventListener('webglcontextrestored', function () { self.lost = false; self._shadowDirty = true; if (self.model) self.show(self.model, true); self.start(); });
     this.start();
   }
   H.Viewer = Viewer;
@@ -221,14 +225,19 @@
     if (!(w > 2 && h > 2)) return false;
     var cur = this.renderer.getSize(new THREE.Vector2());
     if (Math.abs(cur.x - w) < 1 && Math.abs(cur.y - h) < 1) return true;
+    this.renderer.setPixelRatio(this._dprFor(w, h));
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h; this.camera.updateProjectionMatrix();
-    this.dirty = true;
+    this.dirty = true; this._shadowDirty = true;
     return true;
   };
   VP.render = function () {
     if (this.lost) return;
     if (!this.resize()) return;
+    var d = this.distance(), rad = this._radius || 20, cam = this.camera;   // depth precision: keep near/far tight round the model
+    var nn = Math.max(0.05, Math.min(10, 0.05 * d)), ff = d + 3 * rad + 50;
+    if (Math.abs(cam.near - nn) > 1e-3 || Math.abs(cam.far - ff) > 1e-2) { cam.near = nn; cam.far = ff; cam.updateProjectionMatrix(); }
+    if (this._shadowDirty) { this.renderer.shadowMap.needsUpdate = true; this._shadowDirty = false; }
     this.renderer.render(this.scene, this.camera);
     if (this.onRender) this.onRender(this);
   };
@@ -306,6 +315,7 @@
     var m = this.model, bb = m ? m.bounds : { min: [-4, 0, -6], max: [4, 4, 2] };
     var cx = (bb.min[0] + bb.max[0]) / 2, cz = (bb.min[2] + bb.max[2]) / 2, H = Math.max(2, bb.max[1]);
     var rad = Math.sqrt(Math.pow(bb.max[0] - bb.min[0], 2) + Math.pow(bb.max[2] - bb.min[2], 2) + H * H) / 2;
+    this._radius = rad;
     var fov = this.camera.fov * Math.PI / 180, aspect = Math.max(0.5, this.camera.aspect || 1.6);
     var d = rad / Math.sin(fov / 2) * (aspect < 1 ? 1.15 / aspect : 1.02);
     this.fitDist = d;
@@ -370,15 +380,15 @@
         B.main.visible = true; B.rev.visible = true;
         B.main.count = n; B.rev.count = n;
         B.main.material = mats.solid; B.rev.material = mats.blue;
-        mats.solid.clippingPlanes = [below]; mats.blue.clippingPlanes = [above]; mats.ghost.clippingPlanes = [];
+        mats.solid.clippingPlanes = [below]; mats.blue.clippingPlanes = [above]; mats.ghost.clippingPlanes = [IDLE_PLANE];
       } else if (mode === 'complete') {
         B.main.visible = b.hideAfter >= 2; B.rev.visible = false; B.main.count = n;
-        B.main.material = mats.solid; mats.solid.clippingPlanes = [];
+        B.main.material = mats.solid; mats.solid.clippingPlanes = [IDLE_PLANE];
       } else {   // build / site
         B.main.visible = !hidden; B.rev.visible = !hidden && b.hideAfter >= 2;
         B.main.count = k; B.rev.count = n - k;
         B.main.material = mode === 'site' ? mats.solid : mats.ghost; B.rev.material = mats.blue;
-        mats.solid.clippingPlanes = []; mats.blue.clippingPlanes = []; mats.ghost.clippingPlanes = [];
+        mats.solid.clippingPlanes = [IDLE_PLANE]; mats.blue.clippingPlanes = [IDLE_PLANE]; mats.ghost.clippingPlanes = [IDLE_PLANE];
       }
       // lights on: warm glow behind the glass at completion
       if (mats.def.glass) {
@@ -388,11 +398,11 @@
     });
     if (this.edges) {
       this.edges.visible = mode === 'build' || mode === 'equity';
-      this.edges.material.clippingPlanes = mode === 'equity' ? [above] : [];
+      this.edges.material.clippingPlanes = mode === 'equity' ? [above] : [IDLE_PLANE];
       this.edges.material.opacity = mode === 'build' ? 0.18 + 0.25 * (1 - p) : 0.30;
     }
     if (this.water) { this.water.visible = mode === 'equity'; this.water.position.y = clipY; }
-    this.dirty = true; this.wake();
+    this.dirty = true; this._shadowDirty = true; this.wake();
   };
 
   // project a world point to container pixels (for DOM overlays)

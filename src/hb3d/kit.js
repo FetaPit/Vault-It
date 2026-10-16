@@ -23,7 +23,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     TILES: {
       concrete: { w: 0.330, l: 0.420, gauge: 0.345, cover: 0.300, th: 0.022, mat: 'tileConcrete', bond: 'straight' },
       plain:    { w: 0.165, l: 0.265, gauge: 0.100, cover: 0.165, th: 0.012, mat: 'tileClay', bond: 'broken' },
-      slate:    { w: 0.250, l: 0.500, gauge: 0.220, cover: 0.250, th: 0.008, mat: 'slate', bond: 'broken' }
+      slate:    { w: 0.250, l: 0.500, gauge: 0.2125, cover: 0.250, th: 0.006, mat: 'slate', bond: 'broken' }
     }
   };
 
@@ -137,7 +137,9 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     while (v - unitL >= Math.max(leftEnd + J, mid) - 1e-6 && v - unitL >= uA - 1e-6) { right.push([v - unitL, v]); v -= step; }
     var rightStart = v + J;                    // start of first full unit from the right
     var gap = rightStart - J - (leftEnd + J);  // space for a closer (between joints)
-    if (gap > 0.025) bricks.push([leftEnd + J, leftEnd + J + gap]);
+    var cs = leftEnd + J;
+    while (gap > unitL + J + 0.025) { bricks.push([cs, cs + unitL]); cs += step; gap -= step; }   // never stretch a closer past a whole unit
+    if (gap > 0.025) bricks.push([cs, cs + gap]);
     for (var i = right.length - 1; i >= 0; i--) bricks.push(right[i]);
     // cut to the allowed segments (openings / gable rake)
     bricks.forEach(function (b) {
@@ -192,7 +194,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     segs.forEach(function (sg) {
       var L = sg[1] - sg[0]; if (L < 0.02) return;
       var uc = (sg[0] + sg[1]) / 2, rec = 0.006, px = run.ax + dirx * uc - nx * (rec + (thick - rec) / 2), pz = run.az + dirz * uc - nz * (rec + (thick - rec) / 2);
-      self.box('mortar', px, y + (UK.BH + J) / 2, pz, L, UK.BH + J, thick - rec, { ry: ry });
+      self.box(opt.mortarMat || 'mortar', px, y + (UK.BH + J) / 2, pz, L, UK.BH + J, thick - rec, { ry: ry });
     });
   };
   function blockColor(r) { var v = 0x8a + Math.floor(r() * 18); return (v << 16) | (v << 8) | (v - 4); }
@@ -280,6 +282,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       runs.forEach(function (r) {
         var g = gables[r.idx];
         var top = g ? g.ridgeY : runTop(r);
+        self.stage(g && yb >= runTop(r) - 1e-6 && opts.gablesAfterRoof !== false ? 'roofcover' : 'masonry');
         if (yb >= top - 1e-6 || (!g && yt > runTop(r) + 1e-6)) return;
         var isParty = party.indexOf(r.idx) >= 0;
         // corner ownership: run owns its start corner when (idx + k) even; external corners only
@@ -300,7 +303,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         if (isParty && opts.partyBond === 'flemish') {
           var pA = r.convexStart ? (ownS ? 0 : UK.CL) : (r.straightStart ? 0 : (k % 2 === 0 ? -UK.CL : 0)), pB = r.convexEnd ? (ownE ? r.L : r.L - UK.CL) : (r.straightEnd ? r.L : (k % 2 === 1 ? r.L + UK.CL : r.L));
           var psegs = courseSegments(pA, pB, yb, yt, openings[r.idx], g ? { ridgeU: g.ridgeU, ridgeY: g.ridgeY, eaveY: g.eaveY == null ? runTop(r) : g.eaveY, half: g.half } : null);
-          if (psegs.length) self._layRun(r, yb, UK.BL, UK.BH, UK.BL, psegs, { uA: pA, uB: pB, mid: (pA + pB) / 2, unit: 'brick', palette: opts.partyPalette || 'brown', bond: 'flemish', course: k });
+          if (psegs.length) self._layRun(r, yb, UK.BL, UK.BH, UK.BL, psegs, { uA: pA, uB: pB, mid: (pA + pB) / 2, unit: 'brick', palette: opts.partyPalette || 'brown', bond: 'flemish', course: k, mortarMat: opts.mortar });
           return;
         }
         if (isParty) {
@@ -318,10 +321,10 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
           // one-brick solid wall: the non-owning run butts the owner's full 0.215 thickness
           var fA = r.convexStart ? (ownS ? 0 : UK.CL) : (r.straightStart ? 0 : (k % 2 === 0 ? -UK.CL : 0)), fB = r.convexEnd ? (ownE ? r.L : r.L - UK.CL) : (r.straightEnd ? r.L : (k % 2 === 1 ? r.L + UK.CL : r.L));
           var fsegs = courseSegments(fA, fB, yb, yt, openings[r.idx], g ? { ridgeU: g.ridgeU, ridgeY: g.ridgeY, eaveY: g.eaveY == null ? runTop(r) : g.eaveY, half: g.half } : null);
-          if (fsegs.length) self._layRun(r, yb, UK.BL, UK.BH, UK.BL, fsegs, { uA: fA, uB: fB, mid: (fA + fB) / 2, unit: 'brick', palette: pal, bond: 'flemish', course: k });
+          if (fsegs.length) self._layRun(r, yb, UK.BL, UK.BH, UK.BL, fsegs, { uA: fA, uB: fB, mid: (fA + fB) / 2, unit: 'brick', palette: pal, bond: 'flemish', course: k, mortarMat: opts.mortar });
           return;
         }
-        self._layRun(r, yb, UK.BL, UK.BH, UK.BW, segs, { uA: uA, uB: uB, mid: mid, unit: 'brick', palette: pal, mat: face === 'brick' ? 'brick' : 'brickHidden' });
+        self._layRun(r, yb, UK.BL, UK.BH, UK.BW, segs, { uA: uA, uB: uB, mid: mid, unit: 'brick', palette: pal, mat: face === 'brick' ? 'brick' : 'brickHidden', mortarMat: opts.mortar });
         if (leaves === 'cavity' && k % 3 === 0 && yb >= -0.001) {
           // inner leaf: blocks one block-course (3 brick courses) high, behind a 100 mm insulated cavity
           var ir = { ax: r.ax - r.out[0] * innerOff, az: r.az - r.out[1] * innerOff, bx: r.bx - r.out[0] * innerOff, bz: r.bz - r.out[1] * innerOff, L: r.L, out: r.out };
@@ -346,6 +349,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         if (face !== 'brick' && k === 0) self._pendingRender = (self._pendingRender || []).concat([{ r: r, y0: (opts.renderFrom && opts.renderFrom[r.idx]) || y0, y1: top, face: face, openings: openings[r.idx] || [] }]);
       });
     }
+    this.stage('masonry');
     while (hk < hooks.length) { hooks[hk].fn.call(self, self); hk++; }
     // lintels + sills go in as the brickwork reaches them; frames & glass in the fit-out stage
     fit.forEach(function (f) { self._openingStructure(f.run, f.o, opts); });
@@ -375,7 +379,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         var n = Math.max(1, Math.round((w + 0.02) / UK.CH)), pitch = (w + 0.02) / n;
         for (var i = 0; i < n; i++) {
           var up = o.u0 - 0.01 + pitch * (i + 0.5), pp = this._runPoint(r, up, UK.BW / 2);
-          this.box('brick', pp[0], o.v1 + UK.J + UK.BL / 2, pp[1], pitch - UK.J, UK.BL, UK.BW, { ry: ry, color: this._brickColor(opts.palette), kind: 'brick' });
+          this.box('brick', pp[0], o.v1 + UK.J + UK.BL / 2, pp[1], Math.min(UK.BH, pitch - UK.J), UK.BL, UK.BW, { ry: ry, color: this._brickColor(opts.palette), kind: 'brick' });   // real 65 mm brick on end; joints take up the slack
         }
       }
       // steel cavity lintel (visible from inside / during the build): inverted-T profile over both leaves
@@ -395,7 +399,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
 
   // frames, glazing, doors (fit-out)
   KP._openingFit = function (r, o, opts) {
-    var ry = this._ry(r), uc = (o.u0 + o.u1) / 2, w = o.u1 - o.u0, h = o.v1 - o.v0, set = 0.05;
+    var ry = this._ry(r), uc = (o.u0 + o.u1) / 2, w = o.u1 - o.u0, h = o.v1 - o.v0, set = o.setback != null ? o.setback : (opts.setback != null ? opts.setback : 0.095);
     var frameMat = o.frame || opts.frame || 'upvc';
     var depth = 0.070, d0 = set + depth / 2;
     var self = this;
@@ -518,13 +522,14 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this.stage('found');
     runs.forEach(function (r) {
       var c = self._runPoint(r, r.L / 2, UK.WALL / 2), ry = self._ry(r);
-      self.box('soil', c[0], -0.45, c[1], r.L + 0.6, 0.60, 0.75, { ry: ry, hideAfter: 0.10 });       // excavated trench spoil marker
-      self.box('concrete', c[0], -0.15 - 0.1125 - 0.30, c[1], r.L + 0.60, 0.225, 0.60, { ry: ry }); // strip footing
+      var sp = self._runPoint(r, r.L / 2, -0.55);
+      self.box('soil', sp[0], 0.18, sp[1], r.L + 0.6, 0.36, 0.55, { ry: ry, hideAfter: 0.10 });        // spoil heap beside the trench
+      self.box('concrete', c[0], -0.6125, c[1], r.L + 0.60, 0.775, 0.60, { ry: ry });                   // trench-fill concrete, formation at −1.000
     });
     // footing brickwork below DPC: blockwork to −0.15 (two courses below ground, faced in brick from −0.15)
     runs.forEach(function (r) {
       var c = self._runPoint(r, r.L / 2, UK.WALL / 2), ry = self._ry(r);
-      self.box('block', c[0], -0.15 - 0.15, c[1], r.L, 0.30, UK.WALL, { ry: ry, color: 0x7d7d79 });
+      self.box('block', c[0], -0.1875, c[1], r.L, 0.075, UK.WALL, { ry: ry, color: 0x7d7d79 });       // trench blocks up to the first facing course
     });
     this.stage('slab');
     var inset = UK.WALL;
@@ -585,7 +590,14 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         self.beam('timber', q2, m2, 0.072, 0.035, {}); self.beam('timber', q2, rp, 0.072, 0.035, {});
       }
     }
-    var rb = P((a0 + a1) / 2, sm, ridgeY - 0.02); self.box('timber', rb[0], rb[1], rb[2], alongX ? a1 - a0 : 0.035, 0.15, alongX ? 0.035 : a1 - a0, {});
+    var rb = P((a0 + a1) / 2, sm, ridgeY - 0.02); self.box('timber', rb[0], rb[1], rb[2], alongX ? a1 - a0 : 0.032, 0.175, alongX ? 0.032 : a1 - a0, {});
+    if (o.cut) {   // cut roof: purlins 75 × 200 mid-slope (party wall to party wall) + ceiling joists at 400 c/c
+      [s0 + span / 4, s1 - span / 4].forEach(function (s) {
+        var pp = P((a0 + a1) / 2, s, eY + rise / 2 - 0.05);
+        self.box('timber', pp[0], pp[1], pp[2], alongX ? a1 - a0 - 2 * gableIn : 0.075, 0.20, alongX ? 0.075 : a1 - a0 - 2 * gableIn, {});
+      });
+      for (var cj = a0 + gableIn + 0.25; cj <= a1 - gableIn - 0.05; cj += 0.40) self.beam('timber', P(cj, s0 + 0.05, eY + 0.06), P(cj, s1 - 0.05, eY + 0.06), 0.10, 0.05, {});
+    }
     this.stage('roofcover');
     this._slopes(o, T, pitch, a0 - vg, a1 + vg, s0, s1, eY, ridgeY, ov, alongX, P);
     // ridge tiles
@@ -623,7 +635,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       for (var b = 0; b < rows; b++) {
         var d = (b + 0.5) * T.gauge, s = u0 - sd * d * cos, y = eY - ov * Math.tan(pitch) + d * sin + yBat;
         var bp = P((a0 + a1) / 2, s, y);
-        self.box('timber', bp[0], bp[1], bp[2], alongX ? a1 - a0 : 0.038, 0.025, alongX ? 0.038 : a1 - a0, {});
+        self.box('timber', bp[0], bp[1], bp[2], alongX ? a1 - a0 : (o.cut ? 0.038 : 0.050), 0.025, alongX ? (o.cut ? 0.038 : 0.050) : a1 - a0, {});
       }
       var cols = Math.ceil((a1 - a0) / T.cover);
       for (var row = 0; row < rows; row++) {
@@ -644,7 +656,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
 
   // fascia, soffit, half-round gutter and downpipes along both eaves
   KP._eaves = function (o, a0, a1, s0, s1, eY, ov, alongX, P, oneSided) {
-    var self = this; this.stage('fitout');
+    var self = this; this.stage('roofcover');
     var sides = oneSided ? [[s0 - ov, -1]] : [[s0 - ov, -1], [s1 + ov, 1]];
     sides.forEach(function (sv) {
       var s = sv[0], dir = sv[1], fy = eY - ov * Math.tan((o.pitch || 38) * Math.PI / 180) - 0.06;
