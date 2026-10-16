@@ -42,7 +42,7 @@ const fs=require('fs');
   await page.evaluate(()=>ccSaveEdit()); await page.waitForTimeout(400);
   const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('pos_debt1')).debts.find(x=>x.id===5).card);
   ok(saved&&saved.issuer==='Halifax'&&saved.last4==='4821'&&saved.art,'card design saved with the debt');
-  ok(await page.locator('.cc3[data-id="5"] .cc3-front[style*="url("]').count()===1,'front uses the photo');
+  ok(await page.locator('.cc3[data-id="5"] .cc3-base[style*="url("]').count()===1,'front uses the photo');
   ok(errs.length===0,'no page errors '+errs.join('|'));
   await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
 })();

@@ -749,6 +749,22 @@ body::before {
 .cc3-bk-info span{display:block;font-size:3cqw;opacity:.6;text-transform:uppercase;letter-spacing:.1em}
 .cc3-bk-info b{font-size:4.6cqw;font-weight:500}
 .cc3-back .cc3-net{bottom:8%}
+
+/* the card is cut along its x axis as it is paid off */
+.cc3-front{background:none!important;overflow:visible;box-shadow:none;border-radius:0}
+.cc3-lay{position:absolute;inset:0;border-radius:3.7cqw;overflow:hidden;box-shadow:0 1cqw 3cqw rgba(0,0,0,.45)}
+.cc3-piece{filter:grayscale(1) brightness(.6) contrast(.9);transform:translate(.8cqw,.5cqw) rotate(1.1deg);transform-origin:100% 100%;box-shadow:none}
+.cc3-cutline{position:absolute;top:0;bottom:0;width:0;border-left:.5cqw dashed rgba(255,255,255,.85);transform-origin:top;filter:drop-shadow(0 0 .6cqw rgba(0,0,0,.6));pointer-events:none;z-index:3}
+.cc3-scis{position:absolute;top:0;width:9cqw;height:12cqw;margin-left:-4.5cqw;opacity:0;pointer-events:none;z-index:4;filter:drop-shadow(0 .8cqw 1cqw rgba(0,0,0,.5))}
+.cc3-scis svg{width:100%;height:100%;overflow:visible}
+.cc3-bl{transform-origin:0 0}
+.cc3-scis.snip .cc3-bl.a{animation:ccSnipA .5s ease-in-out infinite}
+.cc3-scis.snip .cc3-bl.b{animation:ccSnipB .5s ease-in-out infinite}
+@keyframes ccSnipA{0%,100%{transform:rotate(0)}50%{transform:rotate(-13deg)}}
+@keyframes ccSnipB{0%,100%{transform:rotate(0)}50%{transform:rotate(13deg)}}
+.cc3-bk-cut{position:absolute;top:0;right:0;bottom:0;background:rgba(150,150,150,.55);mix-blend-mode:saturation;border-left:.4cqw dashed rgba(255,255,255,.5);pointer-events:none}
+.cc3-pct{z-index:5}
+.cc3-gloss{z-index:2}
 .cc-tile-actions{display:flex;gap:4px}
 .debt-card-grid.has-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))}
 
@@ -8690,6 +8706,8 @@ var _authForgot=false,_needPin=null,_pinMode='local',_pinEnterLen=4,_pinBusy=fal
 var AL_KEY='pos_al1';
 var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
+var _ccPct={};   // % shown last time for each card, so a payment cuts from where it was and an undo joins it back up
+var _ccIO=null;
 var CC_BRANDS=[
  {n:'American Express',d:'americanexpress.com',g:['#3b7fc4','#12467f'],fg:'#fff',net:'amex',re:/amex|american\s*express/i},
  {n:'Barclaycard',d:'barclaycard.co.uk',g:['#00aeef','#00395d'],fg:'#fff',re:/barclay/i},
@@ -12243,28 +12261,35 @@ function ccNetMark(n){
   return '';
 }
 function ccEsc(t){return viClean(String(t==null?'':t));}
-function cc3dHTML(d,pctNum){
+function cc3dHTML(d,pctNum,shown){
+  if(shown==null)shown=pctNum;
   var b=ccBrand(d)||CC_GENERIC,c=d.card||{},net=ccNetwork(d,b),fg=b.fg;
-  var front=c.art?'background:#000 url('+c.art+') center/cover':'background:linear-gradient(135deg,'+b.g[0]+','+b.g[1]+')';
+  var bg=c.art?'background:#000 url('+c.art+') center/cover':'background:linear-gradient(135deg,'+b.g[0]+','+b.g[1]+')';
   var domain=b.d,logo=c.logo?'<img alt="" src="'+c.logo+'">':(domain?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=64" onerror="this.style.display=\'none\'">':'');
   var mono=ccEsc((b.n||d.name||'?').trim().charAt(0).toUpperCase());
   var last4=/^\d{4}$/.test(c.last4||'')?c.last4:'••••';
-  var shown=ccEsc(d.name);
+  var shownName=ccEsc(d.name);
   var bal=gbpFmt(d.balance),apr=(+d.rate||0)+'% APR',minp=gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0);
   var art=!!c.art;
-  var f='<div class="cc3-face cc3-front" style="'+front+';color:'+fg+'">'
-    +(art?'':'<div class="cc3-sheen"></div>'+(b.acc?'<div class="cc3-acc" style="background:'+b.acc+'"></div>':''))
+  var inner=(art?'':'<div class="cc3-sheen"></div>'+(b.acc?'<div class="cc3-acc" style="background:'+b.acc+'"></div>':''))
     +(art?'':'<div class="cc3-logo"><span>'+mono+'</span>'+logo+'</div>')
     +(art?'':'<div class="cc3-chip"><i></i><i></i><i></i></div><svg class="cc3-nfc" viewBox="0 0 24 24" fill="none" stroke="'+fg+'" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.500 0 12M12 4c4.500 5 4.500 11 0 16M16 2c6 6.500 6 13.500 0 20"/></svg>')
-    +(art?'':'<div class="cc3-num">•••• •••• •••• '+last4+'</div><div class="cc3-name">'+shown+'</div>'+ccNetMark(net))
-    +'<div class="cc3-paid"><span style="width:'+pctNum+'%"></span></div>'
+    +(art?'':'<div class="cc3-num">•••• •••• •••• '+last4+'</div><div class="cc3-name">'+shownName+'</div>'+ccNetMark(net));
+  // the card is cut along its x axis: the paid share on the right is cut off and greyed, the unpaid share on the left stays full colour
+  var P=Math.max(0,Math.min(100,shown));
+  var f='<div class="cc3-face cc3-front">'
+    +'<div class="cc3-lay cc3-base" style="'+bg+';color:'+fg+';clip-path:inset(0 '+P+'% 0 0)">'+inner+'</div>'
+    +'<div class="cc3-lay cc3-piece" style="'+bg+';color:'+fg+';clip-path:inset(0 0 0 '+(100-P)+'%)">'+inner+'</div>'
+    +(P>0&&P<100?'<div class="cc3-cutline cc3-cl-old" style="left:'+(100-P)+'%"></div>':'')
+    +'<div class="cc3-cutline cc3-cl-new" style="left:'+(100-P)+'%;'+(P>0&&P<100?'display:none':'display:none')+'"></div>'
+    +'<div class="cc3-scis" aria-hidden="true"><svg viewBox="-12 -14 24 32"><g class="cc3-bl a"><path d="M0 0 L-2.600 15 L-.8 15.500 L1.200 0Z" fill="#dfe6ea" stroke="#6b7780" stroke-width=".5"/><circle cx="-5.500" cy="-9" r="3.600" fill="none" stroke="#e05c5c" stroke-width="2"/><path d="M-4 -6.500 L0 0" stroke="#6b7780" stroke-width="1.400"/></g><g class="cc3-bl b"><path d="M0 0 L2.600 15 L.8 15.500 L-1.200 0Z" fill="#dfe6ea" stroke="#6b7780" stroke-width=".5"/><circle cx="5.500" cy="-9" r="3.600" fill="none" stroke="#e05c5c" stroke-width="2"/><path d="M4 -6.500 L0 0" stroke="#6b7780" stroke-width="1.400"/></g><circle r="1.200" fill="#6b7780"/></svg></div>'
     +(pctNum>0?'<div class="cc3-pct">'+pctNum+'% paid</div>':'')
     +'<div class="cc3-gloss"></div></div>';
   var back='<div class="cc3-face cc3-back">'
     +'<div class="cc3-stripe"></div><div class="cc3-sig"><span>Authorised signature</span><b>•••</b></div>'
     +'<div class="cc3-bk-info"><div><span>Owed</span><b>'+bal+'</b></div><div><span>Rate</span><b>'+apr+'</b></div><div><span>Min</span><b>'+minp+'/mo</b></div></div>'
-    +ccNetMark(net)+'<div class="cc3-gloss"></div></div>';
-  return '<div class="cc3" data-id="'+d.id+'" role="img" aria-label="'+ccEsc(d.name)+' credit card — drag to rotate, double-click to flip">'
+    +ccNetMark(net)+(pctNum>0?'<div class="cc3-bk-cut" style="width:'+Math.min(100,pctNum)+'%"></div>':'')+'<div class="cc3-gloss"></div></div>';
+  return '<div class="cc3" data-id="'+d.id+'" data-from="'+shown+'" data-to="'+pctNum+'" role="img" aria-label="'+ccEsc(d.name)+' credit card — drag to rotate, double-click to flip">'
     +'<div class="cc3-body" style="--ry:-16deg;--rx:6deg">'+f+back
     +'<div class="cc3-edge cc3-e-t"></div><div class="cc3-edge cc3-e-b"></div><div class="cc3-edge cc3-e-l"></div><div class="cc3-edge cc3-e-r"></div></div></div>';
 }
@@ -12348,6 +12373,45 @@ function ccSaveEdit(){
   ccCloseEdit();saveDebtState();renderDebtTab();showToast('Card design saved ✓');
 }
 
+
+// ── the slow, satisfying cut: scissors travel down the cut line, then the paid part greys and parts from the card ──
+function ccReduced(){try{return window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){return false;}}
+function ccWatchCuts(root){
+  (root||document).querySelectorAll('.cc3[data-from]').forEach(function(c){
+    var a=+c.getAttribute('data-from'),b=+c.getAttribute('data-to');
+    if(a===b||c._ccBusy){return;}
+    if(ccReduced()||typeof IntersectionObserver==='undefined'){ccCut(c,a,b,true);return;}
+    if(!_ccIO)_ccIO=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){_ccIO.unobserve(e.target);var el=e.target;ccCut(el,+el.getAttribute('data-from'),+el.getAttribute('data-to'),false);}});},{threshold:.6});
+    _ccIO.observe(c);
+  });
+}
+function ccCut(c,a,b,instant){
+  if(c._ccBusy||!c.isConnected)return;
+  var id=c.getAttribute('data-id');_ccPct[id]=b;
+  var base=c.querySelector('.cc3-base'),piece=c.querySelector('.cc3-piece'),olds=c.querySelector('.cc3-cl-old'),nw=c.querySelector('.cc3-cl-new'),sc=c.querySelector('.cc3-scis');
+  if(!base||!piece)return;
+  var fin=function(){base.style.clipPath='inset(0 '+b+'% 0 0)';piece.style.clipPath='inset(0 0 0 '+(100-b)+'%)';
+    if(olds)olds.style.display='none';if(nw){nw.style.display=(b>0&&b<100)?'':'none';nw.style.left=(100-b)+'%';nw.style.opacity='1';}if(sc)sc.style.opacity='0';c.setAttribute('data-from',b);c._ccBusy=false;};
+  if(instant){fin();return;}
+  c._ccBusy=true;
+  var T1=3200,T2=2000,ease='cubic-bezier(.45,.05,.25,1)',phase2=function(){
+    var o={duration:T2,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'};
+    base.animate([{clipPath:'inset(0 '+a+'% 0 0)'},{clipPath:'inset(0 '+b+'% 0 0)'}],o);
+    var pa=piece.animate([{clipPath:'inset(0 0 0 '+(100-a)+'%)'},{clipPath:'inset(0 0 0 '+(100-b)+'%)'}],o);
+    if(olds)olds.animate([{opacity:1},{opacity:0}],{duration:T2*.6,fill:'forwards'});
+    if(nw&&b>0&&b<100){nw.style.display='';nw.style.left=(100-b)+'%';nw.animate([{opacity:b>a?1:0},{opacity:1}],{duration:T2*.4,fill:'forwards'});}
+    pa.onfinish=function(){try{base.getAnimations().forEach(function(x){x.cancel();});piece.getAnimations().forEach(function(x){x.cancel();});}catch(e){}fin();};
+  };
+  if(b>a&&b<100&&sc&&nw){   // cutting: scissors snip down the new cut line, drawing it as they go
+    sc.style.left=(100-b)+'%';nw.style.display='';nw.style.left=(100-b)+'%';
+    sc.classList.add('snip');
+    sc.animate([{opacity:0,top:'-14%'},{opacity:1,top:'-10%',offset:.08},{opacity:1,top:'98%',offset:.94},{opacity:0,top:'104%'}],{duration:T1,easing:'linear',fill:'forwards'});
+    var cl=nw.animate([{transform:'scaleY(0)',opacity:1},{transform:'scaleY(1)',opacity:1}],{duration:T1*.86,delay:T1*.08,easing:'linear',fill:'both'});
+    setTimeout(function(){sc.classList.remove('snip');phase2();},T1);
+  } else if(b>=100&&b>a&&sc&&nw){   // fully paid: cut straight across the left edge
+    phase2();
+  } else phase2();
+}
 function makePayment(id){
   var d=debtState.debts.find(function(x){return x.id===id;});
   if(!d)return;
@@ -12355,10 +12419,21 @@ function makePayment(id){
   var v=inp?parseFloat(inp.value)||0:0;
   if(v<=0){showToast('Enter a payment amount');return;}
   if(!d.original||d.original<=0)d.original=d.balance+v;
+  var paid=Math.min(v,d.balance);   // an overpayment can only clear what is owed
   d.balance=Math.max(0,d.balance-v);
+  d.payments=(d.payments||[]).concat([{id:Date.now(),amt:paid,date:new Date().toISOString()}]).slice(-50);
   if(inp)inp.value='';
   saveDebtState();renderDebtTab();updateKPIs();checkAchievements();
-  showToast('£'+v.toLocaleString('en-GB')+' payment recorded ✓');
+  showToast('£'+paid.toLocaleString('en-GB')+' payment recorded ✓ — you can undo it on the card');
+}
+function undoPayment(id){
+  var d=debtState.debts.find(function(x){return x.id===id;});
+  if(!d||!d.payments||!d.payments.length)return;
+  var p=d.payments.pop();
+  d.balance=Math.round((d.balance+p.amt)*100)/100;
+  if(!d.payments.length)delete d.payments;
+  saveDebtState();renderDebtTab();updateKPIs();
+  showToast('£'+(+p.amt).toLocaleString('en-GB')+' payment undone');
 }
 function renderDebtTab(){
   var sorted=[].concat(debtState.debts).sort(function(a,b){
@@ -12395,11 +12470,12 @@ function renderDebtTab(){
         // real-proportion 3D card (drag to rotate, double-tap to flip); progress shown on the card's bottom edge
         return '<div style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px">'
           +'<div style="font-size:.55rem;font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</div>'
-          +cc3dHTML(d,pctNum)
+          +cc3dHTML(d,pctNum,ccReduced()?pctNum:(_ccPct[d.id]!=null?_ccPct[d.id]:0))
           +'<div style="font-size:.52rem;color:var(--re);font-family:\'Share Tech Mono\',monospace;font-weight:700;display:flex;justify-content:space-between"><span>'+gbpFmt(d.balance)+'</span><span style="color:var(--gr);font-weight:400">'+pctNum+'% paid</span></div>'
           +'<div style="display:flex;align-items:center;gap:4px">'
           +'<input type="number" id="debt-pay-inp-'+d.id+'" class="al-inp" placeholder="£ pay" style="flex:1;font-size:.52rem;padding:3px 6px;min-width:0">'
           +'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap" onclick="makePayment('+d.id+')">Pay</button>'
+          +(d.payments&&d.payments.length?'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap;background:transparent;border-color:var(--t3);color:var(--t2)" title="Undo your last payment of £'+d.payments[d.payments.length-1].amt+'" onclick="undoPayment('+d.id+')">↩ Undo £'+Math.round(d.payments[d.payments.length-1].amt*100)/100+'</button>':'')
           +'</div>'
           +'<div style="display:flex;justify-content:space-between;align-items:center">'
           +'<span style="font-size:.46rem;color:var(--t3)">'+d.rate+'% APR</span>'
@@ -12422,6 +12498,7 @@ function renderDebtTab(){
           +'<div style="display:flex;align-items:center;gap:4px">'
           +'<input type="number" id="debt-pay-inp-'+d.id+'" class="al-inp" placeholder="£ pay" style="flex:1;font-size:.52rem;padding:3px 6px;min-width:0">'
           +'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap" onclick="makePayment('+d.id+')">Pay</button>'
+          +(d.payments&&d.payments.length?'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap;background:transparent;border-color:var(--t3);color:var(--t2)" title="Undo your last payment of £'+d.payments[d.payments.length-1].amt+'" onclick="undoPayment('+d.id+')">↩ Undo £'+Math.round(d.payments[d.payments.length-1].amt*100)/100+'</button>':'')
           +'</div>'
           +'<div style="display:flex;justify-content:space-between;align-items:center">'
           +'<span style="font-size:.46rem;color:var(--t3)">'+(DEBT_TYPE_LABELS[d.type]||'Debt')+' · '+d.rate+'% · Min '+gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0)+'/mo</span>'
@@ -12431,7 +12508,7 @@ function renderDebtTab(){
       }
     }).join('')
     +'</div>';
-  setTimeout(function(){drawDebtHistogram();drawDebtDonut();updateDebtInterestPanel();},50);
+  setTimeout(function(){drawDebtHistogram();drawDebtDonut();updateDebtInterestPanel();ccWatchCuts(dl);},50);
 }
 
 var _debtMethod = 'avalanche';
