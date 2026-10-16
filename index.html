@@ -2641,6 +2641,15 @@ input:focus, textarea:focus, select:focus {
 .stk-pie span{font-family:'Share Tech Mono',monospace;font-weight:400;color:var(--t3);font-size:.5rem}
 .stk-pie.on{background:rgba(155,126,200,.16);border-color:#9b7ec8;color:#d9c9f2}
 .stk-pie.add{border-style:dashed;color:var(--em)}
+.stk-pie{position:relative}
+.stk-pie:has(.stk-plat){padding-right:24px}
+.stk-plat{position:absolute;top:-8px;right:-4px;width:22px;height:22px;border-radius:7px;overflow:hidden;background:#fff;border:1px solid rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.stk-plat img{width:100%;height:100%;object-fit:contain;display:block}
+.stk-mono{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:9px;letter-spacing:-.02em;font-family:'Syne',sans-serif}
+.stk-main{position:relative}
+.stk-main-logo{position:absolute;top:12px;right:14px;display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;color:var(--t2)}
+.stk-main-logo .stk-plat{position:static;width:42px;height:42px;border-radius:11px}
+.stk-main-logo .stk-mono{font-size:15px}
 .stk-mini{background:none;border:none;color:var(--t3);cursor:pointer;font-size:.7rem;padding:2px 4px}
 .stk-mini:hover{color:var(--em)}
 .stk-card{background:rgba(4,10,20,.6);border:1px solid rgba(68,192,185,.16);border-radius:10px;padding:14px}
@@ -9568,10 +9577,97 @@ function alTotalOther(){return alState.otherAssets.reduce(function(s,a){return s
 // ═══════════════════════════════════════════════════════════════
 // STOCKS & FUNDS — editable portfolios ("pies") with live prices
 // ═══════════════════════════════════════════════════════════════
+
+// ── Investment platform per pie: automatic logo (known platforms) + manual name / uploaded logo ──
+var STK_PLATFORMS=[
+ {n:'Trading 212',d:'trading212.com',c:'#0a9fe6',re:/trading\s*-?\s*212|\bt212\b/i},
+ {n:'Freetrade',d:'freetrade.io',c:'#1b1b3a',re:/freetrade/i},
+ {n:'Hargreaves Lansdown',d:'hl.co.uk',c:'#0f6d46',re:/hargreaves|\bhl\b/i},
+ {n:'AJ Bell',d:'ajbell.co.uk',c:'#f26522',re:/aj\s*bell|youinvest/i},
+ {n:'Interactive Investor',d:'ii.co.uk',c:'#2b2f7f',re:/interactive\s*investor/i},
+ {n:'Vanguard',d:'vanguardinvestor.co.uk',c:'#96151d',re:/vanguard/i},
+ {n:'Fidelity',d:'fidelity.co.uk',c:'#368727',re:/fidelity/i},
+ {n:'eToro',d:'etoro.com',c:'#13a62c',re:/etoro/i},
+ {n:'Moneybox',d:'moneyboxapp.com',c:'#00a7b5',re:/moneybox/i},
+ {n:'Nutmeg',d:'nutmeg.com',c:'#e30b5c',re:/nutmeg/i},
+ {n:'Plum',d:'withplum.com',c:'#7b5cff',re:/^plum$|\bplum\b/i},
+ {n:'Coinbase',d:'coinbase.com',c:'#0052ff',re:/coinbase/i},
+ {n:'Revolut',d:'revolut.com',c:'#191c1f',re:/revolut/i},
+ {n:'Robinhood',d:'robinhood.com',c:'#0aa80a',re:/robinhood/i},
+ {n:'Charles Schwab',d:'schwab.com',c:'#00a0df',re:/schwab/i},
+ {n:'Interactive Brokers',d:'interactivebrokers.com',c:'#d81222',re:/interactive\s*brokers|\bibkr\b/i},
+ {n:'Degiro',d:'degiro.co.uk',c:'#0b8aa8',re:/degiro/i},
+ {n:'IG',d:'ig.com',c:'#e8003d',re:/^ig$|\big\s*(group|trading|share)/i},
+ {n:'Lightyear',d:'lightyear.com',c:'#222',re:/lightyear/i},
+ {n:'Wealthify',d:'wealthify.com',c:'#6c3ce1',re:/wealthify/i},
+ {n:'Chip',d:'getchip.uk',c:'#6a4cff',re:/^chip$/i},
+ {n:'Scalable Capital',d:'scalable.capital',c:'#1d2df0',re:/scalable/i},
+ {n:'Webull',d:'webull.com',c:'#1a73e8',re:/webull/i},
+ {n:'Saxo',d:'home.saxo',c:'#0d6efd',re:/saxo/i},
+ {n:'Barclays',d:'barclays.co.uk',c:'#00aeef',re:/barclays/i},
+ {n:'Lloyds',d:'lloydsbank.com',c:'#006a4d',re:/lloyds/i},
+ {n:'Halifax',d:'halifax.co.uk',c:'#0067b1',re:/halifax/i},
+ {n:'Santander',d:'santander.co.uk',c:'#ec0000',re:/santander/i},
+ {n:'HSBC',d:'hsbc.co.uk',c:'#db0011',re:/hsbc/i},
+ {n:'NatWest',d:'natwest.com',c:'#5a287d',re:/natwest/i}
+];
+function stkPlatformMatch(t){t=String(t||'').trim();if(!t)return null;for(var i=0;i<STK_PLATFORMS.length;i++)if(STK_PLATFORMS[i].re.test(t))return STK_PLATFORMS[i];return null;}
+function stkMonoColor(n){var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))>>>0;return 'hsl('+(h%360)+',55%,38%)';}
+function stkMono(name,color){
+  var w=String(name||'?').trim().split(/\s+/).filter(Boolean),ini=(w.length>1?w[0][0]+w[1][0]:String(name||'?').trim().slice(0,2)).toUpperCase();
+  return '<span class="stk-mono" style="background:'+(color||stkMonoColor(String(name||'')))+'">'+stkEsc(ini)+'</span>';
+}
+// the little logo badge for a pie: your uploaded logo, else the platform's own logo, else a coloured monogram
+function stkLogoBadge(pie,full){
+  var pl=pie&&pie.platform;if(!pl||!(pl.name||pl.logo))return '';
+  var m=stkPlatformMatch(pl.name),inner;
+  if(pl.logo&&/^data:image\//.test(pl.logo))inner='<img alt="" src="'+stkEsc(pl.logo)+'">';
+  else if(m)inner='<img alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain='+m.d+'&sz=64" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+'<span style="display:none;width:100%;height:100%">'+stkMono(pl.name,m.c)+'</span>';
+  else inner=stkMono(pl.name);
+  var badge='<span class="stk-plat" title="'+stkEsc(pl.name||'Platform')+'">'+inner+'</span>';
+  return full?'<span class="stk-main-logo">'+stkEsc(pl.name||'')+badge+'</span>':badge;
+}
+function stkPlatformAuto(){   // pies named after a known platform get its logo automatically
+  (alState.stockPies||[]).forEach(function(p){if(!p.platform){var m=stkPlatformMatch(p.name);if(m)p.platform={name:m.n,auto:true};}});
+}
+var _platEdit=null;
+function stkPlatformEdit(){
+  stkEnsure();var p=alState.stockPies.find(function(x){return x.id===alState.activePie;});if(!p){showToast('Pick a pie first');return;}
+  _platEdit={id:p.id,logo:(p.platform&&p.platform.logo)||undefined,name:(p.platform&&p.platform.name)||''};stkPlatformEditRender();
+}
+function stkPlatformEditRender(){
+  var o=document.getElementById('stk-shot-ov');if(!o){o=document.createElement('div');o.id='stk-shot-ov';o.className='stk-shot-ov';document.body.appendChild(o);}
+  var p=alState.stockPies.find(function(x){return x.id===_platEdit.id;})||{};
+  var preview=stkLogoBadge({platform:{name:_platEdit.name,logo:_platEdit.logo}});
+  o.innerHTML='<div class="stk-shot" style="width:min(460px,100%)"><div class="stk-shot-hd"><span>🏦 Platform for “'+stkEsc(p.name||'')+'”</span><span style="cursor:pointer" onclick="stkShotClose()">✕</span></div>'
+    +'<div class="stk-shot-bd"><div style="margin-bottom:8px">Type the platform name. Known ones (Trading 212, Freetrade, Hargreaves Lansdown, Vanguard…) get their logo automatically. You can also upload your own logo.</div>'
+    +'<datalist id="stk-plat-list">'+STK_PLATFORMS.map(function(x){return'<option value="'+stkEsc(x.n)+'">';}).join('')+'</datalist>'
+    +'<input id="stk-plat-name" list="stk-plat-list" type="text" maxlength="40" placeholder="Platform name, e.g. Trading 212" value="'+stkEsc(_platEdit.name)+'" oninput="_platEdit.name=this.value;document.getElementById(\'stk-plat-prev\').innerHTML=stkLogoBadge({platform:{name:_platEdit.name,logo:_platEdit.logo}})" style="width:100%;background:rgba(4,10,20,.8);border:1px solid rgba(68,192,185,.25);border-radius:4px;color:#e6eef7;font-size:13px;padding:8px;margin:6px 0">'
+    +'<div style="display:flex;align-items:center;gap:12px;margin:10px 0"><span id="stk-plat-prev" style="position:relative;display:inline-block;width:44px;height:44px">'+preview.replace('class="stk-plat"','class="stk-plat" style="position:static;width:44px;height:44px;border-radius:11px"')+'</span>'
+    +'<button class="stk-btn" onclick="document.getElementById(\'stk-plat-file\').click()">⬆ Upload logo</button>'
+    +(_platEdit.logo?'<button class="stk-btn" onclick="_platEdit.logo=undefined;stkPlatformEditRender()">Use automatic logo</button>':'')
+    +'<input type="file" id="stk-plat-file" accept="image/*" style="display:none" onchange="stkPlatformFile(this)"></div></div>'
+    +'<div class="stk-shot-ft"><button class="stk-btn" style="margin-right:auto" onclick="stkPlatformSave(true)">Remove</button><button class="stk-btn" onclick="stkShotClose()">Cancel</button><button class="btn-add-data" onclick="stkPlatformSave(false)">Save</button></div></div>';
+}
+function stkPlatformFile(inp){
+  var f=inp.files&&inp.files[0];inp.value='';if(!f)return;
+  var img=new Image(),u=URL.createObjectURL(f);
+  img.onload=function(){var sc=Math.min(1,96/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);var d=c.toDataURL('image/png');if(d.length>60000)d=c.toDataURL('image/jpeg',0.8);_platEdit.logo=d;stkPlatformEditRender();};
+  img.onerror=function(){URL.revokeObjectURL(u);showToast('That image could not be read');};
+  img.src=u;
+}
+function stkPlatformSave(remove){
+  var p=alState.stockPies.find(function(x){return x.id===_platEdit.id;});if(!p)return;
+  var name=viClean(String((document.getElementById('stk-plat-name')||{}).value||_platEdit.name||'').trim()).slice(0,40);
+  if(remove||(!name&&!_platEdit.logo))delete p.platform,p.platformOff=true;
+  else{p.platform={name:name};if(_platEdit.logo)p.platform.logo=_platEdit.logo;delete p.platformOff;}
+  stkShotClose();stkSave();showToast(p.platform?'Platform saved ✓':'Platform removed');
+}
 function stkEnsure(){
   if(!alState.stocks)alState.stocks=[];
   if(!alState.stockPies||!alState.stockPies.length)alState.stockPies=[{id:1,name:'My Portfolio'}];
   if(alState.activePie!=='all'&&!alState.stockPies.some(function(p){return p.id===alState.activePie;}))alState.activePie=alState.stockPies[0].id;
+  alState.stockPies.forEach(function(p){if(!p.platform&&!p.platformOff){var m=stkPlatformMatch(p.name);if(m)p.platform={name:m.n,auto:true};}});
 }
 function stkEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 // Holdings with no live price fall back to cost so net worth never silently drops to £0.
@@ -9620,10 +9716,10 @@ function stkRender(){
   var chips='<button class="stk-pie'+(alState.activePie==='all'?' on':'')+'" onclick="stkSelectPie(\'all\')">All pies <span>'+gbpFmt(alTotalStocks())+'</span></button>';
   alState.stockPies.forEach(function(p){
     var v=alState.stocks.filter(function(h){return h.pie===p.id;}).reduce(function(s,h){return s+stkValue(h);},0);
-    chips+='<button class="stk-pie'+(alState.activePie===p.id?' on':'')+'" onclick="stkSelectPie('+p.id+')">'+stkEsc(p.name)+' <span>'+gbpFmt(v)+'</span></button>';
+    chips+='<button class="stk-pie'+(alState.activePie===p.id?' on':'')+'" onclick="stkSelectPie('+p.id+')">'+stkEsc(p.name)+' <span>'+gbpFmt(v)+'</span>'+stkLogoBadge(p)+'</button>';
   });
   chips+='<button class="stk-pie add" onclick="stkNewPie()">+ New pie</button>';
-  if(alState.activePie!=='all')chips+='<button class="stk-mini" title="Rename this pie" onclick="stkRenamePie()">✎</button><button class="stk-mini" title="Delete this pie" onclick="stkDeletePie()">✕</button>';
+  if(alState.activePie!=='all')chips+='<button class="stk-mini" title="Set the investment platform and logo" onclick="stkPlatformEdit()">🏦</button><button class="stk-mini" title="Rename this pie" onclick="stkRenamePie()">✎</button><button class="stk-mini" title="Delete this pie" onclick="stkDeletePie()">✕</button>';
   pies.innerHTML=chips;
 
   var hs=stkVisible().slice().sort(function(a,b){return stkValue(b)-stkValue(a);});
@@ -9639,7 +9735,8 @@ function stkRender(){
   var main=document.getElementById('stk-main');
   if(main){
     var up=ret>=0,dUp=dayChg>=0;
-    main.innerHTML='<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
+    var _ap=alState.activePie!=='all'?alState.stockPies.find(function(x){return x.id===alState.activePie;}):null;
+    main.innerHTML=(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
       +'<div class="stk-stats">'
       +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+cfMoney(total)+'</div><div class="s">'+hs.length+' holding'+(hs.length===1?'':'s')+' · counts towards net worth</div></div>'
       +'<div class="stk-stat" style="background:'+(withCost.length?(up?'rgba(62,207,142,.07)':'rgba(224,92,92,.08)'):'rgba(68,192,185,.06)')+'"><div class="l">Total return</div><div class="v" style="color:'+(withCost.length?(up?'#3ecf8e':'#e05c5c'):'var(--t3)')+'">'+(withCost.length?((up?'+':'−')+cfMoney(Math.abs(ret))):'—')+'</div><div class="s">'+(withCost.length?(withCost.length<hs.length?'on '+withCost.length+' of '+hs.length+' with a cost basis':'vs your average cost'):'add an average cost to see returns')+'</div></div>'
@@ -9955,7 +10052,7 @@ async function stkShotPicked(inp){
       return{name:h.name,value:h.value,shares:h.shares,pl:h.pl,cands:cands,sym:(cands[0]&&cands[0].symbol)||'',inc:false,price:null,ccy:null};
     });
     if(!rows.length){stkShotModal('📷 Import screenshots','<div class="stk-shot-err">No holdings with values were found in those screenshots.</div>','<button class="stk-btn" onclick="stkShotClose()">Close</button>');return;}
-    _shot.rows=rows;_shot.portfolio=d.portfolio||'';
+    _shot.rows=rows;_shot.portfolio=d.portfolio||'';_shot.platform=viClean(String(d.platform||'')).slice(0,40);
     stkShotModal('📷 Reading prices…','<div style="text-align:center;padding:28px 0">Found '+rows.length+' holdings. Fetching live prices…</div>','');
     await stkShotPrice();
     stkShotReview();
@@ -9988,7 +10085,7 @@ function stkShotReview(){
   var pieSel='<select id="stk-shot-pie">'+pies.map(function(p){return'<option value="'+p.id+'"'+((prevSel?String(p.id)===prevSel:(dflt?dflt.id===p.id:p.id===alState.activePie))?' selected':'')+'>'+stkEsc(p.name)+'</option>';}).join('')+(_shot.portfolio&&!dflt?'<option value="new" selected>＋ New pie: '+stkEsc(_shot.portfolio)+'</option>':'')+'<option value="newcustom">＋ New pie…</option></select>';
   var noPrice=0;
   var body='<div>Check each row — pick the right ticker if it guessed wrong. Shares are worked out from the value in your screenshot ÷ the live price, so they’re accurate to the pennies shown. Edit any number.</div>'+
-    '<div style="margin:10px 0;display:flex;gap:8px;align-items:center">Add to: <span style="flex:1;max-width:260px">'+pieSel+'</span></div>'+
+    '<div style="margin:10px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap">Add to: <span style="flex:1;min-width:180px;max-width:260px">'+pieSel+'</span> Platform: <input id="stk-shot-plat" list="stk-plat-list2" type="text" maxlength="40" placeholder="e.g. Trading 212" value="'+stkEsc(_shot.platform||(stkPlatformMatch(_shot.portfolio)||{}).n||'')+'" style="flex:1;min-width:140px;max-width:220px;background:rgba(4,10,20,.8);border:1px solid rgba(68,192,185,.25);border-radius:4px;color:#e6eef7;font-size:12px;padding:5px 6px"><datalist id="stk-plat-list2">'+STK_PLATFORMS.map(function(x){return'<option value="'+stkEsc(x.n)+'">';}).join('')+'</datalist></div>'+
     '<table class="stk-shot-tbl"><thead><tr><th></th><th>HOLDING</th><th>TICKER</th><th class="hide-m">VALUE £</th><th>SHARES</th></tr></thead><tbody>';
   _shot.rows.forEach(function(r,i){
     if(!(r.price>0))noPrice++;
@@ -10025,6 +10122,8 @@ function stkShotConfirm(){
     if(!nm)return;
     pie={id:Date.now(),name:nm.slice(0,40)};alState.stockPies.push(pie);
   } else pie=alState.stockPies.find(function(p){return String(p.id)===String(sel);})||alState.stockPies[0];
+  var _pv=viClean(String((document.getElementById('stk-shot-plat')||{}).value||'').trim()).slice(0,40);
+  if(_pv&&!pie.platform){pie.platform={name:(stkPlatformMatch(_pv)||{}).n||_pv};delete pie.platformOff;}
   var n=0;
   _shot.rows.forEach(function(r){
     if(!r.inc||!(r.units>0)||!r.sym)return;

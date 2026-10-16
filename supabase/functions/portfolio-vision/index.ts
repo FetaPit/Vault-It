@@ -41,6 +41,7 @@ const TOOL = {
     properties: {
       portfolio:    { type: ['string', 'null'], description: 'Name of the pie / portfolio / account if shown (e.g. "Fully Future Focused"), else null' },
       accountValue: { type: ['number', 'null'], description: 'Total account/portfolio value shown, as a plain number, else null' },
+      platform:     { type: ['string', 'null'], description: 'Name of the investing app/platform if you can tell from the screenshot (e.g. "Trading 212", "Freetrade", "Hargreaves Lansdown"), else null' },
       currency:     { type: 'string', description: 'ISO currency of the values shown, e.g. GBP' },
       holdings: {
         type: 'array',
@@ -68,6 +69,7 @@ const PROMPT =
   '(2) Screenshots may overlap (scrolled list): never list the same holding twice. ' +
   '(3) Numbers are plain numbers: "£1,619.66" → 1619.66, "-£2.26 (41.17%)" → pl -2.26. ' +
   '(4) Do not invent share counts; give shares only if printed. (5) Give a Yahoo Finance ticker only when you are confident. ' +
+  '(6) If the app or platform is recognisable from its look, name or logo, give its name in platform. ' +
   'Call the report_holdings tool exactly once with everything you found. Do not answer in prose.'
 
 async function candidates(name: string, hint: string | null) {
@@ -156,6 +158,7 @@ async function handle(req: Request): Promise<Response> {
   })))
   return json({
     portfolio: typeof result.portfolio === 'string' ? result.portfolio.slice(0, 40) : null,
+    platform: typeof result.platform === 'string' ? result.platform.slice(0, 40) : null,
     accountValue: num(result.accountValue), currency: typeof result.currency === 'string' ? result.currency : 'GBP',
     holdings,
   })
