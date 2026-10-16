@@ -2643,6 +2643,11 @@ input:focus, textarea:focus, select:focus {
 .stk-pie.add{border-style:dashed;color:var(--em)}
 .stk-pie{position:relative}
 .stk-pie:has(.stk-plat){padding-right:24px}
+.stk-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;font-size:.44rem;color:var(--t3)}
+.stk-meta-i{display:inline-flex;align-items:center;gap:4px}
+.stk-mini-logo{display:inline-flex;width:14px;height:14px;border-radius:4px;overflow:hidden;background:#fff;vertical-align:middle}
+.stk-mini-logo img{width:100%;height:100%;object-fit:contain}
+.stk-mini-logo .stk-mono{font-size:6px}
 .stk-ch-hd{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
 .stk-ch-hd b{font-family:'Syne',sans-serif;font-size:.6rem;color:var(--em);letter-spacing:.04em}
 .stk-seg{display:inline-flex;border:1px solid rgba(68,192,185,.28);border-radius:6px;overflow:hidden}
@@ -4262,7 +4267,6 @@ button.bd-ic{cursor:pointer}
           <div class="stk-hd">
             <span>Holdings</span>
             <span class="stk-actions">
-              <button class="stk-btn" onclick="stkFocusAdd()" title="Search for a fund, ETF or share by name or ISIN and add it to this pie">＋ Add fund / share</button>
               <button class="stk-btn" onclick="stkRefresh(false)" title="Fetch the latest prices">↻ Refresh prices</button>
               <button class="stk-btn" onclick="stkShotStart()" title="Upload screenshots of your pie or portfolio — no platform connection needed">📷 Import screenshots</button>
               <button class="stk-btn" onclick="document.getElementById('stk-csv').click()" title="Import holdings from a CSV (Trading 212 history export or ticker,units,avg cost)">⇪ Import CSV</button>
@@ -9624,9 +9628,52 @@ var STK_PLATFORMS=[
  {n:'Halifax',d:'halifax.co.uk',c:'#0067b1',re:/halifax/i},
  {n:'Santander',d:'santander.co.uk',c:'#ec0000',re:/santander/i},
  {n:'HSBC',d:'hsbc.co.uk',c:'#db0011',re:/hsbc/i},
- {n:'NatWest',d:'natwest.com',c:'#5a287d',re:/natwest/i}
+ {n:'NatWest',d:'natwest.com',c:'#5a287d',re:/natwest/i},
+ {n:'Monzo',d:'monzo.com',c:'#ff4f40',re:/monzo/i},
+ {n:'Starling',d:'starlingbank.com',c:'#6935d3',re:/starling/i},
+ {n:'Nationwide',d:'nationwide.co.uk',c:'#00205b',re:/nationwide/i},
+ {n:'Aviva',d:'aviva.co.uk',c:'#ffd100',re:/aviva/i},
+ {n:'Standard Life',d:'standardlife.co.uk',c:'#00a3a1',re:/standard\s*life/i},
+ {n:'Bestinvest',d:'bestinvest.co.uk',c:'#00a5a8',re:/bestinvest/i},
+ {n:'Quilter',d:'quilter.com',c:'#005cb9',re:/quilter/i}
 ];
 function stkPlatformMatch(t){t=String(t||'').trim();if(!t)return null;for(var i=0;i<STK_PLATFORMS.length;i++)if(STK_PLATFORMS[i].re.test(t))return STK_PLATFORMS[i];return null;}
+
+var STK_PROVIDERS=[
+ {n:'BlackRock (iShares)',d:'ishares.com',c:'#111',re:/ishares|black\s*rock/i},
+ {n:'Vanguard',d:'vanguardinvestor.co.uk',c:'#96151d',re:/vanguard/i},
+ {n:'Fidelity',d:'fidelity.co.uk',c:'#368727',re:/fidelity/i},
+ {n:'HSBC',d:'hsbc.co.uk',c:'#db0011',re:/hsbc/i},
+ {n:'Legal & General',d:'lgim.com',c:'#0a2540',re:/legal\s*(&|and)?\s*general|\bl&g\b|\blgim\b/i},
+ {n:'Invesco',d:'invesco.com',c:'#0a3a8a',re:/invesco/i},
+ {n:'SPDR (State Street)',d:'ssga.com',c:'#0b4ea2',re:/spdr|state\s*street/i},
+ {n:'Amundi',d:'amundi.com',c:'#0050a0',re:/amundi|lyxor/i},
+ {n:'Xtrackers (DWS)',d:'dws.com',c:'#0b2d6b',re:/xtrackers|\bdws\b/i},
+ {n:'VanEck',d:'vaneck.com',c:'#1d4e89',re:/vaneck/i},
+ {n:'WisdomTree',d:'wisdomtree.eu',c:'#00a0b0',re:/wisdomtree/i},
+ {n:'Schroders',d:'schroders.com',c:'#0a8a5a',re:/schroder/i},
+ {n:'abrdn',d:'abrdn.com',c:'#4b0082',re:/abrdn|aberdeen/i},
+ {n:'Baillie Gifford',d:'bailliegifford.com',c:'#0a3d62',re:/baillie/i},
+ {n:'Jupiter',d:'jupiteram.com',c:'#2a5caa',re:/jupiter/i},
+ {n:'J.P. Morgan',d:'jpmorgan.com',c:'#5b3a29',re:/j\.?\s?p\.?\s*morgan|\bjpm\b/i},
+ {n:'Janus Henderson',d:'janushenderson.com',c:'#e07b00',re:/janus|henderson/i},
+ {n:'Royal London',d:'rlam.com',c:'#d6001c',re:/royal\s*london/i},
+ {n:'ARK Invest',d:'ark-funds.com',c:'#111',re:/\bark\b/i},
+ {n:'Global X',d:'globalxetfs.eu',c:'#e8562a',re:/global\s*x/i},
+ {n:'Rathbones',d:'rathbones.com',c:'#00587c',re:/rathbone/i}
+];
+function stkProviderMatch(t){t=String(t||'').trim();if(!t)return null;for(var i=0;i<STK_PROVIDERS.length;i++)if(STK_PROVIDERS[i].re.test(t))return STK_PROVIDERS[i];return null;}
+function stkMini(domain,label,color){
+  var ini=stkMono(label,color);
+  return '<span class="stk-mini-logo">'+(domain?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=32" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span style="display:none;width:100%;height:100%">'+ini+'</span>':ini)+'</span>';
+}
+// "BlackRock · on Monzo" line under a holding's name
+function stkHoldMeta(h){
+  var out='';
+  if(h.provider){var m=stkProviderMatch(h.provider);out+='<span class="stk-meta-i">'+stkMini(m&&m.d,h.provider,m&&m.c)+stkEsc(h.provider)+'</span>';}
+  if(h.platform){var pm=stkPlatformMatch(h.platform);out+='<span class="stk-meta-i">'+(out?'· ':'')+'on '+stkMini(pm&&pm.d,h.platform,pm&&pm.c)+stkEsc(h.platform)+'</span>';}
+  return out?'<div class="stk-meta">'+out+'</div>':'';
+}
 function stkMonoColor(n){var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))>>>0;return 'hsl('+(h%360)+',55%,38%)';}
 function stkMono(name,color){
   var w=String(name||'?').trim().split(/\s+/).filter(Boolean),ini=(w.length>1?w[0][0]+w[1][0]:String(name||'?').trim().slice(0,2)).toUpperCase();
@@ -9733,7 +9780,7 @@ function stkRender(){
     var v=alState.stocks.filter(function(h){return h.pie===p.id;}).reduce(function(s,h){return s+stkValue(h);},0);
     chips+='<button class="stk-pie'+(alState.activePie===p.id?' on':'')+'" onclick="stkSelectPie('+p.id+')">'+stkEsc(p.name)+' <span>'+gbpFmt(v)+'</span>'+stkLogoBadge(p)+'</button>';
   });
-  chips+='<button class="stk-pie add" onclick="stkNewPie()">+ New pie</button>';
+  chips+='<button class="stk-pie add" onclick="stkNewPie()">+ New pie</button><button class="stk-pie add" style="border-style:solid" title="Search a fund, ETF or share by name or ISIN, and say who provides it and where you hold it" onclick="stkAddFundOpen()">＋ Add fund / share</button>';
   if(alState.activePie!=='all')chips+='<button class="stk-mini" title="Set the investment platform and logo" onclick="stkPlatformEdit()">🏦</button><button class="stk-mini" title="Rename this pie" onclick="stkRenamePie()">✎</button><button class="stk-mini" title="Delete this pie" onclick="stkDeletePie()">✕</button>';
   pies.innerHTML=chips;
 
@@ -9779,7 +9826,7 @@ function stkRender(){
         var srcTxt=h.manualPrice?'manual price':(h.updated?'live · '+stkAgo(h.updated):(+h.price>0?'saved price':(+h.avgCost>0?'valued at cost':'no price')));
         var ch=+h.change||0;
         return '<div class="stk-row">'
-          +'<div class="c-tk"><div class="stk-tk"><i style="background:'+STK_COLORS[i%STK_COLORS.length]+'"></i>'+stkEsc(h.sym)+(alState.activePie==='all'?' <span style="color:var(--t3);font-weight:400;font-size:.44rem">· '+stkEsc(stkPieName(h.pie))+'</span>':'')+'</div><div class="stk-nm">'+stkEsc(h.name||'')+'</div></div>'
+          +'<div class="c-tk"><div class="stk-tk"><i style="background:'+STK_COLORS[i%STK_COLORS.length]+'"></i>'+stkEsc(h.sym)+(alState.activePie==='all'?' <span style="color:var(--t3);font-weight:400;font-size:.44rem">· '+stkEsc(stkPieName(h.pie))+'</span>':'')+'</div><div class="stk-nm">'+stkEsc(h.name||'')+'</div>'+stkHoldMeta(h)+'</div>'
           +'<div class="c-un"><span class="stk-lb">Units</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.units||0)+'" onchange="stkSet('+h.id+',\'units\',this.value)" title="Units held"></div>'
           +'<div class="c-av"><span class="stk-lb">Avg cost £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.avgCost>0?(+h.avgCost).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="—" onchange="stkSet('+h.id+',\'avgCost\',this.value)" title="Your average buy price in £"></div>'
           +'<div class="c-pr"><span class="stk-lb">Price £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.price>0?(+h.price).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="live" onchange="stkSet('+h.id+',\'price\',this.value)" title="Price in £ — type one to override the live price, clear it to go back to live"><div class="stk-src">'+srcTxt+(ch&&!h.manualPrice?' · <span style="color:'+(ch>=0?'#3ecf8e':'#e05c5c')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
@@ -9833,65 +9880,113 @@ function stkDeletePie(){
 function stkTargetPie(){stkEnsure();return alState.activePie==='all'?alState.stockPies[0].id:alState.activePie;}
 function stkFocusAdd(){var r=document.querySelector('#assets-stocks .stk-add'),i=document.getElementById('stk-sym');if(r)r.scrollIntoView({behavior:'smooth',block:'center'});if(i)setTimeout(function(){i.focus();},350);}
 var _stkPick=null,_stkSugT=null,_stkSugCache={},_stkSugList=[],_stkAddBusy=false;
-function stkSuggest(q){
-  q=String(q||'').trim();var box=document.getElementById('stk-suggest');if(!box)return;
+function stkSuggest(q,symId,boxId){
+  symId=symId||'stk-sym';boxId=boxId||'stk-suggest';
+  q=String(q||'').trim();var box=document.getElementById(boxId);if(!box)return;
   if(_stkPick&&_stkPick.sym!==q.toUpperCase())_stkPick=null;
   clearTimeout(_stkSugT);
   if(q.length<2){box.style.display='none';return;}
   _stkSugT=setTimeout(async function(){
     var res=_stkSugCache[q.toLowerCase()];
     if(!res){var r=await _fnInvoke('stock-quotes',{search:q},9000);res=(r&&r.data&&r.data.results)||[];_stkSugCache[q.toLowerCase()]=res;}
-    if((document.getElementById('stk-sym')||{}).value!==q&&String((document.getElementById('stk-sym')||{}).value||'').trim()!==q)return;   // typed on since
+    if(String((document.getElementById(symId)||{}).value||'').trim()!==q)return;   // typed on since
     _stkSugList=res;
-    box.innerHTML=res.length?res.map(function(x,i){return'<div onclick="stkPick('+i+')">'+stkEsc(x.name)+'<small>'+stkEsc(x.symbol)+' · '+stkEsc(x.exchange)+' · '+stkEsc(x.type==='MUTUALFUND'?'fund':x.type==='ETF'?'ETF':'share')+'</small></div>';}).join(''):'<div style="cursor:default;color:var(--t3)">No match — type the exact ticker (e.g. VUSA.L) instead</div>';
+    box.innerHTML=res.length?res.map(function(x,i){return'<div onclick="stkPick('+i+',\''+symId+'\',\''+boxId+'\')">'+stkEsc(x.name)+'<small>'+stkEsc(x.symbol)+' · '+stkEsc(x.exchange)+' · '+stkEsc(x.type==='MUTUALFUND'?'fund':x.type==='ETF'?'ETF':'share')+'</small></div>';}).join(''):'<div style="cursor:default;color:var(--t3)">No match — try the ISIN or the exact ticker (e.g. VUSA.L)</div>';
     box.style.display='block';
   },320);
 }
-function stkPick(i){
+function stkPick(i,symId,boxId){
+  symId=symId||'stk-sym';boxId=boxId||'stk-suggest';
   var x=_stkSugList[i];if(!x)return;
-  var inp=document.getElementById('stk-sym');if(inp)inp.value=x.symbol;
+  var inp=document.getElementById(symId);if(inp)inp.value=x.symbol;
   _stkPick={sym:x.symbol.toUpperCase(),name:viClean(x.name)};
-  var box=document.getElementById('stk-suggest');if(box)box.style.display='none';
-  var u=document.getElementById('stk-units');if(u)u.focus();
+  var box=document.getElementById(boxId);if(box)box.style.display='none';
+  var pv=document.getElementById('afs-prov');if(pv&&!pv.value){var m=stkProviderMatch(x.name);if(m)pv.value=m.n;}   // provider from the fund's name
+  var nx=document.getElementById(symId==='afs-sym'?'afs-units':'stk-units');if(nx)nx.focus();
 }
-document.addEventListener('click',function(e){var box=document.getElementById('stk-suggest');if(box&&!e.target.closest('#stk-sym,#stk-suggest'))box.style.display='none';});
-async function stkAdd(){
-  if(_stkAddBusy)return;
-  var sym=((document.getElementById('stk-sym')||{}).value||'').trim().toUpperCase();
-  var units=parseFloat((document.getElementById('stk-units')||{}).value);
-  var amt=parseFloat((document.getElementById('stk-amt')||{}).value);
-  var cost=parseFloat((document.getElementById('stk-cost')||{}).value);
-  if(!/^[A-Z0-9.\-^=]{1,15}$/.test(sym)){showToast('Search for a fund or share, or enter a ticker, e.g. VUSA.L or AAPL');return;}
-  if(!(units>0)&&!(amt>0)){showToast('Enter how many units you hold — or the £ value you hold');return;}
+document.addEventListener('click',function(e){['stk-suggest','afs-suggest'].forEach(function(id){var box=document.getElementById(id);if(box&&!e.target.closest('#stk-sym,#afs-sym,#'+id))box.style.display='none';});});
+// shared by the inline add row and the "Add fund / share" window
+async function stkAddCore(o){
+  var sym=String(o.sym||'').trim().toUpperCase(),units=o.units,amt=o.amt,cost=o.cost;
+  if(!/^[A-Z0-9.\-^=]{1,15}$/.test(sym))return{err:'Search for a fund or share, or enter a ticker, e.g. VUSA.L or AAPL'};
+  if(!(units>0)&&!(amt>0))return{err:'Enter how many units you hold — or the £ value you hold'};
   if(!(units>0)){   // worked out from the £ you hold ÷ the live price
-    _stkAddBusy=true;showToast('Looking up the live price…');
+    showToast('Looking up the live price…');
     try{
       if(!localStorage.getItem('vi_fx_rates')&&typeof fetchExchangeRates==='function')await new Promise(function(res){try{fetchExchangeRates(function(){res();});setTimeout(res,2500);}catch(e){res();}});
       var res=await stkFetchQuotes([sym]),q=res&&res.quotes&&res.quotes[sym],g=q?stkToGBP(q.price,q.currency):null;
-      if(!(g>0)){_stkAddBusy=false;showToast('No live price found for '+sym+' — enter the units instead');return;}
+      if(!(g>0))return{err:'No live price found for '+sym+' — enter the units you hold instead (or pick a different listing of the fund)'};
       units=+(amt/g).toFixed(6);
-    }catch(e){_stkAddBusy=false;showToast('Could not look up the price — enter the units instead');return;}
-    _stkAddBusy=false;
+    }catch(e){return{err:'Could not look up the price — enter the units instead'};}
   }
   stkEnsure();
-  var pie=stkTargetPie();
-  var ex=alState.stocks.find(function(h){return h.pie===pie&&h.sym===sym;});
-  var h=ex,nm=(_stkPick&&_stkPick.sym===sym)?_stkPick.name:'';
-  if(ex){ // merge into the existing position (weighted average cost)
-    var tc=(ex.avgCost>0?ex.units*ex.avgCost:0)+(cost>0?units*cost:0);
-    ex.units=+(ex.units+units).toFixed(8);
-    if(ex.avgCost>0&&cost>0)ex.avgCost=tc/ex.units;else if(cost>0&&!(ex.avgCost>0))ex.avgCost=cost;
-    if(!ex.name&&nm)ex.name=nm;
+  var pie;
+  if(o.newPie){pie={id:Date.now(),name:viClean(o.newPie).slice(0,40)};alState.stockPies.push(pie);}
+  else pie=alState.stockPies.find(function(p){return String(p.id)===String(o.pieId);})||alState.stockPies.find(function(p){return p.id===stkTargetPie();})||alState.stockPies[0];
+  var nm=(_stkPick&&_stkPick.sym===sym)?_stkPick.name:(o.name||'');
+  var provider=viClean(String(o.provider||'')).trim().slice(0,40),platform=viClean(String(o.platform||'')).trim().slice(0,40);
+  if(platform&&!pie.platform){pie.platform={name:(stkPlatformMatch(platform)||{}).n||platform};delete pie.platformOff;}
+  var h=alState.stocks.find(function(x){return x.pie===pie.id&&x.sym===sym;});
+  if(h){ // merge into the existing position (weighted average cost)
+    var tc=(h.avgCost>0?h.units*h.avgCost:0)+(cost>0?units*cost:0);
+    h.units=+(h.units+units).toFixed(8);
+    if(h.avgCost>0&&cost>0)h.avgCost=tc/h.units;else if(cost>0&&!(h.avgCost>0))h.avgCost=cost;
+    if(!h.name&&nm)h.name=nm;
   } else {
-    h={id:Date.now(),pie:pie,sym:sym,name:nm,units:units,avgCost:cost>0?cost:0,price:0};
+    h={id:Date.now(),pie:pie.id,sym:sym,name:nm,units:units,avgCost:cost>0?cost:0,price:0};
     alState.stocks.push(h);
   }
+  if(provider)h.provider=provider;
+  if(platform)h.platform=platform;
   _stkPick=null;
-  ['stk-sym','stk-units','stk-amt','stk-cost'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
-  var bx=document.getElementById('stk-suggest');if(bx)bx.style.display='none';
+  alState.activePie=pie.id;
   stkSave();
-  showToast((nm||sym)+' added'+(amt>0&&!(parseFloat((document.getElementById('stk-units')||{}).value)>0)?' · '+units+' units':''));
-  stkRefresh(true);
+  return{ok:true,h:h,pie:pie,units:units,name:nm||sym};
+}
+async function stkAddFinish(r,fromAmount){
+  showToast(r.name+' added to “'+r.pie.name+'”'+(fromAmount?' · '+r.units+' units':''));
+  await stkRefresh(true);
+  var h=alState.stocks.find(function(x){return x.id===r.h.id;});
+  if(h&&!(h.price>0)&&!h.updated)showToast('Added, but no live price was found for '+h.sym+'. Type a price in the Price box, or search again and choose another listing (e.g. the London .L one).');
+}
+async function stkAdd(){
+  if(_stkAddBusy)return;_stkAddBusy=true;
+  try{
+    var g=function(id){return(document.getElementById(id)||{}).value;};
+    var units=parseFloat(g('stk-units')),amt=parseFloat(g('stk-amt'));
+    var r=await stkAddCore({sym:g('stk-sym'),units:units,amt:amt,cost:parseFloat(g('stk-cost')),pieId:stkTargetPie()});
+    if(r.err){showToast(r.err);return;}
+    ['stk-sym','stk-units','stk-amt','stk-cost'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+    var bx=document.getElementById('stk-suggest');if(bx)bx.style.display='none';
+    await stkAddFinish(r,!(units>0));
+  }finally{_stkAddBusy=false;}
+}
+function stkAddFundOpen(){
+  stkEnsure();_stkPick=null;
+  var o=document.getElementById('stk-shot-ov');if(!o){o=document.createElement('div');o.id='stk-shot-ov';o.className='stk-shot-ov';document.body.appendChild(o);}
+  var cur=alState.activePie==='all'?alState.stockPies[0].id:alState.activePie;
+  var cp=alState.stockPies.find(function(p){return p.id===cur;})||{};
+  var inp='width:100%;background:rgba(4,10,20,.8);border:1px solid rgba(68,192,185,.25);border-radius:4px;color:#e6eef7;font-size:13px;padding:8px;margin:3px 0 8px';
+  o.innerHTML='<div class="stk-shot" style="width:min(520px,100%)"><div class="stk-shot-hd"><span>＋ Add a fund, ETF or share</span><span style="cursor:pointer" onclick="stkShotClose()">✕</span></div><div class="stk-shot-bd">'
+   +'<label>Fund or share</label><div style="position:relative"><input id="afs-sym" style="'+inp+'" placeholder="Search by name, ticker or ISIN" autocomplete="off" oninput="stkSuggest(this.value,\'afs-sym\',\'afs-suggest\')"><div id="afs-suggest" class="stk-suggest"></div></div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><label>Units</label><input id="afs-units" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 10"></div><div><label>…or £ held</label><input id="afs-amt" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 112.40"></div><div><label>Avg cost £</label><input id="afs-cost" type="number" min="0" step="any" style="'+inp+'" placeholder="optional"></div></div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label>Provider (who runs the fund)</label><input id="afs-prov" list="afs-provs" maxlength="40" style="'+inp+'" placeholder="e.g. BlackRock"><datalist id="afs-provs">'+STK_PROVIDERS.map(function(x){return'<option value="'+stkEsc(x.n)+'">';}).join('')+'</datalist></div>'
+   +'<div><label>Platform (where you hold it)</label><input id="afs-plat" list="afs-plats" maxlength="40" style="'+inp+'" placeholder="e.g. Monzo" value="'+stkEsc((cp.platform&&cp.platform.name)||'')+'"><datalist id="afs-plats">'+STK_PLATFORMS.map(function(x){return'<option value="'+stkEsc(x.n)+'">';}).join('')+'</datalist></div></div>'
+   +'<label>Add to pie</label><select id="afs-pie" style="'+inp+'" onchange="document.getElementById(\'afs-newpie\').style.display=this.value===\'new\'?\'block\':\'none\'">'+alState.stockPies.map(function(p){return'<option value="'+p.id+'"'+(p.id===cur?' selected':'')+'>'+stkEsc(p.name)+'</option>';}).join('')+'<option value="new">＋ New pie…</option></select><input id="afs-newpie" maxlength="40" style="'+inp+';display:none" placeholder="Name for the new pie">'
+   +'<div style="opacity:.7;font-size:11px">Not sure of the units? Enter the £ you hold and they’re worked out from the live price.</div></div>'
+   +'<div class="stk-shot-ft"><button class="stk-btn" onclick="stkShotClose()">Cancel</button><button class="btn-add-data" onclick="stkAddFundConfirm()">Add</button></div></div>';
+  setTimeout(function(){var i=document.getElementById('afs-sym');if(i)i.focus();},100);
+}
+async function stkAddFundConfirm(){
+  if(_stkAddBusy)return;_stkAddBusy=true;
+  try{
+    var g=function(id){return(document.getElementById(id)||{}).value;};
+    var sel=g('afs-pie'),units=parseFloat(g('afs-units'));
+    var r=await stkAddCore({sym:g('afs-sym'),units:units,amt:parseFloat(g('afs-amt')),cost:parseFloat(g('afs-cost')),provider:g('afs-prov'),platform:g('afs-plat'),pieId:sel==='new'?null:sel,newPie:sel==='new'?(g('afs-newpie')||'').trim()||'New pie':null});
+    if(r.err){showToast(r.err);return;}
+    stkShotClose();
+    await stkAddFinish(r,!(units>0));
+  }finally{_stkAddBusy=false;}
 }
 function stkSet(id,field,val){
   var h=alState.stocks.find(function(x){return x.id===id;});
