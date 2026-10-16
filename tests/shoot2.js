@@ -1,0 +1,21 @@
+const { chromium } = require('playwright');
+const tag=process.argv[2]||'a';
+(async()=>{
+  const b=await chromium.launch();
+  const ctx=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:1.5,isMobile:true,hasTouch:true});
+  const page=await ctx.newPage();
+  await page.addInitScript(()=>{if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));
+    localStorage.setItem('vi_settings',JSON.stringify({fontSize:'large',contrast:'standard',motion:'full',currency:'GBP'}));
+    localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'UC',amount:381,cat:'benefits'},{id:2,name:'PIP',amount:778,cat:'benefits'},{id:5,name:'LCWRA',amount:430,cat:'benefits'}],expenses:[{id:3,name:'Rent',amount:700,type:'ce'},{id:4,name:'Food',amount:300,type:'ve'},{id:6,name:'Phone',amount:30,type:'ce'},{id:7,name:'Energy',amount:120,type:'ce'}]}));
+    localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:1,name:'Virgin Credit Card',original:2502,balance:2502,rate:0,min:60,type:'credit'},{id:2,name:'Vanquis',original:2600,balance:2600,rate:29,min:125,type:'credit'},{id:3,name:'Car',original:8000,balance:5000,rate:7,min:200,type:'car'}]}));});
+  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
+  await page.evaluate(()=>showTab('budget')); await page.waitForTimeout(900);
+  await page.locator('#bd-sankey').scrollIntoViewIfNeeded(); await page.waitForTimeout(300);
+  await page.screenshot({path:`shots/resp/${tag}_m_sankey.png`});
+  await page.evaluate(()=>showTab('debt')); await page.waitForTimeout(900);
+  const hi=await page.evaluate(()=>{const c=document.getElementById('debt-bar-chart');const r=c.getBoundingClientRect();return{w:r.width,left:r.left,parent:c.parentElement.getBoundingClientRect().width,sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth};});console.log(JSON.stringify(hi));
+  await page.locator('#debt-bar-chart').scrollIntoViewIfNeeded(); await page.waitForTimeout(300);
+  await page.screenshot({path:`shots/resp/${tag}_m_debthist.png`});
+  await b.close();
+})();
