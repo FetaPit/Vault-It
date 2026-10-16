@@ -1,0 +1,26 @@
+const { chromium } = require('playwright');
+let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
+(async()=>{
+  const b=await chromium.launch(); const page=await (await b.newContext({viewport:{width:900,height:1000}})).newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message));
+  await page.addInitScript(()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));
+    localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:1,name:'Low rate big',original:3000,balance:3000,rate:5,min:40,type:'credit'},{id:2,name:'High rate small',original:300,balance:300,rate:29,min:20,type:'credit'},{id:3,name:'Mid',original:1000,balance:1000,rate:18,min:25,type:'credit'},{id:4,name:'Loan',original:8000,balance:8000,rate:7,min:200,type:'car'}]}));});
+  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
+  await page.evaluate(()=>showTab('debt')); await page.waitForTimeout(6500);
+  ok(await page.locator('#debt-method-btn-avalanche svg').count()===1&&await page.locator('#debt-method-btn-snowball svg').count()===1,'both buttons have icons');
+  const pos=()=>page.evaluate(()=>[...document.querySelectorAll('[data-did]')].map(e=>{const r=e.getBoundingClientRect();return e.getAttribute('data-did')+':'+Math.round(r.left)+','+Math.round(r.top);}));
+  const before=await pos();
+  await page.evaluate(()=>setDebtMethod('snowball'));
+  await page.waitForTimeout(150);
+  const run=await page.evaluate(()=>[...document.querySelectorAll('[data-did]')].filter(e=>e.getAnimations().length).length);
+  ok(run>=2,'tiles are animating after switching ('+run+' moving)');
+  const mid=await pos(); await page.waitForTimeout(1800);
+  const after=await pos();
+  ok(mid.join()!==after.join(),'tiles are mid-flight, not snapped');
+  const order=await page.evaluate(()=>[...document.querySelectorAll('[data-did]')].map(e=>e.getAttribute('data-did')));
+  ok(order.join()==='2,3,1,4','new order: smallest balance first ('+order+')');
+  ok(await page.evaluate(()=>[...document.querySelectorAll('[data-did]')].every(e=>e.getAnimations().length===0&&e.style.zIndex==='')),'animation cleans up');
+  await page.evaluate(()=>setDebtMethod('snowball')); ok(true,'re-selecting same method is a no-op');
+  ok(errs.length===0,'no page errors '+errs.join('|'));
+  await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
+})();
