@@ -4,6 +4,8 @@ const js=esbuild.transformSync(fs.readFileSync('/home/user/Vault-It/supabase/fun
 globalThis.Deno={serve:h=>{globalThis.__h=h;}};
 const urls=[];
 globalThis.fetch=async(u)=>{urls.push(String(u));
+  if(/chart\/FUNDX\?/.test(String(u)))return new Response(JSON.stringify({chart:{result:[{meta:{currency:'GBP',symbol:'FUNDX',shortName:'Some Fund'},timestamp:[1,2,3],indicators:{quote:[{close:[10,10.5,11.24]}]}}]}}));   // fund: no regularMarketPrice
+  if(/chart\/GONE/.test(String(u)))return new Response('{}',{status:404});
   if(String(u).includes('/v1/finance/search'))return new Response(JSON.stringify({quotes:[{symbol:'BCHN.L',quoteType:'ETF',longname:'iShares Blockchain Technology UCITS ETF',exchDisp:'London'},{symbol:'IE00BYZK4552',quoteType:'MUTUALFUND',shortname:'iShares Automation & Robotics',exchDisp:'London'},{symbol:'X',quoteType:'OPTION'},{symbol:'COIN',quoteType:'EQUITY',shortname:'Coinbase',exchDisp:'NASDAQ'}]}));
   const m=/chart\/([^?]+)\?interval=(\w+)&range=(\w+)/.exec(String(u)); const sym=decodeURIComponent(m[1]);
   if(sym==='NOPE'||sym==='NOPE.L')return new Response('{}',{status:404});
@@ -22,6 +24,8 @@ const call=async b=>{const r=await globalThis.__h(new Request('http://x',{method
   r=await call({history:{symbols:['AAPL'],range:'evil'}}); ok(/range=6mo/.test(urls[urls.length-1]),'unknown range falls back to 6mo');
   r=await call({search:'blockchain'}); ok(r.s===200&&r.b.results.length===3&&r.b.results[0].name.includes('iShares Blockchain')&&!r.b.results.some(x=>x.symbol==='X'),'search returns funds, ETFs and shares only: '+r.b.results.map(x=>x.symbol));
   r=await call({search:'a'}); ok(r.b.results.length===0,'1-character searches are ignored');
+  r=await call({symbols:['FUNDX']}); ok(r.b.quotes.FUNDX&&r.b.quotes.FUNDX.price===11.24&&Math.abs(r.b.quotes.FUNDX.changePct-7.05)<0.1,'funds without a market price use the latest close ('+JSON.stringify(r.b.quotes.FUNDX)+')');
+  r=await call({symbols:['GONE']}); ok(!r.b.quotes.GONE&&r.b.misses.GONE.some(m=>/GONE: Yahoo said 404/.test(m)),'a failed lookup explains why: '+JSON.stringify(r.b.misses));
   r=await call({symbols:['AAPL']}); ok(r.s===200&&r.b.quotes!==undefined,'normal quotes still work');
   console.log(fails?'FAILURES '+fails:'ALL PASSED');
 })();

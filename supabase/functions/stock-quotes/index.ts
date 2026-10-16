@@ -13,29 +13,34 @@ const CORS = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } })
 
-async function quote(sym: string) {
+async function quote(sym: string, why?: string[]) {
   try {
     const r = await fetch(
       `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`,
       { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; VaultIt/1.0)', 'Accept': 'application/json' } },
     )
-    if (!r.ok) return null
+    if (!r.ok) { why?.push(`${sym}: Yahoo said ${r.status}`); return null }
     const j = await r.json()
-    const m = j?.chart?.result?.[0]?.meta
-    if (!m || !(m.regularMarketPrice > 0)) return null
-    const prev = m.chartPreviousClose ?? m.previousClose
+    const res = j?.chart?.result?.[0]
+    const m = res?.meta
+    if (!m) { why?.push(`${sym}: ${String(j?.chart?.error?.description ?? 'no data').slice(0, 80)}`); return null }
+    // funds often have no "regular market price": fall back to the latest closing price
+    const closes: number[] = (res?.indicators?.quote?.[0]?.close ?? []).filter((x: unknown) => typeof x === 'number' && (x as number) > 0)
+    const price = m.regularMarketPrice > 0 ? m.regularMarketPrice : closes.length ? closes[closes.length - 1] : (m.chartPreviousClose > 0 ? m.chartPreviousClose : 0)
+    if (!(price > 0)) { why?.push(`${sym}: no price on Yahoo`); return null }
+    const prev = closes.length > 1 ? closes[closes.length - 2] : (m.chartPreviousClose ?? m.previousClose)
     return {
-      price: m.regularMarketPrice as number,
+      price: price as number,
       currency: (m.currency ?? 'USD') as string,   // note: LSE quotes come back in "GBp" (pence)
       name: (m.shortName ?? m.longName ?? sym) as string,
-      changePct: prev > 0 ? ((m.regularMarketPrice - prev) / prev) * 100 : 0,
+      changePct: prev > 0 ? ((price - prev) / prev) * 100 : 0,
       symbol: (m.symbol ?? sym) as string,
     }
   } catch {
+    why?.push(`${sym}: lookup failed`)
     return null
   }
 }
-
 
 const RANGES: Record<string, string> = { '1mo': '1d', '3mo': '1d', '6mo': '1d', '1y': '1d', '5y': '1wk', 'max': '1mo' }
 
@@ -109,11 +114,13 @@ Deno.serve(async (req: Request) => {
   if (!list.length) return json({ quotes: {} })
 
   const quotes: Record<string, unknown> = {}
+  const misses: Record<string, string[]> = {}
   await Promise.all(list.map(async (sym) => {
     // Bare tickers (e.g. Trading 212 exports "VUAG") may be LSE-listed: retry with the .L suffix.
-    const q = (await quote(sym)) ?? (!sym.includes('.') ? await quote(`${sym}.L`) : null)
-    if (q) quotes[sym] = q
+    const why: string[] = []
+    const q = (await quote(sym, why)) ?? (!sym.includes('.') ? await quote(`${sym}.L`, why) : null)
+    if (q) quotes[sym] = q; else misses[sym] = why
   }))
 
-  return json({ quotes })
+  return json({ quotes, misses })
 })

@@ -9925,7 +9925,7 @@ async function stkAddCore(o){
           for(var ai=0;r2&&r2.quotes&&ai<alts.length;ai++){var q2=r2.quotes[alts[ai].symbol],g2=q2?stkToGBP(q2.price,q2.currency):null;if(g2>0){sym=alts[ai].symbol;g=g2;note='Using the '+(alts[ai].exchange||sym)+' listing ('+sym+') — it has a live price';break;}}
         }
       }
-      if(!(g>0))return{err:'No live price found for '+sym+' — enter the units you hold instead (or pick a different listing of the fund)'};
+      if(!(g>0))return{err:'No live price found for '+sym+((window._stkMisses&&window._stkMisses[sym]&&window._stkMisses[sym][0])?' ('+window._stkMisses[sym][0]+')':'')+' — enter the units you hold instead (or pick a different listing of the fund)'};
       units=+(amt/g).toFixed(6);if(note)showToast(note);
     }catch(e){return{err:'Could not look up the price — enter the units instead'};}
   }
@@ -9962,7 +9962,7 @@ async function stkAddFinish(r,fromAmount){
   showToast(r.name+' added to “'+r.pie.name+'”'+(fromAmount?' · '+r.units+' units':''));
   await stkRefresh(true);
   var h=alState.stocks.find(function(x){return x.id===r.h.id;});
-  if(h&&!(h.price>0)&&!h.updated)showToast('Added, but no live price was found for '+h.sym+'. Type a price in the Price box, or search again and choose another listing (e.g. the London .L one).');
+  if(h&&!(h.price>0)&&!h.updated)showToast('Added, but no live price was found for '+h.sym+((window._stkMisses&&window._stkMisses[h.sym]&&window._stkMisses[h.sym][0])?' ('+window._stkMisses[h.sym][0]+')':'')+'. Type a price in the Price box, or search again and choose another listing (e.g. the London .L one).');
 }
 async function stkAdd(){
   if(_stkAddBusy)return;_stkAddBusy=true;
@@ -10029,6 +10029,7 @@ async function stkFetchQuotes(symbols){
   if(_supaClient){
     try{
       var r=await _fnInvoke('stock-quotes',{symbols:symbols},8000);
+      if(r&&r.data&&r.data.misses)window._stkMisses=Object.assign(window._stkMisses||{},r.data.misses);
       if(!r.error&&r.data&&r.data.quotes&&Object.keys(r.data.quotes).length)return{quotes:r.data.quotes,source:'Vault·It price feed'};
     }catch(e){}
   }
