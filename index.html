@@ -3729,28 +3729,28 @@ button.bd-ic{cursor:pointer}
 
   <!-- KPI Strip -->
   <div class="ov-kpis">
-    <div class="ov-kpi">
-      <div class="ov-kpi-lbl">Net Worth</div>
+    <div class="ov-kpi ov-kpi-nw">
+      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M3 17 9 11l4 4 8-9"/><path d="M15 6h6v6"/></svg>Net Worth</div>
       <div class="ov-kpi-val" id="kpi-nw" style="color:var(--em)">£0</div>
       <div class="ov-kpi-sub" id="kpi-nw-sub">assets − liabilities</div>
     </div>
-    <div class="ov-kpi">
-      <div class="ov-kpi-lbl">Total Assets</div>
+    <div class="ov-kpi ov-kpi-as">
+      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/></svg>Total Assets</div>
       <div class="ov-kpi-val" id="kpi-assets" style="color:var(--gr)">£0</div>
       <div class="ov-kpi-sub">all holdings</div>
     </div>
-    <div class="ov-kpi">
-      <div class="ov-kpi-lbl">Total Debt</div>
+    <div class="ov-kpi ov-kpi-db">
+      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Total Debt</div>
       <div class="ov-kpi-val" id="kpi-debt-total" style="color:var(--re)">£0</div>
       <div class="ov-kpi-sub">credit · loans · bnpl</div>
     </div>
-    <div class="ov-kpi">
-      <div class="ov-kpi-lbl">Total Liabilities</div>
+    <div class="ov-kpi ov-kpi-li">
+      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/></svg>Total Liabilities</div>
       <div class="ov-kpi-val" id="kpi-liab" style="color:var(--go)">£0</div>
       <div class="ov-kpi-sub" id="kpi-liab-sub">running costs</div>
     </div>
-    <div class="ov-kpi">
-      <div class="ov-kpi-lbl">Monthly Surplus</div>
+    <div class="ov-kpi ov-kpi-su">
+      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.8 1.8 0 0 1 0 3.5h-3a1.8 1.8 0 0 0 0 3.500h4.500"/></svg>Monthly Surplus</div>
       <div class="ov-kpi-val" id="kpi-debt" style="color:var(--em)">£0</div>
       <div class="ov-kpi-sub" id="kpi-debt-sub">monthly surplus</div>
     </div>
@@ -3794,6 +3794,46 @@ button.bd-ic{cursor:pointer}
     <div id="chart-tooltip" style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--t2);margin-top:8px;text-align:center;min-height:16px"></div>
   </div>
 
+  <!-- Milestone targets + snapshots: directly under the Net Worth chart -->
+  <div class="ov-ms-card ov-ms-wide" id="ov-ms-card" style="margin-top:16px">
+    <div class="ov-ms-title">Milestone Targets &amp; Snapshots</div>
+    <div class="ms-grid">
+      <div class="ms-col">
+        <div class="ms-col-hd">🎯 Goals</div>
+        <div id="ms-list">
+          <div class="ms-row"><div class="ms-dot" id="msdot-0"></div><span class="ms-ic">🛡</span><label>Emergency Fund <span id="mschk-0" class="ms-chk"></span></label><input type="number" id="ms-0" value="2000" min="0" onchange="saveState();drawChart()"></div>
+          <div class="ms-row"><div class="ms-dot" id="msdot-1"></div><span class="ms-ic">✂️</span><label>Clear All Debt <span id="mschk-1" class="ms-chk"></span></label><input type="number" id="ms-1" value="0" min="0" onchange="saveState();drawChart()"></div>
+          <div class="ms-row"><div class="ms-dot" id="msdot-2"></div><span class="ms-ic">🏠</span><label>House Deposit <span id="mschk-2" class="ms-chk"></span></label><input type="number" id="ms-2" value="20000" min="0" onchange="saveState();drawChart()"></div>
+          <div class="ms-row"><div class="ms-dot" id="msdot-3"></div><span class="ms-ic">🔥</span><label>FI Number (25×) <span id="mschk-3" class="ms-chk"></span></label><input type="number" id="ms-3" value="391872" min="0" onchange="saveState();drawChart()"></div>
+          <div class="ms-row"><div class="ms-dot" id="msdot-4"></div><span class="ms-ic">🎯</span><label>Custom Goal <span id="mschk-4" class="ms-chk"></span></label><input type="number" id="ms-4" value="100000" min="0" onchange="saveState();drawChart()"></div>
+          <div id="ms-custom-list"></div>
+        </div>
+        <details class="ms-add" id="ms-add-goal">
+          <summary>＋ Add your own goal</summary>
+          <div class="ms-add-body">
+            <input type="text" id="goal-name" maxlength="30" placeholder="Goal name, e.g. Wedding fund">
+            <input type="number" id="goal-amt" min="0" placeholder="£ target">
+            <button class="btn-add-data" onclick="addCustomGoal()">+ Add goal</button>
+          </div>
+        </details>
+      </div>
+      <div class="ms-col">
+        <div class="ms-col-hd">📸 Snapshots <span style="opacity:.6;font-weight:400">(past net worth on the chart)</span></div>
+        <div id="ms-snap-list"></div>
+        <details class="ms-add" id="ms-add-snap">
+          <summary>＋ Add a snapshot</summary>
+          <div class="ms-add-body">
+            <input type="month" id="snap-month">
+            <input type="number" id="snap-nw" placeholder="£ Net Worth">
+            <input type="number" id="snap-debt" placeholder="£ Debt">
+            <input type="number" id="snap-liab" placeholder="£ Liabilities">
+            <button class="btn-add-data" onclick="addSnapshot()">+ Add Data Point</button>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
   <!-- Net Worth History entry card — Pro -->
   <div class="ov-chart-card" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
     <div style="flex:1;min-width:180px">
@@ -3804,59 +3844,8 @@ button.bd-ic{cursor:pointer}
     <button onclick="openNwHistory()" style="flex-shrink:0;padding:9px 20px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:.58rem;cursor:pointer;letter-spacing:.06em">View Journey →</button>
   </div>
 
-  <!-- Milestones + FIRE Roadmap -->
-  <div class="g2-ms">
-
-    <!-- Milestones settings -->
-    <div class="ov-ms-card">
-      <div class="ov-ms-title">Milestone Targets</div>
-      <div id="ms-list">
-        <div class="ms-row">
-          <div class="ms-dot" id="msdot-0"></div>
-          <span style="font-size:.95rem;flex-shrink:0">🛡</span>
-          <label>Emergency Fund <span id="mschk-0" style="color:var(--em);font-size:.6rem;margin-left:2px"></span></label>
-          <input type="number" id="ms-0" value="2000" min="0" onchange="saveState();drawChart()">
-        </div>
-        <div class="ms-row">
-          <div class="ms-dot" id="msdot-1"></div>
-          <span style="font-size:.95rem;flex-shrink:0">✂️</span>
-          <label>Clear All Debt <span id="mschk-1" style="color:var(--em);font-size:.6rem;margin-left:2px"></span></label>
-          <input type="number" id="ms-1" value="0" min="0" onchange="saveState();drawChart()">
-        </div>
-        <div class="ms-row">
-          <div class="ms-dot" id="msdot-2"></div>
-          <span style="font-size:.95rem;flex-shrink:0">🏠</span>
-          <label>House Deposit <span id="mschk-2" style="color:var(--em);font-size:.6rem;margin-left:2px"></span></label>
-          <input type="number" id="ms-2" value="20000" min="0" onchange="saveState();drawChart()">
-        </div>
-        <div class="ms-row">
-          <div class="ms-dot" id="msdot-3"></div>
-          <span style="font-size:.95rem;flex-shrink:0">🔥</span>
-          <label>FI Number (25×) <span id="mschk-3" style="color:var(--em);font-size:.6rem;margin-left:2px"></span></label>
-          <input type="number" id="ms-3" value="391872" min="0" onchange="saveState();drawChart()">
-        </div>
-        <div class="ms-row">
-          <div class="ms-dot" id="msdot-4"></div>
-          <span style="font-size:.95rem;flex-shrink:0">🎯</span>
-          <label>Custom Goal <span id="mschk-4" style="color:var(--em);font-size:.6rem;margin-left:2px"></span></label>
-          <input type="number" id="ms-4" value="100000" min="0" onchange="saveState();drawChart()">
-        </div>
-      </div>
-      <div style="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px">
-        <div style="font-size:.56rem;color:var(--t3);margin-bottom:6px">Add snapshot (date + net worth)</div>
-        <div class="data-input-row">
-          <input type="month" id="snap-month" style="flex:1;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.7rem;padding:6px 9px;outline:none">
-          <input type="number" id="snap-nw" placeholder="£ Net Worth" style="flex:1">
-        </div>
-        <div class="data-input-row">
-          <input type="number" id="snap-debt" placeholder="£ Debt" style="flex:1">
-          <input type="number" id="snap-liab" placeholder="£ Liabilities" style="flex:1">
-        </div>
-        <button class="btn-add-data" style="width:100%" onclick="addSnapshot()">+ Add Data Point</button>
-      </div>
-    </div>
-
-    <!-- FIRE Roadmap — full width horizontal timeline -->
+  <!-- Financial Freedom Roadmap — full width -->
+  <div style="margin-top:16px">
     <div class="ov-chart-card fire-roadmap-card" id="fire-roadmap-card">
       <div class="fire-rm-header">
         <div>
@@ -3906,19 +3895,18 @@ button.bd-ic{cursor:pointer}
 
   <!-- Summary Cards Row -->
   <div class="g3" id="ov-summary-row" style="margin-top:12px">
-    <div class="ov-chart-card" id="ov-assets-summary-card">
-      <div class="ov-chart-title" style="margin-bottom:8px">Assets Summary</div>
+    <div class="ov-chart-card ov-sum ov-sum-a" id="ov-assets-summary-card">
+      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/><path d="M12 9v0"/></svg></span><span class="ov-chart-title">Assets Summary</span></div>
       <div id="ov-assets-summary"></div>
       <div id="ov-assets-next" style="margin-top:8px;font-size:.55rem;color:var(--em);border-top:1px solid var(--bd);padding-top:6px"></div>
     </div>
-    <div class="ov-chart-card" id="ov-liab-summary-card">
-      <div class="ov-chart-title" style="margin-bottom:8px">Liabilities Summary</div>
+    <div class="ov-chart-card ov-sum ov-sum-l" id="ov-liab-summary-card">
+      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></span><span class="ov-chart-title">Liabilities Summary</span></div>
       <div id="ov-liab-summary"></div>
       <div id="ov-liab-next" style="margin-top:8px;font-size:.55rem;color:var(--go);border-top:1px solid var(--bd);padding-top:6px"></div>
     </div>
-    <div class="ov-chart-card" id="ov-debt-summary-card">
-      <div class="ov-chart-title" style="margin-bottom:8px">Debt Summary</div>
-      <canvas id="ov-debt-mini-chart" height="80" style="width:100%;display:block;margin-bottom:8px"></canvas>
+    <div class="ov-chart-card ov-sum ov-sum-d" id="ov-debt-summary-card">
+      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></span><span class="ov-chart-title">Debt Summary</span></div>
       <div id="ov-debt-summary"></div>
       <div id="ov-debt-next" style="margin-top:8px;font-size:.55rem;color:var(--re);border-top:1px solid var(--bd);padding-top:6px"></div>
     </div>
@@ -5703,7 +5691,7 @@ html{font-size:calc(var(--vi-base,13px) * var(--vi-scale,1))}
   .tab-wrap,#ov-page,.jrny-wrap,.wrap,#assets-page{max-width:min(1900px,calc(100vw - 56px))!important}
   .tab-panel div[style*="max-width:1040px"],.tab-panel div[style*="max-width:1140px"],.tab-panel div[style*="max-width:1100px"],.tab-panel div[style*="max-width:1000px"]{max-width:min(1900px,calc(100vw - 56px))!important}
   #topnav .tab-btn span{white-space:nowrap}
-  #topnav .tab-btn{padding:0 clamp(5px,.7vw,16px)!important;letter-spacing:.05em!important;min-width:0;flex-shrink:1!important;gap:5px}
+  #topnav .tab-btn{padding:0 clamp(5px,.7vw,16px)!important;letter-spacing:.05em!important;gap:5px}
   #topnav .tab-btn svg{flex:none}
   .tab-panel>div[style*="max-width"],.tab-panel>div>div[style*="max-width:1"]{max-width:min(1900px,calc(100vw - 56px))!important}
   /* menu bar: full width, items share the space */
@@ -5769,6 +5757,73 @@ html{font-size:calc(var(--vi-base,13px) * var(--vi-scale,1))}
 .vi-modal-overlay>.vi-modal-box{margin:auto;overflow:visible}
 .vi-modal-duo-hdr{position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background-color:rgba(8,14,24,.96)!important}
 .vi-modal-close{width:38px!important;height:38px!important;flex:none;font-size:1.05rem!important}
+
+/* ═══ Overview: taller chart, milestones under it, full-width roadmap, bigger colour-coded summaries ═══ */
+body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,34vh,560px)!important}
+@media(max-width:600px){body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(220px,32vh,320px)!important}}
+.ov-ms-wide{padding:clamp(12px,1.6vw,20px)}
+.ms-grid{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:820px){.ms-grid{grid-template-columns:1.1fr 1fr;gap:28px}}
+.ms-col-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:.62rem;letter-spacing:.1em;color:var(--tx);margin-bottom:10px}
+.ms-ic{font-size:1.05rem;flex:none}
+.ms-chk{color:var(--em);font-size:.7rem;margin-left:2px}
+.ms-row label{font-size:.7rem!important;color:var(--t2)!important}
+.ms-row input[type=number]{font-size:.78rem!important;width:clamp(90px,9vw,130px)!important}
+.ms-x{flex:none;background:none;border:1px solid rgba(255,255,255,.14);color:var(--t3);border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:.7rem}
+.ms-x:hover{color:var(--re);border-color:var(--re)}
+.ms-snapv{font-family:'Share Tech Mono',monospace;font-size:.74rem;color:var(--em)}
+.ms-empty{font-size:.58rem;color:var(--t3);padding:6px 2px 10px}
+.ms-add{margin-top:10px;border:1px dashed rgba(68,192,185,.4);border-radius:10px;background:rgba(68,192,185,.04)}
+.ms-add>summary{cursor:pointer;padding:12px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:.64rem;letter-spacing:.06em;color:var(--em);list-style:none}
+.ms-add>summary::-webkit-details-marker{display:none}
+.ms-add[open]>summary{border-bottom:1px dashed rgba(68,192,185,.25)}
+.ms-add-body{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+.ms-add-body input{min-width:0;background:var(--c3);border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.76rem;padding:9px 10px}
+.ms-add-body input:first-child{grid-column:1/-1}
+.ms-add-body .btn-add-data{grid-column:1/-1}
+#fire-roadmap-card{width:100%}
+.ms-row.x5{grid-template-columns:20px 24px minmax(0,1fr) clamp(86px,9vw,120px) 30px!important}
+.ms-row.snap{grid-template-columns:24px minmax(0,1fr) auto 30px!important}
+#ms-list .ms-row:not(.x5){grid-template-columns:20px 24px minmax(0,1fr) clamp(86px,9vw,120px)!important}
+.ms-row input[type=number]{width:100%!important;min-width:0}
+/* menu bar items never overlap: they keep their width and the bar scrolls if it must */
+@media(min-width:1100px){
+  #vi-density-btn .vi-d-lbl{display:none!important}#vi-density-btn .vi-d-ico{display:inline!important}
+  #vi-back-us-btn{padding-left:10px!important;padding-right:10px!important}
+  #topnav>div[style*="margin-left:auto"]>span:first-child{display:none}
+  #topnav .tab-btn{letter-spacing:.03em!important;gap:4px!important}
+}
+@media(min-width:1100px) and (max-width:1699px){#topnav .tab-btn .ti{display:none!important}}
+@media(min-width:1100px){#topnav .tab-btn{min-width:max-content!important;flex-shrink:0!important;padding:0 clamp(5px,.7vw,16px)!important}}
+@media(max-width:699px){.ov-kpis>.ov-kpi:last-child:nth-child(odd){grid-column:1/-1}}
+/* cash-flow diagram: the whole thing fits one screen on desktop */
+@media(min-width:900px){.cf-scroll{display:flex;justify-content:center}.cf-scroll svg{width:100%!important;max-height:calc(100vh - 150px);height:auto;margin:0 auto}}
+/* KPI tiles + summaries: bigger, icon-led, colour-coded */
+.ov-kpi-lbl{display:flex;align-items:center;gap:6px;font-size:.58rem!important}
+.ov-kpi-ic{width:15px;height:15px;flex:none}
+.ov-kpi-val{font-size:clamp(1.15rem,1.9vw,1.7rem)!important}
+.ov-kpi-sub{font-size:.54rem!important}
+.ov-kpi-nw{border-top:2px solid #44c0b9}.ov-kpi-nw .ov-kpi-lbl{color:#44c0b9}
+.ov-kpi-as{border-top:2px solid #3ecf8e}.ov-kpi-as .ov-kpi-lbl{color:#3ecf8e}
+.ov-kpi-db{border-top:2px solid #e05c5c}.ov-kpi-db .ov-kpi-lbl{color:#e05c5c}
+.ov-kpi-li{border-top:2px solid #e8c56a}.ov-kpi-li .ov-kpi-lbl{color:#e8c56a}
+.ov-kpi-su{border-top:2px solid #64b5f6}.ov-kpi-su .ov-kpi-lbl{color:#64b5f6}
+.ov-sum{--sc:#44c0b9;border-left:3px solid var(--sc)!important;background:linear-gradient(135deg,color-mix(in srgb,var(--sc) 9%,var(--c2)),var(--c2) 60%)!important}
+.ov-sum-a{--sc:#3ecf8e}.ov-sum-l{--sc:#e8c56a}.ov-sum-d{--sc:#e05c5c}
+.ov-sum-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ov-sum-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,transparent);border:1px solid color-mix(in srgb,var(--sc) 45%,transparent);flex:none}
+.ov-sum .ov-chart-title{font-size:.72rem!important;color:var(--sc)!important;margin:0!important}
+.ov-sum-total{font-family:'Share Tech Mono',monospace;font-size:clamp(1.3rem,2vw,1.9rem);font-weight:700;margin-bottom:10px;letter-spacing:-.01em}
+.ov-sum-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:.78rem}
+.ov-sum-ri{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:6px;background:rgba(255,255,255,.05)}
+.ov-sum-ri svg{width:14px;height:14px}
+.ov-sum-l{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'DM Sans',sans-serif;font-weight:500}
+.ov-sum-v{font-family:'Share Tech Mono',monospace;color:var(--tx);font-size:.8rem}
+.ov-sum-empty{font-size:.66rem;color:var(--t3)}
+.ov-sum-drow{margin-bottom:4px}
+.ov-sum-bar{height:4px;background:rgba(255,255,255,.07);border-radius:2px;margin:0 0 6px 30px}
+.ov-sum-bar div{height:100%;background:var(--gr);border-radius:2px}
+#ov-summary-row [id$="-next"]{font-size:.62rem!important;line-height:1.5}
 /* ── pop-ups can always be left: scrolls inside the screen, close button stays in view ── */
 .paywall-overlay{align-items:flex-start!important;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .paywall-card{margin:auto;max-height:none}
@@ -5860,6 +5915,9 @@ function loadState() {
     var el = document.getElementById('ms-' + i);
     if (el) el.value = ovState.milestones[i] || 0;
   }
+  if (!Array.isArray(ovState.customGoals)) ovState.customGoals = [];
+  if (!Array.isArray(ovState.snapshots)) ovState.snapshots = [];
+  try { renderMsExtras(); } catch (e) {}
   migrateOverviewLedgers();
 }
 
@@ -6005,6 +6063,10 @@ function updateKPIs() {
     var chk = document.getElementById('mschk-' + i);
     if (chk) chk.textContent = hit ? '✓' : '';
   }
+  (ovState.customGoals||[]).forEach(function(g){
+    var hit=g.amount>0&&nw>=g.amount,d=document.getElementById('msdot-c'+g.id),c=document.getElementById('mschk-c'+g.id);
+    if(d)d.classList.toggle('hit',hit);if(c)c.textContent=hit?'✓':'';
+  });
   renderSummaryCards();
   updateSidebar();
   updateFireBanner();
@@ -6195,6 +6257,7 @@ function drawChart() {
   var allVals = [];
   points.forEach(function(p) { allVals.push(p.nw, p.debt); });
   (ovState.milestones||[]).forEach(function(m) { if (m > 0) allVals.push(m); });
+  (ovState.customGoals||[]).forEach(function(g) { if (g.amount > 0) allVals.push(g.amount); });
   if (chartState && chartState.metrics && chartState.metrics.income)
     points.forEach(function(p){ if(p.income) allVals.push(p.income); });
   var minV = Math.min.apply(null, allVals);
@@ -6295,14 +6358,16 @@ function drawChart() {
   // ── Milestone horizontal lines ──
   var msColors=['#c9a84c','#c9a84c','#c9a84c','#c9a84c','#c9a84c'];
   var msLabels=['Emergency Fund','Clear Debt','House Deposit','FI Number','Custom'];
-  (ovState.milestones||[]).forEach(function(m,i){
+  var msAll=(ovState.milestones||[]).map(function(m,i){return{m:m,label:msLabels[i],c:msColors[i]};}).concat((ovState.customGoals||[]).map(function(g){return{m:g.amount,label:g.name,c:'#e8c56a'};}));
+  msAll.forEach(function(it){
+    var m=it.m;
     if (!m||m<=0||m<minV||m>maxV) return;
     var my=yp(m);
-    ctx.save(); ctx.strokeStyle=msColors[i]; ctx.globalAlpha=0.35; ctx.lineWidth=1; ctx.setLineDash([5,4]);
+    ctx.save(); ctx.strokeStyle=it.c; ctx.globalAlpha=0.35; ctx.lineWidth=1; ctx.setLineDash([5,4]);
     ctx.beginPath(); ctx.moveTo(PAD.l,my); ctx.lineTo(W-PAD.r,my); ctx.stroke();
     ctx.setLineDash([]); ctx.globalAlpha=0.6;
-    ctx.fillStyle=msColors[i]; ctx.font="9px 'Syne',sans-serif"; ctx.textAlign='left';
-    ctx.fillText(msLabels[i]+' '+gbpFmt(m), PAD.l+4, my-4);
+    ctx.fillStyle=it.c; ctx.font="9px 'Syne',sans-serif"; ctx.textAlign='left';
+    ctx.fillText(it.label+' '+gbpFmt(m), PAD.l+4, my-4);
     ctx.restore();
   });
 
@@ -6479,6 +6544,42 @@ document.getElementById('nwChart').addEventListener('mouseleave', function() {
 // ═══════════════════════════════════════════════════════════════
 // ADD SNAPSHOT
 // ═══════════════════════════════════════════════════════════════
+
+// ── custom goals + snapshot list (Overview) ──
+function renderMsExtras(){
+  var gl=document.getElementById('ms-custom-list');
+  if(gl){
+    var nw=(typeof calcNW==='function')?0:0;
+    gl.innerHTML=(ovState.customGoals||[]).map(function(g){
+      return '<div class="ms-row x5"><div class="ms-dot" id="msdot-c'+g.id+'"></div><span class="ms-ic">⭐</span><label>'+ccEsc(g.name)+' <span id="mschk-c'+g.id+'" class="ms-chk"></span></label>'
+        +'<input type="number" min="0" value="'+(+g.amount||0)+'" onchange="editCustomGoal('+g.id+',this.value)">'
+        +'<button class="ms-x" title="Remove goal" onclick="delCustomGoal('+g.id+')">✕</button></div>';
+    }).join('');
+  }
+  var sl=document.getElementById('ms-snap-list');
+  if(sl){
+    var snaps=(ovState.snapshots||[]).slice().sort(function(a,b){return a.month<b.month?1:-1;});
+    sl.innerHTML=snaps.length?snaps.map(function(x){
+      return '<div class="ms-row snap"><span class="ms-ic">📸</span><label>'+ccEsc(x.month)+'</label><span class="ms-snapv">'+gbpFmt(x.nw)+'</span>'
+        +'<button class="ms-x" title="Remove snapshot" onclick="delSnapshot(\''+ccEsc(x.month)+'\')">✕</button></div>';
+    }).join(''):'<div class="ms-empty">No snapshots yet — add a past month to build your history.</div>';
+  }
+  try{updateKPIs();}catch(e){}
+}
+function addCustomGoal(){
+  var n=viClean((document.getElementById('goal-name')||{}).value||'').trim().slice(0,30),a=parseFloat((document.getElementById('goal-amt')||{}).value);
+  if(!n){showToast('Name your goal');return;}
+  if(!(a>0)){showToast('Enter a target amount');return;}
+  ovState.customGoals=(ovState.customGoals||[]).concat([{id:Date.now(),name:n,amount:a}]);
+  document.getElementById('goal-name').value='';document.getElementById('goal-amt').value='';
+  saveState();renderMsExtras();drawChart();showToast('Goal added: '+n);
+}
+function editCustomGoal(id,v){var g=(ovState.customGoals||[]).find(function(x){return x.id===id;});if(g){g.amount=parseFloat(v)||0;saveState();drawChart();updateKPIs();}}
+function delCustomGoal(id){ovState.customGoals=(ovState.customGoals||[]).filter(function(x){return x.id!==id;});saveState();renderMsExtras();drawChart();}
+function delSnapshot(m){ovState.snapshots=(ovState.snapshots||[]).filter(function(x){return x.month!==m;});saveState();renderMsExtras();drawChart();updateKPIs();}
+(function(){var o=addSnapshot;})();
+// the add-forms start open on wide screens and tucked away (one tap) on phones
+window.addEventListener('load',function(){var w=window.innerWidth>=900;['ms-add-goal','ms-add-snap'].forEach(function(id){var d=document.getElementById(id);if(d&&w)d.open=true;});});
 function addSnapshot() {
   var month = document.getElementById('snap-month').value;
   var nw    = parseFloat(document.getElementById('snap-nw').value);
@@ -6493,6 +6594,7 @@ function addSnapshot() {
   drawChart();
   updateKPIs();
   showToast('Snapshot added for ' + month);
+  try{renderMsExtras();}catch(e){}
   document.getElementById('snap-month').value = '';
   document.getElementById('snap-nw').value = '';
   document.getElementById('snap-debt').value = '';
@@ -8807,6 +8909,17 @@ var _authForgot=false,_needPin=null,_pinMode='local',_pinEnterLen=4,_pinBusy=fal
 var AL_KEY='pos_al1';
 var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
+var OV_ICO={
+  metals:'<rect x="2" y="9" width="20" height="8" rx="1.5"/><path d="M7 9v8M12 9v8M17 9v8"/>',
+  crypto:'<path d="M8 5h6a3 3 0 0 1 0 6H8m0 0h7a3 3 0 0 1 0 6H8"/><path d="M10 3v18M14 3v18"/>',
+  cash:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/>',
+  house:'<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/>',
+  stocks:'<path d="M3 17 9 11l4 4 8-9"/><path d="M15 6h6v6"/>',
+  inv:'<path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/>',
+  warn:'<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/>',
+  card:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+  loan:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10h5a2 2 0 0 1 0 4H9"/>'
+};
 var _ccPct={};   // % shown last time for each card, so a payment cuts from where it was and an undo joins it back up
 var _ccIO=null;
 var CC_BRANDS=[
@@ -13496,6 +13609,17 @@ document.addEventListener('keydown',function(e){
   ['hbu-ov','hbc-ov','cc-ov'].forEach(function(id){var o=document.getElementById(id);if(o)o.remove();});
 });
 // ── swipe hints: a soft arrow on the edge of any row/diagram that continues off-screen ──
+
+// desktop menu bar: choose the largest text size at which every item still fits on one line
+function viFitNav(){
+  var n=document.getElementById('topnav');if(!n)return;
+  if(window.innerWidth<1100){n.style.zoom='';return;}
+  var sc=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vi-scale'))||1,z=1.5/sc;
+  n.style.zoom=z;
+  for(var i=0;i<40&&n.scrollWidth>n.clientWidth+1;i++){z*=0.97;n.style.zoom=z;}
+}
+window.addEventListener('resize',function(){clearTimeout(viFitNav._t);viFitNav._t=setTimeout(viFitNav,120);});
+window.addEventListener('load',function(){setTimeout(viFitNav,300);setTimeout(viFitNav,1500);});
 function viSwipeWrap(el,hint){
   if(!el||el._swipe)return;el._swipe=true;
   var w=document.createElement('div');w.className='swipe-wrap';
@@ -14582,23 +14706,24 @@ function fireShowDetail(idx){
 }
 
 // ── SUMMARY CARDS ─────────────────────────────────────────────
+function ovIcon(k,c){return '<span class="ov-sum-ri" style="color:'+c+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(OV_ICO[k]||OV_ICO.inv)+'</svg></span>';}
 function renderSummaryCards(){
   var aEl=document.getElementById('ov-assets-summary');
   if(aEl){
     var ta=alTotalAssets();
     var rows=[
-      {l:'Precious Metals',v:alTotalMetals(),c:'var(--go)'},
-      {l:'Crypto',v:alTotalCrypto(),c:'#f7931a'},
-      {l:'Cash & Savings',v:alTotalCash(),c:'var(--gr)'},
-      {l:'House Deposit',v:state?state.saved:0,c:'var(--em)'},
-      {l:'Stocks & Funds',v:alTotalStocks(),c:'#9b7ec8'},
-      {l:'Wealth Inventory',v:alTotalOther(),c:'var(--t2)'}
+      {l:'Precious Metals',v:alTotalMetals(),c:'var(--go)',i:'metals'},
+      {l:'Crypto',v:alTotalCrypto(),c:'#f7931a',i:'crypto'},
+      {l:'Cash & Savings',v:alTotalCash(),c:'var(--gr)',i:'cash'},
+      {l:'House Deposit',v:state?state.saved:0,c:'var(--em)',i:'house'},
+      {l:'Stocks & Funds',v:alTotalStocks(),c:'#9b7ec8',i:'stocks'},
+      {l:'Wealth Inventory',v:alTotalOther(),c:'#8fa3b5',i:'inv'}
     ];
-    aEl.innerHTML=rows.filter(function(r){return r.v>0;}).map(function(r){
-      return '<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:.58rem">'
-        +'<span style="color:'+r.c+'">'+r.l+'</span>'
-        +'<span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(r.v)+'</span></div>';
-    }).join('')||'<div style="font-size:.55rem;color:var(--t3)">No assets tracked yet</div>';
+    aEl.innerHTML='<div class="ov-sum-total" style="color:var(--gr)">'+gbpFmt(ta)+'</div>'
+      +(rows.filter(function(r){return r.v>0;}).map(function(r){
+      return '<div class="ov-sum-row">'+ovIcon(r.i,r.c)+'<span class="ov-sum-l" style="color:'+r.c+'">'+r.l+'</span>'
+        +'<span class="ov-sum-v">'+gbpFmt(r.v)+'</span></div>';
+    }).join('')||'<div class="ov-sum-empty">No assets tracked yet</div>');
     var aNx=document.getElementById('ov-assets-next');
     if(aNx){
       var msg=ta<1000?'Start: open a savings account or add your first asset':
@@ -14611,13 +14736,13 @@ function renderSummaryCards(){
   var lEl=document.getElementById('ov-liab-summary');
   if(lEl){
     var tl=alTotalLiab();
-    lEl.innerHTML=alState.liabilities.length?
+    lEl.innerHTML='<div class="ov-sum-total" style="color:var(--go)">'+gbpFmt(tl)+'</div>'
+      +(alState.liabilities.length?
       alState.liabilities.map(function(l){
-        return '<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:.58rem">'
-          +'<span style="color:var(--t2)">'+l.name+'</span>'
-          +'<span style="font-family:\'Share Tech Mono\',monospace;color:var(--re)">'+gbpFmt(depreciatedValue(l))+'</span></div>';
+        return '<div class="ov-sum-row">'+ovIcon('warn','var(--go)')+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(l.name)+'</span>'
+          +'<span class="ov-sum-v" style="color:var(--go)">'+gbpFmt(depreciatedValue(l))+'</span></div>';
       }).join('')
-      :'<div style="font-size:.55rem;color:var(--t3)">No liabilities tracked</div>';
+      :'<div class="ov-sum-empty">No liabilities tracked</div>');
     var lNx=document.getElementById('ov-liab-next');
     if(lNx){
       var lMsg=tl<=0?'Great — no liabilities tracked. Add any depreciating assets.':
@@ -14628,15 +14753,14 @@ function renderSummaryCards(){
   var dEl=document.getElementById('ov-debt-summary');
   if(dEl){
     var td=debtTotal();
-    dEl.innerHTML='<div style="font-size:.7rem;font-family:\'Share Tech Mono\',monospace;color:var(--re);margin-bottom:6px">'+gbpFmt(td)+'</div>'
+    dEl.innerHTML='<div class="ov-sum-total" style="color:var(--re)">'+gbpFmt(td)+'</div>'
       +debtState.debts.map(function(d){
         var pct=d.original>0?Math.round((1-d.balance/d.original)*100):0;
-        return '<div style="margin-bottom:4px">'
-          +'<div style="display:flex;justify-content:space-between;font-size:.55rem;margin-bottom:2px">'
-          +'<span style="color:var(--t2)">'+d.name+'</span>'
-          +'<span style="font-family:\'Share Tech Mono\',monospace;color:var(--re)">'+gbpFmt(d.balance)+'</span></div>'
-          +'<div style="height:2px;background:rgba(255,255,255,.06);border-radius:1px">'
-          +'<div style="height:100%;width:'+pct+'%;background:var(--gr);border-radius:1px"></div></div></div>';
+        var ik=(d.type==='credit'||d.type==='bnpl')?'card':'loan';
+        return '<div class="ov-sum-drow">'
+          +'<div class="ov-sum-row">'+ovIcon(ik,'var(--re)')+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(d.name)+'</span>'
+          +'<span class="ov-sum-v" style="color:var(--re)">'+gbpFmt(d.balance)+'</span></div>'
+          +'<div class="ov-sum-bar"><div style="width:'+pct+'%"></div></div></div>';
       }).join('');
     var dNx=document.getElementById('ov-debt-next');
     if(dNx){

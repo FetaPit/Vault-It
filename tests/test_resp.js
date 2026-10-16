@@ -5,7 +5,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));localStorage.setItem('vi_settings',JSON.stringify({fontSize:'large',contrast:'standard',motion:'full',currency:'GBP'}));
     localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'UC',amount:381,cat:'benefits'},{id:2,name:'PIP',amount:778,cat:'benefits'}],expenses:[{id:3,name:'Rent',amount:700,type:'ce'}]}));
     localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:1,name:'Card',original:2500,balance:2500,rate:20,min:60,type:'credit'}]}));};
-  const open=async(w,h,mobile)=>{const ctx=await b.newContext({viewport:{width:w,height:h},isMobile:!!mobile,hasTouch:!!mobile});const page=await ctx.newPage();page.on('pageerror',e=>errs.push(e.message));await page.addInitScript(seed);await page.goto('file:///home/user/Vault-It/index.html');await page.waitForTimeout(1500);await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});return page;};
+  const open=async(w,h,mobile)=>{const ctx=await b.newContext({viewport:{width:w,height:h},isMobile:!!mobile,hasTouch:!!mobile});const page=await ctx.newPage();page.on('pageerror',e=>errs.push(e.message));await page.addInitScript(seed);await page.goto('file:///home/user/Vault-It/index.html');await page.waitForTimeout(2300);await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});return page;};
   // desktop
   for(const w of [1280,1600,1920]){
     const p=await open(w,900);
