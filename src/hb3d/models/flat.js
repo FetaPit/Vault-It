@@ -126,6 +126,38 @@
       });
     }
 
+    // Bond tidy-up after wallLoop (kit _layRun artefacts on runs that start and end on a half-bond):
+    // the mid-run closer can come out a full 225 mm long → lay a true 215 mm brick with 5 mm joints either side;
+    // the inner leaf can get 45 mm block slivers → cut them to 100 mm by shortening the neighbouring block.
+    function tidyBond(i0) {
+      var its = K.items, rows = {};
+      for (var i = i0; i < its.length; i++) {
+        var it = its[i];
+        if (it.k === 'brick' && it.sx > UK.BL + 0.001) it.sx = UK.BL;
+        // 65 mm make-up course of sliced blocks under the slab soffit (deflection head): built, but not counted as blocks
+        if (it.k === 'block' && it.sy < UK.KW - 0.002) { it.k = ''; it.c = 0x9a9a95; continue; }
+        if (it.k === 'block') { var key = it.y.toFixed(4) + '|' + it.ry.toFixed(4); (rows[key] = rows[key] || []).push(it); }
+      }
+      Object.keys(rows).forEach(function (key) {
+        var row = rows[key];
+        row.forEach(function (sl) {
+          if (sl.sx >= 0.1 - 1e-6) return;
+          var tx = Math.cos(sl.ry), tz = -Math.sin(sl.ry), us = sl.x * tx + sl.z * tz, ns = sl.x * tz - sl.z * tx;
+          row.some(function (nb) {
+            if (nb === sl || nb.sx < 0.2) return false;
+            var un = nb.x * tx + nb.z * tz;
+            if (Math.abs(nb.x * tz - nb.z * tx - ns) > 1e-4 || Math.abs(Math.abs(un - us) - (sl.sx / 2 + J + nb.sx / 2)) > 1e-3) return false;
+            var dir = un < us ? 1 : -1, far = un - dir * nb.sx / 2, take = 0.1 - sl.sx;   // far end of the neighbour stays put
+            nb.sx -= take; un = far + dir * nb.sx / 2;
+            sl.sx = 0.1; us = far + dir * (nb.sx + J + 0.05);
+            var dn = un - (nb.x * tx + nb.z * tz), ds = us - (sl.x * tx + sl.z * tz);
+            nb.x += dn * tx; nb.z += dn * tz; sl.x += ds * tx; sl.z += ds * tz;
+            return true;
+          });
+        });
+      });
+    }
+
     // ── the user's storey: real cavity wall, course by course ──
     function userStorey(s, O) {
       var y0 = yBot(s), y1 = yTop(s), openings = {}, hooks = [];
@@ -138,8 +170,10 @@
           hooks.push({ y: o.v1, fn: function () { lintel(o, true); if (o.soldier) soldiers(o, true); } });
         });
       });
+      var i0 = K.items.length;
       K.wallLoop(pts, { y0: y0, y1: y1, leaves: 'cavity', palette: MYPAL, openings: openings, hooks: hooks, frame: 'upvcGrey',
         bands: s === 0 ? [{ y0: -0.15, y1: G0, palette: 'brown' }] : null });
+      tidyBond(i0);
       K.stage('masonry');
       O.forEach(function (list) { list.forEach(function (o) { innerInfill(o, y0, y1); }); });
     }

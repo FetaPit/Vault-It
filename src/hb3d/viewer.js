@@ -96,32 +96,41 @@
     return GEOM;
   }
 
-  // procedural UK brick-slip texture (stretcher bond at true scale: 1 texture tile = 0.9 m × 0.6 m = 4 × 8 bricks)
+  // procedural UK brick-slip texture (stretcher bond at true scale: 1 texture tile = 1.8 m × 1.2 m = 8 bricks × 16 courses;
+  // each brick gets its own seeded colour + value jitter so the repeat doesn't read as stripes)
+  var BRICK_TILE = [1.8, 1.2];
   var _brickTex = null;
   function brickTexture() {
     if (_brickTex) return _brickTex;
-    var c = document.createElement('canvas'); c.width = 512; c.height = 512;
-    var g = c.getContext('2d'), cw = 512 / 4, ch = 512 / 8;   // 4 bricks wide (0.9 m), 8 courses high (0.6 m)
-    g.fillStyle = '#b4ab9b'; g.fillRect(0, 0, 512, 512);
-    var pal = H.BRICKS.red;
-    for (var r = 0; r < 8; r++) for (var i = -1; i < 5; i++) {
-      var x = i * cw + (r % 2 ? cw / 2 : 0), c2 = pal[(r * 7 + i * 3 + 11) % pal.length];
-      g.fillStyle = '#' + ('000000' + c2.toString(16)).slice(-6);
-      g.fillRect(x + cw * 0.022, r * ch + ch * 0.067, cw * 0.956, ch * 0.866);
+    var S = 1024, c = document.createElement('canvas'); c.width = S; c.height = S;
+    var g = c.getContext('2d'), cw = S / 8, ch = S / 16;   // 225 mm × 75 mm coordinating module
+    g.fillStyle = '#b4ab9b'; g.fillRect(0, 0, S, S);
+    var pal = H.BRICKS.red, seed = 1234567;
+    var rnd = function () { seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; return ((seed >>> 0) % 100000) / 100000; };
+    for (var r = 0; r < 16; r++) {
+      var row = [];
+      for (var i = 0; i < 8; i++) row.push(rnd());
+      for (var k = -1; k < 9; k++) {                       // wrap the half-bond overhang so the tile repeats seamlessly
+        var x = k * cw + (r % 2 ? cw / 2 : 0), v = row[((k % 8) + 8) % 8], c2 = pal[Math.floor(v * pal.length)];
+        var j = 1 + (rnd() - 0.5) * 0.14;
+        var cr = Math.min(255, Math.round(((c2 >> 16) & 255) * j)), cg = Math.min(255, Math.round(((c2 >> 8) & 255) * j)), cb = Math.min(255, Math.round((c2 & 255) * j));
+        g.fillStyle = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
+        g.fillRect(x + cw * 0.022, r * ch + ch * 0.067, cw * 0.956, ch * 0.866);   // 215 × 65 brick inside a 10 mm joint
+      }
     }
     _brickTex = new THREE.CanvasTexture(c);
     _brickTex.wrapS = _brickTex.wrapT = THREE.RepeatWrapping;
     _brickTex.encoding = THREE.sRGBEncoding;
-    _brickTex.anisotropy = 4;
+    _brickTex.anisotropy = 8;
     return _brickTex;
   }
 
   function col(hex) { return new THREE.Color(hex).convertSRGBToLinear(); }
 
   // three material variants per key: solid, ghost-built (translucent real), blueprint (additive teal)
-  function makeMaterials(key, clip) {
+  function makeMaterials(key, tint) {
     var d = MATS[key] || MATS.concrete;
-    var params = { color: col(d.color), roughness: d.rough == null ? 0.8 : d.rough, metalness: d.metal || 0 };
+    var params = { color: col(tint ? 0xffffff : d.color), roughness: d.rough == null ? 0.8 : d.rough, metalness: d.metal || 0 };
     if (d.emissive) params.emissive = col(d.emissive);
     var lambert = !d.glass && !(d.metal > 0.25) && (d.rough == null || d.rough >= 0.6);   // matt surfaces: Lambert is ~20% cheaper per vertex
     var solid = lambert ? new THREE.MeshLambertMaterial({ color: params.color, emissive: params.emissive || col(0x000000) }) : new THREE.MeshStandardMaterial(params);
@@ -129,7 +138,7 @@
     if (d.brickslip) {
       solid.map = brickTexture();
       solid.onBeforeCompile = function (sh) {   // world-space UVs so the texture stays at true brick scale on any panel size
-        sh.vertexShader = sh.vertexShader.replace('#include <uv_vertex>', '#include <uv_vertex>\n  vec4 hbWp = vec4(position,1.0);\n  #ifdef USE_INSTANCING\n  hbWp = instanceMatrix * hbWp;\n  #endif\n  hbWp = modelMatrix * hbWp;\n  vec3 hbN = abs(normalize(mat3(modelMatrix) * normal));\n  vUv = (hbN.x > hbN.z ? hbWp.zy : hbWp.xy) / vec2(0.9, 0.6);');
+        sh.vertexShader = sh.vertexShader.replace('#include <uv_vertex>', '#include <uv_vertex>\n  vec4 hbWp = vec4(position,1.0);\n  #ifdef USE_INSTANCING\n  hbWp = instanceMatrix * hbWp;\n  #endif\n  hbWp = modelMatrix * hbWp;\n  vec3 hbNo = normal;\n  #ifdef USE_INSTANCING\n  hbNo = mat3(instanceMatrix) * hbNo;\n  #endif\n  vec3 hbN = abs(normalize(mat3(modelMatrix) * hbNo));\n  vUv = (hbN.y > max(hbN.x, hbN.z) ? hbWp.xz : (hbN.x > hbN.z ? hbWp.zy : hbWp.xy)) / vec2(' + BRICK_TILE[0].toFixed(2) + ', ' + BRICK_TILE[1].toFixed(2) + ');');
       };
       solid.defines = { USE_UV: '' };
     }
@@ -259,18 +268,21 @@
     if (!model) { this.dirty = true; return; }
     this._mats = this._mats || {};
     model.batches.forEach(function (b) {
-      var mats = self._mats[b.mat] || (self._mats[b.mat] = makeMaterials(b.mat));
-      var n = b.count, geo = G[b.shape] || G.box;
+      var n = b.count, geo = G[b.shape] || G.box, hasCol = false, def = MATS[b.mat] || MATS.concrete;
+      for (var q = 0; q < n; q++) if (b.color[q] >= 0) { hasCol = true; break; }
+      // explicit colours on a plain material: base colour goes white and uncoloured instances carry the material colour,
+      // so every instance shows exactly its own colour (never black, never double-tinted)
+      var tint = hasCol && !def.inst, mk = b.mat + (tint ? '#tint' : '');
+      var mats = self._mats[mk] || (self._mats[mk] = makeMaterials(b.mat, tint));
       var main = new THREE.InstancedMesh(geo, mats.solid, n), rev = new THREE.InstancedMesh(geo, mats.blue, n);
-      var hasCol = false;
       for (var i = 0; i < n; i++) {
         var o = i * 10, xf = b.xf;
         tmpP.set(xf[o], xf[o + 1], xf[o + 2]); tmpS.set(xf[o + 3], xf[o + 4], xf[o + 5]);
         tmpE.set(xf[o + 6], xf[o + 7], xf[o + 8], 'YZX'); tmpQ.setFromEuler(tmpE);
         tmpM.compose(tmpP, tmpQ, tmpS);
         main.setMatrixAt(i, tmpM); rev.setMatrixAt(n - 1 - i, tmpM);
-        if (b.color[i] >= 0) { hasCol = true; tmpC.setHex(b.color[i]).convertSRGBToLinear(); main.setColorAt(i, tmpC); }
-        else if (mats.def.inst) { tmpC.setHex(0xffffff); main.setColorAt(i, tmpC); }
+        if (b.color[i] >= 0) { tmpC.setHex(b.color[i]).convertSRGBToLinear(); main.setColorAt(i, tmpC); }
+        else if (hasCol) { if (tint) tmpC.setHex(def.color).convertSRGBToLinear(); else tmpC.setHex(0xffffff); main.setColorAt(i, tmpC); }
       }
       if (!hasCol && main.instanceColor) main.instanceColor = null;
       main.instanceMatrix.needsUpdate = true; rev.instanceMatrix.needsUpdate = true;
@@ -320,7 +332,7 @@
     var d = rad / Math.sin(fov / 2) * (aspect < 1 ? 1.15 / aspect : 1.02);
     this.fitDist = d;
     var az = (this.opts.azimuth == null ? 32 : this.opts.azimuth) * Math.PI / 180, el = 20 * Math.PI / 180;
-    var target = new THREE.Vector3(cx, Math.min(H * 0.42, 12), cz + 0.2);
+    var target = new THREE.Vector3(cx, H * (H > 20 ? 0.5 : 0.42), cz + 0.2);   // towers: aim at mid-height so the crown stays in frame
     this.controls.target.copy(target);
     this.camera.position.set(target.x + d * Math.sin(az) * Math.cos(el), target.y + d * Math.sin(el), target.z + d * Math.cos(az) * Math.cos(el));
     this.controls.minDistance = Math.max(1.0, rad * 0.12);

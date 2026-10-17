@@ -139,7 +139,12 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var gap = rightStart - J - (leftEnd + J);  // space for a closer (between joints)
     var cs = leftEnd + J;
     while (gap > unitL + J + 0.025) { bricks.push([cs, cs + unitL]); cs += step; gap -= step; }   // never stretch a closer past a whole unit
-    if (gap > 0.025) bricks.push([cs, cs + gap]);
+    var minCut = opt.unit === 'block' ? 0.10 : 0.025;
+    if (gap > minCut * 0.25 && gap < minCut && opt.unit === 'block' && bricks.length) {   // no block slivers: take the cut from the neighbour
+      var sh = minCut - gap; bricks[bricks.length - 1][1] -= sh; cs -= sh; gap = minCut;
+    }
+    if (gap > unitL) { var pad = (gap - unitL) / 2; bricks.push([cs + pad, cs + pad + unitL]); }   // whole unit, joints take the slack
+    else if (gap > 0.025) bricks.push([cs, cs + gap]);
     for (var i = right.length - 1; i >= 0; i--) bricks.push(right[i]);
     // cut to the allowed segments (openings / gable rake)
     bricks.forEach(function (b) {
