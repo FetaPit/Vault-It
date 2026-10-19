@@ -78,7 +78,7 @@
     balcony:      { color: 0x30363d, rough: 0.5, metal: 0.4 },
     cladding:     { color: 0xffffff, rough: 0.9, brickslip: true },
     curtain:      { color: 0x5d7a8c, rough: 0.15, metal: 0.4 },
-    gold:         { color: 0xe8c56a, rough: 0.4, metal: 0.5, emissive: 0x3a2a00 }
+    gold:         { color: 0xe8c56a, rough: 0.4, metal: 0.5, emissive: 0x3a2a00, keep: true }
   };
 
   var GEOM = null;
@@ -127,28 +127,120 @@
 
   function col(hex) { return new THREE.Color(hex).convertSRGBToLinear(); }
 
-  // three material variants per key: solid, ghost-built (translucent real), blueprint (additive teal)
+  // ── Vault·It look: the deposit-stage house is a translucent teal hologram; the owned (mortgage) house is full colour
+  //    with a green-blue grade so it sits in the app's palette rather than looking purely photographic ──
+  var GRADE = H.GRADE = { amount: 0.62 };          // 0 = photographic, 1 = fully graded
+  var BRICKSLIP_UV = '#include <uv_vertex>\n  vec4 hbWp = vec4(position,1.0);\n  #ifdef USE_INSTANCING\n  hbWp = instanceMatrix * hbWp;\n  #endif\n  hbWp = modelMatrix * hbWp;\n  vec3 hbNo = normal;\n  #ifdef USE_INSTANCING\n  hbNo = mat3(instanceMatrix) * hbNo;\n  #endif\n  vec3 hbN = abs(normalize(mat3(modelMatrix) * hbNo));\n  vUv = (hbN.y > max(hbN.x, hbN.z) ? hbWp.xz : (hbN.x > hbN.z ? hbWp.zy : hbWp.xy)) / vec2(' + BRICK_TILE[0].toFixed(2) + ', ' + BRICK_TILE[1].toFixed(2) + ');';
+  // full colour, graded: cool the palette towards the app's teal, lift the shadows with teal, keep highlights clean
+  function gradeChunk(a) {
+    return '{ float hbL = dot(gl_FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));\n' +
+      '  vec3 hbG = mix(gl_FragColor.rgb, hbL * vec3(0.70, 1.08, 1.14), 0.45) * vec3(0.92, 1.0, 1.02) + vec3(0.006, 0.050, 0.056) * (1.0 - smoothstep(0.0, 0.40, hbL));\n' +
+      '  gl_FragColor.rgb = mix(gl_FragColor.rgb, hbG, ' + a.toFixed(3) + '); }\n#include <tonemapping_fragment>';
+  }
+  // hologram: every surface is re-coloured on a teal ramp by its own lightness (bricks dark, joints light, glass glows)
+  var HOLO_LO = 'vec3(0.012, 0.085, 0.090)', HOLO_HI = 'vec3(0.300, 0.880, 0.800)';
+  var HOLO_CHUNK = '#include <color_fragment>\n  { float hbL = clamp(dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722)) * 1.25, 0.0, 1.0);\n    diffuseColor.rgb = mix(' + HOLO_LO + ', ' + HOLO_HI + ', 0.18 + 0.82 * hbL); }';
+  // material post-processing (also used for uploaded / AI-generated designs)
+  function styleMaterial(m, kind, opts) {
+    opts = opts || {};
+    var slip = !!opts.brickslip, a = GRADE.amount;
+    m.onBeforeCompile = function (sh) {   // replaces (never chains) so styling twice can't double-apply
+      if (slip) sh.vertexShader = sh.vertexShader.replace('#include <uv_vertex>', BRICKSLIP_UV);
+      if (kind === 'solid') sh.fragmentShader = sh.fragmentShader.replace('#include <tonemapping_fragment>', gradeChunk(a));
+      if (kind === 'holo') sh.fragmentShader = sh.fragmentShader.replace('#include <color_fragment>', HOLO_CHUNK);
+      if (kind === 'flat') sh.fragmentShader = sh.fragmentShader.replace('#include <color_fragment>', '');
+    };
+    m.customProgramCacheKey = function () { return 'hb3d:' + kind + ':' + (slip ? 1 : 0) + ':' + a.toFixed(3); };
+    if (slip) m.defines = Object.assign({}, m.defines || {}, { USE_UV: '' });
+    return m;
+  }
+  H.styleMaterial = styleMaterial;
+  // hologram material from any base colour/map (opacity: built 0.55, context 0.20)
+  function holoMaterial(colorLin, opacity, glass, map, worldUV) {
+    var g = new THREE.MeshLambertMaterial({ color: colorLin, emissive: col(0x0b3b38), transparent: true, opacity: glass ? opacity * 0.6 : opacity, depthWrite: !glass, side: THREE.FrontSide });
+    g.emissiveIntensity = 0.55;
+    if (map) g.map = map;
+    return styleMaterial(g, 'holo', { brickslip: !!(map && worldUV) });
+  }
+  H._holoMaterial = holoMaterial;
+
+  // material variants per key: solid (graded full colour), ghost (hologram, built part), ctx (faint hologram: other floors),
+  // blue (blueprint of what is still to come), nb (neighbours)
   function makeMaterials(key, tint) {
     var d = MATS[key] || MATS.concrete;
-    var params = { color: col(tint ? 0xffffff : d.color), roughness: d.rough == null ? 0.8 : d.rough, metalness: d.metal || 0 };
+    var base = col(tint ? 0xffffff : d.color);
+    var params = { color: base, roughness: d.rough == null ? 0.8 : d.rough, metalness: d.metal || 0 };
     if (d.emissive) params.emissive = col(d.emissive);
     var lambert = !d.glass && !(d.metal > 0.25) && (d.rough == null || d.rough >= 0.6);   // matt surfaces: Lambert is ~20% cheaper per vertex
     var solid = lambert ? new THREE.MeshLambertMaterial({ color: params.color, emissive: params.emissive || col(0x000000) }) : new THREE.MeshStandardMaterial(params);
     if (d.glass) { solid.transparent = true; solid.opacity = d.opacity; solid.depthWrite = false; solid.envMapIntensity = 1; }
-    if (d.brickslip) {
-      solid.map = brickTexture();
-      solid.onBeforeCompile = function (sh) {   // world-space UVs so the texture stays at true brick scale on any panel size
-        sh.vertexShader = sh.vertexShader.replace('#include <uv_vertex>', '#include <uv_vertex>\n  vec4 hbWp = vec4(position,1.0);\n  #ifdef USE_INSTANCING\n  hbWp = instanceMatrix * hbWp;\n  #endif\n  hbWp = modelMatrix * hbWp;\n  vec3 hbNo = normal;\n  #ifdef USE_INSTANCING\n  hbNo = mat3(instanceMatrix) * hbNo;\n  #endif\n  vec3 hbN = abs(normalize(mat3(modelMatrix) * hbNo));\n  vUv = (hbN.y > max(hbN.x, hbN.z) ? hbWp.xz : (hbN.x > hbN.z ? hbWp.zy : hbWp.xy)) / vec2(' + BRICK_TILE[0].toFixed(2) + ', ' + BRICK_TILE[1].toFixed(2) + ');');
-      };
-      solid.defines = { USE_UV: '' };
+    if (d.brickslip) solid.map = brickTexture();
+    styleMaterial(solid, 'solid', { brickslip: d.brickslip });
+    var ghost, ctx;
+    if (d.keep) {   // gold highlight bands stay gold in every mode (they mark the user's floor)
+      ghost = solid.clone(); ghost.onBeforeCompile = solid.onBeforeCompile; ghost.customProgramCacheKey = solid.customProgramCacheKey;
+      ghost.transparent = true; ghost.opacity = 0.9;
+      ctx = ghost.clone(); ctx.onBeforeCompile = solid.onBeforeCompile; ctx.customProgramCacheKey = solid.customProgramCacheKey; ctx.opacity = 0.5;
+    } else {
+      ghost = holoMaterial(base.clone(), 0.55, d.glass, d.brickslip ? brickTexture() : null, true);
+      ctx = holoMaterial(base.clone(), 0.16, d.glass, d.brickslip ? brickTexture() : null, true);
     }
-    var ghost = solid.clone(); if (d.brickslip) ghost.onBeforeCompile = solid.onBeforeCompile;
-    ghost.transparent = true; ghost.opacity = d.glass ? 0.25 : 0.80; ghost.depthWrite = !d.glass;
-    ghost.emissive = col(0x0d3a38); ghost.emissiveIntensity = 0.35;
-    var blue = new THREE.MeshLambertMaterial({ color: col(0x2a8f8a), emissive: col(0x0f4a47), transparent: true, opacity: 0.16, depthWrite: true });   // blueprint ghost: only the nearest surface shows, no additive glare
-    var nb = blue.clone(); nb.opacity = 0.07;   // neighbours: fainter still
-    [solid, ghost, blue, nb].forEach(function (m) { m.clippingPlanes = [IDLE_PLANE]; m.clipShadows = true; });
-    return { solid: solid, ghost: ghost, blue: blue, nb: nb, def: d };
+    var blue = new THREE.MeshLambertMaterial({ color: col(0x2a8f8a), emissive: col(0x0f4a47), transparent: true, opacity: 0.11, depthWrite: true });   // blueprint ghost: only the nearest surface shows, no additive glare
+    var nb = blue.clone(); nb.opacity = 0.06;   // neighbours: fainter still
+    styleMaterial(blue, 'flat'); styleMaterial(nb, 'flat');
+    [solid, ghost, ctx, blue, nb].forEach(function (m) { m.clippingPlanes = [IDLE_PLANE]; m.clipShadows = true; });
+    return { solid: solid, ghost: ghost, ctx: ctx, blue: blue, nb: nb, def: d };
+  }
+
+  // ── Uploaded / AI-generated designs (GLB) ──
+  // Normalises the scene to metres (ground at y 0, front face on z 0, centred on x) and wraps it as a model the viewer
+  // and the app treat like the built-in houses: hologram build during the deposit, graded colour once owned.
+  // meta: { name, realSize (Meshy auto_size output is already in metres), source }
+  H.customModel = function (root, meta) {
+    meta = meta || {};
+    root.updateMatrixWorld(true);
+    var box = new THREE.Box3().setFromObject(root), size = box.getSize(new THREE.Vector3());
+    var h0 = Math.max(1e-3, size.y), fp0 = Math.max(1e-3, size.x, size.z), sc = 1;
+    // already metres? (Meshy's auto-size output, or anything house-sized: ≥ 3.5 m to the ridge, ≥ 4 m on plan)
+    var metres = (meta.realSize && h0 > 2.5 && h0 < 160) || (h0 >= 3.5 && h0 < 160 && fp0 >= 4 && fp0 < 200);
+    if (!metres) { sc = 8.5 / h0; if (fp0 * sc > 30) sc = 30 / fp0; }   // unknown units (cm, inches, unit cube…): a two-storey house ≈ 8.5 m
+    var wrap = new THREE.Group();
+    root.position.set(-(box.min.x + box.max.x) / 2, -box.min.y, -box.max.z);
+    wrap.add(root); wrap.scale.setScalar(sc); wrap.updateMatrixWorld(true);
+    var W = size.x * sc, D = size.z * sc, Hh = size.y * sc, meshes = 0;
+    wrap.traverse(function (o) { if (o.isMesh) meshes++; });
+    // Brick estimate for the HUD: external wall area (≈ 72% of the height is wall, 18% openings) × 60 UK bricks per m²
+    var wallH = Hh * 0.72, bricks = Math.max(1000, Math.round(2 * (W + D) * wallH * 0.82 * 60)), tiles = Math.round(W * D * 1.25 * 10);
+    var stats = function (p) {
+      var st = H.stageAt(p), k = Math.max(0, Math.min(1, p));
+      return { bricksLaid: Math.round(bricks * k), bricksTotal: bricks, blocksLaid: 0, tilesLaid: Math.round(tiles * k), tilesTotal: tiles, stage: st.name, stageKey: st.key };
+    };
+    return {
+      type: 'custom', custom: wrap, name: meta.name || 'Your design', source: meta.source || 'upload', batches: [], anchors: {}, focus: null,
+      envelope: [[-W / 2, 0, -D, W / 2, Hh, 0]], bounds: { min: [-W / 2, 0, -D], max: [W / 2, Hh, 0] }, height: Hh,
+      counts: { bricks: bricks, blocks: 0, tiles: tiles }, instances: meshes, info: { width: W, depth: D, height: Hh, scale: sc, estimated: true },
+      stats: stats, brickT: function (i) { return Math.max(0, Math.min(1, i / bricks)); }
+    };
+  };
+  // one-time: give every mesh a graded-colour, a hologram and a blueprint twin
+  function prepareCustom(model) {
+    if (model._cust) return model._cust;
+    var C = { solid: [], holo: [], blue: [], solidMats: [], holoMats: [], blueMats: [] }, list = [];
+    model.custom.traverse(function (o) { if (o.isMesh) list.push(o); });
+    list.forEach(function (mesh) {
+      var mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      var solid = mats.map(function (m) { var c = m.clone(); styleMaterial(c, 'solid'); c.clippingPlanes = [IDLE_PLANE]; c.clipShadows = true; C.solidMats.push(c); return c; });
+      var holo = mats.map(function (m) { var c = holoMaterial((m.color || col(0xcccccc)).clone(), 0.55, m.transparent && m.opacity < 0.6, m.map || null, false); c.clippingPlanes = [IDLE_PLANE]; c.side = THREE.DoubleSide; C.holoMats.push(c); return c; });
+      var blue = new THREE.MeshLambertMaterial({ color: col(0x2a8f8a), emissive: col(0x0f4a47), transparent: true, opacity: 0.11, depthWrite: true, side: THREE.DoubleSide });
+      styleMaterial(blue, 'flat'); blue.clippingPlanes = [IDLE_PLANE]; C.blueMats.push(blue);
+      mesh.material = solid.length > 1 ? solid : solid[0]; mesh.castShadow = true; mesh.receiveShadow = true;
+      var hm = mesh.clone(); hm.material = holo.length > 1 ? holo : holo[0]; hm.castShadow = true;
+      var bm = mesh.clone(); bm.material = blue; bm.castShadow = false; bm.renderOrder = 5;
+      mesh.parent.add(hm); mesh.parent.add(bm);
+      C.solid.push(mesh); C.holo.push(hm); C.blue.push(bm);
+    });
+    model._cust = C;
+    return C;
   }
 
   var IDLE_PLANE = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e5);   // keeps every material on one clipping plane at all times
@@ -177,8 +269,8 @@
     sc.fog = new THREE.Fog(0x05101b, 60, 160);
     var cam = this.camera = new THREE.PerspectiveCamera(36, w / h, 0.05, 600);
     // lights: cool sky + warm key light (late-afternoon sun) with soft shadows
-    sc.add(new THREE.HemisphereLight(col(0xbcd6ea), col(0x1d2a22), 0.62));
-    var sun = this.sun = new THREE.DirectionalLight(col(0xffe3c4), 1.25);
+    sc.add(new THREE.HemisphereLight(col(0xa8dcd6), col(0x10302e), 0.66));
+    var sun = this.sun = new THREE.DirectionalLight(col(0xfff0de), 1.2);
     sun.position.set(18, 26, 22); sun.castShadow = !this.mobile;
     sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
     sc.add(sun); sc.add(sun.target);
@@ -257,7 +349,9 @@
     this.batches = [];
     if (this.edges) { this.root.remove(this.edges); this.edges.geometry.dispose(); this.edges = null; }
     if (this.water) { this.root.remove(this.water); this.water = null; }
+    if (this.focusBox) { this.root.remove(this.focusBox); this.focusBox.geometry.dispose(); this.focusBox = null; }
     if (this.site) { this.root.remove(this.site); this.site = null; }
+    if (this.model && this.model.custom) this.root.remove(this.model.custom);   // kept intact: the app caches the model
   };
 
   // Build the instanced meshes for a compiled model
@@ -266,6 +360,8 @@
     this._clear();
     this.model = model;
     if (!model) { this.dirty = true; return; }
+    this._cust = null;
+    if (model.custom) { this._cust = prepareCustom(model); this.root.add(model.custom); }
     this._mats = this._mats || {};
     model.batches.forEach(function (b) {
       var n = b.count, geo = G[b.shape] || G.box, hasCol = false, def = MATS[b.mat] || MATS.concrete;
@@ -281,12 +377,14 @@
         tmpE.set(xf[o + 6], xf[o + 7], xf[o + 8], 'YZX'); tmpQ.setFromEuler(tmpE);
         tmpM.compose(tmpP, tmpQ, tmpS);
         main.setMatrixAt(i, tmpM); rev.setMatrixAt(n - 1 - i, tmpM);
-        if (b.color[i] >= 0) { tmpC.setHex(b.color[i]).convertSRGBToLinear(); main.setColorAt(i, tmpC); }
-        else if (hasCol) { if (tint) tmpC.setHex(def.color).convertSRGBToLinear(); else tmpC.setHex(0xffffff); main.setColorAt(i, tmpC); }
+        if (b.color[i] >= 0) { tmpC.setHex(b.color[i]).convertSRGBToLinear(); main.setColorAt(i, tmpC); rev.setColorAt(n - 1 - i, tmpC); }
+        else if (hasCol) { if (tint) tmpC.setHex(def.color).convertSRGBToLinear(); else tmpC.setHex(0xffffff); main.setColorAt(i, tmpC); rev.setColorAt(n - 1 - i, tmpC); }
       }
       if (!hasCol && main.instanceColor) main.instanceColor = null;
       main.instanceMatrix.needsUpdate = true; rev.instanceMatrix.needsUpdate = true;
       if (main.instanceColor) main.instanceColor.needsUpdate = true;
+      if (!hasCol && rev.instanceColor) rev.instanceColor = null;
+      if (rev.instanceColor) rev.instanceColor.needsUpdate = true;
       var shadow = !b.ghost && !mats.def.glass && b.mat !== 'string' && b.mat !== 'felt';
       main.castShadow = shadow && b.shape !== 'sph'; main.receiveShadow = !mats.def.glass;
       main.frustumCulled = false; rev.frustumCulled = false;
@@ -309,10 +407,18 @@
     }
     // gold waterline ring (equity mode)
     var bb = model.bounds, wx = bb.max[0] - bb.min[0] + 0.6, wz = bb.max[2] - bb.min[2] + 0.6;
-    var wg = new THREE.EdgesGeometry(new THREE.BoxBufferGeometry(wx, 0.001, wz));
+    var wg = new THREE.EdgesGeometry(new THREE.BoxBufferGeometry(wx - 0.44, 0.001, wz - 0.44));   // hugs the walls (8 cm out)
     this.water = new THREE.LineSegments(wg, new THREE.LineBasicMaterial({ color: col(0xe8c56a), transparent: true, opacity: 0.95 }));
     this.water.position.set((bb.min[0] + bb.max[0]) / 2, 0, (bb.min[2] + bb.max[2]) / 2);
     this.water.visible = false; this.root.add(this.water);
+    // the user's own floor (flats / apartments): a gold frame that marks it in every mode
+    if (model.focus) {
+      var F = model.focus, fh = Math.max(0.2, F.y1 - F.y0);
+      var fg = new THREE.EdgesGeometry(new THREE.BoxBufferGeometry(wx - 0.3, fh, wz - 0.3));
+      this.focusBox = new THREE.LineSegments(fg, new THREE.LineBasicMaterial({ color: col(0xe8c56a), transparent: true, opacity: 0.9, depthWrite: false }));
+      this.focusBox.position.set((bb.min[0] + bb.max[0]) / 2, F.y0 + fh / 2, (bb.min[2] + bb.max[2]) / 2);
+      this.focusBox.renderOrder = 6; this.root.add(this.focusBox);
+    }
     // shadow camera fits the model
     var R = Math.max(wx, wz, bb.max[1]) * 0.75 + 4, sun = this.sun;
     sun.target.position.set((bb.min[0] + bb.max[0]) / 2, 0, (bb.min[2] + bb.max[2]) / 2);
@@ -324,7 +430,7 @@
 
   // camera framing: front-right, elevated, auto distance
   VP.fit = function () {
-    var m = this.model, bb = m ? m.bounds : { min: [-4, 0, -6], max: [4, 4, 2] };
+    var m = this.model, bb = m ? (m.frame || m.bounds) : { min: [-4, 0, -6], max: [4, 4, 2] };   // frame: house + front garden
     var cx = (bb.min[0] + bb.max[0]) / 2, cz = (bb.min[2] + bb.max[2]) / 2, H = Math.max(2, bb.max[1]);
     var rad = Math.sqrt(Math.pow(bb.max[0] - bb.min[0], 2) + Math.pow(bb.max[2] - bb.min[2], 2) + H * H) / 2;
     this._radius = rad;
@@ -356,8 +462,13 @@
   };
 
   // progress / mode → instance counts + materials + clipping
-  // mode: 'build' (translucent built part + blueprint remainder), 'equity' (solid below waterline, blueprint above),
-  //       'complete' (all solid), 'site' (nothing but set-out)
+  // mode: 'build'    deposit stage: the built part is a translucent teal hologram, the rest a faint blueprint;
+  //                  at 100% of the deposit the whole house stands as a hologram
+  //       'equity'   mortgage stage: full-colour (graded) bricks below the owned-share waterline, hologram above
+  //       'complete' mortgage free: all full colour
+  //       'site'     nothing built yet: blueprint only
+  // Flats / apartments (model.focus): only the user's own floor builds and turns to colour; the rest of the block
+  // stays a faint hologram for context.
   VP.setState = function (s) {
     if (s.p != null) this.p = Math.max(0, Math.min(1, s.p));
     if (s.mode) this.mode = s.mode;
@@ -380,40 +491,56 @@
   function upper(t, p) { var lo = 0, hi = t.length; while (lo < hi) { var m = (lo + hi) >> 1; if (t[m] <= p) lo = m + 1; else hi = m; } return lo; }
   VP.apply = function () {
     var self = this, m = this.model; if (!m) { this.dirty = true; return; }
-    var mode = this.mode, p = mode === 'build' ? this.p : 1, H0 = Math.max(0.5, m.height), clipY = this.eq * H0;
+    var mode = this.mode, p = mode === 'build' ? this.p : (mode === 'site' ? 0 : 1), F = m.focus;
+    var y0 = F ? F.y0 : 0, y1 = F ? F.y1 : Math.max(0.5, m.height), clipY = y0 + this.eq * (y1 - y0);
     var below = new THREE.Plane(new THREE.Vector3(0, -1, 0), clipY), above = new THREE.Plane(new THREE.Vector3(0, 1, 0), -clipY);
+    if (this._cust) {   // uploaded / AI design: the hologram rises with the deposit; colour fills up to the owned share
+      var C = this._cust, hb = (mode === 'build' ? p : 0) * y1 + (mode === 'build' && p >= 1 ? 1 : 0);
+      var bBelow = new THREE.Plane(new THREE.Vector3(0, -1, 0), hb), bAbove = new THREE.Plane(new THREE.Vector3(0, 1, 0), -hb);
+      var vis = function (arr, on) { arr.forEach(function (o) { o.visible = on; }); };
+      var clip = function (arr, pl) { arr.forEach(function (mm) { mm.clippingPlanes = [pl]; }); };
+      if (mode === 'equity') { vis(C.solid, true); vis(C.holo, true); vis(C.blue, false); clip(C.solidMats, below); clip(C.holoMats, above); }
+      else if (mode === 'complete') { vis(C.solid, true); vis(C.holo, false); vis(C.blue, false); clip(C.solidMats, IDLE_PLANE); }
+      else if (mode === 'site') { vis(C.solid, false); vis(C.holo, false); vis(C.blue, true); clip(C.blueMats, IDLE_PLANE); }
+      else { vis(C.solid, false); vis(C.holo, true); vis(C.blue, true); clip(C.holoMats, bBelow); clip(C.blueMats, bAbove); }
+      this.edges && (this.edges.visible = mode === 'build' || mode === 'site');
+    }
     this.batches.forEach(function (B) {
-      var b = B.b, n = B.n, k = mode === 'site' ? 0 : upper(b.t, p), mats = B.mats, hidden = b.hideAfter < 2 && p >= b.hideAfter && mode === 'build';
-      if (b.ghost) {   // neighbours: always blueprint ghosts
+      var b = B.b, n = B.n, k = mode === 'site' ? 0 : upper(b.t, p), mats = B.mats, temp = b.hideAfter < 2, hidden = temp && (mode !== 'build' || p >= b.hideAfter);
+      if (b.ghost) {   // neighbours: always faint blueprint
         B.main.count = 0; B.rev.count = n; B.rev.material = mats.nb; B.rev.visible = true; B.main.visible = false; return;
       }
-      if (mode === 'equity') {
-        if (b.hideAfter < 2) { B.main.visible = false; B.rev.visible = false; return; }
-        B.main.visible = true; B.rev.visible = true;
-        B.main.count = n; B.rev.count = n;
-        B.main.material = mats.solid; B.rev.material = mats.blue;
-        mats.solid.clippingPlanes = [below]; mats.blue.clippingPlanes = [above]; mats.ghost.clippingPlanes = [IDLE_PLANE];
-      } else if (mode === 'complete') {
-        B.main.visible = b.hideAfter >= 2; B.rev.visible = false; B.main.count = n;
-        B.main.material = mats.solid; mats.solid.clippingPlanes = [IDLE_PLANE];
-      } else {   // build / site
-        B.main.visible = !hidden; B.rev.visible = !hidden && b.hideAfter >= 2;
-        B.main.count = k; B.rev.count = n - k;
-        B.main.material = mode === 'site' ? mats.solid : mats.ghost; B.rev.material = mats.blue;
-        mats.solid.clippingPlanes = [IDLE_PLANE]; mats.blue.clippingPlanes = [IDLE_PLANE]; mats.ghost.clippingPlanes = [IDLE_PLANE];
+      if (F && !b.focus) {   // the rest of the block: constant faint hologram (no site temporaries)
+        B.rev.visible = false; B.main.visible = !temp; B.main.count = n; B.main.material = mats.ctx; mats.ctx.clippingPlanes = [IDLE_PLANE];
+        return;
       }
-      // lights on: warm glow behind the glass at completion
+      if (mode === 'equity') {
+        B.main.visible = !temp; B.rev.visible = !temp;
+        B.main.count = n; B.rev.count = n;
+        B.main.material = mats.solid; B.rev.material = mats.ghost;
+        mats.solid.clippingPlanes = [below]; mats.ghost.clippingPlanes = [above];
+      } else if (mode === 'complete') {
+        B.main.visible = !temp; B.rev.visible = false; B.main.count = n;
+        B.main.material = mats.solid; mats.solid.clippingPlanes = [IDLE_PLANE];
+      } else {   // build (deposit) / site
+        B.main.visible = !hidden && k > 0; B.rev.visible = !temp && n - k > 0;
+        B.main.count = k; B.rev.count = n - k;
+        B.main.material = mats.ghost; B.rev.material = mats.blue;
+        mats.blue.clippingPlanes = [IDLE_PLANE]; mats.ghost.clippingPlanes = [IDLE_PLANE];
+      }
+      // lights on: warm glow behind the glass once the house is finished / owned
       if (mats.def.glass) {
         var on = self.lights;
-        [mats.solid, mats.ghost].forEach(function (mm) { mm.emissive = col(on ? 0xffb35c : 0x000000); mm.emissiveIntensity = on ? 0.55 : 0; });
+        [mats.solid, mats.ghost].forEach(function (mm) { mm.emissive = col(on ? 0xffb35c : (mm === mats.ghost ? 0x0b3b38 : 0x000000)); mm.emissiveIntensity = on ? 0.55 : (mm === mats.ghost ? 0.55 : 0); });
       }
     });
     if (this.edges) {
-      this.edges.visible = mode === 'build' || mode === 'equity';
-      this.edges.material.clippingPlanes = mode === 'equity' ? [above] : [IDLE_PLANE];
-      this.edges.material.opacity = mode === 'build' ? 0.18 + 0.25 * (1 - p) : 0.30;
+      this.edges.visible = !F && ((mode === 'build' && p < 1) || mode === 'site');
+      this.edges.material.clippingPlanes = [IDLE_PLANE];
+      this.edges.material.opacity = 0.14 + 0.22 * (1 - p);
     }
     if (this.water) { this.water.visible = mode === 'equity'; this.water.position.y = clipY; }
+    if (this.focusBox) this.focusBox.visible = true;
     this.dirty = true; this._shadowDirty = true; this.wake();
   };
 
@@ -422,7 +549,7 @@
     var v = new THREE.Vector3(x, y, z).project(this.camera), w = this.el.clientWidth, h = this.el.clientHeight;
     return { x: (v.x + 1) / 2 * w, y: (1 - v.y) / 2 * h, behind: v.z > 1 };
   };
-  VP.waterline = function () { var m = this.model; return m ? this.eq * Math.max(0.5, m.height) : 0; };
+  VP.waterline = function () { var m = this.model; if (!m) return 0; var F = m.focus; return F ? F.y0 + this.eq * (F.y1 - F.y0) : this.eq * Math.max(0.5, m.height); };
   VP.dispose = function () {
     this.stop(); this._clear();
     if (this._ro) this._ro.disconnect();

@@ -619,7 +619,8 @@
     K.anchor('front', W / 2, 1.5, 0); K.anchor('top', W / 2, CROWN, -D / 2); K.anchor('ridge', W / 2, CROWN, -D / 2);
     K.anchor('myFloor', W / 2, FFL(uf) + 1.5, 0.05);
     return {
-      name: 'Build-to-rent residential tower',
+      name: 'Residential tower · floor ' + uf + ' of ' + NF,
+      focus: { y0: FFL(uf) - SLAB - 0.02, y1: FFL(uf + 1) - SLAB + 0.02 },   // the user's own floor: what the deposit builds
       info: { storeys: NF + 2, floors: NF, floor: uf, floorLevel: FFL(uf), floorTop: FFL(uf) + ZTOP, frontage: W, depth: D, podium: Y1,
         roof: ROOF, eave: ROOF, crown: CROWN, ridge: CROWN, height: OVR + 0.25 }
     };

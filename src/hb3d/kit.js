@@ -163,9 +163,9 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     // mortar bed + perpends behind the units (recessed 6 mm from the face so joints read as real joints)
     if (opt.mortar !== false) segs.forEach(function (s) {
       var L = s[1] - s[0]; if (L < 0.02) return;
-      var uc = (s[0] + s[1]) / 2, rec = 0.006;
-      var px = run.ax + dirx * uc - nx * (rec + (thick - rec) / 2), pz = run.az + dirz * uc - nz * (rec + (thick - rec) / 2);
-      self.box(opt.mortarMat || 'mortar', px, y + (unitH + J) / 2, pz, L, unitH + J, thick - rec, { ry: ry });
+      var uc = (s[0] + s[1]) / 2, rec = 0.006, dep = thick - rec - 0.004, mh = unitH + J - 0.004;   // no face shared with a brick (no flicker)
+      var px = run.ax + dirx * uc - nx * (rec + dep / 2), pz = run.az + dirz * uc - nz * (rec + dep / 2);
+      self.box(opt.mortarMat || 'mortar', px, y + mh / 2, pz, L - 0.004, mh, dep, { ry: ry });
     });
   };
 
@@ -198,8 +198,9 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     });
     segs.forEach(function (sg) {
       var L = sg[1] - sg[0]; if (L < 0.02) return;
-      var uc = (sg[0] + sg[1]) / 2, rec = 0.006, px = run.ax + dirx * uc - nx * (rec + (thick - rec) / 2), pz = run.az + dirz * uc - nz * (rec + (thick - rec) / 2);
-      self.box(opt.mortarMat || 'mortar', px, y + (UK.BH + J) / 2, pz, L, UK.BH + J, thick - rec, { ry: ry });
+      var uc = (sg[0] + sg[1]) / 2, rec = 0.006, dep = thick - rec - 0.004, mh = UK.BH + J - 0.004;   // no face shared with a brick (no flicker)
+      var px = run.ax + dirx * uc - nx * (rec + dep / 2), pz = run.az + dirz * uc - nz * (rec + dep / 2);
+      self.box(opt.mortarMat || 'mortar', px, y + mh / 2, pz, L - 0.004, mh, dep, { ry: ry });
     });
   };
   function blockColor(r) { var v = 0x8a + Math.floor(r() * 18); return (v << 16) | (v << 8) | (v - 4); }
@@ -287,7 +288,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       runs.forEach(function (r) {
         var g = gables[r.idx];
         var top = g ? g.ridgeY : runTop(r);
-        self.stage(g && yb >= runTop(r) - 1e-6 && opts.gablesAfterRoof !== false ? 'roofcover' : 'masonry');
+        self.stage(g && yb >= runTop(r) - 1e-6 && opts.gablesAfterRoof !== false ? 'roofframe' : 'masonry');
         if (yb >= top - 1e-6 || (!g && yt > runTop(r) + 1e-6)) return;
         var isParty = party.indexOf(r.idx) >= 0;
         // corner ownership: run owns its start corner when (idx + k) even; external corners only
@@ -441,7 +442,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       panels.forEach(function (pn) {
         var pu = o.u0 + fw + lw * pn[0], pp = P(pu, set + 0.020);
         if (o.style === 'composite' && pn[1] > 0.7) self.box('glass', pp[0], o.v0 + lh * pn[1], pp[1], lw * 0.42, lh * pn[2], 0.012, { ry: ry, lightsOn: 1 });
-        else self.box(leafMat, pp[0], o.v0 + lh * pn[1], pp[1], o.style === 'composite' ? lw * 0.62 : lw * 0.34, lh * pn[2], 0.012, { ry: ry, color: 0xdddddd });
+        else self.box(leafMat, pp[0], o.v0 + lh * pn[1], pp[1], o.style === 'composite' ? lw * 0.62 : lw * 0.34, lh * pn[2], 0.012, { ry: ry });
       });
       // ironmongery: letter plate, knocker, handle
       var lp = P(uc, set + 0.012); self.box('brass', lp[0], o.v0 + lh * 0.55, lp[1], 0.26, 0.06, 0.01, { ry: ry });
@@ -1058,10 +1059,19 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       var S = STAGE_BY[k], arr = byStage[k], n = arr.length;
       arr.forEach(function (it, i) { it.t = it.g ? 0 : S.t0 + (S.t1 - S.t0) * (n > 1 ? i / (n - 1) : 1) * 0.999 + 1e-6; });
     });
+    // Flats / apartments: meta.focus = {y0, y1} is the user's own floor. Its permanent parts are what the deposit builds
+    // (re-timed across the whole 0–1 timeline in build order); everything else is context, shown as a faint hologram.
+    var F = meta.focus || null;
+    if (F) {
+      var FST = { slab: 1, masonry: 1, roofframe: 1, roofcover: 1, fitout: 1, snag: 1 };
+      this.items.forEach(function (it) { it.f = (!it.g && it.h >= 2 && FST[it.st] && it.y >= F.y0 && it.y <= F.y1) ? 1 : 0; });
+      var fi = this.items.filter(function (it) { return it.f; }).sort(function (a, c) { return a.t - c.t || a.seq - c.seq; });
+      fi.forEach(function (it, i) { it.t = 0.02 + 0.979 * (fi.length > 1 ? i / (fi.length - 1) : 1); });
+    }
     var batches = {}, order = [];
     this.items.forEach(function (it) {
-      var key = it.s + '|' + it.m + '|' + it.g + '|' + it.h;
-      if (!batches[key]) { batches[key] = { shape: it.s, mat: it.m, ghost: !!it.g, hideAfter: it.h, items: [] }; order.push(key); }
+      var key = it.s + '|' + it.m + '|' + it.g + '|' + it.h + '|' + (it.f ? 1 : 0);
+      if (!batches[key]) { batches[key] = { shape: it.s, mat: it.m, ghost: !!it.g, hideAfter: it.h, focus: !!it.f, items: [] }; order.push(key); }
       batches[key].items.push(it);
     });
     var out = order.map(function (k) {
@@ -1074,9 +1084,9 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         t[i] = it.t; col[i] = it.c;
       });
       var kinds = {}; b.items.forEach(function (it) { if (it.k) kinds[it.k] = (kinds[it.k] || 0) + 1; });
-      return { shape: b.shape, mat: b.mat, ghost: b.ghost, hideAfter: b.hideAfter, count: n, xf: f, t: t, color: col, kinds: kinds,
-        // t values of counted units for stats
-        unitT: b.items.filter(function (it) { return it.k && !it.g; }).map(function (it) { return [it.k, it.t]; }) };
+      return { shape: b.shape, mat: b.mat, ghost: b.ghost, hideAfter: b.hideAfter, focus: b.focus, count: n, xf: f, t: t, color: col, kinds: kinds,
+        // t values of counted units for stats (flats: the user's own floor only)
+        unitT: b.items.filter(function (it) { return it.k && !it.g && (!F || it.f); }).map(function (it) { return [it.k, it.t]; }) };
     });
     // global bounds of the real (non-ghost) building
     var mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9];
@@ -1087,12 +1097,22 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       mx[0] = Math.max(mx[0], it.x + e[0]); mx[1] = Math.max(mx[1], it.y + e[1]); mx[2] = Math.max(mx[2], it.z + e[2]);
     });
     mn[1] = Math.max(mn[1], -0.5);
+    // camera frame: the building plus its permanent garden/street works (paths, walls, gates)
+    var fmn = mn.slice(), fmx = mx.slice();
+    this.items.forEach(function (it) {
+      if (it.g || it.h < 2 || it.st !== 'external' || it.y < -0.05) return;
+      var e = extents(it);
+      fmn[0] = Math.min(fmn[0], it.x - e[0]); fmn[2] = Math.min(fmn[2], it.z - e[2]);
+      fmx[0] = Math.max(fmx[0], it.x + e[0]); fmx[2] = Math.max(fmx[2], it.z + e[2]);
+    });
+    // keep the frame sensible: never more than 8 m beyond the building on any side
+    for (var a = 0; a < 3; a += 2) { fmn[a] = Math.max(fmn[a], mn[a] - 8); fmx[a] = Math.min(fmx[a], mx[a] + 8); }
     var unitTs = { brick: [], block: [], tile: [] };
     out.forEach(function (b) { b.unitT.forEach(function (u) { if (unitTs[u[0]]) unitTs[u[0]].push(u[1]); }); delete b.unitT; });
     Object.keys(unitTs).forEach(function (k) { unitTs[k].sort(function (a, c) { return a - c; }); });
     var model = {
-      type: meta.type || '', name: meta.name || '', batches: out, anchors: this.anchors, envelope: this.envelope,
-      bounds: { min: mn, max: mx }, height: mx[1], counts: { bricks: unitTs.brick.length, blocks: unitTs.block.length, tiles: unitTs.tile.length },
+      type: meta.type || '', name: meta.name || '', batches: out, anchors: this.anchors, envelope: this.envelope, focus: F ? { y0: F.y0, y1: F.y1 } : null,
+      bounds: { min: mn, max: mx }, frame: { min: fmn, max: fmx }, height: mx[1], counts: { bricks: unitTs.brick.length, blocks: unitTs.block.length, tiles: unitTs.tile.length },
       instances: this.items.length, info: meta.info || {},
       stats: function (p) {
         var cnt = function (arr) { var lo = 0, hi = arr.length; while (lo < hi) { var m = (lo + hi) >> 1; if (arr[m] <= p) lo = m + 1; else hi = m; } return lo; };

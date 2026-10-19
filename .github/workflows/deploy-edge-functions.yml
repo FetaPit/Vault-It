@@ -37,3 +37,7 @@ jobs:
           supabase functions deploy portfolio-vision \
             --project-ref legpubblzgknxdtvsant \
             --no-verify-jwt
+
+          supabase functions deploy house-3d \
+            --project-ref legpubblzgknxdtvsant \
+            --no-verify-jwt

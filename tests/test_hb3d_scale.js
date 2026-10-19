@@ -64,7 +64,11 @@ TYPES.forEach(function (type) {
   var stats = m.stats(0.5), stats1 = m.stats(1);
   ok(stats.bricksLaid > 0.3 * stats.bricksTotal && stats.bricksLaid <= stats.bricksTotal, type + ': ~most bricks laid by 50% (' + stats.bricksLaid + '/' + stats.bricksTotal + ')');
   ok(stats1.bricksLaid === stats1.bricksTotal, type + ': all bricks laid at 100%');
-  ok(m.stats(0.11).bricksLaid < 0.1 * Math.max(1, stats.bricksTotal), type + ': almost no bricks before masonry stage');
+  if (m.focus) {   // flats: the user's own floor is what the deposit builds, so bricks laid track the deposit
+    var q = m.stats(0.5).bricksLaid / Math.max(1, stats.bricksTotal);
+    ok(q > 0.3 && q < 0.7, type + ': user floor ~half laid at 50% deposit (' + Math.round(q * 100) + '%)');
+    ok(m.stats(0.01).bricksLaid === 0, type + ': nothing laid before the first deposit');
+  } else ok(m.stats(0.11).bricksLaid < 0.1 * Math.max(1, stats.bricksTotal), type + ': almost no bricks before masonry stage');
 
   // geometry sanity
   var b = m.bounds, w = b.max[0] - b.min[0], d = b.max[2] - b.min[2], hgt = b.max[1];

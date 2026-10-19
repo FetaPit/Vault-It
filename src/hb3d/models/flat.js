@@ -640,6 +640,7 @@
     K.anchor('myFloor', W / 2, FFL(MY) + 1.5, 0);
     return {
       name: 'Small flat · floor ' + FLOOR + ' of ' + NS,
+      focus: { y0: FFL(MY) - SLAB - 0.02, y1: FFL(MY + 1) - SLAB + 0.02 },   // the user's own floor: what the deposit builds
       info: { storeys: NS, floor: FLOOR, floorLevel: FFL(MY), frontage: W, depth: D, height: PAR, flatsPerFloor: 4, floorToFloor: FTF }
     };
   };
