@@ -931,16 +931,65 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     });
     // floor + ceiling of the bay
     self.stage('slab'); self.box('concrete', (o.x0 + o.x1) / 2, 0.10, zf + d / 2, w - 0.2, 0.15, d - 0.05, {});
-    // lead-capped slate roof over the bay (three hipped slopes)
+    // hipped bay roof against the wall: front slope + two splay slopes at the same pitch, real slates laid in rows
+    // (cut at the hips), lead hip rolls, lead flashing at the wall, fascia and gutter on every eave
     self.stage('roofcover');
-    var rt = top, rise = 0.45, mat = o.roofTile || 'slate';
-    self.box(mat, (o.x0 + o.x1) / 2, rt + rise / 2, zf + d / 2 + 0.05, w - 2 * inset + 0.1, 0.03, Math.hypot(d, rise) + 0.12, { rx: Math.atan2(rise, d), kind: 'tile' });
-    [[o.x0 + inset / 2, -1], [o.x1 - inset / 2, 1]].forEach(function (sd) {
-      self.box(mat, sd[0], rt + rise / 2, zf + d / 2, inset * 1.25, 0.03, Math.hypot(d, rise) * 1.05, { ry: -sd[1] * Math.PI / 4, rx: Math.atan2(rise, d * 1.2), kind: 'tile' });
+    var rt = top, rise = o.rise || 0.45, T = UK.TILES[o.roofTile === 'plain' ? 'plain' : 'slate'], tilt = Math.atan2(rise, d), slopeL = Math.hypot(d, rise);
+    var S2 = Math.SQRT2, gap = 0.003;
+    var hF = function (px, pz) { return rt + rise * (zf + d - pz) / d; };
+    var hL = function (px, pz) { return rt + rise * ((px - o.x0) - (pz - zf)) / (S2 * d); };
+    var hR = function (px, pz) { return rt + rise * ((o.x1 - px) - (pz - zf)) / (S2 * d); };
+    var roofH = function (px, pz) { return Math.min(hF(px, pz), hL(px, pz), hR(px, pz), rt + rise); };
+    var planes = [
+      { e0: B, e1: C, n: [0, -1], ry: 0, h: hF },
+      { e0: A, e1: B, n: [1 / S2, -1 / S2], ry: -Math.PI / 4, h: hL },
+      { e0: C, e1: Dp, n: [-1 / S2, -1 / S2], ry: Math.PI / 4, h: hR }
+    ];
+    planes.forEach(function (pl) {
+      var ex = pl.e1[0] - pl.e0[0], ez = pl.e1[1] - pl.e0[1], Le = Math.hypot(ex, ez), dx = ex / Le, dz = ez / Le;
+      var inReg = function (u, s) {   // plan point on this slope that is (a) inside the bay and (b) where this slope is the roof surface
+        var px = pl.e0[0] + dx * u + pl.n[0] * s, pz = pl.e0[1] + dz * u + pl.n[1] * s;
+        if (pz < zf - 1e-3 || s < -1e-3) return false;
+        return pl.h(px, pz) <= roofH(px, pz) + 1e-4;
+      };
+      for (var row = 0, v = 0; v < slopeL - 0.02; row++, v += T.gauge) {
+        var vl = Math.min(T.gauge - gap, slopeL - v), vc = v + vl / 2, sC = vc * Math.cos(tilt);
+        for (var u = (row % 2 ? -T.w / 2 : 0) - 0.06; u < Le + 0.06; u += T.w) {
+          var a0 = u + gap / 2, a1 = u + T.w - gap / 2, ok0 = inReg(a0, sC), okm = inReg((a0 + a1) / 2, sC), ok1 = inReg(a1, sC);
+          if (!ok0 && !okm && !ok1) continue;
+          if (!(ok0 && ok1)) {   // cut slate at a hip: keep the part on this slope (bisect each cut edge)
+            var inside = okm ? (a0 + a1) / 2 : (ok0 ? a0 : a1), lo, hi, it, mid;
+            if (!ok0) { lo = a0; hi = inside; for (it = 0; it < 14; it++) { mid = (lo + hi) / 2; if (inReg(mid, sC)) hi = mid; else lo = mid; } a0 = hi; }
+            if (!ok1) { lo = inside; hi = a1; for (it = 0; it < 14; it++) { mid = (lo + hi) / 2; if (inReg(mid, sC)) lo = mid; else hi = mid; } a1 = lo; }
+            if (a1 - a0 < 0.03) continue;
+          }
+          var uc = (a0 + a1) / 2, px = pl.e0[0] + dx * uc + pl.n[0] * sC, pz = pl.e0[1] + dz * uc + pl.n[1] * sC;
+          self.box(T.mat, px, pl.h(px, pz) + 0.035 + T.th / 2, pz, a1 - a0, T.th, vl, { ry: pl.ry, rx: tilt + 0.03, kind: 'tile', color: tileJitter(self.rand, T) });
+        }
+      }
+      // fascia + gutter along this eave
+      var mx = (pl.e0[0] + pl.e1[0]) / 2 - pl.n[0] * 0.02, mz = (pl.e0[1] + pl.e1[1]) / 2 - pl.n[1] * 0.02;
+      self.stage('fitout');
+      self.box(o.fascia || 'timberPaint', mx, rt - 0.03, mz, Le + 0.04, 0.14, 0.025, { ry: pl.ry });
+      self.box('gutter', mx - pl.n[0] * 0.06, rt + 0.0, mz - pl.n[1] * 0.06, Le + 0.04, 0.07, 0.10, { ry: pl.ry });
+      self.stage('roofcover');
     });
-    self.box('lead', (o.x0 + o.x1) / 2, rt + rise + 0.02, zf + 0.06, w, 0.05, 0.14, {});
-    self.stage('fitout');
-    self.box('timberPaint', (o.x0 + o.x1) / 2, rt - 0.02, zf + d + 0.03, w - 2 * inset + 0.1, 0.12, 0.05, {});
+    // lead hip rolls from the eave corners to the wall, and the flashing where the roof meets the wall
+    var topY = rt + rise + 0.035;
+    self.tube('lead', [B[0], rt + 0.05, B[1]], [o.x0 + S2 * d, topY, zf + 0.01], 0.022);
+    self.tube('lead', [C[0], rt + 0.05, C[1]], [o.x1 - S2 * d, topY, zf + 0.01], 0.022);
+    // flashings: an apron dressed over the top course of the front slope with an upstand against the wall, and stepped
+    // abutment flashings where each splay slope meets the wall
+    var fx0 = o.x0 + S2 * d, fx1 = o.x1 - S2 * d, fL = Math.max(0.05, fx1 - fx0), fz = zf + 0.08;
+    self.box('lead', (fx0 + fx1) / 2, hF(0, fz) + 0.05, fz, fL + 0.12, 0.012, 0.17, { rx: tilt });
+    self.box('lead', (fx0 + fx1) / 2, rt + rise + 0.10, zf + 0.008, fL + 0.12, 0.16, 0.012, {});
+    var sideTilt = Math.atan2(rise, S2 * d);   // the splay slopes fall away from the wall at this angle
+    var fw = 0.10, sink = (fw / 2 + 0.006) * Math.tan(sideTilt);   // strip centre sits this much below the wall line on the falling slope
+    [[o.x0 + 0.02, rt, fx0, rt + rise], [fx1, rt + rise, o.x1 - 0.02, rt]].forEach(function (e) {
+      var L = Math.hypot(e[2] - e[0], e[3] - e[1]), rz = Math.atan2(e[3] - e[1], e[2] - e[0]), cx = (e[0] + e[2]) / 2, cy = (e[1] + e[3]) / 2;
+      self.box('lead', cx, cy + 0.035 + T.th + 0.008 - sink, zf + fw / 2 + 0.006, L, 0.006, fw, { rz: rz, rx: sideTilt });   // stepped flashing over the soakers
+      self.box('lead', cx, cy + 0.10, zf + 0.004, L, 0.09, 0.008, { rz: rz });                                              // upstand against the wall
+    });
     self.stage('masonry');
     this.env(o.x0, 0, zf, o.x1, rt + rise, zf + d);
   };

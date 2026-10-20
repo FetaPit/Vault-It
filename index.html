@@ -1034,16 +1034,65 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     });
     // floor + ceiling of the bay
     self.stage('slab'); self.box('concrete', (o.x0 + o.x1) / 2, 0.10, zf + d / 2, w - 0.2, 0.15, d - 0.05, {});
-    // lead-capped slate roof over the bay (three hipped slopes)
+    // hipped bay roof against the wall: front slope + two splay slopes at the same pitch, real slates laid in rows
+    // (cut at the hips), lead hip rolls, lead flashing at the wall, fascia and gutter on every eave
     self.stage('roofcover');
-    var rt = top, rise = 0.45, mat = o.roofTile || 'slate';
-    self.box(mat, (o.x0 + o.x1) / 2, rt + rise / 2, zf + d / 2 + 0.05, w - 2 * inset + 0.1, 0.03, Math.hypot(d, rise) + 0.12, { rx: Math.atan2(rise, d), kind: 'tile' });
-    [[o.x0 + inset / 2, -1], [o.x1 - inset / 2, 1]].forEach(function (sd) {
-      self.box(mat, sd[0], rt + rise / 2, zf + d / 2, inset * 1.25, 0.03, Math.hypot(d, rise) * 1.05, { ry: -sd[1] * Math.PI / 4, rx: Math.atan2(rise, d * 1.2), kind: 'tile' });
+    var rt = top, rise = o.rise || 0.45, T = UK.TILES[o.roofTile === 'plain' ? 'plain' : 'slate'], tilt = Math.atan2(rise, d), slopeL = Math.hypot(d, rise);
+    var S2 = Math.SQRT2, gap = 0.003;
+    var hF = function (px, pz) { return rt + rise * (zf + d - pz) / d; };
+    var hL = function (px, pz) { return rt + rise * ((px - o.x0) - (pz - zf)) / (S2 * d); };
+    var hR = function (px, pz) { return rt + rise * ((o.x1 - px) - (pz - zf)) / (S2 * d); };
+    var roofH = function (px, pz) { return Math.min(hF(px, pz), hL(px, pz), hR(px, pz), rt + rise); };
+    var planes = [
+      { e0: B, e1: C, n: [0, -1], ry: 0, h: hF },
+      { e0: A, e1: B, n: [1 / S2, -1 / S2], ry: -Math.PI / 4, h: hL },
+      { e0: C, e1: Dp, n: [-1 / S2, -1 / S2], ry: Math.PI / 4, h: hR }
+    ];
+    planes.forEach(function (pl) {
+      var ex = pl.e1[0] - pl.e0[0], ez = pl.e1[1] - pl.e0[1], Le = Math.hypot(ex, ez), dx = ex / Le, dz = ez / Le;
+      var inReg = function (u, s) {   // plan point on this slope that is (a) inside the bay and (b) where this slope is the roof surface
+        var px = pl.e0[0] + dx * u + pl.n[0] * s, pz = pl.e0[1] + dz * u + pl.n[1] * s;
+        if (pz < zf - 1e-3 || s < -1e-3) return false;
+        return pl.h(px, pz) <= roofH(px, pz) + 1e-4;
+      };
+      for (var row = 0, v = 0; v < slopeL - 0.02; row++, v += T.gauge) {
+        var vl = Math.min(T.gauge - gap, slopeL - v), vc = v + vl / 2, sC = vc * Math.cos(tilt);
+        for (var u = (row % 2 ? -T.w / 2 : 0) - 0.06; u < Le + 0.06; u += T.w) {
+          var a0 = u + gap / 2, a1 = u + T.w - gap / 2, ok0 = inReg(a0, sC), okm = inReg((a0 + a1) / 2, sC), ok1 = inReg(a1, sC);
+          if (!ok0 && !okm && !ok1) continue;
+          if (!(ok0 && ok1)) {   // cut slate at a hip: keep the part on this slope (bisect each cut edge)
+            var inside = okm ? (a0 + a1) / 2 : (ok0 ? a0 : a1), lo, hi, it, mid;
+            if (!ok0) { lo = a0; hi = inside; for (it = 0; it < 14; it++) { mid = (lo + hi) / 2; if (inReg(mid, sC)) hi = mid; else lo = mid; } a0 = hi; }
+            if (!ok1) { lo = inside; hi = a1; for (it = 0; it < 14; it++) { mid = (lo + hi) / 2; if (inReg(mid, sC)) lo = mid; else hi = mid; } a1 = lo; }
+            if (a1 - a0 < 0.03) continue;
+          }
+          var uc = (a0 + a1) / 2, px = pl.e0[0] + dx * uc + pl.n[0] * sC, pz = pl.e0[1] + dz * uc + pl.n[1] * sC;
+          self.box(T.mat, px, pl.h(px, pz) + 0.035 + T.th / 2, pz, a1 - a0, T.th, vl, { ry: pl.ry, rx: tilt + 0.03, kind: 'tile', color: tileJitter(self.rand, T) });
+        }
+      }
+      // fascia + gutter along this eave
+      var mx = (pl.e0[0] + pl.e1[0]) / 2 - pl.n[0] * 0.02, mz = (pl.e0[1] + pl.e1[1]) / 2 - pl.n[1] * 0.02;
+      self.stage('fitout');
+      self.box(o.fascia || 'timberPaint', mx, rt - 0.03, mz, Le + 0.04, 0.14, 0.025, { ry: pl.ry });
+      self.box('gutter', mx - pl.n[0] * 0.06, rt + 0.0, mz - pl.n[1] * 0.06, Le + 0.04, 0.07, 0.10, { ry: pl.ry });
+      self.stage('roofcover');
     });
-    self.box('lead', (o.x0 + o.x1) / 2, rt + rise + 0.02, zf + 0.06, w, 0.05, 0.14, {});
-    self.stage('fitout');
-    self.box('timberPaint', (o.x0 + o.x1) / 2, rt - 0.02, zf + d + 0.03, w - 2 * inset + 0.1, 0.12, 0.05, {});
+    // lead hip rolls from the eave corners to the wall, and the flashing where the roof meets the wall
+    var topY = rt + rise + 0.035;
+    self.tube('lead', [B[0], rt + 0.05, B[1]], [o.x0 + S2 * d, topY, zf + 0.01], 0.022);
+    self.tube('lead', [C[0], rt + 0.05, C[1]], [o.x1 - S2 * d, topY, zf + 0.01], 0.022);
+    // flashings: an apron dressed over the top course of the front slope with an upstand against the wall, and stepped
+    // abutment flashings where each splay slope meets the wall
+    var fx0 = o.x0 + S2 * d, fx1 = o.x1 - S2 * d, fL = Math.max(0.05, fx1 - fx0), fz = zf + 0.08;
+    self.box('lead', (fx0 + fx1) / 2, hF(0, fz) + 0.05, fz, fL + 0.12, 0.012, 0.17, { rx: tilt });
+    self.box('lead', (fx0 + fx1) / 2, rt + rise + 0.10, zf + 0.008, fL + 0.12, 0.16, 0.012, {});
+    var sideTilt = Math.atan2(rise, S2 * d);   // the splay slopes fall away from the wall at this angle
+    var fw = 0.10, sink = (fw / 2 + 0.006) * Math.tan(sideTilt);   // strip centre sits this much below the wall line on the falling slope
+    [[o.x0 + 0.02, rt, fx0, rt + rise], [fx1, rt + rise, o.x1 - 0.02, rt]].forEach(function (e) {
+      var L = Math.hypot(e[2] - e[0], e[3] - e[1]), rz = Math.atan2(e[3] - e[1], e[2] - e[0]), cx = (e[0] + e[2]) / 2, cy = (e[1] + e[3]) / 2;
+      self.box('lead', cx, cy + 0.035 + T.th + 0.008 - sink, zf + fw / 2 + 0.006, L, 0.006, fw, { rz: rz, rx: sideTilt });   // stepped flashing over the soakers
+      self.box('lead', cx, cy + 0.10, zf + 0.004, L, 0.09, 0.008, { rz: rz });                                              // upstand against the wall
+    });
     self.stage('masonry');
     this.env(o.x0, 0, zf, o.x1, rt + rise, zf + d);
   };
@@ -1200,12 +1249,22 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       mx[0] = Math.max(mx[0], it.x + e[0]); mx[1] = Math.max(mx[1], it.y + e[1]); mx[2] = Math.max(mx[2], it.z + e[2]);
     });
     mn[1] = Math.max(mn[1], -0.5);
+    // camera frame: the building plus its permanent garden/street works (paths, walls, gates)
+    var fmn = mn.slice(), fmx = mx.slice();
+    this.items.forEach(function (it) {
+      if (it.g || it.h < 2 || it.st !== 'external' || it.y < -0.05) return;
+      var e = extents(it);
+      fmn[0] = Math.min(fmn[0], it.x - e[0]); fmn[2] = Math.min(fmn[2], it.z - e[2]);
+      fmx[0] = Math.max(fmx[0], it.x + e[0]); fmx[2] = Math.max(fmx[2], it.z + e[2]);
+    });
+    // keep the frame sensible: never more than 8 m beyond the building on any side
+    for (var a = 0; a < 3; a += 2) { fmn[a] = Math.max(fmn[a], mn[a] - 8); fmx[a] = Math.min(fmx[a], mx[a] + 8); }
     var unitTs = { brick: [], block: [], tile: [] };
     out.forEach(function (b) { b.unitT.forEach(function (u) { if (unitTs[u[0]]) unitTs[u[0]].push(u[1]); }); delete b.unitT; });
     Object.keys(unitTs).forEach(function (k) { unitTs[k].sort(function (a, c) { return a - c; }); });
     var model = {
       type: meta.type || '', name: meta.name || '', batches: out, anchors: this.anchors, envelope: this.envelope, focus: F ? { y0: F.y0, y1: F.y1 } : null,
-      bounds: { min: mn, max: mx }, height: mx[1], counts: { bricks: unitTs.brick.length, blocks: unitTs.block.length, tiles: unitTs.tile.length },
+      bounds: { min: mn, max: mx }, frame: { min: fmn, max: fmx }, height: mx[1], counts: { bricks: unitTs.brick.length, blocks: unitTs.block.length, tiles: unitTs.tile.length },
       instances: this.items.length, info: meta.info || {},
       stats: function (p) {
         var cnt = function (arr) { var lo = 0, hi = arr.length; while (lo < hi) { var m = (lo + hi) >> 1; if (arr[m] <= p) lo = m + 1; else hi = m; } return lo; };
@@ -1384,6 +1443,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var SPR = y0 + 29 * CH, PDEP = 1.20, RE = PR + J / 2 + UK.BL + 0.005;                      // springing 2.025, extrados
     var RIDGE = YR(D / 2);
     var rb = function (m, r, u, d, y, su, sy, sd, o) { var p = P(r, u, d); return K.box(m, p[0], y, p[1], su, sy, sd, Object.assign({ ry: RY(r) }, o || {})); };
+    // mortar bed/perps behind units laid by us: recessed 6 mm, kept 2 mm inside the ends and 4 mm off the top and back faces
+    var mort = function (r, u0, u1, yb, h, d0) { d0 = d0 || 0.006; if (u1 - u0 > 0.01) rb('mortar', r, (u0 + u1) / 2, d0 + (BW - 0.004 - d0) / 2, yb + (h - 0.004) / 2, u1 - u0 - 0.004, h - 0.004, BW - 0.004 - d0); };
     var pts = [[0, 0], [W, 0], [W, -D], [0, -D]];
     var runs = H._loopRuns(pts);                            // 0 front · 1 party (right) · 2 rear · 3 left side (hip end)
     // bay faces: left splay, front, right splay (A → B → C → D)
@@ -1392,6 +1453,21 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       return { r: r, i0: i === 0 ? 0.02 : 0.125, i1: i === 2 ? 0.02 : 0.125, ops: [] };
     });
 
+    // shared stack on the party wall at the ridge (half each side), carried by our chimney breast against the party wall
+    var CHW = 0.89, CHD = 0.665, CHZ = -D / 2, CHY0 = y0 + 118 * CH, CHY1 = y0 + 138 * CH, XB0 = W - CHW / 2;
+    var CBF = RUN(XB0, CHZ + CHD / 2, W, CHZ + CHD / 2), CBI = RUN(XB0, CHZ - CHD / 2, XB0, CHZ + CHD / 2), CBB = RUN(W, CHZ - CHD / 2, XB0, CHZ - CHD / 2);
+    var FIRE = [UK.DPC, F1].map(function (v) { return { u0: 0.1075, u1: 0.5575, v0: v, v1: v + 9 * CH, type: 'void' }; });
+    var FIREH = FIRE.map(function (o) { return { u0: o.u0, u1: o.u1, v0: o.v1, v1: o.v1 + 2 * CH, type: 'void' }; });
+    function breastCourse(k) {   // brick breast round the flues, fireplace openings on the ground and first floors
+      var yb = y0 + k * CH, ev = k % 2 === 0;
+      if (yb < UK.DPC - 1e-6 || yb >= CHY0 - 1e-6) return;
+      var PW = KW + J;   // the cheeks butt the party-wall blockwork
+      [[CBF, ev ? CW : 0, CBF.L - PW, null], [CBI, ev ? 0 : CW, ev ? CBI.L : CBI.L - CW, FIRE.concat(FIREH)], [CBB, PW, ev ? CBB.L - CW : CBB.L, null]].forEach(function (c) {
+        var segs = H._courseSegments(c[1], c[2], yb, yb + CH, c[3], null);
+        if (segs.length) K._layRun(c[0], yb, UK.BL, UK.BH, BW, segs, { uA: c[1], uB: c[2], mid: (c[1] + c[2]) / 2, unit: 'brick', palette: 'brown' });
+      });
+      FIRE.forEach(function (o) { if (Math.abs(yb - o.v1) < 1e-6) rb('concrete', CBI, (o.u0 + o.u1) / 2, BW / 2, o.v1 + CH, o.u1 - o.u0, 2 * CH - 0.004, BW); });
+    }
     var bayInZ = function (x, d) { return Math.min(BD - d, x - BX0 - d * R2, BX1 - d * R2 - x); };   // bay interior front edge
 
     // ═══ 1. OPENINGS (u along the run from its start corner; v absolute) ═══
@@ -1452,12 +1528,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     function head(o) {    // galvanised cavity lintel, soldier course, precast lintel in the inner leaf
       K.stage('masonry');
       var r = o.r, w = o.u1 - o.u0, uc = (o.u0 + o.u1) / 2;
-      rb('steel', r, uc, BW / 2, o.v1 + 0.003, w + 0.30, 0.006, BW);
-      rb('steel', r, uc, BW + CAV / 2, o.v1 + 0.10, w + 0.30, 0.19, 0.005, { rx: 0.42 });
+      var la = Math.max(0, o.u0 - 0.15), lb = Math.min(r.L, o.u1 + 0.15), lc = (la + lb) / 2;    // 150 mm bearings (less at bay corners)
+      rb('steel', r, lc, BW / 2, o.v1 + 0.003, lb - la, 0.006, BW);
+      rb('steel', r, lc, BW + CAV / 2, o.v1 + 0.10, lb - la, 0.19, 0.005, { rx: 0.42 });
       if (o.head === 'soldier') {
         var n = Math.max(1, Math.round(w / CH)), pt = w / n;
         for (var i = 0; i < n; i++) rb('brick', r, o.u0 + pt * (i + 0.5), BW / 2, o.v1 + 0.008 + UK.BL / 2, Math.min(UK.BH, pt - J), UK.BL, BW, { color: K._brickColor(PAL), kind: 'brick' });
-        rb('mortar', r, uc, 0.006 + (BW - 0.006) / 2, o.v1 + 1.5 * CH, w, 3 * CH, BW - 0.006);
+        mort(r, o.u0, o.u1, o.v1, 3 * CH);
       }
       var top = Math.min(blockLine(o.v1 + (o.head === 'soldier' ? 3 * CH : 0), true), EAVE);
       if (top > o.v1 + 0.01) rb('concrete', r, uc, IO + KW / 2, (o.v1 + top) / 2, w, top - o.v1, KW);
@@ -1493,16 +1570,16 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         if (len > 0.02) spans.forEach(function (s) {
           var L = s[1] - s[0], np = Math.ceil(L / UK.BL), pl = (L - (np - 1) * J) / np;
           for (var q = 0; q < np; q++) rb('brick', R0, s[0] + q * (pl + J) + pl / 2, BW / 2 + 0.001, yb + J + UK.BH / 2, pl, UK.BH, BW, { color: K._brickColor(PAL), kind: 'brick' });
-          rb('mortar', R0, (s[0] + s[1]) / 2, 0.007 + (BW - 0.006) / 2, yb + CH / 2, L, CH, BW - 0.006);
+          mort(R0, s[0], s[1], yb, CH, 0.007);
         });
       }
       // party corners of the front and rear walls: the façade runs on into the neighbour's half, so the courses the
       // party wall would own get a half bat instead of a block end
       if (odd && yb < EAVE - 1e-6) {
         rb('brick', R0, W - BW / 2, BW / 2, yb + J + UK.BH / 2, BW, UK.BH, BW, { color: K._brickColor(PAL), kind: 'brick' });
-        rb('mortar', R0, W - CW / 2, 0.006 + (BW - 0.006) / 2, yb + CH / 2, CW, CH, BW - 0.006);
+        mort(R0, W - CW, W, yb, CH);
         rb('brick', R2r, BW / 2, BW / 2, yb + J + UK.BH / 2, BW, UK.BH, BW, { color: K._brickColor(PAL), kind: 'brick' });
-        rb('mortar', R2r, CW / 2, 0.006 + (BW - 0.006) / 2, yb + CH / 2, CW, CH, BW - 0.006);
+        mort(R2r, 0, CW, yb, CH);
       }
     }
     // the arch ring: 25 bricks on end, radial, rough-ring joints (wedge-shaped mortar behind)
@@ -1511,7 +1588,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       for (var i = 0; i < n; i++) {
         var th = Math.PI * (i + 0.5) / n, x = PXM + rm * Math.cos(th), y = SPR + rm * Math.sin(th), rz = th - Math.PI / 2;
         K.box('brick', x, y, -BW / 2, UK.BH, UK.BL, BW, { rz: rz, color: K._brickColor(PAL, 0.94), kind: 'brick' });
-        K.box('mortar', x, y, -0.006 - (BW - 0.006) / 2, Math.PI * (RE + 0.005) / n, UK.BL, BW - 0.006, { rz: rz });
+        K.box('mortar', x, y, -0.006 - (BW - 0.010) / 2, Math.PI * (RE + 0.005) / n, UK.BL - 0.004, BW - 0.010, { rz: rz });
       }
     }
     // scaffold lifts round the front, hip end and rear (the pair is scaffolded as one: the run carries on past the party wall)
@@ -1534,7 +1611,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       hooks.push({ y: o.v1, fn: function () { head(o); } });
     });
     var NB = Math.round((EAVE - y0) / CH);
-    for (var kc = 0; kc < NB; kc++) (function (k) { hooks.push({ y: y0 + k * CH, fn: function () { K.stage('masonry'); bayCourse(k); porchCourse(k); } }); })(kc);
+    for (var kc = 0; kc < NB; kc++) (function (k) { hooks.push({ y: y0 + k * CH, fn: function () { K.stage('masonry'); bayCourse(k); porchCourse(k); breastCourse(k); } }); })(kc);
     hooks.push({ y: SPR, fn: function () { K.stage('masonry'); arch(); } });
     hooks.push({ y: F1 - 0.20, fn: function () {
       K.stage('masonry');
@@ -1556,11 +1633,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       openings: wl, hooks: hooks
     });
     retime(i0, mark);
-    // the party wall is our blockwork leaf only: keep it out of the front and rear walls (their brick runs on into
-    // the neighbour's half)
+    K.stage('masonry');
+    for (var kb = NB; y0 + kb * CH < CHY0 - 1e-6; kb++) breastCourse(kb);                                                      // breast on up through the loft
+    // the party wall is our blockwork leaf only: it stops against the back of the front and rear facing brick (which
+    // runs on into the neighbour's half)
     K.items = K.items.filter(function (it) {
       if (it.g || (it.m !== 'block' && it.m !== 'mortar') || it.x < W - KW - 1e-3 || it.x > W + 1e-3 || Math.abs(Math.abs(it.ry) - Math.PI / 2) > 1e-6) return true;
-      var a = Math.max(it.z - it.sx / 2, -D + WALL), b = Math.min(it.z + it.sx / 2, -WALL);
+      var a = Math.max(it.z - it.sx / 2, -D + BW + J / 2), b = Math.min(it.z + it.sx / 2, -BW - J / 2);
       if (b - a < (it.k === 'block' ? 0.10 : 0.02)) return false;
       it.sx = b - a; it.z = (a + b) / 2; return true;
     });
@@ -1612,7 +1691,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var plate = function (r, a, b) { if (b - a > 0.05) rb('timber', r, (a + b) / 2, IO + KW / 2, EAVE + IO * TAN / 2, b - a, IO * TAN, KW); };   // wall plate packed to the rafter seat
     plate(R0, WALL, BX0); plate(R0, BX1, W - KW); plate(R2r, KW, W - WALL); plate(R3, WALL, D - WALL);
     BAY.forEach(function (f) { plate(f.r, f.i0, f.r.L - f.i1); });
-    for (var cx = 0.45; cx < W - 0.2; cx += 0.40) K.box('timber', cx, EAVE + IO * TAN + 0.05, -D / 2, UK.JOIST_W, 0.10, D - 2 * WALL, {});   // ceiling joists
+    for (var cx = 0.45; cx < XB0 - 0.05; cx += 0.40) K.box('timber', cx, EAVE + IO * TAN + 0.05, -D / 2, UK.JOIST_W, 0.10, D - 2 * WALL, {});   // ceiling joists
     for (var bx = BX0 + 0.35; bx < BX1 - 0.3; bx += 0.40) { var zt = bayInZ(bx, WALL); if (zt > -0.2) K.box('timber', bx, EAVE + IO * TAN + 0.05, (zt - WALL) / 2, UK.JOIST_W, 0.10, zt + WALL, {}); }
     HIPS.concat(VALLEYS).forEach(function (h) { K.beam('timber', p3(h[0], -0.04), p3(h[1], -0.04), 0.175, 0.05, {}); });     // hip + valley rafters
     RIDGES.forEach(function (h) { K.beam('timber', p3(h[0], -0.025), p3(h[1], -0.025), 0.175, 0.032, {}); });                     // ridge boards
@@ -1632,7 +1711,6 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
 
     K.stage('roofcover');
     // shared stack on the party wall at the ridge: built off the party gable before the roof is tiled
-    var CHW = 0.89, CHD = 0.665, CHZ = -D / 2, CHY0 = y0 + 118 * CH, CHY1 = y0 + 138 * CH;
     K.chimney({ x: W, z: CHZ, y0: CHY0, y1: CHY1, w: CHW, d: CHD, pots: 4, palette: PAL });
     K.stage('roofcover');
     var FACETS = []; SOLIDS.forEach(function (S) { S.planes.forEach(function (F) { FACETS.push({ S: S, F: F, f: fr(F) }); }); });
@@ -1641,6 +1719,14 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var inside = function (list, a, b) { return list.some(function (iv) { return iv[0] <= a + 1e-4 && iv[1] >= b - 1e-4; }); };
     var place = function (fc, s, u) { return [fc.F.o[0] + fc.f.n[0] * s + fc.f.t[0] * u, fc.F.o[1] + fc.f.n[1] * s + fc.f.t[1] * u]; };
     var slab = function (m, fc, s, iv, dy, sy, sl, o) { var p = place(fc, s, (iv[0] + iv[1]) / 2); return K.box(m, p[0], YR(s) + dy, p[1], iv[1] - iv[0], sy, sl, Object.assign({ ry: fc.f.ry, rx: PITCH * RAD }, o || {})); };
+    // eaves: painted timber fascia and soffit, fixed to the rafter feet before the roof is felted
+    var FY = YR(-OV) + 0.05 / COS - 0.0875;
+    var EAV = [[[-OV, OV], VL], [VL, EL], [EL, ER], [ER, VR], [VR, [W, OV]], [[-OV, -D - OV], [-OV, OV]], [[W, -D - OV], [-OV, -D - OV]]];
+    EAV.forEach(function (e) {
+      var r = RUN(e[0][0], e[0][1], e[1][0], e[1][1]);
+      rb(FASC, r, r.L / 2, -0.011, FY, r.L, 0.175, 0.022);
+      rb(FASC, r, r.L / 2, OV / 2, FY - 0.0935, r.L, 0.012, OV);
+    });
     // breathable felt in strips, then 25 × 38 battens at the 100 mm gauge, over the whole roof
     FACETS.forEach(function (fc) {
       for (var r = 0; r < ROWS; r += 3) {
@@ -1676,15 +1762,10 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     K.box('lead', W, YR(dF - 0.08) + TOFF + 0.01, cf + 0.08, CHW + 0.12, 0.006, 0.18 / COS, { rx: PITCH * RAD });
     K.box('lead', W, YR(dF - 0.08) + TOFF + 0.01, cb - 0.08, CHW + 0.12, 0.006, 0.18 / COS, { ry: Math.PI, rx: PITCH * RAD });
     [cf, cb].forEach(function (z) { K.box('lead', W, YR(dF) + TOFF + 0.08, z + Math.sign(z - CHZ) * 0.004, CHW + 0.10, 0.18, 0.006, {}); });
-    [cf, cb].forEach(function (z) { K.beam('lead', [W - CHW / 2 - 0.004, YR(dF) + TOFF + 0.07, z], [W - CHW / 2 - 0.004, YR(D / 2) + TOFF + 0.07, CHZ], 0.15, 0.006, {}); });
-    // eaves: painted timber fascia and soffit, cast-iron half-round gutter (front wraps round the bay)
-    var FY = YR(-OV) + 0.05 / COS - 0.0875;
-    var EAV = [[[-OV, OV], VL], [VL, EL], [EL, ER], [ER, VR], [VR, [W, OV]], [[-OV, -D - OV], [-OV, OV]], [[W, -D - OV], [-OV, -D - OV]]];
+    [cf, cb].forEach(function (z) { K.beam('lead', [W - CHW / 2 - 0.004, YR(dF) + TOFF + 0.035, z], [W - CHW / 2 - 0.004, YR(D / 2) + TOFF + 0.035, CHZ], 0.10, 0.006, {}); });
+    // cast-iron half-round gutters on the fascia brackets (the front run wraps round the bay)
     EAV.forEach(function (e) {
-      var r = RUN(e[0][0], e[0][1], e[1][0], e[1][1]);
-      rb(FASC, r, r.L / 2, -0.011, FY, r.L, 0.175, 0.022);
-      rb(FASC, r, r.L / 2, OV / 2, FY - 0.0935, r.L, 0.012, OV);
-      var g0 = P(r, -0.02, -0.08), g1 = P(r, r.L + 0.02, -0.08);
+      var r = RUN(e[0][0], e[0][1], e[1][0], e[1][1]), g0 = P(r, -0.02, -0.08), g1 = P(r, r.L + 0.02, -0.08);
       K.tube('gutter', [g0[0], FY + 0.03, g0[1]], [g1[0], FY + 0.03, g1[1]], 0.056, {});
     });
     K.env(-OV, EAVE, -D - OV, W, RIDGE, OV);
@@ -1807,6 +1888,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     // TV aerial strapped to the stack
     var ax = W - 0.25, az = CHZ - CHD / 2 - 0.05;
     K.tube('metal', [ax, CHY1 - 0.55, az], [ax, CHY1 + 1.25, az], 0.02, {});
+    [CHY1 - 0.45, CHY1 - 0.15].forEach(function (y) { K.box('metal', ax, y, az + 0.025, 0.05, 0.03, 0.05, {}); K.box('metal', W, y, az + 0.045, CHW + 0.01, 0.025, 0.006, {}); });   // wall brackets + strapping
     K.tube('metal', [ax, CHY1 + 1.05, az - 0.45], [ax, CHY1 + 1.05, az + 0.55], 0.012, {});
     for (var ae = 0; ae < 6; ae++) K.tube('metal', [ax - 0.24 + ae * 0.02, CHY1 + 1.05, az - 0.4 + ae * 0.18], [ax + 0.24 - ae * 0.02, CHY1 + 1.05, az - 0.4 + ae * 0.18], 0.005, {});
     // terracotta air bricks under the suspended timber ground floor
@@ -1820,7 +1902,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       for (var y = ya + 0.6; y < yb - 0.1; y += 0.6) ys.push(y);
       ys = ys.map(function (v) { return Math.round(v * 1e4) / 1e4; }).sort(function (a, b) { return a - b; }).filter(function (v, i, a) { return !i || v - a[i - 1] > 1e-6; });
       for (var i = 0; i < ys.length - 1; i++) {
-        H._courseSegments(0, r.L, ys[i], ys[i + 1], ops, null).forEach(function (s) { if (s[1] - s[0] > 0.02) rb('pebbledash', r, (s[0] + s[1]) / 2, -0.009, (ys[i] + ys[i + 1]) / 2, s[1] - s[0], ys[i + 1] - ys[i], 0.018); });
+        // panels overlap their neighbours by 3 mm (same coat, so no seam shows) and stand 2 mm off the brick face
+        H._courseSegments(0, r.L, ys[i], ys[i + 1], ops, null).forEach(function (s) { if (s[1] - s[0] > 0.02) rb('pebbledash', r, (s[0] + s[1]) / 2, -0.012, (ys[i] + ys[i + 1]) / 2 + 0.0015, s[1] - s[0] + 0.003, ys[i + 1] - ys[i] + 0.003, 0.020); });
       }
       H._courseSegments(0, r.L, ya, ya + 0.03, ops, null).forEach(function (s) { rb('render', r, (s[0] + s[1]) / 2, -0.016, ya + 0.012, s[1] - s[0], 0.03, 0.032); });
     }
@@ -1846,7 +1929,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     K.lawn(-0.10, 1.25, PXM - 0.50, GZ - 0.65); K.lawn(PXM + 0.50, 0.40, W - 0.10, GZ - 0.65);
     K.stage('external'); K.box('soil', (BX0 - 0.1 + PXM - 0.5) / 2, 0.015, 0.95, PXM - 0.5 - BX0 + 0.1, 0.03, 0.55, {});   // bed under the bay
     K.shrub(0.30, 0.95, 0.35); K.shrub(2.05, 1.05, 0.30); K.shrub(3.55, 0.85, 0.28); K.shrub(6.55, 0.75, 0.40);
-    K.tree(1.6, 3.9, 3.6);
+    K.tree(0.35, 4.9, 3.3);                                         // flowering cherry by the front wall
     // side drive: twin concrete wheel strips with gravel between, to a pair of close-boarded gates beside the house
     K.stage('external');
     K.box('gravel', (XB + 0.1) / 2, 0.015, (GZ + 0.2 - D - 0.3) / 2, -XB - 0.1, 0.03, GZ + 0.2 + D + 0.3, {});
@@ -2644,8 +2727,9 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     }
     function rpt(r, u, d) { return [r.ax + r.dx * u - r.out[0] * d, r.az + r.dz * u - r.out[1] * d]; }
     function rbox(mat, r, u0, u1, ya, yb, d0, d1, o) {
-      var p = rpt(r, (u0 + u1) / 2, (d0 + d1) / 2), oo = Object.assign({}, o || {}); oo.ry = r.ry;
-      return K.box(mat, p[0], (ya + yb) / 2, p[1], u1 - u0, yb - ya, d1 - d0, oo);
+      var uc = (u0 + u1) / 2, dc = (d0 + d1) / 2, oo = o || {};         // no per-brick allocations: _push reads o at once
+      oo.ry = r.ry;
+      return K.box(mat, r.ax + r.dx * uc - r.out[0] * dc, (ya + yb) / 2, r.az + r.dz * uc - r.out[1] * dc, u1 - u0, yb - ya, d1 - d0, oo);
     }
     function on(r, k, fn) { (r.ev[k] = r.ev[k] || []).push(fn); }
 
@@ -2757,7 +2841,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       rbox('stone', r, o.u0 - 0.1125, o.u1 + 0.1125, ya + J, o.v0, -0.045, T, { color: S() });
       rbox('mortarLime', r, o.u0 - 0.1125, o.u1 + 0.1125, ya, ya + J, 0.006, T);
     }
-    // gauged flat arch: rubbed-brick voussoirs radiating from a point one span below the opening (skewback 1 : 2),
+    // gauged flat arch: an odd number of rubbed-brick voussoirs fanning out to a 1 : 4 skewback, three courses deep,
     // timber lintel behind, optional projecting stone keystone
     function gaugedArch(r, o, key) {
       var u0 = o.u0, u1 = o.u1, uc = o.uc, w = u1 - u0, ya = o.v1, H3 = 3 * CH, wt = w + 0.1125;
@@ -2921,8 +3005,10 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       rbox(P, r, bm[0], bm[1], sy - 0.09, sy, -0.05, 0);
       for (var u = 0.25; u < r.L - 0.2; u += 0.4) rbox(P, r, u - 0.04, u + 0.04, sy - 0.08, sy, -ov + 0.05, -0.05);
       K.stage('fitout');
-      var g = ext(own ? ov + 0.12 : ov), ga = rpt(r, g[0], -ov - 0.09), gb = rpt(r, g[1], -ov - 0.09);
+      var g = ext(ov + 0.09), ga = rpt(r, g[0], -ov - 0.09), gb = rpt(r, g[1], -ov - 0.09);   // runs meet at the mitre
       K.tube('gutter', [ga[0], e - 0.03, ga[1]], [gb[0], e - 0.03, gb[1]], 0.06);
+      if (own && r.sC) K.sph('gutter', ga[0], e - 0.03, ga[1], 0.06);
+      if (own && r.eC) K.sph('gutter', gb[0], e - 0.03, gb[1], 0.06);
     }
     function downpipe(r, u, yTop, dOut, yFoot) {                     // cast-iron downpipe with swan neck and shoe
       var a = rpt(r, u, dOut), b = rpt(r, u, -0.09), y2 = yTop - 0.25, y3 = y2 - 0.35;
@@ -2930,6 +3016,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       K.tube('gutter', [a[0], y2, a[1]], [b[0], y3, b[1]], 0.036);
       K.tube('gutter', [b[0], y3, b[1]], [b[0], (yFoot || 0) + 0.12, b[1]], 0.036);
       K.box('gutter', b[0], (yFoot || 0) + 0.07, b[1], 0.12, 0.10, 0.12, { ry: r.ry });
+      pipeEars(r, u, -0.09, (yFoot || 0) + 0.6, y3 - 0.2);
+    }
+    function pipeEars(r, u, d, ya, yb) {                              // cast-iron ears spiked into the joints
+      for (var y = ya; y <= yb + 1e-6; y += Math.max(0.5, (yb - ya) / Math.max(1, Math.round((yb - ya) / 1.8)))) {
+        var yy = (y > 0.4 && y < 0.66) ? 0.75 : ((y > 3.85 && y < 4.2) ? 4.25 : y);   // clear of the plinth and string course
+        rbox('gutter', r, u - 0.05, u + 0.05, yy - 0.02, yy + 0.02, d, 0);
+      }
     }
 
     // ── chimney stack in Flemish-faced brickwork (one brick thick round the flues), corners bonded like the walls,
@@ -2961,15 +3054,36 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     //    (broken bond, 75 mm head lap, cut to the hips in two steps), lead hip and ridge rolls.
     //    holes: plan rectangles [xa,xb,za,zb] (dormers, stacks) left unslated ──
     var SG = 0.2125, SLL = 0.5, SLW = 0.25, STH = 0.006, KICK = 0.022, SOFF = 0.025 + STH / 2 + 0.002;
+    // triangular pieces in any plane: Euler angles (order YZX, as the viewer) from a basis whose columns are the local
+    // axes; isoTri = isosceles prism (base b0→b1, apex over the base midpoint); rightTri = right triangle (right angle
+    // at C) as two isosceles prisms meeting at the mid-point of the hypotenuse
+    function eulerYZX(m) {
+      var z = Math.asin(Math.max(-1, Math.min(1, m[1][0])));
+      if (Math.abs(m[1][0]) < 0.9999999) return [Math.atan2(-m[1][2], m[1][1]), Math.atan2(-m[2][0], m[0][0]), z];
+      return [0, Math.atan2(m[0][2], m[2][2]), z];
+    }
+    function isoTri(mat, b0, b1, ap, th, o) {
+      var X = [b1[0] - b0[0], b1[1] - b0[1], b1[2] - b0[2]], sx = Math.hypot(X[0], X[1], X[2]);
+      var mid = [(b0[0] + b1[0]) / 2, (b0[1] + b1[1]) / 2, (b0[2] + b1[2]) / 2], Yv = [ap[0] - mid[0], ap[1] - mid[1], ap[2] - mid[2]], sy = Math.hypot(Yv[0], Yv[1], Yv[2]);
+      if (sx < 0.01 || sy < 0.005) return null;
+      X = X.map(function (v) { return v / sx; }); Yv = Yv.map(function (v) { return v / sy; });
+      var Z = [X[1] * Yv[2] - X[2] * Yv[1], X[2] * Yv[0] - X[0] * Yv[2], X[0] * Yv[1] - X[1] * Yv[0]];
+      var e = eulerYZX([[X[0], Yv[0], Z[0]], [X[1], Yv[1], Z[1]], [X[2], Yv[2], Z[2]]]);
+      return K.tri(mat, (mid[0] + ap[0]) / 2, (mid[1] + ap[1]) / 2, (mid[2] + ap[2]) / 2, sx, sy, th, Object.assign({ rx: e[0], ry: e[1], rz: e[2] }, o || {}));
+    }
+    function rightTri(mat, C, A, B, th, o) {
+      var M = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2, (A[2] + B[2]) / 2];
+      isoTri(mat, C, A, M, th, o); isoTri(mat, C, B, M, th, Object.assign({}, o, { kind: '' }));   // one slate, counted once
+    }
     function hipRoof(o) {
       var pr = o.pitch * PI / 180, t = Math.tan(pr), cs = Math.cos(pr), half = (o.z1 - o.z0) / 2, zm = (o.z0 + o.z1) / 2;
       var R = { o: o, pr: pr, t: t, cs: cs, half: half, zm: zm, ridgeY: o.e + half * t, xr0: o.open0 ? o.x0 : o.x0 + half, xr1: o.open1 ? o.x1 : o.x1 - half };
       var slopes = [
-        { ax: 0, a0: o.x0, a1: o.x1, c0: !o.open0, c1: !o.open1, H: function (x, z) { return o.z1 - z; }, P: function (a, h) { return [a, o.z1 - h]; }, rot: function (th) { return { rx: th }; } },
-        { ax: 0, a0: o.x0, a1: o.x1, c0: !o.open0, c1: !o.open1, H: function (x, z) { return z - o.z0; }, P: function (a, h) { return [a, o.z0 + h]; }, rot: function (th) { return { rx: -th }; } }
+        { ax: 0, a0: o.x0, a1: o.x1, c0: !o.open0, c1: !o.open1, H: function (x, z) { return o.z1 - z; }, P: function (a, h) { return [a, o.z1 - h]; }, rot: function (th) { return { rx: th }; }, n: [0, cs, Math.sin(pr)] },
+        { ax: 0, a0: o.x0, a1: o.x1, c0: !o.open0, c1: !o.open1, H: function (x, z) { return z - o.z0; }, P: function (a, h) { return [a, o.z0 + h]; }, rot: function (th) { return { rx: -th }; }, n: [0, cs, -Math.sin(pr)] }
       ];
-      if (!o.open1) slopes.push({ ax: 1, a0: o.z0, a1: o.z1, c0: true, c1: true, H: function (x) { return o.x1 - x; }, P: function (a, h) { return [o.x1 - h, a]; }, rot: function (th) { return { rz: -th }; } });
-      if (!o.open0) slopes.push({ ax: 1, a0: o.z0, a1: o.z1, c0: true, c1: true, H: function (x) { return x - o.x0; }, P: function (a, h) { return [o.x0 + h, a]; }, rot: function (th) { return { rz: th }; } });
+      if (!o.open1) slopes.push({ ax: 1, a0: o.z0, a1: o.z1, c0: true, c1: true, H: function (x) { return o.x1 - x; }, P: function (a, h) { return [o.x1 - h, a]; }, rot: function (th) { return { rz: -th }; }, n: [Math.sin(pr), cs, 0] });
+      if (!o.open0) slopes.push({ ax: 1, a0: o.z0, a1: o.z1, c0: true, c1: true, H: function (x) { return x - o.x0; }, P: function (a, h) { return [o.x0 + h, a]; }, rot: function (th) { return { rz: th }; }, n: [-Math.sin(pr), cs, 0] });
       var prep = function () { slopes.forEach(function (S) {
         S.holes = (o.holes || []).map(function (hl) {
           var h0 = S.H(hl[0], hl[2]), h1 = S.H(hl[1], hl[3]), a0 = S.ax ? hl[2] : hl[0], a1 = S.ax ? hl[3] : hl[1];
@@ -2990,7 +3104,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
           for (var a = S.a0 + 0.2; a < S.a1 - 0.1; a += 0.4) {
             var lim = Math.min(half, S.c0 ? a - S.a0 : 1e9, S.c1 ? S.a1 - a : 1e9) - 0.03;
             if (lim < 0.12) continue;
-            var pcs = [[0, lim]];
+            var pcs = [[0.05, lim]];
             S.holes.forEach(function (hl) { if (a > hl.a0 - 0.03 && a < hl.a1 + 0.03) pcs = subtract(pcs, hl.h0 - 0.02, hl.h1 + 0.02); });
             pcs.forEach(function (pc) {
               if (pc[1] - pc[0] < 0.1) return;
@@ -3019,18 +3133,21 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
           }
           for (var i = 0; ; i++) {
             var s0 = i * SG; if (s0 > sMax - 0.05) break;
-            var le = Math.min(SLL, sMax - s0), eH = S.ext((s0 + le * 0.75) * cs), eL = S.ext((s0 + le * 0.25) * cs), hc = (s0 + le / 2) * cs;
-            if (eL[1] - eL[0] < 0.03) break;
-            if (eH[0] > eH[1]) { var m = (eL[0] + eL[1]) / 2; eH = [m, m]; }
+            var le = Math.min(SLL, sMax - s0), eT = S.ext((s0 + le) * cs), eB = S.ext(s0 * cs), hc = (s0 + le / 2) * cs;
+            if (eB[1] - eB[0] < 0.03) break;
+            if (eT[0] > eT[1]) { var m = (eT[0] + eT[1]) / 2; eT = [m, m]; }
             var shift = (i % 2) * SLW / 2, off = SOFF + (i % 2) * 0.0012;
-            for (var a = S.a0 - SLW + shift; a < S.a1; a += SLW) {
-              var aL = Math.max(eH[0], a), aR = Math.min(eH[1], a + SLW);
+            for (var a = S.a0 - SLW + shift; a < S.a1; a += SLW) {   // whole slates, cut square at the hip line at their head
+              var aL = Math.max(eT[0], a), aR = Math.min(eT[1], a + SLW);
               if (aR - aL < 0.03) continue;
               S.cut(aL, aR, hc).forEach(function (sg) { if (sg[1] - sg[0] >= 0.03) slate(S, sg[0], sg[1], s0, le, off); });
             }
-            var hq = (s0 + le / 4) * cs;                                // hip cuts: half-length slates fill the lower half
-            if (S.c0 && eH[0] - eL[0] > 0.02) S.cut(eL[0], eH[0], hq).forEach(function (sg) { if (sg[1] - sg[0] >= 0.02) slate(S, sg[0], sg[1], s0, le / 2, off); });
-            if (S.c1 && eL[1] - eH[1] > 0.02) S.cut(eH[1], eL[1], hq).forEach(function (sg) { if (sg[1] - sg[0] >= 0.02) slate(S, sg[0], sg[1], s0, le / 2, off); });
+            // raking hip cut: the triangle between that square cut and the hip line, as a true triangular slate piece
+            var W3 = function (a, s) { var p = S.P(a, s * cs), d = off + 0.003; return [p[0] + S.n[0] * d, o.e + s * Math.sin(pr) + S.n[1] * d, p[1] + S.n[2] * d]; };
+            [[S.c0, eT[0], eB[0]], [S.c1, eT[1], eB[1]]].forEach(function (hc2) {
+              if (!hc2[0] || Math.abs(hc2[1] - hc2[2]) < 0.02) return;
+              rightTri('slate', W3(hc2[1], s0), W3(hc2[2], s0), W3(hc2[1], s0 + le), STH, { kind: 'tile', color: slateCol() });
+            });
           }
         });
         // lead rolls on the hips and the ridge (on a lead saddle dressed over both slopes)
@@ -3192,6 +3309,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       var a = r.own ? T : T + GW, e = r.L - a;
       rbox('lead', r, a, e, ad + 0.02, ad + 0.03, T, T + GW);
       rbox('lead', r, a, e, ad + 0.03, ad + 0.22, T, T + 0.006);                // upstand dressed up the parapet
+      var b2 = r.own ? T + GW - 0.02 : T + GW;                                   // lead-dressed board under the slate eaves
+      rbox('lead', r, b2, r.L - b2, ad + 0.03, ME + 0.02, T + GW - 0.02, T + GW);
     });
     mainRoof.cover();
     dormers.forEach(dormer);
@@ -3210,6 +3329,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       K.box('lead', p[0], 9.62, p[1], 0.34, 0.30, 0.22, { ry: B.ry });
       K.tube('gutter', [p[0], 9.47, p[1]], [p[0], 0.12, p[1]], 0.036);
       K.box('gutter', p[0], 0.07, p[1], 0.12, 0.10, 0.12, { ry: B.ry });
+      pipeEars(B, u, -0.11, 0.6, 9.2);
     });
     [[LF, LF.L - 0.35], [LB, 0.35], [RF, 0.35], [RB, RB.L - 0.35]].forEach(function (d) { downpipe(d[0], d[1], WE - 0.06, -WOV - 0.09); });
 
@@ -5000,7 +5120,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     }
     // gold waterline ring (equity mode)
     var bb = model.bounds, wx = bb.max[0] - bb.min[0] + 0.6, wz = bb.max[2] - bb.min[2] + 0.6;
-    var wg = new THREE.EdgesGeometry(new THREE.BoxBufferGeometry(wx, 0.001, wz));
+    var wg = new THREE.EdgesGeometry(new THREE.BoxBufferGeometry(wx - 0.44, 0.001, wz - 0.44));   // hugs the walls (8 cm out)
     this.water = new THREE.LineSegments(wg, new THREE.LineBasicMaterial({ color: col(0xe8c56a), transparent: true, opacity: 0.95 }));
     this.water.position.set((bb.min[0] + bb.max[0]) / 2, 0, (bb.min[2] + bb.max[2]) / 2);
     this.water.visible = false; this.root.add(this.water);
@@ -5023,7 +5143,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
 
   // camera framing: front-right, elevated, auto distance
   VP.fit = function () {
-    var m = this.model, bb = m ? m.bounds : { min: [-4, 0, -6], max: [4, 4, 2] };
+    var m = this.model, bb = m ? (m.frame || m.bounds) : { min: [-4, 0, -6], max: [4, 4, 2] };   // frame: house + front garden
     var cx = (bb.min[0] + bb.max[0]) / 2, cz = (bb.min[2] + bb.max[2]) / 2, H = Math.max(2, bb.max[1]);
     var rad = Math.sqrt(Math.pow(bb.max[0] - bb.min[0], 2) + Math.pow(bb.max[2] - bb.min[2], 2) + H * H) / 2;
     this._radius = rad;
@@ -5128,7 +5248,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       }
     });
     if (this.edges) {
-      this.edges.visible = !F && (mode === 'build' || mode === 'site');
+      this.edges.visible = !F && ((mode === 'build' && p < 1) || mode === 'site');
       this.edges.material.clippingPlanes = [IDLE_PLANE];
       this.edges.material.opacity = 0.14 + 0.22 * (1 - p);
     }

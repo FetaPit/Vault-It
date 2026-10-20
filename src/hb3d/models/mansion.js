@@ -49,8 +49,9 @@
     }
     function rpt(r, u, d) { return [r.ax + r.dx * u - r.out[0] * d, r.az + r.dz * u - r.out[1] * d]; }
     function rbox(mat, r, u0, u1, ya, yb, d0, d1, o) {
-      var p = rpt(r, (u0 + u1) / 2, (d0 + d1) / 2), oo = Object.assign({}, o || {}); oo.ry = r.ry;
-      return K.box(mat, p[0], (ya + yb) / 2, p[1], u1 - u0, yb - ya, d1 - d0, oo);
+      var uc = (u0 + u1) / 2, dc = (d0 + d1) / 2, oo = o || {};         // no per-brick allocations: _push reads o at once
+      oo.ry = r.ry;
+      return K.box(mat, r.ax + r.dx * uc - r.out[0] * dc, (ya + yb) / 2, r.az + r.dz * uc - r.out[1] * dc, u1 - u0, yb - ya, d1 - d0, oo);
     }
     function on(r, k, fn) { (r.ev[k] = r.ev[k] || []).push(fn); }
 
