@@ -180,8 +180,18 @@
       k.floor(WALL, -D + WALL, W - WALL, -WALL, floor1);
       k.floor(PX0 + WALL, -WALL, PX1 - WALL, PZ - WALL, floor1);
     } });
+    // scaffold: the inner line on each side stands clear of everything fixed to that face while the scaffold is up
+    // (to p .80), with inner guard rails across the wider gap (kit adds them when inner > 0.30):
+    //  back  — inner 0.50 clears the rear eaves (tiles −8.85, gutter −8.915) and the transom ends stop under the
+    //          gutter line instead of in the soffit; off 1.55 keeps a 4-board platform
+    //  front — inner 0.40 off the projection face clears the porch canopy (pediment / tiles to 0.97 off the main wall)
+    //          and the transom ends clear the projection's dry verge (to 0.76); off 1.45 keeps 4 boards
+    //  left  — inner 0.40 clears the boiler flue terminal (to −0.27) and the main verge (to −0.09); off 1.17 keeps
+    //          the run inside the 1.35 m side passage (3 boards)
+    //  right — kit default 1.15 / 0.15 off the garage gable
     var SCAF = [[0, PZ], [GX1, PZ], [GX1, -D], [0, -D]];
-    [[1.40, 2.0], [3.40, 4.0], [5.00, 5.8]].forEach(function (s) { hooks.push({ y: s[0], fn: function (k) { k.stage('masonry'); k.scaffoldLift(SCAF, s[1], { off: 1.15 }); } }); });
+    var SCAF_O = { off: { front: 1.45, right: 1.15, back: 1.55, left: 1.17 }, inner: { front: 0.40, back: 0.50, left: 0.40 } };
+    [[1.40, 2.0], [3.40, 4.0], [5.00, 5.8]].forEach(function (s) { hooks.push({ y: s[0], fn: function (k) { k.stage('masonry'); k.scaffoldLift(SCAF, s[1], SCAF_O); } }); });
     var i0 = K.items.length, mark = -1;
     hooks.push({ y: 99, fn: function () { mark = K.items.length; } });
     var gab = function (L, top) { return { ridgeU: L / 2, ridgeY: top + LIFT, half: L / 2, eaveY: eave + LIFT }; };
