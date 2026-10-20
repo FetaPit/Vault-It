@@ -81,3 +81,17 @@ Reads holdings out of screenshots of an investing app, as an alternative to conn
 
 Needs the signed-in user's JWT. Sends 1–4 images to Claude (vision, forced tool call), then looks up ticker
 candidates on Yahoo Finance. Nothing is stored. The app turns value ÷ live price into a share count.
+
+## house-3d
+
+Relay for Meshy AI text-to-3D, used by House Builder → "Generate with AI". Meshy's API does not accept
+browser (CORS) requests, so the app calls this function, which forwards to `api.meshy.ai` and streams the finished
+GLB back. The user's Meshy key (⚙ Settings, stored on their device) is sent per request; an optional project secret
+`MESHY_API_KEY` is used only when a request carries no key. Downloads are limited to `https://*.meshy.ai/…` URLs.
+
+Actions: `create` (preview shape, `auto_size` real-world metres, GLB) → `status` → `refine` (textures) → `status` →
+`download`. Deployed with `--no-verify-jwt`.
+
+> Note (Oct 2026): the GitHub Action "Deploy Supabase Edge Functions" fails with `401 Invalid access token` —
+> the repository secret `SUPABASE_ACCESS_TOKEN` needs renewing (Supabase dashboard → Account → Access Tokens, then
+> GitHub → Settings → Secrets and variables → Actions). house-3d v1 was deployed directly on 20 Oct 2026.
