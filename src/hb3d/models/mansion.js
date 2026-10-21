@@ -7,6 +7,10 @@
 // two spine-wall chimney stacks; two-storey hipped wings (7.2 × 8.55 m) set back 1.35 m with boxed modillion eaves.
 // Forecourt: gravel sweep round a lawn turning circle with a fountain, iron railings on a stone kerb, rusticated gate
 // piers with ball finials and wrought-iron gates, clipped yews, box hedges and parkland trees.
+// Clean shell (Kit detail 'clean'): K.fine() holds everything that is not visible exterior (foundations, scaffold, floors and
+// ceilings, rainwater goods, forecourt, lantern); the hidden back stretchers of the Flemish walls, the brickwork buried behind
+// the wings / portico podium / garden-door landing, the stack courses inside the roof void and 2/3 of the mortar cores are
+// never laid; K.shell() registers the outer-face loops. Full-model output is unchanged.
 (function (H) {
   var UK = H.UK;
   H.models.mansion = function (K, opts) {
@@ -87,14 +91,34 @@
           if (e - a < 0.03) continue;
           if (un[0] === 'S') {
             rbox('brick', r, a, e, ya, yt, 0, BW, { color: pick(plinth ? PAL.plinth : PAL.str), kind: 'brick' });
-            if (full) rbox('brick', r, a, e, ya, yt, T - BW, T, { color: pick(plinth ? PAL.plinth : PAL.str), kind: 'brick' });
+            if (full && !K.clean) rbox('brick', r, a, e, ya, yt, T - BW, T, { color: pick(plinth ? PAL.plinth : PAL.str), kind: 'brick' });   // back stretchers: hidden, full model only
           } else {
             rbox('brick', r, a, e, ya, yt, 0, T, { color: pick(plinth ? PAL.plinth : (K.rand() < 0.65 ? PAL.hdr : PAL.str)), kind: 'brick' });
           }
         }
       }
       // bed + perpends behind the units, recessed 6 mm from the face AND from the cut ends (reveals, corners)
+      if (K.clean) { mortarAcc(r, k, segs); return; }
       segs.forEach(function (sg) { if (sg[1] - sg[0] > 0.03) rbox('mortarLime', r, sg[0] + 0.006, sg[1] - 0.006, yb, yt, 0.006, T - 0.006); });
+    }
+    // clean shell: the lime core is one box per up-to-eight courses of an unchanged segment (the joints look the same,
+    // the instance count drops by two thirds); flushed when the walls are finished
+    function mortarAcc(r, k, segs) {
+      var prev = r.mopen || [], cur = [];
+      segs.forEach(function (sg) {
+        if (sg[1] - sg[0] <= 0.03) return;
+        var g = null;
+        for (var i = 0; i < prev.length; i++) { var p = prev[i]; if (p.k1 === k && p.k1 - p.k0 < 8 && Math.abs(p.a - sg[0]) < 0.001 && Math.abs(p.b - sg[1]) < 0.001) { g = p; break; } }
+        if (g) g.k1 = k + 1; else { g = { a: sg[0], b: sg[1], k0: k, k1: k + 1 }; (r.mlist = r.mlist || []).push(g); }
+        cur.push(g);
+      });
+      r.mopen = cur;
+    }
+    function flushMortar(runs) {
+      runs.forEach(function (r) {
+        (r.mlist || []).forEach(function (g) { rbox('mortarLime', r, g.a + 0.006, g.b - 0.006, Y(g.k0), Y(g.k1), 0.006, T - 0.006); });
+        r.mlist = []; r.mopen = [];
+      });
     }
     function subtract(segs, a, b) {
       var out = [];
@@ -132,7 +156,8 @@
       cuts.sort(function (a, c) { return a - c; });
       for (var i = 0; i < cuts.length - 1; i++) {
         var a = cuts[i], e = cuts[i + 1]; if (e - a < 0.005) continue;
-        var m = (a + e) / 2, flush = br.some(function (z) { return m > z[0] && m < z[1]; });
+        var m = (a + e) / 2, hz = br.filter(function (z) { return m > z[0] && m < z[1]; })[0], flush = !!hz;
+        if (flush && hz[2] === 'buried' && K.clean) continue;               // flush stone buried behind a wing / the portico podium
         var a2 = flush ? Math.max(a, 0) : a, e2 = flush ? Math.min(e, r.L) : e;
         if (e2 - a2 > 0.005) rbox('stone', r, a2, e2, ya + J, yt, flush ? 0 : -p, T, { color: S() });
       }
@@ -211,6 +236,7 @@
         });
       }
       while (hk < hooks.length) { hooks[hk].fn(); hk++; }
+      if (K.clean) { K.stage(stage || 'masonry'); flushMortar(runs); }
     }
 
     // ── six-over-six box sash (fit-out): painted box frame behind a 4½" reveal, upper sash on the outer track,
@@ -349,7 +375,7 @@
 
     // ── chimney stack in Flemish-faced brickwork (one brick thick round the flues), corners bonded like the walls,
     //    two oversailing courses, mortar flaunching, clay pots, lead apron where it leaves the roof ──
-    function stack(s, n0, n1, roofY) {
+    function stack(s, n0, n1, roofY, nEnv) {
       var x0 = s.x - s.w / 2, x1 = s.x + s.w / 2, z0 = s.z - s.d / 2, z1 = s.z + s.d / 2;
       var ring = function (o, na, nb) {
         var q = { bond: 'face', n0: na, n1: nb };
@@ -367,7 +393,7 @@
         K.cyl('terracotta', px, top + 0.70, s.z, 0.13, 0.05, {});
       }
       K.box('lead', s.x, roofY + 0.10, s.z, s.w + 0.10, 0.20, s.d + 0.10);
-      K.env(x0, Y(n0), z0, x1, top + 0.75, z1);
+      K.env(x0, Y(nEnv == null ? n0 : nEnv), z0, x1, top + 0.75, z1);
     }
 
     // ── hipped slate roof, ridge along X, over the eaves-line rectangle [x0,x1]×[z0,z1]; e = top of the rafters at the
@@ -540,9 +566,9 @@
     var bCorn = { key: 'corn', n0: N.corn0, n1: N.corn1, p: PC, extra: corniceExtra };
     MAIN.forEach(function (r) { r.bands.push(bPl, bStr, bCorn); });
     WINGS.forEach(function (r) { r.bands.push(bPl, bStr); });
-    F.breaks = { pl: [[cx - 2.35, cx + 2.35]], str: [[cx - 2.3, cx + 2.3]] };          // portico platform and pediment
-    B.breaks = { pl: [[cx - 1.05, cx + 1.05]] };                                        // garden-door landing
-    [MR, ML].forEach(function (r) { r.breaks = { pl: [[WS - 0.05, WS + WD + 0.05]], str: [[WS - 0.04, WS + WD + 0.04]] }; });   // inside the wings
+    F.breaks = { pl: [[cx - 2.35, cx + 2.35, 'buried']], str: [[cx - 2.3, cx + 2.3]] };   // portico platform and pediment
+    B.breaks = { pl: [[cx - 1.05, cx + 1.05, 'buried']] };                              // garden-door landing
+    [MR, ML].forEach(function (r) { r.breaks = { pl: [[WS - 0.05, WS + WD + 0.05, 'buried']], str: [[WS - 0.04, WS + WD + 0.04, 'buried']] }; });   // inside the wings
 
     // openings: seven bays; centre bay = front door under the portico (first-floor sill raised over the pediment)
     bays.forEach(function (x, i) {
@@ -559,15 +585,25 @@
     [LS, RS].forEach(function (r) { [1.875, 4.275, 6.675].forEach(function (u) { opening(r, u, WIN, N.gwin0, N.gwin1, { head: 'gauged' }); opening(r, u, WIN, N.fwin0, N.wfwin1, { head: 'gauged' }); }); });
 
     // ── foundations: concrete trench fill, blockwork to the first facing course, oversite slab, DPC ──
-    K.foundation([[0, 0], [W, 0], [W, -D], [0, -D]]);
-    K.foundation([[-WW, wz1], [0, wz1], [0, wz0], [-WW, wz0]]);
-    K.foundation([[W, wz1], [W + WW, wz1], [W + WW, wz0], [W, wz0]]);
+    K.fine(function () {                                               // (all below ground or temporary: not in the clean shell)
+      K.foundation([[0, 0], [W, 0], [W, -D], [0, -D]]);
+      K.foundation([[-WW, wz1], [0, wz1], [0, wz0], [-WW, wz0]]);
+      K.foundation([[W, wz1], [W + WW, wz1], [W + WW, wz0], [W, wz0]]);
+    });
+    // clean shell: outer-face loops (everything deeper inside the walls is dropped), and the plinth courses buried
+    // behind the portico podium and the garden-door landing are never laid
+    K.shell([[0, 0], [W, 0], [W, -D], [0, -D]], y0, Y(N.corn1));
+    K.shell([[-WW, wz1], [0, wz1], [0, wz0], [-WW, wz0]], y0, Y(N.wTop));
+    K.shell([[W, wz1], [W + WW, wz1], [W + WW, wz0], [W, wz0]], y0, Y(N.wTop));
+    if (K.clean) { F.ex.push([0, N.plinth, cx - 2.35, cx + 2.35]); B.ex.push([0, N.plinth, cx - 1.05, cx + 1.05]); }
 
     // ── hooks fired as the brickwork reaches them: suspended timber floors, scaffold lifts, parapet coping ──
     var hooks = [], hook = function (n, fn) { hooks.push({ n: n, fn: fn }); };
     var flr = function (x0, z0, x1, z1, y, deck, ceil) {                // joists + boards, lath-and-plaster ceiling below
-      K.floor(x0, z0, x1, z1, y, { deck: deck });
-      if (ceil) K.box('timberWhite', (x0 + x1) / 2, y - UK.JOIST_D - 0.007, (z0 + z1) / 2, x1 - x0, 0.014, z1 - z0);
+      K.fine(function () {                                              // interiors: full model only
+        K.floor(x0, z0, x1, z1, y, { deck: deck });
+        if (ceil) K.box('timberWhite', (x0 + x1) / 2, y - UK.JOIST_D - 0.007, (z0 + z1) / 2, x1 - x0, 0.014, z1 - z0);
+      });
     };
     var mainFloor = function (y, ceil) { flr(T, -D + T, W - T, -T, y, true, ceil); };
     var wingFloor = function (y, deck, ceil) { flr(-WW + T, wz0 + T, 0, wz1 - T, y, deck, ceil); flr(W, wz0 + T, W + WW - T, wz1 - T, y, deck, ceil); };
@@ -580,13 +616,25 @@
     lifts.forEach(function (y, i) {
       var yp = i ? lifts[i - 1] + 1.0 : 0;
       hook(Math.round((y - 0.6 - y0) / CH), function () {
-        scafRun(-0.6, 0, W + 0.6, 0, y, yp); scafRun(W + 0.6, -D, -0.6, -D, y, yp);
-        if (y > 7) return;
-        scafRun(-WW - 0.6, wz1, -0.05, wz1, y, yp); scafRun(-WW, wz0 - 0.1, -WW, wz1, y, yp); scafRun(-0.05, wz0, -WW - 0.6, wz0, y, yp);
-        scafRun(W + 0.05, wz1, W + WW + 0.6, wz1, y, yp); scafRun(W + WW, wz1, W + WW, wz0 - 0.1, y, yp); scafRun(W + WW + 0.6, wz0, W + 0.05, wz0, y, yp);
+        K.fine(function () {                                            // scaffolding: full model only
+          scafRun(-0.6, 0, W + 0.6, 0, y, yp); scafRun(W + 0.6, -D, -0.6, -D, y, yp);
+          if (y > 7) return;
+          scafRun(-WW - 0.6, wz1, -0.05, wz1, y, yp); scafRun(-WW, wz0 - 0.1, -WW, wz1, y, yp); scafRun(-0.05, wz0, -WW - 0.6, wz0, y, yp);
+          scafRun(W + 0.05, wz1, W + WW + 0.6, wz1, y, yp); scafRun(W + WW, wz1, W + WW, wz0 - 0.1, y, yp); scafRun(W + WW + 0.6, wz0, W + 0.05, wz0, y, yp);
+        });
       });
     });
     hook(N.par, function () { MAIN.forEach(coping); });
+    // wing roofs (needed here: the clean shell stops the main block's side walls where they are buried behind a wing)
+    var WP = 30, wtn = Math.tan(WP * PI / 180), WOV = 0.40, WE = Y(N.wTop) + 0.075 + 0.15 / Math.cos(WP * PI / 180) - (WOV + 0.11) * wtn;
+    if (K.clean) {   // the brickwork buried behind each wing, up to 0.24 m under the wing roof, in 0.3 m strips along the wing
+      var wh = (wz1 - wz0 + 2 * WOV) / 2, wzm = (wz0 + wz1) / 2;
+      for (var zs = wz0; zs < wz1 - 0.01; zs += 0.3) {
+        var ze = Math.min(zs + 0.3, wz1), hmin = wh - Math.max(Math.abs(zs - wzm), Math.abs(ze - wzm));
+        var nTop = Math.floor((WE + hmin * wtn - 0.24 - Y(0)) / CH);
+        if (nTop > 0) { MR.ex.push([0, nTop, -ze, -zs]); ML.ex.push([0, nTop, zs + D, ze + D]); }
+      }
+    }
     K.stage('masonry');
     buildWalls(MAIN.concat(WINGS), N.par, hooks);
 
@@ -599,7 +647,6 @@
     var dormers = [];
     [cx - 5.55, cx, cx + 5.55].forEach(function (x) { dormers.push(dormerSpec(mainRoof, x, true), dormerSpec(mainRoof, x, false)); });
     mainRoof.o.holes = stacks.map(hole).concat(dormers.map(function (d) { return d.hole; }));
-    var WP = 30, wtn = Math.tan(WP * PI / 180), WOV = 0.40, WE = Y(N.wTop) + 0.075 + 0.15 / Math.cos(WP * PI / 180) - (WOV + 0.11) * wtn;
     var wStacks = [{ x: -1.8, z: (wz0 + wz1) / 2, w: 1.115, d: 0.665, pots: 2 }, { x: W + 1.8, z: (wz0 + wz1) / 2, w: 1.115, d: 0.665, pots: 2 }];
     var lRoof = hipRoof({ x0: -WW - WOV, x1: 0, z0: wz0 - WOV, z1: wz1 + WOV, e: WE, pitch: WP, open1: true, holes: [hole(wStacks[0])] });
     var rRoof = hipRoof({ x0: W, x1: W + WW + WOV, z0: wz0 - WOV, z1: wz1 + WOV, e: WE, pitch: WP, open0: true, holes: [hole(wStacks[1])] });
@@ -622,7 +669,9 @@
     // stacks first (built off the attic floors), then the lead box gutter, slating, dormers, abutment flashings
     var stackTop = function (s, R) {
       var n0 = R === mainRoof ? N.corn1 : N.wTop, n1 = Math.round((R.ridgeY + (R === mainRoof ? 1.25 : 1.05) - y0) / CH);
-      stack(s, n0, n1, R.ridgeY - s.d / 2 * R.t + SOFF / R.cs - 0.03);
+      var roofY = R.ridgeY - s.d / 2 * R.t + SOFF / R.cs - 0.03;
+      // clean shell: the part of the stack inside the roof void is never laid; brickwork starts just under the lead apron
+      stack(s, K.clean ? Math.max(n0, Math.floor((roofY - y0) / CH) - 1) : n0, n1, roofY, n0);
     };
     stacks.forEach(function (s) { stackTop(s, mainRoof); });
     stackTop(wStacks[0], lRoof); stackTop(wStacks[1], rRoof);
@@ -646,18 +695,20 @@
     // ═══ FIT-OUT ═══ sashes, doors, rainwater goods (lead heads + cast-iron pipes on the rear, wing swan-necks)
     K.stage('fitout');
     fits.forEach(function (o) { if (o.kind === 'door') doorFit(o.r, o, 'doorGreen'); else sashFit(o.r, o); });
-    [0.62, W - 0.62].forEach(function (u) {
-      var p = rpt(B, u, -0.11);
-      K.box('lead', p[0], 9.62, p[1], 0.34, 0.30, 0.22, { ry: B.ry });
-      K.tube('gutter', [p[0], 9.47, p[1]], [p[0], 0.12, p[1]], 0.036);
-      K.box('gutter', p[0], 0.07, p[1], 0.12, 0.10, 0.12, { ry: B.ry });
-      pipeEars(B, u, -0.11, 0.6, 9.2);
+    K.fine(function () {                                                // rainwater goods: not in the clean shell
+      [0.62, W - 0.62].forEach(function (u) {
+        var p = rpt(B, u, -0.11);
+        K.box('lead', p[0], 9.62, p[1], 0.34, 0.30, 0.22, { ry: B.ry });
+        K.tube('gutter', [p[0], 9.47, p[1]], [p[0], 0.12, p[1]], 0.036);
+        K.box('gutter', p[0], 0.07, p[1], 0.12, 0.10, 0.12, { ry: B.ry });
+        pipeEars(B, u, -0.11, 0.6, 9.2);
+      });
+      [[LF, LF.L - 0.35], [LB, 0.35], [RF, 0.35], [RB, RB.L - 0.35]].forEach(function (d) { downpipe(d[0], d[1], WE - 0.06, -WOV - 0.09); });
     });
-    [[LF, LF.L - 0.35], [LB, 0.35], [RF, 0.35], [RB, RB.L - 0.35]].forEach(function (d) { downpipe(d[0], d[1], WE - 0.06, -WOV - 0.09); });
 
     // ═══ PORTICO ═══ tetrastyle Tuscan: stone podium and steps, four columns with pilaster responds, entablature
     // (architrave, frieze, dentil cornice) returned to the wall, pediment with raking cornices under lead
-    K.stage('external');
+    K.stage(K.clean ? 'fitout' : 'external');                          // (the clean shell drops the 'external' stage: the portico stays)
     var px0 = cx - 2.35, px1 = cx + 2.35, pz = 2.30, colZ = 1.95, cr = 0.19, ez = colZ + cr + 0.04, pb = 3.825;
     K.box('stone', cx, 0.225, pz / 2, px1 - px0, 0.45, pz, { color: S() });
     K.box('stone', cx, 0.525, (pz + 0.03) / 2, px1 - px0 + 0.06, 0.15, pz + 0.03, { color: S() });
@@ -688,8 +739,10 @@
 
     // ═══ GROUNDS ═══ gravel sweep round a lawn turning circle with a fountain, lawns, box hedges, clipped yews,
     // rear terrace and lawn, iron railings on a stone kerb with rusticated gate piers and wrought-iron gates, parkland trees
-    var GZ = 16, XL = -WW - 1.5, XR = W + WW + 1.5, TC = [cx, 9.0], IRON = 'gutter';
-    var flat = function (m, x0, z0, x1, z1, h, col) { if (x1 - x0 > 0.01 && z1 - z0 > 0.01) K.box(m, (x0 + x1) / 2, h / 2, (z0 + z1) / 2, x1 - x0, h, z1 - z0, col ? { color: col } : {}); };
+    var IRON = 'gutter';
+    K.fine(function () {                                               // forecourt, gardens, boundary and trees: full model only
+    var GZ = 16, XL = -WW - 1.5, XR = W + WW + 1.5, TC = [cx, 9.0];
+    var flat =function (m, x0, z0, x1, z1, h, col) { if (x1 - x0 > 0.01 && z1 - z0 > 0.01) K.box(m, (x0 + x1) / 2, h / 2, (z0 + z1) / 2, x1 - x0, h, z1 - z0, col ? { color: col } : {}); };
     flat('gravel', -2.5, 0, W + 2.5, GZ - 0.3, 0.03);
     flat('gravel', XL, wz1, 0, 0, 0.03); flat('gravel', W, wz1, XR, 0, 0.03);
     flat('grass', XL, 0, -2.5, GZ - 0.3, 0.02); flat('grass', W + 2.5, 0, XR, GZ - 0.3, 0.02);
@@ -743,12 +796,15 @@
     // parkland trees
     [[XL - 5, 4], [XR + 5, 4], [XL - 4, -8], [XR + 4, -8], [XL - 2, -D - 10], [XR + 2, -D - 10], [cx - 7, -D - 13], [cx + 7, -D - 13]].forEach(function (p, i) { K.tree(p[0], p[1], 8 + (i % 3) * 1.5); });
     K.stage('external');
-    // ═══ SNAGGING ═══ hanging lantern in the portico
-    K.stage('snag');
-    K.box('metal', cx, 3.08, 1.1, 0.02, 0.44, 0.02);
-    K.box(IRON, cx, 2.84, 1.1, 0.28, 0.05, 0.28);
-    K.box('glass', cx, 2.64, 1.1, 0.22, 0.36, 0.22);
-    K.box(IRON, cx, 2.44, 1.1, 0.24, 0.04, 0.24);
+    });                                                                 // end of the full-model grounds
+    // ═══ SNAGGING ═══ hanging lantern in the portico (full model only)
+    K.fine(function () {
+      K.stage('snag');
+      K.box('metal', cx, 3.08, 1.1, 0.02, 0.44, 0.02);
+      K.box(IRON, cx, 2.84, 1.1, 0.28, 0.05, 0.28);
+      K.box('glass', cx, 2.64, 1.1, 0.22, 0.36, 0.22);
+      K.box(IRON, cx, 2.44, 1.1, 0.24, 0.04, 0.24);
+    });
     K.stage('masonry');
 
     K.anchor('front', cx, 1.5, 0); K.anchor('top', cx, mainRoof.ridgeY, -D / 2);

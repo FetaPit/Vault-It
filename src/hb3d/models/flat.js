@@ -38,6 +38,13 @@
     var pts = [[0, 0], [W, 0], [W, -D], [0, -D]], runs = loopRuns(pts);              // runs: 0 front · 1 right · 2 back · 3 left
     var PAL = 'blend', MYPAL = MY === 0 ? 'red' : PAL;
     var IN = WALL + 0.005;                                                            // inside face of the inner leaf
+    // CLEAN SHELL (K.clean): the viewer draws every storey but the user's own as a plain faint silhouette, so those storeys
+    // get only what shapes it (wall block, slab-edge bands, balcony slabs, parapet, roof). The user's storey keeps its
+    // exterior only (real bricks, frames, glass, doors, balcony, bands, trims): no interiors, blinds, frame, rainwater
+    // pipes, plant, landscaping or temporaries. Everything not needed is built inside K.fine(), so the full model is unchanged.
+    var CL = !!K.clean;
+    var GROUND = !CL || MY === 0;        // ground-floor exterior detail (entrance screen, stores, fire exits) is only the user's in the clean shell
+    var CANOPY = !CL || MY === 1;        // the entrance canopy (deck at 3.15, lettering 2.98–3.12) lies in floor 2's height range, not floor 1's
 
     // box on a run (u along the face, d inward). Axis-aligned yaws are folded into the sizes (a box is symmetric under
     // 90° turns) so the instance has no rotation: the viewer's brick-slip shader picks its UV plane from the
@@ -122,7 +129,7 @@
       runs.forEach(function (r, ri) {
         var uA = ri % 2 ? 0.2025 : -e, uB = ri % 2 ? r.L - 0.2025 : r.L + e;
         box('stone', r, (uA + uB) / 2, (0.2025 - e) / 2, y - SLAB / 2, uB - uA, SLAB, 0.2025 + e);
-        box('dpc', r, r.L / 2, -0.002, y - SLAB - 0.006, r.L, 0.012, 0.004);
+        K.fine(function () { box('dpc', r, r.L / 2, -0.002, y - SLAB - 0.006, r.L, 0.012, 0.004); });
       });
     }
 
@@ -167,7 +174,7 @@
         openings[ri] = list.map(function (o) { var c = cut(o); return { u0: c.u0, u1: c.u1, v0: c.v0, v1: c.v1, type: 'void' }; });
         list.forEach(function (o) {
           if (o.sill) hooks.push({ y: o.v0, fn: function () { sill(o); } });
-          hooks.push({ y: o.v1, fn: function () { lintel(o, true); if (o.soldier) soldiers(o, true); } });
+          hooks.push({ y: o.v1, fn: function () { K.fine(function () { lintel(o, true); }); if (o.soldier) soldiers(o, true); } });
         });
       });
       var i0 = K.items.length;
@@ -175,7 +182,16 @@
         bands: s === 0 ? [{ y0: -0.15, y1: G0, palette: 'brown' }] : null });
       tidyBond(i0);
       K.stage('masonry');
-      O.forEach(function (list) { list.forEach(function (o) { innerInfill(o, y0, y1); }); });
+      K.fine(function () { O.forEach(function (list) { list.forEach(function (o) { innerInfill(o, y0, y1); }); }); });
+    }
+
+    // ── clean shell, any storey but the user's: one plain wall block per face (the viewer draws it as a faint silhouette) ──
+    function hull(s) {
+      var y0 = yBot(s), y1 = yTop(s);
+      runs.forEach(function (r, ri) {
+        var uA = ri % 2 ? WALL : 0, uB = ri % 2 ? r.L - WALL : r.L;
+        box('cladding', r, (uA + uB) / 2, WALL / 2, (y0 + y1) / 2, uB - uA, y1 - y0, WALL);
+      });
     }
 
     // ── any other storey: brick-slip cladding panels (true-scale texture) rising in lifts, cut round the openings ──
@@ -230,15 +246,16 @@
     }
     function envelope(s) {
       K.stage('masonry');
-      if (s === MY) userStorey(s, LAY[s]); else cladStorey(s, LAY[s]);
+      if (s === MY) userStorey(s, LAY[s]); else if (CL) hull(s); else cladStorey(s, LAY[s]);
       band(s);
-      if (s === MY) goldLine(yTop(s) + 0.04, 0.07, 0.015);
+      // top trim: in the clean shell it sits on the joint under the slab-edge band so it falls inside the user's floor (rows)
+      if (s === MY) goldLine(CL ? yTop(s) - 0.02 : yTop(s) + 0.04, 0.07, 0.015);
     }
 
     // ── fit-out: windows, doors, balconies ──
     var BLIND = [0xece6d6, 0xd9d4ca, 0xbfb8aa, 0x8f969c, 0xe8e2cf, 0x6d655c];
     function blind(r, u0, u1, top, h, d) {
-      if (K.rand() > 0.45) return;
+      if (CL || K.rand() > 0.45) return;                 // blinds are interior: full model only
       var drop = h * (0.12 + K.rand() * 0.55);
       box('column', r, (u0 + u1) / 2, d, top - drop / 2, u1 - u0, drop, 0.012, { color: pick(BLIND) });
     }
@@ -277,7 +294,7 @@
         box('metal', r, i ? lf[0] + 0.05 : lf[1] - 0.05, SB - 0.005, o.v0 + 1.05, 0.022, 0.15, 0.02);
       });
       box('metal', r, uc, SB - 0.02, o.v0 + 0.012, o.u1 - o.u0, 0.024, 0.10);
-      if (K.rand() < 0.5) {   // curtains drawn to the sides
+      if (!CL && K.rand() < 0.5) {   // curtains drawn to the sides (interior: full model only)
         var cc = pick(BLIND); [o.u0 + FW + 0.12, o.u1 - FW - 0.12].forEach(function (u) { box('column', r, u, SB + FD + 0.06, (iv0 + iv1) / 2 + 0.05, 0.24, iv1 - iv0 - 0.1, 0.04, { color: cc }); });
       }
     }
@@ -319,15 +336,17 @@
         tube('metal', r, i ? lf[0] + 0.16 : lf[1] - 0.16, d0 - 0.09, o.v0 + 0.6, i ? lf[0] + 0.16 : lf[1] - 0.16, d0 - 0.09, o.v0 + 1.6, 0.016);
       });
       box('metal', r, uc, sbE - 0.03, o.v0 + 0.006, o.u1 - o.u0, 0.012, 0.25);    // level threshold
-      // lobby: stone floor, plaster walls, letter-box bank, ceiling lights
-      var lz = 2.7;
-      box('stone', r, uc, (IN + lz) / 2, G0 + 0.03, 3.6, 0.02, lz - IN);
-      [7.25, 10.75].forEach(function (u) { box('render', r, u, (IN + lz) / 2, G0 + 1.35, 0.06, 2.6, lz - IN, { color: 0xeae5d8 }); });
-      box('render', r, uc, lz - 0.005, G0 + 1.35, 3.5, 2.6, 0.01, { color: 0xe4ddcf });
-      box('metal', r, uc, lz - 0.16, G0 + 1.25, 2.4, 1.2, 0.3);
-      for (var i = 1; i < 8; i++) box('upvcGrey', r, uc - 1.2 + 0.3 * i, lz - 0.31, G0 + 1.25, 0.012, 1.2, 0.01);
-      for (var k = 1; k < 4; k++) box('upvcGrey', r, uc, lz - 0.31, G0 + 0.65 + 0.3 * k, 2.4, 0.012, 0.01);
-      [8.4, 9.6].forEach(function (u) { var c = P(r, u, 1.5); K.cyl('gold', c[0], yTop(0) - 0.03, c[1], 0.12, 0.02); });
+      // lobby: stone floor, plaster walls, letter-box bank, ceiling lights (interior: full model only)
+      K.fine(function () {
+        var lz = 2.7;
+        box('stone', r, uc, (IN + lz) / 2, G0 + 0.03, 3.6, 0.02, lz - IN);
+        [7.25, 10.75].forEach(function (u) { box('render', r, u, (IN + lz) / 2, G0 + 1.35, 0.06, 2.6, lz - IN, { color: 0xeae5d8 }); });
+        box('render', r, uc, lz - 0.005, G0 + 1.35, 3.5, 2.6, 0.01, { color: 0xe4ddcf });
+        box('metal', r, uc, lz - 0.16, G0 + 1.25, 2.4, 1.2, 0.3);
+        for (var i = 1; i < 8; i++) box('upvcGrey', r, uc - 1.2 + 0.3 * i, lz - 0.31, G0 + 1.25, 0.012, 1.2, 0.01);
+        for (var k = 1; k < 4; k++) box('upvcGrey', r, uc, lz - 0.31, G0 + 0.65 + 0.3 * k, 2.4, 0.012, 0.01);
+        [8.4, 9.6].forEach(function (u) { var c = P(r, u, 1.5); K.cyl('gold', c[0], yTop(0) - 0.03, c[1], 0.12, 0.02); });
+      });
     }
 
     // bolt-on steel balcony on a front/back run: cantilever arms on thermal-break connectors at the slab edge,
@@ -339,8 +358,9 @@
       box(M, r, uc, z0 - d + 0.05, y - 0.13, w, 0.20, 0.10);
       box(M, r, uc, z0 - d / 2, y - 0.23, w, 0.012, d);
       var nb = Math.floor((d - 0.12) / 0.145);
-      for (var i = 0; i < nb; i++) box('timber', r, uc, z0 - 0.03 - 0.145 * (i + 0.5), y - 0.0175, w - 0.2, 0.025, 0.135);
-      var fz = z0 - d + 0.05;
+      if (CL) box('stone', r, uc, z0 - d / 2, y - 0.0175, w - 0.2, 0.025, d - 0.1);     // clean shell: the timber deck is one board-coloured plate
+      else for (var i = 0; i < nb; i++) box('timber', r, uc, z0 - 0.03 - 0.145 * (i + 0.5), y - 0.0175, w - 0.2, 0.025, 0.135);
+      var fz = z0 - d + 0.05, RAIL = CL ? 'upvcGrey' : 'metal';                         // (clean drops 'metal': the glass rail keeps a visible handrail)
       if (glassy) {
         var nP = Math.max(1, Math.round(w / 1.3)), pw = (w - 0.06) / nP;
         box(M, r, uc, fz, y + 0.05, w, 0.10, 0.08);
@@ -348,9 +368,9 @@
         [u0 + 0.04, u1 - 0.04].forEach(function (u) {
           box(M, r, u, z0 - d / 2, y + 0.05, 0.08, 0.10, d - 0.1);
           box('glass', r, u, z0 - d / 2 - 0.03, y + 0.6, 0.0175, 1.0, d - 0.16);
-          box('metal', r, u, z0 - d / 2, y + 1.125, 0.05, 0.045, d - 0.06);
+          box(RAIL, r, u, z0 - d / 2, y + 1.125, 0.05, 0.045, d - 0.06);
         });
-        box('metal', r, uc, fz, y + 1.125, w, 0.045, 0.05);
+        box(RAIL, r, uc, fz, y + 1.125, w, 0.045, 0.05);
       } else {
         var post = function (u, dz) { box(M, r, u, dz, y + 0.55, 0.05, 1.1, 0.05); };
         var nPo = Math.max(1, Math.round(w / 1.3));
@@ -366,6 +386,10 @@
       tube('metal', r, u1 - 0.3, z0 - d + 0.12, y - 0.16, u1 - 0.3, z0 - d - 0.06, y - 0.19, 0.018);   // drainage spout
       if (K.rand() < 0.55) balcPlants.push([r, u0 + 0.3 + K.rand() * 0.4, z0 - d + 0.3, y]);
     }
+    // clean shell, context storeys: a balcony is just its slab (it shapes the silhouette and shows the floors)
+    function balconySlab(r, u0, u1, y, d) { box('balcony', r, (u0 + u1) / 2, -0.015 - d / 2, y - 0.13, u1 - u0, 0.20, d); }
+    // the balcony span for a 'balc' opening: 225 mm beyond the door on the near corner side, 1.8 m the other way
+    function balcSpan(o) { var left = o.u0 < W / 2; return [left ? o.u0 - 0.225 : o.u0 - 1.8, left ? o.u1 + 1.8 : o.u1 + 0.225]; }
 
     function interior(s) {   // floor finish, plaster ceiling and the rooms' back walls (seen through the glass)
       var y0 = FFL(s), y1 = yTop(s);
@@ -440,38 +464,41 @@
     function hedge(x0, z0, x1, z1, h) { K.box('plant', (x0 + x1) / 2, h / 2, (z0 + z1) / 2, x1 - x0, h, z1 - z0, { color: pick([0x2f5a2c, 0x35602f, 0x2c5229]) }); }
 
     // ═══════════ BUILD ═══════════
-    // set-out: profile pegs + string lines on the outer face, total station on a tripod
-    K.stage('setout');
-    runs.forEach(function (r) {
-      box('string', r, r.L / 2, -0.01, 0.3, r.L + 1.2, 0.004, 0.004, { hideAfter: 0.12 });
-      [-0.6, r.L + 0.6].forEach(function (u) { box('timber', r, u, -0.01, 0.2, 0.05, 0.5, 0.05, { hideAfter: 0.12 }); });
+    K.fine(function () {
+      // set-out: profile pegs + string lines on the outer face, total station on a tripod
+      K.stage('setout');
+      runs.forEach(function (r) {
+        box('string', r, r.L / 2, -0.01, 0.3, r.L + 1.2, 0.004, 0.004, { hideAfter: 0.12 });
+        [-0.6, r.L + 0.6].forEach(function (u) { box('timber', r, u, -0.01, 0.2, 0.05, 0.5, 0.05, { hideAfter: 0.12 }); });
+      });
+      COLS.forEach(function (c) { K.box('timber', c[0], 0.15, c[1], 0.04, 0.3, 0.04, { hideAfter: 0.12 }); });
+      [0, 2.1, 4.2].forEach(function (an) { K.beam('string', [W + 3 + 0.4 * Math.cos(an), 0, 3 + 0.4 * Math.sin(an)], [W + 3, 1.35, 3], 0.03, 0.03, { hideAfter: 0.10 }); });
+      K.box('upvc', W + 3, 1.5, 3, 0.18, 0.26, 0.16, { hideAfter: 0.10 });
+
+      // foundations: piling mat, CFA piles + caps under the columns, ground beams under the walls, starter bars, crane base
+      K.stage('found');
+      K.box('gravel', W / 2, 0.02, -D / 2, W + 6, 0.04, D + 6, { hideAfter: 0.80 });
+      [[W + 6, -D - 3], [-6, 3.5]].forEach(function (s) { K.sph('soil', s[0], 0.35, s[1], 2.4, 0.9, 1.7, { hideAfter: 0.11 }); });
+      COLS.forEach(function (c) { K.cyl('concrete', c[0], -6.6, c[1], 0.3, 11.0); K.box('concrete', c[0], -0.55, c[1], 1.2, 0.75, 1.2); });
+      runs.forEach(function (r) { box('concrete', r, r.L / 2, 0.30, -0.50, r.L, 0.70, 0.60); });
+      COLS.forEach(function (c) { [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(function (q) { K.tube('steel', [c[0] + q[0] * 0.1, -0.2, c[1] + q[1] * 0.1], [c[0] + q[0] * 0.1, 1.1, c[1] + q[1] * 0.1], 0.013, { hideAfter: 0.122 }); }); });
+      crane(-5.5, -6.0, 37.0, 31.0, 10.0);
+
+      // ground-floor slab (suspended on the ground beams)
+      K.stage('slab');
+      K.box('concrete', (0.2025 + 9) / 2, G0 - SLAB / 2, -D / 2, 9 - 0.2025, SLAB, D - 0.405);
+      K.box('concrete', (9 + W - 0.2025) / 2, G0 - SLAB / 2, -D / 2, W - 0.2025 - 9, SLAB, D - 0.405);
     });
-    COLS.forEach(function (c) { K.box('timber', c[0], 0.15, c[1], 0.04, 0.3, 0.04, { hideAfter: 0.12 }); });
-    [0, 2.1, 4.2].forEach(function (an) { K.beam('string', [W + 3 + 0.4 * Math.cos(an), 0, 3 + 0.4 * Math.sin(an)], [W + 3, 1.35, 3], 0.03, 0.03, { hideAfter: 0.10 }); });
-    K.box('upvc', W + 3, 1.5, 3, 0.18, 0.26, 0.16, { hideAfter: 0.10 });
-
-    // foundations: piling mat, CFA piles + caps under the columns, ground beams under the walls, starter bars, crane base
-    K.stage('found');
-    K.box('gravel', W / 2, 0.02, -D / 2, W + 6, 0.04, D + 6, { hideAfter: 0.80 });
-    [[W + 6, -D - 3], [-6, 3.5]].forEach(function (s) { K.sph('soil', s[0], 0.35, s[1], 2.4, 0.9, 1.7, { hideAfter: 0.11 }); });
-    COLS.forEach(function (c) { K.cyl('concrete', c[0], -6.6, c[1], 0.3, 11.0); K.box('concrete', c[0], -0.55, c[1], 1.2, 0.75, 1.2); });
-    runs.forEach(function (r) { box('concrete', r, r.L / 2, 0.30, -0.50, r.L, 0.70, 0.60); });
-    COLS.forEach(function (c) { [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(function (q) { K.tube('steel', [c[0] + q[0] * 0.1, -0.2, c[1] + q[1] * 0.1], [c[0] + q[0] * 0.1, 1.1, c[1] + q[1] * 0.1], 0.013, { hideAfter: 0.122 }); }); });
-    crane(-5.5, -6.0, 37.0, 31.0, 10.0);
-
-    // ground-floor slab (suspended on the ground beams)
-    K.stage('slab');
-    K.box('concrete', (0.2025 + 9) / 2, G0 - SLAB / 2, -D / 2, 9 - 0.2025, SLAB, D - 0.405);
-    K.box('concrete', (9 + W - 0.2025) / 2, G0 - SLAB / 2, -D / 2, W - 0.2025 - 9, SLAB, D - 0.405);
 
     // frame rises floor by floor; the envelope follows two storeys behind (the user's storey course by course)
     var LAG = 2;
-    for (var s = 0; s < NS + LAG; s++) { if (s < NS) frame(s); if (s - LAG >= 0) envelope(s - LAG); }
+    for (var s = 0; s < NS + LAG; s++) { if (s < NS) K.fine(function () { frame(s); }); if (s - LAG >= 0) envelope(s - LAG); }
 
     // ── roof structure: parapets (rising), lift overrun, hatch upstand, tapered insulation ──
     K.stage('roofframe');
-    for (var pl = 0; pl < 4; pl++) {
-      var pa = ROOF + pl * 4 * CH, pb = pa + 4 * CH;
+    // (clean shell: the parapet is one block per face and a slab closes the top of the silhouette)
+    for (var pl = 0; pl < (CL ? 1 : 4); pl++) {
+      var pa = ROOF + pl * 4 * CH, pb = CL ? PAR : pa + 4 * CH;
       runs.forEach(function (r, ri) {
         var uA = ri % 2 ? WALL : 0, uB = ri % 2 ? r.L - WALL : r.L;
         box('cladding', r, (uA + uB) / 2, WALL / 2, (pa + pb) / 2, uB - uA, pb - pa, WALL, { color: 0xffffff });
@@ -479,55 +506,70 @@
     }
     var OV = { x0: 8.85, x1: 10.95, z0: -8.25, z1: -5.7, h: 2.55 };
     K.box('cladding', (OV.x0 + OV.x1) / 2, ROOF + OV.h / 2, (OV.z0 + OV.z1) / 2, OV.x1 - OV.x0, OV.h, OV.z1 - OV.z0, { color: 0xffffff });
-    K.box('concrete', 8.0, ROOF + 0.3, -7.05, 1.1, 0.6, 1.1);                                 // roof-hatch upstand over the stair
-    for (var ir = 0; ir < 10; ir++) {
-      var iz0 = -IN - (D - 2 * IN) * ir / 10, iz1 = -IN - (D - 2 * IN) * (ir + 1) / 10;
-      K.box('insulation', W / 2, ROOF + 0.075, (iz0 + iz1) / 2, W - 2 * IN - 0.02, 0.15, Math.abs(iz1 - iz0) - 0.01);
-    }
+    if (CL) K.box('render', W / 2, ROOF - SLAB / 2, -D / 2, W - 2 * IN, SLAB, D - 2 * IN);          // roof slab: closes the top
+    K.fine(function () {
+      K.box('concrete', 8.0, ROOF + 0.3, -7.05, 1.1, 0.6, 1.1);                                 // roof-hatch upstand over the stair
+      for (var ir = 0; ir < 10; ir++) {
+        var iz0 = -IN - (D - 2 * IN) * ir / 10, iz1 = -IN - (D - 2 * IN) * (ir + 1) / 10;
+        K.box('insulation', W / 2, ROOF + 0.075, (iz0 + iz1) / 2, W - 2 * IN - 0.02, 0.15, Math.abs(iz1 - iz0) - 0.01);
+      }
+    });
 
     // ── roof finishes: membrane + upstands, aluminium copings, gravel margin, sedum blanket, paved walkways, PV ──
     K.stage('roofcover');
     var RF = ROOF + 0.16;
-    K.box('membrane', W / 2, RF - 0.005, -D / 2, W - 2 * IN, 0.01, D - 2 * IN);
-    runs.forEach(function (r, ri) {
-      var uA = ri % 2 ? IN : 0, uB = ri % 2 ? r.L - IN : r.L;
-      box('membrane', r, (uA + uB) / 2, IN + 0.005, RF + 0.15, uB - uA, 0.30, 0.01);
-      box('gravel', r, (uA + uB) / 2 + 0, IN + 0.25, RF + 0.025, ri % 2 ? uB - uA - 1.0 : uB - uA - 2 * IN, 0.05, 0.5);
+    K.fine(function () {
+      K.box('membrane', W / 2, RF - 0.005, -D / 2, W - 2 * IN, 0.01, D - 2 * IN);
+      runs.forEach(function (r, ri) {
+        var uA = ri % 2 ? IN : 0, uB = ri % 2 ? r.L - IN : r.L;
+        box('membrane', r, (uA + uB) / 2, IN + 0.005, RF + 0.15, uB - uA, 0.30, 0.01);
+        box('gravel', r, (uA + uB) / 2 + 0, IN + 0.25, RF + 0.025, ri % 2 ? uB - uA - 1.0 : uB - uA - 2 * IN, 0.05, 0.5);
+      });
     });
     runs.forEach(function (r, ri) {
       var e = 0.045, uA = ri % 2 ? WALL + e : -e, uB = ri % 2 ? r.L - WALL - e : r.L + e;
       box('upvcGrey', r, (uA + uB) / 2, WALL / 2, PAR + 0.025, uB - uA, 0.05, WALL + 2 * e);
-      box('upvcGrey', r, (uA + uB) / 2, -e + 0.005, PAR - 0.03, uB - uA, 0.06, 0.01);
-      box('upvcGrey', r, (uA + uB) / 2, WALL + e - 0.005, PAR - 0.03, uB - uA, 0.06, 0.01);
+      K.fine(function () {
+        box('upvcGrey', r, (uA + uB) / 2, -e + 0.005, PAR - 0.03, uB - uA, 0.06, 0.01);
+        box('upvcGrey', r, (uA + uB) / 2, WALL + e - 0.005, PAR - 0.03, uB - uA, 0.06, 0.01);
+      });
     });
     K.box('upvcGrey', (OV.x0 + OV.x1) / 2, ROOF + OV.h + 0.025, (OV.z0 + OV.z1) / 2, OV.x1 - OV.x0 + 0.09, 0.05, OV.z1 - OV.z0 + 0.09);
-    K.box('upvcGrey', 8.0, ROOF + 0.64, -7.05, 1.2, 0.07, 1.2, { rx: 0.04 });                // hatch lid
-    // zones kept clear of sedum: walkway, plant pad, overrun + hatch
-    var WALK = [1.0, -5.55, 17.0, -4.95], PAD = [12.4, -11.1, 16.9, -8.4], CLR = [7.2, -8.6, 11.3, -5.4];
-    var inRect = function (x0, z0, x1, z1, R) { return x1 > R[0] && x0 < R[2] && z1 > R[1] && z0 < R[3]; };
-    var SEDUM = [0x5f7a3c, 0x66803f, 0x6e7c41, 0x5a7238, 0x74783f, 0x6a6e3c];
-    for (var sx = IN + 0.55; sx < W - IN - 0.6; sx += 2.0) for (var sz = -IN - 0.55; sz > -D + IN + 0.6; sz -= 1.0) {
-      var mx1 = Math.min(sx + 2.0, W - IN - 0.55), mz0 = Math.max(sz - 1.0, -D + IN + 0.55);
-      if (inRect(sx, mz0, mx1, sz, WALK) || inRect(sx, mz0, mx1, sz, PAD) || inRect(sx, mz0, mx1, sz, CLR)) continue;
-      K.box('plant', (sx + mx1) / 2, RF + 0.035, (sz + mz0) / 2, mx1 - sx - 0.02, 0.07, sz - mz0 - 0.02, { color: pick(SEDUM) });
-    }
-    var slab6 = function (x0, z0, x1, z1) { for (var x = x0; x < x1 - 0.05; x += 0.6) for (var z = z0; z < z1 - 0.05; z += 0.6) K.box('paving', x + 0.3, RF + 0.04, z + 0.3, 0.592, 0.05, 0.592, { kind: 'tile' }); };
-    slab6(WALK[0], WALK[1], WALK[2], WALK[3]); slab6(PAD[0], PAD[1], PAD[2], PAD[3]); slab6(7.5, -6.55, 8.7, -5.55);
-    // PV arrays on ballasted frames, tilted 12° to the street
-    var tilt = 12 * Math.PI / 180;
-    [-1.75, -3.75].forEach(function (rz) {
-      for (var px = 1.6; px < 16.4; px += 1.78) {
-        K.box('metal', px + 0.85, RF + 0.1, rz + 0.45, 0.06, 0.2, 0.06); K.box('metal', px + 0.85, RF + 0.27, rz - 0.45, 0.06, 0.54, 0.06);
-        K.box('curtain', px + 0.85, RF + 0.33, rz, 1.70, 0.035, 1.0, { rx: -tilt });
+    K.fine(function () {
+      K.box('upvcGrey', 8.0, ROOF + 0.64, -7.05, 1.2, 0.07, 1.2, { rx: 0.04 });                // hatch lid
+      // zones kept clear of sedum: walkway, plant pad, overrun + hatch
+      var WALK = [1.0, -5.55, 17.0, -4.95], PAD = [12.4, -11.1, 16.9, -8.4], CLR = [7.2, -8.6, 11.3, -5.4];
+      var inRect = function (x0, z0, x1, z1, R) { return x1 > R[0] && x0 < R[2] && z1 > R[1] && z0 < R[3]; };
+      var SEDUM = [0x5f7a3c, 0x66803f, 0x6e7c41, 0x5a7238, 0x74783f, 0x6a6e3c];
+      for (var sx = IN + 0.55; sx < W - IN - 0.6; sx += 2.0) for (var sz = -IN - 0.55; sz > -D + IN + 0.6; sz -= 1.0) {
+        var mx1 = Math.min(sx + 2.0, W - IN - 0.55), mz0 = Math.max(sz - 1.0, -D + IN + 0.55);
+        if (inRect(sx, mz0, mx1, sz, WALK) || inRect(sx, mz0, mx1, sz, PAD) || inRect(sx, mz0, mx1, sz, CLR)) continue;
+        K.box('plant', (sx + mx1) / 2, RF + 0.035, (sz + mz0) / 2, mx1 - sx - 0.02, 0.07, sz - mz0 - 0.02, { color: pick(SEDUM) });
       }
-      K.box('metal', 9.0, RF + 0.2, rz + 0.45, 14.4, 0.04, 0.05); K.box('metal', 9.0, RF + 0.53, rz - 0.45, 14.4, 0.04, 0.05);
-      K.box('concrete', 9.0, RF + 0.04, rz, 14.4, 0.08, 0.3);
+      var slab6 = function (x0, z0, x1, z1) { for (var x = x0; x < x1 - 0.05; x += 0.6) for (var z = z0; z < z1 - 0.05; z += 0.6) K.box('paving', x + 0.3, RF + 0.04, z + 0.3, 0.592, 0.05, 0.592, { kind: 'tile' }); };
+      slab6(WALK[0], WALK[1], WALK[2], WALK[3]); slab6(PAD[0], PAD[1], PAD[2], PAD[3]); slab6(7.5, -6.55, 8.7, -5.55);
+      // PV arrays on ballasted frames, tilted 12° to the street
+      var tilt = 12 * Math.PI / 180;
+      [-1.75, -3.75].forEach(function (rz) {
+        for (var px = 1.6; px < 16.4; px += 1.78) {
+          K.box('metal', px + 0.85, RF + 0.1, rz + 0.45, 0.06, 0.2, 0.06); K.box('metal', px + 0.85, RF + 0.27, rz - 0.45, 0.06, 0.54, 0.06);
+          K.box('curtain', px + 0.85, RF + 0.33, rz, 1.70, 0.035, 1.0, { rx: -tilt });
+        }
+        K.box('metal', 9.0, RF + 0.2, rz + 0.45, 14.4, 0.04, 0.05); K.box('metal', 9.0, RF + 0.53, rz - 0.45, 14.4, 0.04, 0.05);
+        K.box('concrete', 9.0, RF + 0.04, rz, 14.4, 0.08, 0.3);
+      });
     });
 
     // ── fit-out, floor by floor: interiors, windows, doors, balconies; then entrance canopy, rainwater pipes, roof plant ──
     K.stage('fitout');
     for (s = 0; s < NS; s++) {
-      interior(s);
+      K.fine(function () { interior(s); });
+      if (CL && s !== MY) {   // clean shell, context storey: balcony slabs only (windows, doors and glazing are invisible in the silhouette)
+        if (s > 0) [0, 2].forEach(function (ri) {
+          LAY[s][ri].forEach(function (o) { if (o.kind === 'balc') { var bs = balcSpan(o); balconySlab(runs[ri], bs[0], bs[1], FFL(s), 1.5); } });
+        });
+        continue;
+      }
       LAY[s].forEach(function (list) {
         list.forEach(function (o) {
           if (o.kind === 'win' || o.kind === 'stair') glazeWin(o);
@@ -540,8 +582,8 @@
       if (s > 0) [0, 2].forEach(function (ri) {
         LAY[s][ri].forEach(function (o) {
           if (o.kind !== 'balc') return;
-          var left = o.u0 < W / 2;
-          balcony(runs[ri], left ? o.u0 - 0.225 : o.u0 - 1.8, left ? o.u1 + 1.8 : o.u1 + 0.225, FFL(s), 1.5, ri === 0);
+          var bs = balcSpan(o);
+          balcony(runs[ri], bs[0], bs[1], FFL(s), 1.5, ri === 0);
         });
       });
     }
@@ -549,35 +591,43 @@
     var R0 = runs[0], cu0 = 6.975, cu1 = 11.025, cd = 1.5, cyB = 2.95, cyT = 3.15, cw = cu1 - cu0;
     box('upvcGrey', R0, 9.0, -0.015 - cd / 2, cyT - 0.025, cw, 0.05, cd);
     box('upvcGrey', R0, 9.0, -0.015 - cd + 0.03, (cyB + cyT) / 2, cw, cyT - cyB, 0.06);
-    [cu0 + 0.03, cu1 - 0.03].forEach(function (u) { box('upvcGrey', R0, u, -0.015 - cd / 2, (cyB + cyT) / 2, 0.06, cyT - cyB, cd); });
-    box('upvc', R0, 9.0, -0.015 - cd / 2, cyB + 0.01, cw - 0.12, 0.012, cd - 0.06);
-    [8.0, 9.0, 10.0].forEach(function (u) { var c = P(R0, u, -0.8); K.cyl('gold', c[0], cyB, c[1], 0.06, 0.012); });
-    [cu0 + 0.25, cu1 - 0.25].forEach(function (u) { tube('metal', R0, u, -cd + 0.1, cyT - 0.02, u, -0.02, cyT + 1.35, 0.014); box('metal', R0, u, -0.01, cyT + 1.35, 0.12, 0.14, 0.02); });
-    // dry-riser inlet cabinet + label, door-entry panel
-    box('doorRed', R0, 6.75, -0.10, 0.85, 0.55, 0.50, 0.20); box('upvc', R0, 6.75, -0.01, 1.2, 0.5, 0.09, 0.01);
-    box('metal', R0, 10.95, -0.02, 1.3, 0.18, 0.32, 0.04); box('upvcBlack', R0, 10.95, -0.045, 1.38, 0.10, 0.07, 0.01);
-    // rainwater pipes from parapet outlets down both gable ends: hopper heads, clips at 2 m, shoes over gullies
-    [[W, -0.45, 1], [W, -D + 0.45, 1], [0, -0.45, -1], [0, -D + 0.45, -1]].forEach(function (q) {
-      var x = q[0], z = q[1], sd = q[2], xo = x + sd * 0.085, top = PAR - 0.6;
-      K.box('lead', x + sd * 0.03, top + 0.32, z, 0.08, 0.12, 0.14);
-      K.box('gutter', x + sd * 0.10, top + 0.16, z, 0.17, 0.32, 0.30);
-      K.tube('gutter', [xo, top, z], [xo, 0.22, z], 0.05);
-      for (var cy = 1.5; cy < top - 0.3; cy += 2.0) K.box('gutter', x + sd * 0.05, cy, z, 0.10, 0.04, 0.13);
-      K.box('gutter', xo + sd * 0.04, 0.17, z, 0.17, 0.08, 0.12);
-      K.box('steel', xo + sd * 0.12, 0.02, z, 0.30, 0.03, 0.30);
-    });
-    // roof plant: heat-pump condensers on a steel frame, extract cowls, AOV, guard rail round the hatch
-    for (var cu = 0; cu < 3; cu++) {
-      var ux = 13.1 + cu * 1.35;
-      K.box('steel', ux, RF + 0.1, -9.75, 1.2, 0.08, 1.3); K.box('upvc', ux, RF + 0.82, -9.75, 1.0, 1.35, 0.42);
-      [0.25, -0.3].forEach(function (dy) { K.cyl('gutter', ux, RF + 0.82 + dy, -9.53, 0.22, 0.02, { rx: Math.PI / 2 }); });
+    if (CANOPY) {
+      [cu0 + 0.03, cu1 - 0.03].forEach(function (u) { box('upvcGrey', R0, u, -0.015 - cd / 2, (cyB + cyT) / 2, 0.06, cyT - cyB, cd); });
+      box('upvc', R0, 9.0, -0.015 - cd / 2, cyB + 0.01, cw - 0.12, 0.012, cd - 0.06);
+      K.fine(function () {
+        [8.0, 9.0, 10.0].forEach(function (u) { var c = P(R0, u, -0.8); K.cyl('gold', c[0], cyB, c[1], 0.06, 0.012); });
+        [cu0 + 0.25, cu1 - 0.25].forEach(function (u) { tube('metal', R0, u, -cd + 0.1, cyT - 0.02, u, -0.02, cyT + 1.35, 0.014); box('metal', R0, u, -0.01, cyT + 1.35, 0.12, 0.14, 0.02); });
+      });
     }
-    [[3.0, -8.0], [5.0, -9.5], [15.0, -6.5], [3.0, -10.4]].forEach(function (c) { K.cyl('metal', c[0], RF + 0.4, c[1], 0.12, 0.8); K.cyl('metal', c[0], RF + 0.86, c[1], 0.2, 0.1); });
-    K.box('upvcGrey', 7.6, RF + 0.35, -8.15, 1.0, 0.6, 0.7); K.box('balcony', 7.6, RF + 0.66, -8.15, 1.05, 0.04, 0.75, { rx: 0.2 });
-    [[7.35, -7.7], [8.65, -7.7], [8.65, -6.45], [7.35, -6.45]].forEach(function (c) { K.box('string', c[0], RF + 0.55, c[1], 0.05, 1.1, 0.05); });
-    [[8.0, -7.7, 1.3, 0.04], [8.65, -7.075, 0.04, 1.25], [7.35, -7.075, 0.04, 1.25]].forEach(function (g) { [0.55, 1.08].forEach(function (h) { K.box('string', g[0], RF + h, g[1], g[2], 0.04, g[3]); }); });
+    if (GROUND) {   // dry-riser inlet cabinet + label, door-entry panel
+      box('doorRed', R0, 6.75, -0.10, 0.85, 0.55, 0.50, 0.20); box('upvc', R0, 6.75, -0.01, 1.2, 0.5, 0.09, 0.01);
+      box('metal', R0, 10.95, -0.02, 1.3, 0.18, 0.32, 0.04); box('upvcBlack', R0, 10.95, -0.045, 1.38, 0.10, 0.07, 0.01);
+    }
+    K.fine(function () {
+      // rainwater pipes from parapet outlets down both gable ends: hopper heads, clips at 2 m, shoes over gullies
+      [[W, -0.45, 1], [W, -D + 0.45, 1], [0, -0.45, -1], [0, -D + 0.45, -1]].forEach(function (q) {
+        var x = q[0], z = q[1], sd = q[2], xo = x + sd * 0.085, top = PAR - 0.6;
+        K.box('lead', x + sd * 0.03, top + 0.32, z, 0.08, 0.12, 0.14);
+        K.box('gutter', x + sd * 0.10, top + 0.16, z, 0.17, 0.32, 0.30);
+        K.tube('gutter', [xo, top, z], [xo, 0.22, z], 0.05);
+        for (var cy = 1.5; cy < top - 0.3; cy += 2.0) K.box('gutter', x + sd * 0.05, cy, z, 0.10, 0.04, 0.13);
+        K.box('gutter', xo + sd * 0.04, 0.17, z, 0.17, 0.08, 0.12);
+        K.box('steel', xo + sd * 0.12, 0.02, z, 0.30, 0.03, 0.30);
+      });
+      // roof plant: heat-pump condensers on a steel frame, extract cowls, AOV, guard rail round the hatch
+      for (var cu = 0; cu < 3; cu++) {
+        var ux = 13.1 + cu * 1.35;
+        K.box('steel', ux, RF + 0.1, -9.75, 1.2, 0.08, 1.3); K.box('upvc', ux, RF + 0.82, -9.75, 1.0, 1.35, 0.42);
+        [0.25, -0.3].forEach(function (dy) { K.cyl('gutter', ux, RF + 0.82 + dy, -9.53, 0.22, 0.02, { rx: Math.PI / 2 }); });
+      }
+      [[3.0, -8.0], [5.0, -9.5], [15.0, -6.5], [3.0, -10.4]].forEach(function (c) { K.cyl('metal', c[0], RF + 0.4, c[1], 0.12, 0.8); K.cyl('metal', c[0], RF + 0.86, c[1], 0.2, 0.1); });
+      K.box('upvcGrey', 7.6, RF + 0.35, -8.15, 1.0, 0.6, 0.7); K.box('balcony', 7.6, RF + 0.66, -8.15, 1.05, 0.04, 0.75, { rx: 0.2 });
+      [[7.35, -7.7], [8.65, -7.7], [8.65, -6.45], [7.35, -6.45]].forEach(function (c) { K.box('string', c[0], RF + 0.55, c[1], 0.05, 1.1, 0.05); });
+      [[8.0, -7.7, 1.3, 0.04], [8.65, -7.075, 0.04, 1.25], [7.35, -7.075, 0.04, 1.25]].forEach(function (g) { [0.55, 1.08].forEach(function (h) { K.box('string', g[0], RF + h, g[1], g[2], 0.04, g[3]); }); });
+    });
 
     // ── external works: forecourt, terraces, parking, cycle stands, bin store apron, street, communal garden ──
+    K.fine(function () {
     K.stage('external');
     var zP0 = 7.4, zK = 9.4;
     K.paving(7.65, 0.0, 10.35, zP0);                                                      // entrance path
@@ -617,20 +667,25 @@
     [[0.0, 3.3], [1.1, 2.9], [16.4, 3.2], [17.3, 3.5], [6.9, 1.4], [11.0, 1.5], [-0.6, -D - 1.0], [18.6, -D - 1.2]].forEach(function (p) { K.shrub(p[0], p[1], 0.45 + K.rand() * 0.25); });
     K.stage('external');
     streetLight(-1.0, zK - 0.4, 0.9); streetLight(19.0, zK - 0.4, 0.9);
+    });   // end of the external works (full model only)
 
     // ── snagging + handover: building name on the canopy, balcony planters ──
     K.stage('snag');
-    letters('VAULT HOUSE', R0, 9.0, cyB + 0.03, -0.015 - cd - 0.008, 0.14);
-    balcPlants.forEach(function (b) {
-      var c = P(b[0], b[1], b[2]);
-      K.cyl('terracotta', c[0], b[3] + 0.2, c[1], 0.17, 0.4); K.sph('plant', c[0], b[3] + 0.55, c[1], 0.26, 0.26, 0.26, { color: pick([0x3c6b35, 0x2f5a2c, 0x4b7a3c]) });
-    });
+    if (CANOPY) letters('VAULT HOUSE', R0, 9.0, cyB + 0.03, -0.015 - cd - 0.008, 0.14);
+    K.fine(function () {
+      balcPlants.forEach(function (b) {
+        var c = P(b[0], b[1], b[2]);
+        K.cyl('terracotta', c[0], b[3] + 0.2, c[1], 0.17, 0.4); K.sph('plant', c[0], b[3] + 0.55, c[1], 0.26, 0.26, 0.26, { color: pick([0x3c6b35, 0x2f5a2c, 0x4b7a3c]) });
+      });
 
-    // ── neighbours (blueprint ghosts) and the finished silhouette ──
-    K.ghost(function () {
-      K.box('brick', -16.0, 9.0, -6.5, 12.0, 18.0, 13.0);
-      K.box('brick', 31.0, 6.75, -5.5, 12.0, 13.5, 11.0);
+      // ── neighbours (blueprint ghosts) ──
+      K.ghost(function () {
+        K.box('brick', -16.0, 9.0, -6.5, 12.0, 18.0, 13.0);
+        K.box('brick', 31.0, 6.75, -5.5, 12.0, 13.5, 11.0);
+      });
     });
+    // the finished silhouette
+
     K.env(0, -0.15, -D, W, PAR, 0);
     K.env(OV.x0, ROOF, OV.z0, OV.x1, ROOF + OV.h, OV.z1);
     [[2.475, 6.3], [11.7, 15.525]].forEach(function (t) { K.env(t[0], FFL(1) - 0.24, 0, t[1], FFL(NS - 1) + 1.15, 1.515); K.env(t[0], FFL(1) - 0.24, -D - 1.515, t[1], FFL(NS - 1) + 1.15, -D); });
