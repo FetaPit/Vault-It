@@ -621,7 +621,7 @@
     // composite door mouldings: the kit's 0xdddddd tint now renders literally white; use a lighter shade of the door colour
     K.items.forEach(function (it) { if (it.m === 'doorGrey' && it.c === 0xdddddd) it.c = 0x5a6067; });
     K.stage('masonry');
-    K.env(-vg, eave, -D - ov, W + vg, ridge + 0.1, ov); K.env(PX0 - ov, eave, 0, PX1 + ov, pRidge + 0.1, PZ + vg); K.env(W, gEave, GZ1 - ov, GX1 + vg, gRidge + 0.1, GZ0 + ov);
+    K.env(-vg, eave, -D - ov, W + vg, ridge + 0.1, ov, { k: 'gable', axis: 'x' }); K.env(PX0 - ov, eave, 0, PX1 + ov, pRidge + 0.1, PZ + vg, { k: 'gable', axis: 'z' }); K.env(W, gEave, GZ1 - ov, GX1 + vg, gRidge + 0.1, GZ0 + ov, { k: 'gable', axis: 'z' });
     K.anchor('front', W / 2, 1.5, 0); K.anchor('top', W / 2, ridge, -D / 2);
     return {
       name: 'Modern detached house',

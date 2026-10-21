@@ -9,7 +9,7 @@ const { chromium } = require('playwright');
   await pg.goto('file://' + __dirname + '/hb3d_harness.html'); await pg.waitForTimeout(300);
   for (const s of shots) {
     const r = await pg.evaluate((s) => {
-      const res = show(s.type || 'flat', s.p == null ? 1 : s.p, s.mode || 'complete', { floor: s.floor, eq: s.eq }); if (s.lights != null) V.setState({ lights: s.lights });
+      const res = show(s.type || 'flat', s.p == null ? 1 : s.p, s.mode || 'complete', { floor: s.floor, eq: s.eq, detail: s.detail }); if (s.lights != null) V.setState({ lights: s.lights });
       const c = V.controls;
       if (s.tx != null) c.target.set(s.tx, s.ty, s.tz);
       const d = s.dist || V.distance(), az = (s.az == null ? 30 : s.az) * Math.PI / 180, el = (s.el == null ? 20 : s.el) * Math.PI / 180;

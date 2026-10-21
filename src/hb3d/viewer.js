@@ -196,6 +196,7 @@
   // Normalises the scene to metres (ground at y 0, front face on z 0, centred on x) and wraps it as a model the viewer
   // and the app treat like the built-in houses: hologram build during the deposit, graded colour once owned.
   // meta: { name, realSize (Meshy auto_size output is already in metres), source }
+  var UK_CH = 0.075;
   H.customModel = function (root, meta) {
     meta = meta || {};
     root.updateMatrixWorld(true);
@@ -211,12 +212,13 @@
     wrap.traverse(function (o) { if (o.isMesh) meshes++; });
     // Brick estimate for the HUD: external wall area (≈ 72% of the height is wall, 18% openings) × 60 UK bricks per m²
     var wallH = Hh * 0.72, bricks = Math.max(1000, Math.round(2 * (W + D) * wallH * 0.82 * 60)), tiles = Math.round(W * D * 1.25 * 10);
+    var rows = { y0: 0, y1: Hh, n: Math.max(1, Math.round(Hh / UK_CH)), ch: UK_CH };
     var stats = function (p) {
-      var st = H.stageAt(p), k = Math.max(0, Math.min(1, p));
-      return { bricksLaid: Math.round(bricks * k), bricksTotal: bricks, blocksLaid: 0, tilesLaid: Math.round(tiles * k), tilesTotal: tiles, stage: st.name, stageKey: st.key };
+      var k = Math.max(0, Math.min(1, p)), r = k <= 0 ? 0 : Math.min(rows.n, Math.floor(k * rows.n - 1e-9) + 1);
+      return { bricksLaid: Math.round(bricks * k), bricksTotal: bricks, blocksLaid: 0, tilesLaid: Math.round(tiles * k), tilesTotal: tiles, stage: 'Row ' + r + ' of ' + rows.n, stageKey: 'rows' };
     };
     return {
-      type: 'custom', custom: wrap, name: meta.name || 'Your design', source: meta.source || 'upload', batches: [], anchors: {}, focus: null,
+      type: 'custom', custom: wrap, clean: true, rows: rows, name: meta.name || 'Your design', source: meta.source || 'upload', batches: [], anchors: {}, focus: null,
       envelope: [[-W / 2, 0, -D, W / 2, Hh, 0]], bounds: { min: [-W / 2, 0, -D], max: [W / 2, Hh, 0] }, height: Hh,
       counts: { bricks: bricks, blocks: 0, tiles: tiles }, instances: meshes, info: { width: W, depth: D, height: Hh, scale: sc, estimated: true },
       stats: stats, brickT: function (i) { return Math.max(0, Math.min(1, i / bricks)); }
@@ -300,6 +302,7 @@
       if (!self.active) return;
       var moving = self.controls.update();
       if (self._anim) moving = self._stepAnim() || moving;
+      if (self._fly) moving = self._stepFly() || moving;
       if (self.dirty || moving) { self.render(); self.dirty = false; self._idle = 0; } else self._idle++;
       if (self._idle > 45) return;                         // nothing moving for ~0.75 s: sleep until woken
       self._raf = requestAnimationFrame(self._loop);
@@ -350,6 +353,7 @@
     if (this.edges) { this.root.remove(this.edges); this.edges.geometry.dispose(); this.edges = null; }
     if (this.water) { this.root.remove(this.water); this.water = null; }
     if (this.focusBox) { this.root.remove(this.focusBox); this.focusBox.geometry.dispose(); this.focusBox = null; }
+    if (this.rowBand) { this.root.remove(this.rowBand); this.rowBand = null; }
     if (this.site) { this.root.remove(this.site); this.site = null; }
     if (this.model && this.model.custom) this.root.remove(this.model.custom);   // kept intact: the app caches the model
   };
@@ -396,7 +400,17 @@
     // blueprint edges of the finished envelope (silhouette of the final house)
     var pos = [];
     (model.envelope || []).forEach(function (e) {
-      var x0 = e[0], y0 = e[1], z0 = e[2], x1 = e[3], y1 = e[4], z1 = e[5];
+      var x0 = e[0], y0 = e[1], z0 = e[2], x1 = e[3], y1 = e[4], z1 = e[5], sh = e[6], seg = function (a, b) { pos.push(a[0], a[1], a[2], b[0], b[1], b[2]); };
+      if (sh && (sh.k === 'gable' || sh.k === 'hip')) {   // pitched roof outline: eaves rectangle, ridge, and the gable / hip lines
+        var X = sh.axis === 'x', zm = (z0 + z1) / 2, xm = (x0 + x1) / 2, hh = Math.min(x1 - x0, z1 - z0) / 2;
+        var h0 = sh.k === 'hip' && (!sh.hips || sh.hips[0]) ? hh : 0, h1 = sh.k === 'hip' && (!sh.hips || sh.hips[1]) ? hh : 0;   // hipped ends shorten the ridge
+        var r0 = X ? [x0 + h0, y1, zm] : [xm, y1, z0 + h0], r1 = X ? [x1 - h1, y1, zm] : [xm, y1, z1 - h1];
+        var c = [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]];
+        for (var q = 0; q < 4; q++) seg(c[q], c[(q + 1) % 4]);
+        seg(r0, r1);
+        if (X) { seg(c[0], r0); seg(c[3], r0); seg(c[1], r1); seg(c[2], r1); } else { seg(c[0], r0); seg(c[1], r0); seg(c[3], r1); seg(c[2], r1); }
+        return;
+      }
       var c = [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1], [x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]];
       [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]].forEach(function (s) { pos.push.apply(pos, c[s[0]]); pos.push.apply(pos, c[s[1]]); });
     });
@@ -411,6 +425,17 @@
     this.water = new THREE.LineSegments(wg, new THREE.LineBasicMaterial({ color: col(0xe8c56a), transparent: true, opacity: 0.95 }));
     this.water.position.set((bb.min[0] + bb.max[0]) / 2, 0, (bb.min[2] + bb.max[2]) / 2);
     this.water.visible = false; this.root.add(this.water);
+    // the current row: a gold band (outline + glassy plane) at the exact height the deposit has built to
+    this.rowBand = null;
+    if (model.rows) {
+      var bx = bb.min[0] - 0.35, bX = bb.max[0] + 0.35, bz = bb.min[2] - 0.35, bZ = bb.max[2] + 0.35;
+      var rg = new THREE.Group(), pts = [bx, 0, bz, bX, 0, bz, bX, 0, bz, bX, 0, bZ, bX, 0, bZ, bx, 0, bZ, bx, 0, bZ, bx, 0, bz];
+      var lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+      var ln = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: col(0xf3d27a), transparent: true, opacity: 1, depthTest: false, depthWrite: false }));
+      var pl = new THREE.Mesh(new THREE.PlaneBufferGeometry(bX - bx, bZ - bz), new THREE.MeshBasicMaterial({ color: col(0xe8c56a), transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false }));
+      pl.rotation.x = -Math.PI / 2; pl.position.set((bx + bX) / 2, 0, (bz + bZ) / 2);
+      ln.renderOrder = 9; pl.renderOrder = 8; rg.add(pl); rg.add(ln); rg.visible = false; this.root.add(rg); this.rowBand = rg;
+    }
     // the user's own floor (flats / apartments): a gold frame that marks it in every mode
     if (model.focus) {
       var F = model.focus, fh = Math.max(0.2, F.y1 - F.y0);
@@ -492,7 +517,7 @@
   VP.apply = function () {
     var self = this, m = this.model; if (!m) { this.dirty = true; return; }
     var mode = this.mode, p = mode === 'build' ? this.p : (mode === 'site' ? 0 : 1), F = m.focus;
-    var y0 = F ? F.y0 : 0, y1 = F ? F.y1 : Math.max(0.5, m.height), clipY = y0 + this.eq * (y1 - y0);
+    var y0 = F ? F.y0 : (m.rows ? m.rows.y0 : 0), y1 = F ? F.y1 : (m.rows ? m.rows.y1 : Math.max(0.5, m.height)), clipY = y0 + this.eq * (y1 - y0);
     var below = new THREE.Plane(new THREE.Vector3(0, -1, 0), clipY), above = new THREE.Plane(new THREE.Vector3(0, 1, 0), -clipY);
     if (this._cust) {   // uploaded / AI design: the hologram rises with the deposit; colour fills up to the owned share
       var C = this._cust, hb = (mode === 'build' ? p : 0) * y1 + (mode === 'build' && p >= 1 ? 1 : 0);
@@ -501,8 +526,8 @@
       var clip = function (arr, pl) { arr.forEach(function (mm) { mm.clippingPlanes = [pl]; }); };
       if (mode === 'equity') { vis(C.solid, true); vis(C.holo, true); vis(C.blue, false); clip(C.solidMats, below); clip(C.holoMats, above); }
       else if (mode === 'complete') { vis(C.solid, true); vis(C.holo, false); vis(C.blue, false); clip(C.solidMats, IDLE_PLANE); }
-      else if (mode === 'site') { vis(C.solid, false); vis(C.holo, false); vis(C.blue, true); clip(C.blueMats, IDLE_PLANE); }
-      else { vis(C.solid, false); vis(C.holo, true); vis(C.blue, true); clip(C.holoMats, bBelow); clip(C.blueMats, bAbove); }
+      else if (mode === 'site') { vis(C.solid, false); vis(C.holo, false); vis(C.blue, false); }
+      else { vis(C.solid, false); vis(C.holo, true); vis(C.blue, false); clip(C.holoMats, bBelow); }   // hologram up to the current row; the rest is just the outline
       this.edges && (this.edges.visible = mode === 'build' || mode === 'site');
     }
     this.batches.forEach(function (B) {
@@ -511,7 +536,24 @@
         B.main.count = 0; B.rev.count = n; B.rev.material = mats.nb; B.rev.visible = true; B.main.visible = false; return;
       }
       if (F && !b.focus) {   // the rest of the block: constant faint hologram (no site temporaries)
-        B.rev.visible = false; B.main.visible = !temp; B.main.count = n; B.main.material = mats.ctx; mats.ctx.clippingPlanes = [IDLE_PLANE];
+        B.rev.visible = false; B.main.visible = !temp; B.main.count = n; B.main.castShadow = false;
+        B.main.material = m.clean ? mats.blue : mats.ctx;   // clean shell: the rest of the block is a plain faint silhouette, so only your floor stands out
+        mats.ctx.clippingPlanes = [IDLE_PLANE]; mats.blue.clippingPlanes = [IDLE_PLANE];
+        return;
+      }
+      var shadows = !b.ghost && !mats.def.glass && b.mat !== 'string' && b.mat !== 'felt' && b.shape !== 'sph';
+      if (m.clean) {   // clean shell: everything is built by height, so the waterline and the build height both just move through the sorted instances
+        var kq = mode === 'equity' ? upper(b.t, F ? this.eq : (clipY - y0) / Math.max(1e-6, y1 - y0)) : k;
+        if (mode === 'equity') {
+          B.main.visible = !temp && kq > 0; B.rev.visible = !temp && n - kq > 0; B.main.count = kq; B.rev.count = n - kq;
+          B.main.material = mats.solid; B.rev.material = mats.ghost; mats.solid.clippingPlanes = [IDLE_PLANE]; mats.ghost.clippingPlanes = [IDLE_PLANE];
+        } else if (mode === 'complete') {
+          B.main.visible = !temp; B.rev.visible = false; B.main.count = n; B.main.material = mats.solid; mats.solid.clippingPlanes = [IDLE_PLANE];
+        } else {         // build (deposit) / site: hologram up to the current row; the rest is just the outline
+          B.main.visible = k > 0 && !temp; B.rev.visible = false; B.main.count = k; B.main.material = mats.ghost; mats.ghost.clippingPlanes = [IDLE_PLANE];
+        }
+        B.main.castShadow = shadows && (mode === 'complete' || mode === 'equity');
+        if (mats.def.glass) { var on0 = self.lights; [mats.solid, mats.ghost].forEach(function (mm) { mm.emissive = col(on0 ? 0xffb35c : (mm === mats.ghost ? 0x0b3b38 : 0x000000)); mm.emissiveIntensity = on0 ? 0.55 : (mm === mats.ghost ? 0.55 : 0); }); }
         return;
       }
       if (mode === 'equity') {
@@ -534,14 +576,19 @@
         [mats.solid, mats.ghost].forEach(function (mm) { mm.emissive = col(on ? 0xffb35c : (mm === mats.ghost ? 0x0b3b38 : 0x000000)); mm.emissiveIntensity = on ? 0.55 : (mm === mats.ghost ? 0.55 : 0); });
       }
     });
-    if (this.edges) {
+    if (this.edges) {   // outline of the finished house: only above the current row once the walls are going up
+      var hb = m.rows ? m.rows.y0 + (mode === 'build' ? p : 0) * (m.rows.y1 - m.rows.y0) : 0, above2 = new THREE.Plane(new THREE.Vector3(0, 1, 0), -hb);
       this.edges.visible = !F && ((mode === 'build' && p < 1) || mode === 'site');
-      this.edges.material.clippingPlanes = [IDLE_PLANE];
-      this.edges.material.opacity = 0.14 + 0.22 * (1 - p);
+      this.edges.material.clippingPlanes = m.clean && mode === 'build' ? [above2] : [IDLE_PLANE];
+      this.edges.material.opacity = m.clean ? 0.55 : 0.14 + 0.22 * (1 - p);
+    }
+    if (this.rowBand) {
+      this.rowBand.visible = mode === 'build' && p > 0 && p < 0.9999;
+      this.rowBand.position.y = m.rows.y0 + p * (m.rows.y1 - m.rows.y0);
     }
     if (this.water) { this.water.visible = mode === 'equity'; this.water.position.y = clipY; }
     if (this.focusBox) this.focusBox.visible = true;
-    this.dirty = true; this._shadowDirty = true; this.wake();
+    this.dirty = true; if (mode !== 'build' || this._lastMode !== 'build') this._shadowDirty = true; this._lastMode = mode; this.wake();   // no shadows while building: the hologram casts none (one refresh clears any old shadow)
   };
 
   // project a world point to container pixels (for DOM overlays)
@@ -549,7 +596,27 @@
     var v = new THREE.Vector3(x, y, z).project(this.camera), w = this.el.clientWidth, h = this.el.clientHeight;
     return { x: (v.x + 1) / 2 * w, y: (1 - v.y) / 2 * h, behind: v.z > 1 };
   };
-  VP.waterline = function () { var m = this.model; if (!m) return 0; var F = m.focus; return F ? F.y0 + this.eq * (F.y1 - F.y0) : this.eq * Math.max(0.5, m.height); };
+  // the row the deposit has built to: { y, row, rows, p, ratio }  (build mode; p = deposit % funded)
+  VP.rowInfo = function () {
+    var m = this.model; if (!m || !m.rows) return null;
+    var p = this.mode === 'build' ? this.p : (this.mode === 'site' ? 0 : 1), R = m.rows;
+    return { y: R.y0 + p * (R.y1 - R.y0), row: p <= 0 ? 0 : Math.min(R.n, Math.floor(p * R.n - 1e-9) + 1), rows: R.n, p: p };
+  };
+  // glide the camera to look at the current row (and in a little)
+  VP.flyToRow = function (ms) {
+    var ri = this.rowInfo(); if (!ri) return;
+    var bb = this.model.bounds, tgt = new THREE.Vector3((bb.min[0] + bb.max[0]) / 2, Math.max(0.3, ri.y), (bb.min[2] + bb.max[2]) / 2);
+    this._fly = { t0: performance.now(), ms: ms || 650, from: this.controls.target.clone(), to: tgt, z0: this.zoom(), z1: Math.max(this.zoom(), 1.9) };
+    this.dirty = true; this.wake();
+  };
+  VP._stepFly = function () {
+    var f = this._fly, k = Math.min(1, (performance.now() - f.t0) / f.ms), e = 1 - Math.pow(1 - k, 3);
+    var tgt = new THREE.Vector3().lerpVectors(f.from, f.to, e), d = new THREE.Vector3().subVectors(this.camera.position, this.controls.target);
+    this.controls.target.copy(tgt); this.camera.position.copy(tgt).add(d); this.setZoom(f.z0 + (f.z1 - f.z0) * e);
+    if (k >= 1) this._fly = null;
+    return true;
+  };
+  VP.waterline = function () { var m = this.model; if (!m) return 0; var F = m.focus; return F ? F.y0 + this.eq * (F.y1 - F.y0) : (m.rows ? m.rows.y0 + this.eq * (m.rows.y1 - m.rows.y0) : this.eq * Math.max(0.5, m.height)); };
   VP.dispose = function () {
     this.stop(); this._clear();
     if (this._ro) this._ro.disconnect();

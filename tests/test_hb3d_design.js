@@ -40,12 +40,14 @@ const ST = () => { const v = HB3D.viewer, C = v && v._cust; return { engine: doc
   r = await p.evaluate(ST);
   console.log(JSON.stringify({ type: r.type, mode: r.mode, h: r.h, info: r.info, card: r.card.slice(0, 160) }));
   ok(r.type === 'custom' && r.custom, 'uploaded design becomes the House Builder house');
-  ok(r.mode === 'build' && r.holo && r.blue && !r.solid, 'deposit stage: design shown as a hologram rising over a blueprint (no full colour yet)');
+  ok(r.mode === 'build' && r.holo && !r.blue && !r.solid, 'deposit stage: design shown as a hologram rising to the current row (no full colour yet, remainder is an outline)');
   ok(r.h > 6 && r.h < 11, 'unknown units are sized as a real two-storey house (' + r.h.toFixed(2) + ' m)');
   ok(/Uploaded design/.test(r.card) && /hologram/i.test(r.card), 'design card shows the design and how it is used');
   ok(/UK bricks/i.test(r.hud), 'HUD counts (estimated) bricks for the design');
   const vp = await p.evaluate(() => { const v = HB3D.viewer, C = v._cust; return { p: v.p, clip: C.holoMats[0].clippingPlanes[0].constant, H: v.model.height }; });
   ok(Math.abs(vp.clip - vp.p * vp.H) < 0.05, 'hologram height follows the deposit (' + (vp.clip / vp.H * 100).toFixed(0) + '% of the house at ' + (vp.p * 100).toFixed(0) + '% saved)');
+  const rb = await p.evaluate(() => { const v = HB3D.viewer; return { band: v.rowBand && v.rowBand.visible, y: v.rowBand && v.rowBand.position.y, H: v.model.height, ri: v.rowInfo(), label: document.getElementById('hb3d-rowlabel').innerText }; });
+  ok(rb.band && Math.abs(rb.y - 0.5 * rb.H) < 0.05 && /ROW \d+ \/ \d+/.test(rb.label), 'the design also shows the current row (' + rb.label.replace(/\n/g, ' ') + ')');
   await p.screenshot({ path: 'shots/hb3d/design_upload_build.png' });
 
   // ── mortgage stage: colour below the owned share, hologram above

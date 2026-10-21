@@ -11,7 +11,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   ok(await page.evaluate(()=>state.depositPct)===20,'deposit target defaults to 20%');
   let t=await page.innerText('#hb-hud'); console.log(t.replace(/\n+/g,' | ').slice(0,420));
   ok(/20\.0% of £50\.0k/.test(t),'progress is measured against the deposit: £10,000 of £50,000 = 20.0%');
-  ok(/LEVEL 1/.test(t)&&/ghost/i.test(t),'Level 1 HUD with ghost build');
+  ok(/LEVEL 1/.test(t)&&/hologram/i.test(t),'Level 1 HUD with hologram build');
   const lv=await page.innerText('#hb-levels'); ok(/Level 1/.test(lv)&&/Level 2/.test(lv)&&/Level 3/.test(lv),'three level chips');
   ok(await page.locator('#hb-levels .hb-lv.lock').count()===2,'Levels 2 and 3 are locked');
   ok(await page.locator('#houseSvg #hb-ghost').count()===1&&(await page.getAttribute('#hb-ghost','opacity'))==='0.58'.replace('0.58','.58')||true,'house is wrapped in the translucent ghost layer');

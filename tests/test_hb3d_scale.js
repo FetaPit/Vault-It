@@ -85,4 +85,27 @@ TYPES.forEach(function (type) {
     ok(!!m2 && m2.instances > 0, type + ': builds for floor 1');
   }
 });
+// ── clean shell (what the app shows): same UK-size bricks, far fewer parts, built by height, no scaffolding / ghosts / landscaping ──
+var CLEAN_BUDGET = { terraced: 26000, semi: 16000, detached: 20000, mansion: 70000, flat: 14000, apartment: 14000 };
+TYPES.forEach(function (type) {
+  if (!H.models[type]) return;
+  var opts = (type === 'flat' || type === 'apartment') ? { floor: type === 'flat' ? 2 : 5 } : {};
+  var KC = new H.Kit({ seed: 11, detail: 'clean' }), meta = H.models[type](KC, opts) || {};
+  var t0 = Date.now(), mc = KC.compile(Object.assign({ type: type }, meta)), ms = Date.now() - t0;
+  console.log('— ' + type + ' (clean): ' + mc.counts.bricks + ' bricks, ' + mc.counts.tiles + ' tiles, ' + mc.instances + ' instances, ' + (mc.rows ? mc.rows.n + ' rows' : 'no rows'));
+  ok(mc.clean && !!mc.rows && mc.rows.n >= 20 && mc.rows.n < 400, type + ' clean: has brick rows (' + (mc.rows && mc.rows.n) + ')');
+  ok(mc.instances <= (CLEAN_BUDGET[type] || 60000), type + ' clean: instances within budget ' + mc.instances + ' ≤ ' + (CLEAN_BUDGET[type] || 60000));
+  ok(KC.items.every(function (it) { return !it.g && it.h >= 2 && it.st !== 'external' && it.st !== 'setout'; }), type + ' clean: no scaffolding, ghost neighbours or landscaping');
+  ok(!KC.items.some(function (it) { return it.m === 'scaffold' || it.m === 'scaffoldBoard' || it.m === 'fence' || it.m === 'paving' || it.m === 'grass' || it.m === 'plant'; }), type + ' clean: nothing from the dropped materials');
+  var offB = KC.items.filter(function (it) { if (it.k !== 'brick') return false; var d = [it.sx, it.sy, it.sz].sort(function (a, b) { return a - b; }); return !(d[0] >= 0.02 && d[0] <= UK.BH + 0.002 && d[1] <= UK.BW + 0.002 && d[2] <= UK.BL + 0.002); }).length;
+  ok(offB === 0, type + ' clean: every brick is UK size or a cut (' + offB + ' off)');
+  ok(mc.stats(0).bricksLaid === 0 && mc.stats(1).bricksLaid === mc.counts.bricks, type + ' clean: nothing laid at 0%, everything at 100%');
+  // build % == deposit %: an item is laid exactly when the build height reaches its top, so bricks laid never run ahead of the height
+  var H1 = mc.rows.y1 - mc.rows.y0, bad = 0;
+  KC.items.forEach(function (it) { if (it.k !== 'brick' || (mc.focus && !it.f)) return; var top = it.y + H._extents(it)[1], tt = Math.max(0, Math.min(1, (top - mc.rows.y0) / H1)); if (Math.abs(it.t - tt * 0.9999) > 1e-6) bad++; });
+  ok(bad === 0, type + ' clean: every brick is laid when the build height reaches its top (' + bad + ' off)');
+  var s25 = mc.stats(0.25), s50 = mc.stats(0.5), s75 = mc.stats(0.75);
+  ok(s25.bricksLaid <= s50.bricksLaid && s50.bricksLaid <= s75.bricksLaid && s25.bricksLaid > 0, type + ' clean: bricks laid rise with the deposit (' + s25.bricksLaid + ' → ' + s50.bricksLaid + ' → ' + s75.bricksLaid + ')');
+  ok(ms < 2000, type + ' clean: compiles in < 2 s (' + ms + ' ms)');
+});
 console.log(fails ? fails + ' FAILED' : 'ALL PASSED');

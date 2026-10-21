@@ -406,7 +406,7 @@
       var r = RUN(e[0][0], e[0][1], e[1][0], e[1][1]), g0 = P(r, -0.02, -0.08), g1 = P(r, r.L + 0.02, -0.08);
       K.tube('gutter', [g0[0], FY + 0.03, g0[1]], [g1[0], FY + 0.03, g1[1]], 0.056, {});
     });
-    K.env(-OV, EAVE, -D - OV, W, RIDGE, OV);
+    K.env(-OV, EAVE, -D - OV, W, RIDGE, OV, { k: 'hip', axis: 'x', hips: [true, false] });   // hipped at our end, runs on to the party wall
 
     // ═══ 6. FIT-OUT: casements with leaded top lights, sunrise front door, French doors, side door, rainwater ═══
     K.stage('fitout');

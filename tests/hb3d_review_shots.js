@@ -4,7 +4,7 @@
 const path = require('path'), fs = require('fs');
 const { chromium } = require('playwright');
 (async () => {
-  const [type, outdir, floorArg] = process.argv.slice(2);
+  const [type, outdir, floorArg, detailArg] = process.argv.slice(2); const detail = detailArg || 'clean';
   const floor = floorArg ? +floorArg : 5;
   fs.mkdirSync(outdir, { recursive: true });
   const b = await chromium.launch();
@@ -33,8 +33,8 @@ const { chromium } = require('playwright');
   ];
   const results = [];
   for (const s of SHOTS) {
-    const r = await pg.evaluate(([type, floor, s]) => {
-      const res = show(type, s.p, s.mode, { floor: floor, eq: s.eq || 0 });
+    const r = await pg.evaluate(([type, floor, s, detail]) => {
+      const res = show(type, s.p, s.mode, { floor: floor, eq: s.eq || 0, detail: detail });
       const c = V.controls, bb = M.bounds;
       if (s.f != null) {
         const cx = s.x === 'corner' ? bb.max[0] - 0.3 : (bb.min[0] + bb.max[0]) / 2;
@@ -45,7 +45,7 @@ const { chromium } = require('playwright');
       if (s.zoom) V.setZoom(s.zoom);
       c.update(); V.render();
       return { build: res.build, render: res.render, inst: res.inst, counts: res.counts, height: res.height, stats: res.stats };
-    }, [type, floor, s]);
+    }, [type, floor, s, detail]);
     await pg.waitForTimeout(120);
     const out = path.join(outdir, type + '_' + s.n + '.png');
     await pg.screenshot({ path: out });

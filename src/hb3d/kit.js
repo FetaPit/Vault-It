@@ -64,6 +64,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this.cur = 'masonry';
     this.ghostDepth = 0;
     this.brickPalette = opts.palette || 'red';
+    this.clean = opts.detail === 'clean';   // clean shell: no scaffolding, ghosts, landscaping, interiors, gutters or furniture; built by height
+    this.shells = [];         // outer-face loops of the buildings walled by wallLoop (the interior test of the clean profile)
     this.roofs = [];          // pitched roofs built so far (roofGable registers itself; chimneys look them up)
     this._pendingStacks = []; // stacks given only roofY, re-laid roof-aware when the roof under them is built
     this._stackFlash = [];    // chimney flashings waiting for the roof covering under them
@@ -74,8 +76,15 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   // ── stage / ghost control ──
   KP.stage = function (key) { if (!STAGE_BY[key]) throw new Error('unknown stage ' + key); this.cur = key; return this; };
   KP.ghost = function (fn) { this.ghostDepth++; try { fn.call(this, this); } finally { this.ghostDepth--; } return this; };
+  // detail that belongs only to the full model (scaffolding, landscaping, interiors, furniture): skipped in the clean shell
+  // register a building outline (outer-face loop, y range) for the clean shell's interior test — for models that lay their own walls
+  KP.shell = function (pts, y0, y1, ins) { this.shells.push({ pts: pts.map(function (q) { return [q[0], q[1]]; }), y0: y0, y1: y1, ins: ins || 0.125 }); return this; };
+  // clean shell: drop everything whose centre lies in this box (hidden walls, e.g. a main wall behind a wing)
+  KP.hide = function (x0, y0, z0, x1, y1, z1) { (this.hides = this.hides || []).push([Math.min(x0, x1), Math.min(y0, y1), Math.min(z0, z1), Math.max(x0, x1), Math.max(y0, y1), Math.max(z0, z1)]); return this; };
+  KP.fine = function (fn) { if (!this.clean) fn.call(this, this); return this; };
   KP.anchor = function (name, x, y, z) { this.anchors[name] = [x, y, z]; return this; };
-  KP.env = function (x0, y0, z0, x1, y1, z1) { this.envelope.push([Math.min(x0, x1), Math.min(y0, y1), Math.min(z0, z1), Math.max(x0, x1), Math.max(y0, y1), Math.max(z0, z1)]); return this; };
+  // shape (optional): {k:'gable'|'hip', axis:'x'|'z'} draws a pitched roof outline instead of a box (ridge along `axis`)
+  KP.env = function (x0, y0, z0, x1, y1, z1, shape) { var e = [Math.min(x0, x1), Math.min(y0, y1), Math.min(z0, z1), Math.max(x0, x1), Math.max(y0, y1), Math.max(z0, z1)]; if (shape) e.push(shape); this.envelope.push(e); return this; };
 
   // ── primitives ──
   // o: { rx, ry, rz (radians, applied Y then X then Z), stage, color (hex), hideAfter (p after which it disappears),
@@ -297,6 +306,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var leaves = opts.leaves || 'cavity', CH = UK.CH, openings = opts.openings || {}, gables = opts.gables || {};
     var party = opts.party || [];
     var nC = Math.round((y1 - y0) / CH);
+    this.shells.push({ pts: pts.map(function (q) { return [q[0], q[1]]; }), y0: y0, y1: y1, ins: 0.125 });   // clean shell keeps only the outer skin (≤ 125 mm behind the face): inner stretchers, leaf, breasts, partitions go
     var ownerParity = function (runIdx, corner, k) { return (corner + k) % 2 === 0; };
     // record openings for later fit-out
     var fit = [];
@@ -733,7 +743,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var sm = (s0 + s1) / 2;
     var P = function (a, s, y) { return alongX ? [a, y, s] : [s, y, a]; };
     this.anchor('ridge', alongX ? (a0 + a1) / 2 : sm, ridgeY, alongX ? sm : (a0 + a1) / 2);
-    this.env(alongX ? a0 : s0, eY, alongX ? s0 : a0, alongX ? a1 : s1, ridgeY, alongX ? s1 : a1);
+    this.env(alongX ? a0 : s0, eY, alongX ? s0 : a0, alongX ? a1 : s1, ridgeY, alongX ? s1 : a1, { k: 'gable', axis: alongX ? 'x' : 'z' });
     this.stage('roofframe');
     // wall plates
     [s0 + UK.WALL / 2, s1 - UK.WALL / 2].forEach(function (s) { var p = P((a0 + a1) / 2, s, eY + 0.025); self.box('timber', p[0], p[1], p[2], alongX ? a1 - a0 : 0.1, 0.05, alongX ? 0.1 : a1 - a0, {}); });
@@ -902,7 +912,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var rx0 = alongX ? x0 + half : (x0 + x1) / 2, rx1 = alongX ? x1 - half : (x0 + x1) / 2;
     var rz0 = alongX ? (z0 + z1) / 2 : z0 + half, rz1 = alongX ? (z0 + z1) / 2 : z1 - half;
     this.anchor('ridge', (rx0 + rx1) / 2, ridgeY, (rz0 + rz1) / 2);
-    this.env(o.x0, eY, o.z0, o.x1, ridgeY, o.z1);
+    this.env(o.x0, eY, o.z0, o.x1, ridgeY, o.z1, { k: 'hip', axis: alongX ? 'x' : 'z' });
     this.stage('roofframe');
     // ridge board + hip rafters + commons at 400 c/c
     if (alongX) this.box('timber', (rx0 + rx1) / 2, ridgeY - 0.03, rz0, Math.max(0.05, rx1 - rx0), 0.15, 0.035, {});
@@ -1545,11 +1555,55 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   };
 
   // ── compile: group items into batches keyed by (shape, material, ghost, hideAfter), assign build time t ──
+  // ── clean-shell profile ──
+  // Keeps what you can see from outside the finished house: real bricks and roof tiles, windows, doors, chimneys, porch/bay.
+  // Drops scaffolding and site temporaries, neighbour ghosts, landscaping, everything below ground, interiors, hidden structure
+  // (inner leaf, insulation, joists, rafters, battens, membranes), rainwater pipes and fine furniture.
+  var CLEAN_DROP_MAT = { scaffold: 1, scaffoldBoard: 1, string: 1, soil: 1, insulation: 1, closer: 1, block: 1, blockPaving: 1, paving: 1, gravel: 1,
+    grass: 1, plant: 1, bark: 1, fence: 1, fencePost: 1, binBlack: 1, binGreen: 1, binBlue: 1, rubber: 1, curtain: 1, brass: 1, steel: 1, dpc: 1,
+    membrane: 1, felt: 1, timber: 1, chipboard: 1, metal: 1, concrete: 1 };
+  function insideShell(it, shells) {
+    var wallUnit = it.k === 'brick' || it.k === 'block' || it.m === 'brick' || it.m === 'brickHidden' || it.m === 'block';   // masonry keeps only the outer skin
+    for (var i = 0; i < shells.length; i++) {
+      var S = shells[i]; if (it.y < S.y0 + 0.02 || it.y > S.y1 - 0.02) continue;
+      var P = S.pts, n = P.length, inside = false, dmin = 1e9;
+      for (var a = 0, b = n - 1; a < n; b = a++) {
+        var xa = P[a][0], za = P[a][1], xb = P[b][0], zb = P[b][1];
+        if ((za > it.z) !== (zb > it.z) && it.x < (xb - xa) * (it.z - za) / (zb - za) + xa) inside = !inside;
+        var dx = xb - xa, dz = zb - za, L2 = dx * dx + dz * dz, t = L2 ? Math.max(0, Math.min(1, ((it.x - xa) * dx + (it.z - za) * dz) / L2)) : 0;
+        dmin = Math.min(dmin, Math.hypot(it.x - (xa + t * dx), it.z - (za + t * dz)));
+      }
+      if (inside && dmin >= (wallUnit ? S.ins : Math.max(S.ins, 0.34))) return true;     // doors, windows and reveals sit in the wall; furniture, floors and partitions don't
+    }
+    return false;
+  }
+  function cleanKeep(it, shells) {
+    if (it.g || it.h < 2 || it.st === 'external' || it.st === 'setout') return false;
+    if (CLEAN_DROP_MAT[it.m]) return false;
+    if (it.m === 'gutter' && it.s === 'cyl') return false;                                // downpipes, swan-necks
+    var e = extents(it);
+    if (it.y + e[1] < 0.005) return false;                                                 // underground
+    if (!it.k && Math.max(e[0], e[1], e[2]) < 0.03 && it.m !== 'glass') return false;     // fixings, clips, brackets
+    if (shells.length && insideShell(it, shells)) return false;                            // interiors
+    return true;
+  }
+
   KP.compile = function (meta) {
     meta = meta || {};
-    var self = this, byStage = {};
+    var self = this, byStage = {}, clean = this.clean;
     // chimney flashings still waiting for a roof (the model built its own roof covering): dress them now
     (this._stackFlash || []).splice(0).forEach(function (f) { f.fn(); });
+    var F = meta.focus || null;
+    if (clean) {
+      var shells = this.shells, hides = this.hides || [];
+      this.items = this.items.filter(function (it) {
+        for (var h = 0; h < hides.length; h++) { var B = hides[h]; if (it.x >= B[0] && it.x <= B[3] && it.y >= B[1] && it.y <= B[4] && it.z >= B[2] && it.z <= B[5]) return false; }
+        return cleanKeep(it, shells);
+      });
+      this.items.forEach(function (it, i) { it.seq = i; });
+      this.envelope = this.envelope.filter(function (e) { return e[1] > -0.5; });
+      this.counts = { bricks: 0, blocks: 0, tiles: 0 };
+    }
     this.items.forEach(function (it) { (byStage[it.st] = byStage[it.st] || []).push(it); });
     Object.keys(byStage).forEach(function (k) {
       var S = STAGE_BY[k], arr = byStage[k], n = arr.length;
@@ -1557,12 +1611,25 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     });
     // Flats / apartments: meta.focus = {y0, y1} is the user's own floor. Its permanent parts are what the deposit builds
     // (re-timed across the whole 0–1 timeline in build order); everything else is context, shown as a faint hologram.
-    var F = meta.focus || null;
     if (F) {
       var FST = { slab: 1, masonry: 1, roofframe: 1, roofcover: 1, fitout: 1, snag: 1 };
       this.items.forEach(function (it) { it.f = (!it.g && it.h >= 2 && FST[it.st] && it.y >= F.y0 && it.y <= F.y1) ? 1 : 0; });
       var fi = this.items.filter(function (it) { return it.f; }).sort(function (a, c) { return a.t - c.t || a.seq - c.seq; });
       fi.forEach(function (it, i) { it.t = 0.02 + 0.979 * (fi.length > 1 ? i / (fi.length - 1) : 1); });
+    }
+    // Clean shell: the house is built BOTTOM-UP BY HEIGHT, so build % == deposit % exactly. An item appears when the build
+    // height reaches its top; rows are the 75 mm brick courses of the house (or of your own floor in a flat).
+    var rows = null;
+    if (clean) {
+      var top = function (it) { return it.y + extents(it)[1]; }, ymax = 0;
+      if (F) { this.items.forEach(function (it) { if (it.f) ymax = Math.max(ymax, top(it)); }); }
+      else this.items.forEach(function (it) { ymax = Math.max(ymax, top(it)); });
+      var y0r = F ? F.y0 : 0, y1r = F ? Math.max(F.y1, y0r + 0.5) : Math.max(ymax, 1);
+      rows = { y0: y0r, y1: y1r, n: Math.max(1, Math.round((y1r - y0r) / UK.CH)), ch: UK.CH };
+      this.items.forEach(function (it) {
+        if (F && !it.f) { it.t = 0; return; }
+        it.t = Math.max(0, Math.min(1, (top(it) - y0r) / (y1r - y0r))) * 0.9999;
+      });
     }
     var batches = {}, order = [];
     this.items.forEach(function (it) {
@@ -1608,11 +1675,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     Object.keys(unitTs).forEach(function (k) { unitTs[k].sort(function (a, c) { return a - c; }); });
     var model = {
       type: meta.type || '', name: meta.name || '', batches: out, anchors: this.anchors, envelope: this.envelope, focus: F ? { y0: F.y0, y1: F.y1 } : null,
+      clean: clean, rows: rows,
       bounds: { min: mn, max: mx }, frame: { min: fmn, max: fmx }, height: mx[1], counts: { bricks: unitTs.brick.length, blocks: unitTs.block.length, tiles: unitTs.tile.length },
       instances: this.items.length, info: meta.info || {},
       stats: function (p) {
         var cnt = function (arr) { var lo = 0, hi = arr.length; while (lo < hi) { var m = (lo + hi) >> 1; if (arr[m] <= p) lo = m + 1; else hi = m; } return lo; };
         var st = H.stageAt(p);
+        if (rows) { var r = p <= 0 ? 0 : Math.min(rows.n, Math.floor(p * rows.n - 1e-9) + 1); st = { name: 'Row ' + r + ' of ' + rows.n, key: 'rows' }; }
         return { bricksLaid: cnt(unitTs.brick), bricksTotal: unitTs.brick.length, blocksLaid: cnt(unitTs.block), tilesLaid: cnt(unitTs.tile), tilesTotal: unitTs.tile.length, stage: st.name, stageKey: st.key };
       },
       // p at which the n-th brick is laid (for HUD maths)
@@ -1626,7 +1695,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   H.build = function (type, opts) {
     opts = opts || {};
     var fn = H.models[type] || H.models.terraced;
-    var K = new Kit({ seed: opts.seed || 11, palette: opts.palette });
+    var K = new Kit({ seed: opts.seed || 11, palette: opts.palette, detail: opts.detail });
     var meta = fn(K, opts) || {};
     var m = K.compile(Object.assign({ type: type }, meta));
     return m;

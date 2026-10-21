@@ -18,6 +18,26 @@ const seed=(o)=>`(function(){if(localStorage.getItem('ht3'))return;localStorage.
   ok(/bricks/.test(r.cap),'caption shows bricks laid');
   await p.screenshot({path:'shots/hb3d/app_l1.png'});
   ok(errs.length===0,'no errors '+errs.slice(0,3).join(' | '));
+  // ── clean shell: no scaffolding / ghosts / landscaping; rows; build % == deposit % funded, exactly
+  const cl=await p.evaluate(()=>{const m=HB3D.viewer.model;const mats={};m.batches.forEach(b=>{mats[b.mat]=(mats[b.mat]||0)+b.count;});return{clean:m.clean,rows:m.rows,scaf:(mats.scaffold||0)+(mats.scaffoldBoard||0),ghost:m.batches.some(b=>b.ghost),temp:m.batches.some(b=>b.hideAfter<2),fence:(mats.fence||0)+(mats.paving||0)+(mats.grass||0),inst:m.instances,band:HB3D.viewer.rowBand&&HB3D.viewer.rowBand.visible,bandY:HB3D.viewer.rowBand&&HB3D.viewer.rowBand.position.y,ri:HB3D.viewer.rowInfo(),label:getComputedStyle(document.getElementById('hb3d-rowlabel')).display,labelTxt:document.getElementById('hb3d-rowlabel').innerText,card:(document.querySelector('.hb-row')||{}).innerText||'',edgesVisible:HB3D.viewer.edges&&HB3D.viewer.edges.visible};});
+  console.log(JSON.stringify(cl).slice(0,500));
+  ok(cl.clean&&cl.scaf===0&&!cl.ghost&&!cl.temp&&cl.fence===0,'clean shell: no scaffolding, ghost neighbours, site temporaries or landscaping');
+  ok(cl.rows&&cl.rows.n>100&&cl.inst<30000,'clean shell: '+(cl.rows&&cl.rows.n)+' brick rows, '+cl.inst+' parts');
+  ok(cl.band&&Math.abs(cl.bandY-(cl.rows.y0+0.4*(cl.rows.y1-cl.rows.y0)))<0.02,'a gold row band sits at 40% of the house height (y='+(cl.bandY||0).toFixed(2)+')');
+  ok(cl.label!=='none'&&/ROW \d+ \/ \d+/i.test(cl.labelTxt)&&/40\.0% OF DEPOSIT/i.test(cl.labelTxt),'the house is labelled with the current row and deposit % ('+cl.labelTxt.replace(/\n/g,' ')+')');
+  ok(/ROW\s*\d+\s*of\s*\d+/i.test(cl.card)&&/to finish this row/i.test(cl.card),'HUD says which row you are on and what is left to finish it');
+  ok(cl.edgesVisible,'the unbuilt remainder is an outline only');
+  await p.evaluate(()=>document.getElementById('hud-row').click()); await p.waitForTimeout(200);
+  ok(await p.evaluate(()=>!!HB3D.viewer._fly||HB3D.viewer.zoom()>1.5),'📍 button glides the camera to the current row');
+  await p.waitForFunction(()=>!HB3D.viewer._fly,null,{timeout:5000}).catch(()=>{});
+  for(const sv of [500,5000,12500,25000,37500,50000,70000]){
+    await p.evaluate(v=>{state.saved=v;state.deposits=[{amount:v,date:'01/10/2026'}];save();updateUI();},sv);
+    await p.waitForFunction(()=>hb3dState().settled,null,{timeout:20000}).catch(()=>{});
+    await p.waitForTimeout(250);
+    const o=await p.evaluate(()=>({p:HB3D.viewer.p,want:Math.min(1,state.saved/depositTarget()),ri:HB3D.viewer.rowInfo(),y:HB3D.viewer.rowBand&&HB3D.viewer.rowBand.position.y,r:HB3D.viewer.model.rows}));
+    ok(Math.abs(o.p-o.want)<1e-6,'build % equals deposit %: £'+sv+' of £50,000 → '+(o.p*100).toFixed(2)+'% (want '+(o.want*100).toFixed(2)+'%)');
+    if(o.want>0&&o.want<0.9999)ok(Math.abs(o.y-(o.r.y0+o.want*(o.r.y1-o.r.y0)))<0.02,'  … and the row band is at '+(o.want*100).toFixed(1)+'% of the height');
+  }
   await p.context().close();
   // fallback: no three.js → SVG, no errors
   errs.length=0;
