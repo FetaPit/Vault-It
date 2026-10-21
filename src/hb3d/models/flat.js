@@ -102,7 +102,9 @@
     function soldiers(o, real) {  // soldier course over the head, mortar behind, backing behind cladding
       var r = runs[o.ri], w = o.u1 - o.u0, n = Math.max(1, Math.round(w / CH)), pitch = w / n, uc = (o.u0 + o.u1) / 2;
       for (var i = 0; i < n; i++) box('brick', r, o.u0 + pitch * (i + 0.5), BW / 2, o.v1 + J + UK.BL / 2, pitch - J, UK.BL, BW, real ? { color: K._brickColor(MYPAL), kind: 'brick' } : { color: K._brickColor('red') });
-      box('mortar', r, uc, 0.006 + (BW - 0.006) / 2, o.v1 + 1.5 * CH, w + J, 3 * CH, BW - 0.006);
+      // (clean shell: the inside of the skin is visible, so the mortar back sits 4 mm inside the brick backs, like the kit's course mortar, to avoid z-fighting)
+      var md = CL ? BW - 0.010 : BW - 0.006;
+      box('mortar', r, uc, 0.006 + md / 2, o.v1 + 1.5 * CH, w + J, 3 * CH, md);
       if (!real) box('block', r, uc, BW + (WALL - BW) / 2, o.v1 + 1.5 * CH, w + J, 3 * CH, WALL - BW, { color: 0x8c8c88 });
     }
     // inner leaf + insulation the wallLoop cut away round an opening (its block rows are 3 courses high)
