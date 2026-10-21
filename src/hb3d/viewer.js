@@ -459,17 +459,18 @@
     var cx = (bb.min[0] + bb.max[0]) / 2, cz = (bb.min[2] + bb.max[2]) / 2, H = Math.max(2, bb.max[1]);
     var rad = Math.sqrt(Math.pow(bb.max[0] - bb.min[0], 2) + Math.pow(bb.max[2] - bb.min[2], 2) + H * H) / 2;
     this._radius = rad;
-    var fov = this.camera.fov * Math.PI / 180, aspect = Math.max(0.5, this.camera.aspect || 1.6);
-    var d = rad / Math.sin(fov / 2) * (aspect < 1 ? 1.15 / aspect : 1.02);
+    var fov = this.camera.fov * Math.PI / 180, aspect = Math.max(0.5, this.camera.aspect || 1.6), aspF = aspect < 1 ? 1.15 / aspect : 1.02;
+    var F = m && m.focus, fRad = F ? Math.max(6, Math.hypot(bb.max[0] - bb.min[0], bb.max[2] - bb.min[2]) / 2 * 1.05) : rad;   // flats: frame YOUR floor, with the block above and below as context
+    var d = fRad / Math.sin(fov / 2) * aspF, dAll = rad / Math.sin(fov / 2) * aspF;
     this.fitDist = d;
     var az = (this.opts.azimuth == null ? 32 : this.opts.azimuth) * Math.PI / 180, el = 20 * Math.PI / 180;
-    var target = new THREE.Vector3(cx, H * (H > 20 ? 0.5 : 0.42), cz + 0.2);   // towers: aim at mid-height so the crown stays in frame
+    var target = new THREE.Vector3(cx, F ? (F.y0 + F.y1) / 2 : H * (H > 20 ? 0.5 : 0.42), cz + 0.2);   // towers: aim at mid-height so the crown stays in frame
     this.controls.target.copy(target);
     this.camera.position.set(target.x + d * Math.sin(az) * Math.cos(el), target.y + d * Math.sin(el), target.z + d * Math.cos(az) * Math.cos(el));
-    this.controls.minDistance = Math.max(1.0, rad * 0.12);
-    this.controls.maxDistance = d * 5;
-    this.camera.near = 0.05; this.camera.far = Math.max(300, d * 8); this.camera.updateProjectionMatrix();
-    this.scene.fog.near = d * 1.6; this.scene.fog.far = d * 4.5;
+    this.controls.minDistance = Math.max(1.0, fRad * 0.12);
+    this.controls.maxDistance = Math.max(d * 5, dAll * 1.7);    // always able to pull back to the whole building
+    this.camera.near = 0.05; this.camera.far = Math.max(300, dAll * 8); this.camera.updateProjectionMatrix();
+    this.scene.fog.near = Math.max(d, dAll) * 1.6; this.scene.fog.far = Math.max(d, dAll) * 4.5;
     this.controls.update();
     this.dirty = true;
   };
@@ -536,14 +537,14 @@
         B.main.count = 0; B.rev.count = n; B.rev.material = mats.nb; B.rev.visible = true; B.main.visible = false; return;
       }
       if (F && !b.focus) {   // the rest of the block: constant faint hologram (no site temporaries)
-        B.rev.visible = false; B.main.visible = !temp; B.main.count = n; B.main.castShadow = false;
+        B.rev.visible = false; B.main.visible = !temp; B.main.count = n; B.main.castShadow = false; B.main.receiveShadow = false;   // faint silhouette: no shadows on it
         B.main.material = m.clean ? mats.blue : mats.ctx;   // clean shell: the rest of the block is a plain faint silhouette, so only your floor stands out
         mats.ctx.clippingPlanes = [IDLE_PLANE]; mats.blue.clippingPlanes = [IDLE_PLANE];
         return;
       }
       var shadows = !b.ghost && !mats.def.glass && b.mat !== 'string' && b.mat !== 'felt' && b.shape !== 'sph';
       if (m.clean) {   // clean shell: everything is built by height, so the waterline and the build height both just move through the sorted instances
-        var kq = mode === 'equity' ? upper(b.t, F ? this.eq : (clipY - y0) / Math.max(1e-6, y1 - y0)) : k;
+        var kq = mode === 'equity' ? upper(b.t, F ? self.eq : (clipY - y0) / Math.max(1e-6, y1 - y0)) : k;
         if (mode === 'equity') {
           B.main.visible = !temp && kq > 0; B.rev.visible = !temp && n - kq > 0; B.main.count = kq; B.rev.count = n - kq;
           B.main.material = mats.solid; B.rev.material = mats.ghost; mats.solid.clippingPlanes = [IDLE_PLANE]; mats.ghost.clippingPlanes = [IDLE_PLANE];

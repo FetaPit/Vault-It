@@ -8,6 +8,9 @@
 // frameless glass balustrades and stainless hanger rods, a louvred brick crown screening the roof plant, lift overrun,
 // BMU on a perimeter track with its cleaning cradle, aircraft-warning lights. During the build: hoarding, piling rig,
 // climbing tower crane (jib re-positioned at each climb), edge protection that is struck as each band of floors is clad.
+// CLEAN SHELL (what the app draws): `K.clean` builds only what a viewer sees from outside — the buyer's own floor in real brick
+// (frames, glass, balconies, gold bands) over a plain solid silhouette of everything else (podium, wing, one wall + slab band per
+// floor, crown, roof deck, lift overrun). No structure, interiors, crane, hoarding, edge protection, landscaping or neighbours.
 // PERFORMANCE: only the buyer's own floor (opts.floor, 1–30) is laid in real 3D brick — a cavity wall (facing brick,
 // insulation, blockwork) laid course by course while the frame keeps rising above it; every other floor uses the
 // true-scale brick-slip `cladding` material with real 3D bands, frames, glass and balconies.
@@ -306,6 +309,63 @@
       K.slab(CX0, CZ0, CX1, CZ1, OVR + 0.25, 0.25);   // overrun roof
     }
 
+    function meta() {
+      return {
+        name: 'Residential tower · floor ' + uf + ' of ' + NF,
+        focus: { y0: FFL(uf) - SLAB - 0.02, y1: FFL(uf + 1) - SLAB + 0.02 },   // the user's own floor: what the deposit builds
+        info: { storeys: NF + 2, floors: NF, floor: uf, floorLevel: FFL(uf), floorTop: FFL(uf) + ZTOP, frontage: W, depth: D, podium: Y1,
+          roof: ROOF, eave: ROOF, crown: CROWN, ridge: CROWN, height: OVR + 0.25 }
+      };
+    }
+
+    // ═══ CLEAN SHELL ═══
+    // Everything the finished building shows from outside, and nothing else. The kit builds the buyer's floor bottom-up by height
+    // (rows = its 75 mm courses) and the viewer draws every other part as a flat faint silhouette, so for those parts only the
+    // solid outline matters: one cladding wall per run per floor with its stone slab-edge band, no openings, no fittings.
+    if (K.clean) {
+      K.stage('masonry');
+      // podium (ground + mezzanine) and the amenity wing: solid walls with the stone plinth, mezzanine band and cornice
+      PODS.forEach(function (P) {
+        fillWall(P.r, P.uA, P.uB, [], [0, 0.6, 4.425, YM, 7.725, 8.025, Y1], function (yb, yt) {
+          if (yt <= 0.6 + 1e-6) return { mat: 'stone', d0: -0.03 };
+          if (yb >= 4.425 - 1e-6 && yt <= YM + 1e-6) return { mat: 'stone', d0: -0.025 };
+          if (yb >= 8.025 - 1e-6) return { mat: P.tower && uf === 1 ? 'gold' : 'stone', d0: -0.025 };
+          return { mat: 'cladding', tint: PODIUM };
+        });
+      });
+      wingParapet();
+      K.box('mortarDark', (WX0 + WALL) / 2, Y1 - 0.05, WZ0 / 2, -WX0 - WALL, 0.10, -WZ0 - 2 * WALL);   // wing roof deck (the garden's floor)
+      K.box(FR, (LX0 + LX1) / 2, 4.62 - 0.15, 1.8, LX1 - LX0 + 0.6, 0.30, 3.6);                    // entrance canopy
+      // typical floors: slab-edge band + one solid cladding wall per run; the buyer's floor is laid in real brick instead
+      for (var fl = 1; fl <= NF; fl++) {
+        var fy = FFL(fl);
+        if (fl >= 2) band(fl);
+        if (fl === uf) continue;
+        RUNS.forEach(function (r, ri) { fillWall(r, trimA(ri), trimB(ri, r), [], [fy, fy + ZTOP], function () { return { mat: 'cladding', tint: TOWER }; }); });
+      }
+      // the buyer's floor: SFS-backed half-brick skin laid course by course, then frames, glass and the two front balconies
+      var cf = FFL(uf), cops = {};
+      RUNS.forEach(function (r, ri) { cops[ri] = absOps(floorOps(ri), cf); });
+      K.wallLoop(PTS, { y0: cf, y1: cf + ZTOP, leaves: 'single', palette: 'red', openings: cops });
+      K.stage('fitout');
+      RUNS.forEach(function (r, ri) { cops[ri].forEach(function (o) { windowUnit(r, o, cf + 1.10, 1); }); });
+      [[1, 2], [5, 6]].forEach(function (b) { balcony(bayU(b[0]) - PIER / 2, bayU(b[1]) + BAY + PIER / 2, cf, uf, true); });
+      // crown (louvre openings kept: they shape the skyline), roof deck and the lift overrun as plain solids
+      K.stage('masonry');
+      band(NF + 1);
+      RUNS.forEach(function (r, ri) {
+        var ops = floorOps(ri).map(function (o) { return { u0: o.u0, u1: o.u1, v0: ROOF + 15 * CH, v1: ROOF + HEAD }; });
+        fillWall(r, trimA(ri), trimB(ri, r), ops, [ROOF, ROOF + ZTOP], function () { return { mat: 'cladding', tint: TOWER }; });
+        rbox('stone', r, ri % 2 ? WALL : -0.04, ri % 2 ? r.L - WALL : r.L + 0.04, ROOF + ZTOP, CROWN, -0.04, WALL + 0.10);
+      });
+      K.box('stone', W / 2, ROOF + 0.10, -D / 2, W - 2 * WALL, 0.20, D - 2 * WALL);
+      K.box('stone', (CX0 + CX1) / 2, (ROOF + OVR + 0.25) / 2, (CZ0 + CZ1) / 2, CX1 - CX0, OVR + 0.25 - ROOF, CZ1 - CZ0);
+      K.env(0, 0, -D, W, CROWN, 0); K.env(WX0, 0, WZ0, 0, Y1 + 7 * CH, 0); K.env(CX0, ROOF, CZ0, CX1, OVR + 0.25, CZ1);
+      K.anchor('front', W / 2, 1.5, 0); K.anchor('top', W / 2, CROWN, -D / 2); K.anchor('ridge', W / 2, CROWN, -D / 2);
+      K.anchor('myFloor', W / 2, cf + 1.5, 0.05);
+      return meta();
+    }
+
     // ═══ BUILD ═══
     // setting out + hoarding + welfare cabins
     K.stage('setout');
@@ -423,7 +483,7 @@
     }
     function balcony(x0, x1, f, n, user) {   // precast deck on thermal-break connectors, hung from the slab edge above
       var d = 1.60, zf = 0.025, xc = (x0 + x1) / 2, w = x1 - x0, RM = user ? 'gold' : 'metal', EM = user ? 'gold' : FR;
-      K.box('concrete', xc, f - 0.15, zf + d / 2, w, 0.20, d);
+      K.box(K.clean ? 'stone' : 'concrete', xc, f - 0.15, zf + d / 2, w, 0.20, d);
       K.box('paving', xc, f - 0.04, zf + d / 2 - 0.02, w - 0.10, 0.02, d - 0.12);
       K.box(EM, xc, f - 0.14, zf + d + 0.02, w + 0.02, 0.26, 0.04);
       [x0 + 0.02, x1 - 0.02].forEach(function (x) { K.box(EM, x, f - 0.14, zf + d / 2, 0.04, 0.26, d); });
@@ -618,11 +678,6 @@
     K.env(0, 0, -D, W, CROWN, 0); K.env(WX0, 0, WZ0, 0, Y1 + 7 * CH, 0); K.env(CX0, ROOF, CZ0, CX1, OVR + 0.25, CZ1);
     K.anchor('front', W / 2, 1.5, 0); K.anchor('top', W / 2, CROWN, -D / 2); K.anchor('ridge', W / 2, CROWN, -D / 2);
     K.anchor('myFloor', W / 2, FFL(uf) + 1.5, 0.05);
-    return {
-      name: 'Residential tower · floor ' + uf + ' of ' + NF,
-      focus: { y0: FFL(uf) - SLAB - 0.02, y1: FFL(uf + 1) - SLAB + 0.02 },   // the user's own floor: what the deposit builds
-      info: { storeys: NF + 2, floors: NF, floor: uf, floorLevel: FFL(uf), floorTop: FFL(uf) + ZTOP, frontage: W, depth: D, podium: Y1,
-        roof: ROOF, eave: ROOF, crown: CROWN, ridge: CROWN, height: OVR + 0.25 }
-    };
+    return meta();
   };
 })(HB3D);

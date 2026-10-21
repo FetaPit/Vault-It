@@ -50,3 +50,19 @@ Insert things in the order a builder would (bottom-up courses; floors/scaffold l
 
 ## Previewing
 `node tests/hb3d_shot.js <type> <p> <mode> <out.png> '{"az":30,"el":20,"zoom":1.5,"floor":5,"eq":0.4}'` → screenshot (modes: build, equity, complete, site) and JSON with build time, instance count, brick/tile counts. Harness: `tests/hb3d_harness.html`.
+
+## Clean shell (what the app shows)
+The app builds every model with `HB3D.build(type, {floor, detail:'clean'})` (default for users; `localStorage.vi_hb_detail='full'` shows the full model for development, and the tests build both). The clean shell is what you can see from outside the finished house: real UK bricks and roof tiles, windows (frames + glass), doors, chimneys, porch/bay, cornices. It exists so the viewport is fast and a deposit's progress is easy to read.
+
+**Build by height.** `compile()` times each item by its top: an item appears when the build height reaches it, so *build % == deposit % funded exactly*. `model.rows = {y0,y1,n}` — n rows of 75 mm (the brick courses); the viewer draws a gold band at the current row and the app labels it "ROW n / N". Flats/apartments (`meta.focus`): only the user's floor builds (rows = that floor's courses); every other floor is a plain faint silhouette (flat teal material, no colours/textures) — don't generate detail there in clean mode.
+
+**What the clean compile drops automatically:** neighbour ghosts (`K.ghost`), `hideAfter < 2` temporaries (scaffold, cranes, hoarding, pegs), stage `external` (landscaping), stage `setout`, everything underground, small fixings (< 30 mm), downpipes (`gutter` cylinders), materials `scaffold scaffoldBoard string soil insulation closer block blockPaving paving gravel grass plant bark fence fencePost bins rubber curtain brass steel dpc membrane felt timber chipboard metal concrete`, and — via building outlines — interiors: bricks deeper than 125 mm behind the outer face, other items deeper than 340 mm inside.
+
+**API for models** (all no-ops in the full model):
+- `K.clean` — true when building the clean shell.
+- `K.fine(fn)` — runs `fn` only in the full model; use it for anything not visible from outside (and to skip generating it).
+- `K.hide(x0,y0,z0,x1,y1,z1)` — drop every item whose centre is in the box (e.g. a main-block wall buried behind a wing).
+- `K.shell(pts, y0, y1, ins?)` — register an outer-face loop for the interior test; `wallLoop` registers its own, models that lay their own walls must call this.
+- `K.env(x0,y0,z0,x1,y1,z1, {k:'gable'|'hip', axis:'x'|'z', hips:[a,b]})` — the optional shape draws a pitched-roof outline (the unbuilt remainder is shown as an outline above the current row) instead of a box.
+
+Tests: `node tests/test_hb3d_scale.js <type>` runs the full-model checks and the "(clean)" checks (instance budget, UK-size bricks, rows, height timeline, nothing dropped left behind). Render clean views with `node tests/hb3d_multishot.js '[{"type":"…","detail":"clean","p":0.5,"mode":"build","out":"/abs.png"}]'`.
