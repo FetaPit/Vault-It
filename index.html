@@ -19512,7 +19512,7 @@ function undoPayment(id){
 function renderDebtMapConfirm(){
   var el=document.getElementById('debt-map-confirm');if(!el)return;
   var n=(debtState.debts||[]).length,libs=(alState.liabilities||[]).length,k=(n>0||libs>0)?'debtsMapped':'noDebt';
-  var on=fireMan(k);
+  var on=k==='debtsMapped'?fireDebtsConfirmed():fireMan(k);
   el.innerHTML='<label class="map-tick"><input type="checkbox" '+(on?'checked ':'')+'onchange="fireTick(\''+k+'\',this.checked)"><span><b>'+(k==='debtsMapped'?'I’ve added every debt I owe':'I don’t have any debts')+'</b>'
     +'<small>'+(on?'Confirmed — your Roadmap’s “Map Debts” stage is complete.':'Tick when '+(k==='debtsMapped'?'this list is complete':'you owe nothing on cards, loans, car finance or overdrafts')+'. This is what completes “Map Debts” on your Roadmap.')+'</small></span></label>';
 }
@@ -21324,16 +21324,15 @@ function fireMan(k){return !!(ovState.manual&&ovState.manual[k]);}
 function fireSkipped(k){return !!(ovState.skipped&&ovState.skipped[k]);}
 function fireIsConsumerDebt(d){return !!d&&d.type!=='mortgage'&&d.type!=='student';}   // “Debt Free” = no consumer debt (cards, loans, car finance…)
 function fireNwhPoints(){try{var d=nwhLoad();return d&&d.points?d.points.length:0;}catch(e){return 0;}}
-// one-off: people who listed debts before the “I’ve mapped every debt” tick existed keep that stage
-function fireMigrate(){
-  if(!ovState.manual)ovState.manual={};
-  if(ovState.manual._v2)return;
-  ovState.manual._v2=1;
-  if((debtState.debts||[]).length&&ovState.manual.debtsMapped===undefined)ovState.manual.debtsMapped=true;
-  try{localStorage.setItem(OV_KEY,JSON.stringify(ovState));}catch(e){}
+// People who listed debts before the “I’ve mapped every debt” tick existed keep that stage: a debt created before this date
+// (its id is its creation time) counts as confirmed until the user ticks/unticks it themselves. Read-only: nothing is written.
+var FIRE_TICK_SINCE=1792627200000;   // 2026-10-22 00:00 UTC
+function fireDebtsConfirmed(){
+  var v=ovState.manual&&ovState.manual.debtsMapped;
+  if(v!==undefined)return !!v;
+  return (debtState.debts||[]).some(function(d){return +d.id>0&&+d.id<FIRE_TICK_SINCE;});
 }
 function fireBuildStages(){
-  fireMigrate();
   var nw=computeNetWorth();
   var _vu={};try{_vu=JSON.parse(localStorage.getItem('vi_user')||'{}')||{};}catch(e){}
   var annualExp=cfTotalOut()*12||((+_vu.expenses||0)*12)||24000;
@@ -21347,7 +21346,7 @@ function fireBuildStages(){
   var cOrig=consumer.reduce(function(s,d){return s+(d.original||d.balance||0);},0);
   var libs=(alState.liabilities||[]).length;
   var noDebt=debts.length===0&&fireMan('noDebt');
-  var mapped=(debts.length>0||libs>0)&&fireMan('debtsMapped');
+  var mapped=(debts.length>0||libs>0)&&fireDebtsConfirmed();
   var debtsDone=noDebt||mapped;
   var nothingToCut=debtsDone&&consumer.length===0;            // only a mortgage / student loan: there is no consumer debt to cut
   var cleared=cOrig>0?Math.max(0,Math.min(1,1-cTotal/cOrig)):((nothingToCut||noDebt)?1:0);
@@ -21695,7 +21694,7 @@ function fireShowDetail(idx,opts){
     }
   }
   var ticks=(s.confirms||[]).map(function(c){
-    var on=fireMan(c.k);
+    var on=c.k==='debtsMapped'?fireDebtsConfirmed():fireMan(c.k);
     return '<label class="fd-tick"><input type="checkbox" '+(on?'checked ':'')+'onchange="fireTick(\''+c.k+'\',this.checked)"><span>'+c.lbl+(c.sub?'<small>'+c.sub+'</small>':'')+'</span></label>';
   }).join('');
   var acts=(!s.done&&s.acts?s.acts:[]).map(function(a){return '<button type="button" class="fd-btn" onclick="'+a.fn+'">'+a.lbl+'</button>';}).join('');

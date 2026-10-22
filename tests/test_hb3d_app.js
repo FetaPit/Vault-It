@@ -32,7 +32,7 @@ const seed=(o)=>`(function(){if(localStorage.getItem('ht3'))return;localStorage.
   await p.waitForFunction(()=>!HB3D.viewer._fly,null,{timeout:5000}).catch(()=>{});
   for(const sv of [500,5000,12500,25000,37500,50000,70000]){
     await p.evaluate(v=>{state.saved=v;state.deposits=[{amount:v,date:'01/10/2026'}];save();updateUI();},sv);
-    await p.waitForFunction(()=>hb3dState().settled,null,{timeout:20000}).catch(()=>{});
+    await p.waitForFunction(()=>Math.abs(HB3D.viewer.p-Math.min(1,state.saved/depositTarget()))<1e-6&&!HB3D.viewer._anim,null,{timeout:30000}).catch(()=>{});
     await p.waitForTimeout(250);
     const o=await p.evaluate(()=>({p:HB3D.viewer.p,want:Math.min(1,state.saved/depositTarget()),ri:HB3D.viewer.rowInfo(),y:HB3D.viewer.rowBand&&HB3D.viewer.rowBand.position.y,r:HB3D.viewer.model.rows}));
     ok(Math.abs(o.p-o.want)<1e-6,'build % equals deposit %: £'+sv+' of £50,000 → '+(o.p*100).toFixed(2)+'% (want '+(o.want*100).toFixed(2)+'%)');

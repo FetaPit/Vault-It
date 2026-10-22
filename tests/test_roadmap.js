@@ -17,7 +17,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   await p.evaluate(() => showTab('overview')); await p.waitForTimeout(900);
   // reset everything the roadmap reads, as a post-migration user
   const reset = () => p.evaluate(() => {
-    ovState.snapshots = []; ovState.manual = { _v2: 1 }; ovState.skipped = {}; ovState.income = []; ovState.expenses = [];
+    ovState.snapshots = []; ovState.manual = {}; ovState.skipped = {}; ovState.income = []; ovState.expenses = [];
     debtState.debts = []; alState.liabilities = []; alState.cashAccounts = []; alState.stockPies = [];
     try { localStorage.removeItem('vi_nw_history'); } catch (e) {}
     state.saved = 0; state.target = 250000; state.houseMode = null; state.deposits = [];
@@ -32,7 +32,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
 
   // ── 2. the reported case: debts mapped, other things met, but stage 1 (no snapshot) holds everything back
   await p.evaluate(() => {
-    debtState.debts = [{ id: 1, name: 'Barclaycard', original: 2000, balance: 1500, rate: 21, min: 50, type: 'credit' }, { id: 2, name: 'Car', original: 6000, balance: 5000, rate: 7, min: 150, type: 'car' }];
+    debtState.debts = [{ id: Date.now(), name: 'Barclaycard', original: 2000, balance: 1500, rate: 21, min: 50, type: 'credit' }, { id: Date.now() + 1, name: 'Car', original: 6000, balance: 5000, rate: 7, min: 150, type: 'car' }];
     alState.cashAccounts = [{ id: 1, name: 'Savings', type: 'Savings', balance: 1200 }];
     renderFIREroadmap();
   });
@@ -88,13 +88,13 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
 
   // ── 7. only a student loan + mortgage: no consumer debt to cut, so those stages do not block forever
   await reset();
-  await p.evaluate(() => { debtState.debts = [{ id: 1, name: 'Student Loan', original: 38000, balance: 36000, rate: 6, min: 0, type: 'student' }, { id: 2, name: 'Mortgage', original: 200000, balance: 190000, rate: 4, min: 900, type: 'mortgage' }]; ovState.manual.debtsMapped = true; fireLogSnapshot(); });
+  await p.evaluate(() => { debtState.debts = [{ id: Date.now(), name: 'Student Loan', original: 38000, balance: 36000, rate: 6, min: 0, type: 'student' }, { id: Date.now() + 1, name: 'Mortgage', original: 200000, balance: 190000, rate: 4, min: 900, type: 'mortgage' }]; ovState.manual.debtsMapped = true; fireLogSnapshot(); });
   r = await S();
   ok(r.doneKeys.includes('mapDebts') && r.raw.includes('firstCut') && r.raw.includes('debtHalf') && r.raw.includes('debtFree'), 'student loan + mortgage only: First Debt Cut / Halved / Debt Free are not blocked by them');
 
   // ── 8. a debt with no “original” amount is stamped, so progress can be shown
   await reset();
-  await p.evaluate(() => { debtState.debts = [{ id: 1, name: 'Old card', balance: 1000, rate: 20, min: 30, type: 'credit' }]; ovState.manual.debtsMapped = true; fireLogSnapshot(); });
+  await p.evaluate(() => { debtState.debts = [{ id: Date.now(), name: 'Old card', balance: 1000, rate: 20, min: 30, type: 'credit' }]; ovState.manual.debtsMapped = true; fireLogSnapshot(); });
   await p.waitForTimeout(200);
   ok(await p.evaluate(() => debtState.debts[0].original) === 1000, 'a legacy debt without an original amount is stamped with its balance');
   await p.evaluate(() => { debtState.debts[0].balance = 400; renderFIREroadmap(); }); r = await S();
@@ -116,12 +116,16 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   await p.evaluate(() => { alState.stockPies = [{ id: 1, name: 'Stocks & Shares ISA' }]; renderFIREroadmap(); });
   ok((await S()).raw.includes('isa'), 'an ISA-named Stocks & Funds pie counts');
 
-  // ── 12. migration: a user who already had debts before the tick existed keeps Map Debts
-  await p.evaluate(() => { ovState.manual = {}; debtState.debts = [{ id: 1, name: 'Loan', original: 3000, balance: 2000, rate: 8, min: 90, type: 'personal' }]; renderFIREroadmap(); });
-  ok(await p.evaluate(() => ovState.manual.debtsMapped === true && ovState.manual._v2 === 1), 'existing users with debts are grandfathered (no re-lock)');
+  // ── 12. grandfathering: a debt created before the tick existed counts as confirmed; a new one doesn't; nothing is written
+  await reset();
+  await p.evaluate(() => { debtState.debts = [{ id: 1700000000000, name: 'Loan', original: 3000, balance: 2000, rate: 8, min: 90, type: 'personal' }]; renderFIREroadmap(); });
+  ok(await p.evaluate(() => renderFIREroadmap._stages.find(s => s.key === 'mapDebts').raw === true), 'a debt listed before the tick existed keeps Map Debts complete (no re-lock for existing users)');
+  ok(await p.evaluate(() => ovState.manual.debtsMapped === undefined && !JSON.stringify(ovState.manual).includes('_v2')), 'and the grandfathering writes nothing');
+  await p.evaluate(() => { debtState.debts = [{ id: Date.now(), name: 'New loan', original: 3000, balance: 2000, rate: 8, min: 90, type: 'personal' }]; renderFIREroadmap(); });
+  ok(await p.evaluate(() => renderFIREroadmap._stages.find(s => s.key === 'mapDebts').raw === false), 'a debt added now still needs the tick');
 
   // ── 13. the Debt Tracker has the same tick
-  await reset(); await p.evaluate(() => { debtState.debts = [{ id: 1, name: 'Loan', original: 3000, balance: 2000, rate: 8, min: 90, type: 'personal' }]; fireLogSnapshot(); showTab('debt'); });
+  await reset(); await p.evaluate(() => { debtState.debts = [{ id: Date.now(), name: 'Loan', original: 3000, balance: 2000, rate: 8, min: 90, type: 'personal' }]; fireLogSnapshot(); showTab('debt'); });
   await p.waitForTimeout(400);
   ok(await p.evaluate(() => !!document.querySelector('#debt-map-confirm input[type=checkbox]') && /added every debt/i.test(document.getElementById('debt-map-confirm').innerText)), 'Debt Tracker shows “I’ve added every debt I owe”');
   await p.evaluate(() => document.querySelector('#debt-map-confirm input').click()); await p.waitForTimeout(200);
