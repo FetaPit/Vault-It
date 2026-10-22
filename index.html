@@ -8171,8 +8171,31 @@ body::before {
 .fire-timeline-svg {
   display: block;
   height: 280px;
-  min-width: 100%;
+  position: absolute;
+  top: 0; left: 0;
 }
+.fire-timeline-scroll { contain: layout paint; overscroll-behavior-x: contain; }
+.fire-block{margin:0 20px 12px;padding:12px 14px;border:1px solid rgba(232,197,106,.5);border-radius:8px;background:rgba(232,197,106,.07)}
+.fire-block .fb-t{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;color:#e8c56a}
+.fire-block .fb-s{font-size:.56rem;color:var(--t2);margin:4px 0 9px;line-height:1.5}
+.fire-block .fb-b{display:flex;gap:8px;flex-wrap:wrap}
+.fire-block button,.fd-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.54rem;letter-spacing:.04em;padding:7px 12px;border-radius:6px;cursor:pointer;color:#e8c56a;background:rgba(232,197,106,.12);border:1px solid rgba(232,197,106,.55)}
+.fire-block button.ghost,.fd-btn.ghost{color:var(--t2);background:transparent;border-color:var(--bd)}
+.fd-box{margin-top:8px;padding:9px 11px;border:1px solid rgba(68,192,185,.25);border-radius:7px;background:rgba(68,192,185,.05);font-size:.56rem;color:var(--t2);line-height:1.5}
+.fd-box.ok{border-color:rgba(62,207,142,.5);background:rgba(62,207,142,.07);color:#bfe9d3}
+.fd-box.warn{border-color:rgba(232,162,60,.55);background:rgba(232,162,60,.07)}
+.fd-box .fd-h{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:.14em;color:var(--t3);margin-bottom:3px}
+.fd-box ul{margin:0;padding-left:16px}.fd-box li{margin:2px 0}
+.fd-box .fd-sub{margin-top:6px;color:var(--t3)}
+.fd-box .fd-btn{margin-top:8px}
+.fd-tick,.map-tick{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:9px 11px;border:1px solid rgba(68,192,185,.3);border-radius:7px;background:rgba(68,192,185,.06);cursor:pointer;font-size:.6rem;color:var(--tx);line-height:1.4}
+.fd-tick input,.map-tick input{flex:none;appearance:none;-webkit-appearance:none;width:24px;height:24px;margin:0;border:2px solid rgba(68,192,185,.65);border-radius:6px;background:rgba(3,8,16,.9);display:grid;place-content:center;cursor:pointer}
+.fd-tick input:checked,.map-tick input:checked{background:#44c0b9;border-color:#44c0b9}
+.fd-tick input:checked::after,.map-tick input:checked::after{content:'';width:6px;height:12px;border:solid #030810;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.fd-tick input:focus-visible,.map-tick input:focus-visible{outline:2px solid #e8c56a;outline-offset:2px}
+.fd-tick small,.map-tick small{display:block;color:var(--t3);font-size:.52rem;margin-top:2px}
+.fd-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.fd-link{background:none;border:none;color:var(--t3);font-size:.52rem;text-decoration:underline;cursor:pointer;padding:4px 2px}
 
 /* Stage detail pop-up panel */
 .fire-detail-panel {
@@ -8185,8 +8208,8 @@ body::before {
 }
 .fire-detail-inner {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
+  grid-template-columns: auto 1fr;
+  align-items: start;
   gap: 12px;
 }
 .fire-detail-close {
@@ -10220,9 +10243,10 @@ button.bd-ic{cursor:pointer}
         <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#7d8793" stroke-width="1.2" stroke-dasharray="2.5 2.5"/><rect x="5.6" y="7.6" width="4.8" height="3.8" rx=".8" fill="#7d8793"/><path d="M6.6 7.6V6.4a1.4 1.4 0 0 1 2.8 0v1.2" fill="none" stroke="#7d8793" stroke-width="1"/></svg>Locked — finish earlier stages first</span>
         <span id="fire-progress-txt" style="margin-left:auto;color:var(--em)">0 of 30 achieved</span>
       </div>
-      <!-- Horizontal scrolling SVG timeline -->
+      <div id="fire-block" class="fire-block" style="display:none"></div>
+      <!-- Horizontal scrolling timeline: the SVG is only the window of stages on screen -->
       <div class="fire-timeline-scroll" id="fire-timeline-scroll">
-        <svg id="fire-roadmap-svg" class="fire-timeline-svg"></svg>
+        <div id="fire-track" style="position:relative;height:280px"><svg id="fire-roadmap-svg" class="fire-timeline-svg"></svg></div>
       </div>
       <!-- Stage detail panel — shown on click -->
       <div class="fire-detail-panel" id="fire-detail-panel" style="display:none">
@@ -10783,6 +10807,7 @@ button.bd-ic{cursor:pointer}
         <button class="btn-add-data" onclick="showDebtForm()">+ Add Debt</button>
       </div>
       <div id="debt-list-el"></div>
+      <div id="debt-map-confirm"></div>
     </div>
     <div class="g2 debt-charts" style="margin-top:16px">
       <div class="ov-chart-card">
@@ -12604,20 +12629,17 @@ function updateSidebar(){
 function drawChart() {
   var canvas = document.getElementById('nwChart');
   if (!canvas) return;
-  var dpr = window.devicePixelRatio || 1;
-  var rect = canvas.getBoundingClientRect();
-  var W = rect.width || canvas.offsetWidth || 0;
-  var H = rect.height || canvas.offsetHeight || 0;
-  // If canvas not laid out yet, retry after a frame
-  if (W < 50 || H < 50) { setTimeout(drawChart, 150); return; }
-  W = W || 800; H = H || 320;
-  canvas.width  = Math.round(W * dpr);
-  canvas.height = Math.round(H * dpr);
-  canvas.style.width  = W + 'px';
-  canvas.style.height = H + 'px';
+  var dpr = Math.min(window.devicePixelRatio || 1, 2.5);          // a bigger bitmap than ~2.5× adds no visible sharpness
+  canvas.style.width = '100%'; canvas.style.height = '';           // CSS decides the box (it used to be pinned in px after the first draw, so the chart never grew when the screen did)
+  var W = canvas.clientWidth || 0, H = canvas.clientHeight || 0;
+  // not laid out yet (tab hidden): one pending retry at most, never a pile of them
+  if (W < 50 || H < 50) { if (!drawChart._retry) drawChart._retry = setTimeout(function () { drawChart._retry = 0; drawChart(); }, 200); return; }
+  var bw = Math.round(W * dpr), bh = Math.round(H * dpr);
+  if (canvas.width !== bw || canvas.height !== bh) { canvas.width = bw; canvas.height = bh; }   // resizing the bitmap clears it: only when the size really changed
   var ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H);
+  canvas.dataset.drawn = W + 'x' + H + '@' + dpr;
 
   var PROJ_MO = 6;
   var MO_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -15597,6 +15619,9 @@ var FIRE_PHASES=[
   {label:'FOUNDATION',col:'#44c0b9'},{label:'STABILISE',col:'#c9a84c'},{label:'SAVE',col:'#e8c56a'},
   {label:'BUY',col:'#9b7ec8'},{label:'OWN',col:'#3ecf8e'},{label:'FREE',col:'#c9a84c'}
 ];
+// roadmap window geometry + state (declared early: the roadmap is first drawn during start-up)
+var _fireFirstPaint=true,_fireDetailIdx=-1,_fireSkipAsk=-1;
+var FIRE_NODE=108,FIRE_LEFT=60,FIRE_H=280;
 var STK_COLORS=['#44c0b9','#c9a84c','#3ecf8e','#9b7ec8','#64b5f6','#e0894a','#e05c5c','#e8c56a'];
 // ── Budget categories + icons (declared before the init block runs) ──
 var BD_ICONS={
@@ -17177,7 +17202,7 @@ function drawCashflowDiagram(){
   var hosts=['cf-sankey','bd-sankey'].map(function(id){return document.getElementById(id);}).filter(Boolean);
   if(!hosts.length)return;
   var m=cfModel();
-  if(m.total<=0){hosts.forEach(function(h){h.innerHTML='<div class="cf-empty">Add your income and spending to see where every pound goes</div>';});return;}
+  if(m.total<=0){hosts.forEach(function(h){h.__sig=null;h.innerHTML='<div class="cf-empty">Add your income and spending to see where every pound goes</div>';});return;}
   var T=m.total;
   // sources (+ shortfall when spending exceeds income)
   var sources=m.inc.map(function(r){return{name:r.name,amt:+r.amount,col:'#44c0b9'};});
@@ -17268,7 +17293,7 @@ function drawCashflowDiagram(){
     out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2+11).toFixed(1)+'" font-size="10" font-family="Share Tech Mono,monospace" fill="#8f9bab" '+halo+'>'+cfMoney(n.it.amt)+' ('+pct(n.it.amt)+')</text>';
   });
   out+='</svg>';
-  hosts.forEach(function(h){h.innerHTML=out;});
+  hosts.forEach(function(h){if(h.__sig!==out){h.__sig=out;h.innerHTML=out;}});   // identical markup = no repaint
 }
 // ── Budget tab rendering ──
 function bdRowHTML(kind,r){
@@ -19483,7 +19508,16 @@ function undoPayment(id){
   saveDebtState();renderDebtTab();updateKPIs();
   showToast('£'+(+p.amt).toLocaleString('en-GB')+' payment undone');
 }
+// “I’ve added every debt I owe” — the confirmation that completes the Roadmap’s Map Debts stage
+function renderDebtMapConfirm(){
+  var el=document.getElementById('debt-map-confirm');if(!el)return;
+  var n=(debtState.debts||[]).length,libs=(alState.liabilities||[]).length,k=(n>0||libs>0)?'debtsMapped':'noDebt';
+  var on=fireMan(k);
+  el.innerHTML='<label class="map-tick"><input type="checkbox" '+(on?'checked ':'')+'onchange="fireTick(\''+k+'\',this.checked)"><span><b>'+(k==='debtsMapped'?'I’ve added every debt I owe':'I don’t have any debts')+'</b>'
+    +'<small>'+(on?'Confirmed — your Roadmap’s “Map Debts” stage is complete.':'Tick when '+(k==='debtsMapped'?'this list is complete':'you owe nothing on cards, loans, car finance or overdrafts')+'. This is what completes “Map Debts” on your Roadmap.')+'</small></span></label>';
+}
 function renderDebtTab(){
+  try{renderDebtMapConfirm();}catch(e){}
   var sorted=[].concat(debtState.debts).sort(function(a,b){
     if((a.balance>0)!==(b.balance>0))return a.balance>0?-1:1;   // cleared debts go last
     return _debtMethod==='avalanche' ? (+b.rate||0)-(+a.rate||0) : (+a.balance||0)-(+b.balance||0);
@@ -20391,11 +20425,42 @@ function toggleChartMetric(btn,metric){
   drawChart();
 }
 
-// Redraw chart + FIRE roadmap on resize
-window.addEventListener('resize', function() {
-  clearTimeout(window._rz);
-  window._rz = setTimeout(function(){ drawChart(); renderFIREroadmap(); }, 200);
-});
+// Phones fire 'resize' every time the address bar hides or shows while you scroll (the HEIGHT changes, the width doesn't).
+// Redrawing the charts and the roadmap on each of those made them repaint mid-scroll and show up half-drawn, so redraws
+// now only run when the WIDTH or the pixel ratio really changes (rotate, unfold, window resize, zoom).
+function viOnWidthResize(fn, ms) {
+  var lastW = window.innerWidth, lastD = window.devicePixelRatio, t = 0;
+  window.addEventListener('resize', function () {
+    var w = window.innerWidth, d = window.devicePixelRatio;
+    if (Math.abs(w - lastW) < 1 && d === lastD) return;
+    lastW = w; lastD = d;
+    clearTimeout(t); t = setTimeout(fn, ms || 200);
+  });
+}
+viOnWidthResize(function () { drawChart(); renderFIREroadmap(); }, 200);
+// Self-heal: when a chart scrolls back into view (or the page returns from the background) redraw it and nudge the browser to
+// repaint it, so a tile the phone dropped while you were scrolling comes back whole instead of staying half-drawn.
+(function () {
+  var T = [['nwChart', function () { drawChart(); }], ['cf-sankey', function () { drawCashflowDiagram(); }], ['bd-sankey', function () { drawCashflowDiagram(); }],
+    ['fire-timeline-scroll', function () { renderFIREroadmap(); }], ['debt-bar-chart', function () { drawDebtHistogram(); }], ['debt-donut-chart', function () { drawDebtDonut(); }]];
+  function heal(el, fn) {
+    if (!el || !(el.offsetWidth > 0)) return;
+    try { fn(); } catch (e) {}
+    el.style.willChange = 'transform'; clearTimeout(el.__wc); el.__wc = setTimeout(function () { el.style.willChange = ''; }, 500);
+  }
+  window.addEventListener('load', function () {
+    var els = T.map(function (t) { return [document.getElementById(t[0]), t[1]]; }).filter(function (x) { return x[0]; });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { var el = e.target, was = el.__vis; el.__vis = e.isIntersecting; if (e.isIntersecting && was === false) heal(el, el.__heal); });
+      }, { rootMargin: '100px' });
+      els.forEach(function (x) { x[0].__heal = x[1]; io.observe(x[0]); });
+    }
+    function healVisible() { els.forEach(function (x) { var r = x[0].getBoundingClientRect(); if (r.bottom > 0 && r.top < innerHeight) heal(x[0], x[1]); }); }
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) healVisible(); });
+    window.addEventListener('pageshow', function (e) { if (e.persisted) healVisible(); });
+  });
+})();
 
 // ── SETTINGS MODAL ─────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════
@@ -20444,7 +20509,7 @@ function viFitNav(){
   n.style.zoom=z;
   for(var i=0;i<40&&n.scrollWidth>n.clientWidth+1;i++){z*=0.97;n.style.zoom=z;}
 }
-window.addEventListener('resize',function(){clearTimeout(viFitNav._t);viFitNav._t=setTimeout(viFitNav,120);});
+viOnWidthResize(viFitNav,120);
 window.addEventListener('load',function(){setTimeout(viFitNav,300);setTimeout(viFitNav,1500);});
 function viSwipeWrap(el,hint){
   if(!el||el._swipe)return;el._swipe=true;
@@ -21087,9 +21152,9 @@ function drawDebtHistogram(){
   if(!(W>80))W=canvas.offsetWidth;
   if(!(W>80))return;   // tab not on screen yet: it is redrawn when shown
   var H=debtChartSize();
-  canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+  var _bw=Math.round(W*dpr),_bh=Math.round(H*dpr);if(canvas.width!==_bw||canvas.height!==_bh){canvas.width=_bw;canvas.height=_bh;}
   canvas.style.width=W+'px';canvas.style.height=H+'px';
-  var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  var ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,W,H);
   var fs=Math.max(9,Math.min(15,W/62));
   if(!debts.length){
@@ -21218,8 +21283,8 @@ function drawDebtTreemap(){
   }).join('');
 }
 function setDebtView(v){try{localStorage.setItem('vi_debt_view',v);}catch(e){}drawDebtDonut();}
-window.addEventListener('resize',function(){clearTimeout(window._cfT);window._cfT=setTimeout(function(){try{drawCashflowDiagram();}catch(e){}},200);});
-window.addEventListener('resize',function(){clearTimeout(window._dvT);window._dvT=setTimeout(function(){var t=document.getElementById('tab-debt');if(t&&t.style.display!=='none'){drawDebtHistogram();drawDebtDonut();}},150);});
+viOnWidthResize(function(){try{drawCashflowDiagram();}catch(e){}},200);
+viOnWidthResize(function(){var t=document.getElementById('tab-debt');if(t&&t.style.display!=='none'){drawDebtHistogram();drawDebtDonut();}},150);
 
 // ── DEPRECIATION ──────────────────────────────────────────────
 function depreciatedValue(l){
@@ -21251,78 +21316,148 @@ function cryptoLogoUrl(sym){
 // ── CASHFLOW CATEGORIES ───────────────────────────────────────
 
 // ── FIRE ROADMAP ──────────────────────────────────────────────
-// Strictly sequential: a stage only counts once every stage before it is achieved,
-// so a new user always starts at stage 1 and the journey reads left → right.
+// Sequential: a stage counts once every stage before it is achieved (or skipped), so a new user always starts at stage 1 and
+// the journey reads left → right. Because one stuck stage freezes everything after it, every stage (a) says what it is
+// waiting for, (b) says when later stages are already met and which stage is holding them, (c) can be completed with the
+// user's own confirmation where the app can't see the facts, and (d) can be skipped when it genuinely doesn't apply.
 function fireMan(k){return !!(ovState.manual&&ovState.manual[k]);}
+function fireSkipped(k){return !!(ovState.skipped&&ovState.skipped[k]);}
+function fireIsConsumerDebt(d){return !!d&&d.type!=='mortgage'&&d.type!=='student';}   // “Debt Free” = no consumer debt (cards, loans, car finance…)
+function fireNwhPoints(){try{var d=nwhLoad();return d&&d.points?d.points.length:0;}catch(e){return 0;}}
+// one-off: people who listed debts before the “I’ve mapped every debt” tick existed keep that stage
+function fireMigrate(){
+  if(!ovState.manual)ovState.manual={};
+  if(ovState.manual._v2)return;
+  ovState.manual._v2=1;
+  if((debtState.debts||[]).length&&ovState.manual.debtsMapped===undefined)ovState.manual.debtsMapped=true;
+  try{localStorage.setItem(OV_KEY,JSON.stringify(ovState));}catch(e){}
+}
 function fireBuildStages(){
+  fireMigrate();
   var nw=computeNetWorth();
   var _vu={};try{_vu=JSON.parse(localStorage.getItem('vi_user')||'{}')||{};}catch(e){}
   var annualExp=cfTotalOut()*12||((+_vu.expenses||0)*12)||24000;
   var cashSaved=alTotalCash()+(state?state.saved:0);
   var debts=debtState.debts||[];
-  var totalDebt=debtTotal();
-  var origDebt=debts.reduce(function(s,d){return s+(d.original||d.balance||0);},0);
-  var cleared=origDebt>0?Math.max(0,Math.min(1,1-totalDebt/origDebt)):(fireMan('noDebt')?1:0);
+  // a debt that never had an “original” amount can’t show progress (balance falls, original falls with it): stamp it once
+  var stamped=false;debts.forEach(function(d){if(!(d.original>0)&&d.balance>0){d.original=d.balance;stamped=true;}});
+  if(stamped&&typeof saveDebtState==='function')setTimeout(saveDebtState,0);
+  var consumer=debts.filter(fireIsConsumerDebt);
+  var cTotal=consumer.reduce(function(s,d){return s+(+d.balance||0);},0);
+  var cOrig=consumer.reduce(function(s,d){return s+(d.original||d.balance||0);},0);
+  var libs=(alState.liabilities||[]).length;
   var noDebt=debts.length===0&&fireMan('noDebt');
+  var mapped=(debts.length>0||libs>0)&&fireMan('debtsMapped');
+  var debtsDone=noDebt||mapped;
+  var nothingToCut=debtsDone&&consumer.length===0;            // only a mortgage / student loan: there is no consumer debt to cut
+  var cleared=cOrig>0?Math.max(0,Math.min(1,1-cTotal/cOrig)):((nothingToCut||noDebt)?1:0);
   var hasState=typeof state!=='undefined'&&state;
+  var owned=!!(hasState&&state.houseMode==='purchased');      // already own a home: the “saving for a deposit / buying” stages are moot
   var dep=hasState&&state.target>0?pct():0;
+  var snaps=(ovState.snapshots||[]).length+fireNwhPoints();   // net-worth history entered in the history wizard counts too
+  var bud=null;try{bud=bdState();}catch(e){}
   function ratio(v,t){return t>0?Math.max(0,Math.min(1,v/t)):0;}
+  function money(v){return gbpFmt(Math.max(0,v));}
+  var GO_AL={lbl:'Open Assets & Liabilities',fn:"fireGo('assets')"},GO_HB={lbl:'Open House Builder',fn:"fireGo('house')"},GO_DEBT={lbl:'Open Debt Tracker',fn:"fireGo('debt')"},GO_BUD={lbl:'Open Budget',fn:"fireGo('budget')"};
+  function nwStage(key,phase,ic,name,desc,col,target){
+    return {key:key,phase:phase,ic:ic,name:name,desc:desc,col:col,check:function(){return nw>=target();},prog:function(){return ratio(nw,target());},cur:function(){return nw;},target:target(),
+      why:function(){return['Your net worth is '+gbpFmt(nw)+' — this needs '+gbpFmt(target())+'. It rises as you save, invest and pay debts down.'];},acts:[GO_AL]};
+  }
+  function cashStage(key,phase,ic,name,desc,col,target){
+    return {key:key,phase:phase,ic:ic,name:name,desc:desc,col:col,check:function(){return cashSaved>=target;},prog:function(){return ratio(cashSaved,target);},cur:function(){return cashSaved;},target:target,
+      why:function(){return[gbpFmt(cashSaved)+' of '+gbpFmt(target)+' in cash & savings (accounts in Assets & Liabilities plus your house deposit pot).'];},acts:[GO_AL]};
+  }
   var S=[
     // P1 Foundation
-    {phase:0,ic:'snapshot',name:'First Log',    desc:'Net worth snapshot',      col:'#44c0b9',check:function(){return (ovState.snapshots||[]).length>=1;},
+    {key:'firstLog',phase:0,ic:'snapshot',name:'First Log',desc:'Net worth snapshot',col:'#44c0b9',check:function(){return snaps>=1;},
+      why:function(){return['No net worth snapshot saved yet. The button below records today’s figure in one tap — you can add more any time from the Net Worth chart.'];},
+      acts:[{lbl:'Record my net worth now',fn:'fireLogSnapshot()'}],
       hint:'Use “Add Data Point” on the Net Worth chart to record your first snapshot.'},
-    {phase:0,ic:'map',     name:'Map Debts',    desc:'List every debt',         col:'#44c0b9',check:function(){return debts.length>0||noDebt;},manual:'noDebt',manualLbl:'I have no debts',
-      hint:'Add each debt separately (with its type and interest rate) in the Debt Tracker — or confirm you have none.'},
-    {phase:0,ic:'flow',    name:'Zero Budget',  desc:'Every £ given a job',     col:'#44c0b9',check:function(){var b=bdState();return b.m.tIn>0&&(ovState.expenses||[]).length>0&&b.st==='zero';},
-      prog:function(){var b=bdState();return b.m.tIn>0?Math.max(0,Math.min(1,b.assigned/b.m.tIn)):0;},
-      hint:'Open the Budget tab: add your income, then assign every pound to spending, saving or investing until “left to assign” hits £0.'},
-    {phase:0,ic:'coin',    name:'First £ Saved',desc:'Cash balance ≥ £1',       col:'#44c0b9',check:function(){return cashSaved>=1;},
+    {key:'mapDebts',phase:0,ic:'map',name:'Map Debts',desc:'List every debt',col:'#44c0b9',check:function(){return debtsDone;},
+      confirms:(debts.length>0||libs>0)?[{k:'debtsMapped',lbl:'I’ve mapped every debt I owe',sub:'Tick when your list is complete. This is what unlocks the next stage.'}]:[{k:'noDebt',lbl:'I don’t have any debts',sub:'Tick if you owe nothing on cards, loans, car finance or overdrafts.'}],
+      why:function(){
+        if(!debts.length&&!libs)return['No debts are listed in the Debt Tracker. Add each one (card, loan, car finance, overdraft…) — or tick “I don’t have any debts”.'];
+        if(!debts.length)return['You have liabilities in Assets & Liabilities but nothing in the Debt Tracker. Add your cards and loans there, then tick “I’ve mapped every debt I owe”.'];
+        return['You’ve listed '+debts.length+' debt'+(debts.length>1?'s':'')+' ('+gbpFmt(debtTotal())+'). Tick “I’ve mapped every debt I owe” once the list is complete — nothing else is needed.'];},
+      acts:[GO_DEBT],hint:'Add each debt separately (type, balance, interest rate, minimum payment) in the Debt Tracker, then confirm the list is complete.'},
+    {key:'zeroBudget',phase:0,ic:'flow',name:'Zero Budget',desc:'Every £ given a job',col:'#44c0b9',check:function(){return !!bud&&bud.m.tIn>0&&(ovState.expenses||[]).length>0&&bud.st==='zero';},
+      prog:function(){return bud&&bud.m.tIn>0?Math.max(0,Math.min(1,bud.assigned/bud.m.tIn)):0;},
+      why:function(){var w=[];
+        if(!bud||!(bud.m.tIn>0))w.push('Add your monthly income in the Budget tab.');
+        if(!(ovState.expenses||[]).length)w.push('Add at least one spending, saving or investing line.');
+        if(bud&&bud.m.tIn>0&&(ovState.expenses||[]).length){if(bud.st==='under')w.push(money(bud.left)+' is still left to assign — give it a job (spending, saving or investing).');else if(bud.st==='over')w.push('You’ve assigned '+money(-bud.left)+' more than you earn — trim a line.');}
+        return w.length?w:['Almost there — recheck the Budget tab.'];},
+      acts:[GO_BUD],hint:'Open the Budget tab: add your income, then assign every pound until “left to assign” hits £0.'},
+    {key:'firstSaved',phase:0,ic:'coin',name:'First £ Saved',desc:'Cash balance ≥ £1',col:'#44c0b9',check:function(){return cashSaved>=1;},
+      why:function(){return['No cash balance yet. Add a savings or current account in Assets & Liabilities (or log a deposit in the House Builder).'];},acts:[GO_AL],
       hint:'Add a cash or savings account in Assets & Liabilities.'},
     // P2 Stabilise
-    {phase:1,ic:'shield',      name:'£500 Buffer', desc:'Emergency starter',col:'#c9a84c',check:function(){return cashSaved>=500;},prog:function(){return ratio(cashSaved,500);},cur:function(){return cashSaved;},target:500},
-    {phase:1,ic:'shieldCheck', name:'£1k Buffer',  desc:'Emergency fund',   col:'#c9a84c',check:function(){return cashSaved>=1000;},prog:function(){return ratio(cashSaved,1000);},cur:function(){return cashSaved;},target:1000},
-    {phase:1,ic:'scissors',    name:'First Debt Cut',desc:'One debt cleared',col:'#e05c5c',check:function(){return noDebt||debts.some(function(d){return d.balance<=0&&(d.original||0)>0;});},prog:function(){return noDebt?1:(debts.length?Math.max.apply(null,debts.map(function(d){return d.original>0?Math.max(0,Math.min(1,1-d.balance/d.original)):0;})):0);}},
-    {phase:1,ic:'halfPie',     name:'Debt Halved', desc:'50% cleared',      col:'#e0894a',check:function(){return noDebt||(origDebt>0&&totalDebt<=origDebt*0.5);},prog:function(){return noDebt?1:Math.min(1,cleared/0.5);}},
-    {phase:1,ic:'gem',         name:'£1k Net Worth',desc:'NW ≥ £1,000',     col:'#44c0b9',check:function(){return nw>=1000;},prog:function(){return ratio(nw,1000);},cur:function(){return nw;},target:1000},
-    {phase:1,ic:'unlock',      name:'Debt Free',   desc:'Zero consumer debt',col:'#3ecf8e',check:function(){return noDebt||(debts.length>0&&totalDebt<=0);},prog:function(){return noDebt?1:cleared;}},
+    cashStage('buf500',1,'shield','£500 Buffer','Emergency starter','#c9a84c',500),
+    cashStage('buf1k',1,'shieldCheck','£1k Buffer','Emergency fund','#c9a84c',1000),
+    {key:'firstCut',phase:1,ic:'scissors',name:'First Debt Cut',desc:'One debt cleared',col:'#e05c5c',
+      check:function(){return noDebt||nothingToCut||debts.some(function(d){return d.balance<=0&&(d.original||0)>0;});},
+      prog:function(){return(noDebt||nothingToCut)?1:(debts.length?Math.max.apply(null,debts.map(function(d){return d.original>0?Math.max(0,Math.min(1,1-d.balance/d.original)):0;})):0);},
+      why:function(){return(debts.length?['No debt has reached £0 yet. Clear your smallest balance first, then set its balance to £0 in the Debt Tracker.']:['Map your debts first — there is nothing to clear yet.']);},acts:[GO_DEBT]},
+    {key:'debtHalf',phase:1,ic:'halfPie',name:'Debt Halved',desc:'50% cleared',col:'#e0894a',check:function(){return noDebt||nothingToCut||(cOrig>0&&cTotal<=cOrig*0.5);},prog:function(){return(noDebt||nothingToCut)?1:Math.min(1,cleared/0.5);},
+      why:function(){return[Math.round(cleared*100)+'% of your consumer debt is cleared — this needs 50%. (Student loans and mortgages aren’t counted.)'];},acts:[GO_DEBT]},
+    nwStage('nw1k',1,'gem','£1k Net Worth','NW ≥ £1,000','#44c0b9',function(){return 1000;}),
+    {key:'debtFree',phase:1,ic:'unlock',name:'Debt Free',desc:'Zero consumer debt',col:'#3ecf8e',check:function(){return noDebt||nothingToCut||(consumer.length>0&&cTotal<=0);},prog:function(){return(noDebt||nothingToCut)?1:cleared;},
+      why:function(){return['You still owe '+gbpFmt(cTotal)+' across '+consumer.filter(function(d){return d.balance>0;}).length+' consumer debt(s). Student loans and mortgages aren’t counted here.'];},acts:[GO_DEBT]},
     // P3 Save
-    {phase:2,ic:'umbrella',  name:'3-Month EF', desc:'3 months expenses',col:'#c9a84c',check:function(){return cashSaved>=annualExp/4;},prog:function(){return ratio(cashSaved,annualExp/4);},cur:function(){return cashSaved;},target:annualExp/4},
-    {phase:2,ic:'safe',      name:'6-Month EF', desc:'Fully buffered',   col:'#c9a84c',check:function(){return cashSaved>=annualExp/2;},prog:function(){return ratio(cashSaved,annualExp/2);},cur:function(){return cashSaved;},target:annualExp/2},
-    {phase:2,ic:'sprout',    name:'ISA Opened', desc:'ISA or LISA open', col:'#9b7ec8',check:function(){
+    cashStage('ef3',2,'umbrella','3-Month EF','3 months expenses','#c9a84c',annualExp/4),
+    cashStage('ef6',2,'safe','6-Month EF','Fully buffered','#c9a84c',annualExp/2),
+    {key:'isa',phase:2,ic:'sprout',name:'ISA Opened',desc:'ISA or LISA open',col:'#9b7ec8',check:function(){
         var cash=(alState.cashAccounts||[]).some(function(c){var t=(c.type||c.name||'').toUpperCase();return /\bL?ISA\b/.test(t);});
         var pies=(alState.stockPies||[]).some(function(p){return /\bL?ISA\b/i.test(p.name||'');});
-        return cash||pies;},hint:'Add an ISA / LISA cash account, or name a Stocks & Funds pie “ISA”.'},
-    {phase:2,ic:'foundation',name:'1% Deposit', desc:'1% of target saved',col:'#e8c56a',check:function(){return hasState&&state.target>0&&state.saved>=state.target*0.01;},prog:function(){return ratio(dep,0.01);}},
-    {phase:2,ic:'bricks',    name:'5% Deposit', desc:'5% of target',      col:'#e8c56a',check:function(){return hasState&&state.target>0&&state.saved>=state.target*0.05;},prog:function(){return ratio(dep,0.05);}},
-    {phase:2,ic:'gem2',      name:'£5k Net Worth',desc:'NW ≥ £5,000',     col:'#44c0b9',check:function(){return nw>=5000;},prog:function(){return ratio(nw,5000);},cur:function(){return nw;},target:5000},
+        return cash||pies;},
+      why:function(){return['No ISA or LISA found. Add an ISA cash account, or name a Stocks & Funds pie “ISA”. (Not eligible or not interested? You can skip this stage.)'];},acts:[GO_AL],
+      hint:'Add an ISA / LISA cash account, or name a Stocks & Funds pie “ISA”.'},
+    {key:'dep1',phase:2,ic:'foundation',name:'1% Deposit',desc:'1% of target saved',col:'#e8c56a',check:function(){return owned||(hasState&&state.target>0&&state.saved>=state.target*0.01);},prog:function(){return owned?1:ratio(dep,0.01);},
+      why:function(){return(hasState&&state.target>0)?[gbpFmt(state.saved||0)+' of '+gbpFmt(state.target*0.01)+' saved towards your house.']:['No house target set. Set one in the House Builder — or skip this stage if you aren’t buying.'];},acts:[GO_HB]},
+    {key:'dep5',phase:2,ic:'bricks',name:'5% Deposit',desc:'5% of target',col:'#e8c56a',check:function(){return owned||(hasState&&state.target>0&&state.saved>=state.target*0.05);},prog:function(){return owned?1:ratio(dep,0.05);},
+      why:function(){return(hasState&&state.target>0)?[gbpFmt(state.saved||0)+' of '+gbpFmt(state.target*0.05)+' saved towards your house.']:['No house target set. Set one in the House Builder — or skip this stage if you aren’t buying.'];},acts:[GO_HB]},
+    nwStage('nw5k',2,'gem2','£5k Net Worth','NW ≥ £5,000','#44c0b9',function(){return 5000;}),
     // P4 Buy
-    {phase:3,ic:'house',   name:'Deposit Ready',desc:'Full deposit saved',col:'#9b7ec8',check:function(){return hasState&&state.target>0&&pct()>=1;},prog:function(){return dep;}},
-    {phase:3,ic:'coins',   name:'£10k Net Worth',desc:'NW ≥ £10,000',    col:'#44c0b9',check:function(){return nw>=10000;},prog:function(){return ratio(nw,10000);},cur:function(){return nw;},target:10000},
-    {phase:3,ic:'doc',     name:'Applied',      desc:'Mortgage application',col:'#9b7ec8',check:function(){return fireMan('applied');},manual:'applied',manualLbl:'Mark mortgage application as submitted'},
-    {phase:3,ic:'exchange',name:'Exchanged',    desc:'Contracts signed',  col:'#9b7ec8',check:function(){return fireMan('exchanged');},manual:'exchanged',manualLbl:'Mark contracts as exchanged'},
-    {phase:3,ic:'key',     name:'Keys!',        desc:'Property owned',    col:'#3ecf8e',check:function(){return (hasState&&state.houseMode==='purchased')||fireMan('keys');},manual:'keys',manualLbl:'I have the keys',
+    {key:'depReady',phase:3,ic:'house',name:'Deposit Ready',desc:'Full deposit saved',col:'#9b7ec8',check:function(){return owned||(hasState&&state.target>0&&pct()>=1);},prog:function(){return owned?1:dep;},
+      why:function(){return(hasState&&state.target>0)?[Math.round(dep*100)+'% of your '+state.depositPct+'% deposit ('+gbpFmt(depositTarget())+') is saved.']:['No house target set. Set one in the House Builder — or skip this stage if you aren’t buying.'];},acts:[GO_HB]},
+    nwStage('nw10k',3,'coins','£10k Net Worth','NW ≥ £10,000','#44c0b9',function(){return 10000;}),
+    {key:'applied',phase:3,ic:'doc',name:'Applied',desc:'Mortgage application',col:'#9b7ec8',check:function(){return owned||fireMan('applied');},confirms:[{k:'applied',lbl:'My mortgage application has been submitted'}],
+      why:function(){return['Tick when you’ve submitted your mortgage application. Not buying? Skip this stage.'];}},
+    {key:'exchanged',phase:3,ic:'exchange',name:'Exchanged',desc:'Contracts signed',col:'#9b7ec8',check:function(){return owned||fireMan('exchanged');},confirms:[{k:'exchanged',lbl:'Contracts have been exchanged'}],
+      why:function(){return['Tick when contracts are exchanged. Not buying? Skip this stage.'];}},
+    {key:'keys',phase:3,ic:'key',name:'Keys!',desc:'Property owned',col:'#3ecf8e',check:function(){return owned||fireMan('keys');},confirms:[{k:'keys',lbl:'I have the keys'}],
+      why:function(){return['Press “House Purchased” in the House Builder once your deposit goal is met — or tick “I have the keys”.'];},acts:[GO_HB],
       hint:'Press “House Purchased” in the House Builder once your deposit goal is met.'},
     // P5 Own
-    {phase:4,ic:'bars',      name:'£25k',         desc:'NW ≥ £25,000',     col:'#44c0b9',check:function(){return nw>=25000;},prog:function(){return ratio(nw,25000);},cur:function(){return nw;},target:25000},
-    {phase:4,ic:'barsUp',    name:'£50k',         desc:'NW ≥ £50,000',     col:'#44c0b9',check:function(){return nw>=50000;},prog:function(){return ratio(nw,50000);},cur:function(){return nw;},target:50000},
-    {phase:4,ic:'medal',     name:'£100k',        desc:'Six figures',      col:'#c9a84c',check:function(){return nw>=100000;},prog:function(){return ratio(nw,100000);},cur:function(){return nw;},target:100000},
-    {phase:4,ic:'sail',      name:'Coast FI',     desc:'12.5× exp invested',col:'#3ecf8e',check:function(){return nw>=annualExp*12.5;},prog:function(){return ratio(nw,annualExp*12.5);},cur:function(){return nw;},target:annualExp*12.5},
-    {phase:4,ic:'houseSolid',name:'Mortgage Free',desc:'Outright ownership',col:'#e8c56a',check:function(){return (hasState&&state.houseMode==='purchased'&&(state.mortgageBalance||0)<=0)||fireMan('mortgageFree');},manual:'mortgageFree',manualLbl:'My mortgage is paid off'},
+    nwStage('nw25k',4,'bars','£25k','NW ≥ £25,000','#44c0b9',function(){return 25000;}),
+    nwStage('nw50k',4,'barsUp','£50k','NW ≥ £50,000','#44c0b9',function(){return 50000;}),
+    {key:'nw100k',phase:4,ic:'medal',name:'£100k',desc:'Six figures',col:'#c9a84c',check:function(){return nw>=100000;},prog:function(){return ratio(nw,100000);},cur:function(){return nw;},target:100000,why:function(){return['Your net worth is '+gbpFmt(nw)+' — this needs '+gbpFmt(100000)+'.'];},acts:[GO_AL]},
+    {key:'coastFI',phase:4,ic:'sail',name:'Coast FI',desc:'12.5× exp invested',col:'#3ecf8e',check:function(){return nw>=annualExp*12.5;},prog:function(){return ratio(nw,annualExp*12.5);},cur:function(){return nw;},target:annualExp*12.5,why:function(){return['Your net worth is '+gbpFmt(nw)+' — this needs 12.5× a year of spending ('+gbpFmt(annualExp*12.5)+').'];},acts:[GO_AL]},
+    {key:'mortFree',phase:4,ic:'houseSolid',name:'Mortgage Free',desc:'Outright ownership',col:'#e8c56a',check:function(){return (owned&&(state.mortgageBalance||0)<=0)||fireMan('mortgageFree');},confirms:[{k:'mortgageFree',lbl:'My mortgage is paid off'}],
+      why:function(){return['Pay the mortgage balance down to £0 in the House Builder — or tick “My mortgage is paid off”. No mortgage at all? Skip this stage.'];},acts:[GO_HB]},
     // P6 Free
-    {phase:5,ic:'mountain',name:'£250k',    desc:'Quarter million',    col:'#c9a84c',check:function(){return nw>=250000;},prog:function(){return ratio(nw,250000);},cur:function(){return nw;},target:250000},
-    {phase:5,ic:'flame',   name:'Full FI',  desc:'25× expenses invested',col:'#3ecf8e',check:function(){return nw>=annualExp*25;},prog:function(){return ratio(nw,annualExp*25);},cur:function(){return nw;},target:annualExp*25},
-    {phase:5,ic:'flame2',  name:'Fat FIRE', desc:'33× expenses',       col:'#c9a84c',check:function(){return nw>=annualExp*33;},prog:function(){return ratio(nw,annualExp*33);},cur:function(){return nw;},target:annualExp*33},
-    {phase:5,ic:'tree',    name:'Legacy',   desc:'50× — next gen',     col:'#c9a84c',check:function(){return nw>=annualExp*50;},prog:function(){return ratio(nw,annualExp*50);},cur:function(){return nw;},target:annualExp*50}
+    {key:'nw250k',phase:5,ic:'mountain',name:'£250k',desc:'Quarter million',col:'#c9a84c',check:function(){return nw>=250000;},prog:function(){return ratio(nw,250000);},cur:function(){return nw;},target:250000,why:function(){return['Your net worth is '+gbpFmt(nw)+' — this needs '+gbpFmt(250000)+'.'];},acts:[GO_AL]},
+    {key:'fullFI',phase:5,ic:'flame',name:'Full FI',desc:'25× expenses invested',col:'#3ecf8e',check:function(){return nw>=annualExp*25;},prog:function(){return ratio(nw,annualExp*25);},cur:function(){return nw;},target:annualExp*25,why:function(){return['Your net worth is '+gbpFmt(nw)+' — this needs 25× a year of spending ('+gbpFmt(annualExp*25)+').'];},acts:[GO_AL]},
+    {key:'fatFIRE',phase:5,ic:'flame2',name:'Fat FIRE',desc:'33× expenses',col:'#c9a84c',check:function(){return nw>=annualExp*33;},prog:function(){return ratio(nw,annualExp*33);},cur:function(){return nw;},target:annualExp*33,why:function(){return['Your net worth is '+gbpFmt(nw)+' — this needs 33× a year of spending ('+gbpFmt(annualExp*33)+').'];},acts:[GO_AL]},
+    {key:'legacy',phase:5,ic:'tree',name:'Legacy',desc:'50× — next gen',col:'#c9a84c',check:function(){return nw>=annualExp*50;},prog:function(){return ratio(nw,annualExp*50);},cur:function(){return nw;},target:annualExp*50,why:function(){return['Your net worth is '+gbpFmt(nw)+' — this needs 50× a year of spending ('+gbpFmt(annualExp*50)+').'];},acts:[GO_AL]}
   ];
-  // sequential evaluation
+  // sequential evaluation: a stage unlocks when everything before it is achieved or skipped
   var run=true,current=-1;
   S.forEach(function(s,i){
-    s.raw=!!s.check();
-    s.done=run&&s.raw;
-    if(s.done)current=i; else run=false;
+    s.idx=i;
+    s.raw=!!s.check();                       // the requirement itself is met (whether or not the stage is unlocked yet)
+    s.skip=fireSkipped(s.key);
+    s.skipPass=false;
+    if(run&&s.raw){s.done=true;current=i;}
+    else if(run&&s.skip){s.done=false;s.skipPass=true;}      // passed over by the user’s choice: not “achieved”, but it doesn’t hold anything up
+    else{s.done=false;run=false;}
   });
-  var next=Math.min(S.length-1,current+1);
-  S.currentIdx=current;S.nextIdx=(current>=S.length-1)?-1:next;
+  S.currentIdx=current;
+  S.nextIdx=-1;for(var i=0;i<S.length;i++){if(!S[i].done&&!S[i].skipPass){S.nextIdx=i;break;}}
+  S.doneCount=S.filter(function(s){return s.done;}).length;
+  S.skipCount=S.filter(function(s){return s.skipPass;}).length;
+  S.passedIdx=S.nextIdx<0?S.length-1:S.nextIdx-1;            // rail is solid up to the last stage that was passed
+  S.waiting=S.nextIdx<0?[]:S.filter(function(s,i){return i>S.nextIdx&&s.raw;});   // later stages already met, held back by the next-up stage
   return S;
 }
 // Draw a stage icon (duo-tone) centred on cx,cy
@@ -21334,64 +21469,91 @@ function fireIcon(key,cx,cy,size,col,strokeOp,fillOp){
     +'<g fill="'+col+'" fill-opacity="'+(ic.solid?Math.min(.75,fillOp*3):fillOp)+'" stroke="none">'+f+'</g>'
     +'<g fill="none" stroke="'+col+'" stroke-opacity="'+strokeOp+'" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</g></g>';
 }
-var _fireFirstPaint=true,_fireDetailIdx=-1;
+function fireScrollTo(idx){
+  var sc=document.getElementById('fire-timeline-scroll');if(!sc)return;
+  var left=Math.max(0,idx*FIRE_NODE+FIRE_LEFT-sc.offsetWidth/2);
+  sc.scrollTo?sc.scrollTo({left:left,behavior:'smooth'}):(sc.scrollLeft=left);
+}
 function fireJumpToCurrent(){
-  var sc=document.getElementById('fire-timeline-scroll');
   var S=renderFIREroadmap._stages||[];
-  if(!sc||!S.length)return;
+  if(!S.length)return;
   var idx=S.nextIdx>=0?S.nextIdx:S.length-1;
-  sc.scrollTo?sc.scrollTo({left:Math.max(0,idx*108+60-sc.offsetWidth/2),behavior:'smooth'}):(sc.scrollLeft=Math.max(0,idx*108+60-sc.offsetWidth/2));
+  fireScrollTo(idx);
   fireShowDetail(idx);
 }
+// The timeline is drawn as a WINDOW: only the stages on screen (plus a buffer) exist in the SVG, which sits at its place in a wide
+// scrolling track. The old version drew all 30 stages in one 3,360px-wide SVG with blur filters and endless animations; on a
+// high-density phone screen that was millions of pixels to repaint, and it showed up half-drawn.
 function renderFIREroadmap(){
-  var svgEl=document.getElementById('fire-roadmap-svg');
+  var svgEl=document.getElementById('fire-roadmap-svg'),track=document.getElementById('fire-track'),SC=document.getElementById('fire-timeline-scroll');
   if(!svgEl)return;
   var phases=FIRE_PHASES;
   var stages=fireBuildStages();
   renderFIREroadmap._stages=stages;
-  var currentIdx=stages.currentIdx,nextIdx=stages.nextIdx;
-  var doneCount=currentIdx+1;
+  var nextIdx=stages.nextIdx;
+  var doneCount=stages.doneCount,skipCount=stages.skipCount;
 
-  var SCROLL_W=document.getElementById('fire-timeline-scroll');
-  var containerW=SCROLL_W?SCROLL_W.offsetWidth:900;
-  var NODE_SPACING=108,NODE_R=22,LEFT=60;
+  // header: where you are + the blocker banner (these work even while the SVG itself is off-screen)
+  var focus=stages[nextIdx>=0?nextIdx:stages.length-1];
+  var lbl=document.getElementById('fire-current-label');
+  if(lbl){
+    var ph=phases[focus.phase];
+    lbl.textContent=(nextIdx>=0?'STAGE '+(nextIdx+1)+'/30 · ':'COMPLETE · ')+ph.label;
+    lbl.style.color=ph.col;lbl.style.borderColor=ph.col+'44';lbl.style.background=ph.col+'11';
+  }
+  var pt=document.getElementById('fire-progress-txt');
+  if(pt)pt.textContent=doneCount+' of '+stages.length+' achieved'+(skipCount?' · '+skipCount+' skipped':'');
+  var bl=document.getElementById('fire-block');
+  if(bl){
+    var ns=stages[nextIdx>=0?nextIdx:0],w=stages.waiting||[];
+    if(nextIdx>=0&&w.length){
+      var names=w.slice(0,4).map(function(s){return s.name;}).join(', ')+(w.length>4?' …':'');
+      bl.style.display='';
+      bl.innerHTML='<div class="fb-t">🔓 <b>'+w.length+' later stage'+(w.length>1?'s are':' is')+' already met</b> — waiting on “'+ns.name+'”</div>'
+        +'<div class="fb-s">Stages unlock in order, so “'+ns.name+'” is holding back '+names+'. Complete it and they unlock straight away.</div>'
+        +'<div class="fb-b"><button type="button" onclick="fireScrollTo('+nextIdx+');fireShowDetail('+nextIdx+')">Fix “'+ns.name+'”</button>'
+        +'<button type="button" class="ghost" onclick="fireScrollTo('+nextIdx+');fireShowDetail('+nextIdx+',{skipAsk:true})">It doesn’t apply to me</button></div>';
+    }else bl.style.display='none';
+  }
+  if(_fireDetailIdx>=0&&document.getElementById('fire-detail-panel')&&document.getElementById('fire-detail-panel').style.display!=='none')fireShowDetail(_fireDetailIdx,{keepAsk:true});
+
+  var containerW=SC?SC.clientWidth:0;
+  if(!SC||!track||!(containerW>0))return;                       // tab not on screen yet: drawn when it is shown
+  var NODE_SPACING=FIRE_NODE,NODE_R=22,LEFT=FIRE_LEFT,H=FIRE_H,LINE_Y=148;
   var TOTAL_W=Math.max(containerW,stages.length*NODE_SPACING+120);
-  var H=280,LINE_Y=148,PH_BAND=24;
-  svgEl.setAttribute('viewBox','0 0 '+TOTAL_W+' '+H);
-  svgEl.setAttribute('width',TOTAL_W);
-  svgEl.setAttribute('height',H);
-  svgEl.style.minWidth=TOTAL_W+'px';
+  track.style.width=TOTAL_W+'px';track.style.height=H+'px';
   // Always open at stage one; afterwards keep wherever the user has scrolled to
-  if(SCROLL_W&&_fireFirstPaint){SCROLL_W.scrollLeft=0;_fireFirstPaint=false;}
+  if(_fireFirstPaint){SC.scrollLeft=0;_fireFirstPaint=false;}
+  var sl=SC.scrollLeft,buf=Math.max(containerW*0.75,NODE_SPACING*3);
+  var x0=Math.max(0,Math.floor((sl-buf)/NODE_SPACING)*NODE_SPACING),x1=Math.min(TOTAL_W,Math.ceil((sl+containerW+buf)/NODE_SPACING)*NODE_SPACING);
+  var i0=Math.max(0,Math.floor((x0-LEFT)/NODE_SPACING)-1),i1=Math.min(stages.length-1,Math.ceil((x1-LEFT)/NODE_SPACING)+1);
 
   var phaseSpans=phases.map(function(p,pi){
     var idxs=stages.map(function(s,i){return s.phase===pi?i:-1;}).filter(function(x){return x>=0;});
     return{x0:idxs[0]*NODE_SPACING+LEFT-NODE_SPACING/2,x1:idxs[idxs.length-1]*NODE_SPACING+LEFT+NODE_SPACING/2,col:p.col,label:p.label,
-      done:idxs.every(function(i){return stages[i].done;})};
+      done:idxs.every(function(i){return stages[i].done||stages[i].skipPass;})};
   });
 
-  var out='<defs>'
-    +'<filter id="fr-glow"><feGaussianBlur stdDeviation="3" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
-    +'<filter id="fr-glow-sm"><feGaussianBlur stdDeviation="2" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
-    +'</defs>';
-  out+='<rect x="0" y="0" width="'+TOTAL_W+'" height="'+H+'" fill="#030810"/>';
-
+  var out='<rect x="'+x0+'" y="0" width="'+(x1-x0)+'" height="'+H+'" fill="#030810"/>';
   phaseSpans.forEach(function(sp,pi){
-    out+='<rect x="'+sp.x0+'" y="0" width="'+(sp.x1-sp.x0)+'" height="'+H+'" fill="'+sp.col+'" opacity="'+(pi%2===0?'0.07':'0.04')+'"/>';
-    if(pi>0)out+='<line x1="'+sp.x0+'" y1="0" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="0.8" opacity="0.25" stroke-dasharray="4 3"/>';
-    out+='<text x="'+((sp.x0+sp.x1)/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="7.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.6')+'" letter-spacing="2.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
-    out+='<line x1="'+(sp.x0+4)+'" y1="'+(H-16)+'" x2="'+(sp.x1-4)+'" y2="'+(H-16)+'" stroke="'+sp.col+'" stroke-width="'+(sp.done?'1.6':'0.6')+'" opacity="'+(sp.done?'0.7':'0.25')+'"/>';
+    var a=Math.max(x0,sp.x0),b=Math.min(x1,sp.x1);
+    if(b<=a)return;
+    out+='<rect x="'+a+'" y="0" width="'+(b-a)+'" height="'+H+'" fill="'+sp.col+'" opacity="'+(pi%2===0?'0.07':'0.04')+'"/>';
+    if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line x1="'+sp.x0+'" y1="0" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="0.8" opacity="0.25" stroke-dasharray="4 3"/>';
+    out+='<text x="'+((a+b)/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="7.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.6')+'" letter-spacing="2.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
+    out+='<line x1="'+(a+4)+'" y1="'+(H-16)+'" x2="'+(b-4)+'" y2="'+(H-16)+'" stroke="'+sp.col+'" stroke-width="'+(sp.done?'1.6':'0.6')+'" opacity="'+(sp.done?'0.7':'0.25')+'"/>';
   });
 
-  // rail: solid up to the last achieved stage, dashed beyond
+  // rail: solid up to the last passed stage, dashed beyond
   var railX0=LEFT,railX1=(stages.length-1)*NODE_SPACING+LEFT;
-  var doneX=currentIdx>=0?currentIdx*NODE_SPACING+LEFT:railX0;
-  out+='<line x1="'+railX0+'" y1="'+LINE_Y+'" x2="'+railX1+'" y2="'+LINE_Y+'" stroke="rgba(68,192,185,0.15)" stroke-width="2" stroke-dasharray="6 4"/>';
-  if(currentIdx>0)out+='<line x1="'+railX0+'" y1="'+LINE_Y+'" x2="'+doneX+'" y2="'+LINE_Y+'" stroke="rgba(68,192,185,0.85)" stroke-width="3"/>';
+  var doneX=stages.passedIdx>=0?stages.passedIdx*NODE_SPACING+LEFT:railX0;
+  out+='<line x1="'+Math.max(railX0,x0)+'" y1="'+LINE_Y+'" x2="'+Math.min(railX1,x1)+'" y2="'+LINE_Y+'" stroke="rgba(68,192,185,0.15)" stroke-width="2" stroke-dasharray="6 4"/>';
+  if(stages.passedIdx>0&&doneX>x0)out+='<line x1="'+Math.max(railX0,x0)+'" y1="'+LINE_Y+'" x2="'+Math.min(doneX,x1)+'" y2="'+LINE_Y+'" stroke="rgba(68,192,185,0.85)" stroke-width="3"/>';
 
-  stages.forEach(function(s,i){
+  for(var i=i0;i<=i1;i++){
+    var s=stages[i];
     var cx=i*NODE_SPACING+LEFT;
-    var done=s.done,isNext=i===nextIdx,locked=!done&&!isNext;
+    var done=s.done,isNext=i===nextIdx,skipped=s.skipPass,waiting=s.raw&&!done&&!skipped,locked=!done&&!isNext&&!skipped;
     var col=s.col||'#44c0b9';
     var above=i%2===0;
     var namY=above?(LINE_Y-NODE_R-10):(LINE_Y+NODE_R+26);
@@ -21400,15 +21562,15 @@ function renderFIREroadmap(){
 
     out+='<line x1="'+cx+'" y1="'+(above?LINE_Y-NODE_R:LINE_Y+3)+'" x2="'+cx+'" y2="'+(above?LINE_Y-3:LINE_Y+NODE_R)+'" stroke="'+(done?col:'rgba(68,192,185,0.12)')+'" stroke-width="1"/>';
 
-    if(isNext){
-      out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+7)+'" fill="none" stroke="'+col+'" stroke-width="1.2" opacity="0.5" filter="url(#fr-glow)">'
-        +'<animate attributeName="r" values="'+(NODE_R+5)+';'+(NODE_R+10)+';'+(NODE_R+5)+'" dur="2.6s" repeatCount="indefinite"/>'
-        +'<animate attributeName="opacity" values="0.6;0.12;0.6" dur="2.6s" repeatCount="indefinite"/></circle>';
+    if(isNext){   // static halo (no blur filter, no endless animation: those made the whole timeline repaint every frame)
+      out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+6)+'" fill="none" stroke="'+col+'" stroke-width="1.2" opacity="0.55"/>'
+        +'<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+11)+'" fill="none" stroke="'+col+'" stroke-width="3" opacity="0.14"/>';
     }
+    if(done)out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+3)+'" fill="none" stroke="'+col+'" stroke-width="3" opacity="0.2"/>';
     // node body
     out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+NODE_R+'" fill="'+(done?col+'38':isNext?'rgba(10,18,30,0.95)':'rgba(6,12,22,0.92)')+'"'
-      +' stroke="'+(done?col:isNext?col:'rgba(68,192,185,0.14)')+'" stroke-width="'+(done?2.4:isNext?2.2:1)+'"'
-      +(done?' filter="url(#fr-glow-sm)"':'')+(locked?' stroke-dasharray="3 3"':'')+click+'/>';
+      +' stroke="'+(done?col:(isNext||waiting)?col:skipped?'#e8a23c':'rgba(68,192,185,0.14)')+'" stroke-width="'+(done?2.4:isNext?2.2:(waiting||skipped)?1.6:1)+'"'
+      +((locked&&!waiting)||skipped?' stroke-dasharray="3 3"':'')+click+'/>';
     // progress ring on the next stage
     if(isNext&&s.prog){
       var prog=Math.max(0,Math.min(1,s.prog()));
@@ -21418,77 +21580,142 @@ function renderFIREroadmap(){
       }
     }
     // the stage's own icon
-    out+=fireIcon(s.ic,cx,LINE_Y,done?24:22,done?col:isNext?col:'#7d8793',done?1:isNext?0.95:0.62,done?0.30:isNext?0.2:0.1);
-    // achieved: bold tick badge
-    if(done){
+    out+=fireIcon(s.ic,cx,LINE_Y,done?24:22,done?col:(isNext||waiting)?col:'#7d8793',done?1:(isNext||waiting)?0.95:0.62,done?0.30:isNext?0.2:0.1);
+    if(done){   // achieved: bold tick badge
       out+='<g style="pointer-events:none"><circle cx="'+(cx+NODE_R-2)+'" cy="'+(LINE_Y-NODE_R+3)+'" r="8" fill="'+col+'" stroke="#030810" stroke-width="2"/>'
         +'<path d="M'+(cx+NODE_R-5.6)+' '+(LINE_Y-NODE_R+3.2)+'l2.6 2.6 4.6-5.2" fill="none" stroke="#030810" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>';
+    }else if(skipped){   // skipped by choice: amber “forward” badge
+      out+='<g style="pointer-events:none"><circle cx="'+(cx+NODE_R-2)+'" cy="'+(LINE_Y-NODE_R+3)+'" r="8" fill="#030810" stroke="#e8a23c" stroke-width="1.4"/>'
+        +'<path d="M'+(cx+NODE_R-5.4)+' '+(LINE_Y-NODE_R+0.2)+'l3 2.8-3 2.8M'+(cx+NODE_R-1.2)+' '+(LINE_Y-NODE_R+0.2)+'l3 2.8-3 2.8" fill="none" stroke="#e8a23c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>';
+    }else if(waiting){   // requirement already met, but an earlier stage is holding it: outlined tick
+      out+='<g style="pointer-events:none"><circle cx="'+(cx+NODE_R-2)+'" cy="'+(LINE_Y-NODE_R+3)+'" r="8" fill="#050c14" stroke="'+col+'" stroke-width="1.4" stroke-dasharray="2 2"/>'
+        +'<path d="M'+(cx+NODE_R-5.6)+' '+(LINE_Y-NODE_R+3.2)+'l2.6 2.6 4.6-5.2" fill="none" stroke="'+col+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>';
     }
-    // locked: small padlock badge (icon stays visible underneath)
-    if(locked){
+    if(locked&&!waiting){   // locked: small padlock badge (icon stays visible underneath)
       out+='<g style="pointer-events:none" transform="translate('+(cx+NODE_R-3)+' '+(LINE_Y+NODE_R-3)+')"><circle r="7.5" fill="#050c14" stroke="rgba(125,135,147,0.55)" stroke-width="1"/>'
         +'<rect x="-3" y="-0.6" width="6" height="4.6" rx="1" fill="rgba(125,135,147,0.7)"/><path d="M-1.8 -0.6v-1.5a1.8 1.8 0 0 1 3.6 0v1.5" fill="none" stroke="rgba(125,135,147,0.8)" stroke-width="1.1"/></g>';
     }
-    // labels
-    var nameCol=done?col:isNext?'#e9f1f1':'rgba(154,160,166,0.55)';
+    var nameCol=done?col:(isNext||waiting)?'#e9f1f1':skipped?'#e8a23c':'rgba(154,160,166,0.55)';
     out+='<text x="'+cx+'" y="'+namY+'" text-anchor="middle" font-size="7.5" font-family="Syne,sans-serif" font-weight="800" fill="'+nameCol+'"'+click+'>'+s.name+'</text>';
-    out+='<text x="'+cx+'" y="'+descY+'" text-anchor="middle" font-size="6" font-family="DM Sans,sans-serif" fill="rgba(110,120,132,'+(done?0.9:0.65)+')">'+s.desc+'</text>';
-    // tag for the stage to work on now
-    if(isNext){
+    out+='<text x="'+cx+'" y="'+descY+'" text-anchor="middle" font-size="6" font-family="DM Sans,sans-serif" fill="rgba(110,120,132,'+(done?0.9:0.65)+')">'+(waiting?'met · waiting':skipped?'skipped':s.desc)+'</text>';
+    if(isNext){   // tag for the stage to work on now
       var tag=(i===0)?'START HERE':'NEXT UP';
       out+='<rect x="'+(cx-27)+'" y="'+(LINE_Y-NODE_R-48)+'" width="54" height="12" fill="'+col+'26" stroke="'+col+'" stroke-width="0.8"/>'
         +'<text x="'+cx+'" y="'+(LINE_Y-NODE_R-39.5)+'" text-anchor="middle" font-size="6.2" font-family="Share Tech Mono,monospace" fill="'+col+'" letter-spacing="1.2" font-weight="700">'+tag+'</text>';
     }
     out+='<text x="'+(cx-NODE_R+3)+'" y="'+(LINE_Y+NODE_R-2)+'" font-size="5.5" font-family="Share Tech Mono,monospace" fill="rgba(68,192,185,0.3)" style="pointer-events:none">'+String(i+1).padStart(2,'0')+'</text>';
-  });
-  svgEl.innerHTML=out;
-
-  var focus=stages[nextIdx>=0?nextIdx:stages.length-1];
-  var lbl=document.getElementById('fire-current-label');
-  if(lbl){
-    var ph=phases[focus.phase];
-    lbl.textContent=(nextIdx>=0?'STAGE '+(nextIdx+1)+'/30 · ':'COMPLETE · ')+ph.label;
-    lbl.style.color=ph.col;lbl.style.borderColor=ph.col+'44';lbl.style.background=ph.col+'11';
   }
-  var pt=document.getElementById('fire-progress-txt');
-  if(pt)pt.textContent=doneCount+' of '+stages.length+' achieved';
-  if(_fireDetailIdx>=0&&document.getElementById('fire-detail-panel')&&document.getElementById('fire-detail-panel').style.display!=='none')fireShowDetail(_fireDetailIdx);
+  svgEl.setAttribute('viewBox',x0+' 0 '+(x1-x0)+' '+H);
+  svgEl.setAttribute('width',x1-x0);svgEl.setAttribute('height',H);
+  svgEl.style.left=x0+'px';
+  renderFIREroadmap._win={x0:x0,x1:x1,total:TOTAL_W};
+  if(svgEl.__sig!==out){svgEl.__sig=out;svgEl.innerHTML=out;}   // identical drawing = no repaint
 }
-function fireToggleManual(key){
+// scrolling the track just moves the window; it is only redrawn when the user gets near its edge
+(function(){
+  var raf=0;
+  function check(){
+    raf=0;
+    var SC=document.getElementById('fire-timeline-scroll'),w=renderFIREroadmap._win;
+    if(!SC||!w)return;
+    var sl=SC.scrollLeft,cw=SC.clientWidth,m=FIRE_NODE*1.5;
+    if((w.x0>0&&sl<w.x0+m)||(w.x1<w.total&&sl+cw>w.x1-m))renderFIREroadmap();
+  }
+  window.addEventListener('load',function(){
+    var SC=document.getElementById('fire-timeline-scroll');
+    if(SC)SC.addEventListener('scroll',function(){if(!raf)raf=requestAnimationFrame(check);},{passive:true});
+  });
+})();
+
+function fireTick(k,on){
   if(!ovState.manual)ovState.manual={};
-  ovState.manual[key]=!ovState.manual[key];
+  ovState.manual[k]=!!on;
   saveState();
   renderFIREroadmap();
+  try{renderDebtMapConfirm();}catch(e){}
   try{checkAchievements();}catch(e){}
 }
-function fireShowDetail(idx){
+function fireToggleManual(k){fireTick(k,!fireMan(k));}
+function fireSkip(key){
+  if(!ovState.skipped)ovState.skipped={};
+  ovState.skipped[key]=true;
+  _fireSkipAsk=-1;
+  saveState();renderFIREroadmap();
+  var S=renderFIREroadmap._stages||[],n=S.nextIdx;
+  if(n>=0){fireScrollTo(n);fireShowDetail(n);}
+  if(typeof showToast==='function')showToast('Stage skipped — the next one is open');
+}
+function fireUnskip(key){
+  if(ovState.skipped)delete ovState.skipped[key];
+  saveState();renderFIREroadmap();
+}
+function fireGo(tab){
+  try{showTab(tab);}catch(e){}
+  try{window.scrollTo(0,0);}catch(e){}
+}
+// one-tap net worth snapshot for the current month (same record the “Add Data Point” form makes)
+function fireLogSnapshot(){
+  var d=new Date(),month=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  ovState.snapshots=(ovState.snapshots||[]).filter(function(x){return x.month!==month;});
+  ovState.snapshots.push({month:month,nw:computeNetWorth(),debt:debtTotal(),liab:alTotalLiab(),income:cfTotalIn()});
+  saveState();
+  try{drawChart();updateKPIs();renderMsExtras();}catch(e){}
+  renderFIREroadmap();
+  var S=renderFIREroadmap._stages||[],n=S.nextIdx;
+  if(n>=0)fireShowDetail(n);
+  if(typeof showToast==='function')showToast('Net worth snapshot recorded for '+month+' ✓');
+}
+function fireShowDetail(idx,opts){
+  opts=opts||{};
   var S=renderFIREroadmap._stages||fireBuildStages();
   var s=S[idx];
   var panel=document.getElementById('fire-detail-panel'),inner=document.getElementById('fire-detail-inner');
   if(!s||!panel||!inner)return;
+  if(_fireDetailIdx!==idx&&!opts.keepAsk)_fireSkipAsk=-1;
+  if(opts.skipAsk)_fireSkipAsk=idx;
   _fireDetailIdx=idx;
   var ph=FIRE_PHASES[s.phase],col=s.col||ph.col;
   var seq=String(idx+1).padStart(2,'0');
-  var state_=s.done?'ACHIEVED':(idx===S.nextIdx?'IN PROGRESS':'LOCKED');
-  var stCol=s.done?'#3ecf8e':(idx===S.nextIdx?col:'#7d8793');
+  var isNext=idx===S.nextIdx,waiting=s.raw&&!s.done&&!s.skipPass;
+  var state_=s.done?'ACHIEVED':s.skipPass?'SKIPPED':isNext?'IN PROGRESS':waiting?'MET · WAITING':'LOCKED';
+  var stCol=s.done?'#3ecf8e':s.skipPass?'#e8a23c':(isNext||waiting)?col:'#7d8793';
   var long=(FIRE_LONG[idx]||s.desc);
   var progTxt='';
   if(!s.done&&s.cur&&s.target)progTxt='<div style="font-family:\'Share Tech Mono\',monospace;font-size:.5rem;color:'+col+';margin-top:6px">'+gbpFmt(Math.max(0,s.cur()))+' of '+gbpFmt(s.target)+' · '+Math.round(Math.max(0,Math.min(1,s.prog()))*100)+'%</div>';
-  else if(!s.done&&s.prog&&idx===S.nextIdx)progTxt='<div style="font-family:\'Share Tech Mono\',monospace;font-size:.5rem;color:'+col+';margin-top:6px">'+Math.round(Math.max(0,Math.min(1,s.prog()))*100)+'% there</div>';
-  var lockTxt=(!s.done&&idx!==S.nextIdx)?'<div style="font-size:.52rem;color:var(--t3);margin-top:6px">Unlocks after “'+S[S.nextIdx>=0?S.nextIdx:0].name+'”.</div>':'';
-  var hint=(!s.done&&s.hint)?'<div style="font-size:.52rem;color:var(--t2);margin-top:6px;line-height:1.5">▸ '+s.hint+'</div>':'';
-  var btn='';
-  if(s.manual&&(idx===S.nextIdx||s.done||s.raw)){
-    var on=fireMan(s.manual);
-    btn='<button onclick="fireToggleManual(\''+s.manual+'\')" style="margin-top:8px;padding:5px 12px;font-size:.5rem;font-family:\'Syne\',sans-serif;font-weight:700;cursor:pointer;color:'+(on?'var(--t2)':col)+';background:'+(on?'transparent':col+'18')+';border:1px solid '+(on?'var(--bd)':col+'88')+';border-radius:4px">'+(on?'↺ Undo':'✓ '+s.manualLbl)+'</button>';
+  else if(!s.done&&s.prog&&isNext)progTxt='<div style="font-family:\'Share Tech Mono\',monospace;font-size:.5rem;color:'+col+';margin-top:6px">'+Math.round(Math.max(0,Math.min(1,s.prog()))*100)+'% there</div>';
+  var blocker=S.nextIdx>=0?S[S.nextIdx]:null;
+  var need='';
+  if(!s.done&&!s.skipPass){
+    if(waiting&&blocker){
+      need='<div class="fd-box ok">✓ <b>You already meet this.</b> It unlocks as soon as “'+blocker.name+'” is done.<br><button type="button" class="fd-btn" onclick="fireScrollTo('+S.nextIdx+');fireShowDetail('+S.nextIdx+')">Go to “'+blocker.name+'”</button></div>';
+    }else{
+      var items=(s.why?s.why():[s.hint||'Not met yet.']).filter(Boolean);
+      need='<div class="fd-box"><div class="fd-h">WHAT THIS NEEDS</div><ul>'+items.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul>'
+        +(!isNext&&blocker?'<div class="fd-sub">It comes after “'+blocker.name+'” — stages unlock in order.</div>':'')+'</div>';
+    }
   }
+  var ticks=(s.confirms||[]).map(function(c){
+    var on=fireMan(c.k);
+    return '<label class="fd-tick"><input type="checkbox" '+(on?'checked ':'')+'onchange="fireTick(\''+c.k+'\',this.checked)"><span>'+c.lbl+(c.sub?'<small>'+c.sub+'</small>':'')+'</span></label>';
+  }).join('');
+  var acts=(!s.done&&s.acts?s.acts:[]).map(function(a){return '<button type="button" class="fd-btn" onclick="'+a.fn+'">'+a.lbl+'</button>';}).join('');
+  var skip='';
+  if(!s.done){
+    if(s.skip)skip='<button type="button" class="fd-btn ghost" onclick="fireUnskip(\''+s.key+'\')">Undo skip</button>';
+    else if(isNext){
+      if(_fireSkipAsk===idx)skip='<div class="fd-box warn">Skip “'+s.name+'”? It won’t count as achieved, but the stages after it unlock. You can undo this any time.<br>'
+        +'<button type="button" class="fd-btn" onclick="fireSkip(\''+s.key+'\')">Yes, skip it</button> <button type="button" class="fd-btn ghost" onclick="_fireSkipAsk=-1;fireShowDetail('+idx+')">Keep it</button></div>';
+      else skip='<button type="button" class="fd-link" onclick="fireShowDetail('+idx+',{skipAsk:true})">This doesn’t apply to me — skip it</button>';
+    }
+  }
+  var btn=(acts||skip)?'<div class="fd-acts">'+acts+skip+'</div>':'';
   inner.innerHTML='<div style="flex-shrink:0;width:46px;height:46px;border-radius:50%;border:2px solid '+(s.done?col:'rgba(68,192,185,.25)')+';background:'+(s.done?col+'26':'rgba(6,12,22,.9)')+';display:flex;align-items:center;justify-content:center">'
-      +'<svg width="28" height="28" viewBox="0 0 28 28">'+fireIcon(s.ic,14,14,24,s.done||idx===S.nextIdx?col:'#7d8793',s.done||idx===S.nextIdx?1:.6,.25)+'</svg></div>'
+      +'<svg width="28" height="28" viewBox="0 0 28 28">'+fireIcon(s.ic,14,14,24,s.done||isNext||waiting?col:'#7d8793',s.done||isNext||waiting?1:.6,.25)+'</svg></div>'
     +'<div style="flex:1;min-width:0">'
-    +'<div style="font-family:\'Syne\',sans-serif;font-size:.74rem;font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+(s.done?'✓ ':'')+state_+'</span></div>'
+    +'<div style="font-family:\'Syne\',sans-serif;font-size:.74rem;font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+state_+'</span></div>'
     +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:rgba(68,192,185,.45);letter-spacing:.1em;margin-bottom:4px">'+ph.label+' PHASE · STEP '+seq+' OF 30</div>'
     +'<div style="font-family:\'DM Sans\',sans-serif;font-size:.58rem;color:var(--t2);line-height:1.5">'+long+'</div>'
-    +progTxt+hint+lockTxt+btn+'</div>';
+    +progTxt+need+ticks+btn+'</div>';
   panel.style.display='';
 }
 
