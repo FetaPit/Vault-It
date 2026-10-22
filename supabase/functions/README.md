@@ -51,10 +51,21 @@ On Resend's free plan, `FROM_EMAIL` must be `onboarding@resend.dev` and you can 
 send to email addresses you've verified in the Resend dashboard. To send to any address,
 add and verify your own domain in Resend → Domains.
 
+### Abuse limits
+
+This endpoint creates accounts and sends e-mail, so it is metered (migration `008_auth_rate_limit.sql`, `rate_hit()`):
+per address 6/hour, per IP 60/hour, whole service 200/hour. A refused request returns `429 { error: 'rate_limited', retryAfter }`
+and the app shows the wait instead of falling back. Tunable with secrets `RATE_EMAIL_PER_HOUR`, `RATE_IP_PER_HOUR`,
+`RATE_GLOBAL_PER_HOUR` (a room of testers shares one public IP, so keep the per-IP number generous). Counters are keyed by a salted hash,
+never a raw address or IP. If the limiter table is missing the function **fails open** (and logs) rather than locking everyone out —
+so apply migration 008 **before** relying on it. Addresses are validated strictly and HTML-escaped in the e-mail body.
+
+Resend's free plan allows 100 e-mails/day: for a launch-night room of testers, upgrade Resend (and keep `RATE_GLOBAL_PER_HOUR` below your quota).
+
 ### Fallback
 
-If the Edge Function is not deployed, the app automatically falls back to
-Supabase's built-in `signInWithOtp` (rate-limited to ~4 emails/hour per project).
+If the Edge Function is not deployed or fails (5xx / timeout), the app falls back to
+Supabase's built-in `signInWithOtp` (rate-limited to ~4 emails/hour per project). It does **not** fall back when our own limit says 429.
 
 
 ## pin-auth
@@ -66,9 +77,19 @@ Email + PIN sign-in for returning users on any device.
 2. Deploy: `supabase functions deploy pin-auth --no-verify-jwt`
    (optional: `supabase secrets set PIN_PEPPER=<random>`; defaults to the service-role key).
 
-Actions: `status` (does this email have a PIN?), `set` / `remove` (need the signed-in user's JWT) and
-`login` (email + 6-digit PIN → one-time code the app exchanges for a real session).
+Actions: `status` (does this email have a PIN?), `set` / `remove` (need the signed-in user's JWT),
+`login` (email + 6-digit PIN → one-time code the app exchanges for a real session) and
+`delete` (JWT + PIN → erases the account and everything stored about it, see below).
 PINs are PBKDF2-hashed server-side; 5 wrong tries lock the account for 15 min, doubling every further 5.
+
+`status` and `login` are also metered per IP (migration 008): 120 and 60 per 10 min by default (`RATE_PIN_STATUS_PER_10MIN`,
+`RATE_PIN_LOGIN_PER_10MIN`) → `429 { error: 'rate_limited', retryAfter }`, checked *before* a PIN attempt is spent.
+
+`delete` (GDPR erasure): requires the user's own JWT. If the account has a PIN it must be supplied and is checked with the same
+lockout as sign-in; if it has none, the sign-in must be within the last 15 minutes (`403 recent_login`). It calls
+`erase_user_data()` (migration 008 — order matters because `vault_data` archives rows into `vault_data_history` when deleted) and
+only then deletes the auth user, so a failure part-way leaves the login in place and a retry works. Limited to 10 per IP per hour.
+Also run: `supabase/migrations/008_auth_rate_limit.sql` once (before deploying either function).
 
 
 ## portfolio-vision

@@ -5,13 +5,17 @@ src=src.replace(/import \{ createClient \} from [^\n]+\n/,'const createClient=gl
 const js=esbuild.transformSync(src,{loader:'ts',format:'cjs'}).code;
 
 // ── in-memory stand-in for Supabase (mirrors the SQL in 004_user_pins.sql) ──
-const db={pins:{}}; let otpCalls=0, released=0; const users={'jwt-alice':{id:'u-alice',email:'Alice@Example.com'},'jwt-bob':{id:'u-bob',email:'bob@example.com'}};
+const db={pins:{}}; let otpCalls=0, released=0; const NOW=()=>new Date().toISOString(), OLD=()=>new Date(Date.now()-2*3600e3).toISOString();
+const users={'jwt-alice':{id:'u-alice',email:'Alice@Example.com',last_sign_in_at:NOW()},'jwt-bob':{id:'u-bob',email:'bob@example.com',last_sign_in_at:OLD()},
+  'jwt-carol':{id:'u-carol',email:'carol@example.com',last_sign_in_at:NOW()},'jwt-dave':{id:'u-dave',email:'dave@example.com',last_sign_in_at:OLD()}};
+const rate={}; let rateDown=false; const erased=[], deleted=[]; let eraseFails=false;
 const rowsByEmail=e=>Object.values(db.pins).find(r=>r.email===e);
 globalThis.__createClient=()=>({
   auth:{getUser:async jwt=>users[jwt]?{data:{user:users[jwt]},error:null}:{data:{user:null},error:{message:'bad'}},
-        admin:{generateLink:async({email})=>{otpCalls++;return {data:{properties:{email_otp:'654321'}},error:null};}}},
+        admin:{generateLink:async({email})=>{otpCalls++;return {data:{properties:{email_otp:'654321'}},error:null};},
+               deleteUser:async id=>{deleted.push(id);return {error:null};}}},
   from:()=>({
-    select:()=>({eq:(c,v)=>({maybeSingle:async()=>({data:rowsByEmail(v)?{user_id:rowsByEmail(v).user_id}:null})})}),
+    select:()=>({eq:(c,v)=>({maybeSingle:async()=>{const r=c==='user_id'?db.pins[v]:rowsByEmail(v);return {data:r?{user_id:r.user_id}:null};}})}),
     upsert:async(row)=>{db.pins[row.user_id]={...row};return {error:null};},
     delete:()=>({eq:async(c,v)=>{delete db.pins[v];return {};}}),
   }),
@@ -22,10 +26,15 @@ globalThis.__createClient=()=>({
       r.locked_until=(n%5===0)?Date.now()+Math.min(1440,15*Math.pow(2,n/5-1))*60000:null; r.failed_attempts=n; r.last_attempt_at=Date.now();
       released++; return {data:[{user_id:r.user_id,pin_hash:r.pin_hash,salt:r.salt,iterations:r.iterations,attempts:n,locked_secs:0}]};}
     if(fn==='pin_reset_attempts'){const r=db.pins[a.p_user];if(r){r.failed_attempts=0;r.locked_until=null;}return {};}
+    if(fn==='rate_hit'){ if(rateDown)return {data:null,error:{message:'function rate_hit does not exist'}};
+      const now=Date.now(); let r=rate[a.p_key]; if(!r||r.start<now-a.p_window_secs*1000)r=rate[a.p_key]={n:0,start:now}; r.n++;
+      const allowed=r.n<=a.p_limit; return {data:[{allowed,retry_after:allowed?0:Math.ceil((r.start+a.p_window_secs*1000-now)/1000)}],error:null}; }
+    if(fn==='erase_user_data'){ if(eraseFails)return {error:{message:'boom'}}; erased.push(a); delete db.pins[a.p_user]; return {error:null}; }
   }});
-globalThis.Deno={env:{get:k=>({SUPABASE_URL:'http://x',SUPABASE_SERVICE_ROLE_KEY:'svc-secret-key'})[k]},serve:h=>{globalThis.__h=h;}};
+globalThis.Deno={env:{get:k=>({SUPABASE_URL:'http://x',SUPABASE_SERVICE_ROLE_KEY:'svc-secret-key',RATE_PIN_STATUS_PER_10MIN:'5',RATE_PIN_LOGIN_PER_10MIN:'8',RATE_PIN_DELETE_PER_HOUR:'3'})[k]},serve:h=>{globalThis.__h=h;}};
 new Function('require','module','exports',js)(require,{exports:{}},{});
-const call=async(body,jwt)=>{const t=Date.now();const r=await globalThis.__h(new Request('http://x/pin-auth',{method:'POST',headers:{'content-type':'application/json',...(jwt?{authorization:'Bearer '+jwt}:{})},body:JSON.stringify(body)}));return {s:r.status,b:await r.json(),ms:Date.now()-t};};
+let ipN=0; // every call comes from its own address unless a test pins one
+const call=async(body,jwt,ip)=>{const t=Date.now();const r=await globalThis.__h(new Request('http://x/pin-auth',{method:'POST',headers:{'content-type':'application/json','cf-connecting-ip':ip||('10.9.'+(ipN>>8)+'.'+(ipN++&255)),...(jwt?{authorization:'Bearer '+jwt}:{})},body:JSON.stringify(body)}));return {s:r.status,b:await r.json(),ms:Date.now()-t,h:r.headers};};
 
 (async()=>{
   let r=await call({action:'status',email:'alice@example.com'}); ok(r.b.pin===false,'status: no PIN yet');
@@ -73,5 +82,45 @@ const call=async(body,jwt)=>{const t=Date.now();const r=await globalThis.__h(new
   r=await call({action:'remove'},'jwt-bob'); ok(r.b.ok&&!db.pins['u-bob'],'remove deletes the PIN (needs a session)');
   r=await call({action:'remove'}); ok(r.s===401,'remove without a session is refused');
   r=await call({action:'nonsense'}); ok(r.s===400,'unknown action → 400');
+
+  // ── per-IP limits: stop enumeration and spreading guesses over many accounts ──
+  const IP='203.0.113.7'; const st=[]; for(let i=0;i<7;i++)st.push((await call({action:'status',email:'x'+i+'@example.com'},null,IP)).s);
+  ok(st.join()==='200,200,200,200,200,429,429','status: 5 lookups per 10 min per IP, then 429: '+st.join());
+  r=await call({action:'status',email:'x@example.com'},null,IP); ok(r.b.error==='rate_limited'&&r.b.retryAfter>0&&r.b.retryAfter<=600&&r.h.get('retry-after'),'429 says rate_limited and when to retry ('+r.b.retryAfter+'s)');
+  r=await call({action:'status',email:'x@example.com'},null,'203.0.113.8'); ok(r.s===200,'another IP is unaffected');
+  Object.values(db.pins).forEach(x=>{x.failed_attempts=0;x.locked_until=null;x.last_attempt_at=null;});
+  const before=released; const LIP='203.0.113.9'; const lg=[]; for(let i=0;i<10;i++)lg.push((await call({action:'login',email:'nobody'+i+'@example.com',pin:'123456'},null,LIP)).s);
+  ok(lg.join()==='401,401,401,401,401,401,401,401,429,429','login: 8 tries per 10 min per IP across ALL accounts, then 429: '+lg.join());
+  r=await call({action:'login',email:'bob@example.com',pin:'999999'},null,LIP); const rel=released;
+  ok(r.b.error==='rate_limited'&&released===rel,'a rate-limited login is refused before the PIN check — it spends none of the account\'s attempts');
+  ok(!(await call({action:'login',email:'bob@example.com',pin:'999999'},null,LIP)).b.token,'no token while rate limited');
+  rateDown=true; r=await call({action:'status',email:'alice@example.com'},null,IP); ok(r.s===200&&r.b.pin===true,'if the limiter is unavailable the request still works (fails open; PIN lockout still applies)'); rateDown=false;
+  r=await call({action:'login',email:'alice@example.com',pin:'000000'},null,'198.51.100.1',); ok(r.s===401||r.s===429,'login still protected by the per-account lockout');
+
+  // ── delete my account ──
+  Object.keys(db.pins).forEach(k=>delete db.pins[k]);
+  await call({action:'set',pin:'482915'},'jwt-alice'); await call({action:'set',pin:'135790'},'jwt-bob');
+  r=await call({action:'delete',pin:'482915'}); ok(r.s===401&&!erased.length&&!deleted.length,'delete without a session is refused');
+  r=await call({action:'delete',pin:'482915'},'jwt-bogus'); ok(r.s===401&&!erased.length,'delete with an invalid token is refused');
+  r=await call({action:'delete'},'jwt-alice'); ok(r.s===401&&r.b.error==='invalid'&&!erased.length,'a user with a PIN must supply it (nothing erased)');
+  r=await call({action:'delete',pin:'111111'},'jwt-alice'); ok(r.s===401&&r.b.remaining===4&&!erased.length&&!deleted.length,'wrong PIN → refused, counts as a failed attempt, nothing erased');
+  for(let i=0;i<3;i++)await call({action:'delete',pin:'111111'},'jwt-alice');
+  r=await call({action:'delete',pin:'111111'},'jwt-alice'); ok(r.s===429&&r.b.error==='locked','5 wrong PINs on delete lock the account exactly like sign-in ('+r.b.error+')');
+  ok(r.s!==200&&!erased.length,'still nothing erased');
+  r=await call({action:'login',email:'alice@example.com',pin:'482915'}); ok(r.s===429&&!r.b.token,'…and the lock applies to sign-in too (shared counter)');
+  r=await call({action:'delete',pin:'482915'},'jwt-alice'); ok(r.s===429&&!erased.length,'the correct PIN is refused while locked');
+  db.pins['u-alice'].locked_until=Date.now()-1;
+  r=await call({action:'delete',pin:'482915',email:'bob@example.com'},'jwt-alice'); ok(r.s===200&&r.b.ok===true,'correct PIN → account deleted');
+  ok(erased.length===1&&erased[0].p_user==='u-alice'&&erased[0].p_email==='alice@example.com','data erased for the SIGNED-IN user (their e-mail, lower-case) — an e-mail in the request body is ignored');
+  ok(deleted.join()==='u-alice','auth user deleted after the data');
+  ok(!db.pins['u-alice']&&!!db.pins['u-bob'],"another user's PIN/data is untouched");
+  // no PIN → must have signed in recently
+  r=await call({action:'delete'},'jwt-dave'); ok(r.s===403&&r.b.error==='recent_login'&&deleted.length===1,'no PIN and a stale sign-in → asked to sign in again first (nothing erased)');
+  r=await call({action:'delete'},'jwt-carol'); ok(r.s===200&&deleted.join()==='u-alice,u-carol'&&erased[1].p_email==='carol@example.com','no PIN but signed in minutes ago → deleted');
+  // failure ordering: if erasing the data fails the sign-in account must be kept (so the user can retry)
+  users['jwt-erin']={id:'u-erin',email:'erin@example.com',last_sign_in_at:NOW()}; eraseFails=true;
+  r=await call({action:'delete'},'jwt-erin'); ok(r.s===500&&!deleted.includes('u-erin'),'if erasing the data fails, the login is NOT deleted (nothing half-done, retry works)'); eraseFails=false;
+  const DIP='203.0.113.50'; users['jwt-f']={id:'u-f',email:'f@example.com',last_sign_in_at:OLD()}; const dl=[]; for(let i=0;i<5;i++)dl.push((await call({action:'delete'},'jwt-f',DIP)).s);
+  ok(dl.join()==='403,403,403,429,429','delete attempts are limited per IP: '+dl.join());
   console.log(fails?('\n'+fails+' FAILED'):'\nALL PASSED');
 })();

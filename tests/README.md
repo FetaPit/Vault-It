@@ -12,5 +12,7 @@ node tests/test_sync.js            # every data key syncs; new device restores e
 node tests/test_syncnow.js         # sync status, "Upload everything", not-backed-up banner
 node tests/test_history.js         # version history + restore + cross-device pull
 node tests/test_pin_client.js      # email + PIN login flows; test_pin_server.js / test_vision_server.js: edge function logic
-node tests/test_hist.mjs; node tests/test_007.mjs   # SQL migrations 006 / 007 on a local Postgres
+node tests/test_hist.mjs; node tests/test_007.mjs; node tests/test_008.mjs   # SQL migrations 006 / 007 / 008 on a local Postgres
+node tests/test_authmail_server.js # send-auth-email: validation, HTML escaping, per-address / per-IP / global limits, fail-open
+node tests/test_beta_client.js     # privacy/terms wording, 429 handling, Download my data, Delete my account
 ```

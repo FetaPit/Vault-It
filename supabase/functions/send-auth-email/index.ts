@@ -5,6 +5,16 @@ const SUPABASE_URL          = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const FROM_EMAIL            = Deno.env.get('FROM_EMAIL') ?? 'Vault·It <onboarding@resend.dev>'
 const APP_URL               = Deno.env.get('APP_URL') ?? 'https://fetapit.github.io/Vault-It/'
+const PEPPER                = Deno.env.get('PIN_PEPPER') ?? SUPABASE_SERVICE_KEY   // keys in auth_rate are salted hashes, never raw e-mails / IPs
+
+// Abuse limits (fixed windows, counted in the database by rate_hit — see migration 008).
+// A whole room of testers shares one public IP, so the per-IP allowance is generous; the per-address
+// limit stops one inbox being flooded and the global one protects the e-mail quota and sender reputation.
+const num = (k: string, d: number) => { const n = parseInt(Deno.env.get(k) ?? '', 10); return n > 0 ? n : d }
+const LIMIT_EMAIL_PER_HOUR  = num('RATE_EMAIL_PER_HOUR', 6)
+const LIMIT_IP_PER_HOUR     = num('RATE_IP_PER_HOUR', 60)
+const LIMIT_GLOBAL_PER_HOUR = num('RATE_GLOBAL_PER_HOUR', 200)
+const EMAIL_RE              = /^[^\s@<>"`,;()\\]+@[^\s@<>"`,;()\\]+\.[^\s@<>"`,;()\\]+$/   // real addresses can hold an apostrophe (o'brien@…); it is HTML-escaped in the body
 
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
@@ -19,7 +29,28 @@ function err(msg: string, status = 400) {
   return new Response(JSON.stringify({ error: msg }), { status, headers: { ...CORS, 'Content-Type': 'application/json' } })
 }
 
+const esc = (v: string) => v.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!))
+
+async function keyOf(scope: string, id: string): Promise<string> {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${PEPPER}|${scope}|${id}`))
+  return scope + ':' + [...new Uint8Array(d)].slice(0, 16).map((x) => x.toString(16).padStart(2, '0')).join('')
+}
+// 0 = allowed, otherwise seconds to wait. If the limiter itself is unavailable we let the request through
+// (a database hiccup must not lock every tester out) and log it.
+async function limited(admin: ReturnType<typeof createClient>, scope: string, id: string, limit: number, windowSecs: number): Promise<number> {
+  try {
+    const { data, error } = await admin.rpc('rate_hit', { p_key: await keyOf(scope, id), p_limit: limit, p_window_secs: windowSecs })
+    if (error) { console.error('rate_hit failed:', error.message); return 0 }
+    const row = Array.isArray(data) ? data[0] : data
+    return row && row.allowed === false ? Math.max(1, Number(row.retry_after) || 60) : 0
+  } catch (e) { console.error('rate_hit threw:', e); return 0 }
+}
+function clientIp(req: Request): string {
+  return req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown'
+}
+
 function emailHtml(otpCode: string, email: string): string {
+  email = esc(email)
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,8 +108,8 @@ Deno.serve(async (req: Request) => {
   let email: string
   try {
     const body = await req.json()
-    email = (body.email ?? '').trim().toLowerCase()
-    if (!email || !email.includes('@')) return err('Invalid email address')
+    email = String(body.email ?? '').trim().toLowerCase()
+    if (!email || email.length > 254 || !EMAIL_RE.test(email)) return err('Invalid email address')
   } catch {
     return err('Invalid request body')
   }
@@ -87,6 +118,16 @@ Deno.serve(async (req: Request) => {
   const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
     auth: { autoRefreshToken: false, persistSession: false }
   })
+
+  // Abuse protection: this endpoint creates accounts and sends e-mail, so it is metered per address, per IP and overall.
+  const wait = (await limited(admin, 'mail-addr', email, LIMIT_EMAIL_PER_HOUR, 3600))
+            || (await limited(admin, 'mail-ip', clientIp(req), LIMIT_IP_PER_HOUR, 3600))
+            || (await limited(admin, 'mail-all', 'all', LIMIT_GLOBAL_PER_HOUR, 3600))
+  if (wait) {
+    return new Response(JSON.stringify({ error: 'rate_limited', retryAfter: wait }), {
+      status: 429, headers: { ...CORS, 'Content-Type': 'application/json', 'Retry-After': String(wait) },
+    })
+  }
 
   const { data, error: linkErr } = await admin.auth.admin.generateLink({
     type: 'magiclink',
