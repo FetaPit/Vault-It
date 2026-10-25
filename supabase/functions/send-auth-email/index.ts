@@ -11,10 +11,11 @@ const PEPPER                = Deno.env.get('PIN_PEPPER') ?? SUPABASE_SERVICE_KEY
 // A whole room of testers shares one public IP, so the per-IP allowance is generous; the per-address
 // limit stops one inbox being flooded and the global one protects the e-mail quota and sender reputation.
 const num = (k: string, d: number) => { const n = parseInt(Deno.env.get(k) ?? '', 10); return n > 0 ? n : d }
-const LIMIT_EMAIL_PER_HOUR  = num('RATE_EMAIL_PER_HOUR', 6)
+const LIMIT_EMAIL_PER_HOUR  = num('RATE_EMAIL_PER_HOUR', 8)
 const LIMIT_IP_PER_HOUR     = num('RATE_IP_PER_HOUR', 60)
 const LIMIT_GLOBAL_PER_HOUR = num('RATE_GLOBAL_PER_HOUR', 200)
-const EMAIL_RE              = /^[^\s@<>"`,;()\\]+@[^\s@<>"`,;()\\]+\.[^\s@<>"`,;()\\]+$/   // real addresses can hold an apostrophe (o'brien@…); it is HTML-escaped in the body
+// Practical address shape: the characters real mailboxes use, ASCII domain (punycode for IDN). Keeps look-alike text and markup out of the e-mail body.
+const EMAIL_RE              = /^[A-Za-z0-9._%+'-]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/
 
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
@@ -45,8 +46,24 @@ async function limited(admin: ReturnType<typeof createClient>, scope: string, id
     return row && row.allowed === false ? Math.max(1, Number(row.retry_after) || 60) : 0
   } catch (e) { console.error('rate_hit threw:', e); return 0 }
 }
+// IPv4 as is, IPv6 as its /64 (one customer controls a whole /64, so keying on the full address would be free to rotate).
+function ipKey(ip: string): string {
+  const m4 = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i); if (m4) return m4[1]
+  if (!ip.includes(':')) return ip
+  const [head, tail] = ip.split('::'); const h = head ? head.split(':') : []; const t = tail ? tail.split(':') : []
+  const groups = tail === undefined ? h : [...h, ...Array(Math.max(0, 8 - h.length - t.length)).fill('0'), ...t]
+  return groups.slice(0, 4).map((g) => g.padStart(4, '0')).join(':') + '/64'
+}
 function clientIp(req: Request): string {
-  return req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown'
+  return ipKey(req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown')
+}
+// One mailbox, however it is spelled: +tags, Gmail dots and googlemail.com all land in the same inbox, so they share one budget.
+function mailbox(email: string): string {
+  let [local, domain] = email.split('@')
+  local = local.split('+')[0]
+  if (domain === 'googlemail.com') domain = 'gmail.com'
+  if (domain === 'gmail.com') local = local.replace(/\./g, '')
+  return `${local}@${domain}`
 }
 
 function emailHtml(otpCode: string, email: string): string {
@@ -102,8 +119,8 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   if (req.method !== 'POST') return err('Method not allowed', 405)
 
-  if (!RESEND_API_KEY)       return err('RESEND_API_KEY secret not set', 500)
-  if (!SUPABASE_SERVICE_KEY) return err('SUPABASE_SERVICE_ROLE_KEY not available', 500)
+  if (!RESEND_API_KEY)       return err('Server not configured', 500)
+  if (!SUPABASE_SERVICE_KEY) return err('Server not configured', 500)
 
   let email: string
   try {
@@ -120,9 +137,10 @@ Deno.serve(async (req: Request) => {
   })
 
   // Abuse protection: this endpoint creates accounts and sends e-mail, so it is metered per address, per IP and overall.
-  const wait = (await limited(admin, 'mail-addr', email, LIMIT_EMAIL_PER_HOUR, 3600))
-            || (await limited(admin, 'mail-ip', clientIp(req), LIMIT_IP_PER_HOUR, 3600))
+  // Cheapest, bounded keys first: a flood from one IP can write at most one counter row per hour before it is refused.
+  const wait = (await limited(admin, 'mail-ip', clientIp(req), LIMIT_IP_PER_HOUR, 3600))
             || (await limited(admin, 'mail-all', 'all', LIMIT_GLOBAL_PER_HOUR, 3600))
+            || (await limited(admin, 'mail-addr', mailbox(email), LIMIT_EMAIL_PER_HOUR, 3600))
   if (wait) {
     return new Response(JSON.stringify({ error: 'rate_limited', retryAfter: wait }), {
       status: 429, headers: { ...CORS, 'Content-Type': 'application/json', 'Retry-After': String(wait) },
@@ -137,7 +155,7 @@ Deno.serve(async (req: Request) => {
 
   if (linkErr || !data?.properties?.email_otp) {
     console.error('generateLink error:', linkErr)
-    return err(linkErr?.message ?? 'Failed to generate sign-in code', 500)
+    return err('Could not create a sign-in code', 500)
   }
 
   const otpCode = data.properties.email_otp
@@ -160,7 +178,7 @@ Deno.serve(async (req: Request) => {
   if (!resendRes.ok) {
     const resendErr = await resendRes.json().catch(() => ({}))
     console.error('Resend error:', resendErr)
-    return err(`Email delivery failed: ${resendErr.message ?? resendRes.statusText}`, 502)
+    return err('Could not send the sign-in e-mail', 502)
   }
 
   return ok({ success: true })

@@ -1,8 +1,8 @@
 // pin-auth — email + PIN sign-in for returning users, on any device.
 //
 //   { action: 'status', email }            → { pin: boolean }
-//   { action: 'set',    pin }              → { ok }            (needs the user's own session JWT)
-//   { action: 'remove' }                   → { ok }            (needs the user's own session JWT)
+//   { action: 'set',    pin, current? }    → { ok }            (JWT + re-authentication, see below)
+//   { action: 'remove', current? }         → { ok }            (JWT + re-authentication, see below)
 //   { action: 'login',  email, pin }       → { ok, token }  |  { error: 'invalid'|'locked'|'rate_limited', ... }
 //   { action: 'delete', pin? }             → { ok }            (needs the user's own session JWT; erases the account)
 //
@@ -18,6 +18,10 @@
 // enumerate e-mail addresses or to spread guesses across many accounts from one machine.
 // 'delete' re-checks the PIN (same lockout) — or, for an account without a PIN, requires a sign-in
 // within the last 15 minutes — before erasing the account and everything stored about it.
+// 'set' / 'remove' are credential changes, so a session token alone is not enough either: they need a sign-in
+// within the last 15 minutes (covers first-time set after the e-mail code, and 'forgot PIN') or the CURRENT PIN
+// (`current`, same lockout). Without this a stolen token could install its own PIN and then pass 'delete'.
+// New PINs must not be trivially guessable (all-same, runs, repeats, a short list of the most common).
 // Deploy with --no-verify-jwt (the app calls it with its public key).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -31,7 +35,7 @@ const PIN_RE       = /^\d{6}$/
 const EMAIL_RE     = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const num = (k: string, d: number) => { const n = parseInt(Deno.env.get(k) ?? '', 10); return n > 0 ? n : d }
 // a room of testers shares one public IP, so these are generous; they stop scripts, not people
-const LIMIT_STATUS_PER_IP = num('RATE_PIN_STATUS_PER_10MIN', 120)
+const LIMIT_STATUS_PER_IP = num('RATE_PIN_STATUS_PER_10MIN', 300)
 const LIMIT_LOGIN_PER_IP  = num('RATE_PIN_LOGIN_PER_10MIN', 60)
 const LIMIT_DELETE_PER_IP = num('RATE_PIN_DELETE_PER_HOUR', 10)
 const RECENT_LOGIN_SECS   = 15 * 60
@@ -61,12 +65,33 @@ function sameHex(a: string, b: string): boolean {            // constant-time co
 }
 const DUMMY_SALT = new Uint8Array(16)
 
+// Refuse PINs an attacker would try first (they get 5 free guesses per account before any lock).
+const COMMON_PINS = new Set(['123456', '654321', '112233', '123321', '159753', '147258', '258369', '789456', '987654', '100000', '111222', '222333',
+  '112358', '142536', '102030', '010203', '123654', '321123', '159357', '246810', '666888', '888999', '998877', '987123', '121314', '654123',
+  '520520', '521521', '007007', '000001', '777888', '456123', '741852', '963852', '852456', '147852', '369258', '123789', '321654', '999000'])
+function weakPin(p: string): boolean {
+  if (/^(\d)\1{5}$/.test(p)) return true                               // 000000
+  if (/^(\d\d)\1\1$/.test(p) || /^(\d\d\d)\1$/.test(p)) return true     // 121212, 123123
+  const d = [...p].map(Number)
+  if (d.every((x, i) => i === 0 || x === (d[i - 1] + 1) % 10)) return true   // 123456, 456789, 890123
+  if (d.every((x, i) => i === 0 || x === (d[i - 1] + 9) % 10)) return true   // 654321, 321098
+  return COMMON_PINS.has(p)
+}
+// Rate-limit key for an address: IPv4 as is, IPv6 as its /64 (a single customer controls the whole /64, so per-address keys are free to rotate).
+function ipKey(ip: string): string {
+  const m4 = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i); if (m4) return m4[1]
+  if (!ip.includes(':')) return ip
+  const [head, tail] = ip.split('::'); const h = head ? head.split(':') : []; const t = tail ? tail.split(':') : []
+  const groups = tail === undefined ? h : [...h, ...Array(Math.max(0, 8 - h.length - t.length)).fill('0'), ...t]
+  return groups.slice(0, 4).map((g) => g.padStart(4, '0')).join(':') + '/64'
+}
+
 async function keyOf(scope: string, id: string): Promise<string> {
   const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${PEPPER}|${scope}|${id}`))
   return scope + ':' + hex(d).slice(0, 32)
 }
 function clientIp(req: Request): string {
-  return req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown'
+  return ipKey(req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown')
 }
 
 async function handle(req: Request): Promise<Response> {
@@ -79,6 +104,7 @@ async function handle(req: Request): Promise<Response> {
   const action = String(body.action ?? '')
   const email  = String(body.email ?? '').trim().toLowerCase()
   const pin    = String(body.pin ?? '')
+  const current = String(body.current ?? '')
   const admin  = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
 
   // 0 = allowed, otherwise seconds to wait. If the limiter itself is down we let the request through and log it
@@ -101,6 +127,8 @@ async function handle(req: Request): Promise<Response> {
     const { data, error } = await admin.auth.getUser(jwt)
     return error || !data?.user?.email ? null : data.user
   }
+
+  const freshLogin = (u: { last_sign_in_at?: string }) => Date.parse(u.last_sign_in_at ?? '') > Date.now() - RECENT_LOGIN_SECS * 1000
 
   // Check a PIN for an e-mail, spending one attempt BEFORE comparing (so parallel guesses cannot beat the lockout).
   // Unknown e-mails take the same time and give the same answer as a wrong PIN.
@@ -126,6 +154,18 @@ async function handle(req: Request): Promise<Response> {
     return { ok: true, userId: row.user_id }
   }
 
+  // Credential changes need more than a session token: a sign-in within the last 15 minutes, or the CURRENT PIN.
+  // Returns null when allowed, otherwise the refusal to send.
+  const reauth = async (user: { id: string; email?: string; last_sign_in_at?: string }): Promise<Response | null> => {
+    if (freshLogin(user)) return null
+    const { data: row } = await admin.from('user_pins').select('user_id').eq('user_id', user.id).maybeSingle()
+    if (!row) return json({ error: 'recent_login' }, 403)           // no PIN to check: the sign-in itself must be fresh
+    if (!PIN_RE.test(current)) return json({ error: 'reauth' }, 403) // has a PIN: it must be supplied
+    const r = await checkPin(user.email!.toLowerCase(), current)    // wrong guesses count towards the same lockout as sign-in
+    if (!r.ok) return r.res
+    return r.userId === user.id ? null : json({ error: 'auth' }, 401)
+  }
+
   if (action === 'status') {
     { const w = await limited('pin-status', clientIp(req), LIMIT_STATUS_PER_IP, 600); if (w) return tooMany(w) }
     if (!EMAIL_RE.test(email)) return json({ pin: false })
@@ -137,6 +177,8 @@ async function handle(req: Request): Promise<Response> {
     const user = await userFromJwt()
     if (!user)               return json({ error: 'auth' }, 401)
     if (!PIN_RE.test(pin))   return json({ error: 'pin_format' }, 400)
+    if (weakPin(pin))        return json({ error: 'pin_weak' }, 400)
+    { const no = await reauth(user); if (no) return no }
     const salt = crypto.getRandomValues(new Uint8Array(16))
     const { error } = await admin.from('user_pins').upsert({
       user_id: user.id, email: user.email!.toLowerCase(), pin_hash: await derive(pin, salt), salt: hex(salt),
@@ -148,6 +190,7 @@ async function handle(req: Request): Promise<Response> {
   if (action === 'remove') {
     const user = await userFromJwt()
     if (!user) return json({ error: 'auth' }, 401)
+    { const no = await reauth(user); if (no) return no }
     await admin.from('user_pins').delete().eq('user_id', user.id)
     return json({ ok: true })
   }
@@ -179,14 +222,17 @@ async function handle(req: Request): Promise<Response> {
       if (r.userId !== user.id) return json({ error: 'auth' }, 401)
     } else {
       // no PIN to re-check: the sign-in itself must be fresh
-      const last = Date.parse((user as { last_sign_in_at?: string }).last_sign_in_at ?? '')
-      if (!(last > Date.now() - RECENT_LOGIN_SECS * 1000)) return json({ error: 'recent_login' }, 403)
+      if (!freshLogin(user)) return json({ error: 'recent_login' }, 403)
     }
 
     const { error: eraseErr } = await admin.rpc('erase_user_data', { p_user: user.id, p_email: mail })
     if (eraseErr) { console.error('erase_user_data failed:', eraseErr.message); return json({ error: 'server' }, 500) }
     const { error: delErr } = await admin.auth.admin.deleteUser(user.id)
-    if (delErr) { console.error('deleteUser failed:', delErr.message); return json({ error: 'server' }, 500) }
+    // the data is already gone but the login is not: say so (a retry works — nothing is left to erase twice)
+    if (delErr) { console.error('deleteUser failed:', delErr.message); return json({ error: 'partial' }, 500) }
+    // belt and braces: sweep again in case anything re-archived while the login was being removed (idempotent)
+    const { error: sweepErr } = await admin.rpc('erase_user_data', { p_user: user.id, p_email: mail })
+    if (sweepErr) console.error('post-delete sweep failed:', sweepErr.message)
     return json({ ok: true })
   }
 

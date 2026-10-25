@@ -8,7 +8,7 @@ Thanks for trying Vault·It, a UK personal-finance app that turns your numbers i
 
 1. Enter your email address and tap **Continue**.
 2. We email you a **6-digit code** (check spam if it takes more than a minute). Type it in.
-3. Choose a **6-digit PIN**. From then on you sign in on any device with just your **email + PIN** — no code needed.
+3. Choose a **6-digit PIN** (not something easy to guess like 123456 or 000000). From then on you sign in on any device with just your **email + PIN** — no code needed.
    - Five wrong PINs lock sign-in for 15 minutes. An email code always works as a fallback ("Forgot PIN?").
 
 ## What to try

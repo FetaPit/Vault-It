@@ -28,16 +28,25 @@ Project: Supabase `legpubblzgknxdtvsant` (eu-central-1, Frankfurt). Live app: `r
 - Update `APP_URL`, `FROM_EMAIL`, Supabase Site URL/Redirects, and the links in the tester guide / QR code.
 - localStorage is per-origin: anyone who used the github.io address starts empty on the new one until they sign in (their cloud copy restores).
 
+**Before the link goes beyond friendly testers** (from the security review)
+- Sign-in e-mails are protected by rate limits, not a CAPTCHA. Someone determined (a few IPs) can use up the service-wide allowance (default 200/hour) and stop new testers getting a code; PIN sign-in keeps working. Before sharing the link widely add **Cloudflare Turnstile** (or Supabase CAPTCHA) in front of `send-auth-email`, and keep `RATE_GLOBAL_PER_HOUR` under your Resend quota.
+- Anyone who knows an address can spend that mailbox's hourly allowance (8) or lock a PIN (5 wrong tries): the owner can always get in with an e-mail code once the window passes. Known, accepted for the beta.
+- Pin the Edge Functions region if you want the "EU" statement to cover them as well as the database (Supabase → Edge Functions settings).
+- Auth logs (Supabase) and Resend delivery logs hold e-mail address and IP for a short period after deletion; set their retention to the minimum.
+- `?bypass=websummit` on the app URL skips the login screen *on that device* and switches to sample data (no cloud access). It is linked from the landing page for demos; remove it before wide release if you do not want it.
+- The housekeeping that clears saved versions older than 180 days and old usage counters runs as part of normal sign-ins (migration 008). After the beta, delete remaining test accounts yourself (Authentication → Users, or `erase_user_data` + delete) — the notice promises an e-mail first.
+
 **Legal**
 - Privacy notice and beta terms are in the app (`showPrivacy` / `showTerms`). Have them reviewed before opening beyond friendly testers.
 - Check whether **ICO registration** (data-protection fee) applies to PT Live Design.
-- Replace "PT Live Design" with the legal entity name if different.
+- Replace "PT Live Design" with the legal entity name if different, and add a postal address (UK GDPR Art. 13 expects the controller's identity and contact details).
+- The notice and terms state things only you can decide — please confirm each is what you intend: no marketing e-mail without opt-in; accounts removed (after an e-mail) when the beta ends; cancelling a Pioneer plan any time via Stripe or e-mail; liability limited to £100 or what a paying user paid in 12 months. Have a solicitor read them.
 
 **Rehearse** with a non-owner e-mail on a phone *and* a laptop: sign up → code → PIN → add data → sign out → sign in with PIN on the other device → *Download my data* → *Delete my account*.
 
 ## B. At the meeting
 - Hand out the QR code and `docs/TESTER_GUIDE.md` (or its text). Expect many people on one Wi-Fi/IP — limits are set generously for that.
-- If someone reports "too many sign-in emails": limits are per address (6/h), per IP (60/h), global (200/h). Raise `RATE_*` secrets or wait for the window.
+- If someone reports "too many sign-in emails": limits are per mailbox (8/h), per IP (60/h), global (200/h). Raise `RATE_*` secrets or wait for the window.
 
 ## C. While it's live
 - Supabase → Logs → Edge Functions: watch `send-auth-email` and `pin-auth` for 4xx/5xx; "rate_hit failed" means migration 008 is missing.

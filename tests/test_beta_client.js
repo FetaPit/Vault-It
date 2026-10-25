@@ -29,7 +29,7 @@ const MOCK = `
 const fresh = async (b, seed) => {
   const ctx = await b.newContext({ viewport: { width: 430, height: 900 }, acceptDownloads: true }); const page = await ctx.newPage(); const errs = []; page.errs = errs;
   page.on('pageerror', e => errs.push(e.message));
-  await page.addInitScript((seed) => { if (localStorage.getItem('__seeded')) return; localStorage.setItem('__seeded', '1'); localStorage.setItem('vi_declined_demo', 'true'); if (seed) for (const k in seed) localStorage.setItem(k, seed[k]); }, seed || null);
+  await page.addInitScript((seed) => { if (window.name === '__seeded') return; window.name = '__seeded'; localStorage.setItem('vi_declined_demo', 'true'); if (seed) for (const k in seed) localStorage.setItem(k, seed[k]); }, seed || null);
   await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1200);
   await page.evaluate(MOCK); return { ctx, page };
 };
@@ -41,7 +41,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   let { ctx, page } = await fresh(b);
   const card = await page.evaluate(() => document.getElementById('login-overlay').innerText);
   ok(!/end-to-end/i.test(card), 'sign-in card no longer claims “end-to-end encrypted”');
-  ok(/Beta Terms/.test(card) && /Privacy Notice/.test(card), 'sign-in card links the Beta Terms and Privacy Notice');
+  ok(/Beta Terms/.test(card) && /Privacy Notice/.test(card) && /accept the Beta Terms/.test(card) && !/agree to the .*Privacy/.test(card), 'sign-in card: accept the Terms, and the Privacy Notice is information rather than something to agree to');
   await page.evaluate(() => document.querySelector('#auth-email-step a[onclick*="showPrivacy"]').click()); await page.waitForTimeout(200);
   let legal = await page.evaluate(() => (document.getElementById('legal-modal') || {}).innerText || '');
   ok(/not end-to-end encrypted/i.test(legal), 'privacy notice says plainly that it is NOT end-to-end encrypted');
@@ -49,10 +49,25 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   ok(/Frankfurt/.test(legal) && /pete@ptlive\.design/.test(legal) && /ico\.org\.uk/.test(legal), 'privacy notice has the EU location, a contact and the ICO route');
   ok(/Download my data/.test(legal) && /Delete my account/.test(legal) && /one month/.test(legal), 'privacy notice points to the in-app export / delete and the one-month reply');
   ok(!/only in your browser.s local storage|never leaves your device|We have no access to it/i.test(legal), 'the old (now false) “it never leaves your device” claim is gone');
+  // every outside company the app or its server functions talk to must be in the notice (so a new one cannot slip in silently)
+  const fsx = require('fs'), lg = legal;
+  const hostsOf = (txt) => [...new Set([...txt.matchAll(/https?:\/\/([A-Za-z0-9.-]+\.[a-z]{2,})/g)].map(m => m[1]))];
+  const COVERED = { 'logo.clearbit.com': /Clearbit/, 'www.google.com': /Google/, 'cdn.jsdelivr.net': /jsDelivr/, 'cdnjs.cloudflare.com': /cdnjs/, 'loremflickr.com': /loremflickr/, 'open.er-api.com': /ExchangeRate-API/, 'api.coingecko.com': /CoinGecko/,
+    'api.metals.live': /metals\.live/, 'fonts.googleapis.com': /Google Fonts/, 'api.anthropic.com': /Anthropic/, 'www.alphavantage.co': /Alpha Vantage/, 'metals-api.com': /metals-api\.com/, 'buy.stripe.com': /Stripe/, 'legpubblzgknxdtvsant.supabase.co': /Supabase/, 'fetapit.github.io': /GitHub/,
+    'api.resend.com': /Resend/, 'query1.finance.yahoo.com': /Yahoo/, 'query2.finance.yahoo.com': /Yahoo/, 'api.meshy.ai': /Meshy/, 'esm.sh': /Supabase/ };
+  const NOT_USED_FOR_TESTERS = ['www.w3.org', 'vault-it.uk', 'vault-it.co', 'wa.me', 'www.linkedin.com', 'instagram.com', 'ptlive.my.canva.site', 'shibariumscan.io', 'corsproxy.io', 'api.notion.com', 'api.convertkit.com', 'www.shibrpc.com', 'auth.truelayer.com'];   // links, or owner-only connections that do nothing without keys (the notice says so)
+  const found = hostsOf(fsx.readFileSync('/home/user/Vault-It/index.html', 'utf8')).concat(...fsx.readdirSync('/home/user/Vault-It/supabase/functions').filter(d => fsx.existsSync('/home/user/Vault-It/supabase/functions/' + d + '/index.ts')).map(d => hostsOf(fsx.readFileSync('/home/user/Vault-It/supabase/functions/' + d + '/index.ts', 'utf8'))));
+  const unlisted = [...new Set(found)].filter(h => !COVERED[h] && !NOT_USED_FOR_TESTERS.includes(h));
+  ok(unlisted.length === 0, 'no outside host is missing from this check' + (unlisted.length ? ' — NEW: ' + unlisted.join(', ') + ' (add it to the privacy notice, then to COVERED)' : ''));
+  const missing = Object.keys(COVERED).filter(h => !COVERED[h].test(lg)); ok(missing.length === 0, 'the privacy notice names every outside company in use' + (missing.length ? ' — missing: ' + missing.join(', ') : ''));
+  ok(/owner-only connections/.test(lg), 'the notice says what the owner-only connections are');
+  ok(/180 days/.test(lg) && /Waitlist/.test(lg) && /phone number/.test(lg) && /clients or leads/.test(lg) && /withdraw consent/.test(lg) && /Anthropic[^.]*keep it for a limited period/.test(lg.replace(/\n/g, ' ')), 'the notice covers retention, the waitlist, phone number, other people’s details, withdrawal of consent and Anthropic’s retention');
+  ok(/Your browser keeps just a marker that a PIN is set/.test(lg), 'the notice describes the PIN as it is really stored on the device');
   await page.screenshot({ path: SHOT + 'beta_privacy.png' });
   await page.evaluate(() => document.getElementById('legal-modal').remove());
   await page.evaluate(() => showTerms()); legal = await page.evaluate(() => document.getElementById('legal-modal').innerText);
   ok(/not financial/i.test(legal) && /Financial Conduct Authority/.test(legal) && /England and Wales/.test(legal) && /beta/i.test(legal), 'terms: beta, not advice, not FCA-regulated, English law');
+  ok(/Paid plans/.test(legal) && /Stripe/.test(legal) && /cancel/.test(legal) && /what you paid us/.test(legal), 'terms cover the paid plans (price shown first, Stripe, cancelling, consumer rights, liability for payers)');
   await page.screenshot({ path: SHOT + 'beta_terms.png' });
   await page.evaluate(() => document.getElementById('legal-modal').remove());
 
@@ -112,16 +127,35 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   r = await tryDelete(`fnErr(403,{error:'recent_login'})`, ''); ok(/signed in within the last 15 minutes/.test(r.msg) && r.kept && !r.done, 'stale sign-in → asks the user to sign in again');
   r = await tryDelete(`fnErr(429,{error:'rate_limited',retryAfter:120})`, '111111'); ok(/2 min/.test(r.msg) && r.kept, 'network rate limit → “' + r.msg + '”');
   r = await tryDelete(`fnErr(500,{error:'server'})`, '111111'); ok(/try again/.test(r.msg) && r.kept && !r.done, 'server error → can retry, nothing wiped');
-  r = await tryDelete(`({data:null,error:{message:'down'}})`, '111111'); ok(/Could not reach the server/.test(r.msg) && r.kept && !r.done, 'offline → nothing deleted, says so');
+  r = await tryDelete(`({data:null,error:{message:'down'}})`, '111111'); ok(/did not get an answer/.test(r.msg) && r.kept && !r.done, 'no answer → says it cannot tell whether anything was deleted, and nothing local is wiped');
+  r = await tryDelete(`fnErr(500,{error:'partial'})`, '111111'); ok(/data has been erased.*Delete everything again/.test(r.msg) && r.kept, 'partial failure on the server → the message says what really happened: “' + r.msg + '”');
+  r = await tryDelete(`fnErr(401,{error:'auth'})`, '111111'); ok(/already been deleted/.test(r.msg) && r.kept, 'expired sign-in → “' + r.msg + '”');
   ok(r.body.action === 'delete' && r.body.pin === '111111', 'the PIN is sent with the delete request');
-  r = await tryDelete(`({data:{ok:true},error:null})`, '482915');
-  ok(r.done && !r.kept, 'success → this device is wiped and a confirmation screen is shown');
-  const after = await page.evaluate(() => ({ keys: localStorage.length, user: _supaUser, signOut: _m.signOut, text: document.getElementById('delete-done').innerText }));
-  ok(after.keys === 0 && after.user === null, 'every local key removed, signed out of the app');
-  ok(after.signOut.length === 1 && after.signOut[0].scope === 'local', 'Supabase session dropped locally');
-  ok(/has been deleted/.test(after.text), 'user sees: “' + after.text.split('\n')[0] + '”');
+  // success: photos exist in IndexedDB, then everything must go and the page must restart so nothing can write it back
+  await page.evaluate(() => invPut(7, ['data:image/png;base64,AAAA']));
+  ok(await page.evaluate(() => invGet(7).then(f => f.length)) === 1, 'setup: a Wealth Inventory photo is stored in the browser');
+  await page.evaluate(s => { _delBusy = false; _m.script['pin-auth:delete'] = { data: { ok: true }, error: null }; }, '');
+  await page.fill('#del-pin', '482915');
+  await page.evaluate(() => { confirmDeleteAccount(); });
+  await page.waitForSelector('#delete-done', { timeout: 15000 }); await page.waitForTimeout(600);
+  const after = await page.evaluate(async () => ({ keys: Object.keys(localStorage).filter(k => k !== 'setItem').length, deleted: window._viDeleted === true, text: document.getElementById('delete-done').innerText, dbs: indexedDB.databases ? (await indexedDB.databases()).map(d => d.name) : null, url: location.href }));
+  ok(after.keys === 0, 'every local key removed (' + after.keys + ' left)');
+  ok(after.dbs === null || (!after.dbs.includes('vi_photos') && !after.dbs.includes('vaultit-house')), 'photos and saved house designs are gone from the browser (databases: ' + JSON.stringify(after.dbs) + ')');
+  ok(after.deleted && !/deleted=1/.test(after.url), 'the page restarted in a locked "deleted" state and tidied its address');
+  ok(/has been deleted/.test(after.text) && /photos/.test(after.text), 'user sees: “' + after.text.split('\n')[0] + '” (mentions photos and provider backups)');
+  await page.evaluate(() => { try { localStorage.setItem('pos_ov1', '{"x":1}'); localStorage.setItem('vi_user', '{"name":"x"}'); } catch (e) {} });
+  ok(await page.evaluate(() => localStorage.getItem('pos_ov1') === null && localStorage.getItem('vi_user') === null), 'nothing can write data back after deletion (even a late save or sync)');
   await page.screenshot({ path: SHOT + 'beta_deleted.png' });
+  await page.click('#delete-done button'); await page.waitForTimeout(1200);
+  ok(await page.evaluate(() => !document.getElementById('delete-done') && window._viDeleted !== true && localStorage.getItem('vi_demo_mode') === 'true' && !/pete@example\.com/.test(localStorage.getItem('vi_user') || '')), 'Close starts a normal first-visit app (sample data, nothing of the deleted account)');
   ok(page.errs.length === 0, 'no page errors ' + page.errs.slice(0, 2).join(' | '));
+  await ctx.close();
+
+  // late async writers are blocked even before the restart
+  ({ ctx, page } = await fresh(b, seed));
+  await page.evaluate(() => { window._viDeleted = true; _supaUser = { id: 'u-1', email: 'pete@example.com' }; _syncReady = true; window.__up = 0; _supaClient.from = () => ({ upsert: () => { window.__up++; return Promise.resolve({}); }, select: () => ({ eq: () => Promise.resolve({ data: [{ key: 'pos_ov1', value: { income: [{ n: 'Back', amount: 1 }] }, updated_at: new Date().toISOString() }] }) }) }); localStorage.removeItem('pos_ov1'); });
+  await page.evaluate(async () => { await _hydrateFromSupabase('u-1'); localStorage.setItem('vi_dirty', '["pos_ov1"]'); await _flushDirty(); await _upsertRows([{ user_id: 'u-1', key: 'pos_ov1', value: {} }]); });
+  ok(await page.evaluate(() => localStorage.getItem('pos_ov1') === null && window.__up === 0), 'after deletion a late hydrate / flush / upload changes nothing and sends nothing');
   await ctx.close();
 
   // ── 6. not signed in: cannot delete ──
@@ -129,6 +163,121 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await page.evaluate(() => { _supaUser = null; openDeleteAccount(); }); await page.waitForTimeout(200);
   ok(await page.evaluate(() => !document.getElementById('delete-modal')), 'without an account session there is nothing to delete (asked to sign in instead)');
+  await ctx.close();
+
+  // ── 7. PINs: weak ones refused, credential changes ask for the current PIN ──
+  const seedP = { vi_user: JSON.stringify({ name: 'Pete', email: 'pete@example.com' }), vi_last_email: 'pete@example.com' };
+  ({ ctx, page } = await fresh(b, seedP));
+  await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
+  const toast = () => page.evaluate(() => (document.getElementById('toast') || {}).textContent || '');
+  const enter = async (digits) => { for (const d of digits) await page.evaluate(d => _setPinKey(d), d); await page.waitForTimeout(550); };
+  const toSetStep = () => page.evaluate(() => { _supaUser = { id: 'u-1', email: 'pete@example.com' }; _authOTP = { email: 'pete@example.com' }; _pinChange = true; _pinChangeCurrent = ''; _pinBusy = false; _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter'; _showAuthStep('setpin'); });
+  await toSetStep(); await enter('123456');
+  ok(/too easy to guess/.test(await err(page)) && await page.evaluate(() => _pinSetPhase) === 'enter' && !(await page.evaluate(() => _m.calls.some(c => c.body.action === 'set'))), 'a weak PIN (123456) is refused on the device before anything is sent');
+  for (const w of ['000000', '654321', '121212']) { await toSetStep(); await enter(w); if (!/too easy/.test(await err(page))) ok(false, 'weak PIN not refused: ' + w); }
+  await toSetStep(); await page.evaluate(() => { _m.script['pin-auth:set'] = { data: null, error: { context: { json: async () => ({ error: 'pin_weak' }), status: 400 } } }; });
+  await enter('482915'); await enter('482915');
+  ok(/too easy to guess/.test(await err(page)) && await step(page) === 'auth-setpin-step' && !(await page.evaluate(() => localStorage.getItem('vi_pin_hash'))), 'if the server refuses a PIN as weak, the user stays to choose another and no PIN is saved locally');
+  await toSetStep(); await page.evaluate(() => { _m.script['pin-auth:set'] = { data: null, error: { context: { json: async () => ({ error: 'reauth' }), status: 403 } } }; });
+  await enter('482915'); await enter('482915');
+  ok(/current PIN/.test(await toast()) && !(await page.evaluate(() => localStorage.getItem('vi_pin_hash'))), 'if the server wants re-authentication, the user is told and the local PIN is NOT changed: “' + await toast() + '”');
+  await toSetStep(); await page.evaluate(() => { _m.script['pin-auth:set'] = { data: { ok: true }, error: null }; _m.calls.length = 0; });
+  await enter('482915'); await enter('482915');
+  const setCall = await page.evaluate(() => _m.calls.find(c => c.name === 'pin-auth' && c.body.action === 'set'));
+  ok(setCall && setCall.body.pin === '482915' && setCall.body.current === '', 'a good PIN is sent (no current PIN needed right after signing in)');
+  ok(await page.evaluate(() => !!localStorage.getItem('vi_pin_hash')), '…and remembered on this device');
+  // changing an existing PIN: ask for the current one first
+  await page.evaluate(() => { _supaUser = { id: 'u-1', email: 'pete@example.com' }; _m.script['pin-auth:status'] = { data: { pin: true }, error: null }; _m.calls.length = 0; _pinChangeCurrent = ''; window.__c = authChangePin(); });
+  await page.waitForSelector('#askpin-modal', { timeout: 3000 });
+  await page.screenshot({ path: SHOT + 'beta_askpin.png' });
+  await page.click('#askpin-no'); await page.waitForTimeout(200);
+  ok(await page.evaluate(() => !document.getElementById('askpin-modal') && _pinChange !== true) , 'cancelling the current-PIN prompt changes nothing');
+  await page.evaluate(() => { window.__c = authChangePin(); }); await page.waitForSelector('#askpin-modal');
+  await page.fill('#askpin-inp', '731942'); await page.click('#askpin-ok'); await page.waitForTimeout(300);
+  ok(await step(page) === 'auth-setpin-step' && await page.evaluate(() => _pinChangeCurrent) === '731942', 'with the current PIN entered, the new-PIN pad opens');
+  await enter('264813'); await enter('264813');
+  const chg = await page.evaluate(() => _m.calls.filter(c => c.name === 'pin-auth' && c.body.action === 'set').pop());
+  ok(chg && chg.body.current === '731942' && chg.body.pin === '264813', 'the current PIN travels with the change request');
+  // removing: asks, and a refusal leaves everything as it was
+  await page.evaluate(() => { window.confirm = () => true; _m.script['pin-auth:remove'] = { data: null, error: { context: { json: async () => ({ error: 'invalid', remaining: 3 }), status: 401 } } }; localStorage.setItem('vi_pin_hash', 'abc'); window.__r = authRemovePin(); });
+  await page.waitForSelector('#askpin-modal'); await page.fill('#askpin-inp', '000000'); await page.click('#askpin-ok'); await page.waitForTimeout(500);
+  ok(/3 attempts left/.test(await toast()) && await page.evaluate(() => localStorage.getItem('vi_pin_hash')) === 'abc', 'a wrong current PIN refuses the removal and keeps the local PIN: “' + await toast() + '”');
+  ok(page.errs.length === 0, 'no page errors ' + page.errs.slice(0, 2).join(' | '));
+  await ctx.close();
+
+  // ── 8. a different person signing in on a shared device ──
+  const seedA = { vi_user: JSON.stringify({ name: 'Alice', email: 'alice@example.com', phone: '07000' }), vi_last_email: 'alice@example.com', pos_ov1: JSON.stringify({ income: [{ n: 'Pay', amount: 3000 }], expenses: [] }), meshy_api_key: 'msy_alice', 'sb-legpubblzgknxdtvsant-auth-token': JSON.stringify({ access_token: 'bob.jwt' }), vi_dirty: '["pos_ov1"]' };
+  ({ ctx, page } = await fresh(b, seedA));
+  await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
+  await page.evaluate(() => { window.confirm = (m) => { window.__cm = m; return false; }; });
+  await page.evaluate(() => _afterVerified({ id: 'u-b', email: 'bob@example.com' }, 'bob@example.com')); await page.waitForTimeout(300);
+  const cm = await page.evaluate(() => window.__cm);
+  ok(/alice@example\.com/.test(cm) && /bob@example\.com/.test(cm) && /never uploaded/.test(cm), 'a different e-mail on a device with someone else\'s data → asks first, and warns about un-uploaded changes');
+  ok(await page.evaluate(() => !!localStorage.getItem('pos_ov1') && _supaUser === null) && await step(page) === 'auth-email-step', 'Cancel keeps the data and signs the newcomer out again');
+  await page.evaluate(() => { window.confirm = () => { throw new Error('should not ask'); }; });
+  await page.evaluate(() => { _supaClient.from = () => ({ select: () => ({ eq: () => Promise.resolve({ data: [] }) }), upsert: () => Promise.resolve({}) }); });
+  await page.evaluate(() => _afterVerified({ id: 'u-a', email: 'Alice@Example.com' }, 'Alice@Example.com')); await page.waitForTimeout(500);
+  ok(await page.evaluate(() => !!localStorage.getItem('pos_ov1')), 'the same person (any capitalisation) signs in with no prompt and keeps their data');
+  await page.evaluate(() => { window.confirm = () => true; });
+  await Promise.all([page.waitForNavigation({ timeout: 15000 }), page.evaluate(() => { _afterVerified({ id: 'u-b', email: 'bob@example.com' }, 'bob@example.com'); })]);
+  await page.waitForTimeout(800);
+  const sw = await page.evaluate(() => ({ ov: localStorage.getItem('pos_ov1'), user: localStorage.getItem('vi_user'), key: localStorage.getItem('meshy_api_key'), sb: !!localStorage.getItem('sb-legpubblzgknxdtvsant-auth-token'), last: localStorage.getItem('vi_last_email') }));
+  ok(!/"n":"Pay"/.test(sw.ov || '') && sw.key === null && !/Alice|07000/.test(sw.user || '') && sw.sb && sw.last === 'bob@example.com', 'confirming removes the previous person\'s data and API keys, keeps the new sign-in, and starts clean');
+  await ctx.close();
+
+  // ── 9. requests that cost something are never sent twice ──
+  ({ ctx, page } = await fresh(b, seedP));
+  await page.evaluate(() => { window.__calls = 0; window.__f = 0; _sjsStalled = false; _supaClient.functions.invoke = () => { window.__calls++; return new Promise(() => {}); }; window.fetch = () => { window.__f++; return Promise.reject(new Error('net')); }; });
+  const once = await page.evaluate(() => _fnInvoke('pin-auth', { action: 'delete' }, 300, false, true));
+  ok(once.error && once.error.message === 'timeout' && await page.evaluate(() => window.__calls === 1 && window.__f === 0), 'a once-only call that times out is reported, not re-sent');
+  await page.evaluate(() => { _sjsStalled = false; });
+  await page.evaluate(() => _fnInvoke('pin-auth', { action: 'status' }, 300, false, false));
+  ok(await page.evaluate(() => window.__calls === 2 && window.__f === 1), 'ordinary calls still fall back to a direct request');
+  await ctx.close();
+
+  // ── 10. export: allow-list, other people's data, and dialog feedback ──
+  const seedE = { vi_user: JSON.stringify({ name: 'Pete', email: 'pete@example.com' }), vi_last_email: 'pete@example.com', pos_ov1: '{"income":[]}', vi_hb_design: '{"id":1}', vi_tl_auth_code: 'AUTHCODE', vi_tl_code_verifier: 'VERIFIER', vi_tl_state: 'STATE', some_random_thing: 'zzz', vi_conn_x_secret: 'S', vi_bak_pos_ov1: '{"at":1,"value":"{}"}' };
+  ({ ctx, page } = await fresh(b, seedE));
+  await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
+  await page.evaluate(() => { _supaUser = { id: 'u-1', email: 'pete@example.com' }; });
+  let eb = await page.evaluate(() => buildMyDataBundle());
+  ok(eb.onThisDevice.pos_ov1 && eb.onThisDevice.vi_hb_design && eb.onThisDevice.vi_bak_pos_ov1, 'export lists the user data keys (and earlier saved copies)');
+  ok(!('vi_tl_auth_code' in eb.onThisDevice) && !('vi_tl_code_verifier' in eb.onThisDevice) && !('vi_tl_state' in eb.onThisDevice) && !('some_random_thing' in eb.onThisDevice) && !('vi_conn_x_secret' in eb.onThisDevice), 'OAuth codes/verifiers and unknown keys are not exported (allow-list)');
+  ok(/Wealth Inventory photos/.test(eb.note) && /200 saved versions/.test(eb.note), 'the file says what it does not contain');
+  await page.evaluate(() => { _supaUser = { id: 'u-9', email: 'someone.else@example.com' }; });
+  eb = await page.evaluate(() => buildMyDataBundle());
+  ok(Object.keys(eb.onThisDevice).length === 0 && /different sign-in/.test(eb.problems.join()), 'data on the device that belongs to someone else is not put in your file');
+  await page.evaluate(() => { _supaUser = { id: 'u-1', email: 'pete@example.com' }; _supaClient.from = () => { throw new Error('offline'); }; openDeleteAccount(); });
+  await page.waitForSelector('#delete-modal'); await page.click('#del-export'); await page.waitForTimeout(1200);
+  const stt = await page.evaluate(() => document.getElementById('del-status').textContent);
+  ok(/⚠ Downloaded, but/.test(stt) && /offline/.test(stt), 'in the delete dialog an incomplete export is flagged right there: “' + stt.slice(0, 90) + '”');
+  ok(await page.evaluate(() => !document.getElementById('del-export').disabled), 'the export button is usable again afterwards');
+  ok(await page.evaluate(() => parseInt(getComputedStyle(document.getElementById('toast')).zIndex, 10) > 20003), 'toasts now sit above every dialog');
+  await ctx.close();
+
+  // ── 11. smaller promises ──
+  ({ ctx, page } = await fresh(b, seedP));
+  await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
+  // the PIN is never derived into the browser when it lives on the server
+  await page.evaluate(() => { _supaUser = { id: 'u-1', email: 'pete@example.com' }; _authOTP = { email: 'pete@example.com' }; _pinChange = true; _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter'; _showAuthStep('setpin'); _m.script['pin-auth:set'] = { data: { ok: true }, error: null }; });
+  for (let k = 0; k < 2; k++) { for (const d of '482915') await page.evaluate(d => _setPinKey(d), d); await page.waitForTimeout(550); }
+  await page.waitForTimeout(700);
+  ok(await page.evaluate(() => localStorage.getItem('vi_pin_hash')) === 'srv', 'a PIN kept on the server leaves only a marker in the browser (no PIN-derived value to crack)');
+  await page.evaluate(() => { localStorage.removeItem('vi_pin_hash'); _pinChange = true; _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter'; _showAuthStep('setpin'); _m.script['pin-auth:set'] = { data: null, error: { message: 'down' } }; });
+  for (let k = 0; k < 2; k++) { for (const d of '482915') await page.evaluate(d => _setPinKey(d), d); await page.waitForTimeout(550); }
+  await page.waitForTimeout(700);
+  ok(await page.evaluate(() => localStorage.getItem('vi_pin_hash')) !== 'srv' && !!(await page.evaluate(() => localStorage.getItem('vi_pin_hash'))), 'only if the PIN could not reach the server is a local-only check kept (and the user is told)');
+  // a throttled status lookup is not "no PIN"
+  await page.evaluate(() => { _m.script['pin-auth:status'] = { data: null, error: { context: { json: async () => ({ error: 'rate_limited', retryAfter: 30 }), status: 429 } } }; });
+  const stl = await page.evaluate(() => _pinStatus('pete@example.com'));
+  ok(stl.pin === null && stl.limited === true, 'a rate-limited PIN lookup is reported as throttled (so nobody is invited to overwrite a PIN they already have)');
+  // reset warns that earlier versions are kept
+  const rc = await page.evaluate(() => { let m = ''; window.confirm = (x) => { m = x; return false; }; resetVaultData(); return m; });
+  ok(/Earlier versions stay in Version history & restore for up to 180 days/.test(rc) && !/permanently delete/i.test(rc), 'Reset no longer claims to "permanently delete" — it says earlier versions stay restorable');
+  // deep links from the website
+  await page.goto('file:///home/user/Vault-It/index.html?privacy=1'); await page.waitForTimeout(2500);
+  ok(await page.evaluate(() => /Privacy notice/.test((document.getElementById('legal-modal') || {}).innerText || '')), '?privacy=1 opens the privacy notice (linked from the website sign-up)');
+  ok(page.errs.length === 0, 'no page errors ' + page.errs.slice(0, 2).join(' | '));
   await ctx.close(); await b.close();
   console.log(fails ? '\n' + fails + ' FAILED' : '\nALL PASSED'); process.exit(fails ? 1 : 0);
 })();

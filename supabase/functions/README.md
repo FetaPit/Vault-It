@@ -54,7 +54,8 @@ add and verify your own domain in Resend → Domains.
 ### Abuse limits
 
 This endpoint creates accounts and sends e-mail, so it is metered (migration `008_auth_rate_limit.sql`, `rate_hit()`):
-per address 6/hour, per IP 60/hour, whole service 200/hour. A refused request returns `429 { error: 'rate_limited', retryAfter }`
+per mailbox 8/hour (`+tags`, Gmail dots and googlemail.com count as one mailbox), per IP 60/hour (an IPv6 address counts as its /64), whole service 200/hour.
+The cheap, bounded keys are checked first (IP, then service, then mailbox) so a flood of junk addresses writes almost nothing. A refused request returns `429 { error: 'rate_limited', retryAfter }`
 and the app shows the wait instead of falling back. Tunable with secrets `RATE_EMAIL_PER_HOUR`, `RATE_IP_PER_HOUR`,
 `RATE_GLOBAL_PER_HOUR` (a room of testers shares one public IP, so keep the per-IP number generous). Counters are keyed by a salted hash,
 never a raw address or IP. If the limiter table is missing the function **fails open** (and logs) rather than locking everyone out —
@@ -77,18 +78,21 @@ Email + PIN sign-in for returning users on any device.
 2. Deploy: `supabase functions deploy pin-auth --no-verify-jwt`
    (optional: `supabase secrets set PIN_PEPPER=<random>`; defaults to the service-role key).
 
-Actions: `status` (does this email have a PIN?), `set` / `remove` (need the signed-in user's JWT),
+Actions: `status` (does this email have a PIN?), `set` / `remove` (JWT **plus** re-authentication: a sign-in within the last
+15 minutes, or the current PIN in `current` — same lockout; a token alone can no longer install its own PIN),
 `login` (email + 6-digit PIN → one-time code the app exchanges for a real session) and
 `delete` (JWT + PIN → erases the account and everything stored about it, see below).
-PINs are PBKDF2-hashed server-side; 5 wrong tries lock the account for 15 min, doubling every further 5.
+PINs are PBKDF2-hashed server-side; 5 wrong tries lock the account for 15 min, doubling every further 5. `set` refuses trivially
+guessable PINs (`400 pin_weak`: all-same, runs, repeats, a short list of the most common).
 
-`status` and `login` are also metered per IP (migration 008): 120 and 60 per 10 min by default (`RATE_PIN_STATUS_PER_10MIN`,
+`status` and `login` are also metered per IP (migration 008): 300 and 60 per 10 min by default (`RATE_PIN_STATUS_PER_10MIN`,
 `RATE_PIN_LOGIN_PER_10MIN`) → `429 { error: 'rate_limited', retryAfter }`, checked *before* a PIN attempt is spent.
 
 `delete` (GDPR erasure): requires the user's own JWT. If the account has a PIN it must be supplied and is checked with the same
 lockout as sign-in; if it has none, the sign-in must be within the last 15 minutes (`403 recent_login`). It calls
 `erase_user_data()` (migration 008 — order matters because `vault_data` archives rows into `vault_data_history` when deleted) and
-only then deletes the auth user, so a failure part-way leaves the login in place and a retry works. Limited to 10 per IP per hour.
+only then deletes the auth user (`500 partial` if that step fails — the data is already gone, a retry completes it) and sweeps once more.
+Limited to 10 per IP per hour.
 Also run: `supabase/migrations/008_auth_rate_limit.sql` once (before deploying either function).
 
 

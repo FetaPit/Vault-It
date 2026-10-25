@@ -6,14 +6,14 @@ const js=esbuild.transformSync(src,{loader:'ts',format:'cjs'}).code;
 
 // ── in-memory stand-in for Supabase (mirrors the SQL in 004_user_pins.sql) ──
 const db={pins:{}}; let otpCalls=0, released=0; const NOW=()=>new Date().toISOString(), OLD=()=>new Date(Date.now()-2*3600e3).toISOString();
-const users={'jwt-alice':{id:'u-alice',email:'Alice@Example.com',last_sign_in_at:NOW()},'jwt-bob':{id:'u-bob',email:'bob@example.com',last_sign_in_at:OLD()},
+const users={'jwt-alice':{id:'u-alice',email:'Alice@Example.com',last_sign_in_at:NOW()},'jwt-bob':{id:'u-bob',email:'bob@example.com',last_sign_in_at:NOW()},
   'jwt-carol':{id:'u-carol',email:'carol@example.com',last_sign_in_at:NOW()},'jwt-dave':{id:'u-dave',email:'dave@example.com',last_sign_in_at:OLD()}};
-const rate={}; let rateDown=false; const erased=[], deleted=[]; let eraseFails=false;
+const rate={}; let rateDown=false; const erased=[], deleted=[]; let eraseFails=false, deleteFails=false;
 const rowsByEmail=e=>Object.values(db.pins).find(r=>r.email===e);
 globalThis.__createClient=()=>({
   auth:{getUser:async jwt=>users[jwt]?{data:{user:users[jwt]},error:null}:{data:{user:null},error:{message:'bad'}},
         admin:{generateLink:async({email})=>{otpCalls++;return {data:{properties:{email_otp:'654321'}},error:null};},
-               deleteUser:async id=>{deleted.push(id);return {error:null};}}},
+               deleteUser:async id=>{if(deleteFails)return {error:{message:'gotrue down'}};deleted.push(id);return {error:null};}}},
   from:()=>({
     select:()=>({eq:(c,v)=>({maybeSingle:async()=>{const r=c==='user_id'?db.pins[v]:rowsByEmail(v);return {data:r?{user_id:r.user_id}:null};}})}),
     upsert:async(row)=>{db.pins[row.user_id]={...row};return {error:null};},
@@ -111,16 +111,61 @@ const call=async(body,jwt,ip)=>{const t=Date.now();const r=await globalThis.__h(
   r=await call({action:'delete',pin:'482915'},'jwt-alice'); ok(r.s===429&&!erased.length,'the correct PIN is refused while locked');
   db.pins['u-alice'].locked_until=Date.now()-1;
   r=await call({action:'delete',pin:'482915',email:'bob@example.com'},'jwt-alice'); ok(r.s===200&&r.b.ok===true,'correct PIN → account deleted');
-  ok(erased.length===1&&erased[0].p_user==='u-alice'&&erased[0].p_email==='alice@example.com','data erased for the SIGNED-IN user (their e-mail, lower-case) — an e-mail in the request body is ignored');
+  ok(erased.length===2&&erased.every(e=>e.p_user==='u-alice'&&e.p_email==='alice@example.com'),'data erased for the SIGNED-IN user (their e-mail, lower-case) — an e-mail in the request body is ignored; erased again after the login is removed (sweep)');
   ok(deleted.join()==='u-alice','auth user deleted after the data');
   ok(!db.pins['u-alice']&&!!db.pins['u-bob'],"another user's PIN/data is untouched");
   // no PIN → must have signed in recently
   r=await call({action:'delete'},'jwt-dave'); ok(r.s===403&&r.b.error==='recent_login'&&deleted.length===1,'no PIN and a stale sign-in → asked to sign in again first (nothing erased)');
-  r=await call({action:'delete'},'jwt-carol'); ok(r.s===200&&deleted.join()==='u-alice,u-carol'&&erased[1].p_email==='carol@example.com','no PIN but signed in minutes ago → deleted');
+  r=await call({action:'delete'},'jwt-carol'); ok(r.s===200&&deleted.join()==='u-alice,u-carol'&&erased[2].p_email==='carol@example.com','no PIN but signed in minutes ago → deleted');
   // failure ordering: if erasing the data fails the sign-in account must be kept (so the user can retry)
   users['jwt-erin']={id:'u-erin',email:'erin@example.com',last_sign_in_at:NOW()}; eraseFails=true;
   r=await call({action:'delete'},'jwt-erin'); ok(r.s===500&&!deleted.includes('u-erin'),'if erasing the data fails, the login is NOT deleted (nothing half-done, retry works)'); eraseFails=false;
+  // delete: data gone but the login could not be removed → say so ('partial'), do not claim nothing changed
+  users['jwt-gina']={id:'u-gina',email:'gina@example.com',last_sign_in_at:NOW()}; deleteFails=true; const eBefore=erased.length;
+  r=await call({action:'delete'},'jwt-gina'); ok(r.s===500&&r.b.error==='partial'&&erased.length===eBefore+1&&!deleted.includes('u-gina'),'login removal fails after the data was erased → reported as "partial" (retry is safe)'); deleteFails=false;
+  r=await call({action:'delete'},'jwt-gina'); ok(r.s===200&&deleted.includes('u-gina'),'…and a retry completes the deletion');
   const DIP='203.0.113.50'; users['jwt-f']={id:'u-f',email:'f@example.com',last_sign_in_at:OLD()}; const dl=[]; for(let i=0;i<5;i++)dl.push((await call({action:'delete'},'jwt-f',DIP)).s);
   ok(dl.join()==='403,403,403,429,429','delete attempts are limited per IP: '+dl.join());
+
+  // ── weak PINs are refused (an attacker gets 5 free guesses per account) ──
+  Object.keys(db.pins).forEach(k=>delete db.pins[k]);
+  users['jwt-wes']={id:'u-wes',email:'wes@example.com',last_sign_in_at:NOW()};
+  const weak=['000000','111111','999999','123456','234567','456789','890123','654321','987654','321098','121212','123123','112233','520520','159753','102030'];
+  const accepted=[]; for(const w of weak){r=await call({action:'set',pin:w},'jwt-wes'); if(r.s!==400||r.b.error!=='pin_weak')accepted.push(w+':'+r.s);}
+  ok(!accepted.length&&!db.pins['u-wes'],'trivial PINs are refused and never stored'+(accepted.length?' — accepted: '+accepted:''));
+  for(const good of ['482915','135790','907314','264813']){r=await call({action:'set',pin:good},'jwt-wes'); if(r.b.ok!==true)ok(false,'a reasonable PIN was refused: '+good);}
+  ok(!!db.pins['u-wes'],'ordinary PINs are accepted');
+
+  // ── changing credentials needs more than a session token ──
+  // A token holder (stale sign-in) who does not know the PIN cannot install their own PIN and then delete the account
+  users['jwt-vic']={id:'u-vic',email:'vic@example.com',last_sign_in_at:NOW()};
+  await call({action:'set',pin:'731942'},'jwt-vic'); const victimHash=db.pins['u-vic'].pin_hash; users['jwt-vic'].last_sign_in_at=OLD();
+  const dBefore=deleted.length, eB=erased.length;
+  r=await call({action:'set',pin:'222333'},'jwt-vic'); ok(r.s===400,'(weak PIN refused before anything else)');
+  r=await call({action:'set',pin:'846201'},'jwt-vic'); ok(r.s===403&&r.b.error==='reauth'&&db.pins['u-vic'].pin_hash===victimHash,'set over an existing PIN with a stale session and no current PIN → 403, PIN unchanged');
+  r=await call({action:'delete',pin:'846201'},'jwt-vic'); ok(r.s===401&&deleted.length===dBefore&&erased.length===eB,'…so set-then-delete does not work: the attacker cannot delete the account (PoC B)');
+  r=await call({action:'remove'},'jwt-vic'); ok(r.s===403&&!!db.pins['u-vic'],'remove with a stale session and no current PIN → 403, PIN kept');
+  users['jwt-nopin']={id:'u-nopin',email:'nopin@example.com',last_sign_in_at:OLD()};
+  r=await call({action:'set',pin:'846201'},'jwt-nopin'); ok(r.s===403&&r.b.error==='recent_login'&&!db.pins['u-nopin'],'set on an account WITHOUT a PIN with a stale session → 403 recent_login (nothing stored)');
+  r=await call({action:'delete',pin:'846201'},'jwt-nopin'); ok(r.s===403&&r.b.error==='recent_login'&&!deleted.includes('u-nopin'),'…so set-then-delete cannot bypass the recent-login rule either (PoC A)');
+  r=await call({action:'set',pin:'846201',current:'000000'},'jwt-vic'); ok(r.s===401&&r.b.error==='invalid'&&r.b.remaining===3&&db.pins['u-vic'].pin_hash===victimHash,'wrong current PIN → refused and counted as a failed attempt');
+  r=await call({action:'set',pin:'846201',current:'731942'},'jwt-vic'); ok(r.s===200&&r.b.ok&&db.pins['u-vic'].pin_hash!==victimHash,'correct current PIN allows a change even with a stale session');
+  r=await call({action:'remove',current:'846201'},'jwt-vic'); ok(r.s===200&&!db.pins['u-vic'],'correct current PIN allows removal');
+  // a fresh e-mail-code sign-in is enough (first PIN after sign-up, and "forgot PIN")
+  users['jwt-vic'].last_sign_in_at=NOW();
+  r=await call({action:'set',pin:'512906'},'jwt-vic'); ok(r.s===200,'right after signing in, a PIN can be set without a current PIN');
+  r=await call({action:'set',pin:'389407'},'jwt-vic'); ok(r.s===200,'…and changed (forgot-PIN flow: e-mail code, then a new PIN)');
+  // wrong current PINs share the sign-in lockout
+  users['jwt-vic'].last_sign_in_at=OLD(); const lk=[]; for(let i=0;i<5;i++){r=await call({action:'set',pin:'846201',current:'000000'},'jwt-vic');lk.push(r.s);}
+  ok(lk.join()==='401,401,401,401,429','guessing the current PIN locks the account like sign-in does: '+lk.join());
+  r=await call({action:'login',email:'vic@example.com',pin:'389407'}); ok(r.s===429&&!r.b.token,'…and sign-in is refused while locked');
+
+  // ── rate-limit keys: an IPv6 /64 is one customer ──
+  const a6=[]; for(let i=0;i<3;i++)a6.push((await call({action:'status',email:'a@example.com'},null,'2001:db8:aaaa:1::'+(i+1))).s);
+  for(let i=0;i<3;i++)a6.push((await call({action:'status',email:'a@example.com'},null,'2001:db8:aaaa:1:ffff:eeee:dddd:'+(i+1))).s);
+  ok(a6.join()==='200,200,200,200,200,429','addresses inside one /64 share a single allowance: '+a6.join());
+  ok((await call({action:'status',email:'a@example.com'},null,'2001:db8:aaaa:2::1')).s===200,'a different /64 is separate');
+  const m4=[]; for(let i=0;i<6;i++)m4.push((await call({action:'status',email:'a@example.com'},null,i%2?'::ffff:198.51.100.9':'198.51.100.9')).s);
+  ok(m4.join()==='200,200,200,200,200,429','an IPv4-mapped IPv6 address counts as the same IPv4: '+m4.join());
   console.log(fails?('\n'+fails+' FAILED'):'\nALL PASSED');
 })();

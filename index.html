@@ -12,6 +12,20 @@
 <meta name="apple-mobile-web-app-title" content="Vault·It">
 <meta name="mobile-web-app-capable" content="yes">
 <script>
+// After "Delete my account" the page reloads here (?deleted=1): nothing may be written, the browser databases are removed
+// before the app opens them, and the confirmation is shown. Closing it starts a normal, empty app.
+(function () {
+  if (!/[?&]deleted=1(&|$)/.test(location.search)) return;
+  window._viDeleted = true;
+  try { indexedDB.deleteDatabase('vi_photos'); indexedDB.deleteDatabase('vaultit-house'); } catch (e) {}
+  try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  document.addEventListener('DOMContentLoaded', function () {
+    var d = document.createElement('div'); d.id = 'delete-done';
+    d.style.cssText = 'position:fixed;inset:0;z-index:20002;background:#04090f;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center';
+    d.innerHTML = '<div style="max-width:420px;font-family:\'DM Sans\',sans-serif"><div style="font-size:2rem;margin-bottom:10px;color:#44c0b9">✓</div><div style="font-family:\'Syne\',sans-serif;font-size:1rem;font-weight:800;color:#44c0b9;margin-bottom:10px">Your account has been deleted</div><div style="font-size:.65rem;color:#9bb0bd;line-height:1.7;margin-bottom:18px">Your account and everything stored in it have been erased, and so has the data Vault·It kept on this device (including photos). Other devices where you used Vault·It still hold a local copy — clear it there too (browser settings → site data). Our hosting providers may keep short-lived backups and logs for a few days. Thank you for testing Vault·It.</div><button class="btn-add-data" onclick="location.replace(location.pathname)">Close</button></div>';
+    document.body.appendChild(d);
+  });
+})();
 if ('serviceWorker' in navigator) {
   var SW_VERSION = '1.0.4';
   var SW_BLOB = new Blob([
@@ -9358,7 +9372,7 @@ button.bd-ic{cursor:pointer}
         onkeydown="if(event.key==='Enter')authSubmitEmail()">
       <button class="auth-btn" onclick="authSubmitEmail()">Continue →</button>
       <div class="auth-info">Private beta · your data is private to your account · synced across your devices</div>
-      <div class="auth-info" style="margin-top:6px;opacity:.85">By continuing you agree to the <a href="#" onclick="showTerms();return false" style="color:var(--em)">Beta Terms</a> and <a href="#" onclick="showPrivacy();return false" style="color:var(--em)">Privacy Notice</a>.</div>
+      <div class="auth-info" style="margin-top:6px;opacity:.85">By continuing you accept the <a href="#" onclick="showTerms();return false" style="color:var(--em)">Beta Terms</a>. See how we use your data in the <a href="#" onclick="showPrivacy();return false" style="color:var(--em)">Privacy Notice</a>.</div>
     </div>
 
     <!-- Step 2: OTP code verification -->
@@ -9868,7 +9882,7 @@ button.bd-ic{cursor:pointer}
           <button class="vi-camp-tier-cta vi-camp-cta-gold" onclick="showUpgrade('founder'); document.getElementById('vi-campaign-modal').classList.add('hidden')">Invest once. Own it forever →</button>
         </div>
       </div>
-      <p style="font-size:.44rem;color:var(--t3);text-align:center;line-height:1.6">Secure checkout via Stripe · Cancel anytime (Pro) · No recurring charge for Founders<br>Questions? <a href="mailto:connect@vault-it.uk" style="color:var(--em)">connect@vault-it.uk</a></p>
+      <p style="font-size:.44rem;color:var(--t3);text-align:center;line-height:1.6">Secure checkout via Stripe · Cancel anytime (Pro) · No recurring charge for Founders<br>Questions? <a href="mailto:pete@ptlive.design" style="color:var(--em)">pete@ptlive.design</a></p>
     </div>
   </div>
 </div>
@@ -11299,7 +11313,7 @@ button.bd-ic{cursor:pointer}
     </div>
 
     <div style="font-size:.5rem;color:var(--t3);margin-bottom:16px;padding:10px;background:rgba(68,192,185,.04);border-radius:6px;border:1px solid var(--bd)">
-      🔒 All API keys are stored <strong>only in your browser's localStorage</strong>. They are never sent to any server other than the respective API provider. When you host this app publicly, add a backend proxy to keep keys secure.
+      🔒 API keys are stored <strong>only in this browser</strong> and sent only to the service they belong to. (A Meshy key passes through Vault·It's server to reach Meshy; it is not stored there.)
     </div>
 
     <details style="margin-bottom:20px"><summary style="cursor:pointer;font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--t3);letter-spacing:.06em;padding:8px 2px">⚙ Owner &amp; admin tools — not needed for testing</summary>
@@ -11347,7 +11361,7 @@ button.bd-ic{cursor:pointer}
     <!-- Your data (UK GDPR: access, portability, erasure) -->
     <div id="set-yourdata" style="margin-bottom:20px;padding:14px;background:rgba(68,192,185,.04);border-radius:8px;border:1px solid rgba(68,192,185,.2)">
       <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--em);margin-bottom:6px;letter-spacing:.06em">🗂 Your data</div>
-      <div style="font-size:.48rem;color:var(--t3);line-height:1.6;margin-bottom:10px">Download a copy of everything Vault·It holds about you (what is on this device and the copy in your account) as a file you can keep. You can also read how your data is handled, or delete your account for good.</div>
+      <div style="font-size:.48rem;color:var(--t3);line-height:1.6;margin-bottom:10px">Download a copy of your data — your figures and profile (on this device and in your account) and your latest 200 saved versions — as a file you can keep. Photos and technical security records are not in the file; email us for those. You can also read how your data is handled, or delete your account for good.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-add-data" onclick="exportMyData()">⬇ Download my data</button>
         <button class="btn-add-data" style="background:transparent;border-color:var(--em);color:var(--em)" onclick="showPrivacy()">Privacy notice</button>
@@ -11509,7 +11523,7 @@ button.bd-ic{cursor:pointer}
 .btn-reset{background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:3px;color:rgba(255,255,255,.25);font-family:'DM Mono',monospace;font-size:.58rem;padding:6px 12px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;transition:all .2s;width:100%;margin-top:4px}
 .btn-reset:hover{border-color:#e55;color:#e88}
 .scene-cap{text-align:center;margin-top:14px;font-size:.58rem;color:#D4C5A9;opacity:.38;letter-spacing:.2em;text-transform:uppercase}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(4,10,18,.96);border:1px solid rgba(68,192,185,.45);border-radius:5px;padding:12px 22px;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:#44c0b9;z-index:1000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.6),0 0 20px rgba(68,192,185,.1)}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(4,10,18,.96);border:1px solid rgba(68,192,185,.45);border-radius:5px;padding:12px 22px;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:#44c0b9;z-index:30000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.6),0 0 20px rgba(68,192,185,.1)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 /* Wealth Inventory tiles */
@@ -15955,6 +15969,7 @@ function _markDirty(key) {
   if (d.indexOf(key) < 0) { d.push(key); try { _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(d)); } catch (e) {} }
 }
 localStorage.setItem = function(key, value) {
+  if (window._viDeleted) return;   // the account has been deleted: nothing may write data back
   if (_VAULT_KEYS.indexOf(key) > -1 && typeof value === 'string') value = viCleanJSON(value);
   if (_VAULT_KEYS.indexOf(key) > -1) { try { var _prev = localStorage.getItem(key); if (_prev != null && !_isBlankArea(key, _prev) && _isBlankArea(key, value)) _emptiedByUser[key] = true; else if (!_isBlankArea(key, value)) delete _emptiedByUser[key]; } catch (e) {} }
   _lsOrig.call(localStorage, key, value);
@@ -15965,7 +15980,7 @@ localStorage.setItem = function(key, value) {
   }
 };
 async function _upsertRows(rows) {
-  if (!rows.length) return true;
+  if (!rows.length || window._viDeleted) return !window._viDeleted;
   if (_supaClient && !_sjsStalled) {
     var r;
     try { r = await _withTimeout(_supaClient.from('vault_data').upsert(rows, { onConflict: 'user_id,key' }).then(function(x) { return x; }, function(e) { return { error: e }; }), 8000, null); }
@@ -15991,7 +16006,7 @@ async function _upsertRows(rows) {
 }
 var _lastSyncErr = '';
 async function _flushDirty() {
-  if (_flushing || !_supaUser || !_syncReady || localStorage.getItem('vi_demo_mode') === 'true') return;
+  if (window._viDeleted || _flushing || !_supaUser || !_syncReady || localStorage.getItem('vi_demo_mode') === 'true') return;
   _flushing = true;
   try {
     var t0 = Date.now();
@@ -16345,6 +16360,7 @@ async function _hydrateFromSupabase(uid) {
   if (!_supaClient && !_localAccessToken()) { _hydrateErr = 'sync library not loaded'; return false; }
   try {
     var resp = await _selectRows(uid);
+    if (window._viDeleted) return false;
     if (!resp.data) { _hydrateErr = resp.err || 'unknown'; return false; }      // cloud unreachable: leave local data exactly as it is
     _hydrateErr = '';
     var rows = resp.data, have = {}, ts = _lsJSON('vi_ts', {}), pulled = +localStorage.getItem('vi_last_pull') || 0, dirty = _lsJSON('vi_dirty', []);
@@ -16415,7 +16431,9 @@ async function _initSupabaseSession() {
       if (ov && ov.style.display !== 'none') {
         var pinHash = localStorage.getItem('vi_pin_hash');
         if (pinHash) {
-          _pinMode = 'local'; _pinEnterLen = _localPinLen(); _pinEnterBuf = '';
+          if (pinHash === 'srv') { _authOTP = { email: (_supaUser.email || '').toLowerCase() }; _pinMode = 'server'; _pinEnterLen = PIN_LEN; }   // the PIN is checked by the server
+          else { _pinMode = 'local'; _pinEnterLen = _localPinLen(); }
+          _pinEnterBuf = '';
           _showAuthStep('pin');
         } else {
           ov.style.display = 'none';
@@ -16464,7 +16482,7 @@ function _localAccessToken() {
 }
 // Call an edge function without ever hanging the UI: supabase-js first (8 s), then a direct request.
 // (supabase-js waits on its own auth lock before every call, so one stalled refresh can freeze it.)
-async function _fnInvoke(name, body, ms, direct) {
+async function _fnInvoke(name, body, ms, direct, once) {   // once: if supabase-js is slow, report a timeout instead of sending the same request a second time
   if (!_supaClient) { try { _initSupabase(); } catch (e) {} }
   var tok = null;
   if (direct) {   // one-shot, costs money: never send it twice — go straight out with the user's own token
@@ -16473,6 +16491,7 @@ async function _fnInvoke(name, body, ms, direct) {
   if (_supaClient && !direct && !_sjsStalled) {
     var r = await _withTimeout(_supaClient.functions.invoke(name, { body: body }).catch(function(e) { return { data: null, error: e }; }), ms || 8000, null);
     if (r) return r;
+    if (once) return { data: null, error: { message: 'timeout' } };
     _sjsStalled = true;   // supabase-js is not answering: go direct from now on
   }
   try {
@@ -16576,7 +16595,7 @@ async function authSubmitEmail() {
     }
     // Legacy: a PIN that only exists on this device AND a live session → local lock screen
     var pinHash = localStorage.getItem('vi_pin_hash');
-    if (pinHash) {
+    if (pinHash && pinHash !== 'srv') {
       var storedEmail = '';
       try { var _sv = JSON.parse(localStorage.getItem('vi_session') || 'null'); storedEmail = (_sv && _sv.email) ? _sv.email : ''; } catch(e) {}
       if (!storedEmail) { try { var _su = JSON.parse(localStorage.getItem('vi_user') || 'null'); storedEmail = (_su && _su.email) ? _su.email.toLowerCase() : ''; } catch(e) {} }
@@ -16606,7 +16625,7 @@ async function _sendOTP(email) {
     // Try Edge Function first (Resend API, branded template, no SMTP dependency)
     var sent = false, rateWait = 0;
     try {
-      var fnRes = await _fnInvoke('send-auth-email', { email: email }, 5000);
+      var fnRes = await _fnInvoke('send-auth-email', { email: email }, 20000, false, true);
       if (!fnRes.error && fnRes.data && fnRes.data.success) sent = true;
       else if (fnRes.error && fnRes.error.context && fnRes.error.context.status === 429) {   // our own abuse limit: do NOT work around it with the built-in sender
         var lim = null; try { lim = await fnRes.error.context.json(); } catch (e) {}
@@ -16666,8 +16685,33 @@ function _tryEmailJSOTP(email, code) {
 }
 
 // Everything that happens once a Supabase session exists (e-mail code OR e-mail + PIN)
+// Everything this device keeps for a person (data, settings, keys, photos, saved designs). Sign-in tokens (sb-…) can be kept.
+function _wipeDeviceData(keepAuth) {
+  try { var ks = []; for (var i = 0; i < localStorage.length; i++) ks.push(localStorage.key(i)); ks.forEach(function(k) { if (!(keepAuth && /^sb-/.test(k))) localStorage.removeItem(k); }); } catch (e) {}
+  try { sessionStorage.clear(); } catch (e) {}
+}
+function _wipeIdb(name) {
+  return new Promise(function(res) { try { var rq = indexedDB.deleteDatabase(name); rq.onsuccess = rq.onerror = function() { res(true); }; rq.onblocked = function() { res(false); }; setTimeout(function() { res(false); }, 2500); } catch (e) { res(false); } });
+}
+// A different person signing in on a device that still holds someone else's data must not see it, export it, or upload it to their own account.
+async function _guardAccountSwitch(email) {
+  if (localStorage.getItem('vi_demo_mode') === 'true') return true;
+  var owner = (localStorage.getItem('vi_last_email') || '').toLowerCase(), now = email.toLowerCase();
+  if (!owner || owner === now) return true;
+  var unsent = _lsJSON('vi_dirty', []).length;
+  var ok = confirm('This device still holds data saved for ' + owner + '.\n\nSigning in as ' + now + ' removes it from this device, so it cannot be seen by — or uploaded to the account of — someone else.'
+    + (unsent ? '\n\n⚠ It has changes that were never uploaded to ' + owner + '’s account. They would be lost.' : '\n\nIt stays safe in that account.') + '\n\nContinue?');
+  if (!ok) { try { _supaClient.auth.signOut({ scope: 'local' }); } catch (e) {} _supaUser = null; _authOTP = null; _showAuthStep('email'); return false; }
+  try { _invDB && _invDB.close(); _invDB = null; } catch (e) {}
+  try { await invClearAll(); } catch (e) {}
+  _wipeDeviceData(true);
+  try { _createSession(email); } catch (e) {}
+  location.reload();   // start clean from the new account's own data
+  return false;
+}
 async function _afterVerified(user, email) {
   _supaUser = user;
+  if (!(await _guardAccountSwitch(email))) return;
   _dropDemoBeforeSync(email);
   var hydrated = await _hydrateFromSupabase(_supaUser.id);
   // QC-2: demo visitor signing up for the first time — wipe sample data so
@@ -16707,7 +16751,8 @@ async function authVerifyOTP() {
     // Decide whether to ask for a PIN BEFORE signing in (the sign-in event fires immediately):
     // new users, people who forgot their PIN, and anyone without one on the server.
     var st = await _pinStatus(email);
-    _needPin = (st.pin === null) ? (_authForgot ? true : null) : (!st.pin || _authForgot);
+    // (if the lookup was merely throttled we do not know whether a PIN exists: never offer to overwrite one)
+    _needPin = (st.pin === null) ? (_authForgot ? true : (st.limited ? false : null)) : (!st.pin || _authForgot);
     var res = await _withTimeout(_supaClient.auth.verifyOtp({
       email: email, token: entered.trim(), type: 'email'
     }), 20000, { error: { message: 'timeout' } });
@@ -16793,6 +16838,45 @@ var _pinSetFirst = '';
 var _pinSetPhase = 'enter'; // 'enter' | 'confirm'
 var _pinEnterBuf = '';
 
+// PINs an attacker would try first (mirrors the server's rule, which is the one that counts)
+function viWeakPin(p) {
+  if (/^(\d)\1{5}$/.test(p) || /^(\d\d)\1\1$/.test(p) || /^(\d\d\d)\1$/.test(p)) return true;
+  var d = p.split('').map(Number);
+  if (d.every(function(x, i) { return i === 0 || x === (d[i - 1] + 1) % 10; }) || d.every(function(x, i) { return i === 0 || x === (d[i - 1] + 9) % 10; })) return true;
+  return ['123456','654321','112233','123321','159753','147258','258369','789456','987654','100000','111222','222333','112358','142536','102030','010203','123654','321123','159357','246810','666888','888999','998877','987123','121314','654123','520520','521521','007007','000001','777888','456123','741852','963852','852456','147852','369258','123789','321654','999000'].indexOf(p) > -1;
+}
+var _pinChangeCurrent = '';
+// ask for the current PIN (credential changes need it, or a very recent sign-in). Resolves '' if skipped, null if cancelled.
+function viAskCurrentPin(title, text) {
+  return new Promise(function(resolve) {
+    var old = document.getElementById('askpin-modal'); if (old) old.remove();
+    var m = document.createElement('div'); m.id = 'askpin-modal';
+    m.style.cssText = 'position:fixed;inset:0;z-index:20003;background:rgba(2,5,10,.95);display:flex;align-items:center;justify-content:center;padding:12px';
+    m.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);border-radius:10px;width:min(380px,94vw);padding:20px 18px;font-family:\'DM Sans\',sans-serif">'
+      + '<div style="font-family:\'Syne\',sans-serif;font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:8px">' + title + '</div>'
+      + '<div style="font-size:.58rem;color:var(--t2);line-height:1.6;margin-bottom:10px">' + text + '</div>'
+      + '<input id="askpin-inp" class="al-inp" type="password" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="Current 6-digit PIN" style="width:100%;margin-bottom:12px">'
+      + '<div style="display:flex;gap:8px"><button class="btn-add-data" id="askpin-no" style="flex:1;background:transparent;border-color:var(--t3);color:var(--t3)">Cancel</button><button class="btn-add-data" id="askpin-ok" style="flex:1">Continue</button></div></div>';
+    document.body.appendChild(m);
+    var done = function(v) { m.remove(); resolve(v); };
+    document.getElementById('askpin-no').onclick = function() { done(null); };
+    document.getElementById('askpin-ok').onclick = function() { done((document.getElementById('askpin-inp').value || '').trim()); };
+    document.getElementById('askpin-inp').onkeydown = function(e) { if (e.key === 'Enter') document.getElementById('askpin-ok').click(); };
+    setTimeout(function() { var i = document.getElementById('askpin-inp'); if (i) i.focus(); }, 50);
+  });
+}
+// words for the answers pin-auth gives to set / remove
+function _pinChangeProblem(r) {
+  if (!r) return '';
+  if (r.error === 'pin_weak') return 'That PIN is too easy to guess (like 123456 or 000000). Choose another.';
+  if (r.error === 'pin_format') return 'A PIN is exactly 6 digits.';
+  if (r.error === 'locked') return 'Too many wrong PINs. Try again in ' + Math.max(1, Math.ceil((r.retryAfter || 900) / 60)) + ' min, or sign out and sign back in with an email code first.';
+  if (r.error === 'rate_limited') return 'Too many attempts from this network. Try again in ' + Math.max(1, Math.ceil((r.retryAfter || 60) / 60)) + ' min.';
+  if (r.error === 'invalid') return r.remaining ? 'That current PIN is not right — ' + r.remaining + ' attempt' + (r.remaining === 1 ? '' : 's') + ' left.' : 'Enter your current 6-digit PIN.';
+  if (r.error === 'reauth' || r.error === 'recent_login') return 'For your security, enter your current PIN — or sign out and sign back in with an email code, then do this straight away.';
+  if (r.error === 'auth') return 'Your sign-in has expired. Sign in again, then try again.';
+  return 'Something went wrong on our side. Please try again.';
+}
 function _localPinLen() { var n = parseInt(localStorage.getItem('vi_pin_len') || '4', 10); return (n >= 4 && n <= 6) ? n : 4; }
 function _pinPromptNeeded() { return _needPin !== null ? _needPin : !localStorage.getItem('vi_pin_hash'); }
 
@@ -16807,11 +16891,11 @@ function _updatePinDots(n, prefix) {
 }
 
 // call the pin-auth edge function; returns the parsed JSON body (also for 4xx answers) or null if unreachable
-async function _pinCall(body, ms) {
+async function _pinCall(body, ms, once) {
   if (!_supaClient) _initSupabase();
   if (!_supaClient) return null;
   try {
-    var r = await _fnInvoke('pin-auth', body, ms || 8000);
+    var r = await _fnInvoke('pin-auth', body, ms || 8000, false, once);
     if (r.data) return r.data;
     if (r.error && r.error.context && typeof r.error.context.json === 'function') { try { return await r.error.context.json(); } catch (e) {} }
   } catch (e) {}
@@ -16821,6 +16905,7 @@ async function _pinStatus(email) {
   try {
     var r = await Promise.race([_pinCall({ action: 'status', email: email }, 3500), new Promise(function(res) { setTimeout(function() { res(null); }, 12000); })]);
     if (r && typeof r.pin === 'boolean') return { pin: r.pin };
+    if (r && r.error === 'rate_limited') return { pin: null, limited: true };
   } catch (e) {}
   return { pin: null }; // unknown (function not reachable) → fall back to the old behaviour
 }
@@ -16833,6 +16918,8 @@ function _setPinKey(d) {
   var buf = _pinSetBuf;
   setTimeout(function() {
     if (_pinSetPhase === 'enter') {
+      if (viWeakPin(buf)) { _authErr('That PIN is too easy to guess (like 123456 or 000000) — choose another.'); _pinSetBuf = ''; _updatePinDots(0, 'spd'); return; }
+      _clearAuthErr();
       _pinSetFirst = buf;
       _pinSetBuf = '';
       _pinSetPhase = 'confirm';
@@ -16853,9 +16940,17 @@ function _setPinKey(d) {
 async function _finishSetPin(pin) {
   _pinBusy = true;
   var email = (_authOTP && _authOTP.email) ? _authOTP.email : ((_supaUser && _supaUser.email) ? _supaUser.email.toLowerCase() : '');
-  var r = await _pinCall({ action: 'set', pin: pin });
+  var r = await _pinCall({ action: 'set', pin: pin, current: _pinChangeCurrent || '' });
+  if (r && r.error) {   // the server said no: nothing was changed, so do not pretend it was
+    _pinBusy = false; _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter'; _updatePinDots(0, 'spd');
+    var lblx = document.getElementById('auth-setpin-label'); if (lblx) lblx.textContent = _SETPIN_LABEL;
+    var why = _pinChangeProblem(r);
+    if (r.error === 'pin_weak' || r.error === 'pin_format') { _authErr(why); return; }   // stay and choose another
+    _pinChangeCurrent = ''; if (_pinChange) { _pinChange = false; _hideAuthOverlay(); } showToast(why); return;
+  }
+  _pinChangeCurrent = '';
   var onServer = !!(r && r.ok);
-  _lsOrig.call(localStorage, 'vi_pin_hash', _hashStr(pin));
+  _lsOrig.call(localStorage, 'vi_pin_hash', onServer ? 'srv' : _hashStr(pin));   // 'srv' = "a PIN is set on the server": no PIN-derived value is kept in the browser
   _lsOrig.call(localStorage, 'vi_pin_len', String(PIN_LEN));
   _needPin = false; _authForgot = false; _pinBusy = false;
   _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
@@ -16938,7 +17033,7 @@ async function _pinServerLogin(pin) {
   }
   // PIN accepted: exchange the one-time code for a session. Mark the PIN as set BEFORE the
   // sign-in event fires so no "set a PIN" prompt appears.
-  _lsOrig.call(localStorage, 'vi_pin_hash', _hashStr(pin));
+  _lsOrig.call(localStorage, 'vi_pin_hash', 'srv');
   _lsOrig.call(localStorage, 'vi_pin_len', String(PIN_LEN));
   _needPin = false;
   try {
@@ -16963,8 +17058,15 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ── Settings: change / remove the PIN (needs a live session) ──
-function authChangePin() {
+async function authChangePin() {
   if (!_supaUser) { showToast('Sign in with an email code first, then set your PIN'); return; }
+  _pinChangeCurrent = '';
+  var st = await _pinStatus((_supaUser.email || '').toLowerCase());
+  if (st.pin === true) {   // changing an existing PIN: prove you know it (or have just signed in)
+    var cur = await viAskCurrentPin('Change your PIN', 'Enter your current PIN to continue. If you have forgotten it, cancel, sign out and sign back in with an email code — you can then choose a new one.');
+    if (cur === null) return;
+    _pinChangeCurrent = cur;
+  }
   _pinChange = true;
   _authOTP = { email: (_supaUser.email || '').toLowerCase() };
   _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
@@ -16975,7 +17077,10 @@ function authChangePin() {
 }
 async function authRemovePin() {
   if (!confirm('Remove your PIN? You will sign in with an email code each time.')) return;
-  var r = await _pinCall({ action: 'remove' });
+  var cur = '', st = _supaUser ? await _pinStatus((_supaUser.email || '').toLowerCase()) : { pin: null };
+  if (st.pin === true) { cur = await viAskCurrentPin('Remove your PIN', 'Enter your current PIN to continue.'); if (cur === null) return; }
+  var r = await _pinCall({ action: 'remove', current: cur });
+  if (r && r.error) { showToast(_pinChangeProblem(r)); return; }   // refused: keep everything as it was
   localStorage.removeItem('vi_pin_hash'); localStorage.removeItem('vi_pin_len');
   showToast(r && r.ok ? 'PIN removed' : 'PIN removed on this device (the PIN service could not be reached)');
 }
@@ -17037,14 +17142,14 @@ function _completeAuth(email) {
 
 // ── DATA RESET ────────────────────────────────────────────────
 function resetVaultData() {
-  if (!confirm('RESET FINANCIAL DATA\n\nThis will permanently delete:\n• All assets & liabilities\n• All debts\n• Cashflow history\n• Business data\n• Achievements & XP\n\nYour profile, Pioneer status, and API keys are kept.\n\nContinue?')) return;
+  if (!confirm('RESET FINANCIAL DATA\n\nThis clears your current:\n• Assets & liabilities\n• Debts\n• Cashflow history\n• Business data\n• Achievements & XP\n\nYour profile, Pioneer status, and API keys are kept.\n\nEarlier versions stay in Version history & restore for up to 180 days. To remove everything for good, delete your account in Settings.\n\nContinue?')) return;
   var dataKeys = ['pos_al1','pos_debt1','pos_ov1','pos_biz1','pos_ach1','pos4','pos_house','ht3','pos_journey','vi_jrny_events','vi_nw_history','vi_debt','vi_ov'];
   // clear the account's cloud copy too — otherwise signing in brings the old figures straight back
   _resetCloudKeys(dataKeys).then(function(cloudOk) {
     dataKeys.forEach(function(k) { localStorage.removeItem(k); });
     try { var d = _lsJSON('vi_dirty', []).filter(function(k) { return dataKeys.indexOf(k) < 0; }); _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(d)); } catch (e) {}
     try { invClearAll(); } catch(e) {}
-    showToast(cloudOk ? 'Financial data cleared here and in your account ✓' : 'Cleared on this device. Your account copy could not be reached — sign in and reset again to clear it there too.');
+    showToast(cloudOk ? 'Financial data cleared here and in your account ✓ (earlier versions stay restorable for up to 180 days)' : 'Cleared on this device. Your account copy could not be reached — sign in and reset again to clear it there too.');
     setTimeout(function() { location.reload(); }, 1600);
   });
 }
@@ -17065,14 +17170,18 @@ async function _resetCloudKeys(keys) {
 
 // ── YOUR DATA: download a copy, delete the account (UK GDPR access / portability / erasure) ──────────
 // Everything the app keeps on this device that is yours (never sign-in tokens, PIN hashes or API keys) plus the copy in the account.
-var _VI_NOT_EXPORTED = /(^sb-|pin|token|secret|password|api[_-]?key|_key$|emailjs|notion|convertkit|^vi_(ts|dirty|last_sync|session)$)/i;
+var _VI_EXPORT_KEYS = _VAULT_KEYS.concat(['vi_last_email','vi_waitlist','vi_streak','vi_visit_count','vi_last_visit','vi_hb_design','vi_hb3d','vi_hb_detail','vi_stk_chart','vi_density','vi_bd_fold','vi_debt_view','vi_pioneer_email','vi_pioneer_num','vi_founder_num','vi_founder_email','vi_network_optin','vi_wallet_addr']);
+var _VI_NOT_EXPORTED = /(^sb-|pin|token|secret|password|api[_-]?key|_key$|emailjs|notion|convertkit|_tl_|auth_code|verifier|^vi_(ts|dirty|last_sync|session)$)/i;   // safety net on top of the allow-list
 async function buildMyDataBundle() {
   var out = { app: 'Vault·It', exported: new Date().toISOString(), account: { email: (_supaUser && _supaUser.email) || localStorage.getItem('vi_last_email') || null },
-    note: 'Everything Vault·It holds about you. "onThisDevice" is what this browser stores; "inYourAccount" is the copy in your cloud account. Sign-in tokens, PIN hashes and API keys are left out on purpose. A 3D house design you uploaded is stored only in this browser and is not included.',
+    note: 'A copy of your Vault·It data. "onThisDevice" is what this browser stores for you; "inYourAccount" is the copy in your cloud account (the latest 200 saved versions). Sign-in tokens, PIN hashes and API keys are left out on purpose. Not included: Wealth Inventory photos and any 3D house design you uploaded (they live only in this browser), and technical security records held by our providers — email pete@ptlive.design for those.',
     onThisDevice: {}, inYourAccount: null, problems: [] };
-  try {
+  var owner = (localStorage.getItem('vi_last_email') || '').toLowerCase(), acct = ((_supaUser && _supaUser.email) || '').toLowerCase();
+  if (owner && acct && owner !== acct) out.problems.push('The data on this device belongs to a different sign-in (' + owner + '), so it was left out of this file.');
+  else try {
     for (var i = 0; i < localStorage.length; i++) {
       var k = localStorage.key(i); if (_VI_NOT_EXPORTED.test(k)) continue;
+      if (_VI_EXPORT_KEYS.indexOf(k) < 0 && !/^vi_(bak|snap)_/.test(k)) continue;
       var v = localStorage.getItem(k); try { out.onThisDevice[k] = JSON.parse(v); } catch (e) { out.onThisDevice[k] = v; }
     }
   } catch (e) { out.problems.push('device: ' + e.message); }
@@ -17085,25 +17194,35 @@ async function buildMyDataBundle() {
     await grab('profile', function() { return _supaClient.from('profiles').select('*').eq('id', _supaUser.id).maybeSingle(); }, function(d) { cloud.profile = d; });
     await grab('saved data', function() { return _supaClient.from('vault_data').select('key,value,updated_at').eq('user_id', _supaUser.id); }, function(d) { cloud.vaultData = d || []; });
     await grab('net-worth history', function() { return _supaClient.from('nw_history').select('recorded_at,value').eq('user_id', _supaUser.id); }, function(d) { cloud.netWorthHistory = d || []; });
-    await grab('version history', function() { return _supaClient.rpc('vault_history_list', { p_limit: 200 }); }, function(d) { cloud.versionHistory = d || []; });
+    await grab('version history', function() { return _supaClient.rpc('vault_history_list', { p_limit: 200 }); }, function(d) { cloud.versionHistory = d || []; if (cloud.versionHistory.length >= 200) out.problems.push('Only your latest 200 saved versions are included; email pete@ptlive.design for the rest.'); });
     out.inYourAccount = cloud;
   } else out.problems.push('Not signed in on this device, so the copy in your account is not included. Sign in and download again to include it.');
   return out;
 }
-async function exportMyData() {
-  showToast('Preparing your data…');
+async function exportMyData(quiet) {
+  if (!quiet) showToast('Preparing your data…');
   try {
     var bundle = await buildMyDataBundle();
     var blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
     var url = URL.createObjectURL(blob), a = document.createElement('a');
     a.href = url; a.download = 'vault-it-my-data-' + new Date().toISOString().slice(0, 10) + '.json';
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(function() { URL.revokeObjectURL(url); }, 4000);
-    showToast(bundle.problems.length ? 'Downloaded — with ' + bundle.problems.length + ' note' + (bundle.problems.length === 1 ? '' : 's') + ' inside the file' : 'Your data has been downloaded ✓');
+    if (!quiet) showToast(bundle.problems.length ? 'Downloaded — with ' + bundle.problems.length + ' note' + (bundle.problems.length === 1 ? '' : 's') + ' inside the file' : 'Your data has been downloaded ✓');
     return bundle;
-  } catch (e) { showToast('Could not prepare your data: ' + (e && e.message || e)); return null; }
+  } catch (e) { if (!quiet) showToast('Could not prepare your data: ' + (e && e.message || e)); return null; }
 }
 
 var _delBusy = false;
+async function exportFromDeleteDialog(btn) {   // feedback inside the dialog (toasts sit behind it), and a warning if the file is incomplete
+  var st = document.getElementById('del-status'), label = btn.textContent; btn.disabled = true; btn.textContent = 'Preparing your data…';
+  if (st) { st.style.color = 'var(--t2)'; st.textContent = ''; }
+  var b = await exportMyData(true);
+  btn.disabled = false; btn.textContent = label;
+  if (!st) return;
+  if (!b) { st.style.color = '#e74c3c'; st.textContent = 'Could not prepare your data. Nothing has been deleted — try again before deleting.'; }
+  else if (b.problems.length) { st.style.color = '#e0b44a'; st.textContent = '⚠ Downloaded, but: ' + b.problems.join(' · ') + ' Make sure this is enough before you delete.'; }
+  else { st.style.color = 'var(--em)'; st.textContent = '✓ Downloaded — check your Downloads folder before deleting.'; }
+}
 function openDeleteAccount() {
   if (!_supaUser) { showToast('Sign in to your account first — then you can delete it'); try { viReauth(); } catch (e) {} return; }
   var old = document.getElementById('delete-modal'); if (old) old.remove();
@@ -17112,8 +17231,8 @@ function openDeleteAccount() {
   m.innerHTML = '<div style="background:var(--c1);border:1px solid rgba(231,76,60,.5);border-radius:10px;width:min(460px,94vw);max-height:90vh;overflow-y:auto;padding:22px 20px;position:relative;font-family:\'DM Sans\',sans-serif">'
     + '<button onclick="document.getElementById(\'delete-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer">✕</button>'
     + '<div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:#e74c3c;margin-bottom:10px">Delete your account</div>'
-    + '<div style="font-size:.6rem;color:var(--t2);line-height:1.7;margin-bottom:12px">This permanently erases your Vault·It account and <strong>everything in it</strong>: your budget, debts, assets, house plan, net-worth history, saved versions and PIN — in the cloud and on this device. <strong>It cannot be undone, and we cannot recover it.</strong></div>'
-    + '<button class="btn-add-data" style="width:100%;margin-bottom:12px" onclick="exportMyData()">⬇ Download my data first</button>'
+    + '<div style="font-size:.6rem;color:var(--t2);line-height:1.7;margin-bottom:12px">This permanently erases your Vault·It account and <strong>everything in it</strong>: your budget, debts, assets, house plan, net-worth history, saved versions and PIN — in the cloud and on this device. <strong>It cannot be undone.</strong> Short-lived backups and logs kept by our providers clear out within days. Other devices where you have used Vault·It keep a local copy until you clear it there.</div>'
+    + '<button id="del-export" class="btn-add-data" style="width:100%;margin-bottom:12px" onclick="exportFromDeleteDialog(this)">⬇ Download my data first</button>'
     + '<label style="font-size:.52rem;color:var(--t3);display:block;margin-bottom:4px">Your 6-digit PIN <span style="opacity:.7">(leave empty only if you never set one)</span></label>'
     + '<input id="del-pin" class="al-inp" type="password" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="••••••" style="width:100%;margin-bottom:10px">'
     + '<label style="font-size:.52rem;color:var(--t3);display:block;margin-bottom:4px">Type <strong style="color:#e74c3c">DELETE</strong> to confirm</label>'
@@ -17132,30 +17251,27 @@ async function confirmDeleteAccount() {
   var pin = ((document.getElementById('del-pin') || {}).value || '').trim();
   _delBusy = true; if (go) { go.disabled = true; go.textContent = 'Deleting…'; } say('');
   var undo = function() { _delBusy = false; if (go) { go.disabled = false; go.textContent = 'Delete everything'; } };
-  var r = await _pinCall({ action: 'delete', pin: pin }, 40000);
-  if (!r) { undo(); say('Could not reach the server, so nothing was deleted. Check your connection and try again.'); return; }
+  var r = await _pinCall({ action: 'delete', pin: pin }, 45000, true);   // sent once: never repeated behind your back
+  if (!r) { undo(); say('We did not get an answer, so we cannot tell whether anything was deleted. Check your connection, then try again — if the account has already gone you will be told.'); return; }
   if (r.ok) { _finishAccountDeletion(); return; }
   undo();
-  if (r.error === 'locked') say('Too many wrong PINs. Try again in ' + Math.max(1, Math.ceil((r.retryAfter || 900) / 60)) + ' min.');
+  if (r.error === 'partial') say('Your data has been erased, but removing the sign-in itself did not complete. Press Delete everything again to finish.');
+  else if (r.error === 'locked') say('Too many wrong PINs. Try again in ' + Math.max(1, Math.ceil((r.retryAfter || 900) / 60)) + ' min — or sign out, sign back in with an email code (Forgot PIN) and delete straight away.');
   else if (r.error === 'rate_limited') say('Too many attempts from this network. Try again in ' + Math.max(1, Math.ceil((r.retryAfter || 60) / 60)) + ' min.');
   else if (r.error === 'invalid') say(r.remaining ? 'That PIN is not right — ' + r.remaining + ' attempt' + (r.remaining === 1 ? '' : 's') + ' left.' : 'Enter your 6-digit PIN.');
   else if (r.error === 'recent_login') say('For your safety you need to have signed in within the last 15 minutes. Sign out, sign back in with an email code, then delete straight away.');
-  else if (r.error === 'auth') say('Your sign-in has expired. Sign in again, then try again.');
-  else say('Something went wrong on our side, so please try again. Nothing else was changed.');
+  else if (r.error === 'auth') say('Your sign-in has expired — or the account has already been deleted. Sign in again to check.');
+  else say('Something went wrong on our side. Please try again — your data may or may not have been removed yet, and trying again is safe.');
 }
-function _finishAccountDeletion() {
-  window._viDeleted = true;
+async function _finishAccountDeletion() {
+  window._viDeleted = true;   // from here nothing may write data back (sync, auto-refresh, saves)
   try { clearTimeout(_flushT); } catch (e) {}
   _supaUser = null; _syncReady = false;
-  try { if (_supaClient) _supaClient.auth.signOut({ scope: 'local' }).catch(function() {}); } catch (e) {}
-  try { var ks = []; for (var i = 0; i < localStorage.length; i++) ks.push(localStorage.key(i)); ks.forEach(function(k) { localStorage.removeItem(k); }); } catch (e) {}
-  try { sessionStorage.clear(); } catch (e) {}
-  try { indexedDB.deleteDatabase('vaultit-house'); } catch (e) {}
-  var d = document.getElementById('delete-modal'); if (d) d.remove();
-  var done = document.createElement('div');
-  done.id = 'delete-done'; done.style.cssText = 'position:fixed;inset:0;z-index:20002;background:#04090f;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center';
-  done.innerHTML = '<div style="max-width:420px;font-family:\'DM Sans\',sans-serif"><div style="font-size:2rem;margin-bottom:10px">✓</div><div style="font-family:\'Syne\',sans-serif;font-size:1rem;font-weight:800;color:var(--em);margin-bottom:10px">Your account has been deleted</div><div style="font-size:.65rem;color:var(--t2);line-height:1.7;margin-bottom:18px">Your account, your data and the copy on this device have been erased. Thank you for testing Vault·It.</div><button class="btn-add-data" onclick="location.replace(location.pathname)">Close</button></div>';
-  document.body.appendChild(done);
+  try { if (_supaClient) await _withTimeout(_supaClient.auth.signOut({ scope: 'local' }).catch(function() {}), 2500, null); } catch (e) {}
+  try { _invDB && _invDB.close(); _invDB = null; await invClearAll(); } catch (e) {}   // Wealth Inventory photos
+  _wipeDeviceData(false);
+  try { await _wipeIdb('vi_photos'); await _wipeIdb('vaultit-house'); } catch (e) {}   // anything still open is removed when the page restarts
+  location.replace(location.pathname + '?deleted=1');   // a fresh page: no timer or in-memory state survives, then the confirmation is shown
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -18364,7 +18480,7 @@ function stkShotNorm(n){return String(n||'').toLowerCase().replace(/[^a-z0-9]+/g
 async function stkShotPicked(inp){
   var files=Array.prototype.slice.call(inp.files||[],0,4);inp.value='';
   if(!files.length)return;
-  stkShotModal('📷 Reading your screenshots','<div style="text-align:center;padding:28px 0">Reading '+files.length+' screenshot'+(files.length===1?'':'s')+'… this takes a few seconds.<br><span style="opacity:.6">Sent securely to be read; never stored.</span></div>','');
+  stkShotModal('📷 Reading your screenshots','<div style="text-align:center;padding:28px 0">Reading '+files.length+' screenshot'+(files.length===1?'':'s')+'… this takes a few seconds.<br><span style="opacity:.6">Sent to Anthropic (Claude) to be read — Vault·It does not store it. Tip: crop out names and account numbers first.</span></div>','');
   try{
     var images=[];for(var i=0;i<files.length;i++)images.push(await stkShotDownscale(files[i]));
     var r=await _fnInvoke('portfolio-vision',{images:images},60000,true);
@@ -24022,7 +24138,7 @@ function showLegalModal(title, body) {
   modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(560px,94vw);max-height:86vh;overflow-y:auto;padding:24px 22px;position:relative"><button onclick="document.getElementById(\'legal-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer">✕</button><div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:14px">'+title+'</div><div style="font-family:\'DM Sans\',sans-serif;font-size:.6rem;color:var(--t2);line-height:1.7">'+body+'</div></div>';
   document.body.appendChild(modal);
 }
-var VI_LEGAL_DATE = '22 October 2026';
+var VI_LEGAL_DATE = '25 October 2026';
 function _lh(t) { return '<p style="color:var(--em);font-weight:700;margin:14px 0 3px">' + t + '</p>'; }
 function showPrivacy() {
   showLegalModal('Privacy notice', [
@@ -24030,29 +24146,31 @@ function showPrivacy() {
     _lh('Who we are'),
     '<p>Vault·It is run by <strong>PT Live Design</strong> (“we”). We decide how your personal data is used, which makes us the data controller. For anything about your privacy, email <strong>pete@ptlive.design</strong>.</p>',
     _lh('What we hold, and why'),
-    '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Your email address</strong> — to create your account and send you sign-in codes.</li>'
-      + '<li><strong>Your profile</strong> — the name and optional details (such as goals) you give in the set-up questions, to personalise the app.</li>'
-      + '<li><strong>The figures you enter</strong> — income, spending, assets, debts, house plans and net-worth history. This is financial information. We use it only to show you your dashboard, roadmap and House Builder and to keep your devices in step. We do not use it for anything else, and we do not sell it.</li>'
-      + '<li><strong>Your PIN</strong> — kept only as a salted one-way hash. We cannot see it.</li>'
-      + '<li><strong>Security records</strong> — sign-in times, IP addresses, failed-attempt counts and short-lived counters that block abuse. We keep these because it is in our legitimate interest, and yours, to keep accounts safe.</li>'
-      + '<li><strong>Saved versions</strong> — earlier copies of your data for up to 180 days, so you can restore a version if something goes wrong.</li></ul>',
-    '<p>Our lawful bases are: providing the service you asked for (contract), our legitimate interest in security and preventing abuse, and your consent for the optional features below.</p>',
+    '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Your email address</strong> — to create your account, send you sign-in codes and send service messages about the beta and your account. We do not send marketing unless you opt in.</li>'
+      + '<li><strong>Your profile</strong> — your name, phone number, profession and aspirations, goal, and the saving- and spending-style answers from the set-up questions, plus whether you have upgraded to Pioneer.</li>'
+      + '<li><strong>The figures you enter</strong> — income, spending, assets, debts, house plans and net-worth history, and anything else you add: notes, small item photos, and the names and contact details of clients or leads if you use that tab (only add other people’s details if you have a good reason to). This is financial information. We use it only to show you your dashboard, roadmap and House Builder and to keep your devices in step. We do not use it for anything else, and we do not sell it. Full-size photos stay on your device.</li>'
+      + '<li><strong>Your PIN</strong> — on our server only as a salted, peppered one-way hash; we cannot read it. Your browser keeps just a marker that a PIN is set, not the PIN or anything derived from it.</li>'
+      + '<li><strong>Security records</strong> — sign-in times, IP addresses and failed-attempt counters, and short-lived hashed counters that block abuse. We keep these because it is in our legitimate interest, and yours, to keep accounts safe.</li>'
+      + '<li><strong>Saved versions</strong> — earlier copies of your data, including anything you reset or delete, so you can restore a version if something goes wrong. They clear automatically after about 180 days.</li>'
+      + '<li><strong>Waitlist</strong> — if you joined from our website, your email address, to send your Pioneer invite.</li></ul>',
+    '<p>Our lawful bases are: providing the service you asked for (contract), our legitimate interest in security and preventing abuse, and — for optional features that send something to another company, like reading a screenshot — your choice to use them. You can stop using a feature, or withdraw that choice, at any time.</p>',
     _lh('Who else handles it'),
     '<p>These companies process data for us, only to run Vault·It:</p>',
-    '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Supabase</strong> — database, sign-in and server functions, hosted in the EU (Frankfurt).</li>'
-      + '<li><strong>Resend</strong> — delivers your sign-in emails (your email address and the code).</li>'
+    '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Supabase</strong> — database and sign-in, hosted in the EU (Frankfurt), and the server functions, which run on Supabase’s network and may run outside the EU.</li>'
+      + '<li><strong>Resend</strong> — delivers your sign-in emails (your email address and the code). If it is unavailable, Supabase’s own mailer is used instead.</li>'
       + '<li><strong>GitHub Pages</strong> — serves the app’s web pages and sees your IP address when you load the app.</li>'
-      + '<li><strong>jsDelivr and Google Fonts</strong> — deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
-    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads a portfolio screenshot you upload — the image is sent for that one request and we do not keep it; <strong>Yahoo Finance</strong> supplies share prices (ticker symbols are sent, never your name or email); <strong>Meshy</strong> creates 3D house designs from text you type; <strong>Stripe</strong> handles payment if you upgrade (we never see your card); and market-data services you add your own keys for (CoinGecko, Alpha Vantage, metals), which your browser contacts directly.</p>',
+      + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong> — deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
+    '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank and provider logos — it is told the website of each bank, card or investment provider you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices — CoinGecko learns which coins you hold), and <strong>loremflickr</strong> (only if you use photo search, which sends your search words).</p>',
+    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> receives the whole screenshot you upload to read your holdings — so crop out names and account numbers first — and may keep it for a limited period under its own terms; Vault·It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
     '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. We run no advertising and no analytics or tracking in the beta.</p>',
     _lh('How it is protected — and what that does not mean'),
     '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault·It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
     _lh('On your device'),
-    '<p>The app keeps your data and settings in your browser’s storage so it works quickly and offline. This is essential to how it works and is not used to track you. API keys you type in stay in this browser only, and a 3D design you upload stays in this browser only.</p>',
+    '<p>The app keeps your data and settings in your browser’s storage so it works quickly and offline. This is essential to how it works and is not used to track you. API keys you type in stay in this browser (sent only to the service they belong to), and photos and 3D designs you add stay in this browser only.</p>',
     _lh('How long we keep it'),
-    '<p>Until you delete your account. In <strong>Settings → Danger Zone → Delete my account</strong> you can erase your account, financial data, saved versions and PIN straight away, along with the copy on that device. Encrypted backups kept by our provider can hold a copy for a short time afterwards (days, not months). Security counters expire within a day.</p>',
+    '<p>Until you delete your account, or we end the beta — we will email you first so you can download your data, and then remove remaining accounts. In <strong>Settings → Danger Zone → Delete my account</strong> you can erase your account, data, saved versions and PIN straight away, along with the copy on the device you use. Other devices where you have used Vault·It keep their local copy until you clear it there. Our email and hosting providers keep short-lived backups and delivery or access logs (which include your email address and IP address) and these clear out within days.</p>',
     _lh('Your rights'),
-    '<p>Under UK GDPR you can ask to see your data, correct it, have it erased, restrict or object to its use, and take a copy with you. Most of this you can do yourself: <strong>Settings → Your data → Download my data</strong>, and <strong>Delete my account</strong>. For anything else email pete@ptlive.design and we will reply within one month. You can also complain to the Information Commissioner’s Office (ico.org.uk, 0303 123 1113), though we would like the chance to put things right first.</p>',
+    '<p>Under UK GDPR you can ask to see your data, correct it, have it erased, restrict or object to its use, withdraw consent, and take a copy with you. Most of this you can do yourself: <strong>Settings → Your data → Download my data</strong> (your figures, profile and latest 200 saved versions — email us for photos and security records), and <strong>Delete my account</strong>. For anything else email pete@ptlive.design and we will reply within one month. You can also complain to the Information Commissioner’s Office (ico.org.uk, 0303 123 1113), though we would like the chance to put things right first.</p>',
     _lh('Children and changes'),
     '<p>Vault·It is for people aged 18 and over. If we change this notice we will update the date above and tell you in the app if the change matters.</p>'
   ].join(''));
@@ -24067,17 +24185,24 @@ function showTerms() {
     _lh('3. Your account'),
     '<p>You must be 18 or over. Keep your PIN and email account to yourself; you are responsible for what happens under your account, so tell us straight away if you think someone else has got in.</p>',
     _lh('4. Fair use'),
-    '<p>Use Vault·It for your own finances. Do not try to break, probe, overload or scrape it, get into anyone else’s data, or upload anything unlawful. We can suspend an account that does.</p>',
+    '<p>Use Vault·It for your own finances. Do not try to break, probe, overload or scrape it, get into anyone else’s data, or upload anything unlawful. If you store details of other people (such as clients or leads), you must have a lawful reason to hold them. We can suspend an account that breaks these rules.</p>',
     _lh('5. Your data and your feedback'),
     '<p>Your data stays yours. We use it only to run the app for you, as set out in the Privacy Notice. Feedback and ideas you share can be used to improve Vault·It without payment to you.</p>',
-    _lh('6. Availability and liability'),
-    '<p>The beta is provided “as is”, and we cannot promise it will always be available or error-free. Nothing in these terms limits liability that cannot lawfully be limited, including for death or personal injury caused by negligence, or for fraud, or affects your statutory rights as a consumer. Subject to that, we are not responsible for losses from decisions you make using the app or for data lost during the beta, and our total liability to you is limited to £100.</p>',
-    _lh('7. Ending'),
-    '<p>You can stop at any time and delete your account in Settings. We may end or pause the beta, or an account that breaks these terms; where we can, we will email you first so you can download your data.</p>',
-    _lh('8. Law and contact'),
+    _lh('6. Paid plans'),
+    '<p>Pioneer is optional. The price and billing period are shown before you pay, payment is taken by Stripe, and a subscription renews until you cancel. You can cancel at any time from your Stripe receipt or portal, or by emailing pete@ptlive.design. Your legal rights as a consumer, including any right to cancel and to a refund that the law gives you, are not affected.</p>',
+    _lh('7. Availability and liability'),
+    '<p>The beta is provided “as is”, and we cannot promise it will always be available or error-free. Nothing in these terms limits liability that cannot lawfully be limited, including for death or personal injury caused by negligence, or for fraud, or affects your statutory rights as a consumer. Subject to that, we are not responsible for losses from decisions you make using the app or for data lost during the beta, and our total liability to you is limited to £100 or, if you have paid for a plan, what you paid us in the last 12 months if that is more.</p>',
+    _lh('8. Ending'),
+    '<p>You can stop at any time and delete your account in Settings. We may end or pause the beta, or an account that breaks these terms; where we can, we will email you first so you can download your data, and we will then remove remaining accounts.</p>',
+    _lh('9. Law and contact'),
     '<p>These terms are governed by the law of England and Wales. Questions: <strong>pete@ptlive.design</strong>.</p>'
   ].join(''));
 }
+
+// Deep links from the website: ?privacy=1 / ?terms=1 open the notice or the terms straight away
+window.addEventListener('load', function() {
+  try { if (/[?&]privacy=1(&|$)/.test(location.search)) setTimeout(showPrivacy, 900); else if (/[?&]terms=1(&|$)/.test(location.search)) setTimeout(showTerms, 900); } catch (e) {}
+});
 
 // ── TASK 4: EMAIL CAPTURE ────────────────────────────────────────
 function captureEmailToList(email, name, goal) {

@@ -25,7 +25,7 @@ const call = async (body, ip) => { const r = await globalThis.__h(new Request('h
 (async () => {
   let r = await call({ email: 'Pete@Example.com' }); ok(r.s === 200 && r.b.success === true, 'a valid e-mail gets a code');
   ok(sent[0].to[0] === 'pete@example.com', 'address is lower-cased');
-  for (const bad of ['', 'nope', 'a@b', 'a b@c.com', '<script>@x.io', 'x"y@z.com', 'a@b.c<d', 'x'.repeat(250) + '@e.com']) { r = await call({ email: bad }); if (r.s !== 400) ok(false, 'accepted a bad address: ' + bad.slice(0, 30)); }
+  for (const bad of ['', 'nope', 'a@b', 'a b@c.com', '<script>@x.io', 'x"y@z.com', 'a@b.c<d', 'a/b@c.com', 'jos\u00e9@example.com', 'a@b.c', 'victim+your-account-is-locked-visit.evil.example/x@gmail.com', 'x'.repeat(250) + '@e.com']) { r = await call({ email: bad }); if (r.s !== 400) ok(false, 'accepted a bad address: ' + bad.slice(0, 30)); }
   ok(links === 1, 'invalid addresses never reach the auth admin API or the mailer (' + links + ' link)');
   r = await call('not json'); ok(r.s === 400, 'junk body → 400');
   r = await call({ email: 'o\'brien+x@example.co.uk' }); ok(r.s === 200, 'apostrophes and plus-tags in real addresses are allowed');
@@ -38,10 +38,29 @@ const call = async (body, ip) => { const r = await globalThis.__h(new Request('h
   const before = sent.length; await call({ email: A }); ok(sent.length === before, 'no e-mail is sent when limited');
   ok((await call({ email: 'other@example.com' })).s === 200, 'other addresses are unaffected');
 
+  // one mailbox, however it is spelled, shares one budget
+  const V = ['victim+a@gmail.com', 'v.i.c.t.i.m@gmail.com', 'Victim@googlemail.com', 'victim+zzz@gmail.com', 'victim@gmail.com']; const vs = [];
+  for (const a of V) vs.push((await call({ email: a })).s);
+  ok(vs.join() === '200,200,200,429,429', '+tags, Gmail dots and googlemail.com all count against ONE mailbox: ' + vs.join());
+  const nv = []; for (const a of ['bob+1@corp.co.uk', 'bob+2@corp.co.uk', 'bob+3@corp.co.uk', 'bob+4@corp.co.uk']) nv.push((await call({ email: a })).s);
+  ok(nv.join() === '200,200,200,429', 'plus-tags share one budget on any domain: ' + nv.join());
+  const dots = []; for (const a of ['d.o.t@corp.co.uk', 'do.t@corp.co.uk', 'dot@corp.co.uk']) dots.push((await call({ email: a })).s);
+  ok(dots.join() === '200,200,200', 'dots only merge on Gmail (elsewhere they are different mailboxes): ' + dots.join());
+  ok((await call({ email: 'first.last+tag@sub.example.co.uk' })).s === 200, 'a normal tagged address on a sub-domain is accepted');
+
   // per IP: 6 / hour across different addresses
   const IP = '203.0.113.5'; const ip = []; for (let i = 0; i < 8; i++) ip.push((await call({ email: 'ip' + i + '@example.com' }, IP)).s);
   ok(ip.join() === '200,200,200,200,200,200,429,429', 'per IP: 6 per hour then 429: ' + ip.join());
   const linksBefore = links; await call({ email: 'ip9@example.com' }, IP); ok(links === linksBefore, 'a limited call does not even create a sign-in code');
+  // a flood from one IP with endless fresh addresses writes a bounded number of counter rows (IP is checked first)
+  for (const k of Object.keys(rate)) delete rate[k]; const FL = '203.0.113.99';
+  for (let i = 0; i < 40; i++) await call({ email: 'flood' + i + '@example.com' }, FL);
+  ok(Object.keys(rate).length <= 6 + 2, 'rejected requests do not each create a counter row (' + Object.keys(rate).length + ' rows after 40 requests)');
+  // an IPv6 /64 is one customer
+  for (const k of Object.keys(rate)) delete rate[k];
+  const v6 = []; for (let i = 0; i < 3; i++) v6.push((await call({ email: 'sixa' + i + '@example.com' }, '2001:db8:1:1::' + (i + 1))).s);
+  for (let i = 0; i < 4; i++) v6.push((await call({ email: 'sixb' + i + '@example.com' }, '2001:db8:1:1:aaaa:bbbb:cccc:' + (i + 1))).s);
+  ok(v6.join() === '200,200,200,200,200,200,429', 'rotating addresses inside one IPv6 /64 does not give new allowances: ' + v6.join());
 
   // global: a hard ceiling for the whole service (here 9 / hour), whoever is asking
   for (const k of Object.keys(rate)) delete rate[k];
@@ -54,7 +73,8 @@ const call = async (body, ip) => { const r = await globalThis.__h(new Request('h
   for (const k of Object.keys(rate)) delete rate[k]; rateDown = true;
   r = await call({ email: 'fine@example.com' }); ok(r.s === 200, 'if the limiter is unavailable, sign-in still works'); rateDown = false;
   // provider failure is reported as before
-  resendOk = false; r = await call({ email: 'down@example.com' }); ok(r.s === 502, 'mail provider failure → 502 (app then falls back)'); resendOk = true;
+  resendOk = false; r = await call({ email: 'down@example.com' }); ok(r.s === 502, 'mail provider failure → 502 (app then falls back)');
+  ok(!/nope|bad/.test(JSON.stringify(r.b)) && r.b.error === 'Could not send the sign-in e-mail', 'upstream error text is not exposed to callers: ' + JSON.stringify(r.b)); resendOk = true;
   r = await globalThis.__h(new Request('http://x/send-auth-email', { method: 'GET' })); ok(r.status === 405, 'GET → 405');
   console.log(fails ? '\n' + fails + ' FAILED' : '\nALL PASSED'); process.exit(fails ? 1 : 0);
 })();
