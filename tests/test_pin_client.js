@@ -99,11 +99,13 @@ const err=page=>page.evaluate(()=>document.getElementById('auth-err').textConten
   await page.keyboard.type('482915'); await page.waitForTimeout(900);
   ok(await overlay(page)==='none','PIN can be typed on a keyboard');
   // ── 6. Settings: change + remove PIN ──
-  await page.evaluate(()=>authChangePin()); await page.waitForTimeout(300);
-  ok(await overlay(page)==='flex'&&await step(page)==='auth-setpin-step','Settings → Set/change PIN opens the PIN pad over the app');
-  await pad(page,'246810'); await pad(page,'246810'); await page.waitForTimeout(600);
-  ok(await page.evaluate(()=>_srv.pins['pete@example.com'])==='246810'&&await overlay(page)==='none','PIN changed (and the overlay closes again)');
-  await page.evaluate(()=>{window.confirm=()=>true;authRemovePin();}); await page.waitForTimeout(500);
+  await page.evaluate(()=>{window.__c=authChangePin();}); await page.waitForSelector('#askpin-modal',{timeout:4000});   // an existing PIN: the current one is asked for first
+  await page.fill('#askpin-inp','482915'); await page.click('#askpin-ok'); await page.waitForTimeout(300);
+  ok(await overlay(page)==='flex'&&await step(page)==='auth-setpin-step','Settings → Set/change PIN asks for the current PIN, then opens the PIN pad over the app');
+  await pad(page,'264813'); await pad(page,'264813'); await page.waitForTimeout(600);
+  ok(await page.evaluate(()=>_srv.pins['pete@example.com'])==='264813'&&await overlay(page)==='none','PIN changed (and the overlay closes again)');
+  await page.evaluate(()=>{window.confirm=()=>true;window.__r=authRemovePin();}); await page.waitForSelector('#askpin-modal',{timeout:4000});
+  await page.fill('#askpin-inp','264813'); await page.click('#askpin-ok'); await page.waitForTimeout(500);
   ok(await page.evaluate(()=>!_srv.pins['pete@example.com']&&!localStorage.getItem('vi_pin_hash')),'Remove PIN deletes it on the server and this device');
   await ctx.close();
   // ── 7. PIN service unreachable → graceful fallback ──
