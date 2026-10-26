@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
-const IMGS=['/root/.claude/uploads/2a4eadf5-0fc4-5805-8296-f5c90b3cc25f/c50f6bb8-image.jpg'];
+const IMGS=[require('path').join(__dirname,'fixtures','portfolio_screenshot.png')];
 (async()=>{
   const b=await chromium.launch(); const page=await (await b.newContext({viewport:{width:1280,height:1000}})).newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message));
   page.on('dialog',d=>d.accept());
