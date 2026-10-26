@@ -2,16 +2,20 @@
   "name": "vault-it",
   "private": true,
   "version": "0.0.0",
-  "description": "Vault·It is a single-file app with no build step. This file only declares the tooling the tests use.",
+  "description": "Vault\u00b7It is a single-file app with no build step. This file only declares the tooling the tests use.",
   "scripts": {
     "test": "bash scripts/run-tests.sh all",
     "test:server": "bash scripts/run-tests.sh server",
     "test:browser": "bash scripts/run-tests.sh browser",
-    "build:hb3d": "node tools/build_hb3d.js"
+    "build:hb3d": "node tools/build_hb3d.js",
+    "build:site": "node tools/build_site.js",
+    "dev:site": "npm run build:site && wrangler dev",
+    "deploy:dry": "npm run build:site && wrangler deploy --dry-run"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.8",
-    "esbuild": "0.28.2"
+    "esbuild": "0.28.2",
+    "wrangler": "4.153.0"
   },
   "engines": {
     "node": ">=20"
