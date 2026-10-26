@@ -81,7 +81,10 @@ while read -r name status rest; do
   t="$(ls tests/$name.js tests/$name.mjs 2>/dev/null | head -1)"
   again="$(run_one "$t")"
   if [ "${again#* }" = "PASS" ]; then echo "  FLAKY  $name — passed on its own"; FLAKY="$FLAKY $name"
-  else echo "  FAILED $name — ${again#* FAIL }  (log: $LOG_DIR/$name.log)"; FINAL_FAIL=$((FINAL_FAIL+1)); fi
+  else
+    echo "  FAILED $name — ${again#* FAIL }  (log: $LOG_DIR/$name.log)"; FINAL_FAIL=$((FINAL_FAIL+1))
+    echo "  ----- last lines of $name.log -----"; grep -E "^FAIL|^ok|Error|error" "$LOG_DIR/$name.log" | tail -${FAIL_LINES:-25} | cut -c1-220 | sed 's/^/  | /'; echo "  -----"
+  fi
 done <<< "$RESULTS"
 
 echo
