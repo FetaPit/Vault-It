@@ -23,6 +23,12 @@ Project: Supabase `legpubblzgknxdtvsant` (eu-central-1, Frankfurt). Live app: `r
 **Plan and backups**
 - Supabase **Pro** (daily backups, no auto-pause). Free projects pause after a week of inactivity.
 
+**DNS at Wix** (Domains → vault-it.co → Manage DNS records). Wix parks a new domain on its own servers: three `A` records on the bare domain (185.230.63.x) and `www` → `cdn3.wixdns.net`. Replace them:
+- Delete those three `A` records and add four: host blank (the bare domain), values `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`.
+- Change the `www` CNAME value to `fetapit.github.io` (edit the row, or delete it and add a new one).
+- Resend's records (a DKIM `TXT` at `resend._domainkey`, an `MX` and an SPF `TXT` at `send`) and `_dmarc` go in the TXT/MX sections; enter hosts without `.vault-it.co`.
+- Wix also asks you to confirm the account e-mail address; an unconfirmed registrant e-mail can get a domain suspended, so do it.
+
 **Domain cut-over** (only after DNS resolves and Resend shows *Verified*)
 - Add a `CNAME` file containing the domain to the repo root of the Pages branch, enforce HTTPS in repo Settings → Pages.
 - Update `APP_URL`, `FROM_EMAIL`, Supabase Site URL/Redirects, and the links in the tester guide / QR code.
