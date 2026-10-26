@@ -17,10 +17,13 @@ UK personal-finance single-file PWA. Owner: Pete (FetaPit). Live: https://fetapi
 
 ## Tests
 ```
-export NODE_PATH=/usr/local/lib/node_modules_global:<dir with esbuild + @electric-sql/pglite>
-node tests/test_<name>.js        # use absolute paths; tests assume the repo is at /home/user/Vault-It
+bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scripts/run-tests.sh test_roadmap test_pin_server
 ```
-Run the whole `tests/test_*.js` set, plus `crawl.js`, `xss.js`, `xss2.js` and `tests/test_007.mjs` / `test_008.mjs` (pglite), before a release. `test_sync`, `test_cut` and `test_hb3d_app` can fail under parallel load and pass alone — re-run them alone before calling a failure real. Regenerated `shots/*.png` are committed as "Test screenshots refreshed".
+- `server` = node-only tests (edge-function logic, SQL migrations on a local Postgres via pglite, 3D kit scale); `browser` = Playwright tests, `crawl.js`, `xss*.js`. `SHARD=1/3` and `JOBS=2` tune parallelism; logs go to `/tmp/vaultit-test-logs`.
+- A test passes only if it exits 0 **and** prints no `FAIL` line (several print `FAILURES n` and still exit 0). Failures are re-run once on their own — `test_sync`, `test_cut`, `test_hb3d_app` can fail when many browsers run at once — and a pass on the re-run is reported as FLAKY.
+- Cloud sessions: `.claude/hooks/session-start.sh` runs `npm install` (esbuild + pglite), links the repo to `/home/user/Vault-It` (the tests open `file:///home/user/Vault-It/index.html`) and exposes the image's Playwright. Playwright is deliberately **not** in `package.json` (the image already has it plus its Chromium); CI installs it.
+- CI (`.github/workflows/ci.yml`) runs the same script on every push and pull request (server job + 3 browser shards). It deploys nothing.
+- Run everything before a release, plus `node tools/build_hb3d.js` if `src/hb3d` changed. Regenerated `shots/*.png` are committed as "Test screenshots refreshed".
 
 ## Supabase and secrets
 - Never commit keys. The publishable key in `index.html` is public by design; the service-role key, `RESEND_API_KEY`, `PIN_PEPPER` (never change it — every PIN would stop working), `ANTHROPIC_API_KEY` live only in Supabase secrets.

@@ -5,9 +5,17 @@ create function auth.uid() returns uuid language sql stable as $$ select '111111
 create table public.vault_data(user_id uuid,key text,value jsonb); alter table public.vault_data enable row level security; create policy "own vault data" on public.vault_data for all using (auth.uid()=user_id);
 create table public.profiles(id uuid); alter table public.profiles enable row level security; create policy "own profile" on public.profiles for all using (auth.uid()=id);
 create table public.nw_history(user_id uuid); alter table public.nw_history enable row level security; create policy "own nw history" on public.nw_history for all using (auth.uid()=user_id);
+grant usage on schema public, auth to anon, authenticated; grant all on all tables in schema public to anon, authenticated;   -- what Supabase grants by default
 create function public.handle_new_user() returns int language sql as $$ select 1 $$; create function public.rls_auto_enable() returns int language sql as $$ select 1 $$; create function public.waitlist_count() returns int language sql as $$ select 1 $$;`);
 await db.exec(fs.readFileSync('/home/user/Vault-It/supabase/migrations/007_security_hardening.sql','utf8')); console.log('007 runs cleanly');
 const q=async s=>(await db.query(s)).rows[0];
-console.log(await q(`select has_function_privilege('anon','public.handle_new_user()','execute') a, has_function_privilege('authenticated','public.rls_auto_enable()','execute') b, has_function_privilege('anon','public.waitlist_count()','execute') c, has_function_privilege('authenticated','public.waitlist_count()','execute') d`));
+let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
+const f=await q(`select has_function_privilege('anon','public.handle_new_user()','execute') a, has_function_privilege('authenticated','public.rls_auto_enable()','execute') b, has_function_privilege('anon','public.waitlist_count()','execute') c, has_function_privilege('authenticated','public.waitlist_count()','execute') d`);
+ok(f.a===false&&f.b===false,'trigger helper functions are no longer callable through the public API');
+ok(f.c===true,'waitlist_count stays callable by anon (the landing page shows spots left)');
+ok(f.d===false,'…and signed-in users do not need it');
 await db.exec(`insert into public.vault_data values ('11111111-1111-1111-1111-111111111111','k','{}'),('22222222-2222-2222-2222-222222222222','k','{}')`);
-await db.exec(`set role authenticated`); console.log('own rows visible:',(await db.query(`select count(*)::int n from public.vault_data`)).rows[0]);
+await db.exec(`set role authenticated`);
+ok((await q(`select count(*)::int n from public.vault_data`)).n===1,'after the policy rewrite a signed-in user still sees only their own rows');
+await db.exec(`reset role`);
+console.log(fails?'\n'+fails+' FAILED':'\nALL PASSED'); process.exit(fails?1:0);

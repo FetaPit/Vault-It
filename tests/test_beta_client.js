@@ -2,7 +2,7 @@
 // abuse-limit (429) messages that do NOT fall back to the built-in sender, “Download my data”, and “Delete my account”.
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-const SHOT = '/tmp/claude-0/-home-user/2a4eadf5-0fc4-5805-8296-f5c90b3cc25f/scratchpad/shots/';
+const SHOT = (() => { const d = require('os').tmpdir() + '/vaultit-shots/'; try { require('fs').mkdirSync(d, { recursive: true }); } catch (e) {} return d; })();
 const MOCK = `
   window._m={calls:[],otp:0,signOut:[],script:{}};
   const m=window._m;

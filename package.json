@@ -1,0 +1,19 @@
+{
+  "name": "vault-it",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Vault·It is a single-file app with no build step. This file only declares the tooling the tests use.",
+  "scripts": {
+    "test": "bash scripts/run-tests.sh all",
+    "test:server": "bash scripts/run-tests.sh server",
+    "test:browser": "bash scripts/run-tests.sh browser",
+    "build:hb3d": "node tools/build_hb3d.js"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "esbuild": "0.28.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

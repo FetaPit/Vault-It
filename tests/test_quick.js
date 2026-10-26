@@ -1,5 +1,5 @@
 const { chromium } = require('playwright');
-const OUT='/tmp/claude-0/-home-user/2a4eadf5-0fc4-5805-8296-f5c90b3cc25f/scratchpad/shots/';
+const OUT=(() => { const d = require('os').tmpdir() + '/vaultit-shots/'; try { require('fs').mkdirSync(d, { recursive: true }); } catch (e) {} return d; })();
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const MOCK=`
   window._srv={pins:{},fails:{},log:[],otpMail:0,down:false,session:null};

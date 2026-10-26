@@ -1,5 +1,7 @@
 # Vault·It automated checks
 
+Run everything with `bash scripts/run-tests.sh` (see CLAUDE.md); the commands below run a single test.
+
 Headless-browser (Playwright) and logic tests written while hardening sync, login and data safety.
 They assume the repository is checked out at `/home/user/Vault-It` (edit the `file:///home/user/Vault-It/` paths otherwise).
 
