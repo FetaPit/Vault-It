@@ -35,3 +35,7 @@ bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scri
 - Never clear data on a user's device. Browser storage is per web address, so moving to a new domain starts devices empty until they sign in (the cloud copy restores).
 - Test visually and with the suite before releasing; always take the backup branch first.
 - Anything user-facing about privacy/security must match what the code really does (see the review notes in `docs/BETA_RUNBOOK.md`); `tests/test_beta_client.js` fails if the app talks to an outside host the privacy notice does not name.
+
+## Cloudflare
+- `.claude/settings.json` enables the official Cloudflare plugin (`cloudflare@cloudflare`, from the `cloudflare/skills` marketplace): Cloudflare's skills (wrangler, Workers best practices, Turnstile, web performance …) and its MCP server `https://mcp.cloudflare.com/mcp`. The MCP server signs in with OAuth in a browser, which a cloud session cannot do — in cloud sessions use the claude.ai connector for the same URL, or a scoped `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` set in the environment (never paste tokens into chat).
+- Plan (not yet done): DNS for vault-it.co on Cloudflare (the domain stays registered at Wix, only its nameservers move), Workers static assets connected to this repo (production `release/pioneer-v2`, branch previews for the rest), security headers in a `_headers` file, Turnstile in front of `send-auth-email`.
