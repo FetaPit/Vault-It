@@ -4,7 +4,8 @@ const RESEND_API_KEY        = Deno.env.get('RESEND_API_KEY') ?? ''
 const SUPABASE_URL          = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const FROM_EMAIL            = Deno.env.get('FROM_EMAIL') ?? 'Vault·It <onboarding@resend.dev>'
-const APP_URL               = Deno.env.get('APP_URL') ?? 'https://fetapit.github.io/Vault-It/'
+const APP_URL               = Deno.env.get('APP_URL') ?? 'https://app.vault-it.co/'
+const TURNSTILE_SECRET      = Deno.env.get('TURNSTILE_SECRET') ?? ''     // Cloudflare Turnstile ("are you human"); unset = no check yet
 const PEPPER                = Deno.env.get('PIN_PEPPER') ?? SUPABASE_SERVICE_KEY   // keys in auth_rate are salted hashes, never raw e-mails / IPs
 
 // Abuse limits (fixed windows, counted in the database by rate_hit — see migration 008).
@@ -54,9 +55,10 @@ function ipKey(ip: string): string {
   const groups = tail === undefined ? h : [...h, ...Array(Math.max(0, 8 - h.length - t.length)).fill('0'), ...t]
   return groups.slice(0, 4).map((g) => g.padStart(4, '0')).join(':') + '/64'
 }
-function clientIp(req: Request): string {
-  return ipKey(req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown')
+function rawIp(req: Request): string {
+  return req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown'
 }
+function clientIp(req: Request): string { return ipKey(rawIp(req)) }
 // One mailbox, however it is spelled: +tags, Gmail dots and googlemail.com all land in the same inbox, so they share one budget.
 function mailbox(email: string): string {
   let [local, domain] = email.split('@')
@@ -64,6 +66,22 @@ function mailbox(email: string): string {
   if (domain === 'googlemail.com') domain = 'gmail.com'
   if (domain === 'gmail.com') local = local.replace(/\./g, '')
   return `${local}@${domain}`
+}
+
+// Ask Cloudflare whether this Turnstile token is genuine. 'ok' | 'fail' | 'unavailable' (our configuration or their service is
+// broken — the check is skipped, loudly, rather than locking every tester out).
+async function verifyTurnstile(token: string, ip: string): Promise<'ok' | 'fail' | 'unavailable'> {
+  try {
+    const form = new URLSearchParams({ secret: TURNSTILE_SECRET, response: token })
+    if (ip && ip !== 'unknown') form.set('remoteip', ip)
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form, signal: AbortSignal.timeout(4000) })
+    if (!res.ok) { console.error('turnstile siteverify HTTP', res.status); return 'unavailable' }
+    const j = await res.json()
+    if (j.success === true) return 'ok'
+    const codes: string[] = Array.isArray(j['error-codes']) ? j['error-codes'] : []
+    if (codes.some((c) => c === 'invalid-input-secret' || c === 'missing-input-secret' || c === 'internal-error')) { console.error('turnstile misconfigured / down:', codes.join(',')); return 'unavailable' }
+    return 'fail'
+  } catch (e) { console.error('turnstile siteverify failed:', e); return 'unavailable' }
 }
 
 function emailHtml(otpCode: string, email: string): string {
@@ -122,9 +140,10 @@ Deno.serve(async (req: Request) => {
   if (!RESEND_API_KEY)       return err('Server not configured', 500)
   if (!SUPABASE_SERVICE_KEY) return err('Server not configured', 500)
 
-  let email: string
+  let email: string, captchaToken = ''
   try {
     const body = await req.json()
+    captchaToken = typeof body.captchaToken === 'string' ? body.captchaToken.slice(0, 2048) : ''
     email = String(body.email ?? '').trim().toLowerCase()
     if (!email || email.length > 254 || !EMAIL_RE.test(email)) return err('Invalid email address')
   } catch {
@@ -138,8 +157,14 @@ Deno.serve(async (req: Request) => {
 
   // Abuse protection: this endpoint creates accounts and sends e-mail, so it is metered per address, per IP and overall.
   // Cheapest, bounded keys first: a flood from one IP can write at most one counter row per hour before it is refused.
-  const wait = (await limited(admin, 'mail-ip', clientIp(req), LIMIT_IP_PER_HOUR, 3600))
-            || (await limited(admin, 'mail-all', 'all', LIMIT_GLOBAL_PER_HOUR, 3600))
+  // Order matters: the per-IP counter first (bounded), then the human check, and only then the shared counters — so a script that
+  // cannot pass Turnstile can never use up the service-wide or the per-mailbox allowance (the cheap way to deny everyone sign-in).
+  let wait = await limited(admin, 'mail-ip', clientIp(req), LIMIT_IP_PER_HOUR, 3600)
+  if (!wait && TURNSTILE_SECRET) {
+    const verdict = captchaToken ? await verifyTurnstile(captchaToken, rawIp(req)) : 'fail'
+    if (verdict === 'fail') return new Response(JSON.stringify({ error: 'captcha' }), { status: 403, headers: { ...CORS, 'Content-Type': 'application/json' } })
+  }
+  wait = wait || (await limited(admin, 'mail-all', 'all', LIMIT_GLOBAL_PER_HOUR, 3600))
             || (await limited(admin, 'mail-addr', mailbox(email), LIMIT_EMAIL_PER_HOUR, 3600))
   if (wait) {
     return new Response(JSON.stringify({ error: 'rate_limited', retryAfter: wait }), {

@@ -23,19 +23,10 @@ Project: Supabase `legpubblzgknxdtvsant` (eu-central-1, Frankfurt). Live app: `r
 **Plan and backups**
 - Supabase **Pro** (daily backups, no auto-pause). Free projects pause after a week of inactivity.
 
-**DNS at Wix** (Domains → vault-it.co → Manage DNS records). Wix parks a new domain on its own servers: three `A` records on the bare domain (185.230.63.x) and `www` → `cdn3.wixdns.net`. Replace them:
-- Delete those three `A` records and add four: host blank (the bare domain), values `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`.
-- Change the `www` CNAME value to `fetapit.github.io` (edit the row, or delete it and add a new one).
-- Resend's records (a DKIM `TXT` at `resend._domainkey`, an `MX` and an SPF `TXT` at `send`) and `_dmarc` go in the TXT/MX sections; enter hosts without `.vault-it.co`.
-- Wix also asks you to confirm the account e-mail address; an unconfirmed registrant e-mail can get a domain suspended, so do it.
-
-**Domain cut-over** (only after DNS resolves and Resend shows *Verified*)
-- Add a `CNAME` file containing the domain to the repo root of the Pages branch, enforce HTTPS in repo Settings → Pages.
-- Update `APP_URL`, `FROM_EMAIL`, Supabase Site URL/Redirects, and the links in the tester guide / QR code.
-- localStorage is per-origin: anyone who used the github.io address starts empty on the new one until they sign in (their cloud copy restores).
+**Domain and hosting (Cloudflare)** — the whole move is in `docs/CUTOVER.md`: nameservers at Wix → Cloudflare, one Worker serving app.vault-it.co and vault-it.co, Resend's DNS records and DMARC in Cloudflare, Supabase Site URL `https://app.vault-it.co`. Confirm the Wix account e-mail (an unconfirmed registrant e-mail can get a domain suspended).
 
 **Before the link goes beyond friendly testers** (from the security review)
-- Sign-in e-mails are protected by rate limits, not a CAPTCHA. Someone determined (a few IPs) can use up the service-wide allowance (default 200/hour) and stop new testers getting a code; PIN sign-in keeps working. Before sharing the link widely add **Cloudflare Turnstile** (or Supabase CAPTCHA) in front of `send-auth-email`, and keep `RATE_GLOBAL_PER_HOUR` under your Resend quota.
+- Sign-in e-mails are protected by rate limits **and Cloudflare Turnstile** (built; switched on at cut-over by setting `VI_TURNSTILE_SITEKEY` in `index.html` and the `TURNSTILE_SECRET` Supabase secret — see `docs/CUTOVER.md`). Failed checks never use the shared counters. Keep `RATE_GLOBAL_PER_HOUR` under your Resend quota.
 - Anyone who knows an address can spend that mailbox's hourly allowance (8) or lock a PIN (5 wrong tries): the owner can always get in with an e-mail code once the window passes. Known, accepted for the beta.
 - Pin the Edge Functions region if you want the "EU" statement to cover them as well as the database (Supabase → Edge Functions settings).
 - Auth logs (Supabase) and Resend delivery logs hold e-mail address and IP for a short period after deletion; set their retention to the minimum.

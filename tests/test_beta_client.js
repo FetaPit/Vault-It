@@ -54,8 +54,8 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   const hostsOf = (txt) => [...new Set([...txt.matchAll(/https?:\/\/([A-Za-z0-9.-]+\.[a-z]{2,})/g)].map(m => m[1]))];
   const COVERED = { 'logo.clearbit.com': /Clearbit/, 'www.google.com': /Google/, 'cdn.jsdelivr.net': /jsDelivr/, 'cdnjs.cloudflare.com': /cdnjs/, 'loremflickr.com': /loremflickr/, 'open.er-api.com': /ExchangeRate-API/, 'api.coingecko.com': /CoinGecko/,
     'api.metals.live': /metals\.live/, 'fonts.googleapis.com': /Google Fonts/, 'api.anthropic.com': /Anthropic/, 'www.alphavantage.co': /Alpha Vantage/, 'metals-api.com': /metals-api\.com/, 'buy.stripe.com': /Stripe/, 'legpubblzgknxdtvsant.supabase.co': /Supabase/, 'fetapit.github.io': /GitHub/,
-    'api.resend.com': /Resend/, 'query1.finance.yahoo.com': /Yahoo/, 'query2.finance.yahoo.com': /Yahoo/, 'api.meshy.ai': /Meshy/, 'esm.sh': /Supabase/ };
-  const NOT_USED_FOR_TESTERS = ['www.w3.org', 'vault-it.uk', 'vault-it.co', 'wa.me', 'www.linkedin.com', 'instagram.com', 'ptlive.my.canva.site', 'shibariumscan.io', 'corsproxy.io', 'api.notion.com', 'api.convertkit.com', 'www.shibrpc.com', 'auth.truelayer.com'];   // links, or owner-only connections that do nothing without keys (the notice says so)
+    'api.resend.com': /Resend/, 'query1.finance.yahoo.com': /Yahoo/, 'query2.finance.yahoo.com': /Yahoo/, 'api.meshy.ai': /Meshy/, 'esm.sh': /Supabase/, 'challenges.cloudflare.com': /Turnstile/ };
+  const NOT_USED_FOR_TESTERS = ['www.w3.org', 'vault-it.uk', 'vault-it.co', 'app.vault-it.co', 'wa.me', 'www.linkedin.com', 'instagram.com', 'ptlive.my.canva.site', 'shibariumscan.io', 'corsproxy.io', 'api.notion.com', 'api.convertkit.com', 'www.shibrpc.com', 'auth.truelayer.com'];   // links, or owner-only connections that do nothing without keys (the notice says so)
   const found = hostsOf(fsx.readFileSync('/home/user/Vault-It/index.html', 'utf8')).concat(...fsx.readdirSync('/home/user/Vault-It/supabase/functions').filter(d => fsx.existsSync('/home/user/Vault-It/supabase/functions/' + d + '/index.ts')).map(d => hostsOf(fsx.readFileSync('/home/user/Vault-It/supabase/functions/' + d + '/index.ts', 'utf8'))));
   const unlisted = [...new Set(found)].filter(h => !COVERED[h] && !NOT_USED_FOR_TESTERS.includes(h));
   ok(unlisted.length === 0, 'no outside host is missing from this check' + (unlisted.length ? ' — NEW: ' + unlisted.join(', ') + ' (add it to the privacy notice, then to COVERED)' : ''));
@@ -277,6 +277,33 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   // deep links from the website
   await page.goto('file:///home/user/Vault-It/index.html?privacy=1'); await page.waitForTimeout(2500);
   ok(await page.evaluate(() => /Privacy notice/.test((document.getElementById('legal-modal') || {}).innerText || '')), '?privacy=1 opens the privacy notice (linked from the website sign-up)');
+  ok(page.errs.length === 0, 'no page errors ' + page.errs.slice(0, 2).join(' | '));
+  await ctx.close();
+
+  // ── 12. Cloudflare Turnstile in front of the sign-in e-mail, and the move from the old address ──
+  ({ ctx, page } = await fresh(b));
+  ok(await page.evaluate(() => VI_TURNSTILE_SITEKEY === '' && getComputedStyle(document.getElementById('auth-captcha')).display === 'none'), 'no site key → no widget (sign-in works exactly as before)');
+  await page.evaluate(() => { window.VI_TURNSTILE_SITEKEY = '1x00000000000000000000AA'; window.__reset = 0; window.turnstile = { render: (sel, o) => { window.__ts = o; window.__sel = sel; return 'w1'; }, reset: () => { window.__reset++; } }; _showAuthStep('email'); });
+  ok(await page.evaluate(() => window.__ts && window.__ts.sitekey === '1x00000000000000000000AA' && window.__sel === '#auth-captcha' && getComputedStyle(document.getElementById('auth-captcha')).display === 'block'), 'with a site key the widget is drawn in the sign-in card');
+  await page.fill('#auth-email', 'pete@example.com'); await page.evaluate(() => { _m.calls.length = 0; });
+  await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(500);
+  ok(/security check/.test(await err(page)) && !(await page.evaluate(() => _m.calls.some(c => c.name === 'send-auth-email'))), 'no e-mail is requested until the check has passed');
+  await page.evaluate(() => window.__ts.callback('tok-1')); await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(700);
+  const sendCall = await page.evaluate(() => _m.calls.find(c => c.name === 'send-auth-email'));
+  ok(sendCall && sendCall.body.captchaToken === 'tok-1' && sendCall.body.email === 'pete@example.com', 'the token travels with the request');
+  ok(await page.evaluate(() => window.__reset >= 1 && _captchaToken === ''), 'the widget is reset and the used token forgotten (one use only)');
+  await page.evaluate(() => { _showAuthStep('email'); window.__ts.callback('tok-2'); window.__ts['expired-callback'](); });
+  ok(await page.evaluate(() => _captchaToken === ''), 'an expired token is dropped');
+  await page.evaluate(() => { window.__ts.callback('tok-3'); _m.script['send-auth-email'] = { data: null, error: { context: { json: async () => ({ error: 'captcha' }), status: 403 } } }; _m.otp = 0; });
+  await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(700);
+  ok(/did not pass/.test(await err(page)) && await page.evaluate(() => _m.otp) === 0 && await step(page) === 'auth-email-step', 'a failed check is explained and is NOT worked around with the built-in sender');
+  await page.evaluate(() => { _showAuthStep('setpin'); });
+  ok(await page.evaluate(() => getComputedStyle(document.getElementById('auth-captcha')).display === 'none'), 'the widget is hidden on the PIN-setting step');
+  // the old GitHub address says the app has moved
+  const moved = await page.evaluate(() => ({ other: viMovedBanner('app.vault-it.co'), none: !document.getElementById('moved-banner'), shown: viMovedBanner('fetapit.github.io'), link: (document.querySelector('#moved-banner a') || {}).href, txt: (document.getElementById('moved-banner') || {}).innerText || '' }));
+  ok(moved.other === false && moved.none && moved.shown === true && moved.link === 'https://app.vault-it.co/' && /Upload everything/.test(moved.txt), 'the old address shows a "moved" banner with the new link and the back-up reminder; the new address does not');
+  await page.evaluate(() => document.querySelector('#moved-banner span[aria-label=Dismiss]').click());
+  ok(await page.evaluate(() => !document.getElementById('moved-banner') && viMovedBanner('fetapit.github.io') === false), 'it can be dismissed for the session');
   ok(page.errs.length === 0, 'no page errors ' + page.errs.slice(0, 2).join(' | '));
   await ctx.close(); await b.close();
   console.log(fails ? '\n' + fails + ' FAILED' : '\nALL PASSED'); process.exit(fails ? 1 : 0);

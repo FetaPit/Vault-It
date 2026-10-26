@@ -6,7 +6,7 @@
 
 ## Live
 
-**[fetapit.github.io/Vault-It/](https://fetapit.github.io/Vault-It/)**
+**[app.vault-it.co](https://app.vault-it.co)** (landing page: [vault-it.co](https://vault-it.co)). Earlier address: [fetapit.github.io/Vault-It](https://fetapit.github.io/Vault-It/)
 
 ## What It Does
 
@@ -26,7 +26,7 @@ A single-file web app that takes you from debt to owning your home — one stage
 
 - Single HTML file — all CSS, JS, HTML inline
 - Supabase — email OTP auth, cross-device vault sync, per-user RLS
-- GitHub Pages — static hosting from `release/pioneer-v2`
+- Cloudflare Workers — static hosting and DNS (app.vault-it.co, vault-it.co), built from `release/pioneer-v2`; GitHub Pages still serves the older address
 - Pointer Events API — gesture system for isometric viewports
 - No framework · No bundler · No build step
 

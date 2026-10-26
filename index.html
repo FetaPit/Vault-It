@@ -66,9 +66,9 @@ function viCleanJSON(str) {   // returns the cleaned JSON text, or the original 
 <meta property="og:title" content="Vault·It — From Debt to Owning Your Home">
 <meta property="og:description" content="The only personal finance app built for the journey from debt to outright home ownership. Pioneer Edition.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://vault-it.uk/">
-<meta property="og:image" content="https://vault-it.uk/og-image.png">
-<link rel="canonical" href="https://vault-it.uk/">
+<meta property="og:url" content="https://app.vault-it.co/">
+<meta property="og:image" content="https://vault-it.co/og-image.png">
+<link rel="canonical" href="https://app.vault-it.co/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Vault·It — From Debt to Owning Your Home">
 <meta name="twitter:description" content="From debt to owning your home outright. Pioneer Edition.">
@@ -9443,13 +9443,14 @@ button.bd-ic{cursor:pointer}
       <button class="auth-btn secondary" onclick="authForgotPin()" style="margin-top:4px;opacity:.55;font-size:.48rem">Forgot PIN? Get an email code</button>
     </div>
 
+    <div id="auth-captcha" style="display:none;margin:10px 0;min-height:65px;text-align:center"></div>   <!-- Cloudflare Turnstile, only when a site key is set -->
     <div id="auth-err" class="auth-err"></div>
     <hr class="auth-divider">
     <div class="auth-footer">PIONEER EDITION · 2026 · VAULT·IT</div>
   </div>
 </div>
 
-<div id="demo-chip" class="demo-chip" style="display:none"><span class="demo-chip-left">⚡ DEMO MODE &mdash; You&rsquo;re viewing sample data. <button onclick="clearDemoData()">Start with your own data</button></span><a class="demo-signup-btn" href="https://fetapit.github.io/Vault-It/" onclick="localStorage.removeItem('vi_demo_mode');localStorage.removeItem('vi_session');">Sign up free &rarr;</a></div>
+<div id="demo-chip" class="demo-chip" style="display:none"><span class="demo-chip-left">⚡ DEMO MODE &mdash; You&rsquo;re viewing sample data. <button onclick="clearDemoData()">Start with your own data</button></span><a class="demo-signup-btn" href="https://app.vault-it.co/" onclick="localStorage.removeItem('vi_demo_mode');localStorage.removeItem('vi_session');">Sign up free &rarr;</a></div>
 <div id="pwa-install-banner" style="display:none">
   <span>⬇ Install Vault·It — works offline, opens like an app</span>
   <div style="display:flex;gap:6px;align-items:center">
@@ -16467,6 +16468,8 @@ function hasValidSession() {
 }
 
 var _sjsStalled = false;
+// Cloudflare Turnstile ("are you human") in front of the sign-in e-mail. The site key is public; leave it empty to switch the widget off.
+var VI_TURNSTILE_SITEKEY = '', _captchaToken = '', _captchaWidget = null;
 var _SUPA_URL = 'https://legpubblzgknxdtvsant.supabase.co', _SUPA_KEY = 'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz';
 function _withTimeout(p, ms, fallback) {
   return Promise.race([p, new Promise(function(res) { setTimeout(function() { res(fallback); }, ms); })]);
@@ -16554,7 +16557,34 @@ function signOut() {
   location.reload();
 }
 
+function viCaptchaEnsure() {
+  if (!VI_TURNSTILE_SITEKEY) return;
+  var box = document.getElementById('auth-captcha'); if (!box) return;
+  box.style.display = 'block';
+  if (_captchaWidget !== null) return;
+  var blocked = function() { _authErr('The security check could not load. Turn off any blocker for this site, or try another network.'); };
+  var render = function() {
+    if (_captchaWidget !== null || !window.turnstile) return;
+    try {
+      _captchaWidget = window.turnstile.render('#auth-captcha', { sitekey: VI_TURNSTILE_SITEKEY, theme: 'dark',
+        callback: function(t) { _captchaToken = t; _clearAuthErr(); },
+        'expired-callback': function() { _captchaToken = ''; }, 'timeout-callback': function() { _captchaToken = ''; },
+        'error-callback': function() { _captchaToken = ''; blocked(); } });
+    } catch (e) { blocked(); }
+  };
+  if (window.turnstile) { render(); return; }
+  if (document.getElementById('cf-turnstile-js')) return;
+  var sc = document.createElement('script'); sc.id = 'cf-turnstile-js'; sc.async = true; sc.defer = true;
+  sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.onload = render; sc.onerror = blocked;
+  document.head.appendChild(sc);
+}
+function viCaptchaReset() {   // a token works once
+  _captchaToken = '';
+  try { if (_captchaWidget !== null && window.turnstile) window.turnstile.reset(_captchaWidget); } catch (e) {}
+}
 function _showAuthStep(step) {
+  var cap = document.getElementById('auth-captcha'); if (cap) cap.style.display = (VI_TURNSTILE_SITEKEY && step !== 'setpin') ? 'block' : 'none';
+  if (VI_TURNSTILE_SITEKEY && step !== 'setpin') viCaptchaEnsure();
   ['email','otp','pin','setpin'].forEach(function(s) {
     var el = document.getElementById('auth-' + s + '-step');
     if (el) el.classList.toggle('active', s === step);
@@ -16623,15 +16653,19 @@ async function _sendOTP(email) {
   if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
   try {
     // Try Edge Function first (Resend API, branded template, no SMTP dependency)
-    var sent = false, rateWait = 0;
+    var sent = false, rateWait = 0, captchaFailed = false;
+    if (VI_TURNSTILE_SITEKEY && !_captchaToken) { viCaptchaEnsure(); _authErr('Please wait for the security check below to finish, then try again.'); return; }
     try {
-      var fnRes = await _fnInvoke('send-auth-email', { email: email }, 20000, false, true);
+      var fnRes = await _fnInvoke('send-auth-email', { email: email, captchaToken: _captchaToken || undefined }, 20000, false, true);
+      if (VI_TURNSTILE_SITEKEY) viCaptchaReset();
       if (!fnRes.error && fnRes.data && fnRes.data.success) sent = true;
+      else if (fnRes.error && fnRes.error.context && fnRes.error.context.status === 403) captchaFailed = true;   // the human check did not pass: never route around it
       else if (fnRes.error && fnRes.error.context && fnRes.error.context.status === 429) {   // our own abuse limit: do NOT work around it with the built-in sender
         var lim = null; try { lim = await fnRes.error.context.json(); } catch (e) {}
         rateWait = Math.max(1, Math.ceil(((lim && lim.retryAfter) || 600) / 60));
       }
     } catch(fnErr) { /* Edge Function not deployed yet — fall through */ }
+    if (captchaFailed) { _authErr('The security check did not pass — please try again.'); return; }
     if (rateWait) { _authErr('Too many sign-in emails requested for this address or network. Please try again in ' + rateWait + ' min.'); return; }
 
     if (!sent) {
@@ -24158,7 +24192,7 @@ function showPrivacy() {
     '<p>These companies process data for us, only to run Vault·It:</p>',
     '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Supabase</strong> — database and sign-in, hosted in the EU (Frankfurt), and the server functions, which run on Supabase’s network and may run outside the EU.</li>'
       + '<li><strong>Resend</strong> — delivers your sign-in emails (your email address and the code). If it is unavailable, Supabase’s own mailer is used instead.</li>'
-      + '<li><strong>GitHub Pages</strong> — serves the app’s web pages and sees your IP address when you load the app.</li>'
+      + '<li><strong>Cloudflare</strong> — serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong> — deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
     '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank and provider logos — it is told the website of each bank, card or investment provider you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices — CoinGecko learns which coins you hold), and <strong>loremflickr</strong> (only if you use photo search, which sends your search words).</p>',
     '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> receives the whole screenshot you upload to read your holdings — so crop out names and account numbers first — and may keep it for a limited period under its own terms; Vault·It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
@@ -24199,6 +24233,19 @@ function showTerms() {
   ].join(''));
 }
 
+// The app now lives at app.vault-it.co. Anyone still on the old GitHub address is asked to back up first, then move.
+function viMovedBanner(host) {
+  if (host !== 'fetapit.github.io') return false;
+  try { if (sessionStorage.getItem('vi_moved_dismissed')) return false; } catch (e) {}
+  if (document.getElementById('moved-banner')) return true;
+  var b = document.createElement('div'); b.id = 'moved-banner';
+  b.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:10003;background:#0b2a2c;border-bottom:1px solid #44c0b9;color:#cfeeee;padding:10px 14px;font-size:13px;display:flex;gap:10px;align-items:center;flex-wrap:wrap';
+  b.innerHTML = '<span style="flex:1;min-width:220px">📦 Vault·It has moved to <strong>app.vault-it.co</strong>. Back up here first (Settings → Cloud sync → Upload everything), then sign in at the new address — your data comes with you.</span>'
+    + '<a class="btn-add-data" href="https://app.vault-it.co/" style="text-decoration:none">Open new address</a>'
+    + '<span style="cursor:pointer;padding:4px" aria-label="Dismiss" onclick="try{sessionStorage.setItem(\'vi_moved_dismissed\',\'1\')}catch(e){}document.getElementById(\'moved-banner\').remove()">✕</span>';
+  document.body.appendChild(b); return true;
+}
+window.addEventListener('load', function() { try { viMovedBanner(location.hostname); } catch (e) {} });
 // Deep links from the website: ?privacy=1 / ?terms=1 open the notice or the terms straight away
 window.addEventListener('load', function() {
   try { if (/[?&]privacy=1(&|$)/.test(location.search)) setTimeout(showPrivacy, 900); else if (/[?&]terms=1(&|$)/.test(location.search)) setTimeout(showTerms, 900); } catch (e) {}

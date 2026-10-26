@@ -1,6 +1,6 @@
 # Vault·It — working notes for Claude Code
 
-UK personal-finance single-file PWA. Owner: Pete (FetaPit). Live: https://fetapit.github.io/Vault-It/ (custom domain **vault-it.co** being connected — see `docs/BETA_RUNBOOK.md`).
+UK personal-finance single-file PWA. Owner: Pete (FetaPit). App: **https://app.vault-it.co**, landing page: https://vault-it.co (Cloudflare — see `docs/CUTOVER.md` for the state of the move; the older address https://fetapit.github.io/Vault-It/ is GitHub Pages).
 
 ## Where things are
 - `index.html` — the whole app (CSS, JS, markup). The 3D House Builder engine is embedded from `src/hb3d/*` by `node tools/build_hb3d.js` (re-run after editing `src/hb3d`).
@@ -11,7 +11,7 @@ UK personal-finance single-file PWA. Owner: Pete (FetaPit). Live: https://fetapi
 
 ## Branches and releasing
 - Develop on **`Pioneer_v3`** (or the branch the session names). No pull requests unless asked.
-- GitHub Pages publishes **`release/pioneer-v2`** (a custom domain needs a `CNAME` file in the repo root — keep it in `Pioneer_v3` too so a fast-forward always works).
+- `release/pioneer-v2` is the production branch: Cloudflare Workers Builds deploys it (build `npm run build:site`, deploy `npx wrangler deploy`, preview builds for every other branch) and GitHub Pages still publishes it for the older address.
 - To release: run the regression tests, create `backup/release-pioneer-v2-YYYYMMDD-HHMM` from the current release branch, then fast-forward `release/pioneer-v2` to the tested `Pioneer_v3` commit. Only release when asked.
 - Commit messages end with the attribution lines the session provides. Don't put model names in code, docs or commit text beyond those lines.
 
@@ -38,4 +38,4 @@ bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scri
 
 ## Cloudflare
 - `.claude/settings.json` enables the official Cloudflare plugin (`cloudflare@cloudflare`, from the `cloudflare/skills` marketplace): Cloudflare's skills (wrangler, Workers best practices, Turnstile, web performance …) and its MCP server `https://mcp.cloudflare.com/mcp`. The MCP server signs in with OAuth in a browser, which a cloud session cannot do — in cloud sessions use the claude.ai connector for the same URL, or a scoped `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` set in the environment (never paste tokens into chat).
-- Plan (not yet done): DNS for vault-it.co on Cloudflare (the domain stays registered at Wix, only its nameservers move), Workers static assets connected to this repo (production `release/pioneer-v2`, branch previews for the rest), security headers in a `_headers` file, Turnstile in front of `send-auth-email`.
+- Hosting is one Worker (`worker/index.mjs`, config `wrangler.jsonc`, site built by `tools/build_site.js`): app.vault-it.co → dist/app, vault-it.co → dist/landing, www → redirect, previews serve the app. The domain stays registered at Wix; only its nameservers moved to Cloudflare. Remaining steps and state: `docs/CUTOVER.md`.
