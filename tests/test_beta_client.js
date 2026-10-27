@@ -46,7 +46,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   let legal = await page.evaluate(() => (document.getElementById('legal-modal') || {}).innerText || '');
   ok(/not end-to-end encrypted/i.test(legal), 'privacy notice says plainly that it is NOT end-to-end encrypted');
   ok(/Supabase/.test(legal) && /Resend/.test(legal) && /GitHub/.test(legal) && /Anthropic/.test(legal) && /Yahoo/.test(legal) && /Meshy/.test(legal), 'privacy notice names every third party that handles data');
-  ok(/Frankfurt/.test(legal) && /pete@ptlive\.design/.test(legal) && /ico\.org\.uk/.test(legal), 'privacy notice has the EU location, a contact and the ICO route');
+  ok(/Frankfurt/.test(legal) && /hello@vault-it\.co/.test(legal) && /ico\.org\.uk/.test(legal), 'privacy notice has the EU location, a contact and the ICO route');
   ok(/Download my data/.test(legal) && /Delete my account/.test(legal) && /one month/.test(legal), 'privacy notice points to the in-app export / delete and the one-month reply');
   ok(!/only in your browser.s local storage|never leaves your device|We have no access to it/i.test(legal), 'the old (now false) “it never leaves your device” claim is gone');
   // every outside company the app or its server functions talk to must be in the notice (so a new one cannot slip in silently)
@@ -282,7 +282,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
 
   // ── 12. Cloudflare Turnstile in front of the sign-in e-mail, and the move from the old address ──
   ({ ctx, page } = await fresh(b));
-  ok(await page.evaluate(() => VI_TURNSTILE_SITEKEY === '' && !viCaptchaOn() && getComputedStyle(document.getElementById('auth-captcha')).display === 'none'), 'no site key → no widget (sign-in works exactly as before)');
+  ok(await page.evaluate(() => /^0x[0-9A-Za-z_-]{20,}$/.test(VI_TURNSTILE_SITEKEY) && VI_TURNSTILE_HOSTS.join() === 'app.vault-it.co,fetapit.github.io' && !viCaptchaOn() && getComputedStyle(document.getElementById('auth-captcha')).display === 'none'), 'the shipped site key is used only on the two addresses it was made for: from a local file the widget stays off (sign-in works as before)');
   await page.evaluate(() => { window.VI_TURNSTILE_SITEKEY = '1x00000000000000000000AA'; });
   ok(await page.evaluate(() => !viCaptchaOn()), 'with a key but on an address the key was not made for (local file, preview), the widget stays off');
   await ctx.close();

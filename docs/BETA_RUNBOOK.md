@@ -1,7 +1,7 @@
 # Vault·It beta — owner's runbook
 
 Everything that has to be true before testers sign up, and what to do when something goes wrong.
-Project: Supabase `legpubblzgknxdtvsant` (eu-central-1, Frankfurt). Live app: `release/pioneer-v2` → GitHub Pages.
+Project: Supabase `legpubblzgknxdtvsant` (eu-central-1, Frankfurt). Live app: `release/pioneer-v2` → Cloudflare Workers Builds → https://app.vault-it.co (GitHub Pages still serves the old address until it is switched off).
 
 ## A. Before the meeting
 

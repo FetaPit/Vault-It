@@ -23,7 +23,7 @@ Thanks for trying Vault·It, a UK personal-finance app that turns your numbers i
 
 Anything confusing, broken, slow or ugly is useful — especially on your phone. Please include **what you did, what you expected, what happened** and your device/browser. A screenshot helps.
 
-Email: **pete@ptlive.design**
+Email: **hello@vault-it.co**
 
 ## Your data
 

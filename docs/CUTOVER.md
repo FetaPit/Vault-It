@@ -14,34 +14,40 @@ Done in Cloudflare (by Claude, through the Cloudflare connector):
 - The zone also carries Cloudflare Email Routing records (MX `route1-3.mx.cloudflare.net`, DKIM `cf2024-1._domainkey`, SPF at the apex). Resend sends from the `send.` sub-domain, so they do not clash.
 - Worker `vault-it` exists but is still the dashboard's placeholder (deployments say `dash_template`); a second placeholder `blue-grass-5c9d` can be deleted.
 
-Done in the repo (`Pioneer_v3`, tested): Worker with raw-path allowlist, host kinds, https redirect and security headers; build; Turnstile on sign-in e-mail
-(client widget only on the allowed sites; server verifies token **and hostname**, refuses with 503 if Cloudflare cannot be asked, never uses the built-in sender when the check is on);
-new URLs; "moved" banner; share image; privacy notice names Cloudflare/Turnstile; Worker request logging off.
+Done in the repo (`Pioneer_v3`, tested): Worker with raw-path allowlist, host kinds, https redirect and security headers; build; the three custom-domain `routes` in `wrangler.jsonc`;
+Turnstile on the sign-in e-mail (client widget on `app.vault-it.co` and `fetapit.github.io` only; server verifies token **and hostname**, refuses with 503 if Cloudflare cannot be asked, never uses the
+built-in sender when the check is on); new URLs; "moved" banner; share image; privacy notice names Cloudflare/Turnstile; Worker request logging off; `hello@vault-it.co` is the contact address everywhere.
+
+Done elsewhere (by the other session, through the connectors): Wix parking records deleted; Email Routing on (`hello@vault-it.co` → owner's Gmail); Supabase Site URL and redirect URL set to `https://app.vault-it.co`;
+repo `FetaPit/Vault-It` connected to Worker `vault-it` (Workers Builds, build `npm run build:site`, deploy `npx wrangler deploy`, preview builds), production branch switched from `main` to
+**`release/pioneer-v2`** (the first build on `main` failed because `main` has no site build). Until the release below, builds of that branch fail, so the Worker is still the placeholder and the custom
+domains show nothing.
+
+**Production Supabase has NOT been updated yet** (checked 2026-10-27 against the live project, not assumed): `list_migrations` stops at `vision_usage_screenshot_cap`, there is no `auth_rate` table or
+`rate_hit` / `erase_user_data` function (migration 008), `anon` can still execute `handle_new_user`, `rls_auto_enable` and `waitlist_count` (migration 007), and the deployed `send-auth-email` (v6) and
+`pin-auth` (v4) are the old ones. Re-check with `list_migrations` and `get_edge_function` before relying on any line that says "applied".
 
 ## Order of work (follow it — several steps depend on the one before)
-1. **Owner — connect Git to the Worker** (dashboard, needs GitHub sign-in): Workers & Pages → `vault-it` → Settings → Builds → Connect → `FetaPit/Vault-It`,
-   production branch **`Pioneer_v3`** *for now* (`release/pioneer-v2` does not contain the Cloudflare files yet), build command `npm run build:site`,
-   deploy command `npx wrangler deploy`, root directory empty, enable **preview builds** for other branches. The first build replaces the placeholder.
-   Check on a phone: `https://vault-it.ptlived.workers.dev/version.json` shows a commit hash.
-2. **Owner yes → Claude: production Supabase.** The new app calls `pin-auth` actions that exist only in the new function (`set`/`remove` with re-authentication, `delete`), so the
-   database and functions must be updated *before* testers use the new app: apply migrations `007…` then `008…`, deploy `pin-auth` and `send-auth-email`, set `APP_URL=https://app.vault-it.co/`.
-   (`FROM_EMAIL` waits for step 4.) Check with `list_migrations` and the advisors afterwards.
-3. **Claude — attach the domains:** add the three `routes` (custom domains) to `wrangler.jsonc` and push. Cloudflare creates the DNS records itself. Verify `https://app.vault-it.co/version.json`,
-   `curl -sI` for the headers, `http://` → `https://`, `www` → bare domain. (Until this step the domains show nothing.)
-4. **Resend:** owner adds `vault-it.co` in Resend (EU region); Claude adds the records it shows to Cloudflare DNS (DKIM TXT `resend._domainkey`, MX + SPF TXT on `send`) as DNS-only.
-   **Only when Resend shows "Verified"**, set `FROM_EMAIL="Vault·It <noreply@vault-it.co>"` (rollback = set it back to `onboarding@resend.dev`). Send a real code to a Gmail address and check "Show original": SPF, DKIM and DMARC should pass.
-5. **Turn on the human check — in this order:**
-   a. The client with the site key must already be live on `app.vault-it.co` (it is, after step 3, because the key ships in `index.html`).
-   b. Set the Supabase secret `TURNSTILE_SECRET` (the widget's secret — Claude can read it through the Cloudflare connector). From now on `send-auth-email` refuses requests without a valid token.
-   c. **Owner (Supabase dashboard):** Authentication → Attack Protection → enable CAPTCHA → Turnstile → paste the same secret. This closes Supabase's own public sign-in endpoint (`/auth/v1/otp`), which would otherwise still send codes to a script that skips our function.
-6. **Owner — Supabase Authentication → URL Configuration:** Site URL `https://app.vault-it.co`, add it to the redirect URLs (keep the github.io one while it is still used).
-7. **Owner — Stripe:** Payment Links (and any success/cancel URLs) that return to the old address must be changed to `https://app.vault-it.co/…`, otherwise paying users land on the old copy.
-8. **Release:** full test suite, make `backup/release-pioneer-v2-YYYYMMDD-HHMM`, fast-forward `release/pioneer-v2` to the tested `Pioneer_v3` commit, then change the Worker's production branch to `release/pioneer-v2`
-   (Claude can do it through the Cloudflare API, or dashboard: Settings → Builds → Branch control). GitHub Pages keeps serving the old address, which now shows the moved banner.
-   Never release before step 3 works: the released app links to `app.vault-it.co`.
-9. **Rehearse** with a non-owner e-mail on a phone *and* a laptop: sign up → code → PIN → add data → sign out → PIN sign-in on the second device → *Download my data* → *Delete my account*. Check the landing-page waitlist form.
-   Then share `https://app.vault-it.co` (update the QR code; `docs/TESTER_GUIDE.md` already has it).
-10. Later: when nobody uses the old address, turn GitHub Pages off.
+1. **Owner — Resend:** add `vault-it.co` in Resend (EU region) and pass on the records it shows. **Claude** adds them to Cloudflare DNS as DNS-only (DKIM TXT `resend._domainkey`, MX + SPF TXT on `send`),
+   and sets `_dmarc` to `v=DMARC1; p=none; rua=mailto:hello@vault-it.co`. Wait for Resend to show "Verified".
+2. **Owner yes → Claude: production Supabase** (all in one sitting, immediately before step 3, because the old app and the new functions do not match each other):
+   a. apply `007_security_hardening.sql`, then `008_auth_rate_limit.sql` (the functions fail open without 008);
+   b. deploy `pin-auth` and `send-auth-email`;
+   c. secrets: `APP_URL=https://app.vault-it.co/`, and — only once Resend shows the domain verified — `FROM_EMAIL="Vault·It <noreply@vault-it.co>"` (rollback: `onboarding@resend.dev`).
+   Check with `list_migrations`, `list_edge_functions` and the advisors afterwards.
+3. **Release (Claude, when asked):** full test suite, create `backup/release-pioneer-v2-YYYYMMDD-HHMM`, fast-forward `release/pioneer-v2` to the tested `Pioneer_v3` commit. Workers Builds then deploys the Worker and
+   creates the custom domains and their DNS records; GitHub Pages keeps serving the old address, which now shows the "we've moved" banner. Never release before step 2: the released app calls `pin-auth` actions
+   (`set`/`remove` with re-authentication, `delete`) that exist only in the new function.
+4. **Verify (Claude):** `https://app.vault-it.co/version.json` shows the new commit; `curl -sI https://app.vault-it.co/` for the headers; `http://` → `https://`; `www` → bare domain; the landing-page waitlist form.
+   A phone check: `https://vault-it.ptlived.workers.dev/version.json`.
+5. **Turn on the human check — in this order, after step 3** (the client with the site key is then live on both allowed addresses):
+   a. Set the Supabase secret `TURNSTILE_SECRET` (the widget's secret — Claude can read it through the Cloudflare connector). From now on `send-auth-email` refuses requests without a valid token.
+   b. **Owner (Supabase dashboard):** Authentication → Attack Protection → enable CAPTCHA → Turnstile → paste the same secret. This closes Supabase's own public sign-in endpoint (`/auth/v1/otp`), which would otherwise
+      still send codes to a script that skips our function.
+6. **Owner — Stripe:** Payment Links (and any success/cancel URLs) that return to the old address must be changed to `https://app.vault-it.co/…`, otherwise paying users land on the old copy.
+7. **Rehearse** with a non-owner e-mail (a `+tag` Gmail alias works) on a phone *and* a laptop: sign up → code → PIN → add data → sign out → PIN sign-in on the second device → *Download my data* → *Delete my account*.
+   Send a real code to a Gmail address and check "Show original": SPF, DKIM and DMARC should pass. Then share `https://app.vault-it.co` (update the QR code; `docs/TESTER_GUIDE.md` already has it).
+8. Later: when nobody uses the old address, turn GitHub Pages off (and drop `fetapit.github.io` from the widget's allowed sites).
 
 ## Notes
 - Previews (`*.workers.dev`) are public copies wired to the **production** Supabase project and are marked `noindex`. If that bothers you, put them behind Cloudflare Access (Worker → Settings → Domains & Routes → Preview URLs → Access).
