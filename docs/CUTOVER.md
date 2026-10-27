@@ -23,9 +23,11 @@ repo `FetaPit/Vault-It` connected to Worker `vault-it` (Workers Builds, build `n
 **`release/pioneer-v2`** (the first build on `main` failed because `main` has no site build). Until the release below, builds of that branch fail, so the Worker is still the placeholder and the custom
 domains show nothing.
 
-**Production Supabase has NOT been updated yet** (checked 2026-10-27 against the live project, not assumed): `list_migrations` stops at `vision_usage_screenshot_cap`, there is no `auth_rate` table or
-`rate_hit` / `erase_user_data` function (migration 008), `anon` can still execute `handle_new_user`, `rls_auto_enable` and `waitlist_count` (migration 007), and the deployed `send-auth-email` (v6) and
-`pin-auth` (v4) are the old ones. Re-check with `list_migrations` and `get_edge_function` before relying on any line that says "applied".
+**Production Supabase updated on 2026-10-27** (checked against the live project afterwards): migration 007 applied through the connector; 008 pasted
+into the SQL editor by the owner (the connector's confirmation prompt timed out three times), so `list_migrations` shows 007 but not 008 — `auth_rate`,
+`rate_hit` and `erase_user_data` exist. `send-auth-email` v8 and `pin-auth` v5 are deployed from `Pioneer_v3` and match the repo. Resend's records
+(DKIM `resend._domainkey`, `send` + `rsend-euw1` CNAMEs, EU region) were added by Resend's Cloudflare auto-configure. Still to set: `FROM_EMAIL`
+(once Resend shows Verified); `APP_URL` is optional (the code's default is `https://app.vault-it.co/`).
 
 ## Order of work (follow it — several steps depend on the one before)
 1. **Owner — Resend:** add `vault-it.co` in Resend (EU region) and pass on the records it shows. **Claude** adds them to Cloudflare DNS as DNS-only (DKIM TXT `resend._domainkey`, MX + SPF TXT on `send`),
