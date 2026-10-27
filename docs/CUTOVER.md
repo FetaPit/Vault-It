@@ -29,6 +29,21 @@ into the SQL editor by the owner (the connector's confirmation prompt timed out 
 (DKIM `resend._domainkey`, `send` + `rsend-euw1` CNAMEs, EU region) were added by Resend's Cloudflare auto-configure. Still to set: `FROM_EMAIL`
 (once Resend shows Verified); `APP_URL` is optional (the code's default is `https://app.vault-it.co/`).
 
+## Live since 2026-10-27 18:04 UTC (verified 22:10)
+- Released `208b85b` (backup `backup/release-pioneer-v2-20261027-1803`). The GitHub push did **not** start a Workers build (no build or preview build
+  appears for any push since the repo was connected), so the production build was started through the API; the GitHub → Cloudflare link needs checking
+  (GitHub → Settings → Applications → Cloudflare Workers and Pages → repository access must include `Vault-It`). Manual builds carry no commit hash, so
+  `version.json` shows the branch name.
+- Custom domains `app.vault-it.co`, `vault-it.co`, `www.vault-it.co` attached with certificates; headers (HSTS, frame-ancestors, nosniff, referrer,
+  permissions) present; `http://` and `www` reach the right site; `/landing/…` on the app host is 404.
+- Resend domain `vault-it.co` verified (the first auto-configure added DNS records but not the domain itself — it had to be added in Resend again);
+  `FROM_EMAIL` set. Live test with a `+tag` Gmail alias: code e-mail from `noreply@vault-it.co` arrived in the inbox (not spam); code verified; weak PIN refused;
+  PIN set; wrong PIN counted; PIN sign-in issued a token; data saved and read back; delete with wrong PIN refused, with right PIN erased the login, profile,
+  data, history and PIN (checked in the database); `auth_rate` is counting.
+- The sign-in code is **8 digits** (Supabase's OTP length), while the app and `TESTER_GUIDE.md` say 6. Owner: Authentication → Sign In / Providers → Email →
+  Email OTP length = 6 (or change the wording).
+- Not done yet: step 5 (`TURNSTILE_SECRET` + Supabase CAPTCHA) and step 6 (Stripe links).
+
 ## Order of work (follow it — several steps depend on the one before)
 1. **Owner — Resend:** add `vault-it.co` in Resend (EU region) and pass on the records it shows. **Claude** adds them to Cloudflare DNS as DNS-only (DKIM TXT `resend._domainkey`, MX + SPF TXT on `send`),
    and sets `_dmarc` to `v=DMARC1; p=none; rua=mailto:hello@vault-it.co`. Wait for Resend to show "Verified".
