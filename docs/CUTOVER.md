@@ -13,31 +13,29 @@ the old GitHub address shows a "we've moved" banner reminding people to back up 
   `send-auth-email` verifies the token when the Supabase secret `TURNSTILE_SECRET` is set. Failed checks never use the shared rate-limit counters.
 - Privacy notice names Cloudflare and Turnstile.
 
-## Owner's manual steps (nothing else needs the owner)
-1. **Cloudflare**: account, add domain `vault-it.co` (Free). Put the two nameservers it assigns into Wix (Domains → vault-it.co → Advanced →
-   Name servers), remove Wix's, keep DNSSEC off, press "I updated my nameservers". Wait for the "Active" e-mail. Confirm the Wix account e-mail.
-2. **Cloudflare access for Claude** (new session afterwards): claude.ai/customize/connectors → custom connector `https://mcp.cloudflare.com/mcp`,
-   or `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` in the environment settings (token scoped to Zone DNS edit on vault-it.co, Workers Scripts edit,
-   Turnstile edit; never paste it into chat).
-3. **Connect the repo to the Worker** (dashboard, needs GitHub sign-in): Workers & Pages → Create → Import a repository → `FetaPit/Vault-It`
-   (authorise the Cloudflare GitHub app). Project/Worker name **`vault-it`** (must equal `name` in `wrangler.jsonc`). Production branch `release/pioneer-v2`.
-   Build command `npm run build:site`, deploy command `npx wrangler deploy`. Settings → Builds → enable preview builds for other branches.
-4. **Resend**: add domain `vault-it.co` (EU region); paste the record values (DKIM TXT at `resend._domainkey`, MX + SPF TXT at `send`) so they can be added to Cloudflare DNS.
-5. **Supabase dashboard**: Authentication → URL Configuration → Site URL `https://app.vault-it.co`, add it to the redirect URLs.
-6. **Yes** to production changes (migrations 007 + 008, function deploys, secrets).
+## State on 2026-10-27
+**Done:** zone `vault-it.co` Active on Cloudflare (nameservers `donovan`/`lady`); Wix parking records deleted; Email Routing on
+(`hello@vault-it.co` → owner's Gmail; it is now the contact address everywhere); migrations 007 + 008 applied; Supabase Site URL +
+redirect URL set to `https://app.vault-it.co`; repo connected to Worker `vault-it` (Workers Builds, build `npm run build:site`, deploy
+`npx wrangler deploy`, production branch switched from `main` to `release/pioneer-v2` via the API — the first build on `main` failed because
+`main` has no site build); routes in `wrangler.jsonc`; Turnstile widget "Vault-It sign-in" (managed, `app.vault-it.co`) with its site key in
+`index.html` — used only when the page is served from `app.vault-it.co`, so the old address and previews keep signing in without it.
 
-## Claude's steps once the zone is **Active** and Cloudflare access exists (in this order)
-1. In the zone's DNS: delete the records imported from Wix that park the domain (A records `185.230.63.x`, `www` CNAME `cdn3.wixdns.net`) —
-   a Custom Domain cannot be created on a name that already has a CNAME. Add Resend's records and `_dmarc` (`v=DMARC1; p=none; rua=mailto:hello@vault-it.co`) as DNS-only.
-2. Add the routes to `wrangler.jsonc` (a deploy fails while the zone is not Active, which is why they are commented out) and push:
-   `"routes": [{"pattern":"app.vault-it.co","custom_domain":true},{"pattern":"vault-it.co","custom_domain":true},{"pattern":"www.vault-it.co","custom_domain":true}]`
-3. Create the Turnstile widget (domains `app.vault-it.co`, managed mode) via the API; put the **site key** in `VI_TURNSTILE_SITEKEY` in `index.html`.
-4. With the owner's yes: apply `supabase/migrations/007…` and `008…` (008 first matters), deploy `send-auth-email` and `pin-auth`, set secrets `APP_URL=https://app.vault-it.co/`,
-   `FROM_EMAIL="Vault·It <noreply@vault-it.co>"`, `RESEND_API_KEY` (already), and — **only after the client with the site key is live** — `TURNSTILE_SECRET`.
-5. Run the full suite, make `backup/release-pioneer-v2-YYYYMMDD-HHMM`, fast-forward `release/pioneer-v2` (Workers Builds deploys it; GitHub Pages keeps serving the old address).
-6. Verify: `https://app.vault-it.co/version.json` shows the new commit; sign up with a non-owner e-mail on a phone and a laptop; PIN sign-in on the second device;
-   Download my data; Delete my account. Check headers (`curl -sI https://app.vault-it.co/`). Share the new link; update the QR code and `docs/TESTER_GUIDE.md` if needed.
-7. Later: when nobody uses the old address any more, turn GitHub Pages off.
+**Owner, still to do:**
+1. **Resend**: add domain `vault-it.co` (EU region) and pass on the record values (DKIM TXT at `resend._domainkey`, MX + SPF TXT at `send`).
+2. **Yes** to: deploying `send-auth-email` + `pin-auth`, the secrets below, and the release (backup branch + fast-forward).
+
+**Claude, remaining (in this order):**
+1. Add Resend's records and `_dmarc` (`v=DMARC1; p=none; rua=mailto:hello@vault-it.co`) as DNS-only; wait for Resend to show the domain verified.
+2. With the owner's yes: deploy `send-auth-email` and `pin-auth`; set secrets `APP_URL=https://app.vault-it.co/`, `FROM_EMAIL="Vault·It <noreply@vault-it.co>"`
+   (only once Resend shows the domain verified; until then the deployed function sends from `onboarding@resend.dev`).
+3. Run the full suite, make `backup/release-pioneer-v2-YYYYMMDD-HHMM`, fast-forward `release/pioneer-v2` → Workers Builds deploys it and creates
+   the custom domains (vault-it.co shows nothing between the Wix records' removal and this deploy). GitHub Pages keeps serving the old address.
+4. Verify: `https://app.vault-it.co/version.json` shows the new commit; sign up with a non-owner e-mail (a `+tag` Gmail alias works) on a phone and
+   a laptop; PIN sign-in on the second device; Download my data; Delete my account. Check headers (`curl -sI https://app.vault-it.co/`).
+5. `TURNSTILE_SECRET` (secret of the widget above): set it only when the old address is no longer used for sign-in. Once it is set, a sign-in
+   e-mail request without a Turnstile token is refused, and the old address has no widget, so its users must move to app.vault-it.co.
+6. Later: when nobody uses the old address any more, set `TURNSTILE_SECRET` and turn GitHub Pages off.
 
 ## Notes
 - Cloudflare preview links (`*.workers.dev`) serve the app (and the landing page under `/landing/`) and are marked `noindex`; they use the same Supabase project, so do not sign real users up on a preview.

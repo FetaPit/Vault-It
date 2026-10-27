@@ -16469,7 +16469,8 @@ function hasValidSession() {
 
 var _sjsStalled = false;
 // Cloudflare Turnstile ("are you human") in front of the sign-in e-mail. The site key is public; leave it empty to switch the widget off.
-var VI_TURNSTILE_SITEKEY = '', _captchaToken = '', _captchaWidget = null;
+// Turnstile site key: only valid on app.vault-it.co, so the old address and preview links keep signing in without it
+var VI_TURNSTILE_SITEKEY = (location.hostname === 'app.vault-it.co') ? '0x4AAAAAAFoY-niKQ_Wu-1YM' : '', _captchaToken = '', _captchaWidget = null;
 var _SUPA_URL = 'https://legpubblzgknxdtvsant.supabase.co', _SUPA_KEY = 'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz';
 function _withTimeout(p, ms, fallback) {
   return Promise.race([p, new Promise(function(res) { setTimeout(function() { res(fallback); }, ms); })]);

@@ -14,11 +14,11 @@
   },
   "workers_dev": true,
   "preview_urls": true,
-  "observability": { "enabled": true }
-  // Custom domains are added once the vault-it.co zone is Active on Cloudflare (a deploy fails while it is not):
-  //   "routes": [
-  //     { "pattern": "app.vault-it.co", "custom_domain": true },
-  //     { "pattern": "vault-it.co", "custom_domain": true },
-  //     { "pattern": "www.vault-it.co", "custom_domain": true }
-  //   ]
+  "observability": { "enabled": true },
+  // Custom domains (the vault-it.co zone is Active on Cloudflare; Cloudflare creates them on deploy)
+  "routes": [
+    { "pattern": "app.vault-it.co", "custom_domain": true },
+    { "pattern": "vault-it.co", "custom_domain": true },
+    { "pattern": "www.vault-it.co", "custom_domain": true }
+  ]
 }
