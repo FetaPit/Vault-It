@@ -16469,7 +16469,11 @@ function hasValidSession() {
 
 var _sjsStalled = false;
 // Cloudflare Turnstile ("are you human") in front of the sign-in e-mail. The site key is public; leave it empty to switch the widget off.
-var VI_TURNSTILE_SITEKEY = '', _captchaToken = '', _captchaWidget = null;
+// The widget only works on the sites the key was created for, so it is only used there; elsewhere (previews, local files) it stays off.
+var VI_TURNSTILE_SITEKEY = (typeof window.__VI_TS_KEY === 'string') ? window.__VI_TS_KEY : '0x4AAAAAAFoY-niKQ_Wu-1YM';   // public key of the "Vault-It sign-in" widget (the override is for tests)
+var VI_TURNSTILE_HOSTS = ['app.vault-it.co', 'fetapit.github.io'];
+var _captchaToken = '', _captchaWidget = null, _captchaLoadFailed = false, _captchaWaitMsg = false;
+function viCaptchaOn() { return !!VI_TURNSTILE_SITEKEY && (VI_TURNSTILE_HOSTS.indexOf(location.hostname) > -1 || window.__vi_captcha_force === true); }
 var _SUPA_URL = 'https://legpubblzgknxdtvsant.supabase.co', _SUPA_KEY = 'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz';
 function _withTimeout(p, ms, fallback) {
   return Promise.race([p, new Promise(function(res) { setTimeout(function() { res(fallback); }, ms); })]);
@@ -16558,33 +16562,38 @@ function signOut() {
 }
 
 function viCaptchaEnsure() {
-  if (!VI_TURNSTILE_SITEKEY) return;
+  if (!viCaptchaOn()) return;
   var box = document.getElementById('auth-captcha'); if (!box) return;
   box.style.display = 'block';
   if (_captchaWidget !== null) return;
-  var blocked = function() { _authErr('The security check could not load. Turn off any blocker for this site, or try another network.'); };
+  var blocked = function() { _captchaLoadFailed = true; _captchaWaitMsg = false; _authErr('The security check could not load. Turn off any blocker for this site, or try another network, then tap Continue to try again.'); };
   var render = function() {
     if (_captchaWidget !== null || !window.turnstile) return;
     try {
       _captchaWidget = window.turnstile.render('#auth-captcha', { sitekey: VI_TURNSTILE_SITEKEY, theme: 'dark',
-        callback: function(t) { _captchaToken = t; _clearAuthErr(); },
+        callback: function(t) { _captchaToken = t; if (_captchaWaitMsg) { _captchaWaitMsg = false; _clearAuthErr(); } },   // only clears our own "please wait" note, never a real error
         'expired-callback': function() { _captchaToken = ''; }, 'timeout-callback': function() { _captchaToken = ''; },
         'error-callback': function() { _captchaToken = ''; blocked(); } });
     } catch (e) { blocked(); }
   };
   if (window.turnstile) { render(); return; }
-  if (document.getElementById('cf-turnstile-js')) return;
+  var old = document.getElementById('cf-turnstile-js');
+  if (old && _captchaLoadFailed) { old.remove(); old = null; }          // a failed load is tried again the next time
+  if (old) return;
+  _captchaLoadFailed = false;
   var sc = document.createElement('script'); sc.id = 'cf-turnstile-js'; sc.async = true; sc.defer = true;
   sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.onload = render; sc.onerror = blocked;
   document.head.appendChild(sc);
 }
+// start loading the check as soon as the sign-in screen is showing, so it has finished by the time the first Continue is tapped
+window.addEventListener('load', function() { try { var ov = document.getElementById('login-overlay'); if (ov && getComputedStyle(ov).display !== 'none') viCaptchaEnsure(); } catch (e) {} });
 function viCaptchaReset() {   // a token works once
   _captchaToken = '';
   try { if (_captchaWidget !== null && window.turnstile) window.turnstile.reset(_captchaWidget); } catch (e) {}
 }
 function _showAuthStep(step) {
-  var cap = document.getElementById('auth-captcha'); if (cap) cap.style.display = (VI_TURNSTILE_SITEKEY && step !== 'setpin') ? 'block' : 'none';
-  if (VI_TURNSTILE_SITEKEY && step !== 'setpin') viCaptchaEnsure();
+  var cap = document.getElementById('auth-captcha'); if (cap) cap.style.display = (viCaptchaOn() && step !== 'setpin') ? 'block' : 'none';
+  if (viCaptchaOn() && step !== 'setpin') viCaptchaEnsure();
   ['email','otp','pin','setpin'].forEach(function(s) {
     var el = document.getElementById('auth-' + s + '-step');
     if (el) el.classList.toggle('active', s === step);
@@ -16653,21 +16662,24 @@ async function _sendOTP(email) {
   if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
   try {
     // Try Edge Function first (Resend API, branded template, no SMTP dependency)
-    var sent = false, rateWait = 0, captchaFailed = false;
-    if (VI_TURNSTILE_SITEKEY && !_captchaToken) { viCaptchaEnsure(); _authErr('Please wait for the security check below to finish, then try again.'); return; }
+    var sent = false, rateWait = 0, captchaFailed = false, captchaDown = false;
+    if (viCaptchaOn() && !_captchaToken) { viCaptchaEnsure(); if (!_captchaLoadFailed) { _authErr('Please wait for the security check below to finish, then tap Continue again.'); _captchaWaitMsg = true; } return; }
     try {
       var fnRes = await _fnInvoke('send-auth-email', { email: email, captchaToken: _captchaToken || undefined }, 20000, false, true);
-      if (VI_TURNSTILE_SITEKEY) viCaptchaReset();
+      if (viCaptchaOn()) viCaptchaReset();
       if (!fnRes.error && fnRes.data && fnRes.data.success) sent = true;
       else if (fnRes.error && fnRes.error.context && fnRes.error.context.status === 403) captchaFailed = true;   // the human check did not pass: never route around it
+      else if (fnRes.error && fnRes.error.context && fnRes.error.context.status === 503) captchaDown = true;
       else if (fnRes.error && fnRes.error.context && fnRes.error.context.status === 429) {   // our own abuse limit: do NOT work around it with the built-in sender
         var lim = null; try { lim = await fnRes.error.context.json(); } catch (e) {}
         rateWait = Math.max(1, Math.ceil(((lim && lim.retryAfter) || 600) / 60));
       }
     } catch(fnErr) { /* Edge Function not deployed yet — fall through */ }
-    if (captchaFailed) { _authErr('The security check did not pass — please try again.'); return; }
+    if (captchaFailed) { _authErr(viCaptchaOn() ? 'The security check did not pass — please try again.' : 'Sign-in is only available at app.vault-it.co (this address is for looking around).'); return; }
+    if (captchaDown) { _authErr('The security check is temporarily unavailable — please try again in about 30 seconds.'); return; }
     if (rateWait) { _authErr('Too many sign-in emails requested for this address or network. Please try again in ' + rateWait + ' min.'); return; }
 
+    if (!sent && viCaptchaOn()) { _authErr('Could not send the code right now — please try again in a moment.'); return; }   // the built-in sender has no human check, so it is not a way round it
     if (!sent) {
       // Fallback: Supabase built-in signInWithOtp
       var res = await _supaClient.auth.signInWithOtp({
@@ -24240,7 +24252,7 @@ function viMovedBanner(host) {
   if (document.getElementById('moved-banner')) return true;
   var b = document.createElement('div'); b.id = 'moved-banner';
   b.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:10003;background:#0b2a2c;border-bottom:1px solid #44c0b9;color:#cfeeee;padding:10px 14px;font-size:13px;display:flex;gap:10px;align-items:center;flex-wrap:wrap';
-  b.innerHTML = '<span style="flex:1;min-width:220px">📦 Vault·It has moved to <strong>app.vault-it.co</strong>. Back up here first (Settings → Cloud sync → Upload everything), then sign in at the new address — your data comes with you.</span>'
+  b.innerHTML = '<span style="flex:1;min-width:220px">📦 Vault·It has moved to <strong>app.vault-it.co</strong>. Back up here first (Settings → Cloud sync → Upload everything), then sign in at the new address — your account data comes with you. Photos and any 3D design you uploaded stay on this device, so tap Settings → Download my data first.</span>'
     + '<a class="btn-add-data" href="https://app.vault-it.co/" style="text-decoration:none">Open new address</a>'
     + '<span style="cursor:pointer;padding:4px" aria-label="Dismiss" onclick="try{sessionStorage.setItem(\'vi_moved_dismissed\',\'1\')}catch(e){}document.getElementById(\'moved-banner\').remove()">✕</span>';
   document.body.appendChild(b); return true;

@@ -8,6 +8,9 @@ on:
     paths:
       - 'supabase/functions/**'
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

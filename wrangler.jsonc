@@ -14,7 +14,7 @@
   },
   "workers_dev": true,
   "preview_urls": true,
-  "observability": { "enabled": true }
+  "observability": { "enabled": false }   // request URLs and IPs are not logged by the Worker (the privacy notice relies on this)
   // Custom domains are added once the vault-it.co zone is Active on Cloudflare (a deploy fails while it is not):
   //   "routes": [
   //     { "pattern": "app.vault-it.co", "custom_domain": true },

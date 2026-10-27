@@ -6,6 +6,8 @@ const SUPABASE_SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const FROM_EMAIL            = Deno.env.get('FROM_EMAIL') ?? 'Vault·It <onboarding@resend.dev>'
 const APP_URL               = Deno.env.get('APP_URL') ?? 'https://app.vault-it.co/'
 const TURNSTILE_SECRET      = Deno.env.get('TURNSTILE_SECRET') ?? ''     // Cloudflare Turnstile ("are you human"); unset = no check yet
+// Sites a token may have been minted on (Cloudflare reports the hostname in its answer): the app, and the older GitHub address.
+const TURNSTILE_HOSTS       = (Deno.env.get('TURNSTILE_HOSTNAMES') ?? 'app.vault-it.co,fetapit.github.io').split(',').map((h) => h.trim().toLowerCase()).filter(Boolean)
 const PEPPER                = Deno.env.get('PIN_PEPPER') ?? SUPABASE_SERVICE_KEY   // keys in auth_rate are salted hashes, never raw e-mails / IPs
 
 // Abuse limits (fixed windows, counted in the database by rate_hit — see migration 008).
@@ -68,20 +70,28 @@ function mailbox(email: string): string {
   return `${local}@${domain}`
 }
 
-// Ask Cloudflare whether this Turnstile token is genuine. 'ok' | 'fail' | 'unavailable' (our configuration or their service is
-// broken — the check is skipped, loudly, rather than locking every tester out).
-async function verifyTurnstile(token: string, ip: string): Promise<'ok' | 'fail' | 'unavailable'> {
+// Ask Cloudflare whether this Turnstile token is genuine and was minted on one of our sites.
+//   'ok'          genuine
+//   'fail'        not genuine / wrong site
+//   'unreachable' Cloudflare could not be asked (timeout, HTTP error, network): the caller refuses with 503 — failing OPEN here would let anyone
+//                 who can make verification slow or rate-limited (e.g. by flooding it with junk tokens) skip the check altogether
+//   'misconfigured' our own secret is wrong or missing: logged loudly and skipped, so a typo cannot lock every tester out
+async function verifyTurnstile(token: string, ip: string): Promise<'ok' | 'fail' | 'unreachable' | 'misconfigured'> {
   try {
     const form = new URLSearchParams({ secret: TURNSTILE_SECRET, response: token })
     if (ip && ip !== 'unknown') form.set('remoteip', ip)
     const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form, signal: AbortSignal.timeout(4000) })
-    if (!res.ok) { console.error('turnstile siteverify HTTP', res.status); return 'unavailable' }
+    if (!res.ok) { console.error('turnstile siteverify HTTP', res.status); return 'unreachable' }
     const j = await res.json()
-    if (j.success === true) return 'ok'
     const codes: string[] = Array.isArray(j['error-codes']) ? j['error-codes'] : []
-    if (codes.some((c) => c === 'invalid-input-secret' || c === 'missing-input-secret' || c === 'internal-error')) { console.error('turnstile misconfigured / down:', codes.join(',')); return 'unavailable' }
+    if (j.success === true) {
+      const host = String(j.hostname ?? '').toLowerCase()
+      return TURNSTILE_HOSTS.length && !TURNSTILE_HOSTS.includes(host) ? 'fail' : 'ok'
+    }
+    if (codes.some((c) => c === 'invalid-input-secret' || c === 'missing-input-secret')) { console.error('turnstile secret rejected:', codes.join(',')); return 'misconfigured' }
+    if (codes.includes('internal-error')) { console.error('turnstile internal-error'); return 'unreachable' }
     return 'fail'
-  } catch (e) { console.error('turnstile siteverify failed:', e); return 'unavailable' }
+  } catch (e) { console.error('turnstile siteverify failed:', e); return 'unreachable' }
 }
 
 function emailHtml(otpCode: string, email: string): string {
@@ -163,6 +173,7 @@ Deno.serve(async (req: Request) => {
   if (!wait && TURNSTILE_SECRET) {
     const verdict = captchaToken ? await verifyTurnstile(captchaToken, rawIp(req)) : 'fail'
     if (verdict === 'fail') return new Response(JSON.stringify({ error: 'captcha' }), { status: 403, headers: { ...CORS, 'Content-Type': 'application/json' } })
+    if (verdict === 'unreachable') return new Response(JSON.stringify({ error: 'captcha_unavailable', retryAfter: 30 }), { status: 503, headers: { ...CORS, 'Content-Type': 'application/json', 'Retry-After': '30' } })
   }
   wait = wait || (await limited(admin, 'mail-all', 'all', LIMIT_GLOBAL_PER_HOUR, 3600))
             || (await limited(admin, 'mail-addr', mailbox(email), LIMIT_EMAIL_PER_HOUR, 3600))

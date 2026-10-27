@@ -63,10 +63,18 @@ so apply migration 008 **before** relying on it. Addresses are validated strictl
 
 Resend's free plan allows 100 e-mails/day: for a launch-night room of testers, upgrade Resend (and keep `RATE_GLOBAL_PER_HOUR` below your quota).
 
+### Human check (Cloudflare Turnstile)
+
+Set the secret `TURNSTILE_SECRET` (the widget's secret) to require a Turnstile token (`captchaToken` in the request) — `403 { error: 'captcha' }` without a valid one,
+`503 { error: 'captcha_unavailable' }` if Cloudflare cannot be asked (it never skips the check then). The token's site must be in `TURNSTILE_HOSTNAMES`
+(default `app.vault-it.co,fetapit.github.io`). Order: per-IP counter → human check → service-wide and per-mailbox counters, so a script that cannot pass the check cannot use up the shared allowances.
+Leave the secret unset until the client that sends tokens is live (see `docs/CUTOVER.md`). Also enable CAPTCHA (Turnstile) in Supabase → Authentication → Attack Protection so the built-in
+`/auth/v1/otp` endpoint is not a way round it.
+
 ### Fallback
 
 If the Edge Function is not deployed or fails (5xx / timeout), the app falls back to
-Supabase's built-in `signInWithOtp` (rate-limited to ~4 emails/hour per project). It does **not** fall back when our own limit says 429.
+Supabase's built-in `signInWithOtp` (only while the human check is **off**; with it on there is no fallback) (rate-limited to ~4 emails/hour per project). It does **not** fall back when our own limit says 429.
 
 
 ## pin-auth

@@ -146,7 +146,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   await page.evaluate(() => { try { localStorage.setItem('pos_ov1', '{"x":1}'); localStorage.setItem('vi_user', '{"name":"x"}'); } catch (e) {} });
   ok(await page.evaluate(() => localStorage.getItem('pos_ov1') === null && localStorage.getItem('vi_user') === null), 'nothing can write data back after deletion (even a late save or sync)');
   await page.screenshot({ path: SHOT + 'beta_deleted.png' });
-  await page.click('#delete-done button'); await page.waitForTimeout(1200);
+  await page.click('#delete-done button'); await page.waitForFunction(() => localStorage.getItem('vi_demo_mode') === 'true', null, { timeout: 10000 }).catch(() => {}); await page.waitForTimeout(300);
   ok(await page.evaluate(() => !document.getElementById('delete-done') && window._viDeleted !== true && localStorage.getItem('vi_demo_mode') === 'true' && !/pete@example\.com/.test(localStorage.getItem('vi_user') || '')), 'Close starts a normal first-visit app (sample data, nothing of the deleted account)');
   ok(page.errs.length === 0, 'no page errors ' + page.errs.slice(0, 2).join(' | '));
   await ctx.close();
@@ -282,23 +282,53 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
 
   // ── 12. Cloudflare Turnstile in front of the sign-in e-mail, and the move from the old address ──
   ({ ctx, page } = await fresh(b));
-  ok(await page.evaluate(() => VI_TURNSTILE_SITEKEY === '' && getComputedStyle(document.getElementById('auth-captcha')).display === 'none'), 'no site key → no widget (sign-in works exactly as before)');
-  await page.evaluate(() => { window.VI_TURNSTILE_SITEKEY = '1x00000000000000000000AA'; window.__reset = 0; window.turnstile = { render: (sel, o) => { window.__ts = o; window.__sel = sel; return 'w1'; }, reset: () => { window.__reset++; } }; _showAuthStep('email'); });
-  ok(await page.evaluate(() => window.__ts && window.__ts.sitekey === '1x00000000000000000000AA' && window.__sel === '#auth-captcha' && getComputedStyle(document.getElementById('auth-captcha')).display === 'block'), 'with a site key the widget is drawn in the sign-in card');
+  ok(await page.evaluate(() => VI_TURNSTILE_SITEKEY === '' && !viCaptchaOn() && getComputedStyle(document.getElementById('auth-captcha')).display === 'none'), 'no site key → no widget (sign-in works exactly as before)');
+  await page.evaluate(() => { window.VI_TURNSTILE_SITEKEY = '1x00000000000000000000AA'; });
+  ok(await page.evaluate(() => !viCaptchaOn()), 'with a key but on an address the key was not made for (local file, preview), the widget stays off');
+  await ctx.close();
+  // a key on the real address: the widget starts as soon as the sign-in screen shows, before anyone taps Continue
+  ctx = await b.newContext({ viewport: { width: 430, height: 900 } }); page = await ctx.newPage(); page.errs = []; page.on('pageerror', e => page.errs.push(e.message));
+  await page.addInitScript(() => { window.__VI_TS_KEY = '1x00000000000000000000AA'; window.__vi_captcha_force = true; window.__reset = 0; window.turnstile = { render: (sel, o) => { window.__ts = o; window.__sel = sel; window.__renders = (window.__renders || 0) + 1; return 'w1'; }, reset: () => { window.__reset++; } }; localStorage.setItem('vi_declined_demo', 'true'); });
+  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500); await page.evaluate(MOCK);
+  ok(await page.evaluate(() => window.__renders === 1 && window.__ts.sitekey === '1x00000000000000000000AA' && window.__sel === '#auth-captcha' && getComputedStyle(document.getElementById('auth-captcha')).display === 'block'), 'the check is drawn as soon as the sign-in screen appears (not on the first Continue tap)');
   await page.fill('#auth-email', 'pete@example.com'); await page.evaluate(() => { _m.calls.length = 0; });
   await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(500);
   ok(/security check/.test(await err(page)) && !(await page.evaluate(() => _m.calls.some(c => c.name === 'send-auth-email'))), 'no e-mail is requested until the check has passed');
-  await page.evaluate(() => window.__ts.callback('tok-1')); await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(700);
+  await page.evaluate(() => window.__ts.callback('tok-1'));
+  ok(await err(page) === '' || !/wait for the security check/.test(await err(page)), 'finishing the check removes the "please wait" note');
+  await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(700);
   const sendCall = await page.evaluate(() => _m.calls.find(c => c.name === 'send-auth-email'));
   ok(sendCall && sendCall.body.captchaToken === 'tok-1' && sendCall.body.email === 'pete@example.com', 'the token travels with the request');
   ok(await page.evaluate(() => window.__reset >= 1 && _captchaToken === ''), 'the widget is reset and the used token forgotten (one use only)');
   await page.evaluate(() => { _showAuthStep('email'); window.__ts.callback('tok-2'); window.__ts['expired-callback'](); });
   ok(await page.evaluate(() => _captchaToken === ''), 'an expired token is dropped');
+  // real errors are not wiped by the widget finishing
+  await page.evaluate(() => { _m.script['send-auth-email'] = { data: null, error: { context: { json: async () => ({ error: 'rate_limited', retryAfter: 600 }), status: 429 } } }; window.__ts.callback('tok-r'); });
+  await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(600);
+  await page.evaluate(() => window.__ts.callback('tok-r2'));
+  ok(/10 min/.test(await err(page)), 'a "try again in N min" message survives the widget finishing again');
   await page.evaluate(() => { window.__ts.callback('tok-3'); _m.script['send-auth-email'] = { data: null, error: { context: { json: async () => ({ error: 'captcha' }), status: 403 } } }; _m.otp = 0; });
   await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(700);
   ok(/did not pass/.test(await err(page)) && await page.evaluate(() => _m.otp) === 0 && await step(page) === 'auth-email-step', 'a failed check is explained and is NOT worked around with the built-in sender');
+  await page.evaluate(() => { window.__ts.callback('tok-4'); _m.script['send-auth-email'] = { data: null, error: { context: { json: async () => ({ error: 'captcha_unavailable' }), status: 503 } } }; });
+  await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(700);
+  ok(/temporarily unavailable/.test(await err(page)) && await page.evaluate(() => _m.otp) === 0, 'if Cloudflare cannot be asked the user is told to wait a moment (and the built-in sender is still not used)');
+  await page.evaluate(() => { window.__ts.callback('tok-5'); _m.script['send-auth-email'] = { data: null, error: { context: { json: async () => ({ error: 'x' }), status: 500 } } }; });
+  await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(700);
+  ok(/Could not send the code/.test(await err(page)) && await page.evaluate(() => _m.otp) === 0 && await step(page) === 'auth-email-step', 'with the check on, a mail-server outage does not fall back to the unprotected built-in sender');
   await page.evaluate(() => { _showAuthStep('setpin'); });
   ok(await page.evaluate(() => getComputedStyle(document.getElementById('auth-captcha')).display === 'none'), 'the widget is hidden on the PIN-setting step');
+  // a script that failed to load is tried again, not abandoned
+  await page.evaluate(() => { window.turnstile = undefined; window.__renders = 0; _captchaWidget = null; var o = document.getElementById('cf-turnstile-js'); if (o) o.remove(); _captchaLoadFailed = false; _showAuthStep('email'); });
+  await page.waitForTimeout(300);
+  const sc1 = await page.evaluate(() => !!document.getElementById('cf-turnstile-js'));
+  await page.evaluate(() => { document.getElementById('cf-turnstile-js').onerror(); });
+  ok(sc1 && await page.evaluate(() => _captchaLoadFailed === true) && /could not load/.test(await err(page)), 'a blocked or failed widget script is reported');
+  await page.evaluate(() => { window.__oldScript = document.getElementById('cf-turnstile-js'); });
+  await page.fill('#auth-email', 'pete@example.com'); await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(400);
+  ok(await page.evaluate(() => { var n = document.getElementById('cf-turnstile-js'); return !!n && n !== window.__oldScript; }), 'the next Continue tap loads the check again with a fresh script (it is not abandoned after one failure)');
+  ok(page.errs.length === 0, 'no page errors ' + page.errs.slice(0, 2).join(' | '));
+  await ctx.close(); ({ ctx, page } = await fresh(b));
   // the old GitHub address says the app has moved
   const moved = await page.evaluate(() => ({ other: viMovedBanner('app.vault-it.co'), none: !document.getElementById('moved-banner'), shown: viMovedBanner('fetapit.github.io'), link: (document.querySelector('#moved-banner a') || {}).href, txt: (document.getElementById('moved-banner') || {}).innerText || '' }));
   ok(moved.other === false && moved.none && moved.shown === true && moved.link === 'https://app.vault-it.co/' && /Upload everything/.test(moved.txt), 'the old address shows a "moved" banner with the new link and the back-up reminder; the new address does not');

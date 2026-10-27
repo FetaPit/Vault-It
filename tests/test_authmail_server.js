@@ -22,7 +22,9 @@ globalThis.fetch = async (url, init) => {
     if (verifyMode === 'down') throw new Error('network');
     if (verifyMode === 'http500') return { ok: false, status: 500, json: async () => ({}) };
     if (verifyMode === 'badsecret') return { ok: true, status: 200, json: async () => ({ success: false, 'error-codes': ['invalid-input-secret'] }) };
-    return { ok: true, status: 200, json: async () => (f.get('response') === 'good-token' ? { success: true } : { success: false, 'error-codes': ['invalid-input-response'] }) };
+    if (verifyMode === 'internal') return { ok: true, status: 200, json: async () => ({ success: false, 'error-codes': ['internal-error'] }) };
+    if (verifyMode === 'wrongsite') return { ok: true, status: 200, json: async () => ({ success: true, hostname: 'evil.example' }) };
+    return { ok: true, status: 200, json: async () => (f.get('response') === 'good-token' ? { success: true, hostname: 'app.vault-it.co' } : { success: false, 'error-codes': ['invalid-input-response'] }) };
   }
   sent.push(JSON.parse(init.body)); return resendOk ? { ok: true, json: async () => ({}) } : { ok: false, statusText: 'bad', json: async () => ({ message: 'nope' }) };
 };
@@ -100,7 +102,9 @@ const call = async (body, ip) => { const r = await globalThis.__h(new Request('h
   r = await call({ email: 'v6@example.com', captchaToken: 'good-token' }, '2001:db8:aaaa:1::7'); ok(verifyCalls.at(-1).remoteip === '2001:db8:aaaa:1::7', 'an IPv6 caller’s real address (not the /64 key) is what Cloudflare sees');
   const v0 = verifyCalls.length; const lim = []; for (let i = 0; i < 4; i++) lim.push((await call({ email: 'lim' + i + '@example.com', captchaToken: 'good-token' }, '203.0.113.77')).s);
   ok(lim.includes(429) || lim.every(x => x === 200), 'rate limits still apply after the check (' + lim.join() + ')');
-  for (const mode of ['down', 'http500', 'badsecret']) { verifyMode = mode; for (const k of Object.keys(rate)) delete rate[k]; r = await call({ email: 'ok-' + mode + '@example.com', captchaToken: 'anything' }); ok(r.s === 200, 'if Cloudflare (' + mode + ') cannot be asked, sign-in still works and the problem is logged'); }
+  for (const mode of ['down', 'http500', 'internal']) { verifyMode = mode; for (const k of Object.keys(rate)) delete rate[k]; const m0 = sent.length; r = await call({ email: 'cf-' + mode + '@example.com', captchaToken: 'anything' }); ok(r.s === 503 && r.b.error === 'captcha_unavailable' && r.h.get('retry-after') === '30' && sent.length === m0, 'if Cloudflare cannot be asked (' + mode + ') the request is refused with 503 — it never skips the check (a flood of junk tokens cannot switch the check off)'); }
+  verifyMode = 'badsecret'; for (const k of Object.keys(rate)) delete rate[k]; r = await call({ email: 'cf-badsecret@example.com', captchaToken: 'anything' }); ok(r.s === 200, 'a wrong/missing secret on OUR side is logged loudly and skipped, so a typo cannot lock every tester out');
+  verifyMode = 'wrongsite'; for (const k of Object.keys(rate)) delete rate[k]; r = await call({ email: 'cf-wrongsite@example.com', captchaToken: 'good-token' }); ok(r.s === 403 && r.b.error === 'captcha', 'a genuine token minted on some other website is refused (hostname is checked)');
   verifyMode = 'normal';
   load({}); for (const k of Object.keys(rate)) delete rate[k]; const vc = verifyCalls.length;
   r = await call({ email: 'nosecret@example.com' }); ok(r.s === 200 && verifyCalls.length === vc, 'with no secret configured nothing is checked (sign-in works as before)');

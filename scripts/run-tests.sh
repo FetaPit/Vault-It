@@ -27,10 +27,12 @@ if [ "$ROOT" != "/home/user/Vault-It" ] && [ ! -e /home/user/Vault-It/index.html
     || (sudo mkdir -p /home/user && sudo ln -sfn "$ROOT" /home/user/Vault-It) 2>/dev/null \
     || { echo "Cannot make /home/user/Vault-It point at $ROOT — the tests expect the repo there." >&2; exit 2; }
 fi
+if [ "$(cd /home/user/Vault-It 2>/dev/null && pwd -P)" != "$(pwd -P)" ]; then echo "Note: the tests open /home/user/Vault-It/index.html, which is $(cd /home/user/Vault-It && pwd -P), not this checkout ($(pwd -P))." >&2; fi
 # Playwright may be installed globally (Claude Code cloud sessions) rather than in node_modules
 if [ -z "${NODE_PATH:-}" ] && [ -d /usr/local/lib/node_modules_global/playwright ]; then export NODE_PATH=/usr/local/lib/node_modules_global; fi
 
-all_tests() { ls tests/test_*.js tests/test_*.mjs tests/crawl.js tests/xss.js tests/xss2.js 2>/dev/null; }
+mkdir -p "$ROOT/shots/hb3d"   # screenshots are build output (not committed)
+all_tests() { ls tests/test_*.js tests/test_*.mjs tests/crawl.js tests/xss.js tests/xss_attr.js tests/xss2.js 2>/dev/null; }
 is_browser() { grep -qE "require\(['\"]playwright['\"]\)|from ['\"]playwright['\"]" "$1"; }
 
 pick() {   # $1 = server|browser|all
@@ -48,7 +50,7 @@ MODE="${1:-all}"; shift || true
 case "$MODE" in
   all|server|browser) TESTS="$(pick "$MODE")" ;;
   list) pick all; exit 0 ;;
-  *) TESTS=""; for n in "$MODE" "$@"; do n="${n%.js}"; n="${n%.mjs}"; for ext in js mjs; do [ -f "tests/$n.$ext" ] && TESTS="$TESTS tests/$n.$ext"; done; done ;;
+  *) TESTS=""; for n in "$MODE" "$@"; do n="${n%.js}"; n="${n%.mjs}"; found=""; for ext in js mjs; do [ -f "tests/$n.$ext" ] && { TESTS="$TESTS tests/$n.$ext"; found=1; }; done; [ -z "$found" ] && { echo "No such test: $n (try: bash scripts/run-tests.sh list)" >&2; exit 2; }; done ;;
 esac
 
 if [ -n "${SHARD:-}" ]; then   # e.g. 2/3 → every third test starting at the 2nd
@@ -77,7 +79,9 @@ FINAL_FAIL=0; FLAKY=""
 while read -r name status rest; do
   [ -z "$name" ] && continue
   if [ "$status" = "PASS" ]; then echo "  ok     $name"; continue; fi
+  cp "$LOG_DIR/$name.log" "$LOG_DIR/$name.attempt1.log" 2>/dev/null
   echo "  FAIL   $name — $rest   (re-running alone…)"
+  grep -E "^FAIL" "$LOG_DIR/$name.attempt1.log" | head -3 | cut -c1-200 | sed 's/^/         first attempt: /'
   t="$(ls tests/$name.js tests/$name.mjs 2>/dev/null | head -1)"
   again="$(run_one "$t")"
   if [ "${again#* }" = "PASS" ]; then echo "  FLAKY  $name — passed on its own"; FLAKY="$FLAKY $name"

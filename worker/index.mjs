@@ -1,30 +1,38 @@
-// One Worker, two sites: app.vault-it.co → dist/app, vault-it.co → dist/landing (www redirects to the bare domain).
-// Any other host (the workers.dev preview links Cloudflare makes for every branch, localhost) serves the app, and the
-// landing page under /landing/. Static files come from the assets binding; this only chooses the folder, adds the security
+// One Worker, two sites: app.vault-it.co → dist/app, vault-it.co → dist/landing (www redirects to the bare domain; plain http redirects to https).
+// workers.dev preview links (Cloudflare makes one per branch) and localhost serve the app, and the landing page under /landing/;
+// any other host gets a 404. Static files come from the assets binding; this only chooses the folder, adds the security
 // headers and refuses anything but GET/HEAD. Nothing here reads cookies, bodies or user data.
 
 export const HOSTS = { app: 'app.vault-it.co', root: 'vault-it.co', www: 'www.vault-it.co' };
 
-// Where a request should be served from. Returns { redirect } or { file } (a path inside the assets folder) or { notFound }.
-export function route(host, pathname) {
-  host = host.toLowerCase();
-  let path;
-  try { path = decodeURIComponent(pathname); } catch (e) { return { notFound: true }; }
-  if (host === HOSTS.www) return { redirect: 'https://' + HOSTS.root };
-  if (path.includes('\0') || path.split('/').some((s) => s === '..' || s === '.') || path.includes('\\')) return { notFound: true };
+// Which kind of host is this? 'www' | 'root' | 'app' | 'preview' (Cloudflare's workers.dev links, localhost) | null (anything else).
+export function hostKind(hostname) {
+  const h = hostname.toLowerCase().replace(/\.$/, '');                // 'app.vault-it.co.' is the same host
+  if (h === HOSTS.www) return 'www';
+  if (h === HOSTS.root) return 'root';
+  if (h === HOSTS.app) return 'app';
+  if (h.endsWith('.workers.dev') || h === 'localhost' || h === '127.0.0.1') return 'preview';
+  return null;
+}
 
-  let site, rest = path, prod = true;
-  if (host === HOSTS.root) site = 'landing';
-  else if (host === HOSTS.app) site = 'app';
-  else {                                   // previews, localhost
-    prod = false;
-    if (path === '/landing' || path.startsWith('/landing/')) { site = 'landing'; rest = path.slice('/landing'.length) || '/'; }
-    else site = 'app';
-  }
+// Where a request should be served from. Returns { redirect } or { file } (a path inside the assets folder) or { notFound }.
+// The path is judged exactly as the URL parser delivered it, never decoded and re-parsed: every published file has a plain name,
+// so anything with '%', backslashes, control characters, dot segments or empty segments is simply not a file we serve.
+export function route(hostname, pathname) {
+  const kind = hostKind(hostname);
+  if (!kind) return { notFound: true };
+  if (kind === 'www') return { redirect: 'https://' + HOSTS.root };
+  if (!/^\/[A-Za-z0-9._~\-\/]*$/.test(pathname) || pathname.includes('//') || pathname.split('/').some((s) => s === '.' || s === '..')) return { notFound: true };
+
+  let site, rest = pathname;
+  if (kind === 'root') site = 'landing';
+  else if (kind === 'app') site = 'app';
+  else if (pathname === '/landing' || pathname.startsWith('/landing/')) { site = 'landing'; rest = pathname.slice('/landing'.length) || '/'; }   // previews: landing under /landing/
+  else site = 'app';
   if (rest.endsWith('/')) rest += 'index.html';
   else if (!/\.[A-Za-z0-9]+$/.test(rest)) rest += '.html';       // /recover → /recover.html
   if (rest === '/version.json' && site !== 'app') return { notFound: true };
-  return { file: '/' + site + rest, site, prod };
+  return { file: '/' + site + rest, site, prod: kind !== 'preview' };
 }
 
 const SECURITY = {
@@ -50,11 +58,18 @@ export default {
     const url = new URL(request.url);
     if (request.method !== 'GET' && request.method !== 'HEAD') return withHeaders(new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, HEAD' } }), { prod: true });
 
+    const kind = hostKind(url.hostname);
+    if (url.protocol === 'http:' && (kind === 'www' || kind === 'root' || kind === 'app')) {   // production is HTTPS only
+      return withHeaders(Response.redirect('https://' + url.hostname.replace(/\.$/, '') + url.pathname + url.search, 301), { prod: true });
+    }
     const r = route(url.hostname, url.pathname);
     if (r.redirect) return withHeaders(Response.redirect(r.redirect + url.pathname + url.search, 301), { prod: true });
     if (r.notFound) return withHeaders(new Response('Not found', { status: 404 }), { prod: true });
 
-    const asset = await env.ASSETS.fetch(new Request(new URL(r.file, url.origin), { method: request.method, headers: request.headers }));
+    const target = new URL(r.file, url.origin);
+    if (!target.pathname.startsWith('/' + r.site + '/')) return withHeaders(new Response('Not found', { status: 404 }), { prod: true });   // invariant: never leave the site's own folder
+
+    const asset = await env.ASSETS.fetch(new Request(target, { method: request.method, headers: request.headers }));
     if (asset.status === 404 || asset.status >= 500) {
       const nf = await env.ASSETS.fetch(new Request(new URL('/' + r.site + '/404.html', url.origin)));
       return withHeaders(new Response(nf.body, { status: 404, headers: { 'Content-Type': 'text/html; charset=utf-8' } }), { prod: r.prod });

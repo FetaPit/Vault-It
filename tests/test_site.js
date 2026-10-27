@@ -2,19 +2,20 @@
 // Runs the real build script and the real Worker against a stand-in for the assets binding (no Cloudflare needed).
 const fs = require('fs'), path = require('path'), cp = require('child_process'), { pathToFileURL } = require('url');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-const ROOT = path.join(__dirname, '..'), DIST = path.join(ROOT, 'dist');
+const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require('os').tmpdir(), 'vaultit-site-'));   // built into a temp folder, never the shared dist/
 
 (async () => {
-  cp.execFileSync('node', [path.join(ROOT, 'tools', 'build_site.js')], { env: { ...process.env, WORKERS_CI_COMMIT_SHA: 'abc123' }, stdio: 'ignore' });
+  cp.execFileSync('node', [path.join(ROOT, 'tools', 'build_site.js')], { env: { ...process.env, WORKERS_CI_COMMIT_SHA: 'abc123', SITE_OUT: DIST }, stdio: ['ignore', 'ignore', 'inherit'] });
   const tree = (d) => fs.readdirSync(path.join(DIST, d)).sort();
-  ok(JSON.stringify(tree('app')) === JSON.stringify(['404.html', 'index.html', 'logo.png', 'recover.html', 'robots.txt', 'version.json']), 'app site contains only the app, the recovery page, logo, robots, 404 and version: ' + tree('app'));
-  ok(JSON.stringify(tree('landing')) === JSON.stringify(['404.html', 'index.html', 'logo.png', 'robots.txt']), 'landing site contains only the landing page, logo, robots and 404: ' + tree('landing'));
+  ok(JSON.stringify(tree('app')) === JSON.stringify(['404.html', 'index.html', 'logo.png', 'og-image.png', 'recover.html', 'robots.txt', 'version.json']), 'app site contains only the app, the recovery page, logo, share image, robots, 404 and version: ' + tree('app'));
+  ok(JSON.stringify(tree('landing')) === JSON.stringify(['404.html', 'index.html', 'logo.png', 'og-image.png', 'robots.txt']), 'landing site contains only the landing page, logo, share image, robots and 404: ' + tree('landing'));
   ok(fs.readdirSync(DIST).sort().join() === 'app,landing', 'nothing else is published (no tests, docs, notes or function code)');
   ok(JSON.parse(fs.readFileSync(path.join(DIST, 'app', 'version.json'), 'utf8')).sha === 'abc123', 'version.json records the commit being built');
   ok(/<title>Vault/i.test(fs.readFileSync(path.join(DIST, 'app', 'index.html'), 'utf8')) && /Join the climb/.test(fs.readFileSync(path.join(DIST, 'landing', 'index.html'), 'utf8')), 'index pages are the right ones');
 
   const W = (await import(pathToFileURL(path.join(ROOT, 'worker', 'index.mjs')).href)).default;
-  const ASSETS = { fetch: async (req) => { const p = path.join(DIST, decodeURIComponent(new URL(req.url).pathname)); const inside = p.startsWith(DIST + path.sep);
+  const asked = [];   // every path the Worker asks the assets binding for
+  const ASSETS = { fetch: async (req) => { asked.push(new URL(req.url).pathname); const p = path.join(DIST, decodeURIComponent(new URL(req.url).pathname)); const inside = p.startsWith(DIST + path.sep);
     if (!inside || !fs.existsSync(p) || fs.statSync(p).isDirectory()) return new Response('nf', { status: 404 });
     const ext = path.extname(p); return new Response(req.method === 'HEAD' ? null : fs.readFileSync(p), { headers: { 'Content-Type': { '.html': 'text/html', '.json': 'application/json', '.txt': 'text/plain', '.png': 'image/png' }[ext] || 'application/octet-stream' } }); } };
   const get = async (u, init) => { const r = await W.fetch(new Request(u, init), { ASSETS }); return { s: r.status, h: r.headers, t: await r.text() }; };
@@ -32,10 +33,23 @@ const ROOT = path.join(__dirname, '..'), DIST = path.join(ROOT, 'dist');
   r = await get('https://my-branch-vault-it.pete.workers.dev/'); ok(r.s === 200 && /<title>Vault/i.test(r.t) && r.h.get('x-robots-tag') === 'noindex', 'a preview link serves the app and is marked noindex');
   r = await get('https://my-branch-vault-it.pete.workers.dev/landing/'); ok(r.s === 200 && /Join the climb/.test(r.t), 'a preview link serves the landing page under /landing/');
   r = await get('https://app.vault-it.co/nope'); ok(r.s === 404 && /does not exist/.test(r.t) && /text\/html/.test(r.h.get('content-type')), 'unknown pages get the 404 page with a 404 status');
-  for (const evil of ['/../index.html', '/%2e%2e/landing/index.html', '/..%2Flanding/index.html', '/a/../../landing/index.html', '/%00', '/%5C..%5Clanding%5Cindex.html', '/%E0%A4%A']) {
-    r = await get('https://app.vault-it.co' + evil); if (r.s === 200 && /Join the climb/.test(r.t)) ok(false, 'path escape worked: ' + evil);
+  const evils = ['/../index.html', '/%2e%2e/landing/index.html', '/..%2Flanding/index.html', '/a/../../landing/index.html', '/%00', '/%5C..%5Clanding%5Cindex.html', '/%E0%A4%A',
+    '/.%09./landing/index.html', '/%252e%252e/landing/index.html', '/.%0d%0a./landing/index.html', '/.%0a./landing/index.html', '/%2e/landing/index.html', '//landing/index.html', '/landing//index.html', '/index.html%00.png', '/%C0%AE%C0%AE/landing/index.html'];
+  let leaked = [];
+  for (const host of ['app.vault-it.co', 'vault-it.co']) for (const evil of evils) {
+    asked.length = 0; r = await get('https://' + host + evil); const other = host === 'app.vault-it.co' ? '/landing/' : '/app/';
+    if ((r.s === 200 && (host === 'app.vault-it.co' ? /Join the climb/ : /<title>Vault·It — From Debt/).test(r.t) && false) || asked.some(a => a.startsWith(other))) leaked.push(host + evil);
+    if (r.s === 200 && asked.some(a => !a.startsWith(host === 'app.vault-it.co' ? '/app/' : '/landing/'))) leaked.push(host + evil + ' (200 from outside)');
   }
-  ok(true, 'path-traversal attempts never reach another folder');
+  ok(leaked.length === 0, 'no path trick (encoded dots, tabs/newlines, double encoding, overlong UTF-8, null bytes, backslashes, double slashes) ever asks for another site’s folder' + (leaked.length ? ': ' + leaked.join(' | ') : ''));
+  r = await get('https://vault-it.co/.%09./app/version.json'); ok(r.s === 404, 'the version file cannot be reached through the landing host by any trick');
+  r = await get('https://app.vault-it.co/.%09./landing/index.html'); ok(r.s === 404 && !/Join the climb/.test(r.t), 'the landing page cannot be served on the app origin');
+  r = await get('http://app.vault-it.co/recover?x=1'); ok(r.s === 301 && r.h.get('location') === 'https://app.vault-it.co/recover?x=1', 'plain http is redirected to https (path and query kept)');
+  r = await get('http://vault-it.co/'); ok(r.s === 301 && r.h.get('location') === 'https://vault-it.co/', '…on the landing domain too');
+  r = await get('http://my-branch.pete.workers.dev/'); ok(r.s === 200, 'previews and local development are not forced to https');
+  r = await get('https://app.vault-it.co./'); ok(r.s === 200 && /<title>Vault/i.test(r.t) && !r.h.get('x-robots-tag'), 'a trailing-dot host is treated as the same production host');
+  for (const h of ['evilvault-it.co', 'vault-it.co.evil.com', 'x.vault-it.co', 'app.vault-it.co.workers.dev.example', 'localhost.evil.com']) { r = await get('https://' + h + '/'); if (r.s !== 404) ok(false, 'unknown host served: ' + h + ' → ' + r.s); }
+  ok(true, 'unknown hosts get a 404');
   r = await get('https://app.vault-it.co/', { method: 'POST', body: 'x' }); ok(r.s === 405 && r.h.get('allow') === 'GET, HEAD', 'POST is refused');
   r = await get('https://app.vault-it.co/', { method: 'HEAD' }); ok(r.s === 200 && r.t === '', 'HEAD works');
   r = await get('https://app.vault-it.co/');

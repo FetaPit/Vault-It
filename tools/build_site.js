@@ -3,11 +3,11 @@
 //   dist/landing  → https://vault-it.co       marketing page + waitlist
 // Run: node tools/build_site.js            (Cloudflare Workers Builds: build command `npm run build:site`)
 const fs = require('fs'), path = require('path'), cp = require('child_process');
-const ROOT = path.join(__dirname, '..'), OUT = path.join(ROOT, 'dist');
+const ROOT = path.join(__dirname, '..'), OUT = process.env.SITE_OUT ? path.resolve(process.env.SITE_OUT) : path.join(ROOT, 'dist');
 
 const SITE = {
-  app:     [['index.html', 'index.html'], ['recover.html', 'recover.html'], ['logo.png', 'logo.png']],
-  landing: [['landing.html', 'index.html'], ['logo.png', 'logo.png']],
+  app:     [['index.html', 'index.html'], ['recover.html', 'recover.html'], ['logo.png', 'logo.png'], ['og-image.png', 'og-image.png']],
+  landing: [['landing.html', 'index.html'], ['logo.png', 'logo.png'], ['og-image.png', 'og-image.png']],
 };
 const ROBOTS = { app: 'User-agent: *\nDisallow: /\n', landing: 'User-agent: *\nAllow: /\n' };
 

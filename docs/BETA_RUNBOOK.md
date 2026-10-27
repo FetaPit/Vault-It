@@ -26,7 +26,7 @@ Project: Supabase `legpubblzgknxdtvsant` (eu-central-1, Frankfurt). Live app: `r
 **Domain and hosting (Cloudflare)** — the whole move is in `docs/CUTOVER.md`: nameservers at Wix → Cloudflare, one Worker serving app.vault-it.co and vault-it.co, Resend's DNS records and DMARC in Cloudflare, Supabase Site URL `https://app.vault-it.co`. Confirm the Wix account e-mail (an unconfirmed registrant e-mail can get a domain suspended).
 
 **Before the link goes beyond friendly testers** (from the security review)
-- Sign-in e-mails are protected by rate limits **and Cloudflare Turnstile** (built; switched on at cut-over by setting `VI_TURNSTILE_SITEKEY` in `index.html` and the `TURNSTILE_SECRET` Supabase secret — see `docs/CUTOVER.md`). Failed checks never use the shared counters. Keep `RATE_GLOBAL_PER_HOUR` under your Resend quota.
+- Sign-in e-mails are protected by rate limits **and Cloudflare Turnstile** (built; the site key is in `index.html`, the check is switched on by setting the `TURNSTILE_SECRET` Supabase secret and Supabase's own CAPTCHA — in the order given in `docs/CUTOVER.md`). Failed checks never use the shared counters. Keep `RATE_GLOBAL_PER_HOUR` under your Resend quota.
 - Anyone who knows an address can spend that mailbox's hourly allowance (8) or lock a PIN (5 wrong tries): the owner can always get in with an e-mail code once the window passes. Known, accepted for the beta.
 - Pin the Edge Functions region if you want the "EU" statement to cover them as well as the database (Supabase → Edge Functions settings).
 - Auth logs (Supabase) and Resend delivery logs hold e-mail address and IP for a short period after deletion; set their retention to the minimum.
