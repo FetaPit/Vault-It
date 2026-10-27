@@ -46,7 +46,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   let legal = await page.evaluate(() => (document.getElementById('legal-modal') || {}).innerText || '');
   ok(/not end-to-end encrypted/i.test(legal), 'privacy notice says plainly that it is NOT end-to-end encrypted');
   ok(/Supabase/.test(legal) && /Resend/.test(legal) && /GitHub/.test(legal) && /Anthropic/.test(legal) && /Yahoo/.test(legal) && /Meshy/.test(legal), 'privacy notice names every third party that handles data');
-  ok(/Frankfurt/.test(legal) && /pete@ptlive\.design/.test(legal) && /ico\.org\.uk/.test(legal), 'privacy notice has the EU location, a contact and the ICO route');
+  ok(/Frankfurt/.test(legal) && /hello@vault-it\.co/.test(legal) && /ico\.org\.uk/.test(legal), 'privacy notice has the EU location, a contact and the ICO route');
   ok(/Download my data/.test(legal) && /Delete my account/.test(legal) && /one month/.test(legal), 'privacy notice points to the in-app export / delete and the one-month reply');
   ok(!/only in your browser.s local storage|never leaves your device|We have no access to it/i.test(legal), 'the old (now false) “it never leaves your device” claim is gone');
   // every outside company the app or its server functions talk to must be in the notice (so a new one cannot slip in silently)

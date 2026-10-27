@@ -28,7 +28,7 @@ the old GitHub address shows a "we've moved" banner reminding people to back up 
 
 ## Claude's steps once the zone is **Active** and Cloudflare access exists (in this order)
 1. In the zone's DNS: delete the records imported from Wix that park the domain (A records `185.230.63.x`, `www` CNAME `cdn3.wixdns.net`) —
-   a Custom Domain cannot be created on a name that already has a CNAME. Add Resend's records and `_dmarc` (`v=DMARC1; p=none; rua=mailto:pete@ptlive.design`) as DNS-only.
+   a Custom Domain cannot be created on a name that already has a CNAME. Add Resend's records and `_dmarc` (`v=DMARC1; p=none; rua=mailto:hello@vault-it.co`) as DNS-only.
 2. Add the routes to `wrangler.jsonc` (a deploy fails while the zone is not Active, which is why they are commented out) and push:
    `"routes": [{"pattern":"app.vault-it.co","custom_domain":true},{"pattern":"vault-it.co","custom_domain":true},{"pattern":"www.vault-it.co","custom_domain":true}]`
 3. Create the Turnstile widget (domains `app.vault-it.co`, managed mode) via the API; put the **site key** in `VI_TURNSTILE_SITEKEY` in `index.html`.
