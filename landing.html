@@ -933,7 +933,13 @@ if(wForm){
         var res = await supa.from('waitlist').insert([{email:email}]);
         if(res.error && res.error.code!=='23505'){throw res.error;}
       }
-      wMsg.textContent="\u2728 You\u2019re in! We\u2019ll be in touch.";
+      // Joining the list sends no e-mail, so point straight at the app: that is where the sign-in code comes from.
+      wMsg.textContent="\u2728 You\u2019re on the list. Want to try the beta now? ";
+      var go=document.createElement('a');
+      go.href='https://app.vault-it.co/'; go.id='waitlistOpenApp';
+      go.textContent='Open the app \u2192';
+      go.style.cssText='color:var(--teal);font-weight:700;text-decoration:underline;white-space:nowrap';
+      wMsg.appendChild(go);
       wMsg.style.color='var(--teal)';
       wForm.reset();
     }catch(err){
