@@ -21,5 +21,21 @@
   },
   "enabledPlugins": {
     "cloudflare@cloudflare": true
+  },
+  "permissions": {
+    "allow": [
+      "mcp__Supabase__query_logs",
+      "mcp__Supabase__get_advisors",
+      "mcp__Supabase__list_edge_functions",
+      "mcp__Supabase__list_migrations",
+      "mcp__Supabase__get_project",
+      "mcp__github__actions_list",
+      "mcp__github__actions_get",
+      "mcp__github__get_job_logs",
+      "mcp__Cloudflare_Developer_Platform__search_cloudflare_documentation",
+      "mcp__Exa__web_fetch_exa",
+      "mcp__Exa__web_search_exa",
+      "mcp__Claude_Code_Remote__read_documentation"
+    ]
   }
 }
