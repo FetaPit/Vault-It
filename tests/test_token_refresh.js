@@ -51,6 +51,18 @@ const OLD = jwt(-600, 'old'), NEW = jwt(3600, 'new');
   await setup(false);
   r = await page.evaluate(async () => { const ok2 = await _upsertRows([{ user_id: 'u1', key: 'pos_ov1', value: {}, updated_at: new Date().toISOString() }]); return { ok2, err: _lastSyncErr, log: window.__log }; });
   ok(r.ok2 === false && /401/.test(r.err) && r.log.length <= 4, 'a dead refresh token is reported (401) without retrying for ever: ' + r.log.join(','));
+  const ban = await page.evaluate(() => { const b = document.getElementById('session-banner'); return b ? b.innerText : ''; });
+  ok(/sign-in has expired/i.test(ban) && /nothing on this device is lost/i.test(ban), 'a refused renewal tells the user to sign in again (and that local data is safe)');
+  r = await page.evaluate(() => { window.__reauth = 0; window.viReauth = () => { window.__reauth++; }; document.getElementById('session-banner-btn').click();
+    return { called: window.__reauth, gone: !document.getElementById('session-banner'), ov: localStorage.getItem('pos_ov1') !== undefined }; });
+  ok(r.called === 1 && r.gone, '"Sign in again" opens the sign-in screen and the banner goes');
+
+  // a network blip during renewal is not an expired sign-in: no banner
+  await page.evaluate(([k, tok]) => { const s = JSON.parse(localStorage.getItem(k)); s.access_token = tok; localStorage.setItem(k, JSON.stringify(s));
+    window.fetch = async (url) => { if (url.includes('/auth/v1/token')) throw new Error('offline'); return { ok: false, status: 401, json: async () => ({}) }; }; }, [KEY, OLD]);
+  await page.waitForTimeout(20);
+  r = await page.evaluate(async () => { await _upsertRows([{ user_id: 'u1', key: 'pos_ov1', value: {}, updated_at: new Date().toISOString() }]); return !!document.getElementById('session-banner'); });
+  ok(r === false, 'no "expired" banner when the renewal only failed for lack of signal');
 
   ok(errs.length === 0, 'no page errors ' + errs.join('|'));
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED');

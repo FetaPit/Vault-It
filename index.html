@@ -16515,7 +16515,7 @@ function _directRefresh() {
       var res = await fetch(_SUPA_URL + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', signal: ctl.signal,
         headers: { 'content-type': 'application/json', apikey: _SUPA_KEY }, body: JSON.stringify({ refresh_token: s.refresh_token }) });
       clearTimeout(t);
-      if (!res.ok) return null;
+      if (!res.ok) { if (res.status === 400 || res.status === 401) _viSessionExpired(); return null; }   // refused (not a network blip): the sign-in is over
       var n = await res.json(); if (!n || !n.access_token || !n.refresh_token) return null;
       var merged = Object.assign({}, s, n); if (!merged.expires_at && n.expires_in) merged.expires_at = Math.floor(Date.now() / 1000) + n.expires_in;
       _lsOrig.call(localStorage, k, JSON.stringify(merged));   // same place supabase-js keeps it, so both stay on the new pair
@@ -16523,6 +16523,16 @@ function _directRefresh() {
     } catch (e) { return null; } finally { setTimeout(function() { _directRefreshP = null; }, 0); }
   })();
   return _directRefreshP;
+}
+// The saved sign-in can no longer be renewed (e.g. weeks away, or signed out elsewhere): say so and offer to sign in again,
+// instead of looking signed in while nothing uploads. Nothing on this device is touched.
+function _viSessionExpired() {
+  if (document.getElementById('session-banner')) return;
+  var bn = document.createElement('div'); bn.id = 'session-banner';
+  bn.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:10002;background:#2a1d05;border:1px solid #e0b44a;color:#f3d58a;border-radius:10px;padding:10px 12px;font-size:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap';
+  bn.innerHTML = '<span style="flex:1;min-width:200px">⚠ Your sign-in has expired, so changes on this device are not being backed up. Sign in again — nothing on this device is lost.</span><button class="btn-add-data" id="session-banner-btn">Sign in again</button>';
+  document.body.appendChild(bn);
+  document.getElementById('session-banner-btn').onclick = function() { bn.remove(); viReauth(); };
 }
 async function _freshAccessToken() {   // the saved token, renewed first if it has expired
   var tok = _localAccessToken();
