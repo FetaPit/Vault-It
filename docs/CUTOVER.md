@@ -44,6 +44,13 @@ into the SQL editor by the owner (the connector's confirmation prompt timed out 
   Email OTP length = 6 (or change the wording).
 - Not done yet: step 5 (`TURNSTILE_SECRET` + Supabase CAPTCHA) and step 6 (Stripe links).
 
+## Release 2026-10-28 14:23 UTC (`b77d3ad`, backup `backup/release-pioneer-v2-20261028-1352`)
+- Landing join form now calls the new `waitlist-welcome` function (deployed v1): saves the address and e-mails a welcome with the
+  app link from `hello@vault-it.co`. Live test: delivered within a second, but Gmail filed it under **Promotions**.
+- Direct-path session renewal (phones whose tab froze stopped syncing after an hour with 401s while looking signed in).
+- Build again started through the API: the GitHub push still does not trigger Workers Builds.
+- Known flaky test: `test_quick` fails intermittently on the live version too (not caused by these changes).
+
 ## Order of work (follow it — several steps depend on the one before)
 1. **Owner — Resend:** add `vault-it.co` in Resend (EU region) and pass on the records it shows. **Claude** adds them to Cloudflare DNS as DNS-only (DKIM TXT `resend._domainkey`, MX + SPF TXT on `send`),
    and sets `_dmarc` to `v=DMARC1; p=none; rua=mailto:hello@vault-it.co`. Wait for Resend to show "Verified".
