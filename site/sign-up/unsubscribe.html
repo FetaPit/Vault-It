@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex"><meta name="theme-color" content="#04090f"><title>Leave the list · Vault·It</title><link rel="stylesheet" href="style.css"></head>
+<body><header><div class="bar"><a class="logo" href="../sign-up">Vault<span>·</span>It</a></div></header>
+<main>
+  <div id="ask"><h1>Leave the Vault·It list?</h1><p>You’ll get no more beta or news emails from us. Your Vault·It account, if you have one, is not affected.</p><p><button class="btn" id="go" type="button">Yes, remove me</button></p></div>
+  <div id="wait" class="hide"><h1>Removing you…</h1></div>
+  <div id="done" class="hide"><h1>You’re off the list</h1><p>We won’t email you again about the beta or news. We keep just your address on a do-not-email list so it stays that way. Changed your mind? You can <a href="../sign-up">sign up again</a> at any time.</p></div>
+  <div id="bad" class="hide"><h1>That link didn’t work</h1><p>It may have been cut short by your email app. Email <a href="mailto:hello@vault-it.co">hello@vault-it.co</a> and we’ll remove you by hand.</p></div>
+  <div id="fail" class="hide"><h1>Something went wrong</h1><p class="err">We couldn’t remove you just now. Please try again in a few minutes, or email hello@vault-it.co.</p></div>
+</main>
+<footer>Vault·It is a product of PT Live Design, United Kingdom · <a href="mailto:hello@vault-it.co">hello@vault-it.co</a> · <a href="https://app.vault-it.co/?privacy=1">Privacy notice</a></footer>
+<script>
+var FN_URL = window.__VI_WAITLIST_URL || 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join', KEY = 'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz';
+function post(body) { return fetch(FN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify(body) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { s: r.status, b: b }; }); }); }
+function show(id) { document.getElementById('wait').className = 'hide'; document.getElementById(id).className = ''; }
+var q = new URLSearchParams(location.search), u = q.get('u') || '', s = q.get('s') || '';
+// Confirmed by a tap, not on page load, so link-scanning email filters cannot unsubscribe anyone.
+if (!/^[0-9a-f-]{36}$/i.test(u) || !/^[0-9a-f]{32}$/.test(s)) { document.getElementById('ask').className = 'hide'; document.getElementById('bad').className = ''; }
+document.getElementById('go').addEventListener('click', function () {
+  document.getElementById('ask').className = 'hide'; document.getElementById('wait').className = '';
+  post({ action: 'unsubscribe', id: u, sig: s }).then(function (r) { show(r.s === 200 && r.b.success ? 'done' : (r.s === 400 ? 'bad' : 'fail')); }).catch(function () { show('fail'); });
+});
+</script>
+</body></html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex"><meta name="theme-color" content="#04090f"><title>Confirm · Vault·It beta</title><link rel="stylesheet" href="style.css"></head>
+<body><header><div class="bar"><a class="logo" href="../sign-up">Vault<span>·</span>It</a></div></header>
+<main>
+  <div id="wait"><h1>Confirming…</h1><p>One moment.</p></div>
+  <div id="done" class="hide">
+    <h1>You’re on the list</h1>
+    <p>Thanks for confirming. You can start using the beta right now — it’s free, needs no card and never asks for your bank login.</p>
+    <p><a class="btn" href="https://app.vault-it.co/">Open the Vault·It beta</a></p>
+    <div class="card"><h2>Getting in</h2><ol>
+      <li>Enter the same email address and tap Continue.</li>
+      <li>Type the 6-digit code we email you.</li>
+      <li>Choose a 6-digit PIN — from then on, email + PIN signs you in on any device.</li>
+    </ol><p>Made-up figures are fine. Tell us what you find: just reply to any of our emails, or write to <a href="mailto:hello@vault-it.co">hello@vault-it.co</a>.</p></div>
+    <p id="leave" class="hide">Changed your mind? <a id="leave-link" href="#">Remove me from the list</a>.</p>
+  </div>
+  <div id="bad" class="hide">
+    <h1>That link didn’t work</h1>
+    <p>It may have been used already, be more than 7 days old, or have been cut short by your email app. If you already confirmed, you’re on the list — nothing more to do.</p>
+    <p><a class="btn" href="../sign-up">Sign up again</a></p>
+  </div>
+  <div id="fail" class="hide">
+    <h1>Something went wrong</h1>
+    <p class="err" id="fail-msg">We couldn’t confirm your place just now. Please try the link again in a few minutes.</p>
+  </div>
+</main>
+<footer>Vault·It is a product of PT Live Design, United Kingdom · <a href="mailto:hello@vault-it.co">hello@vault-it.co</a> · <a href="https://app.vault-it.co/?privacy=1">Privacy notice</a></footer>
+<script>
+var FN_URL = window.__VI_WAITLIST_URL || 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join', KEY = 'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz';
+function post(body) { return fetch(FN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify(body) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { s: r.status, b: b }; }); }); }
+function show(id) { document.getElementById('wait').className = 'hide'; document.getElementById(id).className = ''; }
+var t = new URLSearchParams(location.search).get('t') || '';
+if (!/^[A-Za-z0-9_-]{32,64}$/.test(t)) show('bad');
+else post({ action: 'confirm', token: t }).then(function (r) {
+  if (r.s === 200 && r.b.success) {
+    show('done');
+    if (r.b.unsubscribe && /^https:\/\/[^\s"<>]+$/.test(r.b.unsubscribe)) { document.getElementById('leave-link').href = r.b.unsubscribe; document.getElementById('leave').className = ''; }
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  } else if (r.s === 400 || r.s === 410) show('bad');
+  else { if (r.s === 429) document.getElementById('fail-msg').textContent = 'Too many tries from here. Please wait a few minutes and open the link again.'; show('fail'); }
+}).catch(function () { show('fail'); });
+</script>
+</body></html>

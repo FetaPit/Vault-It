@@ -128,3 +128,17 @@ Actions: `create` (preview shape, `auto_size` real-world metres, GLB) → `statu
 > Note (Oct 2026): the GitHub Action "Deploy Supabase Edge Functions" fails with `401 Invalid access token` —
 > the repository secret `SUPABASE_ACCESS_TOKEN` needs renewing (Supabase dashboard → Account → Access Tokens, then
 > GitHub → Settings → Secrets and variables → Actions). house-3d v1 was deployed directly on 20 Oct 2026.
+
+## waitlist-join
+
+The beta list behind `vault-it.co/sign-up` (migration `009_waitlist_optin.sql` must be applied first). Double opt-in: `join` stores a pending request and
+e-mails a confirmation link (`SITE_URL` + `sign-up/confirm?t=…`); `confirm` applies the person's choices (testing, marketing) and records the consent
+wording version and time; `unsubscribe` needs the HMAC-signed link from any of our e-mails. Limits per IP / overall / mailbox (`RATE_WAITLIST_*`) use
+`rate_hit` (migration 008); Turnstile is checked when `TURNSTILE_SECRET` is set (allowed hostnames `WAITLIST_TURNSTILE_HOSTNAMES`, default `vault-it.co`).
+Uses `RESEND_API_KEY`, `FROM_EMAIL`, `PIN_PEPPER` (signs unsubscribe links — never change it, or old links stop working).
+
+```
+supabase functions deploy waitlist-join --no-verify-jwt
+```
+Tests: `tests/test_waitlist_server.js` (function), `tests/test_009.mjs` (SQL on pglite), `tests/test_signup_page.js` (pages in a browser).
+

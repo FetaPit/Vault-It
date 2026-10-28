@@ -29,6 +29,10 @@ jobs:
             --project-ref legpubblzgknxdtvsant \
             --no-verify-jwt
 
+          supabase functions deploy waitlist-join \
+            --project-ref legpubblzgknxdtvsant \
+            --no-verify-jwt
+
           supabase functions deploy stock-quotes \
             --project-ref legpubblzgknxdtvsant \
             --no-verify-jwt

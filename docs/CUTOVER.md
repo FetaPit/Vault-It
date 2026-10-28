@@ -31,16 +31,18 @@ domains show nothing.
 1. **Owner — Resend:** add `vault-it.co` in Resend (EU region) and pass on the records it shows. **Claude** adds them to Cloudflare DNS as DNS-only (DKIM TXT `resend._domainkey`, MX + SPF TXT on `send`),
    and sets `_dmarc` to `v=DMARC1; p=none; rua=mailto:hello@vault-it.co`. Wait for Resend to show "Verified".
 2. **Owner yes → Claude: production Supabase** (all in one sitting, immediately before step 3, because the old app and the new functions do not match each other):
-   a. apply `007_security_hardening.sql`, then `008_auth_rate_limit.sql` (the functions fail open without 008);
-   b. deploy `pin-auth` and `send-auth-email`;
+   a. apply `007_security_hardening.sql`, then `008_auth_rate_limit.sql` (the functions fail open without 008), then `009_waitlist_optin.sql`
+      (beta list with double opt-in; it removes the public insert policy, so the **old** landing page's form stops working at that moment — do it together with step 3);
+   b. deploy `pin-auth`, `send-auth-email` and `waitlist-join` (all `--no-verify-jwt`);
    c. secrets: `APP_URL=https://app.vault-it.co/`, and — only once Resend shows the domain verified — `FROM_EMAIL="Vault·It <noreply@vault-it.co>"` (rollback: `onboarding@resend.dev`).
    Check with `list_migrations`, `list_edge_functions` and the advisors afterwards.
 3. **Release (Claude, when asked):** full test suite, create `backup/release-pioneer-v2-YYYYMMDD-HHMM`, fast-forward `release/pioneer-v2` to the tested `Pioneer_v3` commit. Workers Builds then deploys the Worker and
-   creates the custom domains and their DNS records; GitHub Pages keeps serving the old address, which now shows the "we've moved" banner. Never release before step 2: the released app calls `pin-auth` actions
+   creates the custom domains and their DNS records (vault-it.co and vault-it.co/sign-up then serve the new sign-up page, `docs/OFFER_AND_PRICING.md`); GitHub Pages keeps serving the old address, which now shows the "we've moved" banner. Never release before step 2: the released app calls `pin-auth` actions
    (`set`/`remove` with re-authentication, `delete`) that exist only in the new function.
-4. **Verify (Claude):** `https://app.vault-it.co/version.json` shows the new commit; `curl -sI https://app.vault-it.co/` for the headers; `http://` → `https://`; `www` → bare domain; the landing-page waitlist form.
+4. **Verify (Claude):** sign up on `https://vault-it.co/sign-up` with a `+tag` Gmail alias → confirmation e-mail → confirm → unsubscribe link works; `https://app.vault-it.co/version.json` shows the new commit; `curl -sI https://app.vault-it.co/` for the headers; `http://` → `https://`; `www` → bare domain; the landing-page waitlist form.
    A phone check: `https://vault-it.ptlived.workers.dev/version.json`.
 5. **Turn on the human check — in this order, after step 3** (the client with the site key is then live on both allowed addresses):
+   0. Add `vault-it.co` to the Turnstile widget's allowed sites (Claude, through the Cloudflare connector), so the sign-up page can get tokens.
    a. Set the Supabase secret `TURNSTILE_SECRET` (the widget's secret — Claude can read it through the Cloudflare connector). From now on `send-auth-email` refuses requests without a valid token.
    b. **Owner (Supabase dashboard):** Authentication → Attack Protection → enable CAPTCHA → Turnstile → paste the same secret. This closes Supabase's own public sign-in endpoint (`/auth/v1/otp`), which would otherwise
       still send codes to a script that skips our function.
