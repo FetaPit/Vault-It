@@ -929,12 +929,26 @@ if(wForm){
     wMsg.textContent='Joining…';
     wMsg.style.color='var(--muted)';
     try{
-      if(supa){
+      // The server saves the address and e-mails the beta link (waitlist-welcome). If it cannot be reached, save the address directly.
+      var emailed=false, fn=null;
+      try{
+        var ctl=new AbortController(), tm=setTimeout(function(){ctl.abort();},12000);
+        fn=await fetch(SUPA_URL+'/functions/v1/waitlist-welcome',{method:'POST',signal:ctl.signal,
+          headers:{'content-type':'application/json',apikey:SUPA_KEY,authorization:'Bearer '+SUPA_KEY},body:JSON.stringify({email:email})});
+        clearTimeout(tm);
+      }catch(_){fn=null;}
+      if(fn&&fn.status===400){wMsg.textContent='That email address doesn\u2019t look right.';wMsg.style.color='var(--red)';return;}
+      if(fn&&fn.status===429){wMsg.textContent='Too many tries from here. Please wait a while, or open the app below.';wMsg.style.color='var(--muted)';}
+      else if(fn&&fn.ok){var fj=await fn.json().catch(function(){return {};});emailed=!!fj.emailed;}
+      else{
+        if(!supa) throw new Error('offline');
         var res = await supa.from('waitlist').insert([{email:email}]);
         if(res.error && res.error.code!=='23505'){throw res.error;}
       }
-      // Joining the list sends no e-mail, so point straight at the app: that is where the sign-in code comes from.
-      wMsg.textContent="\u2728 You\u2019re on the list. Want to try the beta now? ";
+      // Point straight at the app either way: that is where the sign-in code comes from.
+      if(!(fn&&fn.status===429)) wMsg.textContent=emailed
+        ? "\u2728 You\u2019re in! We\u2019ve emailed you your beta link. Or start now: "
+        : "\u2728 You\u2019re on the list. Want to try the beta now? ";
       var go=document.createElement('a');
       go.href='https://app.vault-it.co/'; go.id='waitlistOpenApp';
       go.textContent='Open the app \u2192';

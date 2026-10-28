@@ -37,6 +37,10 @@ jobs:
             --project-ref legpubblzgknxdtvsant \
             --no-verify-jwt
 
+          supabase functions deploy waitlist-welcome \
+            --project-ref legpubblzgknxdtvsant \
+            --no-verify-jwt
+
           supabase functions deploy portfolio-vision \
             --project-ref legpubblzgknxdtvsant \
             --no-verify-jwt

@@ -77,6 +77,15 @@ If the Edge Function is not deployed or fails (5xx / timeout), the app falls bac
 Supabase's built-in `signInWithOtp` (only while the human check is **off**; with it on there is no fallback) (rate-limited to ~4 emails/hour per project). It does **not** fall back when our own limit says 429.
 
 
+## waitlist-welcome
+
+The landing page's join form. `POST { email }` saves the address to `public.waitlist` (a repeat address is not an error and gets the
+same answer) and e-mails a short welcome with the beta link, from `hello@vault-it.co` with replies to `hello@vault-it.co`
+(`WELCOME_FROM`, `WELCOME_REPLY_TO`, `APP_URL` override). Limits through `rate_hit` (migration 008): 20 an hour per IP, 3 a day per
+mailbox (+tags and Gmail dots count as one), 100 an hour overall (`RATE_WL_*`). If the e-mail cannot be sent the address is still
+saved and the answer says `emailed: false`; if the function is unreachable the page saves the address directly.
+Deploy: `supabase functions deploy waitlist-welcome --no-verify-jwt`. Needs `RESEND_API_KEY` and the `vault-it.co` domain verified in Resend.
+
 ## pin-auth
 
 Email + PIN sign-in for returning users on any device.

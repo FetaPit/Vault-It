@@ -5,7 +5,7 @@ UK personal-finance single-file PWA. Owner: Pete (FetaPit). App: **https://app.v
 ## Where things are
 - `index.html` — the whole app (CSS, JS, markup). The 3D House Builder engine is embedded from `src/hb3d/*` by `node tools/build_hb3d.js` (re-run after editing `src/hb3d`).
 - `landing.html` (marketing + waitlist), `recover.html`.
-- `supabase/functions/*` — Deno edge functions (`pin-auth`, `send-auth-email`, `portfolio-vision`, `stock-quotes`, `house-3d`); `supabase/migrations/*.sql`; `supabase/functions/README.md`.
+- `supabase/functions/*` — Deno edge functions (`pin-auth`, `send-auth-email`, `waitlist-welcome`, `portfolio-vision`, `stock-quotes`, `house-3d`); `supabase/migrations/*.sql`; `supabase/functions/README.md`.
 - `tests/` — Playwright/logic tests (`tests/README.md`). `docs/` — specs, `BETA_RUNBOOK.md`, `TESTER_GUIDE.md`.
 - Supabase project `legpubblzgknxdtvsant` (eu-central-1, Frankfurt).
 
