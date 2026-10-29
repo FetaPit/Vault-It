@@ -3,9 +3,10 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
 let src=fs.readFileSync('/home/user/Vault-It/supabase/functions/portfolio-vision/index.ts','utf8');
 src=src.replace(/import \{ createClient \} from [^\n]+\n/,'const createClient=globalThis.__createClient;\n');
 const js=esbuild.transformSync(src,{loader:'ts',format:'cjs'}).code;
-let spent=0,cap=30,anthropicCalls=0,lastBody=null,env={SUPABASE_URL:'http://x',SUPABASE_SERVICE_ROLE_KEY:'svc',ANTHROPIC_API_KEY:'sk-test'};
+let spent=0,cap=30,plan={is_pioneer:true,is_founder:false},anthropicCalls=0,lastBody=null,env={SUPABASE_URL:'http://x',SUPABASE_SERVICE_ROLE_KEY:'svc',ANTHROPIC_API_KEY:'sk-test'};
 globalThis.__createClient=()=>({auth:{getUser:async j=>j==='good'?{data:{user:{id:'u1'}},error:null}:{data:{user:null},error:{message:'x'}}},
-  rpc:async(fn,a)=>{if(fn!=='vision_take')return{};if(spent+a.p_cost>a.p_max)return{data:false};spent+=a.p_cost;return{data:true};}});
+  rpc:async(fn,a)=>{if(fn!=='vision_take_month')return{};if(a.p_cost>0&&spent+a.p_cost>a.p_max)return{data:false};spent+=a.p_cost;return{data:true};},
+  from:t=>({select:()=>({eq:()=>({maybeSingle:async()=>({data:t==='profiles'?plan:null,error:null})})})})});
 globalThis.Deno={env:{get:k=>env[k]},serve:h=>{globalThis.__h=h;}};
 globalThis.fetch=async(url,opt)=>{
   if(String(url).includes('api.anthropic.com')){anthropicCalls++;lastBody=JSON.parse(opt.body);
@@ -39,7 +40,14 @@ const img={media_type:'image/jpeg',data:'QUJD'};
     spent=0; r=await call({images:[img]}); ok(spent===0,'a failed read is refunded'); ok(r.s===502&&r.b.upstream===400&&/credit balance/.test(r.b.detail)&&!JSON.stringify(r.b).includes('sk-test'),'upstream failure explains why (never the key): '+JSON.stringify(r.b)); globalThis.fetch=real; }
   { const real=globalThis.fetch; globalThis.fetch=async(u,o)=>String(u).includes('anthropic')?new Response(JSON.stringify({content:[{type:'text',text:'Here you go:\n'+JSON.stringify({portfolio:'P',holdings:[{name:'Figma',value:277.79}]})}]}),{status:200}):real(u,o);
     spent=0; r=await call({images:[img]}); ok(r.s===200&&r.b.holdings.length===1&&r.b.holdings[0].name==='Figma','JSON-in-text reply is accepted as a fallback'); globalThis.fetch=real; }
-  spent=29; r=await call({images:[img,img]}); ok(r.s===429&&r.b.error==='limit'&&anthropicCalls===1,'daily cap blocks before any model call');
+  { const real=globalThis.fetch; globalThis.fetch=async(u,o)=>String(u).includes('anthropic')?new Response(JSON.stringify({content:[{type:'text',text:'sorry, no table here'}]}),{status:200}):real(u,o);
+    spent=0; r=await call({images:[img]}); ok(r.s===422&&spent===1,'a billed reply we could not use still counts (no refund leak)'); globalThis.fetch=real; }
+  const calls0=anthropicCalls;
+  spent=29; r=await call({images:[img,img]}); ok(r.s===429&&r.b.error==='limit'&&r.b.allowance===30&&anthropicCalls===calls0,'Pioneer: 30 a month, blocks before any model call');
+  plan={is_pioneer:false,is_founder:false}; spent=2; r=await call({images:[img,img]}); ok(r.s===429&&r.b.allowance===3,'free: 3 a month');
+  spent=2; r=await call({images:[img]}); ok(r.s===200,'free: the 3rd read is allowed');
+  plan={is_pioneer:true,is_founder:true}; spent=9; r=await call({images:[img,img]}); ok(r.s===429&&r.b.allowance===10,'Founding Member: 10 a month (claiming founder never raises the allowance)');
+  plan=null; spent=3; r=await call({images:[img]}); ok(r.s===429&&r.b.allowance===3,'unknown plan: the free allowance');
   env.ANTHROPIC_API_KEY=''; new Function('require','module','exports',js)(require,{exports:{}},{}); r=await call({images:[img]}); ok(r.s===503&&r.b.error==='not_configured','no API key → 503 not_configured');
   r=await call(null,'good','GET'); ok(r.s===405,'GET refused');
   console.log(fails?'FAILURES '+fails:'ALL PASSED');

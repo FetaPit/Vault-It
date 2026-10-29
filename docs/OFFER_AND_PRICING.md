@@ -98,3 +98,16 @@ The UK market has also shrunk: Money Dashboard closed in 2023 and Moneyhub's con
 5. Mailing tool: the build keeps the list in Supabase and sends via Resend (no new processor). Resend's free 100 emails/day is shared with sign-in codes, so upgrade to Resend Pro before running ads. Kit was checked: the account has 0 subscribers and a lapsed trial.
 6. The "One Source Alpha" page couldn't be identified (closest match is a B2B Web3 early-access programme by OneSource). Send the link if you want it compared.
 7. ICO fee: £52/year (tier 1), if not already paid.
+
+## 7. Decided by Pete (29 Oct 2026)
+- Release the sign-up page (migration 009 + `waitlist-join` + release).
+- Pioneer **£5.99/month, £49.99/year**. The old £59.99 annual link is retired in the app. Until the new £49.99 Payment Link is pasted into
+  `VI_STRIPE_LINKS.annual` (index.html), the annual buttons say the plan opens shortly instead of charging the old price.
+- **Founding Member £149 once, 100 places.** Create the Payment Link with Stripe's "limit the number of payments" set to 100, so the cap is real, and
+  paste it into `VI_STRIPE_LINKS.founder`. Until then the button says it opens to beta testers first. Mark founders with `profiles.is_founder = true`.
+- AI screenshot reader: **monthly** allowance, free 3 / Pioneer 30 / Founding Member 10 (migration 010, `portfolio-vision`). A billed but unreadable reply is no longer refunded.
+  Paid status (`is_pioneer`) is still set by the app itself, so someone could claim 30 reads a month; a Stripe webhook would close that.
+- Removed from the app: the celebrity "advisor" cards, the "was £11.99 / £119.99" prices, "50% off forever", the 7-day discount ladder, the "spots left" countdown and "invest" wording.
+- Trader address: PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ (page footers, e-mails, privacy notice).
+- Resend stays on the free plan for now, so **no paid ads yet** (100 e-mails/day shared with sign-in codes).
+- Still in the app, for Pete to decide: the Network tab's "Founding Master Licence £7.77" with a Shibarium NFT card and "33 founding slots" contradicts the £149 offer. It cannot be bought without a pasted link, but it should go or be reworded before the founding offer opens.

@@ -5,12 +5,12 @@
 //   → { portfolio, accountValue, holdings: [{ name, ticker, value, shares, pl, weightPct,
 //                                              candidates: [{ symbol, name, exchange, type }] }] }
 //
-// Needs the caller's own Supabase session JWT (signed-in users only), is capped per user per day
-// (migration 005_vision_usage.sql), and the screenshots are never stored. Live prices and the
+// Needs the caller's own Supabase session JWT (signed-in users only), is capped per user per calendar month by plan
+// (migrations 005 + 010: free 3, Pioneer 30, Founding Member 10 images), and the screenshots are never stored. Live prices and the
 // shares-from-value maths happen in the app via the stock-quotes function.
 //
 // Secrets: ANTHROPIC_API_KEY (required), VISION_MODEL (optional, default claude-sonnet-5-5),
-//          VISION_DAILY_CAP (optional, default 30 images per user per day).
+//          VISION_MONTHLY_FREE / VISION_MONTHLY_PIONEER / VISION_MONTHLY_FOUNDER (optional, defaults 3 / 30 / 10).
 // Deploy with --no-verify-jwt (the function checks the user's token itself).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -20,7 +20,8 @@ const SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const API_KEY      = Deno.env.get('ANTHROPIC_API_KEY') ?? ''
 const MODEL        = Deno.env.get('VISION_MODEL') ?? 'claude-sonnet-5-5'
 const WORKSPACE    = Deno.env.get('ANTHROPIC_WORKSPACE_ID') ?? ''   // only needed when the API key is not scoped to one workspace
-const DAILY_CAP    = parseInt(Deno.env.get('VISION_DAILY_CAP') ?? '30', 10) || 30
+const cap = (k: string, d: number) => { const n = parseInt(Deno.env.get(k) ?? '', 10); return n >= 0 ? n : d }
+const MONTHLY = { free: cap('VISION_MONTHLY_FREE', 3), pioneer: cap('VISION_MONTHLY_PIONEER', 30), founder: cap('VISION_MONTHLY_FOUNDER', 10) }
 const MAX_IMAGES   = 4
 const MAX_B64      = 2_800_000            // ≈ 2 MB per image after base64
 const TYPES        = ['image/jpeg', 'image/png', 'image/webp']
@@ -111,11 +112,17 @@ async function handle(req: Request): Promise<Response> {
     if (im.data.length > MAX_B64) return json({ error: 'too_large' }, 413)
   }
 
-  const { data: allowed } = await admin.rpc('vision_take', { p_user: u.user.id, p_cost: images.length, p_max: DAILY_CAP })
-  if (allowed === false) return json({ error: 'limit', message: 'Daily screenshot limit reached — try again tomorrow.' }, 429)
+  // Allowance by plan. Founding Member wins over Pioneer (it is the smaller allowance, so claiming it never gains anything).
+  let max = MONTHLY.free
+  try {
+    const { data: p } = await admin.from('profiles').select('is_pioneer, is_founder').eq('id', u.user.id).maybeSingle()
+    max = p?.is_founder ? MONTHLY.founder : p?.is_pioneer ? MONTHLY.pioneer : MONTHLY.free
+  } catch { /* unknown plan: the free allowance */ }
+  const { data: allowed } = await admin.rpc('vision_take_month', { p_user: u.user.id, p_cost: images.length, p_max: max })
+  if (allowed === false) return json({ error: 'limit', allowance: max, message: max ? `You've used this month's ${max} screenshot reads — they reset on the 1st.` : 'Screenshot reading is part of the paid plans.' }, 429)
 
-  // a read that produced nothing doesn't count against the daily allowance
-  const refund = async () => { try { await admin.rpc('vision_take', { p_user: u.user.id, p_cost: -images.length, p_max: DAILY_CAP }) } catch { /* best effort */ } }
+  // Only a read the AI service never billed is given back (it failed or could not be reached). A reply we could not use was still billed.
+  const refund = async () => { try { await admin.rpc('vision_take_month', { p_user: u.user.id, p_cost: -images.length, p_max: max }) } catch { /* best effort */ } }
   let result: any
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -146,7 +153,7 @@ async function handle(req: Request): Promise<Response> {
       if (m) { try { result = JSON.parse(m[0]) } catch { /* unreadable */ } }
     }
   } catch (e) { console.error('anthropic fetch failed', String(e)); await refund(); return json({ error: 'vision_failed', detail: 'could not reach the AI service' }, 502) }
-  if (!result || !Array.isArray(result.holdings)) { await refund(); return json({ error: 'unreadable' }, 422) }
+  if (!result || !Array.isArray(result.holdings)) return json({ error: 'unreadable' }, 422)
 
   const num = (v: unknown) => (typeof v === 'number' && isFinite(v) ? v : null)
   const rows = result.holdings.filter((h: any) => h && typeof h.name === 'string' && h.name.trim()).slice(0, 60)

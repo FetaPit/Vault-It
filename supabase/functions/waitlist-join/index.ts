@@ -102,7 +102,7 @@ function confirmHtml(email: string, link: string, unsub: string, testing: boolea
 <p style="margin:0 0 26px;text-align:center"><a href="${l}" style="display:inline-block;background:#c9a84c;color:#04090f;text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:10px">Confirm my place</a></p>
 <p style="margin:0 0 8px;font-size:12px;color:rgba(255,255,255,.45);line-height:1.6">The link works for 7 days. If you did not ask for this, ignore this e-mail: you will not hear from us again and the request is deleted after 30 days.</p>
 </td></tr>
-<tr><td style="padding:16px 36px 26px;border-top:1px solid rgba(68,192,185,.08)"><p style="margin:0;font-size:11px;color:rgba(255,255,255,.35);line-height:1.6">Vault·It is run by PT Live Design, United Kingdom · <a href="mailto:hello@vault-it.co" style="color:rgba(68,192,185,.8)">hello@vault-it.co</a> · <a href="${u}" style="color:rgba(68,192,185,.8)">Remove me from the list</a></p></td></tr>
+<tr><td style="padding:16px 36px 26px;border-top:1px solid rgba(68,192,185,.08)"><p style="margin:0;font-size:11px;color:rgba(255,255,255,.35);line-height:1.6">Vault·It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5 7EQ · <a href="mailto:hello@vault-it.co" style="color:rgba(68,192,185,.8)">hello@vault-it.co</a> · <a href="${u}" style="color:rgba(68,192,185,.8)">Remove me from the list</a></p></td></tr>
 </table></td></tr></table></body></html>`
 }
 
@@ -176,7 +176,7 @@ Deno.serve(async (req: Request) => {
     body: JSON.stringify({
       from: FROM_EMAIL, to: [email], subject: 'Confirm your place on the Vault·It beta list',
       html: confirmHtml(email, link, unsub, testing),
-      text: `Confirm your place on the Vault·It beta list: ${link}\n\nThe link works for 7 days. If you did not ask for this, ignore this e-mail.\nRemove me: ${unsub}\n\nVault·It is run by PT Live Design, United Kingdom · hello@vault-it.co`,
+      text: `Confirm your place on the Vault·It beta list: ${link}\n\nThe link works for 7 days. If you did not ask for this, ignore this e-mail.\nRemove me: ${unsub}\n\nVault·It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ · hello@vault-it.co`,
       headers: { 'List-Unsubscribe': `<${unsub}>` },
     }),
   })
