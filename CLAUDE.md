@@ -5,7 +5,7 @@ UK personal-finance single-file PWA. Owner: Pete (FetaPit). App: **https://app.v
 ## Where things are
 - `index.html` — the whole app (CSS, JS, markup). The 3D House Builder engine is embedded from `src/hb3d/*` by `node tools/build_hb3d.js` (re-run after editing `src/hb3d`).
 - `landing.html` = the sign-up page served at vault-it.co and vault-it.co/sign-up; its confirm / thanks / unsubscribe pages and images are in `site/`; beta list = `waitlist-join` function + migration 009 (double opt-in). Offer, prices and funnel decisions: `docs/OFFER_AND_PRICING.md` (research with sources in `docs/research/`). `recover.html`.
-- `supabase/functions/*` — Deno edge functions (`pin-auth`, `send-auth-email`, `waitlist-join`, `portfolio-vision`, `stock-quotes`, `house-3d`); `supabase/migrations/*.sql`; `supabase/functions/README.md`.
+- `supabase/functions/*` — Deno edge functions (`pin-auth`, `send-auth-email`, `waitlist-join`, `waitlist-welcome` (the older single-step join, kept until the double opt-in page is live), `portfolio-vision`, `stock-quotes`, `house-3d`); `supabase/migrations/*.sql`; `supabase/functions/README.md`.
 - `tests/` — Playwright/logic tests (`tests/README.md`). `docs/` — specs, `BETA_RUNBOOK.md`, `TESTER_GUIDE.md`.
 - Supabase project `legpubblzgknxdtvsant` (eu-central-1, Frankfurt).
 

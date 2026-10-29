@@ -1,0 +1,131 @@
+// waitlist-welcome — the landing page's "Join" form.
+//   POST { email }  → { ok: true, emailed: boolean }   |  400 invalid  |  429 { error: 'rate_limited', retryAfter }
+// Saves the address to public.waitlist (service role; a repeat address is not an error) and e-mails a short welcome with the
+// link to the beta. The answer is the same whether or not the address was already on the list, so it reveals nothing.
+// Abuse limits per IP, per mailbox and overall (rate_hit, migration 008) stop it being used to flood an inbox.
+// If the e-mail cannot be sent the address is still saved and the page still shows the app link.
+// Deploy with --no-verify-jwt (the landing page calls it with the public key).
+
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const RESEND_API_KEY       = Deno.env.get('RESEND_API_KEY') ?? ''
+const SUPABASE_URL         = Deno.env.get('SUPABASE_URL') ?? ''
+const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+const WELCOME_FROM         = Deno.env.get('WELCOME_FROM') ?? 'Vault·It <hello@vault-it.co>'
+const REPLY_TO             = Deno.env.get('WELCOME_REPLY_TO') ?? 'hello@vault-it.co'
+const APP_URL              = Deno.env.get('APP_URL') ?? 'https://app.vault-it.co/'
+const PEPPER               = Deno.env.get('PIN_PEPPER') ?? SUPABASE_SERVICE_KEY   // counter keys are salted hashes, never raw e-mails / IPs
+
+const num = (k: string, d: number) => { const n = parseInt(Deno.env.get(k) ?? '', 10); return n > 0 ? n : d }
+const LIMIT_IP_PER_HOUR     = num('RATE_WL_IP_PER_HOUR', 20)
+const LIMIT_ADDR_PER_DAY    = num('RATE_WL_ADDR_PER_DAY', 3)
+const LIMIT_GLOBAL_PER_HOUR = num('RATE_WL_GLOBAL_PER_HOUR', 100)
+const EMAIL_RE = /^[A-Za-z0-9._%+'-]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/
+
+const CORS = {
+  'Access-Control-Allow-Origin':  '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
+const json = (body: unknown, status = 200, extra: Record<string, string> = {}) =>
+  new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json', ...extra } })
+
+async function keyOf(scope: string, id: string): Promise<string> {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${PEPPER}|${scope}|${id}`))
+  return scope + ':' + [...new Uint8Array(d)].slice(0, 16).map((x) => x.toString(16).padStart(2, '0')).join('')
+}
+function ipKey(ip: string): string {   // IPv4 as is, IPv6 as its /64
+  const m4 = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i); if (m4) return m4[1]
+  if (!ip.includes(':')) return ip
+  const [head, tail] = ip.split('::'); const h = head ? head.split(':') : []; const t = tail ? tail.split(':') : []
+  const groups = tail === undefined ? h : [...h, ...Array(Math.max(0, 8 - h.length - t.length)).fill('0'), ...t]
+  return groups.slice(0, 4).map((g) => g.padStart(4, '0')).join(':') + '/64'
+}
+function clientIp(req: Request): string {
+  return ipKey(req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown')
+}
+function mailbox(email: string): string {   // +tags, Gmail dots and googlemail.com all land in one inbox: one budget
+  let [local, domain] = email.split('@')
+  local = local.split('+')[0]
+  if (domain === 'googlemail.com') domain = 'gmail.com'
+  if (domain === 'gmail.com') local = local.replace(/\./g, '')
+  return `${local}@${domain}`
+}
+
+function welcomeHtml(): string {
+  const app = APP_URL.replace(/[&<>"']/g, '')
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>You're in — Vault·It beta</title></head>
+<body style="margin:0;padding:0;background:#04090f;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#04090f;padding:40px 20px">
+  <tr><td align="center">
+    <table width="520" cellpadding="0" cellspacing="0" style="background:#060d16;border:1px solid rgba(68,192,185,.18);border-radius:16px;overflow:hidden;max-width:520px;width:100%">
+      <tr><td style="padding:32px 40px 22px;text-align:center;border-bottom:1px solid rgba(68,192,185,.12)">
+        <div style="font-size:22px;font-weight:800;letter-spacing:.12em;color:#c9a84c">VAULT·IT</div>
+      </td></tr>
+      <tr><td style="padding:32px 40px">
+        <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#f0f4f8;line-height:1.3">You're in.</h1>
+        <p style="margin:0 0 14px;font-size:15px;color:rgba(255,255,255,.7);line-height:1.6">Thanks for joining Vault·It. The beta is open, so you can start now.</p>
+        <p style="margin:0 0 26px;font-size:15px;color:rgba(255,255,255,.7);line-height:1.6">Open the app and sign in with this e-mail address. We'll send you a code, then you choose a PIN.</p>
+        <table cellpadding="0" cellspacing="0" style="margin:0 auto 26px"><tr><td style="background:#c9a84c;border-radius:10px">
+          <a href="${app}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:700;color:#04090f;text-decoration:none">Open Vault·It &rarr;</a>
+        </td></tr></table>
+        <p style="margin:0;font-size:14px;color:rgba(255,255,255,.6);line-height:1.6">Anything confusing or broken, just reply to this e-mail.<br>Pete</p>
+      </td></tr>
+      <tr><td style="padding:18px 40px 26px;border-top:1px solid rgba(68,192,185,.08);text-align:center">
+        <p style="margin:0;font-size:11px;color:rgba(255,255,255,.25)">You're getting this because this address joined the Vault·It waitlist. To be removed, reply "remove".</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`
+}
+const welcomeText = () => `You're in.\n\nThanks for joining Vault·It. The beta is open, so you can start now.\n\nOpen the app and sign in with this e-mail address. We'll send you a code, then you choose a PIN.\n\n${APP_URL}\n\nAnything confusing or broken, just reply to this e-mail.\nPete\n\nYou're getting this because this address joined the Vault·It waitlist. To be removed, reply "remove".`
+
+Deno.serve(async (req: Request) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
+  if (req.method !== 'POST') return json({ error: 'method' }, 405)
+  if (!SUPABASE_SERVICE_KEY) return json({ error: 'server' }, 500)
+
+  let email: string
+  try {
+    const body = await req.json()
+    email = String(body.email ?? '').trim().toLowerCase()
+  } catch { return json({ error: 'bad_request' }, 400) }
+  if (!email || email.length > 254 || !EMAIL_RE.test(email)) return json({ error: 'invalid_email' }, 400)
+
+  const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
+  // 0 = allowed, otherwise seconds to wait; a limiter outage lets the request through (logged) rather than losing sign-ups
+  const limited = async (scope: string, id: string, limit: number, windowSecs: number): Promise<number> => {
+    try {
+      const { data, error } = await admin.rpc('rate_hit', { p_key: await keyOf(scope, id), p_limit: limit, p_window_secs: windowSecs })
+      if (error) { console.error('rate_hit failed:', error.message); return 0 }
+      const row = Array.isArray(data) ? data[0] : data
+      return row && row.allowed === false ? Math.max(1, Number(row.retry_after) || 60) : 0
+    } catch (e) { console.error('rate_hit threw:', e); return 0 }
+  }
+  const wait = (await limited('wl-ip', clientIp(req), LIMIT_IP_PER_HOUR, 3600))
+            || (await limited('wl-all', 'all', LIMIT_GLOBAL_PER_HOUR, 3600))
+            || (await limited('wl-addr', mailbox(email), LIMIT_ADDR_PER_DAY, 86400))
+  if (wait) return json({ error: 'rate_limited', retryAfter: wait }, 429, { 'Retry-After': String(wait) })
+
+  const { error: insErr } = await admin.from('waitlist').insert({ email, source: 'landing' })
+  if (insErr && insErr.code !== '23505') { console.error('waitlist insert failed:', insErr.message); return json({ error: 'server' }, 500) }
+
+  let emailed = false
+  if (RESEND_API_KEY) {
+    try {
+      const r = await fetch('https://api.resend.com/emails', {
+        method: 'POST', headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: WELCOME_FROM, to: [email], reply_to: REPLY_TO, subject: "You're in — your Vault·It beta link", html: welcomeHtml(), text: welcomeText() }),
+        signal: AbortSignal.timeout(8000),
+      })
+      emailed = r.ok
+      if (!r.ok) console.error('Resend error:', await r.json().catch(() => ({})))
+    } catch (e) { console.error('Resend failed:', e) }
+  } else console.error('RESEND_API_KEY not set: welcome e-mail skipped')
+
+  return json({ ok: true, emailed })
+})

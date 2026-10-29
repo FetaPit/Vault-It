@@ -43,7 +43,7 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
   ok(await page.evaluate(() => document.getElementById('marketing').checked === false && document.getElementById('testing').checked === true), 'the marketing box starts unticked');
   ok(await page.evaluate(() => !!document.querySelector('label[for=email]')), 'the email field has a label');
   ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scrolling on a phone');
-  ok(await page.evaluate(() => [...document.images].every((i) => i.complete && i.naturalWidth > 0)), 'images load');
+  ok(await page.evaluate(async () => { for (const i of document.images) { i.loading = 'eager'; if (!i.complete) await new Promise((r) => { i.onload = i.onerror = r; }); } return [...document.images].every((i) => i.naturalWidth > 0); }), 'every image loads');
   await page.screenshot({ path: path.join(ROOT, 'shots', 'signup_mobile.png'), fullPage: false });
 
   // bad address: nothing sent

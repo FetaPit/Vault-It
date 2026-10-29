@@ -23,9 +23,43 @@ repo `FetaPit/Vault-It` connected to Worker `vault-it` (Workers Builds, build `n
 **`release/pioneer-v2`** (the first build on `main` failed because `main` has no site build). Until the release below, builds of that branch fail, so the Worker is still the placeholder and the custom
 domains show nothing.
 
-**Production Supabase has NOT been updated yet** (checked 2026-10-27 against the live project, not assumed): `list_migrations` stops at `vision_usage_screenshot_cap`, there is no `auth_rate` table or
-`rate_hit` / `erase_user_data` function (migration 008), `anon` can still execute `handle_new_user`, `rls_auto_enable` and `waitlist_count` (migration 007), and the deployed `send-auth-email` (v6) and
-`pin-auth` (v4) are the old ones. Re-check with `list_migrations` and `get_edge_function` before relying on any line that says "applied".
+**Production Supabase updated on 2026-10-27** (checked against the live project afterwards): migration 007 applied through the connector; 008 pasted
+into the SQL editor by the owner (the connector's confirmation prompt timed out three times), so `list_migrations` shows 007 but not 008 — `auth_rate`,
+`rate_hit` and `erase_user_data` exist. `send-auth-email` v8 and `pin-auth` v5 are deployed from `Pioneer_v3` and match the repo. Resend's records
+(DKIM `resend._domainkey`, `send` + `rsend-euw1` CNAMEs, EU region) were added by Resend's Cloudflare auto-configure. Still to set: `FROM_EMAIL`
+(once Resend shows Verified); `APP_URL` is optional (the code's default is `https://app.vault-it.co/`).
+
+## Live since 2026-10-27 18:04 UTC (verified 22:10)
+- Released `208b85b` (backup `backup/release-pioneer-v2-20261027-1803`). The GitHub push did **not** start a Workers build (no build or preview build
+  appears for any push since the repo was connected), so the production build was started through the API; the GitHub → Cloudflare link needs checking
+  (GitHub → Settings → Applications → Cloudflare Workers and Pages → repository access must include `Vault-It`). Manual builds carry no commit hash, so
+  `version.json` shows the branch name.
+- Custom domains `app.vault-it.co`, `vault-it.co`, `www.vault-it.co` attached with certificates; headers (HSTS, frame-ancestors, nosniff, referrer,
+  permissions) present; `http://` and `www` reach the right site; `/landing/…` on the app host is 404.
+- Resend domain `vault-it.co` verified (the first auto-configure added DNS records but not the domain itself — it had to be added in Resend again);
+  `FROM_EMAIL` set. Live test with a `+tag` Gmail alias: code e-mail from `noreply@vault-it.co` arrived in the inbox (not spam); code verified; weak PIN refused;
+  PIN set; wrong PIN counted; PIN sign-in issued a token; data saved and read back; delete with wrong PIN refused, with right PIN erased the login, profile,
+  data, history and PIN (checked in the database); `auth_rate` is counting.
+- The sign-in code is **8 digits** (Supabase's OTP length), while the app and `TESTER_GUIDE.md` say 6. Owner: Authentication → Sign In / Providers → Email →
+  Email OTP length = 6 (or change the wording).
+- Not done yet: step 5 (`TURNSTILE_SECRET` + Supabase CAPTCHA) and step 6 (Stripe links).
+
+## Release 2026-10-28 14:23 UTC (`b77d3ad`, backup `backup/release-pioneer-v2-20261028-1352`)
+- Landing join form now calls the new `waitlist-welcome` function (deployed v1): saves the address and e-mails a welcome with the
+  app link from `hello@vault-it.co`. Live test: delivered within a second, but Gmail filed it under **Promotions**.
+- Direct-path session renewal (phones whose tab froze stopped syncing after an hour with 401s while looking signed in).
+- Build again started through the API: the GitHub push still does not trigger Workers Builds.
+- Known flaky test: `test_quick` fails intermittently on the live version too (not caused by these changes).
+
+## Next release: the sign-up page (`vault-it.co/sign-up`, double opt-in) — needs the owner's yes
+Built and tested on `Pioneer_v3`, not deployed. It replaces the live `waitlist-welcome` join (which saves and e-mails straight away, with no consent box
+and no check that the address belongs to the person typing it). Plan and reasons: `docs/OFFER_AND_PRICING.md`. In one sitting:
+1. Apply `009_waitlist_optin.sql` (removes the browser's insert right; existing rows become `legacy` — not on the marketing list).
+2. Deploy `waitlist-join` (`--no-verify-jwt`). Optional secret `SITE_URL` (default `https://vault-it.co/`).
+3. Release (suite, backup branch, fast-forward). Once 009 is applied the old page's direct-insert fallback stops working, so release straight after.
+4. Verify on a phone: `/sign-up` → confirmation e-mail → `/sign-up/confirm` → app link → the e-mail's "Remove me" link → `/sign-up/unsubscribe`.
+5. Then add `vault-it.co` to the Turnstile widget's allowed sites before `TURNSTILE_SECRET` is set (step 5 below).
+6. Upgrade Resend before running ads (the free 100 e-mails/day is shared with sign-in codes). `waitlist-welcome` can be deleted once nothing calls it.
 
 ## Order of work (follow it — several steps depend on the one before)
 1. **Owner — Resend:** add `vault-it.co` in Resend (EU region) and pass on the records it shows. **Claude** adds them to Cloudflare DNS as DNS-only (DKIM TXT `resend._domainkey`, MX + SPF TXT on `send`),

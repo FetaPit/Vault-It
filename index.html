@@ -15993,14 +15993,18 @@ async function _upsertRows(rows) {
     if (!r) { _sjsStalled = true; _lastSyncErr = 'connection stalled'; } else { _lastSyncErr = String((r.error && (r.error.message || r.error.code)) || 'rejected'); return false; }
   }
   try {   // supabase-js stalled or failed: write straight to the REST API with the saved session token
-    var tok = _localAccessToken(); if (!tok) { _lastSyncErr = 'not signed in'; return false; }
-    var ctl = new AbortController(), t = setTimeout(function() { ctl.abort(); }, 15000);
-    var res = await fetch(_SUPA_URL + '/rest/v1/vault_data?on_conflict=user_id,key', {
-      method: 'POST', signal: ctl.signal,
-      headers: { 'content-type': 'application/json', apikey: _SUPA_KEY, authorization: 'Bearer ' + tok, prefer: 'resolution=merge-duplicates,return=minimal' },
-      body: JSON.stringify(rows)
-    });
-    clearTimeout(t);
+    var tok = await _freshAccessToken(); if (!tok) { _lastSyncErr = 'not signed in'; return false; }
+    var put = async function(tk) {
+      var ctl = new AbortController(), t = setTimeout(function() { ctl.abort(); }, 15000);
+      var r = await fetch(_SUPA_URL + '/rest/v1/vault_data?on_conflict=user_id,key', {
+        method: 'POST', signal: ctl.signal,
+        headers: { 'content-type': 'application/json', apikey: _SUPA_KEY, authorization: 'Bearer ' + tk, prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(rows)
+      });
+      clearTimeout(t); return r;
+    };
+    var res = await put(tok);
+    if (res.status === 401) { var nt = await _directRefresh(); if (nt) res = await put(nt); }
     _lastSyncErr = res.ok ? '' : 'server said ' + res.status;
     return res.ok;
   } catch (e) { _lastSyncErr = 'no connection'; return false; }
@@ -16349,10 +16353,14 @@ async function _selectRows(uid) {
     if (!r) _sjsStalled = true;
   } else if (!_supaClient) why = 'sync library not loaded';
   try {
-    var tok = _localAccessToken(); if (!tok) return { err: why || 'no saved session on this device' };
-    var ctl = new AbortController(), t = setTimeout(function() { ctl.abort(); }, 12000);
-    var res = await fetch(_SUPA_URL + '/rest/v1/vault_data?select=key,value,updated_at&user_id=eq.' + encodeURIComponent(uid), { headers: { apikey: _SUPA_KEY, authorization: 'Bearer ' + tok }, signal: ctl.signal });
-    clearTimeout(t);
+    var tok = await _freshAccessToken(); if (!tok) return { err: why || 'no saved session on this device' };
+    var get = async function(tk) {
+      var ctl = new AbortController(), t = setTimeout(function() { ctl.abort(); }, 12000);
+      var r = await fetch(_SUPA_URL + '/rest/v1/vault_data?select=key,value,updated_at&user_id=eq.' + encodeURIComponent(uid), { headers: { apikey: _SUPA_KEY, authorization: 'Bearer ' + tk }, signal: ctl.signal });
+      clearTimeout(t); return r;
+    };
+    var res = await get(tok);
+    if (res.status === 401) { var nt = await _directRefresh(); if (nt) res = await get(nt); }
     if (!res.ok) return { err: (why ? why + '; ' : '') + 'server said ' + res.status };
     var j = await res.json(); return Array.isArray(j) ? { data: j } : { err: 'unexpected reply' };
   } catch (e) { return { err: (why ? why + '; ' : '') + 'no connection' }; }
@@ -16487,6 +16495,50 @@ function _localAccessToken() {
   } catch (e) {}
   return null;
 }
+// The direct (no supabase-js) path must renew the session itself: on a phone a frozen tab can leave supabase-js stalled,
+// and its access token expires after an hour — every read and write was then refused with 401 while the app still looked signed in.
+function _localSessionKey() {
+  try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (/^sb-.+-auth-token$/.test(k)) return k; } } catch (e) {}
+  return null;
+}
+function _tokenExpiresSoon(tok) {   // true when the JWT has expired or will within a minute (unreadable → assume fine; the server decides)
+  try { var p = JSON.parse(atob(tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))); return !!p.exp && p.exp * 1000 < Date.now() + 60000; } catch (e) { return false; }
+}
+var _directRefreshP = null;   // one renewal at a time: a refresh token works once, so two parallel renewals would log the user out
+function _directRefresh() {
+  if (_directRefreshP) return _directRefreshP;
+  _directRefreshP = (async function() {
+    try {
+      var k = _localSessionKey(); if (!k) return null;
+      var s = JSON.parse(localStorage.getItem(k) || 'null'); if (!s || !s.refresh_token) return null;
+      var ctl = new AbortController(), t = setTimeout(function() { ctl.abort(); }, 10000);
+      var res = await fetch(_SUPA_URL + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', signal: ctl.signal,
+        headers: { 'content-type': 'application/json', apikey: _SUPA_KEY }, body: JSON.stringify({ refresh_token: s.refresh_token }) });
+      clearTimeout(t);
+      if (!res.ok) { if (res.status === 400 || res.status === 401) _viSessionExpired(); return null; }   // refused (not a network blip): the sign-in is over
+      var n = await res.json(); if (!n || !n.access_token || !n.refresh_token) return null;
+      var merged = Object.assign({}, s, n); if (!merged.expires_at && n.expires_in) merged.expires_at = Math.floor(Date.now() / 1000) + n.expires_in;
+      _lsOrig.call(localStorage, k, JSON.stringify(merged));   // same place supabase-js keeps it, so both stay on the new pair
+      return n.access_token;
+    } catch (e) { return null; } finally { setTimeout(function() { _directRefreshP = null; }, 0); }
+  })();
+  return _directRefreshP;
+}
+// The saved sign-in can no longer be renewed (e.g. weeks away, or signed out elsewhere): say so and offer to sign in again,
+// instead of looking signed in while nothing uploads. Nothing on this device is touched.
+function _viSessionExpired() {
+  if (document.getElementById('session-banner')) return;
+  var bn = document.createElement('div'); bn.id = 'session-banner';
+  bn.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:10002;background:#2a1d05;border:1px solid #e0b44a;color:#f3d58a;border-radius:10px;padding:10px 12px;font-size:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap';
+  bn.innerHTML = '<span style="flex:1;min-width:200px">⚠ Your sign-in has expired, so changes on this device are not being backed up. Sign in again — nothing on this device is lost.</span><button class="btn-add-data" id="session-banner-btn">Sign in again</button>';
+  document.body.appendChild(bn);
+  document.getElementById('session-banner-btn').onclick = function() { bn.remove(); viReauth(); };
+}
+async function _freshAccessToken() {   // the saved token, renewed first if it has expired
+  var tok = _localAccessToken();
+  if (tok && _tokenExpiresSoon(tok)) tok = (await _directRefresh()) || tok;
+  return tok;
+}
 // Call an edge function without ever hanging the UI: supabase-js first (8 s), then a direct request.
 // (supabase-js waits on its own auth lock before every call, so one stalled refresh can freeze it.)
 async function _fnInvoke(name, body, ms, direct, once) {   // once: if supabase-js is slow, report a timeout instead of sending the same request a second time
@@ -16505,7 +16557,7 @@ async function _fnInvoke(name, body, ms, direct, once) {   // once: if supabase-
     var ctl = new AbortController(), t = setTimeout(function() { ctl.abort(); }, direct ? (ms || 45000) : 15000);
     var res = await fetch(_SUPA_URL + '/functions/v1/' + name, {
       method: 'POST', signal: ctl.signal,
-      headers: { 'content-type': 'application/json', apikey: _SUPA_KEY, authorization: 'Bearer ' + (tok || _localAccessToken() || _SUPA_KEY) },
+      headers: { 'content-type': 'application/json', apikey: _SUPA_KEY, authorization: 'Bearer ' + (tok || (await _freshAccessToken()) || _SUPA_KEY) },
       body: JSON.stringify(body)
     });
     clearTimeout(t);
@@ -24203,7 +24255,7 @@ function showPrivacy() {
     _lh('Who else handles it'),
     '<p>These companies process data for us, only to run Vault·It:</p>',
     '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Supabase</strong> — database and sign-in, hosted in the EU (Frankfurt), and the server functions, which run on Supabase’s network and may run outside the EU.</li>'
-      + '<li><strong>Resend</strong> — delivers your sign-in emails (your email address and the code) and the beta-list emails. If it is unavailable, Supabase’s own mailer is used instead.</li>'
+      + '<li><strong>Resend</strong> — delivers your sign-in emails (your email address and the code) and the beta-list emails. If it is unavailable, Supabase’s own mailer is used for sign-in emails instead.</li>'
       + '<li><strong>Cloudflare</strong> — serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong> — deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
     '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank and provider logos — it is told the website of each bank, card or investment provider you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices — CoinGecko learns which coins you hold), and <strong>loremflickr</strong> (only if you use photo search, which sends your search words).</p>',

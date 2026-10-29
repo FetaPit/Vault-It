@@ -61,7 +61,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   ok(unlisted.length === 0, 'no outside host is missing from this check' + (unlisted.length ? ' — NEW: ' + unlisted.join(', ') + ' (add it to the privacy notice, then to COVERED)' : ''));
   const missing = Object.keys(COVERED).filter(h => !COVERED[h].test(lg)); ok(missing.length === 0, 'the privacy notice names every outside company in use' + (missing.length ? ' — missing: ' + missing.join(', ') : ''));
   ok(/owner-only connections/.test(lg), 'the notice says what the owner-only connections are');
-  ok(/180 days/.test(lg) && /Waitlist/.test(lg) && /phone number/.test(lg) && /clients or leads/.test(lg) && /withdraw consent/.test(lg) && /Anthropic[^.]*keep it for a limited period/.test(lg.replace(/\n/g, ' ')), 'the notice covers retention, the waitlist, phone number, other people’s details, withdrawal of consent and Anthropic’s retention');
+  ok(/180 days/.test(lg) && /Beta list/.test(lg) && /phone number/.test(lg) && /clients or leads/.test(lg) && /withdraw consent/.test(lg) && /Anthropic[^.]*keep it for a limited period/.test(lg.replace(/\n/g, ' ')), 'the notice covers retention, the waitlist, phone number, other people’s details, withdrawal of consent and Anthropic’s retention');
   ok(/Your browser keeps just a marker that a PIN is set/.test(lg), 'the notice describes the PIN as it is really stored on the device');
   await page.screenshot({ path: SHOT + 'beta_privacy.png' });
   await page.evaluate(() => document.getElementById('legal-modal').remove());
