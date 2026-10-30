@@ -21,7 +21,7 @@ Run on brand-rollout at 42471f4 with the classic hologram viewer as the default 
 
 ## Defects found
 
-1. **Daylight, classic house viewer: the statusline strip under the viewport renders as a light band with near-invisible text** (seen at 832 px wide in Daylight; the 3D viewport itself stays Night by design, the caption strip below it does not). To fix: give `#hb3d-cap` / `.scene-cap` a Daylight-safe background and ink.
+1. **Daylight, classic house viewer: a light band with near-invisible text under the viewport** (seen at 832 px wide in Daylight). Cause found on the fix: it is the fixed app footer, whose text was 5.5 px in both themes, not `#hb3d-cap` / `.scene-cap`. Fixed: footer type floors at 10 px (FCA line 11 px), two rows on phones, page bottom and toast clear its height.
 2. **Assets, 390 px: the 3D cash and metals stage shows as an empty dark box until its first frame** (slow software GL in the sandbox; check on a real phone that it fills within a second).
 
 ## Not checked here

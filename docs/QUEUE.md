@@ -9,8 +9,6 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [ ] Fix from the QA pass (30 Oct): the Daylight statusline strip under the classic house viewer renders as a light band with invisible text (`#hb3d-cap` / `.scene-cap`); after the em-dash copy pass finishes in index.html
-- [~] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
 - [ ] Monetisation outline for the owner to decide on (owner's ask, 30 Oct): which features sit outside the Pro tier and the pricing strategy; a Simplified mode (hide some tabs/features) with the current app as Advanced mode, and which features and tabs belong to Advanced; whether a freemium tier adds or devalues, judged on the success and continued usage of freemium finance apps against paid ones (sources in `docs/research/`); testers stay free. Deliver as a short decision doc and prompt the owner
 - [ ] Custom welcome message for testers (owner's ask, 30 Oct): prompt the owner for the wording, then wire it to the first run for beta accounts
 - [ ] Subscription pop-up: adjust to the monetisation model once the owner decides (owner's ask, 30 Oct; blocked on the outline above)
@@ -31,6 +29,8 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] QA defect 1 (30 Oct): the "light band with invisible text" under the house viewer was the fixed app footer, not the viewer caption; its type was 5.5 px. Footer type now floors at 10 px (FCA line 11 px), wraps to two rows on phones (copyright text hidden there, the logo still names PT Live Design), page and toast clear its height (this commit)
+- [x] Copy pass: em dashes reworded across the app (`fa1e069`, 515 to 221; the rest are code comments); `tests/test_copy.js` keeps them out of user-facing text
 - [x] QA list (handover section 9) in both themes at 390 and 1100 px, plus 320/360/390/412 scroll probe: `docs/qa/QA_30OCT.md`; two defects noted (Daylight statusline strip, 3D cash stage first frame)
 - [x] Level 2 Octalysis slice: purchase-day mortgage entry (lender, balance, rate, fix end, term) feeding the calculator and the panel; three what-ifs from the Budget with the trade-off line (`42471f4`, `tests/test_hb_l2_entry.js`). Still to come later: mortgage cockpit, payday build, bank-versus-you hologram, milestone stages
 - [x] Brand build follow-ups: 6.8 feedback (pop-ups, stage flash, milestone toasts after interaction) and the night window glow (`647fae1`; the real-device speed check waits on the owner)
