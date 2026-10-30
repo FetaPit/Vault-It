@@ -9437,6 +9437,20 @@ html #topnav .tab-btn.active{color:var(--text)!important;background:rgb(var(--tc
 html[data-theme="light"] #topnav .tab-btn.active{box-shadow:inset 0 0 0 1px var(--tc)!important}
 html #topnav .tab-btn.active .vi-ic.ti{opacity:1;animation:vi-tabglow var(--pulse) ease-in-out infinite}
 html[data-theme="light"] #topnav .tab-btn.active .vi-ic.ti{animation:none}
+/* ── Assets and liabilities sub-tabs: each in its own colour (shared with the 3D net worth blocks) ── */
+html .subtab-btn[data-sub="metals"]{--sa:var(--gold);--sa-rgb:var(--gold-rgb)}
+html .subtab-btn[data-sub="crypto"]{--sa:var(--teal);--sa-rgb:var(--teal-rgb)}
+html .subtab-btn[data-sub="cash"]{--sa:var(--green);--sa-rgb:var(--green-rgb)}
+html .subtab-btn[data-sub="other"]{--sa:var(--purple);--sa-rgb:var(--purple-rgb)}
+html .subtab-btn[data-sub="liabilities"]{--sa:var(--amber);--sa-rgb:var(--amber-rgb)}
+html .subtab-btn[data-sub="stocks"]{--sa:var(--green2);--sa-rgb:var(--green2-rgb)}
+html #assets-page .subtab-btn{gap:8px;border-radius:12px;font:600 .62rem/1.2 var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)!important;background:var(--panel)!important;border:1px solid var(--line2)!important;box-shadow:none}
+html #assets-page .subtab-btn .vi-ic.sti{--vi-sw:1.5;width:18px;height:18px;color:var(--sa)!important;opacity:.75;transform:none!important;fill:none!important;stroke:none!important}
+html #assets-page .subtab-btn:hover{color:var(--text)!important;border-color:rgb(var(--sa-rgb) / .6)!important}
+html #assets-page .subtab-btn.active{color:var(--text)!important;border-color:var(--sa)!important;background:rgb(var(--sa-rgb) / .1)!important;box-shadow:0 0 14px -4px rgb(var(--sa-rgb) / .7)!important}
+html[data-theme="light"] #assets-page .subtab-btn.active{box-shadow:none!important}
+html #assets-page .subtab-btn.active .vi-ic.sti{opacity:1}
+html #assets-page .subtab-btn:focus-visible{outline:2px solid var(--sa);outline-offset:2px}
 @keyframes vi-tabglow{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 4px currentColor)}}
 html #topnav .tab-btn:focus-visible{outline:2px solid var(--tc)!important;outline-offset:2px}
 #topnav .vi-usp,#topnav .vi-pro{position:absolute;top:1px;right:2px;padding:1px 4px;border-radius:3px;font:800 .3rem/1.2 var(--font-display);letter-spacing:.08em;animation:none!important;display:inline-block!important}
@@ -10350,7 +10364,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     </div>
     <div class="ov-kpi ov-kpi-li">
       <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/></svg>Total Liabilities</div>
-      <div class="ov-kpi-val" id="kpi-liab" style="color:var(--go)">£0</div>
+      <div class="ov-kpi-val" id="kpi-liab" style="color:var(--amber)">£0</div>
       <div class="ov-kpi-sub" id="kpi-liab-sub">running costs</div>
     </div>
     <div class="ov-kpi ov-kpi-su">
@@ -10503,7 +10517,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     <div class="ov-chart-card ov-sum ov-sum-l" id="ov-liab-summary-card">
       <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></span><span class="ov-chart-title">Liabilities Summary</span></div>
       <div id="ov-liab-summary"></div>
-      <div id="ov-liab-next" style="margin-top:8px;font-size:.55rem;color:var(--go);border-top:1px solid var(--bd);padding-top:6px"></div>
+      <div id="ov-liab-next" style="margin-top:8px;font-size:.55rem;color:var(--amber);border-top:1px solid var(--bd);padding-top:6px"></div>
     </div>
     <div class="ov-chart-card ov-sum ov-sum-d" id="ov-debt-summary-card">
       <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></span><span class="ov-chart-title">Debt Summary</span></div>
@@ -10787,29 +10801,17 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 <div id="tab-assets" class="tab-panel" style="display:none">
   <div id="assets-page" style="max-width:1100px;margin:0 auto;padding:24px 20px 60px">
     <div class="subtab-nav" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-      <button class="subtab-btn active" onclick="showSubtab('assets','metals',this)">
-        <svg class="sti" viewBox="0 0 16 16"><rect x="2" y="5.5" width="12" height="5" rx="1"/><line x1="5.5" y1="5.5" x2="5.5" y2="10.5"/><line x1="8" y1="5.5" x2="8" y2="10.5"/><line x1="10.5" y1="5.5" x2="10.5" y2="10.5"/></svg>
-        <span>Precious Metals</span>
+      <button class="subtab-btn active" data-sub="metals" onclick="showSubtab('assets','metals',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-metals"/></svg><span>Precious metals</span>
       </button>
-      <button class="subtab-btn" onclick="showSubtab('assets','crypto',this)">
-        <svg class="sti" viewBox="0 0 16 16"><path d="M5 3.5h5c1.5 0 2.5.9 2.5 2.3S11.5 8 10 8H5m0 0h5.5c1.5 0 2.5.9 2.5 2.3S11 12.5 9.5 12.5H5"/><line x1="7" y1="2.5" x2="7" y2="13.5"/><line x1="9" y1="2.5" x2="9" y2="13.5"/></svg>
-        <span>Crypto</span>
+      <button class="subtab-btn" data-sub="crypto" onclick="showSubtab('assets','crypto',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-crypto"/></svg><span>Crypto</span>
       </button>
-      <button class="subtab-btn" onclick="showSubtab('assets','cash',this)">
-        <svg class="sti" viewBox="0 0 16 16"><rect x="1" y="4" width="14" height="8" rx="1.5"/><circle cx="8" cy="8" r="2"/><circle cx="3.5" cy="8" r=".5" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r=".5" fill="currentColor" stroke="none"/></svg>
-        <span>Cash &amp; Savings</span>
+      <button class="subtab-btn" data-sub="cash" onclick="showSubtab('assets','cash',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cash"/></svg><span>Cash and savings</span>
       </button>
-      <button class="subtab-btn" onclick="showSubtab('assets','other',this)">
-        <svg class="sti" viewBox="0 0 16 16"><path d="M8 1.5l6 3v6L8 14l-6-3.5v-6z"/><polyline points="2,4.5 8,7.5 14,4.5"/><line x1="8" y1="7.5" x2="8" y2="14"/></svg>
-        <span>Wealth Inventory</span>
+      <button class="subtab-btn" data-sub="other" onclick="showSubtab('assets','other',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cube"/></svg><span>Wealth inventory</span>
       </button>
-      <button class="subtab-btn" onclick="showSubtab('assets','liabilities',this)">
-        <svg class="sti" viewBox="0 0 16 16"><path d="M8 2L1.5 13.5h13L8 2z"/><line x1="8" y1="7" x2="8" y2="10"/><circle cx="8" cy="11.8" r=".6" fill="currentColor" stroke="none"/></svg>
-        <span>Liabilities</span>
+      <button class="subtab-btn" data-sub="liabilities" onclick="showSubtab('assets','liabilities',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-liabilities"/></svg><span>Liabilities</span>
       </button>
-      <button class="subtab-btn" onclick="showSubtab('assets','stocks',this)">
-        <svg class="sti" viewBox="0 0 16 16"><polyline points="1,12 5,7 9,10 15,4"/><polyline points="11,4 15,4 15,8"/></svg>
-        <span>Stocks &amp; Funds</span>
+      <button class="subtab-btn" data-sub="stocks" onclick="showSubtab('assets','stocks',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-candles"/></svg><span>Stocks and funds</span>
       </button>
       <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--em);white-space:nowrap">
         Total: <span id="tab-total-assets" style="font-weight:700">£0</span>
@@ -12250,7 +12252,7 @@ body.vi-wide #nwChart { height: 300px !important; }
 .subtab-btn[onclick*="crypto"]      { --sa: var(--teal); }
 .subtab-btn[onclick*="cash"]        { --sa: var(--green); }
 .subtab-btn[onclick*="other"]       { --sa: var(--purple); }
-.subtab-btn[onclick*="liabilities"] { --sa: var(--red); }
+.subtab-btn[onclick*="liabilities"] { --sa: var(--amber); }
 
 /* Sub-tab buttons: icon + label */
 .subtab-btn { display: flex !important; align-items: center; gap: 5px; }
@@ -12399,10 +12401,10 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .ov-kpi-nw{border-top:2px solid var(--teal)}.ov-kpi-nw .ov-kpi-lbl{color:var(--teal)}
 .ov-kpi-as{border-top:2px solid var(--green)}.ov-kpi-as .ov-kpi-lbl{color:var(--green)}
 .ov-kpi-db{border-top:2px solid var(--red)}.ov-kpi-db .ov-kpi-lbl{color:var(--red)}
-.ov-kpi-li{border-top:2px solid var(--gold)}.ov-kpi-li .ov-kpi-lbl{color:var(--gold)}
+.ov-kpi-li{border-top:2px solid var(--amber)}.ov-kpi-li .ov-kpi-lbl{color:var(--amber)}
 .ov-kpi-su{border-top:2px solid var(--blue)}.ov-kpi-su .ov-kpi-lbl{color:var(--blue)}
 .ov-sum{--sc:var(--teal);border-left:3px solid var(--sc)!important;background:linear-gradient(135deg,color-mix(in srgb,var(--sc) 9%,var(--c2)),var(--c2) 60%)!important}
-.ov-sum-a{--sc:var(--green)}.ov-sum-l{--sc:var(--gold)}.ov-sum-d{--sc:var(--red)}
+.ov-sum-a{--sc:var(--green)}.ov-sum-l{--sc:var(--amber)}.ov-sum-d{--sc:var(--red)}
 .ov-sum-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .ov-sum-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,transparent);border:1px solid color-mix(in srgb,var(--sc) 45%,transparent);flex:none}
 .ov-sum .ov-chart-title{font-size:.72rem!important;color:var(--sc)!important;margin:0!important}
@@ -21663,6 +21665,19 @@ function _drawCompletionExtras(svg,x,y,z,W,D,WH){
 }
 
 // ── DEBT CHARTS ───────────────────────────────────────────────
+// ── Theme colours for canvas drawing (canvas cannot read CSS variables) ──
+function viCss(name){try{return getComputedStyle(document.documentElement).getPropertyValue('--'+name).trim()||'#888';}catch(e){return '#888';}}
+function viRgba(name,a){var v=viCss(name+'-rgb');return v&&v!=='#888'?'rgb('+v+' / '+a+')':viCss(name);}
+function viLight(){return document.documentElement.getAttribute('data-theme')==='light';}
+// debt charts: a red ramp, the largest debt strongest (issuer colours stay on the card artwork only)
+function debtChartPalette(d){
+  var act=(debtState.debts||[]).filter(function(x){return x.balance>0;}).sort(function(a,b){return b.balance-a.balance;});
+  var i=Math.max(0,act.indexOf(d)),n=Math.max(1,act.length),t=n>1?i/(n-1):0;
+  var hi=viLight()?[214,41,41]:[224,92,92],lo=viLight()?[240,160,160]:[110,38,46];
+  var mix=function(k){return Math.round(hi[k]+(lo[k]-hi[k])*t*.85);};
+  var c1='rgb('+mix(0)+','+mix(1)+','+mix(2)+')',c2='rgb('+Math.round(mix(0)*.72)+','+Math.round(mix(1)*.72)+','+Math.round(mix(2)*.72)+')';
+  return{c1:c1,c2:viLight()?c1:c2,fg:'#fff'};
+}
 // each debt keeps the colours of its credit card (issuer brand); other debts get a palette colour
 function debtPalette(d){
   var b=null;try{b=ccBrand(d);}catch(e){}
@@ -21693,7 +21708,7 @@ function drawDebtHistogram(){
   var maxB=sorted[0].balance||1;
   var pad={l:fs*4.2,r:10,t:fs*2.6,b:fs*4.4};
   var bW=(W-pad.l-pad.r)/sorted.length;
-  ctx.save();ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+  ctx.save();ctx.strokeStyle=viRgba('ink',.06);ctx.lineWidth=1;
   for(var gi=0;gi<=4;gi++){
     var gy=pad.t+(H-pad.t-pad.b)*(gi/4);
     ctx.beginPath();ctx.moveTo(pad.l,gy);ctx.lineTo(W-pad.r,gy);ctx.stroke();
@@ -21702,7 +21717,7 @@ function drawDebtHistogram(){
   }
   ctx.restore();
   sorted.forEach(function(d,i){
-    var pal=debtPalette(d);
+    var pal=debtChartPalette(d);
     var bH=((d.balance/maxB)*(H-pad.t-pad.b));
     var bww=Math.min(bW*0.74,fs*9),bx=pad.l+i*bW+(bW-bww)/2,by=H-pad.b-bH;
     var g=ctx.createLinearGradient(0,by,0,by+bH);g.addColorStop(0,pal.c1);g.addColorStop(1,pal.c2);
@@ -21713,10 +21728,10 @@ function drawDebtHistogram(){
     ctx.fillStyle=g;
     ctx.beginPath();var r=Math.min(6,bww/4);ctx.moveTo(bx,by+bH);ctx.lineTo(bx,by+r);ctx.quadraticCurveTo(bx,by,bx+r,by);ctx.lineTo(bx+bww-r,by);ctx.quadraticCurveTo(bx+bww,by,bx+bww,by+r);ctx.lineTo(bx+bww,by+bH);ctx.closePath();ctx.fill();
     ctx.fillStyle='rgba(255,255,255,.14)';ctx.fillRect(bx,by,bww*0.28,bH);
-    ctx.fillStyle='#f1f4f6';ctx.font='bold '+fs+"px 'Share Tech Mono',monospace";ctx.textAlign='center';
+    ctx.fillStyle=viCss('text');ctx.font='bold '+fs+"px 'Share Tech Mono',monospace";ctx.textAlign='center';
     ctx.fillText(gbpFmt(d.balance),bx+bww/2,by-fs*0.5);
     if(d.rate){ctx.fillStyle=pal.c1;ctx.font=fs*0.82+"px 'Share Tech Mono',monospace";ctx.fillText(d.rate+'% APR',bx+bww/2,by-fs*1.55);}
-    ctx.fillStyle='#c5ced6';ctx.font=fs*0.95+"px 'DM Sans',sans-serif";ctx.textAlign='center';
+    ctx.fillStyle=viCss('muted');ctx.font=fs*0.95+"px 'DM Sans',sans-serif";ctx.textAlign='center';
     var nm=String(d.name),mx=Math.max(8,Math.floor(bW/(fs*0.55)));
     ctx.fillText(nm.length>mx?nm.slice(0,mx-1)+'…':nm,bx+bww/2,H-pad.b+fs*1.5);
   });
@@ -21752,7 +21767,7 @@ function drawDebtDonut(){
   var cx=(W-legendW)/2,cy=H/2,r=Math.min(cx,cy)*0.92,inner=r*0.58;
   var angle=-Math.PI/2;
   debts.forEach(function(d){
-    var pal=debtPalette(d),slice=(d.balance/total)*Math.PI*2;
+    var pal=debtChartPalette(d),slice=(d.balance/total)*Math.PI*2;
     var mid=angle+slice/2,g=ctx.createLinearGradient(cx+Math.cos(mid)*inner,cy+Math.sin(mid)*inner,cx+Math.cos(mid)*r,cy+Math.sin(mid)*r);
     g.addColorStop(0,pal.c2);g.addColorStop(1,pal.c1);
     ctx.beginPath();ctx.arc(cx,cy,r,angle,angle+slice);ctx.arc(cx,cy,inner,angle+slice,angle,true);ctx.closePath();
@@ -21768,7 +21783,7 @@ function drawDebtDonut(){
   if(legendW){
     var lx=W-legendW+8,ly=Math.max(fs*1.6,(H-items.length*fs*2.1)/2);
     items.forEach(function(d,i){
-      var pal=debtPalette(d),y=ly+i*fs*2.1,g=ctx.createLinearGradient(lx,y,lx+fs*1.6,y+fs*1.1);g.addColorStop(0,pal.c1);g.addColorStop(1,pal.c2);
+      var pal=debtChartPalette(d),y=ly+i*fs*2.1,g=ctx.createLinearGradient(lx,y,lx+fs*1.6,y+fs*1.1);g.addColorStop(0,pal.c1);g.addColorStop(1,pal.c2);
       ctx.fillStyle=g;ctx.fillRect(lx,y-fs*0.85,fs*1.6,fs*1.1);
       ctx.fillStyle='#d8dfe5';ctx.font=fs+"px 'DM Sans',sans-serif";ctx.textAlign='left';
       var nm=String(d.name);ctx.fillText((nm.length>16?nm.slice(0,15)+'…':nm),lx+fs*2.1,y);
@@ -21802,7 +21817,7 @@ function drawDebtTreemap(){
   var total=debts.reduce(function(a,d){return a+d.balance;},0),gap=3;
   var cells=dtmSquarify(debts.map(function(d){return{v:d.balance,d:d};}),0,0,W,H);
   el.innerHTML=cells.map(function(c){
-    var pal=debtPalette(c.d),big=c.w>110&&c.h>70,mid=c.w>70&&c.h>46,pct=Math.round(c.d.balance/total*100);
+    var pal=debtChartPalette(c.d),big=c.w>110&&c.h>70,mid=c.w>70&&c.h>46,pct=Math.round(c.d.balance/total*100);
     return '<div class="dtm-cell" title="'+ccEsc(c.d.name)+' — '+gbpFmt(c.d.balance)+' ('+pct+'%) · '+(+c.d.rate||0)+'% APR" style="left:'+(c.x+gap/2)+'px;top:'+(c.y+gap/2)+'px;width:'+(c.w-gap)+'px;height:'+(c.h-gap)+'px;background:linear-gradient(135deg,'+pal.c1+','+pal.c2+');color:'+pal.fg+'">'
       +(mid?'<b class="dtm-n">'+ccEsc(c.d.name)+'</b>':'')
       +(mid?'<span class="dtm-v">'+gbpFmt(c.d.balance)+'</span>':'')
@@ -22280,7 +22295,7 @@ function renderSummaryCards(){
     lEl.innerHTML='<div class="ov-sum-total" style="color:var(--go)">'+gbpFmt(tl)+'</div>'
       +(alState.liabilities.length?
       alState.liabilities.map(function(l){
-        return '<div class="ov-sum-row">'+ovIcon('warn','var(--go)')+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(l.name)+'</span>'
+        return '<div class="ov-sum-row">'+ovIcon('warn','var(--amber)')+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(l.name)+'</span>'
           +'<span class="ov-sum-v" style="color:var(--go)">'+gbpFmt(depreciatedValue(l))+'</span></div>';
       }).join('')
       :'<div class="ov-sum-empty">No liabilities tracked</div>');
@@ -25003,7 +25018,7 @@ function nwhRenderHistory(data){
   html+='<div style="overflow-x:auto"><table class="nwh-year-table"><thead><tr>'
     +'<th style="text-align:left">Year</th><th style="text-align:left">Age</th>'
     +'<th>Cash</th><th>Stocks</th><th>Metals</th><th>Crypto</th><th>Property</th>'
-    +'<th style="color:var(--re)">Liabilities</th>'
+    +'<th style="color:var(--amber)">Liabilities</th>'
     +'<th style="color:var(--em)">Net Worth</th>'
     +'<th style="text-align:left">Notes</th><th></th>'
     +'</tr></thead><tbody>';
@@ -25018,7 +25033,7 @@ function nwhRenderHistory(data){
       +'<td><input class="nwh-td-input" type="number" value="'+(p.metals||0)+'" onchange="nwhUpdate('+p.year+',\'metals\',this.value)"></td>'
       +'<td><input class="nwh-td-input" type="number" value="'+(p.crypto||0)+'" onchange="nwhUpdate('+p.year+',\'crypto\',this.value)"></td>'
       +'<td><input class="nwh-td-input" type="number" value="'+(p.property||0)+'" onchange="nwhUpdate('+p.year+',\'property\',this.value)"></td>'
-      +'<td><input class="nwh-td-input" type="number" value="'+(p.liabilities||0)+'" onchange="nwhUpdate('+p.year+',\'liabilities\',this.value)" style="color:var(--re)"></td>'
+      +'<td><input class="nwh-td-input" type="number" value="'+(p.liabilities||0)+'" onchange="nwhUpdate('+p.year+',\'liabilities\',this.value)" style="color:var(--amber)"></td>'
       +'<td><input class="nwh-td-input" id="nwh-nw-'+p.year+'" type="number" value="'+(p.netWorth||0)+'" onchange="nwhUpdateNw('+p.year+',this.value)" style="color:'+nwCol+';font-weight:700"></td>'
       +'<td><input class="nwh-td-input nwh-td-notes" type="text" value="'+(p.notes||'')+'" onchange="nwhUpdate('+p.year+',\'notes\',this.value)" placeholder="—"></td>'
       +'<td><button onclick="nwhDeleteYear('+p.year+')" style="background:none;border:none;color:var(--re);font-size:.7rem;cursor:pointer;padding:2px 4px;opacity:.35" title="Delete row">×</button></td>'
@@ -25041,7 +25056,7 @@ function nwhRenderHistory(data){
       +'<div class="nwh-card-field"><label>Metals</label><input type="number" value="'+(p.metals||0)+'" onchange="nwhUpdate('+p.year+',\'metals\',this.value)"></div>'
       +'<div class="nwh-card-field"><label>Crypto</label><input type="number" value="'+(p.crypto||0)+'" onchange="nwhUpdate('+p.year+',\'crypto\',this.value)"></div>'
       +'<div class="nwh-card-field"><label>Property</label><input type="number" value="'+(p.property||0)+'" onchange="nwhUpdate('+p.year+',\'property\',this.value)"></div>'
-      +'<div class="nwh-card-field"><label style="color:var(--re)">Liabilities</label><input type="number" value="'+(p.liabilities||0)+'" onchange="nwhUpdate('+p.year+',\'liabilities\',this.value)" style="color:var(--re)"></div>'
+      +'<div class="nwh-card-field"><label style="color:var(--amber)">Liabilities</label><input type="number" value="'+(p.liabilities||0)+'" onchange="nwhUpdate('+p.year+',\'liabilities\',this.value)" style="color:var(--amber)"></div>'
       +'<div class="nwh-card-field" style="grid-column:1/-1"><label style="color:var(--em)">Net Worth (override)</label><input id="nwh-nw-'+p.year+'" type="number" value="'+(p.netWorth||0)+'" onchange="nwhUpdateNw('+p.year+',this.value)" style="color:'+nwCol+';font-weight:700"></div>'
       +'<div class="nwh-card-field" style="grid-column:1/-1"><label>Notes</label><input type="text" value="'+(p.notes||'')+'" onchange="nwhUpdate('+p.year+',\'notes\',this.value)" placeholder="—"></div>'
       +'</div>'
