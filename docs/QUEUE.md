@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] Release to production: the landing / sign-up brand pass and hero revision (owner, 30 Oct: "release")
 - [ ] House builder brand build follow-ups (from the 30 Oct review): section 6.8 feedback ("+£5 · +4 bricks" pop-ups, stage flash, milestone toasts), a radial window glow at night, and a real-device speed check of the lite fallback
 - [ ] Level 2 Octalysis slice still open: real mortgage entry at purchase, overpayment what-ifs in the Level 2 panel (`docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md`; the build rule, payments, reset and undo were done 30 Oct)
 - [ ] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
