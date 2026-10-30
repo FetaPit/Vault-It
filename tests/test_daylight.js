@@ -35,6 +35,14 @@ const scan = () => {
   });
   return out;
 };
+// form fields: what you type must read too (the House plan's price box was cream on paper)
+const scanInputs = () => {
+  const P = c => { const m = c.match(/[\d.]+/g); return m ? { r: +m[0], g: +m[1], b: +m[2], a: m[3] == null ? 1 : +m[3] } : null; };
+  const L = c => [c.r, c.g, c.b].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0);
+  return [...document.querySelectorAll('.tab-panel input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=file]), .tab-panel select, .tab-panel textarea')]
+    .filter(e => e.offsetParent && !e.closest('.scene,.inv-stage')).map(e => { let bg = null; for (let x = e; x; x = x.parentElement) { const c = P(getComputedStyle(x).backgroundColor); if (c && c.a > .5) { bg = c; break; } }
+      bg = bg || { r: 243, g: 247, b: 246 }; const f = P(getComputedStyle(e).color), cr = (Math.max(L(f), L(bg)) + .05) / (Math.min(L(f), L(bg)) + .05); return cr < 3 ? '#' + (e.id || e.className) + ' ' + cr.toFixed(2) : null; }).filter(Boolean);
+};
 (async () => {
   const b = await chromium.launch(); const errs = [];
   const p = await (await b.newContext({ viewport: { width: 1100, height: 900 } })).newPage(); p.on('pageerror', e => errs.push(e.message));
@@ -45,6 +53,8 @@ const scan = () => {
     await p.evaluate(t => showTab(t), t); await p.waitForTimeout(t === 'house' ? 2500 : 900);
     const bad = await p.evaluate(scan);
     ok(bad.length === 0, t + ': all text reads on paper (at least 3:1)' + (bad.length ? ' ' + JSON.stringify(bad.slice(0, 6)) : ''));
+    const badIn = await p.evaluate(scanInputs);
+    ok(badIn.length === 0, t + ': typed text in every field reads on paper' + (badIn.length ? ' ' + JSON.stringify(badIn.slice(0, 6)) : ''));
   }
   await p.evaluate(() => showTab('overview')); await p.waitForTimeout(800);
   const g = await p.evaluate(() => ({
