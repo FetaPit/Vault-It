@@ -1588,6 +1588,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     return true;
   }
 
+  var KIND_CODE = { brick: 1, tile: 2, block: 3 };   // per-instance kind in each batch (b.kind), used by the brand build order
   KP.compile = function (meta) {
     meta = meta || {};
     var self = this, byStage = {}, clean = this.clean;
@@ -1640,14 +1641,15 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var out = order.map(function (k) {
       var b = batches[k];
       b.items.sort(function (a, c) { return a.t - c.t || a.seq - c.seq; });
-      var n = b.items.length, f = new Float32Array(n * 10), t = new Float32Array(n), col = new Int32Array(n);
+      var n = b.items.length, f = new Float32Array(n * 10), t = new Float32Array(n), col = new Int32Array(n), kind = new Uint8Array(n);
       b.items.forEach(function (it, i) {
+        kind[i] = it.g ? 0 : (KIND_CODE[it.k] || 0);
         var o = i * 10;
         f[o] = it.x; f[o + 1] = it.y; f[o + 2] = it.z; f[o + 3] = it.sx; f[o + 4] = it.sy; f[o + 5] = it.sz; f[o + 6] = it.rx; f[o + 7] = it.ry; f[o + 8] = it.rz; f[o + 9] = 0;
         t[i] = it.t; col[i] = it.c;
       });
       var kinds = {}; b.items.forEach(function (it) { if (it.k) kinds[it.k] = (kinds[it.k] || 0) + 1; });
-      return { shape: b.shape, mat: b.mat, ghost: b.ghost, hideAfter: b.hideAfter, focus: b.focus, count: n, xf: f, t: t, color: col, kinds: kinds,
+      return { shape: b.shape, mat: b.mat, ghost: b.ghost, hideAfter: b.hideAfter, focus: b.focus, count: n, xf: f, t: t, color: col, kinds: kinds, kind: kind,
         // t values of counted units for stats (flats: the user's own floor only)
         unitT: b.items.filter(function (it) { return it.k && !it.g && (!F || it.f); }).map(function (it) { return [it.k, it.t]; }) };
     });
