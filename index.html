@@ -78,7 +78,7 @@ html{box-sizing:border-box}
   document.addEventListener('DOMContentLoaded', function () {
     var d = document.createElement('div'); d.id = 'delete-done';
     d.style.cssText = 'position:fixed;inset:0;z-index:20002;background:var(--panel);display:flex;align-items:center;justify-content:center;padding:20px;text-align:center';
-    d.innerHTML = '<div style="max-width:420px;font-family:\'DM Sans\',sans-serif"><div style="font-size:2rem;margin-bottom:10px;color:var(--teal)">✓</div><div style="font-family:\'Syne\',sans-serif;font-size:1rem;font-weight:800;color:var(--teal);margin-bottom:10px">Your account has been deleted</div><div style="font-size:.65rem;color:#9bb0bd;line-height:1.7;margin-bottom:18px">Your account and everything stored in it have been erased, and so has the data Vault·It kept on this device (including photos). Other devices where you used Vault·It still hold a local copy — clear it there too (browser settings → site data). Our hosting providers may keep short-lived backups and logs for a few days. Thank you for testing Vault·It.</div><button class="btn-add-data" onclick="location.replace(location.pathname)">Close</button></div>';
+    d.innerHTML = '<div style="max-width:420px;font-family:\'DM Sans\',sans-serif"><div style="font-size:2rem;margin-bottom:10px;color:var(--teal)"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div><div style="font-family:\'Syne\',sans-serif;font-size:1rem;font-weight:800;color:var(--teal);margin-bottom:10px">Your account has been deleted</div><div style="font-size:.65rem;color:#9bb0bd;line-height:1.7;margin-bottom:18px">Your account and everything stored in it have been erased, and so has the data Vault·It kept on this device (including photos). Other devices where you used Vault·It still hold a local copy — clear it there too (browser settings → site data). Our hosting providers may keep short-lived backups and logs for a few days. Thank you for testing Vault·It.</div><button class="btn-add-data" onclick="location.replace(location.pathname)">Close</button></div>';
     document.body.appendChild(d);
   });
 })();
@@ -173,6 +173,14 @@ function viCleanJSON(str) {   // returns the cleaned JSON text, or the original 
 #vi-theme-btn .vi-th-ico{width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:inset -4px -2px 0 0 var(--panel)}
 [data-theme="light"] #vi-theme-btn .vi-th-ico{background:var(--text);box-shadow:inset -4px -2px 0 0 var(--panel)}
 html,body{overflow-x:clip}
+
+/* ── Brand icons (sprite #vi-*) ── */
+.vi-ic{--vi-sw:1.1;width:24px;height:24px;display:inline-block;flex:none;color:inherit;overflow:visible}
+.vi-ic.sm{--vi-sw:1.5;width:18px;height:18px}
+.vi-ic.g{--vi-sw:1.5;width:1.15em;height:1.15em;vertical-align:-.2em}
+.vi-ic.flip{transform:rotate(90deg)}
+.vi-ic.nx{transform:rotate(-90deg)}
+.footer-version{display:none}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -6553,7 +6561,7 @@ html { height: 100%; }
 /* body must GROW with its content (min-height, not height) — otherwise the sticky top nav's containing
    block ends after one screenful and the whole nav scrolls away on long tabs. */
 body { min-height: 100%; }
-html, body { background: var(--bg); color: var(--tx); font-family: 'Finance', 'DM Sans', sans-serif; }
+html, body { background: var(--bg); color: var(--tx); font-family: var(--font-body); }
 
 /* ── TOP NAV ── */
 #topnav {
@@ -9407,6 +9415,120 @@ button.bd-ic{cursor:pointer}
 </style>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" id="vi-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+<symbol id="vi-coins" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 8c0 1.4 3.6 2.5 8 2.5S20 9.4 20 8s-3.6-2.5-8-2.5S4 6.6 4 8z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4 8c0 1.4 3.6 2.5 8 2.5S20 9.4 20 8s-3.6-2.5-8-2.5S4 6.6 4 8z'/><path d='M4 8v4c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V8'/><path d='M4 12v4c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5v-4'/></g></symbol>
+<symbol id="vi-dots" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/><path d='M10.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/><path d='M16.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/><path d='M10.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/><path d='M16.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/></g></symbol>
+<symbol id="vi-heart" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 20s-8-4.7-8-10.3A4.7 4.7 0 0 1 12 7a4.7 4.7 0 0 1 8 2.7C20 15.3 12 20 12 20z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 20s-8-4.7-8-10.3A4.7 4.7 0 0 1 12 7a4.7 4.7 0 0 1 8 2.7C20 15.3 12 20 12 20z'/></g></symbol>
+<symbol id="vi-home" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M5 10v11h14V10l-7-6z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M2.8 11.2L12 3.2l9.2 8'/><path d='M5 9.5V21h14V9.5'/><path d='M10 21v-6h4v6'/></g></symbol>
+<symbol id="vi-briefcase" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M3 8h18v12H3z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 8h18v12H3z'/><path d='M9 8V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V8'/><path d='M3 13h18'/><path d='M10.5 12v2.4h3V12'/></g></symbol>
+<symbol id="vi-rocket" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 2.5c3.5 2.5 5 6 4.5 11l-4.5 3-4.5-3c-.5-5 1-8.5 4.5-11z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 2.5c3.5 2.5 5 6 4.5 11l-4.5 3-4.5-3c-.5-5 1-8.5 4.5-11z'/><path d='M12 9.4a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2z'/><path d='M7.5 13.5L4.5 16l2.2.5'/><path d='M16.5 13.5l3 2.5-2.2.5'/><path d='M10 19.5c.5 1.5 1.5 2.5 2 2.5s1.5-1 2-2.5'/></g></symbol>
+<symbol id="vi-bank" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M3 9l9-5 9 5z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 9l9-5 9 5z'/><path d='M5.5 9.5v7'/><path d='M9.8 9.5v7'/><path d='M14.2 9.5v7'/><path d='M18.5 9.5v7'/><path d='M3.5 20h17'/><path d='M4.5 16.8h15'/></g></symbol>
+<symbol id="vi-gift" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 11h16v9H4z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4 11h16v9H4z'/><path d='M3 8h18v3H3z'/><path d='M12 8v12'/><path d='M12 8c-1.5-4-5-4-5-1.7C7 8 12 8 12 8z'/><path d='M12 8c1.5-4 5-4 5-1.7C17 8 12 8 12 8z'/></g></symbol>
+<symbol id="vi-bolt" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M13 2.5L5 13.5h6l-1 8 8-11h-6z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M13 2.5L5 13.5h6l-1 8 8-11h-6z'/></g></symbol>
+<symbol id="vi-flame" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 3c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-4-1-6 1-9z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-4-1-6 1-9z'/></g></symbol>
+<symbol id="vi-wifi" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 18.4a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M2.5 9a14 14 0 0 1 19 0'/><path d='M5.5 12.5a9.5 9.5 0 0 1 13 0'/><path d='M8.6 16a5 5 0 0 1 6.8 0'/></g></symbol>
+<symbol id="vi-card" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M3 6h18v4H3z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 6h18v12H3z'/><path d='M3 10h18'/><path d='M6.5 15h4'/></g></symbol>
+<symbol id="vi-basket" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 9h16l-2 10.2H6z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 9h18l-2 10.2a1 1 0 0 1-1 .8H6a1 1 0 0 1-1-.8z'/><path d='M8 9l4-6 4 6'/><path d='M9.2 13v3.5'/><path d='M12 13v3.5'/><path d='M14.8 13v3.5'/></g></symbol>
+<symbol id="vi-dumbbell" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4.5 7h2v10h-2z'/><path d='M17.5 7h2v10h-2z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M2.5 9.5v5'/><path d='M4.5 7h2v10h-2z'/><path d='M17.5 7h2v10h-2z'/><path d='M21.5 9.5v5'/><path d='M6.5 12h11'/></g></symbol>
+<symbol id="vi-car" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M3.5 11h17a1 1 0 0 1 1 1v4.5h-19V12a1 1 0 0 1 1-1z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M5 11l1.6-4h10.8L19 11'/><path d='M3.5 11h17a1 1 0 0 1 1 1v4.5h-19V12a1 1 0 0 1 1-1z'/><path d='M6.5 19v-2.5'/><path d='M17.5 19v-2.5'/><path d='M6.8 14h1.4'/><path d='M15.8 14h1.4'/></g></symbol>
+<symbol id="vi-shield" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 3l7 2.5v6c0 4.4-3 7.7-7 9.5-4-1.8-7-5.1-7-9.5v-6z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3l7 2.5v6c0 4.4-3 7.7-7 9.5-4-1.8-7-5.1-7-9.5v-6z'/><path d='M9 12h6'/></g></symbol>
+<symbol id="vi-cutlery" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M5 3h4v6a2 2 0 0 1-4 0z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M7 3v18'/><path d='M5 3v6a2 2 0 0 0 4 0V3'/><path d='M17 21V3c-2.5 1.5-3.5 4-3.5 8H17'/></g></symbol>
+<symbol id="vi-shirt" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M8.5 4L3.5 7l2 3.5L8 9.5V20h8V9.5l2.5 1 2-3.5-5-3a3.5 3.5 0 0 1-7 0z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M8.5 4L3.5 7l2 3.5L8 9.5V20h8V9.5l2.5 1 2-3.5-5-3a3.5 3.5 0 0 1-7 0z'/></g></symbol>
+<symbol id="vi-cup" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4.5 9h11v6a4 4 0 0 1-4 4h-3a4 4 0 0 1-4-4z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4.5 9h11v6a4 4 0 0 1-4 4h-3a4 4 0 0 1-4-4z'/><path d='M15.5 10.5h1.5a2.5 2.5 0 0 1 0 5h-1.5'/><path d='M8 3.5c-.8 1 .8 1.8 0 3'/><path d='M11.5 3.5c-.8 1 .8 1.8 0 3'/></g></symbol>
+<symbol id="vi-bag" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M5 8h14l-1 12H6z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M5 8h14l-1 12H6z'/><path d='M9 8V6a3 3 0 0 1 6 0v2'/></g></symbol>
+<symbol id="vi-lifebuoy" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z'/><path d='M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8z'/><path d='M5.7 5.7l3.5 3.5'/><path d='M18.3 5.7l-3.5 3.5'/><path d='M5.7 18.3l3.5-3.5'/><path d='M18.3 18.3l-3.5-3.5'/></g></symbol>
+<symbol id="vi-brick-wall" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M3 14h18v4H3z'/><path d='M3 10h9v4H3z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 6h18v12H3z'/><path d='M3 10h18'/><path d='M3 14h18'/><path d='M12 6v4'/><path d='M8 10v4'/><path d='M16 10v4'/><path d='M12 14v4'/></g></symbol>
+<symbol id="vi-trend-base" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 16l5-5 4 3 7-8v14.5H4z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 20.5h18'/><path d='M4 16l5-5 4 3 7-8'/><path d='M15 6h5v5'/></g></symbol>
+<symbol id="vi-child" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z'/><path d='M9 11v.4'/><path d='M15 11v.4'/><path d='M9.4 15c1.5 1.4 3.7 1.4 5.2 0'/><path d='M12 3c0 1.6 1.4 2.4 2.4 2.1'/></g></symbol>
+<symbol id="vi-paw" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 14c-2.5 0-4.5 1.8-4.5 3.8 0 1.4 1 2.2 2.3 2.2 1 0 1.4-.4 2.2-.4s1.2.4 2.2.4c1.3 0 2.3-.8 2.3-2.2 0-2-2-3.8-4.5-3.8z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 14c-2.5 0-4.5 1.8-4.5 3.8 0 1.4 1 2.2 2.3 2.2 1 0 1.4-.4 2.2-.4s1.2.4 2.2.4c1.3 0 2.3-.8 2.3-2.2 0-2-2-3.8-4.5-3.8z'/><path d='M3.6 10.5a1.5 2 0 1 1 3 0 1.5 2 0 0 1-3 0z'/><path d='M7.5 7a1.5 2.1 0 1 1 3 0 1.5 2.1 0 0 1-3 0z'/><path d='M13.5 7a1.5 2.1 0 1 1 3 0 1.5 2.1 0 0 1-3 0z'/><path d='M17.4 10.5a1.5 2 0 1 1 3 0 1.5 2 0 0 1-3 0z'/></g></symbol>
+<symbol id="vi-wrench" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M14.5 6a4 4 0 0 0-5 5.2L4 17l3 3 5.8-5.5A4 4 0 0 0 18 9.5l-2.5 2.5-2.2-.5-.5-2.2z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M14.5 6a4 4 0 0 0-5 5.2L4 17l3 3 5.8-5.5A4 4 0 0 0 18 9.5l-2.5 2.5-2.2-.5-.5-2.2z'/></g></symbol>
+<symbol id="vi-book" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 5h7a1 1 0 0 1 1 1v13a2 2 0 0 0-2-1.5H4z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 6a1 1 0 0 0-1-1H4v13h6a2 2 0 0 1 2 1.5'/><path d='M12 6a1 1 0 0 1 1-1h7v13h-6a2 2 0 0 0-2 1.5'/><path d='M12 6v13.5'/></g></symbol>
+<symbol id="vi-repeat" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M9 9h6v6H9z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M17 3l3 3-3 3'/><path d='M4 11V9a3 3 0 0 1 3-3h13'/><path d='M7 21l-3-3 3-3'/><path d='M20 13v2a3 3 0 0 1-3 3H4'/></g></symbol>
+<symbol id="vi-ticket" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z'/><path d='M14.5 7.5v2'/><path d='M14.5 11v2'/><path d='M14.5 14.5v2'/></g></symbol>
+<symbol id="vi-plane" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M21 3l-6.5 18-3.8-7.2L3.5 10z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M21 3l-6.5 18-3.8-7.2L3.5 10z'/><path d='M21 3L10.7 13.8'/></g></symbol>
+<symbol id="vi-sparkle" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z'/><path d='M19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z'/></g></symbol>
+<symbol id="vi-piggy" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M5 12.5a7 5.4 0 0 1 13.4-2.3L21 9.5v4l-1.8.8a5 5 0 0 1-2 3V20h-2.7v-1.6h-4.6V20H7.2v-3A5.3 5.3 0 0 1 5 12.5z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M5 12.5a7 5.4 0 0 1 13.4-2.3L21 9.5v4l-1.8.8a5 5 0 0 1-2 3V20h-2.7v-1.6h-4.6V20H7.2v-3A5.3 5.3 0 0 1 5 12.5z'/><path d='M9.5 9.2h4'/><path d='M16.3 12.4v.2'/><path d='M2.5 11.5c.4 1 1.2 1.5 2.4 1.5'/></g></symbol>
+<symbol id="vi-umbrella" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M3 12a9 9 0 0 1 18 0z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 12a9 9 0 0 1 18 0z'/><path d='M12 3V2'/><path d='M12 12v6.2a2 2 0 0 1-4 0'/><path d='M7.6 12a4.4 4.4 0 0 1 4.4-9'/><path d='M16.4 12A4.4 4.4 0 0 0 12 3'/></g></symbol>
+<symbol id="vi-overview" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><rect x='1' y='1' width='5.5' height='5.5' rx='1'/><rect x='9.5' y='1' width='5.5' height='5.5' rx='1'/><rect x='1' y='9.5' width='5.5' height='5.5' rx='1'/><rect x='9.5' y='9.5' width='5.5' height='5.5' rx='1'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><rect x='1' y='1' width='5.5' height='5.5' rx='1'/><rect x='9.5' y='1' width='5.5' height='5.5' rx='1'/><rect x='1' y='9.5' width='5.5' height='5.5' rx='1'/><rect x='9.5' y='9.5' width='5.5' height='5.5' rx='1'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3.8 5h4.4M3.8 7.2h2.6M16.5 5h4.4M16.5 7.2h2.6M3.8 17.7h4.4M3.8 19.9h2.6M16.5 17.7h4.4M16.5 19.9h2.6"/></g></symbol>
+<symbol id="vi-budget" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><rect x='1.5' y='3.5' width='13' height='9.5' rx='1.6'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><rect x='1.5' y='3.5' width='13' height='9.5' rx='1.6'/><path d='M1.5 6.5h13'/><path d='M10.6 9.8h1.9'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M4 14.5h5M4 16.8h3"/><circle cx="18.2" cy="14.7" r=".9"/></g></symbol>
+<symbol id="vi-house-builder" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><path d='M1.5 9L8 2.5 14.5 9V14.5H10V11H6v3.5H1.5V9z'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><path d='M1.5 9L8 2.5 14.5 9V14.5H10V11H6v3.5H1.5V9z'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M5.5 15.5h2.5M16 15.5h2.5M5.5 18.5h2.5M16 18.5h2.5M17.5 8.2V4.8h2.4v5.4"/></g></symbol>
+<symbol id="vi-assets" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><rect x='1' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='6' width='3' height='8' rx='.5'/><rect x='12' y='3' width='3' height='11' rx='.5'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><rect x='1' y='9' width='3' height='5' rx='.5'/><rect x='6.5' y='6' width='3' height='8' rx='.5'/><rect x='12' y='3' width='3' height='11' rx='.5'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 16.5h1.5M11.2 12h1.6M19.5 7.5h1.5M1 22.5h22"/></g></symbol>
+<symbol id="vi-debt-tracker" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><polyline points='1,4.5 5,9.5 9,7 15,13'/><polyline points='11.5,13 15,13 15,9.5'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M1.5 22.5h21"/><path d="M1.5 12h21" stroke-dasharray="1 2.2"/></g></symbol>
+<symbol id="vi-entrepreneur" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><path d='M9.5 1.5L4 9h5.5L8 14.5l7.5-8.5H9.5z'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><path d='M9.5 1.5L4 9h5.5L8 14.5l7.5-8.5H9.5z'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 3l1.5 1.5M1.5 7.5H3.5M20.5 17l1.5 1.5"/></g></symbol>
+<symbol id="vi-trophy" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><path d='M4.5 1.5h7v5c0 3-3 4-3.5 4S4.5 9.5 4.5 6.5v-5z'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><path d='M4.5 1.5h7v5c0 3-3 4-3.5 4S4.5 9.5 4.5 6.5v-5z'/><path d='M2.5 6H4.5M11.5 6H13.5'/><line x1='8' y1='10.5' x2='8' y2='12.5'/><rect x='5' y='12.5' width='6' height='1.5' rx='.5'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M9.5 6h5M8 21.8h8"/></g></symbol>
+<symbol id="vi-connections" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><circle cx='8' cy='3' r='1.5'/><circle cx='3' cy='13' r='1.5'/><circle cx='13' cy='13' r='1.5'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><circle cx='8' cy='3' r='1.5'/><circle cx='3' cy='13' r='1.5'/><circle cx='13' cy='13' r='1.5'/><line x1='7.1' y1='4.4' x2='3.9' y2='11.6'/><line x1='8.9' y1='4.4' x2='12.1' y2='11.6'/><line x1='4.5' y1='13' x2='11.5' y2='13'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="10.5" stroke-dasharray="1.5 2.6"/></g></symbol>
+<symbol id="vi-network" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><polygon points='8,1 10.5,6 16,6.9 12,10.7 12.9,16 8,13.4 3.1,16 4,10.7 0,6.9 5.5,6'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><polygon points='8,1 10.5,6 16,6.9 12,10.7 12.9,16 8,13.4 3.1,16 4,10.7 0,6.9 5.5,6'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="2.4"/><circle cx="12" cy="12" r="10.5" stroke-dasharray="1.5 2.6"/></g></symbol>
+<symbol id="vi-metals" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><rect x='2' y='5.5' width='12' height='5' rx='1'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><rect x='2' y='5.5' width='12' height='5' rx='1'/><line x1='5.5' y1='5.5' x2='5.5' y2='10.5'/><line x1='8' y1='5.5' x2='8' y2='10.5'/><line x1='10.5' y1='5.5' x2='10.5' y2='10.5'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M5 9.8h2M17 14.2h2"/></g></symbol>
+<symbol id="vi-crypto" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><path d='M5 3.5h5c1.5 0 2.5.9 2.5 2.3S11.5 8 10 8H5m0 0h5.5c1.5 0 2.5.9 2.5 2.3S11 12.5 9.5 12.5H5'/><line x1='7' y1='2.5' x2='7' y2='13.5'/><line x1='9' y1='2.5' x2='9' y2='13.5'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="10.5" stroke-dasharray="1 2.4"/></g></symbol>
+<symbol id="vi-cash" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><rect x='1' y='4' width='14' height='8' rx='1.5'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><rect x='1' y='4' width='14' height='8' rx='1.5'/><circle cx='8' cy='8' r='2'/><circle cx='3.5' cy='8' r='.5' fill='currentColor' stroke='none'/><circle cx='12.5' cy='8' r='.5' fill='currentColor' stroke='none'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M5 8h2M17 16h2"/></g></symbol>
+<symbol id="vi-cube" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><path d='M8 1.5l6 3v6L8 14l-6-3.5v-6z'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><path d='M8 1.5l6 3v6L8 14l-6-3.5v-6z'/><polyline points='2,4.5 8,7.5 14,4.5'/><line x1='8' y1='7.5' x2='8' y2='14'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="11.3" r=".7"/><path d="M12 3.2v1.4"/></g></symbol>
+<symbol id="vi-candles" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='4.5' y='8' width='5' height='8' rx='1'/><rect x='14.5' y='10' width='5' height='6' rx='1'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M7 4v16M17 8v12'/><rect x='4.5' y='8' width='5' height='8' rx='1'/><rect x='14.5' y='10' width='5' height='6' rx='1'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M2 6h20M2 19h20" stroke-dasharray="1 2.4"/></g></symbol>
+<symbol id="vi-net-worth" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 17 9 11l4 4 8-9'/><path d='M15 6h6v6'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 21h18" stroke-dasharray="1 2.2"/><circle cx="9" cy="11" r=".9"/><circle cx="13" cy="15" r=".9"/></g></symbol>
+<symbol id="vi-assets-total" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M5 21V10l7-5 7 5v11z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 21h18M5 21V10l7-5 7 5v11'/><path d='M9 21v-6h6v6'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M8.5 10.5h7M10 8h4"/></g></symbol>
+<symbol id="vi-debt-total" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='2' y='5' width='20' height='14' rx='2'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='2' y='5' width='20' height='14' rx='2'/><path d='M2 10h20'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M5 15.5h4M5 17h2.5M17 15.5h2"/></g></symbol>
+<symbol id="vi-liabilities" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 3 2 20h20L12 3z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3 2 20h20L12 3z'/><path d='M12 10v4M12 17.2h.01'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M6.5 18h11"/></g></symbol>
+<symbol id="vi-coin" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='12' cy='12' r='9'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='12' cy='12' r='9'/><path d='M14.8 9a2.8 2.8 0 0 0-5.3 1.300V16M8 16h8M8 12.500h5.5'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="6.6" stroke-dasharray="1 2.3"/></g></symbol>
+<symbol id="vi-b-ce" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M1.5 11.5 9 4.5l7.5 7'/><path d='M3.5 10.2v7.3h11V10.2'/><rect x='13' y='14.5' width='9.5' height='7.5' rx='1.6' fill='currentColor' fill-opacity='.22'/><path d='M15 14.5v-3a2.8 2.8 0 0 1 5.6 0v3'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M6 9.5h1.5M10.5 9.5H12"/></g></symbol>
+<symbol id="vi-b-ve" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M1.5 11.5 9 4.5l7.5 7'/><path d='M3.5 10.2v7.3h11V10.2'/><rect x='13' y='14.5' width='9.5' height='7.5' rx='1.6' fill='currentColor' fill-opacity='.22'/><path d='M15 14.5v-3a2.8 2.8 0 0 1 5.3-1.2'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M6 9.5h1.5M10.5 9.5H12"/></g></symbol>
+<symbol id="vi-b-cn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M9 3.5l1.9 3.9 4.3.6-3.1 3 .7 4.3L9 13.3l-3.8 2 .7-4.3-3.1-3 4.3-.6z' fill='currentColor' fill-opacity='.18'/><rect x='13' y='14.5' width='9.5' height='7.5' rx='1.6' fill='currentColor' fill-opacity='.22'/><path d='M15 14.5v-3a2.8 2.8 0 0 1 5.6 0v3'/></g></symbol>
+<symbol id="vi-b-vn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M9 3.5l1.9 3.9 4.3.6-3.1 3 .7 4.3L9 13.3l-3.8 2 .7-4.3-3.1-3 4.3-.6z' fill='currentColor' fill-opacity='.18'/><rect x='13' y='14.5' width='9.5' height='7.5' rx='1.6' fill='currentColor' fill-opacity='.22'/><path d='M15 14.5v-3a2.8 2.8 0 0 1 5.3-1.2'/></g></symbol>
+<symbol id="vi-safe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='3' y='4' width='18' height='16' rx='2.5' fill='currentColor' fill-opacity='.16'/><circle cx='12' cy='12' r='3.6'/><path d='M12 8.2v1.4M12 14.4v1.4M8.2 12h1.4M14.4 12h1.4'/><path d='M6 20v1.5M18 20v1.5'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="1.2"/></g></symbol>
+<symbol id="vi-bnpl" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='3' y='5' width='18' height='14' rx='2'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M12 5v14M3 12h18'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M7 8.5h2M15 8.5h2M7 15.5h2M15 15.5h2"/></g></symbol>
+<symbol id="vi-loan" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M6 3h8l4 4v14H6z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M6 3h8l4 4v14H6z'/><path d='M14 3v4h4M9 13h6M9 17h4'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M9 9.5h3"/></g></symbol>
+<symbol id="vi-overdraft" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='12' cy='12' r='9'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='12' cy='12' r='9'/><path d='M8 12h8'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="6.4" stroke-dasharray="1 2.3"/></g></symbol>
+<symbol id="vi-mortgage" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M5 10v10h14V10z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 11l9-7 9 7'/><path d='M5 10v10h14V10'/><path d='M9 15h6'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M10 20v-3.5h4V20"/></g></symbol>
+<symbol id="vi-paid-off" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='3' y='6.5' width='18' height='11' rx='2'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='3' y='6.5' width='18' height='11' rx='2'/><path d='M8.5 12.2l2.4 2.4 4.6-5'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 10h1.5M19.5 14H21"/></g></symbol>
+<symbol id="vi-snowball" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='8' cy='15' r='4.5'/><circle cx='17' cy='8' r='3'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='8' cy='15' r='4.5'/><circle cx='17' cy='8' r='3'/><path d='M11.2 11.8l3.4-2.2'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M2.5 19.5h2.5M1.5 16.8h2"/></g></symbol>
+<symbol id="vi-avalanche" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M2.5 20l6.5-11 4 6.5 3-4.5 5.5 9z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M2.5 20l6.5-11 4 6.5 3-4.5 5.5 9z'/><path d='M8.5 4.500v4'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M5 6h.01M10 3h.01M15 5.5h.01M19 8h.01"/></g></symbol>
+<symbol id="vi-water" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M9.5 15.5a2.8 2.8 0 0 0 2 2.5"/></g></symbol>
+<symbol id="vi-xp" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 3l8 9-8 9-8-9z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3l8 9-8 9-8-9z'/><path d='M4 12h16'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M12 3v18M7.7 7.5L12 12l4.3-4.5"/></g></symbol>
+<symbol id="vi-streak" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='19' cy='12' r='2'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='5' cy='12' r='2'/><circle cx='12' cy='12' r='2'/><circle cx='19' cy='12' r='2'/><path d='M7 12h3M14 12h3'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M5 16.5v1.5M12 16.5v1.5M19 16.5v1.5"/></g></symbol>
+<symbol id="vi-level" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 20h4v-4h4v-4h4V8h4V4'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 22h18"/><circle cx="5" cy="18" r=".6"/><circle cx="9" cy="14" r=".6"/><circle cx="13" cy="10" r=".6"/></g></symbol>
+<symbol id="vi-milestone" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M5 4h11l-2 4 2 4H5z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M5 21V4M5 4h11l-2 4 2 4H5'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 21h6M8 7h5M8 9.5h3"/></g></symbol>
+<symbol id="vi-keys" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='8' cy='15' r='4'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='8' cy='15' r='4'/><path d='M11 12l9-9M16 7l3 3M14 9l2 2'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="8" cy="15" r="1.4"/></g></symbol>
+<symbol id="vi-brick" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='3' y='8' width='18' height='8' rx='1.5'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='3' y='8' width='18' height='8' rx='1.5'/><path d='M8 12h8'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M6.5 8v2M17.5 14v2"/></g></symbol>
+<symbol id="vi-slice" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 3l9 5-9 5-9-5z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3l9 5-9 5-9-5z'/><path d='M3 12l9 5 9-5M3 16l9 5 9-5'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M12 13v8" stroke-dasharray="1 2"/></g></symbol>
+<symbol id="vi-crown" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 18L3 8l5 4 4-7 4 7 5-4-1 10z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 18h18M4 18L3 8l5 4 4-7 4 7 5-4-1 10'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M5 20.5h14"/><circle cx="12" cy="10" r=".8"/></g></symbol>
+<symbol id="vi-vault" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='12' cy='12' r='4'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='12' cy='12' r='9'/><circle cx='12' cy='12' r='4'/><path d='M12 3v3M12 18v3M3 12h3M18 12h3'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M12.00 5.80L12.00 4.60M15.10 6.63L15.70 5.59M17.37 8.90L18.41 8.30M18.20 12.00L19.40 12.00M17.37 15.10L18.41 15.70M15.10 17.37L15.70 18.41M12.00 18.20L12.00 19.40M8.90 17.37L8.30 18.41M6.63 15.10L5.59 15.70M5.80 12.00L4.60 12.00M6.63 8.90L5.59 8.30M8.90 6.63L8.30 5.59"/><circle cx="12" cy="12" r="1"/></g></symbol>
+<symbol id="vi-target" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='12' cy='12' r='5'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='12' cy='12' r='9'/><circle cx='12' cy='12' r='5'/><circle cx='12' cy='12' r='1.2'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></g></symbol>
+<symbol id="vi-forecast" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 17l5-5 4 3 4-6'/><path d='M16 9l5-3' stroke-dasharray='2 2.5'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="3" cy="17" r=".7"/><circle cx="21" cy="6" r=".7"/></g></symbol>
+<symbol id="vi-income" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 16V4M7 9l5-5 5 5M4 20h16'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M9 20v-1.5M15 20v-1.5"/></g></symbol>
+<symbol id="vi-spend" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 4v12M7 11l5 5 5-5M4 20h16'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M9 20v-1.5M15 20v-1.5"/></g></symbol>
+<symbol id="vi-calendar" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='3.5' y='5' width='17' height='15' rx='2'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='3.5' y='5' width='17' height='15' rx='2'/><path d='M3.5 10h17M8 3v4M16 3v4'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/></g></symbol>
+<symbol id="vi-zoom-in" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 5v14M5 12h14'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="9.5" stroke-dasharray="1 2.4"/></g></symbol>
+<symbol id="vi-zoom-out" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M5 12h14'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="9.5" stroke-dasharray="1 2.4"/></g></symbol>
+<symbol id="vi-orbit" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M20 12a8 8 0 1 1-2.6-5.9M20 4.5v4h-4'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="1.2"/></g></symbol>
+<symbol id="vi-reset" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4 12a8 8 0 1 0 2.6-5.9M4 4.5v4h4'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="1.2"/></g></symbol>
+<symbol id="vi-pin" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 21s-6-5.6-6-10a6 6 0 0 1 12 0c0 4.4-6 10-6 10z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 21s-6-5.6-6-10a6 6 0 0 1 12 0c0 4.4-6 10-6 10z'/><circle cx='12' cy='11' r='2.2'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M8 21.5c1 .6 2.4.9 4 .9s3-.3 4-.9"/></g></symbol>
+<symbol id="vi-fullscreen" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r=".9"/></g></symbol>
+<symbol id="vi-pan" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="1.2"/></g></symbol>
+<symbol id="vi-pinch" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4 4l6 6M10 5v5H5M20 20l-6-6M14 19v-5h5'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="1"/></g></symbol>
+<symbol id="vi-mouse" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='7' y='3' width='10' height='18' rx='5'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='7' y='3' width='10' height='18' rx='5'/><path d='M12 7v3'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M7 12h10"/></g></symbol>
+<symbol id="vi-check" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='12' cy='12' r='9'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='12' cy='12' r='9'/><path d='M8 12.5l3 3 5-6'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="6.4" stroke-dasharray="1 2.3"/></g></symbol>
+<symbol id="vi-alert" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M12 3L2 20h20L12 3z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3L2 20h20L12 3z'/><path d='M12 10v4M12 17.2h.01'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M6.5 18h11"/></g></symbol>
+<symbol id="vi-info" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='12' cy='12' r='9'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='12' cy='12' r='9'/><path d='M12 11v5M12 7.8h.01'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="6.4" stroke-dasharray="1 2.3"/></g></symbol>
+<symbol id="vi-lock" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='5' y='11' width='14' height='10' rx='2.2'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='5' y='11' width='14' height='10' rx='2.2'/><path d='M8 11V8a4 4 0 0 1 8 0v3'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M12 15v2.5"/></g></symbol>
+<symbol id="vi-unlock" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='5' y='11' width='14' height='10' rx='2.2'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='5' y='11' width='14' height='10' rx='2.2'/><path d='M8 11V8a4 4 0 0 1 7.5-2'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M12 15v2.5"/></g></symbol>
+<symbol id="vi-plus" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='12' cy='12' r='9'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='12' cy='12' r='9'/><path d='M12 8v8M8 12h8'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="6.2" stroke-dasharray="1 2.3"/></g></symbol>
+<symbol id="vi-edit" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M14 22h7"/></g></symbol>
+<symbol id="vi-close" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M6 6l12 12M18 6L6 18'/></g></symbol>
+<symbol id="vi-undo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M9 7L4 12l5 5M4 12h10a6 6 0 0 1 6 6'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="19" cy="18" r=".6"/></g></symbol>
+<symbol id="vi-chevron" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M6 9l6 6 6-6'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M8 4.5l4 4 4-4"/></g></symbol>
+<symbol id="vi-palette" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 3a9 9 0 1 0 0 18c1.4 0 2-1 2-2s-.6-1.6-.6-2.600c0-1 .8-1.8 1.8-1.800H17a4 4 0 0 0 4-4C21 6.4 17 3 12 3z'/><circle cx='8' cy='11' r='1'/><circle cx='12' cy='7.5' r='1'/><circle cx='16' cy='10' r='1'/></g></symbol>
+<symbol id="vi-sync" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4 10a8 8 0 0 1 14-3M20 4v4h-4M20 14a8 8 0 0 1-14 3M4 20v-4h4'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="1.2"/></g></symbol>
+<symbol id="vi-download" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M12 4v11M7 11l5 5 5-5M5 20h14'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M9 20v-1M15 20v-1"/></g></symbol>
+<symbol id="vi-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='11' cy='11' r='6.5'/><path d='M16 16l4 4'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M8.5 9.5a3 3 0 0 1 2-1.8"/></g></symbol>
+<symbol id="vi-user" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='12' cy='8' r='4'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='12' cy='8' r='4'/><path d='M4 20c1.5-4 5-5 8-5s6.5 1 8 5'/></g></symbol>
+<symbol id="vi-sun" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><circle cx='12' cy='12' r='4'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><circle cx='12' cy='12' r='4'/><path d='M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><circle cx="12" cy="12" r="6.6" stroke-dasharray="1 2.6"/></g></symbol>
+<symbol id="vi-moon" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5z'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M16.5 6.5h.01M19 9.5h.01M14 3.5h.01"/></g></symbol>
+<symbol id="vi-type" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3.5 20L9 5.5l5.5 14.5M5.5 14.5h7'/><circle cx='17.3' cy='17.2' r='2.6'/><path d='M19.9 14.6v5.2'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 21.5h18" stroke-dasharray="1 2.4"/></g></symbol>
+<symbol id="vi-code" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 5l-3 14'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 21.5h18" stroke-dasharray="1 2.4"/></g></symbol>
+<symbol id="vi-mail" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='3' y='5' width='18' height='14' rx='2'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 7l9 6 9-6'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 19l6.5-6M21 19l-6.5-6"/></g></symbol>
+<symbol id="vi-chat" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 20l1.3-4A8 8 0 1 1 8 18.700z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4 20l1.3-4A8 8 0 1 1 8 18.700z'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M9 11.5h.01M12 11.5h.01M15 11.5h.01"/></g></symbol>
+<symbol id="vi-linkedin" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='3.5' y='3.5' width='17' height='17' rx='3'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='3.5' y='3.5' width='17' height='17' rx='3'/><path d='M8 10.500V16M8 7.800h.01M12 16v-5.500M12 13a2.5 2.5 0 0 1 5 0V16'/></g></symbol>
+<symbol id="vi-portfolio" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='3' y='4' width='18' height='16' rx='2'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='3' y='4' width='18' height='16' rx='2'/><path d='M3 9h18M7 6.500h.01M10 6.500h.01'/></g></symbol>
+<symbol id="vi-camera" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><rect x='3.5' y='3.5' width='17' height='17' rx='5'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><rect x='3.5' y='3.5' width='17' height='17' rx='5'/><circle cx='12' cy='12' r='4'/><path d='M17 7h.01'/></g></symbol>
+</svg>
 <!-- ═══════════════════════════════════════════════════════════════
      LOGIN / AUTH OVERLAY  (z-index 10000, shown by default,
      hidden by pre-paint script when session is valid)
@@ -9506,14 +9628,14 @@ button.bd-ic{cursor:pointer}
   <span>⬇ Install Vault·It — works offline, opens like an app</span>
   <div style="display:flex;gap:6px;align-items:center">
     <button class="install-btn" onclick="triggerPwaInstall()">Install Free</button>
-    <button class="dismiss-btn" onclick="dismissPwaBanner()">✕</button>
+    <button class="dismiss-btn" onclick="dismissPwaBanner()"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
   </div>
 </div>
 
 <!-- TOP NAV -->
 <!-- ── LEFT SIDEBAR ── -->
 <div id="sidebar-toggle" onclick="toggleSidebar()" title="Open profile &amp; stats">
-  <span id="sb-toggle-arrow" style="font-size:.85rem;font-weight:700;color:var(--em)">›</span>
+  <span id="sb-toggle-arrow" style="font-size:.85rem;font-weight:700;color:var(--em)"><svg class="vi-ic g nx" role="img" aria-label="Next"><use href="#vi-chevron"/></svg></span>
   <span style="font-family:'Syne',sans-serif;font-size:.28rem;font-weight:800;letter-spacing:.25em;text-transform:uppercase;color:var(--em);writing-mode:vertical-rl;text-orientation:mixed;opacity:.75;line-height:1">VAULT·IT</span>
 </div>
 <div id="left-sidebar">
@@ -9684,7 +9806,7 @@ button.bd-ic{cursor:pointer}
   <!-- Outer bezel -->
   <circle cx="40.0" cy="40.0" r="37.6" fill="#0a1a1a" stroke="#44c0b9" stroke-width="1.4"/>
   <!-- Bezel inner shadow ring -->
-  <circle cx="40.0" cy="40.0" r="34.4" fill="none" stroke="rgba(0,0,0,.6)" stroke-width="1.6"/>
+  <circle cx="40.0" cy="40.0" r="34.4" fill="none" stroke="rgba(0,0,0,.6)" stroke-width="1.5"/>
   <!-- Rivets -->
   <circle cx="40.0" cy="4.2" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="57.9" cy="9.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="71.0" cy="22.1" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="75.8" cy="40.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="71.0" cy="57.9" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="57.9" cy="71.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="40.0" cy="75.8" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="22.1" cy="71.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="9.0" cy="57.9" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="4.2" cy="40.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="9.0" cy="22.1" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="22.1" cy="9.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/>
   <!-- Mounting tabs -->
@@ -9855,7 +9977,7 @@ button.bd-ic{cursor:pointer}
 <div id="vi-campaign-modal" class="hidden">
   <div class="vi-camp-wrap">
     <div class="vi-camp-hdr">
-      <button class="vi-camp-close" onclick="document.getElementById('vi-campaign-modal').classList.add('hidden')">✕</button>
+      <button class="vi-camp-close" onclick="document.getElementById('vi-campaign-modal').classList.add('hidden')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
       <div class="vi-camp-eyebrow">⚡ Crowdfund · Open Now</div>
       <div class="vi-camp-headline">Back Vault·It from the start.</div>
       <p class="vi-camp-sub">Vault·It is the financial operating system you own. Back the build early — lock in your price forever, and help shape what gets built next.</p>
@@ -9987,7 +10109,7 @@ button.bd-ic{cursor:pointer}
   <polyline 
       points="9.0,11.5 16.0,21.1 23.0,11.5"
       fill="none" stroke="#44c0b9" 
-      stroke-width="1.8" 
+      stroke-width="1.5" 
       stroke-linecap="square" 
       stroke-linejoin="miter"/>
   <!-- Centre dot -->
@@ -9997,7 +10119,7 @@ button.bd-ic{cursor:pointer}
         <div class="vi-modal-eyebrow" id="offer-badge">VAULT·IT PRO</div>
         <div class="vi-modal-title" id="offer-headline">Welcome back.</div>
       </div>
-      <button class="vi-modal-close" onclick="document.getElementById('pro-offer-modal').classList.add('hidden')">✕</button>
+      <button class="vi-modal-close" onclick="document.getElementById('pro-offer-modal').classList.add('hidden')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
     </div>
 
     <div class="vi-modal-body">
@@ -10179,27 +10301,27 @@ button.bd-ic{cursor:pointer}
   <!-- KPI Strip -->
   <div class="ov-kpis">
     <div class="ov-kpi ov-kpi-nw">
-      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M3 17 9 11l4 4 8-9"/><path d="M15 6h6v6"/></svg>Net Worth</div>
+      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M3 17 9 11l4 4 8-9"/><path d="M15 6h6v6"/></svg>Net Worth</div>
       <div class="ov-kpi-val" id="kpi-nw" style="color:var(--em)">£0</div>
       <div class="ov-kpi-sub" id="kpi-nw-sub">assets − liabilities</div>
     </div>
     <div class="ov-kpi ov-kpi-as">
-      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/></svg>Total Assets</div>
+      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/></svg>Total Assets</div>
       <div class="ov-kpi-val" id="kpi-assets" style="color:var(--gr)">£0</div>
       <div class="ov-kpi-sub">all holdings</div>
     </div>
     <div class="ov-kpi ov-kpi-db">
-      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Total Debt</div>
+      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Total Debt</div>
       <div class="ov-kpi-val" id="kpi-debt-total" style="color:var(--re)">£0</div>
       <div class="ov-kpi-sub">credit · loans · bnpl</div>
     </div>
     <div class="ov-kpi ov-kpi-li">
-      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/></svg>Total Liabilities</div>
+      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/></svg>Total Liabilities</div>
       <div class="ov-kpi-val" id="kpi-liab" style="color:var(--go)">£0</div>
       <div class="ov-kpi-sub" id="kpi-liab-sub">running costs</div>
     </div>
     <div class="ov-kpi ov-kpi-su">
-      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.8 1.8 0 0 1 0 3.5h-3a1.8 1.8 0 0 0 0 3.500h4.500"/></svg>Monthly Surplus</div>
+      <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.8 1.8 0 0 1 0 3.5h-3a1.8 1.8 0 0 0 0 3.500h4.500"/></svg>Monthly Surplus</div>
       <div class="ov-kpi-val" id="kpi-debt" style="color:var(--em)">£0</div>
       <div class="ov-kpi-sub" id="kpi-debt-sub">monthly surplus</div>
     </div>
@@ -10253,7 +10375,7 @@ button.bd-ic{cursor:pointer}
           <div id="ms-custom-list"></div>
         </div>
         <details class="ms-add" id="ms-add-goal">
-          <summary>＋ Add your own goal</summary>
+          <summary><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> Add your own goal</summary>
           <div class="ms-add-body">
             <input type="text" id="goal-name" maxlength="30" placeholder="Goal name, e.g. Wedding fund">
             <input type="number" id="goal-amt" min="0" placeholder="£ target">
@@ -10265,7 +10387,7 @@ button.bd-ic{cursor:pointer}
         <div class="ms-col-hd">📸 Snapshots <span style="opacity:.6;font-weight:400">(past net worth on the chart)</span></div>
         <div id="ms-snap-list"></div>
         <details class="ms-add" id="ms-add-snap">
-          <summary>＋ Add a snapshot</summary>
+          <summary><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> Add a snapshot</summary>
           <div class="ms-add-body">
             <input type="month" id="snap-month">
             <input type="number" id="snap-nw" placeholder="£ Net Worth">
@@ -10302,8 +10424,8 @@ button.bd-ic{cursor:pointer}
         </div>
       </div>
       <div class="fr-legend">
-        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#44c0b9"/><path d="M4.6 8.2l2.3 2.3 4.4-4.9" fill="none" stroke="#030810" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Achieved</span>
-        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#44c0b9" stroke-width="1.6"/><circle cx="8" cy="8" r="2.4" fill="#44c0b9"/></svg>Next up</span>
+        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#44c0b9"/><path d="M4.6 8.2l2.3 2.3 4.4-4.9" fill="none" stroke="#030810" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Achieved</span>
+        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#44c0b9" stroke-width="1.5"/><circle cx="8" cy="8" r="2.4" fill="#44c0b9"/></svg>Next up</span>
         <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#7d8793" stroke-width="1.2" stroke-dasharray="2.5 2.5"/><rect x="5.6" y="7.6" width="4.8" height="3.8" rx=".8" fill="#7d8793"/><path d="M6.6 7.6V6.4a1.4 1.4 0 0 1 2.8 0v1.2" fill="none" stroke="#7d8793" stroke-width="1"/></svg>Locked — finish earlier stages first</span>
         <span id="fire-progress-txt" style="margin-left:auto;color:var(--em)">0 of 30 achieved</span>
       </div>
@@ -10315,7 +10437,7 @@ button.bd-ic{cursor:pointer}
       <!-- Stage detail panel — shown on click -->
       <div class="fire-detail-panel" id="fire-detail-panel" style="display:none">
         <div class="fire-detail-inner" id="fire-detail-inner"></div>
-        <button onclick="document.getElementById('fire-detail-panel').style.display='none'" class="fire-detail-close">✕</button>
+        <button onclick="document.getElementById('fire-detail-panel').style.display='none'" class="fire-detail-close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
       </div>
     </div>
 
@@ -10341,17 +10463,17 @@ button.bd-ic{cursor:pointer}
   <!-- Summary Cards Row -->
   <div class="g3" id="ov-summary-row" style="margin-top:12px">
     <div class="ov-chart-card ov-sum ov-sum-a" id="ov-assets-summary-card">
-      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/><path d="M12 9v0"/></svg></span><span class="ov-chart-title">Assets Summary</span></div>
+      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/><path d="M12 9v0"/></svg></span><span class="ov-chart-title">Assets Summary</span></div>
       <div id="ov-assets-summary"></div>
       <div id="ov-assets-next" style="margin-top:8px;font-size:.55rem;color:var(--em);border-top:1px solid var(--bd);padding-top:6px"></div>
     </div>
     <div class="ov-chart-card ov-sum ov-sum-l" id="ov-liab-summary-card">
-      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></span><span class="ov-chart-title">Liabilities Summary</span></div>
+      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></span><span class="ov-chart-title">Liabilities Summary</span></div>
       <div id="ov-liab-summary"></div>
       <div id="ov-liab-next" style="margin-top:8px;font-size:.55rem;color:var(--go);border-top:1px solid var(--bd);padding-top:6px"></div>
     </div>
     <div class="ov-chart-card ov-sum ov-sum-d" id="ov-debt-summary-card">
-      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></span><span class="ov-chart-title">Debt Summary</span></div>
+      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></span><span class="ov-chart-title">Debt Summary</span></div>
       <div id="ov-debt-summary"></div>
       <div id="ov-debt-next" style="margin-top:8px;font-size:.55rem;color:var(--re);border-top:1px solid var(--bd);padding-top:6px"></div>
     </div>
@@ -10470,7 +10592,7 @@ button.bd-ic{cursor:pointer}
               </div>
               <div class="vp-gi-sep"></div>
               <div class="vp-gi-row">
-                <div class="vp-gi-ico"><svg width="12" height="17" viewBox="0 0 12 17" fill="none"><rect x="1" y="1" width="10" height="15" rx="5" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="4" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4.5 3 L6 1.5 L7.5 3" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 8.5 L6 10 L7.5 8.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="vp-gi-ico"><svg width="12" height="17" viewBox="0 0 12 17" fill="none"><rect x="1" y="1" width="10" height="15" rx="5" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="4" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.5 3 L6 1.5 L7.5 3" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 8.5 L6 10 L7.5 8.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
                 <div class="vp-gi-lbl"><b>SCROLL</b>zoom in/out</div>
               </div>
               <div class="vp-gi-sep"></div>
@@ -10560,16 +10682,16 @@ button.bd-ic{cursor:pointer}
       <div class="card">
         <div class="card-lbl">Build Milestones</div>
         <div class="mss">
-          <div class="ms" id="ms1"><div class="ms-dot"></div><div class="ms-lbl" id="msl-1">1% — Site Cleared</div><div class="ms-ck">✓</div></div>
-          <div class="ms" id="ms5"><div class="ms-dot"></div><div class="ms-lbl" id="msl-5">5% — Foundation Poured</div><div class="ms-ck">✓</div></div>
-          <div class="ms" id="ms15"><div class="ms-dot"></div><div class="ms-lbl" id="msl-15">15% — Ground Floor Walls</div><div class="ms-ck">✓</div></div>
-          <div class="ms" id="ms30"><div class="ms-dot"></div><div class="ms-lbl" id="msl-30">30% — Ground Floor Up</div><div class="ms-ck">✓</div></div>
-          <div class="ms" id="ms50"><div class="ms-dot"></div><div class="ms-lbl" id="msl-50">50% — First Floor Up</div><div class="ms-ck">✓</div></div>
-          <div class="ms" id="ms65"><div class="ms-dot"></div><div class="ms-lbl" id="msl-65">65% — Roof Structure</div><div class="ms-ck">✓</div></div>
-          <div class="ms" id="ms80"><div class="ms-dot"></div><div class="ms-lbl" id="msl-80">80% — Lights Are On!</div><div class="ms-ck">✓</div></div>
-          <div class="ms" id="ms90"><div class="ms-dot"></div><div class="ms-lbl" id="msl-90">90% — Final Fitting</div><div class="ms-ck">✓</div></div>
-          <div class="ms" id="ms95"><div class="ms-dot"></div><div class="ms-lbl" id="msl-95">95% — Final Touches</div><div class="ms-ck">✓</div></div>
-          <div class="ms" id="ms100"><div class="ms-dot"></div><div class="ms-lbl" id="msl-100">100% — It's Yours! 🎉</div><div class="ms-ck">✓</div></div>
+          <div class="ms" id="ms1"><div class="ms-dot"></div><div class="ms-lbl" id="msl-1">1% — Site Cleared</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
+          <div class="ms" id="ms5"><div class="ms-dot"></div><div class="ms-lbl" id="msl-5">5% — Foundation Poured</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
+          <div class="ms" id="ms15"><div class="ms-dot"></div><div class="ms-lbl" id="msl-15">15% — Ground Floor Walls</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
+          <div class="ms" id="ms30"><div class="ms-dot"></div><div class="ms-lbl" id="msl-30">30% — Ground Floor Up</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
+          <div class="ms" id="ms50"><div class="ms-dot"></div><div class="ms-lbl" id="msl-50">50% — First Floor Up</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
+          <div class="ms" id="ms65"><div class="ms-dot"></div><div class="ms-lbl" id="msl-65">65% — Roof Structure</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
+          <div class="ms" id="ms80"><div class="ms-dot"></div><div class="ms-lbl" id="msl-80">80% — Lights Are On!</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
+          <div class="ms" id="ms90"><div class="ms-dot"></div><div class="ms-lbl" id="msl-90">90% — Final Fitting</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
+          <div class="ms" id="ms95"><div class="ms-dot"></div><div class="ms-lbl" id="msl-95">95% — Final Touches</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
+          <div class="ms" id="ms100"><div class="ms-dot"></div><div class="ms-lbl" id="msl-100">100% — It's Yours! 🎉</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
         </div>
       </div>
       <div class="card">
@@ -10693,7 +10815,7 @@ button.bd-ic{cursor:pointer}
                   </div>
                   <div class="vp-gi-sep"></div>
                   <div class="vp-gi-row">
-                    <div class="vp-gi-ico"><svg width="12" height="17" viewBox="0 0 12 17" fill="none"><rect x="1" y="1" width="10" height="15" rx="5" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="4" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4.5 3 L6 1.5 L7.5 3" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 8.5 L6 10 L7.5 8.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="vp-gi-ico"><svg width="12" height="17" viewBox="0 0 12 17" fill="none"><rect x="1" y="1" width="10" height="15" rx="5" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="4" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.5 3 L6 1.5 L7.5 3" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 8.5 L6 10 L7.5 8.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
                     <div class="vp-gi-lbl"><b>SCROLL</b>zoom in/out</div>
                   </div>
                   <div class="vp-gi-sep"></div>
@@ -10860,8 +10982,8 @@ button.bd-ic{cursor:pointer}
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <span class="ov-chart-title">Debt Strategy</span>
         <div style="display:flex;gap:6px;align-items:center">
-          <button id="debt-method-btn-avalanche" onclick="setDebtMethod('avalanche')" style="padding:4px 10px;background:rgb(var(--orange-rgb) / .15);border:1px solid rgb(var(--orange-rgb) / .5);border-radius:4px;color:var(--or);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;cursor:pointer;letter-spacing:.06em"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M2 20 9 7l4 6 2.500-4L22 20Z"/><path d="M7.500 10.500 9 13l1.500-2"/><circle cx="17" cy="4" r=".8" fill="currentColor"/><circle cx="20" cy="7" r=".8" fill="currentColor"/><circle cx="14" cy="3" r=".8" fill="currentColor"/></svg>AVALANCHE</button>
-          <button id="debt-method-btn-snowball" onclick="setDebtMethod('snowball')" style="padding:4px 10px;background:transparent;border:1px solid var(--t3);border-radius:4px;color:var(--t3);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;cursor:pointer;letter-spacing:.06em"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="13" cy="13" r="8"/><path d="M8 10a6 6 0 0 1 6-3"/><path d="M9 16a6 6 0 0 0 7 1"/><path d="M2 8h3M1 12h4M2 16h3"/></svg>SNOWBALL</button>
+          <button id="debt-method-btn-avalanche" onclick="setDebtMethod('avalanche')" style="padding:4px 10px;background:rgb(var(--orange-rgb) / .15);border:1px solid rgb(var(--orange-rgb) / .5);border-radius:4px;color:var(--or);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;cursor:pointer;letter-spacing:.06em"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M2 20 9 7l4 6 2.500-4L22 20Z"/><path d="M7.500 10.500 9 13l1.500-2"/><circle cx="17" cy="4" r=".8" fill="currentColor"/><circle cx="20" cy="7" r=".8" fill="currentColor"/><circle cx="14" cy="3" r=".8" fill="currentColor"/></svg>AVALANCHE</button>
+          <button id="debt-method-btn-snowball" onclick="setDebtMethod('snowball')" style="padding:4px 10px;background:transparent;border:1px solid var(--t3);border-radius:4px;color:var(--t3);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;cursor:pointer;letter-spacing:.06em"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="13" cy="13" r="8"/><path d="M8 10a6 6 0 0 1 6-3"/><path d="M9 16a6 6 0 0 0 7 1"/><path d="M2 8h3M1 12h4M2 16h3"/></svg>SNOWBALL</button>
         </div>
         <button class="btn-add-data" onclick="showDebtForm()">+ Add Debt</button>
       </div>
@@ -11342,7 +11464,7 @@ button.bd-ic{cursor:pointer}
         <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.58rem;color:var(--go);letter-spacing:.1em">PIONEER STATUS</span>
         <span id="set-pioneer-badge" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.4rem"></span>
       </div>
-      <div id="set-pioneer-active" style="display:none;font-size:.5rem;color:var(--gr);margin-bottom:10px;line-height:1.5">✓ Pioneer access active</div>
+      <div id="set-pioneer-active" style="display:none;font-size:.5rem;color:var(--gr);margin-bottom:10px;line-height:1.5"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access active</div>
       <div id="set-pioneer-inactive" style="font-size:.5rem;color:var(--t2);margin-bottom:10px;line-height:1.5">Upgrade to Pioneer — unlimited tracking, export, projections,<br>£5.99 a month or £49.99 a year.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:7px">
         <button onclick="window.open('https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00','_blank')" style="background:var(--c3);border:1px solid rgb(var(--brass-rgb) / .4);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:7px 6px;cursor:pointer">£5.99/mo</button>
@@ -11432,7 +11554,7 @@ button.bd-ic{cursor:pointer}
 <!-- ═══════════════════ PAYWALL MODAL ═══════════════════ -->
 <div id="paywall-modal" class="paywall-overlay" style="display:none" onclick="if(event.target===this)closePaywall()">
   <div class="paywall-card">
-    <button onclick="closePaywall()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:.9rem;line-height:1">✕</button>
+    <button onclick="closePaywall()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:.9rem;line-height:1"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
     <div style="text-align:center;margin-bottom:18px">
       <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:1.05rem;letter-spacing:.18em;background:linear-gradient(90deg,#b8902e,#f0d878,var(--brass));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">VAULT·IT PIONEER</div>
       <div style="font-size:.48rem;color:var(--t2);margin-top:5px;letter-spacing:.04em">Beta pricing</div>
@@ -11477,7 +11599,6 @@ button.bd-ic{cursor:pointer}
 </div>
 
 <!-- Google Fonts for house-tracker -->
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
 /* ═══════════════════════════════════════════
@@ -11522,7 +11643,7 @@ button.bd-ic{cursor:pointer}
 .price-iw{display:flex;align-items:center;background:rgb(var(--ink-rgb) / .05);border:1px solid rgb(var(--ink-rgb) / .1);border-radius:3px;overflow:hidden;flex:1;transition:border-color .2s}
 .price-iw:focus-within{border-color:#D4A843}
 .price-iw .sym{padding:7px 9px;color:#D4A843;font-size:.8rem;border-right:1px solid rgb(var(--ink-rgb) / .08);background:rgba(212,168,67,.08)}
-.price-iw input{flex:1;background:transparent;border:none;outline:none;color:#F5EDD8;font-family:'DM Mono',monospace;font-size:.82rem;padding:7px 10px;width:0}
+.price-iw input{flex:1;background:transparent;border:none;outline:none;color:#F5EDD8;font-family:var(--font-mono);font-size:.82rem;padding:7px 10px;width:0}
 .btn-sp{padding:7px 12px;background:rgb(var(--teal-rgb) / .1);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:3px;color:var(--teal);font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;cursor:pointer;letter-spacing:.12em;text-transform:uppercase;transition:all .2s;white-space:nowrap}
 .btn-sp:hover{background:rgba(212,168,67,.28)}
 .igrp{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
@@ -11530,7 +11651,7 @@ button.bd-ic{cursor:pointer}
 .iw{display:flex;align-items:center;background:rgb(var(--ink-rgb) / .05);border:1px solid rgb(var(--ink-rgb) / .11);border-radius:3px;overflow:hidden;transition:border-color .2s}
 .iw:focus-within{border-color:#D4A843}
 .iw .sym{padding:10px 12px;color:#D4A843;font-size:.9rem;border-right:1px solid rgb(var(--ink-rgb) / .08);background:rgba(212,168,67,.08)}
-.iw input{flex:1;background:transparent;border:none;outline:none;color:#F5EDD8;font-family:'DM Mono',monospace;font-size:.92rem;padding:10px 12px}
+.iw input{flex:1;background:transparent;border:none;outline:none;color:#F5EDD8;font-family:var(--font-mono);font-size:.92rem;padding:10px 12px}
 .iw input::placeholder{color:rgb(var(--ink-rgb) / .18)}
 .btn-add{width:100%;padding:11px;background:linear-gradient(135deg,var(--teal-deep),var(--teal));border:1px solid rgb(var(--teal-rgb) / .4);border-radius:3px;color:#e8f8f7;font-family:'Syne',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .2s;font-weight:700}
 .btn-add:hover{background:linear-gradient(135deg,var(--teal),var(--brass));transform:translateY(-1px);box-shadow:0 4px 14px rgb(var(--teal-rgb) / .3)}
@@ -11557,7 +11678,7 @@ button.bd-ic{cursor:pointer}
 .log-list::-webkit-scrollbar-thumb{background:rgba(212,168,67,.25);border-radius:2px}
 .log-entry{font-size:.58rem;color:#D4C5A9;opacity:.55;display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgb(var(--ink-rgb) / .04)}
 .log-entry .la{color:var(--teal);opacity:1}
-.btn-reset{background:transparent;border:1px solid rgb(var(--ink-rgb) / .08);border-radius:3px;color:rgb(var(--ink-rgb) / .25);font-family:'DM Mono',monospace;font-size:.58rem;padding:6px 12px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;transition:all .2s;width:100%;margin-top:4px}
+.btn-reset{background:transparent;border:1px solid rgb(var(--ink-rgb) / .08);border-radius:3px;color:rgb(var(--ink-rgb) / .25);font-family:var(--font-mono);font-size:.58rem;padding:6px 12px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;transition:all .2s;width:100%;margin-top:4px}
 .btn-reset:hover{border-color:#e55;color:#e88}
 .scene-cap{text-align:center;margin-top:14px;font-size:.58rem;color:#D4C5A9;opacity:.38;letter-spacing:.2em;text-transform:uppercase}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:rgb(var(--panel-rgb) / .96);border:1px solid rgb(var(--teal-rgb) / .45);border-radius:5px;padding:12px 22px;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--teal);z-index:30000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.6),0 0 20px rgb(var(--teal-rgb) / .1)}
@@ -13096,7 +13217,7 @@ function renderMsExtras(){
     gl.innerHTML=(ovState.customGoals||[]).map(function(g){
       return '<div class="ms-row x5"><div class="ms-dot" id="msdot-c'+g.id+'"></div><span class="ms-ic">⭐</span><label>'+ccEsc(g.name)+' <span id="mschk-c'+g.id+'" class="ms-chk"></span></label>'
         +'<input type="number" min="0" value="'+(+g.amount||0)+'" onchange="editCustomGoal('+g.id+',this.value)">'
-        +'<button class="ms-x" title="Remove goal" onclick="delCustomGoal('+g.id+')">✕</button></div>';
+        +'<button class="ms-x" title="Remove goal" onclick="delCustomGoal('+g.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>';
     }).join('');
   }
   var sl=document.getElementById('ms-snap-list');
@@ -13104,7 +13225,7 @@ function renderMsExtras(){
     var snaps=(ovState.snapshots||[]).slice().sort(function(a,b){return a.month<b.month?1:-1;});
     sl.innerHTML=snaps.length?snaps.map(function(x){
       return '<div class="ms-row snap"><span class="ms-ic">📸</span><label>'+ccEsc(x.month)+'</label><span class="ms-snapv">'+gbpFmt(x.nw)+'</span>'
-        +'<button class="ms-x" title="Remove snapshot" onclick="delSnapshot(\''+ccEsc(x.month)+'\')">✕</button></div>';
+        +'<button class="ms-x" title="Remove snapshot" onclick="delSnapshot(\''+ccEsc(x.month)+'\')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>';
     }).join(''):'<div class="ms-empty">No snapshots yet — add a past month to build your history.</div>';
   }
   try{updateKPIs();}catch(e){}
@@ -14373,7 +14494,7 @@ function hbRenderLevels(){
   var cur=hbLevel(),view=hbView();
   el.innerHTML=HB_LEVELS.map(function(l){
     var cls='hb-lv'+(l.n===view?' on':'')+(l.n<cur?' done':'')+(l.n>cur?' lock':'');
-    return '<button class="'+cls+'" onclick="hbSetView('+l.n+')" title="'+(l.n>cur?'Locked — finish Level '+(l.n-1):'')+'"><span>'+(l.n>cur?'🔒':l.ic)+'</span>Level '+l.n+' · '+l.name+(l.n<cur?' <b>✓</b>':'')+'</button>';
+    return '<button class="'+cls+'" onclick="hbSetView('+l.n+')" title="'+(l.n>cur?'Locked — finish Level '+(l.n-1):'')+'"><span>'+(l.n>cur?'🔒':l.ic)+'</span>Level '+l.n+' · '+l.name+(l.n<cur?' <b><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></b>':'')+'</button>';
   }).join('');
 }
 // which brick row the deposit has reached (3D engine only): row n of N, £ per row, £ left to finish the row you are on
@@ -14703,7 +14824,7 @@ function hbOpenCalc(){
   var o=document.getElementById('hbc-ov');if(o)o.remove();
   o=document.createElement('div');o.id='hbc-ov';o.className='hbc-ov';
   var F=hbcFieldHTML;
-  o.innerHTML='<div class="hbc" role="dialog" aria-label="Mortgage calculator"><div class="hbc-hd"><span>🏠 Mortgage calculator <span style="font-weight:400;font-size:11px;color:var(--t3)">· illustrative, not advice</span></span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="hbCloseCalc()" aria-label="Close">✕</span></div>'
+  o.innerHTML='<div class="hbc" role="dialog" aria-label="Mortgage calculator"><div class="hbc-hd"><span>🏠 Mortgage calculator <span style="font-weight:400;font-size:11px;color:var(--t3)">· illustrative, not advice</span></span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="hbCloseCalc()" aria-label="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div>'
   +'<div class="hbc-body"><div id="hbc-in">'
   +'<details open><summary>1 · Loan</summary><div>'+F('price','Property price £',d.price)+F('dep','Deposit £',d.dep)+F('bal','Mortgage balance £',d.bal)+F('termY','Years remaining',d.termY,{step:1})+F('termM','+ months',d.termM,{step:1})+F('start','Start / today',d.start,{type:'date'})
     +'<div class="full" style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="stk-btn" onclick="hbcFromPrice()">Loan = price − deposit</button>'+(hbLevel()>=2?'<button type="button" class="stk-btn" onclick="hbcSaveBalance()">Save as my current balance</button>':'')+'</div></div></details>'
@@ -14713,7 +14834,7 @@ function hbOpenCalc(){
     +F('mode','Interest method',d.mode,{type:'select',options:[['daily','Daily (most UK lenders)'],['monthly','Monthly'],['annual','Annual rest (older products)']]})+F('stress','Stress test: add % to every rate',d.stress,{step:0.1,min:-5})+'</div></details>'
   +'<details><summary>3 · Repayment type</summary><div>'+F('repay','Type',d.repay,{type:'select',options:[['repayment','Repayment (capital + interest)'],['interest-only','Interest-only'],['part','Part-and-part']]})+F('io','£ on interest-only (part-and-part)',d.io)+'</div></details>'
   +'<details open><summary>4 · Overpayments</summary><div>'+F('over','Extra per month £',d.over)+F('step','Increase it by % each year',d.step,{step:0.5})+F('outcome','Use overpayments to',d.outcome,{type:'select',options:[['term','Reduce the term (keep payment)'],['payment','Reduce the payment (keep term)']]})+F('round','Round payments up to the next £',d.round,{type:'checkbox'})
-    +'<div class="full"><label>Lump sums (one-off)</label><div id="hbc-lumps"></div><div class="hbc-lump"><div><label for="hbc-lm">In month #</label><input id="hbc-lm" type="number" min="1" step="1" value="1"></div><div><label for="hbc-la">Amount £</label><input id="hbc-la" type="number" min="0" step="100" placeholder="e.g. 5000"></div><button type="button" class="stk-btn" onclick="hbcAddLump()">＋ Add</button></div></div></div></details>'
+    +'<div class="full"><label>Lump sums (one-off)</label><div id="hbc-lumps"></div><div class="hbc-lump"><div><label for="hbc-lm">In month #</label><input id="hbc-lm" type="number" min="1" step="1" value="1"></div><div><label for="hbc-la">Amount £</label><input id="hbc-la" type="number" min="0" step="100" placeholder="e.g. 5000"></div><button type="button" class="stk-btn" onclick="hbcAddLump()"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> Add</button></div></div></div></details>'
   +'<details><summary>5 · Offset savings</summary><div>'+F('off','Offset mortgage: my savings reduce the interest-bearing balance',d.off,{type:'checkbox'})+F('offbal','Savings in the offset account £',d.offbal)+F('offadd','Add to it each month £',d.offadd)+'</div></details>'
   +'<details><summary>6 · Fees &amp; lender limits</summary><div>'+F('allow','Penalty-free overpayment allowance % / year',d.allow,{step:1})+F('basis','Allowance year',d.basis,{type:'select',options:[['anniversary','From your start date'],['calendar','Calendar year']]})
     +F('ercon','Early repayment charges apply during the first deal',d.ercon,{type:'checkbox'})+F('erc','ERC % by year (comma-separated)',d.erc,{type:'text',full:true,ph:'5,4,3,2,1'})+F('cap','Cap overpayments at the allowance (avoid ERC)',d.cap,{type:'checkbox'})
@@ -14740,7 +14861,7 @@ function hbcAddLump(){
 function hbcDelLump(i){var cur=hbcRead().raw;cur.lumps.splice(i,1);state.calc=cur;save();hbcRenderLumps();hbcUpdate();}
 function hbcRenderLumps(){
   var el=document.getElementById('hbc-lumps');if(!el)return;var l=(hbcFields().lumps)||[];
-  el.innerHTML=l.length?l.map(function(x,i){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-top:1px solid rgb(var(--ink-rgb) / .06)"><span>Month '+x.month+' · <b>'+hbMoney(x.amount)+'</b></span><button type="button" class="stk-btn" onclick="hbcDelLump('+i+')">✕</button></div>';}).join(''):'<div style="color:var(--t3);font-size:11px">None yet</div>';
+  el.innerHTML=l.length?l.map(function(x,i){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-top:1px solid rgb(var(--ink-rgb) / .06)"><span>Month '+x.month+' · <b>'+hbMoney(x.amount)+'</b></span><button type="button" class="stk-btn" onclick="hbcDelLump('+i+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>';}).join(''):'<div style="color:var(--t3);font-size:11px">None yet</div>';
 }
 function hbcPreset(name){
   var b=hbBudget(),u=Math.round(b.unassigned),sv=Math.round(b.saving);
@@ -14760,9 +14881,9 @@ function hbcChart(base,scn,common){
   // equity (scenario)
   var eq='';if(scn.opts.valuation>0){eq='M'+X(0).toFixed(1)+' '+Y(hbEquityAt(scn,0).equity).toFixed(1);for(var k=12;k<=n;k+=12)eq+=' L'+X(k).toFixed(1)+' '+Y(Math.min(top,hbEquityAt(scn,k).equity)).toFixed(1);}
   return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;height:230px">'+grid
-    +'<path d="'+path(base,'close')+'" fill="none" stroke="#8b97a3" stroke-width="1.6" stroke-dasharray="4 3"/>'
+    +'<path d="'+path(base,'close')+'" fill="none" stroke="#8b97a3" stroke-width="1.5" stroke-dasharray="4 3"/>'
     +'<path d="'+path(scn,'close')+'" fill="none" stroke="#44c0b9" stroke-width="2.2"/>'
-    +(eq?'<path d="'+eq+'" fill="none" stroke="#e8c56a" stroke-width="1.6" opacity=".85"/>':'')
+    +(eq?'<path d="'+eq+'" fill="none" stroke="#e8c56a" stroke-width="1.5" opacity=".85"/>':'')
     +'<g font-size="10" font-family="Share Tech Mono,monospace"><text x="'+L+'" y="'+(H-3)+'" fill="#8b97a3">- - balance, no extras</text><text x="'+(L+150)+'" y="'+(H-3)+'" fill="#44c0b9">— balance, your plan</text>'+(eq?'<text x="'+(L+290)+'" y="'+(H-3)+'" fill="#e8c56a">— equity (value − balance)</text>':'')+'</g></svg>';
 }
 function hbcUpdate(){
@@ -15211,7 +15332,7 @@ function hbOpenUpgrade(){
   var d=hbUpGet(),o=document.getElementById('hbu-ov');if(o)o.remove();
   o=document.createElement('div');o.id='hbu-ov';o.className='hbc-ov';
   var F=hbuF;
-  o.innerHTML='<div class="hbc" role="dialog" aria-label="Upgrade planner"><div class="hbc-hd"><span>🚀 Level 3 · Upgrade planner <span style="font-weight:400;font-size:11px;color:var(--t3)">· illustrative, not advice</span></span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="hbCloseUpgrade()" aria-label="Close">✕</span></div>'
+  o.innerHTML='<div class="hbc" role="dialog" aria-label="Upgrade planner"><div class="hbc-hd"><span>🚀 Level 3 · Upgrade planner <span style="font-weight:400;font-size:11px;color:var(--t3)">· illustrative, not advice</span></span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="hbCloseUpgrade()" aria-label="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div>'
   +'<div class="hbc-body"><div id="hbu-in">'
   +'<details open><summary>1 · The plan</summary><div>'+F('mode','What happens to your current home?',d.mode,{options:[['sell','Sell it and move'],['let','Keep it and let it out']],full:true})
     +F('region','Where is the new home?',d.region,{options:[['eng','England (SDLT)'],['ni','Northern Ireland (SDLT)'],['sco','Scotland (LBTT)'],['wal','Wales (LTT)']]})+F('type','Type of home',d.type,{options:HBU_TYPES})
@@ -16099,7 +16220,7 @@ function viSyncStatus() {
     if (!bn) {
       bn = document.createElement('div'); bn.id = 'sync-banner';
       bn.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:10002;background:var(--panel);border:1px solid #e0b44a;color:#f3d58a;border-radius:10px;padding:10px 12px;font-size:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap';
-      bn.innerHTML = '<span style="flex:1;min-width:200px">⚠ Your latest changes are only on this device. Sign in to back them up to your account.</span><button class="btn-add-data" onclick="viReauth()">Sign in to back up</button><span style="cursor:pointer;padding:4px" onclick="_syncBannerOff=true;viSyncStatus()">✕</span>';
+      bn.innerHTML = '<span style="flex:1;min-width:200px">⚠ Your latest changes are only on this device. Sign in to back them up to your account.</span><button class="btn-add-data" onclick="viReauth()">Sign in to back up</button><span style="cursor:pointer;padding:4px" onclick="_syncBannerOff=true;viSyncStatus()"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span>';
       document.body.appendChild(bn);
     }
   } else if (bn) bn.remove();
@@ -16197,7 +16318,7 @@ async function viOpenHistory() {
   var m = document.createElement('div'); m.id = 'vi-hist';
   m.style.cssText = 'position:fixed;inset:0;z-index:10060;background:rgb(var(--panel-rgb) / .85);display:flex;align-items:center;justify-content:center;padding:14px';
   m.innerHTML = '<div style="background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:12px;width:min(720px,100%);max-height:92vh;overflow:auto;padding:16px;font-size:13px;color:#cfdbe8">' +
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="color:var(--em);font-size:15px">🕘 Version history</b><span style="cursor:pointer;font-size:18px" onclick="viCloseHistory()">✕</span></div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="color:var(--em);font-size:15px">🕘 Version history</b><span style="cursor:pointer;font-size:18px" onclick="viCloseHistory()"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div>' +
     '<div style="opacity:.75;margin-bottom:10px">Every change to your vault is kept. Restore any earlier version — the current one is kept too, so restoring can always be undone.</div>' +
     '<div id="vi-hist-cloud">Loading your account history…</div><div id="vi-hist-local" style="margin-top:16px"></div></div>';
   document.body.appendChild(m);
@@ -17363,7 +17484,7 @@ function openDeleteAccount() {
   var m = document.createElement('div'); m.id = 'delete-modal';
   m.style.cssText = 'position:fixed;inset:0;z-index:20001;background:rgb(var(--panel-rgb) / .95);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:12px';
   m.innerHTML = '<div style="background:var(--c1);border:1px solid rgba(231,76,60,.5);border-radius:10px;width:min(460px,94vw);max-height:90vh;overflow-y:auto;padding:22px 20px;position:relative;font-family:\'DM Sans\',sans-serif">'
-    + '<button onclick="document.getElementById(\'delete-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer">✕</button>'
+    + '<button onclick="document.getElementById(\'delete-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
     + '<div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:#e74c3c;margin-bottom:10px">Delete your account</div>'
     + '<div style="font-size:.6rem;color:var(--t2);line-height:1.7;margin-bottom:12px">This permanently erases your Vault·It account and <strong>everything in it</strong>: your budget, debts, assets, house plan, net-worth history, saved versions and PIN — in the cloud and on this device. <strong>It cannot be undone.</strong> Short-lived backups and logs kept by our providers clear out within days. Other devices where you have used Vault·It keep a local copy until you clear it there.</div>'
     + '<button id="del-export" class="btn-add-data" style="width:100%;margin-bottom:12px" onclick="exportFromDeleteDialog(this)">⬇ Download my data first</button>'
@@ -17461,8 +17582,8 @@ function bdIconKey(kind,r){return r.icon||bdFind(kind,bdCatOf(kind,r)).ic;}
 function bdIcon(key,size,col,fillOp){
   var ic=BD_ICONS[key]||FIRE_ICONS[key]||BD_ICONS.dots;
   return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" aria-hidden="true">'
-    +'<g fill="'+col+'" fill-opacity="'+(fillOp==null?.22:fillOp)+'" stroke="none">'+ic.f.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g>'
-    +'<g fill="none" stroke="'+col+'" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+ic.d.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g></svg>';
+    +'<g fill="'+col+'" fill-opacity="'+(fillOp==null?.16:fillOp)+'" stroke="none">'+ic.f.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g>'
+    +'<g fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+ic.d.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g></svg>';
 }
 function bdTypeOptions(sel){
   return CF_GROUP_ORDER.map(function(t){return '<option value="'+t+'"'+(t===sel?' selected':'')+'>'+CF_GROUPS[t].short+'</option>';}).join('');
@@ -17483,7 +17604,7 @@ function bdRenderPickers(){
       var col=kind==='inc'?'#44c0b9':CF_GROUPS[c.t||'ve'].tx,on=_bdSel[kind]===c.k,own=String(c.k).indexOf('c_')===0;
       return '<button type="button" class="bd-chip'+(on?' on':'')+'" style="--c:'+col+'" onclick="bdPick(\''+kind+'\',\''+c.k+'\')" title="'+cfEsc(c.n)+'">'+bdIcon(c.ic,18,col)+'<span>'+cfEsc(c.n)+'</span>'
         +(own?'<span class="bd-x" title="Delete this category" onclick="event.stopPropagation();bdDelCat(\''+kind+'\',\''+c.k+'\')">×</span>':'')+'</button>';
-    }).join('')+'<button type="button" class="bd-chip add" style="--c:var(--muted)" onclick="bdToggleNew(\''+kind+'\')"><span>＋ New category</span></button>';
+    }).join('')+'<button type="button" class="bd-chip add" style="--c:var(--muted)" onclick="bdToggleNew(\''+kind+'\')"><span><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> New category</span></button>';
   });
 }
 // ── create your own category (name · icon · type) ──
@@ -17686,8 +17807,8 @@ function bdRowHTML(kind,r){
     +'<button class="bd-ic" style="--c:'+fillc+'" title="Change icon" onclick="bdIconOpen(\''+kind+'\','+r.id+')">'+bdIcon(bdIconKey(kind,r),18,col)+'</button>'
     +'<span class="bd-nm">'+cfEsc(r.name)+'</span>'
     +'<span class="bd-amt" style="color:'+col+'">'+cfMoney(r.amount)+'<em>/mo</em></span>'
-    +'<button class="cf-edit" title="Edit name / amount" onclick="bdEdit(\''+kind+'\','+r.id+')">✎</button>'
-    +'<button class="data-item-del" onclick="'+(kind==='exp'?'delExpense':'delIncome')+'('+r.id+')">✕</button>'
+    +'<button class="cf-edit" title="Edit name / amount" onclick="bdEdit(\''+kind+'\','+r.id+')"><svg class="vi-ic g" role="img" aria-label="Edit"><use href="#vi-edit"/></svg></button>'
+    +'<button class="data-item-del" onclick="'+(kind==='exp'?'delExpense':'delIncome')+'('+r.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
     +'<div class="bd-sel"><select class="bd-s" title="Category" onchange="bdSetCat(\''+kind+'\','+r.id+',this.value)">'
     +bdCats(kind).map(function(c){return '<option value="'+c.k+'"'+(c.k===ck?' selected':'')+'>'+cfEsc(c.n)+'</option>';}).join('')+'</select>'
     +(kind==='exp'?'<select class="bd-s bd-type" style="--c:'+col+'" title="Spending type" onchange="bdSetType('+r.id+',this.value)">'+bdTypeOptions(t)+'</select>':'')
@@ -17743,7 +17864,7 @@ function bdRenderLists(){
       +'<span class="bd-tile-sum">'+cfMoney(sum)+'<small>'+(m.tIn>0?Math.round(sum/m.tIn*100)+'% of income':items.length+' item'+(items.length===1?'':'s'))+'</small></span>'
       +'<span class="bd-chev">▾</span></button>'
       +'<div class="bd-tile-body">'+(items.length?items.map(function(r){return bdRowHTML('exp',r);}).join(''):'<div class="bd-tile-empty">Nothing here yet — add your first '+G.short.toLowerCase()+' line below.</div>')
-      +'<div class="bd-qa"><div class="bd-qa-t">＋ Quick add to '+G.short+'</div><div class="bd-qa-row"><input type="text" id="bd-qa-n-'+g+'" maxlength="40" placeholder="'+cfEsc(G.ex.split(',')[0])+'" onkeydown="if(event.key===\'Enter\')bdQuickAdd(\''+g+'\')"><input type="number" id="bd-qa-a-'+g+'" min="0" placeholder="£/mo" onkeydown="if(event.key===\'Enter\')bdQuickAdd(\''+g+'\')"><button type="button" class="btn-add-data" onclick="bdQuickAdd(\''+g+'\')">Add</button></div></div>'
+      +'<div class="bd-qa"><div class="bd-qa-t"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> Quick add to '+G.short+'</div><div class="bd-qa-row"><input type="text" id="bd-qa-n-'+g+'" maxlength="40" placeholder="'+cfEsc(G.ex.split(',')[0])+'" onkeydown="if(event.key===\'Enter\')bdQuickAdd(\''+g+'\')"><input type="number" id="bd-qa-a-'+g+'" min="0" placeholder="£/mo" onkeydown="if(event.key===\'Enter\')bdQuickAdd(\''+g+'\')"><button type="button" class="btn-add-data" onclick="bdQuickAdd(\''+g+'\')">Add</button></div></div>'
       +'</div></section>';
   });
   el.innerHTML='<div class="bd-tiles">'+html+'</div>';
@@ -18003,7 +18124,7 @@ function stkPlatformEditRender(){
   var o=document.getElementById('stk-shot-ov');if(!o){o=document.createElement('div');o.id='stk-shot-ov';o.className='stk-shot-ov';document.body.appendChild(o);}
   var p=alState.stockPies.find(function(x){return x.id===_platEdit.id;})||{};
   var preview=stkLogoBadge({platform:{name:_platEdit.name,logo:_platEdit.logo}});
-  o.innerHTML='<div class="stk-shot" style="width:min(460px,100%)"><div class="stk-shot-hd"><span>🏦 Platform for “'+stkEsc(p.name||'')+'”</span><span style="cursor:pointer" onclick="stkShotClose()">✕</span></div>'
+  o.innerHTML='<div class="stk-shot" style="width:min(460px,100%)"><div class="stk-shot-hd"><span>🏦 Platform for “'+stkEsc(p.name||'')+'”</span><span style="cursor:pointer" onclick="stkShotClose()"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div>'
     +'<div class="stk-shot-bd"><div style="margin-bottom:8px">Type the platform name. Known ones (Trading 212, Freetrade, Hargreaves Lansdown, Vanguard…) get their logo automatically. You can also upload your own logo.</div>'
     +'<datalist id="stk-plat-list">'+STK_PLATFORMS.map(function(x){return'<option value="'+stkEsc(x.n)+'">';}).join('')+'</datalist>'
     +'<input id="stk-plat-name" list="stk-plat-list" type="text" maxlength="40" placeholder="Platform name, e.g. Trading 212" value="'+stkEsc(_platEdit.name)+'" oninput="_platEdit.name=this.value;document.getElementById(\'stk-plat-prev\').innerHTML=stkLogoBadge({platform:{name:_platEdit.name,logo:_platEdit.logo}})" style="width:100%;background:rgb(var(--panel-rgb) / .8);border:1px solid rgb(var(--teal-rgb) / .25);border-radius:4px;color:var(--text);font-size:13px;padding:8px;margin:6px 0">'
@@ -18082,8 +18203,8 @@ function stkRender(){
     var v=alState.stocks.filter(function(h){return h.pie===p.id;}).reduce(function(s,h){return s+stkValue(h);},0);
     chips+='<button class="stk-pie'+(alState.activePie===p.id?' on':'')+'" onclick="stkSelectPie('+p.id+')">'+(p.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(p.name)+' <span>'+gbpFmt(v)+'</span>'+stkLogoBadge(p)+'</button>';
   });
-  chips+='<button class="stk-pie add" onclick="stkNewPie()">+ New pie</button><button class="stk-pie add" style="border-style:solid" title="Search a fund, ETF or share by name or ISIN, and say who provides it and where you hold it" onclick="stkAddFundOpen()">＋ Add fund / share</button>';
-  if(alState.activePie!=='all')chips+='<button class="stk-mini" title="Set the investment platform and logo" onclick="stkPlatformEdit()">🏦</button><button class="stk-mini" title="Rename this pie" onclick="stkRenamePie()">✎</button><button class="stk-mini" title="Delete this pie" onclick="stkDeletePie()">✕</button>';
+  chips+='<button class="stk-pie add" onclick="stkNewPie()">+ New pie</button><button class="stk-pie add" style="border-style:solid" title="Search a fund, ETF or share by name or ISIN, and say who provides it and where you hold it" onclick="stkAddFundOpen()"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> Add fund / share</button>';
+  if(alState.activePie!=='all')chips+='<button class="stk-mini" title="Set the investment platform and logo" onclick="stkPlatformEdit()">🏦</button><button class="stk-mini" title="Rename this pie" onclick="stkRenamePie()"><svg class="vi-ic g" role="img" aria-label="Edit"><use href="#vi-edit"/></svg></button><button class="stk-mini" title="Delete this pie" onclick="stkDeletePie()"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>';
   pies.innerHTML=chips;
 
   var hs=stkVisible().slice().sort(function(a,b){return stkValue(b)-stkValue(a);});
@@ -18100,7 +18221,7 @@ function stkRender(){
   if(main){
     var up=ret>=0,dUp=dayChg>=0;
     var _ap=alState.activePie!=='all'?alState.stockPies.find(function(x){return x.id===alState.activePie;}):null;
-    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()">✎ Rename</button><button class="stk-btn" style="border-color:rgb(var(--red-rgb) / .5);color:var(--red)" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>'+stkFundControls(_ap,hs):'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
+    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-edit"/></svg> Rename</button><button class="stk-btn" style="border-color:rgb(var(--red-rgb) / .5);color:var(--red)" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>'+stkFundControls(_ap,hs):'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
       +'<div class="stk-stats">'
       +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+cfMoney(total)+'</div><div class="s">'+((_ap&&_ap.kind==='fund'&&hs.length===1)?'<b style="color:var(--gold)">'+(+hs[0].units||0).toLocaleString('en-GB',{maximumFractionDigits:4})+' units owned</b>'+(stkPrice(hs[0])>0?' × £'+stkPrice(hs[0]).toFixed(2):''):hs.length+' holding'+(hs.length===1?'':'s'))+' · counts towards net worth</div></div>'
       +'<div class="stk-stat" style="background:'+(withCost.length?(up?'rgb(var(--green-rgb) / .07)':'rgb(var(--red-rgb) / .08)'):'rgb(var(--teal-rgb) / .06)')+'"><div class="l">Total return</div><div class="v" style="color:'+(withCost.length?(up?'var(--green)':'var(--red)'):'var(--t3)')+'">'+(withCost.length?((up?'+':'−')+cfMoney(Math.abs(ret))):'—')+'</div><div class="s">'+(withCost.length?(withCost.length<hs.length?'on '+withCost.length+' of '+hs.length+' with a cost basis':'vs your average cost'):'add an average cost to see returns')+'</div></div>'
@@ -18289,7 +18410,7 @@ function stkAddFundOpen(){
   var cur=alState.activePie==='all'?alState.stockPies[0].id:alState.activePie;
   var cp=alState.stockPies.find(function(p){return p.id===cur;})||{};
   var inp='width:100%;background:rgba(4,10,20,.8);border:1px solid rgba(68,192,185,.25);border-radius:4px;color:#e6eef7;font-size:13px;padding:8px;margin:3px 0 8px';
-  o.innerHTML='<div class="stk-shot" style="width:min(520px,100%)"><div class="stk-shot-hd"><span>＋ Add a fund, ETF or share</span><span style="cursor:pointer" onclick="stkShotClose()">✕</span></div><div class="stk-shot-bd">'
+  o.innerHTML='<div class="stk-shot" style="width:min(520px,100%)"><div class="stk-shot-hd"><span><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> Add a fund, ETF or share</span><span style="cursor:pointer" onclick="stkShotClose()"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div><div class="stk-shot-bd">'
    +'<label>Fund or share</label><div style="position:relative"><input id="afs-sym" style="'+inp+'" placeholder="Search by name, ticker or ISIN" autocomplete="off" oninput="stkSuggest(this.value,\'afs-sym\',\'afs-suggest\')"><div id="afs-suggest" class="stk-suggest"></div></div>'
    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><label>Units</label><input id="afs-units" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 10"></div><div><label>…or £ held</label><input id="afs-amt" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 112.40"></div><div><label>Avg cost £</label><input id="afs-cost" type="number" min="0" step="any" style="'+inp+'" placeholder="optional"></div></div>'
    +'<label>Unit price £ <span style="opacity:.6">(only if there is no live price — from your platform’s fund page)</span></label><input id="afs-px" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 11.24 — leave empty to use the live price">'
@@ -18594,7 +18715,7 @@ function stkShotClose(){var o=document.getElementById('stk-shot-ov');if(o)o.remo
 function stkShotModal(title,body,foot){
   var o=document.getElementById('stk-shot-ov');
   if(!o){o=document.createElement('div');o.id='stk-shot-ov';o.className='stk-shot-ov';document.body.appendChild(o);}
-  o.innerHTML='<div class="stk-shot"><div class="stk-shot-hd"><span>'+title+'</span><span style="cursor:pointer" onclick="stkShotClose()">✕</span></div><div class="stk-shot-bd">'+body+'</div><div class="stk-shot-ft">'+(foot||'')+'</div></div>';
+  o.innerHTML='<div class="stk-shot"><div class="stk-shot-hd"><span>'+title+'</span><span style="cursor:pointer" onclick="stkShotClose()"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div><div class="stk-shot-bd">'+body+'</div><div class="stk-shot-ft">'+(foot||'')+'</div></div>';
 }
 function stkShotDownscale(file){
   return new Promise(function(res,rej){
@@ -18672,7 +18793,7 @@ function stkShotCalc(r){
 function stkShotReview(){
   var prevSel=(document.getElementById('stk-shot-pie')||{}).value;
   var pies=alState.stockPies||[],dflt=_shot.portfolio?pies.find(function(p){return p.name.toLowerCase()===_shot.portfolio.toLowerCase();}):null;
-  var pieSel='<select id="stk-shot-pie">'+pies.map(function(p){return'<option value="'+p.id+'"'+((prevSel?String(p.id)===prevSel:(dflt?dflt.id===p.id:p.id===alState.activePie))?' selected':'')+'>'+stkEsc(p.name)+'</option>';}).join('')+(_shot.portfolio&&!dflt?'<option value="new" selected>＋ New pie: '+stkEsc(_shot.portfolio)+'</option>':'')+'<option value="newcustom">＋ New pie…</option></select>';
+  var pieSel='<select id="stk-shot-pie">'+pies.map(function(p){return'<option value="'+p.id+'"'+((prevSel?String(p.id)===prevSel:(dflt?dflt.id===p.id:p.id===alState.activePie))?' selected':'')+'>'+stkEsc(p.name)+'</option>';}).join('')+(_shot.portfolio&&!dflt?'<option value="new" selected><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> New pie: '+stkEsc(_shot.portfolio)+'</option>':'')+'<option value="newcustom"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> New pie…</option></select>';
   var noPrice=0;
   var body='<div>Check each row — pick the right ticker if it guessed wrong. Shares are worked out from the value in your screenshot ÷ the live price, so they’re accurate to the pennies shown. Edit any number.</div>'+
     '<div style="margin:10px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap">Add to: <span style="flex:1;min-width:180px;max-width:260px">'+pieSel+'</span> Platform: <input id="stk-shot-plat" list="stk-plat-list2" type="text" maxlength="40" placeholder="e.g. Trading 212" value="'+stkEsc(_shot.platform||(stkPlatformMatch(_shot.portfolio)||{}).n||'')+'" style="flex:1;min-width:140px;max-width:220px;background:rgb(var(--panel-rgb) / .8);border:1px solid rgb(var(--teal-rgb) / .25);border-radius:4px;color:var(--text);font-size:12px;padding:5px 6px"><datalist id="stk-plat-list2">'+STK_PLATFORMS.map(function(x){return'<option value="'+stkEsc(x.n)+'">';}).join('')+'</datalist></div>'+
@@ -18983,14 +19104,14 @@ function renderAlTab(){
           +'<span style="font-size:.52rem;color:var(--t3)">Amount:</span>'
           +'<input type="number" class="al-inp" style="flex:1;font-size:.62rem;padding:3px 6px" min="0" step="any" value="'+camount+'" onchange="updateCryptoAmount('+cid+',this.value)" title="Editable: your holdings">'
           +'</div>'
-          +'<button class="data-item-del" style="font-size:.55rem;padding:2px 6px;border:1px solid var(--bd);border-radius:3px" onclick="delCrypto('+cid+')">✕ Remove</button>'
+          +'<button class="data-item-del" style="font-size:.55rem;padding:2px 6px;border:1px solid var(--bd);border-radius:3px" onclick="delCrypto('+cid+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg> Remove</button>'
           +'</div>'
           +'</div>';
       }).join('')+'</div>';
   }
   // Cash accounts
   var cas=document.getElementById('cash-table');
-  if(cas)cas.innerHTML=alState.cashAccounts.length?'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Account</th><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Type</th><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:right">Balance</th><th></th></tr></thead><tbody>'+alState.cashAccounts.map(function(a){return'<tr><td style="padding:7px 10px;font-size:.74rem">'+a.name+'</td><td style="padding:7px 10px;font-size:.62rem;color:var(--t3)">'+a.type+'</td><td style="padding:7px 10px;font-size:.74rem;font-family:\'Share Tech Mono\',monospace;color:var(--gr);text-align:right">\u00a3'+a.balance.toLocaleString('en-GB')+'</td><td style="padding:7px 10px"><button class="data-item-del" onclick="delCashAccount('+a.id+')">✕</button></td></tr>';}).join('')+'</tbody></table>':'<div style="font-size:.6rem;color:var(--t3);text-align:center;padding:16px">No accounts added yet</div>';
+  if(cas)cas.innerHTML=alState.cashAccounts.length?'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Account</th><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Type</th><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:right">Balance</th><th></th></tr></thead><tbody>'+alState.cashAccounts.map(function(a){return'<tr><td style="padding:7px 10px;font-size:.74rem">'+a.name+'</td><td style="padding:7px 10px;font-size:.62rem;color:var(--t3)">'+a.type+'</td><td style="padding:7px 10px;font-size:.74rem;font-family:\'Share Tech Mono\',monospace;color:var(--gr);text-align:right">\u00a3'+a.balance.toLocaleString('en-GB')+'</td><td style="padding:7px 10px"><button class="data-item-del" onclick="delCashAccount('+a.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></td></tr>';}).join('')+'</tbody></table>':'<div style="font-size:.6rem;color:var(--t3);text-align:center;padding:16px">No accounts added yet</div>';
   // Liabilities
   var ll=document.getElementById('liabilities-list');
   if(ll){
@@ -19026,7 +19147,7 @@ function renderAlTab(){
           +'</div>'
           +(l.runningCost>0?'<div class="wi-sub">'+gbpFmt(l.runningCost)+'/mo</div>':'')
           +(l.depRate>0?'<div class="wi-sub" style="color:var(--re)">↓'+l.depRate+'%/yr</div>':'')
-          +'<button class="data-item-del" style="margin-top:4px;width:100%" onclick="delLiability('+l.id+')">✕ Remove</button>'
+          +'<button class="data-item-del" style="margin-top:4px;width:100%" onclick="delLiability('+l.id+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg> Remove</button>'
           +'</div>'
           +'</div>';
       }).join('')+'</div>';
@@ -19064,7 +19185,7 @@ function renderAlTab(){
           +'<div class="wi-name" title="'+a.name+'">'+a.name+'</div>'
           +'<div class="wi-val">£'+(a.value||0).toLocaleString('en-GB')+'</div>'
           +'</div>'
-          +'<button class="wi-del" onclick="delOtherAsset('+a.id+')">✕</button>'
+          +'<button class="wi-del" onclick="delOtherAsset('+a.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
           +'</div>';
       }).join('')+'</div>';
       try{invHydrate();}catch(e){console.error('[Vault-It] invHydrate',e);}
@@ -19286,13 +19407,13 @@ async function invRenderModal(id){
   var prev=_invSpin;
   o.innerHTML='<div class="inv-card">'
     +'<div class="inv-hd"><div><div class="inv-t">'+cfEsc(a.name)+'</div><div class="inv-s">£'+(a.value||0).toLocaleString('en-GB')+' · '+n+' photo'+(n===1?'':'s')+(n>=2?' · 3D view':'')+'</div></div>'
-    +'<button class="inv-x" onclick="invCloseViewer()" title="Close">✕</button></div>'
+    +'<button class="inv-x" onclick="invCloseViewer()" title="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>'
     +'<div class="inv-stage"><canvas id="inv-big"></canvas>'+(n===0?'<div class="inv-empty">No photos yet</div>':'')
-    +'<div class="inv-ctl"><button title="Auto-rotate" onclick="invToggleAuto()" id="inv-auto">⟳</button><button title="Zoom in" onclick="invZoom(0.35)">＋</button><button title="Zoom out" onclick="invZoom(-0.35)">－</button><button title="Previous frame" onclick="_invSpin&&_invSpin.step(-1)">◀</button><button title="Next frame" onclick="_invSpin&&_invSpin.step(1)">▶</button></div></div>'
+    +'<div class="inv-ctl"><button title="Auto-rotate" onclick="invToggleAuto()" id="inv-auto">⟳</button><button title="Zoom in" onclick="invZoom(0.35)"><svg class="vi-ic g" role="img" aria-label="Add"><use href="#vi-plus"/></svg></button><button title="Zoom out" onclick="invZoom(-0.35)">－</button><button title="Previous frame" onclick="_invSpin&&_invSpin.step(-1)">◀</button><button title="Next frame" onclick="_invSpin&&_invSpin.step(1)">▶</button></div></div>'
     +'<div class="inv-hint">'+hint+'</div>'
     +'<div class="inv-strip">'+urls.map(function(u,i){return '<div class="inv-th"><img src="'+u+'" alt="photo '+(i+1)+'"><span class="inv-n">'+(i+1)+'</span>'
-      +'<span class="inv-tb"><button onclick="invMoveFrame('+id+','+i+',-1)" title="Move earlier"'+(i===0?' disabled':'')+'>◀</button><button onclick="invRemoveFrame('+id+','+i+')" title="Delete photo">✕</button><button onclick="invMoveFrame('+id+','+i+',1)" title="Move later"'+(i===n-1?' disabled':'')+'>▶</button></span></div>';}).join('')
-    +'<label class="inv-add">＋<span>Add photos</span><input type="file" accept="image/*" multiple style="display:none" onchange="invAddPhotos('+id+',this.files);this.value=\'\'"></label></div>'
+      +'<span class="inv-tb"><button onclick="invMoveFrame('+id+','+i+',-1)" title="Move earlier"'+(i===0?' disabled':'')+'>◀</button><button onclick="invRemoveFrame('+id+','+i+')" title="Delete photo"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button><button onclick="invMoveFrame('+id+','+i+',1)" title="Move later"'+(i===n-1?' disabled':'')+'>▶</button></span></div>';}).join('')
+    +'<label class="inv-add"><svg class="vi-ic g" role="img" aria-label="Add"><use href="#vi-plus"/></svg><span>Add photos</span><input type="file" accept="image/*" multiple style="display:none" onchange="invAddPhotos('+id+',this.files);this.value=\'\'"></label></div>'
     +'</div>';
   var cv=document.getElementById('inv-big');
   if(prev)prev.dead=true;
@@ -19309,7 +19430,7 @@ function wiSearch(id){
   modal.className='wi-search-modal';
   modal.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
     +'<div style="font-size:.6rem;font-weight:700;color:var(--em);font-family:Syne,sans-serif">SEARCH IMAGE</div>'
-    +'<button onclick="this.closest(\'.wi-search-modal\').remove();document.querySelector(\'.wi-icon-overlay\').remove()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:.8rem">✕</button>'
+    +'<button onclick="this.closest(\'.wi-search-modal\').remove();document.querySelector(\'.wi-icon-overlay\').remove()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:.8rem"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
     +'</div>'
     +'<div style="display:flex;gap:6px">'
     +'<input id="wi-search-inp" class="al-inp" placeholder="Search term (e.g. car, watch)" value="'+cleanSearchTerm(a.name||'')+'" style="flex:1;font-size:.65rem">'
@@ -19338,7 +19459,7 @@ function liabSearch(id){
   modal.className='wi-search-modal';
   modal.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
     +'<div style="font-size:.6rem;font-weight:700;color:var(--em);font-family:Syne,sans-serif">SEARCH IMAGE</div>'
-    +'<button onclick="this.closest(\'.wi-search-modal\').remove();document.querySelector(\'.wi-icon-overlay\').remove()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:.8rem">✕</button>'
+    +'<button onclick="this.closest(\'.wi-search-modal\').remove();document.querySelector(\'.wi-icon-overlay\').remove()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:.8rem"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
     +'</div>'
     +'<div style="display:flex;gap:6px">'
     +'<input id="wi-search-inp" class="al-inp" placeholder="Search term" value="'+cleanSearchTerm(l.name||'')+'" style="flex:1;font-size:.65rem">'
@@ -19550,7 +19671,7 @@ function wiIcon(id,targetList){
   var searchId='wi-icon-search-'+id;
   modal.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
     +'<div style="font-size:.6rem;font-weight:700;color:var(--em);font-family:Syne,sans-serif">CHOOSE ICON</div>'
-    +'<button onclick="this.closest(\'.wi-icon-picker\').remove();document.querySelector(\'.wi-icon-overlay\') &&document.querySelector(\'.wi-icon-overlay\').remove()" style="background:none;border:none;color:var(--t3);cursor:pointer">✕</button>'
+    +'<button onclick="this.closest(\'.wi-icon-picker\').remove();document.querySelector(\'.wi-icon-overlay\') &&document.querySelector(\'.wi-icon-overlay\').remove()" style="background:none;border:none;color:var(--t3);cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
     +'</div>'
     +'<input id="'+searchId+'" class="al-inp" placeholder="Filter icons..." style="margin-bottom:8px;font-size:.62rem" oninput="wiFilterIcons(\''+searchId+'\',\'wi-icon-cats-'+id+'\')">'
     +'<div id="wi-icon-cats-'+id+'">'
@@ -19771,7 +19892,7 @@ function ccOpenEdit(id){
   _ccEdit={id:id,art:(d.card&&d.card.art)||'',logo:(d.card&&d.card.logo)||''};
   var c=d.card||{},o=document.getElementById('cc-ov');if(o)o.remove();
   o=document.createElement('div');o.id='cc-ov';o.className='hbc-ov';
-  o.innerHTML='<div class="hbc" style="width:min(520px,100%)" role="dialog" aria-label="Card design"><div class="hbc-hd"><span>💳 Card design</span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="ccCloseEdit()" aria-label="Close">✕</span></div>'
+  o.innerHTML='<div class="hbc" style="width:min(520px,100%)" role="dialog" aria-label="Card design"><div class="hbc-hd"><span>💳 Card design</span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="ccCloseEdit()" aria-label="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div>'
    +'<div style="padding:14px 16px"><div id="cc-prev" style="max-width:340px;margin:0 auto 12px"></div>'
    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
    +'<div style="grid-column:1/-1"><label style="display:block;font-size:10px;color:var(--t3);margin-bottom:3px">Issuer / company on the card (we scan this and the card name for a known company)</label><input id="cc-issuer" type="text" maxlength="40" class="al-inp" style="width:100%" value="'+ccEsc(c.issuer||'')+'" placeholder="e.g. Barclaycard, Monzo, Amex"></div>'
@@ -19915,7 +20036,7 @@ function renderDebtTab(){
     ?'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;background:rgb(var(--orange-rgb) / .08);border:1px solid rgb(var(--orange-rgb) / .3);border-radius:8px;font-size:.55rem;color:var(--t2);line-height:1.5"><span style="flex:1;min-width:200px"><b style="color:var(--or)">One lump-sum entered at setup.</b> Replace it with each separate debt (type, interest rate, minimum payment) so your payoff plan is accurate.</span><button class="btn-add-data" style="padding:5px 12px;font-size:.52rem" onclick="removeOnboardingDebt()">Replace it →</button></div>'
     :'';
   var _rank={},_rk=0;sorted.forEach(function(d){if(d.balance>0)_rank[d.id]=++_rk;});   // payoff order: Avalanche = highest rate first, Snowball = smallest balance first
-  var _rankBadge=function(d){return _rank[d.id]?'<span class="debt-rank" title="Payoff order #'+_rank[d.id]+' ('+(_debtMethod==='avalanche'?'Avalanche: highest interest rate first':'Snowball: smallest balance first')+')">'+_rank[d.id]+'</span>':'<span class="debt-rank done" title="Paid off">✓</span>';};
+  var _rankBadge=function(d){return _rank[d.id]?'<span class="debt-rank" title="Payoff order #'+_rank[d.id]+' ('+(_debtMethod==='avalanche'?'Avalanche: highest interest rate first':'Snowball: smallest balance first')+')">'+_rank[d.id]+'</span>':'<span class="debt-rank done" title="Paid off"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></span>';};
   var _rankNote='<div class="debt-rank-note"><b>Payoff order</b> — <span class="debt-rank sm">1</span> = '+(_debtMethod==='avalanche'?'highest interest rate (Avalanche): clear this first':'smallest balance (Snowball): clear this first')+'</div>';
   dl.innerHTML=_obBanner+_rankNote+'<div class="debt-card-grid'+(sorted.some(function(d){return d.type==='credit'||d.type==='bnpl';})?' has-cards':'')+'">'
     +sorted.map(function(d){
@@ -19935,11 +20056,11 @@ function renderDebtTab(){
           +'<div style="display:flex;align-items:center;gap:4px">'
           +'<input type="number" id="debt-pay-inp-'+d.id+'" class="al-inp" placeholder="£ pay" style="flex:1;font-size:.52rem;padding:3px 6px;min-width:0">'
           +'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap" onclick="makePayment('+d.id+')">Pay</button>'
-          +(d.payments&&d.payments.length?'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap;background:transparent;border-color:var(--t3);color:var(--t2)" title="Undo your last payment of £'+d.payments[d.payments.length-1].amt+'" onclick="undoPayment('+d.id+')">↩ Undo £'+Math.round(d.payments[d.payments.length-1].amt*100)/100+'</button>':'')
+          +(d.payments&&d.payments.length?'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap;background:transparent;border-color:var(--t3);color:var(--t2)" title="Undo your last payment of £'+d.payments[d.payments.length-1].amt+'" onclick="undoPayment('+d.id+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-undo"/></svg> Undo £'+Math.round(d.payments[d.payments.length-1].amt*100)/100+'</button>':'')
           +'</div>'
           +'<div style="display:flex;justify-content:space-between;align-items:center">'
           +'<span style="font-size:.46rem;color:var(--t3)">'+d.rate+'% APR</span>'
-          +'<span class="cc-tile-actions"><button class="data-item-del" style="font-size:.48rem;padding:2px 5px" title="Flip card" onclick="ccFlipId('+d.id+')">⟲</button><button class="data-item-del" style="font-size:.48rem;padding:2px 5px" title="Card design" onclick="ccOpenEdit('+d.id+')">🎨</button><button class="data-item-del" style="font-size:.48rem;padding:2px 5px" onclick="deleteDebt('+d.id+')">✕</button></span>'
+          +'<span class="cc-tile-actions"><button class="data-item-del" style="font-size:.48rem;padding:2px 5px" title="Flip card" onclick="ccFlipId('+d.id+')">⟲</button><button class="data-item-del" style="font-size:.48rem;padding:2px 5px" title="Card design" onclick="ccOpenEdit('+d.id+')">🎨</button><button class="data-item-del" style="font-size:.48rem;padding:2px 5px" onclick="deleteDebt('+d.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></span>'
           +'</div>'
           +'</div>';
       } else {
@@ -19959,11 +20080,11 @@ function renderDebtTab(){
           +'<div style="display:flex;align-items:center;gap:4px">'
           +'<input type="number" id="debt-pay-inp-'+d.id+'" class="al-inp" placeholder="£ pay" style="flex:1;font-size:.52rem;padding:3px 6px;min-width:0">'
           +'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap" onclick="makePayment('+d.id+')">Pay</button>'
-          +(d.payments&&d.payments.length?'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap;background:transparent;border-color:var(--t3);color:var(--t2)" title="Undo your last payment of £'+d.payments[d.payments.length-1].amt+'" onclick="undoPayment('+d.id+')">↩ Undo £'+Math.round(d.payments[d.payments.length-1].amt*100)/100+'</button>':'')
+          +(d.payments&&d.payments.length?'<button class="btn-add-data" style="padding:4px 8px;font-size:.5rem;white-space:nowrap;background:transparent;border-color:var(--t3);color:var(--t2)" title="Undo your last payment of £'+d.payments[d.payments.length-1].amt+'" onclick="undoPayment('+d.id+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-undo"/></svg> Undo £'+Math.round(d.payments[d.payments.length-1].amt*100)/100+'</button>':'')
           +'</div>'
           +'<div style="display:flex;justify-content:space-between;align-items:center">'
           +'<span style="font-size:.46rem;color:var(--t3)">'+(DEBT_TYPE_LABELS[d.type]||'Debt')+' · '+d.rate+'% · Min '+gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0)+'/mo</span>'
-          +'<button class="data-item-del" style="font-size:.48rem;padding:2px 5px" onclick="deleteDebt('+d.id+')">✕</button>'
+          +'<button class="data-item-del" style="font-size:.48rem;padding:2px 5px" onclick="deleteDebt('+d.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
           +'</div>'
           +'</div>';
       }
@@ -20162,8 +20283,8 @@ function renderBizTab(){
         +'</div>'
         +'<span style="font-size:.58rem;color:'+stageColors[l.stage]+';font-weight:700;text-transform:uppercase;letter-spacing:.08em">'+l.stage+'</span>'
         +'<span style="font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--go)">'+gbpFmt(l.value)+'/mo</span>'
-        +'<button class="dep-btn" onclick="convertLead('+l.id+')" title="Convert to client" style="font-size:.55rem;padding:3px 8px;color:var(--gr);border-color:var(--gr)">✓ Convert</button>'
-        +'<button class="data-item-del" onclick="deleteLead('+l.id+')">✕</button>'
+        +'<button class="dep-btn" onclick="convertLead('+l.id+')" title="Convert to client" style="font-size:.55rem;padding:3px 8px;color:var(--gr);border-color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Convert</button>'
+        +'<button class="data-item-del" onclick="deleteLead('+l.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
         +'</div>';
     }).join(''):'<div style="font-size:.6rem;color:var(--t3);text-align:center;padding:16px">No leads yet. Start building your pipeline!</div>';
   }
@@ -20183,11 +20304,11 @@ function renderBizTab(){
       +'</div>'
       +'<span style="font-size:.58rem;color:var(--t3)">'+c.status+'</span>'
       +'<span class="client-mrr">'+gbpFmt(c.monthly)+'/mo</span>'
-      +'<button class="data-item-del" onclick="deleteClient('+c.id+')">✕</button>'
+      +'<button class="data-item-del" onclick="deleteClient('+c.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
       +'</div>';
   }).join('')||'<div style="font-size:.6rem;color:var(--t3);text-align:center;padding:16px">No clients yet \u2014 add your first!</div>';
   var sl=document.getElementById('stream-list-el');
-  if(sl)sl.innerHTML=bizState.streams.map(function(r){return'<div class="data-item"><span>'+r.name+'</span><span class="data-item-val" style="color:var(--go)">'+gbpFmt(r.monthly)+'/mo</span><button class="data-item-del" onclick="deleteStream('+r.id+')">✕</button></div>';}).join('')||'';
+  if(sl)sl.innerHTML=bizState.streams.map(function(r){return'<div class="data-item"><span>'+r.name+'</span><span class="data-item-val" style="color:var(--go)">'+gbpFmt(r.monthly)+'/mo</span><button class="data-item-del" onclick="deleteStream('+r.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>';}).join('')||'';
   renderIncomeStreams();
   renderBizGoal();
 }
@@ -20491,7 +20612,7 @@ function showApiKeyModal(connId, name, instructions, storageKey) {
   modal.id = 'api-key-modal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:20000;background:rgb(var(--panel-rgb) / .94);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
   modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(420px,92vw);padding:24px 22px;position:relative">'
-    + '<button onclick="document.getElementById(\'api-key-modal\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer">✕</button>'
+    + '<button onclick="document.getElementById(\'api-key-modal\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
     + '<div style="font-family:\'Syne\',sans-serif;font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:6px">Connect ' + name + '</div>'
     + '<div style="font-size:.56rem;color:var(--t3);margin-bottom:14px;line-height:1.6">' + instructions + '</div>'
     + '<input id="api-key-inp" type="password" class="al-inp" placeholder="Paste your API key..." style="width:100%;margin-bottom:12px;box-sizing:border-box">'
@@ -20523,7 +20644,7 @@ function showCryptoKeyModal(connId, name, instructions) {
   modal.id = 'api-key-modal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:20000;background:rgb(var(--panel-rgb) / .94);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
   modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(440px,92vw);padding:24px 22px;position:relative">'
-    + '<button onclick="document.getElementById(\'api-key-modal\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer">✕</button>'
+    + '<button onclick="document.getElementById(\'api-key-modal\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
     + '<div style="font-family:\'Syne\',sans-serif;font-size:.8rem;font-weight:800;color:var(--tx);margin-bottom:6px">Connect ' + name + '</div>'
     + '<div style="font-size:.56rem;color:var(--t3);margin-bottom:14px;line-height:1.6">' + instructions + '</div>'
     + '<label style="font-size:.55rem;color:var(--t2);display:block;margin-bottom:4px">API Key</label>'
@@ -20582,7 +20703,7 @@ function showTrueLayerSetupModal() {
   var modal = document.createElement('div');
   modal.style.cssText = 'position:fixed;inset:0;z-index:20000;background:rgb(var(--panel-rgb) / .94);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
   modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(460px,92vw);padding:28px 24px;position:relative">'
-    + '<button onclick="this.closest(\'[style*=fixed]\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer">✕</button>'
+    + '<button onclick="this.closest(\'[style*=fixed]\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
     + '<div style="font-family:\'Syne\',sans-serif;font-size:.82rem;font-weight:800;color:var(--tx);margin-bottom:8px">🔗 Open Banking via TrueLayer</div>'
     + '<div style="font-size:.58rem;color:var(--t2);line-height:1.7;margin-bottom:14px">Securely connect 40+ UK banks (Monzo, Starling, Lloyds, HSBC, etc.) to pull live balances and transactions into Vault·It.</div>'
     + '<div style="font-size:.56rem;color:var(--t3);margin-bottom:14px;padding:10px;background:rgb(var(--teal-rgb) / .04);border:1px solid var(--bd);border-radius:4px;line-height:1.6">'
@@ -20890,7 +21011,7 @@ function viSwipeWrap(el,hint){
   var w=document.createElement('div');w.className='swipe-wrap';
   el.parentNode.insertBefore(w,el);w.appendChild(el);
   var l=document.createElement('div'),r=document.createElement('div');
-  l.className='swipe-arrow l';l.innerHTML='<span>‹</span>';r.className='swipe-arrow r';r.innerHTML='<span>›</span>';
+  l.className='swipe-arrow l';l.innerHTML='<span><svg class="vi-ic g flip" role="img" aria-label="Previous"><use href="#vi-chevron"/></svg></span>';r.className='swipe-arrow r';r.innerHTML='<span><svg class="vi-ic g nx" role="img" aria-label="Next"><use href="#vi-chevron"/></svg></span>';
   w.appendChild(l);w.appendChild(r);
   var cap=null;if(hint){cap=document.createElement('div');cap.className='swipe-cap';cap.textContent=hint;w.appendChild(cap);}
   var upd=function(){
@@ -20942,7 +21063,7 @@ function verifyPioneerPurchase(){
         { onConflict: 'id' }
       ).catch(function(){});
     }
-    if(msg)msg.innerHTML='<span style="color:var(--gr)">✓ Pioneer access unlocked — welcome to the vault!</span>';
+    if(msg)msg.innerHTML='<span style="color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access unlocked — welcome to the vault!</span>';
     setTimeout(function(){
       closePaywall();
       if (typeof applyPaywall === 'function') applyPaywall();
@@ -21095,7 +21216,7 @@ async function mintOnShibarium() {
     if (step3) step3.classList.add('nw-step-done');
     var mintBtn = document.getElementById('nw-mint-btn');
     if (mintBtn) { mintBtn.textContent = '✓ Minted'; mintBtn.style.color = 'var(--gr)'; }
-    if (resultEl) resultEl.innerHTML = '<span style="color:var(--gr)">✓ NFT minted · Tx: ' + (receipt.hash||'').slice(0,10) + '…</span>';
+    if (resultEl) resultEl.innerHTML = '<span style="color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> NFT minted · Tx: ' + (receipt.hash||'').slice(0,10) + '…</span>';
     showToast('Pioneer Card minted on Shibarium! 🎉');
   } catch(e) {
     var msg = e.message || String(e);
@@ -21250,7 +21371,7 @@ function renderNetworkTab() {
     var resultEl = document.getElementById('nw-mint-result');
     var step3 = document.getElementById('nw-step3-row');
     if (mintBtn) { mintBtn.textContent = '✓ Minted'; mintBtn.style.color = 'var(--gr)'; }
-    if (resultEl) resultEl.innerHTML = '<span style="color:var(--gr)">✓ Minted · Tx: ' + nftTx.slice(0,10) + '…</span>';
+    if (resultEl) resultEl.innerHTML = '<span style="color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Minted · Tx: ' + nftTx.slice(0,10) + '…</span>';
     if (step3) step3.classList.add('nw-step-done');
     var step2Row = document.getElementById('nw-step2-row');
     if (step2Row) step2Row.classList.add('nw-step-done');
@@ -21331,12 +21452,12 @@ async function testApiKey(type){
       if(!key){if(resultEl)resultEl.innerHTML='<span style="color:var(--re)">No key entered</span>';return;}
       var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'x-api-key':key,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'Hi'}]})});
       var d=await r.json();
-      if(d.content){if(resultEl)resultEl.innerHTML='<span style="color:var(--gr)">✓ Claude API key valid</span>';}
+      if(d.content){if(resultEl)resultEl.innerHTML='<span style="color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Claude API key valid</span>';}
       else{if(resultEl)resultEl.innerHTML='<span style="color:var(--re)">✗ '+( d.error&&d.error.message||'Invalid key')+'</span>';}
     }else if(type==='coingecko'){
       var r2=await fetch('https://api.coingecko.com/api/v3/ping');
       var d2=await r2.json();
-      if(d2.gecko_says){if(resultEl)resultEl.innerHTML='<span style="color:var(--gr)">✓ CoinGecko reachable</span>';}
+      if(d2.gecko_says){if(resultEl)resultEl.innerHTML='<span style="color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> CoinGecko reachable</span>';}
       else{if(resultEl)resultEl.innerHTML='<span style="color:var(--re)">✗ CoinGecko unreachable</span>';}
     }
   }catch(e){if(resultEl)resultEl.innerHTML='<span style="color:var(--re)">✗ Error: '+e.message+'</span>';}
@@ -21840,7 +21961,7 @@ function fireIcon(key,cx,cy,size,col,strokeOp,fillOp){
   var d=ic.d.map(function(d){return '<path d="'+d+'"/>';}).join('');
   return '<g transform="translate('+(cx-size/2).toFixed(1)+' '+(cy-size/2).toFixed(1)+') scale('+sc.toFixed(3)+')" style="pointer-events:none">'
     +'<g fill="'+col+'" fill-opacity="'+(ic.solid?Math.min(.75,fillOp*3):fillOp)+'" stroke="none">'+f+'</g>'
-    +'<g fill="none" stroke="'+col+'" stroke-opacity="'+strokeOp+'" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</g></g>';
+    +'<g fill="none" stroke="'+col+'" stroke-opacity="'+strokeOp+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+d+'</g></g>';
 }
 function fireScrollTo(idx){
   var sc=document.getElementById('fire-timeline-scroll');if(!sc)return;
@@ -21962,7 +22083,7 @@ function renderFIREroadmap(){
         +'<path d="M'+(cx+NODE_R-5.4)+' '+(LINE_Y-NODE_R+0.2)+'l3 2.8-3 2.8M'+(cx+NODE_R-1.2)+' '+(LINE_Y-NODE_R+0.2)+'l3 2.8-3 2.8" fill="none" stroke="#e8a23c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>';
     }else if(waiting){   // requirement already met, but an earlier stage is holding it: outlined tick
       out+='<g style="pointer-events:none"><circle cx="'+(cx+NODE_R-2)+'" cy="'+(LINE_Y-NODE_R+3)+'" r="8" fill="#050c14" stroke="'+col+'" stroke-width="1.4" stroke-dasharray="2 2"/>'
-        +'<path d="M'+(cx+NODE_R-5.6)+' '+(LINE_Y-NODE_R+3.2)+'l2.6 2.6 4.6-5.2" fill="none" stroke="'+col+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>';
+        +'<path d="M'+(cx+NODE_R-5.6)+' '+(LINE_Y-NODE_R+3.2)+'l2.6 2.6 4.6-5.2" fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>';
     }
     if(locked&&!waiting){   // locked: small padlock badge (icon stays visible underneath)
       out+='<g style="pointer-events:none" transform="translate('+(cx+NODE_R-3)+' '+(LINE_Y+NODE_R-3)+')"><circle r="7.5" fill="#050c14" stroke="rgba(125,135,147,0.55)" stroke-width="1"/>'
@@ -22060,7 +22181,7 @@ function fireShowDetail(idx,opts){
   var need='';
   if(!s.done&&!s.skipPass){
     if(waiting&&blocker){
-      need='<div class="fd-box ok">✓ <b>You already meet this.</b> It unlocks as soon as “'+blocker.name+'” is done.<br><button type="button" class="fd-btn" onclick="fireScrollTo('+S.nextIdx+');fireShowDetail('+S.nextIdx+')">Go to “'+blocker.name+'”</button></div>';
+      need='<div class="fd-box ok"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg><b>You already meet this.</b> It unlocks as soon as “'+blocker.name+'” is done.<br><button type="button" class="fd-btn" onclick="fireScrollTo('+S.nextIdx+');fireShowDetail('+S.nextIdx+')">Go to “'+blocker.name+'”</button></div>';
     }else{
       var items=(s.why?s.why():[s.hint||'Not met yet.']).filter(Boolean);
       need='<div class="fd-box"><div class="fd-h">WHAT THIS NEEDS</div><ul>'+items.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul>'
@@ -22093,7 +22214,7 @@ function fireShowDetail(idx,opts){
 }
 
 // ── SUMMARY CARDS ─────────────────────────────────────────────
-function ovIcon(k,c){return '<span class="ov-sum-ri" style="color:'+c+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(OV_ICO[k]||OV_ICO.inv)+'</svg></span>';}
+function ovIcon(k,c){return '<span class="ov-sum-ri" style="color:'+c+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(OV_ICO[k]||OV_ICO.inv)+'</svg></span>';}
 function renderSummaryCards(){
   var aEl=document.getElementById('ov-assets-summary');
   if(aEl){
@@ -22418,7 +22539,7 @@ function renderIncomeStreams(){
               +'<div style="display:flex;gap:4px;flex-wrap:wrap">'
               +(nxt?'<button class="dep-btn" style="font-size:.48rem;padding:2px 5px" onclick="moveStreamTask('+s.id+','+t.id+',\''+nxt+'\')">→</button>':'')
               +(prv?'<button class="dep-btn" style="font-size:.48rem;padding:2px 5px" onclick="moveStreamTask('+s.id+','+t.id+',\''+prv+'\')">←</button>':'')
-              +'<button class="data-item-del" style="font-size:.48rem;padding:2px 5px" onclick="deleteStreamTask('+s.id+','+t.id+')">✕</button>'
+              +'<button class="data-item-del" style="font-size:.48rem;padding:2px 5px" onclick="deleteStreamTask('+s.id+','+t.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
               +'</div>'
               +'</div>';
           }).join('')
@@ -23113,7 +23234,7 @@ function renderJrnySVG(currentStage, selectedNode) {
     // Completed tick (left of node)
     if (isPast) {
       out += '<text x="' + (mainX - r - 6) + '" y="' + (cy + 4) + '" text-anchor="middle"'
-        + ' font-size="9" fill="' + col + '" style="pointer-events:none">✓</text>';
+        + ' font-size="9" fill="' + col + '" style="pointer-events:none"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></text>';
     }
 
     // YOU ARE HERE badge (above label area)
@@ -24243,7 +24364,7 @@ function showLegalModal(title, body) {
   var modal = document.createElement('div');
   modal.id = 'legal-modal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:20000;background:rgb(var(--panel-rgb) / .94);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
-  modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(560px,94vw);max-height:86vh;overflow-y:auto;padding:24px 22px;position:relative"><button onclick="document.getElementById(\'legal-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer">✕</button><div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:14px">'+title+'</div><div style="font-family:\'DM Sans\',sans-serif;font-size:.6rem;color:var(--t2);line-height:1.7">'+body+'</div></div>';
+  modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(560px,94vw);max-height:86vh;overflow-y:auto;padding:24px 22px;position:relative"><button onclick="document.getElementById(\'legal-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button><div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:14px">'+title+'</div><div style="font-family:\'DM Sans\',sans-serif;font-size:.6rem;color:var(--t2);line-height:1.7">'+body+'</div></div>';
   document.body.appendChild(modal);
 }
 var VI_LEGAL_DATE = '28 October 2026';
@@ -24316,7 +24437,7 @@ function viMovedBanner(host) {
   b.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:10003;background:var(--panel);border-bottom:1px solid var(--teal);color:#cfeeee;padding:10px 14px;font-size:13px;display:flex;gap:10px;align-items:center;flex-wrap:wrap';
   b.innerHTML = '<span style="flex:1;min-width:220px">📦 Vault·It has moved to <strong>app.vault-it.co</strong>. Back up here first (Settings → Cloud sync → Upload everything), then sign in at the new address — your account data comes with you. Photos and any 3D design you uploaded stay on this device, so tap Settings → Download my data first.</span>'
     + '<a class="btn-add-data" href="https://app.vault-it.co/" style="text-decoration:none">Open new address</a>'
-    + '<span style="cursor:pointer;padding:4px" aria-label="Dismiss" onclick="try{sessionStorage.setItem(\'vi_moved_dismissed\',\'1\')}catch(e){}document.getElementById(\'moved-banner\').remove()">✕</span>';
+    + '<span style="cursor:pointer;padding:4px" aria-label="Dismiss" onclick="try{sessionStorage.setItem(\'vi_moved_dismissed\',\'1\')}catch(e){}document.getElementById(\'moved-banner\').remove()"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span>';
   document.body.appendChild(b); return true;
 }
 window.addEventListener('load', function() { try { viMovedBanner(location.hostname); } catch (e) {} });
@@ -24377,9 +24498,9 @@ function applyViSettings() {
   root.style.fontSize = '';
   root.style.setProperty('--vi-base', sizes[viSettings.fontSize] || '13px');
   if (viSettings.contrast === 'high') {
-    root.style.setProperty('--t2','#c8cdd2');
-    root.style.setProperty('--t3','#8a9098');
-    root.style.setProperty('--bd','rgba(68,192,185,.25)');
+    root.style.setProperty('--t2','var(--text)');   // high contrast works in Night and Daylight
+    root.style.setProperty('--t3','var(--muted)');
+    root.style.setProperty('--bd','rgb(var(--teal-rgb) / .3)');
   } else {
     root.style.removeProperty('--t2');
     root.style.removeProperty('--t3');
@@ -25158,7 +25279,7 @@ function nwhRenderMini(){
   <polyline 
     points="3.9,5.0 7.0,9.2 10.1,5.0"
     fill="none" stroke="#44c0b9" 
-    stroke-width="1.7"
+    stroke-width="1.5"
     stroke-linecap="round"
     stroke-linejoin="round"
     opacity="0.18"/>
@@ -25178,7 +25299,7 @@ function nwhRenderMini(){
 <!-- ══ ALPHA ACCESS MODAL ══ -->
 <div id="waitlist-modal" class="vi-modal-overlay hidden">
   <div class="vi-modal-box" style="max-width:460px;padding:32px 28px 28px">
-    <button onclick="document.getElementById('waitlist-modal').classList.add('hidden')" style="position:absolute;top:12px;right:14px;background:transparent;border:none;color:var(--t3);font-size:1rem;cursor:pointer;line-height:1;padding:4px">✕</button>
+    <button onclick="document.getElementById('waitlist-modal').classList.add('hidden')" style="position:absolute;top:12px;right:14px;background:transparent;border:none;color:var(--t3);font-size:1rem;cursor:pointer;line-height:1;padding:4px"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
     <div style="text-align:center;margin-bottom:20px">
       <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;background:rgb(var(--brass-rgb) / .1);border:1px solid rgb(var(--brass-rgb) / .3);clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));margin-bottom:14px">
         <span style="font-size:.75rem">◈</span>
@@ -25227,7 +25348,7 @@ function nwhRenderMini(){
     <span class="nwh-title">📅 My Financial Journey</span>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <span id="nwh-year-range" style="font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--t2)"></span>
-      <button onclick="closeNwHistory()" style="background:none;border:1px solid var(--bd);color:var(--t2);font-family:'Share Tech Mono',monospace;font-size:.56rem;padding:5px 14px;cursor:pointer">✕ Close</button>
+      <button onclick="closeNwHistory()" style="background:none;border:1px solid var(--bd);color:var(--t2);font-family:'Share Tech Mono',monospace;font-size:.56rem;padding:5px 14px;cursor:pointer"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg> Close</button>
     </div>
   </div>
   <div class="nwh-body" id="nwh-body"></div>
