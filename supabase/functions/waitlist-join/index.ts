@@ -98,7 +98,7 @@ function confirmHtml(email: string, link: string, unsub: string, testing: boolea
 <tr><td style="padding:32px 36px 8px;text-align:center"><div style="font-size:20px;font-weight:800;letter-spacing:.12em;color:#c9a84c">VAULT-IT</div></td></tr>
 <tr><td style="padding:18px 36px 8px">
 <h1 style="margin:0 0 14px;font-size:22px;color:#f0f4f8;line-height:1.3">One click to confirm</h1>
-<p style="margin:0 0 22px;font-size:15px;color:rgba(255,255,255,.7);line-height:1.6">Someone — hopefully you — asked to join the Vault-It beta list with <strong style="color:#e8edf2">${e}</strong>.${testing ? ' Confirm and we will send you the link to start testing.' : ''}</p>
+<p style="margin:0 0 22px;font-size:15px;color:rgba(255,255,255,.7);line-height:1.6">Someone (hopefully you) asked to join the Vault-It beta list with <strong style="color:#e8edf2">${e}</strong>.${testing ? ' Confirm and we will send you the link to start testing.' : ''}</p>
 <p style="margin:0 0 26px;text-align:center"><a href="${l}" style="display:inline-block;background:#c9a84c;color:#04090f;text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:10px">Confirm my place</a></p>
 <p style="margin:0 0 8px;font-size:12px;color:rgba(255,255,255,.45);line-height:1.6">The link works for 7 days. If you did not ask for this, ignore this e-mail: you will not hear from us again and the request is deleted after 30 days.</p>
 </td></tr>
