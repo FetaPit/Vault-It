@@ -33,7 +33,7 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 | 7b | Item 3D viewer for the wealth inventory and liabilities: .glb upload, Night viewer with orbit and zoom, green tint on every model, Poly Pizza library behind `?modeltest=1` (see `docs/WEALTH_INVENTORY_3D_OPTIONS.md`, "Built") | Done, needs the owner's phone test |
 | 8 | Groupings H1 to H4, O1, O2, D1 to D3, A1 (section 4, all approved) | Done |
 | 9 | House builder Level 2 fix (section 3) | Next |
-| 10 | Brand look and every animation on all six three.js models in `src/hb3d` (owner chose option a), behind `?house=new` | |
+| 10 | Brand look and every animation on all six three.js models in `src/hb3d` (owner chose option a), behind `?house=new` | Built behind the flag (`src/hb3d/brand.js`, `tests/test_hb_brand.js`, `docs/HB3D_KIT.md` "Brand build"), needs the owner's phone test |
 | 11 | Net worth in 3D as the Overview hero: 3D blocks first, Graph toggle, choice remembered, blocks in the sub-tab colours, behind `?nw=new` | |
 | 12 | On by default for testers once the owner signs off on the phone (old builder reachable from Settings for a week) | |
 | 13 | `landing.html` brand pass; a service worker that registers (today's is a `blob:` URL browsers refuse); cache version bump | |

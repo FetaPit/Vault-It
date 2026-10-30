@@ -394,7 +394,8 @@
     if (this.water) this.water.visible = false;
     if (this.focusBox) this.focusBox.visible = true;
     this._brandApply();
-    this._lastMode = this.mode; this._shadowDirty = true;
+    if (this._lastMode !== this.mode) this._shadowDirty = true;   // one refresh clears any old shadow; the hologram casts none
+    this._lastMode = this.mode;
     this.dirty = true; this.wake();
   };
 

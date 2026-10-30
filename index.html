@@ -6546,6 +6546,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   VP.dispose = function () {
     this.stop(); this._clear();
     if (this._ro) this._ro.disconnect();
+    if (this._bIO) this._bIO.disconnect();
     this.controls.dispose(); this.renderer.dispose();
     if (this.renderer.domElement.parentNode) this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
   };
@@ -6947,7 +6948,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     if (this.water) this.water.visible = false;
     if (this.focusBox) this.focusBox.visible = true;
     this._brandApply();
-    this._lastMode = this.mode; this._shadowDirty = true;
+    if (this._lastMode !== this.mode) this._shadowDirty = true;   // one refresh clears any old shadow; the hologram casts none
+    this._lastMode = this.mode;
     this.dirty = true; this.wake();
   };
 
