@@ -1,5 +1,5 @@
 // Brand phase 6: Daylight polish. Every visible piece of text on every tab reads on paper (at least 3:1, the
-// floor for large text and icons), there is no glow, and the generated SVG stages and charts swap to Daylight colours.
+// floor for large text and icons), there is no glow, charts swap to Daylight colours, and 3D viewports keep the Night look.
 // Text on gradients (card artwork, gradient buttons) is skipped: its background cannot be measured reliably.
 // Run: node tests/test_daylight.js
 const { chromium } = require('playwright');
@@ -23,7 +23,7 @@ const scan = () => {
   const bgOf = el => { const stack = []; for (let e = el; e; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.backgroundImage !== 'none') return null; const c = parse(cs.backgroundColor); if (c && c.a > 0) { stack.push(c); if (c.a >= .99) break; } } let bg = { r: 243, g: 247, b: 246, a: 1 }; for (let i = stack.length - 1; i >= 0; i--) bg = blend(stack[i], bg); return bg; };
   const out = [];
   document.querySelectorAll('.tab-panel *, #topnav *').forEach(el => {
-    if (!el.offsetParent || el.closest('svg,canvas,input,select,textarea,[disabled],.cc3-card,.cc3,[class*="cc3-"]')) return;
+    if (!el.offsetParent || el.closest('svg,canvas,input,select,textarea,[disabled],.scene,.inv-stage,.cc3-card,.cc3,[class*="cc3-"]')) return;
     const txt = [...el.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join(' ').trim(); if (!txt) return;
     const r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return;
     const cs = getComputedStyle(el); if (cs.visibility === 'hidden') return;
@@ -57,12 +57,16 @@ const scan = () => {
   ok(/^#e6f1f0$/i.test(g.roadmapBg || ''), 'roadmap stage is paper, not Night (' + g.roadmapBg + ')');
   ok(!g.sankeyHalo || /^#ffffff$/i.test(g.sankeyHalo), 'Sankey label halo is paper (' + g.sankeyHalo + ')');
   ok(g.night, 'Night colours are swapped in Daylight');
+  // 3D viewports keep the Night look in both modes (owner, 30 Oct)
   await p.evaluate(() => showTab('assets')); await p.waitForTimeout(900);
-  ok(await p.evaluate(() => (document.querySelector('#metalsSvg rect') || { getAttribute: () => '' }).getAttribute('fill').toLowerCase() === '#e6f1f0'), 'metals stage is paper');
-  // back to Night: the same drawings return to Night colours
+  const vp = await p.evaluate(() => { const sc = document.getElementById('metals-scene'), cs = getComputedStyle(sc);
+    return { bg: cs.getPropertyValue('--bg').trim(), teal: cs.getPropertyValue('--teal').trim(), em: getComputedStyle(sc.querySelector('.vp-gi-hd') || sc).color, page: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+      stage: (document.querySelector('#metalsSvg rect') || { getAttribute: () => '' }).getAttribute('fill') }; });
+  ok(vp.page.toUpperCase() === '#F3F7F6' && vp.bg.toUpperCase() === '#080808' && vp.teal.toUpperCase() === '#44C0B9', '3D viewports keep Night tokens in Daylight (page ' + vp.page + ', viewport ' + vp.bg + ' / ' + vp.teal + ')');
+  ok(/^#060d16$/i.test(vp.stage), 'metals stage keeps its Night background (' + vp.stage + ')');
   await p.evaluate(() => viToggleTheme()); await p.waitForTimeout(600);
-  const n = await p.evaluate(() => ({ t: viTheme(), metals: (document.querySelector('#metalsSvg rect') || { getAttribute: () => '' }).getAttribute('fill'), swap: viDay('#030810') }));
-  ok(n.t === 'dark' && /^#060d16$/i.test(n.metals) && n.swap === '#030810', 'switching to Night redraws with Night colours (' + n.metals + ')');
+  const n = await p.evaluate(() => ({ t: viTheme(), swap: viDay('#030810') }));
+  ok(n.t === 'dark' && n.swap === '#030810', 'in Night nothing is swapped');
   ok(errs.length === 0, 'no page errors ' + errs.join('|'));
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED'); process.exit(fails ? 1 : 0);
 })();

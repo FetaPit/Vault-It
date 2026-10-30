@@ -16,7 +16,7 @@ document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark")}c
 /* Vault·It design tokens. Night is the default, Daylight is the light mode.
  * Switch with data-theme="light" on <html>. Generated from vault-it-brand-book.html */
 html{box-sizing:border-box}
-:root,[data-theme="dark"]{
+:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage{   /* 3D viewports stay Night in Daylight too */
   color-scheme:dark;
   --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --slate:#1C2420; --line:#102221; --line2:#15302F;
   --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882; --lock:#5A6068;
@@ -6235,18 +6235,6 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   var VP = Viewer.prototype;
 
   VP.start = function () { this.active = true; this.dirty = true; this.wake(); };
-  // Night: dark plot and teal survey grid. Daylight: a pale blueprint stage (no glow), same model.
-  VP.setTheme = function (light) {
-    if (this._light === !!light) return; this._light = !!light;
-    var bg = light ? 0xe3efee : 0x05101b, sc = this.scene;
-    sc.background = new THREE.Color(bg); if (sc.fog) sc.fog.color.setHex(bg);
-    this.ground.material.color = col(light ? 0xd6e7e5 : 0x0c1a20);
-    if (this.grid) { sc.remove(this.grid); this.grid.geometry.dispose(); this.grid.material.dispose(); }
-    var g = new THREE.GridHelper(240, 240, col(light ? 0x2e6f6c : 0x1f5e5a), col(light ? 0x9fc4c1 : 0x123734));
-    g.material.transparent = true; g.material.opacity = light ? 0.5 : 0.35; g.position.y = 0.001; sc.add(g); this.grid = g;
-    this.renderer.toneMappingExposure = light ? 0.95 : 1.05;
-    this.dirty = true; this.wake();
-  };
   VP.wake = function () { this._idle = 0; if (this.active && !this._raf) this._raf = requestAnimationFrame(this._loop); };
   VP.settled = function () { return !this._anim && this._idle > 2; };
   VP.stop = function () { this.active = false; if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; } };
@@ -6559,7 +6547,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
    PURPOSEOS GLOBAL — 2-tab build: Overview + House
 ═══════════════════════════════════════════════════════ */
 
-:root {
+:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage {
   /* old names, kept as aliases of the brand tokens for one release */
   --c1: var(--panel); --c2: var(--surf2); --c3: var(--slate); --c4: var(--line2);
   --em: var(--teal); --em2: var(--teal); --em3: var(--faint); --dp: var(--teal-deep);
@@ -9503,7 +9491,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 <style id="vi-daylight">
 /* ═══ Daylight polish (brand phase 6): ink on paper, no glow, nothing faint. Night is untouched. ═══ */
 /* no bloom: glows become nothing on paper */
-[data-theme="light"] *{text-shadow:none!important}
+[data-theme="light"] *:not(.scene *):not(.inv-stage *){text-shadow:none!important}
 [data-theme="light"] .ov-kpi-val,[data-theme="light"] .sb-val{filter:none!important}
 /* titles and eyebrows dimmed for Night read at full strength on paper */
 [data-theme="light"] .ov-chart-title,[data-theme="light"] .ov-ms-title,[data-theme="light"] .card-lbl,[data-theme="light"] .vi-eyebrow{opacity:1!important}
@@ -9512,7 +9500,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 [data-theme="light"] .btn-add-data{color:var(--on-teal)!important;background:var(--btn1);border-color:var(--btn1)}
 [data-theme="light"] .btn-add-data:hover{background:var(--btn2)}
 /* House builder: parchment text from the old tracker becomes ink */
-[data-theme="light"] .price-edit-row label,[data-theme="light"] .igrp label,[data-theme="light"] .tgt-amt,[data-theme="light"] .sl,[data-theme="light"] .log-entry,[data-theme="light"] .scene-cap{color:var(--muted)!important;opacity:1!important}
+[data-theme="light"] .price-edit-row label,[data-theme="light"] .igrp label,[data-theme="light"] .tgt-amt,[data-theme="light"] .sl,[data-theme="light"] .log-entry,[data-theme="light"] .scene-cap:not(.scene *){color:var(--muted)!important;opacity:1!important}
 [data-theme="light"] .ms-lbl{color:var(--lock)!important;opacity:1!important}
 [data-theme="light"] .hbtn{color:var(--muted)}
 [data-theme="light"] .hbtn .pr{opacity:1!important}
@@ -9525,8 +9513,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 [data-theme="light"] .hb-row-n b{color:var(--text)}
 [data-theme="light"] .data-item-del{opacity:.8}
 [data-theme="light"] .sym{color:var(--gold)!important}
-/* 3D stage controls and hints */
-[data-theme="light"] .hud-btn,[data-theme="light"] .vp-gi-hd,[data-theme="light"] .vp-gi-lbl,[data-theme="light"] .vp-gi-ico,[data-theme="light"] .vp-gi b,[data-theme="light"] .vp-key{color:var(--teal-deep)!important}
+[data-theme="light"] .vp-key:not(.scene *){color:var(--teal-deep)!important}
 [data-theme="light"] #nw-zoom-hint{color:var(--muted)!important}
 /* outside brand colours on paper */
 [data-theme="light"] a[href*="wa.me"]{color:#0E7A44!important}
@@ -13373,8 +13360,8 @@ function pct(){return Math.min(state.saved/depositTarget(),1);}
 const S = document.getElementById('houseSvg');
 const NS = 'http://www.w3.org/2000/svg';
 function E(tag,attrs,parent){
-  const e=document.createElementNS(NS,tag),day=typeof viLight==='function'&&viLight();
-  for(const[k,v]of Object.entries(attrs))e.setAttribute(k,day&&(k==='fill'||k==='stroke'||k==='stop-color')?viDay(String(v),false):String(v));   // Daylight stage
+  const e=document.createElementNS(NS,tag);
+  for(const[k,v]of Object.entries(attrs))e.setAttribute(k,String(v));
   if(parent)parent.appendChild(e);
   return e;
 }
@@ -15306,7 +15293,6 @@ function hb3dRedraw() {
       if (ob) ob.classList.add('orbit-active'); if (oi) oi.textContent = '⟳';
       var key = document.querySelector('#houseSceneCard .vp-key'); if (key) key.textContent = 'DRAG · orbit   ·   RIGHT-DRAG / 2 FINGERS · pan   ·   SCROLL / PINCH · zoom';
     }
-    if (v.setTheme) v.setTheme(typeof viLight === 'function' && viLight());
     v.start();
     var key2 = hb3dKey(sm.type, sm.floor), model = hb3dModel(sm.type, sm.floor), changed = key2 !== HB3DAPP.key;
     if (changed) {
@@ -18949,8 +18935,8 @@ function renderMetalsISO(){
   MS.innerHTML='';
   var NS2='http://www.w3.org/2000/svg';
   function mE(tag,attrs,par){
-    var el=document.createElementNS(NS2,tag),day=viLight();
-    for(var k in attrs)el.setAttribute(k,day&&(k==='fill'||k==='stroke'||k==='stop-color')?viDay(String(attrs[k]),false):String(attrs[k]));   // Daylight stage
+    var el=document.createElementNS(NS2,tag);
+    for(var k in attrs)el.setAttribute(k,String(attrs[k]));
     if(par)par.appendChild(el);
     return el;
   }
@@ -21725,11 +21711,6 @@ function viDay(str,brand){
   str=String(str).replace(/#([0-9a-f]{6})/gi,function(m,h){h=h.toLowerCase();var d=VI_DAY_BASE[h]||(brand!==false&&VI_DAY_BRAND[h]);return d?'#'+d:m;});
   return str.replace(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/g,function(m,r,g,b){var k=r+','+g+','+b,d=VI_DAY_RGB[k]||(brand!==false&&VI_DAY_RGB_BRAND[k]);return d?m.replace(k,d).replace(/\s/g,''):m;});
 }
-// same swap on an SVG already in the page (shapes keep their own material colours: brand hues untouched)
-function viDaySvg(root){
-  if(!root||!viLight())return;
-  root.querySelectorAll('[fill],[stroke],[stop-color]').forEach(function(e){['fill','stroke','stop-color'].forEach(function(a){var v=e.getAttribute(a);if(v){var n=viDay(v,false);if(n!==v)e.setAttribute(a,n);}});});
-}
 // debt charts: a red ramp, the largest debt strongest (issuer colours stay on the card artwork only)
 function debtChartRamp(debts){
   var tok=function(n){var v=viCss(n+'-rgb').split(/[\s,]+/).map(Number);return v.length===3&&v.every(function(x){return x>=0;})?v:[128,128,128];};
@@ -22549,7 +22530,7 @@ function renderCashISO(){
   if(cap){
     cap.textContent=gbpFmt(total)+' \u2014 '+fullCubes+' full stacks'+(remainder>0?' + \u00a3'+remainder:'')+' \u00b7 each stack = \u00a31,000';
   }
-  MS.innerHTML=viDay(svgContent,false);
+  MS.innerHTML=svgContent;
 }
 
 (function(){
@@ -25325,7 +25306,7 @@ function viToggleTheme(){
   try{drawChart();}catch(e){}
   try{var _dt=document.getElementById('tab-debt');if(_dt&&_dt.style.display!=='none'){drawDebtHistogram();drawDebtDonut();}}catch(e){}
   // SVG drawings bake their colours in: redraw them for the new theme
-  [function(){renderCashflow();},function(){renderFIREroadmap();},function(){renderMetalsISO();},function(){renderCashISO();},function(){if(typeof redraw==='function')redraw();}].forEach(function(f){try{f();}catch(e){}});
+  [function(){renderCashflow();},function(){renderFIREroadmap();},function(){if(typeof redraw==='function')redraw();}].forEach(function(f){try{f();}catch(e){}});
   if(typeof toast==='function')toast(next==='light'?'Daylight mode':'Night mode');
 }
 document.addEventListener('DOMContentLoaded',viSyncTheme);
