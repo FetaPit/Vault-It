@@ -14,6 +14,7 @@
   },
   "workers_dev": true,
   "preview_urls": true,
+  "previews": {},   // needed by `wrangler preview` (Workers Builds preview links for non-production branches); empty = same settings as production
   "observability": { "enabled": false },   // request URLs and IPs are not logged by the Worker (the privacy notice relies on this)
   // Custom domains (the vault-it.co zone is Active on Cloudflare; Cloudflare creates the DNS records on deploy)
   "routes": [
