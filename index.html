@@ -10048,6 +10048,20 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   html body.vi-compact #topnav .vi-tabs,html #topnav.compact-nav .vi-tabs{justify-content:space-between}
   html body.vi-compact #topnav .tab-btn,html #topnav.compact-nav .tab-btn{flex:1 1 0!important;width:auto;max-width:64px}
 }
+/* phones (owner, 30 Oct 2026): the tab icons sit in a bar fixed to the bottom of the screen, always visible; the header keeps one row.
+   The nav drops to z-index 500 here so pop-ups (Settings at 600 and above) cover the bar; the footer flows at the end of the page instead. */
+@media (max-width:700px){
+  :root{--footer-h:calc(56px + env(safe-area-inset-bottom,0px))}
+  html #topnav{grid-template-rows:46px;z-index:500!important}
+  #topnav .vi-tabs{position:fixed;left:0;right:0;bottom:0;top:auto;grid-row:auto;grid-column:auto;height:calc(56px + env(safe-area-inset-bottom,0px));margin:0;padding:0 4px env(safe-area-inset-bottom,0px);background:rgb(var(--panel-rgb) / .97);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;gap:0;overflow:visible}
+  html #topnav .tab-btn,html body.vi-compact #topnav .tab-btn,html #topnav.compact-nav .tab-btn{flex:1 1 0!important;width:auto;max-width:76px;min-width:44px;height:52px!important;padding:0!important}
+  #topnav .tab-btn .nav-tab-label{display:none!important}
+  html #topnav .tab-btn .vi-ic.ti{width:22px!important;height:22px!important}
+  #topnav .vi-usp,#topnav .vi-pro{top:4px;right:4px}
+  #left-sidebar{top:46px!important}
+  #app-footer{position:static;margin-top:16px}
+  html body #sync-banner{bottom:calc(var(--footer-h) + 6px)!important}
+}
 </style>
 <style id="vi-wordmark">
 /* ═══ Wordmark and mark (brand phase 7): Vault, a brick, It. Never a hyphen. ═══ */
@@ -10910,7 +10924,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     <button class="tab-btn" data-tab="debt" role="tab" aria-label="Debt tracker" title="Debt tracker" onclick="showTab('debt')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-debt-tracker"/></svg><span class="nav-tab-label">Debt tracker</span></button>
     <button class="tab-btn" data-tab="biz" role="tab" aria-label="Entrepreneur" title="Entrepreneur" onclick="showTab('biz');setTimeout(function(){var g=document.getElementById('pro-gate-biz');if(g&&g.style.display!=='none'){gateNudge('Entrepreneur','Income streams + CRM');}},100)"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-entrepreneur"/></svg><span class="nav-tab-label">Entrepreneur</span><span class="vi-pro pro-badge" aria-hidden="true">PRO</span></button>
     <button class="tab-btn" data-tab="achievements" role="tab" aria-label="Achievements" title="Achievements" onclick="showTab('achievements')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-trophy"/></svg><span class="nav-tab-label">Achievements</span></button>
-    <button class="tab-btn" data-tab="connections" role="tab" aria-label="Connections" title="Connections" onclick="showTab('connections')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-connections"/></svg><span class="nav-tab-label">Connections</span></button>
+    <button class="tab-btn" data-tab="connections" role="tab" aria-label="Connections" title="Connections" onclick="showTab('connections')" hidden><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-connections"/></svg><span class="nav-tab-label">Connections</span></button>
     <button class="tab-btn" data-tab="network" role="tab" aria-label="Network" title="Network" onclick="showTab('network')" hidden><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-network"/></svg><span class="nav-tab-label">Network</span></button>
   </div>
   <div class="vi-nw-wrap" style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-left:10px;margin-left:auto">
@@ -11913,18 +11927,8 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 </div>
 
 <!-- ═══════════════════════════ CONNECTIONS ═══════════════════════════ -->
-<div id="tab-connections" class="tab-panel" style="display:none">
-  <div style="max-width:1000px;margin:0 auto;padding:24px 20px 60px">
-    <div class="ov-chart-card" style="margin-bottom:16px">
-      <div class="ov-chart-title" style="margin-bottom:4px">Integration Hub</div>
-      <div style="font-size:.62rem;color:var(--t3)">Connect your accounts to sync data automatically. API keys stored locally in your browser only.</div>
-    </div>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-      <button onclick="refreshAllLiveConns()" style="padding:6px 14px;background:rgb(var(--teal-rgb) / .1);border:1px solid var(--bd2);color:var(--em);font-family:'Syne',sans-serif;font-size:.55rem;font-weight:700;cursor:pointer;border-radius:4px">↻ Refresh Live</button>
-    </div>
-    <div id="connections-list"></div>
-  </div>
-</div>
+<!-- Connections moved into Settings (owner, 30 Oct 2026); showTab('connections') opens Settings at that section -->
+<div id="tab-connections" class="tab-panel" style="display:none"></div>
 
 <!-- ═══════════════════════════════════════════
      VAULT NETWORK TAB
@@ -12092,7 +12096,17 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
       <div class="settings-row"><label class="settings-label">Currency</label><div class="settings-opts" id="set-currency"><button data-val="GBP" onclick="setSetting('currency','GBP',this)" class="active">£ GBP</button><button data-val="USD" onclick="setSetting('currency','USD',this)">$ USD</button><button data-val="EUR" onclick="setSetting('currency','EUR',this)">€ EUR</button><button data-val="INR" onclick="setSetting('currency','INR',this)">₹ INR</button></div></div>
       <div class="settings-row"><label class="settings-label">House builder</label><div class="settings-opts" id="set-house3d"><button data-val="1" onclick="setViewFlag('house',true,this)">Brand build</button><button data-val="0" onclick="setViewFlag('house',false,this)">Classic</button></div></div>
       <div class="settings-row"><label class="settings-label">Net worth</label><div class="settings-opts" id="set-nw3d"><button data-val="1" onclick="setViewFlag('nw',true,this)">3D</button><button data-val="0" onclick="setViewFlag('nw',false,this)">Classic chart</button></div></div>
-      <div class="settings-row"><label class="settings-label">Nav Style</label><div class="settings-opts" id="set-nav"><button data-val="false" onclick="setSetting('compactNav',false,this)" class="active">Labels</button><button data-val="true" onclick="setSetting('compactNav',true,this)">Icons only</button></div></div>
+      <div class="settings-row"><label class="settings-label">Nav style</label><div class="settings-opts" id="set-nav"><button data-val="false" onclick="setSetting('compactNav',false,this)" class="active">Labels</button><button data-val="true" onclick="setSetting('compactNav',true,this)">Icons only</button></div></div>
+    </div>
+
+    <!-- Connections (owner, 30 Oct 2026: out of the menu bar, into Settings) -->
+    <div class="settings-section" id="settings-connections">
+      <div class="settings-section-title">Connections</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px">
+        <div style="font-size:.58rem;color:var(--t3);line-height:1.5">Connect your accounts to sync data automatically. API keys are stored in this browser only.</div>
+        <button onclick="refreshAllLiveConns()" style="flex:none;padding:6px 12px;background:rgb(var(--teal-rgb) / .1);border:1px solid var(--bd2);color:var(--em);font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;cursor:pointer;border-radius:4px">↻ Refresh live</button>
+      </div>
+      <div id="connections-list"></div>
     </div>
 
     <!-- Claude API Key -->
@@ -12421,7 +12435,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 .btn-reset{background:transparent;border:1px solid rgb(var(--ink-rgb) / .08);border-radius:3px;color:rgb(var(--ink-rgb) / .25);font-family:var(--font-mono);font-size:.58rem;padding:6px 12px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;transition:all .2s;width:100%;margin-top:4px}
 .btn-reset:hover{border-color:#e55;color:#e88}
 .scene-cap{text-align:center;margin-top:14px;font-size:.58rem;color:#D4C5A9;opacity:.38;letter-spacing:.2em;text-transform:uppercase}
-.toast{position:fixed;bottom:calc(var(--footer-h, 30px) + 6px);left:50%;transform:translateX(-50%) translateY(80px);background:rgb(var(--panel-rgb) / .96);border:1px solid rgb(var(--teal-rgb) / .45);border-radius:5px;padding:12px 22px;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--teal);z-index:30000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.6),0 0 20px rgb(var(--teal-rgb) / .1)}
+.toast{position:fixed;bottom:calc(var(--footer-h, 30px) + 6px);left:50%;transform:translateX(-50%) translateY(calc(var(--footer-h, 30px) + 80px));background:rgb(var(--panel-rgb) / .96);border:1px solid rgb(var(--teal-rgb) / .45);border-radius:5px;padding:12px 22px;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--teal);z-index:30000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.6),0 0 20px rgb(var(--teal-rgb) / .1)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 /* Wealth Inventory tiles */
@@ -13318,6 +13332,7 @@ body.vi-pop-open{overflow:hidden}
 // TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════
 function showTab(id){
+  if(id==='connections'){showSettings();var cs=document.getElementById('settings-connections');if(cs)setTimeout(function(){try{cs.scrollIntoView({block:'start'})}catch(e){}},60);return;}
   if(id!=='house'&&typeof _threeAnimId!=='undefined'&&_threeAnimId){cancelAnimationFrame(_threeAnimId);_threeAnimId=null;}
   if(id!=='house'&&typeof HB3DAPP!=='undefined'&&HB3DAPP.viewer){try{HB3DAPP.viewer.stop();}catch(e){}}
   // Always collapse the ISO expand when switching tabs
@@ -23042,6 +23057,7 @@ function _refreshPioneerSettingsUI(){
 }
 
 function showSettings(){
+  try{renderConnections()}catch(e){}
   [['house','set-house3d'],['nw','set-nw3d']].forEach(function(x){var r=document.getElementById(x[1]);if(!r)return;var on=viFlag(x[0]);[].forEach.call(r.children,function(b){b.classList.toggle('active',(b.getAttribute('data-val')==='1')===on);});});
   document.getElementById('set-claude-key').value=localStorage.getItem('claude_api_key')||'';
   document.getElementById('set-meshy-key').value=localStorage.getItem('meshy_api_key')||'';

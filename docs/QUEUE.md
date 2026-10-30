@@ -10,7 +10,6 @@ The single list of instructed work. Every session reads it at start and before e
 ## Open
 
 - [ ] Subscription pop-up: adjust to the monetisation model once the owner decides (owner's ask, 30 Oct; blocked on the outline above)
-- [ ] Mobile navigation (owner, 30 Oct 22:03, queued): on phones the tab icons move to a bar fixed at the bottom of the screen, always visible; and the Integrations tab leaves the menu bar in every view and lives in Settings in the sidebar instead
 
 ## Waiting on the owner
 
@@ -28,6 +27,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Mobile navigation (owner, 30 Oct 22:03): on phones (700 px and under) the tab icons sit in a bar fixed to the bottom of the screen, always visible, seven tabs at 44 px or more, header down to one row, footer flows at the page end; the Connections tab has left the menu bar at every width and lives in Settings (section "Connections", list rendered when Settings opens; `showTab('connections')` opens it there). `tests/test_mobile_nav.js` (this commit)
 - [x] Net worth 3D viewer (owner, 30 Oct 22:03): debts grouped by kind, every credit card stacked in one column in its own card colour, loans and other kinds in their own columns, legend lists each card; zoom in and out by + and - buttons, pinch, ctrl+wheel or plain wheel once the scene has been touched, 0 or the reset button restores the view; orbit as before (this commit)
 - [x] Brand book applied to the e-mail comms: sign-in code, beta list confirm and welcome e-mails share one inline brand shell (Night palette, wordmark with the brick hyphen, tagline, FCA line and trader address in the footer); welcome subject loses its em dash; plain-text footers carry the FCA line (this commit; deploy waits on the owner)
 - [x] QA defect 1 (30 Oct): the "light band with invisible text" under the house viewer was the fixed app footer, not the viewer caption; its type was 5.5 px. Footer type now floors at 10 px (FCA line 11 px), wraps to two rows on phones (copyright text hidden there, the logo still names PT Live Design), page and toast clear its height (this commit)
