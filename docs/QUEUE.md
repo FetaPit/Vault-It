@@ -9,8 +9,6 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [ ] Monetisation outline for the owner to decide on (owner's ask, 30 Oct): which features sit outside the Pro tier and the pricing strategy; a Simplified mode (hide some tabs/features) with the current app as Advanced mode, and which features and tabs belong to Advanced; whether a freemium tier adds or devalues, judged on the success and continued usage of freemium finance apps against paid ones (sources in `docs/research/`); testers stay free. Deliver as a short decision doc and prompt the owner
-- [ ] Custom welcome message for testers (owner's ask, 30 Oct): prompt the owner for the wording, then wire it to the first run for beta accounts
 - [ ] Subscription pop-up: adjust to the monetisation model once the owner decides (owner's ask, 30 Oct; blocked on the outline above)
 - [ ] Apply the brand book to the e-mail comms (owner's ask, 30 Oct): sign-in code, beta list confirm and welcome e-mails in `supabase/functions/`; templates first, deploy only with the owner's explicit yes
 - [ ] Net worth 3D viewer (owner, 30 Oct 22:03, queued): stack every credit card in one column, one on top of the other, each keeping its own card colour; a loan is a different kind of debt and gets its own column beside the credit cards (same rule for other debt types); and the dashboard viewport must zoom in and out and orbit, not just turn
@@ -18,6 +16,8 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Waiting on the owner
 
+- Monetisation (decision doc `docs/MONETISATION_DECISION.md`, evidence `docs/research/freemium_vs_paid.md`): four answers needed. 1 model: trial then paid (recommended) or Simplified free / Advanced paid; 2 trial length 30 or 14 days; 3 Simplified by default for new accounts and the tab split in section 3; 4 testers: free until beta ends then 30 days' notice, or Founding offer first. Then: pop-up and Settings copy, Simplified/Advanced switch, trial clock with read-only vault, tester welcome message
+- Custom welcome message for testers: the wording from the owner (a draft is in the session reply); then wire it to the first run for beta accounts
 - Metals price feed (`api.metals.live`): the sandbox cannot reach it (host not in the session's allowed network domains). Check it from a browser, or allow the host in the environment's network settings and ask again
 - Brand build on a real phone: speed of the lite fallback and how the 6.8 feedback feels (Settings > House builder > Brand build, or ?house=new)
 - Classic switches (house builder, net worth) stay in Settings until the owner has tested the new views on their phone (owner, 30 Oct); remove them only when the owner says so
