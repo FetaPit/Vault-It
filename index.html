@@ -10812,8 +10812,8 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
           <div style="font-size:.5rem;color:var(--t3);margin-top:5px">Savings build bricks on your selected floor. Other floors shown as structure.</div>
         </div>
         <div class="hb-plan-add">
-          <div class="hb-sub-lbl">Add to your savings</div>
-        <div class="igrp"><label>Amount Saved</label><div class="iw"><span class="sym">£</span><input type="number" id="savingsInput" placeholder="0.00" min="0" step="100"></div></div>
+          <div class="hb-sub-lbl" id="hb-add-lbl">Add to your savings</div>
+        <div class="igrp"><label for="savingsInput" id="hb-add-amt">Amount Saved</label><div class="iw"><span class="sym">£</span><input type="number" id="savingsInput" placeholder="0.00" min="0" step="100"></div></div>
         <button class="btn-add" id="btnAdd">⊕ &nbsp;Lay the Bricks</button>
           <div class="hb-plan-note" id="hb-plan-brick"></div>
         </div>
@@ -14471,9 +14471,11 @@ function updateUI(){
   else cap.textContent='🎉 Deposit goal reached!';
   if(purchasedBanner)purchasedBanner.style.display=(p>=1&&!state.houseMode&&!noDeposits)?'block':'none';
   if(mortgageComplete)mortgageComplete.style.display=(state.houseMode==='purchased'&&state.mortgageBalance<=0)?'block':'none';
+  var _bought=state.houseMode==='purchased',_ab=document.getElementById('btnAdd'),_al=document.getElementById('hb-add-lbl'),_aa=document.getElementById('hb-add-amt');
+  if(_ab)_ab.innerHTML=_bought?'⊕ &nbsp;Pay off the mortgage':'⊕ &nbsp;Lay the Bricks';if(_al)_al.textContent=_bought?'Pay off your mortgage':'Add to your savings';if(_aa)_aa.textContent=_bought?'Amount paid':'Amount Saved';
   const list=document.getElementById('logList');
   if(!state.deposits.length){list.innerHTML='<div style="font-size:.58rem;color:rgb(var(--ink-rgb) / .18);text-align:center;padding:10px 0">No deposits yet</div>';}
-  else list.innerHTML=[...state.deposits].reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date}</span><span class="la">+${gbpFmt(Number(d.amount))}</span></div>`).join('');
+  else list.innerHTML=(state.payments||[]).slice().reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date} · mortgage</span><span class="la">-${gbpFmt(Number(d.amount))}</span></div>`).join('')+[...state.deposits].reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date}</span><span class="la">+${gbpFmt(Number(d.amount))}</span></div>`).join('');
   renderHabitTracker();
   updateFloorSelector();
   redraw();
@@ -14490,11 +14492,10 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function markHousePurchased(){
   state.houseMode='purchased';
   state.mortgageActive=true;
-  // Loan = price − the deposit actually saved (not a fixed 90%)
-  if(!state.mortgageBalance||state.mortgageBalance<=0){
-    state.mortgageBalance=Math.max(0,Math.round(state.target-state.saved));
-  }
-  state.purchase={price:state.target,deposit:Math.round(state.saved),date:new Date().toISOString().slice(0,10)};
+  // Loan = price − the deposit actually saved, always worked out afresh (an old balance from an earlier purchase or the calculator is never kept)
+  state.mortgageBalance=Math.max(0,Math.round(state.target-state.saved));
+  state.purchase={price:state.target,deposit:Math.round(state.saved),depositTarget:Math.round(depositTarget()),date:new Date().toISOString().slice(0,10)};
+  state.payments=[];
   state.valuation=state.target;
   save();
   toast('🏠 Congratulations — welcome home!');
@@ -14559,6 +14560,7 @@ document.getElementById('btnAdd').addEventListener('click',()=>{
   const v=parseFloat(document.getElementById('savingsInput').value);
   if(!v||v<=0){toast('Enter a valid amount');return;}
   const vBase=v/(window.VI_CURRENCY_RATE||1);
+  if(state.houseMode==='purchased'){if(!(+state.mortgageBalance>0)){toast('Your mortgage is already paid off');return;}hbPayMortgage(vBase);document.getElementById('savingsInput').value='';return;}
   state.saved+=vBase;
   state.deposits.push({amount:vBase,date:new Date().toLocaleDateString('en-GB')});
   recordHabitContribution(vBase);
@@ -14726,15 +14728,28 @@ function renderHabitTracker(){
 document.getElementById('savingsInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnAdd').click();});
 
 // Level 2 and 3 exist only after "I've bought it". These are the fields that step sets (markHousePurchased, Level 3).
-function hbClearPurchase(){delete state.houseMode;delete state.mortgageActive;state.mortgageBalance=0;delete state.purchase;delete state.valuation;delete state.level3;delete state.viewLevel;}
+function hbClearPurchase(){delete state.houseMode;delete state.mortgageActive;state.mortgageBalance=0;delete state.purchase;delete state.valuation;delete state.level3;delete state.viewLevel;delete state.payments;}
+function hbBackup(){try{localStorage.setItem('vi_bak_ht3',JSON.stringify({at:new Date().toISOString(),state:state}));}catch(e){}}
+// Owner's Level 2 rule: what is left to pay after the deposit goal is the whole Level 2 house.
+// £100,000 house, 20% goal: £80,000 is 100%, so £2,000 over the goal builds 2.5%.
+function hbL2Base(){var pu=state.purchase||{},price=+pu.price||+state.valuation||+state.target||0,dtp=+pu.depositTarget||price*(+state.depositPct||0)/100;return Math.max(1,price-dtp);}
+function hbL2Progress(){var bal=Math.max(0,+state.mortgageBalance||0),base=hbL2Base();return Math.min(1,Math.max(0,(base-bal)/base));}
+function hbPayMortgage(vBase){
+  var before=Math.max(0,+state.mortgageBalance||0),paid=Math.min(before,vBase);
+  state.mortgageBalance=Math.round((before-paid)*100)/100;
+  (state.payments=state.payments||[]).push({amount:paid,date:new Date().toLocaleDateString('en-GB')});
+  recordHabitContribution(paid);save();updateUI();
+  var sym=window.VI_CURRENCY_SYMBOL||'£';
+  toast(state.mortgageBalance<=0?'Mortgage paid off. The house is all yours!':'-'+sym+(paid*(window.VI_CURRENCY_RATE||1)).toLocaleString('en-GB',{maximumFractionDigits:2})+' off the mortgage');
+}
 function hbUndoPurchase(){
   if(state.houseMode!=='purchased')return;
   if(!confirm('Not bought yet? This takes the house back to Level 1 (saving for the deposit). Your savings log, house type, price and deposit % are kept.'))return;
-  hbClearPurchase();prevP=0;save();updateUI();updateKPIs();toast('Back to Level 1: saving for your deposit');
+  hbBackup();hbClearPurchase();prevP=0;save();updateUI();updateKPIs();toast('Back to Level 1: saving for your deposit');
 }
 document.getElementById('btnReset').addEventListener('click',()=>{
   if(!confirm('Reset the house builder? This clears your savings log and takes the house back to Level 1. Your house type, price and deposit % are kept.'))return;
-  state.saved=0;state.deposits=[];hbClearPurchase();prevP=0;save();updateUI();updateKPIs();drawChart();toast('Tracker reset. Start saving!');
+  hbBackup();state.saved=0;state.deposits=[];hbClearPurchase();prevP=0;save();updateUI();updateKPIs();drawChart();toast('Tracker reset. Start saving!');
 });
 
 // ── HOUSE-TYPE MILESTONE LABELS ──────────────────────────────────
@@ -14856,10 +14871,10 @@ function hbRenderL2(el){
   });
   var tip=rows?'<div class="hb-tip">💡 <b>What your Budget could do for this mortgage</b><br>Unassigned <b>'+hbMoney(u)+'</b>/mo · already saving <b>'+hbMoney(sv)+'</b>/mo.<table>'+rows+'</table><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+(u>0?'<button class="stk-btn" onclick="hbSetOver('+u+')">Plan: overpay '+hbMoney(u)+'</button>':'')+(u+sv>0&&sv>0?'<button class="stk-btn" onclick="hbSetOver('+(u+sv)+')">Plan: overpay '+hbMoney(u+sv)+'</button>':'')+'</div></div>':'';
   el.innerHTML='<div class="card-lbl">LEVEL 2 · DELETE THE MORTGAGE</div>'
-    +'<div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--text)"><span>You own '+hbMoney(eq)+'</span><span>'+eqp.toFixed(1)+'% of '+hbMoney(val)+'</span></div>'
-    +'<div class="hb-xp"><div style="width:'+eqp.toFixed(1)+'%"></div></div>'
+    +'<div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--text)"><span>Paid off '+hbMoney(Math.max(0,hbL2Base()-bal))+' of '+hbMoney(hbL2Base())+'</span><span>'+(Math.floor(hbL2Progress()*1000)/10).toFixed(1)+'%</span></div>'
+    +'<div class="hb-xp"><div style="width:'+(hbL2Progress()*100).toFixed(1)+'%"></div></div>'
     +'<div class="hb-st"><div><b>'+hbMoney(bal)+'</b><span>still owed</span></div><div><b>'+(scn.balloon>0?'—':hbFmtDate(scn.payoffDate))+'</b><span>mortgage-free</span></div><div><b class="'+(cmp.interestSaved>0?'hbc-good':'')+'">'+hbMoney(cmp.interestSaved)+'</b><span>interest slain</span></div><div><b>'+hbYM(Math.max(0,cmp.monthsSaved))+'</b><span>months shaved</span></div></div>'
-    +'<div style="font-size:.5rem;color:var(--t3)">Solid bricks = the part of the house you own. Ghost bricks = what the lender still owns.</div>'
+    +'<div style="font-size:.5rem;color:var(--t3)">Your Level 2 house is what was left to pay after your deposit goal. Full-colour bricks are what you have paid off; the hologram is what is left. You own '+hbMoney(eq)+' of your home ('+eqp.toFixed(1)+'%).</div>'
     +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Open mortgage calculator</button></div>'
     +tip+hbL3Card();
 }
@@ -15240,7 +15255,7 @@ function hbShadeEquity(){
   if(S.querySelector('#hb-solid'))return;
   var kids=Array.prototype.slice.call(S.childNodes).filter(function(n){return !(n.nodeName==='defs'||(n.nodeName==='rect'&&n.getAttribute('width')==='700')||(n.getAttribute&&n.getAttribute('data-g')));});   // the ground grid is left alone
   if(!kids.length)return;
-  var val=+state.valuation||+state.target||0,bal=Math.max(0,+state.mortgageBalance||0),eqF=val>0?Math.min(1,Math.max(0,(val-bal)/val)):0;
+  var eqF=hbL2Progress();
   var solid=E('g',{id:'hb-solid'}),ghost=E('g',{id:'hb-ghostL2',opacity:'.30'});ghost.style.filter='drop-shadow(0 0 3px rgb(var(--teal-rgb) / .4)) saturate(.6)';
   kids.forEach(function(n){ghost.appendChild(n.cloneNode(true));solid.appendChild(n);});
   Array.prototype.forEach.call(ghost.querySelectorAll('[id]'),function(e){e.removeAttribute('id');});
@@ -15252,7 +15267,7 @@ function hbShadeEquity(){
   solid.setAttribute('clip-path','url(#hb-eqclip)');
   // equity line + label
   E('line',{x1:bb.x-10,x2:bb.x+bb.width+10,y1:y0,y2:y0,stroke:'#e8c56a','stroke-width':1,'stroke-dasharray':'5 4',opacity:.9},S);
-  var t=E('text',{x:Math.max(10,bb.x-12),y:y0<24?y0+14:y0-5,'font-size':10,'font-family':'Share Tech Mono,monospace',fill:'#e8c56a','text-anchor':'start'},S);t.textContent='YOU OWN '+(eqF*100).toFixed(0)+'%';
+  var t=E('text',{x:Math.max(10,bb.x-12),y:y0<24?y0+14:y0-5,'font-size':10,'font-family':'Share Tech Mono,monospace',fill:'#e8c56a','text-anchor':'start'},S);t.textContent='MORTGAGE '+(Math.floor(eqF*1000)/10)+'% PAID';
   hbDrawInterestBar();
 }
 function hbDrawInterestBar(){
@@ -15434,8 +15449,7 @@ function hbSceneMode() {
   }
   if (state.houseMode === 'purchased' && (+state.mortgageBalance || 0) <= 0) return { mode: 'complete', type: type, floor: floor, p: 1, eq: 1 };
   if (state.houseMode === 'purchased') {
-    var val = +state.valuation || +state.target || 0, bal = Math.max(0, +state.mortgageBalance || 0);
-    return { mode: 'equity', type: type, floor: floor, p: 1, eq: val > 0 ? Math.min(1, Math.max(0, (val - bal) / val)) : 0 };
+    return { mode: 'equity', type: type, floor: floor, p: 1, eq: hbL2Progress() };   // Level 2: the house builds in full colour as the mortgage is paid
   }
   // build % == deposit % funded, exactly (pct() = saved ÷ deposit target); free accounts see a 4% teaser
   return { mode: 'build', type: type, floor: floor, p: _isPro() ? pct() : 0.04 };
@@ -15458,7 +15472,7 @@ function hb3dOverlays(sm) {
   $('hb3d-plotlabel').style.display = sm.mode === 'site' ? 'block' : 'none';
   var own = $('hb3d-ownlabel'), ib = $('hb3d-intbar'), up = $('hb3d-upglabel');
   own.style.display = (sm.mode === 'equity' || sm.mode === 'complete') ? 'block' : 'none';
-  own.textContent = 'YOU OWN ' + Math.round((sm.mode === 'complete' ? 1 : sm.eq || 0) * 100) + '%';
+  own.textContent = sm.mode === 'complete' ? 'MORTGAGE FREE' : 'MORTGAGE ' + (Math.floor((sm.eq || 0) * 1000) / 10) + '% PAID';
   ib.style.display = sm.mode === 'equity' ? 'flex' : 'none';
   if (sm.mode === 'equity') {
     try {
@@ -15498,7 +15512,7 @@ function hb3dPlaceOverlays() {
     var name = (m.name || '').replace(/^./, function (c) { return c.toUpperCase(); });
     var what = m.focus ? (sm.mode === 'build' ? 'your floor · ' + st.stage + ' · ' : 'your floor · ') : (sm.mode === 'build' ? st.stage + ' · ' : '');
     cap.textContent = sm.mode === 'site' ? '' : (name + ' · ' + what + st.bricksLaid.toLocaleString('en-GB') + ' / ' + st.bricksTotal.toLocaleString('en-GB') + ' bricks' + (st.tilesTotal ? ' · ' + st.tilesLaid.toLocaleString('en-GB') + ' tiles' : ''));
-    v.renderer.domElement.setAttribute('aria-label', '3D model: ' + (m.name || 'house') + (sm.mode === 'equity' ? ', you own ' + Math.round(sm.eq * 100) + '%' : sm.mode === 'build' ? ', ' + Math.round(p * 100) + '% built' : ''));
+    v.renderer.domElement.setAttribute('aria-label', '3D model: ' + (m.name || 'house') + (sm.mode === 'equity' ? ', mortgage ' + Math.round(sm.eq * 100) + '% paid' : sm.mode === 'build' ? ', ' + Math.round(p * 100) + '% built' : ''));
   }
 }
 function hb3dRedraw() {

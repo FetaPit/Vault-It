@@ -25,6 +25,19 @@ const STUCK = { saved: 20000, target: 320000, houseType: 'semi', depositPct: 20,
     ok(await p.evaluate(() => hbLevel() === 2), w + ': bought again');
     await p.click('#btnReset'); await p.waitForTimeout(800);
     ok(await p.evaluate(() => { const st = JSON.parse(localStorage.getItem('ht3')); return hbLevel() === 1 && !st.houseMode && st.saved === 0 && !(st.deposits || []).length && st.houseType === 'semi' && st.target === 320000 && !st.mortgageBalance; }), w + ': Reset Tracker clears savings and the purchase, keeps type and price');
+    ok(await p.evaluate(() => { const b = JSON.parse(localStorage.getItem('vi_bak_ht3') || 'null'); return b && b.state && b.state.houseMode === 'purchased'; }), w + ': a copy is kept in vi_bak_ht3 before reset');
+    // Owner's Level 2 rule: £100,000 at 20% = £80,000 to pay is the whole Level 2 house; £2,000 over the goal builds 2.5%
+    await p.evaluate(() => { state.houseType = 'terraced'; state.prices.terraced = 100000; state.target = 100000; state.depositPct = 20; state.saved = 22000; state.deposits = [{ amount: 22000, date: '01/10/2026' }]; state.mortgageBalance = 5000; save(); updateUI(); markHousePurchased(); });
+    await p.waitForTimeout(1200);
+    let l2 = await p.evaluate(() => ({ bal: state.mortgageBalance, prog: hbL2Progress(), sm: hbSceneMode(), own: (document.getElementById('hb3d-ownlabel') || {}).textContent, btn: document.getElementById('btnAdd').textContent }));
+    ok(l2.bal === 78000, w + ': purchase works the balance out afresh (old £5,000 ignored): £78,000');
+    ok(Math.abs(l2.prog - 0.025) < 1e-9 && l2.sm.mode === 'equity' && Math.abs(l2.sm.eq - 0.025) < 1e-9, w + ': £2,000 over the goal builds 2.5% of the Level 2 house');
+    ok(/MORTGAGE 2\.5% PAID/.test(l2.own || '') && /Pay off the mortgage/.test(l2.btn), w + ': label reads MORTGAGE 2.5% PAID, button says Pay off the mortgage (' + l2.own + ')');
+    await p.fill('#savingsInput', '8000'); await p.click('#btnAdd'); await p.waitForTimeout(600);
+    l2 = await p.evaluate(() => ({ bal: state.mortgageBalance, prog: hbL2Progress(), saved: state.saved, log: document.getElementById('logList').textContent, pays: JSON.parse(localStorage.getItem('ht3')).payments.length }));
+    ok(l2.bal === 70000 && Math.abs(l2.prog - 0.125) < 1e-9 && l2.saved === 22000 && l2.pays === 1 && /mortgage/.test(l2.log), w + ': paying £8,000 moves the house to 12.5% and is logged; the deposit stays £22,000');
+    await p.evaluate(() => hbPayMortgage(1e9)); await p.waitForTimeout(400);
+    ok(await p.evaluate(() => state.mortgageBalance === 0 && hbSceneMode().mode === 'complete'), w + ': paying the rest finishes the house');
     ok((await p.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0, w + ': no sideways scroll');
     await ctx.close();
   }

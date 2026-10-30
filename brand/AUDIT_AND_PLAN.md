@@ -32,7 +32,7 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 | 7 | Logo and wordmark (brief's phase 8): 23 "Vault-It" with a hyphen, nav logo, `<title>`, `og:title`, manifest, favicon, tagline | Done |
 | 7b | Item 3D viewer for the wealth inventory and liabilities: .glb upload, Night viewer with orbit and zoom, green tint on every model, Poly Pizza library behind `?modeltest=1` (see `docs/WEALTH_INVENTORY_3D_OPTIONS.md`, "Built") | Done, needs the owner's phone test |
 | 8 | Groupings H1 to H4, O1, O2, D1 to D3, A1 (section 4, all approved) | Done |
-| 9 | House builder Level 2 fix (section 3) | Next |
+| 9 | House builder Level 2 fix (section 3) | Done 30 Oct (deposit removal never happens in the app: there is no delete for log entries, so that drop-back rule has nothing to hook on) |
 | 10 | Brand look and every animation on all six three.js models in `src/hb3d` (owner chose option a), behind `?house=new` | |
 | 11 | Net worth in 3D as the Overview hero: 3D blocks first, Graph toggle, choice remembered, blocks in the sub-tab colours, behind `?nw=new` | |
 | 12 | On by default for testers once the owner signs off on the phone (old builder reachable from Settings for a week) | |

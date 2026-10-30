@@ -9,20 +9,20 @@ const seedFn=(o,pro)=>`(function(){if(localStorage.getItem('ht3'))return;localSt
     p.on('pageerror',e=>errs.push(e.message)); p.on('console',m=>{if(m.type()==='error'&&!/Failed to load|net::/.test(m.text()))errs.push('console: '+m.text());});
     await p.addInitScript(seedFn(o,opt.pro)); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
     await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'}); await p.evaluate(()=>showTab('house')); await settle(p); return p;};
-  const L2={saved:37500,target:250000,houseType:'terraced',houseMode:'purchased',mortgageBalance:212500,valuation:250000,purchase:{price:250000,deposit:37500,date:'2026-10-01'},deposits:[{amount:37500,date:'01/10/2026'}],prices:{terraced:250000},calc:{over:300,_set:true,price:250000,dep:37500,bal:212500,val:250000}};
+  const L2={saved:37500,target:250000,houseType:'terraced',houseMode:'purchased',depositPct:15,mortgageBalance:191250,valuation:250000,purchase:{price:250000,deposit:37500,depositTarget:37500,date:'2026-10-01'},deposits:[{amount:37500,date:'01/10/2026'}],prices:{terraced:250000},calc:{over:300,_set:true,price:250000,dep:37500,bal:212500,val:250000}};
   // ── Level 2: equity clip ──
   let p=await open(L2);
   let s=await p.evaluate(()=>hb3dState()); console.log(JSON.stringify(s));
   ok(s.engine==='3d'&&s.mode==='equity','Level 2 renders the equity view in 3D');
-  ok(Math.abs(s.clipY/s.height-0.15)<0.01,'solid part = 15% of the house height ('+(s.clipY/s.height*100).toFixed(1)+'%)');
+  ok(Math.abs(s.clipY/s.height-0.10)<0.01,'solid part = 10% of the house height, the share of the Level 2 house paid off (owner rule) ('+(s.clipY/s.height*100).toFixed(1)+'%)');
   let ov=await p.evaluate(()=>({own:document.getElementById('hb3d-ownlabel').textContent,ownVis:getComputedStyle(document.getElementById('hb3d-ownlabel')).display,ib:document.getElementById('hb3d-intbar').innerText,ibVis:getComputedStyle(document.getElementById('hb3d-intbar')).display,segs:document.querySelectorAll('#hb3d-intbar .ib-seg').length,up:getComputedStyle(document.getElementById('hb3d-upglabel')).display}));
-  ok(ov.own==='YOU OWN 15%'&&ov.ownVis!=='none','"YOU OWN 15%" label shown');
+  ok(ov.own==='MORTGAGE 10% PAID'&&ov.ownVis!=='none','"MORTGAGE 10% PAID" label shown');
   ok(ov.ibVis!=='none'&&/INTEREST/.test(ov.ib)&&/slain/.test(ov.ib)&&ov.segs>=2,'interest bar with slain/remaining segments');
   ok(ov.up==='none','no upgrade label in Level 2');
   await p.screenshot({path:'shots/hb3d/app_l2.png'});
-  await p.evaluate(()=>{state.mortgageBalance=150000;save();updateUI();}); await settle(p);
-  s=await p.evaluate(()=>hb3dState()); ok(Math.abs(s.clipY/s.height-0.40)<0.01,'paying down to £150k → 40% solid ('+(s.clipY/s.height*100).toFixed(1)+'%)');
-  ok(await p.evaluate(()=>document.getElementById('hb3d-ownlabel').textContent)==='YOU OWN 40%','label follows');
+  await p.evaluate(()=>{state.mortgageBalance=127500;save();updateUI();}); await settle(p);
+  s=await p.evaluate(()=>hb3dState()); ok(Math.abs(s.clipY/s.height-0.40)<0.01,'paying down to £127,500 (£85,000 of £212,500 paid) → 40% solid ('+(s.clipY/s.height*100).toFixed(1)+'%)');
+  ok(await p.evaluate(()=>document.getElementById('hb3d-ownlabel').textContent)==='MORTGAGE 40% PAID','label follows');
   await p.evaluate(()=>{state.mortgageBalance=0;save();updateUI();}); await settle(p);
   s=await p.evaluate(()=>hb3dState()); ok(s.mode==='complete','mortgage free → complete solid house');
   ok(await p.evaluate(()=>getComputedStyle(document.getElementById('hb3d-intbar')).display)==='none','no interest bar once mortgage-free');

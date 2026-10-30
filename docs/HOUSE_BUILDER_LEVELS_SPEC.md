@@ -25,9 +25,12 @@ Turn the House Builder from a single deposit progress bar into a **three-level w
 
 ### Level 2 — "Delete the Mortgage"
 - **Goal:** own 100 % of the property outright (or reach the equity/LTV threshold to move up the ladder).
-- **House rendering (equity shading):**
-  - **Solid bricks** = equity = deposit + principal repaid (`equity% = (value − balance) ÷ value`; use *current value* if the user enters a revaluation, else purchase price). E.g. a 15 % deposit → 15 % of the house is solid.
-  - **Ghost bricks** = outstanding mortgage principal; each £ of principal repaid converts ghost → solid.
+- **House rendering (owner's rule, 30 Oct 2026; replaces the earlier equity shading):**
+  - **The Level 2 house is what was left to pay after the deposit goal:** `l2Base = price − depositTarget` (fixed at purchase in `state.purchase.depositTarget`). Progress `= (l2Base − mortgageBalance) ÷ l2Base`, drawn as full-colour bricks up to that height, hologram above (`hbL2Progress()`). Example: £100,000 house, 20 % goal = £20,000, so £80,000 is the whole Level 2 house; £2,000 saved over the goal builds 2,000 ÷ 80,000 = 2.5 %.
+  - **At purchase** the balance is always worked out afresh: `mortgageBalance = price − saved` (an old balance is never kept). The excess over the goal is the first payment.
+  - **After purchase** "Add to savings" becomes **Pay off the mortgage**: it lowers `mortgageBalance` and logs the payment in `state.payments` (the deposit stays as it was). The label reads `MORTGAGE x % PAID`, then `MORTGAGE FREE`.
+  - **Reset tracker** returns to a clean Level 1 (all purchase fields cleared, type, price and deposit % kept) after a confirm, with a copy kept in `vi_bak_ht3`. Level 2 and 3 also offer **Not bought yet? Back to Level 1**, which keeps the savings log.
+  - The Level 2 panel still states how much of the home you own (`(value − balance) ÷ value`) as a fact, under the progress bar.
   - **Interest halo (second layer):** the *projected remaining interest* over the current plan, drawn as a faint red/amber ghost extension that **shrinks** whenever the user overpays, shortens the term or refinances to a lower rate — making "interest slain" visible.
 - **Cockpit (in-depth mortgage calculator, §3):** baseline vs scenario comparison; "Delete the mortgage" date; interest saved; equity at +1/+5/+10 years; best use of the next £100/£1,000 (overpay vs offset vs savings).
 - **Gamification:** "Interest slain" meter (£ interest avoided vs baseline), equity-% ring, overpayment streak, months-shaved counter, badges at 25/50/75/90 % equity and mortgage-free; refix/remortgage reminders as quests.
