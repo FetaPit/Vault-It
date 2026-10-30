@@ -84,6 +84,18 @@ Sources: [Poly Haven licence](https://polyhaven.com/license), [Poly Haven public
 
 Search needs matching words: map item names to search terms ("Gibson Les Paul Standard" → "electric guitar", "Rolex" → "wristwatch"). File sizes are not measured yet (downloads blocked here).
 
+## Built (30 Oct 2026, branch brand-rollout)
+
+- **One 3D viewer for the wealth inventory and liabilities.** A "3D" button on every tile opens the model picker; a tile with a model shows its preview and opens the viewer on tap.
+- **Viewer:** the House builder's Night stage in both modes (dark sky, teal survey grid, soft shadows), orbit by drag, zoom by pinch or scroll, two-finger or right-drag to move, buttons for auto-rotate, zoom in, zoom out and reset. Reduced motion: no auto-spin.
+- **Same look on every model:** each material is nudged 16% towards brand green with a faint green glow, plus a green rim light. Values `I3D_TINT` and `I3D_GLOW` in `index.html` if the owner wants it stronger or weaker.
+- **Upload a .glb** (up to 25 MB): the file stays on the device in IndexedDB next to the photos; only a small preview picture and the source are saved with the item (and synced). On another device the viewer asks for the file again.
+- **Poly Pizza library, test path (option 2):** open the app with `?modeltest=1` once (and `?modeltest=0` to turn it off). The picker then lists 17 hand-picked models (CC0 first, no brand names), best match for the item name first. The browser downloads the .glb straight from `static.poly.pizza`; no key is used in the app. CC-BY models carry their credit line in the viewer and on the tile. If the CDN's bot check refuses, the user is told and nothing is saved.
+- Photos and the photo turntable work as before.
+- Privacy notice names Poly Pizza. Tests: `tests/test_item3d.js`; screenshots: `tests/item3d_shots.js`.
+
+**What the owner's phone test answers:** does `static.poly.pizza` let a real browser on app.vault-it.co (or a local build) download the files (CORS and the bot check)? If yes, live search can follow through an edge function holding `POLYPIZZA_API_KEY` (needs the owner's yes to deploy). If no, the built-in set (layer 1) is the route: we host the chosen CC0 files ourselves.
+
 ## Needs the owner's yes before building
 
 - Layer 2 sends photos to Meshy: update the privacy notice wording (Meshy is named today for house models only).

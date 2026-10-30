@@ -9401,6 +9401,25 @@ button.bd-ic{cursor:pointer}
 .inv-ctl button{width:30px;height:30px;border-radius:7px;border:1px solid rgb(var(--blue-rgb) / .4);background:rgba(0,0,0,.6);color:#9bd0ff;font-size:.8rem;cursor:pointer;padding:0}
 .inv-ctl button:hover{background:rgb(var(--blue-rgb) / .25)}
 .inv-hint{font-size:.52rem;color:var(--t2);line-height:1.5}
+.i3d-stage{touch-action:none}
+.i3d-stage canvas.i3d-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none}
+.wi-img-area img.i3d-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;cursor:zoom-in}
+.i3d-badge{border-color:rgb(var(--green-rgb) / .6)!important;background:rgb(var(--green-rgb) / .18)!important;color:var(--green)!important}
+.i3d-btn{font-family:'Share Tech Mono',monospace;font-size:.6rem;font-weight:700;color:var(--green)}
+.i3d-msg{font-size:.56rem;color:var(--t2);min-height:1em}.i3d-msg.bad{color:var(--re)}
+.i3d-credit{font-size:.5rem;color:var(--t3);word-break:break-word}
+.i3d-row{display:flex;gap:6px;flex-wrap:wrap}
+.i3d-opts{display:flex;flex-direction:column;gap:10px}
+.i3d-up{display:block;text-align:center;padding:10px;cursor:pointer;font-size:.62rem}
+.i3d-lib-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;color:var(--tx);display:flex;align-items:center;gap:6px}
+.i3d-tag{font-family:'Share Tech Mono',monospace;font-size:.46rem;padding:1px 6px;border-radius:99px;border:1px solid var(--amber);color:var(--amber);letter-spacing:.08em;text-transform:uppercase}
+.i3d-lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.i3d-li{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border-radius:9px;border:1px solid var(--bd);background:#05101b;cursor:pointer;color:#e8f1f0;min-width:0}
+.i3d-li img{width:100%;aspect-ratio:1;object-fit:contain}
+.i3d-li span{font-size:.56rem;font-weight:600;text-align:center}
+.i3d-li small{font-size:.46rem;color:#9fb3b1;text-align:center;overflow-wrap:anywhere}
+.i3d-li.best{border-color:var(--green);box-shadow:0 0 0 1px var(--green) inset}
+.i3d-li:hover{border-color:var(--teal)}
 .inv-strip{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px}
 .inv-th{position:relative;flex:0 0 74px;height:74px;border-radius:8px;overflow:hidden;border:1px solid rgb(var(--ink-rgb) / .1)}
 .inv-th img{width:100%;height:100%;object-fit:cover;display:block}
@@ -19208,6 +19227,7 @@ function renderAlTab(){
         } else {
           imgHtml=generateAssetISO(l.name);
         }
+        imgHtml+=i3dTile('li',l);
         var dv=depreciatedValue(l);
         return'<div class="wi-tile">'
           +'<div class="wi-img-area">'
@@ -19218,6 +19238,7 @@ function renderAlTab(){
           +'<label class="dep-btn" title="Upload photo" style="cursor:pointer;flex:1;text-align:center">📷<input type="file" accept="image/*" style="display:none" onchange="liabUpload('+l.id+',this)"></label>'
           +'<button class="dep-btn" onclick="liabSearch('+l.id+')" title="Search image" style="flex:1">🔍</button>'
           +'<button class="dep-btn" onclick="wiIcon('+l.id+',\'liab\')" title="Set icon" style="flex:1">🎨</button>'
+          +'<button class="dep-btn i3d-btn" onclick="i3dPick(\'li\','+l.id+')" title="3D model" aria-label="3D model" style="flex:1">3D</button>'
           +'</div>'
           +'<div class="wi-info">'
           +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px">'
@@ -19249,6 +19270,7 @@ function renderAlTab(){
         } else {
           imgHtml=generateAssetISO(a.name);
         }
+        var i3=i3dTile('wi',a);if(i3){imgHtml+=i3;spin=false;}
         if(spin)imgHtml+='<canvas class="inv-spin" data-id="'+a.id+'" aria-label="3D view of '+cfEsc(a.name)+' — drag to rotate"></canvas><span class="inv-badge">3D · '+a.photos+'</span>';
         if((a.photos||0)>=1)imgHtml+='<button class="inv-exp" title="Open the 3D viewer" onclick="invOpenViewer('+a.id+')">⤢</button>';
         return '<div class="wi-tile">'
@@ -19258,6 +19280,7 @@ function renderAlTab(){
           +'<label class="wi-img-btn" title="Add photos — several angles make a 3D view">📷<input type="file" accept="image/*" multiple style="display:none" onchange="wiUpload('+a.id+',this)"></label>'
           +'<button class="wi-img-btn" onclick="wiSearch('+a.id+')" title="Search image">🔍</button>'
           +'<button class="wi-img-btn" onclick="wiIcon('+a.id+')" title="Pick icon">🎨</button>'
+          +'<button class="wi-img-btn i3d-btn" onclick="i3dPick(\'wi\','+a.id+')" title="3D model" aria-label="3D model">3D</button>'
           +'</div>'
           +'</div>'
           +'<div class="wi-info">'
@@ -19301,7 +19324,7 @@ function addOtherAsset(){
   document.getElementById('oa-name').value='';document.getElementById('oa-val').value='';
   saveAL();renderAlTab();updateKPIs();
 }
-function delOtherAsset(id){alState.otherAssets=alState.otherAssets.filter(function(a){return a.id!==id;});try{if(_invOpen===id)invCloseViewer();invDel(id);}catch(e){}saveAL();renderAlTab();updateKPIs();}
+function delOtherAsset(id){alState.otherAssets=alState.otherAssets.filter(function(a){return a.id!==id;});try{if(_invOpen===id)invCloseViewer();invDel(id);i3dDel('wi',id);}catch(e){}saveAL();renderAlTab();updateKPIs();}
 
 // ═══════════════════════════════════════════════════════════════
 // WEALTH INVENTORY — multi-photo 3D viewer (photo turntable)
@@ -19501,6 +19524,204 @@ async function invRenderModal(id){
 }
 function invToggleAuto(){if(!_invSpin)return;_invSpin.auto=!_invSpin.auto;if(_invSpin.auto)_invSpin.kick();}
 function invZoom(d){if(_invSpin)_invSpin.setZoom(_invSpin.zoom+d);}
+
+// ═══════════════════════════════════════════════════════════════
+// ITEM 3D MODELS (wealth inventory and liabilities)
+// One viewer for both: Night stage in both modes, orbit / rotate / zoom, and every model gets the same
+// subtle green tint so a library model, an upload and a photo-made model all look like one set.
+// The .glb file stays on this device (IndexedDB, next to the photos); the item keeps only a small preview
+// picture and where the model came from (plus the credit line for CC-BY models).
+// Library models (Poly Pizza) are a test path for now: ?modeltest=1 turns it on for this browser.
+// The browser downloads the file straight from Poly Pizza's CDN; no key is used in the app.
+// ═══════════════════════════════════════════════════════════════
+var I3D_PP='https://static.poly.pizza/';
+var I3D_LIB=[
+{k:'guitar',id:'5Fp8gpomrb',t:'Guitar',lic:'CC0',by:'Quaternius',f:'7a272c92-3d46-483d-bf42-ff2c20851a2c'},
+{k:'watch',id:'6908NHM0OcR',t:'Wrist Watch',lic:'CC-BY',by:'Poly by Google',f:'f19112bd-03ad-4f02-9284-2f49ae757fa1'},
+{k:'ring',id:'klY4A6FGjz',t:'Diamond Ring',lic:'CC-BY',by:'mehreen1919',f:'05693451-18dc-494d-8dde-bc911a64ee0b'},
+{k:'necklace',id:'Mezewzksj5',t:'Necklace',lic:'CC0',by:'Quaternius',f:'1ba2c355-431c-46d0-9ab5-0c07c146bb09'},
+{k:'car',id:'BG0KAhmGDt',t:'Car Hatchback',lic:'CC0',by:'Kay Lousberg',f:'7dc33135-12c6-4de4-b5f9-cf445fd35994'},
+{k:'motorbike',id:'0lBe-ApqJs4',t:'Motorcycle',lic:'CC-BY',by:'jeremy',f:'7d230a92-464a-4d1c-874e-712240e2db20'},
+{k:'bicycle',id:'19VoUuA2pcN',t:'Bicycle',lic:'CC-BY',by:'Poly by Google',f:'6048701b-fa87-426b-9242-c786ca25fa3a'},
+{k:'laptop',id:'GnbwSUiVty',t:'Laptop',lic:'CC0',by:'Kenney',f:'8190e659-7079-442f-9ed9-083f67b1746b'},
+{k:'camera',id:'0nfSsetwy0Z',t:'Camera',lic:'CC-BY',by:'Poly by Google',f:'5816c144-82dc-4e1b-a0d9-7f3609d6887c'},
+{k:'painting',id:'Pi6oReAizt',t:'Painting',lic:'CC0',by:'CreativeTrio',f:'c0fa9c78-2671-49d1-b057-9e974e2e1801'},
+{k:'handbag',id:'fLNcjJnsJi',t:'Bag',lic:'CC0',by:'Kenney',f:'4473a789-f73a-47d4-b73a-0e015b643325'},
+{k:'trainers',id:'cs7k_ENAZjQ',t:'Trainer',lic:'CC-BY',by:'jeremy',f:'74850c2b-016a-4446-8ba2-2b55235b2706'},
+{k:'console',id:'7jHiQIMZkRs',t:'Videogame',lic:'CC-BY',by:'Poly by Google',f:'4dc4bf08-d3fa-4c89-8638-9bc86ac3a2c3'},
+{k:'gold',id:'O8IbRMytLf',t:'Gold Bars',lic:'CC0',by:'hat_my_guy',f:'7cf09c1e-4e91-4f23-8c13-12c0d4336e1f'},
+{k:'boat',id:'OknDJkGeJ8',t:'Boat',lic:'CC0',by:'Quaternius',f:'6d669642-c662-49f2-96d9-601bfd5131b4'},
+{k:'sofa',id:'jMu2iCmGxU',t:'Lounge Sofa',lic:'CC0',by:'Kenney',f:'f47310a0-4d22-48a3-a2ce-62f67bcc998d'},
+{k:'tv',id:'9trLeWoBek',t:'Television',lic:'CC0',by:'Kenney',f:'1ddcd36c-ac9e-4dc2-a056-846cea033c02'}
+
+];
+var I3D_WORDS=[['guitar',/guitar|les ?paul|strat|telecaster|bass|ukulele/],['watch',/watch|rolex|omega|cartier|breitling|tag ?heuer|seiko/],['ring',/\bring\b|engagement|diamond/],['necklace',/necklace|chain|pendant|bracelet|jewel/],['motorbike',/motor ?bike|motorcycle|scooter|vespa|ducati|harley/],['bicycle',/bicycle|\bbike\b|cycle|brompton/],['car',/\bcar\b|vehicle|van|bmw|audi|mercedes|ford|tesla|porsche|volkswagen|\bvw\b|toyota|honda|kia|nissan|range ?rover|land ?rover|mini/],['laptop',/laptop|macbook|notebook|computer|\bpc\b/],['camera',/camera|leica|canon|nikon|sony a|fuji/],['painting',/painting|art|print|canvas|picture|sculpture/],['handbag',/bag|purse|hermes|birkin|chanel|louis|gucci|prada/],['trainers',/trainer|sneaker|shoe|jordan|yeezy|nike/],['console',/console|playstation|\bps[45]\b|xbox|switch|nintendo|gaming/],['gold',/gold|silver|bullion|ingot|\bbar\b|coin/],['boat',/boat|yacht|kayak|canoe|jet ?ski/],['sofa',/sofa|couch|furniture|chair/],['tv',/\btv\b|television|oled|screen/]];
+function i3dFlag(){try{if(/[?&]modeltest=1/.test(location.search))localStorage.setItem('vi-flag-models','1');if(/[?&]modeltest=0/.test(location.search))localStorage.removeItem('vi-flag-models');return localStorage.getItem('vi-flag-models')==='1';}catch(e){return /[?&]modeltest=1/.test(location.search);}}
+function i3dMatch(name){var n=String(name||'').toLowerCase();for(var i=0;i<I3D_WORDS.length;i++)if(I3D_WORDS[i][1].test(n))return I3D_WORDS[i][0];return null;}
+function i3dCredit(m){return m&&m.lic==='CC-BY'?'"'+m.t+'" by '+m.by+', https://poly.pizza/m/'+m.id+'. Licence at https://creativecommons.org/licenses/by/3.0':'';}
+function i3dItem(kind,id){return ((kind==='li'?alState.liabilities:alState.otherAssets)||[]).find(function(x){return x.id===id;});}
+function i3dKey(kind,id){return 'm:'+kind+':'+id;}
+function i3dPut(kind,id,buf){return invTx('readwrite',function(s){return s.put({glb:buf,updated:Date.now()},i3dKey(kind,id));});}
+function i3dGetBuf(kind,id){return invTx('readonly',function(s){return s.get(i3dKey(kind,id));}).then(function(v){return v&&v.glb||null;});}
+function i3dDel(kind,id){try{return invTx('readwrite',function(s){return s.delete(i3dKey(kind,id));});}catch(e){return Promise.resolve();}}
+// fetch a library model in the browser (Poly Pizza's CDN checks for bots, so only a real browser gets through)
+function i3dFetchLib(m){
+  return fetch(I3D_PP+m.f+'.glb',{mode:'cors',credentials:'omit'}).then(function(r){
+    if(!r.ok)throw new Error(r.status===403||r.status===503?'Poly Pizza turned the download away ('+r.status+'). Its server checks for bots; try again later, or upload a .glb file instead.':'Poly Pizza answered '+r.status+'.');
+    var ct=r.headers.get('content-type')||'';if(/text\/html/.test(ct))throw new Error('Poly Pizza sent a web page instead of the model (its bot check). Try again later, or upload a .glb file.');
+    return r.arrayBuffer();
+  },function(){throw new Error('Could not reach Poly Pizza from this site (blocked by the browser or offline). Upload a .glb file instead.');});
+}
+function i3dParse(buf){
+  if(!window.THREE)return Promise.reject(new Error('3D is not available on this device.'));
+  return _hbGltfLoader().then(function(G){return new Promise(function(res,rej){try{new G().parse(buf,'',function(g){res(g.scene||(g.scenes&&g.scenes[0]));},function(e){rej(new Error('Could not read that 3D file'+(e&&e.message?': '+e.message:'.')));});}catch(e){rej(e);}});});
+}
+// the house style: same green on every model, lightly
+var I3D_TINT=0.16,I3D_GLOW=0.07;
+// colours as the house viewer gives them (sRGB hex to the renderer's linear space)
+function i3dCol(h){return new THREE.Color(h).convertSRGBToLinear();}
+function i3dStyle(obj){
+  var G=i3dCol(0x3ECF8E),n=0;
+  obj.traverse(function(o){
+    if(!o.isMesh)return;n++;
+    var ms=Array.isArray(o.material)?o.material:[o.material];
+    var out=ms.map(function(m){
+      if(!m)return m;m=m.clone();
+      if(m.color)m.color.lerp(G,I3D_TINT);
+      if(m.emissive){m.emissive=G.clone();m.emissiveIntensity=I3D_GLOW;}
+      m.userData.i3dTint=true;return m;
+    });
+    o.material=Array.isArray(o.material)?out:out[0];
+    o.castShadow=true;o.receiveShadow=true;
+  });
+  return n;
+}
+// fit any model to the same size, centred, standing on the ground
+function i3dFit(obj){
+  var b=new THREE.Box3().setFromObject(obj),s=b.getSize(new THREE.Vector3()),k=2/Math.max(s.x,s.y,s.z,1e-6);
+  obj.scale.multiplyScalar(k);b.setFromObject(obj);var c=b.getCenter(new THREE.Vector3());
+  obj.position.x-=c.x;obj.position.z-=c.z;obj.position.y-=b.min.y;
+  return b.setFromObject(obj);
+}
+function I3DView(host,obj,opts){
+  opts=opts||{};var self=this;
+  var w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);
+  var r=this.r=new THREE.WebGLRenderer({antialias:true,alpha:false,preserveDrawingBuffer:!!opts.still});
+  r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));r.setSize(w,h,false);
+  r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;
+  r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;
+  var cv=r.domElement;cv.className='i3d-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',opts.label||'3D model');
+  host.insertBefore(cv,host.firstChild);
+  var sc=this.sc=new THREE.Scene();sc.background=new THREE.Color(0x05101b);sc.fog=new THREE.Fog(0x05101b,9,26);
+  sc.add(new THREE.HemisphereLight(i3dCol(0xa8dcd6),i3dCol(0x10302e),0.75));
+  var key=new THREE.DirectionalLight(i3dCol(0xfff0de),1.15);key.position.set(3,6,4);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.bias=-0.0005;sc.add(key);
+  var fill=new THREE.DirectionalLight(i3dCol(0x6fb8d8),0.35);fill.position.set(-4,3,-2);sc.add(fill);
+  var rim=new THREE.DirectionalLight(i3dCol(0x3ECF8E),0.55);rim.position.set(-2,3,-5);sc.add(rim);
+  var ground=new THREE.Mesh(new THREE.CircleBufferGeometry(30,48),new THREE.MeshStandardMaterial({color:i3dCol(0x0c1a20),roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;sc.add(ground);
+  var grid=new THREE.GridHelper(24,48,i3dCol(0x1f5e5a),i3dCol(0x123734));grid.material.transparent=true;grid.material.opacity=0.35;grid.position.y=0.002;sc.add(grid);
+  this.tinted=i3dStyle(obj);var bb=i3dFit(obj);sc.add(obj);this.obj=obj;
+  var cam=this.cam=new THREE.PerspectiveCamera(35,w/h,0.02,100);
+  var ty=Math.max(0.3,(bb.max.y)/2);this.home={p:new THREE.Vector3(2.6,1.7+ty*0.4,3.4),t:new THREE.Vector3(0,ty,0)};
+  cam.position.copy(this.home.p);cam.lookAt(this.home.t);
+  if(opts.still){r.render(sc,cam);return;}
+  var ctl=this.ctl=new THREE.OrbitControls(cam,cv);
+  ctl.target.copy(this.home.t);ctl.enableDamping=true;ctl.dampingFactor=0.09;ctl.rotateSpeed=0.8;ctl.minDistance=1.2;ctl.maxDistance=12;ctl.maxPolarAngle=Math.PI/2-0.03;ctl.screenSpacePanning=true;
+  ctl.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
+  var still=false;try{still=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  ctl.autoRotate=!still&&opts.auto!==false;ctl.autoRotateSpeed=1.6;
+  ctl.addEventListener('start',function(){ctl.autoRotate=false;self.onAuto&&self.onAuto(false);});
+  ctl.update();
+  var loop=function(){if(self.dead)return;self.raf=requestAnimationFrame(loop);var W=host.clientWidth,H=host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();}ctl.update();r.render(sc,cam);};
+  loop();
+}
+I3DView.prototype.zoom=function(f){var c=this.cam,t=this.ctl.target,v=c.position.clone().sub(t),d=Math.min(this.ctl.maxDistance,Math.max(this.ctl.minDistance,v.length()*f));c.position.copy(t).add(v.setLength(d));};
+I3DView.prototype.reset=function(){this.cam.position.copy(this.home.p);this.ctl.target.copy(this.home.t);};
+I3DView.prototype.dispose=function(){
+  this.dead=true;cancelAnimationFrame(this.raf);try{this.ctl&&this.ctl.dispose();}catch(e){}
+  this.sc.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(function(m){m&&m.dispose&&m.dispose();});});
+  try{this.r.dispose();this.r.forceContextLoss();}catch(e){}var cv=this.r.domElement;cv.parentNode&&cv.parentNode.removeChild(cv);
+};
+// small still picture for the tile (one short-lived renderer, so tiles never hold WebGL contexts)
+function i3dThumb(obj){
+  var d=document.createElement('div');d.style.cssText='position:fixed;left:-9999px;top:0;width:240px;height:240px';document.body.appendChild(d);
+  try{var v=new I3DView(d,obj,{still:true});var url=v.r.domElement.toDataURL('image/jpeg',0.78);v.dispose();return url;}finally{d.remove();}
+}
+// save a model (ArrayBuffer) on an item
+async function i3dSave(kind,id,buf,meta){
+  var it=i3dItem(kind,id);if(!it)return;
+  var obj=await i3dParse(buf.slice(0));
+  await i3dPut(kind,id,buf);
+  it.model=Object.assign({},meta,{thumb:i3dThumb(obj),at:Date.now()});
+  saveAL();renderAlTab();return it.model;
+}
+var _i3dView=null,_i3dBusy=false;
+function i3dClose(){var o=document.getElementById('i3d-modal');if(o)o.remove();if(_i3dView){_i3dView.dispose();_i3dView=null;}}
+function i3dMsg(t,bad){var e=document.getElementById('i3d-msg');if(e){e.textContent=t||'';e.className='i3d-msg'+(bad?' bad':'');}}
+function i3dShell(title,sub){
+  i3dClose();
+  var o=document.createElement('div');o.id='i3d-modal';o.className='inv-modal';o.setAttribute('tabindex','-1');o.setAttribute('role','dialog');o.setAttribute('aria-label',title);
+  o.addEventListener('keydown',function(e){if(e.key==='Escape')i3dClose();});
+  o.addEventListener('click',function(e){if(e.target===o)i3dClose();});
+  o.innerHTML='<div class="inv-card"><div class="inv-hd"><div><div class="inv-t">'+cfEsc(title)+'</div><div class="inv-s">'+sub+'</div></div>'
+    +'<button class="inv-x" onclick="i3dClose()" title="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div><div id="i3d-body"></div><div id="i3d-msg" class="i3d-msg" role="status" aria-live="polite"></div></div>';
+  document.body.appendChild(o);o.focus();return document.getElementById('i3d-body');
+}
+// open the viewer for an item that has a model
+async function i3dOpen(kind,id){
+  var it=i3dItem(kind,id);if(!it||!it.model)return i3dPick(kind,id);
+  var m=it.model,val=kind==='li'?(typeof depreciatedValue==='function'?depreciatedValue(it):it.value):it.value;
+  var body=i3dShell(it.name,'£'+Math.round(val||0).toLocaleString('en-GB')+' · 3D model'+(m.src==='pp'?' from Poly Pizza':' (your file)'));
+  body.innerHTML='<div class="inv-stage i3d-stage" id="i3d-stage"><div class="inv-empty" id="i3d-wait">Loading the model…</div>'
+    +'<div class="inv-ctl"><button title="Auto-rotate" id="i3d-auto" aria-pressed="true" onclick="i3dAuto()">⟳</button><button title="Zoom in" onclick="_i3dView&&_i3dView.zoom(0.8)">＋</button><button title="Zoom out" onclick="_i3dView&&_i3dView.zoom(1.25)">－</button><button title="Reset view" onclick="_i3dView&&_i3dView.reset()">⌂</button></div></div>'
+    +'<div class="inv-hint">Drag to rotate · pinch or scroll to zoom · two fingers or right-drag to move.'+(m.lic==='CC-BY'?'<br><span class="i3d-credit">'+cfEsc(i3dCredit(m))+'</span>':m.src==='pp'?'<br><span class="i3d-credit">"'+cfEsc(m.t)+'" by '+cfEsc(m.by)+' (CC0) via Poly Pizza</span>':'')+'</div>'
+    +'<div class="i3d-row"><button class="dep-btn" onclick="i3dPick(\''+kind+'\','+id+')">Change model</button><button class="dep-btn" onclick="i3dRemove(\''+kind+'\','+id+')">Remove model</button>'+(kind==='wi'&&(it.photos||0)>=1?'<button class="dep-btn" onclick="i3dClose();invOpenViewer('+id+')">Photos</button>':'')+'</div>';
+  try{
+    var buf=await i3dGetBuf(kind,id);
+    if(!buf&&m.src==='pp'){i3dMsg('Downloading the model from Poly Pizza…');buf=await i3dFetchLib(m);await i3dPut(kind,id,buf);i3dMsg('');}
+    if(!buf)throw new Error('The 3D file is on the device you added it from. Upload it again here to see it on this device.');
+    var obj=await i3dParse(buf.slice(0)),st=document.getElementById('i3d-stage');if(!st)return;
+    var w=document.getElementById('i3d-wait');w&&w.remove();
+    _i3dView=new I3DView(st,obj,{label:'3D model of '+it.name});
+    _i3dView.onAuto=function(on){var b=document.getElementById('i3d-auto');b&&b.setAttribute('aria-pressed',on?'true':'false');};
+    _i3dView.onAuto(_i3dView.ctl.autoRotate);
+  }catch(e){var w2=document.getElementById('i3d-wait');if(w2)w2.textContent='';i3dMsg(e.message||String(e),true);}
+}
+function i3dAuto(){if(!_i3dView)return;var c=_i3dView.ctl;c.autoRotate=!c.autoRotate;_i3dView.onAuto(c.autoRotate);}
+// choose or replace a model
+function i3dPick(kind,id){
+  var it=i3dItem(kind,id);if(!it)return;
+  var lib=i3dFlag(),best=i3dMatch(it.name);
+  var body=i3dShell('3D model for '+it.name,kind==='li'?'Liability':'Wealth inventory');
+  var list=I3D_LIB.slice().sort(function(a,b){return (b.k===best)-(a.k===best);});
+  body.innerHTML='<div class="i3d-opts">'
+    +'<label class="i3d-up dep-btn">Upload a 3D file (.glb)<input type="file" accept=".glb,model/gltf-binary" style="display:none" onchange="i3dUpload(\''+kind+'\','+id+',this)"></label>'
+    +'<div class="inv-hint">The file stays on this device; only a small preview picture is saved with the item. Photos still work as before.</div>'
+    +(lib?'<div class="i3d-lib-hd">Library models <span class="i3d-tag">test</span></div>'
+      +'<div class="inv-hint">Free models from Poly Pizza, downloaded by your browser. '+(best?'Best match for this item first.':'No match for this name yet, so all are shown.')+'</div>'
+      +'<div class="i3d-lib">'+list.map(function(m){return '<button class="i3d-li'+(m.k===best?' best':'')+'" data-k="'+m.k+'" onclick="i3dPickLib(\''+kind+'\','+id+',\''+m.k+'\')"><img src="'+I3D_PP+m.f+'.webp" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'"><span>'+cfEsc(m.t)+'</span><small>'+m.lic+' · '+cfEsc(m.by)+'</small></button>';}).join('')+'</div>'
+      :'')
+    +(it.model?'<div class="i3d-row"><button class="dep-btn" onclick="i3dOpen(\''+kind+'\','+id+')">View current model</button><button class="dep-btn" onclick="i3dRemove(\''+kind+'\','+id+')">Remove model</button></div>':'')
+    +'</div>';
+}
+function i3dUpload(kind,id,input){
+  var f=input.files&&input.files[0];if(!f)return;
+  if(f.size>25*1048576){i3dMsg('That file is over 25 MB. Try a smaller .glb.',true);return;}
+  i3dMsg('Reading '+f.name+'…');
+  f.arrayBuffer().then(function(buf){return i3dSave(kind,id,buf,{src:'file',t:f.name.replace(/\.glb$/i,'')});})
+    .then(function(){i3dOpen(kind,id);},function(e){i3dMsg(e.message||String(e),true);});
+}
+function i3dPickLib(kind,id,k){
+  if(_i3dBusy)return;var m=I3D_LIB.find(function(x){return x.k===k;});if(!m)return;
+  _i3dBusy=true;i3dMsg('Downloading "'+m.t+'" from Poly Pizza…');
+  i3dFetchLib(m).then(function(buf){return i3dSave(kind,id,buf,{src:'pp',k:m.k,id:m.id,f:m.f,t:m.t,by:m.by,lic:m.lic});})
+    .then(function(){_i3dBusy=false;i3dOpen(kind,id);},function(e){_i3dBusy=false;i3dMsg(e.message||String(e),true);});
+}
+function i3dRemove(kind,id){var it=i3dItem(kind,id);if(!it)return;delete it.model;i3dDel(kind,id);i3dClose();saveAL();renderAlTab();}
+// tile markup shared by both lists
+function i3dTile(kind,it){
+  var m=it.model;if(!m||!m.thumb)return '';
+  return '<img class="i3d-thumb" src="'+m.thumb+'" alt="3D model of '+cfEsc(it.name)+'" onclick="i3dOpen(\''+kind+'\','+it.id+')"><span class="inv-badge i3d-badge" title="'+cfEsc(i3dCredit(m)||m.t||'')+'">3D</span>';
+}
 
 function wiSearch(id){
   var a=(alState.otherAssets||[]).find(function(x){return x.id===id;});
@@ -19814,7 +20035,7 @@ function addLiability(){
   var lir=document.getElementById('li-run');if(lir)lir.value='';
   saveAL();renderAlTab();updateKPIs();
 }
-function delLiability(id){alState.liabilities=alState.liabilities.filter(function(l){return l.id!==id;});saveAL();renderAlTab();updateKPIs();}
+function delLiability(id){alState.liabilities=alState.liabilities.filter(function(l){return l.id!==id;});try{i3dDel('li',id);}catch(e){}saveAL();renderAlTab();updateKPIs();}
 
 // ═══════════════════════════════════════════════════════════════
 // DEBT TRACKER JS
@@ -24519,7 +24740,7 @@ function showPrivacy() {
       + '<li><strong>Cloudflare</strong> — serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong> — deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
     '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank and provider logos — it is told the website of each bank, card or investment provider you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices — CoinGecko learns which coins you hold), and <strong>loremflickr</strong> (only if you use photo search, which sends your search words).</p>',
-    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> receives the whole screenshot you upload to read your holdings — so crop out names and account numbers first — and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
+    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> receives the whole screenshot you upload to read your holdings — so crop out names and account numbers first — and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Poly Pizza</strong> supplies free 3D models of everyday items if you pick one from its library for a wealth or liability item: your browser downloads the file straight from Poly Pizza, which sees your IP address and which model you chose, and nothing else. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
     '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or analytics. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected — and what that does not mean'),
     '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
