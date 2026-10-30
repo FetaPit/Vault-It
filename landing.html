@@ -112,11 +112,10 @@ a{color:var(--teal)}
 .btn[disabled]{opacity:.6;cursor:wait}
 /* hero */
 .hero{padding:40px 0 28px}
-.hero-grid{display:grid;gap:32px;grid-template-columns:1fr;align-items:start}
-@media(min-width:900px){.hero-grid{grid-template-columns:1.05fr .95fr;gap:48px}.hero{padding:64px 0 48px}}
+@media(min-width:900px){.hero{padding:56px 0 48px}}
 .hero h1{font-size:clamp(38px,7.2vw,68px);font-weight:800;line-height:1;letter-spacing:-.02em;margin:16px 0 0}
 .hero h1 em{font-style:normal;color:var(--teal)}
-.hero .sub{font-family:var(--font-mono);font-size:17px;letter-spacing:.12em;color:var(--faint);margin:18px 0 0}
+.hero .sub{font-family:var(--font-mono);font-size:18px;letter-spacing:.12em;color:var(--faint);margin:22px 0 0}
 .hero .lede{margin:18px 0 22px}
 /* the form */
 form.join{background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-card);padding:18px;box-shadow:var(--glow)}
@@ -148,9 +147,60 @@ input[type=email]:focus{border-color:var(--teal);outline:none}
 .pop{position:absolute;left:50%;bottom:20%;font-family:var(--font-mono);color:var(--gold);font-size:clamp(18px,3vw,28px);text-shadow:var(--popglow);animation:popup 1250ms var(--ease) forwards;white-space:nowrap}
 @keyframes popup{0%{opacity:0;transform:translate(-50%,12px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-70px)}}
 .hint{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--faint);text-align:center;margin:10px 0 0}
-.stage-cap{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin:14px 0 0;font-variant-numeric:tabular-nums}
-.stage-cap strong{font-family:var(--font-mono);font-size:26px;font-weight:400;color:var(--gold)}
-.stage-cap span{color:var(--muted);font-size:14px;font-family:var(--font-mono);letter-spacing:.06em}
+/* levels, deposit controls, stats and milestone pills: as in the brand book */
+.levels{display:flex;gap:8px;overflow-x:auto;margin-top:28px;padding:2px 0 4px;scrollbar-width:none}
+.levels::-webkit-scrollbar{display:none}
+.lvl{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.06em;padding:12px 18px;border-radius:var(--r-pill);border:1.5px solid var(--line2);color:var(--muted);white-space:nowrap;display:inline-flex;gap:10px;align-items:center}
+.lvl.on{border-color:var(--gold);color:var(--gold);background:rgba(232,197,106,.07)}
+.lvl.open{border-color:var(--gold);color:var(--gold)}
+.lvl.open .lk{display:none}
+.lvl.unlock{animation:sflash 1000ms var(--ease)}
+.stage3d{margin-top:22px}
+.stage3d canvas.nwc{aspect-ratio:16/9}
+@media(max-width:640px){.stage3d canvas.nwc{aspect-ratio:1/1}}
+.stage3d.flashg{animation:sflashg 900ms var(--ease)}
+@keyframes sflashg{0%{box-shadow:0 0 0 0 rgba(62,207,142,0)}25%{box-shadow:0 0 44px 2px rgba(62,207,142,.5);border-color:var(--green)}100%{box-shadow:var(--glow)}}
+.pop.g{color:var(--green);text-shadow:0 0 14px rgba(62,207,142,.7)}
+.dep{display:grid;gap:12px;grid-template-columns:1fr 1fr;margin-top:20px;align-items:end}
+.depf label{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.depin{display:flex;align-items:center;border:1px solid var(--line2);border-radius:12px;background:var(--surf2);overflow:hidden}
+.depin span{padding:0 4px 0 14px;color:var(--gold);font-family:var(--font-mono);font-size:18px}
+.depin span:last-child{padding:0 14px 0 4px}
+.depin input{flex:1;border:0;background:transparent;color:var(--text);font:600 18px var(--font-mono);padding:13px 8px;min-width:0;outline:none;width:100%}
+.depin:focus-within{border-color:var(--teal)}
+.depout{grid-column:1/-1;font-family:var(--font-mono);font-size:14px;color:var(--muted);letter-spacing:.04em}
+@media(min-width:760px){.depout{grid-column:auto;align-self:center}}
+.types{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tab{font:700 12px var(--font-display);letter-spacing:.12em;text-transform:uppercase;padding:10px 14px;border-radius:var(--r-pill);border:0;background:transparent;color:var(--muted);cursor:pointer;min-height:40px;box-shadow:inset 0 0 0 1.5px var(--line2)}
+.tab[aria-pressed="true"]{background:var(--goldf);color:var(--on-gold);box-shadow:none}
+.ctrl{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:18px 0}
+.lay{display:flex;gap:8px;flex-wrap:wrap}
+.lay .btn{min-width:64px}
+.scrub{flex:1;min-width:220px;display:grid;gap:2px}
+.scrub label{font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+input[type=range]{width:100%;accent-color:var(--gold);height:44px;margin:0}
+.vi-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%}
+@media(max-width:620px){.vi-stats{grid-template-columns:repeat(2,1fr)}}
+.vi-stat{background:var(--surf);border:1px solid var(--line);border-radius:var(--r-tile);padding:18px 8px;text-align:center}
+.vi-stat b{display:block;font-family:var(--font-mono);font-weight:400;font-size:24px;color:var(--text);letter-spacing:.04em}
+.vi-stat span{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.vi-pills{display:flex;flex-wrap:wrap;gap:8px;width:100%}
+.vi-pill{font-family:var(--font-mono);font-size:14px;letter-spacing:.06em;padding:8px 16px;border-radius:var(--r-pill);border:1.5px solid var(--gold);color:var(--gold);background:var(--pillbg)}
+.vi-pill.lock{border:1.5px dashed var(--lockline,#3A4446);color:var(--lockfg,#6A7678);background:transparent}
+.vi-pill.pop{animation:pillpop 900ms var(--ease);position:static}
+@keyframes pillpop{0%{transform:scale(.9);box-shadow:0 0 0 0 rgba(232,197,106,.7)}40%{transform:scale(1.08);box-shadow:0 0 22px 4px rgba(232,197,106,.55)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(232,197,106,0)}}
+.unitkey{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-family:var(--font-mono);font-size:13px;color:var(--muted);margin:10px 0 0}
+.unitkey i{display:inline-block;background:var(--teal);border-radius:2px;vertical-align:middle;margin-right:8px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);background:var(--goldf);color:var(--on-gold);padding:12px 18px;border-radius:var(--r-pill);font-weight:700;opacity:0;pointer-events:none;transition:opacity var(--t-fast),transform var(--t-fast) var(--ease);z-index:70}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.hero .lede{margin:22px 0 0}
+/* "home." pulses in vibrant teal (owner, 30 Oct); still in reduced motion */
+.hero h1 em.pulse{animation:homepulse var(--pulse) ease-in-out infinite}
+@keyframes homepulse{0%,100%{color:var(--teal);text-shadow:0 0 0 rgba(68,192,185,0)}50%{color:#5FE0D8;text-shadow:0 0 26px rgba(68,192,185,.75),0 0 60px rgba(68,192,185,.35)}}
+[data-theme="light"] .hero h1 em.pulse{animation-name:homepulse-day}
+@keyframes homepulse-day{0%,100%{color:var(--teal-deep)}50%{color:#1FA39C}}
+.joinsec{padding-top:48px}
+.joinsec .join{max-width:640px}
 /* sections */
 section{padding:64px 0 24px;border-top:1px solid var(--line)}
 section .lead{color:var(--muted);max-width:56ch;margin-bottom:26px}
@@ -198,43 +248,76 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
 </div></header>
 
 <main>
-<div class="hero"><div class="wrap hero-grid">
-  <div>
-    <span class="lbl">Free private beta · Built in the UK</span>
-    <h1>Get out of the red and <em>into your home.</em></h1>
-    <p class="sub">Every pound saved builds your future</p>
-    <p class="lede">Vault-It puts your debts, savings, house deposit and net worth on one honest map, then turns every pound you save towards your deposit into bricks on a 3D house. You type the numbers in. No bank login.</p>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<section class="hero" style="border-top:0"><div class="wrap">
+  <span class="lbl">Free private beta · Built in the UK</span>
+  <h1>Get out of the Red and <em class="pulse">into your home.</em></h1>
+  <p class="sub">Every pound saved builds your future</p>
 
-    <form class="join" id="join" novalidate>
-      <label class="f" for="email">Your email address</label>
-      <div class="row">
-        <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required maxlength="254" />
-        <button class="btn btn-gold" type="submit" id="go">Join the beta list</button>
-      </div>
-      <label class="check"><input type="checkbox" id="testing" checked /> <span>I’d like to test the app — send me the link and tester tips.</span></label>
-      <label class="check"><input type="checkbox" id="marketing" /> <span>Also email me product news and the founding-member offer. Optional; unsubscribe any time.</span></label>
-      <div id="cf-box"></div>
-      <div class="msg" id="msg" role="status" aria-live="polite"></div>
-      <p class="micro">Free during the beta · no card · no bank login. We send one email to confirm your address. <a href="https://app.vault-it.co/?privacy=1">Privacy notice</a></p>
-    </form>
+  <div class="levels" aria-label="Levels">
+    <span class="lvl on"><svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true"><rect x="0" y="0" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="10" y="0" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="5" y="5" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="0" y="10" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="10" y="10" width="8" height="4" rx="1" fill="#E05C5C"/></svg>Level 1 · First deposit</span>
+    <span class="lvl" id="lvl2"><svg class="lk" width="16" height="16" viewBox="0 0 24 24" fill="#E8C56A" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1zm2 0h6V8a3 3 0 0 0-6 0v2z"/></svg>Level 2 · Delete the mortgage</span>
+    <span class="lvl"><svg class="lk" width="16" height="16" viewBox="0 0 24 24" fill="#E8C56A" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1zm2 0h6V8a3 3 0 0 0-6 0v2z"/></svg>Level 3 · Upgrade</span>
   </div>
 
-  <div>
-    <div class="stage3d" id="heroStage">
-      <canvas id="heroCanvas" tabindex="0" role="img" aria-label="A 3D hologram of a Victorian terrace, built brick by brick from a saved deposit and standing complete. Drag to orbit, arrow keys to rotate."></canvas>
-      <div class="rail" role="group" aria-label="Camera controls">
-        <button type="button" id="rIn" aria-label="Zoom in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
-        <button type="button" id="rOut" aria-label="Zoom out"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
-        <button type="button" id="rOrb" aria-label="Auto orbit" aria-pressed="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg></button>
-        <button type="button" id="rRst" aria-label="Reset view"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg></button>
-      </div>
-      <div class="statusline" id="heroStatus" aria-live="off"></div>
-      <div class="pops" id="heroPops"></div>
+  <div class="stage3d" id="heroStage">
+    <canvas id="heroCanvas" tabindex="0" role="img" aria-label="A 3D hologram of a Victorian terrace that builds brick by brick as you save. Drag to orbit, arrow keys to rotate."></canvas>
+    <div class="rail" role="group" aria-label="Camera controls">
+      <button type="button" id="rIn" aria-label="Zoom in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button type="button" id="rOut" aria-label="Zoom out"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+      <button type="button" id="rOrb" aria-label="Auto orbit" aria-pressed="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg></button>
+      <button type="button" id="rRst" aria-label="Reset view"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg></button>
     </div>
-    <p class="hint">DRAG · ORBIT · ARROW KEYS · + − ZOOM</p>
-    <div class="stage-cap"><strong id="capBricks">14,465 bricks</strong><span>Victorian mid-terrace · 154 rows · the finished house</span></div>
+    <div class="statusline" id="heroStatus" aria-live="off"></div>
+    <div class="pops" id="heroPops"></div>
   </div>
-</div></div>
+  <p class="hint">DRAG · ORBIT · ARROW KEYS · + − ZOOM</p>
+  <div class="dep" id="depBox">
+    <div class="depf"><label for="depPrice">Property price</label><div class="depin"><span>£</span><input id="depPrice" type="text" inputmode="numeric" autocomplete="off" value="120000"></div></div>
+    <div class="depf"><label for="depPct">Deposit</label><div class="depin"><input id="depPct" type="text" inputmode="decimal" autocomplete="off" value="20"><span>%</span></div></div>
+    <div class="depout" id="depOut" aria-live="polite"></div>
+  </div>
+  <div class="types" id="depTypes" role="group" aria-label="House type"></div>
+
+  <div class="ctrl">
+    <div class="lay" role="group" aria-label="Lay bricks"><button type="button" class="btn btn-ghost" data-lay="5">+£5</button><button type="button" class="btn btn-ghost" data-lay="50">+£50</button><button type="button" class="btn btn-primary" id="layBtn" data-lay="500">Lay the bricks +£500</button></div>
+    <div class="scrub"><label for="heroRange">Scrub the build</label><input type="range" id="heroRange" min="0" max="100" step="0.1" value="0"></div>
+    <button type="button" class="btn btn-ghost btn-sm" id="heroReset">Reset</button>
+  </div>
+  <div class="vi-stats">
+    <div class="vi-stat"><b id="sBricks">0</b><span>Bricks laid</span></div>
+    <div class="vi-stat"><b id="sToGo">£24.0k</b><span>To go</span></div>
+    <div class="vi-stat"><b id="sXp">5</b><span>XP</span></div>
+    <div class="vi-stat"><b id="sStreak">1</b><span>Streak</span></div>
+  </div>
+  <div class="vi-pills" id="heroPills" style="margin-top:14px"></div>
+
+  <h2 style="margin-top:56px">Net worth in 3D</h2>
+  <p class="lede" style="margin:0">A speed run of the climb: starting in the red with a little saved, paying the debt off block by block, then building wealth in every domain. Big blocks are £1,000. Small cubes are £100. Nine cubes become a block.</p>
+  <div class="stage3d" id="nwStage">
+    <canvas id="nwCanvas" class="nwc" tabindex="0" role="img" aria-label="A 3D scene of assets stacked above a gold line and debt hanging below it, replaying the climb from debt to wealth. Drag to orbit."></canvas>
+    <div class="statusline" id="nwMsg" style="right:14px">Starting in the red</div>
+    <div class="pops" id="nwPops"></div>
+  </div>
+  <div class="ctrl"><p class="unitkey" style="margin:0;flex:1"><span><i style="width:16px;height:6px"></i>1 block = £1,000</span><span><i style="width:7px;height:7px"></i>1 cube = £100</span><span>Nine cubes, then a block</span></p><button type="button" class="btn btn-ghost btn-sm" id="nwReplay">Replay</button></div>
+</div></section>
+
+<section class="joinsec" id="joinsec"><div class="wrap">
+  <h2>Join the free beta</h2>
+  <p class="lede">Vault-It puts your debts, savings, house deposit and net worth on one honest map, then turns every pound you save towards your deposit into bricks on a 3D house. You type the numbers in. No bank login.</p>
+  <form class="join" id="join" novalidate>
+    <label class="f" for="email">Your email address</label>
+    <div class="row">
+      <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required maxlength="254" />
+      <button class="btn btn-gold" type="submit" id="go">Join the beta list</button>
+    </div>
+    <label class="check"><input type="checkbox" id="testing" checked /> <span>I’d like to test the app — send me the link and tester tips.</span></label>
+    <label class="check"><input type="checkbox" id="marketing" /> <span>Also email me product news and the founding-member offer. Optional; unsubscribe any time.</span></label>
+    <div id="cf-box"></div>
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    <p class="micro">Free during the beta · no card · no bank login. We send one email to confirm your address. <a href="https://app.vault-it.co/?privacy=1">Privacy notice</a></p>
+  </form>
+</div></section>
 
 <section id="how"><div class="wrap">
   <h2>How it works</h2>
@@ -341,27 +424,76 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
   });
   syncTheme();
 
-  // ── the hero: the brand book's 3D house, built brick by brick to the finished home (owner, 30 Oct: the landing shows the house fully built)
+  // ── the hero, as in the brand book: deposit → bricks, lay buttons, scrub, milestones, Level 2 unlock
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  var fmt = function (n) { return '£' + Math.round(n).toLocaleString('en-GB'); };
+  var tt; function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('show'); }, 2600); }
   if (window.ViBrand && $('#heroCanvas')) {
-    var VB = window.ViBrand, stage = $('#heroStage'), status = $('#heroStatus'), lastKey = '', done = false;
-    var ctl = VB.makeStage($('#heroCanvas'), { railPad: 70, padB: 40, onFrame: function (info, st) {
-      var bricks = info.bricks !== undefined ? info.bricks : 0, total = info.bricksTotal || 14465, key = info.row + '|' + bricks;
-      if (key !== lastKey) {
-        lastKey = key;
-        status.textContent = st.p >= .999
-          ? 'Victorian mid-terrace · 154 rows · ' + total.toLocaleString('en-GB') + ' bricks · deposit reached'
-          : 'Victorian mid-terrace · Row ' + info.row + ' of 154 · ' + bricks.toLocaleString('en-GB') + ' / ' + total.toLocaleString('en-GB') + ' bricks';
-        $('#capBricks').textContent = (st.p >= .999 ? total : bricks).toLocaleString('en-GB') + ' bricks';
-      }
-      if (st.p >= .999 && !done) { done = true; if (!VB.reduce) { VB.flashStage(stage); VB.popText($('#heroPops'), 'Deposit reached'); } }
-    } });
-    ctl.setTarget(0, true);
-    setTimeout(function () { ctl.setTarget(1); }, 400);   // builds in from the foundations, then stands complete with the pulse and the ring
-    $('#rIn').addEventListener('click', function () { ctl.zoom(1.15); });
-    $('#rOut').addEventListener('click', function () { ctl.zoom(1 / 1.15); });
-    $('#rOrb').addEventListener('click', function () { this.setAttribute('aria-pressed', ctl.toggleAuto()); });
-    $('#rRst').addEventListener('click', function () { ctl.reset(); });
-    window.viHero = ctl;
+    var VB = window.ViBrand, clamp = VB.clamp, popText = VB.popText, flashStage = VB.flashStage;
+    var MS = [[1, 'Site cleared'], [5, 'Foundations'], [10, '10%'], [25, 'Quarter'], [50, 'Halfway'], [75, 'Three-quarters'], [100, 'Deposit ready']];
+    var BT = 14465, DEP = { price: 120000, pct: 20, saved: 8544 }, engaged = false, bonus = 0, msDone = [], lastKey = '', unlocked = false, heroStageEl = $('#heroStage'), pillsHost = $('#heroPills');
+    MS.forEach(function (m) { var sp = document.createElement('span'); sp.className = 'vi-pill lock'; sp.textContent = m[0] + '% · ' + m[1]; pillsHost.appendChild(sp); });
+    function depTarget() { return Math.max(1, DEP.price * DEP.pct / 100); }
+    function perBrick() { return depTarget() * .77 / BT; }
+    function money(n) { return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: n < 10 ? 2 : 0, maximumFractionDigits: n < 100 ? 2 : 0 }); }
+    function fmtK(n) { return n >= 1e6 ? '£' + (n / 1e6).toFixed(2) + 'm' : n >= 1000 ? '£' + (n / 1000).toFixed(1) + 'k' : '£' + Math.round(n); }
+    function heroFrame(info, st) {
+      var p = st.p, bricks = (info.bricks !== undefined ? info.bricks : Math.round(21000 * p)), btot = info.bricksTotal || 21000, key = info.row + '|' + bricks + '|' + info.tiles; BT = btot;
+      if (key !== lastKey) { lastKey = key;
+        $('#heroStatus').textContent = 'Victorian mid-terrace · Row ' + info.row + ' of 154 · ' + bricks.toLocaleString('en-GB') + ' / ' + btot.toLocaleString('en-GB') + ' bricks · ' + money(depTarget() * (info.brickShare || .77) / btot) + ' a brick';
+        $('#sBricks').textContent = bricks.toLocaleString('en-GB'); $('#sToGo').textContent = fmtK(depTarget() * (1 - p)); }
+      var pc = p * 100, done = 0;
+      MS.forEach(function (m, i) { var on = pc >= m[0] - 1e-6, el = pillsHost.children[i];
+        if (on && !msDone[i]) { msDone[i] = true; el.classList.remove('lock'); el.classList.add('pop'); setTimeout(function () { el.classList.remove('pop'); }, 900); if (engaged) toast('Milestone: ' + m[0] + '% ' + m[1]); }
+        else if (!on && msDone[i] && pc < m[0] - .6) { msDone[i] = false; el.classList.add('lock'); }
+        if (msDone[i]) done++; });
+      $('#sXp').textContent = 5 + done * 50 + bonus;
+      if (p >= .999 && !unlocked) { unlocked = true; var l = $('#lvl2'); l.classList.add('open', 'unlock'); setTimeout(function () { l.classList.remove('unlock'); }, 1100); if (engaged) toast('Level 2 unlocked: Delete the Mortgage'); }
+      else if (p < .99 && unlocked) { unlocked = false; $('#lvl2').classList.remove('open'); }
+    }
+    var heroCtl = VB.makeStage($('#heroCanvas'), { railPad: 70, padB: 40, onFrame: heroFrame });
+    function depOut() { var pb = perBrick(); $('#depOut').textContent = 'Deposit target ' + money(depTarget()) + ' · each brick = ' + money(pb) + ' · £500 lays ' + (500 / pb >= 1 ? Math.round(500 / pb) + ' bricks' : (500 / pb).toFixed(2) + ' of a brick'); }
+    function depSync(imm) { var p = clamp(DEP.saved / depTarget(), 0, 1); DEP.saved = Math.min(DEP.saved, depTarget()); heroCtl.setTarget(p, imm); $('#heroRange').value = p * 100; depOut(); }
+    $$('[data-lay]').forEach(function (b) { b.addEventListener('click', function () {
+      engaged = true; var amt = +b.getAttribute('data-lay');
+      if (DEP.saved >= depTarget() - .01) { toast('Deposit full. Reset to build again.'); return; }
+      var nb = amt / perBrick(); DEP.saved = Math.min(depTarget(), DEP.saved + amt); bonus += Math.max(1, Math.round(amt / 20)); depSync();
+      popText($('#heroPops'), '+£' + amt.toLocaleString('en-GB') + ' · ' + (nb >= 1 ? '+' + Math.round(nb) + ' brick' + (Math.round(nb) === 1 ? '' : 's') : nb.toFixed(2) + ' of a brick')); flashStage(heroStageEl);
+    }); });
+    $('#heroRange').addEventListener('input', function () { engaged = true; DEP.saved = (+this.value / 100) * depTarget(); heroCtl.setTarget(+this.value / 100); depOut(); });
+    $('#heroReset').addEventListener('click', function () { bonus = 0; DEP.saved = 0; depSync(); });
+    $('#rIn').addEventListener('click', function () { heroCtl.zoom(1.15); });
+    $('#rOut').addEventListener('click', function () { heroCtl.zoom(1 / 1.15); });
+    $('#rOrb').addEventListener('click', function () { this.setAttribute('aria-pressed', heroCtl.toggleAuto()); });
+    $('#rRst').addEventListener('click', function () { heroCtl.reset(); });
+    var TYPES = [['Small flat', 80000], ['Terraced', 120000], ['Apartment', 300000], ['Semi-detached', 320000], ['Manor house', 1500000]];
+    function depTypesUI() { $$('#depTypes .tab').forEach(function (b, i) { b.setAttribute('aria-pressed', DEP.price === TYPES[i][1] ? 'true' : 'false'); }); }
+    TYPES.forEach(function (t) { var b = document.createElement('button'); b.type = 'button'; b.className = 'tab'; b.textContent = t[0] + ' £' + (t[1] >= 1e6 ? (t[1] / 1e6) + 'm' : (t[1] / 1000) + 'k'); b.addEventListener('click', function () { DEP.price = t[1]; $('#depPrice').value = t[1]; engaged = true; depTypesUI(); depSync(); }); $('#depTypes').appendChild(b); });
+    function depRead() { var pr = parseInt(($('#depPrice').value || '').replace(/[^0-9]/g, ''), 10), pc = parseFloat(($('#depPct').value || '').replace(/[^0-9.]/g, ''));
+      if (isFinite(pr) && pr > 0) DEP.price = clamp(pr, 10000, 50000000); if (isFinite(pc) && pc > 0) DEP.pct = clamp(pc, 1, 100); depTypesUI(); depSync(); }
+    $('#depPrice').addEventListener('input', depRead); $('#depPct').addEventListener('input', depRead);
+    $('#depPrice').addEventListener('blur', function () { this.value = DEP.price; }); $('#depPct').addEventListener('blur', function () { this.value = DEP.pct; });
+    depTypesUI(); depOut();
+    setTimeout(function () { depSync(); }, 350);
+    window.viHero = heroCtl;
+
+    // ── net worth in 3D: a speed run from the red to wealth in every domain (owner, 30 Oct). Runs while on screen, then replays.
+    var nwStageEl = $('#nwStage'), nwMsg = $('#nwMsg'), nwTimer = 0, nwStep = 0, nwOn = false;
+    var nw = VB.makeNW($('#nwCanvas'), { init: { dep: [1, 2], stk: [0, 1], gold: [0, 0], debt: [7, 4] }, onChange: function (t) { nwMsg.textContent = t.net < 0 ? 'In the red: -' + fmt(-t.net) : 'Net worth ' + fmt(t.net); } });
+    var PLAN = []; var k;
+    for (k = 0; k < 7; k++) PLAN.push('debt:1000'); for (k = 0; k < 4; k++) PLAN.push('debt:100');
+    ['dep:1000', 'stk:1000', 'dep:1000', 'gold:1000', 'dep:1000', 'stk:1000', 'dep:1000', 'gold:1000', 'dep:1000', 'stk:1000', 'dep:1000', 'gold:1000', 'dep:1000', 'stk:1000', 'dep:1000', 'dep:100', 'dep:100', 'stk:1000', 'gold:1000', 'dep:1000', 'stk:1000', 'dep:1000', 'gold:1000', 'dep:1000', 'stk:1000'].forEach(function (x) { PLAN.push(x); });
+    function nwNext() {
+      if (nwStep >= PLAN.length) { nwTimer = setTimeout(nwRestart, 5000); return; }
+      var r = nw.act(PLAN[nwStep++]);
+      if (r.ok) { popText($('#nwPops'), r.delta, r.delta.charAt(0) === '-' ? 'g' : ''); flashStage(nwStageEl, r.clear ? 'flashg' : 'flash'); nwMsg.textContent = r.msg; }
+      nwTimer = setTimeout(nwNext, r.clear ? 1800 : 620);
+    }
+    function nwRestart() { clearTimeout(nwTimer); nw.reset(); nwStep = 0; nwMsg.textContent = 'Starting in the red'; if (VB.reduce) { while (nwStep < PLAN.length) nw.act(PLAN[nwStep++]); nwMsg.textContent = 'Out of the red, and building'; return; } nwTimer = setTimeout(nwNext, 1200); }
+    $('#nwReplay').addEventListener('click', nwRestart);
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { var v = es[0].isIntersecting; if (v && !nwOn) { nwOn = true; nwRestart(); } else if (!v && nwOn) { nwOn = false; clearTimeout(nwTimer); } }, { threshold: .05 }).observe($('#nwCanvas'));
+    else nwRestart();
+    window.viNW = nw;
   }
 
   // ── the beta list form (unchanged behaviour)

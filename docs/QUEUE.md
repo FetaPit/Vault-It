@@ -9,7 +9,6 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [~] Landing hero revision (owner's feedback, 30 Oct, on `e7542ff`): copy the brand book hero exactly (level pills, the partially built house with its wireframe, deposit controls, lay buttons, stats and milestone pills), capital "Red", "home." in vibrant pulsing teal, remove the brick counter block, and add the net worth 3D speed run (starts in the red with few assets, clears the debt and builds wealth in every domain)
 - [ ] House builder brand build follow-ups (from the 30 Oct review): section 6.8 feedback ("+£5 · +4 bricks" pop-ups, stage flash, milestone toasts), a radial window glow at night, and a real-device speed check of the lite fallback
 - [ ] Level 2 Octalysis slice still open: real mortgage entry at purchase, overpayment what-ifs in the Level 2 panel (`docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md`; the build rule, payments, reset and undo were done 30 Oct)
 - [ ] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
@@ -31,6 +30,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Landing hero revision: the brand book hero copied as is (levels, partially built house, deposit controls, lay buttons, stats, milestone pills), capital Red, pulsing teal "home.", brick counter removed, net worth 3D speed run added; the form moved below the demos with the sticky header button jumping to it (`tests/test_signup_page.js`)
 - [x] Landing / sign-up page brand pass: tokens, wordmark and mark, tagline, the brand book's 3D house built to the finished home (pulse, ring, scanlines), Night/Daylight toggle, follow-on pages rethemed (`e7542ff`; `tests/test_signup_page.js`)
 - [x] Release to production for the owner's install test (`release/pioneer-v2` → `0f527f7`, backup `backup/release-pioneer-v2-20261030-2037`): installable app and offline shell, One B, 3D views on by default, brand build, Level 2 rule, live value step 1, partial-state fix, chart redraw fix
 - [x] Cross-device readiness for the owner's test (31 Oct): real service worker and manifest (installable, shell opens offline), One B tester agent, `tests/journey_one_b.js`, `tests/test_sw.js`, `docs/qa/TEST_DAY.md` (`04e58dd`); One B's first report in `docs/qa/`

@@ -39,19 +39,24 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
   ok(/Not regulated by the FCA\. Not financial advice\./.test(text), 'FCA line is shown (owner, 30 Oct)');
   ok(/not end-to-end encrypted/i.test(text) && /not financial advice/i.test(text) && /PT Live Design/.test(text) && /hello@vault-it\.co/.test(text), 'trust block is honest; trader identity and contact are shown');
   ok(!/Buffett|Munger|Stevenson|Squibb|bypass=/.test(await page.content()), 'no links to the demo with the celebrity advisor cards');
-  const form = await page.evaluate(() => { const r = document.getElementById('join').getBoundingClientRect(); return { top: r.top + scrollY, bottom: r.bottom + scrollY }; });
-  ok(form.bottom < 844 * 1.6, 'the form is near the top on a phone (ends at ' + Math.round(form.bottom) + 'px)');
+  // owner (30 Oct): the hero is the brand book's demo, so the form sits after it; the sticky header button jumps to it
+  ok(await page.evaluate(() => { const a = document.querySelector('header a.btn[href="#join"]'), f = document.getElementById('join'); return !!a && !!f && a.getBoundingClientRect().top >= 0 && a.getBoundingClientRect().bottom < 80; }), 'the header keeps a Join the beta button on screen that jumps to the form');
   ok(await page.evaluate(() => document.getElementById('marketing').checked === false && document.getElementById('testing').checked === true), 'the marketing box starts unticked');
   ok(await page.evaluate(() => !!document.querySelector('label[for=email]')), 'the email field has a label');
   ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scrolling on a phone');
   // brand pass (30 Oct 2026): tagline, brick wordmark, tokens, the 3D house standing complete, Daylight toggle
-  ok((await page.textContent('h1')).replace(/\s+/g, ' ').trim() === 'Get out of the red and into your home.', 'the hero carries the brand tagline');
+  ok((await page.textContent('h1')).replace(/\s+/g, ' ').trim() === 'Get out of the Red and into your home.' && await page.evaluate(() => { const e = document.querySelector('h1 em.pulse'); return !!e && getComputedStyle(e).animationName === 'homepulse'; }), 'the hero carries the brand tagline, capital Red, pulsing teal home');
   ok(await page.evaluate(() => !!document.querySelector('header .wm .dot') && !/·|-/.test(document.querySelector('header .wm').textContent) && !!document.querySelector('header .mark')), 'wordmark draws the hyphen as the brick (no middle dot) next to the mark');
   ok(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--teal').trim().toUpperCase() === '#44C0B9' && getComputedStyle(document.body).backgroundColor === 'rgb(8, 8, 8)' && /Share Tech Mono/.test(getComputedStyle(document.getElementById('heroStatus')).fontFamily)), 'brand tokens: Night page, teal, mono statusline');
   await page.evaluate(() => document.getElementById('heroStage').scrollIntoView());   // the stage only renders while on screen
   await page.waitForTimeout(4500);
   const hero = await page.evaluate(() => window.viHero ? { target: viHero.getTarget(), p: +viHero.st.p.toFixed(2), status: document.getElementById('heroStatus').textContent, scan: getComputedStyle(document.getElementById('heroStage'), '::after').backgroundImage !== 'none' } : null);
-  ok(hero && hero.target === 1 && hero.p > 0.3 && /Victorian mid-terrace/.test(hero.status) && hero.scan, 'the brand 3D house builds in towards the finished home, with scanlines: ' + JSON.stringify(hero));
+  ok(hero && Math.abs(hero.target - 0.356) < 0.001 && hero.p > 0.1 && /Victorian mid-terrace .* a brick/.test(hero.status) && hero.scan, 'the brand book hero: the house builds to the saved 35.6% of the deposit, with the brick price and scanlines: ' + JSON.stringify(hero));
+  ok(await page.evaluate(() => document.querySelectorAll('.levels .lvl').length === 3 && document.querySelectorAll('#depTypes .tab').length === 5 && document.querySelectorAll('#heroPills .vi-pill').length === 7 && /Deposit target £24,000/.test(document.getElementById('depOut').textContent) && !document.querySelector('.stage-cap')), 'levels, house types, milestone pills and the deposit maths are there; the brick counter block is gone');
+  const nw0 = await page.evaluate(() => viNW.totals());
+  await page.evaluate(() => document.getElementById('nwStage').scrollIntoView()); await page.waitForTimeout(5200);
+  const nw1 = await page.evaluate(() => viNW.totals());
+  ok(nw0.net < 0 && nw0.debt === 7400 && nw1.debt < nw0.debt && /red|worth/i.test(await page.textContent('#nwMsg')), 'the net worth speed run starts in the red (debt £' + nw0.debt + ', net £' + nw0.net + ') and pays it down on screen (debt now £' + nw1.debt + ')');
   await page.click('#themeBtn'); await page.waitForTimeout(250);
   ok(await page.evaluate(() => document.documentElement.getAttribute('data-theme') === 'light' && localStorage.getItem('vi-theme') === 'light' && getComputedStyle(document.body).backgroundColor === 'rgb(243, 247, 246)' && document.querySelector('meta[name=theme-color]').content === '#F3F7F6'), 'Daylight toggle applies, persists and recolours the browser chrome');
   ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scrolling in Daylight either');
