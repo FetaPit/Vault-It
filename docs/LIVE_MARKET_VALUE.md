@@ -29,9 +29,19 @@ Each wealth or liability item gets a **Value: manual / linked** switch. When lin
 - Linked values change net worth, so the change is shown ("+£120 since last week, gold price") and every figure has "Show working".
 - Prices are fetched by our server where a key is needed; keys live in Supabase secrets only.
 
+## Step 1 built (30 Oct 2026, branch `brand-rollout`)
+
+- Every wealth inventory tile has **Link to market value**. The pop-up offers: my own figure, precious metal by weight, or shares or a fund.
+- **Metal:** weight (grams or troy ounces) × purity (9ct to 24ct; sterling, Britannia, fine silver; 950 and 999 platinum and palladium) × the price per troy ounce in Precious metals. If nobody has fetched or typed a price, the item keeps your own figure and says so (the built-in starting price is never used as a valuation).
+- **Shares or a fund:** units × the price of a holding in Stocks and shares (live quote, your typed price, or your average cost, and it says which). Count units here or there, not in both.
+- The item's own figure is kept. Unlinking goes back to it, and it is shown whenever the link cannot be priced (holding removed, no price yet).
+- **Show working** on the tile: the sum, the source and when it was checked, the change since the reading about a week ago, your own figure and the guard-rail line.
+- Linked values count in Wealth inventory, total assets and net worth. Test: `tests/test_live_value.js`.
+- Not checked from the build sandbox: whether the metals price feed (`api.metals.live`) still answers. If it does not, typed prices in Precious metals still work.
+
 ## Needs Pete's yes
 
-- Build step 1 now? (no cost, no new host)
+- ~~Build step 1 now?~~ Yes, built 30 Oct.
 - Step 2 (Land Registry, server function and privacy line)?
 - Apply to eBay for step 3?
 

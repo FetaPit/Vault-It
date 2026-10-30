@@ -10,7 +10,7 @@ Branch `brand-rollout`. Done and pushed: colour code, Daylight polish, logo and 
 - Total assets: teal (done). Yahoo for the free beta: fine.
 - Poly Pizza: loads from the preview. 3D from photos: works. Image search was broken (LoremFlickr only returns one default photo since Flickr blocked it): replaced with Openverse.
 - Daylight was too bright: now off-white paper with a faint teal grid.
-- New feature asked for: link an asset to its live market value. Proposal: `docs/LIVE_MARKET_VALUE.md`.
+- New feature asked for: link an asset to its live market value. Step 1 built on `brand-rollout` (metal by weight, shares or a fund): `docs/LIVE_MARKET_VALUE.md`.
 - Still open: photo-to-3D provider (5), brass uses and "money owed to you" (7).
 
 ## For Pete to decide (original list)

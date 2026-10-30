@@ -11896,6 +11896,18 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 .wi-info{padding:8px 10px 10px}
 .wi-name{font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;color:var(--t1);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wi-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--gr)}
+.wi-link-btn{display:inline-block;margin-top:5px;font:600 .5rem 'DM Sans',sans-serif;padding:3px 7px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
+.wi-link-btn:hover,.wi-link-btn:focus-visible{background:rgb(var(--teal-rgb) / .24)}
+.wi-work{margin-top:5px;font-size:.5rem;color:var(--t2);line-height:1.45}
+.wi-work summary{cursor:pointer;color:var(--teal);font-weight:600}
+.wi-work>div{margin-top:3px;overflow-wrap:anywhere}
+.wi-src{color:var(--t2)}
+.wi-chg{color:var(--t1);font-weight:600}
+.wi-link-kinds{display:flex;flex-direction:column;gap:6px;margin:4px 0 12px;font-size:.62rem;color:var(--t1)}
+.wi-link-kinds label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.wi-link-prev{font:.6rem 'Share Tech Mono',monospace;color:var(--t1);background:rgb(var(--teal-rgb) / .08);border-radius:6px;padding:8px 10px;margin:10px 0;overflow-wrap:anywhere}
+#wi-link-card [hidden]{display:none!important}
+.wi-link-hint{font-size:.52rem;color:var(--t2);margin:6px 0 0}
 .wi-del{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.5);border:none;color:rgba(255,80,80,.6);font-size:.7rem;cursor:pointer;width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;line-height:1}
 .wi-del:hover{color:#ff4444;background:rgba(255,0,0,.15)}
 /* Icon picker */
@@ -18291,7 +18303,7 @@ function alTotalCrypto(){return alState.crypto.reduce(function(s,c){var a=(c.amo
 // cash = bank and savings accounts + the physical cash log (notes and coins at home, in a wallet, in a safe)
 function alTotalPhysical(){return (alState.physicalCash||[]).reduce(function(s,e){return s+(+e.amount||0);},0);}
 function alTotalCash(){return alState.cashAccounts.reduce(function(s,a){return s+a.balance;},0)+Math.max(0,alTotalPhysical());}
-function alTotalOther(){return alState.otherAssets.reduce(function(s,a){return s+a.value;},0);}
+function alTotalOther(){return (alState.otherAssets||[]).reduce(function(s,a){return s+wiValue(a);},0);}
 // ═══════════════════════════════════════════════════════════════
 // STOCKS & FUNDS — editable portfolios ("pies") with live prices
 // ═══════════════════════════════════════════════════════════════
@@ -19487,7 +19499,7 @@ function renderMetalsInputs(){
 }
 function metalValCell(k){var e=document.getElementById('metal-val-'+k);if(e)e.textContent=(window.VI_CURRENCY_SYMBOL||'\u00a3')+Math.round((alState.metals[k]||0)*(alState.metalPrices[k]||0)).toLocaleString('en-GB');}
 function updateMetal(k,v){alState.metals[k]=parseFloat(v)||0;metalValCell(k);saveAL();renderMetalsISO();updateKPIs();checkAchievements();}
-function updateMetalPrice(k,v){alState.metalPrices[k]=parseFloat(v)||0;metalValCell(k);saveAL();renderMetalsISO();updateKPIs();}
+function updateMetalPrice(k,v){alState.metalPrices[k]=parseFloat(v)||0;alState.metalPrices.manualAt=new Date().toISOString();metalValCell(k);saveAL();renderMetalsISO();updateKPIs();}
 // Keep backward compatibility aliases
 function setMetal(m,v){updateMetal(m,v);}
 function setMetalPrice(m,v){updateMetalPrice(m,v);}
@@ -19519,6 +19531,7 @@ function fetchMetalPrices(){
         else if(k==='platinum')alState.metalPrices.platinum=+(priceUSD*gbpRate).toFixed(2);
         else if(k==='palladium')alState.metalPrices.palladium=+(priceUSD*gbpRate).toFixed(2);
       });
+      alState.metalPrices.lastUpdated=new Date().toISOString();
       saveAL();renderAlTab();showToast('Metal prices updated \u2713');
     }).catch(function(){
       // Fallback: try exchangerate-based estimation
@@ -19650,12 +19663,14 @@ function renderAlTab(){
           +'</div>'
           +'<div class="wi-info">'
           +'<div class="wi-name" title="'+a.name+'">'+a.name+'</div>'
-          +'<div class="wi-val">£'+(a.value||0).toLocaleString('en-GB')+'</div>'
+          +'<div class="wi-val">'+wiMoney(wiValue(a))+'</div>'
+          +wiLinkHtml(a)
           +'</div>'
           +'<button class="wi-del" onclick="delOtherAsset('+a.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
           +'</div>';
       }).join('')+'</div>';
       try{invHydrate();}catch(e){console.error('[Vault-It] invHydrate',e);}
+      if(_wiSnapDirty){_wiSnapDirty=false;setTimeout(saveAL,0);}
     }
   }
 }
@@ -19744,6 +19759,148 @@ function invGet(id){return invTx('readonly',function(s){return s.get(String(id))
 function invPut(id,frames){delete _invCache[id];return invTx('readwrite',function(s){return s.put({frames:frames,updated:Date.now()},String(id));});}
 function invDel(id){delete _invCache[id];return invTx('readwrite',function(s){return s.delete(String(id));});}
 function invClearAll(){_invCache={};return invTx('readwrite',function(s){return s.clear();});}
+// ── Live market value, step 1 (docs/LIVE_MARKET_VALUE.md). A wealth item can be linked to:
+//   metal:   weight × purity × the metal price in Precious metals (per troy oz)
+//   holding: units × the live price of a holding in Stocks and shares
+// The item's own figure (a.value) is never overwritten: unlinking goes back to it, and it is used whenever a link cannot be priced.
+// functions, not vars: the totals can run before this part of the script has (startup order)
+function wiTroyG(){return 31.1034768;}
+function wiMetals(){return {gold:'Gold',silver:'Silver',platinum:'Platinum',palladium:'Palladium'};}
+function wiPurity(){return {
+  gold:[['24ct (999)',0.999],['22ct (916)',0.9167],['18ct (750)',0.75],['14ct (585)',0.585],['9ct (375)',0.375]],
+  silver:[['Fine (999)',0.999],['Britannia (958)',0.958],['Sterling (925)',0.925],['800',0.8]],
+  platinum:[['999',0.999],['950',0.95],['900',0.9]],
+  palladium:[['999',0.999],['950',0.95],['500',0.5]]
+};}
+function wiMoney(v){return (window.VI_CURRENCY_SYMBOL||'£')+Math.round((+v||0)*(window.VI_CURRENCY_RATE||1)).toLocaleString('en-GB');}
+function wiMoney2(v){return (window.VI_CURRENCY_SYMBOL||'£')+((+v||0)*(window.VI_CURRENCY_RATE||1)).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function wiWhen(t){if(!t)return '';var d=new Date(t);if(isNaN(d))return '';return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}
+// price of one troy oz and where it came from; null when nobody has fetched or typed one (the default is not a price)
+function wiMetalPrice(m){
+  var p=alState.metalPrices||{},px=+p[m]||0,live=p.lastUpdated?Date.parse(p.lastUpdated):0,own=p.manualAt?Date.parse(p.manualAt):0;
+  if(!(px>0)||(!live&&!own))return null;
+  return own>live?{px:px,src:'your price in Precious metals',at:own}:{px:px,src:'spot price',at:live};
+}
+// {v, ok, src, at, work, note} for a linked item; ok=false means the item's own figure is used
+function wiLinkInfo(a){
+  var L=a&&a.link;if(!L)return null;
+  var own=+a.value||0;
+  if(L.type==='metal'){
+    var g=(+L.grams||0),pur=+L.purity||0,mp=wiMetalPrice(L.metal),name=wiMetals()[L.metal]||'Metal';
+    if(!(g>0)||!(pur>0))return {v:own,ok:false,src:name,note:'Weight or purity missing: showing your own figure.'};
+    if(!mp)return {v:own,ok:false,src:name,note:'No '+name.toLowerCase()+' price yet. Fetch or type one in Precious metals: showing your own figure.'};
+    var fineOz=g*pur/wiTroyG(),v=fineOz*mp.px;
+    return {v:v,ok:true,src:name+' '+mp.src,at:mp.at,
+      work:(L.unit==='oz'?(+(g/wiTroyG()).toFixed(3))+' troy oz':(+g.toFixed(2))+' g')+' × '+(L.label||pur)+' purity = '+fineOz.toFixed(3)+' troy oz of fine '+name.toLowerCase()+' × '+wiMoney2(mp.px)+'/oz = '+wiMoney(v)};
+  }
+  if(L.type==='holding'){
+    var h=(alState.stocks||[]).find(function(x){return x.id===L.stockId;}),u=+L.units||0;
+    if(!h)return {v:own,ok:false,src:'Holding',note:'The linked holding is no longer in Stocks and shares: showing your own figure.'};
+    var px=stkPrice(h),sym=h.sym||h.name||'holding';
+    if(!(u>0)||!(px>0))return {v:own,ok:false,src:sym,note:'No price for '+sym+' yet: showing your own figure.'};
+    var live=+h.price>0&&!h.manualPrice,v2=u*px;
+    return {v:v2,ok:true,src:sym+(live?' live price':(+h.price>0?' price you typed':' average cost (no live price yet)')),at:live?h.updated:0,
+      work:(+u.toFixed(4))+' × '+wiMoney2(px)+' ('+sym+') = '+wiMoney(v2)};
+  }
+  return null;
+}
+function wiValue(a){var i=wiLinkInfo(a);return i?i.v:(+a.value||0);}
+// keep one reading a week old so the tile can say how much the linked value moved, and why
+function wiSnap(a,i){
+  if(!i||!i.ok)return null;var now=Date.now(),s=a.linkSnap;
+  if(!s||!(s.at>0)){a.linkSnap={v:i.v,at:now};_wiSnapDirty=true;return null;}
+  if(now-s.at>7*864e5){a.linkPrev=s;a.linkSnap={v:i.v,at:now};_wiSnapDirty=true;}
+  var p=a.linkPrev||a.linkSnap;if(now-p.at<864e5)return null;
+  var d=i.v-p.v;if(Math.abs(d)<0.5)return null;
+  return (d>0?'+':'-')+wiMoney(Math.abs(d))+' since '+new Date(p.at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+var _wiSnapDirty=false,_wiLinkId=null,_wiLinkReturn=null;
+function wiLinkHtml(a){
+  var i=wiLinkInfo(a),chg=i&&wiSnap(a,i);
+  var btn='<button class="wi-link-btn" type="button" onclick="wiLinkOpen('+a.id+')" aria-label="Value of '+cfEsc(a.name)+': '+(i?'linked':'your own figure')+'. Change">'+(i?(i.ok?'Linked':'Link paused'):'Link to market value')+'</button>';
+  if(!i)return btn;
+  return btn+'<details class="wi-work"><summary>Show working</summary>'
+    +(i.ok?'<div>'+cfEsc(i.work)+'</div><div class="wi-src">'+cfEsc(i.src)+(i.at?', checked '+wiWhen(i.at):'')+'</div>'+(chg?'<div class="wi-chg">'+chg+' ('+cfEsc(i.src)+')</div>':''):'<div>'+cfEsc(i.note)+'</div>')
+    +'<div class="wi-src">Your own figure: '+wiMoney(a.value)+'</div>'
+    +'<div class="wi-src">Estimated market value, not an offer or a valuation. Not financial advice.</div></details>';
+}
+function wiLinkModal(){
+  var m=document.getElementById('wi-link-modal');if(m)return m;
+  m=document.createElement('div');m.id='wi-link-modal';m.className='vi-pop';m.hidden=true;
+  m.setAttribute('onclick',"if(event.target===this)wiLinkClose()");m.setAttribute('onkeydown',"if(event.key==='Escape')wiLinkClose()");
+  m.innerHTML='<div id="wi-link-card" class="ov-data-card vi-pop-card" role="dialog" aria-modal="true" aria-labelledby="wi-link-title">'
+    +'<div class="vi-pop-hd"><div class="ov-data-title" id="wi-link-title">Value</div><button class="inv-x" type="button" onclick="wiLinkClose()" aria-label="Close"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg></button></div>'
+    +'<div class="wi-link-kinds" role="radiogroup" aria-label="How this item is valued">'
+    +'<label><input type="radio" name="wi-lk" value="manual" onchange="wiLinkKind()"> My own figure</label>'
+    +'<label><input type="radio" name="wi-lk" value="metal" onchange="wiLinkKind()"> Precious metal by weight</label>'
+    +'<label><input type="radio" name="wi-lk" value="holding" onchange="wiLinkKind()"> Shares or a fund</label></div>'
+    +'<div id="wi-lk-metal" class="g-form" hidden>'
+    +'<div><label class="ov-kpi-lbl" for="wl-metal">Metal</label><select id="wl-metal" class="al-inp" onchange="wiLinkPurity();wiLinkPreview()">'+Object.keys(wiMetals()).map(function(k){return '<option value="'+k+'">'+wiMetals()[k]+'</option>';}).join('')+'</select></div>'
+    +'<div><label class="ov-kpi-lbl" for="wl-weight">Weight</label><input type="number" id="wl-weight" class="al-inp" min="0" step="any" inputmode="decimal" oninput="wiLinkPreview()"></div>'
+    +'<div><label class="ov-kpi-lbl" for="wl-unit">Unit</label><select id="wl-unit" class="al-inp" onchange="wiLinkPreview()"><option value="g">grams</option><option value="oz">troy ounces</option></select></div>'
+    +'<div><label class="ov-kpi-lbl" for="wl-purity">Purity</label><select id="wl-purity" class="al-inp" onchange="wiLinkPreview()"></select></div></div>'
+    +'<div id="wi-lk-holding" class="g-form" hidden>'
+    +'<div><label class="ov-kpi-lbl" for="wl-stock">Holding</label><select id="wl-stock" class="al-inp" onchange="wiLinkPreview()"></select></div>'
+    +'<div><label class="ov-kpi-lbl" for="wl-units">Units</label><input type="number" id="wl-units" class="al-inp" min="0" step="any" inputmode="decimal" oninput="wiLinkPreview()"></div>'
+    +'<p class="wi-link-hint">The price comes from that holding in Stocks and shares. Count these units here or there, not in both.</p></div>'
+    +'<div id="wi-link-prev" class="wi-link-prev" aria-live="polite"></div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-add-data" type="button" onclick="wiLinkSave()">Save</button>'
+    +'<button class="btn-add-data" type="button" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="wiLinkClose()">Cancel</button></div>'
+    +'<div id="wi-link-msg" class="vi-pop-msg" role="alert"></div>'
+    +'<p class="wi-link-hint">Estimated market value, not an offer or a valuation. Not financial advice.</p></div>';
+  document.body.appendChild(m);return m;
+}
+function wiLinkPurity(sel){
+  var m=document.getElementById('wl-metal').value,p=document.getElementById('wl-purity');
+  p.innerHTML=(wiPurity()[m]||[]).map(function(o){return '<option value="'+o[1]+'">'+o[0]+'</option>';}).join('');
+  if(sel!=null){for(var i=0;i<p.options.length;i++)if(Math.abs(+p.options[i].value-sel)<1e-4)p.selectedIndex=i;}
+}
+function wiLinkKind(){
+  var k=(document.querySelector('input[name="wi-lk"]:checked')||{}).value||'manual';
+  document.getElementById('wi-lk-metal').hidden=k!=='metal';document.getElementById('wi-lk-holding').hidden=k!=='holding';
+  document.getElementById('wi-link-msg').textContent='';wiLinkPreview();
+}
+function wiLinkRead(){
+  var k=(document.querySelector('input[name="wi-lk"]:checked')||{}).value||'manual';
+  if(k==='metal'){var w=parseFloat(document.getElementById('wl-weight').value),u=document.getElementById('wl-unit').value,ps=document.getElementById('wl-purity');
+    return {type:'metal',metal:document.getElementById('wl-metal').value,unit:u,grams:w>0?(u==='oz'?w*wiTroyG():w):0,purity:+ps.value,label:ps.options[ps.selectedIndex]?ps.options[ps.selectedIndex].text:''};}
+  if(k==='holding'){var s=document.getElementById('wl-stock').value,un=parseFloat(document.getElementById('wl-units').value);return {type:'holding',stockId:s===''?null:+s,units:un>0?un:0};}
+  return null;
+}
+function wiLinkPreview(){
+  var a=invItem(_wiLinkId),el=document.getElementById('wi-link-prev');if(!a||!el)return;
+  var L=wiLinkRead();if(!L){el.textContent='Shown as your own figure: '+wiMoney(a.value)+'.';return;}
+  var i=wiLinkInfo({value:a.value,link:L});
+  el.textContent=i.ok?i.work+' ('+i.src+(i.at?', checked '+wiWhen(i.at):'')+')':i.note;
+}
+function wiLinkOpen(id){
+  var a=invItem(id);if(!a)return;_wiLinkId=id;_wiLinkReturn=document.activeElement;
+  var m=wiLinkModal(),L=a.link||{};
+  document.getElementById('wi-link-title').textContent='Value of '+a.name;
+  var st=document.getElementById('wl-stock'),hs=alState.stocks||[];
+  st.innerHTML=hs.length?hs.map(function(h){return '<option value="'+h.id+'">'+cfEsc((h.sym||'')+(h.name&&h.name!==h.sym?' · '+h.name:''))+'</option>';}).join(''):'<option value="">No holdings in Stocks and shares yet</option>';
+  document.getElementById('wl-metal').value=L.metal||'gold';wiLinkPurity(L.purity);
+  document.getElementById('wl-unit').value=L.unit||'g';
+  document.getElementById('wl-weight').value=L.grams?(L.unit==='oz'?+(L.grams/wiTroyG()).toFixed(4):+(+L.grams).toFixed(3)):'';
+  if(L.stockId!=null)st.value=String(L.stockId);document.getElementById('wl-units').value=L.units||'';
+  var k=L.type||'manual';document.querySelector('input[name="wi-lk"][value="'+k+'"]').checked=true;
+  m.hidden=false;document.body.classList.add('vi-pop-open');wiLinkKind();
+  setTimeout(function(){var f=document.querySelector('input[name="wi-lk"]:checked');if(f)f.focus();},30);
+}
+function wiLinkClose(){
+  var m=document.getElementById('wi-link-modal');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');
+  var back=_wiLinkReturn;_wiLinkReturn=null;_wiLinkId=null;if(back&&back.focus)setTimeout(function(){try{back.focus();}catch(e){}},0);
+}
+function wiLinkSave(){
+  var a=invItem(_wiLinkId),msg=document.getElementById('wi-link-msg');if(!a)return;
+  var L=wiLinkRead();
+  if(L&&L.type==='metal'&&!(L.grams>0)){msg.textContent='Enter the weight.';document.getElementById('wl-weight').focus();return;}
+  if(L&&L.type==='holding'&&L.stockId==null){msg.textContent='Add the holding in Stocks and shares first.';return;}
+  if(L&&L.type==='holding'&&!(L.units>0)){msg.textContent='Enter how many units.';document.getElementById('wl-units').focus();return;}
+  if(L){a.link=L;a.linkSnap=null;a.linkPrev=null;}else{delete a.link;delete a.linkSnap;delete a.linkPrev;}
+  saveAL();wiLinkClose();renderAlTab();updateKPIs();
+  showToast(L?'Value linked':'Back to your own figure');
+}
 function invItem(id){return (alState.otherAssets||[]).find(function(x){return x.id===id;});}
 
 // resize + compress a photo (keeps orientation); returns a JPEG Blob
