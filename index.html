@@ -16953,7 +16953,7 @@ var CONNS=[
 
 // ── INIT ──
 // Load AL state
-try{var _als=localStorage.getItem(AL_KEY);if(_als){var _alp=JSON.parse(_als);alState=Object.assign(alState,_alp);if(_alp.metals)alState.metals=Object.assign(alState.metals,_alp.metals);if(_alp.metalPrices)alState.metalPrices=Object.assign(alState.metalPrices,_alp.metalPrices);if(_alp.crypto)alState.crypto=_alp.crypto;if(_alp.cashAccounts)alState.cashAccounts=_alp.cashAccounts;if(_alp.otherAssets)alState.otherAssets=_alp.otherAssets;if(_alp.liabilities)alState.liabilities=_alp.liabilities;}}catch(e){}
+try{var _als=localStorage.getItem(AL_KEY);if(_als){var _alp=JSON.parse(_als);alState=Object.assign(alState,_alp);alNormalise();if(_alp.metals)alState.metals=Object.assign(alState.metals,_alp.metals);if(_alp.metalPrices)alState.metalPrices=Object.assign(alState.metalPrices,_alp.metalPrices);if(_alp.crypto)alState.crypto=_alp.crypto;if(_alp.cashAccounts)alState.cashAccounts=_alp.cashAccounts;if(_alp.otherAssets)alState.otherAssets=_alp.otherAssets;if(_alp.liabilities)alState.liabilities=_alp.liabilities;}}catch(e){}
 // Load Debt state (only override if saved data exists)
 try{var _ds=localStorage.getItem(DEBT_KEY);if(_ds)debtState=JSON.parse(_ds);}catch(e){}
 // Load Biz state
@@ -16970,6 +16970,9 @@ alState.liabilities=(alState.liabilities||[]).map(function(l){
   return Object.assign({depRate:0,runningCost:0,addedDate:new Date().toISOString()},l);
 });
 // Migrate other assets to add image fields
+// Saved metals can lack a metal (older builds, a partial sync): fill the gaps, or every total above them turns into nothing.
+function alNormalise(){alState.metals=Object.assign({gold:0,silver:0,platinum:0,palladium:0},alState.metals||{});alState.metalPrices=Object.assign({gold:1950,silver:23.5,platinum:1020,palladium:1100},alState.metalPrices||{});}
+alNormalise();
 alState.otherAssets=(alState.otherAssets||[]).map(function(a){
   return Object.assign({image:null,svgIcon:null,imageSearch:null},a);
 });
@@ -17399,7 +17402,7 @@ function _reloadAllState() {
     if(_hs){ var _hp=JSON.parse(_hs); state=Object.assign(state,_hp); state.prices=Object.assign({},DEFAULTS,_hp.prices||{}); if(!state.apartmentFloor)state.apartmentFloor=5; if(typeof updateUI==='function')updateUI(); }
   } catch(e) {}
   try { var _s=localStorage.getItem(OV_KEY); if(_s){ var _sp=JSON.parse(_s); ovState=Object.assign(ovState,_sp); } } catch(e) {}
-  try { var _als=localStorage.getItem(AL_KEY); if(_als){ var _alp=JSON.parse(_als); alState=Object.assign(alState,_alp); if(_alp.metals)alState.metals=Object.assign(alState.metals,_alp.metals); if(_alp.metalPrices)alState.metalPrices=Object.assign(alState.metalPrices,_alp.metalPrices); if(_alp.crypto)alState.crypto=_alp.crypto; if(_alp.cashAccounts)alState.cashAccounts=_alp.cashAccounts; if(_alp.otherAssets)alState.otherAssets=_alp.otherAssets; if(_alp.liabilities)alState.liabilities=_alp.liabilities; } } catch(e) {}
+  try { var _als=localStorage.getItem(AL_KEY); if(_als){ var _alp=JSON.parse(_als); alState=Object.assign(alState,_alp);alNormalise(); if(_alp.metals)alState.metals=Object.assign(alState.metals,_alp.metals); if(_alp.metalPrices)alState.metalPrices=Object.assign(alState.metalPrices,_alp.metalPrices); if(_alp.crypto)alState.crypto=_alp.crypto; if(_alp.cashAccounts)alState.cashAccounts=_alp.cashAccounts; if(_alp.otherAssets)alState.otherAssets=_alp.otherAssets; if(_alp.liabilities)alState.liabilities=_alp.liabilities; } } catch(e) {}
   try { var _dsr=localStorage.getItem(DEBT_KEY); if(_dsr) debtState=JSON.parse(_dsr); } catch(e) {}
   try { var _bsr=localStorage.getItem(BIZ_KEY); if(_bsr) bizState=JSON.parse(_bsr); if(!bizState.leads)bizState.leads=[]; } catch(e) {}
   try { var _asr=localStorage.getItem(ACH_KEY); if(_asr){ var _asp=JSON.parse(_asr); achState=Object.assign(achState,_asp); } } catch(e) {}
@@ -18935,7 +18938,7 @@ function renderCashflowCategories(){
 // ═══════════════════════════════════════════════════════════════
 // alState declared above init block
 function saveAL(){try{localStorage.setItem(AL_KEY,JSON.stringify(alState));}catch(e){}if(typeof checkAchievements==='function')checkAchievements();}
-function alTotalMetals(){var m=alState.metals,p=alState.metalPrices;return m.gold*p.gold+m.silver*p.silver+m.platinum*p.platinum+m.palladium*p.palladium;}
+function alTotalMetals(){var m=alState.metals||{},p=alState.metalPrices||{};return ['gold','silver','platinum','palladium'].reduce(function(s,k){return s+(+m[k]||0)*(+p[k]||0);},0);}
 function alTotalCrypto(){return alState.crypto.reduce(function(s,c){var a=(c.amount!=null?c.amount:(c.qty!=null?c.qty:0))||0;var p=c.price||0;return s+a*p;},0);}
 // cash = bank and savings accounts + the physical cash log (notes and coins at home, in a wallet, in a safe)
 function alTotalPhysical(){return (alState.physicalCash||[]).reduce(function(s,e){return s+(+e.amount||0);},0);}
