@@ -10,12 +10,12 @@ The single list of instructed work. Every session reads it at start and before e
 ## Open
 
 - [ ] Subscription pop-up: adjust to the monetisation model once the owner decides (owner's ask, 30 Oct; blocked on the outline above)
-- [ ] Apply the brand book to the e-mail comms (owner's ask, 30 Oct): sign-in code, beta list confirm and welcome e-mails in `supabase/functions/`; templates first, deploy only with the owner's explicit yes
 - [ ] Net worth 3D viewer (owner, 30 Oct 22:03, queued): stack every credit card in one column, one on top of the other, each keeping its own card colour; a loan is a different kind of debt and gets its own column beside the credit cards (same rule for other debt types); and the dashboard viewport must zoom in and out and orbit, not just turn
 - [ ] Mobile navigation (owner, 30 Oct 22:03, queued): on phones the tab icons move to a bar fixed at the bottom of the screen, always visible; and the Integrations tab leaves the menu bar in every view and lives in Settings in the sidebar instead
 
 ## Waiting on the owner
 
+- Deploy the branded e-mails: `send-auth-email`, `waitlist-join`, `waitlist-welcome` (templates committed; previews in the session reply). Needs an explicit yes, then `supabase functions deploy <name> --no-verify-jwt` or the Supabase connector
 - Monetisation (decision doc `docs/MONETISATION_DECISION.md`, evidence `docs/research/freemium_vs_paid.md`): four answers needed. 1 model: trial then paid (recommended) or Simplified free / Advanced paid; 2 trial length 30 or 14 days; 3 Simplified by default for new accounts and the tab split in section 3; 4 testers: free until beta ends then 30 days' notice, or Founding offer first. Then: pop-up and Settings copy, Simplified/Advanced switch, trial clock with read-only vault, tester welcome message
 - Custom welcome message for testers: the wording from the owner (a draft is in the session reply); then wire it to the first run for beta accounts
 - Metals price feed (`api.metals.live`): the sandbox cannot reach it (host not in the session's allowed network domains). Check it from a browser, or allow the host in the environment's network settings and ask again
@@ -29,6 +29,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Brand book applied to the e-mail comms: sign-in code, beta list confirm and welcome e-mails share one inline brand shell (Night palette, wordmark with the brick hyphen, tagline, FCA line and trader address in the footer); welcome subject loses its em dash; plain-text footers carry the FCA line (this commit; deploy waits on the owner)
 - [x] QA defect 1 (30 Oct): the "light band with invisible text" under the house viewer was the fixed app footer, not the viewer caption; its type was 5.5 px. Footer type now floors at 10 px (FCA line 11 px), wraps to two rows on phones (copyright text hidden there, the logo still names PT Live Design), page and toast clear its height (this commit)
 - [x] Copy pass: em dashes reworded across the app (`fa1e069`, 515 to 221; the rest are code comments); `tests/test_copy.js` keeps them out of user-facing text
 - [x] QA list (handover section 9) in both themes at 390 and 1100 px, plus 320/360/390/412 scroll probe: `docs/qa/QA_30OCT.md`; two defects noted (Daylight statusline strip, 3D cash stage first frame)

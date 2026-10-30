@@ -151,3 +151,13 @@ supabase functions deploy waitlist-join --no-verify-jwt
 ```
 Tests: `tests/test_waitlist_server.js` (function), `tests/test_009.mjs` (SQL on pglite), `tests/test_signup_page.js` (pages in a browser).
 
+
+## E-mail templates (brand, 30 Oct 2026)
+
+`send-auth-email` (sign-in code), `waitlist-join` (beta list confirm) and `waitlist-welcome` (older single-step welcome) share the same inline
+`brandShell()`: Night palette from the brand book (background `#080808`, card `#080D14`, text `#E8E8E8`, teal `#44C0B9`, gold button `#E8C56A`),
+the Vault-It wordmark with the brick as the hyphen, the tagline, and a footer with "Not regulated by the FCA. Not financial advice." and the trader
+address. Tables and inline styles only; no web fonts or images, so nothing is fetched when an e-mail opens (Syne, DM Sans and Share Tech Mono are
+named first in the font stacks and used where installed). The shell is pasted into each function rather than imported, because the server tests
+transform each `index.ts` on its own. Preview: `node shots/_email_preview.js` after copying it from the session scratchpad, or render the
+functions' HTML with the tests' esbuild stub. Deploying the three functions is a production change and needs the owner's explicit yes.

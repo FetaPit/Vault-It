@@ -94,53 +94,42 @@ async function verifyTurnstile(token: string, ip: string): Promise<'ok' | 'fail'
   } catch (e) { console.error('turnstile siteverify failed:', e); return 'unreachable' }
 }
 
+// Brand shell for e-mails (Night palette from the brand book, inline styles, tables; no web fonts or images, so nothing is fetched when the e-mail opens).
+function brandShell(title: string, body: string, footer: string): string {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>${title}</title></head>
+<body style="margin:0;padding:0;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#080808;padding:36px 16px"><tr><td align="center">
+<table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:#080D14;border:1px solid #15302F;border-radius:18px;max-width:520px;width:100%">
+<tr><td style="padding:28px 36px 18px;border-bottom:1px solid #102221">
+<div style="font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1;color:#E8E8E8">Vault<span style="display:inline-block;width:8px;height:4px;background:#44C0B9;border-radius:1px;margin:0 2px;vertical-align:middle;position:relative;top:-2px"></span><span style="color:#44C0B9">It</span></div>
+<div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div>
+</td></tr>
+<tr><td style="padding:26px 36px 10px">${body}</td></tr>
+<tr><td style="padding:16px 36px 26px;border-top:1px solid #102221">
+<p style="margin:0 0 8px;font-size:12px;color:#E8E8E8">Not regulated by the FCA. Not financial advice.</p>
+<p style="margin:0;font-size:11px;line-height:1.6;color:#9AA0A6">${footer}</p>
+</td></tr>
+</table></td></tr></table></body></html>`
+}
+const EYEBROW = "margin:0 0 8px;font-family:'Share Tech Mono',Menlo,Consolas,'Courier New',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#44C0B9"
+const H1 = "margin:0 0 14px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8"
+const P = "margin:0 0 18px;font-size:15px;line-height:1.6;color:#9AA0A6"
+const SMALL = "margin:0 0 8px;font-size:12px;line-height:1.6;color:#9AA0A6"
+const BTN = "display:inline-block;background:#E8C56A;color:#1A1400;text-decoration:none;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:15px 24px;border-radius:10px"
+const TRADER = 'Vault-It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5 7EQ · <a href="mailto:hello@vault-it.co" style="color:#44C0B9">hello@vault-it.co</a>'
+
 function emailHtml(otpCode: string, email: string): string {
   email = esc(email)
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sign in to Vault-It</title>
-</head>
-<body style="margin:0;padding:0;background:#04090f;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#04090f;padding:40px 20px">
-  <tr><td align="center">
-    <table width="520" cellpadding="0" cellspacing="0" style="background:#060d16;border:1px solid rgba(68,192,185,.18);border-radius:16px;overflow:hidden;max-width:520px;width:100%">
-      <!-- Header -->
-      <tr><td style="background:linear-gradient(135deg,#060d16,#0a1520);padding:36px 40px 28px;text-align:center;border-bottom:1px solid rgba(68,192,185,.12)">
-        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;letter-spacing:.12em;color:#c9a84c">VAULT-IT</div>
-        <div style="font-size:10px;color:rgba(68,192,185,.7);letter-spacing:.18em;margin-top:4px">SECURE FINANCIAL INTELLIGENCE</div>
-      </td></tr>
-      <!-- Body -->
-      <tr><td style="padding:36px 40px">
-        <p style="margin:0 0 8px;font-size:13px;color:rgba(255,255,255,.45);letter-spacing:.06em">YOUR SIGN-IN CODE</p>
-        <h1 style="margin:0 0 20px;font-size:24px;font-weight:700;color:#f0f4f8;line-height:1.3">Open your Vault</h1>
-        <p style="margin:0 0 28px;font-size:15px;color:rgba(255,255,255,.6);line-height:1.6">
-          Enter this code on the Vault-It sign-in screen for <strong style="color:#e8edf2">${email}</strong>.<br>
-          The code expires in <strong style="color:#44c0b9">60 minutes</strong> and can only be used once.
-        </p>
-        <!-- OTP Code Block -->
-        <table cellpadding="0" cellspacing="0" style="margin:0 auto 28px;width:100%">
-          <tr><td style="text-align:center">
-            <div style="display:inline-block;background:rgba(68,192,185,.08);border:2px solid rgba(68,192,185,.35);border-radius:12px;padding:20px 40px">
-              <div style="font-size:11px;color:rgba(68,192,185,.6);letter-spacing:.18em;margin-bottom:10px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">ENTER THIS CODE</div>
-              <div style="font-size:40px;font-weight:800;letter-spacing:.25em;color:#f0f4f8;font-family:'Courier New',Courier,monospace;line-height:1">${otpCode}</div>
-            </div>
-          </td></tr>
-        </table>
-        <p style="margin:0;font-size:12px;color:rgba(255,255,255,.3);text-align:center">Type or copy the code above into the Vault-It app</p>
-      </td></tr>
-      <!-- Footer -->
-      <tr><td style="padding:20px 40px 28px;border-top:1px solid rgba(68,192,185,.08);text-align:center">
-        <p style="margin:0 0 6px;font-size:11px;color:rgba(255,255,255,.2)">You received this because a sign-in was requested for this email address.</p>
-        <p style="margin:0;font-size:11px;color:rgba(255,255,255,.15)">If you didn't request this, you can safely ignore it. Your vault remains locked.</p>
-      </td></tr>
-    </table>
-  </td></tr>
-</table>
-</body>
-</html>`
+  const body = `<p style="${EYEBROW}">Your sign-in code</p>
+<h1 style="${H1}">Open your vault</h1>
+<p style="${P}">Enter this code on the Vault-It sign-in screen for <strong style="color:#E8E8E8">${email}</strong>. It expires in <strong style="color:#44C0B9">60 minutes</strong> and works once.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 18px"><tr><td style="background:#080808;border:1px solid #15302F;border-radius:12px;padding:18px 32px;text-align:center">
+<div style="${EYEBROW};margin:0 0 10px">Enter this code</div>
+<div style="font-family:'Share Tech Mono',Menlo,Consolas,'Courier New',monospace;font-size:38px;letter-spacing:.22em;line-height:1;color:#E8E8E8">${otpCode}</div>
+</td></tr></table>
+<p style="${SMALL};text-align:center">Type or paste it into the app.</p>`
+  const footer = `You received this because a sign-in was requested for this address. If that was not you, ignore this e-mail: your vault stays locked.<br>${TRADER}`
+  return brandShell('Sign in to Vault-It', body, footer)
 }
 
 Deno.serve(async (req: Request) => {

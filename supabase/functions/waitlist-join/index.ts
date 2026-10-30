@@ -89,21 +89,39 @@ async function verifyTurnstile(token: string, ip: string): Promise<'ok' | 'fail'
   } catch (e) { console.error('turnstile siteverify failed:', e); return 'unreachable' }
 }
 
+// Brand shell for e-mails (Night palette from the brand book, inline styles, tables; no web fonts or images, so nothing is fetched when the e-mail opens).
+function brandShell(title: string, body: string, footer: string): string {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>${title}</title></head>
+<body style="margin:0;padding:0;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#080808;padding:36px 16px"><tr><td align="center">
+<table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:#080D14;border:1px solid #15302F;border-radius:18px;max-width:520px;width:100%">
+<tr><td style="padding:28px 36px 18px;border-bottom:1px solid #102221">
+<div style="font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1;color:#E8E8E8">Vault<span style="display:inline-block;width:8px;height:4px;background:#44C0B9;border-radius:1px;margin:0 2px;vertical-align:middle;position:relative;top:-2px"></span><span style="color:#44C0B9">It</span></div>
+<div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div>
+</td></tr>
+<tr><td style="padding:26px 36px 10px">${body}</td></tr>
+<tr><td style="padding:16px 36px 26px;border-top:1px solid #102221">
+<p style="margin:0 0 8px;font-size:12px;color:#E8E8E8">Not regulated by the FCA. Not financial advice.</p>
+<p style="margin:0;font-size:11px;line-height:1.6;color:#9AA0A6">${footer}</p>
+</td></tr>
+</table></td></tr></table></body></html>`
+}
+const EYEBROW = "margin:0 0 8px;font-family:'Share Tech Mono',Menlo,Consolas,'Courier New',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#44C0B9"
+const H1 = "margin:0 0 14px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8"
+const P = "margin:0 0 18px;font-size:15px;line-height:1.6;color:#9AA0A6"
+const SMALL = "margin:0 0 8px;font-size:12px;line-height:1.6;color:#9AA0A6"
+const BTN = "display:inline-block;background:#E8C56A;color:#1A1400;text-decoration:none;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:15px 24px;border-radius:10px"
+const TRADER = 'Vault-It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5 7EQ · <a href="mailto:hello@vault-it.co" style="color:#44C0B9">hello@vault-it.co</a>'
+
 function confirmHtml(email: string, link: string, unsub: string, testing: boolean): string {
   const e = esc(email), l = esc(link), u = esc(unsub)
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Confirm your place on the Vault-It beta list</title></head>
-<body style="margin:0;padding:0;background:#04090f;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#04090f;padding:36px 16px"><tr><td align="center">
-<table width="520" cellpadding="0" cellspacing="0" style="background:#060d16;border:1px solid rgba(68,192,185,.18);border-radius:16px;max-width:520px;width:100%">
-<tr><td style="padding:32px 36px 8px;text-align:center"><div style="font-size:20px;font-weight:800;letter-spacing:.12em;color:#c9a84c">VAULT-IT</div></td></tr>
-<tr><td style="padding:18px 36px 8px">
-<h1 style="margin:0 0 14px;font-size:22px;color:#f0f4f8;line-height:1.3">One click to confirm</h1>
-<p style="margin:0 0 22px;font-size:15px;color:rgba(255,255,255,.7);line-height:1.6">Someone (hopefully you) asked to join the Vault-It beta list with <strong style="color:#e8edf2">${e}</strong>.${testing ? ' Confirm and we will send you the link to start testing.' : ''}</p>
-<p style="margin:0 0 26px;text-align:center"><a href="${l}" style="display:inline-block;background:#c9a84c;color:#04090f;text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:10px">Confirm my place</a></p>
-<p style="margin:0 0 8px;font-size:12px;color:rgba(255,255,255,.45);line-height:1.6">The link works for 7 days. If you did not ask for this, ignore this e-mail: you will not hear from us again and the request is deleted after 30 days.</p>
-</td></tr>
-<tr><td style="padding:16px 36px 26px;border-top:1px solid rgba(68,192,185,.08)"><p style="margin:0;font-size:11px;color:rgba(255,255,255,.35);line-height:1.6">Vault-It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5 7EQ · <a href="mailto:hello@vault-it.co" style="color:rgba(68,192,185,.8)">hello@vault-it.co</a> · <a href="${u}" style="color:rgba(68,192,185,.8)">Remove me from the list</a></p></td></tr>
-</table></td></tr></table></body></html>`
+  const body = `<p style="${EYEBROW}">Beta list</p>
+<h1 style="${H1}">One click to confirm</h1>
+<p style="${P}">Someone (hopefully you) asked to join the Vault-It beta list with <strong style="color:#E8E8E8">${e}</strong>.${testing ? ' Confirm and we will send you the link to start testing.' : ''}</p>
+<p style="margin:0 0 22px;text-align:center"><a href="${l}" style="${BTN}">Confirm my place</a></p>
+<p style="${SMALL}">The link works for 7 days. If you did not ask for this, ignore this e-mail: you will not hear from us again and the request is deleted after 30 days.</p>`
+  const footer = `${TRADER} · <a href="${u}" style="color:#44C0B9">Remove me from the list</a>`
+  return brandShell('Confirm your place on the Vault-It beta list', body, footer)
 }
 
 Deno.serve(async (req: Request) => {
@@ -176,7 +194,7 @@ Deno.serve(async (req: Request) => {
     body: JSON.stringify({
       from: FROM_EMAIL, to: [email], subject: 'Confirm your place on the Vault-It beta list',
       html: confirmHtml(email, link, unsub, testing),
-      text: `Confirm your place on the Vault-It beta list: ${link}\n\nThe link works for 7 days. If you did not ask for this, ignore this e-mail.\nRemove me: ${unsub}\n\nVault-It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ · hello@vault-it.co`,
+      text: `Confirm your place on the Vault-It beta list: ${link}\n\nThe link works for 7 days. If you did not ask for this, ignore this e-mail.\nRemove me: ${unsub}\n\nVault-It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ · hello@vault-it.co\nNot regulated by the FCA. Not financial advice.`,
       headers: { 'List-Unsubscribe': `<${unsub}>` },
     }),
   })
