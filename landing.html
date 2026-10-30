@@ -311,7 +311,7 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
       <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required maxlength="254" />
       <button class="btn btn-gold" type="submit" id="go">Join the beta list</button>
     </div>
-    <label class="check"><input type="checkbox" id="testing" checked /> <span>I’d like to test the app — send me the link and tester tips.</span></label>
+    <label class="check"><input type="checkbox" id="testing" checked /> <span>I’d like to test the app. Send me the link and tester tips.</span></label>
     <label class="check"><input type="checkbox" id="marketing" /> <span>Also email me product news and the founding-member offer. Optional; unsubscribe any time.</span></label>
     <div id="cf-box"></div>
     <div class="msg" id="msg" role="status" aria-live="polite"></div>
@@ -335,7 +335,7 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
   <div class="grid g3">
     <div class="card"><h3>Overview</h3><p>Your net worth, assets and debts at a glance, with history as you update it.</p></div>
     <div class="card"><h3>Budget &amp; cash flow</h3><p>Income and spending by category, with a diagram of where the money goes each month.</p></div>
-    <div class="card"><h3>House Builder</h3><p>The 3D house that grows with your deposit — terraced, semi, detached, flat and more.</p></div>
+    <div class="card"><h3>House Builder</h3><p>The 3D house that grows with your deposit: terraced, semi, detached, flat and more.</p></div>
     <div class="card"><h3>Assets &amp; liabilities</h3><p>Cash, shares and funds, metals, crypto and possessions, alongside what you owe.</p></div>
     <div class="card"><h3>Debt tracker</h3><p>Every debt in one list and a payoff order you choose, with a projected debt-free date.</p></div>
     <div class="card"><h3>Roadmap</h3><p>Stages from clearing debt to owning your home, with milestones as you reach them.</p></div>
@@ -355,7 +355,7 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
   <div>
     <h2>What we ask of testers</h2>
     <ul class="ticks">
-      <li>Use it on your phone or laptop — made-up figures are fine.</li>
+      <li>Use it on your phone or laptop. Made-up figures are fine.</li>
       <li>Tell us what is confusing, broken, slow or ugly.</li>
       <li>Answer the odd short question by email when we ask.</li>
     </ul>
@@ -366,7 +366,7 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
   <h2>Your data, plainly</h2>
   <div class="grid g2">
     <div class="card"><h3>No bank login, ever</h3><p>You type everything in. Vault-It does not connect to your bank and never asks for your banking details.</p></div>
-    <div class="card"><h3>Stored in the EU</h3><p>Your account is held by Supabase in Frankfurt, encrypted in transit and at rest. It is not end-to-end encrypted — the <a href="https://app.vault-it.co/?privacy=1">privacy notice</a> explains exactly who can see what.</p></div>
+    <div class="card"><h3>Stored in the EU</h3><p>Your account is held by Supabase in Frankfurt, encrypted in transit and at rest. It is not end-to-end encrypted. The <a href="https://app.vault-it.co/?privacy=1">privacy notice</a> explains exactly who can see what.</p></div>
     <div class="card"><h3>Yours to take or delete</h3><p>Download all your data, or delete your account and everything in it, yourself in Settings at any time.</p></div>
     <div class="card"><h3>How we make money</h3><p>From paid plans after the beta, starting at £5.99 a month. We do not sell your data, and these pages carry no ad trackers.</p></div>
   </div>
@@ -537,8 +537,8 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
     e.preventDefault();
     if (busy) return;
     var email = document.getElementById('email').value.trim();
-    if (!EMAIL_RE.test(email) || email.length > 254) { say('Please check your email address — it doesn’t look complete.', 'err'); document.getElementById('email').focus(); return; }
-    if (tsOn() && window.turnstile && tsWidget !== null && !tsToken) { say('One moment — the “are you human” check is still running. Try again in a few seconds.', 'err'); return; }
+    if (!EMAIL_RE.test(email) || email.length > 254) { say('Please check your email address. It doesn’t look complete.', 'err'); document.getElementById('email').focus(); return; }
+    if (tsOn() && window.turnstile && tsWidget !== null && !tsToken) { say('One moment. The “are you human” check is still running. Try again in a few seconds.', 'err'); return; }
     busy = true; btn.disabled = true; say('Sending…');
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 15000);
@@ -555,14 +555,14 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
         location.href = 'sign-up/thanks';
         return;
       }
-      if (r.s === 400) say('Please check your email address — it doesn’t look right.', 'err');
+      if (r.s === 400) say('Please check your email address. It doesn’t look right.', 'err');
       else if (r.s === 429) say('Too many tries from here for now. Please wait ' + Math.max(1, Math.ceil((r.b.retryAfter || 600) / 60)) + ' minutes and try again.', 'err');
       else if (r.s === 403) say('The “are you human” check didn’t pass. Please try again.', 'err');
-      else say('Sorry — that didn’t go through and nothing was saved. Please try again, or email hello@vault-it.co.', 'err');
+      else say('Sorry, that didn’t go through and nothing was saved. Please try again, or email hello@vault-it.co.', 'err');
       throw 0;
     }).catch(function (err) {
       clearTimeout(timer);
-      if (err !== 0) say('Sorry — we couldn’t reach the server and nothing was saved. Please check your connection and try again.', 'err');
+      if (err !== 0) say('Sorry, we couldn’t reach the server and nothing was saved. Please check your connection and try again.', 'err');
       busy = false; btn.disabled = false;
       if (tsWidget !== null && window.turnstile) { try { window.turnstile.reset(tsWidget); } catch (e) {} tsToken = ''; }
     });

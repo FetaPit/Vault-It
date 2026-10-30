@@ -9,7 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [ ] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
+- [~] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
 - [ ] QA list (handover section 9) in both themes at 390 and 1100 px (the full suite ran for the 30 Oct release; the visual list is still to do)
 - [ ] Check the metals price feed (`api.metals.live`) from the preview; replace it if dead (needed by linked metal items)
 - [ ] Monetisation outline for the owner to decide on (owner's ask, 30 Oct): which features sit outside the Pro tier and the pricing strategy; a Simplified mode (hide some tabs/features) with the current app as Advanced mode, and which features and tabs belong to Advanced; whether a freemium tier adds or devalues, judged on the success and continued usage of freemium finance apps against paid ones (sources in `docs/research/`); testers stay free. Deliver as a short decision doc and prompt the owner
