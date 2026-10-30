@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] Release to production so the owner can test the install and offline shell on real devices tomorrow (owner's ask, 30 Oct: "Release so I can test the install tomorrow"; owner's order puts it first)
 - [ ] House builder brand build follow-ups (from the 30 Oct review): section 6.8 feedback ("+£5 · +4 bricks" pop-ups, stage flash, milestone toasts), a radial window glow at night, and a real-device speed check of the lite fallback
 - [ ] Remove the Classic switches from Settings after 6 Nov 2026 (one week), if nobody needs them
 - [ ] Level 2 Octalysis slice still open: real mortgage entry at purchase, overpayment what-ifs in the Level 2 panel (`docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md`; the build rule, payments, reset and undo were done 30 Oct)
