@@ -50,6 +50,8 @@ Two different uses:
 3. **Built-in starter set:** curated with the MCP servers in a build session, so the most common items work offline.
 4. **Photo-to-3D (Tripo, Meshy or Hyper3D):** stays the "exactly my item" option.
 
+**Tested 30 Oct (live):** Poly Haven has 521 models. Good matches: wrist and pocket watches, cameras, a laptop, games consoles and controller, TVs, picture frames (art), vases, bronze and wooden statues, clocks, sofas and chairs. Missing: guitars (a ukulele only), bikes, cars, jewellery, handbags, shoes. Downloads are glTF; the smallest (1k textures) is about 2.2 MB a model, so load on demand, or shrink to a few hundred KB for the built-in set. Poly Pizza answers only with an API key (401 without).
+
 **To try it here:** this cloud session blocks these hosts. Allow `api.polyhaven.com`, `dl.polyhaven.org`, `api.poly.pizza` and `static.poly.pizza` in the environment's network settings, and create a Poly Pizza account and API key (add it as Supabase secret `POLYPIZZA_API_KEY`).
 
 Sources: [Poly Haven licence](https://polyhaven.com/license), [Poly Haven public API](https://github.com/Poly-Haven/Public-API), [Poly Pizza fact sheet](https://poly.pizza/docs/press), [Poly Pizza MCP](https://glama.ai/mcp/servers/MatthewHallCom/Poly-Pizza-MCP), [multi-source asset MCP](https://glama.ai/mcp/servers/jonit-dev/threenative-asset-mcp), [sketchfab-mcp-server](https://npmjs.com/package/sketchfab-mcp-server), [BlenderMCP](https://www.flowhunt.io/mcp-servers/blender), [Smithsonian Open Access 3D](https://www.si.edu/spotlight/openaccesshighlights).
