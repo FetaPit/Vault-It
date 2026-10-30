@@ -14,7 +14,7 @@ const scan = () => {
   const root = parse(getComputedStyle(document.body).backgroundColor);
   const bgOf = el => { const stack = []; for (let e = el; e; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.backgroundImage !== 'none' && e !== document.body && !/^linear-gradient\(rgba\(0, 127, 123/.test(cs.backgroundImage)) return null; const c = parse(cs.backgroundColor); if (c && c.a > 0) { stack.push(c); if (c.a >= .99) break; } } let bg = root; for (let i = stack.length - 1; i >= 0; i--) bg = blend(stack[i], bg); return bg; };
   const out = [];
-  document.querySelectorAll('.tab-panel *, #topnav *, footer *, .vi-fca').forEach(el => {
+  document.querySelectorAll('.tab-panel *, #topnav *, footer *, .vi-fca, #sync-banner *, .vi-pop:not([hidden]) *').forEach(el => {
     if (!el.offsetParent || el.closest('svg,canvas,[disabled],.scene,.inv-stage,.cc3-card,.cc3,[class*="cc3-"]')) return;
     if (el.tagName === 'INPUT' && /checkbox|radio|range|color/.test(el.type)) return; const isField = /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName);
     const txt = isField ? (el.value || '') : [...el.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join(' ').trim(); if (!txt) return;

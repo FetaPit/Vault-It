@@ -9545,6 +9545,9 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 /* primary buttons: white on teal */
 [data-theme="light"] .btn-add-data{color:var(--on-teal)!important;background:var(--btn1);border-color:var(--btn1)}
 [data-theme="light"] .btn-add-data:hover{background:var(--btn2)}
+/* secondary buttons (Cancel and the like): outline, ink text, AA on paper */
+[data-theme="light"] .btn-add-data[style*="color:var(--t3)"]{color:var(--text)!important;background:transparent!important;border-color:var(--lock)!important}
+[data-theme="light"] #sync-banner{color:var(--text)!important;border-color:var(--amber)!important}
 /* House builder: parchment text from the old tracker becomes ink */
 [data-theme="light"] .price-edit-row label,[data-theme="light"] .igrp label,[data-theme="light"] .tgt-amt,[data-theme="light"] .sl,[data-theme="light"] .log-entry,[data-theme="light"] .scene-cap:not(.scene *){color:var(--muted)!important;opacity:1!important}
 [data-theme="light"] .ms-lbl{color:var(--lock)!important;opacity:1!important}
