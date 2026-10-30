@@ -1,0 +1,9 @@
+<!-- claude-kit:start -->
+## Token budget (all projects)
+- Big files: use the session-start map or Grep, then Read with `offset`/`limit`. Never Read a file over about 800 lines whole.
+- Trim command output (`| tail -40`, `| grep`, `--quiet`). If `rtk` is installed, prefix noisy commands with it.
+- Replies: outcome first, short. Line refs or short diffs, not whole files. Don't restate the plan.
+- Delegate: `scout` (Haiku) for wide searches, `grunt` (Haiku) for exact mechanical edits, `architect` (Opus) only for deep explains and plans.
+- Plan mode runs on Opus, everything else on Sonnet. Use plan mode for research, plans and big refactors.
+- When the task changes, suggest `/handoff` and a fresh session. After an exploration phase, suggest `/compact`.
+<!-- claude-kit:end -->
