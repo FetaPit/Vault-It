@@ -1,4 +1,4 @@
-// Brand build on the 3D house builder (on by default since 30 Oct 2026; ?house=old or vi-flag-house = 0 gives the classic builder), brand handover 6.2 to 6.10.
+// Brand build on the 3D house builder (behind ?house=new or vi-flag-house = 1; the classic hologram viewer is the default again since 30 Oct 2026 22:02), brand handover 6.2 to 6.10.
 // Flag off: the current builder, unchanged. Flag on: brick value = deposit target x 0.77 / bricks, bricks laid =
 // floor(bricks x seg(p, 0.03, 0.80)), the ROW label, the HUD and the caption agree, per-brick drop and stagger,
 // reduced motion builds instantly, no page errors, no sideways scroll at 390 px.

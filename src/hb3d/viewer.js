@@ -616,7 +616,7 @@
   VP.flyToRow = function (ms) {
     var ri = this.rowInfo(); if (!ri) return;
     var bb = this.model.bounds, tgt = new THREE.Vector3((bb.min[0] + bb.max[0]) / 2, Math.max(0.3, ri.y), (bb.min[2] + bb.max[2]) / 2);
-    this._fly = { t0: performance.now(), ms: ms || 650, from: this.controls.target.clone(), to: tgt, z0: this.zoom(), z1: Math.max(this.zoom(), 1.9) };
+    this._fly = { t0: performance.now(), ms: ms || 650, from: this.controls.target.clone(), to: tgt, z0: this.zoom(), z1: Math.max(this.zoom(), this.brand ? 1.3 : 1.9) };   // brand build: stay far enough out that the whole house keeps its context (owner saw a wall-only view, 30 Oct)
     this.dirty = true; this.wake();
   };
   VP._stepFly = function () {
