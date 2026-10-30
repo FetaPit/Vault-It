@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] Landing hero revision (owner's feedback, 30 Oct, on `e7542ff`): copy the brand book hero exactly (level pills, the partially built house with its wireframe, deposit controls, lay buttons, stats and milestone pills), capital "Red", "home." in vibrant pulsing teal, remove the brick counter block, and add the net worth 3D speed run (starts in the red with few assets, clears the debt and builds wealth in every domain)
 - [ ] House builder brand build follow-ups (from the 30 Oct review): section 6.8 feedback ("+£5 · +4 bricks" pop-ups, stage flash, milestone toasts), a radial window glow at night, and a real-device speed check of the lite fallback
 - [ ] Level 2 Octalysis slice still open: real mortgage entry at purchase, overpayment what-ifs in the Level 2 panel (`docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md`; the build rule, payments, reset and undo were done 30 Oct)
 - [ ] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
