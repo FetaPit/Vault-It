@@ -22,7 +22,7 @@ const probe = () => {
   const cp = (e, n) => getComputedStyle(e).getPropertyValue(n).trim().toUpperCase(), root = n => cp(document.documentElement, '--' + n);
   const liabTab = cp(lb, '--sa') === root('amber');
   showTab('overview');
-  const ov = { kpiBorder: col('.ov-kpi-li', 'borderTopColor'), kpiVal: col('#kpi-liab'), card: col('#ov-liab-summary-card', 'borderLeftColor'), total: col('#ov-liab-summary .ov-sum-total') };
+  const ov = { asVal: col('#kpi-assets'), asBorder: col('.ov-kpi-as', 'borderTopColor'), asCard: col('#ov-assets-summary-card', 'borderLeftColor'), kpiBorder: col('.ov-kpi-li', 'borderTopColor'), kpiVal: col('#kpi-liab'), card: col('#ov-liab-summary-card', 'borderLeftColor'), total: col('#ov-liab-summary .ov-sum-total') };
   // every asset class wears its sub-tab colour: sub-tab --sa, side panel label
   const cls = { metals: ['metals', 'gold'], crypto: ['crypto', 'teal'], cash: ['cash', 'green'], other: ['other', 'purple'], stocks: ['stocks', 'green2'], liabilities: [null, 'amber'] };
   const side = { metals: 'sb-metals', crypto: 'sb-crypto', cash: 'sb-cash', stocks: 'sb-stocks', other: 'sb-other' };
@@ -53,6 +53,7 @@ const probe = () => {
     ok(r.theme === theme, nm + ': theme is applied');
     ok(r.liabTab, nm + ': liabilities sub-tab is amber');
     ok(r.ov.kpiBorder === T.amber && r.ov.kpiVal === T.amber, nm + ': liabilities KPI is amber');
+    ok(r.ov.asVal === T.teal && r.ov.asBorder === T.teal && r.ov.asCard === T.teal, nm + ': total assets KPI and assets summary are teal (owner, 30 Oct)');
     ok(r.ov.card === T.amber && r.ov.total === T.amber, nm + ': liabilities summary card is amber (' + r.ov.card + ' / ' + r.ov.total + ' vs ' + T.amber + ')');
     ok(r.align.every(a => a.tab && a.side), nm + ': each asset class wears its sub-tab colour (stocks green 2) ' + JSON.stringify(r.align.filter(a => !a.tab || !a.side)));
     ok(!r.hexLeft, nm + ': Budget groups use tokens, no hex');

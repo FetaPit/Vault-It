@@ -68,7 +68,7 @@ Brass is used here where the meaning is not achievement. Each needs a call: gold
 - Budget "save rate"
 - Business MRR and monthly figures, "in progress" and "warm" stage labels
 - Net worth history change when positive
-- Total assets KPI and assets summary card are green; "teal means owned" would make them teal, but net worth is teal already.
+- ~~Total assets green or teal~~: **teal** (owner, 30 Oct 2026). Done.
 
 ## 3. House builder Level 2 bug
 
