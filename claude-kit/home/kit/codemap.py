@@ -14,7 +14,7 @@ import sys
 
 MIN_LINES = int(os.environ.get("CODEMAP_MIN_LINES", "800"))
 MAX_FILES = 6
-MAX_ENTRIES = 45
+MAX_ENTRIES = int(os.environ.get("CODEMAP_MAX_ENTRIES", "45"))
 MIN_BYTES = 20_000  # cheap pre-filter before counting lines
 MAX_BYTES = 5_000_000
 

@@ -4,9 +4,10 @@
 dir="${CLAUDE_PROJECT_DIR:-$PWD}"
 root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null || echo "$dir")
 
-# A project with its own map hook (e.g. Vault-It) prints its own map.
+# A project with its own map (e.g. Vault-It) prints its own map and handoff note.
+[ -f "$root/tools/codemap.py" ] || [ -f "$root/tools/codemap.sh" ] && exit 0
 PY=""; for c in python3 python "py -3"; do $c -c "import sys" >/dev/null 2>&1 && { PY=$c; break; }; done
-if [ ! -f "$root/.claude/session-start.sh" ] && [ -n "$PY" ]; then
+if [ -n "$PY" ]; then
   $PY "$HOME/.claude/kit/codemap.py" "$root" 2>/dev/null | head -150
 fi
 
