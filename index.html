@@ -9413,6 +9413,67 @@ button.bd-ic{cursor:pointer}
 .inv-add span{font-family:'Syne',sans-serif;font-size:.42rem;font-weight:700}
 .inv-add:hover{background:rgb(var(--blue-rgb) / .1)}
 </style>
+<style id="vi-nav">
+/* ── Brand menu bar: icon carries the tab colour, thin neon outline on the selected tab only ── */
+.tab-btn[data-tab="overview"]{--tc:var(--teal);--tc-rgb:var(--teal-rgb)}
+.tab-btn[data-tab="budget"]{--tc:var(--blue);--tc-rgb:var(--blue-rgb)}
+.tab-btn[data-tab="house"]{--tc:var(--gold);--tc-rgb:var(--gold-rgb)}
+.tab-btn[data-tab="assets"]{--tc:var(--green);--tc-rgb:var(--green-rgb)}
+.tab-btn[data-tab="debt"]{--tc:var(--red);--tc-rgb:var(--red-rgb)}
+.tab-btn[data-tab="biz"]{--tc:var(--orange);--tc-rgb:var(--orange-rgb)}
+.tab-btn[data-tab="achievements"]{--tc:var(--brass);--tc-rgb:var(--brass-rgb)}
+.tab-btn[data-tab="connections"],.tab-btn[data-tab="network"]{--tc:var(--purple);--tc-rgb:var(--purple-rgb)}
+html #topnav{background:var(--bg)!important;border-bottom:1px solid var(--line)!important;animation:none!important;backdrop-filter:none!important}
+#topnav .vi-tabs{position:relative;display:flex;align-items:center;gap:2px;flex:1 1 auto;min-width:0;height:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:0 4px}
+#topnav .vi-tabs::-webkit-scrollbar{display:none}
+html #topnav .tab-btn{position:relative;display:inline-flex!important;align-items:center;justify-content:center;gap:7px;flex:0 0 auto!important;height:36px!important;min-width:44px!important;margin:0!important;padding:0 12px!important;border:0!important;border-radius:10px;background:transparent!important;color:var(--muted)!important;font:600 .62rem/1 var(--font-display)!important;letter-spacing:.14em!important;text-transform:uppercase;text-shadow:none!important;box-shadow:none!important;opacity:1!important;cursor:pointer;transition:color var(--t-fast),background-color var(--t-fast),box-shadow var(--t-fast)}
+html #topnav .tab-btn[hidden]{display:none!important}
+#topnav .tab-btn::before,#topnav .tab-btn::after{content:none!important;display:none!important}
+#topnav .tab-btn .nav-tab-label{white-space:nowrap;color:inherit!important}
+html #topnav .tab-btn .vi-ic.ti{--vi-sw:1.5;width:18px!important;height:18px!important;display:block!important;color:var(--tc)!important;opacity:.8;transform:none!important;filter:none!important;stroke:none!important;fill:none!important}
+html #topnav .tab-btn:hover{color:var(--text)!important;background:rgb(var(--tc-rgb) / .07)!important}
+html #topnav .tab-btn:hover .vi-ic.ti{opacity:1}
+html #topnav .tab-btn.active{color:var(--text)!important;background:rgb(var(--tc-rgb) / .09)!important;box-shadow:inset 0 0 0 1px var(--tc),0 0 14px -3px rgb(var(--tc-rgb) / .7)!important}
+html[data-theme="light"] #topnav .tab-btn.active{box-shadow:inset 0 0 0 1px var(--tc)!important}
+html #topnav .tab-btn.active .vi-ic.ti{opacity:1;animation:vi-tabglow var(--pulse) ease-in-out infinite}
+html[data-theme="light"] #topnav .tab-btn.active .vi-ic.ti{animation:none}
+@keyframes vi-tabglow{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 4px currentColor)}}
+html #topnav .tab-btn:focus-visible{outline:2px solid var(--tc)!important;outline-offset:2px}
+#topnav .vi-usp,#topnav .vi-pro{position:absolute;top:1px;right:2px;padding:1px 4px;border-radius:3px;font:800 .3rem/1.2 var(--font-display);letter-spacing:.08em;animation:none!important;display:inline-block!important}
+#topnav .vi-usp{background:var(--goldf);color:var(--on-gold)}
+#topnav .vi-pro{background:rgb(var(--orange-rgb) / .16);color:var(--orange);border:1px solid rgb(var(--orange-rgb) / .5)}
+#topnav #budget-badge{position:absolute;top:5px;right:5px;margin:0}
+/* compact: icons only (also the older "Icons only" setting) */
+body.vi-compact #topnav .nav-tab-label,#topnav.compact-nav .nav-tab-label{display:none!important}
+html body.vi-compact #topnav .tab-btn,html #topnav.compact-nav .tab-btn{padding:0!important;width:44px}
+#vi-theme-btn{height:30px}
+@media (prefers-reduced-motion:reduce){html #topnav .tab-btn.active .vi-ic.ti{animation:none}}
+/* header: row 1 = brand, net worth, Back, Night/Daylight, density; row 2 = the tabs (every width, so labels never get cut off) */
+html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto auto;grid-template-rows:46px 50px;height:auto!important;padding:0 16px!important;overflow:visible!important;align-items:center;column-gap:8px}
+#topnav .nav-brand{grid-row:1;grid-column:1;height:46px!important;border-right:0!important}
+#topnav .nav-brand .logo{display:inline!important}
+#topnav .vi-nw-wrap{grid-row:1;grid-column:2;justify-self:end;padding-left:0!important}
+#topnav .vi-nw-wrap>span:first-child{display:inline!important}
+#vi-back-us-btn{grid-row:1;grid-column:3}
+#vi-theme-btn{grid-row:1;grid-column:4;margin-left:0!important}
+#vi-density-btn{grid-row:1;grid-column:5;margin-left:0!important}
+#topnav .vi-tabs{grid-row:2;grid-column:1/-1;height:50px;border-top:1px solid var(--line);margin:0 -16px;padding:0 12px;justify-content:center}
+#left-sidebar{top:96px!important}
+@media (min-width:1024px) and (max-width:1439px){html #topnav .tab-btn{padding:0 8px!important;gap:6px;letter-spacing:.06em!important;font-size:.56rem!important}}
+@media (min-width:1024px) and (max-width:1279px){html #topnav .tab-btn{padding:0 6px!important;gap:5px;letter-spacing:.03em!important;font-size:.54rem!important}#topnav .vi-tabs{padding:0 2px;gap:0}}
+@media (max-width:1023px){
+  html #topnav{grid-template-columns:auto 1fr auto auto;padding:0 8px!important;column-gap:6px}
+  #vi-back-us-btn{display:none!important}
+  #vi-theme-btn{grid-column:3;padding:0 9px!important}
+  #vi-theme-btn .vi-th-lbl{display:none}
+  #vi-density-btn{grid-column:4}
+  #vi-density-btn .vi-d-opt[data-d="default"]{display:none!important}
+  #vi-density-btn .vi-d-lbl{display:inline!important}#vi-density-btn .vi-d-ico{display:none!important}
+  #topnav .vi-tabs{margin:0 -8px;padding:0 6px;justify-content:flex-start}
+  html body.vi-compact #topnav .vi-tabs,html #topnav.compact-nav .vi-tabs{justify-content:space-between}
+  html body.vi-compact #topnav .tab-btn,html #topnav.compact-nav .tab-btn{flex:1 1 0!important;width:auto;max-width:64px}
+}
+</style>
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" id="vi-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -10201,45 +10262,18 @@ button.bd-ic{cursor:pointer}
     <div style="width:22px;height:22px;flex-shrink:0;animation:vi-logo-spin 12s linear infinite"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="nglow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#44c0b9" stop-opacity="0.15"/><stop offset="100%" stop-color="#44c0b9" stop-opacity="0"/></radialGradient></defs><circle cx="16" cy="16" r="16.5" fill="url(#nglow)"/><circle cx="16" cy="16" r="15" fill="#0a1a1a" stroke="#44c0b9" stroke-width="0.7"/><circle cx="16" cy="16" r="12.5" fill="#040c10"/><circle cx="16" cy="16" r="12.5" fill="none" stroke="#44c0b9" stroke-width="0.3" opacity="0.4"/><polyline points="9,11.5 16,21 23,11.5" fill="none" stroke="#44c0b9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.25"/><polyline points="9,11.5 16,21 23,11.5" fill="none" stroke="#44c0b9" stroke-width="1.0" stroke-linecap="square" stroke-linejoin="miter"/><circle cx="16" cy="16" r="0.9" fill="#44c0b9" opacity="0.5"/></svg></div>
     <span class="logo" style="margin:0">Vault<span>·It</span></span>
   </div>
-  <button class="tab-btn active" onclick="showTab('overview')">
-    <svg class="ti" viewBox="0 0 16 16"><rect x="1" y="1" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="1" width="5.5" height="5.5" rx="1"/><rect x="1" y="9.5" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1"/></svg>
-    <span>Overview</span>
-  </button>
-  <button class="tab-btn" onclick="showTab('budget')" style="position:relative">
-    <svg class="ti" viewBox="0 0 16 16"><rect x="1.5" y="3.5" width="13" height="9.5" rx="1.6"/><path d="M1.5 6.5h13"/><path d="M10.6 9.8h1.9"/></svg>
-    <span>Budget<i id="budget-badge"></i></span>
-  </button>
-  <button class="tab-btn" onclick="showTab('house')" style="position:relative;border-bottom:2px solid var(--go)!important" title="Vault·It's flagship feature">
-    <svg class="ti" viewBox="0 0 16 16" style="color:var(--go)"><path d="M1.5 9L8 2.5 14.5 9V14.5H10V11H6v3.5H1.5V9z"/></svg>
-    <span style="color:var(--go)">House Builder</span>
-    <span style="position:absolute;top:3px;right:3px;font-size:.32rem;background:var(--go);color:#000;font-family:'Syne',sans-serif;font-weight:800;padding:1px 4px;border-radius:2px;letter-spacing:.06em">USP</span>
-  </button>
-  <button class="tab-btn" onclick="showTab('assets')">
-    <svg class="ti" viewBox="0 0 16 16"><rect x="1" y="9" width="3" height="5" rx=".5"/><rect x="6.5" y="6" width="3" height="8" rx=".5"/><rect x="12" y="3" width="3" height="11" rx=".5"/></svg>
-    <span>Assets &amp; Liabilities</span>
-  </button>
-  <button class="tab-btn" onclick="showTab('debt')">
-    <svg class="ti" viewBox="0 0 16 16"><polyline points="1,4.5 5,9.5 9,7 15,13"/><polyline points="11.5,13 15,13 15,9.5"/></svg>
-    <span>Debt Tracker</span>
-  </button>
-  <button class="tab-btn" onclick="showTab('biz');setTimeout(function(){var g=document.getElementById('pro-gate-biz');if(g&&g.style.display!=='none'){gateNudge('Entrepreneur','Income streams + CRM');}},100)">
-    <svg class="ti" viewBox="0 0 16 16"><path d="M9.5 1.5L4 9h5.5L8 14.5l7.5-8.5H9.5z"/></svg>
-    <span>Entrepreneur<span class='pro-badge'>PRO</span></span>
-  </button>
-  <button class="tab-btn" onclick="showTab('achievements')">
-    <svg class="ti" viewBox="0 0 16 16"><path d="M4.5 1.5h7v5c0 3-3 4-3.5 4S4.5 9.5 4.5 6.5v-5z"/><path d="M2.5 6H4.5M11.5 6H13.5"/><line x1="8" y1="10.5" x2="8" y2="12.5"/><rect x="5" y="12.5" width="6" height="1.5" rx=".5"/></svg>
-    <span>Achievements</span>
-  </button>
-  <button class="tab-btn" onclick="showTab('connections')">
-    <svg class="ti" viewBox="0 0 16 16"><circle cx="8" cy="3" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="13" cy="13" r="1.5"/><line x1="7.1" y1="4.4" x2="3.9" y2="11.6"/><line x1="8.9" y1="4.4" x2="12.1" y2="11.6"/><line x1="4.5" y1="13" x2="11.5" y2="13"/></svg>
-    <span>Connections</span>
-  </button>
-  <button class="tab-btn" onclick="showTab('network')" style="position:relative">
-    <svg class="ti" viewBox="0 0 16 16"><polygon points="8,1 10.5,6 16,6.9 12,10.7 12.9,16 8,13.4 3.1,16 4,10.7 0,6.9 5.5,6"/></svg>
-    <span>◈ Network</span>
-    <span style="position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--go);box-shadow:0 0 4px var(--go)"></span>
-  </button>
-  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-left:10px;margin-left:auto">
+  <div class="vi-tabs" id="vi-tabs" role="tablist" aria-label="Sections">
+    <button class="tab-btn active" data-tab="overview" role="tab" aria-label="Overview" title="Overview" onclick="showTab('overview')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-overview"/></svg><span class="nav-tab-label">Overview</span></button>
+    <button class="tab-btn" data-tab="budget" role="tab" aria-label="Budget" title="Budget" onclick="showTab('budget')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-budget"/></svg><span class="nav-tab-label">Budget</span><i id="budget-badge"></i></button>
+    <button class="tab-btn" data-tab="house" role="tab" aria-label="House builder" title="House builder" onclick="showTab('house')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-house-builder"/></svg><span class="nav-tab-label">House builder</span><span class="vi-usp" aria-hidden="true">USP</span></button>
+    <button class="tab-btn" data-tab="assets" role="tab" aria-label="Assets and liabilities" title="Assets and liabilities" onclick="showTab('assets')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-assets"/></svg><span class="nav-tab-label">Assets &amp; liabilities</span></button>
+    <button class="tab-btn" data-tab="debt" role="tab" aria-label="Debt tracker" title="Debt tracker" onclick="showTab('debt')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-debt-tracker"/></svg><span class="nav-tab-label">Debt tracker</span></button>
+    <button class="tab-btn" data-tab="biz" role="tab" aria-label="Entrepreneur" title="Entrepreneur" onclick="showTab('biz');setTimeout(function(){var g=document.getElementById('pro-gate-biz');if(g&&g.style.display!=='none'){gateNudge('Entrepreneur','Income streams + CRM');}},100)"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-entrepreneur"/></svg><span class="nav-tab-label">Entrepreneur</span><span class="vi-pro pro-badge" aria-hidden="true">PRO</span></button>
+    <button class="tab-btn" data-tab="achievements" role="tab" aria-label="Achievements" title="Achievements" onclick="showTab('achievements')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-trophy"/></svg><span class="nav-tab-label">Achievements</span></button>
+    <button class="tab-btn" data-tab="connections" role="tab" aria-label="Connections" title="Connections" onclick="showTab('connections')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-connections"/></svg><span class="nav-tab-label">Connections</span></button>
+    <button class="tab-btn" data-tab="network" role="tab" aria-label="Network" title="Network" onclick="showTab('network')" hidden><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-network"/></svg><span class="nav-tab-label">Network</span></button>
+  </div>
+  <div class="vi-nw-wrap" style="display:flex;align-items:center;gap:6px;flex-shrink:0;padding-left:10px;margin-left:auto">
     <span style="font-family:'Syne',sans-serif;font-size:.44rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--t3)">NET WORTH</span>
     <span id="nav-nw" style="font-family:'Share Tech Mono',monospace;font-size:.74rem;color:var(--em)">£0</span>
   </div>
@@ -10253,7 +10287,6 @@ button.bd-ic{cursor:pointer}
     <button class="vi-d-opt active" data-d="default" onclick="setDensity('default')"><span class="vi-d-lbl">Default</span><span class="vi-d-ico">▪▪</span></button>
     <button class="vi-d-opt" data-d="wide" onclick="setDensity('wide')"><span class="vi-d-lbl">Wide</span><span class="vi-d-ico">▪▪▪</span></button>
   </div>
-  <span style="padding:3px 9px;background:rgb(var(--teal-rgb) / .1);border:1px solid rgb(var(--teal-rgb) / .2);border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:rgb(var(--teal-rgb) / .7);flex-shrink:0;margin-left:6px">α&nbsp;0.6</span>
 </nav>
 
 <!-- ═══════════════════════════════════════════
@@ -12533,7 +12566,7 @@ function showTab(id){
 }
 // Scroll the (horizontally scrollable) top nav so the active tab is fully visible
 function viNavReveal(){
-  var nav=document.getElementById('topnav'),b=nav&&nav.querySelector('.tab-btn.active');
+  var nav=document.getElementById('vi-tabs')||document.getElementById('topnav'),b=nav&&nav.querySelector('.tab-btn.active');
   if(!nav||!b)return;
   var l=b.offsetLeft,r=l+b.offsetWidth,pad=48;
   if(l<nav.scrollLeft+pad)nav.scrollTo?nav.scrollTo({left:Math.max(0,l-pad),behavior:'smooth'}):(nav.scrollLeft=Math.max(0,l-pad));
@@ -25214,7 +25247,8 @@ function setDensity(mode) {
   }, 120);
 }
 function loadDensity() {
-  var saved = localStorage.getItem('vi_density') || 'default';
+  var saved = null; try { saved = localStorage.getItem('vi_density'); } catch (e) {}
+  if (!saved) saved = (window.innerWidth || 1200) < 1024 ? 'compact' : 'default';
   setDensity(saved === 'default' ? null : saved);
 }
 
