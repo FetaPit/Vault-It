@@ -29,8 +29,8 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 | 3, 4 | Icons from the sprite, menu bar (tab colours, neon outline on the selected tab only, Network hidden, compact = icons only, phones and tablets start compact) | Done |
 | 5 | Colour code | Done |
 | 6 | Daylight polish (brief's phase 7) | Done |
-| 7 | Logo and wordmark (brief's phase 8): 23 "Vault-It" with a hyphen, nav logo, `<title>`, `og:title`, manifest, favicon, tagline | Next |
-| 8 | Groupings H1 to H4, O1, O2, D1 to D3, A1 (section 4, all approved) | |
+| 7 | Logo and wordmark (brief's phase 8): 23 "Vault-It" with a hyphen, nav logo, `<title>`, `og:title`, manifest, favicon, tagline | Done |
+| 8 | Groupings H1 to H4, O1, O2, D1 to D3, A1 (section 4, all approved) | Next |
 | 9 | House builder Level 2 fix (section 3) | |
 | 10 | Brand look and every animation on all six three.js models in `src/hb3d` (owner chose option a), behind `?house=new` | |
 | 11 | Net worth in 3D as the Overview hero: 3D blocks first, Graph toggle, choice remembered, blocks in the sub-tab colours, behind `?nw=new` | |
@@ -49,6 +49,10 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 - Daylight tokens changed from the brand file's first values so small text reaches 4.5:1 on paper and tinted chips (same hues): teal #24716C, gold #7F6112, brass #806827, orange #964E19, red #C02323, salmon #AF4C49, amber #955F06, yellow #7B6B07. `brand/vault-it-tokens.css` matches. Metals have tokens `--m-silver`, `--m-platinum`, `--m-palladium`.
 - Tests: the test browser reports a light device, so the app opens in Daylight under test. `test_cc3d` needs `test_hb1` to run first. `test_colour_code` covers phase 5.
 - Level 2 code to reuse: mortgage engine `hbcRead`, `hbL2Sims`; Budget spare `hbBudget()`. **Owner's rule for the overpayment what-ifs:** spare = unassigned + savings + investments, with the trade-off line.
+
+### Copy pass still to do
+
+- About 500 em dashes remain in `index.html`, many in user-facing copy (hints, toasts, roadmap text). Each needs rewording (comma, colon or full stop), not a blind replace. Proposed as a small copy phase, or folded into each later phase for the screens it touches.
 
 ### Proposal: money owed to you (not built, owner to decide)
 
