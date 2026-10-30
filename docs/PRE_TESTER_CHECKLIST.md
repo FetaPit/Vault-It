@@ -2,7 +2,15 @@
 
 Branch `brand-rollout`. Done and pushed: colour code, Daylight polish, logo and tagline, the item 3D viewer (wealth inventory and liabilities), and the card groupings. Nothing is live yet: `release/pioneer-v2` is untouched.
 
-## For Pete to decide
+## Pete's answers (30 Oct)
+
+- Phone build: Cloudflare preview. Link: **https://brand-rollout-vault-it.ptlived.workers.dev** (updates on every push to `brand-rollout`; never live). Sign-in is blocked on preview links by design, so it opens with the demo data.
+- Phases 5 to 8 and the 3D viewer: happy. Green tint: fine as is.
+- E-mails: redeployed with "Vault-It" (`send-auth-email` v10, `waitlist-welcome` v2). Check the sender name in the `FROM_EMAIL` / `WELCOME_FROM` secrets.
+- Total assets: teal (done). Yahoo for the free beta: fine.
+- Still open: photo-to-3D provider (5), brass uses and "money owed to you" (7), the Poly Pizza result (3).
+
+## For Pete to decide (original list)
 
 1. **A phone build to test on.** Either switch on Cloudflare non-production builds for `brand-rollout` (a preview link, nothing goes live), or run `npm run build:site` then `npx wrangler dev` on a computer and open it on the phone over Wi-Fi. Which one?
 2. **Sign off phases 5 to 8 and the 3D viewer** on the phone, in Night and Daylight.
