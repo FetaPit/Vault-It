@@ -30,6 +30,30 @@ Three layers, cheapest first, all optional for the user:
 
 Leave live library search (Sketchfab, Poly Pizza) out for now. It adds an outside host and per-model licence and credit handling, and Sketchfab needs every user to sign in. It can be revisited with a Sketchfab partner agreement if testers ask for exact models without Meshy.
 
+## Open model libraries to tap into (owner asked, 30 Oct)
+
+Two different uses:
+- **In the app, for users:** a normal API called from a Supabase edge function (keys stay server-side).
+- **MCP (for Claude in our build sessions):** lets me search and pull models while curating the built-in set. Users never touch MCP.
+
+| Library | Licence | Access | Size and fit |
+| --- | --- | --- | --- |
+| **Poly Pizza** | CC0 and CC BY (credit shown) | API key (free for hobby use, pay as you go for commercial use); community MCP server | About 7,000 low-poly models: guitar, watch, car, bike, camera… Best category match, one consistent style |
+| **Poly Haven** | CC0 | Free public API, no key; needs a "Powered by Poly Haven" credit and its own User-Agent; covered by community MCP servers and BlenderMCP | Hundreds of photoreal props and furniture; high quality, few personal valuables |
+| **Smithsonian Open Access 3D** | CC0 | Smithsonian 3D API, GLB | About 3,400 museum objects; little overlap with what people own |
+| **Sketchfab** | Per model (CC0, CC BY, CC BY-NC: NC not allowed for us) | API; downloads need each user's Sketchfab login; community MCP server (`sketchfab-mcp-server`) | Largest library; licence checks per model |
+| Kenney, Quaternius | CC0 | Download packs, no API | Good for the bundled starter set |
+
+**Recommendation:**
+1. **Poly Pizza:** auto-match an item's name to a model, CC0 first, CC BY with the credit shown on the tile.
+2. **Poly Haven:** a few hero items where photoreal matters.
+3. **Built-in starter set:** curated with the MCP servers in a build session, so the most common items work offline.
+4. **Photo-to-3D (Tripo, Meshy or Hyper3D):** stays the "exactly my item" option.
+
+**To try it here:** this cloud session blocks these hosts. Allow `api.polyhaven.com`, `dl.polyhaven.org`, `api.poly.pizza` and `static.poly.pizza` in the environment's network settings, and create a Poly Pizza account and API key (add it as Supabase secret `POLYPIZZA_API_KEY`).
+
+Sources: [Poly Haven licence](https://polyhaven.com/license), [Poly Haven public API](https://github.com/Poly-Haven/Public-API), [Poly Pizza fact sheet](https://poly.pizza/docs/press), [Poly Pizza MCP](https://glama.ai/mcp/servers/MatthewHallCom/Poly-Pizza-MCP), [multi-source asset MCP](https://glama.ai/mcp/servers/jonit-dev/threenative-asset-mcp), [sketchfab-mcp-server](https://npmjs.com/package/sketchfab-mcp-server), [BlenderMCP](https://www.flowhunt.io/mcp-servers/blender), [Smithsonian Open Access 3D](https://www.si.edu/spotlight/openaccesshighlights).
+
 ## Needs the owner's yes before building
 
 - Layer 2 sends photos to Meshy: update the privacy notice wording (Meshy is named today for house models only).
