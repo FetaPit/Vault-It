@@ -1,4 +1,4 @@
-# Vault·It brand package
+# Vault-It brand package
 
 Open `vault-it-brand-book.html` in a browser first. It is the visual and behavioural reference for everything else.
 

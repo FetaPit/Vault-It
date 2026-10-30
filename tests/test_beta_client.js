@@ -108,7 +108,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   ok(bundle.problems.length === 0 && bundle.account.email === 'pete@example.com', 'no problems reported; account e-mail recorded');
   const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 8000 }), page.evaluate(() => exportMyData())]);
   ok(/^vault-it-my-data-\d{4}-\d\d-\d\d\.json$/.test(dl.suggestedFilename()), 'downloads a dated .json file: ' + dl.suggestedFilename());
-  const fs = require('fs'); const parsed = JSON.parse(fs.readFileSync(await dl.path(), 'utf8')); ok(parsed.app === 'Vault·It' && parsed.onThisDevice.pos_ov1, 'the downloaded file is valid JSON with the data in it');
+  const fs = require('fs'); const parsed = JSON.parse(fs.readFileSync(await dl.path(), 'utf8')); ok(parsed.app === 'Vault-It' && parsed.onThisDevice.pos_ov1, 'the downloaded file is valid JSON with the data in it');
   // signed out: still exports the device, and says so
   const lone = await page.evaluate(() => { const u = _supaUser; _supaUser = null; return buildMyDataBundle().then(x => { _supaUser = u; return x; }); });
   ok(lone.inYourAccount === null && /Not signed in/.test(lone.problems.join()) && lone.onThisDevice.pos_ov1, 'not signed in → device data only, with a clear note');

@@ -1,4 +1,4 @@
-# Vault·It — Design Brief for Claude Design
+# Vault-It — Design Brief for Claude Design
 
 **Owner:** Pete Thickett (FetaPit)
 **Prepared:** 23 June 2026
@@ -11,7 +11,7 @@ real visuals of the app, the 3D house builder, and the financial journey, fewer 
 
 ## 0. NORTH STAR FOR THIS PASS
 
-> A first-time visitor should understand what Vault·It *does* within 5 seconds of scrolling —
+> A first-time visitor should understand what Vault-It *does* within 5 seconds of scrolling —
 > because they can **see the actual product working**, not just read about it.
 
 Right now the landing page leans on copy, gradients and a Three.js ambient scene. The single

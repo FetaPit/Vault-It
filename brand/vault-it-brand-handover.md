@@ -1,6 +1,6 @@
-# Vault·It brand roll-out: handover for Claude Code
+# Vault-It brand roll-out: handover for Claude Code
 
-You are applying the new Vault·It brand guidelines to the app (app.vault-it.co) and the marketing site (vault-it.co). The guidelines live in an interactive brand book and a set of exported files. This document tells you what to build, in what order, and how to know it is done.
+You are applying the new Vault-It brand guidelines to the app (app.vault-it.co) and the marketing site (vault-it.co). The guidelines live in an interactive brand book and a set of exported files. This document tells you what to build, in what order, and how to know it is done.
 
 Read this whole file before touching code. Then run Step 0.
 
@@ -192,7 +192,7 @@ Accepted when: every screen is usable in Daylight with no invisible text, no neo
 
 ### Phase 8: Logo and wordmark
 
-- Wordmark: Syne 800. "Vault" in `--text`, then a small brick, then "It" in `--teal`. The brick sits on the baseline (`translateY(-.06em)`), `.3em` wide, `.17em` tall, radius 2px. It is a separator, never a hyphen. The app currently writes "Vault-It" with a hyphen and uses two colourways. Standardise on the brick.
+- Wordmark: Syne 800. "Vault" in `--text`, then a small brick, then "It" in `--teal`. The brick sits on the baseline (`translateY(-.06em)`), `.3em` wide, `.17em` tall, radius 2px. In text the name is written Vault-It with a hyphen (owner, 30 Oct 2026); in the logo that hyphen is drawn as the brick. Standardise the logo on the brick.
 - Mark: use the SVG files. Full (96px and up), Mid (40 to 96px), Micro (under 40px, also the favicon and PWA icon). Clear space is a quarter of the icon height. Use the Daylight variants on light surfaces for the header only; elsewhere the built in dark disc works on any background.
 - Update `<title>`, `og:title`, and the hero H1 to the new tagline: **Get out of the red and into your home.** The current site hero still says "From debt to owning your home outright".
 
@@ -447,7 +447,7 @@ Accepted when: switching view never changes the numbers, the totals in the tag m
 ## 8. Known issues to fix while you are there
 
 1. Site hero still says "From debt to owning your home outright". Update H1, meta title and `og:title`.
-2. Wordmark uses a hyphen and two colourways. Standardise on the brick separator.
+2. Wordmark used two colourways. Standardise the logo on the brick; text keeps the hyphen (owner, 30 Oct 2026).
 3. Stocks and funds and Wealth inventory both use purple. Stocks and funds moves to `--green2`.
 4. Liabilities is red on its sub-tab and gold on the overview. Use `--amber` everywhere.
 5. Debt histogram and treemap use issuer colours. Use a red ramp, keep issuer colours on card art only.
@@ -479,7 +479,7 @@ Run every item in both themes, at 390px and 1100px wide.
 - [ ] The net worth scene has £1,000 blocks and £100 cubes, and nine cubes merge into a block.
 - [ ] The main net worth chart has a Graph and 3D blocks toggle with the same ranges and series, and the numbers match in both views.
 - [ ] With WebGL disabled the house still renders (flat fallback) and nothing throws.
-- [ ] Wordmark uses the brick separator everywhere. Favicon and PWA icon use the micro mark.
+- [ ] Logo wordmark uses the brick; text writes Vault-It with a hyphen. Favicon and PWA icon use the micro mark.
 - [ ] No console errors. No new network requests apart from the existing font load.
 - [ ] Lighthouse accessibility score does not drop. Focus rings are visible in both themes.
 

@@ -1,4 +1,4 @@
-/* Vault·It design tokens. Night is the default, Daylight is the light mode.
+/* Vault-It design tokens. Night is the default, Daylight is the light mode.
  * Switch with data-theme="light" on <html>. Generated from vault-it-brand-book.html */
 html{box-sizing:border-box}
 :root,[data-theme="dark"]{

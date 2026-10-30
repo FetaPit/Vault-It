@@ -1,4 +1,4 @@
-# Vault·It beta — owner's runbook
+# Vault-It beta — owner's runbook
 
 Everything that has to be true before testers sign up, and what to do when something goes wrong.
 Project: Supabase `legpubblzgknxdtvsant` (eu-central-1, Frankfurt). Live app: `release/pioneer-v2` → Cloudflare Workers Builds → https://app.vault-it.co (GitHub Pages still serves the old address until it is switched off).
@@ -8,7 +8,7 @@ Project: Supabase `legpubblzgknxdtvsant` (eu-central-1, Frankfurt). Live app: `r
 **Database and functions** (in this order)
 1. Apply `supabase/migrations/007_security_hardening.sql` and `008_auth_rate_limit.sql` (SQL Editor, or `supabase db push`). 008 first matters: the functions fail *open* without it.
 2. Deploy `send-auth-email` and `pin-auth` (the GitHub Action needs a renewed `SUPABASE_ACCESS_TOKEN`, or deploy from the CLI: `supabase functions deploy <name> --no-verify-jwt`).
-3. Secrets (Edge Functions → Secrets): `RESEND_API_KEY`, `FROM_EMAIL` (`Vault·It <noreply@your-domain>`), `APP_URL`, `PIN_PEPPER` (random, **never change it later** — every PIN would stop working), optionally `RATE_*` overrides.
+3. Secrets (Edge Functions → Secrets): `RESEND_API_KEY`, `FROM_EMAIL` (`Vault-It <noreply@your-domain>`), `APP_URL`, `PIN_PEPPER` (random, **never change it later** — every PIN would stop working), optionally `RATE_*` overrides.
 4. Run the Supabase **Security Advisor** and clear anything new.
 
 **Supabase Auth settings** (Authentication → …)

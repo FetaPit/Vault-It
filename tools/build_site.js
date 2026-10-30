@@ -29,7 +29,7 @@ for (const [site, files] of Object.entries(SITE)) {
     fs.copyFileSync(src, path.join(dir, to));
   }
   fs.writeFileSync(path.join(dir, 'robots.txt'), ROBOTS[site]);
-  fs.writeFileSync(path.join(dir, '404.html'), '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Not found · Vault·It</title><body style="margin:0;background:#04090f;color:#9bb0bd;font:16px system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;text-align:center"><div><div style="font-size:2rem;color:#44c0b9;margin-bottom:8px">404</div>That page does not exist. <a style="color:#44c0b9" href="/">Back to Vault·It</a></div>');
+  fs.writeFileSync(path.join(dir, '404.html'), '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Not found · Vault-It</title><body style="margin:0;background:#04090f;color:#9bb0bd;font:16px system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;text-align:center"><div><div style="font-size:2rem;color:#44c0b9;margin-bottom:8px">404</div>That page does not exist. <a style="color:#44c0b9" href="/">Back to Vault-It</a></div>');
 }
 fs.writeFileSync(path.join(OUT, 'app', 'version.json'), JSON.stringify({ sha: sha(), built: new Date().toISOString() }) + '\n');
 const list = (d) => fs.readdirSync(path.join(OUT, d), { recursive: true }).map(String).sort().join(', ');

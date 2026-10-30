@@ -1,4 +1,4 @@
-# Vault·It — the offer, the prices and the sign-up funnel
+# Vault-It — the offer, the prices and the sign-up funnel
 
 Written 28 Oct 2026 from the research in `docs/research/` (every price and rule there has its source URL and the date it was read, 27 Oct 2026).
 Figures marked *estimate* are arithmetic on stated assumptions, not facts. **Prices and caps below are recommendations: Pete decides, and nothing
@@ -6,7 +6,7 @@ is charged differently until the Stripe links are changed.**
 
 ## 1. The offer in one breath
 
-> **Watch your deposit build your home — brick by brick.** Vault·It puts your debts, savings, house deposit and net worth on one honest map and
+> **Watch your deposit build your home — brick by brick.** Vault-It puts your debts, savings, house deposit and net worth on one honest map and
 > turns every pound you save towards your deposit into bricks on a 3D house. You type the numbers in — no bank login. Free while it's in beta.
 
 Why this works (from the research): it leads with the one thing no competitor has (the house that builds), cuts the two biggest fears in UK finance
@@ -52,7 +52,7 @@ The UK market has also shrunk: Money Dashboard closed in 2023 and Moneyhub's con
 ### Conditions that make the founding offer safe and lawful
 1. **Cap the AI screenshot reader.** Today it allows 30 images a day to *any* signed-in user, free users included. A heavy user costs about **£168–£435 a year** (*estimate*, `cost_to_serve.md`), which would use up a £149 payment in about 4 months. Make it a monthly allowance (for example 10 a month for founders, 30 for Pioneer, 0–3 for free), stop refunding the allowance after a successful call, and try the cheaper model.
 2. **3D house generation stays on the user's own Meshy key**, and lifetime excludes AI credits, 3D generation and premium data feeds. Say so next to the price.
-3. **Define "lifetime"** beside the price as *the life of the Vault·It service*, with what happens on closure or sale, and give the 14-day cancellation information (Consumer Contracts Regulations). Without it the cancellation right runs to 12 months.
+3. **Define "lifetime"** beside the price as *the life of the Vault-It service*, with what happens on closure or sale, and give the 14-day cancellation information (Consumer Contracts Regulations). Without it the cancellation right runs to 12 months.
 4. **The cap must be real.** Count paid orders and stop selling at the cap. No countdowns, and no "only X left" unless it is true at that moment. Fake scarcity is a banned practice under the DMCC Act 2024 (CMA fines up to 10% of turnover) and against CAP 3.30–3.31.
 5. **Never call it an investment.** "Invest once. Own it forever." must go: equity or return language is a financial promotion (s21 FSMA).
 
@@ -65,8 +65,8 @@ The UK market has also shrunk: Money Dashboard closed in 2023 and Moneyhub's con
 ## 4. Raising money
 
 - **Do it as pre-sales first**: the founding offer through Stripe on your own site. You keep the list and pay no platform fee. This is unregulated as long as there is no equity, revenue share or return.
-- **Kickstarter is optional and hard.** Technology projects succeed about 23% of the time. Kickstarter won't fund something already available, and Vault·It's beta is live, so a campaign would need a defined new deliverable (a native app, for example). Ask Kickstarter first. UK fees are about 8% per pledge. Kickstarter says email lists convert at 1–5% and pre-launch *followers* at 32%, so build a Kickstarter "notify me" page from your list before launch.
-- **Equity** (selling shares) is regulated. It only goes through an FCA-authorised platform (Crowdcube, Seedrs/Republic) or a qualifying exemption. Don't write "invest in Vault·It" anywhere until then.
+- **Kickstarter is optional and hard.** Technology projects succeed about 23% of the time. Kickstarter won't fund something already available, and Vault-It's beta is live, so a campaign would need a defined new deliverable (a native app, for example). Ask Kickstarter first. UK fees are about 8% per pledge. Kickstarter says email lists convert at 1–5% and pre-launch *followers* at 32%, so build a Kickstarter "notify me" page from your list before launch.
+- **Equity** (selling shares) is regulated. It only goes through an FCA-authorised platform (Crowdcube, Seedrs/Republic) or a qualifying exemption. Don't write "invest in Vault-It" anywhere until then.
 - **Sizing** (*estimate*, `benchmarks.md`): a confirmed email from UK Meta ads costs roughly £16–£31 (range £10–£82). At 1–5% yield, ads alone don't pay for a pre-sale. A £5–10k pre-sale at about £150 needs roughly 700–1,400 engaged, confirmed emails. **Use ads to recruit testers and learn; grow the list organically for the raise.**
 
 ## 5. The funnel as built (`landing.html`, `site/sign-up/*`, `supabase/functions/waitlist-join`, migration 009)
@@ -87,7 +87,7 @@ The UK market has also shrunk: Money Dashboard closed in 2023 and Moneyhub's con
   - "Works offline" and "Seven modules";
   - the Stripe buttons and the demo link.
 
-  The demo the old page linked to shows Warren Buffett & Charlie Munger, Gary Stevenson and Simon Squibb as Vault·It advisors and officers, with made-up quotes. Remove those cards from the app before any traffic.
+  The demo the old page linked to shows Warren Buffett & Charlie Munger, Gary Stevenson and Simon Squibb as Vault-It advisors and officers, with made-up quotes. Remove those cards from the app before any traffic.
 - **Ad links**: use `https://vault-it.co/sign-up?utm_source=meta&utm_medium=paid&utm_campaign=<name>&utm_content=<ad>` (likewise `tiktok`, `instagram`, `reddit`).
 
 ## 6. Decisions only Pete can make

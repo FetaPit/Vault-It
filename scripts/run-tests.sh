@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run the Vault·It test suite.
+# Run the Vault-It test suite.
 #
 #   scripts/run-tests.sh [all|server|browser|<test name>...]
 #

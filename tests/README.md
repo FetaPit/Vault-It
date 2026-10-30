@@ -1,4 +1,4 @@
-# Vault·It automated checks
+# Vault-It automated checks
 
 Run everything with `bash scripts/run-tests.sh` (see CLAUDE.md); the commands below run a single test.
 

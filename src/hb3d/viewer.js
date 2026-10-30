@@ -127,7 +127,7 @@
 
   function col(hex) { return new THREE.Color(hex).convertSRGBToLinear(); }
 
-  // ── Vault·It look: the deposit-stage house is a translucent teal hologram; the owned (mortgage) house is full colour
+  // ── Vault-It look: the deposit-stage house is a translucent teal hologram; the owned (mortgage) house is full colour
   //    with a green-blue grade so it sits in the app's palette rather than looking purely photographic ──
   var GRADE = H.GRADE = { amount: 0.62 };          // 0 = photographic, 1 = fully graded
   var BRICKSLIP_UV = '#include <uv_vertex>\n  vec4 hbWp = vec4(position,1.0);\n  #ifdef USE_INSTANCING\n  hbWp = instanceMatrix * hbWp;\n  #endif\n  hbWp = modelMatrix * hbWp;\n  vec3 hbNo = normal;\n  #ifdef USE_INSTANCING\n  hbNo = mat3(instanceMatrix) * hbNo;\n  #endif\n  vec3 hbN = abs(normalize(mat3(modelMatrix) * hbNo));\n  vUv = (hbN.y > max(hbN.x, hbN.z) ? hbWp.xz : (hbN.x > hbN.z ? hbWp.zy : hbWp.xy)) / vec2(' + BRICK_TILE[0].toFixed(2) + ', ' + BRICK_TILE[1].toFixed(2) + ');';

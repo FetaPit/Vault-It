@@ -6,7 +6,7 @@ model: haiku
 effort: low
 ---
 
-You find code in Vault·It and report where it is. You do not edit.
+You find code in Vault-It and report where it is. You do not edit.
 
 - Start from the session-start map, or run `python3 tools/codemap.py . index.html src/hb3d/kit.js`. Then Grep.
 - Never Read `index.html` (25k lines) or `Vault-It_v0.3_Alpha.html` (legacy, ignore unless asked) without `offset` and `limit`.

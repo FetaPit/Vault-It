@@ -14,7 +14,7 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 | Levels | L1 build, L2 equity shading (`hbSceneMode` mode `equity`, `eq = (valuation - balance) / valuation`), L3 upgrade planner. `hbLevel()` is driven only by `state.houseMode === 'purchased'`. |
 | Tests | `test_hb3d_app`, the kit scale test, `test_roadmap`, `test_beta_client` (outside hosts). |
 | Icons | 66 inline `<svg>`; text glyphs: ✎ 4, ✕ 44, ＋ 11, ◈ 18, ✓ 80, ↩ 2, ‹ 2, › 3. Many emoji used as icons (🏠 🧱 🚀 🔒 🎉). |
-| Wordmark | "Vault-It" with a hyphen 23 times in `index.html`; "Vault·It" 55 times; landing uses "Vault·It" only. |
+| Wordmark | "Vault-It" with a hyphen 23 times in `index.html`; "Vault-It" 55 times; landing uses "Vault-It" only. |
 | Fonts | Loads Syne, DM Sans, Share Tech Mono, **DM Mono** and **Playfair Display** (both to remove). |
 | Theme | No light mode, no `data-theme` anywhere. |
 | Offline caching | The service worker is built from a `blob:` URL. Browsers refuse to register those, so **the app has no working offline cache today** (the error is swallowed). |

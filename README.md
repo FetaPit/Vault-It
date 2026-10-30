@@ -1,4 +1,4 @@
-# Vault·It
+# Vault-It
 
 > *"From debt to owning your home outright."*
 

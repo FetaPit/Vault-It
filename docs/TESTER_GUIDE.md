@@ -1,6 +1,6 @@
-# Vault·It — beta tester guide
+# Vault-It — beta tester guide
 
-Thanks for trying Vault·It, a UK personal-finance app that turns your numbers into a clear road to a deposit, a debt-free date and a house you can watch being built.
+Thanks for trying Vault-It, a UK personal-finance app that turns your numbers into a clear road to a deposit, a debt-free date and a house you can watch being built.
 
 **Open it:** https://app.vault-it.co (works on phone and desktop — add it to your home screen for the full-screen app)
 

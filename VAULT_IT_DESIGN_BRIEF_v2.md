@@ -1,4 +1,4 @@
-# Vault·It — Claude Design Brief v2
+# Vault-It — Claude Design Brief v2
 ## Dynamic 3D Demos · Isometric Asset Vault · Dream Home Builder
 
 **Owner:** Pete Thickett (FetaPit)
@@ -145,7 +145,7 @@ const VAULT_ASSETS = [
 ```
 Section label:  "YOUR ASSET VAULT"
 Headline:       "Every pound you own, visible in one space."
-Subhead:        "Vault·It digitises your entire financial life — savings, stocks, crypto,
+Subhead:        "Vault-It digitises your entire financial life — savings, stocks, crypto,
                  metals, property — rendered in 3D so you can see the full picture at once."
 ```
 
@@ -169,7 +169,7 @@ Below the vault floor, show three individual 3D close-ups as a scroll-snapping c
 **Card 3 — Crypto & Metals**
 - Floating hex token (ETH orange) + gold bar ingot side by side
 - Orbiting slowly — shows the 3D rotation is interactive
-- Sub-copy: "Gold, silver, BTC, ETH — Vault·It prices them live and keeps them alongside
+- Sub-copy: "Gold, silver, BTC, ETH — Vault-It prices them live and keeps them alongside
   your traditional savings."
 
 ### Viewport controls UI (show in all three cards)

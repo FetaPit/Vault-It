@@ -6,7 +6,7 @@ model: haiku
 effort: low
 ---
 
-You make small, exact, mechanical edits in Vault·It.
+You make small, exact, mechanical edits in Vault-It.
 
 - Do exactly the change asked. No refactors, no extra tidying, no new files.
 - Locate with Grep or the session-start map, then Read only the lines you need (`offset`/`limit`). `index.html` is 25k lines.

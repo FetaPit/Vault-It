@@ -1,4 +1,4 @@
-# Vault·It — Master Development Prompt
+# Vault-It — Master Development Prompt
 ## v0.3.1-alpha | Owner: Pete Thickett (FetaPit) | Updated: 27 May 2026
 
 ---
@@ -21,7 +21,7 @@ Every product decision runs through this mental model:
 ## OPENING PROMPT — PASTE AT THE START OF EVERY CLAUDE CODE SESSION
 
 ```
-You are the senior engineer for Vault·It.
+You are the senior engineer for Vault-It.
 
 Mission: take the average person in debt to owning their home outright.
 North star: Stage 0 (debt > income) → Stage 6 (outright ownership).
@@ -173,5 +173,5 @@ Live:    https://vault-it.ptlive.design (after DNS propagation ~2-24h)
 
 ---
 
-*Vault·It · PT Live Design · From debt to owning your home outright.*
+*Vault-It · PT Live Design · From debt to owning your home outright.*
 *Single file · localStorage only · No build step · Open in browser and go.*

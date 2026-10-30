@@ -1,4 +1,4 @@
-# Start the Vault·It brand cutover
+# Start the Vault-It brand cutover
 
 Your repo is **github.com/FetaPit/Vault-It**. Its production branch is **`release/pioneer-v2`** (not `main`). A push there goes live on app.vault-it.co and vault-it.co through Cloudflare, so all brand work happens on `Pioneer_v3` or a branch off it.
 

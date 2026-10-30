@@ -1,4 +1,4 @@
-# Moving Vault·It to vault-it.co on Cloudflare — state and remaining steps
+# Moving Vault-It to vault-it.co on Cloudflare — state and remaining steps
 
 Layout: **app.vault-it.co** = the app, **vault-it.co** = landing page + waitlist, **www** redirects to the bare domain, plain http redirects to https.
 The domain is registered at Wix; its nameservers now point at Cloudflare (zone **Active**, Free plan). One Cloudflare Worker, **`vault-it`**, serves both
@@ -68,7 +68,7 @@ and no check that the address belongs to the person typing it). Plan and reasons
    a. apply `007_security_hardening.sql`, then `008_auth_rate_limit.sql` (the functions fail open without 008), then `009_waitlist_optin.sql`
       (beta list with double opt-in; it removes the public insert policy, so the **old** landing page's form stops working at that moment — do it together with step 3);
    b. deploy `pin-auth`, `send-auth-email` and `waitlist-join` (all `--no-verify-jwt`);
-   c. secrets: `APP_URL=https://app.vault-it.co/`, and — only once Resend shows the domain verified — `FROM_EMAIL="Vault·It <noreply@vault-it.co>"` (rollback: `onboarding@resend.dev`).
+   c. secrets: `APP_URL=https://app.vault-it.co/`, and — only once Resend shows the domain verified — `FROM_EMAIL="Vault-It <noreply@vault-it.co>"` (rollback: `onboarding@resend.dev`).
    Check with `list_migrations`, `list_edge_functions` and the advisors afterwards.
 3. **Release (Claude, when asked):** full test suite, create `backup/release-pioneer-v2-YYYYMMDD-HHMM`, fast-forward `release/pioneer-v2` to the tested `Pioneer_v3` commit. Workers Builds then deploys the Worker and
    creates the custom domains and their DNS records (vault-it.co and vault-it.co/sign-up then serve the new sign-up page, `docs/OFFER_AND_PRICING.md`); GitHub Pages keeps serving the old address, which now shows the "we've moved" banner. Never release before step 2: the released app calls `pin-auth` actions

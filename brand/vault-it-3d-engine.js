@@ -1,4 +1,4 @@
-/*! Vault·It 3D engine. Dependency free. WebGL for the brickwork, canvas 2D for the HUD.
+/*! Vault-It 3D engine. Dependency free. WebGL for the brickwork, canvas 2D for the HUD.
  * Extracted from the brand book. Lift as is, then wire to app data.
  * makeStage(canvas,{railPad,padB,padT,theme,fps,onFrame})   the to-scale house builder, bricks laid one at a time
  * makeNW(canvas,{theme,fps,onChange})                        net worth scene with £1,000 blocks and £100 cubes

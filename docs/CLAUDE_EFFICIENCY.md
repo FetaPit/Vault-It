@@ -1,4 +1,4 @@
-# Working with Claude Code on Vault·It for less
+# Working with Claude Code on Vault-It for less
 
 Set up in `.claude/` and `CLAUDE.md`. Works in cloud sessions and on a laptop clone.
 

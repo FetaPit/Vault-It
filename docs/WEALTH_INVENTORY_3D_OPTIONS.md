@@ -9,10 +9,14 @@ Today each item has a name, a value and up to several photos that turn on a phot
 | Source | What you get | Cost and access | Licence | Fit |
 | --- | --- | --- | --- | --- |
 | **Meshy AI, image to 3D** (from the item's own photos) | A textured GLB of *their* item, made from 1 to 4 photos, in 1 to 3 minutes | The user's own Meshy key and credits (already a setting); Meshy is already named in the privacy notice | The user owns what they generate | **Best match to "my actual guitar".** Photos leave the device, so it must be opt-in and say so |
-| **Sketchfab Download API** | 500,000+ free models, glTF/GLB/USDZ, searchable by name and polygon count | Each end user must sign in to a Sketchfab account, or Vault·It agrees a partner deal with Sketchfab; new outside host | Per model: CC0, CC BY (credit the creator), CC BY-NC (**not allowed in a paid app**) | Big library, but sign-in friction, credits to show, licence checks per model |
+| **Sketchfab Download API** | 500,000+ free models, glTF/GLB/USDZ, searchable by name and polygon count | Each end user must sign in to a Sketchfab account, or Vault-It agrees a partner deal with Sketchfab; new outside host | Per model: CC0, CC BY (credit the creator), CC BY-NC (**not allowed in a paid app**) | Big library, but sign-in friction, credits to show, licence checks per model |
 | **Poly Pizza API** | About 7,000 low-poly models (a guitar, a watch, a car: generic, not exact models), GLB | Free key for hobby use, pay as you go for commercial use; new outside host | CC0 and CC BY | Clean, consistent style; generic only |
 | **Thingiverse API** | STL files made for 3D printing: one colour, no materials | App approval needed; current terms for new apps unclear | Per design, many non-commercial | **Not recommended**: print meshes, no colour, licence risk |
 | **A small built-in set** | About 30 CC0 low-poly models for the common categories (guitar, watch, ring, necklace, car, motorbike, bicycle, laptop, camera, painting, handbag, trainers, console…) | Free, shipped with the app from our own domain, loaded only when needed; works offline | CC0 only, chosen once | Instant and private; category-level, not the exact model |
+
+**Hyper3D (Rodin) and other photo to 3D services** (owner asked, 30 Oct): Hyper3D has an API (1 to 5 photos, GLB) but only on its $120 a month Business plan, and files are kept 7 days. Tripo (about $0.30 a model) and Meshy (about $0.60 a model on Pro) are pay per model. Layer 2 below can use any of them; pick after a side-by-side test on real items. Costs and steps: `docs/INTEGRATIONS_SETUP.md`.
+
+**Owner's decision (30 Oct 2026): go with the three layers below.**
 
 **Brand names:** a model sold as a "Gibson Les Paul" is usually fan-made, and Gibson enforces its guitar shape trademarks. A paid app showing branded replicas from a library is a risk. A generic single-cut electric guitar, or the user's own photos turned into a model, avoids it.
 

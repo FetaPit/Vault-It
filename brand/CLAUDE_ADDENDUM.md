@@ -12,4 +12,4 @@ A new brand is being applied. Design files are in `brand/`. Open `brand/vault-it
 - Do not touch Supabase, secrets, migrations or the edge functions.
 - No new outside hosts. Fonts: Syne, DM Sans, Share Tech Mono only.
 - British English, sentence case, **no em dashes**. Keep "Not regulated by the FCA. Not financial advice." visible. Respect `prefers-reduced-motion`. Pages must never scroll sideways.
-- Tagline: **Get out of the red and into your home.** Name is written Vault·It with a brick separator, never a hyphen.
+- Tagline: **Get out of the red and into your home.** Name is written **Vault-It** with a hyphen (owner, 30 Oct 2026). In the logo wordmark the hyphen is drawn as the brand brick.

@@ -42,7 +42,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   let leaked = [];
   for (const host of ['app.vault-it.co', 'vault-it.co']) for (const evil of evils) {
     asked.length = 0; r = await get('https://' + host + evil); const other = host === 'app.vault-it.co' ? '/landing/' : '/app/';
-    if ((r.s === 200 && (host === 'app.vault-it.co' ? /Join the beta list/ : /<title>Vault·It — From Debt/).test(r.t) && false) || asked.some(a => a.startsWith(other))) leaked.push(host + evil);
+    if ((r.s === 200 && (host === 'app.vault-it.co' ? /Join the beta list/ : /<title>Vault-It — From Debt/).test(r.t) && false) || asked.some(a => a.startsWith(other))) leaked.push(host + evil);
     if (r.s === 200 && asked.some(a => !a.startsWith(host === 'app.vault-it.co' ? '/app/' : '/landing/'))) leaked.push(host + evil + ' (200 from outside)');
   }
   ok(leaked.length === 0, 'no path trick (encoded dots, tabs/newlines, double encoding, overlong UTF-8, null bytes, backslashes, double slashes) ever asks for another site’s folder' + (leaked.length ? ': ' + leaked.join(' | ') : ''));

@@ -1,4 +1,4 @@
-# Vault·It: creative direction for the tester release
+# Vault-It: creative direction for the tester release
 
 From the executive creative director, fintech brand. This sits on top of `vault-it-brand-handover.md` and the brand book. Where they disagree, this file wins. The owner's answers to the open questions are recorded at the end.
 
@@ -96,7 +96,7 @@ Type, price, deposit %, floor (flats only), the amount to add, and the brick val
 
 - **Tokens, Night and Daylight.** Daylight is a designed mode: paper ground, ink text, white panels with corner brackets, and blueprint 3D.
 - **Fonts:** Syne, DM Sans and Share Tech Mono only. Icons come from the sprite with a 1.1 hairline. The colour code applies: gold means now, brass means achievement, teal means built or owned, red means owed, green means cleared.
-- **Wordmark:** Vault·It with the brick separator. Tagline: **Get out of the red and into your home.**
+- **Wordmark:** Vault-It. In the logo the hyphen is drawn as the brick; in text it is a plain hyphen (owner, 30 Oct 2026). Tagline: **Get out of the red and into your home.**
 
 ## 6. Done means
 

@@ -1,4 +1,4 @@
-# Vault·It — Supabase Edge Functions
+# Vault-It — Supabase Edge Functions
 
 ## send-auth-email
 
@@ -25,7 +25,7 @@ supabase link --project-ref legpubblzgknxdtvsant
 supabase secrets set RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
 
 # From address — must be verified in Resend, or use onboarding@resend.dev for testing
-supabase secrets set FROM_EMAIL="Vault·It <noreply@yourdomain.com>"
+supabase secrets set FROM_EMAIL="Vault-It <noreply@yourdomain.com>"
 
 # App redirect URL after magic link click
 supabase secrets set APP_URL=https://fetapit.github.io/Vault-It/

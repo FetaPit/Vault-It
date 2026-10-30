@@ -1,4 +1,4 @@
-/* Vault·It component rules extracted from the brand book. Requires vault-it-tokens.css.
+/* Vault-It component rules extracted from the brand book. Requires vault-it-tokens.css.
  * Menu bar, 3D stage, rail, status line, pop, pills, stats, icon tiles, built-state glow, tracker view toggle. */
 [data-theme="light"] .stage3d::after{opacity:.7}
 .wm{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;white-space:nowrap;display:inline-flex;align-items:baseline;color:var(--text)}

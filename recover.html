@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Vault·It data rescue</title>
+<title>Vault-It data rescue</title>
 <style>
 :root{--bg:#06101c;--card:#0b1a2b;--line:rgba(68,192,185,.28);--em:#44c0b9;--t:#e6eef7;--t2:#9fb3c8;--warn:#e0b44a;--bad:#e06c6c;--good:#4cd08a}
 *{box-sizing:border-box}
@@ -28,8 +28,8 @@ input{width:100%;background:#04101c;border:1px solid var(--line);border-radius:8
 </head>
 <body>
 <main>
-  <h1>Vault·It data rescue</h1>
-  <p>This page only <b>reads this browser's saved Vault·It data</b> and, if you ask, copies it to your cloud vault. It never deletes anything.</p>
+  <h1>Vault-It data rescue</h1>
+  <p>This page only <b>reads this browser's saved Vault-It data</b> and, if you ask, copies it to your cloud vault. It never deletes anything.</p>
 
   <div class="card">
     <h2>1 · What this browser has saved</h2>
@@ -97,7 +97,7 @@ input{width:100%;background:#04101c;border:1px solid var(--line);border-radius:8
       t.appendChild(tr);
     });
     $('summary').innerHTML = '';
-    if (!found) { $('summary').innerHTML = '<p class="bad">No Vault·It data found in this browser at this web address. If you used the app at a different address (for example fetapit.github.io), open this page there instead.</p>'; return; }
+    if (!found) { $('summary').innerHTML = '<p class="bad">No Vault-It data found in this browser at this web address. If you used the app at a different address (for example fetapit.github.io), open this page there instead.</p>'; return; }
     $('summary').appendChild(t);
     var note = document.createElement('p'); note.className = 'small' + (dirty.length ? ' warn' : '');
     note.textContent = dirty.length ? 'Not yet saved to the cloud: ' + dirty.join(', ') : 'No unsynced edits recorded (older versions did not track this, so use the comparison in step 2).';
@@ -224,7 +224,7 @@ input{width:100%;background:#04101c;border:1px solid var(--line);border-radius:8
     fetchJSON(URL_ + '/rest/v1/vault_data?on_conflict=user_id,key', { method: 'POST', headers: { 'content-type': 'application/json', apikey: KEY, authorization: 'Bearer ' + session.token, prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(rows) })
       .then(function (r) {
         if (!r.ok) throw new Error('The cloud refused the upload (' + r.status + '). Nothing was changed. Download the backup file and send it to support.');
-        log('Done ✓ Your data is now in your cloud vault. Sign in to Vault·It from any browser and it will appear.', 'ok');
+        log('Done ✓ Your data is now in your cloud vault. Sign in to Vault-It from any browser and it will appear.', 'ok');
         try { localStorage.setItem('vi_dirty', '[]'); localStorage.setItem('vi_last_sync', String(Date.now())); } catch (e) {}
         $('send').style.display = 'none';
       })

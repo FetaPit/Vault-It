@@ -1,4 +1,4 @@
-# Vault·It House Builder — Levels, Ghost Build & Mortgage Engine
+# Vault-It House Builder — Levels, Ghost Build & Mortgage Engine
 *Expert-reframed brief (fintech product + engineering). Original request by Pete, 16 Oct 2026.*
 
 ---
@@ -7,7 +7,7 @@
 Turn the House Builder from a single deposit progress bar into a **three-level wealth game** that teaches and optimises the path **deposit → mortgage-free → trade-up**, powered by a **transparent, customisable UK mortgage engine**. The 3D/isometric house is the scoreboard: it is built in *ghost* (translucent) form and becomes solid as the user's **equity** grows. Every screen must answer one question: *"What should I do with my next £, to own more of this house sooner and pay the least interest?"*
 
 ## 1. Principles
-1. **Illustrative, not advice.** Vault·It is not FCA-authorised for mortgage advice. All outputs are labelled illustrative, show assumptions, and link to "check your lender's terms / speak to a broker".
+1. **Illustrative, not advice.** Vault-It is not FCA-authorised for mortgage advice. All outputs are labelled illustrative, show assumptions, and link to "check your lender's terms / speak to a broker".
 2. **Transparent maths.** Every number can be expanded to show formula, inputs and assumptions ("Show working").
 3. **Reality-first.** Model UK lender behaviour (daily interest, monthly charge, overpayment allowances, ERCs, fixed-term expiry/reversion) rather than a textbook formula only.
 4. **Gamified, not manipulative.** Progress, streaks and celebration — never shame, urgency timers, or pressure to over-leverage. Respect `prefers-reduced-motion`.

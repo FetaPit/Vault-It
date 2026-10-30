@@ -1,4 +1,4 @@
-# Vault·It — working notes for Claude Code
+# Vault-It — working notes for Claude Code
 
 UK personal-finance single-file PWA. Owner: Pete (FetaPit). App: **https://app.vault-it.co**, landing page: https://vault-it.co (Cloudflare — see `docs/CUTOVER.md` for the state of the move; the older address https://fetapit.github.io/Vault-It/ is GitHub Pages).
 
@@ -53,7 +53,7 @@ A new brand is being applied. Design files are in `brand/`. Open `brand/vault-it
 - Do not touch Supabase, secrets, migrations or the edge functions.
 - No new outside hosts. Fonts: Syne, DM Sans, Share Tech Mono only.
 - British English, sentence case, **no em dashes**. Keep "Not regulated by the FCA. Not financial advice." visible. Respect `prefers-reduced-motion`. Pages must never scroll sideways.
-- Tagline: **Get out of the red and into your home.** Name is written Vault·It with a brick separator, never a hyphen.
+- Tagline: **Get out of the red and into your home.** Name is written **Vault-It** with a hyphen (owner, 30 Oct 2026: easy to type, matches vault-it.co). In the logo wordmark the hyphen is drawn as the brand brick.
 - One phase per session. Read only that phase's part of `brand/vault-it-brand-handover.md` (list its sections with `grep -n '^#' brand/vault-it-brand-handover.md`). Never Read `brand/vault-it-brand-book.html` (227 KB) whole: grep it.
 
 ## Token budget

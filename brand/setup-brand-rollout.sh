@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Vault·It brand rollout: one-command setup.
+# Vault-It brand rollout: one-command setup.
 # Run from the ROOT of your local clone of github.com/FetaPit/Vault-It:
 #   bash setup-brand-rollout.sh /path/to/vault-it-cutover.zip
 # It never touches release/pioneer-v2 (production). It creates branch brand-rollout from Pioneer_v3.
