@@ -6,7 +6,7 @@ const fs = require('fs'), path = require('path'), cp = require('child_process');
 const ROOT = path.join(__dirname, '..'), OUT = process.env.SITE_OUT ? path.resolve(process.env.SITE_OUT) : path.join(ROOT, 'dist');
 
 const SITE = {
-  app:     [['index.html', 'index.html'], ['recover.html', 'recover.html'], ['logo.png', 'logo.png'], ['og-image.png', 'og-image.png']],
+  app:     [['index.html', 'index.html'], ['recover.html', 'recover.html'], ['sw.js', 'sw.js'], ['manifest.webmanifest', 'manifest.webmanifest'], ['logo.png', 'logo.png'], ['og-image.png', 'og-image.png']],
   landing: [['landing.html', 'index.html'], ['landing.html', 'sign-up.html'], ['og-image.png', 'og-image.png'],
             ['site/house-deposit.jpg', 'img/house-deposit.jpg'], ['site/house-built.jpg', 'img/house-built.jpg'], ['site/founder.jpg', 'img/founder.jpg'],
             ['site/sign-up/thanks.html', 'sign-up/thanks.html'], ['site/sign-up/confirm.html', 'sign-up/confirm.html'],
@@ -32,5 +32,7 @@ for (const [site, files] of Object.entries(SITE)) {
   fs.writeFileSync(path.join(dir, '404.html'), '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Not found · Vault-It</title><body style="margin:0;background:#04090f;color:#9bb0bd;font:16px system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;text-align:center"><div><div style="font-size:2rem;color:#44c0b9;margin-bottom:8px">404</div>That page does not exist. <a style="color:#44c0b9" href="/">Back to Vault-It</a></div>');
 }
 fs.writeFileSync(path.join(OUT, 'app', 'version.json'), JSON.stringify({ sha: sha(), built: new Date().toISOString() }) + '\n');
+// the service worker's cache is named after the commit, so a release never serves a stale shell
+const swPath = path.join(OUT, 'app', 'sw.js'); fs.writeFileSync(swPath, fs.readFileSync(swPath, 'utf8').replace('__SW_VERSION__', sha().slice(0, 12)));
 const list = (d) => fs.readdirSync(path.join(OUT, d), { recursive: true }).map(String).sort().join(', ');
 console.log('dist/app:     ' + list('app') + '\ndist/landing: ' + list('landing'));

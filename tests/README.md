@@ -19,5 +19,7 @@ node tests/test_authmail_server.js # send-auth-email: validation, HTML escaping,
 node tests/test_009.mjs; node tests/test_waitlist_server.js   # beta list: migration 009 on Postgres, and the waitlist-join function (double opt-in, signed unsubscribe, limits)
 node tests/test_signup_page.js       # vault-it.co/sign-up and its confirm / thanks / unsubscribe pages in a browser, served through the Worker routing
 node tests/test_beta_client.js     # privacy/terms wording, 429 handling, Download my data, Delete my account
+node tests/journey_one_b.js        # One B's two-device journey: phone signs up (code + PIN), desktop PINs in with the same data, sync both ways on background/foreground, sign out and back, install readiness (VI_APP=<url> also checks the live service worker)
+node tests/test_sw.js              # installable app: real manifest, sw.js registers over http, versioned cache, offline shell, Worker no-cache rule
 node tests/test_nw3d.js            # net worth in 3D behind ?nw=new: flag off unchanged, 3D blocks | Graph toggle, same numbers in both views (VI_APP=file:///… to test another copy)
 ```

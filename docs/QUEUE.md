@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] Cross-device readiness for the owner's test (31 Oct): sign up on a phone, sign in on a desktop with the data intact, install the app, sync on open and close; build the "One B" tester agent and its journey script to run this after every round (owner's ask, 30 Oct)
 - [ ] House builder brand build follow-ups (from the 30 Oct review): section 6.8 feedback ("+£5 · +4 bricks" pop-ups, stage flash, milestone toasts), a radial window glow at night, and a real-device speed check of the lite fallback
 - [ ] Remove the Classic switches from Settings after 6 Nov 2026 (one week), if nobody needs them
 - [ ] Level 2 Octalysis slice still open: real mortgage entry at purchase, overpayment what-ifs in the Level 2 panel (`docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md`; the build rule, payments, reset and undo were done 30 Oct)

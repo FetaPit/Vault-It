@@ -7,7 +7,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
 (async () => {
   cp.execFileSync('node', [path.join(ROOT, 'tools', 'build_site.js')], { env: { ...process.env, WORKERS_CI_COMMIT_SHA: 'abc123', SITE_OUT: DIST }, stdio: ['ignore', 'ignore', 'inherit'] });
   const tree = (d) => fs.readdirSync(path.join(DIST, d), { recursive: true }).map(String).filter((f) => fs.statSync(path.join(DIST, d, f)).isFile()).sort();
-  ok(JSON.stringify(tree('app')) === JSON.stringify(['404.html', 'index.html', 'logo.png', 'og-image.png', 'recover.html', 'robots.txt', 'version.json']), 'app site contains only the app, the recovery page, logo, share image, robots, 404 and version: ' + tree('app'));
+  ok(JSON.stringify(tree('app')) === JSON.stringify(['404.html', 'index.html', 'logo.png', 'manifest.webmanifest', 'og-image.png', 'recover.html', 'robots.txt', 'sw.js', 'version.json']), 'app site contains only the app, the recovery page, the manifest and service worker, logo, share image, robots, 404 and version: ' + tree('app'));
   ok(JSON.stringify(tree('landing')) === JSON.stringify(['404.html', 'img/founder.jpg', 'img/house-built.jpg', 'img/house-deposit.jpg', 'index.html', 'og-image.png', 'robots.txt', 'sign-up.html', 'sign-up/confirm.html', 'sign-up/style.css', 'sign-up/thanks.html', 'sign-up/unsubscribe.html']), 'landing site contains only the sign-up page, its follow-on pages and images, share image, robots and 404: ' + tree('landing'));
   ok(fs.readdirSync(DIST).sort().join() === 'app,landing', 'nothing else is published (no tests, docs, notes or function code)');
   ok(JSON.parse(fs.readFileSync(path.join(DIST, 'app', 'version.json'), 'utf8')).sha === 'abc123', 'version.json records the commit being built');

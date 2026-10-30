@@ -10,8 +10,8 @@ ok(html.includes('<title>Vault-It: ' + TAG + '</title>'), 'title carries the tag
 ok(html.includes('property="og:title" content="Vault-It: ' + TAG + '"'), 'og:title carries the tagline');
 ok((html.match(/rel="manifest"/g) || []).length === 1, 'one web app manifest');
 ok(/rel="icon" type="image\/svg\+xml"/.test(html) && /rel="apple-touch-icon" sizes="180x180" href="data:image\/png/.test(html), 'favicon and touch icon use the micro mark');
-const man = decodeURIComponent(html.match(/rel="manifest" href="data:application\/json;charset=utf-8,([^"]+)"/)[1]);
-const mj = JSON.parse(man);
+ok(/rel="manifest" href="\.\/manifest\.webmanifest"/.test(html), 'manifest is a real file (installable; a data: URL is not)');
+const mj = JSON.parse(fs.readFileSync('/home/user/Vault-It/manifest.webmanifest', 'utf8'));
 ok(mj.name === 'Vault-It' && mj.description === TAG && mj.icons.some(i => i.sizes === '512x512'), 'manifest: name, tagline and icons');
 (async () => {
   const b = await chromium.launch(); const errs = [];
