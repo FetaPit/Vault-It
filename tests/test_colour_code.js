@@ -1,4 +1,4 @@
-// Brand phase 5: the colour code. Liabilities amber, Budget ramp on tokens, debt charts on a red ramp,
+// Brand phase 5: the colour code. Liabilities amber with their logged value, Budget ramp on tokens, debts in their lender's colours (red ramp otherwise),
 // chart colours follow Night and Daylight. Run: node tests/test_colour_code.js
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -9,7 +9,7 @@ const seed = (theme) => {
   localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
   localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' }));
   localStorage.setItem('pos_ov1', JSON.stringify({ income: [{ id: 1, name: 'Salary', amount: 2400, cat: 'salary' }], expenses: [{ id: 3, name: 'Rent', amount: 700, type: 'ce' }, { id: 4, name: 'Food', amount: 300, type: 've' }, { id: 5, name: 'Gym', amount: 30, type: 'cn' }, { id: 6, name: 'Cinema', amount: 20, type: 'vn' }, { id: 7, name: 'Pot', amount: 100, type: 'sv' }, { id: 8, name: 'ISA', amount: 50, type: 'iv' }] }));
-  localStorage.setItem('pos_debt1', JSON.stringify({ debts: [{ id: 1, name: 'Card', original: 2500, balance: 2000, rate: 20, min: 60, type: 'credit' }, { id: 2, name: 'Car loan', original: 6000, balance: 3600, rate: 8, min: 180, type: 'loan' }, { id: 3, name: 'Klarna', original: 300, balance: 200, rate: 0, min: 50, type: 'bnpl' }] }));
+  localStorage.setItem('pos_debt1', JSON.stringify({ debts: [{ id: 1, name: 'Card', original: 2500, balance: 2000, rate: 20, min: 60, type: 'credit' }, { id: 2, name: 'Car loan', original: 6000, balance: 3600, rate: 8, min: 180, type: 'loan' }, { id: 3, name: 'Shop credit', original: 300, balance: 200, rate: 0, min: 50, type: 'bnpl' }, { id: 4, name: 'Virgin Money card', original: 1500, balance: 1000, rate: 22, min: 30, type: 'credit' }] }));
   localStorage.setItem('pos_al1', JSON.stringify({ liabilities: [{ id: 9, name: 'Car', value: 4000, rate: 0, depRate: 0, runningCost: 80, addedDate: new Date().toISOString() }] }));
 };
 // What each check reads, in the current theme
@@ -37,7 +37,8 @@ const probe = () => {
   return {
     tok: { amber: tok('amber'), red: tok('red'), teal: tok('teal'), coral: tok('coral'), salmon: tok('salmon'), yellow: tok('yellow'), green: tok('green'), green2: tok('green2'), text: tok('text'), panel: tok('panel') },
     liabTab, ov, tiles, align, rootTok: { coral: root('coral'), salmon: root('salmon'), amber: root('amber'), yellow: root('yellow'), green: root('green'), green2: root('green2') }, sk, amtColor: amt && getComputedStyle(amt).color, amtContrast: amt ? cr(getComputedStyle(amt).color, tok('panel')) : 0,
-    hexLeft: Object.values(CF_GROUPS).some(g => /#/.test(g.col + g.tx)), ramp: [2, 1, 3].map(id => ramp[id].k), viC: viRgba('gold', 1), theme: viTheme()
+    hexLeft: Object.values(CF_GROUPS).some(g => /#/.test(g.col + g.tx)), ramp: [2, 1, 3].map(id => ramp[id].k), brand: ramp[4].c1,
+    liab: { kpi: document.getElementById('kpi-liab').textContent, card: (document.querySelector('#ov-liab-summary .ov-sum-total') || {}).textContent, want: gbpFmt(alLiabAssetTotal()), sub: document.getElementById('kpi-liab-sub').textContent, nwSame: Math.abs(computeNetWorth() - (alTotalAssets() + totalAssets() - alTotalLiab() - debtTotal() - totalDebts())) < 0.01 }, viC: viRgba('gold', 1), theme: viTheme()
   };
 };
 (async () => {
@@ -58,7 +59,9 @@ const probe = () => {
     const R = r.rootTok, want = { ce: R.coral, ve: R.salmon, cn: R.amber, vn: R.yellow, sv: R.green, iv: R.green2 };
     ok(Object.keys(want).every(g => r.tiles[g] === want[g]), nm + ': each Budget tile carries its ramp colour (' + JSON.stringify(r.tiles) + ')');
     ok(r.sk.includes(T.teal) && r.sk.includes(T.coral) && r.sk.includes(T.green2), nm + ': Sankey fills resolve to the tokens (income teal)');
-    ok(r.ramp[0] === 1 && r.ramp[0] > r.ramp[1] && r.ramp[1] > r.ramp[2], nm + ': debt ramp is strongest for the largest debt (' + r.ramp.join(',') + ')');
+    ok(r.ramp[0] === 1 && r.ramp[0] > r.ramp[1] && r.ramp[1] > r.ramp[2], nm + ': debts with no known lender share the red ramp, largest strongest (' + r.ramp.join(',') + ')');
+    ok(r.brand === '#ee1c1c', nm + ': a Virgin Money debt keeps its lender colour in the charts (' + r.brand + ')');
+    ok(r.liab.kpi === r.liab.want && r.liab.card === r.liab.want && /running/.test(r.liab.sub) && r.liab.nwSame, nm + ': liabilities show the logged value (' + r.liab.kpi + '), running costs as the second line, net worth maths unchanged');
     ok(r.amtContrast >= 4.5, nm + ': Budget amounts are readable (' + r.amtContrast.toFixed(2) + ':1)');
     // switching theme re-resolves everything
     const before = r.viC; await p.evaluate(() => viToggleTheme()); await p.waitForTimeout(300);

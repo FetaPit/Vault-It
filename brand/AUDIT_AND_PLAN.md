@@ -42,7 +42,8 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 
 - Canvas colours: `viCss(name)`, `viRgba(name, a)`, `viLight()`; charts redraw on the `vi-theme` event. SVG built in JS uses `style="fill:…"` so tokens resolve.
 - Asset class colours (sub-tabs, side panel, overview list, net worth blocks): metals gold, crypto teal, cash green, wealth inventory purple, stocks and funds green 2, house deposit teal, liabilities amber, debt red.
-- Debt charts: `debtChartRamp(debts)`, one red ramp, largest debt strongest; issuer colours (`debtPalette`) only on the card artwork.
+- Debts (owner, 30 Oct): every debt keeps its lender's colours (`CC_BRANDS`) wherever it appears, in Night and Daylight: card artwork, histogram, donut, tree map, loan tile, overview summary, and the 3D net worth blocks to come. Debts with no known lender share a red ramp, largest strongest. All from `debtChartRamp(debts)`; near-black cards show their accent, colours close to the panel get a hairline.
+- Liabilities (owner, 30 Oct): the logged value shows everywhere (KPI, summary card, sub-tab, 3D view to come) with running costs as the second line. Net worth maths unchanged: the value counts as owned, running costs so far come off.
 - Tests: the test browser reports a light device, so the app opens in Daylight under test. `test_cc3d` needs `test_hb1` to run first. `test_colour_code` covers phase 5.
 - Level 2 code to reuse: mortgage engine `hbcRead`, `hbL2Sims`; Budget spare `hbBudget()`. **Owner's rule for the overpayment what-ifs:** spare = unassigned + savings + investments, with the trade-off line.
 

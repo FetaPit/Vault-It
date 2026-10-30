@@ -36,17 +36,18 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   ok(await p.evaluate(()=>document.querySelectorAll('#bd-per100 .bd-p100-row').length>=4),'"every £100 of income" fills the income column');
   // ---- debt
   await p.evaluate(()=>showTab('debt')); await p.waitForTimeout(1200);
-  // Brand phase 5: charts use one red ramp (largest debt strongest); issuer colours stay on the card artwork only.
-  const d=await p.evaluate(()=>{const ds=debtState.debts.filter(x=>x.balance>0).sort((a,b)=>b.balance-a.balance);const ramp=debtChartRamp(debtState.debts);
-    const art=debtState.debts.slice(0,3).map(x=>[debtPalette(x).c1,ccBrand(x)&&ccBrand(x).g[0]]);
-    return{k:ds.map(x=>ramp[x.id].k),art,h:document.getElementById('debt-bar-chart').getBoundingClientRect().height};});
-  ok(d.art.every(a=>a[0]===a[1]),'card artwork keeps each credit card\'s own colours ('+d.art.map(a=>a[0]).join(',')+')');
-  ok(d.k[0]===1&&d.k.every((v,i)=>i===0||v<d.k[i-1]||v===d.k[i-1]),'charts: largest debt is the strongest red, smaller debts fade ('+d.k.map(v=>v.toFixed(2)).join(',')+')');
+  // Charts show each debt in its lender's colours (Night and Daylight); debts with no known lender share a red ramp, largest strongest.
+  const d=await p.evaluate(()=>{const ramp=debtChartRamp(debtState.debts);const act=debtState.debts.filter(x=>x.balance>0);
+    const br=act.filter(x=>ccBrand(x)).map(x=>[ramp[x.id].c1,ccBrand(x).acc&&ramp[x.id].c1===ccBrand(x).acc?ccBrand(x).acc:ccBrand(x).g[0],debtPalette(x).c1===ccBrand(x).g[0]]);
+    const plain=act.filter(x=>!ccBrand(x)).sort((a,b)=>b.balance-a.balance).map(x=>ramp[x.id].k);
+    return{br,plain,h:document.getElementById('debt-bar-chart').getBoundingClientRect().height};});
+  ok(d.br.length>=3&&d.br.every(a=>a[0]===a[1]&&a[2]),'charts and card artwork use each lender\'s own colours ('+d.br.map(a=>a[0]).join(',')+')');
+  ok(d.plain.every((v,i)=>i===0?v===1:v<d.plain[i-1]),'debts with no known lender share the red ramp, largest strongest ('+d.plain.map(v=>v.toFixed(2)).join(',')+')');
   ok(d.h>=280,'histogram is bigger on desktop ('+Math.round(d.h)+'px)');
   await p.evaluate(()=>setDebtView('tree')); await p.waitForTimeout(400);
   const tm=await p.evaluate(()=>{const c=[...document.querySelectorAll('.dtm-cell')];const box=document.getElementById('debt-treemap').getBoundingClientRect();const area=c.reduce((a,x)=>{const r=x.getBoundingClientRect();return a+r.width*r.height;},0);return{n:c.length,bg:c.map(x=>x.style.background.slice(0,40)),cover:area/(box.width*box.height),donutHidden:document.getElementById('debt-donut-chart').style.display==='none',bigFirst:c[0].getBoundingClientRect().width*c[0].getBoundingClientRect().height>c[c.length-1].getBoundingClientRect().width*c[c.length-1].getBoundingClientRect().height};});
   console.log(JSON.stringify({n:tm.n,cover:tm.cover}));
-  ok(tm.n===4&&tm.donutHidden,'tree map shows one square per debt'); ok(tm.cover>0.9,'squares fill the grid ('+(tm.cover*100).toFixed(0)+'%)'); ok(tm.bigFirst,'bigger debt = bigger square'); ok(tm.bg[0].includes('linear-gradient'),'squares carry a red ramp gradient');
+  ok(tm.n===4&&tm.donutHidden,'tree map shows one square per debt'); ok(tm.cover>0.9,'squares fill the grid ('+(tm.cover*100).toFixed(0)+'%)'); ok(tm.bigFirst,'bigger debt = bigger square'); ok(tm.bg[0].includes('linear-gradient'),'squares carry the lender gradient');
   ok(await p.evaluate(()=>localStorage.getItem('vi_debt_view'))==='tree','choice is remembered'); await p.evaluate(()=>setDebtView('donut'));
   // ---- viewport
   await p.evaluate(()=>showTab('house')); await p.waitForTimeout(900);

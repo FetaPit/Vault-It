@@ -10350,7 +10350,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     <div class="ov-kpi ov-kpi-nw">
       <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M3 17 9 11l4 4 8-9"/><path d="M15 6h6v6"/></svg>Net Worth</div>
       <div class="ov-kpi-val" id="kpi-nw" style="color:var(--em)">£0</div>
-      <div class="ov-kpi-sub" id="kpi-nw-sub">assets − liabilities</div>
+      <div class="ov-kpi-sub" id="kpi-nw-sub">own − owe</div>
     </div>
     <div class="ov-kpi ov-kpi-as">
       <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/></svg>Total Assets</div>
@@ -12741,8 +12741,8 @@ function updateKPIs() {
   el('kpi-assets').textContent  = gbpFmt(assets);
   var dtEl = el('kpi-debt-total');
   if (dtEl) dtEl.textContent = gbpFmt(debtOnly);
-  el('kpi-liab').textContent    = gbpFmt(liabOnly);
-  el('kpi-liab-sub').textContent = liabOnly > 0 ? 'running costs accrued' : 'physical liabilities';
+  el('kpi-liab').textContent    = gbpFmt(alLiabAssetTotal());   // value logged; running costs come off net worth
+  el('kpi-liab-sub').textContent = alLiabCostLine();
   // Add biz income streams to KPI total
   var bizMonthly = 0;
   if (typeof bizState !== 'undefined' && bizState.incomeStreams) {
@@ -18884,6 +18884,8 @@ function stkShotConfirm(){
 
 // Liabilities: their current asset value ADDS to NW; only running costs detract
 function alLiabAssetTotal(){return alState.liabilities.reduce(function(s,l){return s+depreciatedValue(l);},0);}
+function alLiabMonthly(){return (alState.liabilities||[]).reduce(function(s,l){return s+(+l.runningCost>0?+l.runningCost:0);},0);}
+function alLiabCostLine(){var mo=alLiabMonthly(),acc=alTotalLiab();return mo>0?gbpFmt(mo)+'/mo running · '+gbpFmt(acc)+' so far':'no running costs';}
 function alTotalLiab(){
   // Returns accumulated running costs (monthly cost × months held)
   return alState.liabilities.reduce(function(s,l){
@@ -21669,13 +21671,24 @@ function viLight(){return document.documentElement.getAttribute('data-theme')===
 // debt charts: a red ramp, the largest debt strongest (issuer colours stay on the card artwork only)
 function debtChartRamp(debts){
   var tok=function(n){var v=viCss(n+'-rgb').split(/[\s,]+/).map(Number);return v.length===3&&v.every(function(x){return x>=0;})?v:[128,128,128];};
+  var hex=function(h){h=String(h).replace('#','');if(h.length===3)h=h.replace(/./g,'$&$&');return [0,2,4].map(function(k){return parseInt(h.substr(k,2),16)||0;});};
+  var lum=function(c){var l=c.map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});return .2126*l[0]+.7152*l[1]+.0722*l[2];};
+  var cr=function(a,b){var x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);};
+  var fgFor=function(c){var L=lum(c);return (L+.05)/0.062>1.05/(L+.05)?'#0B1F22':'#FFFFFF';};   // ink or white, whichever reads better
   var red=tok('red'),pan=tok('panel'),map={};
   var list=(debts||[]).filter(function(d){return d.balance>0;}).sort(function(a,b){return (b.balance-a.balance)||((+a.id||0)-(+b.id||0));});
+  var plain=[];
+  list.forEach(function(d){
+    var b=null;try{b=ccBrand(d);}catch(e){}
+    if(!(b&&b.g)){plain.push(d);return;}
+    var c1=b.g[0],c2=b.g[1],lo=cr(hex(c1),pan)<1.6;
+    if(lo&&b.acc){c1=b.acc;c2=b.g[0];lo=cr(hex(c1),pan)<1.6;}     // near-black cards (HSBC, Capital One) show their accent
+    map[d.id]={c1:c1,c2:c2,fg:fgFor(hex(c1)),brand:b.n,edge:lo};   // edge: draw a hairline where the colour is close to the panel
+  });
   var mix=function(t){return red.map(function(c,k){return Math.round(pan[k]+(c-pan[k])*t);});};
-  var lum=function(c){var l=c.map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});return .2126*l[0]+.7152*l[1]+.0722*l[2];};
-  list.forEach(function(d,i){
-    var k=list.length>1?1-0.6*i/(list.length-1):1,a=mix(k),b=mix(k*0.75),L=lum(a);
-    map[d.id]={c1:'rgb('+a.join(',')+')',c2:'rgb('+b.join(',')+')',fg:(L+.05)/0.062>1.05/(L+.05)?'#0B1F22':'#FFFFFF',k:k};   // label: whichever of ink or white reads better
+  plain.forEach(function(d,i){
+    var k=plain.length>1?1-0.6*i/(plain.length-1):1,a=mix(k),b2=mix(k*0.75);
+    map[d.id]={c1:'rgb('+a.join(',')+')',c2:'rgb('+b2.join(',')+')',fg:fgFor(a),k:k};
   });
   return map;
 }
@@ -21728,7 +21741,7 @@ function drawDebtHistogram(){
     if(paidPct>0.005){var ghostH=bH*paidPct/Math.max(0.001,1-paidPct);
       ctx.save();ctx.strokeStyle=pal.c1;ctx.globalAlpha=0.55;ctx.setLineDash([4,3]);ctx.lineWidth=1.2;ctx.strokeRect(bx+.5,by-ghostH+.5,bww-1,ghostH-1);ctx.fillStyle=pal.c1;ctx.globalAlpha=0.08;ctx.fillRect(bx,by-ghostH,bww,ghostH);ctx.restore();}
     ctx.fillStyle=g;
-    ctx.beginPath();var r=Math.min(6,bww/4);ctx.moveTo(bx,by+bH);ctx.lineTo(bx,by+r);ctx.quadraticCurveTo(bx,by,bx+r,by);ctx.lineTo(bx+bww-r,by);ctx.quadraticCurveTo(bx+bww,by,bx+bww,by+r);ctx.lineTo(bx+bww,by+bH);ctx.closePath();ctx.fill();
+    ctx.beginPath();var r=Math.min(6,bww/4);ctx.moveTo(bx,by+bH);ctx.lineTo(bx,by+r);ctx.quadraticCurveTo(bx,by,bx+r,by);ctx.lineTo(bx+bww-r,by);ctx.quadraticCurveTo(bx+bww,by,bx+bww,by+r);ctx.lineTo(bx+bww,by+bH);ctx.closePath();ctx.fill();if(pal.edge){ctx.strokeStyle=viRgba('ink',.35);ctx.lineWidth=1;ctx.stroke();}
     ctx.fillStyle='rgba(255,255,255,.14)';ctx.fillRect(bx,by,bww*0.28,bH);
     ctx.fillStyle=viCss('text');ctx.font='bold '+fs+"px 'Share Tech Mono',monospace";ctx.textAlign='center';
     ctx.fillText(gbpFmt(d.balance),bx+bww/2,by-fs*0.5);
@@ -21773,7 +21786,8 @@ function drawDebtDonut(){
     var mid=angle+slice/2,g=ctx.createLinearGradient(cx+Math.cos(mid)*inner,cy+Math.sin(mid)*inner,cx+Math.cos(mid)*r,cy+Math.sin(mid)*r);
     g.addColorStop(0,pal.c2);g.addColorStop(1,pal.c1);
     ctx.beginPath();ctx.arc(cx,cy,r,angle,angle+slice);ctx.arc(cx,cy,inner,angle+slice,angle,true);ctx.closePath();
-    ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#0d1520';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=viCss('panel');ctx.lineWidth=2;ctx.stroke();
+    if(pal.edge){ctx.strokeStyle=viRgba('ink',.35);ctx.lineWidth=1;ctx.stroke();}
     angle+=slice;
   });
   ctx.fillStyle='rgba(232,232,232,0.95)';ctx.font='bold '+Math.max(13,r*0.2)+"px 'Share Tech Mono',monospace";ctx.textAlign='center';
@@ -21821,7 +21835,7 @@ function drawDebtTreemap(){
   var cells=dtmSquarify(debts.map(function(d){return{v:d.balance,d:d};}),0,0,W,H);
   el.innerHTML=cells.map(function(c){
     var pal=ramp[c.d.id],big=c.w>110&&c.h>70,mid=c.w>70&&c.h>46,pct=Math.round(c.d.balance/total*100);
-    return '<div class="dtm-cell" title="'+ccEsc(c.d.name)+' — '+gbpFmt(c.d.balance)+' ('+pct+'%) · '+(+c.d.rate||0)+'% APR" style="left:'+(c.x+gap/2)+'px;top:'+(c.y+gap/2)+'px;width:'+(c.w-gap)+'px;height:'+(c.h-gap)+'px;background:linear-gradient(135deg,'+pal.c1+','+pal.c2+');color:'+pal.fg+'">'
+    return '<div class="dtm-cell" title="'+ccEsc(c.d.name)+' — '+gbpFmt(c.d.balance)+' ('+pct+'%) · '+(+c.d.rate||0)+'% APR" style="left:'+(c.x+gap/2)+'px;top:'+(c.y+gap/2)+'px;width:'+(c.w-gap)+'px;height:'+(c.h-gap)+'px;background:linear-gradient(135deg,'+pal.c1+','+pal.c2+');color:'+pal.fg+(pal.edge?';outline:1px solid rgb(var(--ink-rgb) / .3);outline-offset:-1px':'')+'">'
       +(mid?'<b class="dtm-n">'+ccEsc(c.d.name)+'</b>':'')
       +(mid?'<span class="dtm-v">'+gbpFmt(c.d.balance)+'</span>':'')
       +(big?'<span class="dtm-s">'+pct+'% of debt · '+(+c.d.rate||0)+'% APR</span>':'')
@@ -22295,7 +22309,8 @@ function renderSummaryCards(){
   var lEl=document.getElementById('ov-liab-summary');
   if(lEl){
     var tl=alTotalLiab();
-    lEl.innerHTML='<div class="ov-sum-total" style="color:var(--amber)">'+gbpFmt(tl)+'</div>'
+    lEl.innerHTML='<div class="ov-sum-total" style="color:var(--amber)">'+gbpFmt(alLiabAssetTotal())+'</div>'
+      +'<div class="ov-sum-empty" style="margin:-6px 0 10px">'+alLiabCostLine()+'</div>'
       +(alState.liabilities.length?
       alState.liabilities.map(function(l){
         return '<div class="ov-sum-row">'+ovIcon('warn','var(--amber)')+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(l.name)+'</span>'
@@ -22312,12 +22327,14 @@ function renderSummaryCards(){
   var dEl=document.getElementById('ov-debt-summary');
   if(dEl){
     var td=debtTotal();
+    var _dr=debtChartRamp(debtState.debts);
     dEl.innerHTML='<div class="ov-sum-total" style="color:var(--re)">'+gbpFmt(td)+'</div>'
       +debtState.debts.map(function(d){
+        var dc=(_dr[d.id]||{}).brand?_dr[d.id].c1:'var(--re)';
         var pct=d.original>0?Math.round((1-d.balance/d.original)*100):0;
         var ik=(d.type==='credit'||d.type==='bnpl')?'card':'loan';
         return '<div class="ov-sum-drow">'
-          +'<div class="ov-sum-row">'+ovIcon(ik,'var(--re)')+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(d.name)+'</span>'
+          +'<div class="ov-sum-row">'+ovIcon(ik,dc)+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(d.name)+'</span>'
           +'<span class="ov-sum-v" style="color:var(--re)">'+gbpFmt(d.balance)+'</span></div>'
           +'<div class="ov-sum-bar"><div style="width:'+pct+'%"></div></div></div>';
       }).join('');
