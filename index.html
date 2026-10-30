@@ -6851,6 +6851,20 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       }
       return { bi: bi, part: part, n: n, front: front, back: back, laid: laid, attr: at, rank: P.rank[bi], cnt: 0, drop: part === 'brick' || part === 'roof' };
     });
+    // window glow (6.5, Night): a soft gold radial over each pane, alpha (0.22 + 0.10 * pulse) * lit, additive, no depth write
+    this._bGlow = null;
+    this._bm.forEach(function (rec) {
+      if (!rec || rec.part !== 'glass') return;
+      var gm = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+        uniforms: { uLit: U.uLitGlass, uPulse: U.uPulse, uCol: { value: v3(C.flash) } },
+        vertexShader: 'varying vec3 vL; void main() { vL = position; gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0); }',
+        fragmentShader: ['uniform float uLit; uniform float uPulse; uniform vec3 uCol; varying vec3 vL;',
+          'void main() { float d = length(vL.xy) * 2.0; float a = smoothstep(1.0, 0.0, d) * (0.22 + 0.10 * uPulse) * uLit; gl_FragColor = vec4(uCol * a, a); }'].join('\n') });
+      var glow = new THREE.InstancedMesh(G.box, gm, rec.n);
+      for (var k = 0; k < rec.n; k++) glow.setMatrixAt(k, compose(m.batches[rec.bi].xf, P.perm[rec.bi][k] * 10, 1.9));
+      glow.instanceMatrix.needsUpdate = true; glow.frustumCulled = false; glow.renderOrder = 8; glow.name = 'glow:glass'; grp.add(glow);
+      self._bGlow = glow;
+    });
     // the most recently laid brick: pale gold, 14% proud, pulsing
     var hl = this._bHL = new THREE.Mesh(G.box, brandMat(U, { base: C.brick, edgeK: 0.4, bevel: 0.014 }, false, true));
     hl.matrixAutoUpdate = false; hl.visible = false; hl.renderOrder = 7; grp.add(hl);
@@ -11255,6 +11269,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
             </div>
           </div>
         </div>
+        <div class="pops" id="hb-pops" aria-hidden="true"></div>
         <!-- HUD control buttons — inside scene, positioned correctly relative to it -->
         <div class="hud-bar" id="hud-bar-house">
           <button class="hud-btn" id="hud-zoom-in"  onclick="houseZoomIn()"  title="Zoom In"  aria-label="Zoom in"  style="font-size:1.1rem;font-weight:700;padding:0">+</button>
@@ -15090,13 +15105,16 @@ document.getElementById('btnAdd').addEventListener('click',()=>{
   if(!v||v<=0){toast('Enter a valid amount');return;}
   const vBase=v/(window.VI_CURRENCY_RATE||1);
   if(state.houseMode==='purchased'){if(!(+state.mortgageBalance>0)){toast('Your mortgage is already paid off');return;}hbPayMortgage(vBase);document.getElementById('savingsInput').value='';return;}
+  const p0=pct();
   state.saved+=vBase;
   state.deposits.push({amount:vBase,date:new Date().toLocaleDateString('en-GB')});
   recordHabitContribution(vBase);
-  save();checkMS(pct());updateUI();
+  const brand=hbBrandOn()&&!!hbBrickInfo();
+  save();if(brand){prevP=pct();}else{checkMS(pct());}updateUI();
   document.getElementById('savingsInput').value='';
   const sym=window.VI_CURRENCY_SYMBOL||'£';
   if (!_isPro()) { showToast('Deposit saved! Upgrade to Pro to watch your house being built 🏗'); }
+  else if (brand) { _hbEngaged=true; hbPop(hbBrandLaid(vBase, v.toLocaleString())); hbFlash(); hbBrandMS(p0, pct()); }   // 6.8: moves, counts, says
   else { toast(vBase<state.target*.005?`+${sym}${v.toLocaleString()} — brick by brick!`:`+${sym}${v.toLocaleString()} added!`); }
 });
 
@@ -15854,6 +15872,19 @@ function setViewFlag(name, on, btn) {   // Settings: brand build or classic hous
 }
 // The brand build (brand handover 6.2 to 6.10) on the six 3D houses, Level 1 only: ?house=new or vi-flag-house = 1.
 function hbBrandOn() { return viFlag('house') && typeof HB3D !== 'undefined' && !!HB3D.brandStats; }
+// 6.8 gamified feedback (brand build): pop-up, stage flash and milestone toasts. Toasts only after the person has interacted, never during the opening build.
+var _hbEngaged = false, _hbMS = [[1, 'Site cleared'], [5, 'Foundations'], [10, '10%'], [25, 'Quarter'], [50, 'Halfway'], [75, 'Three-quarters'], [100, 'Deposit ready']];
+function hbPop(txt) { var h = document.getElementById('hb-pops'); if (!h) return; var e = document.createElement('div'); e.className = 'pop'; e.textContent = txt; h.appendChild(e); setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 1300); }
+function hbFlash() { var sc = document.getElementById('house-scene'); if (!sc) return; sc.classList.remove('flash'); void sc.offsetWidth; sc.classList.add('flash'); }
+function hbBrandMS(p0, p1) {
+  if (!_hbEngaged) return; var hit = null;
+  _hbMS.forEach(function (m) { var t = m[0] / 100; if (p0 < t - 1e-9 && p1 >= t - 1e-9) hit = m; });
+  if (hit) toast(hit[0] === 100 ? 'Keys are yours.' : 'Milestone: ' + hit[0] + '% ' + hit[1]);
+}
+function hbBrandLaid(vBase, shown) {   // what the deposit bought, in bricks: "+£5 · +4 bricks" or "+£5 · 0.42 of a brick"
+  var bi = hbBrickInfo(), nb = bi && bi.perBrick > 0 ? vBase / bi.perBrick : 0;
+  return '+£' + shown + ' · ' + (nb >= 1 ? '+' + Math.round(nb) + ' brick' + (Math.round(nb) === 1 ? '' : 's') : nb.toFixed(2) + ' of a brick');
+}
 // brand maths for a compiled model: brick value = deposit target x 0.77 / bricks, bricks laid = floor(bricks x seg(p, 0.03, 0.80))
 function hbBrandModel(m) { return !!(m && m.clean && !m.custom && m.rows && hbBrandOn()); }
 function hb3dOn() {
@@ -26984,6 +27015,12 @@ function nwhRenderMini(){
 .nw3d-stage{position:relative;border:1px solid var(--line2);border-radius:12px;overflow:hidden;background-color:#080808;background-image:var(--stage-bg)}
 .nw3d-stage::after{content:"";position:absolute;inset:0;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none}
 #house-scene.hb-brand::after{content:"";position:absolute;inset:0;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none;z-index:1}
+/* 6.8 gamified feedback on the brand build: "+£5 · +4 bricks" floats up, the stage border flashes gold */
+#house-scene .pops{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
+#house-scene .pop{position:absolute;left:50%;bottom:22%;font-family:var(--font-mono);color:var(--gold);font-size:clamp(18px,3vw,28px);text-shadow:var(--popglow);animation:hb-popup 1250ms var(--ease) forwards;white-space:nowrap}
+@keyframes hb-popup{0%{opacity:0;transform:translate(-50%,12px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-70px)}}
+#house-scene.hb-brand.flash{animation:nw3d-sflash 800ms var(--ease)}
+@media (prefers-reduced-motion:reduce){#house-scene .pop{animation:none;transform:translate(-50%,0)}#house-scene.hb-brand.flash{animation:none}}
 .nw3d-stage canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:pan-y;outline-offset:-3px}
 .nw3d-stage canvas:focus-visible{outline:2px solid var(--teal)}
 .nw3d-stage.flash{animation:nw3d-sflash 800ms var(--ease)}.nw3d-stage.flashg{animation:nw3d-sflashg 900ms var(--ease)}

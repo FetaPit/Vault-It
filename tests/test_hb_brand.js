@@ -128,6 +128,22 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   ok(r.mode === 'equity' && !r.brand && !r.grpVis && r.water, 'Level 2 (equity) keeps its current look with the flag on');
   await p.context().close();
 
+  // ── 8. 6.8 gamified feedback: the opening build is silent; laying bricks pops "+£200 · +227 bricks", flashes the stage and toasts the milestone; windows glow once lit ──
+  p = await open(terr(5900)); await p.waitForFunction(() => HB3D.viewer.brandInfo(), null, { timeout: 60000 }).catch(() => {}); await settle(p);
+  r = await p.evaluate(() => ({ engaged: _hbEngaged, toastShown: document.getElementById('toast').classList.contains('show'), glow: !!(HB3D.viewer._bGlow && HB3D.viewer._bGlow.count), lit: HB3D.viewer._bU.uLitGlass.value, pops: document.querySelectorAll('#hb-pops .pop').length }));
+  ok(!r.engaged && !r.toastShown && r.pops === 0, 'the opening build shows no toast or pop-up (nobody has interacted yet)');
+  ok(r.glow && r.lit === 0, 'every window has a glow quad, unlit while the house is still being built');
+  await p.fill('#savingsInput', '200'); await p.click('#btnAdd'); await p.waitForTimeout(150);
+  r = await p.evaluate(() => ({ pop: (document.querySelector('#hb-pops .pop') || {}).textContent || '', flash: document.getElementById('house-scene').classList.contains('flash'), toast: document.getElementById('toast').textContent, shown: document.getElementById('toast').classList.contains('show'), per: hbBrickInfo().perBrick, p: pct() }));
+  const wantB = Math.round(200 / r.per);
+  ok(r.pop === '+£200 · +' + wantB + ' bricks', 'the pop-up says what the deposit bought: ' + r.pop);
+  ok(r.flash, 'the stage border flashes gold');
+  ok(r.shown && r.toast === 'Milestone: 25% Quarter' && r.p >= 0.25, 'crossing 25% toasts "Milestone: 25% Quarter" (p = ' + r.p.toFixed(3) + ')');
+  await p.evaluate(() => { state.saved = 24000; save(); updateUI(); }); await settle(p); await p.waitForTimeout(300);
+  r = await p.evaluate(() => ({ lit: HB3D.viewer._bU.uLitGlass.value, vis: HB3D.viewer._bGlow.visible, keys: HB3D.viewer.brandInfo().keys, shared: HB3D.viewer._bGlow.material.uniforms.uLit === HB3D.viewer._bU.uLitGlass }));
+  ok(r.lit === 1 && r.vis && r.keys && r.shared, 'at 100% the windows are lit and the glow follows the same uniform (alpha (0.22 + 0.10 pulse) x lit)');
+  await p.context().close();
+
   ok(errs.length === 0, 'no page errors ' + errs.slice(0, 3).join(' | '));
   await b.close();
   console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED');

@@ -303,6 +303,20 @@
       }
       return { bi: bi, part: part, n: n, front: front, back: back, laid: laid, attr: at, rank: P.rank[bi], cnt: 0, drop: part === 'brick' || part === 'roof' };
     });
+    // window glow (6.5, Night): a soft gold radial over each pane, alpha (0.22 + 0.10 * pulse) * lit, additive, no depth write
+    this._bGlow = null;
+    this._bm.forEach(function (rec) {
+      if (!rec || rec.part !== 'glass') return;
+      var gm = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+        uniforms: { uLit: U.uLitGlass, uPulse: U.uPulse, uCol: { value: v3(C.flash) } },
+        vertexShader: 'varying vec3 vL; void main() { vL = position; gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0); }',
+        fragmentShader: ['uniform float uLit; uniform float uPulse; uniform vec3 uCol; varying vec3 vL;',
+          'void main() { float d = length(vL.xy) * 2.0; float a = smoothstep(1.0, 0.0, d) * (0.22 + 0.10 * uPulse) * uLit; gl_FragColor = vec4(uCol * a, a); }'].join('\n') });
+      var glow = new THREE.InstancedMesh(G.box, gm, rec.n);
+      for (var k = 0; k < rec.n; k++) glow.setMatrixAt(k, compose(m.batches[rec.bi].xf, P.perm[rec.bi][k] * 10, 1.9));
+      glow.instanceMatrix.needsUpdate = true; glow.frustumCulled = false; glow.renderOrder = 8; glow.name = 'glow:glass'; grp.add(glow);
+      self._bGlow = glow;
+    });
     // the most recently laid brick: pale gold, 14% proud, pulsing
     var hl = this._bHL = new THREE.Mesh(G.box, brandMat(U, { base: C.brick, edgeK: 0.4, bevel: 0.014 }, false, true));
     hl.matrixAutoUpdate = false; hl.visible = false; hl.renderOrder = 7; grp.add(hl);
