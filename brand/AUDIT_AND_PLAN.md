@@ -36,7 +36,7 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 | 10 | Brand look and every animation on all six three.js models in `src/hb3d` (owner chose option a), behind `?house=new` | Built behind the flag (`src/hb3d/brand.js`, `tests/test_hb_brand.js`, `docs/HB3D_KIT.md` "Brand build"), needs the owner's phone test |
 | 11 | Net worth in 3D as the Overview hero: 3D blocks first, Graph toggle, choice remembered, blocks in the sub-tab colours, behind `?nw=new` | Built behind the flag (`?nw=new`, off again with `?nw=old`), needs the owner's phone test. `tests/test_nw3d.js` |
 | 12 | On by default for testers once the owner signs off on the phone (old builder reachable from Settings for a week) | Done 30 Oct: both 3D views on by default; Settings has Brand build / Classic and 3D / Classic chart; `?house=old`, `?nw=old` also switch a device to classic |
-| 13 | `landing.html` brand pass; cache version bump. (The service worker part was done with the cross-device work, `04e58dd`.) | |
+| 13 | `landing.html` brand pass; cache version bump. (The service worker part was done with the cross-device work, `04e58dd`.) | Done 30 Oct: tokens, wordmark and mark, tagline, the brand book's 3D house (`site/brand-hero.js`, extracted by `tools/extract_brand_hero.sh`) built to the finished home with pulse, ring and scanlines, Night/Daylight toggle; follow-on pages rethemed. Cache bump is the app's `sw.js` version, stamped per build. |
 | 14 | Full suite and the QA list (brief section 9). Release only when the owner asks | |
 
 ### Working notes

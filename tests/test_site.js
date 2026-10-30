@@ -8,7 +8,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   cp.execFileSync('node', [path.join(ROOT, 'tools', 'build_site.js')], { env: { ...process.env, WORKERS_CI_COMMIT_SHA: 'abc123', SITE_OUT: DIST }, stdio: ['ignore', 'ignore', 'inherit'] });
   const tree = (d) => fs.readdirSync(path.join(DIST, d), { recursive: true }).map(String).filter((f) => fs.statSync(path.join(DIST, d, f)).isFile()).sort();
   ok(JSON.stringify(tree('app')) === JSON.stringify(['404.html', 'index.html', 'logo.png', 'manifest.webmanifest', 'og-image.png', 'recover.html', 'robots.txt', 'sw.js', 'version.json']), 'app site contains only the app, the recovery page, the manifest and service worker, logo, share image, robots, 404 and version: ' + tree('app'));
-  ok(JSON.stringify(tree('landing')) === JSON.stringify(['404.html', 'img/founder.jpg', 'img/house-built.jpg', 'img/house-deposit.jpg', 'index.html', 'og-image.png', 'robots.txt', 'sign-up.html', 'sign-up/confirm.html', 'sign-up/style.css', 'sign-up/thanks.html', 'sign-up/unsubscribe.html']), 'landing site contains only the sign-up page, its follow-on pages and images, share image, robots and 404: ' + tree('landing'));
+  ok(JSON.stringify(tree('landing')) === JSON.stringify(['404.html', 'brand-hero.js', 'img/founder.jpg', 'img/house-built.jpg', 'index.html', 'og-image.png', 'robots.txt', 'sign-up.html', 'sign-up/confirm.html', 'sign-up/style.css', 'sign-up/thanks.html', 'sign-up/unsubscribe.html']), 'landing site contains only the sign-up page, its follow-on pages and images, share image, robots and 404: ' + tree('landing'));
   ok(fs.readdirSync(DIST).sort().join() === 'app,landing', 'nothing else is published (no tests, docs, notes or function code)');
   ok(JSON.parse(fs.readFileSync(path.join(DIST, 'app', 'version.json'), 'utf8')).sha === 'abc123', 'version.json records the commit being built');
   ok(/<title>Vault/i.test(fs.readFileSync(path.join(DIST, 'app', 'index.html'), 'utf8')) && /Join the beta list/.test(fs.readFileSync(path.join(DIST, 'landing', 'index.html'), 'utf8')), 'index pages are the right ones');
@@ -27,7 +27,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   r = await get('https://app.vault-it.co/version.json'); ok(r.s === 200 && JSON.parse(r.t).sha === 'abc123' && r.h.get('cache-control') === 'no-store', 'version.json is served and never cached');
   r = await get('https://vault-it.co/'); ok(r.s === 200 && /Join the beta list/.test(r.t), 'vault-it.co/ serves the landing page');
   r = await get('https://vault-it.co/sign-up'); ok(r.s === 200 && /Join the beta list/.test(r.t) && /rel="canonical" href="https:\/\/vault-it.co\/sign-up"/.test(r.t), 'vault-it.co/sign-up serves the sign-up page (canonical address)');
-  for (const p of ['/sign-up/thanks', '/sign-up/confirm', '/sign-up/unsubscribe', '/sign-up/style.css', '/img/house-deposit.jpg']) { r = await get('https://vault-it.co' + p); if (r.s !== 200) ok(false, p + ' → ' + r.s); }
+  for (const p of ['/sign-up/thanks', '/sign-up/confirm', '/sign-up/unsubscribe', '/sign-up/style.css']) { r = await get('https://vault-it.co' + p); if (r.s !== 200) ok(false, p + ' → ' + r.s); }
   ok(true, 'the follow-on pages and images are served');
   r = await get('https://my-branch-vault-it.pete.workers.dev/landing/sign-up/thanks'); ok(r.s === 200 && /check your inbox/i.test(r.t), 'previews serve the follow-on pages under /landing/');
   r = await get('https://vault-it.co/version.json'); ok(r.s === 404, 'the landing host does not serve the app’s files');

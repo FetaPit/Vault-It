@@ -2,111 +2,208 @@
 <html lang="en-GB">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Vault-It beta — watch your deposit build your home, brick by brick</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Vault-It: Get out of the red and into your home.</title>
 <meta name="description" content="Join the free Vault-It beta: one map of your debts, savings, house deposit and net worth, and a 3D house that builds as you save. Built in the UK. No bank login." />
 <link rel="canonical" href="https://vault-it.co/sign-up" />
-<meta name="theme-color" content="#04090f" />
+<meta name="theme-color" content="#080808" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Vault-It" />
 <meta property="og:locale" content="en_GB" />
 <meta property="og:url" content="https://vault-it.co/sign-up" />
-<meta property="og:title" content="Watch your deposit build your home — join the Vault-It beta" />
+<meta property="og:title" content="Vault-It: Get out of the red and into your home." />
 <meta property="og:description" content="Debts, savings, deposit and net worth on one map, and a 3D house that rises as you save. Free during the beta. No bank login." />
 <meta property="og:image" content="https://vault-it.co/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Vault-It — from debt to the keys of your own home" />
+<meta property="og:image:alt" content="Vault-It: get out of the red and into your home" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Watch your deposit build your home — join the Vault-It beta" />
+<meta name="twitter:title" content="Vault-It: Get out of the red and into your home." />
 <meta name="twitter:description" content="Debts, savings, deposit and net worth on one map, and a 3D house that rises as you save. Free during the beta." />
 <meta name="twitter:image" content="https://vault-it.co/og-image.png" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2304090f'/%3E%3Cpath d='M6 16 16 7l10 9v10H6z' fill='none' stroke='%2344c0b9' stroke-width='2.4' stroke-linejoin='round'/%3E%3Crect x='13' y='18' width='6' height='8' fill='%23c9a84c'/%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Ccircle cx='120' cy='120' r='108' fill='%23000810' stroke='%2342C0B8' stroke-width='14'/%3E%3Cpolygon points='60,76 88,76 120,126.2 152,76 180,76 120,170' fill='%2342C0B8'/%3E%3C/svg%3E" />
+<script>(function(){try{var t=localStorage.getItem("vi-theme");if(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches)t="light";if(t==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
 <style>
-:root{--bg:#04090f;--bg2:#07111b;--card:#0a1622;--line:rgba(68,192,185,.18);--teal:#44c0b9;--gold:#d4b25a;--txt:#eef3f7;--muted:#a9b8c5;--err:#ff8a8a;--r:16px}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-body{background:var(--bg);color:var(--txt);font:17px/1.6 'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+/* Tokens: the same values as the app and the brand book. Night is the default, Daylight is the light mode. */
+:root,[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --line:#102221; --line2:#15302F;
+  --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882;
+  --teal:#44C0B9; --teal-deep:#007F7B; --gold:#E8C56A; --brass:#C9A84C; --green:#3ECF8E; --red:#E05C5C;
+  --goldf:#E8C56A; --on-teal:#00181A; --on-gold:#1A1400; --pulse:2800ms;
+  --surf:#0A1018; --surf2:#080D14; --track:#13202A; --pillbg:#12100A;
+  --stat:#B6D8D6; --stext:0 0 8px #000; --rail-bg:rgba(0,12,18,.74); --rail-btn:rgba(8,24,28,.85);
+  --stage-bg:radial-gradient(120% 90% at 50% 100%,#06242A 0%,#00131A 45%,#080808 100%);
+  --scan:repeating-linear-gradient(0deg,rgba(68,192,185,.05) 0 1px,transparent 1px 4px);--scan-size:auto;
+  --paper-img:repeating-linear-gradient(0deg,rgba(68,192,185,.025) 0 1px,transparent 1px 4px);--paper-size:auto;
+  --tglow:0 0 18px rgba(68,192,185,.35); --dglow:0 0 10px rgba(68,192,185,.6); --popglow:0 0 14px rgba(232,197,106,.7);
+  --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
+  --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
+  --mk-v:#080808; --mk-t:#44C0B9; --mk-bz:#04141A; --mk-h:#0C2A30; --mk-t2:#34A9A2; --mk-hl:#9BEAE3; --mk-gd:#E8C56A;
+  --font-display:"Syne","Helvetica Neue",Arial,sans-serif;
+  --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r-tile:14px; --r-card:18px; --r-pill:999px;
+  --ease:cubic-bezier(.2,.8,.2,1); --t-fast:240ms; --t-base:600ms;
+}
+/* Daylight: deep teal ink on soft paper. Same hues, darker values, no bloom, blueprint grid instead of scanlines. */
+[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F3F7F6; --panel:#FFFFFF; --panel2:#EAF2F1; --line:#C5DAD8; --line2:#9FC4C1;
+  --text:#0B1F22; --muted:#3F5658; --faint:#2E6F6C;
+  --teal:#297B76; --teal-deep:#006B67; --gold:#8B6A15; --brass:#A18331; --green:#207F54; --red:#D62929;
+  --on-teal:#FFFFFF; --on-gold:#1A1400;
+  --surf:#FFFFFF; --surf2:#FFFFFF; --track:#D9E7E6; --pillbg:#FFF6DD;
+  --stat:#1E4A48; --stext:none; --rail-bg:rgba(255,255,255,.88); --rail-btn:#FFFFFF;
+  --stage-bg:radial-gradient(120% 90% at 50% 100%,#D3E9E7 0%,#E6F2F1 50%,#F6FAF9 100%);
+  --scan:linear-gradient(rgba(0,127,123,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.07) 1px,transparent 1px);--scan-size:26px 26px;
+  --paper-img:linear-gradient(rgba(0,127,123,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.05) 1px,transparent 1px);--paper-size:32px 32px;
+  --tglow:none; --dglow:none; --popglow:none;
+  --btn1:#006B67; --btn2:#00837E; --bshadow:0 6px 16px -8px rgba(0,90,88,.55);
+  --glow:0 10px 28px -16px rgba(0,90,88,.35); --elev:0 1px 0 #fff inset,0 10px 28px -18px rgba(0,90,88,.3);
+  --mk-v:#FFFFFF; --mk-t:#006B67; --mk-bz:#EAF3F2; --mk-h:#CDE7E4; --mk-t2:#00504D; --mk-hl:#4FB3AD; --mk-gd:#C79A1C;
+}
+html{box-sizing:border-box;scroll-behavior:smooth;scroll-padding-top:84px;-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:inherit}
+html,body{overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;background-image:var(--paper-img);background-size:var(--paper-size)}
+img,svg,canvas{max-width:100%}
+h1,h2,h3{font-family:var(--font-display);margin:0;letter-spacing:-.01em;line-height:1.05}
+h2{font-size:clamp(28px,5vw,44px);font-weight:800;margin-bottom:14px}
+h3{font-size:20px;font-weight:700;line-height:1.2;margin-bottom:10px}
+p{margin:0 0 1em}
 a{color:var(--teal)}
-h1,h2,h3{font-family:'Syne','DM Sans',system-ui,sans-serif;line-height:1.15;letter-spacing:-.01em}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:#fff;color:#000;padding:8px;z-index:9}
-header{position:sticky;top:0;z-index:5;background:rgba(4,9,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-.bar{display:flex;align-items:center;justify-content:space-between;height:60px}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;color:var(--txt);text-decoration:none}.logo span{color:var(--gold)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;font:700 1rem 'DM Sans',sans-serif;cursor:pointer;text-decoration:none;min-height:48px;padding:0 22px}
-.btn-gold{background:var(--gold);color:#04090f}.btn-gold:hover{filter:brightness(1.08)}
-.btn-sm{min-height:40px;padding:0 16px;font-size:.92rem}
-.btn:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:var(--panel);color:var(--text);padding:8px;z-index:99}
+.lbl{font-family:var(--font-mono);font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+.lede{color:var(--muted);font-size:18px;max-width:56ch}
+.mono{font-family:var(--font-mono)}
+/* header */
+.hdr{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+@media(max-width:700px){.hdr{backdrop-filter:none;background:var(--bg)}}
+.hdr .wrap{display:flex;align-items:center;gap:12px;height:60px}
+.hdr .grow{flex:1}
+.lockup{display:inline-flex;align-items:center;gap:10px;text-decoration:none}
+.mark{width:32px;height:32px;display:block;flex:none}
+.mark .mk-v{fill:var(--mk-v);stroke:var(--mk-t)} .mark .mk-bz{fill:var(--mk-bz)} .mark .mk-tab rect{fill:var(--mk-v);stroke:var(--mk-t)} .mark .mk-tab circle{fill:var(--mk-t)}
+.mark .mk-h{fill:var(--mk-h);stroke:var(--mk-h)} .mark .mk-t{fill:var(--mk-t)} .mark .mk-t2{fill:var(--mk-t2)} .mark .mk-hl{stroke:var(--mk-hl)} .mark .mk-gd{fill:var(--mk-gd)}
+.wm{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;white-space:nowrap;display:inline-flex;align-items:baseline;color:var(--text);font-size:22px}
+.wm b{font-weight:inherit;color:var(--teal);text-shadow:var(--tglow)}
+.wm .dot{display:inline-block;width:.3em;height:.17em;background:var(--teal);border-radius:2px;margin:0 .07em;transform:translateY(-.06em);box-shadow:var(--dglow)}
+[data-theme="light"] .wm b{color:var(--teal-deep);text-shadow:none}
+[data-theme="light"] .wm .dot{background:var(--teal-deep);box-shadow:none}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:700 13px/1 var(--font-display);letter-spacing:.14em;text-transform:uppercase;border:0;border-radius:10px;padding:15px 22px;cursor:pointer;min-height:48px;text-decoration:none;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast),filter var(--t-fast)}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#fff;box-shadow:var(--bshadow)}
+.btn-primary:hover{filter:brightness(1.12)}
+.btn-gold{background:var(--goldf);color:var(--on-gold)}
+.btn-gold:hover{filter:brightness(1.08)}
+.btn-ghost{background:transparent;color:var(--teal);box-shadow:inset 0 0 0 1.5px var(--line2)}
+.btn-ghost:hover{box-shadow:inset 0 0 0 1.5px var(--teal)}
+.btn-sm{padding:10px 14px;font-size:11px;min-height:38px}
+.btn{white-space:nowrap}
+.theme .ti{display:none}.theme .ti-sun{display:block}[data-theme="light"] .theme .ti-sun{display:none}[data-theme="light"] .theme .ti-moon{display:block}
+@media(max-width:560px){.theme{width:38px;padding:0}.theme .tl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.hdr .wrap{gap:8px}.wm{font-size:20px}}
 .btn[disabled]{opacity:.6;cursor:wait}
+/* hero */
 .hero{padding:40px 0 28px}
-.hero-grid{display:grid;gap:28px;align-items:center}
-@media (min-width:900px){.hero-grid{grid-template-columns:1.05fr .95fr;gap:48px}.hero{padding:72px 0 56px}}
-.eyebrow{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
-h1{font-size:clamp(2rem,6.4vw,3.3rem);margin-bottom:16px}
-h1 em{font-style:normal;color:var(--gold)}
-.sub{color:var(--muted);font-size:1.08rem;margin-bottom:22px;max-width:36em}
-form.join{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
-form.join label.f{display:block;font-weight:700;font-size:.95rem;margin-bottom:6px}
+.hero-grid{display:grid;gap:32px;grid-template-columns:1fr;align-items:start}
+@media(min-width:900px){.hero-grid{grid-template-columns:1.05fr .95fr;gap:48px}.hero{padding:64px 0 48px}}
+.hero h1{font-size:clamp(38px,7.2vw,68px);font-weight:800;line-height:1;letter-spacing:-.02em;margin:16px 0 0}
+.hero h1 em{font-style:normal;color:var(--teal)}
+.hero .sub{font-family:var(--font-mono);font-size:17px;letter-spacing:.12em;color:var(--faint);margin:18px 0 0}
+.hero .lede{margin:18px 0 22px}
+/* the form */
+form.join{background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-card);padding:18px;box-shadow:var(--glow)}
+form.join label.f{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
 .row{display:flex;flex-direction:column;gap:10px}
-@media (min-width:520px){.row{flex-direction:row}.row input{flex:1}}
-input[type=email]{width:100%;min-height:52px;border-radius:12px;border:1px solid rgba(169,184,197,.45);background:#03070c;color:var(--txt);font:1.05rem 'DM Sans',sans-serif;padding:0 14px}
+@media(min-width:520px){.row{flex-direction:row}.row input{flex:1}}
+input[type=email]{width:100%;min-height:52px;border-radius:12px;border:1px solid var(--line2);background:var(--surf);color:var(--text);font:16px var(--font-body);padding:0 14px}
+input[type=email]:focus{border-color:var(--teal);outline:none}
 .check{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:.93rem;color:var(--muted);cursor:pointer}
 .check input{width:20px;height:20px;margin-top:2px;flex:0 0 auto;accent-color:var(--teal)}
-.micro{font-size:.85rem;color:var(--muted);margin-top:12px}
+.micro{font-size:.85rem;color:var(--muted);margin:12px 0 0}
 .micro a{color:var(--muted)}
 #cf-box{margin-top:12px}#cf-box:empty{margin:0}
-.msg{margin-top:10px;font-size:.95rem;min-height:1.2em}.msg.err{color:var(--err)}.msg.ok{color:var(--teal)}
-.shot{margin:0;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.msg{margin-top:10px;font-size:.95rem;min-height:1.2em}.msg.err{color:var(--red)}.msg.ok{color:var(--teal)}
+/* the 3D stage, as in the brand book */
+.stage3d{position:relative;border:1px solid var(--line2);border-radius:var(--r-card);overflow:hidden;background:var(--stage-bg);box-shadow:var(--glow)}
+.stage3d canvas{display:block;width:100%;aspect-ratio:16/10;cursor:grab;touch-action:pan-y;outline-offset:-3px}
+@media(max-width:640px){.stage3d canvas{aspect-ratio:4/3}.stage3d .rail{top:10px;right:10px;transform:none;grid-auto-flow:column;padding:4px;gap:4px}.stage3d .rail button{width:38px;height:38px}.stage3d .statusline{right:14px;font-size:11px}}
+.stage3d::after{content:"";position:absolute;inset:0;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none}
+[data-theme="light"] .stage3d::after{opacity:.7}
+.stage3d.flash{animation:sflash 800ms var(--ease)}
+@keyframes sflash{0%{box-shadow:0 0 0 0 rgba(232,197,106,0)}25%{box-shadow:0 0 44px 2px rgba(232,197,106,.5);border-color:var(--gold)}100%{box-shadow:var(--glow)}}
+.rail{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:grid;gap:6px;padding:6px;background:var(--rail-bg);border:1px solid var(--line2);border-radius:16px;z-index:2}
+.rail button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--rail-btn);color:var(--teal);cursor:pointer;display:grid;place-items:center;padding:0}
+.rail button:hover{border-color:var(--teal)}
+.rail button[aria-pressed="true"]{background:rgba(68,192,185,.2);border-color:var(--teal);box-shadow:0 0 14px rgba(68,192,185,.35)}
+.statusline{position:absolute;left:14px;bottom:10px;right:78px;font-family:var(--font-mono);font-size:clamp(11px,1.5vw,14px);letter-spacing:.08em;color:var(--stat);text-shadow:var(--stext);z-index:2;pointer-events:none}
+.pops{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
+.pop{position:absolute;left:50%;bottom:20%;font-family:var(--font-mono);color:var(--gold);font-size:clamp(18px,3vw,28px);text-shadow:var(--popglow);animation:popup 1250ms var(--ease) forwards;white-space:nowrap}
+@keyframes popup{0%{opacity:0;transform:translate(-50%,12px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-70px)}}
+.hint{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--faint);text-align:center;margin:10px 0 0}
+.stage-cap{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin:14px 0 0;font-variant-numeric:tabular-nums}
+.stage-cap strong{font-family:var(--font-mono);font-size:26px;font-weight:400;color:var(--gold)}
+.stage-cap span{color:var(--muted);font-size:14px;font-family:var(--font-mono);letter-spacing:.06em}
+/* sections */
+section{padding:64px 0 24px;border-top:1px solid var(--line)}
+section .lead{color:var(--muted);max-width:56ch;margin-bottom:26px}
+.grid{display:grid;gap:16px;align-items:start}
+@media(min-width:720px){.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-card);padding:22px;min-width:0;position:relative}
+.card p{color:var(--muted);margin:0;font-size:.98rem}
+[data-theme="light"] .card{box-shadow:var(--elev)}
+[data-theme="light"] .card::before{content:"";position:absolute;inset:7px;pointer-events:none;opacity:.55;background:linear-gradient(var(--teal),var(--teal)) left top/9px 1px no-repeat,linear-gradient(var(--teal),var(--teal)) left top/1px 9px no-repeat,linear-gradient(var(--teal),var(--teal)) right bottom/9px 1px no-repeat,linear-gradient(var(--teal),var(--teal)) right bottom/1px 9px no-repeat}
+.num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--gold);color:var(--gold);font-family:var(--font-mono);font-size:15px;margin-bottom:12px;background:var(--pillbg)}
+.shot{margin:16px 0 0;border:1px solid var(--line2);border-radius:var(--r-tile);overflow:hidden;background:var(--stage-bg)}
 .shot img{display:block;width:100%;height:auto}
-.shot figcaption{font-size:.82rem;color:var(--muted);padding:10px 14px}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-section{padding:56px 0;border-top:1px solid rgba(68,192,185,.08)}
-h2{font-size:clamp(1.55rem,4.4vw,2.2rem);margin-bottom:12px}
-.lead{color:var(--muted);max-width:40em;margin-bottom:28px}
-.grid{display:grid;gap:16px}
-@media (min-width:720px){.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
-.card h3{font-size:1.1rem;margin-bottom:6px}
-.card p{color:var(--muted);font-size:.98rem}
-.num{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:rgba(68,192,185,.14);color:var(--teal);font-weight:800;margin-bottom:10px}
-ul.ticks{list-style:none;display:grid;gap:10px}
+ul.ticks{list-style:none;padding:0;margin:0;display:grid;gap:10px}
 ul.ticks li{padding-left:28px;position:relative;color:var(--muted)}
-ul.ticks li strong{color:var(--txt)}
-ul.ticks li:before{content:'';position:absolute;left:4px;top:.5em;width:12px;height:7px;border-left:2px solid var(--teal);border-bottom:2px solid var(--teal);transform:rotate(-45deg)}
+ul.ticks li strong{color:var(--text)}
+ul.ticks li::before{content:"";position:absolute;left:0;top:.55em;width:14px;height:8px;border-radius:2px;background:var(--teal)}
 .founder{display:grid;gap:20px;align-items:center}
-@media (min-width:720px){.founder{grid-template-columns:160px 1fr}}
+@media(min-width:720px){.founder{grid-template-columns:160px 1fr}}
 .founder img{width:140px;height:140px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)}
-.founder p{color:var(--muted);margin-bottom:10px;max-width:42em}
-details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+.founder p{color:var(--muted);max-width:60ch}
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
 details+details{margin-top:10px}
-summary{cursor:pointer;font-weight:700}
-details p{color:var(--muted);margin-top:8px}
-.cta{text-align:center}
+summary{cursor:pointer;font-weight:700;font-family:var(--font-display)}
+details p{color:var(--muted);margin:8px 0 0}
+.cta{text-align:center;padding-bottom:64px}
 .cta p{color:var(--muted);margin:0 auto 20px;max-width:34em}
-footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);font-size:.88rem}
+footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--muted);font-size:14px}
+footer .wm{font-size:26px;margin-bottom:10px}
 footer a{color:var(--muted)}
-footer .fca{color:var(--txt);margin-bottom:8px}
+footer .fca{color:var(--text);margin-bottom:8px}
 footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 </style>
 </head>
 <body>
 <a class="skip" href="#join">Skip to the sign-up form</a>
-<header><div class="wrap bar">
-  <a class="logo" href="./">Vault<span>·</span>It</a>
+<header class="hdr"><div class="wrap">
+  <a class="lockup" href="./" aria-label="Vault-It, top of page">
+    <svg class="mark" viewBox="0 0 240 240" aria-hidden="true"><circle cx="120" cy="120" r="112" class="mk-v" stroke-width="7"/><circle cx="120" cy="120" r="100" class="mk-bz"/><g class="mk-tab"><rect x="105" y="2" width="30" height="16" rx="5" stroke-width="4"/><circle cx="120" cy="10" r="2.6" opacity=".45"/><g transform="rotate(90 120 120)"><rect x="105" y="2" width="30" height="16" rx="5" stroke-width="4"/><circle cx="120" cy="10" r="2.6" opacity=".45"/></g><g transform="rotate(180 120 120)"><rect x="105" y="2" width="30" height="16" rx="5" stroke-width="4"/><circle cx="120" cy="10" r="2.6" opacity=".45"/></g><g transform="rotate(270 120 120)"><rect x="105" y="2" width="30" height="16" rx="5" stroke-width="4"/><circle cx="120" cy="10" r="2.6" opacity=".45"/></g></g><polygon points="68,80 86,80 120,133.6 154,80 172,80 120,162" class="mk-h" stroke-width="10" stroke-linejoin="miter" stroke-miterlimit="10"/><polygon points="68,80 86,80 120,133.6 120,162" class="mk-t"/><polygon points="172,80 154,80 120,133.6 120,162" class="mk-t2"/><path d="M68 80L120 162L172 80" class="mk-hl" fill="none" stroke-width="1.2" opacity=".75"/><rect x="114" y="108" width="12" height="8" rx="2.5" class="mk-gd"/></svg>
+    <span class="wm">Vault<i class="dot"></i><b>It</b></span>
+  </a>
+  <span class="grow"></span>
+  <button class="btn btn-ghost btn-sm theme" id="themeBtn" type="button" aria-pressed="false" aria-label="Switch to Daylight"><svg class="ti ti-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="ti ti-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span class="tl">Daylight</span></button>
   <a class="btn btn-gold btn-sm" href="#join">Join the beta</a>
 </div></header>
 
 <main>
 <div class="hero"><div class="wrap hero-grid">
   <div>
-    <span class="eyebrow">Free private beta · Built in the UK</span>
-    <h1>Watch your deposit <em>build your home</em> — brick by brick.</h1>
-    <p class="sub">Vault-It puts your debts, savings, house deposit and net worth on one honest map, then turns every pound you save towards your deposit into bricks on a 3D house. You type the numbers in. No bank login.</p>
+    <span class="lbl">Free private beta · Built in the UK</span>
+    <h1>Get out of the red and <em>into your home.</em></h1>
+    <p class="sub">Every pound saved builds your future</p>
+    <p class="lede">Vault-It puts your debts, savings, house deposit and net worth on one honest map, then turns every pound you save towards your deposit into bricks on a 3D house. You type the numbers in. No bank login.</p>
 
     <form class="join" id="join" novalidate>
       <label class="f" for="email">Your email address</label>
@@ -122,9 +219,20 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
     </form>
   </div>
 
-  <div class="pair">
-    <figure class="shot"><img src="img/house-deposit.jpg" width="620" height="540" alt="The Vault-It 3D house builder: walls rising to row 62 of 154, with the roof shown as an outline, at 40% of a deposit goal" fetchpriority="high" /><figcaption>Saving: the house builds as a ghost — here 40% of the deposit goal.</figcaption></figure>
-    <figure class="shot"><img src="img/house-built.jpg" width="620" height="540" alt="The finished 3D Victorian terraced house in the Vault-It house builder" loading="lazy" /><figcaption>Goal reached: the whole house stands.</figcaption></figure>
+  <div>
+    <div class="stage3d" id="heroStage">
+      <canvas id="heroCanvas" tabindex="0" role="img" aria-label="A 3D hologram of a Victorian terrace, built brick by brick from a saved deposit and standing complete. Drag to orbit, arrow keys to rotate."></canvas>
+      <div class="rail" role="group" aria-label="Camera controls">
+        <button type="button" id="rIn" aria-label="Zoom in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button type="button" id="rOut" aria-label="Zoom out"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+        <button type="button" id="rOrb" aria-label="Auto orbit" aria-pressed="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg></button>
+        <button type="button" id="rRst" aria-label="Reset view"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg></button>
+      </div>
+      <div class="statusline" id="heroStatus" aria-live="off"></div>
+      <div class="pops" id="heroPops"></div>
+    </div>
+    <p class="hint">DRAG · ORBIT · ARROW KEYS · + − ZOOM</p>
+    <div class="stage-cap"><strong id="capBricks">14,465 bricks</strong><span>Victorian mid-terrace · 154 rows · the finished house</span></div>
   </div>
 </div></div>
 
@@ -134,7 +242,8 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
   <div class="grid g3">
     <div class="card"><div class="num">1</div><h3>Add your numbers</h3><p>Income, spending, debts, savings and what you own. You type them in, so nothing is connected to your bank.</p></div>
     <div class="card"><div class="num">2</div><h3>See the whole picture</h3><p>Net worth over time, where every pound of income goes, a debt payoff plan (snowball or avalanche) and the next step on your roadmap.</p></div>
-    <div class="card"><div class="num">3</div><h3>Build the house</h3><p>Pick a house and a deposit target. It rises as you save, and fills in as you pay the mortgage down.</p></div>
+    <div class="card"><div class="num">3</div><h3>Build the house</h3><p>Pick a house and a deposit target. It rises as you save, and fills in as you pay the mortgage down.</p>
+      <figure class="shot"><img src="img/house-built.jpg" width="620" height="540" alt="The finished 3D Victorian terraced house in the Vault-It house builder" loading="lazy" /></figure></div>
   </div>
 </div></section>
 
@@ -208,14 +317,54 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
 </main>
 
 <footer><div class="wrap">
+  <div class="wm">Vault<i class="dot"></i><b>It</b></div>
   <div class="fca"><strong>Not regulated by the FCA. Not financial advice.</strong></div>
   <div>Vault-It is a product of PT Live Design, run by Pete Thickett, A57, 11 St Mary’s Street, Lincoln LN5 7EQ. Contact: <a href="mailto:hello@vault-it.co">hello@vault-it.co</a></div>
   <div class="links"><a href="https://app.vault-it.co/?privacy=1">Privacy notice</a><a href="https://app.vault-it.co/?terms=1">Beta terms</a><a href="https://app.vault-it.co/">Already testing? Open the app</a><span>© 2026 Vault-It</span></div>
 </div></footer>
 
+<script src="brand-hero.js"></script>
 <script>
 (function () {
   'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+
+  // ── theme: Night by default, Daylight by device preference or the button; remembered on this device
+  var themeBtn = $('#themeBtn'), themeMeta = document.querySelector('meta[name="theme-color"]');
+  function isLight() { return document.documentElement.getAttribute('data-theme') === 'light'; }
+  function syncTheme() { var l = isLight(); themeBtn.querySelector('.tl').textContent = l ? 'Night' : 'Daylight'; themeBtn.setAttribute('aria-label', l ? 'Switch to Night' : 'Switch to Daylight'); themeBtn.setAttribute('aria-pressed', l ? 'true' : 'false'); if (themeMeta) themeMeta.setAttribute('content', l ? '#F3F7F6' : '#080808'); }
+  themeBtn.addEventListener('click', function () {
+    var l = !isLight();
+    if (l) document.documentElement.setAttribute('data-theme', 'light'); else document.documentElement.removeAttribute('data-theme');
+    try { localStorage.setItem('vi-theme', l ? 'light' : 'dark'); } catch (e) {}
+    syncTheme();
+  });
+  syncTheme();
+
+  // ── the hero: the brand book's 3D house, built brick by brick to the finished home (owner, 30 Oct: the landing shows the house fully built)
+  if (window.ViBrand && $('#heroCanvas')) {
+    var VB = window.ViBrand, stage = $('#heroStage'), status = $('#heroStatus'), lastKey = '', done = false;
+    var ctl = VB.makeStage($('#heroCanvas'), { railPad: 70, padB: 40, onFrame: function (info, st) {
+      var bricks = info.bricks !== undefined ? info.bricks : 0, total = info.bricksTotal || 14465, key = info.row + '|' + bricks;
+      if (key !== lastKey) {
+        lastKey = key;
+        status.textContent = st.p >= .999
+          ? 'Victorian mid-terrace · 154 rows · ' + total.toLocaleString('en-GB') + ' bricks · deposit reached'
+          : 'Victorian mid-terrace · Row ' + info.row + ' of 154 · ' + bricks.toLocaleString('en-GB') + ' / ' + total.toLocaleString('en-GB') + ' bricks';
+        $('#capBricks').textContent = (st.p >= .999 ? total : bricks).toLocaleString('en-GB') + ' bricks';
+      }
+      if (st.p >= .999 && !done) { done = true; if (!VB.reduce) { VB.flashStage(stage); VB.popText($('#heroPops'), 'Deposit reached'); } }
+    } });
+    ctl.setTarget(0, true);
+    setTimeout(function () { ctl.setTarget(1); }, 400);   // builds in from the foundations, then stands complete with the pulse and the ring
+    $('#rIn').addEventListener('click', function () { ctl.zoom(1.15); });
+    $('#rOut').addEventListener('click', function () { ctl.zoom(1 / 1.15); });
+    $('#rOrb').addEventListener('click', function () { this.setAttribute('aria-pressed', ctl.toggleAuto()); });
+    $('#rRst').addEventListener('click', function () { ctl.reset(); });
+    window.viHero = ctl;
+  }
+
+  // ── the beta list form (unchanged behaviour)
   var FN_URL = window.__VI_WAITLIST_URL || 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join';
   var KEY = 'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz';   // public by design
   var CONSENT_VERSION = 'signup-2026-10-27';                    // bump with the wording of the marketing box (also in the server)
@@ -242,7 +391,7 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
   function tsOn() { return TS_HOSTS.indexOf(location.hostname) > -1 || window.__vi_captcha_force === true; }
   function tsRender() {
     if (!tsOn() || tsWidget !== null || !window.turnstile) return;
-    tsWidget = window.turnstile.render('#cf-box', { sitekey: TS_KEY, theme: 'dark', callback: function (t) { tsToken = t; }, 'expired-callback': function () { tsToken = ''; }, 'error-callback': function () { tsToken = ''; } });
+    tsWidget = window.turnstile.render('#cf-box', { sitekey: TS_KEY, theme: isLight() ? 'light' : 'dark', callback: function (t) { tsToken = t; }, 'expired-callback': function () { tsToken = ''; }, 'error-callback': function () { tsToken = ''; } });
   }
   if (tsOn()) {
     window.viTsLoaded = tsRender;
