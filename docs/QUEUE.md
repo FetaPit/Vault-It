@@ -20,6 +20,7 @@ The single list of instructed work. Every session reads it at start and before e
 - [ ] Subscription pop-up: adjust to the monetisation model once the owner decides (owner's ask, 30 Oct; blocked on the outline above)
 - [ ] Apply the brand book to the e-mail comms (owner's ask, 30 Oct): sign-in code, beta list confirm and welcome e-mails in `supabase/functions/`; templates first, deploy only with the owner's explicit yes
 - [ ] Net worth 3D viewer (owner, 30 Oct 22:03, queued): stack every credit card in one column, one on top of the other, each keeping its own card colour; a loan is a different kind of debt and gets its own column beside the credit cards (same rule for other debt types); and the dashboard viewport must zoom in and out and orbit, not just turn
+- [ ] Mobile navigation (owner, 30 Oct 22:03, queued): on phones the tab icons move to a bar fixed at the bottom of the screen, always visible; and the Integrations tab leaves the menu bar in every view and lives in Settings in the sidebar instead
 
 ## Waiting on the owner
 
