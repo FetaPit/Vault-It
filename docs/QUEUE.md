@@ -9,9 +9,8 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [ ] Fix from the QA pass (30 Oct): the Daylight statusline strip under the classic house viewer renders as a light band with invisible text (`#hb3d-cap` / `.scene-cap`); after the em-dash copy pass finishes in index.html
 - [~] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
-- [ ] QA list (handover section 9) in both themes at 390 and 1100 px (the full suite ran for the 30 Oct release; the visual list is still to do)
-- [ ] Check the metals price feed (`api.metals.live`) from the preview; replace it if dead (needed by linked metal items)
 - [ ] Monetisation outline for the owner to decide on (owner's ask, 30 Oct): which features sit outside the Pro tier and the pricing strategy; a Simplified mode (hide some tabs/features) with the current app as Advanced mode, and which features and tabs belong to Advanced; whether a freemium tier adds or devalues, judged on the success and continued usage of freemium finance apps against paid ones (sources in `docs/research/`); testers stay free. Deliver as a short decision doc and prompt the owner
 - [ ] Custom welcome message for testers (owner's ask, 30 Oct): prompt the owner for the wording, then wire it to the first run for beta accounts
 - [ ] Subscription pop-up: adjust to the monetisation model once the owner decides (owner's ask, 30 Oct; blocked on the outline above)
@@ -21,6 +20,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Waiting on the owner
 
+- Metals price feed (`api.metals.live`): the sandbox cannot reach it (host not in the session's allowed network domains). Check it from a browser, or allow the host in the environment's network settings and ask again
 - Brand build on a real phone: speed of the lite fallback and how the 6.8 feedback feels (Settings > House builder > Brand build, or ?house=new)
 - Classic switches (house builder, net worth) stay in Settings until the owner has tested the new views on their phone (owner, 30 Oct); remove them only when the owner says so
 - Phone test of vault-it.co/sign-up: confirmation e-mail, confirm page, "Remove me" link
@@ -31,6 +31,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] QA list (handover section 9) in both themes at 390 and 1100 px, plus 320/360/390/412 scroll probe: `docs/qa/QA_30OCT.md`; two defects noted (Daylight statusline strip, 3D cash stage first frame)
 - [x] Level 2 Octalysis slice: purchase-day mortgage entry (lender, balance, rate, fix end, term) feeding the calculator and the panel; three what-ifs from the Budget with the trade-off line (`42471f4`, `tests/test_hb_l2_entry.js`). Still to come later: mortgage cockpit, payday build, bank-versus-you hologram, milestone stages
 - [x] Brand build follow-ups: 6.8 feedback (pop-ups, stage flash, milestone toasts after interaction) and the night window glow (`647fae1`; the real-device speed check waits on the owner)
 - [x] House builder viewport: the classic hologram viewer is the default again, the brand build stays behind the Settings switch, its fly-in stops at 1.3x (`a4abee3`); not yet released
