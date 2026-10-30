@@ -9,7 +9,6 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [ ] House builder brand build follow-ups (from the 30 Oct review): section 6.8 feedback ("+£5 · +4 bricks" pop-ups, stage flash, milestone toasts), a radial window glow at night, and a real-device speed check of the lite fallback
 - [ ] Level 2 Octalysis slice still open: real mortgage entry at purchase, overpayment what-ifs in the Level 2 panel (`docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md`; the build rule, payments, reset and undo were done 30 Oct)
 - [ ] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
 - [ ] QA list (handover section 9) in both themes at 390 and 1100 px (the full suite ran for the 30 Oct release; the visual list is still to do)
@@ -23,6 +22,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Waiting on the owner
 
+- Brand build on a real phone: speed of the lite fallback and how the 6.8 feedback feels (Settings > House builder > Brand build, or ?house=new)
 - Classic switches (house builder, net worth) stay in Settings until the owner has tested the new views on their phone (owner, 30 Oct); remove them only when the owner says so
 - Phone test of vault-it.co/sign-up: confirmation e-mail, confirm page, "Remove me" link
 - `FROM_EMAIL` sender name in Supabase secrets; add vault-it.co to the Turnstile widget's allowed sites; upgrade Resend before ads
@@ -32,6 +32,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Brand build follow-ups: 6.8 feedback (pop-ups, stage flash, milestone toasts after interaction) and the night window glow (`647fae1`; the real-device speed check waits on the owner)
 - [x] House builder viewport: the classic hologram viewer is the default again, the brand build stays behind the Settings switch, its fly-in stops at 1.3x (`a4abee3`); not yet released
 - [x] Release to production: landing / sign-up brand pass with the brand book hero and the net worth speed run (`release/pioneer-v2` → `5e2f78f`, backup `backup/release-pioneer-v2-20261030-2142`; app files unchanged since `0f527f7`)
 - [x] Landing hero revision: the brand book hero copied as is (levels, partially built house, deposit controls, lay buttons, stats, milestone pills), capital Red, pulsing teal "home.", brick counter removed, net worth 3D speed run added; the form moved below the demos with the sticky header button jumping to it (`tests/test_signup_page.js`)

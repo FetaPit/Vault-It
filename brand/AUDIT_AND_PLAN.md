@@ -112,3 +112,7 @@ Nothing is removed. Each change only moves existing controls together.
 ## 30 Oct 22:02: brand build default
 
 The owner saw the live brand build on their tablet as a zoomed-in plane of bricks (a camera state: the "Show it on the house" fly-in, or a pinch) and asked for the earlier classic hologram viewer as the default. `VI_FLAG_DEFAULT.house` is now `false`; the brand build stays behind `?house=new` and the Settings switch; its fly-in now stops at 1.3x so the whole house keeps its context. Fresh loads at 832 px framed the whole house correctly in both modes.
+
+## 30 Oct: 6.8 feedback and window glow (`647fae1`)
+
+Brand build only: pop-up over the stage, gold stage flash, milestone toasts (1/5/10/25/50/75/100, after the first interaction), window glow quads sharing the glass lighting uniform. XP stays with the app's own XP system (not the brand book's 5 + 50 per milestone), so nothing is counted twice.
