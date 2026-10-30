@@ -7,7 +7,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   await page.evaluate(()=>showTab('debt')); await page.waitForTimeout(700);
-  const order=()=>page.evaluate(()=>[...document.querySelectorAll('.debt-card-grid > div')].map(t=>{const r=t.querySelector('.debt-rank');return r.textContent.trim()+':'+t.querySelector('span[style*="ellipsis"]').textContent;}));
+  const order=()=>page.evaluate(()=>[...document.querySelectorAll('.debt-card-grid > div')].map(t=>{const r=t.querySelector('.debt-rank');return (r.classList.contains('done')&&r.querySelector('use[href="#vi-check"]')?'✓':r.textContent.trim())+':'+t.querySelector('span[style*="ellipsis"]').textContent;}));
   let o=await order(); console.log('avalanche',o.join(' | '));
   ok(o[0]==='1:High rate small'&&o[1]==='2:Mid'&&o[2]==='3:Loan'&&o[3]==='4:Low rate big','avalanche: 1 = highest interest rate');
   ok(o[4]==='✓:Cleared','paid-off debt shows a tick instead of a number');

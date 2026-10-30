@@ -19324,7 +19324,7 @@ function v3Metals(){
 }
 
 function renderMetalsISO(){
-  try{if(v3Metals())return;}catch(e){console.error('[Vault-It] 3D metals',e);var sv=document.getElementById('metalsSvg');if(sv)sv.style.display='';}
+  try{if(v3Metals()){renderMetalsInputs();return;}}catch(e){console.error('[Vault-It] 3D metals',e);var sv=document.getElementById('metalsSvg');if(sv)sv.style.display='';}
   var MS=document.getElementById('metalsSvg');
   if(!MS)return;
   MS.innerHTML='';
