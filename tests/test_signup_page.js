@@ -36,6 +36,7 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
   ok(!/spots? (remaining|left)|only \d+ spots|before they.re gone/i.test(text), 'no scarcity claims');
   ok(!/Sarah M|James T|Priya K|From our pioneers|already on the climb/i.test(text), 'no unsourced testimonials');
   ok(!/works offline|seven modules|live spot|most popular|invest once|lifetime/i.test(text), 'none of the false or risky badges from the old page');
+  ok(/Not regulated by the FCA\. Not financial advice\./.test(text), 'FCA line is shown (owner, 30 Oct)');
   ok(/not end-to-end encrypted/i.test(text) && /not financial advice/i.test(text) && /PT Live Design/.test(text) && /hello@vault-it\.co/.test(text), 'trust block is honest; trader identity and contact are shown');
   ok(!/Buffett|Munger|Stevenson|Squibb|bypass=/.test(await page.content()), 'no links to the demo with the celebrity advisor cards');
   const form = await page.evaluate(() => { const r = document.getElementById('join').getBoundingClientRect(); return { top: r.top + scrollY, bottom: r.bottom + scrollY }; });

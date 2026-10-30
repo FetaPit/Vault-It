@@ -15,4 +15,4 @@ ol{color:var(--muted);padding-left:20px}ol li{margin-bottom:8px}
 .btn:focus-visible,a:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
 .err{color:var(--err)}
 .hide{display:none}
-footer{border-top:1px solid var(--line);padding:22px 20px;color:var(--muted);font-size:.85rem;text-align:center}footer a{color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:22px 20px;color:var(--muted);font-size:.85rem;text-align:center}footer a{color:var(--muted)}footer .fca{color:var(--txt)}
