@@ -27100,6 +27100,11 @@ function nwhRenderMini(){
 .nw3d-legend span b{font:400 .58rem var(--font-mono);color:var(--muted)}
 .nw3d-legend i{width:10px;height:10px;border-radius:2px;flex:none;box-shadow:0 0 0 1px rgb(var(--ink-rgb) / .15)}
 .nw3d-legend .below i{border-radius:0 0 3px 3px}
+.nw3d-legend .stack{flex-wrap:wrap}.nw3d-legend .stack i+i{margin-left:-4px}.nw3d-legend .stack em{font:400 .52rem var(--font-mono);color:var(--muted);font-style:normal;flex-basis:100%;padding-left:16px}
+.nw3d-hud{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.nw3d-hud button{width:34px;height:34px;border-radius:8px;border:1px solid rgba(68,192,185,.35);background:rgba(8,13,20,.82);color:#E8E8E8;font:600 16px/1 var(--font-mono);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.nw3d-hud button:hover{border-color:#44C0B9;color:#44C0B9}.nw3d-hud button:focus-visible{outline:2px solid #44C0B9;outline-offset:1px}
+@media(max-width:600px){.nw3d-hud{right:8px;bottom:8px}.nw3d-hud button{width:38px;height:38px}}
 .nw3d-wrap.nw3d-bars #nwChart{position:absolute!important;left:0;top:0;visibility:hidden!important;pointer-events:none}
 .nw3d-wrap.nw3d-bars #nw-zoom-hint{display:none}
 .nw3d-wrap:not(.nw3d-bars) #nw3d-trk-stage,.nw3d-trk-key[hidden]{display:none}
@@ -27129,21 +27134,35 @@ function Proj(st,rect){
     var X=dx*r[0]+dy*r[1]+dz*r[2],Y=dx*u[0]+dy*u[1]+dz*u[2],Z=dx*f[0]+dy*f[1]+dz*f[2];
     if(Z<1)Z=1;var s=focal/Z;return [cx+X*s,cy-Y*s,Z,s]};
 }
-/* shared orbit: drag orbits (touch: horizontal only, so the page still scrolls), arrows rotate and tilt, + and - zoom */
+/* shared orbit and zoom (owner, 30 Oct 2026: the viewport must zoom in and out and orbit, not just turn).
+ * Drag orbits (one finger: horizontal only, so the page still scrolls). Two fingers pinch to zoom. The wheel zooms with ctrl or cmd held
+ * (a trackpad pinch), or plain once the viewport has been touched, so a page scroll over an untouched scene is never hijacked.
+ * Arrows rotate and tilt, + and - zoom, 0 resets. zoom(f) and reset() serve on-screen buttons. */
+var ZMIN=.55,ZMAX=2.6;
 function orbit(cv,st,hooks){
-  var drag=null;
-  cv.addEventListener("pointerdown",function(e){drag={x:e.clientX,y:e.clientY,yaw:st.yaw,pitch:st.pitch};try{cv.setPointerCapture(e.pointerId)}catch(_){}cv.style.cursor="grabbing";if(hooks.touch)hooks.touch()});
-  cv.addEventListener("pointermove",function(e){if(!drag)return;
+  var drag=null,pts={},pinch=null,engaged=false,home={yaw:st.yaw,pitch:st.pitch,zoom:st.zoom};
+  function touched(){engaged=true;if(hooks.touch)hooks.touch()}
+  function ptList(){return Object.keys(pts).map(function(k){return pts[k]})}
+  cv.addEventListener("pointerdown",function(e){pts[e.pointerId]={x:e.clientX,y:e.clientY};try{cv.setPointerCapture(e.pointerId)}catch(_){}
+    var L=ptList();if(L.length>=2){drag=null;pinch={d:Math.hypot(L[0].x-L[1].x,L[0].y-L[1].y),zoom:st.zoom}}
+    else{drag={x:e.clientX,y:e.clientY,yaw:st.yaw,pitch:st.pitch}}cv.style.cursor="grabbing";touched()});
+  cv.addEventListener("pointermove",function(e){if(!pts[e.pointerId])return;pts[e.pointerId]={x:e.clientX,y:e.clientY};
+    if(pinch){var L=ptList();if(L.length>=2){var d=Math.hypot(L[0].x-L[1].x,L[0].y-L[1].y);if(pinch.d>0)st.zoom=clamp(pinch.zoom*d/pinch.d,ZMIN,ZMAX)}touched();return}
+    if(!drag)return;
     st.yaw=drag.yaw-(e.clientX-drag.x)*.008;
-    if(e.pointerType==="mouse")st.pitch=clamp(drag.pitch+(e.clientY-drag.y)*.006,.1,1.2);if(hooks.touch)hooks.touch()});
-  function end(){drag=null;cv.style.cursor="grab";if(hooks.touch)hooks.touch()}
+    if(e.pointerType==="mouse")st.pitch=clamp(drag.pitch+(e.clientY-drag.y)*.006,.1,1.2);touched()});
+  function end(e){if(e&&e.pointerId!=null)delete pts[e.pointerId];var L=ptList();if(L.length<2)pinch=null;if(!L.length)drag=null;else if(!pinch&&L.length===1&&!drag)drag={x:L[0].x,y:L[0].y,yaw:st.yaw,pitch:st.pitch};
+    if(!L.length)cv.style.cursor="grab";if(hooks.touch)hooks.touch()}
   cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);
+  cv.addEventListener("wheel",function(e){if(!(e.ctrlKey||e.metaKey||engaged))return;e.preventDefault();
+    st.zoom=clamp(st.zoom*Math.pow(1.0015,-e.deltaY*(e.deltaMode===1?16:1)),ZMIN,ZMAX);touched()},{passive:false});
   cv.addEventListener("keydown",function(e){var k=e.key,hit=true;
     if(k==="ArrowLeft")st.yaw-=.12;else if(k==="ArrowRight")st.yaw+=.12;
     else if(k==="ArrowUp")st.pitch=clamp(st.pitch+.06,.1,1.2);else if(k==="ArrowDown")st.pitch=clamp(st.pitch-.06,.1,1.2);
-    else if(k==="+"||k==="=")st.zoom=clamp(st.zoom*1.12,.7,1.6);else if(k==="-")st.zoom=clamp(st.zoom/1.12,.7,1.6);else hit=false;
-    if(hit){e.preventDefault();if(hooks.touch)hooks.touch()}});
-  return {isDrag:function(){return !!drag}};
+    else if(k==="+"||k==="=")st.zoom=clamp(st.zoom*1.12,ZMIN,ZMAX);else if(k==="-")st.zoom=clamp(st.zoom/1.12,ZMIN,ZMAX);else if(k==="0")reset();else hit=false;
+    if(hit){e.preventDefault();touched()}});
+  function reset(){st.yaw=home.yaw;st.pitch=home.pitch;st.zoom=home.zoom;engaged=false;if(hooks.reset)hooks.reset()}
+  return {isDrag:function(){return !!drag||!!pinch},zoom:function(f){st.zoom=clamp(st.zoom*f,ZMIN,ZMAX);touched()},reset:reset,engaged:function(){return engaged}};
 }
 /* the block unit: £1,000 unless the tallest stack would pass about 14 blocks, then 2k, 5k, 10k ... (a cube is always a tenth of a block) */
 function niceUnit(mx,cap){var u=1000,s=[1,2,5],k=0;cap=cap||14;while(Math.floor(mx/u+1e-9)>cap&&u<1e12){k++;u=s[k%3]*1000*Math.pow(10,Math.floor(k/3))}return u}
@@ -27202,7 +27221,9 @@ function tag(c,cw,l1,l2,red,anchor){
 }
 
 /* ===== net worth scene: one column per asset class (above the gold zero plane) and per debt (hanging below it) =====
- * setData({cols:[{key,name,short,col:[r,g,b],v,dir:1|-1}],net,debt,fmt}). Values are in the display currency.
+ * setData({cols:[{key,name,short,col:[r,g,b],v,dir:1|-1,segs?:[{key,name,col,v}]}],net,debt,fmt}). Values are in the display currency.
+ * A column with segs stacks them in order from the gold plane outwards (first segment nearest the plane); each block and cube takes the
+ * colour of the segment its value falls in, so several credit cards share one column and each keeps its own card colour (owner, 30 Oct 2026).
  * 1 block = U, 1 cube = U/10 (U = £1,000 unless the tallest column would pass 14 blocks). Nine cubes, then a block.
  * New blocks drop 18 units over 700 ms with a 1000 ms gold flash; removed ones rise 16 units over 900 ms, turn gold and fade. */
 function makeNW(cv,o){
@@ -27210,6 +27231,8 @@ function makeNW(cv,o){
   var st={yaw:-.55,pitch:.46,dist:125,zoom:1,ty:2,fit:.9},self={st:st},idle=-9999,boxes=[],uid=0,cols=[],byKey={},X={},Z={},LZ={},U=1000,first=true,pendingOpen=false,narrow=null;
   var net=0,debt=0,hover=null,tD=125,tTy=2,SP=15,BH=3.2,SM=3.1,fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},PL=.5,box={x:40,z0:-17,z1:17};
   function spawn(k,s,i,born,off){boxes.push({id:uid++,k:k,s:s,i:i,born:born,off:off||0,leave:0,merge:false})}
+  /* colour of the piece whose value runs from v0 for len: the segment holding its middle */
+  function segCol(c,v0,len){if(!c.segs||!c.segs.length)return c.col;var m=v0+len/2,acc=0;for(var i=0;i<c.segs.length;i++){acc+=c.segs[i].v;if(m<acc)return c.segs[i].col}return c.segs[c.segs.length-1].col}
   function liveL(k,s){return boxes.filter(function(b){return b.k===k&&b.s===s&&!b.leave})}
   function leaveTop(k,s,n,now,anim,merge){var L=liveL(k,s).sort(function(a,b){return b.i-a.i});for(var j=0;j<n&&j<L.length;j++){if(anim){L[j].leave=now;L[j].merge=!!merge}else L[j].dead=true}boxes=boxes.filter(function(b){return !b.dead})}
   /* one row of columns; on a phone with more than five columns, two rows: what you own at the back, what you owe in front */
@@ -27250,7 +27273,7 @@ function makeNW(cv,o){
   self.unit=function(){return U};
   self.replay=function(){if(reduceMotion())return;var now=performance.now();boxes.forEach(function(b){if(!b.leave)b.born=now+b.off});S.kick()};
   function geo(b,ts){
-    var c=byKey[b.k],dir=c?c.c.dir:(b.k.indexOf("debt")===0?-1:1),cn=c?c.b:0,col=c?c.c.col:PAL.gold;
+    var c=byKey[b.k],dir=c?c.c.dir:(b.k.indexOf("debt")===0?-1:1),cn=c?c.b:0,col=c?(b.s?segCol(c.c,cn*U+b.i*U/10,U/10):segCol(c.c,b.i*U,U)):PAL.gold;
     var g={x:X[b.k]||0,z:Z[b.k]||0,w:10,d:10,h:BH,y:0,col:col};
     if(b.s){g.w=g.d=g.h=SM;g.x+=(b.i%3-1)*3.45;g.z+=(Math.floor(b.i/3)-1)*3.45;g.y=dir<0?-(cn*BH)-SM:cn*BH}
     else g.y=dir<0?-(b.i+1)*BH:b.i*BH;
@@ -27261,7 +27284,7 @@ function makeNW(cv,o){
   }
   /* the top cube grows by its fraction, so a few pounds still show */
   function partials(){var out=[];cols.forEach(function(c){var q=byKey[c.key];if(q.f>.04&&q.s<9){var i=q.s,h=SM*q.f,base=c.dir<0?-(q.b*BH)-SM:q.b*BH;
-    out.push({x:X[c.key]+(i%3-1)*3.45,z:Z[c.key]+(Math.floor(i/3)-1)*3.45,w:SM,d:SM,h:h,y:c.dir<0?base+SM-h:base,col:c.col,al:1,fl:0,dir:c.dir,k:c.key})}});return out}
+    out.push({x:X[c.key]+(i%3-1)*3.45,z:Z[c.key]+(Math.floor(i/3)-1)*3.45,w:SM,d:SM,h:h,y:c.dir<0?base+SM-h:base,col:segCol(c,q.b*U+i*U/10,U/10),al:1,fl:0,dir:c.dir,k:c.key})}});return out}
   function draw(ts,dt,S){
     var c=S.c,cw=S.cw,ch=S.ch,rm=reduceMotion(),i;
     if(narrow!==(cw<520)&&cols.length)layout();
@@ -27293,7 +27316,8 @@ function makeNW(cv,o){
     tag(c,cw,l1,fmt(net),red,P.pt(box.x,0,0));
     c.restore();
   }
-  var ob=orbit(cv,st,{touch:function(){idle=performance.now()}});
+  var ob=orbit(cv,st,{touch:function(){idle=performance.now()},reset:function(){idle=-9999;S.kick()}});
+  self.zoom=ob.zoom;self.reset=ob.reset;
   /* tap or hover a column to read it */
   function pick(ex,ey){var r=cv.getBoundingClientRect(),mx=ex-r.left,my=ey-r.top,best=null,bd=1e9,P=self._P;if(!P)return;
     cols.forEach(function(c){var q=byKey[c.key],h=Math.max(2,q.b*BH+SM),a=P.pt(X[c.key],c.dir<0?-h:0,Z[c.key]),b=P.pt(X[c.key],c.dir<0?0:h,Z[c.key]),w=Math.max(10,a[3]*6);
@@ -27384,7 +27408,8 @@ function makeTracker(cv,o){
   cv.addEventListener("pointerdown",function(e){pick(e.clientX,e.clientY)});
   cv.addEventListener("pointerleave",function(e){if(e.pointerType==="mouse"&&hover!==-1){hover=-1;emit()}});
   cv.addEventListener("keydown",function(e){if(e.key==="Home"||e.key==="End"||e.key==="PageUp"||e.key==="PageDown"){var i=cur();i=e.key==="Home"?0:e.key==="End"?N-1:e.key==="PageUp"?Math.max(0,i-1):Math.min(N-1,i+1);hover=i;emit();e.preventDefault()}});
-  var ob=orbit(cv,st,{touch:function(){idle=performance.now()}});
+  var ob=orbit(cv,st,{touch:function(){idle=performance.now()},reset:function(){idle=-9999;S.kick()}});
+  self.zoom=ob.zoom;self.reset=ob.reset;
   var S=stage(cv,{fps:o.fps||30,onShow:function(){if(!played)t0=performance.now()}},draw);
   return self;
 }
@@ -27420,8 +27445,9 @@ if(!chartCard)return;
 /* owner, 30 Oct 2026: the 3D scene is the main view of the net worth card; the chart is the backup behind a 3D | Graph switch */
 var hero=document.createElement('div');
 hero.className='nw3d-hero-in';hero.id='nw3d-hero';
-hero.innerHTML='<span class="nw3d-sub" style="margin:0 0 10px">What you own stands on the gold line. What you owe hangs below it. Tap a column to read it, drag to turn it.</span>'
- +'<div class="nw3d-stage" id="nw3d-hero-stage"><canvas id="nw3d-hero-cv" tabindex="0" role="img" aria-label="Net worth in 3D"></canvas></div>'
+hero.innerHTML='<span class="nw3d-sub" style="margin:0 0 10px">What you own stands on the gold line. What you owe hangs below it. Tap a column to read it, drag to turn it, pinch or scroll to zoom.</span>'
+ +'<div class="nw3d-stage" id="nw3d-hero-stage"><canvas id="nw3d-hero-cv" tabindex="0" role="img" aria-label="Net worth in 3D"></canvas>'
+ +'<div class="nw3d-hud" role="group" aria-label="View controls"><button type="button" data-z="in" aria-label="Zoom in" title="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out" title="Zoom out">&minus;</button><button type="button" data-z="reset" aria-label="Reset view" title="Reset view">&#8634;</button></div></div>'
  +'<p class="nw3d-read" id="nw3d-hero-read" aria-live="polite"></p>'
  +'<div class="nw3d-legend" id="nw3d-hero-legend"></div>'
  +'<p class="nw3d-key" id="nw3d-hero-key"></p>';
@@ -27446,7 +27472,9 @@ tip.parentNode.insertBefore(tkey,tip.nextSibling);
 var heroCv=document.getElementById('nw3d-hero-cv'),trkCv=document.getElementById('nw3d-trk-cv'),heroRead=document.getElementById('nw3d-hero-read');
 function keyHtml(U,ghost){return '<span><i class="blk"></i>1 block = '+full(U)+'</span><span><i class="cube"></i>1 cube = '+full(U/10)+'</span>'+(ghost?'<span><i class="ghost"></i>Forecast</span><span>Tap or hover a month to read it</span>':'<span>Nine cubes, then a block</span>')}
 
-/* ── the scene: one column per asset class in its colour code, one per debt in its lender's colours ── */
+/* ── the scene: one column per asset class in its colour code; debts grouped by kind (owner, 30 Oct 2026): every credit card stacks in
+ * one column, one on top of the other, each in its own card colour; loans, car finance, overdrafts and so on each get their own column ── */
+var DEBT_KINDS={credit:['Credit cards','CARDS'],personal:['Personal loans','LOANS'],loan:['Loans','LOANS'],student:['Student loans','STUDENT'],car:['Car finance','CAR'],bnpl:['Buy now pay later','BNPL'],overdraft:['Overdrafts','OVERDRAFT'],mortgage:['Mortgage','MORTGAGE'],other:['Other debts','OTHER DEBT']};
 function sceneData(){
   var st=document.getElementById('nw3d-hero-stage'),r=rate(),cols=[];
   function add(key,name,short,col,v,dir){cols.push({key:key,name:name,short:short,col:col,v:Math.max(0,v)*r,dir:dir})}
@@ -27461,28 +27489,33 @@ function sceneData(){
   add('other','Other assets','OTHER',tok(st,'muted'),n(totalAssets),1);
   var debts=((typeof debtState!=='undefined'&&debtState.debts)||[]).filter(function(d){return d.balance>0}).sort(function(a,b){return (b.balance-a.balance)||((+a.id||0)-(+b.id||0))});
   var ramp={};try{ramp=debtChartRamp(debts)||{}}catch(e){}
-  var red=tok(st,'red'),pan=tok(st,'panel'),MAX=6,rest=0;
-  debts.forEach(function(d,i){
-    if(i>=MAX){rest+=+d.balance||0;return}
+  var red=tok(st,'red'),pan=tok(st,'panel'),groups={},order=[];
+  debts.forEach(function(d){
     var m=ramp[d.id]||{},col=m.brand?parseCol(m.c1):null;
     if(!col){var k=m.k!=null?m.k:1;col=red.map(function(c,j){return Math.round(pan[j]+(c-pan[j])*(.45+.55*k))})}
-    var w=String(d.name||m.brand||'Debt').trim().split(/\s+/);add('debt'+d.id,d.name||'Debt',(w[0].length<4&&w[1]?w[0]+' '+w[1]:w[0]).toUpperCase().slice(0,11),col,+d.balance||0,-1);
+    var kind=DEBT_KINDS[d.type]?d.type:'other';if(!groups[kind]){groups[kind]={v:0,segs:[]};order.push(kind)}
+    groups[kind].v+=+d.balance||0;groups[kind].segs.push({key:'debt'+d.id,name:d.name||'Debt',col:col,v:(+d.balance||0)*r});
   });
-  if(rest>0)add('debtrest','Other debts','MORE DEBT',red,rest,-1);
+  order.sort(function(a,b){return groups[b].v-groups[a].v}).forEach(function(kind){var g=groups[kind],one=g.segs.length===1;
+    add('debt:'+kind,one?g.segs[0].name:DEBT_KINDS[kind][0],DEBT_KINDS[kind][1],g.segs[0].col,g.v,-1);cols[cols.length-1].segs=one?null:g.segs});
   add('debtov','Debts added on the Overview','DEBTS',red,n(totalDebts),-1);
   add('running','Running costs so far','RUNNING',tok(st,'amber'),n(alTotalLiab),-1);
   var net=n(computeNetWorth)*r,debtNow=(n(debtTotal)+n(totalDebts))*r;
   return {cols:cols,net:net,debt:debtNow,fmt:full};
 }
 var heroLast='',heroSummary='',prevNet=null,prevDebt=null;
-var heroEng=E.makeNW(heroCv,{fps:60,fmt:full,onPick:function(c){heroRead.textContent=c?(c.name+(c.dir<0?', owed ':' ')+full(c.v)):heroSummary}});
+var heroEng=E.makeNW(heroCv,{fps:60,fmt:full,onPick:function(c){heroRead.textContent=c?(c.name+(c.dir<0?', owed ':' ')+full(c.v)+(c.segs?': '+c.segs.map(function(s){return s.name+' '+full(s.v)}).join(' · '):'')):heroSummary}});
+document.getElementById('nw3d-hero-stage').addEventListener('click',function(e){var b=e.target.closest('[data-z]');if(!b)return;
+  if(b.dataset.z==='reset')heroEng.reset();else heroEng.zoom(b.dataset.z==='in'?1.25:.8)});
 function refreshHero(){
-  var d=sceneData(),sig=JSON.stringify([Math.round(d.net),Math.round(d.debt),d.cols.map(function(c){return [c.key,Math.round(c.v),c.col]}),sym()]);
+  var d=sceneData(),sig=JSON.stringify([Math.round(d.net),Math.round(d.debt),d.cols.map(function(c){return [c.key,Math.round(c.v),c.col,c.segs?c.segs.map(function(x){return [x.key,Math.round(x.v),x.col]}):0]}),sym()]);
   if(sig===heroLast)return;heroLast=sig;
   var t=heroEng.setData(d),shown=d.cols.filter(function(c){return c.v>=.5});
   heroSummary='Own '+full(t.assets)+' · Owe '+full(t.debt)+' · Net worth '+full(d.net);heroRead.textContent=heroSummary;
-  heroCv.setAttribute('aria-label','Net worth '+full(d.net)+'. What you own, '+full(t.assets)+', stands above the gold line in blocks. What you owe, '+full(t.debt)+', hangs below it. Drag to turn it.');
-  document.getElementById('nw3d-hero-legend').innerHTML=shown.length?shown.map(function(c){return '<span class="'+(c.dir<0?'below':'above')+'"><i style="background:rgb('+c.col.map(Math.round).join(',')+')"></i>'+esc(c.name)+' <b>'+(c.dir<0?'-':'')+full(c.v)+'</b></span>'}).join(''):'<span>Add your savings, investments or debts and they will stack up here.</span>';
+  heroCv.setAttribute('aria-label','Net worth '+full(d.net)+'. What you own, '+full(t.assets)+', stands above the gold line in blocks. What you owe, '+full(t.debt)+', hangs below it. Drag to turn it, pinch or scroll to zoom, or use the + and - buttons.');
+  document.getElementById('nw3d-hero-legend').innerHTML=shown.length?shown.map(function(c){var sw=function(col){return '<i style="background:rgb('+col.map(Math.round).join(',')+')"></i>'};
+    if(c.segs)return '<span class="below stack">'+c.segs.map(function(s){return sw(s.col)}).join('')+esc(c.name)+' <b>-'+full(c.v)+'</b>'+c.segs.map(function(s){return '<em>'+esc(s.name)+' '+full(s.v)+'</em>'}).join('')+'</span>';
+    return '<span class="'+(c.dir<0?'below':'above')+'">'+sw(c.col)+esc(c.name)+' <b>'+(c.dir<0?'-':'')+full(c.v)+'</b></span>'}).join(''):'<span>Add your savings, investments or debts and they will stack up here.</span>';
   document.getElementById('nw3d-hero-key').innerHTML=keyHtml(t.unit,false);
   /* something moves, a number changes, a line confirms: the stage flashes gold when net worth goes up, green when the last debt goes */
   if(prevNet!==null&&!E.reduceMotion()){var hs=document.getElementById('nw3d-hero-stage'),cls=prevDebt>0&&d.debt<=0?'flashg':(Math.round(d.net)>Math.round(prevNet)?'flash':'');

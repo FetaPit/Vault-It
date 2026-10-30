@@ -1,6 +1,7 @@
 // Brand phase 11: net worth in 3D on the Overview, behind ?nw=new (or localStorage vi-flag-nw=1).
 // Flag off = the Overview exactly as before. Flag on = the "Net worth in 3D" scene (one column per asset class, debts below the gold line)
 // and a 3D blocks | Graph toggle on the main chart: 3D first, the choice remembered, the same numbers in both views.
+// 30 Oct: debts grouped by kind (all credit cards in one column, each in its own colour; loans beside them); zoom by buttons, pinch, ctrl+wheel; reset.
 // Run: node tests/test_nw3d.js   (VI_APP=file:///path/to/index.html to test another copy)
 const { chromium } = require('playwright');
 const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
@@ -77,7 +78,7 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
     return { net: Math.round(computeNetWorth()), tag: +cv.dataset.net, sum: t.assets - t.debt, unit: t.unit, cols: cv.dataset.cols, ptsNw: pts.map(x => Math.round(x.nw)), trkNw: d.nw, ptsDebt: pts.map(x => Math.round(x.debt)), trkDebt: d.debt, today: d.today, todayNw: d.nw[d.today],
       kpi: document.getElementById('kpi-nw').textContent, read: document.getElementById('nw3d-hero-read').textContent, tip: document.getElementById('chart-tooltip').textContent, cash: t.cols.cash }; });
   ok(nums.tag === nums.net && Math.abs(nums.sum - nums.net) < 1, 'scene tag = computeNetWorth (' + nums.tag + ') and the columns add up to it (' + nums.sum.toFixed(2) + ')');
-  ok(/cash,deposit,metals,inv,liabval,debt2,debt1,running/.test(nums.cols), 'one column per asset class in order, then each debt and running costs (' + nums.cols + ')');
+  ok(/cash,deposit,metals,inv,liabval,debt:loan,debt:credit,running/.test(nums.cols), 'one column per asset class in order, then one column per kind of debt, largest first, then running costs (' + nums.cols + ')');
   ok(nums.cash && nums.cash.blocks === 6 && nums.cash.cubes === 4 && nums.unit === 1000, '£6,420 of cash = 6 £1,000 blocks + 4 £100 cubes (a fraction tops it)');
   ok(JSON.stringify(nums.ptsNw) === JSON.stringify(nums.trkNw) && JSON.stringify(nums.ptsDebt) === JSON.stringify(nums.trkDebt) && nums.todayNw === nums.net, '3D blocks show the graph\'s own points (' + nums.trkNw.join(', ') + '), today = net worth');
   ok(nums.read.indexOf('Net worth £' + nums.net.toLocaleString('en-GB')) >= 0 && nums.tip.indexOf('net worth £' + nums.net.toLocaleString('en-GB')) >= 0, 'readouts under both 3D views say the same net worth');
@@ -85,6 +86,24 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   const big = await p.evaluate(() => { alState.cashAccounts[0].balance = 64200; drawChart(); const t = nw3d.hero.totals(); const r = { unit: t.unit, blocks: t.cols.cash.blocks, key: document.getElementById('nw3d-hero-key').textContent, tag: +document.getElementById('nw3d-hero-cv').dataset.net, net: Math.round(computeNetWorth()) }; alState.cashAccounts[0].balance = 6420; drawChart(); return r; });
   await p.evaluate(() => { nw3d.setView('line', false); nw3d.setMain('3d', true); }); await p.waitForTimeout(300);
   ok(big.unit === 5000 && big.blocks <= 14 && /1 block = £5,000/.test(big.key) && big.tag === big.net, 'a bigger stack scales the unit and labels it (' + big.key + ')');
+  // owner, 30 Oct: every credit card stacks in one column, each keeping its own colour; a loan is another kind of debt and stands beside it
+  const stk = await p.evaluate(() => { debtState.debts.push({ id: 3, name: 'Vanquis', original: 900, balance: 800, rate: 34, min: 25, type: 'credit' }); drawChart();
+    const t = nw3d.hero.totals(), cv = document.getElementById('nw3d-hero-cv'), lg = document.querySelector('#nw3d-hero-legend .stack');
+    const cols = nw3d.hero._cols ? null : cv.dataset.cols; const sw = lg ? [...lg.querySelectorAll('i')].map(i => i.style.background) : [];
+    const r = { cols, cards: t.cols['debt:credit'] && Math.round(t.cols['debt:credit'].v), loan: t.cols['debt:loan'] && Math.round(t.cols['debt:loan'].v), n: Object.keys(t.cols).filter(k => k.indexOf('debt') === 0).length, sw, legend: lg ? lg.textContent : '' };
+    debtState.debts.pop(); drawChart(); return r; });
+  ok(stk.n === 2 && stk.cards === 2800 && stk.loan === 3650, 'two cards share one column (£2,800) beside the loan column (£3,650), no third debt column (' + stk.cols + ')');
+  ok(stk.sw.length === 2 && stk.sw[0] !== stk.sw[1] && /Barclaycard £2,000/.test(stk.legend) && /Vanquis £800/.test(stk.legend), 'the legend shows both cards in their own colours (' + stk.sw.join(' | ') + ')');
+  // zoom: buttons, ctrl + wheel (trackpad pinch) and reset
+  const z0 = await p.evaluate(() => nw3d.hero.st.zoom);
+  await tap(p, '#nw3d-hero-stage [data-z="in"]'); await tap(p, '#nw3d-hero-stage [data-z="in"]');
+  const z1 = await p.evaluate(() => nw3d.hero.st.zoom);
+  await tap(p, '#nw3d-hero-stage [data-z="out"]'); const z2 = await p.evaluate(() => nw3d.hero.st.zoom);
+  const zb = await p.locator("#nw3d-hero-cv").boundingBox(); await p.mouse.move(zb.x + zb.width / 2, zb.y + zb.height / 2);
+  await p.keyboard.down('Control'); await p.mouse.wheel(0, -400); await p.keyboard.up('Control'); await p.waitForTimeout(100);
+  const z3 = await p.evaluate(() => nw3d.hero.st.zoom);
+  await tap(p, '#nw3d-hero-stage [data-z="reset"]'); const z4 = await p.evaluate(() => nw3d.hero.st.zoom);
+  ok(z0 === 1 && Math.abs(z1 - 1.5625) < 1e-6 && z2 < z1 && z3 > z2 && z4 === 1, 'zoom in twice (' + z1 + '), out (' + z2.toFixed(3) + '), ctrl+wheel in (' + z3.toFixed(3) + '), reset to 1 (' + z4 + ')');
 
   // ── 3. Graph (the backup) and back: same numbers, the choice remembered ──
   await tap(p, '#nw3d-main button[data-m="graph"]'); await p.waitForTimeout(400);
