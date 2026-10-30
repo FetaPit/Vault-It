@@ -9,16 +9,20 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] Landing / sign-up page brand pass (audit plan phase 13; the service worker part was done with the cross-device work, `04e58dd`): align `landing.html` and the `site/` pages with the brand book, including its animations (hero build, pulse, ring ping, scanlines), copied across from the brand book as they are; the one exception is the house builder viewport, which shows the house **fully built**, not the partially built one from the book. Cache version bump with it. Prices still match the Stripe links; no invented testimonials or scarcity. (Owner detail added 30 Oct; owner reordered to the top, 30 Oct: "First we tackle the sign up page")
 - [ ] House builder brand build follow-ups (from the 30 Oct review): section 6.8 feedback ("+£5 · +4 bricks" pop-ups, stage flash, milestone toasts), a radial window glow at night, and a real-device speed check of the lite fallback
-- [ ] Remove the Classic switches from Settings after 6 Nov 2026 (one week), if nobody needs them
 - [ ] Level 2 Octalysis slice still open: real mortgage entry at purchase, overpayment what-ifs in the Level 2 panel (`docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md`; the build rule, payments, reset and undo were done 30 Oct)
-- [ ] Landing / sign-up page brand pass (audit plan phase 13; the service worker part was done with the cross-device work, `04e58dd`): align `landing.html` and the `site/` pages with the brand book, including its animations (hero build, pulse, ring ping, scanlines), copied across from the brand book as they are; the one exception is the house builder viewport, which shows the house **fully built**, not the partially built one from the book. Cache version bump with it. Prices still match the Stripe links; no invented testimonials or scarcity. (Owner detail added 30 Oct)
 - [ ] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
 - [ ] QA list (handover section 9) in both themes at 390 and 1100 px (the full suite ran for the 30 Oct release; the visual list is still to do)
 - [ ] Check the metals price feed (`api.metals.live`) from the preview; replace it if dead (needed by linked metal items)
+- [ ] Monetisation outline for the owner to decide on (owner's ask, 30 Oct): which features sit outside the Pro tier and the pricing strategy; a Simplified mode (hide some tabs/features) with the current app as Advanced mode, and which features and tabs belong to Advanced; whether a freemium tier adds or devalues, judged on the success and continued usage of freemium finance apps against paid ones (sources in `docs/research/`); testers stay free. Deliver as a short decision doc and prompt the owner
+- [ ] Custom welcome message for testers (owner's ask, 30 Oct): prompt the owner for the wording, then wire it to the first run for beta accounts
+- [ ] Subscription pop-up: adjust to the monetisation model once the owner decides (owner's ask, 30 Oct; blocked on the outline above)
+- [ ] Apply the brand book to the e-mail comms (owner's ask, 30 Oct): sign-in code, beta list confirm and welcome e-mails in `supabase/functions/`; templates first, deploy only with the owner's explicit yes
 
 ## Waiting on the owner
 
+- Classic switches (house builder, net worth) stay in Settings until the owner has tested the new views on their phone (owner, 30 Oct); remove them only when the owner says so
 - Phone test of vault-it.co/sign-up: confirmation e-mail, confirm page, "Remove me" link
 - `FROM_EMAIL` sender name in Supabase secrets; add vault-it.co to the Turnstile widget's allowed sites; upgrade Resend before ads
 - Night mode: 68 small WCAG AA failures (faded items, white on teal buttons): design call
