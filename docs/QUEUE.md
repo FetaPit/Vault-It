@@ -12,7 +12,7 @@ The single list of instructed work. Every session reads it at start and before e
 - [ ] House builder brand build follow-ups (from the 30 Oct review): section 6.8 feedback ("+£5 · +4 bricks" pop-ups, stage flash, milestone toasts), a radial window glow at night, and a real-device speed check of the lite fallback
 - [ ] Remove the Classic switches from Settings after 6 Nov 2026 (one week), if nobody needs them
 - [ ] Level 2 Octalysis slice still open: real mortgage entry at purchase, overpayment what-ifs in the Level 2 panel (`docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md`; the build rule, payments, reset and undo were done 30 Oct)
-- [ ] Sign-up page brand pass and cache version bump (audit plan phase 13; the service worker part was done with the cross-device work, `04e58dd`)
+- [ ] Landing / sign-up page brand pass (audit plan phase 13; the service worker part was done with the cross-device work, `04e58dd`): align `landing.html` and the `site/` pages with the brand book, including its animations (hero build, pulse, ring ping, scanlines), copied across from the brand book as they are; the one exception is the house builder viewport, which shows the house **fully built**, not the partially built one from the book. Cache version bump with it. Prices still match the Stripe links; no invented testimonials or scarcity. (Owner detail added 30 Oct)
 - [ ] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
 - [ ] Full suite plus the QA list (handover section 9) in both themes at 390 and 1100 px, then release when the owner asks
 - [ ] Check the metals price feed (`api.metals.live`) from the preview; replace it if dead (needed by linked metal items)
