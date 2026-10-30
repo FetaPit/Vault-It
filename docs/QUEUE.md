@@ -9,7 +9,6 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [~] Landing / sign-up page brand pass (audit plan phase 13; the service worker part was done with the cross-device work, `04e58dd`): align `landing.html` and the `site/` pages with the brand book, including its animations (hero build, pulse, ring ping, scanlines), copied across from the brand book as they are; the one exception is the house builder viewport, which shows the house **fully built**, not the partially built one from the book. Cache version bump with it. Prices still match the Stripe links; no invented testimonials or scarcity. (Owner detail added 30 Oct; owner reordered to the top, 30 Oct: "First we tackle the sign up page")
 - [ ] House builder brand build follow-ups (from the 30 Oct review): section 6.8 feedback ("+£5 · +4 bricks" pop-ups, stage flash, milestone toasts), a radial window glow at night, and a real-device speed check of the lite fallback
 - [ ] Level 2 Octalysis slice still open: real mortgage entry at purchase, overpayment what-ifs in the Level 2 panel (`docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md`; the build rule, payments, reset and undo were done 30 Oct)
 - [ ] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
@@ -31,6 +30,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Landing / sign-up page brand pass: tokens, wordmark and mark, tagline, the brand book's 3D house built to the finished home (pulse, ring, scanlines), Night/Daylight toggle, follow-on pages rethemed (`e7542ff`; `tests/test_signup_page.js`)
 - [x] Release to production for the owner's install test (`release/pioneer-v2` → `0f527f7`, backup `backup/release-pioneer-v2-20261030-2037`): installable app and offline shell, One B, 3D views on by default, brand build, Level 2 rule, live value step 1, partial-state fix, chart redraw fix
 - [x] Cross-device readiness for the owner's test (31 Oct): real service worker and manifest (installable, shell opens offline), One B tester agent, `tests/journey_one_b.js`, `tests/test_sw.js`, `docs/qa/TEST_DAY.md` (`04e58dd`); One B's first report in `docs/qa/`
 - [x] A saved state missing a metal blanked total assets, net worth, the KPIs and the 3D tag to £0: metals are now filled in at load (`tests/test_partial_state.js`)
