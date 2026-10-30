@@ -1,5 +1,5 @@
-// Brand phase 6: Daylight polish. Every visible piece of text on every tab reads on paper (at least 3:1, the
-// floor for large text and icons), there is no glow, charts swap to Daylight colours, and 3D viewports keep the Night look.
+// Brand phase 6: Daylight polish. Every visible piece of text on every tab meets WCAG AA on paper (4.5:1, large text 3:1; the
+// owner asked for AA, 30 Oct), there is no glow, charts swap to Daylight colours, and 3D viewports keep the Night look.
 // Text on gradients (card artwork, gradient buttons) is skipped: its background cannot be measured reliably.
 // Run: node tests/test_daylight.js
 const { chromium } = require('playwright');
@@ -20,7 +20,7 @@ const scan = () => {
   const parse = c => { const m = c.match(/[\d.]+/g); return m ? { r: +m[0], g: +m[1], b: +m[2], a: m[3] == null ? 1 : +m[3] } : null; };
   const lum = c => [c.r, c.g, c.b].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0);
   const blend = (f, bg) => ({ r: f.r * f.a + bg.r * (1 - f.a), g: f.g * f.a + bg.g * (1 - f.a), b: f.b * f.a + bg.b * (1 - f.a), a: 1 });
-  const bgOf = el => { const stack = []; for (let e = el; e; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.backgroundImage !== 'none') return null; const c = parse(cs.backgroundColor); if (c && c.a > 0) { stack.push(c); if (c.a >= .99) break; } } let bg = { r: 241, g: 240, b: 234, a: 1 }; for (let i = stack.length - 1; i >= 0; i--) bg = blend(stack[i], bg); return bg; };
+  const bgOf = el => { const stack = []; for (let e = el; e; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.backgroundImage !== 'none' && e !== document.body) return null; const c = parse(cs.backgroundColor); if (c && c.a > 0) { stack.push(c); if (c.a >= .99) break; } } let bg = { r: 227, g: 225, b: 217, a: 1 }; for (let i = stack.length - 1; i >= 0; i--) bg = blend(stack[i], bg); return bg; };
   const out = [];
   document.querySelectorAll('.tab-panel *, #topnav *').forEach(el => {
     if (!el.offsetParent || el.closest('svg,canvas,input,select,textarea,[disabled],.scene,.inv-stage,.cc3-card,.cc3,[class*="cc3-"]')) return;
@@ -31,7 +31,8 @@ const scan = () => {
     const bg = bgOf(el); if (!bg) return;
     const fg = parse(cs.color); fg.a *= op; const f = blend(fg, bg);
     const cr = (Math.max(lum(f), lum(bg)) + .05) / (Math.min(lum(f), lum(bg)) + .05);
-    if (cr < 3) out.push(txt.slice(0, 30) + ' (' + cr.toFixed(2) + ')');
+    const px = parseFloat(cs.fontSize), large = px >= 24 || (px >= 18.66 && +cs.fontWeight >= 700);   // WCAG AA: 4.5:1, or 3:1 for large text
+    if (cr < (large ? 3 : 4.5)) out.push(txt.slice(0, 30) + ' (' + cr.toFixed(2) + ')');
   });
   return out;
 };
@@ -41,7 +42,7 @@ const scanInputs = () => {
   const L = c => [c.r, c.g, c.b].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0);
   return [...document.querySelectorAll('.tab-panel input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=file]), .tab-panel select, .tab-panel textarea')]
     .filter(e => e.offsetParent && !e.closest('.scene,.inv-stage')).map(e => { let bg = null; for (let x = e; x; x = x.parentElement) { const c = P(getComputedStyle(x).backgroundColor); if (c && c.a > .5) { bg = c; break; } }
-      bg = bg || { r: 241, g: 240, b: 234 }; const f = P(getComputedStyle(e).color), cr = (Math.max(L(f), L(bg)) + .05) / (Math.min(L(f), L(bg)) + .05); return cr < 3 ? '#' + (e.id || e.className) + ' ' + cr.toFixed(2) : null; }).filter(Boolean);
+      bg = bg || { r: 227, g: 225, b: 217 }; const f = P(getComputedStyle(e).color), cr = (Math.max(L(f), L(bg)) + .05) / (Math.min(L(f), L(bg)) + .05); return cr < 4.5 ? '#' + (e.id || e.className) + ' ' + cr.toFixed(2) : null; }).filter(Boolean);
 };
 (async () => {
   const b = await chromium.launch(); const errs = [];
@@ -52,7 +53,7 @@ const scanInputs = () => {
   for (const t of ['overview', 'budget', 'house', 'assets', 'debt', 'entrepreneur', 'achievements', 'connections']) {
     await p.evaluate(t => showTab(t), t); await p.waitForTimeout(t === 'house' ? 2500 : 900);
     const bad = await p.evaluate(scan);
-    ok(bad.length === 0, t + ': all text reads on paper (at least 3:1)' + (bad.length ? ' ' + JSON.stringify(bad.slice(0, 6)) : ''));
+    ok(bad.length === 0, t + ': all text meets WCAG AA on paper (4.5:1, large 3:1)' + (bad.length ? ' ' + JSON.stringify(bad.slice(0, 6)) : ''));
     const badIn = await p.evaluate(scanInputs);
     ok(badIn.length === 0, t + ': typed text in every field reads on paper' + (badIn.length ? ' ' + JSON.stringify(badIn.slice(0, 6)) : ''));
   }
@@ -65,16 +66,16 @@ const scanInputs = () => {
   }));
   ok(g.glow === 'none', 'no glow on the big numbers (' + g.glow + ')');
   ok(/^#e6f1f0$/i.test(g.roadmapBg || ''), 'roadmap stage is paper, not Night (' + g.roadmapBg + ')');
-  ok(!g.sankeyHalo || /^#fbfaf6$/i.test(g.sankeyHalo), 'Sankey label halo is paper (' + g.sankeyHalo + ')');
+  ok(!g.sankeyHalo || /^#eceae3$/i.test(g.sankeyHalo), 'Sankey label halo is paper (' + g.sankeyHalo + ')');
   ok(g.night, 'Night colours are swapped in Daylight');
   const paper = await p.evaluate(() => { const cs = getComputedStyle(document.body); return { bg: cs.backgroundColor, img: cs.backgroundImage }; });
-  ok(paper.bg === 'rgb(241, 240, 234)' && /linear-gradient\(rgba\(0, 127, 123, 0\.07\)/.test(paper.img), 'Daylight page is off-white with a faint teal grid (' + paper.bg + ')');
+  ok(paper.bg === 'rgb(227, 225, 217)' && /linear-gradient\(rgba\(0, 127, 123, 0\.07\)/.test(paper.img), 'Daylight page is off-white with a faint teal grid (' + paper.bg + ')');
   // 3D viewports keep the Night look in both modes (owner, 30 Oct)
   await p.evaluate(() => showTab('assets')); await p.waitForTimeout(900);
   const vp = await p.evaluate(() => { const sc = document.getElementById('metals-scene'), cs = getComputedStyle(sc);
     return { bg: cs.getPropertyValue('--bg').trim(), teal: cs.getPropertyValue('--teal').trim(), em: getComputedStyle(sc.querySelector('.vp-gi-hd') || sc).color, page: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
       stage: (document.querySelector('#metalsSvg rect') || { getAttribute: () => '' }).getAttribute('fill') }; });
-  ok(vp.page.toUpperCase() === '#F1F0EA' && vp.bg.toUpperCase() === '#080808' && vp.teal.toUpperCase() === '#44C0B9', '3D viewports keep Night tokens in Daylight (page ' + vp.page + ', viewport ' + vp.bg + ' / ' + vp.teal + ')');
+  ok(vp.page.toUpperCase() === '#E3E1D9' && vp.bg.toUpperCase() === '#080808' && vp.teal.toUpperCase() === '#44C0B9', '3D viewports keep Night tokens in Daylight (page ' + vp.page + ', viewport ' + vp.bg + ' / ' + vp.teal + ')');
   ok(/^#060d16$/i.test(vp.stage), 'metals stage keeps its Night background (' + vp.stage + ')');
   await p.evaluate(() => viToggleTheme()); await p.waitForTimeout(600);
   const n = await p.evaluate(() => ({ t: viTheme(), swap: viDay('#030810') }));

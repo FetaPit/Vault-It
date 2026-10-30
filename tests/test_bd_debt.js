@@ -30,7 +30,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   console.log(JSON.stringify(th));
   ok(th.rows.every(r=>Math.abs(r[0]-r[1])<=1),'tiles side by side have equal heights (no empty space beside the shorter one)');
   ok(th.qa===6,'every tile has a quick-add in its spare room'); ok(!th.txt,'"give every pound a job" copy removed');
-  ok(/dashed/.test(th.line)&&/62, 207, 142|32, 127, 84/.test(th.line),'divider is dashed and income-green, Night or Daylight ('+th.line+')');
+  ok(/dashed/.test(th.line)&&/62, 207, 142|24, 102, 66/.test(th.line),'divider is dashed and income-green, Night or Daylight ('+th.line+')');
   await p.fill('#bd-qa-n-vn','Cinema'); await p.fill('#bd-qa-a-vn','12'); await p.evaluate(()=>bdQuickAdd('vn')); await p.waitForTimeout(300);
   ok(await p.evaluate(()=>(ovState.expenses||[]).some(e=>e.name==='Cinema'&&e.type==='vn'&&e.amount===12)),'quick-add puts the line in that tile\'s type');
   ok(await p.evaluate(()=>document.querySelectorAll('#bd-per100 .bd-p100-row').length>=4),'"every £100 of income" fills the income column');
