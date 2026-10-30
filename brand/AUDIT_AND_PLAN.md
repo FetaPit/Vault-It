@@ -1,6 +1,6 @@
-# Brand rollout: Step 0 audit and plan
+# Brand rollout: audit, plan and status
 
-Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). Nothing in the app has changed yet. This note is the audit the handover asks for, the plan waiting for the owner's approval, and the house builder Level 2 bug analysis.
+Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live plan for the rollout: the Step 0 audit, the phase order and status, the house builder Level 2 analysis and the approved groupings. Creative direction and the owner's answers: `brand/ECD_BRIEF.md`. Brand brief: `brand/vault-it-brand-handover.md`.
 
 ## 1. Audit
 
@@ -20,21 +20,40 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). Nothing in the app has ch
 | Offline caching | The service worker is built from a `blob:` URL. Browsers refuse to register those, so **the app has no working offline cache today** (the error is swallowed). |
 | Staging | Cloudflare builds only `release/pioneer-v2`. Checks are local builds and Playwright screenshots in the session. |
 
-## 2. Proposed order (one commit per phase)
+## 2. Order and status (one phase per commit, owner's order of 30 Oct 2026)
 
-1. Tokens and Night / Daylight switch
-2. Fonts and glyph clean-up
-3. Icons from the sprite
-4. Menu bar (tab colours, no dots)
-5. Colour code
-6. Daylight polish (brief's phase 7)
-7. Logo and wordmark (brief's phase 8)
-8. **Simplify: group related tiles** (only the items the owner approves, section 4)
-9. **House builder Level 2 fix** (section 3)
-10. New house engine behind `?house=new`
-11. Net worth scene and tracker behind `?nw=new`
-12. `landing.html`
-13. Offline cache that works (a real `sw.js`), version bump
+| # | Phase | Status |
+| --- | --- | --- |
+| 1 | Tokens and Night / Daylight switch | Done |
+| 2 | Fonts and glyph clean-up | Done |
+| 3, 4 | Icons from the sprite, menu bar (tab colours, neon outline on the selected tab only, Network hidden, compact = icons only, phones and tablets start compact) | Done |
+| 5 | Colour code | Done |
+| 6 | Daylight polish (brief's phase 7): 3D stages still dark, Level chip gold text faint, KPI numbers glow | Next |
+| 7 | Logo and wordmark (brief's phase 8): 23 "Vault-It" with a hyphen, nav logo, `<title>`, `og:title`, manifest, favicon, tagline | |
+| 8 | Groupings H1 to H4, O1, O2, D1 to D3, A1 (section 4, all approved) | |
+| 9 | House builder Level 2 fix (section 3) | |
+| 10 | Brand look and every animation on all six three.js models in `src/hb3d` (owner chose option a), behind `?house=new` | |
+| 11 | Net worth in 3D as the Overview hero: 3D blocks first, Graph toggle, choice remembered, blocks in the sub-tab colours, behind `?nw=new` | |
+| 12 | On by default for testers once the owner signs off on the phone (old builder reachable from Settings for a week) | |
+| 13 | `landing.html` brand pass; a service worker that registers (today's is a `blob:` URL browsers refuse); cache version bump | |
+| 14 | Full suite and the QA list (brief section 9). Release only when the owner asks | |
+
+### Working notes
+
+- Canvas colours: `viCss(name)`, `viRgba(name, a)`, `viLight()`; charts redraw on the `vi-theme` event. SVG built in JS uses `style="fill:…"` so tokens resolve.
+- Asset class colours (sub-tabs, side panel, overview list, net worth blocks): metals gold, crypto teal, cash green, wealth inventory purple, stocks and funds green 2, house deposit teal, liabilities amber, debt red.
+- Debt charts: `debtChartRamp(debts)`, one red ramp, largest debt strongest; issuer colours (`debtPalette`) only on the card artwork.
+- Tests: the test browser reports a light device, so the app opens in Daylight under test. `test_cc3d` needs `test_hb1` to run first. `test_colour_code` covers phase 5.
+- Level 2 code to reuse: mortgage engine `hbcRead`, `hbL2Sims`; Budget spare `hbBudget()`. **Owner's rule for the overpayment what-ifs:** spare = unassigned + savings + investments, with the trade-off line.
+
+### Open colour questions for the owner
+
+Brass is used here where the meaning is not achievement. Each needs a call: gold (now), green (cleared) or teal (built).
+- Debt progress bar (red to brass), Debt tab "monthly minimums"
+- Budget "save rate"
+- Business MRR and monthly figures, "in progress" and "warm" stage labels
+- Net worth history change when positive
+- Total assets KPI and assets summary card are green; "teal means owned" would make them teal, but net worth is teal already.
 
 ## 3. House builder Level 2 bug
 
@@ -58,7 +77,7 @@ House £100,000, deposit goal 20% = £20,000, so £80,000 is left to pay. That �
 - "Reset tracker" returns to a clean Level 1 (clears all the purchase fields above), after a confirm, with a copy kept in `vi_bak_ht3`. If deposits are removed so `saved` falls below the goal, the app drops back to Level 1.
 - `docs/HOUSE_BUILDER_LEVELS_SPEC.md` is updated to this rule (it currently says "15% deposit = 15% solid"). Tests added for: £2,000 over on £100k at 20% = 2.5%; reset returns to Level 1; payments after purchase move the house.
 
-## 4. Simplification: group tiles that affect each other (awaiting approval)
+## 4. Simplification: group tiles that affect each other (all approved 30 Oct 2026)
 
 Nothing is removed. Each change only moves existing controls together.
 

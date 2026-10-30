@@ -9735,11 +9735,11 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   </div>
   <div class="sb-section">
     <div class="sb-label">Assets by Class</div>
-    <div class="sb-row"><span style="color:var(--go)">Metals</span><span class="sb-val" id="sb-metals">£0</span></div>
-    <div class="sb-row"><span style="color:#f7931a">Crypto</span><span class="sb-val" id="sb-crypto">£0</span></div>
+    <div class="sb-row"><span style="color:var(--gold)">Metals</span><span class="sb-val" id="sb-metals">£0</span></div>
+    <div class="sb-row"><span style="color:var(--teal)">Crypto</span><span class="sb-val" id="sb-crypto">£0</span></div>
     <div class="sb-row"><span style="color:var(--gr)">Cash</span><span class="sb-val" id="sb-cash">£0</span></div>
-    <div class="sb-row"><span style="color:var(--purple)">Stocks &amp; Funds</span><span class="sb-val" id="sb-stocks">£0</span></div>
-    <div class="sb-row"><span style="color:var(--t2)">Inventory</span><span class="sb-val" id="sb-other">£0</span></div>
+    <div class="sb-row"><span style="color:var(--green2)">Stocks &amp; Funds</span><span class="sb-val" id="sb-stocks">£0</span></div>
+    <div class="sb-row"><span style="color:var(--purple)">Inventory</span><span class="sb-val" id="sb-other">£0</span></div>
   </div>
   <div class="sb-section">
     <div class="sb-label">Cashflow</div>
@@ -10396,7 +10396,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
       <div class="ov-legend">
         <div class="ov-legend-item"><div class="ov-legend-dot" style="background:var(--em)"></div>Net Worth</div>
         <div class="ov-legend-item"><div class="ov-legend-dot" style="background:var(--re)"></div>Total Debt</div>
-        <div class="ov-legend-item"><div class="ov-legend-dot" style="background:var(--go)"></div>Income</div>
+        <div class="ov-legend-item"><div class="ov-legend-dot" style="background:var(--gold)"></div>Income</div>
         <div class="ov-legend-item"><div class="ov-legend-dot" style="background:none;width:16px;height:2px;border-top:2px dashed rgb(var(--teal-rgb) / .5)"></div>Forecast</div>
       </div>
     </div>
@@ -10819,7 +10819,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     </div>
     <div class="subtab-panel active" id="assets-metals">
       <div style="display:flex;justify-content:flex-end;margin:10px 0 2px">
-        <span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--go)">Metals: <span id="subtab-total-metals" style="font-weight:700">£0</span></span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--gold)">Metals: <span id="subtab-total-metals" style="font-weight:700">£0</span></span>
       </div>
       <div style="margin-top:4px">
         <div class="scene-card" id="metalsSceneCard">
@@ -10879,7 +10879,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
         </div>
         <div class="g2" style="margin-top:12px">
           <div class="ov-data-card">
-            <div class="ov-data-title" style="color:var(--go)">Holdings (Troy Oz)</div>
+            <div class="ov-data-title" style="color:var(--gold)">Holdings (Troy Oz)</div>
             <div id="metals-inputs"></div>
           </div>
           <div class="ov-data-card">
@@ -10953,7 +10953,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
       <div class="ov-chart-card" style="margin-top:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <span class="ov-chart-title">Liabilities</span>
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--re)">Total: <span id="subtab-total-liab" style="font-weight:700">£0</span></span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--amber)">Total: <span id="subtab-total-liab" style="font-weight:700">£0</span></span>
         </div>
         <div id="liabilities-list"></div>
         <div class="data-input-row" style="margin-top:8px">
@@ -12247,12 +12247,7 @@ body.vi-wide #nwChart { height: 300px !important; }
   50%       { filter: drop-shadow(0 0 7px var(--ta, var(--teal))); }
 }
 
-/* Sub-tab accent variables */
-.subtab-btn[onclick*="metals"]      { --sa: var(--gold); }
-.subtab-btn[onclick*="crypto"]      { --sa: var(--teal); }
-.subtab-btn[onclick*="cash"]        { --sa: var(--green); }
-.subtab-btn[onclick*="other"]       { --sa: var(--purple); }
-.subtab-btn[onclick*="liabilities"] { --sa: var(--amber); }
+/* Sub-tab accent colours: set per data-sub in the "Assets and liabilities sub-tabs" rules */
 
 /* Sub-tab buttons: icon + label */
 .subtab-btn { display: flex !important; align-items: center; gap: 5px; }
@@ -12310,7 +12305,6 @@ html{font-size:calc(var(--vi-base,13px) * var(--vi-scale,1))}
 #assets-page .subtab-btn.active .sti{opacity:1;color:var(--sa,var(--em))}
 #assets-page .subtab-nav>div[style*="margin-left:auto"]{grid-column:1/-1;text-align:right;margin:0!important}
 @media(min-width:1100px){#assets-page .subtab-nav>div[style*="margin-left:auto"]{grid-column:auto;align-self:center;padding-left:12px}}
-.subtab-btn[onclick*="stocks"]{--sa:var(--purple)}
 
 /* ── swipe hints ── */
 .swipe-wrap{position:relative}
@@ -12493,6 +12487,8 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .bd-p100-bar{height:9px;border-radius:5px;background:rgb(var(--ink-rgb) / .07);overflow:hidden}
 .bd-p100-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 60%,#fff))}
 .bd-p100-row b{font:700 .78rem 'Share Tech Mono',monospace;text-align:right;color:var(--tx)}
+/* Daylight: salmon, amber and yellow are under 4.5:1 on white, so small text stays ink; the colour stays on icons, swatches, bars and borders */
+[data-theme="light"] .bd-amt,[data-theme="light"] .bd-tile-tt b,[data-theme="light"] .bd-qa-t{color:var(--text)!important}
 
 /* ═══ House Builder 3D (Three.js) ═══ */
 #house-scene>canvas.hb3d-canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;z-index:0;cursor:grab}
@@ -12982,7 +12978,7 @@ function drawChart() {
   // ── Zero line ──
   if (minV < 0 && maxV > 0) {
     var zy = yp(0);
-    ctx.save(); ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+    ctx.save(); ctx.strokeStyle=viRgba('gold',.55); ctx.lineWidth=1; ctx.setLineDash([4,4]);   // zero line: gold means now
     ctx.beginPath(); ctx.moveTo(PAD.l,zy); ctx.lineTo(W-PAD.r,zy); ctx.stroke();
     ctx.setLineDash([]); ctx.restore();
   }
@@ -12991,12 +12987,12 @@ function drawChart() {
   (function(){
     var mid = PAD.l + cW * NOW_FRAC;
     ctx.save();
-    ctx.strokeStyle = 'rgba(68,192,185,0.45)';
+    ctx.strokeStyle = viRgba('gold',.6);   // today: gold means now
     ctx.lineWidth = 1.5;
     ctx.setLineDash([5,4]);
     ctx.beginPath(); ctx.moveTo(mid, PAD.t); ctx.lineTo(mid, H-PAD.b); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(68,192,185,0.75)';
+    ctx.fillStyle = viRgba('gold',.9);
     ctx.font = "bold 9px 'Syne',sans-serif";
     ctx.textAlign = NOW_FRAC >= 1 ? 'right' : 'center';
     ctx.fillText('TODAY', NOW_FRAC >= 1 ? mid + 2 : mid, PAD.t - 4);
@@ -13095,10 +13091,10 @@ function drawChart() {
   var showIncome = !chartState||!chartState.metrics||chartState.metrics.income;
   var showNW     = !chartState||!chartState.metrics||chartState.metrics.nw;
 
-  if (showDebt)   drawLine(ptCoords('debt'),  'rgba(224,92,92,0.4)', 1.5, 'rgba(224,92,92,0.04)');
-  if (showDebt)   drawLine(ptCoords('debt'),  '#e05c5c', 2);
-  if (showIncome) drawLine(ptCoords('income'),'#c9a84c', 1.8, 'rgba(201,168,76,.05)');
-  if (showNW)     drawLine(ptCoords('nw'),    '#44c0b9', 2.5, 'rgba(68,192,185,0.07)');
+  if (showDebt)   drawLine(ptCoords('debt'),  viRgba('red',.4), 1.5, viRgba('red',.04));
+  if (showDebt)   drawLine(ptCoords('debt'),  viCss('red'), 2);
+  if (showIncome) drawLine(ptCoords('income'),viCss('gold'), 1.8, viRgba('gold',.05));
+  if (showNW)     drawLine(ptCoords('nw'),    viCss('teal'), 2.5, viRgba('teal',.07));
 
   // ── Forecast / Projection (dashed) ──
   if (hasForecast && points.length >= 2) {
@@ -13139,12 +13135,12 @@ function drawChart() {
 
     ctx.save(); ctx.setLineDash([6,4]); ctx.globalAlpha=0.65; ctx.lineWidth=1.5;
     if (showNW) {
-      ctx.strokeStyle='rgba(68,192,185,.6)'; ctx.beginPath();
+      ctx.strokeStyle=viRgba('teal',.6); ctx.beginPath();
       projPts_nw.forEach(function(pt,i){i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y);});
       ctx.stroke();
     }
     if (showDebt) {
-      ctx.strokeStyle='rgba(224,92,92,.6)'; ctx.beginPath();
+      ctx.strokeStyle=viRgba('red',.6); ctx.beginPath();
       projPts_dt.forEach(function(pt,i){i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y);});
       ctx.stroke();
     }
@@ -13155,7 +13151,7 @@ function drawChart() {
   if (showNW) {
     points.forEach(function(p,i){
       ctx.beginPath(); ctx.arc(xp(i), yp(p.nw), 4, 0, Math.PI*2);
-      ctx.fillStyle='#44c0b9'; ctx.fill();
+      ctx.fillStyle=viCss('teal'); ctx.fill();
       ctx.strokeStyle='rgba(8,8,8,0.8)'; ctx.lineWidth=1.5; ctx.stroke();
     });
   }
@@ -15793,12 +15789,12 @@ var _nwZoom=1, _nwPanMs=0; // net worth chart zoom (1=default) and pan offset in
 // ── Constants used by init-time renders — must be declared BEFORE the init block runs ──
 // ── Spending types: committed vs variable × essential vs non-essential, plus savings & investments ──
 var CF_GROUPS={
-  ce:{label:'Committed · essential',     short:'Committed essential',     col:'#a3202c',tx:'#e5535f',ex:'Rent, mortgage, insurance'},
-  ve:{label:'Variable · essential',      short:'Variable essential',      col:'#ee7d7d',tx:'#ee7d7d',ex:'Groceries, fuel, utilities'},
-  cn:{label:'Committed · non-essential', short:'Committed non-essential', col:'#f59e0b',tx:'#f59e0b',ex:'Subscriptions, gym — same every month'},
-  vn:{label:'Variable · non-essential',  short:'Variable non-essential',  col:'#f5dc4a',tx:'#f5dc4a',ex:'Takeaways, shopping, days out'},
-  sv:{label:'Savings',                   short:'Savings',                 col:'#3ecf8e',tx:'#3ecf8e',ex:'Emergency fund, house deposit'},
-  iv:{label:'Investments',               short:'Investments',             col:'#17805a',tx:'#3fb585',ex:'ISA, pension, shares'}
+  ce:{label:'Committed · essential',     short:'Committed essential',     col:'var(--coral)',tx:'var(--coral)',ex:'Rent, mortgage, insurance'},
+  ve:{label:'Variable · essential',      short:'Variable essential',      col:'var(--salmon)',tx:'var(--salmon)',ex:'Groceries, fuel, utilities'},
+  cn:{label:'Committed · non-essential', short:'Committed non-essential', col:'var(--amber)',tx:'var(--amber)',ex:'Subscriptions, gym, the same every month'},
+  vn:{label:'Variable · non-essential',  short:'Variable non-essential',  col:'var(--yellow)',tx:'var(--yellow)',ex:'Takeaways, shopping, days out'},
+  sv:{label:'Savings',                   short:'Savings',                 col:'var(--green)',tx:'var(--green)',ex:'Emergency fund, house deposit'},
+  iv:{label:'Investments',               short:'Investments',             col:'var(--green2)',tx:'var(--green2)',ex:'ISA, pension, shares'}
 };
 var CF_GROUP_ORDER=['ce','ve','cn','vn','sv','iv'];
 var CF_LEGACY={ce:'necessity',ve:'necessity',cn:'discretionary',vn:'discretionary',sv:'investment',iv:'investment'};
@@ -17617,8 +17613,8 @@ function bdIconKey(kind,r){return r.icon||bdFind(kind,bdCatOf(kind,r)).ic;}
 function bdIcon(key,size,col,fillOp){
   var ic=BD_ICONS[key]||FIRE_ICONS[key]||BD_ICONS.dots;
   return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" aria-hidden="true">'
-    +'<g fill="'+col+'" fill-opacity="'+(fillOp==null?.16:fillOp)+'" stroke="none">'+ic.f.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g>'
-    +'<g fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+ic.d.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g></svg>';
+    +'<g style="fill:'+col+'" fill-opacity="'+(fillOp==null?.16:fillOp)+'" stroke="none">'+ic.f.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g>'
+    +'<g fill="none" style="stroke:'+col+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+ic.d.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g></svg>';
 }
 function bdTypeOptions(sel){
   return CF_GROUP_ORDER.map(function(t){return '<option value="'+t+'"'+(t===sel?' selected':'')+'>'+CF_GROUPS[t].short+'</option>';}).join('');
@@ -17636,7 +17632,7 @@ function bdRenderPickers(){
   ['inc','exp'].forEach(function(kind){
     var el=document.getElementById('bd-pick-'+kind);if(!el)return;
     el.innerHTML=bdCats(kind).map(function(c){
-      var col=kind==='inc'?'#44c0b9':CF_GROUPS[c.t||'ve'].tx,on=_bdSel[kind]===c.k,own=String(c.k).indexOf('c_')===0;
+      var col=kind==='inc'?'var(--teal)':CF_GROUPS[c.t||'ve'].tx,on=_bdSel[kind]===c.k,own=String(c.k).indexOf('c_')===0;
       return '<button type="button" class="bd-chip'+(on?' on':'')+'" style="--c:'+col+'" onclick="bdPick(\''+kind+'\',\''+c.k+'\')" title="'+cfEsc(c.n)+'">'+bdIcon(c.ic,18,col)+'<span>'+cfEsc(c.n)+'</span>'
         +(own?'<span class="bd-x" title="Delete this category" onclick="event.stopPropagation();bdDelCat(\''+kind+'\',\''+c.k+'\')">×</span>':'')+'</button>';
     }).join('')+'<button type="button" class="bd-chip add" style="--c:var(--muted)" onclick="bdToggleNew(\''+kind+'\')"><span><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> New category</span></button>';
@@ -17714,7 +17710,7 @@ function cfEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g
 function cfShort(s,n){s=String(s||'');return s.length>n?s.slice(0,n-1)+'…':s;}
 function cfLink(x0,y0,x1,y1,w,fill,op){
   var xm=(x0+x1)/2;
-  return '<path d="M'+x0+' '+y0+' C'+xm+' '+y0+','+xm+' '+y1+','+x1+' '+y1+' L'+x1+' '+(y1+w)+' C'+xm+' '+(y1+w)+','+xm+' '+(y0+w)+','+x0+' '+(y0+w)+' Z" fill="'+fill+'" fill-opacity="'+op+'"/>';
+  return '<path d="M'+x0+' '+y0+' C'+xm+' '+y0+','+xm+' '+y1+','+x1+' '+y1+' L'+x1+' '+(y1+w)+' C'+xm+' '+(y1+w)+','+xm+' '+(y0+w)+','+x0+' '+(y0+w)+' Z" style="fill:'+fill+'" fill-opacity="'+op+'"/>';
 }
 // Shared model so the Sankey, histogram and summary all agree.
 function cfModel(){
@@ -17735,7 +17731,7 @@ function drawCashflowDiagram(){
   if(m.total<=0){hosts.forEach(function(h){h.__sig=null;h.innerHTML='<div class="cf-empty">Add your income and spending to see where every pound goes</div>';});return;}
   var T=m.total;
   // sources (+ shortfall when spending exceeds income)
-  var sources=m.inc.map(function(r){return{name:r.name,amt:+r.amount,col:'#44c0b9'};});
+  var sources=m.inc.map(function(r){return{name:r.name,amt:+r.amount,col:'var(--teal)'};});
   if(m.shortfall>0)sources.push({name:'Shortfall',amt:m.shortfall,col:'#8a93a6',dash:true});
   // groups and their item nodes
   var groups=CF_GROUP_ORDER.map(function(g){
@@ -17805,20 +17801,20 @@ function drawCashflowDiagram(){
   sy=srcY;
   sources.forEach(function(s){
     var h=Math.max(4,s.amt*k);
-    out+='<rect x="'+XS+'" y="'+sy.toFixed(1)+'" width="'+nodeW+'" height="'+h.toFixed(1)+'" fill="'+s.col+'" fill-opacity="'+(s.dash?.5:.9)+'"/>';
+    out+='<rect x="'+XS+'" y="'+sy.toFixed(1)+'" width="'+nodeW+'" height="'+h.toFixed(1)+'" style="fill:'+s.col+'" fill-opacity=""'+(s.dash?.5:.9)+'"/>';
     out+='<text x="'+(XS-8)+'" y="'+(sy+h/2-2).toFixed(1)+'" text-anchor="end" font-size="11.5" font-weight="700" fill="#cfe9e7" '+halo+'>'+cfEsc(cfShort(s.name,26))+'</text>';
     out+='<text x="'+(XS-8)+'" y="'+(sy+h/2+11).toFixed(1)+'" text-anchor="end" font-size="10.5" font-family="Share Tech Mono,monospace" fill="#8fb4b1" '+halo+'>'+cfMoney(s.amt)+' ('+pct(s.amt)+')</text>';
     sy+=Math.max(s.amt*k,MINSLOT)+gapSrc;
   });
-  out+='<rect x="'+XI+'" y="'+incY.toFixed(1)+'" width="'+nodeW+'" height="'+incH.toFixed(1)+'" fill="#44c0b9"/>';
-  out+='<text x="'+(XI+nodeW/2)+'" y="'+(incY-9).toFixed(1)+'" text-anchor="middle" font-size="11.5" font-weight="800" fill="#44c0b9" letter-spacing="1.5" '+halo+'>INCOME '+cfMoney(m.tIn)+'</text>';
+  out+='<rect x="'+XI+'" y="'+incY.toFixed(1)+'" width="'+nodeW+'" height="'+incH.toFixed(1)+'" style="fill:var(--teal)"/>';
+  out+='<text x="'+(XI+nodeW/2)+'" y="'+(incY-9).toFixed(1)+'" text-anchor="middle" font-size="11.5" font-weight="800" style="fill:var(--teal)" letter-spacing="1.5" '+halo+'>INCOME '+cfMoney(m.tIn)+'</text>';
   groupNodes.forEach(function(gn){
-    out+='<rect x="'+XG+'" y="'+gn.y.toFixed(1)+'" width="'+nodeW+'" height="'+gn.h.toFixed(1)+'" fill="'+gn.g.col+'"/>';
-    out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2-2).toFixed(1)+'" font-size="12" font-weight="800" fill="'+gn.g.tx+'" '+halo+'>'+gn.g.label+'</text>';
+    out+='<rect x="'+XG+'" y="'+gn.y.toFixed(1)+'" width="'+nodeW+'" height="'+gn.h.toFixed(1)+'" style="fill:'+gn.g.col+'"/>';
+    out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2-2).toFixed(1)+'" font-size="12" font-weight="800" style="fill:'+gn.g.tx+'" '+halo+'>'+gn.g.label+'</text>';
     out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2+12).toFixed(1)+'" font-size="10.5" font-family="Share Tech Mono,monospace" fill="#b9c4cf" '+halo+'>'+cfMoney(gn.g.sum)+' ('+pct(gn.g.sum)+')</text>';
   });
   itemNodes.forEach(function(n){
-    out+='<rect x="'+XT+'" y="'+n.y.toFixed(1)+'" width="'+nodeW+'" height="'+n.h.toFixed(1)+'" fill="'+n.g.col+'" fill-opacity="'+(n.it.overflow?.45:.95)+'"'+(n.it.overflow?' stroke="'+n.g.col+'" stroke-dasharray="3 2"':'')+'/>';
+    out+='<rect x="'+XT+'" y="'+n.y.toFixed(1)+'" width="'+nodeW+'" height="'+n.h.toFixed(1)+'" style="fill:'+n.g.col+(n.it.overflow?';stroke:'+n.g.col:'')+'" fill-opacity="'+(n.it.overflow?.45:.95)+'"'+(n.it.overflow?' stroke-dasharray="3 2"':'')+'/>';
     out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2-1).toFixed(1)+'" font-size="11" font-weight="700" fill="#dfe6ec" '+halo+'>'+cfEsc(cfShort(n.it.name,20))+'</text>';
     out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2+11).toFixed(1)+'" font-size="10" font-family="Share Tech Mono,monospace" fill="#8f9bab" '+halo+'>'+cfMoney(n.it.amt)+' ('+pct(n.it.amt)+')</text>';
   });
@@ -17835,8 +17831,8 @@ function bdRowHTML(kind,r){
       +'<span class="bd-edit-btns"><button class="btn-add-data" onclick="bdSaveEdit()">Save</button><button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="bdCancelEdit()">Cancel</button></span></div>';
   }
   var ck=bdCatOf(kind,r),t=kind==='exp'?cfType(r):null;
-  var col=kind==='exp'?CF_GROUPS[t].tx:'#44c0b9';
-  var fillc=kind==='exp'?CF_GROUPS[t].col:'#44c0b9';
+  var col=kind==='exp'?CF_GROUPS[t].tx:'var(--teal)';
+  var fillc=kind==='exp'?CF_GROUPS[t].col:'var(--teal)';
   var open=_bdIconFor&&_bdIconFor.kind===kind&&_bdIconFor.id===r.id;
   var h='<div class="bd-row">'
     +'<button class="bd-ic" style="--c:'+fillc+'" title="Change icon" onclick="bdIconOpen(\''+kind+'\','+r.id+')">'+bdIcon(bdIconKey(kind,r),18,col)+'</button>'
@@ -20070,6 +20066,7 @@ function renderDebtTab(){
   var _obBanner=sorted.some(function(d){return d._onboarding;})
     ?'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;background:rgb(var(--orange-rgb) / .08);border:1px solid rgb(var(--orange-rgb) / .3);border-radius:8px;font-size:.55rem;color:var(--t2);line-height:1.5"><span style="flex:1;min-width:200px"><b style="color:var(--or)">One lump-sum entered at setup.</b> Replace it with each separate debt (type, interest rate, minimum payment) so your payoff plan is accurate.</span><button class="btn-add-data" style="padding:5px 12px;font-size:.52rem" onclick="removeOnboardingDebt()">Replace it →</button></div>'
     :'';
+  var _ramp=debtChartRamp(sorted);
   var _rank={},_rk=0;sorted.forEach(function(d){if(d.balance>0)_rank[d.id]=++_rk;});   // payoff order: Avalanche = highest rate first, Snowball = smallest balance first
   var _rankBadge=function(d){return _rank[d.id]?'<span class="debt-rank" title="Payoff order #'+_rank[d.id]+' ('+(_debtMethod==='avalanche'?'Avalanche: highest interest rate first':'Snowball: smallest balance first')+')">'+_rank[d.id]+'</span>':'<span class="debt-rank done" title="Paid off"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></span>';};
   var _rankNote='<div class="debt-rank-note"><b>Payoff order</b> — <span class="debt-rank sm">1</span> = '+(_debtMethod==='avalanche'?'highest interest rate (Avalanche): clear this first':'smallest balance (Snowball): clear this first')+'</div>';
@@ -20099,7 +20096,7 @@ function renderDebtTab(){
           +'</div>'
           +'</div>';
       } else {
-        var _lp=debtPalette(d);
+        var _lp=_ramp[d.id]||{c1:'var(--red)',c2:'var(--red)'};
         // Loan / other — vertical progress bar (y-axis = monetary value, bar shrinks from top as paid)
         return '<div data-did="'+d.id+'" style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px">'
           +'<div style="font-size:.55rem;font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px">'+_rankBadge(d)+'<span style="overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</span></div>'
@@ -21670,13 +21667,17 @@ function viCss(name){try{return getComputedStyle(document.documentElement).getPr
 function viRgba(name,a){var v=viCss(name+'-rgb');return v&&v!=='#888'?'rgb('+v+' / '+a+')':viCss(name);}
 function viLight(){return document.documentElement.getAttribute('data-theme')==='light';}
 // debt charts: a red ramp, the largest debt strongest (issuer colours stay on the card artwork only)
-function debtChartPalette(d){
-  var act=(debtState.debts||[]).filter(function(x){return x.balance>0;}).sort(function(a,b){return b.balance-a.balance;});
-  var i=Math.max(0,act.indexOf(d)),n=Math.max(1,act.length),t=n>1?i/(n-1):0;
-  var hi=viLight()?[214,41,41]:[224,92,92],lo=viLight()?[240,160,160]:[110,38,46];
-  var mix=function(k){return Math.round(hi[k]+(lo[k]-hi[k])*t*.85);};
-  var c1='rgb('+mix(0)+','+mix(1)+','+mix(2)+')',c2='rgb('+Math.round(mix(0)*.72)+','+Math.round(mix(1)*.72)+','+Math.round(mix(2)*.72)+')';
-  return{c1:c1,c2:viLight()?c1:c2,fg:'#fff'};
+function debtChartRamp(debts){
+  var tok=function(n){var v=viCss(n+'-rgb').split(/[\s,]+/).map(Number);return v.length===3&&v.every(function(x){return x>=0;})?v:[128,128,128];};
+  var red=tok('red'),pan=tok('panel'),map={};
+  var list=(debts||[]).filter(function(d){return d.balance>0;}).sort(function(a,b){return (b.balance-a.balance)||((+a.id||0)-(+b.id||0));});
+  var mix=function(t){return red.map(function(c,k){return Math.round(pan[k]+(c-pan[k])*t);});};
+  var lum=function(c){var l=c.map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});return .2126*l[0]+.7152*l[1]+.0722*l[2];};
+  list.forEach(function(d,i){
+    var k=list.length>1?1-0.6*i/(list.length-1):1,a=mix(k),b=mix(k*0.75),L=lum(a);
+    map[d.id]={c1:'rgb('+a.join(',')+')',c2:'rgb('+b.join(',')+')',fg:(L+.05)/0.062>1.05/(L+.05)?'#0B1F22':'#FFFFFF',k:k};   // label: whichever of ink or white reads better
+  });
+  return map;
 }
 // each debt keeps the colours of its credit card (issuer brand); other debts get a palette colour
 function debtPalette(d){
@@ -21716,8 +21717,9 @@ function drawDebtHistogram(){
     ctx.fillText('£'+Math.round(maxB*(1-gi/4)/100)/10+'k',pad.l-6,gy+fs*0.3);
   }
   ctx.restore();
+  var ramp=debtChartRamp(sorted);
   sorted.forEach(function(d,i){
-    var pal=debtChartPalette(d);
+    var pal=ramp[d.id];
     var bH=((d.balance/maxB)*(H-pad.t-pad.b));
     var bww=Math.min(bW*0.74,fs*9),bx=pad.l+i*bW+(bW-bww)/2,by=H-pad.b-bH;
     var g=ctx.createLinearGradient(0,by,0,by+bH);g.addColorStop(0,pal.c1);g.addColorStop(1,pal.c2);
@@ -21765,9 +21767,9 @@ function drawDebtDonut(){
   }
   var legendW=W>560?Math.min(W*0.42,260):0;
   var cx=(W-legendW)/2,cy=H/2,r=Math.min(cx,cy)*0.92,inner=r*0.58;
-  var angle=-Math.PI/2;
+  var angle=-Math.PI/2,ramp=debtChartRamp(debts);
   debts.forEach(function(d){
-    var pal=debtChartPalette(d),slice=(d.balance/total)*Math.PI*2;
+    var pal=ramp[d.id],slice=(d.balance/total)*Math.PI*2;
     var mid=angle+slice/2,g=ctx.createLinearGradient(cx+Math.cos(mid)*inner,cy+Math.sin(mid)*inner,cx+Math.cos(mid)*r,cy+Math.sin(mid)*r);
     g.addColorStop(0,pal.c2);g.addColorStop(1,pal.c1);
     ctx.beginPath();ctx.arc(cx,cy,r,angle,angle+slice);ctx.arc(cx,cy,inner,angle+slice,angle,true);ctx.closePath();
@@ -21783,7 +21785,7 @@ function drawDebtDonut(){
   if(legendW){
     var lx=W-legendW+8,ly=Math.max(fs*1.6,(H-items.length*fs*2.1)/2);
     items.forEach(function(d,i){
-      var pal=debtChartPalette(d),y=ly+i*fs*2.1,g=ctx.createLinearGradient(lx,y,lx+fs*1.6,y+fs*1.1);g.addColorStop(0,pal.c1);g.addColorStop(1,pal.c2);
+      var pal=ramp[d.id],y=ly+i*fs*2.1,g=ctx.createLinearGradient(lx,y,lx+fs*1.6,y+fs*1.1);g.addColorStop(0,pal.c1);g.addColorStop(1,pal.c2);
       ctx.fillStyle=g;ctx.fillRect(lx,y-fs*0.85,fs*1.6,fs*1.1);
       ctx.fillStyle='#d8dfe5';ctx.font=fs+"px 'DM Sans',sans-serif";ctx.textAlign='left';
       var nm=String(d.name);ctx.fillText((nm.length>16?nm.slice(0,15)+'…':nm),lx+fs*2.1,y);
@@ -21815,9 +21817,10 @@ function drawDebtTreemap(){
   el.style.height=H+'px';el.style.width=W+'px';
   if(!debts.length){el.innerHTML='<div class="dtm-empty">Debt free!</div>';return;}
   var total=debts.reduce(function(a,d){return a+d.balance;},0),gap=3;
+  var ramp=debtChartRamp(debts);
   var cells=dtmSquarify(debts.map(function(d){return{v:d.balance,d:d};}),0,0,W,H);
   el.innerHTML=cells.map(function(c){
-    var pal=debtChartPalette(c.d),big=c.w>110&&c.h>70,mid=c.w>70&&c.h>46,pct=Math.round(c.d.balance/total*100);
+    var pal=ramp[c.d.id],big=c.w>110&&c.h>70,mid=c.w>70&&c.h>46,pct=Math.round(c.d.balance/total*100);
     return '<div class="dtm-cell" title="'+ccEsc(c.d.name)+' — '+gbpFmt(c.d.balance)+' ('+pct+'%) · '+(+c.d.rate||0)+'% APR" style="left:'+(c.x+gap/2)+'px;top:'+(c.y+gap/2)+'px;width:'+(c.w-gap)+'px;height:'+(c.h-gap)+'px;background:linear-gradient(135deg,'+pal.c1+','+pal.c2+');color:'+pal.fg+'">'
       +(mid?'<b class="dtm-n">'+ccEsc(c.d.name)+'</b>':'')
       +(mid?'<span class="dtm-v">'+gbpFmt(c.d.balance)+'</span>':'')
@@ -22268,12 +22271,12 @@ function renderSummaryCards(){
   if(aEl){
     var ta=alTotalAssets();
     var rows=[
-      {l:'Precious Metals',v:alTotalMetals(),c:'var(--go)',i:'metals'},
-      {l:'Crypto',v:alTotalCrypto(),c:'#f7931a',i:'crypto'},
-      {l:'Cash & Savings',v:alTotalCash(),c:'var(--gr)',i:'cash'},
-      {l:'House Deposit',v:state?state.saved:0,c:'var(--em)',i:'house'},
-      {l:'Stocks & Funds',v:alTotalStocks(),c:'#9b7ec8',i:'stocks'},
-      {l:'Wealth Inventory',v:alTotalOther(),c:'#8fa3b5',i:'inv'}
+      {l:'Precious Metals',v:alTotalMetals(),c:'var(--gold)',i:'metals'},
+      {l:'Crypto',v:alTotalCrypto(),c:'var(--teal)',i:'crypto'},
+      {l:'Cash & Savings',v:alTotalCash(),c:'var(--green)',i:'cash'},
+      {l:'House Deposit',v:state?state.saved:0,c:'var(--teal)',i:'house'},
+      {l:'Stocks & Funds',v:alTotalStocks(),c:'var(--green2)',i:'stocks'},
+      {l:'Wealth Inventory',v:alTotalOther(),c:'var(--purple)',i:'inv'}
     ];
     aEl.innerHTML='<div class="ov-sum-total" style="color:var(--gr)">'+gbpFmt(ta)+'</div>'
       +(rows.filter(function(r){return r.v>0;}).map(function(r){
@@ -22292,11 +22295,11 @@ function renderSummaryCards(){
   var lEl=document.getElementById('ov-liab-summary');
   if(lEl){
     var tl=alTotalLiab();
-    lEl.innerHTML='<div class="ov-sum-total" style="color:var(--go)">'+gbpFmt(tl)+'</div>'
+    lEl.innerHTML='<div class="ov-sum-total" style="color:var(--amber)">'+gbpFmt(tl)+'</div>'
       +(alState.liabilities.length?
       alState.liabilities.map(function(l){
         return '<div class="ov-sum-row">'+ovIcon('warn','var(--amber)')+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(l.name)+'</span>'
-          +'<span class="ov-sum-v" style="color:var(--go)">'+gbpFmt(depreciatedValue(l))+'</span></div>';
+          +'<span class="ov-sum-v" style="color:var(--amber)">'+gbpFmt(depreciatedValue(l))+'</span></div>';
       }).join('')
       :'<div class="ov-sum-empty">No liabilities tracked</div>');
     var lNx=document.getElementById('ov-liab-next');
@@ -25239,6 +25242,8 @@ function viToggleTheme(){
   try{localStorage.setItem('vi-theme',next);}catch(e){}
   viSyncTheme();
   try{document.dispatchEvent(new CustomEvent('vi-theme',{detail:next}));}catch(e){}
+  try{drawChart();}catch(e){}
+  try{var _dt=document.getElementById('tab-debt');if(_dt&&_dt.style.display!=='none'){drawDebtHistogram();drawDebtDonut();}}catch(e){}
   if(typeof toast==='function')toast(next==='light'?'Daylight mode':'Night mode');
 }
 document.addEventListener('DOMContentLoaded',viSyncTheme);
