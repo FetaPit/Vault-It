@@ -13629,7 +13629,10 @@ function drawChart() {
   canvas.style.width = '100%'; canvas.style.height = '';           // CSS decides the box (it used to be pinned in px after the first draw, so the chart never grew when the screen did)
   var W = canvas.clientWidth || 0, H = canvas.clientHeight || 0;
   // not laid out yet (tab hidden): one pending retry at most, never a pile of them
-  if (W < 50 || H < 50) { if (!drawChart._retry) drawChart._retry = setTimeout(function () { drawChart._retry = 0; drawChart(); }, 200); return; }
+  if (W < 50 || H < 50) {
+    if (canvas.offsetParent === null) return;   // not shown (the 3D view is the main view, or the tab is hidden): showTab and the view switch redraw it when it appears; retrying here ran every 200 ms for ever
+    if (!drawChart._retry) drawChart._retry = setTimeout(function () { drawChart._retry = 0; drawChart(); }, 200); return;
+  }
   var bw = Math.round(W * dpr), bh = Math.round(H * dpr);
   if (canvas.width !== bw || canvas.height !== bh) { canvas.width = bw; canvas.height = bh; }   // resizing the bitmap clears it: only when the size really changed
   var ctx = canvas.getContext('2d');

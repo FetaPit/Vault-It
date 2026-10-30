@@ -151,7 +151,8 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   await p.setViewportSize({ width: 880, height: 1000 }); await p.waitForTimeout(700);
   const c2 = await p.evaluate(() => window.__c);
   ok(c2.chart >= 1 && c2.road >= 1 && c2.cf >= 1 && c2.chart <= 2, 'a real width change (unfolding) redraws them once (' + JSON.stringify(c2) + ')');
-  // ── 16. the net worth chart grows with the screen (it used to stay pinned at its first width)
+  // ── 16. the net worth chart grows with the screen (it used to stay pinned at its first width). The 3D view is the main view by default, so show the graph first.
+  await p.evaluate(() => { if (window.nw3d) nw3d.setMain('graph', true); }); await p.waitForTimeout(500);
   const cw = await p.evaluate(() => { const c = document.getElementById('nwChart'), h = c.parentElement; return { cssW: c.clientWidth, host: h.clientWidth, drawn: c.dataset.drawn }; });
   ok(cw.cssW > 700 && Math.abs(cw.cssW - cw.host) < 80, 'net worth chart fills the wider screen (' + cw.cssW + 'px in a ' + cw.host + 'px card)');
   await p.setViewportSize({ width: 520, height: 1000 }); await p.waitForTimeout(700);

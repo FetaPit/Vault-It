@@ -25,6 +25,7 @@ const ST = () => { const v = HB3D.viewer, C = v && v._cust; return { engine: doc
     return j({ error: 'unknown' }, 400);
   });
   const p = await ctx.newPage();
+  await p.addInitScript(() => localStorage.setItem('vi-flag-house', '0'));   // classic viewer: the brand build's frame loop starves Playwright's in-page waits under software GL
   p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/Failed to load|net::/.test(m.text())) errs.push('console: ' + m.text()); });
   await p.addInitScript(seed({ saved: 25000, target: 250000, houseType: 'terraced', deposits: [{ amount: 25000, date: '01/10/2026' }], prices: { terraced: 250000 } }));
   await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
@@ -54,9 +55,10 @@ const ST = () => { const v = HB3D.viewer, C = v && v._cust; return { engine: doc
   await p.evaluate(() => { state.houseMode = 'purchased'; state.valuation = 250000; state.mortgageBalance = 150000; save(); updateUI(); });
   await p.waitForTimeout(900);
   r = await p.evaluate(ST);
-  const eq = await p.evaluate(() => { const v = HB3D.viewer, C = v._cust; return { solidClip: C.solidMats[0].clippingPlanes[0].constant, holoClip: -C.holoMats[0].clippingPlanes[0].constant, H: v.model.height, eq: v.eq }; });
+  const eq = await p.evaluate(() => { const v = HB3D.viewer, C = v._cust; return { solidClip: C.solidMats[0].clippingPlanes[0].constant, holoClip: -C.holoMats[0].clippingPlanes[0].constant, H: v.model.height, eq: v.eq, want: hbL2Progress(), exp: (function () { var dt = 250000 * (+state.depositPct || 0) / 100; return (250000 - dt - 150000) / (250000 - dt); })() }; });
   ok(r.mode === 'equity' && r.solid && r.holo && !r.blue, 'mortgage stage: full colour + hologram');
-  ok(Math.abs(eq.solidClip - 0.4 * eq.H) < 0.05 && Math.abs(eq.holoClip - 0.4 * eq.H) < 0.05, 'colour fills exactly the owned 40% of the design');
+  // owner's Level 2 rule (30 Oct 2026): colour = share of the mortgage paid off, (base - balance) / base with base = price - deposit target, not equity / valuation
+  ok(Math.abs(eq.want - eq.exp) < 1e-6 && Math.abs(eq.solidClip - eq.want * eq.H) < 0.05 && Math.abs(eq.holoClip - eq.want * eq.H) < 0.05, 'colour fills exactly the mortgage-paid share of the design (' + (eq.want * 100).toFixed(1) + '%)');
   await p.screenshot({ path: 'shots/hb3d/design_upload_equity.png' });
   await p.evaluate(() => { state.mortgageBalance = 0; save(); updateUI(); });
   await p.waitForTimeout(700);
