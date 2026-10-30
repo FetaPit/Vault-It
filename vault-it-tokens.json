@@ -1,0 +1,118 @@
+{
+  "color": {
+    "void": {
+      "value": "#080808",
+      "role": "Page background (Daylight: Paper)"
+    },
+    "panel": {
+      "value": "#080D14",
+      "role": "Cards and tiles"
+    },
+    "slate": {
+      "value": "#1C2420",
+      "role": "Raised surface"
+    },
+    "line": {
+      "value": "#102221",
+      "role": "Borders, teal hairline"
+    },
+    "lintel": {
+      "value": "#E8E8E8",
+      "role": "Primary text (Daylight: Ink)"
+    },
+    "mortar": {
+      "value": "#9AA0A6",
+      "role": "Secondary text"
+    },
+    "signal": {
+      "value": "#2D8882",
+      "role": "Labels and sublines"
+    },
+    "lock": {
+      "value": "#5A6068",
+      "role": "Locked and disabled"
+    },
+    "teal": {
+      "value": "#44C0B9",
+      "role": "Brand, built, actions, Overview"
+    },
+    "deep-teal": {
+      "value": "#007F7B",
+      "role": "Button gradient start"
+    },
+    "gold": {
+      "value": "#E8C56A",
+      "role": "Now: current row, House builder, metals"
+    },
+    "brass": {
+      "value": "#C9A84C",
+      "role": "Achievement, journey, Pro"
+    },
+    "cleared": {
+      "value": "#3ECF8E",
+      "role": "Assets, paid off, success"
+    },
+    "green-2": {
+      "value": "#3FB585",
+      "role": "Investments and funds"
+    },
+    "overdraft": {
+      "value": "#E05C5C",
+      "role": "Debt and danger"
+    },
+    "horizon": {
+      "value": "#64B5F6",
+      "role": "Budget and info"
+    },
+    "violet": {
+      "value": "#9B7EC8",
+      "role": "Connections, wealth inventory"
+    },
+    "ember": {
+      "value": "#E0894A",
+      "role": "Entrepreneur"
+    },
+    "coral": {
+      "value": "#E5535F",
+      "role": "Committed essential"
+    },
+    "salmon": {
+      "value": "#EE7D7D",
+      "role": "Variable essential"
+    },
+    "amber": {
+      "value": "#F59E0B",
+      "role": "Committed non-essential, liabilities, warning"
+    },
+    "yellow": {
+      "value": "#F5DC4A",
+      "role": "Variable non-essential"
+    }
+  },
+  "font": {
+    "display": "Syne",
+    "body": "DM Sans",
+    "mono": "Share Tech Mono"
+  },
+  "radius": {
+    "brick": "4px",
+    "tile": "14px",
+    "card": "18px",
+    "pill": "999px"
+  },
+  "space": [
+    4,
+    8,
+    12,
+    16,
+    24,
+    40,
+    64
+  ],
+  "motion": {
+    "fast": "240ms",
+    "base": "600ms",
+    "build": "1800ms",
+    "ease": "cubic-bezier(.2,.8,.2,1)"
+  }
+}

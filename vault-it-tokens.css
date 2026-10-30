@@ -1,0 +1,55 @@
+/* Vault·It design tokens. Night is the default, Daylight is the light mode.
+ * Switch with data-theme="light" on <html>. Generated from vault-it-brand-book.html */
+html{box-sizing:border-box}
+:root,[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --slate:#1C2420; --line:#102221; --line2:#15302F;
+  --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882; --lock:#5A6068;
+  --teal:#44C0B9; --teal-deep:#007F7B; --gold:#E8C56A; --brass:#C9A84C;
+  --green:#3ECF8E; --green2:#3FB585; --red:#E05C5C; --blue:#64B5F6; --purple:#9B7EC8; --orange:#E0894A;
+  --coral:#E5535F; --salmon:#EE7D7D; --amber:#F59E0B; --yellow:#F5DC4A;
+  --goldf:#E8C56A; --on-teal:#00181A; --on-gold:#1A1400; --pulse:2800ms;
+  --surf:#0A1018; --surf2:#080D14; --track:#13202A; --pillbg:#12100A; --lib:#0A1618; --doneb:#0A1F22; --toastbg:#08181C;
+  --lockline:#3A4446; --lockfg:#6A7678; --dotoff:#2A3638;
+  --stat:#B6D8D6; --stext:0 0 8px #000; --rail-bg:rgba(0,12,18,.74); --rail-btn:rgba(8,24,28,.85);
+  --stage-bg:radial-gradient(120% 90% at 50% 100%,#06242A 0%,#00131A 45%,#080808 100%);
+  --scan:repeating-linear-gradient(0deg,rgba(68,192,185,.05) 0 1px,transparent 1px 4px);--scan-size:auto;
+  --paper-img:repeating-linear-gradient(0deg,rgba(68,192,185,.025) 0 1px,transparent 1px 4px);--paper-size:auto;
+  --tglow:0 0 18px rgba(68,192,185,.35); --dglow:0 0 10px rgba(68,192,185,.6); --popglow:0 0 14px rgba(232,197,106,.7);
+  --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
+  --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
+  --font-display:"Syne","Helvetica Neue",Arial,sans-serif;
+  --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r-brick:4px; --r-tile:14px; --r-card:18px; --r-pill:999px;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --t-fast:240ms; --t-base:600ms; --t-build:1800ms;
+}
+/* Daylight: deep teal ink on soft paper. Same hues, darker values, no bloom, blueprint grid instead of scanlines. */
+[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F3F7F6; --panel:#FFFFFF; --panel2:#EAF2F1; --slate:#E3EDEC; --line:#C5DAD8; --line2:#9FC4C1;
+  --text:#0B1F22; --muted:#3F5658; --faint:#2E6F6C; --lock:#5C6B6D;
+  --teal:#297B76; --teal-deep:#006B67; --gold:#8B6A15; --brass:#A18331;
+  --green:#207F54; --green2:#2C7D5C; --red:#D62929; --blue:#0B72C4; --purple:#815DBA; --orange:#CF6C24;
+  --coral:#C22A4F; --salmon:#E4645F; --amber:#BB7808; --yellow:#9B8609;
+  --on-teal:#FFFFFF; --on-gold:#1A1400;
+  --surf:#FFFFFF; --surf2:#FFFFFF; --track:#D9E7E6; --pillbg:#FFF6DD; --lib:#F1F7F6; --doneb:#E1F3F1; --toastbg:#FFFFFF;
+  --lockline:#9AB0B1; --lockfg:#5C6B6D; --dotoff:#B9CCCB;
+  --stat:#1E4A48; --stext:none; --rail-bg:rgba(255,255,255,.88); --rail-btn:#FFFFFF;
+  --stage-bg:radial-gradient(120% 90% at 50% 100%,#D3E9E7 0%,#E6F2F1 50%,#F6FAF9 100%);
+  --scan:linear-gradient(rgba(0,127,123,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.07) 1px,transparent 1px);--scan-size:26px 26px;
+  --paper-img:linear-gradient(rgba(0,127,123,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.05) 1px,transparent 1px);--paper-size:32px 32px;
+  --tglow:none; --dglow:none; --popglow:none;
+  --btn1:#006B67; --btn2:#00837E; --bshadow:0 6px 16px -8px rgba(0,90,88,.55);
+  --glow:0 10px 28px -16px rgba(0,90,88,.35); --elev:0 1px 0 #fff inset,0 10px 28px -18px rgba(0,90,88,.3);
+}
+
+/* Light mode signature: soft panels with corner brackets (optional, copy from the brand book) */
+/* Icon weight */
+.vi-ic{--vi-sw:1.1;width:24px;height:24px}
+.vi-ic.sm{--vi-sw:1.5}
+/* Built state: the 2.8 second beat */
+@keyframes vi-glow{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 8px currentColor)}}
+.vi-built{animation:vi-glow var(--pulse) ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.vi-built{animation:none}}
