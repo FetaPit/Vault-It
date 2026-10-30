@@ -1,4 +1,4 @@
-// Brand build on the 3D house builder (house flag: ?house=new or localStorage vi-flag-house = 1), brand handover 6.2 to 6.10.
+// Brand build on the 3D house builder (on by default since 30 Oct 2026; ?house=old or vi-flag-house = 0 gives the classic builder), brand handover 6.2 to 6.10.
 // Flag off: the current builder, unchanged. Flag on: brick value = deposit target x 0.77 / bricks, bricks laid =
 // floor(bricks x seg(p, 0.03, 0.80)), the ROW label, the HUD and the caption agree, per-brick drop and stagger,
 // reduced motion builds instantly, no page errors, no sideways scroll at 390 px.
@@ -7,7 +7,7 @@ const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-const seed = (o, flag) => `(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');${flag ? "localStorage.setItem('vi-flag-house','1');" : ''}localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})()`;
+const seed = (o, flag) => `(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('vi-flag-house',${flag?"'1'":"'0'"});localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})()`;
 const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 1500000, flat: 80000, apartment: 300000 };
 (async () => {
   const b = await chromium.launch(); const errs = [];
@@ -122,7 +122,7 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   p = await open(semi, { flag: false, query: '?house=new' }); await settle(p);
   r = await p.evaluate(() => ({ on: !!HB3D.viewer.brandInfo(), stored: localStorage.getItem('vi-flag-house') }));
   ok(r.on && r.stored === '1', '?house=new shows the brand build and keeps the flag for this device');
-  ok(await p.evaluate(() => { history.replaceState(null, '', location.pathname + '?house=old'); const off = !viFlag('house'); return off && localStorage.getItem('vi-flag-house') === null; }), '?house=old switches it off again');
+  ok(await p.evaluate(() => { history.replaceState(null, '', location.pathname + '?house=old'); const off = !viFlag('house'); return off && localStorage.getItem('vi-flag-house') === '0'; }), '?house=old switches it off again (stored, so the device stays classic)');
   await p.evaluate(() => { state.houseMode = 'purchased'; state.mortgageBalance = 200000; state.valuation = 320000; save(); updateUI(); }); await settle(p);
   r = await p.evaluate(() => { const v = HB3D.viewer; return { mode: hb3dState().mode, brand: !!v.brandInfo(), grpVis: !!(v._bGroup && v._bGroup.visible), water: v.water.visible }; });
   ok(r.mode === 'equity' && !r.brand && !r.grpVis && r.water, 'Level 2 (equity) keeps its current look with the flag on');

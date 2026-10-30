@@ -7,7 +7,7 @@ const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (o) => {
   if (o.theme) localStorage.setItem('vi-theme', o.theme);
-  if (o.flag) localStorage.setItem('vi-flag-nw', '1');
+  if (o.flag === false) localStorage.setItem('vi-flag-nw', '0'); else if (o.flag) localStorage.setItem('vi-flag-nw', '1');
   if (localStorage.getItem('pos_debt1')) return;
   localStorage.setItem('vi_declined_demo', 'true');
   localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
@@ -54,23 +54,25 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   const tap = (p, sel) => p.evaluate((s) => document.querySelector(s).click(), sel);
   const scrollTo = async (p, sel) => { await p.evaluate((s) => { const e = document.querySelector(s); window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 140); }, sel); await p.waitForTimeout(1200); };
 
-  // ── 1. flag off: the Overview is exactly as before ──
-  let p = await open({});
+  // ── 1. classic (vi-flag-nw = 0): the Overview is exactly as before ──
+  let p = await open({ flag: false });
   const off = await p.evaluate(() => ({ hero: !!document.getElementById('nw3d-hero'), seg: !!document.getElementById('nw3d-view'), wrap: !!document.querySelector('.nw3d-wrap'), api: typeof window.nw3d,
     chartVis: getComputedStyle(document.getElementById('nwChart')).visibility, chartH: document.getElementById('nwChart').getBoundingClientRect().height, flag: localStorage.getItem('vi-flag-nw'),
     cards: [...document.querySelectorAll('#ov-page > .ov-chart-card')].length, title: document.querySelector('.ov-chart-title').textContent }));
-  ok(!off.hero && !off.seg && !off.wrap && off.api === 'undefined' && off.flag === null, 'flag off: no 3D scene, no view toggle, drawChart untouched');
+  ok(!off.hero && !off.seg && !off.wrap && off.api === 'undefined' && off.flag === '0', 'classic: no 3D scene, no view toggle, drawChart untouched');
   ok(off.chartVis === 'visible' && off.chartH > 150 && off.title === 'Net Worth Progress', 'flag off: the net worth graph shows as before (' + Math.round(off.chartH) + 'px)');
   await p.context().close();
 
-  // ── 2. ?nw=new turns it on (and remembers it), 3D blocks first ──
+  // ── 2. on by default (owner, 30 Oct): the 3D scene is the main view of the net worth card, the chart is the backup ──
   p = await open({ q: '?nw=new' });
-  let s = await p.evaluate(() => ({ flag: localStorage.getItem('vi-flag-nw'), hero: !!document.getElementById('nw3d-hero'), pressed: [...document.querySelectorAll('#nw3d-view button')].map(x => x.dataset.v + ':' + x.getAttribute('aria-pressed')).join(','),
-    view: nw3d.view(), trk: getComputedStyle(document.getElementById('nw3d-trk-stage')).display, chartVis: getComputedStyle(document.getElementById('nwChart')).visibility, heroFirst: document.getElementById('nw3d-hero').nextElementSibling === document.getElementById('nwChart').closest('.ov-chart-card') }));
-  ok(s.flag === '1' && s.hero && s.heroFirst, '?nw=new switches the flag on and the 3D scene sits right above the main chart');
-  ok(s.pressed === 'bars:true,line:false' && s.view === 'bars' && s.trk !== 'none' && s.chartVis === 'hidden', '3D blocks is the first and default view (' + s.pressed + ')');
+  let s = await p.evaluate(() => ({ flag: localStorage.getItem('vi-flag-nw'), hero: !!document.getElementById('nw3d-hero'), main: nw3d.main(), mpressed: [...document.querySelectorAll('#nw3d-main button')].map(x => x.dataset.m + ':' + x.getAttribute('aria-pressed')).join(','),
+    heroShown: !!document.getElementById('nw3d-hero').offsetParent, chartHidden: !document.getElementById('nwChart').offsetParent, title: document.querySelector('.ov-chart-title').textContent,
+    inCard: document.getElementById('nw3d-hero').closest('.ov-chart-card') === document.getElementById('nwChart').closest('.ov-chart-card') }));
+  ok(s.flag === '1' && s.hero && s.inCard, '?nw=new stores the flag; the 3D scene lives inside the net worth card');
+  ok(s.main === '3d' && s.mpressed === '3d:true,graph:false' && s.heroShown && s.chartHidden && s.title === 'Net worth in 3D', '3D is the main view by default, the chart is hidden behind Graph (' + s.mpressed + ')');
   // numbers: the scene tag is computeNetWorth, columns add up to it, the tracker is the chart's own points
   await scrollTo(p, '#nw3d-hero');
+  await p.evaluate(() => { nw3d.setMain('graph', true); nw3d.setView('bars', false); }); await p.waitForTimeout(500);   // the graph's points exist only while the chart is drawn; Blocks has the month readout
   let nums = await p.evaluate(() => { const t = nw3d.hero.totals(), cv = document.getElementById('nw3d-hero-cv'), d = nw3d.tracker.data(), pts = document.getElementById('nwChart')._points.filter(x => !x.synth);
     return { net: Math.round(computeNetWorth()), tag: +cv.dataset.net, sum: t.assets - t.debt, unit: t.unit, cols: cv.dataset.cols, ptsNw: pts.map(x => Math.round(x.nw)), trkNw: d.nw, ptsDebt: pts.map(x => Math.round(x.debt)), trkDebt: d.debt, today: d.today, todayNw: d.nw[d.today],
       kpi: document.getElementById('kpi-nw').textContent, read: document.getElementById('nw3d-hero-read').textContent, tip: document.getElementById('chart-tooltip').textContent, cash: t.cols.cash }; });
@@ -81,19 +83,22 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   ok(nums.read.indexOf('Net worth £' + nums.net.toLocaleString('en-GB')) >= 0 && nums.tip.indexOf('net worth £' + nums.net.toLocaleString('en-GB')) >= 0, 'readouts under both 3D views say the same net worth');
   // unit scales so the tallest column stays under about 14 blocks
   const big = await p.evaluate(() => { alState.cashAccounts[0].balance = 64200; drawChart(); const t = nw3d.hero.totals(); const r = { unit: t.unit, blocks: t.cols.cash.blocks, key: document.getElementById('nw3d-hero-key').textContent, tag: +document.getElementById('nw3d-hero-cv').dataset.net, net: Math.round(computeNetWorth()) }; alState.cashAccounts[0].balance = 6420; drawChart(); return r; });
+  await p.evaluate(() => { nw3d.setView('line', false); nw3d.setMain('3d', true); }); await p.waitForTimeout(300);
   ok(big.unit === 5000 && big.blocks <= 14 && /1 block = £5,000/.test(big.key) && big.tag === big.net, 'a bigger stack scales the unit and labels it (' + big.key + ')');
 
-  // ── 3. Graph and back: same numbers, the choice remembered ──
-  await tap(p, '#nw3d-view button[data-v="line"]'); await p.waitForTimeout(400);
+  // ── 3. Graph (the backup) and back: same numbers, the choice remembered ──
+  await tap(p, '#nw3d-main button[data-m="graph"]'); await p.waitForTimeout(400);
   s = await p.evaluate(() => ({ view: nw3d.view(), saved: localStorage.getItem('vi-nw-view'), trk: getComputedStyle(document.getElementById('nw3d-trk-stage')).display, chartVis: getComputedStyle(document.getElementById('nwChart')).visibility, pts: document.getElementById('nwChart')._points.filter(x => !x.synth).map(x => Math.round(x.nw)), tag: +document.getElementById('nw3d-hero-cv').dataset.net }));
-  ok(s.view === 'line' && s.saved === 'line' && s.trk === 'none' && s.chartVis === 'visible', 'Graph shows the existing chart and is remembered');
+  ok(s.view === 'line' && s.trk === 'none' && s.chartVis === 'visible' && await p.evaluate(() => nw3d.main() === 'graph' && localStorage.getItem('vi-nw-main') === 'graph' && !document.getElementById('nw3d-hero').offsetParent), 'Graph shows the existing chart (line first), hides the scene, and is remembered');
   ok(JSON.stringify(s.pts) === JSON.stringify(nums.ptsNw) && s.tag === nums.net, 'switching view never changes the numbers');
+  await p.waitForTimeout(1000);   // headless Chromium on file:// can lose a localStorage write made just before a reload
   await p.reload(); await p.waitForFunction(() => typeof nw3d !== 'undefined' && typeof showTab === 'function', null, { timeout: 20000 }); await p.waitForTimeout(600); await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner{display:none!important}' }); await p.evaluate(() => showTab('overview')); await p.waitForTimeout(400);
-  ok(await p.evaluate(() => nw3d.view() === 'line' && document.querySelector('#nw3d-view [data-v="line"]').getAttribute('aria-pressed') === 'true'), 'after a reload the Graph choice is still there');
-  await tap(p, '#nw3d-view button[data-v="bars"]'); await p.waitForTimeout(300);
-  ok(await p.evaluate(() => nw3d.view() === 'bars' && localStorage.getItem('vi-nw-view') === 'bars'), 'and back to 3D blocks, remembered');
+  ok(await p.evaluate(() => nw3d.main() === 'graph' && document.querySelector('#nw3d-main [data-m="graph"]').getAttribute('aria-pressed') === 'true'), 'after a reload the Graph choice is still there');
+  await tap(p, '#nw3d-main button[data-m="3d"]'); await p.waitForTimeout(300);
+  ok(await p.evaluate(() => nw3d.main() === '3d' && localStorage.getItem('vi-nw-main') === '3d'), 'and back to 3D, remembered');
 
-  // ── 4. ranges and series work in both views ──
+  // ── 4. ranges and series work in both chart views (Blocks and Line live behind Graph) ──
+  await p.evaluate(() => nw3d.setMain('graph', true)); await p.waitForTimeout(200);
   for (const v of ['bars', 'line']) {
     await tap(p, `#nw3d-view button[data-v="${v}"]`); await p.waitForTimeout(200);
     await tap(p, '.chart-filter-btn[data-range="6"]'); await p.waitForTimeout(250);
@@ -121,7 +126,7 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   // still frames differ in normal motion (sway, pulse, ring)
   await p.mouse.move(box.x + 4, box.y + 4); await p.waitForTimeout(3000);   // leave it alone: the sway resumes after 2.5 s
   const m1 = await p.evaluate(hash, 'nw3d-trk-cv'); await p.waitForTimeout(400); const m2 = await p.evaluate(hash, 'nw3d-trk-cv');
-  await scrollTo(p, '#nw3d-hero');
+  await p.evaluate(() => nw3d.setMain('3d', true)); await scrollTo(p, '#nw3d-hero');
   const h1 = await p.evaluate(hash, 'nw3d-hero-cv'); await p.waitForTimeout(400); const h2 = await p.evaluate(hash, 'nw3d-hero-cv');
   ok(m1.nz > 1000 && m1.h !== m2.h && h1.nz > 1000 && h1.h !== h2.h, 'both scenes are drawn and move (sway, pulse, ring)');
   await p.context().close();
@@ -130,6 +135,7 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   p = await open({ flag: true, reduce: true });
   await scrollTo(p, '#nw3d-hero'); await p.waitForTimeout(300);
   const r1 = await p.evaluate(hash, 'nw3d-hero-cv'); await p.waitForTimeout(700); const r2 = await p.evaluate(hash, 'nw3d-hero-cv');
+  await p.evaluate(() => { nw3d.setMain('graph', true); nw3d.setView('bars', true); }); await scrollTo(p, '#nw3d-trk-stage'); await p.waitForTimeout(400);
   const t1 = await p.evaluate(hash, 'nw3d-trk-cv'); await p.waitForTimeout(500); const t2 = await p.evaluate(hash, 'nw3d-trk-cv');
   ok(r1.nz > 1000 && r1.h === r2.h && t1.nz > 1000 && t1.h === t2.h, 'reduced motion: both scenes are complete at once and do not move');
   await p.context().close();
@@ -137,13 +143,13 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   // ── 6. phones: no sideways scroll, Daylight text reads ──
   for (const theme of ['dark', 'light']) {
     p = await open({ flag: true, w: 390, h: 844, mob: true, theme });
-    for (const v of ['bars', 'line']) {
-      await p.evaluate((v) => nw3d.setView(v, true), v); await p.waitForTimeout(300);
+    for (const v of ['3d', 'graph']) {
+      await p.evaluate((v) => nw3d.setMain(v, true), v); await p.waitForTimeout(300);
       const sx = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       ok(sx <= 1, theme + ' 390px ' + v + ': no sideways scroll (' + sx + ')');
     }
     if (theme === 'light') {
-      await p.evaluate(() => nw3d.setView('bars', true)); await p.waitForTimeout(300);
+      await p.evaluate(() => nw3d.setMain('3d', true)); await p.waitForTimeout(300);
       const c = await p.evaluate(contrast, NEW_TEXT);
       ok(c.n >= 8 && c.out.length === 0, 'Daylight: the new text passes WCAG AA (' + c.n + ' checked) ' + c.out.join(' | '));
       const fca = await p.evaluate(() => { const e = document.querySelector('.vi-fca'); return !!(e && e.offsetParent && /Not regulated by the FCA\. Not financial advice\./.test(e.textContent)); });
@@ -158,7 +164,7 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   ok(c11.out.length === 0, 'Daylight 1100px: the new text passes WCAG AA (' + c11.n + ' checked) ' + c11.out.join(' | '));
   // ?nw=old turns it off again
   await p.goto(APP + '?nw=old'); await p.waitForTimeout(1500);
-  ok(await p.evaluate(() => localStorage.getItem('vi-flag-nw') === null && !document.getElementById('nw3d-hero')), '?nw=old switches it off');
+  ok(await p.evaluate(() => localStorage.getItem('vi-flag-nw') === '0' && !document.getElementById('nw3d-hero')), '?nw=old switches it off (stored, so the device stays classic)');
   await p.context().close();
 
   ok(errs.length === 0, 'no page errors ' + errs.join(' | '));

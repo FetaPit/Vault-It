@@ -1,3 +1,4 @@
+// Runs the classic house builder (vi-flag-house = 0): the brand build's own checks are in tests/test_hb_brand.js.
 // Brand phase 8: cards that affect each other are grouped (brand/AUDIT_AND_PLAN.md section 4). Nothing is removed:
 // every control keeps its id and still works. Overview O1 and O2 are checked in test_overview.js.
 // Run: node tests/test_groupings.js
@@ -6,7 +7,7 @@ const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = () => {
   if (localStorage.getItem('pos_debt1')) return;
-  localStorage.setItem('vi_declined_demo', 'true');
+  localStorage.setItem('vi_declined_demo', 'true');localStorage.setItem('vi-flag-house','0');
   localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
   localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' }));
   localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' }));

@@ -40,7 +40,7 @@ Branch `brand-rollout`. Done and pushed: colour code, Daylight polish, logo and 
 1. Merge `brand-rollout` into `Pioneer_v3`; full suite green.
 2. Your phone sign-off on the tested commit.
 3. Backup branch `backup/release-pioneer-v2-YYYYMMDD-HHMM`, then fast-forward `release/pioneer-v2`.
-4. New 3D on by default for testers only after your sign-off (old builder kept in Settings for a week).
+4. New 3D on by default since 30 Oct (owner's sign-off); classic views stay in Settings for a week.
 
 ## Quick bug test for the phone (10 minutes)
 

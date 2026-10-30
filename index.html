@@ -6380,7 +6380,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var cx = (bb.min[0] + bb.max[0]) / 2, cz = (bb.min[2] + bb.max[2]) / 2, H = Math.max(2, bb.max[1]);
     var rad = Math.sqrt(Math.pow(bb.max[0] - bb.min[0], 2) + Math.pow(bb.max[2] - bb.min[2], 2) + H * H) / 2;
     this._radius = rad;
-    var fov = this.camera.fov * Math.PI / 180, aspect = Math.max(0.5, this.camera.aspect || 1.6), aspF = aspect < 1 ? 1.15 / aspect : 1.02;
+    var fov = this.camera.fov * Math.PI / 180, aspect = Math.max(0.5, this.camera.aspect || 1.6);
+    var aspF = this.brand ? (aspect < 1 ? 0.98 / aspect : 0.9) : (aspect < 1 ? 1.15 / aspect : 1.02);   // brand build: the house fills the frame like the brand book, closer still on phones (owner, 30 Oct 2026)
     var F = m && m.focus, fRad = F ? Math.max(6, Math.hypot(bb.max[0] - bb.min[0], bb.max[2] - bb.min[2]) / 2 * 1.05) : rad;   // flats: frame YOUR floor, with the block above and below as context
     var d = fRad / Math.sin(fov / 2) * aspF, dAll = rad / Math.sin(fov / 2) * aspF;
     this.fitDist = d;
@@ -6806,6 +6807,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     on = !!on;
     if (on === !!this.brand) return;
     this.brand = on; this._bPrimed = false;
+    if (this.model) try { this.fit(); } catch (e) {}   // the brand framing is closer, so re-frame when the look changes
     var self = this, w = this.el.clientWidth, h = this.el.clientHeight;
     if (w > 2 && h > 2) { this.renderer.setPixelRatio(this._dprFor(w, h)); this.renderer.setSize(w, h, false); }
     if (on && !this._bHooked) {   // once per viewer: visibility, and auto orbit that yields to the user
@@ -12070,6 +12072,8 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
       <div class="settings-row"><label class="settings-label">Contrast</label><div class="settings-opts" id="set-contrast"><button data-val="standard" onclick="setSetting('contrast','standard',this)" class="active">Standard</button><button data-val="high" onclick="setSetting('contrast','high',this)">High Contrast</button></div></div>
       <div class="settings-row"><label class="settings-label">Motion</label><div class="settings-opts" id="set-motion"><button data-val="full" onclick="setSetting('motion','full',this)" class="active">Full</button><button data-val="reduced" onclick="setSetting('motion','reduced',this)">Reduced</button></div></div>
       <div class="settings-row"><label class="settings-label">Currency</label><div class="settings-opts" id="set-currency"><button data-val="GBP" onclick="setSetting('currency','GBP',this)" class="active">£ GBP</button><button data-val="USD" onclick="setSetting('currency','USD',this)">$ USD</button><button data-val="EUR" onclick="setSetting('currency','EUR',this)">€ EUR</button><button data-val="INR" onclick="setSetting('currency','INR',this)">₹ INR</button></div></div>
+      <div class="settings-row"><label class="settings-label">House builder</label><div class="settings-opts" id="set-house3d"><button data-val="1" onclick="setViewFlag('house',true,this)">Brand build</button><button data-val="0" onclick="setViewFlag('house',false,this)">Classic</button></div></div>
+      <div class="settings-row"><label class="settings-label">Net worth</label><div class="settings-opts" id="set-nw3d"><button data-val="1" onclick="setViewFlag('nw',true,this)">3D</button><button data-val="0" onclick="setViewFlag('nw',false,this)">Classic chart</button></div></div>
       <div class="settings-row"><label class="settings-label">Nav Style</label><div class="settings-opts" id="set-nav"><button data-val="false" onclick="setSetting('compactNav',false,this)" class="active">Labels</button><button data-val="true" onclick="setSetting('compactNav',true,this)">Icons only</button></div></div>
     </div>
 
@@ -15840,9 +15844,16 @@ function hbAfterDraw(){
 var HB3DAPP = { viewer: null, key: '', models: {}, order: [], want: null, lastP: null, lastMode: null, idle: {} };
 // Feature flags: ?<name>=new turns one on for this visit (?<name>=old turns it off), localStorage 'vi-flag-<name>' = '1' keeps it on.
 function viFlag(name) {
-  try { var q = new URLSearchParams(location.search).get(name);   // ?x=new switches the flag on for this device (so an installed app keeps it); ?x=old switches it off
-    if (q === 'new') { try { localStorage.setItem('vi-flag-' + name, '1'); } catch (e2) {} return true; } if (q === 'old') { try { localStorage.removeItem('vi-flag-' + name); } catch (e3) {} return false; }
-    return localStorage.getItem('vi-flag-' + name) === '1'; } catch (e) { return false; }
+  // The new 3D views are on by default (owner, 30 Oct 2026). ?x=old (or Settings) puts this device on the classic view; ?x=new puts it back.
+  try { var q = new URLSearchParams(location.search).get(name);
+    if (q === 'new') { viFlagSet(name, true); return true; } if (q === 'old' || q === '0') { viFlagSet(name, false); return false; }
+    return localStorage.getItem('vi-flag-' + name) !== '0'; } catch (e) { return true; }
+}
+function viFlagSet(name, on) { try { localStorage.setItem('vi-flag-' + name, on ? '1' : '0'); } catch (e) {} }
+function setViewFlag(name, on, btn) {   // Settings: brand build or classic house builder; 3D or classic net worth chart
+  viFlagSet(name, on); var row = btn && btn.parentNode; if (row) [].forEach.call(row.children, function (b) { b.classList.toggle('active', b === btn); });
+  if (name === 'house') { try { updateUI(); } catch (e) {} toast(on ? 'Brand house build on' : 'Classic house builder on'); }
+  else { try { if (on) { if (window.nw3dMount) nw3dMount(); } else if (window.nw3d && nw3d.disable) nw3d.disable(); } catch (e) { console.error('[Vault-It] net worth view', e); } toast(on ? '3D net worth on' : 'Classic net worth chart on'); }
 }
 // The brand build (brand handover 6.2 to 6.10) on the six 3D houses, Level 1 only: ?house=new or vi-flag-house = 1.
 function hbBrandOn() { return viFlag('house') && typeof HB3D !== 'undefined' && !!HB3D.brandStats; }
@@ -22944,6 +22955,7 @@ function _refreshPioneerSettingsUI(){
 }
 
 function showSettings(){
+  [['house','set-house3d'],['nw','set-nw3d']].forEach(function(x){var r=document.getElementById(x[1]);if(!r)return;var on=viFlag(x[0]);[].forEach.call(r.children,function(b){b.classList.toggle('active',(b.getAttribute('data-val')==='1')===on);});});
   document.getElementById('set-claude-key').value=localStorage.getItem('claude_api_key')||'';
   document.getElementById('set-meshy-key').value=localStorage.getItem('meshy_api_key')||'';
   var cgEl=document.getElementById('set-cg-key');if(cgEl)cgEl.value=localStorage.getItem('coingecko_api_key')||'';
@@ -26966,7 +26978,9 @@ function nwhRenderMini(){
      to real data. Canvas 2D only: no WebGL, no outside hosts. With the flag off nothing below runs and the Overview is unchanged. -->
 <style id="vi-nw3d">
 .nw3d-card{margin-bottom:20px}
-.nw3d-card .nw3d-sub{display:block;font:400 .6rem/1.45 var(--font-body);color:var(--muted);margin-top:6px;max-width:60ch}
+.ov-chart-card.nw3d-main-3d .nw3d-graph-only{display:none!important}
+.ov-chart-card:not(.nw3d-main-3d) .nw3d-hero-in{display:none!important}
+.nw3d-hero-in .nw3d-sub,.nw3d-card .nw3d-sub{display:block;font:400 .6rem/1.45 var(--font-body);color:var(--muted);margin-top:6px;max-width:60ch}
 .nw3d-stage{position:relative;border:1px solid var(--line2);border-radius:12px;overflow:hidden;background-color:#080808;background-image:var(--stage-bg)}
 .nw3d-stage::after{content:"";position:absolute;inset:0;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none}
 #house-scene.hb-brand::after{content:"";position:absolute;inset:0;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none;z-index:1}
@@ -27289,9 +27303,11 @@ window.ViNW3D={makeNW:makeNW,makeTracker:makeTracker,niceUnit:niceUnit,split:spl
  * chart's own points (drawChart: canvas._points, canvas._proj) for the tracker, so switching view can never change a number. */
 (function(){
 "use strict";
-function nw3dFlag(){try{if(/[?&]nw=new\b/.test(location.search))localStorage.setItem('vi-flag-nw','1');if(/[?&]nw=(old|0)\b/.test(location.search))localStorage.removeItem('vi-flag-nw');return localStorage.getItem('vi-flag-nw')==='1';}catch(e){return /[?&]nw=new\b/.test(location.search);}}
+function nw3dFlag(){return typeof viFlag==='function'?viFlag('nw'):true;}   // on by default (owner, 30 Oct 2026); ?nw=old or Settings for the classic chart
 window.nw3dFlag=nw3dFlag;
-if(!nw3dFlag()||!window.ViNW3D||typeof drawChart!=='function')return;
+/* mount / unmount without a reload, so Settings can switch a device between 3D and the classic chart live */
+window.nw3dMount=function(){
+if(window.nw3d||!window.ViNW3D||typeof drawChart!=='function')return;
 var E=window.ViNW3D,MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function rate(){return window.VI_CURRENCY_RATE||1}
 function sym(){return window.VI_CURRENCY_SYMBOL||'£'}
@@ -27308,25 +27324,30 @@ function parseCol(s){s=String(s||'').trim();var m=s.match(/^#([0-9a-f]{3}|[0-9a-
 /* ── markup (only with the flag on) ── */
 var chartCv=document.getElementById('nwChart'),chartCard=chartCv&&chartCv.closest('.ov-chart-card');
 if(!chartCard)return;
-var hero=document.createElement('section');
-hero.className='ov-chart-card nw3d-card';hero.id='nw3d-hero';hero.setAttribute('aria-labelledby','nw3d-hero-t');
-hero.innerHTML='<div class="ov-chart-hd" style="margin-bottom:12px"><div><span class="ov-chart-title" id="nw3d-hero-t">Net worth in 3D</span>'
- +'<span class="nw3d-sub">What you own stands on the gold line. What you owe hangs below it. Tap a column to read it, drag to turn it.</span></div></div>'
+/* owner, 30 Oct 2026: the 3D scene is the main view of the net worth card; the chart is the backup behind a 3D | Graph switch */
+var hero=document.createElement('div');
+hero.className='nw3d-hero-in';hero.id='nw3d-hero';
+hero.innerHTML='<span class="nw3d-sub" style="margin:0 0 10px">What you own stands on the gold line. What you owe hangs below it. Tap a column to read it, drag to turn it.</span>'
  +'<div class="nw3d-stage" id="nw3d-hero-stage"><canvas id="nw3d-hero-cv" tabindex="0" role="img" aria-label="Net worth in 3D"></canvas></div>'
  +'<p class="nw3d-read" id="nw3d-hero-read" aria-live="polite"></p>'
  +'<div class="nw3d-legend" id="nw3d-hero-legend"></div>'
  +'<p class="nw3d-key" id="nw3d-hero-key"></p>';
-chartCard.parentNode.insertBefore(hero,chartCard);
+var hd=chartCard.querySelector('.ov-chart-hd'),ttl=chartCard.querySelector('.ov-chart-title');hd.parentNode.insertBefore(hero,hd.nextSibling);
+var mseg=document.createElement('div');mseg.className='nw3d-seg';mseg.id='nw3d-main';mseg.setAttribute('role','group');mseg.setAttribute('aria-label','Net worth view');
+mseg.innerHTML='<button type="button" data-m="3d" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick"/></svg>3D</button>'
+ +'<button type="button" data-m="graph" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-forecast"/></svg>Graph</button>';
 var seg=document.createElement('div');seg.className='nw3d-seg';seg.id='nw3d-view';seg.setAttribute('role','group');seg.setAttribute('aria-label','Chart view');
-seg.innerHTML='<button type="button" data-v="bars" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick"/></svg>3D blocks</button>'
- +'<button type="button" data-v="line" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-forecast"/></svg>Graph</button>';
-var ctl=chartCard.querySelector('.ov-chart-hd > div');ctl.insertBefore(seg,ctl.firstChild);
-var wrap=chartCv.parentNode;wrap.classList.add('nw3d-wrap');
+seg.className+=' nw3d-graph-only';
+seg.innerHTML='<button type="button" data-v="bars" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick"/></svg>Blocks</button>'
+ +'<button type="button" data-v="line" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-forecast"/></svg>Line</button>';
+var ctl=chartCard.querySelector('.ov-chart-hd > div');ctl.insertBefore(seg,ctl.firstChild);ctl.insertBefore(mseg,ctl.firstChild);
+[].forEach.call(ctl.querySelectorAll('.chart-filter-group'),function(g){g.classList.add('nw3d-graph-only')});var lg=chartCard.querySelector('.ov-legend');if(lg)lg.classList.add('nw3d-graph-only');
+var wrap=chartCv.parentNode;wrap.classList.add('nw3d-wrap');wrap.classList.add('nw3d-graph-only');
 var tst=document.createElement('div');tst.className='nw3d-stage';tst.id='nw3d-trk-stage';
 tst.innerHTML='<canvas id="nw3d-trk-cv" tabindex="0" role="img" aria-label="Net worth tracker in 3D blocks. Tap a month to read it, drag to turn it."></canvas>';
 wrap.appendChild(tst);
 var tip=document.getElementById('chart-tooltip');
-var tkey=document.createElement('p');tkey.className='nw3d-key nw3d-trk-key';tkey.id='nw3d-trk-key';
+var tkey=document.createElement('p');tkey.className='nw3d-key nw3d-trk-key nw3d-graph-only';tkey.id='nw3d-trk-key';tip.classList.add('nw3d-graph-only');
 tip.parentNode.insertBefore(tkey,tip.nextSibling);
 
 var heroCv=document.getElementById('nw3d-hero-cv'),trkCv=document.getElementById('nw3d-trk-cv'),heroRead=document.getElementById('nw3d-hero-read');
@@ -27397,7 +27418,7 @@ function refreshTracker(force){var d=trackerData();if(!d.nw.length)return;var si
 function refresh(){try{refreshHero()}catch(e){console.warn('nw3d scene',e)}try{refreshTracker()}catch(e){console.warn('nw3d tracker',e)}}
 
 /* ── the view toggle: 3D blocks first, Graph one tap away, the choice remembered on this device ── */
-function getView(){try{return localStorage.getItem('vi-nw-view')==='line'?'line':'bars'}catch(e){return 'bars'}}
+function getView(){try{return localStorage.getItem('vi-nw-view')==='bars'?'bars':'line'}catch(e){return 'line'}}   // the chart is the backup, so its own default is the line
 function setView(v,user){
   wrap.classList.toggle('nw3d-bars',v==='bars');tkey.hidden=v!=='bars';
   seg.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-v')===v?'true':'false')});
@@ -27407,13 +27428,34 @@ function setView(v,user){
   if(v==='bars')refreshTracker(true);
 }
 seg.addEventListener('click',function(e){var b=e.target.closest('button[data-v]');if(b)setView(b.getAttribute('data-v'),true)});
+function getMain(){try{return localStorage.getItem('vi-nw-main')==='graph'?'graph':'3d'}catch(e){return '3d'}}
+function curMain(){return chartCard.classList.contains('nw3d-main-3d')?'3d':'graph'}
+function setMain(v,user){
+  chartCard.classList.toggle('nw3d-main-3d',v==='3d');
+  mseg.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-m')===v?'true':'false')});
+  if(ttl)ttl.textContent=v==='3d'?'Net worth in 3D':'Net worth progress';
+  if(user){try{localStorage.setItem('vi-nw-main',v)}catch(e){}}
+  try{if(v==='3d'){refresh(true);if(heroEng.replay)heroEng.replay();}else{drawChart();refreshTracker(true);}}catch(e){}
+  try{window.dispatchEvent(new Event('resize'))}catch(e){}
+}
+mseg.addEventListener('click',function(e){var b=e.target.closest('button[data-m]');if(b)setMain(b.getAttribute('data-m'),true)});
+setMain(getMain());
 
 /* every redraw of the main chart (data, range, series, theme, currency) refreshes both 3D views */
 var _draw=drawChart;
 window.drawChart=drawChart=function(){var r=_draw.apply(this,arguments);refresh();return r};
-window.nw3d={hero:heroEng,tracker:trk,setView:setView,view:function(){return wrap.classList.contains('nw3d-bars')?'bars':'line'},sceneData:sceneData,trackerData:trackerData,refresh:refresh};
+function disable(){   // back to the classic card exactly as it was built
+  hero.remove();mseg.remove();seg.remove();tst.remove();tkey.remove();
+  wrap.classList.remove('nw3d-wrap','nw3d-graph-only','nw3d-bars');tip.classList.remove('nw3d-graph-only');
+  [].forEach.call(chartCard.querySelectorAll('.nw3d-graph-only'),function(e){e.classList.remove('nw3d-graph-only')});
+  chartCard.classList.remove('nw3d-main-3d');if(ttl)ttl.textContent='Net Worth Progress';
+  window.drawChart=drawChart=_draw;delete window.nw3d;try{_draw();}catch(e){}
+}
+window.nw3d={hero:heroEng,tracker:trk,setView:setView,view:function(){return wrap.classList.contains('nw3d-bars')?'bars':'line'},setMain:setMain,main:curMain,sceneData:sceneData,trackerData:trackerData,refresh:refresh,disable:disable};
 setView(getView(),false);
-window.addEventListener('load',function(){setTimeout(refresh,50)});
+if(document.readyState==='complete')setTimeout(refresh,50);else window.addEventListener('load',function(){setTimeout(refresh,50)});
+};
+if(nw3dFlag())window.nw3dMount();
 })();
 </script>
 </body>

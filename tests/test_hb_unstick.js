@@ -1,3 +1,4 @@
+// Runs the classic house builder (vi-flag-house = 0): the brand build's own checks are in tests/test_hb_brand.js.
 // Owner, 30 Oct: the house builder was stuck in Level 2 (finished house, "You own 90%") with only 31% of the deposit saved,
 // and Reset Tracker did not take it back. Reset now returns to Level 1, and Level 2 has "Not bought yet? Back to Level 1",
 // which keeps the savings log. Run: node tests/test_hb_unstick.js
@@ -10,7 +11,7 @@ const STUCK = { saved: 20000, target: 320000, houseType: 'semi', depositPct: 20,
   const b = await chromium.launch(); const errs = [];
   for (const w of [1100, 390]) {
     const ctx = await b.newContext({ viewport: { width: w, height: 900 } }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); p.on('dialog', d => d.accept());
-    await p.addInitScript(s => { if (localStorage.getItem('ht3')) return; localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' })); localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' })); localStorage.setItem('ht3', JSON.stringify(s)); }, STUCK);
+    await p.addInitScript(s => { if (localStorage.getItem('ht3')) return; localStorage.setItem('vi_declined_demo', 'true');localStorage.setItem('vi-flag-house','0'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' })); localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' })); localStorage.setItem('ht3', JSON.stringify(s)); }, STUCK);
     await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.evaluate(() => showTab('house')); await p.waitForTimeout(2500);

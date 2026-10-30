@@ -1,7 +1,8 @@
+// Runs the classic house builder (vi-flag-house = 0): the brand build's own checks are in tests/test_hb_brand.js.
 const { chromium } = require('playwright');
 const routeThree=require('./three_route');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
-const seed=(o)=>`(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})();`;
+const seed=(o)=>`(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi-flag-house','0');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})();`;
 (async()=>{
   const b=await chromium.launch(); const errs=[];
   const open=async(o,w,h,route=true)=>{const ctx=await b.newContext({viewport:{width:w||1280,height:h||900}}); if(route)await routeThree(ctx); const p=await ctx.newPage();

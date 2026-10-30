@@ -252,6 +252,7 @@
     on = !!on;
     if (on === !!this.brand) return;
     this.brand = on; this._bPrimed = false;
+    if (this.model) try { this.fit(); } catch (e) {}   // the brand framing is closer, so re-frame when the look changes
     var self = this, w = this.el.clientWidth, h = this.el.clientHeight;
     if (w > 2 && h > 2) { this.renderer.setPixelRatio(this._dprFor(w, h)); this.renderer.setSize(w, h, false); }
     if (on && !this._bHooked) {   // once per viewer: visibility, and auto orbit that yields to the user

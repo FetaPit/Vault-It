@@ -463,7 +463,8 @@
     var cx = (bb.min[0] + bb.max[0]) / 2, cz = (bb.min[2] + bb.max[2]) / 2, H = Math.max(2, bb.max[1]);
     var rad = Math.sqrt(Math.pow(bb.max[0] - bb.min[0], 2) + Math.pow(bb.max[2] - bb.min[2], 2) + H * H) / 2;
     this._radius = rad;
-    var fov = this.camera.fov * Math.PI / 180, aspect = Math.max(0.5, this.camera.aspect || 1.6), aspF = aspect < 1 ? 1.15 / aspect : 1.02;
+    var fov = this.camera.fov * Math.PI / 180, aspect = Math.max(0.5, this.camera.aspect || 1.6);
+    var aspF = this.brand ? (aspect < 1 ? 0.98 / aspect : 0.9) : (aspect < 1 ? 1.15 / aspect : 1.02);   // brand build: the house fills the frame like the brand book, closer still on phones (owner, 30 Oct 2026)
     var F = m && m.focus, fRad = F ? Math.max(6, Math.hypot(bb.max[0] - bb.min[0], bb.max[2] - bb.min[2]) / 2 * 1.05) : rad;   // flats: frame YOUR floor, with the block above and below as context
     var d = fRad / Math.sin(fov / 2) * aspF, dAll = rad / Math.sin(fov / 2) * aspF;
     this.fitDist = d;
