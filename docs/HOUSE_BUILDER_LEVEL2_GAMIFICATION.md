@@ -55,7 +55,7 @@ Octalysis groups 8 drives. 1 to 3 are "White Hat" (feel good, sustainable); 6 to
 
 ## Where it fits in the plan
 
-- **Level 2 fix phase** (next after groupings): the rule, reset and undo purchase, the mortgage cockpit, payday build (manual tap), the bank-versus-you hologram, overpayment what-ifs, milestones.
+- **Level 2 fix phase**: the rule, reset and undo purchase (done 30 Oct); the purchase-day mortgage entry (lender, balance, rate, fix end, term; `hbOpenMortgageEntry`, saved as `state.mortgage` and fed to the calculator and the panel's what-ifs; done 30 Oct, `tests/test_hb_l2_entry.js`); three what-ifs from the Budget with the trade-off line (done 30 Oct). Still open: the mortgage cockpit, payday build (manual tap), the bank-versus-you hologram, milestone stages.
 - **3D house phase:** the brick ceremonies, room reveals, customisation and seasonal touches on all six models.
 - **After bank linking is live:** auto-detected payments, household mode, share card.
 

@@ -9752,6 +9752,7 @@ input:focus, textarea:focus, select:focus {
 .hbc td{padding:4px 6px;border-top:1px solid rgb(var(--ink-rgb) / .05);text-align:right}
 .hbc-pre{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .hbc-note{font-size:10.5px;color:var(--t3);line-height:1.55;margin-top:8px}
+#hbm-in{display:grid;grid-template-columns:1fr 1fr;gap:10px}#hbm-in label{display:block;font-size:10.5px;color:var(--t3);margin-bottom:4px}#hbm-in input{width:100%;background:var(--surf);border:1px solid var(--line2);border-radius:8px;color:var(--text);padding:9px 10px;font:600 14px var(--font-mono)}#hbm-in input:focus{border-color:var(--teal);outline:none}@media(max-width:600px){#hbm-in{grid-template-columns:1fr}}
 .hbc-lump{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:end;margin-top:6px}
 
 .stk-pie{position:relative}
@@ -15044,6 +15045,7 @@ function markHousePurchased(){
   save();
   toast('🏠 Congratulations — welcome home!');
   updateUI();
+  hbOpenMortgageEntry(true);   // Level 2 onboarding: the mortgage entered in about a minute (Octalysis doc, phase 2)
 }
 
 let prevP=0;
@@ -15275,7 +15277,7 @@ function renderHabitTracker(){
 document.getElementById('savingsInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnAdd').click();});
 
 // Level 2 and 3 exist only after "I've bought it". These are the fields that step sets (markHousePurchased, Level 3).
-function hbClearPurchase(){delete state.houseMode;delete state.mortgageActive;state.mortgageBalance=0;delete state.purchase;delete state.valuation;delete state.level3;delete state.viewLevel;delete state.payments;}
+function hbClearPurchase(){delete state.houseMode;delete state.mortgageActive;state.mortgageBalance=0;delete state.purchase;delete state.valuation;delete state.level3;delete state.viewLevel;delete state.payments;delete state.mortgage;}
 function hbBackup(){try{localStorage.setItem('vi_bak_ht3',JSON.stringify({at:new Date().toISOString(),state:state}));}catch(e){}}
 // Owner's Level 2 rule: what is left to pay after the deposit goal is the whole Level 2 house.
 // £100,000 house, 20% goal: £80,000 is 100%, so £2,000 over the goal builds 2.5%.
@@ -15411,23 +15413,68 @@ function hbBadgeToasts(p){
 }
 // L2 / L3 panels
 function hbSetOver(v){var cur=hbcRead().raw;cur.over=Math.max(0,Math.round(v));state.calc=cur;save();updateUI();toast('Plan: overpay '+hbMoney(cur.over)+' a month');}
+var HB_TRADEOFF='<div class="hb-tradeoff" style="margin-top:8px;font-size:.5rem;color:var(--t3);line-height:1.5">Money overpaid is not invested or saved. Check your lender\'s overpayment limit (often 10% a year) and any early repayment charges. Illustrative only. Not regulated by the FCA. Not financial advice.</div>';
+// Level 2 onboarding (docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md, phase 2): the mortgage as the lender states it, entered in about a minute on purchase day.
+// Every figure is the person's own: the balance starts from their price minus their deposit; lender, rate, fix end and term stay blank until typed.
+function hbMortgageLine(){
+  var m=state.mortgage; if(!m) return '<div style="font-size:.52rem;color:var(--t3);margin:4px 0 6px">Enter your mortgage (lender, rate, fix end, term) so the dates and interest below use your real figures.</div>';
+  var bits=[]; if(m.lender) bits.push(hbEsc(m.lender)); if(m.rate!=null) bits.push(m.rate+'%'+(m.fixEnd?' fixed until '+hbFmtMonth(m.fixEnd):'')); else if(m.fixEnd) bits.push('fixed until '+hbFmtMonth(m.fixEnd)); if(m.termYears) bits.push(m.termYears+' years left');
+  return '<div class="hb-mline" style="font-family:\'Share Tech Mono\',monospace;font-size:.56rem;color:var(--teal);margin:4px 0 6px">'+(bits.join(' · ')||'Mortgage entered')+'</div>';
+}
+function hbEsc(v){return String(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function hbFmtMonth(ym){try{return new Date(ym+'-01T00:00:00Z').toLocaleDateString('en-GB',{month:'short',year:'numeric'});}catch(e){return ym;}}
+function hbOpenMortgageEntry(first){
+  hbCloseCalc(); var o=document.getElementById('hbm-ov'); if(o) o.remove();
+  var m=state.mortgage||{}, bal=state.mortgageBalance||0;
+  o=document.createElement('div'); o.id='hbm-ov'; o.className='hbc-ov';
+  o.innerHTML='<div class="hbc" style="width:min(560px,100%)" role="dialog" aria-label="Your mortgage"><div class="hbc-hd"><span>🔑 Your mortgage, in a minute <span style="font-weight:400;font-size:11px;color:var(--t3)">· your figures only · illustrative, not advice</span></span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="hbCloseMortgageEntry()" role="button" aria-label="Close">×</span></div>'
+    +'<div class="hbc-body" style="grid-template-columns:1fr"><div id="hbm-in">'
+    +'<p class="hbc-note full" style="margin:0 0 4px">Level 1 built your deposit. Level 2 is what is left to pay: <b>'+hbMoney(hbL2Base())+'</b>. Copy the figures from your lender\'s offer; leave anything you do not have yet blank.</p>'
+    +'<div><label for="hbm-lender">Lender</label><input id="hbm-lender" type="text" maxlength="60" value="'+hbEsc(m.lender||'')+'" placeholder="e.g. your bank"></div>'
+    +'<div><label for="hbm-bal">Balance owed £</label><input id="hbm-bal" type="number" min="0" step="1" value="'+bal+'"></div>'
+    +'<div><label for="hbm-rate">Interest rate %</label><input id="hbm-rate" type="number" min="0" step="0.01" value="'+(m.rate!=null?m.rate:'')+'" placeholder="on your offer"></div>'
+    +'<div><label for="hbm-fix">Fixed rate ends</label><input id="hbm-fix" type="month" value="'+hbEsc(m.fixEnd||'')+'"></div>'
+    +'<div><label for="hbm-term">Years left on the term</label><input id="hbm-term" type="number" min="1" max="40" step="1" value="'+(m.termYears||'')+'" placeholder="e.g. 25"></div>'
+    +'<div class="full" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn-add-data" id="hbm-save" onclick="hbSaveMortgageEntry()">Save my mortgage</button><button type="button" class="stk-btn" id="hbm-later" onclick="hbCloseMortgageEntry()">'+(first?'Later':'Cancel')+'</button></div>'
+    +'<div class="hbc-note full">Illustrative only. Not regulated by the FCA. Not financial advice.</div>'
+    +'</div></div></div>';
+  document.body.appendChild(o);
+  var f=document.getElementById('hbm-lender'); if(f) f.focus();
+}
+function hbCloseMortgageEntry(){var o=document.getElementById('hbm-ov');if(o)o.remove();}
+function hbSaveMortgageEntry(){
+  var g=function(id){var e=document.getElementById('hbm-'+id);return e?String(e.value).trim():'';};
+  var bal=parseFloat(g('bal')),rate=parseFloat(g('rate')),term=parseInt(g('term'),10),fix=g('fix'),lender=g('lender').slice(0,60);
+  if(!(isFinite(bal)&&bal>=0)){toast('Enter the balance your lender shows');return;}
+  state.mortgage={lender:lender,rate:isFinite(rate)&&rate>=0?rate:null,fixEnd:/^\d{4}-\d{2}$/.test(fix)?fix:null,termYears:isFinite(term)&&term>0?term:null,entered:new Date().toISOString().slice(0,10)};
+  state.mortgageBalance=Math.round(bal);
+  // the calculator and the Level 2 what-ifs run on the same figures
+  var c=Object.assign({},state.calc||{});c.bal=Math.round(bal);c._set=true;
+  if(state.mortgage.rate!=null){c.p1rate=state.mortgage.rate;if(!c.p1type||c.p1type==='tracker')c.p1type='fixed';}
+  if(state.mortgage.termYears){c.termY=state.mortgage.termYears;c.termM=0;}
+  if(state.mortgage.fixEnd){var now=new Date(),fe=new Date(state.mortgage.fixEnd+'-01T00:00:00Z');c.p1months=Math.max(1,(fe.getUTCFullYear()-now.getFullYear())*12+(fe.getUTCMonth()-now.getMonth()));}
+  state.calc=c;save();hbCloseMortgageEntry();updateUI();
+  var pr=hbL2Progress();toast('Level 2 is the '+hbMoney(hbL2Base())+' left to pay.'+(pr>0?' You have already built '+(Math.floor(pr*1000)/10).toFixed(1)+'% of it.':' Every payment builds it in full colour.'));
+}
 function hbL2Sims(){var c=hbcRead();return{c:c,base:hbSimulate(c.base),scn:hbSimulate(c.scn)};}
 function hbRenderL2(el){
   var bal=state.mortgageBalance||0,val=state.valuation||state.target||0,eq=Math.max(0,val-bal),eqp=val>0?eq/val*100:0;
   var S2=hbL2Sims(),base=S2.base,scn=S2.scn,cmp=hbCompare(base,scn),bud=hbBudget(),u=Math.round(bud.unassigned),sv=Math.round(bud.saving);
   var rows='';
-  [[u,'your unassigned '+hbMoney(u)],[u+sv,'unassigned + savings '+hbMoney(u+sv)]].forEach(function(x,i){
-    if(!(x[0]>0)||(i===1&&!(sv>0)))return;
+  var hu=Math.round(u/2);
+  [[hu,'half your unassigned '+hbMoney(hu)],[u,'your unassigned '+hbMoney(u)],[u+sv,'unassigned + savings '+hbMoney(u+sv)]].forEach(function(x,i){   // three what-ifs from their own Budget (Octalysis doc: spare money nudge)
+    if(!(x[0]>0)||(i===0&&hu===u)||(i===2&&!(sv>0)))return;
     var sc=hbSimulate(Object.assign({},S2.c.base,{over:{monthly:x[0],stepUpPct:0,lumps:[],roundUp:false}})),cm=hbCompare(base,sc);
     rows+='<tr><td>+'+hbMoney(x[0])+'/mo ('+x[1].split(' ').slice(0,-1).join(' ')+')</td><td>'+hbYM(cm.monthsSaved)+' sooner</td><td>'+hbMoney(cm.interestSaved)+' less interest</td></tr>';
   });
-  var tip=rows?'<div class="hb-tip">💡 <b>What your Budget could do for this mortgage</b><br>Unassigned <b>'+hbMoney(u)+'</b>/mo · already saving <b>'+hbMoney(sv)+'</b>/mo.<table>'+rows+'</table><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+(u>0?'<button class="stk-btn" onclick="hbSetOver('+u+')">Plan: overpay '+hbMoney(u)+'</button>':'')+(u+sv>0&&sv>0?'<button class="stk-btn" onclick="hbSetOver('+(u+sv)+')">Plan: overpay '+hbMoney(u+sv)+'</button>':'')+'</div></div>':'';
+  var tip=rows?'<div class="hb-tip">💡 <b>What your Budget could do for this mortgage</b><br>Unassigned <b>'+hbMoney(u)+'</b>/mo · already saving <b>'+hbMoney(sv)+'</b>/mo.<table>'+rows+'</table><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+(u>0?'<button class="stk-btn" onclick="hbSetOver('+u+')">Plan: overpay '+hbMoney(u)+'</button>':'')+(u+sv>0&&sv>0?'<button class="stk-btn" onclick="hbSetOver('+(u+sv)+')">Plan: overpay '+hbMoney(u+sv)+'</button>':'')+'</div>'+HB_TRADEOFF+'</div>':'';
   el.innerHTML='<div class="card-lbl">LEVEL 2 · DELETE THE MORTGAGE</div>'
+    +hbMortgageLine()
     +'<div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--text)"><span>Paid off '+hbMoney(Math.max(0,hbL2Base()-bal))+' of '+hbMoney(hbL2Base())+'</span><span>'+(Math.floor(hbL2Progress()*1000)/10).toFixed(1)+'%</span></div>'
     +'<div class="hb-xp"><div style="width:'+(hbL2Progress()*100).toFixed(1)+'%"></div></div>'
     +'<div class="hb-st"><div><b>'+hbMoney(bal)+'</b><span>still owed</span></div><div><b>'+(scn.balloon>0?'—':hbFmtDate(scn.payoffDate))+'</b><span>mortgage-free</span></div><div><b class="'+(cmp.interestSaved>0?'hbc-good':'')+'">'+hbMoney(cmp.interestSaved)+'</b><span>interest slain</span></div><div><b>'+hbYM(Math.max(0,cmp.monthsSaved))+'</b><span>months shaved</span></div></div>'
     +'<div style="font-size:.5rem;color:var(--t3)">Your Level 2 house is what was left to pay after your deposit goal. Full-colour bricks are what you have paid off; the hologram is what is left. You own '+hbMoney(eq)+' of your home ('+eqp.toFixed(1)+'%).</div>'
-    +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Open mortgage calculator</button></div>'
+    +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn-add-data" onclick="hbOpenMortgageEntry(false)">'+(state.mortgage?'✎ Your mortgage':'🔑 Enter your mortgage')+'</button><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Open mortgage calculator</button></div>'
     +tip+hbL3Card();
 }
 
