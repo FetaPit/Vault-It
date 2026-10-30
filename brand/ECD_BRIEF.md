@@ -1,6 +1,6 @@
 # Vault·It: creative direction for the tester release
 
-From the executive creative director, fintech brand. This sits on top of `vault-it-brand-handover.md` and the brand book. Where they disagree, this file wins. Open questions are at the end; anything marked **(pending)** waits for the owner's answer.
+From the executive creative director, fintech brand. This sits on top of `vault-it-brand-handover.md` and the brand book. Where they disagree, this file wins. The owner's answers to the open questions are recorded at the end.
 
 ## The idea
 
@@ -29,8 +29,8 @@ This is the last build before testers. It has to feel finished, calm and trustwo
 
 The home screen answers one question: **am I getting out of the red?**
 
-- **Hero: net worth in 3D.** The tracker from the brand book (section 6.12) is the first thing on screen. It has a **Graph | 3D blocks** toggle in the top corner, with range (All, 1Y, 6M, 3M) and series (Net worth, Debt, Income, Forecast) beside it. Both views use the same numbers, and the tag totals always match. The view last chosen is remembered. Default view: **(pending, Q2)**.
-- Above the plane, what you own (£1,000 blocks, £100 cubes, nine cubes merge into a block). Below it, what you owe, in red. The gold zero plane reads NET WORTH, IN THE RED or OUT OF THE RED.
+- **Hero: net worth in 3D.** The tracker from the brand book (section 6.12) is the first thing on screen. It has a **Graph | 3D blocks** toggle in the top corner, with range (All, 1Y, 6M, 3M) and series (Net worth, Debt, Income, Forecast) beside it. Both views use the same numbers, and the tag totals always match. The view last chosen is remembered. Default view: **3D blocks** on first open, then the view last chosen.
+- Above the plane, what you own (£1,000 blocks, £100 cubes, nine cubes merge into a block), **one column per asset class in its menu colour**: Cash and savings green, Precious metals gold, Stocks and funds green 2, Crypto teal, Wealth inventory (valuables) purple, Deposit teal. Liabilities hang below in amber, debts in red. Below it, what you owe, in red. The gold zero plane reads NET WORTH, IN THE RED or OUT OF THE RED.
 - **Under the hero, one stat strip:** net worth, total debt, monthly surplus, deposit progress. Each figure links to its tab.
 - **One "own and owe" card** replaces the three summary cards (assets, liabilities, debt).
 - **Goals and Snapshots** share one card as tabs.
@@ -47,7 +47,7 @@ The brand book's 3D house beats the current one. Match it exactly:
 - **Environment.** Ground grid fading to the edges, ground glow, dashed site boundary, ring ping every 2.8 s, sweep band rising through the model, and scanlines in Night or a blueprint grid in Daylight. The house drifts in a slow auto orbit that stops on touch.
 - **The gold slice and tag:** ROW n / 154 and x.x% OF DEPOSIT. The row, brick count and percentage always agree.
 - **Brick value** comes from their own price and deposit: `depositTarget × 0.77 / bricksTotal`. It is shown beside the inputs ("each brick = £1.28").
-- How this reaches all six house types **(pending, Q1)**.
+- **All six house types** (terraced, semi, detached, manor, flat, apartment) get this look and every animation on their own to-scale models. No type is lost.
 
 ### One "Your house plan" card
 
@@ -111,7 +111,15 @@ Type, price, deposit %, floor (flats only), the amount to add, and the brick val
   - The overpayment what-ifs match the engine to within £1.
 - Saved data from today's app loads untouched.
 
-## Open questions (owner)
+## Owner's answers (30 Oct 2026)
+
+1. **a**: the brand look on all six models.
+2. **3D blocks** first, then the last choice.
+3. **Both**: icons-only menu and tighter spacing in compact mode.
+4. **On by default for testers.**
+5. Net worth blocks are colour coded to the Assets and liabilities sub-tabs.
+
+## Questions as asked
 
 1. **House types and the new 3D house.** The brand engine draws one house (one shape, 154 courses). The app has six types: terraced, semi, detached, manor, flat and apartment, with floor choice for flats. Options:
    - **a. (recommended)** Bring the brand look and every animation (brick drop, gold flash, last brick ring, slice and tag, pulse, grid, ping, sweep, Daylight blueprint) onto all six of the app's to-scale models. One look everywhere and no type is lost.
