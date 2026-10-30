@@ -40,3 +40,11 @@ bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scri
 ## Cloudflare
 - `.claude/settings.json` enables the official Cloudflare plugin (`cloudflare@cloudflare`, from the `cloudflare/skills` marketplace): Cloudflare's skills (wrangler, Workers best practices, Turnstile, web performance …) and its MCP server `https://mcp.cloudflare.com/mcp`. The MCP server signs in with OAuth in a browser, which a cloud session cannot do — in cloud sessions use the claude.ai connector for the same URL, or a scoped `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` set in the environment (never paste tokens into chat).
 - Hosting is one Worker (`worker/index.mjs`, config `wrangler.jsonc`, site built by `tools/build_site.js`): app.vault-it.co → dist/app, vault-it.co → dist/landing, www → redirect, previews serve the app. The domain stays registered at Wix; only its nameservers moved to Cloudflare. Remaining steps and state: `docs/CUTOVER.md`.
+
+## Token budget
+- `index.html` is 25k lines; `Vault-It_v0.3_Alpha.html` is a legacy build (ignore unless asked). Never Read either without `offset`/`limit`. A line-numbered map is added at session start (`.claude/hooks/map.sh`); otherwise Grep first.
+- `index.html` between `<<HB3D_ENGINE` and `HB3D_ENGINE>>` is generated: edit `src/hb3d/*`, then `node tools/build_hb3d.js`.
+- Run the tests you need by name (`bash scripts/run-tests.sh test_x`); the full suite only before a release. Read failures from `/tmp/vaultit-test-logs` rather than pasting whole runs.
+- Trim command output (`| tail -40`, `| grep`). Use `rtk` if installed.
+- Plan mode runs on Opus, the rest on Sonnet (`opusplan`). Delegate: `scout` (Haiku) finds code, `grunt` (Haiku) makes exact mechanical edits, `architect` (Opus) explains and plans, read-only.
+- Replies: outcome first, short, line refs rather than whole files. Suggest `/handoff` and a fresh session when the task changes, `/compact` after exploring.
