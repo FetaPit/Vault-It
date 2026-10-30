@@ -34,7 +34,7 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 | 8 | Groupings H1 to H4, O1, O2, D1 to D3, A1 (section 4, all approved) | Done |
 | 9 | House builder Level 2 fix (section 3) | Next |
 | 10 | Brand look and every animation on all six three.js models in `src/hb3d` (owner chose option a), behind `?house=new` | |
-| 11 | Net worth in 3D as the Overview hero: 3D blocks first, Graph toggle, choice remembered, blocks in the sub-tab colours, behind `?nw=new` | |
+| 11 | Net worth in 3D as the Overview hero: 3D blocks first, Graph toggle, choice remembered, blocks in the sub-tab colours, behind `?nw=new` | Built behind the flag (`?nw=new`, off again with `?nw=old`), needs the owner's phone test. `tests/test_nw3d.js` |
 | 12 | On by default for testers once the owner signs off on the phone (old builder reachable from Settings for a week) | |
 | 13 | `landing.html` brand pass; a service worker that registers (today's is a `blob:` URL browsers refuse); cache version bump | |
 | 14 | Full suite and the QA list (brief section 9). Release only when the owner asks | |

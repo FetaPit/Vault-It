@@ -19,4 +19,5 @@ node tests/test_authmail_server.js # send-auth-email: validation, HTML escaping,
 node tests/test_009.mjs; node tests/test_waitlist_server.js   # beta list: migration 009 on Postgres, and the waitlist-join function (double opt-in, signed unsubscribe, limits)
 node tests/test_signup_page.js       # vault-it.co/sign-up and its confirm / thanks / unsubscribe pages in a browser, served through the Worker routing
 node tests/test_beta_client.js     # privacy/terms wording, 429 handling, Download my data, Delete my account
+node tests/test_nw3d.js            # net worth in 3D behind ?nw=new: flag off unchanged, 3D blocks | Graph toggle, same numbers in both views (VI_APP=file:///… to test another copy)
 ```
