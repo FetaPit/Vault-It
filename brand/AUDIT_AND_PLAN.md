@@ -55,7 +55,7 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 
 - About 500 em dashes remain in `index.html`, many in user-facing copy (hints, toasts, roadmap text). Each needs rewording (comma, colon or full stop), not a blind replace. Proposed as a small copy phase, or folded into each later phase for the screens it touches.
 
-### Proposal: money owed to you (not built, owner to decide)
+### Money owed to you: **built 30 Oct** as the Debtors sub-tab of Debt Tracker (owner moved it there from Assets; Creditors = what you owe). Original proposal:
 
 - **Where it lives:** a seventh sub-tab in Assets and liabilities, "Owed to you" (people, deposits held by a landlord, refunds due), each with an amount, who owes it, an expected date and a "how sure" setting (expected or doubtful).
 - **Net worth:** expected amounts count as something you own; doubtful ones are shown but left out, so the headline figure never rests on money that may not come back.

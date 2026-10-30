@@ -11108,6 +11108,12 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 <!-- ═══════════════════════════ DEBT TRACKER ═══════════════════════════ -->
 <div id="tab-debt" class="tab-panel" style="display:none">
 <div style="max-width:900px;margin:0 auto;padding:24px 20px 60px">
+    <!-- Creditors (what you owe) and Debtors (owed to you), owner 30 Oct -->
+    <div class="debt-sides" role="tablist" aria-label="Who owes whom">
+      <button role="tab" id="debt-side-btn-creditors" aria-selected="true" aria-controls="debt-side-creditors" onclick="setDebtSide('creditors')"><span>Creditors</span><small>You owe</small></button>
+      <button role="tab" id="debt-side-btn-debtors" aria-selected="false" aria-controls="debt-side-debtors" onclick="setDebtSide('debtors')"><span>Debtors</span><small>Owed to you</small></button>
+    </div>
+    <div id="debt-side-creditors" class="debt-side" role="tabpanel" aria-labelledby="debt-side-btn-creditors">
     <div class="ov-kpis debt-strip" role="group" aria-label="Debt at a glance">
       <div class="ov-kpi"><div class="ov-kpi-lbl">Total Debt</div><div class="ov-kpi-val" id="debt-total" style="color:var(--re)">£0</div></div>
       <div class="ov-kpi"><div class="ov-kpi-lbl">Monthly Minimums</div><div class="ov-kpi-val" id="debt-mins" style="color:var(--gold)">£0/mo</div></div>
@@ -11159,6 +11165,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
         <div id="debt-treemap" class="dtm" style="display:none"></div>
         </div>
     </div>
+    </div><!-- /creditors -->
 <div id="debt-form-modal" class="vi-pop" hidden onclick="if(event.target===this)hideDebtForm()" onkeydown="if(event.key==='Escape')hideDebtForm()">
 <div id="debt-form-card" class="ov-data-card vi-pop-card" role="dialog" aria-modal="true" aria-labelledby="debt-form-title" style="display:none">
       <div class="vi-pop-hd"><div class="ov-data-title" id="debt-form-title">Add a debt</div><button class="inv-x" type="button" onclick="hideDebtForm()" aria-label="Close"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg></button></div>
@@ -11175,6 +11182,39 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
       </div>
       <div id="debt-form-msg" class="vi-pop-msg" role="alert"></div>
     </div>
+</div>
+    <div id="debt-side-debtors" class="debt-side" role="tabpanel" aria-labelledby="debt-side-btn-debtors" hidden>
+      <div class="ov-kpis debt-strip owe-strip" role="group" aria-label="Owed to you at a glance">
+        <div class="ov-kpi"><div class="ov-kpi-lbl">Owed to you</div><div class="ov-kpi-val" id="owe-total" style="color:var(--blue)">£0</div></div>
+        <div class="ov-kpi"><div class="ov-kpi-lbl">Counted in net worth</div><div class="ov-kpi-val" id="owe-counted" style="color:var(--teal)">£0</div></div>
+        <div class="ov-kpi"><div class="ov-kpi-lbl">Doubtful</div><div class="ov-kpi-val" id="owe-doubt" style="color:var(--t2)">£0</div></div>
+        <div class="ov-kpi"><div class="ov-kpi-lbl">People and firms</div><div class="ov-kpi-val" id="owe-count" style="color:var(--tx)">0</div></div>
+      </div>
+      <div class="ov-chart-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <span class="ov-chart-title">Owed to you</span>
+          <button class="btn-add-data" onclick="showOweForm()">+ Add someone who owes you</button>
+        </div>
+        <div class="owe-hint">Money lent to a friend, a deposit a landlord holds, a refund on its way. Amounts you expect back count in your net worth; doubtful ones are shown but left out.</div>
+        <div id="owe-list"></div>
+      </div>
+    </div>
+<div id="owe-form-modal" class="vi-pop" hidden onclick="if(event.target===this)hideOweForm()" onkeydown="if(event.key==='Escape')hideOweForm()">
+  <div class="ov-data-card vi-pop-card" role="dialog" aria-modal="true" aria-labelledby="owe-form-title">
+    <div class="vi-pop-hd"><div class="ov-data-title" id="owe-form-title">Someone owes you</div><button class="inv-x" type="button" onclick="hideOweForm()" aria-label="Close"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg></button></div>
+    <div class="g-form">
+      <div><label class="ov-kpi-lbl" for="of-who">Who</label><input type="text" id="of-who" class="al-inp" autocomplete="off" placeholder="e.g. Sam, or Landlord" onkeydown="if(event.key==='Enter'){event.preventDefault();saveOwe();}"></div>
+      <div><label class="ov-kpi-lbl" for="of-what">What for</label><input type="text" id="of-what" class="al-inp" autocomplete="off" placeholder="e.g. Rent deposit"></div>
+      <div><label class="ov-kpi-lbl" for="of-amt">Amount £</label><input type="number" id="of-amt" class="al-inp" min="0" step="0.01"></div>
+      <div><label class="ov-kpi-lbl" for="of-date">Expected back by</label><input type="date" id="of-date" class="al-inp"></div>
+      <div><label class="ov-kpi-lbl" for="of-sure">How sure</label><select id="of-sure" class="al-inp"><option value="expected">Expected back</option><option value="doubtful">Doubtful</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-add-data" onclick="saveOwe()">Save</button>
+      <button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="hideOweForm()">Cancel</button>
+    </div>
+    <div id="owe-form-msg" class="vi-pop-msg" role="alert"></div>
+  </div>
 </div>
   </div>
 </div>
@@ -12530,6 +12570,28 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .pc-row select,.pc-row input[type=date]{background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.72rem;padding:6px 9px;outline:none}
 .pc-out{background:transparent!important;border-color:var(--re)!important;color:var(--re)!important}
 @media(max-width:600px){.pc-row{flex-wrap:wrap}.pc-row>*{flex:1 1 45%}}
+.debt-sides{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid rgb(var(--teal-rgb) / .3);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.debt-sides button{background:none;border:0;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--t2);min-height:48px}
+.debt-sides button span{font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+.debt-sides button small{font-size:.54rem}
+.debt-sides button[aria-selected="true"]{color:var(--tx);background:rgb(var(--teal-rgb) / .14)}
+#debt-side-btn-creditors[aria-selected="true"] span{color:var(--re)}#debt-side-btn-debtors[aria-selected="true"] span{color:var(--blue)}
+#debt-side-btn-creditors[aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--re)}#debt-side-btn-debtors[aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--blue)}
+[data-theme="light"] #debt-side-btn-creditors[aria-selected="true"] span,[data-theme="light"] #debt-side-btn-debtors[aria-selected="true"] span{color:var(--text)}
+.debt-sides button+button{border-left:1px solid rgb(var(--teal-rgb) / .3)}
+.owe-hint{font-size:.58rem;color:var(--t2);line-height:1.5;margin-bottom:12px}
+.owe-empty{font-size:.62rem;color:var(--t3);text-align:center;padding:18px}
+.owe-row{position:relative;border:1px solid var(--bd);border-left:3px solid var(--blue);border-radius:10px;padding:12px;margin-bottom:10px;background:rgb(var(--blue-rgb) / .04)}
+.owe-row.doubt{border-left-color:var(--t3)}.owe-row.done{opacity:.75;border-left-color:var(--green)}
+.owe-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.owe-who{font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;color:var(--tx)}.owe-what{font-size:.58rem;color:var(--t2);margin-top:2px}
+.owe-amt{font-family:'Share Tech Mono',monospace;font-size:.95rem;color:var(--blue);text-align:right;white-space:nowrap}.owe-amt small{display:block;font-size:.52rem;color:var(--t2)}
+.owe-row.done .owe-amt{color:var(--gr)}
+.owe-bar{height:4px;border-radius:2px;background:rgb(var(--ink-rgb) / .08);margin:10px 0 8px;overflow:hidden}.owe-bar div{height:100%;background:var(--green)}
+.owe-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:.56rem;color:var(--t2)}.owe-meta .late{color:var(--re)}
+.owe-sure select{background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-size:.56rem;padding:4px 6px}
+.owe-pay{display:flex;gap:6px;margin-top:8px}.owe-pay input{flex:1;min-width:0;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.7rem;padding:6px 8px}
+.owe-del{margin-top:8px}
 .vi-pop{position:fixed;inset:0;z-index:9000;background:rgb(var(--bg-rgb) / .78);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px}
 .vi-pop[hidden]{display:none}
 .vi-pop-card{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;margin:0!important;box-shadow:0 18px 50px -20px rgba(0,0,0,.6)}
@@ -16311,7 +16373,7 @@ function _isBlankArea(key, v) {   // an area with nothing in it (new-device defa
     var n = function(a) { return a && a.length; };
     if (key === 'pos_ov1') return !(n(o.income) || n(o.expenses));
     if (key === 'pos_al1') return !(n(o.cashAccounts) || n(o.physicalCash) || n(o.stocks) || n(o.otherAssets) || n(o.crypto) || n(o.liabilities) || (o.metals && Object.keys(o.metals).some(function(m) { return +o.metals[m] > 0; })));
-    if (key === 'pos_debt1') return !n(o.debts);
+    if (key === 'pos_debt1') return !(n(o.debts) || n(o.owedToMe));
     if (key === 'ht3') return !(+o.saved > 0);
     if (key === 'pos_biz1') return !(n(o.clients) || n(o.leads) || n(o.streams));
   } catch (e) {}
@@ -19068,7 +19130,7 @@ function alTotalLiab(){
 }
 function alTotalAssets(){
   var liabAssets=alLiabAssetTotal();
-  return alTotalMetals()+alTotalCrypto()+alTotalCash()+alTotalOther()+alTotalStocks()+(state?state.saved:0)+liabAssets;
+  return alTotalMetals()+alTotalCrypto()+alTotalCash()+alTotalOther()+alTotalStocks()+(state?state.saved:0)+liabAssets+(typeof alTotalOwedToMe==='function'?alTotalOwedToMe():0);
 }
 function computeNetWorth(){return alTotalAssets()+totalAssets()-alTotalLiab()-debtTotal()-totalDebts();}
 
@@ -20458,7 +20520,61 @@ function renderDebtMapConfirm(){
   el.innerHTML='<label class="map-tick"><input type="checkbox" '+(on?'checked ':'')+'onchange="fireTick(\''+k+'\',this.checked)"><span><b>'+(k==='debtsMapped'?'I’ve added every debt I owe':'I don’t have any debts')+'</b>'
     +'<small>'+(on?'Confirmed — your Roadmap’s “Map Debts” stage is complete.':'Tick when '+(k==='debtsMapped'?'this list is complete':'you owe nothing on cards, loans, car finance or overdrafts')+'. This is what completes “Map Debts” on your Roadmap.')+'</small></span></label>';
 }
+// ── Debtors: money owed to you (debtState.owedToMe). Expected amounts count as something you own; doubtful ones don't. ──
+function oweList(){return debtState.owedToMe=debtState.owedToMe||[];}
+function oweLeft(o){return Math.max(0,(+o.amount||0)-(o.paid||[]).reduce(function(s,p){return s+(+p.amount||0);},0));}
+function alTotalOwedToMe(){return oweList().filter(function(o){return o.sure!=='doubtful';}).reduce(function(s,o){return s+oweLeft(o);},0);}
+function setDebtSide(side){
+  side=side==='debtors'?'debtors':'creditors';
+  ['creditors','debtors'].forEach(function(k){var b=document.getElementById('debt-side-btn-'+k),p=document.getElementById('debt-side-'+k);if(b)b.setAttribute('aria-selected',k===side?'true':'false');if(p)p.hidden=k!==side;});
+  try{localStorage.setItem('vi_debt_side',side);}catch(e){}
+  if(side==='debtors')renderOwe();else{try{renderDebtTab();}catch(e){}}
+}
+var _oweReturn=null;
+function showOweForm(){var m=document.getElementById('owe-form-modal');if(!m)return;if(m.parentNode!==document.body)document.body.appendChild(m);_oweReturn=document.activeElement;m.hidden=false;document.body.classList.add('vi-pop-open');var g=document.getElementById('owe-form-msg');if(g)g.textContent='';setTimeout(function(){var f=document.getElementById('of-who');if(f)f.focus();},30);}
+function hideOweForm(){var m=document.getElementById('owe-form-modal');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');var b=_oweReturn;_oweReturn=null;if(b&&b.focus)setTimeout(function(){try{b.focus();}catch(e){}},0);}
+function saveOwe(){
+  var v=function(id){return (document.getElementById(id)||{}).value||'';};
+  var who=v('of-who').trim(),amt=(parseFloat(v('of-amt'))||0)/(window.VI_CURRENCY_RATE||1),msg=document.getElementById('owe-form-msg');
+  if(!who){if(msg)msg.textContent='Who owes you? A name is enough.';return;}
+  if(!(amt>0)){if(msg)msg.textContent='Enter the amount they owe you.';return;}
+  oweList().push({id:Date.now(),who:who.slice(0,60),what:v('of-what').trim().slice(0,80),amount:amt,due:v('of-date'),sure:v('of-sure')==='doubtful'?'doubtful':'expected',paid:[],added:new Date().toISOString().slice(0,10)});
+  ['of-who','of-what','of-amt','of-date'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});var su=document.getElementById('of-sure');if(su)su.value='expected';
+  hideOweForm();saveDebtState();renderOwe();updateKPIs();
+}
+function owePaid(id){
+  var o=oweList().find(function(x){return x.id===id;}),inp=document.getElementById('owe-pay-'+id);if(!o||!inp)return;
+  var a=(parseFloat(inp.value)||0)/(window.VI_CURRENCY_RATE||1);if(!(a>0))return;a=Math.min(a,oweLeft(o));
+  o.paid=o.paid||[];o.paid.push({amount:a,date:new Date().toISOString().slice(0,10)});inp.value='';
+  saveDebtState();renderOwe();updateKPIs();if(oweLeft(o)<=0.004&&typeof showToast==='function')showToast(o.who+' has paid you back in full');
+}
+function oweSure(id,val){var o=oweList().find(function(x){return x.id===id;});if(!o)return;o.sure=val==='doubtful'?'doubtful':'expected';saveDebtState();renderOwe();updateKPIs();}
+function oweDel(id){debtState.owedToMe=oweList().filter(function(x){return x.id!==id;});saveDebtState();renderOwe();updateKPIs();}
+function renderOwe(){
+  var list=oweList(),el=document.getElementById('owe-list');
+  var open=list.filter(function(o){return oweLeft(o)>0.004;}),tot=open.reduce(function(s,o){return s+oweLeft(o);},0),doubt=open.filter(function(o){return o.sure==='doubtful';}).reduce(function(s,o){return s+oweLeft(o);},0);
+  var set=function(id,t){var e=document.getElementById(id);if(e)e.textContent=t;};
+  set('owe-total',gbpFmt(tot));set('owe-counted',gbpFmt(tot-doubt));set('owe-doubt',gbpFmt(doubt));set('owe-count',String(open.length));
+  if(!el)return;
+  if(!list.length){el.innerHTML='<div class="owe-empty">Nobody owes you anything yet.</div>';return;}
+  var today=new Date().toISOString().slice(0,10);
+  el.innerHTML=list.slice().sort(function(a,b){return (oweLeft(b)>0)-(oweLeft(a)>0)||(a.due||'9').localeCompare(b.due||'9');}).map(function(o){
+    var left=oweLeft(o),done=left<=0.004,late=!done&&o.due&&o.due<today,pct=o.amount>0?Math.round((1-left/o.amount)*100):0;
+    var due=o.due?new Date(o.due+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+    return '<div class="owe-row'+(done?' done':'')+(o.sure==='doubtful'?' doubt':'')+'">'
+      +'<div class="owe-top"><div><div class="owe-who">'+cfEsc(o.who)+'</div>'+(o.what?'<div class="owe-what">'+cfEsc(o.what)+'</div>':'')+'</div>'
+      +'<div class="owe-amt">'+(done?'Paid back':gbpFmt(left))+'<small>'+(done?gbpFmt(o.amount):'of '+gbpFmt(o.amount))+'</small></div></div>'
+      +'<div class="owe-bar" aria-hidden="true"><div style="width:'+pct+'%"></div></div>'
+      +'<div class="owe-meta">'+(due?'<span class="'+(late?'late':'')+'">'+(late?'Was due ':'Due ')+due+'</span>':'<span>No date set</span>')
+      +(done?'':'<label class="owe-sure"><select aria-label="How sure are you of getting this back" onchange="oweSure('+o.id+',this.value)"><option value="expected"'+(o.sure!=='doubtful'?' selected':'')+'>Expected back</option><option value="doubtful"'+(o.sure==='doubtful'?' selected':'')+'>Doubtful, not counted</option></select></label>')+'</div>'
+      +(done?'':'<div class="owe-pay"><input type="number" id="owe-pay-'+o.id+'" min="0" step="0.01" placeholder="£ paid back" aria-label="Amount paid back by '+cfEsc(o.who)+'" onkeydown="if(event.key===\'Enter\'){event.preventDefault();owePaid('+o.id+');}"><button class="btn-add-data" onclick="owePaid('+o.id+')">Record</button></div>')
+      +'<button class="data-item-del owe-del" onclick="oweDel('+o.id+')" aria-label="Remove '+cfEsc(o.who)+'"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg> Remove</button>'
+      +'</div>';
+  }).join('');
+}
+setTimeout(function(){try{if(localStorage.getItem('vi_debt_side')==='debtors')setDebtSide('debtors');}catch(e){}},0);
 function renderDebtTab(){
+  try{renderOwe();}catch(e){console.error('[Vault-It] owed to you',e);}
   try{renderDebtMapConfirm();}catch(e){}
   var sorted=[].concat(debtState.debts).sort(function(a,b){
     if((a.balance>0)!==(b.balance>0))return a.balance>0?-1:1;   // cleared debts go last
@@ -22724,7 +22840,8 @@ function renderSummaryCards(){
       {l:'Stocks & Shares',v:alTotalStocks(),c:'var(--green2)',i:'stocks'},
       {l:'Precious Metals',v:alTotalMetals(),c:'var(--gold)',i:'metals'},
       {l:'Wealth Inventory',v:alTotalOther(),c:'var(--purple)',i:'inv'},
-      {l:'Crypto',v:alTotalCrypto(),c:'var(--teal)',i:'crypto'}
+      {l:'Crypto',v:alTotalCrypto(),c:'var(--teal)',i:'crypto'},
+      {l:'Owed to you',v:(typeof alTotalOwedToMe==='function'?alTotalOwedToMe():0),c:'var(--blue)',i:'cash'}
     ];
     aEl.innerHTML='<div class="ov-sum-total" style="color:var(--teal)">'+gbpFmt(ta)+'</div>'
       +(rows.filter(function(r){return r.v>0;}).map(function(r){

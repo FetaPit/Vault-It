@@ -43,7 +43,7 @@ const seed = () => {
     const d = await p.evaluate(() => { const st = document.querySelector('.debt-strip'), card = document.getElementById('debt-charts'), plan = document.getElementById('debt-list-el').closest('.ov-chart-card');
       const vis = id => { const e = document.getElementById(id); return !!e && e.getBoundingClientRect().height > 0; };
       return { d1: !!st && st.querySelectorAll('.ov-kpi').length === 4 && getComputedStyle(st.querySelector('.ov-kpi')).borderTopWidth === '0px', hist: vis('debt-bar-chart'), donut: vis('debt-donut-chart'),
-        d3: plan.contains(document.getElementById('debt-interest-panel')) && vis('debt-interest-panel'), lbl: document.getElementById('debt-plan-lbl').textContent, cards: document.querySelectorAll('#tab-debt .ov-chart-card').length };
+        d3: plan.contains(document.getElementById('debt-interest-panel')) && vis('debt-interest-panel'), lbl: document.getElementById('debt-plan-lbl').textContent, cards: document.querySelectorAll('#debt-side-creditors .ov-chart-card').length };
     });
     ok(d.d1, w + ': D1 the four debt figures are one strip');
     const brass = await p.evaluate(() => { const v = n => { const e = document.createElement('i'); e.style.color = 'var(--' + n + ')'; document.body.appendChild(e); const c = getComputedStyle(e).color; e.remove(); return c; };
