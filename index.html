@@ -10891,23 +10891,23 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 <div id="tab-assets" class="tab-panel" style="display:none">
   <div id="assets-page" style="max-width:1100px;margin:0 auto;padding:24px 20px 60px">
     <div class="subtab-nav" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-      <button class="subtab-btn active" data-sub="metals" onclick="showSubtab('assets','metals',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-metals"/></svg><span>Precious metals</span>
+      <button class="subtab-btn active" data-sub="cash" onclick="showSubtab('assets','cash',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cash"/></svg><span>Cash and savings</span>
       </button>
-      <button class="subtab-btn" data-sub="crypto" onclick="showSubtab('assets','crypto',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-crypto"/></svg><span>Crypto</span>
+      <button class="subtab-btn" data-sub="stocks" onclick="showSubtab('assets','stocks',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-candles"/></svg><span>Stocks and shares</span>
       </button>
-      <button class="subtab-btn" data-sub="cash" onclick="showSubtab('assets','cash',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cash"/></svg><span>Cash and savings</span>
+      <button class="subtab-btn" data-sub="metals" onclick="showSubtab('assets','metals',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-metals"/></svg><span>Precious metals</span>
       </button>
       <button class="subtab-btn" data-sub="other" onclick="showSubtab('assets','other',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cube"/></svg><span>Wealth inventory</span>
       </button>
-      <button class="subtab-btn" data-sub="liabilities" onclick="showSubtab('assets','liabilities',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-liabilities"/></svg><span>Liabilities</span>
+      <button class="subtab-btn" data-sub="crypto" onclick="showSubtab('assets','crypto',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-crypto"/></svg><span>Crypto</span>
       </button>
-      <button class="subtab-btn" data-sub="stocks" onclick="showSubtab('assets','stocks',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-candles"/></svg><span>Stocks and funds</span>
+      <button class="subtab-btn" data-sub="liabilities" onclick="showSubtab('assets','liabilities',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-liabilities"/></svg><span>Liabilities</span>
       </button>
       <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--em);white-space:nowrap">
         Total: <span id="tab-total-assets" style="font-weight:700">£0</span>
       </div>
     </div>
-    <div class="subtab-panel active" id="assets-metals">
+    <div class="subtab-panel" id="assets-metals">
       <div style="display:flex;justify-content:flex-end;margin:10px 0 2px">
         <span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--gold)">Metals: <span id="subtab-total-metals" style="font-weight:700">£0</span></span>
       </div>
@@ -10995,7 +10995,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
         </div>
       </div>
     </div>
-    <div class="subtab-panel" id="assets-cash">
+    <div class="subtab-panel active" id="assets-cash">
       <div class="ov-chart-card" style="margin-top:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <span class="ov-chart-title">Cash &amp; Savings Accounts</span>
@@ -11008,6 +11008,22 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
           <input type="number" id="ca-bal" placeholder="Balance £">
           <button class="btn-add-data" onclick="addCashAccount()">+ Add</button>
         </div>
+      </div>
+      <div class="ov-chart-card pc-card" id="pc-card" style="margin-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap">
+          <span class="ov-chart-title">Physical cash</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--gr)">Total: <span id="pc-total" style="font-weight:700">£0</span></span>
+        </div>
+        <div class="pc-hint">Notes and coins you keep at home, in a wallet or in a safe. Log what goes in and what you take out; it counts in your cash and net worth.</div>
+        <div id="pc-log"></div>
+        <div class="data-input-row pc-row" style="margin-top:10px">
+          <select id="pc-where" aria-label="Where the cash is"><option>Wallet</option><option>At home</option><option>Safe</option><option>Money box</option><option>Other</option></select>
+          <input type="number" id="pc-amt" min="0" step="0.01" placeholder="Amount £" aria-label="Amount">
+          <input type="date" id="pc-date" aria-label="Date">
+          <button class="btn-add-data" onclick="pcAdd(1)">+ Put in</button>
+          <button class="btn-add-data pc-out" onclick="pcAdd(-1)">− Take out</button>
+        </div>
+        <div id="pc-msg" class="vi-pop-msg" role="status"></div>
       </div>
       <div style="margin-top:16px">
         <div class="scene-card" id="cashSceneCard" style="margin-bottom:16px">
@@ -12504,6 +12520,16 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .debt-strip .ov-kpi+.ov-kpi{border-left:1px solid rgb(var(--ink-rgb) / .08)!important}
 @media(max-width:600px){.debt-strip{grid-template-columns:1fr 1fr!important}.debt-strip .ov-kpi:nth-child(3){border-left:0!important}.debt-strip .ov-kpi:nth-child(n+3){border-top:1px solid rgb(var(--ink-rgb) / .08)!important}}
 .debt-charts[data-chart="hist"] .debt-break-only,.debt-charts[data-chart="break"] .debt-hist-only{display:none!important}
+.pc-hint{font-size:.56rem;color:var(--t2);margin-bottom:10px;line-height:1.5}
+.pc-places{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.pc-place{font-size:.56rem;padding:3px 8px;border-radius:99px;border:1px solid rgb(var(--green-rgb) / .35);color:var(--t2)}.pc-place b{color:var(--gr);font-family:'Share Tech Mono',monospace}
+.pc-list{max-height:220px;overflow:auto;border-top:1px solid var(--bd)}
+.pc-line{display:grid;grid-template-columns:90px 1fr auto 26px;gap:8px;align-items:center;padding:6px 2px;border-bottom:1px solid var(--bd);font-size:.62rem}
+.pc-d{font-family:'Share Tech Mono',monospace;color:var(--t2);font-size:.56rem}.pc-a{font-family:'Share Tech Mono',monospace;text-align:right}.pc-a.in{color:var(--gr)}.pc-a.out{color:var(--re)}
+.pc-empty{font-size:.6rem;color:var(--t3);text-align:center;padding:12px}
+.pc-row select,.pc-row input[type=date]{background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.72rem;padding:6px 9px;outline:none}
+.pc-out{background:transparent!important;border-color:var(--re)!important;color:var(--re)!important}
+@media(max-width:600px){.pc-row{flex-wrap:wrap}.pc-row>*{flex:1 1 45%}}
 .vi-pop{position:fixed;inset:0;z-index:9000;background:rgb(var(--bg-rgb) / .78);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px}
 .vi-pop[hidden]{display:none}
 .vi-pop-card{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;margin:0!important;box-shadow:0 18px 50px -20px rgba(0,0,0,.6)}
@@ -12676,7 +12702,7 @@ function showTab(id){
   if(id==='budget'){renderCashflow();}
   try{viNavReveal();}catch(e){}
   if(id==='house')setTimeout(redraw,30);
-  if(id==='assets'){setTimeout(()=>{renderMetalsISO();renderAlTab();},30);}
+  if(id==='assets'){setTimeout(()=>{renderAlTab();var on=document.querySelector('#assets-page .subtab-panel.active');if(on&&on.id==='assets-cash')renderCashISO();else renderMetalsISO();},30);}
   if(id==='debt'){renderDebtTab();setTimeout(function(){drawDebtHistogram();drawDebtDonut();},80);}
   if(id==='biz'){renderBizTab();updateProGate();}
   if(id==='achievements')renderAchievements();
@@ -16078,7 +16104,7 @@ var _invDB=null,_invCache={},_invViews=[],_invSpin=null,_invOpen=null;
 var PIN_LEN=6,_SETPIN_LABEL='Set a 6-digit PIN — then sign in anywhere with just your email + PIN';
 var _authForgot=false,_needPin=null,_pinMode='local',_pinEnterLen=4,_pinBusy=false,_pinChange=false;
 var AL_KEY='pos_al1';
-var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],otherAssets:[],liabilities:[]};
+var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],physicalCash:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
 var DEBT_PAL=[['#e05c5c','#8f2530'],['#c9a84c','#7a5f1a'],['#44c0b9','#1f6e6a'],['#9b7ec8','#563a86'],['#3ecf8e','#1a7d55'],['#f59e0b','#9a5f06']];
 var _bdFold=(function(){try{return JSON.parse(localStorage.getItem('vi_bd_fold')||'{}')||{};}catch(e){return {};}})();
@@ -16284,7 +16310,7 @@ function _isBlankArea(key, v) {   // an area with nothing in it (new-device defa
     if (_isDemoSample(key, o)) return true;   // the built-in sample persona is never the user's own data: it must not replace real figures
     var n = function(a) { return a && a.length; };
     if (key === 'pos_ov1') return !(n(o.income) || n(o.expenses));
-    if (key === 'pos_al1') return !(n(o.cashAccounts) || n(o.stocks) || n(o.otherAssets) || n(o.crypto) || n(o.liabilities) || (o.metals && Object.keys(o.metals).some(function(m) { return +o.metals[m] > 0; })));
+    if (key === 'pos_al1') return !(n(o.cashAccounts) || n(o.physicalCash) || n(o.stocks) || n(o.otherAssets) || n(o.crypto) || n(o.liabilities) || (o.metals && Object.keys(o.metals).some(function(m) { return +o.metals[m] > 0; })));
     if (key === 'pos_debt1') return !n(o.debts);
     if (key === 'ht3') return !(+o.saved > 0);
     if (key === 'pos_biz1') return !(n(o.clients) || n(o.leads) || n(o.streams));
@@ -18189,7 +18215,9 @@ function renderCashflowCategories(){
 function saveAL(){try{localStorage.setItem(AL_KEY,JSON.stringify(alState));}catch(e){}if(typeof checkAchievements==='function')checkAchievements();}
 function alTotalMetals(){var m=alState.metals,p=alState.metalPrices;return m.gold*p.gold+m.silver*p.silver+m.platinum*p.platinum+m.palladium*p.palladium;}
 function alTotalCrypto(){return alState.crypto.reduce(function(s,c){var a=(c.amount!=null?c.amount:(c.qty!=null?c.qty:0))||0;var p=c.price||0;return s+a*p;},0);}
-function alTotalCash(){return alState.cashAccounts.reduce(function(s,a){return s+a.balance;},0);}
+// cash = bank and savings accounts + the physical cash log (notes and coins at home, in a wallet, in a safe)
+function alTotalPhysical(){return (alState.physicalCash||[]).reduce(function(s,e){return s+(+e.amount||0);},0);}
+function alTotalCash(){return alState.cashAccounts.reduce(function(s,a){return s+a.balance;},0)+Math.max(0,alTotalPhysical());}
 function alTotalOther(){return alState.otherAssets.reduce(function(s,a){return s+a.value;},0);}
 // ═══════════════════════════════════════════════════════════════
 // STOCKS & FUNDS — editable portfolios ("pies") with live prices
@@ -19285,6 +19313,7 @@ function renderAlTab(){
   }
   // Cash accounts
   var cas=document.getElementById('cash-table');
+  try{renderPhysicalCash();}catch(e){console.error('[Vault-It] physical cash',e);}
   if(cas)cas.innerHTML=alState.cashAccounts.length?'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Account</th><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Type</th><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:right">Balance</th><th></th></tr></thead><tbody>'+alState.cashAccounts.map(function(a){return'<tr><td style="padding:7px 10px;font-size:.74rem">'+a.name+'</td><td style="padding:7px 10px;font-size:.62rem;color:var(--t3)">'+a.type+'</td><td style="padding:7px 10px;font-size:.74rem;font-family:\'Share Tech Mono\',monospace;color:var(--gr);text-align:right">\u00a3'+a.balance.toLocaleString('en-GB')+'</td><td style="padding:7px 10px"><button class="data-item-del" onclick="delCashAccount('+a.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></td></tr>';}).join('')+'</tbody></table>':'<div style="font-size:.6rem;color:var(--t3);text-align:center;padding:16px">No accounts added yet</div>';
   // Liabilities
   var ll=document.getElementById('liabilities-list');
@@ -19389,6 +19418,39 @@ function addCashAccount(){
   alState.cashAccounts.push({id:Date.now(),name:n,type:t,balance:b});
   document.getElementById('ca-name').value='';document.getElementById('ca-bal').value='';
   saveAL();renderAlTab();updateKPIs();renderCashISO();
+}
+// Physical cash log: each line is money put in (+) or taken out (-), with where it is kept and the date.
+function pcAdd(sign){
+  var amt=(parseFloat((document.getElementById('pc-amt')||{}).value)||0)/(window.VI_CURRENCY_RATE||1);
+  var msg=document.getElementById('pc-msg');
+  if(!(amt>0)){if(msg)msg.textContent='Enter an amount above zero.';return;}
+  var where=(document.getElementById('pc-where')||{}).value||'Wallet';
+  var held=alTotalPhysicalAt(where);
+  if(sign<0&&amt>held+0.005){if(msg)msg.textContent='Only '+gbpFmt(held)+' is logged in '+where.toLowerCase()+'.';return;}
+  var d=(document.getElementById('pc-date')||{}).value||new Date().toISOString().slice(0,10);
+  alState.physicalCash=alState.physicalCash||[];
+  alState.physicalCash.push({id:Date.now(),where:where,amount:sign*amt,date:d});
+  document.getElementById('pc-amt').value='';if(msg)msg.textContent='';
+  saveAL();renderAlTab();updateKPIs();renderCashISO();
+}
+function alTotalPhysicalAt(where){return (alState.physicalCash||[]).filter(function(e){return e.where===where;}).reduce(function(s,e){return s+(+e.amount||0);},0);}
+function pcDel(id){
+  var e=(alState.physicalCash||[]).find(function(x){return x.id===id;});if(!e)return;
+  var msg=document.getElementById('pc-msg');
+  if((+e.amount||0)>0&&alTotalPhysicalAt(e.where)-e.amount<-0.005){if(msg)msg.textContent='Remove the take-out lines for '+String(e.where).toLowerCase()+' first, or the total would go below zero.';return;}
+  if(msg)msg.textContent='';
+  alState.physicalCash=alState.physicalCash.filter(function(x){return x.id!==id;});saveAL();renderAlTab();updateKPIs();renderCashISO();
+}
+function renderPhysicalCash(){
+  var el=document.getElementById('pc-log'),tot=document.getElementById('pc-total');if(!el)return;
+  var log=(alState.physicalCash||[]).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'')||b.id-a.id;});
+  if(tot)tot.textContent=gbpFmt(Math.max(0,alTotalPhysical()));
+  var dt=document.getElementById('pc-date');if(dt&&!dt.value)dt.value=new Date().toISOString().slice(0,10);
+  if(!log.length){el.innerHTML='<div class="pc-empty">No physical cash logged yet.</div>';return;}
+  var places={};(alState.physicalCash||[]).forEach(function(e){places[e.where]=(places[e.where]||0)+(+e.amount||0);});
+  el.innerHTML='<div class="pc-places">'+Object.keys(places).filter(function(k){return Math.abs(places[k])>0.004;}).map(function(k){return '<span class="pc-place">'+cfEsc(k)+' <b>'+gbpFmt(places[k])+'</b></span>';}).join('')+'</div>'
+    +'<div class="pc-list">'+log.map(function(e){var inn=(+e.amount||0)>=0,d=e.date?new Date(e.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+      return '<div class="pc-line"><span class="pc-d">'+d+'</span><span class="pc-w">'+cfEsc(e.where||'')+'</span><span class="pc-a '+(inn?'in':'out')+'">'+(inn?'+':'−')+gbpFmt(Math.abs(+e.amount||0))+'</span><button class="data-item-del" onclick="pcDel('+e.id+')" aria-label="Remove this line"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg></button></div>';}).join('')+'</div>';
 }
 function delCashAccount(id){alState.cashAccounts=alState.cashAccounts.filter(function(a){return a.id!==id;});saveAL();renderAlTab();updateKPIs();renderCashISO();}
 function addOtherAsset(){
@@ -22657,14 +22719,14 @@ function renderSummaryCards(){
   if(aEl){
     var ta=alTotalAssets();
     var rows=[
-      {l:'Precious Metals',v:alTotalMetals(),c:'var(--gold)',i:'metals'},
-      {l:'Crypto',v:alTotalCrypto(),c:'var(--teal)',i:'crypto'},
       {l:'Cash & Savings',v:alTotalCash(),c:'var(--green)',i:'cash'},
       {l:'House Deposit',v:state?state.saved:0,c:'var(--teal)',i:'house'},
-      {l:'Stocks & Funds',v:alTotalStocks(),c:'var(--green2)',i:'stocks'},
-      {l:'Wealth Inventory',v:alTotalOther(),c:'var(--purple)',i:'inv'}
+      {l:'Stocks & Shares',v:alTotalStocks(),c:'var(--green2)',i:'stocks'},
+      {l:'Precious Metals',v:alTotalMetals(),c:'var(--gold)',i:'metals'},
+      {l:'Wealth Inventory',v:alTotalOther(),c:'var(--purple)',i:'inv'},
+      {l:'Crypto',v:alTotalCrypto(),c:'var(--teal)',i:'crypto'}
     ];
-    aEl.innerHTML='<div class="ov-sum-total" style="color:var(--gr)">'+gbpFmt(ta)+'</div>'
+    aEl.innerHTML='<div class="ov-sum-total" style="color:var(--teal)">'+gbpFmt(ta)+'</div>'
       +(rows.filter(function(r){return r.v>0;}).map(function(r){
       return '<div class="ov-sum-row">'+ovIcon(r.i,r.c)+'<span class="ov-sum-l" style="color:'+r.c+'">'+r.l+'</span>'
         +'<span class="ov-sum-v">'+gbpFmt(r.v)+'</span></div>';
@@ -23306,7 +23368,7 @@ function jrnyTotalDebt() {
 }
 
 function jrnyTotalCash() {
-  return (alState.cashAccounts||[]).reduce(function(a,r){ return a + (+r.balance||0); }, 0);
+  return (alState.cashAccounts||[]).reduce(function(a,r){ return a + (+r.balance||0); }, 0) + Math.max(0, typeof alTotalPhysical === 'function' ? alTotalPhysical() : 0);
 }
 
 function jrnyHouseSaved() {
