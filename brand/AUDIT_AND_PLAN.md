@@ -63,7 +63,7 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 
 ### Open colour questions for the owner
 
-Brass is used here where the meaning is not achievement. Each needs a call: gold (now), green (cleared) or teal (built).
+**Decided 30 Oct (owner said yes):** debt progress bar red to green; monthly minimums, business MRR and monthly figures and the "warm" stage gold; budget save rate and positive net worth history change green. Done. Original list:
 - Debt progress bar (red to brass), Debt tab "monthly minimums"
 - Budget "save rate"
 - Business MRR and monthly figures, "in progress" and "warm" stage labels

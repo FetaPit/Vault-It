@@ -6780,7 +6780,7 @@ html, body { background: var(--bg); color: var(--tx); font-family: var(--font-bo
 .debt-name{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700}
 .debt-bal{font-family:'Share Tech Mono',monospace;font-size:.8rem;color:var(--re)}
 .debt-bar-wrap{height:4px;background:rgb(var(--ink-rgb) / .06);border-radius:2px;overflow:hidden}
-.debt-bar-fill{height:100%;background:linear-gradient(90deg,var(--re),var(--go));border-radius:2px;transition:width .6s}
+.debt-bar-fill{height:100%;background:linear-gradient(90deg,var(--re),var(--green));border-radius:2px;transition:width .6s}
 .debt-meta{display:flex;gap:16px;margin-top:7px;font-size:.58rem;color:var(--t3);font-family:'Share Tech Mono',monospace;flex-wrap:wrap}
 .cc-wrap{display:inline-block;vertical-align:top;margin:10px 12px 10px 0}
 .cc-portrait{position:relative;width:85px;height:135px;border-radius:8px;overflow:hidden;background:linear-gradient(160deg,#1a2a3a,var(--panel));border:1px solid rgb(var(--teal-rgb) / .35);font-family:'Share Tech Mono',monospace}
@@ -11094,7 +11094,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 <div style="max-width:900px;margin:0 auto;padding:24px 20px 60px">
     <div class="ov-kpis debt-strip" role="group" aria-label="Debt at a glance">
       <div class="ov-kpi"><div class="ov-kpi-lbl">Total Debt</div><div class="ov-kpi-val" id="debt-total" style="color:var(--re)">£0</div></div>
-      <div class="ov-kpi"><div class="ov-kpi-lbl">Monthly Minimums</div><div class="ov-kpi-val" id="debt-mins" style="color:var(--go)">£0/mo</div></div>
+      <div class="ov-kpi"><div class="ov-kpi-lbl">Monthly Minimums</div><div class="ov-kpi-val" id="debt-mins" style="color:var(--gold)">£0/mo</div></div>
       <div class="ov-kpi"><div class="ov-kpi-lbl">Debts Active</div><div class="ov-kpi-val" id="debt-count" style="color:var(--tx)">0</div></div>
       <div class="ov-kpi"><div class="ov-kpi-lbl">Est. Payoff</div><div class="ov-kpi-val" id="debt-payoff-kpi" style="color:var(--em)">—</div></div>
     </div>
@@ -11183,7 +11183,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div class="ov-chart-title">Income Stream Builder</div>
         <div style="display:flex;align-items:center;gap:14px">
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--go)">MRR: <span id="tab-total-biz" style="font-weight:700">£0/mo</span></span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--gold)">MRR: <span id="tab-total-biz" style="font-weight:700">£0/mo</span></span>
           <button class="btn-add-data" onclick="showStreamForm()">+ New Stream</button>
         </div>
       </div>
@@ -11216,7 +11216,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     </div>
 
     <div class="ov-kpis">
-      <div class="ov-kpi"><div class="ov-kpi-lbl">Monthly Recurring Revenue</div><div class="ov-kpi-val" id="biz-mrr" style="color:var(--go)">£0/mo</div></div>
+      <div class="ov-kpi"><div class="ov-kpi-lbl">Monthly Recurring Revenue</div><div class="ov-kpi-val" id="biz-mrr" style="color:var(--gold)">£0/mo</div></div>
       <div class="ov-kpi"><div class="ov-kpi-lbl">Active Clients</div><div class="ov-kpi-val" id="biz-clients-kpi" style="color:var(--em)">0</div></div>
       <div class="ov-kpi"><div class="ov-kpi-lbl">Pipeline Value</div><div class="ov-kpi-val" id="biz-pipeline" style="color:var(--t2)">£0/mo</div></div>
       <div class="ov-kpi">
@@ -18144,7 +18144,7 @@ function renderCashflow(){
     '<span style="'+mono+'color:var(--gr)">In: '+gbpFmt(tIn)+'/mo</span>'+
     '<span style="'+mono+'color:var(--re)">Spend: '+gbpFmt(tOut)+'/mo</span>'+
     '<span style="'+mono+'color:'+(surplus>=0?'var(--em)':'var(--re)')+'">Surplus: '+gbpFmt(surplus)+'/mo</span>'+
-    '<span style="'+mono+'color:var(--go)">Save rate: '+rate+'%</span>';
+    '<span style="'+mono+'color:var(--gr)">Save rate: '+rate+'%</span>';
   ['cf-legend','bd-legend'].forEach(function(id){var e=document.getElementById(id);if(e)e.innerHTML=cfLegendHTML();});
   // dashboard nudge: unassigned pounds → Budget tab
   var nd=document.getElementById('cf-nudge');
@@ -20656,7 +20656,7 @@ function renderBizTab(){
   var lds=document.getElementById('leads-list-el');
   if(lds){
     var leads=bizState.leads||[];
-    var stageColors={cold:'var(--t3)',warm:'var(--go)',hot:'var(--re)'};
+    var stageColors={cold:'var(--t3)',warm:'var(--gold)',hot:'var(--re)'};
     var stageIcons={cold:'❄️',warm:'🌤️',hot:'🔥'};
     lds.innerHTML=leads.length?leads.map(function(l){
       return'<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;margin-bottom:6px;background:var(--c2)">'
@@ -20670,7 +20670,7 @@ function renderBizTab(){
         +(l.notes?'<div style="font-size:.48rem;color:var(--t3);margin-top:2px">'+l.notes+'</div>':'')
         +'</div>'
         +'<span style="font-size:.58rem;color:'+stageColors[l.stage]+';font-weight:700;text-transform:uppercase;letter-spacing:.08em">'+l.stage+'</span>'
-        +'<span style="font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--go)">'+gbpFmt(l.value)+'/mo</span>'
+        +'<span style="font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--gold)">'+gbpFmt(l.value)+'/mo</span>'
         +'<button class="dep-btn" onclick="convertLead('+l.id+')" title="Convert to client" style="font-size:.55rem;padding:3px 8px;color:var(--gr);border-color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Convert</button>'
         +'<button class="data-item-del" onclick="deleteLead('+l.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
         +'</div>';
@@ -20696,7 +20696,7 @@ function renderBizTab(){
       +'</div>';
   }).join('')||'<div style="font-size:.6rem;color:var(--t3);text-align:center;padding:16px">No clients yet \u2014 add your first!</div>';
   var sl=document.getElementById('stream-list-el');
-  if(sl)sl.innerHTML=bizState.streams.map(function(r){return'<div class="data-item"><span>'+r.name+'</span><span class="data-item-val" style="color:var(--go)">'+gbpFmt(r.monthly)+'/mo</span><button class="data-item-del" onclick="deleteStream('+r.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>';}).join('')||'';
+  if(sl)sl.innerHTML=bizState.streams.map(function(r){return'<div class="data-item"><span>'+r.name+'</span><span class="data-item-val" style="color:var(--gold)">'+gbpFmt(r.monthly)+'/mo</span><button class="data-item-del" onclick="deleteStream('+r.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>';}).join('')||'';
   renderIncomeStreams();
   renderBizGoal();
 }
@@ -25393,7 +25393,7 @@ function nwhRenderHistory(data){
   html+='<div class="ov-kpi"><div class="ov-kpi-lbl">At 18</div><div class="ov-kpi-val" style="font-size:.78rem;color:var(--em)">'+nwhFmt(startNw)+'</div><div class="ov-kpi-sub">starting point</div></div>';
   html+='<div class="ov-kpi"><div class="ov-kpi-lbl">All-Time Low</div><div class="ov-kpi-val" style="font-size:.78rem;color:var(--re)">'+nwhFmt(minNw)+'</div><div class="ov-kpi-sub">trough</div></div>';
   html+='<div class="ov-kpi"><div class="ov-kpi-lbl">All-Time High</div><div class="ov-kpi-val" style="font-size:.78rem;color:var(--gr)">'+nwhFmt(maxNw)+'</div><div class="ov-kpi-sub">peak</div></div>';
-  html+='<div class="ov-kpi"><div class="ov-kpi-lbl">Total Growth</div><div class="ov-kpi-val" style="font-size:.78rem;color:'+(endNw-startNw>=0?'var(--go)':'var(--re)')+'">'+nwhFmt(endNw-startNw)+'</div><div class="ov-kpi-sub">since age 18</div></div>';
+  html+='<div class="ov-kpi"><div class="ov-kpi-lbl">Total Growth</div><div class="ov-kpi-val" style="font-size:.78rem;color:'+(endNw-startNw>=0?'var(--gr)':'var(--re)')+'">'+nwhFmt(endNw-startNw)+'</div><div class="ov-kpi-sub">since age 18</div></div>';
   html+='</div>';
   // Chart card
   html+='<div class="ov-chart-card" style="margin-bottom:18px">'

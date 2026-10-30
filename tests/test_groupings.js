@@ -46,6 +46,9 @@ const seed = () => {
         d3: plan.contains(document.getElementById('debt-interest-panel')) && vis('debt-interest-panel'), lbl: document.getElementById('debt-plan-lbl').textContent, cards: document.querySelectorAll('#tab-debt .ov-chart-card').length };
     });
     ok(d.d1, w + ': D1 the four debt figures are one strip');
+    const brass = await p.evaluate(() => { const v = n => { const e = document.createElement('i'); e.style.color = 'var(--' + n + ')'; document.body.appendChild(e); const c = getComputedStyle(e).color; e.remove(); return c; };
+      const bar = document.querySelector('.debt-bar-fill'); return { mins: getComputedStyle(document.getElementById('debt-mins')).color === v('gold'), bar: !bar || /linear-gradient/.test(getComputedStyle(bar).backgroundImage) && getComputedStyle(bar).backgroundImage.includes(v('green').replace('rgb(', '').split(',')[0]) }; });
+    ok(brass.mins && brass.bar, w + ': brass only means achievement: monthly minimums gold, debt bar red to green (owner, 30 Oct)');
     ok(d.hist && !d.donut, w + ': D2 one chart card, Histogram first');
     ok(d.d3 && d.lbl === 'Avalanche method', w + ': D3 strategy and its interest cost in one card');
     await p.evaluate(() => setDebtChart('break')); await p.waitForTimeout(300);
