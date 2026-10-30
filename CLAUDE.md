@@ -41,6 +41,11 @@ bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scri
 - `.claude/settings.json` enables the official Cloudflare plugin (`cloudflare@cloudflare`, from the `cloudflare/skills` marketplace): Cloudflare's skills (wrangler, Workers best practices, Turnstile, web performance …) and its MCP server `https://mcp.cloudflare.com/mcp`. The MCP server signs in with OAuth in a browser, which a cloud session cannot do — in cloud sessions use the claude.ai connector for the same URL, or a scoped `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` set in the environment (never paste tokens into chat).
 - Hosting is one Worker (`worker/index.mjs`, config `wrangler.jsonc`, site built by `tools/build_site.js`): app.vault-it.co → dist/app, vault-it.co → dist/landing, www → redirect, previews serve the app. The domain stays registered at Wix; only its nameservers moved to Cloudflare. Remaining steps and state: `docs/CUTOVER.md`.
 
+## Work queue (never skip instructed work)
+- `docs/QUEUE.md` is the owner's ordered list of instructed work. The `queue.sh` hook prints it at session start and on every prompt. Do items top to bottom; a newer ask never jumps an older one unless the owner reorders it.
+- Every new request from the owner goes into `docs/QUEUE.md` in the same turn, before any work on it. Mark `[~]` when starting, move to Done with the commit when finished.
+- Before starting any task and before any release, run the `queue-keeper` agent with the task; obey a STOP or ADD. "Release" is a queue item, not a reset of the queue.
+
 ## Brand rollout
 
 A new brand is being applied. Design files are in `brand/`. Open `brand/vault-it-brand-book.html` in a browser to see the target, and follow `brand/vault-it-brand-handover.md` phase by phase.
