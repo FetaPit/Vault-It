@@ -26,13 +26,14 @@ html{box-sizing:border-box}
   --t-fast:240ms; --t-base:600ms; --t-build:1800ms;
 }
 /* Daylight: deep teal ink on soft paper. Same hues, darker values, no bloom, blueprint grid instead of scanlines. */
+/* Daylight text values darkened (phase 6) so small text reaches 4.5:1 on paper and on tinted chips; same hues. */
 [data-theme="light"]{
   color-scheme:light;
   --bg:#F3F7F6; --panel:#FFFFFF; --panel2:#EAF2F1; --slate:#E3EDEC; --line:#C5DAD8; --line2:#9FC4C1;
   --text:#0B1F22; --muted:#3F5658; --faint:#2E6F6C; --lock:#5C6B6D;
-  --teal:#297B76; --teal-deep:#006B67; --gold:#8B6A15; --brass:#A18331;
-  --green:#207F54; --green2:#2C7D5C; --red:#D62929; --blue:#0B72C4; --purple:#815DBA; --orange:#CF6C24;
-  --coral:#C22A4F; --salmon:#E4645F; --amber:#BB7808; --yellow:#9B8609;
+  --teal:#24716C; --teal-deep:#006B67; --gold:#7F6112; --brass:#806827;
+  --green:#207F54; --green2:#2C7D5C; --red:#C02323; --blue:#0B72C4; --purple:#815DBA; --orange:#964E19;
+  --coral:#C22A4F; --salmon:#AF4C49; --amber:#955F06; --yellow:#7B6B07;
   --on-teal:#FFFFFF; --on-gold:#1A1400;
   --surf:#FFFFFF; --surf2:#FFFFFF; --track:#D9E7E6; --pillbg:#FFF6DD; --lib:#F1F7F6; --doneb:#E1F3F1; --toastbg:#FFFFFF;
   --lockline:#9AB0B1; --lockfg:#5C6B6D; --dotoff:#B9CCCB;

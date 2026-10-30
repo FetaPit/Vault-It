@@ -321,6 +321,18 @@
   var VP = Viewer.prototype;
 
   VP.start = function () { this.active = true; this.dirty = true; this.wake(); };
+  // Night: dark plot and teal survey grid. Daylight: a pale blueprint stage (no glow), same model.
+  VP.setTheme = function (light) {
+    if (this._light === !!light) return; this._light = !!light;
+    var bg = light ? 0xe3efee : 0x05101b, sc = this.scene;
+    sc.background = new THREE.Color(bg); if (sc.fog) sc.fog.color.setHex(bg);
+    this.ground.material.color = col(light ? 0xd6e7e5 : 0x0c1a20);
+    if (this.grid) { sc.remove(this.grid); this.grid.geometry.dispose(); this.grid.material.dispose(); }
+    var g = new THREE.GridHelper(240, 240, col(light ? 0x2e6f6c : 0x1f5e5a), col(light ? 0x9fc4c1 : 0x123734));
+    g.material.transparent = true; g.material.opacity = light ? 0.5 : 0.35; g.position.y = 0.001; sc.add(g); this.grid = g;
+    this.renderer.toneMappingExposure = light ? 0.95 : 1.05;
+    this.dirty = true; this.wake();
+  };
   VP.wake = function () { this._idle = 0; if (this.active && !this._raf) this._raf = requestAnimationFrame(this._loop); };
   VP.settled = function () { return !this._anim && this._idle > 2; };
   VP.stop = function () { this.active = false; if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; } };

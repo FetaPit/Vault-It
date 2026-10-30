@@ -28,8 +28,8 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 | 2 | Fonts and glyph clean-up | Done |
 | 3, 4 | Icons from the sprite, menu bar (tab colours, neon outline on the selected tab only, Network hidden, compact = icons only, phones and tablets start compact) | Done |
 | 5 | Colour code | Done |
-| 6 | Daylight polish (brief's phase 7): 3D stages still dark, Level chip gold text faint, KPI numbers glow | Next |
-| 7 | Logo and wordmark (brief's phase 8): 23 "Vault-It" with a hyphen, nav logo, `<title>`, `og:title`, manifest, favicon, tagline | |
+| 6 | Daylight polish (brief's phase 7) | Done |
+| 7 | Logo and wordmark (brief's phase 8): 23 "Vault-It" with a hyphen, nav logo, `<title>`, `og:title`, manifest, favicon, tagline | Next |
 | 8 | Groupings H1 to H4, O1, O2, D1 to D3, A1 (section 4, all approved) | |
 | 9 | House builder Level 2 fix (section 3) | |
 | 10 | Brand look and every animation on all six three.js models in `src/hb3d` (owner chose option a), behind `?house=new` | |
@@ -44,8 +44,16 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 - Asset class colours (sub-tabs, side panel, overview list, net worth blocks): metals gold, crypto teal, cash green, wealth inventory purple, stocks and funds green 2, house deposit teal, liabilities amber, debt red.
 - Debts (owner, 30 Oct): every debt keeps its lender's colours (`CC_BRANDS`) wherever it appears, in Night and Daylight: card artwork, histogram, donut, tree map, loan tile, overview summary, and the 3D net worth blocks to come. Debts with no known lender share a red ramp, largest strongest. All from `debtChartRamp(debts)`; near-black cards show their accent, colours close to the panel get a hairline.
 - Liabilities (owner, 30 Oct): the logged value shows everywhere (KPI, summary card, sub-tab, 3D view to come) with running costs as the second line. Net worth maths unchanged: the value counts as owned, running costs so far come off.
+- Daylight (phase 6): Daylight-only rules live in `<style id="vi-daylight">`. Generated SVG and canvas colours go through `viDay(str, brand)` (Night colours to Daylight; backgrounds and greys always, brand hues only for charts and text) and the SVG element helpers `E()` / `mE()`; drawings are redrawn on the theme switch. The 3D viewer has `setTheme(light)` (pale blueprint stage). `test_daylight` fails if any text on any tab drops under 3:1 in Daylight.
+- Daylight tokens changed from the brand file's first values so small text reaches 4.5:1 on paper and tinted chips (same hues): teal #24716C, gold #7F6112, brass #806827, orange #964E19, red #C02323, salmon #AF4C49, amber #955F06, yellow #7B6B07. `brand/vault-it-tokens.css` matches. Metals have tokens `--m-silver`, `--m-platinum`, `--m-palladium`.
 - Tests: the test browser reports a light device, so the app opens in Daylight under test. `test_cc3d` needs `test_hb1` to run first. `test_colour_code` covers phase 5.
 - Level 2 code to reuse: mortgage engine `hbcRead`, `hbL2Sims`; Budget spare `hbBudget()`. **Owner's rule for the overpayment what-ifs:** spare = unassigned + savings + investments, with the trade-off line.
+
+### Proposal: money owed to you (not built, owner to decide)
+
+- **Where it lives:** a seventh sub-tab in Assets and liabilities, "Owed to you" (people, deposits held by a landlord, refunds due), each with an amount, who owes it, an expected date and a "how sure" setting (expected or doubtful).
+- **Net worth:** expected amounts count as something you own; doubtful ones are shown but left out, so the headline figure never rests on money that may not come back.
+- **Dashboard:** one row in the "Own and owe" card and its own column above the plane in the 3D net worth view, in blue (the one hue no asset class uses). Not a separate KPI: it is usually small, and the stat strip stays at four figures.
 
 ### Open colour questions for the owner
 

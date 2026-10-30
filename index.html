@@ -23,7 +23,7 @@ html{box-sizing:border-box}
   --teal:#44C0B9; --teal-deep:#007F7B; --gold:#E8C56A; --brass:#C9A84C;
   --green:#3ECF8E; --green2:#3FB585; --red:#E05C5C; --blue:#64B5F6; --purple:#9B7EC8; --orange:#E0894A;
   --coral:#E5535F; --salmon:#EE7D7D; --amber:#F59E0B; --yellow:#F5DC4A;
-  --goldf:#E8C56A; --on-teal:#00181A; --on-gold:#1A1400; --pulse:2800ms;
+  --goldf:#E8C56A; --on-teal:#00181A; --m-silver:#C0C8D0; --m-platinum:#E0E8F0; --m-palladium:#D0D8E0; --on-gold:#1A1400; --pulse:2800ms;
   --surf:#0A1018; --surf2:#080D14; --track:#13202A; --pillbg:#12100A; --lib:#0A1618; --doneb:#0A1F22; --toastbg:#08181C;
   --lockline:#3A4446; --lockfg:#6A7678; --dotoff:#2A3638;
   --stat:#B6D8D6; --stext:0 0 8px #000; --rail-bg:rgba(0,12,18,.74); --rail-btn:rgba(8,24,28,.85);
@@ -46,10 +46,10 @@ html{box-sizing:border-box}
   color-scheme:light;
   --bg:#F3F7F6; --panel:#FFFFFF; --panel2:#EAF2F1; --slate:#E3EDEC; --line:#C5DAD8; --line2:#9FC4C1;
   --text:#0B1F22; --muted:#3F5658; --faint:#2E6F6C; --lock:#5C6B6D;
-  --teal:#297B76; --teal-deep:#006B67; --gold:#8B6A15; --brass:#A18331;
-  --green:#207F54; --green2:#2C7D5C; --red:#D62929; --blue:#0B72C4; --purple:#815DBA; --orange:#CF6C24;
-  --coral:#C22A4F; --salmon:#E4645F; --amber:#BB7808; --yellow:#9B8609;
-  --on-teal:#FFFFFF; --on-gold:#1A1400;
+  --teal:#24716C; --teal-deep:#006B67; --gold:#7F6112; --brass:#806827;
+  --green:#207F54; --green2:#2C7D5C; --red:#C02323; --blue:#0B72C4; --purple:#815DBA; --orange:#964E19;
+  --coral:#C22A4F; --salmon:#AF4C49; --amber:#955F06; --yellow:#7B6B07;
+  --on-teal:#FFFFFF; --m-silver:#5B6670; --m-platinum:#52606B; --m-palladium:#5F6870; --on-gold:#1A1400;
   --surf:#FFFFFF; --surf2:#FFFFFF; --track:#D9E7E6; --pillbg:#FFF6DD; --lib:#F1F7F6; --doneb:#E1F3F1; --toastbg:#FFFFFF;
   --lockline:#9AB0B1; --lockfg:#5C6B6D; --dotoff:#B9CCCB;
   --stat:#1E4A48; --stext:none; --rail-bg:rgba(255,255,255,.88); --rail-btn:#FFFFFF;
@@ -59,7 +59,7 @@ html{box-sizing:border-box}
   --tglow:none; --dglow:none; --popglow:none;
   --btn1:#006B67; --btn2:#00837E; --bshadow:0 6px 16px -8px rgba(0,90,88,.55);
   --glow:0 10px 28px -16px rgba(0,90,88,.35); --elev:0 1px 0 #fff inset,0 10px 28px -18px rgba(0,90,88,.3);
-  --ink-rgb:11 31 34;--bg-rgb:243 247 246;--panel-rgb:255 255 255;--teal-rgb:41 123 118;--teal-deep-rgb:0 107 103;--gold-rgb:139 106 21;--brass-rgb:161 131 49;--green-rgb:32 127 84;--green2-rgb:44 125 92;--red-rgb:214 41 41;--blue-rgb:11 114 196;--purple-rgb:129 93 186;--orange-rgb:207 108 36;--amber-rgb:187 120 8;
+  --ink-rgb:11 31 34;--bg-rgb:243 247 246;--panel-rgb:255 255 255;--teal-rgb:36 113 108;--teal-deep-rgb:0 107 103;--gold-rgb:127 97 18;--brass-rgb:128 104 39;--green-rgb:32 127 84;--green2-rgb:44 125 92;--red-rgb:192 35 35;--blue-rgb:11 114 196;--purple-rgb:129 93 186;--orange-rgb:150 78 25;--amber-rgb:149 95 6;
 }
 </style>
 <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Vault%C2%B7It%22%2C%22short_name%22%3A%22VaultIt%22%2C%22description%22%3A%22From%20debt%20to%20owning%20your%20home%20outright%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080808%22%2C%22theme_color%22%3A%22%2344c0b9%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bcharset%3Dutf-8%2C%253Csvg%2520viewBox%253D%25220%25200%2520100%2520100%2522%2520xmlns%253D%2522http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2522%253E%253Ccircle%2520cx%253D%252250%2522%2520cy%253D%252250%2522%2520r%253D%252247%2522%2520fill%253D%2522none%2522%2520stroke%253D%2522%252344c0b9%2522%2520stroke-width%253D%25222%2522%252F%253E%253Ccircle%2520cx%253D%252250%2522%2520cy%253D%252250%2522%2520r%253D%252242%2522%2520fill%253D%2522%2523030c14%2522%252F%253E%253Cpolyline%2520points%253D%252224%252C28%252050%252C64%252076%252C28%2522%2520fill%253D%2522none%2522%2520stroke%253D%2522%252344c0b9%2522%2520stroke-width%253D%25226%2522%252F%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
@@ -6235,6 +6235,18 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   var VP = Viewer.prototype;
 
   VP.start = function () { this.active = true; this.dirty = true; this.wake(); };
+  // Night: dark plot and teal survey grid. Daylight: a pale blueprint stage (no glow), same model.
+  VP.setTheme = function (light) {
+    if (this._light === !!light) return; this._light = !!light;
+    var bg = light ? 0xe3efee : 0x05101b, sc = this.scene;
+    sc.background = new THREE.Color(bg); if (sc.fog) sc.fog.color.setHex(bg);
+    this.ground.material.color = col(light ? 0xd6e7e5 : 0x0c1a20);
+    if (this.grid) { sc.remove(this.grid); this.grid.geometry.dispose(); this.grid.material.dispose(); }
+    var g = new THREE.GridHelper(240, 240, col(light ? 0x2e6f6c : 0x1f5e5a), col(light ? 0x9fc4c1 : 0x123734));
+    g.material.transparent = true; g.material.opacity = light ? 0.5 : 0.35; g.position.y = 0.001; sc.add(g); this.grid = g;
+    this.renderer.toneMappingExposure = light ? 0.95 : 1.05;
+    this.dirty = true; this.wake();
+  };
   VP.wake = function () { this._idle = 0; if (this.active && !this._raf) this._raf = requestAnimationFrame(this._loop); };
   VP.settled = function () { return !this._anim && this._idle > 2; };
   VP.stop = function () { this.active = false; if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; } };
@@ -8256,7 +8268,7 @@ body::before {
 .fire-block button.ghost,.fd-btn.ghost{color:var(--t2);background:transparent;border-color:var(--bd)}
 .fd-box{margin-top:8px;padding:9px 11px;border:1px solid rgb(var(--teal-rgb) / .25);border-radius:7px;background:rgb(var(--teal-rgb) / .05);font-size:.56rem;color:var(--t2);line-height:1.5}
 .fd-box.ok{border-color:rgb(var(--green-rgb) / .5);background:rgb(var(--green-rgb) / .07);color:#bfe9d3}
-.fd-box.warn{border-color:rgba(232,162,60,.55);background:rgba(232,162,60,.07)}
+.fd-box.warn{border-color:rgb(var(--amber-rgb) / .55);background:rgb(var(--amber-rgb) / .07)}
 .fd-box .fd-h{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:.14em;color:var(--t3);margin-bottom:3px}
 .fd-box ul{margin:0;padding-left:16px}.fd-box li{margin:2px 0}
 .fd-box .fd-sub{margin-top:6px;color:var(--t3)}
@@ -9158,8 +9170,8 @@ input:focus, textarea:focus, select:focus {
 .cf-row .cf-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cf-edit{background:none;border:none;color:var(--t3);cursor:pointer;font-size:.7rem;padding:0 3px}
 .cf-edit:hover{color:var(--em)}
-.cf-nudge{margin:8px 0;padding:9px 12px;background:rgba(232,162,60,.08);border:1px solid rgba(232,162,60,.3);border-radius:8px;font-size:.55rem;color:var(--t2);line-height:1.5}
-.cf-nudge b{color:#e8a23c}
+.cf-nudge{margin:8px 0;padding:9px 12px;background:rgb(var(--amber-rgb) / .08);border:1px solid rgb(var(--amber-rgb) / .3);border-radius:8px;font-size:.55rem;color:var(--t2);line-height:1.5}
+.cf-nudge b{color:var(--amber)}
 .fr-legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:6px 4px 8px;font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--t2)}
 .fr-legend span{display:inline-flex;align-items:center;gap:6px}
 /* ── Stocks & Funds (portfolio pies) ── */
@@ -9317,7 +9329,7 @@ input:focus, textarea:focus, select:focus {
 .tab-btn[onclick*="budget"].active{color:var(--blue)!important;border-bottom-color:var(--blue)!important;text-shadow:0 0 12px rgb(var(--blue-rgb) / .55)}
 .tab-btn[onclick*="budget"]::before{background:var(--blue)}
 .tab-btn[onclick*="budget"]{--ta:var(--blue)}
-#budget-badge{display:none;width:7px;height:7px;border-radius:50%;background:#e8a23c;margin-left:5px;box-shadow:0 0 8px #e8a23c;vertical-align:middle}
+#budget-badge{display:none;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-left:5px;box-shadow:0 0 8px var(--amber);vertical-align:middle}
 .bd-zero-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
 .bd-big{font-family:'Syne',sans-serif;font-size:clamp(1.3rem,3.2vw,2rem);font-weight:800;letter-spacing:-.01em;line-height:1.15}
 .bd-msg{font-size:.58rem;color:var(--t2);margin-top:6px;max-width:520px;line-height:1.55}
@@ -9325,7 +9337,7 @@ input:focus, textarea:focus, select:focus {
 .bd-stats label{display:block;font-family:'Share Tech Mono',monospace;font-size:.42rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
 .bd-stats b{font-family:'Share Tech Mono',monospace;font-size:.85rem;font-weight:700;color:var(--tx)}
 .bd-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:rgb(var(--ink-rgb) / .06)}
-.bd-rest{background:repeating-linear-gradient(45deg,rgba(232,162,60,.55) 0 5px,rgba(232,162,60,.18) 5px 10px)}
+.bd-rest{background:repeating-linear-gradient(45deg,rgb(var(--amber-rgb) / .55) 0 5px,rgb(var(--amber-rgb) / .18) 5px 10px)}
 .bd-assign{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--t2)}
 .bd-picks{display:flex;flex-wrap:wrap;gap:6px}
 .bd-pick-lbl{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin:12px 0 6px}
@@ -9487,6 +9499,37 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   html body.vi-compact #topnav .vi-tabs,html #topnav.compact-nav .vi-tabs{justify-content:space-between}
   html body.vi-compact #topnav .tab-btn,html #topnav.compact-nav .tab-btn{flex:1 1 0!important;width:auto;max-width:64px}
 }
+</style>
+<style id="vi-daylight">
+/* ═══ Daylight polish (brand phase 6): ink on paper, no glow, nothing faint. Night is untouched. ═══ */
+/* no bloom: glows become nothing on paper */
+[data-theme="light"] *{text-shadow:none!important}
+[data-theme="light"] .ov-kpi-val,[data-theme="light"] .sb-val{filter:none!important}
+/* titles and eyebrows dimmed for Night read at full strength on paper */
+[data-theme="light"] .ov-chart-title,[data-theme="light"] .ov-ms-title,[data-theme="light"] .card-lbl,[data-theme="light"] .vi-eyebrow{opacity:1!important}
+[data-theme="light"] .vi-sub{color:var(--muted)!important}
+/* primary buttons: white on teal */
+[data-theme="light"] .btn-add-data{color:var(--on-teal)!important;background:var(--btn1);border-color:var(--btn1)}
+[data-theme="light"] .btn-add-data:hover{background:var(--btn2)}
+/* House builder: parchment text from the old tracker becomes ink */
+[data-theme="light"] .price-edit-row label,[data-theme="light"] .igrp label,[data-theme="light"] .tgt-amt,[data-theme="light"] .sl,[data-theme="light"] .log-entry,[data-theme="light"] .scene-cap{color:var(--muted)!important;opacity:1!important}
+[data-theme="light"] .ms-lbl{color:var(--lock)!important;opacity:1!important}
+[data-theme="light"] .hbtn{color:var(--muted)}
+[data-theme="light"] .hbtn .pr{opacity:1!important}
+[data-theme="light"] .hb-lv.on,[data-theme="light"] .hb-bd.got,[data-theme="light"] .hb-tip td:last-child{color:var(--gold)!important}
+[data-theme="light"] .hb-lv.lock{opacity:.75!important}
+[data-theme="light"] .ms{opacity:1!important}
+[data-theme="light"] .bd-qa-t{opacity:1!important}
+.vi-dim{opacity:.6}[data-theme="light"] .vi-dim{opacity:1;color:var(--muted)}
+[data-theme="light"] #btnReset{color:var(--lock)!important}
+[data-theme="light"] .hb-row-n b{color:var(--text)}
+[data-theme="light"] .data-item-del{opacity:.8}
+[data-theme="light"] .sym{color:var(--gold)!important}
+/* 3D stage controls and hints */
+[data-theme="light"] .hud-btn,[data-theme="light"] .vp-gi-hd,[data-theme="light"] .vp-gi-lbl,[data-theme="light"] .vp-gi-ico,[data-theme="light"] .vp-gi b,[data-theme="light"] .vp-key{color:var(--teal-deep)!important}
+[data-theme="light"] #nw-zoom-hint{color:var(--muted)!important}
+/* outside brand colours on paper */
+[data-theme="light"] a[href*="wa.me"]{color:#0E7A44!important}
 </style>
 </head>
 <body>
@@ -10533,7 +10576,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 <div id="tab-budget" class="tab-panel" style="display:none">
   <div style="max-width:1040px;margin:0 auto;padding:24px 20px 60px">
     <div style="margin-bottom:14px">
-      <div style="font-family:'Syne',sans-serif;font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:var(--blue);opacity:.8;margin-bottom:6px">Vault·It · Budget</div>
+      <div style="font-family:'Syne',sans-serif;font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:var(--blue);opacity:.8;margin-bottom:6px" class="vi-eyebrow">Vault·It · Budget</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--t3);letter-spacing:.08em;margin-top:4px">ZERO-BASED BUDGET &nbsp;·&nbsp; INCOME − SPENDING − SAVING = £0</div>
     </div>
     <div class="ov-chart-card" style="margin-bottom:14px"><div id="bd-zero"></div></div>
@@ -10597,9 +10640,9 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 <!-- VERBATIM house-tracker.html content starts here -->
 <div class="wrap" style="max-width:1140px;margin:0 auto;padding:0 20px">
   <header style="text-align:center;margin-bottom:44px">
-    <div style="font-family:'Syne',sans-serif;font-size:.52rem;letter-spacing:.35em;text-transform:uppercase;color:var(--teal);opacity:.65;margin-bottom:8px">Vault·It · House Builder</div>
+    <div style="font-family:'Syne',sans-serif;font-size:.52rem;letter-spacing:.35em;text-transform:uppercase;color:var(--teal);opacity:.65;margin-bottom:8px" class="vi-eyebrow">Vault·It · House Builder</div>
     <h1 style="font-family:'Syne',sans-serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:800;color:var(--text);letter-spacing:-.02em">Build Your <span style="color:var(--teal)">Dream Home</span></h1>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:.72rem;color:#5a8888;opacity:.7;margin-top:5px;letter-spacing:.08em">Every pound saved builds your future</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.72rem;color:#5a8888;opacity:.7;margin-top:5px;letter-spacing:.08em" class="vi-eyebrow vi-sub">Every pound saved builds your future</div>
   </header>
   <div id="hb-levels" class="hb-levels"></div>
   <div class="grid">
@@ -12487,8 +12530,6 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .bd-p100-bar{height:9px;border-radius:5px;background:rgb(var(--ink-rgb) / .07);overflow:hidden}
 .bd-p100-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 60%,#fff))}
 .bd-p100-row b{font:700 .78rem 'Share Tech Mono',monospace;text-align:right;color:var(--tx)}
-/* Daylight: salmon, amber and yellow are under 4.5:1 on white, so small text stays ink; the colour stays on icons, swatches, bars and borders */
-[data-theme="light"] .bd-amt,[data-theme="light"] .bd-tile-tt b,[data-theme="light"] .bd-qa-t{color:var(--text)!important}
 
 /* ═══ House Builder 3D (Three.js) ═══ */
 #house-scene>canvas.hb3d-canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;z-index:0;cursor:grab}
@@ -13332,8 +13373,8 @@ function pct(){return Math.min(state.saved/depositTarget(),1);}
 const S = document.getElementById('houseSvg');
 const NS = 'http://www.w3.org/2000/svg';
 function E(tag,attrs,parent){
-  const e=document.createElementNS(NS,tag);
-  for(const[k,v]of Object.entries(attrs))e.setAttribute(k,String(v));
+  const e=document.createElementNS(NS,tag),day=typeof viLight==='function'&&viLight();
+  for(const[k,v]of Object.entries(attrs))e.setAttribute(k,day&&(k==='fill'||k==='stroke'||k==='stop-color')?viDay(String(v),false):String(v));   // Daylight stage
   if(parent)parent.appendChild(e);
   return e;
 }
@@ -14560,7 +14601,7 @@ function hbRenderHUD(){
         +'<div class="hb-row-sub">'+(RS.p>=0.9999?'Every row is built — your deposit is funded.':_cs+Math.round(RS.toRow*_cr).toLocaleString('en-GB')+' to finish this row · '+_cs+Math.round(RS.per*_cr).toLocaleString('en-GB')+' lays one row')+'</div>'
         +'<button class="stk-btn" onclick="hbJumpToRow()">📍 Show it on the house</button></div>';
     }
-    el.innerHTML='<div class="card-lbl">LEVEL 1 · FIRST DEPOSIT <span style="opacity:.6">· hologram build</span></div>'
+    el.innerHTML='<div class="card-lbl">LEVEL 1 · FIRST DEPOSIT <span class="vi-dim">· hologram build</span></div>'
       +'<div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--text)"><span>'+gbpFmt(state.saved||0)+' saved</span><span>'+(p*100).toFixed(1)+'% of '+gbpFmt(dt)+'</span></div>'
       +'<div class="hb-xp"><div style="width:'+(p*100).toFixed(1)+'%"></div></div>'
       +rowHtml
@@ -15265,6 +15306,7 @@ function hb3dRedraw() {
       if (ob) ob.classList.add('orbit-active'); if (oi) oi.textContent = '⟳';
       var key = document.querySelector('#houseSceneCard .vp-key'); if (key) key.textContent = 'DRAG · orbit   ·   RIGHT-DRAG / 2 FINGERS · pan   ·   SCROLL / PINCH · zoom';
     }
+    if (v.setTheme) v.setTheme(typeof viLight === 'function' && viLight());
     v.start();
     var key2 = hb3dKey(sm.type, sm.floor), model = hb3dModel(sm.type, sm.floor), changed = key2 !== HB3DAPP.key;
     if (changed) {
@@ -17819,6 +17861,7 @@ function drawCashflowDiagram(){
     out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2+11).toFixed(1)+'" font-size="10" font-family="Share Tech Mono,monospace" fill="#8f9bab" '+halo+'>'+cfMoney(n.it.amt)+' ('+pct(n.it.amt)+')</text>';
   });
   out+='</svg>';
+  out=viDay(out);
   hosts.forEach(function(h){if(h.__sig!==out){h.__sig=out;h.innerHTML=out;}});   // identical markup = no repaint
 }
 // ── Budget tab rendering ──
@@ -17875,7 +17918,7 @@ function bdRenderPer100(){
   var used=0;
   var rows=CF_GROUP_ORDER.map(function(g){var v=cfSum(m.by[g]),per=v/m.tIn*100;used+=per;return per>0.05?'<div class="bd-p100-row" style="--c:'+CF_GROUPS[g].col+';--t:'+CF_GROUPS[g].tx+'"><span class="bd-p100-ic">'+bdGroupIcon(g,18)+'</span><span class="bd-p100-l">'+CF_GROUPS[g].short+'</span><span class="bd-p100-bar"><i style="width:'+Math.min(100,per).toFixed(1)+'%"></i></span><b>£'+per.toFixed(0)+'</b></div>':'';}).join('');
   var left=Math.max(0,100-used);
-  el.innerHTML=rows+(left>0.5?'<div class="bd-p100-row" style="--c:#e8a23c;--t:#e8a23c"><span class="bd-p100-ic">◌</span><span class="bd-p100-l">Unassigned</span><span class="bd-p100-bar"><i style="width:'+left.toFixed(1)+'%"></i></span><b>£'+left.toFixed(0)+'</b></div>':'');
+  el.innerHTML=rows+(left>0.5?'<div class="bd-p100-row" style="--c:var(--amber);--t:var(--amber)"><span class="bd-p100-ic">◌</span><span class="bd-p100-l">Unassigned</span><span class="bd-p100-bar"><i style="width:'+left.toFixed(1)+'%"></i></span><b>£'+left.toFixed(0)+'</b></div>':'');
 }
 function bdRenderLists(){
   var m=cfModel();
@@ -17945,7 +17988,7 @@ function bdRenderZero(){
   var el=document.getElementById('bd-zero');if(!el)return;
   var s=bdState(),m=s.m;
   var denom=Math.max(m.tIn,s.assigned,1);
-  var col=s.st==='zero'?'#3ecf8e':s.st==='under'?'#e8a23c':s.st==='over'?'#e05c5c':'#7d8793';
+  var col=s.st==='zero'?'var(--green)':s.st==='under'?'var(--amber)':s.st==='over'?'var(--red)':'var(--lock)';
   var big=s.st==='none'?'Add your income':s.st==='zero'?'Every pound accounted for ✓':cfMoney(Math.abs(s.left))+(s.st==='under'?' left to assign':' over-assigned');
   var msg=s.st==='none'?'Start with what comes in each month — then plan where it goes.'
     :s.st==='zero'?'Income − spending − saving = £0. That’s a zero-based budget. Nothing is left to chance.'
@@ -17976,7 +18019,7 @@ function bdUpdateBadge(){
   var s=bdState(),show=s.st==='under'||s.st==='over';
   b.style.display=show?'inline-block':'none';
   b.title=show?(s.st==='under'?cfMoney(s.left)+' still unassigned':'Over-assigned by '+cfMoney(-s.left)):'';
-  b.style.background=s.st==='over'?'#e05c5c':'#e8a23c';
+  b.style.background=s.st==='over'?'var(--red)':'var(--amber)';
 }
 function cfLegendHTML(){
   return CF_GROUP_ORDER.map(function(t){return '<span title="'+cfEsc(CF_GROUPS[t].ex)+'" style="--c:'+CF_GROUPS[t].tx+'"><i style="background:'+CF_GROUPS[t].col+'"></i><s>'+bdGroupIcon(t,22)+'</s>'+CF_GROUPS[t].short+'</span>';}).join('');
@@ -18029,12 +18072,12 @@ function renderCashflowCategories(){
     var segs=b.types.map(function(t){var v=cfSum(m.by[t]);return v>0?'<div title="'+CF_GROUPS[t].short+' '+cfMoney(v)+'" style="width:'+Math.min(100,v/m.total*100).toFixed(2)+'%;background:'+CF_GROUPS[t].col+'"></div>':'';}).join('');
     return '<div style="margin-bottom:12px">'
       +'<div style="display:flex;justify-content:space-between;gap:8px;font-size:.58rem;margin-bottom:4px"><span style="color:var(--tx);font-weight:700">'+b.label+' <span style="color:var(--t3);font-weight:400">· '+b.guide+'</span></span>'
-      +'<span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(sum)+'/mo &nbsp;<b style="color:'+(bad?'#e8a23c':'var(--tx)')+'">'+pct+'%</b></span></div>'
+      +'<span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(sum)+'/mo &nbsp;<b style="color:'+(bad?'var(--amber)':'var(--tx)')+'">'+pct+'%</b></span></div>'
       +'<div style="position:relative;display:flex;height:8px;background:rgb(var(--ink-rgb) / .06);border-radius:4px;overflow:visible">'
       +'<div style="display:flex;width:100%;border-radius:4px;overflow:hidden">'+segs+'</div>'
       +'<div title="Guide: '+b.target+'%" style="position:absolute;top:-3px;bottom:-3px;left:'+b.target+'%;width:2px;background:rgb(var(--ink-rgb) / .4)"></div></div></div>';
   }).join('')
-  +(m.overflow>0.5?'<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;gap:8px;font-size:.58rem;margin-bottom:4px"><span style="color:#e8a23c;font-weight:700">Unassigned</span><span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(m.overflow)+'/mo &nbsp;<b style="color:#e8a23c">'+Math.round(m.overflow/m.total*100)+'%</b></span></div><div style="height:8px;border-radius:4px;background:rgb(var(--ink-rgb) / .06)"><div style="height:100%;width:'+Math.min(100,m.overflow/m.total*100)+'%;border-radius:4px" class="bd-rest"></div></div></div>':'')
+  +(m.overflow>0.5?'<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;gap:8px;font-size:.58rem;margin-bottom:4px"><span style="color:var(--amber);font-weight:700">Unassigned</span><span style="font-family:\'Share Tech Mono\',monospace;color:var(--t2)">'+gbpFmt(m.overflow)+'/mo &nbsp;<b style="color:var(--amber)">'+Math.round(m.overflow/m.total*100)+'%</b></span></div><div style="height:8px;border-radius:4px;background:rgb(var(--ink-rgb) / .06)"><div style="height:100%;width:'+Math.min(100,m.overflow/m.total*100)+'%;border-radius:4px" class="bd-rest"></div></div></div>':'')
   +(m.shortfall>0?'<div style="font-size:.55rem;color:var(--red);margin-top:4px">⚠ You are planning to spend '+gbpFmt(m.shortfall)+'/mo more than you earn.</div>':'');
 }
 
@@ -18906,8 +18949,8 @@ function renderMetalsISO(){
   MS.innerHTML='';
   var NS2='http://www.w3.org/2000/svg';
   function mE(tag,attrs,par){
-    var el=document.createElementNS(NS2,tag);
-    for(var k in attrs)el.setAttribute(k,String(attrs[k]));
+    var el=document.createElementNS(NS2,tag),day=viLight();
+    for(var k in attrs)el.setAttribute(k,day&&(k==='fill'||k==='stroke'||k==='stop-color')?viDay(String(attrs[k]),false):String(attrs[k]));   // Daylight stage
     if(par)par.appendChild(el);
     return el;
   }
@@ -19008,12 +19051,12 @@ function renderMetalsISO(){
   // Labels
   function mlabel(x,y,z,text,col,fs){
     var p3=mIso(x,y,z);
-    mE('text',{x:p3.x.toFixed(1),y:p3.y.toFixed(1),'font-size':fs||9,'font-family':'Syne,sans-serif','font-weight':'700',fill:col,'text-anchor':'start','pointer-events':'none'},MS).textContent=text;
+    mE('text',{x:p3.x.toFixed(1),y:p3.y.toFixed(1),'font-size':fs||9,'font-family':'Syne,sans-serif','font-weight':'700',style:'fill:'+col,'text-anchor':'start','pointer-events':'none'},MS).textContent=text;
   }
-  if(alState.metals.gold>0)      mlabel(-0.8,-0.8,GH+0.4,'GOLD — '+alState.metals.gold.toFixed(2)+' oz · 1oz bars','#c9a84c',8);
-  if(alState.metals.silver>0)    mlabel(silverStartCol-0.5,-0.8,SH+0.4,'SILVER — '+alState.metals.silver.toFixed(2)+' oz · 1oz bars','#c0c8d0',8);
-  if(alState.metals.platinum>0)  mlabel(-0.8,ptStartRow-0.7,PH+0.4,'PLATINUM — '+alState.metals.platinum.toFixed(2)+' oz · 1oz wafers','#e0e8f0',8);
-  if(alState.metals.palladium>0) mlabel(-0.8,pdStartRow-0.7,PDH+0.4,'PALLADIUM — '+alState.metals.palladium.toFixed(2)+' oz · 1oz wafers','#d0d8e0',8);
+  if(alState.metals.gold>0)      mlabel(-0.8,-0.8,GH+0.4,'GOLD: '+alState.metals.gold.toFixed(2)+' oz · 1oz bars','var(--gold)',8);
+  if(alState.metals.silver>0)    mlabel(silverStartCol-0.5,-0.8,SH+0.4,'SILVER: '+alState.metals.silver.toFixed(2)+' oz · 1oz bars','var(--m-silver)',8);
+  if(alState.metals.platinum>0)  mlabel(-0.8,ptStartRow-0.7,PH+0.4,'PLATINUM: '+alState.metals.platinum.toFixed(2)+' oz · 1oz wafers','var(--m-platinum)',8);
+  if(alState.metals.palladium>0) mlabel(-0.8,pdStartRow-0.7,PDH+0.4,'PALLADIUM: '+alState.metals.palladium.toFixed(2)+' oz · 1oz wafers','var(--m-palladium)',8);
 
   // Total value footer
   var tv=alTotalMetals();
@@ -19036,7 +19079,7 @@ function renderMetalsISO(){
 }
 
 function renderMetalsInputs(){
-  var metals=[{k:'gold',lbl:'Gold',col:'#c9a84c'},{k:'silver',lbl:'Silver',col:'#c0c8d0'},{k:'platinum',lbl:'Platinum',col:'#e0e8f0'},{k:'palladium',lbl:'Palladium',col:'#d0d8e0'}];
+  var metals=[{k:'gold',lbl:'Gold',col:'var(--gold)'},{k:'silver',lbl:'Silver',col:'var(--m-silver)'},{k:'platinum',lbl:'Platinum',col:'var(--m-platinum)'},{k:'palladium',lbl:'Palladium',col:'var(--m-palladium)'}];
   var mi=document.getElementById('metals-inputs');
   if(mi)mi.innerHTML=metals.map(function(m){
     return'<div class="metal-row"><span class="metal-lbl" style="color:'+m.col+'">'+m.lbl+'</span>'
@@ -21668,6 +21711,25 @@ function _drawCompletionExtras(svg,x,y,z,W,D,WH){
 function viCss(name){try{return getComputedStyle(document.documentElement).getPropertyValue('--'+name).trim()||'#888';}catch(e){return '#888';}}
 function viRgba(name,a){var v=viCss(name+'-rgb');return v&&v!=='#888'?'rgb('+v+' / '+a+')':viCss(name);}
 function viLight(){return document.documentElement.getAttribute('data-theme')==='light';}
+// ── Daylight: swap Night colours in generated SVG / canvas strings. Backgrounds and greys always; brand hues only where asked. No-op in Night. ──
+var VI_DAY_BASE={'030810':'e6f1f0','060d16':'e6f1f0','050c14':'ffffff','0d1520':'ffffff','0a121e':'ffffff','0d1f1f':'eaf2f1','1a2a2a':'d9e7e6',
+  'e9f1f1':'0b1f22','cfe9e7':'0b1f22','dfe6ec':'0b1f22','dfe6ea':'0b1f22','d8dfe5':'0b1f22','f1f4f6':'0b1f22','c5ced6':'3f5658','c9d6e3':'3f5658',
+  'b9c4cf':'3f5658','8fb4b1':'3f5658','8f9bab':'3f5658','8fa3b5':'3f5658','8b97a3':'5c6b6d','7d8793':'5c6b6d','6b7780':'5c6b6d','6b8197':'5c6b6d','8a93a6':'5c6b6d','d4c5a9':'3f5658','f1d98b':'7f6112'};
+var VI_DAY_BRAND={'44c0b9':'24716c','38a09a':'24716c','c9a84c':'806827','e8c56a':'7f6112','3ecf8e':'207f54','3fb585':'2c7d5c','9b7ec8':'815dba','e0894a':'964e19',
+  'e05c5c':'c02323','e8a23c':'955f06','f59e0b':'955f06','64b5f6':'0b72c4','e5535f':'c22a4f','ee7d7d':'af4c49','f5dc4a':'7b6b07'};
+var VI_DAY_RGB={'10,18,30':'255,255,255','6,12,22':'243,247,246','4,10,14':'255,255,255','6,18,32':'234,242,241','2,4,8':'200,222,220',
+  '154,160,166':'92,107,109','110,120,132':'63,86,88','125,135,147':'92,107,109','90,96,104':'92,107,109','150,160,170':'63,86,88','140,150,160':'63,86,88','232,232,232':'11,31,34'};
+var VI_DAY_RGB_BRAND={'68,192,185':'36,113,108','201,168,76':'128,104,39','224,92,92':'192,35,35','62,207,142':'32,127,84','232,197,106':'127,97,18','200,168,64':'128,104,39','232,162,60':'149,95,6'};
+function viDay(str,brand){
+  if(!str||typeof VI_DAY_BASE==='undefined'||!VI_DAY_BASE||!viLight())return str;
+  str=String(str).replace(/#([0-9a-f]{6})/gi,function(m,h){h=h.toLowerCase();var d=VI_DAY_BASE[h]||(brand!==false&&VI_DAY_BRAND[h]);return d?'#'+d:m;});
+  return str.replace(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/g,function(m,r,g,b){var k=r+','+g+','+b,d=VI_DAY_RGB[k]||(brand!==false&&VI_DAY_RGB_BRAND[k]);return d?m.replace(k,d).replace(/\s/g,''):m;});
+}
+// same swap on an SVG already in the page (shapes keep their own material colours: brand hues untouched)
+function viDaySvg(root){
+  if(!root||!viLight())return;
+  root.querySelectorAll('[fill],[stroke],[stop-color]').forEach(function(e){['fill','stroke','stop-color'].forEach(function(a){var v=e.getAttribute(a);if(v){var n=viDay(v,false);if(n!==v)e.setAttribute(a,n);}});});
+}
 // debt charts: a red ramp, the largest debt strongest (issuer colours stay on the card artwork only)
 function debtChartRamp(debts){
   var tok=function(n){var v=viCss(n+'-rgb').split(/[\s,]+/).map(Number);return v.length===3&&v.every(function(x){return x>=0;})?v:[128,128,128];};
@@ -21790,9 +21852,9 @@ function drawDebtDonut(){
     if(pal.edge){ctx.strokeStyle=viRgba('ink',.35);ctx.lineWidth=1;ctx.stroke();}
     angle+=slice;
   });
-  ctx.fillStyle='rgba(232,232,232,0.95)';ctx.font='bold '+Math.max(13,r*0.2)+"px 'Share Tech Mono',monospace";ctx.textAlign='center';
+  ctx.fillStyle=viCss('text');ctx.font='bold '+Math.max(13,r*0.2)+"px 'Share Tech Mono',monospace";ctx.textAlign='center';
   ctx.fillText(gbpFmt(total),cx,cy+fs*0.3);
-  ctx.fillStyle='rgba(150,160,170,0.85)';ctx.font=fs*0.9+"px 'DM Sans',sans-serif";
+  ctx.fillStyle=viCss('muted');ctx.font=fs*0.9+"px 'DM Sans',sans-serif";
   ctx.fillText('total debt',cx,cy+fs*1.6);
   // legend: swatches carry each card's colours
   var items=debts.slice().sort(function(a,b){return b.balance-a.balance;});
@@ -21801,9 +21863,9 @@ function drawDebtDonut(){
     items.forEach(function(d,i){
       var pal=ramp[d.id],y=ly+i*fs*2.1,g=ctx.createLinearGradient(lx,y,lx+fs*1.6,y+fs*1.1);g.addColorStop(0,pal.c1);g.addColorStop(1,pal.c2);
       ctx.fillStyle=g;ctx.fillRect(lx,y-fs*0.85,fs*1.6,fs*1.1);
-      ctx.fillStyle='#d8dfe5';ctx.font=fs+"px 'DM Sans',sans-serif";ctx.textAlign='left';
+      ctx.fillStyle=viCss('text');ctx.font=fs+"px 'DM Sans',sans-serif";ctx.textAlign='left';
       var nm=String(d.name);ctx.fillText((nm.length>16?nm.slice(0,15)+'…':nm),lx+fs*2.1,y);
-      ctx.fillStyle='rgba(150,160,170,.9)';ctx.font=fs*0.88+"px 'Share Tech Mono',monospace";ctx.fillText(Math.round(d.balance/total*100)+'% · '+gbpFmt(d.balance),lx+fs*2.1,y+fs*0.95);
+      ctx.fillStyle=viCss('muted');ctx.font=fs*0.88+"px 'Share Tech Mono',monospace";ctx.fillText(Math.round(d.balance/total*100)+'% · '+gbpFmt(d.balance),lx+fs*2.1,y+fs*0.95);
     });
   }
 }
@@ -22058,7 +22120,7 @@ function renderFIREroadmap(){
   if(lbl){
     var ph=phases[focus.phase];
     lbl.textContent=(nextIdx>=0?'STAGE '+(nextIdx+1)+'/30 · ':'COMPLETE · ')+ph.label;
-    lbl.style.color=ph.col;lbl.style.borderColor=ph.col+'44';lbl.style.background=ph.col+'11';
+    lbl.style.color=viDay(ph.col);lbl.style.borderColor=viDay(ph.col+'44');lbl.style.background=viDay(ph.col+'11');
   }
   var pt=document.getElementById('fire-progress-txt');
   if(pt)pt.textContent=doneCount+' of '+stages.length+' achieved'+(skipCount?' · '+skipCount+' skipped':'');
@@ -22168,6 +22230,7 @@ function renderFIREroadmap(){
   svgEl.setAttribute('width',x1-x0);svgEl.setAttribute('height',H);
   svgEl.style.left=x0+'px';
   renderFIREroadmap._win={x0:x0,x1:x1,total:TOTAL_W};
+  out=viDay(out);
   if(svgEl.__sig!==out){svgEl.__sig=out;svgEl.innerHTML=out;}   // identical drawing = no repaint
 }
 // scrolling the track just moves the window; it is only redrawn when the user gets near its edge
@@ -22486,7 +22549,7 @@ function renderCashISO(){
   if(cap){
     cap.textContent=gbpFmt(total)+' \u2014 '+fullCubes+' full stacks'+(remainder>0?' + \u00a3'+remainder:'')+' \u00b7 each stack = \u00a31,000';
   }
-  MS.innerHTML=svgContent;
+  MS.innerHTML=viDay(svgContent,false);
 }
 
 (function(){
@@ -25261,6 +25324,8 @@ function viToggleTheme(){
   try{document.dispatchEvent(new CustomEvent('vi-theme',{detail:next}));}catch(e){}
   try{drawChart();}catch(e){}
   try{var _dt=document.getElementById('tab-debt');if(_dt&&_dt.style.display!=='none'){drawDebtHistogram();drawDebtDonut();}}catch(e){}
+  // SVG drawings bake their colours in: redraw them for the new theme
+  [function(){renderCashflow();},function(){renderFIREroadmap();},function(){renderMetalsISO();},function(){renderCashISO();},function(){if(typeof redraw==='function')redraw();}].forEach(function(f){try{f();}catch(e){}});
   if(typeof toast==='function')toast(next==='light'?'Daylight mode':'Night mode');
 }
 document.addEventListener('DOMContentLoaded',viSyncTheme);
