@@ -9185,6 +9185,7 @@ input:focus, textarea:focus, select:focus {
 .hb-lv.on{border-color:var(--brass);color:#f1d98b;background:rgb(var(--brass-rgb) / .12);box-shadow:0 0 14px rgb(var(--brass-rgb) / .18)}
 .hb-lv.done{border-color:rgb(var(--green-rgb) / .5);color:var(--green)}
 .hb-lv.lock{opacity:.45;cursor:not-allowed}
+.hb-undo{margin-top:12px;text-align:right}.hb-undo-btn{background:transparent!important;border-color:var(--t2)!important;color:var(--t1)!important}
 .hb-xp{height:8px;border-radius:99px;background:rgb(var(--ink-rgb) / .07);overflow:hidden;margin:8px 0 6px}
 .hb-xp>div{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--brass));transition:width .5s}
 .hb-st{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
@@ -14724,9 +14725,16 @@ function renderHabitTracker(){
 }
 document.getElementById('savingsInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnAdd').click();});
 
+// Level 2 and 3 exist only after "I've bought it". These are the fields that step sets (markHousePurchased, Level 3).
+function hbClearPurchase(){delete state.houseMode;delete state.mortgageActive;state.mortgageBalance=0;delete state.purchase;delete state.valuation;delete state.level3;delete state.viewLevel;}
+function hbUndoPurchase(){
+  if(state.houseMode!=='purchased')return;
+  if(!confirm('Not bought yet? This takes the house back to Level 1 (saving for the deposit). Your savings log, house type, price and deposit % are kept.'))return;
+  hbClearPurchase();prevP=0;save();updateUI();updateKPIs();toast('Back to Level 1: saving for your deposit');
+}
 document.getElementById('btnReset').addEventListener('click',()=>{
-  if(!confirm('Reset all savings progress?'))return;
-  state.saved=0;state.deposits=[];prevP=0;save();updateUI();updateKPIs();drawChart();toast('Tracker reset. Start saving!');
+  if(!confirm('Reset the house builder? This clears your savings log and takes the house back to Level 1. Your house type, price and deposit % are kept.'))return;
+  state.saved=0;state.deposits=[];hbClearPurchase();prevP=0;save();updateUI();updateKPIs();drawChart();toast('Tracker reset. Start saving!');
 });
 
 // ── HOUSE-TYPE MILESTONE LABELS ──────────────────────────────────
@@ -14825,6 +14833,7 @@ function hbRenderHUD(){
   } else {
     hbRenderL3(el);
   }
+  if(view>=2&&state.houseMode==='purchased')el.insertAdjacentHTML('beforeend','<div class="hb-undo"><button type="button" class="btn-add-data hb-undo-btn" onclick="hbUndoPurchase()">Not bought yet? Back to Level 1</button></div>');
   hbBadgeToasts(p);
 }
 function hbBadgeToasts(p){
