@@ -1,46 +1,17 @@
-# Vault·It
+# Vault·It brand package
 
-> *"From debt to owning your home outright."*
+Open `vault-it-brand-book.html` in a browser first. It is the visual and behavioural reference for everything else.
 
-**Alpha v0.9.0** — Secure personal finance intelligence. Email OTP auth. Cross-device vault sync. Works as a PWA.
+| File | Use |
+| --- | --- |
+| `vault-it-brand-book.html` | The interactive brand book. Source of truth |
+| `vault-it-brand-handover.md` | The full build brief, phase by phase, with acceptance criteria |
+| `vault-it-3d-engine.js` | The 3D engine: to-scale house, net worth scene, tracker. Use as is |
+| `vault-it-tokens.css` | Colour, type, radius, motion tokens for Night and Daylight |
+| `vault-it-components.css` | Menu bar, 3D stage, rail, pills, stat tiles, toggle styles |
+| `vault-it-icons.svg` | Icon sprite (`#vi-<id>`) |
+| `vault-it-icons.json` | Icon manifest: names, groups, colours, where each is used |
+| `vault-it-logo-mark-*.svg` | Brand mark, Night and Daylight |
+| `vault-it-tokens.json`, `tailwind.vault-it.js` | Same tokens for other toolchains. Only if needed |
 
-## Live
-
-**[app.vault-it.co](https://app.vault-it.co)** (landing page: [vault-it.co](https://vault-it.co)). Earlier address: [fetapit.github.io/Vault-It](https://fetapit.github.io/Vault-It/)
-
-## What It Does
-
-A single-file web app that takes you from debt to owning your home — one stage at a time.
-
-| Tab | What It Tracks |
-|---|---|
-| Overview | Net worth KPIs, asset/debt entry, NW chart |
-| House Builder | Isometric house progression, deposit target |
-| Metals | Precious metals holdings, live spot prices |
-| Assets | Stocks & funds, crypto, cash, other assets |
-| Debt | Snowball/avalanche planner, interest calculations |
-| Cashflow | Income vs expenses, savings rate |
-| Journey | Financial milestone tracker |
-
-## Stack
-
-- Single HTML file — all CSS, JS, HTML inline
-- Supabase — email OTP auth, cross-device vault sync, per-user RLS
-- Cloudflare Workers — static hosting and DNS (app.vault-it.co, vault-it.co), built from `release/pioneer-v2`; GitHub Pages still serves the older address
-- Pointer Events API — gesture system for isometric viewports
-- No framework · No bundler · No build step
-
-## Alpha
-
-33 Pioneer spots. Invite-only. Free tier + Pioneer (£7.77/mo).
-
-## Branches
-
-| Branch | Purpose |
-|---|---|
-| `release/pioneer-v2` | Production — GitHub Pages serves from here |
-| `claude/pioneer-v2-migration-UaFPz` | Development |
-
----
-
-*Not financial advice. Consult a qualified advisor.*
+`CLAUDE_ADDENDUM.md` is text to **append** to the repo's existing `CLAUDE.md`. Do not replace that file.
