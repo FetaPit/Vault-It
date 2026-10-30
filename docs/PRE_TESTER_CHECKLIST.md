@@ -8,7 +8,10 @@ Branch `brand-rollout`. Done and pushed: colour code, Daylight polish, logo and 
 - Phases 5 to 8 and the 3D viewer: happy. Green tint: fine as is.
 - E-mails: redeployed with "Vault-It" (`send-auth-email` v10, `waitlist-welcome` v2). Check the sender name in the `FROM_EMAIL` / `WELCOME_FROM` secrets.
 - Total assets: teal (done). Yahoo for the free beta: fine.
-- Still open: photo-to-3D provider (5), brass uses and "money owed to you" (7), the Poly Pizza result (3).
+- Poly Pizza: loads from the preview. 3D from photos: works. Image search was broken (LoremFlickr only returns one default photo since Flickr blocked it): replaced with Openverse.
+- Daylight was too bright: now off-white paper with a faint teal grid.
+- New feature asked for: link an asset to its live market value. Proposal: `docs/LIVE_MARKET_VALUE.md`.
+- Still open: photo-to-3D provider (5), brass uses and "money owed to you" (7).
 
 ## For Pete to decide (original list)
 

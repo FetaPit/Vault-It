@@ -20,7 +20,7 @@ const scan = () => {
   const parse = c => { const m = c.match(/[\d.]+/g); return m ? { r: +m[0], g: +m[1], b: +m[2], a: m[3] == null ? 1 : +m[3] } : null; };
   const lum = c => [c.r, c.g, c.b].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0);
   const blend = (f, bg) => ({ r: f.r * f.a + bg.r * (1 - f.a), g: f.g * f.a + bg.g * (1 - f.a), b: f.b * f.a + bg.b * (1 - f.a), a: 1 });
-  const bgOf = el => { const stack = []; for (let e = el; e; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.backgroundImage !== 'none') return null; const c = parse(cs.backgroundColor); if (c && c.a > 0) { stack.push(c); if (c.a >= .99) break; } } let bg = { r: 243, g: 247, b: 246, a: 1 }; for (let i = stack.length - 1; i >= 0; i--) bg = blend(stack[i], bg); return bg; };
+  const bgOf = el => { const stack = []; for (let e = el; e; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.backgroundImage !== 'none') return null; const c = parse(cs.backgroundColor); if (c && c.a > 0) { stack.push(c); if (c.a >= .99) break; } } let bg = { r: 241, g: 240, b: 234, a: 1 }; for (let i = stack.length - 1; i >= 0; i--) bg = blend(stack[i], bg); return bg; };
   const out = [];
   document.querySelectorAll('.tab-panel *, #topnav *').forEach(el => {
     if (!el.offsetParent || el.closest('svg,canvas,input,select,textarea,[disabled],.scene,.inv-stage,.cc3-card,.cc3,[class*="cc3-"]')) return;
@@ -41,7 +41,7 @@ const scanInputs = () => {
   const L = c => [c.r, c.g, c.b].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0);
   return [...document.querySelectorAll('.tab-panel input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=file]), .tab-panel select, .tab-panel textarea')]
     .filter(e => e.offsetParent && !e.closest('.scene,.inv-stage')).map(e => { let bg = null; for (let x = e; x; x = x.parentElement) { const c = P(getComputedStyle(x).backgroundColor); if (c && c.a > .5) { bg = c; break; } }
-      bg = bg || { r: 243, g: 247, b: 246 }; const f = P(getComputedStyle(e).color), cr = (Math.max(L(f), L(bg)) + .05) / (Math.min(L(f), L(bg)) + .05); return cr < 3 ? '#' + (e.id || e.className) + ' ' + cr.toFixed(2) : null; }).filter(Boolean);
+      bg = bg || { r: 241, g: 240, b: 234 }; const f = P(getComputedStyle(e).color), cr = (Math.max(L(f), L(bg)) + .05) / (Math.min(L(f), L(bg)) + .05); return cr < 3 ? '#' + (e.id || e.className) + ' ' + cr.toFixed(2) : null; }).filter(Boolean);
 };
 (async () => {
   const b = await chromium.launch(); const errs = [];
@@ -65,14 +65,16 @@ const scanInputs = () => {
   }));
   ok(g.glow === 'none', 'no glow on the big numbers (' + g.glow + ')');
   ok(/^#e6f1f0$/i.test(g.roadmapBg || ''), 'roadmap stage is paper, not Night (' + g.roadmapBg + ')');
-  ok(!g.sankeyHalo || /^#ffffff$/i.test(g.sankeyHalo), 'Sankey label halo is paper (' + g.sankeyHalo + ')');
+  ok(!g.sankeyHalo || /^#fbfaf6$/i.test(g.sankeyHalo), 'Sankey label halo is paper (' + g.sankeyHalo + ')');
   ok(g.night, 'Night colours are swapped in Daylight');
+  const paper = await p.evaluate(() => { const cs = getComputedStyle(document.body); return { bg: cs.backgroundColor, img: cs.backgroundImage }; });
+  ok(paper.bg === 'rgb(241, 240, 234)' && /linear-gradient\(rgba\(0, 127, 123, 0\.07\)/.test(paper.img), 'Daylight page is off-white with a faint teal grid (' + paper.bg + ')');
   // 3D viewports keep the Night look in both modes (owner, 30 Oct)
   await p.evaluate(() => showTab('assets')); await p.waitForTimeout(900);
   const vp = await p.evaluate(() => { const sc = document.getElementById('metals-scene'), cs = getComputedStyle(sc);
     return { bg: cs.getPropertyValue('--bg').trim(), teal: cs.getPropertyValue('--teal').trim(), em: getComputedStyle(sc.querySelector('.vp-gi-hd') || sc).color, page: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
       stage: (document.querySelector('#metalsSvg rect') || { getAttribute: () => '' }).getAttribute('fill') }; });
-  ok(vp.page.toUpperCase() === '#F3F7F6' && vp.bg.toUpperCase() === '#080808' && vp.teal.toUpperCase() === '#44C0B9', '3D viewports keep Night tokens in Daylight (page ' + vp.page + ', viewport ' + vp.bg + ' / ' + vp.teal + ')');
+  ok(vp.page.toUpperCase() === '#F1F0EA' && vp.bg.toUpperCase() === '#080808' && vp.teal.toUpperCase() === '#44C0B9', '3D viewports keep Night tokens in Daylight (page ' + vp.page + ', viewport ' + vp.bg + ' / ' + vp.teal + ')');
   ok(/^#060d16$/i.test(vp.stage), 'metals stage keeps its Night background (' + vp.stage + ')');
   await p.evaluate(() => viToggleTheme()); await p.waitForTimeout(600);
   const n = await p.evaluate(() => ({ t: viTheme(), swap: viDay('#030810') }));

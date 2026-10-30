@@ -29,18 +29,18 @@ html{box-sizing:border-box}
 /* Daylight text values darkened (phase 6) so small text reaches 4.5:1 on paper and on tinted chips; same hues. */
 [data-theme="light"]{
   color-scheme:light;
-  --bg:#F3F7F6; --panel:#FFFFFF; --panel2:#EAF2F1; --slate:#E3EDEC; --line:#C5DAD8; --line2:#9FC4C1;
+  --bg:#F1F0EA; --panel:#FBFAF6; --panel2:#E8EEEA; --slate:#E3EDEC; --line:#C5DAD8; --line2:#9FC4C1;
   --text:#0B1F22; --muted:#3F5658; --faint:#2E6F6C; --lock:#5C6B6D;
   --teal:#24716C; --teal-deep:#006B67; --gold:#7F6112; --brass:#806827;
   --green:#207F54; --green2:#2C7D5C; --red:#C02323; --blue:#0B72C4; --purple:#815DBA; --orange:#964E19;
   --coral:#C22A4F; --salmon:#AF4C49; --amber:#955F06; --yellow:#7B6B07;
   --on-teal:#FFFFFF; --on-gold:#1A1400;
-  --surf:#FFFFFF; --surf2:#FFFFFF; --track:#D9E7E6; --pillbg:#FFF6DD; --lib:#F1F7F6; --doneb:#E1F3F1; --toastbg:#FFFFFF;
+  --surf:#FBFAF6; --surf2:#FBFAF6; --track:#D9E7E6; --pillbg:#FFF6DD; --lib:#F4F4EE; --doneb:#E1F3F1; --toastbg:#FBFAF6;
   --lockline:#9AB0B1; --lockfg:#5C6B6D; --dotoff:#B9CCCB;
-  --stat:#1E4A48; --stext:none; --rail-bg:rgba(255,255,255,.88); --rail-btn:#FFFFFF;
+  --stat:#1E4A48; --stext:none; --rail-bg:rgba(251,250,246,.9); --rail-btn:#FBFAF6;
   --stage-bg:radial-gradient(120% 90% at 50% 100%,#D3E9E7 0%,#E6F2F1 50%,#F6FAF9 100%);
   --scan:linear-gradient(rgba(0,127,123,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.07) 1px,transparent 1px);--scan-size:26px 26px;
-  --paper-img:linear-gradient(rgba(0,127,123,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.05) 1px,transparent 1px);--paper-size:32px 32px;
+  --paper-img:linear-gradient(rgba(0,127,123,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.07) 1px,transparent 1px);--paper-size:32px 32px;
   --tglow:none; --dglow:none; --popglow:none;
   --btn1:#006B67; --btn2:#00837E; --bshadow:0 6px 16px -8px rgba(0,90,88,.55);
   --glow:0 10px 28px -16px rgba(0,90,88,.35); --elev:0 1px 0 #fff inset,0 10px 28px -18px rgba(0,90,88,.3);
