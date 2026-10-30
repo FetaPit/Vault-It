@@ -56,13 +56,33 @@ Two different uses:
 
 Sources: [Poly Haven licence](https://polyhaven.com/license), [Poly Haven public API](https://github.com/Poly-Haven/Public-API), [Poly Pizza fact sheet](https://poly.pizza/docs/press), [Poly Pizza MCP](https://glama.ai/mcp/servers/MatthewHallCom/Poly-Pizza-MCP), [multi-source asset MCP](https://glama.ai/mcp/servers/jonit-dev/threenative-asset-mcp), [sketchfab-mcp-server](https://npmjs.com/package/sketchfab-mcp-server), [BlenderMCP](https://www.flowhunt.io/mcp-servers/blender), [Smithsonian Open Access 3D](https://www.si.edu/spotlight/openaccesshighlights).
 
-## Poly Pizza API notes (ours)
+## Poly Pizza API notes (ours, tested live 30 Oct 2026)
 
-- Base `https://api.poly.pizza/v1/`. Key in header `X-Auth-Token` (no prefix). In build sessions the key is a network secret on `api.poly.pizza` (added by the proxy, never in code or chat); in the app it is Supabase secret `POLYPIZZA_API_KEY`, used only by an edge function.
-- `GET /search/{query}?limit=5` (also `cursor`, `format=glb`, `tricount=0-5000`), `GET /model/{id}`, `GET /popular`. Results carry `ID`, `Title`, `Creator.Username`, `Creator.PURL`, `Thumbnail`, `Download` (a .glb on the CDN, no key needed), `Licence`, `Tags`, `TriangleCount`.
-- Licence: CC0 needs nothing; CC-BY 4.0 shows on the tile: "Title" by Username (poly.pizza) CC-BY 4.0. Store the credit with the item.
-- Store the model ID, not just the file: IDs are stable. 429 means back off for a second.
-- Not yet verified live (key arrives in the next session); the field names come from a community guide.
+- Base `https://api.poly.pizza/v1/` (v1.1 also answers). Key in header `X-Auth-Token`, no prefix. Build sessions: network secret on `api.poly.pizza`. App: Supabase secret `POLYPIZZA_API_KEY`, edge function only.
+- `GET /search/{query}?limit=6` returns `{ total, results }`. Each result: `ID`, `Title`, `Description`, `Attribution` (a ready-made credit line), `Thumbnail` (.webp), `Download` (.glb on `static.poly.pizza`), `Tri Count`, `Creator.Username`, `Category`, `Tags`, `Licence` ("CC0 1.0" or "CC-BY 3.0"), `Animated`, `Orbit` (a suggested camera angle). The community guide's field names (`TriangleCount`, `PURL`, `cursor`) are wrong.
+- **Downloads:** `static.poly.pizza` sits behind a Cloudflare bot check ("Just a moment…"), so a server (our edge function, or this build session) cannot fetch the .glb. A user's browser normally passes it, so the app would load the model straight into the viewer from the browser; whether the CDN allows that from app.vault-it.co (CORS) is not yet checked. Commercial use is pay as you go: ask Poly Pizza for server-side download access when signing up for it.
+- Licence: CC0 needs nothing; for CC-BY show the `Attribution` line on the tile and store it with the item. Store the model `ID` (stable).
+
+### Search results (best match per item: CC0 first, then fewest triangles)
+
+| Item | Matches | Best | Next |
+| --- | --- | --- | --- |
+| Gibson Les Paul | 15 | Guitar, CC0, 2,325 tris (Quaternius) | Electric guitar, CC-BY, 560 tris (Poly by Google) |
+| Watch | 4 | No real watch (monitors); "wristwatch" finds Watch and Wrist Watch, CC-BY | Poly Haven has photoreal watches, CC0 |
+| Ring | 63 | Ring, CC-BY, 288 tris; Diamond Solitaire Ring, CC-BY | |
+| Necklace | 33 | Necklace, CC0, 792 tris (Quaternius) | Pearl necklace, CC-BY |
+| Sports car | 88 | Convertible, CC-BY, 1,671 tris | Camaro ZL1, Nissan GTR (branded: avoid) |
+| Motorbike | 42 | Motorcycle, CC-BY, 432 tris | |
+| Bicycle | 43 | Bicycle, CC-BY, 1,714 tris | |
+| Laptop | 50 | Laptop, CC0, 136 tris (Kenney) | |
+| Camera | 66 | Instant Camera, CC-BY, 494 tris | Poly Haven Camera_01, CC0 |
+| Painting | 81 | Wall painting, CC-BY, 96 tris | Poly Haven picture frames, CC0 |
+| Handbag | 50 | Bag, CC0, 1,232 tris (Quaternius); "Purse", CC-BY | |
+| Trainers | 4 | Trainer, CC-BY, 474 tris; Sneakers, CC-BY | |
+| Games console | 29 | Videogame, CC-BY, 309 tris; PS3 Slim (branded: avoid) | Poly Haven gaming_console, CC0 |
+| Gold bar | 36 | Gold Bars, CC0, 286 tris | Gold Ingots, CC0 |
+
+Search needs matching words: map item names to search terms ("Gibson Les Paul Standard" → "electric guitar", "Rolex" → "wristwatch"). File sizes are not measured yet (downloads blocked here).
 
 ## Needs the owner's yes before building
 
