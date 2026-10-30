@@ -5,7 +5,9 @@ disable-model-invocation: true
 argument-hint: "[next task, optional]"
 ---
 
-Write `.claude/handoff.md` (overwrite it). Max 25 lines:
+1. Get the note path:
+   `p=$(git rev-parse --show-toplevel 2>/dev/null || pwd); mkdir -p ~/.claude/handoffs; echo ~/.claude/handoffs/$(echo "$p" | tr / -).md`
+2. Write that file (overwrite). Max 25 lines:
 
 ```
 ## Goal
@@ -20,6 +22,6 @@ Write `.claude/handoff.md` (overwrite it). Max 25 lines:
 <the argument, if given>
 ```
 
-Rules: facts only, no narration. Leave out anything already in CLAUDE.md. Do not paste code.
+Facts only, no narration. Leave out anything already in CLAUDE.md. No code.
 
-Then tell the user in one line: "Saved. Run /clear (same task) or start a new session (new task). The note loads automatically." If the note is stale later, they can delete the file.
+3. Tell the user in one line: "Saved. Run /clear (same task) or start a new session (new task). The note loads automatically."

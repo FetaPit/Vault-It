@@ -4,6 +4,8 @@ Opus is the architect, Sonnet the contractor, Haiku the labourer. Don't pay the 
 
 ## Claude Code (set up in this repo)
 
+To apply the same setup to every project and to cloud sessions, see `claude-kit/README.md`.
+
 | What | How it saves | Where |
 | --- | --- | --- |
 | `opusplan` model | Opus only in plan mode (shift+tab twice). Sonnet does the edits. | `.claude/settings.json` |

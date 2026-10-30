@@ -6,8 +6,9 @@ cd "${CLAUDE_PROJECT_DIR:-$(dirname "$0")/..}" || exit 0
 echo "# Project map (line numbers). Read big files by range only."
 bash tools/codemap.sh 2>/dev/null || echo "(codemap failed; run bash tools/codemap.sh)"
 
-if [ -s .claude/handoff.md ]; then
+note="$HOME/.claude/handoffs/$(pwd | tr / -).md"
+if [ -s "$note" ]; then
   echo
-  echo "# Handoff from last session (.claude/handoff.md)"
-  cat .claude/handoff.md
+  echo "# Handoff from last session ($note)"
+  cat "$note"
 fi
