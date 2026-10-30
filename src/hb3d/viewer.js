@@ -82,6 +82,7 @@
   };
 
   var GEOM = null;
+  H._geoms = function () { return geoms(); };
   function geoms() {
     if (GEOM) return GEOM;
     GEOM = {
@@ -245,7 +246,7 @@
     return C;
   }
 
-  var IDLE_PLANE = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e5);   // keeps every material on one clipping plane at all times
+  var IDLE_PLANE = H._IDLE_PLANE = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e5);   // keeps every material on one clipping plane at all times
   var tmpM = new THREE.Matrix4(), tmpQ = new THREE.Quaternion(), tmpE = new THREE.Euler(0, 0, 0, 'YZX'), tmpP = new THREE.Vector3(), tmpS = new THREE.Vector3(), tmpC = new THREE.Color();
 
   function Viewer(container, opts) {
@@ -254,7 +255,8 @@
     this.opts = opts;
     var w = Math.max(1, container.clientWidth), h = Math.max(1, container.clientHeight);
     var r = this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.preserve });
-    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, Math.sqrt(budget / Math.max(1, w * h)))); };
+    var me = this;   // brand look (house flag): pixel ratio capped at 1.5 below 700 px wide, 2 above (brand handover 6.10)
+    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, me.brand ? (me._bLite ? 1 : w < 700 ? 1.5 : 2) : 9, Math.sqrt(budget / Math.max(1, w * h)))); };
     r.setPixelRatio(this._dprFor(w, h));
     r.setSize(w, h, false);
     r.outputEncoding = THREE.sRGBEncoding;
@@ -303,6 +305,7 @@
       var moving = self.controls.update();
       if (self._anim) moving = self._stepAnim() || moving;
       if (self._fly) moving = self._stepFly() || moving;
+      if (self._brandTick) moving = self._brandTick() || moving;   // brand look: smoothing, brick drops, pulse, sweep, ring (only while on screen)
       if (self.dirty || moving) { self.render(); self.dirty = false; self._idle = 0; } else self._idle++;
       if (self._idle > 45) return;                         // nothing moving for ~0.75 s: sleep until woken
       self._raf = requestAnimationFrame(self._loop);
@@ -322,7 +325,7 @@
 
   VP.start = function () { this.active = true; this.dirty = true; this.wake(); };
   VP.wake = function () { this._idle = 0; if (this.active && !this._raf) this._raf = requestAnimationFrame(this._loop); };
-  VP.settled = function () { return !this._anim && this._idle > 2; };
+  VP.settled = function () { if (this._brandActive && this._brandActive()) return this._brandSettled(); return !this._anim && this._idle > 2; };
   VP.stop = function () { this.active = false; if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; } };
   VP.resize = function () {
     var w = this.el.clientWidth, h = this.el.clientHeight;
@@ -348,6 +351,7 @@
 
   VP._clear = function () {
     var self = this;
+    if (this._brandClear) this._brandClear();
     this.batches.forEach(function (b) { self.root.remove(b.main); self.root.remove(b.rev); b.main.dispose && b.main.dispose(); b.rev.dispose && b.rev.dispose(); });
     this.batches = [];
     if (this.edges) { this.root.remove(this.edges); this.edges.geometry.dispose(); this.edges = null; }
@@ -496,13 +500,14 @@
   // Flats / apartments (model.focus): only the user's own floor builds and turns to colour; the rest of the block
   // stays a faint hologram for context.
   VP.setState = function (s) {
-    if (s.p != null) this.p = Math.max(0, Math.min(1, s.p));
+    if (s.p != null) { this.p = Math.max(0, Math.min(1, s.p)); this._bTarget = this.p; }
     if (s.mode) this.mode = s.mode;
     if (s.eq != null) this.eq = Math.max(0, Math.min(1, s.eq));
     if (s.lights != null) this.lights = !!s.lights;
     this.apply();
   };
   VP.animateTo = function (p1, ms) {
+    if (this._brandActive && this._brandActive()) { this._bTarget = Math.max(0, Math.min(1, p1)); this.dirty = true; this.wake(); return; }   // brand: eased by the frame loop
     var reduce = (typeof document !== 'undefined' && document.body && document.body.classList.contains('reduced-motion')) || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     if (reduce || !(ms > 0) || Math.abs(p1 - this.p) < 1e-4) { this.setState({ p: p1 }); return; }
     this._anim = { p0: this.p, p1: p1, t0: performance.now(), ms: ms };
@@ -517,6 +522,8 @@
   function upper(t, p) { var lo = 0, hi = t.length; while (lo < hi) { var m = (lo + hi) >> 1; if (t[m] <= p) lo = m + 1; else hi = m; } return lo; }
   VP.apply = function () {
     var self = this, m = this.model; if (!m) { this.dirty = true; return; }
+    if (this._brandActive && this._brandActive()) { this._brandApplyAll(); return; }   // brand look for the Level 1 build (house flag)
+    if (this._bOn) this._brandEnv(false);
     var mode = this.mode, p = mode === 'build' ? this.p : (mode === 'site' ? 0 : 1), F = m.focus;
     var y0 = F ? F.y0 : (m.rows ? m.rows.y0 : 0), y1 = F ? F.y1 : (m.rows ? m.rows.y1 : Math.max(0.5, m.height)), clipY = y0 + this.eq * (y1 - y0);
     var below = new THREE.Plane(new THREE.Vector3(0, -1, 0), clipY), above = new THREE.Plane(new THREE.Vector3(0, 1, 0), -clipY);
@@ -600,6 +607,7 @@
   // the row the deposit has built to: { y, row, rows, p, ratio }  (build mode; p = deposit % funded)
   VP.rowInfo = function () {
     var m = this.model; if (!m || !m.rows) return null;
+    if (this._brandActive && this._brandActive() && this._bInfo) { var bi = this._bInfo; return { y: bi.y, row: bi.row, rows: bi.rows, p: bi.p, brand: bi }; }
     var p = this.mode === 'build' ? this.p : (this.mode === 'site' ? 0 : 1), R = m.rows;
     return { y: R.y0 + p * (R.y1 - R.y0), row: p <= 0 ? 0 : Math.min(R.n, Math.floor(p * R.n - 1e-9) + 1), rows: R.n, p: p };
   };
@@ -621,6 +629,7 @@
   VP.dispose = function () {
     this.stop(); this._clear();
     if (this._ro) this._ro.disconnect();
+    if (this._bIO) this._bIO.disconnect();
     this.controls.dispose(); this.renderer.dispose();
     if (this.renderer.domElement.parentNode) this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
   };
