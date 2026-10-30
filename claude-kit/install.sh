@@ -7,7 +7,7 @@
 #
 # Safe to re-run. Backs up ~/.claude/settings.json first, merges instead of
 # overwriting, and never replaces an agent, skill or CLAUDE.md section it did
-# not install. Needs bash and python3.
+# not install. Needs bash and Python 3. On Windows, run it in Git Bash.
 set -euo pipefail
 
 REF="${CLAUDE_KIT_REF:-ccr-1e6fa12e-ez0xw6}"
@@ -17,7 +17,9 @@ KIT="$CLAUDE_DIR/kit"
 MARK="<!-- claude-kit -->"
 MODE="${1:-install}"
 
-command -v python3 >/dev/null || { echo "claude-kit needs python3" >&2; exit 1; }
+# python3 on Mac/Linux, python or py on Windows (skips the Microsoft Store stub).
+PY=""; for c in python3 python "py -3"; do $c -c "import sys" >/dev/null 2>&1 && { PY=$c; break; }; done
+[ -n "$PY" ] || { echo "claude-kit needs Python 3 (Windows: winget install -e --id Python.Python.3.13)" >&2; exit 1; }
 mkdir -p "$CLAUDE_DIR"
 
 # Find the kit files: next to this script, or download them.
@@ -46,12 +48,12 @@ place() {
 
 # Settings merge / unmerge. Previous model and effort are saved for uninstall.
 settings() {
-  python3 - "$CLAUDE_DIR/settings.json" "$KIT/prev.json" "$1" <<'PY'
+  $PY - "$CLAUDE_DIR/settings.json" "$KIT/prev.json" "$1" <<'PY'
 import json, os, shutil, sys, time
 path, prev_path, mode = sys.argv[1:4]
 cfg = {}
 if os.path.exists(path):
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         cfg = json.load(f)
     shutil.copy(path, f"{path}.bak-{time.strftime('%Y%m%d-%H%M%S')}")
 
@@ -66,7 +68,7 @@ def ours(entry):
 starts = cfg.setdefault("hooks", {}).setdefault("SessionStart", [])
 if mode == "install":
     if not os.path.exists(prev_path):
-        with open(prev_path, "w") as f:
+        with open(prev_path, "w", encoding="utf-8") as f:
             json.dump({k: cfg.get(k) for k in WANT}, f)
     cfg.update(WANT)
     cfg.setdefault("env", {}).update(ENV)
@@ -76,7 +78,7 @@ if mode == "install":
         starts.append({"matcher": "startup|clear",
                        "hooks": [{"type": "command", "command": f"bash \"{HOOK}\"", "timeout": 20}]})
 else:
-    prev = json.load(open(prev_path)) if os.path.exists(prev_path) else {}
+    prev = json.load(open(prev_path, encoding="utf-8")) if os.path.exists(prev_path) else {}
     for k in WANT:
         if prev.get(k) is None:
             cfg.pop(k, None)
@@ -94,7 +96,7 @@ if not starts:
     cfg["hooks"].pop("SessionStart")
 if not cfg["hooks"]:
     cfg.pop("hooks")
-with open(path, "w") as f:
+with open(path, "w", encoding="utf-8") as f:
     json.dump(cfg, f, indent=2)
     f.write("\n")
 PY
@@ -102,14 +104,14 @@ PY
 
 # Add or remove the kit's block in the user CLAUDE.md, leaving the rest alone.
 claude_md() {
-  python3 - "$CLAUDE_DIR/CLAUDE.md" "${1:-}" <<'PY'
+  $PY - "$CLAUDE_DIR/CLAUDE.md" "${1:-}" <<'PY'
 import os, re, sys
 path, block_file = sys.argv[1], sys.argv[2]
-text = open(path).read() if os.path.exists(path) else ""
+text = open(path, encoding="utf-8").read() if os.path.exists(path) else ""
 text = re.sub(r"\n*<!-- claude-kit:start -->.*?<!-- claude-kit:end -->\n?", "\n", text, flags=re.S).strip()
 if block_file:
-    text = (text + "\n\n" if text else "") + open(block_file).read().strip()
-open(path, "w").write(text + "\n" if text else "")
+    text = (text + "\n\n" if text else "") + open(block_file, encoding="utf-8").read().strip()
+open(path, "w", encoding="utf-8").write(text + "\n" if text else "")
 PY
 }
 

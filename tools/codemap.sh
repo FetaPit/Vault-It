@@ -6,6 +6,7 @@
 #        bash tools/codemap.sh index.html  (one file)
 set -euo pipefail
 cd "$(dirname "$0")/.."
+PY=""; for c in python3 python "py -3"; do $c -c "import sys" >/dev/null 2>&1 && { PY=$c; break; }; done
 
 echo "## Files (lines)"
 git ls-files | grep -vE '\.(svg|png|jpg|ico|json)$' | while read -r f; do
@@ -25,8 +26,9 @@ for f in "${files[@]}"; do
     *.md) grep -nE '^#{1,2} ' "$f" || true ;;
     *)
       # Section banners: a rule line of ═ then a title line, or "══ TITLE ══" inline.
-      python3 - "$f" <<'PYEOF'
+      [ -n "$PY" ] && $PY - "$f" <<'PYEOF'
 import re, sys
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 lines = open(sys.argv[1], encoding="utf-8").read().split("\n")
 def strip(t):
     return re.sub(r"^[\s/*<>!#-]+|[\s/*<>!#-]+$", "", t.replace("═", ""))

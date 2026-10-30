@@ -6,7 +6,8 @@ cd "${CLAUDE_PROJECT_DIR:-$(dirname "$0")/..}" || exit 0
 echo "# Project map (line numbers). Read big files by range only."
 bash tools/codemap.sh 2>/dev/null || echo "(codemap failed; run bash tools/codemap.sh)"
 
-note="$HOME/.claude/handoffs/$(pwd | tr / -).md"
+root=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+note="$HOME/.claude/handoffs/$(printf %s "$root" | tr '/\\: ' '----').md"
 if [ -s "$note" ]; then
   echo
   echo "# Handoff from last session ($note)"

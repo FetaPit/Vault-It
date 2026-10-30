@@ -6,7 +6,7 @@ argument-hint: "[next task, optional]"
 ---
 
 1. Get the note path:
-   `p=$(git rev-parse --show-toplevel 2>/dev/null || pwd); mkdir -p ~/.claude/handoffs; echo ~/.claude/handoffs/$(echo "$p" | tr / -).md`
+   `p=$(git rev-parse --show-toplevel 2>/dev/null || pwd); mkdir -p ~/.claude/handoffs; echo ~/.claude/handoffs/$(printf %s "$p" | tr '/\\: ' '----').md`
 2. Write that file (overwrite). Max 25 lines:
 
 ```

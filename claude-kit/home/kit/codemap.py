@@ -64,6 +64,7 @@ def sections(path, lines):
 
 
 def main():
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     root = sys.argv[1] if len(sys.argv) > 1 else "."
     wanted = sys.argv[2:]
     try:

@@ -5,11 +5,12 @@ dir="${CLAUDE_PROJECT_DIR:-$PWD}"
 root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null || echo "$dir")
 
 # A project with its own map hook (e.g. Vault-It) prints its own map.
-if [ ! -f "$root/.claude/session-start.sh" ] && command -v python3 >/dev/null; then
-  python3 "$HOME/.claude/kit/codemap.py" "$root" 2>/dev/null | head -150
+PY=""; for c in python3 python "py -3"; do $c -c "import sys" >/dev/null 2>&1 && { PY=$c; break; }; done
+if [ ! -f "$root/.claude/session-start.sh" ] && [ -n "$PY" ]; then
+  $PY "$HOME/.claude/kit/codemap.py" "$root" 2>/dev/null | head -150
 fi
 
-note="$HOME/.claude/handoffs/$(echo "$root" | tr / -).md"
+note="$HOME/.claude/handoffs/$(printf %s "$root" | tr '/\\: ' '----').md"
 if [ -s "$note" ]; then
   echo
   echo "# Handoff from last session ($note)"
