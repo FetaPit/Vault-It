@@ -1,5 +1,6 @@
 // Brand rollout screenshots: every main tab in Night and Daylight at 390px and 1100px.
 //   node tests/brand_shots.js [tab ...]      → shots/brand/<tab>-<theme>-<width>.png
+//   FULL=1 node tests/brand_shots.js house  → whole page instead of the first screen
 // Uses the same seed as test_overview plus a house in progress. Prints page errors and sideways scroll.
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -30,7 +31,7 @@ const seed = (theme) => {
       await p.evaluate(() => window.scrollTo(0, 0));
       const sx = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       if (sx > 1) console.log('SIDEWAYS SCROLL', t, theme, w, sx + 'px');
-      await p.screenshot({ path: `${OUT}/${t}-${theme === 'dark' ? 'night' : 'daylight'}-${w}.png`, fullPage: false });
+      await p.screenshot({ path: `${OUT}/${t}-${theme === 'dark' ? 'night' : 'daylight'}-${w}.png`, fullPage: !!process.env.FULL });
     }
     await ctx.close();
   }

@@ -6827,6 +6827,14 @@ html, body { background: var(--bg); color: var(--tx); font-family: var(--font-bo
 .metal-inp{flex:1;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.75rem;padding:6px 8px;outline:none}
 .metal-inp:focus{border-color:var(--em)}
 .metal-unit{font-size:.58rem;color:var(--t3);width:22px}
+.mh-head{display:grid;grid-template-columns:78px 1fr 1fr 76px;gap:8px;font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin:0 0 6px}
+.mh-row{display:grid!important;grid-template-columns:78px 1fr 1fr 76px;gap:8px;align-items:center}
+.mh-cell{display:flex;align-items:center;gap:4px;min-width:0}
+.mh-cell .metal-inp{min-width:0;width:100%}
+.mh-cell .metal-unit{width:34px;flex:none}
+.mh-k{display:none;font-size:.48rem;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;width:34px;flex:none}
+.mh-val{font-family:'Share Tech Mono',monospace;font-size:.72rem;text-align:right;white-space:nowrap}
+@media(max-width:600px){.mh-head{display:none}.mh-row{grid-template-columns:1fr auto;row-gap:6px;padding-bottom:8px;border-bottom:1px solid rgb(var(--ink-rgb) / .06)}.mh-row .mh-cell{grid-column:1 / -1}.mh-row .mh-val{grid-column:2;grid-row:1}.mh-k{display:inline}}
 /* Chart filter/metric buttons */
 .chart-filter-group{display:flex;gap:0;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
 .chart-filter-btn,.chart-metric-btn{padding:4px 10px;background:transparent;border:none;border-right:1px solid var(--bd);color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.55rem;cursor:pointer;transition:all .15s;letter-spacing:.06em;text-transform:uppercase}
@@ -10478,11 +10486,11 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   </div>
 
   <!-- Milestone targets + snapshots: directly under the Net Worth chart -->
-  <div class="ov-ms-card ov-ms-wide" id="ov-ms-card" style="margin-top:16px">
-    <div class="ov-ms-title">Milestone Targets &amp; Snapshots</div>
+  <div class="ov-ms-card ov-ms-wide" id="ov-ms-card" data-tab="goals" style="margin-top:16px">
+    <div class="ov-ms-top"><div class="ov-ms-title">Goals and snapshots</div>
+      <div class="ov-ms-tabs" role="tablist" aria-label="Goals and snapshots"><button role="tab" id="ov-ms-tab-goals" aria-selected="true" onclick="ovMsTab('goals')">🎯 Goals</button><button role="tab" id="ov-ms-tab-snaps" aria-selected="false" onclick="ovMsTab('snaps')">📸 Snapshots</button></div></div>
     <div class="ms-grid">
-      <div class="ms-col">
-        <div class="ms-col-hd">🎯 Goals</div>
+      <div class="ms-col" data-p="goals" role="tabpanel" aria-labelledby="ov-ms-tab-goals">
         <div id="ms-list">
           <div class="ms-row"><div class="ms-dot" id="msdot-0"></div><span class="ms-ic">🛡</span><label>Emergency Fund <span id="mschk-0" class="ms-chk"></span></label><input type="number" id="ms-0" value="2000" min="0" onchange="saveState();drawChart()"></div>
           <div class="ms-row"><div class="ms-dot" id="msdot-1"></div><span class="ms-ic">✂️</span><label>Clear All Debt <span id="mschk-1" class="ms-chk"></span></label><input type="number" id="ms-1" value="0" min="0" onchange="saveState();drawChart()"></div>
@@ -10500,8 +10508,8 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
           </div>
         </details>
       </div>
-      <div class="ms-col">
-        <div class="ms-col-hd">📸 Snapshots <span style="opacity:.6;font-weight:400">(past net worth on the chart)</span></div>
+      <div class="ms-col" data-p="snaps" role="tabpanel" aria-labelledby="ov-ms-tab-snaps">
+        <div class="ms-col-hint">Past net worth, shown on the chart.</div>
         <div id="ms-snap-list"></div>
         <details class="ms-add" id="ms-add-snap">
           <summary><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> Add a snapshot</summary>
@@ -10577,23 +10585,26 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     </div>
   </div>
 
-  <!-- Summary Cards Row -->
-  <div class="g3" id="ov-summary-row" style="margin-top:12px">
-    <div class="ov-chart-card ov-sum ov-sum-a" id="ov-assets-summary-card">
-      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/><path d="M12 9v0"/></svg></span><span class="ov-chart-title">Assets Summary</span></div>
+  <!-- Own and owe: assets, liabilities and debt in one card; each heading opens its tab -->
+  <div class="ov-chart-card ov-own" id="ov-own-card" style="margin-top:12px">
+  <div class="ov-own-hd"><span class="ov-chart-title">Own and owe</span><span class="ov-own-sub">Tap a heading to open it</span></div>
+  <div class="g3" id="ov-summary-row">
+    <div class="ov-sum ov-sum-a" id="ov-assets-summary-card">
+      <button type="button" class="ov-sum-hd ov-sum-go" onclick="ovGo('assets')" aria-label="Open Assets"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/><path d="M12 9v0"/></svg></span><span class="ov-chart-title">Assets</span><span class="ov-sum-arr" aria-hidden="true">›</span></button>
       <div id="ov-assets-summary"></div>
       <div id="ov-assets-next" style="margin-top:8px;font-size:.55rem;color:var(--em);border-top:1px solid var(--bd);padding-top:6px"></div>
     </div>
-    <div class="ov-chart-card ov-sum ov-sum-l" id="ov-liab-summary-card">
-      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></span><span class="ov-chart-title">Liabilities Summary</span></div>
+    <div class="ov-sum ov-sum-li" id="ov-liab-summary-card">
+      <button type="button" class="ov-sum-hd ov-sum-go" onclick="ovGo('liabilities')" aria-label="Open Liabilities"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></span><span class="ov-chart-title">Liabilities</span><span class="ov-sum-arr" aria-hidden="true">›</span></button>
       <div id="ov-liab-summary"></div>
       <div id="ov-liab-next" style="margin-top:8px;font-size:.55rem;color:var(--amber);border-top:1px solid var(--bd);padding-top:6px"></div>
     </div>
-    <div class="ov-chart-card ov-sum ov-sum-d" id="ov-debt-summary-card">
-      <div class="ov-sum-hd"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></span><span class="ov-chart-title">Debt Summary</span></div>
+    <div class="ov-sum ov-sum-d" id="ov-debt-summary-card">
+      <button type="button" class="ov-sum-hd ov-sum-go" onclick="ovGo('debt')" aria-label="Open Debt"><span class="ov-sum-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></span><span class="ov-chart-title">Debt</span><span class="ov-sum-arr" aria-hidden="true">›</span></button>
       <div id="ov-debt-summary"></div>
       <div id="ov-debt-next" style="margin-top:8px;font-size:.55rem;color:var(--re);border-top:1px solid var(--bd);padding-top:6px"></div>
     </div>
+  </div>
   </div>
 
 </div>
@@ -10752,8 +10763,9 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     </div>
     <div class="panel">
       <div class="card" id="hb-hud"></div>
-      <div class="card">
-        <div class="card-lbl">House Type</div>
+      <div class="card hb-plan" id="hb-plan">
+        <div class="card-lbl">Your house plan</div>
+        <div class="hb-sub-lbl">House type</div>
         <div class="htypes" id="htypes">
           <button class="hbtn active" data-type="terraced"><span class="ico">🏠</span><span class="nm">Terraced</span><span class="pr" id="pr-terraced">£200,000</span></button>
           <button class="hbtn" data-type="semi"><span class="ico">🏡</span><span class="nm">Semi-Detached</span><span class="pr" id="pr-semi">£320,000</span></button>
@@ -10784,20 +10796,25 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
           </div>
           <div style="font-size:.5rem;color:var(--t3);margin-top:5px">Savings build bricks on your selected floor. Other floors shown as structure.</div>
         </div>
-      </div>
-      <div class="card">
-        <div class="card-lbl">Add to Savings</div>
+        <div class="hb-plan-add">
+          <div class="hb-sub-lbl">Add to your savings</div>
         <div class="igrp"><label>Amount Saved</label><div class="iw"><span class="sym">£</span><input type="number" id="savingsInput" placeholder="0.00" min="0" step="100"></div></div>
         <button class="btn-add" id="btnAdd">⊕ &nbsp;Lay the Bricks</button>
+          <div class="hb-plan-note" id="hb-plan-brick"></div>
+        </div>
       </div>
-      <div class="card">
-        <div class="card-lbl">Build Progress</div>
+      <div class="card hb-prog" id="hb-prog">
+        <div class="card-lbl">Progress</div>
         <div class="pnums"><div class="saved-amt" id="savedAmt">£0</div><div class="tgt-amt" id="tgtAmt">of £200,000</div></div>
         <div class="pbar-wrap"><div class="pbar-fill" id="pbarFill" style="width:0%"></div></div>
         <div class="ppct" id="ppct">0.0%</div>
-      </div>
-      <div class="card">
-        <div class="card-lbl">Build Milestones</div>
+        <div class="stats">
+          <div class="stat"><div class="sv" id="stBricks">0</div><div class="sl">Bricks Laid</div></div>
+          <div class="stat"><div class="sv" id="stTiles">0</div><div class="sl">Roof Tiles</div></div>
+          <div class="stat"><div class="sv" id="stRemain">£0</div><div class="sl">Remaining</div></div>
+          <div class="stat"><div class="sv" id="stDeposit">£0</div><div class="sl">10% Deposit</div></div>
+        </div>
+        <div class="hb-sub-lbl">Milestones</div>
         <div class="mss">
           <div class="ms" id="ms1"><div class="ms-dot"></div><div class="ms-lbl" id="msl-1">1% — Site Cleared</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
           <div class="ms" id="ms5"><div class="ms-dot"></div><div class="ms-lbl" id="msl-5">5% — Foundation Poured</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
@@ -10811,23 +10828,10 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
           <div class="ms" id="ms100"><div class="ms-dot"></div><div class="ms-lbl" id="msl-100">100% — It's Yours! 🎉</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-lbl">Statistics</div>
-        <div class="stats">
-          <div class="stat"><div class="sv" id="stBricks">0</div><div class="sl">Bricks Laid</div></div>
-          <div class="stat"><div class="sv" id="stTiles">0</div><div class="sl">Roof Tiles</div></div>
-          <div class="stat"><div class="sv" id="stRemain">£0</div><div class="sl">Remaining</div></div>
-          <div class="stat"><div class="sv" id="stDeposit">£0</div><div class="sl">10% Deposit</div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-lbl">Savings Log</div>
-        <div class="log-list" id="logList"><div style="font-size:.58rem;color:rgb(var(--ink-rgb) / .18);text-align:center;padding:10px 0">No deposits yet</div></div>
-        <button class="btn-reset" id="btnReset">⟳ Reset Tracker</button>
-      </div>
     </div>
-    <!-- Habit Tracker -->
-    <div style="margin-top:16px;background:rgb(var(--panel-rgb) / 0.7);border:1px solid rgb(var(--teal-rgb) / .12);border-radius:10px;padding:14px 18px">
+    <!-- History: contribution streak, savings log, reset -->
+    <div class="card hb-hist" id="hb-hist">
+      <div class="card-lbl">History</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
         <div style="font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--em)">Contribution Streak</div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -10838,23 +10842,28 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
       </div>
       <div id="habit-streak-label" style="font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--go);margin-bottom:10px">🔥 0 streak</div>
       <div id="habit-circles" style="display:flex;align-items:flex-end;gap:1px;overflow-x:auto;padding-bottom:8px;min-height:52px;scrollbar-width:thin;scrollbar-color:rgb(var(--teal-rgb) / .2) transparent"></div>
+        <div class="hb-sub-lbl">Savings log</div>
+        <div class="log-list" id="logList"><div style="font-size:.58rem;color:rgb(var(--ink-rgb) / .18);text-align:center;padding:10px 0">No deposits yet</div></div>
+        <button class="btn-reset" id="btnReset">⟳ Reset Tracker</button>
     </div>
   </div>
 </div>
 <!-- VERBATIM house-tracker.html content ends here -->
 
-<!-- 3D Model Upload & Meshy AI -->
+<!-- Your own design: upload a 3D model or generate one with AI (one collapsed card) -->
 <div style="max-width:1140px;margin:16px auto 0;padding:0 20px">
+<details class="ov-chart-card hb-own" id="hb-own-design">
+<summary class="ov-chart-title hb-own-sum">Your own design <span class="hb-own-pro">PRO</span><span class="hb-own-hint">Upload a 3D model or describe one for AI to build</span></summary>
 <div class="g2" style="margin-top:12px">
-  <div class="ov-chart-card">
-    <div class="ov-chart-title" style="margin-bottom:10px">Upload 3D Model <span style="font-size:.45rem;padding:2px 6px;background:rgb(var(--brass-rgb) / .15);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:3px;color:var(--go);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em">PRO</span></div>
+  <div class="hb-own-col">
+    <div class="ov-chart-title" style="margin-bottom:10px">Upload a 3D model <span style="font-size:.45rem;padding:2px 6px;background:rgb(var(--brass-rgb) / .15);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:3px;color:var(--go);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em">PRO</span></div>
     <p style="font-size:.58rem;color:var(--t3);margin-bottom:8px">Use your own GLB/GLTF house model as your House Builder house — it builds as a hologram while you save the deposit, then turns to full colour as you own it.</p>
     <input type="file" id="model-file-input" accept=".glb,.gltf" style="display:none" onchange="loadCustomModel(this)">
     <button class="btn-add-data" onclick="document.getElementById('model-file-input').click()" style="width:100%;margin-bottom:6px">📁 Upload GLB / GLTF</button>
     <div id="hb-upload-msg" style="font-size:.58rem;color:var(--t2);min-height:14px"></div>
     <div id="hb-design-status" class="hbd" style="display:none"></div>
   </div>
-  <div class="ov-chart-card">
+  <div class="hb-own-col">
     <div class="ov-chart-title" style="margin-bottom:10px">Generate with AI <span style="font-size:.45rem;padding:2px 6px;background:rgb(var(--brass-rgb) / .15);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:3px;color:var(--go);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em">PRO</span></div>
     <p style="font-size:.58rem;color:var(--t3);margin-bottom:8px">Describe your dream home and Meshy AI will model it in 3D (2–6 minutes). It becomes your House Builder house, built as a hologram with your deposit and in colour once you own it. Requires a Meshy API key (⚙ Settings).</p>
     <textarea id="meshy-prompt" class="al-inp" rows="3" placeholder="e.g. A modern detached house with large windows, white render, flat roof and a double garage..." style="width:100%;resize:vertical"></textarea>
@@ -10862,6 +10871,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     <div id="meshy-status" style="font-size:.58rem;color:var(--t2);margin-top:8px;min-height:16px"></div>
   </div>
 </div>
+</details>
 </div>
 
 </div>
@@ -10947,16 +10957,11 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
           <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
           <div class="scene-cap" id="metalsCap">—</div>
         </div>
-        <div class="g2" style="margin-top:12px">
-          <div class="ov-data-card">
-            <div class="ov-data-title" style="color:var(--gold)">Holdings (Troy Oz)</div>
-            <div id="metals-inputs"></div>
-          </div>
-          <div class="ov-data-card">
-            <div class="ov-data-title" style="color:var(--t3)">Spot Prices (£/oz)</div>
-            <div id="price-inputs"></div>
-            <button class="btn-add-data" style="width:100%;margin-top:8px" onclick="fetchMetalPrices()">↻ Fetch Live Prices</button>
-          </div>
+        <div class="ov-data-card mh-card" style="margin-top:12px">
+          <div class="ov-data-title" style="color:var(--gold)">Your metals and today's prices</div>
+          <div class="mh-head" aria-hidden="true"><span>Metal</span><span>You hold (troy oz)</span><span>Price per oz</span><span>Value</span></div>
+          <div id="metals-inputs"></div>
+          <button class="btn-add-data" style="width:100%;margin-top:8px" onclick="fetchMetalPrices()">↻ Fetch live prices</button>
         </div>
         <div id="metals-kpis" class="g4" style="margin-top:12px"></div>
       </div>
@@ -11077,7 +11082,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 <!-- ═══════════════════════════ DEBT TRACKER ═══════════════════════════ -->
 <div id="tab-debt" class="tab-panel" style="display:none">
 <div style="max-width:900px;margin:0 auto;padding:24px 20px 60px">
-    <div class="ov-kpis">
+    <div class="ov-kpis debt-strip" role="group" aria-label="Debt at a glance">
       <div class="ov-kpi"><div class="ov-kpi-lbl">Total Debt</div><div class="ov-kpi-val" id="debt-total" style="color:var(--re)">£0</div></div>
       <div class="ov-kpi"><div class="ov-kpi-lbl">Monthly Minimums</div><div class="ov-kpi-val" id="debt-mins" style="color:var(--go)">£0/mo</div></div>
       <div class="ov-kpi"><div class="ov-kpi-lbl">Debts Active</div><div class="ov-kpi-val" id="debt-count" style="color:var(--tx)">0</div></div>
@@ -11085,50 +11090,50 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     </div>
     <div class="ov-chart-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <span class="ov-chart-title">Debt Strategy</span>
+        <span class="ov-chart-title">Your plan</span>
         <div style="display:flex;gap:6px;align-items:center">
           <button id="debt-method-btn-avalanche" onclick="setDebtMethod('avalanche')" style="padding:4px 10px;background:rgb(var(--orange-rgb) / .15);border:1px solid rgb(var(--orange-rgb) / .5);border-radius:4px;color:var(--or);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;cursor:pointer;letter-spacing:.06em"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M2 20 9 7l4 6 2.500-4L22 20Z"/><path d="M7.500 10.500 9 13l1.500-2"/><circle cx="17" cy="4" r=".8" fill="currentColor"/><circle cx="20" cy="7" r=".8" fill="currentColor"/><circle cx="14" cy="3" r=".8" fill="currentColor"/></svg>AVALANCHE</button>
           <button id="debt-method-btn-snowball" onclick="setDebtMethod('snowball')" style="padding:4px 10px;background:transparent;border:1px solid var(--t3);border-radius:4px;color:var(--t3);font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;cursor:pointer;letter-spacing:.06em"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="13" cy="13" r="8"/><path d="M8 10a6 6 0 0 1 6-3"/><path d="M9 16a6 6 0 0 0 7 1"/><path d="M2 8h3M1 12h4M2 16h3"/></svg>SNOWBALL</button>
         </div>
         <button class="btn-add-data" onclick="showDebtForm()">+ Add Debt</button>
       </div>
+        <div id="debt-interest-panel" class="debt-cost">
+        <div class="debt-cost-hd">What it costs in interest</div>
+        <div class="g2">
+          <div style="padding:12px;background:rgb(var(--red-rgb) / .06);border:1px solid rgb(var(--red-rgb) / .18);border-radius:6px">
+            <div style="font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Minimum payments only</div>
+            <div id="debt-min-payoff" style="font-family:'Share Tech Mono',monospace;font-size:.85rem;color:var(--re);font-weight:700">—</div>
+            <div id="debt-min-interest" style="font-size:.52rem;color:var(--t3);margin-top:2px">total interest paid</div>
+          </div>
+          <div style="padding:12px;background:rgb(var(--green-rgb) / .06);border:1px solid rgb(var(--green-rgb) / .18);border-radius:6px">
+            <div style="font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px"><span id="debt-plan-lbl">Avalanche method</span></div>
+            <div id="debt-aval-payoff" style="font-family:'Share Tech Mono',monospace;font-size:.85rem;color:var(--gr);font-weight:700">—</div>
+            <div id="debt-aval-interest" style="font-size:.52rem;color:var(--t3);margin-top:2px">total interest paid</div>
+          </div>
+        </div>
+        <div id="debt-interest-saving" style="text-align:center;margin-top:10px;font-size:.58rem;color:var(--go);font-family:'Share Tech Mono',monospace"></div>
+      </div>
       <div id="debt-list-el"></div>
       <div id="debt-map-confirm"></div>
     </div>
-    <div class="g2 debt-charts" style="margin-top:16px">
-      <div class="ov-chart-card">
-        <div class="ov-chart-title" style="margin-bottom:10px">Debt Histogram</div>
-        <canvas id="debt-bar-chart" height="260" style="width:100%;display:block"></canvas>
-      </div>
-      <div class="ov-chart-card">
+    <div class="ov-chart-card debt-charts" id="debt-charts" data-chart="hist" style="margin-top:16px">
         <div class="ov-chart-hd" style="margin-bottom:10px;gap:10px;flex-wrap:wrap">
-          <span class="ov-chart-title">Debt Breakdown</span>
-          <div class="chart-filter-group">
+          <div class="chart-filter-group debt-chart-tabs" role="tablist" aria-label="Debt chart">
+            <button id="debt-chart-hist" class="chart-filter-btn on" role="tab" aria-selected="true" onclick="setDebtChart('hist')">Histogram</button>
+            <button id="debt-chart-break" class="chart-filter-btn" role="tab" aria-selected="false" onclick="setDebtChart('break')">Breakdown</button>
+          </div>
+          <div class="chart-filter-group debt-break-only">
             <button id="debt-view-donut" class="chart-filter-btn on" onclick="setDebtView('donut')">◔ Donut</button>
             <button id="debt-view-tree" class="chart-filter-btn" onclick="setDebtView('tree')">▦ Tree map</button>
           </div>
         </div>
+        <canvas id="debt-bar-chart" class="debt-hist-only" height="260" style="width:100%;display:block"></canvas>
+        <div class="debt-break-only">
         <canvas id="debt-donut-chart" height="260" style="width:100%;display:block"></canvas>
         <div id="debt-treemap" class="dtm" style="display:none"></div>
-      </div>
-    </div>
-    <div id="debt-interest-panel" class="ov-chart-card" style="margin-top:16px">
-      <div class="ov-chart-title" style="margin-bottom:10px">Interest Cost Analysis</div>
-      <div class="g2">
-        <div style="padding:12px;background:rgb(var(--red-rgb) / .06);border:1px solid rgb(var(--red-rgb) / .18);border-radius:6px">
-          <div style="font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Minimum Payments Only</div>
-          <div id="debt-min-payoff" style="font-family:'Share Tech Mono',monospace;font-size:.85rem;color:var(--re);font-weight:700">—</div>
-          <div id="debt-min-interest" style="font-size:.52rem;color:var(--t3);margin-top:2px">total interest paid</div>
         </div>
-        <div style="padding:12px;background:rgb(var(--green-rgb) / .06);border:1px solid rgb(var(--green-rgb) / .18);border-radius:6px">
-          <div style="font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Avalanche Method</div>
-          <div id="debt-aval-payoff" style="font-family:'Share Tech Mono',monospace;font-size:.85rem;color:var(--gr);font-weight:700">—</div>
-          <div id="debt-aval-interest" style="font-size:.52rem;color:var(--t3);margin-top:2px">total interest paid</div>
-        </div>
-      </div>
-      <div id="debt-interest-saving" style="text-align:center;margin-top:10px;font-size:.58rem;color:var(--go);font-family:'Share Tech Mono',monospace"></div>
     </div>
-    <div id="debt-form-card" class="ov-data-card" style="display:none;margin-top:16px">
+<div id="debt-form-card" class="ov-data-card" style="display:none;margin-top:16px">
       <div class="ov-data-title">Add / Edit Debt</div>
       <div class="g-form">
         <div><label class="ov-kpi-lbl">Name</label><input type="text" id="df-name" class="al-inp"></div>
@@ -11768,6 +11773,21 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 .pbar-fill{height:100%;background:linear-gradient(90deg,var(--teal-deep),var(--teal),var(--brass));border-radius:2px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
 .ppct{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--brass);text-align:right}
 .mss{display:flex;flex-direction:column;gap:5px}
+.hb-sub-lbl{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t2);margin:14px 0 8px}
+.hb-plan .hb-sub-lbl:first-of-type,.hb-prog .card-lbl+.hb-sub-lbl{margin-top:0}
+.hb-plan-add{margin-top:14px;padding-top:2px;border-top:1px solid rgb(var(--teal-rgb) / .12)}
+.hb-plan-note{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--t2);margin-top:8px}
+.hb-prog .stats{margin-top:12px}
+.hb-prog .mss{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.hb-prog .ms{padding:5px 7px;font-size:.52rem;gap:6px}
+.hb-hist .log-list{max-height:220px;overflow:auto}
+.hb-own>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0}
+.hb-own>summary::-webkit-details-marker{display:none}
+.hb-own>summary::before{content:'';width:7px;height:7px;border-right:2px solid var(--teal);border-bottom:2px solid var(--teal);transform:rotate(-45deg);transition:transform .2s;margin-right:2px}
+.hb-own[open]>summary::before{transform:rotate(45deg)}
+.hb-own-pro{font-size:.45rem;padding:2px 6px;background:rgb(var(--brass-rgb) / .15);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:3px;color:var(--go);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em}
+.hb-own-hint{font-family:'DM Sans',sans-serif;font-size:.56rem;font-weight:400;letter-spacing:0;text-transform:none;color:var(--t2)}
+.hb-own-col{min-width:0}
 .ms{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:3px;background:rgb(var(--ink-rgb) / .03);border:1px solid rgb(var(--ink-rgb) / .05);transition:all .3s;font-size:.6rem;color:#D4C5A9;opacity:.45}
 .ms.hit{background:rgb(var(--teal-rgb) / .08);border-color:rgb(var(--teal-rgb) / .3);color:var(--teal);opacity:1}
 .ms-dot{width:7px;height:7px;border-radius:50%;background:rgb(var(--ink-rgb) / .14);flex-shrink:0;transition:all .3s}
@@ -12464,7 +12484,29 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .ov-kpi-li{border-top:2px solid var(--amber)}.ov-kpi-li .ov-kpi-lbl{color:var(--amber)}
 .ov-kpi-su{border-top:2px solid var(--blue)}.ov-kpi-su .ov-kpi-lbl{color:var(--blue)}
 .ov-sum{--sc:var(--teal);border-left:3px solid var(--sc)!important;background:linear-gradient(135deg,color-mix(in srgb,var(--sc) 9%,var(--c2)),var(--c2) 60%)!important}
-.ov-sum-a{--sc:var(--green)}.ov-sum-l{--sc:var(--amber)}.ov-sum-d{--sc:var(--red)}
+.debt-strip{grid-template-columns:repeat(4,minmax(0,1fr))!important;background:rgb(var(--panel-rgb) / .85);border:1px solid rgb(var(--teal-rgb) / .14);border-radius:12px;padding:6px;gap:0!important}
+.debt-strip .ov-kpi{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+.debt-strip .ov-kpi::before,.debt-strip .ov-kpi::after{display:none!important}
+.debt-strip .ov-kpi+.ov-kpi{border-left:1px solid rgb(var(--ink-rgb) / .08)!important}
+@media(max-width:600px){.debt-strip{grid-template-columns:1fr 1fr!important}.debt-strip .ov-kpi:nth-child(3){border-left:0!important}.debt-strip .ov-kpi:nth-child(n+3){border-top:1px solid rgb(var(--ink-rgb) / .08)!important}}
+.debt-charts[data-chart="hist"] .debt-break-only,.debt-charts[data-chart="break"] .debt-hist-only{display:none!important}
+.debt-cost{margin:0 0 14px;padding:12px;border:1px solid rgb(var(--ink-rgb) / .07);border-radius:10px;background:rgb(var(--ink-rgb) / .02)}
+.debt-cost-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;color:var(--t2);margin-bottom:8px}
+.ov-sum-a{--sc:var(--green)}.ov-sum-li{--sc:var(--amber)}.ov-sum-d{--sc:var(--red)}
+.ov-own .ov-sum{border-radius:10px;padding:12px 12px 10px;min-width:0;overflow:hidden}
+.ov-own-hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.ov-own-sub{font-size:.56rem;color:var(--t2)}
+.ov-sum-go{width:100%;background:none;border:0;padding:0;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.ov-sum-go:hover .ov-chart-title,.ov-sum-go:focus-visible .ov-chart-title{text-decoration:underline;text-underline-offset:3px}
+.ov-sum-arr{margin-left:auto;color:var(--sc);font-size:1.1rem;line-height:1}
+.ov-ms-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.ov-ms-top .ov-ms-title{margin:0!important}
+.ov-ms-tabs{display:inline-flex;border:1px solid rgb(var(--teal-rgb) / .3);border-radius:8px;overflow:hidden}
+.ov-ms-tabs button{background:none;border:0;padding:6px 12px;font-family:'Syne',sans-serif;font-weight:700;font-size:.58rem;color:var(--t2);cursor:pointer;min-height:32px}
+.ov-ms-tabs button[aria-selected="true"]{background:rgb(var(--teal-rgb) / .16);color:var(--tx)}
+.ov-ms-card .ms-grid{grid-template-columns:1fr!important}
+.ov-ms-card[data-tab="goals"] .ms-col[data-p="snaps"],.ov-ms-card[data-tab="snaps"] .ms-col[data-p="goals"]{display:none}
+.ms-col-hint{font-size:.58rem;color:var(--t2);margin-bottom:8px}
 .ov-sum-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .ov-sum-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,transparent);border:1px solid color-mix(in srgb,var(--sc) 45%,transparent);flex:none}
 .ov-sum .ov-chart-title{font-size:.72rem!important;color:var(--sc)!important;margin:0!important}
@@ -12634,6 +12676,20 @@ function viNavReveal(){
   if(l<nav.scrollLeft+pad)nav.scrollTo?nav.scrollTo({left:Math.max(0,l-pad),behavior:'smooth'}):(nav.scrollLeft=Math.max(0,l-pad));
   else if(r>nav.scrollLeft+nav.clientWidth-pad){var x=r-nav.clientWidth+pad;nav.scrollTo?nav.scrollTo({left:x,behavior:'smooth'}):(nav.scrollLeft=x);}
 }
+// Overview "Own and owe" headings open their tab (liabilities is a sub-tab of Assets)
+function ovGo(t){
+  if(t==='debt'){showTab('debt');return;}
+  showTab('assets');
+  if(t==='liabilities'){var b=document.querySelector('#assets-page [onclick*="\'liabilities\'"]');showSubtab('assets','liabilities',b);}
+  try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){window.scrollTo(0,0);}
+}
+// Goals / Snapshots tabs on the Overview, choice remembered on this device
+function ovMsTab(t){
+  var c=document.getElementById('ov-ms-card');if(!c)return;t=t==='snaps'?'snaps':'goals';c.setAttribute('data-tab',t);
+  ['goals','snaps'].forEach(function(k){var b=document.getElementById('ov-ms-tab-'+k);if(b)b.setAttribute('aria-selected',k===t?'true':'false');});
+  try{localStorage.setItem('vi-ov-ms-tab',t);}catch(e){}
+}
+setTimeout(function(){try{var t=localStorage.getItem('vi-ov-ms-tab');if(t)ovMsTab(t);}catch(e){}},0);
 function showSubtab(group,id,btn){
   document.querySelectorAll('#'+group+'-page .subtab-panel').forEach(p=>{p.classList.remove('active');p.style.display='none';});
   document.querySelectorAll('#'+group+'-page .subtab-btn').forEach(b=>b.classList.remove('active'));
@@ -14603,6 +14659,7 @@ function hbRenderHUD(){
   var el=document.getElementById('hb-hud');if(!el)return;
   var view=hbView(),p=pct(),dt=depositTarget(),rem=Math.max(0,dt-(state.saved||0));
   var _bi=hbBrickInfo(),brickTotal=_bi?_bi.total:0,perBrick=_bi?_bi.perBrick:0;
+  var _pb=document.getElementById('hb-plan-brick');if(_pb)_pb.textContent=_bi?'Each brick is worth about '+(window.VI_CURRENCY_SYMBOL||'£')+(perBrick*(window.VI_CURRENCY_RATE||1)).toFixed(2)+' of your deposit.':'';
   var _bLaid=_bi?Math.min(brickTotal,_bi.model.stats(_isPro()?p:0.04).bricksLaid):0,_sym=window.VI_CURRENCY_SYMBOL||'£',_rate=window.VI_CURRENCY_RATE||1;
   var inp=document.getElementById('depositPctInput');if(inp&&document.activeElement!==inp)inp.value=state.depositPct;
   var amt=document.getElementById('depositPctAmt');if(amt)amt.textContent='= '+gbpFmt(dt);
@@ -15215,6 +15272,7 @@ function hbDesignCard() {
   var el = document.getElementById('hb-design-status'); if (!el) return;
   var m = hbDesignMeta();
   if (!m) { el.innerHTML = ''; el.style.display = 'none'; return; }
+  var own = document.getElementById('hb-own-design'); if (own) own.open = true;
   var src = m.source === 'ai' ? 'AI design' : 'Uploaded design', esc = function (t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var info = HB3DAPP.customModel && HB3DAPP.designId === m.id ? HB3DAPP.customModel.info : null;
   el.style.display = 'block';
@@ -19102,17 +19160,13 @@ function renderMetalsISO(){
 
 function renderMetalsInputs(){
   var metals=[{k:'gold',lbl:'Gold',col:'var(--gold)'},{k:'silver',lbl:'Silver',col:'var(--m-silver)'},{k:'platinum',lbl:'Platinum',col:'var(--m-platinum)'},{k:'palladium',lbl:'Palladium',col:'var(--m-palladium)'}];
-  var mi=document.getElementById('metals-inputs');
+  // one row per metal: holdings and the price beside it, value at the end (A1)
+  var mi=document.getElementById('metals-inputs'),sym=window.VI_CURRENCY_SYMBOL||'\u00a3';
   if(mi)mi.innerHTML=metals.map(function(m){
-    return'<div class="metal-row"><span class="metal-lbl" style="color:'+m.col+'">'+m.lbl+'</span>'
-      +'<input class="metal-inp" type="number" min="0" step="0.01" value="'+(alState.metals[m.k]||0)+'" onchange="updateMetal(\''+m.k+'\',this.value)">'
-      +'<span class="metal-unit">oz</span></div>';
-  }).join('');
-  var pi=document.getElementById('price-inputs');
-  if(pi)pi.innerHTML=metals.map(function(m){
-    return'<div class="metal-row"><span class="metal-lbl" style="color:'+m.col+'">'+m.lbl+'</span>'
-      +'<input class="metal-inp" type="number" min="0" step="0.01" value="'+(alState.metalPrices[m.k]||0)+'" onchange="updateMetalPrice(\''+m.k+'\',this.value)">'
-      +'<span class="metal-unit">'+(window.VI_CURRENCY_SYMBOL||'\u00a3')+'</span></div>';
+    return'<div class="metal-row mh-row"><span class="metal-lbl" style="color:'+m.col+'">'+m.lbl+'</span>'
+      +'<label class="mh-cell"><span class="mh-k">Hold</span><input class="metal-inp" type="number" min="0" step="0.01" value="'+(alState.metals[m.k]||0)+'" aria-label="'+m.lbl+' held, troy ounces" onchange="updateMetal(\''+m.k+'\',this.value)"><span class="metal-unit">oz</span></label>'
+      +'<label class="mh-cell"><span class="mh-k">Price</span><input class="metal-inp" type="number" min="0" step="0.01" value="'+(alState.metalPrices[m.k]||0)+'" aria-label="'+m.lbl+' price per ounce" onchange="updateMetalPrice(\''+m.k+'\',this.value)"><span class="metal-unit">'+sym+'/oz</span></label>'
+      +'<span class="mh-val" id="metal-val-'+m.k+'" style="color:'+m.col+'">'+sym+Math.round((alState.metals[m.k]||0)*(alState.metalPrices[m.k]||0)).toLocaleString('en-GB')+'</span></div>';
   }).join('');
   var mk=document.getElementById('metals-kpis');
   if(mk)mk.innerHTML=metals.map(function(m){
@@ -19122,8 +19176,9 @@ function renderMetalsInputs(){
       +'<div class="ov-kpi-sub">'+(alState.metals[m.k]||0).toFixed(2)+' oz @ '+(window.VI_CURRENCY_SYMBOL||'\u00a3')+(alState.metalPrices[m.k]||0).toLocaleString('en-GB')+'</div></div>';
   }).join('');
 }
-function updateMetal(k,v){alState.metals[k]=parseFloat(v)||0;saveAL();renderMetalsISO();updateKPIs();checkAchievements();}
-function updateMetalPrice(k,v){alState.metalPrices[k]=parseFloat(v)||0;saveAL();renderMetalsISO();updateKPIs();}
+function metalValCell(k){var e=document.getElementById('metal-val-'+k);if(e)e.textContent=(window.VI_CURRENCY_SYMBOL||'\u00a3')+Math.round((alState.metals[k]||0)*(alState.metalPrices[k]||0)).toLocaleString('en-GB');}
+function updateMetal(k,v){alState.metals[k]=parseFloat(v)||0;metalValCell(k);saveAL();renderMetalsISO();updateKPIs();checkAchievements();}
+function updateMetalPrice(k,v){alState.metalPrices[k]=parseFloat(v)||0;metalValCell(k);saveAL();renderMetalsISO();updateKPIs();}
 // Keep backward compatibility aliases
 function setMetal(m,v){updateMetal(m,v);}
 function setMetalPrice(m,v){updateMetalPrice(m,v);}
@@ -20396,6 +20451,7 @@ function renderDebtTab(){
 
 var _debtMethod = 'avalanche';
 function setDebtMethod(m) {
+  setTimeout(function(){ try { updateDebtInterestPanel(); } catch (e) {} }, 0);
   var same = _debtMethod === m;
   var dl = document.getElementById('debt-list-el');
   var first = {};
@@ -20483,7 +20539,8 @@ function updateDebtInterestPanel() {
   }
   var ip = document.getElementById('debt-interest-panel'); if (ip) ip.style.display = '';
   var minOnly = calcDebtInterestTotal(debts, 'min');
-  var aval = calcDebtInterestTotal(debts, 'avalanche');
+  var aval = calcDebtInterestTotal(debts, _debtMethod === 'snowball' ? 'snowball' : 'avalanche'), _mName = _debtMethod === 'snowball' ? 'Snowball' : 'Avalanche';
+  var pl = document.getElementById('debt-plan-lbl'); if (pl) pl.textContent = _mName + ' method';
   var fmt = function(n){ return n < 1200 ? n + ' months' : (n/12).toFixed(1) + ' years'; };
   var mp = document.getElementById('debt-min-payoff'); if (mp) mp.textContent = fmt(minOnly.months);
   var mi = document.getElementById('debt-min-interest'); if (mi) mi.textContent = '£' + Math.round(minOnly.interest).toLocaleString('en-GB') + ' total interest';
@@ -20491,7 +20548,7 @@ function updateDebtInterestPanel() {
   var ai = document.getElementById('debt-aval-interest'); if (ai) ai.textContent = '£' + Math.round(aval.interest).toLocaleString('en-GB') + ' total interest';
   var saving = Math.round(minOnly.interest - aval.interest);
   var is = document.getElementById('debt-interest-saving');
-  if (is) is.textContent = saving > 0 ? 'Avalanche saves you £' + saving.toLocaleString('en-GB') + ' in interest — ' + (minOnly.months - aval.months) + ' months sooner' : 'Minimum payments work. Add extra monthly surplus to accelerate payoff.';
+  if (is) is.textContent = saving > 0 ? _mName + ' saves you £' + saving.toLocaleString('en-GB') + ' in interest, ' + (minOnly.months - aval.months) + ' months sooner' : 'Minimum payments work. Add extra monthly surplus to accelerate payoff.';
   var kpiEl = document.getElementById('debt-payoff-kpi');
   if (kpiEl) kpiEl.textContent = aval.months > 0 ? fmt(aval.months) : 'Debt-free!';
 }
@@ -21855,6 +21912,7 @@ function hbMeshyResume() {
   try {
     var p = JSON.parse(localStorage.getItem('vi_hb_meshy') || 'null');
     if (!p || !p.preview) return;
+    var own = document.getElementById('hb-own-design'); if (own) own.open = true;
     if (Date.now() - (p.t || 0) > 86400000) { _hbMeshyPending(null); return; }
     generateMeshyModel(p);
   } catch (e) {}
@@ -22123,7 +22181,15 @@ function drawDebtTreemap(){
       +'</div>';
   }).join('');
 }
-function setDebtView(v){try{localStorage.setItem('vi_debt_view',v);}catch(e){}drawDebtDonut();}
+function setDebtView(v){try{localStorage.setItem('vi_debt_view',v);}catch(e){}setDebtChart('break');}
+// one chart card: Histogram or Breakdown (donut / tree map); choice remembered on this device
+function setDebtChart(c){
+  c=c==='break'?'break':'hist';try{localStorage.setItem('vi_debt_chart',c);}catch(e){}
+  var w=document.getElementById('debt-charts');if(w)w.setAttribute('data-chart',c);
+  [['hist','debt-chart-hist'],['break','debt-chart-break']].forEach(function(x){var b=document.getElementById(x[1]);if(b){b.classList.toggle('on',x[0]===c);b.setAttribute('aria-selected',x[0]===c?'true':'false');}});
+  if(c==='hist')drawDebtHistogram();else drawDebtDonut();
+}
+setTimeout(function(){try{var c=localStorage.getItem('vi_debt_chart');if(c==='break'){var w=document.getElementById('debt-charts');if(w)w.setAttribute('data-chart','break');var h=document.getElementById('debt-chart-hist'),b=document.getElementById('debt-chart-break');if(h){h.classList.remove('on');h.setAttribute('aria-selected','false');}if(b){b.classList.add('on');b.setAttribute('aria-selected','true');}}}catch(e){}},0);
 viOnWidthResize(function(){try{drawCashflowDiagram();}catch(e){}},200);
 viOnWidthResize(function(){var t=document.getElementById('tab-debt');if(t&&t.style.display!=='none'){drawDebtHistogram();drawDebtDonut();}},150);
 

@@ -19,10 +19,16 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   ok(cf.h<=cf.vh-100,'cash-flow diagram fits on one screen ('+Math.round(cf.h)+'px high in a '+cf.vh+'px window)');
   const fs=await p.evaluate(()=>({row:parseFloat(getComputedStyle(document.querySelector('.ov-sum-row')).fontSize),tot:parseFloat(getComputedStyle(document.querySelector('.ov-sum-total')).fontSize),icon:document.querySelectorAll('.ov-sum-ic svg').length,col:[...document.querySelectorAll('.ov-sum')].map(e=>getComputedStyle(e).borderLeftColor)}));
   console.log(JSON.stringify(fs)); ok(fs.row>=12&&fs.tot>=20,'summary text is larger ('+fs.row.toFixed(1)+'px rows, '+fs.tot.toFixed(1)+'px totals)'); ok(fs.icon===3&&new Set(fs.col).size===3,'each summary has an icon and its own colour');
+  const own=await p.evaluate(()=>({cards:document.querySelectorAll('#ov-own-card .ov-sum').length,inOne:!document.querySelector('.ov-sum.ov-chart-card')}));
+  ok(own.cards===3&&own.inOne,'assets, liabilities and debt sit in one Own and owe card (O1)');
+  await p.evaluate(()=>document.querySelector('#ov-own-card .ov-sum-li .ov-sum-go').click()); await p.waitForTimeout(300);
+  ok(await p.evaluate(()=>document.getElementById('tab-assets').style.display!=='none'&&document.getElementById('assets-liabilities').classList.contains('active')),'the Liabilities heading opens Assets, Liabilities');
+  await p.evaluate(()=>showTab('overview')); await p.waitForTimeout(300);
   // custom goal + snapshot
   await p.fill('#goal-name','Wedding fund'); await p.fill('#goal-amt','8000'); await p.evaluate(()=>addCustomGoal());
   let st=await p.evaluate(()=>({goals:ovState.customGoals.length,rows:document.querySelectorAll('#ms-custom-list .ms-row').length,saved:JSON.parse(localStorage.getItem('pos_ov1')).customGoals.length}));
   ok(st.goals===1&&st.rows===1&&st.saved===1,'custom goal added, shown and saved');
+  await p.evaluate(()=>ovMsTab('snaps')); ok(await p.evaluate(()=>getComputedStyle(document.querySelector('.ms-col[data-p="goals"]')).display==='none'&&localStorage.getItem('vi-ov-ms-tab')==='snaps'),'Goals / Snapshots tabs switch and the choice is remembered (O2)');
   await p.fill('#snap-month','2026-03'); await p.fill('#snap-nw','1200'); await p.evaluate(()=>addSnapshot());
   st=await p.evaluate(()=>({snaps:document.querySelectorAll('#ms-snap-list .ms-row').length}));
   ok(st.snaps===1,'snapshot added and listed');
@@ -31,7 +37,8 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   ok(st.snaps===0&&st.goals===0,'both can be removed again'); await p.context().close();
   // mobile
   p=await open(390,844,true);
-  const mb=await p.evaluate(()=>{const a=document.querySelector('#ms-add-goal>summary').getBoundingClientRect(),b=document.querySelector('#ms-add-snap>summary').getBoundingClientRect();return{a:a.height>30&&a.width>200,b:b.height>30&&b.width>200,open:document.getElementById('ms-add-goal').open};});
+  await p.evaluate(()=>ovMsTab('snaps'));const mbB=await p.evaluate(()=>document.querySelector('#ms-add-snap>summary').getBoundingClientRect());await p.evaluate(()=>ovMsTab('goals'));
+  const mb=await p.evaluate((bb)=>{const a=document.querySelector('#ms-add-goal>summary').getBoundingClientRect(),b=bb;return{a:a.height>30&&a.width>200,b:b.height>30&&b.width>200,open:document.getElementById('ms-add-goal').open};},mbB);
   ok(mb.a&&mb.b,'mobile: "Add your own goal" and "Add a snapshot" buttons are visible');
   await p.evaluate(()=>{document.querySelector('#ms-add-goal>summary').click();}); await p.waitForTimeout(200);
   ok(await p.evaluate(()=>document.getElementById('ms-add-goal').open&&document.getElementById('goal-name').getBoundingClientRect().width>150),'mobile: tapping it opens the form');
