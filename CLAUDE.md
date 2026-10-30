@@ -54,3 +54,12 @@ A new brand is being applied. Design files are in `brand/`. Open `brand/vault-it
 - No new outside hosts. Fonts: Syne, DM Sans, Share Tech Mono only.
 - British English, sentence case, **no em dashes**. Keep "Not regulated by the FCA. Not financial advice." visible. Respect `prefers-reduced-motion`. Pages must never scroll sideways.
 - Tagline: **Get out of the red and into your home.** Name is written Vault·It with a brick separator, never a hyphen.
+- One phase per session. Read only that phase's part of `brand/vault-it-brand-handover.md` (list its sections with `grep -n '^#' brand/vault-it-brand-handover.md`). Never Read `brand/vault-it-brand-book.html` (227 KB) whole: grep it.
+
+## Token budget
+- `index.html` is 25k lines; `Vault-It_v0.3_Alpha.html` is a legacy build (ignore unless asked). Never Read either without `offset`/`limit`. A line-numbered map is added at session start (`.claude/hooks/map.sh`); otherwise Grep first.
+- `index.html` between `<<HB3D_ENGINE` and `HB3D_ENGINE>>` is generated: edit `src/hb3d/*`, then `node tools/build_hb3d.js`.
+- Run the tests you need by name (`bash scripts/run-tests.sh test_x`); the full suite only before a release. Read failures from `/tmp/vaultit-test-logs` rather than pasting whole runs.
+- Trim command output (`| tail -40`, `| grep`). Use `rtk` if installed.
+- Plan mode runs on Opus, the rest on Sonnet (`opusplan`). Delegate: `scout` (Haiku) finds code, `grunt` (Haiku) makes exact mechanical edits, `architect` (Opus) explains and plans, read-only.
+- Replies: outcome first, short, line refs rather than whole files. Suggest `/handoff` and a fresh session when the task changes, `/compact` after exploring.
