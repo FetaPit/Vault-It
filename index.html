@@ -6998,7 +6998,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     U.uNow.value = now; U.uPulse.value = pulse; U.uBuilt.value = seg(p, 0.05, 1);
     U.uFadeGlaze.value = seg(p, 0.88, 0.93); U.uLitGlass.value = seg(p, 0.93, 0.96); U.uLitDoor.value = seg(p, 0.96, 1);
     var top = Math.max(R.y1, R.y0 + 1), span = top - R.y0;
-    U.uSweepOn.value = red ? 0 : 1;
+    U.uSweepOn.value = (red || this._bLite) ? 0 : 1;
     U.uSweep.value = R.y0 + ((now * 20 * CH) % (span + 40 * CH)) - 10 * CH;   // 20 courses a second, repeating
     // environment
     var sb = seg(p, 0.005, 0.03), fnd = seg(p, 0, 0.03);
@@ -7011,10 +7011,10 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     E.slice.visible = pa > 0 && p > 0; E.slice.position.y = st.y; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
     this._bPulse = pulse;
     this._bInfo = { p: p, row: st.row, rows: st.rows, y: st.y, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
-      sliceA: pa, keys: st.keys, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height };
+      sliceA: pa, keys: st.keys, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: red };
     // auto orbit (6.6.8): drifts round slowly, stops at a touch, resumes after 2.5 s idle; off for reduced motion
     var ctl = this.controls;
-    if (red) ctl.autoRotate = false;
+    if (red || this._bLite) ctl.autoRotate = false;
     else if (!ctl.autoRotate && !this._bDrag && performance.now() - (this._bTouch || 0) > 2500) { ctl.autoRotate = true; ctl.autoRotateSpeed = 0.12 * 60 / (2 * Math.PI); }
     this.dirty = true;
   };
@@ -7026,13 +7026,19 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var t = performance.now(), raw = this._bTickT ? (t - this._bTickT) / 1000 : 1 / 60; this._bTickT = t;
     // a device that cannot keep up (frames slower than 1/10 s on average) drops to the lite stage (6.10): pixel ratio 1, no
     // ambient pulse, sweep or ring, and it only draws while something is building, so it never runs hot doing nothing
-    if (raw < 2) { this._bEma = this._bEma == null ? raw : this._bEma * 0.85 + raw * 0.15; this._bFrames = (this._bFrames || 0) + 1; }
-    if (!this._bLite && this._bFrames > 12 && this._bEma > 0.1) {
+    // Speed is judged only after the warm-up (shader compile and the first geometry upload make the first seconds slow on
+    // every device): from 3 s in, a running average slower than 1/8 s over 40 frames means the device cannot keep up.
+    if (!this._bT0) this._bT0 = t;
+    if (raw < 2 && t - this._bT0 > 3000) { this._bEma = this._bEma == null ? raw : this._bEma * 0.9 + raw * 0.1; this._bFrames = (this._bFrames || 0) + 1; }
+    if (!this._bLite && this._bFrames > 40 && this._bEma > 0.125) {
       this._bLite = true; var w = this.el.clientWidth, h = this.el.clientHeight;
-      if (w > 2 && h > 2) { this.renderer.setPixelRatio(this._dprFor(w, h)); this.renderer.setSize(w, h, false); }
+      if (w > 2 && h > 2) { this.renderer.setPixelRatio(1); this.renderer.setSize(w, h, false); }
     }
+    // lite (6.10): pixel ratio 1 and about 12 frames a second; the pulse and ring ping stay, only the sweep and auto orbit stop
+    if (this._bLite && !reduced() && t - (this._bLastDraw || 0) < 80 && this._brandSettled()) return true;
+    this._bLastDraw = t;
     var dt = Math.min(this._bLite ? 0.5 : 0.05, raw);
-    var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red || this._bLite;
+    var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red;
     if (red) this.p = target;
     else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 1.7); if (Math.abs(target - this.p) < 0.0003) this.p = target; }
     this._brandApply();
@@ -11268,6 +11274,11 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
           <button class="hud-btn" onclick="toggleExpand()"                   title="Fullscreen"  aria-label="Fullscreen">⛶</button>
         </div>
       </div>
+      <!-- Lay the bricks sits right under the viewport so the laying is seen (owner, 30 Oct 2026) -->
+      <div class="hb-lay" id="hb-lay" role="group" aria-labelledby="hb-add-lbl">
+        <div class="hb-sub-lbl" id="hb-add-lbl">Add to your savings</div>
+        <div class="hb-lay-row"><label for="savingsInput" id="hb-add-amt" class="vi-sr">Amount Saved</label><div class="iw"><span class="sym">£</span><input type="number" id="savingsInput" placeholder="0.00" min="0" step="100"></div><button class="btn-add" id="btnAdd">⊕ &nbsp;Lay the Bricks</button></div>
+      </div>
       <div class="vp-key">☝ DRAG — PAN &nbsp;·&nbsp; ✌ DRAG — ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH — ZOOM</div>
       <div class="scene-cap" id="sceneCap" style="display:none"></div>
       <!-- House Purchased CTA — shown when deposit goal reached -->
@@ -11319,12 +11330,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
           </div>
           <div style="font-size:.5rem;color:var(--t3);margin-top:5px">Savings build bricks on your selected floor. Other floors shown as structure.</div>
         </div>
-        <div class="hb-plan-add">
-          <div class="hb-sub-lbl" id="hb-add-lbl">Add to your savings</div>
-        <div class="igrp"><label for="savingsInput" id="hb-add-amt">Amount Saved</label><div class="iw"><span class="sym">£</span><input type="number" id="savingsInput" placeholder="0.00" min="0" step="100"></div></div>
-        <button class="btn-add" id="btnAdd">⊕ &nbsp;Lay the Bricks</button>
-          <div class="hb-plan-note" id="hb-plan-brick"></div>
-        </div>
+        <div class="hb-plan-note" id="hb-plan-brick" style="margin-top:14px"></div>
       </div>
       <div class="card hb-prog" id="hb-prog">
         <div class="card-lbl">Progress</div>
@@ -12357,7 +12363,12 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 .mss{display:flex;flex-direction:column;gap:5px}
 .hb-sub-lbl{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t2);margin:14px 0 8px}
 .hb-plan .hb-sub-lbl:first-of-type,.hb-prog .card-lbl+.hb-sub-lbl{margin-top:0}
-.hb-plan-add{margin-top:14px;padding-top:2px;border-top:1px solid rgb(var(--teal-rgb) / .12)}
+.hb-lay{margin-top:10px;padding:10px 12px;background:rgb(var(--panel-rgb) / .9);border:1px solid rgb(var(--teal-rgb) / .22);border-radius:6px}
+.hb-lay .hb-sub-lbl{margin:0 0 6px}
+.hb-lay-row{display:flex;gap:8px;align-items:stretch}
+.hb-lay-row .iw{flex:1;min-width:0}
+.hb-lay-row .btn-add{width:auto;flex:none;padding:11px 16px;white-space:nowrap}
+.vi-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .hb-plan-note{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--t2);margin-top:8px}
 .hb-prog .stats{margin-top:12px}
 .hb-prog .mss{display:grid;grid-template-columns:1fr 1fr;gap:4px}
@@ -15829,7 +15840,9 @@ function hbAfterDraw(){
 var HB3DAPP = { viewer: null, key: '', models: {}, order: [], want: null, lastP: null, lastMode: null, idle: {} };
 // Feature flags: ?<name>=new turns one on for this visit (?<name>=old turns it off), localStorage 'vi-flag-<name>' = '1' keeps it on.
 function viFlag(name) {
-  try { var q = new URLSearchParams(location.search).get(name); if (q === 'new') return true; if (q === 'old') return false; return localStorage.getItem('vi-flag-' + name) === '1'; } catch (e) { return false; }
+  try { var q = new URLSearchParams(location.search).get(name);   // ?x=new switches the flag on for this device (so an installed app keeps it); ?x=old switches it off
+    if (q === 'new') { try { localStorage.setItem('vi-flag-' + name, '1'); } catch (e2) {} return true; } if (q === 'old') { try { localStorage.removeItem('vi-flag-' + name); } catch (e3) {} return false; }
+    return localStorage.getItem('vi-flag-' + name) === '1'; } catch (e) { return false; }
 }
 // The brand build (brand handover 6.2 to 6.10) on the six 3D houses, Level 1 only: ?house=new or vi-flag-house = 1.
 function hbBrandOn() { return viFlag('house') && typeof HB3D !== 'undefined' && !!HB3D.brandStats; }
@@ -16048,6 +16061,7 @@ function hb3dPlaceOverlays() {
     var what = m.focus ? (sm.mode === 'build' ? 'your floor · ' + st.stage + ' · ' : 'your floor · ') : (sm.mode === 'build' ? st.stage + ' · ' : '');
     cap.textContent = sm.mode === 'site' ? '' : (name + ' · ' + what + st.bricksLaid.toLocaleString('en-GB') + ' / ' + st.bricksTotal.toLocaleString('en-GB') + ' bricks' + (st.tilesTotal ? ' · ' + st.tilesLaid.toLocaleString('en-GB') + ' tiles' : '')
       + (bri ? ' · ' + (window.VI_CURRENCY_SYMBOL || '£') + (HB3D.brandBrickValue(depositTarget(), st.bricksTotal) * (window.VI_CURRENCY_RATE || 1)).toFixed(2) + ' a brick' : ''));
+    var bInf = bri && v.brandInfo ? v.brandInfo() : null; if (bInf && (bInf.reduced || bInf.lite)) cap.textContent += bInf.reduced ? ' · animations off: reduced motion is on in your device settings' : ' · animations reduced: this device is slow';
     v.renderer.domElement.setAttribute('aria-label', '3D model: ' + (m.name || 'house') + (sm.mode === 'equity' ? ', mortgage ' + Math.round(sm.eq * 100) + '% paid' : sm.mode === 'build' ? ', ' + Math.round(p * 100) + '% built' : ''));
   }
 }

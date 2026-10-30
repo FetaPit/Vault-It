@@ -444,7 +444,7 @@
     U.uNow.value = now; U.uPulse.value = pulse; U.uBuilt.value = seg(p, 0.05, 1);
     U.uFadeGlaze.value = seg(p, 0.88, 0.93); U.uLitGlass.value = seg(p, 0.93, 0.96); U.uLitDoor.value = seg(p, 0.96, 1);
     var top = Math.max(R.y1, R.y0 + 1), span = top - R.y0;
-    U.uSweepOn.value = red ? 0 : 1;
+    U.uSweepOn.value = (red || this._bLite) ? 0 : 1;
     U.uSweep.value = R.y0 + ((now * 20 * CH) % (span + 40 * CH)) - 10 * CH;   // 20 courses a second, repeating
     // environment
     var sb = seg(p, 0.005, 0.03), fnd = seg(p, 0, 0.03);
@@ -457,10 +457,10 @@
     E.slice.visible = pa > 0 && p > 0; E.slice.position.y = st.y; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
     this._bPulse = pulse;
     this._bInfo = { p: p, row: st.row, rows: st.rows, y: st.y, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
-      sliceA: pa, keys: st.keys, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height };
+      sliceA: pa, keys: st.keys, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: red };
     // auto orbit (6.6.8): drifts round slowly, stops at a touch, resumes after 2.5 s idle; off for reduced motion
     var ctl = this.controls;
-    if (red) ctl.autoRotate = false;
+    if (red || this._bLite) ctl.autoRotate = false;
     else if (!ctl.autoRotate && !this._bDrag && performance.now() - (this._bTouch || 0) > 2500) { ctl.autoRotate = true; ctl.autoRotateSpeed = 0.12 * 60 / (2 * Math.PI); }
     this.dirty = true;
   };
@@ -472,13 +472,19 @@
     var t = performance.now(), raw = this._bTickT ? (t - this._bTickT) / 1000 : 1 / 60; this._bTickT = t;
     // a device that cannot keep up (frames slower than 1/10 s on average) drops to the lite stage (6.10): pixel ratio 1, no
     // ambient pulse, sweep or ring, and it only draws while something is building, so it never runs hot doing nothing
-    if (raw < 2) { this._bEma = this._bEma == null ? raw : this._bEma * 0.85 + raw * 0.15; this._bFrames = (this._bFrames || 0) + 1; }
-    if (!this._bLite && this._bFrames > 12 && this._bEma > 0.1) {
+    // Speed is judged only after the warm-up (shader compile and the first geometry upload make the first seconds slow on
+    // every device): from 3 s in, a running average slower than 1/8 s over 40 frames means the device cannot keep up.
+    if (!this._bT0) this._bT0 = t;
+    if (raw < 2 && t - this._bT0 > 3000) { this._bEma = this._bEma == null ? raw : this._bEma * 0.9 + raw * 0.1; this._bFrames = (this._bFrames || 0) + 1; }
+    if (!this._bLite && this._bFrames > 40 && this._bEma > 0.125) {
       this._bLite = true; var w = this.el.clientWidth, h = this.el.clientHeight;
-      if (w > 2 && h > 2) { this.renderer.setPixelRatio(this._dprFor(w, h)); this.renderer.setSize(w, h, false); }
+      if (w > 2 && h > 2) { this.renderer.setPixelRatio(1); this.renderer.setSize(w, h, false); }
     }
+    // lite (6.10): pixel ratio 1 and about 12 frames a second; the pulse and ring ping stay, only the sweep and auto orbit stop
+    if (this._bLite && !reduced() && t - (this._bLastDraw || 0) < 80 && this._brandSettled()) return true;
+    this._bLastDraw = t;
     var dt = Math.min(this._bLite ? 0.5 : 0.05, raw);
-    var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red || this._bLite;
+    var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red;
     if (red) this.p = target;
     else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 1.7); if (Math.abs(target - this.p) < 0.0003) this.p = target; }
     this._brandApply();

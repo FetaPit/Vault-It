@@ -25,13 +25,14 @@ const seed = () => {
     const h = await p.evaluate(() => {
       const plan = document.getElementById('hb-plan'), prog = document.getElementById('hb-prog'), hist = document.getElementById('hb-hist'), own = document.getElementById('hb-own-design');
       const inn = (c, ids) => ids.every(id => c && c.contains(document.getElementById(id)));
-      return { h1: inn(plan, ['htypes', 'priceInput', 'depositPctInput', 'floor-selector-card', 'savingsInput', 'btnAdd']), brick: /Each brick is worth about £\d/.test((document.getElementById('hb-plan-brick') || {}).textContent || ''),
+      return { h1: inn(plan, ['htypes', 'priceInput', 'depositPctInput', 'floor-selector-card']), lay: inn(document.getElementById('houseSceneCard'), ['savingsInput', 'btnAdd']) && document.getElementById('hb-lay').compareDocumentPosition(document.getElementById('sceneCap')) & 4, brick: /Each brick is worth about £\d/.test((document.getElementById('hb-plan-brick') || {}).textContent || ''),
         h2: inn(prog, ['savedAmt', 'pbarFill', 'stBricks', 'stRemain', 'ms1', 'ms100']),
         h3: inn(hist, ['habit-circles', 'logList', 'btnReset']) && hist.querySelector('#habit-circles').compareDocumentPosition(hist.querySelector('#logList')) & 4 && hist.querySelector('#logList').compareDocumentPosition(hist.querySelector('#btnReset')) & 4,
         h4: own && own.tagName === 'DETAILS' && !own.open && inn(own, ['model-file-input', 'meshy-prompt', 'meshy-go']),
         cards: document.querySelectorAll('#house-tab-inner .panel > .card').length, side: document.documentElement.scrollWidth - innerWidth };
     });
-    ok(h.h1 && h.brick, w + ': H1 one "Your house plan" card (type, price, deposit, floor, add savings, brick value)');
+    ok(h.h1 && h.brick, w + ': H1 one "Your house plan" card (type, price, deposit, floor, brick value)');
+    ok(h.lay, w + ': Lay the bricks sits right under the viewport (owner, 30 Oct)');
     ok(h.h2, w + ': H2 one "Progress" card (bar, stats, milestones)');
     ok(h.h3, w + ': H3 one "History" card: streak, then log, then reset');
     ok(h.h4, w + ': H4 "Your own design" is one collapsed card');

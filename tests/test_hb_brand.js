@@ -118,10 +118,11 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   ok(r.dpr <= 1.5, 'pixel ratio capped at 1.5 below 700 px');
   await p.context().close();
 
-  // ── 7. ?house=new turns it on for the visit without storing anything; Level 2 keeps its own look ──
+  // ── 7. ?house=new turns it on and keeps it on for this device (owner, 30 Oct: an installed app must keep it); ?house=old turns it off. Level 2 keeps its own look ──
   p = await open(semi, { flag: false, query: '?house=new' }); await settle(p);
   r = await p.evaluate(() => ({ on: !!HB3D.viewer.brandInfo(), stored: localStorage.getItem('vi-flag-house') }));
-  ok(r.on && r.stored === null, '?house=new shows the brand build and stores no flag');
+  ok(r.on && r.stored === '1', '?house=new shows the brand build and keeps the flag for this device');
+  ok(await p.evaluate(() => { history.replaceState(null, '', location.pathname + '?house=old'); const off = !viFlag('house'); return off && localStorage.getItem('vi-flag-house') === null; }), '?house=old switches it off again');
   await p.evaluate(() => { state.houseMode = 'purchased'; state.mortgageBalance = 200000; state.valuation = 320000; save(); updateUI(); }); await settle(p);
   r = await p.evaluate(() => { const v = HB3D.viewer; return { mode: hb3dState().mode, brand: !!v.brandInfo(), grpVis: !!(v._bGroup && v._bGroup.visible), water: v.water.visible }; });
   ok(r.mode === 'equity' && !r.brand && !r.grpVis && r.water, 'Level 2 (equity) keeps its current look with the flag on');
