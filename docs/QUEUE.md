@@ -9,11 +9,10 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [~] Cross-device readiness for the owner's test (31 Oct): sign up on a phone, sign in on a desktop with the data intact, install the app, sync on open and close; build the "One B" tester agent and its journey script to run this after every round (owner's ask, 30 Oct)
 - [ ] House builder brand build follow-ups (from the 30 Oct review): section 6.8 feedback ("+£5 · +4 bricks" pop-ups, stage flash, milestone toasts), a radial window glow at night, and a real-device speed check of the lite fallback
 - [ ] Remove the Classic switches from Settings after 6 Nov 2026 (one week), if nobody needs them
 - [ ] Level 2 Octalysis slice still open: real mortgage entry at purchase, overpayment what-ifs in the Level 2 panel (`docs/HOUSE_BUILDER_LEVEL2_GAMIFICATION.md`; the build rule, payments, reset and undo were done 30 Oct)
-- [ ] Sign-up page brand pass and a service worker that registers (today's is a `blob:` URL browsers refuse), cache version bump (audit plan phase 13)
+- [ ] Sign-up page brand pass and cache version bump (audit plan phase 13; the service worker part was done with the cross-device work, `04e58dd`)
 - [ ] Copy pass: em dashes in `index.html` (about 500) and `landing.html` (15), reworded not blind-replaced
 - [ ] Full suite plus the QA list (handover section 9) in both themes at 390 and 1100 px, then release when the owner asks
 - [ ] Check the metals price feed (`api.metals.live`) from the preview; replace it if dead (needed by linked metal items)
@@ -28,6 +27,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Cross-device readiness for the owner's test (31 Oct): real service worker and manifest (installable, shell opens offline), One B tester agent, `tests/journey_one_b.js`, `tests/test_sw.js`, `docs/qa/TEST_DAY.md` (`04e58dd`); One B's first report in `docs/qa/`
 - [x] A saved state missing a metal blanked total assets, net worth, the KPIs and the 3D tag to £0: metals are now filled in at load (`tests/test_partial_state.js`)
 - [x] Owner's answers: both 3D views on by default (classic in Settings for a week; remove the switches after 6 Nov), camera closer on phones in the brand build, ring ping from 5%, net worth card with 3D as the main view and the chart as the backup
 - [x] No animation seen on the owner's phone: the slow-device lite switch tripped during warm-up (now judged after 3 s, keeps the pulse and ring), `?house=new` now sticks on the device; "Lay the bricks" moved under the viewport (`tests/test_hb_brand.js`, `test_groupings`)

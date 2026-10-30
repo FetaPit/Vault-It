@@ -17,7 +17,7 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 | Wordmark | "Vault-It" with a hyphen 23 times in `index.html`; "Vault-It" 55 times; landing uses "Vault-It" only. |
 | Fonts | Loads Syne, DM Sans, Share Tech Mono, **DM Mono** and **Playfair Display** (both to remove). |
 | Theme | No light mode, no `data-theme` anywhere. |
-| Offline caching | The service worker is built from a `blob:` URL. Browsers refuse to register those, so **the app has no working offline cache today** (the error is swallowed). |
+| Offline caching | Was a `blob:` URL worker that browsers refused. Fixed 30 Oct (`04e58dd`): real `sw.js` and `manifest.webmanifest`, versioned by the build, shell opens offline (`tests/test_sw.js`). |
 | Staging | Cloudflare builds only `release/pioneer-v2`. Checks are local builds and Playwright screenshots in the session. |
 
 ## 2. Order and status (one phase per commit, owner's order of 30 Oct 2026)
@@ -36,7 +36,7 @@ Branch `brand-rollout` (from `Pioneer_v3` at 8e8cca5). This is the single live p
 | 10 | Brand look and every animation on all six three.js models in `src/hb3d` (owner chose option a), behind `?house=new` | Built behind the flag (`src/hb3d/brand.js`, `tests/test_hb_brand.js`, `docs/HB3D_KIT.md` "Brand build"), needs the owner's phone test |
 | 11 | Net worth in 3D as the Overview hero: 3D blocks first, Graph toggle, choice remembered, blocks in the sub-tab colours, behind `?nw=new` | Built behind the flag (`?nw=new`, off again with `?nw=old`), needs the owner's phone test. `tests/test_nw3d.js` |
 | 12 | On by default for testers once the owner signs off on the phone (old builder reachable from Settings for a week) | Done 30 Oct: both 3D views on by default; Settings has Brand build / Classic and 3D / Classic chart; `?house=old`, `?nw=old` also switch a device to classic |
-| 13 | `landing.html` brand pass; a service worker that registers (today's is a `blob:` URL browsers refuse); cache version bump | |
+| 13 | `landing.html` brand pass; cache version bump. (The service worker part was done with the cross-device work, `04e58dd`.) | |
 | 14 | Full suite and the QA list (brief section 9). Release only when the owner asks | |
 
 ### Working notes
