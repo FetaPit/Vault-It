@@ -19203,7 +19203,12 @@ V3Scene.prototype.kick=function(ms){this._until=Math.max(this._until||0,Date.now
 V3Scene.prototype.clear=function(){var g=this.root;while(g.children.length){var o=g.children.pop();o.traverse(function(m){if(m.geometry)m.geometry.dispose();var ms=m.material?(Array.isArray(m.material)?m.material:[m.material]):[];ms.forEach(function(x){if(x.map)x.map.dispose();x.dispose();});});}};
 // survey grid sized to the content (cell 5 cm), framed like the House Builder: three-quarter view from above
 V3Scene.prototype.frame=function(keep){
-  var box=new THREE.Box3().setFromObject(this.root);if(box.isEmpty())box.set(new THREE.Vector3(-20,0,-20),new THREE.Vector3(20,5,20));
+  this.size();
+  var box=new THREE.Box3().setFromObject(this.root),m4=new THREE.Matrix4(),gb=new THREE.Box3();
+  this.root.updateMatrixWorld(true);
+  this.root.traverse(function(o){if(!o.isInstancedMesh||!o.count)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();   // batched coins: measure every instance, not just the one coin shape
+    for(var i=0;i<o.count;i++){o.getMatrixAt(i,m4);m4.premultiply(o.matrixWorld);box.union(gb.copy(o.geometry.boundingBox).applyMatrix4(m4));}});
+  if(box.isEmpty())box.set(new THREE.Vector3(-20,0,-20),new THREE.Vector3(20,5,20));
   var c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3()),R=Math.max(s.x,s.z,s.y*1.6,20);
   this.catcher.scale.set(R*3,R*3,1);this.catcher.position.x=c.x;this.catcher.position.z=c.z;
   if(this.grid){this.sc.remove(this.grid);this.grid.geometry.dispose();this.grid.material.dispose();}
@@ -19211,8 +19216,11 @@ V3Scene.prototype.frame=function(keep){
   var g=this.grid=new THREE.GridHelper(size,div,v3Col(0x1f5e5a),v3Col(0x123734));g.material.transparent=true;g.material.opacity=0.35;g.position.set(c.x,0.01,c.z);this.sc.add(g);
   this.sc.fog.near=R*2.5;this.sc.fog.far=R*8;
   var sun=this.sun;sun.position.set(c.x+R*.9,R*1.4,c.z+R*1.1);sun.target.position.copy(c);var sc=sun.shadow.camera,e=R*3;sc.left=-e;sc.right=e;sc.top=e;sc.bottom=-e;sc.near=1;sc.far=R*40;sc.updateProjectionMatrix();   // wide enough that the floor near the camera is never left in false shadow
-  this.home={t:new THREE.Vector3(c.x,s.y*0.3,c.z),p:new THREE.Vector3(c.x+R*1.05,R*1.0+s.y,c.z+R*1.45)};
-  this.ctl.minDistance=Math.max(4,R*0.15);this.ctl.maxDistance=R*6;
+  var t0=new THREE.Vector3(c.x,s.y*0.3,c.z),p0=new THREE.Vector3(c.x+R*1.05,R*1.0+s.y,c.z+R*1.45),dir=p0.clone().sub(t0),cam=this.cam;
+  // fit everything (labels too) inside the narrower of the two view angles, so a phone held upright sees the whole scene
+  var rad=box.getBoundingSphere(new THREE.Sphere()).radius,vf=cam.fov*Math.PI/180,hf=2*Math.atan(Math.tan(vf/2)*(cam.aspect||1)),need=rad*((cam.aspect||1)<1?1.35:1.08)/Math.sin(Math.min(vf,hf)/2);
+  dir.setLength(Math.max(need,R*0.6));this.home={t:t0,p:t0.clone().add(dir)};
+  this.ctl.minDistance=Math.max(4,R*0.15);this.ctl.maxDistance=Math.max(R*6,dir.length()*2);
   if(!keep||!this._framed){this.reset();this._framed=true;}
   this.kick(900);
 };

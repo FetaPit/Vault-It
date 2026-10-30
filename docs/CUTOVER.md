@@ -49,6 +49,14 @@ into the SQL editor by the owner (the connector's confirmation prompt timed out 
   Email OTP length = 6 (or change the wording).
 - Not done yet: step 5 (`TURNSTILE_SECRET` + Supabase CAPTCHA) and step 6 (Stripe links).
 
+## Release 2026-10-30 16:04 UTC (`2f1315f`, backup `backup/release-pioneer-v2-20261030-1600`), plus a 3D framing fix the same day
+- Brand rollout phases 1 to 8, Daylight (darker, WCAG AA), item 3D viewer, Debtors / Creditors, physical cash log, assets reorder,
+  3D cash (1 coin = 1 unit, stacks of 10, blocks of 10 x 10) and metals (real bar sizes from weight).
+- Migration `009_waitlist_optin` applied; `waitlist-join` deployed (v1, no JWT check). Smoke test: bad e-mail 400, unknown confirm link 410.
+- The sign-up page at vault-it.co/sign-up is now live with double opt-in. Still to do: steps 4 to 6 of the list below (phone check, Turnstile, Resend).
+- Production build started from the push this time (no API call needed).
+- Known flaky test: `test_quick` (also fails 1 in 4 on the previous release).
+
 ## Release 2026-10-28 14:23 UTC (`b77d3ad`, backup `backup/release-pioneer-v2-20261028-1352`)
 - Landing join form now calls the new `waitlist-welcome` function (deployed v1): saves the address and e-mails a welcome with the
   app link from `hello@vault-it.co`. Live test: delivered within a second, but Gmail filed it under **Promotions**.
@@ -56,7 +64,7 @@ into the SQL editor by the owner (the connector's confirmation prompt timed out 
 - Build again started through the API: the GitHub push still does not trigger Workers Builds.
 - Known flaky test: `test_quick` fails intermittently on the live version too (not caused by these changes).
 
-## Next release: the sign-up page (`vault-it.co/sign-up`, double opt-in) — needs the owner's yes
+## The sign-up page (`vault-it.co/sign-up`, double opt-in): steps 1 to 3 done 30 Oct
 Built and tested on `Pioneer_v3`, not deployed. It replaces the live `waitlist-welcome` join (which saves and e-mails straight away, with no consent box
 and no check that the address belongs to the person typing it). Plan and reasons: `docs/OFFER_AND_PRICING.md`. In one sitting:
 1. Apply `009_waitlist_optin.sql` (removes the browser's insert right; existing rows become `legacy` — not on the marketing list).

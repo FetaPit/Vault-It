@@ -1,6 +1,6 @@
 # Before testers: what is left (30 Oct 2026)
 
-Branch `brand-rollout`. Done and pushed: colour code, Daylight polish, logo and tagline, the item 3D viewer (wealth inventory and liabilities), and the card groupings. Nothing is live yet: `release/pioneer-v2` is untouched.
+Branch `brand-rollout`. Done and pushed: colour code, Daylight polish, logo and tagline, the item 3D viewer (wealth inventory and liabilities), and the card groupings. Released 30 Oct 2026 (see `docs/CUTOVER.md`). Backup of the previous release: `backup/release-pioneer-v2-20261030-1600`.
 
 ## Pete's answers (30 Oct)
 
