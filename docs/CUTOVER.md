@@ -29,6 +29,11 @@ into the SQL editor by the owner (the connector's confirmation prompt timed out 
 (DKIM `resend._domainkey`, `send` + `rsend-euw1` CNAMEs, EU region) were added by Resend's Cloudflare auto-configure. Still to set: `FROM_EMAIL`
 (once Resend shows Verified); `APP_URL` is optional (the code's default is `https://app.vault-it.co/`).
 
+## 30 Oct 2026: name in e-mails
+- `send-auth-email` v10 and `waitlist-welcome` v2 deployed from `brand-rollout` (owner's yes): the only change is the name, Vault·It to **Vault-It**. Both checked live (an invalid address gets a 400). `waitlist-join` (not deployed yet) and a comment in `stock-quotes` carry the same change in the repo.
+- The sender name in the `FROM_EMAIL` and `WELCOME_FROM` secrets (if set) is not in the code: check it reads "Vault-It" in Supabase, Edge Functions, Secrets.
+- Preview builds: every `brand-rollout` preview failed until `wrangler.jsonc` got an empty `previews` block (30 Oct). Pushes now start preview builds on their own.
+
 ## Live since 2026-10-27 18:04 UTC (verified 22:10)
 - Released `208b85b` (backup `backup/release-pioneer-v2-20261027-1803`). The GitHub push did **not** start a Workers build (no build or preview build
   appears for any push since the repo was connected), so the production build was started through the API; the GitHub → Cloudflare link needs checking

@@ -1,4 +1,4 @@
-// stock-quotes — read-only live price lookup for Vault·It's Stocks & Funds tab.
+// stock-quotes — read-only live price lookup for Vault-It's Stocks & Funds tab.
 // Body: { symbols: ["VUSA.L", "AAPL", ...] }  →  { quotes: { "AAPL": { price, currency, name, changePct } } }
 // History:  { history: { symbols: [...], range: '1mo'|'3mo'|'6mo'|'1y'|'5y'|'max' } } → { series: { SYM: { currency, t: [unix…], c: [close…] } } }
 // Search:   { search: 'blockchain etf' | 'IE00BYZK4552' | 'VUSA' } → { results: [{ symbol, name, exchange, type }] }   (shares, ETFs and funds)

@@ -11,7 +11,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const RESEND_API_KEY       = Deno.env.get('RESEND_API_KEY') ?? ''
 const SUPABASE_URL         = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-const WELCOME_FROM         = Deno.env.get('WELCOME_FROM') ?? 'Vault·It <hello@vault-it.co>'
+const WELCOME_FROM         = Deno.env.get('WELCOME_FROM') ?? 'Vault-It <hello@vault-it.co>'
 const REPLY_TO             = Deno.env.get('WELCOME_REPLY_TO') ?? 'hello@vault-it.co'
 const APP_URL              = Deno.env.get('APP_URL') ?? 'https://app.vault-it.co/'
 const PEPPER               = Deno.env.get('PIN_PEPPER') ?? SUPABASE_SERVICE_KEY   // counter keys are salted hashes, never raw e-mails / IPs
@@ -56,25 +56,25 @@ function welcomeHtml(): string {
   const app = APP_URL.replace(/[&<>"']/g, '')
   return `<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>You're in — Vault·It beta</title></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>You're in — Vault-It beta</title></head>
 <body style="margin:0;padding:0;background:#04090f;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#04090f;padding:40px 20px">
   <tr><td align="center">
     <table width="520" cellpadding="0" cellspacing="0" style="background:#060d16;border:1px solid rgba(68,192,185,.18);border-radius:16px;overflow:hidden;max-width:520px;width:100%">
       <tr><td style="padding:32px 40px 22px;text-align:center;border-bottom:1px solid rgba(68,192,185,.12)">
-        <div style="font-size:22px;font-weight:800;letter-spacing:.12em;color:#c9a84c">VAULT·IT</div>
+        <div style="font-size:22px;font-weight:800;letter-spacing:.12em;color:#c9a84c">VAULT-IT</div>
       </td></tr>
       <tr><td style="padding:32px 40px">
         <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#f0f4f8;line-height:1.3">You're in.</h1>
-        <p style="margin:0 0 14px;font-size:15px;color:rgba(255,255,255,.7);line-height:1.6">Thanks for joining Vault·It. The beta is open, so you can start now.</p>
+        <p style="margin:0 0 14px;font-size:15px;color:rgba(255,255,255,.7);line-height:1.6">Thanks for joining Vault-It. The beta is open, so you can start now.</p>
         <p style="margin:0 0 26px;font-size:15px;color:rgba(255,255,255,.7);line-height:1.6">Open the app and sign in with this e-mail address. We'll send you a code, then you choose a PIN.</p>
         <table cellpadding="0" cellspacing="0" style="margin:0 auto 26px"><tr><td style="background:#c9a84c;border-radius:10px">
-          <a href="${app}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:700;color:#04090f;text-decoration:none">Open Vault·It &rarr;</a>
+          <a href="${app}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:700;color:#04090f;text-decoration:none">Open Vault-It &rarr;</a>
         </td></tr></table>
         <p style="margin:0;font-size:14px;color:rgba(255,255,255,.6);line-height:1.6">Anything confusing or broken, just reply to this e-mail.<br>Pete</p>
       </td></tr>
       <tr><td style="padding:18px 40px 26px;border-top:1px solid rgba(68,192,185,.08);text-align:center">
-        <p style="margin:0;font-size:11px;color:rgba(255,255,255,.25)">You're getting this because this address joined the Vault·It waitlist. To be removed, reply "remove".</p>
+        <p style="margin:0;font-size:11px;color:rgba(255,255,255,.25)">You're getting this because this address joined the Vault-It waitlist. To be removed, reply "remove".</p>
       </td></tr>
     </table>
   </td></tr>
@@ -82,7 +82,7 @@ function welcomeHtml(): string {
 </body>
 </html>`
 }
-const welcomeText = () => `You're in.\n\nThanks for joining Vault·It. The beta is open, so you can start now.\n\nOpen the app and sign in with this e-mail address. We'll send you a code, then you choose a PIN.\n\n${APP_URL}\n\nAnything confusing or broken, just reply to this e-mail.\nPete\n\nYou're getting this because this address joined the Vault·It waitlist. To be removed, reply "remove".`
+const welcomeText = () => `You're in.\n\nThanks for joining Vault-It. The beta is open, so you can start now.\n\nOpen the app and sign in with this e-mail address. We'll send you a code, then you choose a PIN.\n\n${APP_URL}\n\nAnything confusing or broken, just reply to this e-mail.\nPete\n\nYou're getting this because this address joined the Vault-It waitlist. To be removed, reply "remove".`
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
@@ -119,7 +119,7 @@ Deno.serve(async (req: Request) => {
     try {
       const r = await fetch('https://api.resend.com/emails', {
         method: 'POST', headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: WELCOME_FROM, to: [email], reply_to: REPLY_TO, subject: "You're in — your Vault·It beta link", html: welcomeHtml(), text: welcomeText() }),
+        body: JSON.stringify({ from: WELCOME_FROM, to: [email], reply_to: REPLY_TO, subject: "You're in — your Vault-It beta link", html: welcomeHtml(), text: welcomeText() }),
         signal: AbortSignal.timeout(8000),
       })
       emailed = r.ok

@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const RESEND_API_KEY        = Deno.env.get('RESEND_API_KEY') ?? ''
 const SUPABASE_URL          = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-const FROM_EMAIL            = Deno.env.get('FROM_EMAIL') ?? 'Vault·It <onboarding@resend.dev>'
+const FROM_EMAIL            = Deno.env.get('FROM_EMAIL') ?? 'Vault-It <onboarding@resend.dev>'
 const APP_URL               = Deno.env.get('APP_URL') ?? 'https://app.vault-it.co/'
 const TURNSTILE_SECRET      = Deno.env.get('TURNSTILE_SECRET') ?? ''     // Cloudflare Turnstile ("are you human"); unset = no check yet
 // Sites a token may have been minted on (Cloudflare reports the hostname in its answer): the app, and the older GitHub address.
@@ -101,7 +101,7 @@ function emailHtml(otpCode: string, email: string): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sign in to Vault·It</title>
+<title>Sign in to Vault-It</title>
 </head>
 <body style="margin:0;padding:0;background:#04090f;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#04090f;padding:40px 20px">
@@ -109,7 +109,7 @@ function emailHtml(otpCode: string, email: string): string {
     <table width="520" cellpadding="0" cellspacing="0" style="background:#060d16;border:1px solid rgba(68,192,185,.18);border-radius:16px;overflow:hidden;max-width:520px;width:100%">
       <!-- Header -->
       <tr><td style="background:linear-gradient(135deg,#060d16,#0a1520);padding:36px 40px 28px;text-align:center;border-bottom:1px solid rgba(68,192,185,.12)">
-        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;letter-spacing:.12em;color:#c9a84c">VAULT·IT</div>
+        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;letter-spacing:.12em;color:#c9a84c">VAULT-IT</div>
         <div style="font-size:10px;color:rgba(68,192,185,.7);letter-spacing:.18em;margin-top:4px">SECURE FINANCIAL INTELLIGENCE</div>
       </td></tr>
       <!-- Body -->
@@ -117,7 +117,7 @@ function emailHtml(otpCode: string, email: string): string {
         <p style="margin:0 0 8px;font-size:13px;color:rgba(255,255,255,.45);letter-spacing:.06em">YOUR SIGN-IN CODE</p>
         <h1 style="margin:0 0 20px;font-size:24px;font-weight:700;color:#f0f4f8;line-height:1.3">Open your Vault</h1>
         <p style="margin:0 0 28px;font-size:15px;color:rgba(255,255,255,.6);line-height:1.6">
-          Enter this code on the Vault·It sign-in screen for <strong style="color:#e8edf2">${email}</strong>.<br>
+          Enter this code on the Vault-It sign-in screen for <strong style="color:#e8edf2">${email}</strong>.<br>
           The code expires in <strong style="color:#44c0b9">60 minutes</strong> and can only be used once.
         </p>
         <!-- OTP Code Block -->
@@ -129,7 +129,7 @@ function emailHtml(otpCode: string, email: string): string {
             </div>
           </td></tr>
         </table>
-        <p style="margin:0;font-size:12px;color:rgba(255,255,255,.3);text-align:center">Type or copy the code above into the Vault·It app</p>
+        <p style="margin:0;font-size:12px;color:rgba(255,255,255,.3);text-align:center">Type or copy the code above into the Vault-It app</p>
       </td></tr>
       <!-- Footer -->
       <tr><td style="padding:20px 40px 28px;border-top:1px solid rgba(68,192,185,.08);text-align:center">
@@ -206,7 +206,7 @@ Deno.serve(async (req: Request) => {
     body: JSON.stringify({
       from:    FROM_EMAIL,
       to:      [email],
-      subject: 'Your Vault·It sign-in code',
+      subject: 'Your Vault-It sign-in code',
       html:    emailHtml(otpCode, email),
     }),
   })

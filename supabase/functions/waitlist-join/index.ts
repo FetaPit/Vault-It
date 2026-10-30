@@ -9,7 +9,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const RESEND_API_KEY        = Deno.env.get('RESEND_API_KEY') ?? ''
 const SUPABASE_URL          = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-const FROM_EMAIL            = Deno.env.get('FROM_EMAIL') ?? 'Vault·It <onboarding@resend.dev>'
+const FROM_EMAIL            = Deno.env.get('FROM_EMAIL') ?? 'Vault-It <onboarding@resend.dev>'
 const SITE_URL              = (Deno.env.get('SITE_URL') ?? 'https://vault-it.co/').replace(/\/?$/, '/')
 const TURNSTILE_SECRET      = Deno.env.get('TURNSTILE_SECRET') ?? ''     // unset = no human check yet
 const TURNSTILE_HOSTS       = (Deno.env.get('WAITLIST_TURNSTILE_HOSTNAMES') ?? 'vault-it.co').split(',').map((h) => h.trim().toLowerCase()).filter(Boolean)
@@ -91,18 +91,18 @@ async function verifyTurnstile(token: string, ip: string): Promise<'ok' | 'fail'
 
 function confirmHtml(email: string, link: string, unsub: string, testing: boolean): string {
   const e = esc(email), l = esc(link), u = esc(unsub)
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Confirm your place on the Vault·It beta list</title></head>
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Confirm your place on the Vault-It beta list</title></head>
 <body style="margin:0;padding:0;background:#04090f;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#04090f;padding:36px 16px"><tr><td align="center">
 <table width="520" cellpadding="0" cellspacing="0" style="background:#060d16;border:1px solid rgba(68,192,185,.18);border-radius:16px;max-width:520px;width:100%">
-<tr><td style="padding:32px 36px 8px;text-align:center"><div style="font-size:20px;font-weight:800;letter-spacing:.12em;color:#c9a84c">VAULT·IT</div></td></tr>
+<tr><td style="padding:32px 36px 8px;text-align:center"><div style="font-size:20px;font-weight:800;letter-spacing:.12em;color:#c9a84c">VAULT-IT</div></td></tr>
 <tr><td style="padding:18px 36px 8px">
 <h1 style="margin:0 0 14px;font-size:22px;color:#f0f4f8;line-height:1.3">One click to confirm</h1>
-<p style="margin:0 0 22px;font-size:15px;color:rgba(255,255,255,.7);line-height:1.6">Someone — hopefully you — asked to join the Vault·It beta list with <strong style="color:#e8edf2">${e}</strong>.${testing ? ' Confirm and we will send you the link to start testing.' : ''}</p>
+<p style="margin:0 0 22px;font-size:15px;color:rgba(255,255,255,.7);line-height:1.6">Someone — hopefully you — asked to join the Vault-It beta list with <strong style="color:#e8edf2">${e}</strong>.${testing ? ' Confirm and we will send you the link to start testing.' : ''}</p>
 <p style="margin:0 0 26px;text-align:center"><a href="${l}" style="display:inline-block;background:#c9a84c;color:#04090f;text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:10px">Confirm my place</a></p>
 <p style="margin:0 0 8px;font-size:12px;color:rgba(255,255,255,.45);line-height:1.6">The link works for 7 days. If you did not ask for this, ignore this e-mail: you will not hear from us again and the request is deleted after 30 days.</p>
 </td></tr>
-<tr><td style="padding:16px 36px 26px;border-top:1px solid rgba(68,192,185,.08)"><p style="margin:0;font-size:11px;color:rgba(255,255,255,.35);line-height:1.6">Vault·It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5 7EQ · <a href="mailto:hello@vault-it.co" style="color:rgba(68,192,185,.8)">hello@vault-it.co</a> · <a href="${u}" style="color:rgba(68,192,185,.8)">Remove me from the list</a></p></td></tr>
+<tr><td style="padding:16px 36px 26px;border-top:1px solid rgba(68,192,185,.08)"><p style="margin:0;font-size:11px;color:rgba(255,255,255,.35);line-height:1.6">Vault-It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5 7EQ · <a href="mailto:hello@vault-it.co" style="color:rgba(68,192,185,.8)">hello@vault-it.co</a> · <a href="${u}" style="color:rgba(68,192,185,.8)">Remove me from the list</a></p></td></tr>
 </table></td></tr></table></body></html>`
 }
 
@@ -174,9 +174,9 @@ Deno.serve(async (req: Request) => {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      from: FROM_EMAIL, to: [email], subject: 'Confirm your place on the Vault·It beta list',
+      from: FROM_EMAIL, to: [email], subject: 'Confirm your place on the Vault-It beta list',
       html: confirmHtml(email, link, unsub, testing),
-      text: `Confirm your place on the Vault·It beta list: ${link}\n\nThe link works for 7 days. If you did not ask for this, ignore this e-mail.\nRemove me: ${unsub}\n\nVault·It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ · hello@vault-it.co`,
+      text: `Confirm your place on the Vault-It beta list: ${link}\n\nThe link works for 7 days. If you did not ask for this, ignore this e-mail.\nRemove me: ${unsub}\n\nVault-It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ · hello@vault-it.co`,
       headers: { 'List-Unsubscribe': `<${unsub}>` },
     }),
   })
