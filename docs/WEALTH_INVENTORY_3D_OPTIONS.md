@@ -56,6 +56,14 @@ Two different uses:
 
 Sources: [Poly Haven licence](https://polyhaven.com/license), [Poly Haven public API](https://github.com/Poly-Haven/Public-API), [Poly Pizza fact sheet](https://poly.pizza/docs/press), [Poly Pizza MCP](https://glama.ai/mcp/servers/MatthewHallCom/Poly-Pizza-MCP), [multi-source asset MCP](https://glama.ai/mcp/servers/jonit-dev/threenative-asset-mcp), [sketchfab-mcp-server](https://npmjs.com/package/sketchfab-mcp-server), [BlenderMCP](https://www.flowhunt.io/mcp-servers/blender), [Smithsonian Open Access 3D](https://www.si.edu/spotlight/openaccesshighlights).
 
+## Poly Pizza API notes (ours)
+
+- Base `https://api.poly.pizza/v1/`. Key in header `X-Auth-Token` (no prefix). In build sessions the key is a network secret on `api.poly.pizza` (added by the proxy, never in code or chat); in the app it is Supabase secret `POLYPIZZA_API_KEY`, used only by an edge function.
+- `GET /search/{query}?limit=5` (also `cursor`, `format=glb`, `tricount=0-5000`), `GET /model/{id}`, `GET /popular`. Results carry `ID`, `Title`, `Creator.Username`, `Creator.PURL`, `Thumbnail`, `Download` (a .glb on the CDN, no key needed), `Licence`, `Tags`, `TriangleCount`.
+- Licence: CC0 needs nothing; CC-BY 4.0 shows on the tile: "Title" by Username (poly.pizza) CC-BY 4.0. Store the credit with the item.
+- Store the model ID, not just the file: IDs are stable. 429 means back off for a second.
+- Not yet verified live (key arrives in the next session); the field names come from a community guide.
+
 ## Needs the owner's yes before building
 
 - Layer 2 sends photos to Meshy: update the privacy notice wording (Meshy is named today for house models only).
