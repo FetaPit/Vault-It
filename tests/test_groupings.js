@@ -53,6 +53,15 @@ const seed = () => {
     await p.evaluate(() => setDebtChart('hist')); await p.evaluate(() => setDebtMethod('snowball')); await p.waitForTimeout(400);
     ok(await p.evaluate(() => document.getElementById('debt-plan-lbl').textContent === 'Snowball method' && /Snowball|Minimum/.test(document.getElementById('debt-interest-saving').textContent)), w + ': picking Snowball shows what Snowball costs');
     await p.evaluate(() => setDebtMethod('avalanche'));
+    // + Add Debt opens a pop-up in view (owner: it used to open at the foot of the page, out of sight)
+    await p.evaluate(() => window.scrollTo(0, 0)); await p.click('button[onclick="showDebtForm()"]'); await p.waitForTimeout(200);
+    const pop = await p.evaluate(() => { const c = document.getElementById('debt-form-card').getBoundingClientRect(); return { inView: c.top >= 0 && c.bottom <= innerHeight && c.height > 100, focus: document.activeElement.id, top: document.getElementById('debt-form-modal').parentNode === document.body }; });
+    ok(pop.inView && pop.focus === 'df-name' && pop.top, w + ': + Add Debt opens a pop-up in view, name field focused');
+    await p.click('#debt-form-card button[onclick="saveDebt()"]'); ok(/Give the debt a name/.test(await p.textContent('#debt-form-msg')), w + ': saving without a name says why');
+    await p.keyboard.press('Escape'); ok(await p.evaluate(() => document.getElementById('debt-form-modal').hidden), w + ': Escape closes it');
+    await p.evaluate(() => { window.isPioneer = () => true; }); await p.click('button[onclick="showDebtForm()"]'); await p.fill('#df-name', 'Test card'); await p.fill('#df-balance', '300'); await p.press('#df-name', 'Enter'); await p.waitForTimeout(300);
+    ok(await p.evaluate(() => debtState.debts.some(d => d.name === 'Test card' && d.balance === 300) && document.getElementById('debt-form-modal').hidden), w + ': saving adds the debt and closes the pop-up');
+    await p.evaluate(() => { debtState.debts = debtState.debts.filter(d => d.name !== 'Test card'); saveDebtState(); renderDebtTab(); });
     ok(d.cards === 2, w + ': debt tab is 2 cards plus the strip, was 5 (' + d.cards + ')');
     // Assets: metals
     await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'metals', null); }); await p.waitForTimeout(600);

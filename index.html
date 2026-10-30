@@ -11143,20 +11143,23 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
         <div id="debt-treemap" class="dtm" style="display:none"></div>
         </div>
     </div>
-<div id="debt-form-card" class="ov-data-card" style="display:none;margin-top:16px">
-      <div class="ov-data-title">Add / Edit Debt</div>
+<div id="debt-form-modal" class="vi-pop" hidden onclick="if(event.target===this)hideDebtForm()" onkeydown="if(event.key==='Escape')hideDebtForm()">
+<div id="debt-form-card" class="ov-data-card vi-pop-card" role="dialog" aria-modal="true" aria-labelledby="debt-form-title" style="display:none">
+      <div class="vi-pop-hd"><div class="ov-data-title" id="debt-form-title">Add a debt</div><button class="inv-x" type="button" onclick="hideDebtForm()" aria-label="Close"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg></button></div>
       <div class="g-form">
-        <div><label class="ov-kpi-lbl">Name</label><input type="text" id="df-name" class="al-inp"></div>
+        <div><label class="ov-kpi-lbl">Name</label><input type="text" id="df-name" class="al-inp" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();saveDebt();}"></div>
         <div><label class="ov-kpi-lbl">Balance £</label><input type="number" id="df-balance" class="al-inp"></div>
         <div><label class="ov-kpi-lbl">Interest Rate %</label><input type="number" id="df-rate" step="0.1" class="al-inp"></div>
         <div><label class="ov-kpi-lbl">Min Payment £/mo</label><input type="number" id="df-min" class="al-inp"></div>
         <div><label class="ov-kpi-lbl">Type</label><select id="di-type" class="al-inp"><option value="credit">Credit Card</option><option value="personal">Personal Loan</option><option value="student">Student Loan</option><option value="car">Car / Vehicle Finance</option><option value="bnpl">Buy Now Pay Later</option><option value="overdraft">Overdraft</option><option value="mortgage">Mortgage</option><option value="other">Other</option></select></div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn-add-data" onclick="saveDebt()">Save Debt</button>
-        <button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="document.getElementById('debt-form-card').style.display='none'">Cancel</button>
+        <button class="btn-add-data" onclick="saveDebt()">Save debt</button>
+        <button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="hideDebtForm()">Cancel</button>
       </div>
+      <div id="debt-form-msg" class="vi-pop-msg" role="alert"></div>
     </div>
+</div>
   </div>
 </div>
 
@@ -12501,6 +12504,13 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .debt-strip .ov-kpi+.ov-kpi{border-left:1px solid rgb(var(--ink-rgb) / .08)!important}
 @media(max-width:600px){.debt-strip{grid-template-columns:1fr 1fr!important}.debt-strip .ov-kpi:nth-child(3){border-left:0!important}.debt-strip .ov-kpi:nth-child(n+3){border-top:1px solid rgb(var(--ink-rgb) / .08)!important}}
 .debt-charts[data-chart="hist"] .debt-break-only,.debt-charts[data-chart="break"] .debt-hist-only{display:none!important}
+.vi-pop{position:fixed;inset:0;z-index:9000;background:rgb(var(--bg-rgb) / .78);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px}
+.vi-pop[hidden]{display:none}
+.vi-pop-card{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;margin:0!important;box-shadow:0 18px 50px -20px rgba(0,0,0,.6)}
+.vi-pop-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.vi-pop-hd .ov-data-title{margin:0!important}
+.vi-pop-msg{font-size:.58rem;color:var(--re);min-height:1em;margin-top:8px}
+body.vi-pop-open{overflow:hidden}
 .debt-cost{margin:0 0 14px;padding:12px;border:1px solid rgb(var(--ink-rgb) / .07);border-radius:10px;background:rgb(var(--ink-rgb) / .02)}
 .debt-cost-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;color:var(--t2);margin-bottom:8px}
 .ov-sum-a{--sc:var(--teal)}.ov-sum-li{--sc:var(--amber)}.ov-sum-d{--sc:var(--red)}
@@ -20104,19 +20114,33 @@ function delLiability(id){alState.liabilities=alState.liabilities.filter(functio
 // debtState declared above init block
 function saveDebtState(){try{localStorage.setItem(DEBT_KEY,JSON.stringify(debtState));}catch(e){}}
 function debtTotal(){return debtState.debts.reduce(function(s,d){return s+d.balance;},0);}
-function showDebtForm(){document.getElementById('debt-form-card').style.display='block';}
+// Add a debt: a pop-up over the page (it used to open at the foot of the Debt tab, out of sight)
+var _debtFormReturn=null;
+function showDebtForm(){
+  var m=document.getElementById('debt-form-modal'),c=document.getElementById('debt-form-card');if(!m||!c)return;
+  if(m.parentNode!==document.body)document.body.appendChild(m);   // out of the tab, so it always sits on top
+  _debtFormReturn=document.activeElement;
+  m.hidden=false;c.style.display='block';document.body.classList.add('vi-pop-open');
+  var msg=document.getElementById('debt-form-msg');if(msg)msg.textContent='';
+  setTimeout(function(){var f=document.getElementById('df-name');if(f)f.focus();},30);
+}
+function hideDebtForm(){
+  var m=document.getElementById('debt-form-modal'),c=document.getElementById('debt-form-card');
+  if(c)c.style.display='none';if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');
+  var back=_debtFormReturn;_debtFormReturn=null;if(back&&back.focus)setTimeout(function(){try{back.focus();}catch(e){}},0);
+}
 function saveDebt(){
   var n=document.getElementById('df-name').value.trim();
   var b=(parseFloat(document.getElementById('df-balance').value)||0)/(window.VI_CURRENCY_RATE||1);
   var r=parseFloat(document.getElementById('df-rate').value)||0;
   var m=(parseFloat(document.getElementById('df-min').value)||0)/(window.VI_CURRENCY_RATE||1);
-  if(!n)return;
-  if(!isPioneer()&&(debtState.debts||[]).filter(function(d){return !d._onboarding;}).length>=FREE_LIMITS.debts){showPaywall('debts');return;}
+  if(!n){var mm=document.getElementById('debt-form-msg');if(mm)mm.textContent='Give the debt a name, for example "Barclaycard".';var fn=document.getElementById('df-name');if(fn)fn.focus();return;}
+  if(!isPioneer()&&(debtState.debts||[]).filter(function(d){return !d._onboarding;}).length>=FREE_LIMITS.debts){hideDebtForm();showPaywall('debts');return;}
   var dtype=(document.getElementById('di-type')||{}).value||'other';
   debtState.debts.push({id:Date.now(),name:n,original:b,balance:b,rate:r,min:m,type:dtype});
   document.getElementById('df-name').value='';document.getElementById('df-balance').value='';document.getElementById('df-rate').value='';document.getElementById('df-min').value='';
   var dit=document.getElementById('di-type');if(dit)dit.value='credit';
-  document.getElementById('debt-form-card').style.display='none';
+  hideDebtForm();
   saveDebtState();renderDebtTab();updateKPIs();checkAchievements();
 }
 // Placeholder total created by the old onboarding questionnaire — let users replace it with real, separate debts.
