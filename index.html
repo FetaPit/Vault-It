@@ -12596,6 +12596,10 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .owe-sure select{background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-size:.56rem;padding:4px 6px}
 .owe-pay{display:flex;gap:6px;margin-top:8px}.owe-pay input{flex:1;min-width:0;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.7rem;padding:6px 8px}
 .owe-del{margin-top:8px}
+.v3-host{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;background:#05101b}
+.scene.v3-on{position:relative;min-height:380px}
+#cashSceneCard .scene.v3-on{min-height:420px}
+#cashSceneCard .orbit-hint{z-index:2}
 .vi-pop{position:fixed;inset:0;z-index:9000;background:rgb(var(--bg-rgb) / .78);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px}
 .vi-pop[hidden]{display:none}
 .vi-pop-card{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;margin:0!important;box-shadow:0 18px 50px -20px rgba(0,0,0,.6)}
@@ -15909,15 +15913,15 @@ function _updateMetalsHUD(){
 }
 
 function toggleMetalsOrbitMode(){
-  _mOrbitMode=!_mOrbitMode;
+  _mOrbitMode=!_mOrbitMode;if(window._v3MetalsOn&&V3.metals)V3.metals.spin(_mOrbitMode);
   var btn=document.getElementById('hud-metals-orbit-toggle');
   var ico=document.getElementById('hud-metals-orbit-icon');
   if(btn)btn.classList.toggle('orbit-active',_mOrbitMode);
   if(ico)ico.textContent=_mOrbitMode?'⟳':'✥';
 }
 
-function metalsZoomIn(){_mZoom=Math.min(3.5,(_mZoom||1)*1.15);_updateMetalsHUD();renderMetalsISO();}
-function metalsZoomOut(){_mZoom=Math.max(0.3,(_mZoom||1)/1.15);_updateMetalsHUD();renderMetalsISO();}
+function metalsZoomIn(){if(window._v3MetalsOn&&V3.metals){V3.metals.zoom(0.85);return;}_mZoom=Math.min(3.5,(_mZoom||1)*1.15);_updateMetalsHUD();renderMetalsISO();}
+function metalsZoomOut(){if(window._v3MetalsOn&&V3.metals){V3.metals.zoom(1.18);return;}_mZoom=Math.max(0.3,(_mZoom||1)/1.15);_updateMetalsHUD();renderMetalsISO();}
 
 function toggleMetalsExpand(){
   _mIsExpanded=!_mIsExpanded;
@@ -15929,7 +15933,7 @@ function toggleMetalsExpand(){
   if(_mIsExpanded&&_isExpanded)toggleExpand();
   setTimeout(renderMetalsISO,30);
 }
-function resetMetalsView(){_mPanX=0;_mPanY=0;_mAngle=0;_mZoom=1;_updateMetalsHUD();renderMetalsISO();}
+function resetMetalsView(){if(window._v3MetalsOn&&V3.metals){V3.metals.reset();return;}_mPanX=0;_mPanY=0;_mAngle=0;_mZoom=1;_updateMetalsHUD();renderMetalsISO();}
 
 // ── METALS GESTURE SYSTEM (Pointer Events API) ────────────────────────────────
 (function initMetalsGestures() {
@@ -15946,6 +15950,7 @@ function resetMetalsView(){_mPanX=0;_mPanY=0;_mAngle=0;_mZoom=1;_updateMetalsHUD
     }
 
     el.addEventListener('pointerdown', function(e) {
+      if (window._v3MetalsOn) return;   // the 3D view has its own orbit controls
       if (e.target !== el && e.target.closest && (e.target.closest('.hud-bar') || e.target.closest('.vp-guide'))) return;
       e.preventDefault();
       el.setPointerCapture(e.pointerId);
@@ -15961,6 +15966,7 @@ function resetMetalsView(){_mPanX=0;_mPanY=0;_mAngle=0;_mZoom=1;_updateMetalsHUD
     });
 
     el.addEventListener('pointermove', function(e) {
+      if (window._v3MetalsOn) return;
       if (!ptrs.has(e.pointerId)) return;
       var prev = ptrs.get(e.pointerId);
       var cur = { x: e.clientX, y: e.clientY };
@@ -15996,6 +16002,7 @@ function resetMetalsView(){_mPanX=0;_mPanY=0;_mAngle=0;_mZoom=1;_updateMetalsHUD
     el.addEventListener('pointercancel', onUp);
 
     el.addEventListener('wheel', function(e) {
+      if (window._v3MetalsOn) return;
       e.preventDefault();
       _mZoom = Math.max(0.3, Math.min(3.5, (_mZoom || 1) - e.deltaY * 0.001));
       _updateMetalsHUD(); renderMetalsISO();
@@ -19138,7 +19145,186 @@ function alTotalAssets(){
 }
 function computeNetWorth(){return alTotalAssets()+totalAssets()-alTotalLiab()-debtTotal()-totalDebts();}
 
+
+// ═══════════════════════════════════════════════════════════════
+// 3D CASH AND PRECIOUS METALS: the House Builder's own environment (dark teal sky, fog, survey grid, the same
+// lights and orbit controls), real-size coins and bars. Units: centimetres.
+// Cash: 1 coin = 1 unit of the chosen currency (£1, $1, €1, ₹1 at their real size). Stacks of 10, 10 rows by
+// 10 columns make a block of 1,000; then a gap and the next block. Metals: the user's weight in each metal as
+// standard bars (1 kg, 100 g, 1 oz, then the remainder), sized from the metal's density; value at the live price.
+// Falls back to the older drawings if 3D is not available on the device.
+// ═══════════════════════════════════════════════════════════════
+var V3={};
+function v3Ok(){try{if(!window.THREE||!THREE.OrbitControls)return false;if(V3._gl===undefined){var c=document.createElement('canvas');V3._gl=!!(c.getContext('webgl')||c.getContext('experimental-webgl'));}return V3._gl;}catch(e){return false;}}
+function v3Col(h){return new THREE.Color(h).convertSRGBToLinear();}
+var V3_COINS={   // real sizes (cm): diameter, thickness, edge sides; outer and inner metal colours
+  GBP:{d:2.343,t:0.28,sides:12,outer:'#C8A445',inner:'#C9CDD2',sym:'£',name:'£1'},
+  USD:{d:2.649,t:0.20,sides:48,outer:'#C59B3C',inner:null,sym:'$',name:'$1'},
+  EUR:{d:2.325,t:0.233,sides:48,outer:'#C9CDD2',inner:'#C8A445',sym:'€',name:'€1'},
+  INR:{d:2.0,t:0.145,sides:48,outer:'#C9CDD2',inner:null,sym:'₹',name:'₹1'}
+};
+var V3_METALS={gold:{rho:19.32,col:'#E5BC52',rough:.2,label:'Gold'},silver:{rho:10.49,col:'#DADDE0',rough:.24,label:'Silver'},platinum:{rho:21.45,col:'#C7CCD1',rough:.28,label:'Platinum'},palladium:{rho:12.02,col:'#BEC2C5',rough:.3,label:'Palladium'}};
+var V3_BARS=[{g:1000,name:'1 kg',w:11.6,d:5.2,pile:5},{g:100,name:'100 g',w:5.5,d:3.1,pile:10},{g:31.1035,name:'1 oz',w:4.1,d:2.4,pile:10}];
+var OZ_G=31.1035;
+// the House Builder's look (src/hb3d/viewer.js): same sky, fog, ground, grid and lights
+function V3Scene(host,label){
+  var self=this;this.host=host;
+  var r=this.r=new THREE.WebGLRenderer({antialias:true,alpha:false});
+  r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;
+  r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;
+  var cv=r.domElement;cv.className='v3-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',label);
+  cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none';
+  host.insertBefore(cv,host.firstChild);
+  var sc=this.sc=new THREE.Scene();sc.background=new THREE.Color(0x05101b);sc.fog=new THREE.Fog(0x05101b,600,1600);
+  sc.add(new THREE.HemisphereLight(v3Col(0xa8dcd6),v3Col(0x10302e),0.66));
+  var sun=this.sun=new THREE.DirectionalLight(v3Col(0xfff0de),1.2);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-0.0004;sun.shadow.normalBias=0.02;sc.add(sun);sc.add(sun.target);
+  var fill=new THREE.DirectionalLight(v3Col(0x6fb8d8),0.35);fill.position.set(-200,120,-100);sc.add(fill);
+  this.ground=new THREE.Mesh(new THREE.CircleBufferGeometry(5000,64),new THREE.MeshStandardMaterial({color:v3Col(0x0c1a20),roughness:1}));
+  this.ground.rotation.x=-Math.PI/2;this.ground.position.y=-0.02;sc.add(this.ground);
+  // shadows fall on a shadow-only plane sized to the content (the big floor stays evenly lit)
+  this.catcher=new THREE.Mesh(new THREE.PlaneBufferGeometry(1,1),new THREE.ShadowMaterial({opacity:0.38}));this.catcher.rotation.x=-Math.PI/2;this.catcher.position.y=0.005;this.catcher.receiveShadow=true;sc.add(this.catcher);
+  this.grid=null;
+  // soft studio reflections so metal reads as metal
+  try{var pm=new THREE.PMREMGenerator(r),es=new THREE.Scene(),cvs=document.createElement('canvas');cvs.width=4;cvs.height=64;var g=cvs.getContext('2d'),gr=g.createLinearGradient(0,0,0,64);gr.addColorStop(0,'#cfe9e6');gr.addColorStop(.45,'#3c6b6a');gr.addColorStop(1,'#071216');g.fillStyle=gr;g.fillRect(0,0,4,64);
+    var tx=new THREE.CanvasTexture(cvs);es.add(new THREE.Mesh(new THREE.SphereBufferGeometry(50,32,16),new THREE.MeshBasicMaterial({map:tx,side:THREE.BackSide})));
+    var panel=new THREE.Mesh(new THREE.PlaneBufferGeometry(30,12),new THREE.MeshBasicMaterial({color:0xffffff}));panel.position.set(0,30,-20);panel.lookAt(0,0,0);es.add(panel);
+    this.env=pm.fromScene(es,0.04).texture;pm.dispose();}catch(e){this.env=null;}
+  this.root=new THREE.Group();sc.add(this.root);
+  var cam=this.cam=new THREE.PerspectiveCamera(36,1,0.5,8000);
+  var ctl=this.ctl=new THREE.OrbitControls(cam,cv);
+  ctl.enableDamping=true;ctl.dampingFactor=0.09;ctl.rotateSpeed=0.8;ctl.maxPolarAngle=Math.PI/2-0.04;ctl.screenSpacePanning=true;
+  ctl.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
+  ctl.addEventListener('change',function(){self.kick();});
+  this._loop=function(){self.raf=0;if(self.dead)return;self.size();var moving=self.ctl.update();self.r.render(self.sc,self.cam);if(moving||self._spin||Date.now()<self._until)self.raf=requestAnimationFrame(self._loop);};
+  if(window.ResizeObserver){this.ro=new ResizeObserver(function(){self.kick();});this.ro.observe(host);}
+}
+V3Scene.prototype.size=function(){var w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;if(w!==this._w||h!==this._h){this._w=w;this._h=h;this.r.setSize(w,h,false);this.cam.aspect=w/h;this.cam.updateProjectionMatrix();}};
+V3Scene.prototype.kick=function(ms){this._until=Math.max(this._until||0,Date.now()+(ms||600));if(!this.raf)this.raf=requestAnimationFrame(this._loop);};
+V3Scene.prototype.clear=function(){var g=this.root;while(g.children.length){var o=g.children.pop();o.traverse(function(m){if(m.geometry)m.geometry.dispose();var ms=m.material?(Array.isArray(m.material)?m.material:[m.material]):[];ms.forEach(function(x){if(x.map)x.map.dispose();x.dispose();});});}};
+// survey grid sized to the content (cell 5 cm), framed like the House Builder: three-quarter view from above
+V3Scene.prototype.frame=function(keep){
+  var box=new THREE.Box3().setFromObject(this.root);if(box.isEmpty())box.set(new THREE.Vector3(-20,0,-20),new THREE.Vector3(20,5,20));
+  var c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3()),R=Math.max(s.x,s.z,s.y*1.6,20);
+  this.catcher.scale.set(R*3,R*3,1);this.catcher.position.x=c.x;this.catcher.position.z=c.z;
+  if(this.grid){this.sc.remove(this.grid);this.grid.geometry.dispose();this.grid.material.dispose();}
+  var size=Math.ceil(R*14/10)*10,cell=Math.max(5,Math.ceil(size/400/5)*5),div=Math.round(size/cell);
+  var g=this.grid=new THREE.GridHelper(size,div,v3Col(0x1f5e5a),v3Col(0x123734));g.material.transparent=true;g.material.opacity=0.35;g.position.set(c.x,0.01,c.z);this.sc.add(g);
+  this.sc.fog.near=R*2.5;this.sc.fog.far=R*8;
+  var sun=this.sun;sun.position.set(c.x+R*.9,R*1.4,c.z+R*1.1);sun.target.position.copy(c);var sc=sun.shadow.camera,e=R*3;sc.left=-e;sc.right=e;sc.top=e;sc.bottom=-e;sc.near=1;sc.far=R*40;sc.updateProjectionMatrix();   // wide enough that the floor near the camera is never left in false shadow
+  this.home={t:new THREE.Vector3(c.x,s.y*0.3,c.z),p:new THREE.Vector3(c.x+R*1.05,R*1.0+s.y,c.z+R*1.45)};
+  this.ctl.minDistance=Math.max(4,R*0.15);this.ctl.maxDistance=R*6;
+  if(!keep||!this._framed){this.reset();this._framed=true;}
+  this.kick(900);
+};
+V3Scene.prototype.reset=function(){if(!this.home)return;this.cam.position.copy(this.home.p);this.ctl.target.copy(this.home.t);this.ctl.update();this.kick();};
+V3Scene.prototype.zoom=function(f){var t=this.ctl.target,v=this.cam.position.clone().sub(t),d=Math.min(this.ctl.maxDistance,Math.max(this.ctl.minDistance,v.length()*f));this.cam.position.copy(t).add(v.setLength(d));this.kick();};
+V3Scene.prototype.spin=function(on){this.ctl.autoRotate=!!on;this.ctl.autoRotateSpeed=1.2;this._spin=!!on;this.kick();};
+function v3Mat(hex,rough,metal,env){var m=new THREE.MeshStandardMaterial({color:v3Col(hex),roughness:rough,metalness:metal});if(env){m.envMap=env;m.envMapIntensity=1.1;}return m;}
+// canvas textures: a coin edge (one band per coin) and a coin face with the currency symbol
+function v3CoinEdge(spec,n){var c=document.createElement('canvas');c.width=64;c.height=Math.max(16,n*16);var g=c.getContext('2d');
+  for(var i=0;i<n;i++){var y=i*16;g.fillStyle=spec.outer;g.fillRect(0,y,64,16);g.fillStyle='rgba(255,255,255,.18)';g.fillRect(0,y+2,64,3);g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+14,64,2);
+    if(spec.sides>12){g.fillStyle='rgba(0,0,0,.18)';for(var x=0;x<64;x+=4)g.fillRect(x,y+4,1,9);}}
+  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.wrapS=THREE.RepeatWrapping;t.repeat.x=spec.sides>12?6:1;return t;}
+function v3CoinFace(spec){var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d');
+  g.fillStyle=spec.outer;g.fillRect(0,0,128,128);
+  if(spec.inner){g.fillStyle=spec.inner;g.beginPath();g.arc(64,64,40,0,Math.PI*2);g.fill();}
+  g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=3;g.beginPath();g.arc(64,64,56,0,Math.PI*2);g.stroke();
+  g.fillStyle='rgba(40,30,10,.55)';g.font='bold 54px Syne, sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(spec.sym,64,68);
+  g.fillStyle='rgba(255,255,255,.25)';g.fillText(spec.sym,62,65);
+  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.center.set(.5,.5);t.rotation=-Math.PI/2;return t;}
+function v3Stack(spec,n,env){
+  var geo=new THREE.CylinderBufferGeometry(spec.d/2,spec.d/2,spec.t*n,spec.sides,1,false,spec.sides===12?Math.PI/12:0);
+  var side=new THREE.MeshStandardMaterial({map:v3CoinEdge(spec,n),roughness:.35,metalness:.85,envMap:env||null,envMapIntensity:1});
+  var face=new THREE.MeshStandardMaterial({map:v3CoinFace(spec),roughness:.3,metalness:.85,envMap:env||null,envMapIntensity:1});
+  return {geo:geo,mats:[side,face,face]};
+}
+// a label that always faces the camera
+function v3Label(text,sub,color,scale){var c=document.createElement('canvas'),g=c.getContext('2d');c.width=512;c.height=sub?120:72;
+  g.fillStyle='rgba(4,14,20,.82)';g.strokeStyle=color;g.lineWidth=3;var w=c.width-6,h=c.height-6;g.beginPath();if(g.roundRect)g.roundRect(3,3,w,h,14);else g.rect(3,3,w,h);g.fill();g.stroke();
+  g.fillStyle=color;g.font='800 34px Syne, sans-serif';g.textAlign='center';g.fillText(text,256,46);if(sub){g.fillStyle='#d6e6e4';g.font='26px "Share Tech Mono", monospace';g.fillText(sub,256,94);}
+  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true}));sp.renderOrder=10;var k=scale||10;sp.scale.set(k,k*c.height/c.width,1);return sp;}
+function v3Host(sceneEl,svgId){
+  var svg=document.getElementById(svgId);if(!sceneEl)return null;
+  var h=sceneEl.querySelector('.v3-host');if(!h){h=document.createElement('div');h.className='v3-host';sceneEl.insertBefore(h,sceneEl.firstChild);}
+  if(svg)svg.style.display='none';sceneEl.classList.add('v3-on');return h;
+}
+function v3Cash(){
+  if(!v3Ok())return false;
+  var card=document.getElementById('cashSceneCard'),scene=card&&card.querySelector('.scene');if(!scene)return false;
+  var host=v3Host(scene,'cashSvg');if(!host.clientWidth)return true;   // tab hidden: drawn when shown
+  var V=V3.cash||(V3.cash=new V3Scene(host,'3D view of your cash as coins'));V.clear();
+  var cur=(window.VI_CURRENCY||(typeof viSettings!=='undefined'&&viSettings.currency)||'GBP').toUpperCase(),spec=V3_COINS[cur]||V3_COINS.GBP;
+  var units=Math.max(0,Math.floor(alTotalCash()*(window.VI_CURRENCY_RATE||1)));
+  var STACK=10,PER_BLOCK=1000,pitch=spec.d+0.12,blockW=pitch*10,gap=spec.d*2.2;
+  var blocks=Math.ceil(units/PER_BLOCK),cols=Math.max(1,Math.ceil(Math.sqrt(blocks||1)));
+  var fullStacks=Math.floor(units/STACK),rest=units%STACK;
+  var pos=function(stackIdx){var b=Math.floor(stackIdx/100),s=stackIdx%100,bx=b%cols,bz=Math.floor(b/cols);return [bx*(blockW+gap)+(s%10)*pitch,bz*(blockW+gap)+Math.floor(s/10)*pitch];};
+  var m4=new THREE.Matrix4();
+  if(fullStacks>0&&fullStacks<=20000){
+    var st=v3Stack(spec,STACK,V.env),im=new THREE.InstancedMesh(st.geo,st.mats,fullStacks);im.castShadow=im.receiveShadow=true;
+    for(var i=0;i<fullStacks;i++){var p=pos(i);m4.makeTranslation(p[0],spec.t*STACK/2,p[1]);im.setMatrixAt(i,m4);}V.root.add(im);
+  }else if(fullStacks>20000){   // very large balances: each full block of 1,000 drawn as one solid block of stacks
+    var fb=Math.floor(fullStacks/100),bg=new THREE.BoxBufferGeometry(blockW-0.12,spec.t*STACK,blockW-0.12),tx=v3CoinEdge(spec,STACK);tx.repeat.x=10;
+    var bm=new THREE.MeshStandardMaterial({map:tx,roughness:.35,metalness:.85,envMap:V.env}),bi=new THREE.InstancedMesh(bg,bm,fb);bi.castShadow=bi.receiveShadow=true;
+    for(var j=0;j<fb;j++){var q=pos(j*100);m4.makeTranslation(q[0]+blockW/2-pitch/2,spec.t*STACK/2,q[1]+blockW/2-pitch/2);bi.setMatrixAt(j,m4);}V.root.add(bi);
+    var left=fullStacks-fb*100;if(left>0){var st2=v3Stack(spec,STACK,V.env),im2=new THREE.InstancedMesh(st2.geo,st2.mats,left);im2.castShadow=true;for(var k=0;k<left;k++){var r2=pos(fb*100+k);m4.makeTranslation(r2[0],spec.t*STACK/2,r2[1]);im2.setMatrixAt(k,m4);}V.root.add(im2);}
+  }
+  if(rest>0){var ps=v3Stack(spec,rest,V.env),pm=new THREE.Mesh(ps.geo,ps.mats),pp=pos(fullStacks);pm.position.set(pp[0],spec.t*rest/2,pp[1]);pm.castShadow=pm.receiveShadow=true;V.root.add(pm);}
+  var sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
+  var full=Math.floor(units/PER_BLOCK),part=units%PER_BLOCK;
+  if(units>0){var lb=v3Label(sym+fmt(units)+' in '+spec.name+' coins',(full?full+' block'+(full>1?'s':'')+' of 1,000':'')+(full&&part?' + ':'')+(part?fmt(part)+' coins':''),'#3ECF8E',Math.max(9,Math.min(60,blockW*(cols>1?1.4:0.9))));
+    var bb=new THREE.Box3().setFromObject(V.root),cc=bb.getCenter(new THREE.Vector3());lb.position.set(cc.x,bb.max.y+lb.scale.y*0.9+1,cc.z);V.root.add(lb);}
+  V.stats={units:units,cur:cur,coin:spec.name,fullStacks:fullStacks,rest:rest,fullBlocks:Math.floor(units/PER_BLOCK),stackHeight:spec.t*STACK};
+  V.frame(V3._cashUnits===units&&V3._cashCur===cur);V3._cashUnits=units;V3._cashCur=cur;
+  var cap=document.getElementById('cashCap');if(cap)cap.textContent=units?sym+fmt(units)+' = '+fmt(units)+' '+spec.name+' coins ('+spec.d*10+' mm across, '+(spec.t*10).toFixed(1)+' mm thick) · '+Math.floor(units/PER_BLOCK)+' full block'+(Math.floor(units/PER_BLOCK)===1?'':'s')+' of 1,000'+(units%PER_BLOCK?' + '+fmt(units%PER_BLOCK)+' coins':''):'No cash yet. Add an account or some physical cash.';
+  return true;
+}
+// a cast-style bar: bevelled block with the weight and fineness stamped on top
+function v3Bar(w,d,h,metal,fmt,env){
+  var shape=new THREE.Shape(),bw=w/2,bd=d/2,rr=Math.min(w,d)*0.08;
+  shape.moveTo(-bw+rr,-bd);shape.lineTo(bw-rr,-bd);shape.quadraticCurveTo(bw,-bd,bw,-bd+rr);shape.lineTo(bw,bd-rr);shape.quadraticCurveTo(bw,bd,bw-rr,bd);shape.lineTo(-bw+rr,bd);shape.quadraticCurveTo(-bw,bd,-bw,bd-rr);shape.lineTo(-bw,-bd+rr);shape.quadraticCurveTo(-bw,-bd,-bw+rr,-bd);
+  var bev=Math.min(h*0.3,0.12),geo=new THREE.ExtrudeBufferGeometry(shape,{depth:Math.max(0.02,h-bev*2),bevelEnabled:true,bevelThickness:bev,bevelSize:bev*0.8,bevelSegments:2,curveSegments:4});
+  geo.rotateX(-Math.PI/2);geo.translate(0,bev,0);
+  var c=document.createElement('canvas');c.width=256;c.height=Math.round(256*d/w);var g=c.getContext('2d');g.fillStyle=metal.col;g.fillRect(0,0,c.width,c.height);
+  g.strokeStyle='rgba(0,0,0,.28)';g.lineWidth=4;g.strokeRect(14,14,c.width-28,c.height-28);g.fillStyle='rgba(50,36,8,.5)';g.textAlign='center';g.textBaseline='middle';
+  var fs=Math.max(14,Math.round(c.height*0.2));g.font='700 '+fs+'px "Share Tech Mono", monospace';g.fillText(metal.label.toUpperCase(),128,c.height*0.33);g.fillText(fmt,128,c.height*0.55);g.font=Math.round(fs*0.8)+'px "Share Tech Mono", monospace';g.fillText('999.9',128,c.height*0.76);
+  var tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;tx.repeat.set(1/w,1/d);tx.offset.set(0.5,0.5);
+  var top=new THREE.MeshStandardMaterial({map:tx,roughness:metal.rough,metalness:1,envMap:env||null,envMapIntensity:1.2});
+  var side=new THREE.MeshStandardMaterial({color:v3Col(metal.col),roughness:metal.rough+.06,metalness:1,envMap:env||null,envMapIntensity:1.2});
+  return {geo:geo,mats:[top,side]};
+}
+function v3Metals(){
+  if(!v3Ok())return false;
+  var scene=document.getElementById('metals-scene');if(!scene)return false;
+  var host=v3Host(scene,'metalsSvg');window._v3MetalsOn=true;if(!host.clientWidth)return true;
+  var V=V3.metals||(V3.metals=new V3Scene(host,'3D view of your precious metals as bars'));V.clear();V.stats={};
+  var sym=window.VI_CURRENCY_SYMBOL||'£',rate=window.VI_CURRENCY_RATE||1,x0=0,parts=[],m4=new THREE.Matrix4();
+  ['gold','silver','platinum','palladium'].forEach(function(k){
+    var oz=+(alState.metals[k]||0);if(!(oz>0))return;var M=V3_METALS[k],grams=oz*OZ_G,left=grams,zone=new THREE.Group(),z=0,zw=0;
+    V3_BARS.forEach(function(B,bi){
+      var n=Math.floor((left+1e-6)/B.g);left-=n*B.g;
+      var isLast=bi===V3_BARS.length-1,frac=isLast&&left>0.05?left/B.g:0;if(!n&&!frac)return;
+      zone.userData.bars=zone.userData.bars||{};zone.userData.bars[B.name]={n:n,h:+((B.g/M.rho)/(B.w*B.d)).toFixed(3)};if(frac)zone.userData.bars.rest_g=+left.toFixed(2);
+      var h=(B.g/M.rho)/(B.w*B.d);
+      if(n){var bar=v3Bar(B.w,B.d,h,M,B.name,V.env),im=new THREE.InstancedMesh(bar.geo,bar.mats,n);im.castShadow=im.receiveShadow=true;
+        var perRow=Math.max(1,Math.min(10,Math.ceil(Math.sqrt(n/B.pile))));
+        for(var i=0;i<n;i++){var pile=Math.floor(i/B.pile),lvl=i%B.pile,cx=(pile%perRow)*(B.w+1),cz=z+Math.floor(pile/perRow)*(B.d+1);m4.makeTranslation(cx+B.w/2,lvl*h,cz+B.d/2);im.setMatrixAt(i,m4);}
+        zone.add(im);zw=Math.max(zw,perRow*(B.w+1));z+=Math.ceil(Math.ceil(n/B.pile)/perRow)*(B.d+1)+1;}
+      if(frac){var fh=Math.max(0.03,h*frac),fb=v3Bar(B.w,B.d,fh,M,(left).toFixed(1)+' g',V.env),fm=new THREE.Mesh(fb.geo,fb.mats);fm.position.set(B.w/2,0,z+B.d/2);fm.castShadow=fm.receiveShadow=true;zone.add(fm);zw=Math.max(zw,B.w+1);z+=B.d+2;}
+    });
+    V.stats=V.stats||{};V.stats[k]=zone.userData.bars;
+    var value=oz*(alState.metalPrices[k]||0);
+    var lb=v3Label(M.label+' · '+oz.toFixed(2)+' oz',sym+Math.round(value*rate).toLocaleString('en-GB')+' at '+sym+Math.round((alState.metalPrices[k]||0)*rate).toLocaleString('en-GB')+'/oz',M.col,Math.max(12,zw*0.9));
+    lb.position.set(zw/2,Math.max(6,z*0.25)+3,z/2);zone.add(lb);
+    zone.position.x=x0;V.root.add(zone);parts.push(oz.toFixed(2)+' oz '+M.label.toLowerCase()+' ('+(grams>=1000?(grams/1000).toFixed(2)+' kg':Math.round(grams)+' g')+')');x0+=zw+8;
+  });
+  V.frame(V3._metalsKey===JSON.stringify(alState.metals));V3._metalsKey=JSON.stringify(alState.metals);
+  var cap=document.getElementById('metalsCap');if(cap)cap.textContent=parts.length?parts.join(' · ')+' · real bar sizes from each metal\'s weight · value at the live price':'No metals yet. Add your holdings below.';
+  return true;
+}
+
 function renderMetalsISO(){
+  try{if(v3Metals())return;}catch(e){console.error('[Vault-It] 3D metals',e);var sv=document.getElementById('metalsSvg');if(sv)sv.style.display='';}
   var MS=document.getElementById('metalsSvg');
   if(!MS)return;
   MS.innerHTML='';
@@ -22927,9 +23113,10 @@ function toggleCashExpand(){
   setTimeout(renderCashISO,80);
 }
 
-function resetCashView(){_cPanX=0;_cPanY=0;_cAngle=0;_cZoom=1;renderCashISO();}
+function resetCashView(){if(V3.cash&&document.querySelector('#cashSceneCard .v3-host')){V3.cash.reset();return;}_cPanX=0;_cPanY=0;_cAngle=0;_cZoom=1;renderCashISO();}
 
 function renderCashISO(){
+  try{if(v3Cash())return;}catch(e){console.error('[Vault-It] 3D cash',e);var sv=document.getElementById('cashSvg');if(sv)sv.style.display='';}
   var MS=document.getElementById('cashSvg');
   if(!MS)return;
   var total=alTotalCash();
