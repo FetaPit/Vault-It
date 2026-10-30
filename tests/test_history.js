@@ -19,7 +19,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   await page.evaluate(()=>_hydrateFromSupabase('u1'));
   await page.evaluate(()=>viOpenHistory()); await page.waitForTimeout(500);
   const txt=await page.innerText('#vi-hist');
-  ok(/Budget — income & spending/.test(txt)&&/3 income \(£1,589\/mo\)/.test(txt),'version history lists the earlier version with what is in it');
+  ok(/Budget: income & spending/.test(txt)&&/3 income \(£1,589\/mo\)/.test(txt),'version history lists the earlier version with what is in it');
   ok(/On this device/.test(txt)&&/Restore all/.test(txt),'and this device\'s daily copies');
   await page.click('#vi-hist-cloud button'); await page.waitForTimeout(800);
   const r=await page.evaluate(()=>({local:JSON.parse(localStorage.getItem('pos_ov1')).income.length,cloud:_cloud.pos_ov1.value.income.length}));
