@@ -11395,7 +11395,18 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     <div class="ov-chart-card" style="margin-bottom:14px"><div id="bd-zero"></div></div>
     <div id="bd-nudge"></div>
     <div class="cf-legend" id="bd-legend"></div>
-    <div class="bd-split" style="margin-top:8px">
+    <!-- owner, 31 Oct: the income flow sits at the top, straight above the income | spending split, so the dashed divider runs on from it -->
+    <div class="ov-chart-card bd-sankey-card" style="margin:4px 0 0">
+      <div class="ov-chart-hd bd-flow-hd" style="flex-wrap:wrap;gap:10px;padding:0 16px"><span class="ov-chart-title">Where your income flows</span>
+        <div class="nw3d-seg" id="bd-view" role="group" aria-label="Income flow view"><button type="button" data-v="flow" aria-pressed="true"><svg class="vi-ic" aria-hidden="true"><use href="#vi-forecast"/></svg>Flow</button><button type="button" data-v="3d" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick"/></svg>3D</button></div></div>
+      <div id="bd-sankey" class="cf-scroll"></div>
+      <div id="bd-3d" hidden>
+        <span class="nw3d-sub bd3d-sub">Every £100 of your monthly income is one block, in the colour of where it goes, with a row of space between groups. Tap or hover a block to read its line, drag to turn it.</span>
+        <div class="nw3d-stage" id="bd3d-stage"><canvas id="bd3d-cv" tabindex="0" role="img" aria-label="Your monthly budget in £100 blocks, grouped by colour. Tap a block to read it, drag to turn it."></canvas></div>
+        <p class="nw3d-read" id="bd3d-read" aria-live="polite"></p>
+      </div>
+    </div>
+    <div class="bd-split" style="margin-top:14px">
       <div class="ov-chart-card bd-inc">
         <div class="ov-ms-title" style="color:var(--gr);margin-bottom:10px">Income <span style="color:var(--t3);font-weight:400">· per month</span></div>
         <div id="cf-income-list" class="data-list"></div>
@@ -11427,10 +11438,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
         <div style="font-size:.46rem;color:var(--t3);margin-top:6px;line-height:1.6">Every line has its own <b>category</b> and <b>type</b> drop-downs. Tap a line’s icon to give it a different icon; ✎ edits its name or amount. <b style="color:var(--tx)">Committed</b> = same every month · <b style="color:var(--tx)">Variable</b> = changes month to month.</div>
       </div>
-    </div>
-    <div class="ov-chart-card bd-sankey-card" style="margin-top:14px">
-      <div class="ov-chart-hd" style="flex-wrap:wrap;gap:10px;padding:0 16px"><span class="ov-chart-title">Where your income flows</span></div>
-      <div id="bd-sankey" class="cf-scroll"></div>
     </div>
   </div>
 </div><!-- /tab-budget -->
@@ -13465,11 +13472,19 @@ body.vi-pop-open{overflow:hidden}
   .bd-split>.ov-chart-card{background:none!important;border:0!important;box-shadow:none!important;clip-path:none!important;padding-top:4px}
   .bd-split>.bd-inc{padding-right:clamp(16px,2vw,32px)}
   .bd-split>.bd-exp{padding-left:clamp(16px,2vw,32px)}
-  .bd-split::before{content:'';position:absolute;top:0;bottom:-14px;left:var(--bd-split,40%);width:0;margin-left:-1px;border-left:2px dashed var(--gr);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--gr) 55%,transparent))}
+  .bd-split::before{content:'';position:absolute;top:-14px;bottom:0;left:var(--bd-split,40%);width:0;margin-left:-1px;border-left:2px dashed var(--bd-line);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--bd-line) 50%,transparent))}
   .bd-sankey-card{position:relative;padding-left:0!important;padding-right:0!important}
-  .bd-sankey-card::after{content:'';position:absolute;top:0;bottom:0;left:var(--bd-split,40%);width:0;margin-left:-1px;border-left:2px dashed var(--gr);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--gr) 55%,transparent));pointer-events:none;z-index:3}
+  .bd-sankey-card::after{content:'';position:absolute;top:var(--bd-line-top,0px);bottom:0;left:var(--bd-split,40%);width:0;margin-left:-1px;border-left:2px dashed var(--bd-line);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--bd-line) 50%,transparent));pointer-events:none;z-index:3}
+  .bd-sankey-card.bd-is-3d::after{display:none}
   #bd-sankey svg{max-height:none!important;width:100%!important}
 }
+:root{--bd-line:color-mix(in srgb,var(--teal) 62%,#fff)}
+[data-theme="light"]{--bd-line:color-mix(in srgb,var(--teal) 70%,#fff)}
+.bd-flow-hd{display:flex;justify-content:space-between;align-items:center}
+#bd-3d{padding:0 16px 6px}
+#bd-sankey[hidden],#bd-3d[hidden]{display:none!important}
+#bd3d-stage{height:clamp(300px,46vh,520px);margin-top:10px}
+@media(max-width:600px){#bd3d-stage{height:min(96vw,380px)}}
 .bd-exp-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .bd-fold-btns{display:flex;gap:6px}
 .bd-fold-btns button{background:rgb(var(--ink-rgb) / .04);border:1px solid rgb(var(--ink-rgb) / .14);border-radius:6px;color:var(--t2);font:600 .56rem 'DM Sans',sans-serif;padding:5px 10px;cursor:pointer}
@@ -27987,7 +28002,88 @@ function makeTracker(cv,o){
   var S=stage(cv,{fps:o.fps||30,onShow:function(){if(!played)t0=performance.now()}},draw);
   return self;
 }
-window.ViNW3D={makeNW:makeNW,makeTracker:makeTracker,niceUnit:niceUnit,split:split,reduceMotion:reduceMotion,lite:function(v){if(v!=null)LITE=!!v;return LITE},coarse:COARSE};
+/* ===== budget in 3D (owner, 31 Oct 2026): where the monthly income goes, in £100 blocks =====
+ * setData({groups:[{key,label,col:[r,g,b],items:[{name,v}]}],total,fmt}). Every budget line is a run of £100 blocks (the last one
+ * shrinks to its share of £100), laid row by row in its group's colour, with lines in a group in alternating shades; one empty row
+ * separates each colour group (owner, 31 Oct). Over about 360 blocks the block becomes £200, £500, £1,000 ... and says so.
+ * Blocks drop into place group by group; reduced motion shows the finished map. Drag to turn, pinch or ctrl+wheel to zoom. */
+function makeTreeMap(cv,o){
+  o=o||{};
+  var st={yaw:-.5,pitch:.78,dist:125,zoom:1.15,ty:1,fit:.9},self={st:st},idle=-9999,cells=[],groups=[],total=0,hover=null,first=true,pending=false,PL=.5,
+    fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},U=100,CS=3,GP=.5,CH=2.3,C=12,ROWS=1,bands=[],ext={x:10,z:10};
+  function unitFor(t){var u=100,steps=[100,200,500,1000,2000,5000,10000],k=0;while(t/u>360&&k<steps.length-1){k++;u=steps[k]}return u}
+  function layout(narrow){
+    /* the grid width that makes the squarest map for this budget (wider on a desktop, narrower on a phone) */
+    var gc=groups.map(function(g){return g.items.reduce(function(a,it){return a+Math.ceil(it.v/U-1e-9)},0)}),mx=Math.max.apply(null,[1].concat(gc));
+    C=Math.max(narrow?5:6,Math.min(narrow?10:24,mx));   /* as wide as the biggest group, so most groups take a single row */
+    cells=[];bands=[];var row=narrow?1:0,gi=0,seq=0,P=CS+GP;   /* phones: an empty row above the first group too, for its name */
+    groups.forEach(function(g){var k=0,r0=row;
+      g.items.forEach(function(it,ii){var full=Math.floor(it.v/U+1e-9),f=it.v/U-full;if(f<1e-6)f=0;var nn=full+(f>0?1:0);
+        for(var q=0;q<nn;q++){var part=q===full?f:1;cells.push({g:g,it:it,ii:ii,col:k%C,row:r0+Math.floor(k/C),part:part,off:gi*320+seq*16});k++;seq++}});
+      var used=Math.max(1,Math.ceil(k/C));bands.push({g:g,r0:r0,r1:r0+used-1});row=r0+used+1;gi++});   /* +1: one empty row between colour groups */
+    ROWS=Math.max(1,row-1);var usedC=Math.min(C,mx);ext={x:usedC*P/2,z:ROWS*P/2};
+    cells.forEach(function(c){var s=c.part<1?CS*Math.sqrt(c.part):CS;c.x=-ext.x+c.col*P+P/2;c.z=-ext.z+c.row*P+P/2;c.w=c.d=Math.max(.35,s)});
+  }
+  self.setData=function(d){
+    var rm=reduceMotion();if(d.fmt)fmt=d.fmt;total=d.total||0;
+    groups=(d.groups||[]).map(function(g){var items=(g.items||[]).filter(function(it){return it.v>0});return {key:g.key,label:g.label,col:g.col,items:items,sum:items.reduce(function(a,it){return a+it.v},0)}}).filter(function(g){return g.sum>0});
+    U=unitFor(groups.reduce(function(a,g){return a+g.sum},0));self._narrow=S.cw<520;layout(self._narrow);var now=performance.now();
+    cells.forEach(function(c){c.born=rm?-1e9:(first?-1:now+c.off*.4)});if(first&&!rm)pending=true;first=false;
+    cv.dataset.total=String(Math.round(total));cv.dataset.unit=String(U);cv.dataset.blocks=String(cells.length);S.kick();return self.tiles();
+  };
+  /* for tests and the readout: each line's value, its blocks (the last one partial) and the value they stand for; and each group's rows */
+  self.tiles=function(){var by={};cells.forEach(function(c){var k=c.g.key+'|'+c.ii,t=by[k]||(by[k]={group:c.g.key,name:c.it.name,v:c.it.v,blocks:0,worth:0,rows:{}});t.blocks++;t.worth+=c.part*U;t.rows[c.row]=1});
+    return Object.keys(by).map(function(k){var t=by[k];t.rows=Object.keys(t.rows).map(Number);return t})};
+  self.bands=function(){return bands.map(function(b){return {group:b.g.key,r0:b.r0,r1:b.r1}})};
+  self.unit=function(){return U};
+  self.replay=function(){if(reduceMotion())return;var now=performance.now();cells.forEach(function(c){c.born=now+c.off*.6});S.kick()};
+  self.kick=function(){S.kick()};
+  function shade(c){var t=(c.ii%2)?.16:0;return t?mix(c.g.col,[255,255,255],t):c.g.col}
+  function geo(c,ts){
+    var g={x:c.x,z:c.z,w:c.w,d:c.d,h:CH,y:0,col:shade(c)},age=ts-c.born,fl=0;
+    if(c.born>0){if(age<0)return null;var e=age<600?ease3(age/600):1;g.y=(1-e)*10;fl=clamp(1-age/900,0,1)}
+    g.fl=fl;g.c=c;return g;
+  }
+  function draw(ts,dt,S){
+    var cx=S.c,cw=S.cw,ch=S.ch,rm=reduceMotion(),narrow=cw<520;
+    if(groups.length&&narrow!==self._narrow){self._narrow=narrow;layout(narrow)}
+    if(pending){cells.forEach(function(c){c.born=ts+c.off});pending=false}
+    var Y0=narrow?-.12:-.5;   /* phones: face the rows nearly square on, so each group's name runs level with its row */
+    if(!rm&&!ob.isDrag()&&ts-idle>2500)st.yaw=Y0+Math.sin(ts/5200)*(narrow?.1:.28);else if(rm&&!ob.engaged())st.yaw=Y0;
+    st.fit=narrow?1.05:.9;if(narrow&&!self._pitchSet&&!ob.engaged()){st.pitch=1.05;self._pitchSet=true}   /* phones: look down more, so each group's name has its own row */
+    var LW=narrow?0:16,fb=[[-ext.x-2-LW,ext.x+2,0,CH,-ext.z-2,ext.z+2]],tD=fitDist(st,cw,ch,fb,Y0,1,.9,.74);
+    var k=rm||self._snapD?1:Math.min(1,dt*3);self._snapD=false;st.dist+=(tD-st.dist)*k;
+    PL=rm?.5:.5+.5*Math.sin(ts*0.002244);
+    var P=new Proj(st,{x:0,y:0,w:cw,h:ch});self._P=P;
+    cx.save();
+    ground(cx,P,st,ext.x+2,-ext.z-2,ext.z+2,false,ts,rm,CS+GP);
+    var items=[];cells.forEach(function(c){var g=geo(c,ts);if(g)items.push(g)});
+    items.forEach(function(g){g.dz=Math.hypot(P.pos[0]-g.x,P.pos[1]-(g.y+g.h/2),P.pos[2]-g.z)});items.sort(function(a,b){return b.dz-a.dz});
+    items.forEach(function(g){var col=g.fl>0?mix(g.col,PAL.flash,g.fl):g.col;if(hover&&hover.g===g.c.g&&hover.ii===g.c.ii)col=mix(col,PAL.flash,.45);drawBox(cx,P,g,PL,col,PAL.fa+.16+.06*PL,.66+.25*PL,PAL.edgeK)});
+    /* each group's name and total beside its first row, to the left of the blocks (on a phone, in the empty row above it) */
+    var lf=clamp(cw*.02,9,12);cx.font=lf+"px 'Share Tech Mono',monospace";cx.textBaseline="middle";
+    bands.forEach(function(b){var zr=-ext.z+b.r0*(CS+GP)+(CS+GP)/2,q=narrow?P.pt(-ext.x,0,zr-(CS+GP)):P.pt(-ext.x-1.2,0,zr),txt=b.g.label+" · "+fmt(b.g.sum),tw=cx.measureText(txt).width;
+      cx.textAlign=narrow?"left":"right";var x0=narrow?q[0]:q[0]-tw;if(x0<4){x0=4}
+      cx.fillStyle="rgba(8,8,8,.62)";cx.fillRect(x0-3,q[1]-lf*.75,tw+6,lf*1.5);cx.fillStyle=rgba(b.g.col,1);cx.textAlign="left";cx.fillText(txt,x0,q[1])});
+    tag(cx,cw,"MONTHLY INCOME",fmt(total),false,null);
+    cx.fillStyle=PAL.label;cx.textAlign="left";cx.textBaseline="alphabetic";cx.font=lf+"px 'Share Tech Mono',monospace";cx.fillText("1 block = "+fmt(U),12,ch-12);
+    cx.restore();
+  }
+  var ob=orbit(cv,st,{touch:function(){idle=performance.now()},reset:function(){idle=-9999;S.kick()}});
+  self.zoom=ob.zoom;self.reset=ob.reset;
+  function inside(px,py,poly){var ins=false;for(var i=0,j=poly.length-1;i<poly.length;j=i++){var xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];if(((yi>py)!==(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))ins=!ins}return ins}
+  function pick(ex,ey){var r=cv.getBoundingClientRect(),mx=ex-r.left,my=ey-r.top,P=self._P,best=null,bd=Infinity;if(!P)return;
+    cells.forEach(function(c){var y=CH,h=(CS+GP)/2,x0=c.x-h,x1=c.x+h,z0=c.z-h,z1=c.z+h,poly=[P.pt(x0,y,z0),P.pt(x1,y,z0),P.pt(x1,y,z1),P.pt(x0,y,z1)];
+      if(inside(mx,my,poly)){var dz=P.pt(c.x,y,c.z)[2];if(dz<bd){bd=dz;best=c}}});
+    var was=hover;hover=best;
+    if((was&&was.g)!==(best&&best.g)||(was&&was.ii)!==(best&&best.ii)){if(o.onPick)o.onPick(best?{group:best.g.label,name:best.it.name,v:best.it.v,share:total>0?best.it.v/total:0,blocks:Math.ceil(best.it.v/U-1e-9),unit:U}:null);S.kick()}}
+  cv.addEventListener("pointermove",function(e){if(e.pointerType==="mouse"&&!e.buttons)pick(e.clientX,e.clientY)});
+  cv.addEventListener("pointerdown",function(e){pick(e.clientX,e.clientY)});
+  cv.addEventListener("pointerleave",function(e){if(e.pointerType==="mouse"&&hover){hover=null;if(o.onPick)o.onPick(null);S.kick()}});
+  var S=stage(cv,o,draw);self._narrow=S.cw<520;
+  return self;
+}
+window.ViNW3D={makeNW:makeNW,makeTracker:makeTracker,makeTreeMap:makeTreeMap,niceUnit:niceUnit,split:split,reduceMotion:reduceMotion,lite:function(v){if(v!=null)LITE=!!v;return LITE},coarse:COARSE};
 })();
 </script>
 <script id="vi-nw3d-app">
@@ -28172,6 +28268,49 @@ window.addEventListener('pageshow',function(e){if(e.persisted)rescue()});
 document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(rescue,60)});
 };
 if(nw3dFlag())window.nw3dMount();
+})();
+/* ===== Budget: Flow | 3D on "Where your income flows" (owner, 31 Oct 2026) =====
+ * 3D is a tree map of the same budget the flow chart draws: one block per line, floor area in proportion to its amount, coloured by
+ * group, with what is not yet assigned as its own grey group. The choice is kept per device (vi-bd-view); Flow is the default. */
+(function(){
+var KEY='vi-bd-view',eng=null,sig='',cur='flow';
+function el(id){return document.getElementById(id)}
+/* the stage is always Night (tokens redefined inside it), so colours are read there */
+function rgbIn(host,v){var sp=document.createElement('span');sp.style.color=v;sp.style.display='none';host.appendChild(sp);var m=(getComputedStyle(sp).color.match(/[\d.]+/g)||[0,0,0]);sp.remove();return [+m[0],+m[1],+m[2]]}
+function data(){
+  var m=cfModel(),host=el('bd3d-stage')||document.body;
+  var groups=CF_GROUP_ORDER.map(function(g){return {key:g,label:CF_GROUPS[g].short,col:rgbIn(host,CF_GROUPS[g].col),items:(m.by[g]||[]).map(function(r){return {name:r.name,v:+r.amount||0}})}});
+  if(m.overflow>0)groups.push({key:'un',label:'Unassigned',col:[138,147,166],items:[{name:'Unassigned',v:m.overflow}]});
+  return {groups:groups,total:m.tIn,shortfall:m.shortfall,fmt:function(v){return gbpFmt(v)}};
+}
+function ensure(){
+  if(eng||!window.ViNW3D||!ViNW3D.makeTreeMap||!el('bd3d-cv'))return eng;
+  var read=el('bd3d-read');
+  eng=ViNW3D.makeTreeMap(el('bd3d-cv'),{fmt:function(v){return gbpFmt(v)},onPick:function(p){if(!read)return;
+    read.textContent=p?p.group+' · '+p.name+': '+gbpFmt(p.v)+' a month, '+Math.round(p.share*100)+'% of your income ('+p.blocks+' block'+(p.blocks===1?'':'s')+' of '+gbpFmt(p.unit)+')':readDefault()}});
+  return eng;
+}
+function readDefault(){var m=cfModel();return m.tIn>0?'Income '+gbpFmt(m.tIn)+' a month'+(m.overflow>0?' · '+gbpFmt(m.overflow)+' not assigned yet':'')+(m.shortfall>0?' · spending is '+gbpFmt(m.shortfall)+' more than income':''):'Add your income and spending to see where every pound goes'}
+function refresh(force){
+  if(cur!=='3d'||!ensure())return;
+  var d=data(),sg=JSON.stringify(d.groups.map(function(g){return [g.key,g.items.map(function(i){return [i.name,i.v]})]}))+'|'+d.total;
+  var read=el('bd3d-read');if(read&&!read.dataset.hold)read.textContent=readDefault();
+  if(sg===sig&&!force)return;sig=sg;eng.setData(d);
+}
+function show(v,user){
+  cur=v==='3d'?'3d':'flow';var card=document.querySelector('.bd-sankey-card');
+  if(el('bd-sankey'))el('bd-sankey').hidden=cur==='3d';if(el('bd-3d'))el('bd-3d').hidden=cur!=='3d';if(card)card.classList.toggle('bd-is-3d',cur==='3d');
+  [].forEach.call(document.querySelectorAll('#bd-view button'),function(b){b.setAttribute('aria-pressed',b.dataset.v===cur?'true':'false')});
+  if(user){try{localStorage.setItem(KEY,cur)}catch(e){}}
+  if(cur==='3d'){var had=!!eng;refresh(true);if(had&&user&&eng)eng.replay();if(eng)eng.kick()}
+  else{try{drawCashflowDiagram()}catch(e){}}
+}
+var _dcd=window.drawCashflowDiagram;if(typeof _dcd==='function'){window.drawCashflowDiagram=drawCashflowDiagram=function(){var r=_dcd.apply(this,arguments);try{refresh()}catch(e){console.warn('budget 3D',e)}return r}}
+function init(){var seg=el('bd-view');if(!seg)return;
+  seg.addEventListener('click',function(e){var b=e.target.closest('button[data-v]');if(b)show(b.dataset.v,true)});
+  var saved='flow';try{saved=localStorage.getItem(KEY)==='3d'?'3d':'flow'}catch(e){}show(saved,false);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+window.bd3d={show:show,engine:function(){return eng},data:data,view:function(){return cur}};
 })();
 </script>
 </body>

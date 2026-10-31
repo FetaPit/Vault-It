@@ -33,6 +33,7 @@ node tests/test_view_mode.js        # Simplified / Advanced view: Advanced when 
 node tests/test_tester_welcome.js    # tester welcome note: shown once after the welcome flow for beta accounts, agreed wording with the 30-day first sentence, closes with Esc / outside / Let's go, phone fit
 node tests/test_nw3d_first.js       # 3D net worth draws on first show even when a stale "not visible" observer entry arrives first (the phone defect of 31 Oct); fails on the old code
 node tests/test_ov_tiles.js           # Round 3: forecast note says what it rests on (no line before two real months); assets and liabilities on one scale; debt left in soft red, paid off in green from the right
+node tests/test_bd_flow3d.js          # Round 3: income flow at the top of Budget, light teal divider running on from it, Flow | 3D tree map (areas in proportion, rises in, reduced motion finished)
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width
 node tests/test_nw3d.js            # net worth in 3D (on by default): flag off unchanged, 3D | Graph toggle, same numbers in both views, debts grouped by kind (cards stacked in one column, each in its own colour), zoom buttons / ctrl+wheel / reset (VI_APP=file:///… to test another copy)
 ```
