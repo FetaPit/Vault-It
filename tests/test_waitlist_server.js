@@ -113,6 +113,20 @@ const unsubOf = (m) => ((m.html.match(/href="(https:\/\/vault-it\.co\/sign-up\/u
   verifyMode = 'wrongsite'; r = await call({ action: 'join', email: 'h2@example.com', captchaToken: 'good' }); ok(r.s === 403, 'a token minted on another site is refused');
   verifyMode = 'down'; r = await call({ action: 'join', email: 'h3@example.com', captchaToken: 'good' }); ok(r.s === 503 && r.b.retryAfter > 0, 'if Cloudflare cannot be asked, the request is refused (503), not waved through'); verifyMode = 'normal';
 
+  // the check could not load on the person's device: not stuck, but only through the stricter door
+  load({ TURNSTILE_SECRET: 'sec', RATE_WAITLIST_NOCHECK_IP_PER_HOUR: '2', RATE_WAITLIST_NOCHECK_ALL_PER_HOUR: '3' });
+  const vc = verifyCalls.length;
+  r = await call({ action: 'join', email: 'nc1@example.com', captchaUnavailable: true }, '10.9.0.1'); ok(r.s === 200 && r.b.success === true, 'with the check unable to load, a join without a token is accepted');
+  ok(sent.some((m) => m.to[0] === 'nc1@example.com'), '(and the double opt-in confirmation e-mail is still sent)');
+  ok(verifyCalls.length === vc, 'no token means Cloudflare is not asked');
+  await call({ action: 'join', email: 'nc2@example.com', captchaUnavailable: true }, '10.9.0.1');
+  r = await call({ action: 'join', email: 'nc3@example.com', captchaUnavailable: true }, '10.9.0.1'); ok(r.s === 429 && r.b.retryAfter > 0, 'the same address cannot use that door more than the stricter hourly limit (2 here)');
+  await call({ action: 'join', email: 'nc4@example.com', captchaUnavailable: true }, '10.9.0.2');
+  r = await call({ action: 'join', email: 'nc5@example.com', captchaUnavailable: true }, '10.9.0.3'); ok(r.s === 429, 'all such joins together are capped too (3 here)');
+  r = await call({ action: 'join', email: 'nc6@example.com' }, '10.9.0.4'); ok(r.s === 403 && r.b.error === 'captcha', 'a join with no token and no flag is still refused');
+  r = await call({ action: 'join', email: 'nc7@example.com', captchaUnavailable: true, captchaToken: 'bad' }, '10.9.0.5'); ok(r.s === 403, 'a bad token is still refused even with the flag set');
+  load({ TURNSTILE_SECRET: 'sec' });
+
   // methods
   const opt = await globalThis.__h(new Request('http://x/waitlist-join', { method: 'OPTIONS' })); ok(opt.status === 200, 'CORS preflight answered');
   const g = await globalThis.__h(new Request('http://x/waitlist-join', { method: 'GET' })); ok(g.status === 405, 'GET refused (a link scanner cannot confirm or unsubscribe anyone)');

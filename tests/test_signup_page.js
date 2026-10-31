@@ -89,6 +89,43 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
   ok([...page.hosts].every((h) => ['fonts.googleapis.com', 'fonts.gstatic.com', 'legpubblzgknxdtvsant.supabase.co'].includes(h)), 'talks only to the fonts service and our own server: ' + [...page.hosts].join(', '));
   await ctx.close();
 
+  // the "are you human" check cannot be allowed to strand a tester (the live widget once refused vault-it.co outright)
+  const STUB = 'window.turnstile={render:function(sel,o){window.__ts=o;return "w1"},reset:function(){}};setTimeout(function(){window.viTsLoaded&&window.viTsLoaded()},0)';
+  const withCheck = async (route) => {
+    const r = await page0(390, 844); r.page.errs = r.page.errs || [];
+    await r.ctx.addInitScript(() => { window.__vi_captcha_force = true; window.__vi_captcha_wait_ms = 3000; });
+    await r.page.route('https://challenges.cloudflare.com/**', route);
+    await r.page.goto(BASE + '/sign-up', { waitUntil: 'load' }); await r.page.waitForTimeout(300);
+    await r.page.fill('#email', 'tester@example.com');
+    return r;
+  };
+  // 1) the script is blocked (ad blocker, private DNS): the form still sends, flagged, with no token
+  ({ ctx, page } = await withCheck((r) => r.abort()));
+  await page.waitForTimeout(300);
+  await Promise.all([page.waitForURL('**/sign-up/thanks'), page.click('#go')]);
+  ok(page.posts[0] && page.posts[0].captchaUnavailable === true && !page.posts[0].captchaToken, 'check script blocked: the join still goes through, flagged as having no check');
+  await ctx.close();
+  // 2) the widget reports an error: same
+  ({ ctx, page } = await withCheck((r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: STUB })));
+  await page.evaluate(() => window.__ts['error-callback']('110200')); await page.waitForTimeout(100);
+  ok(/can still join/i.test(await page.textContent('#msg')), 'a widget error says the person can still join');
+  await Promise.all([page.waitForURL('**/sign-up/thanks'), page.click('#go')]);
+  ok(page.posts[0].captchaUnavailable === true && !page.posts[0].captchaToken, 'widget error: the join is sent flagged, no token');
+  await ctx.close();
+  // 3) still running normally: the form waits (no request); then it gives up after the wait, and a late token is used when there is one
+  ({ ctx, page } = await withCheck((r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: STUB })));
+  await page.click('#go'); await page.waitForTimeout(150);
+  ok(page.posts.length === 0 && /still running/i.test(await page.textContent('#msg')), 'while the check is still running normally, the form waits for it');
+  await page.waitForTimeout(3200);
+  await Promise.all([page.waitForURL('**/sign-up/thanks'), page.click('#go')]);
+  ok(page.posts[0].captchaUnavailable === true, 'after the wait with no token, the form stops waiting');
+  await ctx.close();
+  ({ ctx, page } = await withCheck((r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: STUB })));
+  await page.evaluate(() => window.__ts.callback('tok123'));
+  await Promise.all([page.waitForURL('**/sign-up/thanks'), page.click('#go')]);
+  ok(page.posts[0].captchaToken === 'tok123' && page.posts[0].captchaUnavailable === false, 'a passed check sends its token and is not flagged');
+  await ctx.close();
+
   // a device set to light gets Daylight on its first visit (QA list: device preference is followed, the toggle persists)
   ({ ctx, page } = await page0(390, 844, 'light'));
   await page.goto(BASE + '/sign-up', { waitUntil: 'load' });

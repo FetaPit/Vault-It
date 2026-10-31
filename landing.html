@@ -538,15 +538,22 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
   if (!store.get('vi_ref') && referrer) store.set('vi_ref', referrer);
 
   // Cloudflare's "are you human" check, only on the address the widget is registered for.
-  var tsToken = '', tsWidget = null;
+  var tsToken = '', tsWidget = null, tsFailed = false;
   function tsOn() { return TS_HOSTS.indexOf(location.hostname) > -1 || window.__vi_captcha_force === true; }
   function tsRender() {
     if (!tsOn() || tsWidget !== null || !window.turnstile) return;
-    tsWidget = window.turnstile.render('#cf-box', { sitekey: TS_KEY, theme: isLight() ? 'light' : 'dark', callback: function (t) { tsToken = t; }, 'expired-callback': function () { tsToken = ''; }, 'error-callback': function () { tsToken = ''; } });
+    tsWidget = window.turnstile.render('#cf-box', { sitekey: TS_KEY, theme: isLight() ? 'light' : 'dark', callback: function (t) { tsToken = t; }, 'expired-callback': function () { tsToken = ''; }, 'error-callback': function () { tsToken = ''; tsGiveUp(); }, 'unsupported-callback': function () { tsGiveUp(); } });
+  }
+  // Testers must never be stuck: if the check cannot load, errors, or does not finish, the form stops waiting for it and the server
+  // takes the join through a stricter per-address limit (still double opt-in). A token that arrives later is still sent.
+  function tsGiveUp() {
+    if (tsToken || tsFailed) return;
+    tsFailed = true; say('The “are you human” check didn’t finish, but you can still join. We’ll email you to confirm.');
   }
   if (tsOn()) {
     window.viTsLoaded = tsRender;
     var s = document.createElement('script'); s.async = true; s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=viTsLoaded&render=explicit';
+    s.onerror = tsGiveUp; setTimeout(tsGiveUp, window.__vi_captcha_wait_ms || 15000);
     document.head.appendChild(s);
   }
 
@@ -557,14 +564,14 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
     if (busy) return;
     var email = document.getElementById('email').value.trim();
     if (!EMAIL_RE.test(email) || email.length > 254) { say('Please check your email address. It doesn’t look complete.', 'err'); document.getElementById('email').focus(); return; }
-    if (tsOn() && window.turnstile && tsWidget !== null && !tsToken) { say('One moment. The “are you human” check is still running. Try again in a few seconds.', 'err'); return; }
+    if (tsOn() && window.turnstile && tsWidget !== null && !tsToken && !tsFailed) { say('One moment. The “are you human” check is still running. Try again in a few seconds.', 'err'); return; }
     busy = true; btn.disabled = true; say('Sending…');
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 15000);
     fetch(FN_URL, {
       method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, signal: ctrl ? ctrl.signal : undefined,
       body: JSON.stringify({ action: 'join', email: email, testing: document.getElementById('testing').checked, marketing: document.getElementById('marketing').checked,
-        consentVersion: CONSENT_VERSION, source: /sign-up/.test(location.pathname) ? 'sign-up' : 'home', utm: utm, referrer: store.get('vi_ref') || referrer, captchaToken: tsToken })
+        consentVersion: CONSENT_VERSION, source: /sign-up/.test(location.pathname) ? 'sign-up' : 'home', utm: utm, referrer: store.get('vi_ref') || referrer, captchaToken: tsToken, captchaUnavailable: tsOn() && !tsToken })
     }).then(function (res) {
       return res.json().catch(function () { return {}; }).then(function (b) { return { s: res.status, b: b }; });
     }).then(function (r) {

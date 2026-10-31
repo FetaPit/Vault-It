@@ -1,5 +1,5 @@
 // waitlist-join — the beta list behind vault-it.co/sign-up, with double opt-in.
-//   POST {action:'join', email, testing, marketing, consentVersion, source, utm:{source,medium,campaign,content}, referrer, captchaToken}
+//   POST {action:'join', email, testing, marketing, consentVersion, source, utm:{source,medium,campaign,content}, referrer, captchaToken, captchaUnavailable}
 //        → stores a PENDING request (migration 009) and e-mails a confirmation link; nothing counts until the owner of the address clicks it
 //   POST {action:'confirm', token}        → confirms the address and applies the choices made at sign-up (the consent record)
 //   POST {action:'unsubscribe', id, sig}  → leaves the list; the link is signed, so nobody can unsubscribe someone else
@@ -21,6 +21,8 @@ const num = (k: string, d: number) => { const n = parseInt(Deno.env.get(k) ?? ''
 const LIMIT_IP_PER_HOUR     = num('RATE_WAITLIST_IP_PER_HOUR', 30)       // a room of people at an event shares one IP
 const LIMIT_EMAIL_PER_HOUR  = num('RATE_WAITLIST_EMAIL_PER_HOUR', 3)     // stops one inbox being flooded with confirmation mails
 const LIMIT_GLOBAL_PER_HOUR = num('RATE_WAITLIST_GLOBAL_PER_HOUR', 300)  // protects the shared e-mail quota (sign-in codes use it too)
+const LIMIT_NOCHECK_IP_PER_HOUR  = num('RATE_WAITLIST_NOCHECK_IP_PER_HOUR', 3)    // joins without the human check (the check could not load on their device)
+const LIMIT_NOCHECK_ALL_PER_HOUR = num('RATE_WAITLIST_NOCHECK_ALL_PER_HOUR', 20)  // all such joins together, so a script cannot use this door to drain the e-mail quota
 const EMAIL_RE              = /^[A-Za-z0-9._%+'-]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/
 const TAG_RE                = /[^A-Za-z0-9 _.\-+|]/g
 
@@ -172,9 +174,15 @@ Deno.serve(async (req: Request) => {
   // so a script that cannot pass Turnstile cannot use up everyone's allowance.
   let wait = await limited(admin, 'wl-ip', ip, LIMIT_IP_PER_HOUR, 3600)
   if (!wait && TURNSTILE_SECRET) {
-    const verdict = captchaToken ? await verifyTurnstile(captchaToken, rawIp(req)) : 'fail'
-    if (verdict === 'fail') return json({ error: 'captcha' }, 403)
-    if (verdict === 'unreachable') return json({ error: 'captcha_unavailable', retryAfter: 30 }, 503, { 'Retry-After': '30' })
+    if (!captchaToken && body.captchaUnavailable === true) {
+      // The check could not load on the person's device (blocked, offline, odd network): testers must not be stuck. No token means the
+      // stricter counters; the confirmation e-mail (double opt-in) still has to be clicked before anyone counts.
+      wait = (await limited(admin, 'wl-nocheck-ip', ip, LIMIT_NOCHECK_IP_PER_HOUR, 3600)) || (await limited(admin, 'wl-nocheck-all', 'all', LIMIT_NOCHECK_ALL_PER_HOUR, 3600))
+    } else {
+      const verdict = captchaToken ? await verifyTurnstile(captchaToken, rawIp(req)) : 'fail'
+      if (verdict === 'fail') return json({ error: 'captcha' }, 403)
+      if (verdict === 'unreachable') return json({ error: 'captcha_unavailable', retryAfter: 30 }, 503, { 'Retry-After': '30' })
+    }
   }
   wait = wait || (await limited(admin, 'wl-all', 'all', LIMIT_GLOBAL_PER_HOUR, 3600)) || (await limited(admin, 'wl-addr', mailbox(email), LIMIT_EMAIL_PER_HOUR, 3600))
   if (wait) return json({ error: 'rate_limited', retryAfter: wait }, 429, { 'Retry-After': String(wait) })
