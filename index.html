@@ -6209,7 +6209,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var w = Math.max(1, container.clientWidth), h = Math.max(1, container.clientHeight);
     var r = this.renderer = new THREE.WebGLRenderer({ antialias: !opts.mobile, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.preserve });   // touch devices: no MSAA (the pixel ratio covers it; MSAA on a big phone canvas is what loses the context)
     var me = this;   // brand look (house flag): pixel ratio capped at 1.5 below 700 px wide, 2 above (brand handover 6.10)
-    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, me.brand ? (me._bLite ? 1 : w < 700 ? 1.5 : 2) : 9, Math.sqrt(budget / Math.max(1, w * h)))); };
+    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, me.brand ? (me._bLite ? 1 : w < 700 ? 1.25 : 1.5) : 9, Math.sqrt(budget / Math.max(1, w * h)))); };
     r.setPixelRatio(this._dprFor(w, h));
     r.setSize(w, h, false);
     r.outputEncoding = THREE.sRGBEncoding;
@@ -6255,13 +6255,19 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this._loop = function () {
       self._raf = 0;
       if (!self.active || self.offscreen || document.hidden) { self._lastT = 0; return; }   // off screen or in a background tab: sleep (woken when seen again)
+      // brand: what a drawn frame really cost is the gap until the browser gives us the next frame (the GPU work lands after render() returns)
+      if (self.brand && self._bDrewAt) { var fc = performance.now() - self._bDrewAt; self._bCost = self._bCost == null ? fc : self._bCost * 0.6 + fc * 0.4; self._bDrewAt = 0; self._bGap = Math.max(80, Math.min(1500, self._bCost * 2.2)); }
       var moving = self.controls.update();
       if (self._anim) moving = self._stepAnim() || moving;
       if (self._fly) moving = self._stepFly() || moving;
       if (self._brandTick) moving = self._brandTick() || moving;   // brand look: smoothing, brick drops, pulse, sweep, ring (only while on screen)
+      // brand lite (slow or software-drawn GPU, owner 31 Oct): frames are spaced at about 2.5x their own cost, so the page always has time
+      // to answer taps and scrolls between them ("Page unresponsive" otherwise); a skipped frame keeps the loop alive without drawing
+      if (self.brand && self._bLite && (self.dirty || moving) && performance.now() - (self._bLastDraw || 0) < (self._bGap || 120)) { self._raf = requestAnimationFrame(self._loop); return; }
       if (self.dirty || moving) {
         var t = performance.now();
         self.render(); self.dirty = false; self._idle = 0;
+        if (self.brand) { self._bLastDraw = self._bDrewAt = performance.now(); self._bDraws = (self._bDraws || 0) + 1; }
         // adaptive quality: the gap between moving frames, averaged after a warm-up, tells whether this device keeps up; a slow
         // one (under ~14 frames a second over 40 frames) drops to lite (no shadows, pixel ratio 1) rather than stuttering
         if (moving && self._lastT && !self._lite && !self.brand) { var dt = t - self._lastT; if (dt > 2 && dt < 500) { self._ema = self._ema == null ? dt : self._ema * 0.9 + dt * 0.1; self._nf = (self._nf || 0) + 1; if (self._nf > 40 && self._ema > 70) self.goLite(); } }
@@ -6760,6 +6766,11 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   var C = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2, 0.62, 0.74], frame: [0.78, 0.93, 0.92], glass: [0.02, 0.2, 0.22], glassLit: [0.96, 0.78, 0.42],
     door: [0.04, 0.24, 0.26], edge: [0.01, 0.1, 0.1], sheen: [0.75, 0.98, 0.96], flash: [0.91, 0.77, 0.42], shMin: 0.5, edgeK: 0.62, front: 0.88, back: 0.09 };
   var TEAL = [68 / 255, 192 / 255, 185 / 255], GOLD = [232 / 255, 197 / 255, 106 / 255], RAFTER = [120 / 255, 230 / 255, 222 / 255];
+  function softGL(r) {   // a GPU drawn in software (no graphics chip, or a blocklisted one): the 3D must stay light there
+    try { var gl = r.getContext(), ext = gl.getExtension('WEBGL_debug_renderer_info'), name = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+      return /swiftshader|llvmpipe|softpipe|software|basic render/i.test(String(name || '')); } catch (e) { return false; }
+  }
+  H.brandSoftGL = softGL;
   function reduced() {
     try { return (document.body && document.body.classList.contains('reduced-motion')) || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { return false; }
   }
@@ -6780,8 +6791,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     '  #ifndef BRAND_LAST',
     '  float age = uNow - aLaid;',
     '  if (aLaid > 1.0e8 || age < 0.0) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }',
-    '  float d = clamp(age / 0.38, 0.0, 1.0); vis = smoothstep(0.0, 0.5, d); float e = 1.0 - d; drop = e * e * e * uDrop;',
-    '  vFlash = uFlashOn * (1.0 - clamp(age / 1.1, 0.0, 1.0));',
+    '  float d = clamp(age / 0.9, 0.0, 1.0); vis = smoothstep(0.0, 0.5, d); float e = 1.0 - d; drop = e * e * e * uDrop;',
+    '  vFlash = uFlashOn * (1.0 - clamp(age / 2.0, 0.0, 1.0));',
     '  #endif',
     '  vec4 wp = modelMatrix * im * vec4(position, 1.0); wp.y += drop;',
     '  vN = normalize(mat3(modelMatrix) * mat3(im) * normal);',
@@ -6812,14 +6823,18 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     '  float s = 1.0 - clamp(abs(vW.y - uSweep) / uSweepW, 0.0, 1.0); col = mix(col, uSheen, s * 0.5 * uSweepOn);',
     '  a = uBack > 0.5 ? uBackA * vAlpha : (uFrontA + 0.06 * uPulse * uBuilt + 0.2 * fl) * vAlpha;',
     '  #endif',
+    '  #ifdef BRAND_OPAQUE',
+    '  gl_FragColor = vec4(col, 1.0);',
+    '  #else',
     '  gl_FragColor = vec4(col * a, a);',
+    '  #endif',
     '}'].join('\n');
 
   function shared() {   // uniforms every brand material reads (one object each, shared by reference)
     return { uNow: { value: 0 }, uPulse: { value: 0.5 }, uBuilt: { value: 0 }, uSweep: { value: -1e3 }, uSweepOn: { value: 0 }, uSweepW: { value: 6 * CH },
       uFadeGlaze: { value: 0 }, uLitGlass: { value: 0 }, uLitDoor: { value: 0 }, one: { value: 1 }, zero: { value: 0 } };
   }
-  function brandMat(U, look, back, last) {
+  function brandMat(U, look, back, last, opaque) {
     var u = {
       uNow: U.uNow, uPulse: U.uPulse, uBuilt: U.uBuilt, uSweep: U.uSweep, uSweepOn: U.uSweepOn, uSweepW: U.uSweepW,
       uBase: { value: v3(look.base) }, uLitCol: { value: v3(look.lit || look.base) }, uLit: look.litU || U.zero,
@@ -6828,9 +6843,11 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       uBack: { value: back ? 1 : 0 }, uFrontA: { value: look.front == null ? C.front : look.front }, uBackA: { value: C.back }, uTone: { value: look.tone || 0 },
       uDrop: { value: look.drop || 0 }, uFlashOn: { value: look.flash || 0 }, uFade: look.fadeU || U.one
     };
-    var mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS, fragmentShader: FS, transparent: true, premultipliedAlpha: true,
+    // opaque (bricks, roof, trim; owner 31 Oct): drawn solid with the depth test, so each pixel is shaded about once. The see-through
+    // version blended every brick behind every other and froze phones ("Page unresponsive"); at 0.88 alpha it looked the same.
+    var mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS, fragmentShader: FS, transparent: !opaque, premultipliedAlpha: true,
       depthWrite: !back, depthTest: !back, side: back ? THREE.BackSide : THREE.FrontSide });
-    if (last) mat.defines = { BRAND_LAST: '' };
+    mat.defines = {}; if (last) mat.defines.BRAND_LAST = ''; if (opaque) mat.defines.BRAND_OPAQUE = '';
     return mat;
   }
   function lookOf(part, U) {
@@ -6916,12 +6933,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       var part = P.parts[bi]; if (part === 'ctx' || part === 'none') return null;
       var n = b.count, pm = P.perm[bi], geo = (G[b.shape] || G.box).clone(), laid = new Float32Array(n).fill(1e9);
       var at = new THREE.InstancedBufferAttribute(laid, 1); at.setUsage(THREE.DynamicDrawUsage); geo.setAttribute('aLaid', at);
-      var look = lookOf(part, U), front = new THREE.InstancedMesh(geo, brandMat(U, look, false), n);
+      var solid = part === 'brick' || part === 'roof' || part === 'trim' || part === 'gold';
+      var look = lookOf(part, U), front = new THREE.InstancedMesh(geo, brandMat(U, look, false, false, solid), n);
       for (var k = 0; k < n; k++) front.setMatrixAt(k, compose(b.xf, pm[k] * 10, 1));
       front.instanceMatrix.needsUpdate = true; front.frustumCulled = false; front.count = 0; front.renderOrder = part === 'glass' ? 6 : 4;
       front.name = 'part:' + part; grp.add(front);
-      var back = null;
-      if (part === 'brick' || part === 'trim') {   // far faces, faint: the hologram reads as solid brickwork you can see into
+      var back = null;   // the faint far-face pass is gone (owner, 31 Oct): drawn without a depth test it redrew each pixel dozens of times
+      if (false) {
         back = new THREE.InstancedMesh(geo, brandMat(U, look, true), n); back.instanceMatrix = front.instanceMatrix;
         back.frustumCulled = false; back.count = 0; back.renderOrder = 3; grp.add(back);
       }
@@ -7075,7 +7093,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         mm.compose(new THREE.Vector3(xf[o], xf[o + 1], xf[o + 2]), new THREE.Quaternion().setFromEuler(e), new THREE.Vector3(xf[o + 3] * 1.14, xf[o + 4] * 1.14, xf[o + 5] * 1.14));
         hl.matrix.copy(mm); hl.matrixWorldNeedsUpdate = true; this._bLastJ = j;
       }
-      var landed = motion || (rec && now >= rec.laid[kk] + 0.38);
+      var landed = motion || (rec && now >= rec.laid[kk] + 0.9);
       last = { n: L, x: xf[o], y: xf[o + 1], z: xf[o + 2], shown: !!landed };
       hl.visible = !!landed;
     } else { hl.visible = false; this._bLastJ = -1; }
@@ -7096,7 +7114,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     E.slice.visible = pa > 0 && p > 0; E.slice.position.y = st.y; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
     this._bPulse = pulse;
     this._bInfo = { p: p, row: st.row, rows: st.rows, y: st.y, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
-      sliceA: pa, keys: st.keys, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: red };
+      sliceA: pa, keys: st.keys, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: motion };
     // auto orbit (6.6.8): drifts round slowly, stops at a touch, resumes after 2.5 s idle; off for reduced motion
     var ctl = this.controls;
     if (red || this._bLite) ctl.autoRotate = false;
@@ -7109,32 +7127,31 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     if (!this._brandActive() || !this._bm) { this._bTickT = 0; return false; }
     if (this._bVis === false || (typeof document !== 'undefined' && document.hidden)) { this._bTickT = 0; return false; }
     var t = performance.now(), raw = this._bTickT ? (t - this._bTickT) / 1000 : 1 / 60; this._bTickT = t;
-    // a device that cannot keep up (frames slower than 1/10 s on average) drops to the lite stage (6.10): pixel ratio 1, no
-    // ambient pulse, sweep or ring, and it only draws while something is building, so it never runs hot doing nothing
-    // Speed is judged only after the warm-up (shader compile and the first geometry upload make the first seconds slow on
-    // every device): from 3 s in, a running average slower than 1/8 s over 40 frames means the device cannot keep up.
     if (!this._bT0) this._bT0 = t;
-    if (raw < 2 && t - this._bT0 > 3000) { this._bEma = this._bEma == null ? raw : this._bEma * 0.9 + raw * 0.1; this._bFrames = (this._bFrames || 0) + 1; }
-    if (!this._bLite && this._bFrames > 40 && this._bEma > 0.125) {
+    // lite (6.10, tightened 31 Oct after "Page unresponsive"): straight away on a software-drawn GPU (SwiftShader, llvmpipe, Microsoft Basic
+    // Render), or once the first frames after a one-second warm-up average more than 50 ms each. Lite: pixel ratio 1, no ambient pulse,
+    // sweep, ring or auto orbit, frames spaced by the loop, and no drawing at all once the house has settled.
+    if (this._bSoft == null) this._bSoft = softGL(this.renderer);
+    if (!this._bLite && (this._bSoft || (t - this._bT0 > 1000 && (this._bDraws || 0) > 4 && this._bCost > 50))) {
       this._bLite = true; var w = this.el.clientWidth, h = this.el.clientHeight;
-      if (w > 2 && h > 2) { this.renderer.setPixelRatio(1); this.renderer.setSize(w, h, false); }
+      if (w > 2 && h > 2) { this.renderer.setPixelRatio(this._bSoft ? 0.75 : 1); this.renderer.setSize(w, h, false); }   // software GL: three quarters resolution, a third of the work
+      this.controls.autoRotate = false;
     }
-    // lite (6.10): pixel ratio 1 and about 12 frames a second; the pulse and ring ping stay, only the sweep and auto orbit stop
-    if (this._bLite && !reduced() && t - (this._bLastDraw || 0) < 80 && this._brandSettled()) return true;
-    this._bLastDraw = t;
+    if (this._bLite && !this.dirty && this._brandSettled() && !this._bDrag && this._bWasSettled) return false;   // still and unchanged: nothing to draw
     var dt = Math.min(this._bLite ? 0.5 : 0.05, raw);
     var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red;
     if (red) this.p = target;
-    else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 1.7); if (Math.abs(target - this.p) < 0.0003) this.p = target; }
+    else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 0.55); if (Math.abs(target - this.p) < 0.0003) this.p = target; }   // slow motion (owner, 31 Oct): a deposit builds over about five seconds
     this._brandApply();
-    if (calm) return !this._brandSettled() || !!this._fly;
+    this._bWasSettled = this._brandSettled();
+    if (calm || this._bLite) return !this._bWasSettled || !!this._fly;
     return true;   // pulse, sweep and ring keep the stage alive
   };
   VP._brandSettled = function () {
     var target = this._bTarget == null ? this.p : this._bTarget;
     if (Math.abs(target - this.p) > 1e-9) return false;
     var now = this._bNow(), busy = false;
-    (this._bm || []).forEach(function (rec) { if (rec && rec.cnt > 0 && rec.laid[rec.cnt - 1] > -999 && now < rec.laid[rec.cnt - 1] + 1.5) busy = true; });
+    (this._bm || []).forEach(function (rec) { if (rec && rec.cnt > 0 && rec.laid[rec.cnt - 1] > -999 && now < rec.laid[rec.cnt - 1] + 2.1) busy = true; });
     return !busy;
   };
   VP.brandInfo = function () { return this._brandActive() ? this._bInfo : null; };
@@ -16351,7 +16368,7 @@ function hb3dPlaceOverlays() {
     var what = m.focus ? (sm.mode === 'build' ? 'your floor · ' + st.stage + ' · ' : 'your floor · ') : (sm.mode === 'build' ? st.stage + ' · ' : '');
     cap.textContent = sm.mode === 'site' ? '' : (name + ' · ' + what + st.bricksLaid.toLocaleString('en-GB') + ' / ' + st.bricksTotal.toLocaleString('en-GB') + ' bricks' + (st.tilesTotal && !bri ? ' · ' + st.tilesLaid.toLocaleString('en-GB') + ' tiles' : '')
       + (bri ? ' · ' + (window.VI_CURRENCY_SYMBOL || '£') + (HB3D.brandBrickValue(depositTarget(), st.bricksTotal) * (window.VI_CURRENCY_RATE || 1)).toFixed(2) + ' a brick' : ''));
-    var bInf = bri && v.brandInfo ? v.brandInfo() : null; if (bInf && (bInf.reduced || bInf.lite)) cap.textContent += bInf.reduced ? ' · animations off: reduced motion is on in your device settings' : ' · animations reduced: this device is slow';
+    var bInf = bri && v.brandInfo ? v.brandInfo() : null; if (bInf && (bInf.reduced || bInf.lite)) cap.textContent += bInf.reduced ? ' · animations off: reduced motion is on in your device settings' : ' · lighter animation for this device';
     v.renderer.domElement.setAttribute('aria-label', '3D model: ' + (m.name || 'house') + (sm.mode === 'equity' ? ', mortgage ' + Math.round(sm.eq * 100) + '% paid' : sm.mode === 'build' ? ', ' + Math.round(p * 100) + '% built' : ''));
   }
 }
