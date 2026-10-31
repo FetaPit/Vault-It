@@ -1,6 +1,8 @@
 // Mobile navigation (owner, 30 Oct 2026): on phones the tab icons sit in a bar fixed to the bottom of the screen and stay there while the
 // page scrolls; the header keeps one row; the footer flows at the end of the page. The Connections tab has left the menu bar at every width
 // and lives in Settings: showTab('connections') opens Settings at that section with the list rendered. Desktop keeps the two-row header.
+// Tablets and folds (701 to 1023 px, Fold open at 884) keep the labelled menu at the top even with the compact density saved;
+// the Fold closed (344) gets the phone bar; the Settings "Icons only" choice still hides labels.
 // Run: node tests/test_mobile_nav.js
 const { chromium } = require('playwright');
 const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
@@ -61,6 +63,32 @@ const seed = (theme) => {
     ok(m.pos !== 'fixed' && m.top >= 40 && m.top <= 80 && m.navH >= 90, theme + ' 1100: the tabs stay in the header\'s second row (' + m.pos + ', top ' + m.top + ', header ' + m.navH + 'px)');
     ok(m.tabs.length === 7 && !m.conn && m.footerPos === 'fixed', theme + ' 1100: seven tabs, no Connections tab, footer fixed as before');
     await p.context().close();
+  }
+  // ── tablets and folds (owner, 31 Oct): the labelled menu stays at the top; only phones get the bottom icon bar ──
+  for (const [w, dens] of [[701, null], [768, null], [884, null], [884, 'compact'], [1023, 'compact']]) {
+    const ctx = await b.newContext({ viewport: { width: w, height: 1000 }, hasTouch: true, isMobile: false });
+    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(w + ' tablet: ' + e.message));
+    await p.addInitScript(seed, 'dark'); if (dens) await p.addInitScript((d) => localStorage.setItem('vi_density', d), dens);
+    await p.goto(APP); await p.waitForTimeout(1500);
+    await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal,#trial-banner,#tester-welcome{display:none!important}' });
+    const t = await p.evaluate(() => { const bar = document.getElementById('vi-tabs'); const labels = [...bar.querySelectorAll('.tab-btn')].filter(x => !x.hidden && getComputedStyle(x).display !== 'none').map(x => { const l = x.querySelector('.nav-tab-label'); return !!l && getComputedStyle(l).display !== 'none' && l.getBoundingClientRect().width > 8; });
+      return { pos: getComputedStyle(bar).position, labels, fit: bar.scrollWidth <= bar.clientWidth + 1, sx: document.documentElement.scrollWidth - innerWidth, compact: document.body.classList.contains('vi-compact'), top: Math.round(bar.getBoundingClientRect().top) }; });
+    ok(t.pos !== 'fixed' && t.top < 120 && t.labels.length === 7 && t.labels.every(Boolean) && t.fit && t.sx <= 1, w + 'px' + (dens ? ' (density ' + dens + ' saved)' : '') + ': the labelled menu sits at the top, all seven labels show and fit (' + JSON.stringify(t) + ')');
+    await ctx.close();
+  }
+  { // Galaxy Fold closed (344 px): the phone bar at the bottom
+    const ctx = await b.newContext({ viewport: { width: 344, height: 882 }, isMobile: true, hasTouch: true });
+    const p = await ctx.newPage(); await p.addInitScript(seed, 'dark'); await p.goto(APP); await p.waitForTimeout(1500);
+    const t = await p.evaluate(() => { const bar = document.getElementById('vi-tabs'), r = bar.getBoundingClientRect(); return { pos: getComputedStyle(bar).position, bottom: Math.round(r.bottom), inner: innerHeight, sx: document.documentElement.scrollWidth - innerWidth }; });
+    ok(t.pos === 'fixed' && t.bottom === t.inner && t.sx <= 1, '344px (Fold closed): the icon bar is fixed to the bottom, no sideways scroll');
+    await ctx.close();
+  }
+  { // "Icons only" chosen in Settings still means icons only on a tablet
+    const ctx = await b.newContext({ viewport: { width: 884, height: 1000 } });
+    const p = await ctx.newPage(); await p.addInitScript(seed, 'dark'); await p.addInitScript(() => localStorage.setItem('vi_settings', JSON.stringify({ compactNav: true }))); await p.goto(APP); await p.waitForTimeout(1500);
+    const hid = await p.evaluate(() => [...document.querySelectorAll('#vi-tabs .tab-btn:not([hidden]) .nav-tab-label')].every(l => getComputedStyle(l).display === 'none'));
+    ok(hid, '884px with "Icons only" chosen in Settings: labels stay hidden');
+    await ctx.close();
   }
   await b.close();
   ok(errs.length === 0, 'no page errors ' + errs.join(' | '));

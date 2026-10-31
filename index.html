@@ -10096,9 +10096,11 @@ html #topnav .tab-btn:focus-visible{outline:2px solid var(--tc)!important;outlin
 #topnav .vi-usp{background:var(--goldf);color:var(--on-gold)}
 #topnav .vi-pro{background:rgb(var(--orange-rgb) / .16);color:var(--orange);border:1px solid rgb(var(--orange-rgb) / .5)}
 #topnav #budget-badge{position:absolute;top:5px;right:5px;margin:0}
-/* compact: icons only (also the older "Icons only" setting) */
-body.vi-compact #topnav .nav-tab-label,#topnav.compact-nav .nav-tab-label{display:none!important}
-html body.vi-compact #topnav .tab-btn,html #topnav.compact-nav .tab-btn{padding:0!important;width:44px}
+/* compact: icons only on desktop (also the older "Icons only" setting, at every width). Tablets and folds keep the labels
+   (owner, 31 Oct): only phones get the icon bar, at the bottom. */
+#topnav.compact-nav .nav-tab-label{display:none!important}
+html #topnav.compact-nav .tab-btn{padding:0!important;width:44px}
+@media (min-width:1024px){body.vi-compact #topnav .nav-tab-label{display:none!important}html body.vi-compact #topnav .tab-btn{padding:0!important;width:44px}}
 #vi-theme-btn{height:30px}
 @media (prefers-reduced-motion:reduce){html #topnav .tab-btn.active .vi-ic.ti{animation:none}}
 /* header: row 1 = brand, net worth, Back, Night/Daylight, density; row 2 = the tabs (every width, so labels never get cut off) */
@@ -10122,9 +10124,10 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   #vi-density-btn{grid-column:4}
   #vi-density-btn .vi-d-opt[data-d="default"]{display:none!important}
   #vi-density-btn .vi-d-lbl{display:inline!important}#vi-density-btn .vi-d-ico{display:none!important}
-  #topnav .vi-tabs{margin:0 -8px;padding:0 6px;justify-content:flex-start}
-  html body.vi-compact #topnav .vi-tabs,html #topnav.compact-nav .vi-tabs{justify-content:space-between}
-  html body.vi-compact #topnav .tab-btn,html #topnav.compact-nav .tab-btn{flex:1 1 0!important;width:auto;max-width:64px}
+  #topnav .vi-tabs{margin:0 -8px;padding:0 2px;gap:0;justify-content:safe center}
+  html #topnav .tab-btn{padding:0 6px!important;gap:5px;letter-spacing:.03em!important;font-size:.54rem!important}   /* all seven labelled tabs fit from 701 px */
+  html #topnav.compact-nav .vi-tabs{justify-content:space-between}
+  html #topnav.compact-nav .tab-btn{flex:1 1 0!important;width:auto;max-width:64px}
 }
 /* phones (owner, 30 Oct 2026): the tab icons sit in a bar fixed to the bottom of the screen, always visible; the header keeps one row.
    The nav drops to z-index 500 here so pop-ups (Settings at 600 and above) cover the bar; the footer flows at the end of the page instead. */
