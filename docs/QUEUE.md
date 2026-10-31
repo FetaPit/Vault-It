@@ -9,7 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [ ] Subscription pop-up and Settings copy: Vaulter / Pioneer monthly / Pioneer yearly / Founding Member, yearly extras named (own 3D design, AI model, early access, extra house types), prices unchanged (owner's ask, 30 Oct, answers 31 Oct)
+- [~] Subscription pop-up and Settings copy: Vaulter / Pioneer monthly / Pioneer yearly / Founding Member, yearly extras named (own 3D design, AI model, early access, extra house types), prices unchanged (owner's ask, 30 Oct, answers 31 Oct). Added 31 Oct 12:xx: beta testers get a visible discount, £2 a month and £28 a year off; the new price points and their Payment Links are created in Stripe (owner: "you have access to Stripe so populate these")
 - [ ] Tier gates from the questionnaire (31 Oct): old caps go (assets, liabilities, debts unlimited), house build Level 1 open to all, Pioneer gates on net worth history, Levels 2 and 3, Entrepreneur, projections, history and restore, Connections; yearly-only gates on own 3D design, AI model and extra house types; AI reader 3 / 30 / 10 a month
 - [ ] Simplified / Advanced view (owner, 31 Oct): switch in Settings and the welcome flow, new accounts start Simplified, synced per account; tile list in `docs/MONETISATION_DECISION.md` section 8 (Overview KPIs one row, 3D card, roadmap, achievements card; Budget sections collapsed with the Sankey on top and a flow animation; House viewport and plan; all Assets sub-tabs; all of Debt)
 - [ ] Tester welcome message (wording agreed 31 Oct): wire it to the first run for beta accounts
@@ -17,6 +17,7 @@ The single list of instructed work. Every session reads it at start and before e
 - [ ] 3D net worth first draw (owner, 31 Oct, live defect): the main Overview 3D net worth scene only populates after the 3D view is toggled off and back on; it must draw on first show
 - [ ] Tablet and fold navigation (owner, 31 Oct): tablet and folding-phone widths keep the labelled menu bar at the top; only the phone view has the icon bar at the bottom
 - [ ] House builder style exactly as the brand book (owner, 31 Oct, 11:30): make the house builder's look and animations match the brand book the owner attached (`brand/vault-it-brand-book-31oct.html`, a newer 170 KB version that differs from `brand/vault-it-brand-book.html`) and the screen recording of the animations (frames every 2 s in `brand/reference/house-animation/`; the original mp4 was attached in the 31 Oct session and is not in the repo). Audit the differences first and report before changing code; the level rules and flag defaults stand
+- [ ] Secure paid gateway (owner, 31 Oct: "yes we need to set up the paid gateway securely"): paid status set by a Stripe webhook (checkout.session.completed with the account id as client_reference_id) into `profiles` through a new edge function, the client's write access to `is_pioneer` / `is_founder` revoked by migration, plan and tester columns on `profiles`, the app reading paid status from the profile only; needs the webhook signing secret in Supabase secrets and the owner's yes before the migration and function go to production
 
 ## Waiting on the owner
 
