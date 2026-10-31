@@ -61,10 +61,13 @@ A new brand is being applied. Design files are in `brand/`. Open `brand/vault-it
 - Tagline: **Get out of the red and into your home.** Name is written **Vault-It** with a hyphen (owner, 30 Oct 2026: easy to type, matches vault-it.co). In the logo wordmark the hyphen is drawn as the brand brick.
 - One phase per session. Read only that phase's part of `brand/vault-it-brand-handover.md` (list its sections with `grep -n '^#' brand/vault-it-brand-handover.md`). Never Read `brand/vault-it-brand-book.html` (227 KB) whole: grep it.
 
-## Token budget
-- `index.html` is 25k lines; `Vault-It_v0.3_Alpha.html` is a legacy build (ignore unless asked). Never Read either without `offset`/`limit`. A line-numbered map is added at session start (`.claude/hooks/map.sh`); otherwise Grep first.
+## Token budget (full playbook: `docs/CLAUDE_EFFICIENCY.md`; never trade a test, screenshot or rule for tokens)
+- One queue item per fresh session, started from its brief; `/handoff` when it is done. Independent items can run as parallel sessions on their own branches, merged one at a time.
+- Cloud sessions keep the model they were created with (`opusplan` is CLI only): Sonnet for building, Opus for planning, 3D engine, money logic and hard bugs. Never switch model mid-session.
+- `index.html` is 25k lines; `Vault-It_v0.3_Alpha.html` is a legacy build (ignore unless asked). Never Read either without `offset`/`limit` (200 lines or fewer). A line-numbered map is added at session start (`.claude/hooks/map.sh`); otherwise Grep first. Don't re-read a file you just edited.
 - `index.html` between `<<HB3D_ENGINE` and `HB3D_ENGINE>>` is generated: edit `src/hb3d/*`, then `node tools/build_hb3d.js`.
-- Run the tests you need by name (`bash scripts/run-tests.sh test_x`); the full suite only before a release. Read failures from `/tmp/vaultit-test-logs` rather than pasting whole runs.
-- Trim command output (`| tail -40`, `| grep`). Use `rtk` if installed.
-- Plan mode runs on Opus, the rest on Sonnet (`opusplan`). Delegate: `scout` (Haiku) finds code, `grunt` (Haiku) makes exact mechanical edits, `architect` (Opus) explains and plans, read-only.
-- Replies: outcome first, short, line refs rather than whole files. Suggest `/handoff` and a fresh session when the task changes, `/compact` after exploring.
+- Run the tests you need by name (`bash scripts/run-tests.sh test_x`). For the full suite, push and read CI with `mcp__github__actions_list` / `get_job_logs` (failing job only); a release still needs it green on the exact commit. Read failures from `/tmp/vaultit-test-logs` rather than pasting whole runs.
+- Screenshots: shoot the changed element at 390 and 1100 px, Night and Daylight; open only the images needed to judge the change, send the set to the owner with `SendUserFile`.
+- Trim command output (`| tail -40`, `| grep`, `cut -c1-200`). Use `rtk` if installed.
+- Delegate: `scout` (Haiku) finds code, `grunt` (Haiku) makes exact mechanical edits, `architect` (Opus) explains and plans, read-only.
+- Batch owner decisions into one question early. Replies: outcome first, short, line refs rather than whole files. `/compact` at 35% context.

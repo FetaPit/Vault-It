@@ -50,6 +50,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Efficiency rules for every session (owner, 31 Oct evening, asked for in this session so tonight's work is cheaper; docs and the queue hook only, no app code): `docs/CLAUDE_EFFICIENCY.md` rewritten as the playbook, a matching section in `CLAUDE.md`, the prompt hook trimmed, brand phase 5 status and a token estimate for the tester release given in chat (this commit)
 - [x] Net worth in 3D (owner, 31 Oct): the column list folds into a "What each column is" dropdown, the scene rests 20% closer (35% cut off the first column at 1100 px), the debt columns stand right after the inventory cubes. Commit 11e23b8
 - [x] Goals and snapshots (owner, 31 Oct): hidden while the 3D view shows; they appear in the net worth Graph view (what is added there still feeds everything else). Commit 11e23b8
 - [x] Financial freedom roadmap (owner, 31 Oct): the rail runs between the coins, never through them; coins have depth, the stage to work on is the largest and turns gently, the others grow on hover; the road sits in slight perspective; on phones it is a carousel (largest in the centre, fading to the sides, swipe settles on a stage); opens with the current stage centred. Commit 11e23b8

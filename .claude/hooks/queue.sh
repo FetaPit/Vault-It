@@ -9,7 +9,8 @@ n=$(printf '%s\n' "$open" | grep -c '^- ' || true)
 [ "$n" -gt 0 ] || { echo "Queue (docs/QUEUE.md): nothing open."; exit 0; }
 if [ "$MODE" = "prompt" ]; then
   echo "Queue check (docs/QUEUE.md, $n open, owner's order; a new ask goes on the list this turn, after the open items unless the owner reorders):"
-  printf '%s\n' "$open" | head -3 | sed 's/ (instructed.*//; s/^/  /'
+  # Titles only on every prompt (full text is in the file and printed at session start)
+  printf '%s\n' "$open" | head -3 | sed 's/ (instructed.*//; s/^/  /' | cut -c1-160
   [ "$n" -gt 3 ] && echo "  ... and $((n-3)) more"
 else
   echo "WORK QUEUE (docs/QUEUE.md): $n open item(s), in the owner's order. Do them top to bottom; add every new request to the file before starting it."
