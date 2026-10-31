@@ -28,6 +28,8 @@ Why it matters: every turn re-sends the whole conversation. A session sitting at
 
 ## 4. Conversation
 
+- In cloud sessions `/handoff` notes live in the container's home folder and are lost when it is reclaimed. The queue item's progress line ("Next: ...") and the commit body are the handoff that survives.
+
 - Replies: outcome first, short, line references rather than code dumps.
 - Batch the owner's decisions into one `AskUserQuestion` early in the item, not one question per turn later.
 - Owner: point at queue items by number ("Round 3 item 8") and paste screenshots only when they show something the text cannot.
@@ -41,7 +43,7 @@ Every change keeps its tests (new behaviour gets a test that fails on the old co
 ## 6. Bigger options (need the owner's yes)
 
 - **Split `index.html` into source parts** (`src/app/*.css`, `*.js`, `*.html`) that `tools/build_site.js` stitches back into the same single file. Reads, greps and diffs get much smaller and parallel sessions conflict less. It is a large refactor: do it between rounds, with the full suite and a visual pass before and after, and keep the shipped file byte-for-byte equivalent at first.
-- **A `ship-item` project skill** that holds the per-item loop (mark the queue, run named tests, shoot the changed element, commit, update the queue, hand off), so each session loads it on demand instead of re-deriving it from `CLAUDE.md`.
+- ~~A `ship-item` project skill~~: built 31 Oct (`.claude/skills/ship-item/`, `.claude/agents/rollout-qc.md`, `.claude/hooks/qc-gate.sh`, `tools/shot.js`).
 
 ## Quick reference
 
@@ -53,4 +55,5 @@ Every change keeps its tests (new behaviour gets a test that fails on the old co
 | Plan a feature (CLI) | Shift+Tab twice, then describe it |
 | Quick questions | `/caveman`, then short prompts. `/caveman off` to stop |
 | Context getting big | `/compact` |
+| Build or finish a queue item | `/ship-item Round 3 item 8` |
 | Switching task | `/handoff next: Round 3 item 20`, then a new session |

@@ -45,6 +45,7 @@ bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scri
 - `docs/QUEUE.md` is the owner's ordered list of instructed work. The `queue.sh` hook prints it at session start and on every prompt. Do items top to bottom; a newer ask never jumps an older one unless the owner reorders it.
 - Every new request from the owner goes into `docs/QUEUE.md` in the same turn, before any work on it. Mark `[~]` when starting, move to Done with the commit when finished.
 - Before starting any task and before any release, run the `queue-keeper` agent with the task; obey a STOP or ADD. "Release" is a queue item, not a reset of the queue.
+- Every item that changes app code (`index.html`, `landing.html`, `src/`, `site/`, `worker/`, `supabase/`) goes through the `ship-item` skill: intent card from the owner's own words, failing test first, named tests, `node tools/shot.js` element shots, then the read-only `rollout-qc` agent. `.claude/hooks/qc-gate.sh` blocks a commit of staged app code without its PASS. Docs, tests and queue commits pass straight through.
 
 ## Brand rollout
 
