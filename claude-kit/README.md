@@ -21,15 +21,20 @@ Your existing hooks, permissions, agents and skills with the same names are kept
 
 ## Install
 
-**Your Mac or PC (once):**
+Always install from a checked-out copy. Never pipe a download into a shell (`curl ... | bash`): the kit's own rules forbid it, and auto mode blocks it.
+
+**Your Mac or PC (once, in Git Bash on Windows):** from a Vault-It checkout,
 ```
-curl -fsSL https://raw.githubusercontent.com/FetaPit/Vault-It/Pioneer_v3/claude-kit/install.sh | bash
+git pull && bash claude-kit/install.sh
 ```
 Restart Claude Code. Re-run the same line to update. Remove with `bash ~/.claude/kit/install.sh --uninstall` (puts your old model and effort back).
 
-**Cloud sessions (claude.ai/code, phone):** cloud containers start fresh each time, so add the same line to each environment's setup script (Live Design, Net Worth Tracker, Default Cloud Environment): environment menu in the session title bar, Edit, Setup script.
+**Cloud sessions (claude.ai/code, phone):** cloud containers start fresh each time, so each environment's setup script (Live Design, Net Worth Tracker, Default Cloud Environment) installs it again: environment menu in the session title bar, Edit, Setup script. Use this line (it clones, then runs the installer from the copy):
+```
+rm -rf /tmp/claude-kit-src && git clone -q --depth 1 -b Pioneer_v3 https://github.com/FetaPit/Vault-It /tmp/claude-kit-src && bash /tmp/claude-kit-src/claude-kit/install.sh
+```
 
-The kit lives in `claude-kit/` on `Pioneer_v3`, so this address stays the same. Changes to the kit reach you the next time the line runs.
+The kit lives in `claude-kit/` on `Pioneer_v3`, and installs pull from there. Kit changes made on another branch (for example `brand-rollout`) reach machines only once they are on `Pioneer_v3`. Check with `git diff --stat origin/Pioneer_v3 HEAD -- claude-kit`.
 
 ## Claude app (claude.ai, phone, desktop)
 
