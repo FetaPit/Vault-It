@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] Release (owner, 31 Oct, "Release and implement all queued edits": release first, owner's order): full suite on `brand-rollout` (b1bbbeb: trial then paid 38c3137, plans pop-up 883dfdd), backup branch, fast-forward `release/pioneer-v2`
 - [ ] Tier gates from the questionnaire (31 Oct): old caps go (assets, liabilities, debts unlimited), house build Level 1 open to all, Pioneer gates on net worth history, Levels 2 and 3, Entrepreneur, projections, history and restore, Connections; yearly-only gates on own 3D design, AI model and extra house types; AI reader 3 / 30 / 10 a month
 - [ ] Simplified / Advanced view (owner, 31 Oct): switch in Settings and the welcome flow, new accounts start Simplified, synced per account; tile list in `docs/MONETISATION_DECISION.md` section 8 (Overview KPIs one row, 3D card, roadmap, achievements card; Budget sections collapsed with the Sankey on top and a flow animation; House viewport and plan; all Assets sub-tabs; all of Debt)
 - [ ] Tester welcome message (wording agreed 31 Oct): wire it to the first run for beta accounts
