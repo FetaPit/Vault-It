@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] Release (owner, 31 Oct): full suite on `brand-rollout` (a1126c8: phone 3D fix e4dc352 + 3D efficiency f0b8cd2), backup branch, fast-forward `release/pioneer-v2`
 - [ ] Trial then paid (owner, 31 Oct, decisions 1 and 2): everyone gets 30 days of the full app with no card; at the end a prompt to choose a paid tier (Pioneer monthly or annual, Founding Member first for testers), then the read-only vault; week-one activation nudges and a day-23 reminder; beta accounts get the same prompt once their 30 days are over
 - [ ] Subscription pop-up and Settings copy: Vaulter / Pioneer monthly / Pioneer yearly / Founding Member, yearly extras named (own 3D design, AI model, early access, extra house types), prices unchanged (owner's ask, 30 Oct, answers 31 Oct)
 - [ ] Tier gates from the questionnaire (31 Oct): old caps go (assets, liabilities, debts unlimited), house build Level 1 open to all, Pioneer gates on net worth history, Levels 2 and 3, Entrepreneur, projections, history and restore, Connections; yearly-only gates on own 3D design, AI model and extra house types; AI reader 3 / 30 / 10 a month
