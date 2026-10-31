@@ -28158,15 +28158,15 @@ function makeTracker(cv,o){
 function makeTreeMap(cv,o){
   o=o||{};
   var st={yaw:-.5,pitch:.98,dist:125,zoom:1.15,ty:1,fit:.9},self={st:st},idle=-9999,cells=[],groups=[],rects=[],raw=[],total=0,hover=null,first=true,pending=false,PL=.5,
-    fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},U=100,BS=3.3,GG=.12,LG=.05,CH=.85,ext={x:10,z:10},plate={W:20,D:20},pile={x0:0,x1:0},
+    fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},U=100,BS=3.3,GG=.035,LG=.02,CH=.85,ext={x:10,z:10},plate={W:20,D:20},pile={x0:0,x1:0},
     T_IN=900,T_GO=850,SPREAD=2100,t0=0,sx=0;
   function unitFor(t){var u=100,steps=[100,200,500,1000,2000,5000,10000],k=0;while(t/u>360&&k<steps.length-1){k++;u=steps[k]}return u}
   /* a line's rectangle in blocks: columns about one £100 block wide, full rows of £100 blocks, then one thinner row for the rest */
   function fill(r,g,it,j,rect){
     var v=it.v,kpa=r.w*r.h/v,side=Math.sqrt(U*kpa),c=Math.max(1,Math.min(Math.round(r.w/side)||1,Math.max(1,Math.floor(v/U+1e-9)))),cw=r.w/c,
-      nf=Math.floor(v/(U*c)+1e-9),rem=v-nf*U*c,rd=U*kpa/cw,z=r.y,k,bi=Math.min(.045,cw*.03);
+      nf=Math.floor(v/(U*c)+1e-9),rem=v-nf*U*c,rd=U*kpa/cw,z=r.y,k,bi=Math.min(.025,cw*.02);
     if(rem<.005)rem=0;
-    function put(zz,dd,val){for(k=0;k<c;k++)cells.push({g:g,it:it,ii:j,r:rect,val:val,part:val/U,x:r.x+cw*(k+.5),z:zz+dd/2,w:Math.max(.05,cw-bi),d:Math.max(.05,dd-Math.min(.045,dd*.03)),row:Math.round(zz*100)})}
+    function put(zz,dd,val){for(k=0;k<c;k++)cells.push({g:g,it:it,ii:j,r:rect,val:val,part:val/U,x:r.x+cw*(k+.5),z:zz+dd/2,w:Math.max(.05,cw-bi),d:Math.max(.05,dd-Math.min(.025,dd*.02)),row:Math.round(zz*100)})}
     for(var q=0;q<nf;q++){put(z,rd,U);z+=rd}
     if(rem>0)put(z,r.y+r.h-z,rem/c);
   }
