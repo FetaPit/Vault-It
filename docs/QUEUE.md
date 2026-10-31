@@ -9,7 +9,6 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [~] House builder style exactly as the brand book (owner, 31 Oct, 11:30): make the house builder's look and animations match the brand book the owner attached (`brand/vault-it-brand-book-31oct.html`, a newer 170 KB version that differs from `brand/vault-it-brand-book.html`) and the screen recording of the animations (frames every 2 s in `brand/reference/house-animation/`; the original mp4 was attached in the 31 Oct session and is not in the repo). Audit the differences first and report before changing code; the level rules and flag defaults stand
 - [ ] Secure paid gateway (owner, 31 Oct: "yes we need to set up the paid gateway securely"): paid status set by a Stripe webhook (checkout.session.completed with the account id as client_reference_id) into `profiles` through a new edge function, the client's write access to `is_pioneer` / `is_founder` revoked by migration, plan and tester columns on `profiles`, the app reading paid status from the profile only; needs the webhook signing secret in Supabase secrets and the owner's yes before the migration and function go to production
 - [ ] Net worth 3D card controls (owner, 31 Oct 12:33, phone screenshot): the Graph / 3D / progress toggles are unclean (three views, four states) and belong top right; the key is too small and unclear, and its swatches should look like 3D blocks in the theme; split the net worth progress blocks into their own card below the 3D viewport, where the forecast toggle gives a separate insight (owner asked whether to split; recommendation: yes, one card per view, each with its own key)
 
@@ -26,6 +25,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] House builder style as the brand book and recording (owner, 31 Oct): the brand build is now the default (owner's call; classic viewer stays as the Settings switch), camera controls use the brand line icons, a column on the right at desktop and a row top right on phones, the caption wraps in Share Tech Mono and no longer counts tiles. Commit HOUSECOMMIT on `brand-rollout`, not released.
 - [x] Tablet and fold navigation (owner, 31 Oct): labelled top menu from 701 px even with the compact density saved; phones (Fold closed included) keep the bottom bar; "Icons only" still works. Not done (owner's call): phones in landscape still get the two-row header rather than the bottom bar. Commit 2047ce0 on `brand-rollout`, not released.
 - [x] 3D net worth first draw (owner, 31 Oct, live defect): the stage read the oldest visibility entry and could stay "not visible"; it now reads the newest, kick notices an on-screen canvas, and lite mode no longer starts a second loop. Regression test fails on the old code. Commit ff89c32 on `brand-rollout`, not released.
 - [x] Sign-up page steps (owner, 31 Oct): small app screenshots for steps 1 to 3, four brand icons pulsing on step 2 (reduced motion respected), the big house removed. Commit 8080f69 on `brand-rollout`, not released.

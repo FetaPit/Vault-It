@@ -1,4 +1,5 @@
-// Brand build on the 3D house builder (behind ?house=new or vi-flag-house = 1; the classic hologram viewer is the default again since 30 Oct 2026 22:02), brand handover 6.2 to 6.10.
+// Brand build on the 3D house builder (on by default since 31 Oct 2026, owner: the screen recording is the target; ?house=old or vi-flag-house = 0 gives the classic viewer), brand handover 6.2 to 6.10.
+// Camera rail as the brand book and recording: line icons, a column on the right at desktop, a row top right at phone width.
 // Flag off: the current builder, unchanged. Flag on: brick value = deposit target x 0.77 / bricks, bricks laid =
 // floor(bricks x seg(p, 0.03, 0.80)), the ROW label, the HUD and the caption agree, per-brick drop and stagger,
 // reduced motion builds instantly, no page errors, no sideways scroll at 390 px.
@@ -67,6 +68,8 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   ok(r.bi.row === r.rowWant && new RegExp('ROW ' + r.rowWant + ' / ' + r.bi.rows).test(r.label) && r.cls.includes('brand'), 'the gold tag shows the course of the last brick laid: ' + r.label);
   ok(/31\.3% OF DEPOSIT/.test(r.label) && /31\.3% of/.test(r.hud), 'tag and HUD agree on the percentage (31.3%)');
   ok(new RegExp('ROW\\s*' + r.rowWant + '\\s*of\\s*' + r.bi.rows, 'i').test(r.hud), 'HUD row card agrees (ROW ' + r.rowWant + ' of ' + r.bi.rows + ')');
+  const rail = await p.evaluate(() => { const h = document.getElementById('hud-bar-house'), s = document.getElementById('house-scene').getBoundingClientRect(), b = h.getBoundingClientRect(); return { dir: getComputedStyle(h).flexDirection, mid: Math.abs((b.top + b.bottom) / 2 - (s.top + s.bottom) / 2) }; });
+  ok(rail.dir === 'column' && rail.mid < 30, 'desktop: camera controls are a column on the right, centred (' + JSON.stringify(rail) + ')');
   ok(r.cap.includes(r.L.toLocaleString('en-GB') + ' / ' + r.N.toLocaleString('en-GB') + ' bricks') && /£7\.24 a brick/.test(r.cap), 'caption agrees: ' + r.cap);
   ok(r.pill === 'BRICK #' + r.L.toLocaleString('en-GB'), 'the last brick laid is ringed and numbered (' + r.pill + ')');
   ok(Math.abs(r.bi.y - (r.bi.last.y + 0.0325)) < 0.06 && r.bi.sliceA === 1, 'the gold slice sits on the course of the last brick');
@@ -116,6 +119,9 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   ok(r.sw <= r.iw, 'no sideways scroll at 390 px (' + r.sw + ' <= ' + r.iw + ')');
   ok(r.inside, 'the ROW tag stays inside the stage at 390 px');
   ok(r.dpr <= 1.5, 'pixel ratio capped at 1.5 below 700 px');
+  r = await p.evaluate(() => { const s = document.getElementById('house-scene').getBoundingClientRect(), h = document.getElementById('hud-bar-house'), b = h.getBoundingClientRect(), ic = h.querySelector('.hb-ico'); return { dir: getComputedStyle(h).flexDirection, top: b.top - s.top, right: s.right - b.right, ico: ic && getComputedStyle(ic).display, sw: b.right <= s.right + 1 && b.left >= s.left - 1 }; });
+  ok(r.dir === 'row' && r.top < 20 && r.right < 20 && r.sw, 'phone: camera controls are a row top right inside the stage (' + JSON.stringify(r) + ')');
+  ok(r.ico === 'block', 'phone: the controls use the brand line icons');
   await p.context().close();
 
   // ── 7. ?house=new turns it on and keeps it on for this device (owner, 30 Oct: an installed app must keep it); ?house=old turns it off. Level 2 keeps its own look ──
