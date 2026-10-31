@@ -51,7 +51,9 @@ const seed = (o) => {
   ok(/^£0$/.test(m.prices[0]) && /Read-only/.test(m.notes[0]) && /After your 30 days/.test(m.eyebrows[0]) && /Adding and editing/.test(m.vaulterFeat), 'Vaulter: £0, after the 30 days, read-only, adding and editing crossed off');
   ok(/<s>£5\.99<\/s>£3\.99/.test(m.monthlyHtml) && /£2 off/.test(m.monthlyHtml), 'monthly shows £5.99 struck through and £3.99 for beta testers (£2 off)');
   ok(/<s>£49\.99<\/s>£21\.99/.test(m.annualHtml) && /£28 off/.test(m.annualHtml), 'yearly shows £49.99 struck through and £21.99 for beta testers (£28 off)');
-  ok(/own 3D house design/.test(m.yearlyExtras) && /AI house model/.test(m.yearlyExtras) && /Early access and roadmap voting/.test(m.yearlyExtras) && /Extra house types/.test(m.yearlyExtras), 'yearly names its extras');
+  ok(/Early access/.test(m.yearlyExtras) && /Roadmap voting/.test(m.yearlyExtras) && /Everything in monthly/.test(m.yearlyExtras), 'yearly names its extras (early access, roadmap voting)');
+  const monthlyFeat = await p.evaluate(() => document.querySelectorAll('#pro-offer-modal .vi-tier-table > .vi-tier-col')[1].querySelector('.vi-tier-features').textContent);
+  ok(/own 3D house design/.test(monthlyFeat) && /AI house model/.test(monthlyFeat) && /All six house types/.test(monthlyFeat), 'monthly includes the design tools and all six house types (decision 10)');
   ok(/£149/.test(m.prices[3]) && /once/.test(m.prices[3]) && /100 places/.test(m.eyebrows[3]) && /testers first/.test(m.eyebrows[3]) && /life of the service/.test(m.notes[3]), 'Founding Member: £149 once, 100 places, testers first, for the life of the service');
   ok(m.ctas[1] === 'Go monthly' && m.ctas[2] === 'Go yearly' && m.ctas[3] === 'Take a place' && /No card, no cost/.test(m.ctas[0]), 'buttons: Go monthly, Go yearly, Take a place; Vaulter needs no card');
 
@@ -69,7 +71,7 @@ const seed = (o) => {
   // ── 4. Settings ──
   const S = await p.evaluate(() => { VI_BETA_OPEN = true; _refreshPioneerSettingsUI(); return { m: document.getElementById('set-plan-monthly').textContent, a: document.getElementById('set-plan-annual').textContent, f: document.getElementById('set-plan-founder').textContent, extras: document.getElementById('set-plan-extras').textContent, txt: document.getElementById('set-pioneer-inactive').textContent, badge: document.getElementById('set-pioneer-badge').textContent }; });
   ok(S.m === 'Monthly £3.99 (was £5.99)' && S.a === 'Yearly £21.99 (was £49.99)' && S.f === 'Founding £149', 'Settings buttons carry the tester prices (' + S.m + ' / ' + S.a + ' / ' + S.f + ')');
-  ok(/own 3D house design/.test(S.extras) && /Founding Member \(£149 once, 100 places, beta testers first\)/.test(S.extras), 'Settings names the yearly extras and the Founding terms');
+  ok(/own 3D house design/.test(S.extras) && /early access/.test(S.extras) && /six preset houses/.test(S.extras) && /Founding Member \(£149 once, 100 places, beta testers first\)/.test(S.extras), 'Settings names the design tools, the yearly extras and the Founding terms');
   ok(/TRIAL/.test(S.badge) && /beta tester price, £2 off/.test(S.txt), 'Settings status line uses the tester price (' + S.badge + ')');
   await p.context().close();
 

@@ -91,7 +91,7 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
 <script>
 // ── Input safety: user-entered text is rendered into the page in many places, so markup characters are
 // neutralised on the way IN (typing, imports, cloud sync, already-saved data) — nothing can inject script.
-var VI_KEYS_EARLY = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1','ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history','vi_settings','vi_user','vi_pioneer','vi_founder','vi_debt','vi_ov'];
+var VI_KEYS_EARLY = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1','ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history','vi_settings','vi_user','vi_pioneer','vi_founder','vi_plan','vi_debt','vi_ov'];
 function viClean(t) { return String(t).replace(/[<>`]/g, '').replace(/"/g, '\u201D').replace(/'/g, '\u2019'); }
 function viCleanDeep(o) {
   if (typeof o === 'string') return /^data:(image|application)\//.test(o) ? o : viClean(o);
@@ -10935,10 +10935,10 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
             <div class="vi-tier-saving">Read-only. Nothing you built is lost.</div>
             <ul class="vi-tier-features">
               <li>Every tab and number still shows</li>
-              <li>Your house as you left it</li>
+              <li>Your house as you left it, any of the six</li>
               <li>Cloud copy and Download my data</li>
               <li class="vi-no">Adding and editing</li>
-              <li class="vi-no">Pioneer features</li>
+              <li class="vi-no">Your own 3D design and AI model</li>
             </ul>
             <button class="vi-tier-cta vi-tier-cta-ghost" disabled>No card, no cost</button>
           </div>
@@ -10950,12 +10950,12 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
             <div class="vi-tier-saving" id="offer-note-monthly">Cancel any time</div>
             <ul class="vi-tier-features">
               <li>The whole app, editing on</li>
-              <li>Net worth history</li>
-              <li>House Levels 2 and 3</li>
-              <li>Entrepreneur</li>
-              <li>Projections and forecast</li>
+              <li>All six house types, Levels 1 to 3</li>
+              <li>Your own 3D house design</li>
+              <li>AI house model</li>
+              <li>Net worth history, projections, Connections</li>
               <li>Version history and restore</li>
-              <li>Connections</li>
+              <li>Entrepreneur</li>
               <li>AI screenshot reader, 30 a month</li>
             </ul>
             <button class="vi-tier-cta vi-tier-cta-secondary" id="offer-cta-monthly" onclick="showUpgrade('monthly'); document.getElementById('pro-offer-modal').classList.add('hidden')">Go monthly</button>
@@ -10967,11 +10967,10 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
             <div class="vi-tier-price" id="offer-price-annual">£49.99<span>/yr</span></div>
             <div class="vi-tier-saving" id="offer-note-annual">Around 30% less than paying monthly</div>
             <ul class="vi-tier-features">
-              <li>Everything in monthly, plus:</li>
-              <li>Your own 3D house design</li>
-              <li>AI house model</li>
-              <li>Early access and roadmap voting</li>
-              <li>Extra house types</li>
+              <li>Everything in monthly</li>
+              <li>Two months free against paying monthly</li>
+              <li>Early access to new features</li>
+              <li>Roadmap voting</li>
             </ul>
             <button class="vi-tier-cta vi-tier-cta-primary" id="offer-cta-annual" onclick="showUpgrade('annual'); document.getElementById('pro-offer-modal').classList.add('hidden')">Go yearly</button>
           </div>
@@ -11720,7 +11719,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
             <span>Holdings</span>
             <span class="stk-actions">
               <button class="stk-btn" onclick="stkRefresh(false)" title="Fetch the latest prices">↻ Refresh prices</button>
-              <button class="stk-btn" onclick="stkShotStart()" title="Upload screenshots of your pie or portfolio, no platform connection needed">📷 Import screenshots</button>
+              <button class="stk-btn" onclick="stkShotStart()" title="Upload screenshots of your pie or portfolio, no platform connection needed">📷 Import screenshots</button><span id="stk-shot-allow" class="stk-allow" aria-live="polite"></span>
               <button class="stk-btn" onclick="document.getElementById('stk-csv').click()" title="Import holdings from a CSV (Trading 212 history export or ticker,units,avg cost)">⇪ Import CSV</button>
             </span>
           </div>
@@ -11864,11 +11863,9 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     <div id="pro-gate-biz" style="display:none">
       <div class="pro-gate-overlay" style="padding:28px 24px">
         <div class="pro-gate-icon">🚀</div>
-        <div class="pro-gate-title">Entrepreneur tools: Pro only</div>
-        <div class="pro-gate-sub" style="margin-bottom:16px">Complete these 5 steps to unlock your Pro trial</div>
-        <div id="pro-gate-tasklist" style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:280px;margin-bottom:16px"></div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--em);margin-bottom:14px">£5.99/mo · £49.99/yr</div>
-        <button class="pro-gate-btn" id="pro-gate-main-btn" onclick="showUpgrade('annual')">Upgrade to Pro →</button>
+        <div class="pro-gate-title">Entrepreneur tools</div>
+        <div class="pro-gate-sub" style="margin-bottom:16px">Part of every plan. Pick a plan to keep editing after your 30 days.</div>
+        <button class="pro-gate-btn" id="pro-gate-main-btn" onclick="viShowTrialEnd('biz')">See plans</button>
       </div>
     </div>
 
@@ -12285,7 +12282,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
       </div>
       <div id="set-pioneer-active" style="display:none;font-size:.5rem;color:var(--gr);margin-bottom:10px;line-height:1.5"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access active. Thank you for backing Vault-It.</div>
       <div id="set-pioneer-inactive" style="font-size:.5rem;color:var(--t2);margin-bottom:8px;line-height:1.5"></div>
-      <div id="set-plan-extras" style="font-size:.46rem;color:var(--t3);margin-bottom:10px;line-height:1.55">Pioneer is the whole app with editing on: net worth history, house Levels 2 and 3, Entrepreneur, projections, version history and restore, Connections. Yearly adds your own 3D house design, the AI house model, early access with roadmap voting and the extra house types. Founding Member (£149 once, 100 places, beta testers first) has all of that for the life of the service.</div>
+      <div id="set-plan-extras" style="font-size:.46rem;color:var(--t3);margin-bottom:10px;line-height:1.55">Pioneer is the whole app with editing on, plus your own 3D house design and the AI house model. Yearly adds early access to new features and roadmap voting. Founding Member (£149 once, 100 places, beta testers first) has all of that for the life of the service. The six preset houses are in every plan.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
         <button id="set-plan-monthly" onclick="showUpgrade('monthly')" style="background:var(--c3);border:1px solid rgb(var(--brass-rgb) / .4);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:8px 6px;cursor:pointer">Monthly £5.99</button>
         <button id="set-plan-annual" onclick="showUpgrade('annual')" style="background:linear-gradient(90deg,rgba(184,144,46,.15),rgb(var(--brass-rgb) / .15));border:1px solid rgb(var(--brass-rgb) / .5);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:8px 6px;cursor:pointer">Yearly £49.99</button>
@@ -12846,6 +12843,7 @@ body.vi-wide #nwChart { height: 300px !important; }
 .vi-tier-col.vi-tier-founder  { background: rgb(var(--brass-rgb) / .04); }
 .vi-tier-col.vi-tier-vaulter  { background: rgb(var(--ink-rgb) / .035); }
 .vi-tier-price s { color: var(--t3); font-size: .58rem; font-weight: 400; margin-right: 5px; text-decoration-thickness: 1.5px; }
+.stk-allow{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:.06em;color:var(--t3);align-self:center;margin-left:6px;white-space:nowrap}
 .vi-tier-tester { display:block; font-family:'Share Tech Mono',monospace; font-size:.4rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gr); margin-top:3px; }
 #pro-offer-modal .vi-modal-box { max-width: 880px; }
 @media (max-width: 760px) { .vi-tier-table { grid-template-columns: 1fr 1fr; } .vi-tier-col { border-bottom: 1px solid var(--bd); } .vi-tier-col:nth-child(2n) { border-right: none; } }
@@ -15150,7 +15148,7 @@ function updatePriceInput(){document.getElementById('priceInput').value=state.pr
 let tT2;
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT2);tT2=setTimeout(()=>t.classList.remove('show'),3000);}
 
-function markHousePurchased(){
+function markHousePurchased(){if(viBlockEdit())return;
   state.houseMode='purchased';
   state.mortgageActive=true;
   // Loan = price − the deposit actually saved, always worked out afresh (an old balance from an earlier purchase or the calculator is never kept)
@@ -16555,7 +16553,7 @@ function hbRenderL3(el){
     +'<div style="font-size:.5rem;color:var(--t3)">'+(now.ready?'You could afford the upgrade today.':'Ready '+(w.ready?(w.ready.months===0?'now':'in '+hbYM(w.ready.months)):'beyond the mortgage term')+' on your current plan.')+' The new home is shown as a ghost build.</div>'
     +'<div style="margin-top:10px"><button class="btn-add-data" onclick="hbOpenUpgrade()">🚀 Open upgrade planner</button></div>';
 }
-function hbUnlockL3(){
+function hbUnlockL3(){if(viBlockEdit())return;
   if(state.houseMode!=='purchased'){toast('Buy your first home to unlock Level 3');return;}
   state.level3=true;state.viewLevel=3;
   if(!state.up)state.up=hbUpGet();
@@ -17225,7 +17223,7 @@ var _supaUser   = null;
 var _lsOrig     = Storage.prototype.setItem; // save original before patch
 var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
   'ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history',
-  'vi_settings','vi_user','vi_pioneer','vi_founder','vi_debt','vi_ov'];
+  'vi_settings','vi_user','vi_pioneer','vi_founder','vi_plan','vi_debt','vi_ov'];
 
 // ── SAFE SYNC ─────────────────────────────────────────────────
 // Every edit to a vault key is time-stamped (vi_ts) and queued (vi_dirty) until the cloud confirms it.
@@ -17489,7 +17487,7 @@ async function viOpenHistory() {
   });
   el.innerHTML = h;
 }
-async function viRestoreVersion(id, key) {
+async function viRestoreVersion(id, key) {if(viBlockEdit())return;
   if (!confirm('Restore this earlier version of ' + (VI_AREA_LABEL[key] || key) + '? The current version is kept in the history.')) return;
   var r = await _rpc('vault_history_restore', { p_id: id });
   if (r.error) { showToast('Restore failed: ' + (r.error.message || 'unknown')); return; }
@@ -17502,7 +17500,7 @@ async function viRestoreVersion(id, key) {
   _syncReady = false; await _hydrateFromSupabase(_supaUser.id); _rerenderAll();
   viCloseHistory(); showToast((VI_AREA_LABEL[key] || key) + ' restored ✓ and it will appear on your other devices too');
 }
-function viRestoreSnapshot(k) {
+function viRestoreSnapshot(k) {if(viBlockEdit())return;
   var o = _lsJSON(k, null); if (!o || !o.data) return;
   if (!confirm('Restore everything from ' + new Date(o.at).toLocaleString('en-GB') + '? This replaces what is on this device and in your account (the current version stays in the history).')) return;
   Object.keys(o.data).forEach(function(key) { if (_VAULT_KEYS.indexOf(key) > -1) localStorage.setItem(key, o.data[key]); });   // tracked → uploaded
@@ -20409,6 +20407,7 @@ function fetchMetalPrices(){
     });
 }
 function renderAlTab(){
+  try{var sa=document.getElementById('stk-shot-allow');if(sa)sa.textContent=viShotAllowance();}catch(e){}
   var ttEl=document.getElementById('tab-total-assets');
   if(ttEl)ttEl.textContent=gbpFmt(alTotalAssets()+totalAssets());
   // Sub-tab totals (each reflects the actual value of assets in that section)
@@ -20602,7 +20601,6 @@ function addOtherAsset(){if(viBlockEdit())return;
   var n=document.getElementById('oa-name').value.trim();
   var v=(parseFloat(document.getElementById('oa-val').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
-  if(!_isPro()&&(alState.otherAssets||[]).length>=FREE_LIMITS.assets){showPaywall('assets');return;}
   alState.otherAssets.push({id:Date.now(),name:n,value:v,image:null,svgIcon:null,imageSearch:null});
   document.getElementById('oa-name').value='';document.getElementById('oa-val').value='';
   saveAL();renderAlTab();updateKPIs();
@@ -21462,7 +21460,6 @@ function addLiability(){if(viBlockEdit())return;
   var dep=parseFloat((document.getElementById('li-dep')||{}).value)||0;
   var run=(parseFloat((document.getElementById('li-run')||{}).value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
-  if(!_isPro()&&(alState.liabilities||[]).length>=FREE_LIMITS.liabilities){showPaywall('liabilities');return;}
   alState.liabilities.push({id:Date.now(),name:n,value:v,rate:r,depRate:dep,runningCost:run,addedDate:new Date().toISOString()});
   liNameEl.value='';liValEl.value='';var liRateEl=document.getElementById('li-rate');if(liRateEl)liRateEl.value='';
   var lid=document.getElementById('li-dep');if(lid)lid.value='';
@@ -21498,7 +21495,6 @@ function saveDebt(){if(viBlockEdit())return;
   var r=parseFloat(document.getElementById('df-rate').value)||0;
   var m=(parseFloat(document.getElementById('df-min').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n){var mm=document.getElementById('debt-form-msg');if(mm)mm.textContent='Give the debt a name, for example "Barclaycard".';var fn=document.getElementById('df-name');if(fn)fn.focus();return;}
-  if(!_isPro()&&(debtState.debts||[]).filter(function(d){return !d._onboarding;}).length>=FREE_LIMITS.debts){hideDebtForm();showPaywall('debts');return;}
   var dtype=(document.getElementById('di-type')||{}).value||'other';
   debtState.debts.push({id:Date.now(),name:n,original:b,balance:b,rate:r,min:m,type:dtype});
   document.getElementById('df-name').value='';document.getElementById('df-balance').value='';document.getElementById('df-rate').value='';document.getElementById('df-min').value='';
@@ -22593,6 +22589,7 @@ function handleOAuthCallback() {
   // Handle Stripe success redirect
   var params = new URLSearchParams(window.location.search);
   if (params.get('upgraded') === '1') {
+    var pl = params.get('plan'); if (pl === 'monthly' || pl === 'yearly') { try { localStorage.setItem('vi_plan', pl); } catch (e) {} }   // which Pioneer plan (the Payment Link's return URL says)
     window.history.replaceState({}, document.title, window.location.pathname);
     var u = {};
     try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
@@ -22612,6 +22609,7 @@ function handleOAuthCallback() {
     return;
   }
   if (params.get('founded') === '1') {
+    try { localStorage.setItem('vi_plan', 'founder'); } catch (e) {}
     window.history.replaceState({}, document.title, window.location.pathname);
     var u = {};
     try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
@@ -22768,7 +22766,7 @@ viOnWidthResize(function () { drawChart(); renderFIREroadmap(); }, 200);
 // ═══════════════════════════════════════════════════════════════
 var _STRIPE_MONTHLY='https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00';
 var _STRIPE_ANNUAL ='';   // see VI_STRIPE_LINKS.annual (the old annual link is retired)
-var FREE_LIMITS    ={assets:3,liabilities:2,debts:1};
+// the old item caps (3 assets, 2 liabilities, 1 debt) went on 31 Oct 2026: every plan tracks as many as it likes
 
 function isPioneer(){return localStorage.getItem('vi_pioneer')==='true';}
 
@@ -22793,6 +22791,23 @@ function viTrialDay() { return Math.max(1, Math.floor((Date.now() - viTrialStart
 function viTrialDaysLeft() { return Math.max(0, VI_TRIAL_DAYS - viTrialDay() + 1); }                       // 30 on day 1, 1 on day 30, 0 after
 function viTrialState() { return viPaid() ? 'paid' : viTrialDaysLeft() > 0 ? 'trial' : 'ended'; }
 function viCanEdit() { return viTrialState() !== 'ended'; }
+// Tiers (owner, 31 Oct, decision doc section 10). viPlan: 'monthly' | 'yearly' | 'founder' | null (a paid account with no plan recorded
+// is an earlier buyer and counts as paid in full). viTier: 'trial' | 'ended' | 'monthly' | 'yearly' | 'founder'. viCan(feature): the
+// only paid-only features are the design tools ('design' = upload your own 3D house, 'aimodel' = generate one with AI), which need a
+// paid plan even during the trial; everything else is open to every state, read-only once the trial has ended.
+function viPlan() { try { var p = localStorage.getItem('vi_plan'); return (p === 'monthly' || p === 'yearly' || p === 'founder') ? p : null; } catch (e) { return null; } }
+function viTier() { var st = viTrialState(); if (st !== 'paid') return st; if (isFounder()) return 'founder'; return viPlan() || 'yearly'; }
+function viCan(f) { if (f === 'design' || f === 'aimodel') return viPaid(); return true; }
+// the AI screenshot reader's monthly allowance, as the server applies it (supabase/functions/portfolio-vision): 3 unpaid, 30 Pioneer, 10 Founding
+function viShotAllowance() { var t = viTier(); return t === 'founder' ? '10 screenshot reads a month' : (t === 'monthly' || t === 'yearly') ? '30 screenshot reads a month' : '3 screenshot reads a month (30 on Pioneer)'; }
+// a paid-only design tool: true (and the plans prompt shows) when this account may not use it yet
+function viGateDesign(f) {
+  if (viBlockEdit()) return true;
+  if (viCan(f)) return false;
+  try { showToast(f === 'aimodel' ? 'Generating a house with AI needs a paid plan: Pioneer monthly or yearly, or Founding Member.' : 'Uploading your own 3D house needs a paid plan: Pioneer monthly or yearly, or Founding Member.'); } catch (e) {}
+  viShowTrialEnd('design');
+  return true;
+}
 // the first line of every add / edit / delete handler: true (and the plans prompt shows) while the vault is read-only
 function viBlockEdit() {
   if (viCanEdit()) return false;
@@ -22840,11 +22855,8 @@ function viTrialBoot() { setTimeout(viTrialRefresh, 1200); setTimeout(viTrialRef
 
 function showPaywall(feature){
   var msgs={
-    assets:      '🔒 Free tier: up to 3 assets. Pioneer = unlimited.',
-    liabilities: '🔒 Free tier: up to 2 liabilities. Pioneer = unlimited.',
-    debts:       '🔒 Free tier: 1 debt tracked. Pioneer = unlimited.',
-    export:      '🔒 Data export is a Pioneer feature.',
-    analytics:   '🔒 Advanced analytics is a Pioneer feature.'
+    assets:      'Every plan tracks as many assets as you like.',
+    export:      'Download my data is in every plan.'
   };
   var msg=document.getElementById('paywall-feature-msg');
   if(msg)msg.textContent=msgs[feature]||'🔒 This is a Pioneer feature.';
@@ -23345,7 +23357,7 @@ async function testApiKey(type){
 // Both become the House Builder's house (see hbDesignAdopt) — hologram while saving the deposit, colour once owned.
 function loadCustomModel(input){
   var file = input && input.files && input.files[0]; if (input) input.value = '';
-  if (!_isPro()) { showUpgrade('annual'); showToast('Uploading your own 3D house model is a Pro feature'); return; }
+  if (viGateDesign('design')) return;
   if (!file) return;
   if (file.size > 60 * 1024 * 1024) { showToast('That file is over 60 MB. Export a lighter GLB'); return; }
   var st = document.getElementById('hb-upload-msg'); if (st) st.textContent = 'Reading ' + file.name + '…';
@@ -23389,7 +23401,7 @@ async function _hbMeshyWait(key, id, label, statusEl) {
 function _hbMeshyPending(p) { try { if (p) { var o = JSON.parse(localStorage.getItem('vi_hb_meshy') || '{}'); localStorage.setItem('vi_hb_meshy', JSON.stringify(Object.assign(o, p, { t: Date.now() }))); } else localStorage.removeItem('vi_hb_meshy'); } catch (e) {} }
 var _hbMeshyBusy = false;
 async function generateMeshyModel(resume){
-  if (!_isPro()) { showUpgrade('annual'); showToast('AI 3D model generation is a Pro feature'); return; }
+  if (viGateDesign('aimodel')) return;
   if (_hbMeshyBusy) { showToast('Already generating, hang on'); return; }
   var key = (localStorage.getItem('meshy_api_key') || '').trim();
   if (!key) { showToast('Add your Meshy API key in ⚙ Settings'); return; }
