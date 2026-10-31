@@ -9,10 +9,14 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
 (async () => {
   const b = await chromium.launch(); const errs = [];
   for (const [w, theme] of [[1100, 'dark'], [390, 'light']]) {
-    const ctx = await b.newContext({ viewport: { width: w, height: 900 } }); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-    await p.addInitScript(t => { if (localStorage.getItem('pos_al1')) return; localStorage.setItem('vi_theme', t); localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' })); localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' }));
+    const ctx = await b.newContext({ viewport: { width: w, height: 900 } });
+    // live price feeds are cut off so the test is the same on any network (a live metal or FX price would replace the typed one)
+    await ctx.route(/metals\.live|metals-api\.com|er-api\.com|exchangerate|coingecko\.com|stock-quotes/, r => r.abort());
+    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
+    // seed only on the first load (?seed); a reload must not see an empty store mid-commit and write the seed back over saved data
+    await p.addInitScript(t => { if (!/[?&]seed\b/.test(location.search) || localStorage.getItem('pos_al1')) return; localStorage.setItem('vi_theme', t); localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' })); localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' }));
       localStorage.setItem('pos_al1', JSON.stringify({ otherAssets: [{ id: 1, name: 'Wedding ring', value: 300 }], metalPrices: { gold: 2000, silver: 25, platinum: 800, palladium: 900, lastUpdated: new Date().toISOString() }, stocks: [{ id: 7, sym: 'VWRL', name: 'Vanguard FTSE All-World', units: 10, price: 100, updated: Date.now() }] })); }, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.goto('file:///home/user/Vault-It/index.html?seed'); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.evaluate(t => { if ((document.documentElement.dataset.theme || 'dark') !== t && window.viToggleTheme) viToggleTheme(); showTab('assets'); showSubtab('assets', 'other', null); }, theme); await p.waitForSelector('#other-assets-list .wi-link-btn', { timeout: 20000 }); await p.waitForTimeout(200);
     const tile = () => p.evaluate(() => { const t = document.querySelector('#other-assets-list .wi-tile'); return { val: t.querySelector('.wi-val').textContent, btn: t.querySelector('.wi-link-btn').textContent, work: (t.querySelector('.wi-work') || {}).textContent || '', total: alTotalOther() }; });
@@ -30,11 +34,11 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
     ok(t.val === '£482' && t.btn === 'Linked' && Math.abs(t.total - 10 * 0.75 / 31.1034768 * 2000) < 0.01, w + ': 10 g of 18ct gold at £2,000/oz = £482, counted in the total (' + JSON.stringify(t) + ')');
     ok(/Show working/.test(t.work) && /Gold spot price, checked/.test(t.work) && /Your own figure: £300/.test(t.work) && /Not financial advice/.test(t.work), w + ': show working names the source, the time, the own figure and the guard rail');
     ok(await p.evaluate(() => { const a = JSON.parse(localStorage.getItem('pos_al1')).otherAssets[0]; return a.link.type === 'metal' && a.value === 300; }), w + ': link saved; own figure kept');
-    await p.reload(); await p.waitForFunction(() => typeof wiValue === 'function' && typeof showTab === 'function', null, { timeout: 20000 }); await p.waitForTimeout(600); await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
+    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForFunction(() => typeof wiValue === 'function' && typeof showTab === 'function', null, { timeout: 20000 }); await p.waitForTimeout(600); await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'other', null); }); await p.waitForSelector('#other-assets-list .wi-link-btn', { timeout: 20000 }); await p.waitForTimeout(200);
-    t = await tile(); ok(t.val === '£482' && errs.length === 0, w + ': after a reload the linked value is still worked out (startup order)');
+    t = await tile(); ok(t.val === '£482' && errs.length === 0, w + ': after a reload the linked value is still worked out (startup order) ' + JSON.stringify(t) + ' ' + JSON.stringify(await p.evaluate(() => ({ link: alState.otherAssets[0] && alState.otherAssets[0].link, mp: alState.metalPrices }))));
     await p.evaluate(() => updateMetalPrice('gold', 2200)); await p.evaluate(() => renderAlTab());
-    t = await tile(); ok(t.val === '£530' && /your price in Precious metals/.test(t.work), w + ': a typed metal price is used and named as yours');
+    t = await tile(); ok(t.val === '£530' && /your price in Precious metals/.test(t.work), w + ': a typed metal price is used and named as yours ' + JSON.stringify(t));
     await p.evaluate(() => { delete alState.metalPrices.lastUpdated; delete alState.metalPrices.manualAt; renderAlTab(); });
     t = await tile(); ok(t.val === '£300' && t.btn === 'Link paused' && /No gold price yet/.test(t.work), w + ': with no price checked, the own figure is shown and the tile says why');
     await p.evaluate(() => { alState.metalPrices.lastUpdated = new Date().toISOString(); alState.otherAssets[0].linkSnap = { v: 400, at: Date.now() - 3 * 864e5 }; renderAlTab(); });
