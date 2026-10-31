@@ -6164,7 +6164,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this.el = container;
     this.opts = opts;
     var w = Math.max(1, container.clientWidth), h = Math.max(1, container.clientHeight);
-    var r = this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.preserve });
+    var r = this.renderer = new THREE.WebGLRenderer({ antialias: !opts.mobile, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.preserve });   // touch devices: no MSAA (the pixel ratio covers it; MSAA on a big phone canvas is what loses the context)
     var me = this;   // brand look (house flag): pixel ratio capped at 1.5 below 700 px wide, 2 above (brand handover 6.10)
     this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, me.brand ? (me._bLite ? 1 : w < 700 ? 1.5 : 2) : 9, Math.sqrt(budget / Math.max(1, w * h)))); };
     r.setPixelRatio(this._dprFor(w, h));
@@ -6226,8 +6226,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       this._ro = new ResizeObserver(function () { self.resize(); });
       this._ro.observe(container);
     }
-    cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); self.lost = true; self.stop(); });
-    cv.addEventListener('webglcontextrestored', function () { self.lost = false; self._shadowDirty = true; if (self.model) self.show(self.model, true); self.start(); });
+    cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); self.lost = true; self.stop(); if (self.onLost) self.onLost(); });
+    cv.addEventListener('webglcontextrestored', function () { self.lost = false; self._shadowDirty = true; if (self.model) self.show(self.model, true); self.start(); if (self.onRestored) self.onRestored(); });
     this.start();
   }
   H.Viewer = Viewer;
@@ -16219,6 +16219,13 @@ function hb3dBrandOverlays(v, sm, bi, rl) {
     keys.style.display = k2.behind ? 'none' : '';
   } else keys.style.display = 'none';
 }
+function hb3dRecreate() {
+  var v = HB3DAPP.viewer; if (!v) return;
+  try { v.dispose(); } catch (e) {}
+  HB3DAPP.viewer = HB3D.viewer = null; HB3DAPP.key = null; HB3DAPP.lastP = null; HB3DAPP.lastMode = null;
+  try { hb3dRedraw(); } catch (e) { console.warn('house viewer rebuild', e); }
+  var ld = document.getElementById('hb3d-loading'); if (ld && HB3DAPP.viewer && !HB3DAPP.viewer.lost) { ld.style.display = 'none'; ld.textContent = 'Building your house…'; }
+}
 function hb3dRedraw() {
   var el = document.getElementById('house-scene'); if (!el) return false;
   var sm = hbSceneMode(); HB3DAPP.want = sm;
@@ -16238,6 +16245,10 @@ function hb3dRedraw() {
       v = HB3DAPP.viewer = HB3D.viewer = new HB3D.Viewer(el, { mobile: !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches) });   // touch devices: no shadows, lighter pixel budget
       v.onView = function (vw) { _houseZoom = _HZ_DEFAULT * vw.zoom(); };
       v.onRender = function () { hb3dPlaceOverlays(); };
+      /* a lost WebGL context (a phone's GPU reset) used to leave a white box for good: say so, wait for the browser to hand it back, else rebuild */
+      v.onLost = function () { var ld = document.getElementById('hb3d-loading'); if (ld) { ld.textContent = 'Reloading the house…'; ld.style.display = 'block'; }
+        setTimeout(function () { if (HB3DAPP.viewer === v && v.lost) hb3dRecreate(); }, 2500); };
+      v.onRestored = function () { var ld = document.getElementById('hb3d-loading'); if (ld) ld.style.display = 'none'; };
       _orbitMode = true;
       var ob = document.getElementById('hud-orbit-toggle'), oi = document.getElementById('hud-orbit-icon');
       if (ob) ob.classList.add('orbit-active'); if (oi) oi.textContent = '⟳';
@@ -17291,7 +17302,7 @@ function _areaSummary(key, v) {
   } catch (e) { return '–'; }
 }
 function _rerenderAll() {
-  ['loadState', 'updateUI', 'updateKPIs', 'updateSidebar', 'renderCashflow', 'renderDebtTab', 'renderAlTab', 'stkRender', 'renderSummaryCards', 'renderPioneerCard', 'nwhRenderMini'].forEach(function(f) {
+  ['loadState', 'updateUI', 'updateKPIs', 'updateSidebar', 'renderCashflow', 'renderDebtTab', 'renderAlTab', 'stkRender', 'renderSummaryCards', 'renderPioneerCard', 'nwhRenderMini', 'drawChart'].forEach(function(f) {   // drawChart also refreshes the 3D net worth scene
     try { if (typeof window[f] === 'function') window[f](); } catch (e) {}
   });
 }
@@ -19917,11 +19928,15 @@ var V3_COINS={   // real sizes (cm): diameter, thickness, edge sides; outer and 
 var V3_METALS={gold:{rho:19.32,col:'#E5BC52',rough:.2,label:'Gold'},silver:{rho:10.49,col:'#DADDE0',rough:.24,label:'Silver'},platinum:{rho:21.45,col:'#C7CCD1',rough:.28,label:'Platinum'},palladium:{rho:12.02,col:'#BEC2C5',rough:.3,label:'Palladium'}};
 var V3_BARS=[{g:1000,name:'1 kg',w:11.6,d:5.2,pile:5},{g:100,name:'100 g',w:5.5,d:3.1,pile:10},{g:31.1035,name:'1 oz',w:4.1,d:2.4,pile:10}];
 var OZ_G=31.1035;
+/* WebGL on phones (owner, 31 Oct): touch devices skip MSAA and keep each canvas under about 2.2M pixels; desktops 4M. A lost context pauses the loop instead of drawing into nothing. */
+function viCoarse(){try{return !!(window.matchMedia&&matchMedia('(pointer: coarse)').matches)}catch(e){return false}}
+function viGlDpr(host){var w=Math.max(1,host.clientWidth||300),h=Math.max(1,host.clientHeight||200),budget=viCoarse()?2.2e6:4e6;return Math.max(1,Math.min(window.devicePixelRatio||1,viCoarse()?1.5:2,Math.sqrt(budget/(w*h))));}
 // the House Builder's look (src/hb3d/viewer.js): same sky, fog, ground, grid and lights
 function V3Scene(host,label){
   var self=this;this.host=host;
-  var r=this.r=new THREE.WebGLRenderer({antialias:true,alpha:false});
-  r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;
+  var r=this.r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:false});
+  r.setPixelRatio(viGlDpr(host));r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;
+  r.domElement.addEventListener('webglcontextlost',function(e){e.preventDefault();self._lost=true;});r.domElement.addEventListener('webglcontextrestored',function(){self._lost=false;self.kick(800);});
   r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;
   var cv=r.domElement;cv.className='v3-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',label);
   cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none';
@@ -19946,7 +19961,7 @@ function V3Scene(host,label){
   ctl.enableDamping=true;ctl.dampingFactor=0.09;ctl.rotateSpeed=0.8;ctl.maxPolarAngle=Math.PI/2-0.04;ctl.screenSpacePanning=true;
   ctl.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
   ctl.addEventListener('change',function(){self.kick();});
-  this._loop=function(){self.raf=0;if(self.dead)return;self.size();var moving=self.ctl.update();self.r.render(self.sc,self.cam);if(moving||self._spin||Date.now()<self._until)self.raf=requestAnimationFrame(self._loop);};
+  this._loop=function(){self.raf=0;if(self.dead||self._lost)return;self.size();var moving=self.ctl.update();self.r.render(self.sc,self.cam);if(moving||self._spin||Date.now()<self._until)self.raf=requestAnimationFrame(self._loop);};
   if(window.ResizeObserver){this.ro=new ResizeObserver(function(){self.kick();});this.ro.observe(host);}
 }
 V3Scene.prototype.size=function(){var w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;if(w!==this._w||h!==this._h){this._w=w;this._h=h;this.r.setSize(w,h,false);this.cam.aspect=w/h;this.cam.updateProjectionMatrix();}};
@@ -20900,8 +20915,9 @@ function i3dFit(obj){
 function I3DView(host,obj,opts){
   opts=opts||{};var self=this;
   var w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);
-  var r=this.r=new THREE.WebGLRenderer({antialias:true,alpha:false,preserveDrawingBuffer:!!opts.still});
-  r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));r.setSize(w,h,false);
+  var r=this.r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:false,preserveDrawingBuffer:!!opts.still});
+  r.setPixelRatio(viGlDpr(host));r.setSize(w,h,false);
+  r.domElement.addEventListener('webglcontextlost',function(e){e.preventDefault();self._lost=true;});r.domElement.addEventListener('webglcontextrestored',function(){self._lost=false;});
   r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;
   r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;
   var cv=r.domElement;cv.className='i3d-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',opts.label||'3D model');
@@ -20925,7 +20941,7 @@ function I3DView(host,obj,opts){
   ctl.autoRotate=!still&&opts.auto!==false;ctl.autoRotateSpeed=1.6;
   ctl.addEventListener('start',function(){ctl.autoRotate=false;self.onAuto&&self.onAuto(false);});
   ctl.update();
-  var loop=function(){if(self.dead)return;self.raf=requestAnimationFrame(loop);var W=host.clientWidth,H=host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();}ctl.update();r.render(sc,cam);};
+  var loop=function(){if(self.dead)return;self.raf=requestAnimationFrame(loop);if(self._lost)return;var W=host.clientWidth,H=host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();}ctl.update();r.render(sc,cam);};
   loop();
 }
 I3DView.prototype.zoom=function(f){var c=this.cam,t=this.ctl.target,v=c.position.clone().sub(t),d=Math.min(this.ctl.maxDistance,Math.max(this.ctl.minDistance,v.length()*f));c.position.copy(t).add(v.setLength(d));};
@@ -27129,6 +27145,8 @@ function nwhRenderMini(){
 (function(){
 "use strict";
 var RMQ=null;try{RMQ=window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):null}catch(e){}
+/* LITE: set once a scene's frames run slow (a big phone screen): no canvas shadows, a lower pixel ratio and 30 fps. Shared by both scenes. */
+var LITE=false,COARSE=false;try{COARSE=!!(window.matchMedia&&matchMedia('(pointer: coarse)').matches)}catch(e){}
 function reduceMotion(){return !!((document.body&&document.body.classList.contains('reduced-motion'))||(RMQ&&RMQ.matches))}
 function clamp(v,a,b){return v<a?a:v>b?b:v}
 function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
@@ -27207,7 +27225,7 @@ function ground(c,P,st,halfX,z0,z1,red,ts,rm,spacing){
   for(i=-nx;i<=nx;i++){c.strokeStyle=rgba(PAL.grid,PAL.gridA*(1-Math.abs(i)/(nx+1.5)));A=P.pt(i*spacing,0,gz0);B=P.pt(i*spacing,0,gz1);c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(B[0],B[1]);c.stroke()}
   for(var z=Math.ceil(gz0/spacing)*spacing;z<=gz1;z+=spacing){c.strokeStyle=rgba(PAL.grid,PAL.gridA*.8);A=P.pt(-nx*spacing,0,z);B=P.pt(nx*spacing,0,z);c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(B[0],B[1]);c.stroke()}
   var CS=red?PAL.red:PAL.planeS,CF=red?PAL.red:PAL.planeF,pq=[P.pt(-halfX,0,z0),P.pt(halfX,0,z0),P.pt(halfX,0,z1),P.pt(-halfX,0,z1)];
-  c.save();c.shadowColor=rgba(CS,.7);c.shadowBlur=PAL.blur;c.beginPath();c.moveTo(pq[0][0],pq[0][1]);for(i=1;i<4;i++)c.lineTo(pq[i][0],pq[i][1]);c.closePath();
+  c.save();c.shadowColor=rgba(CS,.7);c.shadowBlur=LITE?0:PAL.blur;c.beginPath();c.moveTo(pq[0][0],pq[0][1]);for(i=1;i<4;i++)c.lineTo(pq[i][0],pq[i][1]);c.closePath();
   c.fillStyle=rgba(CF,PAL.planeFA);c.fill();c.strokeStyle=rgba(CS,.9);c.lineWidth=1.5;c.stroke();c.restore();
   if(!rm){var pg=(ts%2800)/2800,ge=pg*16,rq=[P.pt(-halfX-ge,0,z0-ge),P.pt(halfX+ge,0,z0-ge),P.pt(halfX+ge,0,z1+ge),P.pt(-halfX-ge,0,z1+ge)];
     c.beginPath();c.moveTo(rq[0][0],rq[0][1]);for(i=1;i<4;i++)c.lineTo(rq[i][0],rq[i][1]);c.closePath();c.strokeStyle=rgba(CS,(1-pg)*.45);c.lineWidth=1.4;c.stroke()}
@@ -27216,9 +27234,12 @@ function ground(c,P,st,halfX,z0,z1,red,ts,rm,spacing){
 function stage(cv,o,draw){
   /* sizing, pixel ratio cap, visible-only rendering, frame cap: shared by both scenes */
   var c=cv.getContext("2d"),S={c:c,cw:300,ch:200,dpr:1,vis:false,raf:0,last:0};
-  function size(){var r=cv.getBoundingClientRect();S.cw=Math.max(2,r.width);S.ch=Math.max(2,r.height);S.dpr=Math.min(window.innerWidth<700?1.5:2,window.devicePixelRatio||1);cv.width=Math.round(S.cw*S.dpr);cv.height=Math.round(S.ch*S.dpr);S.kick()}
-  function frame(ts){S.raf=0;if(!S.vis||document.hidden)return;var fps=o.fps||30;if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
-    var dt=Math.min(.05,(ts-(S.last||ts))/1000);S.last=ts;c.setTransform(S.dpr,0,0,S.dpr,0,0);c.clearRect(0,0,S.cw,S.ch);draw(ts,dt,S);S.raf=requestAnimationFrame(frame)}
+  /* pixel budget: about 1.6M canvas pixels (a 1500 x 520 stage on a big phone would otherwise be 6M at 2x), 1.25x once LITE */
+  function size(){var r=cv.getBoundingClientRect();S.cw=Math.max(2,r.width);S.ch=Math.max(2,r.height);S.dpr=Math.max(1,Math.min(window.innerWidth<700?1.5:2,window.devicePixelRatio||1,Math.sqrt(1.6e6/(S.cw*S.ch)),LITE?1.25:9));cv.width=Math.round(S.cw*S.dpr);cv.height=Math.round(S.ch*S.dpr);S.kick()}
+  function frame(ts){S.raf=0;if(!S.vis||document.hidden)return;var fps=LITE?30:(o.fps||30);if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
+    var dt=Math.min(.05,(ts-(S.last||ts))/1000);S.last=ts;c.setTransform(S.dpr,0,0,S.dpr,0,0);c.clearRect(0,0,S.cw,S.ch);var t0=performance.now();draw(ts,dt,S);
+    var cost=performance.now()-t0;S.ema=S.ema==null?cost:S.ema*.85+cost*.15;S.n=(S.n||0)+1;if(!LITE&&S.n>12&&S.ema>16){LITE=true;size()}   // frames over ~16 ms of drawing: go lite for good
+    S.raf=requestAnimationFrame(frame)}
   S.kick=function(){if(S.vis&&!S.raf){S.last=0;S.raf=requestAnimationFrame(frame)}};
   if("ResizeObserver" in window)new ResizeObserver(size).observe(cv);else window.addEventListener("resize",size);
   if("IntersectionObserver" in window)new IntersectionObserver(function(es){S.vis=es[0].isIntersecting;if(S.vis&&o.onShow)o.onShow();S.kick()},{threshold:.01}).observe(cv);else{S.vis=true}
@@ -27231,7 +27252,7 @@ function tag(c,cw,l1,l2,red,anchor){
   var tw=Math.max(w1,w2)+fs*1.5,th=fs*3.6,tx=cw-tw-14,ty=14,CS=red?PAL.red:PAL.planeS;
   c.save();if(anchor){c.strokeStyle=rgba(CS,.9);c.lineWidth=1.2;c.beginPath();c.moveTo(anchor[0],anchor[1]);c.lineTo(tx+tw*.5,ty+th);c.stroke();
     c.fillStyle=rgba(CS,1);c.beginPath();c.arc(anchor[0],anchor[1],3,0,Math.PI*2);c.fill()}
-  c.shadowColor=rgba(CS,.55);c.shadowBlur=18;c.beginPath();if(c.roundRect)c.roundRect(tx,ty,tw,th,fs*.4);else c.rect(tx,ty,tw,th);c.fillStyle=red?"#E05C5C":"#E8C56A";c.fill();c.restore();
+  c.shadowColor=rgba(CS,.55);c.shadowBlur=LITE?0:18;c.beginPath();if(c.roundRect)c.roundRect(tx,ty,tw,th,fs*.4);else c.rect(tx,ty,tw,th);c.fillStyle=red?"#E05C5C":"#E8C56A";c.fill();c.restore();
   c.fillStyle=red?"#1A0606":"#1A1400";c.textAlign="left";c.textBaseline="alphabetic";c.font=fs+"px 'Share Tech Mono',monospace";c.fillText(l1,tx+fs*.75,ty+fs*1.15);
   c.font=(fs*1.5)+"px 'Share Tech Mono',monospace";c.fillText(l2,tx+fs*.75,ty+fs*2.9);
 }
@@ -27429,7 +27450,7 @@ function makeTracker(cv,o){
   var S=stage(cv,{fps:o.fps||30,onShow:function(){if(!played)t0=performance.now()}},draw);
   return self;
 }
-window.ViNW3D={makeNW:makeNW,makeTracker:makeTracker,niceUnit:niceUnit,split:split,reduceMotion:reduceMotion};
+window.ViNW3D={makeNW:makeNW,makeTracker:makeTracker,niceUnit:niceUnit,split:split,reduceMotion:reduceMotion,lite:function(v){if(v!=null)LITE=!!v;return LITE},coarse:COARSE};
 })();
 </script>
 <script id="vi-nw3d-app">
@@ -27520,7 +27541,7 @@ function sceneData(){
   return {cols:cols,net:net,debt:debtNow,fmt:full};
 }
 var heroLast='',heroSummary='',prevNet=null,prevDebt=null;
-var heroEng=E.makeNW(heroCv,{fps:60,fmt:full,onPick:function(c){heroRead.textContent=c?(c.name+(c.dir<0?', owed ':' ')+full(c.v)+(c.segs?': '+c.segs.map(function(s){return s.name+' '+full(s.v)}).join(' · '):'')):heroSummary}});
+var heroEng=E.makeNW(heroCv,{fps:E.coarse?30:60,fmt:full,onPick:function(c){heroRead.textContent=c?(c.name+(c.dir<0?', owed ':' ')+full(c.v)+(c.segs?': '+c.segs.map(function(s){return s.name+' '+full(s.v)}).join(' · '):'')):heroSummary}});
 document.getElementById('nw3d-hero-stage').addEventListener('click',function(e){var b=e.target.closest('[data-z]');if(!b)return;
   if(b.dataset.z==='reset')heroEng.reset();else heroEng.zoom(b.dataset.z==='in'?1.25:.8)});
 function refreshHero(){

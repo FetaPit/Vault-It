@@ -22,6 +22,7 @@ node tests/test_beta_client.js     # privacy/terms wording, 429 handling, Downlo
 node tests/journey_one_b.js        # One B's two-device journey: phone signs up (code + PIN), desktop PINs in with the same data, sync both ways on background/foreground, sign out and back, install readiness (VI_APP=<url> also checks the live service worker)
 node tests/test_hb_l2_entry.js      # Level 2 onboarding: purchase-day mortgage entry (lender, balance, rate, fix end, term), panel summary, what-ifs on those figures
 node tests/test_sw.js              # installable app: real manifest, sw.js registers over http, versioned cache, offline shell, Worker no-cache rule
+node tests/test_gl_recover.js       # 3D viewports on phones: a lost WebGL context shows a note and the house viewer rebuilds itself; the net worth scene follows a cloud sync; canvas pixel budgets and lite mode
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width
 node tests/test_nw3d.js            # net worth in 3D (on by default): flag off unchanged, 3D | Graph toggle, same numbers in both views, debts grouped by kind (cards stacked in one column, each in its own colour), zoom buttons / ctrl+wheel / reset (VI_APP=file:///… to test another copy)
 ```

@@ -29,6 +29,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] 3D viewports on the owner's phone (owner, 31 Oct 23:01, live defect): the house viewer now reports a lost WebGL context ("Reloading the house…"), resumes when the browser hands it back and rebuilds itself on a fresh canvas after 2.5 s if not; touch devices skip MSAA and keep every WebGL canvas inside a 2.2M-pixel budget (cash and metals viewers too, and they pause on a lost context); the net worth scene refreshes after a cloud sync (drawChart joined _rerenderAll, so no more £0 under a £15.3k header); the 2D net worth scenes keep to a 1.6M-pixel budget, run at 30 fps on touch and drop shadows and pixel ratio for good once frames run slow. `tests/test_gl_recover.js` (this commit; needs a release to reach the phone)
 - [x] Release (owner, 31 Oct): full suite green (72 ok; `test_honest_pricing` corrected to count priced amounts only, the hero demo figures are not prices), backup `backup/release-pioneer-v2-20261031-1019`, `release/pioneer-v2` fast-forwarded to `a5ba24a`
 - [x] Feature questionnaire (owner, 31 Oct): answers in `docs/MONETISATION_DECISION.md` section 8 (Vaulter / Pioneer, yearly extras, tier gates, Simplified tiles)
 - [x] Branded e-mails deployed (owner's yes, 31 Oct): send-auth-email v11, waitlist-join v2, waitlist-welcome v3; live copies matched the repo before the templates, so nothing was lost
