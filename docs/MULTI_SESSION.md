@@ -31,12 +31,15 @@ A session then asks for the folder and the owner approves each time. The laptop 
 
 ## Laptop set-up (once, in Git Bash)
 
+One working copy only: `C:\Users\Asus ZenBook Duo\Projects\Vault-It` (checked 31 Oct). The old `C:\Users\Asus ZenBook Duo\Vault-It` (on `main`, with unused Vercel skills in `.agents/`) and `Documents\PT Live Design\Vault-It` (brand files, not a git repo) stay off the Remote Control list.
+
+
 ```
 git config --global pull.rebase true
 git config --global rebase.autoStash true
 git config --global core.autocrlf true      # Git for Windows default: LF in the repo, CRLF on disk
-cd /c/path/to/Vault-It && git fetch && git switch brand-rollout && git pull
-curl -fsSL https://raw.githubusercontent.com/FetaPit/Vault-It/Pioneer_v3/claude-kit/install.sh | bash   # updates the user-level kit
+cd "/c/Users/Asus ZenBook Duo/Projects/Vault-It" && git fetch && git switch brand-rollout && git pull   # the one working copy on the laptop
+bash claude-kit/install.sh   # updates the user-level kit from this checkout (auto mode blocks curl | bash, rightly)
 ```
 
 Agents: the laptop's user-level `scout`, `grunt` and `architect` (from `claude-kit`) and the repo's own (`.claude/agents/`) share names and content; the repo's copy wins inside this project, and adds `queue-keeper`, `one-b` and `rollout-qc`. The `ship-item` skill and the commit gate come with the repo, so a laptop session gets them after `git pull` and a restart. The gate falls back to reading the raw command when Windows has no Python.
