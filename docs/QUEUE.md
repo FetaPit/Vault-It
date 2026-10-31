@@ -31,6 +31,9 @@ The single list of instructed work. Every session reads it at start and before e
   18. Liabilities tiles the same size as the wealth inventory tiles after 12
   19. Desktop: the asset and liability 3D viewports orbit the item on click and drag
   20. Side bar (ledger) wider; every value from across the app pulls into it, with the relevant icon at the left of each line
+- [ ] Footer disclaimer and privacy link (owner, 31 Oct; owner kept it after Round 3): a plain disclaimer at the bottom of app.vault-it.co and vault-it.co, with "Privacy notice" and "Beta terms" linked from both footers (today the app footer has small "Privacy" / "Terms" buttons, the landing footer already links `?privacy=1` / `?terms=1`). Wording approved by the owner, keep it exact (no em dashes):
+  "Not regulated by the FCA. Not financial advice." then "Vault-It helps you track and plan your money. Forecasts, dates and values are estimates from what you enter and public prices, and may be wrong. Speak to a regulated adviser before big money decisions."
+  Same job, from the security review (31 Oct): the Worker's Content-Security-Policy only sets frame-ancestors / object-src / base-uri; add script, connect and image sources (report-only first, so nothing live breaks), and recheck the privacy notice against every outside host the app calls (`tests/test_beta_client.js`). Escaping, Download my data and Delete my account already exist.
 
 ## Waiting on the owner
 
