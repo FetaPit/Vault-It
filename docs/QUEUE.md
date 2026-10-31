@@ -9,13 +9,15 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [ ] Subscription pop-up: adjust to the monetisation model once the owner decides (owner's ask, 30 Oct; blocked on the outline above)
+- [ ] Deploy the branded e-mails (owner's yes, 31 Oct): `send-auth-email`, `waitlist-join`, `waitlist-welcome` from the committed templates, after checking the live copies carry nothing the repo lacks
+- [ ] Release (owner, 31 Oct): full suite, backup branch, fast-forward `release/pioneer-v2` to the tested `brand-rollout` head (classic viewer default, Level 2 mortgage entry, copy, footer, net worth stacking and zoom, bottom tab bar, Connections in Settings)
+- [ ] Trial then paid (owner, 31 Oct, decisions 1 and 2): everyone gets 30 days of the full app with no card; at the end a prompt to choose a paid tier (Pioneer monthly or annual, Founding Member first for testers), then the read-only vault; week-one activation nudges and a day-23 reminder; beta accounts get the same prompt once their 30 days are over
+- [ ] Subscription pop-up: rewrite to the decided model (30-day trial, Pioneer £5.99 / £49.99, Founding £149 first for testers); the Free column goes; Settings copy to match (owner's ask, 30 Oct, unblocked 31 Oct)
+- [ ] Simplified / Advanced mode (owner, 31 Oct, decision 3): a switch in Settings and the welcome flow, new accounts start Simplified, remembered per account and synced; tab split as section 3 of `docs/MONETISATION_DECISION.md`
+- [ ] Tester welcome message (wording agreed 31 Oct): wire it to the first run for beta accounts
 
 ## Waiting on the owner
 
-- Deploy the branded e-mails: `send-auth-email`, `waitlist-join`, `waitlist-welcome` (templates committed; previews in the session reply). Needs an explicit yes, then `supabase functions deploy <name> --no-verify-jwt` or the Supabase connector
-- Monetisation (decision doc `docs/MONETISATION_DECISION.md`, evidence `docs/research/freemium_vs_paid.md`): four answers needed. 1 model: trial then paid (recommended) or Simplified free / Advanced paid; 2 trial length 30 or 14 days; 3 Simplified by default for new accounts and the tab split in section 3; 4 testers: free until beta ends then 30 days' notice, or Founding offer first. Then: pop-up and Settings copy, Simplified/Advanced switch, trial clock with read-only vault, tester welcome message
-- Custom welcome message for testers: the wording from the owner (a draft is in the session reply); then wire it to the first run for beta accounts
 - Metals price feed (`api.metals.live`): the sandbox cannot reach it (host not in the session's allowed network domains). Check it from a browser, or allow the host in the environment's network settings and ask again
 - Brand build on a real phone: speed of the lite fallback and how the 6.8 feedback feels (Settings > House builder > Brand build, or ?house=new)
 - Classic switches (house builder, net worth) stay in Settings until the owner has tested the new views on their phone (owner, 30 Oct); remove them only when the owner says so

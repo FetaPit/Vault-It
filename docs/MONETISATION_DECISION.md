@@ -71,3 +71,12 @@ Say so next to the Founding price, as agreed on 29 Oct.
 4. **Testers**: free until beta ends, then 30 days' notice before their trial clock starts? Or Founding offer first, then the clock?
 
 Once answered I will: rewrite the pop-up and Settings copy to match (queued), build the Simplified/Advanced switch, add the trial clock and read-only state, and write the tester welcome message around it.
+
+## 7. Decided by Pete (31 Oct 2026)
+
+1. **Trial then paid.** 30 days of the full app, no card, then a prompt to choose a paid tier. Testers get the same prompt once their 30 days are over (the sign-up page's "free while it's in beta" line and the tester guide need to match this before it goes live).
+2. **30 days**, with week-one activation nudges and a day-23 reminder.
+3. **Simplified by default** for new accounts, Advanced for existing ones; tab split as section 3.
+4. **Release** the current state first; the trial clock, pop-up and mode switch follow as queued work.
+
+Welcome message for testers, agreed: "Welcome to the Vault-It beta. It's free while we test. Type your numbers in, made-up ones are fine, and watch your deposit build your house. Anything confusing or broken, tell me. Your feedback decides what gets built next. Pete" (the first sentence changes to the 30-day wording once the trial clock is live).
