@@ -12680,6 +12680,10 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wi-work>div{margin-top:3px;overflow-wrap:anywhere}
 .wi-src{color:var(--t2)}
 .wi-chg{color:var(--t1);font-weight:600}
+.wi-hist{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:.5rem;color:var(--t2);min-width:0}
+.wi-hist svg{flex:0 0 auto;width:64px;height:18px;overflow:visible}
+.wi-hist span{min-width:0;overflow-wrap:anywhere}
+.wi-guess{color:var(--t1)}
 .wi-link-kinds{display:flex;flex-direction:column;gap:6px;margin:4px 0 12px;font-size:.62rem;color:var(--t1)}
 .wi-link-kinds label{display:flex;gap:8px;align-items:center;cursor:pointer}
 .wi-link-prev{font:.6rem 'Share Tech Mono',monospace;color:var(--t1);background:rgb(var(--teal-rgb) / .08);border-radius:6px;padding:8px 10px;margin:10px 0;overflow-wrap:anywhere}
@@ -20981,11 +20985,46 @@ function wiSnap(a,i){
   return (d>0?'+':'-')+wiMoney(Math.abs(d))+' since '+new Date(p.at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 }
 var _wiSnapDirty=false,_wiLinkId=null,_wiLinkReturn=null;
+/* Round 3 (8): the value of each item over time. One reading a day at most, {d, v, src}: the live source when the item is linked
+   and priced, otherwise "your figure". Kept on the item (the user's own data, saved like the rest), newest 120 readings. */
+var WI_HIST_MAX=120;
+function wiDay(t){var d=new Date(t||Date.now());return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function wiHist(a,i){
+  if(!a)return [];var v=i?i.v:(+a.value||0),src=i&&i.ok?i.src:'your figure';
+  if(!(v>0))return a.valHist||[];
+  var H=Array.isArray(a.valHist)?a.valHist:(a.valHist=[]),day=wiDay(),last=H[H.length-1];
+  v=Math.round(v*100)/100;
+  if(last&&last.d===day){if(Math.abs(last.v-v)>=0.5||last.src!==src){last.v=v;last.src=src;_wiSnapDirty=true;}}
+  else{H.push({d:day,v:v,src:src});if(H.length>WI_HIST_MAX)H.splice(0,H.length-WI_HIST_MAX);_wiSnapDirty=true;}
+  return H;
+}
+function wiDayLabel(d){var x=new Date(d+'T12:00:00');return isNaN(x)?d:x.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+// a small line of the readings, and the change since the first one
+function wiSpark(H){
+  if(!H||H.length<2)return '';
+  var vs=H.map(function(h){return +h.v||0;}),lo=Math.min.apply(null,vs),hi=Math.max.apply(null,vs),W=64,Ht=18,n=vs.length;
+  var pts=vs.map(function(v,k){return (k*(W/(n-1))).toFixed(1)+','+(hi===lo?Ht/2:(Ht-1-(v-lo)/(hi-lo)*(Ht-2))).toFixed(1);}).join(' ');
+  var f=H[0],l=H[n-1],d=l.v-f.v,up=d>=0;
+  var txt=wiMoney(f.v)+' on '+wiDayLabel(f.d)+', '+wiMoney(l.v)+' now ('+(Math.abs(d)<0.5?'no change':(up?'+':'-')+wiMoney(Math.abs(d)))+'), '+n+' readings';
+  return '<div class="wi-hist" title="'+cfEsc(txt+'. Latest from '+l.src)+'"><svg viewBox="0 0 '+W+' '+Ht+'" role="img" aria-label="Value history: '+cfEsc(txt)+'"><polyline points="'+pts+'" style="fill:none;stroke:var(--teal);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round"/></svg><span aria-hidden="true">'+(Math.abs(d)<0.5?'No change':(up?'+':'-')+wiMoney(Math.abs(d)))+' since '+cfEsc(wiDayLabel(f.d).replace(/ \d{4}$/,''))+'</span></div>';
+}
+// which live source fits this item, from its name; manual when none does (never a guessed figure)
+function wiGuessSource(a){
+  var nm=String(a&&a.name||''),lo=nm.toLowerCase();
+  var metal=/\b(gold|sovereign|krugerrand|britannia|maple ?leaf|bullion|ingot|22 ?ct|24 ?ct|18 ?ct|9 ?ct)\b/.test(lo)?'gold'
+    :/\bsilver\b/.test(lo)?'silver':/\bplatinum\b/.test(lo)?'platinum':/\bpalladium\b/.test(lo)?'palladium':null;
+  if(metal)return {kind:'metal',metal:metal,why:'"'+nm+'" looks like '+metal+'. Enter its weight and purity to follow the '+metal+' price; leave it as your own figure if it is worth more than its metal.'};
+  var hs=alState.stocks||[];
+  for(var k=0;k<hs.length;k++){var h=hs[k],sym=String(h.sym||'').toLowerCase(),hn=String(h.name||'').toLowerCase();
+    if((sym.length>=2&&new RegExp('\\b'+sym.replace(/[^a-z0-9]/g,'')+'\\b').test(lo))||(hn.length>=4&&(lo.indexOf(hn)>=0||(lo.length>=4&&hn.indexOf(lo)>=0))))
+      return {kind:'holding',stockId:h.id,why:'"'+nm+'" matches '+(h.sym||h.name)+' in Stocks and shares. Enter the units to follow its price.'};}
+  return {kind:'manual',why:'No live price source found for "'+nm+'". Your own figure is used, and each change you make is kept in its value history.'};
+}
 function wiLinkHtml(a){
-  var i=wiLinkInfo(a),chg=i&&wiSnap(a,i);
+  var i=wiLinkInfo(a),chg=i&&wiSnap(a,i),hist=wiSpark(wiHist(a,i));
   var btn='<button class="wi-link-btn" type="button" onclick="wiLinkOpen('+a.id+')" aria-label="Value of '+cfEsc(a.name)+': '+(i?'linked':'your own figure')+'. Change">'+(i?(i.ok?'Linked':'Link paused'):'Link to market value')+'</button>';
-  if(!i)return btn;
-  return btn+'<details class="wi-work"><summary>Show working</summary>'
+  if(!i)return hist+btn;
+  return hist+btn+'<details class="wi-work"><summary>Show working</summary>'
     +(i.ok?'<div>'+cfEsc(i.work)+'</div><div class="wi-src">'+cfEsc(i.src)+(i.at?', checked '+wiWhen(i.at):'')+'</div>'+(chg?'<div class="wi-chg">'+chg+' ('+cfEsc(i.src)+')</div>':''):'<div>'+cfEsc(i.note)+'</div>')
     +'<div class="wi-src">Your own figure: '+wiMoney(a.value)+'</div>'
     +'<div class="wi-src">Estimated market value, not an offer or a valuation. Not financial advice.</div></details>';
@@ -21000,6 +21039,8 @@ function wiLinkModal(){
     +'<label><input type="radio" name="wi-lk" value="manual" onchange="wiLinkKind()"> My own figure</label>'
     +'<label><input type="radio" name="wi-lk" value="metal" onchange="wiLinkKind()"> Precious metal by weight</label>'
     +'<label><input type="radio" name="wi-lk" value="holding" onchange="wiLinkKind()"> Shares or a fund</label></div>'
+    +'<p id="wi-link-guess" class="wi-link-hint wi-guess" aria-live="polite"></p>'
+    +'<div id="wi-lk-manual" class="g-form" hidden><div><label class="ov-kpi-lbl" for="wl-own">Your figure (£)</label><input type="number" id="wl-own" class="al-inp" min="0" step="any" inputmode="decimal" oninput="wiLinkPreview()"></div></div>'
     +'<div id="wi-lk-metal" class="g-form" hidden>'
     +'<div><label class="ov-kpi-lbl" for="wl-metal">Metal</label><select id="wl-metal" class="al-inp" onchange="wiLinkPurity();wiLinkPreview()">'+Object.keys(wiMetals()).map(function(k){return '<option value="'+k+'">'+wiMetals()[k]+'</option>';}).join('')+'</select></div>'
     +'<div><label class="ov-kpi-lbl" for="wl-weight">Weight</label><input type="number" id="wl-weight" class="al-inp" min="0" step="any" inputmode="decimal" oninput="wiLinkPreview()"></div>'
@@ -21023,7 +21064,7 @@ function wiLinkPurity(sel){
 }
 function wiLinkKind(){
   var k=(document.querySelector('input[name="wi-lk"]:checked')||{}).value||'manual';
-  document.getElementById('wi-lk-metal').hidden=k!=='metal';document.getElementById('wi-lk-holding').hidden=k!=='holding';
+  document.getElementById('wi-lk-manual').hidden=k!=='manual';document.getElementById('wi-lk-metal').hidden=k!=='metal';document.getElementById('wi-lk-holding').hidden=k!=='holding';
   document.getElementById('wi-link-msg').textContent='';wiLinkPreview();
 }
 function wiLinkRead(){
@@ -21035,7 +21076,7 @@ function wiLinkRead(){
 }
 function wiLinkPreview(){
   var a=invItem(_wiLinkId),el=document.getElementById('wi-link-prev');if(!a||!el)return;
-  var L=wiLinkRead();if(!L){el.textContent='Shown as your own figure: '+wiMoney(a.value)+'.';return;}
+  var L=wiLinkRead();if(!L){var ow=parseFloat(document.getElementById('wl-own').value);el.textContent='Shown as your own figure: '+wiMoney(ow>0?ow:a.value)+'.';return;}
   var i=wiLinkInfo({value:a.value,link:L});
   el.textContent=i.ok?i.work+' ('+i.src+(i.at?', checked '+wiWhen(i.at):'')+')':i.note;
 }
@@ -21049,7 +21090,11 @@ function wiLinkOpen(id){
   document.getElementById('wl-unit').value=L.unit||'g';
   document.getElementById('wl-weight').value=L.grams?(L.unit==='oz'?+(L.grams/wiTroyG()).toFixed(4):+(+L.grams).toFixed(3)):'';
   if(L.stockId!=null)st.value=String(L.stockId);document.getElementById('wl-units').value=L.units||'';
-  var k=L.type||'manual';document.querySelector('input[name="wi-lk"][value="'+k+'"]').checked=true;
+  document.getElementById('wl-own').value=+a.value>0?+a.value:'';
+  var k=L.type||'manual',gs=document.getElementById('wi-link-guess');gs.textContent='';
+  if(!a.link){var g=wiGuessSource(a);k=g.kind;gs.textContent=g.why;
+    if(g.kind==='metal'){document.getElementById('wl-metal').value=g.metal;wiLinkPurity();}
+    if(g.kind==='holding')st.value=String(g.stockId);}document.querySelector('input[name="wi-lk"][value="'+k+'"]').checked=true;
   m.hidden=false;document.body.classList.add('vi-pop-open');wiLinkKind();
   setTimeout(function(){var f=document.querySelector('input[name="wi-lk"]:checked');if(f)f.focus();},30);
 }
@@ -21063,6 +21108,7 @@ function wiLinkSave(){if(viBlockEdit())return;
   if(L&&L.type==='metal'&&!(L.grams>0)){msg.textContent='Enter the weight.';document.getElementById('wl-weight').focus();return;}
   if(L&&L.type==='holding'&&L.stockId==null){msg.textContent='Add the holding in Stocks and shares first.';return;}
   if(L&&L.type==='holding'&&!(L.units>0)){msg.textContent='Enter how many units.';document.getElementById('wl-units').focus();return;}
+  if(!L){var ow=parseFloat(document.getElementById('wl-own').value);if(!(ow>0)){msg.textContent='Enter your figure.';document.getElementById('wl-own').focus();return;}a.value=ow;}
   if(L){a.link=L;a.linkSnap=null;a.linkPrev=null;}else{delete a.link;delete a.linkSnap;delete a.linkPrev;}
   saveAL();wiLinkClose();renderAlTab();updateKPIs();
   showToast(L?'Value linked':'Back to your own figure');

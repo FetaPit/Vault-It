@@ -10,8 +10,25 @@ The single list of instructed work. Every session reads it at start and before e
 ## Open
 
 - [~] Release the MVP (owner, 31 Oct pm, "release when ready"; 17:00 "do that": release by pull request the owner merges from the GitHub app, since the session cannot push to the production branch). Full suite on 792604c: everything green except `test_hb_brand`, which failed about one run in four with two real faults: the house panel could stay on "Counting bricks…" and the gold ROW tag could keep the previous house's figures after a house change. Both fixed in the release commit; then the house builder and smoke tests re-run. Release commit 1cced67. Backup branch `backup/release-pioneer-v2-20261031-mvp` taken; frozen branch `release-mvp-20261031`; pull request FetaPit/Vault-It#3 into `release/pioneer-v2` opened for the owner to merge (owner notified)
-- [~] Round 3 (owner, 31 Oct 16:40, twenty edits; owner reordered 17:00: start now, alongside the release pull request; the brief re-stated as an Anthropic dev and a fintech dev is `docs/ROUND3_BRIEF.md`):
-  Progress: 15 done (a8a7796); 1 to 4 done (da9d696); 5, 6, 6a and 7 done (a1ac51f); 13 done (0e25b78); 9 to 11 done (7e4cd00); 12 and 18 done (b4661a1); 14 and 19 done (ad51b76); 16 and 17 done (341d6a7); 20 done (this commit). Next: 8 (market value over time).
+- [ ] Footer disclaimer and privacy link (owner, 31 Oct; owner kept it after Round 3): a plain disclaimer at the bottom of app.vault-it.co and vault-it.co, with "Privacy notice" and "Beta terms" linked from both footers (today the app footer has small "Privacy" / "Terms" buttons, the landing footer already links `?privacy=1` / `?terms=1`). Wording approved by the owner, keep it exact (no em dashes):
+  "Not regulated by the FCA. Not financial advice." then "Vault-It helps you track and plan your money. Forecasts, dates and values are estimates from what you enter and public prices, and may be wrong. Speak to a regulated adviser before big money decisions."
+  Same job, from the security review (31 Oct): the Worker's Content-Security-Policy only sets frame-ancestors / object-src / base-uri; add script, connect and image sources (report-only first, so nothing live breaks), and recheck the privacy notice against every outside host the app calls (`tests/test_beta_client.js`). Escaping, Download my data and Delete my account already exist.
+
+## Waiting on the owner
+
+- Metals price feed (`api.metals.live`): the sandbox cannot reach it (host not in the session's allowed network domains). Check it from a browser, or allow the host in the environment's network settings and ask again
+- Brand build on a real phone: speed of the lite fallback and how the 6.8 feedback feels (Settings > House builder > Brand build, or ?house=new)
+- Classic switches (house builder, net worth) stay in Settings until the owner has tested the new views on their phone (owner, 30 Oct); remove them only when the owner says so
+- Phone test of vault-it.co/sign-up: confirmation e-mail, confirm page, "Remove me" link
+- `FROM_EMAIL` sender name in Supabase secrets; add vault-it.co to the Turnstile widget's allowed sites; upgrade Resend before ads
+- Night mode: 68 small WCAG AA failures (faded items, white on teal buttons): design call
+- Live market value steps 2 and 3 (Land Registry house price index; eBay estimate): yes or no (`docs/LIVE_MARKET_VALUE.md`)
+- Poly Pizza: commercial plan and an edge function for live search, or self-host a small CC0 set (`docs/WEALTH_INVENTORY_3D_OPTIONS.md`)
+
+## Done (30 Oct 2026)
+
+- [x] Round 3 (owner, 31 Oct 16:40, twenty edits; owner reordered 17:00: start now, alongside the release pull request; the brief re-stated as an Anthropic dev and a fintech dev is `docs/ROUND3_BRIEF.md`):
+  Progress: 15 done (a8a7796); 1 to 4 done (da9d696); 5, 6, 6a and 7 done (a1ac51f); 13 done (0e25b78); 9 to 11 done (7e4cd00); 12 and 18 done (b4661a1); 14 and 19 done (ad51b76); 16 and 17 done (341d6a7); 20 done (5a5f32b); 8 done (this commit): every wealth item keeps one value reading a day with its source, a small line on the tile, and the link suggests a live source from the name or stays on the own figure.
   1. Dashboard forecast: small text bottom right of the tile saying what the forecast is based on, depends on and limited by
   2. Assets and liabilities dashboard tile: proportional value scale on the x axis, like the debt tile
   3. Debt tile: the amount paid off shown as a green bar from the right
@@ -33,23 +50,6 @@ The single list of instructed work. Every session reads it at start and before e
   18. Liabilities tiles the same size as the wealth inventory tiles after 12
   19. Desktop: the asset and liability 3D viewports orbit the item on click and drag
   20. Side bar (ledger) wider; every value from across the app pulls into it, with the relevant icon at the left of each line
-- [ ] Footer disclaimer and privacy link (owner, 31 Oct; owner kept it after Round 3): a plain disclaimer at the bottom of app.vault-it.co and vault-it.co, with "Privacy notice" and "Beta terms" linked from both footers (today the app footer has small "Privacy" / "Terms" buttons, the landing footer already links `?privacy=1` / `?terms=1`). Wording approved by the owner, keep it exact (no em dashes):
-  "Not regulated by the FCA. Not financial advice." then "Vault-It helps you track and plan your money. Forecasts, dates and values are estimates from what you enter and public prices, and may be wrong. Speak to a regulated adviser before big money decisions."
-  Same job, from the security review (31 Oct): the Worker's Content-Security-Policy only sets frame-ancestors / object-src / base-uri; add script, connect and image sources (report-only first, so nothing live breaks), and recheck the privacy notice against every outside host the app calls (`tests/test_beta_client.js`). Escaping, Download my data and Delete my account already exist.
-
-## Waiting on the owner
-
-- Metals price feed (`api.metals.live`): the sandbox cannot reach it (host not in the session's allowed network domains). Check it from a browser, or allow the host in the environment's network settings and ask again
-- Brand build on a real phone: speed of the lite fallback and how the 6.8 feedback feels (Settings > House builder > Brand build, or ?house=new)
-- Classic switches (house builder, net worth) stay in Settings until the owner has tested the new views on their phone (owner, 30 Oct); remove them only when the owner says so
-- Phone test of vault-it.co/sign-up: confirmation e-mail, confirm page, "Remove me" link
-- `FROM_EMAIL` sender name in Supabase secrets; add vault-it.co to the Turnstile widget's allowed sites; upgrade Resend before ads
-- Night mode: 68 small WCAG AA failures (faded items, white on teal buttons): design call
-- Live market value steps 2 and 3 (Land Registry house price index; eBay estimate): yes or no (`docs/LIVE_MARKET_VALUE.md`)
-- Poly Pizza: commercial plan and an edge function for live search, or self-host a small CC0 set (`docs/WEALTH_INVENTORY_3D_OPTIONS.md`)
-
-## Done (30 Oct 2026)
-
 - [x] Efficiency rules for every session (owner, 31 Oct evening, asked for in this session so tonight's work is cheaper; docs and the queue hook only, no app code): `docs/CLAUDE_EFFICIENCY.md` rewritten as the playbook, a matching section in `CLAUDE.md`, the prompt hook trimmed, brand phase 5 status and a token estimate for the tester release given in chat (this commit)
 - [x] Net worth in 3D (owner, 31 Oct): the column list folds into a "What each column is" dropdown, the scene rests 20% closer (35% cut off the first column at 1100 px), the debt columns stand right after the inventory cubes. Commit 11e23b8
 - [x] Goals and snapshots (owner, 31 Oct): hidden while the 3D view shows; they appear in the net worth Graph view (what is added there still feeds everything else). Commit 11e23b8

@@ -46,3 +46,9 @@ Each wealth or liability item gets a **Value: manual / linked** switch. When lin
 - Apply to eBay for step 3?
 
 Sources: [eBay Browse API](https://developer.ebay.com/api-docs/buy/browse/resources/methods), [eBay call limits and Growth Check](https://developer.ebay.com/develop/get-started/api-call-limits), [eBay licence update on restricted pricing data (EcommerceBytes)](https://www.ecommercebytes.com/2025/07/18/ebay-restricts-developers-from-using-its-data-to-train-ai/), [UK House Price Index](https://landregistry.data.gov.uk/app/ukhpi/), [UK HPI on data.gov.uk (Open Government Licence)](https://data.gov.uk/dataset/uk-house-price-index).
+
+## Value over time (Round 3, item 8, 31 Oct 2026)
+- Every wealth item keeps `valHist`: one reading a day at most, `{d: 'YYYY-MM-DD', v, src}`, newest 120. `src` is the live source when the item is linked and priced (for example "Gold spot price"), otherwise "your figure". Stored on the item like the rest of the user's data (device and their own cloud copy); nothing is sent anywhere new.
+- The tile shows a small line of the readings and the change since the first one; the full sentence and the latest source are in its label.
+- The link pop-up suggests a source from the item's name: a metal word (gold, sovereign, Krugerrand, Britannia, silver, platinum, palladium, carat marks) suggests the metal by weight, a ticker or name of a holding in Stocks and shares suggests that holding. No weight, purity or units are filled in. When nothing fits it stays on "My own figure" and says so; the own figure can be edited there and each change is kept in the history.
+- Test: `tests/test_value_hist.js`.
