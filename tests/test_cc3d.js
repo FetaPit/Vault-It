@@ -34,7 +34,7 @@ const fs=require('fs');
   // edit: issuer scan + photo imprint
   await page.evaluate(()=>ccOpenEdit(5)); await page.waitForTimeout(300);
   await page.fill('#cc-issuer','Halifax'); await page.fill('#cc-last4','4821');
-  const png=fs.readFileSync('/home/user/Vault-It/shots/hb1.png');
+  const png=await page.screenshot({clip:{x:0,y:0,width:480,height:320}});   // any photo will do; made here so the test needs no leftover file (CI has no shots/)
   await page.setInputFiles('#cc-ov input[type=file] >> nth=0',{name:'card.png',mimeType:'image/png',buffer:png}); await page.waitForTimeout(600);
   ok(await page.evaluate(()=>_ccEdit.art.startsWith('data:image/jpeg')),'photo imprinted (cropped to card ratio)');
   const dims=await page.evaluate(()=>new Promise(r=>{const i=new Image();i.onload=()=>r(i.width/i.height);i.src=_ccEdit.art;}));

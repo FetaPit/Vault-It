@@ -31,6 +31,15 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     ok(/^0\.25 BTC held$/.test(r.tiles[0].held) && /^1\.5 ETH held$/.test(r.tiles[1].held), T + 'each tile shows the tokens held (' + r.tiles[0].held + ', ' + r.tiles[1].held + ')');
     ok(/Live price · CoinGecko · just now · indicative/.test(r.tiles[0].src), T + 'and where the price comes from (' + r.tiles[0].src + ')');
     ok(r.tiles[0].logo >= (mob ? 50 : 62), T + 'bigger coin icons (' + r.tiles[0].logo + ' px)');
+    // a check that finds the same prices does not save (so it does not upload the account copy every 15 minutes)
+    const saves = await p.evaluate(async () => { let n = 0; const o = window.saveAL; window.saveAL = saveAL = function () { n++; return o.apply(this, arguments); }; await fetchCryptoPrices(true); window.saveAL = saveAL = o; return n; });
+    ok(saves === 0, T + 'a price check with no change saves nothing (' + saves + ' saves)');
+    // no automatic checks for a device that holds no coin (a new device's blank sample, before the cloud copy arrives)
+    const n1 = calls.length;
+    await p.evaluate(() => { window._crKeep = alState.crypto; alState.crypto = [{ id: 9, sym: 'BTC', amount: 0, price: 1 }]; alState.cryptoCheckedAt = null; crAutoRefresh(); });
+    await p.waitForTimeout(500);
+    ok(calls.length === n1, T + 'no automatic price check when no coin is held');
+    await p.evaluate(() => { alState.crypto = window._crKeep; });
     // a failed refresh keeps the last price and says it could not refresh
     mode = 'fail'; await p.evaluate(() => fetchCryptoPrices(true)); await p.waitForTimeout(800);
     r = await p.evaluate(() => ({ p: alState.crypto[0].price, src: document.querySelector('#crypto-table .wi-tile .cr-src').textContent }));

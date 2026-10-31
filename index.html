@@ -20678,18 +20678,22 @@ function fetchCryptoPrices(quiet){
   var ids=list.map(function(c){return crCoinId(c.sym||c.symbol)}).filter(function(v,i,a){return a.indexOf(v)===i}).join(',');
   return fetch('https://api.coingecko.com/api/v3/simple/price?ids='+encodeURIComponent(ids)+'&vs_currencies=gbp&include_24hr_change=true')
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(d){
-      var now=new Date().toISOString(),got=0;
+      var now=new Date().toISOString(),got=0,was=crSig(list);
       list.forEach(function(c){var x=d&&d[crCoinId(c.sym||c.symbol)];
         if(x&&typeof x.gbp==='number'&&x.gbp>0){c.price=x.gbp;c.change24h=x.gbp_24h_change||0;c.priceSrc='live';c.priceAt=now;got++}
         else if(c.priceSrc==='live'){c.priceSrc='stale'}else c.priceSrc=c.priceSrc||'manual'});
-      alState.cryptoCheckedAt=now;alState.cryptoErr=null;saveAL();renderAlTab();try{updateKPIs()}catch(e){}
+      alState.cryptoCheckedAt=now;alState.cryptoErr=null;
+      if(crSig(list)!==was)saveAL();   /* save (and so sync) only when a price changed, not for every check */
+      renderAlTab();try{updateKPIs()}catch(e){}
       if(!quiet)showToast(got?'Crypto prices updated ✓':'No live price found for these coins');return true;
-    }).catch(function(e){alState.cryptoErr=new Date().toISOString();list.forEach(function(c){if(c.priceSrc==='live')c.priceSrc='stale'});saveAL();try{renderAlTab()}catch(_){}if(!quiet)showToast('Crypto prices unavailable just now. Your last prices are kept.');return false;})
+    }).catch(function(e){alState.cryptoErr=new Date().toISOString();var was=crSig(list);list.forEach(function(c){if(c.priceSrc==='live')c.priceSrc='stale'});if(crSig(list)!==was)saveAL();try{renderAlTab()}catch(_){}if(!quiet)showToast('Crypto prices unavailable just now. Your last prices are kept.');return false;})
     .then(function(v){_crBusy=false;return v;});
 }
+function crSig(list){return JSON.stringify(list.map(function(c){return [c.price,c.priceSrc,c.change24h]}))}
+/* automatic checks only when the user holds some coin (not on a new device's blank sample, before the cloud copy arrives) */
 function crAutoRefresh(){
   var last=Date.parse(alState.cryptoCheckedAt||0)||0;
-  if((alState.crypto||[]).length&&Date.now()-last>VI_CRYPTO_EVERY-5000)fetchCryptoPrices(true);
+  if((alState.crypto||[]).some(function(c){return c&&(+(c.amount!=null?c.amount:c.qty)||0)>0})&&Date.now()-last>VI_CRYPTO_EVERY-5000)fetchCryptoPrices(true);
 }
 function crAgo(iso){var t=Date.parse(iso||0);if(!t)return '';var m=Math.round((Date.now()-t)/60000);return m<1?'just now':m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' d ago'}
 function crPriceLine(c){
