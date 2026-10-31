@@ -28,7 +28,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
-- [x] Sign-up page steps (owner, 31 Oct): small app screenshots for steps 1 to 3, four brand icons pulsing on step 2 (reduced motion respected), the big house removed. Commit cda009e on `brand-rollout`, not released.
+- [x] Sign-up page steps (owner, 31 Oct): small app screenshots for steps 1 to 3, four brand icons pulsing on step 2 (reduced motion respected), the big house removed. Commit 8080f69 on `brand-rollout`, not released.
 - [x] Tester welcome message (31 Oct): Pete's note shown once after the welcome flow for beta accounts, first sentence in the 30-day form ("Your first 30 days are free, no card needed."), Let's go and a mail link. Commit 02b6918 on `brand-rollout`, not released.
 - [x] Simplified / Advanced view (owner, 31 Oct): synced switch in Settings and the welcome step (new accounts Simplified, existing Advanced), the section 8 tile list, Overview achievements card, Budget Sankey on top with every section folded, Sankey flow animation, phone KPIs in two rows. Budget "sections" read as the six spending and saving groups; the income list stays open so income can be added. Commit 96bd33e on `brand-rollout`, not released.
 - [x] Tier gates (31 Oct, decision 10): caps gone; design tools (upload, AI model) need a paid plan, trial included; every preset house for everyone; ended accounts see everything read-only; plan recorded from the Stripe return; AI reader allowance line; four more read-only guards. Commit 4254a03 on `brand-rollout`, not released.
