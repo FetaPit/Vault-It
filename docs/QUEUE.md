@@ -9,6 +9,28 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] Release the MVP (owner, 31 Oct pm, "release when ready"): full suite on 792604c, backup branch `backup/release-pioneer-v2-20261031-mvp`, fast-forward `release/pioneer-v2`. The session cannot push to the production branch (permission layer); the owner pushes from Git Bash with the commands given in chat
+- [ ] Round 3 (owner, 31 Oct 16:40, twenty edits, start only after the release above; the brief re-stated as an Anthropic dev and a fintech dev is `docs/ROUND3_BRIEF.md`):
+  1. Dashboard forecast: small text bottom right of the tile saying what the forecast is based on, depends on and limited by
+  2. Assets and liabilities dashboard tile: proportional value scale on the x axis, like the debt tile
+  3. Debt tile: the amount paid off shown as a green bar from the right
+  4. Debt tile: the amount still to pay in a subtle red hue
+  5. Budget tab: the dashed line becomes light teal and extends to where the income flows in
+  6. Budget: an alternate view of the income flow like Net worth in 3D, with entry animations: a 3D tree map, each colour-coded category a block proportional to its spend or saving
+  7. Budget: the income flow viewport moves to the top of the tab
+  8. Link to market value: aggregate a valuation of the named valuable over time; default to manual when no source is found
+  9. Crypto icons larger
+  10. Crypto live price pulled automatically and linked to the user's holdings, not typed in
+  11. Crypto tile also shows the token amount held
+  12. Wealth inventory: bigger item tiles, especially on desktop
+  13. Wealth inventory: uploaded photos missing when an item tile is expanded (bug)
+  14. 3D model upload in liabilities is laggy; remove the green tint and show the model's own textures and colours (wealth inventory too)
+  15. Desktop menu bar spans the viewport width with the Vault-It logo and the Daylight button in the same row; remove the Compact menu options, width decides
+  16. Flag post labels in the 3D scenes match the dashboard labels, in gold, across the board (precious metals etc.)
+  17. Precious metals and cash 3D environment to match the Net worth in 3D scene exactly (it looks dull now)
+  18. Liabilities tiles the same size as the wealth inventory tiles after 12
+  19. Desktop: the asset and liability 3D viewports orbit the item on click and drag
+  20. Side bar (ledger) wider; every value from across the app pulls into it, with the relevant icon at the left of each line
 
 ## Waiting on the owner
 
