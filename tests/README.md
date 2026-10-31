@@ -46,6 +46,7 @@ node tests/test_i3d_live.js           # Round 3: desktop, hover a model tile to 
 node tests/test_ledger.js             # Round 3: the side bar ledger lists every money figure with its icon, each equal to its tab; also the Savings rate line and the stale-price note
 node tests/test_nw3d_labels.js       # Net worth in 3D: floor names never overlap or leave the stage (makeNW, 5a5f32b)
 node tests/test_signoff_a.js         # Phone sign-off A: Feedback pill never covers a 3D stage; Net worth floor names sit on the income flow label plate
+node tests/test_signoff_b.js         # Phone sign-off B: old green item pictures redrawn in the model colours; phone tap makes the tile a live orbit view
 node tests/test_footer.js             # footer: approved disclaimer, Privacy notice / Beta terms links in the app and landing footers, type floors, --footer-h tracks the fixed footer
 node tests/test_csp_report_only.mjs   # Worker: Content-Security-Policy-Report-Only lists every outside host the app calls; enforced CSP unchanged
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width

@@ -21554,7 +21554,7 @@ async function i3dSave(kind,id,buf,meta){
   i3dMsg('Saving it on this device…');await tick();
   await i3dPut(kind,id,buf);
   i3dStyle(obj);await tick();
-  it.model=Object.assign({},meta,{thumb:i3dThumb(obj),at:Date.now()});
+  it.model=Object.assign({},meta,{thumb:i3dThumb(obj),tv:2,at:Date.now()});
   saveAL();renderAlTab();_i3dReady={kind:kind,id:id,obj:obj};return it.model;
 }
 var _i3dView=null,_i3dBusy=false,_i3dReady=null;   // _i3dReady: the model just saved, already read, so the viewer does not read it twice
@@ -21627,15 +21627,21 @@ function i3dRemove(kind,id){var it=i3dItem(kind,id);if(!it)return;delete it.mode
 // tile markup shared by both lists
 function i3dTile(kind,it){
   var m=it.model;if(!m||!m.thumb)return '';
-  return '<img class="i3d-thumb" src="'+m.thumb+'" alt="3D model of '+cfEsc(it.name)+'" onclick="i3dOpen(\''+kind+'\','+it.id+')" onmouseenter="i3dLive(\''+kind+'\','+it.id+',this)"><span class="inv-badge i3d-badge" title="'+cfEsc(i3dCredit(m)||m.t||'')+'">3D</span>';
+  return '<img class="i3d-thumb" src="'+m.thumb+'" alt="3D model of '+cfEsc(it.name)+'" onclick="i3dTap(\''+kind+'\','+it.id+',this)" onmouseenter="i3dLive(\''+kind+'\','+it.id+',this)"><span class="inv-badge i3d-badge" title="'+cfEsc(i3dCredit(m)||m.t||'')+'">3D</span>';
 }
 /* desktop (owner, 31 Oct): an item's 3D model turns in its own tile. Hovering a model tile swaps the still picture for a live view
    (one tile at a time, so only one 3D canvas is ever open); click and drag orbits round the item, a click without a drag opens the
    full viewer. The wheel is left to the page. Touch screens keep the picture and open the viewer on a tap. */
 var _i3dLive=null;
 function i3dLiveStop(){var r=_i3dLive;_i3dLive=null;if(!r)return;try{r.view&&r.view.dispose()}catch(e){}if(r.host)r.host.remove();if(r.img)r.img.style.visibility='';}
-function i3dLive(kind,id,img){
-  if(!window.matchMedia||!matchMedia('(hover: hover) and (pointer: fine)').matches||!viGlOk())return;
+/* phone (owner, 31 Oct): the first tap on a model tile turns it into the live view (drag to orbit); a tap without a drag opens the full viewer */
+function i3dTap(kind,id,img){
+  var live=_i3dLive&&_i3dLive.key===kind+':'+id&&_i3dLive.view;
+  if(live||!viGlOk()||!window.matchMedia||!matchMedia('(pointer: coarse)').matches)return i3dOpen(kind,id);
+  i3dLive(kind,id,img,true);
+}
+function i3dLive(kind,id,img,force){
+  if(!window.matchMedia||!(force||matchMedia('(hover: hover) and (pointer: fine)').matches)||!viGlOk())return;
   var key=kind+':'+id;if(_i3dLive&&_i3dLive.key===key&&_i3dLive.area.isConnected)return;
   i3dLiveStop();var area=img.parentNode,rec={key:key,area:area,img:img};_i3dLive=rec;
   i3dGetBuf(kind,id).then(function(buf){return _i3dLive===rec&&buf?i3dParse(buf.slice(0)):null}).then(function(obj){
@@ -21649,7 +21655,22 @@ function i3dLive(kind,id,img){
     img.style.visibility='hidden';
   }).catch(function(){if(_i3dLive===rec)_i3dLive=null;});
 }
-(function(){var _rat=window.renderAlTab;if(typeof _rat==='function')window.renderAlTab=renderAlTab=function(){i3dLiveStop();return _rat.apply(this,arguments)};})();
+/* pictures saved by the earlier green-tinted build (no tv mark) are redrawn once, from the saved model, in its own colours (owner, 31 Oct) */
+var _i3dRe={run:false,tried:{}};
+function i3dRefreshThumbs(){
+  if(_i3dRe.run||!viGlOk())return;
+  var todo=[];[['wi',alState.otherAssets],['li',alState.liabilities]].forEach(function(g){(g[1]||[]).forEach(function(it){if(it.model&&it.model.thumb&&it.model.tv!==2&&!_i3dRe.tried[g[0]+it.id])todo.push([g[0],it])})});
+  if(!todo.length)return;_i3dRe.run=true;
+  (async function(){
+    for(var i=0;i<todo.length;i++){var k=todo[i][0],it=todo[i][1];_i3dRe.tried[k+it.id]=1;
+      try{var buf=await i3dGetBuf(k,it.id);if(!buf)continue;var obj=await i3dParse(buf.slice(0));i3dStyle(obj);
+        it.model.thumb=i3dThumb(obj);it.model.tv=2;saveAL();
+        [].forEach.call(document.querySelectorAll('img.i3d-thumb'),function(im){if((im.getAttribute('onclick')||'').indexOf("'"+k+"',"+it.id+",")>-1)im.src=it.model.thumb});
+      }catch(e){}}
+    _i3dRe.run=false;
+  })();
+}
+(function(){var _rat=window.renderAlTab;if(typeof _rat==='function')window.renderAlTab=renderAlTab=function(){i3dLiveStop();var r=_rat.apply(this,arguments);try{setTimeout(i3dRefreshThumbs,400)}catch(e){}return r};})();
 
 function wiSearch(id){
   var a=(alState.otherAssets||[]).find(function(x){return x.id===id;});
