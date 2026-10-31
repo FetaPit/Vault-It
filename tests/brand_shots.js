@@ -4,6 +4,7 @@
 // Uses the same seed as test_overview plus a house in progress. Prints page errors and sideways scroll.
 const { chromium } = require('playwright');
 const fs = require('fs');
+const routeThree = require('./three_route');   // three.js served locally (the sandbox has no CDN), so the house is the 3D one
 const OUT = __dirname + '/../shots/brand'; fs.mkdirSync(OUT, { recursive: true });
 const TABS = process.argv.slice(2).length ? process.argv.slice(2) : ['overview', 'budget', 'house', 'assets', 'debt', 'achievements'];
 const seed = (theme) => {
@@ -22,12 +23,14 @@ const seed = (theme) => {
   for (const theme of ['dark', 'light']) for (const w of [390, 1100]) {
     const mob = w < 700;
     const ctx = await b.newContext({ viewport: { width: w, height: mob ? 844 : 900 }, isMobile: mob, hasTouch: mob, deviceScaleFactor: mob ? 2 : 1 });
+    await routeThree(ctx);
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(theme + w + ': ' + e.message));
     await p.addInitScript(seed, theme);
     await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2000);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     for (const t of TABS) {
-      await p.evaluate(t => showTab(t), t); await p.waitForTimeout(t === 'house' ? 2500 : 900);
+      await p.evaluate(t => showTab(t), t); await p.waitForTimeout(900);
+      if (t === 'house') { for (let i = 0; i < 40; i++) { if (await p.evaluate(() => !!(window.HB3DAPP && HB3DAPP.viewer && HB3DAPP.viewer.model && HB3DAPP.viewer.settled && HB3DAPP.viewer.settled()))) break; await p.waitForTimeout(300); } await p.waitForTimeout(400); }   // the engine arrives on demand
       await p.evaluate(() => window.scrollTo(0, 0));
       const sx = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       if (sx > 1) console.log('SIDEWAYS SCROLL', t, theme, w, sx + 'px');

@@ -23,7 +23,7 @@ const guitar = () => { const g = new THREE.Group(), M = (c) => new THREE.MeshSta
     await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(theme + w + ': ' + e.message));
     await p.addInitScript(seed, theme); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2000);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
-    await p.evaluate(g => { const mk = eval('(' + g + ')'); showTab('assets'); const it = i3dItem('wi', 11); it.model = { src: 'file', t: 'guitar', thumb: i3dThumb(mk()) }; i3dItem('li', 21).model = { src: 'pp', k: 'car', t: 'Car Hatchback', by: 'Kay Lousberg', lic: 'CC0', thumb: i3dThumb(new THREE.Mesh(new THREE.BoxGeometry(2, .7, 1), new THREE.MeshStandardMaterial({ color: 0x2255aa }))) }; renderAlTab();
+    await p.evaluate(() => new Promise(r => viThree(r))); await p.evaluate(g => { const mk = eval('(' + g + ')'); showTab('assets'); const it = i3dItem('wi', 11); it.model = { src: 'file', t: 'guitar', thumb: i3dThumb(mk()) }; i3dItem('li', 21).model = { src: 'pp', k: 'car', t: 'Car Hatchback', by: 'Kay Lousberg', lic: 'CC0', thumb: i3dThumb(new THREE.Mesh(new THREE.BoxGeometry(2, .7, 1), new THREE.MeshStandardMaterial({ color: 0x2255aa }))) }; renderAlTab();
       showSubtab('assets', 'other', document.querySelector('[onclick*="\'other\'"]')); }, guitar.toString());
     await p.waitForTimeout(500); await p.evaluate(() => document.getElementById('other-assets-list').scrollIntoView({ block: 'start' }));
     await p.screenshot({ path: `${OUT}/item3d-tiles-${theme}-${w}.png` });

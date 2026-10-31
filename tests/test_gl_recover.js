@@ -4,6 +4,13 @@
 //   2. house viewer: lose it and never restore -> after ~2.5 s the viewer is rebuilt on a fresh canvas and draws
 //   3. net worth scene: data changed by a sync (_rerenderAll) -> the scene tag follows the header
 //   4. pixel budgets: the hero canvas stays under 1.6M pixels at 1500 px wide; lite mode halves nothing visible but switches shadows off
+// 3D efficiency (owner, 31 Oct): three.js is fetched after the page has painted (on first need or when idle), the house viewer sleeps
+// off screen and in a background tab and wakes when seen, it drops to lite quality on demand, the coin stage draws only on a kick,
+// the engine is not loaded at all without WebGL
+//   5. three.js arrives after the load event, through the loader, and HB3D.supported() turns true once it is here
+//   6. house viewer: another tab -> offscreen and no frame scheduled; back -> awake and drawn; a hidden page -> no frame
+//   7. goLite: shadows off, pixel ratio 1, still draws
+//   8. cash stage: idle after a second (no frame scheduled), a kick schedules one, shadows use the desktop filter here
 // Run: node tests/test_gl_recover.js   (VI_APP=file:///… to test another copy)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');   // three.js served locally (the sandbox has no CDN)
@@ -66,6 +73,47 @@ const seed = eval(shotSrc.slice(shotSrc.indexOf('const seed ='), shotSrc.indexOf
   const r4 = await p.evaluate(() => { const cv = document.getElementById('nw3d-hero-cv'); const px = cv.width * cv.height; const wasLite = ViNW3D.lite(); ViNW3D.lite(true); const on = ViNW3D.lite(); ViNW3D.lite(wasLite); return { px, w: cv.width, h: cv.height, on, wasLite }; });
   ok(r4.px <= 1.65e6, 'the hero canvas keeps to the pixel budget at 1500 px wide (' + r4.w + 'x' + r4.h + ' = ' + Math.round(r4.px / 1e3) + 'k)');
   ok(r4.on === true, 'lite mode can be switched on (shadows off, 30 fps, 1.25x)');
+
+  // ── 5. three.js loaded on demand, after first paint ──
+  const r5 = await p.evaluate(() => {
+    const nav = performance.getEntriesByType('navigation')[0], tags = [...document.querySelectorAll('script[src*="three"]')];
+    const res = performance.getEntriesByType('resource').filter(e => /three\.min\.js/.test(e.name))[0];
+    return { tags: tags.length, viaLoader: tags.every(t => t.getAttribute('data-vi') === 'three'), loadEnd: nav && Math.round(nav.loadEventEnd), fetched: res && Math.round(res.startTime), state: viThreeState(), sup: HB3D.supported() };
+  });
+  ok(r5.tags === 3 && r5.viaLoader && r5.state === 2 && r5.sup === true, 'three.js came through the loader (' + r5.tags + ' tags) and the engine reports supported');
+  ok(r5.fetched > 0 && r5.loadEnd > 0 && r5.fetched >= r5.loadEnd, 'three.js was fetched after the page had loaded (load ' + r5.loadEnd + ' ms, fetch ' + r5.fetched + ' ms)');
+
+  // ── 6. the house viewer sleeps off screen and in a background tab ──
+  await p.evaluate(() => showTab('house')); await p.waitForTimeout(800);
+  const r6a = await p.evaluate(() => ({ off: HB3DAPP.viewer.offscreen, raf: HB3DAPP.viewer._raf }));
+  await p.evaluate(() => showTab('overview')); await p.waitForTimeout(600);
+  const r6b = await p.evaluate(async () => { const v = HB3DAPP.viewer; v.wake(); await new Promise(r => setTimeout(r, 150)); return { off: v.offscreen, raf: v._raf }; });
+  await p.evaluate(() => showTab('house')); await p.waitForTimeout(600);
+  const r6c = await p.evaluate(() => ({ off: HB3DAPP.viewer.offscreen, drawn: HB3DAPP.viewer.dirty === false }));
+  ok(r6a.off === false, 'on the house tab the viewer is on screen');
+  ok(r6b.off === true && r6b.raf === 0, 'on another tab the viewer is off screen and schedules no frame, even when poked');
+  ok(r6c.off === false && r6c.drawn, 'back on the house tab it wakes and draws');
+  const r6d = await p.evaluate(async () => { const v = HB3DAPP.viewer; const d = Object.getOwnPropertyDescriptor(Document.prototype, 'hidden');
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); v.wake(); await new Promise(r => setTimeout(r, 150));
+    const hidden = { raf: v._raf }; delete document.hidden; document.dispatchEvent(new Event('visibilitychange')); await new Promise(r => setTimeout(r, 150)); return { hidden, back: v.dirty === false }; });
+  ok(r6d.hidden.raf === 0 && r6d.back, 'a hidden page stops the frames; showing it again redraws');
+
+  // ── 7. lite quality on demand ──
+  const r7 = await p.evaluate(async () => { const v = HB3DAPP.viewer; v.goLite(); await new Promise(r => setTimeout(r, 200)); return { sh: v.renderer.shadowMap.enabled, sun: v.sun.castShadow, dpr: v.renderer.getPixelRatio(), drawn: v.dirty === false, lite: v._lite }; });
+  ok(r7.lite && r7.sh === false && r7.sun === false && r7.dpr === 1 && r7.drawn, 'goLite: shadows off, pixel ratio 1, still drawing (' + JSON.stringify(r7) + ')');
+
+  // ── 8. the coin stage draws only on a kick ──
+  await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', document.querySelector('.subtab-btn[data-sub="cash"]')); }); await p.waitForTimeout(1600);
+  // headless Chromium draws this stage in software (a frame can take 200 ms), so wait for idle rather than assuming it
+  const idleCash = async () => { for (let i = 0; i < 40; i++) { if (await p.evaluate(() => !!(window.V3 && V3.cash) && V3.cash.raf === 0 && Date.now() > V3.cash._until)) return true; await p.waitForTimeout(250); } return false; };
+  const r8 = await p.evaluate(() => (window.V3 && V3.cash) ? { type: V3.cash.r.shadowMap.type === THREE.PCFSoftShadowMap, off: V3.cash._off } : { none: true });
+  if (r8.none) console.log('skip: no 3D cash stage in this seed');
+  else {
+    const idle1 = await idleCash();
+    const kicked = await p.evaluate(() => { V3.cash.kick(); return V3.cash.raf !== 0; });
+    const idle2 = await idleCash();
+    ok(idle1 && kicked && idle2 && r8.type && r8.off === false, 'cash stage: idle, a kick draws, idle again; desktop shadow filter (' + JSON.stringify({ idle1, kicked, idle2, type: r8.type, off: r8.off }) + ')');
+  }
 
   await b.close();
   ok(errs.length === 0, 'no page errors ' + errs.join(' | '));

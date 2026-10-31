@@ -4,8 +4,9 @@
 // ═══════════════════════════════════════════════════════════════
 (function (H) {
   'use strict';
-  if (typeof THREE === 'undefined') { H.supported = function () { return false; }; return; }
-
+  // three.js is loaded on first need (index.html viThree): until it arrives the viewer is not supported, and H._boot() builds it
+  // once THREE exists. Everything below runs inside boot() for that reason.
+  function boot() {
   var _sup = null;
   H.supported = function () {
     if (_sup !== null) return _sup;
@@ -301,12 +302,19 @@
     this._idle = 0;
     this._loop = function () {
       self._raf = 0;
-      if (!self.active) return;
+      if (!self.active || self.offscreen || document.hidden) { self._lastT = 0; return; }   // off screen or in a background tab: sleep (woken when seen again)
       var moving = self.controls.update();
       if (self._anim) moving = self._stepAnim() || moving;
       if (self._fly) moving = self._stepFly() || moving;
       if (self._brandTick) moving = self._brandTick() || moving;   // brand look: smoothing, brick drops, pulse, sweep, ring (only while on screen)
-      if (self.dirty || moving) { self.render(); self.dirty = false; self._idle = 0; } else self._idle++;
+      if (self.dirty || moving) {
+        var t = performance.now();
+        self.render(); self.dirty = false; self._idle = 0;
+        // adaptive quality: the gap between moving frames, averaged after a warm-up, tells whether this device keeps up; a slow
+        // one (under ~14 frames a second over 40 frames) drops to lite (no shadows, pixel ratio 1) rather than stuttering
+        if (moving && self._lastT && !self._lite && !self.brand) { var dt = t - self._lastT; if (dt > 2 && dt < 500) { self._ema = self._ema == null ? dt : self._ema * 0.9 + dt * 0.1; self._nf = (self._nf || 0) + 1; if (self._nf > 40 && self._ema > 70) self.goLite(); } }
+        self._lastT = moving ? t : 0;
+      } else { self._idle++; self._lastT = 0; }
       if (self._idle > 45) return;                         // nothing moving for ~0.75 s: sleep until woken
       self._raf = requestAnimationFrame(self._loop);
     };
@@ -316,6 +324,14 @@
       this._ro = new ResizeObserver(function () { self.resize(); });
       this._ro.observe(container);
     }
+    // only draw while the stage can be seen: another tab, a scrolled-away stage or a hidden page costs nothing
+    this.offscreen = false;
+    if (typeof IntersectionObserver !== 'undefined') {
+      this._io = new IntersectionObserver(function (es) { var vis = es[es.length - 1].isIntersecting; if (vis === !self.offscreen) return; self.offscreen = !vis; if (vis) { self.dirty = true; self.wake(); } }, { threshold: 0.01 });
+      this._io.observe(container);
+    }
+    this._onVis = function () { if (!document.hidden) { self.dirty = true; self.wake(); } };
+    document.addEventListener('visibilitychange', this._onVis);
     cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); self.lost = true; self.stop(); if (self.onLost) self.onLost(); });
     cv.addEventListener('webglcontextrestored', function () { self.lost = false; self._shadowDirty = true; if (self.model) self.show(self.model, true); self.start(); if (self.onRestored) self.onRestored(); });
     this.start();
@@ -327,6 +343,15 @@
   VP.wake = function () { this._idle = 0; if (this.active && !this._raf) this._raf = requestAnimationFrame(this._loop); };
   VP.settled = function () { if (this._brandActive && this._brandActive()) return this._brandSettled(); return !this._anim && this._idle > 2; };
   VP.stop = function () { this.active = false; if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; } };
+  // lite quality for a device that cannot keep up: shadows off, pixel ratio 1 (nothing else changes; the brand look has its own lite stage)
+  VP.goLite = function () {
+    if (this._lite) return; this._lite = true;
+    this.renderer.shadowMap.enabled = false; this.sun.castShadow = false; this.opts.maxDpr = 1;
+    this.scene.traverse(function (o) { var m = o.material; if (!m) return; (Array.isArray(m) ? m : [m]).forEach(function (x) { x.needsUpdate = true; }); });
+    var w = this.el.clientWidth, h = this.el.clientHeight;
+    if (w > 2 && h > 2) { this.renderer.setPixelRatio(this._dprFor(w, h)); this.renderer.setSize(w, h, false); }
+    this.dirty = true; this._shadowDirty = true; this.wake();
+  };
   VP.resize = function () {
     var w = this.el.clientWidth, h = this.el.clientHeight;
     if (!(w > 2 && h > 2)) return false;
@@ -630,8 +655,16 @@
   VP.dispose = function () {
     this.stop(); this._clear();
     if (this._ro) this._ro.disconnect();
+    if (this._io) this._io.disconnect();
+    if (this._onVis) document.removeEventListener('visibilitychange', this._onVis);
     if (this._bIO) this._bIO.disconnect();
     this.controls.dispose(); this.renderer.dispose();
     if (this.renderer.domElement.parentNode) this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
   };
+  }   // end boot()
+  if (typeof THREE !== 'undefined') boot();
+  else {
+    H.supported = function () { return false; };
+    H._boot = function () { if (typeof THREE === 'undefined') return false; delete H._boot; boot(); if (H._bootBrand) { var b = H._bootBrand; delete H._bootBrand; b(); } return true; };
+  }
 })(HB3D);

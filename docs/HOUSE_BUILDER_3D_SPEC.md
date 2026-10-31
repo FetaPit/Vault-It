@@ -1,6 +1,6 @@
 # House Builder 3D — engineering spec
 
-Replaces the hand-drawn SVG isometric scene with a real Three.js (r128, global `THREE` + `THREE.OrbitControls`, already loaded in `<head>`) scene in which **every brick, block, tile, joist, truss and frame is a 3D object at true UK scale**. The SVG engine stays in the file as a fallback when WebGL / three.js is unavailable.
+Replaces the hand-drawn SVG isometric scene with a real Three.js (r128, global `THREE` + `THREE.OrbitControls`, fetched on first need by `viThree()` in `<head>` and in the background once the page is idle; the engine boots itself when it lands) scene in which **every brick, block, tile, joist, truss and frame is a 3D object at true UK scale**. The SVG engine stays in the file as a fallback when WebGL / three.js is unavailable.
 
 ## 1. Units, axes, conventions
 - **Metres.** Y is up. X runs along the street frontage (left → right as seen from the street). The **front façade lies on z = 0 and faces +Z**; the building occupies z ≤ 0 (depth runs towards −Z). Front garden / street are z > 0.
@@ -37,7 +37,7 @@ Replaces the hand-drawn SVG isometric scene with a real Three.js (r128, global `
 
 ## 3. Architecture
 ```
-<script>  // <<HB3D_ENGINE   (placed right after the three.js <script> tags in <head>)
+<script>  // <<HB3D_ENGINE   (placed right after the viThree loader script in <head>; three.js itself is injected on demand)
   HB3D.UK, HB3D.supported(), HB3D.Kit (geometry builder), HB3D.models.{terraced,semi,detached,mansion,flat,apartment},
   HB3D.build(type, opts) → Model, HB3D.Viewer(containerEl)
 // HB3D_ENGINE>>

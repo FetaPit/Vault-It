@@ -24,8 +24,8 @@ let html = fs.readFileSync(HTML, 'utf8');
 const re = /<script>\n\/\/ <<HB3D_ENGINE[\s\S]*?\/\/ HB3D_ENGINE>>\n<\/script>/;
 if (re.test(html)) html = html.replace(re, () => block);
 else {
-  const anchor = '<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>';
-  if (html.indexOf(anchor) < 0) throw new Error('OrbitControls script tag not found');
+  const anchor = '  if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 6000 }); else setTimeout(go, 2500);\n});\n</script>';   // the end of the viThree loader script
+  if (html.indexOf(anchor) < 0) throw new Error('viThree loader script not found');
   html = html.replace(anchor, anchor + '\n' + block);
 }
 fs.writeFileSync(HTML, html);

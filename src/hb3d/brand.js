@@ -129,6 +129,7 @@
       stage: stageName(P, p, row), keys: p >= 0.999 };
   };
 
+  function boot() {   // the viewer methods need THREE and H.Viewer; with three.js loaded later (viThree) H._boot calls this
   if (!H.Viewer || typeof THREE === 'undefined') return;
   var VP = H.Viewer.prototype;
 
@@ -514,4 +515,6 @@
     return !busy;
   };
   VP.brandInfo = function () { return this._brandActive() ? this._bInfo : null; };
+  }   // end boot()
+  if (H.Viewer) boot(); else H._bootBrand = boot;
 })(HB3D);
