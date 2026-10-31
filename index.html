@@ -13422,6 +13422,8 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 #vi-fb-btn{position:fixed;right:14px;bottom:calc(var(--footer-h,30px) + 14px);z-index:450;display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .5);color:var(--teal);font:600 .62rem 'Syne',sans-serif;letter-spacing:.06em;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer}
 #vi-fb-btn .vi-ic{width:16px;height:16px}
 #vi-fb-btn.vi-fb-left{right:auto;left:14px}
+#vi-fb-btn.vi-fb-top{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 62px)}
+#vi-fb-btn.vi-fb-away{opacity:0;pointer-events:none}
 #vi-fb-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 @media(max-width:600px){#vi-fb-btn span{display:none}#vi-fb-btn{padding:10px}}
 .vi-fb-card{max-width:440px;width:100%}
@@ -28133,10 +28135,11 @@ function makeNW(cv,o){
     var lf=clamp(cw*.022,9,12),lines={};
     function names(back){c.font=lf+"px 'Share Tech Mono',monospace";c.textAlign="center";c.textBaseline="alphabetic";
     cols.filter(function(cc){return (LZ[cc.key]<0)===back}).map(function(cc){return {c:cc,q:P.pt(X[cc.key],0,LZ[cc.key])}}).sort(function(a,b){return a.q[0]-b.q[0]}).forEach(function(L){
-      var placed=lines.box=lines.box||[],w=c.measureText(L.c.short).width,r=-1;L.q[0]=clamp(L.q[0],w/2+4,cw-w/2-4);L.q[1]=Math.min(L.q[1],ch-8-2*(lf+3));   /* full names (owner, 31 Oct): up to three staggered lines, never off the stage, never over another name */
+      var placed=lines.box=lines.box||[],w=c.measureText(L.c.short).width,r=-1;L.q[0]=clamp(L.q[0],w/2+4,cw-w/2-(L.q[1]>ch*.45?54:4));   /* clear of the zoom buttons */L.q[1]=Math.min(L.q[1],ch-14-2*(lf+3));   /* full names (owner, 31 Oct): up to three staggered lines, never off the stage, never over another name */
       for(var j=0;j<3&&r<0;j++){var yy=L.q[1]+j*(lf+3),x0=L.q[0]-w/2-3,x1=L.q[0]+w/2+3;if(!placed.some(function(B){return Math.abs(B.y-yy)<lf+2&&x0<B.x1&&x1>B.x0}))r=j}
       if(r<0)return;placed.push({x0:L.q[0]-w/2-3,x1:L.q[0]+w/2+3,y:L.q[1]+r*(lf+3)});
-      c.fillStyle=L.c.dir<0?rgba(PAL.red,.95):rgba(PAL.gold,.95);if(hover===L.c.key)c.fillStyle='#fff';   /* what you own in gold, like the dashboard tag; debts stay red */c.fillText(L.c.short,L.q[0],L.q[1]+r*(lf+3))})}
+      var ly=L.q[1]+r*(lf+3);c.fillStyle="rgba(8,8,8,.72)";c.fillRect(L.q[0]-w/2-3,ly-lf*1.05,w+6,lf*1.5);   /* the income flow's label plate: transparent black behind the name (owner, 31 Oct) */
+      c.fillStyle=L.c.dir<0?rgba(PAL.red,.95):rgba(PAL.gold,.95);if(hover===L.c.key)c.fillStyle='#fff';   /* what you own in gold, like the dashboard tag; debts stay red */c.fillText(L.c.short,L.q[0],ly)})}
     if(narrow){items.forEach(function(g){if(g.dir>0)paint(g)});names(true);names(false)}   /* phones: names on top of the blocks, so none hides behind a column */
     else{names(true);items.forEach(function(g){if(g.dir>0)paint(g)});names(false)}
     var l1=debt<=0&&net>=0?"OUT OF THE RED":red?"IN THE RED":"NET WORTH";
@@ -28843,10 +28846,13 @@ function init(){
   try{if(window.bd3d&&!bd3d.show._fb){var os=bd3d.show;bd3d.show=function(v,user){var r=os.apply(this,arguments);if(v==='3d'&&user)setTimeout(function(){viFbMoment('bd3d')},8000);return r};bd3d.show._fb=true}}catch(e){}
   if(!document.getElementById('vi-fb-btn')){var b=document.createElement('button');b.id='vi-fb-btn';b.type='button';b.setAttribute('aria-label','Send feedback');b.title='Send feedback';
     b.innerHTML='<svg class="vi-ic" aria-hidden="true"><use href="#vi-chat"/></svg><span>Feedback</span>';b.onclick=function(){viFbOpen()};document.body.appendChild(b);
-    var pend=0,dodge=function(){pend=0;b.classList.remove('vi-fb-left');var r=b.getBoundingClientRect();if(!r.width)return;
+    var pend=0,dodge=function(){pend=0;b.classList.remove('vi-fb-left','vi-fb-top','vi-fb-away');var r=b.getBoundingClientRect();if(!r.width)return;
+      /* a 3D stage is never covered (owner, 31 Oct): bottom right, then bottom left, then the top edge, then tucked away while a stage fills the screen */
+      var onStage=function(){var q=b.getBoundingClientRect();return [].some.call(document.querySelectorAll('.nw3d-stage,.inv-stage,.i3d-stage'),function(s){var t=s.getBoundingClientRect();return t.width>0&&!(q.right<=t.left||q.left>=t.right||q.bottom<=t.top||q.top>=t.bottom)})};
       var hit=function(){var pts=[[r.left+4,r.top+4],[r.right-4,r.top+4],[r.left+4,r.bottom-4],[r.right-4,r.bottom-4],[r.left+r.width/2,r.top+r.height/2]];
         return pts.some(function(q){return document.elementsFromPoint(q[0],q[1]).some(function(el){return el!==b&&!b.contains(el)&&el.closest&&el.closest('button,a,input,select,textarea,[onclick],[role=button]')&&!el.closest('#vi-fb-btn')})})};
-      if(hit()){b.classList.add('vi-fb-left');r=b.getBoundingClientRect();if(hit())b.classList.remove('vi-fb-left')}};
+      if(hit()){b.classList.add('vi-fb-left');r=b.getBoundingClientRect();if(hit())b.classList.remove('vi-fb-left')}
+      if(onStage()){b.classList.remove('vi-fb-left');b.classList.add('vi-fb-left');if(onStage()){b.classList.remove('vi-fb-left');b.classList.add('vi-fb-top');if(onStage()){b.classList.remove('vi-fb-top');b.classList.add('vi-fb-away')}}}};
     var later=function(){if(!pend)pend=requestAnimationFrame(dodge)};window.addEventListener('scroll',later,{passive:true});window.addEventListener('resize',later);document.addEventListener('click',function(){setTimeout(later,350)},true);setTimeout(later,600);setInterval(function(){if(!document.hidden)later()},1500);window.viFbDodge=dodge}
   var row=document.getElementById('set-fbact');if(row)[].forEach.call(row.children,function(x){x.classList.toggle('active',x.dataset.val===(actOn()?'1':'0'))});
 }
