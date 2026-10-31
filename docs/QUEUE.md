@@ -13,6 +13,8 @@ The single list of instructed work. Every session reads it at start and before e
 
 - [~] Tester feedback (owner, 31 Oct evening; "the final task before tester launch"): "We need an optimal low effort and maximal utility method for each tester to send their feedback to us. What would be a tech AI enhanced way to do this making it easy for the user and giving us back end and user session activity." Owner chose (31 Oct): our own activity log in Supabase (no new host, no money figures); AI-sorted feedback as a daily email digest and a weekly themed report turned into queue items; screenshot attached by default with money figures blurred (tester can untick); build and test locally, then ask before applying the migration and deploying. Owner, 31 Oct later: "We need to add way more specific separate questions from the user to identify honest feedback prior to launch": a bank of short, specific, skippable questions (contextual one-question prompts after key features, and two-minute check-ins on trial days 3, 14 and 25), written to get honest answers (what they did and expected, not whether they like it).
 
+- [ ] Bring in the owner's local Claude kit from their laptop (owner, 31 Oct): waiting for the laptop folder to be shared with this session
+
 ## Waiting on the owner
 
 - Split `index.html` into source files (owner, 31 Oct: remind in one week): Google Calendar reminder Sat 7 Nov 09:30. Plan in `docs/CLAUDE_EFFICIENCY.md` section 6; needs the owner's go
