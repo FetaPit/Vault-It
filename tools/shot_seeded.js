@@ -7,7 +7,7 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
   fs.mkdirSync('shots/qc', { recursive: true }); const b = await chromium.launch();
   for (const theme of ['dark', 'light']) for (const w of [390, 1100]) {
     const phone = w < 700, ctx = await b.newContext({ viewport: { width: w, height: phone ? 844 : 900 }, deviceScaleFactor: phone ? 2 : 1, isMobile: phone, hasTouch: phone });
-    await ctx.route(/^https?:/, r => r.abort()); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+    await require('../tests/three_route')(ctx); await ctx.route(/fonts\.(googleapis|gstatic)/, r => r.fulfill({ status: 200, contentType: 'text/css', body: '' })); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(seed, { theme, flag: true }); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#trial-banner,#tester-welcome{display:none!important}' });
     await p.evaluate(t => { showTab(t || 'overview'); }, a.tab); if (a.js) await p.evaluate(a.js); await p.waitForTimeout(1800);

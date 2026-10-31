@@ -20466,8 +20466,8 @@ V3Scene.prototype.frame=function(keep){
   var c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3()),R=Math.max(s.x,s.z,s.y*1.6,20);
   this.catcher.scale.set(R*3,R*3,1);this.catcher.position.x=c.x;this.catcher.position.z=c.z;
   if(this.grid){this.sc.remove(this.grid);this.grid.geometry.dispose();this.grid.material.dispose();}
-  var size=Math.ceil(R*14/10)*10,cell=Math.max(5,Math.ceil(size/400/5)*5),div=Math.round(size/cell);
-  var g=this.grid=new THREE.GridHelper(size,div,0x44C0B9,0x44C0B9);g.material.transparent=true;g.material.opacity=0.3;g.material.depthWrite=false;g.material.fog=false;g.material.toneMapped=false;g.position.set(c.x,0.01,c.z);this.sc.add(g);
+  this.R=R;var size=Math.ceil(R*7/10)*10,cell=Math.max(5,Math.ceil(size/160/5)*5),div=Math.round(size/cell);   /* owner, 31 Oct: a shorter draw distance, so the scene is lighter; the grid fades out in the fog, no hard edge */
+  var g=this.grid=new THREE.GridHelper(size,div,0x44C0B9,0x44C0B9);g.material.transparent=true;g.material.opacity=0.3;g.material.depthWrite=false;g.material.fog=true;g.material.toneMapped=false;g.position.set(c.x,0.01,c.z);this.sc.add(g);
   /* the same floor as Net worth in 3D: a teal glow under the items and a gold-edged plinth round them */
   if(this.deco){this.sc.remove(this.deco);this.deco.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}});}
   var deco=this.deco=new THREE.Group(),pad=Math.max(2,R*0.08),px0=box.min.x-pad,px1=box.max.x+pad,pz0=box.min.z-pad,pz1=box.max.z+pad;
@@ -20476,7 +20476,7 @@ V3Scene.prototype.frame=function(keep){
   var fill=new THREE.Mesh(new THREE.PlaneBufferGeometry(px1-px0,pz1-pz0),new THREE.MeshBasicMaterial({color:0x0b2a2c,transparent:true,opacity:0.55,depthWrite:false,toneMapped:false}));fill.rotation.x=-Math.PI/2;fill.position.set((px0+px1)/2,0.008,(pz0+pz1)/2);deco.add(fill);
   var edge=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(px0,0.02,pz0),new THREE.Vector3(px1,0.02,pz0),new THREE.Vector3(px1,0.02,pz1),new THREE.Vector3(px0,0.02,pz1)]),new THREE.LineBasicMaterial({color:0xE8C56A,transparent:true,opacity:0.95,toneMapped:false}));deco.add(edge);
   this.sc.add(deco);
-  this.sc.fog.near=R*2.2;this.sc.fog.far=R*6;
+  this.sc.fog.near=R*2.2;this.sc.fog.far=R*5;
   var sun=this.sun;sun.position.set(c.x+R*.9,R*1.4,c.z+R*1.1);sun.target.position.copy(c);var sc=sun.shadow.camera,e=R*3;sc.left=-e;sc.right=e;sc.top=e;sc.bottom=-e;sc.near=1;sc.far=R*40;sc.updateProjectionMatrix();   // wide enough that the floor near the camera is never left in false shadow
   var t0=new THREE.Vector3(c.x,s.y*0.3,c.z),p0=new THREE.Vector3(c.x+R*1.05,R*1.0+s.y,c.z+R*1.45),dir=p0.clone().sub(t0),cam=this.cam;
   // fit everything (labels too) inside the narrower of the two view angles, so a phone held upright sees the whole scene
