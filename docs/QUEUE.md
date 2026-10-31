@@ -9,8 +9,8 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [~] Release the MVP (owner, 31 Oct pm, "release when ready"): full suite on 792604c, backup branch `backup/release-pioneer-v2-20261031-mvp`, fast-forward `release/pioneer-v2`. The session cannot push to the production branch (permission layer); the owner pushes from Git Bash with the commands given in chat
-- [ ] Round 3 (owner, 31 Oct 16:40, twenty edits, start only after the release above; the brief re-stated as an Anthropic dev and a fintech dev is `docs/ROUND3_BRIEF.md`):
+- [~] Release the MVP (owner, 31 Oct pm, "release when ready"; 17:00 "do that": release by pull request the owner merges from the GitHub app, since the session cannot push to the production branch). Full suite on 792604c: everything green except `test_hb_brand`, which failed about one run in four with two real faults: the house panel could stay on "Counting bricks…" and the gold ROW tag could keep the previous house's figures after a house change. Both fixed in the release commit; then the house builder and smoke tests re-run. Backup branch `backup/release-pioneer-v2-20261031-mvp`, frozen branch `release-mvp-20261031`, pull request into `release/pioneer-v2`
+- [~] Round 3 (owner, 31 Oct 16:40, twenty edits; owner reordered 17:00: start now, alongside the release pull request; the brief re-stated as an Anthropic dev and a fintech dev is `docs/ROUND3_BRIEF.md`):
   1. Dashboard forecast: small text bottom right of the tile saying what the forecast is based on, depends on and limited by
   2. Assets and liabilities dashboard tile: proportional value scale on the x axis, like the debt tile
   3. Debt tile: the amount paid off shown as a green bar from the right

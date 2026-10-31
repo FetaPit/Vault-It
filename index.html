@@ -15593,6 +15593,10 @@ function hbRenderHUD(){
   var _hti=document.getElementById('house-tab-inner');if(_hti)_hti.setAttribute('data-lvl',String(hbView()));
   var view=hbView(),p=pct(),dt=depositTarget(),rem=Math.max(0,dt-(state.saved||0));
   var _bi=hbBrickInfo(),brickTotal=_bi?_bi.total:0,perBrick=_bi?_bi.perBrick:0;
+  // the model can finish building on another path (the viewer) without this panel hearing about it: until the count is
+  // known, look again every half second for up to 15 s, so it never stays on "Counting bricks…" (owner, 31 Oct: house builder)
+  clearTimeout(window._hbHudRetry);
+  if(_bi)window._hbHudTries=0;else if((window._hbHudTries=(window._hbHudTries||0)+1)<=30)window._hbHudRetry=setTimeout(function(){try{hbRenderHUD();hbWriteStats();}catch(e){}},500);
   var _pb=document.getElementById('hb-plan-brick');if(_pb)_pb.textContent=_bi?'Each brick is worth about '+(window.VI_CURRENCY_SYMBOL||'£')+(perBrick*(window.VI_CURRENCY_RATE||1)).toFixed(2)+' of your deposit.':'';
   var _bLaid=_bi?Math.min(brickTotal,(hbBrandModel(_bi.model)?HB3D.brandStats(_bi.model,_isPro()?p:0.04):_bi.model.stats(_isPro()?p:0.04)).bricksLaid):0,_sym=window.VI_CURRENCY_SYMBOL||'£',_rate=window.VI_CURRENCY_RATE||1;
   var inp=document.getElementById('depositPctInput');if(inp&&document.activeElement!==inp)inp.value=state.depositPct;
@@ -16493,6 +16497,12 @@ function hb3dRedraw() {
     } else v.setState({ mode: sm.mode, p: sm.p, eq: sm.eq || 0, lights: lights });
     HB3DAPP.lastP = sm.p; HB3DAPP.lastMode = sm.mode;
     hb3dOverlays(sm);
+    // wake the frame loop (it sleeps when still) and place the labels again once the new state has been drawn, so the gold
+    // ROW tag, brick pill and caption never keep the previous house's figures (owner, 31 Oct: house builder)
+    if (typeof v.wake === 'function') v.wake();
+    clearTimeout(HB3DAPP.olT1); clearTimeout(HB3DAPP.olT2);
+    HB3DAPP.olT1 = setTimeout(function () { try { hb3dPlaceOverlays(); } catch (e) {} }, 300);
+    HB3DAPP.olT2 = setTimeout(function () { try { hb3dPlaceOverlays(); } catch (e) {} }, 1200);
     return true;
   } catch (e) {
     HB3D._failed = true;
