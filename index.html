@@ -10138,7 +10138,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   #topnav .vi-usp,#topnav .vi-pro{top:4px;right:4px}
   #left-sidebar{top:46px!important}
   #app-footer{position:static;margin-top:16px}
-  html body #sync-banner{bottom:calc(var(--footer-h) + 6px)!important}
+  html body #sync-banner,html body #trial-banner{bottom:calc(var(--footer-h) + 6px)!important}
 }
 </style>
 <style id="vi-wordmark">
@@ -10174,6 +10174,14 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 /* secondary buttons (Cancel and the like): outline, ink text, AA on paper */
 [data-theme="light"] .btn-add-data[style*="color:var(--t3)"]{color:var(--text)!important;background:transparent!important;border-color:var(--lock)!important}
 [data-theme="light"] #sync-banner{color:var(--text)!important;border-color:var(--amber)!important}
+/* trial then paid: the plans prompt (no free column, Founding Member first) and the foot-of-page trial line */
+#pro-offer-modal.vi-trial-end .vi-tier-table{grid-template-columns:1fr 1fr}
+#pro-offer-modal.vi-trial-end .vi-tier-table>.vi-tier-col:first-child{display:none}
+#pro-offer-modal.vi-trial-end .vi-tier-founder{order:-1}
+#trial-banner{position:fixed;left:8px;right:8px;bottom:8px;z-index:10001;background:var(--panel);color:var(--text);border:1px solid var(--teal);border-radius:10px;padding:10px 12px;font-size:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 8px 24px rgb(0 0 0 / .25)}
+#trial-banner.trial-warn{border-color:var(--amber)}
+#trial-banner .trial-msg{flex:1;min-width:180px;line-height:1.45}
+#trial-banner .trial-x{background:none;border:0;color:var(--t2);font-size:14px;cursor:pointer;padding:2px 6px;min-width:32px;min-height:32px}
 /* House builder: parchment text from the old tracker becomes ink */
 [data-theme="light"] .price-edit-row label,[data-theme="light"] .igrp label,[data-theme="light"] .tgt-amt,[data-theme="light"] .sl,[data-theme="light"] .log-entry,[data-theme="light"] .scene-cap:not(.scene *){color:var(--muted)!important;opacity:1!important}
 [data-theme="light"] .ms-lbl{color:var(--lock)!important;opacity:1!important}
@@ -10666,8 +10674,8 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 
     <!-- STEP 1: Identity + goal -->
     <div id="w-step-1">
-      <div class="welcome-h2">Alpha testers get a free lifetime<br>Pro licence on beta release.</div>
-      <div class="welcome-sub">Register now to lock it in. Join the founding cohort shaping Vault-It. Your profile unlocks the full app and secures your Pioneer status forever.</div>
+      <div class="welcome-h2">Your first 30 days are free.<br>The whole app, no card.</div>
+      <div class="welcome-sub">Register to start your 30 days. After that, pick a plan to keep editing; your numbers stay yours either way. Beta testers get first call on the Founding Member places.</div>
       <div class="welcome-field">
         <label>First Name</label>
         <input type="text" class="welcome-inp" id="w-name" placeholder="Your first name" autocomplete="given-name">
@@ -10985,7 +10993,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
           </div>
         </div>
       </div>
-      <button class="vi-cta-ghost" onclick="document.getElementById('pro-offer-modal').classList.add('hidden')">Continue on free tier</button>
+      <button class="vi-cta-ghost" id="offer-ghost" onclick="document.getElementById('pro-offer-modal').classList.add('hidden')">Continue on free tier</button>
     </div>
   </div>
 </div>
@@ -13138,7 +13146,7 @@ html{font-size:calc(var(--vi-base,13px) * var(--vi-scale,1))}
 
 /* ── phones: calmer overlays ── */
 @media(max-width:700px){
-  #sync-banner{left:6px!important;right:6px!important;bottom:6px!important;padding:6px 8px!important;font-size:10px!important;gap:6px!important;border-radius:8px!important}
+  #sync-banner,#trial-banner{left:6px!important;right:6px!important;bottom:6px!important;padding:6px 8px!important;font-size:10px!important;gap:6px!important;border-radius:8px!important}
   #sync-banner span:first-child{min-width:0!important;line-height:1.3}
   #sync-banner .btn-add-data{padding:4px 8px!important;font-size:10px!important}
   #sidebar-toggle{width:20px!important;opacity:.8}
@@ -14158,7 +14166,7 @@ function renderMsExtras(){
   }
   try{updateKPIs();}catch(e){}
 }
-function addCustomGoal(){
+function addCustomGoal(){if(viBlockEdit())return;
   var n=viClean((document.getElementById('goal-name')||{}).value||'').trim().slice(0,30),a=parseFloat((document.getElementById('goal-amt')||{}).value);
   if(!n){showToast('Name your goal');return;}
   if(!(a>0)){showToast('Enter a target amount');return;}
@@ -14166,13 +14174,13 @@ function addCustomGoal(){
   document.getElementById('goal-name').value='';document.getElementById('goal-amt').value='';
   saveState();renderMsExtras();drawChart();showToast('Goal added: '+n);
 }
-function editCustomGoal(id,v){var g=(ovState.customGoals||[]).find(function(x){return x.id===id;});if(g){g.amount=parseFloat(v)||0;saveState();drawChart();updateKPIs();}}
-function delCustomGoal(id){ovState.customGoals=(ovState.customGoals||[]).filter(function(x){return x.id!==id;});saveState();renderMsExtras();drawChart();}
-function delSnapshot(m){ovState.snapshots=(ovState.snapshots||[]).filter(function(x){return x.month!==m;});saveState();renderMsExtras();drawChart();updateKPIs();}
+function editCustomGoal(id,v){if(viBlockEdit())return;var g=(ovState.customGoals||[]).find(function(x){return x.id===id;});if(g){g.amount=parseFloat(v)||0;saveState();drawChart();updateKPIs();}}
+function delCustomGoal(id){if(viBlockEdit())return;ovState.customGoals=(ovState.customGoals||[]).filter(function(x){return x.id!==id;});saveState();renderMsExtras();drawChart();}
+function delSnapshot(m){if(viBlockEdit())return;ovState.snapshots=(ovState.snapshots||[]).filter(function(x){return x.month!==m;});saveState();renderMsExtras();drawChart();updateKPIs();}
 (function(){var o=addSnapshot;})();
 // the add-forms start open on wide screens and tucked away (one tap) on phones
 window.addEventListener('load',function(){var w=window.innerWidth>=900;['ms-add-goal','ms-add-snap'].forEach(function(id){var d=document.getElementById(id);if(d&&w)d.open=true;});});
-function addSnapshot() {
+function addSnapshot() {if(viBlockEdit())return;
   var month = document.getElementById('snap-month').value;
   var nw    = parseFloat(document.getElementById('snap-nw').value);
   var debt  = parseFloat(document.getElementById('snap-debt').value) || 0;
@@ -15157,7 +15165,7 @@ function checkMS(np){
 }
 
 var _aptFloorT=null;
-function setApartmentFloor(v){
+function setApartmentFloor(v){if(viBlockEdit())return;
   state.apartmentFloor=parseInt(v)||1;
   var fd=document.getElementById('floor-display');
   if(fd)fd.textContent='Floor '+state.apartmentFloor;
@@ -15194,6 +15202,7 @@ document.getElementById('htypes').addEventListener('click',e=>{
 });
 
 document.getElementById('btnSP').addEventListener('click',()=>{
+  if(viBlockEdit())return;
   const v=parseInt((document.getElementById('priceInput').value||'').replace(/,/g,''));
   if(!v||v<1000){toast('Enter a valid price');return;}
   const vBase=Math.round(v/(window.VI_CURRENCY_RATE||1));
@@ -15205,6 +15214,7 @@ document.getElementById('btnSP').addEventListener('click',()=>{
 document.getElementById('priceInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnSP').click();});
 
 document.getElementById('btnAdd').addEventListener('click',()=>{
+  if(viBlockEdit())return;
   const v=parseFloat(document.getElementById('savingsInput').value);
   if(!v||v<=0){toast('Enter a valid amount');return;}
   const vBase=v/(window.VI_CURRENCY_RATE||1);
@@ -15249,7 +15259,7 @@ function _buildHabitYearSel(){
   sel.innerHTML=html;
 }
 
-function recordHabitContribution(amount){
+function recordHabitContribution(amount){if(viBlockEdit())return;
   if(!state.habitLog)state.habitLog=[];
   var key=getHabitPeriodKey();
   var existing=state.habitLog.find(function(h){return h.date===key;});
@@ -15385,7 +15395,7 @@ function hbBackup(){try{localStorage.setItem('vi_bak_ht3',JSON.stringify({at:new
 // £100,000 house, 20% goal: £80,000 is 100%, so £2,000 over the goal builds 2.5%.
 function hbL2Base(){var pu=state.purchase||{},price=+pu.price||+state.valuation||+state.target||0,dtp=+pu.depositTarget||price*(+state.depositPct||0)/100;return Math.max(1,price-dtp);}
 function hbL2Progress(){var bal=Math.max(0,+state.mortgageBalance||0),base=hbL2Base();return Math.min(1,Math.max(0,(base-bal)/base));}
-function hbPayMortgage(vBase){
+function hbPayMortgage(vBase){if(viBlockEdit())return;
   var before=Math.max(0,+state.mortgageBalance||0),paid=Math.min(before,vBase);
   state.mortgageBalance=Math.round((before-paid)*100)/100;
   (state.payments=state.payments||[]).push({amount:paid,date:new Date().toLocaleDateString('en-GB')});
@@ -15393,7 +15403,7 @@ function hbPayMortgage(vBase){
   var sym=window.VI_CURRENCY_SYMBOL||'£';
   toast(state.mortgageBalance<=0?'Mortgage paid off. The house is all yours!':'-'+sym+(paid*(window.VI_CURRENCY_RATE||1)).toLocaleString('en-GB',{maximumFractionDigits:2})+' off the mortgage');
 }
-function hbUndoPurchase(){
+function hbUndoPurchase(){if(viBlockEdit())return;
   if(state.houseMode!=='purchased')return;
   if(!confirm('Not bought yet? This takes the house back to Level 1 (saving for the deposit). Your savings log, house type, price and deposit % are kept.'))return;
   hbBackup();hbClearPurchase();prevP=0;save();updateUI();updateKPIs();toast('Back to Level 1: saving for your deposit');
@@ -15424,7 +15434,7 @@ var HB_BADGES=[[.01,'Site cleared'],[.05,'Foundations'],[.10,'10%'],[.25,'Quarte
 function hbLevel(){if(state.houseMode==='purchased')return state.level3?3:2;return 1;}
 function hbView(){var v=+state.viewLevel,c=hbLevel();return(v>=1&&v<=c)?v:c;}
 function hbSetView(n){if(n>hbLevel()){toast('Finish Level '+(n-1)+' to unlock Level '+n);return;}state.viewLevel=n;save();updateUI();}
-function hbSetDepositPct(v){
+function hbSetDepositPct(v){if(viBlockEdit())return;
   v=parseFloat(v);var inp=document.getElementById('depositPctInput');
   if(!(v>=1&&v<=60)){toast('Choose a deposit between 1% and 60%');if(inp)inp.value=state.depositPct;return;}
   state.depositPct=Math.round(v*10)/10;save();updateUI();
@@ -15544,7 +15554,7 @@ function hbOpenMortgageEntry(first){
   var f=document.getElementById('hbm-lender'); if(f) f.focus();
 }
 function hbCloseMortgageEntry(){var o=document.getElementById('hbm-ov');if(o)o.remove();}
-function hbSaveMortgageEntry(){
+function hbSaveMortgageEntry(){if(viBlockEdit())return;
   var g=function(id){var e=document.getElementById('hbm-'+id);return e?String(e.value).trim():'';};
   var bal=parseFloat(g('bal')),rate=parseFloat(g('rate')),term=parseInt(g('term'),10),fix=g('fix'),lender=g('lender').slice(0,60);
   if(!(isFinite(bal)&&bal>=0)){toast('Enter the balance your lender shows');return;}
@@ -15857,14 +15867,14 @@ function hbcSchedule(save_){clearTimeout(_hbcT);_hbcT=setTimeout(function(){hbcU
 function hbcPersist(){try{state.calc=hbcRead().raw;save();}catch(e){}}
 function hbcSet(id,v){var e=document.getElementById('hbc-'+id);if(!e)return;if(e.type==='checkbox')e.checked=!!v;else e.value=v;}
 function hbcFromPrice(){var p=parseFloat(hbcGet('price'))||0,d=parseFloat(hbcGet('dep'))||0;hbcSet('bal',Math.max(0,Math.round(p-d)));hbcUpdate();hbcPersist();}
-function hbcSaveBalance(){var b=parseFloat(hbcGet('bal'))||0;state.mortgageBalance=Math.round(b);var v=parseFloat(hbcGet('val'));if(v>0)state.valuation=v;hbcPersist();save();updateUI();toast('Current balance saved: '+hbMoney(b));}
-function hbcAddLump(){
+function hbcSaveBalance(){if(viBlockEdit())return;var b=parseFloat(hbcGet('bal'))||0;state.mortgageBalance=Math.round(b);var v=parseFloat(hbcGet('val'));if(v>0)state.valuation=v;hbcPersist();save();updateUI();toast('Current balance saved: '+hbMoney(b));}
+function hbcAddLump(){if(viBlockEdit())return;
   var m=parseInt(document.getElementById('hbc-lm').value),a=parseFloat(document.getElementById('hbc-la').value);
   if(!(m>=1)||!(a>0)){toast('Enter the month number and an amount');return;}
   var cur=hbcRead().raw;cur.lumps=(cur.lumps||[]).concat([{month:m,amount:a}]).sort(function(x,y){return x.month-y.month;});
   state.calc=cur;save();document.getElementById('hbc-la').value='';hbcRenderLumps();hbcUpdate();
 }
-function hbcDelLump(i){var cur=hbcRead().raw;cur.lumps.splice(i,1);state.calc=cur;save();hbcRenderLumps();hbcUpdate();}
+function hbcDelLump(i){if(viBlockEdit())return;var cur=hbcRead().raw;cur.lumps.splice(i,1);state.calc=cur;save();hbcRenderLumps();hbcUpdate();}
 function hbcRenderLumps(){
   var el=document.getElementById('hbc-lumps');if(!el)return;var l=(hbcFields().lumps)||[];
   el.innerHTML=l.length?l.map(function(x,i){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-top:1px solid rgb(var(--ink-rgb) / .06)"><span>Month '+x.month+' · <b>'+hbMoney(x.amount)+'</b></span><button type="button" class="stk-btn" onclick="hbcDelLump('+i+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>';}).join(''):'<div style="color:var(--t3);font-size:11px">None yet</div>';
@@ -16096,7 +16106,7 @@ function _hbIdb() {
 }
 function hbDesignPut(buf) { return _hbIdb().then(function (db) { return new Promise(function (res, rej) { var tx = db.transaction('designs', 'readwrite'); tx.objectStore('designs').put(buf, 'current'); tx.oncomplete = function () { res(); }; tx.onerror = function () { rej(tx.error); }; }); }); }
 function hbDesignGet() { return _hbIdb().then(function (db) { return new Promise(function (res, rej) { var rq = db.transaction('designs').objectStore('designs').get('current'); rq.onsuccess = function () { res(rq.result || null); }; rq.onerror = function () { rej(rq.error); }; }); }); }
-function hbDesignDel() { return _hbIdb().then(function (db) { return new Promise(function (res) { var tx = db.transaction('designs', 'readwrite'); tx.objectStore('designs').delete('current'); tx.oncomplete = function () { res(); }; tx.onerror = function () { res(); }; }); }).catch(function () {}); }
+function hbDesignDel() {if(viBlockEdit())return; return _hbIdb().then(function (db) { return new Promise(function (res) { var tx = db.transaction('designs', 'readwrite'); tx.objectStore('designs').delete('current'); tx.oncomplete = function () { res(); }; tx.onerror = function () { res(); }; }); }).catch(function () {}); }
 function _hbGltfLoader() {
   var G = window.THREE && (THREE.GLTFLoader || window.GLTFLoader);
   if (G) return Promise.resolve(G);
@@ -16149,7 +16159,7 @@ function hbDesignToggle(on) {
   if (on) hbDesignEnsure();
   hbDesignCard(); if (typeof updateUI === 'function') updateUI();
 }
-function hbDesignRemove() {
+function hbDesignRemove() {if(viBlockEdit())return;
   hbDesignDel(); hbDesignSetMeta(null); HB3DAPP.customModel = null; HB3DAPP.designId = '';
   hbDesignCard(); if (typeof updateUI === 'function') updateUI();
   if (typeof showToast === 'function') showToast('Design removed. Back to the standard ' + (state.houseType || 'house'));
@@ -17696,6 +17706,7 @@ async function _syncPioneerFromProfile(uid) {
       _lsOrig.call(localStorage, 'vi_pioneer', 'true');
     }
   } catch(e) {}
+  try { viTrialRefresh(); } catch (e) {}   // the account date is known now: the trial line and Settings follow it
 }
 
 async function _initSupabaseSession() {
@@ -18519,7 +18530,7 @@ function _completeAuth(email) {
 }
 
 // ── DATA RESET ────────────────────────────────────────────────
-function resetVaultData() {
+function resetVaultData() {if(viBlockEdit())return;
   if (!confirm('RESET FINANCIAL DATA\n\nThis clears your current:\n• Assets & liabilities\n• Debts\n• Cashflow history\n• Business data\n• Achievements & XP\n\nYour profile, Pioneer status, and API keys are kept.\n\nEarlier versions stay in Version history & restore for up to 180 days. To remove everything for good, delete your account in Settings.\n\nContinue?')) return;
   var dataKeys = ['pos_al1','pos_debt1','pos_ov1','pos_biz1','pos_ach1','pos4','pos_house','ht3','pos_journey','vi_jrny_events','vi_nw_history','vi_debt','vi_ov'];
   // clear the account's cloud copy too — otherwise signing in brings the old figures straight back
@@ -18747,7 +18758,7 @@ function bdRenderNew(){
       +'<div class="bd-new-row" style="margin-top:8px"><button class="btn-add-data" onclick="bdSaveNew(\''+kind+'\')">Save category</button><button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="bdToggleNew(\''+kind+'\')">Cancel</button></div>';
   });
 }
-function bdSaveNew(kind){
+function bdSaveNew(kind){if(viBlockEdit())return;
   var n=((document.getElementById('bd-new-name-'+kind)||{}).value||'').trim();
   if(!n){showToast('Give your category a name');return;}
   if(!ovState.customCats)ovState.customCats=[];
@@ -18758,7 +18769,7 @@ function bdSaveNew(kind){
   saveState();bdRender();bdPick(kind,c.k);
   showToast('“'+n+'” added');
 }
-function bdDelCat(kind,key){
+function bdDelCat(kind,key){if(viBlockEdit())return;
   var c=(ovState.customCats||[]).find(function(x){return x.k===key;});
   if(!c||!confirm('Delete the category “'+c.n+'”? Lines using it become “Other”.'))return;
   ovState.customCats=ovState.customCats.filter(function(x){return x.k!==key;});
@@ -18766,7 +18777,7 @@ function bdDelCat(kind,key){
   saveState();bdRender();
 }
 // ── add income / spending ──
-function addIncome(){
+function addIncome(){if(viBlockEdit())return;
   var nEl=document.getElementById('cf-inc-name'),aEl=document.getElementById('cf-inc-amt');
   var a=parseFloat(aEl.value),n=nEl.value.trim();
   if(!n&&_bdSel.inc)n=bdFind('inc',_bdSel.inc).n;
@@ -18776,7 +18787,7 @@ function addIncome(){
   nEl.value='';aEl.value='';_bdSel.inc=null;_bdAuto.inc='';
   saveState();renderCashflow();updateKPIs();
 }
-function addExpense(){
+function addExpense(){if(viBlockEdit())return;
   var nEl=document.getElementById('cf-exp-name'),aEl=document.getElementById('cf-exp-amt');
   var a=parseFloat(aEl.value),n=nEl.value.trim();
   if(!n&&_bdSel.exp)n=bdFind('exp',_bdSel.exp).n;
@@ -18791,8 +18802,8 @@ function addExpense(){
   if(sel){sel.value='ce';delete sel.dataset.touched;}
   saveState();renderCashflow();updateKPIs();
 }
-function delIncome(id){ovState.income=(ovState.income||[]).filter(function(r){return r.id!==id;});saveState();renderCashflow();updateKPIs();}
-function delExpense(id){ovState.expenses=(ovState.expenses||[]).filter(function(r){return r.id!==id;});saveState();renderCashflow();updateKPIs();}
+function delIncome(id){if(viBlockEdit())return;ovState.income=(ovState.income||[]).filter(function(r){return r.id!==id;});saveState();renderCashflow();updateKPIs();}
+function delExpense(id){if(viBlockEdit())return;ovState.expenses=(ovState.expenses||[]).filter(function(r){return r.id!==id;});saveState();renderCashflow();updateKPIs();}
 function cfMoney(n){
   var rate=window.VI_CURRENCY_RATE||1,sym=window.VI_CURRENCY_SYMBOL||'£';
   var v=(isNaN(n)||n==null?0:n)*rate;
@@ -18944,7 +18955,7 @@ function bdRowHTML(kind,r){
   return h+'</div>';
 }
 function bdItem(kind,id){return ((kind==='exp'?ovState.expenses:ovState.income)||[]).find(function(x){return x.id===id;});}
-function bdSetCat(kind,id,key){
+function bdSetCat(kind,id,key){if(viBlockEdit())return;
   var r=bdItem(kind,id);if(!r)return;
   r.cat=key;delete r.icon;
   if(kind==='exp'&&!r.typeLocked){var t=bdFind('exp',key).t||'ve';r.type=t;r.category=cfGroupToCat(t);}
@@ -18993,7 +19004,7 @@ function bdRenderLists(){
   });
   el.innerHTML='<div class="bd-tiles">'+html+'</div>';
 }
-function bdQuickAdd(g){
+function bdQuickAdd(g){if(viBlockEdit())return;
   var n=((document.getElementById('bd-qa-n-'+g)||{}).value||'').trim(),a=parseFloat((document.getElementById('bd-qa-a-'+g)||{}).value);
   if(!n||!(a>0)){showToast('Enter a name and a monthly amount');return;}
   n=viClean(n).slice(0,40);
@@ -19015,9 +19026,9 @@ function bdGroupIcon(g,px){
   else body='<path d="M3 17.500 9 11.500l4 4 8-9"/><path d="M15 6.500h6v6"/><path d="M3 21h18" opacity=".5"/>';
   return '<svg viewBox="0 0 24 24" width="'+px+'" height="'+px+'" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+body+'</svg>';
 }
-function bdEdit(kind,id){_bdEdit={kind:kind,id:id};bdRenderLists();}
+function bdEdit(kind,id){if(viBlockEdit())return;_bdEdit={kind:kind,id:id};bdRenderLists();}
 function bdCancelEdit(){_bdEdit=null;bdRenderLists();}
-function bdSaveEdit(){
+function bdSaveEdit(){if(viBlockEdit())return;
   if(!_bdEdit)return;
   var r=bdItem(_bdEdit.kind,_bdEdit.id);
   if(!r){_bdEdit=null;return;}
@@ -19267,7 +19278,7 @@ function stkPlatformFile(inp){
   img.onerror=function(){URL.revokeObjectURL(u);showToast('That image could not be read');};
   img.src=u;
 }
-function stkPlatformSave(remove){
+function stkPlatformSave(remove){if(viBlockEdit())return;
   var p=alState.stockPies.find(function(x){return x.id===_platEdit.id;});if(!p)return;
   var name=viClean(String((document.getElementById('stk-plat-name')||{}).value||_platEdit.name||'').trim()).slice(0,40);
   if(remove||(!name&&!_platEdit.logo))delete p.platform,p.platformOff=true;
@@ -19303,7 +19314,7 @@ function stkAgo(ts){
   var m=Math.round((Date.now()-ts)/60000);
   return m<1?'just now':m<60?m+'m ago':m<1440?Math.round(m/60)+'h ago':Math.round(m/1440)+'d ago';
 }
-function stkSave(){saveAL();if(typeof updateKPIs==='function')updateKPIs();stkRender();if(typeof renderSummaryCards==='function')try{renderSummaryCards();}catch(e){}}
+function stkSave(){if(viBlockEdit())return;saveAL();if(typeof updateKPIs==='function')updateKPIs();stkRender();if(typeof renderSummaryCards==='function')try{renderSummaryCards();}catch(e){}}
 
 // ── donut ──
 function stkDonut(slices,total,top,sub,subCol){
@@ -19415,7 +19426,7 @@ function stkRenamePie(){
   if(!n||!n.trim())return;
   p.name=n.trim().slice(0,40);saveAL();stkRender();
 }
-function stkDeletePie(){
+function stkDeletePie(){if(viBlockEdit())return;
   var p=alState.stockPies.find(function(x){return x.id===alState.activePie;});
   if(!p)return;
   var n=alState.stocks.filter(function(h){return h.pie===p.id;}).length;
@@ -19458,7 +19469,7 @@ function stkPick(i,symId,boxId){
 }
 document.addEventListener('click',function(e){['stk-suggest','afs-suggest'].forEach(function(id){var box=document.getElementById(id);if(box&&!e.target.closest('#stk-sym,#afs-sym,#'+id))box.style.display='none';});});
 // shared by the inline add row and the "Add fund / share" window
-async function stkAddCore(o){
+async function stkAddCore(o){if(viBlockEdit())return;
   var sym=String(o.sym||'').trim().toUpperCase(),units=o.units,amt=o.amt,cost=o.cost;
   if(!/^[A-Z0-9.\-^=]{1,15}$/.test(sym))return{err:'Search for a fund or share, or enter a ticker, e.g. VUSA.L or AAPL'};
   if(!(units>0)&&!(amt>0))return{err:'Enter how many units you hold, or the £ value you hold'};
@@ -19518,7 +19529,7 @@ async function stkAddFinish(r,fromAmount){
   var h=alState.stocks.find(function(x){return x.id===r.h.id;});
   if(h&&!(h.price>0)&&!h.updated)showToast('Added, but no live price was found for '+h.sym+((window._stkMisses&&window._stkMisses[h.sym]&&window._stkMisses[h.sym][0])?' ('+window._stkMisses[h.sym][0]+')':'')+'. Type a price in the Price box, or search again and choose another listing (e.g. the London .L one).');
 }
-async function stkAdd(){
+async function stkAdd(){if(viBlockEdit())return;
   if(_stkAddBusy)return;_stkAddBusy=true;
   try{
     var g=function(id){return(document.getElementById(id)||{}).value;};
@@ -19546,7 +19557,7 @@ function stkAddFundOpen(){
    +'<div class="stk-shot-ft"><button class="stk-btn" onclick="stkShotClose()">Cancel</button><button class="btn-add-data" onclick="stkAddFundConfirm()">Add</button></div></div>';
   setTimeout(function(){var i=document.getElementById('afs-sym');if(i)i.focus();},100);
 }
-async function stkAddFundConfirm(){
+async function stkAddFundConfirm(){if(viBlockEdit())return;
   if(_stkAddBusy)return;_stkAddBusy=true;
   try{
     var g=function(id){return(document.getElementById(id)||{}).value;};
@@ -19569,7 +19580,7 @@ function stkFundControls(pie,hs){
     +'<div><label>…or £ you hold</label><input id="stk-fs-amt" type="number" min="0" step="any" style="'+inp+'" placeholder="e.g. 224.80" onkeydown="if(event.key===\'Enter\')stkFundSetAmount('+h.id+')"></div>'
     +'<div class="stk-fs-btns"><button class="btn-add-data" onclick="stkFundApply('+h.id+')">Save</button>'+(man?'<button class="stk-btn" onclick="stkFundLive('+h.id+')">Use live price</button>':'')+'</div></div>';
 }
-function stkFundApply(id){
+function stkFundApply(id){if(viBlockEdit())return;
   var h=alState.stocks.find(function(x){return x.id===id;});if(!h)return;
   var g=function(i){return parseFloat((document.getElementById(i)||{}).value);};
   var px=g('stk-fs-px'),un=g('stk-fs-un'),amt=g('stk-fs-amt');
@@ -19583,7 +19594,7 @@ function stkFundApply(id){
   showToast('Saved · '+(+h.units).toLocaleString('en-GB',{maximumFractionDigits:4})+' units'+(price>0?' = £'+(h.units*price).toLocaleString('en-GB',{maximumFractionDigits:2}):''));
 }
 function stkFundLive(id){var h=alState.stocks.find(function(x){return x.id===id;});if(!h)return;h.manualPrice=false;h.price=0;stkSave();stkRefresh(false);}
-function stkSet(id,field,val){
+function stkSet(id,field,val){if(viBlockEdit())return;
   var h=alState.stocks.find(function(x){return x.id===id;});
   if(!h)return;
   var v=parseFloat(val);
@@ -19595,7 +19606,7 @@ function stkSet(id,field,val){
   }
   stkSave();
 }
-function stkRemove(id){
+function stkRemove(id){if(viBlockEdit())return;
   var h=alState.stocks.find(function(x){return x.id===id;});
   if(!h)return;
   alState.stocks=alState.stocks.filter(function(x){return x.id!==id;});
@@ -19858,7 +19869,7 @@ function stkShotDownscale(file){
   });
 }
 function stkShotNorm(n){return String(n||'').toLowerCase().replace(/[^a-z0-9]+/g,'').replace(/(inc|corp|corporation|plc|ltd|group|holdings|co)$/,'');}
-async function stkShotPicked(inp){
+async function stkShotPicked(inp){if(viBlockEdit())return;
   var files=Array.prototype.slice.call(inp.files||[],0,4);inp.value='';
   if(!files.length)return;
   stkShotModal('📷 Reading your screenshots','<div style="text-align:center;padding:28px 0">Reading '+files.length+' screenshot'+(files.length===1?'':'s')+'… this takes a few seconds.<br><span style="opacity:.6">Sent to Anthropic (Claude) to be read. Vault-It does not store it. Tip: crop out names and account numbers first.</span></div>','');
@@ -20351,11 +20362,11 @@ function renderMetalsInputs(){
   }).join('');
 }
 function metalValCell(k){var e=document.getElementById('metal-val-'+k);if(e)e.textContent=(window.VI_CURRENCY_SYMBOL||'\u00a3')+Math.round((alState.metals[k]||0)*(alState.metalPrices[k]||0)).toLocaleString('en-GB');}
-function updateMetal(k,v){alState.metals[k]=parseFloat(v)||0;metalValCell(k);saveAL();renderMetalsISO();updateKPIs();checkAchievements();}
-function updateMetalPrice(k,v){alState.metalPrices[k]=parseFloat(v)||0;alState.metalPrices.manualAt=new Date().toISOString();metalValCell(k);saveAL();renderMetalsISO();updateKPIs();}
+function updateMetal(k,v){if(viBlockEdit())return;alState.metals[k]=parseFloat(v)||0;metalValCell(k);saveAL();renderMetalsISO();updateKPIs();checkAchievements();}
+function updateMetalPrice(k,v){if(viBlockEdit())return;alState.metalPrices[k]=parseFloat(v)||0;alState.metalPrices.manualAt=new Date().toISOString();metalValCell(k);saveAL();renderMetalsISO();updateKPIs();}
 // Keep backward compatibility aliases
-function setMetal(m,v){updateMetal(m,v);}
-function setMetalPrice(m,v){updateMetalPrice(m,v);}
+function setMetal(m,v){if(viBlockEdit())return;updateMetal(m,v);}
+function setMetalPrice(m,v){if(viBlockEdit())return;updateMetalPrice(m,v);}
 function fetchCryptoPrices(){
   var ids=alState.crypto.map(function(c){
     var COIN_ID_MAP={BTC:'bitcoin',ETH:'ethereum',SOL:'solana',BNB:'binancecoin',XRP:'ripple',ADA:'cardano',DOGE:'dogecoin',DOT:'polkadot',MATIC:'matic-network',AVAX:'avalanche-2',LINK:'chainlink',LTC:'litecoin',UNI:'uniswap',ATOM:'cosmos',ALGO:'algorand'};
@@ -20527,7 +20538,7 @@ function renderAlTab(){
     }
   }
 }
-function addCrypto(){
+function addCrypto(){if(viBlockEdit())return;
   var sym=document.getElementById('cr-sym').value.trim().toUpperCase();
   var amt=parseFloat(document.getElementById('cr-amt').value)||0;
   var pr=parseFloat(document.getElementById('cr-price').value)||0;
@@ -20536,9 +20547,9 @@ function addCrypto(){
   document.getElementById('cr-sym').value='';document.getElementById('cr-amt').value='';document.getElementById('cr-price').value='';
   saveAL();renderAlTab();updateKPIs();
 }
-function delCrypto(id){alState.crypto=alState.crypto.filter(function(c){return c.id!==id;});saveAL();renderAlTab();updateKPIs();}
-function updateCryptoAmount(id,val){var c=alState.crypto.find(function(x){return x.id===id;});if(c){c.amount=parseFloat(val)||0;saveAL();updateKPIs();}}
-function addCashAccount(){
+function delCrypto(id){if(viBlockEdit())return;alState.crypto=alState.crypto.filter(function(c){return c.id!==id;});saveAL();renderAlTab();updateKPIs();}
+function updateCryptoAmount(id,val){if(viBlockEdit())return;var c=alState.crypto.find(function(x){return x.id===id;});if(c){c.amount=parseFloat(val)||0;saveAL();updateKPIs();}}
+function addCashAccount(){if(viBlockEdit())return;
   var n=document.getElementById('ca-name').value.trim();
   var t=document.getElementById('ca-type').value;
   var b=(parseFloat(document.getElementById('ca-bal').value)||0)/(window.VI_CURRENCY_RATE||1);
@@ -20548,7 +20559,7 @@ function addCashAccount(){
   saveAL();renderAlTab();updateKPIs();renderCashISO();
 }
 // Physical cash log: each line is money put in (+) or taken out (-), with where it is kept and the date.
-function pcAdd(sign){
+function pcAdd(sign){if(viBlockEdit())return;
   var amt=(parseFloat((document.getElementById('pc-amt')||{}).value)||0)/(window.VI_CURRENCY_RATE||1);
   var msg=document.getElementById('pc-msg');
   if(!(amt>0)){if(msg)msg.textContent='Enter an amount above zero.';return;}
@@ -20562,7 +20573,7 @@ function pcAdd(sign){
   saveAL();renderAlTab();updateKPIs();renderCashISO();
 }
 function alTotalPhysicalAt(where){return (alState.physicalCash||[]).filter(function(e){return e.where===where;}).reduce(function(s,e){return s+(+e.amount||0);},0);}
-function pcDel(id){
+function pcDel(id){if(viBlockEdit())return;
   var e=(alState.physicalCash||[]).find(function(x){return x.id===id;});if(!e)return;
   var msg=document.getElementById('pc-msg');
   if((+e.amount||0)>0&&alTotalPhysicalAt(e.where)-e.amount<-0.005){if(msg)msg.textContent='Remove the take-out lines for '+String(e.where).toLowerCase()+' first, or the total would go below zero.';return;}
@@ -20580,17 +20591,17 @@ function renderPhysicalCash(){
     +'<div class="pc-list">'+log.map(function(e){var inn=(+e.amount||0)>=0,d=e.date?new Date(e.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
       return '<div class="pc-line"><span class="pc-d">'+d+'</span><span class="pc-w">'+cfEsc(e.where||'')+'</span><span class="pc-a '+(inn?'in':'out')+'">'+(inn?'+':'−')+gbpFmt(Math.abs(+e.amount||0))+'</span><button class="data-item-del" onclick="pcDel('+e.id+')" aria-label="Remove this line"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg></button></div>';}).join('')+'</div>';
 }
-function delCashAccount(id){alState.cashAccounts=alState.cashAccounts.filter(function(a){return a.id!==id;});saveAL();renderAlTab();updateKPIs();renderCashISO();}
-function addOtherAsset(){
+function delCashAccount(id){if(viBlockEdit())return;alState.cashAccounts=alState.cashAccounts.filter(function(a){return a.id!==id;});saveAL();renderAlTab();updateKPIs();renderCashISO();}
+function addOtherAsset(){if(viBlockEdit())return;
   var n=document.getElementById('oa-name').value.trim();
   var v=(parseFloat(document.getElementById('oa-val').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
-  if(!isPioneer()&&(alState.otherAssets||[]).length>=FREE_LIMITS.assets){showPaywall('assets');return;}
+  if(!_isPro()&&(alState.otherAssets||[]).length>=FREE_LIMITS.assets){showPaywall('assets');return;}
   alState.otherAssets.push({id:Date.now(),name:n,value:v,image:null,svgIcon:null,imageSearch:null});
   document.getElementById('oa-name').value='';document.getElementById('oa-val').value='';
   saveAL();renderAlTab();updateKPIs();
 }
-function delOtherAsset(id){alState.otherAssets=alState.otherAssets.filter(function(a){return a.id!==id;});try{if(_invOpen===id)invCloseViewer();invDel(id);i3dDel('wi',id);}catch(e){}saveAL();renderAlTab();updateKPIs();}
+function delOtherAsset(id){if(viBlockEdit())return;alState.otherAssets=alState.otherAssets.filter(function(a){return a.id!==id;});try{if(_invOpen===id)invCloseViewer();invDel(id);i3dDel('wi',id);}catch(e){}saveAL();renderAlTab();updateKPIs();}
 
 // ═══════════════════════════════════════════════════════════════
 // WEALTH INVENTORY — multi-photo 3D viewer (photo turntable)
@@ -20744,7 +20755,7 @@ function wiLinkClose(){
   var m=document.getElementById('wi-link-modal');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');
   var back=_wiLinkReturn;_wiLinkReturn=null;_wiLinkId=null;if(back&&back.focus)setTimeout(function(){try{back.focus();}catch(e){}},0);
 }
-function wiLinkSave(){
+function wiLinkSave(){if(viBlockEdit())return;
   var a=invItem(_wiLinkId),msg=document.getElementById('wi-link-msg');if(!a)return;
   var L=wiLinkRead();
   if(L&&L.type==='metal'&&!(L.grams>0)){msg.textContent='Enter the weight.';document.getElementById('wl-weight').focus();return;}
@@ -20806,7 +20817,7 @@ async function invAddPhotos(id,files){
     showToast(all.length>=2?('✓ '+all.length+' photos. Drag the item to spin it in 3D'):'✓ Photo added. Add more angles to make it 3D');
   }catch(e){console.error('[Vault-It] photos',e);showToast('Could not save photos on this device');}
 }
-function wiUpload(id,input){invAddPhotos(id,input.files);try{input.value='';}catch(e){}}
+function wiUpload(id,input){if(viBlockEdit())return;invAddPhotos(id,input.files);try{input.value='';}catch(e){}}
 async function invRemoveFrame(id,idx){
   var a=invItem(id),fr=await invGet(id);if(!a||idx<0||idx>=fr.length)return;
   fr.splice(idx,1);
@@ -21426,7 +21437,7 @@ function wiFilterIcons(inputId,catsId){
   out.innerHTML='<div class="wi-icon-grid">'+matches.map(function(ic){return'<div class="wi-icon-opt">'+ic+'</div>';}).join('')+'</div>';
 }
 
-function wiSetIcon(id,icon,targetList){
+function wiSetIcon(id,icon,targetList){if(viBlockEdit())return;
   var list=targetList==='liab'?alState.liabilities:(alState.otherAssets||[]);
   var a=list.find(function(x){return x.id===id;});
   if(a){a.svgIcon=icon;a.image=null;saveAL();renderAlTab();}
@@ -21435,7 +21446,7 @@ function wiSetIcon(id,icon,targetList){
   if(picker)picker.remove();if(overlay)overlay.remove();
 }
 
-function addLiability(){
+function addLiability(){if(viBlockEdit())return;
   var liNameEl=document.getElementById('li-name');
   var liValEl=document.getElementById('li-val');
   if(!liNameEl||!liValEl)return;
@@ -21445,14 +21456,14 @@ function addLiability(){
   var dep=parseFloat((document.getElementById('li-dep')||{}).value)||0;
   var run=(parseFloat((document.getElementById('li-run')||{}).value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
-  if(!isPioneer()&&(alState.liabilities||[]).length>=FREE_LIMITS.liabilities){showPaywall('liabilities');return;}
+  if(!_isPro()&&(alState.liabilities||[]).length>=FREE_LIMITS.liabilities){showPaywall('liabilities');return;}
   alState.liabilities.push({id:Date.now(),name:n,value:v,rate:r,depRate:dep,runningCost:run,addedDate:new Date().toISOString()});
   liNameEl.value='';liValEl.value='';var liRateEl=document.getElementById('li-rate');if(liRateEl)liRateEl.value='';
   var lid=document.getElementById('li-dep');if(lid)lid.value='';
   var lir=document.getElementById('li-run');if(lir)lir.value='';
   saveAL();renderAlTab();updateKPIs();
 }
-function delLiability(id){alState.liabilities=alState.liabilities.filter(function(l){return l.id!==id;});try{i3dDel('li',id);}catch(e){}saveAL();renderAlTab();updateKPIs();}
+function delLiability(id){if(viBlockEdit())return;alState.liabilities=alState.liabilities.filter(function(l){return l.id!==id;});try{i3dDel('li',id);}catch(e){}saveAL();renderAlTab();updateKPIs();}
 
 // ═══════════════════════════════════════════════════════════════
 // DEBT TRACKER JS
@@ -21475,13 +21486,13 @@ function hideDebtForm(){
   if(c)c.style.display='none';if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');
   var back=_debtFormReturn;_debtFormReturn=null;if(back&&back.focus)setTimeout(function(){try{back.focus();}catch(e){}},0);
 }
-function saveDebt(){
+function saveDebt(){if(viBlockEdit())return;
   var n=document.getElementById('df-name').value.trim();
   var b=(parseFloat(document.getElementById('df-balance').value)||0)/(window.VI_CURRENCY_RATE||1);
   var r=parseFloat(document.getElementById('df-rate').value)||0;
   var m=(parseFloat(document.getElementById('df-min').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n){var mm=document.getElementById('debt-form-msg');if(mm)mm.textContent='Give the debt a name, for example "Barclaycard".';var fn=document.getElementById('df-name');if(fn)fn.focus();return;}
-  if(!isPioneer()&&(debtState.debts||[]).filter(function(d){return !d._onboarding;}).length>=FREE_LIMITS.debts){hideDebtForm();showPaywall('debts');return;}
+  if(!_isPro()&&(debtState.debts||[]).filter(function(d){return !d._onboarding;}).length>=FREE_LIMITS.debts){hideDebtForm();showPaywall('debts');return;}
   var dtype=(document.getElementById('di-type')||{}).value||'other';
   debtState.debts.push({id:Date.now(),name:n,original:b,balance:b,rate:r,min:m,type:dtype});
   document.getElementById('df-name').value='';document.getElementById('df-balance').value='';document.getElementById('df-rate').value='';document.getElementById('df-min').value='';
@@ -21490,13 +21501,13 @@ function saveDebt(){
   saveDebtState();renderDebtTab();updateKPIs();checkAchievements();
 }
 // Placeholder total created by the old onboarding questionnaire — let users replace it with real, separate debts.
-function removeOnboardingDebt(){
+function removeOnboardingDebt(){if(viBlockEdit())return;
   debtState.debts=debtState.debts.filter(function(d){return !d._onboarding;});
   saveDebtState();renderDebtTab();updateKPIs();
   showToast('Placeholder removed. Add each debt below');
   showDebtForm();
 }
-function deleteDebt(id){debtState.debts=debtState.debts.filter(function(d){return d.id!==id;});saveDebtState();renderDebtTab();updateKPIs();}
+function deleteDebt(id){if(viBlockEdit())return;debtState.debts=debtState.debts.filter(function(d){return d.id!==id;});saveDebtState();renderDebtTab();updateKPIs();}
 var CC_LOGOS={
   'amex':'https://logo.clearbit.com/americanexpress.com',
   'american express':'https://logo.clearbit.com/americanexpress.com',
@@ -21661,7 +21672,7 @@ function ccArtFile(inp,kind){
 }
 function ccClearArt(){_ccEdit.art='';_ccEdit.logo='';ccPreview();}
 function ccCloseEdit(){var o=document.getElementById('cc-ov');if(o)o.remove();_ccEdit=null;}
-function ccSaveEdit(){
+function ccSaveEdit(){if(viBlockEdit())return;
   var d=debtState.debts.find(function(x){return x.id===_ccEdit.id;});if(!d)return;
   var nd=ccDraft().card;
   if(!nd.issuer&&nd.network==='auto'&&!nd.last4&&!nd.art&&!nd.logo)delete d.card;else d.card=nd;
@@ -21711,7 +21722,7 @@ function ccCut(c,a,b,instant){
     phase2();
   } else phase2();
 }
-function makePayment(id){
+function makePayment(id){if(viBlockEdit())return;
   var d=debtState.debts.find(function(x){return x.id===id;});
   if(!d)return;
   var inp=document.getElementById('debt-pay-inp-'+id);
@@ -21725,7 +21736,7 @@ function makePayment(id){
   saveDebtState();renderDebtTab();updateKPIs();checkAchievements();
   showToast('£'+paid.toLocaleString('en-GB')+' payment recorded ✓ You can undo it on the card');
 }
-function undoPayment(id){
+function undoPayment(id){if(viBlockEdit())return;
   var d=debtState.debts.find(function(x){return x.id===id;});
   if(!d||!d.payments||!d.payments.length)return;
   var p=d.payments.pop();
@@ -21755,7 +21766,7 @@ function setDebtSide(side){
 var _oweReturn=null;
 function showOweForm(){var m=document.getElementById('owe-form-modal');if(!m)return;if(m.parentNode!==document.body)document.body.appendChild(m);_oweReturn=document.activeElement;m.hidden=false;document.body.classList.add('vi-pop-open');var g=document.getElementById('owe-form-msg');if(g)g.textContent='';setTimeout(function(){var f=document.getElementById('of-who');if(f)f.focus();},30);}
 function hideOweForm(){var m=document.getElementById('owe-form-modal');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');var b=_oweReturn;_oweReturn=null;if(b&&b.focus)setTimeout(function(){try{b.focus();}catch(e){}},0);}
-function saveOwe(){
+function saveOwe(){if(viBlockEdit())return;
   var v=function(id){return (document.getElementById(id)||{}).value||'';};
   var who=v('of-who').trim(),amt=(parseFloat(v('of-amt'))||0)/(window.VI_CURRENCY_RATE||1),msg=document.getElementById('owe-form-msg');
   if(!who){if(msg)msg.textContent='Who owes you? A name is enough.';return;}
@@ -21764,14 +21775,14 @@ function saveOwe(){
   ['of-who','of-what','of-amt','of-date'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});var su=document.getElementById('of-sure');if(su)su.value='expected';
   hideOweForm();saveDebtState();renderOwe();updateKPIs();
 }
-function owePaid(id){
+function owePaid(id){if(viBlockEdit())return;
   var o=oweList().find(function(x){return x.id===id;}),inp=document.getElementById('owe-pay-'+id);if(!o||!inp)return;
   var a=(parseFloat(inp.value)||0)/(window.VI_CURRENCY_RATE||1);if(!(a>0))return;a=Math.min(a,oweLeft(o));
   o.paid=o.paid||[];o.paid.push({amount:a,date:new Date().toISOString().slice(0,10)});inp.value='';
   saveDebtState();renderOwe();updateKPIs();if(oweLeft(o)<=0.004&&typeof showToast==='function')showToast(o.who+' has paid you back in full');
 }
 function oweSure(id,val){var o=oweList().find(function(x){return x.id===id;});if(!o)return;o.sure=val==='doubtful'?'doubtful':'expected';saveDebtState();renderOwe();updateKPIs();}
-function oweDel(id){debtState.owedToMe=oweList().filter(function(x){return x.id!==id;});saveDebtState();renderOwe();updateKPIs();}
+function oweDel(id){if(viBlockEdit())return;debtState.owedToMe=oweList().filter(function(x){return x.id!==id;});saveDebtState();renderOwe();updateKPIs();}
 function renderOwe(){
   var list=oweList(),el=document.getElementById('owe-list');
   var open=list.filter(function(o){return oweLeft(o)>0.004;}),tot=open.reduce(function(s,o){return s+oweLeft(o);},0),doubt=open.filter(function(o){return o.sure==='doubtful';}).reduce(function(s,o){return s+oweLeft(o);},0);
@@ -21990,7 +22001,7 @@ function updateDebtInterestPanel() {
 function saveBiz(){try{localStorage.setItem(BIZ_KEY,JSON.stringify(bizState));}catch(e){}if(typeof checkAchievements==='function')checkAchievements();}
 function bizMRR(){return bizState.clients.filter(function(c){return c.status==='Active';}).reduce(function(s,c){return s+c.monthly;},0)+bizState.streams.reduce(function(s,r){return s+r.monthly;},0);}
 function showClientForm(){document.getElementById('client-form-card').style.display='block';}
-function saveClient(){
+function saveClient(){if(viBlockEdit())return;
   var n=document.getElementById('cl-name').value.trim();
   var mo=parseFloat(document.getElementById('cl-mo').value)||0;
   var st=document.getElementById('cl-status').value;
@@ -22007,11 +22018,11 @@ function saveClient(){
   document.getElementById('client-form-card').style.display='none';
   saveBiz();renderBizTab();updateKPIs();checkAchievements();
 }
-function deleteClient(id){bizState.clients=bizState.clients.filter(function(c){return c.id!==id;});saveBiz();renderBizTab();updateKPIs();}
+function deleteClient(id){if(viBlockEdit())return;bizState.clients=bizState.clients.filter(function(c){return c.id!==id;});saveBiz();renderBizTab();updateKPIs();}
 
 // ── LEADS ─────────────────────────────────────────────────────
 function showLeadForm(){document.getElementById('lead-form-card').style.display='block';}
-function saveLead(){
+function saveLead(){if(viBlockEdit())return;
   var n=(document.getElementById('ld-name')||{}).value||'';
   if(!n.trim()){showToast('Enter a contact name');return;}
   if(!bizState.leads)bizState.leads=[];
@@ -22028,7 +22039,7 @@ function saveLead(){
   document.getElementById('lead-form-card').style.display='none';
   saveBiz();renderBizTab();showToast('Lead added!');
 }
-function deleteLead(id){if(!bizState.leads)return;bizState.leads=bizState.leads.filter(function(l){return l.id!==id;});saveBiz();renderBizTab();}
+function deleteLead(id){if(viBlockEdit())return;if(!bizState.leads)return;bizState.leads=bizState.leads.filter(function(l){return l.id!==id;});saveBiz();renderBizTab();}
 function convertLead(id){
   if(!bizState.leads)return;
   var lead=bizState.leads.find(function(l){return l.id===id;});
@@ -22037,7 +22048,7 @@ function convertLead(id){
   bizState.leads=bizState.leads.filter(function(l){return l.id!==id;});
   saveBiz();renderBizTab();updateKPIs();showToast(lead.name+' converted to active client!');
 }
-function addStream(){
+function addStream(){if(viBlockEdit())return;
   var n=document.getElementById('str-name').value.trim();
   var mo=parseFloat(document.getElementById('str-amt').value)||0;
   if(!n)return;
@@ -22045,7 +22056,7 @@ function addStream(){
   document.getElementById('str-name').value='';document.getElementById('str-amt').value='';
   saveBiz();renderBizTab();updateKPIs();
 }
-function deleteStream(id){bizState.streams=bizState.streams.filter(function(r){return r.id!==id;});saveBiz();renderBizTab();updateKPIs();}
+function deleteStream(id){if(viBlockEdit())return;bizState.streams=bizState.streams.filter(function(r){return r.id!==id;});saveBiz();renderBizTab();updateKPIs();}
 function renderBizTab(){
   var mrr=bizMRR();
   var ttEl=document.getElementById('tab-total-biz');if(ttEl)ttEl.textContent=gbpFmt(mrr)+'/mo';
@@ -22101,7 +22112,7 @@ function renderBizTab(){
   renderBizGoal();
 }
 
-function saveBizGoal() {
+function saveBizGoal() {if(viBlockEdit())return;
   var g = parseFloat((document.getElementById('biz-goal-inp')||{}).value) || 0;
   if (!g) { showToast('Enter a target monthly revenue'); return; }
   bizState.revenueGoal = g;
@@ -22201,7 +22212,7 @@ function checkAchievements(){
   });
   if(gained>0){saveAch();renderAchievements();}
 }
-function resetAllAchievements(){
+function resetAllAchievements(){if(viBlockEdit())return;
   if(!confirm('Reset all achievements and XP? This cannot be undone.'))return;
   achState={unlocked:[],xp:0,snapshots:[],connected:achState.connected||{}};
   saveAch();renderAchievements();showToast('Achievements reset');
@@ -22755,6 +22766,74 @@ var FREE_LIMITS    ={assets:3,liabilities:2,debts:1};
 
 function isPioneer(){return localStorage.getItem('vi_pioneer')==='true';}
 
+// ─── TRIAL THEN PAID (owner, 31 Oct 2026; docs/MONETISATION_DECISION.md sections 7 and 8) ───
+// Everyone gets 30 days of the full app, no card. The clock starts at the account's creation date (set by the server at the first
+// sign-in, so clearing a device cannot restart it), or on a device that has never signed in at its first run, and never before
+// VI_TRIAL_EPOCH, so accounts that existed before the trial went live get their full 30 days from that date. When the days are up
+// the vault turns read-only: every tab opens, every number shows, the cloud copy and Download my data keep working; adding,
+// editing and deleting wait for a plan. Paid accounts (Pioneer or Founding Member) never see any of this.
+var VI_TRIAL_DAYS = 30, VI_TRIAL_EPOCH = Date.parse('2026-11-01T00:00:00Z');
+function viPaid() { if (isPioneer() || isFounder()) return true; try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.pro); } catch (e) { return false; } }
+function viTrialStart() {
+  var t = 0;
+  try { if (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.created_at) t = Date.parse(_supaUser.created_at) || 0; } catch (e) {}
+  try {
+    if (t) localStorage.setItem('vi_trial_t0', String(t));   // a local-only key (not synced): the last known account date, for loads before sign-in completes
+    else { t = parseInt(localStorage.getItem('vi_trial_t0') || '0', 10) || 0; if (!t) { t = Date.now(); localStorage.setItem('vi_trial_t0', String(t)); } }
+  } catch (e) { if (!t) t = Date.now(); }
+  return Math.max(t, VI_TRIAL_EPOCH);
+}
+function viTrialDay() { return Math.max(1, Math.floor((Date.now() - viTrialStart()) / 86400000) + 1); }   // day 1 is the first day
+function viTrialDaysLeft() { return Math.max(0, VI_TRIAL_DAYS - viTrialDay() + 1); }                       // 30 on day 1, 1 on day 30, 0 after
+function viTrialState() { return viPaid() ? 'paid' : viTrialDaysLeft() > 0 ? 'trial' : 'ended'; }
+function viCanEdit() { return viTrialState() !== 'ended'; }
+// the first line of every add / edit / delete handler: true (and the plans prompt shows) while the vault is read-only
+function viBlockEdit() {
+  if (viCanEdit()) return false;
+  try { showToast('Your 30 days are up: the vault is read-only until you pick a plan.'); } catch (e) {}
+  viShowTrialEnd('edit');
+  return true;
+}
+// the plans prompt: the subscription pop-up with trial wording, Founding Member first (testers first, as agreed), no free column
+function viShowTrialEnd(reason) {
+  var modal = document.getElementById('pro-offer-modal'); if (!modal) return;
+  var ended = viTrialState() === 'ended', left = viTrialDaysLeft();
+  var set = function (id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
+  set('offer-badge', ended ? 'YOUR 30 DAYS ARE UP' : left + (left === 1 ? ' DAY LEFT' : ' DAYS LEFT'));
+  set('offer-headline', ended ? 'Pick a plan to keep editing.' : 'Pick a plan before your 30 days end.');
+  set('offer-body', ended ? 'Everything you entered is safe and still here to read. Choose a plan to carry on adding and editing.'
+                          : 'Your numbers stay yours either way. After day 30 the vault turns read-only until you choose a plan.');
+  var gate = document.getElementById('offer-task-gate'); if (gate) gate.style.display = 'none';
+  var cta = document.getElementById('offer-cta-annual'); if (cta) { cta.disabled = false; cta.style.opacity = ''; cta.innerHTML = '<span id="offer-annual-price">£49.99/yr</span> · Annual'; }
+  var mo = document.getElementById('offer-cta-monthly'); if (mo) mo.style.display = '';
+  var ghost = document.getElementById('offer-ghost'); if (ghost) ghost.textContent = ended ? 'Keep reading only' : 'Not now';
+  modal.classList.add('vi-trial-end'); modal.classList.remove('hidden');
+  if (reason === 'open') { try { localStorage.setItem('vi_trial_prompt', new Date().toDateString()); } catch (e) {} }
+}
+// one fixed line at the foot of the page: week-one nudges (the next core task), the countdown from day 23, read-only after day 30
+function viTrialBanner() {
+  var bn = document.getElementById('trial-banner');
+  var hide = function () { if (bn) bn.remove(); };
+  var st = viTrialState(); if (st === 'paid') return hide();
+  var busy = ['welcome-overlay', 'login-overlay'].some(function (id) { var el = document.getElementById(id); return !!(el && getComputedStyle(el).display !== 'none'); });
+  if (busy) return hide();
+  var day = viTrialDay(), left = viTrialDaysLeft(), today = new Date().toDateString(), msg, btn, act, kind, tone;
+  if (st === 'ended') { kind = 'ended'; tone = 'warn'; msg = 'Your 30 days are up. The vault is read-only until you pick a plan.'; btn = 'See plans'; act = "viShowTrialEnd('banner')"; }
+  else if (left <= 7) { kind = 'd' + day; tone = 'warn'; msg = left + (left === 1 ? ' day' : ' days') + ' left of your free 30. Pick a plan to keep editing after that.'; btn = 'See plans'; act = "viShowTrialEnd('banner')"; }
+  else if (day <= 7) {
+    var next = getCoreTaskStatus().filter(function (t) { return !t.done; })[0]; if (!next) return hide();
+    kind = 'd' + day; tone = 'nudge'; msg = 'Day ' + day + ' of your free 30 · next: ' + next.label.charAt(0).toLowerCase() + next.label.slice(1); btn = 'Do it'; act = "viTrialDismiss();showTab('" + next.tab + "')";
+  } else return hide();
+  if (localStorage.getItem('vi_trial_nudge') === today + ':' + kind) return hide();
+  if (!bn) { bn = document.createElement('div'); bn.id = 'trial-banner'; bn.setAttribute('role', 'status'); document.body.appendChild(bn); }
+  bn.className = 'trial-' + tone; bn.dataset.kind = kind;
+  bn.innerHTML = '<span class="trial-msg">' + msg + '</span><button class="btn-add-data" onclick="' + act + '">' + btn + '</button>'
+    + '<button class="trial-x" onclick="viTrialDismiss()" aria-label="Dismiss">✕</button>';
+}
+function viTrialDismiss() { var bn = document.getElementById('trial-banner'); try { localStorage.setItem('vi_trial_nudge', new Date().toDateString() + ':' + (bn ? bn.dataset.kind : '')); } catch (e) {} if (bn) bn.remove(); }
+function viTrialRefresh() { try { viTrialBanner(); } catch (e) {} try { _refreshPioneerSettingsUI(); } catch (e) {} }
+function viTrialBoot() { setTimeout(viTrialRefresh, 1200); setTimeout(viTrialRefresh, 6000); }   // after the overlays have decided whether to show
+
 function showPaywall(feature){
   var msgs={
     assets:      '🔒 Free tier: up to 3 assets. Pioneer = unlimited.',
@@ -23176,12 +23255,15 @@ function _refreshPioneerSettingsUI(){
   var active=document.getElementById('set-pioneer-active');
   var inactive=document.getElementById('set-pioneer-inactive');
   var badge=document.getElementById('set-pioneer-badge');
-  var pioneer=isPioneer();
+  var st=viTrialState(),pioneer=st==='paid',left=viTrialDaysLeft(),day=viTrialDay();
   if(active)active.style.display=pioneer?'block':'none';
-  if(inactive)inactive.style.display=pioneer?'none':'block';
+  if(inactive){inactive.style.display=pioneer?'none':'block';
+    inactive.textContent=st==='ended'?'Your 30 days are up, so the vault is read-only: every number is safe and still here. Pick a plan to carry on editing: £5.99 a month or £49.99 a year, or a Founding Member place at £149 once.'
+      :'Day '+day+' of your 30 free days ('+left+(left===1?' day':' days')+' left). Everything is open. After day 30 the vault turns read-only until you pick a plan: £5.99 a month or £49.99 a year.';}
   if(badge)badge.innerHTML=pioneer
     ?'<span style="color:var(--go);background:rgb(var(--brass-rgb) / .12);padding:2px 7px;border-radius:10px;border:1px solid rgb(var(--brass-rgb) / .3)">◆ ACTIVE</span>'
-    :'<span style="color:var(--t3);background:var(--c3);padding:2px 7px;border-radius:10px;border:1px solid var(--bd)">FREE TIER</span>';
+    :st==='ended'?'<span style="color:var(--amber);background:rgb(var(--amber-rgb) / .12);padding:2px 7px;border-radius:10px;border:1px solid rgb(var(--amber-rgb) / .35)">READ-ONLY</span>'
+    :'<span style="color:var(--t3);background:var(--c3);padding:2px 7px;border-radius:10px;border:1px solid var(--bd)">TRIAL · '+left+' DAYS LEFT</span>';
 }
 
 function showSettings(){
@@ -24320,7 +24402,7 @@ function _autoStreamIcon(name){
 
 function showStreamForm(){document.getElementById('stream-form-card').style.display='block';}
 
-function saveIncomeStream(){
+function saveIncomeStream(){if(viBlockEdit())return;
   var name=(document.getElementById('isb-name')||{}).value||'';
   if(!name.trim()){showToast('Enter a stream name');return;}
   var stream={
@@ -24438,12 +24520,12 @@ function toggleStreamStep(streamId,stepIdx,done){
   saveBiz();renderIncomeStreams();
 }
 
-function deleteIncomeStream(id){
+function deleteIncomeStream(id){if(viBlockEdit())return;
   bizState.incomeStreams=(bizState.incomeStreams||[]).filter(function(s){return s.id!==id;});
   saveBiz();renderIncomeStreams();
 }
 
-function updateStreamInvested(id,val){
+function updateStreamInvested(id,val){if(viBlockEdit())return;
   var s=(bizState.incomeStreams||[]).find(function(st){return st.id===id;});
   if(!s)return;
   var v=parseFloat(val)||0;
@@ -24460,7 +24542,7 @@ function updateStreamInvested(id,val){
   setTimeout(function(){drawStreamChart(id);},20);
 }
 
-function logStreamIncome(id){
+function logStreamIncome(id){if(viBlockEdit())return;
   var s=(bizState.incomeStreams||[]).find(function(st){return st.id===id;});
   if(!s)return;
   var inp=document.getElementById('log-act-'+id);
@@ -24474,7 +24556,7 @@ function logStreamIncome(id){
   setTimeout(function(){drawStreamChart(id);},30);
 }
 
-function addStreamTask(id){
+function addStreamTask(id){if(viBlockEdit())return;
   var s=(bizState.incomeStreams||[]).find(function(st){return st.id===id;});
   if(!s)return;
   var inp=document.getElementById('newtask-'+id);
@@ -24494,7 +24576,7 @@ function moveStreamTask(streamId,taskId,newStage){
   saveBiz();renderIncomeStreams();
 }
 
-function deleteStreamTask(streamId,taskId){
+function deleteStreamTask(streamId,taskId){if(viBlockEdit())return;
   var s=(bizState.incomeStreams||[]).find(function(st){return st.id===streamId;});
   if(!s||!s.tasks)return;
   s.tasks=s.tasks.filter(function(t){return t.id!==taskId;});
@@ -25136,7 +25218,7 @@ function jrnySaveEvents(evs) {
   try { localStorage.setItem(JRNY_EVENTS_KEY, JSON.stringify(evs)); } catch(e) {}
 }
 
-function jrnyAddEvent() {
+function jrnyAddEvent() {if(viBlockEdit())return;
   var nameEl = document.getElementById('jrny-ev-name');
   var dateEl = document.getElementById('jrny-ev-date');
   var name = nameEl ? nameEl.value.trim() : '';
@@ -25158,7 +25240,7 @@ function jrnyToggleEvent(id) {
   renderJrnyCustomEvents();
 }
 
-function jrnyDeleteEvent(id) {
+function jrnyDeleteEvent(id) {if(viBlockEdit())return;
   jrnySaveEvents(jrnyLoadEvents().filter(function(e) { return e.id !== id; }));
   renderJrnyCustomEvents();
 }
@@ -25550,76 +25632,14 @@ function jrnyWizSkip() {
 // ══════════════════════════════════════════════════════════════
 
 function initProOffer() {
+  // Trial then paid (31 Oct): the 30 days carry no upgrade pop-up (the banner counts the days). Once they are up, the plans
+  // prompt shows once a day on open, and whenever an edit is tried. Paid accounts never see it.
   try {
     var user = JSON.parse(localStorage.getItem('vi_user') || 'null');
-    if (!user || user.pro) return;
-
-    var now      = new Date();
-    var joined   = user.joined ? new Date(user.joined) : now;
-    var daysSince = Math.floor((now - joined) / 86400000);
-
-    // Increment login count
-    user.logins = (user.logins || 0) + 1;
-    localStorage.setItem('vi_user', JSON.stringify(user));
-
-    // Don't show on very first session (welcome screen already shown)
-    if (user.logins <= 1) return;
-
-    // Decide offer
-    var discountPct = 0;
-    var headline    = '';
-    var body        = '';
-    var priceStr    = '';
-    var saving      = '';
-    var badge       = 'VAULT-IT PRO';
-
-    // One honest price for everyone: no time-based discounts or expiry messages (their buttons always charged the full price).
-    headline = 'Welcome back' + (user.name ? ', ' + user.name : '') + '.';
-    body     = 'Your journey continues. Unlock Entrepreneur tools, the full 3D vault, Stocks & FFHF tracker with Vault-It Pro.';
-    priceStr = '£5.99/mo';
-
-    var modal  = document.getElementById('pro-offer-modal');
-    if (!modal) return;
-    var elBadge = document.getElementById('offer-badge');
-    var elHead  = document.getElementById('offer-headline');
-    var elBody  = document.getElementById('offer-body');
-    var elPrice = document.getElementById('offer-price');
-    var elSave  = document.getElementById('offer-saving');
-    var elExp   = document.getElementById('offer-expires');
-
-    if (elBadge) elBadge.textContent = badge;
-    if (elHead)  elHead.textContent  = headline;
-    if (elBody)  elBody.textContent  = body;
-    if (elPrice) elPrice.textContent = priceStr;
-    if (elSave)  { elSave.textContent = saving; elSave.style.display = saving ? '' : 'none'; }
-
-    // Task gate — populate in modal
-    var tasks = getCoreTaskStatus();
-    var incomplete = tasks.filter(function(t){ return !t.done; });
-    var taskGate  = document.getElementById('offer-task-gate');
-    var taskList  = document.getElementById('offer-task-list');
-    var ctaAnnual = document.getElementById('offer-cta-annual');
-    var ctaMo     = document.getElementById('offer-cta-monthly');
-    if (incomplete.length > 0) {
-      if (taskGate) taskGate.style.display = '';
-      if (taskList) taskList.innerHTML = incomplete.map(function(t){
-        return '<div class="vi-task-item" onclick="document.getElementById(\'pro-offer-modal\').classList.add(\'hidden\');showTab(\''+t.tab+'\')">'+t.icon+' '+t.label+'<span class="vi-task-goto">→</span></div>';
-      }).join('');
-      if (ctaAnnual) { ctaAnnual.disabled = true; ctaAnnual.style.opacity = '.4'; ctaAnnual.innerHTML = incomplete.length + ' task' + (incomplete.length !== 1 ? 's' : '') + ' remaining'; }
-      if (ctaMo)     { ctaMo.style.display = 'none'; }
-    } else {
-      if (taskGate) taskGate.style.display = 'none';
-      if (ctaAnnual) {
-        ctaAnnual.disabled = false; ctaAnnual.style.opacity = '';
-        var annualEl = document.getElementById('offer-annual-price');
-        var annualTxt = annualEl ? annualEl.textContent : '£49.99/yr';
-        ctaAnnual.innerHTML = '<span id="offer-annual-price">' + annualTxt + '</span> · Annual, best value →';
-      }
-    }
-    // Show after 1.5s delay so app loads first
-    setTimeout(function() {
-      modal.classList.remove('hidden');
-    }, 1500);
+    if (user) { user.logins = (user.logins || 0) + 1; localStorage.setItem('vi_user', JSON.stringify(user)); }
+    if (viTrialState() !== 'ended') return;
+    if (localStorage.getItem('vi_trial_prompt') === new Date().toDateString()) return;
+    setTimeout(function () { if (viTrialState() === 'ended') viShowTrialEnd('open'); }, 1500);   // after the app has loaded
   } catch(e) {}
 }
 
@@ -25639,8 +25659,9 @@ function gateNudge(tabName, features) {
 // ══════════════════════════════════════════════════════════════
 
 function _isPro() {
-  if (isPioneer()) return true;
-  try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.pro); } catch(e) { return false; }
+  // Trial then paid (31 Oct): the 30 days give the full app, and the read-only vault after them still shows everything that was
+  // built, so no feature is hidden by this check any more. Paid status itself is viPaid(); the Vaulter / Pioneer split is queued.
+  return true;
 }
 
 function _proLockOverlay(title, subtitle) {
@@ -25839,11 +25860,11 @@ function getCoreTaskStatus() {
     { label: 'Set house target',             done: house,    tab: 'house',        icon: '⌂' },
     { label: 'Log a debt or confirm free',   done: debt,     tab: 'debt',         icon: '◈' },
     { label: 'Complete Journey Map wizard',  done: journey,  tab: 'journey',      icon: '▲' },
-  ];
+  ].filter(function (t) { return !!document.getElementById('tab-' + t.tab); });   // a task whose tab has gone (the Journey Map panel is no longer in the page) would send people to a blank screen
 }
 
 function applyPaywall() {
-  var pioneer = isPioneer();
+  var pioneer = _isPro();
   var bizGate = document.getElementById('pro-gate-biz');
   if (bizGate) bizGate.style.display = pioneer ? 'none' : '';
   updateProGate();
@@ -25949,7 +25970,7 @@ function exportData() {
   } catch(e) { showToast('Export failed: ' + e.message); }
 }
 
-function importData() {
+function importData() {if(viBlockEdit())return;
   var input = document.createElement('input');
   input.type = 'file';
   input.accept = '.json';
@@ -26111,7 +26132,7 @@ function renderPioneerCard() {
   } catch(e) { console.warn('[Vault-It] renderPioneerCard error:', e); }
 }
 
-function saveProfile() {
+function saveProfile() {if(viBlockEdit())return;
   var nm    = document.getElementById('sb-profile-name');
   var em    = document.getElementById('sb-profile-email');
   var job   = document.getElementById('sb-profile-job');
@@ -26524,9 +26545,9 @@ function initWelcome() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() { _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); initQuickLogin(); setTimeout(stkAutoRefresh, 4000); });
+  document.addEventListener('DOMContentLoaded', function() { _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); viTrialBoot(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); initQuickLogin(); setTimeout(stkAutoRefresh, 4000); });
 } else {
-  _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); initQuickLogin(); setTimeout(stkAutoRefresh, 4000);
+  _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); viTrialBoot(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); initQuickLogin(); setTimeout(stkAutoRefresh, 4000);
 }
 
 // ─── ALPHA TEST SEEDER ────────────────────────────────────────────────────────
@@ -26671,7 +26692,7 @@ var NWH_KEY = 'vi_nw_history';
 var _nwhWizData = {};
 
 function nwhLoad(){ try{ return JSON.parse(localStorage.getItem(NWH_KEY)||'null'); }catch(e){ return null; } }
-function nwhSave(d){ try{ localStorage.setItem(NWH_KEY,JSON.stringify(d)); }catch(e){} }
+function nwhSave(d){if(viBlockEdit())return; try{ localStorage.setItem(NWH_KEY,JSON.stringify(d)); }catch(e){} }
 function nwhFmt(n){ return (n>=0?'£':'-£')+Math.abs(Math.round(n)).toLocaleString(); }
 
 function openNwHistory(){
@@ -26880,21 +26901,21 @@ function nwhUpdate(year,field,value){
   nwhDrawChart(data.points);
 }
 
-function nwhUpdateNw(year,value){
+function nwhUpdateNw(year,value){if(viBlockEdit())return;
   var data=nwhLoad(); if(!data) return;
   var p=data.points.find(function(x){return x.year===year;}); if(!p) return;
   p.netWorth=parseFloat(value)||0; p.estimated=false;
   nwhSave(data); nwhDrawChart(data.points);
 }
 
-function nwhDeleteYear(year){
+function nwhDeleteYear(year){if(viBlockEdit())return;
   var data=nwhLoad(); if(!data) return;
   if(year===new Date().getFullYear()){showToast('Cannot delete the current year');return;}
   data.points=data.points.filter(function(p){return p.year!==year;});
   nwhSave(data); nwhRenderHistory(data);
 }
 
-function nwhAddYear(){
+function nwhAddYear(){if(viBlockEdit())return;
   var yr=parseInt(prompt('Enter a year to add (e.g. '+(new Date().getFullYear()-5)+'):'));
   if(!yr||isNaN(yr)) return;
   var data=nwhLoad(); if(!data) return;
