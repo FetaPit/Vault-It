@@ -9,8 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [~] Simplified / Advanced view (owner, 31 Oct): switch in Settings and the welcome flow, new accounts start Simplified, synced per account; tile list in `docs/MONETISATION_DECISION.md` section 8 (Overview KPIs one row, 3D card, roadmap, achievements card; Budget sections collapsed with the Sankey on top and a flow animation; House viewport and plan; all Assets sub-tabs; all of Debt)
-- [ ] Tester welcome message (wording agreed 31 Oct): wire it to the first run for beta accounts
+- [~] Tester welcome message (wording agreed 31 Oct): wire it to the first run for beta accounts
 - [ ] Sign-up page steps (owner, 31 Oct 09:56, from phone screenshots): in the "how it works" steps, drop the big 3D house under step 3 and give steps 1, 2 and 3 a small screenshot each, relevant to its subject; step 2's screenshot carries the relevant brand-book iconography with subtle pulsing animations (reduced motion respected)
 - [ ] 3D net worth first draw (owner, 31 Oct, live defect): the main Overview 3D net worth scene only populates after the 3D view is toggled off and back on; it must draw on first show
 - [ ] Tablet and fold navigation (owner, 31 Oct): tablet and folding-phone widths keep the labelled menu bar at the top; only the phone view has the icon bar at the bottom
@@ -31,6 +30,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Simplified / Advanced view (owner, 31 Oct): synced switch in Settings and the welcome step (new accounts Simplified, existing Advanced), the section 8 tile list, Overview achievements card, Budget Sankey on top with every section folded, Sankey flow animation, phone KPIs in two rows. Budget "sections" read as the six spending and saving groups; the income list stays open so income can be added. Commit 96bd33e on `brand-rollout`, not released.
 - [x] Tier gates (31 Oct, decision 10): caps gone; design tools (upload, AI model) need a paid plan, trial included; every preset house for everyone; ended accounts see everything read-only; plan recorded from the Stripe return; AI reader allowance line; four more read-only guards. Commit 4254a03 on `brand-rollout`, not released.
 - [x] Release (owner, 31 Oct, afternoon): full suite green on `brand-rollout` (71 ok; `test_beta_client`, `test_cut`, `test_hb3d_design`, `test_nw3d` flaky under load and passed alone; `test_hb3d_levels` updated: the house build follows pct() for unpaid users, the 4% teaser rule is gone), backup `backup/release-pioneer-v2-20261031-1234`, `release/pioneer-v2` fast-forwarded to cd2df3f (trial then paid, plans pop-up with tester prices, Stripe links). Cloudflare deploys it.
 - [x] Subscription pop-up and Settings copy (owner, 30 and 31 Oct): four columns Vaulter (£0, read-only after the 30 days) / Pioneer monthly / Pioneer yearly (extras named) / Founding Member; beta testers see £3.99 and £21.99 with the full price struck through; Stripe live prices and Payment Links created (yearly £49.99, tester £3.99 / £21.99, Founding £149 capped at 100), the £59.99 link switched off, the monthly link's return fixed; Settings "Your plan" rewritten. Commit 883dfdd on `brand-rollout`, not released. Tester status is "everyone during the beta" until the gateway adds a profile flag.
