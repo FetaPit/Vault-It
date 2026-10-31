@@ -111,3 +111,15 @@ The UK market has also shrunk: Money Dashboard closed in 2023 and Moneyhub's con
 - Trader address: PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ (page footers, e-mails, privacy notice).
 - Resend stays on the free plan for now, so **no paid ads yet** (100 e-mails/day shared with sign-in codes).
 - Still in the app, for Pete to decide: the Network tab's "Founding Master Licence £7.77" with a Shibarium NFT card and "33 founding slots" contradicts the £149 offer. It cannot be bought without a pasted link, but it should go or be reworded before the founding offer opens.
+
+## Stripe as set up on 31 Oct 2026 (live)
+
+| Plan | Price | Stripe price | Payment Link | Returns to |
+|---|---|---|---|---|
+| Pioneer monthly | £5.99 a month | `price_1TdPy79mgKf6Hnty9GNgtoIp` | https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00 | `?upgraded=1&plan=monthly` |
+| Pioneer yearly | £49.99 a year | `price_1UWalp9mgKf6HntyQzc6DFgy` (`pioneer_yearly`) | https://buy.stripe.com/dRm3cp6Pccff2mFa102VG02 | `?upgraded=1&plan=yearly` |
+| Pioneer monthly, beta tester | £3.99 a month (£2 off) | `price_1UWalr9mgKf6Hntyo8fCeWYH` (`pioneer_monthly_tester`) | https://buy.stripe.com/6oUeV7b5sbbb7GZ6OO2VG03 | `?upgraded=1&plan=monthly` |
+| Pioneer yearly, beta tester | £21.99 a year (£28 off) | `price_1UWalt9mgKf6Hntyj2Fu1WLO` (`pioneer_yearly_tester`) | https://buy.stripe.com/9B63cp0qObbb2mF6OO2VG04 | `?upgraded=1&plan=yearly` |
+| Founding Member | £149 once, Stripe stops the link after 100 payments | `price_1UWam79mgKf6HntyipUcP8oo` (`founding_member`, product `prod_VXg87aVvQj3qUJ`) | https://buy.stripe.com/eVq28l0qO6UV3qJc982VG05 | `?founded=1` |
+
+Switched off: the £59.99 yearly link (`plink_1TdPyH9mgKf6Hnty9IT0ARfh`). Still in the account, unused: the old "Vault·It Pro" £4.99 / £39.99 prices and the "Vault·It Free" product; archive them from the Dashboard when convenient. The app appends `prefilled_email` and `client_reference_id` (the account id) to every link so the webhook (secure paid gateway, queued) can match a payment to an account.

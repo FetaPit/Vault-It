@@ -1,7 +1,7 @@
 // Trial then paid (owner, 31 Oct 2026; docs/MONETISATION_DECISION.md 7 and 8): 30 days of the full app, then a read-only vault until a
 // plan is picked. Checks, in Night at 1100 px and Daylight at 390 px:
 //   1. fresh device: day 1 of 30, editing allowed, the week-one nudge names the next core task, dismiss keeps it away for the day
-//   2. day 25: the countdown line says 6 days left; "See plans" opens the prompt with trial wording, no free column, Founding first
+//   2. day 25: the countdown line says 6 days left; "See plans" opens the prompt with trial wording and the four plan columns
 //   3. day 31: read-only. Every add / edit / delete handler returns before touching data (sampled), the prompt opens, numbers still
 //      show, every tab still opens, Settings says READ-ONLY, the prompt shows on open once a day
 //   4. paid (vi_pioneer): no line, no prompt, Settings says ACTIVE
@@ -33,7 +33,7 @@ const seed = (o) => {
     return p;
   };
   const banner = () => { const bn = document.getElementById('trial-banner'); if (!bn) return null; const r = bn.getBoundingClientRect(); return { txt: bn.textContent, kind: bn.dataset.kind, cls: bn.className, bottom: Math.round(r.bottom), inner: innerHeight, btn: (bn.querySelector('.btn-add-data') || {}).textContent }; };
-  const modal = () => { const m = document.getElementById('pro-offer-modal'); const cols = [...m.querySelectorAll('.vi-tier-table > .vi-tier-col')]; return { open: !m.classList.contains('hidden'), badge: document.getElementById('offer-badge').textContent, head: document.getElementById('offer-headline').textContent, ghost: document.getElementById('offer-ghost').textContent, freeHidden: getComputedStyle(cols[0]).display === 'none', founderFirst: getComputedStyle(m.querySelector('.vi-tier-founder')).order === '-1', gate: getComputedStyle(document.getElementById('offer-task-gate')).display === 'none' }; };
+  const modal = () => { const m = document.getElementById('pro-offer-modal'); const cols = [...m.querySelectorAll('.vi-tier-table > .vi-tier-col')]; return { open: !m.classList.contains('hidden'), badge: document.getElementById('offer-badge').textContent, head: document.getElementById('offer-headline').textContent, ghost: document.getElementById('offer-ghost').textContent, cols: cols.map(c => c.querySelector('.vi-tier-name').textContent), vaulterShown: getComputedStyle(cols[0]).display !== 'none', founderFirst: getComputedStyle(m.querySelector('.vi-tier-founder')).order === '-1', tester: /£5\.99/.test(document.getElementById('offer-price-monthly').innerHTML) && /£3\.99/.test(document.getElementById('offer-price-monthly').textContent) }; };
 
   // ── 1. fresh device, day 1 ──
   let p = await open({ w: 1100, theme: 'dark', nodebt: true });   // one core task left undone (no debt yet), so the nudge has something to say
@@ -56,7 +56,8 @@ const seed = (o) => {
   ok(s.st === 'trial' && s.day === 25 && s.left === 6 && bn && bn.kind === 'd25' && /6 days left of your free 30/.test(bn.txt) && /trial-warn/.test(bn.cls) && bn.btn === 'See plans', 'day 25: the countdown line says 6 days left (' + (bn && bn.txt) + ')');
   await p.evaluate(() => document.querySelector('#trial-banner .btn-add-data').click()); await p.waitForTimeout(300);
   let m = await p.evaluate(modal);
-  ok(m.open && m.badge === '6 DAYS LEFT' && /before your 30 days end/.test(m.head) && m.ghost === 'Not now' && m.freeHidden && m.founderFirst && m.gate, 'See plans opens the prompt: trial wording, no free column, Founding Member first, no task gate (' + JSON.stringify(m) + ')');
+  ok(m.open && m.badge === '6 DAYS LEFT' && /before your 30 days end/.test(m.head) && m.ghost === 'Not now' && m.cols.join('|') === 'Vaulter|Monthly|Yearly|Founding Member' && m.vaulterShown && m.tester, 'See plans opens the prompt: trial wording, Vaulter / monthly / yearly / Founding columns, tester price shown (' + JSON.stringify(m) + ')');
+  ok(!m.founderFirst, 'during the trial the columns keep their order');
   await p.keyboard.press('Escape'); ok(await p.evaluate(() => document.getElementById('pro-offer-modal').classList.contains('hidden')), 'Esc closes it');
   await p.context().close();
 
@@ -72,13 +73,14 @@ const seed = (o) => {
   });
   ok(r.inc && r.exp && r.debts, 'a delete on income, expenses and debts changes nothing');
   ok(r.prompt && r.badge === 'YOUR 30 DAYS ARE UP' && r.ghost === 'Keep reading only', 'the blocked edit opens the prompt with the read-only wording (' + r.badge + ' / ' + r.ghost + ')');
+  ok(await p.evaluate(() => getComputedStyle(document.querySelector('#pro-offer-modal .vi-tier-founder')).order === '-1'), 'once the days are up, Founding Member leads the columns');
   ok(r.kpi.length > 0 && r.kpi !== '£0', 'the numbers still show (net worth ' + r.kpi + ')');
   const tabs = await p.evaluate(() => { document.getElementById('pro-offer-modal').classList.add('hidden'); return ['budget', 'house', 'assets', 'debt', 'achievements', 'overview'].map(t => { showTab(t); return document.getElementById('tab-' + t).classList.contains('active'); }); });
   ok(tabs.every(Boolean), 'every tab still opens');
   bn = await p.evaluate(banner);
   ok(bn && bn.kind === 'ended' && /read-only until you pick a plan/.test(bn.txt), 'the foot line says the vault is read-only (' + (bn && bn.txt) + ')');
   const st = await p.evaluate(() => { _refreshPioneerSettingsUI(); return { badge: document.getElementById('set-pioneer-badge').textContent, txt: document.getElementById('set-pioneer-inactive').textContent }; });
-  ok(/READ-ONLY/.test(st.badge) && /30 days are up/.test(st.txt) && /£5\.99 a month or £49\.99 a year/.test(st.txt) && /£149 once/.test(st.txt), 'Settings says READ-ONLY with the prices (' + st.badge + ')');
+  ok(/VAULTER · READ-ONLY/.test(st.badge) && /30 days are up/.test(st.txt) && /£3\.99 a month \(beta tester price, £2 off\)/.test(st.txt) && /£21\.99 a year \(beta tester price, £28 off\)/.test(st.txt) && /£149 once/.test(st.txt), 'Settings says VAULTER · READ-ONLY with the tester prices (' + st.badge + ')');
   const once = await p.evaluate(async () => { localStorage.removeItem('vi_trial_prompt'); initProOffer(); await new Promise(r => setTimeout(r, 1800)); const m = document.getElementById('pro-offer-modal'); const first = !m.classList.contains('hidden'); m.classList.add('hidden'); initProOffer(); await new Promise(r => setTimeout(r, 1800)); return { first, second: !m.classList.contains('hidden'), stamp: localStorage.getItem('vi_trial_prompt') === new Date().toDateString() }; });
   ok(once.first && !once.second && once.stamp, 'on open the prompt shows once a day');
   await p.context().close();

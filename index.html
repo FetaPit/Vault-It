@@ -10175,9 +10175,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 [data-theme="light"] .btn-add-data[style*="color:var(--t3)"]{color:var(--text)!important;background:transparent!important;border-color:var(--lock)!important}
 [data-theme="light"] #sync-banner{color:var(--text)!important;border-color:var(--amber)!important}
 /* trial then paid: the plans prompt (no free column, Founding Member first) and the foot-of-page trial line */
-#pro-offer-modal.vi-trial-end .vi-tier-table{grid-template-columns:1fr 1fr}
-#pro-offer-modal.vi-trial-end .vi-tier-table>.vi-tier-col:first-child{display:none}
-#pro-offer-modal.vi-trial-end .vi-tier-founder{order:-1}
+#pro-offer-modal.vi-trial-end .vi-tier-founder{order:-1}   /* once the days are up, Founding Member (testers first) leads */
 #trial-banner{position:fixed;left:8px;right:8px;bottom:8px;z-index:10001;background:var(--panel);color:var(--text);border:1px solid var(--teal);border-radius:10px;padding:10px 12px;font-size:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 8px 24px rgb(0 0 0 / .25)}
 #trial-banner.trial-warn{border-color:var(--amber)}
 #trial-banner .trial-msg{flex:1;min-width:180px;line-height:1.45}
@@ -10810,9 +10808,9 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
         <!-- Free -->
         <div class="vi-camp-tier">
           <div class="vi-camp-tier-badge"></div>
-          <div class="vi-camp-tier-name">Free</div>
+          <div class="vi-camp-tier-name">Vaulter</div>
           <div class="vi-camp-tier-price">£0</div>
-          <div class="vi-camp-tier-note">Always free. Core tools forever.</div>
+          <div class="vi-camp-tier-note">After your 30 days: read-only, nothing lost.</div>
           <ul class="vi-camp-tier-features">
             <li>Dashboard &amp; KPIs</li>
             <li>Journey map</li>
@@ -10827,9 +10825,9 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
         <!-- Pro Backer (featured) -->
         <div class="vi-camp-tier vi-camp-featured">
           <div class="vi-camp-tier-badge">Best value</div>
-          <div class="vi-camp-tier-name">Pro Backer</div>
+          <div class="vi-camp-tier-name">Pioneer yearly</div>
           <div class="vi-camp-tier-price">£49.99<span>/yr</span></div>
-          <div class="vi-camp-tier-note">Early backer rate. Renews at the same price as long as you stay subscribed.</div>
+          <div class="vi-camp-tier-note">Around 30% less than monthly. Beta testers pay £21.99. Renews at the same price as long as you stay subscribed.</div>
           <ul class="vi-camp-tier-features">
             <li>Everything in Free</li>
             <li>Entrepreneur tab</li>
@@ -10917,83 +10915,84 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   <circle cx="16.0" cy="16.0" r="0.8" fill="#44c0b9" opacity="0.4"/>
 </svg></div>
       <div>
-        <div class="vi-modal-eyebrow" id="offer-badge">VAULT-IT PRO</div>
-        <div class="vi-modal-title" id="offer-headline">Welcome back.</div>
+        <div class="vi-modal-eyebrow" id="offer-badge">PLANS</div>
+        <div class="vi-modal-title" id="offer-headline">Pick a plan to keep editing.</div>
       </div>
       <button class="vi-modal-close" onclick="document.getElementById('pro-offer-modal').classList.add('hidden')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
     </div>
 
     <div class="vi-modal-body">
-      <p class="vi-modal-desc" id="offer-body">Unlock the full toolkit on your road to outright ownership.</p>
+      <p class="vi-modal-desc" id="offer-body">Your numbers stay yours either way. After day 30 the vault turns read-only until you choose a plan.</p>
 
-      <!-- Task gate — must complete core tasks to upgrade -->
-      <div id="offer-task-gate" style="display:none">
-        <div class="vi-modal-task-hdr">Complete these first to unlock Pro:</div>
-        <div id="offer-task-list" class="vi-modal-task-list"></div>
-      </div>
-
-      <!-- 3-tier comparison -->
+      <!-- Plans (owner, 31 Oct 2026: docs/MONETISATION_DECISION.md sections 8 and 9). Prices are painted by viPricePaint(): beta testers see £2 a month / £28 a year off Pioneer. -->
       <div class="vi-tier-wrap">
         <div class="vi-tier-table">
-          <!-- Free -->
-          <div class="vi-tier-col">
-            <div class="vi-tier-popular"></div>
-            <div class="vi-tier-name">Free</div>
+          <!-- Vaulter: what you have after the 30 days without paying -->
+          <div class="vi-tier-col vi-tier-vaulter">
+            <div class="vi-tier-popular">After your 30 days</div>
+            <div class="vi-tier-name">Vaulter</div>
             <div class="vi-tier-price">£0</div>
-            <div class="vi-tier-saving">Core tools, always free</div>
+            <div class="vi-tier-saving">Read-only. Nothing you built is lost.</div>
             <ul class="vi-tier-features">
-              <li>Dashboard &amp; KPIs</li>
-              <li>Journey map</li>
-              <li>House builder</li>
-              <li>Debt tracker</li>
-              <li class="vi-no">Entrepreneur</li>
-              <li class="vi-no">NW History</li>
-              <li class="vi-no">3D Vault</li>
+              <li>Every tab and number still shows</li>
+              <li>Your house as you left it</li>
+              <li>Cloud copy and Download my data</li>
+              <li class="vi-no">Adding and editing</li>
+              <li class="vi-no">Pioneer features</li>
             </ul>
-            <button class="vi-tier-cta vi-tier-cta-ghost" disabled>Current plan</button>
+            <button class="vi-tier-cta vi-tier-cta-ghost" disabled>No card, no cost</button>
           </div>
-          <!-- Pro (featured) -->
-          <div class="vi-tier-col vi-tier-featured">
-            <div class="vi-tier-popular">Most Popular</div>
-            <div class="vi-tier-name">Pro</div>
-            <div class="vi-tier-price" id="offer-price">£5.99<span>/mo</span></div>
-            <div class="vi-tier-saving" id="offer-saving" style="display:none"></div>
+          <!-- Pioneer monthly -->
+          <div class="vi-tier-col vi-tier-monthly">
+            <div class="vi-tier-popular">Pioneer</div>
+            <div class="vi-tier-name">Monthly</div>
+            <div class="vi-tier-price" id="offer-price-monthly">£5.99<span>/mo</span></div>
+            <div class="vi-tier-saving" id="offer-note-monthly">Cancel any time</div>
             <ul class="vi-tier-features">
-              <li>Everything in Free</li>
-              <li>Entrepreneur tab</li>
-              <li>NW History</li>
-              <li>3D Vault</li>
-              <li>Analytics suite</li>
-              <li>Early access</li>
-              <li>Priority support</li>
+              <li>The whole app, editing on</li>
+              <li>Net worth history</li>
+              <li>House Levels 2 and 3</li>
+              <li>Entrepreneur</li>
+              <li>Projections and forecast</li>
+              <li>Version history and restore</li>
+              <li>Connections</li>
+              <li>AI screenshot reader, 30 a month</li>
             </ul>
-            <button class="vi-tier-cta vi-tier-cta-primary" id="offer-cta-annual" onclick="showUpgrade('annual'); document.getElementById('pro-offer-modal').classList.add('hidden')">
-              <span id="offer-annual-price">£49.99/yr</span> · Annual
-            </button>
-            <button class="vi-tier-cta vi-tier-cta-secondary" id="offer-cta-monthly" onclick="showUpgrade('monthly'); document.getElementById('pro-offer-modal').classList.add('hidden')">Monthly billing</button>
-            <div class="vi-tier-annual-note" id="offer-annual-note">Early backer rate</div>
-            <div class="vi-modal-expires" id="offer-expires" style="text-align:center;margin-top:4px"></div>
+            <button class="vi-tier-cta vi-tier-cta-secondary" id="offer-cta-monthly" onclick="showUpgrade('monthly'); document.getElementById('pro-offer-modal').classList.add('hidden')">Go monthly</button>
+          </div>
+          <!-- Pioneer yearly (featured) -->
+          <div class="vi-tier-col vi-tier-featured vi-tier-yearly">
+            <div class="vi-tier-popular">Pioneer · best value</div>
+            <div class="vi-tier-name">Yearly</div>
+            <div class="vi-tier-price" id="offer-price-annual">£49.99<span>/yr</span></div>
+            <div class="vi-tier-saving" id="offer-note-annual">Around 30% less than paying monthly</div>
+            <ul class="vi-tier-features">
+              <li>Everything in monthly, plus:</li>
+              <li>Your own 3D house design</li>
+              <li>AI house model</li>
+              <li>Early access and roadmap voting</li>
+              <li>Extra house types</li>
+            </ul>
+            <button class="vi-tier-cta vi-tier-cta-primary" id="offer-cta-annual" onclick="showUpgrade('annual'); document.getElementById('pro-offer-modal').classList.add('hidden')">Go yearly</button>
           </div>
           <!-- Founding Member -->
           <div class="vi-tier-col vi-tier-founder">
-            <div class="vi-tier-popular" style="color:var(--go)">Limited · Founder</div>
-            <div class="vi-tier-name">Founder</div>
+            <div class="vi-tier-popular" style="color:var(--go)">100 places · testers first</div>
+            <div class="vi-tier-name">Founding Member</div>
             <div class="vi-tier-price" style="color:var(--go)">£149<span> once</span></div>
-            <div class="vi-tier-saving">Lifetime · pay once</div>
+            <div class="vi-tier-saving">Yearly Pioneer for the life of the service</div>
             <ul class="vi-tier-features">
-              <li>Everything in Pro</li>
-              <li>Lifetime access</li>
-              <li>Founder badge</li>
-              <li>Name in credits</li>
+              <li>Everything in yearly, for good</li>
+              <li>Founding badge and name in credits</li>
               <li>Priority requests</li>
-              <li>Roadmap voting</li>
               <li>Founders channel</li>
+              <li>AI screenshot reader, 10 a month</li>
             </ul>
-            <button class="vi-tier-cta vi-tier-cta-founder" onclick="showUpgrade('founder'); document.getElementById('pro-offer-modal').classList.add('hidden')">Become a Founding Member →</button>
+            <button class="vi-tier-cta vi-tier-cta-founder" id="offer-cta-founder" onclick="showUpgrade('founder'); document.getElementById('pro-offer-modal').classList.add('hidden')">Take a place</button>
           </div>
         </div>
       </div>
-      <button class="vi-cta-ghost" id="offer-ghost" onclick="document.getElementById('pro-offer-modal').classList.add('hidden')">Continue on free tier</button>
+      <button class="vi-cta-ghost" id="offer-ghost" onclick="document.getElementById('pro-offer-modal').classList.add('hidden')">Not now</button>
     </div>
   </div>
 </div>
@@ -12277,20 +12276,22 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     </div>
     </details>
 
-    <!-- Pioneer Status -->
+    <!-- Your plan (owner, 31 Oct 2026: Vaulter / Pioneer monthly / Pioneer yearly / Founding Member; beta testers £2 a month, £28 a year off) -->
     <div style="margin-bottom:20px;padding:16px;background:linear-gradient(135deg,rgb(var(--brass-rgb) / .07),rgb(var(--brass-rgb) / .02));border-radius:10px;border:1px solid rgb(var(--brass-rgb) / .35)">
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">
         <span style="font-size:.9rem;animation:pw-pulse 2.5s ease-in-out infinite;display:inline-block">◆</span>
-        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.58rem;color:var(--go);letter-spacing:.1em">PIONEER STATUS</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.58rem;color:var(--go);letter-spacing:.1em">YOUR PLAN</span>
         <span id="set-pioneer-badge" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.4rem"></span>
       </div>
-      <div id="set-pioneer-active" style="display:none;font-size:.5rem;color:var(--gr);margin-bottom:10px;line-height:1.5"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access active</div>
-      <div id="set-pioneer-inactive" style="font-size:.5rem;color:var(--t2);margin-bottom:10px;line-height:1.5">Upgrade to Pioneer: unlimited tracking, export, projections,<br>£5.99 a month or £49.99 a year.</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:7px">
-        <button onclick="window.open('https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00','_blank')" style="background:var(--c3);border:1px solid rgb(var(--brass-rgb) / .4);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:7px 6px;cursor:pointer">£5.99/mo</button>
-        <button onclick="showUpgrade('annual')" style="background:linear-gradient(90deg,rgba(184,144,46,.15),rgb(var(--brass-rgb) / .15));border:1px solid rgb(var(--brass-rgb) / .5);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:7px 6px;cursor:pointer">£49.99/yr ★</button>
-        <button onclick="closeSettings();showPaywall('assets')" style="background:none;border:1px solid var(--bd);border-radius:5px;color:var(--t3);font-size:.44rem;padding:7px 9px;cursor:pointer;white-space:nowrap">Already paid?</button>
+      <div id="set-pioneer-active" style="display:none;font-size:.5rem;color:var(--gr);margin-bottom:10px;line-height:1.5"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access active. Thank you for backing Vault-It.</div>
+      <div id="set-pioneer-inactive" style="font-size:.5rem;color:var(--t2);margin-bottom:8px;line-height:1.5"></div>
+      <div id="set-plan-extras" style="font-size:.46rem;color:var(--t3);margin-bottom:10px;line-height:1.55">Pioneer is the whole app with editing on: net worth history, house Levels 2 and 3, Entrepreneur, projections, version history and restore, Connections. Yearly adds your own 3D house design, the AI house model, early access with roadmap voting and the extra house types. Founding Member (£149 once, 100 places, beta testers first) has all of that for the life of the service.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
+        <button id="set-plan-monthly" onclick="showUpgrade('monthly')" style="background:var(--c3);border:1px solid rgb(var(--brass-rgb) / .4);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:8px 6px;cursor:pointer">Monthly £5.99</button>
+        <button id="set-plan-annual" onclick="showUpgrade('annual')" style="background:linear-gradient(90deg,rgba(184,144,46,.15),rgb(var(--brass-rgb) / .15));border:1px solid rgb(var(--brass-rgb) / .5);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:8px 6px;cursor:pointer">Yearly £49.99</button>
+        <button id="set-plan-founder" onclick="showUpgrade('founder')" style="background:rgb(var(--brass-rgb) / .22);border:1px solid rgb(var(--brass-rgb) / .6);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;padding:8px 6px;cursor:pointer">Founding £149</button>
       </div>
+      <div style="margin-top:8px;text-align:right"><button onclick="closeSettings();showPaywall('assets')" style="background:none;border:1px solid var(--bd);border-radius:5px;color:var(--t3);font-size:.44rem;padding:6px 9px;cursor:pointer">Already paid?</button></div>
     </div>
 
     <div style="font-size:.5rem;color:var(--t3);margin-bottom:16px;padding:10px;background:rgb(var(--teal-rgb) / .04);border-radius:6px;border:1px solid var(--bd)">
@@ -12391,15 +12392,15 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      <a href="https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00" target="_blank" class="pw-plan">
+      <a href="#" onclick="showUpgrade('monthly');return false" class="pw-plan">
         <div style="font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;color:var(--t2)">Monthly</div>
-        <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:900;color:var(--go);line-height:1">£5.99</div>
+        <div id="pw-price-monthly" style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:900;color:var(--go);line-height:1">£5.99</div>
                 <div style="font-size:.42rem;color:var(--em);margin-top:2px">per month · cancel anytime</div>
       </a>
       <a href="#" onclick="showUpgrade('annual');return false" class="pw-plan pw-plan-annual">
         <div class="pw-best-badge" style="margin-bottom:3px">Best Value</div>
-        <div style="font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;color:var(--t2)">Annual</div>
-        <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:900;color:var(--go);line-height:1">£49.99</div>
+        <div style="font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;color:var(--t2)">Yearly</div>
+        <div id="pw-price-annual" style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:900;color:var(--go);line-height:1">£49.99</div>
                 <div style="font-size:.42rem;color:var(--em);margin-top:2px">billed annually</div>
       </a>
     </div>
@@ -12830,8 +12831,8 @@ body.vi-wide #nwChart { height: 300px !important; }
 /* ═══ TIER TABLE (offer modal) ════════════════════════════ */
 .vi-tier-wrap { display: flex; justify-content: center; padding: 0 0 12px; }
 .vi-tier-table {
-  display: grid; grid-template-columns: 1fr 1.15fr 1fr;
-  gap: 0; width: 100%; max-width: 580px;
+  display: grid; grid-template-columns: 1fr 1fr 1.1fr 1fr;
+  gap: 0; width: 100%; max-width: 820px;
   border: 1px solid var(--bd); border-radius: 8px; overflow: hidden;
 }
 .vi-tier-col {
@@ -12843,6 +12844,11 @@ body.vi-wide #nwChart { height: 300px !important; }
 .vi-tier-col:last-child { border-right: none; }
 .vi-tier-col.vi-tier-featured { background: rgb(var(--teal-rgb) / .05); position: relative; }
 .vi-tier-col.vi-tier-founder  { background: rgb(var(--brass-rgb) / .04); }
+.vi-tier-col.vi-tier-vaulter  { background: rgb(var(--ink-rgb) / .035); }
+.vi-tier-price s { color: var(--t3); font-size: .58rem; font-weight: 400; margin-right: 5px; text-decoration-thickness: 1.5px; }
+.vi-tier-tester { display:block; font-family:'Share Tech Mono',monospace; font-size:.4rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gr); margin-top:3px; }
+#pro-offer-modal .vi-modal-box { max-width: 880px; }
+@media (max-width: 760px) { .vi-tier-table { grid-template-columns: 1fr 1fr; } .vi-tier-col { border-bottom: 1px solid var(--bd); } .vi-tier-col:nth-child(2n) { border-right: none; } }
 .vi-tier-popular {
   font-family:'Syne',sans-serif; font-weight:800;
   font-size:.38rem; letter-spacing:.18em; text-transform:uppercase;
@@ -12886,7 +12892,7 @@ body.vi-wide #nwChart { height: 300px !important; }
 .vi-tier-annual-note { font-size:.4rem; color:var(--t3); text-align:center; margin-top:4px; }
 @media (max-width:560px) {
   .vi-tier-table { grid-template-columns: 1fr; }
-  .vi-tier-col { border-right:none; border-bottom:1px solid var(--bd); }
+  .vi-tier-col, .vi-tier-col:nth-child(2n) { border-right:none; border-bottom:1px solid var(--bd); }
   .vi-tier-col:last-child { border-bottom:none; }
 }
 
@@ -22803,11 +22809,9 @@ function viShowTrialEnd(reason) {
   set('offer-headline', ended ? 'Pick a plan to keep editing.' : 'Pick a plan before your 30 days end.');
   set('offer-body', ended ? 'Everything you entered is safe and still here to read. Choose a plan to carry on adding and editing.'
                           : 'Your numbers stay yours either way. After day 30 the vault turns read-only until you choose a plan.');
-  var gate = document.getElementById('offer-task-gate'); if (gate) gate.style.display = 'none';
-  var cta = document.getElementById('offer-cta-annual'); if (cta) { cta.disabled = false; cta.style.opacity = ''; cta.innerHTML = '<span id="offer-annual-price">£49.99/yr</span> · Annual'; }
-  var mo = document.getElementById('offer-cta-monthly'); if (mo) mo.style.display = '';
+  viPricePaint();
   var ghost = document.getElementById('offer-ghost'); if (ghost) ghost.textContent = ended ? 'Keep reading only' : 'Not now';
-  modal.classList.add('vi-trial-end'); modal.classList.remove('hidden');
+  modal.classList.toggle('vi-trial-end', ended); modal.classList.remove('hidden');   // once the days are up, Founding Member leads
   if (reason === 'open') { try { localStorage.setItem('vi_trial_prompt', new Date().toDateString()); } catch (e) {} }
 }
 // one fixed line at the foot of the page: week-one nudges (the next core task), the countdown from day 23, read-only after day 30
@@ -22845,6 +22849,7 @@ function showPaywall(feature){
   var msg=document.getElementById('paywall-feature-msg');
   if(msg)msg.textContent=msgs[feature]||'🔒 This is a Pioneer feature.';
   var modal=document.getElementById('paywall-modal');
+  try{viPricePaint();}catch(e){}
   if(modal)modal.style.display='flex';
 }
 
@@ -23258,11 +23263,12 @@ function _refreshPioneerSettingsUI(){
   var st=viTrialState(),pioneer=st==='paid',left=viTrialDaysLeft(),day=viTrialDay();
   if(active)active.style.display=pioneer?'block':'none';
   if(inactive){inactive.style.display=pioneer?'none':'block';
-    inactive.textContent=st==='ended'?'Your 30 days are up, so the vault is read-only: every number is safe and still here. Pick a plan to carry on editing: £5.99 a month or £49.99 a year, or a Founding Member place at £149 once.'
-      :'Day '+day+' of your 30 free days ('+left+(left===1?' day':' days')+' left). Everything is open. After day 30 the vault turns read-only until you pick a plan: £5.99 a month or £49.99 a year.';}
+    inactive.textContent=st==='ended'?'Your 30 days are up, so you are a Vaulter: the vault is read-only and every number is safe and still here. Pick a plan to carry on editing: Pioneer at '+viPlanLabel('monthly')+' or '+viPlanLabel('annual')+', or a Founding Member place at £149 once.'
+      :'Day '+day+' of your 30 free days ('+left+(left===1?' day':' days')+' left). Everything is open. After day 30 the vault turns read-only (Vaulter) until you pick a plan: Pioneer at '+viPlanLabel('monthly')+' or '+viPlanLabel('annual')+'.';}
+  try{viPricePaint();}catch(e){}
   if(badge)badge.innerHTML=pioneer
     ?'<span style="color:var(--go);background:rgb(var(--brass-rgb) / .12);padding:2px 7px;border-radius:10px;border:1px solid rgb(var(--brass-rgb) / .3)">◆ ACTIVE</span>'
-    :st==='ended'?'<span style="color:var(--amber);background:rgb(var(--amber-rgb) / .12);padding:2px 7px;border-radius:10px;border:1px solid rgb(var(--amber-rgb) / .35)">READ-ONLY</span>'
+    :st==='ended'?'<span style="color:var(--amber);background:rgb(var(--amber-rgb) / .12);padding:2px 7px;border-radius:10px;border:1px solid rgb(var(--amber-rgb) / .35)">VAULTER · READ-ONLY</span>'
     :'<span style="color:var(--t3);background:var(--c3);padding:2px 7px;border-radius:10px;border:1px solid var(--bd)">TRIAL · '+left+' DAYS LEFT</span>';
 }
 
@@ -25896,13 +25902,50 @@ function updateProGate() {
 // Replace placeholder IDs with live ones from your Stripe dashboard.
 // buy.stripe.com links: Product → Share → Buy link
 // Stripe Payment Link slugs (live, PT Live Design account). Prices in the app must match what each link charges.
+// Stripe Payment Links (live, created 31 Oct 2026 through the Stripe connector; price ids in docs/OFFER_AND_PRICING.md).
+// Every link sends the buyer back to the app with ?upgraded=1 or ?founded=1. The Founding link stops after 100 payments (Stripe's own cap).
 var VI_STRIPE_LINKS = {
-  monthly:  'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',  // £5.99/mo
-  // £49.99/yr. Paste the NEW £49.99 Payment Link here. The old annual link charges more and must not be used while the app says £49.99.
-  annual:   '',
-  // Founding Member, £149 one-off, 100 places. In Stripe set the Payment Link to stop after 100 payments, so the cap is real.
-  founder:  ''
+  monthly:        'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',   // Pioneer monthly £5.99
+  annual:         'https://buy.stripe.com/dRm3cp6Pccff2mFa102VG02',   // Pioneer yearly £49.99
+  monthly_tester: 'https://buy.stripe.com/6oUeV7b5sbbb7GZ6OO2VG03',   // beta testers: £3.99 a month (£2 off)
+  annual_tester:  'https://buy.stripe.com/9B63cp0qObbb2mF6OO2VG04',   // beta testers: £21.99 a year (£28 off)
+  founder:        'https://buy.stripe.com/eVq28l0qO6UV3qJc982VG05'    // Founding Member £149 once, 100 places
 };
+var VI_PLANS = { monthly: { price: 5.99, tester: 3.99, per: ' a month' }, annual: { price: 49.99, tester: 21.99, per: ' a year' }, founder: { price: 149, per: ' once' } };
+// Beta testers get £2 a month / £28 a year off Pioneer (owner, 31 Oct). The app is in beta, so every account counts as a tester
+// until the profile carries a tester flag (secure paid gateway, queued); a device can also be marked with vi_beta.
+var VI_BETA_OPEN = true;
+function viBetaTester() { try { if (localStorage.getItem('vi_beta') === 'false') return false; return VI_BETA_OPEN || localStorage.getItem('vi_beta') === 'true'; } catch (e) { return VI_BETA_OPEN; } }
+function viPlanPrice(plan) { var P = VI_PLANS[plan]; return '£' + ((viBetaTester() && P.tester) ? P.tester : P.price).toFixed(2); }
+function viPlanLabel(plan) {   // for sentences: "£3.99 a month (beta tester price, £2 off)"
+  var P = VI_PLANS[plan], t = viBetaTester() && P.tester;
+  return t ? '£' + P.tester.toFixed(2) + P.per + ' (beta tester price, £' + (Math.round((P.price - P.tester) * 100) / 100) + ' off)' : '£' + P.price.toFixed(2) + P.per;
+}
+// paints every price cell: the tester price with the full price struck through, or the full price alone
+function viPricePaint() {
+  var t = viBetaTester();
+  [['monthly', '/mo', 'offer-price-monthly', 'offer-note-monthly', 'Cancel any time'], ['annual', '/yr', 'offer-price-annual', 'offer-note-annual', 'Around 30% less than paying monthly']].forEach(function (x) {
+    var P = VI_PLANS[x[0]], off = Math.round((P.price - P.tester) * 100) / 100, el = document.getElementById(x[2]), note = document.getElementById(x[3]);
+    if (el) el.innerHTML = t ? '<s>£' + P.price.toFixed(2) + '</s>£' + P.tester.toFixed(2) + '<span>' + x[1] + '</span><span class="vi-tier-tester">Beta tester price · £' + off + ' off</span>' : '£' + P.price.toFixed(2) + '<span>' + x[1] + '</span>';
+    if (note) note.textContent = x[4];
+    var pw = document.getElementById('pw-price-' + x[0]); if (pw) pw.innerHTML = t ? '<s style="color:var(--t3);font-size:.6rem;font-weight:400;margin-right:4px">£' + P.price.toFixed(2) + '</s>£' + P.tester.toFixed(2) : '£' + P.price.toFixed(2);
+    var sb = document.getElementById('set-plan-' + x[0]); if (sb) sb.textContent = (x[0] === 'monthly' ? 'Monthly ' : 'Yearly ') + viPlanPrice(x[0]) + (t ? ' (was £' + P.price.toFixed(2) + ')' : '');
+  });
+}
+function showUpgrade(plan) {
+  var key = plan; if ((plan === 'monthly' || plan === 'annual') && viBetaTester()) key = plan + '_tester';
+  var link = VI_STRIPE_LINKS[key] || VI_STRIPE_LINKS[plan];
+  if (!link) { showToast('That plan is not open yet.'); return; }
+  var user = {};
+  try { user = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
+  var q = [];
+  if (user.email) q.push('prefilled_email=' + encodeURIComponent(user.email));   // Payment Links read prefilled_email from the query
+  // the account id rides along as client_reference_id, so the payment can be matched to this account on the server (secure paid gateway, queued)
+  try { if (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) q.push('client_reference_id=' + encodeURIComponent(_supaUser.id)); } catch (e) {}
+  var checkoutUrl = link + (q.length ? '?' + q.join('&') : '');
+  window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+  showToast(plan === 'founder' ? 'Opening the Founding Member checkout…' : 'Opening secure checkout…');
+}
 // Founding Master Licence — £7.77 one-time (set via Settings or paste here)
 var VI_FOUNDING_LINK = localStorage.getItem('vi_founding_link') || '';
 
@@ -25929,21 +25972,6 @@ var VI_CAMPAIGN = {
   deadline:     '2026-08-31'
 };
 
-function showUpgrade(plan) {
-  var link = VI_STRIPE_LINKS[plan];
-  if (!link) {
-    if (plan === 'founder') { showToast('Founding Member (£149 once, 100 places) opens to beta testers first. We’ll email you.'); return; }
-    if (plan === 'annual')  { showToast('The £49.99 annual plan opens shortly. Monthly (£5.99) is available now.'); return; }
-    link = VI_STRIPE_LINKS.monthly;
-  }
-  if (!link) return;
-  var user = {};
-  try { user = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
-  // Payment Links support prefilled_email as a query param
-  var checkoutUrl = link + (user.email ? '?prefilled_email=' + encodeURIComponent(user.email) : '');
-  window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-  showToast(plan === 'founder' ? '⚡ Opening Founders checkout…' : 'Opening secure checkout…');
-}
 
 // ══════════════════════════════════════════════════════════════
 // DATA EXPORT / IMPORT
@@ -26073,7 +26101,7 @@ function renderPioneerCard() {
     // ── Rarity ──
     var pioneer = isPioneer();
     var rarityStars = pioneer ? '✦✦✦' : '✦';
-    var rarityLabel = pioneer ? 'GENESIS' : 'FREE';
+    var rarityLabel = pioneer ? 'GENESIS' : (typeof viTrialState === 'function' && viTrialState() === 'ended' ? 'VAULTER' : 'TRIAL');
     var joined = u.joined ? new Date(u.joined).getFullYear() : new Date().getFullYear();
     var saveArch  = u.saveArch  || '';
     var spendArch = u.spendArch || '';

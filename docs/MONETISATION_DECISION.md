@@ -120,3 +120,10 @@ The old caps (3 assets, 2 liabilities, 1 debt) go. The house build is never behi
 - Entrepreneur: Advanced and Pioneer only.
 
 **Build order from this.** 1 trial clock and end-of-trial prompt; 2 pop-up and Settings copy with Vaulter / Pioneer monthly / Pioneer yearly / Founding Member columns and the yearly extras named; 3 the gates above replace the old caps; 4 Simplified / Advanced switch with the tile list above; 5 the achievements card on the Overview; 6 the tester welcome message.
+
+## 9. Decided by Pete (31 Oct 2026, afternoon)
+
+- **Vaulter is the read-only state after the 30 days**, not a free tier and not a cheaper paid tier: everything built stays visible, the cloud copy and Download my data keep working, adding and editing wait for a plan. The pop-up shows it as the £0 column.
+- **Beta testers pay £2 a month and £28 a year less**: Pioneer £3.99 a month or £21.99 a year, shown with the full price struck through. Founding Member stays £149. While the app is in beta every account counts as a tester (`VI_BETA_OPEN`); the secure paid gateway (queued) adds a real tester flag on the profile.
+- **Stripe (live account PT Live Design), created 31 Oct through the Stripe connector**: see the table in `docs/OFFER_AND_PRICING.md`. The old £59.99 yearly link is switched off; the monthly link now returns buyers to the app with `?upgraded=1` (it pointed at `?paid=1`, which the app never read).
+- **Secure paid gateway: yes.** Paid status will be set by a Stripe webhook into `profiles` through a new edge function, with the client's write access to `is_pioneer` revoked. Until then the device flag stands. Queued after the open items.
