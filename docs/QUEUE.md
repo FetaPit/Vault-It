@@ -15,6 +15,8 @@ The single list of instructed work. Every session reads it at start and before e
 - [ ] Simplified / Advanced view (owner, 31 Oct): switch in Settings and the welcome flow, new accounts start Simplified, synced per account; tile list in `docs/MONETISATION_DECISION.md` section 8 (Overview KPIs one row, 3D card, roadmap, achievements card; Budget sections collapsed with the Sankey on top and a flow animation; House viewport and plan; all Assets sub-tabs; all of Debt)
 - [ ] Tester welcome message (wording agreed 31 Oct): wire it to the first run for beta accounts
 - [ ] Sign-up page steps (owner, 31 Oct 09:56, from phone screenshots): in the "how it works" steps, drop the big 3D house under step 3 and give steps 1, 2 and 3 a small screenshot each, relevant to its subject; step 2's screenshot carries the relevant brand-book iconography with subtle pulsing animations (reduced motion respected)
+- [ ] 3D net worth first draw (owner, 31 Oct, live defect): the main Overview 3D net worth scene only populates after the 3D view is toggled off and back on; it must draw on first show
+- [ ] Tablet and fold navigation (owner, 31 Oct): tablet and folding-phone widths keep the labelled menu bar at the top; only the phone view has the icon bar at the bottom
 
 ## Waiting on the owner
 
