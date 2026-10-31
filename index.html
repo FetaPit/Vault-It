@@ -7234,6 +7234,16 @@ html, body { background: var(--bg); color: var(--tx); font-family: var(--font-bo
 }
 #left-sidebar.open { left: 0; }
 #sidebar-toggle.open { left: 240px; }
+/* the ledger (owner, 31 Oct): a wider side bar, icon, name and value on each line */
+#left-sidebar{width:min(320px,calc(100vw - 24px));left:calc(-1 * min(320px,calc(100vw - 24px)))}
+#left-sidebar.open{left:0}
+#sidebar-toggle.open{left:min(320px,calc(100vw - 24px))}
+.sb-ledger .sb-lg{display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:8px;padding:3px 0}
+.sb-ledger .sb-lg .ov-sum-ri{width:22px;height:22px}
+.sb-ledger .sb-lg .ov-sum-ri svg{width:16px;height:16px}
+.sb-ledger .sb-lg-l{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 .62rem/1.3 'DM Sans',sans-serif}
+.sb-ledger .sb-val{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text)}
+.sb-ledger .sb-lg-h{margin-top:12px}
 .sb-section { margin-bottom: 16px; }
 .sb-label {
   font-family: 'Syne', sans-serif; font-size: .46rem; font-weight: 700;
@@ -10557,35 +10567,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <button data-c="EUR" onclick="switchCurrency('EUR')" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:.38rem;padding:3px 4px;background:rgb(var(--teal-rgb) / .06);border:1px solid rgb(var(--teal-rgb) / .12);border-radius:4px;color:rgb(var(--teal-rgb) / .4);cursor:pointer;transition:all .15s" title="Euro">€</button>
       <button data-c="INR" onclick="switchCurrency('INR')" style="flex:1;font-family:'Share Tech Mono',monospace;font-size:.38rem;padding:3px 4px;background:rgb(var(--teal-rgb) / .06);border:1px solid rgb(var(--teal-rgb) / .12);border-radius:4px;color:rgb(var(--teal-rgb) / .4);cursor:pointer;transition:all .15s" title="Indian Rupee">₹</button>
     </div>
-    <div class="sb-row"><span style="color:var(--t2)">Total</span><span class="sb-val" id="sb-nw">£0</span></div>
-    <div class="sb-row"><span style="color:var(--t2)">Assets</span><span class="sb-val" id="sb-assets">£0</span></div>
-    <div class="sb-row"><span style="color:var(--re)">Debt</span><span class="sb-val" style="color:var(--re)" id="sb-debt">£0</span></div>
-  </div>
-  <div class="sb-section">
-    <div class="sb-label">House Deposit</div>
-    <div class="sb-row"><span id="sb-house-type" style="color:var(--em)">Terraced</span><span class="sb-val" id="sb-house-pct">0%</span></div>
-    <div class="sb-bar-wrap"><div class="sb-bar-fill" id="sb-house-bar" style="width:0%"></div></div>
-    <div class="sb-row"><span style="color:var(--t3)">Saved</span><span class="sb-val" id="sb-house-saved">£0</span></div>
-    <div class="sb-row"><span style="color:var(--t3)">Target</span><span class="sb-val" id="sb-house-target">£0</span></div>
-  </div>
-  <div class="sb-section">
-    <div class="sb-label">Assets by Class</div>
-    <div class="sb-row"><span style="color:var(--gold)">Metals</span><span class="sb-val" id="sb-metals">£0</span></div>
-    <div class="sb-row"><span style="color:var(--teal)">Crypto</span><span class="sb-val" id="sb-crypto">£0</span></div>
-    <div class="sb-row"><span style="color:var(--gr)">Cash</span><span class="sb-val" id="sb-cash">£0</span></div>
-    <div class="sb-row"><span style="color:var(--green2)">Stocks &amp; Funds</span><span class="sb-val" id="sb-stocks">£0</span></div>
-    <div class="sb-row"><span style="color:var(--purple)">Inventory</span><span class="sb-val" id="sb-other">£0</span></div>
-  </div>
-  <div class="sb-section">
-    <div class="sb-label">Cashflow</div>
-    <div class="sb-row"><span style="color:var(--gr)">Income</span><span class="sb-val" id="sb-income">£0/mo</span></div>
-    <div class="sb-row"><span style="color:var(--re)">Expenses</span><span class="sb-val" id="sb-exp">£0/mo</span></div>
-    <div class="sb-row"><span style="color:var(--em)">Surplus</span><span class="sb-val" id="sb-surplus">£0/mo</span></div>
-  </div>
-  <div class="sb-section">
-    <div class="sb-label">MRR</div>
-    <div class="sb-row"><span style="color:var(--t2)">Business</span><span class="sb-val" id="sb-mrr">£0/mo</span></div>
-    <div class="sb-row"><span style="color:var(--t2)">Clients</span><span class="sb-val" id="sb-clients">0</span></div>
+    <!-- the ledger (owner, 31 Oct): every money figure in the app, each with its icon, written by viRenderLedger from the dashboard's own functions -->
+    <div id="sb-ledger" class="sb-ledger"></div>
   </div>
   <div class="sb-section" id="sb-profile-section">
     <div class="sb-label">Your Profile</div>
@@ -13898,31 +13881,56 @@ function updateSidebar(){
   } catch(e) {}
 
   if(!_sidebarOpen)return;
-  var nw=computeNetWorth();
-  var assets=totalAssets()+alTotalAssets();
-  _sbEl('sb-nw',gbpFmt(nw));
-  _sbEl('sb-assets',gbpFmt(assets));
-  _sbEl('sb-debt',gbpFmt(debtTotal()));
-  var p=typeof pct==='function'?pct():0;
-  var htype=(state&&state.houseType)||'terraced';
-  _sbEl('sb-house-type',htype.charAt(0).toUpperCase()+htype.slice(1));
-  _sbEl('sb-house-pct',(p*100).toFixed(1)+'%');
-  _sbEl('sb-house-saved',gbpFmt(state?state.saved:0));
-  _sbEl('sb-house-target',gbpFmt(state?state.target:0));
-  var hbar=document.getElementById('sb-house-bar');if(hbar)hbar.style.width=(p*100)+'%';
-  _sbEl('sb-metals',gbpFmt(alTotalMetals()));
-  _sbEl('sb-crypto',gbpFmt(alTotalCrypto()));
-  _sbEl('sb-cash',gbpFmt(alTotalCash()+(state?state.saved:0)));
-  _sbEl('sb-stocks',gbpFmt(alTotalStocks()));
-  _sbEl('sb-other',gbpFmt(alTotalOther()));
-  var inc=cfTotalIn(),exp=cfTotalOut();
-  _sbEl('sb-income',gbpFmt(inc)+'/mo');
-  _sbEl('sb-exp',gbpFmt(exp)+'/mo');
-  var sur=inc-exp;
-  var surEl=document.getElementById('sb-surplus');
-  if(surEl){surEl.textContent=gbpFmt(sur)+'/mo';surEl.style.color=sur>=0?'var(--em)':'var(--re)';}
-  _sbEl('sb-mrr',gbpFmt(typeof bizMRR==='function'?bizMRR():0)+'/mo');
-  _sbEl('sb-clients',typeof bizState!=='undefined'?(bizState.clients||[]).filter(function(c){return c.status==='Active';}).length:0);
+  try{viRenderLedger();}catch(e){console.error('[Vault-It] ledger',e);}
+}
+/* The ledger (owner, 31 Oct 2026): every money figure the app holds, one line each with the icon of where it comes from. Every value
+   is computed by the same function the dashboard, Budget, House builder and Debt tracker use, and printed with the same formatter, so
+   a line always equals what that tab shows. Sections: overview, what you own, the house deposit, what you owe, the monthly budget,
+   and the business when there is one. */
+function viRenderLedger(){
+  var el=document.getElementById('sb-ledger');if(!el)return;
+  var L=VI_LABELS,out=[],f=function(v){return gbpFmt(v)},m=function(v){return gbpFmt(v)+'/mo'};
+  function sec(t){out.push('<div class="sb-label sb-lg-h">'+t+'</div>')}
+  function line(ic,col,label,val,id,vcol){out.push('<div class="sb-row sb-lg" data-k="'+(id||'')+'">'+ovIcon(ic,col)+'<span class="sb-lg-l" style="color:'+col+'">'+ccEsc(label)+'</span><span class="sb-val"'+(id?' id="'+id+'"':'')+(vcol?' style="color:'+vcol+'"':'')+'>'+val+'</span></div>')}
+  var assets=totalAssets()+alTotalAssets(),debtOnly=totalDebts()+debtTotal(),nw=computeNetWorth(),biz=0;
+  if(typeof bizState!=='undefined'&&bizState.incomeStreams)bizState.incomeStreams.forEach(function(s){biz+=(+s.monthlyIncome||0)});
+  var inc=cfTotalIn(),outM=cfTotalOut(),sur=inc+biz-outM;
+  sec('Overview');
+  line('nw',nw>=0?'var(--teal)':'var(--red)','Net worth',f(nw),'sb-nw');
+  line('inv','var(--teal)','Total assets',f(assets),'sb-assets');
+  line('card','var(--red)','Total debt',f(debtOnly),'sb-debt','var(--red)');
+  line('warn','var(--amber)',L.liab,f(alLiabAssetTotal()),'sb-liab');
+  line('plus',sur>=0?'var(--teal)':'var(--red)','Monthly surplus',m(sur),'sb-surplus',sur>=0?'':'var(--red)');
+  sec('What you own');
+  line('cash','var(--green)',L.cash,f(alTotalCash()),'sb-cash');
+  line('house','var(--teal)',L.deposit,f(state?state.saved:0),'sb-deposit');
+  line('stocks','var(--green2)',L.stocks,f(alTotalStocks()),'sb-stocks');
+  line('metals','var(--gold)',L.metals,f(alTotalMetals()),'sb-metals');
+  line('inv','var(--purple)',L.inv,f(alTotalOther()),'sb-other');
+  line('crypto','var(--teal)',L.crypto,f(alTotalCrypto()),'sb-crypto');
+  if(typeof alTotalOwedToMe==='function')line('owed','var(--blue)',L.owed,f(alTotalOwedToMe()),'sb-owed');
+  if(totalAssets()>0)line('inv','var(--t2)','Other assets',f(totalAssets()),'sb-other-assets');
+  sec('House deposit');
+  var p=typeof pct==='function'?pct():0,ht=(state&&state.houseType)||'terraced';
+  line('house','var(--teal)',ht.charAt(0).toUpperCase()+ht.slice(1)+' · '+(p*100).toFixed(1)+'% saved',f(state?state.saved:0),'sb-house-saved');
+  line('flag','var(--gold)','Deposit target',f(typeof depositTarget==='function'?depositTarget():0),'sb-house-deposit');
+  line('house','var(--t2)','House price',f(state?state.target:0),'sb-house-target');
+  out.push('<div class="sb-bar-wrap"><div class="sb-bar-fill" id="sb-house-bar" style="width:'+Math.min(100,p*100).toFixed(1)+'%"></div></div>');
+  var debts=(typeof debtState!=='undefined'&&debtState.debts)||[],liabs=(alState.liabilities||[]);
+  if(debts.length||liabs.length){sec('What you owe');
+    debts.forEach(function(d){line((d.type==='credit'||d.type==='bnpl')?'card':'loan','var(--red)',d.name||'Debt',f(+d.balance||0),'sb-debt-'+d.id,'var(--red)')});
+    liabs.forEach(function(l){line('warn','var(--amber)',l.name||'Liability',f(depreciatedValue(l)),'sb-liab-'+l.id)});
+    if(alTotalLiab()>0)line('warn','var(--amber)','Running costs so far',f(alTotalLiab()),'sb-running');}
+  sec('Monthly budget');
+  line('income','var(--teal)','Income',m(inc),'sb-income');
+  var by=cfItemsByGroup();
+  CF_GROUP_ORDER.forEach(function(g){var t=(by[g]||[]).reduce(function(a,r){return a+(+r.amount||0)},0);if(t>0)line(g==='sv'?'cash':g==='iv'?'stocks':'out',CF_GROUPS[g].col,CF_GROUPS[g].short,m(t),'sb-bd-'+g)});
+  var mdl=cfModel();if(mdl.overflow>0)line('plus','var(--t2)','Not assigned yet',m(mdl.overflow),'sb-unassigned');
+  if(biz>0)line('biz','var(--orange)','Business income',m(biz),'sb-biz-income');
+  line('plus',sur>=0?'var(--teal)':'var(--red)','Surplus',m(sur),'sb-surplus-2',sur>=0?'':'var(--red)');
+  var mrr=typeof bizMRR==='function'?bizMRR():0,cl=typeof bizState!=='undefined'?(bizState.clients||[]).filter(function(c){return c.status==='Active'}).length:0;
+  if(mrr>0||cl>0){sec('Business');line('biz','var(--orange)','Monthly recurring revenue',m(mrr),'sb-mrr');line('biz','var(--orange)','Active clients',String(cl),'sb-clients');}
+  el.innerHTML=out.join('');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -17252,7 +17260,14 @@ var OV_ICO={
   inv:'<path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/>',
   warn:'<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/>',
   card:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
-  loan:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10h5a2 2 0 0 1 0 4H9"/>'
+  loan:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10h5a2 2 0 0 1 0 4H9"/>',
+  nw:'<path d="M3 20h18"/><path d="M5 16l5-5 4 3 6-7"/><circle cx="20" cy="7" r="1.5"/>',
+  income:'<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 19h16"/>',
+  out:'<path d="M12 21V9M7 14l5-5 5 5"/><path d="M4 5h16"/>',
+  plus:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+  flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+  biz:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  owed:'<path d="M4 12h12M12 7l5 5-5 5"/><path d="M20 5v14"/>'
 };
 var _ccPct={};   // % shown last time for each card, so a payment cuts from where it was and an undo joins it back up
 var _ccIO=null;
@@ -27991,10 +28006,12 @@ function makeNW(cv,o){
     var lf=clamp(cw*.022,9,12),lines={};
     function names(back){c.font=lf+"px 'Share Tech Mono',monospace";c.textAlign="center";c.textBaseline="alphabetic";
     cols.filter(function(cc){return (LZ[cc.key]<0)===back}).map(function(cc){return {c:cc,q:P.pt(X[cc.key],0,LZ[cc.key])}}).sort(function(a,b){return a.q[0]-b.q[0]}).forEach(function(L){
-      var row=lines[LZ[L.c.key]]=lines[LZ[L.c.key]]||[-1e9,-1e9,-1e9],w=c.measureText(L.c.short).width,r=-1;L.q[0]=clamp(L.q[0],w/2+4,cw-w/2-4);L.q[1]=Math.min(L.q[1],ch-8-2*(lf+3));   /* full names (owner, 31 Oct): up to three staggered lines, never off the stage */
-      for(var j=0;j<3;j++)if(L.q[0]-w/2>row[j]+6){r=j;break}if(r<0)return;row[r]=L.q[0]+w/2;
+      var placed=lines.box=lines.box||[],w=c.measureText(L.c.short).width,r=-1;L.q[0]=clamp(L.q[0],w/2+4,cw-w/2-4);L.q[1]=Math.min(L.q[1],ch-8-2*(lf+3));   /* full names (owner, 31 Oct): up to three staggered lines, never off the stage, never over another name */
+      for(var j=0;j<3&&r<0;j++){var yy=L.q[1]+j*(lf+3),x0=L.q[0]-w/2-3,x1=L.q[0]+w/2+3;if(!placed.some(function(B){return Math.abs(B.y-yy)<lf+2&&x0<B.x1&&x1>B.x0}))r=j}
+      if(r<0)return;placed.push({x0:L.q[0]-w/2-3,x1:L.q[0]+w/2+3,y:L.q[1]+r*(lf+3)});
       c.fillStyle=L.c.dir<0?rgba(PAL.red,.95):rgba(PAL.gold,.95);if(hover===L.c.key)c.fillStyle='#fff';   /* what you own in gold, like the dashboard tag; debts stay red */c.fillText(L.c.short,L.q[0],L.q[1]+r*(lf+3))})}
-    names(true);items.forEach(function(g){if(g.dir>0)paint(g)});names(false);
+    if(narrow){items.forEach(function(g){if(g.dir>0)paint(g)});names(true);names(false)}   /* phones: names on top of the blocks, so none hides behind a column */
+    else{names(true);items.forEach(function(g){if(g.dir>0)paint(g)});names(false)}
     var l1=debt<=0&&net>=0?"OUT OF THE RED":red?"IN THE RED":"NET WORTH";
     tag(c,cw,l1,fmt(net),red,P.pt(box.x,0,0));
     c.restore();
