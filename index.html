@@ -10175,7 +10175,37 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 [data-theme="light"] .btn-add-data[style*="color:var(--t3)"]{color:var(--text)!important;background:transparent!important;border-color:var(--lock)!important}
 [data-theme="light"] #sync-banner{color:var(--text)!important;border-color:var(--amber)!important}
 /* trial then paid: the plans prompt (no free column, Founding Member first) and the foot-of-page trial line */
-#pro-offer-modal.vi-trial-end .vi-tier-founder{order:-1}   /* once the days are up, Founding Member (testers first) leads */
+#pro-offer-modal.vi-trial-end .vi-tier-founder{order:-1}
+/* Simplified / Advanced view (owner, 31 Oct) */
+body.vi-simple [data-adv],html body.vi-simple #topnav .tab-btn[data-adv]{display:none!important}
+body:not(.vi-simple) [data-simple]{display:none!important}
+body.vi-simple #house-tab-inner[data-lvl="1"] #hb-hud{display:none!important}
+body.vi-simple .bd-page{display:flex;flex-direction:column}
+body.vi-simple .bd-page>*{order:2}
+body.vi-simple .bd-page>:first-child{order:0}
+body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
+.settings-hint{font-size:.46rem;color:var(--t3);line-height:1.5}
+.w-view-pick{margin-top:14px;text-align:left}
+.w-view-lbl{font-family:'Syne',sans-serif;font-weight:700;font-size:.56rem;color:var(--tx);margin-bottom:8px}
+.w-view-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.w-view-opt{display:flex;flex-direction:column;gap:3px;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--bd2);background:var(--c3);color:var(--t2);cursor:pointer;min-height:44px}
+.w-view-opt b{font-family:'Syne',sans-serif;font-size:.6rem;color:var(--tx)}
+.w-view-opt span{font-size:.48rem;line-height:1.4}
+.w-view-opt.active{border-color:var(--teal);background:rgb(var(--teal-rgb) / .1);box-shadow:inset 0 0 0 1px rgb(var(--teal-rgb) / .4)}
+.w-view-note{font-size:.46rem;color:var(--t3);margin-top:6px}
+.ov-ach-all{background:none;border:1px solid var(--bd2);border-radius:6px;color:var(--t2);font-size:.5rem;padding:6px 10px;cursor:pointer;min-height:32px}
+.ov-ach-top{display:flex;align-items:center;gap:14px;padding:4px 2px 10px}
+.ov-ach-lv{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:'Share Tech Mono',monospace;font-size:1rem;color:var(--brass);border:1.5px solid var(--brass);background:rgb(var(--brass-rgb) / .08)}
+.ov-ach-meta{flex:1;min-width:0}.ov-ach-meta b{font-family:'Syne',sans-serif;font-size:.66rem;color:var(--tx)}.ov-ach-meta small{display:block;font-size:.48rem;color:var(--t3);margin-top:4px}
+.ov-ach-bar{height:6px;border-radius:3px;background:rgb(var(--ink-rgb) / .08);margin-top:6px;overflow:hidden}.ov-ach-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--brass),var(--gold))}
+.ov-ach-streak{flex:none;text-align:center}.ov-ach-streak b{display:block;font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:var(--gold)}.ov-ach-streak small{font-size:.44rem;color:var(--t3)}
+.ov-ach-badges{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.ov-ach-badge{font-size:1.1rem;width:34px;height:34px;display:grid;place-items:center;border-radius:8px;background:rgb(var(--brass-rgb) / .08);border:1px solid rgb(var(--brass-rgb) / .25)}
+.ov-ach-none{font-size:.52rem;color:var(--t2);flex:1;min-width:180px}.ov-ach-count{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.46rem;color:var(--t3)}
+/* the Sankey's bands breathe in a wave from left to right; never with reduced motion */
+@keyframes cfFlow{0%,100%{opacity:1}50%{opacity:.62}}
+@media (prefers-reduced-motion:no-preference){body:not(.reduced-motion) .cf-ln{animation:cfFlow 3.6s ease-in-out infinite}}
+/* KPIs: one row on desktop, two rows on phones (three then two) */
+@media (max-width:699px) and (min-width:321px){.ov-kpis:not(.debt-strip){grid-template-columns:repeat(6,minmax(0,1fr))!important}.ov-kpis:not(.debt-strip)>.ov-kpi{grid-column:span 2!important}.ov-kpis:not(.debt-strip)>.ov-kpi:nth-child(n+4){grid-column:span 3!important}}   /* once the days are up, Founding Member (testers first) leads */
 #trial-banner{position:fixed;left:8px;right:8px;bottom:8px;z-index:10001;background:var(--panel);color:var(--text);border:1px solid var(--teal);border-radius:10px;padding:10px 12px;font-size:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 8px 24px rgb(0 0 0 / .25)}
 #trial-banner.trial-warn{border-color:var(--amber)}
 #trial-banner .trial-msg{flex:1;min-width:180px;line-height:1.45}
@@ -10737,6 +10767,14 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
         </div>
       </div>
       <div style="font-size:.5rem;color:var(--t3);line-height:1.55;margin-top:10px;text-align:center">Got debts? You'll add each one separately, with its type, interest rate and minimum payment, in the <b style="color:var(--em)">Debt Tracker</b>, so your payoff plan is accurate.</div>
+      <div class="w-view-pick" role="group" aria-label="How much to show on screen">
+        <div class="w-view-lbl">How much do you want on screen?</div>
+        <div class="w-view-opts">
+          <button type="button" class="w-view-opt active" data-v="simple" aria-pressed="true" onclick="wPickView('simple',this)"><b>Simplified</b><span>The essentials. Recommended to start.</span></button>
+          <button type="button" class="w-view-opt" data-v="adv" aria-pressed="false" onclick="wPickView('adv',this)"><b>Advanced</b><span>Every tile and tab.</span></button>
+        </div>
+        <div class="w-view-note">You can switch any time in Settings.</div>
+      </div>
       <button class="welcome-cta" onclick="wStep2Submit()" style="margin-top:14px">Start Vaulting →</button>
     </div>
 
@@ -11006,8 +11044,8 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     <button class="tab-btn" data-tab="house" role="tab" aria-label="House builder" title="House builder" onclick="showTab('house')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-house-builder"/></svg><span class="nav-tab-label">House builder</span><span class="vi-usp" aria-hidden="true">USP</span></button>
     <button class="tab-btn" data-tab="assets" role="tab" aria-label="Assets and liabilities" title="Assets and liabilities" onclick="showTab('assets')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-assets"/></svg><span class="nav-tab-label">Assets &amp; liabilities</span></button>
     <button class="tab-btn" data-tab="debt" role="tab" aria-label="Debt tracker" title="Debt tracker" onclick="showTab('debt')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-debt-tracker"/></svg><span class="nav-tab-label">Debt tracker</span></button>
-    <button class="tab-btn" data-tab="biz" role="tab" aria-label="Entrepreneur" title="Entrepreneur" onclick="showTab('biz');setTimeout(function(){var g=document.getElementById('pro-gate-biz');if(g&&g.style.display!=='none'){gateNudge('Entrepreneur','Income streams + CRM');}},100)"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-entrepreneur"/></svg><span class="nav-tab-label">Entrepreneur</span><span class="vi-pro pro-badge" aria-hidden="true">PRO</span></button>
-    <button class="tab-btn" data-tab="achievements" role="tab" aria-label="Achievements" title="Achievements" onclick="showTab('achievements')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-trophy"/></svg><span class="nav-tab-label">Achievements</span></button>
+    <button class="tab-btn" data-tab="biz" data-adv role="tab" aria-label="Entrepreneur" title="Entrepreneur" onclick="showTab('biz');setTimeout(function(){var g=document.getElementById('pro-gate-biz');if(g&&g.style.display!=='none'){gateNudge('Entrepreneur','Income streams + CRM');}},100)"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-entrepreneur"/></svg><span class="nav-tab-label">Entrepreneur</span><span class="vi-pro pro-badge" aria-hidden="true">PRO</span></button>
+    <button class="tab-btn" data-tab="achievements" data-adv role="tab" aria-label="Achievements" title="Achievements" onclick="showTab('achievements')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-trophy"/></svg><span class="nav-tab-label">Achievements</span></button>
     <button class="tab-btn" data-tab="connections" role="tab" aria-label="Connections" title="Connections" onclick="showTab('connections')" hidden><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-connections"/></svg><span class="nav-tab-label">Connections</span></button>
     <button class="tab-btn" data-tab="network" role="tab" aria-label="Network" title="Network" onclick="showTab('network')" hidden><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-network"/></svg><span class="nav-tab-label">Network</span></button>
   </div>
@@ -11132,7 +11170,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   </div>
 
   <!-- Milestone targets + snapshots: directly under the Net Worth chart -->
-  <div class="ov-ms-card ov-ms-wide" id="ov-ms-card" data-tab="goals" style="margin-top:16px">
+  <div class="ov-ms-card ov-ms-wide" id="ov-ms-card" data-tab="goals" data-adv style="margin-top:16px">
     <div class="ov-ms-top"><div class="ov-ms-title">Goals and snapshots</div>
       <div class="ov-ms-tabs" role="tablist" aria-label="Goals and snapshots"><button role="tab" id="ov-ms-tab-goals" aria-selected="true" onclick="ovMsTab('goals')">🎯 Goals</button><button role="tab" id="ov-ms-tab-snaps" aria-selected="false" onclick="ovMsTab('snaps')">📸 Snapshots</button></div></div>
     <div class="ms-grid">
@@ -11171,8 +11209,8 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     </div>
   </div>
 
-  <!-- Net Worth History entry card — Pro -->
-  <div class="ov-chart-card" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+  <!-- Net Worth History entry card -->
+  <div class="ov-chart-card" id="ov-nwh-card" data-adv style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
     <div style="flex:1;min-width:180px">
       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.7rem;color:var(--tx);margin-bottom:4px">📅 Net Worth History <span style="font-size:.44rem;color:var(--go);background:rgba(247,179,85,.12);border:1px solid rgba(247,179,85,.2);padding:2px 7px;font-family:'Share Tech Mono',monospace;letter-spacing:.08em;vertical-align:middle">PRO</span></div>
       <div style="font-size:.55rem;color:var(--t2);line-height:1.5">Retroactively track your financial journey since 18: see every high, low and turning point.</div>
@@ -11214,8 +11252,14 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 
   </div>
 
+  <!-- Achievements on the Overview: Simplified view shows this card instead of the Achievements tab (owner, 31 Oct) -->
+  <div class="ov-chart-card ov-ach-card" id="ov-ach-card" data-simple style="margin-top:16px">
+    <div class="ov-chart-hd"><span class="ov-chart-title">Achievements</span><button type="button" class="ov-ach-all" onclick="showTab('achievements')">See all badges</button></div>
+    <div id="ov-ach-body"></div>
+  </div>
+
   <!-- ── CASH FLOW SECTION ── -->
-  <div style="margin-top:24px">
+  <div id="ov-cf-card" data-adv style="margin-top:24px">
     <div class="ov-chart-card">
       <div class="ov-chart-hd">
         <span class="ov-chart-title">Cash Flow</span>
@@ -11232,7 +11276,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   </div>
 
   <!-- Own and owe: assets, liabilities and debt in one card; each heading opens its tab -->
-  <div class="ov-chart-card ov-own" id="ov-own-card" style="margin-top:12px">
+  <div class="ov-chart-card ov-own" id="ov-own-card" data-adv style="margin-top:12px">
   <div class="ov-own-hd"><span class="ov-chart-title">Own and owe</span><span class="ov-own-sub">Tap a heading to open it</span></div>
   <div class="g3" id="ov-summary-row">
     <div class="ov-sum ov-sum-a" id="ov-assets-summary-card">
@@ -11258,7 +11302,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 
 <!-- ═══════════════════════════ BUDGET (zero-based) ═══════════════════════════ -->
 <div id="tab-budget" class="tab-panel" style="display:none">
-  <div style="max-width:1040px;margin:0 auto;padding:24px 20px 60px">
+  <div class="bd-page" style="max-width:1040px;margin:0 auto;padding:24px 20px 60px">
     <div style="margin-bottom:14px">
       <div style="font-family:'Syne',sans-serif;font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:var(--blue);opacity:.8;margin-bottom:6px" class="vi-eyebrow">Vault-It · Budget</div>
       <div style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--t3);letter-spacing:.08em;margin-top:4px">ZERO-BASED BUDGET &nbsp;·&nbsp; INCOME − SPENDING − SAVING = £0</div>
@@ -11450,7 +11494,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
         </div>
         <div class="hb-plan-note" id="hb-plan-brick" style="margin-top:14px"></div>
       </div>
-      <div class="card hb-prog" id="hb-prog">
+      <div class="card hb-prog" id="hb-prog" data-adv>
         <div class="card-lbl">Progress</div>
         <div class="pnums"><div class="saved-amt" id="savedAmt">£0</div><div class="tgt-amt" id="tgtAmt">of £200,000</div></div>
         <div class="pbar-wrap"><div class="pbar-fill" id="pbarFill" style="width:0%"></div></div>
@@ -11477,7 +11521,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
       </div>
     </div>
     <!-- History: contribution streak, savings log, reset -->
-    <div class="card hb-hist" id="hb-hist">
+    <div class="card hb-hist" id="hb-hist" data-adv>
       <div class="card-lbl">History</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
         <div style="font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--em)">Contribution Streak</div>
@@ -11499,7 +11543,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 
 <!-- Your own design: upload a 3D model or generate one with AI (one collapsed card) -->
 <div style="max-width:1140px;margin:16px auto 0;padding:0 20px">
-<details class="ov-chart-card hb-own" id="hb-own-design">
+<details class="ov-chart-card hb-own" id="hb-own-design" data-adv>
 <summary class="ov-chart-title hb-own-sum">Your own design <span class="hb-own-pro">PRO</span><span class="hb-own-hint">Upload a 3D model or describe one for AI to build</span></summary>
 <div class="g2" style="margin-top:12px">
   <div class="hb-own-col">
@@ -12172,6 +12216,8 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
     <!-- Display & Accessibility -->
     <div class="settings-section">
       <div class="settings-section-title">Display &amp; Accessibility</div>
+      <div class="settings-row"><label class="settings-label">View</label><div class="settings-opts" id="set-view"><button data-val="simple" onclick="setSetting('view','simple',this)">Simplified</button><button data-val="adv" onclick="setSetting('view','adv',this)">Advanced</button></div></div>
+      <div class="settings-row" style="margin-top:-6px"><span class="settings-hint" id="set-view-hint">Simplified keeps the essentials on screen. Advanced shows every tile and tab. Nothing is deleted either way.</span></div>
       <div class="settings-row"><label class="settings-label">Text Size</label><div class="settings-opts" id="set-fontsize"><button data-val="small" onclick="setSetting('fontSize','small',this)">Small</button><button data-val="normal" onclick="setSetting('fontSize','normal',this)" class="active">Normal</button><button data-val="large" onclick="setSetting('fontSize','large',this)">Large</button><button data-val="xl" onclick="setSetting('fontSize','xl',this)">XL</button></div></div>
       <div class="settings-row"><label class="settings-label">Contrast</label><div class="settings-opts" id="set-contrast"><button data-val="standard" onclick="setSetting('contrast','standard',this)" class="active">Standard</button><button data-val="high" onclick="setSetting('contrast','high',this)">High Contrast</button></div></div>
       <div class="settings-row"><label class="settings-label">Motion</label><div class="settings-opts" id="set-motion"><button data-val="full" onclick="setSetting('motion','full',this)" class="active">Full</button><button data-val="reduced" onclick="setSetting('motion','reduced',this)">Reduced</button></div></div>
@@ -13435,7 +13481,7 @@ function showTab(id){
   document.querySelectorAll('.tab-btn').forEach(b=>{
     if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'"))b.classList.add('active');
   });
-  if(id==='overview'){updateKPIs();drawChart();renderCashflow();renderSummaryCards();}
+  if(id==='overview'){updateKPIs();drawChart();renderCashflow();renderSummaryCards();try{renderOvAch();}catch(e){}}
   if(id==='budget'){renderCashflow();}
   try{viNavReveal();}catch(e){}
   if(id==='house')setTimeout(redraw,30);
@@ -15478,6 +15524,7 @@ function hbRowStats(){
 }
 function hbRenderHUD(){
   var el=document.getElementById('hb-hud');if(!el)return;
+  var _hti=document.getElementById('house-tab-inner');if(_hti)_hti.setAttribute('data-lvl',String(hbView()));
   var view=hbView(),p=pct(),dt=depositTarget(),rem=Math.max(0,dt-(state.saved||0));
   var _bi=hbBrickInfo(),brickTotal=_bi?_bi.total:0,perBrick=_bi?_bi.perBrick:0;
   var _pb=document.getElementById('hb-plan-brick');if(_pb)_pb.textContent=_bi?'Each brick is worth about '+(window.VI_CURRENCY_SYMBOL||'£')+(perBrick*(window.VI_CURRENCY_RATE||1)).toFixed(2)+' of your deposit.':'';
@@ -18817,7 +18864,7 @@ function cfEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g
 function cfShort(s,n){s=String(s||'');return s.length>n?s.slice(0,n-1)+'…':s;}
 function cfLink(x0,y0,x1,y1,w,fill,op){
   var xm=(x0+x1)/2;
-  return '<path d="M'+x0+' '+y0+' C'+xm+' '+y0+','+xm+' '+y1+','+x1+' '+y1+' L'+x1+' '+(y1+w)+' C'+xm+' '+(y1+w)+','+xm+' '+(y0+w)+','+x0+' '+(y0+w)+' Z" style="fill:'+fill+'" fill-opacity="'+op+'"/>';
+  return '<path class="cf-ln" d="M'+x0+' '+y0+' C'+xm+' '+y0+','+xm+' '+y1+','+x1+' '+y1+' L'+x1+' '+(y1+w)+' C'+xm+' '+(y1+w)+','+xm+' '+(y0+w)+','+x0+' '+(y0+w)+' Z" style="fill:'+fill+';animation-delay:'+(x0/600).toFixed(2)+'s" fill-opacity="'+op+'"/>';
 }
 // Shared model so the Sankey, histogram and summary all agree.
 function cfModel(){
@@ -18995,7 +19042,7 @@ function bdRenderLists(){
   var exp=(ovState.expenses||[]),html='';
   CF_GROUP_ORDER.forEach(function(g){
     var items=exp.filter(function(r){return cfType(r)===g;}).sort(function(a,b){return (+b.amount||0)-(+a.amount||0);});
-    var sum=cfSum(items),folded=!!_bdFold[g],G=CF_GROUPS[g];
+    var sum=cfSum(items),folded=bdIsFolded(g),G=CF_GROUPS[g];
     html+='<section class="bd-tile'+(folded?' folded':'')+'" data-g="'+g+'" style="--c:'+G.col+';--t:'+G.tx+'">'
       +'<button type="button" class="bd-tile-hd" onclick="bdFold(\''+g+'\')" aria-expanded="'+(!folded)+'">'
       +'<span class="bd-tile-ic">'+bdGroupIcon(g,34)+'</span>'
@@ -19016,7 +19063,8 @@ function bdQuickAdd(g){if(viBlockEdit())return;
   ovState.expenses.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),category:cfGroupToCat(g),type:g,cat:bdGuess('exp',n)});
   saveState();renderCashflow();updateKPIs();showToast('Added to '+CF_GROUPS[g].short);
 }
-function bdFold(g){_bdFold[g]=!_bdFold[g];try{localStorage.setItem('vi_bd_fold',JSON.stringify(_bdFold));}catch(e){}bdRenderLists();}
+function bdIsFolded(g){return Object.prototype.hasOwnProperty.call(_bdFold,g)?!!_bdFold[g]:(typeof viSimple==='function'&&viSimple());}
+function bdFold(g){_bdFold[g]=!bdIsFolded(g);try{localStorage.setItem('vi_bd_fold',JSON.stringify(_bdFold));}catch(e){}bdRenderLists();}
 function bdFoldAll(v){CF_GROUP_ORDER.forEach(function(g){_bdFold[g]=!!v;});try{localStorage.setItem('vi_bd_fold',JSON.stringify(_bdFold));}catch(e){}bdRenderLists();}
 // group icons: lock = committed (same every month), open lock = variable; roof = essential, star = non-essential
 function bdGroupIcon(g,px){
@@ -23286,6 +23334,7 @@ function _refreshPioneerSettingsUI(){
 
 function showSettings(){
   try{renderConnections()}catch(e){}
+  (function(){var r=document.getElementById('set-view');if(!r)return;var v=viSimple()?'simple':'adv';[].forEach.call(r.children,function(b){b.classList.toggle('active',b.getAttribute('data-val')===v);});})();
   [['house','set-house3d'],['nw','set-nw3d']].forEach(function(x){var r=document.getElementById(x[1]);if(!r)return;var on=viFlag(x[0]);[].forEach.call(r.children,function(b){b.classList.toggle('active',(b.getAttribute('data-val')==='1')===on);});});
   document.getElementById('set-claude-key').value=localStorage.getItem('claude_api_key')||'';
   document.getElementById('set-meshy-key').value=localStorage.getItem('meshy_api_key')||'';
@@ -25807,6 +25856,7 @@ function wStep2Submit() {
 
   // Hide overlay immediately — user is in the app
   var ov = document.getElementById('welcome-overlay'); if (ov) ov.style.display = 'none';
+  viSetView(_wView);   // the view chosen on this step (Simplified unless they picked Advanced)
   applyPaywall();
   updateSidebar();
   if (typeof renderJourney === 'function') renderJourney();
@@ -25820,6 +25870,7 @@ function wStep2Submit() {
 // Step 2 skip — save what we have and enter app
 function wStep2Skip() {
   var ov=document.getElementById('welcome-overlay'); if(ov) ov.style.display='none';
+  viSetView(_wView);
   if (typeof journeyState !== 'undefined' && _wSelectedVal) {
     journeyState.stageOverride = parseInt(_wSelectedVal) || 0;
     jrnySaveState();
@@ -26385,6 +26436,30 @@ function loadViSettings() {
 function saveViSettings() {
   localStorage.setItem('vi_settings', JSON.stringify(viSettings));
 }
+// Simplified / Advanced view (owner, 31 Oct; decision doc section 8). Stored in vi_settings, so it follows the account to every
+// device. An account with no choice saved (everyone before this change) stays Advanced; the welcome flow starts new accounts Simplified.
+function viSimple() { return !!(viSettings && viSettings.view === 'simple'); }
+function viSetView(v) { viSettings.view = v === 'adv' ? 'adv' : 'simple'; saveViSettings(); applyViSettings(); }
+var _wView = 'simple';
+function wPickView(v, btn) {
+  _wView = v === 'adv' ? 'adv' : 'simple';
+  document.querySelectorAll('.w-view-opt').forEach(function (b) { var on = b.getAttribute('data-v') === _wView; b.classList.toggle('active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+}
+// the Overview achievements card: level, XP to the next level, streak and the badges earned so far
+function renderOvAch() {
+  var el = document.getElementById('ov-ach-body'); if (!el || typeof achState === 'undefined' || typeof currentLevel !== 'function') return;
+  var lv = currentLevel(), nx = nextLevel(), i = LVS.indexOf(lv) + 1, xp = achState.xp || 0;
+  var pc = nx ? Math.max(0, Math.min(100, (xp - lv.xp) / (nx.xp - lv.xp) * 100)) : 100;
+  var got = BADGES.filter(function (b) { return (achState.unlocked || []).indexOf(b.id) > -1; });
+  var streak = +(achState.streak || localStorage.getItem('vi_streak') || 0);
+  el.innerHTML = '<div class="ov-ach-top"><span class="ov-ach-lv" aria-label="Level ' + i + '">' + i + '</span><div class="ov-ach-meta"><b>' + lv.n + '</b>'
+    + '<div class="ov-ach-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pc) + '"><i style="width:' + pc.toFixed(1) + '%"></i></div>'
+    + '<small>' + xp.toLocaleString() + ' XP' + (nx ? ' · ' + (nx.xp - xp).toLocaleString() + ' to ' + nx.n : ' · top level') + '</small></div>'
+    + '<div class="ov-ach-streak"><b>' + streak + '</b><small>day' + (streak === 1 ? '' : 's') + ' in a row</small></div></div>'
+    + '<div class="ov-ach-badges">' + (got.length ? got.slice(-8).map(function (b) { return '<span class="ov-ach-badge" title="' + b.name.replace(/"/g, '&quot;') + '">' + b.icon + '</span>'; }).join('')
+      : '<span class="ov-ach-none">No badges yet. Your first one comes with your first deposit or your first budget line.</span>')
+    + '<span class="ov-ach-count">' + got.length + ' of ' + BADGES.length + ' badges</span></div>';
+}
 function setSetting(key, val, btn) {
   viSettings[key] = val;
   saveViSettings();
@@ -26421,6 +26496,10 @@ function applyViSettings() {
   }
   var nav = document.getElementById('topnav');
   if (nav) nav.classList.toggle('compact-nav', !!viSettings.compactNav);
+  document.body.classList.toggle('vi-simple', viSimple());
+  try { if (typeof bdRenderLists === 'function' && document.getElementById('cf-expense-list')) bdRenderLists(); } catch (e) {}   // folding follows the view
+  try { renderOvAch(); } catch (e) {}
+  try { if (viSimple() && /^(achievements|biz)$/.test((document.querySelector('.tab-panel.active') || {}).id ? document.querySelector('.tab-panel.active').id.replace('tab-', '') : '')) showTab('overview'); } catch (e) {}
   window.VI_CURRENCY = viSettings.currency || 'GBP';
   if (typeof _applyCurrency === 'function') _applyCurrency();
   if (typeof fetchExchangeRates === 'function') setTimeout(fetchExchangeRates, 800);
