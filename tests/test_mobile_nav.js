@@ -83,11 +83,22 @@ const seed = (theme) => {
     ok(t.pos === 'fixed' && t.bottom === t.inner && t.sx <= 1, '344px (Fold closed): the icon bar is fixed to the bottom, no sideways scroll');
     await ctx.close();
   }
-  { // "Icons only" chosen in Settings still means icons only on a tablet
+  { // owner, 31 Oct: no Compact / Icons only choice any more; the width decides. A saved "Icons only" or "compact" is left in storage but not applied
     const ctx = await b.newContext({ viewport: { width: 884, height: 1000 } });
-    const p = await ctx.newPage(); await p.addInitScript(seed, 'dark'); await p.addInitScript(() => localStorage.setItem('vi_settings', JSON.stringify({ compactNav: true }))); await p.goto(APP); await p.waitForTimeout(1500);
-    const hid = await p.evaluate(() => [...document.querySelectorAll('#vi-tabs .tab-btn:not([hidden]) .nav-tab-label')].every(l => getComputedStyle(l).display === 'none'));
-    ok(hid, '884px with "Icons only" chosen in Settings: labels stay hidden');
+    const p = await ctx.newPage(); await p.addInitScript(seed, 'dark'); await p.addInitScript(() => { localStorage.setItem('vi_settings', JSON.stringify({ compactNav: true })); localStorage.setItem('vi_density', 'wide'); }); await p.goto(APP); await p.waitForTimeout(1500);
+    const r = await p.evaluate(() => ({ shown: [...document.querySelectorAll('#vi-tabs .tab-btn:not([hidden]) .nav-tab-label')].every(l => getComputedStyle(l).display !== 'none'), dens: getComputedStyle(document.getElementById('vi-density-btn')).display, setNav: !!document.getElementById('set-nav'), wide: document.body.classList.contains('vi-wide'), kept: localStorage.getItem('vi_density') === 'wide' && JSON.parse(localStorage.getItem('vi_settings')).compactNav === true }));
+    ok(r.shown && r.dens === 'none' && !r.setNav && !r.wide && r.kept, '884px with an old "Icons only" and "Wide" saved: labels show, no density switch or Nav style setting, saved values untouched (' + JSON.stringify(r) + ')');
+    await ctx.close();
+  }
+  // ── wide desktop (owner, 31 Oct): one row (logo, tabs across the width, net worth, Back, Night/Daylight) when it fits, else two rows ──
+  for (const [w, one] of [[1920, true], [1100, false]]) {
+    const ctx = await b.newContext({ viewport: { width: w, height: 900 } });
+    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(w + ' desktop: ' + e.message)); await p.addInitScript(seed, 'dark'); await p.goto(APP); await p.waitForTimeout(1800);
+    const r = await p.evaluate(() => { const t = document.getElementById('vi-tabs'), nav = document.getElementById('topnav'), top = (id) => { const e = document.getElementById(id) || document.querySelector(id); const q = e.getBoundingClientRect(); return Math.round(q.top + q.height / 2); };
+      const tb = [...t.querySelectorAll('.tab-btn:not([hidden])')].map(x => x.getBoundingClientRect());
+      return { one: document.body.classList.contains('vi-nav1'), navH: Math.round(nav.getBoundingClientRect().height), tabsMid: top('vi-tabs'), logoMid: top('.nav-brand'), themeMid: top('vi-theme-btn'), fit: t.scrollWidth <= t.clientWidth + 1, spread: tb.length ? Math.round(tb[tb.length - 1].right - tb[0].left) : 0, tw: Math.round(t.clientWidth), labels: [...t.querySelectorAll('.tab-btn:not([hidden]) .nav-tab-label')].every(l => getComputedStyle(l).display !== 'none'), sx: document.documentElement.scrollWidth - innerWidth }; });
+    if (one) ok(r.one && Math.abs(r.tabsMid - r.logoMid) < 6 && Math.abs(r.themeMid - r.logoMid) < 6 && r.navH < 80 && r.fit && r.labels && r.spread > r.tw * 0.85 && r.sx <= 1, w + 'px: one header row, logo, tabs and Daylight on the same line, tabs spread across the width (' + JSON.stringify(r) + ')');
+    else ok(!r.one && r.fit && r.labels && r.sx <= 1, w + 'px: too narrow for one row, so the labelled tabs keep their own row (' + JSON.stringify(r) + ')');
     await ctx.close();
   }
   await b.close();

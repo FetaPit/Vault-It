@@ -10154,6 +10154,24 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   html #topnav.compact-nav .vi-tabs{justify-content:space-between}
   html #topnav.compact-nav .tab-btn{flex:1 1 0!important;width:auto;max-width:64px}
 }
+/* desktop menu (owner, 31 Oct): the tabs spread across the full width; when everything fits on one line (viNavFit decides from the
+   real widths) the header is a single row: logo, tabs, net worth, Back Vault-It, Night/Daylight. No density switch: width decides. */
+#vi-density-btn{display:none!important}
+@media (min-width:1024px){
+  #topnav .vi-tabs{justify-content:space-evenly}
+  html body.vi-nav1 #topnav{grid-template-columns:auto 1fr auto auto auto;grid-template-rows:60px}
+  body.vi-nav1 #topnav .nav-brand{height:60px!important}
+  body.vi-nav1 #topnav .vi-tabs{grid-row:1;grid-column:2;height:60px;border-top:0;margin:0;padding:0 6px}
+  body.vi-nav1 #topnav .vi-nw-wrap{grid-column:3}
+  body.vi-nav1 #vi-back-us-btn{grid-column:4}
+  body.vi-nav1 #vi-theme-btn{grid-column:5}
+  body.vi-nav1 #left-sidebar{top:60px!important}
+  body.vi-nav1t #topnav .vi-nw-wrap>span:first-child{display:none!important}
+  body.vi-nav1t #vi-theme-btn .vi-th-lbl{display:none}
+  body.vi-nav1t #vi-theme-btn{padding:0 9px!important}
+  html body.vi-nav1t #topnav .tab-btn{padding:0 6px!important;gap:5px;letter-spacing:.03em!important;font-size:.54rem!important}
+  body.vi-nav1t #topnav .vi-tabs{padding:0 2px}
+}
 /* phones (owner, 30 Oct 2026): the tab icons sit in a bar fixed to the bottom of the screen, always visible; the header keeps one row.
    The nav drops to z-index 500 here so pop-ups (Settings at 600 and above) cover the bar; the footer flows at the end of the page instead. */
 @media (max-width:700px){
@@ -12287,7 +12305,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <div class="settings-row"><label class="settings-label">Currency</label><div class="settings-opts" id="set-currency"><button data-val="GBP" onclick="setSetting('currency','GBP',this)" class="active">£ GBP</button><button data-val="USD" onclick="setSetting('currency','USD',this)">$ USD</button><button data-val="EUR" onclick="setSetting('currency','EUR',this)">€ EUR</button><button data-val="INR" onclick="setSetting('currency','INR',this)">₹ INR</button></div></div>
       <div class="settings-row"><label class="settings-label">House builder</label><div class="settings-opts" id="set-house3d"><button data-val="1" onclick="setViewFlag('house',true,this)">Brand build</button><button data-val="0" onclick="setViewFlag('house',false,this)">Classic</button></div></div>
       <div class="settings-row"><label class="settings-label">Net worth</label><div class="settings-opts" id="set-nw3d"><button data-val="1" onclick="setViewFlag('nw',true,this)">3D</button><button data-val="0" onclick="setViewFlag('nw',false,this)">Classic chart</button></div></div>
-      <div class="settings-row"><label class="settings-label">Nav style</label><div class="settings-opts" id="set-nav"><button data-val="false" onclick="setSetting('compactNav',false,this)" class="active">Labels</button><button data-val="true" onclick="setSetting('compactNav',true,this)">Icons only</button></div></div>
     </div>
 
     <!-- Connections (owner, 30 Oct 2026: out of the menu bar, into Settings) -->
@@ -26671,7 +26688,7 @@ function applyViSettings() {
     document.body.classList.remove('reduced-motion');
   }
   var nav = document.getElementById('topnav');
-  if (nav) nav.classList.toggle('compact-nav', !!viSettings.compactNav);
+  if (nav) nav.classList.remove('compact-nav');   // owner, 31 Oct: the width decides, not a setting
   document.body.classList.toggle('vi-simple', viSimple());
   try { if (typeof bdRenderLists === 'function' && document.getElementById('cf-expense-list')) bdRenderLists(); } catch (e) {}   // folding follows the view
   try { renderOvAch(); } catch (e) {}
@@ -27378,11 +27395,33 @@ function setDensity(mode) {
     }
   }, 120);
 }
-function loadDensity() {
-  var saved = null; try { saved = localStorage.getItem('vi_density'); } catch (e) {}
-  if (!saved) saved = (window.innerWidth || 1200) < 1024 ? 'compact' : 'default';
-  setDensity(saved === 'default' ? null : saved);
+function loadDensity() {   // owner, 31 Oct: no Compact / Default / Wide choice; the width decides (a saved choice is kept but not used)
+  var compact = (window.innerWidth || 1200) < 1024;
+  document.body.classList.remove('vi-wide'); document.body.classList.toggle('vi-compact', compact);
+  viNavFit();
 }
+// one-row desktop header when everything fits: try one row, then one row without the "NET WORTH" word and the Daylight label,
+// else keep the two rows (labels are never cut off)
+function viNavFit() {
+  var b = document.body, t = document.getElementById('vi-tabs'); if (!b || !t) return;
+  b.classList.remove('vi-nav1', 'vi-nav1t');
+  if ((window.innerWidth || 0) < 1024) return;
+  var fits = function () { return t.scrollWidth <= t.clientWidth + 1; };
+  b.classList.add('vi-nav1'); if (fits()) return;
+  b.classList.add('vi-nav1t'); if (fits()) return;
+  b.classList.remove('vi-nav1', 'vi-nav1t');
+}
+(function () { var lastW = 0, tm = 0;
+  window.addEventListener('resize', function () { var w = window.innerWidth; if (w === lastW) return; lastW = w; clearTimeout(tm); tm = setTimeout(function () { try { loadDensity(); } catch (e) {} }, 150); });
+  window.addEventListener('load', function () { try { viNavFit(); } catch (e) {} });
+  try { document.fonts && document.fonts.ready.then(function () { try { viNavFit(); } catch (e) {} }); } catch (e) {}
+  // fonts arriving, tabs unlocking or labels changing alter the tabs' widths after start-up: check again whenever a tab button
+  // changes size (each fit starts from the same state and lands on the same answer, so the watcher settles after one extra check)
+  var fitT = 0, refit = function () { clearTimeout(fitT); fitT = setTimeout(function () { try { viNavFit(); } catch (e) {} }, 80); };
+  var watch = function () { var t = document.getElementById('vi-tabs'); if (!t || typeof ResizeObserver === 'undefined') return;
+    var ro = new ResizeObserver(refit); [].forEach.call(t.querySelectorAll('.tab-btn'), function (x) { ro.observe(x); }); };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
+})();
 
 function nwhRenderMini(){
   var wrap=document.getElementById('nwh-mini-wrap'); if(!wrap) return;
