@@ -213,6 +213,14 @@ section .lead{color:var(--muted);max-width:56ch;margin-bottom:26px}
 .num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--gold);color:var(--gold);font-family:var(--font-mono);font-size:15px;margin-bottom:12px;background:var(--pillbg)}
 .shot{margin:16px 0 0;border:1px solid var(--line2);border-radius:var(--r-tile);overflow:hidden;background:var(--stage-bg)}
 .shot img{display:block;width:100%;height:auto}
+/* "How it works" steps: a small real screen each (owner, 31 Oct); step 2 carries the brand icons, pulsing gently */
+.step-img{position:relative}
+.step-icons{position:absolute;left:8px;right:8px;bottom:10px;display:flex;justify-content:center;gap:10px;pointer-events:none}
+.step-icons .si{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;color:var(--c);background:rgb(5 16 27 / .78);border:1px solid color-mix(in srgb,var(--c) 55%,transparent);box-shadow:0 0 0 0 color-mix(in srgb,var(--c) 45%,transparent);animation:siPulse 2.4s ease-in-out var(--d) infinite}
+.step-icons svg{width:22px;height:22px}
+.step-cap{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--muted);text-align:center;padding:8px 6px;border-top:1px solid var(--line2)}
+@keyframes siPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 color-mix(in srgb,var(--c) 40%,transparent)}50%{transform:scale(1.08);box-shadow:0 0 0 6px color-mix(in srgb,var(--c) 0%,transparent)}}
+@media (prefers-reduced-motion:reduce){.step-icons .si{animation:none!important}}
 ul.ticks{list-style:none;padding:0;margin:0;display:grid;gap:10px}
 ul.ticks li{padding-left:28px;position:relative;color:var(--muted)}
 ul.ticks li strong{color:var(--text)}
@@ -236,6 +244,7 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="vi-net-worth" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 17 9 11l4 4 8-9'/><path d='M15 6h6v6'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 21h18" stroke-dasharray="1 2.2"/><circle cx="9" cy="11" r=".9"/><circle cx="13" cy="15" r=".9"/></g></symbol><symbol id="vi-budget" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><rect x='1.5' y='3.5' width='13' height='9.5' rx='1.6'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><rect x='1.5' y='3.5' width='13' height='9.5' rx='1.6'/><path d='M1.5 6.5h13'/><path d='M10.6 9.8h1.9'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M4 14.5h5M4 16.8h3"/><circle cx="18.2" cy="14.7" r=".9"/></g></symbol><symbol id="vi-debt-tracker" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><polyline points='1,4.5 5,9.5 9,7 15,13'/><polyline points='11.5,13 15,13 15,9.5'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M1.5 22.5h21"/><path d="M1.5 12h21" stroke-dasharray="1 2.2"/></g></symbol><symbol id="vi-trend-base" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 16l5-5 4 3 7-8v14.5H4z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 20.5h18'/><path d='M4 16l5-5 4 3 7-8'/><path d='M15 6h5v5'/></g></symbol></svg>
 <a class="skip" href="#join">Skip to the sign-up form</a>
 <header class="hdr"><div class="wrap">
   <a class="lockup" href="./" aria-label="Vault-It, top of page">
@@ -323,10 +332,19 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
   <h2>How it works</h2>
   <p class="lead">Set up in a few minutes. Real screens from the app, shown with sample figures.</p>
   <div class="grid g3">
-    <div class="card"><div class="num">1</div><h3>Add your numbers</h3><p>Income, spending, debts, savings and what you own. You type them in, so nothing is connected to your bank.</p></div>
-    <div class="card"><div class="num">2</div><h3>See the whole picture</h3><p>Net worth over time, where every pound of income goes, a debt payoff plan (snowball or avalanche) and the next step on your roadmap.</p></div>
+    <div class="card"><div class="num">1</div><h3>Add your numbers</h3><p>Income, spending, debts, savings and what you own. You type them in, so nothing is connected to your bank.</p>
+      <figure class="shot step-shot"><img src="img/step-1-numbers.jpg" width="620" height="399" alt="The Budget tab: income and spending lines sorted into committed, variable, savings and investment groups" loading="lazy" /></figure></div>
+    <div class="card"><div class="num">2</div><h3>See the whole picture</h3><p>Net worth over time, where every pound of income goes, a debt payoff plan (snowball or avalanche) and the next step on your roadmap.</p>
+      <figure class="shot step-shot step-2"><div class="step-img"><img src="img/step-2-picture.jpg" width="620" height="384" alt="The Overview: net worth, assets, debt, liabilities and monthly surplus, above the net worth in 3D scene" loading="lazy" />
+        <div class="step-icons" aria-hidden="true">
+          <span class="si" style="--c:var(--gold);--d:0s"><svg viewBox="0 0 24 24"><use href="#vi-net-worth"/></svg></span>
+          <span class="si" style="--c:var(--teal);--d:.6s"><svg viewBox="0 0 24 24"><use href="#vi-budget"/></svg></span>
+          <span class="si" style="--c:var(--red);--d:1.2s"><svg viewBox="0 0 24 24"><use href="#vi-debt-tracker"/></svg></span>
+          <span class="si" style="--c:var(--green);--d:1.8s"><svg viewBox="0 0 24 24"><use href="#vi-trend-base"/></svg></span>
+        </div></div>
+        <figcaption class="step-cap">Net worth · Budget · Debt plan · Roadmap</figcaption></figure></div>
     <div class="card"><div class="num">3</div><h3>Build the house</h3><p>Pick a house and a deposit target. It rises as you save, and fills in as you pay the mortgage down.</p>
-      <figure class="shot"><img src="img/house-built.jpg" width="620" height="540" alt="The finished 3D Victorian terraced house in the Vault-It house builder" loading="lazy" /></figure></div>
+      <figure class="shot step-shot"><img src="img/step-3-house.jpg" width="620" height="412" alt="The House Builder: a Victorian terrace part-built in teal bricks, with the row being laid marked in gold" loading="lazy" /></figure></div>
   </div>
 </div></section>
 

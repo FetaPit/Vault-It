@@ -9,8 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [~] Sign-up page steps (owner, 31 Oct 09:56, from phone screenshots): in the "how it works" steps, drop the big 3D house under step 3 and give steps 1, 2 and 3 a small screenshot each, relevant to its subject; step 2's screenshot carries the relevant brand-book iconography with subtle pulsing animations (reduced motion respected)
-- [ ] 3D net worth first draw (owner, 31 Oct, live defect): the main Overview 3D net worth scene only populates after the 3D view is toggled off and back on; it must draw on first show
+- [~] 3D net worth first draw (owner, 31 Oct, live defect): the main Overview 3D net worth scene only populates after the 3D view is toggled off and back on; it must draw on first show
 - [ ] Tablet and fold navigation (owner, 31 Oct): tablet and folding-phone widths keep the labelled menu bar at the top; only the phone view has the icon bar at the bottom
 - [ ] House builder style exactly as the brand book (owner, 31 Oct, 11:30): make the house builder's look and animations match the brand book the owner attached (`brand/vault-it-brand-book-31oct.html`, a newer 170 KB version that differs from `brand/vault-it-brand-book.html`) and the screen recording of the animations (frames every 2 s in `brand/reference/house-animation/`; the original mp4 was attached in the 31 Oct session and is not in the repo). Audit the differences first and report before changing code; the level rules and flag defaults stand
 - [ ] Secure paid gateway (owner, 31 Oct: "yes we need to set up the paid gateway securely"): paid status set by a Stripe webhook (checkout.session.completed with the account id as client_reference_id) into `profiles` through a new edge function, the client's write access to `is_pioneer` / `is_founder` revoked by migration, plan and tester columns on `profiles`, the app reading paid status from the profile only; needs the webhook signing secret in Supabase secrets and the owner's yes before the migration and function go to production
@@ -29,6 +28,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Sign-up page steps (owner, 31 Oct): small app screenshots for steps 1 to 3, four brand icons pulsing on step 2 (reduced motion respected), the big house removed. Commit cda009e on `brand-rollout`, not released.
 - [x] Tester welcome message (31 Oct): Pete's note shown once after the welcome flow for beta accounts, first sentence in the 30-day form ("Your first 30 days are free, no card needed."), Let's go and a mail link. Commit 02b6918 on `brand-rollout`, not released.
 - [x] Simplified / Advanced view (owner, 31 Oct): synced switch in Settings and the welcome step (new accounts Simplified, existing Advanced), the section 8 tile list, Overview achievements card, Budget Sankey on top with every section folded, Sankey flow animation, phone KPIs in two rows. Budget "sections" read as the six spending and saving groups; the income list stays open so income can be added. Commit 96bd33e on `brand-rollout`, not released.
 - [x] Tier gates (31 Oct, decision 10): caps gone; design tools (upload, AI model) need a paid plan, trial included; every preset house for everyone; ended accounts see everything read-only; plan recorded from the Stripe return; AI reader allowance line; four more read-only guards. Commit 4254a03 on `brand-rollout`, not released.
