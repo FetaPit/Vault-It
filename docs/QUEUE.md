@@ -9,10 +9,10 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [ ] Release (owner, 31 Oct): full suite, backup branch, fast-forward `release/pioneer-v2` to the tested `brand-rollout` head (classic viewer default, Level 2 mortgage entry, copy, footer, net worth stacking and zoom, bottom tab bar, Connections in Settings)
 - [ ] Trial then paid (owner, 31 Oct, decisions 1 and 2): everyone gets 30 days of the full app with no card; at the end a prompt to choose a paid tier (Pioneer monthly or annual, Founding Member first for testers), then the read-only vault; week-one activation nudges and a day-23 reminder; beta accounts get the same prompt once their 30 days are over
-- [ ] Subscription pop-up: rewrite to the decided model (30-day trial, Pioneer £5.99 / £49.99, Founding £149 first for testers); the Free column goes; Settings copy to match (owner's ask, 30 Oct, unblocked 31 Oct)
-- [ ] Simplified / Advanced mode (owner, 31 Oct, decision 3): a switch in Settings and the welcome flow, new accounts start Simplified, remembered per account and synced; tab split as section 3 of `docs/MONETISATION_DECISION.md`
+- [ ] Subscription pop-up and Settings copy: Vaulter / Pioneer monthly / Pioneer yearly / Founding Member, yearly extras named (own 3D design, AI model, early access, extra house types), prices unchanged (owner's ask, 30 Oct, answers 31 Oct)
+- [ ] Tier gates from the questionnaire (31 Oct): old caps go (assets, liabilities, debts unlimited), house build Level 1 open to all, Pioneer gates on net worth history, Levels 2 and 3, Entrepreneur, projections, history and restore, Connections; yearly-only gates on own 3D design, AI model and extra house types; AI reader 3 / 30 / 10 a month
+- [ ] Simplified / Advanced view (owner, 31 Oct): switch in Settings and the welcome flow, new accounts start Simplified, synced per account; tile list in `docs/MONETISATION_DECISION.md` section 8 (Overview KPIs one row, 3D card, roadmap, achievements card; Budget sections collapsed with the Sankey on top and a flow animation; House viewport and plan; all Assets sub-tabs; all of Debt)
 - [ ] Tester welcome message (wording agreed 31 Oct): wire it to the first run for beta accounts
 - [ ] Sign-up page steps (owner, 31 Oct 09:56, from phone screenshots): in the "how it works" steps, drop the big 3D house under step 3 and give steps 1, 2 and 3 a small screenshot each, relevant to its subject; step 2's screenshot carries the relevant brand-book iconography with subtle pulsing animations (reduced motion respected)
 
@@ -29,6 +29,8 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Release (owner, 31 Oct): full suite green (72 ok; `test_honest_pricing` corrected to count priced amounts only, the hero demo figures are not prices), backup `backup/release-pioneer-v2-20261031-1019`, `release/pioneer-v2` fast-forwarded to `a5ba24a`
+- [x] Feature questionnaire (owner, 31 Oct): answers in `docs/MONETISATION_DECISION.md` section 8 (Vaulter / Pioneer, yearly extras, tier gates, Simplified tiles)
 - [x] Branded e-mails deployed (owner's yes, 31 Oct): send-auth-email v11, waitlist-join v2, waitlist-welcome v3; live copies matched the repo before the templates, so nothing was lost
 - [x] Trial length comparison (owner, 31 Oct): 7 against 30 days on conversion and retention, with sources, in `docs/research/trial_length.md`; decision 2 of the monetisation doc updated (this commit)
 - [x] Mobile navigation (owner, 30 Oct 22:03): on phones (700 px and under) the tab icons sit in a bar fixed to the bottom of the screen, always visible, seven tabs at 44 px or more, header down to one row, footer flows at the page end; the Connections tab has left the menu bar at every width and lives in Settings (section "Connections", list rendered when Settings opens; `showTab('connections')` opens it there). `tests/test_mobile_nav.js` (this commit)

@@ -80,3 +80,43 @@ Once answered I will: rewrite the pop-up and Settings copy to match (queued), bu
 4. **Release** the current state first; the trial clock, pop-up and mode switch follow as queued work.
 
 Welcome message for testers, agreed: "Welcome to the Vault-It beta. It's free while we test. Type your numbers in, made-up ones are fine, and watch your deposit build your house. Anything confusing or broken, tell me. Your feedback decides what gets built next. Pete" (the first sentence changes to the 30-day wording once the trial clock is live).
+
+## 8. Feature questionnaire, answered by Pete (31 Oct 2026)
+
+Model: **tiers plus a view switch.** The tier (Vaulter or Pioneer) decides what you can use; Simplified / Advanced is a separate view anyone can switch, and new accounts start Simplified. Everyone gets 30 days of the full app first (section 7).
+
+**Names.** First tier **Vaulter**. Paid tier **Pioneer**, £5.99 a month or £49.99 a year. **Founding Member** £149 once, 100 places, testers first.
+
+**Monthly against yearly: yearly gets extras.** Yearly-only perks: own 3D design and AI house model, early access to new features with roadmap voting, and the extra house types (manor, detached and the premium models). Everything else in Pioneer is the same on both.
+
+| Feature | Vaulter (first tier) | Pioneer |
+|---|---|---|
+| Overview KPIs, net worth in 3D with the graph toggle, goals and snapshots, roadmap, cash flow, own and owe | Yes | Yes |
+| Net worth history (wizard, monthly points, restore) | No | Yes |
+| Budget: income, buckets, savings and investments, Sankey, per-line analysis | Yes, all | Yes |
+| House builder Level 1: pick a house, deposit target, lay bricks, full build | Yes | Yes |
+| House builder Level 2 (mortgage) and Level 3 (upgrade) | No | Yes |
+| Own 3D design, AI house model | No | Yearly only |
+| Extra house types (manor, detached, premium models) | No | Yearly only |
+| Assets and liabilities: every sub-tab, no item caps | Yes | Yes |
+| Live prices (crypto, metals, stocks) | Yes | Yes |
+| AI screenshot reader | 3 a month | 30 a month (Founding 10) |
+| Debt tracker: list, payoff order and date, charts, debtors, no debt cap | Yes | Yes |
+| Achievements | Yes | Yes |
+| Entrepreneur | No | Yes |
+| Download my data | Yes | Yes |
+| Projections and forecast, version history and restore, Connections | No | Yes |
+
+The old caps (3 assets, 2 liabilities, 1 debt) go. The house build is never behind the paywall.
+
+**Simplified view (the default), tile by tile.** Advanced shows everything the tier allows.
+
+- Overview: all five KPIs in one row (two rows on phones); the net worth in 3D card with the graph toggle; the financial freedom roadmap; an achievements card (badges and streak) instead of a tab. Goals and snapshots, cash flow and own and owe wait for Advanced.
+- Budget: every section, each collapsed by default, with the Sankey at the top and a flow animation (reduced motion respected).
+- House builder: the viewport with Add to your savings, and Your house plan. The level panel (progress, bricks, XP, streak, milestones) and History wait for Advanced.
+- Assets and liabilities: every sub-tab.
+- Debt tracker: everything (KPIs, your plan, debt cards with Pay, charts and debtors).
+- Achievements: a card on the Overview in Simplified; the tab appears in Advanced.
+- Entrepreneur: Advanced and Pioneer only.
+
+**Build order from this.** 1 trial clock and end-of-trial prompt; 2 pop-up and Settings copy with Vaulter / Pioneer monthly / Pioneer yearly / Founding Member columns and the yearly extras named; 3 the gates above replace the old caps; 4 Simplified / Advanced switch with the tile list above; 5 the achievements card on the Overview; 6 the tester welcome message.
