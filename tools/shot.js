@@ -1,12 +1,12 @@
 // Element screenshots for a finished item, Night and Daylight at 390 and 1100 px, plus the checks the owner's rules need.
-// Usage: node tools/shot.js --name r3-8 --tab assets [--sub stocks] [--sel "#al-card"] [--widths 390,1100] [--themes dark,light] [--url file:///home/user/Vault-It/index.html]
+// Usage: node tools/shot.js --name r3-8 --tab assets [--sub stocks] [--sel "#al-card"] [--widths 390,1100] [--themes dark,light] [--js "toggleSidebar()"] [--url file:///home/user/Vault-It/index.html]
 // Writes shots/qc/<name>_<theme>_<width>.png (git-ignored) and prints one line per shot: path, page errors, sideways scroll.
 // Data: the app's own sample data (?bypass=websummit), so no account and no network are needed.
 const { chromium } = require('playwright');
 const fs = require('fs');
 
 const a = {}; for (let i = 2; i < process.argv.length; i += 2) a[process.argv[i].replace(/^--/, '')] = process.argv[i + 1];
-const name = a.name || 'shot', tab = a.tab || 'overview', sub = a.sub || '', sel = a.sel || '';
+const name = a.name || 'shot', tab = a.tab || 'overview', sub = a.sub || '', sel = a.sel || '', js = a.js || '';
 const widths = (a.widths || '390,1100').split(',').map(Number), themes = (a.themes || 'dark,light').split(',');
 const base = a.url || 'file:///home/user/Vault-It/index.html';
 const url = base + (base.includes('?') ? '&' : '?') + 'bypass=websummit';
@@ -27,6 +27,7 @@ const url = base + (base.includes('?') ? '&' : '?') + 'bypass=websummit';
       try { showTab(t); } catch (e) {}
       if (s) try { showSubtab(t, s, document.querySelector('.subtab-btn[onclick*="' + s + '"]')); } catch (e) {}
     }, [tab, sub]);
+    if (js) { try { await page.evaluate(js); } catch (e) { errs.push('js: ' + e.message); } }
     await page.waitForTimeout(1200);
     const sideways = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
     const path = `shots/qc/${name}_${theme}_${w}.png`;
