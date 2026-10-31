@@ -45,6 +45,24 @@ const SECURITY = {
   'Content-Security-Policy': "frame-ancestors 'none'; object-src 'none'; base-uri 'self'",
 };
 
+// Report-only for now (nothing is blocked): the outside hosts the app calls, as named in the privacy notice (tests/test_csp_report_only.mjs).
+// Inline scripts and styles are allowed because the app is one file; 'self' covers both sites' own files, blob:/data: cover generated models and photos.
+const SB = 'https://legpubblzgknxdtvsant.supabase.co';
+const CONNECT = [SB, 'wss://legpubblzgknxdtvsant.supabase.co', 'https://api.coingecko.com', 'https://open.er-api.com', 'https://api.metals.live', 'https://metals-api.com',
+  'https://www.alphavantage.co', 'https://api.anthropic.com', 'https://api.openverse.org', 'https://static.poly.pizza', 'https://poly.pizza', 'https://corsproxy.io',
+  'https://api.notion.com', 'https://api.convertkit.com', 'https://www.shibrpc.com', 'https://challenges.cloudflare.com'];
+const REPORT_ONLY = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com",
+  "connect-src 'self' blob: data: " + CONNECT.join(' '),
+  "img-src 'self' data: blob: https://logo.clearbit.com https://www.google.com https://static.poly.pizza https://poly.pizza",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "frame-src https://challenges.cloudflare.com",
+  "worker-src 'self' blob:",
+].join('; ');
+SECURITY['Content-Security-Policy-Report-Only'] = REPORT_ONLY;
+
 function withHeaders(res, { file, prod } = {}) {
   const h = new Headers(res.headers);
   for (const [k, v] of Object.entries(SECURITY)) h.set(k, v);

@@ -10228,6 +10228,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 .auth-sub{font-family:var(--font-body)!important;font-size:.72rem!important;letter-spacing:0!important;text-transform:none!important;color:var(--muted)!important;margin-top:4px}
 .auth-footer{color:var(--muted)!important;opacity:1!important;font-size:.5rem!important;letter-spacing:.04em!important;text-transform:none!important}
 .vi-fca{color:var(--muted);font-family:var(--font-body);font-size:max(.5rem,11px);letter-spacing:0;text-transform:none;margin-left:6px;white-space:nowrap}
+.vi-disc{color:var(--muted);font-family:var(--font-body);font-size:max(.5rem,10px);line-height:1.35;letter-spacing:0;text-transform:none;flex:1 1 100%;margin-top:1px}
 </style>
 <style id="vi-daylight">
 /* ═══ Daylight polish (brand phase 6): ink on paper, no glow, nothing faint. Night is untouched. ═══ */
@@ -27663,7 +27664,7 @@ function nwhRenderMini(){
 
 <!-- ══ FOOTER ══ -->
 <div id="app-footer">
-  <span class="footer-copy"><span class="footer-cr">© 2026 PT Live Design. All rights reserved.</span> <button onclick="showPrivacy()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Privacy</button><span style="color:var(--t3);opacity:.4">·</span><button onclick="showTerms()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Terms</button> <span class="vi-fca">Not regulated by the FCA. Not financial advice.</span></span>
+  <span class="footer-copy"><span class="footer-cr">© 2026 PT Live Design. All rights reserved.</span> <button onclick="showPrivacy()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Privacy notice</button><span style="color:var(--t3);opacity:.4">·</span><button onclick="showTerms()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Beta terms</button> <span class="vi-fca">Not regulated by the FCA. Not financial advice.</span> <span class="vi-disc">Vault-It helps you track and plan your money. Forecasts, dates and values are estimates from what you enter and public prices, and may be wrong. Speak to a regulated adviser before big money decisions.</span></span>
   <span class="footer-logo"><div style="width:14px;height:14px;flex-shrink:0;display:inline-block"><svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2020/svg" style="">
   <defs>
     <radialGradient id="vaultGlow3" cx="50%" cy="50%" r="50%">
@@ -27714,6 +27715,16 @@ function nwhRenderMini(){
 </svg></div> PT Live Design</span>
   <span class="footer-version">Vault-It v0.9.2 Alpha · build flow-dash-1</span>
 </div>
+<script>
+// The fixed footer wraps to a few lines when the disclaimer is long: keep --footer-h equal to its real height so the page and toasts clear it.
+// On phones the footer flows with the page and --footer-h is the bottom tab bar, so it is left alone there.
+(function(){
+  var f=document.getElementById('app-footer'); if(!f) return;
+  function sync(){ try{ if(getComputedStyle(f).position==='fixed') document.documentElement.style.setProperty('--footer-h',f.offsetHeight+'px'); else document.documentElement.style.removeProperty('--footer-h'); }catch(e){} }
+  if(window.ResizeObserver) new ResizeObserver(sync).observe(f);
+  window.addEventListener('resize',sync); sync();
+})();
+</script>
 
 <!-- ══ ALPHA ACCESS MODAL ══ -->
 <div id="waitlist-modal" class="vi-modal-overlay hidden">
