@@ -39,7 +39,8 @@ node tests/test_value_hist.js         # Round 3 (8): each wealth item keeps one 
 node tests/test_icons.js              # Icons: embedded coin logos work offline, no emoji fallback; inventory and liability items are the brand block, blank until a brand icon is picked; old emoji choices map to brand icons
 node tests/test_crypto_live.js         # Round 3: crypto prices fetched by themselves (CoinGecko mocked), tokens held, price source and age, bigger icons, last price kept on failure
 node tests/test_i3d_live.js           # Round 3: desktop, hover a model tile to orbit it by click and drag (one live view), click opens the viewer; touch keeps the picture
-node tests/test_ledger.js             # Round 3: the side bar ledger lists every money figure with its icon, each equal to its tab
+node tests/test_ledger.js             # Round 3: the side bar ledger lists every money figure with its icon, each equal to its tab; also the Savings rate line and the stale-price note
+node tests/test_nw3d_labels.js       # Net worth in 3D: floor names never overlap or leave the stage (makeNW, 5a5f32b)
 node tests/test_footer.js             # footer: approved disclaimer, Privacy notice / Beta terms links in the app and landing footers, type floors, --footer-h tracks the fixed footer
 node tests/test_csp_report_only.mjs   # Worker: Content-Security-Policy-Report-Only lists every outside host the app calls; enforced CSP unchanged
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width

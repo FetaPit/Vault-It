@@ -35,6 +35,28 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     ok(r.dashLiab.length >= 1 && r.dashLiab.every(([l, v]) => r.led[l] === v), T + 'each liability matches the liabilities tile');
     ok(r.dep[0] === r.dep[1] && r.inc[0] === r.inc[1] && ['Committed essential', 'Income', 'Deposit target', 'House price'].every(k => k in r.led || Object.keys(r.led).some(x => x.indexOf(k) === 0)), T + 'house deposit target and the monthly budget are in it too');
     ok(r.sx <= 1, T + 'no sideways scroll with the ledger open');
+    // item 20 gaps (owner, 31 Oct): a Savings rate line (Budget's formula and rounding) and a stale note on live prices older than a day
+    const g = await p.evaluate(() => {
+      const row = k => document.querySelector('#sb-ledger .sb-lg[data-k="' + k + '"]'), note = k => { const n = row(k) && row(k).querySelector('.sb-lg-n'); return n ? n.textContent : null; };
+      const m = cfModel(), want = (m.tIn > 0 ? Math.max(-999, Math.round((m.surplus / m.tIn) * 100)) : 0) + '%';
+      renderCashflow(); const budget = (document.getElementById('cf-summary').textContent.match(/Save rate: (-?\d+%)/) || [])[1];
+      const r1 = row('sb-savings-rate');
+      const fresh = { stocks: note('sb-stocks'), metals: note('sb-metals'), crypto: note('sb-crypto') };
+      const DAY = 864e5, ago = d => Date.now() - d * DAY;
+      alState.stocks = [{ id: 's1', name: 'Test plc', ticker: 'TST', shares: 2, price: 10, updated: ago(3) }, { id: 's2', name: 'Fresh plc', ticker: 'FRS', shares: 1, price: 5, updated: Date.now() }];
+      alState.metalPrices = Object.assign({}, alState.metalPrices, { gold: 1800, lastUpdated: new Date(ago(2)).toISOString() });
+      alState.crypto = [{ id: 'c1', name: 'Bitcoin', amount: 1, price: 1000, priceSrc: 'live', priceAt: new Date(ago(4)).toISOString() }];
+      viRenderLedger();
+      const stale = { stocks: note('sb-stocks'), metals: note('sb-metals'), crypto: note('sb-crypto') };
+      alState.stocks = [{ id: 's2', name: 'Fresh plc', ticker: 'FRS', shares: 1, price: 5, updated: Date.now() }, { id: 's3', name: 'Mine', ticker: 'MNE', shares: 1, price: 5, manualPrice: true, updated: 0 }];
+      alState.metalPrices.lastUpdated = new Date().toISOString(); alState.crypto[0].priceAt = new Date().toISOString();
+      viRenderLedger();
+      const back = { stocks: note('sb-stocks'), metals: note('sb-metals'), crypto: note('sb-crypto') };
+      return { want, budget, got: r1 && r1.querySelector('.sb-val').textContent, icon: !!(r1 && r1.querySelector('.ov-sum-ri svg')), lab: r1 && r1.querySelector('.sb-lg-l').textContent, fresh, stale, back };
+    });
+    ok(g.lab === 'Savings rate' && g.icon && g.got === g.want && g.budget === g.want, T + 'Savings rate line, with an icon, equals Budget\'s Save rate (' + g.got + ' = ' + g.budget + ', expected ' + g.want + ')');
+    ok(g.stale.stocks && /3 ?d/.test(g.stale.stocks) && g.stale.metals && /2 ?d/.test(g.stale.metals) && g.stale.crypto && /4 ?d/.test(g.stale.crypto), T + 'live prices older than a day are marked stale on their line (' + JSON.stringify(g.stale) + ')');
+    ok(!g.back.stocks && !g.back.metals && !g.back.crypto, T + 'fresh live prices and typed prices carry no stale note');
     await ctx.close();
   }
   await b.close();

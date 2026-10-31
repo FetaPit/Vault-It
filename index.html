@@ -7241,6 +7241,7 @@ html, body { background: var(--bg); color: var(--tx); font-family: var(--font-bo
 .sb-ledger .sb-lg{display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:8px;padding:3px 0}
 .sb-ledger .sb-lg .ov-sum-ri{width:22px;height:22px}
 .sb-ledger .sb-lg .ov-sum-ri svg{width:16px;height:16px}
+.sb-ledger .sb-lg-n{grid-column:2/-1;font:400 max(.5rem,10px)/1.3 'DM Sans',sans-serif;color:var(--amber);margin-top:-2px}
 .sb-ledger .sb-lg-l{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 .62rem/1.3 'DM Sans',sans-serif}
 .sb-ledger .sb-val{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--text)}
 .sb-ledger .sb-lg-h{margin-top:12px}
@@ -13903,7 +13904,14 @@ function viRenderLedger(){
   var el=document.getElementById('sb-ledger');if(!el)return;
   var L=VI_LABELS,out=[],f=function(v){return gbpFmt(v)},m=function(v){return gbpFmt(v)+'/mo'};
   function sec(t){out.push('<div class="sb-label sb-lg-h">'+t+'</div>')}
-  function line(ic,col,label,val,id,vcol){out.push('<div class="sb-row sb-lg" data-k="'+(id||'')+'">'+ovIcon(ic,col)+'<span class="sb-lg-l" style="color:'+col+'">'+ccEsc(label)+'</span><span class="sb-val"'+(id?' id="'+id+'"':'')+(vcol?' style="color:'+vcol+'"':'')+'>'+val+'</span></div>')}
+  function line(ic,col,label,val,id,vcol,note){out.push('<div class="sb-row sb-lg" data-k="'+(id||'')+'">'+ovIcon(ic,col)+'<span class="sb-lg-l" style="color:'+col+'">'+ccEsc(label)+'</span><span class="sb-val"'+(id?' id="'+id+'"':'')+(vcol?' style="color:'+vcol+'"':'')+'>'+val+'</span>'+(note?'<span class="sb-lg-n">'+ccEsc(note)+'</span>':'')+'</div>')}
+  // live prices older than a day are flagged on their line, from the timestamps each tab already keeps (typed prices carry none)
+  var DAYMS=864e5,now=Date.now();
+  function stale(oldest){return oldest&&now-oldest>DAYMS?'Live price last updated '+Math.round((now-oldest)/DAYMS)+' d ago':''}
+  var stkOld=0,crOld=0,mtOld=0;
+  (alState.stocks||[]).forEach(function(h){if(!h.manualPrice&&+h.updated>0&&(!stkOld||h.updated<stkOld))stkOld=+h.updated});
+  (alState.crypto||[]).forEach(function(c){var t=(c.priceSrc==='live'||c.priceSrc==='stale')?Date.parse(c.priceAt||0):0;if(t&&(!crOld||t<crOld))crOld=t});
+  var mp=alState.metalPrices||{},mLive=mp.lastUpdated?Date.parse(mp.lastUpdated):0,mOwn=mp.manualAt?Date.parse(mp.manualAt):0;if(mLive&&mLive>=mOwn)mtOld=mLive;
   var assets=totalAssets()+alTotalAssets(),debtOnly=totalDebts()+debtTotal(),nw=computeNetWorth(),biz=0;
   if(typeof bizState!=='undefined'&&bizState.incomeStreams)bizState.incomeStreams.forEach(function(s){biz+=(+s.monthlyIncome||0)});
   var inc=cfTotalIn(),outM=cfTotalOut(),sur=inc+biz-outM;
@@ -13916,10 +13924,10 @@ function viRenderLedger(){
   sec('What you own');
   line('cash','var(--green)',L.cash,f(alTotalCash()),'sb-cash');
   line('house','var(--teal)',L.deposit,f(state?state.saved:0),'sb-deposit');
-  line('stocks','var(--green2)',L.stocks,f(alTotalStocks()),'sb-stocks');
-  line('metals','var(--gold)',L.metals,f(alTotalMetals()),'sb-metals');
+  line('stocks','var(--green2)',L.stocks,f(alTotalStocks()),'sb-stocks','',stale(stkOld));
+  line('metals','var(--gold)',L.metals,f(alTotalMetals()),'sb-metals','',alTotalMetals()>0?stale(mtOld):'');
   line('inv','var(--purple)',L.inv,f(alTotalOther()),'sb-other');
-  line('crypto','var(--teal)',L.crypto,f(alTotalCrypto()),'sb-crypto');
+  line('crypto','var(--teal)',L.crypto,f(alTotalCrypto()),'sb-crypto','',stale(crOld));
   if(typeof alTotalOwedToMe==='function')line('owed','var(--blue)',L.owed,f(alTotalOwedToMe()),'sb-owed');
   if(totalAssets()>0)line('inv','var(--t2)','Other assets',f(totalAssets()),'sb-other-assets');
   sec('House deposit');
@@ -13940,6 +13948,7 @@ function viRenderLedger(){
   var mdl=cfModel();if(mdl.overflow>0)line('plus','var(--t2)','Not assigned yet',m(mdl.overflow),'sb-unassigned');
   if(biz>0)line('biz','var(--orange)','Business income',m(biz),'sb-biz-income');
   line('plus',sur>=0?'var(--teal)':'var(--red)','Surplus',m(sur),'sb-surplus-2',sur>=0?'':'var(--red)');
+  line('plus',mdl.surplus>=0?'var(--teal)':'var(--red)','Savings rate',(mdl.tIn>0?Math.max(-999,Math.round((mdl.surplus/mdl.tIn)*100)):0)+'%','sb-savings-rate',mdl.surplus>=0?'':'var(--red)');   /* Budget's Save rate: same surplus, same income, same rounding */
   var mrr=typeof bizMRR==='function'?bizMRR():0,cl=typeof bizState!=='undefined'?(bizState.clients||[]).filter(function(c){return c.status==='Active'}).length:0;
   if(mrr>0||cl>0){sec('Business');line('biz','var(--orange)','Monthly recurring revenue',m(mrr),'sb-mrr');line('biz','var(--orange)','Active clients',String(cl),'sb-clients');}
   el.innerHTML=out.join('');
