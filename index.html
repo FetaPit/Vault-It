@@ -28164,22 +28164,23 @@ function makeTracker(cv,o){
  * (owner, 31 Oct 19:04, dtmSquarify): each colour group (expense type) is an exact rectangle, area in proportion to its amount, and
  * inside it each budget line is an exact rectangle too. A line's rectangle is filled with blocks: rows of £100 blocks, and one
  * thinner last row that shares the pounds left over (so a block is never worth more than £100 and every rectangle is filled to the
- * pound). One flat layer; lines in alternating shades; a gutter between groups. What is not assigned yet is a grey area.
+ * pound). One flat layer, low blocks (owner: 35% lower); lines in alternating shades; only a hairline between blocks and between
+ * groups, so from above it reads as one solid rectangle (owner, 31 Oct). What is not assigned yet is a grey area.
  * Over about 360 blocks the block becomes £200, £500, £1,000 ... and says so.
  * Intro (owner, 31 Oct): the income arrives as a teal pile on the left, then the blocks slide right along x into their places,
  * taking their group's colour as they land. Reduced motion shows the finished map. */
 function makeTreeMap(cv,o){
   o=o||{};
   var st={yaw:-.5,pitch:.98,dist:125,zoom:1.15,ty:1,fit:.9},self={st:st},idle=-9999,cells=[],groups=[],rects=[],raw=[],total=0,hover=null,first=true,pending=false,PL=.5,
-    fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},U=100,BS=3.3,GG=1.6,LG=.45,CH=1.3,ext={x:10,z:10},plate={W:20,D:20},pile={x0:0,x1:0},
+    fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},U=100,BS=3.3,GG=.12,LG=.05,CH=.85,ext={x:10,z:10},plate={W:20,D:20},pile={x0:0,x1:0},
     T_IN=900,T_GO=850,SPREAD=2100,t0=0,sx=0;
   function unitFor(t){var u=100,steps=[100,200,500,1000,2000,5000,10000],k=0;while(t/u>360&&k<steps.length-1){k++;u=steps[k]}return u}
   /* a line's rectangle in blocks: columns about one £100 block wide, full rows of £100 blocks, then one thinner row for the rest */
   function fill(r,g,it,j,rect){
     var v=it.v,kpa=r.w*r.h/v,side=Math.sqrt(U*kpa),c=Math.max(1,Math.min(Math.round(r.w/side)||1,Math.max(1,Math.floor(v/U+1e-9)))),cw=r.w/c,
-      nf=Math.floor(v/(U*c)+1e-9),rem=v-nf*U*c,rd=U*kpa/cw,z=r.y,k,bi=Math.min(.4,cw*.14);
+      nf=Math.floor(v/(U*c)+1e-9),rem=v-nf*U*c,rd=U*kpa/cw,z=r.y,k,bi=Math.min(.045,cw*.03);
     if(rem<.005)rem=0;
-    function put(zz,dd,val){for(k=0;k<c;k++)cells.push({g:g,it:it,ii:j,r:rect,val:val,part:val/U,x:r.x+cw*(k+.5),z:zz+dd/2,w:Math.max(.2,cw-bi),d:Math.max(.12,dd-Math.min(.4,dd*.14)),row:Math.round(zz*100)})}
+    function put(zz,dd,val){for(k=0;k<c;k++)cells.push({g:g,it:it,ii:j,r:rect,val:val,part:val/U,x:r.x+cw*(k+.5),z:zz+dd/2,w:Math.max(.05,cw-bi),d:Math.max(.05,dd-Math.min(.045,dd*.03)),row:Math.round(zz*100)})}
     for(var q=0;q<nf;q++){put(z,rd,U);z+=rd}
     if(rem>0)put(z,r.y+r.h-z,rem/c);
   }
@@ -28212,7 +28213,7 @@ function makeTreeMap(cv,o){
   self.tiles=function(){var by={};cells.forEach(function(c){var k=c.g.key+'|'+c.ii,t=by[k]||(by[k]={group:c.g.key,name:c.it.name,v:c.it.v,blocks:0,worth:0,rows:{}});t.blocks++;t.worth+=c.part*U;t.rows[c.row]=1});
     return Object.keys(by).map(function(k){var t=by[k];t.rows=Object.keys(t.rows).map(Number);return t})};
   self.rects=function(){return rects.map(function(r){return {group:r.g.key,x:r.x,z:r.z,w:r.w,d:r.d,blocks:r.k,sum:r.g.sum}})};
-  self.plate=function(){return {W:plate.W,D:plate.D,areas:raw.map(function(r){return {group:r.d.key,a:r.w*r.h,sum:r.d.sum}})}};
+  self.plate=function(){return {W:plate.W,D:plate.D,H:CH,areas:raw.map(function(r){return {group:r.d.key,a:r.w*r.h,sum:r.d.sum}})}};
   self.cells=function(){return cells.map(function(c){return {group:c.g.key,name:c.it.name,val:c.val,x:c.x,z:c.z,w:c.w,d:c.d}})};
   self.unit=function(){return U};
   self.phase=function(){var ts=performance.now();if(pending||t0===Infinity)return 'waiting';if(t0<0)return 'done';var e=ts-t0;return e<T_IN?'pile':e<lastEnd()?'moving':'done'};
@@ -28250,8 +28251,8 @@ function makeTreeMap(cv,o){
     ground(cx,Pr,st,ext.x+1,-ext.z-1,ext.z+1,false,ts,rm,BS+.5);
     /* each group's area on the floor, tinted and outlined in its colour, so the map reads as a tree map before the blocks land */
     var land=function(r){var last=cells.filter(function(c){return c.r===r}).pop();if(t0<0||!last)return 1;return clamp((ts-t0-last.off-T_GO*.6)/500,0,1)};
-    rects.forEach(function(r){var a=land(r);if(a<=0)return;var x0=r.x-.2,x1=r.x+r.w+.2,z0=r.z-.2,z1=r.z+r.d+.2,q=[Pr.pt(x0,.02,z0),Pr.pt(x1,.02,z0),Pr.pt(x1,.02,z1),Pr.pt(x0,.02,z1)];
-      cx.beginPath();cx.moveTo(q[0][0],q[0][1]);for(var i=1;i<4;i++)cx.lineTo(q[i][0],q[i][1]);cx.closePath();cx.fillStyle=rgba(r.g.col,.13*a);cx.fill();cx.strokeStyle=rgba(r.g.col,.75*a);cx.lineWidth=1.2;cx.stroke()});
+    rects.forEach(function(r){var a=land(r);if(a<=0)return;var x0=r.x,x1=r.x+r.w,z0=r.z,z1=r.z+r.d,q=[Pr.pt(x0,.02,z0),Pr.pt(x1,.02,z0),Pr.pt(x1,.02,z1),Pr.pt(x0,.02,z1)];
+      cx.beginPath();cx.moveTo(q[0][0],q[0][1]);for(var i=1;i<4;i++)cx.lineTo(q[i][0],q[i][1]);cx.closePath();cx.fillStyle=rgba(r.g.col,.13*a);cx.fill();cx.strokeStyle=rgba(r.g.col,.6*a);cx.lineWidth=.8;cx.stroke()});
     var items=[];cells.forEach(function(c){var g=geo(c,ts);if(g)items.push(g)});
     items.forEach(function(g){g.dz=Math.hypot(Pr.pos[0]-g.x,Pr.pos[1]-(g.y+g.h/2),Pr.pos[2]-g.z)});items.sort(function(a,b){return b.dz-a.dz});
     items.forEach(function(g){var col=g.fl>0?mix(g.col,PAL.flash,g.fl*.8):g.col;if(hover&&hover.g===g.c.g&&hover.ii===g.c.ii)col=mix(col,PAL.flash,.45);drawBox(cx,Pr,g,PL,col,PAL.fa+.16+.06*PL,.66+.25*PL,PAL.edgeK)});
@@ -28275,7 +28276,7 @@ function makeTreeMap(cv,o){
     cells.forEach(function(c){var y=CH,x0=c.x-c.w/2-.2,x1=c.x+c.w/2+.2,z0=c.z-c.d/2-.2,z1=c.z+c.d/2+.2,poly=[Pr.pt(x0,y,z0),Pr.pt(x1,y,z0),Pr.pt(x1,y,z1),Pr.pt(x0,y,z1)];
       if(inside(mx,my,poly)){var dz=Pr.pt(c.x,y,c.z)[2];if(dz<bd){bd=dz;best=c}}});
     var was=hover;hover=best;
-    if((was&&was.g)!==(best&&best.g)||(was&&was.ii)!==(best&&best.ii)){if(o.onPick)o.onPick(best?{group:best.g.label,name:best.it.name,v:best.it.v,share:total>0?best.it.v/total:0,blocks:Math.ceil(best.it.v/U-1e-9),unit:U}:null);S.kick()}}
+    if((was&&was.g)!==(best&&best.g)||(was&&was.ii)!==(best&&best.ii)){if(o.onPick)o.onPick(best?{group:best.g.label,name:best.it.name,v:best.it.v,share:total>0?best.it.v/total:0,blocks:cells.filter(function(c){return c.g===best.g&&c.ii===best.ii}).length,unit:U}:null);S.kick()}}
   cv.addEventListener("pointermove",function(e){if(e.pointerType==="mouse"&&!e.buttons)pick(e.clientX,e.clientY)});
   cv.addEventListener("pointerdown",function(e){pick(e.clientX,e.clientY)});
   cv.addEventListener("pointerleave",function(e){if(e.pointerType==="mouse"&&hover){hover=null;if(o.onPick)o.onPick(null);S.kick()}});
@@ -28487,7 +28488,7 @@ function ensure(){
   if(eng||!window.ViNW3D||!ViNW3D.makeTreeMap||!el('bd3d-cv'))return eng;
   var read=el('bd3d-read');
   eng=ViNW3D.makeTreeMap(el('bd3d-cv'),{fmt:function(v){return gbpFmt(v)},onPick:function(p){if(!read)return;
-    read.textContent=p?p.group+' · '+p.name+': '+gbpFmt(p.v)+' a month, '+Math.round(p.share*100)+'% of your income ('+p.blocks+' block'+(p.blocks===1?'':'s')+' of '+gbpFmt(p.unit)+')':readDefault()}});
+    read.textContent=p?p.group+' · '+p.name+': '+gbpFmt(p.v)+' a month, '+Math.round(p.share*100)+'% of your income ('+p.blocks+' block'+(p.blocks===1?'':'s')+' of up to '+gbpFmt(p.unit)+')':readDefault()}});
   return eng;
 }
 function readDefault(){var m=cfModel();return m.tIn>0?'Income '+gbpFmt(m.tIn)+' a month'+(m.overflow>0?' · '+gbpFmt(m.overflow)+' not assigned yet':'')+(m.shortfall>0?' · spending is '+gbpFmt(m.shortfall)+' more than income':''):'Add your income and spending to see where every pound goes'}

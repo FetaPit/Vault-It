@@ -41,6 +41,9 @@ const EXP = [{ id: 3, name: 'Rent', amount: 700, type: 'ce' }, { id: 4, name: 'C
     const PL = r.plate, perPound = PL.areas.map(a => a.a / a.sum);
     ok(Math.abs(PL.areas.reduce((a, x) => a + x.a, 0) - PL.W * PL.D) < 1e-6 && perPound.every(x => Math.abs(x - perPound[0]) / perPound[0] < 1e-6), T + '3D tree map: the areas fill one rectangle exactly, each in proportion to its amount');
     ok(PL.areas.length === 7 && PL.areas.slice(0, -1).every((a, i) => i === 0 || a.sum <= PL.areas[i - 1].sum) && PL.areas[6].group === 'un', T + '3D tree map: largest first, what is not assigned last (' + PL.areas.map(a => a.group).join(',') + ')');
+    // owner, 31 Oct: blocks 35% lower than before (1.3 -> 0.85) and only a hairline between blocks and types, so from above it is one solid rectangle
+    const cover = r.cells.reduce((a, c) => a + c.w * c.d, 0) / (PL.W * PL.D);
+    ok(PL.H <= 0.85 && cover > 0.93, T + '3D tree map: low blocks (' + PL.H + ') covering ' + Math.round(cover * 100) + '% of the rectangle seen from above');
     const R = r.rects, apart = (a, c) => a.x + a.w <= c.x + 1e-6 || c.x + c.w <= a.x + 1e-6 || a.z + a.d <= c.z + 1e-6 || c.z + c.d <= a.z + 1e-6;
     ok(R.every((a, i) => R.every((c, j) => i === j || apart(a, c))) && R.every(a => a.x >= -PL.W / 2 - 1e-6 && a.x + a.w <= PL.W / 2 + 1e-6 && a.z >= -PL.D / 2 - 1e-6 && a.z + a.d <= PL.D / 2 + 1e-6), T + '3D tree map: areas never overlap and stay inside the rectangle');
     // blocks: £100 each, the last row of a line shares the pounds left over, so no block is over £100 and every line adds up to the pound
