@@ -12,7 +12,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Waiting on the owner
 
-- Secure paid gateway go-live (built, not live): your yes to apply migration 011 and deploy `stripe-webhook`, then add the Stripe webhook endpoint and set `STRIPE_WEBHOOK_SECRET` (steps in `supabase/functions/README.md`); release the app after that
+- `STRIPE_WEBHOOK_SECRET` in Supabase secrets (the only gateway step left; I am not allowed to write secrets): Stripe Dashboard → Developers → Webhooks → endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` → Reveal signing secret, then Supabase → Edge Functions → Secrets → add `STRIPE_WEBHOOK_SECRET`. Until then payments wait (Stripe retries for three days)
 - Metals price feed (`api.metals.live`): the sandbox cannot reach it (host not in the session's allowed network domains). Check it from a browser, or allow the host in the environment's network settings and ask again
 - Brand build on a real phone: speed of the lite fallback and how the 6.8 feedback feels (Settings > House builder > Brand build, or ?house=new)
 - Classic switches (house builder, net worth) stay in Settings until the owner has tested the new views on their phone (owner, 30 Oct); remove them only when the owner says so
@@ -24,6 +24,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Gateway go-live and release (owner, 31 Oct: "yes and release when ready"): migration 011 applied (guard checked live in a rolled-back transaction), `stripe-webhook` deployed, Stripe endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` created; full suite passed; released to `release/pioneer-v2` with this commit (backup branch taken first). Left for the owner: the webhook secret (see Waiting)
 - [x] Net worth 3D card controls (owner, 31 Oct 12:33): three views, one switch each, top right: the net worth card is 3D | Graph (the old Blocks | Line switch is gone); the progress blocks have their own card directly below with a Forecast switch (in step with the graph's) and their own readout and key; keys and legends are bigger and every swatch is a small 3D block in its colour. Commit 7e94db2 on `brand-rollout`, not released.
 - [x] Secure paid gateway, built (owner, 31 Oct): migration 011 (paid columns the browser cannot change, tester flag from confirmed waitlist addresses, Stripe event log, `stripe_apply`), edge function `stripe-webhook` (signature checked, each event once, stale and old-subscription events skipped), the app reads paid status from the profile only once the server has it and works as before on an older server, privacy notice names Stripe. Tests: test_011, test_stripe_server, test_paid_gateway. Commit 9d6cbce on `brand-rollout`, not released, not live (needs the owner's yes)
 - [x] House builder style as the brand book and recording (owner, 31 Oct): the brand build is now the default (owner's call; classic viewer stays as the Settings switch), camera controls use the brand line icons, a column on the right at desktop and a row top right on phones, the caption wraps in Share Tech Mono and no longer counts tiles. Commit 5371db7 on `brand-rollout`, not released.

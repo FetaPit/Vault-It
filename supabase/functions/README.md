@@ -174,7 +174,7 @@ which the app adds to every Payment Link; else the Stripe customer; else the che
 `.updated`, `.deleted` (renewals, late payments, cancellations). The plan comes from the Payment Link id, then the link's
 `metadata.plan`, then the price. Test-mode events are ignored unless `STRIPE_ALLOW_TEST=1`.
 
-**Go-live order (needs Pete's yes; production database and functions):**
+**Go-live order (needs Pete's yes; production database and functions).** Done 31 Oct 2026: steps 1 to 3 (endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK`) and 5; step 4 (the secret) is Pete's, in the Supabase dashboard.
 1. Apply `supabase/migrations/011_paid_gateway.sql`.
 2. Deploy: `supabase functions deploy stripe-webhook --no-verify-jwt` (Stripe sends no Supabase token; the signature is the check).
 3. Stripe Dashboard → Developers → Webhooks → Add endpoint `https://legpubblzgknxdtvsant.supabase.co/functions/v1/stripe-webhook`,
