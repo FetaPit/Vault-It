@@ -220,9 +220,9 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   ok(await page.evaluate(() => !!localStorage.getItem('pos_ov1')), 'the same person (any capitalisation) signs in with no prompt and keeps their data');
   await page.evaluate(() => { window.confirm = () => true; });
   await Promise.all([page.waitForNavigation({ timeout: 15000 }), page.evaluate(() => { _afterVerified({ id: 'u-b', email: 'bob@example.com' }, 'bob@example.com'); })]);
-  await page.waitForTimeout(800);
-  const sw = await page.evaluate(() => ({ ov: localStorage.getItem('pos_ov1'), user: localStorage.getItem('vi_user'), key: localStorage.getItem('meshy_api_key'), sb: !!localStorage.getItem('sb-legpubblzgknxdtvsant-auth-token'), last: localStorage.getItem('vi_last_email') }));
-  ok(!/"n":"Pay"/.test(sw.ov || '') && sw.key === null && !/Alice|07000/.test(sw.user || '') && sw.sb && sw.last === 'bob@example.com', 'confirming removes the previous person\'s data and API keys, keeps the new sign-in, and starts clean');
+  await page.waitForTimeout(3000);   // long enough for anything start-up does after the reload (the demo used to drop the new sign-in here)
+  const sw = await page.evaluate(() => ({ ov: localStorage.getItem('pos_ov1'), user: localStorage.getItem('vi_user'), key: localStorage.getItem('meshy_api_key'), sb: !!localStorage.getItem('sb-legpubblzgknxdtvsant-auth-token'), last: localStorage.getItem('vi_last_email'), demo: localStorage.getItem('vi_demo_mode') }));
+  ok(!/"n":"Pay"/.test(sw.ov || '') && sw.key === null && !/Alice|07000/.test(sw.user || '') && sw.sb && sw.last === 'bob@example.com' && sw.demo !== 'true', 'confirming removes the previous person\'s data and API keys, keeps the new sign-in, and starts clean');
   await ctx.close();
 
   // ── 9. requests that cost something are never sent twice ──

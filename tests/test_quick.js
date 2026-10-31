@@ -57,11 +57,13 @@ const err=page=>page.evaluate(()=>document.getElementById('auth-err').textConten
   ok(s.sess.expiry-Date.now()>29*864e5,'session ~30 days');
   // reload: session renewed, no overlays
   const st=await page.evaluate(()=>{const o=JSON.parse(localStorage.getItem('vi_session'));o.expiry=Date.now()+864e5;localStorage.setItem('vi_session',JSON.stringify(o));return localStorage.getItem('vi_user');});
+  await page.waitForTimeout(1500);   // headless Chromium on file:// can lose a localStorage write made just before a reload
   await page.reload(); await page.waitForTimeout(1200);
   ok(await page.evaluate(()=>JSON.parse(localStorage.getItem('vi_session')).expiry-Date.now()>29*864e5),'session renewed on open');
   ok(await overlay(page)==='none'&&await page.evaluate(()=>getComputedStyle(document.getElementById('welcome-overlay')).display)==='none','reload: straight into the app');
   // session expired: PIN pad shown directly with email prefilled
   await page.evaluate(()=>{const o=JSON.parse(localStorage.getItem('vi_session'));o.expiry=Date.now()-1000;localStorage.setItem('vi_session',JSON.stringify(o));});
+  await page.waitForTimeout(1500);   // headless Chromium on file:// can lose a localStorage write made just before a reload
   await page.reload(); await page.waitForTimeout(1200);
   await page.evaluate(MOCK); await page.evaluate(()=>{_srv.pins={'pete@example.com':'482915'};}); await page.evaluate(HYD);
   await page.evaluate(()=>initQuickLogin()); await page.waitForTimeout(600);
@@ -71,6 +73,7 @@ const err=page=>page.evaluate(()=>document.getElementById('auth-err').textConten
   ok(await overlay(page)==='none','PIN signs back in');
   // PIN removed server-side: email step prefilled
   await page.evaluate(()=>{const o=JSON.parse(localStorage.getItem('vi_session'));o.expiry=Date.now()-1000;localStorage.setItem('vi_session',JSON.stringify(o));});
+  await page.waitForTimeout(1500);   // headless Chromium on file:// can lose a localStorage write made just before a reload
   await page.reload(); await page.waitForTimeout(1200);
   await page.evaluate(MOCK); await page.evaluate(()=>initQuickLogin()); await page.waitForTimeout(600);
   ok(await step(page)==='auth-email-step'&&await page.evaluate(()=>document.getElementById('auth-email').value)==='pete@example.com','no PIN: email step prefilled');

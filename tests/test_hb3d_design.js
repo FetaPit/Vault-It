@@ -68,6 +68,7 @@ const ST = () => { const v = HB3D.viewer, C = v && v._cust; return { engine: doc
   await p.evaluate(() => { state.houseMode = null; state.mortgageBalance = 0; save(); updateUI(); });
 
   // ── persists across a reload (IndexedDB)
+  await p.waitForTimeout(1500);   // headless Chromium on file:// can lose a localStorage write made just before a reload
   await p.reload(); await p.waitForTimeout(1500);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await p.evaluate(() => showTab('house'));

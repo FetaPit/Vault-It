@@ -10157,6 +10157,8 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 /* desktop menu (owner, 31 Oct): the tabs spread across the full width; when everything fits on one line (viNavFit decides from the
    real widths) the header is a single row: logo, tabs, net worth, Back Vault-It, Night/Daylight. No density switch: width decides. */
 #vi-density-btn{display:none!important}
+.vi-fc-note{margin:8px 0 0 auto;max-width:62ch;text-align:right;font:400 .5rem/1.45 'Share Tech Mono',monospace;color:var(--t2);letter-spacing:.01em}
+.vi-fc-note[hidden]{display:none}
 @media (min-width:1024px){
   #topnav .vi-tabs{justify-content:space-evenly}
   html body.vi-nav1 #topnav{grid-template-columns:auto 1fr auto auto auto;grid-template-rows:60px}
@@ -11249,6 +11251,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <div id="nw-zoom-hint" style="position:absolute;top:6px;right:8px;font-size:.46rem;color:rgb(var(--teal-rgb) / .4);font-family:'Share Tech Mono',monospace;pointer-events:none">Scroll=zoom · Drag=pan · Dbl-click=reset</div>
     </div>
     <div id="chart-tooltip" style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--t2);margin-top:8px;text-align:center;min-height:16px"></div>
+    <p class="vi-fc-note" id="nw-fc-note" hidden></p>
   </div>
 
   <!-- Milestone targets + snapshots: directly under the Net Worth chart -->
@@ -13424,6 +13427,18 @@ body.vi-pop-open{overflow:hidden}
 .ov-sum-drow{margin-bottom:4px}
 .ov-sum-bar{height:4px;background:rgb(var(--ink-rgb) / .07);border-radius:2px;margin:0 0 6px 30px}
 .ov-sum-bar div{height:100%;background:var(--gr);border-radius:2px}
+/* own and owe bars (owner, 31 Oct): assets and liabilities on one scale per card; debt shows what is left (soft red, from the left)
+   and what is paid off (green, from the right) */
+.ov-sum-sbar{height:5px;background:rgb(var(--ink-rgb) / .07);border-radius:3px;margin:-3px 0 7px 30px;overflow:hidden}
+.ov-sum-sbar span{display:block;height:100%;border-radius:3px;opacity:.85}
+.ov-sum-axis{display:flex;justify-content:space-between;margin:2px 0 4px 30px;padding-top:3px;border-top:1px solid rgb(var(--ink-rgb) / .12);font:400 .5rem/1 'Share Tech Mono',monospace;color:var(--t2)}
+.ov-sum-dbar{display:flex;height:7px;border-radius:4px;overflow:hidden;margin:-2px 0 3px 30px;background:rgb(var(--ink-rgb) / .06)}
+.ov-dbar-rem{background:rgb(var(--red-rgb) / .28)}
+.ov-dbar-paid{background:var(--green)}
+.ov-sum-dlab{display:flex;justify-content:space-between;gap:8px;margin:0 0 8px 30px;font:400 .52rem/1.2 'Share Tech Mono',monospace}
+.ov-dlab-rem{color:var(--red)}
+.ov-dlab-paid{color:var(--green)}
+.ov-dlab-none{color:var(--t2)}
 #ov-summary-row [id$="-next"]{font-size:.62rem!important;line-height:1.5}
 
 /* ═══ Debt tab: charts inherit each card's colours; bigger on desktop ═══ */
@@ -13881,6 +13896,14 @@ function updateSidebar(){
 // ═══════════════════════════════════════════════════════════════
 // LINE CHART  (fixed: date-based x-axis, correct NW, forecast)
 // ═══════════════════════════════════════════════════════════════
+// What the forecast rests on (owner, 31 Oct: small text, bottom right of the tile). Written by drawChart from the same months the
+// dashed line uses, so the note and the line cannot disagree.
+function viFcNote(on, months, ahead) {
+  var t = !on ? '' : months >= 2
+    ? 'Forecast: a straight line through your last ' + months + ' months of net worth and debt, carried ' + ahead + ' months ahead. It assumes no investment growth, no inflation and no change to your income, spending or debts. A guide from what you have entered, not a prediction.'
+    : 'Forecast: starts once you have two months of net worth logged (' + months + ' so far). It is a straight line through your own recent months, nothing more.';
+  ['nw-fc-note', 'nw3d-fc-note'].forEach(function (id) { var el = document.getElementById(id); if (!el) return; el.textContent = t; el.hidden = !t; });
+}
 function drawChart() {
   var canvas = document.getElementById('nwChart');
   if (!canvas) return;
@@ -14142,15 +14165,19 @@ function drawChart() {
       return{slope:(n*sxy-sx*sy)/d, intercept:(sy-sx*(n*sxy-sx*sy)/d/n)/n+ (sy-(n*sxy-sx*sy)/d*sx)/n};
     }
     // simpler linReg
-    function lr(vals) {
+    var lr = window._viLr = function (vals) {
       var n=vals.length,sx=0,sy=0,sxy=0,sx2=0;
       for(var i=0;i<n;i++){sx+=i;sy+=vals[i];sxy+=i*vals[i];sx2+=i*i;}
       var d=n*sx2-sx*sx||1;
       var slope=(n*sxy-sx*sy)/d;
       var intercept=(sy-slope*sx)/n;
       return{slope:slope,intercept:intercept};
-    }
-    var projSrc = points.slice(-Math.min(points.length,6));
+    };
+    var projSrc = points.slice(-Math.min(points.length,6)).filter(function(p){return !p.synth;});   // only months the user really logged
+  }
+  viFcNote(hasForecast, projSrc ? projSrc.length : 0, PROJ_MO);
+  if (hasForecast && points.length >= 2 && projSrc.length >= 2) {
+    var lr = window._viLr;
     var nwReg  = lr(projSrc.map(function(p){return p.nw;}));
     var dtReg  = lr(projSrc.map(function(p){return p.debt;}));
     var projN  = projSrc.length;
@@ -24386,6 +24413,14 @@ function fireShowDetail(idx,opts){
 
 // ── SUMMARY CARDS ─────────────────────────────────────────────
 function ovIcon(k,c){return '<span class="ov-sum-ri" style="color:'+c+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(OV_ICO[k]||OV_ICO.inv)+'</svg></span>';}
+// proportional bars for the Own and owe tiles (owner, 31 Oct): each row's bar is its value against a rounded maximum,
+// with a £0, half and maximum scale under the rows, like the debt tile
+function ovScaleMax(vals){var m=Math.max.apply(null,[0].concat(vals.filter(function(v){return isFinite(v);})));if(m<=0)return 0;
+  var p=Math.pow(10,Math.floor(Math.log10(m))),f=m/p,n=f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10;return n*p;}
+function ovScaleBar(v,max,c){var w=max>0?Math.max(0,Math.min(100,v/max*100)):0;
+  return '<div class="ov-sum-sbar"><span style="width:'+w.toFixed(1)+'%;background:'+c+'"></span></div>';}
+function ovScaleAxis(max){if(!(max>0))return '';
+  return '<div class="ov-sum-axis" aria-hidden="true"><span>£0</span><span>'+gbpFmt(max/2)+'</span><span>'+gbpFmt(max)+'</span></div>';}
 function renderSummaryCards(){
   var aEl=document.getElementById('ov-assets-summary');
   if(aEl){
@@ -24399,11 +24434,12 @@ function renderSummaryCards(){
       {l:'Crypto',v:alTotalCrypto(),c:'var(--teal)',i:'crypto'},
       {l:'Owed to you',v:(typeof alTotalOwedToMe==='function'?alTotalOwedToMe():0),c:'var(--blue)',i:'cash'}
     ];
+    var aRows=rows.filter(function(r){return r.v>0;}), aMax=ovScaleMax(aRows.map(function(r){return r.v;}));
     aEl.innerHTML='<div class="ov-sum-total" style="color:var(--teal)">'+gbpFmt(ta)+'</div>'
-      +(rows.filter(function(r){return r.v>0;}).map(function(r){
-      return '<div class="ov-sum-row">'+ovIcon(r.i,r.c)+'<span class="ov-sum-l" style="color:'+r.c+'">'+r.l+'</span>'
-        +'<span class="ov-sum-v">'+gbpFmt(r.v)+'</span></div>';
-    }).join('')||'<div class="ov-sum-empty">No assets tracked yet</div>');
+      +(aRows.map(function(r){
+      return '<div class="ov-sum-drow"><div class="ov-sum-row">'+ovIcon(r.i,r.c)+'<span class="ov-sum-l" style="color:'+r.c+'">'+r.l+'</span>'
+        +'<span class="ov-sum-v">'+gbpFmt(r.v)+'</span></div>'+ovScaleBar(r.v,aMax,r.c)+'</div>';
+    }).join('')+ovScaleAxis(aMax)||'<div class="ov-sum-empty">No assets tracked yet</div>');
     var aNx=document.getElementById('ov-assets-next');
     if(aNx){
       var msg=ta<1000?'Start: open a savings account or add your first asset':
@@ -24418,11 +24454,12 @@ function renderSummaryCards(){
     var tl=alTotalLiab();
     lEl.innerHTML='<div class="ov-sum-total" style="color:var(--amber)">'+gbpFmt(alLiabAssetTotal())+'</div>'
       +'<div class="ov-sum-empty" style="margin:-6px 0 10px">'+alLiabCostLine()+'</div>'
-      +(alState.liabilities.length?
-      alState.liabilities.map(function(l){
-        return '<div class="ov-sum-row">'+ovIcon('warn','var(--amber)')+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(l.name)+'</span>'
-          +'<span class="ov-sum-v" style="color:var(--amber)">'+gbpFmt(depreciatedValue(l))+'</span></div>';
-      }).join('')
+      +(alState.liabilities.length?(function(){
+        var lMax=ovScaleMax(alState.liabilities.map(function(l){return depreciatedValue(l);}));
+        return alState.liabilities.map(function(l){var lv=depreciatedValue(l);
+        return '<div class="ov-sum-drow"><div class="ov-sum-row">'+ovIcon('warn','var(--amber)')+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(l.name)+'</span>'
+          +'<span class="ov-sum-v" style="color:var(--amber)">'+gbpFmt(lv)+'</span></div>'+ovScaleBar(lv,lMax,'var(--amber)')+'</div>';
+      }).join('')+ovScaleAxis(lMax);})()
       :'<div class="ov-sum-empty">No liabilities tracked</div>');
     var lNx=document.getElementById('ov-liab-next');
     if(lNx){
@@ -24438,12 +24475,16 @@ function renderSummaryCards(){
     dEl.innerHTML='<div class="ov-sum-total" style="color:var(--re)">'+gbpFmt(td)+'</div>'
       +debtState.debts.map(function(d){
         var dc=(_dr[d.id]||{}).brand?_dr[d.id].c1:'var(--re)';
-        var pct=d.original>0?Math.round((1-d.balance/d.original)*100):0;
         var ik=(d.type==='credit'||d.type==='bnpl')?'card':'loan';
+        var bal=Math.max(0,+d.balance||0), orig=+d.original||0, known=orig>0&&orig>=bal, paid=known?orig-bal:0;
+        var pPct=known?Math.max(0,Math.min(100,paid/orig*100)):0;
         return '<div class="ov-sum-drow">'
           +'<div class="ov-sum-row">'+ovIcon(ik,dc)+'<span class="ov-sum-l" style="color:var(--t1)">'+ccEsc(d.name)+'</span>'
-          +'<span class="ov-sum-v" style="color:var(--re)">'+gbpFmt(d.balance)+'</span></div>'
-          +'<div class="ov-sum-bar"><div style="width:'+pct+'%"></div></div></div>';
+          +'<span class="ov-sum-v" style="color:var(--re)">'+gbpFmt(bal)+'</span></div>'
+          +'<div class="ov-sum-dbar" role="img" aria-label="'+(known?gbpFmt(bal)+' to pay, '+gbpFmt(paid)+' paid off of '+gbpFmt(orig):gbpFmt(bal)+' to pay')+'">'
+          +'<span class="ov-dbar-rem" style="width:'+(100-pPct).toFixed(1)+'%"></span><span class="ov-dbar-paid" style="width:'+pPct.toFixed(1)+'%"></span></div>'
+          +'<div class="ov-sum-dlab"><span class="ov-dlab-rem">'+gbpFmt(bal)+' to pay</span>'
+          +(known?'<span class="ov-dlab-paid">'+gbpFmt(paid)+' paid off</span>':'<span class="ov-dlab-none">starting balance not recorded</span>')+'</div></div>';
       }).join('');
     var dNx=document.getElementById('ov-debt-next');
     if(dNx){
@@ -26835,7 +26876,11 @@ function initDemoMode() {
   var hasData = !!localStorage.getItem('pos_ov1');
   var declined = localStorage.getItem('vi_declined_demo') === 'true';
   var isDemo  = localStorage.getItem('vi_demo_mode') === 'true';
-  if (!hasUser && !hasData && !declined) { loadDemoData(); isDemo = true; }
+  // a device where someone has just signed in (an account switch wipes the old data, keeps the sign-in and reloads) starts clean:
+  // loading the demo there used to drop the new sign-in a moment later (found 31 Oct by test_beta_client)
+  var session = null; try { session = JSON.parse(localStorage.getItem('vi_session') || 'null'); } catch (e) {}
+  var signedIn = !!(session && session.email && session.expiry > Date.now());
+  if (!hasUser && !hasData && !declined && !signedIn) { loadDemoData(); isDemo = true; }
   var chip = document.getElementById('demo-chip');
   if (chip) chip.style.display = isDemo ? 'flex' : 'none';
 }
@@ -27996,7 +28041,8 @@ tcard.innerHTML='<div class="nw3d-top"><span class="ov-chart-title">Net worth pr
  +'<span class="nw3d-sub">Your net worth month by month, one column of blocks a month. Forecast adds the next six months as see-through blocks. Tap or hover a month to read it, drag to turn it.</span>'
  +'<div class="nw3d-stage" id="nw3d-trk-stage"><canvas id="nw3d-trk-cv" tabindex="0" role="img" aria-label="Net worth progress in 3D blocks. Tap a month to read it, drag to turn it."></canvas></div>'
  +'<p class="nw3d-read" id="nw3d-trk-read" aria-live="polite"></p>'
- +'<p class="nw3d-key" id="nw3d-trk-key"></p>';
+ +'<p class="nw3d-key" id="nw3d-trk-key"></p>'
+ +'<p class="vi-fc-note" id="nw3d-fc-note" hidden></p>';
 chartCard.parentNode.insertBefore(tcard,chartCard.nextSibling);
 var tst=document.getElementById('nw3d-trk-stage'),tkey=document.getElementById('nw3d-trk-key'),trkRead=document.getElementById('nw3d-trk-read'),fcBtn=document.getElementById('nw3d-fc');
 function fcSync(){fcBtn.setAttribute('aria-pressed',chartState.metrics.proj?'true':'false')}
