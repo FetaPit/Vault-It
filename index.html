@@ -13408,7 +13408,8 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .owe-sure select{background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-size:.56rem;padding:4px 6px}
 .owe-pay{display:flex;gap:6px;margin-top:8px}.owe-pay input{flex:1;min-width:0;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:.7rem;padding:6px 8px}
 .owe-del{margin-top:8px}
-.v3-host{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;background:#05101b}
+.v3-host{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;background-color:#080808;background-image:var(--stage-bg)}
+.v3-host::after{content:"";position:absolute;inset:0;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none;z-index:1}
 .scene.v3-on{position:relative;min-height:380px}
 #cashSceneCard .scene.v3-on{min-height:420px}
 #cashSceneCard .orbit-hint{z-index:2}
@@ -17089,6 +17090,8 @@ var chartState={range:'all',metrics:{nw:true,debt:true,income:true,proj:true}}; 
 var _nwZoom=1, _nwPanMs=0; // net worth chart zoom (1=default) and pan offset in milliseconds
 // ── Constants used by init-time renders — must be declared BEFORE the init block runs ──
 // ── Spending types: committed vs variable × essential vs non-essential, plus savings & investments ──
+/* one set of names for what you own, used by the dashboard, the 3D scenes and the ledger (owner, 31 Oct: labels must match everywhere) */
+var VI_LABELS={cash:'Cash and savings',deposit:'House deposit',stocks:'Stocks and shares',metals:'Precious metals',inv:'Wealth inventory',crypto:'Crypto',owed:'Owed to you',liab:'Liabilities',debt:'Debt'};
 var CF_GROUPS={
   ce:{label:'Committed · essential',     short:'Committed essential',     col:'var(--coral)',tx:'var(--coral)',ex:'Rent, mortgage, insurance'},
   ve:{label:'Variable · essential',      short:'Variable essential',      col:'var(--salmon)',tx:'var(--salmon)',ex:'Groceries, fuel, utilities'},
@@ -20276,19 +20279,19 @@ function viGlDpr(host){var w=Math.max(1,host.clientWidth||300),h=Math.max(1,host
 // the House Builder's look (src/hb3d/viewer.js): same sky, fog, ground, grid and lights
 function V3Scene(host,label){
   var self=this;this.host=host;
-  var r=this.r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:false});
+  var r=this.r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:true});r.setClearColor(0x000000,0);   /* transparent: the Net worth in 3D stage shows through (owner, 31 Oct) */
   r.setPixelRatio(viGlDpr(host));r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;
   r.domElement.addEventListener('webglcontextlost',function(e){e.preventDefault();self._lost=true;});r.domElement.addEventListener('webglcontextrestored',function(){self._lost=false;self.kick(800);});
   r.shadowMap.enabled=true;r.shadowMap.type=viCoarse()?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;   // touch devices: the cheaper filter and a smaller map
   var cv=r.domElement;cv.className='v3-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',label);
   cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none';
   host.insertBefore(cv,host.firstChild);
-  var sc=this.sc=new THREE.Scene();sc.background=new THREE.Color(0x05101b);sc.fog=new THREE.Fog(0x05101b,600,1600);
+  var sc=this.sc=new THREE.Scene();sc.background=null;sc.fog=new THREE.Fog(0x080808,600,1600);
   sc.add(new THREE.HemisphereLight(v3Col(0xa8dcd6),v3Col(0x10302e),0.66));
   var sun=this.sun=new THREE.DirectionalLight(v3Col(0xfff0de),1.2);sun.castShadow=true;var sms=viCoarse()?1024:2048;sun.shadow.mapSize.set(sms,sms);sun.shadow.bias=-0.0004;sun.shadow.normalBias=0.02;sc.add(sun);sc.add(sun.target);
   var fill=new THREE.DirectionalLight(v3Col(0x6fb8d8),0.35);fill.position.set(-200,120,-100);sc.add(fill);
   this.ground=new THREE.Mesh(new THREE.CircleBufferGeometry(5000,64),new THREE.MeshStandardMaterial({color:v3Col(0x0c1a20),roughness:1}));
-  this.ground.rotation.x=-Math.PI/2;this.ground.position.y=-0.02;sc.add(this.ground);
+  this.ground.rotation.x=-Math.PI/2;this.ground.position.y=-0.02;this.ground.visible=false;sc.add(this.ground);   /* the stage itself is the floor now */
   // shadows fall on a shadow-only plane sized to the content (the big floor stays evenly lit)
   this.catcher=new THREE.Mesh(new THREE.PlaneBufferGeometry(1,1),new THREE.ShadowMaterial({opacity:0.38}));this.catcher.rotation.x=-Math.PI/2;this.catcher.position.y=0.005;this.catcher.receiveShadow=true;sc.add(this.catcher);
   this.grid=null;
@@ -20331,8 +20334,16 @@ V3Scene.prototype.frame=function(keep){
   this.catcher.scale.set(R*3,R*3,1);this.catcher.position.x=c.x;this.catcher.position.z=c.z;
   if(this.grid){this.sc.remove(this.grid);this.grid.geometry.dispose();this.grid.material.dispose();}
   var size=Math.ceil(R*14/10)*10,cell=Math.max(5,Math.ceil(size/400/5)*5),div=Math.round(size/cell);
-  var g=this.grid=new THREE.GridHelper(size,div,v3Col(0x1f5e5a),v3Col(0x123734));g.material.transparent=true;g.material.opacity=0.35;g.position.set(c.x,0.01,c.z);this.sc.add(g);
-  this.sc.fog.near=R*2.5;this.sc.fog.far=R*8;
+  var g=this.grid=new THREE.GridHelper(size,div,0x44C0B9,0x44C0B9);g.material.transparent=true;g.material.opacity=0.3;g.material.depthWrite=false;g.material.fog=false;g.material.toneMapped=false;g.position.set(c.x,0.01,c.z);this.sc.add(g);
+  /* the same floor as Net worth in 3D: a teal glow under the items and a gold-edged plinth round them */
+  if(this.deco){this.sc.remove(this.deco);this.deco.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}});}
+  var deco=this.deco=new THREE.Group(),pad=Math.max(2,R*0.08),px0=box.min.x-pad,px1=box.max.x+pad,pz0=box.min.z-pad,pz1=box.max.z+pad;
+  var gc=document.createElement('canvas');gc.width=gc.height=128;var gx=gc.getContext('2d'),rg=gx.createRadialGradient(64,64,0,64,64,64);rg.addColorStop(0,'rgba(68,192,185,.22)');rg.addColorStop(1,'rgba(68,192,185,0)');gx.fillStyle=rg;gx.fillRect(0,0,128,128);
+  var glow=new THREE.Mesh(new THREE.PlaneBufferGeometry(R*3.2,R*3.2),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false,fog:false,toneMapped:false}));glow.rotation.x=-Math.PI/2;glow.position.set(c.x,0.004,c.z);deco.add(glow);
+  var fill=new THREE.Mesh(new THREE.PlaneBufferGeometry(px1-px0,pz1-pz0),new THREE.MeshBasicMaterial({color:0x0b2a2c,transparent:true,opacity:0.55,depthWrite:false,toneMapped:false}));fill.rotation.x=-Math.PI/2;fill.position.set((px0+px1)/2,0.008,(pz0+pz1)/2);deco.add(fill);
+  var edge=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(px0,0.02,pz0),new THREE.Vector3(px1,0.02,pz0),new THREE.Vector3(px1,0.02,pz1),new THREE.Vector3(px0,0.02,pz1)]),new THREE.LineBasicMaterial({color:0xE8C56A,transparent:true,opacity:0.95,toneMapped:false}));deco.add(edge);
+  this.sc.add(deco);
+  this.sc.fog.near=R*2.2;this.sc.fog.far=R*6;
   var sun=this.sun;sun.position.set(c.x+R*.9,R*1.4,c.z+R*1.1);sun.target.position.copy(c);var sc=sun.shadow.camera,e=R*3;sc.left=-e;sc.right=e;sc.top=e;sc.bottom=-e;sc.near=1;sc.far=R*40;sc.updateProjectionMatrix();   // wide enough that the floor near the camera is never left in false shadow
   var t0=new THREE.Vector3(c.x,s.y*0.3,c.z),p0=new THREE.Vector3(c.x+R*1.05,R*1.0+s.y,c.z+R*1.45),dir=p0.clone().sub(t0),cam=this.cam;
   // fit everything (labels too) inside the narrower of the two view angles, so a phone held upright sees the whole scene
@@ -20365,10 +20376,18 @@ function v3Stack(spec,n,env){
   return {geo:geo,mats:[side,face,face]};
 }
 // a label that always faces the camera
-function v3Label(text,sub,color,scale){var c=document.createElement('canvas'),g=c.getContext('2d');c.width=512;c.height=sub?120:72;
-  g.fillStyle='rgba(4,14,20,.82)';g.strokeStyle=color;g.lineWidth=3;var w=c.width-6,h=c.height-6;g.beginPath();if(g.roundRect)g.roundRect(3,3,w,h,14);else g.rect(3,3,w,h);g.fill();g.stroke();
-  g.fillStyle=color;g.font='800 34px Syne, sans-serif';g.textAlign='center';g.fillText(text,256,46);if(sub){g.fillStyle='#d6e6e4';g.font='26px "Share Tech Mono", monospace';g.fillText(sub,256,94);}
-  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true}));sp.renderOrder=10;var k=scale||10;sp.scale.set(k,k*c.height/c.width,1);return sp;}
+/* the gold tag from Net worth in 3D (owner, 31 Oct: "flag post labels in gold, the same as the dashboard"): what it is in small capitals,
+   the value large, a detail line, on a thin gold post planted in the floor. Returns a group; .tag is the sprite. */
+function v3Label(l1,l2,l3,scale){var c=document.createElement('canvas'),g=c.getContext('2d');c.width=512;c.height=l3?196:150;
+  var w=c.width-24,h=c.height-24;g.shadowColor='rgba(232,197,106,.55)';g.shadowBlur=12;g.fillStyle='#E8C56A';g.beginPath();if(g.roundRect)g.roundRect(12,12,w,h,16);else g.rect(12,12,w,h);g.fill();g.shadowBlur=0;
+  g.fillStyle='#1A1400';g.textAlign='left';g.textBaseline='alphabetic';g.font='30px "Share Tech Mono", monospace';g.fillText(String(l1).toUpperCase(),34,56);
+  g.font='58px "Share Tech Mono", monospace';g.fillText(l2,34,116);if(l3){g.globalAlpha=.78;g.font='24px "Share Tech Mono", monospace';g.fillText(l3,34,160);g.globalAlpha=1;}
+  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true,fog:false,toneMapped:false}));sp.renderOrder=10;var k=scale||10;sp.scale.set(k,k*c.height/c.width,1);
+  var grp=new THREE.Group();grp.add(sp);grp.tag=sp;grp.userData.v3Tag=[l1,l2,l3||''];return grp;}
+/* plant the tag: its foot at (x,0,z), the tag's lower edge at height y */
+function v3Plant(grp,x,y,z){var sp=grp.tag,hy=sp.scale.y/2;sp.position.set(0,y+hy,0);grp.position.set(x,0,z);
+  var post=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(0,y+hy*0.2,0)]),new THREE.LineBasicMaterial({color:0xE8C56A,transparent:true,opacity:.95,depthTest:false,fog:false,toneMapped:false}));post.renderOrder=9;grp.add(post);
+  var dot=new THREE.Mesh(new THREE.CircleBufferGeometry(Math.max(0.25,sp.scale.x*0.018),16),new THREE.MeshBasicMaterial({color:0xE8C56A,depthTest:false,fog:false,toneMapped:false}));dot.rotation.x=-Math.PI/2;dot.position.y=0.03;dot.renderOrder=9;grp.add(dot);return grp;}
 function v3Host(sceneEl,svgId){
   var svg=document.getElementById(svgId);if(!sceneEl)return null;
   var h=sceneEl.querySelector('.v3-host');if(!h){h=document.createElement('div');h.className='v3-host';sceneEl.insertBefore(h,sceneEl.firstChild);}
@@ -20398,8 +20417,8 @@ function v3Cash(){
   if(rest>0){var ps=v3Stack(spec,rest,V.env),pm=new THREE.Mesh(ps.geo,ps.mats),pp=pos(fullStacks);pm.position.set(pp[0],spec.t*rest/2,pp[1]);pm.castShadow=pm.receiveShadow=true;V.root.add(pm);}
   var sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
   var full=Math.floor(units/PER_BLOCK),part=units%PER_BLOCK;
-  if(units>0){var lb=v3Label(sym+fmt(units)+' in '+spec.name+' coins',(full?full+' block'+(full>1?'s':'')+' of 1,000':'')+(full&&part?' + ':'')+(part?fmt(part)+' coins':''),'#3ECF8E',Math.max(9,Math.min(60,blockW*(cols>1?1.4:0.9))));
-    var bb=new THREE.Box3().setFromObject(V.root),cc=bb.getCenter(new THREE.Vector3());lb.position.set(cc.x,bb.max.y+lb.scale.y*0.9+1,cc.z);V.root.add(lb);}
+  if(units>0){var lb=v3Label('Cash · '+spec.name+' coins',sym+fmt(units),(full?full+' block'+(full>1?'s':'')+' of 1,000':'')+(full&&part?' + ':'')+(part?fmt(part)+' coins':''),Math.max(9,Math.min(60,blockW*(cols>1?1.4:0.9))));
+    var bb=new THREE.Box3().setFromObject(V.root),cc=bb.getCenter(new THREE.Vector3());v3Plant(lb,bb.min.x-lb.tag.scale.x*0.05,bb.max.y+lb.tag.scale.y*0.5+1,cc.z);V.root.add(lb);}
   V.stats={units:units,cur:cur,coin:spec.name,fullStacks:fullStacks,rest:rest,fullBlocks:Math.floor(units/PER_BLOCK),stackHeight:spec.t*STACK};
   V.frame(V3._cashUnits===units&&V3._cashCur===cur);V3._cashUnits=units;V3._cashCur=cur;
   var cap=document.getElementById('cashCap');if(cap)cap.textContent=units?sym+fmt(units)+' = '+fmt(units)+' '+spec.name+' coins ('+spec.d*10+' mm across, '+(spec.t*10).toFixed(1)+' mm thick) · '+Math.floor(units/PER_BLOCK)+' full block'+(Math.floor(units/PER_BLOCK)===1?'':'s')+' of 1,000'+(units%PER_BLOCK?' + '+fmt(units%PER_BLOCK)+' coins':''):'No cash yet. Add an account or some physical cash.';
@@ -20440,8 +20459,8 @@ function v3Metals(){
     });
     V.stats=V.stats||{};V.stats[k]=zone.userData.bars;
     var value=oz*(alState.metalPrices[k]||0);
-    var lb=v3Label(M.label+' · '+oz.toFixed(2)+' oz',sym+Math.round(value*rate).toLocaleString('en-GB')+' at '+sym+Math.round((alState.metalPrices[k]||0)*rate).toLocaleString('en-GB')+'/oz',M.col,Math.max(12,zw*0.9));
-    lb.position.set(zw/2,Math.max(6,z*0.25)+3,z/2);zone.add(lb);
+    var lb=v3Label(M.label+' · '+oz.toFixed(2)+' oz',sym+Math.round(value*rate).toLocaleString('en-GB'),'at '+sym+Math.round((alState.metalPrices[k]||0)*rate).toLocaleString('en-GB')+' an ounce',Math.max(12,zw*0.9));
+    v3Plant(lb,zw/2,Math.max(6,z*0.25)+3,-2);zone.add(lb);
     zone.position.x=x0;V.root.add(zone);parts.push(oz.toFixed(2)+' oz '+M.label.toLowerCase()+' ('+(grams>=1000?(grams/1000).toFixed(2)+' kg':Math.round(grams)+' g')+')');x0+=zw+8;
   });
   V.frame(V3._metalsKey===JSON.stringify(alState.metals));V3._metalsKey=JSON.stringify(alState.metals);
@@ -24515,13 +24534,13 @@ function renderSummaryCards(){
   if(aEl){
     var ta=alTotalAssets();
     var rows=[
-      {l:'Cash & Savings',v:alTotalCash(),c:'var(--green)',i:'cash'},
-      {l:'House Deposit',v:state?state.saved:0,c:'var(--teal)',i:'house'},
-      {l:'Stocks & Shares',v:alTotalStocks(),c:'var(--green2)',i:'stocks'},
-      {l:'Precious Metals',v:alTotalMetals(),c:'var(--gold)',i:'metals'},
-      {l:'Wealth Inventory',v:alTotalOther(),c:'var(--purple)',i:'inv'},
-      {l:'Crypto',v:alTotalCrypto(),c:'var(--teal)',i:'crypto'},
-      {l:'Owed to you',v:(typeof alTotalOwedToMe==='function'?alTotalOwedToMe():0),c:'var(--blue)',i:'cash'}
+      {l:VI_LABELS.cash,v:alTotalCash(),c:'var(--green)',i:'cash'},
+      {l:VI_LABELS.deposit,v:state?state.saved:0,c:'var(--teal)',i:'house'},
+      {l:VI_LABELS.stocks,v:alTotalStocks(),c:'var(--green2)',i:'stocks'},
+      {l:VI_LABELS.metals,v:alTotalMetals(),c:'var(--gold)',i:'metals'},
+      {l:VI_LABELS.inv,v:alTotalOther(),c:'var(--purple)',i:'inv'},
+      {l:VI_LABELS.crypto,v:alTotalCrypto(),c:'var(--teal)',i:'crypto'},
+      {l:VI_LABELS.owed,v:(typeof alTotalOwedToMe==='function'?alTotalOwedToMe():0),c:'var(--blue)',i:'cash'}
     ];
     var aRows=rows.filter(function(r){return r.v>0;}), aMax=ovScaleMax(aRows.map(function(r){return r.v;}));
     aEl.innerHTML='<div class="ov-sum-total" style="color:var(--teal)">'+gbpFmt(ta)+'</div>'
@@ -27972,8 +27991,9 @@ function makeNW(cv,o){
     var lf=clamp(cw*.022,9,12),lines={};
     function names(back){c.font=lf+"px 'Share Tech Mono',monospace";c.textAlign="center";c.textBaseline="alphabetic";
     cols.filter(function(cc){return (LZ[cc.key]<0)===back}).map(function(cc){return {c:cc,q:P.pt(X[cc.key],0,LZ[cc.key])}}).sort(function(a,b){return a.q[0]-b.q[0]}).forEach(function(L){
-      var row=lines[LZ[L.c.key]]=lines[LZ[L.c.key]]||[-1e9,-1e9],w=c.measureText(L.c.short).width,r=-1;for(var j=0;j<2;j++)if(L.q[0]-w/2>row[j]+6){r=j;break}if(r<0)return;row[r]=L.q[0]+w/2;
-      c.fillStyle=L.c.dir<0?rgba(PAL.red,.95):PAL.label;if(hover===L.c.key)c.fillStyle=rgba(PAL.gold,1);c.fillText(L.c.short,L.q[0],L.q[1]+r*(lf+3))})}
+      var row=lines[LZ[L.c.key]]=lines[LZ[L.c.key]]||[-1e9,-1e9,-1e9],w=c.measureText(L.c.short).width,r=-1;L.q[0]=clamp(L.q[0],w/2+4,cw-w/2-4);L.q[1]=Math.min(L.q[1],ch-8-2*(lf+3));   /* full names (owner, 31 Oct): up to three staggered lines, never off the stage */
+      for(var j=0;j<3;j++)if(L.q[0]-w/2>row[j]+6){r=j;break}if(r<0)return;row[r]=L.q[0]+w/2;
+      c.fillStyle=L.c.dir<0?rgba(PAL.red,.95):rgba(PAL.gold,.95);if(hover===L.c.key)c.fillStyle='#fff';   /* what you own in gold, like the dashboard tag; debts stay red */c.fillText(L.c.short,L.q[0],L.q[1]+r*(lf+3))})}
     names(true);items.forEach(function(g){if(g.dir>0)paint(g)});names(false);
     var l1=debt<=0&&net>=0?"OUT OF THE RED":red?"IN THE RED":"NET WORTH";
     tag(c,cw,l1,fmt(net),red,P.pt(box.x,0,0));
@@ -28232,16 +28252,17 @@ function keyHtml(U,ghost){var t=tok(document.getElementById('nw3d-hero-stage'),'
 
 /* ── the scene: one column per asset class in its colour code; debts grouped by kind (owner, 30 Oct 2026): every credit card stacks in
  * one column, one on top of the other, each in its own card colour; loans, car finance, overdrafts and so on each get their own column ── */
-var DEBT_KINDS={credit:['Credit cards','CARDS'],personal:['Personal loans','LOANS'],loan:['Loans','LOANS'],student:['Student loans','STUDENT'],car:['Car finance','CAR'],bnpl:['Buy now pay later','BNPL'],overdraft:['Overdrafts','OVERDRAFT'],mortgage:['Mortgage','MORTGAGE'],other:['Other debts','OTHER DEBT']};
+var DEBT_KINDS={credit:['Credit cards','Credit cards'],personal:['Personal loans','Personal loans'],loan:['Loans','Loans'],student:['Student loans','Student loans'],car:['Car finance','Car finance'],bnpl:['Buy now pay later','Buy now pay later'],overdraft:['Overdrafts','Overdrafts'],mortgage:['Mortgage','Mortgage'],other:['Other debts','Other debts']};
 function sceneData(){
   var st=document.getElementById('nw3d-hero-stage'),r=rate(),cols=[];
   function add(key,name,short,col,v,dir){cols.push({key:key,name:name,short:short,col:col,v:Math.max(0,v)*r,dir:dir})}
-  add('cash','Cash and savings','CASH',tok(st,'green'),n(alTotalCash),1);
-  add('deposit','House deposit','DEPOSIT',tok(st,'teal'),n(function(){return state?state.saved:0}),1);
-  add('stocks','Stocks and funds','FUNDS',tok(st,'green2'),n(alTotalStocks),1);
-  add('metals','Precious metals','METALS',tok(st,'gold'),n(alTotalMetals),1);
-  add('crypto','Crypto','CRYPTO',tok(st,'teal'),n(alTotalCrypto),1);
-  add('inv','Wealth inventory','ITEMS',tok(st,'purple'),n(alTotalOther),1);
+  var L=window.VI_LABELS||{};   /* the dashboard's own names on the floor (owner, 31 Oct) */
+  add('cash',L.cash,L.cash,tok(st,'green'),n(alTotalCash),1);
+  add('deposit',L.deposit,L.deposit,tok(st,'teal'),n(function(){return state?state.saved:0}),1);
+  add('stocks',L.stocks,L.stocks,tok(st,'green2'),n(alTotalStocks),1);
+  add('metals',L.metals,L.metals,tok(st,'gold'),n(alTotalMetals),1);
+  add('crypto',L.crypto,L.crypto,tok(st,'teal'),n(alTotalCrypto),1);
+  add('inv',L.inv,L.inv,tok(st,'purple'),n(alTotalOther),1);
   var debts=((typeof debtState!=='undefined'&&debtState.debts)||[]).filter(function(d){return d.balance>0}).sort(function(a,b){return (b.balance-a.balance)||((+a.id||0)-(+b.id||0))});
   var ramp={};try{ramp=debtChartRamp(debts)||{}}catch(e){}
   var red=tok(st,'red'),pan=tok(st,'panel'),groups={},order=[];
@@ -28254,11 +28275,11 @@ function sceneData(){
   order.sort(function(a,b){return groups[b].v-groups[a].v}).forEach(function(kind){var g=groups[kind],one=g.segs.length===1;
     add('debt:'+kind,one?g.segs[0].name:DEBT_KINDS[kind][0],DEBT_KINDS[kind][1],g.segs[0].col,g.v,-1);cols[cols.length-1].segs=one?null:g.segs});
   /* the debt columns stand right after the inventory cubes (owner, 31 Oct: the cards alongside the wealth inventory); the rest follow */
-  add('liabval','Liabilities, value','LIAB',tok(st,'amber'),n(alLiabAssetTotal),1);
-  add('owed','Owed to you','OWED',tok(st,'blue'),n(function(){return typeof alTotalOwedToMe==='function'?alTotalOwedToMe():0}),1);
-  add('other','Other assets','OTHER',tok(st,'muted'),n(totalAssets),1);
+  add('liabval','Liabilities, value',L.liab,tok(st,'amber'),n(alLiabAssetTotal),1);
+  add('owed',L.owed,L.owed,tok(st,'blue'),n(function(){return typeof alTotalOwedToMe==='function'?alTotalOwedToMe():0}),1);
+  add('other','Other assets','Other assets',tok(st,'muted'),n(totalAssets),1);
   add('debtov','Debts added on the Overview','DEBTS',red,n(totalDebts),-1);
-  add('running','Running costs so far','RUNNING',tok(st,'amber'),n(alTotalLiab),-1);
+  add('running','Running costs so far','Running costs',tok(st,'amber'),n(alTotalLiab),-1);
   var net=n(computeNetWorth)*r,debtNow=(n(debtTotal)+n(totalDebts))*r;
   return {cols:cols,net:net,debt:debtNow,fmt:full};
 }
