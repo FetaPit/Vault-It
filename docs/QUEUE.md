@@ -11,7 +11,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 - [~] Release the MVP (owner, 31 Oct pm, "release when ready"; 17:00 "do that": release by pull request the owner merges from the GitHub app, since the session cannot push to the production branch). Full suite on 792604c: everything green except `test_hb_brand`, which failed about one run in four with two real faults: the house panel could stay on "Counting bricks…" and the gold ROW tag could keep the previous house's figures after a house change. Both fixed in the release commit; then the house builder and smoke tests re-run. Release commit 1cced67. Backup branch `backup/release-pioneer-v2-20261031-mvp` taken; frozen branch `release-mvp-20261031`; pull request FetaPit/Vault-It#3 into `release/pioneer-v2` opened for the owner to merge (owner notified)
 
-- [~] Bank and platform logos (owner, 31 Oct evening): "Queue up auto adding logos for all major banks and investment platforms which will auto apply looking at each account's name."
+- [~] Tester feedback (owner, 31 Oct evening; "the final task before tester launch"): "We need an optimal low effort and maximal utility method for each tester to send their feedback to us. What would be a tech AI enhanced way to do this making it easy for the user and giving us back end and user session activity." Owner chose (31 Oct): our own activity log in Supabase (no new host, no money figures); AI-sorted feedback as a daily email digest and a weekly themed report turned into queue items; screenshot attached by default with money figures blurred (tester can untick); build and test locally, then ask before applying the migration and deploying.
 
 ## Waiting on the owner
 
@@ -26,6 +26,8 @@ The single list of instructed work. Every session reads it at start and before e
 - Poly Pizza: commercial plan and an edge function for live search, or self-host a small CC0 set (`docs/WEALTH_INVENTORY_3D_OPTIONS.md`)
 
 ## Done (30 Oct 2026)
+
+- [x] Bank and platform logos (owner, 31 Oct evening): "Queue up auto adding logos for all major banks and investment platforms which will auto apply looking at each account's name." Done (c520aaa): cash accounts show their bank's logo from the name (about 50 UK banks and providers added), initials offline, brand bank icon when unknown; everyday words do not match.
 
 - [x] Budget 3D tree map: sections nearly touch (owner, 31 Oct evening): "Leave a lot smaller gap between each section. They should nearly touch." Taken as the gap between the tree map's expense sections (the owner's earlier word); done before the logos because the owner asked to "queue up" the logos and this is a direct edit to the view just shipped. Done (e347400): gaps 0.12 -> 0.035 between sections, blocks cover 97% from above. Next: bank and platform logos.
 
