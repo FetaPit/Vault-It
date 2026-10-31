@@ -33,7 +33,7 @@ if [ -z "${NODE_PATH:-}" ] && [ -d /usr/local/lib/node_modules_global/playwright
 
 mkdir -p "$ROOT/shots/hb3d"   # screenshots are build output (not committed)
 all_tests() { ls tests/test_*.js tests/test_*.mjs tests/crawl.js tests/xss.js tests/xss_attr.js tests/xss2.js 2>/dev/null; }
-is_browser() { grep -qE "require\(['\"]playwright['\"]\)|from ['\"]playwright['\"]" "$1"; }
+is_browser() { grep -qE "require\(['\"]playwright['\"]\)|from ['\"]playwright['\"]|require\(['\"]\./xss(\.js)?['\"]\)" "$1"; }   # xss_attr.js runs the browser check in xss.js
 
 pick() {   # $1 = server|browser|all
   local f
