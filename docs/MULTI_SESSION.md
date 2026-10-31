@@ -7,7 +7,7 @@ The owner runs Claude in three places: the Claude app on the phone (cloud sessio
 | Where | Best at | Never |
 | --- | --- | --- |
 | Cloud sessions (phone, claude.ai/code) | Building queue items, tests, QC, research. Linux matches CI; the test suite runs as written | Push to `release/pioneer-v2` (blocked), reach `api.metals.live` or `*.workers.dev`, serve a build to the phone |
-| Laptop, Claude Code in **Git Bash** | Releases (the only place that pushes `release/pioneer-v2`), phone staging (`npm run build:site`, then `npx wrangler dev` on the home Wi-Fi), hosts the sandbox blocks, real Windows browsers, Supabase and Cloudflare logins in a browser | Run the full test suite (78 tests open `file:///home/user/Vault-It/index.html`, the cloud path; CI and cloud run them) |
+| Laptop, Claude Code in **Git Bash** | Releases (the only place that pushes `release/pioneer-v2`), phone staging (`npm run build:site`, then `npx wrangler dev --ip 0.0.0.0 --local-upstream localhost`; open `http://<laptop Wi-Fi IP>:8787/`, landing at `/landing/`. Without `--local-upstream` the dev server takes the first route's host, app.vault-it.co, and redirects the phone to the live site), hosts the sandbox blocks, real Windows browsers, Supabase and Cloudflare logins in a browser | Run the full test suite (78 tests open `file:///home/user/Vault-It/index.html`, the cloud path; CI and cloud run them) |
 | Laptop, PowerShell | Windows jobs outside the repo | Run Claude Code on this repo: the hooks are bash scripts and Claude Code on Windows uses Git Bash for its own commands anyway |
 | GitHub Actions (CI) | The full suite on every push, three browser shards | Deploys nothing |
 
