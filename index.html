@@ -12324,6 +12324,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <div class="settings-row"><label class="settings-label">Motion</label><div class="settings-opts" id="set-motion"><button data-val="full" onclick="setSetting('motion','full',this)" class="active">Full</button><button data-val="reduced" onclick="setSetting('motion','reduced',this)">Reduced</button></div></div>
       <div class="settings-row"><label class="settings-label">Currency</label><div class="settings-opts" id="set-currency"><button data-val="GBP" onclick="setSetting('currency','GBP',this)" class="active">£ GBP</button><button data-val="USD" onclick="setSetting('currency','USD',this)">$ USD</button><button data-val="EUR" onclick="setSetting('currency','EUR',this)">€ EUR</button><button data-val="INR" onclick="setSetting('currency','INR',this)">₹ INR</button></div></div>
       <div class="settings-row"><label class="settings-label">House builder</label><div class="settings-opts" id="set-house3d"><button data-val="1" onclick="setViewFlag('house',true,this)">Brand build</button><button data-val="0" onclick="setViewFlag('house',false,this)">Classic</button></div></div>
+      <div class="settings-row"><label class="settings-label">Share usage</label><div class="settings-opts" id="set-fbact"><button data-val="1" onclick="viFbAct(true,this)">On</button><button data-val="0" onclick="viFbAct(false,this)">Off</button></div></div>
+      <p class="wi-link-hint" style="margin:-4px 0 10px">During the beta the app records which screens and features you use, errors and how long you stay, in our own database, to improve it. Never your figures or what you type.</p>
       <div class="settings-row"><label class="settings-label">Net worth</label><div class="settings-opts" id="set-nw3d"><button data-val="1" onclick="setViewFlag('nw',true,this)">3D</button><button data-val="0" onclick="setViewFlag('nw',false,this)">Classic chart</button></div></div>
     </div>
 
@@ -12486,7 +12488,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     <!-- Your data (UK GDPR: access, portability, erasure) -->
     <div id="set-yourdata" style="margin-bottom:20px;padding:14px;background:rgb(var(--teal-rgb) / .04);border-radius:8px;border:1px solid rgb(var(--teal-rgb) / .2)">
       <div style="font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;color:var(--em);margin-bottom:6px;letter-spacing:.06em">🗂 Your data</div>
-      <div style="font-size:.48rem;color:var(--t3);line-height:1.6;margin-bottom:10px">Download a copy of your data as a file you can keep: your figures and profile (on this device and in your account) and your latest 200 saved versions. Photos and technical security records are not in the file; email us for those. You can also read how your data is handled, or delete your account for good.</div>
+      <div style="font-size:.48rem;color:var(--t3);line-height:1.6;margin-bottom:10px">Download a copy of your data as a file you can keep: your figures and profile (on this device and in your account) and your latest 200 saved versions. Photos, feedback you sent, the beta usage log and technical security records are not in the file; email us for those. You can also read how your data is handled, or delete your account for good.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-add-data" onclick="exportMyData()">⬇ Download my data</button>
         <button class="btn-add-data" style="background:transparent;border-color:var(--em);color:var(--em)" onclick="showPrivacy()">Privacy notice</button>
@@ -13416,6 +13418,32 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .scene.v3-on{position:relative;min-height:380px}
 #cashSceneCard .scene.v3-on{min-height:420px}
 #cashSceneCard .orbit-hint{z-index:2}
+/* Tester feedback (docs/TESTER_FEEDBACK.md) */
+#vi-fb-btn{position:fixed;right:14px;bottom:calc(var(--footer-h,30px) + 14px);z-index:450;display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .5);color:var(--teal);font:600 .62rem 'Syne',sans-serif;letter-spacing:.06em;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer}
+#vi-fb-btn .vi-ic{width:16px;height:16px}
+#vi-fb-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media(max-width:600px){#vi-fb-btn span{display:none}#vi-fb-btn{padding:10px}}
+.vi-fb-card{max-width:440px;width:100%}
+.vi-fb-q{display:block;font-size:.72rem;color:var(--text);margin:6px 0}
+#vi-fb-text{width:100%;resize:vertical;min-height:84px;box-sizing:border-box}
+.vi-fb-rate{display:flex;align-items:center;gap:6px;margin:10px 0;flex-wrap:wrap}.vi-fb-rate span{font-size:.62rem;color:var(--t2);margin-right:4px}
+.vi-fb-rate button{width:36px;height:36px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--text);font-family:'Share Tech Mono',monospace;cursor:pointer}
+.vi-fb-rate button[aria-pressed="true"]{background:rgb(var(--teal-rgb) / .18);border-color:var(--teal);color:var(--teal)}
+.vi-fb-pic{display:flex;align-items:center;gap:8px;font-size:.64rem;color:var(--text)}
+.vi-fb-picrow{display:flex;gap:10px;align-items:center;margin-top:6px;min-width:0}
+#vi-fb-shot{width:110px;max-height:90px;object-fit:cover;object-position:top;border-radius:6px;border:1px solid var(--bd2);flex:none}
+#vi-fb-nudge{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--footer-h,30px) + 64px);z-index:450;display:flex;align-items:center;gap:10px;width:max-content;max-width:min(460px,calc(100vw - 24px));padding:10px 12px;border-radius:12px;background:var(--panel);border:1px solid rgb(var(--gold-rgb) / .5);color:var(--text);font-size:.68rem;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#vi-fb-nudge[hidden]{display:none}
+.vi-fbq-step{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--t2);margin-top:2px}
+.vi-fbq-ch{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.vi-fbq-ch button{padding:8px 12px;border-radius:999px;border:1px solid var(--bd2);background:transparent;color:var(--text);font-size:.66rem;cursor:pointer;min-height:36px}
+.vi-fbq-ch button[aria-pressed="true"]{background:rgb(var(--teal-rgb) / .18);border-color:var(--teal);color:var(--teal)}
+.vi-fbq-score button{width:36px;padding:0;border-radius:8px;font-family:'Share Tech Mono',monospace}
+.vi-fbq-ends{display:flex;justify-content:space-between;width:100%;font-size:.56rem;color:var(--t2)}
+#vi-fbq-text{width:100%;resize:vertical;min-height:64px;box-sizing:border-box}
+#vi-fbq-text[hidden]{display:none}
+#vi-fb-nudge .btn-add-data{white-space:nowrap}
+@media print{#vi-fb-btn,#vi-fb-nudge{display:none}}
 .vi-pop{position:fixed;inset:0;z-index:9000;background:rgb(var(--bg-rgb) / .78);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px}
 .vi-pop[hidden]{display:none}
 .vi-pop-card{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;margin:0!important;box-shadow:0 18px 50px -20px rgba(0,0,0,.6)}
@@ -15382,6 +15410,7 @@ function markHousePurchased(){if(viBlockEdit())return;
   state.valuation=state.target;
   save();
   toast('🏠 Congratulations, welcome home!');
+  try{setTimeout(function(){if(window.viFbMoment)viFbMoment('house')},6000)}catch(e){}
   updateUI();
   hbOpenMortgageEntry(true);   // Level 2 onboarding: the mortgage entered in about a minute (Octalysis doc, phase 2)
 }
@@ -26791,8 +26820,8 @@ function showPrivacy() {
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
     '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank and provider logos; it is told the website of each bank, card or investment provider you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
-    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Poly Pizza</strong> supplies free 3D models of everyday items if you pick one from its library for a wealth or liability item: your browser downloads the file straight from Poly Pizza, which sees your IP address and which model you chose, and nothing else. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
-    '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or analytics. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
+    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us, and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Poly Pizza</strong> supplies free 3D models of everyday items if you pick one from its library for a wealth or liability item: your browser downloads the file straight from Poly Pizza, which sees your IP address and which model you chose, and nothing else. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
+    '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or third-party analytics. During the beta the app records how it is used (screens opened, features used, errors and how long a visit lasts, never your figures or what you type) in our own database, to improve it; you can switch this off in Settings (Share usage). Feedback you send from the app is stored by us with the screen you were on, your last few taps and, unless you untick it, a picture of that screen with every figure hidden. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected, and what that does not mean'),
     '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
     _lh('On your device'),
@@ -28563,6 +28592,261 @@ function init(){var seg=el('bd-view');if(!seg)return;
   var saved='flow';try{saved=localStorage.getItem(KEY)==='3d'?'3d':'flow'}catch(e){}show(saved,false);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 window.bd3d={show:show,engine:function(){return eng},data:data,view:function(){return cur}};
+})();
+</script>
+<script id="vi-feedback">
+/* ===== Tester feedback (owner, 31 Oct 2026; docs/TESTER_FEEDBACK.md) =====
+ * One Feedback button on every screen: a sentence, an optional rating and a picture of the screen with every figure hidden.
+ * The app attaches what we need to act on it (screen, device, theme, the last 50 actions, recent errors), never money figures.
+ * During the beta it also keeps a light activity log (screens opened, features used, errors, session length) in our own
+ * database; Settings > Share usage turns it off. The server function sorts feedback with Claude and emails the owner. */
+(function(){
+var TRAIL=[],ERRS=[],EVQ=[],SES=null,SES_T0=Date.now(),TAB='overview',TAB_T0=Date.now(),KEY_ACT='vi-fb-activity',FN='tester-feedback',H2C='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+var shot=null,shotBusy=null,rating=null,moment=null,returnTo=null;
+function now(){return new Date().toISOString()}
+/* labels in the trail: a button's id or short visible text, with every figure removed */
+function clean(s){return String(s||'').replace(/[£$€]\s?[\d.,]+\s?[kKmM]?/g,'').replace(/\d/g,'').replace(/\s+/g,' ').trim().slice(0,40)}
+function actOn(){try{return localStorage.getItem(KEY_ACT)!=='0'}catch(e){return true}}
+function signedIn(){try{return !!(typeof _supaUser!=='undefined'&&_supaUser&&_supaUser.id)}catch(e){return false}}
+function uuid(){try{if(crypto.randomUUID)return crypto.randomUUID()}catch(e){}return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=Math.random()*16|0;return (c==='x'?r:(r&3|8)).toString(16)})}
+function rec(ev,el,ms,toLog){var e={t:now(),ev:ev,tab:TAB};if(el)e.el=clean(el);if(ms!=null)e.ms=Math.round(ms);TRAIL.push(e);if(TRAIL.length>50)TRAIL.shift();if(toLog!==false&&actOn()){EVQ.push(e);if(EVQ.length>200)EVQ.shift()}}
+SES=uuid();rec('session_start');
+/* screens: wrap the tab functions (time on the previous screen goes with the next one) */
+function wrapTabs(){
+  ['showTab','showSubtab'].forEach(function(fn){var o=window[fn];if(typeof o!=='function'||o._fb)return;
+    var w=function(){var nt=fn==='showTab'?arguments[0]:(arguments[0]+'/'+arguments[1]),t=Date.now(),ms=t-TAB_T0;var r=o.apply(this,arguments);if(nt&&nt!==TAB){if(TAB==='overview'&&ms>60000)try{viFbMoment('nw3d')}catch(e){}TAB=String(nt).slice(0,40);TAB_T0=t;rec('tab',null,ms)}return r};
+    w._fb=true;window[fn]=w;try{if(fn==='showTab')showTab=w;else showSubtab=w}catch(e){}});
+  /* features: named actions, no values */
+  ['addExpense','addIncome','saveDebt','addOtherAsset','addLiability','addCrypto','addCashAccount','exportData','viToggleTheme','i3dPick','wiLinkSave','hbOpenMortgageEntry'].forEach(function(fn){var o=window[fn];if(typeof o!=='function'||o._fb)return;
+    var w=function(){var r=o.apply(this,arguments);try{rec('feature',fn);
+      if(fn==='addExpense'&&typeof ovState!=='undefined'&&(ovState.expenses||[]).length>=3)viFbMoment('budget');
+      if(fn==='saveDebt'&&typeof debtState!=='undefined'&&(debtState.debts||[]).length>=1)viFbMoment('debt');
+      if((fn==='addCashAccount'||fn==='addOtherAsset')&&typeof alState!=='undefined'&&((alState.cashAccounts||[]).length+(alState.otherAssets||[]).length)>=2)viFbMoment('assets');
+      if(fn==='addCrypto')setTimeout(function(){viFbMoment('prices')},4000)}catch(e){}return r};
+    w._fb=true;window[fn]=w});
+}
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('button,a,[role="button"],label.dep-btn,label.wi-img-btn');if(!b||b.closest('#vi-fb'))return;
+  rec('click',b.id||b.getAttribute('aria-label')||b.title||b.textContent,null,false)},true);
+window.addEventListener('error',function(e){var m=String(e&&e.message||'error').slice(0,200),s=String(e&&e.filename||'').split('/').pop()+':'+(e&&e.lineno||0);ERRS.push({t:now(),msg:m,src:s});if(ERRS.length>20)ERRS.shift();rec('error',m)});
+window.addEventListener('unhandledrejection',function(e){var m=String(e&&e.reason&&(e.reason.message||e.reason)||'rejection').slice(0,200);ERRS.push({t:now(),msg:m,src:'promise'});if(ERRS.length>20)ERRS.shift();rec('error',m)});
+function context(){
+  var q=function(id){var e=document.getElementById(id);return e?e.className:''};
+  var flags={};try{flags.house=typeof viFlag==='function'?!!viFlag('house'):null;flags.nw=typeof viFlag==='function'?!!viFlag('nw'):null}catch(e){}
+  return {build:document.lastModified,host:location.host,tab:TAB,viewport:innerWidth+'x'+innerHeight,dpr:window.devicePixelRatio||1,touch:'ontouchstart' in window,
+    theme:document.documentElement.dataset.theme||'dark',flags:flags,standalone:!!(window.matchMedia&&matchMedia('(display-mode: standalone)').matches),online:navigator.onLine,
+    sync:(function(){try{return JSON.parse(localStorage.getItem('vi_dirty')||'[]').length?'waiting':'ok'}catch(e){return '?'}})(),
+    trialDay:(function(){try{return viTrialDay()}catch(e){return null}})(),ua:navigator.userAgent.slice(0,160),errors:ERRS.slice(-20),trail:TRAIL.slice(-50)};
+}
+/* ---- the activity log: batched, sent every minute and when the page is hidden ---- */
+var _tok=null;
+async function token(){try{if(typeof _freshAccessToken==='function'){var t=await _freshAccessToken();if(t)_tok=t}}catch(e){}return _tok}
+function flush(keep){
+  if(!EVQ.length||!signedIn()||!actOn())return Promise.resolve(false);
+  var batch=EVQ.splice(0,200),body=JSON.stringify({kind:'events',session:SES,events:batch});
+  var go=function(t){if(!t){EVQ.unshift.apply(EVQ,batch);return false}
+    return fetch(_SUPA_URL+'/functions/v1/'+FN,{method:'POST',keepalive:!!keep,headers:{'content-type':'application/json',apikey:_SUPA_KEY,authorization:'Bearer '+t},body:body})
+      .then(function(r){return r.ok}).catch(function(){return false})};
+  return keep?Promise.resolve(go(_tok)):token().then(go);
+}
+setInterval(function(){flush(false)},60000);
+document.addEventListener('visibilitychange',function(){if(document.hidden){rec('session_end',null,Date.now()-SES_T0);flush(true)}else{SES_T0=Date.now();rec('session_start')}});
+/* ---- the picture of the screen, every figure hidden before it leaves the device ---- */
+function loadH2C(){if(window.html2canvas)return Promise.resolve(window.html2canvas);
+  return new Promise(function(res,rej){var s=document.createElement('script');s.src=H2C;s.onload=function(){res(window.html2canvas)};s.onerror=rej;document.head.appendChild(s);setTimeout(function(){rej(new Error('timeout'))},8000)})}
+function maskDoc(doc){
+  var w=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT),n;while((n=w.nextNode()))if(/\d/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace(/\d/g,'•');
+  [].forEach.call(doc.querySelectorAll('input,textarea'),function(i){if(/checkbox|radio|button|submit/.test(i.type))return;var v=String(i.value||'').replace(/\d/g,'•');i.value=v;i.setAttribute('value',v);if(i.placeholder)i.placeholder=i.placeholder.replace(/\d/g,'•')});
+  var fb=doc.getElementById('vi-fb');if(fb)fb.remove();var bt=doc.getElementById('vi-fb-btn');if(bt)bt.remove();
+}
+function pixelate(out,scale){   /* charts and 3D scenes are pictures, so their figures cannot be swapped out: blur them into blocks */
+  var c=out.getContext('2d');c.imageSmoothingEnabled=false;
+  [].forEach.call(document.querySelectorAll('canvas'),function(cv){var r=cv.getBoundingClientRect();if(r.width<8||r.height<8||r.bottom<0||r.right<0||r.top>innerHeight||r.left>innerWidth)return;
+    var x=Math.max(0,r.left)*scale,y=Math.max(0,r.top)*scale,w=(Math.min(innerWidth,r.right)-Math.max(0,r.left))*scale,h=(Math.min(innerHeight,r.bottom)-Math.max(0,r.top))*scale;if(w<2||h<2)return;
+    var t=document.createElement('canvas'),k=14;t.width=Math.max(1,Math.round(w/k));t.height=Math.max(1,Math.round(h/k));var tc=t.getContext('2d');tc.drawImage(out,x,y,w,h,0,0,t.width,t.height);c.drawImage(t,0,0,t.width,t.height,x,y,w,h)});
+}
+function capture(){
+  if(shotBusy)return shotBusy;
+  shotBusy=loadH2C().then(function(h2c){var scale=Math.min(1,960/innerWidth);
+    return h2c(document.body,{x:scrollX,y:scrollY,width:innerWidth,height:innerHeight,windowWidth:innerWidth,windowHeight:innerHeight,scale:scale,logging:false,useCORS:false,
+      backgroundColor:getComputedStyle(document.body).backgroundColor,ignoreElements:function(el){return el.id==='vi-fb'||el.id==='vi-fb-btn'},onclone:function(d){maskDoc(d)}})
+      .then(function(out){pixelate(out,out.width/innerWidth);var q=.62,u=out.toDataURL('image/jpeg',q);while(u.length>680000&&q>.25){q-=.12;u=out.toDataURL('image/jpeg',q)}return u.length>680000?null:u})})
+    .catch(function(e){console.warn('[Vault-It] feedback picture',e);return null}).then(function(u){shot=u;shotBusy=null;paintShot();return u});
+  return shotBusy;
+}
+function paintShot(){var p=document.getElementById('vi-fb-shot'),cb=document.getElementById('vi-fb-pic'),st=document.getElementById('vi-fb-picst');if(!p)return;
+  if(shot){p.src=shot;p.hidden=false;if(st)st.textContent='Your figures are hidden in the picture.';if(cb)cb.disabled=false}
+  else if(shotBusy){p.hidden=true;if(st)st.textContent='Taking the picture…'}
+  else{p.hidden=true;if(cb){cb.checked=false;cb.disabled=true}if(st)st.textContent='A picture of the screen is not available here; your words are enough.'}}
+/* ---- the sheet ---- */
+function sheet(){
+  var m=document.getElementById('vi-fb');if(m)return m;
+  m=document.createElement('div');m.id='vi-fb';m.className='vi-pop';m.hidden=true;
+  m.setAttribute('onclick',"if(event.target===this)viFbClose()");m.setAttribute('onkeydown',"if(event.key==='Escape')viFbClose()");
+  m.innerHTML='<div class="ov-data-card vi-pop-card vi-fb-card" role="dialog" aria-modal="true" aria-labelledby="vi-fb-title">'
+    +'<div class="vi-pop-hd"><div class="ov-data-title" id="vi-fb-title">Send feedback</div><button class="inv-x" type="button" onclick="viFbClose()" aria-label="Close"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg></button></div>'
+    +'<label class="vi-fb-q" for="vi-fb-text" id="vi-fb-q">What happened, or what would you change?</label>'
+    +'<textarea id="vi-fb-text" class="al-inp" rows="4" maxlength="4000" placeholder="One sentence is plenty"></textarea>'
+    +'<div class="vi-fb-rate" role="group" aria-label="How is it going, 1 to 5"><span>How is it going?</span>'+[1,2,3,4,5].map(function(n){return '<button type="button" data-r="'+n+'" aria-pressed="false" onclick="viFbRate('+n+')">'+n+'</button>'}).join('')+'</div>'
+    +'<label class="vi-fb-pic"><input type="checkbox" id="vi-fb-pic" checked> Attach a picture of this screen</label>'
+    +'<div class="vi-fb-picrow"><img id="vi-fb-shot" alt="The picture that will be sent, with figures hidden" hidden><span id="vi-fb-picst" class="wi-link-hint"></span></div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn-add-data" type="button" id="vi-fb-send" onclick="viFbSend()">Send</button>'
+    +'<button class="btn-add-data" type="button" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="viFbClose()">Cancel</button></div>'
+    +'<div id="vi-fb-msg" class="vi-pop-msg" role="alert"></div>'
+    +'<p class="wi-link-hint">Goes to the Vault-It team with the screen you are on and your last few taps (never your figures). It is sorted by Anthropic’s Claude. <a href="#" onclick="viFbClose();try{showPrivacy()}catch(e){};return false">Privacy notice</a></p></div>';
+  document.body.appendChild(m);return m;
+}
+window.viFbOpen=function(mo){
+  var m=sheet();moment=mo||null;rating=null;returnTo=document.activeElement;
+  document.getElementById('vi-fb-q').textContent='What happened, or what would you change?';
+  document.getElementById('vi-fb-text').value='';document.getElementById('vi-fb-msg').textContent='';
+  [].forEach.call(m.querySelectorAll('.vi-fb-rate button'),function(b){b.setAttribute('aria-pressed','false')});
+  var cb=document.getElementById('vi-fb-pic');cb.checked=true;cb.disabled=false;
+  shot=null;rec('feedback_open',mo||'button',null,false);
+  m.hidden=false;document.body.classList.add('vi-pop-open');capture();paintShot();
+  if(!signedIn())document.getElementById('vi-fb-msg').innerHTML='Sign in to send feedback from here, or email <a href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback">hello@vault-it.co</a>.';
+  setTimeout(function(){var t=document.getElementById('vi-fb-text');if(t)t.focus()},40);
+};
+window.viFbClose=function(){var m=document.getElementById('vi-fb');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');var b=returnTo;returnTo=null;if(b&&b.focus)setTimeout(function(){try{b.focus()}catch(e){}},0)};
+window.viFbRate=function(n){rating=n;[].forEach.call(document.querySelectorAll('#vi-fb .vi-fb-rate button'),function(b){b.setAttribute('aria-pressed',String(+b.dataset.r===n))})};
+window.viFbSend=async function(){
+  var msg=document.getElementById('vi-fb-msg'),txt=document.getElementById('vi-fb-text').value.trim(),btn=document.getElementById('vi-fb-send');
+  if(!signedIn()){msg.innerHTML='Sign in to send feedback from here, or email <a href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback">hello@vault-it.co</a>.';return}
+  if(!txt&&!rating){msg.textContent='Write a sentence or pick a number first.';document.getElementById('vi-fb-text').focus();return}
+  btn.disabled=true;msg.textContent='Sending…';
+  if(document.getElementById('vi-fb-pic').checked&&shotBusy){try{await shotBusy}catch(e){}}
+  var body={kind:'feedback',text:txt.slice(0,4000),rating:rating,moment:moment||null,screenshot:document.getElementById('vi-fb-pic').checked?shot:null,context:context()};
+  var r=null;try{r=await _fnInvoke(FN,body,20000)}catch(e){r={error:e}}
+  btn.disabled=false;
+  if(r&&!r.error&&r.data&&r.data.ok){rec('feedback_sent',moment||'button');viFbClose();try{showToast('Thank you. Pete reads every one.')}catch(e){}flush(false);return}
+  var st=r&&r.error&&r.error.context&&r.error.context.status;
+  msg.innerHTML=st===429?'That is a lot of feedback for one day. Thank you! Email <a href="mailto:hello@vault-it.co">hello@vault-it.co</a> for anything else.':'Could not send just now. Try again in a moment, or email <a href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback">hello@vault-it.co</a>.';
+};
+/* ---- honest questions (owner, 31 Oct: "way more specific separate questions ... to identify honest feedback prior to launch") ----
+ * Written to get what people did and expected, not whether they like it. Each is short, skippable and asked once.
+ * One prompt per visit at most, never in the first minute; the rest wait for a later visit. Wording lives here only. */
+var VI_FB_Q={
+  budget:{t:'Setting up your budget: which part was hardest to fill in?',c:['Income','Bills','Everyday spending','Savings','None, it was easy'],x:'What made it hard? (optional)'},
+  house:{t:'Does the house builder make your deposit feel closer, further away, or no different?',c:['Closer','No different','Further away','Not sure'],x:'Why? (optional)'},
+  debt:{t:'Do your debt figures here match what your lender shows you?',c:['Yes','Close','No','Not checked'],x:'If not, what is different? (optional)'},
+  assets:{t:'Is there money you chose not to add? What, and why?',c:['I added everything','Some, on purpose','Some, it was too fiddly','Some, I did not trust it'],x:'Tell us more (optional)'},
+  prices:{t:'Were the live prices close to what your bank, app or exchange shows?',c:['Yes','Close','No','Not checked'],x:'Which one was off? (optional)'},
+  nw3d:{t:'What does Net worth in 3D tell you that a normal graph does not?',c:['More','The same','Less','I did not get it'],x:'In your words (optional)'},
+  bd3d:{t:'The 3D budget view: is it clearer than the flow chart, or just prettier?',c:['Clearer','About the same','Just prettier','Harder to read']},
+  trust:{t:'Did anything make you hesitate to type in your real figures?',c:['No','Yes'],x:'What was it? (optional)'}
+};
+var VI_FB_SURVEYS={
+  day3:{t:'A few days in',n:'Two minutes, three questions. Honest answers help most, the critical ones especially.',q:[
+    {q:'expect',t:'What did you expect Vault-It to do that it does not?',x:'Type your answer'},
+    {q:'nearly_quit',t:'Was there a moment you nearly gave up? What were you trying to do?',x:'Type your answer'},
+    {q:'today',t:'How do you keep track of your money today?',c:['Banking app','Spreadsheet','Another app','Pen and paper','I do not'],x:'Which one? (optional)'}]},
+  day14:{t:'Two weeks in',n:'Two minutes, five questions. Honest answers help most, the critical ones especially.',q:[
+    {q:'pmf',t:'How would you feel if you could no longer use Vault-It?',c:['Very disappointed','Somewhat disappointed','Not disappointed']},
+    {q:'benefit',t:'What is the main thing you get from it?',x:'Type your answer'},
+    {q:'who',t:'Who do you think would get the most from it?',x:'Type your answer'},
+    {q:'improve',t:'What one thing would make it more useful to you?',x:'Type your answer'},
+    {q:'distrust',t:'Is there anything you do not trust about it?',c:['No','Yes'],x:'What? (optional)'}]},
+  day25:{t:'Your free 30 days end soon',n:'Two minutes, five questions. Honest answers help most, the critical ones especially.',q:[
+    {q:'keep',t:'Will you keep using Vault-It after your free 30 days?',c:['Yes','Not sure','No']},
+    {q:'change_mind',t:'What would change your mind, or make it a clear yes?',x:'Type your answer'},
+    {q:'price',t:'At the tester price of £3.99 a month, Vault-It feels:',c:['Too cheap to trust','A bargain','About right','Getting expensive','Too expensive']},
+    {q:'recommend',t:'How likely are you to recommend it to a friend?',s:1},
+    {q:'recommend_why',t:'What is the main reason for your score?',x:'Type your answer'}]}
+};
+var _asked=false,_loadT=Date.now(),_ask=null;
+function pendingGet(){try{return JSON.parse(localStorage.getItem('vi-fb-pending')||'[]')}catch(e){return []}}
+function pendingSet(a){try{localStorage.setItem('vi-fb-pending',JSON.stringify(a.slice(0,8)))}catch(e){}}
+function done(k){try{return !!localStorage.getItem('vi-fb-m-'+k)}catch(e){return true}}
+function mark(k){try{localStorage.setItem('vi-fb-m-'+k,now())}catch(e){}}
+/* ask k now if this visit has not had a prompt and the first minute has passed; otherwise keep it for a later visit */
+window.viFbMoment=function(k,force){
+  if(!(VI_FB_Q[k]||VI_FB_SURVEYS[k])||!signedIn()||done(k))return false;
+  if(!force&&(_asked||Date.now()-_loadT<60000)){var pq=pendingGet();if(pq.indexOf(k)<0){pq.push(k);pendingSet(pq)}return false}
+  _asked=true;mark(k);pendingSet(pendingGet().filter(function(x){return x!==k}));
+  var sv=VI_FB_SURVEYS[k],lab=sv?sv.t+': '+sv.q.length+' quick questions':VI_FB_Q[k].t;
+  var d=document.getElementById('vi-fb-nudge');if(!d){d=document.createElement('div');d.id='vi-fb-nudge';d.setAttribute('role','status');document.body.appendChild(d)}
+  d.innerHTML='<span></span><button type="button" class="btn-add-data" onclick="viFbNudgeOpen()">Answer</button><button type="button" class="inv-x" aria-label="Not now" onclick="this.parentNode.hidden=true"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg></button>';
+  d.firstChild.textContent=lab;d.dataset.k=k;d.hidden=false;rec('moment',k,null,false);
+  setTimeout(function(){if(d.dataset.k===k)d.hidden=true},25000);return true;
+};
+window.viFbNudgeOpen=function(){var d=document.getElementById('vi-fb-nudge'),k=d&&d.dataset.k;if(d)d.hidden=true;if(k)viFbAsk(k)};
+/* the question sheet: one question, or a short check-in one question at a time */
+function askSheet(){
+  var m=document.getElementById('vi-fbq');if(m)return m;
+  m=document.createElement('div');m.id='vi-fbq';m.className='vi-pop';m.hidden=true;
+  m.setAttribute('onclick',"if(event.target===this)viFbAskClose()");m.setAttribute('onkeydown',"if(event.key==='Escape')viFbAskClose()");
+  m.innerHTML='<div class="ov-data-card vi-pop-card vi-fb-card" role="dialog" aria-modal="true" aria-labelledby="vi-fbq-title">'
+    +'<div class="vi-pop-hd"><div class="ov-data-title" id="vi-fbq-title">Quick question</div><button class="inv-x" type="button" onclick="viFbAskClose()" aria-label="Close"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg></button></div>'
+    +'<p class="wi-link-hint" id="vi-fbq-note"></p><div class="vi-fbq-step" id="vi-fbq-step" aria-live="polite"></div>'
+    +'<label class="vi-fb-q" id="vi-fbq-q" for="vi-fbq-text"></label><div class="vi-fbq-ch" id="vi-fbq-ch" role="group"></div>'
+    +'<textarea id="vi-fbq-text" class="al-inp" rows="3" maxlength="1000"></textarea>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn-add-data" type="button" id="vi-fbq-next" onclick="viFbAskNext()">Send</button>'
+    +'<button class="btn-add-data" type="button" id="vi-fbq-skip" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="viFbAskNext(true)">Skip</button></div>'
+    +'<div id="vi-fbq-msg" class="vi-pop-msg" role="alert"></div></div>';
+  document.body.appendChild(m);return m;
+}
+function askPaint(){
+  var a=_ask,it=a.items[a.i],last=a.i===a.items.length-1;
+  document.getElementById('vi-fbq-title').textContent=a.survey?VI_FB_SURVEYS[a.k].t:'Quick question';
+  document.getElementById('vi-fbq-note').textContent=a.survey?VI_FB_SURVEYS[a.k].n:'Honest answers help most. Skip it if you prefer.';
+  document.getElementById('vi-fbq-step').textContent=a.items.length>1?'Question '+(a.i+1)+' of '+a.items.length:'';
+  document.getElementById('vi-fbq-q').textContent=it.t;
+  var ch=document.getElementById('vi-fbq-ch'),ans=a.ans[a.i]||{};
+  var opts=it.s?[0,1,2,3,4,5,6,7,8,9,10].map(String):(it.c||[]);
+  ch.className='vi-fbq-ch'+(it.s?' vi-fbq-score':'');ch.setAttribute('aria-label',it.t);
+  ch.innerHTML=opts.map(function(o){var on=it.s?String(ans.score)===o:ans.choice===o;return '<button type="button" aria-pressed="'+on+'" data-v="'+cfEsc(o)+'">'+cfEsc(o)+'</button>'}).join('');
+  [].forEach.call(ch.children,function(b){b.onclick=function(){var v=b.dataset.v;if(it.s)ans.score=+v;else ans.choice=v;a.ans[a.i]=ans;[].forEach.call(ch.children,function(x){x.setAttribute('aria-pressed',String(x===b))})}});
+  if(it.s)ch.insertAdjacentHTML('beforeend','<span class="vi-fbq-ends"><span>Not likely</span><span>Very likely</span></span>');
+  var tx=document.getElementById('vi-fbq-text');tx.hidden=!it.x;tx.placeholder=it.x||'';tx.value=ans.text||'';
+  document.getElementById('vi-fbq-next').textContent=last?'Send':'Next';document.getElementById('vi-fbq-msg').textContent='';
+}
+window.viFbAsk=function(k){
+  var sv=VI_FB_SURVEYS[k],q=VI_FB_Q[k];if(!sv&&!q)return;
+  _ask={k:k,survey:!!sv,items:sv?sv.q:[{q:k,t:q.t,c:q.c,x:q.x}],i:0,ans:[]};
+  var m=askSheet();askPaint();m.hidden=false;document.body.classList.add('vi-pop-open');rec('question_open',k,null,false);
+  setTimeout(function(){var b=m.querySelector('#vi-fbq-ch button')||document.getElementById('vi-fbq-text');if(b)b.focus()},40);
+};
+window.viFbAskClose=function(){var m=document.getElementById('vi-fbq');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open')};
+window.viFbAskNext=async function(skip){
+  var a=_ask;if(!a)return;var it=a.items[a.i],ans=a.ans[a.i]||{};
+  var tx=document.getElementById('vi-fbq-text');if(!tx.hidden&&tx.value.trim())ans.text=tx.value.trim().slice(0,1000);
+  if(skip)a.ans[a.i]=null;else a.ans[a.i]=ans;
+  if(a.i<a.items.length-1){a.i++;askPaint();return}
+  var got=a.ans.map(function(x,i){if(!x||(x.choice==null&&x.score==null&&!x.text))return null;var o={q:a.items[i].q};if(x.choice!=null)o.choice=x.choice;if(x.score!=null)o.score=x.score;if(x.text)o.text=x.text;return o}).filter(Boolean);
+  if(!got.length){viFbAskClose();return}
+  var body=a.survey?{kind:'survey',survey:a.k,answers:got,context:context()}:{kind:'feedback',question:a.k,moment:a.k,choice:got[0].choice||null,text:got[0].text||'',rating:null,screenshot:null,context:context()};
+  var btn=document.getElementById('vi-fbq-next'),msg=document.getElementById('vi-fbq-msg');btn.disabled=true;msg.textContent='Sending…';
+  var r=null;try{r=await _fnInvoke(FN,body,20000)}catch(e){r={error:e}}
+  btn.disabled=false;
+  if(r&&!r.error&&r.data&&r.data.ok){rec('question_sent',a.k);viFbAskClose();try{showToast('Thank you. That really helps.')}catch(e){}return}
+  msg.innerHTML='Could not send just now. Try again in a moment, or email <a href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback">hello@vault-it.co</a>.';
+};
+/* when to ask: check-ins on trial days 3, 14 and 25 come first; otherwise the oldest waiting question */
+function askDue(){
+  if(!signedIn()||_asked)return;var day=0;try{day=viTrialDay()}catch(e){}
+  var sv=day>=25&&day<=30?'day25':day>=14&&day<=18?'day14':day>=3&&day<=7?'day3':null;
+  if(sv&&!done(sv)){viFbMoment(sv,true);return}
+  var pq=pendingGet().filter(function(k){return !done(k)});if(pq.length)viFbMoment(pq[0],true);
+}
+setTimeout(askDue,65000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden){_asked=false;_loadT=Date.now();setTimeout(askDue,65000)}});
+/* triggers for the single questions */
+function trig(){
+  try{var n=0;try{n=+localStorage.getItem('vi-fb-visits')||0}catch(e){}if(!sessionStorage.getItem('vi-fb-v')){sessionStorage.setItem('vi-fb-v','1');n++;localStorage.setItem('vi-fb-visits',String(n))}if(n>=2)viFbMoment('trust')}catch(e){}
+}
+setTimeout(trig,2000);
+/* ---- Settings: share usage ---- */
+window.viFbAct=function(on,btn){try{localStorage.setItem(KEY_ACT,on?'1':'0')}catch(e){}if(!on)EVQ.length=0;
+  var row=document.getElementById('set-fbact');if(row)[].forEach.call(row.children,function(b){b.classList.toggle('active',b.dataset.val===(on?'1':'0'))});try{showToast(on?'Thank you: usage sharing on':'Usage sharing off')}catch(e){}};
+function init(){
+  wrapTabs();
+  try{if(window.bd3d&&!bd3d.show._fb){var os=bd3d.show;bd3d.show=function(v,user){var r=os.apply(this,arguments);if(v==='3d'&&user)setTimeout(function(){viFbMoment('bd3d')},8000);return r};bd3d.show._fb=true}}catch(e){}
+  if(!document.getElementById('vi-fb-btn')){var b=document.createElement('button');b.id='vi-fb-btn';b.type='button';b.setAttribute('aria-label','Send feedback');b.title='Send feedback';
+    b.innerHTML='<svg class="vi-ic" aria-hidden="true"><use href="#vi-chat"/></svg><span>Feedback</span>';b.onclick=function(){viFbOpen()};document.body.appendChild(b)}
+  var row=document.getElementById('set-fbact');if(row)[].forEach.call(row.children,function(x){x.classList.toggle('active',x.dataset.val===(actOn()?'1':'0'))});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+setTimeout(wrapTabs,1500);
+window.viFb={flush:flush,context:context,trail:function(){return TRAIL.slice()},queue:function(){return EVQ.slice()},capture:capture,maskDoc:maskDoc};
 })();
 </script>
 </body>

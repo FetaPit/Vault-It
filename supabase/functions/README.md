@@ -186,3 +186,53 @@ which the app adds to every Payment Link; else the Stripe customer; else the che
    checkout e-mail so it can be linked by hand: `update profiles set is_pioneer = true, plan = 'monthly' where id = '…';`
 
 Tests: `tests/test_011.mjs` (database, real Postgres), `tests/test_stripe_server.js` (function), `tests/test_paid_gateway.js` (app).
+
+## Tester feedback (tester-feedback, feedback-digest)
+
+The in-app Feedback sheet, targeted questions, short surveys and the activity log for beta testers, and the owner's daily and weekly
+digests. Spec and owner's decisions: `docs/TESTER_FEEDBACK.md`. Tables and limits: migration `012_tester_feedback.sql` (RLS on, no
+client policies; only these functions read or write, with the service role).
+
+**tester-feedback** (`POST`, the signed-in user's `Authorization: Bearer` token, checked with `auth.getUser`):
+- `{kind:'feedback', text, rating, moment, question, choice, screenshot, context}` → `{ok, id}`. Valid with at least one of text
+  (up to 4,000), rating (1 to 5) or choice (up to 60). `question` is a targeted question id (`[a-z0-9_]`, up to 40). The screenshot is a
+  `data:image/jpeg;base64,` string up to 700 KB with figures already hidden by the app; context up to 32 KB.
+- `{kind:'survey', survey:'day3'|'day14'|'day25'|..., answers:[{q, choice?, text? (1,000), score? 0 to 10}] (1 to 8), context}` →
+  `{ok, id}`, one row with `survey` + `answers` (the text column holds a short joined summary for search).
+- `{kind:'events', session:<uuid>, events:[{t, ev, tab, el, ms}] (up to 200)}` → `{ok, n}`; `ev` is one of `session_start`,
+  `session_end`, `tab`, `feature`, `error`.
+- Errors: 400 bad body, 401 not signed in, 413 too large, 429 limited (20 feedback or surveys a day, 60 event batches an hour per tester,
+  enforced in the database with a per-tester lock). Amounts and digits are stripped from the action trail and event labels on the server too.
+- After storing, Claude triages the row (`{type, severity 1-4, area, summary, steps}`, surveys also `sentiment` -2..2 and
+  `honest_takeaway`), after the answer is sent where the runtime allows. A failed or unusable reply leaves the row untriaged for the
+  digest. Severity 4 e-mails `OWNER_EMAIL` at once. The screenshot goes to Claude only with `FEEDBACK_VISION=1`.
+
+**feedback-digest** (`POST`, header `x-digest-key` compared in constant time with `FEEDBACK_DIGEST_KEY`; without that secret it refuses
+everything): `{mode:'daily'}` triages up to 20 untriaged rows, applies retention (events after 120 days, screenshots after 180 days),
+then e-mails the last 24 hours grouped by severity, survey and targeted-question choice counts, and activity totals. `{mode:'weekly'}`
+asks Claude for themes ranked by severity and frequency (grouped by area if the AI is unavailable), stores the report in
+`feedback_reports` and e-mails it. Read the newest report with
+`select body from feedback_reports where period = 'weekly' order by created_at desc limit 1;`
+
+Secrets (`ANTHROPIC_API_KEY` and `RESEND_API_KEY` exist already):
+```
+supabase secrets set OWNER_EMAIL=<owner's address> FEEDBACK_DIGEST_KEY=<openssl rand -hex 32>
+# optional: FEEDBACK_MODEL (default claude-haiku-5-5), FEEDBACK_VISION=1 (send screenshots to Claude; default off),
+#           FEEDBACK_VIEW_URL (link in e-mails, {id} is replaced), FEEDBACK_PER_DAY (20), FEEDBACK_EVENT_BATCHES_PER_HOUR (60),
+#           FROM_EMAIL (shared with the other mail functions)
+```
+
+**Go-live order (production; needs the owner's yes):**
+1. Apply `supabase/migrations/012_tester_feedback.sql` (check first with the connector's `list_migrations`).
+2. Set the secrets above.
+3. Deploy both. `tester-feedback` checks the user's token itself and `feedback-digest` is called by pg_cron with the digest key
+   (no Supabase token), so both need `--no-verify-jwt`:
+   ```
+   supabase functions deploy tester-feedback --no-verify-jwt
+   supabase functions deploy feedback-digest --no-verify-jwt
+   ```
+4. Store the same digest key in Vault and add the schedule: `docs/TESTER_FEEDBACK_DEPLOY.sql` (pg_cron + pg_net, 07:41 UK daily,
+   Monday 07:47 UK weekly, key read from `vault.decrypted_secrets`).
+5. Release the app with the Feedback button and the updated privacy notice.
+
+Tests: `tests/test_012.mjs` (database on pglite), `tests/test_feedback_server.js` (both functions, with stubs).

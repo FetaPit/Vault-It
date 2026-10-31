@@ -21,9 +21,13 @@ Thanks for trying Vault-It, a UK personal-finance app that turns your numbers in
 
 ## Tell us what you find
 
-Anything confusing, broken, slow or ugly is useful — especially on your phone. Please include **what you did, what you expected, what happened** and your device/browser. A screenshot helps.
+Anything confusing, broken, slow or ugly is useful, especially on your phone.
 
-Email: **hello@vault-it.co**
+The quickest way: tap **Feedback** (bottom right, on every screen), write one sentence and press Send. The app adds the screen you are on, your device and your last few taps, and a picture of the screen with every figure hidden (untick it if you prefer). It never sends your figures. Now and then the app asks a one-tap "How was that?" after a key moment; answer only if you like.
+
+During the beta the app also notes which screens and features you use and any errors (never your figures or what you type), so we can see where people get stuck. You can switch this off in Settings, Share usage.
+
+Or email: **hello@vault-it.co**
 
 ## Your data
 

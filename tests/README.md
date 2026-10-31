@@ -29,6 +29,8 @@ node tests/test_tiers.js            # tier gates: no item caps, design tools (up
 node tests/test_paid_gateway.js     # secure paid gateway, app side: the Stripe return URL alone unlocks nothing, the profile is mirrored both ways, typed e-mail proves nothing, no is_pioneer in the sign-in upsert, older server works as before
 node tests/test_stripe_server.js     # stripe-webhook: signature checks, plan from link / metadata / price, unpaid and test-mode ignored, retry on database failure
 node tests/test_011.mjs              # migration 011 on pglite: browser cannot set paid columns, events once and in order, founders, testers from the waitlist, erase unlinks events
+node tests/test_012.mjs              # migration 012 on pglite: tester feedback, surveys, events and reports; RLS with no client access, checks, per-tester limits, activity totals, retention, erase
+node tests/test_feedback_server.js   # tester-feedback + feedback-digest: auth, 400/413/429, trail amounts stripped, Claude triage (bad reply stays untriaged), severity 4 e-mail, surveys, events, digest key, daily and weekly digests
 node tests/test_view_mode.js        # Simplified / Advanced view: Advanced when nothing is saved, the Simplified tile list on Overview / Budget / House, achievements card, tabs, synced choice, welcome default, phone KPIs in two rows, Sankey flow animation and reduced motion
 node tests/test_tester_welcome.js    # tester welcome note: shown once after the welcome flow for beta accounts, agreed wording with the 30-day first sentence, closes with Esc / outside / Let's go, phone fit
 node tests/test_nw3d_first.js       # 3D net worth draws on first show even when a stale "not visible" observer entry arrives first (the phone defect of 31 Oct); fails on the old code
@@ -38,6 +40,7 @@ node tests/test_inv_preview.js         # Round 3: the item viewer shows the save
 node tests/test_value_hist.js         # Round 3 (8): each wealth item keeps one value reading a day with its source; the link suggests a source from the name, else stays manual
 node tests/test_icons.js              # Icons: embedded coin logos work offline, no emoji fallback; inventory and liability items are the brand block, blank until a brand icon is picked; old emoji choices map to brand icons
 node tests/test_bank_logos.js         # Bank and platform logos: cash accounts get their bank's logo from the name (initials offline, brand bank icon when unknown); more platforms for pies
+node tests/test_feedback_client.js     # Tester feedback in the app: button, sheet, picture with figures hidden, context without figures, activity log and its Settings switch, moment prompts, privacy notice
 node tests/test_crypto_live.js         # Round 3: crypto prices fetched by themselves (CoinGecko mocked), tokens held, price source and age, bigger icons, last price kept on failure
 node tests/test_i3d_live.js           # Round 3: desktop, hover a model tile to orbit it by click and drag (one live view), click opens the viewer; touch keeps the picture
 node tests/test_ledger.js             # Round 3: the side bar ledger lists every money figure with its icon, each equal to its tab; also the Savings rate line and the stale-price note
