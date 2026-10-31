@@ -118,6 +118,10 @@ const data = p => p.evaluate(() => ({ saved: state.saved, debts: debtState.debts
   await phone.fill('#w-name', 'One B'); await phone.fill('#w-email', EMAIL); await phone.click('#w-opts .welcome-opt[data-val="1"]'); await phone.click('#w-step-1 .welcome-cta'); await phone.waitForTimeout(600);
   await phone.fill('#w-house', '250000'); await phone.click('#w-step-2 .welcome-cta'); await phone.waitForTimeout(1000);
   ok(await welcome(phone) === 'none' && await phone.evaluate(() => JSON.parse(localStorage.getItem('vi_user')).name === 'One B' && state.target === 250000), 'phone: welcome done, name and £250,000 house price saved');
+  // Pete's tester note shows once after the welcome flow (31 Oct): a tester reads it and closes it
+  await phone.waitForTimeout(900);
+  ok(await phone.evaluate(() => !document.getElementById('tester-welcome').classList.contains('hidden')), 'phone: the tester welcome note from Pete shows once');
+  await phone.click('#tester-welcome .tw-go'); await phone.waitForTimeout(200);
 
   // ── 2. phone: save money, then put the app in the background (close / switch app) ──
   await phone.evaluate(() => showTab('house')); await phone.waitForTimeout(800);
