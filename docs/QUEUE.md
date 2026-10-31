@@ -9,16 +9,13 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [~] House builder freezes the page (owner, 31 Oct, MVP, top priority, must be testable live today): the house builder is laggy, breaks site navigation and triggers "Page unresponsive"; a deposit cannot even be added. Make it behave exactly as the brand book: smooth, with the pulsing and the brick-laying animations in slow motion so the user sees their input build the house
 - [ ] Net worth in 3D (owner, 31 Oct): the column list under the scene folds into a dropdown (collapsed); on desktop the credit card blocks stand alongside the wealth inventory cubes; cubes about 35% larger, so the visual gets more room
-- [ ] Net worth progress (owner, 31 Oct): Forecast on by default; the key shows three colours (net worth, debt, monthly income), not one
 - [ ] Goals and snapshots (owner, 31 Oct): off the dashboard; shown and editable only in the net worth Graph view (what is added there still feeds everything else)
 - [ ] Financial freedom roadmap (owner, 31 Oct): the line must not run through or behind the icons; a 3D touch (coins that turn, or the road in slight perspective, icons in front); the stage just unlocked is the largest, others grow on hover; on mobile a swipe carousel with the largest icon in the centre and smaller ones fading out to the sides
 - [ ] Budget colours (owner, 31 Oct): keep the group headings and tiles colour coded (committed essential, variable essential, committed non-essential, variable non-essential) but drop the colour from the individual items inside (rent, council tax, debt …); everything else stays as it is
 - [ ] House type icons (owner, 31 Oct): new icons for the six types (terraced, semi-detached, detached, manor, flat, apartment) in the brand book's icon style, laid out in two rows of three on every screen size
 - [ ] Contribution streak (owner, 31 Oct): on desktop it fills only a third of the width and the dates, months and dots are far too small; make it readable on desktop, tablet and phone
 - [ ] Debt charts (owner, 31 Oct): three views but four buttons; the tree map shows by default, and directly under it one tile with the histogram and the donut behind a toggle
-- [ ] Prices and Stripe checkout (owner, 31 Oct, afternoon): the plan is £5.99 a month; early testers get access free in exchange for detailed feedback; after their 30 days testers get £3.99 a month or a £39.99 Pioneer licence. Add to Stripe checkout and the app's plans pop-up (owner's words: "the Vaulter price is £5.99 a month")
 
 ## Waiting on the owner
 
@@ -33,6 +30,10 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] House builder freezes (owner, 31 Oct, top priority): bricks drawn solid with the depth test, the far-face pass removed, a lite mode that really skips frames and starts at once on a software GPU, slow-motion laying (about 5 s a deposit, 0.9 s drop, 2 s gold flash). Commit eb0c7c0 on `brand-rollout` (full suite passed); release blocked by the session's permission layer, owner to push
+- [x] Net worth in 3D empty on load (owner, 31 Oct): safety net: a forced refresh and stage kick after load, on return from the background and after a failed draw. Commit PRICECOMMIT
+- [x] Net worth progress (owner, 31 Oct): Forecast on by default; the key names net worth, debt and monthly income with 3D swatches. Commit PRICECOMMIT
+- [x] Prices and Stripe checkout (owner, 31 Oct pm): testers £3.99 a month, £39.99 a year (new price and link, £21.99 link switched off), Founding £99 (new price and capped link); full prices struck through in the pop-up, campaign page and Settings; webhook deployed with the new links. Commit PRICECOMMIT
 - [x] Gateway go-live and release (owner, 31 Oct: "yes and release when ready"): migration 011 applied (guard checked live in a rolled-back transaction), `stripe-webhook` deployed, Stripe endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` created; full suite passed; released to `release/pioneer-v2` with this commit (backup branch taken first). The owner set `STRIPE_WEBHOOK_SECRET` the same day; the function now refuses unsigned requests (400), so the gateway is fully live
 - [x] Net worth 3D card controls (owner, 31 Oct 12:33): three views, one switch each, top right: the net worth card is 3D | Graph (the old Blocks | Line switch is gone); the progress blocks have their own card directly below with a Forecast switch (in step with the graph's) and their own readout and key; keys and legends are bigger and every swatch is a small 3D block in its colour. Commit 7e94db2 on `brand-rollout`, not released.
 - [x] Secure paid gateway, built (owner, 31 Oct): migration 011 (paid columns the browser cannot change, tester flag from confirmed waitlist addresses, Stripe event log, `stripe_apply`), edge function `stripe-webhook` (signature checked, each event once, stale and old-subscription events skipped), the app reads paid status from the profile only once the server has it and works as before on an older server, privacy notice names Stripe. Tests: test_011, test_stripe_server, test_paid_gateway. Commit 9d6cbce on `brand-rollout`, not released, not live (needs the owner's yes)

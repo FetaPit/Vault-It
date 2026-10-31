@@ -143,3 +143,8 @@ The old caps (3 assets, 2 liabilities, 1 debt) go. The house build is never behi
 - **Earlier buyers:** Stripe had no completed checkouts on 31 Oct 2026, so there are no earlier payers to reconcile; any paid flag on a device today is self-declared and is cleared by the profile once the gateway is live.
 - **Live (31 Oct 2026, Pete: "yes and release when ready"):** migration 011 applied (4 profiles, none marked paid, so nothing to reconcile), `stripe-webhook` deployed (no JWT check; the Stripe signature is the check), Stripe endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` created for the five events. **Pete set the secret the same day** (checked: an unsigned request now gets 400). For a rotation later: put the endpoint's signing secret into Supabase as `STRIPE_WEBHOOK_SECRET` (Stripe Dashboard → Developers → Webhooks → the endpoint → Reveal signing secret; Supabase → Edge Functions → Secrets). Until then the function answers 500 and Stripe keeps retrying for up to three days, so no payment is lost.
 - Still client-side only: the paid-only design tools (upload / generate a 3D house). The AI reader allowance is enforced on the server from `is_pioneer` / `is_founder`, which are now trustworthy.
+
+## 12. Decided by Pete (31 Oct 2026, late afternoon)
+
+- **Tester prices:** free for the 30 days in exchange for detailed feedback, then £3.99 a month, **£39.99 a year** (replaces £21.99) or **Founding Member £99** (replaces £149 for testers). Full prices unchanged. Every tester price shows the full price struck through (pop-up, campaign page, Settings).
+- The £21.99 link is switched off in Stripe; the webhook knows the new links and prices.

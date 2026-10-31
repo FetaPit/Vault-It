@@ -10907,7 +10907,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <div class="vi-camp-tier-badge">Best value</div>
           <div class="vi-camp-tier-name">Pioneer yearly</div>
           <div class="vi-camp-tier-price">£49.99<span>/yr</span></div>
-          <div class="vi-camp-tier-note">Around 30% less than monthly. Beta testers pay £21.99. Renews at the same price as long as you stay subscribed.</div>
+          <div class="vi-camp-tier-note">Around 30% less than monthly. Beta testers pay £39.99. Renews at the same price as long as you stay subscribed.</div>
           <ul class="vi-camp-tier-features">
             <li>Everything in Free</li>
             <li>Entrepreneur tab</li>
@@ -10922,7 +10922,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div class="vi-camp-tier vi-camp-gold-tier">
           <div class="vi-camp-tier-badge" id="camp-founder-slots">100 places</div>
           <div class="vi-camp-tier-name">Founding Member</div>
-          <div class="vi-camp-tier-price">£149<span> once</span></div>
+          <div class="vi-camp-tier-price" id="camp-price-founder">£149<span> once</span></div>
           <div class="vi-camp-tier-note">One payment for Pro for the life of the Vault-It service. AI extras have a monthly allowance. 14 days to change your mind.</div>
           <ul class="vi-camp-tier-features">
             <li>Pro for the life of the service</li>
@@ -11018,7 +11018,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     <div class="vi-modal-body">
       <p class="vi-modal-desc" id="offer-body">Your numbers stay yours either way. After day 30 the vault turns read-only until you choose a plan.</p>
 
-      <!-- Plans (owner, 31 Oct 2026: docs/MONETISATION_DECISION.md sections 8 and 9). Prices are painted by viPricePaint(): beta testers see £2 a month / £28 a year off Pioneer. -->
+      <!-- Plans (owner, 31 Oct 2026: docs/MONETISATION_DECISION.md sections 8 and 9). Prices are painted by viPricePaint(): beta testers see £2 a month / £10 a year / £50 off Founding off Pioneer. -->
       <div class="vi-tier-wrap">
         <div class="vi-tier-table">
           <!-- Vaulter: what you have after the 30 days without paying -->
@@ -11072,7 +11072,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <div class="vi-tier-col vi-tier-founder">
             <div class="vi-tier-popular" style="color:var(--go)">100 places · testers first</div>
             <div class="vi-tier-name">Founding Member</div>
-            <div class="vi-tier-price" style="color:var(--go)">£149<span> once</span></div>
+            <div class="vi-tier-price" id="offer-price-founder" style="color:var(--go)">£149<span> once</span></div>
             <div class="vi-tier-saving">Yearly Pioneer for the life of the service</div>
             <ul class="vi-tier-features">
               <li>Everything in yearly, for good</li>
@@ -11208,7 +11208,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <button class="chart-metric-btn active" data-metric="nw" onclick="toggleChartMetric(this,'nw')">NW</button>
           <button class="chart-metric-btn active" data-metric="debt" onclick="toggleChartMetric(this,'debt')">Debt</button>
           <button class="chart-metric-btn active" data-metric="income" onclick="toggleChartMetric(this,'income')">Income</button>
-          <button class="chart-metric-btn" data-metric="proj" onclick="toggleChartMetric(this,'proj')">Forecast</button>
+          <button class="chart-metric-btn active" data-metric="proj" onclick="toggleChartMetric(this,'proj')">Forecast</button>
         </div>
       </div>
       <div class="ov-legend">
@@ -12375,7 +12375,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     </div>
     </details>
 
-    <!-- Your plan (owner, 31 Oct 2026: Vaulter / Pioneer monthly / Pioneer yearly / Founding Member; beta testers £2 a month, £28 a year off) -->
+    <!-- Your plan (owner, 31 Oct 2026: Vaulter / Pioneer monthly / Pioneer yearly / Founding Member; beta testers £2 a month, £10 a year, £50 off Founding) -->
     <div style="margin-bottom:20px;padding:16px;background:linear-gradient(135deg,rgb(var(--brass-rgb) / .07),rgb(var(--brass-rgb) / .02));border-radius:10px;border:1px solid rgb(var(--brass-rgb) / .35)">
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">
         <span style="font-size:.9rem;animation:pw-pulse 2.5s ease-in-out infinite;display:inline-block">◆</span>
@@ -16990,7 +16990,7 @@ var _ISB_TYPES={passive:'Passive',active:'Active','portfolio':'Portfolio'};
 var _ISB_STATUS_COLOR={idea:'var(--t3)',building:'var(--go)',active:'var(--gr)'};
 
 // ── STATE DEFAULTS (must be before INIT block) ──
-var chartState={range:'all',metrics:{nw:true,debt:true,income:true,proj:false}};
+var chartState={range:'all',metrics:{nw:true,debt:true,income:true,proj:true}};   // Forecast on by default (owner, 31 Oct)
 var _nwZoom=1, _nwPanMs=0; // net worth chart zoom (1=default) and pan offset in milliseconds
 // ── Constants used by init-time renders — must be declared BEFORE the init block runs ──
 // ── Spending types: committed vs variable × essential vs non-essential, plus savings & investments ──
@@ -23446,7 +23446,7 @@ function _refreshPioneerSettingsUI(){
   var st=viTrialState(),pioneer=st==='paid',left=viTrialDaysLeft(),day=viTrialDay();
   if(active)active.style.display=pioneer?'block':'none';
   if(inactive){inactive.style.display=pioneer?'none':'block';
-    inactive.textContent=st==='ended'?'Your 30 days are up, so you are a Vaulter: the vault is read-only and every number is safe and still here. Pick a plan to carry on editing: Pioneer at '+viPlanLabel('monthly')+' or '+viPlanLabel('annual')+', or a Founding Member place at £149 once.'
+    inactive.textContent=st==='ended'?'Your 30 days are up, so you are a Vaulter: the vault is read-only and every number is safe and still here. Pick a plan to carry on editing: Pioneer at '+viPlanLabel('monthly')+' or '+viPlanLabel('annual')+', or a Founding Member place at '+viPlanLabel('founder')+'.'
       :'Day '+day+' of your 30 free days ('+left+(left===1?' day':' days')+' left). Everything is open. After day 30 the vault turns read-only (Vaulter) until you pick a plan: Pioneer at '+viPlanLabel('monthly')+' or '+viPlanLabel('annual')+'.';}
   try{viPricePaint();}catch(e){}
   if(badge)badge.innerHTML=pioneer
@@ -26096,18 +26096,21 @@ var VI_STRIPE_LINKS = {
   monthly:        'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',   // Pioneer monthly £5.99
   annual:         'https://buy.stripe.com/dRm3cp6Pccff2mFa102VG02',   // Pioneer yearly £49.99
   monthly_tester: 'https://buy.stripe.com/6oUeV7b5sbbb7GZ6OO2VG03',   // beta testers: £3.99 a month (£2 off)
-  annual_tester:  'https://buy.stripe.com/9B63cp0qObbb2mF6OO2VG04',   // beta testers: £21.99 a year (£28 off)
-  founder:        'https://buy.stripe.com/eVq28l0qO6UV3qJc982VG05'    // Founding Member £149 once, 100 places
+  annual_tester:  'https://buy.stripe.com/3cI8wJ0qO9337GZa102VG06',   // beta testers: £39.99 a year (£10 off; owner, 31 Oct)
+  founder:        'https://buy.stripe.com/eVq28l0qO6UV3qJc982VG05',   // Founding Member £149 once, 100 places
+  founder_tester: 'https://buy.stripe.com/bJe3cpc9w4MN8L31uu2VG07'    // beta testers: Founding Member £99 once (£50 off; owner, 31 Oct)
 };
-var VI_PLANS = { monthly: { price: 5.99, tester: 3.99, per: ' a month' }, annual: { price: 49.99, tester: 21.99, per: ' a year' }, founder: { price: 149, per: ' once' } };
-// Beta testers get £2 a month / £28 a year off Pioneer (owner, 31 Oct). The app is in beta, so every account counts as a tester
+var VI_PLANS = { monthly: { price: 5.99, tester: 3.99, per: ' a month' }, annual: { price: 49.99, tester: 39.99, per: ' a year' }, founder: { price: 149, tester: 99, per: ' once' } };
+// Beta testers (owner, 31 Oct, afternoon): free for their 30 days in return for detailed feedback, then £3.99 a month, £39.99 a year or
+// Founding Member £99, each shown with the full price struck through. The app is in beta, so every account counts as a tester
 // until the profile carries a tester flag (secure paid gateway, queued); a device can also be marked with vi_beta.
 var VI_BETA_OPEN = true;
 function viBetaTester() { try { if (localStorage.getItem('vi_beta') === 'false') return false; return VI_BETA_OPEN || localStorage.getItem('vi_beta') === 'true'; } catch (e) { return VI_BETA_OPEN; } }
 function viPlanPrice(plan) { var P = VI_PLANS[plan]; return '£' + ((viBetaTester() && P.tester) ? P.tester : P.price).toFixed(2); }
 function viPlanLabel(plan) {   // for sentences: "£3.99 a month (beta tester price, £2 off)"
   var P = VI_PLANS[plan], t = viBetaTester() && P.tester;
-  return t ? '£' + P.tester.toFixed(2) + P.per + ' (beta tester price, £' + (Math.round((P.price - P.tester) * 100) / 100) + ' off)' : '£' + P.price.toFixed(2) + P.per;
+  var f = function (v) { return v.toFixed(2).replace(/\.00$/, ''); };   // £5.99, but £99 and £149, not £99.00
+  return t ? '£' + f(P.tester) + P.per + ' (beta tester price, £' + (Math.round((P.price - P.tester) * 100) / 100) + ' off)' : '£' + f(P.price) + P.per;
 }
 // paints every price cell: the tester price with the full price struck through, or the full price alone
 function viPricePaint() {
@@ -26119,9 +26122,12 @@ function viPricePaint() {
     var pw = document.getElementById('pw-price-' + x[0]); if (pw) pw.innerHTML = t ? '<s style="color:var(--t3);font-size:.6rem;font-weight:400;margin-right:4px">£' + P.price.toFixed(2) + '</s>£' + P.tester.toFixed(2) : '£' + P.price.toFixed(2);
     var sb = document.getElementById('set-plan-' + x[0]); if (sb) sb.textContent = (x[0] === 'monthly' ? 'Monthly ' : 'Yearly ') + viPlanPrice(x[0]) + (t ? ' (was £' + P.price.toFixed(2) + ')' : '');
   });
+  var F = VI_PLANS.founder;   // Founding Member: £99 for testers, £149 struck through
+  ['offer-price-founder', 'camp-price-founder'].forEach(function (id) { var el = document.getElementById(id); if (el) el.innerHTML = t ? '<s>£' + F.price + '</s>£' + F.tester + '<span> once</span><span class="vi-tier-tester">Beta tester price · £' + (F.price - F.tester) + ' off</span>' : '£' + F.price + '<span> once</span>'; });
+  var fb = document.getElementById('set-plan-founder'); if (fb) fb.textContent = 'Founding £' + (t ? F.tester + ' (was £' + F.price + ')' : F.price);
 }
 function showUpgrade(plan) {
-  var key = plan; if ((plan === 'monthly' || plan === 'annual') && viBetaTester()) key = plan + '_tester';
+  var key = plan; if ((plan === 'monthly' || plan === 'annual' || plan === 'founder') && viBetaTester()) key = plan + '_tester';
   var link = VI_STRIPE_LINKS[key] || VI_STRIPE_LINKS[plan];
   if (!link) { showToast('That plan is not open yet.'); return; }
   var user = {};
@@ -27708,6 +27714,7 @@ function makeNW(cv,o){
   self.totals=function(){var a=0,dd=0,cc={};cols.forEach(function(c){cc[c.key]={v:c.v,blocks:byKey[c.key].b,cubes:byKey[c.key].s};if(c.dir>0)a+=c.v;else dd+=c.v});return {assets:a,debt:dd,net:net,unit:U,cols:cc}};
   self.unit=function(){return U};
   self.replay=function(){if(reduceMotion())return;var now=performance.now();boxes.forEach(function(b){if(!b.leave)b.born=now+b.off});S.kick()};
+  self.kick=function(){S.kick()};
   function geo(b,ts){
     var c=byKey[b.k],dir=c?c.c.dir:(b.k.indexOf("debt")===0?-1:1),cn=c?c.b:0,col=c?(b.s?segCol(c.c,cn*U+b.i*U/10,U/10):segCol(c.c,b.i*U,U)):PAL.gold;
     var g={x:X[b.k]||0,z:Z[b.k]||0,w:10,d:10,h:BH,y:0,col:col};
@@ -27975,8 +27982,12 @@ function refreshHero(){
 
 /* ── the tracker: 3D blocks of the main chart's own points ── */
 var trkLast='';
+/* the progress key names its three colours (owner, 31 Oct): net worth, debt, monthly income, then the block sizes */
+function trkKey(s){var st=document.getElementById('nw3d-hero-stage'),out='';
+  [['nw','teal','Net worth'],['debt','red','Debt'],['inc','gold','Monthly income']].forEach(function(x){if(!s.sel||s.sel[x[0]]!==false)out+='<span>'+iso(tok(st,x[1]),1,1,1,7)+x[2]+'</span>'});
+  return out+keyHtml(s.unit,true)}
 var trk=E.makeTracker(trkCv,{fps:30,fmt:full,onChange:function(s){
-  tkey.innerHTML=keyHtml(s.unit,true);
+  tkey.innerHTML=trkKey(s);
   if(s.lab==null){trkRead.textContent=trkToday();return}
   var t=s.lab+(s.forecast?' (forecast)':'')+': net worth '+full(s.v.nw);
   if(s.sel.debt)t+=' · debt '+full(s.v.debt);if(s.sel.inc&&!s.forecast)t+=' · income '+full(s.v.inc)+'/mo';
@@ -27991,7 +28002,7 @@ function trackerData(){
   return d;
 }
 function refreshTracker(force){fcSync();var d=trackerData();if(!d.nw.length)return;var sig=JSON.stringify(d);if(sig===trkLast&&!force)return;trkLast=sig;trk.setData(d);if(!trkRead.textContent||/^Today/.test(trkRead.textContent))trkRead.textContent=trkToday()}
-function refresh(){try{refreshHero()}catch(e){console.warn('nw3d scene',e)}try{refreshTracker()}catch(e){console.warn('nw3d tracker',e)}}
+function refresh(){try{refreshHero()}catch(e){console.warn('nw3d scene',e);heroLast=''}try{refreshTracker()}catch(e){console.warn('nw3d tracker',e);trkLast=''}}
 
 /* ── the view switch: 3D first, Graph one tap away, the choice remembered on this device ── */
 function getMain(){try{return localStorage.getItem('vi-nw-main')==='graph'?'graph':'3d'}catch(e){return '3d'}}
@@ -28020,6 +28031,12 @@ function disable(){   // back to the classic card exactly as it was built
 window.nw3d={hero:heroEng,tracker:trk,setMain:setMain,main:curMain,sceneData:sceneData,trackerData:trackerData,refresh:refresh,disable:disable};
 fcSync();
 if(document.readyState==='complete')setTimeout(refresh,50);else window.addEventListener('load',function(){setTimeout(refresh,50)});
+/* safety net (owner, 31 Oct: the scene was empty on opening the app again). A refresh is forced, and the stage kicked, a moment after
+   load, when the page comes back from the background or the back-forward cache, and whenever the last draw found no data. */
+function rescue(){heroLast='';trkLast='';refresh();try{heroEng.kick()}catch(e){}}
+[600,1800,4500].forEach(function(ms){setTimeout(function(){if(!heroLast||!document.getElementById('nw3d-hero-cv').dataset.net)rescue();else try{heroEng.kick()}catch(e){}},ms)});
+window.addEventListener('pageshow',function(e){if(e.persisted)rescue()});
+document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(rescue,60)});
 };
 if(nw3dFlag())window.nw3dMount();
 })();

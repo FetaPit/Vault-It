@@ -119,7 +119,13 @@ The UK market has also shrunk: Money Dashboard closed in 2023 and Moneyhub's con
 | Pioneer monthly | £5.99 a month | `price_1TdPy79mgKf6Hnty9GNgtoIp` | https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00 | `?upgraded=1&plan=monthly` |
 | Pioneer yearly | £49.99 a year | `price_1UWalp9mgKf6HntyQzc6DFgy` (`pioneer_yearly`) | https://buy.stripe.com/dRm3cp6Pccff2mFa102VG02 | `?upgraded=1&plan=yearly` |
 | Pioneer monthly, beta tester | £3.99 a month (£2 off) | `price_1UWalr9mgKf6Hntyo8fCeWYH` (`pioneer_monthly_tester`) | https://buy.stripe.com/6oUeV7b5sbbb7GZ6OO2VG03 | `?upgraded=1&plan=monthly` |
-| Pioneer yearly, beta tester | £21.99 a year (£28 off) | `price_1UWalt9mgKf6Hntyj2Fu1WLO` (`pioneer_yearly_tester`) | https://buy.stripe.com/9B63cp0qObbb2mF6OO2VG04 | `?upgraded=1&plan=yearly` |
+| Pioneer yearly, beta tester | £39.99 a year (£10 off; was £21.99 until 31 Oct pm) | `price_1UWeLL9mgKf6HntydosAUcXr` (`pioneer_yearly_tester`) | https://buy.stripe.com/3cI8wJ0qO9337GZa102VG06 | `?upgraded=1&plan=yearly` |
+| Founding Member, beta tester | £99 once (£50 off), same 100-place cap | `price_1UWeLN9mgKf6Hnty3Rboi2or` (`founding_member_tester`) | https://buy.stripe.com/bJe3cpc9w4MN8L31uu2VG07 | `?founded=1` |
 | Founding Member | £149 once, Stripe stops the link after 100 payments | `price_1UWam79mgKf6HntyipUcP8oo` (`founding_member`, product `prod_VXg87aVvQj3qUJ`) | https://buy.stripe.com/eVq28l0qO6UV3qJc982VG05 | `?founded=1` |
 
-Switched off: the £59.99 yearly link (`plink_1TdPyH9mgKf6Hnty9IT0ARfh`). Still in the account, unused: the old "Vault·It Pro" £4.99 / £39.99 prices and the "Vault·It Free" product; archive them from the Dashboard when convenient. The app appends `prefilled_email` and `client_reference_id` (the account id) to every link so the webhook (secure paid gateway, live 31 Oct: endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` → Supabase `stripe-webhook`) can match a payment to an account.
+Switched off: the £59.99 yearly link (`plink_1TdPyH9mgKf6Hnty9IT0ARfh`) and the £21.99 tester yearly link (`plink_1UWamF9mgKf6Hnty4WkoKDk4`, 31 Oct pm). Still in the account, unused: the old "Vault·It Pro" £4.99 / £39.99 prices and the "Vault·It Free" product; archive them from the Dashboard when convenient. The app appends `prefilled_email` and `client_reference_id` (the account id) to every link so the webhook (secure paid gateway, live 31 Oct: endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` → Supabase `stripe-webhook`) can match a payment to an account.
+
+
+## Decided by Pete (31 Oct 2026, afternoon)
+
+- Testers use the app free for their 30 days in return for detailed feedback. After that: **£3.99 a month, £39.99 a year** (was £21.99) or **Founding Member £99** (£50 off), each shown with the full price struck through. Full prices stay £5.99 / £49.99 / £149. The webhook maps the new links and prices.
