@@ -8,7 +8,7 @@ Nothing changes in the app until you answer the four questions at the end.
 
 - **Free tier as coded**: 3 assets, 2 liabilities, 1 debt (`FREE_LIMITS`). Pro-gated: the house build itself (free users see a 4% build, deposits still save), Entrepreneur tab, Achievements (blurred), Net worth history, own 3D design and AI model generation, export and projections (Settings copy). Metals, cash flow and the 3D net worth are not gated.
 - **The pop-up** (`#pro-offer-modal`) shows Free / Pro / Founder. Its Free column lists "House builder, Entrepreneur, NW History, 3D Vault" as free, which contradicts the gates above. Stripe: the monthly link is live; the annual and Founding links are blank, so those buttons say the plan opens shortly.
-- **Paid status** is set on the device (`vi_pioneer` / `is_pioneer`), so it is self-declared until a Stripe webhook exists.
+- **Paid status** is set on the device (`vi_pioneer` / `is_pioneer`), so it is self-declared until the Stripe webhook goes live (built 31 Oct, section 11).
 - **Cost**: about £0.005 a month per typical user; fixed costs about £37.50 a month before VAT once on Supabase Pro, Workers Paid and Resend Pro. The AI screenshot reader is the only cost that grows (capped monthly: free 3, Pioneer 30, Founder 10).
 
 ## 2. Freemium or not
@@ -135,3 +135,11 @@ The old caps (3 assets, 2 liabilities, 1 debt) go. The house build is never behi
 - Earlier buyers with no plan recorded count as paid. The yearly extras that remain are early access and roadmap voting.
 - **House builder look: the screen recording is the target.** The brand build switches ON by default (the classic viewer stays as the Settings switch); the remaining gaps (control buttons in a row at the top right, caption text) are fixed in the house style item.
 - **Secure paid gateway:** every address confirmed on the waitlist is a beta tester; Pete reconciles paid profiles against Stripe before any self-declared row is cleared.
+
+## 11. Secure paid gateway, as built (31 Oct 2026, not yet live)
+
+- **Server side:** migration 011 adds `plan`, `paid_at`, `paid_until`, `stripe_customer_id`, `stripe_subscription_id`, `stripe_synced_at` and `is_beta` to `profiles`, with a trigger that keeps the browser from changing any of them (or `is_pioneer` / `is_founder`). The `stripe-webhook` function verifies Stripe's signature and applies each event once through `stripe_apply`; out-of-order and old-subscription events are skipped; a founder stays paid for good. `is_beta` is set for every address confirmed on the waitlist, now and when an address confirms later.
+- **App side:** once the server has the new columns, the profile is the only source of paid status. The device mirrors it both ways, the Stripe return URL only starts a "confirming your payment" wait, "Verify your purchase" asks the server, and paid status is no longer synced through the vault. On an older server the app behaves as before, so it can be released before or after the migration.
+- **Earlier buyers:** Stripe had no completed checkouts on 31 Oct 2026, so there are no earlier payers to reconcile; any paid flag on a device today is self-declared and is cleared by the profile once the gateway is live.
+- **Go-live needs Pete's yes:** apply migration 011, deploy `stripe-webhook`, add the endpoint in Stripe and set `STRIPE_WEBHOOK_SECRET` (steps in `supabase/functions/README.md`), then release the app. The privacy notice now names Stripe and the plan record, so release the app after the webhook is live.
+- Still client-side only: the paid-only design tools (upload / generate a 3D house). The AI reader allowance is enforced on the server from `is_pioneer` / `is_founder`, which are now trustworthy.

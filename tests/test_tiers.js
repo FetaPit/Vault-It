@@ -4,7 +4,7 @@
 //      touch nothing; paid (vi_pioneer) they pass the gate; an ended account is blocked by read-only first
 //   3. every preset house type can be chosen in the trial; the house build follows the real progress (no teaser)
 //   4. read-only also stops Level 2 purchase, Level 3 unlock and a version restore
-//   5. the plan is recorded from the Stripe return (?upgraded=1&plan=yearly, ?founded=1) and viTier() reads it; a paid account with
+//   5. viTier() reads the recorded plan (monthly, yearly, founder); a paid account with
 //      no plan counts as yearly; the AI reader allowance line says 3 / 30 / 10
 // Run: node tests/test_tiers.js
 const { chromium } = require('playwright');
@@ -68,13 +68,14 @@ const seed = (o) => {
   await p.context().close();
 
   // ── 5. the plan from the Stripe return ──
-  p = await open({}, '?upgraded=1&plan=yearly');
-  let pl = await p.evaluate(() => ({ plan: viPlan(), tier: viTier(), inKeys: _VAULT_KEYS.indexOf('vi_plan') >= 0 && VI_KEYS_EARLY.indexOf('vi_plan') >= 0, url: location.search }));
-  ok(pl.plan === 'yearly' && pl.tier === 'yearly' && pl.inKeys && pl.url === '', '?upgraded=1&plan=yearly records the yearly plan (synced key) and cleans the URL');
+  // (how the plan arrives, from Stripe through the profile or on an older server from the return URL, is test_paid_gateway.js)
+  p = await open({ paid: true, plan: 'yearly' });
+  let pl = await p.evaluate(() => ({ plan: viPlan(), tier: viTier(), early: VI_KEYS_EARLY.indexOf('vi_plan') >= 0 }));
+  ok(pl.plan === 'yearly' && pl.tier === 'yearly' && pl.early, 'a yearly plan reads as yearly (and the key is cleaned on load)');
   await p.context().close();
-  p = await open({}, '?founded=1');
+  p = await open({ paid: true, plan: 'founder', founder: true });
   pl = await p.evaluate(() => ({ plan: viPlan(), tier: viTier(), allow: viShotAllowance() }));
-  ok(pl.plan === 'founder' && pl.tier === 'founder' && /^10 /.test(pl.allow), '?founded=1 records the Founding plan; allowance 10');
+  ok(pl.plan === 'founder' && pl.tier === 'founder' && /^10 /.test(pl.allow), 'a Founding Member reads as founder; allowance 10');
   await p.context().close();
   p = await open({ paid: true, plan: 'monthly' });
   pl = await p.evaluate(() => ({ tier: viTier(), can: viCan('design') }));

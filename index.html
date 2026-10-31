@@ -14297,11 +14297,11 @@ function addSnapshot() {if(viBlockEdit())return;
 // TOAST (shared)
 // ═══════════════════════════════════════════════════════════════
 var _toastT;
-function showToast(msg) {
+function showToast(msg, ms) {
   var t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   clearTimeout(_toastT);
-  _toastT = setTimeout(function() { t.classList.remove('show'); }, 3000);
+  _toastT = setTimeout(function() { t.classList.remove("show"); }, ms || 3000);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -17309,7 +17309,10 @@ var _supaUser   = null;
 var _lsOrig     = Storage.prototype.setItem; // save original before patch
 var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
   'ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history',
-  'vi_settings','vi_user','vi_pioneer','vi_founder','vi_plan','vi_debt','vi_ov'];
+  'vi_settings','vi_user','vi_debt','vi_ov'];
+// Paid status is not user data: it comes from the profile (the server, set by Stripe), never from the synced vault, so an old
+// vault row or a restored version cannot make an account paid (secure paid gateway, migration 011).
+var VI_SERVER_KEYS = ['vi_pioneer','vi_founder','vi_plan'];
 
 // ── SAFE SYNC ─────────────────────────────────────────────────
 // Every edit to a vault key is time-stamped (vi_ts) and queued (vi_dirty) until the cloud confirms it.
@@ -17757,6 +17760,7 @@ async function _hydrateFromSupabase(uid) {
     _hydrating = true;
     try {
       rows.forEach(function(row) {
+        if (VI_SERVER_KEYS.indexOf(row.key) > -1) return;   // older synced copies of paid status: the profile decides
         have[row.key] = 1; _cloudSeen[row.key] = row.value;
         var cloud = (row.value !== null && typeof row.value === 'object') ? JSON.stringify(viCleanDeep(row.value)) : String(row.value);
         var local = localStorage.getItem(row.key);
@@ -17788,15 +17792,49 @@ async function _hydrateFromSupabase(uid) {
   } catch(e) { _hydrating = false; return false; }
 }
 
-async function _syncPioneerFromProfile(uid) {
-  if (!_supaClient) return;
+// ── Paid status from the server (secure paid gateway: migration 011 + the stripe-webhook function) ──
+// Once the server keeps paid status (the profile has the Stripe columns), the profile is the only source: the device mirrors it,
+// up or down, and nothing the browser sets (a URL, an e-mail typed in, a storage flag) makes an account paid. On an older server
+// (the columns are missing) everything works as before, so the app can ship before or after the migration.
+var _viGateway = null;   // null = not known yet · true = the server keeps paid status · false = older server
+var VI_PAID_COLS = 'is_pioneer,is_founder,plan,paid_until,is_beta,stripe_synced_at';
+function _viColumnMissing(err) { return !!err && (err.code === '42703' || err.code === 'PGRST204' || /does not exist|could not find .*column/i.test(err.message || '')); }
+async function viGatewayCheck() {   // works signed out too: an unknown column is an error whatever the row rules return
+  if (_viGateway !== null || !_supaClient) return _viGateway;
+  try { var r = await _supaClient.from('profiles').select('stripe_synced_at').limit(1); if (!r.error) _viGateway = true; else if (_viColumnMissing(r.error)) _viGateway = false; } catch (e) {}
+  return _viGateway;
+}
+function viPaidApply(row) {   // mirror the profile onto this device
+  var was = viPaid(), paid = !!(row.is_pioneer || row.is_founder);
   try {
-    var res = await _supaClient.from('profiles').select('is_pioneer').eq('id', uid).single();
-    if (res.data && res.data.is_pioneer && localStorage.getItem('vi_pioneer') !== 'true') {
-      _lsOrig.call(localStorage, 'vi_pioneer', 'true');
+    if (paid) localStorage.setItem('vi_pioneer', 'true'); else localStorage.removeItem('vi_pioneer');
+    if (row.is_founder) localStorage.setItem('vi_founder', 'true'); else localStorage.removeItem('vi_founder');
+    if (row.plan === 'monthly' || row.plan === 'yearly' || row.plan === 'founder') localStorage.setItem('vi_plan', row.plan); else if (!paid) localStorage.removeItem('vi_plan');
+    if (row.is_beta) localStorage.setItem('vi_beta', 'true');
+    var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
+    if (u && !!u.pro !== paid) { u.pro = paid; localStorage.setItem('vi_user', JSON.stringify(u)); if (typeof _vaultItUser !== 'undefined') _vaultItUser = u; }
+  } catch (e) {}
+  if (paid) {
+    var pend = null; try { pend = localStorage.getItem('vi_pay_pending'); localStorage.removeItem('vi_pay_pending'); } catch (e) {}
+    if (pend && !was) { try { showToast(row.is_founder ? 'Welcome, Founding Member. Your payment is confirmed.' : 'Welcome, Pioneer. Your payment is confirmed.'); } catch (e) {} }
+  }
+  if (was !== paid) { try { if (typeof applyPaywall === 'function') applyPaywall(); } catch (e) {} try { if (typeof renderPioneerCard === 'function') renderPioneerCard(); } catch (e) {} try { if (row.is_founder) viApplyFounderBadge(); } catch (e) {} }
+}
+
+async function _syncPioneerFromProfile(uid) {
+  if (!_supaClient) return null;
+  var row = null;
+  try {
+    var res = await _supaClient.from('profiles').select(VI_PAID_COLS).eq('id', uid).single();
+    if (res && !res.error && res.data) { _viGateway = true; row = res.data; viPaidApply(row); }
+    else if (res && _viColumnMissing(res.error)) {
+      _viGateway = false;   // older server: as before, a paid flag on the profile is copied down
+      var old = await _supaClient.from('profiles').select('is_pioneer').eq('id', uid).single();
+      if (old.data && old.data.is_pioneer && localStorage.getItem('vi_pioneer') !== 'true') _lsOrig.call(localStorage, 'vi_pioneer', 'true');
     }
   } catch(e) {}
   try { viTrialRefresh(); } catch (e) {}   // the account date is known now: the trial line and Settings follow it
+  return row;
 }
 
 async function _initSupabaseSession() {
@@ -18586,16 +18624,17 @@ function _completeAuth(email) {
     try {
       var u = JSON.parse(localStorage.getItem('vi_user') || '{}');
       var s = JSON.parse(localStorage.getItem('vi_settings') || '{}');
-      _supaClient.from('profiles').upsert({
+      var prow = {
         id: _supaUser.id,
         name: u.name || null, phone: u.phone || null,
         job: u.job || null, dream: u.dream || null,
         goal: u.goal || null, save_arch: u.saveArch || null,
         spend_arch: u.spendArch || null,
-        is_pioneer: localStorage.getItem('vi_pioneer') === 'true',
         currency: s.currency || 'GBP',
         updated_at: new Date().toISOString()
-      }, { onConflict: 'id' });
+      };
+      if (_viGateway !== true) prow.is_pioneer = localStorage.getItem('vi_pioneer') === 'true';   // older server only: the server ignores it once it keeps paid status
+      _supaClient.from('profiles').upsert(prow, { onConflict: 'id' });
       _flushDirty();   // push anything not yet confirmed by the cloud
     } catch(e) {}
   }
@@ -22672,49 +22711,50 @@ function dismissPwaBanner() {
   if (banner) banner.style.display = 'none';
 }
 
-function handleOAuthCallback() {
-  // Handle Stripe success redirect
-  var params = new URLSearchParams(window.location.search);
-  if (params.get('upgraded') === '1') {
-    var pl = params.get('plan'); if (pl === 'monthly' || pl === 'yearly') { try { localStorage.setItem('vi_plan', pl); } catch (e) {} }   // which Pioneer plan (the Payment Link's return URL says)
-    window.history.replaceState({}, document.title, window.location.pathname);
-    var u = {};
-    try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
-    u.pro = true;
-    try { localStorage.setItem('vi_user', JSON.stringify(u)); } catch(e) {}
-    localStorage.setItem('vi_pioneer', 'true');
-    if (_supaClient && _supaUser) {
-      _supaClient.from('profiles').upsert(
-        { id: _supaUser.id, is_pioneer: true, updated_at: new Date().toISOString() },
-        { onConflict: 'id' }
-      ).catch(function(){});
-    }
-    if (typeof _vaultItUser !== 'undefined') { _vaultItUser = u; }
-    if (typeof applyPaywall === 'function') applyPaywall();
-    if (typeof renderPioneerCard === 'function') renderPioneerCard();
-    showToast('🎉 Welcome, Pioneer! All modules unlocked.');
-    return;
+// Back from checkout (see handleOAuthCallback). vi_pay_pending remembers it until the server confirms, across reloads and sign-in.
+function viPaymentReturn(plan) {
+  try { localStorage.setItem('vi_pay_pending', JSON.stringify({ plan: plan, t: Date.now() })); } catch (e) {}
+  viPaymentConfirm(plan, 0);
+}
+async function viPaymentConfirm(plan, n) {
+  var gw = await viGatewayCheck();
+  if (gw === false) { try { localStorage.removeItem('vi_pay_pending'); } catch (e) {} return viPaymentLegacy(plan); }
+  if (n === 0) showToast('Thank you. Confirming your payment with Stripe…');
+  if (gw === true && _supaClient && _supaUser) {
+    var row = await _syncPioneerFromProfile(_supaUser.id);
+    if (row && (row.is_pioneer || row.is_founder)) return;   // viPaidApply has welcomed them
   }
-  if (params.get('founded') === '1') {
-    try { localStorage.setItem('vi_plan', 'founder'); } catch (e) {}
+  if (n < 20) { setTimeout(function () { viPaymentConfirm(plan, n + 1); }, 3000); return; }
+  showToast(_supaUser ? 'Your payment is still being confirmed. Your plan appears here as soon as Stripe tells us, usually within a minute. Questions: hello@vault-it.co'
+                      : 'Sign in with the email you paid with and your plan appears. Questions: hello@vault-it.co', 9000);
+}
+function viPaymentLegacy(plan) {   // older server only (no migration 011): the device flag, copied to the profile
+  var u = {};
+  try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
+  u.pro = true; if (plan === 'founder') { u.founder = true; u.founderSince = new Date().toISOString(); }
+  try { localStorage.setItem('vi_user', JSON.stringify(u)); } catch(e) {}
+  try { if (plan) localStorage.setItem('vi_plan', plan); } catch (e) {}
+  localStorage.setItem('vi_pioneer', 'true');
+  if (plan === 'founder') localStorage.setItem('vi_founder', 'true');
+  if (_supaClient && _supaUser) {
+    try { _supaClient.from('profiles').upsert({ id: _supaUser.id, is_pioneer: true, updated_at: new Date().toISOString() }, { onConflict: 'id' }).then(function(){}, function(){}); } catch (e) {}
+  }
+  if (typeof _vaultItUser !== 'undefined') { _vaultItUser = u; }
+  if (typeof applyPaywall === 'function') applyPaywall();
+  if (typeof renderPioneerCard === 'function') renderPioneerCard();
+  if (plan === 'founder') { viApplyFounderBadge(); showToast('⚡ Welcome, Founding Member! Pioneer status locked in permanently.'); }
+  else showToast('🎉 Welcome, Pioneer! All modules unlocked.');
+}
+
+function handleOAuthCallback() {
+  // Back from a Stripe Payment Link. The URL alone proves nothing (anyone can type it): once the server keeps paid status the
+  // app waits for the stripe-webhook to mark the account paid; on an older server it unlocks this device as before.
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('upgraded') === '1' || params.get('founded') === '1') {
+    var pl = params.get('founded') === '1' ? 'founder' : params.get('plan');
+    if (pl !== 'monthly' && pl !== 'yearly' && pl !== 'founder') pl = null;
     window.history.replaceState({}, document.title, window.location.pathname);
-    var u = {};
-    try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
-    u.pro = true; u.founder = true; u.founderSince = new Date().toISOString();
-    try { localStorage.setItem('vi_user', JSON.stringify(u)); } catch(e) {}
-    localStorage.setItem('vi_pioneer', 'true');
-    localStorage.setItem('vi_founder', 'true');
-    if (_supaClient && _supaUser) {
-      _supaClient.from('profiles').upsert(
-        { id: _supaUser.id, is_pioneer: true, updated_at: new Date().toISOString() },
-        { onConflict: 'id' }
-      ).catch(function(){});
-    }
-    if (typeof _vaultItUser !== 'undefined') { _vaultItUser = u; }
-    if (typeof applyPaywall === 'function') applyPaywall();
-    if (typeof renderPioneerCard === 'function') renderPioneerCard();
-    viApplyFounderBadge();
-    showToast('⚡ Welcome, Founding Member! Pioneer status locked in permanently.');
+    viPaymentReturn(pl);
     return;
   }
   var code = params.get('code');
@@ -23021,7 +23061,24 @@ function closeSettings(){
   var sm=document.getElementById('settings-modal');if(sm)sm.style.display='none';
 }
 
-function verifyPioneerPurchase(){
+// "Already upgraded?": once the server keeps paid status this asks it (the account's profile, set by Stripe); a typed e-mail proves nothing.
+async function verifyPioneerPurchase(){
+  var msg=document.getElementById('pw-verify-msg');
+  var say=function(c,t){ if(msg) msg.innerHTML='<span style="color:var('+c+')">'+t+'</span>'; };
+  var gw=await viGatewayCheck();
+  if(gw===true){
+    if(!_supaUser){ say('--re','Sign in with the email you paid with, then check again.'); return; }
+    say('--t2','Checking your account…');
+    var row=await _syncPioneerFromProfile(_supaUser.id);
+    if(row&&(row.is_pioneer||row.is_founder)){ say('--gr','Confirmed: your '+(row.is_founder?'Founding Member':'Pioneer')+' plan is active.'); setTimeout(function(){ closePaywall(); },1400); }
+    else if(row) say('--re','No payment found for this account yet. It can take a minute after checkout. If you paid with a different email, write to hello@vault-it.co and we will link it.');
+    else say('--re','Could not reach Vault-It to check. Try again in a moment.');
+    return;
+  }
+  if(gw===null&&_supaClient){ say('--re','Could not reach Vault-It to check. Try again in a moment.'); return; }
+  verifyPioneerPurchaseLegacy();
+}
+function verifyPioneerPurchaseLegacy(){   // older server only (no migration 011)
   var inp=document.getElementById('pw-verify-email');
   var msg=document.getElementById('pw-verify-msg');
   var entered=(inp?inp.value.trim().toLowerCase():'');
@@ -26375,7 +26432,7 @@ function showLegalModal(title, body) {
   modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(560px,94vw);max-height:86vh;overflow-y:auto;padding:24px 22px;position:relative"><button onclick="document.getElementById(\'legal-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button><div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:14px">'+title+'</div><div style="font-family:\'DM Sans\',sans-serif;font-size:.6rem;color:var(--t2);line-height:1.7">'+body+'</div></div>';
   document.body.appendChild(modal);
 }
-var VI_LEGAL_DATE = '28 October 2026';
+var VI_LEGAL_DATE = '31 October 2026';
 function _lh(t) { return '<p style="color:var(--em);font-weight:700;margin:14px 0 3px">' + t + '</p>'; }
 function showPrivacy() {
   showLegalModal('Privacy notice', [
@@ -26384,7 +26441,8 @@ function showPrivacy() {
     '<p>Vault-It is run by <strong>PT Live Design</strong> (“we”), A57, 11 St Mary’s Street, Lincoln LN5 7EQ. We decide how your personal data is used, which makes us the data controller. For anything about your privacy, email <strong>hello@vault-it.co</strong>.</p>',
     _lh('What we hold, and why'),
     '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Your email address</strong>: to create your account, send you sign-in codes and send service messages about the beta and your account. We do not send marketing unless you opt in.</li>'
-      + '<li><strong>Your profile</strong>: your name, phone number, profession and aspirations, goal, and the saving- and spending-style answers from the set-up questions, plus whether you have upgraded to Pioneer.</li>'
+      + '<li><strong>Your profile</strong>: your name, phone number, profession and aspirations, goal, and the saving- and spending-style answers from the set-up questions.</li>'
+      + '<li><strong>Your plan</strong>: which plan you bought (Pioneer monthly or yearly, or Founding Member), when you paid and when it renews or ends, whether you are a beta tester (an address confirmed on the beta list gets the tester price), and the Stripe customer and subscription references that link a payment to your account. We never see or store your card details.</li>'
       + '<li><strong>The figures you enter</strong>: income, spending, assets, debts, house plans and net-worth history, and anything else you add: notes, small item photos, and the names and contact details of clients or leads if you use that tab (only add other people’s details if you have a good reason to). This is financial information. We use it only to show you your dashboard, roadmap and House Builder and to keep your devices in step. We do not use it for anything else, and we do not sell it. Full-size photos stay on your device.</li>'
       + '<li><strong>Your PIN</strong>: on our server only as a salted, peppered one-way hash; we cannot read it. Your browser keeps just a marker that a PIN is set, not the PIN or anything derived from it.</li>'
       + '<li><strong>Security records</strong>: sign-in times, IP addresses and failed-attempt counters, and short-lived hashed counters that block abuse. We keep these because it is in our legitimate interest, and yours, to keep accounts safe.</li>'
@@ -26394,6 +26452,7 @@ function showPrivacy() {
     _lh('Who else handles it'),
     '<p>These companies process data for us, only to run Vault-It:</p>',
     '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Supabase</strong>: database and sign-in, hosted in the EU (Frankfurt), and the server functions, which run on Supabase’s network and may run outside the EU.</li>'
+      + '<li><strong>Stripe</strong>: takes payments for Pioneer and Founding Member. When you pay, Stripe receives your email address, your card details and your Vault-It account reference, and sends our server a signed record of the payment (the plan, and when it renews or ends).</li>'
       + '<li><strong>Resend</strong>: delivers your sign-in emails (your email address and the code) and the beta-list emails. If it is unavailable, Supabase’s own mailer is used for sign-in emails instead.</li>'
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',

@@ -161,3 +161,28 @@ address. Tables and inline styles only; no web fonts or images, so nothing is fe
 named first in the font stacks and used where installed). The shell is pasted into each function rather than imported, because the server tests
 transform each `index.ts` on its own. Preview: `node shots/_email_preview.js` after copying it from the session scratchpad, or render the
 functions' HTML with the tests' esbuild stub. Deploying the three functions is a production change and needs the owner's explicit yes.
+
+## stripe-webhook (secure paid gateway)
+
+The only way an account becomes paid. Stripe sends payment events here; the function checks the `Stripe-Signature` header
+(HMAC-SHA256 with the endpoint's signing secret, 5-minute window) before reading anything, then applies the event once through
+`stripe_apply` (migration 011). The browser can no longer set `is_pioneer`, `is_founder`, `plan`, `paid_until`, `is_beta` or the
+Stripe ids on its profile: a trigger silently keeps the server's values.
+
+Handled: `checkout.session.completed` and `checkout.session.async_payment_succeeded` (the account comes from `client_reference_id`,
+which the app adds to every Payment Link; else the Stripe customer; else the checkout e-mail), `customer.subscription.created`,
+`.updated`, `.deleted` (renewals, late payments, cancellations). The plan comes from the Payment Link id, then the link's
+`metadata.plan`, then the price. Test-mode events are ignored unless `STRIPE_ALLOW_TEST=1`.
+
+**Go-live order (needs Pete's yes; production database and functions):**
+1. Apply `supabase/migrations/011_paid_gateway.sql`.
+2. Deploy: `supabase functions deploy stripe-webhook --no-verify-jwt` (Stripe sends no Supabase token; the signature is the check).
+3. Stripe Dashboard → Developers → Webhooks → Add endpoint `https://legpubblzgknxdtvsant.supabase.co/functions/v1/stripe-webhook`,
+   events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.created`,
+   `customer.subscription.updated`, `customer.subscription.deleted`. Copy its signing secret (`whsec_…`).
+4. `supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_…` (comma-separate two while rotating).
+5. Release the app (it detects the new columns and switches to the profile by itself; on an older server it behaves as before).
+6. Check: `select id, kind, result, received_at from stripe_events order by received_at desc limit 20;` A `no_user` row has the
+   checkout e-mail so it can be linked by hand: `update profiles set is_pioneer = true, plan = 'monthly' where id = '…';`
+
+Tests: `tests/test_011.mjs` (database, real Postgres), `tests/test_stripe_server.js` (function), `tests/test_paid_gateway.js` (app).
