@@ -10058,6 +10058,7 @@ button.bd-ic{cursor:pointer}
 .inv-hint{font-size:.52rem;color:var(--t2);line-height:1.5}
 .i3d-stage{touch-action:none}
 .i3d-stage canvas.i3d-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none}
+.wi-img-area .i3d-live{position:absolute;inset:0;z-index:2}.wi-img-area .i3d-live canvas{width:100%!important;height:100%!important;cursor:grab;display:block}
 .wi-img-area img.i3d-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;cursor:zoom-in}
 .i3d-badge{border-color:rgb(var(--green-rgb) / .6)!important;background:rgb(var(--green-rgb) / .18)!important;color:var(--green)!important}
 .i3d-btn{font-family:'Share Tech Mono',monospace;font-size:.6rem;font-weight:700;color:var(--green)}
@@ -21216,8 +21217,8 @@ function invZoom(d){if(_invSpin)_invSpin.setZoom(_invSpin.zoom+d);}
 
 // ═══════════════════════════════════════════════════════════════
 // ITEM 3D MODELS (wealth inventory and liabilities)
-// One viewer for both: Night stage in both modes, orbit / rotate / zoom, and every model gets the same
-// subtle green tint so a library model, an upload and a photo-made model all look like one set.
+// One viewer for both: Night stage in both modes, orbit / rotate / zoom, neutral white light so every model
+// shows its own colours and textures (owner, 31 Oct: the green tint is gone).
 // The .glb file stays on this device (IndexedDB, next to the photos); the item keeps only a small preview
 // picture and where the model came from (plus the credit line for CC-BY models).
 // Library models (Poly Pizza) are a test path for now: ?modeltest=1 turns it on for this browser.
@@ -21266,21 +21267,21 @@ function i3dParse(buf){
   return new Promise(function(res,rej){viThree(res,function(){rej(new Error('The 3D engine could not be downloaded. Check the connection and try again.'));});}).then(_hbGltfLoader).then(function(G){return new Promise(function(res,rej){try{new G().parse(buf,'',function(g){res(g.scene||(g.scenes&&g.scenes[0]));},function(e){rej(new Error('Could not read that 3D file'+(e&&e.message?': '+e.message:'.')));});}catch(e){rej(e);}});});
 }
 // the house style: same green on every model, lightly
-var I3D_TINT=0.16,I3D_GLOW=0.07;
 // colours as the house viewer gives them (sRGB hex to the renderer's linear space)
 function i3dCol(h){return new THREE.Color(h).convertSRGBToLinear();}
+/* owner, 31 Oct: no green tint; every model shows its own colours and textures. Oversized textures are scaled down once (2048 px,
+   1024 on touch devices) so a big upload does not stall the page or run a phone out of graphics memory. */
+function i3dSlimTex(t,max){
+  var im=t&&t.image;if(!im||t.userData.i3dSlim)return;var w=im.width||0,h=im.height||0;if(!(w>max||h>max))return;
+  try{var k=max/Math.max(w,h),c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);t.image=c;t.needsUpdate=true;t.userData.i3dSlim=true;}catch(e){}
+}
 function i3dStyle(obj){
-  var G=i3dCol(0x3ECF8E),n=0;
+  var n=0,max=viCoarse()?1024:2048;
   obj.traverse(function(o){
     if(!o.isMesh)return;n++;
-    var ms=Array.isArray(o.material)?o.material:[o.material];
-    var out=ms.map(function(m){
-      if(!m)return m;m=m.clone();
-      if(m.color)m.color.lerp(G,I3D_TINT);
-      if(m.emissive){m.emissive=G.clone();m.emissiveIntensity=I3D_GLOW;}
-      m.userData.i3dTint=true;return m;
-    });
-    o.material=Array.isArray(o.material)?out:out[0];
+    (Array.isArray(o.material)?o.material:[o.material]).forEach(function(m){if(!m)return;
+      ['map','normalMap','roughnessMap','metalnessMap','emissiveMap','aoMap'].forEach(function(k){if(m[k])i3dSlimTex(m[k],max)});});
     o.castShadow=true;o.receiveShadow=true;
   });
   return n;
@@ -21298,15 +21299,16 @@ function I3DView(host,obj,opts){
   var r=this.r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:false,preserveDrawingBuffer:!!opts.still});
   r.setPixelRatio(viGlDpr(host));r.setSize(w,h,false);
   r.domElement.addEventListener('webglcontextlost',function(e){e.preventDefault();self._lost=true;});r.domElement.addEventListener('webglcontextrestored',function(){self._lost=false;});
-  r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;
-  r.shadowMap.enabled=true;r.shadowMap.type=viCoarse()?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;   // touch devices: the cheaper filter and a smaller map
+  r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.NoToneMapping;   // the model's own colours, not a film curve (owner, 31 Oct)
+  r.shadowMap.enabled=!opts.still;r.shadowMap.type=THREE.PCFShadowMap;   // the still preview needs no shadows; the cheaper filter everywhere
   var cv=r.domElement;cv.className='i3d-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',opts.label||'3D model');
   host.insertBefore(cv,host.firstChild);
   var sc=this.sc=new THREE.Scene();sc.background=new THREE.Color(0x05101b);sc.fog=new THREE.Fog(0x05101b,9,26);
-  sc.add(new THREE.HemisphereLight(i3dCol(0xa8dcd6),i3dCol(0x10302e),0.75));
-  var key=new THREE.DirectionalLight(i3dCol(0xfff0de),1.15);key.position.set(3,6,4);key.castShadow=true;var kms=viCoarse()?512:1024;key.shadow.mapSize.set(kms,kms);key.shadow.bias=-0.0005;sc.add(key);
-  var fill=new THREE.DirectionalLight(i3dCol(0x6fb8d8),0.35);fill.position.set(-4,3,-2);sc.add(fill);
-  var rim=new THREE.DirectionalLight(i3dCol(0x3ECF8E),0.55);rim.position.set(-2,3,-5);sc.add(rim);
+  /* neutral white light, so nothing tints the model (the stage keeps the brand floor and grid) */
+  sc.add(new THREE.HemisphereLight(0xffffff,0x3a3a3a,0.9));
+  var key=new THREE.DirectionalLight(0xffffff,1.1);key.position.set(3,6,4);key.castShadow=!opts.still;var kms=viCoarse()?512:1024;key.shadow.mapSize.set(kms,kms);key.shadow.bias=-0.0005;sc.add(key);
+  var fill=new THREE.DirectionalLight(0xffffff,0.35);fill.position.set(-4,3,-2);sc.add(fill);
+  var rim=new THREE.DirectionalLight(0xffffff,0.3);rim.position.set(-2,3,-5);sc.add(rim);
   var ground=new THREE.Mesh(new THREE.CircleBufferGeometry(30,48),new THREE.MeshStandardMaterial({color:i3dCol(0x0c1a20),roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;sc.add(ground);
   var grid=new THREE.GridHelper(24,48,i3dCol(0x1f5e5a),i3dCol(0x123734));grid.material.transparent=true;grid.material.opacity=0.35;grid.position.y=0.002;sc.add(grid);
   this.tinted=i3dStyle(obj);var bb=i3dFit(obj);sc.add(obj);this.obj=obj;
@@ -21347,17 +21349,21 @@ I3DView.prototype.dispose=function(){
 // small still picture for the tile (one short-lived renderer, so tiles never hold WebGL contexts)
 function i3dThumb(obj){
   var d=document.createElement('div');d.style.cssText='position:fixed;left:-9999px;top:0;width:240px;height:240px';document.body.appendChild(d);
-  try{var v=new I3DView(d,obj,{still:true});var url=v.r.domElement.toDataURL('image/jpeg',0.78);v.dispose();return url;}finally{d.remove();}
+  try{var v=new I3DView(d,obj,{still:true});var url=v.r.domElement.toDataURL('image/jpeg',0.78);v.sc.remove(obj);v.dispose();return url;}finally{d.remove();}
 }
 // save a model (ArrayBuffer) on an item
 async function i3dSave(kind,id,buf,meta){
   var it=i3dItem(kind,id);if(!it)return;
+  var tick=function(){return new Promise(function(r){requestAnimationFrame(function(){setTimeout(r,0)})})};
+  i3dMsg('Reading the model…');await tick();
   var obj=await i3dParse(buf.slice(0));
+  i3dMsg('Saving it on this device…');await tick();
   await i3dPut(kind,id,buf);
+  i3dStyle(obj);await tick();
   it.model=Object.assign({},meta,{thumb:i3dThumb(obj),at:Date.now()});
-  saveAL();renderAlTab();return it.model;
+  saveAL();renderAlTab();_i3dReady={kind:kind,id:id,obj:obj};return it.model;
 }
-var _i3dView=null,_i3dBusy=false;
+var _i3dView=null,_i3dBusy=false,_i3dReady=null;   // _i3dReady: the model just saved, already read, so the viewer does not read it twice
 function i3dClose(){var o=document.getElementById('i3d-modal');if(o)o.remove();if(_i3dView){_i3dView.dispose();_i3dView=null;}}
 function i3dMsg(t,bad){var e=document.getElementById('i3d-msg');if(e){e.textContent=t||'';e.className='i3d-msg'+(bad?' bad':'');}}
 function i3dShell(title,sub){
@@ -21371,6 +21377,7 @@ function i3dShell(title,sub){
 }
 // open the viewer for an item that has a model
 async function i3dOpen(kind,id){
+  i3dLiveStop();
   var it=i3dItem(kind,id);if(!it||!it.model)return i3dPick(kind,id);
   var m=it.model,val=kind==='li'?(typeof depreciatedValue==='function'?depreciatedValue(it):it.value):it.value;
   var body=i3dShell(it.name,'£'+Math.round(val||0).toLocaleString('en-GB')+' · 3D model'+(m.src==='pp'?' from Poly Pizza':' (your file)'));
@@ -21379,10 +21386,13 @@ async function i3dOpen(kind,id){
     +'<div class="inv-hint">Drag to rotate · pinch or scroll to zoom · two fingers or right-drag to move.'+(m.lic==='CC-BY'?'<br><span class="i3d-credit">'+cfEsc(i3dCredit(m))+'</span>':m.src==='pp'?'<br><span class="i3d-credit">"'+cfEsc(m.t)+'" by '+cfEsc(m.by)+' (CC0) via Poly Pizza</span>':'')+'</div>'
     +'<div class="i3d-row"><button class="dep-btn" onclick="i3dPick(\''+kind+'\','+id+')">Change model</button><button class="dep-btn" onclick="i3dRemove(\''+kind+'\','+id+')">Remove model</button>'+(kind==='wi'&&(it.photos||0)>=1?'<button class="dep-btn" onclick="i3dClose();invOpenViewer('+id+')">Photos</button>':'')+'</div>';
   try{
-    var buf=await i3dGetBuf(kind,id);
-    if(!buf&&m.src==='pp'){i3dMsg('Downloading the model from Poly Pizza…');buf=await i3dFetchLib(m);await i3dPut(kind,id,buf);i3dMsg('');}
-    if(!buf)throw new Error('The 3D file is on the device you added it from. Upload it again here to see it on this device.');
-    var obj=await i3dParse(buf.slice(0)),st=document.getElementById('i3d-stage');if(!st)return;
+    var obj=null,pre=_i3dReady;_i3dReady=null;
+    if(pre&&pre.kind===kind&&pre.id===id)obj=pre.obj;
+    else{var buf=await i3dGetBuf(kind,id);
+      if(!buf&&m.src==='pp'){i3dMsg('Downloading the model from Poly Pizza…');buf=await i3dFetchLib(m);await i3dPut(kind,id,buf);i3dMsg('');}
+      if(!buf)throw new Error('The 3D file is on the device you added it from. Upload it again here to see it on this device.');
+      obj=await i3dParse(buf.slice(0));}
+    var st=document.getElementById('i3d-stage');if(!st)return;
     var w=document.getElementById('i3d-wait');w&&w.remove();
     _i3dView=new I3DView(st,obj,{label:'3D model of '+it.name});
     _i3dView.onAuto=function(on){var b=document.getElementById('i3d-auto');b&&b.setAttribute('aria-pressed',on?'true':'false');};
@@ -21423,8 +21433,29 @@ function i3dRemove(kind,id){var it=i3dItem(kind,id);if(!it)return;delete it.mode
 // tile markup shared by both lists
 function i3dTile(kind,it){
   var m=it.model;if(!m||!m.thumb)return '';
-  return '<img class="i3d-thumb" src="'+m.thumb+'" alt="3D model of '+cfEsc(it.name)+'" onclick="i3dOpen(\''+kind+'\','+it.id+')"><span class="inv-badge i3d-badge" title="'+cfEsc(i3dCredit(m)||m.t||'')+'">3D</span>';
+  return '<img class="i3d-thumb" src="'+m.thumb+'" alt="3D model of '+cfEsc(it.name)+'" onclick="i3dOpen(\''+kind+'\','+it.id+')" onmouseenter="i3dLive(\''+kind+'\','+it.id+',this)"><span class="inv-badge i3d-badge" title="'+cfEsc(i3dCredit(m)||m.t||'')+'">3D</span>';
 }
+/* desktop (owner, 31 Oct): an item's 3D model turns in its own tile. Hovering a model tile swaps the still picture for a live view
+   (one tile at a time, so only one 3D canvas is ever open); click and drag orbits round the item, a click without a drag opens the
+   full viewer. The wheel is left to the page. Touch screens keep the picture and open the viewer on a tap. */
+var _i3dLive=null;
+function i3dLiveStop(){var r=_i3dLive;_i3dLive=null;if(!r)return;try{r.view&&r.view.dispose()}catch(e){}if(r.host)r.host.remove();if(r.img)r.img.style.visibility='';}
+function i3dLive(kind,id,img){
+  if(!window.matchMedia||!matchMedia('(hover: hover) and (pointer: fine)').matches||!viGlOk())return;
+  var key=kind+':'+id;if(_i3dLive&&_i3dLive.key===key&&_i3dLive.area.isConnected)return;
+  i3dLiveStop();var area=img.parentNode,rec={key:key,area:area,img:img};_i3dLive=rec;
+  i3dGetBuf(kind,id).then(function(buf){return _i3dLive===rec&&buf?i3dParse(buf.slice(0)):null}).then(function(obj){
+    if(!obj||_i3dLive!==rec||!area.isConnected)return;
+    var host=document.createElement('div');host.className='i3d-live';area.appendChild(host);rec.host=host;
+    var it=i3dItem(kind,id);rec.view=new I3DView(host,obj,{auto:false,label:'3D model of '+(it?it.name:'the item')+'. Drag to turn it round, click to open it.'});
+    rec.view.ctl.enableZoom=false;rec.view.ctl.enablePan=false;
+    var cv=rec.view.r.domElement,d0=null;
+    cv.addEventListener('pointerdown',function(e){d0=[e.clientX,e.clientY]});
+    cv.addEventListener('pointerup',function(e){if(d0&&Math.hypot(e.clientX-d0[0],e.clientY-d0[1])<4)i3dOpen(kind,id);d0=null});
+    img.style.visibility='hidden';
+  }).catch(function(){if(_i3dLive===rec)_i3dLive=null;});
+}
+(function(){var _rat=window.renderAlTab;if(typeof _rat==='function')window.renderAlTab=renderAlTab=function(){i3dLiveStop();return _rat.apply(this,arguments)};})();
 
 function wiSearch(id){
   var a=(alState.otherAssets||[]).find(function(x){return x.id===id;});

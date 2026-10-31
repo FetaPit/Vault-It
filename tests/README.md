@@ -36,6 +36,7 @@ node tests/test_ov_tiles.js           # Round 3: forecast note says what it rest
 node tests/test_bd_flow3d.js          # Round 3: income flow at the top of Budget, light teal divider running on from it, Flow | 3D tree map (areas in proportion, rises in, reduced motion finished)
 node tests/test_inv_preview.js         # Round 3: the item viewer shows the saved preview when the full photos are on another device; tapping the picture opens it
 node tests/test_crypto_live.js         # Round 3: crypto prices fetched by themselves (CoinGecko mocked), tokens held, price source and age, bigger icons, last price kept on failure
+node tests/test_i3d_live.js           # Round 3: desktop, hover a model tile to orbit it by click and drag (one live view), click opens the viewer; touch keeps the picture
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width
 node tests/test_nw3d.js            # net worth in 3D (on by default): flag off unchanged, 3D | Graph toggle, same numbers in both views, debts grouped by kind (cards stacked in one column, each in its own colour), zoom buttons / ctrl+wheel / reset (VI_APP=file:///… to test another copy)
 ```

@@ -1,5 +1,5 @@
 // Item 3D models for the wealth inventory and liabilities: upload a .glb, the Night viewer (orbit, zoom, reset),
-// the same green tint on every model, the preview on the tile, the Poly Pizza library test path (?modeltest=1)
+// each model in its own colours (no tint, owner 31 Oct), the preview on the tile, the Poly Pizza library test path (?modeltest=1)
 // with the CDN mocked (ok and bot-check refusal), remove, and clean-up when an item is deleted.
 // Run: node tests/test_item3d.js
 const { chromium } = require('playwright');
@@ -54,11 +54,11 @@ const idbHas = (p, key) => p.evaluate(k => invTx('readonly', s => s.get(k)).then
     await p.waitForFunction(() => window._i3dView && _i3dView.ctl, null, { timeout: 15000 }).catch(() => {});
     const v = await p.evaluate(() => { const V = _i3dView, it = i3dItem('wi', 11); let mat = null; V.obj.traverse(o => { if (o.isMesh) mat = o.material; });
       const st = document.getElementById('i3d-stage'), cs = getComputedStyle(st);
-      return { ctl: !!(V.ctl && V.ctl.enableDamping), bg: V.sc.background.getHexString(), g: mat.color.g, r: mat.color.r, tinted: !!mat.userData.i3dTint, em: mat.emissive.getHexString() === i3dCol(0x3ECF8E).getHexString(),
+      return { ctl: !!(V.ctl && V.ctl.enableDamping), bg: V.sc.background.getHexString(), g: mat.color.g, r: mat.color.r, b: mat.color.b, tinted: !!mat.userData.i3dTint, em: mat.emissive.getHexString(), tm: V.r.toneMapping === THREE.NoToneMapping,
         thumb: (it.model.thumb || '').slice(0, 22), src: it.model.src, stageBg: cs.getPropertyValue('--bg').trim(), canvas: !!st.querySelector('canvas.i3d-canvas'), auto: V.ctl.autoRotate }; });
     ok(v.canvas && v.ctl, theme + ': viewer opens with orbit controls');
     ok(v.bg === '05101b' && v.stageBg.toUpperCase() === '#080808', theme + ': viewer keeps the Night stage (' + v.bg + ', ' + v.stageBg + ')');
-    ok(v.tinted && v.g > 0.05 && v.r > 0.6 && v.em, theme + ': model gets the subtle green tint (r ' + v.r.toFixed(2) + ' g ' + v.g.toFixed(2) + ')');
+    ok(!v.tinted && v.r === 1 && v.g === 0 && v.b === 0 && v.em === '000000' && v.tm, theme + ': the model keeps its own colour, no green tint or glow, no film curve (owner, 31 Oct) (r ' + v.r + ' g ' + v.g + ' b ' + v.b + ', emissive ' + v.em + ')');
     ok(v.thumb === 'data:image/jpeg;base64' && v.src === 'file', theme + ': tile preview picture saved with the item');
     ok(await idbHas(p, 'm:wi:11'), theme + ': the .glb is kept on the device');
     const z = await p.evaluate(() => { const V = _i3dView, d0 = V.cam.position.distanceTo(V.ctl.target); V.zoom(0.8); const d1 = V.cam.position.distanceTo(V.ctl.target); V.reset(); const d2 = V.cam.position.distanceTo(V.ctl.target); return { d0, d1, d2 }; });
