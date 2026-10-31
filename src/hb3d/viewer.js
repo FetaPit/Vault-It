@@ -257,7 +257,7 @@
     var w = Math.max(1, container.clientWidth), h = Math.max(1, container.clientHeight);
     var r = this.renderer = new THREE.WebGLRenderer({ antialias: !opts.mobile, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.preserve });   // touch devices: no MSAA (the pixel ratio covers it; MSAA on a big phone canvas is what loses the context)
     var me = this;   // brand look (house flag): pixel ratio capped at 1.5 below 700 px wide, 2 above (brand handover 6.10)
-    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, me.brand ? (me._bLite ? 1 : w < 700 ? 1.5 : 2) : 9, Math.sqrt(budget / Math.max(1, w * h)))); };
+    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, me.brand ? (me._bLite ? 1 : w < 700 ? 1.25 : 1.5) : 9, Math.sqrt(budget / Math.max(1, w * h)))); };
     r.setPixelRatio(this._dprFor(w, h));
     r.setSize(w, h, false);
     r.outputEncoding = THREE.sRGBEncoding;
@@ -303,13 +303,19 @@
     this._loop = function () {
       self._raf = 0;
       if (!self.active || self.offscreen || document.hidden) { self._lastT = 0; return; }   // off screen or in a background tab: sleep (woken when seen again)
+      // brand: what a drawn frame really cost is the gap until the browser gives us the next frame (the GPU work lands after render() returns)
+      if (self.brand && self._bDrewAt) { var fc = performance.now() - self._bDrewAt; self._bCost = self._bCost == null ? fc : self._bCost * 0.6 + fc * 0.4; self._bDrewAt = 0; self._bGap = Math.max(80, Math.min(1500, self._bCost * 2.2)); }
       var moving = self.controls.update();
       if (self._anim) moving = self._stepAnim() || moving;
       if (self._fly) moving = self._stepFly() || moving;
       if (self._brandTick) moving = self._brandTick() || moving;   // brand look: smoothing, brick drops, pulse, sweep, ring (only while on screen)
+      // brand lite (slow or software-drawn GPU, owner 31 Oct): frames are spaced at about 2.5x their own cost, so the page always has time
+      // to answer taps and scrolls between them ("Page unresponsive" otherwise); a skipped frame keeps the loop alive without drawing
+      if (self.brand && self._bLite && (self.dirty || moving) && performance.now() - (self._bLastDraw || 0) < (self._bGap || 120)) { self._raf = requestAnimationFrame(self._loop); return; }
       if (self.dirty || moving) {
         var t = performance.now();
         self.render(); self.dirty = false; self._idle = 0;
+        if (self.brand) { self._bLastDraw = self._bDrewAt = performance.now(); self._bDraws = (self._bDraws || 0) + 1; }
         // adaptive quality: the gap between moving frames, averaged after a warm-up, tells whether this device keeps up; a slow
         // one (under ~14 frames a second over 40 frames) drops to lite (no shadows, pixel ratio 1) rather than stuttering
         if (moving && self._lastT && !self._lite && !self.brand) { var dt = t - self._lastT; if (dt > 2 && dt < 500) { self._ema = self._ema == null ? dt : self._ema * 0.9 + dt * 0.1; self._nf = (self._nf || 0) + 1; if (self._nf > 40 && self._ema > 70) self.goLite(); } }

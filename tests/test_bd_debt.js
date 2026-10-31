@@ -45,7 +45,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   ok(d.plain.every((v,i)=>i===0?v===1:v<d.plain[i-1]),'debts with no known lender share the red ramp, largest strongest ('+d.plain.map(v=>v.toFixed(2)).join(',')+')');
   ok(d.h>=280,'histogram is bigger on desktop ('+Math.round(d.h)+'px)');
   await p.evaluate(()=>setDebtView('tree')); await p.waitForTimeout(400);
-  const tm=await p.evaluate(()=>{const c=[...document.querySelectorAll('.dtm-cell')];const box=document.getElementById('debt-treemap').getBoundingClientRect();const area=c.reduce((a,x)=>{const r=x.getBoundingClientRect();return a+r.width*r.height;},0);return{n:c.length,bg:c.map(x=>x.style.background.slice(0,40)),cover:area/(box.width*box.height),donutHidden:document.getElementById('debt-donut-chart').style.display==='none',bigFirst:c[0].getBoundingClientRect().width*c[0].getBoundingClientRect().height>c[c.length-1].getBoundingClientRect().width*c[c.length-1].getBoundingClientRect().height};});
+  const tm=await p.evaluate(()=>{const c=[...document.querySelectorAll('.dtm-cell')];const box=document.getElementById('debt-treemap').getBoundingClientRect();const area=c.reduce((a,x)=>{const r=x.getBoundingClientRect();return a+r.width*r.height;},0);return{n:c.length,bg:c.map(x=>x.style.background.slice(0,40)),cover:area/(box.width*box.height),donutHidden:getComputedStyle(document.getElementById('debt-donut-chart')).display==='none',bigFirst:c[0].getBoundingClientRect().width*c[0].getBoundingClientRect().height>c[c.length-1].getBoundingClientRect().width*c[c.length-1].getBoundingClientRect().height};});
   console.log(JSON.stringify({n:tm.n,cover:tm.cover}));
   ok(tm.n===4&&tm.donutHidden,'tree map shows one square per debt'); ok(tm.cover>0.9,'squares fill the grid ('+(tm.cover*100).toFixed(0)+'%)'); ok(tm.bigFirst,'bigger debt = bigger square'); ok(tm.bg[0].includes('linear-gradient'),'squares carry the lender gradient');
   ok(await p.evaluate(()=>localStorage.getItem('vi_debt_view'))==='tree','choice is remembered'); await p.evaluate(()=>setDebtView('donut'));
@@ -57,5 +57,13 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   const vm=await p.evaluate(()=>{const s=[...document.querySelectorAll('#tab-assets .scene')].find(e=>e.offsetParent);return s?s.getBoundingClientRect().height:0;});
   ok(Math.abs(vm-0.75*900)<4,'metals viewport likewise ('+Math.round(vm)+'px)');
   ok(errs.length===0,'no page errors '+errs.join('|'));
+  // owner, 31 Oct: the tree map first in its own card, then one tile with Histogram | Donut
+  await p.evaluate(()=>{showTab('debt');setDebtChart('hist');}); await p.waitForTimeout(600);
+  const lay=await p.evaluate(()=>{const vis=id=>{const e=document.getElementById(id);return !!e&&e.getBoundingClientRect().height>0;};const t=document.getElementById('debt-charts-tree'),c=document.getElementById('debt-charts');
+    const r={tree:vis('debt-treemap'),cells:document.querySelectorAll('#debt-charts-tree .dtm-cell').length,order:t&&c&&t.getBoundingClientRect().bottom<=c.getBoundingClientRect().top+1,hist:vis('debt-bar-chart'),donut:vis('debt-donut-chart'),btns:document.querySelectorAll('#debt-charts .debt-chart-tabs button').length};
+    setDebtChart('donut');r.donut2=vis('debt-donut-chart');r.hist2=vis('debt-bar-chart');r.tree2=vis('debt-treemap');setDebtChart('hist');return r;});
+  ok(lay.tree&&lay.cells>=2&&lay.order,'the tree map shows by default in its own card above the pay-off tile');
+  ok(lay.hist&&!lay.donut&&lay.btns===2,'the pay-off tile opens on the histogram with two buttons (Histogram | Donut)');
+  ok(lay.donut2&&!lay.hist2&&lay.tree2,'Donut swaps the histogram for the donut; the tree map stays');
   await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
 })();

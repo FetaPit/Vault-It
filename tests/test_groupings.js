@@ -51,10 +51,10 @@ const seed = () => {
     const brass = await p.evaluate(() => { const v = n => { const e = document.createElement('i'); e.style.color = 'var(--' + n + ')'; document.body.appendChild(e); const c = getComputedStyle(e).color; e.remove(); return c; };
       const bar = document.querySelector('.debt-bar-fill'); return { mins: getComputedStyle(document.getElementById('debt-mins')).color === v('gold'), bar: !bar || /linear-gradient/.test(getComputedStyle(bar).backgroundImage) && getComputedStyle(bar).backgroundImage.includes(v('green').replace('rgb(', '').split(',')[0]) }; });
     ok(brass.mins && brass.bar, w + ': brass only means achievement: monthly minimums gold, debt bar red to green (owner, 30 Oct)');
-    ok(d.hist && !d.donut, w + ': D2 one chart card, Histogram first');
+    ok(d.hist && !d.donut, w + ': D2 the pay-off tile opens on the histogram');
     ok(d.d3 && d.lbl === 'Avalanche method', w + ': D3 strategy and its interest cost in one card');
     await p.evaluate(() => setDebtChart('break')); await p.waitForTimeout(300);
-    ok(await p.evaluate(() => document.getElementById('debt-donut-chart').getBoundingClientRect().height > 0 && document.getElementById('debt-bar-chart').getBoundingClientRect().height === 0 && localStorage.getItem('vi_debt_chart') === 'break'), w + ': Breakdown shows the donut, choice remembered');
+    ok(await p.evaluate(() => document.getElementById('debt-donut-chart').getBoundingClientRect().height > 0 && document.getElementById('debt-bar-chart').getBoundingClientRect().height === 0 && localStorage.getItem('vi_debt_chart') === 'donut'), w + ': Donut shows (the tree map has its own card above), choice remembered');
     await p.evaluate(() => setDebtChart('hist')); await p.evaluate(() => setDebtMethod('snowball')); await p.waitForTimeout(400);
     ok(await p.evaluate(() => document.getElementById('debt-plan-lbl').textContent === 'Snowball method' && /Snowball|Minimum/.test(document.getElementById('debt-interest-saving').textContent)), w + ': picking Snowball shows what Snowball costs');
     await p.evaluate(() => setDebtMethod('avalanche'));
@@ -67,7 +67,7 @@ const seed = () => {
     await p.evaluate(() => { window.isPioneer = () => true; }); await p.click('button[onclick="showDebtForm()"]'); await p.fill('#df-name', 'Test card'); await p.fill('#df-balance', '300'); await p.press('#df-name', 'Enter'); await p.waitForTimeout(300);
     ok(await p.evaluate(() => debtState.debts.some(d => d.name === 'Test card' && d.balance === 300) && document.getElementById('debt-form-modal').hidden), w + ': saving adds the debt and closes the pop-up');
     await p.evaluate(() => { debtState.debts = debtState.debts.filter(d => d.name !== 'Test card'); saveDebtState(); renderDebtTab(); });
-    ok(d.cards === 2, w + ': debt tab is 2 cards plus the strip, was 5 (' + d.cards + ')');
+    ok(d.cards === 3, w + ': debt tab is 3 cards plus the strip (tree map, pay-off, plan; was 5) (' + d.cards + ')');
     // Assets: metals
     await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'metals', null); }); await p.waitForTimeout(600);
     const a = await p.evaluate(() => { const rows = [...document.querySelectorAll('#metals-inputs .mh-row')]; return { n: rows.length, ins: rows.map(r => r.querySelectorAll('input').length), gold: document.getElementById('metal-val-gold').textContent, price: !!document.getElementById('price-inputs') }; });

@@ -19,18 +19,20 @@ const LINK_PLAN: Record<string, string> = {
   plink_1TdPyE9mgKf6HntyJ3h5SAhd: 'monthly',   // Pioneer monthly £5.99
   plink_1UWamD9mgKf6HntyUntyzIXi: 'monthly',   // Pioneer monthly, beta tester £3.99
   plink_1UWamA9mgKf6HntyEUGFyoUl: 'yearly',    // Pioneer yearly £49.99
-  plink_1UWamF9mgKf6Hnty4WkoKDk4: 'yearly',    // Pioneer yearly, beta tester £21.99
+  plink_1UWamF9mgKf6Hnty4WkoKDk4: 'yearly',    // Pioneer yearly, beta tester £21.99 (switched off 31 Oct)
+  plink_1UWeLV9mgKf6HntypWOAliQr: 'yearly',    // Pioneer yearly, beta tester £39.99 (31 Oct)
+  plink_1UWeLX9mgKf6Hnty371EuOTR: 'founder',   // Founding Member, beta tester £99 once (31 Oct)
   plink_1UWamU9mgKf6HntyFvzfNyKe: 'founder',   // Founding Member £149 once
   plink_1TdPyH9mgKf6Hnty9IT0ARfh: 'yearly',    // the retired £59.99 yearly link (switched off; earlier buyers)
 }
 const META_PLAN: Record<string, string> = {
   pioneer_monthly: 'monthly', pioneer_monthly_tester: 'monthly', pioneer_yearly: 'yearly', pioneer_yearly_tester: 'yearly',
-  founding_member: 'founder', monthly: 'monthly', yearly: 'yearly', founder: 'founder',
+  founding_member: 'founder', founding_member_tester: 'founder', monthly: 'monthly', yearly: 'yearly', founder: 'founder',
 }
 const PRICE_PLAN: Record<string, string> = {
   price_1TdPy79mgKf6Hnty9GNgtoIp: 'monthly', price_1UWalr9mgKf6Hntyo8fCeWYH: 'monthly',
   price_1UWalp9mgKf6HntyQzc6DFgy: 'yearly',  price_1UWalt9mgKf6Hntyj2Fu1WLO: 'yearly',
-  price_1UWam79mgKf6HntyipUcP8oo: 'founder',
+  price_1UWam79mgKf6HntyipUcP8oo: 'founder', price_1UWeLL9mgKf6HntydosAUcXr: 'yearly', price_1UWeLN9mgKf6Hnty3Rboi2or: 'founder',
 }
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -64,7 +66,7 @@ function checkoutArgs(ev: any) {
   const s = ev.data?.object ?? {}
   if (s.payment_status !== 'paid' && s.payment_status !== 'no_payment_required') return null   // bank payments: async_payment_succeeded follows
   const plan = LINK_PLAN[idOf(s.payment_link) ?? ''] ?? META_PLAN[String(s.metadata?.plan ?? '')]
-    ?? (s.mode === 'payment' && s.amount_total === 14900 && s.currency === 'gbp' ? 'founder' : null)
+    ?? (s.mode === 'payment' && (s.amount_total === 14900 || s.amount_total === 9900) && s.currency === 'gbp' ? 'founder' : null)
   if (!plan) return null                                                                         // not one of our plans
   const ref = typeof s.client_reference_id === 'string' && UUID_RE.test(s.client_reference_id) ? s.client_reference_id.toLowerCase() : null
   const created = (typeof ev.created === 'number' ? ev.created : 0)

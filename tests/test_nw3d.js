@@ -81,10 +81,12 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   ok(lay.next && lay.below && lay.trkShown, 'the progress blocks are their own card, directly under the net worth card, shown with the 3D view');
   ok(lay.switches === 2 && !lay.old && lay.mTop < 50 && lay.mRight < 40 && lay.fTop < 50 && lay.fRight < 40, 'one switch per card, top right: 3D | Graph, and Forecast on the progress card (' + JSON.stringify(lay) + ')');
   let nums = await p.evaluate(() => { const t = nw3d.hero.totals(), cv = document.getElementById('nw3d-hero-cv'), d = nw3d.tracker.data(), pts = document.getElementById('nwChart')._points.filter(x => !x.synth);
-    return { net: Math.round(computeNetWorth()), tag: +cv.dataset.net, sum: t.assets - t.debt, unit: t.unit, cols: cv.dataset.cols, ptsNw: pts.map(x => Math.round(x.nw)), trkNw: d.nw, ptsDebt: pts.map(x => Math.round(x.debt)), trkDebt: d.debt, today: d.today, todayNw: d.nw[d.today],
+    return { net: Math.round(computeNetWorth()), tag: +cv.dataset.net, sum: t.assets - t.debt, unit: t.unit, cols: cv.dataset.cols, ptsNw: pts.map(x => Math.round(x.nw)), trkNw: d.nw.slice(0, d.today + 1), ptsDebt: pts.map(x => Math.round(x.debt)), trkDebt: d.debt.slice(0, d.today + 1), fcDefault: d.sel.fc && chartState.metrics.proj && document.getElementById('nw3d-fc').getAttribute('aria-pressed') === 'true', keyTxt: document.getElementById('nw3d-trk-key').textContent, keySw: document.getElementById('nw3d-trk-key').querySelectorAll('svg').length, today: d.today, todayNw: d.nw[d.today],
       kpi: document.getElementById('kpi-nw').textContent, read: document.getElementById('nw3d-hero-read').textContent, tip: document.getElementById('nw3d-trk-read').textContent, cash: t.cols.cash }; });
+  ok(nums.fcDefault, 'Forecast is on by default (owner, 31 Oct)');
+  ok(/Net worth/.test(nums.keyTxt) && /Debt/.test(nums.keyTxt) && /Monthly income/.test(nums.keyTxt) && nums.keySw >= 6, 'the progress key names its three colours, each with a 3D swatch (' + nums.keyTxt + ')');
   ok(nums.tag === nums.net && Math.abs(nums.sum - nums.net) < 1, 'scene tag = computeNetWorth (' + nums.tag + ') and the columns add up to it (' + nums.sum.toFixed(2) + ')');
-  ok(/cash,deposit,metals,inv,liabval,debt:loan,debt:credit,running/.test(nums.cols), 'one column per asset class in order, then one column per kind of debt, largest first, then running costs (' + nums.cols + ')');
+  ok(/cash,deposit,metals,inv,debt:loan,debt:credit,liabval,running/.test(nums.cols), 'asset classes in order, the debt columns right after the inventory cubes (owner, 31 Oct), then the rest (' + nums.cols + ')');
   ok(nums.cash && nums.cash.blocks === 6 && nums.cash.cubes === 4 && nums.unit === 1000, '£6,420 of cash = 6 £1,000 blocks + 4 £100 cubes (a fraction tops it)');
   ok(JSON.stringify(nums.ptsNw) === JSON.stringify(nums.trkNw) && JSON.stringify(nums.ptsDebt) === JSON.stringify(nums.trkDebt) && nums.todayNw === nums.net, '3D blocks show the graph\'s own points (' + nums.trkNw.join(', ') + '), today = net worth');
   ok(nums.read.indexOf('Net worth £' + nums.net.toLocaleString('en-GB')) >= 0 && nums.tip.indexOf('net worth £' + nums.net.toLocaleString('en-GB')) >= 0, 'readouts under both 3D views say the same net worth');
@@ -109,7 +111,7 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   await p.keyboard.down('Control'); await p.mouse.wheel(0, -400); await p.keyboard.up('Control'); await p.waitForTimeout(100);
   const z3 = await p.evaluate(() => nw3d.hero.st.zoom);
   await tap(p, '#nw3d-hero-stage [data-z="reset"]'); const z4 = await p.evaluate(() => nw3d.hero.st.zoom);
-  ok(z0 === 1 && Math.abs(z1 - 1.5625) < 1e-6 && z2 < z1 && z3 > z2 && z4 === 1, 'zoom in twice (' + z1 + '), out (' + z2.toFixed(3) + '), ctrl+wheel in (' + z3.toFixed(3) + '), reset to 1 (' + z4 + ')');
+  ok(Math.abs(z0 - 1.2) < 1e-9 && Math.abs(z1 - 1.2 * 1.5625) < 1e-6 && z2 < z1 && z3 > z2 && Math.abs(z4 - 1.2) < 1e-9, 'the scene rests 20% closer (owner, 31 Oct): zoom in twice (' + z1.toFixed(3) + '), out (' + z2.toFixed(3) + '), ctrl+wheel in (' + z3.toFixed(3) + '), reset to 1.2 (' + z4 + ')');
 
   // ── 3. Graph (the backup) and back: same numbers, the choice remembered ──
   await tap(p, '#nw3d-main button[data-m="graph"]'); await p.waitForTimeout(400);
@@ -123,6 +125,7 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   ok(await p.evaluate(() => nw3d.main() === '3d' && localStorage.getItem('vi-nw-main') === '3d'), 'and back to 3D, remembered');
 
   // ── 4. ranges and series: the progress blocks follow the graph's months, whichever view the top card shows ──
+  await tap(p, '#nw3d-fc'); await p.waitForTimeout(250);   // Forecast starts on: turn it off, then each pass turns it on and off again
   for (const v of ['graph', '3d']) {
     await p.evaluate((v) => nw3d.setMain(v, true), v); await p.waitForTimeout(200);
     await p.evaluate(() => setChartRange(document.querySelector('.chart-filter-btn[data-range="6"]'), '6')); await p.waitForTimeout(250);
@@ -147,7 +150,7 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   // the keys: bigger, swatches drawn as 3D blocks
   const key = await p.evaluate(() => { const k = document.getElementById('nw3d-hero-key'), t = document.getElementById('nw3d-trk-key'), lg = document.getElementById('nw3d-hero-legend');
     return { fs: parseFloat(getComputedStyle(k).fontSize), lfs: parseFloat(getComputedStyle(lg.querySelector('span')).fontSize), faces: [...k.querySelectorAll('svg')].map(s => s.querySelectorAll('polygon').length), tfaces: t.querySelectorAll('svg polygon').length, lsw: [...lg.querySelectorAll('svg')].every(s => s.querySelectorAll('polygon').length === 3) }; });
-  ok(key.fs >= 9.5 && key.lfs >= 10 && key.faces.length === 2 && key.faces.every(n => n === 3) && key.tfaces === 9 && key.lsw, 'keys are bigger (' + key.fs + 'px, legend ' + key.lfs + 'px) and every swatch is a 3D block (three faces)');
+  ok(key.fs >= 9.5 && key.lfs >= 10 && key.faces.length === 2 && key.faces.every(n => n === 3) && key.tfaces === 18 && key.lsw, 'keys are bigger (' + key.fs + 'px, legend ' + key.lfs + 'px) and every swatch is a 3D block (three faces)');
 
   // tap a month to read it
   await scrollTo(p, '#nw3d-trk-stage'); await p.waitForTimeout(1200);

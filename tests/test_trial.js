@@ -80,7 +80,7 @@ const seed = (o) => {
   bn = await p.evaluate(banner);
   ok(bn && bn.kind === 'ended' && /read-only until you pick a plan/.test(bn.txt), 'the foot line says the vault is read-only (' + (bn && bn.txt) + ')');
   const st = await p.evaluate(() => { _refreshPioneerSettingsUI(); return { badge: document.getElementById('set-pioneer-badge').textContent, txt: document.getElementById('set-pioneer-inactive').textContent }; });
-  ok(/VAULTER · READ-ONLY/.test(st.badge) && /30 days are up/.test(st.txt) && /£3\.99 a month \(beta tester price, £2 off\)/.test(st.txt) && /£21\.99 a year \(beta tester price, £28 off\)/.test(st.txt) && /£149 once/.test(st.txt), 'Settings says VAULTER · READ-ONLY with the tester prices (' + st.badge + ')');
+  ok(/VAULTER · READ-ONLY/.test(st.badge) && /30 days are up/.test(st.txt) && /£3\.99 a month \(beta tester price, £2 off\)/.test(st.txt) && /£39\.99 a year \(beta tester price, £10 off\)/.test(st.txt) && /£99 once \(beta tester price, £50 off\)/.test(st.txt), 'Settings says VAULTER · READ-ONLY with the tester prices (' + st.badge + ')');
   const once = await p.evaluate(async () => { localStorage.removeItem('vi_trial_prompt'); initProOffer(); await new Promise(r => setTimeout(r, 1800)); const m = document.getElementById('pro-offer-modal'); const first = !m.classList.contains('hidden'); m.classList.add('hidden'); initProOffer(); await new Promise(r => setTimeout(r, 1800)); return { first, second: !m.classList.contains('hidden'), stamp: localStorage.getItem('vi_trial_prompt') === new Date().toDateString() }; });
   ok(once.first && !once.second && once.stamp, 'on open the prompt shows once a day');
   await p.context().close();

@@ -135,7 +135,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   // ── 14. rendering: a light windowed SVG, no filters or endless animations
   await reset();
   const g = await p.evaluate(() => { const sv = document.getElementById('fire-roadmap-svg'); return { nodes: sv.querySelectorAll('*').length, filters: sv.querySelectorAll('filter').length, anims: sv.querySelectorAll('animate').length, w: sv.getBoundingClientRect().width, track: document.getElementById('fire-track').offsetWidth }; });
-  ok(g.nodes < 330 && g.filters === 0 && g.anims === 0, 'roadmap SVG is light: ' + g.nodes + ' elements, ' + g.filters + ' filters, ' + g.anims + ' animations');
+  ok(g.nodes < 540 && g.filters === 0 && g.anims === 0, 'roadmap SVG is light: ' + g.nodes + ' elements, ' + g.filters + ' filters, ' + g.anims + ' animations');
   ok(g.w < g.track * 0.6 && g.track > 3000, 'only a window is drawn (' + Math.round(g.w) + 'px of a ' + g.track + 'px track)');
   await p.evaluate(() => { document.getElementById('fire-timeline-scroll').scrollLeft = 2600; }); await p.waitForTimeout(400);
   const far = await p.evaluate(() => { const sv = document.getElementById('fire-roadmap-svg'); return { left: parseFloat(sv.style.left), txt: sv.textContent }; });
@@ -159,5 +159,17 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   const cn = await p.evaluate(() => { const c = document.getElementById('nwChart'); return { cssW: c.clientWidth, bw: c.width, dpr: devicePixelRatio }; });
   ok(cn.cssW < 520 && Math.abs(cn.bw - cn.cssW * Math.min(cn.dpr, 2.5)) <= 2, 'and shrinks again with a matching bitmap (' + cn.cssW + 'px, bitmap ' + cn.bw + ')');
   ok(errs.length === 0, 'no errors ' + errs.slice(0, 3).join(' | '));
+  // ── coins (owner, 31 Oct): the rail runs between the coins, the stage to work on is the largest, phones get a carousel
+  await p.evaluate(() => { renderFIREroadmap(); const SC = document.getElementById('fire-timeline-scroll'), st = renderFIREroadmap._stages; SC.scrollLeft = Math.max(0, st.nextIdx * FIRE_NODE + FIRE_LEFT - SC.clientWidth / 2); renderFIREroadmap(); fireCarousel(); }); await p.waitForTimeout(400);
+  const coins = await p.evaluate(() => { const svg = document.getElementById('fire-roadmap-svg'), SC = document.getElementById('fire-timeline-scroll'), st = renderFIREroadmap._stages;
+    const gs = [...svg.querySelectorAll('g.fire-coin')]; const faces = gs.map(g => { const c = [...g.querySelectorAll('circle')].filter(x => x.getAttribute('fill') === '#071018')[0]; return { i: +g.dataset.i, cx: +c.getAttribute('cx'), r: +c.getAttribute('r'), next: g.classList.contains('next'), sc: g.style.transform }; });
+    const rails = [...svg.querySelectorAll(':scope > line')].filter(l => l.getAttribute('y1') === '148' && l.getAttribute('y2') === '148').map(l => [+l.getAttribute('x1'), +l.getAttribute('x2')]);
+    const crosses = rails.some(([a, b]) => faces.some(f => f.cx > a && f.cx < b));
+    const mid = SC.scrollLeft + SC.clientWidth / 2, near = faces.slice().sort((p, q) => Math.abs(p.cx - mid) - Math.abs(q.cx - mid));
+    const sc = t => +(t.match(/scale\(([\d.]+)\)/) || [0, 1])[1];
+    return { n: gs.length, nextR: (faces.find(f => f.next) || {}).r, otherR: (faces.find(f => !f.next) || {}).r, rails: rails.length, crosses, centred: near[0].i === Math.max(0, Math.min(st.length - 1, Math.round((mid - FIRE_LEFT) / FIRE_NODE))), centreScale: sc(near[0].sc), edgeScale: sc(near[near.length - 1].sc) }; });
+  ok(coins.n > 3 && coins.nextR === 30 && coins.otherR === 22, 'coins drawn; the stage to work on is the largest (r 30 vs 22)');
+  ok(coins.rails > 2 && !coins.crosses, 'the rail runs between the coins, never through one (' + coins.rails + ' segments)');
+  ok(coins.centred && coins.centreScale > coins.edgeScale && coins.centreScale > 1.1, 'phone carousel: the current stage sits in the centre, largest, the edges shrink (' + coins.centreScale + ' vs ' + coins.edgeScale + ')');
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED');
 })();

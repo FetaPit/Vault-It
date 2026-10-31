@@ -9,10 +9,31 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] Release the MVP (owner, 31 Oct pm, "release when ready"; 17:00 "do that": release by pull request the owner merges from the GitHub app, since the session cannot push to the production branch). Full suite on 792604c: everything green except `test_hb_brand`, which failed about one run in four with two real faults: the house panel could stay on "Counting bricks…" and the gold ROW tag could keep the previous house's figures after a house change. Both fixed in the release commit; then the house builder and smoke tests re-run. Backup branch `backup/release-pioneer-v2-20261031-mvp`, frozen branch `release-mvp-20261031`, pull request into `release/pioneer-v2`
+- [~] Round 3 (owner, 31 Oct 16:40, twenty edits; owner reordered 17:00: start now, alongside the release pull request; the brief re-stated as an Anthropic dev and a fintech dev is `docs/ROUND3_BRIEF.md`):
+  1. Dashboard forecast: small text bottom right of the tile saying what the forecast is based on, depends on and limited by
+  2. Assets and liabilities dashboard tile: proportional value scale on the x axis, like the debt tile
+  3. Debt tile: the amount paid off shown as a green bar from the right
+  4. Debt tile: the amount still to pay in a subtle red hue
+  5. Budget tab: the dashed line becomes light teal and extends to where the income flows in
+  6. Budget: an alternate view of the income flow like Net worth in 3D, with entry animations: a 3D tree map, each colour-coded category a block proportional to its spend or saving
+  7. Budget: the income flow viewport moves to the top of the tab
+  8. Link to market value: aggregate a valuation of the named valuable over time; default to manual when no source is found
+  9. Crypto icons larger
+  10. Crypto live price pulled automatically and linked to the user's holdings, not typed in
+  11. Crypto tile also shows the token amount held
+  12. Wealth inventory: bigger item tiles, especially on desktop
+  13. Wealth inventory: uploaded photos missing when an item tile is expanded (bug)
+  14. 3D model upload in liabilities is laggy; remove the green tint and show the model's own textures and colours (wealth inventory too)
+  15. Desktop menu bar spans the viewport width with the Vault-It logo and the Daylight button in the same row; remove the Compact menu options, width decides
+  16. Flag post labels in the 3D scenes match the dashboard labels, in gold, across the board (precious metals etc.)
+  17. Precious metals and cash 3D environment to match the Net worth in 3D scene exactly (it looks dull now)
+  18. Liabilities tiles the same size as the wealth inventory tiles after 12
+  19. Desktop: the asset and liability 3D viewports orbit the item on click and drag
+  20. Side bar (ledger) wider; every value from across the app pulls into it, with the relevant icon at the left of each line
 
 ## Waiting on the owner
 
-- `STRIPE_WEBHOOK_SECRET` in Supabase secrets (the only gateway step left; I am not allowed to write secrets): Stripe Dashboard → Developers → Webhooks → endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` → Reveal signing secret, then Supabase → Edge Functions → Secrets → add `STRIPE_WEBHOOK_SECRET`. Until then payments wait (Stripe retries for three days)
 - Metals price feed (`api.metals.live`): the sandbox cannot reach it (host not in the session's allowed network domains). Check it from a browser, or allow the host in the environment's network settings and ask again
 - Brand build on a real phone: speed of the lite fallback and how the 6.8 feedback feels (Settings > House builder > Brand build, or ?house=new)
 - Classic switches (house builder, net worth) stay in Settings until the owner has tested the new views on their phone (owner, 30 Oct); remove them only when the owner says so
@@ -24,7 +45,18 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
-- [x] Gateway go-live and release (owner, 31 Oct: "yes and release when ready"): migration 011 applied (guard checked live in a rolled-back transaction), `stripe-webhook` deployed, Stripe endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` created; full suite passed; released to `release/pioneer-v2` with this commit (backup branch taken first). Left for the owner: the webhook secret (see Waiting)
+- [x] Net worth in 3D (owner, 31 Oct): the column list folds into a "What each column is" dropdown, the scene rests 20% closer (35% cut off the first column at 1100 px), the debt columns stand right after the inventory cubes. Commit 11e23b8
+- [x] Goals and snapshots (owner, 31 Oct): hidden while the 3D view shows; they appear in the net worth Graph view (what is added there still feeds everything else). Commit 11e23b8
+- [x] Financial freedom roadmap (owner, 31 Oct): the rail runs between the coins, never through them; coins have depth, the stage to work on is the largest and turns gently, the others grow on hover; the road sits in slight perspective; on phones it is a carousel (largest in the centre, fading to the sides, swipe settles on a stage); opens with the current stage centred. Commit 11e23b8
+- [x] Budget colours (owner, 31 Oct): tiles and headings keep the group colour; the lines inside and the chips beside the account line are neutral. Commit 11e23b8
+- [x] House type icons (owner, 31 Oct): six line icons in the brand icon style (24 grid, hairline, 16% fill), two rows of three on every width. Commit 11e23b8
+- [x] Contribution streak (owner, 31 Oct): dots, month labels and links scale with the card (about 22 px dots on a desktop). Commit 11e23b8
+- [x] Debt charts (owner, 31 Oct): the tree map first in its own card, then one tile with Histogram | Donut. Commit 11e23b8
+- [x] House builder freezes (owner, 31 Oct, top priority): bricks drawn solid with the depth test, the far-face pass removed, a lite mode that really skips frames and starts at once on a software GPU, slow-motion laying (about 5 s a deposit, 0.9 s drop, 2 s gold flash). Commit eb0c7c0 on `brand-rollout` (full suite passed); release blocked by the session's permission layer, owner to push
+- [x] Net worth in 3D empty on load (owner, 31 Oct): safety net: a forced refresh and stage kick after load, on return from the background and after a failed draw. Commit 7f9f390
+- [x] Net worth progress (owner, 31 Oct): Forecast on by default; the key names net worth, debt and monthly income with 3D swatches. Commit 7f9f390
+- [x] Prices and Stripe checkout (owner, 31 Oct pm): testers £3.99 a month, £39.99 a year (new price and link, £21.99 link switched off), Founding £99 (new price and capped link); full prices struck through in the pop-up, campaign page and Settings; webhook deployed with the new links. Commit 7f9f390
+- [x] Gateway go-live and release (owner, 31 Oct: "yes and release when ready"): migration 011 applied (guard checked live in a rolled-back transaction), `stripe-webhook` deployed, Stripe endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` created; full suite passed; released to `release/pioneer-v2` with this commit (backup branch taken first). The owner set `STRIPE_WEBHOOK_SECRET` the same day; the function now refuses unsigned requests (400), so the gateway is fully live
 - [x] Net worth 3D card controls (owner, 31 Oct 12:33): three views, one switch each, top right: the net worth card is 3D | Graph (the old Blocks | Line switch is gone); the progress blocks have their own card directly below with a Forecast switch (in step with the graph's) and their own readout and key; keys and legends are bigger and every swatch is a small 3D block in its colour. Commit 7e94db2 on `brand-rollout`, not released.
 - [x] Secure paid gateway, built (owner, 31 Oct): migration 011 (paid columns the browser cannot change, tester flag from confirmed waitlist addresses, Stripe event log, `stripe_apply`), edge function `stripe-webhook` (signature checked, each event once, stale and old-subscription events skipped), the app reads paid status from the profile only once the server has it and works as before on an older server, privacy notice names Stripe. Tests: test_011, test_stripe_server, test_paid_gateway. Commit 9d6cbce on `brand-rollout`, not released, not live (needs the owner's yes)
 - [x] House builder style as the brand book and recording (owner, 31 Oct): the brand build is now the default (owner's call; classic viewer stays as the Settings switch), camera controls use the brand line icons, a column on the right at desktop and a row top right on phones, the caption wraps in Share Tech Mono and no longer counts tiles. Commit 5371db7 on `brand-rollout`, not released.
