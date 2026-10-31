@@ -11,7 +11,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 - [~] Release the MVP (owner, 31 Oct pm, "release when ready"; 17:00 "do that": release by pull request the owner merges from the GitHub app, since the session cannot push to the production branch). Full suite on 792604c: everything green except `test_hb_brand`, which failed about one run in four with two real faults: the house panel could stay on "Counting bricks…" and the gold ROW tag could keep the previous house's figures after a house change. Both fixed in the release commit; then the house builder and smoke tests re-run. Release commit 1cced67. Backup branch `backup/release-pioneer-v2-20261031-mvp` taken; frozen branch `release-mvp-20261031`; pull request FetaPit/Vault-It#3 into `release/pioneer-v2` opened for the owner to merge (owner notified)
 - [~] Round 3 (owner, 31 Oct 16:40, twenty edits; owner reordered 17:00: start now, alongside the release pull request; the brief re-stated as an Anthropic dev and a fintech dev is `docs/ROUND3_BRIEF.md`):
-  Progress: 15 done (a8a7796); 1 to 4 done (da9d696); 5, 6, 6a and 7 done (a1ac51f); 13 done (this commit). Next: 8 to 14 and 16 to 19 (Assets and liabilities), then 20 (ledger).
+  Progress: 15 done (a8a7796); 1 to 4 done (da9d696); 5, 6, 6a and 7 done (a1ac51f); 13 done (0e25b78); 9 to 11 done (this commit). Next: 8 to 14 and 16 to 19 (Assets and liabilities), then 20 (ledger).
   1. Dashboard forecast: small text bottom right of the tile saying what the forecast is based on, depends on and limited by
   2. Assets and liabilities dashboard tile: proportional value scale on the x axis, like the debt tile
   3. Debt tile: the amount paid off shown as a green bar from the right

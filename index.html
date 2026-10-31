@@ -10031,6 +10031,13 @@ button.bd-ic{cursor:pointer}
 .inv-exp{position:absolute;top:5px;right:26px;z-index:3;width:20px;height:20px;border-radius:4px;border:1px solid rgb(var(--blue-rgb) / .5);background:rgba(0,0,0,.55);color:#9bd0ff;font-size:.7rem;line-height:1;cursor:pointer;padding:0}
 .inv-exp:hover{background:rgb(var(--blue-rgb) / .25)}
 .wi-img-area img.wi-open{cursor:zoom-in}
+/* crypto (owner, 31 Oct): bigger coin icons, the tokens held, where the price comes from */
+.cr-logo{width:64px;height:64px;border-radius:50%;background:rgb(var(--ink-rgb) / .06);object-fit:contain}
+.cr-glyph{display:flex;align-items:center;justify-content:center;font-size:2.4rem}
+@media(max-width:600px){.cr-logo{width:52px;height:52px}.cr-glyph{font-size:2rem}}
+.cr-held{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--text)}
+.cr-src{font:400 .5rem/1.35 'Share Tech Mono',monospace;margin-bottom:6px}
+.cr-src-live{color:var(--green)}.cr-src-stale{color:var(--amber)}.cr-src-own{color:var(--t2)}
 .inv-stage .inv-prev{display:block;max-width:100%;max-height:100%;margin:auto;object-fit:contain;position:absolute;inset:0}
 .inv-stage canvas[hidden]{display:none}
 .wi-img-overlay{pointer-events:none}
@@ -11759,14 +11766,14 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <span style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--t2)">Total: <span id="subtab-total-crypto" style="font-weight:700;color:var(--em)">£0</span></span>
         </div>
         <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-add-data" onclick="fetchLivePrices()">↻ Live Prices</button>
+          <button class="btn-add-data" onclick="fetchLivePrices()">↻ Refresh live prices</button>
           <button class="btn-add-data" onclick="showToast('Wallet connect coming soon: paste your wallet address to auto-import holdings')" style="background:transparent;border-color:var(--go);color:var(--go)">🔗 Connect Wallet</button>
         </div>
         <div id="crypto-table"></div>
         <div class="data-input-row" style="margin-top:12px">
           <input type="text" id="cr-sym" placeholder="Symbol (e.g. SOL)" style="max-width:100px">
           <input type="number" id="cr-amt" placeholder="Amount" step="0.0001">
-          <input type="number" id="cr-price" placeholder="Price £">
+          <input type="number" id="cr-price" placeholder="Price £ (only if no live price)" title="Live prices come from CoinGecko; type a price only for a coin it does not list">
           <button class="btn-add-data" onclick="addCrypto()">+ Add</button>
         </div>
       </div>
@@ -13645,6 +13652,7 @@ function showSubtab(group,id,btn){
   if(group==='assets'&&id==='metals')setTimeout(renderMetalsISO,30);
   if(group==='assets'&&id==='cash')setTimeout(renderCashISO,80);
   if(group==='assets'&&id==='stocks'){try{stkRender();}catch(e){}setTimeout(stkAutoRefresh,100);}
+  if(group==='assets'&&id==='crypto')setTimeout(function(){try{crAutoRefresh()}catch(e){}},100);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -20597,22 +20605,42 @@ function updateMetalPrice(k,v){if(viBlockEdit())return;alState.metalPrices[k]=pa
 // Keep backward compatibility aliases
 function setMetal(m,v){if(viBlockEdit())return;updateMetal(m,v);}
 function setMetalPrice(m,v){if(viBlockEdit())return;updateMetalPrice(m,v);}
-function fetchCryptoPrices(){
-  var ids=alState.crypto.map(function(c){
-    var COIN_ID_MAP={BTC:'bitcoin',ETH:'ethereum',SOL:'solana',BNB:'binancecoin',XRP:'ripple',ADA:'cardano',DOGE:'dogecoin',DOT:'polkadot',MATIC:'matic-network',AVAX:'avalanche-2',LINK:'chainlink',LTC:'litecoin',UNI:'uniswap',ATOM:'cosmos',ALGO:'algorand'};
-    return COIN_ID_MAP[c.sym]||c.sym.toLowerCase();
-  }).join(',');
-  fetch('https://api.coingecko.com/api/v3/simple/price?ids='+ids+'&vs_currencies=gbp&include_24hr_change=true')
-    .then(function(r){return r.json();}).then(function(d){
-      var COIN_ID_MAP={BTC:'bitcoin',ETH:'ethereum',SOL:'solana',BNB:'binancecoin',XRP:'ripple',ADA:'cardano',DOGE:'dogecoin',DOT:'polkadot',MATIC:'matic-network',AVAX:'avalanche-2',LINK:'chainlink',LTC:'litecoin',UNI:'uniswap',ATOM:'cosmos',ALGO:'algorand'};
-      alState.crypto.forEach(function(c){
-        var cid=COIN_ID_MAP[c.sym]||c.sym.toLowerCase();
-        if(d[cid]){c.price=d[cid].gbp;c.change24h=d[cid].gbp_24h_change||0;}
-      });
-      saveAL();renderAlTab();showToast('Crypto prices updated \u2713');
-    }).catch(function(){showToast('Crypto prices unavailable');});
+/* crypto prices (owner, 31 Oct 2026: "pulled automatically and linked to the holdings, not typed in"). CoinGecko's free price API,
+   already named in the privacy notice; only the coin names are sent, never amounts. Fetched when the Crypto tab opens, a few seconds
+   after start-up, and every 15 minutes while it is open. Each coin keeps its price's source and time; if a fetch fails, the last price
+   stays and says how old it is; a coin CoinGecko does not know keeps the price the user typed, marked as theirs. Indicative prices. */
+var VI_CRYPTO_EVERY=15*60*1000,_crBusy=false;
+function crCoinId(sym){sym=String(sym||'').toUpperCase();return (typeof COIN_ID_MAP!=='undefined'&&COIN_ID_MAP[sym])||sym.toLowerCase()}
+function fetchCryptoPrices(quiet){
+  var list=(alState.crypto||[]).filter(function(c){return c&&(c.sym||c.symbol)});
+  if(!list.length||_crBusy){if(!quiet&&!list.length)showToast('Add a coin first');return Promise.resolve(false)}
+  _crBusy=true;
+  var ids=list.map(function(c){return crCoinId(c.sym||c.symbol)}).filter(function(v,i,a){return a.indexOf(v)===i}).join(',');
+  return fetch('https://api.coingecko.com/api/v3/simple/price?ids='+encodeURIComponent(ids)+'&vs_currencies=gbp&include_24hr_change=true')
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(d){
+      var now=new Date().toISOString(),got=0;
+      list.forEach(function(c){var x=d&&d[crCoinId(c.sym||c.symbol)];
+        if(x&&typeof x.gbp==='number'&&x.gbp>0){c.price=x.gbp;c.change24h=x.gbp_24h_change||0;c.priceSrc='live';c.priceAt=now;got++}
+        else if(c.priceSrc==='live'){c.priceSrc='stale'}else c.priceSrc=c.priceSrc||'manual'});
+      alState.cryptoCheckedAt=now;alState.cryptoErr=null;saveAL();renderAlTab();try{updateKPIs()}catch(e){}
+      if(!quiet)showToast(got?'Crypto prices updated ✓':'No live price found for these coins');return true;
+    }).catch(function(e){alState.cryptoErr=new Date().toISOString();list.forEach(function(c){if(c.priceSrc==='live')c.priceSrc='stale'});saveAL();try{renderAlTab()}catch(_){}if(!quiet)showToast('Crypto prices unavailable just now. Your last prices are kept.');return false;})
+    .then(function(v){_crBusy=false;return v;});
 }
-function fetchLivePrices(){fetchCryptoPrices();} // backward compat
+function crAutoRefresh(){
+  var last=Date.parse(alState.cryptoCheckedAt||0)||0;
+  if((alState.crypto||[]).length&&Date.now()-last>VI_CRYPTO_EVERY-5000)fetchCryptoPrices(true);
+}
+function crAgo(iso){var t=Date.parse(iso||0);if(!t)return '';var m=Math.round((Date.now()-t)/60000);return m<1?'just now':m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' d ago'}
+function crPriceLine(c){
+  if(c.priceSrc==='live')return 'Live price · CoinGecko · '+crAgo(c.priceAt)+' · indicative';
+  if(c.priceSrc==='stale'||(c.priceAt&&alState.cryptoErr))return 'Last live price · '+crAgo(c.priceAt)+' · could not refresh';
+  return 'Your price · no live price found for '+String(c.sym||c.symbol||'this coin').toUpperCase();
+}
+function updateCryptoPrice(id,val){if(viBlockEdit())return;var c=alState.crypto.find(function(x){return x.id===id;});if(!c)return;c.price=parseFloat(val)||0;c.priceSrc='manual';c.priceAt=null;saveAL();renderAlTab();updateKPIs();}
+setTimeout(function(){try{crAutoRefresh()}catch(e){}},4000);
+setInterval(function(){try{var p=document.getElementById('assets-crypto');if(!document.hidden&&p&&p.offsetParent)crAutoRefresh()}catch(e){}},60000);
+function fetchLivePrices(){fetchCryptoPrices(false);} // backward compat
 function fetchMetalPrices(){
   fetch('https://api.metals.live/v1/spot/gold,silver,platinum,palladium')
     .then(function(r){return r.json();}).then(function(d){
@@ -20662,17 +20690,20 @@ function renderAlTab(){
         var val=camount*cprice;
         return'<div class="wi-tile" style="min-height:0">'
           +'<div class="wi-img-area" style="background:rgb(var(--panel-rgb) / .9);flex-direction:column;gap:6px;padding:12px">'
-          +(logo?'<img src="'+logo+'" style="width:40px;height:40px;border-radius:50%;background:rgb(var(--ink-rgb) / .06)" onerror="this.style.display=\'none\'">'
-               :'<div style="font-size:1.8rem">'+(c.sym==='BTC'?'₿':c.sym==='ETH'?'Ξ':'🪙')+'</div>')
-          +'<div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:1rem;color:var(--go)">'+(c.sym||c.symbol||'')+'</div>'
-          +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--t2)">£'+cprice.toLocaleString('en-GB')+'</div>'
-          +'<div style="font-size:.55rem;color:'+changeCol+'">'+(change!==0?changeStr:'')+'</div>'
+          +(logo?'<img class="cr-logo" src="'+logo+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">':'')
+          +'<div class="cr-logo cr-glyph" aria-hidden="true"'+(logo?' style="display:none"':'')+'>'+(c.sym==='BTC'?'₿':c.sym==='ETH'?'Ξ':'🪙')+'</div>'
+          +'<div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:1.05rem;color:var(--go)">'+ccEsc(c.sym||c.symbol||'')+'</div>'
+          +'<div class="cr-held">'+crQty(camount)+' '+ccEsc(String(c.sym||c.symbol||'').toUpperCase())+' held</div>'
+          +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:.66rem;color:var(--t2)">£'+cprice.toLocaleString('en-GB',{maximumFractionDigits:cprice<1?6:2})+' each</div>'
+          +'<div style="font-size:.55rem;color:'+changeCol+'">'+(change!==0?changeStr+' in 24 h':'')+'</div>'
           +'</div>'
           +'<div class="wi-info" style="padding:8px 10px">'
-          +'<div style="font-family:\'Syne\',sans-serif;font-size:.68rem;font-weight:700;color:var(--em);margin-bottom:4px">£'+Math.round(val).toLocaleString('en-GB')+'</div>'
+          +'<div style="font-family:\'Syne\',sans-serif;font-size:.74rem;font-weight:700;color:var(--em);margin-bottom:2px">£'+val.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
+          +'<div class="cr-src cr-src-'+(c.priceSrc==='live'?'live':c.priceSrc==='stale'?'stale':'own')+'">'+crPriceLine(c)+'</div>'
+          +(c.priceSrc!=='live'?'<div style="display:flex;align-items:center;gap:4px;margin-bottom:6px"><span style="font-size:.52rem;color:var(--t3)">Price £:</span><input type="number" class="al-inp" style="flex:1;font-size:.62rem;padding:3px 6px" min="0" step="any" value="'+cprice+'" onchange="updateCryptoPrice('+cid+',this.value)" aria-label="Your price for '+ccEsc(c.sym||'')+'"></div>':'')
           +'<div style="display:flex;align-items:center;gap:4px;margin-bottom:6px">'
-          +'<span style="font-size:.52rem;color:var(--t3)">Amount:</span>'
-          +'<input type="number" class="al-inp" style="flex:1;font-size:.62rem;padding:3px 6px" min="0" step="any" value="'+camount+'" onchange="updateCryptoAmount('+cid+',this.value)" title="Editable: your holdings">'
+          +'<span style="font-size:.52rem;color:var(--t3)">Tokens held:</span>'
+          +'<input type="number" class="al-inp" style="flex:1;font-size:.62rem;padding:3px 6px" min="0" step="any" value="'+camount+'" onchange="updateCryptoAmount('+cid+',this.value)" title="Editable: your holdings" aria-label="'+ccEsc(c.sym||'')+' tokens held">'
           +'</div>'
           +'<button class="data-item-del" style="font-size:.55rem;padding:2px 6px;border:1px solid var(--bd);border-radius:3px" onclick="delCrypto('+cid+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg> Remove</button>'
           +'</div>'
@@ -20774,12 +20805,14 @@ function addCrypto(){if(viBlockEdit())return;
   var amt=parseFloat(document.getElementById('cr-amt').value)||0;
   var pr=parseFloat(document.getElementById('cr-price').value)||0;
   if(!sym)return;
-  alState.crypto.push({id:Date.now(),sym:sym,amount:amt,price:pr});
+  alState.crypto.push({id:Date.now(),sym:sym,amount:amt,price:pr,priceSrc:'manual'});
+  setTimeout(function(){fetchCryptoPrices(true)},50);   // its live price straight away (the typed one stays only if none is found)
   document.getElementById('cr-sym').value='';document.getElementById('cr-amt').value='';document.getElementById('cr-price').value='';
   saveAL();renderAlTab();updateKPIs();
 }
 function delCrypto(id){if(viBlockEdit())return;alState.crypto=alState.crypto.filter(function(c){return c.id!==id;});saveAL();renderAlTab();updateKPIs();}
-function updateCryptoAmount(id,val){if(viBlockEdit())return;var c=alState.crypto.find(function(x){return x.id===id;});if(c){c.amount=parseFloat(val)||0;saveAL();updateKPIs();}}
+function updateCryptoAmount(id,val){if(viBlockEdit())return;var c=alState.crypto.find(function(x){return x.id===id;});if(c){c.amount=parseFloat(val)||0;saveAL();renderAlTab();updateKPIs();}}
+function crQty(q){q=+q||0;return q.toLocaleString('en-GB',{maximumFractionDigits:q>=100?2:8})}
 function addCashAccount(){if(viBlockEdit())return;
   var n=document.getElementById('ca-name').value.trim();
   var t=document.getElementById('ca-type').value;
