@@ -11,6 +11,8 @@ for (const [re, what] of [[/was £\d/, '"was £…" reference prices'], [/50% of
 }
 ok(/£49\.99/.test(app) && /£5\.99/.test(app) && /£149/.test(app), 'the app shows the decided prices (£5.99/mo, £49.99/yr, £149 founder)');
 ok(/founderSlots: 100,/.test(app), 'founding cap is 100');
-ok(!/£\d/.test(page.replace(/£5\.99 a month/g, '')), 'the sign-up page names no price except the £5.99 starting price');
+// Prices are amounts with a billing period or a one-off. The hero demo's lay buttons (£5, £50, £500), the deposit figure and the block key (£1,000, £100) are illustrations, not prices.
+const priced = page.match(/£[\d,.]+k?\s*(a month|\/mo\b|per month|a year|\/yr\b|per year|once|one-off)/g) || [];
+ok(priced.length > 0 && priced.every((m) => /^£5\.99 a month$/.test(m)) && !/£49\.99|£149|£59\.99/.test(page), 'the sign-up page names no price except the £5.99 starting price (' + [...new Set(priced)].join(', ') + ')');
 ok(/A57, 11 St Mary’s Street, Lincoln LN5 7EQ/.test(page) && /Lincoln LN5 7EQ/.test(app), 'trader address on the sign-up page and in the privacy notice');
 console.log(fails ? '\n' + fails + ' FAILED' : '\nALL PASSED'); process.exit(fails ? 1 : 0);
