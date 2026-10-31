@@ -27500,9 +27500,25 @@ function nwhRenderMini(){
 .nw3d-hud button{width:34px;height:34px;border-radius:8px;border:1px solid rgba(68,192,185,.35);background:rgba(8,13,20,.82);color:#E8E8E8;font:600 16px/1 var(--font-mono);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
 .nw3d-hud button:hover{border-color:#44C0B9;color:#44C0B9}.nw3d-hud button:focus-visible{outline:2px solid #44C0B9;outline-offset:1px}
 @media(max-width:600px){.nw3d-hud{right:8px;bottom:8px}.nw3d-hud button{width:38px;height:38px}}
-.nw3d-wrap.nw3d-bars #nwChart{position:absolute!important;left:0;top:0;visibility:hidden!important;pointer-events:none}
-.nw3d-wrap.nw3d-bars #nw-zoom-hint{display:none}
-.nw3d-wrap:not(.nw3d-bars) #nw3d-trk-stage,.nw3d-trk-key[hidden]{display:none}
+.ov-chart-card.nw3d-main-3d>.nw3d-wrap{position:absolute!important;left:0;right:0;top:0;visibility:hidden!important;pointer-events:none!important}   /* kept laid out: the graph's months feed the progress blocks */
+/* owner, 31 Oct 2026: three views, one switch each, top right. Net worth card: 3D | Graph. The progress blocks have their own card below with Forecast. */
+.nw3d-top{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0}
+.nw3d-top .ov-chart-title{min-width:0;overflow-wrap:anywhere}
+.nw3d-trk-card{margin-top:16px}
+.nw3d-hero-in .nw3d-sub,.nw3d-trk-card .nw3d-sub{display:block;font:400 .68rem/1.45 var(--font-body);color:var(--muted);max-width:64ch}
+.nw3d-trk-card .nw3d-sub{margin:6px 0 10px}
+.nw3d-seg button.nw3d-fc[aria-pressed="false"]{color:var(--text)}
+/* a bigger key, its swatches drawn as small 3D blocks in the stage's colours */
+.nw3d-key{font-size:.74rem;gap:8px 18px;color:var(--text)}
+.nw3d-key span{display:inline-flex;align-items:center;gap:7px}
+.nw3d-key svg,.nw3d-legend svg{flex:none;display:block;overflow:visible}
+.nw3d-legend{gap:8px 18px;margin-top:10px}
+.nw3d-legend span{font-size:.78rem;gap:7px}
+.nw3d-legend span b{font-size:.74rem}
+.nw3d-legend .stack svg+svg{margin-left:-6px}
+.nw3d-legend .stack em{font-size:.7rem;padding-left:24px}
+.nw3d-read{font-size:.72rem}
+@media(max-width:600px){.nw3d-seg button{padding:6px 10px}.nw3d-key{font-size:.78rem}.nw3d-legend span{font-size:.8rem}}
 </style>
 <script id="vi-nw3d-engine">
 (function(){
@@ -27855,25 +27871,38 @@ hero.innerHTML='<span class="nw3d-sub" style="margin:0 0 10px">What you own stan
  +'<div class="nw3d-legend" id="nw3d-hero-legend"></div>'
  +'<p class="nw3d-key" id="nw3d-hero-key"></p>';
 var hd=chartCard.querySelector('.ov-chart-hd'),ttl=chartCard.querySelector('.ov-chart-title');hd.parentNode.insertBefore(hero,hd.nextSibling);
+var top=document.createElement('div');top.className='nw3d-top';hd.insertBefore(top,hd.firstChild);top.appendChild(ttl);
 var mseg=document.createElement('div');mseg.className='nw3d-seg';mseg.id='nw3d-main';mseg.setAttribute('role','group');mseg.setAttribute('aria-label','Net worth view');
 mseg.innerHTML='<button type="button" data-m="3d" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick"/></svg>3D</button>'
  +'<button type="button" data-m="graph" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-forecast"/></svg>Graph</button>';
-var seg=document.createElement('div');seg.className='nw3d-seg';seg.id='nw3d-view';seg.setAttribute('role','group');seg.setAttribute('aria-label','Chart view');
-seg.className+=' nw3d-graph-only';
-seg.innerHTML='<button type="button" data-v="bars" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick"/></svg>Blocks</button>'
- +'<button type="button" data-v="line" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-forecast"/></svg>Line</button>';
-var ctl=chartCard.querySelector('.ov-chart-hd > div');ctl.insertBefore(seg,ctl.firstChild);ctl.insertBefore(mseg,ctl.firstChild);
-[].forEach.call(ctl.querySelectorAll('.chart-filter-group'),function(g){g.classList.add('nw3d-graph-only')});var lg=chartCard.querySelector('.ov-legend');if(lg)lg.classList.add('nw3d-graph-only');
-var wrap=chartCv.parentNode;wrap.classList.add('nw3d-wrap');wrap.classList.add('nw3d-graph-only');
-var tst=document.createElement('div');tst.className='nw3d-stage';tst.id='nw3d-trk-stage';
-tst.innerHTML='<canvas id="nw3d-trk-cv" tabindex="0" role="img" aria-label="Net worth tracker in 3D blocks. Tap a month to read it, drag to turn it."></canvas>';
-wrap.appendChild(tst);
-var tip=document.getElementById('chart-tooltip');
-var tkey=document.createElement('p');tkey.className='nw3d-key nw3d-trk-key nw3d-graph-only';tkey.id='nw3d-trk-key';tip.classList.add('nw3d-graph-only');
-tip.parentNode.insertBefore(tkey,tip.nextSibling);
+top.appendChild(mseg);
+var ctl=chartCard.querySelector('.ov-chart-hd > div:not(.nw3d-top)');ctl.classList.add('nw3d-graph-only');var lg=chartCard.querySelector('.ov-legend');if(lg)lg.classList.add('nw3d-graph-only');
+var wrap=chartCv.parentNode;wrap.classList.add('nw3d-wrap');
+var tip=document.getElementById('chart-tooltip');tip.classList.add('nw3d-graph-only');
+/* the progress blocks: their own card under the net worth card (owner, 31 Oct 2026), with the Forecast switch top right */
+var tcard=document.createElement('div');tcard.className='ov-chart-card nw3d-trk-card';tcard.id='nw3d-trk-card';
+tcard.innerHTML='<div class="nw3d-top"><span class="ov-chart-title">Net worth progress</span>'
+ +'<div class="nw3d-seg" role="group" aria-label="Forecast"><button type="button" class="nw3d-fc" id="nw3d-fc" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-forecast"/></svg>Forecast</button></div></div>'
+ +'<span class="nw3d-sub">Your net worth month by month, one column of blocks a month. Forecast adds the next six months as see-through blocks. Tap or hover a month to read it, drag to turn it.</span>'
+ +'<div class="nw3d-stage" id="nw3d-trk-stage"><canvas id="nw3d-trk-cv" tabindex="0" role="img" aria-label="Net worth progress in 3D blocks. Tap a month to read it, drag to turn it."></canvas></div>'
+ +'<p class="nw3d-read" id="nw3d-trk-read" aria-live="polite"></p>'
+ +'<p class="nw3d-key" id="nw3d-trk-key"></p>';
+chartCard.parentNode.insertBefore(tcard,chartCard.nextSibling);
+var tst=document.getElementById('nw3d-trk-stage'),tkey=document.getElementById('nw3d-trk-key'),trkRead=document.getElementById('nw3d-trk-read'),fcBtn=document.getElementById('nw3d-fc');
+function fcSync(){fcBtn.setAttribute('aria-pressed',chartState.metrics.proj?'true':'false')}
+fcBtn.addEventListener('click',function(){toggleChartMetric(chartCard.querySelector('.chart-metric-btn[data-metric="proj"]'),'proj');fcSync();refreshTracker(true)});
 
 var heroCv=document.getElementById('nw3d-hero-cv'),trkCv=document.getElementById('nw3d-trk-cv'),heroRead=document.getElementById('nw3d-hero-read');
-function keyHtml(U,ghost){return '<span><i class="blk"></i>1 block = '+full(U)+'</span><span><i class="cube"></i>1 cube = '+full(U/10)+'</span>'+(ghost?'<span><i class="ghost"></i>Forecast</span><span>Tap or hover a month to read it</span>':'<span>Nine cubes, then a block</span>')}
+/* a small isometric box (a by b by h units) with a lit top and a shaded side, so the key looks like the blocks on the stage */
+function iso(col,a,b,h,u,ghost){
+  var c30=.866*u,s30=.5*u,P=function(x,y,z){return [(x-y)*c30,(x+y)*s30-z*u]},pts=[],F=function(arr){return arr.map(function(q){return (q[0]-minX+1).toFixed(1)+','+(q[1]-minY+1).toFixed(1)}).join(' ')};
+  var top=[P(0,0,h),P(a,0,h),P(a,b,h),P(0,b,h)],lf=[P(0,b,0),P(a,b,0),P(a,b,h),P(0,b,h)],rt=[P(a,0,0),P(a,b,0),P(a,b,h),P(a,0,h)];
+  pts=top.concat(lf,rt);var minX=Math.min.apply(0,pts.map(function(q){return q[0]})),minY=Math.min.apply(0,pts.map(function(q){return q[1]})),maxX=Math.max.apply(0,pts.map(function(q){return q[0]})),maxY=Math.max.apply(0,pts.map(function(q){return q[1]}));
+  var sh=function(k){return 'rgb('+col.map(function(v){return Math.round(k>1?v+(255-v)*(k-1):v*k)}).join(',')+')'},st=ghost?' fill="none" stroke="'+sh(1)+'" stroke-width="1" stroke-dasharray="2 2"':'';
+  return '<svg aria-hidden="true" width="'+Math.ceil(maxX-minX+2)+'" height="'+Math.ceil(maxY-minY+2)+'">'
+   +'<polygon points="'+F(lf)+'"'+(st||' fill="'+sh(.78)+'"')+'/><polygon points="'+F(rt)+'"'+(st||' fill="'+sh(.55)+'"')+'/><polygon points="'+F(top)+'"'+(st||' fill="'+sh(1.25)+'"')+'/></svg>'}
+function keyHtml(U,ghost){var t=tok(document.getElementById('nw3d-hero-stage'),'teal');
+  return '<span>'+iso(t,2.6,1,1,7)+'1 block = '+full(U)+'</span><span>'+iso(t,1,1,1,7)+'1 cube = '+full(U/10)+'</span>'+(ghost?'<span>'+iso(t,2.6,1,1,7,true)+'Forecast</span>':'<span>Nine cubes, then a block</span>')}
 
 /* ── the scene: one column per asset class in its colour code; debts grouped by kind (owner, 30 Oct 2026): every credit card stacks in
  * one column, one on top of the other, each in its own card colour; loans, car finance, overdrafts and so on each get their own column ── */
@@ -27916,7 +27945,7 @@ function refreshHero(){
   var t=heroEng.setData(d),shown=d.cols.filter(function(c){return c.v>=.5});
   heroSummary='Own '+full(t.assets)+' · Owe '+full(t.debt)+' · Net worth '+full(d.net);heroRead.textContent=heroSummary;
   heroCv.setAttribute('aria-label','Net worth '+full(d.net)+'. What you own, '+full(t.assets)+', stands above the gold line in blocks. What you owe, '+full(t.debt)+', hangs below it. Drag to turn it, pinch or scroll to zoom, or use the + and - buttons.');
-  document.getElementById('nw3d-hero-legend').innerHTML=shown.length?shown.map(function(c){var sw=function(col){return '<i style="background:rgb('+col.map(Math.round).join(',')+')"></i>'};
+  document.getElementById('nw3d-hero-legend').innerHTML=shown.length?shown.map(function(c){var sw=function(col){return iso(col.map(Math.round),1,1,1,8).replace('<svg ','<svg data-col="rgb('+col.map(Math.round).join(',')+')" ')};
     if(c.segs)return '<span class="below stack">'+c.segs.map(function(s){return sw(s.col)}).join('')+esc(c.name)+' <b>-'+full(c.v)+'</b>'+c.segs.map(function(s){return '<em>'+esc(s.name)+' '+full(s.v)+'</em>'}).join('')+'</span>';
     return '<span class="'+(c.dir<0?'below':'above')+'">'+sw(c.col)+esc(c.name)+' <b>'+(c.dir<0?'-':'')+full(c.v)+'</b></span>'}).join(''):'<span>Add your savings, investments or debts and they will stack up here.</span>';
   document.getElementById('nw3d-hero-key').innerHTML=keyHtml(t.unit,false);
@@ -27931,11 +27960,12 @@ function refreshHero(){
 var trkLast='';
 var trk=E.makeTracker(trkCv,{fps:30,fmt:full,onChange:function(s){
   tkey.innerHTML=keyHtml(s.unit,true);
-  if(!wrap.classList.contains('nw3d-bars')||s.lab==null||!tip)return;
+  if(s.lab==null){trkRead.textContent=trkToday();return}
   var t=s.lab+(s.forecast?' (forecast)':'')+': net worth '+full(s.v.nw);
   if(s.sel.debt)t+=' · debt '+full(s.v.debt);if(s.sel.inc&&!s.forecast)t+=' · income '+full(s.v.inc)+'/mo';
-  tip.textContent=t;
+  trkRead.textContent=t;
 }});
+function trkToday(){var d=trk.data&&trk.data();return d&&d.nw&&d.nw.length?'Today: net worth '+full(d.nw[d.today])+(d.sel.debt?' · debt '+full(d.debt[d.today]):''):''}
 function trackerData(){
   var pts=(chartCv._points||[]).filter(function(p){return !p.synth}),m=chartState.metrics,proj=m.proj?(chartCv._proj||[]):[],r=rate();
   var d={labels:[],nw:[],debt:[],inc:[],today:pts.length-1,sel:{nw:!!m.nw,debt:!!m.debt,inc:!!m.income,fc:!!m.proj}};
@@ -27943,28 +27973,18 @@ function trackerData(){
   proj.forEach(function(p){d.labels.push(monthLab(p.month));d.nw.push(Math.round((+p.nw||0)*r));d.debt.push(Math.round((+p.debt||0)*r));d.inc.push(0)});
   return d;
 }
-function refreshTracker(force){var d=trackerData();if(!d.nw.length)return;var sig=JSON.stringify(d);if(sig===trkLast&&!force)return;trkLast=sig;trk.setData(d)}
+function refreshTracker(force){fcSync();var d=trackerData();if(!d.nw.length)return;var sig=JSON.stringify(d);if(sig===trkLast&&!force)return;trkLast=sig;trk.setData(d);if(!trkRead.textContent||/^Today/.test(trkRead.textContent))trkRead.textContent=trkToday()}
 function refresh(){try{refreshHero()}catch(e){console.warn('nw3d scene',e)}try{refreshTracker()}catch(e){console.warn('nw3d tracker',e)}}
 
-/* ── the view toggle: 3D blocks first, Graph one tap away, the choice remembered on this device ── */
-function getView(){try{return localStorage.getItem('vi-nw-view')==='bars'?'bars':'line'}catch(e){return 'line'}}   // the chart is the backup, so its own default is the line
-function setView(v,user){
-  wrap.classList.toggle('nw3d-bars',v==='bars');tkey.hidden=v!=='bars';
-  seg.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-v')===v?'true':'false')});
-  if(user){try{localStorage.setItem('vi-nw-view',v)}catch(e){}}
-  if(tip)tip.textContent='';
-  drawChart();
-  if(v==='bars')refreshTracker(true);
-}
-seg.addEventListener('click',function(e){var b=e.target.closest('button[data-v]');if(b)setView(b.getAttribute('data-v'),true)});
+/* ── the view switch: 3D first, Graph one tap away, the choice remembered on this device ── */
 function getMain(){try{return localStorage.getItem('vi-nw-main')==='graph'?'graph':'3d'}catch(e){return '3d'}}
 function curMain(){return chartCard.classList.contains('nw3d-main-3d')?'3d':'graph'}
 function setMain(v,user){
   chartCard.classList.toggle('nw3d-main-3d',v==='3d');
   mseg.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-m')===v?'true':'false')});
-  if(ttl)ttl.textContent=v==='3d'?'Net worth in 3D':'Net worth progress';
+  if(ttl)ttl.textContent=v==='3d'?'Net worth in 3D':'Net worth over time';
   if(user){try{localStorage.setItem('vi-nw-main',v)}catch(e){}}
-  try{if(v==='3d'){refresh(true);if(heroEng.replay)heroEng.replay();}else{drawChart();refreshTracker(true);}}catch(e){}
+  try{drawChart();if(v==='3d'){refresh(true);if(heroEng.replay)heroEng.replay();}}catch(e){}
   try{window.dispatchEvent(new Event('resize'))}catch(e){}
 }
 mseg.addEventListener('click',function(e){var b=e.target.closest('button[data-m]');if(b)setMain(b.getAttribute('data-m'),true)});
@@ -27974,14 +27994,14 @@ setMain(getMain());
 var _draw=drawChart;
 window.drawChart=drawChart=function(){var r=_draw.apply(this,arguments);refresh();return r};
 function disable(){   // back to the classic card exactly as it was built
-  hero.remove();mseg.remove();seg.remove();tst.remove();tkey.remove();
-  wrap.classList.remove('nw3d-wrap','nw3d-graph-only','nw3d-bars');tip.classList.remove('nw3d-graph-only');
+  hero.remove();mseg.remove();tcard.remove();hd.insertBefore(ttl,top);top.remove();
+  wrap.classList.remove('nw3d-wrap');tip.classList.remove('nw3d-graph-only');
   [].forEach.call(chartCard.querySelectorAll('.nw3d-graph-only'),function(e){e.classList.remove('nw3d-graph-only')});
   chartCard.classList.remove('nw3d-main-3d');if(ttl)ttl.textContent='Net Worth Progress';
   window.drawChart=drawChart=_draw;delete window.nw3d;try{_draw();}catch(e){}
 }
-window.nw3d={hero:heroEng,tracker:trk,setView:setView,view:function(){return wrap.classList.contains('nw3d-bars')?'bars':'line'},setMain:setMain,main:curMain,sceneData:sceneData,trackerData:trackerData,refresh:refresh,disable:disable};
-setView(getView(),false);
+window.nw3d={hero:heroEng,tracker:trk,setMain:setMain,main:curMain,sceneData:sceneData,trackerData:trackerData,refresh:refresh,disable:disable};
+fcSync();
 if(document.readyState==='complete')setTimeout(refresh,50);else window.addEventListener('load',function(){setTimeout(refresh,50)});
 };
 if(nw3dFlag())window.nw3dMount();

@@ -9,7 +9,6 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [ ] Net worth 3D card controls (owner, 31 Oct 12:33, phone screenshot): the Graph / 3D / progress toggles are unclean (three views, four states) and belong top right; the key is too small and unclear, and its swatches should look like 3D blocks in the theme; split the net worth progress blocks into their own card below the 3D viewport, where the forecast toggle gives a separate insight (owner asked whether to split; recommendation: yes, one card per view, each with its own key)
 
 ## Waiting on the owner
 
@@ -25,6 +24,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Net worth 3D card controls (owner, 31 Oct 12:33): three views, one switch each, top right: the net worth card is 3D | Graph (the old Blocks | Line switch is gone); the progress blocks have their own card directly below with a Forecast switch (in step with the graph's) and their own readout and key; keys and legends are bigger and every swatch is a small 3D block in its colour. Commit NWCOMMIT on `brand-rollout`, not released.
 - [x] Secure paid gateway, built (owner, 31 Oct): migration 011 (paid columns the browser cannot change, tester flag from confirmed waitlist addresses, Stripe event log, `stripe_apply`), edge function `stripe-webhook` (signature checked, each event once, stale and old-subscription events skipped), the app reads paid status from the profile only once the server has it and works as before on an older server, privacy notice names Stripe. Tests: test_011, test_stripe_server, test_paid_gateway. Commit 9d6cbce on `brand-rollout`, not released, not live (needs the owner's yes)
 - [x] House builder style as the brand book and recording (owner, 31 Oct): the brand build is now the default (owner's call; classic viewer stays as the Settings switch), camera controls use the brand line icons, a column on the right at desktop and a row top right on phones, the caption wraps in Share Tech Mono and no longer counts tiles. Commit 5371db7 on `brand-rollout`, not released.
 - [x] Tablet and fold navigation (owner, 31 Oct): labelled top menu from 701 px even with the compact density saved; phones (Fold closed included) keep the bottom bar; "Icons only" still works. Not done (owner's call): phones in landscape still get the two-row header rather than the bottom bar. Commit 2047ce0 on `brand-rollout`, not released.
