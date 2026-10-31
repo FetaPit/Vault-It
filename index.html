@@ -22,7 +22,7 @@ html{box-sizing:border-box}
   --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882; --lock:#8C939B;
   --teal:#44C0B9; --teal-deep:#007F7B; --gold:#E8C56A; --brass:#C9A84C;
   --green:#3ECF8E; --green2:#3FB585; --red:#E05C5C; --blue:#64B5F6; --purple:#9B7EC8; --orange:#E0894A;
-  --coral:#E5535F; --salmon:#EE7D7D; --amber:#F59E0B; --yellow:#F5DC4A;
+  --coral:#E5535F; --salmon:#FFA38A; --amber:#F59E0B; --yellow:#F5DC4A;
   --goldf:#E8C56A; --on-teal:#00181A; --m-silver:#C0C8D0; --m-platinum:#E0E8F0; --m-palladium:#D0D8E0; --on-gold:#1A1400; --pulse:2800ms;
   --surf:#0A1018; --surf2:#080D14; --track:#13202A; --pillbg:#12100A; --lib:#0A1618; --doneb:#0A1F22; --toastbg:#08181C;
   --lockline:#3A4446; --lockfg:#6A7678; --dotoff:#2A3638;
@@ -48,7 +48,7 @@ html{box-sizing:border-box}
   --text:#0B1F22; --muted:#3A5052; --faint:#215451; --lock:#39433F;
   --teal:#185550; --teal-deep:#005652; --gold:#60480B; --brass:#5B4A19;
   --green:#135738; --green2:#1C563E; --red:#951919; --blue:#054E88; --purple:#583F81; --orange:#773C11;
-  --coral:#911D3A; --salmon:#7E3532; --amber:#6B4303; --yellow:#584C04;
+  --coral:#4F0A1E; --salmon:#8A3510; --amber:#6B4303; --yellow:#584C04;
   --on-teal:#FFFFFF; --m-silver:#444D55; --m-platinum:#414E56; --m-palladium:#464D53; --on-gold:#1A1400;
   --surf:#DAD8D0; --surf2:#DAD8D0; --track:#BCC6C1; --pillbg:#FFF6DD; --lib:#D3D2CA; --doneb:#E1F3F1; --toastbg:#DAD8D0;
   --lockline:#9AB0B1; --lockfg:#39433F; --dotoff:#A9BAB8;
@@ -19132,7 +19132,7 @@ function cfEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g
 function cfShort(s,n){s=String(s||'');return s.length>n?s.slice(0,n-1)+'…':s;}
 function cfLink(x0,y0,x1,y1,w,fill,op){
   var xm=(x0+x1)/2;
-  return '<path class="cf-ln" d="M'+x0+' '+y0+' C'+xm+' '+y0+','+xm+' '+y1+','+x1+' '+y1+' L'+x1+' '+(y1+w)+' C'+xm+' '+(y1+w)+','+xm+' '+(y0+w)+','+x0+' '+(y0+w)+' Z" style="fill:'+fill+';animation-delay:'+(x0/600).toFixed(2)+'s" fill-opacity="'+op+'"/>';
+  return '<path class="cf-ln" d="M'+x0+' '+y0+' C'+xm+' '+y0+','+xm+' '+y1+','+x1+' '+y1+' L'+x1+' '+(y1+w)+' C'+xm+' '+(y1+w)+','+xm+' '+(y0+w)+','+x0+' '+(y0+w)+' Z" style="fill:'+fill+';stroke:'+fill+';stroke-width:1.5px;stroke-opacity:.9;vector-effect:non-scaling-stroke;animation-delay:'+(x0/600).toFixed(2)+'s" fill-opacity="'+op+'"/>';
 }
 // Shared model so the Sankey, histogram and summary all agree.
 function cfModel(){
@@ -19220,10 +19220,13 @@ function drawCashflowDiagram(){
   // -- nodes
   var halo='paint-order="stroke" stroke="#050c14" stroke-width="3" stroke-linejoin="round"';
   function pct(v){return (v/T*100).toFixed(1)+'%';}
+  /* a bright stroke in the block's own colour from the block to its label (owner, 31 Oct) */
+  function lead(xa,xb,y,col){return '<line class="cf-lead" x1="'+xa+'" y1="'+y.toFixed(1)+'" x2="'+xb+'" y2="'+y.toFixed(1)+'" style="stroke:'+col+'" stroke-width="2.5" stroke-linecap="round"/>';}
   sy=srcY;
   sources.forEach(function(s){
     var h=Math.max(4,s.amt*k);
     out+='<rect x="'+XS+'" y="'+sy.toFixed(1)+'" width="'+nodeW+'" height="'+h.toFixed(1)+'" style="fill:'+s.col+'" fill-opacity=""'+(s.dash?.5:.9)+'"/>';
+    out+=lead(XS,XS-6,sy+h/2,s.col);
     out+='<text x="'+(XS-8)+'" y="'+(sy+h/2-2).toFixed(1)+'" text-anchor="end" font-size="11.5" font-weight="700" fill="#cfe9e7" '+halo+'>'+cfEsc(cfShort(s.name,26))+'</text>';
     out+='<text x="'+(XS-8)+'" y="'+(sy+h/2+11).toFixed(1)+'" text-anchor="end" font-size="10.5" font-family="Share Tech Mono,monospace" fill="#8fb4b1" '+halo+'>'+cfMoney(s.amt)+' ('+pct(s.amt)+')</text>';
     sy+=Math.max(s.amt*k,MINSLOT)+gapSrc;
@@ -19232,11 +19235,13 @@ function drawCashflowDiagram(){
   out+='<text x="'+(XI+nodeW/2)+'" y="'+(incY-9).toFixed(1)+'" text-anchor="middle" font-size="11.5" font-weight="800" style="fill:var(--teal)" letter-spacing="1.5" '+halo+'>INCOME '+cfMoney(m.tIn)+'</text>';
   groupNodes.forEach(function(gn){
     out+='<rect x="'+XG+'" y="'+gn.y.toFixed(1)+'" width="'+nodeW+'" height="'+gn.h.toFixed(1)+'" style="fill:'+gn.g.col+'"/>';
+    out+=lead(XG+nodeW,XG+nodeW+6,gn.y+gn.h/2,gn.g.col);
     out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2-2).toFixed(1)+'" font-size="12" font-weight="800" style="fill:'+gn.g.tx+'" '+halo+'>'+gn.g.label+'</text>';
     out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2+12).toFixed(1)+'" font-size="10.5" font-family="Share Tech Mono,monospace" fill="#b9c4cf" '+halo+'>'+cfMoney(gn.g.sum)+' ('+pct(gn.g.sum)+')</text>';
   });
   itemNodes.forEach(function(n){
     out+='<rect x="'+XT+'" y="'+n.y.toFixed(1)+'" width="'+nodeW+'" height="'+n.h.toFixed(1)+'" style="fill:'+n.g.col+(n.it.overflow?';stroke:'+n.g.col:'')+'" fill-opacity="'+(n.it.overflow?.45:.95)+'"'+(n.it.overflow?' stroke-dasharray="3 2"':'')+'/>';
+    out+=lead(XT+nodeW,XT+nodeW+6,n.y+n.h/2,n.g.col);
     out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2-1).toFixed(1)+'" font-size="11" font-weight="700" fill="#dfe6ec" '+halo+'>'+cfEsc(cfShort(n.it.name,20))+'</text>';
     out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2+11).toFixed(1)+'" font-size="10" font-family="Share Tech Mono,monospace" fill="#8f9bab" '+halo+'>'+cfMoney(n.it.amt)+' ('+pct(n.it.amt)+')</text>';
   });
