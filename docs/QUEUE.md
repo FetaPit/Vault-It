@@ -9,7 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [ ] Tier gates from the questionnaire (31 Oct): old caps go (assets, liabilities, debts unlimited), house build Level 1 open to all, Pioneer gates on net worth history, Levels 2 and 3, Entrepreneur, projections, history and restore, Connections; yearly-only gates on own 3D design, AI model and extra house types; AI reader 3 / 30 / 10 a month
+- [~] Tier gates (31 Oct, revised by the owner the same afternoon, decision doc section 10): old caps go (assets, liabilities, debts unlimited); the six preset house types for everyone; own 3D design upload and AI model need a paid plan (monthly, yearly or Founding), trial included; an ended account sees everything read-only, so no Pioneer-only locks; AI reader 3 / 30 / 10 a month shown next to the button; read-only guards on the handlers the audit found unguarded
 - [ ] Simplified / Advanced view (owner, 31 Oct): switch in Settings and the welcome flow, new accounts start Simplified, synced per account; tile list in `docs/MONETISATION_DECISION.md` section 8 (Overview KPIs one row, 3D card, roadmap, achievements card; Budget sections collapsed with the Sankey on top and a flow animation; House viewport and plan; all Assets sub-tabs; all of Debt)
 - [ ] Tester welcome message (wording agreed 31 Oct): wire it to the first run for beta accounts
 - [ ] Sign-up page steps (owner, 31 Oct 09:56, from phone screenshots): in the "how it works" steps, drop the big 3D house under step 3 and give steps 1, 2 and 3 a small screenshot each, relevant to its subject; step 2's screenshot carries the relevant brand-book iconography with subtle pulsing animations (reduced motion respected)

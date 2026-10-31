@@ -127,3 +127,11 @@ The old caps (3 assets, 2 liabilities, 1 debt) go. The house build is never behi
 - **Beta testers pay £2 a month and £28 a year less**: Pioneer £3.99 a month or £21.99 a year, shown with the full price struck through. Founding Member stays £149. While the app is in beta every account counts as a tester (`VI_BETA_OPEN`); the secure paid gateway (queued) adds a real tester flag on the profile.
 - **Stripe (live account PT Live Design), created 31 Oct through the Stripe connector**: see the table in `docs/OFFER_AND_PRICING.md`. The old £59.99 yearly link is switched off; the monthly link now returns buyers to the app with `?upgraded=1` (it pointed at `?paid=1`, which the app never read).
 - **Secure paid gateway: yes.** Paid status will be set by a Stripe webhook into `profiles` through a new edge function, with the client's write access to `is_pioneer` revoked. Until then the device flag stands. Queued after the open items.
+
+## 10. Decided by Pete (31 Oct 2026, afternoon, second round)
+
+- **An ended (read-only) account sees everything.** Net worth history, house Levels 2 and 3, Entrepreneur, projections, version history and Connections all stay visible after the 30 days; only editing stops. So there are no Pioneer-only locks on features: the real gates are the paid-only design tools and the AI reader allowance.
+- **House types: all six preset models (terraced, semi, detached, manor, flat, apartment) for everyone**, trial and Vaulter included. **Uploading your own 3D design or generating one with AI needs a paid plan** (Pioneer monthly, Pioneer yearly or Founding Member), including during the trial. Those two buttons only appear in Advanced mode.
+- Earlier buyers with no plan recorded count as paid. The yearly extras that remain are early access and roadmap voting.
+- **House builder look: the screen recording is the target.** The brand build switches ON by default (the classic viewer stays as the Settings switch); the remaining gaps (control buttons in a row at the top right, caption text) are fixed in the house style item.
+- **Secure paid gateway:** every address confirmed on the waitlist is a beta tester; Pete reconciles paid profiles against Stripe before any self-declared row is cleared.
