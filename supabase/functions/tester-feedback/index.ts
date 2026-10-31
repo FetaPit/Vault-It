@@ -81,7 +81,7 @@ export function cleanContext(ctx: Record<string, unknown>): Record<string, unkno
   const out: Record<string, unknown> = { ...ctx }
   if ('trail' in ctx) {
     out.trail = (Array.isArray(ctx.trail) ? ctx.trail : []).slice(-LIMITS.trail).filter((x) => x && typeof x === 'object').map((x: any) => ({
-      t: typeof x.t === 'number' && isFinite(x.t) ? x.t : null,
+      t: typeof x.t === 'number' && isFinite(x.t) ? x.t : typeof x.t === 'string' && isFinite(Date.parse(x.t)) ? new Date(Date.parse(x.t)).toISOString() : null,
       ev: typeof x.ev === 'string' ? x.ev.replace(/[^A-Za-z0-9_.:-]/g, '').slice(0, 32) : null,
       tab: plainTab(x.tab),
       el: cleanLabel(x.el),
@@ -89,7 +89,10 @@ export function cleanContext(ctx: Record<string, unknown>): Record<string, unkno
   }
   if ('errors' in ctx) {
     out.errors = (Array.isArray(ctx.errors) ? ctx.errors : []).slice(-LIMITS.errors)
-      .map((e) => stripMoney(typeof e === 'string' ? e : JSON.stringify(e)))
+      .map((e: any) => e && typeof e === 'object'
+        ? { t: typeof e.t === 'string' || typeof e.t === 'number' ? String(e.t).slice(0, 40) : null,
+            msg: stripMoney(e.msg).replace(/\d+/g, '#'), src: typeof e.src === 'string' ? e.src.replace(/[^A-Za-z0-9_.:\/-]/g, '').slice(0, 80) : null }
+        : stripMoney(typeof e === 'string' ? e : JSON.stringify(e)).replace(/\d+/g, '#'))
   }
   return out
 }

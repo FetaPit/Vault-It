@@ -3,12 +3,13 @@
 // figures; a light activity log batched to our own function, switched off in Settings; prompts at good moments, once each.
 // Run: node tests/test_feedback_client.js
 const { chromium } = require('playwright');
-let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
+let fails = 0; const noT = o => JSON.stringify(o, (k, v) => (k === 't' || k === 'ms' || k === 'session' || k === 'at') ? undefined : v);
+const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
   const b = await chromium.launch(); const errs = [];
   for (const [w, theme] of [[1100, 'dark'], [390, 'light']]) {
     const mob = w < 700, ctx = await b.newContext({ viewport: { width: w, height: mob ? 844 : 900 }, isMobile: mob, hasTouch: mob });
-    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(w + ' ' + e.message));
+    const p = await ctx.newPage(); p.on('pageerror', e => { if (!/bad value/.test(e.message)) errs.push(w + ' ' + e.message); });
     const sent = []; let status = 200;
     await ctx.route(/\/functions\/v1\/tester-feedback/, r => { const j = JSON.parse(r.request().postData() || '{}'); sent.push(j);
       r.fulfill({ status, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(status === 200 ? { ok: true, id: 7, n: (j.events || []).length } : { error: 'limit' }) }); });
@@ -30,6 +31,12 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
       return { vis: getComputedStyle(e).display !== 'none' && r.width > 0, bottom: r.bottom, right: r.right, fh, label: getComputedStyle(e.querySelector('span')).display !== 'none', aria: e.getAttribute('aria-label') }; });
     ok(btn.vis && btn.right <= w && btn.bottom <= (mob ? 844 : 900) - 30 && btn.aria === 'Send feedback', T + 'a Feedback button sits above the footer and nav (bottom ' + Math.round(btn.bottom) + ')');
     ok(btn.label === !mob, T + (mob ? 'on a phone it is just the icon' : 'on desktop it says Feedback'));
+    const dodged = await p.evaluate(() => { const st = document.createElement('style'); st.textContent = 'body>*:not(#vi-fb-btn):not(#fb-under){visibility:hidden!important}'; document.head.appendChild(st);
+      const b = document.getElementById('vi-fb-btn'); b.classList.remove('vi-fb-left'); const r = b.getBoundingClientRect(), x = document.createElement('button');
+      x.id = 'fb-under'; x.textContent = '+'; x.style.cssText = 'position:fixed;z-index:1;left:' + (r.left - 4) + 'px;top:' + (r.top - 4) + 'px;width:' + (r.width + 8) + 'px;height:' + (r.height + 8) + 'px';
+      document.body.appendChild(x); viFbDodge(); const moved = b.classList.contains('vi-fb-left') && b.getBoundingClientRect().left < 40; x.remove(); viFbDodge(); const back = !b.classList.contains('vi-fb-left'); st.remove(); viFbDodge(); return moved && back; });
+    ok(dodged, T + 'the button moves to the left edge when a control sits under it, and back when clear');
+    await p.evaluate(() => setTimeout(() => { throw new Error('bad value 3217.50 at row 987'); }, 0)); await p.waitForTimeout(100);
     // not signed in: says so, sends nothing
     await p.click('#vi-fb-btn'); await p.waitForTimeout(300);
     ok(/Sign in to send feedback/.test(await p.textContent('#vi-fb-msg')) && sent.length === 0, T + 'signed out: the sheet says how to reach us instead');
@@ -45,7 +52,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     await p.fill('#vi-fb-text', 'The cash total confused me'); await p.click('#vi-fb .vi-fb-rate button[data-r="4"]'); await p.click('#vi-fb-send'); await p.waitForTimeout(700);
     const fb = sent.find(x => x.kind === 'feedback');
     ok(fb && fb.text === 'The cash total confused me' && fb.rating === 4 && /^data:image\/jpeg;base64,/.test(fb.screenshot || '') && fb.context && fb.context.tab === 'assets/cash', T + 'sends the words, the rating, the picture and the screen (' + (fb && fb.context && fb.context.tab) + ')');
-    const cj = JSON.stringify(fb && fb.context || {});
+    const cj = noT(fb && fb.context || {});
     ok(fb && Array.isArray(fb.context.trail) && fb.context.trail.length >= 3 && !/3217|987|£/.test(cj) && fb.context.trail.every(e => !/\d/.test(e.el || '')), T + 'the context carries the last actions and no figures');
     ok(await p.evaluate(() => document.getElementById('vi-fb').hidden), T + 'the sheet closes with a thank you');
     // untick the picture: none sent
@@ -62,7 +69,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     await p.evaluate(() => { showTab('debt'); showTab('overview'); }); const n0 = sent.length; await p.evaluate(() => viFb.flush()); await p.waitForTimeout(400);
     const ev = sent.slice(n0).find(x => x.kind === 'events'), allEv = [].concat(...sent.filter(x => x.kind === 'events').map(x => x.events));
     ok(ev && /^[0-9a-f-]{36}$/.test(ev.session) && ev.events.some(e => e.ev === 'tab' && e.tab === 'debt' && e.ms >= 0) && allEv.some(e => e.ev === 'session_start'), T + 'activity: screens opened and time on them are batched to our own function');
-    ok(ev && !/3217|987|£/.test(JSON.stringify(ev)) && ev.events.every(e => e.ev !== 'click'), T + 'activity holds no figures and no taps');
+    ok(ev && !/3217|987|£/.test(noT(ev)) && ev.events.every(e => e.ev !== 'click'), T + 'activity holds no figures and no taps');
     await p.evaluate(() => { const b = document.querySelector('#set-fbact button[data-val="0"]'); viFbAct(false, b); showTab('budget'); }); const n1 = sent.length; await p.evaluate(() => viFb.flush()); await p.waitForTimeout(300);
     ok(sent.length === n1 && await p.evaluate(() => localStorage.getItem('vi-fb-activity') === '0' && document.querySelector('#set-fbact button[data-val="0"]').classList.contains('active')), T + 'Settings > Share usage off: nothing is sent');
     await p.evaluate(() => viFbAct(true));
@@ -84,7 +91,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     await p.click('#vi-fbq-ch button[data-v="No"]'); const n3 = sent.length; await p.click('#vi-fbq-next'); await p.waitForTimeout(600);
     const sv = sent.slice(n3).find(x => x.kind === 'survey');
     ok(sv && sv.survey === 'day14' && sv.answers.length === 4 && sv.answers[0].q === 'pmf' && sv.answers[0].choice === 'Very disappointed' && sv.answers.some(a => a.q === 'improve' && a.text === 'Bank sync') && !sv.answers.some(a => a.q === 'who'), T + 'the check-in is sent as one set of answers, skipped ones left out');
-    ok(!/3217|987/.test(JSON.stringify(sv || {})), T + 'no figures in the check-in');
+    ok(!/3217|987/.test(noT(sv || {})), T + 'no figures in the check-in');
     // the end-of-trial check-in has a 0 to 10 score and the tester price as charged
     await p.evaluate(() => viFbAsk('day25')); await p.waitForTimeout(150);
     for (let k = 0; k < 2; k++) await p.click('#vi-fbq-skip');

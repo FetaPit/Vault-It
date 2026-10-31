@@ -148,7 +148,7 @@ const good = (o = {}) => ({ kind: 'feedback', text: 'The bills tab froze when I 
   ok(!req.body.messages[0].content.some((c) => c.type === 'image'), 'the screenshot is not sent to Claude by default');
   const els = row.context.trail.map((x) => x.el);
   ok(els[0] === 'Pay now' && els[1] === 'Debt of' && els[2] === 'btn-save', 'trail labels: amounts and digits stripped before storing: ' + JSON.stringify(els));
-  ok(row.context.errors[0] === '[amount] is wrong at line 40', 'page errors keep line numbers but lose amounts: ' + row.context.errors[0]);
+  ok(row.context.errors[0] === '[amount] is wrong at line #', 'page errors lose amounts and digits: ' + row.context.errors[0]);
   const prompt = req.body.messages[0].content.find((c) => c.type === 'text').text;
   ok(!/£|250|12\.50/.test(prompt) && prompt.includes('<feedback>') && prompt.includes('btn-save'), 'the triage prompt carries the trail without figures, the text fenced as data');
   ok(sent.resend.length === 0, 'severity 2: no e-mail');
@@ -258,6 +258,9 @@ const good = (o = {}) => ({ kind: 'feedback', text: 'The bills tab froze when I 
   ok(p('{"type":"bug","severity":3,"summary":"Shows £1,200 instead of £1,300"}').summary === 'Shows [amount] instead of [amount]', 'amounts in the summary are removed');
   ok(p('not json') === null && p({ severity: 2 }) === null && p([]) === null, 'unusable replies give null');
   ok(mod.cleanLabel('£5k left') === 'left' && mod.cleanLabel('12 months') === 'months' && mod.cleanLabel('') === null, 'cleanLabel strips amounts and digits');
+  { const c = mod.cleanContext({ trail: [{ t: '2026-10-31T20:00:00.000Z', ev: 'tab', tab: 'budget', el: 'Save' }], errors: [{ t: '2026-10-31T20:00:01.000Z', msg: 'bad value 3217.50 at row 987', src: 'index.html:28630' }, 'oops £12 then 44'] });
+    ok(c.trail[0].t === '2026-10-31T20:00:00.000Z', 'cleanContext keeps the trail time the app sends (ISO text)');
+    ok(!/\d/.test(c.errors[0].msg) && c.errors[0].src === 'index.html:28630' && !/\d/.test(c.errors[1]), 'cleanContext strips every digit from error messages, keeps the source line'); }
   const blk = (s) => s.slice(s.indexOf('// <<TRIAGE'), s.indexOf('// TRIAGE>>'));
   ok(blk(FB.src).length > 1000 && blk(FB.src) === blk(DG.src), 'the triage block is identical in both functions');
   ok(!/\u2014/.test(FB.src + DG.src), 'no em dashes in either function');
