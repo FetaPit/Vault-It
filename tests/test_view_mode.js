@@ -38,6 +38,7 @@ const seed = (o) => {
   // ── 1. no view saved: Advanced ──
   let p = await open({});
   await p.evaluate(() => showTab('overview')); await p.waitForTimeout(400);
+  await p.evaluate(() => { if (window.nw3d) nw3d.setMain('graph', true); }); await p.waitForTimeout(300);   // goals and snapshots live in the Graph view (owner, 31 Oct)
   let o = await p.evaluate(() => window.__ov());
   ok(!o.simple && o.ms && o.nwh && o.cf && o.own && !o.ach && /achievements/.test(o.tabs) && /biz/.test(o.tabs), 'no view saved: Advanced, every Overview tile and tab shows, no achievements card');
   const fold0 = await p.evaluate(() => { showTab('budget'); return [...document.querySelectorAll('.bd-tile')].map(t => t.classList.contains('folded')); });

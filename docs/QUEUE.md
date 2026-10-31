@@ -9,13 +9,6 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [ ] Net worth in 3D (owner, 31 Oct): the column list under the scene folds into a dropdown (collapsed); on desktop the credit card blocks stand alongside the wealth inventory cubes; cubes about 35% larger, so the visual gets more room
-- [ ] Goals and snapshots (owner, 31 Oct): off the dashboard; shown and editable only in the net worth Graph view (what is added there still feeds everything else)
-- [ ] Financial freedom roadmap (owner, 31 Oct): the line must not run through or behind the icons; a 3D touch (coins that turn, or the road in slight perspective, icons in front); the stage just unlocked is the largest, others grow on hover; on mobile a swipe carousel with the largest icon in the centre and smaller ones fading out to the sides
-- [ ] Budget colours (owner, 31 Oct): keep the group headings and tiles colour coded (committed essential, variable essential, committed non-essential, variable non-essential) but drop the colour from the individual items inside (rent, council tax, debt …); everything else stays as it is
-- [ ] House type icons (owner, 31 Oct): new icons for the six types (terraced, semi-detached, detached, manor, flat, apartment) in the brand book's icon style, laid out in two rows of three on every screen size
-- [ ] Contribution streak (owner, 31 Oct): on desktop it fills only a third of the width and the dates, months and dots are far too small; make it readable on desktop, tablet and phone
-- [ ] Debt charts (owner, 31 Oct): three views but four buttons; the tree map shows by default, and directly under it one tile with the histogram and the donut behind a toggle
 
 ## Waiting on the owner
 
@@ -30,6 +23,13 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Net worth in 3D (owner, 31 Oct): the column list folds into a "What each column is" dropdown, the scene rests 20% closer (35% cut off the first column at 1100 px), the debt columns stand right after the inventory cubes. Commit ROUND2COMMIT
+- [x] Goals and snapshots (owner, 31 Oct): hidden while the 3D view shows; they appear in the net worth Graph view (what is added there still feeds everything else). Commit ROUND2COMMIT
+- [x] Financial freedom roadmap (owner, 31 Oct): the rail runs between the coins, never through them; coins have depth, the stage to work on is the largest and turns gently, the others grow on hover; the road sits in slight perspective; on phones it is a carousel (largest in the centre, fading to the sides, swipe settles on a stage); opens with the current stage centred. Commit ROUND2COMMIT
+- [x] Budget colours (owner, 31 Oct): tiles and headings keep the group colour; the lines inside and the chips beside the account line are neutral. Commit ROUND2COMMIT
+- [x] House type icons (owner, 31 Oct): six line icons in the brand icon style (24 grid, hairline, 16% fill), two rows of three on every width. Commit ROUND2COMMIT
+- [x] Contribution streak (owner, 31 Oct): dots, month labels and links scale with the card (about 22 px dots on a desktop). Commit ROUND2COMMIT
+- [x] Debt charts (owner, 31 Oct): the tree map first in its own card, then one tile with Histogram | Donut. Commit ROUND2COMMIT
 - [x] House builder freezes (owner, 31 Oct, top priority): bricks drawn solid with the depth test, the far-face pass removed, a lite mode that really skips frames and starts at once on a software GPU, slow-motion laying (about 5 s a deposit, 0.9 s drop, 2 s gold flash). Commit eb0c7c0 on `brand-rollout` (full suite passed); release blocked by the session's permission layer, owner to push
 - [x] Net worth in 3D empty on load (owner, 31 Oct): safety net: a forced refresh and stage kick after load, on return from the background and after a failed draw. Commit 7f9f390
 - [x] Net worth progress (owner, 31 Oct): Forecast on by default; the key names net worth, debt and monthly income with 3D swatches. Commit 7f9f390

@@ -8,6 +8,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   const b=await chromium.launch(); const errs=[];
   const open=async(w,h,mob)=>{const ctx=await b.newContext({viewport:{width:w,height:h},isMobile:!!mob,hasTouch:!!mob});const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));await p.addInitScript(seed);await p.goto('file:///home/user/Vault-It/index.html');await p.waitForTimeout(2000);await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});await p.evaluate(()=>showTab('overview'));await p.waitForTimeout(900);return p;};
   let p=await open(1600,900);
+  await p.evaluate(()=>{if(window.nw3d)nw3d.setMain('graph',true);}); await p.waitForTimeout(300);   // goals and snapshots show in the Graph view only (owner, 31 Oct)
   const g=await p.evaluate(()=>{const r=id=>document.querySelector(id).getBoundingClientRect();const c=document.getElementById('nwChart').closest('.ov-chart-card').getBoundingClientRect(),cb=(document.getElementById('nw3d-trk-card')||document.getElementById('nwChart').closest('.ov-chart-card')).getBoundingClientRect(),ms=r('#ov-ms-card'),road=r('#fire-roadmap-card'),nwh=document.getElementById('nwh-mini-wrap').closest('.ov-chart-card').getBoundingClientRect();
     return{chartH:(function(){var c=document.getElementById('nwChart'),e=c.offsetParent&&getComputedStyle(c).visibility!=='hidden'?c:(document.getElementById('nw3d-hero-stage')||c);return e.getBoundingClientRect().height})(),chartW:c.width,chartLeft:c.left,roadW:road.width,roadLeft:road.left,msTop:ms.top,chartBottom:cb.bottom,roadTop:road.top,msBottom:ms.bottom,vh:innerHeight,nwhTop:nwh.top};});
   console.log(JSON.stringify(g));
@@ -37,6 +38,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   ok(st.snaps===0&&st.goals===0,'both can be removed again'); await p.context().close();
   // mobile
   p=await open(390,844,true);
+  await p.evaluate(()=>{if(window.nw3d)nw3d.setMain('graph',true);}); await p.waitForTimeout(300);   // goals live in the Graph view (owner, 31 Oct)
   await p.evaluate(()=>ovMsTab('snaps'));const mbB=await p.evaluate(()=>document.querySelector('#ms-add-snap>summary').getBoundingClientRect());await p.evaluate(()=>ovMsTab('goals'));
   const mb=await p.evaluate((bb)=>{const a=document.querySelector('#ms-add-goal>summary').getBoundingClientRect(),b=bb;return{a:a.height>30&&a.width>200,b:b.height>30&&b.width>200,open:document.getElementById('ms-add-goal').open};},mbB);
   ok(mb.a&&mb.b,'mobile: "Add your own goal" and "Add a snapshot" buttons are visible');

@@ -86,7 +86,7 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   ok(nums.fcDefault, 'Forecast is on by default (owner, 31 Oct)');
   ok(/Net worth/.test(nums.keyTxt) && /Debt/.test(nums.keyTxt) && /Monthly income/.test(nums.keyTxt) && nums.keySw >= 6, 'the progress key names its three colours, each with a 3D swatch (' + nums.keyTxt + ')');
   ok(nums.tag === nums.net && Math.abs(nums.sum - nums.net) < 1, 'scene tag = computeNetWorth (' + nums.tag + ') and the columns add up to it (' + nums.sum.toFixed(2) + ')');
-  ok(/cash,deposit,metals,inv,liabval,debt:loan,debt:credit,running/.test(nums.cols), 'one column per asset class in order, then one column per kind of debt, largest first, then running costs (' + nums.cols + ')');
+  ok(/cash,deposit,metals,inv,debt:loan,debt:credit,liabval,running/.test(nums.cols), 'asset classes in order, the debt columns right after the inventory cubes (owner, 31 Oct), then the rest (' + nums.cols + ')');
   ok(nums.cash && nums.cash.blocks === 6 && nums.cash.cubes === 4 && nums.unit === 1000, '£6,420 of cash = 6 £1,000 blocks + 4 £100 cubes (a fraction tops it)');
   ok(JSON.stringify(nums.ptsNw) === JSON.stringify(nums.trkNw) && JSON.stringify(nums.ptsDebt) === JSON.stringify(nums.trkDebt) && nums.todayNw === nums.net, '3D blocks show the graph\'s own points (' + nums.trkNw.join(', ') + '), today = net worth');
   ok(nums.read.indexOf('Net worth £' + nums.net.toLocaleString('en-GB')) >= 0 && nums.tip.indexOf('net worth £' + nums.net.toLocaleString('en-GB')) >= 0, 'readouts under both 3D views say the same net worth');
@@ -111,7 +111,7 @@ const hash = (id) => { const c = document.getElementById(id), d = c.getContext('
   await p.keyboard.down('Control'); await p.mouse.wheel(0, -400); await p.keyboard.up('Control'); await p.waitForTimeout(100);
   const z3 = await p.evaluate(() => nw3d.hero.st.zoom);
   await tap(p, '#nw3d-hero-stage [data-z="reset"]'); const z4 = await p.evaluate(() => nw3d.hero.st.zoom);
-  ok(z0 === 1 && Math.abs(z1 - 1.5625) < 1e-6 && z2 < z1 && z3 > z2 && z4 === 1, 'zoom in twice (' + z1 + '), out (' + z2.toFixed(3) + '), ctrl+wheel in (' + z3.toFixed(3) + '), reset to 1 (' + z4 + ')');
+  ok(Math.abs(z0 - 1.2) < 1e-9 && Math.abs(z1 - 1.2 * 1.5625) < 1e-6 && z2 < z1 && z3 > z2 && Math.abs(z4 - 1.2) < 1e-9, 'the scene rests 20% closer (owner, 31 Oct): zoom in twice (' + z1.toFixed(3) + '), out (' + z2.toFixed(3) + '), ctrl+wheel in (' + z3.toFixed(3) + '), reset to 1.2 (' + z4 + ')');
 
   // ── 3. Graph (the backup) and back: same numbers, the choice remembered ──
   await tap(p, '#nw3d-main button[data-m="graph"]'); await p.waitForTimeout(400);
