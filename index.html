@@ -9884,6 +9884,13 @@ input:focus, textarea:focus, select:focus {
 .stk-meta-i{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 .stk-tag{font-style:normal;font-family:'Share Tech Mono',monospace;font-size:.38rem;letter-spacing:.08em;color:var(--gold);border:1px solid rgb(var(--gold-rgb) / .5);border-radius:3px;padding:1px 4px;margin-right:6px;vertical-align:middle}
 .stk-mini-logo{display:inline-flex;width:14px;height:14px;border-radius:4px;overflow:hidden;background:#fff;vertical-align:middle}
+.cash-acc{display:inline-flex;align-items:center;gap:8px;min-width:0}
+.cash-logo{display:inline-flex;flex:none;width:22px;height:22px;border-radius:6px;overflow:hidden;background:#fff;align-items:center;justify-content:center}
+.cash-logo img{width:100%;height:100%;object-fit:contain}
+.cash-logo .cash-mono{width:100%;height:100%}
+.cash-logo .stk-mono{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:700}
+.cash-logo-none{background:rgb(var(--teal-rgb) / .1);border:1px solid rgb(var(--teal-rgb) / .3)}
+.cash-logo-none .vi-ic{width:15px;height:15px;color:var(--teal)}
 .stk-mini-logo img{width:100%;height:100%;object-fit:contain}
 .stk-mini-logo .stk-mono{font-size:6px}
 .stk-ch-hd{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
@@ -19477,9 +19484,67 @@ var STK_PLATFORMS=[
  {n:'Aviva',d:'aviva.co.uk',c:'#ffd100',re:/aviva/i},
  {n:'Standard Life',d:'standardlife.co.uk',c:'#00a3a1',re:/standard\s*life/i},
  {n:'Bestinvest',d:'bestinvest.co.uk',c:'#00a5a8',re:/bestinvest/i},
- {n:'Quilter',d:'quilter.com',c:'#005cb9',re:/quilter/i}
+ {n:'Quilter',d:'quilter.com',c:'#005cb9',re:/quilter/i},
+ /* owner, 31 Oct: logos for all major banks and investment platforms, applied from each account's name. Brands that are also
+    everyday words (Wise, Curve, Marcus, Tandem, Tesco, Sainsbury's) match only as the whole name or with an account word */
+ {n:'InvestEngine',d:'investengine.com',c:'#2a2aff',re:/invest\s*engine/i},
+ {n:'PensionBee',d:'pensionbee.com',c:'#ffcc00',re:/pension\s*bee/i},
+ {n:'Moneyfarm',d:'moneyfarm.com',c:'#0a2d5c',re:/moneyfarm/i},
+ {n:'Charles Stanley',d:'charles-stanley.co.uk',c:'#00263e',re:/charles\s*stanley/i},
+ {n:'CMC Markets',d:'cmcmarkets.com',c:'#00a3e0',re:/\bcmc\b/i},
+ {n:'Plus500',d:'plus500.com',c:'#0f2a4a',re:/plus\s*500/i},
+ {n:'Dodl',d:'dodl.co.uk',c:'#111',re:/\bdodl\b/i},
+ {n:'Scottish Widows',d:'scottishwidows.co.uk',c:'#00205b',re:/scottish\s*widows/i},
+ {n:'Royal London',d:'royallondon.com',c:'#d6001c',re:/royal\s*london/i},
+ {n:'Legal & General',d:'legalandgeneral.com',c:'#0a2540',re:/legal\s*(&|and)?\s*general|\bl&g\b/i},
+ {n:'Nest',d:'nestpensions.org.uk',c:'#e5007e',re:/^\s*nest\s*$|\bnest\s*(pension|workplace)/i},
+ {n:'Prudential',d:'pru.co.uk',c:'#ed1b2e',re:/prudential|\bpru\b/i},
+ {n:'Bank of Scotland',d:'bankofscotland.co.uk',c:'#003478',re:/bank\s*of\s*scotland/i},
+ {n:'Royal Bank of Scotland',d:'rbs.co.uk',c:'#0a2f5c',re:/royal\s*bank\s*of\s*scotland|\brbs\b/i},
+ {n:'Ulster Bank',d:'ulsterbank.co.uk',c:'#003479',re:/ulster\s*bank/i},
+ {n:'First Direct',d:'firstdirect.com',c:'#000',re:/first\s*direct/i},
+ {n:'TSB',d:'tsb.co.uk',c:'#00a3e0',re:/\btsb\b/i},
+ {n:'Metro Bank',d:'metrobankonline.co.uk',c:'#e4002b',re:/metro\s*bank/i},
+ {n:'Virgin Money',d:'virginmoney.com',c:'#cc0000',re:/virgin\s*money/i},
+ {n:'Co-operative Bank',d:'co-operativebank.co.uk',c:'#00b1e7',re:/co-?operative\s*bank|\bco-?op\s*bank/i},
+ {n:'Chase',d:'chase.co.uk',c:'#117aca',re:/\bchase\b/i},
+ {n:'Kroo',d:'kroo.com',c:'#000',re:/\bkroo\b/i},
+ {n:'Zopa',d:'zopa.com',c:'#3a1d6e',re:/\bzopa\b/i},
+ {n:'Marcus',d:'marcus.co.uk',c:'#0a2240',re:/marcus\s*(by\s*)?goldman|^\s*marcus(\s+(account|card|bank|savings?|saver|isa|current|easy|access|instant|jar|pot|balance|gbp|eur|usd|fixed|bonus|cashback|credit|rate|interest|\d+))*\s*$/i},
+ {n:'Atom bank',d:'atombank.co.uk',c:'#2b1a5a',re:/atom\s*bank/i},
+ {n:'Tandem',d:'tandem.co.uk',c:'#003a5d',re:/tandem\s*bank|^\s*tandem(\s+(account|card|bank|savings?|saver|isa|current|easy|access|instant|jar|pot|balance|gbp|eur|usd|fixed|bonus|cashback|credit|rate|interest|\d+))*\s*$/i},
+ {n:'Tesco Bank',d:'tescobank.com',c:'#00539f',re:/tesco\s*(bank|savings?|saver|credit|isa|clubcard\s*(credit|plus))/i},
+ {n:"Sainsbury's Bank",d:'sainsburysbank.co.uk',c:'#f06c00',re:/sainsbury'?s?\s*(bank|savings?|saver|credit|isa)/i},
+ {n:'M&S Bank',d:'bank.marksandspencer.com',c:'#000',re:/\bm\s*&\s*s\b|marks\s*(&|and)\s*spencer/i},
+ {n:'NS&I',d:'nsandi.com',c:'#5c2483',re:/ns\s*&\s*i|\bnsandi\b|premium\s*bonds|national\s*savings/i},
+ {n:'Post Office',d:'postoffice.co.uk',c:'#e60000',re:/post\s*office/i},
+ {n:'Yorkshire Building Society',d:'ybs.co.uk',c:'#0d2c6c',re:/yorkshire\s*(bs|building)|\bybs\b/i},
+ {n:'Coventry Building Society',d:'coventrybuildingsociety.co.uk',c:'#00205b',re:/coventry\s*(bs|building)/i},
+ {n:'Skipton Building Society',d:'skipton.co.uk',c:'#00205b',re:/skipton/i},
+ {n:'Leeds Building Society',d:'leedsbuildingsociety.co.uk',c:'#00843d',re:/leeds\s*(bs|building)/i},
+ {n:'Principality',d:'principality.co.uk',c:'#e2001a',re:/principality/i},
+ {n:'Al Rayan Bank',d:'alrayanbank.co.uk',c:'#7b2d26',re:/al\s*rayan/i},
+ {n:'Investec',d:'investec.com',c:'#00205b',re:/investec/i},
+ {n:'Shawbrook',d:'shawbrook.co.uk',c:'#e5007d',re:/shawbrook/i},
+ {n:'Paragon Bank',d:'paragonbank.co.uk',c:'#00205b',re:/paragon/i},
+ {n:'Close Brothers',d:'closebrothers.com',c:'#00205b',re:/close\s*brothers/i},
+ {n:'Danske Bank',d:'danskebank.co.uk',c:'#003755',re:/danske/i},
+ {n:'Wise',d:'wise.com',c:'#9fe870',re:/^\s*wise(\s+(account|card|bank|savings?|saver|isa|current|easy|access|instant|jar|pot|balance|gbp|eur|usd|fixed|bonus|cashback|credit|rate|interest|\d+))*\s*$|transferwise/i},
+ {n:'PayPal',d:'paypal.com',c:'#003087',re:/paypal/i},
+ {n:'Curve',d:'curve.com',c:'#000',re:/^\s*curve(\s+(account|card|bank|savings?|saver|isa|current|easy|access|instant|jar|pot|balance|gbp|eur|usd|fixed|bonus|cashback|credit|rate|interest|\d+))*\s*$/i},
+ {n:'American Express',d:'americanexpress.com',c:'#006fcf',re:/american\s*express|\bamex\b/i},
+ {n:'Barclaycard',d:'barclaycard.co.uk',c:'#00aeef',re:/barclaycard/i}
 ];
-function stkPlatformMatch(t){t=String(t||'').trim();if(!t)return null;for(var i=0;i<STK_PLATFORMS.length;i++)if(STK_PLATFORMS[i].re.test(t))return STK_PLATFORMS[i];return null;}
+function stkPlatformMatch(t){t=String(t||'').trim();if(!t)return null;var best=null;
+  /* the longest brand name that matches wins, so "Barclaycard" beats "Barclays" and "Bank of Scotland" beats a bare "Scotland" */
+  for(var i=0;i<STK_PLATFORMS.length;i++)if(STK_PLATFORMS[i].re.test(t)&&(!best||STK_PLATFORMS[i].n.length>best.n.length))best=STK_PLATFORMS[i];return best;}
+/* a cash account's logo from its name: the bank's own logo (Google's logo service, named in the privacy notice), its initials
+   when offline, or the brand bank icon when the name is not a known bank */
+function viBankLogo(name){
+  var m=stkPlatformMatch(name);
+  if(!m)return '<span class="cash-logo cash-logo-none" title="Bank account"><svg class="vi-ic" aria-hidden="true"><use href="#vi-bank"/></svg></span>';
+  return '<span class="cash-logo" title="'+stkEsc(m.n)+'"><img alt="'+stkEsc(m.n)+'" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain='+m.d+'&sz=64" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="cash-mono" style="display:none">'+stkMono(m.n,m.c)+'</span></span>';
+}
 
 var STK_PROVIDERS=[
  {n:'BlackRock (iShares)',d:'ishares.com',c:'#111',re:/ishares|black\s*rock/i},
@@ -20777,7 +20842,7 @@ function renderAlTab(){
   // Cash accounts
   var cas=document.getElementById('cash-table');
   try{renderPhysicalCash();}catch(e){console.error('[Vault-It] physical cash',e);}
-  if(cas)cas.innerHTML=alState.cashAccounts.length?'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Account</th><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Type</th><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:right">Balance</th><th></th></tr></thead><tbody>'+alState.cashAccounts.map(function(a){return'<tr><td style="padding:7px 10px;font-size:.74rem">'+a.name+'</td><td style="padding:7px 10px;font-size:.62rem;color:var(--t3)">'+a.type+'</td><td style="padding:7px 10px;font-size:.74rem;font-family:\'Share Tech Mono\',monospace;color:var(--gr);text-align:right">\u00a3'+a.balance.toLocaleString('en-GB')+'</td><td style="padding:7px 10px"><button class="data-item-del" onclick="delCashAccount('+a.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></td></tr>';}).join('')+'</tbody></table>':'<div style="font-size:.6rem;color:var(--t3);text-align:center;padding:16px">No accounts added yet</div>';
+  if(cas)cas.innerHTML=alState.cashAccounts.length?'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Account</th><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Type</th><th style="font-size:.54rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:right">Balance</th><th></th></tr></thead><tbody>'+alState.cashAccounts.map(function(a){return'<tr><td style="padding:7px 10px;font-size:.74rem"><span class="cash-acc">'+viBankLogo(a.name)+'<span>'+cfEsc(a.name)+'</span></span></td><td style="padding:7px 10px;font-size:.62rem;color:var(--t3)">'+a.type+'</td><td style="padding:7px 10px;font-size:.74rem;font-family:\'Share Tech Mono\',monospace;color:var(--gr);text-align:right">\u00a3'+a.balance.toLocaleString('en-GB')+'</td><td style="padding:7px 10px"><button class="data-item-del" onclick="delCashAccount('+a.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></td></tr>';}).join('')+'</tbody></table>':'<div style="font-size:.6rem;color:var(--t3);text-align:center;padding:16px">No accounts added yet</div>';
   // Liabilities
   var ll=document.getElementById('liabilities-list');
   if(ll){
