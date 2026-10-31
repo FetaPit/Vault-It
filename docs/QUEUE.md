@@ -27,6 +27,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (30 Oct 2026)
 
+- [x] Trial length comparison (owner, 31 Oct): 7 against 30 days on conversion and retention, with sources, in `docs/research/trial_length.md`; decision 2 of the monetisation doc updated (this commit)
 - [x] Mobile navigation (owner, 30 Oct 22:03): on phones (700 px and under) the tab icons sit in a bar fixed to the bottom of the screen, always visible, seven tabs at 44 px or more, header down to one row, footer flows at the page end; the Connections tab has left the menu bar at every width and lives in Settings (section "Connections", list rendered when Settings opens; `showTab('connections')` opens it there). `tests/test_mobile_nav.js` (this commit)
 - [x] Net worth 3D viewer (owner, 30 Oct 22:03): debts grouped by kind, every credit card stacked in one column in its own card colour, loans and other kinds in their own columns, legend lists each card; zoom in and out by + and - buttons, pinch, ctrl+wheel or plain wheel once the scene has been touched, 0 or the reset button restores the view; orbit as before (this commit)
 - [x] Brand book applied to the e-mail comms: sign-in code, beta list confirm and welcome e-mails share one inline brand shell (Night palette, wordmark with the brick hyphen, tagline, FCA line and trader address in the footer); welcome subject loses its em dash; plain-text footers carry the FCA line (this commit; deploy waits on the owner)

@@ -66,7 +66,7 @@ Say so next to the Founding price, as agreed on 29 Oct.
 ## 6. Your four decisions
 
 1. **Model**: trial then paid (recommended), or option B (Simplified free, Advanced paid)?
-2. **Trial length**: 30 days (recommended), or 14?
+2. **Trial length**: 30 days (recommended), or 14? Evidence in `docs/research/trial_length.md`: longer trials win on both conversion and renewal in the app data, most of all on annual plans; 7-day trials only win for products whose value shows in one session, and a budget needs a payday and a round of bills to show its value (YNAB runs 34 days for that reason). The risk with 30 days is people putting it off, so week-one activation nudges and a day-23 reminder go with it.
 3. **Simplified by default for new accounts**, Advanced for existing ones? And is the tab split in section 3 right?
 4. **Testers**: free until beta ends, then 30 days' notice before their trial clock starts? Or Founding offer first, then the clock?
 
