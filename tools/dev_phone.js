@@ -24,6 +24,8 @@ if (!ips.length) console.log('  no Wi-Fi address found: check the laptop is on t
 for (const { name, ip } of ips) console.log(`  https://${ip}:${port}/            app        (${name})\n  https://${ip}:${port}/landing/    landing page`);
 console.log('  Sample data without signing in: add ?bypass=websummit\n  Certificate warning: Advanced, then Proceed. If the phone cannot connect, allow Node.js on Private networks in Windows Firewall.\n');
 
-const args = ['wrangler', 'dev', '--ip', '0.0.0.0', '--port', port, '--local-upstream', 'localhost', '--local-protocol', 'https'];
-const child = spawn('npx', args, { stdio: 'inherit', shell: process.platform === 'win32' });
+// Run wrangler's own entry with this Node, so no shell is needed on Windows (shell: true with an argument list is deprecated)
+const wrangler = require('path').join(__dirname, '..', 'node_modules', 'wrangler', 'bin', 'wrangler.js');
+const args = [wrangler, 'dev', '--ip', '0.0.0.0', '--port', port, '--local-upstream', 'localhost', '--local-protocol', 'https'];
+const child = spawn(process.execPath, args, { stdio: 'inherit' });
 child.on('exit', code => process.exit(code || 0));
