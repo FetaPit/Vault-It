@@ -46,6 +46,7 @@ bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scri
 - Every new request from the owner goes into `docs/QUEUE.md` in the same turn, before any work on it. Mark `[~]` when starting, move to Done with the commit when finished.
 - Before starting any task and before any release, run the `queue-keeper` agent with the task; obey a STOP or ADD. "Release" is a queue item, not a reset of the queue.
 - Laptop, phone and cloud sessions share the queue: claim an item (`[~] (laptop)` / `[~] (cloud)`) and push the claim before building; one item per session and branch; releases only from the laptop. Full rules: `docs/MULTI_SESSION.md`.
+- Session titles: once the purpose is clear, rename the session to `Vault-It · <Build|Ops|Setup|Research|Marketing>: <purpose>` (cloud: `set_session_title`; CLI: `/rename`), again when the purpose changes; name child sessions the same way.
 - Every item that changes app code (`index.html`, `landing.html`, `src/`, `site/`, `worker/`, `supabase/`) goes through the `ship-item` skill: intent card from the owner's own words, failing test first, named tests, `node tools/shot.js` element shots, then the read-only `rollout-qc` agent. `.claude/hooks/qc-gate.sh` blocks a commit of staged app code without its PASS. Docs, tests and queue commits pass straight through.
 
 ## Brand rollout
