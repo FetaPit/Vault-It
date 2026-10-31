@@ -1,7 +1,7 @@
 // Round 3, items 5 to 7 (owner, 31 Oct 2026): on the Budget tab "Where your income flows" sits at the top, straight above the
 // income | spending split; the dashed divider is light teal and runs on from the flow chart's income block down between the columns;
-// a Flow | 3D switch shows the same budget in 3D as a tree map: one area per colour group filled with £100 blocks (smaller ones for the
-// pounds left over), one empty block between areas; the income arrives as a teal pile on the left and slides right into place (owner,
+// a Flow | 3D switch shows the same budget in 3D as a tree map: one clean rectangle like the debt tree map, each colour group and each line an exact
+// rectangle filled with £100 blocks (a thinner last row shares the pounds left over); the income arrives as a teal pile on the left and slides right into place (owner,
 // 31 Oct evening); finished at once with reduced motion. The choice is kept per device.
 // Run: node tests/test_bd_flow3d.js   (VI_APP=file:///path/to/index.html to test another copy)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
@@ -35,15 +35,18 @@ const EXP = [{ id: 3, name: 'Rent', amount: 700, type: 'ce' }, { id: 4, name: 'C
     ok(await p.evaluate(() => bd3d.view() === 'flow' && !document.getElementById('bd-sankey').hidden && document.getElementById('bd-3d').hidden), T + 'Flow is the default');
     await p.click('#bd-view button[data-v="3d"]'); await p.waitForTimeout(rm ? 600 : 300);
     r = await p.evaluate(() => { const e = bd3d.engine(), t = e.tiles(), cv = document.getElementById('bd3d-cv'), cr = cv.getBoundingClientRect();
-      return { n: t.length, unit: e.unit(), lines: t.map(x => ({ n: x.name, v: x.v, b: x.blocks, w: x.worth })), rects: e.rects(), phase: e.phase(), groups: [...new Set(t.map(x => x.group))].join(','), sum: t.reduce((a, x) => a + x.worth, 0), total: +cv.dataset.total, flowHidden: getComputedStyle(document.getElementById('bd-sankey')).display === 'none', h: cr.height, pressed: document.querySelector('#bd-view [data-v="3d"]').getAttribute('aria-pressed'), saved: localStorage.getItem('vi-bd-view') }; });
+      return { n: t.length, unit: e.unit(), lines: t.map(x => ({ n: x.name, v: x.v, b: x.blocks, w: x.worth })), rects: e.rects(), plate: e.plate(), cells: e.cells(), phase: e.phase(), groups: [...new Set(t.map(x => x.group))].join(','), sum: t.reduce((a, x) => a + x.worth, 0), total: +cv.dataset.total, flowHidden: getComputedStyle(document.getElementById('bd-sankey')).display === 'none', h: cr.height, pressed: document.querySelector('#bd-view [data-v="3d"]').getAttribute('aria-pressed'), saved: localStorage.getItem('vi-bd-view') }; });
     ok(r.n === 8 && r.groups === 'ce,sv,un,iv,ve,vn,cn' || (r.n === 8 && r.groups.split(',').sort().join() === 'ce,cn,iv,sv,un,ve,vn'), T + '3D: one block per budget line, plus what is not assigned as its own group (' + r.groups + ')');
-    ok(r.unit === 100 && r.lines.every(l => l.b === Math.ceil(l.v / 100 - 1e-9) && Math.abs(l.w - l.v) < 0.01), T + '3D: every line is a run of £100 blocks, the last one its share of £100 (' + r.lines.map(l => l.n + ' ' + l.b).join(', ') + ')');
-    // a tree map (owner, 31 Oct evening): one rectangle per colour group on the block grid, never overlapping, one empty block between groups
-    const R = r.rects, apart = (a, c) => a.x + a.w < c.x || c.x + c.w < a.x || a.z + a.h < c.z || c.z + c.h < a.z;
-    ok(R.length === 7 && R.every((a, i) => R.every((c, j) => i === j || apart(a, c))), T + '3D tree map: one area per group, one empty block between areas (' + R.map(a => a.group + ' ' + a.x + ',' + a.z + ' ' + a.w + 'x' + a.h).join('; ') + ')');
-    ok(R.every(a => a.blocks <= a.w * a.h && a.w * a.h - a.blocks < Math.max(a.w, a.h)), T + '3D tree map: each area holds its blocks with less than one row spare');
-    ok(new Set(R.map(a => a.z)).size < R.length, T + '3D tree map: areas share rows side by side (not one bar per group)');
-    ok(R.slice(0, -1).every((a, i) => i === 0 || a.blocks <= R[i - 1].blocks) && R[R.length - 1].group === 'un', T + '3D tree map: largest first, what is not assigned last');
+    // one clean rectangle like the debt tree map (owner, 31 Oct 19:04): group areas tile the plate exactly, in proportion to their amounts
+    const PL = r.plate, perPound = PL.areas.map(a => a.a / a.sum);
+    ok(Math.abs(PL.areas.reduce((a, x) => a + x.a, 0) - PL.W * PL.D) < 1e-6 && perPound.every(x => Math.abs(x - perPound[0]) / perPound[0] < 1e-6), T + '3D tree map: the areas fill one rectangle exactly, each in proportion to its amount');
+    ok(PL.areas.length === 7 && PL.areas.slice(0, -1).every((a, i) => i === 0 || a.sum <= PL.areas[i - 1].sum) && PL.areas[6].group === 'un', T + '3D tree map: largest first, what is not assigned last (' + PL.areas.map(a => a.group).join(',') + ')');
+    const R = r.rects, apart = (a, c) => a.x + a.w <= c.x + 1e-6 || c.x + c.w <= a.x + 1e-6 || a.z + a.d <= c.z + 1e-6 || c.z + c.d <= a.z + 1e-6;
+    ok(R.every((a, i) => R.every((c, j) => i === j || apart(a, c))) && R.every(a => a.x >= -PL.W / 2 - 1e-6 && a.x + a.w <= PL.W / 2 + 1e-6 && a.z >= -PL.D / 2 - 1e-6 && a.z + a.d <= PL.D / 2 + 1e-6), T + '3D tree map: areas never overlap and stay inside the rectangle');
+    // blocks: £100 each, the last row of a line shares the pounds left over, so no block is over £100 and every line adds up to the pound
+    const byLine = {}; r.cells.forEach(c => { (byLine[c.name] = byLine[c.name] || []).push(c.val); });
+    ok(r.cells.every(c => c.val <= 100 + 1e-9) && r.lines.every(l => Math.abs(byLine[l.n].reduce((a, v) => a + v, 0) - l.v) < 0.005), T + '3D: no block is worth more than £100 and each line\'s blocks add up to it (' + r.lines.map(l => l.n + ' ' + byLine[l.n].length).join(', ') + ')');
+    ok(r.lines.every(l => { const v = byLine[l.n], small = v.filter(x => x < 100 - 1e-9); return small.every(x => Math.abs(x - small[0]) < 1e-9) && v.length - small.length === Math.round((l.v - small.reduce((a, x) => a + x, 0)) / 100); }), T + '3D: blocks are £100, except one thinner last row whose blocks share what is left (' + r.lines.map(l => l.n + ' ' + byLine[l.n].filter(x => x < 100 - 1e-9).length + ' small').join(', ') + ')');
     ok(Math.abs(r.sum - r.total) < 0.5 && r.total === 2400, T + '3D: the blocks add up to the monthly income (' + r.sum + ' of ' + r.total + ')');
     ok(r.flowHidden && r.h > 250 && r.pressed === 'true' && r.saved === '3d', T + '3D shows instead of the flow chart, and the choice is kept (' + Math.round(r.h) + ' px stage)');
     // entry animation: blocks rise in group order; with reduced motion they are already in place

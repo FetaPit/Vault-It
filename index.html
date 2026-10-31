@@ -28160,56 +28160,45 @@ function makeTracker(cv,o){
   return self;
 }
 /* ===== budget in 3D (owner, 31 Oct 2026): where the monthly income goes, as a tree map of £100 blocks =====
- * setData({groups:[{key,label,col:[r,g,b],items:[{name,v}]}],total,fmt}). Each colour group (expense type) is one rectangle of the
- * tree map, its area in proportion to its amount: the rectangle is filled with £100 blocks, one flat layer, each budget line a run of
- * blocks in alternating shades, the last block of a line smaller (its share of £100). One empty block of space between groups.
- * Rectangles are laid in strips, largest first, each strip as square as it can be (a squarified tree map on the block grid); what
- * is not assigned yet is a grey rectangle at the end. Over about 360 blocks the block becomes £200, £500, £1,000 ... and says so.
- * Intro (owner, 31 Oct): the income arrives as a teal pile of blocks on the left, then the blocks slide right along x and sort
- * themselves into their rectangles, taking their group's colour as they land. Reduced motion shows the finished map. */
+ * setData({groups:[{key,label,col:[r,g,b],items:[{name,v}]}],total,fmt}). One clean rectangle, laid out like the debt tree map
+ * (owner, 31 Oct 19:04, dtmSquarify): each colour group (expense type) is an exact rectangle, area in proportion to its amount, and
+ * inside it each budget line is an exact rectangle too. A line's rectangle is filled with blocks: rows of £100 blocks, and one
+ * thinner last row that shares the pounds left over (so a block is never worth more than £100 and every rectangle is filled to the
+ * pound). One flat layer; lines in alternating shades; a gutter between groups. What is not assigned yet is a grey area.
+ * Over about 360 blocks the block becomes £200, £500, £1,000 ... and says so.
+ * Intro (owner, 31 Oct): the income arrives as a teal pile on the left, then the blocks slide right along x into their places,
+ * taking their group's colour as they land. Reduced motion shows the finished map. */
 function makeTreeMap(cv,o){
   o=o||{};
-  var st={yaw:-.5,pitch:.86,dist:125,zoom:1.15,ty:1,fit:.9},self={st:st},idle=-9999,cells=[],groups=[],rects=[],total=0,hover=null,first=true,pending=false,PL=.5,
-    fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},U=100,CS=3,GP=.5,P=CS+GP,CH=2.3,ext={x:10,z:10},pile={x0:0,x1:0},
+  var st={yaw:-.5,pitch:.98,dist:125,zoom:1.15,ty:1,fit:.9},self={st:st},idle=-9999,cells=[],groups=[],rects=[],raw=[],total=0,hover=null,first=true,pending=false,PL=.5,
+    fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},U=100,BS=3.3,GG=1.6,LG=.45,CH=1.3,ext={x:10,z:10},plate={W:20,D:20},pile={x0:0,x1:0},
     T_IN=900,T_GO=850,SPREAD=2100,t0=0,sx=0;
   function unitFor(t){var u=100,steps=[100,200,500,1000,2000,5000,10000],k=0;while(t/u>360&&k<steps.length-1){k++;u=steps[k]}return u}
-  function count(g){return g.items.reduce(function(a,it){return a+Math.ceil(it.v/U-1e-9)},0)}
-  /* rectangles on the block grid: strips across a fixed width, each strip adding groups while that keeps its rectangles squarer */
-  function pack(G,Wc){
-    var out=[],i=0,z=0;
-    while(i<G.length){var best=null;
-      for(var j=i;j<G.length;j++){var m=j-i+1,avail=Wc-(m-1),S=0,k,h,ws,tw;if(avail<m)break;
-        for(k=i;k<=j;k++)S+=G[k].n;h=Math.max(1,Math.ceil(S/avail));
-        for(;;){ws=[];tw=0;for(k=i;k<=j;k++){var w=Math.ceil(G[k].n/h);ws.push(w);tw+=w}if(tw<=avail)break;h++}
-        var worst=0;ws.forEach(function(w){worst=Math.max(worst,w/h,h/w)});
-        if(best&&worst>best.worst)break;best={j:j,h:h,ws:ws,worst:worst}}
-      var x=0;for(var q=i;q<=best.j;q++){var w2=best.ws[q-i];out.push({g:G[q].g,n:G[q].n,x:x,z:z,w:w2,h:best.h});x+=w2+1}
-      z+=best.h+1;i=best.j+1}
-    return out;
+  /* a line's rectangle in blocks: columns about one £100 block wide, full rows of £100 blocks, then one thinner row for the rest */
+  function fill(r,g,it,j,rect){
+    var v=it.v,kpa=r.w*r.h/v,side=Math.sqrt(U*kpa),c=Math.max(1,Math.min(Math.round(r.w/side)||1,Math.max(1,Math.floor(v/U+1e-9)))),cw=r.w/c,
+      nf=Math.floor(v/(U*c)+1e-9),rem=v-nf*U*c,rd=U*kpa/cw,z=r.y,k,bi=Math.min(.4,cw*.14);
+    if(rem<.005)rem=0;
+    function put(zz,dd,val){for(k=0;k<c;k++)cells.push({g:g,it:it,ii:j,r:rect,val:val,part:val/U,x:r.x+cw*(k+.5),z:zz+dd/2,w:Math.max(.2,cw-bi),d:Math.max(.12,dd-Math.min(.4,dd*.14)),row:Math.round(zz*100)})}
+    for(var q=0;q<nf;q++){put(z,rd,U);z+=rd}
+    if(rem>0)put(z,r.y+r.h-z,rem/c);
   }
   function layout(narrow){
-    var G=groups.map(function(g){return {g:g,n:Math.max(1,count(g))}}),un=G.filter(function(x){return x.g.key==='un'});
-    G=G.filter(function(x){return x.g.key!=='un'}).sort(function(a,b){return b.n-a.n}).concat(un);
-    var N=G.reduce(function(a,x){return a+x.n},0),mx=G.reduce(function(a,x){return Math.max(a,x.n)},1);
-    /* a wide map for a desktop stage, a squarer one for a phone; never narrower than the biggest group needs to stay square */
-    /* try every width and keep the map with the least empty floor, as close as it can be to the stage's shape */
-    var want=narrow?1.1:2,lo=Math.max(narrow?3:5,Math.ceil(Math.sqrt(mx))),hi=Math.max(lo,Math.ceil(Math.sqrt(N*want*2))+G.length),bestS=Infinity;
-    for(var Wc=lo;Wc<=hi;Wc++){var R=pack(G,Wc),w=0,dd=0;R.forEach(function(r){w=Math.max(w,r.x+r.w);dd=Math.max(dd,r.z+r.h)});
-      var sc=w*dd+N*1.5*Math.abs(Math.log((w/dd)/want));if(sc<bestS){bestS=sc;rects=R}}
-    var W=0,D=0;rects.forEach(function(r){W=Math.max(W,r.x+r.w);D=Math.max(D,r.z+r.h)});
-    ext={x:W*P/2,z:D*P/2};cells=[];var seq=0;
-    rects.forEach(function(r){var k=0;
-      r.g.items.forEach(function(it,ii){var full=Math.floor(it.v/U+1e-9),f=it.v/U-full;if(f<1e-6)f=0;var nn=full+(f>0?1:0);
-        for(var q=0;q<nn;q++){var part=q===full?f:1,col=k%r.w,row=Math.floor(k/r.w);
-          cells.push({g:r.g,it:it,ii:ii,r:r,part:part,gx:r.x+col,gz:r.z+row,row:r.z+row,seq:seq++});k++}});
-      r.k=k;r.uw=Math.min(r.w,k);r.uh=Math.ceil(k/r.w)});   /* the floor the blocks actually use (outline and name follow it) */
-    /* the income pile on the left: as deep as the map, the first blocks to leave nearest the map */
-    var rowsZ=Math.max(1,D),pc=Math.max(1,Math.ceil(cells.length/rowsZ)),gapX=narrow?2:3;
-    pile={x0:-ext.x-(gapX+pc)*P,x1:-ext.x-gapX*P};
-    cells.forEach(function(c,q){var s=c.part<1?CS*Math.sqrt(c.part):CS;c.w=c.d=Math.max(.35,s);
-      c.x=-ext.x+c.gx*P+P/2;c.z=-ext.z+c.gz*P+P/2;
-      c.px=pile.x1-(Math.floor(q/rowsZ)+.5)*P;c.pz=-ext.z+(q%rowsZ)*P+P/2;
-      c.off=T_IN+q*Math.min(70,SPREAD/Math.max(1,cells.length))});
+    var G=groups.slice().sort(function(a,b){return (a.key==='un')-(b.key==='un')||b.sum-a.sum}),tot=G.reduce(function(a,g){return a+g.sum},0);
+    var want=narrow?1.05:1.9,A=Math.max(1,tot/U)*BS*BS*1.18,W=Math.sqrt(A*want),D=A/W;plate={W:W,D:D};ext={x:W/2,z:D/2};
+    raw=typeof dtmSquarify==='function'?dtmSquarify(G.map(function(g){return {v:g.sum,d:g}}),-W/2,-D/2,W,D):[];
+    rects=[];cells=[];
+    raw.forEach(function(gr){var g=gr.d,rect={g:g,x:gr.x+GG/2,z:gr.y+GG/2,w:Math.max(.4,gr.w-GG),d:Math.max(.4,gr.h-GG)};rects.push(rect);
+      var its=g.items.slice().sort(function(a,b){return b.v-a.v});
+      dtmSquarify(its.map(function(it,j){return {v:it.v,d:{it:it,j:j}}}),rect.x,rect.z,rect.w,rect.d).forEach(function(lr){
+        var r={x:lr.x+(lr.x>rect.x+.01?LG/2:0),y:lr.y+(lr.y>rect.z+.01?LG/2:0)};
+        r.w=lr.x+lr.w-r.x-(lr.x+lr.w<rect.x+rect.w-.01?LG/2:0);r.h=lr.y+lr.h-r.y-(lr.y+lr.h<rect.z+rect.d-.01?LG/2:0);
+        fill(r,g,lr.d.it,lr.d.j,rect)});
+      rect.k=cells.filter(function(c){return c.r===rect}).length});
+    /* the income pile on the left, the first blocks to leave nearest the map */
+    var pp=BS+.4,rowsZ=Math.max(1,Math.floor(D/pp)),pc=Math.max(1,Math.ceil(cells.length/rowsZ)),gapX=narrow?2:3;
+    pile={x0:-ext.x-gapX*pp-pc*pp,x1:-ext.x-gapX*pp};
+    cells.forEach(function(c,q){c.px=pile.x1-(Math.floor(q/rowsZ)+.5)*pp;c.pz=-ext.z+(q%rowsZ)*pp+pp/2;c.off=T_IN+q*Math.min(70,SPREAD/Math.max(1,cells.length))});
   }
   self.setData=function(d){
     var rm=reduceMotion();if(d.fmt)fmt=d.fmt;total=d.total||0;
@@ -28222,9 +28211,9 @@ function makeTreeMap(cv,o){
   /* for tests and the readout: each line's value, its blocks (the last one partial) and the value they stand for; each group's rectangle */
   self.tiles=function(){var by={};cells.forEach(function(c){var k=c.g.key+'|'+c.ii,t=by[k]||(by[k]={group:c.g.key,name:c.it.name,v:c.it.v,blocks:0,worth:0,rows:{}});t.blocks++;t.worth+=c.part*U;t.rows[c.row]=1});
     return Object.keys(by).map(function(k){var t=by[k];t.rows=Object.keys(t.rows).map(Number);return t})};
-  self.rects=function(){return rects.map(function(r){return {group:r.g.key,x:r.x,z:r.z,w:r.w,h:r.h,blocks:r.k,sum:r.g.sum}})};
-  self.cells=function(){return cells.map(function(c){return {group:c.g.key,gx:c.gx,gz:c.gz,part:c.part}})};
-  self.bands=function(){return rects.map(function(r){return {group:r.g.key,r0:r.z,r1:r.z+r.h-1}})};
+  self.rects=function(){return rects.map(function(r){return {group:r.g.key,x:r.x,z:r.z,w:r.w,d:r.d,blocks:r.k,sum:r.g.sum}})};
+  self.plate=function(){return {W:plate.W,D:plate.D,areas:raw.map(function(r){return {group:r.d.key,a:r.w*r.h,sum:r.d.sum}})}};
+  self.cells=function(){return cells.map(function(c){return {group:c.g.key,name:c.it.name,val:c.val,x:c.x,z:c.z,w:c.w,d:c.d}})};
   self.unit=function(){return U};
   self.phase=function(){var ts=performance.now();if(pending||t0===Infinity)return 'waiting';if(t0<0)return 'done';var e=ts-t0;return e<T_IN?'pile':e<lastEnd()?'moving':'done'};
   self.replay=function(){if(reduceMotion())return;pending=true;t0=Infinity;S.kick()};
@@ -28249,30 +28238,30 @@ function makeTreeMap(cv,o){
     if(pending){t0=rm?-1e9:ts;pending=false}
     var Y0=narrow?-.2:-.42;
     if(!rm&&!ob.isDrag()&&ts-idle>2500)st.yaw=Y0+Math.sin(ts/5200)*(narrow?.1:.22);else if(rm&&!ob.engaged())st.yaw=Y0;
-    st.fit=narrow?1.05:.92;if(narrow&&!self._pitchSet&&!ob.engaged()){st.pitch=1.0;self._pitchSet=true}
+    st.fit=narrow?1.05:.92;if(narrow&&!self._pitchSet&&!ob.engaged()){st.pitch=1.12;self._pitchSet=true}
     /* while the income arrives the camera frames the pile and the map together, then settles on the map */
     var intro=t0>=0&&ts-t0<lastEnd()+300,x0=intro?pile.x0-1:-ext.x-2,cxm=(x0+ext.x+2)/2;
-    var fb=[[x0-cxm,ext.x+2-cxm,0,CH+3,-ext.z-2,ext.z+2]],tD=fitDist(st,cw,ch,fb,Y0,1,.9,.74);
+    var SC=2.4,fb=[[(x0-cxm)*SC,(ext.x+1-cxm)*SC,0,(CH+1)*SC,(-ext.z-1)*SC,(ext.z+1)*SC]],tD=fitDist(st,cw,ch,fb,Y0,1,narrow?.92:.95,narrow?.8:.8);   /* SC: the map is drawn 2.4x larger, so the camera can come close enough */
     var k=rm||self._snapD?1:Math.min(1,dt*2.2);if(!self._d0){st.dist=tD;self._d0=true}self._snapD=false;st.dist+=(tD-st.dist)*k;
     sx+=(cxm-sx)*k;
     PL=rm?.5:.5+.5*Math.sin(ts*0.002244);
-    var P0=new Proj(st,{x:0,y:0,w:cw,h:ch}),Pr={focal:P0.focal,pos:[P0.pos[0]+sx,P0.pos[1],P0.pos[2]],pt:function(x,y,z){return P0.pt(x-sx,y,z)}};self._P=Pr;
+    var P0=new Proj(st,{x:0,y:0,w:cw,h:ch}),Pr={focal:P0.focal,pos:[P0.pos[0]/SC+sx,P0.pos[1]/SC,P0.pos[2]/SC],pt:function(x,y,z){return P0.pt((x-sx)*SC,y*SC,z*SC)}};self._P=Pr;
     cx.save();
-    ground(cx,Pr,st,ext.x+2,-ext.z-2,ext.z+2,false,ts,rm,P);
+    ground(cx,Pr,st,ext.x+1,-ext.z-1,ext.z+1,false,ts,rm,BS+.5);
     /* each group's area on the floor, tinted and outlined in its colour, so the map reads as a tree map before the blocks land */
     var land=function(r){var last=cells.filter(function(c){return c.r===r}).pop();if(t0<0||!last)return 1;return clamp((ts-t0-last.off-T_GO*.6)/500,0,1)};
-    rects.forEach(function(r){var a=land(r);if(a<=0)return;var x0=-ext.x+r.x*P+.15,x1=-ext.x+(r.x+r.uw)*P-.15,z0=-ext.z+r.z*P+.15,z1=-ext.z+(r.z+r.uh)*P-.15,q=[Pr.pt(x0,.02,z0),Pr.pt(x1,.02,z0),Pr.pt(x1,.02,z1),Pr.pt(x0,.02,z1)];
+    rects.forEach(function(r){var a=land(r);if(a<=0)return;var x0=r.x-.2,x1=r.x+r.w+.2,z0=r.z-.2,z1=r.z+r.d+.2,q=[Pr.pt(x0,.02,z0),Pr.pt(x1,.02,z0),Pr.pt(x1,.02,z1),Pr.pt(x0,.02,z1)];
       cx.beginPath();cx.moveTo(q[0][0],q[0][1]);for(var i=1;i<4;i++)cx.lineTo(q[i][0],q[i][1]);cx.closePath();cx.fillStyle=rgba(r.g.col,.13*a);cx.fill();cx.strokeStyle=rgba(r.g.col,.75*a);cx.lineWidth=1.2;cx.stroke()});
     var items=[];cells.forEach(function(c){var g=geo(c,ts);if(g)items.push(g)});
     items.forEach(function(g){g.dz=Math.hypot(Pr.pos[0]-g.x,Pr.pos[1]-(g.y+g.h/2),Pr.pos[2]-g.z)});items.sort(function(a,b){return b.dz-a.dz});
     items.forEach(function(g){var col=g.fl>0?mix(g.col,PAL.flash,g.fl*.8):g.col;if(hover&&hover.g===g.c.g&&hover.ii===g.c.ii)col=mix(col,PAL.flash,.45);drawBox(cx,Pr,g,PL,col,PAL.fa+.16+.06*PL,.66+.25*PL,PAL.edgeK)});
     /* each group's name and total over its rectangle, once its blocks have landed; names never overlap (pushed down a line) */
     var lf=clamp(cw*.02,9,12),boxes=[];cx.font=lf+"px 'Share Tech Mono',monospace";cx.textBaseline="middle";cx.textAlign="left";
-    /* names sit on the floor just in front of their area (in the gap row), from its left edge */
-    rects.map(function(r){var q=Pr.pt(-ext.x+r.x*P+.2,0,-ext.z+(r.z+r.uh)*P+GP*.5);return {r:r,q:q}}).sort(function(a,b){return b.q[1]-a.q[1]}).forEach(function(o2){
+    /* names sit on top of their area at its back left corner, like the debt tree map */
+    rects.map(function(r){var q=Pr.pt(r.x+.3,CH+.1,r.z+.3);return {r:r,q:q}}).sort(function(a,b){return a.q[1]-b.q[1]}).forEach(function(o2){
       var r=o2.r,a=land(r);if(a<=0)return;
-      var txt=r.g.label+" · "+fmt(r.g.sum),tw=cx.measureText(txt).width,hh=lf*1.5,bx=clamp(o2.q[0],4,cw-tw-8),by=o2.q[1]+hh*.55;
-      for(var t=0;t<8&&boxes.some(function(b){return bx<b[0]+b[2]+6&&bx+tw+6>b[0]&&by-hh/2<b[1]+hh/2&&by+hh/2>b[1]-hh/2});t++)by-=hh+1;
+      var txt=r.g.label+" · "+fmt(r.g.sum),tw=cx.measureText(txt).width,hh=lf*1.5,bx=clamp(o2.q[0],4,cw-tw-8),by=o2.q[1]+hh*.7;
+      for(var t=0;t<8&&boxes.some(function(b){return bx<b[0]+b[2]+6&&bx+tw+6>b[0]&&by-hh/2<b[1]+hh/2&&by+hh/2>b[1]-hh/2});t++)by+=hh+1;
       boxes.push([bx-3,by,tw]);
       cx.globalAlpha=a;cx.fillStyle="rgba(8,8,8,.72)";cx.fillRect(bx-3,by-hh/2,tw+6,hh);cx.fillStyle=rgba(r.g.col,1);cx.fillText(txt,bx,by);cx.globalAlpha=1});
     tag(cx,cw,"MONTHLY INCOME",fmt(total),false,null);
@@ -28283,7 +28272,7 @@ function makeTreeMap(cv,o){
   self.zoom=ob.zoom;self.reset=ob.reset;
   function inside(px,py,poly){var ins=false;for(var i=0,j=poly.length-1;i<poly.length;j=i++){var xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];if(((yi>py)!==(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))ins=!ins}return ins}
   function pick(ex,ey){var r=cv.getBoundingClientRect(),mx=ex-r.left,my=ey-r.top,Pr=self._P,best=null,bd=Infinity;if(!Pr)return;
-    cells.forEach(function(c){var y=CH,h=P/2,x0=c.x-h,x1=c.x+h,z0=c.z-h,z1=c.z+h,poly=[Pr.pt(x0,y,z0),Pr.pt(x1,y,z0),Pr.pt(x1,y,z1),Pr.pt(x0,y,z1)];
+    cells.forEach(function(c){var y=CH,x0=c.x-c.w/2-.2,x1=c.x+c.w/2+.2,z0=c.z-c.d/2-.2,z1=c.z+c.d/2+.2,poly=[Pr.pt(x0,y,z0),Pr.pt(x1,y,z0),Pr.pt(x1,y,z1),Pr.pt(x0,y,z1)];
       if(inside(mx,my,poly)){var dz=Pr.pt(c.x,y,c.z)[2];if(dz<bd){bd=dz;best=c}}});
     var was=hover;hover=best;
     if((was&&was.g)!==(best&&best.g)||(was&&was.ii)!==(best&&best.ii)){if(o.onPick)o.onPick(best?{group:best.g.label,name:best.it.name,v:best.it.v,share:total>0?best.it.v/total:0,blocks:Math.ceil(best.it.v/U-1e-9),unit:U}:null);S.kick()}}
