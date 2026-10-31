@@ -69,7 +69,7 @@ const seedFn=(o,pro)=>`(function(){if(localStorage.getItem('ht3'))return;localSt
   await p.evaluate(()=>houseZoomIn()); ok(await p.evaluate(()=>_houseZoom)>z2,'+ button zooms in');
   await p.evaluate(()=>resetView()); ok(Math.abs(await p.evaluate(()=>_houseZoom)-1.2)<1e-6,'reset returns to the default view');
   await p.evaluate(()=>toggleOrbitMode()); ok(await p.evaluate(()=>HB3D.viewer.controls.touches.ONE===THREE.TOUCH.PAN),'orbit button switches one-finger drag to pan');
-  ok(await p.evaluate(()=>hb3dState().mode)==='build'&&await p.evaluate(()=>hb3dState().p)===0.04,'non-Pro users see the 4% teaser');
+  ok(await p.evaluate(()=>hb3dState().mode)==='build'&&Math.abs(await p.evaluate(()=>hb3dState().p-pct()))<1e-9,'the house build is never behind the paywall: an unpaid user sees the real build at pct() (trial then paid, 31 Oct)');
   await p.screenshot({path:'shots/hb3d/app_mobile.png'});
   ok(errs.length===0,'no errors '+errs.slice(0,4).join(' | '));
   await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
