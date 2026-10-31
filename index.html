@@ -10030,6 +10030,9 @@ button.bd-ic{cursor:pointer}
 .inv-badge{position:absolute;top:6px;left:6px;z-index:2;font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:.08em;padding:2px 6px;border-radius:99px;background:rgb(var(--blue-rgb) / .2);border:1px solid rgb(var(--blue-rgb) / .5);color:#9bd0ff;pointer-events:none}
 .inv-exp{position:absolute;top:5px;right:26px;z-index:3;width:20px;height:20px;border-radius:4px;border:1px solid rgb(var(--blue-rgb) / .5);background:rgba(0,0,0,.55);color:#9bd0ff;font-size:.7rem;line-height:1;cursor:pointer;padding:0}
 .inv-exp:hover{background:rgb(var(--blue-rgb) / .25)}
+.wi-img-area img.wi-open{cursor:zoom-in}
+.inv-stage .inv-prev{display:block;max-width:100%;max-height:100%;margin:auto;object-fit:contain;position:absolute;inset:0}
+.inv-stage canvas[hidden]{display:none}
 .wi-img-overlay{pointer-events:none}
 .wi-img-overlay .wi-img-btn{pointer-events:auto}
 .inv-modal{position:fixed;inset:0;z-index:9000;background:rgb(var(--panel-rgb) / .94);display:flex;align-items:center;justify-content:center;padding:14px;outline:none}
@@ -20734,7 +20737,7 @@ function renderAlTab(){
         var iconDisplay=a.svgIcon||null;
         var imgHtml='',spin=(a.photos||0)>=2;
         if(imgSrc){
-          imgHtml='<img src="'+imgSrc+'" alt="'+cfEsc(a.name)+'" onerror="this.style.display=\'none\'">';
+          imgHtml='<img src="'+imgSrc+'" alt="'+cfEsc(a.name)+'" onerror="this.style.display=\'none\'" class="wi-open" title="Open the photo viewer" onclick="invOpenViewer('+a.id+')">';
         } else if(iconDisplay){
           imgHtml='<span style="font-size:2.5rem">'+iconDisplay+'</span>';
         } else {
@@ -20742,7 +20745,7 @@ function renderAlTab(){
         }
         var i3=i3dTile('wi',a);if(i3){imgHtml+=i3;spin=false;}
         if(spin)imgHtml+='<canvas class="inv-spin" data-id="'+a.id+'" aria-label="3D view of '+cfEsc(a.name)+'. Drag to rotate"></canvas><span class="inv-badge">3D · '+a.photos+'</span>';
-        if((a.photos||0)>=1)imgHtml+='<button class="inv-exp" title="Open the 3D viewer" onclick="invOpenViewer('+a.id+')">⤢</button>';
+        if((a.photos||0)>=1||imgSrc)imgHtml+='<button class="inv-exp" title="Open the photo viewer" aria-label="Open the photo viewer for '+cfEsc(a.name)+'" onclick="invOpenViewer('+a.id+')">⤢</button>';
         return '<div class="wi-tile">'
           +'<div class="wi-img-area">'
           +imgHtml
@@ -21151,14 +21154,17 @@ async function invRenderModal(id){
   var blobs=await invGet(id),frames=await invFrames(id);
   var urls=blobs.map(function(b){return URL.createObjectURL(b);});
   var n=blobs.length;
+  /* owner, 31 Oct: the photos were missing when a tile was opened. Full photos live on the device they were added on (IndexedDB);
+     the cloud copy and a new web address only carry the item's preview. Show that preview, and say where the photos are. */
+  var prevOnly=n===0&&!!a.image;
   var hint=n===0?'Add photos taken from all around the object. Keep the same distance and height, moving in order.':n===1?'One photo so far. Add more angles (12–24 around the object works best) to unlock the 3D spin.':n<8?'Add a few more angles for a smoother spin: 12–24 works best.':'Drag left/right to spin · scroll or pinch to zoom · arrow keys step frame by frame.';
   var prev=_invSpin;
   o.innerHTML='<div class="inv-card">'
-    +'<div class="inv-hd"><div><div class="inv-t">'+cfEsc(a.name)+'</div><div class="inv-s">£'+(a.value||0).toLocaleString('en-GB')+' · '+n+' photo'+(n===1?'':'s')+(n>=2?' · 3D view':'')+'</div></div>'
+    +'<div class="inv-hd"><div><div class="inv-t">'+cfEsc(a.name)+'</div><div class="inv-s">£'+(a.value||0).toLocaleString('en-GB')+' · '+(prevOnly?'preview'+((a.photos||0)>0?' · '+a.photos+' photo'+(a.photos===1?'':'s')+' on another device':''):n+' photo'+(n===1?'':'s')+(n>=2?' · 3D view':''))+'</div></div>'
     +'<button class="inv-x" onclick="invCloseViewer()" title="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>'
-    +'<div class="inv-stage"><canvas id="inv-big"></canvas>'+(n===0?'<div class="inv-empty">No photos yet</div>':'')
+    +'<div class="inv-stage"><canvas id="inv-big"'+(prevOnly?' hidden':'')+'></canvas>'+(prevOnly?'<img class="inv-prev" src="'+cfEsc(a.image)+'" alt="'+cfEsc(a.name)+'">':n===0?'<div class="inv-empty">No photos yet</div>':'')
     +'<div class="inv-ctl"><button title="Auto-rotate" onclick="invToggleAuto()" id="inv-auto">⟳</button><button title="Zoom in" onclick="invZoom(0.35)"><svg class="vi-ic g" role="img" aria-label="Add"><use href="#vi-plus"/></svg></button><button title="Zoom out" onclick="invZoom(-0.35)">－</button><button title="Previous frame" onclick="_invSpin&&_invSpin.step(-1)">◀</button><button title="Next frame" onclick="_invSpin&&_invSpin.step(1)">▶</button></div></div>'
-    +'<div class="inv-hint">'+hint+'</div>'
+    +'<div class="inv-hint">'+(prevOnly&&(a.photos||0)>0?'This is the saved preview. The full photos ('+a.photos+') are kept on the device they were added on, and are not copied to your account or to a new web address. Add photos here to see them on this device.':prevOnly?'This is the item\'s picture. Add photos taken from all around it to make a 3D view.':hint)+'</div>'
     +'<div class="inv-strip">'+urls.map(function(u,i){return '<div class="inv-th"><img src="'+u+'" alt="photo '+(i+1)+'"><span class="inv-n">'+(i+1)+'</span>'
       +'<span class="inv-tb"><button onclick="invMoveFrame('+id+','+i+',-1)" title="Move earlier"'+(i===0?' disabled':'')+'>◀</button><button onclick="invRemoveFrame('+id+','+i+')" title="Delete photo"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button><button onclick="invMoveFrame('+id+','+i+',1)" title="Move later"'+(i===n-1?' disabled':'')+'>▶</button></span></div>';}).join('')
     +'<label class="inv-add"><svg class="vi-ic g" role="img" aria-label="Add"><use href="#vi-plus"/></svg><span>Add photos</span><input type="file" accept="image/*" multiple style="display:none" onchange="invAddPhotos('+id+',this.files);this.value=\'\'"></label></div>'
