@@ -10,7 +10,8 @@
     "build:hb3d": "node tools/build_hb3d.js",
     "build:site": "node tools/build_site.js",
     "dev:site": "npm run build:site && wrangler dev",
-    "deploy:dry": "npm run build:site && wrangler deploy --dry-run"
+    "deploy:dry": "npm run build:site && wrangler deploy --dry-run",
+    "dev:phone": "node tools/dev_phone.js"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.8",

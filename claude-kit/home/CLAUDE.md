@@ -9,4 +9,7 @@
 
 ## Session titles (all projects)
 - Once a session's purpose is clear and the automatic title doesn't say it, rename the session (cloud: `set_session_title`; CLI: `/rename`). Pattern: `<Project> · <Build|Ops|Setup|Research|Marketing>: <purpose>`, for example `Vault-It · Build: footer disclaimer + ledger fixes`. Rename again when the purpose changes. Name child sessions you create the same way.
+
+## Windows laptops (all projects)
+- Run Claude Code from Git Bash; hook scripts are bash. Never pipe a download into a shell (`curl ... | bash`): install from a checked-out copy instead.
 <!-- claude-kit:end -->

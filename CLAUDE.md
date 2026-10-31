@@ -12,7 +12,7 @@ UK personal-finance single-file PWA. Owner: Pete (FetaPit). App: **https://app.v
 ## Branches and releasing
 - Develop on **`Pioneer_v3`** (or the branch the session names). No pull requests unless asked.
 - `release/pioneer-v2` is the production branch: Cloudflare Workers Builds deploys it (build `npm run build:site`, deploy `npx wrangler deploy`, preview builds for every other branch) and GitHub Pages still publishes it for the older address.
-- To release: run the regression tests, create `backup/release-pioneer-v2-YYYYMMDD-HHMM` from the current release branch, then fast-forward `release/pioneer-v2` to the tested `Pioneer_v3` commit. Only release when asked.
+- To release: `/release` (`.claude/skills/release/SKILL.md`): CI green on the exact commit, the owner's phone sign-off, `backup/release-pioneer-v2-YYYYMMDD-HHMM`, server steps in order, the owner moves `release/pioneer-v2`, then a live `version.json` check. Only release when asked. The whole loop, ask to live: `docs/DEV_WORKFLOW.md`.
 - Commit messages end with the attribution lines the session provides. Don't put model names in code, docs or commit text beyond those lines.
 
 ## Tests
@@ -53,7 +53,7 @@ bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scri
 
 A new brand is being applied. Design files are in `brand/`. Open `brand/vault-it-brand-book.html` in a browser to see the target, and follow `brand/vault-it-brand-handover.md` phase by phase.
 
-- Work on `Pioneer_v3` or a branch off it. Never push brand work to `release/pioneer-v2`, and never add a working branch to the Cloudflare build trigger (`npx wrangler deploy` would go live). Check on a phone with a local build (`npm run build:site`, then `npx wrangler dev`), or a Cloudflare non-production build only if the owner has enabled it.
+- Work on `Pioneer_v3` or a branch off it. Never push brand work to `release/pioneer-v2`, and never add a working branch to the Cloudflare build trigger (`npx wrangler deploy` would go live). Check on a phone with a local build (`npm run dev:phone` on the laptop, then the printed `https://` address), or a Cloudflare non-production build only if the owner has enabled it.
 - One phase per commit. After each, post screenshots of Night and Daylight at 390px and 1100px.
 - Audit first: read `src/hb3d/kit.js`, `src/hb3d/viewer.js`, `tools/build_hb3d.js`, `docs/HB3D_KIT.md`, `docs/HOUSE_BUILDER_3D_SPEC.md`, `docs/HOUSE_BUILDER_LEVELS_SPEC.md` and `docs/CUTOVER.md`, and report before changing code. The house builder level rules in those specs must keep working.
 - Flags: `viFlag('house')` (brand build) is **on** by default (owner, 31 Oct: the screen recording is the target); the classic hologram viewer stays as the Settings switch. `viFlag('nw')` (3D net worth) is on by default. `?house=new` / `?nw=new`, `?x=old`, or `localStorage` `vi-flag-house` / `vi-flag-nw` override per device; Settings has the switches. Do not change the defaults without the owner's word.
