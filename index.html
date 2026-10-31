@@ -12685,6 +12685,10 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wi-info{padding:8px 10px 10px}
 .wi-name{font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;color:var(--t1);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wi-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--gr)}
+/* bigger item tiles (owner, 31 Oct): wealth inventory, liabilities and crypto share the grid; about four across at 1100 px, two on a phone */
+.wi-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,140px),1fr));gap:12px}
+@media(min-width:900px){.wi-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+  .wi-info{padding:12px 14px 14px}.wi-name{font-size:.78rem}.wi-val{font-size:.86rem}}
 .wi-link-btn{display:inline-block;margin-top:5px;font:600 .5rem 'DM Sans',sans-serif;padding:3px 7px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
 .wi-link-btn:hover,.wi-link-btn:focus-visible{background:rgb(var(--teal-rgb) / .24)}
 .wi-work{margin-top:5px;font-size:.5rem;color:var(--t2);line-height:1.45}
