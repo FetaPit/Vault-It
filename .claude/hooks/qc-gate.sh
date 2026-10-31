@@ -3,10 +3,14 @@
 # App code = index.html, landing.html, recover.html, sw.js, manifest, src/, site/, worker/, supabase/.
 # Docs, tests, tools and queue-only commits pass straight through. Exit 2 blocks the call and shows the reason to Claude.
 input=$(cat)
-cmd=$(printf '%s' "$input" | python3 -c 'import json,sys
+# Windows often has no python3 (or only the Store stub): try python and py -3, else read the raw JSON so the gate never fails open
+PY=""; for c in python3 python "py -3"; do $c -c "import json" >/dev/null 2>&1 && { PY=$c; break; }; done
+if [ -n "$PY" ]; then
+  cmd=$(printf '%s' "$input" | $PY -c 'import json,sys
 try: print(json.load(sys.stdin).get("tool_input",{}).get("command",""))
 except Exception: print("")' 2>/dev/null)
-printf '%s' "$cmd" | grep -qE '(^|[;&| ])git( -C [^ ]+)? commit\b' || exit 0
+else cmd=$(printf '%s' "$input" | sed 's/\\"/"/g'); fi
+printf '%s' "$cmd" | grep -qE '(^|[;&| "])git( -C [^ ]+)? commit\b' || exit 0
 cd "${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null || exit 0
 app=$(git diff --cached --name-only 2>/dev/null | grep -E '^(index\.html|landing\.html|recover\.html|sw\.js|manifest\.webmanifest|src/|site/|worker/|supabase/)')
 [ -z "$app" ] && exit 0
