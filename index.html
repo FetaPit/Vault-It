@@ -27523,10 +27523,13 @@ function stage(cv,o,draw){
   function frame(ts){S.raf=0;if(!S.vis||document.hidden)return;var fps=LITE?30:(o.fps||30);if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
     var dt=Math.min(.05,(ts-(S.last||ts))/1000);S.last=ts;c.setTransform(S.dpr,0,0,S.dpr,0,0);c.clearRect(0,0,S.cw,S.ch);var t0=performance.now();draw(ts,dt,S);
     var cost=performance.now()-t0;S.ema=S.ema==null?cost:S.ema*.85+cost*.15;S.n=(S.n||0)+1;if(!LITE&&S.n>12&&S.ema>16){LITE=true;size()}   // frames over ~16 ms of drawing: go lite for good
-    S.raf=requestAnimationFrame(frame)}
-  S.kick=function(){if(S.vis&&!S.raf){S.last=0;S.raf=requestAnimationFrame(frame)}};
+    if(!S.raf)S.raf=requestAnimationFrame(frame)}   // size() may already have queued the next frame: never run two loops
+  /* a canvas that is plainly on screen counts as visible even if the observer has not said so yet (phones, 31 Oct: the scene
+     stayed empty until the view was toggled, because a stale "not visible" entry was read) */
+  function onScreen(){if(!cv.isConnected)return false;var r=cv.getBoundingClientRect();return r.width>2&&r.height>2&&r.bottom>0&&r.right>0&&r.top<(window.innerHeight||0)&&r.left<(window.innerWidth||0)}
+  S.kick=function(){if(!S.vis&&onScreen()){S.vis=true;if(o.onShow)o.onShow()}if(S.vis&&!S.raf){S.last=0;S.raf=requestAnimationFrame(frame)}};
   if("ResizeObserver" in window)new ResizeObserver(size).observe(cv);else window.addEventListener("resize",size);
-  if("IntersectionObserver" in window)new IntersectionObserver(function(es){S.vis=es[0].isIntersecting;if(S.vis&&o.onShow)o.onShow();S.kick()},{threshold:.01}).observe(cv);else{S.vis=true}
+  if("IntersectionObserver" in window)new IntersectionObserver(function(es){var was=S.vis;S.vis=es[es.length-1].isIntersecting;if(S.vis&&!was&&o.onShow)o.onShow();S.kick()},{threshold:.01}).observe(cv);else{S.vis=true}
   document.addEventListener("visibilitychange",S.kick);
   size();return S;
 }

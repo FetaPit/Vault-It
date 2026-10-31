@@ -28,6 +28,7 @@ node tests/test_plans.js            # plans pop-up and Settings: Vaulter / month
 node tests/test_tiers.js            # tier gates: no item caps, design tools (upload, AI) need a paid plan, every preset house for all, read-only stops Level 2 / 3 / restore, plan recorded from the Stripe return, AI reader allowance line
 node tests/test_view_mode.js        # Simplified / Advanced view: Advanced when nothing is saved, the Simplified tile list on Overview / Budget / House, achievements card, tabs, synced choice, welcome default, phone KPIs in two rows, Sankey flow animation and reduced motion
 node tests/test_tester_welcome.js    # tester welcome note: shown once after the welcome flow for beta accounts, agreed wording with the 30-day first sentence, closes with Esc / outside / Let's go, phone fit
+node tests/test_nw3d_first.js       # 3D net worth draws on first show even when a stale "not visible" observer entry arrives first (the phone defect of 31 Oct); fails on the old code
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width
 node tests/test_nw3d.js            # net worth in 3D (on by default): flag off unchanged, 3D | Graph toggle, same numbers in both views, debts grouped by kind (cards stacked in one column, each in its own colour), zoom buttons / ctrl+wheel / reset (VI_APP=file:///… to test another copy)
 ```
