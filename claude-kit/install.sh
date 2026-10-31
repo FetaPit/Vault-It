@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # claude-kit installer: token-saving defaults for Claude Code, for every project.
 #
-#   Install or update:  curl -fsSL https://raw.githubusercontent.com/FetaPit/Vault-It/<ref>/claude-kit/install.sh | bash
-#   From a checkout:    bash claude-kit/install.sh
+#   Install or update:  bash claude-kit/install.sh  (from a checkout; never pipe a download into a shell)
 #   Uninstall:          bash ~/.claude/kit/install.sh --uninstall
 #
 # Safe to re-run. Backs up ~/.claude/settings.json first, merges instead of
