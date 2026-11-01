@@ -46,3 +46,92 @@ Fine as is (owner): Debt tracker, everything else.
 - Most of the cold-load cost is likely set-up, not the animation: shader compiling, building geometry and first-frame layout. Build the house geometry once and keep it (so the second visit is instant), start WebGL only when the viewport scrolls into view, and show the still picture until the first 3D frame is ready, so the page never freezes.
 - Fidelity and speed pull against each other. Sharper lines usually come from rendering at the screen's full pixel ratio with anti-aliasing and using proper thick lines for the wireframe, which costs more GPU. Keep it sharp at rest and drop the resolution only while laying or orbiting.
 - Prove it with numbers from a cleared-cache phone load (time to first 3D frame, longest page freeze, tap delay), before and after, as the 31 Oct fix did. The owner's hunch that it only looked fast because it was cached is a fair one to test first.
+
+## David (COO): how this round is split
+
+Where we are: Phase 0 Foundation. The gate is pre-sales and the waitlist, not polish. A tester seeing the app tonight helps that; another day of edits before anyone sees it does not. So tonight is about one thing working well (the house builder), with the quick fixes alongside it. The bigger 3D work on Budget and Dashboard is the next round, not tonight. (Launch strategy doc not re-read for this; the call is the same either way.)
+
+Pushback: 19 edits in one go is how we ended up going round in circles. Four workstreams, each with one owner, one brief, its own tests and its own preview link. Nothing merges to the release until Pete has seen it.
+
+| Stream | Edits | Who builds | When | Why it is grouped |
+|---|---|---|---|---|
+| A. House builder engine | E12, E13, E14, E15 | Fable session | Tonight, first | One engine (`src/hb3d/`), one measure (cold load on a phone). Speed and sharpness pull against each other, so one session owns both |
+| B. Quick fixes | E16, E17, E18, E1, E2, E3, E9, E10 | Sonnet session | Tonight, alongside A | Small, separate screens in `index.html`, each a clear yes or no on a screenshot |
+| C. Budget and Dashboard 3D | E4, E5, E6, E7, E8, E11 | Fable or Opus session | Tomorrow | E7 says Budget's 3D must match the Dashboard's, and E8 (outlines and flag-post labels) is then built once for both. Biggest design job; needs Pedro's brief first |
+| D. 3D model viewer | E19 | Sonnet session | Tomorrow | One shared viewer for Liabilities and Wealth inventory |
+
+Tonight's tester: send the preview link (sign-in off, demo data) once A and B pass, not the live site. The live release waits until Pete signs off on A and B, then C and D follow as v0.7.1.
+
+Order of merging: B first (small), then A, each rebased and re-tested, then one fresh preview for Pete.
+
+Risks:
+- A's honest finding may be that cold load is still slow on a mid-range phone even with the last-course idea. Then the fallback is the still picture first and 3D on tap. Pete decides on the numbers, not on feel.
+- C is where the round-in-circles risk is highest (labels, outlines, flag posts). Pedro briefs it, Pete approves the brief before any code.
+
+One question for Pete: is the tester tonight seeing a preview link fine (demo data, no sign-in), or do they need to sign in with their own figures? Recommended: the preview link.
+
+## Pedro (CD): creative brief for this round
+
+Judged from the owner's words and the code at 67bb51e. No screenshots of these screens exist yet and Pedro has not seen the preview, so every "Done means" needs fresh shots (390, 768, 1100, Night and Daylight; plus 412 and 884 for E1). Where the owner's words clash with ECD_BRIEF, his words win.
+
+### A. House builder (E12 to E18)
+Idea: the house is already there the moment you look, sharp as a drawing, and only your newest course is laid in front of you.
+1. Sharp = a hairline at native resolution. `src/hb3d/viewer.js:92` caps pixel ratio at 1.25 under 700 px and `:90` turns anti-aliasing off on touch, so a 1 px line on a 3x phone is stretched about 2.4x. At rest render at min(devicePixelRatio, 2); drop to 1.25 only while bricks land or a finger is down, back to full 300 ms later. `brand.js:311` LineBasicMaterial is always 1 device pixel: swap for LineSegments2 + LineMaterial (three r128 examples/js/lines). Outer edges 1.25 css px --teal #44C0B9 at .9; joints .75 px at .35; the course being laid --gold #E8C56A. Glow: one additive 3 px copy at .12, no bloom. Viewport stays Night in Daylight too (index.html:19).
+2. Ground plane (E15): copy Net worth's ground() (index.html ~27005): teal radial glow .18, fading grid .28, gold plinth (1.5 px, 14 px blur, 9% fill), and every 2800 ms a rectangle growing 16 units out at 1.4 px, .45 to 0. It fails in the house because the ping is hidden in lite mode (brand.js:616, 668) and a slow cold load trips lite, and it sits at 10% at low progress (:669). Keep the ping in lite, fixed .45 peak, gold. Only reduced motion stops it (static rectangle stays).
+3. Buttons (E18): #hud-bar-house to bottom centre, 12 px up, one row. Pill: --rail-bg, 1 px rgba(68,192,185,.3), --r-pill, 4 px padding and gap. Buttons drawn 36 px with 44 px hit area; 18 px sprite icons in --teal (vi-zoom-out, vi-zoom-in, vi-orbit, vi-pin, vi-reset, vi-fullscreen). Remove the emoji fallbacks (📍 ✥ ⛶ ↺, markup ~11512): an emoji as an icon is a hard fail. Orbit on: --teal border plus --dglow. Delete the top-right phone override at :10263; gold ROW n / 154 tag to top left.
+4. Copy (E16): delete #hb-add-lbl "Add to your savings" (:11532) and its setter (:14596). Button says "Lay the bricks" ("Pay off the mortgage" on Level 2) with vi-brick-wall instead of ⊕. Input aria-label "Amount to add to your deposit"; rename the help FAQ at :27959 to match.
+5. Amount box (E17): now about 12 px, under the 16 px that stops iOS zooming. Make it 56 px tall, Share Tech Mono 24 px digits, 20 px £ in --gold, inputmode="decimal", placeholder "2,000". At 599 px and under: input full width, 48 px button full width below; above, one row. Under it a live mono 12 px --muted line "£n lays n bricks" (depositTarget × 0.77 / bricksTotal).
+6. E13 (motion): agrees, with the refinement. Frame one is the finished house up to the course below the newest, built once and kept, crossfaded from #hbStill over 200 ms. Then lay only bricks added since the last visit, capped at one course: each drops in 320 ms, flashes gold, settles teal; stagger min(40 ms, 1200 ms ÷ bricks in course), a course in 1.2 to 1.5 s; last brick keeps its ring and number; ground ping fires once. A deposit worth more than one course: lower courses appear under a 300 ms rising sweep, then the top course lays. The full build from an empty plot moves to an opt-in "Watch it built" link under the viewport (keeps the animation he likes, never blocks a load; retires ECD_BRIEF §3 "opening build on first view"). Reduced motion: final state.
+Done means: at 390 Night zoomed to the eaves, single clean hairlines, no stair-steps (compare 67bb51e); two frames 1.4 s apart show the gold rectangle spreading, also with lite forced on; one button row bottom centre, no emoji, nothing over the ROW tag or caption at 390/768/1100; "Add to your savings" nowhere, amount box 56 px with 24 px digits and the brick line; plus numbers from a cleared-cache phone load (first 3D frame, longest freeze, tap delay), before and after.
+ASK 1: "the navigation buttons at the top of Build Your Dream Home" = (a) the camera buttons (zoom, orbit, my row, reset, full screen), top right on a phone. Recommended; notes assume this. (b) the Level 1 / 2 / 3 pills under the heading.
+
+### B. Navigation (E1)
+Idea: a phone gets the thumb bar; anything with more room gets the tabs on top, as on desktop.
+1. Bottom bar at max-width 599 px only; top nav from 600 px. Phones 320 to 440 px and fold cover screens 344 to 412 px keep the bar; unfolded folds about 600 to 900 px, iPad mini 744 px and wider get the top nav. 600 is Android's own phone/tablet line. Today it is 700 px (index.html:10117), which is why the bar shows on an unfolded fold.
+2. Change both max-width:700px rules to 599px; keep --footer-h in that rule.
+3. 600 to 1023 px: existing two-row header. Row 1 logo, net worth, Night/Daylight. Row 2 the eight tabs, icons only, 22 px icons in 44 px targets, space-evenly, no sideways scroll; labels on long-press and hover.
+4. Active tab: 1 px outline in the tab's colour, 10 px radius, --dglow in Night. House builder keeps only its USP badge.
+5. Landscape phone (600 px or wider, under 500 px tall): tabs move into the single 46 px header row.
+Done means: 390 and 412 bottom bar as now; 768 and 884 no bottom bar, eight icons in the top row, active outlined; 844 x 390 a single header row; at 599 and 600 nothing under a bar.
+
+### C. Dashboard (E2 to E4)
+Idea: the roadmap opens on what you're working on now; the money visibly flows and every label reads.
+1. Start (E2): :23431 already centres the next stage, but _fireFirstPaint is used up before the track has width, so it lands at 0. Clear that flag only when SC.clientWidth > 0 and scrollWidth > clientWidth; set the scroll in a rAF after the SVG width; re-centre each time the tab opens. No scroll animation; one gold ring pulse on Debt halved.
+2. Detail (E3): remove #fire-block (:11325 and its filler ~:23411). Tapping a node opens #fire-detail-panel inline under the track (240 ms height and fade), node gets a 1 px gold ring. Panel: name, status chip (Achieved / Next up / "Met. Waiting on Debt halved"), what it takes from the user's own figures, the action. On Next up only: "6 later stages are already met. They tick when you finish Debt halved." Close with a 44 px ×, tapping the node again, or Esc.
+3. Flow (E4): .cf-ln only pulses opacity now (cfFlow, :10299). Links draw in left to right (income to groups 0 to 600 ms, groups to items 300 to 900 ms), then a dash overlay (2 14, link colour, .7) runs at 40 px/s on links at .55. Pause off screen; reduced motion static.
+4. Labels (E4): replace the halo stroke (:18263) with black chips: #080808 at .88, 1 px category-colour stroke at .5, 4 px radius, 4 px 6 px padding; name DM Sans 600 11 px #E8E8E8, amount Share Tech Mono 10.5 px in the category colour; chips stay black in Daylight. Size by getBBox, 30 px minimum between rows, push crowded chips down their leader line.
+Done means: fresh load at 390 has Debt halved centred and no gold tile; tapping it shows the six-stages line, a met later stage shows "Met. Waiting on Debt halved"; frames 500 ms apart show dashes moving; every label readable on its chip with no overlaps, Night and Daylight, 390 and 1100.
+
+### D. Budget (E5 to E11)
+Idea: read the bar first, then the flow, then your own lines; in 3D each section is boxed and flagged in its colour.
+1. Key (E5): attach to the top tile. Move #bd-legend (:11396) into the #bd-zero card as a footer under a 1 px --line border, 8 px 12 px padding; 2 columns at 599 and under, 3 at 600 to 999, 6 in a row from 1000; 8 px swatch, 14 px icon, mono 10 px uppercase; at most 76 px tall at 390.
+2. Bar intro (E6): when half in view, segments grow in order committed essential to investments, 400 ms each, 120 ms stagger, done by 1.1 s; Income, Assigned and Left count up alongside. Reduced motion: final state.
+3. Outlines (E8): tree map (~:27337) floor outline 1.5 px at .95, fill .08, each rect inset 0.3 units for a gap. Colours from CF_GROUPS (:16205): committed essential --coral #E5535F (the darkest red in the tokens; a new hex would be a hard fail), variable essential --salmon, committed non-essential --amber, variable non-essential --yellow, savings --green, investments --green2.
+4. Flag posts (E8): 1 px post in the section colour from the rect's back-left corner to 2 block heights above its tallest block, 3 px dot on top; black chip (as C4) "COMMITTED ESSENTIAL · £n" on the dot. Post projected every frame so it turns with the orbit; only the chip faces the screen. Collisions: raise the post one chip height (up to 3 steps), then shorten to the total only; never slide a chip off its post.
+5. Collapsed (E9): bdIsFolded (:18382) defaults to folded for everyone; a saved vi_bd_fold choice still wins.
+6. Arrow (E10): replace the ▾ glyph (:13535) with vi-chevron 20 px, stroke 2, in a 44 px target; down when folded, turns up over 240 ms; drop the -90° rule at :13536.
+7. Dropdown (E11): one 44 px "Choose a category" button for #bd-pick-exp and #bd-pick-inc. Spending main 8: Rent / Mortgage, Council tax, Utilities and bills, Groceries, Transport and fuel, Debt payments, Savings, House deposit; then "More categories (21)" grouped under the 6 type headings. Income: Salary, Side hustle, Benefits, Other, then "More (3)". role="listbox", arrow keys, Esc.
+Done means: key inside the top card at 390, bar readable; frame at 500 ms shows the bar part-filled; 3D at two orbit angles shows six coloured rectangles with gaps, every chip on its post, none overlapping; fresh load all groups folded with 20 px down arrows, one dropdown instead of the pill grid.
+ASK 2 (E7): (a) Dashboard and Budget flow views already share one renderer (drawCashflowDiagram, :18191, draws #cf-sankey and #bd-sankey), so C3 and C4 land on both; the 3D tree map with posts stays on Budget. Recommended. (b) Also add the Flow | 3D toggle and tree map to the Dashboard Cash flow card.
+
+### E. Liabilities and Wealth inventory (E19)
+Idea: tap the car and it fills the screen; turn it, pull it close, put it back.
+1. One tap or click opens i3dOpen everywhere. Drop the phone two-step in i3dTap (:20684): its first tap only turns the tile live, and if the model file isn't on the device (i3dGetBuf empty) nothing happens, which fits "I can't expand it". Add a 44 px vi-fullscreen button in each tile corner.
+2. Full-screen sheet on phones (100dvh, safe areas); modal up to 880 px from 600 px, 4:3 stage at least 60vh; scale .96 to 1 with a fade over 240 ms; --stage-bg, scanlines, gold plinth floor (:19518).
+3. OrbitControls, damping .08. Touch: one finger orbits, pinch zooms, two fingers pan. Mouse: drag and wheel. Zoom .6x to 3x of fitted radius, max polar 85°. Same bottom-centre pill as A3 (zoom out, zoom in, auto-rotate, reset) replacing the ⟳ ＋ glyphs at :20626. Auto-rotate stops on touch, resumes after 2.5 s.
+4. Tag: the existing gold flag-post tag (v3Label, :19559): LIABILITY with the depreciated value, or WEALTH ITEM.
+5. Close: 44 px ×, Esc, Android back, swipe down; focus returns to the tile.
+6. WebGL off: the saved thumbnail with the tag and "3D is off on this device. This is the saved picture."
+Done means: one tap on the Civic at 390 opens the viewer; shots after a drag and a pinch show a new angle and closer view; same for a Wealth inventory item; WebGL-off shot shows picture and tag; closing lands back on the tile.
+
+## Ready-to-run prompts (one fresh session each, started only on the owner's go)
+
+Shared rules for every stream: read CLAUDE.md, docs/DEV_WORKFLOW.md and docs/MULTI_SESSION.md first. Work on your own branch from `candidate/v0.7`. Ship through the ship-item skill (intent card from the owner's words in docs/briefs/V07_PREVIEW_EDITS.md, a failing test first, named tests, `node tools/shot.js` shots at 390, 768 and 1100 in Night and Daylight, Pedro REVIEW to PASS, then rollout-qc). Never push release/pioneer-v2 or touch PR #3. No Supabase changes. Report your branch, SHA, test results and Cloudflare preview link (https://<branch-alias>-vault-it.ptlived.workers.dev) to the release chat, session_01Koffvw9bGnT6zw8keBi9TD. British English, no em dashes. Finish in five lines or fewer.
+
+**Stream A, house builder engine (Fable, tonight):** "Build v0.7 preview edits E12 to E15 from docs/briefs/V07_PREVIEW_EDITS.md (owner's words, David's split, Pedro section A1, A2 and A6). Step one: measure a cleared-cache load at 390 px with CPU 4x on 67bb51e (time to first 3D frame, longest main-thread task, tap delay) and write the numbers down. Then: the finished house shows at once (built once and kept), only bricks added since the last visit animate (capped at one course), the full build moves to an opt-in 'Watch it built' link, 3D starts only when the viewport scrolls into view with the still picture until the first frame, sharp hairlines at full pixel ratio at rest, and the gold ground ping kept in lite mode. Edit src/hb3d/* and run node tools/build_hb3d.js. Measure again. tests/test_hb_speed.js must pass and gain a cold-load check. Report before and after numbers with the shots."
+
+**Stream B, quick fixes (Sonnet, tonight):** "Build v0.7 preview edits E16, E17, E18, E1, E2, E3, E9 and E10 from docs/briefs/V07_PREVIEW_EDITS.md, following Pedro sections A3 to A5, B, C1, C2, D5 and D6 exactly. Only index.html markup, CSS and UI code; do not touch src/hb3d (Stream A owns it). One commit per edit, each with its own failing test. Merge first, before Stream A."
+
+**Stream C, Budget and Dashboard 3D (Fable or Opus, tomorrow, after Pedro's brief is approved by the owner):** "Build v0.7.1 edits E4, E5, E6, E7, E8 and E11 from docs/briefs/V07_PREVIEW_EDITS.md, Pedro sections C3, C4 and D1 to D4 and D7, using the owner's answer to ASK 2. Labels and flag posts are built once and shared by both views."
+
+**Stream D, 3D model viewer (Sonnet, tomorrow):** "Build v0.7.1 edit E19 from docs/briefs/V07_PREVIEW_EDITS.md, Pedro section E: one shared viewer for Liabilities and Wealth inventory, one tap to open, orbit and pinch zoom, the WebGL-off picture."
