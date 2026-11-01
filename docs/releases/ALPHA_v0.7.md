@@ -8,7 +8,7 @@ The release going to testers on Mon 2 Nov 2026: production branch `release/pione
 |---|---------|-----|--------------------|
 | 1 | Feedback button covers the Net worth in 3D view at 1100 px (`test_signoff_a` fails, CI run 41326238697 on 7e0212a). Side issue: `test_sync` "NOT SYNCED: vi-fb-visits" under load | Feedback button session | Done, 1e686be (1 Nov 16:50), CI to confirm |
 | 2 | Remove the celebrity names (Gary Stevenson in a CSS comment; Buffett, Munger, Stevenson, Squibb advisor cards in `Vault-It_v0.3_Alpha.html`). Branch `claude/social-media-strategy-launch-fwdvvq`, `test_honest_pricing` | Marketing session | Done, e3e5647 (1 Nov 16:42) |
-| 3 | CI green on the exact release commit (last full result: red on 7e0212a; later runs cancelled or still running) | Ops session | Waiting on 1 and 2 |
+| 3 | CI green on the exact release commit (last full result: red on 7e0212a; later runs cancelled or still running) | Ops session | Done, CI green on 0909a7e (run 41328370081) |
 | 4 | Owner's phone sign-off on that commit: faster house builder, old builder gone, seven phone fixes, Feedback button, Help centre (tour once after the welcome, Settings replay, FAQs, help chat) | Owner | Waiting on 1 to 3 |
 | 5 | Release steps (`/release`): backup branch, fast-forward `release-mvp-20261031` to the signed-off commit, rewrite the PR #3 description (it still lists only the 31 Oct changes), owner merges, live version check, tag `v0.7.0-alpha` | Ops session, then owner | Not started |
 
