@@ -143,7 +143,7 @@ Actions: `create` (preview shape, `auto_size` real-world metres, GLB) → `statu
 The beta list behind `vault-it.co/sign-up` (migration `009_waitlist_optin.sql` must be applied first). Double opt-in: `join` stores a pending request and
 e-mails a confirmation link (`SITE_URL` + `sign-up/confirm?t=…`); `confirm` applies the person's choices (testing, marketing) and records the consent
 wording version and time; `unsubscribe` needs the HMAC-signed link from any of our e-mails. Limits per IP / overall / mailbox (`RATE_WAITLIST_*`) use
-`rate_hit` (migration 008); Turnstile is checked when `TURNSTILE_SECRET` is set (allowed hostnames `WAITLIST_TURNSTILE_HOSTNAMES`, default `vault-it.co`).
+`rate_hit` (migration 008); Turnstile is checked when `TURNSTILE_SECRET` is set (allowed hostnames `WAITLIST_TURNSTILE_HOSTNAMES`, default `vault-it.co`). A join with no token (the page could not load the check) is still accepted, on a stricter allowance: `RATE_WAITLIST_NOTOKEN_IP_PER_HOUR` (default 5) and `RATE_WAITLIST_NOTOKEN_GLOBAL_PER_HOUR` (default 60); a token that is present but wrong is refused. Lower the global one if unsolicited confirmation mails become a concern.
 Uses `RESEND_API_KEY`, `FROM_EMAIL`, `PIN_PEPPER` (signs unsubscribe links — never change it, or old links stop working).
 
 ```
