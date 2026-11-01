@@ -30,7 +30,7 @@ function shell(title, pre, body, footer) {
 </td></tr></table></td></tr></table></body></html>`;
 }
 const UNSUB = '{{unsubscribe_url}}';
-const footer = `You are getting this because you joined the Vault-It list and confirmed your address.<br><span style="display:inline-block;padding:8px 0">${a(UNSUB, 'Unsubscribe in one click')}</span><br>${TRADER}`;
+const footer = `You are getting this because you joined the Vault-It list and confirmed your address.<br><a href="${UNSUB}" style="display:inline-block;padding:12px 0;color:#44C0B9">Unsubscribe in one click</a><br>${TRADER}`;
 
 const cta = `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr><td><a href="https://app.vault-it.co" style="${BTN}">Open Vault-It</a></td></tr></table>`;
 const welcomeBody = `<p style="${EYEBROW}">Welcome</p>
@@ -44,7 +44,7 @@ const welcomeBody = `<p style="${EYEBROW}">Welcome</p>
 <p style="${P}">Vault-It puts your debts, savings and house deposit on one map. You type in your own figures, and we never ask for your bank login. Every pound you save lays a brick on your house. What you owe sits below the ground, so being in debt is a starting line, not a failure screen. The aim: give anyone, even someone in debt, a live date for when they will hold the keys to their own home.</p>
 ${cta}
 <h2 style="${H2}">Who is behind it</h2>
-<p style="${P}">I&#39;m Pete Thickett. I run PT Live Design in Lincoln, where I have worked on branding and design since 2019. I have been a multimedia designer, including producing training resources for the Royal Air Force Officer Training Academy at Cranwell. I hold a Certified Professional in Psychology of Design from the London School of International Business, and I am a local leader for the Interaction Design Foundation. ${todo('taken only from your LinkedIn. Approve, trim, or add anything else. The landing page says "UK developer", which your profile does not.')}</p>
+<p style="${P}">I run PT Live Design in Lincoln, where I have worked on branding and design since 2019. I have been a multimedia designer, including producing training resources for the Royal Air Force Officer Training Academy at Cranwell. I hold a Certified Professional in Psychology of Design from the London School of International Business, and I am a local leader for the Interaction Design Foundation. ${todo('taken only from your LinkedIn. Approve, trim, or add anything else. The landing page says "UK developer", which your profile does not.')}</p>
 <p style="${P}">Once a week I will send a short note: what is new, what I fixed, what got better. Reply to this e-mail any time. I read every reply.</p>
 <p style="${P}">Thanks,<br>Pete</p>`;
 
