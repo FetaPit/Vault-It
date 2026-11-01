@@ -33,6 +33,7 @@ The brand book draws 14,465 bricks with raw WebGL: one shader program, one insta
 
 ## Pete's decisions (1 Nov, after the brief)
 - Release: option (b) — hold until the engine passes the gate. No still-picture fallback release tonight.
+- Confirmed again 1 Nov 23:30 ("Ok coordinate the transplant ahead of the mvp 0.7 releass"): the engine transplant IS the release gate. Order: B2 CI diagnosis and bugs -> A2 skeleton -> A2 milestones (terrace first) -> Pedro side-by-side -> one preview -> Pete signs off on fold + laptop -> release.
 - Pedro's ASK: the house viewport keeps the Night palette in Daylight mode too. No Daylight palette work.
 - Lazy laying (part of the A2 spec): on load, only the top course is laid brick by brick; every course below is drawn as one settled shape (merged static instancing, no per-brick drop state). When a deposit adds more than the current course (e.g. £80,000 at once), the new bricks lay with the brand-book drop animation, course after course, to the new level — Pedro's stagger and drop timings apply to those new courses only. Initial render = settled shell + one animated top course; deposits animate only the delta.
 
