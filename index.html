@@ -11529,7 +11529,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       </div>
       <!-- Lay the bricks sits right under the viewport so the laying is seen (owner, 30 Oct 2026) -->
       <div class="hb-lay" id="hb-lay" role="group" aria-label="Lay the bricks">
-        <div class="hb-lay-row"><label for="savingsInput" id="hb-add-amt" class="vi-sr">Amount to add to your deposit</label><div class="iw"><span class="sym">£</span><input type="number" id="savingsInput" placeholder="0.00" min="0" step="100" aria-label="Amount to add to your deposit"></div><button class="btn-add" id="btnAdd"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick-wall"/></svg> Lay the bricks</button></div>
+        <div class="hb-lay-row"><label for="savingsInput" id="hb-add-amt" class="vi-sr">Amount to add to your deposit</label><div class="iw"><span class="sym">£</span><input type="number" id="savingsInput" inputmode="decimal" placeholder="2,000" min="0" step="100" aria-label="Amount to add to your deposit"></div><button class="btn-add" id="btnAdd"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick-wall"/></svg> Lay the bricks</button></div>
+        <div class="hb-brick-line" id="hb-brick-line" aria-live="polite"></div>
       </div>
       <div class="vp-key">☝ DRAG TO PAN &nbsp;·&nbsp; ✌ DRAG TO ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH TO ZOOM</div>
       <div class="scene-cap" id="sceneCap" style="display:none"></div>
@@ -12620,6 +12621,13 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .hb-lay-row{display:flex;gap:8px;align-items:stretch}
 .hb-lay-row .iw{flex:1;min-width:0}
 .hb-lay-row .btn-add{width:auto;flex:none;padding:11px 16px;white-space:nowrap}
+.hb-lay .iw{border-radius:8px;border-color:rgb(var(--teal-rgb) / .35)}
+.hb-lay .iw .sym{display:flex;align-items:center;height:56px;padding:0 14px;font-size:20px;line-height:1;color:var(--gold)}
+.hb-lay .iw input{height:56px;box-sizing:border-box;font-family:'Share Tech Mono',var(--font-mono);font-size:24px;line-height:1;padding:0 14px}
+.hb-lay-row .btn-add{min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px}
+.hb-lay-row .btn-add .vi-ic{width:20px;height:20px}
+.hb-brick-line{margin-top:8px;min-height:16px;font-family:'Share Tech Mono',var(--font-mono);font-size:12px;line-height:16px;color:var(--muted)}
+@media(max-width:599px){.hb-lay-row{flex-direction:column}.hb-lay-row .btn-add{width:100%;height:48px;flex:none}}
 .vi-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .hb-plan-note{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--t2);margin-top:8px}
 .hb-prog .stats{margin-top:12px}
@@ -14679,19 +14687,26 @@ document.getElementById('btnSP').addEventListener('click',()=>{
 });
 document.getElementById('priceInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnSP').click();});
 
+function hbBrickLineUpdate(){
+  var el=document.getElementById('hb-brick-line'),inp=document.getElementById('savingsInput');if(!el||!inp)return;
+  var v=parseFloat(inp.value),bi=state.houseMode==='purchased'?null:hbBrickInfo();
+  if(!(v>0)||!bi||!(bi.perBrick>0)){el.textContent='';return;}
+  var rate=window.VI_CURRENCY_RATE||1,sym=window.VI_CURRENCY_SYMBOL||'£',n=Math.floor(v/rate/bi.perBrick+1e-9);
+  el.textContent=sym+v.toLocaleString('en-GB',{maximumFractionDigits:2})+' lays '+n.toLocaleString('en-GB')+(n===1?' brick':' bricks');
+}
 document.getElementById('btnAdd').addEventListener('click',()=>{
   if(viBlockEdit())return;
   const v=parseFloat(document.getElementById('savingsInput').value);
   if(!v||v<=0){toast('Enter a valid amount');return;}
   const vBase=v/(window.VI_CURRENCY_RATE||1);
-  if(state.houseMode==='purchased'){if(!(+state.mortgageBalance>0)){toast('Your mortgage is already paid off');return;}hbPayMortgage(vBase);document.getElementById('savingsInput').value='';return;}
+  if(state.houseMode==='purchased'){if(!(+state.mortgageBalance>0)){toast('Your mortgage is already paid off');return;}hbPayMortgage(vBase);document.getElementById('savingsInput').value='';hbBrickLineUpdate();return;}
   const p0=pct();
   state.saved+=vBase;
   state.deposits.push({amount:vBase,date:new Date().toLocaleDateString('en-GB')});
   recordHabitContribution(vBase);
   const brand=hbBrandOn()&&!!hbBrickInfo();
   save();if(brand){prevP=pct();}else{checkMS(pct());}updateUI();
-  document.getElementById('savingsInput').value='';
+  document.getElementById('savingsInput').value='';hbBrickLineUpdate();
   const sym=window.VI_CURRENCY_SYMBOL||'£';
   if (!_isPro()) { showToast('Deposit saved! Upgrade to Pro to watch your house being built 🏗'); }
   else if (brand) { _hbEngaged=true; hbPop(hbBrandLaid(vBase, v.toLocaleString())); hbFlash(); hbBrandMS(p0, pct()); }   // 6.8: moves, counts, says
@@ -14852,6 +14867,7 @@ function renderHabitTracker(){
   }
   circlesEl.innerHTML=html;
 }
+document.getElementById('savingsInput').addEventListener('input',hbBrickLineUpdate);
 document.getElementById('savingsInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnAdd').click();});
 
 // Level 2 and 3 exist only after "I've bought it". These are the fields that step sets (markHousePurchased, Level 3).
