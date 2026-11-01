@@ -33,6 +33,30 @@ A game layer for health and fitness, built on a fork of [openGym](https://github
 - `src/views/Character.jsx`: character sheet + physique hologram (reuses openGym's `BodyMap` volume data).
 - Game state goes in the Zustand store next to `workouts`, so it syncs and backs up with everything else.
 
+## 3D body scan and forecast
+
+Built on the Vault-It 3D engine approach: dependency-free WebGL, instanced bricks, orbit camera,
+bricks laid bottom to top. The prototype's Body tab shows it with a hand-tuned body shape.
+
+**Accuracy, honestly.** Girths and shape: 97–99% is reachable (±1–2 cm). Body fat %: ±2–3 points,
+nothing gets to 99% (DEXA is ±1–2). Forecast: a range that narrows each scan.
+
+Pipeline in the app:
+1. **Capture.** Guided 4 angles (front, left, back, right) with the Capacitor camera. On-device
+   checks before the shot: MediaPipe Pose for A-pose and distance, accelerometer for phone tilt.
+2. **Silhouettes.** MediaPipe segmentation per photo. Photos never leave the phone or your server.
+3. **Fit.** A parametric body model fitted to the 4 silhouettes + keypoints, pinned by your height
+   and constrained so volume × body density matches Hume weight and body fat.
+   - Model license matters: SMPL / SMPL-X are research-only. Check NAVER's Anny model
+     (reported as Apache-2.0) before choosing. Run the fit in a sidecar next to the openGym api.
+   - Shortcut: a paid scan SDK (Bodygram, 3DLOOK, Prism) if we want accuracy before building our own.
+4. **Prove it.** Monthly tape measurements (openGym already logs body measurements) are ground
+   truth. Every scan shows its error against the last tape check, so "99%" is measured, not claimed.
+5. **Forecast.** Weekly energy-balance model (Hall: fat 9,440 kcal/kg, lean 1,816 kcal/kg, metabolic
+   adaptation ~22 kcal/day per kg lost) with Forbes partition shifted by training, protein and sleep.
+   Inputs are your real habit hit-rates from quests. Fat and lean mass changes are mapped onto the
+   body model's shape space, so the 3D body morphs. Re-fit the coefficients to your own scans over time.
+
 ## Octalysis
 
 Strong on drives 2, 3, 4, 7. Weakest on 5 (social): a two-person party with a training partner is the fix.
@@ -48,4 +72,5 @@ No XP for big calorie deficits. Rest and sleep are quests. Low recovery lowers d
 2. Health Connect reads: steps, sleep, nutrition, body fat, lean mass.
 3. Game lib + tests, character sheet view.
 4. Quests, boss, skill tree in the app.
-5. Party mode (drive 5), share cards.
+5. Body tab: brick renderer + forecast, then guided capture and the model fit.
+6. Party mode (drive 5), share cards.
