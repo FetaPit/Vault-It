@@ -26155,7 +26155,12 @@ function initDemoMode() {
   // loading the demo there used to drop the new sign-in a moment later (found 31 Oct by test_beta_client)
   var session = null; try { session = JSON.parse(localStorage.getItem('vi_session') || 'null'); } catch (e) {}
   var signedIn = !!(session && session.email && session.expiry > Date.now());
-  if (!hasUser && !hasData && !declined && !signedIn) { loadDemoData(); isDemo = true; }
+  if (!hasUser && !hasData && !declined && !signedIn) {
+    loadDemoData(); isDemo = true;
+    // the seed lands after the app's state has loaded: read it back and redraw, so the first visit is not empty until a reload (release chat, 1 Nov)
+    try { _reloadAllState(); } catch (e) {}
+    try { updateKPIs(); drawChart(); renderCashflow(); renderSummaryCards(); renderFIREroadmap(); } catch (e) {}
+  }
   var chip = document.getElementById('demo-chip');
   if (chip) chip.style.display = isDemo ? 'flex' : 'none';
 }
