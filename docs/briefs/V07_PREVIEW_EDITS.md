@@ -135,3 +135,11 @@ Shared rules for every stream: read CLAUDE.md, docs/DEV_WORKFLOW.md and docs/MUL
 **Stream C, Budget and Dashboard 3D (Fable or Opus, tomorrow, after Pedro's brief is approved by the owner):** "Build v0.7.1 edits E4, E5, E6, E7, E8 and E11 from docs/briefs/V07_PREVIEW_EDITS.md, Pedro sections C3, C4 and D1 to D4 and D7, using the owner's answer to ASK 2. Labels and flag posts are built once and shared by both views."
 
 **Stream D, 3D model viewer (Sonnet, tomorrow):** "Build v0.7.1 edit E19 from docs/briefs/V07_PREVIEW_EDITS.md, Pedro section E: one shared viewer for Liabilities and Wealth inventory, one tap to open, orbit and pinch zoom, the WebGL-off picture."
+
+## Owner's answers (1 Nov ~19:40)
+
+Verbatim: "1a same for dashboard means the budget flow diagram edits should be mirrored on the dashboard. The asset needs to be the same. Fligposts arent releveant here, just ensure the labels are clear with a black bg. Same style. 3a"
+
+- ASK 1 (E18): (a), the camera buttons (zoom, orbit, my row, reset, full screen) move to the bottom of the viewport.
+- ASK 2 (E7): the Budget flow diagram and the Dashboard flow diagram are one and the same asset: every flow edit (animation, black-background labels in the same style) lands on both. Flag posts do not apply to the flow diagram; they stay only on the Budget 3D view (E8). This matches Pedro's option (a): drawCashflowDiagram draws both, so build once and check both #cf-sankey and #bd-sankey.
+- David's question (tester tonight): (a), the preview link with demo data and no sign-in.
