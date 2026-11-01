@@ -236,3 +236,29 @@ supabase secrets set OWNER_EMAIL=<owner's address> FEEDBACK_DIGEST_KEY=<openssl 
 5. Release the app with the Feedback button and the updated privacy notice.
 
 Tests: `tests/test_012.mjs` (database on pglite), `tests/test_feedback_server.js` (both functions, with stubs).
+
+## Help centre (help-ask; tester-feedback for unanswered questions)
+
+The in-app help (? in the header): guided tour, FAQs and a help chat. Answers come first from the FAQ list and the tester's own
+numbers on the device; nothing leaves the device for those.
+
+**help-ask** (`POST`, the signed-in user's `Authorization: Bearer` token): `{question (up to 400), history? (last 6 turns, text only),
+guide (the FAQ list as text, up to 24 KB)}` → `{ok, answer, show, unsure}`. Claude (`HELP_MODEL`, default `claude-haiku-5-5`, low effort,
+1,024 tokens) answers only from the guide and replies `[[unsure]]` when the guide does not cover it. Amounts and long numbers are
+stripped from the question and history (the app strips them first). `show` is a tour step id for the app's "Show me" button.
+Errors: 400 / 401 / 413, 429 after `HELP_PER_DAY` (40) questions a day per tester (`rate_hit`, migration 008), 502 when the AI fails
+(the app falls back to its built-in answer), 503 without `ANTHROPIC_API_KEY`.
+
+**Unanswered questions** go to `tester-feedback` as `{kind:'feedback', moment:'help_unanswered', text}`. Each one is e-mailed to
+`OWNER_EMAIL` at once and filed with a fixed triage (`area: help`, severity 1, no AI call), so it also shows in the daily digest.
+They count towards the tester's 20 feedback items a day.
+
+**Go-live (production; needs the owner's yes):** no new secrets or migrations. Deploy both:
+```
+supabase functions deploy help-ask --no-verify-jwt
+supabase functions deploy tester-feedback --no-verify-jwt
+```
+Until then the app answers from the FAQ list only, and unanswered questions still reach the live `tester-feedback` (daily digest)
+but without the instant e-mail.
+
+Tests: `tests/test_help_server.js` (both functions, with stubs), `tests/test_help_centre.js` (the app).

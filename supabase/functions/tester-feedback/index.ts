@@ -10,7 +10,8 @@
 //
 // Feedback is stored first (migration 012, tester_feedback_add), then Claude triages it: {type, severity 1-4, area, summary, steps}
 // (surveys also get sentiment -2..2 and a one-line honest_takeaway).
-// Severity 4 (data loss, cannot sign in, money figures wrong) e-mails the owner straight away. If the AI call fails the row stays
+// Severity 4 (data loss, cannot sign in, money figures wrong) e-mails the owner straight away, and so does every help question the
+// in-app guide could not answer (moment 'help_unanswered'). If the AI call fails the row stays
 // untriaged and the daily digest picks it up. The screenshot is only sent to Claude when FEEDBACK_VISION=1 (default off).
 // Money figures never reach the server on purpose: the app hides them before sending, and this function strips any amount or
 // digits it still finds in the action trail and event labels.
@@ -374,19 +375,56 @@ async function emailOwner(subject: string, html: string, text: string): Promise<
   } catch (e) { console.error('Resend unreachable:', String(e).slice(0, 120)); return false }
 }
 
+// ── help questions the in-app guide could not answer (owner, 1 Nov 2026: "an email sent to me for each unanswered question")
+// The app sends them as feedback with moment 'help_unanswered' (amounts already removed on the device). Each one is e-mailed to
+// the owner straight away and filed with a fixed triage (no AI call): it is a question to answer in the FAQ, not a fault report.
+export const HELP_MOMENT = 'help_unanswered'
+export function helpTriage(text: string): Triage {
+  return { type: 'confusion', severity: 1, area: 'help', summary: ('Help question not answered: ' + String(text ?? '').replace(/\s+/g, ' ').trim()).slice(0, 160), steps: [] }
+}
+export function helpText(id: number | string, who: string, screen: string, question: string, link: string): string {
+  return `A tester asked the in-app help something it could not answer.\n\nQuestion: ${question}\nTester: ${who}\nScreen: ${screen || 'not given'}\n\n` +
+    `Add an answer to VI_KB in index.html so the next tester gets one.\n\nFeedback #${id}${link ? ': ' + link : ''}`
+}
+function helpHtml(id: number | string, who: string, screen: string, question: string, link: string): string {
+  const row = (k: string, v: string) => `<tr><td style="padding:4px 12px 4px 0;color:#9AA0A6;font-size:13px;vertical-align:top">${k}</td><td style="padding:4px 0;font-size:14px;color:#E8E8E8">${esc(v)}</td></tr>`
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unanswered help question</title></head>
+<body style="margin:0;padding:24px 16px;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
+<div style="max-width:560px;margin:0 auto;background:#080D14;border:1px solid #15302F;border-radius:14px;padding:24px">
+<p style="margin:0 0 6px;font-family:'Share Tech Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#44C0B9">Help question not answered</p>
+<h1 style="margin:0 0 16px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;line-height:1.3;white-space:pre-wrap">${esc(question)}</h1>
+<table role="presentation" cellpadding="0" cellspacing="0">${row('Tester', who)}${row('Screen', screen || 'not given')}</table>
+<p style="margin:16px 0 0;font-size:13px;line-height:1.6;color:#9AA0A6">Add an answer to the help guide (VI_KB in index.html) so the next tester gets one.</p>
+<p style="margin:12px 0 0;font-size:13px;color:#9AA0A6">Feedback #${esc(id)}${link ? ` · <a href="${esc(link)}" style="color:#44C0B9">view</a>` : ''}</p>
+<p style="margin:12px 0 0;font-size:12px;color:#9AA0A6">Not regulated by the FCA. Not financial advice.</p>
+</div></body></html>`
+}
+
 type Admin = ReturnType<typeof createClient>
+async function testerName(admin: Admin, user: { id: string; email?: string }): Promise<string> {
+  let who = user.email ?? 'a tester'
+  try {
+    const { data: p } = await admin.from('profiles').select('name').eq('id', user.id).maybeSingle()
+    const first = typeof p?.name === 'string' ? p.name.trim().split(/\s+/)[0] : ''
+    if (first) who = `${first} (${user.email ?? 'no e-mail'})`
+  } catch { /* the e-mail address will do */ }
+  return who
+}
+async function helpAlert(admin: Admin, id: number, row: FeedbackRow, user: { id: string; email?: string }) {
+  const { error } = await admin.from('tester_feedback').update({ triage: helpTriage(row.text), triaged_at: new Date().toISOString() }).eq('id', id)
+  if (error) console.error('help triage not stored:', error.message)
+  const who = await testerName(admin, user), screen = screenOf(row.context), link = viewLink(id), q = row.text.slice(0, 600)
+  await emailOwner(`Vault-It help: unanswered question`, helpHtml(id, who, screen, q, link), helpText(id, who, screen, q, link))
+}
+
 async function triageAndStore(admin: Admin, id: number, row: FeedbackRow, user: { id: string; email?: string }) {
+  if (row.moment === HELP_MOMENT && row.text) return helpAlert(admin, id, row, user)
   const t = await triageRow(AI, row, VISION)
   if (!t) return
   const { error } = await admin.from('tester_feedback').update({ triage: t, triaged_at: new Date().toISOString() }).eq('id', id)
   if (error) { console.error('triage not stored:', error.message); return }
   if (t.severity >= 4) {
-    let who = user.email ?? 'a tester'
-    try {
-      const { data: p } = await admin.from('profiles').select('name').eq('id', user.id).maybeSingle()
-      const first = typeof p?.name === 'string' ? p.name.trim().split(/\s+/)[0] : ''
-      if (first) who = `${first} (${user.email ?? 'no e-mail'})`
-    } catch { /* the e-mail address will do */ }
+    const who = await testerName(admin, user)
     const screen = screenOf(row.context), link = viewLink(id)
     const said = (row.survey ? `Survey ${row.survey}:\n` : row.question ? `Question ${row.question}${row.choice ? ', picked: ' + row.choice : ''}\n` : row.choice ? `Picked: ${row.choice}\n` : '') + row.text
     await emailOwner(`Vault-It urgent feedback: ${t.summary.slice(0, 80)}`, urgentHtml(id, t, who, screen, said, link), urgentText(id, t, who, screen, said, link))
