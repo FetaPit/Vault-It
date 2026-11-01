@@ -1,5 +1,6 @@
 // Element screenshots for a finished item, Night and Daylight at 390 and 1100 px, plus the checks the owner's rules need.
-// Usage: node tools/shot.js --name r3-8 --tab assets [--sub stocks] [--sel "#al-card"] [--widths 390,1100] [--themes dark,light] [--js "toggleSidebar()"] [--url file:///home/user/Vault-It/index.html]
+// Usage: node tools/shot.js --name r3-8 --tab assets [--sub stocks] [--sel "#al-card"] [--widths 390,1100] [--themes dark,light] [--js "toggleSidebar()"] [--url file:///home/user/Vault-It/index.html] [--full 1]
+// Marketing pages for the creative director: --url file:///home/user/Vault-It/landing.html --widths 390,768,1100 --full 1
 // Writes shots/qc/<name>_<theme>_<width>.png (git-ignored) and prints one line per shot: path, page errors, sideways scroll.
 // Data: the app's own sample data (?bypass=websummit), so no account and no network are needed.
 const { chromium } = require('playwright');
@@ -33,7 +34,7 @@ const url = base + (base.includes('?') ? '&' : '?') + 'bypass=websummit';
     const path = `shots/qc/${name}_${theme}_${w}.png`;
     const el = sel ? page.locator(sel).first() : null;
     if (el && await el.count()) await el.screenshot({ path });
-    else { await page.screenshot({ path }); if (sel) errs.push('selector not found: ' + sel); }
+    else { await page.screenshot({ path, fullPage: a.full === '1' }); if (sel) errs.push('selector not found: ' + sel); }
     if (errs.length || sideways) bad++;
     console.log(`${path}  errors=${errs.length}${errs.length ? ' (' + errs[0].slice(0, 120) + ')' : ''}  sideways=${sideways ? 'YES' : 'no'}`);
     await ctx.close();

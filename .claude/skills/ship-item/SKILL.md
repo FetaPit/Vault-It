@@ -23,6 +23,7 @@ Work in this order. Do not skip a step to save tokens; the savings come from doi
    ```
 4. **Internal critique of the card.** Ask yourself: would the owner recognise this as what they asked for? Did I add anything they did not ask for, or drop a word they used (for example "across the board", "exactly", "every")? Is each "done means" line checkable? Fix the card.
 5. If there are open questions, ask them all in one `AskUserQuestion` now, with a recommended option first. Do not ask what the codebase or the brief already answers.
+6. **Creative brief (anything people see: layout, styling, 3D look, copy, emails).** Run the `creative-director` agent in BRIEF mode with the item and the owner's words. Build to `docs/creative/briefs/<slug>.md`. Obey an ASK. Skip for logic-only items.
 
 ## 2. Build
 - Find code with the session map and `Grep`, then read ranges. Use `scout` for wide searches and `grunt` for exact mechanical edits.
@@ -35,12 +36,13 @@ Work in this order. Do not skip a step to save tokens; the savings come from doi
 
 ## 4. Independent QC
 1. Stage the change: `git add <files>` (no `git commit -a`: the gate checks exactly what is staged).
+1b. **Creative review (visual items).** Shoot Night and Daylight at 390, 768 and 1100 px (`--full 1` for marketing pages), then run the `creative-director` agent in REVIEW mode with the brief path and the screenshot paths. REVISE: fix, re-shoot, re-stage, review again. PASS writes `shots/qc/CD_PASS`. The owner can waive it for one commit (`CD_OVERRIDE=owner git commit ...`, and say so in the commit body); never waive it on your own.
 2. Run the `rollout-qc` agent with the item, the intent card path, the test command and its output, and the screenshot paths.
 3. FIX: make the fixes, re-run the evidence, re-stage, run `rollout-qc` again. ASK: put the question to the owner. After two FIX rounds on the same point, stop and tell the owner what is blocking, rather than looping.
 4. PASS writes `shots/qc/QC_PASS`. The commit gate (`.claude/hooks/qc-gate.sh`) refuses an app commit whose staged change does not match it, so anything edited after QC needs QC again.
 
 ## 5. Ship
-1. Commit. Message: `<Round / item>: <what changed, plain words>`, then a body with the intent card's "Done means" lines, the tests run, and `QC: PASS (rollout-qc)`. End with the session's attribution lines.
+1. Commit. Message: `<Round / item>: <what changed, plain words>`, then a body with the intent card's "Done means" lines, the tests run, and `QC: PASS (rollout-qc)` (plus `CD: PASS <score> (creative-director)` for visual items). End with the session's attribution lines.
 2. Update `docs/QUEUE.md`: the item's progress line, or move it to Done with the commit hash. Commit that with the work or straight after.
 3. Push to the session's branch (and `brand-rollout` when the owner has asked for that). Fetch and rebase first; another session may be working in parallel.
 4. Send the screenshots to the owner with `SendUserFile` (Night and Daylight at 390 and 1100 px).
