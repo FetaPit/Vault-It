@@ -6040,8 +6040,10 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this.opts = opts;
     var w = Math.max(1, container.clientWidth), h = Math.max(1, container.clientHeight);
     var r = this.renderer = new THREE.WebGLRenderer({ antialias: !opts.mobile, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.preserve });   // touch devices: no MSAA (the pixel ratio covers it; MSAA on a big phone canvas is what loses the context)
-    var me = this;   // brand look (house flag): pixel ratio capped at 1.5 below 700 px wide, 2 above (brand handover 6.10)
-    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, me.brand ? (me._bLite ? 1 : w < 700 ? 1.25 : 1.5) : 9, Math.sqrt(budget / Math.max(1, w * h)))); };
+    var me = this;   // brand look: sharp hairlines at rest (v0.7, owner 1 Nov: "the wireframe should be quite sharp"): the screen's own pixel ratio, capped at 2;
+    // 1.25 on a phone (1.5 wider) only while bricks land or a finger is down (me._bBusy, brand.js), back to full about 300 ms later; lite stays at 1
+    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, me.brand ? (me._bLite ? (me._bSoft ? 0.75 : 1) : me._bBusy ? (w < 700 ? 1.25 : 1.5) : 2) : 9, Math.sqrt(budget / Math.max(1, w * h)))); };
+    this._setDpr = function () { var w = me.el.clientWidth, h = me.el.clientHeight, d = me._dprFor(w, h); if (!(w > 2 && h > 2) || Math.abs(me.renderer.getPixelRatio() - d) < 1e-3) return; me.renderer.setPixelRatio(d); me.renderer.setSize(w, h, false); me.dirty = true; };
     r.setPixelRatio(this._dprFor(w, h));
     r.setSize(w, h, false);
     r.outputEncoding = THREE.sRGBEncoding;
@@ -6089,12 +6091,15 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       if (!self.active || self.offscreen || document.hidden) { self._lastT = 0; return; }   // off screen or in a background tab: sleep (woken when seen again)
       // brand: what a drawn frame really cost is the gap until the browser gives us the next frame (the GPU work lands after render() returns)
       if (self.brand && self._bDrewAt) { var fc = performance.now() - self._bDrewAt; self._bCost = self._bCost == null ? fc : self._bCost * 0.6 + fc * 0.4; self._bDrewAt = 0; self._bGap = Math.max(80, Math.min(1500, self._bCost * 2.2)); }
+      // v0.7 cold start: while the still picture covers the stage, draw one part a frame into the hidden canvas so each shader program
+      // compiles in its own short task, not all of them in the first frame (which froze a phone for over a second)
+      if (self._bWarm && self._bWarm.length) { self._brandWarm(); self._raf = requestAnimationFrame(self._loop); return; }
       var moving = self.controls.update();
       if (self._fly) moving = self._stepFly() || moving;
       if (self._brandTick) moving = self._brandTick() || moving;   // brand look: smoothing, brick drops, pulse, sweep, ring (only while on screen)
       // brand lite (slow or software-drawn GPU, owner 31 Oct): frames are spaced at about 2.5x their own cost, so the page always has time
       // to answer taps and scrolls between them ("Page unresponsive" otherwise); a skipped frame keeps the loop alive without drawing
-      if (self.brand && self._bLite && (self.dirty || moving) && performance.now() - (self._bLastDraw || 0) < (self._bGap || 120)) { self._raf = requestAnimationFrame(self._loop); return; }
+      if (self.brand && self._bLite && (self.dirty || moving) && performance.now() - (self._bLastDraw || 0) < Math.max(self._bGap || 120, self._bPingPace ? 250 : 0)) { self._raf = requestAnimationFrame(self._loop); return; }   // settled in lite: the ground ping alone, at most 4 frames a second
       if (self.brand && self._bCalm && !self._bLite && performance.now() - (self._bLastDraw || 0) < 32) { self._raf = requestAnimationFrame(self._loop); return; }   // brand at rest: 30 frames a second
       if (self.dirty || moving) {
         var t = performance.now();
@@ -6130,15 +6135,14 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
 
   VP.start = function () { this.active = true; this.dirty = true; this.wake(); };
   VP.wake = function () { this._idle = 0; if (this.active && !this._raf) this._raf = requestAnimationFrame(this._loop); };
-  VP.settled = function () { if (this._brandActive && this._brandActive()) return this._brandSettled(); return this._idle > 2; };
+  VP.settled = function () { if (this._brandActive && this._brandActive()) return !!this._bDraws && !this._bWarm && this._brandSettled(); return this._idle > 2; };   // brand: settled means on screen (first frame drawn) and at rest
   VP.stop = function () { this.active = false; if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; } };
   // lite quality for a device that cannot keep up: shadows off, pixel ratio 1 (nothing else changes; the brand look has its own lite stage)
   VP.goLite = function () {
     if (this._lite) return; this._lite = true;
     this.renderer.shadowMap.enabled = false; this.sun.castShadow = false; this.opts.maxDpr = 1;
     this.scene.traverse(function (o) { var m = o.material; if (!m) return; (Array.isArray(m) ? m : [m]).forEach(function (x) { x.needsUpdate = true; }); });
-    var w = this.el.clientWidth, h = this.el.clientHeight;
-    if (w > 2 && h > 2) { this.renderer.setPixelRatio(this._dprFor(w, h)); this.renderer.setSize(w, h, false); }
+    this._setDpr();
     this.dirty = true; this._shadowDirty = true; this.wake();
   };
   VP.resize = function () {
@@ -6275,6 +6279,17 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     if (this._brandActive && this._brandActive()) { this._bTarget = Math.max(0, Math.min(1, p1)); this.dirty = true; this.wake(); return; }   // eased by the frame loop
     this.setState({ p: p1 });
   };
+  // v0.7 opening (owner, 1 Nov: "only the last course of bricks ... is animated upon loading, and the rest act as one 3D model already
+  // loaded"): everything up to p0 is in place on the first frame; the bricks between p0 and p1 (the newest course at most) lay themselves
+  // with a stagger, a course in about 1.2 to 1.5 s. Reduced motion: p1 at once. Without the brand build it is a plain setState.
+  VP.openAt = function (p0, p1) {
+    p1 = Math.max(0, Math.min(1, p1)); p0 = Math.max(0, Math.min(p1, p0));
+    this.p = p0; this._bTarget = p0;
+    if (!(this._brandActive && this._brandActive())) { this.setState({ p: p1 }); return; }
+    this._bPrimed = false; this.apply();   // instant: the finished house below the newest course
+    if (p1 > p0) { this._bOpen = true; this.p = p1; this._bTarget = p1; this._brandApply(); }
+    this.dirty = true; this.wake();
+  };
   // modes (all drawn by the brand build, brand.js): 'site' nothing built yet; 'build' Level 1, the deposit lays the bricks;
   // 'equity' Level 2, the paid share solid below a gold line and the rest a faint hologram; 'complete' mortgage free.
   // Flats / apartments (model.focus): only the user's own floor builds; the rest of the block stays a faint silhouette.
@@ -6351,6 +6366,17 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   H.BRAND = { share: SHARE, bricks: [0.03, 0.80], timbers: [0.60, 0.80], tiles: [0.80, 0.88], glaze: [0.88, 0.93], lights: [0.93, 0.96], decor: [0.96, 1], keys: 0.999 };
   H.brandBrickValue = function (depositTarget, bricksTotal) { return depositTarget * SHARE / Math.max(1, bricksTotal); };
   H.brandBricksLaid = function (bricksTotal, p) { return bricksTotal > 0 ? Math.floor(bricksTotal * seg(p, 0.03, 0.80) + 1e-6) : 0; };
+  // v0.7 opening: the progress to show at once, so that only the bricks laid since the last visit (lastSeen bricks, null on a first
+  // visit) animate, capped at the course being laid. A first visit lays the top course; a visit with nothing new lays nothing.
+  // Returns p itself when the build is past the brickwork (roof, glazing) or before it (foundations).
+  H.brandOpenFrom = function (m, p, lastSeen) {
+    var P = H.brandPlan(m), N = P.N, L = H.brandBricksLaid(N, p);
+    if (!N || L <= 0 || p > 0.80) return p;
+    var courseStart = lowerBound(P.course, P.course[L - 1]);   // the first brick of the course the last brick sits in
+    var from = lastSeen == null ? courseStart : Math.max(courseStart, Math.min(L, Math.floor(lastSeen)));
+    if (from >= L) return p;
+    return 0.03 + 0.77 * (from + 0.5) / N;   // floor(N * seg) lands on exactly `from` bricks
+  };
 
   // ── parts of a house, by material (bricks and tiles by the kit's per-instance kind) ──
   var ROOF = { slate: 1, tileClay: 1, tileConcrete: 1, ridge: 1 };
@@ -6683,10 +6709,10 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   };
 
   function staticMesh(n, V, I, U, look, solid, order, part) {
-    var sg = new THREE.BufferGeometry(), drop = function () { this.array = null; };   // uploaded once, complete: the page's copy is not kept
-    [['position', 3], ['normal', 3], ['uv', 2], ['aFS', 2], ['aIO', 3]].forEach(function (a) { sg.setAttribute(a[0], new THREE.BufferAttribute(new Float32Array(n * V * a[1]), a[1]).onUpload(drop)); });
-    sg.setAttribute('aCol', new THREE.BufferAttribute(new Uint8Array(n * V * 3), 3, true).onUpload(drop));   // Level 2's real colours (3 bytes a vertex)
-    sg.setIndex(new THREE.BufferAttribute(n * V > 65535 ? new Uint32Array(n * I) : new Uint16Array(n * I), 1).onUpload(drop));
+    var sg = new THREE.BufferGeometry();   // uploaded a slice at a time as it is baked (v0.7); once complete the page's copy is dropped (see bakeUpload)
+    [['position', 3], ['normal', 3], ['uv', 2], ['aFS', 2], ['aIO', 3]].forEach(function (a) { sg.setAttribute(a[0], new THREE.BufferAttribute(new Float32Array(n * V * a[1]), a[1])); });
+    sg.setAttribute('aCol', new THREE.BufferAttribute(new Uint8Array(n * V * 3), 3, true));   // Level 2's real colours (3 bytes a vertex)
+    sg.setIndex(new THREE.BufferAttribute(n * V > 65535 ? new Uint32Array(n * I) : new Uint16Array(n * I), 1));
     sg.setDrawRange(0, 0);
     var stat = new THREE.Mesh(sg, brandMat(U, look, false, false, solid, true));
     stat.frustumCulled = false; stat.renderOrder = order; stat.visible = false; stat.name = 'static:' + part;
@@ -6716,6 +6742,23 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     }
   }
   H._brandBakeRange = bakeRange;
+  // v0.7: the static mesh goes to the GPU a slice at a time, in step with the bake (drawn with an empty range meanwhile), so the finished
+  // house never arrives as one 15 MB upload in a single frame; after the last slice the page's copies are dropped
+  var STAT_ATTRS = [['position', 3], ['normal', 3], ['uv', 2], ['aFS', 2], ['aIO', 3], ['aCol', 3]];
+  function slice(at, o, c) {   // widen a pending slice rather than replace it: two bake steps can land between frames
+    var r = at.updateRange; if (r.count > 0) { var e = Math.max(r.offset + r.count, o + c); o = Math.min(r.offset, o); c = e - o; }
+    r.offset = o; r.count = c; at.needsUpdate = true;
+  }
+  function bakeUpload(rec, k0, k1, done) {
+    var sg = rec.stat.geometry, V = rec.V, I = rec.I;
+    STAT_ATTRS.forEach(function (a) { slice(sg.attributes[a[0]], k0 * V * a[1], (k1 - k0) * V * a[1]); });
+    slice(sg.index, k0 * I, (k1 - k0) * I);
+    rec.stat.visible = true;   // an empty draw range until landed parts move in: the frame only uploads
+    if (done) rec.stat.onAfterRender = function () {   // the last slice has gone up in this frame: the page's copies go
+      this.onAfterRender = function () {};
+      STAT_ATTRS.forEach(function (a) { sg.attributes[a[0]].array = null; }); sg.index.array = null;
+    };
+  }
   // bake every part a slice at a time (about 4 ms each), between frames, so the page stays responsive on a slow phone
   VP._bBakeGo = function () {
     var self = this, tok = this._bBakeTok;
@@ -6725,7 +6768,9 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       var t0 = performance.now(), left = false;
       for (var r = 0; r < self._bm.length; r++) {
         var rec = self._bm[r]; if (!rec || !rec.stat || rec.ready >= rec.n) continue;
+        var r0 = rec.ready;
         while (rec.ready < rec.n && performance.now() - t0 < 4) { var k1 = Math.min(rec.n, rec.ready + 64); bakeRange(rec, rec.ready, k1); rec.ready = k1; }
+        if (rec.ready > r0) bakeUpload(rec, r0, rec.ready, rec.ready >= rec.n);
         if (rec.ready < rec.n) { left = true; break; }
       }
       self.dirty = true;
@@ -6746,7 +6791,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       rec.alaid.set(rec.laid.subarray(S, rec.cnt)); rec.attr.updateRange.offset = 0; rec.attr.updateRange.count = m; rec.attr.needsUpdate = true;
     }
     rec.front.count = m; rec.front.visible = m > 0;
-    if (rec.stat) { rec.stat.geometry.setDrawRange(c0 * rec.I, (S - c0) * rec.I); rec.stat.visible = S > c0; }
+    if (rec.stat) { rec.stat.geometry.setDrawRange(c0 * rec.I, (S - c0) * rec.I); rec.stat.visible = S > c0 || (rec.ready > 0 && rec.ready < rec.n); }   // still baking: visible with an empty range so its slices upload
     rec.S = S; rec.act = rec.cnt; rec.dirtyA = false;
   }
 
@@ -6822,8 +6867,18 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var fline = segs(fpts, lineMat(TEAL, 0)); fline.renderOrder = 2; grp.add(fline);
     var fillMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(TEAL[0], TEAL[1], TEAL[2]), transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide });
     var fills = rects.map(function (r) { var f = new THREE.Mesh(new THREE.PlaneBufferGeometry(r[2] - r[0], r[3] - r[1]), fillMat); f.rotation.x = -Math.PI / 2; f.position.set((r[0] + r[2]) / 2, y0 + 0.008, (r[1] + r[3]) / 2); f.renderOrder = 2; grp.add(f); return f; });
-    var ring = new THREE.LineLoop(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute([-0.5, 0, -0.5, 0.5, 0, -0.5, 0.5, 0, 0.5, -0.5, 0, 0.5], 3)), lineMat(TEAL, 0));
-    ring.position.set(cx, y0 + 0.015, cz); ring.renderOrder = 2; grp.add(ring);
+    // the ground ping: a flat gold band (a fixed 100 mm wide, so it reads on a phone where a GL line is one faint pixel), its rectangle
+    // rewritten each frame by ringSet()
+    var rg0 = new THREE.BufferGeometry(); rg0.setAttribute('position', new THREE.BufferAttribute(new Float32Array(8 * 3), 3).setUsage(THREE.DynamicDrawUsage));
+    rg0.setIndex([0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 0, 4, 3, 4, 7]);
+    var ring = new THREE.Mesh(rg0, new THREE.MeshBasicMaterial({ color: new THREE.Color(GOLD[0], GOLD[1], GOLD[2]), transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));   // additive: it glows over the grid rather than covering it
+    ring.position.set(cx, y0 + 0.015, cz); ring.renderOrder = 2; ring.frustumCulled = false; grp.add(ring);
+    ring.userData.set = function (hw, hd) {   // half width and half depth of the rectangle, band 100 mm wide
+      var a = rg0.attributes.position.array, t = 0.1, o = [[-hw, -hd], [hw, -hd], [hw, hd], [-hw, hd]], i = [[-hw + t, -hd + t], [hw - t, -hd + t], [hw - t, hd - t], [-hw + t, hd - t]];
+      for (var q = 0; q < 4; q++) { a[q * 3] = o[q][0]; a[q * 3 + 1] = 0; a[q * 3 + 2] = o[q][1]; a[12 + q * 3] = i[q][0]; a[12 + q * 3 + 1] = 0; a[12 + q * 3 + 2] = i[q][1]; }
+      rg0.attributes.position.needsUpdate = true;
+    };
+    ring.userData.set(w / 2, d / 2);
     // roof timbers: 18 rafters per roof, front to back, as bright lines (shown 0.60 to 0.80)
     var roofs = [], NR = 18;
     (m.envelope || []).forEach(function (e) {
@@ -6852,6 +6907,45 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this._bEnvObj = { glow: glow, grid: grid, site: site, fline: fline, fillMat: fillMat, fills: fills, ring: ring, rafters: rafters, slice: slice, sFill: sFill, sLine: sLine, w: w, d: d, big: big, cx: cx, cz: cz };
     this.scene.add(grp);
     this._bModel = m; this._bV = null; this._bPrimed = false; this._bLastJ = -1;
+    // cold start (v0.7): before the first real frame, compile the shaders one part a frame (viewer loop), each in its own short task
+    if (!this._bDraws) {
+      var warm = [null], seen = {}, sig = function (mt) { return Object.keys(mt.defines || {}).sort().join(',') + '|' + (mt.transparent ? 't' : 'o'); };   // the environment together, then one frame per distinct program
+      this._bm.forEach(function (rec) {
+        if (!rec) return;
+        var k = sig(rec.front.material); if (!seen[k]) { seen[k] = 1; warm.push(rec.front); }
+        if (rec.stat) { var ks = sig(rec.stat.material); if (!seen[ks]) { seen[ks] = 1; warm.push({ mat: rec.stat.material, V: rec.V, I: rec.I }); } }
+      });
+      if (this._bGlow) warm.push(this._bGlow); warm.push(hl);
+      this._bWarm = warm;
+    }
+  };
+  // one warm-up frame: only the given part is drawn (into the hidden canvas), so its shader program compiles now rather than in the
+  // first visible frame. A static part is stood in for by a one-brick mesh with the same material (its own geometry must not be uploaded
+  // before it is baked).
+  VP._brandWarm = function () {
+    var grp = this._bGroup, o = this._bWarm.shift();
+    if (!grp || this.lost || !this._brandActive()) { this._bWarm = null; return; }
+    if (!this.resize()) { this._bWarm = null; return; }
+    var saved = []; grp.children.forEach(function (c) { saved.push([c, c.visible]); });
+    var tmp = null, cnt = null, PART = /^(part|static|glow|colour|colourStatic):|^lastBrick$/;
+    if (!o) grp.children.forEach(function (c) { if (PART.test(c.name)) c.visible = false; });   // the environment alone
+    else {
+      grp.children.forEach(function (c) { c.visible = c === o; });
+      if (o.isInstancedMesh) { cnt = o.count; o.count = Math.min(1, o.instanceMatrix.count); o.visible = o.count > 0; }
+      else if (o.mat) {   // one real brick-sized box in front of the camera, so the fragment program is compiled too (a degenerate mesh draws no pixels)
+        var g = new THREE.BufferGeometry(), g0 = H._geoms().box, E = this._bEnvObj;
+        ['position', 'normal', 'uv'].forEach(function (k) { g.setAttribute(k, g0.attributes[k]); }); g.setIndex(g0.index);
+        var V0 = g0.attributes.position.count, fs = new Float32Array(V0 * 2).fill(1), io = new Float32Array(V0 * 3);
+        for (var q = 0; q < V0; q++) { io[q * 3] = E.cx; io[q * 3 + 1] = 1; io[q * 3 + 2] = E.cz; }
+        g.setAttribute('aFS', new THREE.BufferAttribute(fs, 2)); g.setAttribute('aIO', new THREE.BufferAttribute(io, 3)); g.setAttribute('aCol', new THREE.BufferAttribute(new Uint8Array(V0 * 3).fill(128), 3, true));
+        tmp = new THREE.Mesh(g, o.mat); tmp.position.set(E.cx, 1, E.cz); tmp.frustumCulled = false; grp.add(tmp);
+      } else o.visible = true;
+    }
+    try { this.renderer.render(this.scene, this.camera); } catch (e) {}
+    if (tmp) { grp.remove(tmp); tmp.geometry.dispose(); }
+    if (o && o.isInstancedMesh && cnt != null) o.count = cnt;
+    saved.forEach(function (s) { s[0].visible = s[1]; });
+    if (!this._bWarm.length) { this._bWarm = null; this.dirty = true; }
   };
 
   // scene look on/off: the stage gradient replaces the plain background, the brand grid replaces the survey grid
@@ -6948,6 +7042,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var P = H.brandPlan(m), R = P.rows, p = this.mode === 'site' ? 0 : (L2 ? 1 : this.p), now = this._bNow(), motion = reduced(), red = motion || !!this._bLite, U = this._bU, E = this._bEnvObj;
     var V = units(P, p), V0 = this._bV == null ? -1 : this._bV, inst = motion || !this._bPrimed;   // lite keeps the drop and flash, not the ambient motion
     var add = Math.max(0, V - Math.max(V0, 0)), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.12, 0.9 / add) : 0;
+    var open = !!this._bOpen; this._bOpen = false;
+    if (open && !inst && add > 0) stp = Math.min(0.04, 1.2 / add);   // the opening course: each brick 40 ms after the last, the whole course started within 1.2 s
     if (V !== V0) {
       this._bm.forEach(function (rec) {
         if (!rec) return;
@@ -6997,8 +7093,10 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var sb = seg(p, 0.005, 0.03), fnd = seg(p, 0, 0.03);
     E.site.material.opacity = 0.55 * sb; E.site.visible = sb > 0;
     E.fline.material.opacity = 0.75 * fnd; E.fline.visible = fnd > 0; E.fillMat.opacity = 0.14 * fnd; E.fills.forEach(function (f) { f.visible = fnd > 0; });
-    var ping = red ? 0 : (performance.now() % 2800) / 2800, rg = ping * E.big * 0.625;
-    E.ring.visible = !red && p > 0.05 && !L2; E.ring.scale.set(E.w + 2 * rg, 1, E.d + 2 * rg); E.ring.material.opacity = (1 - ping) * (0.10 + 0.40 * seg(p, 0.5, 1));
+    // the ground ping (E15, owner 1 Nov: "a subtle rectangle spreading out around the house, like on the net worth 3D viewport"): gold, every
+    // 2.8 s, 0.45 to 0, in lite too (Pedro A2); reduced motion keeps a still rectangle half way out
+    var ping = motion ? 0.5 : (performance.now() % 2800) / 2800, rg = ping * E.big * 0.625;
+    E.ring.visible = p > 0.05 && !L2; E.ring.userData.set(E.w / 2 + rg, E.d / 2 + rg); E.ring.material.opacity = motion ? 0.22 : (1 - ping) * 0.45;
     if (E.rafters) { var nT = Math.ceil(seg(p, 0.60, 0.80) * 18); E.rafters.visible = nT > 0; E.rafters.geometry.setDrawRange(0, nT * E.rafters.userData.per); }
     var pa = L2 ? (eqS > 0 && eqS < 1 ? 1 : 0) : 1 - seg(p, 0.97, 1), sy = L2 ? cy : st.y;
     E.slice.visible = pa > 0 && p > 0; E.slice.position.y = sy; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
@@ -7028,7 +7126,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       if (w > 2 && h > 2) { this.renderer.setPixelRatio(this._bSoft ? 0.75 : 1); this.renderer.setSize(w, h, false); }   // software GL: three quarters resolution, a third of the work
       this.controls.autoRotate = false;
     }
-    if (this._bLite && !this.dirty && this._brandSettled() && !this._bDrag && this._bWasSettled) return false;   // still and unchanged: nothing to draw
+    if (this._bLite && !this.dirty && this._brandSettled() && !this._bDrag && this._bWasSettled) {   // still and unchanged: only the ground ping moves (at the lite pace)
+      var ringOn = this._bEnvObj && this._bEnvObj.ring.visible && !reduced() && this._bVis !== false;
+      this._bPingPace = !!ringOn;
+      if (ringOn) { this._brandApply(); return true; }
+      return false;
+    }
+    this._bPingPace = false;
     var dt = Math.min(this._bLite ? 0.5 : 0.05, raw);
     var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red;
     if (red) this.p = target;
@@ -7040,6 +7144,11 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     }
     this._brandApply();
     this._bWasSettled = this._brandSettled();
+    // pixel ratio (E14): full at rest for sharp hairlines; a phone drops to 1.25 while bricks land, the camera flies or a finger is down, and
+    // is back about 300 ms after the last of those (the buffer is resized only at those two moments)
+    var busy = !this._bWasSettled || this._bDrag || !!this._fly;
+    if (busy) { this._bBusyT = t; if (!this._bBusy) { this._bBusy = true; if (this._setDpr) this._setDpr(); } }
+    else if (this._bBusy && t - (this._bBusyT || 0) > 300) { this._bBusy = false; if (this._setDpr) this._setDpr(); }
     // at rest (nothing landing, no touch for 1.5 s, no camera fly): only the slow pulse, sweep, ring and orbit move, and they run on the
     // clock, so the frame loop draws them at most 30 times a second (a 120 Hz phone was drawing four times as often for the same look)
     this._bCalm = !red && !this._bLite && this._bWasSettled && !this._bDrag && !this._fly && !this._anim && t - (this._bTouch || 0) > 1500;
@@ -13587,7 +13696,9 @@ body.vi-pop-open{overflow:hidden}
 .hbd .hbd-dim{color:var(--t3);margin-top:3px}
 .hbd .hbd-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
 #house-scene:not([data-engine="3d"])>canvas.hb3d-canvas,#house-scene:not([data-engine="3d"]) #hb3d-ov{display:none}
-#house-scene[data-engine="3d"] #hbStill{display:none!important}
+#house-scene #hbStill{position:absolute;inset:0;z-index:1;width:100%;height:100%;transition:opacity .2s linear}   /* the still picture sits over the 3D canvas until the first 3D frame, then fades (v0.7) */
+#house-scene[data-engine="3d"] #hbStill{opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){#house-scene #hbStill{transition:none}}
 #house-scene[data-engine="still"] .hud-bar,#house-scene[data-engine="still"] .vp-key{display:none!important}   /* the still picture has nothing to zoom or orbit */
 #hb3d-ov{position:absolute;inset:0;z-index:10;pointer-events:none;overflow:hidden;font-family:'Share Tech Mono',monospace}
 .hb-row{margin:8px 0 6px;padding:10px 12px;border:1px solid rgb(var(--gold-rgb) / .5);border-radius:8px;background:rgb(var(--gold-rgb) / .07)}
@@ -14510,7 +14621,8 @@ function hbStill(){
   var g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);
   var bg=g.createRadialGradient(W/2,H,0,W/2,H,Math.max(W,H)*1.1); bg.addColorStop(0,'#06242A'); bg.addColorStop(.45,'#00131A'); bg.addColorStop(1,'#080808');
   g.fillStyle=bg; g.fillRect(0,0,W,H);
-  var cap=document.getElementById('hb3d-cap'), note='Still picture: 3D is not available on this device';
+  var standIn=hb3dOn()&&!(typeof HB3D!=='undefined'&&HB3D._failed);   // v0.7: the still also stands in while the 3D starts (no note then; the 3D takes over)
+  var cap=document.getElementById('hb3d-cap'), note=standIn?'':'Still picture: 3D is not available on this device';
   if(!m){ g.fillStyle='rgba(182,216,214,.8)'; g.font='12px "Share Tech Mono",monospace'; g.fillText(note,14,22); if(cap)cap.textContent=''; return; }
   var P=HB3D.brandPlan(m), B=HB3D.BRAND_C||{}, L2=sm.mode==='equity'||sm.mode==='complete', p=sm.mode==='site'?0:(L2?1:sm.p);
   var V=HB3D.brandUnits(P,p), R=m.rows, Vc=L2?HB3D.brandColourUnits(P,sm.mode==='complete'?1:(sm.eq||0)):-1;   // Level 2: the equity share is in real colours
@@ -14577,7 +14689,7 @@ function hbStill(){
     var tag=sm.mode==='complete'?'MORTGAGE FREE':sm.mode==='equity'?'MORTGAGE '+(Math.floor((sm.paid||0)*1000)/10)+'% PAID · YOU OWN '+(Math.floor((sm.eq||0)*1000)/10)+'%':sm.mode==='site'?'YOUR PLOT':(p*100).toFixed(1)+'% OF DEPOSIT';
     g.font='600 13px "Share Tech Mono",monospace'; var tw=g.measureText(tag).width+18, tx=Math.max(14,Math.min(W-tw-14,W/2-tw/2)), ty=18;
     g.fillStyle='#E8C56A'; g.fillRect(tx,ty,tw,24); g.fillStyle='#1A1400'; g.fillText(tag,tx+9,ty+16);
-    g.font='11px "Share Tech Mono",monospace'; g.fillStyle='rgba(182,216,214,.85)'; g.fillText(note,14,H-14);
+    if(note){g.font='11px "Share Tech Mono",monospace'; g.fillStyle='rgba(182,216,214,.85)'; g.fillText(note,14,H-14);}
   };
   drawSome();
   if(cap){var st=HB3D.brandStats(m,p), nm=(m.name||'').replace(/^./,function(c){return c.toUpperCase();});
@@ -15678,7 +15790,7 @@ function hb3dOverlays(sm) {
 function hbSty(el, k, v) { var c = el._sty || (el._sty = {}); if (c[k] !== v) { el.style[k] = v; c[k] = v; } }
 function hbTxt(el, t) { if (el._txt !== t) { el.textContent = t; el._txt = t; } }
 function hbAttr(el, k, v) { var c = el._att || (el._att = {}); v = String(v); if (c[k] !== v) { el.setAttribute(k, v); c[k] = v; } }
-function hbSize(el, key) { if (el._szk !== key) { el._szw = el.offsetWidth; el._szh = el.offsetHeight; el._szk = key; } return [el._szw, el._szh]; }
+function hbSize(el, key) { if (el._szk !== key) { el._szw = el.offsetWidth; el._szh = el.offsetHeight; el._szk = el._szw ? key : null; } return [el._szw, el._szh]; }   // a size read while hidden (0) is not kept: measured again once shown
 function hb3dPlaceOverlays() {
   var v = HB3DAPP.viewer, sm = HB3DAPP.want; if (!v || !v.model || !sm) return;
   var EW = v.el.clientWidth, EH = v.el.clientHeight;   // read before anything is written this frame
@@ -15736,6 +15848,13 @@ function hb3dBrandOverlays(v, sm, bi, rl, EW, EH) {
   var rlShow = pc.behind ? 'none' : 'block'; hbSty(rl, 'display', rlShow);
   var rs = hbSize(rl, html + '|' + fs + '|' + rlShow), tw = rs[0] || 150, th = rs[1] || fs * 2.9;   // measured again only when the text changes
   var tx = Math.max(lpad, Math.min(W - tw - 6 - rail, pc.x + fs * 1.6)), ty = Math.max(6, Math.min(Ht - th - 96, pc.y - th - fs * 1.4));
+  // the tag keeps clear of the last brick's ring (Pedro, 1 Nov: at 1100 it sat on the ring): flip to the other side of its anchor, else above or below
+  var Lq = bi.last && bi.last.shown ? v.project(bi.last.x, bi.last.y, bi.last.z) : null, ls0 = Math.max(0.7, Math.min(1.4, W / 760)), rq = (8 + 4 * (bi.pulse || 0.5)) * ls0 + 7 * ls0 + 3;
+  var ringHit = function (x, y) { return !!Lq && !Lq.behind && x < Lq.x + rq && x + tw > Lq.x - rq && y < Lq.y + rq && y + th > Lq.y - rq; };
+  if (ringHit(tx, ty)) {
+    var alt = [[pc.x - tw - fs * 1.6, ty], [tx, Lq ? Lq.y - rq - th - 2 : ty], [tx, Lq ? Lq.y + rq + 2 : ty], [pc.x - tw - fs * 1.6, Lq ? Lq.y + rq + 2 : ty]];
+    for (var ai = 0; ai < alt.length; ai++) { var ax = Math.max(lpad, Math.min(W - tw - 6 - rail, alt[ai][0])), ay = Math.max(6, Math.min(Ht - th - 96, alt[ai][1])); if (!ringHit(ax, ay)) { tx = ax; ty = ay; break; } }
+  }
   hbSty(rl, 'left', tx + 'px'); hbSty(rl, 'top', ty + 'px');
   var ld = $('.ld'), dot = $('.dot');
   hbAttr(ld, 'x1', pc.x); hbAttr(ld, 'y1', pc.y); hbAttr(ld, 'x2', tx + tw * 0.2); hbAttr(ld, 'y2', ty + th);
@@ -15752,8 +15871,11 @@ function hb3dBrandOverlays(v, sm, bi, rl, EW, EH) {
     var t = 'BRICK #' + L.n.toLocaleString('en-GB'); hbTxt(pill, t);
     var pShow = q.behind ? 'none' : 'block'; hbSty(pill, 'display', pShow);
     var pw = hbSize(pill, t + '|' + pShow)[0] || 90;
-    hbSty(pill, 'left', Math.max(lpad, Math.min(W - pw - 4 - rail, q.x + rr + 10 * ls)) + 'px');
-    hbSty(pill, 'top', Math.max(4, Math.min(Ht - 40, q.y - rr - 6 * ls - 18)) + 'px');
+    var px = Math.max(lpad, Math.min(W - pw - 8 - rail, q.x + rr + 10 * ls)), py = Math.max(4, Math.min(Ht - 40, q.y - rr - 6 * ls - 18)), ph = 18;
+    // keep the pill off the ROW tag (Pedro, 1 Nov: at 390 the tag covered "BRICK #n"): below the ring, else on the ring's left
+    var hit = function (x, y) { return x < tx + tw && x + pw > tx && y < ty + th && y + ph > ty; };
+    if (hit(px, py)) { py = Math.min(Ht - 40, q.y + rr + 6 * ls); if (hit(px, py)) { px = Math.max(lpad, q.x - rr - 10 * ls - pw); py = Math.max(4, Math.min(Ht - 40, q.y - rr - 6 * ls - 18)); if (hit(px, py)) { px = Math.max(lpad, Math.min(W - pw - 4 - rail, q.x - pw / 2)); py = Math.min(Ht - 40, ty + th + 4); } } }   // last resort: under the tag
+    hbSty(pill, 'left', px + 'px'); hbSty(pill, 'top', py + 'px');
   } else { hbSty(ring, 'display', 'none'); hbSty(ticks, 'display', 'none'); hbSty(pill, 'display', 'none'); }
   // keys glint on the front door handle at 100%
   var keys = $('.keys');
@@ -15770,33 +15892,49 @@ function hb3dRecreate() {
   try { hb3dRedraw(); } catch (e) { console.warn('house viewer rebuild', e); }
   var ld = document.getElementById('hb3d-loading'); if (ld && HB3DAPP.viewer && !HB3DAPP.viewer.lost) { ld.style.display = 'none'; ld.textContent = 'Building your house…'; }
 }
+// v0.7 cold start helpers: is the stage on screen, and wake the 3D the moment it scrolls in (the still picture shows meanwhile)
+function hb3dInView(el) { var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < (window.innerHeight || document.documentElement.clientHeight); }
+function hb3dStartWhenSeen(el) {
+  if (HB3DAPP.seenIO) return;
+  if (typeof IntersectionObserver === 'undefined') { setTimeout(function () { try { redraw(); } catch (e) {} }, 400); return; }
+  HB3DAPP.seenIO = new IntersectionObserver(function (es) { if (!es.some(function (e) { return e.isIntersecting; })) return; HB3DAPP.seenIO.disconnect(); HB3DAPP.seenIO = null; try { redraw(); } catch (e) {} }, { threshold: 0.05 });
+  HB3DAPP.seenIO.observe(el);
+}
+// bricks this device last saw laid on a house (per house key), so the opening lays only what is new: a display note, not the user's data
+function hbSeenBricks(key, set) {
+  var all = {}; try { all = JSON.parse(localStorage.getItem('vi_hb_seen') || '{}') || {}; } catch (e) { all = {}; }
+  if (set == null) return all[key] == null ? null : +all[key];
+  all[key] = set; try { localStorage.setItem('vi_hb_seen', JSON.stringify(all)); } catch (e) {}
+  return set;
+}
 function hb3dRedraw() {
   var el = document.getElementById('house-scene'); if (!el) return false;
   var sm = hbSceneMode(); HB3DAPP.want = sm;
   if (!hb3dHas(sm.type)) { if (HB3DAPP.viewer) HB3DAPP.viewer.stop(); return false; }
-  el.setAttribute('data-engine', '3d');
+  var drawn = !!(HB3DAPP.viewer && HB3DAPP.viewer._bDraws);   // v0.7 cold start: the stage is '3d' only once a 3D frame exists; until then the still picture of the same house
+  if (drawn) el.setAttribute('data-engine', '3d');
   var lock = document.getElementById('house-pro-lock'); if (lock) lock.style.display = 'none';
   if (!(el.clientWidth > 0 && el.clientHeight > 0)) { hb3dIdleBuild(sm.type, sm.floor); return true; }   // tab hidden: build later
-  if (!HB3D.Viewer) {   // three.js is fetched on first need: say so, build the house geometry meanwhile, draw when the engine lands
-    var ovl0 = hb3dOverlayEls(), ld0 = ovl0 && ovl0.querySelector('#hb3d-loading'); if (ld0) { ld0.textContent = 'Loading the 3D engine…'; ld0.style.display = 'block'; }
-    hb3dIdleBuild(sm.type, sm.floor);
-    if (!HB3DAPP.waitingThree) { HB3DAPP.waitingThree = true;
-      viThree(function () { HB3DAPP.waitingThree = false; if (ld0) ld0.textContent = 'Building your house…'; try { redraw(); } catch (e) { console.warn('house 3D', e); } },
-              function () { HB3DAPP.waitingThree = false; if (ld0) ld0.style.display = 'none'; try { redraw(); } catch (e) {} }); }
-    return true;
-  }
   if (!hb3dModelIfReady(sm.type, sm.floor) && sm.type !== 'custom') {   // first build of this house: show a note, let the page paint, then build
-    var ovl = hb3dOverlayEls(), ld = ovl && ovl.querySelector('#hb3d-loading'); if (ld) ld.style.display = 'block';
+    var ovl = hb3dOverlayEls(), ld = ovl && ovl.querySelector('#hb3d-loading'); if (ld) { ld.textContent = 'Building your house…'; ld.style.display = 'block'; }
     if (!HB3DAPP.deferred) HB3DAPP.deferred = setTimeout(function () { HB3DAPP.deferred = 0; try { hb3dModel(sm.type, sm.floor); } catch (e) {} redraw(); }, 40);
     return true;
   }
+  if (!drawn) hbStill();   // the house as a still picture, at once; the 3D takes over when its first frame is ready
   var ldn = document.getElementById('hb3d-loading'); if (ldn) ldn.style.display = 'none';
+  if (!HB3D.Viewer) {   // three.js is fetched on first need: the still picture stands in, the 3D draws when the engine lands
+    if (!HB3DAPP.waitingThree) { HB3DAPP.waitingThree = true;
+      viThree(function () { HB3DAPP.waitingThree = false; try { redraw(); } catch (e) { console.warn('house 3D', e); } },
+              function () { HB3DAPP.waitingThree = false; try { redraw(); } catch (e) {} }); }
+    return true;
+  }
+  if (!HB3DAPP.viewer && !hb3dInView(el)) { hb3dStartWhenSeen(el); return true; }   // start WebGL only once the stage scrolls into view
   try {
     var v = HB3DAPP.viewer;
     if (!v) {
       v = HB3DAPP.viewer = HB3D.viewer = new HB3D.Viewer(el, { mobile: !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches) });   // touch devices: no shadows, lighter pixel budget
       v.onView = function (vw) { _houseZoom = _HZ_DEFAULT * vw.zoom(); };
-      v.onRender = function () { hb3dPlaceOverlays(); };
+      v.onRender = function () { if (el.getAttribute('data-engine') !== '3d') el.setAttribute('data-engine', '3d'); hb3dPlaceOverlays(); };   // first frame: the still picture fades out
       /* a lost WebGL context (a phone's GPU reset) used to leave a white box for good: say so, wait for the browser to hand it back, else rebuild */
       v.onLost = function () { var ld = document.getElementById('hb3d-loading'); if (ld) { ld.textContent = 'Reloading the house…'; ld.style.display = 'block'; }
         setTimeout(function () { if (HB3DAPP.viewer === v && v.lost) hb3dRecreate(); }, 2500); };
@@ -15818,10 +15956,10 @@ function hb3dRedraw() {
     }
     if (Math.abs(v.zoom() * _HZ_DEFAULT - _houseZoom) > 1e-6) v.setZoom(_houseZoom / _HZ_DEFAULT);
     var first = sm.mode === 'build' && HB3DAPP.lastP == null;
-    if (sm.mode === 'build') {   // opening animates from 0; the displayed % eases to the saved %; un-laying is instant
-      if (first) v.setState({ mode: 'build', eq: 0, p: 0 });
-      else v.setState({ mode: 'build', eq: 0 });
-      if (!first && sm.p < v.p - 1e-9) v.setState({ p: sm.p }); else v.animateTo(sm.p, 1);
+    if (sm.mode === 'build') {   // opening (v0.7, owner 1 Nov): the finished house up to the newest course at once, only the bricks since the last visit lay (one course at most); a deposit eases up; un-laying is instant
+      if (first) { var p0 = hbBrandModel(model) && HB3D.brandOpenFrom ? HB3D.brandOpenFrom(model, sm.p, hbSeenBricks(key2)) : sm.p; v.setState({ mode: 'build', eq: 0, p: p0 }); v.openAt(p0, sm.p); }
+      else { v.setState({ mode: 'build', eq: 0 }); if (sm.p < v.p - 1e-9) v.setState({ p: sm.p }); else v.animateTo(sm.p, 1); }
+      if (hbBrandModel(model)) hbSeenBricks(key2, HB3D.brandStats(model, sm.p).bricksLaid);
     } else v.setState({ mode: sm.mode, p: sm.p, eq: sm.eq || 0 });   // site, or Level 2 (the paid line eases up in the frame loop)
     HB3DAPP.lastP = sm.p; HB3DAPP.lastMode = sm.mode;
     hb3dOverlays(sm);
@@ -26122,6 +26260,8 @@ function loadDemoData() {
       prices: { terraced: 240000, semi: 320000, detached: 500000, mansion: 1500000, flat: 80000, apartment: 300000 },
       apartmentFloor: 5, houseMode: null, mortgageBalance: 0
     }));
+    // the house code read its state before this seed existed (v0.7, 1 Nov: a fresh device showed an empty plot): read it again now
+    try { if (typeof state !== 'undefined' && !(+state.saved > 0)) { var _hd = JSON.parse(localStorage.getItem('ht3')); state = Object.assign({}, state, _hd, { prices: Object.assign({}, DEFAULTS, _hd.prices || {}) }); } } catch (e) {}
   }
   if (!localStorage.getItem('pos_journey')) {
     localStorage.setItem('pos_journey', JSON.stringify({

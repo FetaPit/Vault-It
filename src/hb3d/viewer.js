@@ -88,8 +88,10 @@
     this.opts = opts;
     var w = Math.max(1, container.clientWidth), h = Math.max(1, container.clientHeight);
     var r = this.renderer = new THREE.WebGLRenderer({ antialias: !opts.mobile, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.preserve });   // touch devices: no MSAA (the pixel ratio covers it; MSAA on a big phone canvas is what loses the context)
-    var me = this;   // brand look (house flag): pixel ratio capped at 1.5 below 700 px wide, 2 above (brand handover 6.10)
-    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, me.brand ? (me._bLite ? 1 : w < 700 ? 1.25 : 1.5) : 9, Math.sqrt(budget / Math.max(1, w * h)))); };
+    var me = this;   // brand look: sharp hairlines at rest (v0.7, owner 1 Nov: "the wireframe should be quite sharp"): the screen's own pixel ratio, capped at 2;
+    // 1.25 on a phone (1.5 wider) only while bricks land or a finger is down (me._bBusy, brand.js), back to full about 300 ms later; lite stays at 1
+    this._dprFor = function (w, h) { var budget = opts.mobile ? 2.2e6 : 4e6; return Math.max(1, Math.min(window.devicePixelRatio || 1, opts.maxDpr || 2, me.brand ? (me._bLite ? (me._bSoft ? 0.75 : 1) : me._bBusy ? (w < 700 ? 1.25 : 1.5) : 2) : 9, Math.sqrt(budget / Math.max(1, w * h)))); };
+    this._setDpr = function () { var w = me.el.clientWidth, h = me.el.clientHeight, d = me._dprFor(w, h); if (!(w > 2 && h > 2) || Math.abs(me.renderer.getPixelRatio() - d) < 1e-3) return; me.renderer.setPixelRatio(d); me.renderer.setSize(w, h, false); me.dirty = true; };
     r.setPixelRatio(this._dprFor(w, h));
     r.setSize(w, h, false);
     r.outputEncoding = THREE.sRGBEncoding;
@@ -137,12 +139,15 @@
       if (!self.active || self.offscreen || document.hidden) { self._lastT = 0; return; }   // off screen or in a background tab: sleep (woken when seen again)
       // brand: what a drawn frame really cost is the gap until the browser gives us the next frame (the GPU work lands after render() returns)
       if (self.brand && self._bDrewAt) { var fc = performance.now() - self._bDrewAt; self._bCost = self._bCost == null ? fc : self._bCost * 0.6 + fc * 0.4; self._bDrewAt = 0; self._bGap = Math.max(80, Math.min(1500, self._bCost * 2.2)); }
+      // v0.7 cold start: while the still picture covers the stage, draw one part a frame into the hidden canvas so each shader program
+      // compiles in its own short task, not all of them in the first frame (which froze a phone for over a second)
+      if (self._bWarm && self._bWarm.length) { self._brandWarm(); self._raf = requestAnimationFrame(self._loop); return; }
       var moving = self.controls.update();
       if (self._fly) moving = self._stepFly() || moving;
       if (self._brandTick) moving = self._brandTick() || moving;   // brand look: smoothing, brick drops, pulse, sweep, ring (only while on screen)
       // brand lite (slow or software-drawn GPU, owner 31 Oct): frames are spaced at about 2.5x their own cost, so the page always has time
       // to answer taps and scrolls between them ("Page unresponsive" otherwise); a skipped frame keeps the loop alive without drawing
-      if (self.brand && self._bLite && (self.dirty || moving) && performance.now() - (self._bLastDraw || 0) < (self._bGap || 120)) { self._raf = requestAnimationFrame(self._loop); return; }
+      if (self.brand && self._bLite && (self.dirty || moving) && performance.now() - (self._bLastDraw || 0) < Math.max(self._bGap || 120, self._bPingPace ? 250 : 0)) { self._raf = requestAnimationFrame(self._loop); return; }   // settled in lite: the ground ping alone, at most 4 frames a second
       if (self.brand && self._bCalm && !self._bLite && performance.now() - (self._bLastDraw || 0) < 32) { self._raf = requestAnimationFrame(self._loop); return; }   // brand at rest: 30 frames a second
       if (self.dirty || moving) {
         var t = performance.now();
@@ -178,15 +183,14 @@
 
   VP.start = function () { this.active = true; this.dirty = true; this.wake(); };
   VP.wake = function () { this._idle = 0; if (this.active && !this._raf) this._raf = requestAnimationFrame(this._loop); };
-  VP.settled = function () { if (this._brandActive && this._brandActive()) return this._brandSettled(); return this._idle > 2; };
+  VP.settled = function () { if (this._brandActive && this._brandActive()) return !!this._bDraws && !this._bWarm && this._brandSettled(); return this._idle > 2; };   // brand: settled means on screen (first frame drawn) and at rest
   VP.stop = function () { this.active = false; if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; } };
   // lite quality for a device that cannot keep up: shadows off, pixel ratio 1 (nothing else changes; the brand look has its own lite stage)
   VP.goLite = function () {
     if (this._lite) return; this._lite = true;
     this.renderer.shadowMap.enabled = false; this.sun.castShadow = false; this.opts.maxDpr = 1;
     this.scene.traverse(function (o) { var m = o.material; if (!m) return; (Array.isArray(m) ? m : [m]).forEach(function (x) { x.needsUpdate = true; }); });
-    var w = this.el.clientWidth, h = this.el.clientHeight;
-    if (w > 2 && h > 2) { this.renderer.setPixelRatio(this._dprFor(w, h)); this.renderer.setSize(w, h, false); }
+    this._setDpr();
     this.dirty = true; this._shadowDirty = true; this.wake();
   };
   VP.resize = function () {
@@ -322,6 +326,17 @@
   VP.animateTo = function (p1) {
     if (this._brandActive && this._brandActive()) { this._bTarget = Math.max(0, Math.min(1, p1)); this.dirty = true; this.wake(); return; }   // eased by the frame loop
     this.setState({ p: p1 });
+  };
+  // v0.7 opening (owner, 1 Nov: "only the last course of bricks ... is animated upon loading, and the rest act as one 3D model already
+  // loaded"): everything up to p0 is in place on the first frame; the bricks between p0 and p1 (the newest course at most) lay themselves
+  // with a stagger, a course in about 1.2 to 1.5 s. Reduced motion: p1 at once. Without the brand build it is a plain setState.
+  VP.openAt = function (p0, p1) {
+    p1 = Math.max(0, Math.min(1, p1)); p0 = Math.max(0, Math.min(p1, p0));
+    this.p = p0; this._bTarget = p0;
+    if (!(this._brandActive && this._brandActive())) { this.setState({ p: p1 }); return; }
+    this._bPrimed = false; this.apply();   // instant: the finished house below the newest course
+    if (p1 > p0) { this._bOpen = true; this.p = p1; this._bTarget = p1; this._brandApply(); }
+    this.dirty = true; this.wake();
   };
   // modes (all drawn by the brand build, brand.js): 'site' nothing built yet; 'build' Level 1, the deposit lays the bricks;
   // 'equity' Level 2, the paid share solid below a gold line and the rest a faint hologram; 'complete' mortgage free.

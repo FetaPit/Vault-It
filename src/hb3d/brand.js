@@ -19,6 +19,17 @@
   H.BRAND = { share: SHARE, bricks: [0.03, 0.80], timbers: [0.60, 0.80], tiles: [0.80, 0.88], glaze: [0.88, 0.93], lights: [0.93, 0.96], decor: [0.96, 1], keys: 0.999 };
   H.brandBrickValue = function (depositTarget, bricksTotal) { return depositTarget * SHARE / Math.max(1, bricksTotal); };
   H.brandBricksLaid = function (bricksTotal, p) { return bricksTotal > 0 ? Math.floor(bricksTotal * seg(p, 0.03, 0.80) + 1e-6) : 0; };
+  // v0.7 opening: the progress to show at once, so that only the bricks laid since the last visit (lastSeen bricks, null on a first
+  // visit) animate, capped at the course being laid. A first visit lays the top course; a visit with nothing new lays nothing.
+  // Returns p itself when the build is past the brickwork (roof, glazing) or before it (foundations).
+  H.brandOpenFrom = function (m, p, lastSeen) {
+    var P = H.brandPlan(m), N = P.N, L = H.brandBricksLaid(N, p);
+    if (!N || L <= 0 || p > 0.80) return p;
+    var courseStart = lowerBound(P.course, P.course[L - 1]);   // the first brick of the course the last brick sits in
+    var from = lastSeen == null ? courseStart : Math.max(courseStart, Math.min(L, Math.floor(lastSeen)));
+    if (from >= L) return p;
+    return 0.03 + 0.77 * (from + 0.5) / N;   // floor(N * seg) lands on exactly `from` bricks
+  };
 
   // ── parts of a house, by material (bricks and tiles by the kit's per-instance kind) ──
   var ROOF = { slate: 1, tileClay: 1, tileConcrete: 1, ridge: 1 };
@@ -351,10 +362,10 @@
   };
 
   function staticMesh(n, V, I, U, look, solid, order, part) {
-    var sg = new THREE.BufferGeometry(), drop = function () { this.array = null; };   // uploaded once, complete: the page's copy is not kept
-    [['position', 3], ['normal', 3], ['uv', 2], ['aFS', 2], ['aIO', 3]].forEach(function (a) { sg.setAttribute(a[0], new THREE.BufferAttribute(new Float32Array(n * V * a[1]), a[1]).onUpload(drop)); });
-    sg.setAttribute('aCol', new THREE.BufferAttribute(new Uint8Array(n * V * 3), 3, true).onUpload(drop));   // Level 2's real colours (3 bytes a vertex)
-    sg.setIndex(new THREE.BufferAttribute(n * V > 65535 ? new Uint32Array(n * I) : new Uint16Array(n * I), 1).onUpload(drop));
+    var sg = new THREE.BufferGeometry();   // uploaded a slice at a time as it is baked (v0.7); once complete the page's copy is dropped (see bakeUpload)
+    [['position', 3], ['normal', 3], ['uv', 2], ['aFS', 2], ['aIO', 3]].forEach(function (a) { sg.setAttribute(a[0], new THREE.BufferAttribute(new Float32Array(n * V * a[1]), a[1])); });
+    sg.setAttribute('aCol', new THREE.BufferAttribute(new Uint8Array(n * V * 3), 3, true));   // Level 2's real colours (3 bytes a vertex)
+    sg.setIndex(new THREE.BufferAttribute(n * V > 65535 ? new Uint32Array(n * I) : new Uint16Array(n * I), 1));
     sg.setDrawRange(0, 0);
     var stat = new THREE.Mesh(sg, brandMat(U, look, false, false, solid, true));
     stat.frustumCulled = false; stat.renderOrder = order; stat.visible = false; stat.name = 'static:' + part;
@@ -384,6 +395,23 @@
     }
   }
   H._brandBakeRange = bakeRange;
+  // v0.7: the static mesh goes to the GPU a slice at a time, in step with the bake (drawn with an empty range meanwhile), so the finished
+  // house never arrives as one 15 MB upload in a single frame; after the last slice the page's copies are dropped
+  var STAT_ATTRS = [['position', 3], ['normal', 3], ['uv', 2], ['aFS', 2], ['aIO', 3], ['aCol', 3]];
+  function slice(at, o, c) {   // widen a pending slice rather than replace it: two bake steps can land between frames
+    var r = at.updateRange; if (r.count > 0) { var e = Math.max(r.offset + r.count, o + c); o = Math.min(r.offset, o); c = e - o; }
+    r.offset = o; r.count = c; at.needsUpdate = true;
+  }
+  function bakeUpload(rec, k0, k1, done) {
+    var sg = rec.stat.geometry, V = rec.V, I = rec.I;
+    STAT_ATTRS.forEach(function (a) { slice(sg.attributes[a[0]], k0 * V * a[1], (k1 - k0) * V * a[1]); });
+    slice(sg.index, k0 * I, (k1 - k0) * I);
+    rec.stat.visible = true;   // an empty draw range until landed parts move in: the frame only uploads
+    if (done) rec.stat.onAfterRender = function () {   // the last slice has gone up in this frame: the page's copies go
+      this.onAfterRender = function () {};
+      STAT_ATTRS.forEach(function (a) { sg.attributes[a[0]].array = null; }); sg.index.array = null;
+    };
+  }
   // bake every part a slice at a time (about 4 ms each), between frames, so the page stays responsive on a slow phone
   VP._bBakeGo = function () {
     var self = this, tok = this._bBakeTok;
@@ -393,7 +421,9 @@
       var t0 = performance.now(), left = false;
       for (var r = 0; r < self._bm.length; r++) {
         var rec = self._bm[r]; if (!rec || !rec.stat || rec.ready >= rec.n) continue;
+        var r0 = rec.ready;
         while (rec.ready < rec.n && performance.now() - t0 < 4) { var k1 = Math.min(rec.n, rec.ready + 64); bakeRange(rec, rec.ready, k1); rec.ready = k1; }
+        if (rec.ready > r0) bakeUpload(rec, r0, rec.ready, rec.ready >= rec.n);
         if (rec.ready < rec.n) { left = true; break; }
       }
       self.dirty = true;
@@ -414,7 +444,7 @@
       rec.alaid.set(rec.laid.subarray(S, rec.cnt)); rec.attr.updateRange.offset = 0; rec.attr.updateRange.count = m; rec.attr.needsUpdate = true;
     }
     rec.front.count = m; rec.front.visible = m > 0;
-    if (rec.stat) { rec.stat.geometry.setDrawRange(c0 * rec.I, (S - c0) * rec.I); rec.stat.visible = S > c0; }
+    if (rec.stat) { rec.stat.geometry.setDrawRange(c0 * rec.I, (S - c0) * rec.I); rec.stat.visible = S > c0 || (rec.ready > 0 && rec.ready < rec.n); }   // still baking: visible with an empty range so its slices upload
     rec.S = S; rec.act = rec.cnt; rec.dirtyA = false;
   }
 
@@ -490,8 +520,18 @@
     var fline = segs(fpts, lineMat(TEAL, 0)); fline.renderOrder = 2; grp.add(fline);
     var fillMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(TEAL[0], TEAL[1], TEAL[2]), transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide });
     var fills = rects.map(function (r) { var f = new THREE.Mesh(new THREE.PlaneBufferGeometry(r[2] - r[0], r[3] - r[1]), fillMat); f.rotation.x = -Math.PI / 2; f.position.set((r[0] + r[2]) / 2, y0 + 0.008, (r[1] + r[3]) / 2); f.renderOrder = 2; grp.add(f); return f; });
-    var ring = new THREE.LineLoop(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute([-0.5, 0, -0.5, 0.5, 0, -0.5, 0.5, 0, 0.5, -0.5, 0, 0.5], 3)), lineMat(TEAL, 0));
-    ring.position.set(cx, y0 + 0.015, cz); ring.renderOrder = 2; grp.add(ring);
+    // the ground ping: a flat gold band (a fixed 100 mm wide, so it reads on a phone where a GL line is one faint pixel), its rectangle
+    // rewritten each frame by ringSet()
+    var rg0 = new THREE.BufferGeometry(); rg0.setAttribute('position', new THREE.BufferAttribute(new Float32Array(8 * 3), 3).setUsage(THREE.DynamicDrawUsage));
+    rg0.setIndex([0, 1, 5, 0, 5, 4, 1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 0, 4, 3, 4, 7]);
+    var ring = new THREE.Mesh(rg0, new THREE.MeshBasicMaterial({ color: new THREE.Color(GOLD[0], GOLD[1], GOLD[2]), transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }));   // additive: it glows over the grid rather than covering it
+    ring.position.set(cx, y0 + 0.015, cz); ring.renderOrder = 2; ring.frustumCulled = false; grp.add(ring);
+    ring.userData.set = function (hw, hd) {   // half width and half depth of the rectangle, band 100 mm wide
+      var a = rg0.attributes.position.array, t = 0.1, o = [[-hw, -hd], [hw, -hd], [hw, hd], [-hw, hd]], i = [[-hw + t, -hd + t], [hw - t, -hd + t], [hw - t, hd - t], [-hw + t, hd - t]];
+      for (var q = 0; q < 4; q++) { a[q * 3] = o[q][0]; a[q * 3 + 1] = 0; a[q * 3 + 2] = o[q][1]; a[12 + q * 3] = i[q][0]; a[12 + q * 3 + 1] = 0; a[12 + q * 3 + 2] = i[q][1]; }
+      rg0.attributes.position.needsUpdate = true;
+    };
+    ring.userData.set(w / 2, d / 2);
     // roof timbers: 18 rafters per roof, front to back, as bright lines (shown 0.60 to 0.80)
     var roofs = [], NR = 18;
     (m.envelope || []).forEach(function (e) {
@@ -520,6 +560,45 @@
     this._bEnvObj = { glow: glow, grid: grid, site: site, fline: fline, fillMat: fillMat, fills: fills, ring: ring, rafters: rafters, slice: slice, sFill: sFill, sLine: sLine, w: w, d: d, big: big, cx: cx, cz: cz };
     this.scene.add(grp);
     this._bModel = m; this._bV = null; this._bPrimed = false; this._bLastJ = -1;
+    // cold start (v0.7): before the first real frame, compile the shaders one part a frame (viewer loop), each in its own short task
+    if (!this._bDraws) {
+      var warm = [null], seen = {}, sig = function (mt) { return Object.keys(mt.defines || {}).sort().join(',') + '|' + (mt.transparent ? 't' : 'o'); };   // the environment together, then one frame per distinct program
+      this._bm.forEach(function (rec) {
+        if (!rec) return;
+        var k = sig(rec.front.material); if (!seen[k]) { seen[k] = 1; warm.push(rec.front); }
+        if (rec.stat) { var ks = sig(rec.stat.material); if (!seen[ks]) { seen[ks] = 1; warm.push({ mat: rec.stat.material, V: rec.V, I: rec.I }); } }
+      });
+      if (this._bGlow) warm.push(this._bGlow); warm.push(hl);
+      this._bWarm = warm;
+    }
+  };
+  // one warm-up frame: only the given part is drawn (into the hidden canvas), so its shader program compiles now rather than in the
+  // first visible frame. A static part is stood in for by a one-brick mesh with the same material (its own geometry must not be uploaded
+  // before it is baked).
+  VP._brandWarm = function () {
+    var grp = this._bGroup, o = this._bWarm.shift();
+    if (!grp || this.lost || !this._brandActive()) { this._bWarm = null; return; }
+    if (!this.resize()) { this._bWarm = null; return; }
+    var saved = []; grp.children.forEach(function (c) { saved.push([c, c.visible]); });
+    var tmp = null, cnt = null, PART = /^(part|static|glow|colour|colourStatic):|^lastBrick$/;
+    if (!o) grp.children.forEach(function (c) { if (PART.test(c.name)) c.visible = false; });   // the environment alone
+    else {
+      grp.children.forEach(function (c) { c.visible = c === o; });
+      if (o.isInstancedMesh) { cnt = o.count; o.count = Math.min(1, o.instanceMatrix.count); o.visible = o.count > 0; }
+      else if (o.mat) {   // one real brick-sized box in front of the camera, so the fragment program is compiled too (a degenerate mesh draws no pixels)
+        var g = new THREE.BufferGeometry(), g0 = H._geoms().box, E = this._bEnvObj;
+        ['position', 'normal', 'uv'].forEach(function (k) { g.setAttribute(k, g0.attributes[k]); }); g.setIndex(g0.index);
+        var V0 = g0.attributes.position.count, fs = new Float32Array(V0 * 2).fill(1), io = new Float32Array(V0 * 3);
+        for (var q = 0; q < V0; q++) { io[q * 3] = E.cx; io[q * 3 + 1] = 1; io[q * 3 + 2] = E.cz; }
+        g.setAttribute('aFS', new THREE.BufferAttribute(fs, 2)); g.setAttribute('aIO', new THREE.BufferAttribute(io, 3)); g.setAttribute('aCol', new THREE.BufferAttribute(new Uint8Array(V0 * 3).fill(128), 3, true));
+        tmp = new THREE.Mesh(g, o.mat); tmp.position.set(E.cx, 1, E.cz); tmp.frustumCulled = false; grp.add(tmp);
+      } else o.visible = true;
+    }
+    try { this.renderer.render(this.scene, this.camera); } catch (e) {}
+    if (tmp) { grp.remove(tmp); tmp.geometry.dispose(); }
+    if (o && o.isInstancedMesh && cnt != null) o.count = cnt;
+    saved.forEach(function (s) { s[0].visible = s[1]; });
+    if (!this._bWarm.length) { this._bWarm = null; this.dirty = true; }
   };
 
   // scene look on/off: the stage gradient replaces the plain background, the brand grid replaces the survey grid
@@ -616,6 +695,8 @@
     var P = H.brandPlan(m), R = P.rows, p = this.mode === 'site' ? 0 : (L2 ? 1 : this.p), now = this._bNow(), motion = reduced(), red = motion || !!this._bLite, U = this._bU, E = this._bEnvObj;
     var V = units(P, p), V0 = this._bV == null ? -1 : this._bV, inst = motion || !this._bPrimed;   // lite keeps the drop and flash, not the ambient motion
     var add = Math.max(0, V - Math.max(V0, 0)), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.12, 0.9 / add) : 0;
+    var open = !!this._bOpen; this._bOpen = false;
+    if (open && !inst && add > 0) stp = Math.min(0.04, 1.2 / add);   // the opening course: each brick 40 ms after the last, the whole course started within 1.2 s
     if (V !== V0) {
       this._bm.forEach(function (rec) {
         if (!rec) return;
@@ -665,8 +746,10 @@
     var sb = seg(p, 0.005, 0.03), fnd = seg(p, 0, 0.03);
     E.site.material.opacity = 0.55 * sb; E.site.visible = sb > 0;
     E.fline.material.opacity = 0.75 * fnd; E.fline.visible = fnd > 0; E.fillMat.opacity = 0.14 * fnd; E.fills.forEach(function (f) { f.visible = fnd > 0; });
-    var ping = red ? 0 : (performance.now() % 2800) / 2800, rg = ping * E.big * 0.625;
-    E.ring.visible = !red && p > 0.05 && !L2; E.ring.scale.set(E.w + 2 * rg, 1, E.d + 2 * rg); E.ring.material.opacity = (1 - ping) * (0.10 + 0.40 * seg(p, 0.5, 1));
+    // the ground ping (E15, owner 1 Nov: "a subtle rectangle spreading out around the house, like on the net worth 3D viewport"): gold, every
+    // 2.8 s, 0.45 to 0, in lite too (Pedro A2); reduced motion keeps a still rectangle half way out
+    var ping = motion ? 0.5 : (performance.now() % 2800) / 2800, rg = ping * E.big * 0.625;
+    E.ring.visible = p > 0.05 && !L2; E.ring.userData.set(E.w / 2 + rg, E.d / 2 + rg); E.ring.material.opacity = motion ? 0.22 : (1 - ping) * 0.45;
     if (E.rafters) { var nT = Math.ceil(seg(p, 0.60, 0.80) * 18); E.rafters.visible = nT > 0; E.rafters.geometry.setDrawRange(0, nT * E.rafters.userData.per); }
     var pa = L2 ? (eqS > 0 && eqS < 1 ? 1 : 0) : 1 - seg(p, 0.97, 1), sy = L2 ? cy : st.y;
     E.slice.visible = pa > 0 && p > 0; E.slice.position.y = sy; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
@@ -696,7 +779,13 @@
       if (w > 2 && h > 2) { this.renderer.setPixelRatio(this._bSoft ? 0.75 : 1); this.renderer.setSize(w, h, false); }   // software GL: three quarters resolution, a third of the work
       this.controls.autoRotate = false;
     }
-    if (this._bLite && !this.dirty && this._brandSettled() && !this._bDrag && this._bWasSettled) return false;   // still and unchanged: nothing to draw
+    if (this._bLite && !this.dirty && this._brandSettled() && !this._bDrag && this._bWasSettled) {   // still and unchanged: only the ground ping moves (at the lite pace)
+      var ringOn = this._bEnvObj && this._bEnvObj.ring.visible && !reduced() && this._bVis !== false;
+      this._bPingPace = !!ringOn;
+      if (ringOn) { this._brandApply(); return true; }
+      return false;
+    }
+    this._bPingPace = false;
     var dt = Math.min(this._bLite ? 0.5 : 0.05, raw);
     var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red;
     if (red) this.p = target;
@@ -708,6 +797,11 @@
     }
     this._brandApply();
     this._bWasSettled = this._brandSettled();
+    // pixel ratio (E14): full at rest for sharp hairlines; a phone drops to 1.25 while bricks land, the camera flies or a finger is down, and
+    // is back about 300 ms after the last of those (the buffer is resized only at those two moments)
+    var busy = !this._bWasSettled || this._bDrag || !!this._fly;
+    if (busy) { this._bBusyT = t; if (!this._bBusy) { this._bBusy = true; if (this._setDpr) this._setDpr(); } }
+    else if (this._bBusy && t - (this._bBusyT || 0) > 300) { this._bBusy = false; if (this._setDpr) this._setDpr(); }
     // at rest (nothing landing, no touch for 1.5 s, no camera fly): only the slow pulse, sweep, ring and orbit move, and they run on the
     // clock, so the frame loop draws them at most 30 times a second (a 120 Hz phone was drawing four times as often for the same look)
     this._bCalm = !red && !this._bLite && this._bWasSettled && !this._bDrag && !this._fly && !this._anim && t - (this._bTouch || 0) > 1500;
