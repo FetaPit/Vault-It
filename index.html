@@ -6164,6 +6164,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     if (Math.abs(cam.near - nn) > 1e-3 || Math.abs(cam.far - ff) > 1e-2) { cam.near = nn; cam.far = ff; cam.updateProjectionMatrix(); }
     if (this._shadowDirty) { this.renderer.shadowMap.needsUpdate = true; this._shadowDirty = false; }
     this.renderer.render(this.scene, this.camera);
+    if (H.perf) H.perf.frame(this);   // ?perf=1 overlay (index.html): one call per drawn frame; keep it when the renderer changes
     if (this.onRender) this.onRender(this);
   };
 
@@ -13743,6 +13744,7 @@ body.vi-pop-open{overflow:hidden}
 // TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════
 function showTab(id){
+  if(id==='house'&&window.VIPERF)VIPERF.mark('tab');
   if(id==='connections'){showSettings();var cs=document.getElementById('settings-connections');if(cs)setTimeout(function(){try{cs.scrollIntoView({block:'start'})}catch(e){}},60);return;}
   if(id!=='house'&&typeof _threeAnimId!=='undefined'&&_threeAnimId){cancelAnimationFrame(_threeAnimId);_threeAnimId=null;}
   if(id!=='house'&&typeof HB3DAPP!=='undefined'&&HB3DAPP.viewer){try{HB3DAPP.viewer.stop();}catch(e){}}
@@ -15583,6 +15585,76 @@ function setViewFlag(name, on, btn) {   // Settings: 3D or classic net worth cha
   viFlagSet(name, on); var row = btn && btn.parentNode; if (row) [].forEach.call(row.children, function (b) { b.classList.toggle('active', b === btn); });
   { try { if (on) { if (window.nw3dMount) nw3dMount(); } else if (window.nw3d && nw3d.disable) nw3d.disable(); } catch (e) { console.error('[Vault-It] net worth view', e); } toast(on ? '3D net worth on' : 'Classic net worth chart on'); }
 }
+// ═══════════════════════════════════════════════════════════════
+// ?perf=1 — ON-DEVICE PERFORMANCE OVERLAY (v0.7 final round). Off unless the URL has perf=1 (kept in localStorage 'vi-perf' until ?perf=0).
+// Page level only: it samples the viewer through HB3D.perf.frame (one call per drawn frame), a longtask observer and timing marks here.
+// ═══════════════════════════════════════════════════════════════
+(function () {
+  var on = false;
+  try { var q = new URLSearchParams(location.search).get('perf');
+    if (q === '1') { localStorage.setItem('vi-perf', '1'); on = true; } else if (q === '0') { localStorage.removeItem('vi-perf'); } else on = localStorage.getItem('vi-perf') === '1'; } catch (e) { on = /[?&]perf=1/.test(location.search); }
+  if (!on) return;
+  var S = { frames: 0, dts: [], orbit: [], draws: [], over33: 0, longN: 0, longMax: 0, last: 0, tabAt: null, firstFrameMs: null, build: null, lay: null, dragging: false, v: null };
+  var MAXN = 400;
+  function pct(a, q) { if (!a.length) return null; var s = a.slice().sort(function (x, y) { return x - y; }); return s[Math.min(s.length - 1, Math.floor(q * s.length))]; }
+  function f1(x) { return x == null ? '-' : (Math.round(x * 10) / 10).toString(); }
+  function glInfo(v) {
+    try { var gl = v.renderer.getContext(), v2 = (typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext), x = gl.getExtension('WEBGL_debug_renderer_info');
+      return (v2 ? 'WebGL2' : 'WebGL1') + (x ? ' · ' + gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : ''); } catch (e) { return 'n/a'; }
+  }
+  function snapshot() {
+    var v = S.v || window.HB3DAPP && HB3DAPP.viewer, now = performance.now(), n1 = 0, i;
+    for (i = S.draws.length - 1; i >= 0 && now - S.draws[i] <= 1000; i--) n1++;
+    var info = null; try { info = v && v.brandInfo ? v.brandInfo() : null; } catch (e) {}
+    var cv = v && v.renderer ? v.renderer.domElement : null, mem = performance.memory;
+    var sm = window.HB3DAPP && HB3DAPP.want || {};
+    return { frames: S.frames, fps: n1, p50: pct(S.dts, 0.5), p95: pct(S.dts, 0.95), max: S.dts.length ? Math.max.apply(null, S.dts) : null, over33: S.over33,
+      longN: S.longN, longMax: S.longMax, heapMB: mem ? Math.round(mem.usedJSHeapSize / 1048576) : null, dpr: v && v.renderer ? v.renderer.getPixelRatio() : window.devicePixelRatio,
+      canvas: cv ? cv.width + 'x' + cv.height : null, gl: v && v.renderer ? glInfo(v) : null, bricks: v && v.model ? v.model.counts.bricks : null, bricksTotal: info ? info.bricksTotal : null,
+      engine: v ? 'three.js r' + (window.THREE ? THREE.REVISION : '?') + (v.brand ? ' · brand shaders' : ' · standard') + (v._bLite ? ' · lite' : (v._bCalm ? ' · at rest' : ' · full')) : 'not started',
+      firstFrameMs: S.firstFrameMs, buildMs: S.build, layMs: S.lay, orbitP95: pct(S.orbit, 0.95), orbitN: S.orbit.length, type: sm.type || (window.state && state.houseType) || null };
+  }
+  function lines(k) {
+    return ['fps ' + k.fps + '   frames ' + k.frames, 'frame ms p50 ' + f1(k.p50) + ' · p95 ' + f1(k.p95) + ' · max ' + f1(k.max), 'frames >33 ms: ' + k.over33,
+      'long tasks ' + k.longN + ' · worst ' + f1(k.longMax) + ' ms', 'JS heap ' + (k.heapMB == null ? 'n/a' : k.heapMB + ' MB'),
+      'DPR ' + f1(k.dpr) + ' · canvas ' + (k.canvas || '-'), 'renderer ' + (k.gl || '-'), 'bricks ' + (k.bricks == null ? '-' : k.bricks) + (k.bricksTotal ? ' (' + k.bricksTotal + ' UK)' : ''),
+      'engine ' + k.engine, 'first 3D frame ' + (k.firstFrameMs == null ? 'waiting' : f1(k.firstFrameMs) + ' ms from House tab'), 'build ' + f1(k.buildMs) + ' ms · lay ' + f1(k.layMs) + ' ms',
+      'orbit p95 ' + f1(k.orbitP95) + ' ms (' + k.orbitN + ' frames)'];
+  }
+  function report() {
+    var k = snapshot();
+    return ['Vault-It performance report', 'date ' + new Date().toISOString(), 'userAgent ' + navigator.userAgent, 'viewport ' + innerWidth + 'x' + innerHeight, 'devicePixelRatio ' + window.devicePixelRatio, 'house type ' + (k.type || '-'), ''].concat(lines(k)).join('\n');
+  }
+  window.VIPERF = { snapshot: snapshot, report: report,
+    mark: function (n) { if (n === 'tab') { S.tabAt = performance.now(); S.firstFrameMs = null; } },
+    phase: function (n, ms) { S[n] = ms; } };
+  // the engine calls this once per drawn frame
+  var wait = setInterval(function () { if (window.HB3D) { clearInterval(wait); HB3D.perf = { frame: function (v) {
+    var t = performance.now(); S.v = v; S.frames++; S.draws.push(t); if (S.draws.length > 200) S.draws.shift();
+    if (S.firstFrameMs == null) S.firstFrameMs = t - (S.tabAt == null ? 0 : S.tabAt);
+    if (S.last) { var dt = t - S.last; if (dt < 1000) { S.dts.push(dt); if (S.dts.length > MAXN) S.dts.shift(); if (dt > 33) S.over33++; if (S.dragging) { S.orbit.push(dt); if (S.orbit.length > MAXN) S.orbit.shift(); } } }
+    S.last = t; } }; } }, 30);
+  try { new PerformanceObserver(function (l) { l.getEntries().forEach(function (e) { S.longN++; if (e.duration > S.longMax) S.longMax = e.duration; }); }).observe({ entryTypes: ['longtask'] }); } catch (e) {}
+  document.addEventListener('pointerdown', function (e) { if (e.target && e.target.closest && e.target.closest('#house-scene')) { S.dragging = true; S.last = 0; } }, true);
+  ['pointerup', 'pointercancel'].forEach(function (n) { document.addEventListener(n, function () { S.dragging = false; S.last = 0; }, true); });
+  function mount() {
+    var el = document.createElement('div'); el.id = 'vi-perf';
+    el.style.cssText = 'position:fixed;right:4px;top:4px;z-index:10002;width:226px;max-width:calc(100vw - 8px);background:rgba(8,14,16,.88);color:#cfe;font:10px/1.35 "Share Tech Mono",monospace;border:1px solid #2a8f8a;border-radius:6px;padding:5px 6px;pointer-events:none;';
+    el.innerHTML = '<pre style="margin:0;white-space:pre-wrap;word-break:break-word;font:inherit"></pre><div style="margin-top:4px;display:flex;gap:6px"><button data-act="copy" style="pointer-events:auto;font:inherit;padding:3px 8px;background:#123734;color:#cfe;border:1px solid #2a8f8a;border-radius:4px">Copy report</button><button data-act="min" style="pointer-events:auto;font:inherit;padding:3px 8px;background:#123734;color:#cfe;border:1px solid #2a8f8a;border-radius:4px">Hide</button></div>';
+    document.body.appendChild(el);
+    var pre = el.firstChild, min = false;
+    function tick() { if (!min) pre.textContent = lines(snapshot()).join('\n'); }
+    setInterval(tick, 500); tick();
+    el.addEventListener('click', function (ev) {
+      var a = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-act'); if (!a) return;
+      if (a === 'min') { min = !min; pre.style.display = min ? 'none' : ''; ev.target.textContent = min ? 'Show' : 'Hide'; return; }
+      var txt = report(), old = el.querySelector('textarea'); if (old) old.remove();
+      function fallback() { var ta = document.createElement('textarea'); ta.readOnly = true; ta.value = txt; ta.rows = 6; ta.style.cssText = 'display:block;width:100%;margin-top:4px;font:inherit;pointer-events:auto;box-sizing:border-box'; el.appendChild(ta); ta.focus(); ta.select(); }
+      try { navigator.clipboard.writeText(txt).then(function () { ev.target.textContent = 'Copied'; setTimeout(function () { ev.target.textContent = 'Copy report'; }, 1500); }, fallback); } catch (e) { fallback(); }
+    });
+  }
+  if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
+})();
 // The brand build (brand handover 6.2 to 6.10): the only house builder (owner, 1 Nov 2026: the old one is deleted), Levels 1 and 2.
 function hbBrandOn() { return typeof HB3D !== 'undefined' && !!HB3D.brandStats; }
 // 6.8 gamified feedback (brand build): pop-up, stage flash and milestone toasts. Toasts only after the person has interacted, never during the opening build.
@@ -15623,7 +15695,9 @@ function hb3dModel(type, floor) {
   type = hb3dType(type); floor = hb3dFloor(type, floor);
   var k = hb3dKey(type, floor), m = HB3DAPP.models[k];
   if (!m) {
+    var _pt = window.VIPERF ? performance.now() : 0;
     m = HB3D.build(type, { floor: floor, detail: hb3dDetail() });
+    if (_pt) VIPERF.phase('build', performance.now() - _pt);
     HB3DAPP.models[k] = m; HB3DAPP.order.push(k);
     while (HB3DAPP.order.length > 4) { var old = HB3DAPP.order.shift(); if (old !== HB3DAPP.key) delete HB3DAPP.models[old]; else HB3DAPP.order.push(old); if (HB3DAPP.order.length <= 4) break; }
   }
@@ -15949,6 +16023,7 @@ function hb3dRedraw() {
     v.setBrand(true);
     var _hs = document.getElementById('house-scene'); if (_hs) _hs.classList.toggle('hb-brand', brandOn);   // scanlines over the stage (handover 6.6)
     var key2 = hb3dKey(sm.type, sm.floor), model = hb3dModel(sm.type, sm.floor), changed = key2 !== HB3DAPP.key;
+    var _lt = window.VIPERF ? performance.now() : 0;
     if (changed) {
       var sameType = !!HB3DAPP.key && HB3DAPP.key.split('|')[0] === sm.type;   // floor change: keep the camera so the highlight visibly moves
       v.show(model, sameType); HB3DAPP.key = key2; HB3DAPP.lastP = null;
@@ -15962,6 +16037,7 @@ function hb3dRedraw() {
       if (hbBrandModel(model)) hbSeenBricks(key2, HB3D.brandStats(model, sm.p).bricksLaid);
     } else v.setState({ mode: sm.mode, p: sm.p, eq: sm.eq || 0 });   // site, or Level 2 (the paid line eases up in the frame loop)
     HB3DAPP.lastP = sm.p; HB3DAPP.lastMode = sm.mode;
+    if (_lt) VIPERF.phase('lay', performance.now() - _lt);
     hb3dOverlays(sm);
     // wake the frame loop (it sleeps when still) and place the labels again once the new state has been drawn, so the gold
     // ROW tag, brick pill and caption never keep the previous house's figures (owner, 31 Oct: house builder)
