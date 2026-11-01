@@ -371,9 +371,8 @@ th{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spac
             <tbody>
               <tr><td>openGym (your fork)</td><td>Workouts, sets, PRs, muscle volume, weigh-ins</td><td>Built in</td><td>STR, DISC</td><td><span class="st ok">Ready</span></td></tr>
               <tr><td>Samsung Health</td><td>Steps, sleep, heart rate, active calories</td><td>Health Connect</td><td>END, VIT</td><td><span class="st add">Add read permissions</span></td></tr>
-              <tr><td>Hume</td><td>Weight, body fat, lean mass</td><td>Health Connect, if Hume syncs there</td><td>FORM</td><td><span class="st chk">Check Hume sync</span></td></tr>
-              <tr><td>Nutrition app</td><td>Calories, protein, macros, water</td><td>Health Connect nutrition records</td><td>FUEL</td><td><span class="st chk">Which app?</span></td></tr>
-              <tr><td>Lean for Life</td><td>Program check-ins, phase, weigh-ins</td><td>Quick log in Forge or CSV</td><td>DISC, FORM</td><td><span class="st chk">No public API seen</span></td></tr>
+              <tr><td>Hume</td><td>Weight, body fat, lean mass</td><td>Google Health, then Health Connect</td><td>FORM</td><td><span class="st add">Confirm body fat is shared</span></td></tr>
+              <tr><td>Lean 4 Life</td><td>Food log, macros, workouts, check-ins</td><td>Ask your coach: Health Connect, export or API</td><td>FUEL, DISC</td><td><span class="st chk">Needs your coach</span></td></tr>
             </tbody>
           </table></div>
         </div>
@@ -407,9 +406,9 @@ const STATS = [
   { k:'STR',  name:'Strength',    col:'--s-str',  src:'openGym' },
   { k:'END',  name:'Endurance',   col:'--s-end',  src:'Samsung Health' },
   { k:'VIT',  name:'Vitality',    col:'--s-vit',  src:'Sleep, HR' },
-  { k:'FUEL', name:'Nutrition',   col:'--s-fuel', src:'Nutrition app' },
+  { k:'FUEL', name:'Nutrition',   col:'--s-fuel', src:'Lean 4 Life' },
   { k:'FORM', name:'Body comp',   col:'--s-form', src:'Hume' },
-  { k:'DISC', name:'Discipline',  col:'--s-disc', src:'Streaks, Lean for Life' },
+  { k:'DISC', name:'Discipline',  col:'--s-disc', src:'Streaks, Lean 4 Life' },
 ];
 const statLevel = xp => Math.floor(Math.sqrt(xp / 40));
 const statNext = L => 40 * (L + 1) ** 2;
@@ -425,12 +424,12 @@ const titleFor = L => TITLES.filter(t => L >= t[0]).pop()[1];
 const QUESTS = [
   { id:'q1', s:'STR',  t:'Push day: bench 4 × 6 @ 82.5 kg', src:'openGym', xp:120 },
   { id:'q2', s:'END',  t:'Walk 9,000 steps', src:'Samsung Health', xp:60, prog:[6240, 9000] },
-  { id:'q3', s:'FUEL', t:'Hit 160 g protein', src:'Nutrition app', xp:50, prog:[112, 160] },
-  { id:'q4', s:'FUEL', t:'Calories in range (2,100–2,400)', src:'Nutrition app', xp:30, prog:[1640, 2250] },
+  { id:'q3', s:'FUEL', t:'Hit 160 g protein', src:'Lean 4 Life', xp:50, prog:[112, 160] },
+  { id:'q4', s:'FUEL', t:'Calories in range (2,100–2,400)', src:'Lean 4 Life', xp:30, prog:[1640, 2250] },
   { id:'q5', s:'VIT',  t:'Lights out by 22:45', src:'Samsung Health', xp:40 },
   { id:'q6', s:'FORM', t:'Morning weigh-in on the Body Pod', src:'Hume', xp:15, done:true },
-  { id:'q7', s:'DISC', t:'Lean for Life daily check-in', src:'Lean for Life', xp:25 },
-  { id:'q8', s:'VIT',  t:'Drink 3 L water', src:'Nutrition app', xp:20, prog:[1.8, 3] },
+  { id:'q7', s:'DISC', t:'Lean 4 Life daily check-in', src:'Lean 4 Life', xp:25 },
+  { id:'q8', s:'VIT',  t:'Drink 3 L water', src:'Lean 4 Life', xp:20, prog:[1.8, 3] },
 ];
 const MYSTERY = { id:'qm', t:'Mystery quest', sub:'Opens at 18:00', xp:'?' };
 const LOOT = ['Streak freeze', '2× XP on your next workout', 'Title: Night Owl Slayer', 'Bonus skill point', 'Cosmetic: Ember aura'];

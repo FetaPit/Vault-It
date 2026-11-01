@@ -18,9 +18,8 @@ A game layer for health and fitness, built on a fork of [openGym](https://github
 |---|---|---|---|
 | openGym | workouts, sets, PRs, muscle volume, weigh-ins | built in | none |
 | Samsung Health | steps, sleep, resting HR, HRV, active kcal | Health Connect | add read permissions + reader in `HealthConnectPlugin.java` / `lib/health-read.js` |
-| Hume | weight, body fat, lean mass | Health Connect, if Hume writes there | check Hume app connections; else CSV import |
-| Nutrition app | kcal, protein, macros, water | Health Connect `NutritionRecord`, `HydrationRecord` | depends on which app |
-| Lean for Life | check-ins, phase | no public API found | quick log in Forge, or CSV |
+| Hume | weight, body fat, lean mass | Hume → Google Health → Health Connect | confirm Google Health shares body fat + lean mass in Health Connect |
+| Lean 4 Life (coach's app) | food log, macros, workouts, check-ins | best: app writes `NutritionRecord` to Health Connect. Else export or API from the coach | v2.8.6 added health data reading; ask the coach if it can also write. Fallback: quick log in Forge |
 
 ## Game layer (new code in the fork)
 
