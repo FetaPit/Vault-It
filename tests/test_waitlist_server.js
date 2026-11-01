@@ -6,12 +6,13 @@ src = src.replace(/import \{ createClient \} from [^\n]+\n/, 'const createClient
 const js = esbuild.transformSync(src, { loader: 'ts', format: 'cjs' }).code;
 
 // stand-in database: the three RPCs behave like migration 009 (tested on a real Postgres in test_009.mjs)
-const rate = {}, rows = {}, calls = []; let dbDown = false;
+const rate = {}, rows = {}, calls = []; let dbDown = false, rateDown = false;
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
 globalThis.__createClient = () => ({
   rpc: async (fn, a) => {
     calls.push([fn, a]);
     if (fn === 'rate_hit') {
+      if (rateDown) return { data: null, error: { message: 'rate down' } };
       const now = Date.now(); let r = rate[a.p_key]; if (!r || r.start < now - a.p_window_secs * 1000) r = rate[a.p_key] = { n: 0, start: now }; r.n++;
       const allowed = r.n <= a.p_limit; return { data: [{ allowed, retry_after: allowed ? 0 : 99 }], error: null };
     }
@@ -136,6 +137,11 @@ const unsubOf = (m) => ((m.html.match(/href="(https:\/\/vault-it\.co\/sign-up\/u
   r = await call({ action: 'join', email: 'blocked9@example.com' }, '9.9.9.9'); ok(r.s === 429 && r.b.retryAfter > 0, 'a sixth token-less join from one address in an hour is turned away (5 an hour)');
   r = await call({ action: 'join', email: 'blockedother@example.com' }, '9.9.9.10'); ok(r.s === 200, 'another address is not affected');
   r = await call({ action: 'join', email: 'bot@example.com', captchaToken: 'bad' }); ok(r.s === 403 && r.b.error === 'captcha', 'a token that is present but wrong is still refused');
+  // if the counter itself is broken, a token-less join is NOT waved through (the normal path with a token still fails open, as before)
+  rateDown = true; const sent1 = sent.length;
+  r = await call({ action: 'join', email: 'ratedown@example.com' }); ok(r.s === 429 && r.b.retryAfter > 0 && sent.length === sent1 && !rows['ratedown@example.com'], 'with no token and the rate counter failing, the join is turned away as limited (nothing saved, no e-mail)');
+  r = await call({ action: 'join', email: 'ratedown2@example.com', captchaToken: 'good' }); ok(r.s === 200, 'with a genuine token the join still goes through when the counter fails (unchanged)');
+  rateDown = false;
   for (const k of Object.keys(rate)) delete rate[k];
   load({ TURNSTILE_SECRET: 'sec', RATE_WAITLIST_NOTOKEN_GLOBAL_PER_HOUR: '3' });
   for (let i = 0; i < 3; i++) await call({ action: 'join', email: 'g' + i + '@example.com' });
