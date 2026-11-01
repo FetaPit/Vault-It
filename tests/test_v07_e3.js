@@ -36,7 +36,13 @@ const seed = (theme) => {
     ok(d.ring && d.ringW === '1' && /gold|e8c56a|60480b|var\(/i.test(d.ringStroke), t + 'selected node has a 1 px gold ring (' + d.ringStroke + ')');
     if (theme === 'light') { const c = await p.evaluate(() => { const e = document.querySelector('#fire-detail-panel .fd-box.ok'); const f = x => x.match(/[\d.]+/g).slice(0, 3).map(Number); const L = a => { const v = a.map(x => { x /= 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); }); return .2126 * v[0] + .7152 * v[1] + .0722 * v[2]; };
         const col = getComputedStyle(e).color, b = [218, 216, 208]; const l1 = L(f(col)), l2 = L(b); return (Math.max(l1, l2) + .05) / (Math.min(l1, l2) + .05); });
-      ok(c >= 4.5, t + 'Daylight: the "already met" box is readable (contrast ' + c.toFixed(1) + ')'); }
+      ok(c >= 4.5, t + 'Daylight: the "already met" box is readable (contrast ' + c.toFixed(1) + ')');
+      const cs = await p.evaluate(() => { const L = a => { const v = a.map(x => { x /= 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); }); return .2126 * v[0] + .7152 * v[1] + .0722 * v[2]; };
+        const q = e => { const m = getComputedStyle(e).color.match(/[\d.]+/g).slice(0, 3).map(Number), l = L(m), l2 = L([218, 216, 208]); return +((Math.max(l, l2) + .05) / (Math.min(l, l2) + .05)).toFixed(1); };
+        const col = document.querySelector('#fire-detail-inner > div:nth-child(2)'), title = col.children[0], chip = title.querySelector('span'), phase = col.children[1], prog = [...col.children].find(x => /there|of £|% /.test(x.textContent) && x.style.fontFamily);
+        return { title: q(title), chip: q(chip), phase: q(phase), prog: prog ? q(prog) : 99, tick: getComputedStyle(document.querySelector('.fd-box.ok .vi-ic')).marginRight }; });
+      ok(cs.title >= 4.5 && cs.chip >= 4.5 && cs.phase >= 4.5 && cs.prog >= 4.5, t + 'Daylight panel text meets AA (title ' + cs.title + ', chip ' + cs.chip + ', phase ' + cs.phase + ', progress ' + cs.prog + ')');
+      ok(parseFloat(cs.tick) >= 6, t + 'the tick has a gap before the text (' + cs.tick + ')'); }
     // a later stage that is already met
     const wi = S.waiting[0];
     await p.evaluate(i => fireScrollTo(i), wi); await p.waitForTimeout(900);

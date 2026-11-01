@@ -8852,6 +8852,7 @@ html[data-theme="light"] .fd-box.ok{color:var(--t1);background:rgb(var(--green-r
 .fire-detail-close{top:0!important;right:0!important;width:44px;height:44px;display:grid;place-items:center;padding:0!important}
 .fire-detail-close .vi-ic{width:18px;height:18px}
 .fire-detail-inner{padding-right:30px}
+.fd-box.ok .vi-ic{margin-right:6px}
 @keyframes fdIn{from{opacity:0;max-height:0}to{opacity:1;max-height:1200px}}
 .fire-detail-panel{overflow:hidden}
 .fire-detail-panel:not([style*="display: none"]):not([style*="display:none"]){animation:fdIn .24s ease-out}
@@ -9709,7 +9710,8 @@ input:focus, textarea:focus, select:focus {
 .cf-legend em{font-style:normal;color:var(--t3)}
 .cf-scroll{overflow-x:auto;border-radius:8px;background:rgb(var(--panel-rgb) / .45);-webkit-overflow-scrolling:touch}
 .cf-scroll svg{display:block}
-html[data-theme="light"] .cf-chip{--teal:#44C0B9;--green:#3ECF8E;--green2:#3FB585;--coral:#E5535F;--salmon:#FFA38A;--amber:#F59E0B;--yellow:#F5DC4A}   /* the chips stay black in Daylight, so their text keeps the Night colours */
+html[data-theme="light"] .cf-chip{--teal:#44C0B9;--green:#3ECF8E;--green2:#3FB585;--coral:#E5535F;--salmon:#FFA38A;--amber:#F59E0B;--yellow:#F5DC4A}
+html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Daylight so the paper does not show through (AA for the coral amounts); the chips stay black in Daylight, so their text keeps the Night colours */
 .cf-sub{font-family:'Syne',sans-serif;font-size:.52rem;font-weight:800;letter-spacing:.16em;color:var(--t3);margin:14px 0 6px}
 .cf-empty{padding:34px 12px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--t3)}
 .cf-presets{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
@@ -13545,7 +13547,8 @@ body.vi-pop-open{overflow:hidden}
 .bd-tile-tt em{font:normal .56rem 'DM Sans',sans-serif;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bd-tile-sum{display:flex;flex-direction:column;align-items:flex-end;font:700 .92rem 'Share Tech Mono',monospace;color:var(--tx)}
 .bd-tile-sum small{font:.5rem 'Share Tech Mono',monospace;color:var(--t3);font-weight:400}
-.bd-chev{flex:none;color:var(--t);display:grid;place-items:center;width:44px;height:44px;margin:-8px -8px -8px 0;transform:rotate(180deg);transition:transform .24s ease}   /* open: the arrow points up; folded: down (owner, 1 Nov, E10) */
+.bd-chev{position:relative;flex:none;color:var(--t);display:grid;place-items:center;width:24px;height:24px;transform:rotate(180deg);transition:transform .24s ease}   /* open: the arrow points up; folded: down (owner, 1 Nov, E10) */
+.bd-chev::before{content:'';position:absolute;inset:-10px}   /* 44 px hit area around the 24 px arrow, so the title column keeps its width */
 .bd-tile.folded .bd-chev{transform:none}
 @media (prefers-reduced-motion:reduce){.bd-chev{transition:none}}
 .bd-tile-body{padding:4px 14px 12px}
@@ -23662,13 +23665,13 @@ function fireShowDetail(idx,opts){
     }
   }
   var btn=(acts||skip)?'<div class="fd-acts">'+acts+skip+'</div>':'';
-  inner.innerHTML='<div style="flex-shrink:0;width:46px;height:46px;border-radius:50%;border:2px solid '+(s.done?col:'rgb(var(--teal-rgb) / .25)')+';background:'+(s.done?col+'26':'rgb(var(--panel-rgb) / .9)')+';display:flex;align-items:center;justify-content:center">'
+  inner.innerHTML=viDay('<div style="flex-shrink:0;width:46px;height:46px;border-radius:50%;border:2px solid '+(s.done?col:'rgb(var(--teal-rgb) / .25)')+';background:'+(s.done?col+'26':'rgb(var(--panel-rgb) / .9)')+';display:flex;align-items:center;justify-content:center">'
       +'<svg width="28" height="28" viewBox="0 0 28 28">'+fireIcon(s.ic,14,14,24,s.done||isNext||waiting?col:'#7d8793',s.done||isNext||waiting?1:.6,.25)+'</svg></div>'
     +'<div style="flex:1;min-width:0">'
     +'<div style="font-family:\'Syne\',sans-serif;font-size:.74rem;font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+state_+'</span></div>'
-    +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:rgb(var(--teal-rgb) / .45);letter-spacing:.1em;margin-bottom:4px">'+ph.label+' PHASE · STEP '+seq+' OF 30</div>'
+    +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:var(--t2);letter-spacing:.1em;margin-bottom:4px">'+ph.label+' PHASE · STEP '+seq+' OF 30</div>'
     +'<div style="font-family:\'DM Sans\',sans-serif;font-size:.58rem;color:var(--t2);line-height:1.5">'+long+'</div>'
-    +progTxt+need+ticks+btn+'</div>';
+    +progTxt+need+ticks+btn+'</div>');
   panel.style.display='';
   if(!opts.keepAsk)renderFIREroadmap();   // draws the gold ring on the tapped stage
 }

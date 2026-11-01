@@ -38,6 +38,7 @@ const parse = html => { const d = new DOMParser().parseFromString('<body>' + htm
       ok(c.every(k => k.x >= 0 && k.y >= 0), t + id + ': no chip is clipped by the top or left edge');
       res[id] = JSON.stringify(c);
     }
+    { const fo = await p.evaluate(() => getComputedStyle(document.querySelector('.cf-chip rect')).fillOpacity); ok(theme === 'dark' ? fo === '0.88' : fo === '1', t + 'chip fill opacity is solid in Daylight (' + fo + ')'); }
     ok(res['cf-sankey'] === res['bd-sankey'], t + 'Dashboard and Budget carry identical chips');
     // visible check: chip rect contains its text in the live DOM
     const fit = await p.evaluate(() => { const h = document.getElementById('bd-sankey'); let bad = 0; if (!h.clientWidth) return -1; h.querySelectorAll('.cf-chip').forEach(g => { const r = g.querySelector('rect').getBBox(); g.querySelectorAll('text').forEach(x => { const b = x.getBBox(); if (b.x < r.x - .5 || b.x + b.width > r.x + r.width + .5 || b.y < r.y - .5 || b.y + b.height > r.y + r.height + .5) bad++; }); }); return bad; });

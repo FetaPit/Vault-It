@@ -17,7 +17,9 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     let r = await info(); const t = theme + ' ' + w + 'px: ';
     ok(r.text === '' && r.use === '#vi-chevron', t + 'the glyph is gone; vi-chevron sprite icon (' + r.use + ')');
     ok(r.sw === 20 && r.sdw === '2', t + '20 px icon, stroke 2 (' + r.sw + ', ' + r.sdw + ')');
-    ok(r.w >= 44 && r.h >= 44, t + '44 px target (' + r.w + 'x' + r.h + ')');
+    const hit = await p.evaluate(() => { const c = document.querySelector('.bd-tile[data-g="ce"] .bd-chev'), b = getComputedStyle(c, '::before'); return { w: Math.round(c.getBoundingClientRect().width), hit: parseFloat(b.width) || 0, hh: parseFloat(b.height) || 0, title: Math.round(document.querySelector('.bd-tile[data-g="ce"] .bd-tile-tt b').getBoundingClientRect().height), lh: parseFloat(getComputedStyle(document.querySelector('.bd-tile[data-g="ce"] .bd-tile-tt b')).lineHeight) || 16 }; });
+    ok(hit.w <= 24 && hit.hit >= 44 && hit.hh >= 44, t + 'arrow drawn 24 px with a 44 px hit area (' + hit.w + ', ' + hit.hit + 'x' + hit.hh + ')');
+    ok(Math.round(hit.title / hit.lh) <= 2, t + 'the title column keeps two lines at most (' + Math.round(hit.title / hit.lh) + ')');
     const rot = m => { const n = m.match(/matrix\(([^)]+)\)/); if (!n) return 0; const v = n[1].split(',').map(Number); return Math.round(Math.atan2(v[1], v[0]) * 180 / Math.PI); };
     ok(rot(r.tr) === 0, t + 'folded: the arrow points down, as drawn (' + rot(r.tr) + ' deg)');
     ok(/0\.24s/.test(r.dur), t + 'turns over 240 ms (' + r.dur + ')');
