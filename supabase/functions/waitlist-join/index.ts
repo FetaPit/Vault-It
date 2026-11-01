@@ -21,6 +21,10 @@ const num = (k: string, d: number) => { const n = parseInt(Deno.env.get(k) ?? ''
 const LIMIT_IP_PER_HOUR     = num('RATE_WAITLIST_IP_PER_HOUR', 30)       // a room of people at an event shares one IP
 const LIMIT_EMAIL_PER_HOUR  = num('RATE_WAITLIST_EMAIL_PER_HOUR', 3)     // stops one inbox being flooded with confirmation mails
 const LIMIT_GLOBAL_PER_HOUR = num('RATE_WAITLIST_GLOBAL_PER_HOUR', 300)  // protects the shared e-mail quota (sign-in codes use it too)
+// Joins sent WITHOUT a human-check token (the check could not load). 5 an hour per address: enough for a real visitor to retry a typo or two,
+// a sixth of the normal 30. 60 an hour across everyone: a fifth of the global 300, so a script that simply leaves the token out cannot use up the shared mail quota.
+const LIMIT_NOTOKEN_IP_PER_HOUR     = num('RATE_WAITLIST_NOTOKEN_IP_PER_HOUR', 5)
+const LIMIT_NOTOKEN_GLOBAL_PER_HOUR = num('RATE_WAITLIST_NOTOKEN_GLOBAL_PER_HOUR', 60)
 const EMAIL_RE              = /^[A-Za-z0-9._%+'-]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/
 const TAG_RE                = /[^A-Za-z0-9 _.\-+|]/g
 
@@ -172,9 +176,16 @@ Deno.serve(async (req: Request) => {
   // so a script that cannot pass Turnstile cannot use up everyone's allowance.
   let wait = await limited(admin, 'wl-ip', ip, LIMIT_IP_PER_HOUR, 3600)
   if (!wait && TURNSTILE_SECRET) {
-    const verdict = captchaToken ? await verifyTurnstile(captchaToken, rawIp(req)) : 'fail'
-    if (verdict === 'fail') return json({ error: 'captcha' }, 403)
-    if (verdict === 'unreachable') return json({ error: 'captcha_unavailable', retryAfter: 30 }, 503, { 'Retry-After': '30' })
+    if (!captchaToken) {
+      // No token at all: the page sends none when the check cannot load (ad blocker, private DNS, a Cloudflare outage), and testers must never
+      // be stuck. Allowed, but on a much smaller allowance, per address and across everyone, plus the e-mailed confirmation link below.
+      wait = (await limited(admin, 'wl-notok-ip', ip, LIMIT_NOTOKEN_IP_PER_HOUR, 3600)) || (await limited(admin, 'wl-notok-all', 'all', LIMIT_NOTOKEN_GLOBAL_PER_HOUR, 3600))
+    } else {
+      // A token that is present but does not verify is still refused.
+      const verdict = await verifyTurnstile(captchaToken, rawIp(req))
+      if (verdict === 'fail') return json({ error: 'captcha' }, 403)
+      if (verdict === 'unreachable') return json({ error: 'captcha_unavailable', retryAfter: 30 }, 503, { 'Retry-After': '30' })
+    }
   }
   wait = wait || (await limited(admin, 'wl-all', 'all', LIMIT_GLOBAL_PER_HOUR, 3600)) || (await limited(admin, 'wl-addr', mailbox(email), LIMIT_EMAIL_PER_HOUR, 3600))
   if (wait) return json({ error: 'rate_limited', retryAfter: wait }, 429, { 'Retry-After': String(wait) })

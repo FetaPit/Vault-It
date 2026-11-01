@@ -106,9 +106,23 @@ const unsubOf = (m) => ((m.html.match(/href="(https:\/\/vault-it\.co\/sign-up\/u
   // Turnstile on: checked after the per-IP counter and BEFORE the shared counters
   load({ TURNSTILE_SECRET: 'sec' });
   const calls0 = calls.length;
-  r = await call({ action: 'join', email: 'bot@example.com' }); ok(r.s === 403 && r.b.error === 'captcha', 'with the check on, a request without a token is refused');
-  const used = calls.slice(calls0).map((c) => c[1].p_key ? c[1].p_key.split(':')[0] : c[0]);
-  ok(used.join() === 'wl-ip', 'a refused bot only touches its own per-IP counter (not the global or mailbox allowance): ' + used.join());
+  // no token (the page could not load the check): allowed on a much smaller allowance, still with the e-mailed confirmation link (owner, 1 Nov: testers must never be stuck)
+  const sent0 = sent.length, vc0 = verifyCalls.length;
+  r = await call({ action: 'join', email: 'blocked@example.com' }, '9.9.9.9'); ok(r.s === 200 && r.b.success, 'with the check on, a request without a token is accepted (the check could not load)');
+  ok(sent.length === sent0 + 1 && !!linkOf(sent[sent.length - 1]) && rows['blocked@example.com'].status === 'pending', 'it still gets the confirmation e-mail and stays pending until the link is clicked');
+  ok(verifyCalls.length === vc0, 'no token means Cloudflare is not asked');
+  const used = calls.slice(calls0).filter((c) => c[0] === 'rate_hit').map((c) => c[1].p_key.split(':')[0]);
+  ok(['wl-ip', 'wl-notok-ip', 'wl-notok-all', 'wl-all', 'wl-addr'].every((k) => used.includes(k)), 'a token-less join is counted on its own stricter counters as well as the normal ones: ' + used.join());
+  for (let i = 0; i < 4; i++) await call({ action: 'join', email: 'blocked' + i + '@example.com' }, '9.9.9.9');
+  r = await call({ action: 'join', email: 'blocked9@example.com' }, '9.9.9.9'); ok(r.s === 429 && r.b.retryAfter > 0, 'a sixth token-less join from one address in an hour is turned away (5 an hour)');
+  r = await call({ action: 'join', email: 'blockedother@example.com' }, '9.9.9.10'); ok(r.s === 200, 'another address is not affected');
+  r = await call({ action: 'join', email: 'bot@example.com', captchaToken: 'bad' }); ok(r.s === 403 && r.b.error === 'captcha', 'a token that is present but wrong is still refused');
+  for (const k of Object.keys(rate)) delete rate[k];
+  load({ TURNSTILE_SECRET: 'sec', RATE_WAITLIST_NOTOKEN_GLOBAL_PER_HOUR: '3' });
+  for (let i = 0; i < 3; i++) await call({ action: 'join', email: 'g' + i + '@example.com' });
+  const calls1 = calls.length; r = await call({ action: 'join', email: 'g9@example.com' }); ok(r.s === 429, 'across everyone, token-less joins are capped (60 an hour; 3 in this test) so a script leaving the token out cannot drain the mail quota');
+  ok(!calls.slice(calls1).some((c) => c[0] === 'rate_hit' && /^wl-(all|addr)/.test(c[1].p_key)), 'a capped token-less join does not use the shared or mailbox allowance');
+  load({ TURNSTILE_SECRET: 'sec' });
   r = await call({ action: 'join', email: 'human@example.com', captchaToken: 'good' }); ok(r.s === 200, 'a genuine token passes');
   verifyMode = 'wrongsite'; r = await call({ action: 'join', email: 'h2@example.com', captchaToken: 'good' }); ok(r.s === 403, 'a token minted on another site is refused');
   verifyMode = 'down'; r = await call({ action: 'join', email: 'h3@example.com', captchaToken: 'good' }); ok(r.s === 503 && r.b.retryAfter > 0, 'if Cloudflare cannot be asked, the request is refused (503), not waved through'); verifyMode = 'normal';
