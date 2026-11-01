@@ -10252,19 +10252,17 @@ body.reduced-motion #vt-spot,body.reduced-motion #vt-card,body.reduced-motion .v
    recording's order (+, −, auto-orbit, reset); "show my row" and full screen follow, so nothing is lost */
 /* Brand build camera rail (brand book .rail + 31 Oct recording): line icons, vertical on the right at desktop, a row top right on phones. The stage keeps the Night look in Daylight too. */
 .hud-btn .hb-ico{display:none}
-html #house-scene.hb-brand .hud-bar{right:12px;padding:6px;gap:6px;background:rgba(0,12,18,.74);border:1px solid rgba(68,192,185,.3);border-radius:16px}
+/* camera pill (v0.7 E18, owner 1 Nov): one row, bottom centre, 12 px up; buttons drawn 36 px inside a 44 px hit area; 18 px line icons in teal */
+html #house-scene.hb-brand .hud-bar{position:absolute;left:50%;right:auto;top:auto;bottom:12px;transform:translateX(-50%);flex-direction:row;align-items:center;gap:4px;padding:4px;max-width:calc(100% - 16px);background:var(--rail-bg);border:1px solid rgba(68,192,185,.3);border-radius:var(--r-pill);box-shadow:none}
 html #house-scene.hb-brand .hud-bar .hud-sep{display:none}
-html #house-scene.hb-brand .hud-btn{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;font-size:0!important;line-height:0;display:grid;place-items:center;border-radius:10px;border:1px solid rgba(68,192,185,.22);background:rgba(8,24,28,.85);color:#44c0b9;box-shadow:none}
-html #house-scene.hb-brand .hud-btn:hover{border-color:#44c0b9}
-html #house-scene.hb-brand .hud-btn #hud-orbit-icon{display:none}
-html #house-scene.hb-brand .hud-btn .hb-ico{display:block}
-html #house-scene.hb-brand .hud-btn.hud-toggle.orbit-active{background:rgba(68,192,185,.2);border-color:#44c0b9;box-shadow:0 0 14px rgba(68,192,185,.35)}
-html #house-scene.hb-brand #hb3d-cap{left:14px;right:78px;bottom:10px;font-family:'Share Tech Mono',monospace;font-size:clamp(11px,1.5vw,14px);letter-spacing:.08em;color:#B6D8D6;text-shadow:0 0 8px #000;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35;z-index:2}
-@media(max-width:640px){html #house-scene.hb-brand .hud-bar{top:10px;right:10px;bottom:auto;transform:none;flex-direction:row;padding:4px;gap:4px}
-  html #house-scene.hb-brand .hud-btn{width:38px!important;min-width:38px!important;height:38px!important;min-height:38px!important}
-  html #house-scene.hb-brand #hb3d-cap{right:14px;font-size:11px}}
-#house-scene.hb-brand #hud-zoom-in{order:1}#house-scene.hb-brand #hud-zoom-out{order:2}#house-scene.hb-brand #hud-orbit-toggle{order:3}
-#house-scene.hb-brand #hud-reset{order:4}#house-scene.hb-brand #hud-row{order:5}#house-scene.hb-brand .hud-bar>[onclick="toggleExpand()"]{order:6}
+html #house-scene.hb-brand .hud-btn{position:relative;box-sizing:border-box;width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;font-size:0!important;line-height:0;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:#44c0b9;box-shadow:none}
+html #house-scene.hb-brand .hud-btn::before{content:"";position:absolute;inset:4px;box-sizing:border-box;border-radius:50%;border:1px solid rgba(68,192,185,.22);background:var(--rail-btn);transition:border-color .15s,box-shadow .15s}
+html #house-scene.hb-brand .hud-btn svg{position:relative;width:18px;height:18px;display:block}
+html #house-scene.hb-brand .hud-btn:hover::before,html #house-scene.hb-brand .hud-btn:focus-visible::before{border-color:#44c0b9}
+html #house-scene.hb-brand .hud-btn.hud-toggle.orbit-active{background:transparent!important;box-shadow:none!important;border:0!important}
+html #house-scene.hb-brand .hud-btn.hud-toggle.orbit-active::before{border-color:#44c0b9;box-shadow:var(--dglow);background:var(--rail-btn)}
+html #house-scene.hb-brand #hb3d-cap{left:14px;right:14px;bottom:72px;font-family:'Share Tech Mono',monospace;font-size:clamp(11px,1.5vw,14px);letter-spacing:.08em;color:#B6D8D6;text-shadow:0 0 8px #000;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35;z-index:2}
+@media(max-width:640px){html #house-scene.hb-brand #hb3d-cap{font-size:11px}}
 /* Simplified / Advanced view (owner, 31 Oct) */
 body.vi-simple [data-adv],html body.vi-simple #topnav .tab-btn[data-adv]{display:none!important}
 body:not(.vi-simple) [data-simple]{display:none!important}
@@ -11514,17 +11512,13 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
         <div class="pops" id="hb-pops" aria-hidden="true"></div>
         <!-- HUD control buttons — inside scene, positioned correctly relative to it -->
-        <div class="hud-bar" id="hud-bar-house">
-          <button class="hud-btn" id="hud-zoom-in"  onclick="houseZoomIn()"  title="Zoom In"  aria-label="Zoom in"  style="font-size:1.1rem;font-weight:700;padding:0">+<svg class="hb-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-          <button class="hud-btn" id="hud-zoom-out" onclick="houseZoomOut()" title="Zoom Out" aria-label="Zoom out" style="font-size:1.2rem;font-weight:700;padding:0">−<svg class="hb-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
-          <div class="hud-sep"></div>
-          <button class="hud-btn hud-toggle" id="hud-orbit-toggle" onclick="toggleOrbitMode()" title="Toggle orbit mode" aria-label="Toggle orbit mode">
-            <span id="hud-orbit-icon">✥</span><svg class="hb-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg>
-          </button>
-          <div class="hud-sep"></div>
-          <button class="hud-btn" id="hud-row" onclick="hbJumpToRow()" title="Show the row I am on" aria-label="Show the row I am on" style="font-size:1rem">📍<svg class="hb-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/></svg></button>
-          <button class="hud-btn" id="hud-reset"   onclick="resetView()"    title="Reset view"  aria-label="Reset camera">↺<svg class="hb-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg></button>
-          <button class="hud-btn" onclick="toggleExpand()"                   title="Fullscreen"  aria-label="Fullscreen">⛶<svg class="hb-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
+        <div class="hud-bar" id="hud-bar-house" role="toolbar" aria-label="Camera">
+          <button class="hud-btn" id="hud-zoom-out" onclick="houseZoomOut()" title="Zoom out" aria-label="Zoom out"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-zoom-out"/></svg></button>
+          <button class="hud-btn" id="hud-zoom-in" onclick="houseZoomIn()" title="Zoom in" aria-label="Zoom in"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-zoom-in"/></svg></button>
+          <button class="hud-btn hud-toggle" id="hud-orbit-toggle" onclick="toggleOrbitMode()" title="Toggle orbit mode" aria-label="Toggle orbit mode"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-orbit"/></svg></button>
+          <button class="hud-btn" id="hud-row" onclick="hbJumpToRow()" title="Show the row I am on" aria-label="Show the row I am on"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-pin"/></svg></button>
+          <button class="hud-btn" id="hud-reset" onclick="resetView()" title="Reset camera" aria-label="Reset camera"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-reset"/></svg></button>
+          <button class="hud-btn" id="hud-full" onclick="toggleExpand()" title="Full screen" aria-label="Full screen"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-fullscreen"/></svg></button>
         </div>
       </div>
       <!-- Lay the bricks sits right under the viewport so the laying is seen (owner, 30 Oct 2026) -->
@@ -15724,7 +15718,7 @@ function hb3dBrandOverlays(v, sm, bi, rl, EW, EH) {
   var html = l1 + (l2 ? '<span>' + l2 + '</span>' : ''); if (rl._h !== html) { rl.innerHTML = html; rl._h = html; }
   var rlShow = pc.behind ? 'none' : 'block'; hbSty(rl, 'display', rlShow);
   var rs = hbSize(rl, html + '|' + fs + '|' + rlShow), tw = rs[0] || 150, th = rs[1] || fs * 2.9;   // measured again only when the text changes
-  var tx = Math.max(lpad, Math.min(W - tw - 6 - rail, pc.x + fs * 1.6)), ty = Math.max(6, Math.min(Ht - th - 30, pc.y - th - fs * 1.4));
+  var tx = Math.max(lpad, Math.min(W - tw - 6 - rail, pc.x + fs * 1.6)), ty = Math.max(6, Math.min(Ht - th - 96, pc.y - th - fs * 1.4));
   hbSty(rl, 'left', tx + 'px'); hbSty(rl, 'top', ty + 'px');
   var ld = $('.ld'), dot = $('.dot');
   hbAttr(ld, 'x1', pc.x); hbAttr(ld, 'y1', pc.y); hbAttr(ld, 'x2', tx + tw * 0.2); hbAttr(ld, 'y2', ty + th);

@@ -71,8 +71,8 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   ok(r.bi.row === r.rowWant && new RegExp('ROW ' + r.rowWant + ' / ' + r.bi.rows).test(r.label) && r.cls.includes('brand'), 'the gold tag shows the course of the last brick laid: ' + r.label);
   ok(/31\.3% OF DEPOSIT/.test(r.label) && /31\.3% of/.test(r.hud), 'tag and HUD agree on the percentage (31.3%)');
   ok(new RegExp('ROW\\s*' + r.rowWant + '\\s*of\\s*' + r.bi.rows, 'i').test(r.hud), 'HUD row card agrees (ROW ' + r.rowWant + ' of ' + r.bi.rows + ')');
-  const rail = await p.evaluate(() => { const h = document.getElementById('hud-bar-house'), s = document.getElementById('house-scene').getBoundingClientRect(), b = h.getBoundingClientRect(); return { dir: getComputedStyle(h).flexDirection, mid: Math.abs((b.top + b.bottom) / 2 - (s.top + s.bottom) / 2) }; });
-  ok(rail.dir === 'column' && rail.mid < 30, 'desktop: camera controls are a column on the right, centred (' + JSON.stringify(rail) + ')');
+  const rail = await p.evaluate(() => { const h = document.getElementById('hud-bar-house'), s = document.getElementById('house-scene').getBoundingClientRect(), b = h.getBoundingClientRect(); return { dir: getComputedStyle(h).flexDirection, mid: Math.abs((b.left + b.right) / 2 - (s.left + s.right) / 2), gap: Math.round(s.bottom - b.bottom) }; });
+  ok(rail.dir === 'row' && rail.mid < 4 && rail.gap >= 11 && rail.gap <= 13, 'desktop: camera controls are a row, bottom centre, 12 px up (v0.7 E18) (' + JSON.stringify(rail) + ')');
   ok(r.cap.includes(r.L.toLocaleString('en-GB') + ' / ' + r.N.toLocaleString('en-GB') + ' bricks') && /£7\.24 a brick/.test(r.cap), 'caption agrees: ' + r.cap);
   ok(r.pill === 'BRICK #' + r.L.toLocaleString('en-GB'), 'the last brick laid is ringed and numbered (' + r.pill + ')');
   ok(Math.abs(r.bi.y - (r.bi.last.y + 0.0325)) < 0.06 && r.bi.sliceA === 1, 'the gold slice sits on the course of the last brick');
@@ -122,8 +122,8 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   ok(r.sw <= r.iw, 'no sideways scroll at 390 px (' + r.sw + ' <= ' + r.iw + ')');
   ok(r.inside, 'the ROW tag stays inside the stage at 390 px');
   ok(r.dpr <= 1.5, 'pixel ratio capped at 1.5 below 700 px');
-  r = await p.evaluate(() => { const s = document.getElementById('house-scene').getBoundingClientRect(), h = document.getElementById('hud-bar-house'), b = h.getBoundingClientRect(), ic = h.querySelector('.hb-ico'); return { dir: getComputedStyle(h).flexDirection, top: b.top - s.top, right: s.right - b.right, ico: ic && getComputedStyle(ic).display, sw: b.right <= s.right + 1 && b.left >= s.left - 1 }; });
-  ok(r.dir === 'row' && r.top < 20 && r.right < 20 && r.sw, 'phone: camera controls are a row top right inside the stage (' + JSON.stringify(r) + ')');
+  r = await p.evaluate(() => { const s = document.getElementById('house-scene').getBoundingClientRect(), h = document.getElementById('hud-bar-house'), b = h.getBoundingClientRect(), ic = h.querySelector('svg'); return { dir: getComputedStyle(h).flexDirection, gap: Math.round(s.bottom - b.bottom), mid: Math.abs((b.left + b.right) / 2 - (s.left + s.right) / 2), ico: ic && getComputedStyle(ic).display, sw: b.right <= s.right + 1 && b.left >= s.left - 1 }; });
+  ok(r.dir === 'row' && r.gap >= 11 && r.gap <= 13 && r.mid < 4 && r.sw, 'phone: camera controls are a row, bottom centre inside the stage (v0.7 E18) (' + JSON.stringify(r) + ')');
   ok(r.ico === 'block', 'phone: the controls use the brand line icons');
   await p.context().close();
 
