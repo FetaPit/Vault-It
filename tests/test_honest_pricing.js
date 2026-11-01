@@ -4,7 +4,7 @@ const fs = require('fs');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const app = fs.readFileSync('/home/user/Vault-It/index.html', 'utf8'), page = fs.readFileSync('/home/user/Vault-It/landing.html', 'utf8');
 for (const [re, what] of [[/was £\d/, '"was £…" reference prices'], [/50% off/i, '"50% off" claims'], [/Offer expires/i, 'expiring-offer messages'],
-  [/£3\.59|£4\.49|£5\.09/, 'the old time-based discount prices'], [/Buffett|Munger|Squibb|Gary Stevenson —/, 'celebrity advisor cards'],
+  [/£3\.59|£4\.49|£5\.09/, 'the old time-based discount prices'], [/Buffett|Munger|Squibb|Stevenson/, 'celebrity advisor names, including code comments'],
   [/Invest once|Invest in you/i, 'investment wording'], [/spots left/i, 'a "spots left" countdown'],
   [/3cIfZbddA6UV5yR4GG2VG01/, 'the retired £59.99 annual Stripe link'], [/£59\.99/, 'the old £59.99 annual price']]) {
   ok(!re.test(app), 'app has no ' + what);
