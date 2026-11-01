@@ -96,7 +96,7 @@ function brandShell(title: string, body: string, footer: string): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#080808;padding:36px 16px"><tr><td align="center">
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:#080D14;border:1px solid #15302F;border-radius:18px;max-width:520px;width:100%">
 <tr><td style="padding:28px 36px 18px;border-bottom:1px solid #102221">
-<div style="font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1;color:#E8E8E8">Vault<span style="display:inline-block;width:8px;height:4px;background:#44C0B9;border-radius:1px;margin:0 2px;vertical-align:middle;position:relative;top:-2px"></span><span style="color:#44C0B9">It</span></div>
+<img src="https://vault-it.co/email/lockup.png" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">
 <div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div>
 </td></tr>
 <tr><td style="padding:26px 36px 10px">${body}</td></tr>

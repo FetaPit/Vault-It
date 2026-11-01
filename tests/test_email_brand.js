@@ -12,9 +12,9 @@ const load = (name) => {
   return { src, ex: m.exports };
 };
 const DG = load('feedback-digest'), FB = load('tester-feedback');
-const BRICK = /Vault<span style="[^"]*display:inline-block[^"]*background:#44C0B9[^"]*"><\/span><span style="color:#44C0B9">It<\/span>/;
+const BRICK = /<img src="https:\/\/vault-it\.co\/email\/lockup\.png"[^>]*alt="Vault-It"/;
 const checkBrand = (name, html) => {
-  ok(BRICK.test(html), name + ': logo is Vault, brick, teal It');
+  ok(BRICK.test(html), name + ': logo is the brand lockup picture');
   ok(/font-family:'Syne'/.test(html) && /font-family:'DM Sans'/.test(html), name + ': Syne headings and DM Sans body');
   ok(/background:#080808/.test(html) && /background:#080D14/.test(html) && /#15302F/.test(html), name + ': Night page, panel and border');
   ok(html.includes('Get out of the red and into your home.'), name + ': tagline');
@@ -33,10 +33,15 @@ ok(typeof FB.ex.urgentHtml === 'function', 'urgentHtml is exported');
 if (FB.ex.urgentHtml) checkBrand('urgent alert', FB.ex.urgentHtml(7, { type: 'bug', severity: 4, area: 'sign in', summary: 'Cannot sign in', steps: ['Open app'] }, 'Tess', 'login', 'text', ''));
 ok(typeof FB.ex.helpHtml === 'function', 'helpHtml is exported');
 if (FB.ex.helpHtml) checkBrand('unanswered help question', FB.ex.helpHtml(8, 'Tess', 'login', 'How do I add a card?', ''));
+// the picture itself: drawn from the brand book, shipped with the site, big enough for 3x screens
+const png = fs.readFileSync(__dirname + '/../site/email/lockup.png');
+ok(png.readUInt32BE(16) >= 600 && png.readUInt32BE(20) >= 150, 'lockup.png is a 3x picture (' + png.readUInt32BE(16) + 'x' + png.readUInt32BE(20) + ')');
+ok(/site\/email\/lockup\.png/.test(fs.readFileSync(__dirname + '/../tools/build_site.js', 'utf8')), 'build_site ships lockup.png to vault-it.co/email/');
+ok(/Syne/.test(fs.readFileSync(__dirname + '/../tools/build_email_lockup.js', 'utf8')) && /vault-it-logo-mark-mid\.svg/.test(fs.readFileSync(__dirname + '/../tools/build_email_lockup.js', 'utf8')), 'lockup is built from the brand book mid icon and Syne');
 // the other emails: lockup must match the same markup
 for (const f of ['send-auth-email', 'waitlist-join', 'waitlist-welcome']) {
   const s = fs.readFileSync(ROOT + f + '/index.ts', 'utf8');
-  ok(BRICK.test(s), f + ': logo is Vault, brick, teal It');
+  ok(BRICK.test(s), f + ': logo is the brand lockup picture');
   ok(s.includes('Not regulated by the FCA. Not financial advice.'), f + ': FCA line');
 }
 console.log(fails ? 'FAILURES ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);

@@ -274,8 +274,8 @@ export function groupBySeverity(rows: Row[]): Record<string, Row[]> {
   return g
 }
 
-/** The brand lockup for e-mail: Vault, a brick, It (same markup as send-auth-email; tests/test_email_brand.js checks every e-mail). */
-const LOCKUP = `<div style="font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1;color:#E8E8E8">Vault<span style="display:inline-block;width:8px;height:4px;background:#44C0B9;border-radius:1px;margin:0 2px;vertical-align:middle;position:relative;top:-2px"></span><span style="color:#44C0B9">It</span></div>`
+/** The brand lockup for e-mail: the mid icon and the Syne wordmark as a picture (mail clients cannot load Syne). Drawn by tools/build_email_lockup.js from the brand book; served from the landing site. */
+const LOCKUP = `<img src="https://vault-it.co/email/lockup.png" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">`
 function shell(title: string, body: string): string {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>${esc(title)}</title></head>
 <body style="margin:0;padding:24px 16px;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
