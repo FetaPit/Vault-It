@@ -8806,14 +8806,11 @@ body::before {
 @keyframes fire-spin{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.84)}}
 @media(max-width:700px){#fire-track{transform:none}.fire-coin.next{animation:none}}
 @media(prefers-reduced-motion:reduce){.fire-coin.next{animation:none}.fire-coin{transition:none}}
-.fire-block{margin:0 20px 12px;padding:12px 14px;border:1px solid rgb(var(--gold-rgb) / .5);border-radius:8px;background:rgb(var(--gold-rgb) / .07)}
-.fire-block .fb-t{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;color:var(--gold)}
-.fire-block .fb-s{font-size:.56rem;color:var(--t2);margin:4px 0 9px;line-height:1.5}
-.fire-block .fb-b{display:flex;gap:8px;flex-wrap:wrap}
-.fire-block button,.fd-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.54rem;letter-spacing:.04em;padding:7px 12px;border-radius:6px;cursor:pointer;color:var(--gold);background:rgb(var(--gold-rgb) / .12);border:1px solid rgb(var(--gold-rgb) / .55)}
-.fire-block button.ghost,.fd-btn.ghost{color:var(--t2);background:transparent;border-color:var(--bd)}
+.fd-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.54rem;letter-spacing:.04em;padding:7px 12px;border-radius:6px;cursor:pointer;color:var(--gold);background:rgb(var(--gold-rgb) / .12);border:1px solid rgb(var(--gold-rgb) / .55)}
+.fd-btn.ghost{color:var(--t2);background:transparent;border-color:var(--bd)}
 .fd-box{margin-top:8px;padding:9px 11px;border:1px solid rgb(var(--teal-rgb) / .25);border-radius:7px;background:rgb(var(--teal-rgb) / .05);font-size:.56rem;color:var(--t2);line-height:1.5}
 .fd-box.ok{border-color:rgb(var(--green-rgb) / .5);background:rgb(var(--green-rgb) / .07);color:#bfe9d3}
+html[data-theme="light"] .fd-box.ok{color:var(--t1);background:rgb(var(--green-rgb) / .12);border-color:rgb(var(--green-rgb) / .6)}
 .fd-box.warn{border-color:rgb(var(--amber-rgb) / .55);background:rgb(var(--amber-rgb) / .07)}
 .fd-box .fd-h{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:.14em;color:var(--t3);margin-bottom:3px}
 .fd-box ul{margin:0;padding-left:16px}.fd-box li{margin:2px 0}
@@ -8852,6 +8849,13 @@ body::before {
   transition: color .15s;
 }
 .fire-detail-close:hover { color: var(--em); }
+.fire-detail-close{top:0!important;right:0!important;width:44px;height:44px;display:grid;place-items:center;padding:0!important}
+.fire-detail-close .vi-ic{width:18px;height:18px}
+.fire-detail-inner{padding-right:30px}
+@keyframes fdIn{from{opacity:0;max-height:0}to{opacity:1;max-height:1200px}}
+.fire-detail-panel{overflow:hidden}
+.fire-detail-panel:not([style*="display: none"]):not([style*="display:none"]){animation:fdIn .24s ease-out}
+@media (prefers-reduced-motion:reduce){.fire-detail-panel{animation:none!important}}
 
 /* Hide old bento wrap */
 #fire-bento-wrap { display: none !important; }
@@ -11328,7 +11332,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#7d8793" stroke-width="1.2" stroke-dasharray="2.5 2.5"/><rect x="5.6" y="7.6" width="4.8" height="3.8" rx=".8" fill="#7d8793"/><path d="M6.6 7.6V6.4a1.4 1.4 0 0 1 2.8 0v1.2" fill="none" stroke="#7d8793" stroke-width="1"/></svg>Locked: finish earlier stages first</span>
         <span id="fire-progress-txt" style="margin-left:auto;color:var(--em)">0 of 30 achieved</span>
       </div>
-      <div id="fire-block" class="fire-block" style="display:none"></div>
       <!-- Horizontal scrolling timeline: the SVG is only the window of stages on screen -->
       <div class="fire-timeline-scroll" id="fire-timeline-scroll">
         <div id="fire-track" style="position:relative;height:280px"><svg id="fire-roadmap-svg" class="fire-timeline-svg"></svg></div>
@@ -11336,7 +11339,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <!-- Stage detail panel — shown on click -->
       <div class="fire-detail-panel" id="fire-detail-panel" style="display:none">
         <div class="fire-detail-inner" id="fire-detail-inner"></div>
-        <button onclick="document.getElementById('fire-detail-panel').style.display='none'" class="fire-detail-close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
+        <button type="button" onclick="fireCloseDetail()" class="fire-detail-close" aria-label="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
       </div>
     </div>
 
@@ -23425,18 +23428,6 @@ function renderFIREroadmap(){
   }
   var pt=document.getElementById('fire-progress-txt');
   if(pt)pt.textContent=doneCount+' of '+stages.length+' achieved'+(skipCount?' · '+skipCount+' skipped':'');
-  var bl=document.getElementById('fire-block');
-  if(bl){
-    var ns=stages[nextIdx>=0?nextIdx:0],w=stages.waiting||[];
-    if(nextIdx>=0&&w.length){
-      var names=w.slice(0,4).map(function(s){return s.name;}).join(', ')+(w.length>4?' …':'');
-      bl.style.display='';
-      bl.innerHTML='<div class="fb-t">🔓 <b>'+w.length+' later stage'+(w.length>1?'s are':' is')+' already met</b>, waiting on “'+ns.name+'”</div>'
-        +'<div class="fb-s">Stages unlock in order, so “'+ns.name+'” is holding back '+names+'. Complete it and they unlock straight away.</div>'
-        +'<div class="fb-b"><button type="button" onclick="fireScrollTo('+nextIdx+');fireShowDetail('+nextIdx+')">Fix “'+ns.name+'”</button>'
-        +'<button type="button" class="ghost" onclick="fireScrollTo('+nextIdx+');fireShowDetail('+nextIdx+',{skipAsk:true})">It doesn’t apply to me</button></div>';
-    }else bl.style.display='none';
-  }
   if(_fireDetailIdx>=0&&document.getElementById('fire-detail-panel')&&document.getElementById('fire-detail-panel').style.display!=='none')fireShowDetail(_fireDetailIdx,{keepAsk:true});
 
   var containerW=SC?SC.clientWidth:0;
@@ -23482,7 +23473,7 @@ function renderFIREroadmap(){
     var above=i%2===0;
     var namY=above?(LINE_Y-NODE_R-10):(LINE_Y+NODE_R+26);
     var descY=above?(LINE_Y-NODE_R-21):(LINE_Y+NODE_R+36);
-    var click=' style="cursor:pointer" onclick="fireShowDetail('+i+')"';
+    var click=' style="cursor:pointer" onclick="fireNodeTap('+i+')"';
 
     out+='<g class="fire-coin'+(isNext?' next':'')+(done?' done':'')+'" data-i="'+i+'">';
     out+='<line x1="'+cx+'" y1="'+(above?LINE_Y-NODE_R:LINE_Y+3)+'" x2="'+cx+'" y2="'+(above?LINE_Y-3:LINE_Y+NODE_R)+'" stroke="'+(done?col:'rgba(68,192,185,0.12)')+'" stroke-width="1"/>';
@@ -23496,6 +23487,7 @@ function renderFIREroadmap(){
         +'<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+11)+'" fill="none" stroke="'+col+'" stroke-width="3" opacity="0.14"/>';
     }
     if(done)out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+3)+'" fill="none" stroke="'+col+'" stroke-width="3" opacity="0.2"/>';
+    if(i===_fireDetailIdx)out+='<circle class="fire-sel" cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+5)+'" fill="none" stroke="var(--gold)" stroke-width="1"/>';   // the tapped stage: a 1 px gold ring (E3)
     // node body
     out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+NODE_R+'" fill="'+(done?col+'38':isNext?'rgba(10,18,30,0.95)':'rgba(6,12,22,0.92)')+'"'
       +' stroke="'+(done?col:(isNext||waiting)?col:skipped?'#e8a23c':'rgba(68,192,185,0.14)')+'" stroke-width="'+(done?2.4:isNext?2.2:(waiting||skipped)?1.6:1)+'"'
@@ -23628,7 +23620,8 @@ function fireShowDetail(idx,opts){
   var ph=FIRE_PHASES[s.phase],col=s.col||ph.col;
   var seq=String(idx+1).padStart(2,'0');
   var isNext=idx===S.nextIdx,waiting=s.raw&&!s.done&&!s.skipPass;
-  var state_=s.done?'ACHIEVED':s.skipPass?'SKIPPED':isNext?'IN PROGRESS':waiting?'MET · WAITING':'LOCKED';
+  var blk0=S.nextIdx>=0?S[S.nextIdx]:null;
+  var state_=s.done?'Achieved':s.skipPass?'Skipped':isNext?'Next up':(waiting&&blk0)?'Met. Waiting on '+blk0.name:'Locked';
   var stCol=s.done?'#3ecf8e':s.skipPass?'#e8a23c':(isNext||waiting)?col:'#7d8793';
   var long=(FIRE_LONG[idx]||s.desc);
   var progTxt='';
@@ -23645,6 +23638,7 @@ function fireShowDetail(idx,opts){
         +(!isNext&&blocker?'<div class="fd-sub">It comes after “'+blocker.name+'”, so stages unlock in order.</div>':'')+'</div>';
     }
   }
+  if(isNext&&!s.done&&(S.waiting||[]).length){var wn=S.waiting.length;need+='<div class="fd-box ok"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg>'+wn+' later stage'+(wn>1?'s are':' is')+' already met. '+(wn>1?'They tick':'It ticks')+' when you finish “'+s.name+'”.</div>';}
   var ticks=(s.confirms||[]).map(function(c){
     var on=c.k==='debtsMapped'?fireDebtsConfirmed():fireMan(c.k);
     return '<label class="fd-tick"><input type="checkbox" '+(on?'checked ':'')+'onchange="fireTick(\''+c.k+'\',this.checked)"><span>'+c.lbl+(c.sub?'<small>'+c.sub+'</small>':'')+'</span></label>';
@@ -23668,7 +23662,17 @@ function fireShowDetail(idx,opts){
     +'<div style="font-family:\'DM Sans\',sans-serif;font-size:.58rem;color:var(--t2);line-height:1.5">'+long+'</div>'
     +progTxt+need+ticks+btn+'</div>';
   panel.style.display='';
+  if(!opts.keepAsk)renderFIREroadmap();   // draws the gold ring on the tapped stage
 }
+function fireCloseDetail(){
+  var panel=document.getElementById('fire-detail-panel');if(panel)panel.style.display='none';
+  _fireDetailIdx=-1;_fireSkipAsk=-1;renderFIREroadmap();
+}
+function fireNodeTap(i){
+  var panel=document.getElementById('fire-detail-panel');
+  if(_fireDetailIdx===i&&panel&&panel.style.display!=='none')fireCloseDetail();else fireShowDetail(i);
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&_fireDetailIdx>=0){var p=document.getElementById('fire-detail-panel');if(p&&p.style.display!=='none')fireCloseDetail();}});
 
 // ── SUMMARY CARDS ─────────────────────────────────────────────
 function ovIcon(k,c){return '<span class="ov-sum-ri" style="color:'+c+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(OV_ICO[k]||OV_ICO.inv)+'</svg></span>';}
