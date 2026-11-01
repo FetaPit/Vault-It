@@ -7,7 +7,7 @@ const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
   const b = await chromium.launch();
-  for (const w of [390, 599, 600, 768, 1100]) {
+  for (const w of [390, 599, 600, 768, 884, 1100]) {
     const p = await b.newPage({ viewport: { width: w, height: 900 } }); const errs = [];
     p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(() => { localStorage.setItem('vi_declined_demo', 'true'); });

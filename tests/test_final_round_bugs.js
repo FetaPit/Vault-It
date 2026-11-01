@@ -33,6 +33,22 @@ async function open(b, w, type, errs) {
     const t = await p.evaluate(() => document.getElementById('hb-hud').textContent);
     ok(!/Counting bricks/.test(t) && !/…\s*of\s*…/i.test(t) && /UK bricks/i.test(t) && /\d,\d{3}\s*of\s*[\d,]+\s*UK bricks/i.test(t), 'b: the moment the model is built the HUD shows the real count (' + t.replace(/\s+/g, ' ').match(/.{0,20}UK bricks/i) + ')');
     await ctx.close(); }
+  // c) "£n lays n bricks" shows at 884 px (fold inner screen) and still at 390, 768, 1100, also when the amount is typed before the house model has landed
+  for (const w of [390, 768, 884, 1100]) {
+    const { ctx, p } = await open(b, w, 'terraced', errs);
+    await p.fill('#savingsInput', '5'); await p.waitForTimeout(300);
+    let ln = await p.evaluate(() => { const e = document.getElementById('hb-brick-line'), r = e.getBoundingClientRect(); return { t: e.textContent.trim(), vis: r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden' }; });
+    ok(/^£5 lays \d+ bricks?$/.test(ln.t) && ln.vis, 'c: ' + w + ' px: line shows (' + ln.t + ')');
+    if (w === 884) {   // typed while the model was not there: the line fills in when it lands
+      await p.evaluate(() => { window.requestIdleCallback = function () { return 0; }; HB3DAPP.models = {}; HB3DAPP.order = []; HB3DAPP.idle = {}; document.getElementById('savingsInput').value = ''; hbBrickLineUpdate(); });
+      await p.fill('#savingsInput', '5'); await p.waitForTimeout(200);
+      ok(await p.evaluate(() => document.getElementById('hb-brick-line').textContent.trim() === ''), 'c: 884 px: no model yet, the line is empty');
+      await p.evaluate(() => { hb3dModel(state.houseType, state.apartmentFloor); }); await p.waitForTimeout(600);
+      ln = await p.evaluate(() => document.getElementById('hb-brick-line').textContent.trim());
+      ok(/^£5 lays \d+ bricks?$/.test(ln), 'c: 884 px: the moment the model lands the line shows (' + ln + ')');
+    }
+    await ctx.close();
+  }
   ok(errs.length === 0, 'no page errors ' + errs.slice(0, 2).join(' | '));
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASS'); process.exit(fails ? 1 : 0);
 })();

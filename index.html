@@ -14815,6 +14815,7 @@ document.getElementById('priceInput').addEventListener('keydown',e=>{if(e.key===
 function hbBrickLineUpdate(){
   var el=document.getElementById('hb-brick-line'),inp=document.getElementById('savingsInput');if(!el||!inp)return;
   var v=parseFloat(inp.value),bi=state.houseMode==='purchased'?null:hbBrickInfo();
+  if(v>0&&!bi&&state.houseMode!=='purchased')window._hbHudWait=true;   // typed before the house model landed: hb3dModel fills the line in when it does
   if(!(v>0)||!bi||!(bi.perBrick>0)){el.textContent='';return;}
   var rate=window.VI_CURRENCY_RATE||1,sym=window.VI_CURRENCY_SYMBOL||'£',n=Math.floor(v/rate/bi.perBrick+1e-9);
   el.textContent=sym+v.toLocaleString('en-GB',{maximumFractionDigits:2})+' lays '+n.toLocaleString('en-GB')+(n===1?' brick':' bricks');
@@ -15699,7 +15700,7 @@ function hb3dModel(type, floor) {
     m = HB3D.build(type, { floor: floor, detail: hb3dDetail() });
     if (_pt) VIPERF.phase('build', performance.now() - _pt);
     HB3DAPP.models[k] = m; HB3DAPP.order.push(k);
-    if (window._hbHudWait) { window._hbHudWait = false; setTimeout(function () { try { hbRenderHUD(); hbWriteStats(); } catch (e) {} }, 0); }   // Level 1 card was on "Counting bricks…"
+    if (window._hbHudWait) { window._hbHudWait = false; setTimeout(function () { try { hbRenderHUD(); hbWriteStats(); hbBrickLineUpdate(); } catch (e) {} }, 0); }   // Level 1 card was on "Counting bricks…"
     while (HB3DAPP.order.length > 4) { var old = HB3DAPP.order.shift(); if (old !== HB3DAPP.key) delete HB3DAPP.models[old]; else HB3DAPP.order.push(old); if (HB3DAPP.order.length <= 4) break; }
   }
   return m;
