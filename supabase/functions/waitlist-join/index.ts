@@ -128,6 +128,68 @@ function confirmHtml(email: string, link: string, unsub: string, testing: boolea
   return brandShell('Confirm your place on the Vault-It beta list', body, footer)
 }
 
+// Welcome e-mail (owner, 1 Nov 2026). Copy: docs/marketing/welcome-email.html, written from the owner's own words. Sent once, only to people who
+// ticked the marketing box and then confirmed. Tests: tests/test_waitlist_server.js.
+function welcomeHtml(unsub: string): string {
+  const u = esc(unsub)
+  const body = `<p style="margin:0 0 8px;font-family:'Share Tech Mono',Menlo,Consolas,'Courier New',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#44C0B9">Welcome</p>
+<h1 style="margin:0 0 14px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8">Why Vault-It exists</h1>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">Hi there,</p>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">Thanks for joining. I&#39;m Pete, the person behind Vault-It.</p>
+<h2 style="margin:22px 0 8px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:800;line-height:1.3;color:#E8E8E8">The story</h2>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">I could not see where my contributions were going, or what value I actually owned. I looked for a whole strategy for building wealth and could not find one. So I made one.</p>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">I wanted to see what I was working towards, and exactly how much I needed to put in to lay one more brick, with real visual feedback.</p>
+<h2 style="margin:22px 0 8px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:800;line-height:1.3;color:#E8E8E8">What it is for</h2>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">Vault-It puts your debts, savings and house deposit on one map. You type in your own figures, and we never ask for your bank login. Every pound you save lays a brick on your house. What you owe sits below the ground, so being in debt is a starting line, not a failure screen. The aim: give anyone, even someone in debt, a live date for when they will hold the keys to their own home.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr><td><a href="https://app.vault-it.co" style="display:inline-block;background:#E8C56A;color:#1A1400;text-decoration:none;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:15px 24px;border-radius:12px">Open Vault-It</a></td></tr></table>
+<h2 style="margin:22px 0 8px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:800;line-height:1.3;color:#E8E8E8">Who is behind it</h2>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">I&#39;m a designer and founder. I run PT Live Design in Lincoln, where I have worked on branding and design since 2019. I have been a multimedia designer, including producing training resources for the Royal Air Force Officer Training Academy at Cranwell. I hold a Certified Professional in Psychology of Design from the London School of International Business, and I am a local leader for the Interaction Design Foundation.</p>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">Once a week I will send a short note: what is new, what I fixed, what got better. Reply to this e-mail any time. I read every reply.</p>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">Thanks,<br>Pete</p>`
+  const footer = `You are getting this because you confirmed your place on the Vault-It list and ticked the e-mail box. <a href="${u}" style="display:inline-block;padding:12px 0;color:#44C0B9">Unsubscribe in one click</a><br>${TRADER}`
+  return brandShell('Why Vault-It exists', body, footer)
+}
+const WELCOME_TEXT = (unsub: string) => `Hi there,
+
+Thanks for joining. I'm Pete, the person behind Vault-It.
+
+THE STORY
+I could not see where my contributions were going, or what value I actually owned. I looked for a whole strategy for building wealth and could not find one. So I made one.
+
+I wanted to see what I was working towards, and exactly how much I needed to put in to lay one more brick, with real visual feedback.
+
+WHAT IT IS FOR
+Vault-It puts your debts, savings and house deposit on one map. You type in your own figures, and we never ask for your bank login. Every pound you save lays a brick on your house. What you owe sits below the ground, so being in debt is a starting line, not a failure screen. The aim: give anyone, even someone in debt, a live date for when they will hold the keys to their own home.
+
+Open Vault-It: https://app.vault-it.co
+
+Once a week I will send a short note: what is new, what I fixed, what got better. Reply to this e-mail any time. I read every reply.
+
+Thanks,
+Pete
+
+Not regulated by the FCA. Not financial advice.
+Unsubscribe in one click: ${unsub}
+Vault-It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ · hello@vault-it.co`
+
+async function sendWelcome(admin: ReturnType<typeof createClient>, id: string, email: string): Promise<boolean> {
+  try {
+    const unsub = await unsubscribeUrl(id)
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: FROM_EMAIL, reply_to: 'hello@vault-it.co', to: [email], subject: 'Why Vault-It exists', html: welcomeHtml(unsub), text: WELCOME_TEXT(unsub),
+        headers: { 'List-Unsubscribe': `<${unsub}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
+      }),
+    })
+    if (!res.ok) { console.error('welcome send failed:', await res.json().catch(() => ({}))); return false }
+    const { error } = await admin.rpc('waitlist_mark_welcome', { p_id: id })
+    if (error) console.error('waitlist_mark_welcome failed:', error.message)
+    return true
+  } catch (e) { console.error('welcome send error:', String(e)); return false }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   if (req.method !== 'POST') return json({ error: 'method' }, 405)
@@ -148,6 +210,8 @@ Deno.serve(async (req: Request) => {
     if (error) { console.error('waitlist_confirm failed:', error.message); return json({ error: 'server' }, 500) }
     const row = Array.isArray(data) ? data[0] : data
     if (!row) return json({ error: 'invalid_link' }, 410)     // unknown, used or expired
+    // The welcome goes only to people who ticked the marketing box and have not had it yet (welcome_due). Best effort: the confirmation page never waits on it or fails because of it.
+    if (row.marketing_consent === true && row.welcome_due === true) await sendWelcome(admin, String(row.id), String(row.email))
     return json({ success: true, testing: !!row.wants_testing, unsubscribe: await unsubscribeUrl(String(row.id)) })
   }
 

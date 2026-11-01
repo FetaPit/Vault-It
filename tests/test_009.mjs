@@ -80,4 +80,23 @@ await req('trigger@example.com', true, false, H('8'));
 ok((await q(`select count(*)::int n from public.waitlist where email like 'stale%'`))[0].n === 0, 'unconfirmed requests older than 30 days are deleted');
 ok((await q(`select count(*)::int n from public.waitlist where email='kept@x.co'`))[0].n === 1, 'confirmed rows are never swept, however old');
 
+
+// migration 013: the welcome e-mail (owner, 1 Nov)
+try { await db.exec(fs.readFileSync(dir + '013_waitlist_welcome.sql', 'utf8')); await db.exec(fs.readFileSync(dir + '013_waitlist_welcome.sql', 'utf8')); ok(true, '013 runs, and twice'); } catch (e) { ok(false, '013: ' + e.message); }
+{
+  const mk = async (email, marketing, h) => { const id = (await req(email, true, marketing, h))[0].id; const c = (await q(`select * from public.waitlist_confirm($1)`, [h]))[0]; return { id, c }; };
+  const a = await mk('w1@example.com', true, H('a')), b = await mk('w2@example.com', false, H('b'));
+  ok(a.c.marketing_consent === true && b.c.marketing_consent === false, 'confirming returns whether the marketing box was ticked');
+  ok(a.c.welcome_due === true, 'a first confirmation says the welcome is due');
+  ok((await q(`select public.waitlist_mark_welcome($1) r`, [a.id]))[0].r === true, 'the welcome can be marked sent once');
+  ok((await q(`select public.waitlist_mark_welcome($1) r`, [a.id]))[0].r === false, '... and not a second time');
+  ok((await q(`select public.waitlist_mark_welcome($1) r`, [b.id]))[0].r === false && (await q(`select welcome_sent_at from public.waitlist where id=$1`, [b.id]))[0].welcome_sent_at === null, 'someone without the marketing box is never marked');
+  await req('w1@example.com', true, true, H('c')); const again = (await q(`select * from public.waitlist_confirm($1)`, [H('c')]))[0];
+  ok(again.marketing_consent === true && again.welcome_due === false, 'confirming again after re-joining says the welcome is NOT due');
+  await q(`select public.waitlist_unsubscribe($1)`, [a.id]);
+  ok((await q(`select public.waitlist_mark_welcome($1) r`, [a.id]))[0].r === false, 'nothing is marked for someone who has left');
+  let denied = false; try { await db.exec(`set role anon; select public.waitlist_mark_welcome('${a.id}')`); } catch (e) { denied = true; } await db.exec('reset role');
+  ok(denied, 'the browser role cannot call the new function');
+}
+
 console.log(fails ? '\n' + fails + ' FAILED' : '\nALL PASSED'); process.exit(fails ? 1 : 0);

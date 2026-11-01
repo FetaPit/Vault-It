@@ -23,8 +23,9 @@ globalThis.__createClient = () => ({
     if (fn === 'waitlist_confirm') {
       const r = Object.values(rows).find((x) => x.confirm_hash && x.confirm_hash === a.p_confirm_hash);
       if (!r) return { data: [], error: null };
-      Object.assign(r, { status: 'confirmed', wants_testing: r.req.p_testing, marketing: r.req.p_marketing, confirm_hash: null }); return { data: [{ id: r.id, email: r.email, wants_testing: r.wants_testing }], error: null };
+      Object.assign(r, { status: 'confirmed', wants_testing: r.req.p_testing, marketing: r.req.p_marketing, confirm_hash: null }); return { data: [{ id: r.id, email: r.email, wants_testing: r.wants_testing, marketing_consent: r.marketing === true, welcome_due: !r.welcome }], error: null };
     }
+    if (fn === 'waitlist_mark_welcome') { const r = Object.values(rows).find((x) => x.id === a.p_id); if (!r || r.welcome) return { data: false, error: null }; r.welcome = true; return { data: true, error: null }; }
     if (fn === 'waitlist_unsubscribe') { const r = Object.values(rows).find((x) => x.id === a.p_id); if (r) r.status = 'unsubscribed'; return { data: !!r, error: null }; }
     return { data: null, error: { message: 'unknown ' + fn } };
   },
@@ -88,6 +89,22 @@ const unsubOf = (m) => ((m.html.match(/href="(https:\/\/vault-it\.co\/sign-up\/u
   ok(r.s === 200 && r.b.success && r.b.testing === true && rows['pete@example.com'].status === 'confirmed', 'the link confirms the address and returns the tester choice');
   ok(/^https:\/\/vault-it\.co\/sign-up\/unsubscribe\?u=[0-9a-f-]{36}&s=[0-9a-f]{32}$/.test(r.b.unsubscribe), 'the confirmed page gets a signed leave link');
   r = await call({ action: 'confirm', token: new URL(link).searchParams.get('t') }); ok(r.s === 410, 'a used link does not work twice');
+  // welcome e-mail (owner, 1 Nov): once, only to people who ticked the marketing box
+  const nWel = () => sent.filter((m) => m.subject === 'Why Vault-It exists').length;
+  const welcomes = sent.filter((m) => m.subject === 'Why Vault-It exists');
+  ok(welcomes.length === 1 && welcomes[0].to[0] === 'pete@example.com' && rows['pete@example.com'].welcome === true, 'confirming with the marketing box ticked sends the welcome once and records it');
+  { const t3 = await call({ action: 'join', email: 'pete@example.com', marketing: true, testing: true }).then(() => new URL(linkOf(sent[sent.length - 1])).searchParams.get('t')); const k = nWel(); r = await call({ action: 'confirm', token: t3 }); ok(r.s === 200 && nWel() === k, 'joining and confirming again never sends the welcome a second time'); }
+  const w0 = welcomes[0];
+  ok(/lockup\.gif/.test(w0.html) && /Not regulated by the FCA\. Not financial advice\./.test(w0.html) && !/[—–]/.test(w0.html + w0.text) && /Why Vault-It exists/.test(w0.html), 'the welcome carries the brand lockup, the FCA line and no dashes');
+  ok(/sign-up\/unsubscribe\?u=[0-9a-f-]{36}&(amp;)?s=[0-9a-f]{32}/.test(w0.html) && /sign-up\/unsubscribe/.test(w0.headers['List-Unsubscribe']) && w0.headers['List-Unsubscribe-Post'] === 'List-Unsubscribe=One-Click', 'the welcome has a signed one-click unsubscribe link and header');
+  ok(/see what I was working towards/.test(w0.text) && /one more brick/.test(w0.text) && !/built every line|developer/i.test(w0.html + w0.text), 'the story is in the owner\'s words, no bragging');
+  ok(w0.reply_to === 'hello@vault-it.co', 'replies reach hello@vault-it.co');
+  const tok = (email, marketing) => call({ action: 'join', email, marketing, testing: true }).then(() => linkOf(sent[sent.length - 1])).then((l) => new URL(l).searchParams.get('t'));
+  const nW = () => sent.filter((m) => m.subject === 'Why Vault-It exists').length;
+  let t2 = await tok('nomarketing@example.com', false), c0 = nW();
+  r = await call({ action: 'confirm', token: t2 }); ok(r.s === 200 && nW() === c0 && !rows['nomarketing@example.com'].welcome, 'no marketing box ticked: confirmed, but no welcome is sent');
+  t2 = await tok('flaky@example.com', true); resendOk = false; r = await call({ action: 'confirm', token: t2 }); resendOk = true;
+  ok(r.s === 200 && r.b.success && !rows['flaky@example.com'].welcome, 'a failed welcome send never breaks the confirmation and is not recorded as sent');
   r = await call({ action: 'confirm', token: 'x'.repeat(43) }); ok(r.s === 410, 'an unknown token is refused');
   r = await call({ action: 'confirm', token: '<script>' }); ok(r.s === 400, 'a malformed token is refused before the database');
 
