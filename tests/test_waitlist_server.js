@@ -99,6 +99,8 @@ const unsubOf = (m) => ((m.html.match(/href="(https:\/\/vault-it\.co\/sign-up\/u
   ok(/sign-up\/unsubscribe\?u=[0-9a-f-]{36}&(amp;)?s=[0-9a-f]{32}/.test(w0.html) && /sign-up\/unsubscribe/.test(w0.headers['List-Unsubscribe']) && w0.headers['List-Unsubscribe-Post'] === 'List-Unsubscribe=One-Click', 'the welcome has a signed one-click unsubscribe link and header');
   ok(/see what I was working towards/.test(w0.text) && /one more brick/.test(w0.text) && !/built every line|developer/i.test(w0.html + w0.text), 'the story is in the owner\'s words, no bragging');
   ok(w0.reply_to === 'hello@vault-it.co', 'replies reach hello@vault-it.co');
+  ok(!/once a week|every week|weekly/i.test(w0.html + w0.text) && /When there is news I will send a short note/.test(w0.text), 'the welcome promises no weekly send that does not exist yet (owner, 1 Nov)');
+  ok(!/once a week|every week|weekly/i.test(require('fs').readFileSync(__dirname + '/../docs/marketing/welcome-email.html', 'utf8')), 'the welcome draft in docs/marketing makes no weekly promise either');
   const tok = (email, marketing) => call({ action: 'join', email, marketing, testing: true }).then(() => linkOf(sent[sent.length - 1])).then((l) => new URL(l).searchParams.get('t'));
   const nW = () => sent.filter((m) => m.subject === 'Why Vault-It exists').length;
   let t2 = await tok('nomarketing@example.com', false), c0 = nW();

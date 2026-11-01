@@ -45,7 +45,7 @@ const welcomeBody = `<p style="${EYEBROW}">Welcome</p>
 ${cta}
 <h2 style="${H2}">Who is behind it</h2>
 <p style="${P}">I&#39;m a designer and founder. I run PT Live Design in Lincoln, where I have worked on branding and design since 2019. I have been a multimedia designer, including producing training resources for the Royal Air Force Officer Training Academy at Cranwell. I hold a Certified Professional in Psychology of Design from the London School of International Business, and I am a local leader for the Interaction Design Foundation.</p>
-<p style="${P}">Once a week I will send a short note: what is new, what I fixed, what got better. Reply to this e-mail any time. I read every reply.</p>
+<p style="${P}">When there is news I will send a short note: what is new, what I fixed, what got better. Reply to this e-mail any time. I read every reply.</p>
 <p style="${P}">Thanks,<br>Pete</p>`;
 
 // Day 3 e-mail: the research, kept out of the welcome so the welcome stays short
