@@ -1,0 +1,759 @@
+<title>Forge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a game HUD. Character sheet on top, four tabs below (Today, Skills, Progress, Design).
+   Single dark world by choice: a forge at night. Ember = XP and action, gold = loot and levels. */
+:root{
+  color-scheme:dark;
+  --ink:#0E0B14; --hull:#17121F; --hull2:#1E1828; --rim:#2C2438; --rim2:#3A3049;
+  --bone:#EEE7F3; --dust:#A69CB4; --ash:#6D6479;
+  --ember:#FF7A3D; --gold:#F2C14E; --rose:#FF5A7E; --aqua:#3FD4C4;
+  --s-str:#FF7A3D; --s-end:#3FD4C4; --s-vit:#A585FF; --s-fuel:#F2C14E; --s-form:#8FD18A; --s-disc:#6FA8FF;
+  --f-disp:"Chakra Petch","Arial Narrow",Arial,sans-serif;
+  --f-body:"Figtree","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px; --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--ink);color:var(--bone)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;
+  background:radial-gradient(90% 60% at 20% -10%,#2A1530 0%,transparent 60%),radial-gradient(70% 50% at 100% 0%,#10262A 0%,transparent 60%),var(--ink)}
+.wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.wrap *{min-width:0}
+h1,h2,h3{font-family:var(--f-disp);font-weight:700;letter-spacing:.02em;margin:0;text-wrap:balance}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--dust)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--dust)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.panel{background:linear-gradient(180deg,var(--hull2),var(--hull));border:1px solid var(--rim);border-radius:var(--r)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid var(--rim2);color:var(--dust);white-space:nowrap}
+.chip.sample{border-color:#5a3a1f;color:var(--gold);background:#22180c}
+
+/* ---------- top bar ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h1{font-size:24px;letter-spacing:.18em}
+.brand svg{width:28px;height:28px}
+
+/* ---------- character sheet ---------- */
+.sheet{display:grid;grid-template-columns:300px 1fr;gap:0;overflow:hidden}
+.avatar{position:relative;border-right:1px solid var(--rim);background:radial-gradient(60% 55% at 50% 55%,#2b1a22 0%,transparent 70%),repeating-linear-gradient(0deg,rgba(63,212,196,.05) 0 1px,transparent 1px 4px);display:grid;place-items:center;padding:14px}
+.avatar svg{width:100%;max-width:270px;height:auto}
+.avatar .cls{position:absolute;left:14px;bottom:12px;right:14px;display:flex;justify-content:space-between;gap:8px;font-family:var(--f-mono);font-size:10px;color:var(--dust);text-transform:uppercase;letter-spacing:.08em}
+.body-seg{transition:fill-opacity .6s var(--ease)}
+.info{padding:18px 20px;display:grid;gap:16px;align-content:start}
+.idrow{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.lvl{display:flex;align-items:center;gap:14px}
+.lvlbadge{width:64px;height:64px;display:grid;place-items:center;font-family:var(--f-disp);font-weight:700;font-size:28px;color:var(--ink);background:var(--gold);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);box-shadow:0 0 30px rgba(242,193,78,.4)}
+.lvl h3{font-size:22px}
+.lvl .title{font-family:var(--f-mono);font-size:12px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.vitals{display:flex;gap:10px;flex-wrap:wrap}
+.vital{display:grid;gap:4px;min-width:118px;padding:8px 10px;border:1px solid var(--rim);border-radius:8px;background:rgba(0,0,0,.2)}
+.vital b{font-family:var(--f-mono);font-size:18px;font-weight:600}
+.vital span{font-size:11px;color:var(--dust);text-transform:uppercase;letter-spacing:.08em}
+.bar{height:8px;border-radius:999px;background:#0b0810;border:1px solid var(--rim);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:inherit;transition:width .8s var(--ease)}
+.xpbar{height:14px;position:relative}
+.xpbar i{background:linear-gradient(90deg,#b8441a,var(--ember) 60%,#ffb36b);box-shadow:0 0 16px rgba(255,122,61,.6)}
+.xpmeta{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px;color:var(--dust);margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{padding:10px 12px;border:1px solid var(--rim);border-radius:8px;background:rgba(0,0,0,.18);display:grid;gap:6px}
+.stat .h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.stat .k{font-family:var(--f-disp);font-weight:700;letter-spacing:.1em;font-size:14px}
+.stat .lv{font-family:var(--f-mono);font-size:13px}
+.stat .src{font-size:11px;color:var(--ash)}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--rim);overflow-x:auto}
+.tab{background:none;border:0;padding:10px 16px;font-family:var(--f-disp);font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:14px;color:var(--dust);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--bone);border-color:var(--ember)}
+.tab .sp{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;margin-left:6px;border-radius:999px;background:var(--gold);color:var(--ink);font-family:var(--f-mono);font-size:11px;letter-spacing:0}
+.view{display:grid;gap:18px}
+
+/* ---------- today ---------- */
+.today{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start}
+.col{display:grid;gap:18px}
+.card{padding:16px}
+.card > header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.quests{display:grid;gap:8px}
+.quest{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;width:100%;text-align:left;padding:10px 12px;border-radius:8px;border:1px solid var(--rim);background:rgba(0,0,0,.18);cursor:pointer;transition:border-color .2s,background .2s,transform .15s}
+.quest:hover{border-color:var(--rim2);background:rgba(255,255,255,.02)}
+.quest:active{transform:scale(.995)}
+.quest .ico{width:42px;height:32px;border-radius:8px;display:grid;place-items:center;font-family:var(--f-disp);font-weight:700;font-size:12px;border:1px solid currentColor}
+.quest .t{font-weight:600}
+.quest .m{font-size:12px;color:var(--dust);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.quest .m .bar{width:90px;height:5px}
+.quest .xp{font-family:var(--f-mono);font-size:13px;color:var(--ember);text-align:right}
+.quest.done{opacity:.55}
+.quest.done .t{text-decoration:line-through;text-decoration-color:var(--ash)}
+.quest.done .xp{color:var(--form,#8FD18A)}
+.quest.locked{cursor:default;border-style:dashed}
+.boss{position:relative;overflow:hidden}
+.boss .name{font-family:var(--f-disp);font-size:22px;font-weight:700}
+.boss .hp{height:16px;margin-top:10px}
+.boss .hp i{background:linear-gradient(90deg,#7a1630,var(--rose));box-shadow:0 0 14px rgba(255,90,126,.5)}
+.boss svg.monster{position:absolute;right:-10px;top:-6px;width:130px;opacity:.9}
+.log{display:grid;gap:6px;font-size:13px;max-height:220px;overflow:auto}
+.log div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--rim);padding-bottom:5px}
+.log .mono{color:var(--ember)}
+.streak{display:flex;align-items:center;gap:14px}
+.flame{width:46px;height:56px}
+.freeze{display:flex;gap:6px;margin-top:8px}
+.freeze i{width:18px;height:18px;border-radius:4px;border:1px solid var(--aqua);background:rgba(63,212,196,.18)}
+.freeze i.off{border-color:var(--rim2);background:none}
+
+/* ---------- skills ---------- */
+.skills{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start}
+.tree{padding:8px}
+.tree svg{width:100%;height:auto;display:block}
+.node{cursor:pointer}
+.node circle.c{transition:fill .3s,stroke .3s}
+.node text{font-family:var(--f-mono);font-size:9px;fill:var(--dust);text-anchor:middle;pointer-events:none}
+.node.owned text{fill:var(--bone)}
+.node.avail circle.c{animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{stroke-opacity:1}50%{stroke-opacity:.35}}
+.node.sel circle.ring{stroke:var(--gold)}
+.detail{padding:18px;display:grid;gap:12px;position:sticky;top:max(12px,env(safe-area-inset-top,0px))}
+.detail .branch{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+.detail h3{font-size:22px}
+.req{font-size:13px;color:var(--dust)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:8px;border:1px solid #ff9a63;background:linear-gradient(180deg,#ff8a4f,#e2602a);color:#1a0b03;font-family:var(--f-disp);font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.btn[disabled]{background:none;border-color:var(--rim2);color:var(--ash);cursor:not-allowed}
+.btn.ghost{background:none;color:var(--dust);border-color:var(--rim2)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--dust)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+/* ---------- progress ---------- */
+.prog{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.prog .wide{grid-column:1/-1}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{font-family:var(--f-mono);font-size:10px;fill:var(--ash)}
+.heat{overflow-x:auto}
+.heat text{font-family:var(--f-mono);font-size:10px;fill:var(--ash)}
+.heat svg{min-width:640px;width:100%;height:auto}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.badge{display:grid;justify-items:center;gap:6px;padding:12px 8px;border:1px solid var(--rim);border-radius:8px;text-align:center;background:rgba(0,0,0,.18)}
+.badge svg{width:44px;height:44px}
+.badge b{font-family:var(--f-disp);font-size:13px;letter-spacing:.04em}
+.badge small{font-size:11px;color:var(--dust);line-height:1.3}
+.badge.locked{opacity:.45}
+.trend{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.trend .big{font-family:var(--f-mono);font-size:24px;font-weight:600}
+.trend .delta{font-family:var(--f-mono);font-size:12px}
+
+/* ---------- design ---------- */
+.design{display:grid;grid-template-columns:1fr 1.2fr;gap:18px;align-items:start}
+.octa svg{width:100%;max-width:440px;height:auto;display:block;margin:0 auto}
+.octa text{font-family:var(--f-mono);font-size:10px;fill:var(--dust)}
+.drives{display:grid;gap:8px}
+.drive{display:grid;grid-template-columns:28px 1fr 40px;gap:10px;align-items:start;padding:10px;border:1px solid var(--rim);border-radius:8px;background:rgba(0,0,0,.18)}
+.drive .n{font-family:var(--f-disp);font-weight:700;font-size:18px;color:var(--gold)}
+.drive b{font-family:var(--f-disp);letter-spacing:.04em}
+.drive p{margin:2px 0 0;font-size:13px;color:var(--dust)}
+.drive .sc{font-family:var(--f-mono);text-align:right}
+.hat{font-family:var(--f-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:1px 6px;border-radius:4px;margin-left:6px}
+.hat.w{color:#cfe9ff;border:1px solid #33506b}
+.hat.b{color:#ffc2cf;border:1px solid #6b2f3d}
+.tblwrap{overflow-x:auto}
+.tblwrap table{width:100%;border-collapse:collapse;font-size:13px;min-width:620px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--rim);vertical-align:top}
+th{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ash);font-weight:400}
+.st{font-family:var(--f-mono);font-size:11px;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.st.ok{color:#a8f0b4;background:#13301b}
+.st.add{color:#ffd78a;background:#33260c}
+.st.chk{color:#ffb3c2;background:#331520}
+.guard{display:grid;gap:8px;margin:0;padding-left:18px;color:var(--dust);font-size:14px}
+.guard b{color:var(--bone)}
+
+/* ---------- fx ---------- */
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;padding:12px 18px;border-radius:10px;background:#221a2c;border:1px solid var(--gold);color:var(--bone);font-weight:600;transition:all .3s var(--ease);z-index:50;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.float{position:fixed;font-family:var(--f-mono);font-weight:600;color:var(--ember);pointer-events:none;z-index:60;text-shadow:0 0 10px rgba(255,122,61,.8);animation:rise 1.1s var(--ease) forwards}
+@keyframes rise{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-60px)}}
+.lvup{position:fixed;inset:0;display:grid;place-items:center;background:rgba(8,5,12,.78);z-index:70}
+.lvup[hidden]{display:none!important}
+.lvup .box{text-align:center;display:grid;gap:10px;justify-items:center;padding:28px;max-width:360px}
+.lvup .big{font-family:var(--f-disp);font-weight:700;font-size:64px;color:var(--gold);text-shadow:0 0 40px rgba(242,193,78,.6);line-height:1}
+.lvup .box .lvlbadge{width:96px;height:96px;font-size:40px;animation:pop .6s var(--ease)}
+@keyframes pop{from{transform:scale(.3) rotate(-30deg)}to{transform:scale(1) rotate(0)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+@media (max-width:900px){
+  .sheet,.today,.skills,.design{grid-template-columns:minmax(0,1fr)}
+  .avatar{border-right:0;border-bottom:1px solid var(--rim)}
+  .avatar svg{max-width:220px}
+  .detail{position:static}
+}
+@media (max-width:560px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .prog,.trend{grid-template-columns:1fr}
+  .vital{min-width:0;flex:1 1 40%}
+}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 28 9v14l-12 7-12-7V9z" fill="none" stroke="#FF7A3D" stroke-width="2"/><path d="M11 21l5-12 5 12M12.8 17h6.4" fill="none" stroke="#F2C14E" stroke-width="2" stroke-linecap="round"/></svg>
+      <h1>FORGE</h1>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span class="chip sample">Sample data</span>
+      <span class="chip" id="dateChip"></span>
+      <button class="chip" id="resetBtn" style="cursor:pointer;background:none">Reset demo</button>
+    </div>
+  </div>
+
+  <!-- CHARACTER SHEET -->
+  <section class="panel sheet" aria-label="Character sheet">
+    <div class="avatar">
+      <svg id="avatarSvg" viewBox="0 0 260 300" role="img" aria-label="Your physique, lit by the muscles trained this week"></svg>
+      <div class="cls"><span>Class: Recomp Ranger</span><span id="buildPct"></span></div>
+    </div>
+    <div class="info">
+      <div class="idrow">
+        <div class="lvl">
+          <div class="lvlbadge" id="lvlBadge">14</div>
+          <div>
+            <h3>Player One</h3>
+            <div class="title" id="titleTxt">Iron Initiate</div>
+          </div>
+        </div>
+        <div class="vitals">
+          <div class="vital"><span>HP · Recovery</span><b id="hpVal" style="color:var(--rose)">82</b><div class="bar"><i id="hpBar" style="background:var(--rose)"></i></div></div>
+          <div class="vital"><span>Fuel · Today</span><b id="fuelVal" style="color:var(--gold)">1,640</b><div class="bar"><i id="fuelBar" style="background:var(--gold)"></i></div></div>
+          <div class="vital"><span>Streak</span><b id="streakVal" style="color:var(--ember)">23 days</b><div class="bar"><i id="streakBar" style="background:var(--ember)"></i></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="bar xpbar"><i id="xpBar"></i></div>
+        <div class="xpmeta"><span id="xpTxt"></span><span id="xpNext"></span></div>
+      </div>
+      <div class="stats" id="stats"></div>
+    </div>
+  </section>
+
+  <!-- TABS -->
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="today" id="t-today">Today</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="skills" id="t-skills">Skill tree<span class="sp" id="spBadge">0</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="progress" id="t-progress">Progress</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="design" id="t-design">Design</button>
+  </div>
+
+  <!-- TODAY -->
+  <section class="view" data-view="today">
+    <div class="today">
+      <div class="panel card">
+        <header><h2>Daily quests</h2><span class="chip" id="questCount"></span></header>
+        <div class="quests" id="quests"></div>
+      </div>
+      <div class="col">
+        <div class="panel card boss">
+          <svg class="monster" viewBox="0 0 120 120" aria-hidden="true">
+            <path d="M10 100 L30 40 L45 60 L60 18 L75 60 L90 40 L110 100 Z" fill="#2a1420" stroke="#FF5A7E" stroke-width="2"/>
+            <circle cx="48" cy="74" r="5" fill="#FF5A7E"/><circle cx="72" cy="74" r="5" fill="#FF5A7E"/>
+            <path d="M44 90 h32" stroke="#FF5A7E" stroke-width="3" stroke-dasharray="4 3"/>
+          </svg>
+          <h2>Weekly boss</h2>
+          <div class="name">The Plateau</div>
+          <div class="muted" style="font-size:13px;max-width:30ch">Every XP you earn this week hits it. Skip a day and it heals 5%.</div>
+          <div class="bar hp"><i id="bossBar"></i></div>
+          <div class="xpmeta"><span id="bossTxt"></span><span>Resets Monday</span></div>
+          <div class="muted" style="font-size:12px;margin-top:8px">Drop: <b style="color:var(--gold)">Plateau Breaker</b> badge · +1 skill point</div>
+        </div>
+        <div class="panel card">
+          <header><h2>Streak</h2><span class="chip">Best 41</span></header>
+          <div class="streak">
+            <svg class="flame" viewBox="0 0 46 56" aria-hidden="true"><path d="M23 2c4 10 16 16 16 30a16 16 0 0 1-32 0c0-8 5-12 7-18 2 5 4 7 6 7-1-7 0-13 3-19z" fill="#FF7A3D"/><path d="M23 26c3 5 8 8 8 14a8 8 0 0 1-16 0c0-4 3-6 4-9 1 2 2 3 3 3 0-3 0-5 1-8z" fill="#F2C14E"/></svg>
+            <div>
+              <div class="mono" style="font-size:28px;font-weight:600" id="streakBig">23</div>
+              <div class="muted" style="font-size:13px">days with 3+ quests done</div>
+              <div class="freeze" id="freeze" title="Streak freezes"></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel card">
+          <header><h2>Battle log</h2></header>
+          <div class="log" id="log"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="view" data-view="skills" hidden>
+    <div class="skills">
+      <div class="panel tree">
+        <svg id="treeSvg" viewBox="-310 -300 620 600" role="img" aria-label="Skill tree with six branches"></svg>
+      </div>
+      <div class="col">
+        <div class="panel detail" id="detail"></div>
+        <div class="panel card">
+          <h2 style="margin-bottom:10px">How points work</h2>
+          <p class="muted" style="margin:0;font-size:14px">You earn 1 skill point per level, and the weekly boss drops one more. Each skill needs the one before it on its branch. Skills change how the game plays: new quest types, XP bonuses, streak freezes.</p>
+          <div class="legend" style="margin-top:12px">
+            <span><i style="background:var(--gold)"></i>Owned</span>
+            <span><i style="border:2px solid var(--ember)"></i>Can unlock</span>
+            <span><i style="background:var(--rim2)"></i>Locked</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="view" data-view="progress" hidden>
+    <div class="prog">
+      <div class="panel card chart wide">
+        <header><h2>XP per week, by stat</h2><div class="legend" id="xpLegend"></div></header>
+        <svg id="xpChart" viewBox="0 0 760 240" role="img" aria-label="Weekly XP for the last 12 weeks, stacked by stat"></svg>
+      </div>
+      <div class="panel card chart">
+        <header><h2>Body composition</h2><span class="chip">Hume</span></header>
+        <div class="trend">
+          <div><div class="muted" style="font-size:12px">Body fat</div><div class="big" id="bfNow"></div><div class="delta" id="bfDelta"></div><svg id="bfSpark" viewBox="0 0 220 70"></svg></div>
+          <div><div class="muted" style="font-size:12px">Lean mass</div><div class="big" id="lmNow"></div><div class="delta" id="lmDelta"></div><svg id="lmSpark" viewBox="0 0 220 70"></svg></div>
+        </div>
+      </div>
+      <div class="panel card chart">
+        <header><h2>Strength</h2><span class="chip">openGym</span></header>
+        <div class="trend">
+          <div><div class="muted" style="font-size:12px">Bench, est. 1RM</div><div class="big" id="bnNow"></div><div class="delta" id="bnDelta"></div><svg id="bnSpark" viewBox="0 0 220 70"></svg></div>
+          <div><div class="muted" style="font-size:12px">Squat, est. 1RM</div><div class="big" id="sqNow"></div><div class="delta" id="sqDelta"></div><svg id="sqSpark" viewBox="0 0 220 70"></svg></div>
+        </div>
+      </div>
+      <div class="panel card wide">
+        <header><h2>Quest days, last 40 weeks</h2><div class="legend"><span>Fewer</span><span id="heatKey"></span><span>More</span></div></header>
+        <div class="heat"><svg id="heat" viewBox="0 0 760 152" role="img" aria-label="Calendar heatmap of quests done per day"></svg></div>
+      </div>
+      <div class="panel card wide">
+        <header><h2>Achievements</h2><span class="chip" id="badgeCount"></span></header>
+        <div class="badges" id="badges"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESIGN -->
+  <section class="view" data-view="design" hidden>
+    <div class="design">
+      <div class="col">
+        <div class="panel card octa">
+          <header><h2>Octalysis coverage</h2><span class="chip" id="octaScore"></span></header>
+          <svg id="octa" viewBox="-220 -200 440 450" role="img" aria-label="Octalysis octagon showing how strongly Forge uses each of the 8 core drives"></svg>
+          <p class="muted" style="font-size:13px;margin:8px 0 0">Top drives (white hat) make you feel good about playing. Bottom drives (black hat) create urgency. For health we lean white hat and use black hat lightly, so the game never punishes rest or under-eating.</p>
+        </div>
+        <div class="panel card">
+          <h2 style="margin-bottom:10px">Guardrails</h2>
+          <ul class="guard">
+            <li><b>No reward for big deficits.</b> Fuel quests pay for hitting a range, never for eating less.</li>
+            <li><b>Rest is a quest.</b> Rest days and good sleep earn XP and streak freezes, so skipping training when wrecked never breaks the streak.</li>
+            <li><b>Recovery sets difficulty.</b> Low HP (poor sleep, high resting HR) swaps today's quests for easier ones.</li>
+            <li><b>Losses are capped.</b> The boss heals 5% per missed day. Levels and skills are never taken away.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col">
+        <div class="panel card">
+          <h2 style="margin-bottom:12px">The 8 core drives in Forge</h2>
+          <div class="drives" id="drives"></div>
+        </div>
+        <div class="panel card">
+          <header><h2>Where the data comes from</h2></header>
+          <div class="tblwrap"><table>
+            <thead><tr><th>App</th><th>What it gives</th><th>Path in</th><th>Feeds</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>openGym (your fork)</td><td>Workouts, sets, PRs, muscle volume, weigh-ins</td><td>Built in</td><td>STR, DISC</td><td><span class="st ok">Ready</span></td></tr>
+              <tr><td>Samsung Health</td><td>Steps, sleep, heart rate, active calories</td><td>Health Connect</td><td>END, VIT</td><td><span class="st add">Add read permissions</span></td></tr>
+              <tr><td>Hume</td><td>Weight, body fat, lean mass</td><td>Health Connect, if Hume syncs there</td><td>FORM</td><td><span class="st chk">Check Hume sync</span></td></tr>
+              <tr><td>Nutrition app</td><td>Calories, protein, macros, water</td><td>Health Connect nutrition records</td><td>FUEL</td><td><span class="st chk">Which app?</span></td></tr>
+              <tr><td>Lean for Life</td><td>Program check-ins, phase, weigh-ins</td><td>Quick log in Forge or CSV</td><td>DISC, FORM</td><td><span class="st chk">No public API seen</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="lvup" id="lvup" hidden>
+  <div class="box">
+    <div class="lvlbadge" id="lvupBadge">15</div>
+    <div class="big">LEVEL UP</div>
+    <div class="muted" id="lvupTxt">+1 skill point</div>
+    <button class="btn" id="lvupClose">Continue</button>
+  </div>
+</div>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// seeded random so the sample data is the same every load
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+const STATS = [
+  { k:'STR',  name:'Strength',    col:'--s-str',  src:'openGym' },
+  { k:'END',  name:'Endurance',   col:'--s-end',  src:'Samsung Health' },
+  { k:'VIT',  name:'Vitality',    col:'--s-vit',  src:'Sleep, HR' },
+  { k:'FUEL', name:'Nutrition',   col:'--s-fuel', src:'Nutrition app' },
+  { k:'FORM', name:'Body comp',   col:'--s-form', src:'Hume' },
+  { k:'DISC', name:'Discipline',  col:'--s-disc', src:'Streaks, Lean for Life' },
+];
+const statLevel = xp => Math.floor(Math.sqrt(xp / 40));
+const statNext = L => 40 * (L + 1) ** 2;
+const statCur = L => 40 * L ** 2;
+
+// level curve: XP from level L to L+1
+const need = L => Math.round(90 * L ** 1.55);
+const levelFrom = total => { let L = 1, t = total; while (t >= need(L)) { t -= need(L); L++; } return { L, into: t, need: need(L) }; };
+const cumTo = L => { let s = 0; for (let i = 1; i < L; i++) s += need(i); return s; };
+const TITLES = [[1,'Fresh Spawn'],[5,'Gym Rat'],[10,'Iron Initiate'],[15,'Forged'],[20,'Steel Ranger'],[30,'Titan'],[40,'Mythic']];
+const titleFor = L => TITLES.filter(t => L >= t[0]).pop()[1];
+
+const QUESTS = [
+  { id:'q1', s:'STR',  t:'Push day: bench 4 × 6 @ 82.5 kg', src:'openGym', xp:120 },
+  { id:'q2', s:'END',  t:'Walk 9,000 steps', src:'Samsung Health', xp:60, prog:[6240, 9000] },
+  { id:'q3', s:'FUEL', t:'Hit 160 g protein', src:'Nutrition app', xp:50, prog:[112, 160] },
+  { id:'q4', s:'FUEL', t:'Calories in range (2,100–2,400)', src:'Nutrition app', xp:30, prog:[1640, 2250] },
+  { id:'q5', s:'VIT',  t:'Lights out by 22:45', src:'Samsung Health', xp:40 },
+  { id:'q6', s:'FORM', t:'Morning weigh-in on the Body Pod', src:'Hume', xp:15, done:true },
+  { id:'q7', s:'DISC', t:'Lean for Life daily check-in', src:'Lean for Life', xp:25 },
+  { id:'q8', s:'VIT',  t:'Drink 3 L water', src:'Nutrition app', xp:20, prog:[1.8, 3] },
+];
+const MYSTERY = { id:'qm', t:'Mystery quest', sub:'Opens at 18:00', xp:'?' };
+const LOOT = ['Streak freeze', '2× XP on your next workout', 'Title: Night Owl Slayer', 'Bonus skill point', 'Cosmetic: Ember aura'];
+
+// ----- skill tree -----
+const BR = [
+  { s:'STR', a:0,   nodes:[['Iron Initiate','Log 5 workouts in openGym.','Unlocks strength quests.'],['Progressive Overload','STR level 4.','+15% XP on any session with a PR.'],['Compound King','STR level 6.','Bonus XP for squat, bench, deadlift and overhead press.'],['Plate Collector','STR level 9.','Tracks est. 1RM against strength standards and awards ranks.']] },
+  { s:'END', a:60,  nodes:[['First Steps','Average 6,000 steps for a week.','Unlocks step quests from Samsung Health.'],['Zone 2 Engine','END level 4.','Cardio sessions by heart rate zone pay XP.'],['Ten-K Club','END level 6.','10,000-step days drop loot.'],['Iron Lungs','END level 9.','Resting heart rate drops count as achievements.']] },
+  { s:'VIT', a:120, nodes:[['Sleep Hygiene','Log sleep for 7 nights.','Unlocks bedtime quests.'],['Recovery Sense','VIT level 4.','Low HP swaps in easier quests for the day.'],['Deep Rest','VIT level 6.','7.5 h+ nights earn double VIT.'],['Regenerator','VIT level 9.','5 good nights in a row earn a streak freeze.']] },
+  { s:'FUEL',a:180, nodes:[['Food Logger','Log meals 5 days.','Unlocks nutrition quests.'],['Protein Forge','FUEL level 4.','Protein target pays a combo bonus with workout days.'],['Macro Mage','FUEL level 6.','Hitting all three macros in range drops loot.'],['Hydra','FUEL level 9.','Water quests and a hydration meter on the HUD.']] },
+  { s:'FORM',a:240, nodes:[['First Scan','First Hume body scan.','Unlocks the physique hologram.'],['Recomp Path','FORM level 4.','Lean mass up while body fat falls counts as a milestone.'],['Lean Machine','FORM level 7.','Each 1% body fat lost is a boss-level reward.']] },
+  { s:'DISC',a:300, nodes:[['Daily Ritual','3 quests a day for 3 days.','Unlocks the streak flame.'],['Unbroken','30-day streak.','A free streak freeze each month.'],['Iron Will','DISC level 8.','Unlocks hard mode quests at 1.5× XP.']] },
+];
+const TREE = [{ id:'root', name:'Awakening', s:null, req:'Start the game.', eff:'Your character exists. Everything grows from here.', x:0, y:0, parent:null }];
+BR.forEach((b, bi) => b.nodes.forEach((n, i) => {
+  const r = 78 + i * 62, a = (b.a - 90) * Math.PI / 180, wob = (i % 2 ? 9 : -9) * Math.PI / 180;
+  TREE.push({ id:`${b.s}${i}`, name:n[0], req:n[1], eff:n[2], s:b.s, x:Math.cos(a + wob * (i ? 1 : 0)) * r, y:Math.sin(a + wob * (i ? 1 : 0)) * r, parent: i ? `${b.s}${i-1}` : 'root' });
+}));
+const byId = Object.fromEntries(TREE.map(n => [n.id, n]));
+
+// ----- state -----
+const KEY = 'forge_demo_v1';
+const fresh = () => ({
+  total: cumTo(14) + Math.round(need(14) * 0.71),
+  sxp: { STR:2620, END:1490, VIT:1180, FUEL:930, FORM:700, DISC:2050 },
+  done: { q6:true },
+  owned: ['root','STR0','STR1','STR2','END0','END1','VIT0','FUEL0','FORM0','DISC0','DISC1'],
+  bonusSP: 1,
+  boss: 1240,
+  log: [['Weigh-in on the Body Pod', 15], ['Slept 7 h 42 m', 40], ['Pull day, 3 PRs', 165]],
+  freezes: 2,
+});
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch { S = fresh(); }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} };
+const spLeft = () => (levelFrom(S.total).L - 1) + S.bonusSP - (S.owned.length - 1);
+const sLv = k => statLevel(S.sxp[k]);
+
+// ----- character sheet -----
+function drawAvatar() {
+  const svg = $('#avatarSvg'); svg.innerHTML = '';
+  const cx = 130, cy = 150, R = 120;
+  const defs = el('defs', {}, svg);
+  const pat = el('pattern', { id:'scan', width:4, height:4, patternUnits:'userSpaceOnUse' }, defs);
+  el('rect', { width:4, height:1, fill:'rgba(255,255,255,.12)' }, pat);
+  const glow = el('filter', { id:'glow', x:'-50%', y:'-50%', width:'200%', height:'200%' }, defs);
+  el('feGaussianBlur', { stdDeviation:3, result:'b' }, glow);
+  const m = el('feMerge', {}, glow); el('feMergeNode', { in:'b' }, m); el('feMergeNode', { in:'SourceGraphic' }, m);
+
+  // stat ring: one arc per stat, filled by progress to the next stat level
+  const pt = (r, a) => [cx + r * Math.sin(a * Math.PI / 180), cy - r * Math.cos(a * Math.PI / 180)];
+  const arc = (r, a0, a1) => { const [x0, y0] = pt(r, a0), [x1, y1] = pt(r, a1); return `M${x0} ${y0} A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1} ${y1}`; };
+  STATS.forEach((st, i) => {
+    const a0 = i * 60 + 4, a1 = i * 60 + 56, L = sLv(st.k);
+    const f = (S.sxp[st.k] - statCur(L)) / (statNext(L) - statCur(L));
+    el('path', { d:arc(R, a0, a1), stroke:css('--rim2'), 'stroke-width':6, fill:'none', 'stroke-linecap':'round' }, svg);
+    el('path', { d:arc(R, a0, a0 + (a1 - a0) * Math.max(.04, f)), stroke:css(st.col), 'stroke-width':6, fill:'none', 'stroke-linecap':'round', filter:'url(#glow)' }, svg);
+    const [lx, ly] = pt(R - 16, (a0 + a1) / 2);
+    const t = el('text', { x:lx, y:ly + 3, 'text-anchor':'middle', fill:css(st.col), 'font-family':'JetBrains Mono, monospace', 'font-size':9, 'font-weight':600 }, svg); t.textContent = st.k;
+  });
+
+  // physique: each region lit by how much it was trained this week (openGym body map volume)
+  const heat = { shoulders:.85, chest:.9, arms:.6, core:.35, quads:.55, calves:.2, head:.15 };
+  const fig = el('g', { transform:'translate(0,6)' }, svg);
+  const seg = (tag, attrs, region) => {
+    const base = Object.assign({ fill:css('--ember'), 'fill-opacity':heat[region], stroke:css('--aqua'), 'stroke-opacity':.7, 'stroke-width':1.2, class:'body-seg' }, attrs);
+    el(tag, base, fig);
+    el(tag, Object.assign({}, attrs, { fill:'url(#scan)' }), fig);
+  };
+  seg('circle', { cx:130, cy:62, r:15 }, 'head');
+  seg('path', { d:'M98 88 L162 88 L154 132 L106 132 Z' }, 'chest');
+  seg('circle', { cx:93, cy:94, r:11 }, 'shoulders'); seg('circle', { cx:167, cy:94, r:11 }, 'shoulders');
+  seg('rect', { x:78, y:104, width:13, height:42, rx:6, transform:'rotate(8 84 125)' }, 'arms');
+  seg('rect', { x:169, y:104, width:13, height:42, rx:6, transform:'rotate(-8 176 125)' }, 'arms');
+  seg('rect', { x:72, y:150, width:11, height:36, rx:5, transform:'rotate(8 78 168)' }, 'arms');
+  seg('rect', { x:177, y:150, width:11, height:36, rx:5, transform:'rotate(-8 182 168)' }, 'arms');
+  seg('path', { d:'M107 135 L153 135 L149 170 L111 170 Z' }, 'core');
+  seg('rect', { x:108, y:174, width:20, height:54, rx:8 }, 'quads'); seg('rect', { x:132, y:174, width:20, height:54, rx:8 }, 'quads');
+  seg('rect', { x:111, y:232, width:15, height:40, rx:6 }, 'calves'); seg('rect', { x:134, y:232, width:15, height:40, rx:6 }, 'calves');
+  const lit = Object.values(heat).reduce((a, b) => a + b, 0) / Object.keys(heat).length;
+  $('#buildPct').textContent = `Trained this week ${Math.round(lit * 100)}%`;
+}
+
+function drawSheet() {
+  const { L, into, need: nd } = levelFrom(S.total);
+  $('#lvlBadge').textContent = L;
+  $('#titleTxt').textContent = titleFor(L);
+  $('#xpBar').style.width = (into / nd * 100) + '%';
+  $('#xpTxt').textContent = `${fmt(into)} / ${fmt(nd)} XP`;
+  $('#xpNext').textContent = `${fmt(nd - into)} to level ${L + 1}`;
+  $('#hpVal').textContent = '82 / 100'; $('#hpBar').style.width = '82%';
+  const kcal = QUESTS.find(q => q.id === 'q4').prog;
+  $('#fuelVal').textContent = `${fmt(kcal[0])} kcal`; $('#fuelBar').style.width = (kcal[0] / kcal[1] * 100) + '%';
+  $('#streakVal').textContent = '23 days'; $('#streakBar').style.width = (23 / 30 * 100) + '%';
+  const box = $('#stats'); box.innerHTML = '';
+  STATS.forEach(st => {
+    const lv = sLv(st.k), f = (S.sxp[st.k] - statCur(lv)) / (statNext(lv) - statCur(lv));
+    const d = document.createElement('div'); d.className = 'stat';
+    d.innerHTML = `<div class="h"><span class="k" style="color:var(${st.col})">${st.k}</span><span class="lv">Lv ${lv}</span></div>
+      <div class="bar"><i style="width:${Math.max(3, f * 100)}%;background:var(${st.col})"></i></div>
+      <span class="src">${st.name} · ${st.src}</span>`;
+    box.appendChild(d);
+  });
+  const sp = spLeft(); $('#spBadge').textContent = sp; $('#spBadge').hidden = sp <= 0;
+  drawAvatar();
+}
+
+// ----- today -----
+function drawQuests() {
+  const box = $('#quests'); box.innerHTML = '';
+  let doneN = 0;
+  QUESTS.forEach(q => {
+    const st = STATS.find(s => s.k === q.s), done = !!S.done[q.id]; if (done) doneN++;
+    const b = document.createElement('button'); b.className = 'quest' + (done ? ' done' : ''); b.id = 'quest-' + q.id;
+    b.setAttribute('aria-pressed', done);
+    const prog = q.prog && !done ? `<span class="bar"><i style="width:${Math.min(100, q.prog[0] / q.prog[1] * 100)}%;background:var(${st.col})"></i></span><span class="mono">${q.prog[0].toLocaleString('en-US')} / ${q.prog[1].toLocaleString('en-US')}</span>` : '';
+    b.innerHTML = `<span class="ico" style="color:var(${st.col})">${q.s}</span>
+      <span><span class="t">${q.t}</span><span class="m"><span>${q.src}</span>${prog}</span></span>
+      <span class="xp">${done ? 'Done' : '+' + q.xp + ' XP'}</span>`;
+    b.onclick = e => toggleQuest(q, e);
+    box.appendChild(b);
+  });
+  const m = document.createElement('div'); m.className = 'quest locked';
+  m.innerHTML = `<span class="ico" style="color:var(--gold)">?</span><span><span class="t">${MYSTERY.t}</span><span class="m">${MYSTERY.sub} · could be anything from a 5-minute plank to a loot chest</span></span><span class="xp" style="color:var(--gold)">? XP</span>`;
+  box.appendChild(m);
+  $('#questCount').textContent = `${doneN} / ${QUESTS.length} done`;
+}
+
+function toggleQuest(q, e) {
+  const before = levelFrom(S.total).L;
+  if (S.done[q.id]) { delete S.done[q.id]; S.total -= q.xp; S.sxp[q.s] -= q.xp; S.boss -= q.xp; S.log = S.log.filter(l => l[0] !== q.t); }
+  else {
+    S.done[q.id] = true; S.total += q.xp; S.sxp[q.s] += q.xp; S.boss += q.xp; S.log.unshift([q.t, q.xp]);
+    floatXP(e, '+' + q.xp + ' XP');
+    if (rnd() < 0.28) { const l = LOOT[Math.floor(rnd() * LOOT.length)]; setTimeout(() => toast('Loot drop: ' + l), 500); if (l === 'Streak freeze') S.freezes = Math.min(3, S.freezes + 1); }
+  }
+  save(); render();
+  const after = levelFrom(S.total).L;
+  if (after > before) levelUp(after);
+}
+
+function drawBoss() {
+  const HP = 2000, dmg = Math.min(HP, S.boss);
+  $('#bossBar').style.width = ((HP - dmg) / HP * 100) + '%';
+  $('#bossTxt').textContent = dmg >= HP ? 'Defeated' : `${fmt(HP - dmg)} / ${fmt(HP)} HP left`;
+  const f = $('#freeze'); f.innerHTML = '';
+  for (let i = 0; i < 3; i++) { const x = document.createElement('i'); if (i >= S.freezes) x.className = 'off'; f.appendChild(x); }
+  f.title = `${S.freezes} of 3 streak freezes`;
+  const lg = $('#log'); lg.innerHTML = '';
+  S.log.slice(0, 10).forEach(([t, xp]) => { const d = document.createElement('div'); d.innerHTML = `<span>${t}</span><span class="mono">+${xp}</span>`; lg.appendChild(d); });
+}
+
+// ----- skill tree -----
+let selected = 'STR3';
+const nodeState = n => S.owned.includes(n.id) ? 'owned' : (n.parent && S.owned.includes(n.parent) ? 'avail' : 'locked');
+function drawTree() {
+  const svg = $('#treeSvg'); svg.innerHTML = '';
+  [80, 140, 202, 264].forEach(r => el('circle', { cx:0, cy:0, r, fill:'none', stroke:css('--rim'), 'stroke-dasharray':'2 6' }, svg));
+  TREE.forEach(n => { if (!n.parent) return; const p = byId[n.parent];
+    const owned = S.owned.includes(n.id);
+    el('line', { x1:p.x, y1:p.y, x2:n.x, y2:n.y, stroke: owned ? css(STATS.find(s => s.k === n.s).col) : css('--rim2'), 'stroke-width': owned ? 2.5 : 1.5, 'stroke-opacity': owned ? .9 : 1 }, svg); });
+  BR.forEach(b => { const a = (b.a - 90) * Math.PI / 180, r = 292;
+    const t = el('text', { x:Math.cos(a) * r, y:Math.sin(a) * r + 4, 'text-anchor':'middle', fill:css(STATS.find(s => s.k === b.s).col), 'font-family':'Chakra Petch, sans-serif', 'font-weight':700, 'font-size':13, 'letter-spacing':'1.5' }, svg);
+    t.textContent = b.s; });
+  TREE.forEach(n => {
+    const st = nodeState(n), col = n.s ? css(STATS.find(s => s.k === n.s).col) : css('--gold');
+    const g = el('g', { class:`node ${st}${selected === n.id ? ' sel' : ''}`, transform:`translate(${n.x},${n.y})`, tabindex:0, role:'button', 'aria-label':`${n.name}, ${st}` }, svg);
+    const r = n.id === 'root' ? 22 : 15;
+    el('circle', { class:'ring', r:r + 5, fill:'none', stroke:'transparent', 'stroke-width':2 }, g);
+    el('circle', { class:'c', r, fill: st === 'owned' ? col : css('--hull'), stroke: st === 'locked' ? css('--rim2') : col, 'stroke-width': st === 'avail' ? 2.5 : 1.5, filter: st === 'owned' ? 'url(#tglow)' : '' }, g);
+    if (st === 'locked') el('path', { d:'M-4 -1 h8 v6 h-8 z M-2.5 -1 v-2.5 a2.5 2.5 0 0 1 5 0 v2.5', fill:'none', stroke:css('--ash'), 'stroke-width':1.2 }, g);
+    const label = el('text', { y:r + 13 }, g); label.textContent = n.name;
+    g.addEventListener('click', () => { selected = n.id; drawTree(); drawDetail(); });
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selected = n.id; drawTree(); drawDetail(); } });
+  });
+  const defs = el('defs', {}, svg), f = el('filter', { id:'tglow', x:'-80%', y:'-80%', width:'260%', height:'260%' }, defs);
+  el('feGaussianBlur', { stdDeviation:4, result:'b' }, f); const m = el('feMerge', {}, f); el('feMergeNode', { in:'b' }, m); el('feMergeNode', { in:'SourceGraphic' }, m);
+}
+function drawDetail() {
+  const n = byId[selected], st = nodeState(n), sp = spLeft();
+  const stat = STATS.find(s => s.k === n.s);
+  const box = $('#detail');
+  const stateTxt = { owned:'Owned', avail:'Ready to unlock', locked:'Locked: unlock the skill before it first' }[st];
+  box.innerHTML = `<div class="branch" style="color:${stat ? `var(${stat.col})` : 'var(--gold)'}">${stat ? stat.name + ' branch' : 'Core'}</div>
+    <h3>${n.name}</h3>
+    <div>${n.eff}</div>
+    <div class="req">Requirement: ${n.req}</div>
+    <div class="req">${stateTxt}</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn" id="unlockBtn" ${st !== 'avail' || sp <= 0 ? 'disabled' : ''}>${st === 'owned' ? 'Owned' : 'Unlock · 1 SP'}</button>
+      <span class="mono muted" style="font-size:13px">${sp} SP available</span>
+    </div>`;
+  $('#unlockBtn').onclick = () => {
+    if (nodeState(n) !== 'avail' || spLeft() <= 0) return;
+    S.owned.push(n.id); save(); toast(`Skill unlocked: ${n.name}`); render();
+  };
+}
+
+// ----- progress -----
+const WEEKS = 12;
+const weekly = Array.from({ length:WEEKS }, (_, i) => {
+  const ramp = 0.55 + i / WEEKS * 0.6;
+  return { STR: (380 + rnd() * 160) * ramp, END:(190 + rnd() * 120) * ramp, VIT:(170 + rnd() * 70) * ramp, FUEL:(90 + rnd() * 120) * ramp * (i > 3 ? 1.4 : 1), FORM:(40 + rnd() * 30), DISC:(140 + rnd() * 60) * ramp };
+});
+if (weekly[7]) Object.keys(weekly[7]).forEach(k => weekly[7][k] *= .45); // a sick week, shown honestly
+function drawXPChart() {
+  const svg = $('#xpChart'); svg.innerHTML = '';
+  const W = 760, H = 240, pl = 44, pr = 10, pt = 10, pb = 26;
+  const tot = weekly.map(w => Object.values(w).reduce((a, b) => a + b, 0));
+  const max = Math.ceil(Math.max(...tot) / 500) * 500;
+  const y = v => pt + (H - pt - pb) * (1 - v / max);
+  for (let v = 0; v <= max; v += 500) {
+    el('line', { x1:pl, x2:W - pr, y1:y(v), y2:y(v), stroke:css('--rim'), 'stroke-width':1 }, svg);
+    const t = el('text', { x:pl - 8, y:y(v) + 3, 'text-anchor':'end' }, svg); t.textContent = fmt(v);
+  }
+  const bw = (W - pl - pr) / WEEKS;
+  weekly.forEach((w, i) => {
+    let acc = 0;
+    STATS.forEach(st => { const v = w[st.k];
+      el('rect', { x:pl + i * bw + bw * .18, width:bw * .64, y:y(acc + v), height:y(acc) - y(acc + v), fill:css(st.col), 'fill-opacity': i === WEEKS - 1 ? 1 : .78 }, svg); acc += v; });
+    const t = el('text', { x:pl + i * bw + bw / 2, y:H - 8, 'text-anchor':'middle' }, svg); t.textContent = i === WEEKS - 1 ? 'This wk' : `W${i + 1}`;
+  });
+  const last = tot[WEEKS - 1], lt = el('text', { x:pl + (WEEKS - .5) * bw, y:y(last) - 6, 'text-anchor':'middle', fill:css('--bone'), 'font-weight':600 }, svg); lt.textContent = fmt(last);
+  const sick = el('text', { x:pl + 7.5 * bw, y:y(tot[7]) - 6, 'text-anchor':'middle' }, svg); sick.textContent = 'sick';
+  $('#xpLegend').innerHTML = STATS.map(s => `<span><i style="background:var(${s.col})"></i>${s.k}</span>`).join('');
+}
+function spark(id, data, col, unit, nowId, deltaId, goodDown, dp = 1) {
+  const svg = $(id); svg.innerHTML = '';
+  const W = 220, H = 70, p = 6, mn = Math.min(...data), mx = Math.max(...data), rg = mx - mn || 1;
+  const X = i => p + (W - 2 * p) * i / (data.length - 1), Y = v => p + (H - 2 * p) * (1 - (v - mn) / rg);
+  const line = data.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join(' ');
+  el('path', { d:`${line} L${X(data.length - 1)} ${H} L${X(0)} ${H} Z`, fill:col, 'fill-opacity':.12 }, svg);
+  el('path', { d:line, fill:'none', stroke:col, 'stroke-width':2 }, svg);
+  el('circle', { cx:X(data.length - 1), cy:Y(data[data.length - 1]), r:3.5, fill:col }, svg);
+  const now = data[data.length - 1], d = now - data[0], good = goodDown ? d < 0 : d > 0;
+  $(nowId).textContent = now.toFixed(dp) + unit;
+  $(deltaId).innerHTML = `<span style="color:${good ? 'var(--s-form)' : 'var(--rose)'}">${d > 0 ? '+' : ''}${d.toFixed(dp)}${unit}</span> <span class="muted">in 12 weeks</span>`;
+}
+function drawProgress() {
+  drawXPChart();
+  const bf = Array.from({ length:12 }, (_, i) => 24.6 - i * .32 + (rnd() - .5) * .5);
+  const lm = Array.from({ length:12 }, (_, i) => 61.2 + i * .14 + (rnd() - .5) * .3);
+  const bn = Array.from({ length:12 }, (_, i) => 88 + i * 1.1 + (rnd() - .5) * 1.4);
+  const sq = Array.from({ length:12 }, (_, i) => 112 + i * 1.8 + (rnd() - .5) * 2);
+  spark('#bfSpark', bf, css('--s-form'), '%', '#bfNow', '#bfDelta', true);
+  spark('#lmSpark', lm, css('--s-form'), ' kg', '#lmNow', '#lmDelta', false);
+  spark('#bnSpark', bn, css('--s-str'), ' kg', '#bnNow', '#bnDelta', false, 0);
+  spark('#sqSpark', sq, css('--s-str'), ' kg', '#sqNow', '#sqDelta', false, 0);
+
+  // heatmap: 20 weeks × 7 days, quests done per day (0–8)
+  const svg = $('#heat'); svg.innerHTML = '';
+  const cell = 15, gap = 3, ox = 34, oy = 22, ramp = ['#1d1726', '#4a2618', '#8a3c19', '#d4602a', '#ff9a5c'];
+  ['Mon','Wed','Fri','Sun'].forEach((d, i) => { const t = el('text', { x:0, y:oy + [0, 2, 4, 6][i] * (cell + gap) + 11 }, svg); t.textContent = d; });
+  for (let w = 0; w < 40; w++) for (let d = 0; d < 7; d++) {
+    const streakZone = w * 7 + d >= 280 - 23 - 2;
+    let n = Math.floor(rnd() * 7); if (streakZone) n = 3 + Math.floor(rnd() * 5); if (w === 31 && d > 1) n = Math.floor(rnd() * 2);
+    if (w === 39 && d > 5) n = -1;
+    if (n < 0) continue;
+    el('rect', { x:ox + w * (cell + gap), y:oy + d * (cell + gap), width:cell, height:cell, rx:3, fill:ramp[Math.min(4, Math.floor(n / 2))] }, svg).appendChild(Object.assign(document.createElementNS(NS, 'title'), { textContent:`${n} quests` }));
+  }
+  ['Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'].forEach((m, i) => { const t = el('text', { x:ox + Math.round(i * 4.35 + 1) * (cell + gap), y:12 }, svg); t.textContent = m; });
+  $('#heatKey').innerHTML = ramp.map(c => `<i style="background:${c};border-radius:3px"></i>`).join('');
+
+  const B = [
+    ['First Blood','Finish your first logged workout.',1,'--s-str'],['PR Hunter','Set 10 personal records.',1,'--s-str'],['Week Warrior','7-day streak.',1,'--s-disc'],
+    ['Sleep Sage','7 nights over 7 hours.',1,'--s-vit'],['Protein Forge','Hit protein 14 days.',1,'--s-fuel'],['Recomp','Body fat down, lean mass up, same month.',1,'--s-form'],
+    ['Plateau Breaker','Beat the weekly boss.',0,'--rose'],['Ten-K Club','10,000 steps, 10 days.',0,'--s-end'],['Unbroken','30-day streak.',0,'--s-disc'],
+    ['???','Hidden. Keep playing.',0,'--gold'],['???','Hidden. Keep playing.',0,'--gold'],['Centurion','100 workouts.',0,'--s-str'],
+  ];
+  $('#badges').innerHTML = B.map(([n, d, got, c]) => `<div class="badge${got ? '' : ' locked'}">
+    <svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 2 39 12v20L22 42 5 32V12z" fill="${got ? `var(${c})` : 'none'}" fill-opacity=".2" stroke="var(${got ? c : '--rim2'})" stroke-width="2"/><path d="M15 23l5 5 9-11" fill="none" stroke="var(${got ? c : '--rim2'})" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" ${got ? '' : 'opacity=".0"'}/>${got ? '' : '<text x="22" y="27" text-anchor="middle" font-family="Chakra Petch" font-size="13" fill="#6D6479">?</text>'}</svg>
+    <b>${n}</b><small>${d}</small></div>`).join('');
+  $('#badgeCount').textContent = `${B.filter(b => b[2]).length} / ${B.length}`;
+}
+
+// ----- design: octalysis -----
+const DRIVES = [
+  { n:1, name:'Epic Meaning & Calling', hat:'w', sc:7, how:'A main quest you write yourself ("strongest I have been by 40"), a class, and a title that changes as you level.' },
+  { n:2, name:'Development & Accomplishment', hat:'w', sc:10, how:'XP, levels, six stats, PRs, the skill tree, badges and the weekly boss. The core loop.' },
+  { n:3, name:'Empowerment of Creativity & Feedback', hat:'w', sc:8, how:'You choose your skill build and quests. Live feedback: the physique hologram lights up by muscle trained.' },
+  { n:4, name:'Ownership & Possession', hat:'w', sc:9, how:'Your character, titles, cosmetics and streak freezes. Your data lives on your own openGym server.' },
+  { n:5, name:'Social Influence & Relatedness', hat:'w', sc:5, how:'Planned: a two-person party with a training partner, shared boss fights and share cards.' },
+  { n:6, name:'Scarcity & Impatience', hat:'b', sc:6, how:'The mystery quest opens at 18:00, skills are gated by stat level, freezes cap at 3.' },
+  { n:7, name:'Unpredictability & Curiosity', hat:'b', sc:8, how:'Loot drops on quest completion, hidden achievements, the mystery quest.' },
+  { n:8, name:'Loss & Avoidance', hat:'b', sc:4, how:'The streak flame and a boss that heals 5% per missed day. Kept light on purpose.' },
+];
+function drawOcta() {
+  const svg = $('#octa'); svg.innerHTML = '';
+  // Octalysis layout: 1 top, 2 upper-left, 3 upper-right, 4 left, 5 right, 6 lower-left, 7 lower-right, 8 bottom
+  const ang = { 1:0, 3:45, 5:90, 7:135, 8:180, 6:225, 4:270, 2:315 };
+  const R = 140, P = (r, a) => [r * Math.sin(a * Math.PI / 180), -r * Math.cos(a * Math.PI / 180)];
+  const order = [1, 3, 5, 7, 8, 6, 4, 2];
+  [.25, .5, .75, 1].forEach(f => el('polygon', { points:order.map(n => P(R * f, ang[n]).join(',')).join(' '), fill: f === 1 ? css('--hull') : 'none', stroke:css('--rim2'), 'stroke-width':1 }, svg));
+  el('line', { x1:-R - 30, x2:R + 30, y1:0, y2:0, stroke:css('--rim2'), 'stroke-dasharray':'3 5' }, svg);
+  el('line', { x1:0, x2:0, y1:-R - 10, y2:R + 10, stroke:css('--rim2'), 'stroke-dasharray':'3 5' }, svg);
+  el('polygon', { points:order.map(n => P(R * DRIVES[n - 1].sc / 10, ang[n]).join(',')).join(' '), fill:css('--ember'), 'fill-opacity':.25, stroke:css('--ember'), 'stroke-width':2 }, svg);
+  order.forEach(n => { const d = DRIVES[n - 1], [x, y] = P(R * d.sc / 10, ang[n]); el('circle', { cx:x, cy:y, r:4, fill:css('--ember') }, svg);
+    const [lx, ly] = P(R + 26, ang[n]), t = el('text', { x:lx, y:ly + 4, 'text-anchor': Math.abs(lx) < 5 ? 'middle' : lx > 0 ? 'start' : 'end', fill:css('--bone'), 'font-family':'Chakra Petch, sans-serif', 'font-size':12, 'font-weight':700 }, svg);
+    t.textContent = `${n} · ${d.sc}`; });
+  [['Left brain', -R - 34, -R + 6, 'start'], ['Right brain', R + 34, -R + 6, 'end'], ['White hat ↑', -R - 34, R + 40, 'start'], ['Black hat ↓', R + 34, R + 40, 'end']].forEach(([s, x, y, a]) => { const t = el('text', { x, y, 'text-anchor':a }, svg); t.textContent = s; });
+  const total = DRIVES.reduce((a, d) => a + d.sc, 0);
+  $('#octaScore').textContent = `Score ${total} / 80`;
+  $('#drives').innerHTML = DRIVES.map(d => `<div class="drive"><span class="n">${d.n}</span><div><b>${d.name}</b><span class="hat ${d.hat}">${d.hat === 'w' ? 'White hat' : 'Black hat'}</span><p>${d.how}</p></div><span class="sc">${d.sc}/10</span></div>`).join('');
+}
+
+// ----- fx -----
+let tt;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 2600); }
+function floatXP(e, txt) { const r = e.currentTarget.getBoundingClientRect(); const f = document.createElement('div'); f.className = 'float'; f.textContent = txt; f.style.left = (r.right - 90) + 'px'; f.style.top = (r.top + 4) + 'px'; document.body.appendChild(f); setTimeout(() => f.remove(), 1200); }
+function levelUp(L) { $('#lvupBadge').textContent = L; $('#lvupTxt').textContent = `Level ${L} · ${titleFor(L)} · +1 skill point`; $('#lvup').hidden = false; $('#lvupClose').focus(); }
+$('#lvupClose').onclick = () => { $('#lvup').hidden = true; };
+
+// ----- tabs & boot -----
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+  document.querySelectorAll('.view').forEach(v => v.hidden = v.dataset.view !== t.dataset.tab);
+  try { localStorage.setItem(KEY + '_tab', t.dataset.tab); } catch {}
+});
+$('#resetBtn').onclick = () => { S = fresh(); save(); render(); toast('Demo reset'); };
+$('#dateChip').textContent = new Date().toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+
+function render() { drawSheet(); drawQuests(); drawBoss(); drawTree(); drawDetail(); }
+render(); drawProgress(); drawOcta();
+try { const tab = localStorage.getItem(KEY + '_tab'); if (tab) document.querySelector(`.tab[data-tab="${tab}"]`)?.click(); } catch {}
+})();
+</script>
