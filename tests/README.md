@@ -48,6 +48,8 @@ node tests/test_value_hist.js         # Round 3 (8): each wealth item keeps one 
 node tests/test_icons.js              # Icons: embedded coin logos work offline, no emoji fallback; inventory and liability items are the brand block, blank until a brand icon is picked; old emoji choices map to brand icons
 node tests/test_bank_logos.js         # Bank and platform logos: cash accounts get their bank's logo from the name (initials offline, brand bank icon when unknown); more platforms for pies
 node tests/test_feedback_client.js     # Tester feedback in the app: button, sheet, picture with figures hidden, context without figures, activity log and its Settings switch, moment prompts, privacy notice
+node tests/test_help_centre.js       # Help centre: ? in the header, tour once after the welcome and Pete's note with a skip, Settings replay, FAQs, chat from FAQs and own numbers, help-ask and unanswered questions filed
+node tests/test_help_server.js       # help-ask (Haiku, guide only, amounts stripped, limits, unsure) and tester-feedback e-mailing each unanswered help question
 node tests/test_crypto_live.js         # Round 3: crypto prices fetched by themselves (CoinGecko mocked), tokens held, price source and age, bigger icons, last price kept on failure
 node tests/test_i3d_live.js           # Round 3: desktop, hover a model tile to orbit it by click and drag (one live view), click opens the viewer; touch keeps the picture
 node tests/test_ledger.js             # Round 3: the side bar ledger lists every money figure with its icon, each equal to its tab; also the Savings rate line and the stale-price note

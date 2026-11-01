@@ -19,6 +19,10 @@ Thanks for trying Vault-It, a UK personal-finance app that turns your numbers in
 - **House Builder** — pick a house, set a deposit target and add savings. The house is built as a ghost while you save the deposit; once you're in mortgage mode it fills with colour. Try the 3D view.
 - **A second device** — sign in again with email + PIN and check your data is there.
 
+## Help, FAQs and the tour
+
+Tap **?** in the header for help. **Ask** answers questions about the app and your own numbers (your keys date, debts, deposit), **FAQs** lists the common questions and **Tour** walks you round each tab. The tour runs once after the welcome steps (skip it if you like); replay it any time from **Settings, Replay the app tour**. Questions the help cannot answer go to Pete so he can add an answer.
+
 ## Tell us what you find
 
 Anything confusing, broken, slow or ugly is useful, especially on your phone.
