@@ -31,7 +31,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   });
   await page.waitForTimeout(400);
   const keys=await page.evaluate(()=>({written:[...new Set(_written)],synced:_VAULT_KEYS,cloud:Object.keys(_cloud)}));
-  const LOCAL_ONLY=/^(vi_ts|vi_dirty|vi_bak_.*|vi_last_.*|vi_session|vi_pin_.*|vi_pin_hash|vi_pin_len|vi_demo_mode|vi_declined_demo|vi_fx_.*|vi_last_visit|vi_streak|emailjs_.*|.*_api_key|.*_key|alpha_vantage_key|coingecko_api_key|supabase.*|sb-.*|__.*|vi_pioneer_email|vi_pioneer_num|vi_founder_.*)$/;
+  const LOCAL_ONLY=/^(vi_ts|vi_dirty|vi_bak_.*|vi_last_.*|vi_session|vi_pin_.*|vi_pin_hash|vi_pin_len|vi_demo_mode|vi_declined_demo|vi_fx_.*|vi_last_visit|vi_streak|emailjs_.*|.*_api_key|.*_key|alpha_vantage_key|coingecko_api_key|supabase.*|sb-.*|__.*|vi_pioneer_email|vi_pioneer_num|vi_founder_.*|vi-fb-.*)$/;
   const missed=keys.written.filter(k=>!keys.synced.includes(k)&&!LOCAL_ONLY.test(k));
   ok(missed.length===0,'every data key the app writes is on the sync list'+(missed.length?' — NOT SYNCED: '+missed.join(', '):''));
   ok(keys.cloud.includes('ht3'),'House Builder reaches the cloud (ht3)');

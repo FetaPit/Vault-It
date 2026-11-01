@@ -27851,13 +27851,13 @@ function init(){
       var onStage=function(){var q=b.getBoundingClientRect();return [].some.call(document.querySelectorAll('.nw3d-stage,.inv-stage,.i3d-stage'),function(s){var t=s.getBoundingClientRect();return t.width>0&&getComputedStyle(s).visibility!=='hidden'&&!(q.right<=t.left||q.left>=t.right||q.bottom<=t.top||q.top>=t.bottom)})};
       var hit=function(){var pts=[[r.left+4,r.top+4],[r.right-4,r.top+4],[r.left+4,r.bottom-4],[r.right-4,r.bottom-4],[r.left+r.width/2,r.top+r.height/2]];
         return pts.some(function(q){return document.elementsFromPoint(q[0],q[1]).some(function(el){return el!==b&&!b.contains(el)&&el.closest&&el.closest('button,a,input,select,textarea,[onclick],[role=button]')&&!el.closest('#vi-fb-btn')})})};
-      /* desktop: the top edge sits under the nav tabs, so it is never used there; with a stage in every spot it stays visible in the spot that covers no control (owner, 1 Nov) */
-      var mob=window.innerWidth<=600,spots=mob?['','vi-fb-left','vi-fb-top']:['','vi-fb-left'],pick=null,free=null;
-      for(var k=0;k<spots.length;k++){b.classList.remove('vi-fb-left','vi-fb-top');if(spots[k])b.classList.add(spots[k]);r=b.getBoundingClientRect();
-        if(spots[k]!=='vi-fb-top'&&hit())continue;if(free===null)free=spots[k];if(!onStage()){pick=spots[k];break}}
-      b.classList.remove('vi-fb-left','vi-fb-top');
+      /* desktop: the top spot starts below the nav tabs (never under them); with a stage in every spot it stays visible in the spot that covers no control (owner, 1 Nov) */
+      var mob=window.innerWidth<=600,spots=['','vi-fb-left','vi-fb-top'],pick=null,free=null,nv=document.getElementById('topnav'),nb=nv?nv.getBoundingClientRect().bottom:0;
+      for(var k=0;k<spots.length;k++){b.classList.remove('vi-fb-left','vi-fb-top');b.style.top='';if(spots[k])b.classList.add(spots[k]);if(spots[k]==='vi-fb-top'&&!mob&&nb>0)b.style.top=Math.round(nb+10)+'px';r=b.getBoundingClientRect();
+        if((spots[k]!=='vi-fb-top'||!mob)&&hit())continue;if(free===null)free=spots[k];if(!onStage()){pick=spots[k];break}}
+      b.classList.remove('vi-fb-left','vi-fb-top');b.style.top='';
       if(pick===null)pick=mob?'vi-fb-away':(free===null?'':free);
-      if(pick)b.classList.add(pick)};
+      if(pick)b.classList.add(pick);if(pick==='vi-fb-top'&&!mob&&nb>0)b.style.top=Math.round(nb+10)+'px'};
     var later=function(){if(!pend)pend=requestAnimationFrame(dodge)};window.addEventListener('scroll',later,{passive:true});window.addEventListener('resize',later);document.addEventListener('click',function(){setTimeout(later,350)},true);setTimeout(later,600);setInterval(function(){if(!document.hidden)later()},1500);window.viFbDodge=dodge}
   var row=document.getElementById('set-fbact');if(row)[].forEach.call(row.children,function(x){x.classList.toggle('active',x.dataset.val===(actOn()?'1':'0'))});
 }
