@@ -347,7 +347,7 @@ export function urgentText(id: number | string, t: Triage, who: string, screen: 
     `\nWhat they wrote:\n${text || '(rating only)'}\n\nFeedback #${id}${link ? ': ' + link : ''}`
 }
 /** The brand lockup for e-mail: the mid icon and the Syne wordmark as a picture (mail clients cannot load Syne). Drawn by tools/build_email_lockup.js from the brand book; served from the landing site. */
-const LOCKUP = `<img src="https://vault-it.co/email/lockup.png" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">`
+const LOCKUP = `<img src="https://vault-it.co/email/lockup.gif" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">`
 export function urgentHtml(id: number | string, t: Triage, who: string, screen: string, text: string, link: string): string {
   const row = (k: string, v: string) => `<tr><td style="padding:4px 12px 4px 0;color:#9AA0A6;font-size:13px;vertical-align:top">${k}</td><td style="padding:4px 0;font-size:14px;color:#E8E8E8">${esc(v)}</td></tr>`
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Urgent tester feedback</title></head>

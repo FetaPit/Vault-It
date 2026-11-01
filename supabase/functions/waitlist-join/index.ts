@@ -96,7 +96,7 @@ function brandShell(title: string, body: string, footer: string): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#080808;padding:36px 16px"><tr><td align="center">
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:#080D14;border:1px solid #15302F;border-radius:18px;max-width:520px;width:100%">
 <tr><td style="padding:28px 36px 18px;border-bottom:1px solid #102221">
-<img src="https://vault-it.co/email/lockup.png" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">
+<img src="https://vault-it.co/email/lockup.gif" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">
 <div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div>
 </td></tr>
 <tr><td style="padding:26px 36px 10px">${body}</td></tr>
@@ -111,7 +111,7 @@ const H1 = "margin:0 0 14px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,
 const P = "margin:0 0 18px;font-size:15px;line-height:1.6;color:#9AA0A6"
 const SMALL = "margin:0 0 8px;font-size:12px;line-height:1.6;color:#9AA0A6"
 const BTN = "display:inline-block;background:#E8C56A;color:#1A1400;text-decoration:none;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:15px 24px;border-radius:10px"
-const TRADER = 'Vault-It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5 7EQ · <a href="mailto:hello@vault-it.co" style="color:#44C0B9">hello@vault-it.co</a>'
+const TRADER = 'Vault-It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5&nbsp;7EQ · <a href="mailto:hello@vault-it.co" style="color:#44C0B9">hello@vault-it.co</a>'
 
 function confirmHtml(email: string, link: string, unsub: string, testing: boolean): string {
   const e = esc(email), l = esc(link), u = esc(unsub)
@@ -119,7 +119,7 @@ function confirmHtml(email: string, link: string, unsub: string, testing: boolea
 <h1 style="${H1}">One click to confirm</h1>
 <p style="${P}">Someone (hopefully you) asked to join the Vault-It beta list with <strong style="color:#E8E8E8">${e}</strong>.${testing ? ' Confirm and we will send you the link to start testing.' : ''}</p>
 <p style="margin:0 0 22px;text-align:center"><a href="${l}" style="${BTN}">Confirm my place</a></p>
-<p style="${SMALL}">The link works for 7 days. If you did not ask for this, ignore this e-mail: you will not hear from us again and the request is deleted after 30 days.</p>`
+<p style="${SMALL}">The link works for 7 days. If you did not ask for this, ignore this email: you will not hear from us again and the request is deleted after 30 days.</p>`
   const footer = `${TRADER} · <a href="${u}" style="color:#44C0B9">Remove me from the list</a>`
   return brandShell('Confirm your place on the Vault-It beta list', body, footer)
 }

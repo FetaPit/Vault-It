@@ -12,7 +12,7 @@ const load = (name) => {
   return { src, ex: m.exports };
 };
 const DG = load('feedback-digest'), FB = load('tester-feedback');
-const BRICK = /<img src="https:\/\/vault-it\.co\/email\/lockup\.png"[^>]*alt="Vault-It"/;
+const BRICK = /<img src="https:\/\/vault-it\.co\/email\/lockup\.gif"[^>]*alt="Vault-It"/;
 const checkBrand = (name, html) => {
   ok(BRICK.test(html), name + ': logo is the brand lockup picture');
   ok(/font-family:'Syne'/.test(html) && /font-family:'DM Sans'/.test(html), name + ': Syne headings and DM Sans body');
@@ -34,10 +34,16 @@ if (FB.ex.urgentHtml) checkBrand('urgent alert', FB.ex.urgentHtml(7, { type: 'bu
 ok(typeof FB.ex.helpHtml === 'function', 'helpHtml is exported');
 if (FB.ex.helpHtml) checkBrand('unanswered help question', FB.ex.helpHtml(8, 'Tess', 'login', 'How do I add a card?', ''));
 // the picture itself: drawn from the brand book, shipped with the site, big enough for 3x screens
-const png = fs.readFileSync(__dirname + '/../site/email/lockup.png');
-ok(png.readUInt32BE(16) >= 600 && png.readUInt32BE(20) >= 150, 'lockup.png is a 3x picture (' + png.readUInt32BE(16) + 'x' + png.readUInt32BE(20) + ')');
-ok(/site\/email\/lockup\.png/.test(fs.readFileSync(__dirname + '/../tools/build_site.js', 'utf8')), 'build_site ships lockup.png to vault-it.co/email/');
+const gif = fs.readFileSync(__dirname + '/../site/email/lockup.gif');
+ok(gif.slice(0, 3).toString() === 'GIF' && gif.readUInt16LE(6) >= 380 && gif.readUInt16LE(8) >= 64, 'lockup.gif is a 2x picture (' + gif.readUInt16LE(6) + 'x' + gif.readUInt16LE(8) + ')');
+ok(gif.length < 150 * 1024, 'lockup.gif is under 150 KB (' + Math.round(gif.length / 1024) + ' KB)');
+// frame one is the finished still (Outlook desktop shows only frame one); the loop count is 2, so it comes to rest
+ok(gif.includes(Buffer.from('NETSCAPE2.0')) && gif.indexOf(Buffer.from('NETSCAPE2.0')) > 0 && gif[gif.indexOf(Buffer.from('NETSCAPE2.0')) + 13] === 1, 'GIF plays twice (one repeat), then rests on the still');
+ok(/site\/email\/lockup\.gif/.test(fs.readFileSync(__dirname + '/../tools/build_site.js', 'utf8')), 'build_site ships lockup.gif to vault-it.co/email/');
 ok(/Syne/.test(fs.readFileSync(__dirname + '/../tools/build_email_lockup.js', 'utf8')) && /vault-it-logo-mark-mid\.svg/.test(fs.readFileSync(__dirname + '/../tools/build_email_lockup.js', 'utf8')), 'lockup is built from the brand book mid icon and Syne');
+ // plain-text parts must not carry HTML entities
+for (const f of ['waitlist-join', 'waitlist-welcome']) { const s = fs.readFileSync(ROOT + f + '/index.ts', 'utf8'); const lines = s.split('\n').filter((l) => /\btext:|welcomeText = /.test(l)); ok(lines.length > 0 && lines.every((l) => !l.includes('&nbsp;')), f + ': plain-text part has no &nbsp;'); }
+const txt = FB.ex.helpHtml ? 1 : 0; void txt;
 // the other emails: lockup must match the same markup
 for (const f of ['send-auth-email', 'waitlist-join', 'waitlist-welcome']) {
   const s = fs.readFileSync(ROOT + f + '/index.ts', 'utf8');
