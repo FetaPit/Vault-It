@@ -538,26 +538,39 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
   if (!store.get('vi_ref') && referrer) store.set('vi_ref', referrer);
 
   // Cloudflare's "are you human" check, only on the address the widget is registered for.
-  var tsToken = '', tsWidget = null;
+  // Testers are never stuck: if the check errors, fails to load or gives no answer within 8 seconds,
+  // we say so and let the form send without a token (the server then applies a stricter limit).
+  var tsToken = '', tsWidget = null, tsFailed = false, tsTimer = null;
+  var TS_FAIL_MSG = 'The “are you human” check could not load. You can still join with the button below.';
+  function say(text, kind) { msg.textContent = text; msg.className = 'msg' + (kind ? ' ' + kind : ''); }
+  function tsGiveUp() {
+    if (tsFailed || tsToken) return;
+    tsFailed = true; clearTimeout(tsTimer);
+    if (!busy) say(TS_FAIL_MSG);
+  }
   function tsOn() { return TS_HOSTS.indexOf(location.hostname) > -1 || window.__vi_captcha_force === true; }
   function tsRender() {
     if (!tsOn() || tsWidget !== null || !window.turnstile) return;
-    tsWidget = window.turnstile.render('#cf-box', { sitekey: TS_KEY, theme: isLight() ? 'light' : 'dark', callback: function (t) { tsToken = t; }, 'expired-callback': function () { tsToken = ''; }, 'error-callback': function () { tsToken = ''; } });
+    tsWidget = window.turnstile.render('#cf-box', { sitekey: TS_KEY, theme: isLight() ? 'light' : 'dark',
+      callback: function (t) { tsToken = t; tsFailed = false; clearTimeout(tsTimer); },
+      'expired-callback': function () { tsToken = ''; },
+      'error-callback': function () { tsToken = ''; tsGiveUp(); } });
   }
   if (tsOn()) {
     window.viTsLoaded = tsRender;
+    tsTimer = setTimeout(tsGiveUp, 8000);
     var s = document.createElement('script'); s.async = true; s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=viTsLoaded&render=explicit';
+    s.onerror = tsGiveUp;
     document.head.appendChild(s);
   }
 
-  function say(text, kind) { msg.textContent = text; msg.className = 'msg' + (kind ? ' ' + kind : ''); }
   var busy = false;
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     if (busy) return;
     var email = document.getElementById('email').value.trim();
     if (!EMAIL_RE.test(email) || email.length > 254) { say('Please check your email address. It doesn’t look complete.', 'err'); document.getElementById('email').focus(); return; }
-    if (tsOn() && window.turnstile && tsWidget !== null && !tsToken) { say('One moment. The “are you human” check is still running. Try again in a few seconds.', 'err'); return; }
+    if (tsOn() && !tsToken && !tsFailed) { say('One moment. The “are you human” check is still running. Try again in a few seconds.', 'err'); return; }
     busy = true; btn.disabled = true; say('Sending…');
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 15000);

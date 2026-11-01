@@ -106,6 +106,55 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
   ok(page.posts[0].source === 'home', 'sign-ups from the home address are told apart from /sign-up');
   await ctx.close();
 
+  // ── the "are you human" check must never leave a tester stuck (owner, 31 Oct): a widget that errors, fails to
+  // load or stays silent for 8 s shows "could not load" and the form still sends, without a token.
+  const tsPage = async (mode) => {
+    const c = await page0(390, 844);
+    await c.page.addInitScript(() => { window.__vi_captcha_force = true; });
+    await c.page.route('https://challenges.cloudflare.com/**', (r) => {
+      if (mode === 'blocked') return r.abort();
+      r.fulfill({ status: 200, contentType: 'text/javascript', body: `window.turnstile={render:function(s,o){` +
+        (mode === 'error' ? `setTimeout(function(){o['error-callback']()},50);` : mode === 'ok' ? `setTimeout(function(){o.callback('TOK123')},50);` : mode === 'slow' ? `window.__tsCb=o.callback;` : ``) +
+        `return 'w1'},reset:function(){}};window.viTsLoaded&&window.viTsLoaded();` });
+    });
+    await c.page.goto(BASE + '/sign-up', { waitUntil: 'load' });
+    await c.page.fill('#email', 'ts@example.com');
+    return c;
+  };
+  ({ ctx, page } = await tsPage('error'));
+  await page.waitForTimeout(400);
+  ok(/could not load/i.test(await page.textContent('#msg')), 'a widget error says the check could not load');
+  await page.click('#go'); await page.waitForTimeout(500);
+  ok(page.posts.length === 1 && page.posts[0].captchaToken === '', 'after a widget error the form still sends, without a token');
+  await ctx.close();
+  ({ ctx, page } = await tsPage('silent'));
+  await page.waitForTimeout(1500); await page.click('#go'); await page.waitForTimeout(300);
+  ok(page.posts.length === 0 && /still running/i.test(await page.textContent('#msg')), 'a check that is still working (under 8 s) asks the visitor to wait a moment');
+  await page.waitForTimeout(7200);
+  ok(/could not load/i.test(await page.textContent('#msg')), 'after about 8 s with no token the page says the check could not load');
+  await page.click('#go'); await page.waitForTimeout(500);
+  ok(page.posts.length === 1 && page.posts[0].captchaToken === '', 'after 8 s of silence the form sends without a token');
+  await ctx.close();
+  ({ ctx, page } = await tsPage('blocked'));
+  await page.waitForTimeout(600);
+  ok(/could not load/i.test(await page.textContent('#msg')), 'a blocked check script (ad blocker, private DNS) says the check could not load');
+  await page.click('#go'); await page.waitForTimeout(500);
+  ok(page.posts.length === 1 && page.posts[0].captchaToken === '', 'with the check script blocked the form still sends');
+  await ctx.close();
+  ({ ctx, page } = await tsPage('ok'));
+  await page.waitForTimeout(400);
+  ok(!/could not load/i.test(await page.textContent('#msg')), 'a working check shows no warning');
+  await page.click('#go'); await page.waitForTimeout(500);
+  ok(page.posts.length === 1 && page.posts[0].captchaToken === 'TOK123', 'a working check still sends its token');
+  await ctx.close();
+  ({ ctx, page } = await tsPage('slow'));
+  await page.waitForTimeout(500); await page.click('#go'); await page.waitForTimeout(200);
+  ok(page.posts.length === 0, 'a slow but working check holds the form until it answers');
+  await page.evaluate(() => window.__tsCb('SLOWTOK')); await page.click('#go'); await page.waitForTimeout(500);
+  ok(page.posts.length === 1 && page.posts[0].captchaToken === 'SLOWTOK', 'a slow check that answers in time sends its token');
+  ok(page.errs.length === 0, 'no page errors in the check cases ' + page.errs.join(' | '));
+  await ctx.close();
+
   // ── confirm page
   ({ ctx, page } = await page0(390, 844));
   page.reply = { status: 200, body: { success: true, testing: true, unsubscribe: 'https://vault-it.co/sign-up/unsubscribe?u=11111111-1111-1111-1111-111111111111&s=' + 'a'.repeat(32) } };
