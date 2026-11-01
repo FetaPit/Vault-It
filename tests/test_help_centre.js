@@ -98,6 +98,12 @@ const seed = (o) => {
     let a = await ask('how much do I owe?');
     ok(/£3(,000|\.0k)/.test(a) && /1 debt/.test(a) && sent.ask.length === 0, T + 'own numbers answered on the device: ' + a.slice(0, 80));
     a = await ask('when could I get my keys?'); ok(/keys around/.test(a) && sent.ask.length === 0, T + 'keys date from their numbers');
+    // the deposit answer and FAQ match the House builder tab (depositTarget(), state.depositPct), not the roadmap's own figure
+    const hb = await p.evaluate(() => ({ tgt: gbpFmt(depositTarget()), pct: state.depositPct }));
+    a = await ask('how much of my deposit have I saved?');
+    ok(a.includes(hb.tgt) && a.includes(hb.pct + '%') && sent.ask.length === 0, T + 'deposit answer matches House builder (' + hb.tgt + ', ' + hb.pct + '%): ' + a.slice(0, 90));
+    const depFaq = await p.evaluate(() => (viHelp.kb.find(f => /How big a deposit/.test(f.q)) || {}).a || '');
+    ok(depFaq.includes(hb.pct + '%') && !/plans for a 10%/.test(depFaq), T + 'deposit FAQ states the House builder starting deposit (' + hb.pct + '%)');
     a = await ask('avalanche or snowball'); ok(/highest interest rate first/.test(a) && sent.ask.length === 0, T + 'a clear FAQ match is answered at once');
     await p.evaluate(() => { const b = [...document.querySelectorAll('#vh-log .vh-act[data-show]')].pop(); b.click(); }); await p.waitForTimeout(900);
     ok(await tourOn(p) && (await p.evaluate(() => document.getElementById('vt-title').textContent)) === 'Debt tracker', T + 'Show me spotlights the right part of the app');

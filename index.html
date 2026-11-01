@@ -27957,7 +27957,7 @@ var KB=[
 
   {c:'House builder',q:'How does the house builder work?',k:'3d bricks build ghost colour levels house',a:'Pick a house type, price and deposit. <b>Level 1</b>: the house is drawn as a ghost and bricks go down as you save your deposit. When you buy, <b>Level 2</b> starts: enter your mortgage and the house fills with colour as your share grows.',act:[{l:'Show me',show:'house'}]},
   {c:'House builder',q:'How do I add savings to my house?',k:'deposit lay bricks add saved money towards',a:'In House builder, use <b>Add to your savings</b> each time you put money towards your deposit.',act:[{l:'Show me',show:'house-save'}]},
-  {c:'House builder',q:'How big a deposit do I need?',k:'deposit size percent 10 5 how much need',a:'Vault-It plans for a 10% deposit unless you change it. Many UK lenders accept 5%, but a bigger deposit usually means a better rate. A regulated mortgage adviser can tell you what lenders would offer you.'},
+  {c:'House builder',q:'How big a deposit do I need?',k:'deposit size percent 10 5 how much need',a:'In House builder you set your deposit as a percentage of the home\'s price. It starts at 20% and you can change it there. The roadmap on Overview plans with its own deposit figure, shown on its Deposit card. Many UK lenders accept 5%, but a bigger deposit usually means a better rate. A regulated mortgage adviser can tell you what lenders would offer you.'},
   {c:'House builder',q:'Does a Lifetime ISA help?',k:'lisa isa bonus government 25',a:'If you add a cash account with the type <b>LISA</b>, your deposit forecast includes the 25% government bonus (up to about £83 a month). Check the LISA rules on gov.uk first.'},
   {c:'House builder',q:'The house or a 3D view is blank',k:'blank broken not showing 3d house view stuck slow',a:'Tap the reset button in the viewer, turn your phone round or reload the page. Older phones can struggle with 3D, and closing other tabs helps. If it keeps happening, tap Feedback so Pete can see it.',act:[{l:'Send feedback',fn:'viFbOpen'}]},
 
@@ -28105,7 +28105,7 @@ function search(query,limit){var ix=index(),qt=tok(query);if(!qt.length)return [
 var call=function(fn){try{return typeof window[fn]==='function'?window[fn]():undefined}catch(e){return undefined}};
 function snap(){var o={};
   o.nw=call('computeNetWorth');o.debt=call('jrnyTotalDebt');o.debtCount=(typeof debtState!=='undefined'&&debtState.debts)?debtState.debts.filter(function(d){return +d.balance>0}).length:0;
-  o.income=call('jrnyIncome');o.expenses=call('jrnyExpenses');o.surplus=call('jrnySurplus');o.saved=call('jrnyHouseSaved');o.target=call('jrnyHouseTarget');o.depTarget=call('jrnyDepositTarget');
+  o.income=call('jrnyIncome');o.expenses=call('jrnyExpenses');o.surplus=call('jrnySurplus');o.saved=call('jrnyHouseSaved');o.target=call('jrnyHouseTarget');o.depTarget=call('jrnyDepositTarget');o.hbTarget=call('depositTarget');try{o.hbPct=+state.depositPct||null}catch(e){o.hbPct=null}
   o.depMonths=call('jrnyDepositMonths');o.debtMonths=call('jrnyDebtFreeMonths');o.efMonths=call('jrnyEFMonths');o.keys=call('jrnyKeysDate');o.maxMort=call('jrnyMaxMortgage');o.rag=call('jrnyMortgageReadiness');o.cash=call('jrnyTotalCash');
   var lv=document.getElementById('ach-level-name');o.level=lv?lv.textContent.trim():'';
   o.demo=!!(document.getElementById('demo-chip')&&visible(document.getElementById('demo-chip')));
@@ -28127,8 +28127,8 @@ var INTENTS=[
   {re:/how much (do i owe|debt)|my debts?|total debt|what do i owe/,show:'debt',fn:function(o){
     if(!o.debt)return 'You have no debts listed. If you have some, add them in Debt tracker so your dates are accurate.';
     return 'You owe <b>'+money(o.debt)+'</b> across '+o.debtCount+' debt'+(o.debtCount===1?'':'s')+(o.debtMonths?'. At your current pace that is cleared in about '+months(o.debtMonths)+'.':'.')}},
-  {re:/deposit|how much (have i|i've|ive) saved|my sav/,show:'house',fn:function(o){if(!o.depTarget)return null;var pct=Math.min(100,Math.round((o.saved||0)/o.depTarget*100));
-    return 'You have saved <b>'+money(o.saved)+'</b> of a '+money(o.depTarget)+' deposit ('+pct+'%) for a '+money(o.target)+' home. '+(o.depMonths===0?'Your deposit is complete.':o.depMonths?'At your current pace it is done in about '+months(o.depMonths)+'.':'Add your income and spending to see how long the rest will take.')}},
+  {re:/deposit|how much (have i|i've|ive) saved|my sav/,show:'house',fn:function(o){var t=o.hbTarget;if(!t||!o.hbPct)return null;var pct=Math.min(100,Math.round((o.saved||0)/t*100)),same=o.depTarget&&Math.abs(o.depTarget-t)<1;
+    return 'You have saved <b>'+money(o.saved)+'</b> of your <b>'+money(t)+'</b> deposit ('+pct+'% there). That target is '+o.hbPct+'% of a '+money(o.target)+' home, as set in House builder. '+((o.saved||0)>=t?'Your deposit is complete.':same&&o.depMonths?'At your current pace it is done in about '+months(o.depMonths)+'.':'The roadmap on Overview plans with its own deposit figure, so its dates can differ.')}},
   {re:/surplus|left over|spare (money|cash)|my (income|spending|expenses|budget)|how much (do i|can i) (earn|spend|save)/,show:'budget',fn:function(o){
     if(!o.income&&!o.expenses)return 'You have not added income or spending yet. Add them in the Budget and I can tell you what is left each month.';
     return 'Each month you bring in <b>'+money(o.income)+'</b> and spend <b>'+money(o.expenses)+'</b>, leaving <b>'+money(o.surplus)+'</b>. '+(o.surplus>0?'That surplus is what powers your debt and deposit dates.':'Finding even a small surplus is the first step.')}},
