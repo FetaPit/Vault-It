@@ -16,6 +16,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Waiting on the owner
 
+- Brand name check before social launch (owner, 1 Nov, marketing session): social accounts paused until the name is cleared. UK register: every Vault It / Vaultit company is dissolved. Active elsewhere: Vaultit AB (Sweden, 559087-5646, part of ID06 AB, secure database platform, B2B) and the US kids' art app VaultIt (holds @vaultitapp). Needed: UKIPO + EUIPO search for VAULTIT (an EU mark from before 2021 also sits on the UK register), ideally a trade mark attorney's clearance search. Then keep the name and file (classes 9, 36, 42), or rename now.
 - Split `index.html` into source files (owner, 31 Oct: remind in one week): Google Calendar reminder Sat 7 Nov 09:30. Plan in `docs/CLAUDE_EFFICIENCY.md` section 6; needs the owner's go
 - Metals price feed (`api.metals.live`): the sandbox cannot reach it (host not in the session's allowed network domains). Check it from a browser, or allow the host in the environment's network settings and ask again
 - Brand build on a real phone: speed of the lite fallback and how the 6.8 feedback feels (Settings > House builder > Brand build, or ?house=new)
