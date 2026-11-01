@@ -43,7 +43,7 @@ const welcomeBody = `<p style="${EYEBROW}">Welcome</p>
 <p style="${P}">Vault-It puts your debts, savings and house deposit on one map. You type in your own figures, and we never ask for your bank login. Every pound you save lays a brick on your house. What you owe sits below the ground. The aim: nobody has to guess whether they will ever own a home.</p>
 ${cta}
 <h2 style="${H2}">Who is behind it</h2>
-<p style="${P}">I&#39;m Pete Thickett, a UK developer. Vault-It is a product of PT Live Design in Lincoln. ${todo('your professional background and credentials, in your own words: roles, years, qualifications. Nothing is written here until you supply it.')}</p>
+<p style="${P}">I&#39;m Pete Thickett. I run PT Live Design in Lincoln, where I have worked on branding and design since 2019. I have been a multimedia designer, including producing training resources for the Royal Air Force Officer Training Academy at Cranwell. I hold a Certified Professional in Psychology of Design from the London School of International Business, and I am a local leader for the Interaction Design Foundation. ${todo('taken only from your LinkedIn. Approve, trim, or add anything else. The landing page says "UK developer", which your profile does not.')}</p>
 <p style="${P}">Once a week I will send a short note: what is new, what I fixed, what got better. Reply to this e-mail any time. I read every reply.</p>
 <p style="${P}">Thanks,<br>Pete</p>`;
 
