@@ -67,4 +67,4 @@ The release going to testers on Mon 2 Nov 2026: production branch `release/pione
 - Candidate 67bb51e green; owner held it after the preview (19 edits, `docs/briefs/V07_PREVIEW_EDITS.md` on brand-rollout).
 - Streams started on the owner's "Go" (19:40): A house builder engine (Fable, session_01KoffvynkETPQC1hZdf8um5, branch v07/house-builder); B quick fixes and flow labels (Sonnet, session_01KoffvwxP6sZqoPLryChbVP, branch v07/quick-fixes). Merge B then A into candidate/v0.7, CI, one preview.
 - When merging the streams, also cherry-pick da55c59 (waitlist-join: no-token rate_hit error now counts as limited, fails closed; QC PASS) onto candidate/v0.7 so step 6 deploys waitlist-join from the same code. No migration in that change; migration 013 (welcome) still needs the owner's yes.
-- Open owner decision before the e-mail deploy: reword or keep the welcome e-mail's "weekly note" line.
+- Weekly note settled (owner via Venture Control): welcome copy now says "When there is news I will send a short note" (f927469, on brand-rollout after da55c59). Deploy waitlist-join from f927469 or later; cherry-pick both da55c59 and f927469 onto candidate/v0.7.
