@@ -13,7 +13,7 @@ const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const DAY = 86400000;
 const seed = (o) => {
-  localStorage.setItem('vi-theme', o.theme); localStorage.setItem('vi-flag-house', '0'); localStorage.setItem('vi_declined_demo', 'true');
+  localStorage.setItem('vi-theme', o.theme); localStorage.setItem('vi_declined_demo', 'true');
   localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
   localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com', joined: new Date(Date.now() - 40 * 86400000).toISOString(), logins: 3 }));
   localStorage.setItem('pos_ov1', JSON.stringify({ income: [{ id: 1, name: 'Salary', amount: 2400, cat: 'salary' }], expenses: [{ id: 3, name: 'Rent', amount: 700, type: 'ce' }] }));

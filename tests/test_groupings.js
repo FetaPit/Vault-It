@@ -1,4 +1,4 @@
-// Runs the classic house builder (vi-flag-house = 0): the brand build's own checks are in tests/test_hb_brand.js.
+// The house builder here is the brand 3D build (the only one since 1 Nov 2026); its own checks are in tests/test_hb_brand.js.
 // Brand phase 8: cards that affect each other are grouped (brand/AUDIT_AND_PLAN.md section 4). Nothing is removed:
 // every control keeps its id and still works. Overview O1 and O2 are checked in test_overview.js.
 // Run: node tests/test_groupings.js
@@ -7,7 +7,7 @@ const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = () => {
   if (localStorage.getItem('pos_debt1')) return;
-  localStorage.setItem('vi_declined_demo', 'true');localStorage.setItem('vi-flag-house','0');
+  localStorage.setItem('vi_declined_demo', 'true');
   localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
   localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' }));
   localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' }));
@@ -29,14 +29,14 @@ const seed = () => {
       return { h1: inn(plan, ['htypes', 'priceInput', 'depositPctInput', 'floor-selector-card']), lay: inn(document.getElementById('houseSceneCard'), ['savingsInput', 'btnAdd']) && document.getElementById('hb-lay').compareDocumentPosition(document.getElementById('sceneCap')) & 4, brick: /Each brick is worth about £\d/.test((document.getElementById('hb-plan-brick') || {}).textContent || ''),
         h2: inn(prog, ['savedAmt', 'pbarFill', 'stBricks', 'stRemain', 'ms1', 'ms100']),
         h3: inn(hist, ['habit-circles', 'logList', 'btnReset']) && hist.querySelector('#habit-circles').compareDocumentPosition(hist.querySelector('#logList')) & 4 && hist.querySelector('#logList').compareDocumentPosition(hist.querySelector('#btnReset')) & 4,
-        h4: own && own.tagName === 'DETAILS' && !own.open && inn(own, ['model-file-input', 'meshy-prompt', 'meshy-go']),
+        h4: own && own.tagName === 'DETAILS' && !own.open && !own.querySelector('input,textarea,button') && /Coming later as part of Pro/.test(own.textContent),
         cards: document.querySelectorAll('#house-tab-inner .panel > .card').length, side: document.documentElement.scrollWidth - innerWidth };
     });
     ok(h.h1 && h.brick, w + ': H1 one "Your house plan" card (type, price, deposit, floor, brick value)');
     ok(h.lay, w + ': Lay the bricks sits right under the viewport (owner, 30 Oct)');
     ok(h.h2, w + ': H2 one "Progress" card (bar, stats, milestones)');
     ok(h.h3, w + ': H3 one "History" card: streak, then log, then reset');
-    ok(h.h4, w + ': H4 "Your own design" is one collapsed card');
+    ok(h.h4, w + ': H4 "Your own design" is one collapsed card, locked: "Coming later as part of Pro", no upload or prompt');
     ok(h.cards === 3, w + ': house panel has 3 cards (HUD, plan, progress), was 7 (' + h.cards + ')');
     await p.fill('#savingsInput', '100'); await p.click('#btnAdd'); await p.waitForTimeout(400);
     ok(await p.evaluate(() => JSON.parse(localStorage.getItem('ht3')).saved === 8600), w + ': laying bricks from the plan card still saves');

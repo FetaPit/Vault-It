@@ -1,12 +1,13 @@
-// Runs the classic house builder (vi-flag-house = 0): the brand build's own checks are in tests/test_hb_brand.js.
+// Levels on the 3D house builder (the brand build is the only one; its finer checks are in tests/test_hb_brand.js).
+// Level 2 = paying the mortgage (the whole house as the Level 1 hologram, the share you own laid in colour, gold tag MORTGAGE x% PAID / YOU OWN y%); Level 3 is locked under Pro.
 const { chromium } = require('playwright');
 const routeThree=require('./three_route');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
-const seedFn=(o,pro)=>`(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi-flag-house','0');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:${pro!==false}}));${pro!==false?"localStorage.setItem('vi_pioneer','true');":''}localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'Salary',amount:2000}],expenses:[{id:2,name:'Rent',amount:1200,type:'ce'}]}));})();`;
+const seedFn=(o,pro)=>`(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:${pro!==false}}));${pro!==false?"localStorage.setItem('vi_pioneer','true');":''}localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'Salary',amount:2000}],expenses:[{id:2,name:'Rent',amount:1200,type:'ce'}]}));})();`;
 (async()=>{
   const b=await chromium.launch(); const errs=[];
   const settle=async p=>{await p.waitForTimeout(300);await p.waitForFunction(()=>hb3dState().settled,null,{timeout:20000}).catch(()=>{});};
-  const open=async(o,opt)=>{opt=opt||{};const ctx=await b.newContext({viewport:{width:opt.w||1280,height:opt.h||900},hasTouch:!!opt.touch}); await routeThree(ctx); const p=await ctx.newPage();
+  const open=async(o,opt)=>{opt=opt||{};const ctx=await b.newContext({viewport:{width:opt.w||1280,height:opt.h||900},hasTouch:!!opt.touch,reducedMotion:'reduce'}); await routeThree(ctx); const p=await ctx.newPage();
     p.on('pageerror',e=>errs.push(e.message)); p.on('console',m=>{if(m.type()==='error'&&!/Failed to load|net::/.test(m.text()))errs.push('console: '+m.text());});
     await p.addInitScript(seedFn(o,opt.pro)); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
     await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'}); await p.evaluate(()=>showTab('house')); await settle(p); return p;};
@@ -15,22 +16,33 @@ const seedFn=(o,pro)=>`(function(){if(localStorage.getItem('ht3'))return;localSt
   let p=await open(L2);
   let s=await p.evaluate(()=>hb3dState()); console.log(JSON.stringify(s));
   ok(s.engine==='3d'&&s.mode==='equity','Level 2 renders the equity view in 3D');
-  ok(Math.abs(s.clipY/s.height-0.10)<0.01,'solid part = 10% of the house height, the share of the Level 2 house paid off (owner rule) ('+(s.clipY/s.height*100).toFixed(1)+'%)');
-  let ov=await p.evaluate(()=>({own:document.getElementById('hb3d-ownlabel').textContent,ownVis:getComputedStyle(document.getElementById('hb3d-ownlabel')).display,ib:document.getElementById('hb3d-intbar').innerText,ibVis:getComputedStyle(document.getElementById('hb3d-intbar')).display,segs:document.querySelectorAll('#hb3d-intbar .ib-seg').length,up:getComputedStyle(document.getElementById('hb3d-upglabel')).display}));
-  ok(ov.own==='MORTGAGE 10% PAID'&&ov.ownVis!=='none','"MORTGAGE 10% PAID" label shown');
+  ok(Math.abs(s.clipY/s.height-0.235)<0.01&&await p.evaluate(()=>Math.abs(HB3D.viewer.eq-hbL2Own())<1e-9),'colour line at the share of the home you own: (£250,000 - £191,250) / £250,000 = 23.5% of the height ('+(s.clipY/s.height*100).toFixed(1)+'%)');
+  const tag=()=>p.evaluate(()=>{const rl=document.getElementById('hb3d-rowlabel');return{txt:rl.textContent,vis:getComputedStyle(rl).display,brand:rl.classList.contains('brand')};});
+  await p.waitForFunction(()=>/MORTGAGE/.test(document.getElementById('hb3d-rowlabel').textContent),null,{timeout:20000}).catch(()=>{});
+  let ov=await p.evaluate(()=>{const up=document.getElementById('hb3d-upglabel'),v=HB3D.viewer;return{ownVis:getComputedStyle(document.getElementById('hb3d-ownlabel')).display,ib:document.getElementById('hb3d-intbar').innerText,ibVis:getComputedStyle(document.getElementById('hb3d-intbar')).display,segs:document.querySelectorAll('#hb3d-intbar .ib-seg').length,up:up?getComputedStyle(up).display:'none',brand:!!v.brandInfo(),bi:v.brandInfo()};});
+  let tg=await tag();
+  ok(ov.brand&&ov.bi.bricks===ov.bi.bricksTotal&&ov.bi.colour>0&&Math.abs(ov.bi.colour/ov.bi.colourTotal-0.235)<0.01,'Level 2 is drawn by the brand build: whole house laid, '+(ov.bi&&ov.bi.colour)+' of '+(ov.bi&&ov.bi.colourTotal)+' parts in colour (23.5%)');
+  ok(tg.txt==='MORTGAGE 10% PAIDYOU OWN 23.5%'&&tg.vis!=='none'&&tg.brand,'gold tag reads "MORTGAGE 10% PAID" / "YOU OWN 23.5%" ('+tg.txt+')');
+  ok(ov.ownVis==='none','the old owned label is hidden (the gold tag replaces it)');
   ok(ov.ibVis!=='none'&&/INTEREST/.test(ov.ib)&&/slain/.test(ov.ib)&&ov.segs>=2,'interest bar with slain/remaining segments');
   ok(ov.up==='none','no upgrade label in Level 2');
   await p.screenshot({path:'shots/hb3d/app_l2.png'});
   await p.evaluate(()=>{state.mortgageBalance=127500;save();updateUI();}); await settle(p);
-  s=await p.evaluate(()=>hb3dState()); ok(Math.abs(s.clipY/s.height-0.40)<0.01,'paying down to £127,500 (£85,000 of £212,500 paid) → 40% solid ('+(s.clipY/s.height*100).toFixed(1)+'%)');
-  ok(await p.evaluate(()=>document.getElementById('hb3d-ownlabel').textContent)==='MORTGAGE 40% PAID','label follows');
+  s=await p.evaluate(()=>hb3dState()); ok(Math.abs(s.clipY/s.height-0.49)<0.01,'paying down to £127,500 (£85,000 of £212,500 paid): you own 49%, the colour reaches 49% ('+(s.clipY/s.height*100).toFixed(1)+'%)');
+  await p.waitForFunction(()=>/40% PAID/.test(document.getElementById('hb3d-rowlabel').textContent),null,{timeout:20000}).catch(()=>{});
+  ok((await tag()).txt==='MORTGAGE 40% PAIDYOU OWN 49%','gold tag follows (MORTGAGE 40% PAID / YOU OWN 49%)');
   await p.evaluate(()=>{state.mortgageBalance=0;save();updateUI();}); await settle(p);
-  s=await p.evaluate(()=>hb3dState()); ok(s.mode==='complete','mortgage free → complete solid house');
+  s=await p.evaluate(()=>hb3dState()); ok(s.mode==='complete'&&!!s.brand,'mortgage free → complete house in the brand build');
+  await p.waitForFunction(()=>document.getElementById('hb3d-rowlabel').textContent==='MORTGAGE FREE',null,{timeout:20000}).catch(()=>{});
+  ok((await tag()).txt==='MORTGAGE FREE','gold tag reads MORTGAGE FREE');
   ok(await p.evaluate(()=>getComputedStyle(document.getElementById('hb3d-intbar')).display)==='none','no interest bar once mortgage-free');
-  // ── Level 3: upgrade ghost ──
+  // ── Level 3: locked under Pro for everyone (owner, 1 Nov 2026) ──
   await p.evaluate(()=>{state.mortgageBalance=180000;save();updateUI();hbUnlockL3();}); await settle(p);
-  s=await p.evaluate(()=>hb3dState()); ok(s.mode==='build'&&s.upgrade,'Level 3 shows the upgrade home as a ghost build');
-  ok(/UPGRADE \d+% FUNDED/.test(await p.evaluate(()=>document.getElementById('hb3d-upglabel').textContent)),'"UPGRADE n% FUNDED" label');
+  s=await p.evaluate(()=>hb3dState()); let l3=await p.evaluate(()=>({lv:hbLevel(),l3:!!state.level3,toast:document.getElementById('toast').textContent,up:(document.getElementById('hb3d-upglabel')||{style:{}}).style.display}));
+  ok(s.mode==='equity'&&!s.upgrade&&l3.lv===2&&!l3.l3,'hbUnlockL3() changes nothing: still Level 2, no upgrade build');
+  ok(l3.toast==='Level 3: plan your next home. Coming later as part of Pro.','it only says Level 3 is coming as part of Pro');
+  await p.evaluate(()=>{state.level3=true;save();updateUI();}); await settle(p);
+  s=await p.evaluate(()=>hb3dState()); ok(s.mode==='equity'&&!s.upgrade&&await p.evaluate(()=>hbLevel())===2,'a saved level3 = true still shows Level 2 (no upgrade ghost)');
   await p.screenshot({path:'shots/hb3d/app_l3.png'});
   await p.context().close();
   // ── blank plot ──

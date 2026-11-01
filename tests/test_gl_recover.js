@@ -10,21 +10,22 @@
 //   5. three.js arrives after the load event, through the loader, and HB3D.supported() turns true once it is here
 //   6. house viewer: another tab -> offscreen and no frame scheduled; back -> awake and drawn; a hidden page -> no frame
 //   7. goLite: shadows off, pixel ratio 1, still draws
+// (the brand build's frames are heavier in software GL, so 'drawn' waits up to 4 s for the frame rather than a fixed 150 ms)
 //   8. cash stage: idle after a second (no frame scheduled), a kick schedules one, shadows use the desktop filter here
 // Run: node tests/test_gl_recover.js   (VI_APP=file:///… to test another copy)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');   // three.js served locally (the sandbox has no CDN)
 const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-// same seed as the brand screenshots (a house in progress), classic viewer pinned
+// same seed as the brand screenshots (a house in progress); the brand build is the only house builder
 const shotSrc = require('fs').readFileSync(__dirname + '/brand_shots.js', 'utf8');
 const seed = eval(shotSrc.slice(shotSrc.indexOf('const seed ='), shotSrc.indexOf('(async')).replace('const seed =', ''));
 (async () => {
   const b = await chromium.launch(); const errs = [];
-  const ctx = await b.newContext({ viewport: { width: 1500, height: 900 } });
+  const ctx = await b.newContext({ viewport: { width: 1500, height: 900 }, reducedMotion: 'reduce' });   // the brand build's frame loop sleeps once drawn (under motion it keeps drawing its pulse)
   await routeThree(ctx);
   const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-  await p.addInitScript(seed, 'dark'); await p.addInitScript(() => localStorage.setItem('vi-flag-house', '0')); await p.goto(APP); await p.waitForTimeout(1800);
+  await p.addInitScript(seed, 'dark'); await p.goto(APP); await p.waitForTimeout(1800);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
 
   // ── 1. lose and restore ──
@@ -95,11 +96,11 @@ const seed = eval(shotSrc.slice(shotSrc.indexOf('const seed ='), shotSrc.indexOf
   ok(r6c.off === false && r6c.drawn, 'back on the house tab it wakes and draws');
   const r6d = await p.evaluate(async () => { const v = HB3DAPP.viewer; const d = Object.getOwnPropertyDescriptor(Document.prototype, 'hidden');
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); v.wake(); await new Promise(r => setTimeout(r, 150));
-    const hidden = { raf: v._raf }; delete document.hidden; document.dispatchEvent(new Event('visibilitychange')); await new Promise(r => setTimeout(r, 150)); return { hidden, back: v.dirty === false }; });
-  ok(r6d.hidden.raf === 0 && r6d.back, 'a hidden page stops the frames; showing it again redraws');
+    const hidden = { raf: v._raf }; delete document.hidden; document.dispatchEvent(new Event('visibilitychange')); for (let i = 0; i < 40 && v.dirty !== false; i++) await new Promise(r => setTimeout(r, 100)); return { hidden, back: v.dirty === false }; });
+  ok(r6d.hidden.raf === 0 && r6d.back, 'a hidden page stops the frames; showing it again redraws (' + JSON.stringify(r6d) + ')');
 
   // ── 7. lite quality on demand ──
-  const r7 = await p.evaluate(async () => { const v = HB3DAPP.viewer; v.goLite(); await new Promise(r => setTimeout(r, 200)); return { sh: v.renderer.shadowMap.enabled, sun: v.sun.castShadow, dpr: v.renderer.getPixelRatio(), drawn: v.dirty === false, lite: v._lite }; });
+  const r7 = await p.evaluate(async () => { const v = HB3DAPP.viewer; v.goLite(); for (let i = 0; i < 40 && v.dirty !== false; i++) await new Promise(r => setTimeout(r, 100)); return { sh: v.renderer.shadowMap.enabled, sun: v.sun.castShadow, dpr: v.renderer.getPixelRatio(), drawn: v.dirty === false, lite: v._lite }; });
   ok(r7.lite && r7.sh === false && r7.sun === false && r7.dpr === 1 && r7.drawn, 'goLite: shadows off, pixel ratio 1, still drawing (' + JSON.stringify(r7) + ')');
 
   // ── 8. the coin stage draws only on a kick ──
