@@ -65,3 +65,12 @@ node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the
 node tests/test_nw3d.js            # net worth in 3D (on by default): flag off unchanged, 3D | Graph toggle, same numbers in both views, debts grouped by kind (cards stacked in one column, each in its own colour), zoom buttons / ctrl+wheel / reset (VI_APP=file:///… to test another copy)
 node tests/test_email_brand.js   # every e-mail the functions send: brand lockup (Vault, brick, teal It), Night colours, Syne, tagline, FCA line
 ```
+node tests/test_v07_e16.js         # v0.7 E16: "Add to your savings" gone, button "Lay the bricks" with the brick-wall icon, input aria-label
+node tests/test_v07_e17.js         # v0.7 E17: amount box 56 px, 24 px mono digits, gold pound, 599/600 px layout, live "£n lays n bricks" line
+node tests/test_v07_e18.js         # v0.7 E18: house camera buttons in a bottom-centre pill, sprite icons, no emoji, orbit glow
+node tests/test_v07_e1.js          # v0.7 E1: bottom tab bar at 599 px and under only; icon nav at the top from 600 px
+node tests/test_v07_e2.js          # v0.7 E2: the roadmap opens centred on the next achievement, each time the tab opens
+node tests/test_v07_e3.js          # v0.7 E3: gold roadmap tile gone; stage detail on tap (Next up, Met. Waiting on, ring, close x/Esc)
+node tests/test_v07_e9.js          # v0.7 E9: budget spending groups folded by default; a saved choice wins
+node tests/test_v07_e10.js         # v0.7 E10: expense bar arrow: sprite chevron 20 px in a 44 px target, down folded, up open
+node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, identical on #cf-sankey and #bd-sankey, Night and Daylight
