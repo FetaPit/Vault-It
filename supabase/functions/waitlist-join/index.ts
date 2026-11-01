@@ -55,13 +55,15 @@ export async function unsubscribeUrl(id: string): Promise<string> {
 }
 
 // ── limits (same mechanism as send-auth-email: migration 008's rate_hit, keys are salted hashes)
-async function limited(admin: ReturnType<typeof createClient>, scope: string, id: string, limit: number, windowSecs: number): Promise<number> {
+async function limited(admin: ReturnType<typeof createClient>, scope: string, id: string, limit: number, windowSecs: number, failClosed = false): Promise<number> {
+  // failClosed: if the counter cannot be read, treat the caller as limited (used for joins without a human-check token)
+  const broken = failClosed ? 60 : 0
   try {
     const { data, error } = await admin.rpc('rate_hit', { p_key: scope + ':' + (await sha256(`${PEPPER}|${scope}|${id}`)).slice(0, 32), p_limit: limit, p_window_secs: windowSecs })
-    if (error) { console.error('rate_hit failed:', error.message); return 0 }
+    if (error) { console.error('rate_hit failed:', error.message); return broken }
     const row = Array.isArray(data) ? data[0] : data
     return row && row.allowed === false ? Math.max(1, Number(row.retry_after) || 60) : 0
-  } catch (e) { console.error('rate_hit threw:', e); return 0 }
+  } catch (e) { console.error('rate_hit threw:', e); return broken }
 }
 function ipKey(ip: string): string {
   const m4 = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i); if (m4) return m4[1]
@@ -243,7 +245,7 @@ Deno.serve(async (req: Request) => {
     if (!captchaToken) {
       // No token at all: the page sends none when the check cannot load (ad blocker, private DNS, a Cloudflare outage), and testers must never
       // be stuck. Allowed, but on a much smaller allowance, per address and across everyone, plus the e-mailed confirmation link below.
-      wait = (await limited(admin, 'wl-notok-ip', ip, LIMIT_NOTOKEN_IP_PER_HOUR, 3600)) || (await limited(admin, 'wl-notok-all', 'all', LIMIT_NOTOKEN_GLOBAL_PER_HOUR, 3600))
+      wait = (await limited(admin, 'wl-notok-ip', ip, LIMIT_NOTOKEN_IP_PER_HOUR, 3600, true)) || (await limited(admin, 'wl-notok-all', 'all', LIMIT_NOTOKEN_GLOBAL_PER_HOUR, 3600, true))
     } else {
       // A token that is present but does not verify is still refused.
       const verdict = await verifyTurnstile(captchaToken, rawIp(req))
