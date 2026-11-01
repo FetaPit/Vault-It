@@ -13544,8 +13544,9 @@ body.vi-pop-open{overflow:hidden}
 .bd-tile-tt em{font:normal .56rem 'DM Sans',sans-serif;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bd-tile-sum{display:flex;flex-direction:column;align-items:flex-end;font:700 .92rem 'Share Tech Mono',monospace;color:var(--tx)}
 .bd-tile-sum small{font:.5rem 'Share Tech Mono',monospace;color:var(--t3);font-weight:400}
-.bd-chev{flex:none;color:var(--t);font-size:.9rem;transition:transform .25s}
-.bd-tile.folded .bd-chev{transform:rotate(-90deg)}
+.bd-chev{flex:none;color:var(--t);display:grid;place-items:center;width:44px;height:44px;margin:-8px -8px -8px 0;transform:rotate(180deg);transition:transform .24s ease}   /* open: the arrow points up; folded: down (owner, 1 Nov, E10) */
+.bd-tile.folded .bd-chev{transform:none}
+@media (prefers-reduced-motion:reduce){.bd-chev{transition:none}}
 .bd-tile-body{padding:4px 14px 12px}
 .bd-tile.folded .bd-tile-body{display:none}
 .bd-tile-empty{font:.58rem 'DM Sans',sans-serif;color:var(--t3);padding:12px 2px}
@@ -18384,7 +18385,7 @@ function bdRenderLists(){
       +'<span class="bd-tile-ic">'+bdGroupIcon(g,34)+'</span>'
       +'<span class="bd-tile-tt"><b>'+G.label+'</b><em>'+G.ex+'</em></span>'
       +'<span class="bd-tile-sum">'+cfMoney(sum)+'<small>'+(m.tIn>0?Math.round(sum/m.tIn*100)+'% of income':items.length+' item'+(items.length===1?'':'s'))+'</small></span>'
-      +'<span class="bd-chev">▾</span></button>'
+      +'<span class="bd-chev"><svg class="vi-ic" style="--vi-sw:2;width:20px;height:20px" aria-hidden="true"><use href="#vi-chevron"/></svg></span></button>'
       +'<div class="bd-tile-body">'+(items.length?items.map(function(r){return bdRowHTML('exp',r);}).join(''):'<div class="bd-tile-empty">Nothing here yet. Add your first '+G.short.toLowerCase()+' line below.</div>')
       +'<div class="bd-qa"><div class="bd-qa-t"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-plus"/></svg> Quick add to '+G.short+'</div><div class="bd-qa-row"><input type="text" id="bd-qa-n-'+g+'" maxlength="40" placeholder="'+cfEsc(G.ex.split(',')[0])+'" onkeydown="if(event.key===\'Enter\')bdQuickAdd(\''+g+'\')"><input type="number" id="bd-qa-a-'+g+'" min="0" placeholder="£/mo" onkeydown="if(event.key===\'Enter\')bdQuickAdd(\''+g+'\')"><button type="button" class="btn-add-data" onclick="bdQuickAdd(\''+g+'\')">Add</button></div></div>'
       +'</div></section>';
