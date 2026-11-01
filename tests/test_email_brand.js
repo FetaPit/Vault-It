@@ -49,5 +49,6 @@ for (const f of ['send-auth-email', 'waitlist-join', 'waitlist-welcome']) {
   const s = fs.readFileSync(ROOT + f + '/index.ts', 'utf8');
   ok(BRICK.test(s), f + ': logo is the brand lockup picture');
   ok(s.includes('Not regulated by the FCA. Not financial advice.'), f + ': FCA line');
+  ok(s.includes('Get out of the red and into your home.') && /font-family:'Syne'/.test(s) && /font-family:'DM Sans'/.test(s) && /background:#080808/.test(s) && /background:#080D14/.test(s) && /#15302F/.test(s), f + ': tagline, Syne and DM Sans, Night page, panel and border (owner, 1 Nov: OTP, confirm and welcome mails carry the same brand)');
 }
 console.log(fails ? 'FAILURES ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);
