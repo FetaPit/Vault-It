@@ -32,10 +32,11 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else consol
     ok(btn.vis && btn.right <= w && btn.bottom <= (mob ? 844 : 900) - 30 && btn.aria === 'Send feedback', T + 'a Feedback button sits above the footer and nav (bottom ' + Math.round(btn.bottom) + ')');
     ok(btn.label === !mob, T + (mob ? 'on a phone it is just the icon' : 'on desktop it says Feedback'));
     const dodged = await p.evaluate(() => { const st = document.createElement('style'); st.textContent = 'body>*:not(#vi-fb-btn):not(#fb-under){visibility:hidden!important}'; document.head.appendChild(st);
-      const b = document.getElementById('vi-fb-btn'); b.classList.remove('vi-fb-left'); const r = b.getBoundingClientRect(), x = document.createElement('button');
+      const b = document.getElementById('vi-fb-btn'); b.classList.remove('vi-fb-left', 'vi-fb-top', 'vi-fb-away'); const r = b.getBoundingClientRect(), x = document.createElement('button');
       x.id = 'fb-under'; x.textContent = '+'; x.style.cssText = 'position:fixed;z-index:1;left:' + (r.left - 4) + 'px;top:' + (r.top - 4) + 'px;width:' + (r.width + 8) + 'px;height:' + (r.height + 8) + 'px';
       document.body.appendChild(x); viFbDodge(); const moved = b.classList.contains('vi-fb-left') && b.getBoundingClientRect().left < 40; x.remove(); viFbDodge(); const back = !b.classList.contains('vi-fb-left'); st.remove(); viFbDodge(); return moved && back; });
     ok(dodged, T + 'the button moves to the left edge when a control sits under it, and back when clear');
+    ok(await p.evaluate(() => { viFbDodge(); const b = document.getElementById('vi-fb-btn'), r = b.getBoundingClientRect(), e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.width > 0 && getComputedStyle(b).opacity !== '0' && !!e && b.contains(e) && (innerWidth <= 600 || !b.classList.contains('vi-fb-top')); }), T + 'the button is visible and clickable (never under the nav tabs)');
     await p.evaluate(() => setTimeout(() => { throw new Error('bad value 3217.50 at row 987'); }, 0)); await p.waitForTimeout(100);
     // not signed in: says so, sends nothing
     await p.click('#vi-fb-btn'); await p.waitForTimeout(300);
