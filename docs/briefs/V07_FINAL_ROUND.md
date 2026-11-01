@@ -29,6 +29,8 @@ The brand book draws 14,465 bricks with raw WebGL: one shader program, one insta
 - Pedro's ASK: the house viewport keeps the Night palette in Daylight mode too. No Daylight palette work.
 - Lazy laying (part of the A2 spec): on load, only the top course is laid brick by brick; every course below is drawn as one settled shape (merged static instancing, no per-brick drop state). When a deposit adds more than the current course (e.g. £80,000 at once), the new bricks lay with the brand-book drop animation, course after course, to the new level — Pedro's stagger and drop timings apply to those new courses only. Initial render = settled shell + one animated top course; deposits animate only the delta.
 
+- House-type switching is very laggy on the fold (Pete, 1 Nov): a switch must not rebuild per-brick animation state. Same lazy-laying rule: draw the new type as settled shell + one animated top course at the current level. Gate: no main-thread task over 100 ms on switch.
+
 ## David's view
 - Honest timing: the engine swap is hours, not minutes. Release tonight only if the owner takes the safety option (still picture by default, 3D on tap) for v0.7 and the new engine as v0.7.1; otherwise the release follows the new engine.
 - No new features in this round. Anything new goes to v0.7.1.
