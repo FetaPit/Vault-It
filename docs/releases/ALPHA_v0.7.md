@@ -29,7 +29,7 @@ The release going to testers on Mon 2 Nov 2026: production branch `release/pione
 
 ### Not in v0.7 (decided, or later)
 
-- PostHog in the live app (queue item open; ship after the release so alpha usage can be measured from week 1)
+- PostHog in the live app: after alpha testing (owner, 1 Nov). The Supabase usage log and Stripe cover the alpha
 - Branded emails, letters of intent, creator shortlist, business plan follow-ups
 - Brand rename (UKIPO VAULTIT mark held by Vaultit AB): blocks public launch, socials and incorporating, not the private tester release
 - Making the repo private: do it after the merge and check the next Cloudflare build still runs (it also takes fetapit.github.io offline)
