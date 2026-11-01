@@ -20,6 +20,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   ok(r.sameRow,'tiles sit alongside each other'); ok(r.incW<r.expW,'income column is narrower than expenditure ('+Math.round(r.incW)+' vs '+Math.round(r.expW)+')');
   ok(Math.abs(r.lineX-r.nodeX)<8,'dividing line lines up with the end of the income block in the flow diagram ('+Math.round(r.lineX)+' vs '+Math.round(r.nodeX)+')');
   ok(r.legendFs>=12&&r.legendIcons>=6,'key is bigger and carries the icons ('+r.legendFs.toFixed(1)+'px)');
+  await p.evaluate(()=>bdFoldAll(false));   // sections start folded now (v0.7 E9): open them first
   const h0=await p.evaluate(()=>document.querySelector('.bd-tile[data-g="ce"] .bd-tile-body').getBoundingClientRect().height);
   await p.evaluate(()=>document.querySelector('.bd-tile[data-g="ce"] .bd-tile-hd').click()); await p.waitForTimeout(200);
   const h1=await p.evaluate(()=>({h:document.querySelector('.bd-tile[data-g="ce"] .bd-tile-body').getBoundingClientRect().height,saved:localStorage.getItem('vi_bd_fold')}));

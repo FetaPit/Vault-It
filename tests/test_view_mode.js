@@ -42,7 +42,7 @@ const seed = (o) => {
   let o = await p.evaluate(() => window.__ov());
   ok(!o.simple && o.ms && o.nwh && o.cf && o.own && !o.ach && /achievements/.test(o.tabs) && /biz/.test(o.tabs), 'no view saved: Advanced, every Overview tile and tab shows, no achievements card');
   const fold0 = await p.evaluate(() => { showTab('budget'); return [...document.querySelectorAll('.bd-tile')].map(t => t.classList.contains('folded')); });
-  ok(fold0.length >= 3 && fold0.every(f => !f), 'Advanced: budget sections start open');
+  ok(fold0.length >= 3 && fold0.every(f => f), 'Advanced: budget sections start folded (v0.7 E9: folded for everyone)');
 
   // ── 2. switch to Simplified from Settings ──
   await p.evaluate(() => { showSettings(); document.querySelector('#set-view [data-val="simple"]').click(); closeSettings(); showTab('overview'); }); await p.waitForTimeout(400);

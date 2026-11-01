@@ -18399,7 +18399,7 @@ function bdQuickAdd(g){if(viBlockEdit())return;
   ovState.expenses.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),category:cfGroupToCat(g),type:g,cat:bdGuess('exp',n)});
   saveState();renderCashflow();updateKPIs();showToast('Added to '+CF_GROUPS[g].short);
 }
-function bdIsFolded(g){return Object.prototype.hasOwnProperty.call(_bdFold,g)?!!_bdFold[g]:(typeof viSimple==='function'&&viSimple());}
+function bdIsFolded(g){return Object.prototype.hasOwnProperty.call(_bdFold,g)?!!_bdFold[g]:true;}   // every group starts folded for everyone; a saved choice still wins (owner, 1 Nov, E9)
 function bdFold(g){_bdFold[g]=!bdIsFolded(g);try{localStorage.setItem('vi_bd_fold',JSON.stringify(_bdFold));}catch(e){}bdRenderLists();}
 function bdFoldAll(v){CF_GROUP_ORDER.forEach(function(g){_bdFold[g]=!!v;});try{localStorage.setItem('vi_bd_fold',JSON.stringify(_bdFold));}catch(e){}bdRenderLists();}
 // group icons: lock = committed (same every month), open lock = variable; roof = essential, star = non-essential
