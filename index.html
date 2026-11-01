@@ -11528,9 +11528,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
       </div>
       <!-- Lay the bricks sits right under the viewport so the laying is seen (owner, 30 Oct 2026) -->
-      <div class="hb-lay" id="hb-lay" role="group" aria-labelledby="hb-add-lbl">
-        <div class="hb-sub-lbl" id="hb-add-lbl">Add to your savings</div>
-        <div class="hb-lay-row"><label for="savingsInput" id="hb-add-amt" class="vi-sr">Amount Saved</label><div class="iw"><span class="sym">£</span><input type="number" id="savingsInput" placeholder="0.00" min="0" step="100"></div><button class="btn-add" id="btnAdd">⊕ &nbsp;Lay the Bricks</button></div>
+      <div class="hb-lay" id="hb-lay" role="group" aria-label="Lay the bricks">
+        <div class="hb-lay-row"><label for="savingsInput" id="hb-add-amt" class="vi-sr">Amount to add to your deposit</label><div class="iw"><span class="sym">£</span><input type="number" id="savingsInput" placeholder="0.00" min="0" step="100" aria-label="Amount to add to your deposit"></div><button class="btn-add" id="btnAdd"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick-wall"/></svg> Lay the bricks</button></div>
       </div>
       <div class="vp-key">☝ DRAG TO PAN &nbsp;·&nbsp; ✌ DRAG TO ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH TO ZOOM</div>
       <div class="scene-cap" id="sceneCap" style="display:none"></div>
@@ -14592,8 +14591,8 @@ function updateUI(){
   else cap.textContent='🎉 Deposit goal reached!';
   if(purchasedBanner)purchasedBanner.style.display=(p>=1&&!state.houseMode&&!noDeposits)?'block':'none';
   if(mortgageComplete)mortgageComplete.style.display=(state.houseMode==='purchased'&&state.mortgageBalance<=0)?'block':'none';
-  var _bought=state.houseMode==='purchased',_ab=document.getElementById('btnAdd'),_al=document.getElementById('hb-add-lbl'),_aa=document.getElementById('hb-add-amt');
-  if(_ab)_ab.innerHTML=_bought?'⊕ &nbsp;Pay off the mortgage':'⊕ &nbsp;Lay the Bricks';if(_al)_al.textContent=_bought?'Pay off your mortgage':'Add to your savings';if(_aa)_aa.textContent=_bought?'Amount paid':'Amount Saved';
+  var _bought=state.houseMode==='purchased',_ab=document.getElementById('btnAdd'),_al=document.getElementById('hb-lay'),_aa=document.getElementById('hb-add-amt'),_ai='<svg class="vi-ic" aria-hidden="true"><use href="#vi-brick-wall"/></svg> ';
+  if(_ab)_ab.innerHTML=_ai+(_bought?'Pay off the mortgage':'Lay the bricks');if(_al)_al.setAttribute('aria-label',_bought?'Pay off your mortgage':'Lay the bricks');if(_aa)_aa.textContent=_bought?'Amount paid':'Amount to add to your deposit';var _si=document.getElementById('savingsInput');if(_si)_si.setAttribute('aria-label',_aa.textContent);
   const list=document.getElementById('logList');
   if(!state.deposits.length){list.innerHTML='<div style="font-size:.58rem;color:rgb(var(--ink-rgb) / .18);text-align:center;padding:10px 0">No deposits yet</div>';}
   else list.innerHTML=(state.payments||[]).slice().reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date} · mortgage</span><span class="la">-${gbpFmt(Number(d.amount))}</span></div>`).join('')+[...state.deposits].reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date}</span><span class="la">+${gbpFmt(Number(d.amount))}</span></div>`).join('');
@@ -27956,7 +27955,7 @@ var KB=[
   {c:'Budget and debts',q:'Where can I get free debt help?',k:'struggling help support debt charity stepchange',a:'Free, confidential help: <b>StepChange</b>, <b>National Debtline</b> and <b>MoneyHelper</b>. If you are struggling, talk to one of them before taking on new credit.'},
 
   {c:'House builder',q:'How does the house builder work?',k:'3d bricks build ghost colour levels house',a:'Pick a house type, price and deposit. <b>Level 1</b>: the house is drawn as a ghost and bricks go down as you save your deposit. When you buy, <b>Level 2</b> starts: enter your mortgage and the house fills with colour as your share grows.',act:[{l:'Show me',show:'house'}]},
-  {c:'House builder',q:'How do I add savings to my house?',k:'deposit lay bricks add saved money towards',a:'In House builder, use <b>Add to your savings</b> each time you put money towards your deposit.',act:[{l:'Show me',show:'house-save'}]},
+  {c:'House builder',q:'How do I add savings to my house?',k:'deposit lay bricks add saved money towards',a:'In House builder, use <b>Lay the bricks</b> each time you put money towards your deposit.',act:[{l:'Show me',show:'house-save'}]},
   {c:'House builder',q:'How big a deposit do I need?',k:'deposit size percent 10 5 how much need',a:'In House builder you set your deposit as a percentage of the home\'s price. It starts at 20% and you can change it there. The roadmap on Overview plans with its own deposit figure, shown on its Deposit card. Many UK lenders accept 5%, but a bigger deposit usually means a better rate. A regulated mortgage adviser can tell you what lenders would offer you.'},
   {c:'House builder',q:'Does a Lifetime ISA help?',k:'lisa isa bonus government 25',a:'If you add a cash account with the type <b>LISA</b>, your deposit forecast includes the 25% government bonus (up to about £83 a month). Check the LISA rules on gov.uk first.'},
   {c:'House builder',q:'The house or a 3D view is blank',k:'blank broken not showing 3d house view stuck slow',a:'Tap the reset button in the viewer, turn your phone round or reload the page. Older phones can struggle with 3D, and closing other tabs helps. If it keeps happening, tap Feedback so Pete can see it.',act:[{l:'Send feedback',fn:'viFbOpen'}]},
