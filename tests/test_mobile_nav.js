@@ -1,7 +1,7 @@
 // Mobile navigation (owner, 30 Oct 2026): on phones the tab icons sit in a bar fixed to the bottom of the screen and stay there while the
 // page scrolls; the header keeps one row; the footer flows at the end of the page. The Connections tab has left the menu bar at every width
 // and lives in Settings: showTab('connections') opens Settings at that section with the list rendered. Desktop keeps the two-row header.
-// Tablets and folds (701 to 1023 px, Fold open at 884) keep the labelled menu at the top even with the compact density saved;
+// Tablets and folds (600 to 1023 px, Fold open at 884) keep the menu at the top, icons only from v0.7 E1 (tests/test_v07_e1.js), even with the compact density saved;
 // the Fold closed (344) gets the phone bar; the Settings "Icons only" choice still hides labels.
 // Run: node tests/test_mobile_nav.js
 const { chromium } = require('playwright');
@@ -73,7 +73,7 @@ const seed = (theme) => {
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal,#trial-banner,#tester-welcome{display:none!important}' });
     const t = await p.evaluate(() => { const bar = document.getElementById('vi-tabs'); const labels = [...bar.querySelectorAll('.tab-btn')].filter(x => !x.hidden && getComputedStyle(x).display !== 'none').map(x => { const l = x.querySelector('.nav-tab-label'); return !!l && getComputedStyle(l).display !== 'none' && l.getBoundingClientRect().width > 8; });
       return { pos: getComputedStyle(bar).position, labels, fit: bar.scrollWidth <= bar.clientWidth + 1, sx: document.documentElement.scrollWidth - innerWidth, compact: document.body.classList.contains('vi-compact'), top: Math.round(bar.getBoundingClientRect().top) }; });
-    ok(t.pos !== 'fixed' && t.top < 120 && t.labels.length === 7 && t.labels.every(Boolean) && t.fit && t.sx <= 1, w + 'px' + (dens ? ' (density ' + dens + ' saved)' : '') + ': the labelled menu sits at the top, all seven labels show and fit (' + JSON.stringify(t) + ')');
+    ok(t.pos !== 'fixed' && t.top < 120 && t.labels.length === 7 && t.labels.every(x => !x) && t.fit && t.sx <= 1, w + 'px' + (dens ? ' (density ' + dens + ' saved)' : '') + ': the icon menu sits at the top, seven icons, no labels, and fits (' + JSON.stringify(t) + ')');
     await ctx.close();
   }
   { // Galaxy Fold closed (344 px): the phone bar at the bottom
@@ -86,8 +86,8 @@ const seed = (theme) => {
   { // owner, 31 Oct: no Compact / Icons only choice any more; the width decides. A saved "Icons only" or "compact" is left in storage but not applied
     const ctx = await b.newContext({ viewport: { width: 884, height: 1000 } });
     const p = await ctx.newPage(); await p.addInitScript(seed, 'dark'); await p.addInitScript(() => { localStorage.setItem('vi_settings', JSON.stringify({ compactNav: true })); localStorage.setItem('vi_density', 'wide'); }); await p.goto(APP); await p.waitForTimeout(1500);
-    const r = await p.evaluate(() => ({ shown: [...document.querySelectorAll('#vi-tabs .tab-btn:not([hidden]) .nav-tab-label')].every(l => getComputedStyle(l).display !== 'none'), dens: getComputedStyle(document.getElementById('vi-density-btn')).display, setNav: !!document.getElementById('set-nav'), wide: document.body.classList.contains('vi-wide'), kept: localStorage.getItem('vi_density') === 'wide' && JSON.parse(localStorage.getItem('vi_settings')).compactNav === true }));
-    ok(r.shown && r.dens === 'none' && !r.setNav && !r.wide && r.kept, '884px with an old "Icons only" and "Wide" saved: labels show, no density switch or Nav style setting, saved values untouched (' + JSON.stringify(r) + ')');
+    const r = await p.evaluate(() => ({ shown: [...document.querySelectorAll('#vi-tabs .tab-btn:not([hidden]) .nav-tab-label')].every(l => getComputedStyle(l).display === 'none'), dens: getComputedStyle(document.getElementById('vi-density-btn')).display, setNav: !!document.getElementById('set-nav'), wide: document.body.classList.contains('vi-wide'), kept: localStorage.getItem('vi_density') === 'wide' && JSON.parse(localStorage.getItem('vi_settings')).compactNav === true }));
+    ok(r.shown && r.dens === 'none' && !r.setNav && !r.wide && r.kept, '884px with an old "Icons only" and "Wide" saved: icons only, no density switch or Nav style setting, saved values untouched (' + JSON.stringify(r) + ')');
     await ctx.close();
   }
   // ── wide desktop (owner, 31 Oct): one row (logo, tabs across the width, net worth, Back, Night/Daylight) when it fits, else two rows ──

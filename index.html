@@ -10115,7 +10115,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 }
 /* phones (owner, 30 Oct 2026): the tab icons sit in a bar fixed to the bottom of the screen, always visible; the header keeps one row.
    The nav drops to z-index 500 here so pop-ups (Settings at 600 and above) cover the bar; the footer flows at the end of the page instead. */
-@media (max-width:700px){
+@media (max-width:599px){
   :root{--footer-h:calc(56px + env(safe-area-inset-bottom,0px))}
   html #topnav{grid-template-rows:46px;z-index:500!important}
   #topnav .vi-tabs{position:fixed;left:0;right:0;bottom:0;top:auto;grid-row:auto;grid-column:auto;height:calc(56px + env(safe-area-inset-bottom,0px));margin:0;padding:0 4px env(safe-area-inset-bottom,0px);background:rgb(var(--panel-rgb) / .97);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;gap:0;overflow:visible}
@@ -10127,12 +10127,20 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   #app-footer{position:static;margin-top:16px}
   html body #sync-banner,html body #trial-banner{bottom:calc(var(--footer-h) + 6px)!important}
 }
+/* tablets, unfolded folds and wider (v0.7 E1, owner 1 Nov; Pedro B): from 600 px the tabs sit at the top as on desktop, icons only,
+   22 px icons in 44 px targets, spread evenly; the active tab is outlined in its own colour. Phones (599 and under) keep the bottom bar. */
+@media (min-width:600px) and (max-width:1023px){
+  #topnav .vi-tabs{justify-content:space-evenly!important}
+  html #topnav .tab-btn,html #topnav.compact-nav .tab-btn,html body.vi-compact #topnav .tab-btn{flex:0 0 44px!important;width:44px!important;min-width:44px;max-width:44px;height:44px!important;padding:0!important;border-radius:10px!important}
+  html #topnav .tab-btn .nav-tab-label,#topnav .tab-btn .nav-tab-label{display:none!important}
+  html #topnav .tab-btn .vi-ic.ti{width:22px!important;height:22px!important}
+}
 /* ===== Help centre: guided tour, FAQs, help chat (owner, 1 Nov 2026; tests/test_help_centre.js) ===== */
 #vi-help-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:28px;min-width:28px;padding:0 10px;margin-left:8px;flex-shrink:0;background:transparent;border:1px solid var(--line2);border-radius:999px;color:var(--muted);font-family:var(--font-display);font-size:.5rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
 #vi-help-btn b{font-size:.8rem;line-height:1;color:var(--teal);font-weight:800;letter-spacing:0}
 #vi-help-btn:hover,#vi-help-btn[aria-expanded="true"]{color:var(--text);border-color:var(--teal)}
 #vi-help-btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
-@media(max-width:700px){#vi-help-btn{width:34px;height:34px;padding:0;margin-left:6px}#vi-help-btn span{display:none}#vi-help-btn b{font-size:.95rem}}
+@media(max-width:599px){#vi-help-btn{width:34px;height:34px;padding:0;margin-left:6px}#vi-help-btn span{display:none}#vi-help-btn b{font-size:.95rem}}
 
 #vi-help{position:fixed;z-index:9500;right:16px;bottom:calc(var(--footer-h,30px) + 16px);width:min(400px,calc(100vw - 32px));height:min(620px,calc(100dvh - var(--footer-h,30px) - 170px));background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .35);border-radius:var(--r-tile,14px);box-shadow:0 18px 60px rgba(0,0,0,.45);display:none;flex-direction:column;overflow:hidden;font-family:var(--font-body);color:var(--text)}
 #vi-help.open{display:flex}
