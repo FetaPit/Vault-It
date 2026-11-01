@@ -61,3 +61,10 @@ The release going to testers on Mon 2 Nov 2026: production branch `release/pione
 - 31 Oct 21:50: owner holds the release until House builder speed and Phone sign-off fixes are done.
 - 1 Nov: both done; old house builder deleted; Help centre added to the release ("Add to mvp list"); Feedback button blocker found by CI and fixed (e86fa6c), which then broke `test_signoff_a` (in progress); celebrity names found and fixed on a side branch.
 - 2 Nov: CI green, phone sign-off, merge PR #3 as v0.7.
+
+## Release-night notes (1 Nov, evening)
+
+- Candidate 67bb51e green; owner held it after the preview (19 edits, `docs/briefs/V07_PREVIEW_EDITS.md` on brand-rollout).
+- Streams started on the owner's "Go" (19:40): A house builder engine (Fable, session_01KoffvynkETPQC1hZdf8um5, branch v07/house-builder); B quick fixes and flow labels (Sonnet, session_01KoffvwxP6sZqoPLryChbVP, branch v07/quick-fixes). Merge B then A into candidate/v0.7, CI, one preview.
+- When merging the streams, also cherry-pick da55c59 (waitlist-join: no-token rate_hit error now counts as limited, fails closed; QC PASS) onto candidate/v0.7 so step 6 deploys waitlist-join from the same code. No migration in that change; migration 013 (welcome) still needs the owner's yes.
+- Open owner decision before the e-mail deploy: reword or keep the welcome e-mail's "weekly note" line.
