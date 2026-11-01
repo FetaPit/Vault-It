@@ -1,6 +1,6 @@
 # Weekly newsletter: format guide
 
-Template: `newsletter-template.html` (built by `node docs/marketing/build_emails.js`, shared look with the other Vault-It e-mails). Welcome e-mail: `welcome-email.html`. Both are drafts. Nothing is sent and nothing is deployed without the owner's yes.
+Template: `newsletter-template.html` (built by `node docs/marketing/build_emails.js`, shared look with the other Vault-It e-mails). Welcome e-mail: `welcome-email.html`; day 3 research e-mail: `research-email.html`. Both are drafts. Nothing is sent and nothing is deployed without the owner's yes.
 
 ## Filling it each week (a session can do this in one pass)
 1. Window: last Monday to this Sunday. Sources: `docs/QUEUE.md` Done section, and `git log --since="<monday>" --oneline origin/release/pioneer-v2` (only what is live counts; no unreleased work).
