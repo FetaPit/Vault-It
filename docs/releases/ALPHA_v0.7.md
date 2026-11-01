@@ -25,12 +25,15 @@ The release going to testers on Mon 2 Nov 2026: production branch `release/pione
 - Feedback button and specific questions, 4fbd68d and d851346 (server live since 31 Oct)
 - Help centre, 47ceb8e and 2a19d70 (server: `help-ask` v1 and `tester-feedback` v3 deployed 1 Nov)
 - Ledger gaps, footer disclaimer, icons, bank logos, Budget 3D tree map gaps
+- Added by the owner, 1 Nov 17:25: branded emails (9c8005e, f5cc583), pending Pedro's final sign-off. Their function deploys follow after the site is live, each with the owner's yes
+- Likely in: the landing no-stuck fallback (client side only)
+- The candidate moves past 0909a7e for these, so CI and the phone sign-off run again on the new commit
 - Nothing in Supabase, secrets or migrations changes with the merge
 
 ### Not in v0.7 (decided, or later)
 
 - PostHog in the live app: after alpha testing (owner, 1 Nov). The Supabase usage log and Stripe cover the alpha
-- Branded emails, letters of intent, creator shortlist, business plan follow-ups
+- Letters of intent, creator shortlist, business plan follow-ups; weekly newsletter and welcome e-mail (new, own session)
 - Brand rename (UKIPO VAULTIT mark held by Vaultit AB): blocks public launch, socials and incorporating, not the private tester release
 - Making the repo private: do it after the merge and check the next Cloudflare build still runs (it also takes fetapit.github.io offline)
 
