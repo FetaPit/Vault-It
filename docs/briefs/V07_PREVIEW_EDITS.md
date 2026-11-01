@@ -128,11 +128,11 @@ Done means: one tap on the Civic at 390 opens the viewer; shots after a drag and
 
 Shared rules for every stream: read CLAUDE.md, docs/DEV_WORKFLOW.md and docs/MULTI_SESSION.md first. Work on your own branch from `candidate/v0.7`. Ship through the ship-item skill (intent card from the owner's words in docs/briefs/V07_PREVIEW_EDITS.md, a failing test first, named tests, `node tools/shot.js` shots at 390, 768 and 1100 in Night and Daylight, Pedro REVIEW to PASS, then rollout-qc). Never push release/pioneer-v2 or touch PR #3. No Supabase changes. Report your branch, SHA, test results and Cloudflare preview link (https://<branch-alias>-vault-it.ptlived.workers.dev) to the release chat, session_01Koffvw9bGnT6zw8keBi9TD. British English, no em dashes. Finish in five lines or fewer.
 
-**Stream A, house builder engine (Fable, tonight):** "Build v0.7 preview edits E12 to E15 from docs/briefs/V07_PREVIEW_EDITS.md (owner's words, David's split, Pedro section A1, A2 and A6). Step one: measure a cleared-cache load at 390 px with CPU 4x on 67bb51e (time to first 3D frame, longest main-thread task, tap delay) and write the numbers down. Then: the finished house shows at once (built once and kept), only bricks added since the last visit animate (capped at one course), the full build moves to an opt-in 'Watch it built' link, 3D starts only when the viewport scrolls into view with the still picture until the first frame, sharp hairlines at full pixel ratio at rest, and the gold ground ping kept in lite mode. Edit src/hb3d/* and run node tools/build_hb3d.js. Measure again. tests/test_hb_speed.js must pass and gain a cold-load check. Report before and after numbers with the shots."
+**Stream A, house builder engine (Fable, tonight):** "Build v0.7 preview edits E12 to E15 from docs/briefs/V07_PREVIEW_EDITS.md (owner's words, David's split, Pedro section A1, A2 and A6). Step one: measure a cleared-cache load at 390 px with CPU 4x on 67bb51e (time to first 3D frame, longest main-thread task, tap delay) and write the numbers down. Then: the finished house shows at once (built once and kept), only bricks added since the last visit animate (capped at one course), the full build moves to an opt-in 'Watch it built' link, 3D starts only when the viewport scrolls into view with the still picture until the first frame, sharp hairlines at full pixel ratio at rest, and the gold ground ping kept in lite mode. Edit src/hb3d/* and run node tools/build_hb3d.js. Measure again. tests/test_hb_speed.js must pass and gain a cold-load check. Protect Pedro's addendum section 3 moment on the demo data (house mid-build, no Pro lock). Apply his section 4 cuts. Report before and after numbers with the shots."
 
-**Stream B, quick fixes (Sonnet, tonight):** "Build v0.7 preview edits E16, E17, E18, E1, E2, E3, E9 and E10 from docs/briefs/V07_PREVIEW_EDITS.md, following Pedro sections A3 to A5, B, C1, C2, D5 and D6 exactly. Only index.html markup, CSS and UI code; do not touch src/hb3d (Stream A owns it). One commit per edit, each with its own failing test. Merge first, before Stream A."
+**Stream B, quick fixes (Sonnet, tonight):** "Build v0.7 preview edits E16, E17, E18, E1, E2, E3, E9 and E10 from docs/briefs/V07_PREVIEW_EDITS.md, following Pedro sections A3 to A5, B, C1, C2, D5 and D6 exactly. Only index.html markup, CSS and UI code; do not touch src/hb3d (Stream A owns it). Also the black label chips on the flow diagram (E4 labels, Pedro C4 and addendum section 2 chip spec), checked on both #cf-sankey and #bd-sankey; the flow animation stays in Stream C. Leave out B5 (landscape single row) and the brick-count line unless the brick value already exists in index.html. One commit per edit, each with its own failing test. Merge first, before Stream A."
 
-**Stream C, Budget and Dashboard 3D (Fable or Opus, tomorrow, after Pedro's brief is approved by the owner):** "Build v0.7.1 edits E4, E5, E6, E7, E8 and E11 from docs/briefs/V07_PREVIEW_EDITS.md, Pedro sections C3, C4 and D1 to D4 and D7, using the owner's answer to ASK 2. Labels and flag posts are built once and shared by both views."
+**Stream C, Budget and Dashboard 3D (Fable or Opus, tomorrow, after Pedro's brief is approved by the owner):** "Build v0.7.1 edits E4, E5, E6, E7, E8 and E11 from docs/briefs/V07_PREVIEW_EDITS.md, Pedro sections C3, C4 and D1 to D4 and D7, using the owner's answer to ASK 2. One flow asset on Dashboard and Budget (Pedro addendum section 2). One chip style is shared by the flow SVG and the 3D tree map; flag posts are 3D only."
 
 **Stream D, 3D model viewer (Sonnet, tomorrow):** "Build v0.7.1 edit E19 from docs/briefs/V07_PREVIEW_EDITS.md, Pedro section E: one shared viewer for Liabilities and Wealth inventory, one tap to open, orbit and pinch zoom, the WebGL-off picture."
 
@@ -143,3 +143,40 @@ Verbatim: "1a same for dashboard means the budget flow diagram edits should be m
 - ASK 1 (E18): (a), the camera buttons (zoom, orbit, my row, reset, full screen) move to the bottom of the viewport.
 - ASK 2 (E7): the Budget flow diagram and the Dashboard flow diagram are one and the same asset: every flow edit (animation, black-background labels in the same style) lands on both. Flag posts do not apply to the flow diagram; they stay only on the Budget 3D view (E8). This matches Pedro's option (a): drawCashflowDiagram draws both, so build once and check both #cf-sankey and #bd-sankey.
 - David's question (tester tonight): (a), the preview link with demo data and no sign-in.
+
+## David (COO): rebound on the owner's answers
+
+- The answers make it smaller, not bigger. One flow diagram, built once, shows on both tabs. Flag posts only on the Budget 3D. Good.
+- One change to the split: move the black-label chips (E4 labels, now on both diagrams) into tonight's Stream B. The Dashboard is the first screen a tester sees, and lost labels are the first thing they'd notice. It is one renderer and a small change. The flow animation (draw-in and moving dashes) stays tomorrow in Stream C.
+- Tonight's tester is on the preview with demo data, so:
+  - The demo must show a house part built, with a deposit already laid, or the house builder lands flat. Stream A checks the demo house on a cleared-cache phone.
+  - The Feedback button can't send on the preview (no sign-in). Get their reaction by message or a quick call. Three questions, drafted for Pete to send himself: what did you think it does in the first 10 seconds; what did you try first; what nearly made you close it.
+- Timing, honestly: A and B start the moment Pete says go. Target a preview link by about 22:00. If A's numbers aren't good enough by then, the tester sees B's fixes with the house builder showing the still picture first and 3D on tap. Better a calm still picture than a frozen page.
+- The live release is not tonight. v0.7 goes live once Pete signs off A and B on the preview. C and D follow as v0.7.1.
+- Still open for Pete before the email functions deploy (not tonight): reword or keep the welcome e-mail's "weekly note" line.
+
+## Pedro (CD): addendum after the owner's answers
+
+1. Changes to A to E
+- A: ASK closed; A3 is the camera buttons. Nothing else in A changes.
+- C and D: E7 ASK closed. C3 and C4 describe one flow asset rendered on Dashboard and Budget. Flag posts (D4) are Budget 3D tree map only. The flow diagram gets black chips only and keeps its existing leader line from block to label (not a flag post). Stream C wording fixed: one chip style is shared by the flow SVG and the 3D tree map; posts are 3D only.
+- E: no change. Every shot uses the demo data seed (no sign-in), as the tester will.
+
+2. "Same asset" beyond the shared drawCashflowDiagram (index.html:18191)
+- One geometry: remove the isBd branch at ~18235 (height cap innerHeight minus 150 on Budget, minus 170 on Dashboard), so both have the same shape at the same width.
+- Same frame: same card padding (0 at the sides, as .bd-sankey-card), same .cf-scroll background; #cf-sankey gets the same SVG rules as #bd-sankey (:13511, max-height:none).
+- Budget-only furniture stays out of the asset: the dashed income | spending divider (.bd-sankey-card::after) and the Flow | 3D toggle.
+- Same title on both: "Where your income flows" (the Dashboard's "Cash flow" title goes).
+- Same chip from one function: #080808 at .88, 1 px category-colour stroke at .5, 4 px radius, 4 px 6 px padding, name DM Sans 600 11 px, amount Share Tech Mono 10.5 px.
+- Same motion: 900 ms draw-in, dashes at 40 px/s, both in viewBox units. Each host fires its own draw-in on its first view (a shared trigger would leave the second already drawn); the __sig cache must not block that first animation.
+- Key: one component (cfLegendHTML fills both) in the compact D1 strip; in the top card on Budget, directly above the diagram on Dashboard.
+- Done means on both #cf-sankey and #bd-sankey: crops at 390 and 1100 match apart from the heading row; every label on a black chip, no overlaps, Night and Daylight; a frame 400 ms after each tab's first view shows a part-drawn flow, a later frame shows the dashes moved; reduced motion static at full opacity.
+
+3. The one moment to protect tonight (first 30 s on the demo preview)
+- Tap House builder: within about 1 s a sharp finished house on the gold plinth with the ping spreading. Then the top course lays itself in 1.2 to 1.5 s, and ROW n / 154 and % OF DEPOSIT agree.
+- Type an amount in the big box, tap "Lay the bricks": within 250 ms bricks drop, flash gold and settle, "+£n · +n bricks" floats up, the figure changes.
+- Needs: a first visit has no last visit, so it lays the top course (the owner's own idea); the demo deposit sits mid-build, not empty and not finished; the demo must not hit #house-pro-lock (the "Pro only" overlay with a 🔒 emoji: kills the moment and is a hard fail).
+
+4. Cuts to keep the bar high tonight
+- Stream A: full pixel ratio at rest first; swap to LineMaterial only if the zoomed-eaves shot still fails (risky against the hologram shaders and clipping plane). Drop the 300 ms sweep band: lower courses appear at once, the top course lays. Keep "Watch it built" only if the old build path survives as is, otherwise v0.7.1.
+- Stream B: move B5 (landscape single row) to tomorrow. Drop the live brick-count line if the brick value isn't already in index.html; do not invent it. Any edit that fails REVIEW stays off tonight's preview.
