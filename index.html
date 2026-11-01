@@ -15090,7 +15090,7 @@ function hbRenderHUD(){
   var _bi=hbBrickInfo(),brickTotal=_bi?_bi.total:0,perBrick=_bi?_bi.perBrick:0;
   // the model can finish building on another path (the viewer) without this panel hearing about it: until the count is
   // known, look again every half second for up to 15 s, so it never stays on "Counting bricks…" (owner, 31 Oct: house builder)
-  clearTimeout(window._hbHudRetry);
+  clearTimeout(window._hbHudRetry); window._hbHudWait=!_bi;   // hb3dModel re-renders this panel the moment a model lands, however late (the retries below are only a backstop)
   if(_bi)window._hbHudTries=0;else if((window._hbHudTries=(window._hbHudTries||0)+1)<=30)window._hbHudRetry=setTimeout(function(){try{hbRenderHUD();hbWriteStats();}catch(e){}},500);
   var _pb=document.getElementById('hb-plan-brick');if(_pb)_pb.textContent=_bi?'Each brick is worth about '+(window.VI_CURRENCY_SYMBOL||'£')+(perBrick*(window.VI_CURRENCY_RATE||1)).toFixed(2)+' of your deposit.':'';
   var _bLaid=_bi?Math.min(brickTotal,(hbBrandModel(_bi.model)?HB3D.brandStats(_bi.model,_isPro()?p:0.04):_bi.model.stats(_isPro()?p:0.04)).bricksLaid):0,_sym=window.VI_CURRENCY_SYMBOL||'£',_rate=window.VI_CURRENCY_RATE||1;
@@ -15699,6 +15699,7 @@ function hb3dModel(type, floor) {
     m = HB3D.build(type, { floor: floor, detail: hb3dDetail() });
     if (_pt) VIPERF.phase('build', performance.now() - _pt);
     HB3DAPP.models[k] = m; HB3DAPP.order.push(k);
+    if (window._hbHudWait) { window._hbHudWait = false; setTimeout(function () { try { hbRenderHUD(); hbWriteStats(); } catch (e) {} }, 0); }   // Level 1 card was on "Counting bricks…"
     while (HB3DAPP.order.length > 4) { var old = HB3DAPP.order.shift(); if (old !== HB3DAPP.key) delete HB3DAPP.models[old]; else HB3DAPP.order.push(old); if (HB3DAPP.order.length <= 4) break; }
   }
   return m;

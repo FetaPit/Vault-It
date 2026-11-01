@@ -25,6 +25,14 @@ async function open(b, w, type, errs) {
     const r2 = await p.evaluate(() => document.getElementById('hb3d-cap').textContent);
     ok(/Victorian mid-terrace/.test(r2) && !/tower/i.test(r2), 'a: once the terraced house is drawn the caption names it (' + r2.slice(0, 40) + ')');
     await ctx.close(); }
+  // b) Level 1 never sticks on "Counting bricks…" / "… OF … UK BRICKS": when the model lands after the HUD's own retries ran out, the HUD still updates
+  { const { ctx, p } = await open(b, 390, 'terraced', errs);
+    await p.evaluate(() => { window.requestIdleCallback = function () { return 0; }; HB3DAPP.models = {}; HB3DAPP.order = []; HB3DAPP.idle = {}; window._hbHudTries = 0; for (let i = 0; i < 40; i++) hbRenderHUD(); });
+    ok(await p.evaluate(() => /Counting bricks/.test(document.getElementById('hb-hud').textContent)), 'b: with no model yet the HUD says "Counting bricks…"');
+    await p.evaluate(() => { clearTimeout(window._hbHudRetry); hb3dModel(state.houseType, state.apartmentFloor); }); await p.waitForTimeout(800);
+    const t = await p.evaluate(() => document.getElementById('hb-hud').textContent);
+    ok(!/Counting bricks/.test(t) && !/…\s*of\s*…/i.test(t) && /UK bricks/i.test(t) && /\d,\d{3}\s*of\s*[\d,]+\s*UK bricks/i.test(t), 'b: the moment the model is built the HUD shows the real count (' + t.replace(/\s+/g, ' ').match(/.{0,20}UK bricks/i) + ')');
+    await ctx.close(); }
   ok(errs.length === 0, 'no page errors ' + errs.slice(0, 2).join(' | '));
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASS'); process.exit(fails ? 1 : 0);
 })();
