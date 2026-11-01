@@ -35,8 +35,19 @@ A game layer for health and fitness, built on a fork of [openGym](https://github
 
 ## 3D body scan and forecast
 
-Built on the Vault-It 3D engine approach: dependency-free WebGL, instanced bricks, orbit camera,
-bricks laid bottom to top. The prototype's Body tab shows it with a hand-tuned body shape.
+Built on the Vault-It 3D engine approach (dependency-free WebGL, same camera and orbit), rendering
+anatomy: 15 muscle groups with fibre direction, under a see-through fat layer whose thickness follows
+fat mass. Skin / Fat / Muscle views. A scan line sweeps up the body when a check-in loads.
+
+**How the model is built:** every 4-week check-in logs tape girths (chest, waist, hips, arm, thigh,
+calf), four photos and Hume weight/body fat. Tape sets each part's size (the prototype already fits
+to tape within ~1 cm), photos set the shape (app build), Hume sets fat versus lean.
+
+**Strength drives the physique forecast.** A strength snapshot of the main lifts from openGym
+(est. 1RM), ranked Iron → Bronze → Silver → Gold → Mythic by multiple of body weight. Weekly gains
+slow as tiers rise and with deficit, low protein and short sleep. Each muscle group grows from the
+lifts that train it (bench → chest, triceps, front delts; row → lats, biceps; and so on), with about
+45% of a strength gain showing as girth. The next tier-up becomes a strength quest with an ETA.
 
 **Accuracy, honestly.** Girths and shape: 97–99% is reachable (±1–2 cm). Body fat %: ±2–3 points,
 nothing gets to 99% (DEXA is ±1–2). Forecast: a range that narrows each scan.

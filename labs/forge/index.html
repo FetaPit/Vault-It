@@ -185,13 +185,17 @@ th{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spac
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ---------- body ---------- */
-.bodyv{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;align-items:start}
+.bodyv{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;align-items:start}
 .stage{padding:14px;display:grid;gap:12px;position:sticky;top:max(12px,env(safe-area-inset-top,0px))}
-.stagebox{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--rim);background:radial-gradient(110% 80% at 50% 100%,#13262a 0%,#0d0f17 55%,var(--ink) 100%)}
-.stagebox::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(63,212,196,.04) 0 1px,transparent 1px 4px)}
-#bodyCv{display:block;width:100%;aspect-ratio:4/5;max-height:640px;cursor:grab;touch-action:none}
+.stagebox{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--rim);background:radial-gradient(90% 70% at 50% 92%,#16303a 0%,#0e1119 50%,var(--ink) 100%)}
+.stagebox::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(63,212,196,.035) 0 1px,transparent 1px 3px)}
+#bodyCv{display:block;width:100%;aspect-ratio:4/5;max-height:660px;cursor:grab;touch-action:none}
 .stagehud{position:absolute;left:12px;top:10px;right:12px;display:flex;justify-content:space-between;gap:8px;font-family:var(--f-mono);font-size:11px;color:var(--dust);text-transform:uppercase;letter-spacing:.08em;pointer-events:none}
 .stagehud b{color:var(--bone);font-weight:600}
+.stagefoot{position:absolute;left:12px;bottom:10px;right:12px;display:flex;justify-content:space-between;gap:8px;font-family:var(--f-mono);font-size:12px;color:var(--bone);pointer-events:none}
+.seg{display:inline-flex;border:1px solid var(--rim2);border-radius:8px;overflow:hidden}
+.seg button{background:none;border:0;padding:7px 12px;font-family:var(--f-disp);font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dust);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--rim);color:var(--bone)}
 .weekrow{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
 .weekrow output{font-family:var(--f-mono);font-size:14px;color:var(--gold);min-width:8ch;text-align:right}
 input[type=range]{width:100%;accent-color:var(--ember)}
@@ -210,6 +214,23 @@ input[type=range]{width:100%;accent-color:var(--ember)}
 .fc th:first-child,.fc td:first-child{text-align:left;font-family:var(--f-body)}
 .fc th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ash);font-weight:400}
 .fc .good{color:var(--s-form)} .fc .bad{color:var(--rose)} .fc .rng{color:var(--ash);font-size:11px}
+.lifts{display:grid;gap:8px}
+.lift{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 12px;border:1px solid var(--rim);border-radius:8px;background:rgba(0,0,0,.18);text-align:left;width:100%;cursor:pointer}
+.lift[aria-pressed="true"]{border-color:var(--gold)}
+.lift .n{font-weight:600}
+.lift .v{font-family:var(--f-mono);text-align:right}
+.lift .meta{font-size:12px;color:var(--dust);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lift .bar{grid-column:1/-1;height:6px}
+.tier{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid currentColor}
+.total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.total b{font-family:var(--f-mono);font-size:24px}
+.squest{margin-top:10px;padding:10px 12px;border:1px dashed var(--gold);border-radius:8px;font-size:13px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.squest b{color:var(--gold)}
+.grow{display:grid;gap:6px;margin-top:12px}
+.growr{display:grid;grid-template-columns:96px 1fr 58px;gap:10px;align-items:center;font-size:13px;background:none;border:0;padding:3px 0;cursor:pointer;text-align:left;width:100%;color:inherit}
+.growr .bar{height:7px}
+.growr span:last-child{font-family:var(--f-mono);text-align:right;color:var(--gold)}
+.growr[aria-pressed="true"] span:first-child{color:var(--gold)}
 .scan{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .shot{display:grid;gap:8px}
 .shot .frame{position:relative;aspect-ratio:3/4;border:1px dashed var(--rim2);border-radius:8px;overflow:hidden;background:#110d17 center/cover no-repeat;display:grid;place-items:center}
@@ -217,13 +238,14 @@ input[type=range]{width:100%;accent-color:var(--ember)}
 .shot .frame svg{width:70%;height:auto;opacity:.8}
 .shot label.btn{cursor:pointer}
 .shot input{position:absolute;width:1px;height:1px;opacity:0}
-.calib{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.calib{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
 .calib label{display:grid;gap:4px;font-size:12px;color:var(--dust)}
 .calib input{font:inherit;font-family:var(--f-mono);color:var(--bone);background:#0b0810;border:1px solid var(--rim2);border-radius:6px;padding:8px 10px;width:100%}
+.ckgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px}
+.fitres{font-family:var(--f-mono);font-size:13px;color:var(--s-form)}
 .acc td:nth-child(2){font-family:var(--f-mono);white-space:nowrap}
 .legend .sq{width:10px;height:10px;border-radius:2px;display:inline-block}
-@media (max-width:900px){.bodyv{grid-template-columns:minmax(0,1fr)}.stage{position:static}.scan{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:560px){.calib{grid-template-columns:1fr}}
+@media (max-width:900px){.bodyv,.ckgrid{grid-template-columns:minmax(0,1fr)}.stage{position:static}.scan{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 @media (max-width:900px){
   .sheet,.today,.skills,.design{grid-template-columns:minmax(0,1fr)}
@@ -333,22 +355,34 @@ input[type=range]{width:100%;accent-color:var(--ember)}
   <section class="view" data-view="body" hidden>
     <div class="bodyv">
       <div class="panel stage">
-        <header style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Your body in 2 cm bricks</h2>
-          <div class="legend"><span><i class="sq" style="background:var(--aqua)"></i>Body</span><span><i class="sq" style="background:var(--ember)"></i>Bricks to burn</span><span><i class="sq" style="background:var(--gold)"></i>Bricks to build</span></div></header>
+        <header style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 id="stageTitle">You, now</h2>
+          <div class="seg" role="group" aria-label="Layers"><button id="ly-skin" aria-pressed="false">Skin</button><button id="ly-fat" aria-pressed="true">Fat</button><button id="ly-muscle" aria-pressed="false">Muscle</button></div></header>
         <div class="stagebox">
-          <canvas id="bodyCv" tabindex="0" aria-label="3D model of your body. Drag or use arrow keys to turn it."></canvas>
-          <div class="stagehud"><span>Drag to turn</span><span><b id="brickCount">0</b> bricks</span></div>
+          <canvas id="bodyCv" tabindex="0" aria-label="3D anatomy model of your body. Drag or use arrow keys to turn it."></canvas>
+          <div class="stagehud"><span>Drag to turn</span><span id="hudSel">Tap a lift or muscle to light it up</span></div>
+          <div class="stagefoot"><span id="hudL"></span><span id="hudR"></span></div>
         </div>
         <div class="weekrow">
-          <label for="weekSl" class="muted" style="font-size:13px">Forecast</label>
-          <input type="range" id="weekSl" min="0" max="26" step="1" value="12">
-          <output id="weekOut" for="weekSl">Week 12</output>
+          <label for="weekSl" class="muted" style="font-size:13px">Future you</label>
+          <input type="range" id="weekSl" min="0" max="26" step="1" value="0">
+          <output id="weekOut" for="weekSl">Now</output>
         </div>
         <div class="ticks"><span>Now</span><span>+3 months</span><span>+6 months</span></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" id="replayBtn">Replay build</button><button class="btn ghost sm" id="nowBtn">Show me now</button></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn ghost sm" id="replayBtn">Replay scan</button>
+          <button class="btn ghost sm on" id="heatBtn" aria-pressed="true">Growth glow</button>
+          <span class="legend"><span><i style="background:#B9402F"></i>Muscle</span><span><i style="background:#F2C88A"></i>Fat</span><span><i style="background:var(--gold)"></i>Forecast growth</span></span>
+        </div>
         <div id="glMsg" class="muted" hidden style="font-size:13px">Your browser has WebGL turned off, so the 3D model can't draw. The forecast numbers still work.</div>
       </div>
+
       <div class="col">
+        <div class="panel card">
+          <header><h2>Strength snapshot</h2><span class="chip">openGym · est. 1RM</span></header>
+          <div class="total"><span class="muted" style="font-size:13px">Squat + bench + deadlift</span><b id="sbd"></b></div>
+          <div class="lifts" id="lifts"></div>
+          <div class="squest" id="squest"></div>
+        </div>
         <div class="panel card">
           <header><h2>Habits you lock in</h2><span class="chip">From your quests</span></header>
           <div class="presets" style="margin-bottom:14px"><button class="btn ghost sm on" id="pNow">Your last 28 days</button><button class="btn ghost sm" id="pLock">Lock in 90%</button></div>
@@ -360,31 +394,37 @@ input[type=range]{width:100%;accent-color:var(--ember)}
           <table class="fc" id="fcTable"></table>
           <svg id="bfChart" viewBox="0 0 420 170" style="width:100%;height:auto;margin-top:12px" role="img" aria-label="Body fat forecast for 26 weeks"></svg>
           <div class="legend" style="margin-top:6px"><span><i style="background:var(--ember)"></i>With these habits (shaded: likely range)</span><span><i style="background:var(--ash)"></i>Last 28 days, unchanged</span></div>
+          <h2 style="margin-top:16px">Muscle growth by group</h2>
+          <div class="grow" id="grow"></div>
         </div>
       </div>
     </div>
 
     <div class="panel card">
-      <header><h2>Scan</h2><span class="chip" id="shotCount">0 / 4 angles</span></header>
+      <header><h2>Check-in</h2><span class="chip">+150 XP · every 4 weeks</span></header>
+      <p class="muted" style="margin:0 0 12px;font-size:14px;max-width:70ch">Your model is rebuilt from what you log here. Tape measurements set the size of each part, the four photos set the shape, Hume sets fat versus lean.</p>
       <div class="scan" id="scan"></div>
-      <div class="calib" style="margin-top:14px">
+      <h2 style="margin:16px 0 8px">Tape (cm, relaxed)</h2>
+      <div class="calib" id="tape"></div>
+      <h2 style="margin:16px 0 8px">Scale and height</h2>
+      <div class="calib">
         <label for="cH">Height (cm)<input id="cH" type="number" inputmode="decimal" value="178" min="140" max="210"></label>
         <label for="cW">Weight (kg) · Hume<input id="cW" type="number" inputmode="decimal" value="79.8" step="0.1" min="40" max="200"></label>
         <label for="cB">Body fat (%) · Hume<input id="cB" type="number" inputmode="decimal" value="21.2" step="0.1" min="5" max="50"></label>
       </div>
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px">
-        <button class="btn" id="buildBtn">Build my model</button>
-        <span class="muted" style="font-size:13px;max-width:62ch">Photos stay in this browser and are never uploaded. In this prototype the model is shaped from your height and Hume numbers; fitting it to the photos comes with the app build.</span>
+        <button class="btn" id="buildBtn">Log check-in</button>
+        <span class="fitres" id="fitRes" role="status"></span>
       </div>
-      <div class="today" style="margin-top:16px">
+      <p class="muted" style="font-size:12px;margin:8px 0 0;max-width:72ch">Photos stay in this browser and are never uploaded. In this prototype the model is fitted to your tape and Hume numbers; fitting the shape to the photos comes with the app build.</p>
+      <div class="ckgrid">
         <div>
-          <h2 style="margin-bottom:8px">For an accurate scan</h2>
+          <h2 style="margin-bottom:8px">For an accurate check-in</h2>
           <ul class="guard">
             <li><b>Phone upright at hip height, 2.5 m away.</b> Lean it on a shelf and use the 10 second timer.</li>
-            <li><b>Fitted clothes or underwear,</b> hair up, shoes off.</li>
-            <li><b>A-pose:</b> arms about 20° out, feet hip-width apart.</li>
-            <li><b>Plain wall, even light,</b> no window behind you.</li>
-            <li><b>Same time every scan:</b> morning, before food. Consistency matters more than anything else.</li>
+            <li><b>Fitted clothes or underwear,</b> hair up, shoes off. A-pose: arms about 20° out.</li>
+            <li><b>Tape snug, not tight.</b> Waist at the navel, arm at mid-bicep relaxed, thigh just below the glute.</li>
+            <li><b>Same time every check-in:</b> morning, before food. Consistency matters more than anything else.</li>
           </ul>
         </div>
         <div class="tblwrap">
@@ -392,11 +432,11 @@ input[type=range]{width:100%;accent-color:var(--ember)}
           <table class="acc" style="min-width:0">
             <thead><tr><th>Measure</th><th>Target</th><th>How we check</th></tr></thead>
             <tbody>
-              <tr><td>Height</td><td>Exact</td><td>You enter it</td></tr>
-              <tr><td>Waist, hips, chest, arms, thighs</td><td>±1–2 cm (97–99%)</td><td>Tape measure once a month, logged in openGym</td></tr>
-              <tr><td>Body shape and volume</td><td>~97–99%</td><td>Volume × body density must match Hume weight</td></tr>
+              <tr><td>Girths</td><td>±1–2 cm</td><td>Model vs your tape, every check-in</td></tr>
+              <tr><td>Body shape</td><td>~97–99%</td><td>Photo outlines vs model outline</td></tr>
               <tr><td>Body fat %</td><td>±2–3 points</td><td>Hume trend; even DEXA is ±1–2</td></tr>
-              <tr><td>Forecast</td><td>A range</td><td>Narrows after every scan</td></tr>
+              <tr><td>Strength forecast</td><td>A range</td><td>Your logged lifts each week</td></tr>
+              <tr><td>Physique forecast</td><td>A range</td><td>Narrows after every check-in</td></tr>
             </tbody>
           </table>
         </div>
@@ -874,169 +914,317 @@ try { const tab = localStorage.getItem(KEY + '_tab'); if (tab) document.querySel
 })();
 </script>
 <script>
-/* Body forge: a 2 cm brick model of the body and a habit-driven forecast.
-   Camera, projection and orbit are lifted from vault-it-3d-engine.js (Proj, projMatrix, orbit). */
+/* Body: a layered anatomy model (muscle groups under a fat layer) with a strength- and habit-driven forecast.
+   Camera, projection and orbit come from vault-it-3d-engine.js (Proj, projMatrix, orbit). */
 (() => {
 const $ = s => document.querySelector(s);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const lerp = (a, b, t) => a + (b - a) * t;
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const f1 = v => v.toFixed(1);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
-// ---------- body composition model ----------
-// Reference shape = the "now" scan: 79.8 kg, 21.2% fat.
-const FM0 = 79.8 * 0.212, FFM0 = 79.8 - FM0;
+// ================= data: check-in, habits, lifts =================
 let cal = { H:178, W:79.8, BF:21.2 };
 const nowComp = () => ({ fm: cal.W * cal.BF / 100, ffm: cal.W * (1 - cal.BF / 100) });
 
 const HABITS = [
-  { k:'cal',   name:'Calories in range',  sub:'Lean 4 Life', now:.64 },
-  { k:'prot',  name:'Protein target',     sub:'Lean 4 Life', now:.71 },
-  { k:'train', name:'Training sessions',  sub:'openGym',     now:.88 },
-  { k:'steps', name:'9,000 steps',        sub:'Samsung Health', now:.60 },
-  { k:'sleep', name:'7 h+ sleep',         sub:'Samsung Health', now:.55 },
+  { k:'train', name:'Training sessions', sub:'openGym', now:.88 },
+  { k:'prot',  name:'Protein target',    sub:'Lean 4 Life', now:.71 },
+  { k:'cal',   name:'Calories in range', sub:'Lean 4 Life', now:.64 },
+  { k:'sleep', name:'7 h+ sleep',        sub:'Samsung Health', now:.55 },
+  { k:'steps', name:'9,000 steps',       sub:'Samsung Health', now:.60 },
 ];
 const habitsNow = Object.fromEntries(HABITS.map(h => [h.k, h.now]));
 let hab = { ...habitsNow };
 
-// Weekly energy-balance simulation. Fat ~9,440 kcal/kg and lean ~1,816 kcal/kg (Hall 2008);
-// Forbes partition 10.4/(10.4+FM), shifted by training, protein and sleep;
-// maintenance falls ~22 kcal/day per kg lost, so the deficit shrinks as you lean out.
+const GROUPS = { chest:'Chest', delts:'Shoulders', biceps:'Biceps', triceps:'Triceps', forearms:'Forearms', abs:'Abs', obliques:'Obliques',
+  lats:'Lats', traps:'Traps', lowerback:'Lower back', glutes:'Glutes', quads:'Quads', hamstrings:'Hamstrings', adductors:'Adductors', calves:'Calves' };
+const GK = Object.keys(GROUPS);
+// e1RM from openGym; tiers by multiple of body weight (male standards, roughly novice / intermediate / advanced / elite)
+const TIERS = [['Iron','#8d8296'],['Bronze','#c98a5a'],['Silver','#c9d2dc'],['Gold','#F2C14E'],['Mythic','#A585FF']];
+const LIFTS = [
+  { k:'squat', name:'Back squat',    e1:133, std:[.9,1.25,1.75,2.5],  hits:{ quads:.6, glutes:.4, adductors:.35, lowerback:.15 } },
+  { k:'bench', name:'Bench press',   e1:100, std:[.75,1.0,1.5,2.0],   hits:{ chest:.6, delts:.2, triceps:.4 } },
+  { k:'dead',  name:'Deadlift',      e1:160, std:[1.0,1.5,2.0,2.75],  hits:{ hamstrings:.5, glutes:.3, lowerback:.6, traps:.3, forearms:.35, lats:.1 } },
+  { k:'ohp',   name:'Overhead press',e1:60,  std:[.5,.65,.9,1.25],    hits:{ delts:.6, triceps:.3, traps:.2 } },
+  { k:'row',   name:'Barbell row',   e1:85,  std:[.6,.8,1.1,1.5],     hits:{ lats:.6, biceps:.45, traps:.25, delts:.12, forearms:.2 } },
+  { k:'calf',  name:'Standing calf raise', e1:140, std:[.8,1.3,1.9,2.6], hits:{ calves:.8 } },
+];
+const tierOf = (l, kg, bw) => { const r = kg / bw; let t = 0; l.std.forEach((s, i) => { if (r >= s) t = i + 1; }); return t; };
+const RATE = [.025, .015, .008, .004, .002];   // weekly e1RM gain by tier at full adherence
+
+// ================= forecast models =================
+// Body composition: weekly energy balance. Fat ~9,440 kcal/kg, lean ~1,816 kcal/kg (Hall 2008),
+// Forbes partition 10.4/(10.4+FM) shifted by training, protein and sleep, ~22 kcal/day adaptation per kg lost.
 function simulate(h, weeks = 26, k = { def:1, gain:1 }) {
   let { fm, ffm } = nowComp(); const W0 = fm + ffm; const out = [{ fm, ffm }];
   for (let w = 1; w <= weeks; w++) {
     const W = fm + ffm;
-    let eb = h.cal * -450 + (1 - h.cal) * 250;          // on-plan days -450, off-plan days +250
-    eb += -160 * h.steps - 140 * h.train;                // extra steps and sessions
-    eb = eb * k.def + 22 * (W0 - W);                     // metabolic adaptation
-    let p = 10.4 / (10.4 + fm);                          // share of weight change that is lean
-    p *= (1 - 0.85 * h.train * h.prot) * (1 + 0.6 * (1 - h.sleep));
-    p = clamp(p, 0.02, 0.6);
-    const E = eb * 7, dW = E < 0 ? E / ((1 - p) * 9440 + p * 1816) : E / ((1 - p) * 9440 + p * 1816) ;
-    fm += dW * (1 - p); ffm += dW * p;
-    ffm += 0.08 * h.train * h.prot * (0.6 + 0.4 * h.sleep) * k.gain / (1 + w / 40);  // muscle built
-    fm = Math.max(fm, 6);
+    let eb = h.cal * -450 + (1 - h.cal) * 250 - 160 * h.steps - 140 * h.train;
+    eb = eb * k.def + 22 * (W0 - W);
+    let p = 10.4 / (10.4 + fm);
+    p = clamp(p * (1 - .85 * h.train * h.prot) * (1 + .6 * (1 - h.sleep)), .02, .6);
+    const dW = eb * 7 / ((1 - p) * 9440 + p * 1816);
+    fm = Math.max(6, fm + dW * (1 - p)); ffm += dW * p;
+    ffm += .08 * h.train * h.prot * (.6 + .4 * h.sleep) * k.gain / (1 + w / 40);
     out.push({ fm, ffm });
   }
   return out;
 }
 const band = h => ({ mid:simulate(h), lo:simulate(h, 26, { def:1.25, gain:1.4 }), hi:simulate(h, 26, { def:.75, gain:.6 }) });
+// Strength: weekly e1RM gains slow as you climb tiers; a calorie deficit and short sleep slow them more.
+function strength(h) {
+  return LIFTS.map(l => { let kg = l.e1; const arr = [kg];
+    for (let w = 1; w <= 26; w++) {
+      const bw = cal.W, t = tierOf(l, kg, bw);
+      const g = RATE[t] * h.train * (.5 + .5 * h.prot) * (.7 + .3 * h.sleep) * (1 - .25 * h.cal);
+      kg *= 1 + g; arr.push(kg);
+    }
+    return arr; });
+}
+// Muscle size: each group grows with the lifts that train it. About 45% of a strength gain shows up as
+// girth (the rest is the nervous system getting better), and lean-mass loss in a deficit shrinks everything.
+function growthAt(str, sims, w) {
+  const G = Object.fromEntries(GK.map(k => [k, 0])), W = Object.fromEntries(GK.map(k => [k, 0]));
+  LIFTS.forEach((l, i) => { const gain = str[i][w] / str[i][0] - 1;
+    for (const g in l.hits) { G[g] += l.hits[g] * gain; W[g] += l.hits[g]; } });
+  const lean = Math.sqrt(sims.mid[w].ffm / sims.mid[0].ffm) - 1;
+  GK.forEach(g => { G[g] = (W[g] ? G[g] / W[g] * .45 : .004 * w * hab.train) + Math.min(0, lean); });
+  G.abs += .0008 * w * hab.train; G.obliques += .0006 * w * hab.train;
+  return G;
+}
 
-// ---------- body shape ----------
-// Sections in cm for a 178 cm reference. Fat thickness F and muscle share M per region move them.
-const F = { waist:2.8, belly:1.9, hip:2.3, chest:1.4, back:1.1, thigh:1.7, calf:.6, arm:1.0, fore:.5, neck:.7, face:.6 };
-const M = { chest:.22, sh:.35, arm:.42, fore:.3, thigh:.35, calf:.3, waist:.06, hip:.12, neck:.2, back:.2 };
-const TORSO = [ // y, a (half width), b (half depth), z centre, fat, muscle, belly bulge
-  [82,15.5,10.5,0,'hip','hip',0],[90,17.5,11.5,0,'hip','hip',0],[98,16.5,11.4,.5,'waist','waist',.6],
-  [106,15.6,11.4,1,'waist','waist',1],[114,15.9,11.6,.8,'belly','waist',.7],[124,17.2,12,.3,'chest','chest',.1],
-  [134,18.2,11.8,0,'chest','chest',0],[142,17,10.5,-.5,'back','back',0],[148,11,8,-.5,'neck','neck',0]];
-const LEG = [[2,4,4.6,'calf'],[8,3.5,3.9,'calf'],[20,4.2,4.7,'calf'],[32,6,6.5,'calf'],[44,5.1,5.4,'calf'],[50,5.7,6.1,'thigh'],[62,7.3,7.9,'thigh'],[76,8.7,9.3,'thigh'],[86,9.1,9.7,'thigh']];
-function shape(c) {
-  const fk = c.fm / FM0 - 1, lk = c.ffm / FFM0 - 1;
-  const g = (base, f, m) => Math.max(base * .55, base + (F[f] || 0) * fk + base * (M[m] || 0) * lk * 1.6);
-  const torso = TORSO.map(([y, a, b, zc, f, m, bulge]) => [y, g(a, f, m), g(b, f, m), zc, bulge * Math.max(-1, fk) * 2.4]);
-  const leg = LEG.map(([y, a, b, f]) => [y, g(a, f, f), g(b, f, f)]);
-  const ar = r => g(r, 'arm', 'arm'), fr = r => g(r, 'fore', 'fore');
-  return { torso, leg, ar, fr, fk, lk, delt:g(6.1, 'arm', 'sh'), neck:g(6, 'neck', 'neck'), face:F.face * fk * .5 };
-}
-const interp = (rows, y) => { for (let i = 1; i < rows.length; i++) if (y <= rows[i][0]) { const a = rows[i - 1], b = rows[i], t = (y - a[0]) / (b[0] - a[0]); return a.map((v, j) => lerp(v, b[j], t)); } return null; };
-function capsule(px, py, pz, A, B, r0, r1) {
-  const abx = B[0] - A[0], aby = B[1] - A[1], abz = B[2] - A[2];
-  const t = clamp(((px - A[0]) * abx + (py - A[1]) * aby + (pz - A[2]) * abz) / (abx * abx + aby * aby + abz * abz), 0, 1);
-  const dx = px - A[0] - abx * t, dy = py - A[1] - aby * t, dz = pz - A[2] - abz * t;
-  return dx * dx + dy * dy + dz * dz <= lerp(r0, r1, t) ** 2;
-}
-function inside(S, x, y, z) {
-  if (y >= 82 && y <= 148) { const s = interp(S.torso, y); const bb = z > s[3] ? s[2] + s[4] : s[2];
-    if ((x / s[1]) ** 2 + ((z - s[3]) / bb) ** 2 <= 1) return true; }
-  if (y > 146 && y < 157 && x * x + (z + .5) ** 2 <= S.neck ** 2) return true;
-  if (y >= 152 && ((x / (8.2 + S.face)) ** 2 + ((y - 165) / 11.5) ** 2 + ((z - .5) / (9.8 + S.face)) ** 2) <= 1) return true;
-  const sx = x < 0 ? -1 : 1, ax = Math.abs(x);
-  if (y <= 86 && y >= 2) { const l = interp(S.leg, y); const cx = lerp(11, 9, (y - 2) / 84);
-    if (((ax - cx) / l[1]) ** 2 + (z / l[2]) ** 2 <= 1) return true; }
-  if (y < 6 && y >= 0 && Math.abs(ax - 11) < 4.4 && z > -4 && z < 15) return true;  // feet
-  if (y > 70 && y < 147 && ax > 12) {
-    if ((ax - 18.5) ** 2 + (y - 139.5) ** 2 + (z + .5) ** 2 <= S.delt ** 2) return true;
-    const Sh = [19.5, 141, -1], E = [24, 113, -1], Wr = [27, 87, 1], Hd = [28.5, 74, 2];
-    if (capsule(ax, y, z, Sh, E, S.ar(5), S.ar(4))) return true;
-    if (capsule(ax, y, z, E, Wr, S.fr(4.2), S.fr(2.9))) return true;
-    if (capsule(ax, y, z, Wr, Hd, 3, 2.2)) return true;
+// ================= anatomy =================
+// Reference body, 178 cm. The muscle layer has bulges for each group; the fat layer sits on top
+// with a thickness pattern that scales with fat mass. Calibration factors come from the tape.
+let K = { chest:1, waist:1, hips:1, arm:1, thigh:1, calf:1 };
+const TORSO = [[77,8,6,0],[81,13.6,9.3,0],[90,15.6,10.2,-.6],[98,14,9.3,0],[106,12.6,8.8,.3],[114,13.2,9.3,.3],[124,15.2,10.4,.2],[134,16.6,10.6,0],[142,15.6,9.4,-.5],[148,10.5,7.4,-.5],[153,6,5.6,-.5]];
+const TFAT = [[77,1.0],[81,1.9],[94,2.1],[104,2.2],[114,2.0],[124,1.4],[136,1.1],[146,.8],[153,.6]];
+const LEG = [[2,3.4,3.9],[8,3.0,3.4],[20,3.8,4.2],[32,4.8,5.2],[44,4.3,4.5],[50,4.8,5.1],[62,6.0,6.5],[76,6.9,7.4],[88,7.4,8]];
+const LFAT = [[2,.3],[20,.45],[40,.5],[47,.5],[54,1.1],[70,1.5],[88,1.7]];
+const ip = (rows, y) => { if (y <= rows[0][0]) return rows[0].slice(1); for (let i = 1; i < rows.length; i++) if (y <= rows[i][0]) { const a = rows[i - 1], b = rows[i], t = (y - a[0]) / (b[0] - a[0]); return a.slice(1).map((v, j) => lerp(v, b[j + 1], t)); } return rows[rows.length - 1].slice(1); };
+const kTorso = y => y < 89 ? K.hips : y < 106 ? lerp(K.hips, K.waist, (y - 89) / 17) : y < 131 ? lerp(K.waist, K.chest, (y - 106) / 25) : K.chest;
+const kLeg = y => y > 52 ? K.thigh : y < 40 ? K.calf : lerp(K.calf, K.thigh, (y - 40) / 12);
+const angd = (a, b) => { let d = Math.abs(a - b) % (2 * Math.PI); return d > Math.PI ? 2 * Math.PI - d : d; };
+const gauss = (d, s) => Math.exp(-(d * d) / (2 * s * s));
+// torso bulges: group, theta (0 = front, ±pi = back, symmetric), y, sigma theta, sigma y, amplitude cm
+const TB = [['chest',.55,130,.42,6,1.7],['abs',0,107,.3,10,.7],['obliques',1.35,108,.32,8,.6],['lats',2.05,127,.45,9,1.7],
+  ['traps',Math.PI,146,.75,4.5,1.5],['lowerback',2.85,103,.22,9,1.0],['glutes',2.55,88,.5,6,2.3]];
+const LB = [['quads',0,70,.9,11,1.3],['quads',-.65,55,.38,4,.8],['hamstrings',Math.PI,68,.8,11,1.1],['adductors',-1.55,76,.45,8,1.0],
+  ['calves',Math.PI - .45,34,.45,6,1.0],['calves',-(Math.PI - .45),34,.45,6,1.0],['calves',.35,30,.3,7,.45]];
+
+function bulge(list, th, y, G, base) {
+  let d = 0, best = null, bw = .3, w1 = 0, w2 = 0, gw = 0;
+  for (const [g, t0, y0, st, sy, A] of list) {
+    const w = gauss(angd(Math.abs(th) === th || t0 < 0 ? th : th, t0 < 0 ? t0 : (t0 === 0 || t0 === Math.PI ? t0 : Math.sign(th || 1) * t0)), st) * gauss(y - y0, sy);
+    d += w * (A + (G[g] || 0) * (base + A) * 1.0);
+    if (w > bw) { bw = w; best = g; }
+    gw += w * (G[g] || 0);
+    if (w > w1) { w2 = w1; w1 = w; } else if (w > w2) w2 = w;
   }
-  return false;
-}
-// girths from the analytic sections (Ramanujan's ellipse perimeter)
-const per = (a, b) => Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
-function girths(S) {
-  const t = y => { const s = interp(S.torso, y); return per(s[1], s[2] + s[4] / 2); };
-  const l = interp(S.leg, 76);
-  return { waist:t(106), chest:t(132), hips:t(90), thigh:per(l[1], l[2]), arm:2 * Math.PI * S.ar(4.55) };
+  return [d, best, w2 > .1 ? clamp(1 - (w1 - w2) / .22, 0, 1) : 0, gw];
 }
 
-// ---------- voxels ----------
-const V = 2, NX = 42, NY = 92, NZ = 24, X0 = -42, Z0 = -20;
-function voxelize(c) {
-  const S = shape(c), sy = cal.H / 178, g = new Uint8Array(NX * NY * NZ);
-  for (let j = 0; j < NY; j++) { const y = (j * V + 1) / sy;
-    for (let i = 0; i < NX; i++) { const x = X0 + i * V + 1;
-      for (let k = 0; k < NZ; k++) if (inside(S, x, y, Z0 + k * V + 1)) g[(j * NX + i) * NZ + k] = 1; } }
-  return g;
-}
-const at = (g, i, j, k) => i < 0 || j < 0 || k < 0 || i >= NX || j >= NY || k >= NZ ? 0 : g[(j * NX + i) * NZ + k];
-const surf = (g, i, j, k) => at(g, i, j, k) && !(at(g, i + 1, j, k) && at(g, i - 1, j, k) && at(g, i, j + 1, k) && at(g, i, j - 1, k) && at(g, i, j, k + 1) && at(g, i, j, k - 1));
-
-const hex = h => [parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255];
-const C_BODY = hex('#3FD4C4'), C_BURN = hex('#FF7A3D'), C_GAIN = hex('#F2C14E'), C_FLOOR = hex('#2C2438'), C_RIM = hex('#4a3a5c');
-let gNow = null, counts = { body:0, burn:0, gain:0 };
-function instances(gA, gB) {
-  const out = []; counts = { body:0, burn:0, gain:0 };
-  let s = 1;
-  const jit = () => (s = (s * 16807) % 2147483647) / 2147483647;
-  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) for (let k = 0; k < NZ; k++) {
-    const a = at(gA, i, j, k), b = at(gB, i, j, k), x = X0 + i * V + 1, y = j * V + 1, z = Z0 + k * V + 1;
-    const born = .15 + j / NY * 1.5 + jit() * .12, sh = .9 + jit() * .14;
-    if (b && surf(gB, i, j, k)) { const c = a ? C_BODY : C_GAIN; a ? counts.body++ : counts.gain++;
-      out.push(x, y, z, c[0] * sh, c[1] * sh, c[2] * sh, .9, born); }
-    else if (a && !b && surf(gA, i, j, k)) { counts.burn++; out.push(x, y, z, C_BURN[0] * sh, C_BURN[1] * sh, C_BURN[2] * sh, .5, born); }
+// mesh builder: rings of points -> indexed triangles with outward normals
+function Mesh() { return { p:[], g:[], fib:[], e:[], gr:[], c:[], idx:[], n:0 }; }
+function addRings(m, rings, ns, closeEnds) {
+  const base = m.n;
+  rings.forEach(r => r.pts.forEach(v => { m.p.push(v[0], v[1], v[2]); m.g.push(v[3]); m.fib.push(v[4]); m.e.push(v[5] || 0); m.gr.push(v[6] || 0); m.c.push(r.c[0], r.c[1], r.c[2]); m.n++; }));
+  for (let i = 0; i < rings.length - 1; i++) for (let j = 0; j < ns; j++) {
+    const a = base + i * ns + j, b = base + i * ns + (j + 1) % ns, c = a + ns, d = b + ns;
+    m.idx.push(a, c, b, b, c, d);
   }
-  for (let i = -24; i <= 24; i++) for (let k = -24; k <= 24; k++) { const r = Math.hypot(i, k); if (r > 24) continue;
-    const c = r > 22.5 ? C_RIM : C_FLOOR; out.push(i * 2, -1.2, k * 2, c[0], c[1], c[2], .86, r / 24 * .3); }
-  return new Float32Array(out);
+}
+function finish(m) {
+  const N = new Float32Array(m.n * 3), P = m.p;
+  for (let i = 0; i < m.idx.length; i += 3) {
+    const a = m.idx[i] * 3, b = m.idx[i + 1] * 3, c = m.idx[i + 2] * 3;
+    const ux = P[b] - P[a], uy = P[b + 1] - P[a + 1], uz = P[b + 2] - P[a + 2], vx = P[c] - P[a], vy = P[c + 1] - P[a + 1], vz = P[c + 2] - P[a + 2];
+    const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+    [a, b, c].forEach(k => { N[k] += nx; N[k + 1] += ny; N[k + 2] += nz; });
+  }
+  for (let i = 0; i < m.n; i++) { // orient outward from each ring's centre
+    const k = i * 3, ox = P[k] - m.c[k], oy = P[k + 1] - m.c[k + 1], oz = P[k + 2] - m.c[k + 2];
+    let nx = N[k], ny = N[k + 1], nz = N[k + 2]; const l = Math.hypot(nx, ny, nz) || 1;
+    const s = nx * ox + ny * oy + nz * oz < 0 ? -1 : 1; N[k] = nx / l * s; N[k + 1] = ny / l * s; N[k + 2] = nz / l * s;
+  }
+  m.N = N; return m;
+}
+function ellipsoidRings(cx, cy, cz, rx, ry, rz, g, nr = 16, ns = 28, gw = 0) {
+  const rings = [];
+  for (let i = 0; i <= nr; i++) { const ph = -Math.PI / 2 + Math.PI * i / nr, cr = Math.cos(ph), y = cy + ry * Math.sin(ph), pts = [];
+    for (let j = 0; j < ns; j++) { const th = 2 * Math.PI * j / ns; pts.push([cx + rx * cr * Math.sin(th), y, cz + rz * cr * Math.cos(th), g, th * rx, 0, gw * (.4 + .6 * cr)]); }
+    rings.push({ c:[cx, y, cz], pts }); }
+  return rings;
 }
 
-// ---------- WebGL (same approach as the Vault-It engine: instanced unit cubes) ----------
+// build both layers for a body state: G = growth per group, fatK = fat thickness multiplier
+function buildBody(G, fatK) {
+  const sy = cal.H / 178, mus = Mesh(), fat = Mesh(), NS = 56;
+  const gi = g => g ? GK.indexOf(g) : -1;
+  // torso
+  const tm = [], tf = [];
+  for (let y = 77; y <= 153.01; y += 1.4) {
+    const [a0, b0, zc] = ip(TORSO, y), k = kTorso(y), a = a0 * k, b = b0 * k, T = ip(TFAT, y)[0] * k * fatK, pm = [], pf = [];
+    for (let j = 0; j < NS; j++) {
+      const th = -Math.PI + 2 * Math.PI * j / NS, s = Math.sin(th), c = Math.cos(th);
+      const [d, g, eg, gw] = bulge(TB, th, y, G, Math.min(a, b) * .25);
+      const belly = y > 96 && y < 120 ? 1 + .45 * Math.max(0, c) * gauss(y - 108, 7) + .45 * s * s * gauss(y - 104, 6) : 1;
+      const lowBack = c < -.3 && y < 110 ? 1.15 : 1;
+      const mx = (a + d) * s, mz = zc + (b + d) * c, ft = T * belly * lowBack;
+      let fib = th * a; if (g === 'abs') fib = mx * 1.3; else if (g === 'chest') fib = y + .5 * Math.abs(mx); else if (g === 'lats') fib = y - .7 * Math.abs(mx); else if (g === 'traps') fib = y + Math.abs(mx) * .6;
+      pm.push([mx, y * sy, mz, gi(g), fib, eg + (Math.abs(mx) < .5 && c > .5 && y > 96 && y < 122 ? .8 : 0) + (g === 'abs' && [100, 108, 116].some(v => Math.abs(y - v) < .8) ? .7 : 0), gw]);
+      pf.push([(a + d + ft) * s, y * sy, zc + (b + d + ft) * c, -1, 0]);
+    }
+    tm.push({ c:[0, y * sy, zc], pts:pm }); tf.push({ c:[0, y * sy, zc], pts:pf });
+  }
+  addRings(mus, tm, NS); addRings(fat, tf, NS);
+  // neck and head
+  const nm = [], nf = [];
+  for (let y = 144; y <= 158; y += 1.4) { const pm = [], pf = [];
+    for (let j = 0; j < 28; j++) { const th = -Math.PI + 2 * Math.PI * j / 28, r = 5.3, g = Math.cos(th) < -.2 ? 'traps' : null;
+      pm.push([r * Math.sin(th), y * sy, -.6 + r * 1.06 * Math.cos(th), gi(g), y]); pf.push([(r + .7 * fatK) * Math.sin(th), y * sy, -.6 + (r + .7 * fatK) * 1.06 * Math.cos(th), -1, 0]); }
+    nm.push({ c:[0, y * sy, -.6], pts:pm }); nf.push({ c:[0, y * sy, -.6], pts:pf }); }
+  addRings(mus, nm, 28); addRings(fat, nf, 28);
+  addRings(mus, ellipsoidRings(0, 165 * sy, .5, 7.7, 10.8 * sy, 9.2, -2), 28);
+  addRings(fat, ellipsoidRings(0, 165 * sy, .5, 8.2, 11.2 * sy, 9.7, -1), 28);
+  // legs and feet, built for the right side and mirrored
+  [1, -1].forEach(side => {
+    const lm = [], lf = [], LS = 32;
+    for (let y = 2; y <= 88.01; y += 1.4) {
+      const [a0, b0] = ip(LEG, y), k = kLeg(y), a = a0 * k, b = b0 * k, T = ip(LFAT, y)[0] * k * fatK, cx = side * lerp(11, 9, (y - 2) / 86), pm = [], pf = [];
+      for (let j = 0; j < LS; j++) {
+        const th = -Math.PI + 2 * Math.PI * j / LS, s = Math.sin(th), c = Math.cos(th);
+        const [d, g, eg, gw] = bulge(LB, th, y, G, Math.min(a, b) * .3);
+        const outer = 1 + .35 * Math.max(0, s) * (y > 55 ? 1 : 0);
+        pm.push([cx + side * (a + d) * s, y * sy, (b + d) * c, gi(g || (y < 46 ? null : 'quads')), th * a, eg + (y > 44 && y < 50 ? .5 : 0), gw]);
+        pf.push([cx + side * (a + d + T * outer) * s, y * sy, (b + d + T * outer) * c, -1, 0]);
+      }
+      lm.push({ c:[cx, y * sy, 0], pts:pm }); lf.push({ c:[cx, y * sy, 0], pts:pf });
+    }
+    addRings(mus, lm, LS); addRings(fat, lf, LS);
+    addRings(mus, ellipsoidRings(side * 11, 2.8, 4.5, 4, 2.9, 8.6, -2, 8, 20), 20);
+    addRings(fat, ellipsoidRings(side * 11, 2.8, 4.5, 4.3, 3.2, 8.9, -1, 8, 20), 20);
+    // arm: shoulder -> elbow -> wrist -> fingertips
+    const PTS = [[19.5, 141, -1], [24, 113, -1], [27, 87, 1], [28.5, 73, 2]].map(p => [p[0], p[1] * sy, p[2]]);
+    const seg = [], am = [], af = [], AS = 28;
+    let L = 0; for (let i = 0; i < 3; i++) { const l = Math.hypot(PTS[i + 1][0] - PTS[i][0], PTS[i + 1][1] - PTS[i][1], PTS[i + 1][2] - PTS[i][2]); seg.push(l); L += l; }
+    for (let s = 0; s <= L + .01; s += 1.2) {
+      let i = 0, acc = 0; while (i < 2 && s > acc + seg[i]) { acc += seg[i]; i++; }
+      const t = (s - acc) / seg[i], A = PTS[i], B = PTS[i + 1];
+      const P = [lerp(A[0], B[0], t), lerp(A[1], B[1], t), lerp(A[2], B[2], t)];
+      const Tg = [(B[0] - A[0]) / seg[i], (B[1] - A[1]) / seg[i], (B[2] - A[2]) / seg[i]];
+      let F = [-Tg[2] * Tg[0], -Tg[2] * Tg[1], 1 - Tg[2] * Tg[2]]; const fl = Math.hypot(...F); F = F.map(v => v / fl);
+      const S = [Tg[1] * F[2] - Tg[2] * F[1], Tg[2] * F[0] - Tg[0] * F[2], Tg[0] * F[1] - Tg[1] * F[0]];
+      let r, T, gdef = null, flat = 1;
+      if (i === 0) { r = lerp(4.0, 3.3, t); T = 1.0; } else if (i === 1) { r = lerp(3.6, 2.4, t) + 0.5 * gauss(t - .15, .2); T = .5; gdef = 'forearms'; } else { r = lerp(2.4, 1.5, t); T = .25; flat = 1.9; }
+      r *= K.arm; T *= K.arm * fatK;
+      const pm = [], pf = [];
+      for (let j = 0; j < AS; j++) {
+        const th = -Math.PI + 2 * Math.PI * j / AS, cs = Math.cos(th), sn = Math.sin(th);
+        let d = 0, g = gdef, bi = 0, tr = 0;
+        if (i === 0) { bi = gauss(angd(th, 0), .8) * gauss(t - .55, .2); tr = gauss(angd(th, Math.PI), .9) * gauss(t - .4, .25);
+          d = bi * (1.1 + (G.biceps || 0) * 6) + tr * (1.2 + (G.triceps || 0) * 6); g = bi > tr ? (bi > .2 ? 'biceps' : null) : (tr > .2 ? 'triceps' : null);
+          if (t < .25) g = g || 'delts'; }
+        if (i === 1) d = gauss(angd(th, .6), 1) * gauss(t - .2, .2) * (.9 + (G.forearms || 0) * 5);
+        const R = r + d, cf = cs / flat, sf = sn * (flat > 1 ? 1.3 : 1);
+        const mx = P[0] + (F[0] * cf + S[0] * sf) * R, my = P[1] + (F[1] * cf + S[1] * sf) * R, mz = P[2] + (F[2] * cf + S[2] * sf) * R;
+        const Tb = T * (1 + .5 * Math.max(0, -cs)), R2 = R + Tb;
+        pm.push([side * mx, my, mz, i === 2 ? -2 : gi(g), th * R, i === 0 ? clamp(1 - Math.abs(bi - tr) / .2, 0, 1) * (bi + tr > .15 ? 1 : 0) : 0, i === 0 ? bi * (G.biceps || 0) + tr * (G.triceps || 0) + (t < .25 ? (1 - t / .25) * (G.delts || 0) : 0) : i === 1 ? gauss(angd(th, .6), 1) * gauss(t - .2, .25) * (G.forearms || 0) : 0]);
+        pf.push([side * (P[0] + (F[0] * cf + S[0] * sf) * R2), P[1] + (F[1] * cf + S[1] * sf) * R2, P[2] + (F[2] * cf + S[2] * sf) * R2, -1, 0]);
+      }
+      am.push({ c:[side * P[0], P[1], P[2]], pts:pm }); af.push({ c:[side * P[0], P[1], P[2]], pts:pf });
+    }
+    addRings(mus, am, AS); addRings(fat, af, AS);
+    const dg = 1 + (G.delts || 0) * 2.2;
+    addRings(mus, ellipsoidRings(side * 18.6, 139.3 * sy, -.4, 5.1 * dg * K.arm, 6.1 * dg * sy, 5.5 * dg * K.arm, gi('delts'), 16, 28, G.delts || 0), 28);
+    addRings(fat, ellipsoidRings(side * 18.6, 139.3 * sy, -.4, (5.1 * dg + .8 * fatK) * K.arm, (6.1 * dg + .6 * fatK) * sy, (5.5 * dg + .8 * fatK) * K.arm, -1), 28);
+  });
+  return { mus:finish(mus), fat:finish(fat) };
+}
+
+// girths taken on the outer (fat) surface, the same place a tape sits
+const per = pts => { let s = 0; for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length]; s += Math.hypot(a[0] - b[0], a[1] - b[1]); } return s; };
+function girths(G, fatK) {
+  const torso = y => { const [a0, b0, zc] = ip(TORSO, y), k = kTorso(y), a = a0 * k, b = b0 * k, T = ip(TFAT, y)[0] * k * fatK, pts = [];
+    for (let j = 0; j < 96; j++) { const th = -Math.PI + 2 * Math.PI * j / 96, s = Math.sin(th), c = Math.cos(th), [d] = bulge(TB, th, y, G, Math.min(a, b) * .25);
+      const belly = y > 96 && y < 120 ? 1 + .45 * Math.max(0, c) * gauss(y - 108, 7) + .45 * s * s * gauss(y - 104, 6) : 1, lb = c < -.3 && y < 110 ? 1.15 : 1;
+      pts.push([(a + d + T * belly * lb) * s, (b + d + T * belly * lb) * c]); } return per(pts); };
+  const leg = y => { const [a0, b0] = ip(LEG, y), k = kLeg(y), a = a0 * k, b = b0 * k, T = ip(LFAT, y)[0] * k * fatK, pts = [];
+    for (let j = 0; j < 96; j++) { const th = -Math.PI + 2 * Math.PI * j / 96, s = Math.sin(th), c = Math.cos(th), [d] = bulge(LB, th, y, G, Math.min(a, b) * .3), o = 1 + .35 * Math.max(0, s) * (y > 55 ? 1 : 0);
+      pts.push([(a + d + T * o) * s, (b + d + T * o) * c]); } return per(pts); };
+  const arm = () => { const r = lerp(4.0, 3.3, .55) * K.arm, T = K.arm * fatK, pts = [];
+    for (let j = 0; j < 96; j++) { const th = -Math.PI + 2 * Math.PI * j / 96, bi = gauss(angd(th, 0), .8), tr = gauss(angd(th, Math.PI), .9) * gauss(.15, .25);
+      const R = r + bi * (1.1 + (G.biceps || 0) * 6) + tr * (1.2 + (G.triceps || 0) * 6) + T * (1 + .5 * Math.max(0, -Math.cos(th))); pts.push([R * Math.sin(th), R * Math.cos(th)]); } return per(pts); };
+  return { chest:torso(131), waist:torso(106), hips:torso(89), arm:arm(), thigh:leg(76), calf:leg(34) };
+}
+const ZERO = Object.fromEntries(GK.map(k => [k, 0]));
+
+// ================= WebGL =================
 const cv = $('#bodyCv');
-let gl = null, g2 = false, ext = null, prog, A = {}, U = {}, cubeBuf, instBuf, nInst = 0;
-const VS = `attribute vec3 aPos;attribute vec3 aNrm;attribute vec2 aUV;attribute vec3 aOff;attribute vec4 aCol;attribute float aBorn;
-uniform mat4 uVP;uniform float uT;uniform float uVox;varying vec3 vN;varying vec2 vUV;varying vec3 vC;varying float vK;
-void main(){float k=clamp((uT-aBorn)/.35,0.,1.);k=1.-pow(1.-k,3.);vec3 p=aOff+aPos*uVox*aCol.a*k+vec3(0.,(1.-k)*14.,0.);
-gl_Position=uVP*vec4(p,1.);vN=aNrm;vUV=aUV;vC=aCol.rgb;vK=k;}`;
-const FS = `precision mediump float;uniform vec3 uL;varying vec3 vN;varying vec2 vUV;varying vec3 vC;varying float vK;
-void main(){if(vK<.01)discard;float d=max(dot(normalize(vN),uL),0.)*.62+.38;float e=min(min(vUV.x,1.-vUV.x),min(vUV.y,1.-vUV.y));
-gl_FragColor=vec4(vC*d*mix(.5,1.,smoothstep(0.,.14,e)),1.);}`;
+let gl = null, g2 = false, ext = null, P1, P2, A1 = {}, U1 = {}, A2 = {}, U2 = {};
+const bufs = { mus:{}, fat:{}, floor:{} };
+const VS = `attribute vec3 aPos;attribute vec3 aNrm;attribute float aG;attribute float aFib;attribute float aGrow;attribute float aEdge;
+uniform mat4 uVP;varying vec3 vN;varying vec3 vW;varying float vG;varying float vFib;varying float vGrow;varying float vEdge;
+void main(){vW=aPos;vN=aNrm;vG=aG;vFib=aFib;vGrow=aGrow;vEdge=aEdge;gl_Position=uVP*vec4(aPos,1.);}`;
+const FS_M = `precision mediump float;uniform vec3 uL;uniform vec3 uEye;uniform float uScan;uniform float uHeat;uniform float uSel;uniform float uT;
+varying vec3 vN;varying vec3 vW;varying float vG;varying float vFib;varying float vGrow;varying float vEdge;
+void main(){if(vW.y>uScan)discard;vec3 N=normalize(vN),V=normalize(uEye-vW);
+float d=max(dot(N,uL),0.),h=pow(max(dot(N,normalize(uL+V)),0.),28.),rim=pow(1.-abs(dot(N,V)),2.6);
+vec3 base=vG<-1.5?vec3(.33,.30,.38):vec3(.70,.21,.17);
+float stripe=vG>-.5?.84+.16*sin(vFib*5.):1.;stripe*=1.-.5*clamp(vEdge,0.,1.);
+float sel=uSel>-.5&&abs(vG-uSel)<.5?1.:0.;
+vec3 c=base*(.30+.70*d)*stripe+h*.22+rim*vec3(.25,.83,.77)*.38;
+float pulse=.75+.25*sin(uT*3.);
+c=mix(c,vec3(.95,.76,.31)*(.45+.55*d),clamp(vGrow*uHeat*pulse,0.,.85));
+c=mix(c,vec3(1.,.86,.45)*(.5+.5*d),sel*.55);
+c+=vec3(.25,.83,.77)*exp(-pow((vW.y-uScan)/1.3,2.))*1.2;
+gl_FragColor=vec4(c,1.);}`;
+const FS_F = `precision mediump float;uniform vec3 uL;uniform vec3 uEye;uniform float uScan;uniform float uA;uniform vec3 uCol;uniform float uFres;
+varying vec3 vN;varying vec3 vW;varying float vG;varying float vFib;varying float vGrow;varying float vEdge;
+void main(){if(vW.y>uScan)discard;vec3 N=normalize(vN),V=normalize(uEye-vW);
+float d=max(dot(N,uL),0.),rim=pow(1.-abs(dot(N,V)),2.),h=pow(max(dot(N,normalize(uL+V)),0.),40.);
+float a=uA*mix(1.,.5+.5*rim,uFres);
+vec3 c=uCol*(.42+.58*d)+h*.25;
+c+=vec3(.25,.83,.77)*exp(-pow((vW.y-uScan)/1.3,2.))*1.2;
+gl_FragColor=vec4(c*a,a);}`;
+function prog(vs, fs, A, U, an, un) {
+  const sh = (t, s) => { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(o); return o; };
+  const p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw gl.getProgramInfoLog(p);
+  an.forEach(n => A[n] = gl.getAttribLocation(p, n)); un.forEach(n => U[n] = gl.getUniformLocation(p, n)); return p;
+}
 function initGL() {
-  gl = cv.getContext('webgl2', { antialias:true, alpha:true }) || cv.getContext('webgl', { antialias:true, alpha:true });
+  gl = cv.getContext('webgl2', { antialias:true, alpha:true, premultipliedAlpha:true }) || cv.getContext('webgl', { antialias:true, alpha:true, premultipliedAlpha:true });
   if (!gl) return false;
-  g2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
-  if (!g2) { ext = gl.getExtension('ANGLE_instanced_arrays'); if (!ext) return false; }
-  const sh = (t, src) => { const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(s); return s; };
-  prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog);
-  ['aPos','aNrm','aUV','aOff','aCol','aBorn'].forEach(n => A[n] = gl.getAttribLocation(prog, n));
-  ['uVP','uT','uVox','uL'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
-  // unit cube, 36 verts (pos, normal, uv), counter-clockwise from outside — as in the engine
-  const cb = [], fs = [[[1,0,0],[0,1,0],[0,0,1]],[[-1,0,0],[0,0,-1],[0,1,0]],[[0,1,0],[0,0,1],[1,0,0]],[[0,-1,0],[1,0,0],[0,0,1]],[[0,0,1],[1,0,0],[0,1,0]],[[0,0,-1],[0,1,0],[1,0,0]]];
-  fs.forEach(([n, a, b]) => { const P = [[-1,-1],[1,-1],[1,1],[-1,1]].map(q => [(n[0]+a[0]*q[0]+b[0]*q[1])*.5,(n[1]+a[1]*q[0]+b[1]*q[1])*.5,(n[2]+a[2]*q[0]+b[2]*q[1])*.5]), UV = [[0,0],[1,0],[1,1],[0,1]];
-    [[0,1,2],[0,2,3]].forEach(t => { const [p0, p1, p2] = t.map(i => P[i]);
-      const cr = [(p1[1]-p0[1])*(p2[2]-p0[2])-(p1[2]-p0[2])*(p2[1]-p0[1]),(p1[2]-p0[2])*(p2[0]-p0[0])-(p1[0]-p0[0])*(p2[2]-p0[2]),(p1[0]-p0[0])*(p2[1]-p0[1])-(p1[1]-p0[1])*(p2[0]-p0[0])];
-      const tt = cr[0]*n[0]+cr[1]*n[1]+cr[2]*n[2] > 0 ? t : [t[0], t[2], t[1]];
-      tt.forEach(i => cb.push(...P[i], ...n, ...UV[i])); }); });
-  cubeBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, cubeBuf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cb), gl.STATIC_DRAW);
-  instBuf = gl.createBuffer();
+  const an = ['aPos','aNrm','aG','aFib','aGrow','aEdge'];
+  P1 = prog(VS, FS_M, A1, U1, an, ['uVP','uL','uEye','uScan','uHeat','uSel','uT']);
+  P2 = prog(VS, FS_F, A2, U2, an, ['uVP','uL','uEye','uScan','uA','uCol','uFres']);
+  for (const k in bufs) { bufs[k].v = gl.createBuffer(); bufs[k].i = gl.createBuffer(); }
+  // scanner ring on the floor
+  const fl = Mesh(), rings = [];
+  [30, 31.2, 33.5, 34].forEach((r, i) => { const pts = []; for (let j = 0; j < 72; j++) { const t = 2 * Math.PI * j / 72; pts.push([r * Math.sin(t), -.2, r * Math.cos(t), -1, 0]); } rings.push({ c:[0, -10, 0], pts }); });
+  addRings(fl, rings, 72); upload('floor', finish(fl), null);
   return true;
 }
-const div = (loc, d) => g2 ? gl.vertexAttribDivisor(loc, d) : ext.vertexAttribDivisorANGLE(loc, d);
-function upload(arr) { gl.bindBuffer(gl.ARRAY_BUFFER, instBuf); gl.bufferData(gl.ARRAY_BUFFER, arr, gl.DYNAMIC_DRAW); nInst = arr.length / 8; }
+function upload(key, m, grow) {
+  const n = m.n, arr = new Float32Array(n * 10);
+  for (let i = 0; i < n; i++) { const o = i * 10, g = m.g[i]; arr[o + 9] = m.e[i] || 0;
+    arr[o] = m.p[i * 3]; arr[o + 1] = m.p[i * 3 + 1]; arr[o + 2] = m.p[i * 3 + 2];
+    arr[o + 3] = m.N[i * 3]; arr[o + 4] = m.N[i * 3 + 1]; arr[o + 5] = m.N[i * 3 + 2];
+    arr[o + 6] = g; arr[o + 7] = m.fib[i]; arr[o + 8] = grow ? clamp((m.gr[i] || 0) / .03, 0, 1) : 0; }
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufs[key].v); gl.bufferData(gl.ARRAY_BUFFER, arr, gl.DYNAMIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufs[key].i); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(m.idx), gl.DYNAMIC_DRAW);
+  bufs[key].count = m.idx.length;
+}
+function bind(key, A) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufs[key].v); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufs[key].i);
+  [['aPos',3,0],['aNrm',3,12],['aG',1,24],['aFib',1,28],['aGrow',1,32],['aEdge',1,36]].forEach(([n, s, o]) => { if (A[n] < 0) return; gl.enableVertexAttribArray(A[n]); gl.vertexAttribPointer(A[n], s, gl.FLOAT, false, 40, o); });
+}
 
-// camera: Proj and projMatrix from vault-it-3d-engine.js
-const st = { yaw:-.55, pitch:.14, dist:300, zoom:1, ty:90, fit:.9 };
+// camera from the Vault-It engine
+const st = { yaw:-.5, pitch:.12, dist:300, zoom:1, ty:92, fit:.9 };
 function Proj(st, rect) {
   const cp = Math.cos(st.pitch), sp = Math.sin(st.pitch), d = st.dist / st.zoom;
   const pos = [d * Math.sin(st.yaw) * cp, st.ty + d * sp, d * Math.cos(st.yaw) * cp];
@@ -1052,127 +1240,163 @@ function projMatrix(P) {
   return new Float32Array([sx*r[0],sy*u[0],a*f[0],f[0], sx*r[1],sy*u[1],a*f[1],f[1], sx*r[2],sy*u[2],a*f[2],f[2], -sx*dot(r,pos),-sy*dot(u,pos),-a*dot(f,pos)+b,-dot(f,pos)]);
 }
 let drag = null, lastTouch = -1e9;
-cv.addEventListener('pointerdown', e => { drag = { x:e.clientX, y:e.clientY, yaw:st.yaw, pitch:st.pitch }; try { cv.setPointerCapture(e.pointerId); } catch {} cv.style.cursor = 'grabbing'; lastTouch = performance.now(); });
-cv.addEventListener('pointermove', e => { if (!drag) return; st.yaw = drag.yaw - (e.clientX - drag.x) * .008; st.pitch = clamp(drag.pitch + (e.clientY - drag.y) * .005, -.2, 1.1); lastTouch = performance.now(); });
-const end = () => { drag = null; cv.style.cursor = 'grab'; };
-cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
-cv.addEventListener('wheel', e => { e.preventDefault(); st.zoom = clamp(st.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08), .7, 2.2); lastTouch = performance.now(); }, { passive:false });
+cv.addEventListener('pointerdown', e => { drag = { x:e.clientX, y:e.clientY, yaw:st.yaw, pitch:st.pitch }; try { cv.setPointerCapture(e.pointerId); } catch {} cv.style.cursor = 'grabbing'; lastTouch = performance.now(); kick(); });
+cv.addEventListener('pointermove', e => { if (!drag) return; st.yaw = drag.yaw - (e.clientX - drag.x) * .008; st.pitch = clamp(drag.pitch + (e.clientY - drag.y) * .005, -.3, 1.1); lastTouch = performance.now(); kick(); });
+const endDrag = () => { drag = null; cv.style.cursor = 'grab'; };
+cv.addEventListener('pointerup', endDrag); cv.addEventListener('pointercancel', endDrag);
+cv.addEventListener('wheel', e => { e.preventDefault(); st.zoom = clamp(st.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08), .7, 2.4); lastTouch = performance.now(); kick(); }, { passive:false });
 cv.addEventListener('keydown', e => { const m = { ArrowLeft:[-.12,0], ArrowRight:[.12,0], ArrowUp:[0,.06], ArrowDown:[0,-.06] }[e.key];
-  if (m) { st.yaw += m[0]; st.pitch = clamp(st.pitch + m[1], -.2, 1.1); e.preventDefault(); lastTouch = performance.now(); } });
+  if (m) { st.yaw += m[0]; st.pitch = clamp(st.pitch + m[1], -.3, 1.1); e.preventDefault(); lastTouch = performance.now(); kick(); } });
 
-let t0 = performance.now(), raf = 0, lastF = 0;
+let layer = 'fat', heat = true, sel = -1, scanT0 = performance.now(), raf = 0, lastF = 0;
+const FAT_A = { skin:.95, fat:.72, muscle:0 };
 function frame(ts) {
   raf = 0; if (!cv.offsetParent || document.hidden) return;
-  const r = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
-  const w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+  const r = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
   if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
-  if (!reduce && !drag && ts - lastTouch > 3500) st.yaw += Math.min(50, ts - (lastF || ts)) * .00018;
+  if (!reduce && !drag && ts - lastTouch > 3500) st.yaw += Math.min(50, ts - (lastF || ts)) * .00016;
   lastF = ts;
+  const P = Proj(st, { w:r.width, h:r.height }), VP = projMatrix(P), L = [-.45, .7, .55], ll = Math.hypot(...L);
+  const scanP = reduce ? 1 : clamp((ts - scanT0) / 1900, 0, 1), scan = -4 + (cal.H / 178 * 182 + 8) * (1 - Math.pow(1 - scanP, 2));
   gl.viewport(0, 0, w, h); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.useProgram(prog);
-  gl.uniformMatrix4fv(U.uVP, false, projMatrix(Proj(st, { w:r.width, h:r.height })));
-  gl.uniform1f(U.uT, reduce ? 99 : (ts - t0) / 1000); gl.uniform1f(U.uVox, V);
-  const L = [-.45, .7, .55], ll = Math.hypot(...L); gl.uniform3f(U.uL, L[0] / ll, L[1] / ll, L[2] / ll);
-  gl.bindBuffer(gl.ARRAY_BUFFER, cubeBuf);
-  [['aPos',3,0],['aNrm',3,12],['aUV',2,24]].forEach(([n, s, o]) => { gl.enableVertexAttribArray(A[n]); gl.vertexAttribPointer(A[n], s, gl.FLOAT, false, 32, o); div(A[n], 0); });
-  gl.bindBuffer(gl.ARRAY_BUFFER, instBuf);
-  [['aOff',3,0],['aCol',4,12],['aBorn',1,28]].forEach(([n, s, o]) => { gl.enableVertexAttribArray(A[n]); gl.vertexAttribPointer(A[n], s, gl.FLOAT, false, 32, o); div(A[n], 1); });
-  g2 ? gl.drawArraysInstanced(gl.TRIANGLES, 0, 36, nInst) : ext.drawArraysInstancedANGLE(gl.TRIANGLES, 0, 36, nInst);
-  kick();
+  gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.disable(gl.BLEND); gl.depthMask(true); gl.disable(gl.CULL_FACE);
+  // muscle
+  gl.useProgram(P1); bind('mus', A1);
+  gl.uniformMatrix4fv(U1.uVP, false, VP); gl.uniform3f(U1.uL, L[0] / ll, L[1] / ll, L[2] / ll); gl.uniform3f(U1.uEye, ...P.pos);
+  gl.uniform1f(U1.uScan, scan); gl.uniform1f(U1.uHeat, heat ? 1 : 0); gl.uniform1f(U1.uSel, sel); gl.uniform1f(U1.uT, ts / 1000);
+  gl.drawElements(gl.TRIANGLES, bufs.mus.count, gl.UNSIGNED_SHORT, 0);
+  // fat: depth pre-pass so only the nearest surface blends over the muscle
+  gl.useProgram(P2); gl.uniformMatrix4fv(U2.uVP, false, VP); gl.uniform3f(U2.uL, L[0] / ll, L[1] / ll, L[2] / ll); gl.uniform3f(U2.uEye, ...P.pos); gl.uniform1f(U2.uScan, scan);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+  if (FAT_A[layer] > 0) {
+    bind('fat', A2);
+    gl.colorMask(false, false, false, false); gl.drawElements(gl.TRIANGLES, bufs.fat.count, gl.UNSIGNED_SHORT, 0); gl.colorMask(true, true, true, true);
+    gl.uniform1f(U2.uA, FAT_A[layer]); gl.uniform1f(U2.uFres, layer === 'skin' ? .25 : 1);
+    gl.uniform3f(U2.uCol, ...(layer === 'skin' ? [.80, .62, .52] : [.95, .78, .54]));
+    gl.drawElements(gl.TRIANGLES, bufs.fat.count, gl.UNSIGNED_SHORT, 0);
+  }
+  gl.depthMask(false); bind('floor', A2); gl.uniform1f(U2.uScan, 999); gl.uniform1f(U2.uA, .55); gl.uniform1f(U2.uFres, 0); gl.uniform3f(U2.uCol, .25, .83, .77);
+  gl.drawElements(gl.TRIANGLES, bufs.floor.count, gl.UNSIGNED_SHORT, 0); gl.depthMask(true);
+  if (!reduce) kick();
 }
-const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+const kick = () => { if (gl && !raf) raf = requestAnimationFrame(frame); };
 
-// ---------- UI ----------
-let week = 12, sims = band(hab), simsNow = simulate(habitsNow);
-const f1 = v => v.toFixed(1);
-function rebuild(replay) {
-  if (!gNow) gNow = voxelize(nowComp());
-  const c = sims.mid[week], gB = week ? voxelize(c) : gNow;
-  if (gl) { upload(instances(gNow, gB)); if (replay) t0 = performance.now(); else if (performance.now() - t0 < 2200) {} else t0 = performance.now() - 99000; kick(); }
-  const n = counts.body + counts.gain;
-  $('#brickCount').textContent = n.toLocaleString('en-US') + (week ? ` · ${counts.burn.toLocaleString('en-US')} to burn · ${counts.gain.toLocaleString('en-US')} to build` : '');
-  drawTable(); drawChart();
+// ================= UI =================
+let week = 0, sims, simsNow, str, grow;
+const bfOf = c => c.fm / (c.fm + c.ffm) * 100;
+function recompute() { sims = band(hab); simsNow = simulate(habitsNow); str = strength(hab); }
+function rebuild() {
+  grow = growthAt(str, sims, week);
+  const fatK = Math.pow(sims.mid[week].fm / sims.mid[0].fm, .85);
+  if (gl) { const b = buildBody(grow, fatK); const maxG = Math.max(.001, ...Object.values(grow));
+    const norm = Object.fromEntries(GK.map(k => [k, week ? clamp(grow[k] / .035, 0, 1) : 0]));
+    upload('mus', b.mus, week > 0); upload('fat', b.fat, null); kick(); }
+  const c = sims.mid[week];
+  $('#stageTitle').textContent = week ? `You, week ${week}` : 'You, now';
+  $('#hudL').textContent = `${f1(c.fm + c.ffm)} kg · ${f1(bfOf(c))}% fat`;
+  $('#hudR').textContent = `${f1(c.ffm)} kg lean`;
+  drawLifts(); drawTable(); drawChart(); drawGrow();
+}
+function drawLifts() {
+  const bw = cal.W; let total = 0, best = null;
+  $('#lifts').innerHTML = LIFTS.map((l, i) => {
+    const now = str[i][0], at = str[i][week], t = tierOf(l, now, bw), nx = l.std[t] ? l.std[t] * bw : null;
+    if (['squat','bench','dead'].includes(l.k)) total += week ? at : now;
+    const lo = t ? l.std[t - 1] * bw : 0, pct = nx ? clamp((now - lo) / (nx - lo), 0, 1) : 1;
+    const eta = nx ? str[i].findIndex(v => v >= nx) : -1;
+    if (nx && eta > 0 && (!best || eta < best.eta)) best = { l, eta, nx, t:t + 1 };
+    const [tn, tc] = TIERS[t];
+    return `<button class="lift" data-i="${i}" aria-pressed="${sel >= 0 && Object.keys(l.hits).map(g => GK.indexOf(g)).includes(sel) && selLift === i}">
+      <span class="n">${l.name}</span><span class="v">${Math.round(now)} kg${week ? ` <span style="color:var(--gold)">→ ${Math.round(at)}</span>` : ''}</span>
+      <span class="meta"><span class="tier" style="color:${tc}">${tn}</span><span>${(now / bw).toFixed(2)}× body weight</span>${nx ? `<span>${TIERS[t + 1][0]} at ${Math.round(nx)} kg${eta > 0 ? ` · week ${eta}` : eta === 0 ? '' : ' · past 6 months'}</span>` : '<span>Top tier</span>'}</span>
+      <span></span><span class="bar"><i style="width:${pct * 100}%;background:${TIERS[Math.min(4, t + 1)][1]}"></i></span></button>`; }).join('');
+  $('#sbd').textContent = `${Math.round(total)} kg`;
+  $('#squest').innerHTML = best ? `<span>Strength quest: <b>${best.l.name} ${Math.round(best.nx)} kg</b> for ${TIERS[best.t][0]}</span><span class="mono">ETA week ${best.eta} · +300 XP</span>` : '<span>Every lift is at its top tier.</span>';
+  document.querySelectorAll('.lift').forEach(b => b.onclick = () => { const l = LIFTS[+b.dataset.i]; const top = Object.entries(l.hits).sort((a, c) => c[1] - a[1])[0][0];
+    selLift = selLift === +b.dataset.i ? -1 : +b.dataset.i; selectGroup(selLift < 0 ? null : top, `${l.name}: ${Object.keys(l.hits).map(g => GROUPS[g]).join(', ')}`); });
+}
+let selLift = -1;
+function selectGroup(g, label) { sel = g ? GK.indexOf(g) : -1; $('#hudSel').textContent = g ? label : 'Tap a lift or muscle to light it up'; drawLifts(); drawGrow(); kick(); }
+function drawGrow() {
+  const gA = girths(ZERO, 1), rows = GK.map(k => [k, grow[k]]).sort((a, b) => b[1] - a[1]);
+  const mx = Math.max(.01, ...rows.map(r => r[1]));
+  $('#grow').innerHTML = week ? rows.map(([k, v]) => `<button class="growr" data-g="${k}" aria-pressed="${sel === GK.indexOf(k)}"><span>${GROUPS[k]}</span><span class="bar"><i style="width:${Math.max(0, v / mx * 100)}%;background:${v >= 0 ? 'var(--gold)' : 'var(--rose)'}"></i></span><span>${v >= 0 ? '+' : ''}${(v * 100).toFixed(1)}%</span></button>`).join('')
+    : '<p class="muted" style="margin:0;font-size:13px">Move the Future you slider to see which muscles grow, and by how much.</p>';
+  document.querySelectorAll('.growr').forEach(b => b.onclick = () => { selLift = -1; const g = b.dataset.g; selectGroup(sel === GK.indexOf(g) ? null : g, GROUPS[g]); });
 }
 function drawTable() {
-  const a = nowComp(), b = sims.mid[week], lo = sims.lo[week], hi = sims.hi[week];
-  const ga = girths(shape(a)), gb = girths(shape(b)), sy = cal.H / 178;
-  const bf = c => c.fm / (c.fm + c.ffm) * 100;
-  const row = (name, x, y, unit, goodDown, rng) => { const d = y - x, good = goodDown ? d < -0.05 : d > 0.05, bad = goodDown ? d > 0.05 : d < -0.05;
+  const a = sims.mid[0], b = sims.mid[week], lo = sims.lo[week], hi = sims.hi[week];
+  const ga = girths(ZERO, 1), gb = girths(grow, Math.pow(b.fm / a.fm, .85));
+  const row = (name, x, y, unit, goodDown, rng) => { const d = y - x, good = goodDown ? d < -.05 : d > .05, bad = goodDown ? d > .05 : d < -.05;
     return `<tr><td>${name}</td><td>${f1(x)}${unit}</td><td class="${good ? 'good' : bad ? 'bad' : ''}">${f1(y)}${unit}${rng ? `<div class="rng">${rng}</div>` : ''}</td></tr>`; };
   $('#fcWeek').textContent = week ? `Week ${week}` : 'Now';
   $('#fcTable').innerHTML = `<thead><tr><th>Measure</th><th>Now</th><th>${week ? 'Week ' + week : 'Now'}</th></tr></thead><tbody>` +
     row('Weight', a.fm + a.ffm, b.fm + b.ffm, ' kg', true, week ? `${f1(lo.fm + lo.ffm)}–${f1(hi.fm + hi.ffm)}` : '') +
-    row('Body fat', bf(a), bf(b), '%', true, week ? `${f1(bf(lo))}–${f1(bf(hi))}` : '') +
+    row('Body fat', bfOf(a), bfOf(b), '%', true, week ? `${f1(bfOf(lo))}–${f1(bfOf(hi))}` : '') +
     row('Lean mass', a.ffm, b.ffm, ' kg', false) +
-    row('Waist', ga.waist * sy, gb.waist * sy, ' cm', true) +
-    row('Hips', ga.hips * sy, gb.hips * sy, ' cm', true) +
-    row('Chest', ga.chest * sy, gb.chest * sy, ' cm', false) +
-    row('Upper arm', ga.arm * sy, gb.arm * sy, ' cm', false) +
-    row('Thigh', ga.thigh * sy, gb.thigh * sy, ' cm', true) + '</tbody>';
+    row('Chest', ga.chest, gb.chest, ' cm', false) + row('Waist', ga.waist, gb.waist, ' cm', true) + row('Hips', ga.hips, gb.hips, ' cm', true) +
+    row('Upper arm', ga.arm, gb.arm, ' cm', false) + row('Thigh', ga.thigh, gb.thigh, ' cm', false) + row('Calf', ga.calf, gb.calf, ' cm', false) + '</tbody>';
 }
 function drawChart() {
-  const svg = $('#bfChart'), W = 420, H = 170, pl = 34, pr = 10, pt = 10, pb = 22, css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-  const bf = c => c.fm / (c.fm + c.ffm) * 100;
-  const all = [...sims.lo, ...sims.hi, ...simsNow].map(bf), mn = Math.floor(Math.min(...all)) - 1, mx = Math.ceil(Math.max(...all)) + 1;
+  const svg = $('#bfChart'), W = 420, H = 170, pl = 34, pr = 10, pt = 10, pb = 22;
+  const all = [...sims.lo, ...sims.hi, ...simsNow].map(bfOf), mn = Math.floor(Math.min(...all)) - 1, mx = Math.ceil(Math.max(...all)) + 1;
   const X = w => pl + (W - pl - pr) * w / 26, Y = v => pt + (H - pt - pb) * (1 - (v - mn) / (mx - mn));
-  const line = arr => arr.map((c, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(bf(c)).toFixed(1)}`).join(' ');
-  let s = '';
-  const step = Math.max(1, Math.round((mx - mn) / 4));
-  for (let v = Math.ceil(mn); v <= mx; v += step) s += `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="${css('--rim')}"/><text x="${pl - 6}" y="${Y(v) + 3}" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" fill="${css('--ash')}">${v}%</text>`;
-  [0, 13, 26].forEach(w => s += `<text x="${X(w)}" y="${H - 6}" text-anchor="${w ? w === 26 ? 'end' : 'middle' : 'start'}" font-family="JetBrains Mono, monospace" font-size="10" fill="${css('--ash')}">${w ? '+' + (w === 13 ? 3 : 6) + ' mo' : 'Now'}</text>`);
-  const up = sims.hi.map((c, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(bf(c)).toFixed(1)}`).join(' ');
-  const dn = sims.lo.map((c, i) => [X(i), Y(bf(c))]).reverse().map(p => `L${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
-  s += `<path d="${up} ${dn} Z" fill="${css('--ember')}" fill-opacity=".16"/>`;
-  s += `<path d="${line(simsNow)}" fill="none" stroke="${css('--ash')}" stroke-width="1.5" stroke-dasharray="4 4"/>`;
-  s += `<path d="${line(sims.mid)}" fill="none" stroke="${css('--ember')}" stroke-width="2.2"/>`;
-  s += `<line x1="${X(week)}" x2="${X(week)}" y1="${pt}" y2="${H - pb}" stroke="${css('--gold')}" stroke-dasharray="2 3"/>`;
-  const m = sims.mid[week]; s += `<circle cx="${X(week)}" cy="${Y(bf(m))}" r="4" fill="${css('--gold')}"/><text x="${clamp(X(week), 60, W - 50)}" y="${Y(bf(m)) - 9}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="${css('--bone')}">${f1(bf(m))}%</text>`;
+  const line = arr => arr.map((c, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(bfOf(c)).toFixed(1)}`).join(' ');
+  const t = (x, y, s, a = 'middle', extra = '') => `<text x="${x}" y="${y}" text-anchor="${a}" font-family="JetBrains Mono, monospace" font-size="10" fill="${css('--ash')}" ${extra}>${s}</text>`;
+  let s = ''; const step = Math.max(1, Math.round((mx - mn) / 4));
+  for (let v = Math.ceil(mn); v <= mx; v += step) s += `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="${css('--rim')}"/>` + t(pl - 6, Y(v) + 3, v + '%', 'end');
+  s += t(X(0), H - 6, 'Now', 'start') + t(X(13), H - 6, '+3 mo') + t(X(26), H - 6, '+6 mo', 'end');
+  const up = sims.hi.map((c, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(bfOf(c)).toFixed(1)}`).join(' ');
+  const dn = sims.lo.map((c, i) => [X(i), Y(bfOf(c))]).reverse().map(p => `L${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
+  s += `<path d="${up} ${dn} Z" fill="${css('--ember')}" fill-opacity=".16"/><path d="${line(simsNow)}" fill="none" stroke="${css('--ash')}" stroke-width="1.5" stroke-dasharray="4 4"/><path d="${line(sims.mid)}" fill="none" stroke="${css('--ember')}" stroke-width="2.2"/>`;
+  const m = sims.mid[week];
+  s += `<line x1="${X(week)}" x2="${X(week)}" y1="${pt}" y2="${H - pb}" stroke="${css('--gold')}" stroke-dasharray="2 3"/><circle cx="${X(week)}" cy="${Y(bfOf(m))}" r="4" fill="${css('--gold')}"/>`;
+  s += `<text x="${clamp(X(week), 40, W - 40)}" y="${Y(bfOf(m)) - 9}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="${css('--bone')}">${f1(bfOf(m))}%</text>`;
   svg.innerHTML = s;
 }
-
-// habits
 function drawHabits() {
   $('#habits').innerHTML = HABITS.map(h => `<div class="habit"><div class="h"><label for="h-${h.k}">${h.name} <span class="muted" style="font-size:11px">· ${h.sub}</span></label><span id="hv-${h.k}">${Math.round(hab[h.k] * 100)}% of days</span></div>
     <div class="rw"><input type="range" id="h-${h.k}" min="0" max="100" step="1" value="${Math.round(hab[h.k] * 100)}"><i class="now" style="left:calc(${h.now * 100}% + ${8 - h.now * 16}px)"></i></div></div>`).join('');
-  HABITS.forEach(h => $('#h-' + h.k).addEventListener('input', e => { hab[h.k] = e.target.value / 100; $('#hv-' + h.k).textContent = e.target.value + '% of days'; setPreset(null); recalc(); }));
+  HABITS.forEach(h => $('#h-' + h.k).addEventListener('input', e => { hab[h.k] = e.target.value / 100; $('#hv-' + h.k).textContent = e.target.value + '% of days'; setPreset(null); schedule(true); }));
 }
-let pend = 0;
-function recalc() { sims = band(hab); if (!pend) pend = requestAnimationFrame(() => { pend = 0; rebuild(false); }); }
+let pend = 0, needSim = false;
+function schedule(sim) { needSim = needSim || sim; if (!pend) pend = requestAnimationFrame(() => { pend = 0; if (needSim) recompute(); needSim = false; rebuild(); }); }
 function setPreset(p) { $('#pNow').classList.toggle('on', p === 'now'); $('#pLock').classList.toggle('on', p === 'lock'); }
-$('#pNow').onclick = () => { hab = { ...habitsNow }; drawHabits(); setPreset('now'); recalc(); };
-$('#pLock').onclick = () => { hab = Object.fromEntries(HABITS.map(h => [h.k, .9])); drawHabits(); setPreset('lock'); recalc(); };
-$('#weekSl').addEventListener('input', e => { week = +e.target.value; $('#weekOut').textContent = week ? `Week ${week}` : 'Now'; if (!pend) pend = requestAnimationFrame(() => { pend = 0; rebuild(false); }); });
-$('#replayBtn').onclick = () => rebuild(true);
-$('#nowBtn').onclick = () => { week = 0; $('#weekSl').value = 0; $('#weekOut').textContent = 'Now'; rebuild(true); };
+$('#pNow').onclick = () => { hab = { ...habitsNow }; drawHabits(); setPreset('now'); schedule(true); };
+$('#pLock').onclick = () => { hab = Object.fromEntries(HABITS.map(h => [h.k, .9])); drawHabits(); setPreset('lock'); if (!week) { week = 12; $('#weekSl').value = 12; $('#weekOut').textContent = 'Week 12'; } schedule(true); };
+$('#weekSl').addEventListener('input', e => { week = +e.target.value; $('#weekOut').textContent = week ? `Week ${week}` : 'Now'; schedule(false); });
+$('#replayBtn').onclick = () => { scanT0 = performance.now(); kick(); };
+$('#heatBtn').onclick = e => { heat = !heat; e.currentTarget.classList.toggle('on', heat); e.currentTarget.setAttribute('aria-pressed', heat); kick(); };
+['skin','fat','muscle'].forEach(k => $('#ly-' + k).onclick = () => { layer = k; ['skin','fat','muscle'].forEach(x => $('#ly-' + x).setAttribute('aria-pressed', x === k)); kick(); });
 
-// scan slots
+// check-in: photos, tape, scale
 const ANG = [['front','Front'],['left','Left side'],['back','Back'],['right','Right side']];
 const guide = side => side ? `<svg viewBox="0 0 60 120" aria-hidden="true"><g fill="none" stroke="#3FD4C4" stroke-width="1.2" stroke-dasharray="3 3"><ellipse cx="30" cy="12" rx="7" ry="9"/><path d="M27 21 L24 40 Q22 55 25 62 L26 85 L25 116 M33 21 L38 40 Q40 52 36 62 L35 85 L36 116 M30 30 L31 66"/></g></svg>`
   : `<svg viewBox="0 0 60 120" aria-hidden="true"><g fill="none" stroke="#3FD4C4" stroke-width="1.2" stroke-dasharray="3 3"><ellipse cx="30" cy="12" rx="7" ry="9"/><path d="M22 24 L38 24 L42 50 L40 62 L36 116 M22 24 L18 50 L20 62 L24 116 M22 25 L12 64 M38 25 L48 64 M30 62 L30 112"/></g></svg>`;
 let shots = 0;
-$('#scan').innerHTML = ANG.map(([k, n], i) => `<div class="shot" id="shot-${k}"><div class="frame">${guide(i % 2)}</div>
-  <label class="btn ghost sm" for="f-${k}">${n}</label><input type="file" id="f-${k}" accept="image/*" capture="environment"></div>`).join('');
+$('#scan').innerHTML = ANG.map(([k, n], i) => `<div class="shot" id="shot-${k}"><div class="frame">${guide(i % 2)}</div><label class="btn ghost sm" for="f-${k}">${n}</label><input type="file" id="f-${k}" accept="image/*" capture="environment"></div>`).join('');
 ANG.forEach(([k]) => $('#f-' + k).addEventListener('change', e => { const f = e.target.files[0]; if (!f) return;
   const box = $('#shot-' + k); if (!box.classList.contains('has')) shots++; box.classList.add('has');
-  box.querySelector('.frame').style.backgroundImage = `url(${URL.createObjectURL(f)})`; box.querySelector('svg').style.opacity = .55;
-  $('#shotCount').textContent = `${shots} / 4 angles`; }));
+  box.querySelector('.frame').style.backgroundImage = `url(${URL.createObjectURL(f)})`; box.querySelector('svg').style.opacity = .55; }));
+const TAPE = [['chest','Chest'],['waist','Waist'],['hips','Hips'],['arm','Upper arm'],['thigh','Thigh'],['calf','Calf']];
+const g0 = girths(ZERO, 1);
+$('#tape').innerHTML = TAPE.map(([k, n]) => `<label for="t-${k}">${n}<input id="t-${k}" type="number" inputmode="decimal" step="0.5" value="${g0[k].toFixed(1)}"></label>`).join('');
 $('#buildBtn').onclick = () => {
-  const H = +$('#cH').value, W = +$('#cW').value, B = +$('#cB').value;
-  if (!(H >= 140 && H <= 210 && W >= 40 && W <= 200 && B >= 5 && B <= 50)) { $('#buildBtn').textContent = 'Check the three numbers'; setTimeout(() => $('#buildBtn').textContent = 'Build my model', 2000); return; }
-  cal = { H, W, BF:B }; gNow = null; sims = band(hab); simsNow = simulate(habitsNow);
-  week = 0; $('#weekSl').value = 0; $('#weekOut').textContent = 'Now'; rebuild(true);
+  const H = +$('#cH').value, W = +$('#cW').value, B = +$('#cB').value, tape = Object.fromEntries(TAPE.map(([k]) => [k, +$('#t-' + k).value]));
+  if (!(H >= 140 && H <= 210 && W >= 40 && W <= 200 && B >= 5 && B <= 50) || TAPE.some(([k]) => !(tape[k] > 10 && tape[k] < 200))) { $('#fitRes').style.color = 'var(--rose)'; $('#fitRes').textContent = 'Check the numbers: one is missing or out of range.'; return; }
+  cal = { H, W, BF:B };
+  for (let it = 0; it < 4; it++) { const g = girths(ZERO, 1); TAPE.forEach(([k]) => { K[k] = clamp(K[k] * tape[k] / g[k], .6, 1.6); }); }
+  const g = girths(ZERO, 1), err = Math.max(...TAPE.map(([k]) => Math.abs(g[k] - tape[k])));
+  recompute(); week = 0; $('#weekSl').value = 0; $('#weekOut').textContent = 'Now'; rebuild(); scanT0 = performance.now(); kick();
+  $('#fitRes').style.color = ''; $('#fitRes').textContent = `Check-in logged, +150 XP. Model matches your tape within ${err.toFixed(1)} cm.`;
   cv.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'center' });
 };
 
 // boot
-let ok = false; try { ok = initGL(); } catch (e) { ok = false; }
+let ok = false; try { ok = initGL(); } catch (e) { console.warn(e); ok = false; }
 if (!ok) { gl = null; $('#glMsg').hidden = false; cv.hidden = true; }
-drawHabits(); setPreset('now');
-$('#weekOut').textContent = 'Week 12';
-rebuild(true);
-// start drawing whenever the Body tab becomes visible
-new MutationObserver(() => { if (gl && cv.offsetParent) { t0 = performance.now(); kick(); } }).observe($('[data-view="body"]'), { attributes:true, attributeFilter:['hidden'] });
-document.addEventListener('visibilitychange', () => gl && kick());
-window.addEventListener('resize', () => gl && kick());
+drawHabits(); setPreset('now'); recompute(); rebuild();
+new MutationObserver(() => { if (cv.offsetParent) { scanT0 = performance.now(); kick(); } }).observe($('[data-view="body"]'), { attributes:true, attributeFilter:['hidden'] });
+document.addEventListener('visibilitychange', kick); window.addEventListener('resize', kick);
 })();
 </script>
