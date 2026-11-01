@@ -28,5 +28,14 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     ok(!r.side && errs.length === 0, t + 'no sideways scroll, no page errors ' + errs.slice(0, 1));
     await ctx.close();
   }
+  // the app's own demo data at 1100 (two columns): no title runs under its amount, and every title keeps two lines at most
+  { const ctx = await b.newContext({ viewport: { width: 1100, height: 900 } }); const p = await ctx.newPage(); await p.addInitScript(() => localStorage.setItem('vi-theme', 'dark'));
+    await p.goto(APP); await p.waitForFunction(() => localStorage.getItem('pos_ov1'), null, { timeout: 30000 }); await p.reload(); await p.waitForFunction(() => window.cfModel && cfModel().total > 0, null, { timeout: 30000 }); await p.waitForTimeout(500);
+    await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#trial-banner{display:none!important}' }); await p.evaluate(() => showTab('budget')); await p.waitForTimeout(800);
+    const r = await p.evaluate(() => [...document.querySelectorAll('.bd-tile')].map(t => { const b = t.querySelector('.bd-tile-tt b'), s = t.querySelector('.bd-tile-sum'), br = b.getBoundingClientRect(), sr = s.getBoundingClientRect(), tt = t.querySelector('.bd-tile-tt').getBoundingClientRect();
+      return { g: t.dataset.g, lines: Math.round(br.height / (parseFloat(getComputedStyle(b).lineHeight) || parseFloat(getComputedStyle(b).fontSize) * 1.3)), clash: tt.right > sr.left + 1 }; }));
+    ok(r.length === 6 && r.every(x => !x.clash), '1100 demo: no title runs under its amount (' + r.filter(x => x.clash).map(x => x.g).join(',') + ')');
+    ok(r.every(x => x.lines <= 2), '1100 demo: every title keeps two lines at most (' + r.map(x => x.g + ':' + x.lines).join(' ') + ')');
+    await ctx.close(); }
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASS'); process.exit(fails ? 1 : 0);
 })();
