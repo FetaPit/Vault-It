@@ -24,6 +24,11 @@ The brand book draws 14,465 bricks with raw WebGL: one shader program, one insta
 3. A2's engine merges once it meets the gate: no main-thread task over 100 ms while loading, laying or orbiting; laptop 55 to 60 fps, phone at least 30 fps sustained; first 3D frame within about 1.5 s on the phone; Pedro PASS against the brand book.
 4. One preview, the owner signs off on both devices, then the release (backup, PR #3 to the signed-off commit, owner merges, live check, tag v0.7.0-alpha), then the server deploys with the owner's yes.
 
+## Pete's decisions (1 Nov, after the brief)
+- Release: option (b) — hold until the engine passes the gate. No still-picture fallback release tonight.
+- Pedro's ASK: the house viewport keeps the Night palette in Daylight mode too. No Daylight palette work.
+- Lazy laying (part of the A2 spec): on load, only the top course is laid brick by brick; every course below is drawn as one settled shape (merged static instancing, no per-brick drop state). When a deposit adds more than the current course (e.g. £80,000 at once), the new bricks lay with the brand-book drop animation, course after course, to the new level — Pedro's stagger and drop timings apply to those new courses only. Initial render = settled shell + one animated top course; deposits animate only the delta.
+
 ## David's view
 - Honest timing: the engine swap is hours, not minutes. Release tonight only if the owner takes the safety option (still picture by default, 3D on tap) for v0.7 and the new engine as v0.7.1; otherwise the release follows the new engine.
 - No new features in this round. Anything new goes to v0.7.1.
