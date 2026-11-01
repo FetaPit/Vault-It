@@ -13636,7 +13636,7 @@ function showTab(id){
   document.querySelectorAll('.tab-btn').forEach(b=>{
     if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'"))b.classList.add('active');
   });
-  if(id==='overview'){updateKPIs();drawChart();renderCashflow();renderSummaryCards();try{renderOvAch();}catch(e){}}
+  if(id==='overview'){_fireFirstPaint=true;updateKPIs();drawChart();renderCashflow();renderSummaryCards();try{renderOvAch();}catch(e){}}
   if(id==='budget'){renderCashflow();}
   try{viNavReveal();}catch(e){}
   if(id==='house')setTimeout(redraw,30);
@@ -23445,7 +23445,7 @@ function renderFIREroadmap(){
   var TOTAL_W=Math.max(containerW,stages.length*NODE_SPACING+120);
   track.style.width=TOTAL_W+'px';track.style.height=H+'px';
   // Always open at stage one; afterwards keep wherever the user has scrolled to
-  if(_fireFirstPaint){SC.scrollLeft=Math.max(0,(nextIdx>=0?nextIdx:0)*NODE_SPACING+LEFT-containerW/2);_fireFirstPaint=false;}   // open with the stage to work on in the centre (owner, 31 Oct)
+  if(_fireFirstPaint||renderFIREroadmap._cIdx!==nextIdx){SC.scrollLeft=Math.max(0,(nextIdx>=0?nextIdx:0)*NODE_SPACING+LEFT-containerW/2);_fireFirstPaint=false;renderFIREroadmap._cIdx=nextIdx;}   // open on the stage to work on, centred, with no scroll animation: on a fresh load, each time the tab opens, and when late data moves the next stage (owner, 1 Nov, E2)
   var sl=SC.scrollLeft,buf=Math.max(containerW*0.75,NODE_SPACING*3);
   var x0=Math.max(0,Math.floor((sl-buf)/NODE_SPACING)*NODE_SPACING),x1=Math.min(TOTAL_W,Math.ceil((sl+containerW+buf)/NODE_SPACING)*NODE_SPACING);
   var i0=Math.max(0,Math.floor((x0-LEFT)/NODE_SPACING)-1),i1=Math.min(stages.length-1,Math.ceil((x1-LEFT)/NODE_SPACING)+1);
