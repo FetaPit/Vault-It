@@ -1,6 +1,6 @@
 # Vault-It voice
 
-This is how Pete writes, and so how Vault-It sounds. It is drawn from the patterns in his own sent messages (no message content is copied here) and the brand rules in `CLAUDE.md`. The creative director checks all copy against this file. So does any session drafting text for Pete to use elsewhere.
+This is how Pete writes, and so how Vault-It sounds. It is drawn from the patterns in his own sent messages (no message content is copied here) and the brand rules in `CLAUDE.md`. Pedro, the creative director, checks all copy against this file. So does any session drafting text for Pete to use elsewhere.
 
 ## In one line
 Plain, direct and polite. Say the point in the first line, give the concrete detail, then stop.

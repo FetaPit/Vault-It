@@ -1,6 +1,6 @@
 # Creative rubric
 
-The creative director scores every visual change against this list before rollout QC and the commit. A pass needs:
+Pedro, the creative director, scores every visual change against this list before rollout QC and the commit. A pass needs:
 - no hard fail
 - a weighted total of **4.0 or more**
 - no criterion under 3

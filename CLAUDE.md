@@ -65,8 +65,9 @@ A new brand is being applied. Design files are in `brand/`. Open `brand/vault-it
 - One phase per session. Read only that phase's part of `brand/vault-it-brand-handover.md` (list its sections with `grep -n '^#' brand/vault-it-brand-handover.md`). Never Read `brand/vault-it-brand-book.html` (227 KB) whole: grep it.
 
 ## Creative direction
-- The `creative-director` agent (Opus) owns the look and the words of everything people see: the marketing site, app UI and 3D scenes, emails, social and Canva assets, and copy. It writes a brief before visual work (BRIEF), scores screenshots against `docs/creative/RUBRIC.md` (REVIEW), and checks copy against `docs/creative/VOICE.md` (COPY). It never builds.
-- Hard gate (owner, 1 Nov 2026): a visual change is committed only with a creative-director PASS for exactly the staged change (`shots/qc/CD_PASS`; the commit hook checks `landing.html`, `site/`, `src/hb3d/`, `brand/`, `marketing/`; rollout-qc checks app UI and emails). Only the owner can waive it, one commit at a time (`CD_OVERRIDE=owner`).
+- **Pedro**, the creative director (`pedro` agent, Opus), owns the look and the words of everything people see: the marketing site, app UI and 3D scenes, emails, social and Canva assets, and copy. It writes a brief before visual work (BRIEF), scores screenshots against `docs/creative/RUBRIC.md` (REVIEW), and checks copy against `docs/creative/VOICE.md` (COPY). It never builds.
+- **Call Pedro wherever it is practical and advantageous** (owner, 1 Nov 2026), not only inside ship-item: any page, screen, chart, email, post, deck or wording someone outside the team will see, and any time a visual or copy choice is in doubt. Skip him for logic-only work and internal notes. The owner calls him by name ("ask Pedro…") or with `/pedro <task>`.
+- Hard gate (owner, 1 Nov 2026): a visual change is committed only with a Pedro PASS for exactly the staged change (`shots/qc/CD_PASS`; the commit hook checks `landing.html`, `site/`, `src/hb3d/`, `brand/`, `marketing/`; rollout-qc checks app UI and emails). Only the owner can waive it, one commit at a time (`CD_OVERRIDE=owner`).
 - Direction: lean into the HUD (live 3D, hairline neon, mono labels, gold accents), with fewer generic cards. Marketing pages are short, use live 3D a visitor can type into instead of screenshots, and keep a sign-up within one thumb scroll.
 - Text Pete will use elsewhere: brief, in `docs/creative/VOICE.md`.
 
@@ -78,5 +79,5 @@ A new brand is being applied. Design files are in `brand/`. Open `brand/vault-it
 - Run the tests you need by name (`bash scripts/run-tests.sh test_x`). For the full suite, push and read CI with `mcp__github__actions_list` / `get_job_logs` (failing job only); a release still needs it green on the exact commit. Read failures from `/tmp/vaultit-test-logs` rather than pasting whole runs.
 - Screenshots: shoot the changed element at 390 and 1100 px, Night and Daylight; open only the images needed to judge the change, send the set to the owner with `SendUserFile`.
 - Trim command output (`| tail -40`, `| grep`, `cut -c1-200`). Use `rtk` if installed.
-- Delegate: `scout` (Haiku) finds code, `grunt` (Haiku) makes exact mechanical edits, `architect` (Opus) explains and plans, read-only; `creative-director` (Opus) briefs and judges anything visual or written for users.
+- Delegate: `scout` (Haiku) finds code, `grunt` (Haiku) makes exact mechanical edits, `architect` (Opus) explains and plans, read-only; `pedro` (Opus, Pedro Pedro) briefs and judges anything visual or written for users.
 - Batch owner decisions into one question early. Replies: outcome first, short, line refs rather than whole files. `/compact` at 35% context.

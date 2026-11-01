@@ -1,6 +1,6 @@
 // Element screenshots for a finished item, Night and Daylight at 390 and 1100 px, plus the checks the owner's rules need.
 // Usage: node tools/shot.js --name r3-8 --tab assets [--sub stocks] [--sel "#al-card"] [--widths 390,1100] [--themes dark,light] [--js "toggleSidebar()"] [--url file:///home/user/Vault-It/index.html] [--full 1]
-// Marketing pages for the creative director: --url file:///home/user/Vault-It/landing.html --widths 390,768,1100 --full 1
+// Marketing pages for Pedro: --url file:///home/user/Vault-It/landing.html --widths 390,768,1100 --full 1
 // Writes shots/qc/<name>_<theme>_<width>.png (git-ignored) and prints one line per shot: path, page errors, sideways scroll.
 // Data: the app's own sample data (?bypass=websummit), so no account and no network are needed.
 const { chromium } = require('playwright');

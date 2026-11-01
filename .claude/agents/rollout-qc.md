@@ -28,7 +28,7 @@ If any of the three is missing, reply `FIX: evidence missing: <what>` and stop.
    - Saved data, deposits, prices, house types and levels work as before. Nothing clears a user's device.
    - Night and Daylight both readable. No sideways scroll. `prefers-reduced-motion` respected for new motion.
    - The generated HB3D block is not hand-edited (`src/hb3d` plus `node tools/build_hb3d.js`).
-   - Creative pass: if the staged diff changes what people see (CSS, markup, copy, 3D look, email templates) in `index.html` or `supabase/functions`, `shots/qc/CD_PASS` must equal `git diff --cached --binary | sha256sum` (the creative-director's REVIEW pass). Missing or stale is a FIX. Logic-only changes do not need it. (The commit hook enforces it for `landing.html`, `site/`, `src/hb3d/`, `brand/` and `marketing/`.)
+   - Creative pass: if the staged diff changes what people see (CSS, markup, copy, 3D look, email templates) in `index.html` or `supabase/functions`, `shots/qc/CD_PASS` must equal `git diff --cached --binary | sha256sum` (the Pedro's REVIEW pass). Missing or stale is a FIX. Logic-only changes do not need it. (The commit hook enforces it for `landing.html`, `site/`, `src/hb3d/`, `brand/` and `marketing/`.)
 5. **Evidence check.** Re-run one or two of the named tests yourself (`bash scripts/run-tests.sh <name>`; pass means exit 0 and no `FAIL` line). Confirm a new behaviour has a test that would fail on the old code: read the assertion. Open the screenshots for this item: judge legibility, overlap, clipping and contrast in both themes and both widths. If `tools/shot.js` reported errors or sideways scroll, that is a FIX.
 6. **Verdict.**
    - **PASS**: every owner ask is met with evidence and no rule is broken. Write the marker:
