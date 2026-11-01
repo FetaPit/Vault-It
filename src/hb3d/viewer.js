@@ -212,6 +212,7 @@
     if (Math.abs(cam.near - nn) > 1e-3 || Math.abs(cam.far - ff) > 1e-2) { cam.near = nn; cam.far = ff; cam.updateProjectionMatrix(); }
     if (this._shadowDirty) { this.renderer.shadowMap.needsUpdate = true; this._shadowDirty = false; }
     this.renderer.render(this.scene, this.camera);
+    if (H.perf) H.perf.frame(this);   // ?perf=1 overlay (index.html): one call per drawn frame; keep it when the renderer changes
     if (this.onRender) this.onRender(this);
   };
 
