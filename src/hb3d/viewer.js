@@ -312,6 +312,7 @@
       // brand lite (slow or software-drawn GPU, owner 31 Oct): frames are spaced at about 2.5x their own cost, so the page always has time
       // to answer taps and scrolls between them ("Page unresponsive" otherwise); a skipped frame keeps the loop alive without drawing
       if (self.brand && self._bLite && (self.dirty || moving) && performance.now() - (self._bLastDraw || 0) < (self._bGap || 120)) { self._raf = requestAnimationFrame(self._loop); return; }
+      if (self.brand && self._bCalm && !self._bLite && performance.now() - (self._bLastDraw || 0) < 32) { self._raf = requestAnimationFrame(self._loop); return; }   // brand at rest: 30 frames a second
       if (self.dirty || moving) {
         var t = performance.now();
         self.render(); self.dirty = false; self._idle = 0;

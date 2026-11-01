@@ -142,23 +142,35 @@
       return /swiftshader|llvmpipe|softpipe|software|basic render/i.test(String(name || '')); } catch (e) { return false; }
   }
   H.brandSoftGL = softGL;
+  var mqRM = null;   // one media query, read every frame (a new matchMedia each frame cost more than the brick maths)
   function reduced() {
-    try { return (document.body && document.body.classList.contains('reduced-motion')) || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { return false; }
+    try { if (!mqRM && window.matchMedia) mqRM = window.matchMedia('(prefers-reduced-motion: reduce)'); return (document.body && document.body.classList.contains('reduced-motion')) || !!(mqRM && mqRM.matches); } catch (e) { return false; }
   }
   H.brandReduced = reduced;
   function v3(a) { return new THREE.Vector3(a[0], a[1], a[2]); }
 
   // per-brick shader: drop in (0.38 s, e^3), fade in, gold flash (1.1 s), mortar bevel, pulse, sweep band
+  // BRAND_STATIC: the same look for parts that have finished landing, baked into one plain mesh per part (positions, normals and the
+  // per-brick face size and seed already in world space), so a phone draws thousands of settled bricks as one cheap mesh
   var VS = [
+    '#ifdef BRAND_STATIC',
+    'attribute vec2 aFS; attribute vec3 aIO;',
+    '#else',
     'attribute float aLaid;',
+    '#endif',
     'uniform float uNow; uniform float uDrop; uniform float uFlashOn; uniform float uFade;',
     'varying vec3 vN; varying vec3 vW; varying vec2 vUV; varying vec2 vFS; varying float vFlash; varying float vAlpha; varying float vSeed;',
     'void main() {',
+    '  float vis = 1.0; float drop = 0.0; vFlash = 0.0;',
+    '  #ifdef BRAND_STATIC',
+    '  vec4 wp = modelMatrix * vec4(position, 1.0);',
+    '  vN = normalize(mat3(modelMatrix) * normal);',
+    '  vFS = aFS; vec3 io = (modelMatrix * vec4(aIO, 1.0)).xyz;',
+    '  #else',
     '  mat4 im = mat4(1.0);',
     '  #ifdef USE_INSTANCING',
     '  im = instanceMatrix;',
     '  #endif',
-    '  float vis = 1.0; float drop = 0.0; vFlash = 0.0;',
     '  #ifndef BRAND_LAST',
     '  float age = uNow - aLaid;',
     '  if (aLaid > 1.0e8 || age < 0.0) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }',
@@ -169,8 +181,9 @@
     '  vN = normalize(mat3(modelMatrix) * mat3(im) * normal);',
     '  vec3 sc = vec3(length(im[0].xyz), length(im[1].xyz), length(im[2].xyz)); vec3 an = abs(normal);',
     '  vFS = an.x > 0.5 ? sc.zy : (an.y > 0.5 ? sc.xz : sc.xy);',
-    '  vUV = uv; vW = wp.xyz; vAlpha = vis * uFade;',
     '  vec3 io = (modelMatrix * im * vec4(0.0, 0.0, 0.0, 1.0)).xyz;',
+    '  #endif',
+    '  vUV = uv; vW = wp.xyz; vAlpha = vis * uFade;',
     '  vSeed = fract(sin(dot(io.xz + vec2(io.y * 1.3, io.x * 0.7), vec2(12.9898, 78.233))) * 43758.5453);',
     '  gl_Position = projectionMatrix * viewMatrix * wp;',
     '}'].join('\n');
@@ -205,7 +218,7 @@
     return { uNow: { value: 0 }, uPulse: { value: 0.5 }, uBuilt: { value: 0 }, uSweep: { value: -1e3 }, uSweepOn: { value: 0 }, uSweepW: { value: 6 * CH },
       uFadeGlaze: { value: 0 }, uLitGlass: { value: 0 }, uLitDoor: { value: 0 }, one: { value: 1 }, zero: { value: 0 } };
   }
-  function brandMat(U, look, back, last, opaque) {
+  function brandMat(U, look, back, last, opaque, stat) {
     var u = {
       uNow: U.uNow, uPulse: U.uPulse, uBuilt: U.uBuilt, uSweep: U.uSweep, uSweepOn: U.uSweepOn, uSweepW: U.uSweepW,
       uBase: { value: v3(look.base) }, uLitCol: { value: v3(look.lit || look.base) }, uLit: look.litU || U.zero,
@@ -218,7 +231,7 @@
     // version blended every brick behind every other and froze phones ("Page unresponsive"); at 0.88 alpha it looked the same.
     var mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS, fragmentShader: FS, transparent: !opaque, premultipliedAlpha: true,
       depthWrite: !back, depthTest: !back, side: back ? THREE.BackSide : THREE.FrontSide });
-    mat.defines = {}; if (last) mat.defines.BRAND_LAST = ''; if (opaque) mat.defines.BRAND_OPAQUE = '';
+    mat.defines = {}; if (last) mat.defines.BRAND_LAST = ''; if (opaque) mat.defines.BRAND_OPAQUE = ''; if (stat) mat.defines.BRAND_STATIC = '';
     return mat;
   }
   function lookOf(part, U) {
@@ -273,6 +286,7 @@
         this._bIO = new IntersectionObserver(function (es) { self._bVis = es[es.length - 1].isIntersecting; if (self._bVis) self.wake(); }, { threshold: 0.01 });
         this._bIO.observe(this.el);
       }
+      this.renderer.domElement.addEventListener('webglcontextlost', function () { self._bModel = null; });   // static meshes keep no page copy: rebuilt on restore
       this.controls.addEventListener('start', function () { self._bTouch = performance.now(); self._bDrag = true; if (self.brand) self.controls.autoRotate = false; });
       this.controls.addEventListener('end', function () { self._bTouch = performance.now(); self._bDrag = false; });
     }
@@ -290,13 +304,77 @@
       if (g.parent) g.parent.remove(g);
       g.traverse(function (o) { if (o.geometry && o.geometry !== H._geoms().box) o.geometry.dispose(); if (o.material) o.material.dispose(); });
     }
+    this._bBakeTok = (this._bBakeTok || 0) + 1; if (this._bBakeT) { clearTimeout(this._bBakeT); this._bBakeT = 0; }
     this._bGroup = null; this._bm = null; this._bModel = null; this._bInfo = null; this._bV = null; this._bPrimed = false; this._bLastJ = -1;
   };
+
+  function staticMesh(n, V, I, U, look, solid, order, part) {
+    var sg = new THREE.BufferGeometry(), drop = function () { this.array = null; };   // uploaded once, complete: the page's copy is not kept
+    [['position', 3], ['normal', 3], ['uv', 2], ['aFS', 2], ['aIO', 3]].forEach(function (a) { sg.setAttribute(a[0], new THREE.BufferAttribute(new Float32Array(n * V * a[1]), a[1]).onUpload(drop)); });
+    sg.setIndex(new THREE.BufferAttribute(n * V > 65535 ? new Uint32Array(n * I) : new Uint16Array(n * I), 1).onUpload(drop));
+    sg.setDrawRange(0, 0);
+    var stat = new THREE.Mesh(sg, brandMat(U, look, false, false, solid, true));
+    stat.frustumCulled = false; stat.renderOrder = order; stat.visible = false; stat.name = 'static:' + part;
+    return stat;
+  }
+  // bake instances [k0, k1) of a part into its static mesh (world positions, normals as mat3(instance) * normal, face sizes, origins)
+  function bakeRange(rec, k0, k1) {
+    var g = rec.front.geometry, sg = rec.stat.geometry, V = rec.V, I = rec.I, M = rec.mats;
+    var P0 = g.attributes.position.array, N0 = g.attributes.normal.array, U0 = g.attributes.uv ? g.attributes.uv.array : null, X0 = g.index ? g.index.array : null;
+    var A = sg.attributes, pos = A.position.array, nor = A.normal.array, uv = A.uv.array, fs = A.aFS.array, io = A.aIO.array, idx = sg.index.array;
+    for (var k = k0; k < k1; k++) {
+      var m = k * 16, a = M[m], b = M[m + 1], c = M[m + 2], d = M[m + 4], e = M[m + 5], f = M[m + 6], gg = M[m + 8], h = M[m + 9], ii = M[m + 10], tx = M[m + 12], ty = M[m + 13], tz = M[m + 14];
+      var sx = Math.sqrt(a * a + b * b + c * c), sy = Math.sqrt(d * d + e * e + f * f), sz = Math.sqrt(gg * gg + h * h + ii * ii);
+      for (var j = 0; j < V; j++) {
+        var o = (k * V + j), o3 = o * 3, o2 = o * 2, x = P0[j * 3], y = P0[j * 3 + 1], z = P0[j * 3 + 2], nx = N0[j * 3], ny = N0[j * 3 + 1], nz = N0[j * 3 + 2];
+        pos[o3] = a * x + d * y + gg * z + tx; pos[o3 + 1] = b * x + e * y + h * z + ty; pos[o3 + 2] = c * x + f * y + ii * z + tz;
+        nor[o3] = a * nx + d * ny + gg * nz; nor[o3 + 1] = b * nx + e * ny + h * nz; nor[o3 + 2] = c * nx + f * ny + ii * nz;
+        var ax = Math.abs(nx), ay = Math.abs(ny);
+        if (ax > 0.5) { fs[o2] = sz; fs[o2 + 1] = sy; } else if (ay > 0.5) { fs[o2] = sx; fs[o2 + 1] = sz; } else { fs[o2] = sx; fs[o2 + 1] = sy; }
+        if (U0) { uv[o2] = U0[j * 2]; uv[o2 + 1] = U0[j * 2 + 1]; }
+        io[o3] = tx; io[o3 + 1] = ty; io[o3 + 2] = tz;
+      }
+      for (var q = 0; q < I; q++) idx[k * I + q] = (X0 ? X0[q] : q) + k * V;
+    }
+  }
+  H._brandBakeRange = bakeRange;
+  // bake every part a slice at a time (about 4 ms each), between frames, so the page stays responsive on a slow phone
+  VP._bBakeGo = function () {
+    var self = this, tok = this._bBakeTok;
+    var step = function () {
+      self._bBakeT = 0;
+      if (tok !== self._bBakeTok || !self._bm) return;
+      var t0 = performance.now(), left = false;
+      for (var r = 0; r < self._bm.length; r++) {
+        var rec = self._bm[r]; if (!rec || !rec.stat || rec.ready >= rec.n) continue;
+        while (rec.ready < rec.n && performance.now() - t0 < 4) { var k1 = Math.min(rec.n, rec.ready + 64); bakeRange(rec, rec.ready, k1); rec.ready = k1; }
+        if (rec.ready < rec.n) { left = true; break; }
+      }
+      self.dirty = true;
+      if (left) self._bBakeT = setTimeout(step, 16); else self.wake();
+    };
+    this._bBakeT = setTimeout(step, 30);
+  };
+  // move landed parts into the static mesh and give the instanced mesh only what is still landing ([S, cnt) of the laying order).
+  // The static mesh is drawn once it is fully baked (one complete upload, then the page's copy is dropped)
+  function syncPart(rec, now) {
+    var S = Math.min(rec.S, rec.cnt), lim = rec.stat && rec.ready >= rec.n ? rec.cnt : 0;
+    while (S < lim && rec.laid[S] + 2.05 <= now) S++;   // drop 0.9 s, flash 2 s: after that a part looks the same either way
+    if (S === rec.S && rec.act === rec.cnt && !rec.dirtyA) return;
+    var m = rec.cnt - S, im = rec.front.instanceMatrix;
+    if (m > 0) {
+      im.array.set(rec.mats.subarray(S * 16, rec.cnt * 16)); im.updateRange.offset = 0; im.updateRange.count = m * 16; im.needsUpdate = true;
+      rec.alaid.set(rec.laid.subarray(S, rec.cnt)); rec.attr.updateRange.offset = 0; rec.attr.updateRange.count = m; rec.attr.needsUpdate = true;
+    }
+    rec.front.count = m; rec.front.visible = m > 0;
+    if (rec.stat) { rec.stat.geometry.setDrawRange(0, S * rec.I); rec.stat.visible = S > 0; }
+    rec.S = S; rec.act = rec.cnt; rec.dirtyA = false;
+  }
 
   // build the brand meshes and environment for the current model (once per model)
   VP._brandBuild = function () {
     this._brandClear();
-    var self = this, m = this.model, P = H.brandPlan(m), G = H._geoms(), R = P.rows, U = this._bU || (this._bU = shared());
+    var self = this, m = this.model, P = H.brandPlan(m), G = H._geoms(), R = P.rows, U = this._bU || (this._bU = shared()), budget = 640000;
     var grp = this._bGroup = new THREE.Group(); grp.name = 'brand';
     var tmpM = new THREE.Matrix4(), tmpQ = new THREE.Quaternion(), tmpE = new THREE.Euler(0, 0, 0, 'YZX'), tmpP = new THREE.Vector3(), tmpS = new THREE.Vector3();
     var compose = function (xf, o, k) { tmpP.set(xf[o], xf[o + 1], xf[o + 2]); tmpS.set(xf[o + 3] * k, xf[o + 4] * k, xf[o + 5] * k); tmpE.set(xf[o + 6], xf[o + 7], xf[o + 8], 'YZX'); tmpQ.setFromEuler(tmpE); return tmpM.compose(tmpP, tmpQ, tmpS); };
@@ -309,13 +387,23 @@
       for (var k = 0; k < n; k++) front.setMatrixAt(k, compose(b.xf, pm[k] * 10, 1));
       front.instanceMatrix.needsUpdate = true; front.frustumCulled = false; front.count = 0; front.renderOrder = part === 'glass' ? 6 : 4;
       front.name = 'part:' + part; grp.add(front);
+      // speed (owner, 31 Oct): the instanced mesh only carries the parts still landing; the ones that have landed move into one static
+      // mesh with the same look (baked a slice at a time while the page is idle), so a frame draws a few hundred instances, not thousands
+      var mats = Float32Array.from(front.instanceMatrix.array), alaid = new Float32Array(n).fill(1e9);
+      at.array = alaid; front.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      var V = geo.attributes.position.count, I = geo.index ? geo.index.count : V, stat = null;
+      // memory: 52 bytes a vertex on the GPU (the copy in the page is dropped once uploaded). Parts merge while the house stays under
+      // about 33 MB; anything bigger (the mansion's 48,000 bricks) stays instanced as before
+      if (n * V <= budget) { budget -= n * V; stat = staticMesh(n, V, I, U, look, solid, front.renderOrder, part); grp.add(stat); }
       var back = null;   // the faint far-face pass is gone (owner, 31 Oct): drawn without a depth test it redrew each pixel dozens of times
       if (false) {
         back = new THREE.InstancedMesh(geo, brandMat(U, look, true), n); back.instanceMatrix = front.instanceMatrix;
         back.frustumCulled = false; back.count = 0; back.renderOrder = 3; grp.add(back);
       }
-      return { bi: bi, part: part, n: n, front: front, back: back, laid: laid, attr: at, rank: P.rank[bi], cnt: 0, drop: part === 'brick' || part === 'roof' };
+      return { bi: bi, part: part, n: n, front: front, back: back, laid: laid, attr: at, rank: P.rank[bi], cnt: 0, drop: part === 'brick' || part === 'roof',
+        mats: mats, alaid: alaid, stat: stat, V: V, I: I, ready: 0, S: 0, act: -1 };
     });
+    this._bBakeGo();
     // window glow (6.5, Night): a soft gold radial over each pane, alpha (0.22 + 0.10 * pulse) * lit, additive, no depth write
     this._bGlow = null;
     this._bm.forEach(function (rec) {
@@ -442,18 +530,18 @@
             var glaze = rec.part === 'glass' || rec.part === 'door' || rec.part === 'frame';
             rec.laid[k] = (inst || glaze) ? -1000 : now + Math.floor(Math.max(0, rec.rank[k] - Math.max(V0, 0))) * stp;
           }
-          rec.attr.needsUpdate = true;
+          rec.dirtyA = true;
         } else if (k1 < k0) {   // un-laying is instant
           for (var k2 = k1; k2 < k0; k2++) rec.laid[k2] = 1e9;
-          rec.attr.needsUpdate = true;
+          rec.dirtyA = true;
         }
-        rec.cnt = k1; rec.front.count = k1; rec.front.visible = k1 > 0;
-        if (rec.back) { rec.back.count = k1; rec.back.visible = k1 > 0; }
+        rec.cnt = k1;
       });
       this._bV = V;
       if (V > V0) this._bGrow = now;
     }
     this._bPrimed = true;
+    this._bm.forEach(function (rec) { if (rec) syncPart(rec, now); });
     var st = H.brandStats(m, p), L = st.bricksLaid, pulse = red ? 0.5 : 0.5 + 0.5 * Math.sin(performance.now() * 0.002244);
     // the last brick laid: stays lit pale gold, 14% proud; shown once it has landed
     var hl = this._bHL, last = null;
@@ -495,6 +583,7 @@
 
   // frame loop: ease the displayed progress toward the target, then redraw (only while on screen)
   VP._brandTick = function () {
+    this._bCalm = false;
     if (!this._brandActive() || !this._bm) { this._bTickT = 0; return false; }
     if (this._bVis === false || (typeof document !== 'undefined' && document.hidden)) { this._bTickT = 0; return false; }
     var t = performance.now(), raw = this._bTickT ? (t - this._bTickT) / 1000 : 1 / 60; this._bTickT = t;
@@ -515,6 +604,9 @@
     else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 0.55); if (Math.abs(target - this.p) < 0.0003) this.p = target; }   // slow motion (owner, 31 Oct): a deposit builds over about five seconds
     this._brandApply();
     this._bWasSettled = this._brandSettled();
+    // at rest (nothing landing, no touch for 1.5 s, no camera fly): only the slow pulse, sweep, ring and orbit move, and they run on the
+    // clock, so the frame loop draws them at most 30 times a second (a 120 Hz phone was drawing four times as often for the same look)
+    this._bCalm = !red && !this._bLite && this._bWasSettled && !this._bDrag && !this._fly && !this._anim && t - (this._bTouch || 0) > 1500;
     if (calm || this._bLite) return !this._bWasSettled || !!this._fly;
     return true;   // pulse, sweep and ring keep the stage alive
   };
