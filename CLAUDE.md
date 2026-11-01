@@ -31,6 +31,7 @@ bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scri
 - The GitHub Action "Deploy Supabase Edge Functions" needs a valid `SUPABASE_ACCESS_TOKEN` repo secret; otherwise deploy with the Supabase connector or `supabase functions deploy <name> --no-verify-jwt`.
 
 ## Owner's standing rules
+- When you ask the owner to run anything, say exactly where, every time: the app (Claude Code chat on the phone or laptop, or a claude.ai page), Claude Code in Git Bash on the laptop (type it to Claude, or as a `!` command), plain Git Bash, PowerShell, or a browser. Give the folder too (laptop repo: `~/Projects/Vault-It` in Git Bash, `C:\Users\Asus ZenBook Duo\Projects\Vault-It` in PowerShell) and one command per line, ready to paste. Default to Git Bash for repo commands (owner, 1 Nov 2026).
 - Stick to the housing and expenditure form; do not guess any figures.
 - Marketing pages: no invented testimonials, scarcity, reference prices or advisors; prices must match the Stripe links (`tests/test_signup_page.js` checks the sign-up page).
 - Never clear data on a user's device. Browser storage is per web address, so moving to a new domain starts devices empty until they sign in (the cloud copy restores).
