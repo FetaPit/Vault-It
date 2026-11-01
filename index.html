@@ -9709,6 +9709,7 @@ input:focus, textarea:focus, select:focus {
 .cf-legend em{font-style:normal;color:var(--t3)}
 .cf-scroll{overflow-x:auto;border-radius:8px;background:rgb(var(--panel-rgb) / .45);-webkit-overflow-scrolling:touch}
 .cf-scroll svg{display:block}
+html[data-theme="light"] .cf-chip{--teal:#44C0B9;--green:#3ECF8E;--green2:#3FB585;--coral:#E5535F;--salmon:#FFA38A;--amber:#F59E0B;--yellow:#F5DC4A}   /* the chips stay black in Daylight, so their text keeps the Night colours */
 .cf-sub{font-family:'Syne',sans-serif;font-size:.52rem;font-weight:800;letter-spacing:.16em;color:var(--t3);margin:14px 0 6px}
 .cf-empty{padding:34px 12px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--t3)}
 .cf-presets{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
@@ -18226,7 +18227,7 @@ function drawCashflowDiagram(){
   }).filter(function(g){return g.sum>0;});
   var nItems=groups.reduce(function(n,g){return n+g.items.length;},0);
   var wide=window.innerWidth>=900;   // on desktop the diagram is condensed vertically so it fits one screen
-  var W=960,padT=30,padB=14,nodeW=14,gapItem=wide?4:6,gapGroup=wide?16:22,gapSrc=6,MINSLOT=wide?24:28;
+  var W=960,padT=42,padB=14,nodeW=14,gapItem=wide?4:6,gapGroup=wide?16:22,gapSrc=6,MINSLOT=36;   // 36: a two-line label chip is 32 px tall, so rows never touch (E4 labels, v0.7)
   var XS=190,XI=370,XG=535,XT=795;
   var usable=Math.max(300,60+nItems*(wide?27:34));
   var gaps=(nItems-groups.length)*gapItem+(groups.length-1)*gapGroup;
@@ -18281,7 +18282,16 @@ function drawCashflowDiagram(){
     });
   });
   // -- nodes
-  var halo='paint-order="stroke" stroke="#050c14" stroke-width="3" stroke-linejoin="round"';
+  // every label is a black chip (v0.7 E4 labels, owner 1 Nov; Pedro C4): #080808 at .88, 1 px stroke in the category colour at .5, 4 px radius, 4 px 6 px padding;
+  // name DM Sans 600 11 px #E8E8E8, amount Share Tech Mono 10.5 px in the category colour. Sized from measured text, so it needs no layout; black in Daylight too.
+  var _cx2=null;try{_cx2=document.createElement('canvas').getContext('2d');}catch(e){}
+  function tw(t,f){try{_cx2.font=f;var w=_cx2.measureText(t).width;if(w>0)return w;}catch(e){}return String(t).length*(/mono/i.test(f)?6.5:6.3);}
+  function chip(x,cy,anchor,name,amt,col,nameCol){
+    var wn=tw(name,'600 11px "DM Sans",sans-serif'),wa=tw(amt,'10.5px "Share Tech Mono",monospace'),w=Math.ceil(Math.max(wn,wa))+14,h=32,x0=anchor==='end'?x-w:x,y0=cy-h/2;
+    return '<g class="cf-chip"><rect x="'+x0.toFixed(1)+'" y="'+y0.toFixed(1)+'" width="'+w+'" height="'+h+'" rx="4" fill="#080808" fill-opacity=".88" stroke-opacity=".5" stroke-width="1" style="stroke:'+col+'"/>'
+      +'<text x="'+(x0+7).toFixed(1)+'" y="'+(y0+14).toFixed(1)+'" font-family="DM Sans,sans-serif" font-size="11" font-weight="600" fill="'+(nameCol||'#E8E8E8')+'">'+cfEsc(name)+'</text>'
+      +'<text x="'+(x0+7).toFixed(1)+'" y="'+(y0+26.5).toFixed(1)+'" font-family="Share Tech Mono,monospace" font-size="10.5" style="fill:'+col+'">'+cfEsc(amt)+'</text></g>';
+  }
   function pct(v){return (v/T*100).toFixed(1)+'%';}
   /* a bright stroke in the block's own colour from the block to its label (owner, 31 Oct) */
   function lead(xa,xb,y,col){return '<line class="cf-lead" x1="'+xa+'" y1="'+y.toFixed(1)+'" x2="'+xb+'" y2="'+y.toFixed(1)+'" style="stroke:'+col+'" stroke-width="2.5" stroke-linecap="round"/>';}
@@ -18290,23 +18300,20 @@ function drawCashflowDiagram(){
     var h=Math.max(4,s.amt*k);
     out+='<rect x="'+XS+'" y="'+sy.toFixed(1)+'" width="'+nodeW+'" height="'+h.toFixed(1)+'" style="fill:'+s.col+'" fill-opacity=""'+(s.dash?.5:.9)+'"/>';
     out+=lead(XS,XS-6,sy+h/2,s.col);
-    out+='<text x="'+(XS-8)+'" y="'+(sy+h/2-2).toFixed(1)+'" text-anchor="end" font-size="11.5" font-weight="700" fill="#cfe9e7" '+halo+'>'+cfEsc(cfShort(s.name,26))+'</text>';
-    out+='<text x="'+(XS-8)+'" y="'+(sy+h/2+11).toFixed(1)+'" text-anchor="end" font-size="10.5" font-family="Share Tech Mono,monospace" fill="#8fb4b1" '+halo+'>'+cfMoney(s.amt)+' ('+pct(s.amt)+')</text>';
+    out+=chip(XS-8,sy+Math.max(h/2,MINSLOT/2),'end',cfShort(s.name,24),cfMoney(s.amt)+' ('+pct(s.amt)+')',s.dash?'rgb(138,147,166)':s.col);   // Shortfall: an rgb() grey, which Daylight does not remap, so its chip keeps the Night colour
     sy+=Math.max(s.amt*k,MINSLOT)+gapSrc;
   });
   out+='<rect x="'+XI+'" y="'+incY.toFixed(1)+'" width="'+nodeW+'" height="'+incH.toFixed(1)+'" style="fill:var(--teal)"/>';
-  out+='<text x="'+(XI+nodeW/2)+'" y="'+(incY-9).toFixed(1)+'" text-anchor="middle" font-size="11.5" font-weight="800" style="fill:var(--teal)" letter-spacing="1.5" '+halo+'>INCOME '+cfMoney(m.tIn)+'</text>';
+  (function(){var wI=Math.ceil(Math.max(tw('INCOME','600 11px "DM Sans",sans-serif'),tw(cfMoney(m.tIn),'10.5px "Share Tech Mono",monospace')))+14;out+=chip(XI+nodeW/2-wI/2,incY-24,'start','INCOME',cfMoney(m.tIn),'var(--teal)');})();
   groupNodes.forEach(function(gn){
     out+='<rect x="'+XG+'" y="'+gn.y.toFixed(1)+'" width="'+nodeW+'" height="'+gn.h.toFixed(1)+'" style="fill:'+gn.g.col+'"/>';
     out+=lead(XG+nodeW,XG+nodeW+6,gn.y+gn.h/2,gn.g.col);
-    out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2-2).toFixed(1)+'" font-size="12" font-weight="800" style="fill:'+gn.g.tx+'" '+halo+'>'+gn.g.label+'</text>';
-    out+='<text x="'+(XG+nodeW+8)+'" y="'+(gn.y+gn.h/2+12).toFixed(1)+'" font-size="10.5" font-family="Share Tech Mono,monospace" fill="#b9c4cf" '+halo+'>'+cfMoney(gn.g.sum)+' ('+pct(gn.g.sum)+')</text>';
+    out+=chip(XG+nodeW+8,gn.y+Math.max(gn.h/2,MINSLOT/2),'start',gn.g.label,cfMoney(gn.g.sum)+' ('+pct(gn.g.sum)+')',gn.g.col);
   });
   itemNodes.forEach(function(n){
     out+='<rect x="'+XT+'" y="'+n.y.toFixed(1)+'" width="'+nodeW+'" height="'+n.h.toFixed(1)+'" style="fill:'+n.g.col+(n.it.overflow?';stroke:'+n.g.col:'')+'" fill-opacity="'+(n.it.overflow?.45:.95)+'"'+(n.it.overflow?' stroke-dasharray="3 2"':'')+'/>';
     out+=lead(XT+nodeW,XT+nodeW+6,n.y+n.h/2,n.g.col);
-    out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2-1).toFixed(1)+'" font-size="11" font-weight="700" fill="#dfe6ec" '+halo+'>'+cfEsc(cfShort(n.it.name,20))+'</text>';
-    out+='<text x="'+(XT+nodeW+8)+'" y="'+(n.y+n.h/2+11).toFixed(1)+'" font-size="10" font-family="Share Tech Mono,monospace" fill="#8f9bab" '+halo+'>'+cfMoney(n.it.amt)+' ('+pct(n.it.amt)+')</text>';
+    out+=chip(XT+nodeW+8,n.y+Math.max(n.h/2,MINSLOT/2),'start',cfShort(n.it.name,18),cfMoney(n.it.amt)+' ('+pct(n.it.amt)+')',n.g.col);
   });
   out+='</svg>';
   out=viDay(out);
