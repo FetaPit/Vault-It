@@ -274,14 +274,17 @@ export function groupBySeverity(rows: Row[]): Record<string, Row[]> {
   return g
 }
 
+/** The brand lockup for e-mail: Vault, a brick, It (same markup as send-auth-email; tests/test_email_brand.js checks every e-mail). */
+const LOCKUP = `<div style="font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1;color:#E8E8E8">Vault<span style="display:inline-block;width:8px;height:4px;background:#44C0B9;border-radius:1px;margin:0 2px;vertical-align:middle;position:relative;top:-2px"></span><span style="color:#44C0B9">It</span></div>`
 function shell(title: string, body: string): string {
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title></head>
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>${esc(title)}</title></head>
 <body style="margin:0;padding:24px 16px;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
-<div style="max-width:620px;margin:0 auto;background:#080D14;border:1px solid #15302F;border-radius:14px;padding:24px">
-<div style="font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;font-weight:800;color:#E8E8E8">Vault<span style="display:inline-block;width:7px;height:4px;background:#44C0B9;border-radius:1px;margin:0 2px 5px;vertical-align:middle"></span>It</div>
-<h1 style="margin:14px 0 4px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;line-height:1.3">${esc(title)}</h1>
+<div style="max-width:620px;margin:0 auto;background:#080D14;border:1px solid #15302F;border-radius:18px;padding:24px 28px">
+<div style="padding-bottom:16px;border-bottom:1px solid #102221">${LOCKUP}<div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div></div>
+<h1 style="margin:18px 0 4px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8">${esc(title)}</h1>
 ${body}
-<p style="margin:22px 0 0;font-size:11px;color:#9AA0A6">Sent by the feedback-digest function. Tester figures never leave their devices; screenshots have them hidden.</p>
+<div style="margin-top:22px;padding-top:14px;border-top:1px solid #102221"><p style="margin:0 0 6px;font-size:12px;color:#E8E8E8">Not regulated by the FCA. Not financial advice.</p>
+<p style="margin:0;font-size:11px;line-height:1.6;color:#9AA0A6">Sent by the feedback-digest function. Tester figures never leave their devices; screenshots have them hidden.</p></div>
 </div></body></html>`
 }
 const H2 = 'margin:22px 0 8px;font-family:\'Share Tech Mono\',Menlo,Consolas,monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#44C0B9'

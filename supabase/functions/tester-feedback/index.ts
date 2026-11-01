@@ -346,18 +346,22 @@ export function urgentText(id: number | string, t: Triage, who: string, screen: 
     (t.steps.length ? `Likely steps:\n${t.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n` : '') +
     `\nWhat they wrote:\n${text || '(rating only)'}\n\nFeedback #${id}${link ? ': ' + link : ''}`
 }
-function urgentHtml(id: number | string, t: Triage, who: string, screen: string, text: string, link: string): string {
+/** The brand lockup for e-mail: Vault, a brick, It (same markup as send-auth-email; tests/test_email_brand.js checks every e-mail). */
+const LOCKUP = `<div style="font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1;color:#E8E8E8">Vault<span style="display:inline-block;width:8px;height:4px;background:#44C0B9;border-radius:1px;margin:0 2px;vertical-align:middle;position:relative;top:-2px"></span><span style="color:#44C0B9">It</span></div>`
+export function urgentHtml(id: number | string, t: Triage, who: string, screen: string, text: string, link: string): string {
   const row = (k: string, v: string) => `<tr><td style="padding:4px 12px 4px 0;color:#9AA0A6;font-size:13px;vertical-align:top">${k}</td><td style="padding:4px 0;font-size:14px;color:#E8E8E8">${esc(v)}</td></tr>`
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Urgent tester feedback</title></head>
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Urgent tester feedback</title></head>
 <body style="margin:0;padding:24px 16px;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
-<div style="max-width:560px;margin:0 auto;background:#080D14;border:1px solid #15302F;border-radius:14px;padding:24px">
+<div style="max-width:560px;margin:0 auto;background:#080D14;border:1px solid #15302F;border-radius:18px;padding:24px 28px">
+<div style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #102221">${LOCKUP}<div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div></div>
 <p style="margin:0 0 6px;font-family:'Share Tech Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#E8C56A">Urgent: severity 4</p>
-<h1 style="margin:0 0 16px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;line-height:1.3">${esc(t.summary)}</h1>
+<h1 style="margin:0 0 16px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8">${esc(t.summary)}</h1>
 <table role="presentation" cellpadding="0" cellspacing="0">${row('Type', t.type)}${row('Area', t.area)}${row('Tester', who)}${row('Screen', screen || 'not given')}</table>
 ${t.steps.length ? `<p style="margin:16px 0 6px;color:#9AA0A6;font-size:13px">Likely steps</p><ol style="margin:0;padding-left:20px;font-size:14px;line-height:1.6">${t.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
 <p style="margin:16px 0 6px;color:#9AA0A6;font-size:13px">What they wrote</p>
 <p style="margin:0;font-size:14px;line-height:1.6;white-space:pre-wrap">${esc(text || '(rating only)')}</p>
 <p style="margin:18px 0 0;font-size:13px;color:#9AA0A6">Feedback #${esc(id)}${link ? ` · <a href="${esc(link)}" style="color:#44C0B9">view</a>` : ''}</p>
+<div style="margin-top:20px;padding-top:14px;border-top:1px solid #102221"><p style="margin:0;font-size:12px;color:#E8E8E8">Not regulated by the FCA. Not financial advice.</p></div>
 </div></body></html>`
 }
 const viewLink = (id: number | string) => VIEW_URL ? VIEW_URL.replace('{id}', String(id)) : ''
@@ -386,13 +390,14 @@ export function helpText(id: number | string, who: string, screen: string, quest
   return `A tester asked the in-app help something it could not answer.\n\nQuestion: ${question}\nTester: ${who}\nScreen: ${screen || 'not given'}\n\n` +
     `Add an answer to VI_KB in index.html so the next tester gets one.\n\nFeedback #${id}${link ? ': ' + link : ''}`
 }
-function helpHtml(id: number | string, who: string, screen: string, question: string, link: string): string {
+export function helpHtml(id: number | string, who: string, screen: string, question: string, link: string): string {
   const row = (k: string, v: string) => `<tr><td style="padding:4px 12px 4px 0;color:#9AA0A6;font-size:13px;vertical-align:top">${k}</td><td style="padding:4px 0;font-size:14px;color:#E8E8E8">${esc(v)}</td></tr>`
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unanswered help question</title></head>
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Unanswered help question</title></head>
 <body style="margin:0;padding:24px 16px;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
-<div style="max-width:560px;margin:0 auto;background:#080D14;border:1px solid #15302F;border-radius:14px;padding:24px">
+<div style="max-width:560px;margin:0 auto;background:#080D14;border:1px solid #15302F;border-radius:18px;padding:24px 28px">
+<div style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #102221">${LOCKUP}<div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div></div>
 <p style="margin:0 0 6px;font-family:'Share Tech Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#44C0B9">Help question not answered</p>
-<h1 style="margin:0 0 16px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;line-height:1.3;white-space:pre-wrap">${esc(question)}</h1>
+<h1 style="margin:0 0 16px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8;white-space:pre-wrap">${esc(question)}</h1>
 <table role="presentation" cellpadding="0" cellspacing="0">${row('Tester', who)}${row('Screen', screen || 'not given')}</table>
 <p style="margin:16px 0 0;font-size:13px;line-height:1.6;color:#9AA0A6">Add an answer to the help guide (VI_KB in index.html) so the next tester gets one.</p>
 <p style="margin:12px 0 0;font-size:13px;color:#9AA0A6">Feedback #${esc(id)}${link ? ` · <a href="${esc(link)}" style="color:#44C0B9">view</a>` : ''}</p>

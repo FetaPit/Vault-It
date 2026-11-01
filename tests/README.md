@@ -63,4 +63,5 @@ node tests/test_footer.js             # footer: approved disclaimer, Privacy not
 node tests/test_csp_report_only.mjs   # Worker: Content-Security-Policy-Report-Only lists every outside host the app calls; enforced CSP unchanged
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width
 node tests/test_nw3d.js            # net worth in 3D (on by default): flag off unchanged, 3D | Graph toggle, same numbers in both views, debts grouped by kind (cards stacked in one column, each in its own colour), zoom buttons / ctrl+wheel / reset (VI_APP=file:///… to test another copy)
+node tests/test_email_brand.js   # every e-mail the functions send: brand lockup (Vault, brick, teal It), Night colours, Syne, tagline, FCA line
 ```
