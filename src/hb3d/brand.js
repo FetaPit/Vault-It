@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // HB3D BRAND: the brand book's build animation and hologram look on every three.js house model (Level 1 deposit build).
-// Ships behind the house flag (?house=new, or localStorage vi-flag-house = 1): the app calls viewer.setBrand(true).
-// With the flag off nothing here runs and the viewer behaves exactly as before.
+// The only house builder (owner, 1 Nov 2026: the classic viewer is deleted): Level 1 (the deposit lays the bricks) and Level 2
+// (the paid share solid below a gold line, mortgage free lit). The app calls viewer.setBrand(true).
 //
 // Stage schedule by deposit progress p = saved / depositTarget (brand handover 6.4):
 //   0.005 to 0.03 site boundary · 0 to 0.03 footprint · 0.03 to 0.80 bricks in laying order (course by course, round the
@@ -74,15 +74,21 @@
     bricks.forEach(function (r, j) { rank[r.bi][r.i] = j; });
     tiles.forEach(function (r, o) { rank[r.bi][r.i] = N + o; });
     roof.forEach(function (r) { if (!r.tile) rank[r.bi][r.i] = T ? N + Math.min(T - 1, lowerBound(tileY, r.y + 1e-6)) : Math.max(0, N - 1); });
-    var c0 = N ? course[0] : 0, doorPts = [];
+    var c0 = N ? course[0] : 0, doorPts = [], rank2 = rank.map(function (rk) { return null; });
     rest.forEach(function (r) {
-      if (r.part === 'glass' || r.part === 'frame' || r.part === 'door') { rank[r.bi][r.i] = N + T; if (r.part === 'door') doorPts.push(r); return; }
       var cb = Math.round((r.bot - R.y0) / R.ch) + 1;     // the course this part sits in
-      rank[r.bi][r.i] = !N || cb < c0 ? -1 : Math.min(N - 1, lowerBound(course, cb));   // shows with the first brick of its course
+      var byCourse = !N || cb < c0 ? -1 : Math.min(N - 1, lowerBound(course, cb));   // shows with the first brick of its course
+      if (r.part === 'glass' || r.part === 'frame' || r.part === 'door') {   // Level 1: glazing goes in at the end; Level 2 colours it with its course
+        rank[r.bi][r.i] = N + T; if (r.part === 'door') doorPts.push(r);
+        (rank2[r.bi] || (rank2[r.bi] = Float64Array.from(rank[r.bi])))[r.i] = byCourse; return;
+      }
+      rank[r.bi][r.i] = byCourse;
     });
-    // each batch sorted by rank, so what shows is always a prefix of the instances
-    var perm = rank.map(function (rk) { var ix = []; for (var i = 0; i < rk.length; i++) ix.push(i); ix.sort(function (p, q) { return rk[p] - rk[q] || p - q; }); return Int32Array.from(ix); });
+    rank2 = rank2.map(function (r2, bi) { return r2 || rank[bi]; });
+    // each batch sorted by rank (then by the Level 2 order), so what shows, and what is in colour, is always a prefix of the instances
+    var perm = rank.map(function (rk, bi) { var r2 = rank2[bi], ix = []; for (var i = 0; i < rk.length; i++) ix.push(i); ix.sort(function (p, q) { return rk[p] - rk[q] || r2[p] - r2[q] || p - q; }); return Int32Array.from(ix); });
     var sorted = rank.map(function (rk, bi) { var pm = perm[bi], out = new Float64Array(rk.length); for (var k = 0; k < pm.length; k++) out[k] = rk[pm[k]]; return out; });
+    var sorted2 = rank2.map(function (rk, bi) { var pm = perm[bi], out = new Float64Array(rk.length); for (var k = 0; k < pm.length; k++) out[k] = rk[pm[k]]; return out; });
     var inv = perm.map(function (pm) { var v = new Int32Array(pm.length); for (var k = 0; k < pm.length; k++) v[pm[k]] = k; return v; });
     var bK = new Int32Array(N); for (var j = 0; j < N; j++) bK[j] = inv[bBi[j]][bI[j]];
     // the front door (for the keys glint): door leaves on the front-most face
@@ -93,7 +99,7 @@
       dd.forEach(function (d) { sx += d.x; sy += d.y; });
       door = [sx / dd.length + 0.18, sy / dd.length, zmax + 0.05];
     }
-    m._bp = { N: N, T: T, rows: R, course: course, top: top, bBi: bBi, bK: bK, tileTop: tileTop, parts: parts, perm: perm, rank: sorted, door: door, cx: cx, cz: cz };
+    m._bp = { N: N, T: T, rows: R, course: course, top: top, bBi: bBi, bK: bK, tileTop: tileTop, parts: parts, perm: perm, rank: sorted, rank2: sorted2, door: door, cx: cx, cz: cz };
     return m._bp;
   };
   // progress → how many ranks are released
@@ -105,6 +111,15 @@
     return P.N + Math.floor(P.T * seg(p, 0.80, 0.88) + 1e-6);
   }
   H.brandUnits = units;
+  // Level 2 (owner, 1 Nov 2026): how many parts are in full colour for an equity share e of the home's value (same laying order)
+  H.brandColourUnits = function (P, e) { e = clamp(e || 0, 0, 1); return e >= 1 - 1e-9 ? 1e15 : Math.floor((P.N + P.T) * e + 1e-6); };
+  // real material colours (sRGB) for parts the kit does not colour itself
+  var MATCOL = { mortar: 0xb9b2a5, mortarDark: 0x8f8a80, mortarLime: 0xd0c4a8, insulation: 0xe6d9a2, closer: 0xd8d2c0, concrete: 0x9c9a94, soil: 0x4a3a2c, dpc: 0x16181b,
+    timber: 0xc8a06e, timberWhite: 0xf1efe9, chipboard: 0xb9955f, steel: 0x6e7880, metal: 0x9aa3ab, felt: 0x2a2d33, ridge: 0x4a4440, lead: 0x6b7178, stone: 0xd9cfb6,
+    render: 0xeae5d8, pebbledash: 0xd3cbb5, upvc: 0xf3f3ef, upvcGrey: 0x3a3f45, upvcBlack: 0x1d2024, timberPaint: 0xf0ede4, glass: 0x9fc4d6, doorRed: 0x7a1d22,
+    doorBlue: 0x1d2f55, doorGreen: 0x1f4a35, doorBlack: 0x15171a, doorGrey: 0x464c53, garageDoor: 0xe9e9e4, brass: 0xc9a84c, gutter: 0x1b1d20, terracotta: 0xa65638,
+    column: 0xece6d6, balcony: 0x30363d, curtain: 0x5d7a8c, gold: 0xe8c56a, slate: 0x4f5660, tileClay: 0x9c4a32, tileConcrete: 0x6d6a66, brick: 0x9b4a35, block: 0xa9a59c };
+  H.brandColourOf = function (b, i) { var c = b.color && b.color[i] >= 0 ? b.color[i] : MATCOL[b.mat]; return c == null ? 0xbdb8ae : c; };
   function stageName(P, p, row) {
     if (p <= 0) return 'Your plot';
     if (p < 0.03) return p < 0.005 ? 'Site cleared' : 'Foundations';
@@ -129,13 +144,14 @@
       stage: stageName(P, p, row), keys: p >= 0.999 };
   };
 
+  // ── Night palette (brand engine THG.dark). The 3D viewports keep the Night look in Daylight too (owner, 30 Oct). ──
+  var C = H.BRAND_C = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2, 0.62, 0.74], frame: [0.78, 0.93, 0.92], glass: [0.02, 0.2, 0.22], glassLit: [0.96, 0.78, 0.42],
+    door: [0.04, 0.24, 0.26], edge: [0.01, 0.1, 0.1], sheen: [0.75, 0.98, 0.96], flash: [0.91, 0.77, 0.42], shMin: 0.5, edgeK: 0.62, front: 0.88, back: 0.09 };   // shared with the still picture (no three.js needed)
   function boot() {   // the viewer methods need THREE and H.Viewer; with three.js loaded later (viThree) H._boot calls this
   if (!H.Viewer || typeof THREE === 'undefined') return;
   var VP = H.Viewer.prototype;
 
-  // ── Night palette (brand engine THG.dark). The 3D viewports keep the Night look in Daylight too (owner, 30 Oct). ──
-  var C = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2, 0.62, 0.74], frame: [0.78, 0.93, 0.92], glass: [0.02, 0.2, 0.22], glassLit: [0.96, 0.78, 0.42],
-    door: [0.04, 0.24, 0.26], edge: [0.01, 0.1, 0.1], sheen: [0.75, 0.98, 0.96], flash: [0.91, 0.77, 0.42], shMin: 0.5, edgeK: 0.62, front: 0.88, back: 0.09 };
+  var C = H.BRAND_C;
   var TEAL = [68 / 255, 192 / 255, 185 / 255], GOLD = [232 / 255, 197 / 255, 106 / 255], RAFTER = [120 / 255, 230 / 255, 222 / 255];
   function softGL(r) {   // a GPU drawn in software (no graphics chip, or a blocklisted one): the 3D must stay light there
     try { var gl = r.getContext(), ext = gl.getExtension('WEBGL_debug_renderer_info'), name = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
@@ -157,6 +173,12 @@
     'attribute vec2 aFS; attribute vec3 aIO;',
     '#else',
     'attribute float aLaid;',
+    '#endif',
+    '#ifdef BRAND_COLOUR',
+    'varying vec3 vCol;',
+    '#ifdef BRAND_STATIC',
+    'attribute vec3 aCol;',
+    '#endif',
     '#endif',
     'uniform float uNow; uniform float uDrop; uniform float uFlashOn; uniform float uFade;',
     'varying vec3 vN; varying vec3 vW; varying vec2 vUV; varying vec2 vFS; varying float vFlash; varying float vAlpha; varying float vSeed;',
@@ -185,6 +207,15 @@
     '  #endif',
     '  vUV = uv; vW = wp.xyz; vAlpha = vis * uFade;',
     '  vSeed = fract(sin(dot(io.xz + vec2(io.y * 1.3, io.x * 0.7), vec2(12.9898, 78.233))) * 43758.5453);',
+    '  #ifdef BRAND_COLOUR',
+    '  #ifdef BRAND_STATIC',
+    '  vCol = aCol;',
+    '  #elif defined(USE_INSTANCING_COLOR)',
+    '  vCol = instanceColor;',
+    '  #else',
+    '  vCol = vec3(1.0);',
+    '  #endif',
+    '  #endif',
     '  gl_Position = projectionMatrix * viewMatrix * wp;',
     '}'].join('\n');
   var FS = [
@@ -192,12 +223,22 @@
     'uniform float uShMin; uniform float uEdgeK; uniform float uPulse; uniform float uBuilt; uniform float uSweep; uniform float uSweepOn; uniform float uSweepW;',
     'uniform float uBack; uniform float uFrontA; uniform float uBackA; uniform float uTone; uniform float uBevel;',
     'varying vec3 vN; varying vec3 vW; varying vec2 vUV; varying vec2 vFS; varying float vFlash; varying float vAlpha; varying float vSeed;',
+    '#ifdef BRAND_COLOUR',
+    'varying vec3 vCol;',
+    '#endif',
     'void main() {',
     '  vec3 L = normalize(vec3(-0.45, 0.7, 0.55)); float lt = max(0.0, dot(normalize(vN), L)); float sh = uShMin + (1.0 - uShMin) * lt;',
+    '  #ifdef BRAND_COLOUR',
+    '  vec3 base = mix(vCol * (1.0 - uTone + 2.0 * uTone * vSeed), uLitCol, uLit);',   // Level 2: the real material colour of each part
+    '  #else',
     '  vec3 base = mix(uBase * (1.0 - uTone + 2.0 * uTone * vSeed), uLitCol, uLit);',
+    '  #endif',
     '  vec3 col = base * sh;',
     '  vec2 dd = min(vUV, 1.0 - vUV) * vFS; float ed = min(dd.x, dd.y); float bev = smoothstep(0.0, uBevel, ed);',
     '  col = mix(col, uEdge * (0.6 + 0.4 * sh), (1.0 - bev) * uEdgeK);',
+    '  #ifdef BRAND_COLOUR',
+    '  col = mix(col, vec3(0.267, 0.753, 0.725) * sh, 0.16);',   // a subtle teal hue over the real colours (owner, 1 Nov)
+    '  #endif',
     '  float fl = clamp(vFlash, 0.0, 1.0); col = mix(col, uFlashCol, fl * 0.9);',
     '  float a;',
     '  #ifdef BRAND_LAST',
@@ -218,11 +259,11 @@
     return { uNow: { value: 0 }, uPulse: { value: 0.5 }, uBuilt: { value: 0 }, uSweep: { value: -1e3 }, uSweepOn: { value: 0 }, uSweepW: { value: 6 * CH },
       uFadeGlaze: { value: 0 }, uLitGlass: { value: 0 }, uLitDoor: { value: 0 }, one: { value: 1 }, zero: { value: 0 } };
   }
-  function brandMat(U, look, back, last, opaque, stat) {
+  function brandMat(U, look, back, last, opaque, stat, colour) {
     var u = {
       uNow: U.uNow, uPulse: U.uPulse, uBuilt: U.uBuilt, uSweep: U.uSweep, uSweepOn: U.uSweepOn, uSweepW: U.uSweepW,
       uBase: { value: v3(look.base) }, uLitCol: { value: v3(look.lit || look.base) }, uLit: look.litU || U.zero,
-      uEdge: { value: v3(C.edge) }, uSheen: { value: v3(C.sheen) }, uFlashCol: { value: v3(C.flash) },
+      uEdge: { value: v3(look.edge || C.edge) }, uSheen: { value: v3(C.sheen) }, uFlashCol: { value: v3(C.flash) },
       uShMin: { value: C.shMin }, uEdgeK: { value: look.edgeK == null ? C.edgeK : look.edgeK }, uBevel: { value: look.bevel || 0.012 },
       uBack: { value: back ? 1 : 0 }, uFrontA: { value: look.front == null ? C.front : look.front }, uBackA: { value: C.back }, uTone: { value: look.tone || 0 },
       uDrop: { value: look.drop || 0 }, uFlashOn: { value: look.flash || 0 }, uFade: look.fadeU || U.one
@@ -232,6 +273,7 @@
     var mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS, fragmentShader: FS, transparent: !opaque, premultipliedAlpha: true,
       depthWrite: !back, depthTest: !back, side: back ? THREE.BackSide : THREE.FrontSide });
     mat.defines = {}; if (last) mat.defines.BRAND_LAST = ''; if (opaque) mat.defines.BRAND_OPAQUE = ''; if (stat) mat.defines.BRAND_STATIC = '';
+    if (colour) { mat.defines.BRAND_COLOUR = ''; mat.polygonOffset = true; mat.polygonOffsetFactor = -1; mat.polygonOffsetUnits = -1; }   // Level 2: drawn over the hologram brick it replaces
     return mat;
   }
   function lookOf(part, U) {
@@ -294,7 +336,7 @@
   };
   VP._brandActive = function () {
     var m = this.model;
-    return !!(this.brand && m && m.clean && !m.custom && m.rows && m.batches && (this.mode === 'build' || this.mode === 'site'));
+    return !!(this.brand && m && m.clean && !m.custom && m.rows && m.batches && (this.mode === 'build' || this.mode === 'site' || this.mode === 'equity' || this.mode === 'complete'));
   };
   VP._bNow = function () { if (!this._bT0) this._bT0 = performance.now(); return (performance.now() - this._bT0) / 1000; };
 
@@ -305,23 +347,26 @@
       g.traverse(function (o) { if (o.geometry && o.geometry !== H._geoms().box) o.geometry.dispose(); if (o.material) o.material.dispose(); });
     }
     this._bBakeTok = (this._bBakeTok || 0) + 1; if (this._bBakeT) { clearTimeout(this._bBakeT); this._bBakeT = 0; }
-    this._bGroup = null; this._bm = null; this._bModel = null; this._bInfo = null; this._bV = null; this._bPrimed = false; this._bLastJ = -1;
+    this._bGroup = null; this._bm = null; this._bModel = null; this._bCutOn = null; this._bInfo = null; this._bV = null; this._bPrimed = false; this._bLastJ = -1;
   };
 
   function staticMesh(n, V, I, U, look, solid, order, part) {
     var sg = new THREE.BufferGeometry(), drop = function () { this.array = null; };   // uploaded once, complete: the page's copy is not kept
     [['position', 3], ['normal', 3], ['uv', 2], ['aFS', 2], ['aIO', 3]].forEach(function (a) { sg.setAttribute(a[0], new THREE.BufferAttribute(new Float32Array(n * V * a[1]), a[1]).onUpload(drop)); });
+    sg.setAttribute('aCol', new THREE.BufferAttribute(new Uint8Array(n * V * 3), 3, true).onUpload(drop));   // Level 2's real colours (3 bytes a vertex)
     sg.setIndex(new THREE.BufferAttribute(n * V > 65535 ? new Uint32Array(n * I) : new Uint16Array(n * I), 1).onUpload(drop));
     sg.setDrawRange(0, 0);
     var stat = new THREE.Mesh(sg, brandMat(U, look, false, false, solid, true));
     stat.frustumCulled = false; stat.renderOrder = order; stat.visible = false; stat.name = 'static:' + part;
     return stat;
   }
+  // each part's real colour, in laying order (bytes, sRGB: the brand shaders write colours as they are)
+  function rgbOf(b, pm, n) { var out = new Uint8Array(n * 3); for (var k = 0; k < n; k++) { var c = H.brandColourOf(b, pm[k]); out[k * 3] = (c >> 16) & 255; out[k * 3 + 1] = (c >> 8) & 255; out[k * 3 + 2] = c & 255; } return out; }
   // bake instances [k0, k1) of a part into its static mesh (world positions, normals as mat3(instance) * normal, face sizes, origins)
   function bakeRange(rec, k0, k1) {
     var g = rec.front.geometry, sg = rec.stat.geometry, V = rec.V, I = rec.I, M = rec.mats;
     var P0 = g.attributes.position.array, N0 = g.attributes.normal.array, U0 = g.attributes.uv ? g.attributes.uv.array : null, X0 = g.index ? g.index.array : null;
-    var A = sg.attributes, pos = A.position.array, nor = A.normal.array, uv = A.uv.array, fs = A.aFS.array, io = A.aIO.array, idx = sg.index.array;
+    var A = sg.attributes, pos = A.position.array, nor = A.normal.array, uv = A.uv.array, fs = A.aFS.array, io = A.aIO.array, idx = sg.index.array, ac = A.aCol.array, RC = rec.rgb;
     for (var k = k0; k < k1; k++) {
       var m = k * 16, a = M[m], b = M[m + 1], c = M[m + 2], d = M[m + 4], e = M[m + 5], f = M[m + 6], gg = M[m + 8], h = M[m + 9], ii = M[m + 10], tx = M[m + 12], ty = M[m + 13], tz = M[m + 14];
       var sx = Math.sqrt(a * a + b * b + c * c), sy = Math.sqrt(d * d + e * e + f * f), sz = Math.sqrt(gg * gg + h * h + ii * ii);
@@ -333,6 +378,7 @@
         if (ax > 0.5) { fs[o2] = sz; fs[o2 + 1] = sy; } else if (ay > 0.5) { fs[o2] = sx; fs[o2 + 1] = sz; } else { fs[o2] = sx; fs[o2 + 1] = sy; }
         if (U0) { uv[o2] = U0[j * 2]; uv[o2 + 1] = U0[j * 2 + 1]; }
         io[o3] = tx; io[o3 + 1] = ty; io[o3 + 2] = tz;
+        ac[o3] = RC[k * 3]; ac[o3 + 1] = RC[k * 3 + 1]; ac[o3 + 2] = RC[k * 3 + 2];
       }
       for (var q = 0; q < I; q++) idx[k * I + q] = (X0 ? X0[q] : q) + k * V;
     }
@@ -361,13 +407,14 @@
     var S = Math.min(rec.S, rec.cnt), lim = rec.stat && rec.ready >= rec.n ? rec.cnt : 0;
     while (S < lim && rec.laid[S] + 2.05 <= now) S++;   // drop 0.9 s, flash 2 s: after that a part looks the same either way
     if (S === rec.S && rec.act === rec.cnt && !rec.dirtyA) return;
+    var c0 = Math.min(rec.cutS || 0, S);   // Level 2: the hologram is not drawn under parts already in colour
     var m = rec.cnt - S, im = rec.front.instanceMatrix;
     if (m > 0) {
       im.array.set(rec.mats.subarray(S * 16, rec.cnt * 16)); im.updateRange.offset = 0; im.updateRange.count = m * 16; im.needsUpdate = true;
       rec.alaid.set(rec.laid.subarray(S, rec.cnt)); rec.attr.updateRange.offset = 0; rec.attr.updateRange.count = m; rec.attr.needsUpdate = true;
     }
     rec.front.count = m; rec.front.visible = m > 0;
-    if (rec.stat) { rec.stat.geometry.setDrawRange(0, S * rec.I); rec.stat.visible = S > 0; }
+    if (rec.stat) { rec.stat.geometry.setDrawRange(c0 * rec.I, (S - c0) * rec.I); rec.stat.visible = S > c0; }
     rec.S = S; rec.act = rec.cnt; rec.dirtyA = false;
   }
 
@@ -401,7 +448,7 @@
         back.frustumCulled = false; back.count = 0; back.renderOrder = 3; grp.add(back);
       }
       return { bi: bi, part: part, n: n, front: front, back: back, laid: laid, attr: at, rank: P.rank[bi], cnt: 0, drop: part === 'brick' || part === 'roof',
-        mats: mats, alaid: alaid, stat: stat, V: V, I: I, ready: 0, S: 0, act: -1 };
+        mats: mats, alaid: alaid, stat: stat, V: V, I: I, ready: 0, S: 0, act: -1, look: look, rgb: rgbOf(b, pm, n), cutS: 0 };
     });
     this._bBakeGo();
     // window glow (6.5, Night): a soft gold radial over each pane, alpha (0.22 + 0.10 * pulse) * lit, additive, no depth write
@@ -492,25 +539,72 @@
     this.dirty = true;
   };
 
+  // Level 2 colour layer (owner, 1 Nov 2026): the same parts again in their real colours, laid over the hologram in the same order
+  // with the same drop and flash. Landed parts sit in a static mesh that shares the hologram's baked buffers; parts still landing
+  // are instances. Made on first use.
+  function colourLayer(self, rec) {
+    if (rec.C) return rec.C;
+    var U = self._bU, n = rec.n, lk = Object.assign({}, rec.look, { edge: [0.55, 0.53, 0.50], edgeK: rec.part === 'brick' ? 0.5 : (rec.look.edgeK == null ? 0.3 : rec.look.edgeK), tone: 0.06 });
+    var solid = rec.part !== 'glass', C = { laid: new Float32Array(n).fill(1e9), cnt: 0, S: 0, act: -1, dirty: true, stat: null };
+    var gf = new THREE.BufferGeometry(), g0 = rec.front.geometry;
+    ['position', 'normal', 'uv'].forEach(function (k) { if (g0.attributes[k]) gf.setAttribute(k, g0.attributes[k]); }); if (g0.index) gf.setIndex(g0.index);
+    C.alaid = new Float32Array(n).fill(1e9); C.attr = new THREE.InstancedBufferAttribute(C.alaid, 1); C.attr.setUsage(THREE.DynamicDrawUsage); gf.setAttribute('aLaid', C.attr);
+    var f = C.front = new THREE.InstancedMesh(gf, brandMat(U, lk, false, false, solid, false, true), n);
+    f.instanceMatrix.setUsage(THREE.DynamicDrawUsage); f.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3); f.instanceColor.setUsage(THREE.DynamicDrawUsage);
+    f.frustumCulled = false; f.count = 0; f.visible = false; f.renderOrder = rec.front.renderOrder + 1; f.name = 'colour:' + rec.part; self._bGroup.add(f);
+    if (rec.stat) {
+      var sg = rec.stat.geometry, g2 = new THREE.BufferGeometry();
+      ['position', 'normal', 'uv', 'aFS', 'aIO', 'aCol'].forEach(function (k) { g2.setAttribute(k, sg.attributes[k]); }); g2.setIndex(sg.index); g2.setDrawRange(0, 0);
+      C.stat = new THREE.Mesh(g2, brandMat(U, lk, false, false, solid, true, true)); C.stat.frustumCulled = false; C.stat.visible = false;
+      C.stat.renderOrder = rec.front.renderOrder + 1; C.stat.name = 'colourStatic:' + rec.part; self._bGroup.add(C.stat);
+    }
+    return (rec.C = C);
+  }
+  function syncColour(rec, now) {
+    var C = rec.C, S = Math.min(C.S, C.cnt), lim = rec.stat && rec.ready >= rec.n ? C.cnt : 0;
+    while (S < lim && C.laid[S] + 2.05 <= now) S++;
+    if (S === C.S && C.act === C.cnt && !C.dirty) return;
+    var m = C.cnt - S, f = C.front;
+    if (m > 0) {
+      f.instanceMatrix.array.set(rec.mats.subarray(S * 16, C.cnt * 16)); f.instanceMatrix.updateRange.offset = 0; f.instanceMatrix.updateRange.count = m * 16; f.instanceMatrix.needsUpdate = true;
+      var ic = f.instanceColor.array; for (var k = S; k < C.cnt; k++) { var o = (k - S) * 3; ic[o] = rec.rgb[k * 3] / 255; ic[o + 1] = rec.rgb[k * 3 + 1] / 255; ic[o + 2] = rec.rgb[k * 3 + 2] / 255; }
+      f.instanceColor.updateRange.offset = 0; f.instanceColor.updateRange.count = m * 3; f.instanceColor.needsUpdate = true;
+      C.alaid.set(C.laid.subarray(S, C.cnt)); C.attr.updateRange.offset = 0; C.attr.updateRange.count = m; C.attr.needsUpdate = true;
+    }
+    f.count = m; f.visible = m > 0;
+    if (C.stat) { C.stat.geometry.setDrawRange(0, S * rec.I); C.stat.visible = S > 0; }
+    if (rec.cutS !== S) { rec.cutS = S; rec.dirtyA = true; }   // the hologram stops under what is now in colour
+    C.S = S; C.act = C.cnt; C.dirty = false;
+  }
+  // how many parts of each kind are in colour for equity share e; new ones get their lay time (stagger as Level 1)
+  VP._brandColour = function (on, e, now, inst) {
+    var self = this, P = H.brandPlan(this.model), Vc = H.brandColourUnits(P, e), V0 = this._bVc == null ? 0 : this._bVc;
+    var add = Math.max(0, Vc - V0), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.12, 0.9 / add) : 0;
+    (this._bm || []).forEach(function (rec) {
+      if (!rec) return;
+      if (!on) { if (rec.C) { rec.C.front.visible = false; if (rec.C.stat) rec.C.stat.visible = false; rec.C.cnt = 0; rec.C.S = 0; rec.C.laid.fill(1e9); rec.C.dirty = true; } if (rec.cutS) { rec.cutS = 0; rec.dirtyA = true; } return; }
+      var C = colourLayer(self, rec), k1 = lowerBound(P.rank2[rec.bi], Vc), k0 = C.cnt;
+      if (k1 > k0) { for (var k = k0; k < k1; k++) C.laid[k] = inst ? -1000 : now + Math.floor(Math.max(0, P.rank2[rec.bi][k] - V0)) * stp; C.dirty = true; }
+      else if (k1 < k0) { for (var k2 = k1; k2 < k0; k2++) C.laid[k2] = 1e9; C.dirty = true; }
+      C.cnt = k1; syncColour(rec, now);
+    });
+    this._bVc = on ? Vc : null;
+    return Vc;
+  };
+
   // apply(): the Level 1 build under the brand look
   VP._brandApplyAll = function () {
     var m = this.model, F = m.focus;
     if (this._bModel !== m) this._brandBuild();
+    if (this._bMode !== this.mode) { this._bPrimed = false; this._bMode = this.mode; this._bEq = null; }   // a new level: the hologram shows at once, the colour lays from 0
     this._brandEnv(true);
     var P = H.brandPlan(m), IDLE = H._IDLE_PLANE;
-    this.batches.forEach(function (B, bi) {
-      var part = P.parts[bi], b = B.b, mats = B.mats;
-      if (part === 'ctx') {   // flats: the rest of the block, a faint silhouette as before
-        B.rev.visible = false; B.main.visible = b.hideAfter >= 2; B.main.count = B.n; B.main.castShadow = false; B.main.receiveShadow = false;
-        B.main.material = mats.blue; mats.blue.clippingPlanes = [IDLE];
-      } else { B.main.visible = false; B.rev.visible = false; }
+    this.batches.forEach(function (B, bi) {   // flats: the rest of the block, a faint silhouette
+      if (B.main) B.main.visible = P.parts[bi] === 'ctx' && B.b.hideAfter >= 2;
     });
-    if (this.edges) { this.edges.visible = !F; this.edges.material.clippingPlanes = [IDLE]; this.edges.material.opacity = 0.34; }   // the finished house as a faint wire
-    if (this.rowBand) this.rowBand.visible = false;
-    if (this.water) this.water.visible = false;
+    if (this.edges) { this.edges.visible = !F && (this.mode === 'build' || this.mode === 'site'); this.edges.material.clippingPlanes = [IDLE]; this.edges.material.opacity = 0.34; }   // the finished house as a faint wire
     if (this.focusBox) this.focusBox.visible = true;
     this._brandApply();
-    if (this._lastMode !== this.mode) this._shadowDirty = true;   // one refresh clears any old shadow; the hologram casts none
     this._lastMode = this.mode;
     this.dirty = true; this.wake();
   };
@@ -518,7 +612,8 @@
   // counts, per-brick stamps and the frame's uniforms (called by apply() and every animated frame)
   VP._brandApply = function () {
     var m = this.model; if (!m || !this._bm) return;
-    var P = H.brandPlan(m), R = P.rows, p = this.mode === 'site' ? 0 : this.p, now = this._bNow(), motion = reduced(), red = motion || !!this._bLite, U = this._bU, E = this._bEnvObj;
+    var L2 = this.mode === 'equity' || this.mode === 'complete';
+    var P = H.brandPlan(m), R = P.rows, p = this.mode === 'site' ? 0 : (L2 ? 1 : this.p), now = this._bNow(), motion = reduced(), red = motion || !!this._bLite, U = this._bU, E = this._bEnvObj;
     var V = units(P, p), V0 = this._bV == null ? -1 : this._bV, inst = motion || !this._bPrimed;   // lite keeps the drop and flash, not the ambient motion
     var add = Math.max(0, V - Math.max(V0, 0)), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.12, 0.9 / add) : 0;
     if (V !== V0) {
@@ -541,11 +636,13 @@
       if (V > V0) this._bGrow = now;
     }
     this._bPrimed = true;
+    // Level 2: the parts in full colour follow the equity share of the home's value (eased by the frame loop, from 0 when the level opens)
+    var eqS = L2 ? (this._bEq == null ? this.eq : this._bEq) : 0, Vc = this._brandColour(L2, eqS, now, motion);
     this._bm.forEach(function (rec) { if (rec) syncPart(rec, now); });
     var st = H.brandStats(m, p), L = st.bricksLaid, pulse = red ? 0.5 : 0.5 + 0.5 * Math.sin(performance.now() * 0.002244);
     // the last brick laid: stays lit pale gold, 14% proud; shown once it has landed
     var hl = this._bHL, last = null;
-    if (L > 0) {
+    if (L > 0 && !L2) {
       var j = L - 1, rec = this._bm[P.bBi[j]], kk = P.bK[j], b = m.batches[P.bBi[j]], o = P.perm[P.bBi[j]][kk] * 10, xf = b.xf;
       if (this._bLastJ !== j) {
         var mm = new THREE.Matrix4(), e = new THREE.Euler(xf[o + 6], xf[o + 7], xf[o + 8], 'YZX');
@@ -559,6 +656,8 @@
     // stage uniforms
     U.uNow.value = now; U.uPulse.value = pulse; U.uBuilt.value = seg(p, 0.05, 1);
     U.uFadeGlaze.value = seg(p, 0.88, 0.93); U.uLitGlass.value = seg(p, 0.93, 0.96); U.uLitDoor.value = seg(p, 0.96, 1);
+    if (this.mode === 'equity') { U.uLitGlass.value = 0; U.uLitDoor.value = 0; }   // the lights go on when the mortgage is paid off
+    var cy = Vc <= 0 ? R.y0 : (Vc <= P.N ? P.top[Vc - 1] : (P.T ? P.tileTop[Math.min(P.T - 1, Vc - P.N - 1)] : R.y1));   // top of the last part in colour
     var top = Math.max(R.y1, R.y0 + 1), span = top - R.y0;
     U.uSweepOn.value = (red || this._bLite) ? 0 : 1;
     U.uSweep.value = R.y0 + ((now * 20 * CH) % (span + 40 * CH)) - 10 * CH;   // 20 courses a second, repeating
@@ -567,13 +666,13 @@
     E.site.material.opacity = 0.55 * sb; E.site.visible = sb > 0;
     E.fline.material.opacity = 0.75 * fnd; E.fline.visible = fnd > 0; E.fillMat.opacity = 0.14 * fnd; E.fills.forEach(function (f) { f.visible = fnd > 0; });
     var ping = red ? 0 : (performance.now() % 2800) / 2800, rg = ping * E.big * 0.625;
-    E.ring.visible = !red && p > 0.05; E.ring.scale.set(E.w + 2 * rg, 1, E.d + 2 * rg); E.ring.material.opacity = (1 - ping) * (0.10 + 0.40 * seg(p, 0.5, 1));
+    E.ring.visible = !red && p > 0.05 && !L2; E.ring.scale.set(E.w + 2 * rg, 1, E.d + 2 * rg); E.ring.material.opacity = (1 - ping) * (0.10 + 0.40 * seg(p, 0.5, 1));
     if (E.rafters) { var nT = Math.ceil(seg(p, 0.60, 0.80) * 18); E.rafters.visible = nT > 0; E.rafters.geometry.setDrawRange(0, nT * E.rafters.userData.per); }
-    var pa = 1 - seg(p, 0.97, 1);
-    E.slice.visible = pa > 0 && p > 0; E.slice.position.y = st.y; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
+    var pa = L2 ? (eqS > 0 && eqS < 1 ? 1 : 0) : 1 - seg(p, 0.97, 1), sy = L2 ? cy : st.y;
+    E.slice.visible = pa > 0 && p > 0; E.slice.position.y = sy; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
     this._bPulse = pulse;
-    this._bInfo = { p: p, row: st.row, rows: st.rows, y: st.y, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
-      sliceA: pa, keys: st.keys, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: motion };
+    this._bInfo = { mode: this.mode, eq: eqS, colour: L2 ? Math.min(P.N + P.T, Vc) : 0, colourTotal: P.N + P.T, p: p, row: st.row, rows: st.rows, y: sy, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
+      sliceA: pa, keys: st.keys && !L2, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: motion };
     // auto orbit (6.6.8): drifts round slowly, stops at a touch, resumes after 2.5 s idle; off for reduced motion
     var ctl = this.controls;
     if (red || this._bLite) ctl.autoRotate = false;
@@ -602,6 +701,11 @@
     var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red;
     if (red) this.p = target;
     else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 0.55); if (Math.abs(target - this.p) < 0.0003) this.p = target; }   // slow motion (owner, 31 Oct): a deposit builds over about five seconds
+    if (this.mode === 'equity' || this.mode === 'complete') {   // Level 2: the colour bricks lay as the equity share eases up, from 0 when the level opens
+      if (this._bEq == null) this._bEq = red ? this.eq : 0;
+      if (red) this._bEq = this.eq;
+      else if (this._bEq !== this.eq) { this._bEq += (this.eq - this._bEq) * Math.min(1, dt * 0.55); if (Math.abs(this.eq - this._bEq) < 0.0003) this._bEq = this.eq; }
+    }
     this._brandApply();
     this._bWasSettled = this._brandSettled();
     // at rest (nothing landing, no touch for 1.5 s, no camera fly): only the slow pulse, sweep, ring and orbit move, and they run on the
@@ -613,8 +717,12 @@
   VP._brandSettled = function () {
     var target = this._bTarget == null ? this.p : this._bTarget;
     if (Math.abs(target - this.p) > 1e-9) return false;
+    if ((this.mode === 'equity' || this.mode === 'complete') && (this._bEq == null || Math.abs(this._bEq - this.eq) > 1e-9)) return false;
     var now = this._bNow(), busy = false;
-    (this._bm || []).forEach(function (rec) { if (rec && rec.cnt > 0 && rec.laid[rec.cnt - 1] > -999 && now < rec.laid[rec.cnt - 1] + 2.1) busy = true; });
+    (this._bm || []).forEach(function (rec) {
+      if (rec && rec.cnt > 0 && rec.laid[rec.cnt - 1] > -999 && now < rec.laid[rec.cnt - 1] + 2.1) busy = true;
+      if (rec && rec.C && rec.C.cnt > 0 && rec.C.laid[rec.C.cnt - 1] > -999 && now < rec.C.laid[rec.C.cnt - 1] + 2.1) busy = true;
+    });
     return !busy;
   };
   VP.brandInfo = function () { return this._brandActive() ? this._bInfo : null; };

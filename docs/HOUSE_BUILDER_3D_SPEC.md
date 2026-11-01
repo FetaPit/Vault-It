@@ -2,6 +2,8 @@
 
 Replaces the hand-drawn SVG isometric scene with a real Three.js (r128, global `THREE` + `THREE.OrbitControls`, fetched on first need by `viThree()` in `<head>` and in the background once the page is idle; the engine boots itself when it lands) scene in which **every brick, block, tile, joist, truss and frame is a 3D object at true UK scale**. The SVG engine stays in the file as a fallback when WebGL / three.js is unavailable.
 
+> **1 Nov 2026 (owner):** the brand build (`src/hb3d/brand.js`, see `docs/HB3D_KIT.md`) is now the only house builder; the classic modes below are deleted, Level 3 is locked under Pro, and a still picture replaces the SVG fallback. The sections below describe the original design.
+
 ## 1. Units, axes, conventions
 - **Metres.** Y is up. X runs along the street frontage (left → right as seen from the street). The **front façade lies on z = 0 and faces +Z**; the building occupies z ≤ 0 (depth runs towards −Z). Front garden / street are z > 0.
 - Ground (finished ground level, FGL) is y = 0. DPC at y = 0.150. Foundations below 0.
@@ -118,7 +120,7 @@ Flats/apartments: the same stages per floor, the frame rising floor by floor; th
 - OrbitControls: drag = orbit, right-drag / two fingers = pan, wheel / pinch = zoom; damping; polar angle limited above ground; distance clamped.
 - Existing HUD buttons keep working: `houseZoomIn/Out` (×1.2 dolly), `resetView`, `toggleOrbitMode` (switches one-finger/left drag between orbit and pan), `toggleExpand` (resizes renderer). `_houseZoom` is kept in sync as `_HZ_DEFAULT × fitDistance / distance`.
 - Render on demand (dirty flag + damping), paused when the House tab or the page is hidden. `setPixelRatio(min(dpr, 2))`, shadows on desktop only, antialias.
-- Fails quietly to the SVG engine if `THREE` is missing or a WebGL context cannot be created.
+- If `THREE` is missing or a WebGL context cannot be created, a still picture of the same house at its current build level is drawn instead (`hbStill()`, owner 1 Nov 2026). The SVG engine is deleted.
 
 ## 8. Counters driven by the model
 - HUD (Level 1): "N of {bricksTotal} bricks", "Each brick ≈ £x" where x = depositTarget × wallShare / bricksTotal (wallShare = 0.46, the masonry window of the timeline), so `saved / x` matches the bricks visibly laid.
@@ -128,4 +130,4 @@ Flats/apartments: the same stages per floor, the frame rising floor by floor; th
 ## 9. Testing
 - `tests/three_route.js` serves three r128 from `tests/vendor/` (the CDN is unreachable in the sandbox).
 - Node unit tests extract `// <<HB3D_ENGINE … // HB3D_ENGINE>>` and run every model builder: brick module (0.225 × 0.075 × 0.1125), course counts per storey, wall thickness, opening sizes, no overlapping bricks, counts within budget.
-- Browser tests: each type × p ∈ {0, .05, .3, .6, .8, 1} × modes renders with no errors; overlays; `_houseZoom` sync with pinch; SVG fallback when three.js is blocked.
+- Browser tests: each type × p ∈ {0, .05, .3, .6, .8, 1} × modes renders with no errors; overlays; `_houseZoom` sync with pinch; still picture when three.js is blocked.

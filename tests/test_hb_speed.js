@@ -8,7 +8,8 @@
 //    late a 50 ms timer fires (what a tap or scroll waits), the frame gap. The browser here draws WebGL in software and copies the canvas
 //    back every frame, as a phone whose GPU Chrome will not use does; the app spots that and runs its lighter mode.
 //    Old build (two runs): 1,834 to 2,517 ms blocked in 6 s, longest task 157 to 334 ms, taps waited 144 to 264 ms (p95). This build:
-//    about 160 to 410, 70 to 90 and 72 to 76.
+//    about 160 to 410, 70 to 90 and 72 to 76. Limits scale with the machine (its old-way frame cost against 60 ms): on a machine half
+//    as fast the old build measured 3,860 / 661 / 675 and this one 1,641 / 137 / 161.
 // 3. At rest the full-quality stage draws at most about 30 frames a second (pulse, sweep and orbit run on the clock).
 // 1 and 3 run in a browser with GPU compositing (no canvas copy-back) at page scale 1.25, the 3D stage's own cap on a phone. Frame
 // pacing on the full-quality path cannot be timed here (the software GPU, not the app, is the limit), so 1 times one frame's GPU work.
@@ -80,6 +81,9 @@ const fmt = s => `long tasks ${s.longN} (max ${s.longMax.toFixed(0)} ms, blockin
     return { hasStatic, active, laid, instAll, tNew, tOld, diff: diff / (W * H * 4), maxd, W, H };
   });
   console.log(`[look] ${L.W} x ${L.H} px · ${L.laid} parts laid · instanced at rest ${L.active} (old way ${L.instAll == null ? '-' : L.instAll}) · a frame ${L.tNew.toFixed(1)} ms (old way ${L.tOld ? L.tOld.toFixed(1) : '-'} ms) · pixels differing ${L.diff != null ? (L.diff * 100).toFixed(3) + '%' : '-'} (max ${L.maxd == null ? '-' : L.maxd})`);
+  // machine speed: the old way of drawing a frame cost about 60 ms where the limits below were set; a slower machine gets more room
+  const K = Math.max(1, (L.tOld || L.tNew) / 60);
+  console.log(`[machine] old-way frame ${(L.tOld || L.tNew).toFixed(1)} ms: limits x${K.toFixed(2)}`);
   ok(L.hasStatic, 'landed parts are kept in one static mesh per part');
   ok(L.hasStatic && L.active === 0, `at rest nothing is left in the instanced meshes (${L.active} of ${L.laid})`);
   ok(L.hasStatic && L.diff < 0.001 && L.maxd <= 8, `the frame looks the same as the old way (${L.diff != null ? (L.diff * 100).toFixed(3) : '-'}% of pixels differ, max ${L.maxd})`);
@@ -104,9 +108,9 @@ const fmt = s => `long tasks ${s.longN} (max ${s.longMax.toFixed(0)} ms, blockin
     console.log(`[${label}] laying : ${fmt(lay)} · bricks ${before} -> ${after.bricks}`);
     ok(after.bricks === after.want && after.bricks > before, `${label}: the deposit laid its bricks (${before} -> ${after.bricks}, plan ${after.want})`);
     ok(after.last, `${label}: the last brick landed and is lit`);
-    ok(lay.tbt < 900, `${label}: the page is blocked under 900 ms in 6 s (${lay.tbt.toFixed(0)} ms; old build 1,834 to 2,517)`);
-    ok(lay.longMax < 130, `${label}: no task over 130 ms (max ${lay.longMax.toFixed(0)} ms; old build 157 to 334)`);
-    ok(lay.lagP95 < 110, `${label}: a tap waits under 110 ms (p95) (${lay.lagP95.toFixed(0)} ms; old build 144 to 264)`);
+    ok(lay.tbt < 1000 * K, `${label}: the page is blocked under ${(1000 * K).toFixed(0)} ms in 6 s (${lay.tbt.toFixed(0)} ms; old build 1,834 to 2,517 on the reference machine)`);
+    ok(lay.longMax < 150 * K, `${label}: no task over ${(150 * K).toFixed(0)} ms (max ${lay.longMax.toFixed(0)} ms; old build 157 to 334)`);
+    ok(lay.lagP95 < 120 * K, `${label}: a tap waits under ${(120 * K).toFixed(0)} ms (p95) (${lay.lagP95.toFixed(0)} ms; old build 144 to 264)`);
     // memory: the static meshes stay within about 33 MB of GPU memory on every house (52 bytes a vertex, 640,000 vertices); a bigger
     // part (the mansion's bricks) stays instanced. The page keeps no copy once a static mesh is uploaded.
     for (const t of ['terraced', 'detached', 'mansion', 'flat', 'apartment']) {

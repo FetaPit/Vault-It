@@ -5970,69 +5970,6 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     return _sup;
   };
 
-  // ── materials (sRGB colours; the renderer outputs sRGB) ──
-  var MATS = H.MATS = {
-    brick:        { color: 0xffffff, rough: 0.92, inst: true },
-    brickHidden:  { color: 0xffffff, rough: 0.92, inst: true },
-    block:        { color: 0xffffff, rough: 0.95, inst: true },
-    mortar:       { color: 0xb9b2a5, rough: 1.0 },
-    mortarDark:   { color: 0x8f8a80, rough: 1.0 },
-    mortarLime:   { color: 0xd0c4a8, rough: 1.0 },
-    insulation:   { color: 0xe6d9a2, rough: 0.9 },
-    closer:       { color: 0xd8d2c0, rough: 0.9 },
-    concrete:     { color: 0x9c9a94, rough: 0.95 },
-    soil:         { color: 0x4a3a2c, rough: 1.0 },
-    dpc:          { color: 0x16181b, rough: 0.6 },
-    timber:       { color: 0xc8a06e, rough: 0.85 },
-    timberWhite:  { color: 0xf1efe9, rough: 0.6 },
-    chipboard:    { color: 0xb9955f, rough: 0.9 },
-    steel:        { color: 0x6e7880, rough: 0.5, metal: 0.6 },
-    metal:        { color: 0x9aa3ab, rough: 0.4, metal: 0.7 },
-    felt:         { color: 0x2a2d33, rough: 0.9 },
-    slate:        { color: 0xffffff, rough: 0.55, inst: true },
-    tileClay:     { color: 0xffffff, rough: 0.85, inst: true },
-    tileConcrete: { color: 0xffffff, rough: 0.9, inst: true },
-    ridge:        { color: 0x4a4440, rough: 0.85 },
-    lead:         { color: 0x6b7178, rough: 0.6, metal: 0.3 },
-    stone:        { color: 0xd9cfb6, rough: 0.9 },
-    render:       { color: 0xeae5d8, rough: 0.95 },
-    pebbledash:   { color: 0xd3cbb5, rough: 1.0 },
-    upvc:         { color: 0xf3f3ef, rough: 0.45 },
-    upvcGrey:     { color: 0x3a3f45, rough: 0.5 },
-    upvcBlack:    { color: 0x1d2024, rough: 0.5 },
-    timberPaint:  { color: 0xf0ede4, rough: 0.55 },
-    glass:        { color: 0x9fc4d6, rough: 0.05, metal: 0.2, opacity: 0.38, glass: true },
-    doorRed:      { color: 0x7a1d22, rough: 0.45 },
-    doorBlue:     { color: 0x1d2f55, rough: 0.45 },
-    doorGreen:    { color: 0x1f4a35, rough: 0.45 },
-    doorBlack:    { color: 0x15171a, rough: 0.4 },
-    doorGrey:     { color: 0x464c53, rough: 0.45 },
-    garageDoor:   { color: 0xe9e9e4, rough: 0.5 },
-    brass:        { color: 0xc9a84c, rough: 0.3, metal: 0.9 },
-    gutter:       { color: 0x1b1d20, rough: 0.5 },
-    terracotta:   { color: 0xa65638, rough: 0.85 },
-    grass:        { color: 0x2c4627, rough: 1.0 },
-    plant:        { color: 0xffffff, rough: 0.95, inst: true },
-    bark:         { color: 0x4a3626, rough: 1.0 },
-    paving:       { color: 0x8f8c85, rough: 0.95 },
-    blockPaving:  { color: 0xffffff, rough: 0.95, inst: true },
-    gravel:       { color: 0xb3ab9c, rough: 1.0 },
-    fence:        { color: 0x7a5434, rough: 0.95, inst: true },
-    fencePost:    { color: 0x5a3f28, rough: 0.95 },
-    scaffold:     { color: 0xa9b2ba, rough: 0.4, metal: 0.6 },
-    scaffoldBoard:{ color: 0xb48c55, rough: 0.9 },
-    string:       { color: 0xf0d24a, rough: 0.6, emissive: 0x3a2f00 },
-    membrane:     { color: 0x2e3238, rough: 0.8 },
-    binBlack:     { color: 0x22252a, rough: 0.6 },
-    binGreen:     { color: 0x24502e, rough: 0.6 },
-    binBlue:      { color: 0x1f3d6b, rough: 0.6 },
-    rubber:       { color: 0x111111, rough: 0.9 },
-    column:       { color: 0xece6d6, rough: 0.8 },
-    balcony:      { color: 0x30363d, rough: 0.5, metal: 0.4 },
-    cladding:     { color: 0xffffff, rough: 0.9, brickslip: true },
-    curtain:      { color: 0x5d7a8c, rough: 0.15, metal: 0.4 },
-    gold:         { color: 0xe8c56a, rough: 0.4, metal: 0.5, emissive: 0x3a2a00, keep: true }
-  };
 
   var GEOM = null;
   H._geoms = function () { return geoms(); };
@@ -6050,100 +5987,16 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     return GEOM;
   }
 
-  // procedural UK brick-slip texture (stretcher bond at true scale: 1 texture tile = 1.8 m × 1.2 m = 8 bricks × 16 courses;
-  // each brick gets its own seeded colour + value jitter so the repeat doesn't read as stripes)
-  var BRICK_TILE = [1.8, 1.2];
-  var _brickTex = null;
-  function brickTexture() {
-    if (_brickTex) return _brickTex;
-    var S = 1024, c = document.createElement('canvas'); c.width = S; c.height = S;
-    var g = c.getContext('2d'), cw = S / 8, ch = S / 16;   // 225 mm × 75 mm coordinating module
-    g.fillStyle = '#b4ab9b'; g.fillRect(0, 0, S, S);
-    var pal = H.BRICKS.red, seed = 1234567;
-    var rnd = function () { seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; return ((seed >>> 0) % 100000) / 100000; };
-    for (var r = 0; r < 16; r++) {
-      var row = [];
-      for (var i = 0; i < 8; i++) row.push(rnd());
-      for (var k = -1; k < 9; k++) {                       // wrap the half-bond overhang so the tile repeats seamlessly
-        var x = k * cw + (r % 2 ? cw / 2 : 0), v = row[((k % 8) + 8) % 8], c2 = pal[Math.floor(v * pal.length)];
-        var j = 1 + (rnd() - 0.5) * 0.14;
-        var cr = Math.min(255, Math.round(((c2 >> 16) & 255) * j)), cg = Math.min(255, Math.round(((c2 >> 8) & 255) * j)), cb = Math.min(255, Math.round((c2 & 255) * j));
-        g.fillStyle = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
-        g.fillRect(x + cw * 0.022, r * ch + ch * 0.067, cw * 0.956, ch * 0.866);   // 215 × 65 brick inside a 10 mm joint
-      }
-    }
-    _brickTex = new THREE.CanvasTexture(c);
-    _brickTex.wrapS = _brickTex.wrapT = THREE.RepeatWrapping;
-    _brickTex.encoding = THREE.sRGBEncoding;
-    _brickTex.anisotropy = 8;
-    return _brickTex;
-  }
-
   function col(hex) { return new THREE.Color(hex).convertSRGBToLinear(); }
 
-  // ── Vault-It look: the deposit-stage house is a translucent teal hologram; the owned (mortgage) house is full colour
-  //    with a green-blue grade so it sits in the app's palette rather than looking purely photographic ──
-  var GRADE = H.GRADE = { amount: 0.62 };          // 0 = photographic, 1 = fully graded
-  var BRICKSLIP_UV = '#include <uv_vertex>\n  vec4 hbWp = vec4(position,1.0);\n  #ifdef USE_INSTANCING\n  hbWp = instanceMatrix * hbWp;\n  #endif\n  hbWp = modelMatrix * hbWp;\n  vec3 hbNo = normal;\n  #ifdef USE_INSTANCING\n  hbNo = mat3(instanceMatrix) * hbNo;\n  #endif\n  vec3 hbN = abs(normalize(mat3(modelMatrix) * hbNo));\n  vUv = (hbN.y > max(hbN.x, hbN.z) ? hbWp.xz : (hbN.x > hbN.z ? hbWp.zy : hbWp.xy)) / vec2(' + BRICK_TILE[0].toFixed(2) + ', ' + BRICK_TILE[1].toFixed(2) + ');';
-  // full colour, graded: cool the palette towards the app's teal, lift the shadows with teal, keep highlights clean
-  function gradeChunk(a) {
-    return '{ float hbL = dot(gl_FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));\n' +
-      '  vec3 hbG = mix(gl_FragColor.rgb, hbL * vec3(0.70, 1.08, 1.14), 0.45) * vec3(0.92, 1.0, 1.02) + vec3(0.006, 0.050, 0.056) * (1.0 - smoothstep(0.0, 0.40, hbL));\n' +
-      '  gl_FragColor.rgb = mix(gl_FragColor.rgb, hbG, ' + a.toFixed(3) + '); }\n#include <tonemapping_fragment>';
-  }
-  // hologram: every surface is re-coloured on a teal ramp by its own lightness (bricks dark, joints light, glass glows)
-  var HOLO_LO = 'vec3(0.012, 0.085, 0.090)', HOLO_HI = 'vec3(0.300, 0.880, 0.800)';
-  var HOLO_CHUNK = '#include <color_fragment>\n  { float hbL = clamp(dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722)) * 1.25, 0.0, 1.0);\n    diffuseColor.rgb = mix(' + HOLO_LO + ', ' + HOLO_HI + ', 0.18 + 0.82 * hbL); }';
-  // material post-processing (also used for uploaded / AI-generated designs)
-  function styleMaterial(m, kind, opts) {
-    opts = opts || {};
-    var slip = !!opts.brickslip, a = GRADE.amount;
-    m.onBeforeCompile = function (sh) {   // replaces (never chains) so styling twice can't double-apply
-      if (slip) sh.vertexShader = sh.vertexShader.replace('#include <uv_vertex>', BRICKSLIP_UV);
-      if (kind === 'solid') sh.fragmentShader = sh.fragmentShader.replace('#include <tonemapping_fragment>', gradeChunk(a));
-      if (kind === 'holo') sh.fragmentShader = sh.fragmentShader.replace('#include <color_fragment>', HOLO_CHUNK);
-      if (kind === 'flat') sh.fragmentShader = sh.fragmentShader.replace('#include <color_fragment>', '');
-    };
-    m.customProgramCacheKey = function () { return 'hb3d:' + kind + ':' + (slip ? 1 : 0) + ':' + a.toFixed(3); };
-    if (slip) m.defines = Object.assign({}, m.defines || {}, { USE_UV: '' });
-    return m;
-  }
-  H.styleMaterial = styleMaterial;
-  // hologram material from any base colour/map (opacity: built 0.55, context 0.20)
-  function holoMaterial(colorLin, opacity, glass, map, worldUV) {
-    var g = new THREE.MeshLambertMaterial({ color: colorLin, emissive: col(0x0b3b38), transparent: true, opacity: glass ? opacity * 0.6 : opacity, depthWrite: !glass, side: THREE.FrontSide });
-    g.emissiveIntensity = 0.55;
-    if (map) g.map = map;
-    return styleMaterial(g, 'holo', { brickslip: !!(map && worldUV) });
-  }
-  H._holoMaterial = holoMaterial;
-
-  // material variants per key: solid (graded full colour), ghost (hologram, built part), ctx (faint hologram: other floors),
-  // blue (blueprint of what is still to come), nb (neighbours)
-  function makeMaterials(key, tint) {
-    var d = MATS[key] || MATS.concrete;
-    var base = col(tint ? 0xffffff : d.color);
-    var params = { color: base, roughness: d.rough == null ? 0.8 : d.rough, metalness: d.metal || 0 };
-    if (d.emissive) params.emissive = col(d.emissive);
-    var lambert = !d.glass && !(d.metal > 0.25) && (d.rough == null || d.rough >= 0.6);   // matt surfaces: Lambert is ~20% cheaper per vertex
-    var solid = lambert ? new THREE.MeshLambertMaterial({ color: params.color, emissive: params.emissive || col(0x000000) }) : new THREE.MeshStandardMaterial(params);
-    if (d.glass) { solid.transparent = true; solid.opacity = d.opacity; solid.depthWrite = false; solid.envMapIntensity = 1; }
-    if (d.brickslip) solid.map = brickTexture();
-    styleMaterial(solid, 'solid', { brickslip: d.brickslip });
-    var ghost, ctx;
-    if (d.keep) {   // gold highlight bands stay gold in every mode (they mark the user's floor)
-      ghost = solid.clone(); ghost.onBeforeCompile = solid.onBeforeCompile; ghost.customProgramCacheKey = solid.customProgramCacheKey;
-      ghost.transparent = true; ghost.opacity = 0.9;
-      ctx = ghost.clone(); ctx.onBeforeCompile = solid.onBeforeCompile; ctx.customProgramCacheKey = solid.customProgramCacheKey; ctx.opacity = 0.5;
-    } else {
-      ghost = holoMaterial(base.clone(), 0.55, d.glass, d.brickslip ? brickTexture() : null, true);
-      ctx = holoMaterial(base.clone(), 0.16, d.glass, d.brickslip ? brickTexture() : null, true);
-    }
-    var blue = new THREE.MeshLambertMaterial({ color: col(0x2a8f8a), emissive: col(0x0f4a47), transparent: true, opacity: 0.11, depthWrite: true });   // blueprint ghost: only the nearest surface shows, no additive glare
-    var nb = blue.clone(); nb.opacity = 0.06;   // neighbours: fainter still
-    styleMaterial(blue, 'flat'); styleMaterial(nb, 'flat');
-    [solid, ghost, ctx, blue, nb].forEach(function (m) { m.clippingPlanes = [IDLE_PLANE]; m.clipShadows = true; });
-    return { solid: solid, ghost: ghost, ctx: ctx, blue: blue, nb: nb, def: d };
+  // The brand build draws the house with its own shaders (brand.js). The only standard material left is the faint blueprint
+  // silhouette of the rest of a block of flats around your floor.
+  function makeMaterials() {
+    var blue = new THREE.MeshLambertMaterial({ color: col(0x2a8f8a), emissive: col(0x0f4a47), transparent: true, opacity: 0.11, depthWrite: true });
+    blue.onBeforeCompile = function (sh) { sh.fragmentShader = sh.fragmentShader.replace('#include <color_fragment>', ''); };
+    blue.customProgramCacheKey = function () { return 'hb3d:flat'; };
+    blue.clippingPlanes = [IDLE_PLANE];
+    return { blue: blue };
   }
 
   // ── Uploaded / AI-generated designs (GLB) ──
@@ -6178,27 +6031,6 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       stats: stats, brickT: function (i) { return Math.max(0, Math.min(1, i / bricks)); }
     };
   };
-  // one-time: give every mesh a graded-colour, a hologram and a blueprint twin
-  function prepareCustom(model) {
-    if (model._cust) return model._cust;
-    var C = { solid: [], holo: [], blue: [], solidMats: [], holoMats: [], blueMats: [] }, list = [];
-    model.custom.traverse(function (o) { if (o.isMesh) list.push(o); });
-    list.forEach(function (mesh) {
-      var mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-      var solid = mats.map(function (m) { var c = m.clone(); styleMaterial(c, 'solid'); c.clippingPlanes = [IDLE_PLANE]; c.clipShadows = true; C.solidMats.push(c); return c; });
-      var holo = mats.map(function (m) { var c = holoMaterial((m.color || col(0xcccccc)).clone(), 0.55, m.transparent && m.opacity < 0.6, m.map || null, false); c.clippingPlanes = [IDLE_PLANE]; c.side = THREE.DoubleSide; C.holoMats.push(c); return c; });
-      var blue = new THREE.MeshLambertMaterial({ color: col(0x2a8f8a), emissive: col(0x0f4a47), transparent: true, opacity: 0.11, depthWrite: true, side: THREE.DoubleSide });
-      styleMaterial(blue, 'flat'); blue.clippingPlanes = [IDLE_PLANE]; C.blueMats.push(blue);
-      mesh.material = solid.length > 1 ? solid : solid[0]; mesh.castShadow = true; mesh.receiveShadow = true;
-      var hm = mesh.clone(); hm.material = holo.length > 1 ? holo : holo[0]; hm.castShadow = true;
-      var bm = mesh.clone(); bm.material = blue; bm.castShadow = false; bm.renderOrder = 5;
-      mesh.parent.add(hm); mesh.parent.add(bm);
-      C.solid.push(mesh); C.holo.push(hm); C.blue.push(bm);
-    });
-    model._cust = C;
-    return C;
-  }
-
   var IDLE_PLANE = H._IDLE_PLANE = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e5);   // keeps every material on one clipping plane at all times
   var tmpM = new THREE.Matrix4(), tmpQ = new THREE.Quaternion(), tmpE = new THREE.Euler(0, 0, 0, 'YZX'), tmpP = new THREE.Vector3(), tmpS = new THREE.Vector3(), tmpC = new THREE.Color();
 
@@ -6238,7 +6070,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var g1 = new THREE.GridHelper(240, 240, col(0x1f5e5a), col(0x123734)); g1.material.transparent = true; g1.material.opacity = 0.35; g1.position.y = 0.001; sc.add(g1);
     this.grid = g1;
     this.root = new THREE.Group(); sc.add(this.root);
-    this.edges = null; this.water = null;
+    this.edges = null;
 
     var ctl = this.controls = new THREE.OrbitControls(cam, cv);
     ctl.enableDamping = true; ctl.dampingFactor = 0.09; ctl.rotateSpeed = 0.8; ctl.zoomSpeed = 1.0; ctl.panSpeed = 0.8;
@@ -6258,7 +6090,6 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       // brand: what a drawn frame really cost is the gap until the browser gives us the next frame (the GPU work lands after render() returns)
       if (self.brand && self._bDrewAt) { var fc = performance.now() - self._bDrewAt; self._bCost = self._bCost == null ? fc : self._bCost * 0.6 + fc * 0.4; self._bDrewAt = 0; self._bGap = Math.max(80, Math.min(1500, self._bCost * 2.2)); }
       var moving = self.controls.update();
-      if (self._anim) moving = self._stepAnim() || moving;
       if (self._fly) moving = self._stepFly() || moving;
       if (self._brandTick) moving = self._brandTick() || moving;   // brand look: smoothing, brick drops, pulse, sweep, ring (only while on screen)
       // brand lite (slow or software-drawn GPU, owner 31 Oct): frames are spaced at about 2.5x their own cost, so the page always has time
@@ -6271,7 +6102,6 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         if (self.brand) { self._bLastDraw = self._bDrewAt = performance.now(); self._bDraws = (self._bDraws || 0) + 1; }
         // adaptive quality: the gap between moving frames, averaged after a warm-up, tells whether this device keeps up; a slow
         // one (under ~14 frames a second over 40 frames) drops to lite (no shadows, pixel ratio 1) rather than stuttering
-        if (moving && self._lastT && !self._lite && !self.brand) { var dt = t - self._lastT; if (dt > 2 && dt < 500) { self._ema = self._ema == null ? dt : self._ema * 0.9 + dt * 0.1; self._nf = (self._nf || 0) + 1; if (self._nf > 40 && self._ema > 70) self.goLite(); } }
         self._lastT = moving ? t : 0;
       } else { self._idle++; self._lastT = 0; }
       if (self._idle > 45) return;                         // nothing moving for ~0.75 s: sleep until woken
@@ -6300,7 +6130,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
 
   VP.start = function () { this.active = true; this.dirty = true; this.wake(); };
   VP.wake = function () { this._idle = 0; if (this.active && !this._raf) this._raf = requestAnimationFrame(this._loop); };
-  VP.settled = function () { if (this._brandActive && this._brandActive()) return this._brandSettled(); return !this._anim && this._idle > 2; };
+  VP.settled = function () { if (this._brandActive && this._brandActive()) return this._brandSettled(); return this._idle > 2; };
   VP.stop = function () { this.active = false; if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; } };
   // lite quality for a device that cannot keep up: shadows off, pixel ratio 1 (nothing else changes; the brand look has its own lite stage)
   VP.goLite = function () {
@@ -6336,14 +6166,11 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   VP._clear = function () {
     var self = this;
     if (this._brandClear) this._brandClear();
-    this.batches.forEach(function (b) { self.root.remove(b.main); self.root.remove(b.rev); b.main.dispose && b.main.dispose(); b.rev.dispose && b.rev.dispose(); });
+    this.batches.forEach(function (b) { if (b.main) { self.root.remove(b.main); b.main.dispose && b.main.dispose(); } });
     this.batches = [];
     if (this.edges) { this.root.remove(this.edges); this.edges.geometry.dispose(); this.edges = null; }
-    if (this.water) { this.root.remove(this.water); this.water = null; }
     if (this.focusBox) { this.root.remove(this.focusBox); this.focusBox.geometry.dispose(); this.focusBox = null; }
-    if (this.rowBand) { this.root.remove(this.rowBand); this.rowBand = null; }
     if (this.site) { this.root.remove(this.site); this.site = null; }
-    if (this.model && this.model.custom) this.root.remove(this.model.custom);   // kept intact: the app caches the model
   };
 
   // Build the instanced meshes for a compiled model
@@ -6352,38 +6179,20 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this._clear();
     this.model = model;
     if (!model) { this.dirty = true; return; }
-    this._cust = null;
-    if (model.custom) { this._cust = prepareCustom(model); this.root.add(model.custom); }
-    this._mats = this._mats || {};
-    model.batches.forEach(function (b) {
-      var n = b.count, geo = G[b.shape] || G.box, hasCol = false, def = MATS[b.mat] || MATS.concrete;
-      for (var q = 0; q < n; q++) if (b.color[q] >= 0) { hasCol = true; break; }
-      // explicit colours on a plain material: base colour goes white and uncoloured instances carry the material colour,
-      // so every instance shows exactly its own colour (never black, never double-tinted)
-      var tint = hasCol && !def.inst, mk = b.mat + (tint ? '#tint' : '');
-      var mats = self._mats[mk] || (self._mats[mk] = makeMaterials(b.mat, tint));
-      var main = new THREE.InstancedMesh(geo, mats.solid, n), rev = new THREE.InstancedMesh(geo, mats.blue, n);
-      for (var i = 0; i < n; i++) {
-        var o = i * 10, xf = b.xf;
-        tmpP.set(xf[o], xf[o + 1], xf[o + 2]); tmpS.set(xf[o + 3], xf[o + 4], xf[o + 5]);
-        tmpE.set(xf[o + 6], xf[o + 7], xf[o + 8], 'YZX'); tmpQ.setFromEuler(tmpE);
-        tmpM.compose(tmpP, tmpQ, tmpS);
-        main.setMatrixAt(i, tmpM); rev.setMatrixAt(n - 1 - i, tmpM);
-        if (b.color[i] >= 0) { tmpC.setHex(b.color[i]).convertSRGBToLinear(); main.setColorAt(i, tmpC); rev.setColorAt(n - 1 - i, tmpC); }
-        else if (hasCol) { if (tint) tmpC.setHex(def.color).convertSRGBToLinear(); else tmpC.setHex(0xffffff); main.setColorAt(i, tmpC); rev.setColorAt(n - 1 - i, tmpC); }
+    var mats = this._mats || (this._mats = makeMaterials());
+    model.batches.forEach(function (b) {   // the house itself is drawn by the brand build; only the rest of a block of flats needs a mesh here
+      var ctx = !!(model.focus && !b.focus && !b.ghost && b.hideAfter >= 2), n = b.count, main = null;
+      if (ctx) {
+        main = new THREE.InstancedMesh(G[b.shape] || G.box, mats.blue, n);
+        for (var i = 0; i < n; i++) {
+          var o = i * 10, xf = b.xf;
+          tmpP.set(xf[o], xf[o + 1], xf[o + 2]); tmpS.set(xf[o + 3], xf[o + 4], xf[o + 5]);
+          tmpE.set(xf[o + 6], xf[o + 7], xf[o + 8], 'YZX'); tmpQ.setFromEuler(tmpE);
+          main.setMatrixAt(i, tmpM.compose(tmpP, tmpQ, tmpS));
+        }
+        main.instanceMatrix.needsUpdate = true; main.frustumCulled = false; main.visible = false; self.root.add(main);
       }
-      if (!hasCol && main.instanceColor) main.instanceColor = null;
-      main.instanceMatrix.needsUpdate = true; rev.instanceMatrix.needsUpdate = true;
-      if (main.instanceColor) main.instanceColor.needsUpdate = true;
-      if (!hasCol && rev.instanceColor) rev.instanceColor = null;
-      if (rev.instanceColor) rev.instanceColor.needsUpdate = true;
-      var shadow = !b.ghost && !mats.def.glass && b.mat !== 'string' && b.mat !== 'felt';
-      main.castShadow = shadow && b.shape !== 'sph'; main.receiveShadow = !mats.def.glass;
-      main.frustumCulled = false; rev.frustumCulled = false;
-      rev.renderOrder = 5;
-      if (mats.def.glass) main.renderOrder = 4;
-      self.root.add(main); self.root.add(rev);
-      self.batches.push({ b: b, main: main, rev: rev, mats: mats, n: n });
+      self.batches.push({ b: b, main: main, mats: mats, n: n });
     });
     // blueprint edges of the finished envelope (silhouette of the final house)
     var pos = [];
@@ -6407,23 +6216,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       this.edges = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ color: col(0x44c0b9), transparent: true, opacity: 0.35, depthWrite: false }));
       this.root.add(this.edges);
     }
-    // gold waterline ring (equity mode)
     var bb = model.bounds, wx = bb.max[0] - bb.min[0] + 0.6, wz = bb.max[2] - bb.min[2] + 0.6;
-    var wg = new THREE.EdgesGeometry(new THREE.BoxBufferGeometry(wx - 0.44, 0.001, wz - 0.44));   // hugs the walls (8 cm out)
-    this.water = new THREE.LineSegments(wg, new THREE.LineBasicMaterial({ color: col(0xe8c56a), transparent: true, opacity: 0.95 }));
-    this.water.position.set((bb.min[0] + bb.max[0]) / 2, 0, (bb.min[2] + bb.max[2]) / 2);
-    this.water.visible = false; this.root.add(this.water);
-    // the current row: a gold band (outline + glassy plane) at the exact height the deposit has built to
-    this.rowBand = null;
-    if (model.rows) {
-      var bx = bb.min[0] - 0.35, bX = bb.max[0] + 0.35, bz = bb.min[2] - 0.35, bZ = bb.max[2] + 0.35;
-      var rg = new THREE.Group(), pts = [bx, 0, bz, bX, 0, bz, bX, 0, bz, bX, 0, bZ, bX, 0, bZ, bx, 0, bZ, bx, 0, bZ, bx, 0, bz];
-      var lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-      var ln = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: col(0xf3d27a), transparent: true, opacity: 1, depthTest: false, depthWrite: false }));
-      var pl = new THREE.Mesh(new THREE.PlaneBufferGeometry(bX - bx, bZ - bz), new THREE.MeshBasicMaterial({ color: col(0xe8c56a), transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false }));
-      pl.rotation.x = -Math.PI / 2; pl.position.set((bx + bX) / 2, 0, (bz + bZ) / 2);
-      ln.renderOrder = 9; pl.renderOrder = 8; rg.add(pl); rg.add(ln); rg.visible = false; this.root.add(rg); this.rowBand = rg;
-    }
     // the user's own floor (flats / apartments): a gold frame that marks it in every mode
     if (model.focus) {
       var F = model.focus, fh = Math.max(0.2, F.y1 - F.y0);
@@ -6432,11 +6225,6 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       this.focusBox.position.set((bb.min[0] + bb.max[0]) / 2, F.y0 + fh / 2, (bb.min[2] + bb.max[2]) / 2);
       this.focusBox.renderOrder = 6; this.root.add(this.focusBox);
     }
-    // shadow camera fits the model
-    var R = Math.max(wx, wz, bb.max[1]) * 0.75 + 4, sun = this.sun;
-    sun.target.position.set((bb.min[0] + bb.max[0]) / 2, 0, (bb.min[2] + bb.max[2]) / 2);
-    sun.position.set(sun.target.position.x + R * 0.8, R * 1.3, sun.target.position.z + R);
-    var scam = sun.shadow.camera; scam.left = -R; scam.right = R; scam.top = R; scam.bottom = -R; scam.near = 0.5; scam.far = R * 4; scam.updateProjectionMatrix();
     if (!keepCamera) this.fit();
     this.apply();
   };
@@ -6476,14 +6264,6 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this.controls.touches.ONE = pan ? THREE.TOUCH.PAN : THREE.TOUCH.ROTATE;
   };
 
-  // progress / mode → instance counts + materials + clipping
-  // mode: 'build'    deposit stage: the built part is a translucent teal hologram, the rest a faint blueprint;
-  //                  at 100% of the deposit the whole house stands as a hologram
-  //       'equity'   mortgage stage: full-colour (graded) bricks below the owned-share waterline, hologram above
-  //       'complete' mortgage free: all full colour
-  //       'site'     nothing built yet: blueprint only
-  // Flats / apartments (model.focus): only the user's own floor builds and turns to colour; the rest of the block
-  // stays a faint hologram for context.
   VP.setState = function (s) {
     if (s.p != null) { this.p = Math.max(0, Math.min(1, s.p)); this._bTarget = this.p; }
     if (s.mode) this.mode = s.mode;
@@ -6491,97 +6271,20 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     if (s.lights != null) this.lights = !!s.lights;
     this.apply();
   };
-  VP.animateTo = function (p1, ms) {
-    if (this._brandActive && this._brandActive()) { this._bTarget = Math.max(0, Math.min(1, p1)); this.dirty = true; this.wake(); return; }   // brand: eased by the frame loop
-    var reduce = (typeof document !== 'undefined' && document.body && document.body.classList.contains('reduced-motion')) || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    if (reduce || !(ms > 0) || Math.abs(p1 - this.p) < 1e-4) { this.setState({ p: p1 }); return; }
-    this._anim = { p0: this.p, p1: p1, t0: performance.now(), ms: ms };
-    this.dirty = true; this.wake();
+  VP.animateTo = function (p1) {
+    if (this._brandActive && this._brandActive()) { this._bTarget = Math.max(0, Math.min(1, p1)); this.dirty = true; this.wake(); return; }   // eased by the frame loop
+    this.setState({ p: p1 });
   };
-  VP._stepAnim = function () {
-    var a = this._anim, k = Math.min(1, (performance.now() - a.t0) / a.ms), e = 1 - Math.pow(1 - k, 3);
-    this.p = a.p0 + (a.p1 - a.p0) * e; this.apply();
-    if (k >= 1) this._anim = null;
-    return true;
-  };
-  function upper(t, p) { var lo = 0, hi = t.length; while (lo < hi) { var m = (lo + hi) >> 1; if (t[m] <= p) lo = m + 1; else hi = m; } return lo; }
+  // modes (all drawn by the brand build, brand.js): 'site' nothing built yet; 'build' Level 1, the deposit lays the bricks;
+  // 'equity' Level 2, the paid share solid below a gold line and the rest a faint hologram; 'complete' mortgage free.
+  // Flats / apartments (model.focus): only the user's own floor builds; the rest of the block stays a faint silhouette.
   VP.apply = function () {
-    var self = this, m = this.model; if (!m) { this.dirty = true; return; }
-    if (this._brandActive && this._brandActive()) { this._brandApplyAll(); return; }   // brand look for the Level 1 build (house flag)
-    if (this._bOn) this._brandEnv(false);
-    var mode = this.mode, p = mode === 'build' ? this.p : (mode === 'site' ? 0 : 1), F = m.focus;
-    var y0 = F ? F.y0 : (m.rows ? m.rows.y0 : 0), y1 = F ? F.y1 : (m.rows ? m.rows.y1 : Math.max(0.5, m.height)), clipY = y0 + this.eq * (y1 - y0);
-    var below = new THREE.Plane(new THREE.Vector3(0, -1, 0), clipY), above = new THREE.Plane(new THREE.Vector3(0, 1, 0), -clipY);
-    if (this._cust) {   // uploaded / AI design: the hologram rises with the deposit; colour fills up to the owned share
-      var C = this._cust, hb = (mode === 'build' ? p : 0) * y1 + (mode === 'build' && p >= 1 ? 1 : 0);
-      var bBelow = new THREE.Plane(new THREE.Vector3(0, -1, 0), hb), bAbove = new THREE.Plane(new THREE.Vector3(0, 1, 0), -hb);
-      var vis = function (arr, on) { arr.forEach(function (o) { o.visible = on; }); };
-      var clip = function (arr, pl) { arr.forEach(function (mm) { mm.clippingPlanes = [pl]; }); };
-      if (mode === 'equity') { vis(C.solid, true); vis(C.holo, true); vis(C.blue, false); clip(C.solidMats, below); clip(C.holoMats, above); }
-      else if (mode === 'complete') { vis(C.solid, true); vis(C.holo, false); vis(C.blue, false); clip(C.solidMats, IDLE_PLANE); }
-      else if (mode === 'site') { vis(C.solid, false); vis(C.holo, false); vis(C.blue, false); }
-      else { vis(C.solid, false); vis(C.holo, true); vis(C.blue, false); clip(C.holoMats, bBelow); }   // hologram up to the current row; the rest is just the outline
-      this.edges && (this.edges.visible = mode === 'build' || mode === 'site');
-    }
-    this.batches.forEach(function (B) {
-      var b = B.b, n = B.n, k = mode === 'site' ? 0 : upper(b.t, p), mats = B.mats, temp = b.hideAfter < 2, hidden = temp && (mode !== 'build' || p >= b.hideAfter);
-      if (b.ghost) {   // neighbours: always faint blueprint
-        B.main.count = 0; B.rev.count = n; B.rev.material = mats.nb; B.rev.visible = true; B.main.visible = false; return;
-      }
-      if (F && !b.focus) {   // the rest of the block: constant faint hologram (no site temporaries)
-        B.rev.visible = false; B.main.visible = !temp; B.main.count = n; B.main.castShadow = false; B.main.receiveShadow = false;   // faint silhouette: no shadows on it
-        B.main.material = m.clean ? mats.blue : mats.ctx;   // clean shell: the rest of the block is a plain faint silhouette, so only your floor stands out
-        mats.ctx.clippingPlanes = [IDLE_PLANE]; mats.blue.clippingPlanes = [IDLE_PLANE];
-        return;
-      }
-      var shadows = !b.ghost && !mats.def.glass && b.mat !== 'string' && b.mat !== 'felt' && b.shape !== 'sph';
-      if (m.clean) {   // clean shell: everything is built by height, so the waterline and the build height both just move through the sorted instances
-        var kq = mode === 'equity' ? upper(b.t, F ? self.eq : (clipY - y0) / Math.max(1e-6, y1 - y0)) : k;
-        if (mode === 'equity') {
-          B.main.visible = !temp && kq > 0; B.rev.visible = !temp && n - kq > 0; B.main.count = kq; B.rev.count = n - kq;
-          B.main.material = mats.solid; B.rev.material = mats.ghost; mats.solid.clippingPlanes = [IDLE_PLANE]; mats.ghost.clippingPlanes = [IDLE_PLANE];
-        } else if (mode === 'complete') {
-          B.main.visible = !temp; B.rev.visible = false; B.main.count = n; B.main.material = mats.solid; mats.solid.clippingPlanes = [IDLE_PLANE];
-        } else {         // build (deposit) / site: hologram up to the current row; the rest is just the outline
-          B.main.visible = k > 0 && !temp; B.rev.visible = false; B.main.count = k; B.main.material = mats.ghost; mats.ghost.clippingPlanes = [IDLE_PLANE];
-        }
-        B.main.castShadow = shadows && (mode === 'complete' || mode === 'equity');
-        if (mats.def.glass) { var on0 = self.lights; [mats.solid, mats.ghost].forEach(function (mm) { mm.emissive = col(on0 ? 0xffb35c : (mm === mats.ghost ? 0x0b3b38 : 0x000000)); mm.emissiveIntensity = on0 ? 0.55 : (mm === mats.ghost ? 0.55 : 0); }); }
-        return;
-      }
-      if (mode === 'equity') {
-        B.main.visible = !temp; B.rev.visible = !temp;
-        B.main.count = n; B.rev.count = n;
-        B.main.material = mats.solid; B.rev.material = mats.ghost;
-        mats.solid.clippingPlanes = [below]; mats.ghost.clippingPlanes = [above];
-      } else if (mode === 'complete') {
-        B.main.visible = !temp; B.rev.visible = false; B.main.count = n;
-        B.main.material = mats.solid; mats.solid.clippingPlanes = [IDLE_PLANE];
-      } else {   // build (deposit) / site
-        B.main.visible = !hidden && k > 0; B.rev.visible = !temp && n - k > 0;
-        B.main.count = k; B.rev.count = n - k;
-        B.main.material = mats.ghost; B.rev.material = mats.blue;
-        mats.blue.clippingPlanes = [IDLE_PLANE]; mats.ghost.clippingPlanes = [IDLE_PLANE];
-      }
-      // lights on: warm glow behind the glass once the house is finished / owned
-      if (mats.def.glass) {
-        var on = self.lights;
-        [mats.solid, mats.ghost].forEach(function (mm) { mm.emissive = col(on ? 0xffb35c : (mm === mats.ghost ? 0x0b3b38 : 0x000000)); mm.emissiveIntensity = on ? 0.55 : (mm === mats.ghost ? 0.55 : 0); });
-      }
-    });
-    if (this.edges) {   // outline of the finished house: only above the current row once the walls are going up
-      var hb = m.rows ? m.rows.y0 + (mode === 'build' ? p : 0) * (m.rows.y1 - m.rows.y0) : 0, above2 = new THREE.Plane(new THREE.Vector3(0, 1, 0), -hb);
-      this.edges.visible = !F && ((mode === 'build' && p < 1) || mode === 'site');
-      this.edges.material.clippingPlanes = m.clean && mode === 'build' ? [above2] : [IDLE_PLANE];
-      this.edges.material.opacity = m.clean ? 0.55 : 0.14 + 0.22 * (1 - p);
-    }
-    if (this.rowBand) {
-      this.rowBand.visible = mode === 'build' && p > 0 && p < 0.9999;
-      this.rowBand.position.y = m.rows.y0 + p * (m.rows.y1 - m.rows.y0);
-    }
-    if (this.water) { this.water.visible = mode === 'equity'; this.water.position.y = clipY; }
-    if (this.focusBox) this.focusBox.visible = true;
-    this.dirty = true; if (mode !== 'build' || this._lastMode !== 'build') this._shadowDirty = true; this._lastMode = mode; this.wake();   // no shadows while building: the hologram casts none (one refresh clears any old shadow)
+    var m = this.model; if (!m) { this.dirty = true; return; }
+    if (this._brandActive && this._brandActive()) { this._brandApplyAll(); return; }
+    if (this._bOn) this._brandEnv(false);   // nothing the brand build can draw (no laying plan): an empty stage
+    this.batches.forEach(function (B) { if (B.main) B.main.visible = false; });
+    if (this.edges) this.edges.visible = false;
+    this.dirty = true; this.wake();
   };
 
   // project a world point to container pixels (for DOM overlays)
@@ -6593,8 +6296,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   VP.rowInfo = function () {
     var m = this.model; if (!m || !m.rows) return null;
     if (this._brandActive && this._brandActive() && this._bInfo) { var bi = this._bInfo; return { y: bi.y, row: bi.row, rows: bi.rows, p: bi.p, brand: bi }; }
-    var p = this.mode === 'build' ? this.p : (this.mode === 'site' ? 0 : 1), R = m.rows;
-    return { y: R.y0 + p * (R.y1 - R.y0), row: p <= 0 ? 0 : Math.min(R.n, Math.floor(p * R.n - 1e-9) + 1), rows: R.n, p: p };
+    return null;
   };
   // glide the camera to look at the current row (and in a little)
   VP.flyToRow = function (ms) {
@@ -6630,8 +6332,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
 
 // ═══════════════════════════════════════════════════════════════
 // HB3D BRAND: the brand book's build animation and hologram look on every three.js house model (Level 1 deposit build).
-// Ships behind the house flag (?house=new, or localStorage vi-flag-house = 1): the app calls viewer.setBrand(true).
-// With the flag off nothing here runs and the viewer behaves exactly as before.
+// The only house builder (owner, 1 Nov 2026: the classic viewer is deleted): Level 1 (the deposit lays the bricks) and Level 2
+// (the paid share solid below a gold line, mortgage free lit). The app calls viewer.setBrand(true).
 //
 // Stage schedule by deposit progress p = saved / depositTarget (brand handover 6.4):
 //   0.005 to 0.03 site boundary · 0 to 0.03 footprint · 0.03 to 0.80 bricks in laying order (course by course, round the
@@ -6704,15 +6406,21 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     bricks.forEach(function (r, j) { rank[r.bi][r.i] = j; });
     tiles.forEach(function (r, o) { rank[r.bi][r.i] = N + o; });
     roof.forEach(function (r) { if (!r.tile) rank[r.bi][r.i] = T ? N + Math.min(T - 1, lowerBound(tileY, r.y + 1e-6)) : Math.max(0, N - 1); });
-    var c0 = N ? course[0] : 0, doorPts = [];
+    var c0 = N ? course[0] : 0, doorPts = [], rank2 = rank.map(function (rk) { return null; });
     rest.forEach(function (r) {
-      if (r.part === 'glass' || r.part === 'frame' || r.part === 'door') { rank[r.bi][r.i] = N + T; if (r.part === 'door') doorPts.push(r); return; }
       var cb = Math.round((r.bot - R.y0) / R.ch) + 1;     // the course this part sits in
-      rank[r.bi][r.i] = !N || cb < c0 ? -1 : Math.min(N - 1, lowerBound(course, cb));   // shows with the first brick of its course
+      var byCourse = !N || cb < c0 ? -1 : Math.min(N - 1, lowerBound(course, cb));   // shows with the first brick of its course
+      if (r.part === 'glass' || r.part === 'frame' || r.part === 'door') {   // Level 1: glazing goes in at the end; Level 2 colours it with its course
+        rank[r.bi][r.i] = N + T; if (r.part === 'door') doorPts.push(r);
+        (rank2[r.bi] || (rank2[r.bi] = Float64Array.from(rank[r.bi])))[r.i] = byCourse; return;
+      }
+      rank[r.bi][r.i] = byCourse;
     });
-    // each batch sorted by rank, so what shows is always a prefix of the instances
-    var perm = rank.map(function (rk) { var ix = []; for (var i = 0; i < rk.length; i++) ix.push(i); ix.sort(function (p, q) { return rk[p] - rk[q] || p - q; }); return Int32Array.from(ix); });
+    rank2 = rank2.map(function (r2, bi) { return r2 || rank[bi]; });
+    // each batch sorted by rank (then by the Level 2 order), so what shows, and what is in colour, is always a prefix of the instances
+    var perm = rank.map(function (rk, bi) { var r2 = rank2[bi], ix = []; for (var i = 0; i < rk.length; i++) ix.push(i); ix.sort(function (p, q) { return rk[p] - rk[q] || r2[p] - r2[q] || p - q; }); return Int32Array.from(ix); });
     var sorted = rank.map(function (rk, bi) { var pm = perm[bi], out = new Float64Array(rk.length); for (var k = 0; k < pm.length; k++) out[k] = rk[pm[k]]; return out; });
+    var sorted2 = rank2.map(function (rk, bi) { var pm = perm[bi], out = new Float64Array(rk.length); for (var k = 0; k < pm.length; k++) out[k] = rk[pm[k]]; return out; });
     var inv = perm.map(function (pm) { var v = new Int32Array(pm.length); for (var k = 0; k < pm.length; k++) v[pm[k]] = k; return v; });
     var bK = new Int32Array(N); for (var j = 0; j < N; j++) bK[j] = inv[bBi[j]][bI[j]];
     // the front door (for the keys glint): door leaves on the front-most face
@@ -6723,7 +6431,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       dd.forEach(function (d) { sx += d.x; sy += d.y; });
       door = [sx / dd.length + 0.18, sy / dd.length, zmax + 0.05];
     }
-    m._bp = { N: N, T: T, rows: R, course: course, top: top, bBi: bBi, bK: bK, tileTop: tileTop, parts: parts, perm: perm, rank: sorted, door: door, cx: cx, cz: cz };
+    m._bp = { N: N, T: T, rows: R, course: course, top: top, bBi: bBi, bK: bK, tileTop: tileTop, parts: parts, perm: perm, rank: sorted, rank2: sorted2, door: door, cx: cx, cz: cz };
     return m._bp;
   };
   // progress → how many ranks are released
@@ -6735,6 +6443,15 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     return P.N + Math.floor(P.T * seg(p, 0.80, 0.88) + 1e-6);
   }
   H.brandUnits = units;
+  // Level 2 (owner, 1 Nov 2026): how many parts are in full colour for an equity share e of the home's value (same laying order)
+  H.brandColourUnits = function (P, e) { e = clamp(e || 0, 0, 1); return e >= 1 - 1e-9 ? 1e15 : Math.floor((P.N + P.T) * e + 1e-6); };
+  // real material colours (sRGB) for parts the kit does not colour itself
+  var MATCOL = { mortar: 0xb9b2a5, mortarDark: 0x8f8a80, mortarLime: 0xd0c4a8, insulation: 0xe6d9a2, closer: 0xd8d2c0, concrete: 0x9c9a94, soil: 0x4a3a2c, dpc: 0x16181b,
+    timber: 0xc8a06e, timberWhite: 0xf1efe9, chipboard: 0xb9955f, steel: 0x6e7880, metal: 0x9aa3ab, felt: 0x2a2d33, ridge: 0x4a4440, lead: 0x6b7178, stone: 0xd9cfb6,
+    render: 0xeae5d8, pebbledash: 0xd3cbb5, upvc: 0xf3f3ef, upvcGrey: 0x3a3f45, upvcBlack: 0x1d2024, timberPaint: 0xf0ede4, glass: 0x9fc4d6, doorRed: 0x7a1d22,
+    doorBlue: 0x1d2f55, doorGreen: 0x1f4a35, doorBlack: 0x15171a, doorGrey: 0x464c53, garageDoor: 0xe9e9e4, brass: 0xc9a84c, gutter: 0x1b1d20, terracotta: 0xa65638,
+    column: 0xece6d6, balcony: 0x30363d, curtain: 0x5d7a8c, gold: 0xe8c56a, slate: 0x4f5660, tileClay: 0x9c4a32, tileConcrete: 0x6d6a66, brick: 0x9b4a35, block: 0xa9a59c };
+  H.brandColourOf = function (b, i) { var c = b.color && b.color[i] >= 0 ? b.color[i] : MATCOL[b.mat]; return c == null ? 0xbdb8ae : c; };
   function stageName(P, p, row) {
     if (p <= 0) return 'Your plot';
     if (p < 0.03) return p < 0.005 ? 'Site cleared' : 'Foundations';
@@ -6759,13 +6476,14 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       stage: stageName(P, p, row), keys: p >= 0.999 };
   };
 
+  // ── Night palette (brand engine THG.dark). The 3D viewports keep the Night look in Daylight too (owner, 30 Oct). ──
+  var C = H.BRAND_C = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2, 0.62, 0.74], frame: [0.78, 0.93, 0.92], glass: [0.02, 0.2, 0.22], glassLit: [0.96, 0.78, 0.42],
+    door: [0.04, 0.24, 0.26], edge: [0.01, 0.1, 0.1], sheen: [0.75, 0.98, 0.96], flash: [0.91, 0.77, 0.42], shMin: 0.5, edgeK: 0.62, front: 0.88, back: 0.09 };   // shared with the still picture (no three.js needed)
   function boot() {   // the viewer methods need THREE and H.Viewer; with three.js loaded later (viThree) H._boot calls this
   if (!H.Viewer || typeof THREE === 'undefined') return;
   var VP = H.Viewer.prototype;
 
-  // ── Night palette (brand engine THG.dark). The 3D viewports keep the Night look in Daylight too (owner, 30 Oct). ──
-  var C = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2, 0.62, 0.74], frame: [0.78, 0.93, 0.92], glass: [0.02, 0.2, 0.22], glassLit: [0.96, 0.78, 0.42],
-    door: [0.04, 0.24, 0.26], edge: [0.01, 0.1, 0.1], sheen: [0.75, 0.98, 0.96], flash: [0.91, 0.77, 0.42], shMin: 0.5, edgeK: 0.62, front: 0.88, back: 0.09 };
+  var C = H.BRAND_C;
   var TEAL = [68 / 255, 192 / 255, 185 / 255], GOLD = [232 / 255, 197 / 255, 106 / 255], RAFTER = [120 / 255, 230 / 255, 222 / 255];
   function softGL(r) {   // a GPU drawn in software (no graphics chip, or a blocklisted one): the 3D must stay light there
     try { var gl = r.getContext(), ext = gl.getExtension('WEBGL_debug_renderer_info'), name = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
@@ -6787,6 +6505,12 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     'attribute vec2 aFS; attribute vec3 aIO;',
     '#else',
     'attribute float aLaid;',
+    '#endif',
+    '#ifdef BRAND_COLOUR',
+    'varying vec3 vCol;',
+    '#ifdef BRAND_STATIC',
+    'attribute vec3 aCol;',
+    '#endif',
     '#endif',
     'uniform float uNow; uniform float uDrop; uniform float uFlashOn; uniform float uFade;',
     'varying vec3 vN; varying vec3 vW; varying vec2 vUV; varying vec2 vFS; varying float vFlash; varying float vAlpha; varying float vSeed;',
@@ -6815,6 +6539,15 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     '  #endif',
     '  vUV = uv; vW = wp.xyz; vAlpha = vis * uFade;',
     '  vSeed = fract(sin(dot(io.xz + vec2(io.y * 1.3, io.x * 0.7), vec2(12.9898, 78.233))) * 43758.5453);',
+    '  #ifdef BRAND_COLOUR',
+    '  #ifdef BRAND_STATIC',
+    '  vCol = aCol;',
+    '  #elif defined(USE_INSTANCING_COLOR)',
+    '  vCol = instanceColor;',
+    '  #else',
+    '  vCol = vec3(1.0);',
+    '  #endif',
+    '  #endif',
     '  gl_Position = projectionMatrix * viewMatrix * wp;',
     '}'].join('\n');
   var FS = [
@@ -6822,12 +6555,22 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     'uniform float uShMin; uniform float uEdgeK; uniform float uPulse; uniform float uBuilt; uniform float uSweep; uniform float uSweepOn; uniform float uSweepW;',
     'uniform float uBack; uniform float uFrontA; uniform float uBackA; uniform float uTone; uniform float uBevel;',
     'varying vec3 vN; varying vec3 vW; varying vec2 vUV; varying vec2 vFS; varying float vFlash; varying float vAlpha; varying float vSeed;',
+    '#ifdef BRAND_COLOUR',
+    'varying vec3 vCol;',
+    '#endif',
     'void main() {',
     '  vec3 L = normalize(vec3(-0.45, 0.7, 0.55)); float lt = max(0.0, dot(normalize(vN), L)); float sh = uShMin + (1.0 - uShMin) * lt;',
+    '  #ifdef BRAND_COLOUR',
+    '  vec3 base = mix(vCol * (1.0 - uTone + 2.0 * uTone * vSeed), uLitCol, uLit);',   // Level 2: the real material colour of each part
+    '  #else',
     '  vec3 base = mix(uBase * (1.0 - uTone + 2.0 * uTone * vSeed), uLitCol, uLit);',
+    '  #endif',
     '  vec3 col = base * sh;',
     '  vec2 dd = min(vUV, 1.0 - vUV) * vFS; float ed = min(dd.x, dd.y); float bev = smoothstep(0.0, uBevel, ed);',
     '  col = mix(col, uEdge * (0.6 + 0.4 * sh), (1.0 - bev) * uEdgeK);',
+    '  #ifdef BRAND_COLOUR',
+    '  col = mix(col, vec3(0.267, 0.753, 0.725) * sh, 0.16);',   // a subtle teal hue over the real colours (owner, 1 Nov)
+    '  #endif',
     '  float fl = clamp(vFlash, 0.0, 1.0); col = mix(col, uFlashCol, fl * 0.9);',
     '  float a;',
     '  #ifdef BRAND_LAST',
@@ -6848,11 +6591,11 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     return { uNow: { value: 0 }, uPulse: { value: 0.5 }, uBuilt: { value: 0 }, uSweep: { value: -1e3 }, uSweepOn: { value: 0 }, uSweepW: { value: 6 * CH },
       uFadeGlaze: { value: 0 }, uLitGlass: { value: 0 }, uLitDoor: { value: 0 }, one: { value: 1 }, zero: { value: 0 } };
   }
-  function brandMat(U, look, back, last, opaque, stat) {
+  function brandMat(U, look, back, last, opaque, stat, colour) {
     var u = {
       uNow: U.uNow, uPulse: U.uPulse, uBuilt: U.uBuilt, uSweep: U.uSweep, uSweepOn: U.uSweepOn, uSweepW: U.uSweepW,
       uBase: { value: v3(look.base) }, uLitCol: { value: v3(look.lit || look.base) }, uLit: look.litU || U.zero,
-      uEdge: { value: v3(C.edge) }, uSheen: { value: v3(C.sheen) }, uFlashCol: { value: v3(C.flash) },
+      uEdge: { value: v3(look.edge || C.edge) }, uSheen: { value: v3(C.sheen) }, uFlashCol: { value: v3(C.flash) },
       uShMin: { value: C.shMin }, uEdgeK: { value: look.edgeK == null ? C.edgeK : look.edgeK }, uBevel: { value: look.bevel || 0.012 },
       uBack: { value: back ? 1 : 0 }, uFrontA: { value: look.front == null ? C.front : look.front }, uBackA: { value: C.back }, uTone: { value: look.tone || 0 },
       uDrop: { value: look.drop || 0 }, uFlashOn: { value: look.flash || 0 }, uFade: look.fadeU || U.one
@@ -6862,6 +6605,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS, fragmentShader: FS, transparent: !opaque, premultipliedAlpha: true,
       depthWrite: !back, depthTest: !back, side: back ? THREE.BackSide : THREE.FrontSide });
     mat.defines = {}; if (last) mat.defines.BRAND_LAST = ''; if (opaque) mat.defines.BRAND_OPAQUE = ''; if (stat) mat.defines.BRAND_STATIC = '';
+    if (colour) { mat.defines.BRAND_COLOUR = ''; mat.polygonOffset = true; mat.polygonOffsetFactor = -1; mat.polygonOffsetUnits = -1; }   // Level 2: drawn over the hologram brick it replaces
     return mat;
   }
   function lookOf(part, U) {
@@ -6924,7 +6668,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   };
   VP._brandActive = function () {
     var m = this.model;
-    return !!(this.brand && m && m.clean && !m.custom && m.rows && m.batches && (this.mode === 'build' || this.mode === 'site'));
+    return !!(this.brand && m && m.clean && !m.custom && m.rows && m.batches && (this.mode === 'build' || this.mode === 'site' || this.mode === 'equity' || this.mode === 'complete'));
   };
   VP._bNow = function () { if (!this._bT0) this._bT0 = performance.now(); return (performance.now() - this._bT0) / 1000; };
 
@@ -6935,23 +6679,26 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       g.traverse(function (o) { if (o.geometry && o.geometry !== H._geoms().box) o.geometry.dispose(); if (o.material) o.material.dispose(); });
     }
     this._bBakeTok = (this._bBakeTok || 0) + 1; if (this._bBakeT) { clearTimeout(this._bBakeT); this._bBakeT = 0; }
-    this._bGroup = null; this._bm = null; this._bModel = null; this._bInfo = null; this._bV = null; this._bPrimed = false; this._bLastJ = -1;
+    this._bGroup = null; this._bm = null; this._bModel = null; this._bCutOn = null; this._bInfo = null; this._bV = null; this._bPrimed = false; this._bLastJ = -1;
   };
 
   function staticMesh(n, V, I, U, look, solid, order, part) {
     var sg = new THREE.BufferGeometry(), drop = function () { this.array = null; };   // uploaded once, complete: the page's copy is not kept
     [['position', 3], ['normal', 3], ['uv', 2], ['aFS', 2], ['aIO', 3]].forEach(function (a) { sg.setAttribute(a[0], new THREE.BufferAttribute(new Float32Array(n * V * a[1]), a[1]).onUpload(drop)); });
+    sg.setAttribute('aCol', new THREE.BufferAttribute(new Uint8Array(n * V * 3), 3, true).onUpload(drop));   // Level 2's real colours (3 bytes a vertex)
     sg.setIndex(new THREE.BufferAttribute(n * V > 65535 ? new Uint32Array(n * I) : new Uint16Array(n * I), 1).onUpload(drop));
     sg.setDrawRange(0, 0);
     var stat = new THREE.Mesh(sg, brandMat(U, look, false, false, solid, true));
     stat.frustumCulled = false; stat.renderOrder = order; stat.visible = false; stat.name = 'static:' + part;
     return stat;
   }
+  // each part's real colour, in laying order (bytes, sRGB: the brand shaders write colours as they are)
+  function rgbOf(b, pm, n) { var out = new Uint8Array(n * 3); for (var k = 0; k < n; k++) { var c = H.brandColourOf(b, pm[k]); out[k * 3] = (c >> 16) & 255; out[k * 3 + 1] = (c >> 8) & 255; out[k * 3 + 2] = c & 255; } return out; }
   // bake instances [k0, k1) of a part into its static mesh (world positions, normals as mat3(instance) * normal, face sizes, origins)
   function bakeRange(rec, k0, k1) {
     var g = rec.front.geometry, sg = rec.stat.geometry, V = rec.V, I = rec.I, M = rec.mats;
     var P0 = g.attributes.position.array, N0 = g.attributes.normal.array, U0 = g.attributes.uv ? g.attributes.uv.array : null, X0 = g.index ? g.index.array : null;
-    var A = sg.attributes, pos = A.position.array, nor = A.normal.array, uv = A.uv.array, fs = A.aFS.array, io = A.aIO.array, idx = sg.index.array;
+    var A = sg.attributes, pos = A.position.array, nor = A.normal.array, uv = A.uv.array, fs = A.aFS.array, io = A.aIO.array, idx = sg.index.array, ac = A.aCol.array, RC = rec.rgb;
     for (var k = k0; k < k1; k++) {
       var m = k * 16, a = M[m], b = M[m + 1], c = M[m + 2], d = M[m + 4], e = M[m + 5], f = M[m + 6], gg = M[m + 8], h = M[m + 9], ii = M[m + 10], tx = M[m + 12], ty = M[m + 13], tz = M[m + 14];
       var sx = Math.sqrt(a * a + b * b + c * c), sy = Math.sqrt(d * d + e * e + f * f), sz = Math.sqrt(gg * gg + h * h + ii * ii);
@@ -6963,6 +6710,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         if (ax > 0.5) { fs[o2] = sz; fs[o2 + 1] = sy; } else if (ay > 0.5) { fs[o2] = sx; fs[o2 + 1] = sz; } else { fs[o2] = sx; fs[o2 + 1] = sy; }
         if (U0) { uv[o2] = U0[j * 2]; uv[o2 + 1] = U0[j * 2 + 1]; }
         io[o3] = tx; io[o3 + 1] = ty; io[o3 + 2] = tz;
+        ac[o3] = RC[k * 3]; ac[o3 + 1] = RC[k * 3 + 1]; ac[o3 + 2] = RC[k * 3 + 2];
       }
       for (var q = 0; q < I; q++) idx[k * I + q] = (X0 ? X0[q] : q) + k * V;
     }
@@ -6991,13 +6739,14 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var S = Math.min(rec.S, rec.cnt), lim = rec.stat && rec.ready >= rec.n ? rec.cnt : 0;
     while (S < lim && rec.laid[S] + 2.05 <= now) S++;   // drop 0.9 s, flash 2 s: after that a part looks the same either way
     if (S === rec.S && rec.act === rec.cnt && !rec.dirtyA) return;
+    var c0 = Math.min(rec.cutS || 0, S);   // Level 2: the hologram is not drawn under parts already in colour
     var m = rec.cnt - S, im = rec.front.instanceMatrix;
     if (m > 0) {
       im.array.set(rec.mats.subarray(S * 16, rec.cnt * 16)); im.updateRange.offset = 0; im.updateRange.count = m * 16; im.needsUpdate = true;
       rec.alaid.set(rec.laid.subarray(S, rec.cnt)); rec.attr.updateRange.offset = 0; rec.attr.updateRange.count = m; rec.attr.needsUpdate = true;
     }
     rec.front.count = m; rec.front.visible = m > 0;
-    if (rec.stat) { rec.stat.geometry.setDrawRange(0, S * rec.I); rec.stat.visible = S > 0; }
+    if (rec.stat) { rec.stat.geometry.setDrawRange(c0 * rec.I, (S - c0) * rec.I); rec.stat.visible = S > c0; }
     rec.S = S; rec.act = rec.cnt; rec.dirtyA = false;
   }
 
@@ -7031,7 +6780,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         back.frustumCulled = false; back.count = 0; back.renderOrder = 3; grp.add(back);
       }
       return { bi: bi, part: part, n: n, front: front, back: back, laid: laid, attr: at, rank: P.rank[bi], cnt: 0, drop: part === 'brick' || part === 'roof',
-        mats: mats, alaid: alaid, stat: stat, V: V, I: I, ready: 0, S: 0, act: -1 };
+        mats: mats, alaid: alaid, stat: stat, V: V, I: I, ready: 0, S: 0, act: -1, look: look, rgb: rgbOf(b, pm, n), cutS: 0 };
     });
     this._bBakeGo();
     // window glow (6.5, Night): a soft gold radial over each pane, alpha (0.22 + 0.10 * pulse) * lit, additive, no depth write
@@ -7122,25 +6871,72 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this.dirty = true;
   };
 
+  // Level 2 colour layer (owner, 1 Nov 2026): the same parts again in their real colours, laid over the hologram in the same order
+  // with the same drop and flash. Landed parts sit in a static mesh that shares the hologram's baked buffers; parts still landing
+  // are instances. Made on first use.
+  function colourLayer(self, rec) {
+    if (rec.C) return rec.C;
+    var U = self._bU, n = rec.n, lk = Object.assign({}, rec.look, { edge: [0.55, 0.53, 0.50], edgeK: rec.part === 'brick' ? 0.5 : (rec.look.edgeK == null ? 0.3 : rec.look.edgeK), tone: 0.06 });
+    var solid = rec.part !== 'glass', C = { laid: new Float32Array(n).fill(1e9), cnt: 0, S: 0, act: -1, dirty: true, stat: null };
+    var gf = new THREE.BufferGeometry(), g0 = rec.front.geometry;
+    ['position', 'normal', 'uv'].forEach(function (k) { if (g0.attributes[k]) gf.setAttribute(k, g0.attributes[k]); }); if (g0.index) gf.setIndex(g0.index);
+    C.alaid = new Float32Array(n).fill(1e9); C.attr = new THREE.InstancedBufferAttribute(C.alaid, 1); C.attr.setUsage(THREE.DynamicDrawUsage); gf.setAttribute('aLaid', C.attr);
+    var f = C.front = new THREE.InstancedMesh(gf, brandMat(U, lk, false, false, solid, false, true), n);
+    f.instanceMatrix.setUsage(THREE.DynamicDrawUsage); f.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3); f.instanceColor.setUsage(THREE.DynamicDrawUsage);
+    f.frustumCulled = false; f.count = 0; f.visible = false; f.renderOrder = rec.front.renderOrder + 1; f.name = 'colour:' + rec.part; self._bGroup.add(f);
+    if (rec.stat) {
+      var sg = rec.stat.geometry, g2 = new THREE.BufferGeometry();
+      ['position', 'normal', 'uv', 'aFS', 'aIO', 'aCol'].forEach(function (k) { g2.setAttribute(k, sg.attributes[k]); }); g2.setIndex(sg.index); g2.setDrawRange(0, 0);
+      C.stat = new THREE.Mesh(g2, brandMat(U, lk, false, false, solid, true, true)); C.stat.frustumCulled = false; C.stat.visible = false;
+      C.stat.renderOrder = rec.front.renderOrder + 1; C.stat.name = 'colourStatic:' + rec.part; self._bGroup.add(C.stat);
+    }
+    return (rec.C = C);
+  }
+  function syncColour(rec, now) {
+    var C = rec.C, S = Math.min(C.S, C.cnt), lim = rec.stat && rec.ready >= rec.n ? C.cnt : 0;
+    while (S < lim && C.laid[S] + 2.05 <= now) S++;
+    if (S === C.S && C.act === C.cnt && !C.dirty) return;
+    var m = C.cnt - S, f = C.front;
+    if (m > 0) {
+      f.instanceMatrix.array.set(rec.mats.subarray(S * 16, C.cnt * 16)); f.instanceMatrix.updateRange.offset = 0; f.instanceMatrix.updateRange.count = m * 16; f.instanceMatrix.needsUpdate = true;
+      var ic = f.instanceColor.array; for (var k = S; k < C.cnt; k++) { var o = (k - S) * 3; ic[o] = rec.rgb[k * 3] / 255; ic[o + 1] = rec.rgb[k * 3 + 1] / 255; ic[o + 2] = rec.rgb[k * 3 + 2] / 255; }
+      f.instanceColor.updateRange.offset = 0; f.instanceColor.updateRange.count = m * 3; f.instanceColor.needsUpdate = true;
+      C.alaid.set(C.laid.subarray(S, C.cnt)); C.attr.updateRange.offset = 0; C.attr.updateRange.count = m; C.attr.needsUpdate = true;
+    }
+    f.count = m; f.visible = m > 0;
+    if (C.stat) { C.stat.geometry.setDrawRange(0, S * rec.I); C.stat.visible = S > 0; }
+    if (rec.cutS !== S) { rec.cutS = S; rec.dirtyA = true; }   // the hologram stops under what is now in colour
+    C.S = S; C.act = C.cnt; C.dirty = false;
+  }
+  // how many parts of each kind are in colour for equity share e; new ones get their lay time (stagger as Level 1)
+  VP._brandColour = function (on, e, now, inst) {
+    var self = this, P = H.brandPlan(this.model), Vc = H.brandColourUnits(P, e), V0 = this._bVc == null ? 0 : this._bVc;
+    var add = Math.max(0, Vc - V0), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.12, 0.9 / add) : 0;
+    (this._bm || []).forEach(function (rec) {
+      if (!rec) return;
+      if (!on) { if (rec.C) { rec.C.front.visible = false; if (rec.C.stat) rec.C.stat.visible = false; rec.C.cnt = 0; rec.C.S = 0; rec.C.laid.fill(1e9); rec.C.dirty = true; } if (rec.cutS) { rec.cutS = 0; rec.dirtyA = true; } return; }
+      var C = colourLayer(self, rec), k1 = lowerBound(P.rank2[rec.bi], Vc), k0 = C.cnt;
+      if (k1 > k0) { for (var k = k0; k < k1; k++) C.laid[k] = inst ? -1000 : now + Math.floor(Math.max(0, P.rank2[rec.bi][k] - V0)) * stp; C.dirty = true; }
+      else if (k1 < k0) { for (var k2 = k1; k2 < k0; k2++) C.laid[k2] = 1e9; C.dirty = true; }
+      C.cnt = k1; syncColour(rec, now);
+    });
+    this._bVc = on ? Vc : null;
+    return Vc;
+  };
+
   // apply(): the Level 1 build under the brand look
   VP._brandApplyAll = function () {
     var m = this.model, F = m.focus;
     if (this._bModel !== m) this._brandBuild();
+    if (this._bMode !== this.mode) { this._bPrimed = false; this._bMode = this.mode; this._bEq = null; }   // a new level: the hologram shows at once, the colour lays from 0
     this._brandEnv(true);
     var P = H.brandPlan(m), IDLE = H._IDLE_PLANE;
-    this.batches.forEach(function (B, bi) {
-      var part = P.parts[bi], b = B.b, mats = B.mats;
-      if (part === 'ctx') {   // flats: the rest of the block, a faint silhouette as before
-        B.rev.visible = false; B.main.visible = b.hideAfter >= 2; B.main.count = B.n; B.main.castShadow = false; B.main.receiveShadow = false;
-        B.main.material = mats.blue; mats.blue.clippingPlanes = [IDLE];
-      } else { B.main.visible = false; B.rev.visible = false; }
+    this.batches.forEach(function (B, bi) {   // flats: the rest of the block, a faint silhouette
+      if (B.main) B.main.visible = P.parts[bi] === 'ctx' && B.b.hideAfter >= 2;
     });
-    if (this.edges) { this.edges.visible = !F; this.edges.material.clippingPlanes = [IDLE]; this.edges.material.opacity = 0.34; }   // the finished house as a faint wire
-    if (this.rowBand) this.rowBand.visible = false;
-    if (this.water) this.water.visible = false;
+    if (this.edges) { this.edges.visible = !F && (this.mode === 'build' || this.mode === 'site'); this.edges.material.clippingPlanes = [IDLE]; this.edges.material.opacity = 0.34; }   // the finished house as a faint wire
     if (this.focusBox) this.focusBox.visible = true;
     this._brandApply();
-    if (this._lastMode !== this.mode) this._shadowDirty = true;   // one refresh clears any old shadow; the hologram casts none
     this._lastMode = this.mode;
     this.dirty = true; this.wake();
   };
@@ -7148,7 +6944,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   // counts, per-brick stamps and the frame's uniforms (called by apply() and every animated frame)
   VP._brandApply = function () {
     var m = this.model; if (!m || !this._bm) return;
-    var P = H.brandPlan(m), R = P.rows, p = this.mode === 'site' ? 0 : this.p, now = this._bNow(), motion = reduced(), red = motion || !!this._bLite, U = this._bU, E = this._bEnvObj;
+    var L2 = this.mode === 'equity' || this.mode === 'complete';
+    var P = H.brandPlan(m), R = P.rows, p = this.mode === 'site' ? 0 : (L2 ? 1 : this.p), now = this._bNow(), motion = reduced(), red = motion || !!this._bLite, U = this._bU, E = this._bEnvObj;
     var V = units(P, p), V0 = this._bV == null ? -1 : this._bV, inst = motion || !this._bPrimed;   // lite keeps the drop and flash, not the ambient motion
     var add = Math.max(0, V - Math.max(V0, 0)), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.12, 0.9 / add) : 0;
     if (V !== V0) {
@@ -7171,11 +6968,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       if (V > V0) this._bGrow = now;
     }
     this._bPrimed = true;
+    // Level 2: the parts in full colour follow the equity share of the home's value (eased by the frame loop, from 0 when the level opens)
+    var eqS = L2 ? (this._bEq == null ? this.eq : this._bEq) : 0, Vc = this._brandColour(L2, eqS, now, motion);
     this._bm.forEach(function (rec) { if (rec) syncPart(rec, now); });
     var st = H.brandStats(m, p), L = st.bricksLaid, pulse = red ? 0.5 : 0.5 + 0.5 * Math.sin(performance.now() * 0.002244);
     // the last brick laid: stays lit pale gold, 14% proud; shown once it has landed
     var hl = this._bHL, last = null;
-    if (L > 0) {
+    if (L > 0 && !L2) {
       var j = L - 1, rec = this._bm[P.bBi[j]], kk = P.bK[j], b = m.batches[P.bBi[j]], o = P.perm[P.bBi[j]][kk] * 10, xf = b.xf;
       if (this._bLastJ !== j) {
         var mm = new THREE.Matrix4(), e = new THREE.Euler(xf[o + 6], xf[o + 7], xf[o + 8], 'YZX');
@@ -7189,6 +6988,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     // stage uniforms
     U.uNow.value = now; U.uPulse.value = pulse; U.uBuilt.value = seg(p, 0.05, 1);
     U.uFadeGlaze.value = seg(p, 0.88, 0.93); U.uLitGlass.value = seg(p, 0.93, 0.96); U.uLitDoor.value = seg(p, 0.96, 1);
+    if (this.mode === 'equity') { U.uLitGlass.value = 0; U.uLitDoor.value = 0; }   // the lights go on when the mortgage is paid off
+    var cy = Vc <= 0 ? R.y0 : (Vc <= P.N ? P.top[Vc - 1] : (P.T ? P.tileTop[Math.min(P.T - 1, Vc - P.N - 1)] : R.y1));   // top of the last part in colour
     var top = Math.max(R.y1, R.y0 + 1), span = top - R.y0;
     U.uSweepOn.value = (red || this._bLite) ? 0 : 1;
     U.uSweep.value = R.y0 + ((now * 20 * CH) % (span + 40 * CH)) - 10 * CH;   // 20 courses a second, repeating
@@ -7197,13 +6998,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     E.site.material.opacity = 0.55 * sb; E.site.visible = sb > 0;
     E.fline.material.opacity = 0.75 * fnd; E.fline.visible = fnd > 0; E.fillMat.opacity = 0.14 * fnd; E.fills.forEach(function (f) { f.visible = fnd > 0; });
     var ping = red ? 0 : (performance.now() % 2800) / 2800, rg = ping * E.big * 0.625;
-    E.ring.visible = !red && p > 0.05; E.ring.scale.set(E.w + 2 * rg, 1, E.d + 2 * rg); E.ring.material.opacity = (1 - ping) * (0.10 + 0.40 * seg(p, 0.5, 1));
+    E.ring.visible = !red && p > 0.05 && !L2; E.ring.scale.set(E.w + 2 * rg, 1, E.d + 2 * rg); E.ring.material.opacity = (1 - ping) * (0.10 + 0.40 * seg(p, 0.5, 1));
     if (E.rafters) { var nT = Math.ceil(seg(p, 0.60, 0.80) * 18); E.rafters.visible = nT > 0; E.rafters.geometry.setDrawRange(0, nT * E.rafters.userData.per); }
-    var pa = 1 - seg(p, 0.97, 1);
-    E.slice.visible = pa > 0 && p > 0; E.slice.position.y = st.y; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
+    var pa = L2 ? (eqS > 0 && eqS < 1 ? 1 : 0) : 1 - seg(p, 0.97, 1), sy = L2 ? cy : st.y;
+    E.slice.visible = pa > 0 && p > 0; E.slice.position.y = sy; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
     this._bPulse = pulse;
-    this._bInfo = { p: p, row: st.row, rows: st.rows, y: st.y, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
-      sliceA: pa, keys: st.keys, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: motion };
+    this._bInfo = { mode: this.mode, eq: eqS, colour: L2 ? Math.min(P.N + P.T, Vc) : 0, colourTotal: P.N + P.T, p: p, row: st.row, rows: st.rows, y: sy, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
+      sliceA: pa, keys: st.keys && !L2, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: motion };
     // auto orbit (6.6.8): drifts round slowly, stops at a touch, resumes after 2.5 s idle; off for reduced motion
     var ctl = this.controls;
     if (red || this._bLite) ctl.autoRotate = false;
@@ -7232,6 +7033,11 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red;
     if (red) this.p = target;
     else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 0.55); if (Math.abs(target - this.p) < 0.0003) this.p = target; }   // slow motion (owner, 31 Oct): a deposit builds over about five seconds
+    if (this.mode === 'equity' || this.mode === 'complete') {   // Level 2: the colour bricks lay as the equity share eases up, from 0 when the level opens
+      if (this._bEq == null) this._bEq = red ? this.eq : 0;
+      if (red) this._bEq = this.eq;
+      else if (this._bEq !== this.eq) { this._bEq += (this.eq - this._bEq) * Math.min(1, dt * 0.55); if (Math.abs(this.eq - this._bEq) < 0.0003) this._bEq = this.eq; }
+    }
     this._brandApply();
     this._bWasSettled = this._brandSettled();
     // at rest (nothing landing, no touch for 1.5 s, no camera fly): only the slow pulse, sweep, ring and orbit move, and they run on the
@@ -7243,8 +7049,12 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   VP._brandSettled = function () {
     var target = this._bTarget == null ? this.p : this._bTarget;
     if (Math.abs(target - this.p) > 1e-9) return false;
+    if ((this.mode === 'equity' || this.mode === 'complete') && (this._bEq == null || Math.abs(this._bEq - this.eq) > 1e-9)) return false;
     var now = this._bNow(), busy = false;
-    (this._bm || []).forEach(function (rec) { if (rec && rec.cnt > 0 && rec.laid[rec.cnt - 1] > -999 && now < rec.laid[rec.cnt - 1] + 2.1) busy = true; });
+    (this._bm || []).forEach(function (rec) {
+      if (rec && rec.cnt > 0 && rec.laid[rec.cnt - 1] > -999 && now < rec.laid[rec.cnt - 1] + 2.1) busy = true;
+      if (rec && rec.C && rec.C.cnt > 0 && rec.C.laid[rec.C.cnt - 1] > -999 && now < rec.C.laid[rec.C.cnt - 1] + 2.1) busy = true;
+    });
     return !busy;
   };
   VP.brandInfo = function () { return this._brandActive() ? this._bInfo : null; };
@@ -11573,7 +11383,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <div class="scene-lbl" id="sceneLabel" style="display:none"></div>
 
       <div class="scene" id="house-scene" style="position:relative">
-        <svg id="houseSvg" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block"></svg>
+        <canvas id="hbStill" role="img" aria-label="Still picture of your house" style="width:100%;height:100%;display:block"></canvas>
 
         <div id="house-pro-lock" style="position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgb(var(--panel-rgb) / .82);backdrop-filter:blur(6px);text-align:center;padding:24px">
           <div style="font-size:1.8rem;margin-bottom:10px">🔒</div>
@@ -11739,24 +11549,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 <!-- Your own design: upload a 3D model or generate one with AI (one collapsed card) -->
 <div style="max-width:1140px;margin:16px auto 0;padding:0 20px">
 <details class="ov-chart-card hb-own" id="hb-own-design" data-adv>
-<summary class="ov-chart-title hb-own-sum">Your own design <span class="hb-own-pro">PRO</span><span class="hb-own-hint">Upload a 3D model or describe one for AI to build</span></summary>
-<div class="g2" style="margin-top:12px">
-  <div class="hb-own-col">
-    <div class="ov-chart-title" style="margin-bottom:10px">Upload a 3D model <span style="font-size:.45rem;padding:2px 6px;background:rgb(var(--brass-rgb) / .15);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:3px;color:var(--go);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em">PRO</span></div>
-    <p style="font-size:.58rem;color:var(--t3);margin-bottom:8px">Use your own GLB/GLTF house model as your House Builder house. It builds as a hologram while you save the deposit, then turns to full colour as you own it.</p>
-    <input type="file" id="model-file-input" accept=".glb,.gltf" style="display:none" onchange="loadCustomModel(this)">
-    <button class="btn-add-data" onclick="document.getElementById('model-file-input').click()" style="width:100%;margin-bottom:6px">📁 Upload GLB / GLTF</button>
-    <div id="hb-upload-msg" style="font-size:.58rem;color:var(--t2);min-height:14px"></div>
-    <div id="hb-design-status" class="hbd" style="display:none"></div>
-  </div>
-  <div class="hb-own-col">
-    <div class="ov-chart-title" style="margin-bottom:10px">Generate with AI <span style="font-size:.45rem;padding:2px 6px;background:rgb(var(--brass-rgb) / .15);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:3px;color:var(--go);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em">PRO</span></div>
-    <p style="font-size:.58rem;color:var(--t3);margin-bottom:8px">Describe your dream home and Meshy AI will model it in 3D (2–6 minutes). It becomes your House Builder house, built as a hologram with your deposit and in colour once you own it. Requires a Meshy API key (⚙ Settings).</p>
-    <textarea id="meshy-prompt" class="al-inp" rows="3" placeholder="e.g. A modern detached house with large windows, white render, flat roof and a double garage..." style="width:100%;resize:vertical"></textarea>
-    <button id="meshy-go" class="btn-add-data" onclick="generateMeshyModel()" style="width:100%;margin-top:8px">✨ Generate 3D House</button>
-    <div id="meshy-status" style="font-size:.58rem;color:var(--t2);margin-top:8px;min-height:16px"></div>
-  </div>
-</div>
+<summary class="ov-chart-title hb-own-sum">Your own design <span class="hb-own-pro">PRO</span><span class="hb-own-hint">🔒 Coming later as part of Pro</span></summary>
+<p class="hb-own-locked" style="font-size:.62rem;color:var(--t2);margin-top:10px">Upload a 3D model or describe one for AI to build, and it becomes your House Builder house. Coming later as part of Pro.</p>
 </details>
 </div>
 
@@ -12416,7 +12210,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <div class="settings-row"><label class="settings-label">Contrast</label><div class="settings-opts" id="set-contrast"><button data-val="standard" onclick="setSetting('contrast','standard',this)" class="active">Standard</button><button data-val="high" onclick="setSetting('contrast','high',this)">High Contrast</button></div></div>
       <div class="settings-row"><label class="settings-label">Motion</label><div class="settings-opts" id="set-motion"><button data-val="full" onclick="setSetting('motion','full',this)" class="active">Full</button><button data-val="reduced" onclick="setSetting('motion','reduced',this)">Reduced</button></div></div>
       <div class="settings-row"><label class="settings-label">Currency</label><div class="settings-opts" id="set-currency"><button data-val="GBP" onclick="setSetting('currency','GBP',this)" class="active">£ GBP</button><button data-val="USD" onclick="setSetting('currency','USD',this)">$ USD</button><button data-val="EUR" onclick="setSetting('currency','EUR',this)">€ EUR</button><button data-val="INR" onclick="setSetting('currency','INR',this)">₹ INR</button></div></div>
-      <div class="settings-row"><label class="settings-label">House builder</label><div class="settings-opts" id="set-house3d"><button data-val="1" onclick="setViewFlag('house',true,this)">Brand build</button><button data-val="0" onclick="setViewFlag('house',false,this)">Classic</button></div></div>
       <div class="settings-row"><label class="settings-label">Share usage</label><div class="settings-opts" id="set-fbact"><button data-val="1" onclick="viFbAct(true,this)">On</button><button data-val="0" onclick="viFbAct(false,this)">Off</button></div></div>
       <p class="wi-link-hint" style="margin:-4px 0 10px">During the beta the app records which screens and features you use, errors and how long you stay, in our own database, to improve it. Never your figures or what you type.</p>
       <div class="settings-row"><label class="settings-label">Net worth</label><div class="settings-opts" id="set-nw3d"><button data-val="1" onclick="setViewFlag('nw',true,this)">3D</button><button data-val="0" onclick="setViewFlag('nw',false,this)">Classic chart</button></div></div>
@@ -13680,7 +13473,8 @@ body.vi-pop-open{overflow:hidden}
 .hbd .hbd-dim{color:var(--t3);margin-top:3px}
 .hbd .hbd-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
 #house-scene:not([data-engine="3d"])>canvas.hb3d-canvas,#house-scene:not([data-engine="3d"]) #hb3d-ov{display:none}
-#house-scene[data-engine="3d"] #houseSvg{display:none!important}
+#house-scene[data-engine="3d"] #hbStill{display:none!important}
+#house-scene[data-engine="still"] .hud-bar,#house-scene[data-engine="still"] .vp-key{display:none!important}   /* the still picture has nothing to zoom or orbit */
 #hb3d-ov{position:absolute;inset:0;z-index:10;pointer-events:none;overflow:hidden;font-family:'Share Tech Mono',monospace}
 .hb-row{margin:8px 0 6px;padding:10px 12px;border:1px solid rgb(var(--gold-rgb) / .5);border-radius:8px;background:rgb(var(--gold-rgb) / .07)}
 .hb-row-n{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--gold);letter-spacing:.12em}
@@ -14579,877 +14373,101 @@ function depositTarget(){return Math.max(1,(+state.target||0)*((+state.depositPc
 function pct(){return Math.min(state.saved/depositTarget(),1);}
 
 
-// ═══════════════════════════════════════════════════════════════
-// ISO BLUEPRINT ENGINE — PurposeOS
-// Isometric architectural drawing engine
-// Brand: #44c0b9 teal · #080808 charcoal · #c9a84c gold · Syne/Share Tech Mono
-// ═══════════════════════════════════════════════════════════════
-
-// Drawing helpers — declare S, NS, E for the draw functions
-const S = document.getElementById('houseSvg');
-const NS = 'http://www.w3.org/2000/svg';
-function E(tag,attrs,parent){
-  const e=document.createElementNS(NS,tag);
-  for(const[k,v]of Object.entries(attrs))e.setAttribute(k,String(v));
-  if(parent)parent.appendChild(e);
-  return e;
-}
-function getDefs(){let d=S.querySelector('defs');if(!d){d=E('defs',{},S);}return d;}
-function removeById(id){const e=S.getElementById(id);if(e)e.parentNode.removeChild(e);}
-
-// ── ISO COORDINATE SYSTEM ────────────────────────────────────────
-let _ox=300, _oy=200, _tx=28, _ty=14, _tz=30;
-const _HZ_DEFAULT=1.2, _VX=335, _VY=255;   // default zoom multiplier; the model is centred on (_VX,_VY), left of the zoom buttons
-// per model, keyed by its base origin x: [centre x, centre y, width, height] of the full model at scale 1 → auto-fit so each fills the view
-const _HFIT={280:[239,261,452,300],265:[197,262,430,338],220:[177,209,470,381],250:[222,203,450,374],200:[239,175,217,248],175:[191,135,295,331]};
-let _houseZoom=_HZ_DEFAULT;   // pinch / wheel / +/- multiply the auto-fit
-function _setView(ox,oy,tx,ty,tz){   // every house model sets its base view here
-  const f=_HFIT[ox]||_HFIT[280], fit=Math.max(.9,Math.min(2.1,Math.min(600/f[2],440/f[3]))), s=fit*_houseZoom;
-  _ox=_VX+(ox-f[0])*s; _oy=_VY+(oy-f[1])*s; _tx=tx*s; _ty=ty*s; _tz=tz*s;
-}
-
-// Pan & orbit state
+// House viewport globals (zoom and the expanded stage), shared by the 3D view and its controls. The SVG blueprint engine that lived
+// here is gone (owner, 1 Nov 2026): the brand 3D build is the only house builder, with a still picture where 3D cannot run.
+const _HZ_DEFAULT=1.2, _VX=335, _VY=255;
+let _houseZoom=_HZ_DEFAULT;
 let _panX=0, _panY=0, _viewAngle=0, _isExpanded=false;
 
-function _iso(x,y,z){
-  let rx=x, ry=y;
-  if(_viewAngle!==0){
-    const c=Math.cos(_viewAngle), s=Math.sin(_viewAngle);
-    rx=x*c-y*s; ry=x*s+y*c;
-  }
-  return {
-    x: _ox+(rx-ry)*_tx+_panX,
-    y: _oy+(rx+ry)*_ty-z*_tz+_panY
-  };
-}
-function _pts(corners){
-  return corners.map(([x,y,z])=>{const p=_iso(x,y,z);return `${p.x.toFixed(1)},${p.y.toFixed(1)}`;}).join(' ');
-}
-function _face(corners,fill,stroke,sw,dash){
-  const a={points:_pts(corners),fill:fill||'none'};
-  if(stroke){a.stroke=stroke;a['stroke-width']=sw||1;}
-  if(dash)a['stroke-dasharray']=dash;
-  return E('polygon',a,S);
-}
-function _line(a,b,stroke,sw,dash){
-  const pa=_iso(a[0],a[1],a[2]||0), pb=_iso(b[0],b[1],b[2]||0);
-  const at={x1:pa.x.toFixed(1),y1:pa.y.toFixed(1),x2:pb.x.toFixed(1),y2:pb.y.toFixed(1),stroke:stroke||'rgba(68,192,185,.5)','stroke-width':sw||0.8};
-  if(dash)at['stroke-dasharray']=dash;
-  return E('line',at,S);
-}
-function _txt(x,y,text,size,fill,anchor,weight,spacing){
-  const t=E('text',{x,y,'font-size':size||8,'font-family':'Syne,sans-serif','font-weight':weight||'700',fill:fill||'rgba(200,230,230,.75)','text-anchor':anchor||'middle','letter-spacing':spacing||1.5},S);
-  t.textContent=text; return t;
-}
-function _annot(isoCoord,text,dx,dy,color){
-  const p=_iso(isoCoord[0],isoCoord[1],isoCoord[2]||0);
-  color=color||'rgba(200,230,230,.55)';
-  _line([isoCoord[0],isoCoord[1],isoCoord[2]||0],[isoCoord[0],isoCoord[1],isoCoord[2]||0],color,.6,'');
-  E('line',{x1:p.x,y1:p.y,x2:p.x+dx*.65,y2:p.y+dy*.65,stroke:color,'stroke-width':.7,'stroke-dasharray':'3,2'},S);
-  const ta=E('text',{x:p.x+dx,y:p.y+dy,'font-size':6.5,'font-family':'Syne,sans-serif','font-weight':'700',fill:color,'letter-spacing':1.5,'text-anchor':dx>0?'start':dx<0?'end':'middle'},S);
-  ta.textContent=text;
-}
-
-// ── GROUND GRID ───────────────────────────────────────────────────
-function _grid(x0,y0,x1,y1,z){
-  z=z||0;
-  // ── Ground plane fills the full viewport ──
-  // X = left/right axis. Y = depth axis. Z = height axis (up).
-  // Lines fade as they approach the edges (horizon effect).
-
-  const cx=(x0+x1)/2, cy=(y0+y1)/2;
-  const maxR=Math.max(x1-x0,y1-y0)*0.7;
-
-  function fade(gx,gy){
-    const dx=gx-cx, dy=gy-cy;
-    const d=Math.sqrt(dx*dx+dy*dy);
-    return Math.max(0, 1-d/maxR);
-  }
-
-  // Grid lines along X axis (constant Y, varying X) — depth lines
-  for(let gy=y0;gy<=y1;gy++){
-    const a=_iso(x0,gy,z), b=_iso(x1,gy,z);
-    const f=fade(cx,gy);
-    const op=(0.12*f+0.02).toFixed(3);
-    E('line',{x1:a.x.toFixed(1),y1:a.y.toFixed(1),x2:b.x.toFixed(1),y2:b.y.toFixed(1),
-      stroke:'rgba(68,192,185,'+op+')','stroke-width':.6},S);
-  }
-  // Grid lines along Y axis (constant X, varying Y) — width lines
-  for(let gx=x0;gx<=x1;gx++){
-    const a=_iso(gx,y0,z), b=_iso(gx,y1,z);
-    const f=fade(gx,cy);
-    const op=(0.12*f+0.02).toFixed(3);
-    E('line',{x1:a.x.toFixed(1),y1:a.y.toFixed(1),x2:b.x.toFixed(1),y2:b.y.toFixed(1),
-      stroke:'rgba(68,192,185,'+op+')','stroke-width':.6},S);
-  }
-
-  // Dot intersections — smaller radius away from centre, horizon fade
-  for(let gx=x0;gx<=x1;gx+=1){
-    for(let gy=y0;gy<=y1;gy+=1){
-      const p=_iso(gx,gy,z);
-      const f=fade(gx,gy);
-      if(f<0.05) continue;
-      const op=(0.7*f+0.08).toFixed(3);
-      const r=(1.8*f+0.4).toFixed(2);
-      E('circle',{cx:p.x.toFixed(1),cy:p.y.toFixed(1),r:r,
-        fill:'rgba(68,192,185,'+op+')'},S);
-    }
-  }
-
-  // Axis markers at origin — X and Y axis lines (bright)
-  const o=_iso(0,0,0);
-  const xEnd=_iso(3,0,0), yEnd=_iso(0,3,0);
-  // X axis (right)
-  E('line',{x1:o.x.toFixed(1),y1:o.y.toFixed(1),x2:xEnd.x.toFixed(1),y2:xEnd.y.toFixed(1),
-    stroke:'rgba(68,192,185,.55)','stroke-width':1.2,'stroke-dasharray':'4,3'},S);
-  // Y axis (depth)
-  E('line',{x1:o.x.toFixed(1),y1:o.y.toFixed(1),x2:yEnd.x.toFixed(1),y2:yEnd.y.toFixed(1),
-    stroke:'rgba(201,168,76,.45)','stroke-width':1.2,'stroke-dasharray':'4,3'},S);
-}
-
-// ── HOUSE BLOCK (walls + optional roof) ──────────────────────────
-// ghost: draw as white wireframe only
-// p: progress 0..1 controls how built the walls/roof are
-function _walls(x,y,z,w,d,wallH,p,ghost,accent){
-  const isG=ghost||false;
-  const ecBase = isG ? 'rgba(255,255,255,.22)' : (accent||'rgba(68,192,185,.88)');
-  const ec  = (!isG && p>=1.0) ? (accent||'rgba(100,220,215,1.0)') : ecBase;
-  const sw  = isG ? .7 : (p>=1.0 ? 1.3 : 1.1);
-  const wFrac = isG ? .3 : Math.min(p, 1);
-  const wH    = wallH * wFrac;
-  if(wH < .01) return;
-
-  const wfa = isG ? 0 : Math.min(0.07+wFrac*0.16, 0.23);
-  const ff  = isG ? 'none' : `rgba(68,192,185,${wfa.toFixed(2)})`;
-  const fs  = isG ? 'none' : `rgba(28,65,80,${(wfa*1.6).toFixed(2)})`;
-  const ft  = isG ? 'none' : `rgba(68,192,185,${(wfa*0.8).toFixed(2)})`;
-
-  // Inner fill lines for blueprint texture
-  if(!isG && wH > .5){
-    const cols = Math.ceil(w/0.8);
-    for(let i=1;i<cols;i++){
-      const lx=x+i*w/cols;
-      const pa=_iso(lx,y,z), pb=_iso(lx,y,z+wH);
-      E('line',{x1:pa.x,y1:pa.y,x2:pb.x,y2:pb.y,stroke:'rgba(68,192,185,.12)','stroke-width':.5},S);
-    }
-  }
-
-  // Draw all 4 walls — painter's order: far faces first, near faces last
-  // Back face (y+d — far side)
-  const fbk = isG ? 'none' : `rgba(18,50,65,${(wfa*1.4).toFixed(2)})`;
-  _face([[x,y+d,z],[x+w,y+d,z],[x+w,y+d,z+wH],[x,y+d,z+wH]], fbk, ec, sw*.8);
-  // Left face (x — far-left side)
-  const flt = isG ? 'none' : `rgba(24,60,75,${(wfa*1.2).toFixed(2)})`;
-  _face([[x,y,z],[x,y+d,z],[x,y+d,z+wH],[x,y,z+wH]], flt, ec, sw*.8);
-  // Front face (y face — near)
-  _face([[x,y,z],[x+w,y,z],[x+w,y,z+wH],[x,y,z+wH]], ff, ec, sw);
-  // Right face (x+w face — near-right)
-  _face([[x+w,y,z],[x+w,y+d,z],[x+w,y+d,z+wH],[x+w,y,z+wH]], fs, ec, sw);
-  // Top plate
-  if(wFrac < .99){
-    _face([[x,y,z+wH],[x+w,y,z+wH],[x+w,y+d,z+wH],[x,y+d,z+wH]], ft, ec, sw*.6);
-  } else {
-    _face([[x,y,z+wH],[x+w,y,z+wH],[x+w,y+d,z+wH],[x,y+d,z+wH]], ft, ec, sw*.7);
-  }
-
-  // Floor line at 50% height (all 4 walls)
-  if(!isG && p >= .25 && wH >= wallH*.5){
-    _line([x,y,z+wallH*.5],[x+w,y,z+wallH*.5], 'rgba(68,192,185,.22)', .7, '3,2');
-    _line([x+w,y,z+wallH*.5],[x+w,y+d,z+wallH*.5], 'rgba(68,192,185,.16)', .5, '3,2');
-    _line([x,y,z+wallH*.5],[x,y+d,z+wallH*.5], 'rgba(68,192,185,.14)', .5, '3,2');
-    _line([x,y+d,z+wallH*.5],[x+w,y+d,z+wallH*.5], 'rgba(68,192,185,.12)', .4, '3,2');
-  }
-  // Update brick count
-  if(!isG){
-    const el=document.getElementById('stBricks');
-    if(el)el.textContent=Math.floor(wFrac*w*d*wallH*8)|0;
-  }
-}
-
-function _roof(x,y,z,w,d,rh,p,ghost){
-  const isG=ghost||false;
-  const ec  = isG ? 'rgba(255,255,255,.18)' : (p>=1.0?'rgba(100,220,215,.95)':'rgba(68,192,185,.82)');
-  const sw  = isG ? .7 : (p>=1.0?1.2:1);
-  const ff  = isG ? 'none'                  : 'rgba(68,192,185,.07)';
-  const fs  = isG ? 'none'                  : 'rgba(50,100,110,.15)';
-
-  const rx=x+w/2, ry=y+d/2;
-  const ridgeZ=z+rh;
-
-  if(p < .50){
-    // Wireframe roof outline only — no fill (remove dark blue planes)
-    _face([[x,y,z],[x+w,y,z],[rx,y,ridgeZ]], 'none', ec, sw, '4,3');
-    _face([[x+w,y,z],[x+w,y+d,z],[rx,ry,ridgeZ],[rx,y,ridgeZ]], 'none', ec, sw, '4,3');
-    return;
-  }
-
-  const rp=Math.min(Math.max(p-0.50,0)/0.40,1);
-  const rfa=0.07+rp*0.20;
-  const fFill=isG?ff:`rgba(68,192,185,${rfa.toFixed(2)})`;
-  const sFill=isG?fs:`rgba(30,75,90,${(rfa*1.1).toFixed(2)})`;
-
-  // All 4 roof faces — painter's order: far faces first
-  // Back gable triangle (y+d side — far)
-  _face([[x,y+d,z],[x+w,y+d,z],[rx,y+d,ridgeZ]], sFill, ec, sw*.85);
-  // Left slope face (x side — far-left)
-  _face([[x,y,z],[x,y+d,z],[rx,y+d,ridgeZ],[rx,y,ridgeZ]], sFill, ec, sw*.85);
-  // Front gable triangle (y side — near)
-  _face([[x,y,z],[x+w,y,z],[rx,y,ridgeZ]], fFill, ec, sw);
-  // Right slope face (x+w side — near-right)
-  _face([[x+w,y,z],[x+w,y+d,z],[rx,y+d,ridgeZ],[rx,y,ridgeZ]], sFill, ec, sw);
-
-  // Ridge line
-  if(!isG)_line([rx,y,ridgeZ],[rx,y+d,ridgeZ], 'rgba(68,192,185,.65)', 1.2);
-
-  // Roof timbers: visible 40-70% (wireframe interior)
-  if(!isG && p >= .40 && p < .72){
-    const steps=5;
-    for(let i=0;i<=steps;i++){
-      const t=i/steps;
-      const bx=x+t*w;
-      // Rafter from eave to ridge (front face rafters)
-      _line([bx,y,z],[rx,y,ridgeZ], 'rgba(68,192,185,.22)', .6, '2,3');
-    }
-    // Purlins
-    for(let j=1;j<3;j++){
-      const pz=z+rh*(.3+j*.25);
-      const hfrac=(pz-z)/rh;
-      const ew_=hfrac*(w/2);
-      _line([rx-ew_,y,pz],[rx+ew_,y,pz], 'rgba(68,192,185,.2)', .5, '3,2');
-    }
-  }
-
-  // Tile count
-  if(!isG){
-    const el=document.getElementById('stTiles');
-    if(el)el.textContent=Math.floor(rp*w*d*4)|0;
-  }
-}
-
-function _chimney(x,y,z,p){
-  if(p<.70)return;
-  const cp=Math.min((p-.70)/.20,1);
-  const ch=.9*cp;
-  if(ch<.05)return;
-  const cw=.32,cd=.32;
-  _walls(x,y,z,cw,cd,ch,1,false,'rgba(68,192,185,.75)');
-  // Cap
-  if(cp>.85){
-    _face([[x-.05,y-.05,z+ch],[x+cw+.05,y-.05,z+ch],[x+cw+.05,y+cd+.05,z+ch],[x-.05,y+cd+.05,z+ch]],'rgba(68,192,185,.25)','rgba(68,192,185,.7)',.8);
-    // Smoke rings
-    for(let i=0;i<3;i++){
-      const sp=_iso(x+cw/2,y+cd/2,z+ch+.1+i*.35);
-      E('ellipse',{cx:sp.x,cy:sp.y,rx:3+i*2.5,ry:1.5+i*1.2,fill:'none',stroke:`rgba(68,192,185,${(.25-i*.08).toFixed(2)})`,'stroke-width':.7},S);
-    }
-  }
-}
-
-function _window(x,y,z,face,glow){
-  const ww=.42,wh=.54;
-  const fill=glow?'rgba(255,200,80,.2)':'rgba(8,18,38,.75)';
-  const ec=glow?'rgba(255,200,80,.8)':'rgba(100,180,200,.55)';
-  const sw=glow?1:.8;
-  let corners;
-  if(face==='front') corners=[[x,y,z],[x+ww,y,z],[x+ww,y,z+wh],[x,y,z+wh]];
-  else               corners=[[x,y,z],[x,y+ww,z],[x,y+ww,z+wh],[x,y,z+wh]];
-  _face(corners,fill,ec,sw);
-  // Cross dividers
-  const mx=face==='front'?_iso(x+ww/2,y,z+wh/2):_iso(x,y+ww/2,z+wh/2);
-  if(face==='front'){
-    _line([x+ww/2,y,z],[x+ww/2,y,z+wh],ec,.5);
-    _line([x,y,z+wh/2],[x+ww,y,z+wh/2],ec,.5);
-  } else {
-    _line([x,y+ww/2,z],[x,y+ww/2,z+wh],ec,.5);
-    _line([x,y,z+wh/2],[x,y+ww,z+wh/2],ec,.5);
-  }
-  if(glow){
-    const gr=face==='front'?[[x-.06,y,z-.06],[x+ww+.06,y,z-.06],[x+ww+.06,y,z+wh+.06],[x-.06,y,z+wh+.06]]:[[x,y-.06,z-.06],[x,y+ww+.06,z-.06],[x,y+ww+.06,z+wh+.06],[x,y,z+wh+.06]];
-    _face(gr,'none','rgba(255,200,80,.18)',2.5);
-  }
-}
-
-function _door(x,y,z,p){
-  if(p<.65)return;
-  const dw=.44,dh=.72;
-  _face([[x,y,z],[x+dw,y,z],[x+dw,y,z+dh],[x,y,z+dh]],'rgba(5,10,20,.85)','rgba(68,192,185,.55)',.9);
-  _line([x,y,z+dh*.5],[x+dw,y,z+dh*.5],'rgba(68,192,185,.25)',.5);
-  const hp=_iso(x+dw*.72,y,z+dh*.42);
-  E('circle',{cx:hp.x,cy:hp.y,r:2.5,fill:'rgba(201,168,76,.85)'},S);
-  // Door arch
-  const top=_iso(x+dw/2,y,z+dh);
-  const l=_iso(x,y,z+dh), r=_iso(x+dw,y,z+dh);
-  E('path',{d:`M${l.x},${l.y} Q${top.x},${top.y-8} ${r.x},${r.y}`,fill:'none',stroke:'rgba(68,192,185,.35)','stroke-width':.7},S);
-}
-
-function _foundation(x,y,w,d,p){
-  if(p<.01)return;
-  const layers=3;
-  for(let i=0;i<layers;i++){
-    const lz=i*.11, ex=(layers-1-i)*.18;
-    const ef=`rgba(68,192,185,${(.25+i*.18).toFixed(2)})`;
-    _face([[x-ex,y-ex,lz],[x+w+ex,y-ex,lz],[x+w+ex,y+d+ex,lz],[x-ex,y+d+ex,lz]],'rgba(20,40,60,.45)',ef,.8);
-    if(i===layers-1){
-      // Top slab detail lines
-      const n=Math.ceil(w);
-      for(let j=1;j<n;j++){_line([x+j*(w/n),y,lz],[x+j*(w/n),y+d,lz],'rgba(68,192,185,.18)',.5,'2,3');}
-    }
-  }
-}
-
-function _partyWall(x,y0,y1,z0,z1){
-  _line([x,y0,z0],[x,y1,z0],'rgba(201,168,76,.55)',1.2);
-  _line([x,y0,z0],[x,y0,z1],'rgba(201,168,76,.55)',1.2);
-  _line([x,y1,z0],[x,y1,z1],'rgba(201,168,76,.35)',.8,'3,2');
-}
-
-function _bgRect(){
-  // Solid deep background — safe, no gradient refs that can break
-  E('rect',{x:0,y:0,width:700,height:500,fill:'#030810'},S);
-
-  // Subtle horizon gradient via two overlaid rects — no defs required
-  // Top third: slightly lighter (sky)
-  E('rect',{x:0,y:0,width:700,height:180,fill:'rgba(6,18,32,.55)'},S);
-  // Bottom strip: ground depth darkening
-  E('rect',{x:0,y:380,width:700,height:120,fill:'rgba(2,4,8,.45)'},S);
-}
-
-function _titleBlock(line1,line2){
-  _txt(300,22,line1,11,'rgba(232,248,248,.9)','middle','800',2.5);
-  _txt(300,37,line2,7,'rgba(68,192,185,.65)','middle','700',3.5);
-}
-
-function _stageCaption(text){
-  E('rect',{x:0,y:398,width:600,height:22,fill:'rgba(4,10,14,.8)'},S);
-  _txt(300,412,text,7.5,'rgba(200,235,232,.65)','middle','700',2.8);
-}
-
-// ── FULL WIREFRAME GHOST ────────────────────────────────────────
-// Draw complete building outline — always visible at low p, fades as progress rises
-function _fullGhost(x,y,z,w,d,wallH,rh,alpha){
-  const al=alpha!==undefined?alpha:0.35;
-  const ec=`rgba(68,192,185,${al.toFixed(2)})`;
-  const sw=.7; const dash='4,3';
-  // Bottom plate (front+right visible)
-  _line([x,y,z],[x+w,y,z],ec,sw,dash);
-  _line([x+w,y,z],[x+w,y+d,z],ec,sw,dash);
-  // Vertical corner edges
-  _line([x,y,z],[x,y,z+wallH],ec,sw,dash);
-  _line([x+w,y,z],[x+w,y,z+wallH],ec,sw,dash);
-  _line([x+w,y+d,z],[x+w,y+d,z+wallH],ec,sw,dash);
-  _line([x,y+d,z],[x,y+d,z+wallH],ec,sw,dash);
-  // Top plate
-  _line([x,y,z+wallH],[x+w,y,z+wallH],ec,sw,dash);
-  _line([x+w,y,z+wallH],[x+w,y+d,z+wallH],ec,sw,dash);
-  _line([x,y+d,z+wallH],[x+w,y+d,z+wallH],ec,sw,dash);
-  _line([x,y,z+wallH],[x,y+d,z+wallH],ec,sw,dash);
-  // Pitched roof — only if rh > 0 (skip for flat-roof buildings)
-  if(rh>0){
-    const rx=x+w/2, rz=z+wallH+rh;
-    _line([x,y,z+wallH],[rx,y,rz],ec,sw,dash);
-    _line([x+w,y,z+wallH],[rx,y,rz],ec,sw,dash);
-    _line([rx,y,rz],[rx,y+d,rz],ec,sw,dash);
-    _line([x,y+d,z+wallH],[rx,y+d,rz],ec,sw,dash);
-    _line([x+w,y+d,z+wallH],[rx,y+d,rz],ec,sw,dash);
-  }
-}
-
-// ── BRICK-BY-BRICK FACE RENDERER ──────────────────────────────────
-const BW=0.34,BH=0.15,BM=0.022;
-function _brickFace(fX,fY,az,fW,fH,face,p,bFill,bEdge){
-  const cols=Math.max(1,Math.round(fW/(BW+BM)));
-  const rows=Math.max(1,Math.round(fH/(BH+BM)));
-  const total=cols*rows;
-  const show=p>=1.0?total:Math.floor(p*total);
-  if(show<=0)return;
-  const fc=bFill||'rgba(68,192,185,.17)';
-  const ec=bEdge||'rgba(68,192,185,.78)';
-  let cnt=0;
-  for(let r=0;r<rows;r++){
-    const off=(r%2)?(BW+BM)*0.5:0;
-    for(let c=0;c<cols;c++){
-      if(cnt>=show)return;
-      cnt++;
-      const u1=(face==='front'?fX:fY)+c*(BW+BM)+off;
-      const u2=Math.min(u1+BW,(face==='front'?fX:fY)+fW);
-      const bz1=az+r*(BH+BM);
-      const bz2=Math.min(bz1+BH,az+fH);
-      if(u2<=u1||bz2<=bz1)continue;
-      if(face==='front'){
-        _face([[u1,fY,bz1],[u2,fY,bz1],[u2,fY,bz2],[u1,fY,bz2]],fc,ec,0.42);
-      }else{
-        _face([[fX,u1,bz1],[fX,u2,bz1],[fX,u2,bz2],[fX,u1,bz2]],fc,ec,0.42);
-      }
-    }
-  }
-}
-function _brickHouse(x,y,z,W,D,WH,p){
-  const wFrac=Math.min(p,1);
-  const fcF=p>=1.0?'rgba(68,192,185,.32)':'rgba(68,192,185,.18)';
-  const fcR=p>=1.0?'rgba(28,65,80,.40)':'rgba(28,65,80,.22)';
-  const fcBk=p>=1.0?'rgba(18,50,65,.38)':'rgba(18,50,65,.20)'; // back wall (darker)
-  const fcL=p>=1.0?'rgba(24,60,75,.36)':'rgba(24,60,75,.18)';  // left wall
-  const ecF=p>=1.0?'rgba(100,220,215,1.0)':'rgba(68,192,185,.80)';
-  const ecR=p>=1.0?'rgba(100,220,215,.88)':'rgba(68,192,185,.65)';
-  // All 4 faces — painter's order: far first, near last
-  _brickFace(x,y+D,z,W,WH*wFrac,'front',wFrac,fcBk,'rgba(68,192,185,.55)'); // back
-  _brickFace(x,y,z,D,WH*wFrac,'right',wFrac,fcL,'rgba(68,192,185,.58)');    // left (x=x face)
-  _brickFace(x,y,z,W,WH*wFrac,'front',wFrac,fcF,ecF);   // front
-  _brickFace(x+W,y,z,D,WH*wFrac,'right',wFrac,fcR,ecR); // right
-  const wH=WH*wFrac;
-  if(wH>0.1){
-    const tfa=p>=1.0?0.18:0.07;
-    _face([[x,y,z+wH],[x+W,y,z+wH],[x+W,y+D,z+wH],[x,y+D,z+wH]],`rgba(68,192,185,${tfa})`,ecF,p>=1.0?1.2:0.8);
-  }
-  if(p>=1.0){
-    // Corner lines on all 4 vertical edges + top edges
-    const gc='rgba(201,168,76,.45)';
-    // Bottom edges
-    _line([x,y,z],[x+W,y,z],gc,.8);_line([x+W,y,z],[x+W,y+D,z],gc,.8);
-    _line([x,y+D,z],[x+W,y+D,z],gc,.8);_line([x,y,z],[x,y+D,z],gc,.8);
-    // Top edges
-    _line([x,y,z+WH],[x+W,y,z+WH],gc,.8);_line([x+W,y,z+WH],[x+W,y+D,z+WH],gc,.8);
-    _line([x,y+D,z+WH],[x+W,y+D,z+WH],gc,.8);_line([x,y,z+WH],[x,y+D,z+WH],gc,.8);
-  }
-  const el=document.getElementById('stBricks');
-  if(el)el.textContent=Math.floor(wFrac*(W/BW)*(WH/BH)*2)|0;
-}
-
-// ── FLAT ROOF ────────────────────────────────────────────────────
-// z = full wall height (base assumed 0); draws at actual wall-top progress
-function _flatRoof(x,y,z,w,d,p){
-  if(p<.40) return;
-  const wFrac=Math.min(p,1);
-  const dz=z*wFrac;
-  const rp=Math.min((p-.40)/.35,1);
-  const fa=Math.min(0.07+rp*0.16,0.22);
-  const ff=`rgba(68,192,185,${fa.toFixed(2)})`;
-  const ec='rgba(68,192,185,.88)'; const sw=1.0;
-  _face([[x,y,dz],[x+w,y,dz],[x+w,y+d,dz],[x,y+d,dz]],ff,ec,sw);
-  if(rp>=.5){
-    const ph=0.12;
-    _face([[x,y,dz],[x+w,y,dz],[x+w,y,dz+ph],[x,y,dz+ph]],'rgba(68,192,185,.12)',ec,.7);
-    _face([[x+w,y,dz],[x+w,y+d,dz],[x+w,y+d,dz+ph],[x+w,y,dz+ph]],'rgba(28,65,80,.18)',ec,.7);
-  }
-}
-
-// ── DRAW FUNCTIONS ────────────────────────────────────────────────
-
-function drawTerraced(p){
-  S.innerHTML='';getDefs();_bgRect();
-  _setView(280,245,27,13.5,31);
-  const gl=p>=.80;
-  const W=2.4, D=2.4, WH=3.0, RH=1.85; // terraced with pitched roof
-
-  _grid(-14,-4,18,16,0);
-
-  // Full wireframe ghost — fades as building rises (rh=0 = flat roof)
-  const gA=Math.max(0,0.42*(1-p*1.3));
-  if(gA>0.02){
-    _fullGhost(0,0,0,W,D,WH,RH,gA);
-    _fullGhost(W+.1,.15,0,W*.95,D*.95,WH*.9,RH*.9,gA*.55);
-    _fullGhost(W*2+.2,.3,0,W*.9,D*.9,WH*.82,RH*.82,gA*.35);
-    _fullGhost(-W-.05,.15,0,W*.95,D*.95,WH*.9,RH*.9,gA*.55);
-    _fullGhost(-W*2-.1,.3,0,W*.9,D*.9,WH*.82,RH*.82,gA*.35);
-  }
-
-  if(p>=.05) _foundation(0,0,W,D,p);
-
-  // Far right ghost (Unit 3)
-  _walls(W*2+.2,.3,0,W*.9,D*.9,WH*.82,0,true);
-  // Right ghost (Unit 2)
-  _walls(W+.1,.15,0,W*.95,D*.95,WH*.9,0,true);
-  // Far left ghost (Unit -2)
-  _walls(-W*2-.1,.3,0,W*.9,D*.9,WH*.82,0,true);
-  // Left ghost (Unit -1)
-  _walls(-W-.05,.15,0,W*.95,D*.95,WH*.9,0,true);
-
-  // ── Main house (yours) — pitched roof ──
-  _brickHouse(0,0,0,W,D,WH,p);
-  _drawScaffolding(S,0,0,0,W,D,WH,p);
-  if(p>=1.0)_drawCompletionExtras(S,0,0,0,W,D,WH);
-  _roof(0,0,WH,W,D,RH,p,false);
-
-  // Windows (60%+)
-  if(p>=.60){
-    _window(.25,0,WH*.58,'front',gl); _window(W-.62,0,WH*.58,'front',gl);
-    _window(.25,0,WH*.14,'front',gl); _window(W-.62,0,WH*.14,'front',gl);
-    _window(W,D*.15,WH*.55,'right',gl); _window(W,D*.55,WH*.55,'right',gl);
-    _window(W,D*.15,WH*.14,'right',gl);
-  }
-  _door(W/2-.22,0,0,p);
-
-  // Party wall indicators (both sides)
-  if(p>=.02){
-    _partyWall(0,0,D,0,WH);
-    _partyWall(W,0,D,0,WH);
-  }
-
-  // Survey tripod on ground
-  if(p<.15){
-    const tp=_iso(W/2+.4,D+.5,0);
-    E('path',{d:`M${tp.x},${tp.y-18} L${tp.x-10},${tp.y} M${tp.x},${tp.y-18} L${tp.x+10},${tp.y} M${tp.x},${tp.y-18} L${tp.x},${tp.y}`,stroke:'rgba(200,230,230,.5)','stroke-width':.8,fill:'none'},S);
-    E('circle',{cx:tp.x,cy:tp.y-18,r:3.5,fill:'none',stroke:'rgba(68,192,185,.6)','stroke-width':.9},S);
-    const kp=_iso(W*.3,D+.8,0);
-    E('circle',{cx:kp.x,cy:kp.y,r:4.5,fill:'none',stroke:'rgba(201,168,76,.5)','stroke-width':.9},S);
-    E('line',{x1:kp.x+4,y1:kp.y,x2:kp.x+10,y2:kp.y,stroke:'rgba(201,168,76,.5)','stroke-width':.9},S);
-    E('line',{x1:kp.x+9,y1:kp.y,x2:kp.x+9,y2:kp.y-4,stroke:'rgba(201,168,76,.5)','stroke-width':.9},S);
-    E('line',{x1:kp.x+7,y1:kp.y,x2:kp.x+7,y2:kp.y-3,stroke:'rgba(201,168,76,.5)','stroke-width':.9},S);
-  }
-}
-
-function drawSemi(p){
-  S.innerHTML='';getDefs();_bgRect();
-  _setView(265,250,28,14,32);
-  const gl=p>=.80;
-  const W=2.8, D=2.6, WH=2.8, RH=1.7; // half the footprint of detached
-
-  _grid(-14,-4,18,16,0);
-
-  // Full wireframe ghost
-  const gA=Math.max(0,0.42*(1-p*1.3));
-  if(gA>0.02){
-    _fullGhost(0,0,0,W,D,WH,RH,gA);
-    _fullGhost(W+.05,.2,0,W*.92,D*.9,WH*.9,RH*.88,gA*.5);
-  }
-
-  if(p>=.05) _foundation(0,0,W,D,p);
-
-  // Ghost neighbour RIGHT (attached, mirror image)
-  _walls(W+.05,.2,0,W*.92,D*.9,WH*.9,0,true);
-  _roof (W+.05,.2,WH*.9,W*.92,D*.9,RH*.88,0,true);
-  if(true){
-    _window(W+.28,.2,WH*.55,'front',false);
-    _window(W+W*.6,.2,WH*.55,'front',false);
-  }
-  // Main house
-  _brickHouse(0,0,0,W,D,WH,p);
-  _drawScaffolding(S,0,0,0,W,D,WH,p);
-  if(p>=1.0)_drawCompletionExtras(S,0,0,0,W,D,WH);
-  _roof (0,0,WH,W,D,RH,p,false);
-  _chimney(W*.55,D*.08,WH+RH*.7,p);
-
-  // Side return / extension on left (35%+)
-  if(p>=.35){
-    const srp=Math.min((p-.35)/.25,1);
-    _walls(-1.0,.55,0,1.0,D*.55,WH*.6,srp,false,'rgba(68,192,185,.75)');
-    _roof(-1.0,.55,WH*.6,1.0,D*.55,RH*.55,Math.max(0,p-.50),false);
-  }
-
-  // Windows
-  if(p>=.60){
-    _window(.28,0,WH*.58,'front',gl); _window(W-.68,0,WH*.58,'front',gl);
-    _window(.28,0,WH*.14,'front',gl); _window(W-.68,0,WH*.14,'front',gl);
-    _window(W,D*.12,WH*.55,'right',gl); _window(W,D*.52,WH*.55,'right',gl);
-    _window(W,D*.12,WH*.14,'right',gl); _window(W,D*.52,WH*.14,'right',gl);
-  }
-  _door(W/2-.22,0,0,p);
-
-  // Party wall (right side only)
-  if(p>=.02) _partyWall(W,0,D,0,WH);
-}
-
-function drawDetached(p){
-  S.innerHTML='';getDefs();_bgRect();
-  _setView(220,195,26,13,31);
-  const gl=p>=.80;
-  const W=5.0, D=3.2, WH=3.2, RH=2.2;
-
-  _grid(-14,-4,18,16,0);
-
-  // Full wireframe ghost
-  const gA=Math.max(0,0.42*(1-p*1.3));
-  if(gA>0.02){
-    _fullGhost(0,0,0,W,D,WH,RH,gA);
-    _fullGhost(W+.7,.3,0,2.0,2.2,2.0,0.7,gA*.45); // garage ghost
-  }
-
-  if(p>=.05) _foundation(-.2,-.2,W+.4,D+.4,p);
-
-  // Ghost garage (right side)
-  const gx=W+.7, gw=2.0, gd=2.2, gwh=2.0, grh=.7;
-  _walls(gx,.3,0,gw,gd,gwh,.25,true);
-  // Flat roof for garage
-  _face([[gx,.3,gwh],[gx+gw,.3,gwh],[gx+gw,.3+gd,gwh],[gx,.3+gd,gwh]],'rgba(8,18,38,.22)','rgba(255,255,255,.18)',.7);
-  // Garage door on front face
-  _face([[gx+.2,.3,.1],[gx+gw-.2,.3,.1],[gx+gw-.2,.3,gwh-.1],[gx+.2,.3,gwh-.1]],'rgba(8,18,38,.3)','rgba(255,255,255,.15)',.6,'3,2');
-  for(let i=1;i<5;i++){
-    const lz=gwh*.12*i;
-    _line([gx+.2,.3,lz],[gx+gw-.2,.3,lz],'rgba(255,255,255,.1)',.4);
-  }
-  // garage label removed
-
-  // Bay window protrusion (front face, left side, 35%+)
-  if(p>=.35){
-    const bp=Math.min((p-.35)/.25,1);
-    const bx=.6, bw=1.1, bd=.5;
-    _walls(bx,-.5,0,bw,bd,WH*.72,bp,false,'rgba(68,192,185,.72)');
-    _roof (bx,-.5,WH*.72,bw,bd,RH*.55,Math.max(0,p-.50),false);
-    if(p>=.60) _window(bx+.1,-.5,WH*.35,'front',gl);
-  }
-
-  // Main house
-  _brickHouse(0,0,0,W,D,WH,p);
-  _drawScaffolding(S,0,0,0,W,D,WH,p);
-  if(p>=1.0)_drawCompletionExtras(S,0,0,0,W,D,WH);
-  _roof (0,0,WH,W,D,RH,p,false);
-  _chimney(W*.32,D*.08,WH+RH*.72,p);
-  _chimney(W*.72,D*.08,WH+RH*.72,p);
-
-  // Windows
-  if(p>=.60){
-    _window(.3,0,WH*.58,'front',gl); _window(W/2-.22,0,WH*.58,'front',gl); _window(W-.72,0,WH*.58,'front',gl);
-    _window(.3,0,WH*.14,'front',gl); _window(W/2-.22,0,WH*.14,'front',gl); _window(W-.72,0,WH*.14,'front',gl);
-    _window(W,D*.1,WH*.55,'right',gl); _window(W,D*.45,WH*.55,'right',gl);
-    _window(W,D*.1,WH*.14,'right',gl); _window(W,D*.45,WH*.14,'right',gl);
-  }
-  _door(W*.42,0,0,p);
-
-  // Driveway lines
-  const dr1=_iso(W*.3,D+.2,0), dr2=_iso(W*.3,D+2,0);
-  const dr3=_iso(W*.7,D+.2,0), dr4=_iso(W*.7,D+2,0);
-  E('line',{x1:dr1.x,y1:dr1.y,x2:dr2.x,y2:dr2.y,stroke:'rgba(68,192,185,.15)','stroke-width':.6,'stroke-dasharray':'4,3'},S);
-  E('line',{x1:dr3.x,y1:dr3.y,x2:dr4.x,y2:dr4.y,stroke:'rgba(68,192,185,.15)','stroke-width':.6,'stroke-dasharray':'4,3'},S);
-
-}
-
-function drawMansion(p){
-  S.innerHTML='';getDefs();_bgRect();
-  _setView(250,200,23,11.5,27);
-  const gl=p>=.80;
-  // Central block
-  const CW=5.5, CD=3.5, CWH=4.0, CRH=2.5;
-  // Wings
-  const LW=1.8, LX=-LW-.15, LD=2.8, LWH=3.1, LRH=1.5;
-  const RX=CW+.15, RW=1.8, RD=2.8, RWH=3.1, RRH=1.5;
-
-  _grid(-14,-4,18,16,0);
-
-  // Full wireframe ghost for all three blocks
-  const gA=Math.max(0,0.42*(1-p*1.3));
-  if(gA>0.02){
-    _fullGhost(0,0,0,CW,CD,CWH,CRH,gA);
-    _fullGhost(LX,0.35,0,LW,LD,LWH,LRH,gA*.7);
-    _fullGhost(RX,0.35,0,RW,RD,RWH,RRH,gA*.7);
-  }
-
-  if(p>=.05){
-    _foundation(-LW-.3,-.2,LW+CW+RW+.6,Math.max(CD,LD)+.4,p);
-  }
-
-  // Left wing
-  _brickHouse(LX,0.35,0,LW,LD,LWH,p*.85);
-  _roof (LX,0.35,LWH,LW,LD,LRH,p*.85,false);
-  _chimney(LX+LW*.6,0.45,LWH+LRH*.7,p);
-  if(p>=.60){
-    _window(LX+.2,.35,LWH*.52,'front',gl);
-    _window(LX+.2,.35,LWH*.12,'front',gl);
-  }
-
-  // Right wing
-  _brickHouse(RX,0.35,0,RW,RD,RWH,p*.85);
-  _roof (RX,0.35,RWH,RW,RD,RRH,p*.85,false);
-  _chimney(RX+RW*.4,0.45,RWH+RRH*.7,p);
-  if(p>=.60){
-    _window(RX+.22,.35,RWH*.52,'front',gl);
-    _window(RX+.22,.35,RWH*.12,'front',gl);
-    _window(RX,RD*.2,RWH*.52,'right',gl);
-    _window(RX,RD*.6,RWH*.52,'right',gl);
-  }
-
-  // Central block
-  _brickHouse(0,0,0,CW,CD,CWH,p);
-  _drawScaffolding(S,0,0,0,CW,CD,CWH,p);
-  if(p>=1.0)_drawCompletionExtras(S,0,0,0,CW,CD,CWH);
-  _roof (0,0,CWH,CW,CD,CRH,p,false);
-  _chimney(CW*.22,CD*.08,CWH+CRH*.7,p);
-  _chimney(CW*.75,CD*.08,CWH+CRH*.7,p);
-
-  // Grand portico columns (65%+)
-  if(p>=.65){
-    const colHeight=CWH*.75;
-    const cols=[CW*.3,CW*.42,CW*.56,CW*.68];
-    cols.forEach(cx=>{
-      const cdp=Math.min((p-.65)/.20,1)*colHeight;
-      if(cdp<.05)return;
-      const cw=.12,cd=.08;
-      _face([[cx,0,0],[cx+cw,0,0],[cx+cw,0,cdp],[cx,0,cdp]],'rgba(68,192,185,.18)','rgba(68,192,185,.7)',.9);
-    });
-    // Entablature (lintel)
-    if(p>=.72){
-      _face([[CW*.28,0,colHeight],[CW*.72,0,colHeight],[CW*.72,0,colHeight+.12],[CW*.28,0,colHeight+.12]],'rgba(68,192,185,.15)','rgba(68,192,185,.65)',.8);
-    }
-  }
-
-  // Windows central block
-  if(p>=.60){
-    _window(.4,0,CWH*.58,'front',gl); _window(CW*.35,0,CWH*.58,'front',gl);
-    _window(CW*.62,0,CWH*.58,'front',gl); _window(CW-.82,0,CWH*.58,'front',gl);
-    _window(.4,0,CWH*.20,'front',gl); _window(CW*.35,0,CWH*.20,'front',gl);
-    _window(CW*.62,0,CWH*.20,'front',gl); _window(CW-.82,0,CWH*.20,'front',gl);
-    _window(CW,CD*.1,CWH*.55,'right',gl); _window(CW,CD*.45,CWH*.55,'right',gl);
-    _window(CW,CD*.1,CWH*.18,'right',gl); _window(CW,CD*.45,CWH*.18,'right',gl);
-    // Circular/ocular window (front top center)
-    const owp=_iso(CW/2-.18,0,CWH*.8);
-    E('ellipse',{cx:owp.x,cy:owp.y,rx:9,ry:6,fill:gl?'rgba(255,200,80,.18)':'rgba(8,18,38,.6)',stroke:gl?'rgba(255,200,80,.7)':'rgba(100,180,200,.5)','stroke-width':.9},S);
-  }
-  _door(CW*.45,0,0,p);
-
-  // Turret caps on wing corners (75%+)
-  if(p>=.75){
-    [[LX,0.35,LWH],[RX+RW-.3,0.35,RWH]].forEach(([tx_,ty_,tz_])=>{
-      const tp=_iso(tx_+.15,ty_+.15,tz_);
-      E('polygon',{points:`${tp.x},${tp.y-14} ${tp.x-9},${tp.y+2} ${tp.x+9},${tp.y+2}`,fill:'rgba(68,192,185,.25)',stroke:'rgba(68,192,185,.8)','stroke-width':.9},S);
-    });
-  }
-
-}
-
-
-function drawFlat(p){
-  S.innerHTML='';getDefs();_bgRect();
-  const TOTAL=10, FH=0.52;
-  const W=3.2, D=2.0, WH=TOTAL*FH;
-  _setView(200,200,24,12,28);
-  const myFloor=Math.max(0,Math.min(TOTAL-1,(state.apartmentFloor||5)-1)); // 0-indexed
-  const gl=p>=.80;
-
-  _grid(-14,-4,18,16,0);
-
-  const gA=Math.max(0,0.38*(1-p*1.3));
-  if(gA>0.02){
-    _fullGhost(0,0,0,W,D,WH,0,gA);
-    _fullGhost(W+.05,.15,0,W*.95,D*.92,WH*.95,0,gA*.5);
-  }
-  if(p>=.05) _foundation(-.1,-.1,W+.2,D+.2,p);
-  // Ghost neighbour
-  _walls(W+.05,.15,0,W*.95,D*.92,WH*.95,0,true);
-
-  // Draw floors bottom-up
-  for(let f=0;f<TOTAL;f++){
-    const fz=f*FH;
-    if(f===myFloor){
-      // YOUR floor — builds with bricks based on savings progress
-      _brickFace(0,0,fz,W,FH,'front',p,'rgba(68,192,185,.28)','rgba(100,220,215,.92)');
-      _brickFace(W,0,fz,D,FH,'right',p,'rgba(50,130,145,.26)','rgba(100,220,215,.72)');
-      _face([[0,0,fz],[W,0,fz],[W,D,fz],[0,D,fz]],'rgba(68,192,185,.06)','rgba(68,192,185,.35)',.5);
-      if(p>=1){
-        const wz=fz+FH*.45;
-        _window(.3,0,wz,'front',gl);_window(W-.65,0,wz,'front',gl);
-        if(f<3){_window(W,D*.2,wz,'right',gl);}
-      }
-    } else {
-      // All other floors — greyed out like surrounding ghost buildings
-      const ga=Math.max(0.10,0.22-(Math.abs(f-myFloor))*0.015);
-      _fullGhost(0,0,fz,W,D,FH,0,ga);
-      // Floor slab lines for structure feel
-      _line([0,0,fz],[W,0,fz],'rgba(68,192,185,.08)',.4,'3,3');
-      _line([W,0,fz],[W,D,fz],'rgba(68,192,185,.05)',.3,'3,3');
-      // Windows on non-selected floors (ghost style)
-      if(p>=.80){
-        const wz=fz+FH*.45;
-        _window(.3,0,wz,'front',false);_window(W-.65,0,wz,'front',false);
-      }
-    }
-  }
-  _flatRoof(0,0,WH,W,D,p);
-  if(p>=.65)_door(W*.35,0,0,p);
-  if(p>=.02) _partyWall(W,0,D,0,WH);
-}
-
-function drawApartment(p){
-  S.innerHTML='';getDefs();_bgRect();
-  const TOTAL=30, FH=0.38;
-  const W=5.0, D=2.6, WH=TOTAL*FH;
-  _setView(175,200,18,9,20);
-  const myFloor=Math.max(0,Math.min(TOTAL-1,(state.apartmentFloor||15)-1)); // 0-indexed
-  const gl=p>=.80;
-
-  _grid(-14,-4,18,16,0);
-  const gA=Math.max(0,0.35*(1-p*1.3));
-  if(gA>0.02)_fullGhost(0,0,0,W,D,WH,0,gA);
-  if(p>=.05)_foundation(-.15,-.15,W+.3,D+.3,p);
-
-  // Neighbouring buildings (ghost, different heights for cityscape)
-  _walls(-W-.3,.2,0,W*.75,D*.7,WH*.55,0,true);
-  _walls(W+.25,.2,0,W*.8,D*.7,WH*.72,0,true);
-
-  // Draw all 30 floors bottom-up
-  for(let f=0;f<TOTAL;f++){
-    const fz=f*FH;
-    if(f===myFloor){
-      // YOUR floor — builds with bricks based on savings progress
-      _brickFace(0,0,fz,W,FH,'front',p,'rgba(68,192,185,.26)','rgba(100,220,215,.9)');
-      _brickFace(W,0,fz,D,FH,'right',p,'rgba(50,130,145,.24)','rgba(100,220,215,.68)');
-      _face([[0,0,fz],[W,0,fz],[W,D,fz],[0,D,fz]],'rgba(68,192,185,.06)','rgba(68,192,185,.32)',.5);
-      if(p>=.80){
-        const wz=fz+FH*.45;
-        _window(.3,0,wz,'front',gl);_window(W*.3,0,wz,'front',gl);
-        _window(W*.56,0,wz,'front',gl);_window(W-.55,0,wz,'front',gl);
-        _window(W,D*.15,wz,'right',gl);_window(W,D*.55,wz,'right',gl);
-      }
-    } else {
-      // All other floors — greyed out like ghost buildings
-      const dist=Math.abs(f-myFloor);
-      const ga=Math.max(0.08,0.2-dist*0.006);
-      _fullGhost(0,0,fz,W,D,FH,0,ga);
-      // Faint floor slab
-      _line([0,0,fz],[W,0,fz],'rgba(68,192,185,.04)',.3,'4,4');
-      // Ghost windows (very faint)
-      if(p>=.85&&dist<=3){
-        const wz=fz+FH*.45;
-        _window(.3,0,wz,'front',false);_window(W*.56,0,wz,'front',false);
-      }
-    }
-  }
-
-  _flatRoof(0,0,WH,W,D,p);
-  // Ground floor lobby/entrance
-  if(p>=.60){
-    const cp=Math.min((p-.60)/.25,1);
-    const cx=W*.38,cw=W*.24;
-    _face([[cx,0,FH*.4],[cx+cw,0,FH*.4],[cx+cw,0,FH*.4+.2*cp],[cx,0,FH*.4+.2*cp]],'rgba(68,192,185,.12)','rgba(68,192,185,.55)',.8);
-  }
-  _door(W*.46,0,0,p);
-}
-
-const DRAW={terraced:drawTerraced,semi:drawSemi,detached:drawDetached,mansion:drawMansion,flat:drawFlat,apartment:drawApartment};
-function _drawBlankPlot(){
-  S.innerHTML=''; getDefs(); _bgRect();
-  _setView(280,245,27,13.5,31);
-  _grid(-14,-4,18,16,0);
-  // Dashed plot boundary
-  _line([-.3,-.3,0],[2.7,-.3,0],'rgba(201,168,76,.3)',.9,'6,4');
-  _line([2.7,-.3,0],[2.7,2.7,0],'rgba(201,168,76,.3)',.9,'6,4');
-  _line([2.7,2.7,0],[-.3,2.7,0],'rgba(201,168,76,.3)',.9,'6,4');
-  _line([-.3,2.7,0],[-.3,-.3,0],'rgba(201,168,76,.3)',.9,'6,4');
-  // Corner pegs
-  [[-.3,-.3,0],[2.7,-.3,0],[2.7,2.7,0],[-.3,2.7,0]].forEach(function(c){
-    var pt=_iso(c[0],c[1],c[2]);
-    E('circle',{cx:pt.x,cy:pt.y,r:3,fill:'#c9a84c',stroke:'none',opacity:'.45'},S);
-  });
-  // Centre prompt
-  var cp=_iso(1.2,1.2,0);
-  E('text',{x:cp.x,y:cp.y-14,'font-size':11,'font-family':'Syne,sans-serif','font-weight':'800',fill:'rgba(68,192,185,.4)','text-anchor':'middle','letter-spacing':2},S).textContent='YOUR PLOT';
-  E('text',{x:cp.x,y:cp.y+3,'font-size':7,'font-family':'Share Tech Mono,monospace',fill:'rgba(255,255,255,.18)','text-anchor':'middle','letter-spacing':.5},S).textContent='add a deposit to break ground';
-}
 function redraw(){
   if (hb3dOn() && hb3dRedraw()) return;
-  var _hs = document.getElementById('house-scene'); if (_hs && _hs.getAttribute('data-engine')) _hs.removeAttribute('data-engine');
-  var lockEl = document.getElementById('house-pro-lock');
-  if (lockEl) lockEl.style.display = 'none';
-  // Blank state: no deposits recorded yet — show empty plot
-  if (state.saved <= 0 && (!state.deposits || state.deposits.length === 0)) {
-    _drawBlankPlot();
-    return;
-  }
-  // Mortgage paid off — show fully completed solid house
-  if (state.houseMode === 'purchased' && state.mortgageBalance <= 0) {
-    (DRAW[state.houseType]||drawTerraced)(1.0);
-    return;
-  }
-  var rawP = state.houseMode==='purchased' ? 1 : (_isPro() ? pct() : 0);   // once bought, the whole house exists — equity shading shows what you own
-  var displayP = rawP < 0.04 ? 0.04 : rawP;
-  (DRAW[state.houseType]||drawTerraced)(displayP);
+  hbStill();   // no 3D on this device (no WebGL, an old phone, or the 3D engine could not load): a still picture of the same house
+}
+// ── STILL PICTURE (owner, 1 Nov 2026): when the 3D cannot run, the user's house at its current build level, drawn once on a 2D canvas
+// from the same brick plan as the 3D (same parts laid, brand colours, the paid line on Level 2). No three.js, works offline.
+function hbStill(){
+  var el=document.getElementById('house-scene'), cv=document.getElementById('hbStill'); if(!el||!cv)return;
+  el.setAttribute('data-engine','still');
+  var sm=hbSceneMode(); HB3DAPP.want=sm;
+  var W=Math.max(1,el.clientWidth), H=Math.max(1,el.clientHeight); if(W<4||H<4)return;
+  var m=(typeof HB3D!=='undefined'&&HB3D.build&&HB3D.brandPlan)?hb3dModel(sm.type==='custom'?state.houseType:sm.type, sm.floor):null;
+  var key=[sm.mode,sm.type,sm.floor,(sm.p||0).toFixed(4),(sm.eq||0).toFixed(4),W,H,!!m].join('|'); if(cv._key===key)return; cv._key=key;
+  var dpr=Math.min(2,window.devicePixelRatio||1); cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+  var g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);
+  var bg=g.createRadialGradient(W/2,H,0,W/2,H,Math.max(W,H)*1.1); bg.addColorStop(0,'#06242A'); bg.addColorStop(.45,'#00131A'); bg.addColorStop(1,'#080808');
+  g.fillStyle=bg; g.fillRect(0,0,W,H);
+  var cap=document.getElementById('hb3d-cap'), note='Still picture: 3D is not available on this device';
+  if(!m){ g.fillStyle='rgba(182,216,214,.8)'; g.font='12px "Share Tech Mono",monospace'; g.fillText(note,14,22); if(cap)cap.textContent=''; return; }
+  var P=HB3D.brandPlan(m), B=HB3D.BRAND_C||{}, L2=sm.mode==='equity'||sm.mode==='complete', p=sm.mode==='site'?0:(L2?1:sm.p);
+  var V=HB3D.brandUnits(P,p), R=m.rows, Vc=L2?HB3D.brandColourUnits(P,sm.mode==='complete'?1:(sm.eq||0)):-1;   // Level 2: the equity share is in real colours
+  // camera: from the front right and above, as the 3D opens
+  var yaw=0.62, pit=0.5, Vx=Math.sin(yaw)*Math.cos(pit), Vy=Math.sin(pit), Vz=Math.cos(yaw)*Math.cos(pit);
+  var rx=Math.cos(yaw), rz=-Math.sin(yaw), ux=-Math.sin(yaw)*Math.sin(pit), uy=Math.cos(pit), uz=-Math.cos(yaw)*Math.sin(pit);
+  var bb=m.bounds, pts=[], k, i;
+  for(k=0;k<8;k++){var x=k&1?bb.max[0]:bb.min[0], y=k&2?bb.max[1]:bb.min[1], z=k&4?bb.max[2]:bb.min[2]; pts.push([x*rx+z*rz, x*ux+y*uy+z*uz]);}
+  var sx0=1e9,sx1=-1e9,sy0=1e9,sy1=-1e9; pts.forEach(function(q){sx0=Math.min(sx0,q[0]);sx1=Math.max(sx1,q[0]);sy0=Math.min(sy0,q[1]);sy1=Math.max(sy1,q[1]);});
+  var sc=Math.min(W*0.78/(sx1-sx0||1), H*0.62/(sy1-sy0||1)), ox=W/2-sc*(sx0+sx1)/2, oy=H*0.55+sc*(sy0+sy1)/2;
+  var PX=function(x,y,z){return [ox+sc*(x*rx+z*rz), oy-sc*(x*ux+y*uy+z*uz)];};
+  // ground grid: 11 lines each way, strongest in the middle (as the 3D stage)
+  var cx=(bb.min[0]+bb.max[0])/2, cz=(bb.min[2]+bb.max[2])/2, big=Math.max(bb.max[0]-bb.min[0],bb.max[2]-bb.min[2],6), E=big*1.25, sp=E/5;
+  g.lineWidth=1;
+  for(i=-5;i<=5;i++){var a=0.3*(1-Math.abs(i)/6.5); g.strokeStyle='rgba(68,192,185,'+a.toFixed(3)+')';
+    var A=PX(cx+i*sp,0,cz-E),Bq=PX(cx+i*sp,0,cz+E),Cq=PX(cx-E,0,cz+i*sp),D=PX(cx+E,0,cz+i*sp); g.beginPath(); g.moveTo(A[0],A[1]); g.lineTo(Bq[0],Bq[1]); g.moveTo(Cq[0],Cq[1]); g.lineTo(D[0],D[1]); g.stroke();}
+  // the laid parts, as lit boxes (top and the two faces towards the camera), far to near
+  var Ld=[-0.45,0.7,0.55], ln=Math.hypot(Ld[0],Ld[1],Ld[2]); Ld=[Ld[0]/ln,Ld[1]/ln,Ld[2]/ln];
+  var col=function(part){ if(part==='brick')return B.brick; if(part==='roof')return B.tile; if(part==='glass')return sm.mode==='complete'?B.glassLit:B.glass; if(part==='door')return sm.mode==='complete'?B.flash:B.door; if(part==='frame')return B.frame; if(part==='gold')return B.flash; return B.trim; };
+  var items=[];
+  m.batches.forEach(function(b,bi){
+    var part=P.parts[bi]; if(part==='none')return;
+    var ctx=part==='ctx', n=ctx?b.count:HB3D._lowerBound(P.rank[bi],V), pm=P.perm[bi], c=col(part)||[0.27,0.75,0.73], kc=ctx||Vc<0?0:HB3D._lowerBound(P.rank2[bi],Vc);
+    for(var j=0;j<n;j++){var o=(ctx?j:pm[j])*10, xf=b.xf, cc=c;
+      if(j<kc){var h=HB3D.brandColourOf(b,pm[j]); cc=[((h>>16)&255)/255*0.84+0.267*0.16,((h>>8)&255)/255*0.84+0.753*0.16,(h&255)/255*0.84+0.725*0.16];}   // real colour, subtle teal hue
+      items.push([xf[o],xf[o+1],xf[o+2],xf[o+3],xf[o+4],xf[o+5],xf[o+6],xf[o+7],xf[o+8],cc,ctx?0.06:(part==='glass'?0.85:1)]);}
+  });
+  items.sort(function(a,b){return (a[0]*Vx+a[1]*Vy+a[2]*Vz)-(b[0]*Vx+b[1]*Vy+b[2]*Vz);});
+  var face=[[0,1,0],[0,-1,0],[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]], tok=cv._tok=(cv._tok||0)+1, at=0;
+  var drawSome=function(){
+    if(cv._tok!==tok)return;
+    var t0=performance.now();
+    // depth slices of 256 parts, far to near; inside a slice the faces of one colour share one path and one fill (a software canvas
+    // pays per fill, so this is what keeps an old phone quick)
+    while(at<items.length&&performance.now()-t0<12){
+      var end=Math.min(items.length,at+256), paths={}, order=[];
+      for(;at<end;at++){
+        var it=items[at], ax=it[6], ay=it[7], az=it[8], sa=Math.sin(ax),ca=Math.cos(ax),sb=Math.sin(ay),cb=Math.cos(ay),sg=Math.sin(az),cg=Math.cos(az);
+        // R = Ry * Rz * Rx (Euler order YZX, as the 3D)
+        var M=[cb*cg, sb*sa-cb*sg*ca, cb*sg*sa+sb*ca, sg, cg*ca, -cg*sa, -sb*cg, sb*sg*ca+cb*sa, cb*ca-sb*sg*sa];
+        var hx=it[3]/2, hy=it[4]/2, hz=it[5]/2, c=it[9];
+        for(var f=0;f<6;f++){
+          var nl=face[f], nx=M[0]*nl[0]+M[1]*nl[1]+M[2]*nl[2], ny=M[3]*nl[0]+M[4]*nl[1]+M[5]*nl[2], nz=M[6]*nl[0]+M[7]*nl[1]+M[8]*nl[2];
+          if(nx*Vx+ny*Vy+nz*Vz<=0.02)continue;
+          var sh=0.5+0.5*Math.max(0,nx*Ld[0]+ny*Ld[1]+nz*Ld[2]);
+          var key=Math.round(c[0]*sh*63)+','+Math.round(c[1]*sh*63)+','+Math.round(c[2]*sh*63)+','+it[10];
+          var pth=paths[key]; if(!pth){pth=paths[key]=new Path2D();order.push(key);}
+          var u=nl[1]?[1,0,0]:(nl[0]?[0,1,0]:[1,0,0]), w=nl[1]?[0,0,1]:(nl[0]?[0,0,1]:[0,1,0]);
+          for(var q=0;q<4;q++){var s0=q<2?1:-1, s1=(q===0||q===3)?1:-1;
+            var lx=(nl[0]+s0*u[0]+s1*w[0])*hx, ly=(nl[1]+s0*u[1]+s1*w[1])*hy, lz=(nl[2]+s0*u[2]+s1*w[2])*hz;
+            var pt=PX(it[0]+M[0]*lx+M[1]*ly+M[2]*lz, it[1]+M[3]*lx+M[4]*ly+M[5]*lz, it[2]+M[6]*lx+M[7]*ly+M[8]*lz);
+            if(q===0)pth.moveTo(pt[0],pt[1]); else pth.lineTo(pt[0],pt[1]);}
+          pth.closePath();
+        }
+      }
+      order.forEach(function(k){var v=k.split(','); g.globalAlpha=+v[3]; g.fillStyle='rgb('+Math.round(v[0]*255/63)+','+Math.round(v[1]*255/63)+','+Math.round(v[2]*255/63)+')'; g.fill(paths[k]);});
+    }
+    g.globalAlpha=1;
+    if(at<items.length){setTimeout(drawSome,0);return;}
+    // Level 2: the gold paid line round the house; Level 1: the gold slice at the course being laid
+    var gy=sm.mode==='equity'&&Vc>0&&Vc<P.N+P.T?(Vc<=P.N?P.top[Vc-1]:P.tileTop[Math.min(P.T-1,Vc-P.N-1)]):(sm.mode==='build'&&p>0&&p<0.97?HB3D.brandStats(m,p).y:null);
+    if(gy!=null){var m2=14*0.075, c1=PX(bb.min[0]-m2,gy,bb.min[2]-m2),c2=PX(bb.max[0]+m2,gy,bb.min[2]-m2),c3=PX(bb.max[0]+m2,gy,bb.max[2]+m2),c4=PX(bb.min[0]-m2,gy,bb.max[2]+m2);
+      g.strokeStyle='rgba(232,197,106,.95)'; g.fillStyle='rgba(232,197,106,.11)'; g.lineWidth=1.2; g.beginPath(); g.moveTo(c1[0],c1[1]); g.lineTo(c2[0],c2[1]); g.lineTo(c3[0],c3[1]); g.lineTo(c4[0],c4[1]); g.closePath(); g.fill(); g.stroke();}
+    var tag=sm.mode==='complete'?'MORTGAGE FREE':sm.mode==='equity'?'MORTGAGE '+(Math.floor((sm.paid||0)*1000)/10)+'% PAID · YOU OWN '+(Math.floor((sm.eq||0)*1000)/10)+'%':sm.mode==='site'?'YOUR PLOT':(p*100).toFixed(1)+'% OF DEPOSIT';
+    g.font='600 13px "Share Tech Mono",monospace'; var tw=g.measureText(tag).width+18, tx=Math.max(14,Math.min(W-tw-14,W/2-tw/2)), ty=18;
+    g.fillStyle='#E8C56A'; g.fillRect(tx,ty,tw,24); g.fillStyle='#1A1400'; g.fillText(tag,tx+9,ty+16);
+    g.font='11px "Share Tech Mono",monospace'; g.fillStyle='rgba(182,216,214,.85)'; g.fillText(note,14,H-14);
+  };
+  drawSome();
+  if(cap){var st=HB3D.brandStats(m,p), nm=(m.name||'').replace(/^./,function(c){return c.toUpperCase();});
+    cap.textContent=sm.mode==='site'?'':nm+' · '+(sm.mode==='build'?st.stage+' · ':'')+st.bricksLaid.toLocaleString('en-GB')+' / '+st.bricksTotal.toLocaleString('en-GB')+' bricks';}
 }
 
 function updateUI(){
@@ -15748,6 +14766,8 @@ function hbBackup(){try{localStorage.setItem('vi_bak_ht3',JSON.stringify({at:new
 // £100,000 house, 20% goal: £80,000 is 100%, so £2,000 over the goal builds 2.5%.
 function hbL2Base(){var pu=state.purchase||{},price=+pu.price||+state.valuation||+state.target||0,dtp=+pu.depositTarget||price*(+state.depositPct||0)/100;return Math.max(1,price-dtp);}
 function hbL2Progress(){var bal=Math.max(0,+state.mortgageBalance||0),base=hbL2Base();return Math.min(1,Math.max(0,(base-bal)/base));}
+// the share of the home you own: (value - mortgage balance) / value, deposit included. Level 2 lays this share of the bricks in full colour (owner, 1 Nov 2026)
+function hbL2Own(){var pu=state.purchase||{},val=+state.valuation||+pu.price||+state.target||0,bal=Math.max(0,+state.mortgageBalance||0);return val>0?Math.min(1,Math.max(0,(val-bal)/val)):0;}
 function hbPayMortgage(vBase){if(viBlockEdit())return;
   var before=Math.max(0,+state.mortgageBalance||0),paid=Math.min(before,vBase);
   state.mortgageBalance=Math.round((before-paid)*100)/100;
@@ -15784,9 +14804,10 @@ const MS_PCTS=[1,5,15,30,50,65,80,90,95,100];
 // ═══════════════════════════════════════════════════════════════
 var HB_LEVELS=[{n:1,name:'First Deposit',ic:'🧱'},{n:2,name:'Delete the Mortgage',ic:'🏠'},{n:3,name:'Upgrade',ic:'🚀'}];
 var HB_BADGES=[[.01,'Site cleared'],[.05,'Foundations'],[.10,'10%'],[.25,'Quarter'],[.50,'Halfway'],[.75,'Three-quarters'],[1,'Deposit ready']];
-function hbLevel(){if(state.houseMode==='purchased')return state.level3?3:2;return 1;}
+function hbLevel(){return state.houseMode==='purchased'?2:1;}   // Level 3 is locked for everyone (owner, 1 Nov 2026: Pro, after the MVP); state.level3 is kept as saved
 function hbView(){var v=+state.viewLevel,c=hbLevel();return(v>=1&&v<=c)?v:c;}
-function hbSetView(n){if(n>hbLevel()){toast('Finish Level '+(n-1)+' to unlock Level '+n);return;}state.viewLevel=n;save();updateUI();}
+var HB_L3_LOCKED='Level 3: plan your next home. Coming later as part of Pro.';
+function hbSetView(n){if(n>=3){toast(HB_L3_LOCKED);return;}if(n>hbLevel()){toast('Finish Level '+(n-1)+' to unlock Level '+n);return;}state.viewLevel=n;save();updateUI();}
 function hbSetDepositPct(v){if(viBlockEdit())return;
   v=parseFloat(v);var inp=document.getElementById('depositPctInput');
   if(!(v>=1&&v<=60)){toast('Choose a deposit between 1% and 60%');if(inp)inp.value=state.depositPct;return;}
@@ -15811,6 +14832,7 @@ function hbRenderLevels(){
   var cur=hbLevel(),view=hbView();
   el.innerHTML=HB_LEVELS.map(function(l){
     var cls='hb-lv'+(l.n===view?' on':'')+(l.n<cur?' done':'')+(l.n>cur?' lock':'');
+    if(l.n>=3)return '<button class="hb-lv lock" onclick="hbSetView(3)" title="'+HB_L3_LOCKED+'"><span>🔒</span>Level 3 · '+l.name+' <span class="hb-own-pro">PRO</span></button>';   // locked for everyone (owner, 1 Nov)
     return '<button class="'+cls+'" onclick="hbSetView('+l.n+')" title="'+(l.n>cur?'Locked: finish Level '+(l.n-1):'')+'"><span>'+(l.n>cur?'🔒':l.ic)+'</span>Level '+l.n+' · '+l.name+(l.n<cur?' <b><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></b>':'')+'</button>';
   }).join('');
 }
@@ -15867,10 +14889,8 @@ function hbRenderHUD(){
       +'<div class="hb-badges">'+HB_BADGES.map(function(b,i){return '<span class="hb-bd'+(p>=b[0]?' got':'')+'">'+(p>=b[0]?'🏅 ':'')+(b[0]*100)+'% · '+b[1]+'</span>';}).join('')+'</div>'
       +'<div style="margin-top:10px"><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Preview your mortgage</button></div>'
       +tip;
-  } else if(view===2){
-    hbRenderL2(el);
   } else {
-    hbRenderL3(el);
+    hbRenderL2(el);
   }
   if(view>=2&&state.houseMode==='purchased')el.insertAdjacentHTML('beforeend','<div class="hb-undo"><button type="button" class="btn-add-data hb-undo-btn" onclick="hbUndoPurchase()">Not bought yet? Back to Level 1</button></div>');
   hbBadgeToasts(p);
@@ -16307,74 +15327,17 @@ function hbcUpdate(){
   window._hbcLast={base:base,scn:scn,cmp:cmp};
 }
 
-// ghost build: Level 1 draws the whole house translucent; solid bricks arrive in Level 2
-function hbGhostWrap(){
-  if(S.querySelector('#hb-ghost'))return;
-  var g=E('g',{id:'hb-ghost',opacity:'.58'});g.style.filter='drop-shadow(0 0 3px rgb(var(--teal-rgb) / .5))';
-  Array.prototype.slice.call(S.childNodes).forEach(function(n){
-    if(n.nodeName==='defs'||(n.nodeName==='rect'&&n.getAttribute('width')==='700'))return;
-    g.appendChild(n);
-  });
-  S.appendChild(g);
-}
-
-// Level 2/3: the whole house is drawn; solid bricks (clipped from the ground up) = equity, ghost = what the lender owns.
-// The remaining interest is a separate bar beside the house.
-function hbShadeEquity(){
-  if(S.querySelector('#hb-solid'))return;
-  var kids=Array.prototype.slice.call(S.childNodes).filter(function(n){return !(n.nodeName==='defs'||(n.nodeName==='rect'&&n.getAttribute('width')==='700')||(n.getAttribute&&n.getAttribute('data-g')));});   // the ground grid is left alone
-  if(!kids.length)return;
-  var eqF=hbL2Progress();
-  var solid=E('g',{id:'hb-solid'}),ghost=E('g',{id:'hb-ghostL2',opacity:'.30'});ghost.style.filter='drop-shadow(0 0 3px rgb(var(--teal-rgb) / .4)) saturate(.6)';
-  kids.forEach(function(n){ghost.appendChild(n.cloneNode(true));solid.appendChild(n);});
-  Array.prototype.forEach.call(ghost.querySelectorAll('[id]'),function(e){e.removeAttribute('id');});
-  S.appendChild(ghost);S.appendChild(solid);
-  var bb;try{bb=solid.getBBox();}catch(e){bb=null;}
-  if(!bb||!bb.height)return;
-  var h=bb.height*eqF,y0=bb.y+bb.height-h,defs=getDefs();
-  var cp=E('clipPath',{id:'hb-eqclip'},defs);E('rect',{x:bb.x-6,y:y0,width:bb.width+12,height:h+8},cp);
-  solid.setAttribute('clip-path','url(#hb-eqclip)');
-  // equity line + label
-  E('line',{x1:bb.x-10,x2:bb.x+bb.width+10,y1:y0,y2:y0,stroke:'#e8c56a','stroke-width':1,'stroke-dasharray':'5 4',opacity:.9},S);
-  var t=E('text',{x:Math.max(10,bb.x-12),y:y0<24?y0+14:y0-5,'font-size':10,'font-family':'Share Tech Mono,monospace',fill:'#e8c56a','text-anchor':'start'},S);t.textContent='MORTGAGE '+(Math.floor(eqF*1000)/10)+'% PAID';
-  hbDrawInterestBar();
-}
-function hbDrawInterestBar(){
-  try{
-    var S2=hbL2Sims(),base=S2.base,scn=S2.scn;
-    var tot=Math.max(1,base.totalInterest),rem=Math.min(tot,scn.totalInterest),slain=Math.max(0,tot-rem);
-    var x=596,y=96,w=22,h=290,remH=h*rem/tot,slH=h-remH;
-    var g=E('g',{id:'hb-intbar'},S);
-    E('rect',{x:x,y:y,width:w,height:h,rx:4,fill:'rgba(255,255,255,.05)',stroke:'rgba(255,255,255,.14)','stroke-width':.8},g);
-    if(slH>0.5)E('rect',{x:x,y:y,width:w,height:slH,rx:4,fill:'rgba(62,207,142,.55)'},g);
-    E('rect',{x:x,y:y+slH,width:w,height:remH,rx:4,fill:'rgba(224,92,92,.6)'},g);
-    var lab=function(tx,ty,txt,col,anchor,sz){var e=E('text',{x:tx,y:ty,'font-size':sz||8.5,'font-family':'Share Tech Mono,monospace',fill:col,'text-anchor':anchor||'middle'},g);e.textContent=txt;};
-    lab(x+w/2,y-26,'INTEREST','#c9d6e3');lab(x+w/2,y-14,'to pay','#8fa3b5');
-    lab(x+w/2,y+h+14,hbMoney(rem),'#e05c5c');lab(x+w/2,y+h+26,'left','#8fa3b5');
-    if(slain>0.5){lab(x+w/2,y+h+42,'−'+hbMoney(slain),'#3ecf8e');lab(x+w/2,y+h+54,'slain','#8fa3b5');}
-  }catch(e){}
-}
-
-(function(){   // tag the ground grid so the equity shading measures the HOUSE, not the plot
-  var _g=_grid;_grid=function(){var n0=S.childNodes.length;_g.apply(this,arguments);for(var i=n0;i<S.childNodes.length;i++){var c=S.childNodes[i];if(c.setAttribute)c.setAttribute('data-g','1');}};
-})();
 (function(){
-  var _r=redraw;redraw=function(){_r.apply(this,arguments);try{hbAfterDraw();}catch(e){console.error('[Vault-It] hbAfterDraw',e);}try{hbWriteStats();}catch(e){}};
+  var _r=redraw;redraw=function(){_r.apply(this,arguments);try{hbWriteStats();}catch(e){}};
   var _u=updateUI;updateUI=function(){_u.apply(this,arguments);try{hbRenderLevels();hbRenderHUD();}catch(e){console.error('[Vault-It] hbRender',e);}};
 })();
-function hbAfterDraw(){
-  if(hb3dActive())return;   // the 3D engine draws its own overlays
-  if(hbLevel()>=3&&hbView()===3){hbDrawL3();return;}
-  if(hbLevel()===1&&!(state.saved<=0&&(!state.deposits||!state.deposits.length)))hbGhostWrap();
-  else if(hbLevel()>=2&&typeof hbShadeEquity==='function')hbShadeEquity();
-}
 
 // ═══════════════════════════════════════════════════════════════
 // HOUSE BUILDER 3D — app integration (engine: HB3D in <head>). Falls back to the SVG engine silently.
 // ═══════════════════════════════════════════════════════════════
 var HB3DAPP = { viewer: null, key: '', models: {}, order: [], want: null, lastP: null, lastMode: null, idle: {} };
 // Feature flags: ?<name>=new turns one on for this visit (?<name>=old turns it off), localStorage 'vi-flag-<name>' = '1' keeps it on.
-var VI_FLAG_DEFAULT = { house: true, nw: true };   // house: the brand build is the default (owner, 31 Oct 2026: the screen recording is the target; the classic viewer stays as the Settings switch); nw: 3D net worth on
+var VI_FLAG_DEFAULT = { nw: true };   // nw: 3D net worth on. The house builder has no flag: the brand build is the only one (owner, 31 Oct / 1 Nov 2026)
 function viFlag(name) {
   // ?x=new (or Settings) puts this device on the new view; ?x=old puts it on the classic one. Without either, the default above applies.
   try { var q = new URLSearchParams(location.search).get(name);
@@ -16382,13 +15345,12 @@ function viFlag(name) {
     var v = localStorage.getItem('vi-flag-' + name); return v == null ? !!VI_FLAG_DEFAULT[name] : v !== '0'; } catch (e) { return !!VI_FLAG_DEFAULT[name]; }
 }
 function viFlagSet(name, on) { try { localStorage.setItem('vi-flag-' + name, on ? '1' : '0'); } catch (e) {} }
-function setViewFlag(name, on, btn) {   // Settings: brand build or classic house builder; 3D or classic net worth chart
+function setViewFlag(name, on, btn) {   // Settings: 3D or classic net worth chart
   viFlagSet(name, on); var row = btn && btn.parentNode; if (row) [].forEach.call(row.children, function (b) { b.classList.toggle('active', b === btn); });
-  if (name === 'house') { try { updateUI(); } catch (e) {} toast(on ? 'Brand house build on' : 'Classic house builder on'); }
-  else { try { if (on) { if (window.nw3dMount) nw3dMount(); } else if (window.nw3d && nw3d.disable) nw3d.disable(); } catch (e) { console.error('[Vault-It] net worth view', e); } toast(on ? '3D net worth on' : 'Classic net worth chart on'); }
+  { try { if (on) { if (window.nw3dMount) nw3dMount(); } else if (window.nw3d && nw3d.disable) nw3d.disable(); } catch (e) { console.error('[Vault-It] net worth view', e); } toast(on ? '3D net worth on' : 'Classic net worth chart on'); }
 }
-// The brand build (brand handover 6.2 to 6.10) on the six 3D houses, Level 1 only: ?house=new or vi-flag-house = 1.
-function hbBrandOn() { return viFlag('house') && typeof HB3D !== 'undefined' && !!HB3D.brandStats; }
+// The brand build (brand handover 6.2 to 6.10): the only house builder (owner, 1 Nov 2026: the old one is deleted), Levels 1 and 2.
+function hbBrandOn() { return typeof HB3D !== 'undefined' && !!HB3D.brandStats; }
 // 6.8 gamified feedback (brand build): pop-up, stage flash and milestone toasts. Toasts only after the person has interacted, never during the opening build.
 var _hbEngaged = false, _hbMS = [[1, 'Site cleared'], [5, 'Foundations'], [10, '10%'], [25, 'Quarter'], [50, 'Halfway'], [75, 'Three-quarters'], [100, 'Deposit ready']];
 function hbPop(txt) { var h = document.getElementById('hb-pops'); if (!h) return; var e = document.createElement('div'); e.className = 'pop'; e.textContent = txt; h.appendChild(e); setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 1300); }
@@ -16418,7 +15380,7 @@ function hb3dType(t) { return HB3D_TYPES[t] ? t : 'terraced'; }
 function hb3dActive() { var el = document.getElementById('house-scene'); return hb3dOn() && !!el && el.getAttribute('data-engine') === '3d'; }
 function hb3dHas(t) { if (t === 'custom') return !!HB3DAPP.customModel; return typeof HB3D !== 'undefined' && !!(HB3D.models && HB3D.models[hb3dType(t)]); }
 function hb3dFloor(type, f) { var mx = type === 'flat' ? 10 : (type === 'apartment' ? 30 : 1); return Math.max(1, Math.min(mx, parseInt(f, 10) || 5)); }
-function hb3dDetail() { try { return localStorage.getItem('vi_hb_detail') === 'full' ? 'full' : 'clean'; } catch (e) { return 'clean'; } }
+function hb3dDetail() { return 'clean'; }   // the brand build draws the clean shell only
 function hb3dKey(type, floor) { return type + '|' + (type === 'custom' ? (HB3DAPP.designId || '') : (type === 'flat' || type === 'apartment') ? floor : '') + '|' + hb3dDetail(); }
 // compiled models are cached (small LRU) — building one takes 0.1–0.5 s
 function hb3dModel(type, floor) {
@@ -16453,7 +15415,8 @@ function hb3dIdleBuild(type, floor) {
 function hbDesignMeta() { try { return JSON.parse(localStorage.getItem('vi_hb_design') || 'null'); } catch (e) { return null; } }
 function hbDesignSetMeta(m) { try { if (m) localStorage.setItem('vi_hb_design', JSON.stringify(m)); else localStorage.removeItem('vi_hb_design'); } catch (e) {} }
 // on = the user chose to show their design and it is ready to draw
-function hbDesignOn() { var m = hbDesignMeta(); if (!m || !m.active || !hb3dOn()) return false; if (!HB3DAPP.customModel || HB3DAPP.designId !== m.id) { hbDesignEnsure(); return false; } return true; }
+var HB_DESIGN_LOCKED = true;   // Your own design: locked for everyone (owner, 1 Nov 2026: Pro, after the MVP); saved designs are left as they are
+function hbDesignOn() { if (HB_DESIGN_LOCKED) return false; var m = hbDesignMeta(); if (!m || !m.active || !hb3dOn()) return false; if (!HB3DAPP.customModel || HB3DAPP.designId !== m.id) { hbDesignEnsure(); return false; } return true; }
 function _hbIdb() {
   return new Promise(function (res, rej) {
     if (!window.indexedDB) return rej(new Error('no IndexedDB'));
@@ -16539,19 +15502,15 @@ function hbDesignCard() {
 }
 
 // restore the user's design (and any AI generation still running) once the page has settled
-setTimeout(function () { try { hbDesignCard(); hbDesignEnsure(); hbMeshyResume(); } catch (e) {} }, 1500);
+setTimeout(function () { if (HB_DESIGN_LOCKED) return; try { hbDesignCard(); hbDesignEnsure(); hbMeshyResume(); } catch (e) {} }, 1500);
 function hbSceneMode() {
   var type = hb3dType(state.houseType), floor = hb3dFloor(type, state.apartmentFloor);
   if (hbDesignOn()) { type = 'custom'; floor = 1; }   // the user's own uploaded / AI design replaces the standard house
   var blank = state.saved <= 0 && (!state.deposits || !state.deposits.length);
   if (blank) return { mode: 'site', type: type, floor: floor, p: 0 };
-  if (hbLevel() >= 3 && hbView() === 3) {
-    var u = hbUpGet(), now = hbUpNow(u), ut = hb3dType(u.type || type);
-    return { mode: 'build', upgrade: true, type: ut, floor: hb3dFloor(ut, state.apartmentFloor), p: Math.max(0, Math.min(1, now.readiness || 0)), u: u, ready: now.readiness };
-  }
   if (state.houseMode === 'purchased' && (+state.mortgageBalance || 0) <= 0) return { mode: 'complete', type: type, floor: floor, p: 1, eq: 1 };
   if (state.houseMode === 'purchased') {
-    return { mode: 'equity', type: type, floor: floor, p: 1, eq: hbL2Progress() };   // Level 2: the house builds in full colour as the mortgage is paid
+    return { mode: 'equity', type: type, floor: floor, p: 1, eq: hbL2Own(), paid: hbL2Progress() };   // Level 2: the house builds in full colour as the mortgage is paid
   }
   // build % == deposit % funded, exactly (pct() = saved ÷ deposit target); free accounts see a 4% teaser
   return { mode: 'build', type: type, floor: floor, p: _isPro() ? pct() : 0.04 };
@@ -16625,8 +15584,10 @@ function hb3dPlaceOverlays() {
     var m = v.model, p = sm.mode === 'build' ? v.p : (sm.mode === 'site' ? 0 : 1), st = bri ? HB3D.brandStats(m, p) : m.stats(p);
     var name = (m.name || '').replace(/^./, function (c) { return c.toUpperCase(); });
     var what = m.focus ? (sm.mode === 'build' ? 'your floor · ' + st.stage + ' · ' : 'your floor · ') : (sm.mode === 'build' ? st.stage + ' · ' : '');
-    var capT = sm.mode === 'site' ? '' : (name + ' · ' + what + st.bricksLaid.toLocaleString('en-GB') + ' / ' + st.bricksTotal.toLocaleString('en-GB') + ' bricks' + (st.tilesTotal && !bri ? ' · ' + st.tilesLaid.toLocaleString('en-GB') + ' tiles' : '')
-      + (bri ? ' · ' + (window.VI_CURRENCY_SYMBOL || '£') + (HB3D.brandBrickValue(depositTarget(), st.bricksTotal) * (window.VI_CURRENCY_RATE || 1)).toFixed(2) + ' a brick' : ''));
+    var bInf0 = bri && v.brandInfo ? v.brandInfo() : null;
+    if (bInf0 && (sm.mode === 'equity' || sm.mode === 'complete')) st = { bricksLaid: bInf0.colour, bricksTotal: bInf0.colourTotal, tilesTotal: 0, tilesLaid: 0 };   // Level 2: the bricks in full colour are yours
+    var capT = sm.mode === 'site' ? '' : (name + ' · ' + what + st.bricksLaid.toLocaleString('en-GB') + ' / ' + st.bricksTotal.toLocaleString('en-GB') + (sm.mode === 'equity' || sm.mode === 'complete' ? ' bricks and tiles yours' : ' bricks') + (st.tilesTotal && !bri ? ' · ' + st.tilesLaid.toLocaleString('en-GB') + ' tiles' : '')
+      + (bri && sm.mode === 'build' ? ' · ' + (window.VI_CURRENCY_SYMBOL || '£') + (HB3D.brandBrickValue(depositTarget(), st.bricksTotal) * (window.VI_CURRENCY_RATE || 1)).toFixed(2) + ' a brick' : ''));
     var bInf = bri && v.brandInfo ? v.brandInfo() : null; if (bInf && (bInf.reduced || bInf.lite)) capT += bInf.reduced ? ' · animations off: reduced motion is on in your device settings' : ' · lighter animation for this device';
     hbTxt(cap, capT);
     hbAttr(v.renderer.domElement, 'aria-label', '3D model: ' + (m.name || 'house') + (sm.mode === 'equity' ? ', mortgage ' + Math.round(sm.eq * 100) + '% paid' : sm.mode === 'build' ? ', ' + Math.round(p * 100) + '% built' : ''));
@@ -16637,7 +15598,9 @@ function hb3dPlaceOverlays() {
 function hb3dBrandOverlays(v, sm, bi, rl, EW, EH) {
   var svg = document.getElementById('hb3d-lead'), pill = document.getElementById('hb3d-bpill');
   if (!svg || !pill || !rl) return;
-  var on = !!bi && sm.mode === 'build' && bi.p > 0;
+  var L2 = !!bi && (sm.mode === 'equity' || sm.mode === 'complete');   // Level 2 under the brand look (owner, 1 Nov)
+  var on = !!bi && ((sm.mode === 'build' && bi.p > 0) || L2);
+  if (L2) { var own = document.getElementById('hb3d-ownlabel'); if (own && own.style.display !== 'none') own.style.display = 'none'; }   // the gold tag says it instead
   hbSty(svg, 'display', on ? 'block' : 'none'); if (!on) { hbSty(pill, 'display', 'none'); if (bi) hbSty(rl, 'display', 'none'); return; }
   var W = EW == null ? v.el.clientWidth : EW, Ht = EH == null ? v.el.clientHeight : EH, fs = Math.max(11, Math.min(17, W * 0.026)), lpad = 22, hb = v.el.querySelector('.hud-bar'), rail = 58, $ = function (s) { return svg.querySelector(s); };
   if (hb && v.el._railK !== W + 'x' + Ht) { v.el._railK = W + 'x' + Ht; v.el._rail = 58; if (hb.offsetWidth) { var er = v.el.getBoundingClientRect(), hr = hb.getBoundingClientRect(); if (hr.left > er.left + W / 2) v.el._rail = Math.max(0, er.right - hr.left) + 4; } }
@@ -16645,8 +15608,9 @@ function hb3dBrandOverlays(v, sm, bi, rl, EW, EH) {
   // the tag: ROW n / N and x.x% OF DEPOSIT, joined to the slice centre by a leader line
   var pc = v.project(bi.cx, bi.sliceA > 0 ? bi.y : bi.top, bi.cz);
   var l1 = bi.keys ? 'KEYS ARE YOURS' : (v.model.focus ? 'FLOOR ' + (sm.floor || '') + ' · ' : '') + 'ROW ' + bi.row + ' / ' + bi.rows, l2 = (bi.p * 100).toFixed(1) + '% OF DEPOSIT';
+  if (L2) { l1 = sm.mode === 'complete' ? 'MORTGAGE FREE' : 'MORTGAGE ' + (Math.floor((sm.paid || 0) * 1000) / 10) + '% PAID'; l2 = sm.mode === 'complete' ? '' : 'YOU OWN ' + (Math.floor((sm.eq || 0) * 1000) / 10) + '%'; }
   if (!rl.classList.contains('brand')) rl.classList.add('brand'); hbSty(rl, 'fontSize', fs + 'px');
-  var html = l1 + '<span>' + l2 + '</span>'; if (rl._h !== html) { rl.innerHTML = html; rl._h = html; }
+  var html = l1 + (l2 ? '<span>' + l2 + '</span>' : ''); if (rl._h !== html) { rl.innerHTML = html; rl._h = html; }
   var rlShow = pc.behind ? 'none' : 'block'; hbSty(rl, 'display', rlShow);
   var rs = hbSize(rl, html + '|' + fs + '|' + rlShow), tw = rs[0] || 150, th = rs[1] || fs * 2.9;   // measured again only when the text changes
   var tx = Math.max(lpad, Math.min(W - tw - 6 - rail, pc.x + fs * 1.6)), ty = Math.max(6, Math.min(Ht - th - 30, pc.y - th - fs * 1.4));
@@ -16721,8 +15685,8 @@ function hb3dRedraw() {
       var key = document.querySelector('#houseSceneCard .vp-key'); if (key) key.textContent = 'DRAG · orbit   ·   RIGHT-DRAG / 2 FINGERS · pan   ·   SCROLL / PINCH · zoom';
     }
     v.start();
-    var brandOn = hbBrandOn() && !sm.upgrade && typeof v.setBrand === 'function';   // house flag: the brand build for Level 1
-    if (typeof v.setBrand === 'function') v.setBrand(brandOn);
+    var brandOn = true;   // the brand build is the only house builder (Levels 1 and 2)
+    v.setBrand(true);
     var _hs = document.getElementById('house-scene'); if (_hs) _hs.classList.toggle('hb-brand', brandOn);   // scanlines over the stage (handover 6.6)
     var key2 = hb3dKey(sm.type, sm.floor), model = hb3dModel(sm.type, sm.floor), changed = key2 !== HB3DAPP.key;
     if (changed) {
@@ -16731,17 +15695,12 @@ function hb3dRedraw() {
       if (!sameType) v.setZoom(_houseZoom / _HZ_DEFAULT);
     }
     if (Math.abs(v.zoom() * _HZ_DEFAULT - _houseZoom) > 1e-6) v.setZoom(_houseZoom / _HZ_DEFAULT);
-    var lights = sm.mode === 'complete' || sm.mode === 'equity';
-    var grow = sm.mode === 'build' && HB3DAPP.lastMode === 'build' && HB3DAPP.lastP != null && sm.p > HB3DAPP.lastP + 1e-4;
     var first = sm.mode === 'build' && HB3DAPP.lastP == null;
-    if (brandOn && sm.mode === 'build') {   // brand: opening animates from 0; the displayed % eases to the saved %; un-laying is instant
-      if (first) v.setState({ mode: 'build', eq: 0, lights: false, p: 0 });
-      else v.setState({ mode: 'build', eq: 0, lights: false });
+    if (sm.mode === 'build') {   // opening animates from 0; the displayed % eases to the saved %; un-laying is instant
+      if (first) v.setState({ mode: 'build', eq: 0, p: 0 });
+      else v.setState({ mode: 'build', eq: 0 });
       if (!first && sm.p < v.p - 1e-9) v.setState({ p: sm.p }); else v.animateTo(sm.p, 1);
-    } else if (grow || first) {   // watch the new bricks go in
-      v.setState({ mode: 'build', eq: 0, lights: lights, p: first ? Math.max(0, sm.p - 0.12) : v.p });
-      v.animateTo(sm.p, first ? 1200 : 1600);
-    } else v.setState({ mode: sm.mode, p: sm.p, eq: sm.eq || 0, lights: lights });
+    } else v.setState({ mode: sm.mode, p: sm.p, eq: sm.eq || 0 });   // site, or Level 2 (the paid line eases up in the frame loop)
     HB3DAPP.lastP = sm.p; HB3DAPP.lastMode = sm.mode;
     hb3dOverlays(sm);
     // wake the frame loop (it sleeps when still) and place the labels again once the new state has been drawn, so the gold
@@ -16923,24 +15882,16 @@ function hbRenderL3(el){
     +'<div style="font-size:.5rem;color:var(--t3)">'+(now.ready?'You could afford the upgrade today.':'Ready '+(w.ready?(w.ready.months===0?'now':'in '+hbYM(w.ready.months)):'beyond the mortgage term')+' on your current plan.')+' The new home is shown as a ghost build.</div>'
     +'<div style="margin-top:10px"><button class="btn-add-data" onclick="hbOpenUpgrade()">🚀 Open upgrade planner</button></div>';
 }
-function hbUnlockL3(){if(viBlockEdit())return;
-  if(state.houseMode!=='purchased'){toast('Buy your first home to unlock Level 3');return;}
-  state.level3=true;state.viewLevel=3;
-  if(!state.up)state.up=hbUpGet();
-  save();updateUI();toast('🚀 Level 3 unlocked: Upgrade');
-}
+function hbUnlockL3(){toast(HB_L3_LOCKED);}   // Level 3 is locked for everyone (owner, 1 Nov 2026); the name stays for old buttons
 function hbL3Card(){
+  if(state.houseMode!=='purchased')return '';
+  return '<div class="hb-tip hb-l3-locked">🔒 '+HB_L3_LOCKED+' <span class="hb-own-pro">PRO</span></div>';
+}
+function hbL3CardDormant(){   // the old unlock card, kept for when Level 3 returns
   if(state.level3||state.houseMode!=='purchased')return '';
   var val=+state.valuation||+state.target||0,bal=Math.max(0,+state.mortgageBalance||0),eqp=val>0?(val-bal)/val*100:0,th=hbUpGet().threshold;
   if(eqp>=th)return '<div class="hb-tip" style="border-color:rgb(var(--gold-rgb) / .6)">🚀 <b>Level 3 is ready</b>: you own '+eqp.toFixed(0)+'% (threshold '+th+'%). Time to plan your upgrade.<div style="margin-top:8px"><button class="btn-add-data" onclick="hbUnlockL3()">Unlock Level 3</button></div></div>';
   return '<div class="hb-tip">🔒 Level 3 unlocks at <b>'+th+'%</b> equity (you have '+eqp.toFixed(0)+'%). <button class="stk-btn" onclick="hbUnlockL3()">Unlock early</button></div>';
-}
-function hbDrawL3(){
-  var u=hbUpGet(),now=hbUpNow(u),p=Math.max(.04,now.readiness);
-  (DRAW[u.type]||drawTerraced)(p);
-  hbGhostWrap();
-  var t=E('text',{x:20,y:26,'font-size':11,'font-family':'Share Tech Mono,monospace',fill:'#e8c56a'},S);t.textContent='UPGRADE '+(now.readiness*100).toFixed(0)+'% FUNDED';
-  var t2=E('text',{x:20,y:40,'font-size':8.5,'font-family':'Share Tech Mono,monospace',fill:'#8fa3b5'},S);t2.textContent=(u.mode==='sell'?'sell & move':'keep & let')+' · target '+hbMoney(u.price);
 }
 
 function updateMilestoneLabels(){
@@ -16973,10 +15924,7 @@ function resetView(){
   redraw();
 }
 
-function housePan(dx, dy) {
-  _panX += dx; _panY += dy;
-  _updateHUD(); redraw();
-}
+function housePan(dx, dy) { _panX += dx; _panY += dy; _updateHUD(); }   // the 3D view pans itself; the still picture does not move
 
 // ═══════════════════════════════════════════════════════════════
 // HOUSE ISO VIEWPORT — full gesture control
@@ -16992,17 +15940,8 @@ function _houseSetZoom(z, ax, ay) {
     var z3 = Math.max(0.5, Math.min(hb3dMaxZoom(), z));
     HB3DAPP.viewer.setZoom(z3 / _HZ_DEFAULT); _houseZoom = z3; _updateHUD(); return;
   }
-  var nz = Math.max(0.5, Math.min(6, z)), f = nz / _houseZoom;
-  if (ax == null) { ax = _VX; ay = _VY; }
-  _panX = _panX * f + (ax - _VX) * (1 - f);   // keep the point under the fingers/cursor fixed
-  _panY = _panY * f + (ay - _VY) * (1 - f);
-  _houseZoom = nz;
-  _updateHUD();
+  _houseZoom = Math.max(0.5, Math.min(6, z)); _updateHUD();   // the still picture does not zoom
   redraw();
-}
-function _svgPt(cx, cy) {
-  var r = document.getElementById('houseSvg').getBoundingClientRect(), sc = Math.min(r.width / 700, r.height / 500);
-  return [350 + (cx - (r.left + r.width / 2)) / sc, 250 + (cy - (r.top + r.height / 2)) / sc];
 }
 
 function houseZoomIn()  { _houseSetZoom(_houseZoom * 1.2); }
@@ -17032,105 +15971,9 @@ function _updateHUD() {
   if (mEl) mEl.textContent = _orbitMode ? 'ORBIT MODE' : 'PAN MODE';
 }
 
-// ── HOUSE BUILDER GESTURE SYSTEM (Pointer Events API) ─────────────────────────
-// Unified mouse+touch+stylus via PointerEvents — setPointerCapture ensures
-// events continue when pointer leaves the element boundary. touch-action:none
-// in CSS tells the browser not to intercept the touch stream for scrolling.
-(function initHouseGestures() {
-  function attach() {
-    var el = document.getElementById('house-scene');
-    if (!el) return;
-
-    var ptrs = new Map(); // pointerId → {x,y}
-    var _pinchStartDist = 0, _pinchStartZoom = 1;
-    var _orb2PrevX = 0;
-
-    function pDist(a, b) {
-      var dx = a.x - b.x, dy = a.y - b.y;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    el.addEventListener('pointerdown', function(e) {
-      if (hb3dActive()) return;   // the 3D view uses OrbitControls on its canvas
-      // Ignore clicks on HUD buttons — let them bubble to onclick
-      if (e.target !== el && e.target.closest && (e.target.closest('.hud-bar') || e.target.closest('.vp-guide'))) return;
-      e.preventDefault();
-      el.setPointerCapture(e.pointerId);
-      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      el.style.cursor = 'grabbing';
-
-      if (ptrs.size === 2) {
-        var pts = Array.from(ptrs.values());
-        _pinchStartDist = pDist(pts[0], pts[1]);
-        _pinchStartZoom = _houseZoom;
-        _orb2PrevX = (pts[0].x + pts[1].x) / 2;
-      }
-    });
-
-    el.addEventListener('pointermove', function(e) {
-      if (hb3dActive()) return;
-      if (!ptrs.has(e.pointerId)) return;
-      var prev = ptrs.get(e.pointerId);
-      var cur = { x: e.clientX, y: e.clientY };
-      ptrs.set(e.pointerId, cur);
-
-      if (ptrs.size === 1) {
-        var dx = cur.x - prev.x, dy = cur.y - prev.y;
-        if (_orbitMode) {
-          _viewAngle -= dx * 0.007;
-          _viewAngle = _viewAngle % (2 * Math.PI); // normalise — Bug 6 fix
-          _panY += dy * 0.35;
-        } else {
-          _panX += dx; _panY += dy;
-        }
-        _updateHUD(); redraw();
-      } else if (ptrs.size === 2) {
-        var pts = Array.from(ptrs.values());
-        var dist = pDist(pts[0], pts[1]);
-        if (_pinchStartDist > 0) { var _a = _svgPt((pts[0].x + pts[1].x) / 2, (pts[0].y + pts[1].y) / 2); _houseSetZoom(_pinchStartZoom * (dist / _pinchStartDist), _a[0], _a[1]); }
-        var midX = (pts[0].x + pts[1].x) / 2;
-        _viewAngle -= (midX - _orb2PrevX) * 0.007;
-        _viewAngle = _viewAngle % (2 * Math.PI);
-        _orb2PrevX = midX;
-        _updateHUD(); redraw();
-      }
-    });
-
-    function onUp(e) {
-      if (hb3dActive()) return;
-      ptrs.delete(e.pointerId);
-      try { el.releasePointerCapture(e.pointerId); } catch(_) {}
-      if (ptrs.size === 0) el.style.cursor = 'grab';
-      // Reset pinch baseline when going from 2→1 fingers
-      if (ptrs.size === 1) {
-        var pts = Array.from(ptrs.values());
-        _pinchStartZoom = _houseZoom;
-        _orb2PrevX = pts[0].x;
-      }
-    }
-    el.addEventListener('pointerup',     onUp);
-    el.addEventListener('pointercancel', onUp);
-
-    el.addEventListener('wheel', function(e) {
-      if (hb3dActive()) return;
-      e.preventDefault();
-      var _a = _svgPt(e.clientX, e.clientY);
-      _houseSetZoom(_houseZoom * Math.exp(-e.deltaY * 0.0015), _a[0], _a[1]);
-    }, { passive: false });
-
-    window.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && _isExpanded) toggleExpand();
-    });
-
-    _updateHUD();
-  }
-  // Guarantee DOM is ready — no setTimeout guesswork
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', attach);
-  } else {
-    attach();
-  }
-}());
+// The 3D view handles its own gestures (OrbitControls on its canvas); the still picture is still. Escape closes the expanded stage.
+window.addEventListener('keydown', function (e) { if (e.key === 'Escape' && _isExpanded) toggleExpand(); });
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { _updateHUD(); }); else _updateHUD();
 
 // ── METALS VIEWPORT STATE & CONTROLS ──────────────────────────────
 var _mPanX=0, _mPanY=0, _mAngle=0, _mIsExpanded=false, _mZoom=1;
@@ -23888,7 +22731,7 @@ function _refreshPioneerSettingsUI(){
 function showSettings(){
   try{renderConnections()}catch(e){}
   (function(){var r=document.getElementById('set-view');if(!r)return;var v=viSimple()?'simple':'adv';[].forEach.call(r.children,function(b){b.classList.toggle('active',b.getAttribute('data-val')===v);});})();
-  [['house','set-house3d'],['nw','set-nw3d']].forEach(function(x){var r=document.getElementById(x[1]);if(!r)return;var on=viFlag(x[0]);[].forEach.call(r.children,function(b){b.classList.toggle('active',(b.getAttribute('data-val')==='1')===on);});});
+  [['nw','set-nw3d']].forEach(function(x){var r=document.getElementById(x[1]);if(!r)return;var on=viFlag(x[0]);[].forEach.call(r.children,function(b){b.classList.toggle('active',(b.getAttribute('data-val')==='1')===on);});});
   document.getElementById('set-claude-key').value=localStorage.getItem('claude_api_key')||'';
   document.getElementById('set-meshy-key').value=localStorage.getItem('meshy_api_key')||'';
   var cgEl=document.getElementById('set-cg-key');if(cgEl)cgEl.value=localStorage.getItem('coingecko_api_key')||'';
@@ -23957,7 +22800,7 @@ async function testApiKey(type){
 
 // ── YOUR OWN DESIGN: upload a GLB/GLTF, or generate one with Meshy AI ─────────
 // Both become the House Builder's house (see hbDesignAdopt) — hologram while saving the deposit, colour once owned.
-function loadCustomModel(input){
+function loadCustomModel(input){if(HB_DESIGN_LOCKED){toast('Your own design: coming later as part of Pro');return;}
   var file = input && input.files && input.files[0]; if (input) input.value = '';
   if (viGateDesign('design')) return;
   if (!file) return;
@@ -24002,7 +22845,7 @@ async function _hbMeshyWait(key, id, label, statusEl) {
 }
 function _hbMeshyPending(p) { try { if (p) { var o = JSON.parse(localStorage.getItem('vi_hb_meshy') || '{}'); localStorage.setItem('vi_hb_meshy', JSON.stringify(Object.assign(o, p, { t: Date.now() }))); } else localStorage.removeItem('vi_hb_meshy'); } catch (e) {} }
 var _hbMeshyBusy = false;
-async function generateMeshyModel(resume){
+async function generateMeshyModel(resume){if(HB_DESIGN_LOCKED){toast('Your own design: coming later as part of Pro');return;}
   if (viGateDesign('aimodel')) return;
   if (_hbMeshyBusy) { showToast('Already generating, hang on'); return; }
   var key = (localStorage.getItem('meshy_api_key') || '').trim();
@@ -24053,74 +22896,6 @@ function hbMeshyResume() {
 }
 
 // ── SCAFFOLDING HELPER ────────────────────────────────────────
-function _drawScaffolding(svg,x,y,z,W,D,WH,p){
-  if(p>=0.35||p<=0)return;
-  var opacity=Math.max(0,0.7*(0.35-p)/0.35);
-  var corners=[[0,0],[W,0],[0,D],[W,D]];
-  corners.forEach(function(c){
-    var bot=_iso(x+c[0],y+c[1],z);
-    var top=_iso(x+c[0],y+c[1],z+WH+0.4);
-    var ln=document.createElementNS('http://www.w3.org/2000/svg','line');
-    ln.setAttribute('x1',bot.x);ln.setAttribute('y1',bot.y);
-    ln.setAttribute('x2',top.x);ln.setAttribute('y2',top.y);
-    ln.setAttribute('stroke','rgba(201,168,76,'+opacity+')');
-    ln.setAttribute('stroke-width','2');
-    svg.appendChild(ln);
-  });
-  var bh=z+WH*0.5;
-  [[0,0,W,0],[0,D,W,D],[0,0,0,D],[W,0,W,D]].forEach(function(e){
-    var a=_iso(x+e[0],y+e[1],bh),b=_iso(x+e[2],y+e[3],bh);
-    var ln=document.createElementNS('http://www.w3.org/2000/svg','line');
-    ln.setAttribute('x1',a.x);ln.setAttribute('y1',a.y);
-    ln.setAttribute('x2',b.x);ln.setAttribute('y2',b.y);
-    ln.setAttribute('stroke','rgba(201,168,76,'+(opacity*0.6)+')');
-    ln.setAttribute('stroke-width','1.5');
-    svg.appendChild(ln);
-  });
-}
-
-// ── COMPLETION EXTRAS ─────────────────────────────────────────
-function _drawCompletionExtras(svg,x,y,z,W,D,WH){
-  // Glowing perimeter lines (no filled faces — avoids floating squares)
-  var ec='rgba(68,192,185,0.45)';
-  _line([x-0.5,y-0.5,z],[x+W+0.5,y-0.5,z],ec,1.2);
-  _line([x+W+0.5,y-0.5,z],[x+W+0.5,y+D+0.5,z],ec,1.2);
-  _line([x+W+0.5,y+D+0.5,z],[x-0.5,y+D+0.5,z],ec,1.2);
-  _line([x-0.5,y+D+0.5,z],[x-0.5,y-0.5,z],ec,1.2);
-
-  // Left garden bush — rendered as a small 3D box (not flat face)
-  var bx=x-2.8,by=y+D*0.3;
-  _walls(bx,by,z,2.2,1.8,0.9,1,false,'rgba(50,130,60,.85)');
-
-  // Right garden bush
-  var bx2=x+W+0.6,by2=y+D*0.3;
-  _walls(bx2,by2,z,2.2,1.8,0.9,1,false,'rgba(50,130,60,.85)');
-
-  // Garden path — 3 ISO step lines, not a filled face
-  var doorX=x+W/2, pathYStart=y+D, pathYEnd=y+D+4;
-  for(var pi=0;pi<3;pi++){
-    var pyo=pathYStart+pi*1.4;
-    _line([doorX-0.8,pyo,z],[doorX+0.8,pyo,z],'rgba(90,110,90,0.5)',0.8);
-  }
-
-  // Fence — line-based, no filled faces
-  var fy=y+D+5;
-  _line([x-2.5,fy,z],[x+W+2.5,fy,z],'rgba(68,192,185,0.25)',1.0);
-  for(var fp=0;fp<=5;fp++){
-    var fpx=x-2.5+fp*(W+5)/5;
-    _line([fpx,fy,z],[fpx,fy,z+0.6],'rgba(68,192,185,0.35)',1.2);
-  }
-
-  // Letterbox on front wall (a small raised face, not floating)
-  var lbX=x+W/2-0.8,lbY=y,lbZ=z+1.4;
-  _face([[lbX,lbY,lbZ],[lbX+1.6,lbY,lbZ],[lbX+1.6,lbY,lbZ+0.5],[lbX,lbY,lbZ+0.5]],'rgba(200,160,20,0.85)','rgba(200,160,20,0.5)',1.0);
-
-  // Solar panels on roof (small panels flush against roof slope)
-  var spz=z+WH+0.05;
-  var panelD=Math.min(D*0.6,1.5);
-  _face([[x+W*0.2,y+D*0.2,spz],[x+W*0.4,y+D*0.2,spz+0.08],[x+W*0.4,y+D*0.2+panelD,spz+0.08],[x+W*0.2,y+D*0.2+panelD,spz]],'rgba(10,30,80,0.85)','rgba(68,192,185,0.4)',0.8);
-  _face([[x+W*0.5,y+D*0.2,spz],[x+W*0.7,y+D*0.2,spz+0.08],[x+W*0.7,y+D*0.2+panelD,spz+0.08],[x+W*0.5,y+D*0.2+panelD,spz]],'rgba(10,30,80,0.85)','rgba(68,192,185,0.4)',0.8);
-}
 
 // ── DEBT CHARTS ───────────────────────────────────────────────
 // ── Theme colours for canvas drawing (canvas cannot read CSS variables) ──
@@ -28764,7 +27539,7 @@ window.addEventListener('error',function(e){var m=String(e&&e.message||'error').
 window.addEventListener('unhandledrejection',function(e){var m=String(e&&e.reason&&(e.reason.message||e.reason)||'rejection').replace(/\d+/g,'#').slice(0,200);ERRS.push({t:now(),msg:m,src:'promise'});if(ERRS.length>20)ERRS.shift();rec('error',m)});
 function context(){
   var q=function(id){var e=document.getElementById(id);return e?e.className:''};
-  var flags={};try{flags.house=typeof viFlag==='function'?!!viFlag('house'):null;flags.nw=typeof viFlag==='function'?!!viFlag('nw'):null}catch(e){}
+  var flags={};try{flags.nw=typeof viFlag==='function'?!!viFlag('nw'):null}catch(e){}
   return {build:document.lastModified,host:location.host,tab:TAB,viewport:innerWidth+'x'+innerHeight,dpr:window.devicePixelRatio||1,touch:'ontouchstart' in window,
     theme:document.documentElement.dataset.theme||'dark',flags:flags,standalone:!!(window.matchMedia&&matchMedia('(display-mode: standalone)').matches),online:navigator.onLine,
     sync:(function(){try{return JSON.parse(localStorage.getItem('vi_dirty')||'[]').length?'waiting':'ok'}catch(e){return '?'}})(),

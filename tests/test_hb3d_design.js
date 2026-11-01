@@ -1,113 +1,55 @@
-// Your own design in House Builder: upload a GLB → it becomes the house (hologram while saving the deposit, colour as you
-// own it), survives a reload (IndexedDB), can be hidden/removed; Meshy AI generation through the house-3d relay (mocked).
+// Your own design in House Builder (upload a GLB or describe one for Meshy AI) is locked for everyone (owner, 1 Nov 2026: Pro, after
+// the MVP). The card only says "Coming later as part of Pro" (no file input, no Meshy prompt), hbDesignOn() is false even with a saved
+// design, loadCustomModel / generateMeshyModel only toast and change nothing, the relay is never called, and the house stays the brand build.
+// (The GLB fixture tests/fixtures/sample_house.glb is kept for when the feature returns.)
 const { chromium } = require('playwright');
-const fs = require('fs'), path = require('path');
+const path = require('path');
 const routeThree = require('./three_route');
 const GLB = path.join(__dirname, 'fixtures', 'sample_house.glb');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})();`;
-const ST = () => { const v = HB3D.viewer, C = v && v._cust; return { engine: document.getElementById('house-scene').getAttribute('data-engine'), type: HB3DAPP.want && HB3DAPP.want.type, mode: HB3DAPP.want && HB3DAPP.want.mode,
-  custom: !!(v && v.model && v.model.custom), holo: C ? C.holo.some(o => o.visible) : null, solid: C ? C.solid.some(o => o.visible) : null, blue: C ? C.blue.some(o => o.visible) : null,
-  card: (document.getElementById('hb-design-status') || {}).innerText || '', hud: (document.getElementById('hb-hud') || {}).innerText || '', cap: (document.getElementById('hb3d-cap') || {}).textContent || '',
-  h: v && v.model ? v.model.height : 0, info: v && v.model && v.model.info, meta: JSON.parse(localStorage.getItem('vi_hb_design') || 'null') }; };
+const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('vi_hb_design',JSON.stringify({id:'d1',active:true,name:'My design',source:'upload'}));localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})();`;
 (async () => {
   const b = await chromium.launch(); const errs = [];
-  const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } }); await routeThree(ctx);
-  // mocked relay for Meshy (create → status → refine → status → download)
-  let calls = [];
-  await ctx.route(/functions\/v1\/house-3d/, async route => {
-    const body = JSON.parse(route.request().postData() || '{}'); calls.push(body.action);
-    const j = (o, s) => route.fulfill({ status: s || 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(o) });
-    if (body.action === 'create') return j({ id: 'prev-12345678' });
-    if (body.action === 'refine') return j({ id: 'ref-123456789' });
-    if (body.action === 'status') return j({ status: 'SUCCEEDED', progress: 100, glb: 'https://assets.meshy.ai/x/' + body.id + '.glb' });
-    if (body.action === 'download') return route.fulfill({ status: 200, contentType: 'model/gltf-binary', headers: { 'access-control-allow-origin': '*' }, body: fs.readFileSync(GLB) });
-    return j({ error: 'unknown' }, 400);
-  });
-  const p = await ctx.newPage();
-  await p.addInitScript(() => localStorage.setItem('vi-flag-house', '0'));   // classic viewer: the brand build's frame loop starves Playwright's in-page waits under software GL
+  const ctx = await b.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' }); await routeThree(ctx);
+  let calls = 0; await ctx.route(/functions\/v1\/house-3d/, r => { calls++; r.abort(); });
+  const p = await ctx.newPage(); p.setDefaultTimeout(120000);
   p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/Failed to load|net::/.test(m.text())) errs.push('console: ' + m.text()); });
-  await p.addInitScript(seed({ saved: 25000, target: 250000, houseType: 'terraced', deposits: [{ amount: 25000, date: '01/10/2026' }], prices: { terraced: 250000 } }));
+  await p.addInitScript(seed({ saved: 20000, target: 250000, houseType: 'terraced', deposits: [{ amount: 20000, date: '01/10/2026' }], prices: { terraced: 250000 } }));
   await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
-  await p.evaluate(() => showTab('house')); await p.waitForTimeout(1200);
-  let r = await p.evaluate(ST);
-  ok(r.engine === '3d' && r.type === 'terraced' && !r.custom, 'starts with the standard terraced house');
-
-  // ── upload
-  await p.setInputFiles('#model-file-input', GLB);
-  await p.waitForFunction(() => HB3D.viewer && HB3D.viewer.model && HB3D.viewer.model.custom, null, { timeout: 15000 }).catch(() => {});
-  await p.waitForTimeout(900);
-  r = await p.evaluate(ST);
-  console.log(JSON.stringify({ type: r.type, mode: r.mode, h: r.h, info: r.info, card: r.card.slice(0, 160) }));
-  ok(r.type === 'custom' && r.custom, 'uploaded design becomes the House Builder house');
-  ok(r.mode === 'build' && r.holo && !r.blue && !r.solid, 'deposit stage: design shown as a hologram rising to the current row (no full colour yet, remainder is an outline)');
-  ok(r.h > 6 && r.h < 11, 'unknown units are sized as a real two-storey house (' + r.h.toFixed(2) + ' m)');
-  ok(/Uploaded design/.test(r.card) && /hologram/i.test(r.card), 'design card shows the design and how it is used');
-  ok(/UK bricks/i.test(r.hud), 'HUD counts (estimated) bricks for the design');
-  const vp = await p.evaluate(() => { const v = HB3D.viewer, C = v._cust; return { p: v.p, clip: C.holoMats[0].clippingPlanes[0].constant, H: v.model.height }; });
-  ok(Math.abs(vp.clip - vp.p * vp.H) < 0.05, 'hologram height follows the deposit (' + (vp.clip / vp.H * 100).toFixed(0) + '% of the house at ' + (vp.p * 100).toFixed(0) + '% saved)');
-  const rb = await p.evaluate(() => { const v = HB3D.viewer; return { band: v.rowBand && v.rowBand.visible, y: v.rowBand && v.rowBand.position.y, H: v.model.height, ri: v.rowInfo(), label: document.getElementById('hb3d-rowlabel').innerText }; });
-  ok(rb.band && Math.abs(rb.y - 0.5 * rb.H) < 0.05 && /ROW \d+ \/ \d+/.test(rb.label), 'the design also shows the current row (' + rb.label.replace(/\n/g, ' ') + ')');
-  await p.screenshot({ path: 'shots/hb3d/design_upload_build.png' });
-
-  // ── mortgage stage: colour below the owned share, hologram above
-  await p.evaluate(() => { state.houseMode = 'purchased'; state.valuation = 250000; state.mortgageBalance = 150000; save(); updateUI(); });
-  await p.waitForTimeout(900);
-  r = await p.evaluate(ST);
-  const eq = await p.evaluate(() => { const v = HB3D.viewer, C = v._cust; return { solidClip: C.solidMats[0].clippingPlanes[0].constant, holoClip: -C.holoMats[0].clippingPlanes[0].constant, H: v.model.height, eq: v.eq, want: hbL2Progress(), exp: (function () { var dt = 250000 * (+state.depositPct || 0) / 100; return (250000 - dt - 150000) / (250000 - dt); })() }; });
-  ok(r.mode === 'equity' && r.solid && r.holo && !r.blue, 'mortgage stage: full colour + hologram');
-  // owner's Level 2 rule (30 Oct 2026): colour = share of the mortgage paid off, (base - balance) / base with base = price - deposit target, not equity / valuation
-  ok(Math.abs(eq.want - eq.exp) < 1e-6 && Math.abs(eq.solidClip - eq.want * eq.H) < 0.05 && Math.abs(eq.holoClip - eq.want * eq.H) < 0.05, 'colour fills exactly the mortgage-paid share of the design (' + (eq.want * 100).toFixed(1) + '%)');
-  await p.screenshot({ path: 'shots/hb3d/design_upload_equity.png' });
-  await p.evaluate(() => { state.mortgageBalance = 0; save(); updateUI(); });
-  await p.waitForTimeout(700);
-  r = await p.evaluate(ST);
-  ok(r.mode === 'complete' && r.solid && !r.holo && !r.blue, 'mortgage free: the whole design in colour');
-  await p.screenshot({ path: 'shots/hb3d/design_upload_complete.png' });
-  await p.evaluate(() => { state.houseMode = null; state.mortgageBalance = 0; save(); updateUI(); });
-
-  // ── persists across a reload (IndexedDB)
-  await p.waitForTimeout(1500);   // headless Chromium on file:// can lose a localStorage write made just before a reload
-  await p.reload(); await p.waitForTimeout(1500);
-  await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await p.evaluate(() => showTab('house'));
-  await p.waitForFunction(() => HB3D.viewer && HB3D.viewer.model && HB3D.viewer.model.custom, null, { timeout: 15000 }).catch(() => {});
-  r = await p.evaluate(ST);
-  ok(r.type === 'custom' && r.custom, 'design is restored after reloading the app');
+  await p.waitForFunction(() => window.HB3D && HB3D.viewer && HB3D.viewer.brandInfo && HB3D.viewer.brandInfo() && HB3D.viewer.settled(), null, { timeout: 60000 }).catch(() => {});
 
-  // ── hide / show / remove
-  await p.evaluate(() => hbDesignToggle(false)); await p.waitForTimeout(700);
-  r = await p.evaluate(ST);
-  ok(r.type === 'terraced' && !r.custom && /Show my design/.test(r.card), '"Show standard house" switches back, design kept');
-  await p.evaluate(() => hbDesignToggle(true)); await p.waitForTimeout(900);
-  r = await p.evaluate(ST);
-  ok(r.type === 'custom' && r.custom, '"Show my design" brings it back');
-  await p.evaluate(() => hbDesignRemove()); await p.waitForTimeout(700);
-  r = await p.evaluate(ST);
-  ok(r.type === 'terraced' && !r.custom && !r.meta && r.card === '', 'remove deletes the design');
+  // the card: locked, Pro, no upload or prompt
+  let r = await p.evaluate(() => { const c = document.getElementById('hb-own-design'); return { txt: c ? c.innerText + ' ' + c.textContent : '', file: !!document.getElementById('model-file-input'), inputs: c ? c.querySelectorAll('input,textarea,button').length : -1 }; });
+  ok(/Coming later as part of Pro/.test(r.txt) && /PRO/.test(r.txt), 'the Your own design card says "Coming later as part of Pro"');
+  ok(!r.file && r.inputs === 0, 'no file input (#model-file-input) and no Meshy prompt or buttons on the card');
 
-  // ── Meshy AI (relay mocked)
-  await p.evaluate(() => { localStorage.setItem('meshy_api_key', 'msy_test_key_123456'); document.getElementById('meshy-prompt').value = 'modern detached house with a flat roof'; });
-  await p.evaluate(() => generateMeshyModel());
-  await p.waitForFunction(() => HB3D.viewer && HB3D.viewer.model && HB3D.viewer.model.custom, null, { timeout: 30000 }).catch(() => {});
-  await p.waitForTimeout(600);
-  r = await p.evaluate(ST);
-  const st = await p.evaluate(() => document.getElementById('meshy-status').textContent);
-  ok(calls.join(',') === 'create,status,refine,status,download', 'AI flow: preview → texture → download via the relay (' + calls.join(',') + ')');
-  ok(r.type === 'custom' && r.meta && r.meta.source === 'ai' && /AI design/.test(r.card), 'AI design becomes the House Builder house');
-  ok(r.mode === 'build' && r.holo && !r.solid, 'AI design also builds as a hologram during the deposit');
-  ok(/House Builder house/.test(st), 'AI status confirms (' + st + ')');
-  ok(!(await p.evaluate(() => localStorage.getItem('vi_hb_meshy'))), 'no generation left pending');
-  // relay error is shown to the user
-  await ctx.unroute(/functions\/v1\/house-3d/);
-  await ctx.route(/functions\/v1\/house-3d/, route => route.fulfill({ status: 402, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ error: 'Your Meshy account is out of credits.' }) }));
-  await p.evaluate(() => generateMeshyModel()); await p.waitForTimeout(800);
-  ok(/out of credits/.test(await p.evaluate(() => document.getElementById('meshy-status').textContent)), 'Meshy errors are explained');
-  await p.evaluate(() => hbDesignRemove());
+  // a saved design does not take over the house
+  const ST = () => p.evaluate(() => { const v = HB3D.viewer; return { on: hbDesignOn(), type: HB3DAPP.want && HB3DAPP.want.type, mode: HB3DAPP.want && HB3DAPP.want.mode, custom: !!(v.model && v.model.custom), brand: !!v.brandInfo(), engine: document.getElementById('house-scene').getAttribute('data-engine'), meta: localStorage.getItem('vi_hb_design'), model: v.model && v.model.type }; });
+  const s0 = await ST();
+  ok(!s0.on, 'hbDesignOn() is false even with a saved design');
+  ok(s0.engine === '3d' && s0.type === 'terraced' && s0.mode === 'build' && !s0.custom && s0.brand, 'the house is still the brand build of the chosen type (' + s0.type + ')');
 
-  // ── non-Pro users are offered the upgrade
-  await p.evaluate(() => { var u = JSON.parse(localStorage.getItem('vi_user')); u.pro = false; localStorage.setItem('vi_user', JSON.stringify(u)); localStorage.removeItem('vi_pioneer'); });
-  ok(errs.length === 0, 'no errors ' + errs.slice(0, 3).join(' | '));
+  // loadCustomModel with a real GLB only toasts; nothing changes
+  await p.evaluate(() => { const i = document.createElement('input'); i.type = 'file'; i.id = 'tmp-glb'; i.style.display = 'none'; document.body.appendChild(i); });
+  await p.setInputFiles('#tmp-glb', GLB);
+  await p.evaluate(() => loadCustomModel(document.getElementById('tmp-glb')));
+  await p.waitForTimeout(1500);
+  r = await p.evaluate(() => ({ toast: document.getElementById('toast').textContent, shown: document.getElementById('toast').classList.contains('show') }));
+  ok(r.shown && r.toast === 'Your own design: coming later as part of Pro', 'loadCustomModel only toasts "' + r.toast + '"');
+  let s1 = await ST();
+  ok(!s1.on && !s1.custom && s1.brand && s1.type === 'terraced' && s1.meta === s0.meta, 'nothing changes: same house, saved design left as it was');
+
+  // generateMeshyModel only toasts and never calls the relay
+  await p.evaluate(() => { document.getElementById('toast').textContent = ''; return generateMeshyModel(); });
+  await p.waitForTimeout(800);
+  r = await p.evaluate(() => document.getElementById('toast').textContent);
+  ok(r === 'Your own design: coming later as part of Pro' && calls === 0, 'generateMeshyModel only toasts; the house-3d relay is never called');
+  s1 = await ST();
+  ok(!s1.on && !s1.custom && s1.brand, 'the house is still the brand build');
+
+  ok(errs.length === 0, 'no page errors ' + errs.slice(0, 3).join(' | '));
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED');
+  process.exit(fails ? 1 : 0);
 })();

@@ -1,6 +1,7 @@
-// Brand build on the 3D house builder (on by default since 31 Oct 2026, owner: the screen recording is the target; ?house=old or vi-flag-house = 0 gives the classic viewer), brand handover 6.2 to 6.10.
+// Brand build on the 3D house builder, brand handover 6.2 to 6.10. It is the only house builder (owner, 31 Oct / 1 Nov 2026): there is
+// no house flag any more, so ?house=old or vi-flag-house = 0 still give the brand build, and Level 2 is drawn by it too.
 // Camera rail as the brand book and recording: line icons, a column on the right at desktop, a row top right at phone width.
-// Flag off: the current builder, unchanged. Flag on: brick value = deposit target x 0.77 / bricks, bricks laid =
+// No classic builder to fall back to. Brick value = deposit target x 0.77 / bricks, bricks laid =
 // floor(bricks x seg(p, 0.03, 0.80)), the ROW label, the HUD and the caption agree, per-brick drop and stagger,
 // reduced motion builds instantly, no page errors, no sideways scroll at 390 px.
 // VI_INDEX=/path/to/index.html runs it against another copy (a worktree); the default is the repo the suite expects.
@@ -26,17 +27,19 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   const settle = p => p.waitForFunction(() => HB3D.viewer.settled(), null, { timeout: 120000, polling: 500 }).catch(() => {});
   const semi = { saved: 20000, target: 320000, houseType: 'semi', depositPct: 20, deposits: [{ amount: 20000, date: '01/10/2026' }], prices: { semi: 320000 } };
 
-  // ── 1. flag off: the current builder, exactly as before ──
-  let p = await open(semi, { flag: false }); await settle(p);
+  // ── 1. no house flag: ?house=old and vi-flag-house = 0 still give the brand build (the classic viewer is gone) ──
+  let p = await open(semi, { flag: false, query: '?house=old' }); await settle(p);
   let r = await p.evaluate(() => {
-    const v = HB3D.viewer, i = hbBrickInfo(), m = i.model, span = m.brickT(m.counts.bricks - 1) - m.brickT(0);
-    return { brand: !!v.brand, grp: !!v._bGroup, band: v.rowBand && v.rowBand.visible, label: document.getElementById('hb3d-rowlabel').className, txt: document.getElementById('hb3d-rowlabel').textContent,
-      per: i.perBrick, old: depositTarget() * Math.max(0.02, span) / m.counts.bricks, laid: document.getElementById('stBricks').textContent, oldLaid: m.stats(pct()).bricksLaid, flag: hbBrandOn() };
+    const v = HB3D.viewer, i = hbBrickInfo(), ri = v.rowInfo();
+    return { brand: !!v.brand, grp: !!v._bGroup, bi: !!v.brandInfo(), on: hbBrandOn(), band: v.rowBand, water: v.water, riBrand: !!(ri && ri.brand),
+      setRow: !!document.getElementById('set-house3d'), cls: document.getElementById('hb3d-rowlabel').className,
+      per: i.perBrick, want: depositTarget() * 0.77 / i.total, laid: document.getElementById('stBricks').textContent, bricks: (v.brandInfo() || {}).bricks };
   });
-  ok(!r.flag && !r.brand && !r.grp, 'flag off: no brand build');
-  ok(r.band && r.label === '' && /ROW \d+ \/ \d+/.test(r.txt), 'flag off: the old gold row band and label (' + r.txt + ')');
-  ok(Math.abs(r.per - r.old) < 1e-9, 'flag off: brick value unchanged (£' + r.per.toFixed(2) + ')');
-  ok(r.laid === r.oldLaid.toLocaleString('en-GB'), 'flag off: brick count unchanged (' + r.laid + ')');
+  ok(r.on && r.brand && r.grp && r.bi, '?house=old with vi-flag-house = 0: still the brand build');
+  ok(r.band === undefined && r.water === undefined && r.riBrand && r.cls.includes('brand'), 'no classic row band or water plane; the row comes from the brand build');
+  ok(!r.setRow, 'Settings has no house builder switch (#set-house3d gone)');
+  ok(Math.abs(r.per - r.want) < 1e-9, 'brick value = deposit target x 0.77 / bricks (£' + r.per.toFixed(2) + ')');
+  ok(r.laid === (r.bricks || 0).toLocaleString('en-GB'), 'brick count matches the brand build (' + r.laid + ')');
   await p.context().close();
 
   // ── 2. flag on: brick value = deposit target x 0.77 / bricks, for every house at its default price ──
@@ -124,14 +127,25 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   ok(r.ico === 'block', 'phone: the controls use the brand line icons');
   await p.context().close();
 
-  // ── 7. ?house=new turns it on and keeps it on for this device (owner, 30 Oct: an installed app must keep it); ?house=old turns it off. Level 2 keeps its own look ──
-  p = await open(semi, { flag: false, query: '?house=new' }); await settle(p);
-  r = await p.evaluate(() => ({ on: !!HB3D.viewer.brandInfo(), stored: localStorage.getItem('vi-flag-house') }));
-  ok(r.on && r.stored === '1', '?house=new shows the brand build and keeps the flag for this device');
-  ok(await p.evaluate(() => { history.replaceState(null, '', location.pathname + '?house=old'); const off = !viFlag('house'); return off && localStorage.getItem('vi-flag-house') === '0'; }), '?house=old switches it off again (stored, so the device stays classic)');
+  // ── 7. no house flag: ?house=new changes nothing, ?house=old does not switch the brand build off. Level 2 is drawn by the brand build ──
+  p = await open(semi, { query: '?house=new' }); await settle(p);
+  r = await p.evaluate(() => ({ on: !!HB3D.viewer.brandInfo(), def: JSON.stringify(VI_FLAG_DEFAULT) }));
+  ok(r.on && r.def === '{"nw":true}', 'the house has no flag (VI_FLAG_DEFAULT is ' + r.def + ') and the brand build shows');
+  ok(await p.evaluate(() => { history.replaceState(null, '', location.pathname + '?house=old'); viFlag('house'); updateUI(); return hbBrandOn() && !!HB3D.viewer.brandInfo(); }), '?house=old leaves the brand build on');
   await p.evaluate(() => { state.houseMode = 'purchased'; state.mortgageBalance = 200000; state.valuation = 320000; save(); updateUI(); }); await settle(p);
-  r = await p.evaluate(() => { const v = HB3D.viewer; return { mode: hb3dState().mode, brand: !!v.brandInfo(), grpVis: !!(v._bGroup && v._bGroup.visible), water: v.water.visible }; });
-  ok(r.mode === 'equity' && !r.brand && !r.grpVis && r.water, 'Level 2 (equity) keeps its current look with the flag on');
+  await p.waitForFunction(() => /MORTGAGE/.test(document.getElementById('hb3d-rowlabel').textContent), null, { timeout: 30000 }).catch(() => {});
+  r = await p.evaluate(() => { const v = HB3D.viewer, rl = document.getElementById('hb3d-rowlabel'), own = document.getElementById('hb3d-ownlabel');
+    return { mode: hb3dState().mode, brand: !!v.brandInfo(), grpVis: !!(v._bGroup && v._bGroup.visible), bi: v.brandInfo(), tag: rl.textContent, tagVis: getComputedStyle(rl).display !== 'none', own: own ? getComputedStyle(own).display : 'none', eq: HB3DAPP.want.eq, paid: HB3DAPP.want.paid, own2: hbL2Own(), prog: hbL2Progress(), cap: document.getElementById('hb3d-cap').textContent }; });
+  ok(r.mode === 'equity' && r.brand && r.grpVis && r.bi.p === 1 && r.bi.bricks === r.bi.bricksTotal, 'Level 2 (equity) is drawn by the brand build: the whole house laid as the Level 1 hologram');
+  ok(Math.abs(r.eq - r.own2) < 1e-12 && Math.abs(r.eq - 0.375) < 1e-9 && Math.abs(r.paid - r.prog) < 1e-12, 'you own (value - balance) / value = 37.5%; mortgage paid = hbL2Progress() (' + (r.paid * 100).toFixed(1) + '%)');
+  ok(r.bi.colour > 0 && r.bi.colour < r.bi.colourTotal && Math.abs(r.bi.colour / r.bi.colourTotal - r.eq) < 0.01, 'the colour layer lays the share you own in real colours (' + r.bi.colour + ' of ' + r.bi.colourTotal + ' bricks and tiles)');
+  ok(r.tagVis && r.tag === 'MORTGAGE ' + Math.floor(r.paid * 1000) / 10 + '% PAIDYOU OWN 37.5%', 'the gold tag reads ' + r.tag);
+  ok(new RegExp(r.bi.colour.toLocaleString('en-GB') + ' / ' + r.bi.colourTotal.toLocaleString('en-GB') + ' bricks and tiles yours').test(r.cap), 'caption: ' + r.cap);
+  ok(r.own === 'none', 'the old owned label stays hidden under the brand Level 2');
+  await p.evaluate(() => { state.mortgageBalance = 0; save(); updateUI(); }); await settle(p);
+  await p.waitForFunction(() => /MORTGAGE FREE/.test(document.getElementById('hb3d-rowlabel').textContent), null, { timeout: 30000 }).catch(() => {});
+  r = await p.evaluate(() => ({ mode: hb3dState().mode, brand: !!HB3D.viewer.brandInfo(), tag: document.getElementById('hb3d-rowlabel').textContent, bi: HB3D.viewer.brandInfo() }));
+  ok(r.mode === 'complete' && r.brand && r.tag === 'MORTGAGE FREE', 'mortgage paid off: brand build, tag MORTGAGE FREE');
   await p.context().close();
 
   // ── 8. 6.8 gamified feedback: the opening build is silent; laying bricks pops "+£200 · +227 bricks", flashes the stage and toasts the milestone; windows glow once lit ──

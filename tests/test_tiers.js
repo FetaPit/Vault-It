@@ -12,7 +12,7 @@ const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const DAY = 86400000;
 const seed = (o) => {
-  localStorage.setItem('vi-theme', 'dark'); localStorage.setItem('vi-flag-house', '0'); localStorage.setItem('vi_declined_demo', 'true');
+  localStorage.setItem('vi-theme', 'dark'); localStorage.setItem('vi_declined_demo', 'true');
   localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
   localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com', logins: 3 }));
   localStorage.setItem('pos_ov1', JSON.stringify({ income: [{ id: 1, name: 'Salary', amount: 2400, cat: 'salary' }], expenses: [{ id: 3, name: 'Rent', amount: 700, type: 'ce' }] }));
@@ -48,8 +48,9 @@ const seed = (o) => {
   ok(caps.free && caps.assets && caps.pw !== false, 'no item caps: FREE_LIMITS is gone and a fourth asset saves without a paywall');
   ok(caps.tier === 'trial' && /^3 screenshot reads a month/.test(caps.allow), 'trial: tier is trial, the AI reader allowance says 3 a month (' + caps.allow + ')');
   // ── 2. design tools in the trial ──
-  const d1 = await p.evaluate(() => { const before = window.__prompts; loadCustomModel({ files: [], value: '' }); const a = window.__prompts - before; const o1 = !document.getElementById('pro-offer-modal').classList.contains('hidden'); document.getElementById('pro-offer-modal').classList.add('hidden'); generateMeshyModel(); return { a, o1, b: window.__prompts - before - a, o2: !document.getElementById('pro-offer-modal').classList.contains('hidden'), can: viCan('design'), canAi: viCan('aimodel') }; });
-  ok(d1.a === 1 && d1.o1 && d1.b === 1 && d1.o2 && !d1.can && !d1.canAi, 'trial: upload and AI generation open the plans prompt and go no further');
+  const d1 = await p.evaluate(async () => { const before = window.__prompts, T = document.getElementById('toast'); loadCustomModel({ files: [], value: '' }); const t1 = T.textContent; T.textContent = ''; await generateMeshyModel(); const t2 = T.textContent;
+    return { prompts: window.__prompts - before, o: !document.getElementById('pro-offer-modal').classList.contains('hidden'), t1, t2, on: hbDesignOn(), can: viCan('design'), canAi: viCan('aimodel') }; });
+  ok(d1.prompts === 0 && !d1.o && d1.t1 === 'Your own design: coming later as part of Pro' && d1.t2 === d1.t1 && !d1.on && !d1.can && !d1.canAi, 'trial: upload and AI generation are locked for everyone: they only say "coming later as part of Pro" (' + JSON.stringify(d1) + ')');
   // ── 3. every preset house type, real build ──
   const types = await p.evaluate(() => { showTab('house'); const out = []; ['semi', 'detached', 'mansion', 'flat', 'apartment', 'terraced'].forEach(t => { const btn = document.querySelector('#htypes [data-type="' + t + '"]'); if (btn) { btn.click(); out.push(state.houseType === t); } else out.push('nobtn:' + t); }); return { out, p: Math.abs(hb3dState().p - pct()) < 1e-9 || hb3dState().engine !== '3d' }; });
   ok(types.out.every(x => x === true), 'trial: every preset house type can be chosen (' + types.out.join(',') + ')');
@@ -63,7 +64,7 @@ const seed = (o) => {
 
   // ── 4. ended: read-only stops Level 2, Level 3, restore and the design tools ──
   p = await open({ t0: Date.now() - 31 * DAY });
-  const e1 = await p.evaluate(async () => { const before = window.__prompts; const mode0 = state.houseMode; markHousePurchased(); const m1 = state.houseMode === mode0; hbUnlockL3(); const l3 = !state.l3; let restored = false; try { await viRestoreVersion('x', 'pos_ov1'); } catch (e) {} viRestoreSnapshot('pos_ov1'); loadCustomModel({ files: [], value: '' }); return { m1, l3, prompts: window.__prompts - before, inc: ovState.income.length === 1 }; });
+  const e1 = await p.evaluate(async () => { const before = window.__prompts; const mode0 = state.houseMode; markHousePurchased(); const m1 = state.houseMode === mode0; hbUnlockL3(); const l3 = !state.level3 && hbLevel() !== 3; let restored = false; try { await viRestoreVersion('x', 'pos_ov1'); } catch (e) {} viRestoreSnapshot('pos_ov1'); loadCustomModel({ files: [], value: '' }); return { m1, l3, prompts: window.__prompts - before, inc: ovState.income.length === 1 }; });
   ok(e1.m1 && e1.l3 && e1.inc && e1.prompts >= 3, 'ended: Level 2 purchase, Level 3 unlock, restore and upload are all blocked (' + JSON.stringify(e1) + ')');
   await p.context().close();
 

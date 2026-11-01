@@ -30,7 +30,7 @@ const MOCK = (mode, prof, extra) => `
     functions: { invoke: async () => ({ data: null, error: { message: 'n/a' } }) },
     from: qb }) }; }, set() {} });`;
 const seed = (o) => {
-  localStorage.setItem('vi-theme', 'dark'); localStorage.setItem('vi-flag-house', '0'); localStorage.setItem('vi_declined_demo', 'true');
+  localStorage.setItem('vi-theme', 'dark'); localStorage.setItem('vi_declined_demo', 'true');
   localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
   localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com', logins: 3, pro: !!o.paid }));
   localStorage.setItem('vi_tester_note', '1');

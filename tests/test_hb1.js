@@ -1,7 +1,8 @@
 const { chromium } = require('playwright');
+const routeThree=require('./three_route');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 (async()=>{
-  const b=await chromium.launch(); const page=await (await b.newContext({viewport:{width:1280,height:1100}})).newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message)); page.on('console',m=>{if(m.type()==='error'&&!/Failed to load|net::/.test(m.text()))errs.push('C:'+m.text());});
+  const b=await chromium.launch(); const ctx=await b.newContext({viewport:{width:1280,height:1100},reducedMotion:'reduce'}); await routeThree(ctx); const page=await ctx.newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message)); page.on('console',m=>{if(m.type()==='error'&&!/Failed to load|net::/.test(m.text()))errs.push('C:'+m.text());});
   await page.addInitScript(()=>{if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'P',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');
     localStorage.setItem('ht3',JSON.stringify({saved:10000,target:250000,houseType:'terraced',deposits:[{amount:10000,date:'01/10/2026'}],prices:{terraced:250000}}));
     localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'Salary',amount:2000}],expenses:[{id:2,name:'Rent',amount:1200,type:'ce'},{id:3,name:'ISA',amount:100,type:'sv'}]}));});
@@ -14,8 +15,10 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   ok(/LEVEL 1/.test(t)&&/hologram/i.test(t),'Level 1 HUD with hologram build');
   const lv=await page.innerText('#hb-levels'); ok(/Level 1/.test(lv)&&/Level 2/.test(lv)&&/Level 3/.test(lv),'three level chips');
   ok(await page.locator('#hb-levels .hb-lv.lock').count()===2,'Levels 2 and 3 are locked');
-  ok(await page.locator('#houseSvg #hb-ghost').count()===1&&(await page.getAttribute('#hb-ghost','opacity'))==='0.58'.replace('0.58','.58')||true,'house is wrapped in the translucent ghost layer');
-  ok(+(await page.getAttribute('#hb-ghost','opacity'))<1,'ghost layer opacity < 1');
+  await page.waitForFunction(()=>window.HB3D&&HB3D.viewer&&HB3D.viewer.brandInfo&&HB3D.viewer.brandInfo(),null,{timeout:60000}).catch(()=>{});
+  const stg=await page.evaluate(()=>({engine:document.getElementById('house-scene').getAttribute('data-engine'),bi:HB3D.viewer.brandInfo(),N:HB3D.viewer.model.counts.bricks,svg:!!document.getElementById('houseSvg'),edges:!!(HB3D.viewer.edges&&HB3D.viewer.edges.visible)}));
+  ok(stg.engine==='3d'&&stg.bi&&!stg.svg,'Level 1 is the brand 3D build (no SVG blueprint)');
+  ok(stg.bi&&stg.bi.bricks>0&&stg.bi.bricks<stg.N&&stg.edges,'part built ('+(stg.bi&&stg.bi.bricks)+' of '+stg.N+' bricks), the rest of the house a faint outline');
   await page.waitForFunction(()=>!!hbBrickInfo(),null,{timeout:10000}); await page.evaluate(()=>hbRenderHUD()); t=await page.innerText('#hb-hud');
   const ebr=await page.evaluate(()=>{const i=hbBrickInfo();return{per:'£'+i.perBrick.toFixed(2),total:i.total.toLocaleString('en-GB')};});
   ok(t.includes('Each brick ≈ '+ebr.per)&&new RegExp('of '+ebr.total+' UK bricks','i').test(t),'each brick = deposit ÷ the real UK brick count of the model ('+ebr.per+', '+ebr.total+' bricks)');

@@ -37,6 +37,8 @@ Turn the House Builder from a single deposit progress bar into a **three-level w
 - **Exit to Level 3:** equity ≥ user's trade-up threshold **or** user opts in to "Plan my upgrade".
 
 ### Level 3 — "Upgrade (second property)"
+
+> **Locked under Pro for everyone (owner, 1 Nov 2026):** "it will need a lot more refinement to be useful with the complexity of building 2 properties simultaneously and that is out of scope of the mvp". The chip shows a lock and PRO; nothing opens the planner; saved Level 3 data is kept.
 - **Planner:** target property value, projected sale price (growth assumption, editable), selling costs (agent %, legal, EPC/moving), buying costs (SDLT/LBTT/LTT via an editable, dated rate table, legal, survey), ERC on current deal, resulting **new deposit & LTV**, new mortgage payment, affordability headroom vs income (illustrative 4–4.5× income cap and a stress-rate test), and "months until ready" under the current plan.
 - **Options:** sell-and-move, or keep-and-let (later, behind a flag).
 - **Rendering:** the first house becomes a solid "foundation" icon; a larger **ghost** second house appears and fills with projected net equity.
