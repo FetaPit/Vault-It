@@ -34,13 +34,14 @@ const footer = `You are getting this because you joined the Vault-It list and co
 
 const cta = `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr><td><a href="https://app.vault-it.co" style="${BTN}">Open Vault-It</a></td></tr></table>`;
 const welcomeBody = `<p style="${EYEBROW}">Welcome</p>
-<h1 style="${H1}">Why I built Vault-It</h1>
+<h1 style="${H1}">Why Vault-It exists</h1>
 <p style="${P}">Hi {{first_name|there}},</p>
-<p style="${P}">Thanks for joining. I&#39;m Pete, and I built Vault-It.</p>
+<p style="${P}">Thanks for joining. I&#39;m Pete, the person behind Vault-It.</p>
 <h2 style="${H2}">The story</h2>
-<p style="${P}">I was drowning in spreadsheets trying to get from debt to my first home. Every tool I found tracked one thing. None of them showed me the whole path. So I built the one I wished existed.</p>
+<p style="${P}">I could not see where my contributions were going, or what value I actually owned. I looked for a whole strategy for building wealth and could not find one. So I made one.</p>
+<p style="${P}">I wanted to see what I was working towards, and exactly how much I needed to put in to lay one more brick, with real visual feedback.</p>
 <h2 style="${H2}">What it is for</h2>
-<p style="${P}">Vault-It puts your debts, savings and house deposit on one map. You type in your own figures, and we never ask for your bank login. Every pound you save lays a brick on your house. What you owe sits below the ground. The aim: nobody has to guess whether they will ever own a home.</p>
+<p style="${P}">Vault-It puts your debts, savings and house deposit on one map. You type in your own figures, and we never ask for your bank login. Every pound you save lays a brick on your house. What you owe sits below the ground, so being in debt is a starting line, not a failure screen. The aim: give anyone, even someone in debt, a live date for when they will hold the keys to their own home.</p>
 ${cta}
 <h2 style="${H2}">Who is behind it</h2>
 <p style="${P}">I&#39;m Pete Thickett. I run PT Live Design in Lincoln, where I have worked on branding and design since 2019. I have been a multimedia designer, including producing training resources for the Royal Air Force Officer Training Academy at Cranwell. I hold a Certified Professional in Psychology of Design from the London School of International Business, and I am a local leader for the Interaction Design Foundation. ${todo('taken only from your LinkedIn. Approve, trim, or add anything else. The landing page says "UK developer", which your profile does not.')}</p>
@@ -57,14 +58,14 @@ const researchBody = `<p style="${EYEBROW}">Day 3 · The research</p>
 <p style="${SMALL};color:#E8E8E8">${strong('Time.')} In children and teenagers with ADHD, a review of 27 studies found time is judged less accurately [3]. I have not found the same review for adults, so I will not claim it. If &quot;later&quot; feels vague, a saving goal is hard to hold on to. Vault-It tries to make later concrete with a date and a house you can see.</p>
 <p style="${SMALL};margin:0;color:#E8E8E8">${strong('Seeing the future.')} In lab tasks, people shown a realistic picture of their older self put more aside [4]. That work was not about ADHD, and later replications were mixed.</p>
 </div>
-<p style="${P}">Vault-It is not a treatment and not a diagnosis tool. I cannot promise it will help you. I would like to find out with you whether it does. ${todo('whether you want to say anything about your own experience here. Left out until you decide.')}</p>
+<p style="${P}">Vault-It is not a treatment and not a diagnosis tool. I cannot promise it will help you. I would like to find out with you whether it does.</p>
 ${cta}
 <p style="${P}">Thanks,<br>Pete</p>
 <p style="${SMALL};margin-top:18px;border-top:1px solid #102221;padding-top:14px;color:#E8E8E8">References</p>
-<p style="${SMALL}">[1] ${todo("author list")} ${a('https://pubmed.ncbi.nlm.nih.gov/32998893/', 'ADHD, financial distress, and suicide in adulthood: a population study')}. Science Advances, 2020.<br>
-[2] ${todo('authors and journal')} ${a('https://pubmed.ncbi.nlm.nih.gov/31343233/', 'Financial decision-making in adults with ADHD')}. 2019.<br>
-[3] Zheng and others, 2020. ${todo('replace with the DOI or PubMed link')} Time perception deficits in children and adolescents with ADHD: a meta-analysis.<br>
-[4] Hershfield and others. ${a('https://pages.stern.nyu.edu/~hhershfi/resources/Research/JMR-D-ce.pdf', 'Increasing saving behavior through age-progressed renderings of the future self')}. Journal of Marketing Research, 2011.</p>`;
+<p style="${SMALL}">[1] Beauchaine, T. P., Ben-David, I. and Bos, M. (2020). ${a('https://doi.org/10.1126/sciadv.aba1551', 'ADHD, financial distress, and suicide in adulthood: a population study')}. Science Advances, 6(40).<br>
+[2] Bangma, D. F. and others (2019). ${a('https://doi.org/10.1037/neu0000571', 'Financial decision-making in adults with ADHD')}. Neuropsychology, 33(8), 1065-1077.<br>
+[3] Zheng, Q., Wang, X., Chiu, K. Y. and Shum, K. K. (2020). ${a('https://doi.org/10.1177/1087054720978557', 'Time perception deficits in children and adolescents with ADHD: a meta-analysis')}. Journal of Attention Disorders.<br>
+[4] Hershfield, H. E. and others (2011). ${a('https://pages.stern.nyu.edu/~hhershfi/resources/Research/JMR-D-ce.pdf', 'Increasing saving behavior through age-progressed renderings of the future self')}. Journal of Marketing Research, 48(SPL), S23-S37.</p>`;
 
 const li = t => `<li style="margin:0 0 6px">${t}</li>`;
 const ul = items => `<ul style="${P};padding-left:20px">${items.map(li).join('')}</ul>`;
@@ -86,7 +87,7 @@ ${ul(['{{Improvement: what is quicker, clearer or easier.}}'])}
 <p style="${P}">Thanks,<br>Pete</p>`;
 
 const out = __dirname;
-fs.writeFileSync(path.join(out, 'welcome-email.html'), shell('Why I built Vault-It', 'Why I built Vault-It, and what happens next.', welcomeBody, footer));
+fs.writeFileSync(path.join(out, 'welcome-email.html'), shell('Why Vault-It exists', 'Why Vault-It exists, and what happens next.', welcomeBody, footer));
 fs.writeFileSync(path.join(out, 'newsletter-template.html'), shell('Vault-It weekly', '{{preheader: one line}}', newsBody, footer));
 fs.writeFileSync(path.join(out, 'research-email.html'), shell('If money admin and your brain do not get on', 'What the research says about money, attention and time, and what it does not.', researchBody, footer));
 console.log('built');
