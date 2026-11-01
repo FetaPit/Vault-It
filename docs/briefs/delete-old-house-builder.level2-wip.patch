@@ -1,0 +1,391 @@
+diff --git a/index.html b/index.html
+index 050aa2d..09de759 100644
+--- a/index.html
++++ b/index.html
+@@ -6821,14 +6821,24 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+     'uniform vec3 uBase; uniform vec3 uLitCol; uniform float uLit; uniform vec3 uEdge; uniform vec3 uSheen; uniform vec3 uFlashCol;',
+     'uniform float uShMin; uniform float uEdgeK; uniform float uPulse; uniform float uBuilt; uniform float uSweep; uniform float uSweepOn; uniform float uSweepW;',
+     'uniform float uBack; uniform float uFrontA; uniform float uBackA; uniform float uTone; uniform float uBevel;',
++    'uniform float uCut; uniform float uCutOn; uniform float uRise;',
+     'varying vec3 vN; varying vec3 vW; varying vec2 vUV; varying vec2 vFS; varying float vFlash; varying float vAlpha; varying float vSeed;',
+     'void main() {',
++    '  #ifdef BRAND_HOLO',
++    '  if (vW.y < uCut) discard;',
++    '  #else',
++    '  if (uCutOn > 0.5 && vW.y > uCut) discard;',
++    '  #endif',
+     '  vec3 L = normalize(vec3(-0.45, 0.7, 0.55)); float lt = max(0.0, dot(normalize(vN), L)); float sh = uShMin + (1.0 - uShMin) * lt;',
+     '  vec3 base = mix(uBase * (1.0 - uTone + 2.0 * uTone * vSeed), uLitCol, uLit);',
+     '  vec3 col = base * sh;',
+     '  vec2 dd = min(vUV, 1.0 - vUV) * vFS; float ed = min(dd.x, dd.y); float bev = smoothstep(0.0, uBevel, ed);',
+     '  col = mix(col, uEdge * (0.6 + 0.4 * sh), (1.0 - bev) * uEdgeK);',
+     '  float fl = clamp(vFlash, 0.0, 1.0); col = mix(col, uFlashCol, fl * 0.9);',
++    '  #ifdef BRAND_HOLO',
++    '  float ha = (0.03 + 0.14 * (1.0 - bev)) * vAlpha; gl_FragColor = vec4(mix(base, uSheen, 0.3) * ha, ha); return;',
++    '  #endif',
++    '  float rb = uCutOn * uRise * (1.0 - clamp((uCut - vW.y) / 0.225, 0.0, 1.0)); col = mix(col, uFlashCol, rb * 0.85);',   // Level 2: the paid line rises with the gold flash
+     '  float a;',
+     '  #ifdef BRAND_LAST',
+     '  col = mix(col, vec3(1.0, 0.94, 0.64), 0.88) * (1.08 + 0.3 * uPulse); a = 1.0;',
+@@ -6846,10 +6856,12 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+ 
+   function shared() {   // uniforms every brand material reads (one object each, shared by reference)
+     return { uNow: { value: 0 }, uPulse: { value: 0.5 }, uBuilt: { value: 0 }, uSweep: { value: -1e3 }, uSweepOn: { value: 0 }, uSweepW: { value: 6 * CH },
+-      uFadeGlaze: { value: 0 }, uLitGlass: { value: 0 }, uLitDoor: { value: 0 }, one: { value: 1 }, zero: { value: 0 } };
++      uFadeGlaze: { value: 0 }, uLitGlass: { value: 0 }, uLitDoor: { value: 0 }, one: { value: 1 }, zero: { value: 0 },
++      uCut: { value: 1e9 }, uCutOn: { value: 0 }, uRise: { value: 0 } };
+   }
+-  function brandMat(U, look, back, last, opaque, stat) {
++  function brandMat(U, look, back, last, opaque, stat, holo) {
+     var u = {
++      uCut: U.uCut, uCutOn: U.uCutOn, uRise: U.uRise,
+       uNow: U.uNow, uPulse: U.uPulse, uBuilt: U.uBuilt, uSweep: U.uSweep, uSweepOn: U.uSweepOn, uSweepW: U.uSweepW,
+       uBase: { value: v3(look.base) }, uLitCol: { value: v3(look.lit || look.base) }, uLit: look.litU || U.zero,
+       uEdge: { value: v3(C.edge) }, uSheen: { value: v3(C.sheen) }, uFlashCol: { value: v3(C.flash) },
+@@ -6862,6 +6874,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+     var mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS, fragmentShader: FS, transparent: !opaque, premultipliedAlpha: true,
+       depthWrite: !back, depthTest: !back, side: back ? THREE.BackSide : THREE.FrontSide });
+     mat.defines = {}; if (last) mat.defines.BRAND_LAST = ''; if (opaque) mat.defines.BRAND_OPAQUE = ''; if (stat) mat.defines.BRAND_STATIC = '';
++    if (holo) { mat.defines.BRAND_HOLO = ''; mat.transparent = true; mat.depthWrite = false; }   // Level 2: the unpaid share as a faint hologram
+     return mat;
+   }
+   function lookOf(part, U) {
+@@ -6924,7 +6937,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+   };
+   VP._brandActive = function () {
+     var m = this.model;
+-    return !!(this.brand && m && m.clean && !m.custom && m.rows && m.batches && (this.mode === 'build' || this.mode === 'site'));
++    return !!(this.brand && m && m.clean && !m.custom && m.rows && m.batches && (this.mode === 'build' || this.mode === 'site' || this.mode === 'equity' || this.mode === 'complete'));
+   };
+   VP._bNow = function () { if (!this._bT0) this._bT0 = performance.now(); return (performance.now() - this._bT0) / 1000; };
+ 
+@@ -7031,7 +7044,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+         back.frustumCulled = false; back.count = 0; back.renderOrder = 3; grp.add(back);
+       }
+       return { bi: bi, part: part, n: n, front: front, back: back, laid: laid, attr: at, rank: P.rank[bi], cnt: 0, drop: part === 'brick' || part === 'roof',
+-        mats: mats, alaid: alaid, stat: stat, V: V, I: I, ready: 0, S: 0, act: -1 };
++        mats: mats, alaid: alaid, stat: stat, V: V, I: I, ready: 0, S: 0, act: -1, look: look };
+     });
+     this._bBakeGo();
+     // window glow (6.5, Night): a soft gold radial over each pane, alpha (0.22 + 0.10 * pulse) * lit, additive, no depth write
+@@ -7122,10 +7135,29 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+     this.dirty = true;
+   };
+ 
++  // Level 2 hologram pass: the same meshes again with the faint material, drawn only above the paid line (made on first use)
++  VP._brandHolo = function (on) {
++    var U = this._bU, grp = this._bGroup;
++    (this._bm || []).forEach(function (rec) {
++      if (!rec) return;
++      if (on && !rec.holo) {
++        var hi = new THREE.InstancedMesh(rec.front.geometry, brandMat(U, rec.look, false, false, false, false, true), rec.n);
++        hi.instanceMatrix = rec.front.instanceMatrix; hi.frustumCulled = false; hi.renderOrder = 5; hi.name = 'holo:' + rec.part; grp.add(hi);
++        var hs = rec.stat ? new THREE.Mesh(rec.stat.geometry, brandMat(U, rec.look, false, false, false, true, true)) : null;
++        if (hs) { hs.frustumCulled = false; hs.renderOrder = 5; hs.name = 'holoStatic:' + rec.part; grp.add(hs); }
++        rec.holo = { i: hi, s: hs };
++      }
++      if (!rec.holo) return;
++      rec.holo.i.visible = on && rec.front.visible; rec.holo.i.count = rec.front.count;
++      if (rec.holo.s) rec.holo.s.visible = on && rec.stat.visible;
++    });
++  };
++
+   // apply(): the Level 1 build under the brand look
+   VP._brandApplyAll = function () {
+     var m = this.model, F = m.focus;
+     if (this._bModel !== m) this._brandBuild();
++    if (this._bMode !== this.mode) { this._bPrimed = false; this._bMode = this.mode; if (this.mode !== 'equity') this._bEq = null; }   // a new level shows at once, no drop
+     this._brandEnv(true);
+     var P = H.brandPlan(m), IDLE = H._IDLE_PLANE;
+     this.batches.forEach(function (B, bi) {
+@@ -7135,7 +7167,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+         B.main.material = mats.blue; mats.blue.clippingPlanes = [IDLE];
+       } else { B.main.visible = false; B.rev.visible = false; }
+     });
+-    if (this.edges) { this.edges.visible = !F; this.edges.material.clippingPlanes = [IDLE]; this.edges.material.opacity = 0.34; }   // the finished house as a faint wire
++    if (this.edges) { this.edges.visible = !F && (this.mode === 'build' || this.mode === 'site'); this.edges.material.clippingPlanes = [IDLE]; this.edges.material.opacity = 0.34; }   // the finished house as a faint wire
+     if (this.rowBand) this.rowBand.visible = false;
+     if (this.water) this.water.visible = false;
+     if (this.focusBox) this.focusBox.visible = true;
+@@ -7148,7 +7180,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+   // counts, per-brick stamps and the frame's uniforms (called by apply() and every animated frame)
+   VP._brandApply = function () {
+     var m = this.model; if (!m || !this._bm) return;
+-    var P = H.brandPlan(m), R = P.rows, p = this.mode === 'site' ? 0 : this.p, now = this._bNow(), motion = reduced(), red = motion || !!this._bLite, U = this._bU, E = this._bEnvObj;
++    var L2 = this.mode === 'equity' || this.mode === 'complete';
++    var P = H.brandPlan(m), R = P.rows, p = this.mode === 'site' ? 0 : (L2 ? 1 : this.p), now = this._bNow(), motion = reduced(), red = motion || !!this._bLite, U = this._bU, E = this._bEnvObj;
+     var V = units(P, p), V0 = this._bV == null ? -1 : this._bV, inst = motion || !this._bPrimed;   // lite keeps the drop and flash, not the ambient motion
+     var add = Math.max(0, V - Math.max(V0, 0)), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.12, 0.9 / add) : 0;
+     if (V !== V0) {
+@@ -7175,7 +7208,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+     var st = H.brandStats(m, p), L = st.bricksLaid, pulse = red ? 0.5 : 0.5 + 0.5 * Math.sin(performance.now() * 0.002244);
+     // the last brick laid: stays lit pale gold, 14% proud; shown once it has landed
+     var hl = this._bHL, last = null;
+-    if (L > 0) {
++    if (L > 0 && !L2) {
+       var j = L - 1, rec = this._bm[P.bBi[j]], kk = P.bK[j], b = m.batches[P.bBi[j]], o = P.perm[P.bBi[j]][kk] * 10, xf = b.xf;
+       if (this._bLastJ !== j) {
+         var mm = new THREE.Matrix4(), e = new THREE.Euler(xf[o + 6], xf[o + 7], xf[o + 8], 'YZX');
+@@ -7189,6 +7222,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+     // stage uniforms
+     U.uNow.value = now; U.uPulse.value = pulse; U.uBuilt.value = seg(p, 0.05, 1);
+     U.uFadeGlaze.value = seg(p, 0.88, 0.93); U.uLitGlass.value = seg(p, 0.93, 0.96); U.uLitDoor.value = seg(p, 0.96, 1);
++    // Level 2 (owner, 1 Nov): paying the mortgage, the paid share solid below a gold line and the rest a faint hologram; mortgage free,
++    // the whole house solid with the windows lit and the door gold
++    var F2 = m.focus, cy0 = F2 ? F2.y0 : R.y0, cy1 = F2 ? F2.y1 : R.y1, eqS = this._bEq == null ? this.eq : this._bEq, cut = cy0 + eqS * (cy1 - cy0);
++    if (this.mode === 'equity') { U.uCutOn.value = 1; U.uCut.value = cut; U.uLitGlass.value = 0; U.uLitDoor.value = 0; }
++    else { U.uCutOn.value = 0; U.uCut.value = 1e9; U.uRise.value = 0; }
++    U.uRise.value = this.mode === 'equity' && this._bRiseAt != null && !motion ? Math.max(0, 1 - (now - this._bRiseAt) / 1.1) : 0;
++    this._brandHolo(this.mode === 'equity');
+     var top = Math.max(R.y1, R.y0 + 1), span = top - R.y0;
+     U.uSweepOn.value = (red || this._bLite) ? 0 : 1;
+     U.uSweep.value = R.y0 + ((now * 20 * CH) % (span + 40 * CH)) - 10 * CH;   // 20 courses a second, repeating
+@@ -7197,13 +7237,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+     E.site.material.opacity = 0.55 * sb; E.site.visible = sb > 0;
+     E.fline.material.opacity = 0.75 * fnd; E.fline.visible = fnd > 0; E.fillMat.opacity = 0.14 * fnd; E.fills.forEach(function (f) { f.visible = fnd > 0; });
+     var ping = red ? 0 : (performance.now() % 2800) / 2800, rg = ping * E.big * 0.625;
+-    E.ring.visible = !red && p > 0.05; E.ring.scale.set(E.w + 2 * rg, 1, E.d + 2 * rg); E.ring.material.opacity = (1 - ping) * (0.10 + 0.40 * seg(p, 0.5, 1));
++    E.ring.visible = !red && p > 0.05 && !L2; E.ring.scale.set(E.w + 2 * rg, 1, E.d + 2 * rg); E.ring.material.opacity = (1 - ping) * (0.10 + 0.40 * seg(p, 0.5, 1));
+     if (E.rafters) { var nT = Math.ceil(seg(p, 0.60, 0.80) * 18); E.rafters.visible = nT > 0; E.rafters.geometry.setDrawRange(0, nT * E.rafters.userData.per); }
+-    var pa = 1 - seg(p, 0.97, 1);
+-    E.slice.visible = pa > 0 && p > 0; E.slice.position.y = st.y; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
++    var pa = this.mode === 'equity' ? 1 : (L2 ? 0 : 1 - seg(p, 0.97, 1)), sy = this.mode === 'equity' ? cut : st.y;
++    E.slice.visible = pa > 0 && p > 0; E.slice.position.y = sy; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
+     this._bPulse = pulse;
+-    this._bInfo = { p: p, row: st.row, rows: st.rows, y: st.y, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
+-      sliceA: pa, keys: st.keys, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: motion };
++    this._bInfo = { mode: this.mode, eq: eqS, p: p, row: st.row, rows: st.rows, y: sy, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
++      sliceA: pa, keys: st.keys && !L2, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: motion };
+     // auto orbit (6.6.8): drifts round slowly, stops at a touch, resumes after 2.5 s idle; off for reduced motion
+     var ctl = this.controls;
+     if (red || this._bLite) ctl.autoRotate = false;
+@@ -7232,6 +7272,10 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+     var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red;
+     if (red) this.p = target;
+     else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 0.55); if (Math.abs(target - this.p) < 0.0003) this.p = target; }   // slow motion (owner, 31 Oct): a deposit builds over about five seconds
++    if (this.mode === 'equity') {   // Level 2: the paid line rises the same way, with the gold flash while it moves
++      if (this._bEq == null || red || !this._bPrimed) this._bEq = this.eq;
++      else if (this._bEq !== this.eq) { if (this.eq > this._bEq) this._bRiseAt = this._bNow(); this._bEq += (this.eq - this._bEq) * Math.min(1, dt * 0.55); if (Math.abs(this.eq - this._bEq) < 0.0003) this._bEq = this.eq; }
++    }
+     this._brandApply();
+     this._bWasSettled = this._brandSettled();
+     // at rest (nothing landing, no touch for 1.5 s, no camera fly): only the slow pulse, sweep, ring and orbit move, and they run on the
+@@ -7243,6 +7287,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
+   VP._brandSettled = function () {
+     var target = this._bTarget == null ? this.p : this._bTarget;
+     if (Math.abs(target - this.p) > 1e-9) return false;
++    if (this.mode === 'equity' && this._bEq != null && (Math.abs(this._bEq - this.eq) > 1e-9 || (this._bRiseAt != null && this._bNow() - this._bRiseAt < 1.1))) return false;
+     var now = this._bNow(), busy = false;
+     (this._bm || []).forEach(function (rec) { if (rec && rec.cnt > 0 && rec.laid[rec.cnt - 1] > -999 && now < rec.laid[rec.cnt - 1] + 2.1) busy = true; });
+     return !busy;
+@@ -16626,7 +16671,7 @@ function hb3dPlaceOverlays() {
+     var name = (m.name || '').replace(/^./, function (c) { return c.toUpperCase(); });
+     var what = m.focus ? (sm.mode === 'build' ? 'your floor · ' + st.stage + ' · ' : 'your floor · ') : (sm.mode === 'build' ? st.stage + ' · ' : '');
+     var capT = sm.mode === 'site' ? '' : (name + ' · ' + what + st.bricksLaid.toLocaleString('en-GB') + ' / ' + st.bricksTotal.toLocaleString('en-GB') + ' bricks' + (st.tilesTotal && !bri ? ' · ' + st.tilesLaid.toLocaleString('en-GB') + ' tiles' : '')
+-      + (bri ? ' · ' + (window.VI_CURRENCY_SYMBOL || '£') + (HB3D.brandBrickValue(depositTarget(), st.bricksTotal) * (window.VI_CURRENCY_RATE || 1)).toFixed(2) + ' a brick' : ''));
++      + (bri && sm.mode === 'build' ? ' · ' + (window.VI_CURRENCY_SYMBOL || '£') + (HB3D.brandBrickValue(depositTarget(), st.bricksTotal) * (window.VI_CURRENCY_RATE || 1)).toFixed(2) + ' a brick' : ''));
+     var bInf = bri && v.brandInfo ? v.brandInfo() : null; if (bInf && (bInf.reduced || bInf.lite)) capT += bInf.reduced ? ' · animations off: reduced motion is on in your device settings' : ' · lighter animation for this device';
+     hbTxt(cap, capT);
+     hbAttr(v.renderer.domElement, 'aria-label', '3D model: ' + (m.name || 'house') + (sm.mode === 'equity' ? ', mortgage ' + Math.round(sm.eq * 100) + '% paid' : sm.mode === 'build' ? ', ' + Math.round(p * 100) + '% built' : ''));
+@@ -16637,7 +16682,9 @@ function hb3dPlaceOverlays() {
+ function hb3dBrandOverlays(v, sm, bi, rl, EW, EH) {
+   var svg = document.getElementById('hb3d-lead'), pill = document.getElementById('hb3d-bpill');
+   if (!svg || !pill || !rl) return;
+-  var on = !!bi && sm.mode === 'build' && bi.p > 0;
++  var L2 = !!bi && (sm.mode === 'equity' || sm.mode === 'complete');   // Level 2 under the brand look (owner, 1 Nov)
++  var on = !!bi && ((sm.mode === 'build' && bi.p > 0) || L2);
++  if (L2) { var own = document.getElementById('hb3d-ownlabel'); if (own && own.style.display !== 'none') own.style.display = 'none'; }   // the gold tag says it instead
+   hbSty(svg, 'display', on ? 'block' : 'none'); if (!on) { hbSty(pill, 'display', 'none'); if (bi) hbSty(rl, 'display', 'none'); return; }
+   var W = EW == null ? v.el.clientWidth : EW, Ht = EH == null ? v.el.clientHeight : EH, fs = Math.max(11, Math.min(17, W * 0.026)), lpad = 22, hb = v.el.querySelector('.hud-bar'), rail = 58, $ = function (s) { return svg.querySelector(s); };
+   if (hb && v.el._railK !== W + 'x' + Ht) { v.el._railK = W + 'x' + Ht; v.el._rail = 58; if (hb.offsetWidth) { var er = v.el.getBoundingClientRect(), hr = hb.getBoundingClientRect(); if (hr.left > er.left + W / 2) v.el._rail = Math.max(0, er.right - hr.left) + 4; } }
+@@ -16645,8 +16692,9 @@ function hb3dBrandOverlays(v, sm, bi, rl, EW, EH) {
+   // the tag: ROW n / N and x.x% OF DEPOSIT, joined to the slice centre by a leader line
+   var pc = v.project(bi.cx, bi.sliceA > 0 ? bi.y : bi.top, bi.cz);
+   var l1 = bi.keys ? 'KEYS ARE YOURS' : (v.model.focus ? 'FLOOR ' + (sm.floor || '') + ' · ' : '') + 'ROW ' + bi.row + ' / ' + bi.rows, l2 = (bi.p * 100).toFixed(1) + '% OF DEPOSIT';
++  if (L2) { l1 = sm.mode === 'complete' ? 'MORTGAGE FREE' : 'MORTGAGE ' + (Math.floor((sm.eq || 0) * 1000) / 10) + '% PAID'; l2 = ''; }
+   if (!rl.classList.contains('brand')) rl.classList.add('brand'); hbSty(rl, 'fontSize', fs + 'px');
+-  var html = l1 + '<span>' + l2 + '</span>'; if (rl._h !== html) { rl.innerHTML = html; rl._h = html; }
++  var html = l1 + (l2 ? '<span>' + l2 + '</span>' : ''); if (rl._h !== html) { rl.innerHTML = html; rl._h = html; }
+   var rlShow = pc.behind ? 'none' : 'block'; hbSty(rl, 'display', rlShow);
+   var rs = hbSize(rl, html + '|' + fs + '|' + rlShow), tw = rs[0] || 150, th = rs[1] || fs * 2.9;   // measured again only when the text changes
+   var tx = Math.max(lpad, Math.min(W - tw - 6 - rail, pc.x + fs * 1.6)), ty = Math.max(6, Math.min(Ht - th - 30, pc.y - th - fs * 1.4));
+diff --git a/src/hb3d/brand.js b/src/hb3d/brand.js
+index 6dc5392..b6d93ba 100644
+--- a/src/hb3d/brand.js
++++ b/src/hb3d/brand.js
+@@ -191,14 +191,24 @@
+     'uniform vec3 uBase; uniform vec3 uLitCol; uniform float uLit; uniform vec3 uEdge; uniform vec3 uSheen; uniform vec3 uFlashCol;',
+     'uniform float uShMin; uniform float uEdgeK; uniform float uPulse; uniform float uBuilt; uniform float uSweep; uniform float uSweepOn; uniform float uSweepW;',
+     'uniform float uBack; uniform float uFrontA; uniform float uBackA; uniform float uTone; uniform float uBevel;',
++    'uniform float uCut; uniform float uCutOn; uniform float uRise;',
+     'varying vec3 vN; varying vec3 vW; varying vec2 vUV; varying vec2 vFS; varying float vFlash; varying float vAlpha; varying float vSeed;',
+     'void main() {',
++    '  #ifdef BRAND_HOLO',
++    '  if (vW.y < uCut) discard;',
++    '  #else',
++    '  if (uCutOn > 0.5 && vW.y > uCut) discard;',
++    '  #endif',
+     '  vec3 L = normalize(vec3(-0.45, 0.7, 0.55)); float lt = max(0.0, dot(normalize(vN), L)); float sh = uShMin + (1.0 - uShMin) * lt;',
+     '  vec3 base = mix(uBase * (1.0 - uTone + 2.0 * uTone * vSeed), uLitCol, uLit);',
+     '  vec3 col = base * sh;',
+     '  vec2 dd = min(vUV, 1.0 - vUV) * vFS; float ed = min(dd.x, dd.y); float bev = smoothstep(0.0, uBevel, ed);',
+     '  col = mix(col, uEdge * (0.6 + 0.4 * sh), (1.0 - bev) * uEdgeK);',
+     '  float fl = clamp(vFlash, 0.0, 1.0); col = mix(col, uFlashCol, fl * 0.9);',
++    '  #ifdef BRAND_HOLO',
++    '  float ha = (0.03 + 0.14 * (1.0 - bev)) * vAlpha; gl_FragColor = vec4(mix(base, uSheen, 0.3) * ha, ha); return;',
++    '  #endif',
++    '  float rb = uCutOn * uRise * (1.0 - clamp((uCut - vW.y) / 0.225, 0.0, 1.0)); col = mix(col, uFlashCol, rb * 0.85);',   // Level 2: the paid line rises with the gold flash
+     '  float a;',
+     '  #ifdef BRAND_LAST',
+     '  col = mix(col, vec3(1.0, 0.94, 0.64), 0.88) * (1.08 + 0.3 * uPulse); a = 1.0;',
+@@ -216,10 +226,12 @@
+ 
+   function shared() {   // uniforms every brand material reads (one object each, shared by reference)
+     return { uNow: { value: 0 }, uPulse: { value: 0.5 }, uBuilt: { value: 0 }, uSweep: { value: -1e3 }, uSweepOn: { value: 0 }, uSweepW: { value: 6 * CH },
+-      uFadeGlaze: { value: 0 }, uLitGlass: { value: 0 }, uLitDoor: { value: 0 }, one: { value: 1 }, zero: { value: 0 } };
++      uFadeGlaze: { value: 0 }, uLitGlass: { value: 0 }, uLitDoor: { value: 0 }, one: { value: 1 }, zero: { value: 0 },
++      uCut: { value: 1e9 }, uCutOn: { value: 0 }, uRise: { value: 0 } };
+   }
+-  function brandMat(U, look, back, last, opaque, stat) {
++  function brandMat(U, look, back, last, opaque, stat, holo) {
+     var u = {
++      uCut: U.uCut, uCutOn: U.uCutOn, uRise: U.uRise,
+       uNow: U.uNow, uPulse: U.uPulse, uBuilt: U.uBuilt, uSweep: U.uSweep, uSweepOn: U.uSweepOn, uSweepW: U.uSweepW,
+       uBase: { value: v3(look.base) }, uLitCol: { value: v3(look.lit || look.base) }, uLit: look.litU || U.zero,
+       uEdge: { value: v3(C.edge) }, uSheen: { value: v3(C.sheen) }, uFlashCol: { value: v3(C.flash) },
+@@ -232,6 +244,7 @@
+     var mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS, fragmentShader: FS, transparent: !opaque, premultipliedAlpha: true,
+       depthWrite: !back, depthTest: !back, side: back ? THREE.BackSide : THREE.FrontSide });
+     mat.defines = {}; if (last) mat.defines.BRAND_LAST = ''; if (opaque) mat.defines.BRAND_OPAQUE = ''; if (stat) mat.defines.BRAND_STATIC = '';
++    if (holo) { mat.defines.BRAND_HOLO = ''; mat.transparent = true; mat.depthWrite = false; }   // Level 2: the unpaid share as a faint hologram
+     return mat;
+   }
+   function lookOf(part, U) {
+@@ -294,7 +307,7 @@
+   };
+   VP._brandActive = function () {
+     var m = this.model;
+-    return !!(this.brand && m && m.clean && !m.custom && m.rows && m.batches && (this.mode === 'build' || this.mode === 'site'));
++    return !!(this.brand && m && m.clean && !m.custom && m.rows && m.batches && (this.mode === 'build' || this.mode === 'site' || this.mode === 'equity' || this.mode === 'complete'));
+   };
+   VP._bNow = function () { if (!this._bT0) this._bT0 = performance.now(); return (performance.now() - this._bT0) / 1000; };
+ 
+@@ -401,7 +414,7 @@
+         back.frustumCulled = false; back.count = 0; back.renderOrder = 3; grp.add(back);
+       }
+       return { bi: bi, part: part, n: n, front: front, back: back, laid: laid, attr: at, rank: P.rank[bi], cnt: 0, drop: part === 'brick' || part === 'roof',
+-        mats: mats, alaid: alaid, stat: stat, V: V, I: I, ready: 0, S: 0, act: -1 };
++        mats: mats, alaid: alaid, stat: stat, V: V, I: I, ready: 0, S: 0, act: -1, look: look };
+     });
+     this._bBakeGo();
+     // window glow (6.5, Night): a soft gold radial over each pane, alpha (0.22 + 0.10 * pulse) * lit, additive, no depth write
+@@ -492,10 +505,29 @@
+     this.dirty = true;
+   };
+ 
++  // Level 2 hologram pass: the same meshes again with the faint material, drawn only above the paid line (made on first use)
++  VP._brandHolo = function (on) {
++    var U = this._bU, grp = this._bGroup;
++    (this._bm || []).forEach(function (rec) {
++      if (!rec) return;
++      if (on && !rec.holo) {
++        var hi = new THREE.InstancedMesh(rec.front.geometry, brandMat(U, rec.look, false, false, false, false, true), rec.n);
++        hi.instanceMatrix = rec.front.instanceMatrix; hi.frustumCulled = false; hi.renderOrder = 5; hi.name = 'holo:' + rec.part; grp.add(hi);
++        var hs = rec.stat ? new THREE.Mesh(rec.stat.geometry, brandMat(U, rec.look, false, false, false, true, true)) : null;
++        if (hs) { hs.frustumCulled = false; hs.renderOrder = 5; hs.name = 'holoStatic:' + rec.part; grp.add(hs); }
++        rec.holo = { i: hi, s: hs };
++      }
++      if (!rec.holo) return;
++      rec.holo.i.visible = on && rec.front.visible; rec.holo.i.count = rec.front.count;
++      if (rec.holo.s) rec.holo.s.visible = on && rec.stat.visible;
++    });
++  };
++
+   // apply(): the Level 1 build under the brand look
+   VP._brandApplyAll = function () {
+     var m = this.model, F = m.focus;
+     if (this._bModel !== m) this._brandBuild();
++    if (this._bMode !== this.mode) { this._bPrimed = false; this._bMode = this.mode; if (this.mode !== 'equity') this._bEq = null; }   // a new level shows at once, no drop
+     this._brandEnv(true);
+     var P = H.brandPlan(m), IDLE = H._IDLE_PLANE;
+     this.batches.forEach(function (B, bi) {
+@@ -505,7 +537,7 @@
+         B.main.material = mats.blue; mats.blue.clippingPlanes = [IDLE];
+       } else { B.main.visible = false; B.rev.visible = false; }
+     });
+-    if (this.edges) { this.edges.visible = !F; this.edges.material.clippingPlanes = [IDLE]; this.edges.material.opacity = 0.34; }   // the finished house as a faint wire
++    if (this.edges) { this.edges.visible = !F && (this.mode === 'build' || this.mode === 'site'); this.edges.material.clippingPlanes = [IDLE]; this.edges.material.opacity = 0.34; }   // the finished house as a faint wire
+     if (this.rowBand) this.rowBand.visible = false;
+     if (this.water) this.water.visible = false;
+     if (this.focusBox) this.focusBox.visible = true;
+@@ -518,7 +550,8 @@
+   // counts, per-brick stamps and the frame's uniforms (called by apply() and every animated frame)
+   VP._brandApply = function () {
+     var m = this.model; if (!m || !this._bm) return;
+-    var P = H.brandPlan(m), R = P.rows, p = this.mode === 'site' ? 0 : this.p, now = this._bNow(), motion = reduced(), red = motion || !!this._bLite, U = this._bU, E = this._bEnvObj;
++    var L2 = this.mode === 'equity' || this.mode === 'complete';
++    var P = H.brandPlan(m), R = P.rows, p = this.mode === 'site' ? 0 : (L2 ? 1 : this.p), now = this._bNow(), motion = reduced(), red = motion || !!this._bLite, U = this._bU, E = this._bEnvObj;
+     var V = units(P, p), V0 = this._bV == null ? -1 : this._bV, inst = motion || !this._bPrimed;   // lite keeps the drop and flash, not the ambient motion
+     var add = Math.max(0, V - Math.max(V0, 0)), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.12, 0.9 / add) : 0;
+     if (V !== V0) {
+@@ -545,7 +578,7 @@
+     var st = H.brandStats(m, p), L = st.bricksLaid, pulse = red ? 0.5 : 0.5 + 0.5 * Math.sin(performance.now() * 0.002244);
+     // the last brick laid: stays lit pale gold, 14% proud; shown once it has landed
+     var hl = this._bHL, last = null;
+-    if (L > 0) {
++    if (L > 0 && !L2) {
+       var j = L - 1, rec = this._bm[P.bBi[j]], kk = P.bK[j], b = m.batches[P.bBi[j]], o = P.perm[P.bBi[j]][kk] * 10, xf = b.xf;
+       if (this._bLastJ !== j) {
+         var mm = new THREE.Matrix4(), e = new THREE.Euler(xf[o + 6], xf[o + 7], xf[o + 8], 'YZX');
+@@ -559,6 +592,13 @@
+     // stage uniforms
+     U.uNow.value = now; U.uPulse.value = pulse; U.uBuilt.value = seg(p, 0.05, 1);
+     U.uFadeGlaze.value = seg(p, 0.88, 0.93); U.uLitGlass.value = seg(p, 0.93, 0.96); U.uLitDoor.value = seg(p, 0.96, 1);
++    // Level 2 (owner, 1 Nov): paying the mortgage, the paid share solid below a gold line and the rest a faint hologram; mortgage free,
++    // the whole house solid with the windows lit and the door gold
++    var F2 = m.focus, cy0 = F2 ? F2.y0 : R.y0, cy1 = F2 ? F2.y1 : R.y1, eqS = this._bEq == null ? this.eq : this._bEq, cut = cy0 + eqS * (cy1 - cy0);
++    if (this.mode === 'equity') { U.uCutOn.value = 1; U.uCut.value = cut; U.uLitGlass.value = 0; U.uLitDoor.value = 0; }
++    else { U.uCutOn.value = 0; U.uCut.value = 1e9; U.uRise.value = 0; }
++    U.uRise.value = this.mode === 'equity' && this._bRiseAt != null && !motion ? Math.max(0, 1 - (now - this._bRiseAt) / 1.1) : 0;
++    this._brandHolo(this.mode === 'equity');
+     var top = Math.max(R.y1, R.y0 + 1), span = top - R.y0;
+     U.uSweepOn.value = (red || this._bLite) ? 0 : 1;
+     U.uSweep.value = R.y0 + ((now * 20 * CH) % (span + 40 * CH)) - 10 * CH;   // 20 courses a second, repeating
+@@ -567,13 +607,13 @@
+     E.site.material.opacity = 0.55 * sb; E.site.visible = sb > 0;
+     E.fline.material.opacity = 0.75 * fnd; E.fline.visible = fnd > 0; E.fillMat.opacity = 0.14 * fnd; E.fills.forEach(function (f) { f.visible = fnd > 0; });
+     var ping = red ? 0 : (performance.now() % 2800) / 2800, rg = ping * E.big * 0.625;
+-    E.ring.visible = !red && p > 0.05; E.ring.scale.set(E.w + 2 * rg, 1, E.d + 2 * rg); E.ring.material.opacity = (1 - ping) * (0.10 + 0.40 * seg(p, 0.5, 1));
++    E.ring.visible = !red && p > 0.05 && !L2; E.ring.scale.set(E.w + 2 * rg, 1, E.d + 2 * rg); E.ring.material.opacity = (1 - ping) * (0.10 + 0.40 * seg(p, 0.5, 1));
+     if (E.rafters) { var nT = Math.ceil(seg(p, 0.60, 0.80) * 18); E.rafters.visible = nT > 0; E.rafters.geometry.setDrawRange(0, nT * E.rafters.userData.per); }
+-    var pa = 1 - seg(p, 0.97, 1);
+-    E.slice.visible = pa > 0 && p > 0; E.slice.position.y = st.y; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
++    var pa = this.mode === 'equity' ? 1 : (L2 ? 0 : 1 - seg(p, 0.97, 1)), sy = this.mode === 'equity' ? cut : st.y;
++    E.slice.visible = pa > 0 && p > 0; E.slice.position.y = sy; E.sFill.material.opacity = 0.11 * pa; E.sLine.material.opacity = 0.95 * pa;
+     this._bPulse = pulse;
+-    this._bInfo = { p: p, row: st.row, rows: st.rows, y: st.y, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
+-      sliceA: pa, keys: st.keys, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: motion };
++    this._bInfo = { mode: this.mode, eq: eqS, p: p, row: st.row, rows: st.rows, y: sy, bricks: L, bricksTotal: st.bricksTotal, tiles: st.tilesLaid, tilesTotal: st.tilesTotal, stage: st.stage,
++      sliceA: pa, keys: st.keys && !L2, last: last, pulse: pulse, door: P.door, cx: E.cx, cz: E.cz, top: m.height, lite: !!this._bLite, reduced: motion };
+     // auto orbit (6.6.8): drifts round slowly, stops at a touch, resumes after 2.5 s idle; off for reduced motion
+     var ctl = this.controls;
+     if (red || this._bLite) ctl.autoRotate = false;
+@@ -602,6 +642,10 @@
+     var target = this._bTarget == null ? this.p : this._bTarget, red = reduced(), calm = red;
+     if (red) this.p = target;
+     else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 0.55); if (Math.abs(target - this.p) < 0.0003) this.p = target; }   // slow motion (owner, 31 Oct): a deposit builds over about five seconds
++    if (this.mode === 'equity') {   // Level 2: the paid line rises the same way, with the gold flash while it moves
++      if (this._bEq == null || red || !this._bPrimed) this._bEq = this.eq;
++      else if (this._bEq !== this.eq) { if (this.eq > this._bEq) this._bRiseAt = this._bNow(); this._bEq += (this.eq - this._bEq) * Math.min(1, dt * 0.55); if (Math.abs(this.eq - this._bEq) < 0.0003) this._bEq = this.eq; }
++    }
+     this._brandApply();
+     this._bWasSettled = this._brandSettled();
+     // at rest (nothing landing, no touch for 1.5 s, no camera fly): only the slow pulse, sweep, ring and orbit move, and they run on the
+@@ -613,6 +657,7 @@
+   VP._brandSettled = function () {
+     var target = this._bTarget == null ? this.p : this._bTarget;
+     if (Math.abs(target - this.p) > 1e-9) return false;
++    if (this.mode === 'equity' && this._bEq != null && (Math.abs(this._bEq - this.eq) > 1e-9 || (this._bRiseAt != null && this._bNow() - this._bRiseAt < 1.1))) return false;
+     var now = this._bNow(), busy = false;
+     (this._bm || []).forEach(function (rec) { if (rec && rec.cnt > 0 && rec.laid[rec.cnt - 1] > -999 && now < rec.laid[rec.cnt - 1] + 2.1) busy = true; });
+     return !busy;
