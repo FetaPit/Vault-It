@@ -18,6 +18,13 @@ The brand book draws 14,465 bricks with raw WebGL: one shader program, one insta
 | rollout-qc, queue-keeper | QC on every app commit; queue kept current | | |
 | David (COO, release chat) | Order, merges into candidate/v0.7, CI, previews, owner sign-off, release | candidate/v0.7 | Owner's "signed off" |
 
+## A2 port plan (accepted 1 Nov 23:16, David)
+- New src/hb3d/house_gl.js ported from the brand book: raw WebGL, one program, one instanced draw per pass, shader-driven drop/flash/pulse/sweep, brand-book orbit and DPR. Three.js no longer loads for the house; other viewports untouched; viewer.js and brand.js stay behind ?house=legacy for one release.
+- Lazy laying as Pete specified: settled stamps for everything below the frontier, one upload one draw; deposits animate only new courses; a type switch fills new instance buffers (measured; chunked over two frames if the mansion misses 40 ms) and lays only the top course.
+- Confirmed cause of the switch freeze: the old engine rebuilds all instances synchronously (setMatrixAt over 12k-48k bricks plus geometry clones in one main-thread task).
+- Keeps B2's perf hook once per drawn frame. New tests in tests/test_hb_engine.js against Pedro's done-means list; existing viewport tests must stay green.
+- Honest estimate: 2.5 to 3 days. Tonight: skeleton on v07/engine (new file, legacy flag, failing tests). First milestone: the terrace drawing as settled shell + one animated course.
+
 ## Order
 1. B2's perf overlay merges first; the owner measures the current build on his fold phone and laptop and pastes the reports.
 2. A2's plan, then the build; B2's three fixes merge as they pass.
