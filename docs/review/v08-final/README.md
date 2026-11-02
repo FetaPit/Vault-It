@@ -43,3 +43,5 @@ Shots are in followup/.
 5. Entrepreneur KPIs: 360 and 390 PASS (2 x 2, no ellipsis, on brand). FIX at 460: the grid goes 3 across and leaves "Monthly goal" alone on a second row, with "Monthly recurring revenue" wrapping to 3 lines. Keep the 2 x 2 grid up to 599 px, then 4 across.
 Nit: "No clients yet — add your first!" has an em dash (pre-existing copy). Make it "No clients yet. Add your first."
 Parked for v0.8.1 (pre-existing on 8b33d7c): at 360 the header "NET WORTH" label wraps to two lines.
+
+Follow-up 2, v08/type-scale fea1747: PASS. The Entrepreneur KPIs are 2 x 2 at 460 and 599 with no lone tile, and 4 across at 768 (Monthly recurring revenue on 2 lines). The empty-clients copy has no em dash. Shots: followup/biz2_{460,599,768}.png.
