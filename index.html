@@ -9015,6 +9015,24 @@ body::before {
 }
 .footer-copy button { font-size: inherit !important; }
 @media (max-width: 560px) { .footer-cr { display: none; } :root { --footer-h: 44px; } }
+/* v0.8 (owner, 2 Nov; Pedro's spec E): 600 px and up, the fixed footer folds to one 24 px line with the FCA statement and a More button
+   1.2 s after scrolling stops and on load; scrolling, the page end or More show it in full. Transform only, so the page never jumps; instant with reduced motion.
+   Under 600 it stays at the page end. */
+#app-footer { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 0; padding-top: 0; transition: transform .24s var(--ease, ease); }
+.ft-strip { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 24px; text-align: center; }
+#app-footer .ft-strip .vi-fca { margin: 0; white-space: normal; }
+.ft-more { display: none; align-items: center; gap: 4px; height: 24px; padding: 0 6px; background: none; border: 0; color: var(--muted); font: 500 10px var(--font-body, 'DM Sans'), sans-serif; cursor: pointer; }
+.ft-more .vi-ic { width: 14px; height: 14px; transform: none; transition: transform .24s var(--ease, ease); }
+.ft-more[aria-expanded="false"] .vi-ic { transform: rotate(180deg); }
+.ft-more:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+@media (min-width: 600px) { .ft-more { display: inline-flex; } }
+.ft-body { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 14px; min-width: 0; padding-bottom: 2px; transition: opacity .2s ease; }
+.ft-body .footer-copy { min-width: 0; }
+.ft-body .vi-disc { flex: 1 1 100%; order: 3; }
+#app-footer.vi-ft-min { transform: translateY(var(--ft-hide, 0px)); }
+#app-footer.vi-ft-min .ft-body { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { #app-footer, #app-footer * { transition: none !important; } }
+body.reduced-motion #app-footer, body.reduced-motion #app-footer * { transition: none !important; }
 .footer-logo {
   font-family: 'Syne', sans-serif;
   font-size: .48rem;
@@ -10479,6 +10497,19 @@ input:focus, textarea:focus, select:focus {
 .cf-legend em{font-style:normal;color:var(--t3)}
 .cf-scroll{overflow-x:auto;border-radius:8px;background:rgb(var(--panel-rgb) / .45);-webkit-overflow-scrolling:touch}
 .cf-scroll svg{display:block}
+/* v0.8 (owner, 2 Nov): "make the scroll bar larger and more obvious at the bottom, and add a scroll bar at the top as well".
+   The flow charts hide the thin native bar and get two rails, one above and a bigger one below, synced with the chart and draggable by touch or mouse. */
+.cf-scroll{scrollbar-width:none}
+.cf-scroll::-webkit-scrollbar{display:none}
+.cf-rail{position:relative;height:20px;margin:0;cursor:pointer;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.cf-rail[hidden]{display:none}
+.cf-rail.cf-rail-t{margin-bottom:-1px}
+.cf-rail.cf-rail-b{margin-top:2px}
+.cf-rail::before{content:"";position:absolute;left:0;right:0;top:5px;height:10px;border-radius:5px;background:var(--track)}
+.cf-rail .cf-thumb{position:absolute;top:7px;left:0;height:6px;min-width:40px;border-radius:5px;background:rgb(var(--teal-rgb) / .5);cursor:grab;transition:top .15s,height .15s,background .15s}
+.cf-rail:hover .cf-thumb,.cf-rail.drag .cf-thumb{top:5px;height:10px;background:rgb(var(--teal-rgb) / .8)}
+.cf-rail.drag .cf-thumb{cursor:grabbing}
+@media (prefers-reduced-motion:reduce){.cf-rail .cf-thumb{transition:none}}
 html[data-theme="light"] .cf-chip{--teal:#44C0B9;--green:#3ECF8E;--green2:#3FB585;--coral:#E5535F;--salmon:#FFA38A;--amber:#F59E0B;--yellow:#F5DC4A}
 html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Daylight so the paper does not show through (AA for the coral amounts); the chips stay black in Daylight, so their text keeps the Night colours */
 .cf-sub{font-family:'Syne',sans-serif;font-size:.52rem;font-weight:800;letter-spacing:.16em;color:var(--t3);margin:14px 0 6px}
@@ -10903,7 +10934,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   html #topnav .tab-btn .vi-ic.ti{width:22px!important;height:22px!important}
   #topnav .vi-usp,#topnav .vi-pro{top:4px;right:4px}
   #left-sidebar{top:46px!important}
-  #app-footer{position:static;margin-top:16px}
+  #app-footer{position:static;margin-top:16px;padding-right:64px}   /* v0.8: the text wraps clear of the fixed Feedback button */
   html body #sync-banner,html body #trial-banner{bottom:calc(var(--footer-h) + 6px)!important}
 }
 /* tablets, unfolded folds and wider (v0.7 E1, owner 1 Nov; Pedro B): from 600 px the tabs sit at the top as on desktop, icons only,
@@ -11939,8 +11970,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 <div id="tab-overview" class="tab-panel active">
 <div id="ov-page">
 
-  <!-- Dev contact bento card -->
-  <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--c1);border:1px solid rgb(var(--brass-rgb) / .35);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin-bottom:14px;position:relative;overflow:hidden">
+  <!-- Dev contact bento card: moved to the foot of whichever tab is open (viDevCardPlace, v0.8) -->
+  <div id="vi-devcard" style="margin-bottom:14px!important;display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--c1);border:1px solid rgb(var(--brass-rgb) / .35);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));margin:24px 0 0;position:relative;overflow:hidden">
     <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--brass),#f0d878,var(--brass))"></div>
     <div style="flex-shrink:0;padding:2px;border-radius:8px;background:linear-gradient(135deg,#b8902e 0%,#f0d878 40%,var(--brass) 70%,#b8902e 100%);box-shadow:0 0 16px rgb(var(--brass-rgb) / .5),0 2px 6px rgba(0,0,0,.4)">
       <div style="border-radius:6px;overflow:hidden;width:48px;height:48px;background:var(--c1)">
@@ -12134,8 +12165,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div id="cf-summary" style="display:flex;gap:14px;flex-wrap:wrap"></div>
       </div>
       <div id="cf-nudge"></div>
-      <div class="cf-legend" id="cf-legend"></div>
       <div id="cf-sankey" class="cf-scroll"></div>
+      <div class="cf-legend" id="cf-legend"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
         <span style="font-size:.5rem;color:var(--t3);line-height:1.5">Plan every pound in your <b style="color:var(--blue)">Budget</b>.</span>
         <button class="btn-add-data" onclick="showTab('budget')">Open Budget →</button>
@@ -14188,13 +14219,13 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 #cashSceneCard .scene.v3-on{min-height:420px}
 #cashSceneCard .orbit-hint{z-index:2}
 /* Tester feedback (docs/TESTER_FEEDBACK.md) */
-#vi-fb-btn{position:fixed;right:14px;bottom:calc(var(--footer-h,30px) + 14px);z-index:450;display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .5);color:var(--teal);font:600 .62rem 'Syne',sans-serif;letter-spacing:.06em;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer}
+#vi-fb-btn{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));left:auto;top:auto;bottom:calc(var(--footer-h,30px) + 12px);z-index:450;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 12px;box-sizing:border-box;border-radius:999px;background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .5);color:var(--teal);font:700 10px 'Syne',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer}
 #vi-fb-btn .vi-ic{width:16px;height:16px}
-#vi-fb-btn.vi-fb-left{right:auto;left:14px}
-#vi-fb-btn.vi-fb-top{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 62px)}
-#vi-fb-btn.vi-fb-away{opacity:0;pointer-events:none}
+/* v0.8 (owner, 2 Nov): "It should stay bottom right." Fixed there on every tab and width, above the footer or the phone tab bar; nothing moves it */
 #vi-fb-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-@media(max-width:600px){#vi-fb-btn span{display:none}#vi-fb-btn{padding:10px}}
+@media(max-width:599px){#vi-fb-btn span{display:none}#vi-fb-btn{width:40px;height:40px;padding:0}#vi-fb-btn .vi-ic{width:18px;height:18px}}
+/* hidden while a pop-up or the help panel is open (Pedro, v0.8 spec E) */
+body:has(#vi-help.open) #vi-fb-btn,body:has(.vi-modal-overlay:not(.hidden):not([style*="display: none"]):not([style*="display:none"])) #vi-fb-btn,body:has(#vi-fb:not([hidden])) #vi-fb-btn{visibility:hidden}
 .vi-fb-card{max-width:440px;width:100%}
 .vi-fb-q{display:block;font-size:.72rem;color:var(--text);margin:6px 0}
 #vi-fb-text{width:100%;resize:vertical;min-height:84px;box-sizing:border-box}
@@ -14280,10 +14311,13 @@ body.vi-pop-open{overflow:hidden}
 @media(min-width:1100px){.debt-card-grid.has-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))!important;gap:16px}}
 
 /* ═══ Budget: income | expenditure split, tiles side by side, colour-coded, collapsible ═══ */
-.cf-legend{gap:10px 22px!important;font-size:.78rem!important;margin:12px 0 10px!important;font-family:'DM Sans',sans-serif!important;color:var(--t1)!important}
-.cf-legend span{gap:9px!important;padding:6px 12px;border-radius:99px;background:rgb(var(--ink-rgb) / .03);border:1px solid color-mix(in srgb,var(--c,#8899aa) 35%,transparent)}
-.cf-legend i{width:18px!important;height:18px!important;border-radius:5px!important}
+.cf-legend{gap:4px 6px!important;margin:8px 0 4px!important;font-family:'DM Sans',sans-serif!important}
+/* v0.8 (owner, 2 Nov; Pedro's spec A): a compact key, one marker per group (its icon in the group colour), 22 px pills */
+.cf-legend span{gap:5px!important;height:22px;box-sizing:border-box;padding:0 8px 0 6px;border-radius:99px;background:rgb(var(--ink-rgb) / .03);border:1px solid color-mix(in srgb,var(--c,#8899aa) 35%,transparent);white-space:nowrap;font:500 10.5px 'DM Sans',sans-serif;color:var(--text);transition:background .15s}
+.cf-legend span:hover{background:color-mix(in srgb,var(--c,#8899aa) 10%,transparent)}
 .cf-legend s{text-decoration:none;display:inline-flex;color:var(--c,#aab)}
+.cf-legend s svg{width:14px!important;height:14px!important;--vi-sw:1.5}
+#bd-legend{margin:0 0 10px!important}
 .bd-split{position:relative;display:grid;grid-template-columns:1fr;gap:14px}
 .bd-split>.ov-chart-card{min-width:0}
 @media(min-width:1000px){
@@ -14417,6 +14451,7 @@ function showTab(id){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   const panel=document.getElementById('tab-'+id);
   if(panel){panel.classList.add('active');panel.style.display='block';}
+  try{viDevCardPlace(panel);}catch(e){}
   document.querySelectorAll('.tab-btn').forEach(b=>{
     if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'"))b.classList.add('active');
   });
@@ -14437,6 +14472,13 @@ function showTab(id){
     if (hasLive) refreshAllLiveConns();
   }
 }
+// Message the Dev sits at the foot of every tab (owner, 2 Nov: "at the bottom of each tab, not at the top"): one card, moved into the open tab's page as its last block
+function viDevCardPlace(panel){
+  var c=document.getElementById('vi-devcard');panel=panel||document.querySelector('.tab-panel.active');if(!c||!panel)return;
+  var host=panel.firstElementChild&&!/^(SCRIPT|STYLE)$/.test(panel.firstElementChild.tagName)?panel.firstElementChild:panel;
+  if(host.lastElementChild!==c)host.appendChild(c);
+}
+document.addEventListener('DOMContentLoaded',function(){try{viDevCardPlace();}catch(e){}});
 // Scroll the (horizontally scrollable) top nav so the active tab is fully visible
 function viNavReveal(){
   var nav=document.getElementById('vi-tabs')||document.getElementById('topnav'),b=nav&&nav.querySelector('.tab-btn.active');
@@ -19398,7 +19440,7 @@ function bdUpdateBadge(){
   b.style.background=s.st==='over'?'var(--red)':'var(--amber)';
 }
 function cfLegendHTML(){
-  return CF_GROUP_ORDER.map(function(t){return '<span title="'+cfEsc(CF_GROUPS[t].ex)+'" style="--c:'+CF_GROUPS[t].tx+'"><i style="background:'+CF_GROUPS[t].col+'"></i><s>'+bdGroupIcon(t,22)+'</s>'+CF_GROUPS[t].short+'</span>';}).join('');
+  return CF_GROUP_ORDER.map(function(t){return '<span title="'+cfEsc(CF_GROUPS[t].ex)+'" style="--c:'+CF_GROUPS[t].tx+'"><s>'+bdGroupIcon(t,22)+'</s>'+CF_GROUPS[t].short+'</span>';}).join('');
 }
 function bdRender(){
   bdRenderZero();bdRenderLists();bdRenderPickers();bdRenderNew();renderCashflowCategories();
@@ -23378,10 +23420,37 @@ function viSwipeWrap(el,hint){
   try{new MutationObserver(upd).observe(el,{childList:true,subtree:true});}catch(e){}
   upd();
 }
+// v0.8 scroll rails for the flow charts: one above (inserted before the swipe wrapper) and a bigger one below, synced both ways
+function viCfRails(el){
+  if(!el||el._rails)return;el._rails=true;
+  var box=el.parentNode&&el.parentNode.classList.contains('swipe-wrap')?el.parentNode:el;
+  var mk=function(cls,lbl){var r=document.createElement('div');r.className='cf-rail '+cls;r.dataset.for=el.id;r.setAttribute('role','scrollbar');r.setAttribute('aria-controls',el.id);r.setAttribute('aria-orientation','horizontal');r.setAttribute('aria-label',lbl);r.innerHTML='<div class="cf-thumb"></div>';return r;};
+  var top=mk('cf-rail-t','Scroll the flow sideways'),bot=mk('cf-rail-b','Scroll the flow sideways');
+  box.parentNode.insertBefore(top,box);box.parentNode.insertBefore(bot,box.nextSibling);
+  var rails=[top,bot];
+  var geo=function(r){var rw=r.clientWidth,max=el.scrollWidth-el.clientWidth,t=r.firstChild,tw=Math.max(t.offsetWidth,1);return {rw:rw,max:max,tw:tw,span:Math.max(rw-tw,1)};};
+  var upd=function(){var max=el.scrollWidth-el.clientWidth;
+    rails.forEach(function(r){var on=max>6;r.hidden=!on;if(!on)return;var t=r.firstChild,rw=r.clientWidth;
+      t.style.width=Math.max(rw*el.clientWidth/el.scrollWidth,0)+'px';var g=geo(r);t.style.left=(g.span*el.scrollLeft/max)+'px';
+      r.setAttribute('aria-valuenow',Math.round(100*el.scrollLeft/max));});};
+  rails.forEach(function(r){
+    var drag=null;
+    r.addEventListener('pointerdown',function(e){var g=geo(r),a=r.getBoundingClientRect(),t=r.firstChild.getBoundingClientRect();
+      if(e.target!==r.firstChild){el.scrollLeft=Math.max(0,Math.min(g.max,(e.clientX-a.left-g.tw/2)/g.span*g.max));upd();}
+      drag={x:e.clientX,s:el.scrollLeft,id:e.pointerId};r.classList.add('drag');try{r.setPointerCapture(e.pointerId);}catch(_){ }e.preventDefault();});
+    r.addEventListener('pointermove',function(e){if(!drag||e.pointerId!==drag.id)return;var g=geo(r);el.scrollLeft=Math.max(0,Math.min(g.max,drag.s+(e.clientX-drag.x)*g.max/g.span));upd();});
+    var end=function(){drag=null;r.classList.remove('drag');};r.addEventListener('pointerup',end);r.addEventListener('pointercancel',end);
+  });
+  el.addEventListener('scroll',upd,{passive:true});window.addEventListener('resize',upd);
+  try{new ResizeObserver(upd).observe(el);}catch(e){}
+  try{new MutationObserver(upd).observe(el,{childList:true,subtree:true});}catch(e){}
+  upd();
+}
 function viSwipeInit(){
   viSwipeWrap(document.getElementById('stk-pies'));
   viSwipeWrap(document.getElementById('cf-sankey'),'← swipe sideways to follow the flow →');
   viSwipeWrap(document.getElementById('bd-sankey'),'← swipe sideways to follow the flow →');
+  viCfRails(document.getElementById('cf-sankey'));viCfRails(document.getElementById('bd-sankey'));
 }
 window.addEventListener('load',function(){setTimeout(viSwipeInit,400);});
 function closePaywall(){
@@ -27691,7 +27760,9 @@ function nwhRenderMini(){
 
 <!-- ══ FOOTER ══ -->
 <div id="app-footer">
-  <span class="footer-copy"><span class="footer-cr">© 2026 PT Live Design. All rights reserved.</span> <button onclick="showPrivacy()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Privacy notice</button><span style="color:var(--t3);opacity:.4">·</span><button onclick="showTerms()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Beta terms</button> <span class="vi-fca">Not regulated by the FCA. Not financial advice.</span> <span class="vi-disc">Vault-It helps you track and plan your money. Forecasts, dates and values are estimates from what you enter and public prices, and may be wrong. Speak to a regulated adviser before big money decisions.</span></span>
+  <div class="ft-strip"><span class="vi-fca">Not regulated by the FCA. Not financial advice.</span><button type="button" class="ft-more" aria-expanded="true" aria-controls="ft-body"><span>Less</span><svg class="vi-ic" aria-hidden="true"><use href="#vi-chevron"/></svg></button></div>
+  <div class="ft-body" id="ft-body">
+  <span class="footer-copy"><span class="footer-cr">© 2026 PT Live Design. All rights reserved.</span> <button onclick="showPrivacy()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Privacy notice</button><span style="color:var(--t3);opacity:.4">·</span><button onclick="showTerms()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Beta terms</button></span>
   <span class="footer-logo"><div style="width:14px;height:14px;flex-shrink:0;display:inline-block"><svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2020/svg" style="">
   <defs>
     <radialGradient id="vaultGlow3" cx="50%" cy="50%" r="50%">
@@ -27741,6 +27812,8 @@ function nwhRenderMini(){
   <circle cx="7.0" cy="7.0" r="0.4" fill="#44c0b9" opacity="0.4"/>
 </svg></div> PT Live Design</span>
   <span class="footer-version">Vault-It v0.9.2 Alpha · build flow-dash-1</span>
+  <span class="vi-disc">Vault-It helps you track and plan your money. Forecasts, dates and values are estimates from what you enter and public prices, and may be wrong. Speak to a regulated adviser before big money decisions.</span>
+  </div>
 </div>
 <script>
 // The fixed footer wraps to a few lines when the disclaimer is long: keep --footer-h equal to its real height so the page and toasts clear it.
@@ -27750,6 +27823,22 @@ function nwhRenderMini(){
   function sync(){ try{ if(getComputedStyle(f).position==='fixed') document.documentElement.style.setProperty('--footer-h',f.offsetHeight+'px'); else document.documentElement.style.removeProperty('--footer-h'); }catch(e){} }
   if(window.ResizeObserver) new ResizeObserver(sync).observe(f);
   window.addEventListener('resize',sync); sync();
+  // fold to the FCA line 1.2 s after scrolling stops and on load; scrolling, the page end, focus or More show it in full
+  var strip=f.querySelector('.ft-strip'),more=f.querySelector('.ft-more'),tm=0,pinned=false;
+  function fixed(){ try{ return getComputedStyle(f).position==='fixed'; }catch(e){ return false; } }
+  function atEnd(){ var d=document.documentElement; return window.scrollY+window.innerHeight>=d.scrollHeight-4; }
+  function mark(open){ if(more){ more.setAttribute('aria-expanded',open?'true':'false'); more.firstChild.textContent=open?'Less':'More'; more.setAttribute('aria-label',open?'Show less of the footer':'Show the full footer'); } }
+  function show(){ f.classList.remove('vi-ft-min'); mark(true); }
+  function hide(){ if(!fixed()||pinned||atEnd()||f.matches(':focus-within')||!strip){ show(); return; }
+    f.style.setProperty('--ft-hide',Math.max(0,f.offsetHeight-strip.offsetHeight-parseFloat(getComputedStyle(f).paddingTop||0))+'px'); f.classList.add('vi-ft-min'); mark(false); }
+  function later(){ clearTimeout(tm); tm=setTimeout(hide,1200); }
+  window.addEventListener('scroll',function(){ if(!fixed()) return; pinned=false; show(); later(); },{passive:true});
+  window.addEventListener('resize',function(){ if(f.classList.contains('vi-ft-min')) hide(); });
+  f.addEventListener('focusin',function(e){ if(e.target!==more) show(); });   // More is in the strip, so focusing it needs nothing opened
+  f.addEventListener('focusout',function(){ setTimeout(function(){ if(!f.matches(':focus-within')&&!pinned) later(); },0); });
+  if(more) more.addEventListener('click',function(){ clearTimeout(tm); if(f.classList.contains('vi-ft-min')){ pinned=true; show(); } else { pinned=false; f.blur&&more.blur(); hide(); if(!f.classList.contains('vi-ft-min')) mark(true); } });
+  f.addEventListener('click',function(e){ if(f.classList.contains('vi-ft-min')&&!e.target.closest('button,a')){ pinned=true; show(); } });
+  later();
 })();
 </script>
 
@@ -28808,19 +28897,7 @@ function init(){
   try{if(window.bd3d&&!bd3d.show._fb){var os=bd3d.show;bd3d.show=function(v,user){var r=os.apply(this,arguments);if(v==='3d'&&user)setTimeout(function(){viFbMoment('bd3d')},8000);return r};bd3d.show._fb=true}}catch(e){}
   if(!document.getElementById('vi-fb-btn')){var b=document.createElement('button');b.id='vi-fb-btn';b.type='button';b.setAttribute('aria-label','Send feedback');b.title='Send feedback';
     b.innerHTML='<svg class="vi-ic" aria-hidden="true"><use href="#vi-chat"/></svg><span>Feedback</span>';b.onclick=function(){viFbOpen()};document.body.appendChild(b);
-    var pend=0,dodge=function(){pend=0;b.classList.remove('vi-fb-left','vi-fb-top','vi-fb-away');var r=b.getBoundingClientRect();if(!r.width)return;
-      /* a 3D stage is never covered (owner, 31 Oct): bottom right, then bottom left, then the top edge, then tucked away while a stage fills the screen */
-      var onStage=function(){var q=b.getBoundingClientRect();return [].some.call(document.querySelectorAll('.nw3d-stage,.inv-stage,.i3d-stage'),function(s){var t=s.getBoundingClientRect();return t.width>0&&getComputedStyle(s).visibility!=='hidden'&&!(q.right<=t.left||q.left>=t.right||q.bottom<=t.top||q.top>=t.bottom)})};
-      var hit=function(){var pts=[[r.left+4,r.top+4],[r.right-4,r.top+4],[r.left+4,r.bottom-4],[r.right-4,r.bottom-4],[r.left+r.width/2,r.top+r.height/2]];
-        return pts.some(function(q){return document.elementsFromPoint(q[0],q[1]).some(function(el){return el!==b&&!b.contains(el)&&el.closest&&el.closest('button,a,input,select,textarea,[onclick],[role=button]')&&!el.closest('#vi-fb-btn')})})};
-      /* desktop: the top spot starts below the nav tabs (never under them); with a stage in every spot it stays visible in the spot that covers no control (owner, 1 Nov) */
-      var mob=window.innerWidth<=600,spots=['','vi-fb-left','vi-fb-top'],pick=null,free=null,nv=document.getElementById('topnav'),nb=nv?nv.getBoundingClientRect().bottom:0;
-      for(var k=0;k<spots.length;k++){b.classList.remove('vi-fb-left','vi-fb-top');b.style.top='';if(spots[k])b.classList.add(spots[k]);if(spots[k]==='vi-fb-top'&&!mob&&nb>0)b.style.top=Math.round(nb+10)+'px';r=b.getBoundingClientRect();
-        if((spots[k]!=='vi-fb-top'||!mob)&&hit())continue;if(free===null)free=spots[k];if(!onStage()){pick=spots[k];break}}
-      b.classList.remove('vi-fb-left','vi-fb-top');b.style.top='';
-      if(pick===null)pick=mob?'vi-fb-away':(free===null?'':free);
-      if(pick)b.classList.add(pick);if(pick==='vi-fb-top'&&!mob&&nb>0)b.style.top=Math.round(nb+10)+'px'};
-    var later=function(){if(!pend)pend=requestAnimationFrame(dodge)};window.addEventListener('scroll',later,{passive:true});window.addEventListener('resize',later);document.addEventListener('click',function(){setTimeout(later,350)},true);setTimeout(later,600);setInterval(function(){if(!document.hidden)later()},1500);window.viFbDodge=dodge}
+    window.viFbDodge=function(){}}   /* the old dodge (left, top, tucked away) is gone: the button stays bottom right (owner, 2 Nov) */
   var row=document.getElementById('set-fbact');if(row)[].forEach.call(row.children,function(x){x.classList.toggle('active',x.dataset.val===(actOn()?'1':'0'))});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
