@@ -94,3 +94,7 @@ D2 cc57e1c: the finish is verified by grep: all three `.hb-tip` strings use vi-i
 
 ## B2, v07/final-fixes c017efc: PASS
 390, Night and Daylight, live GLB seed. The badge reads "3D · tap to turn" with vi-orbit on touch, in Night colours on the stage in both themes (good QC catch on the 2:1 contrast). "Change model" and "Remove model" are teal ghost pills. Accepted deviation: 11 px with 5 11 padding in the modal, a better tap target that sits within the type floors.
+
+## A2, v07/engine 8ae7537: PASS (coin gold and E8)
+- Coin gold (my own sampling of the gold pixels): the p90 is #E7BF64 at dark 390, #EBC267 at dark 1100, #E6BE65 at light 390 and #EAC166 at light 1100, with saturation .56 to .57. The 390 median moves from #433C26 to #D3AF59, so the muddy stacks are gone and they read as warm gold. Metals p90 is #E8C56A. Fog off on the metal materials: accepted.
+- E8: at 1100 every chip's corner sits on its dot. At 390 the remaining offset is 1 to 2 px, within anti-aliasing. Investments is dashed and reads apart from Savings. A2's addition, the dot drawn over the chip corner: accepted, because it shows the anchor.
