@@ -105,13 +105,16 @@ async function open(b, theme, w, phone) {
         flow: !!document.querySelector('#ov-page > #ov-ms-card, #ov-page > #ov-nwh-card'),
         labels: [...btns.querySelectorAll('button')].map(x => x.textContent.trim()),
         right: Math.abs(cb.right - parseFloat(cs.paddingRight) - bb.right), below,
-        hs: [...btns.querySelectorAll('button')].map(x => Math.round(x.getBoundingClientRect().height)), fs: getComputedStyle(btns.querySelector('button')).fontSize, rows: new Set([...btns.querySelectorAll('button')].map(x => Math.round(x.getBoundingClientRect().top))).size,
+        hs: [...btns.querySelectorAll('button')].map(x => Math.round(x.getBoundingClientRect().height)), fs: getComputedStyle(btns.querySelector('button')).fontSize, sum: [...btns.querySelectorAll('button')].reduce((t, x) => t + x.getBoundingClientRect().width, 0) + 2 * parseFloat(getComputedStyle(btns).columnGap), rows: new Set([...btns.querySelectorAll('button')].map(x => Math.round(x.getBoundingClientRect().top))).size,
         closed: document.getElementById('ov-ms-card').hidden && document.getElementById('ov-nwh-card').hidden && document.getElementById('ov-ms-card').offsetParent === null };
     });
     ok(r.inCard && !r.flow, T + 'history, goals and snapshots are off the dashboard flow, inside the net worth tile');
     ok(r.labels.join() === 'History,Goals,Snapshots' && r.right < 3 && r.below, T + 'History, Goals and Snapshots buttons sit bottom right of the tile (' + r.right.toFixed(1) + ' px from the right edge)');
     ok(r.closed, T + 'all three are collapsed by default');
     ok(r.hs.every(h => h === 28) && r.rows === 1 && r.fs === '10px', T + '28 px pills, 10 px labels, on one right-aligned row (' + r.hs.join(',') + ')');
+    // the tests block the network, so Syne falls back to a narrower face; the real Syne measured about 19 px wider at 390 (Pedro review 2),
+    // so the fallback row must leave that plus 8 px spare
+    if (w <= 420) ok(r.sum <= 317, T + 'the pills leave room for the real Syne at this width (' + Math.round(r.sum) + ' px with the fallback font, 317 allowed)');
     const st = async () => p.evaluate(() => ({ ms: document.getElementById('ov-ms-card').offsetParent !== null, tab: document.getElementById('ov-ms-card').getAttribute('data-tab'),
       goals: getComputedStyle(document.querySelector('.ms-col[data-p="goals"]')).display !== 'none', snaps: getComputedStyle(document.querySelector('.ms-col[data-p="snaps"]')).display !== 'none',
       nwh: document.getElementById('ov-nwh-card').offsetParent !== null,
