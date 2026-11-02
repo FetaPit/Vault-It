@@ -29,13 +29,13 @@ async function open(b, theme, w, phone) {
     const r = await p.evaluate(() => {
       if (typeof viForecast !== 'function') return null;
       const keep = { inc: ovState.income, exp: ovState.expenses, debts: debtState.debts };
-      const run = (income, expenses, debts, start) => { ovState.income = income; ovState.expenses = expenses; debtState.debts = debts; return viForecast(6, start || { nw: 10000, debt: 0 }); };
+      const run = (income, expenses, debts, start) => { ovState.income = income; ovState.expenses = expenses; debtState.debts = debts; return viForecast(6, Object.assign({ nw: 10000, debt: 0, sav: 0, inv: 0 }, start || {})); };
       const out = {};
       // no savings, no investments, no debts, income all spent: flat
       out.flat = run([{ name: 'Salary', amount: 2000 }], [{ name: 'Rent', amount: 2000, type: 'ce' }], []);
       // unassigned surplus is not counted
       out.surplus = run([{ name: 'Salary', amount: 3000 }], [{ name: 'Rent', amount: 1000, type: 'ce' }], []);
-      // savings: adds exactly what is assigned, no interest
+      // savings: what is assigned, compounding monthly at the stated UK rate
       out.sav = run([{ name: 'Salary', amount: 3000 }], [{ name: 'Rent', amount: 1000, type: 'ce' }, { name: 'Savings', amount: 200, type: 'sv' }], []);
       // investments compound at the stated rate
       out.inv = run([{ name: 'Salary', amount: 3000 }], [{ name: 'Rent', amount: 1000, type: 'ce' }, { name: 'ISA', amount: 500, type: 'iv' }], []);
@@ -48,11 +48,18 @@ async function open(b, theme, w, phone) {
       out.level = run([{ name: 'Salary', amount: 3000 }], [{ name: 'Rent', amount: 1000, type: 'ce' }], [{ id: 1, name: 'Loan', balance: 3000, rate: 0, min: 0 }], { nw: 10000, debt: 3000 });
       // spending more than comes in: decline
       out.neg = run([{ name: 'Salary', amount: 1500 }], [{ name: 'Rent', amount: 1800, type: 'ce' }], []);
-      // no budget at all: no growth
+      // what the user already holds grows at the stated rates too (owner, 2 Nov 19:20; David's call on existing balances)
+      out.held = run([{ name: 'Salary', amount: 2000 }], [{ name: 'Rent', amount: 2000, type: 'ce' }], [], { sav: 10000, inv: 20000 });
+      // no budget at all: no new money; with nothing held, a flat line
       out.none = run([], [], []);
+      // no budget, but balances held: they still grow, nothing is added
+      out.noneHeld = run([], [], [], { sav: 10000, inv: 0 });
       out.noneNote = (drawChart(), document.getElementById('nw-fc-note').textContent);
+      // left to itself, the forecast reads what is held from the app: cash accounts plus the house deposit, and stocks and shares
+      out.app = (() => { const f = viForecast(6, { nw: 0, debt: 0 }); const cash = alState.cashAccounts.reduce((t, a) => t + Math.max(0, +a.balance || 0), 0);
+        return { sav0: f.sav0, inv0: f.inv0, want: cash + Math.max(0, +state.saved || 0), stocks: alTotalStocks() }; })();
       ovState.income = keep.inc; ovState.expenses = keep.exp; debtState.debts = keep.debts; drawChart();
-      out.rate = VI_FC_INV_RATE;
+      out.rates = VI_FC_RATES;
       return out;
     });
     if (!r) { ok(false, 'the forecast comes from the Budget (viForecast is missing)'); fails += 0; }
@@ -60,16 +67,23 @@ async function open(b, theme, w, phone) {
     const nw = (f) => f.pts.map(x => Math.round(x.nw)), dt = (f) => f.pts.map(x => Math.round(x.debt));
     ok(nw(r.flat).every(v => v === 10000), 'no savings, no investments, no debts: a flat line (' + nw(r.flat).join(',') + ')');
     ok(nw(r.surplus).every(v => v === 10000), 'money not given a job is not counted (£2,000 unassigned, line stays flat)');
-    ok(nw(r.sav).join() === [10200, 10400, 10600, 10800, 11000, 11200].join(), 'savings add exactly what the budget assigns, no interest (' + nw(r.sav).join(',') + ')');
+    ok(r.rates.sav === 0.0165 && r.rates.inv === 0.05, 'the rates are the UK medians the owner chose: savings 1.65%, investments 5% a year');
+    const ms = Math.pow(1.0165, 1 / 12) - 1, mi = Math.pow(1.05, 1 / 12) - 1, fv = (pm, i, n) => pm * (Math.pow(1 + i, n) - 1) / i;
+    ok(r.sav.pts.every((x, k) => Math.abs(x.nw - 10000 - fv(200, ms, k + 1)) < 0.01) && r.sav.pts[0].nw === 10200,
+      'savings add what the budget assigns and compound monthly at 1.65% a year (' + r.sav.pts.map(x => x.nw.toFixed(2)).join(', ') + ')');
     const inc = r.inv.pts.map((x, i) => x.nw - (i ? r.inv.pts[i - 1].nw : 10000));
-    ok(inc.every((d, i) => i === 0 || d > inc[i - 1]) && Math.abs(r.inv.pts[5].nw - 10000 - 500 * ((Math.pow(1 + Math.pow(1.04, 1 / 12) - 1, 6) - 1) / (Math.pow(1.04, 1 / 12) - 1))) < 0.01,
-      'investments compound monthly at ' + r.rate * 100 + '% a year (gains ' + inc.map(d => d.toFixed(2)).join(', ') + ')');
+    ok(inc.every((d, i) => i === 0 || d > inc[i - 1]) && r.inv.pts.every((x, k) => Math.abs(x.nw - 10000 - fv(500, mi, k + 1)) < 0.01),
+      'investments compound monthly at 5% a year (gains ' + inc.map(d => d.toFixed(2)).join(', ') + ')');
+    ok(r.held.pts.every((x, k) => Math.abs(x.nw - 10000 - 10000 * (Math.pow(1 + ms, k + 1) - 1) - 20000 * (Math.pow(1 + mi, k + 1) - 1)) < 0.01) && Math.abs(r.held.pts[5].nw - 10000 - (10000 * (Math.pow(1.0165, .5) - 1) + 20000 * (Math.pow(1.05, .5) - 1))) < 0.01,
+      'balances already held grow too: £10,000 saved and £20,000 invested add ' + (r.held.pts[5].nw - 10000).toFixed(2) + ' over six months');
+    ok(Math.abs(r.app.sav0 - r.app.want) < 0.01 && Math.abs(r.app.inv0 - r.app.stocks) < 0.01 && r.app.sav0 > 0, 'what is held comes from the app: savings ' + Math.round(r.app.sav0) + ' (cash accounts plus house deposit), investments ' + Math.round(r.app.inv0) + ' (stocks and shares)');
     ok(dt(r.repay).every((v, i) => v < (i ? dt(r.repay)[i - 1] : 3000)) && nw(r.repay).every((v, i) => v > (i ? nw(r.repay)[i - 1] : 10000)) && Math.round(r.repay.pts[0].debt) === Math.round(3000 * 1.02 - 300),
       'debt repayments make debt fall (after 2% a month interest) and net worth rise (debt ' + dt(r.repay).join(',') + ')');
     ok(dt(r.grow).every((v, i) => v > (i ? dt(r.grow)[i - 1] : 3000)) && nw(r.grow)[5] < 10000, 'no repayment budgeted: the debt grows by its APR and net worth falls (' + dt(r.grow).join(',') + ')');
     ok(dt(r.level).every(v => v === 3000) && nw(r.level).every(v => v === 10000), 'no repayment and no APR: the debt stays level');
     ok(nw(r.neg).every((v, i) => v === 10000 - 300 * (i + 1)), 'negative cash flow means decline (£300 a month: ' + nw(r.neg).join(',') + ')');
-    ok(!r.none.hasBudget && nw(r.none).every(v => v === 10000) && /set up your Budget/.test(r.noneNote) && /not a prediction/.test(r.noneNote), 'no budget: no growth, and the note asks for a budget');
+    ok(!r.none.hasBudget && nw(r.none).every(v => v === 10000) && /Set up your Budget/.test(r.noneNote) && /not a prediction/.test(r.noneNote), 'no budget and nothing held: no growth, and the note asks for a budget');
+    ok(!r.noneHeld.hasBudget && r.noneHeld.pts.every((x, k) => Math.abs(x.nw - 10000 - 10000 * (Math.pow(1 + ms, k + 1) - 1)) < 0.01), 'no budget: no new money, but savings held still grow at 1.65%');
     }
     errs.push(...p._errs); await ctx.close();
   }
@@ -91,7 +105,7 @@ async function open(b, theme, w, phone) {
         same: JSON.stringify(proj.map(x => Math.round(x.nw))) === JSON.stringify(d.nw.slice(d.today + 1)) };
     });
     ok(!r.hid && r.w >= r.inner - 2 && r.align === 'left' && r.fs === 10.5 && r.info, T + 'the forecast note spans the tile (' + Math.round(r.w) + ' of ' + Math.round(r.inner) + ' px, ' + r.align + ')');
-    ok(/from your Budget only/.test(r.txt) && /savings/.test(r.txt) && /investments/.test(r.txt) && /debt payments|no debt payments/.test(r.txt) && /an estimate from what you've entered, not a prediction/i.test(r.txt) && !/—/.test(r.txt) && !/straight line/.test(r.txt),
+    ok(/your Budget adds/.test(r.txt) && /Savings grow at 1\.65% a year \(Bank of England average for easy-access savings\)/.test(r.txt) && /investments at 5% \(FCA mid projection\)/.test(r.txt) && /Debts follow your APR and budgeted repayments/.test(r.txt) && /debt payments|no debt payments/.test(r.txt) && /an estimate from what you've entered, not a prediction/i.test(r.txt) && !/—/.test(r.txt) && !/straight line/.test(r.txt),
       T + 'the note says what the forecast rests on: "' + r.txt.slice(0, 110) + '..."');
     ok(r.same, T + 'the 3D progress blocks forecast the same months as the graph');
 

@@ -14885,17 +14885,29 @@ function viRenderLedger(){
 // The forecast (owner, 2 Nov: "take into account ... what is available in the user's budget to add and compound, rather than
 // optimistically showing growth ... take into consideration if the user's paying off debt or not"). Driven by the Budget, never by a trend:
 // - each month adds only what the budget assigns to Savings and Investments (unassigned surplus is not counted);
-// - savings earn nothing (the app stores no savings rate); what goes into Investments compounds monthly at VI_FC_INV_RATE a year;
+// - savings and investments, what you hold now and what the budget adds, compound monthly at the UK rates in VI_FC_RATES
+//   (owner, 2 Nov 19:20: "Chose uk median and state");
 // - each debt in the Debt tracker gains a month's interest at its APR, then the budget's "Debt payments" lines pay it down, shared by
 //   each debt's minimum payment (or its balance when no minimums are set); with no repayment budgeted a debt stays level or grows;
 // - spending plus saving beyond income (a shortfall) comes off net worth every month;
-// - no budget at all: no growth, only debt interest, and the note asks for a budget.
+// - no budget at all: no new money goes in (balances still grow at the stated rates), and the note asks for a budget.
 // Pure apart from reading the app's state, so the graph, the 3D blocks and the note share one set of numbers.
-var VI_FC_INV_RATE = 0.04;   // a year, nominal, stated in the note: the app stores no growth rate for investments
-var VI_FC_SAV_RATE = 0;      // a year: the app stores no savings rate
+// ── Forecast rates: the one place to update them. Both a year, compounded monthly, and named in the note. ──
+var VI_FC_RATES = {
+  sav: 0.0165, savSrc: 'Bank of England average for easy-access savings',   // BoE effective rate on instant-access (sight) deposits, Aug 2026 (published 29 Sep 2026)
+  inv: 0.05,   invSrc: 'FCA mid projection'                                  // FCA intermediate projection rate, COBS 13 Annex 2
+};
 function viFcIsDebtLine(e) { return (e.cat || bdGuess('exp', e.name || '')) === 'debt'; }
+// What the user holds now that grows: savings = cash accounts plus the house deposit; investments = stocks and shares.
+function viFcBalances() {
+  var cash = ((typeof alState !== 'undefined' && alState.cashAccounts) || []).reduce(function (t, a) { return t + Math.max(0, +a.balance || 0); }, 0);
+  var dep = (typeof state !== 'undefined' && state) ? Math.max(0, +state.saved || 0) : 0, inv = 0;
+  try { inv = Math.max(0, alTotalStocks() || 0); } catch (e) {}
+  return { sav: cash + dep, inv: inv };
+}
 function viForecast(months, start) {
   start = start || { nw: computeNetWorth(), debt: debtTotal() + alTotalLiab() };
+  var bal = viFcBalances(), sav0 = start.sav != null ? +start.sav : bal.sav, inv0 = start.inv != null ? +start.inv : bal.inv;
   var inc = cfTotalIn(), lines = (ovState.expenses || []).filter(function (e) { return (+e.amount || 0) > 0; });
   var hasBudget = inc > 0 || lines.length > 0, sv = 0, iv = 0, spend = 0, repay = 0;
   if (hasBudget) lines.forEach(function (e) { var t = cfType(e), a = +e.amount || 0;
@@ -14904,8 +14916,9 @@ function viForecast(months, start) {
   var debts = ((typeof debtState !== 'undefined' && debtState.debts) || []).filter(function (d) { return (+d.balance || 0) > 0; })
     .map(function (d) { return { b: +d.balance, apr: Math.max(0, +d.rate || 0), w: Math.max(0, +d.min || 0) }; });
   var sum = function () { return debts.reduce(function (t, d) { return t + d.b; }, 0); };
-  var d0 = sum(), other = Math.max(0, (+start.debt || 0) - d0), mi = Math.pow(1 + VI_FC_INV_RATE, 1 / 12) - 1, ms = VI_FC_SAV_RATE / 12;
-  var savPot = 0, invPot = 0, lost = 0, out = [];
+  var d0 = sum(), other = Math.max(0, (+start.debt || 0) - d0);
+  var ms = Math.pow(1 + VI_FC_RATES.sav, 1 / 12) - 1, mi = Math.pow(1 + VI_FC_RATES.inv, 1 / 12) - 1;
+  var savPot = sav0, invPot = inv0, lost = 0, out = [];
   for (var m = 1; m <= months; m++) {
     savPot = savPot * (1 + ms) + sv;
     invPot = invPot * (1 + mi) + iv;
@@ -14918,24 +14931,27 @@ function viForecast(months, start) {
     }
     lost += short;
     var dn = sum();
-    out.push({ nw: (+start.nw || 0) + savPot + invPot + (d0 - dn) - lost, debt: other + dn });
+    out.push({ nw: (+start.nw || 0) + (savPot - sav0) + (invPot - inv0) + (d0 - dn) - lost, debt: other + dn });
   }
-  return { pts: out, hasBudget: hasBudget, sv: sv, iv: iv, repay: repay, short: short, debts: debts.length, apr: debts.some(function (d) { return d.apr > 0; }) };
+  return { pts: out, hasBudget: hasBudget, sv: sv, iv: iv, repay: repay, short: short, debts: debts.length, apr: debts.some(function (d) { return d.apr > 0; }), sav0: sav0, inv0: inv0 };
 }
+function viFcPct(r) { return String(+(r * 100).toFixed(2)) + '%'; }
 // The note under the graph says what the forecast rests on, in plain words, from the same numbers the line uses.
 function viFcNote(f, ahead) {
   var el = document.getElementById('nw-fc-note'); if (!el) return;
   var t = '';
-  if (f && !f.hasBudget) t = 'Forecast: set up your Budget to see one. Until then it shows no growth' + (f.apr ? ', only interest added to debts that have a rate' : '') + '. An estimate from what you\'ve entered, not a prediction.';
-  else if (f) {
-    var p = [];
-    p.push(f.sv > 0 ? gbpFmt(f.sv) + ' a month into savings (no interest assumed)' : 'nothing into savings');
-    p.push(f.iv > 0 ? gbpFmt(f.iv) + ' into investments, growing ' + Math.round(VI_FC_INV_RATE * 100) + '% a year' : 'nothing into investments');
-    var d = f.repay > 0 ? (f.debts ? '; your ' + gbpFmt(f.repay) + ' debt payments come off your debts after interest at each APR' : '')
-      : (f.debts ? '; no debt payments are budgeted, so debts stay level' + (f.apr ? ' or grow by their interest' : '') : '');
-    t = 'Forecast for the next ' + ahead + ' months, from your Budget only: ' + p.join(' and ') + d
-      + (f.short > 0 ? '; your plan spends ' + gbpFmt(f.short) + ' a month more than comes in, so that comes off' : '')
-      + '. Money not given a job is not counted. An estimate from what you\'ve entered, not a prediction.';
+  if (f) {
+    var R = VI_FC_RATES, plan;
+    if (!f.hasBudget) plan = 'no Budget yet, so no new money goes in. Set up your Budget to see your plan.';
+    else {
+      plan = (f.sv > 0 || f.iv > 0 ? 'your Budget adds ' + (f.sv > 0 ? gbpFmt(f.sv) + ' a month' : 'nothing') + ' to savings and ' + (f.iv > 0 ? gbpFmt(f.iv) + (f.sv > 0 ? '' : ' a month') : 'nothing') + ' to investments'
+        : 'your Budget adds nothing to savings or investments')
+        + (f.debts ? (f.repay > 0 ? '; ' + gbpFmt(f.repay) + ' a month of debt payments come off your debts' : '; no debt payments are budgeted') : '')
+        + (f.short > 0 ? '; your plan spends ' + gbpFmt(f.short) + ' a month more than comes in, so that comes off' : '')
+        + '. Money not given a job is not counted.';
+    }
+    t = 'Forecast for the next ' + ahead + ' months: ' + plan + ' An estimate from what you\'ve entered, not a prediction. Savings grow at '
+      + viFcPct(R.sav) + ' a year (' + R.savSrc + ') and investments at ' + viFcPct(R.inv) + ' (' + R.invSrc + '). Debts follow your APR and budgeted repayments.';
   }
   var tx = document.getElementById('nw-fc-txt'); (tx || el).textContent = t; el.hidden = !t;
 }
