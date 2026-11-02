@@ -148,7 +148,8 @@ input[type=email]:focus{border-color:var(--teal);outline:none}
 @keyframes popup{0%{opacity:0;transform:translate(-50%,12px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-70px)}}
 .hint{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--faint);text-align:center;margin:10px 0 0}
 /* levels, deposit controls, stats and milestone pills: as in the brand book */
-.levels{display:flex;gap:8px;overflow-x:auto;margin-top:28px;padding:2px 0 4px;scrollbar-width:none}
+.levels{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin-top:28px;padding:2px 0 4px;scrollbar-width:none}
+.levels>*{flex:0 0 auto;scroll-snap-align:start}
 .levels::-webkit-scrollbar{display:none}
 .lvl{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.06em;padding:12px 18px;border-radius:var(--r-pill);border:1.5px solid var(--line2);color:var(--muted);white-space:nowrap;display:inline-flex;gap:10px;align-items:center}
 .lvl.on{border-color:var(--gold);color:var(--gold);background:rgba(232,197,106,.07)}

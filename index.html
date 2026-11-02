@@ -10510,6 +10510,8 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .hb-lv.on{border-color:var(--brass);color:#f1d98b;background:rgb(var(--brass-rgb) / .12);box-shadow:0 0 14px rgb(var(--brass-rgb) / .18)}
 .hb-lv.done{border-color:rgb(var(--green-rgb) / .5);color:var(--green)}
 .hb-lv.lock{opacity:.45;cursor:not-allowed}
+/* phones (owner, 2 Nov): the three level cards sit side by side and swipe, one row high, so the house stage gets the room */
+@media (max-width:699px){.hb-levels{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:-18px -4px 12px;padding:2px 12px 4px}.hb-levels::-webkit-scrollbar{display:none}.hb-lv{flex:0 0 auto;scroll-snap-align:start;white-space:nowrap}}
 .hb-undo{margin-top:12px;text-align:right}.hb-undo-btn{background:transparent!important;border-color:var(--t2)!important;color:var(--t1)!important}
 .hb-xp{height:8px;border-radius:99px;background:rgb(var(--ink-rgb) / .07);overflow:hidden;margin:8px 0 6px}
 .hb-xp>div{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--brass));transition:width .5s}
@@ -10693,6 +10695,7 @@ button.bd-ic{cursor:pointer}
 #ov-summary-row{align-items:stretch;gap:clamp(6px,1.4vw,12px)}
 @media (min-width:520px){#ov-summary-row{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 @media (max-width:519px){#ov-summary-row{grid-template-columns:1fr!important}}
+@media (max-width:899px){#ov-summary-row{gap:16px}}   /* phones and the unfolded fold: room between Assets, Liabilities and Debt (owner, 2 Nov) */
 #ov-summary-row .ov-chart-card{min-width:0;overflow:hidden}
 #ov-summary-row .ov-chart-title{overflow-wrap:anywhere}
 @media (max-width:900px) and (min-width:520px){
@@ -27889,6 +27892,8 @@ function clamp(v,a,b){return v<a?a:v>b?b:v}
 function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
 function rgba(c,a){return "rgba("+(c[0]|0)+","+(c[1]|0)+","+(c[2]|0)+","+a.toFixed(3)+")"}
 function ease3(t){return 1-Math.pow(1-t,3)}
+/* build/intro timings, ms (owner, 2 Nov: all 3D build animations were too fast, slowed by 100%: every duration doubled) */
+var NW_D={drop:1400,flash:2000,leave:1800,dropStep:120,subStep:80,stack:1400,stackStep:90,pileMs:1800,goMs:1700,spread:4200,cellStep:140,land:1000};
 var LD=(function(){var v=[-.45,.7,.55],l=Math.hypot(v[0],v[1],v[2]);return [v[0]/l,v[1]/l,v[2]/l]})();
 /* Night palette (nwPal dark). 3D viewports keep the Night look in Daylight too (owner, 30 Oct). */
 var PAL={teal:[68,192,185],red:[224,92,92],gold:[232,197,106],fa:.72,shMin:.5,edgeMix:[255,255,255],edgeK:.35,flash:[232,197,106],glow:[68,192,185],glowA:.18,grid:[68,192,185],gridA:.28,planeS:[232,197,106],planeF:[232,197,106],planeFA:.09,blur:14,label:"rgba(168,176,176,.95)"};
@@ -27970,10 +27975,12 @@ function ground(c,P,st,halfX,z0,z1,red,ts,rm,spacing){
 }
 function stage(cv,o,draw){
   /* sizing, pixel ratio cap, visible-only rendering, frame cap: shared by both scenes */
-  var c=cv.getContext("2d"),S={c:c,cw:300,ch:200,dpr:1,vis:false,raf:0,last:0};
+  var c=cv.getContext("2d"),S={c:c,cw:300,ch:200,dpr:1,vis:false,mid:false,raf:0,last:0};
   /* pixel budget: about 1.6M canvas pixels (a 1500 x 520 stage on a big phone would otherwise be 6M at 2x), 1.25x once LITE */
   function size(){var r=cv.getBoundingClientRect();S.cw=Math.max(2,r.width);S.ch=Math.max(2,r.height);S.dpr=Math.max(1,Math.min(window.innerWidth<700?1.5:2,window.devicePixelRatio||1,Math.sqrt(1.6e6/(S.cw*S.ch)),LITE?1.25:9));cv.width=Math.round(S.cw*S.dpr);cv.height=Math.round(S.ch*S.dpr);S.kick()}
-  function frame(ts){S.raf=0;if(!S.vis||document.hidden)return;var fps=LITE?30:(o.fps||30);if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
+  /* 'mid': the canvas is about half on screen (a tall one, half the screen); once true it stays true. Intros start on it, not at the first pixel (owner, 2 Nov) */
+  function midNow(){var r=cv.getBoundingClientRect(),vh=window.innerHeight||0,seen=Math.min(r.bottom,vh)-Math.max(r.top,0);return r.height>2&&seen>=Math.min(.55*r.height,.55*vh)}
+  function frame(ts){S.raf=0;if(!S.vis||document.hidden)return;if(!S.mid&&midNow())S.mid=true;var fps=LITE?30:(o.fps||30);if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
     var dt=Math.min(.05,(ts-(S.last||ts))/1000);S.last=ts;c.setTransform(S.dpr,0,0,S.dpr,0,0);c.clearRect(0,0,S.cw,S.ch);var t0=performance.now();draw(ts,dt,S);
     var cost=performance.now()-t0;S.ema=S.ema==null?cost:S.ema*.85+cost*.15;S.n=(S.n||0)+1;if(!LITE&&S.n>12&&S.ema>16){LITE=true;size()}   // frames over ~16 ms of drawing: go lite for good
     if(!S.raf)S.raf=requestAnimationFrame(frame)}   // size() may already have queued the next frame: never run two loops
@@ -27982,7 +27989,7 @@ function stage(cv,o,draw){
   function onScreen(){if(!cv.isConnected)return false;var r=cv.getBoundingClientRect();return r.width>2&&r.height>2&&r.bottom>0&&r.right>0&&r.top<(window.innerHeight||0)&&r.left<(window.innerWidth||0)}
   S.kick=function(){if(!S.vis&&onScreen()){S.vis=true;if(o.onShow)o.onShow()}if(S.vis&&!S.raf){S.last=0;S.raf=requestAnimationFrame(frame)}};
   if("ResizeObserver" in window)new ResizeObserver(size).observe(cv);else window.addEventListener("resize",size);
-  if("IntersectionObserver" in window)new IntersectionObserver(function(es){var was=S.vis;S.vis=es[es.length-1].isIntersecting;if(S.vis&&!was&&o.onShow)o.onShow();S.kick()},{threshold:.01}).observe(cv);else{S.vis=true}
+  if("IntersectionObserver" in window)new IntersectionObserver(function(es){var was=S.vis;S.vis=es[es.length-1].isIntersecting;if(!S.mid&&midNow())S.mid=true;if(S.vis&&!was&&o.onShow)o.onShow();S.kick()},{threshold:[.01,.3,.55,.8]}).observe(cv);else{S.vis=true}
   document.addEventListener("visibilitychange",S.kick);
   size();return S;
 }
@@ -28034,10 +28041,10 @@ function makeNW(cv,o){
         var open=first&&!rm;for(i=0;i<q.b;i++)spawn(c.key,0,i,open?-1:-1e9,j*90+i*45);for(i=0;i<q.s;i++)spawn(c.key,1,i,open?-1:-1e9,j*90+q.b*45+i*30);
         if(anim&&!old&&!rebuild)boxes.forEach(function(b){if(b.k===c.key)b.born=now+b.off*.3});
         return}
-      if(q.b>old.b){for(i=old.b;i<q.b;i++)spawn(c.key,0,i,anim?now+(i-old.b)*60:-1e9);
-        leaveTop(c.key,1,99,now,anim,true);for(i=0;i<q.s;i++)spawn(c.key,1,i,anim?now+(q.b-old.b)*60+i*40:-1e9)}
+      if(q.b>old.b){for(i=old.b;i<q.b;i++)spawn(c.key,0,i,anim?now+(i-old.b)*NW_D.dropStep:-1e9);
+        leaveTop(c.key,1,99,now,anim,true);for(i=0;i<q.s;i++)spawn(c.key,1,i,anim?now+(q.b-old.b)*NW_D.dropStep+i*NW_D.subStep:-1e9)}
       else if(q.b<old.b){leaveTop(c.key,0,old.b-q.b,now,anim,false);boxes=boxes.filter(function(b){return !(b.k===c.key&&b.s===1)});for(i=0;i<q.s;i++)spawn(c.key,1,i,-1e9)}
-      else if(q.s>old.s){for(i=old.s;i<q.s;i++)spawn(c.key,1,i,anim?now+(i-old.s)*40:-1e9)}
+      else if(q.s>old.s){for(i=old.s;i<q.s;i++)spawn(c.key,1,i,anim?now+(i-old.s)*NW_D.subStep:-1e9)}
       else if(q.s<old.s)leaveTop(c.key,1,old.s-q.s,now,anim,false);
     });
     byKey=nb;cols=list;if(first)pendingOpen=!rm;first=false;layout();
@@ -28049,15 +28056,17 @@ function makeNW(cv,o){
   self.totals=function(){var a=0,dd=0,cc={};cols.forEach(function(c){cc[c.key]={v:c.v,blocks:byKey[c.key].b,cubes:byKey[c.key].s};if(c.dir>0)a+=c.v;else dd+=c.v});return {assets:a,debt:dd,net:net,unit:U,cols:cc}};
   self.unit=function(){return U};
   self.replay=function(){if(reduceMotion())return;var now=performance.now();boxes.forEach(function(b){if(!b.leave)b.born=now+b.off});S.kick()};
+  self.started=function(){return !pendingOpen};
   self.kick=function(){S.kick()};
   function geo(b,ts){
     var c=byKey[b.k],dir=c?c.c.dir:(b.k.indexOf("debt")===0?-1:1),cn=c?c.b:0,col=c?(b.s?segCol(c.c,cn*U+b.i*U/10,U/10):segCol(c.c,b.i*U,U)):PAL.gold;
     var g={x:X[b.k]||0,z:Z[b.k]||0,w:10,d:10,h:BH,y:0,col:col};
     if(b.s){g.w=g.d=g.h=SM;g.x+=(b.i%3-1)*3.45;g.z+=(Math.floor(b.i/3)-1)*3.45;g.y=dir<0?-(cn*BH)-SM:cn*BH}
     else g.y=dir<0?-(b.i+1)*BH:b.i*BH;
+    if(b.born===-1&&pendingOpen)return null;   /* waiting for the middle of the screen: not built yet */
     var age=ts-b.born,al=1,fl=0;
-    if(b.born>0){if(age<0)return null;g.y+=age<700?(1-ease3(age/700))*18:0;fl=clamp(1-age/1000,0,1)}
-    if(b.leave){var lt=clamp((ts-b.leave)/900,0,1);g.y+=(b.merge?-1:1)*ease3(lt)*(b.merge?3:16);al=1-lt;fl=1-lt*.15}
+    if(b.born>0){if(age<0)return null;g.y+=age<NW_D.drop?(1-ease3(age/NW_D.drop))*18:0;fl=clamp(1-age/NW_D.flash,0,1)}
+    if(b.leave){var lt=clamp((ts-b.leave)/NW_D.leave,0,1);g.y+=(b.merge?-1:1)*ease3(lt)*(b.merge?3:16);al=1-lt;fl=1-lt*.15}
     g.al=al;g.fl=fl;g.dir=dir;g.k=b.k;return g;
   }
   /* the top cube grows by its fraction, so a few pounds still show */
@@ -28066,8 +28075,8 @@ function makeNW(cv,o){
   function draw(ts,dt,S){
     var c=S.c,cw=S.cw,ch=S.ch,rm=reduceMotion(),i;
     if(narrow!==(cw<520)&&cols.length)layout();
-    if(pendingOpen){boxes.forEach(function(b){if(b.born===-1)b.born=ts+b.off});pendingOpen=false}
-    boxes.forEach(function(b){if(b.born===-1)b.born=-1e9});
+    if(pendingOpen&&(rm||S.mid)){boxes.forEach(function(b){if(b.born===-1)b.born=ts+b.off});pendingOpen=false}   /* the opening build starts when the stage is about half on screen (owner, 2 Nov) */
+    if(!pendingOpen)boxes.forEach(function(b){if(b.born===-1)b.born=-1e9});
     if(!rm&&!ob.isDrag()&&ts-idle>2500)st.yaw=-.55+Math.sin(ts/4200)*.35;
     st.fit=cw<520?1.1:.9;var hx=box.x+2,fb=[[-hx,hx,0,0,box.z0,box.z1]];
     cols.forEach(function(cc){var q=byKey[cc.key],h=q.b*BH+SM,x=X[cc.key],z=Z[cc.key];fb.push(cc.dir>0?[x-5,x+5,0,h,z-5,z+5]:[x-5,x+5,-h,0,z-5,z+5],[x-4,x+4,0,0,LZ[cc.key]-2,LZ[cc.key]+6])});
@@ -28125,16 +28134,17 @@ function makeTracker(cv,o){
   function unit(){var mx=0;for(var i=0;i<N;i++){if(!shown(i))continue;if(sel.nw)mx=Math.max(mx,Math.abs(D.nw[i]));if(sel.debt)mx=Math.max(mx,D.debt[i]||0);if(sel.inc&&i<=TODAY)mx=Math.max(mx,D.inc[i]||0)}return niceUnit(mx,14)}
   function cur(){return hover>=0?hover:TODAY}
   function emit(){cv.dataset.unit=String(U);cv.dataset.months=String(N);if(o.onChange){var i=cur();o.onChange({i:i,hover:hover,lab:D.labels[i],v:{nw:D.nw[i],debt:D.debt[i],inc:D.inc[i]},forecast:i>TODAY,unit:U,sel:sel})}}
-  self.setData=function(d){D=d;N=d.nw.length;TODAY=d.today;if(d.sel)for(var k in d.sel)sel[k]=d.sel[k];if(d.fmt)fmt=d.fmt;U=unit();t0=performance.now();played=S.vis;hover=-1;emit();S.kick()};
+  self.setData=function(d){D=d;N=d.nw.length;TODAY=d.today;if(d.sel)for(var k in d.sel)sel[k]=d.sel[k];if(d.fmt)fmt=d.fmt;U=unit();t0=performance.now();played=S.vis&&S.mid;hover=-1;emit();S.kick()};
   self.setSeries=function(k,on){sel[k]=on;U=unit();t0=performance.now()-300;emit();S.kick()};
   self.replay=function(){t0=performance.now();S.kick()};
+  self.started=function(){return played};
   self.data=function(){return {labels:D.labels.slice(),nw:D.nw.slice(),debt:D.debt.slice(),inc:D.inc.slice(),today:TODAY,unit:U,sel:JSON.parse(JSON.stringify(sel))}};
-  function CO(ts,i){return reduceMotion()?1:ease3(clamp((ts-t0-i*45)/700,0,1))}
+  function CO(ts,i){return reduceMotion()?1:ease3(clamp((ts-t0-i*NW_D.stackStep)/NW_D.stack,0,1))}
   function lanes(){var neg=false;if(sel.nw)for(var i=0;i<N;i++)if(shown(i)&&D.nw[i]<0)neg=true;return {nw:0,debt:neg?-14:0,inc:16,zMin:neg?-28:-14,zMax:sel.inc?34:14}}
   function hgt(v){var q=split(Math.abs(v),U);return q.b*BH+((q.s||q.f>.03)?SM:0)}
   function draw(ts,dt,S){
     var c=S.c,cw=S.cw,ch=S.ch,rm=reduceMotion(),i,k;
-    if(!played){t0=ts;played=true}
+    if(!played){if(S.mid||reduceMotion()){t0=ts;played=true}else t0=Infinity}   /* the intro starts when the stage is about half on screen (owner, 2 Nov) */
     var Y0=cw<520?-.62:-.3;   /* on a phone the row turns further so the months recede into the depth of a tall stage */
     if(self._narrow!==(cw<520)){self._narrow=cw<520;st.yaw=Y0}
     if(!rm&&!ob.isDrag()&&ts-idle>2500)st.yaw=Y0+Math.sin(ts/4600)*.18;
@@ -28209,7 +28219,7 @@ function makeTreeMap(cv,o){
   o=o||{};
   var st={yaw:-.5,pitch:.98,dist:125,zoom:1.15,ty:1,fit:.9},self={st:st},idle=-9999,cells=[],groups=[],rects=[],raw=[],total=0,hover=null,first=true,pending=false,PL=.5,
     fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},U=100,BS=3.3,GG=.035,LG=.02,CH=.85,ext={x:10,z:10},plate={W:20,D:20},pile={x0:0,x1:0},
-    T_IN=900,T_GO=850,SPREAD=2100,t0=0,sx=0;
+    T_IN=NW_D.pileMs,T_GO=NW_D.goMs,SPREAD=NW_D.spread,t0=0,sx=0;
   function unitFor(t){var u=100,steps=[100,200,500,1000,2000,5000,10000],k=0;while(t/u>360&&k<steps.length-1){k++;u=steps[k]}return u}
   /* a line's rectangle in blocks: columns about one £100 block wide, full rows of £100 blocks, then one thinner row for the rest */
   function fill(r,g,it,j,rect){
@@ -28235,7 +28245,7 @@ function makeTreeMap(cv,o){
     /* the income pile on the left, the first blocks to leave nearest the map */
     var pp=BS+.4,rowsZ=Math.max(1,Math.floor(D/pp)),pc=Math.max(1,Math.ceil(cells.length/rowsZ)),gapX=narrow?2:3;
     pile={x0:-ext.x-gapX*pp-pc*pp,x1:-ext.x-gapX*pp};
-    cells.forEach(function(c,q){c.px=pile.x1-(Math.floor(q/rowsZ)+.5)*pp;c.pz=-ext.z+(q%rowsZ)*pp+pp/2;c.off=T_IN+q*Math.min(70,SPREAD/Math.max(1,cells.length))});
+    cells.forEach(function(c,q){c.px=pile.x1-(Math.floor(q/rowsZ)+.5)*pp;c.pz=-ext.z+(q%rowsZ)*pp+pp/2;c.off=T_IN+q*Math.min(NW_D.cellStep,SPREAD/Math.max(1,cells.length))});
   }
   self.setData=function(d){
     var rm=reduceMotion();if(d.fmt)fmt=d.fmt;total=d.total||0;
@@ -28261,23 +28271,23 @@ function makeTreeMap(cv,o){
   /* where a block is at time ts: in the pile, sliding right with a small hop, or landed (a gold flash as it lands) */
   function geo(c,ts){
     var g={x:c.x,z:c.z,w:c.w,d:c.d,h:CH,y:0,col:shade(c),fl:0,c:c},age=ts-t0;
-    if(t0<0||age>=c.off+T_GO+500)return g;
+    if(t0<0||age>=c.off+T_GO+NW_D.land)return g;
     if(age<0)return null;
     if(age<c.off){g.x=c.px;g.z=c.pz;g.col=PAL.teal;var a=clamp(age/T_IN,0,1);g.y=(1-ease3(a))*7;return g}
     var m=age-c.off;
     if(m<T_GO){var e=ease3(m/T_GO);g.x=mix1(c.px,c.x,e);g.z=mix1(c.pz,c.z,e);g.y=Math.sin(Math.PI*e)*2.6;g.col=mix(PAL.teal,g.col,clamp((e-.5)/.5,0,1));return g}
-    g.fl=clamp(1-(m-T_GO)/500,0,1);return g;
+    g.fl=clamp(1-(m-T_GO)/NW_D.land,0,1);return g;
   }
   function mix1(a,b,t){return a+(b-a)*t}
   function draw(ts,dt,S){
     var cx=S.c,cw=S.cw,ch=S.ch,rm=reduceMotion(),narrow=cw<520;
     if(groups.length&&narrow!==self._narrow){self._narrow=narrow;layout(narrow)}
-    if(pending){t0=rm?-1e9:ts;pending=false}
+    if(pending&&(rm||S.mid)){t0=rm?-1e9:ts;pending=false}   /* waits for the middle of the screen (owner, 2 Nov) */
     var Y0=narrow?-.2:-.42;
     if(!rm&&!ob.isDrag()&&ts-idle>2500)st.yaw=Y0+Math.sin(ts/5200)*(narrow?.1:.22);else if(rm&&!ob.engaged())st.yaw=Y0;
     st.fit=narrow?1.05:.92;if(narrow&&!self._pitchSet&&!ob.engaged()){st.pitch=1.12;self._pitchSet=true}
     /* while the income arrives the camera frames the pile and the map together, then settles on the map */
-    var intro=t0>=0&&ts-t0<lastEnd()+300,x0=intro?pile.x0-1:-ext.x-2,cxm=(x0+ext.x+2)/2;
+    var intro=t0>=0&&ts-t0<lastEnd()+600,x0=intro?pile.x0-1:-ext.x-2,cxm=(x0+ext.x+2)/2;
     var SC=2.4,fb=[[(x0-cxm)*SC,(ext.x+1-cxm)*SC,0,(CH+1)*SC,(-ext.z-1)*SC,(ext.z+1)*SC]],tD=fitDist(st,cw,ch,fb,Y0,1,narrow?.92:.95,narrow?.8:.8);   /* SC: the map is drawn 2.4x larger, so the camera can come close enough */
     var k=rm||self._snapD?1:Math.min(1,dt*2.2);if(!self._d0){st.dist=tD;self._d0=true}self._snapD=false;st.dist+=(tD-st.dist)*k;
     sx+=(cxm-sx)*k;
@@ -28286,7 +28296,7 @@ function makeTreeMap(cv,o){
     cx.save();
     ground(cx,Pr,st,ext.x+1,-ext.z-1,ext.z+1,false,ts,rm,BS+.5);
     /* each group's area on the floor, tinted and outlined in its colour, so the map reads as a tree map before the blocks land */
-    var land=function(r){var last=cells.filter(function(c){return c.r===r}).pop();if(t0<0||!last)return 1;return clamp((ts-t0-last.off-T_GO*.6)/500,0,1)};
+    var land=function(r){var last=cells.filter(function(c){return c.r===r}).pop();if(t0<0||!last)return 1;return clamp((ts-t0-last.off-T_GO*.6)/NW_D.land,0,1)};
     rects.forEach(function(r){var a=land(r);if(a<=0)return;var x0=r.x,x1=r.x+r.w,z0=r.z,z1=r.z+r.d,q=[Pr.pt(x0,.02,z0),Pr.pt(x1,.02,z0),Pr.pt(x1,.02,z1),Pr.pt(x0,.02,z1)];
       cx.beginPath();cx.moveTo(q[0][0],q[0][1]);for(var i=1;i<4;i++)cx.lineTo(q[i][0],q[i][1]);cx.closePath();cx.fillStyle=rgba(r.g.col,.13*a);cx.fill();cx.strokeStyle=rgba(r.g.col,.6*a);cx.lineWidth=.8;cx.stroke()});
     var items=[];cells.forEach(function(c){var g=geo(c,ts);if(g)items.push(g)});
@@ -28319,7 +28329,7 @@ function makeTreeMap(cv,o){
   var S=stage(cv,o,draw);self._narrow=S.cw<520;
   return self;
 }
-window.ViNW3D={makeNW:makeNW,makeTracker:makeTracker,makeTreeMap:makeTreeMap,niceUnit:niceUnit,split:split,reduceMotion:reduceMotion,lite:function(v){if(v!=null)LITE=!!v;return LITE},coarse:COARSE};
+window.ViNW3D={timing:NW_D,makeNW:makeNW,makeTracker:makeTracker,makeTreeMap:makeTreeMap,niceUnit:niceUnit,split:split,reduceMotion:reduceMotion,lite:function(v){if(v!=null)LITE=!!v;return LITE},coarse:COARSE};
 })();
 </script>
 <script id="vi-nw3d-app">
@@ -28494,7 +28504,7 @@ function disable(){   // back to the classic card exactly as it was built
   chartCard.classList.remove('nw3d-main-3d');if(ttl)ttl.textContent='Net Worth Progress';
   window.drawChart=drawChart=_draw;delete window.nw3d;try{_draw();}catch(e){}
 }
-window.nw3d={hero:heroEng,tracker:trk,setMain:setMain,main:curMain,sceneData:sceneData,trackerData:trackerData,refresh:refresh,disable:disable};
+window.nw3d={timing:{dropMs:ViNW3D.timing.drop,flashMs:ViNW3D.timing.flash,stackMs:ViNW3D.timing.stack,stackStep:ViNW3D.timing.stackStep,budgetPileMs:ViNW3D.timing.pileMs,budgetGoMs:ViNW3D.timing.goMs},hero:heroEng,tracker:trk,setMain:setMain,main:curMain,sceneData:sceneData,trackerData:trackerData,refresh:refresh,disable:disable};
 fcSync();
 if(document.readyState==='complete')setTimeout(refresh,50);else window.addEventListener('load',function(){setTimeout(refresh,50)});
 /* safety net (owner, 31 Oct: the scene was empty on opening the app again). A refresh is forced, and the stage kicked, a moment after
