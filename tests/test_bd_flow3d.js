@@ -59,7 +59,7 @@ const EXP = [{ id: 3, name: 'Rent', amount: 700, type: 'ce' }, { id: 4, name: 'C
     if (rm) ok(r.phase === 'done' && shot2 > 0 && Math.abs(shot2 - shot) / Math.max(shot2, 1) < 0.15, T + 'reduced motion: the map is drawn finished straight away (' + r.phase + ', ' + shot + ' / ' + shot2 + ' red pixels)');
     else {
       ok(r.phase === 'pile' || r.phase === 'moving', T + 'the intro starts with the income as a pile (' + r.phase + ')');
-      await p.waitForTimeout(2600);
+      for (let i = 0; i < 40 && await p.evaluate(() => bd3d.engine().phase()) !== 'done'; i++) await p.waitForTimeout(500);   // the intro runs at half speed since 2 Nov (owner): about 8 s
       const shot3 = await p.evaluate(() => { const cv = document.getElementById('bd3d-cv'), c = cv.getContext('2d'), d = c.getImageData(0, 0, cv.width, cv.height).data; let n = 0; for (let i = 0; i < d.length; i += 16) if (d[i] > 180 && d[i + 1] < 140) n++; return n; });
       ok(shot3 > shot * 1.2 && await p.evaluate(() => bd3d.engine().phase()) === 'done', T + 'the income blocks slide right and take their groups\' colours (' + shot + ' then ' + shot3 + ' red pixels)');
       await p.evaluate(() => bd3d.engine().replay()); await p.waitForTimeout(150);
