@@ -28,8 +28,29 @@ const E = [
     "#topnav .vi-pro{background:rgb(var(--orange-rgb) / .16);color:var(--orange);border:1px solid rgb(var(--orange-rgb) / .5)}\n"
     + "/* v0.8 type scale, Pedro review 1: a badge never sits on its tab's icon or label (it sits on the tab's top edge, above both) */\n"
     + "html body #topnav .vi-usp,html body #topnav .vi-pro{top:0;right:2px;left:auto;width:auto;line-height:1;padding:1px 3px}html body #topnav .vi-pro{padding:0 3px}   /* about 11 px tall: clears the icon (11 px down) and the label (13 px down) */\n"
-    + ".ov-kpi-lbl{display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em!important}.ov-kpi-lbl .ov-kpi-ic{display:inline-block;vertical-align:-3px;margin-right:4px}@media (max-width:459.98px){.ov-kpi-lbl .ov-kpi-ic{display:none}}   /* KPI labels on one line; under 460 the tile's coloured top edge stands in for the icon */\n"
+    + "#ov-page .ov-kpi-lbl{display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em!important}#ov-page .ov-kpi-lbl .ov-kpi-ic{display:inline-block;vertical-align:-3px;margin-right:4px}@media (max-width:459.98px){#ov-page .ov-kpi-lbl .ov-kpi-ic{display:none}}#tab-biz .ov-kpi-lbl{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;letter-spacing:.06em!important}@media (max-width:459.98px){html #tab-biz .ov-kpis:not(.debt-strip){grid-template-columns:repeat(2,minmax(0,1fr))!important}html #tab-biz .ov-kpis:not(.debt-strip)>.ov-kpi{grid-column:auto!important}}@media (max-width:379.98px){#tab-biz .ov-kpis:not(.debt-strip)>.ov-kpi{padding-left:6px!important;padding-right:6px!important}#tab-biz .ov-kpi-lbl{letter-spacing:.03em!important}}   /* KPI labels on one line; under 460 the tile's coloured top edge stands in for the icon */\n"
     + ".vp-key{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.45;text-wrap:balance}   /* the 3D key wraps onto centred lines rather than losing its end */\n"],
+  ['follow-up: Stocks donut sub-line (real-pixel SVG) at 10.5',
+    `if(sub)out+='<text x="75" y="88" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="9"`,
+    `if(sub)out+='<text x="75" y="90" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="10.5"`],
+  ['follow-up: item block caption drawn as HTML over the scaled SVG (it drew at about 8.6 px), so it is 10.5 px at any tile size',
+    `    +'<text x="50" y="95" text-anchor="middle" font-size="5.5" style="fill:'+v+'" font-family="\\'Share Tech Mono\\',monospace" letter-spacing="0.4" opacity="0.85">'+cfEsc(String(name||'').substring(0,14).toUpperCase())+'</text>'
+    +'</svg>';`,
+    `    +'</svg>'
+    +'<span class="iso-cap" style="color:'+v+'">'+cfEsc(String(name||'').substring(0,14).toUpperCase())+'</span>';`],
+  ['follow-up: item block caption style',
+    ".dev-links{grid-template-columns:repeat(auto-fill,minmax(min(100%,124px),1fr))!important}   /* v0.8 type scale: the five links wrap rather than clip */\n",
+    ".dev-links{grid-template-columns:repeat(auto-fill,minmax(min(100%,124px),1fr))!important}   /* v0.8 type scale: the five links wrap rather than clip */\n.iso-cap{position:absolute;left:4%;right:4%;bottom:2%;text-align:center;font:400 10.5px/1.2 'Share Tech Mono',monospace;letter-spacing:.04em;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}   /* v0.8 type scale follow-up */\n"],
+  ['Pedro (2 Nov): the forecast note shows only in Graph view, hidden while the Net worth tile shows 3D (same class the 3D/Graph toggle sets, so it follows the remembered choice)',
+    ".ov-chart-card.nw3d-main-3d .nw3d-graph-only{display:none!important}\n",
+    ".ov-chart-card.nw3d-main-3d .nw3d-graph-only{display:none!important}\n.ov-chart-card.nw3d-main-3d #nw-fc-note{display:none!important}\n"],
+  ['Pedro (2 Nov): on phones the cash-flow diagram is drawn 1:1 in its sideways scroller, so the chips render at their real 11 / 10.5 px',
+    `  var out='<svg viewBox="0 0 '+W+' '+H.toFixed(0)+'" width="100%" style="min-width:'+(wide?'0':'640px')+'"`,
+    `  var one=window.innerWidth<600;   // phones: 1:1, scrolled sideways (v0.8 type scale)
+  var out='<svg viewBox="0 0 '+W+' '+H.toFixed(0)+'" width="'+(one?W:'100%')+'"'+(one?' height="'+H.toFixed(0)+'" class="cf-1to1"':'')+' style="min-width:'+(one?W+'px':wide?'0':'640px')+'"`],
+  ['phone 1:1 diagram style',
+    ".cf-scroll svg{display:block}\n",
+    ".cf-scroll svg{display:block}\n.cf-scroll svg.cf-1to1{width:960px!important;min-width:960px!important;max-width:none!important;height:auto!important}   /* phones: 1:1 (v0.8 type scale) */\n"],
   // Roadmap SVG: real-pixel text (the SVG is not scaled), so the attribute sizes are the drawn sizes
   ['roadmap phase label',
     `text-anchor="middle" font-size="7.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.6')+'" letter-spacing="2.5">`,

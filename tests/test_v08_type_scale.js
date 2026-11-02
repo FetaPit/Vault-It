@@ -29,8 +29,15 @@ const OFF = ':root{--vi-fs-0:0px!important;--vi-fs-1:0px!important;--vi-fs-2:0px
   for (const m of body.matchAll(/font-size\s*:\s*(\d*\.?\d+)(rem|px)(?![\w(])/g)) {
     const n = +m[1], u = m[2]; if (u === 'rem' ? n >= 0.81 : n >= 10.5) continue;
     const line = body.slice(body.lastIndexOf('\n', m.index) + 1, body.indexOf('\n', m.index));
-    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar|(^|[^b])tab-btn\b|#app-footer|\.ft-[a-z]|#vi-fb-btn|\.i3d-hint\{|\.i3d-badge\{/.test(line)) continue;   // KEEP rules (C2 pills, D2 card titles, house viewport HUD)
+    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar|(^|[^b])tab-btn\b|#app-footer|\.ft-[a-z]|#vi-fb-btn|\.i3d-hint\{|\.i3d-badge\{|#topnav \.vi-usp,#topnav \.vi-pro\{/.test(line)) continue;   // KEEP rules (C2 pills, D2 card titles, house viewport HUD)
     bare.push(line.trim().slice(0, 90));
+  }
+  // the font: shorthand too, including a clamp() minimum (follow-up: .dtm-n / .dtm-s on the Debt tree map)
+  for (const m of body.matchAll(/\bfont\s*:\s*(?:[a-z0-9-]+\s+){0,3}(clamp\(\s*)?(\d*\.?\d+)(rem|px)/g)) {
+    const n = +m[2], u = m[3]; if (u === 'rem' ? n >= 0.81 : n >= 10.5) continue;
+    const line = body.slice(body.lastIndexOf('\n', m.index) + 1, body.indexOf('\n', m.index));
+    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar|(^|[^b])tab-btn\b|#app-footer|\.ft-[a-z]|#vi-fb-btn|\.i3d-hint\{|\.i3d-badge\{|#topnav \.vi-usp,#topnav \.vi-pro\{/.test(line)) continue;
+    bare.push('font: ' + line.trim().slice(0, 80));
   }
   for (const m of body.matchAll(/max\((\d*\.?\d+)rem,var\(--vi-fs-(\d)\)\)/g)) {
     const n = +m[1], t = +m[2], want = n < 0.56 ? 1 : n < 0.70 ? 2 : 3;
@@ -145,6 +152,58 @@ function measure() {
     const co = await p2.evaluate(() => { try { fireCarousel(); } catch (e) {} return [...document.querySelectorAll('#fire-roadmap-svg .fire-coin')].map(g => [parseFloat(g.style.opacity || '1'), (g.style.transform.match(/scale\(([\d.]+)\)/) || [0, 1])[1] * 1]); });
     ok(co.length > 2 && co.some(x => x[0] < 0.9) && co.every(x => x[1] >= 1), `390: Roadmap coins away from the centre still fade, and none scales under 1 (opacity min ${Math.min(...co.map(x => x[0]))}, scale min ${Math.min(...co.map(x => x[1]))})`);
     await c2.close();
+  }
+  // follow-up items (David's sweep of 8b33d7c): Entrepreneur KPI labels are never cut; the Stocks donut sub-line and the item block caption draw at 10.5 px or more
+  {
+    const c3 = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); const p3 = await c3.newPage();
+    await p3.addInitScript(() => { try { localStorage.setItem('vi_declined_demo', 'true'); } catch (e) {} });
+    await p3.goto(URL_); await p3.waitForTimeout(1100); await p3.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
+    const fu = await p3.evaluate(() => { showTab('biz');
+      const biz = [...document.querySelectorAll('#tab-biz .ov-kpi-lbl')].filter(e => e.offsetParent).filter(e => e.scrollWidth > e.clientWidth + 1).map(e => e.textContent.trim());
+      const host = document.createElement('div'); host.style.cssText = 'position:fixed;left:0;top:0;width:150px;height:150px'; document.body.appendChild(host);
+      host.innerHTML = '<div style="position:relative;width:150px;height:150px">' + generateAssetISO('Laptop', '', 'asset') + '</div>' + stkDonut([{ v: 1, c: '#3ecf8e' }], 1, '£1,234', '+20.29%', '#3ecf8e');
+      const cap = host.querySelector('.iso-cap'), sub = [...host.querySelectorAll('svg text')].pop();
+      const out = { biz, cap: cap ? parseFloat(getComputedStyle(cap).fontSize) : 0, capText: cap ? cap.textContent : '', sub: +(parseFloat(sub.getAttribute('font-size')) * sub.getScreenCTM().a).toFixed(2) }; host.remove(); return out; });
+    ok(fu.biz.length === 0, `390: Entrepreneur KPI labels are not cut (${fu.biz.join(',')})`);
+    const bl = await p3.evaluate(() => [...document.querySelectorAll('#tab-biz .ov-kpi-lbl')].filter(e => e.offsetParent).map(e => Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight === 'normal' ? parseFloat(getComputedStyle(e).fontSize) * 1.2 : getComputedStyle(e).lineHeight))));
+    ok(bl.length > 0 && bl.every(n => n <= 2), `390: Entrepreneur KPI labels wrap to at most two lines (${bl.join(',')})`);
+    await p3.setViewportSize({ width: 360, height: 780 }); await p3.waitForTimeout(300);
+    const bl360 = await p3.evaluate(() => [...document.querySelectorAll('#tab-biz .ov-kpi-lbl')].filter(e => e.offsetParent).map(e => [Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight === 'normal' ? parseFloat(getComputedStyle(e).fontSize) * 1.2 : getComputedStyle(e).lineHeight)), e.scrollWidth > e.clientWidth + 1]));
+    ok(bl360.length > 0 && bl360.every(x => x[0] <= 2 && !x[1]), `360: Entrepreneur KPI labels wrap to at most two lines, none cut (${bl360.map(x => x[0]).join(',')})`);
+    await p3.setViewportSize({ width: 390, height: 844 }); await p3.waitForTimeout(300);
+    ok(fu.cap >= 10.5 && fu.capText === 'LAPTOP', `item block caption at ${fu.cap} px (${fu.capText})`);
+    ok(fu.sub >= 10.5, `Stocks donut sub-line drawn at ${fu.sub} px`);
+    await c3.close();
+  }
+  // Pedro (2 Nov): the forecast note shows only in Graph view; hidden in 3D, and the remembered choice holds on reload
+  // (a signed-in seeded page: the sample-data mode starts every load fresh, so it cannot show a remembered choice; seed from test_sankey_fit)
+  {
+    const seedFc=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));
+      localStorage.setItem('vi_settings',JSON.stringify({fontSize:'large',contrast:'standard',motion:'full',currency:'GBP',compactNav:true}));
+      const ex=[['Council tax',147,'ce'],['Electricity',75,'ce'],['Gas',60,'ce'],['Phone & internet',50,'ce'],['Water',35,'ce'],['Rent',300,'ce'],['Debt repayments',300,'ve'],['Monthly groceries',220,'ve'],['Groceries top-up',50,'ve'],['Gym',50,'cn'],['Car tax',38,'cn'],['Car insurance',33,'cn'],['Monzo Max',22,'cn'],['House contents',9,'cn'],['Petrol',70,'vn'],['Car repairs',50,'vn'],['Eating out',30,'vn'],['Clothing',30,'vn'],['Drinks',30,'vn'],['Shopping',21,'vn'],['Haircut',15,'vn'],['Emergency fund',100,'sv'],['ISA',50,'iv']].map((e,i)=>({id:100+i,name:e[0],amount:e[1],type:e[2]}));
+      localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'Universal Credit',amount:381,cat:'benefits'},{id:2,name:'PIP (Care/Mobility)',amount:778,cat:'benefits'},{id:5,name:'LCWRA',amount:430,cat:'benefits'},{id:8,name:'UC Housing Element',amount:347,cat:'benefits'}],expenses:ex}));
+      localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:1,name:'Card',original:2500,balance:2000,rate:20,min:60,type:'credit'}]}));};
+    const c4 = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); await routeThree(c4); const p4 = await c4.newPage();
+    await p4.addInitScript(seedFc);
+    const st = () => p4.evaluate(() => { const n = document.getElementById('nw-fc-note'), c = n && n.closest('.ov-chart-card'); return { has: !!(n && n.textContent.trim()), is3d: !!(c && c.classList.contains('nw3d-main-3d')), shown: !!(n && n.offsetParent) }; });
+    const pick = m => p4.evaluate(m => document.querySelector('#nw3d-main button[data-m="' + m + '"]').click(), m);
+    await p4.goto('file:///home/user/Vault-It/index.html'); await p4.waitForTimeout(2200); await p4.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
+    await pick('3d'); await p4.waitForTimeout(400); const a3 = await st();
+    await pick('graph'); await p4.waitForTimeout(400); const ag = await st();
+    await p4.reload(); await p4.waitForTimeout(2200); const ar = await st();
+    await pick('3d'); await p4.waitForTimeout(300); await p4.reload(); await p4.waitForTimeout(2200); const ar3 = await st();
+    ok(a3.has && a3.is3d && !a3.shown, 'forecast note hidden while the Net worth tile shows 3D ' + JSON.stringify(a3));
+    ok(!ag.is3d && ag.shown, 'forecast note shown in Graph view ' + JSON.stringify(ag));
+    ok(!ar.is3d && ar.shown && ar3.is3d && !ar3.shown, 'after a reload the note follows the remembered view (Graph: shown, 3D: hidden) ' + JSON.stringify([ar, ar3]));
+    // Pedro (2 Nov): on phones the cash-flow diagram is drawn 1:1 in its sideways scroller, so its chips read at 10.5 px or more
+    for (const [tab, id] of [['overview', 'cf-sankey'], ['budget', 'bd-sankey']]) {
+      await p4.evaluate(t => showTab(t), tab); await p4.waitForTimeout(800);
+      const sk = await p4.evaluate(id => { const host = document.getElementById(id), sv = host.querySelector('svg'); const sz = [...sv.querySelectorAll('.cf-chip text')].map(t => parseFloat(t.getAttribute('font-size')) * t.getScreenCTM().a);
+        const ch = [...sv.querySelectorAll('.cf-chip rect')].map(x => x.getBoundingClientRect()); let ov = 0; for (let i = 0; i < ch.length; i++) for (let j = i + 1; j < ch.length; j++) { const a = ch[i], c = ch[j]; if (Math.min(a.right, c.right) - Math.max(a.left, c.left) > 1 && Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top) > 1) ov++; }
+        return { n: sz.length, min: +Math.min(...sz).toFixed(1), scrolls: host.scrollWidth > host.clientWidth, ov, side: document.documentElement.scrollWidth > innerWidth + 1 }; }, id);
+      ok(sk.n > 0 && sk.min >= 10.5 && sk.scrolls && sk.ov === 0 && !sk.side, `390 ${id}: chips drawn at ${sk.min} px or more (1:1 in the sideways scroller), none overlapping, page not sideways ` + JSON.stringify(sk));
+    }
+    await c4.close();
   }
   // the user's Text Size setting still works (Large = 15 px root on a phone)
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true }); const page = await ctx.newPage();
