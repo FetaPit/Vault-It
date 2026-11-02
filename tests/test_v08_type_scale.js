@@ -34,7 +34,7 @@ const OFF = ':root{--vi-fs-0:0px!important;--vi-fs-1:0px!important;--vi-fs-2:0px
   }
   for (const m of body.matchAll(/max\((\d*\.?\d+)rem,var\(--vi-fs-(\d)\)\)/g)) {
     const n = +m[1], t = +m[2], want = n < 0.56 ? 1 : n < 0.70 ? 2 : 3;
-    if (t !== want && t !== 0) wrong.push(m[0]);
+    if (t < want && t !== 0) wrong.push(m[0]);   // a caps Syne button may sit above its source tier (11.5 px)
   }
   ok(bare.length === 0, `source: every font-size under .81rem / 10.5px has a floor (${bare.length} without)` + (bare.length ? '\n        ' + bare.slice(0, 6).join('\n        ') : ''));
   ok(wrong.length === 0, `source: each floor matches its source size tier (${wrong.length} wrong)` + (wrong.length ? ' ' + wrong.slice(0, 4).join(' ') : ''));

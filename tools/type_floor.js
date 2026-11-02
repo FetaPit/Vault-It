@@ -5,7 +5,8 @@
 //   .56 to .69rem                   -> --vi-fs-2  11.5px   body in tiles, list rows, buttons
 //   .70 to .80rem                   -> --vi-fs-3  12.5px   lead lines, inputs
 //   .81rem and up, 10.5px and up    -> unchanged           headings, figures
-//   uppercase Syne with letter-spacing .08em or more (in the same rule or style attribute) -> --vi-fs-0 10px
+//   uppercase Syne with letter-spacing .08em or more (in the same rule or style attribute) -> --vi-fs-0 10px,
+//     except actual buttons (a <button> or a .btn / -btn selector, not tabs), which take at least --vi-fs-2 11.5px
 // Skipped: the generated HB3D block, values already inside max()/min(), and the KEEP rules below.
 // Usage: node tools/type_floor.js [--dry]
 const fs = require('fs');
@@ -30,11 +31,20 @@ function capsSyne(ctx) {
   if (!/text-transform\s*:\s*uppercase/.test(ctx) || !/Syne|--font-display/.test(ctx)) return false;
   const m = ctx.match(/letter-spacing\s*:\s*(\d*\.?\d+)em/); return !!m && +m[1] >= 0.08;
 }
+// an actual button (Pedro, 2 Nov): CSS selector naming a button, or an inline style on a <button> tag. Tabs keep the 10 px caps.
+function isButton(s, i) {
+  const open = s.lastIndexOf('{', i), st = Math.max(s.lastIndexOf('style="', i), s.lastIndexOf("style='", i), s.lastIndexOf("style=\\'", i));
+  let who;
+  if (st > open) { who = s.slice(s.lastIndexOf('<', st), st); return /^<button\b/.test(who); }
+  who = s.slice(Math.max(s.lastIndexOf('}', open), s.lastIndexOf('*/', open), s.lastIndexOf('\n', open - 1)) + 1, open);
+  if (/tab-btn|subtab|vh-tab|vi-fb|tab\b/.test(who)) return false;
+  return /\bbutton\b|\.btn\b|\.btn-|-btn\b|-cta\b|\.cta\b/.test(who);
+}
 function lineOf(s, i) { return s.slice(s.lastIndexOf('\n', i) + 1, (s.indexOf('\n', i) + 1 || s.length + 1) - 1); }
 function floorFor(s, i, n, u) {
   let t = tierOf(n, u); if (!t) return null;
   if (KEEP.some(k => lineOf(s, i).includes(k))) return null;
-  if (capsSyne(context(s, i))) t = 0;
+  if (capsSyne(context(s, i))) t = isButton(s, i) ? Math.max(t, 2) : 0;   // caps Syne: buttons 11.5 px, labels and eyebrows 10 px
   counts[t]++; return `var(--vi-fs-${t})`;
 }
 function fix(s) {
