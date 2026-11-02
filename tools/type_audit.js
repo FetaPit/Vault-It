@@ -19,6 +19,7 @@ const VIEWS = [
 ];
 async function sweep(page) {
   return page.evaluate(() => {
+    for (const an of document.getAnimations()) { try { an.pause(); an.currentTime = 0; } catch (e) {} }
     const vw = innerWidth, res = [];
     const sel = el => { const p = []; for (let e = el, i = 0; e && e.nodeType === 1 && i < 4; e = e.parentElement, i++) { let s = e.tagName.toLowerCase(); if (e.id) { p.unshift(s + '#' + e.id); break; } if (e.classList.length) s += '.' + [...e.classList].slice(0, 2).join('.'); p.unshift(s); } return p.join('>'); };
     const all = document.querySelectorAll('body *');

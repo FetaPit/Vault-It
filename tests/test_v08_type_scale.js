@@ -1,7 +1,8 @@
-// v0.8 type scale (F2): on phones, folds and tablets (under 1100 px) the root is ~15 px and no text is under 10.5 px,
-// measured as drawn (SVG text includes its viewBox scale). Desktop (1100+) keeps its scale. The 3D stage keeps its size.
-// The change makes no new clipped or overlapping text: each view is measured with the type scale on and then off in the same page.
-// No sideways page scroll at 390, 690, 1100 and 1440. Run: node tests/test_v08_type_scale.js
+// v0.8 type scale (F2, Pedro's spec section H): floors under the small sizes at every width, no root bump.
+// Source: every font-size under .81rem (or 10.5px) carries the floor for its source size (10.5 / 11.5 / 12.5 px, 10 px for uppercase Syne).
+// Screen: at 390, 690, 1100 and 1440 no text is under 10 px as drawn (SVG text includes its viewBox scale), apart from the agreed exceptions.
+// The floors make no new clipped or overlapping text: each view is measured with the floors on and then off (tokens set to 0) in the same page.
+// Root size, the tab bar's height and the 3D house stage's size do not change. No sideways page scroll. Run: node tests/test_v08_type_scale.js
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -14,12 +15,35 @@ const VIEWS = [
   ['settings', 'showSettings()'], ['paywall', 'showPaywall()'], ['help', "document.getElementById('vi-help-btn').click()"],
   ['mortgage', "showTab('house');hbOpenCalc()"], ['debtform', "showTab('debt');showDebtForm()"], ['feedback', "document.getElementById('vi-fb-btn').click()"],
 ];
-// Deliberate exceptions under 10 px (agreed with the creative director): nav USP/PRO badges (8 px, else they cover the tab icons),
-// the Roadmap stage numbers inside the coins (8 px, decorative), the SVG fallback drawn when the 3D metals scene cannot start
-// (a scene, like the canvases), and the formula superscript in the mortgage notes.
-const EXEMPT = /span\.vi-usp|span\.vi-pro|metalsSvg|>sup \||fire-coin[^|]*\|\s*\d\d$/;
+// Deliberate exceptions under 10 px (agreed with the creative director): nav USP/PRO badges (9 px caps), the Roadmap stage numbers
+// inside the coins (8 px, decorative), the SVG fallback drawn when the 3D metals scene cannot start (a scene, like the canvases),
+// the house builder viewport's own HUD (hard rule: not touched) and the formula superscript in the mortgage notes.
+const EXEMPT = /span\.vi-usp|span\.vi-pro|metalsSvg|hud-bar|>sup \||fire-coin[^|]*\|\s*\d\d$/;
+const OFF = ':root{--vi-fs-0:0px!important;--vi-fs-1:0px!important;--vi-fs-2:0px!important;--vi-fs-3:0px!important}';
+
+// source check: every small font-size in index.html carries its tier floor
+{
+  const src = require('fs').readFileSync('/home/user/Vault-It/index.html', 'utf8');
+  const body = src.slice(0, src.indexOf('// <<HB3D_ENGINE')) + src.slice(src.indexOf('// HB3D_ENGINE>>'));
+  const bare = [], wrong = [];
+  for (const m of body.matchAll(/font-size\s*:\s*(\d*\.?\d+)(rem|px)(?![\w(])/g)) {
+    const n = +m[1], u = m[2]; if (u === 'rem' ? n >= 0.81 : n >= 10.5) continue;
+    const line = body.slice(body.lastIndexOf('\n', m.index) + 1, body.indexOf('\n', m.index));
+    if (/\.nw-more-btns button\{|\.hud-bar/.test(line)) continue;           // KEEP rules (C2 pills, house viewport HUD)
+    bare.push(line.trim().slice(0, 90));
+  }
+  for (const m of body.matchAll(/max\((\d*\.?\d+)rem,var\(--vi-fs-(\d)\)\)/g)) {
+    const n = +m[1], t = +m[2], want = n < 0.56 ? 1 : n < 0.70 ? 2 : 3;
+    if (t !== want && t !== 0) wrong.push(m[0]);
+  }
+  ok(bare.length === 0, `source: every font-size under .81rem / 10.5px has a floor (${bare.length} without)` + (bare.length ? '\n        ' + bare.slice(0, 6).join('\n        ') : ''));
+  ok(wrong.length === 0, `source: each floor matches its source size tier (${wrong.length} wrong)` + (wrong.length ? ' ' + wrong.slice(0, 4).join(' ') : ''));
+  ok(/--vi-fs-1:10\.5px;--vi-fs-2:11\.5px;--vi-fs-3:12\.5px/.test(src) && /--vi-fs-0:10px/.test(src), 'source: floor tokens 10 / 10.5 / 11.5 / 12.5 px');
+  ok(!/--vi-scale:1\.15/.test(src), 'source: no root bump');
+}
 
 function measure() {
+  for (const an of document.getAnimations()) { try { an.pause(); an.currentTime = 0; } catch (e) {} }   // measure at rest (the Roadmap's next coin spins)
   const vw = innerWidth, small = [], boxes = [];
   for (const el of document.querySelectorAll('body *')) {
     if (/^(SCRIPT|STYLE|NOSCRIPT|CANVAS|OPTION|svg|path|use)$/.test(el.tagName)) continue;
@@ -51,10 +75,10 @@ function measure() {
 (async () => {
   const b = await chromium.launch();
   for (const w of [390, 690, 1100, 1440]) {
-    const phone = w < 700, narrow = w < 1100;
+    const phone = w < 700;
     const ctx = await b.newContext({ viewport: { width: w, height: phone ? 844 : 900 }, isMobile: phone, hasTouch: phone });
     await routeThree(ctx);
-    let under = 0, under105 = 0, sideways = [], newClip = [], newOver = [], errs = [], root = 0;
+    let under = 0, under105 = 0, navGrew = [], sideways = [], newClip = [], newOver = [], errs = [], root = 0;
     for (const [name, js] of VIEWS) {
       const page = await ctx.newPage(); page.on('pageerror', e => errs.push(name + ': ' + e.message));
       await page.addInitScript(() => { try { localStorage.setItem('vi_declined_demo', 'true'); } catch (e) {} });
@@ -64,10 +88,13 @@ function measure() {
       await page.waitForTimeout(600);
       const on = await page.evaluate(measure); root = on.root;
       if (on.sideways) sideways.push(name);
-      if (narrow) {
+      {
         for (const [f, s] of on.small) { if (f < 10.5) under105++; if (f < 10 && !EXEMPT.test(s)) { under++; if (under <= 12) console.log(`      ${w} ${name}: ${f}px  ${s}`); } }
-        // the same page with the type scale switched off: anything clipped or overlapping only with it on is new
-        await page.addStyleTag({ content: ':root{--vi-scale:1!important;--vi-fs-min:0px!important}' }); await page.waitForTimeout(300);
+        // the same page with the floors switched off: anything clipped or overlapping only with them on is new
+        const nav1 = await page.evaluate(() => Math.round(document.getElementById('topnav').getBoundingClientRect().height));
+        await page.addStyleTag({ content: OFF }); await page.waitForTimeout(300);
+        const nav0 = await page.evaluate(() => Math.round(document.getElementById('topnav').getBoundingClientRect().height));
+        if (nav1 !== nav0) navGrew.push(`${name} ${nav0}->${nav1}`);
         const off = await page.evaluate(measure);
         const oc = new Set(off.clipped.map(s => s.split(' | ')[0])), oo = new Set(off.over.map(s => s.replace(/ \| [^X]*/g, '')));
         for (const s of on.clipped) if (!oc.has(s.split(' | ')[0])) newClip.push(name + ': ' + s);
@@ -75,12 +102,13 @@ function measure() {
       }
       await page.close();
     }
-    if (narrow) {
-      ok(Math.abs(root - 13 * 1.15) < 0.05, `${w}: root is ${root} px (13 x 1.15)`);
+    {
+      ok(Math.abs(root - 13 * (w >= 1400 ? 1.28 : w >= 1100 ? 1.12 : 1)) < 0.05, `${w}: root size unchanged (${root} px)`);
+      ok(navGrew.length === 0, `${w}: the tab bar keeps its height` + (navGrew.length ? ' (' + navGrew.slice(0, 3).join(', ') + ')' : ''));
       ok(under === 0, `${w}: no text under 10 px outside the agreed exceptions (${under} found; ${under105} under 10.5 incl. exceptions)`);
-      ok(newClip.length === 0, `${w}: no text newly clipped by the bigger type (${newClip.length})` + (newClip.length ? '\n        ' + newClip.slice(0, 8).join('\n        ') : ''));
+      ok(newClip.length === 0, `${w}: no text newly clipped by the floors (${newClip.length})` + (newClip.length ? '\n        ' + newClip.slice(0, 8).join('\n        ') : ''));
       ok(newOver.length === 0, `${w}: no text newly overlapping (${newOver.length})` + (newOver.length ? '\n        ' + newOver.slice(0, 8).join('\n        ') : ''));
-    } else ok(Math.abs(root - 13 * (w >= 1400 ? 1.28 : 1.12)) < 0.05, `${w}: desktop root unchanged (${root} px)`);
+    }
     ok(sideways.length === 0, `${w}: no sideways page scroll on any view` + (sideways.length ? ' (' + sideways.join(', ') + ')' : ''));
     ok(errs.length === 0, `${w}: no page errors` + (errs.length ? ' (' + errs[0].slice(0, 120) + ')' : ''));
 
@@ -90,16 +118,16 @@ function measure() {
     await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await page.evaluate("showTab('house')"); await page.waitForTimeout(700);
     const st = () => page.evaluate(() => { const c = document.querySelector('#houseSceneCard canvas'); if (!c) return 'none'; const r = c.getBoundingClientRect(); return Math.round(r.width) + 'x' + Math.round(r.height); });
-    const s1 = await st(); await page.addStyleTag({ content: ':root{--vi-scale:' + (narrow ? 1 : 'var(--vi-scale)') + '!important;--vi-fs-min:0px!important}' }); await page.waitForTimeout(400); const s0 = await st();
-    ok(s1 === s0 && s1 !== 'none', `${w}: 3D house stage size unchanged by the type scale (${s1} vs ${s0})`);
+    const s1 = await st(); await page.addStyleTag({ content: OFF }); await page.waitForTimeout(400); const s0 = await st();
+    ok(s1 === s0 && s1 !== 'none', `${w}: 3D house stage size unchanged by the floors (${s1} vs ${s0})`);
     await ctx.close();
   }
-  // the user's Text Size setting still works on top (Large = 15 px base x 1.15 on a phone)
+  // the user's Text Size setting still works (Large = 15 px root on a phone)
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true }); const page = await ctx.newPage();
   await page.addInitScript(() => { try { localStorage.setItem('vi_declined_demo', 'true'); } catch (e) {} });
   await page.goto(URL_); await page.waitForTimeout(1000);
   const lg = await page.evaluate(() => { document.documentElement.style.setProperty('--vi-base', '15px'); return parseFloat(getComputedStyle(document.documentElement).fontSize); });
-  ok(Math.abs(lg - 15 * 1.15) < 0.05, `390: Text Size Large still scales the app (${lg} px)`);
+  ok(Math.abs(lg - 15) < 0.05, `390: Text Size Large still scales the app (${lg} px)`);
   await b.close();
   console.log(fails ? `FAILURES ${fails}` : 'ALL OK');
   process.exit(fails ? 1 : 0);
