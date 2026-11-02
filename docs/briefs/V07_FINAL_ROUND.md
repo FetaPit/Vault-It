@@ -48,6 +48,7 @@ The brand book draws 14,465 bricks with raw WebGL: one shader program, one insta
 fps 60 · frame ms p50 16.8 / p95 33.5 / max 53.2 · frames>33: 145 of 2313 · long tasks 9, worst 273 ms (idle compiles by design)
 first 3D frame 203.8 ms from House tab · build 191.9 ms · lay 0.2 ms · orbit p95 18.2 ms (107 frames)
 engine house_gl, one instanced draw, WebGL2, DPR 1.5, 21,000 bricks. GATE MET. Owner: "The engine looks good."
+Full pasted report, 09:14 (fold inner screen, 690x727 at DPR 2.625): fps 55 over 5,956 frames · p50 16.9 / p95 35.9 / max 76.6 · 402 frames >33 ms (6.7%) · long tasks 15, worst 273 ms (idle type compiles) · first 3D frame 203.8 ms · build 191.9 ms · lay 0.1 ms · orbit p95 18.2 ms (362 frames) · canvas 926x681 · WebGL2 Adreno 740 · house_gl at rest. Both screens of the fold pass the gate.
 
 ## Final round part 2 (owner, 2 Nov 09:1x, from the fold test)
 1. All 3D build animations are too fast: slow by 100% (duration doubled). Applies to the house builder AND the Net-worth 3D AND the dashboard's other 3D graph. House: drop 380->760 ms, stagger min(120,900/N)->min(240,1800/N), flash 1100->2200 ms; orbit/ping/pulse feel unchanged. Pedro's brand-book timings are overridden by the owner here; tests updated to the new numbers.
