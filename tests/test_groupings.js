@@ -24,7 +24,7 @@ const seed = () => {
     // House
     await p.evaluate(() => showTab('house')); await p.waitForTimeout(2500);
     const h = await p.evaluate(() => {
-      const plan = document.getElementById('hb-plan'), prog = document.getElementById('hb-prog'), hist = document.getElementById('hb-hist'), own = document.getElementById('hb-own-design');
+      const plan = document.getElementById('hb-plan'), prog = document.getElementById('hb-hud'), hist = document.getElementById('hb-hist'), own = document.getElementById('hb-own-design');
       const inn = (c, ids) => ids.every(id => c && c.contains(document.getElementById(id)));
       return { h1: inn(plan, ['htypes', 'priceInput', 'depositPctInput', 'floor-selector-card']), lay: inn(document.getElementById('houseSceneCard'), ['savingsInput', 'btnAdd']) && document.getElementById('hb-lay').compareDocumentPosition(document.getElementById('sceneCap')) & 4, brick: /Each brick is worth about £\d/.test((document.getElementById('hb-plan-brick') || {}).textContent || ''),
         h2: inn(prog, ['savedAmt', 'pbarFill', 'stBricks', 'stRemain', 'ms1', 'ms100']),
@@ -34,10 +34,10 @@ const seed = () => {
     });
     ok(h.h1 && h.brick, w + ': H1 one "Your house plan" card (type, price, deposit, floor, brick value)');
     ok(h.lay, w + ': Lay the bricks sits right under the viewport (owner, 30 Oct)');
-    ok(h.h2, w + ': H2 one "Progress" card (bar, stats, milestones)');
+    ok(h.h2, w + ': H2 one progress tile, the Level 1 card (bar, stats, milestones; v0.8 merged the old Progress card into it)');
     ok(h.h3, w + ': H3 one "History" card: streak, then log, then reset');
     ok(h.h4, w + ': H4 "Your own design" is one collapsed card, locked: "Coming later as part of Pro", no upload or prompt');
-    ok(h.cards === 3, w + ': house panel has 3 cards (HUD, plan, progress), was 7 (' + h.cards + ')');
+    ok(h.cards === 2, w + ': house panel has 2 cards (progress tile, plan), was 7, then 3 (' + h.cards + ')');
     await p.fill('#savingsInput', '100'); await p.click('#btnAdd'); await p.waitForTimeout(400);
     ok(await p.evaluate(() => JSON.parse(localStorage.getItem('ht3')).saved === 8600), w + ': laying bricks from the plan card still saves');
     // Debt
