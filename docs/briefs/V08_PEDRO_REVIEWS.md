@@ -41,3 +41,8 @@ The structure matches the accepted build: one tile, six iconned stats (2 x 3 at 
 
 ### Global note for David (not D2's)
 At 390 and 690 the root is 13 px, so the app's common sizes (.5rem, .56rem) render at 6.5 to 7.3 px. In the House tile: eyebrow 6.5, milestone names 6.8, Next line 7.0. The brand book's smallest text is 10.5 px. The 10 px floor in my spec came from `index.html:8990`, which covers only the footer. Raising the whole scale is one change (`--vi-base` or the root `font-size`), but it would reflow every tab, so it needs the owner's word and its own round. ASK raised with David.
+
+### D2 Level 2 check (David's question b)
+Shot with houseMode 'purchased', 390 and 1100, against candidate/v0.8. Before, Level 2 showed the old deposit card ("£0 of £40.0k deposit, 0.0%") next to "Paid off 100%". That card contradicted the paid-off figure and was stale once the house was bought. Now the Level 2 tile runs full width: mortgage bar, still owed, mortgage-free date, interest slain, months shaved, both mortgage buttons, the Level 3 lock and "Back to Level 1". No mortgage information is lost, and at 1100 it reads as fuller, not emptier.
+4. For consistency with Level 1, the four Level 2 stats get the same icon cell: `vi-mortgage` still owed, `vi-keys` mortgage-free, `vi-coins` interest slain, `vi-calendar` months shaved. The emoji 🔑 🧮 🔒 in Level 2 come out too: use `vi-lock` 14 px on the Level 3 line, and buttons have no icon.
+(a) Sub-line and "% of income" sizes stay as they are this round (global type-scale ASK).
