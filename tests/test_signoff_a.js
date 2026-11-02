@@ -27,10 +27,11 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
       const r = await p.evaluate(() => {
         const s = document.getElementById('nw3d-hero-stage').getBoundingClientRect(), f = document.getElementById('vi-fb-btn'), fr = f.getBoundingClientRect(), vis = getComputedStyle(f).visibility !== 'hidden' && getComputedStyle(f).display !== 'none' && getComputedStyle(f).opacity !== '0' && fr.width > 0;
         const hit = !(fr.right <= s.left || fr.left >= s.right || fr.bottom <= s.top || fr.top >= s.bottom);
-        return { vis, hit, sTop: Math.round(s.top), sBot: Math.round(s.bottom) };
+        const onCtl = [...document.querySelectorAll('.nw3d-hud,.inv-ctl,.hud-bar')].some(h => { const t = h.getBoundingClientRect(); return t.width > 0 && !(fr.right <= t.left || fr.left >= t.right || fr.bottom <= t.top || fr.top >= t.bottom); });
+        return { vis, hit, onCtl, sTop: Math.round(s.top), sBot: Math.round(s.bottom) };
       });
       // v0.8 (owner, 2 Nov): the Feedback button stays bottom right, so it may sit over the stage; it must stay shown there
-      ok(r.vis, T + 'Feedback pill stays shown bottom right over the stage (' + place + '; stage ' + r.sTop + '-' + r.sBot + ', pill ' + (r.vis ? 'shown' : 'tucked away') + ')');
+      ok(r.onCtl ? !r.vis : r.vis, T + 'Feedback pill stays bottom right over the stage, fading only over its controls (' + (r.onCtl ? 'on the controls; ' : '') + place + '; stage ' + r.sTop + '-' + r.sBot + ', pill ' + (r.vis ? 'shown' : 'tucked away') + ')');
     }
     await p.evaluate(() => { document.getElementById('nw3d-hero-stage').scrollIntoView({ block: 'center' }); nw3d.hero.kick(); }); await p.waitForTimeout(900);
     const n = await p.evaluate(() => ({ plates: window.__plates, cols: (document.getElementById('nw3d-hero-cv').dataset.cols || '').split(',').filter(Boolean).length }));

@@ -39,16 +39,36 @@ const seed = t => {
       for (const at of ['top', 'mid', 'end']) {
         await p.evaluate(a => { const m = document.documentElement.scrollHeight - innerHeight; scrollTo(0, a === 'top' ? 0 : a === 'mid' ? m / 2 : m); }, at);
         await p.waitForTimeout(450);
-        const f = await p.evaluate(() => {
+        const read = () => p.evaluate(() => {
           const e = document.getElementById('vi-fb-btn'); const r = e.getBoundingClientRect(), cs = getComputedStyle(e);
           const nav = innerWidth < 600 ? document.querySelector('#topnav .vi-tabs').getBoundingClientRect().top : innerHeight;
-          return { h: Math.round(r.height), l: Math.round(r.left), r: Math.round(r.right), b: Math.round(r.bottom), w: r.width, nav: Math.round(nav), vis: cs.visibility !== 'hidden' && cs.opacity !== '0' && cs.display !== 'none', cls: e.className, top: e.style.top };
+          const hud = e.classList.contains('vi-fb-fade') && [...document.querySelectorAll('.nw3d-hud,.inv-ctl,.hud-bar')].some(h => { const t = h.getBoundingClientRect(); return t.width > 0 && !(r.right <= t.left || r.left >= t.right || r.bottom <= t.top || r.top >= t.bottom); });
+          return { o: cs.opacity, vz: cs.visibility, hud, h: Math.round(r.height), l: Math.round(r.left), r: Math.round(r.right), b: Math.round(r.bottom), w: r.width, nav: Math.round(nav), vis: cs.visibility !== 'hidden' && (cs.opacity !== '0' || hud) && cs.display !== 'none', cls: e.className.replace('vi-fb-fade', '').trim(), top: e.style.top };
         });
+        let f = await read(); if (!f.vis) { await p.waitForTimeout(900); f = await read(); }
         if (!(f.vis && f.w > 0 && (phone ? f.w === 40 : f.h === 32) && f.r <= w && f.r >= w - 30 && f.b <= f.nav - 6 && f.l > w / 2 && !f.cls && !f.top)) fbBad.push(tab + '@' + at + ' ' + JSON.stringify(f));
       }
     }
     ok(!devBad.length, T + 'one Message the Dev card, the last thing on every tab ' + devBad.join('; '));
     ok(!fbBad.length, T + 'Feedback stays bottom right, clear of the nav, on every tab at top, middle and end ' + fbBad.slice(0, 3).join('; '));
+    // over a 3D viewer's controls it fades out in place, and comes back once clear (Pedro's review)
+    await p.evaluate(() => { showTab('overview'); scrollTo(0, 0); }); await p.waitForTimeout(300);
+    const fd = await p.evaluate(async () => { const b = document.getElementById('vi-fb-btn'), r0 = b.getBoundingClientRect(), h = document.createElement('div');
+      h.className = window.__hudCls || 'nw3d-hud'; h.style.cssText = 'position:fixed;z-index:1;left:' + (r0.left + 4) + 'px;top:' + (r0.top + 2) + 'px;width:30px;height:28px'; document.body.appendChild(h);
+      const until = async f => { for (let i = 0; i < 30 && !f(); i++) { window.dispatchEvent(new Event('scroll')); await new Promise(r => setTimeout(r, 100)); } return f(); };
+      const over = await until(() => getComputedStyle(b).opacity === '0' && getComputedStyle(b).pointerEvents === 'none');
+      const r1 = b.getBoundingClientRect(); h.remove(); const back = await until(() => getComputedStyle(b).opacity === '1');
+      return { over, back, still: Math.abs(r1.right - r0.right) < 1 && Math.abs(r1.top - r0.top) < 1 }; });
+    ok(fd.over && fd.back && fd.still, T + 'over 3D controls the button fades out without moving, and returns when clear ' + JSON.stringify(fd));
+    await p.evaluate(() => { window.__hudCls = 'hud-bar'; });
+    const fd2 = await p.evaluate(async () => { const b = document.getElementById('vi-fb-btn'), r0 = b.getBoundingClientRect(), h = document.createElement('div');
+      h.className = window.__hudCls || 'nw3d-hud'; h.style.cssText = 'position:fixed;z-index:1;left:' + (r0.left + 4) + 'px;top:' + (r0.top + 2) + 'px;width:30px;height:28px'; document.body.appendChild(h);
+      const until = async f => { for (let i = 0; i < 30 && !f(); i++) { window.dispatchEvent(new Event('scroll')); await new Promise(r => setTimeout(r, 100)); } return f(); };
+      const over = await until(() => getComputedStyle(b).opacity === '0' && getComputedStyle(b).pointerEvents === 'none');
+      const r1 = b.getBoundingClientRect(); h.remove(); const back = await until(() => getComputedStyle(b).opacity === '1');
+      return { over, back, still: Math.abs(r1.right - r0.right) < 1 && Math.abs(r1.top - r0.top) < 1 }; });
+    ok(fd2.over && fd2.back && fd2.still, T + 'over a viewer zoom bar (.hud-bar) the button fades out without moving, and returns when clear ' + JSON.stringify(fd2));
+    await p.evaluate(() => { window.__hudCls = ''; });
 
     // 3: the footer collapses after scrolling stops, comes back on scroll up and at the page end
     await p.evaluate(() => { showTab('overview'); scrollTo(0, 0); }); await p.waitForTimeout(1700);
@@ -86,10 +106,13 @@ const seed = t => {
         const same = sp.every((x, i) => { probe.style.color = CF_GROUPS[CF_GROUP_ORDER[i]].tx; return !x.querySelector('i') && getComputedStyle(probe).color === getComputedStyle(x.querySelector('s')).color; }); probe.remove();
         const fsz = Math.max(...sp.map(x => parseFloat(getComputedStyle(x).fontSize))), hh = Math.max(...sp.map(x => x.getBoundingClientRect().height));
         const ic = Math.max(...sp.map(x => { const v = x.querySelector('svg'); return v ? v.getBoundingClientRect().width : 0; }));
-        return { n: sp.length, rows: tops.size, fsz, hh, ic, same, below: l.getBoundingClientRect().top >= s.getBoundingClientRect().bottom, lh: Math.round(l.getBoundingClientRect().height) };
+        const alpha = c => { const m = String(c).match(/\/\s*([\d.]+)\)|rgba\([^)]*,\s*([\d.]+)\)/); return m ? +(m[1] || m[2]) : 1; };
+        const strong = sp.every(x => { const cs = getComputedStyle(x); return alpha(cs.borderTopColor) >= 0.55 && alpha(cs.backgroundColor) >= 0.08; });
+        return { strong, n: sp.length, rows: tops.size, fsz, hh, ic, same, below: l.getBoundingClientRect().top >= s.getBoundingClientRect().bottom, lh: Math.round(l.getBoundingClientRect().height) };
       }, [lg, sk]);
       ok(L.n === 6 && L.fsz <= 11.5 && L.hh <= 22 && L.ic <= 14 && L.same, T + tab + ' pills are compact, colours unchanged (font ' + L.fsz + ', height ' + L.hh + ', icon ' + L.ic + ')');
       ok(L.rows <= (w < 600 ? 3 : w < 1000 ? 2 : 1), T + tab + ' six pills fit in ' + L.rows + ' rows (' + L.lh + ' px)');
+      ok(L.strong, T + tab + ' each pill carries its colour: 60% border and a 10% fill (Pedro, review 1)');
       if (tab === 'overview') ok(L.below, T + 'on Cash flow the key sits below the chart');
     }
 
