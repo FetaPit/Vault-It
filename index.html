@@ -14379,6 +14379,7 @@ body.vi-pop-open{overflow:hidden}
   #hb-hud .mss{grid-template-columns:repeat(5,minmax(0,1fr))}
 }
 @container (min-width:560px){.hb-stx{grid-template-columns:repeat(6,minmax(0,1fr))}.hb-stx>div{grid-template-columns:minmax(0,1fr);text-align:center;justify-items:center;padding:10px 6px}.hb-stx .vi-ic{grid-row:auto;margin-bottom:4px}}
+@container (min-width:520px){.hb-stx.hb-stx4{grid-template-columns:repeat(4,minmax(0,1fr))}}   /* Level 2: four stats, one row */
 @container (min-width:820px){.hb-stx .vi-ic{width:26px;height:26px}.hb-stx b{font-size:.9rem}.hb-stx span{font-size:.52rem}}
 .hb-row{margin:8px 0 6px;padding:10px 12px;border:1px solid rgb(var(--gold-rgb) / .5);border-radius:8px;background:rgb(var(--gold-rgb) / .07)}
 .hb-row-n{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--gold);letter-spacing:.12em}
@@ -15902,9 +15903,9 @@ function hbRenderL2(el){
     +hbMortgageLine()
     +'<div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--text)"><span>Paid off '+hbMoney(Math.max(0,hbL2Base()-bal))+' of '+hbMoney(hbL2Base())+'</span><span>'+(Math.floor(hbL2Progress()*1000)/10).toFixed(1)+'%</span></div>'
     +'<div class="hb-xp"><div style="width:'+(hbL2Progress()*100).toFixed(1)+'%"></div></div>'
-    +'<div class="hb-st"><div><b>'+hbMoney(bal)+'</b><span>still owed</span></div><div><b>'+(scn.balloon>0?'–':hbFmtDate(scn.payoffDate))+'</b><span>mortgage-free</span></div><div><b class="'+(cmp.interestSaved>0?'hbc-good':'')+'">'+hbMoney(cmp.interestSaved)+'</b><span>interest slain</span></div><div><b>'+hbYM(Math.max(0,cmp.monthsSaved))+'</b><span>months shaved</span></div></div>'
+    +'<div class="hb-stx hb-stx4"><div><svg class="vi-ic" aria-hidden="true"><use href="#vi-mortgage"/></svg><b>'+hbMoney(bal)+'</b><span>still owed</span></div><div><svg class="vi-ic" aria-hidden="true"><use href="#vi-keys"/></svg><b>'+(scn.balloon>0?'–':hbFmtDate(scn.payoffDate))+'</b><span>mortgage-free</span></div><div><svg class="vi-ic" aria-hidden="true"><use href="#vi-coins"/></svg><b class="'+(cmp.interestSaved>0?'hbc-good':'')+'">'+hbMoney(cmp.interestSaved)+'</b><span>interest slain</span></div><div><svg class="vi-ic" aria-hidden="true"><use href="#vi-calendar"/></svg><b>'+hbYM(Math.max(0,cmp.monthsSaved))+'</b><span>months shaved</span></div></div>'
     +'<div style="font-size:.5rem;color:var(--t3)">Your Level 2 house is what was left to pay after your deposit goal. Full-colour bricks are what you have paid off; the hologram is what is left. You own '+hbMoney(eq)+' of your home ('+eqp.toFixed(1)+'%).</div>'
-    +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn-add-data" onclick="hbOpenMortgageEntry(false)">'+(state.mortgage?'✎ Your mortgage':'🔑 Enter your mortgage')+'</button><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Open mortgage calculator</button></div>'
+    +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn-add-data" onclick="hbOpenMortgageEntry(false)">'+(state.mortgage?'Your mortgage':'Enter your mortgage')+'</button><button class="btn-add-data" onclick="hbOpenCalc()">Open mortgage calculator</button></div>'
     +tip+hbL3Card();
 }
 
@@ -16963,7 +16964,7 @@ function hbRenderL3(el){
 function hbUnlockL3(){toast(HB_L3_LOCKED);}   // Level 3 is locked for everyone (owner, 1 Nov 2026); the name stays for old buttons
 function hbL3Card(){
   if(state.houseMode!=='purchased')return '';
-  return '<div class="hb-tip hb-l3-locked">🔒 '+HB_L3_LOCKED+' <span class="hb-own-pro">PRO</span></div>';
+  return '<div class="hb-tip hb-l3-locked"><svg class="vi-ic" style="width:14px;height:14px;--vi-sw:1.5;vertical-align:-2px" aria-hidden="true"><use href="#vi-lock"/></svg> '+HB_L3_LOCKED+' <span class="hb-own-pro">PRO</span></div>';
 }
 function hbL3CardDormant(){   // the old unlock card, kept for when Level 3 returns
   if(state.level3||state.houseMode!=='purchased')return '';

@@ -86,6 +86,16 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
     ok(h.ids, t + 'the bar, stats and milestones keep their ids, inside the one tile');
     ok(!h.dead, t + 'no dead columns beside the cards (' + h.ncards + ' cards)');
     ok(!h.side && errs.length === 0, t + 'House: no sideways scroll, no page errors ' + errs.slice(0, 1));
+    // Level 2 (Pedro, round 1 item 4): the four stats get the same icon cells; no emoji on its buttons or the Level 3 line
+    p.on('dialog', d => d.accept().catch(() => {}));
+    await p.evaluate(() => { state.saved = depositTarget(); save(); updateUI(); markHousePurchased(); }); await p.waitForTimeout(600);
+    const l2 = await p.evaluate(() => { const hud = document.getElementById('hb-hud'), R = e => e.getBoundingClientRect(), st = [...hud.querySelectorAll('.hb-stx > div')], tops = st.map(x => Math.round(R(x).top)), lk = hud.querySelector('.hb-l3-locked');
+      return { lvl: /LEVEL 2/.test(hud.innerText), n: st.length, icons: st.map(x => (x.querySelector('use') || { getAttribute: () => '' }).getAttribute('href')).join(','), perRow: tops.filter(x => x === tops[0]).length,
+        emoji: ([...hud.querySelectorAll('button')].map(b => b.textContent).join(' ') + (lk ? lk.textContent : '')).match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u270E]/gu) || [], lock: !lk || !!lk.querySelector('use[href="#vi-lock"]'),
+        side: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 }; });
+    ok(l2.lvl && l2.n === 4 && l2.icons === '#vi-mortgage,#vi-keys,#vi-coins,#vi-calendar', t + 'Level 2: four stats with icons (' + l2.icons + ')');
+    ok(w < 600 ? l2.perRow === 2 : l2.perRow === 4, t + 'Level 2: stats ' + l2.perRow + ' across');
+    ok(!l2.emoji.length && l2.lock && !l2.side, t + 'Level 2: no emoji on buttons or the Level 3 line (lock icon instead), no sideways scroll (' + l2.emoji.join('') + ')');
     await ctx.close();
   }
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASS'); process.exit(fails ? 1 : 0);
