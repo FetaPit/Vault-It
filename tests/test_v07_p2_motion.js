@@ -39,6 +39,10 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     ok(await p.evaluate(() => __p2hero.started() === true), 'net worth scene: once it is about half on screen the opening build starts');
     await p.context().close(); }
   { const p = await open('budget');
+    // switch to 3D with the chart well above the screen, so nothing is on screen when the intro arms (since v0.8 the compact key puts the
+    // chart about half on screen at the top of the page on a 390 x 700 phone, where starting at once is right; this test is about the scroll trigger)
+    await place(p, '.bd-sankey-card', -900); await p.waitForTimeout(300);
+    ok(await p.evaluate(() => document.querySelector('.bd-sankey-card').getBoundingClientRect().bottom < 0), 'budget 3D: the chart is off screen before the 3D view opens');
     await p.evaluate(() => document.querySelector('#bd-view button[data-v="3d"]').click()); await p.waitForTimeout(800);
     await place(p, '#bd3d-cv', 690); await p.waitForTimeout(1500);
     const ph0 = await p.evaluate(() => bd3d.engine().phase());
