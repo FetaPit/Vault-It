@@ -9851,6 +9851,8 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .hb-lv.on{border-color:var(--brass);color:#f1d98b;background:rgb(var(--brass-rgb) / .12);box-shadow:0 0 14px rgb(var(--brass-rgb) / .18)}
 .hb-lv.done{border-color:rgb(var(--green-rgb) / .5);color:var(--green)}
 .hb-lv.lock{opacity:.45;cursor:not-allowed}
+/* phones (owner, 2 Nov): the three level cards sit side by side and swipe, one row high, so the house stage gets the room */
+@media (max-width:699px){.hb-levels{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:-18px -4px 12px;padding:2px 12px 4px}.hb-levels::-webkit-scrollbar{display:none}.hb-lv{flex:0 0 auto;scroll-snap-align:start;white-space:nowrap}}
 .hb-undo{margin-top:12px;text-align:right}.hb-undo-btn{background:transparent!important;border-color:var(--t2)!important;color:var(--t1)!important}
 .hb-xp{height:8px;border-radius:99px;background:rgb(var(--ink-rgb) / .07);overflow:hidden;margin:8px 0 6px}
 .hb-xp>div{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--brass));transition:width .5s}
@@ -10034,6 +10036,7 @@ button.bd-ic{cursor:pointer}
 #ov-summary-row{align-items:stretch;gap:clamp(6px,1.4vw,12px)}
 @media (min-width:520px){#ov-summary-row{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 @media (max-width:519px){#ov-summary-row{grid-template-columns:1fr!important}}
+@media (max-width:899px){#ov-summary-row{gap:16px}}   /* phones and the unfolded fold: room between Assets, Liabilities and Debt (owner, 2 Nov) */
 #ov-summary-row .ov-chart-card{min-width:0;overflow:hidden}
 #ov-summary-row .ov-chart-title{overflow-wrap:anywhere}
 @media (max-width:900px) and (min-width:520px){
