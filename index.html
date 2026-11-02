@@ -14294,13 +14294,13 @@ body.vi-pop-open{overflow:hidden}
 .bd-tile{border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:12px;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 12%,var(--panel)),var(--panel) 55%);overflow:hidden}
 .bd-tile-hd{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:0;cursor:pointer;color:var(--t1);text-align:left;border-bottom:1px solid color-mix(in srgb,var(--c) 28%,transparent)}
 .bd-tile.folded .bd-tile-hd{border-bottom-color:transparent}
-.bd-tile-ic{flex:none;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--t);background:color-mix(in srgb,var(--c) 22%,transparent);border:1px solid color-mix(in srgb,var(--c) 55%,transparent)}
+.bd-tile-ic{flex:none;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--t);background:color-mix(in srgb,var(--c) 22%,transparent);border:1px solid color-mix(in srgb,var(--c) 55%,transparent)}
 .bd-tile-tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.bd-tile-tt b{font:800 .68rem/1.25 'Syne',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--t);text-wrap:balance;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}   /* two lines at most, never under the amount (owner, 2 Nov, v0.8) */
+.bd-tile-tt b{font:800 .77rem/1.25 'Syne',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--t);text-wrap:balance;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}   /* two lines at most, never under the amount (owner, 2 Nov, v0.8) */
 .bd-tile-tt em{font:normal .56rem 'DM Sans',sans-serif;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bd-tile-sum{flex:none;display:flex;flex-direction:column;align-items:flex-end;font:700 .92rem 'Share Tech Mono',monospace;color:var(--tx);white-space:nowrap}
 .bd-tile-sum small{font:.5rem 'Share Tech Mono',monospace;color:var(--t3);font-weight:400}
-@media (min-width:1000px) and (max-width:1279px){.bd-tile-hd{gap:8px;padding:10px}.bd-tile-ic{width:36px;height:36px}.bd-tile-tt b{font-size:.54rem;letter-spacing:.02em;text-wrap:balance}}   /* two columns: keep each title to two lines, clear of its amount (Pedro, v0.7 E10) */
+@media (min-width:1000px) and (max-width:1279px){.bd-tiles{grid-template-columns:1fr}}   /* one column until the cards are wide enough for 10 px titles side by side (Pedro, v0.8) */
 .bd-chev{position:relative;flex:none;color:var(--t);display:grid;place-items:center;width:24px;height:24px;transform:rotate(180deg);transition:transform .24s ease}   /* open: the arrow points up; folded: down (owner, 1 Nov, E10) */
 .bd-chev::before{content:'';position:absolute;inset:-10px}   /* 44 px hit area around the 24 px arrow, so the title column keeps its width */
 .bd-tile.folded .bd-chev{transform:none}
@@ -19347,7 +19347,7 @@ function bdRenderLists(){
     var sum=cfSum(items),folded=bdIsFolded(g),G=CF_GROUPS[g];
     html+='<section class="bd-tile'+(folded?' folded':'')+'" data-g="'+g+'" style="--c:'+G.col+';--t:'+G.tx+'">'
       +'<button type="button" class="bd-tile-hd" onclick="bdFold(\''+g+'\')" aria-expanded="'+(!folded)+'">'
-      +'<span class="bd-tile-ic">'+bdGroupIcon(g,24)+'</span>'
+      +'<span class="bd-tile-ic">'+bdGroupIcon(g,20)+'</span>'
       +'<span class="bd-tile-tt"><b>'+G.short.replace(/non-essential/,'<span style="white-space:nowrap">non-essential</span>')+'</b><em>'+G.ex+'</em></span>'
       +'<span class="bd-tile-sum">'+cfMoney(sum)+'<small>'+(m.tIn>0?Math.round(sum/m.tIn*100)+'% of income':items.length+' item'+(items.length===1?'':'s'))+'</small></span>'
       +'<span class="bd-chev"><svg class="vi-ic" style="--vi-sw:2;width:20px;height:20px" aria-hidden="true"><use href="#vi-chevron"/></svg></span></button>'

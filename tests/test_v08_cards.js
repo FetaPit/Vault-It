@@ -1,6 +1,6 @@
 // v0.8 stream D2 (owner, 2 Nov), two items:
 // 1) Budget "Spending & saving per month" cards: no "·" between the words ("Committed essential"), a smaller icon tile
-//    (36 to 40 px), titles two lines at most, and the title never runs into the amount and "% of income" column.
+//    (30 to 32 px), titles two lines at most, and the title never runs into the amount and "% of income" column.
 //    390, 690 (the fold, unfolded), 1100 and 1440, Night and Daylight. Chevrons, expand and collapse still work.
 // 2) House tab: the Level 1 card and the old PROGRESS tile become one tile: one bar, one set of stats each with a line
 //    icon, one milestone set with the house-type names, earned and unearned. ROW card, "Show it on the house",
@@ -23,7 +23,7 @@ const SEED = (theme) => {
 const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#trial-banner,#tester-welcome{display:none!important}';
 (async () => {
   const b = await chromium.launch();
-  for (const theme of ['dark', 'light']) for (const w of [390, 690, 1100, 1440]) {
+  for (const theme of ['dark', 'light']) for (const w of [390, 690, 1100, 1280, 1440]) {
     const mob = w < 700, t = theme + ' ' + w + 'px: ';
     const ctx = await b.newContext({ viewport: { width: w, height: 900 }, isMobile: mob, hasTouch: mob, colorScheme: theme });
     await routeThree(ctx); await ctx.route(/open\.er-api\.com/, r => r.abort());
@@ -32,15 +32,17 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
 
     // ── 1) Budget cards ──
     await p.evaluate(() => { showTab('budget'); bdFoldAll(true); }); await p.waitForTimeout(600);
-    const bd = await p.evaluate(() => [...document.querySelectorAll('.bd-tile')].map(tl => {
+    const bd = await p.evaluate(() => [...document.querySelectorAll('.bd-tile')].map(tl => { const fs = parseFloat(getComputedStyle(tl.querySelector('.bd-tile-tt b')).fontSize);
       const b = tl.querySelector('.bd-tile-tt b'), tt = tl.querySelector('.bd-tile-tt').getBoundingClientRect(), s = tl.querySelector('.bd-tile-sum').getBoundingClientRect(),
         ic = tl.querySelector('.bd-tile-ic').getBoundingClientRect(), ch = tl.querySelector('.bd-chev').getBoundingClientRect(), br = b.getBoundingClientRect(), lh = parseFloat(getComputedStyle(b).lineHeight) || parseFloat(getComputedStyle(b).fontSize) * 1.3;
-      return { g: tl.dataset.g, text: b.textContent, lines: Math.round(br.height / lh), icw: Math.round(ic.width), ich: Math.round(ic.height), clash: tt.right > s.left + 0.5 || br.right > s.left + 0.5 || s.right > ch.left + 0.5, sumInside: s.right <= tl.getBoundingClientRect().right };
+      return { g: tl.dataset.g, text: b.textContent, lines: Math.round(br.height / lh), icw: Math.round(ic.width), ich: Math.round(ic.height), clash: tt.right > s.left + 0.5 || br.right > s.left + 0.5 || s.right > ch.left + 0.5, sumInside: s.right <= tl.getBoundingClientRect().right, fs, clip: b.scrollWidth > b.clientWidth + 1 || b.scrollHeight > b.clientHeight + 1 };
     }));
     ok(bd.length === 6, t + 'six spending cards (' + bd.length + ')');
     ok(bd.every(x => !/[·•.]/.test(x.text)), t + 'no separator in the titles (' + bd.map(x => x.text).join(' | ') + ')');
     ok(bd.find(x => x.g === 'ce').text === 'Committed essential' && bd.find(x => x.g === 'vn').text === 'Variable non-essential', t + 'titles read "Committed essential", "Variable non-essential"');
-    ok(bd.every(x => x.icw >= 36 && x.icw <= 40 && x.ich === x.icw), t + 'icon tiles 36 to 40 px (' + bd.map(x => x.icw).join(',') + ')');
+    ok(bd.every(x => x.icw >= 30 && x.icw <= 32 && x.ich === x.icw), t + 'icon tiles 30 to 32 px (Pedro: 32, 30 in the two-column band) (' + bd.map(x => x.icw).join(',') + ')');
+    ok(bd.every(x => x.fs >= 10), t + 'titles at least 10 px, the app floor (' + bd[0].fs + ')');
+    ok(bd.every(x => !x.clip), t + 'no title is cut off (' + bd.filter(x => x.clip).map(x => x.g).join(',') + ')');
     ok(bd.every(x => x.lines <= 2), t + 'every title two lines at most (' + bd.map(x => x.g + ':' + x.lines).join(' ') + ')');
     ok(bd.every(x => !x.clash && x.sumInside), t + 'no title runs into the amount column, nor the amount into the arrow (' + bd.filter(x => x.clash).map(x => x.g).join(',') + ')');
     const fold = await p.evaluate(async () => { const hd = document.querySelector('.bd-tile[data-g="iv"] .bd-tile-hd'); hd.click(); await new Promise(r => setTimeout(r, 300));
