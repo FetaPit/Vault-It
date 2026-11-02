@@ -77,23 +77,29 @@ const seed = t => {
     if (fixed) {
       const vis = () => p.evaluate(F => { const f = document.getElementById('app-footer'), r = f.getBoundingClientRect(), q = f.querySelector('.vi-fca').getBoundingClientRect();
         return { shown: Math.round(innerHeight - r.top), full: f.offsetHeight, fcaIn: q.top >= 0 && q.bottom <= innerHeight + 0.5 && q.height > 0, txt: f.querySelector('.vi-fca').textContent.trim() === F, sh: document.documentElement.scrollHeight, tr: getComputedStyle(f).transitionProperty }; }, FCA);
-      const a = await vis();
+      // every state read waits (bounded, up to about 2.4 s) for the 240 ms slide to settle: under load it can land late; the expectations are unchanged
+      const settle = async want => { let v = await vis(); for (let i = 0; i < 12 && !want(v); i++) { await p.waitForTimeout(200); v = await vis(); } return v; };
+      const a = await settle(v => v.shown <= 30);
       ok(a.shown <= 30 && a.fcaIn && a.txt, T + 'at rest (and on load) the footer folds to one line with the FCA statement (' + a.shown + '/' + a.full + ')');
       ok(/transform/.test(a.tr), T + 'the footer moves by transform (' + a.tr + ')');
       await p.mouse.move(w / 2, h / 3); await p.mouse.wheel(0, 400); await p.waitForTimeout(1900);
-      const c = await vis();
+      const c = await settle(v => v.shown <= 30);
       ok(c.shown <= 30 && c.shown < c.full && c.fcaIn && c.txt, T + 'after scrolling down stops it collapses to a slim strip with the FCA line (' + c.shown + ' px of ' + c.full + ')');
       ok(c.sh === a.sh, T + 'collapsing does not change the page height (' + a.sh + ' vs ' + c.sh + ')');
-      await p.mouse.wheel(0, -120); await p.waitForTimeout(500);
-      let u = await vis(); for (let i = 0; i < 5 && u.shown < u.full - 1; i++) { await p.waitForTimeout(200); u = await vis(); }   // under load the 240 ms slide can land late ok(u.shown >= u.full - 1, T + 'scrolling shows it in full (' + u.shown + ')');
+      // the footer opens on a scroll and folds again 1.2 s after it stops, so the page itself records the most it showed (every 50 ms, 3 s)
+      await p.evaluate(() => { const f = document.getElementById('app-footer'); window.__ftMax = 0; const t0 = performance.now();
+        const id = setInterval(() => { window.__ftMax = Math.max(window.__ftMax, Math.round(innerHeight - f.getBoundingClientRect().top)); if (performance.now() - t0 > 3000) clearInterval(id); }, 50); });
+      await p.evaluate(() => { const y = scrollY; scrollBy(0, -120); window.__ftMoved = scrollY !== y; }); await p.waitForTimeout(3200);   // the page itself scrolls (a wheel over a 3D view zooms it instead)
+      const u = await p.evaluate(() => ({ moved: window.__ftMoved, shown: window.__ftMax, full: document.getElementById('app-footer').offsetHeight }));
+      ok(u.moved && u.shown >= u.full - 1, T + 'scrolling shows it in full (' + u.shown + ' of ' + u.full + ')');
       await p.waitForTimeout(1500);
       await p.click('#app-footer .ft-more'); await p.waitForTimeout(500);
-      const m = await vis(); const ex = await p.evaluate(() => document.querySelector('#app-footer .ft-more').getAttribute('aria-expanded'));
+      const m = await settle(v => v.shown >= v.full - 1); const ex = await p.evaluate(() => document.querySelector('#app-footer .ft-more').getAttribute('aria-expanded'));
       ok(m.shown >= m.full - 1 && ex === 'true', T + 'More opens the full footer (' + m.shown + ', aria-expanded ' + ex + ')');
       await p.waitForTimeout(1500); ok((await vis()).shown >= m.full - 1, T + 'after More it stays open until the next scroll');
       await p.mouse.wheel(0, 300); await p.waitForTimeout(1900);
       await p.evaluate(() => scrollTo(0, document.documentElement.scrollHeight)); await p.waitForTimeout(1900);
-      const e = await vis(); ok(e.shown >= e.full - 1, T + 'at the page end it shows in full (' + e.shown + ')');
+      const e = await settle(v => v.shown >= v.full - 1); ok(e.shown >= e.full - 1, T + 'at the page end it shows in full (' + e.shown + ')');
     }
 
     // 4: compact pills, below the chart on Cash flow, same style on Budget
