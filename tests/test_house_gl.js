@@ -79,6 +79,10 @@ const PAL = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2
     ok(bt.n61 === 61 && bt.same61, 'a 61-brick batch drops together (no stagger over 60)');
     ok(bt.n39 === 39 && Math.abs(bt.gap39 - 900 / 39) <= 900 / 39 * 0.1, 'a 39-brick batch is spaced 900/39 = 23 ms within 10% (' + bt.gap39.toFixed(1) + ' ms)');
     ok(dep.settled, 'the stage settles after the deposit');
+    // the other types compile in idle time after the first house settles (David, 2 Nov): a first switch pays no model compile
+    const warm = await p.waitForFunction(() => HB3DAPP.warmed && ['semi', 'detached', 'flat', 'apartment', 'mansion'].every(t => !!hb3dModelIfReady(t, state.apartmentFloor)), null, { timeout: 60000 }).then(() => true).catch(() => false);
+    const cached = await p.evaluate(() => Object.keys(HB3DAPP.models).length);
+    ok(warm && cached >= 6, 'the other house types are compiled in idle time after the first house settles (' + cached + ' models cached)');
     // a house-type switch: settled shell + one course, no main-thread task over 100 ms
     const sw = await p.evaluate(async () => {
       const lt = []; let po; try { po = new PerformanceObserver(l => l.getEntries().forEach(e => lt.push(e.duration))); po.observe({ entryTypes: ['longtask'] }); } catch (e) {}
@@ -91,7 +95,7 @@ const PAL = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2
     });
     console.log(JSON.stringify(sw));
     ok(sw.same && sw.type === 'semi' && sw.drew, 'switching to a semi redraws in the same renderer (no viewer rebuild)');
-    ok(sw.longMax < 200, 'switch: no main-thread task over 200 ms on this software GPU (longest ' + sw.longMax.toFixed(0) + ' ms; the 100 ms gate is read on the owner\'s phone with ?perf=1: the renderer\'s own buffer fill is ' + (sw.buildMs == null ? '-' : sw.buildMs.toFixed(0)) + ' ms, the rest is compiling the semi model in kit.js)');
+    ok(sw.longMax < 150, 'switch to a precompiled type: no main-thread task over 150 ms on this software GPU (longest ' + sw.longMax.toFixed(0) + ' ms; the renderer\'s buffer fill ' + (sw.buildMs == null ? '-' : sw.buildMs.toFixed(0)) + ' ms; the 100 ms gate is read on the owner\'s phone with ?perf=1)');
     ok(sw.settledAtOpen > 0 && sw.animated <= sw.course, 'the semi opens as a settled shell (' + sw.settledAtOpen + ' at once) plus one course (' + sw.animated + ' animated)');
     ok(sw.firstMs != null && sw.firstMs < 1000, 'first frame of the new type within a second (' + (sw.firstMs == null ? '-' : sw.firstMs.toFixed(0)) + ' ms)');
     // orbit: a scripted 300 px drag over a second gives no frame over 33 ms (p95 20 ms) at phone width

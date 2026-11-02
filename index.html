@@ -16360,7 +16360,7 @@ function hb3dModel(type, floor) {
     if (_pt) VIPERF.phase('build', performance.now() - _pt);
     HB3DAPP.models[k] = m; HB3DAPP.order.push(k);
     if (window._hbHudWait) { window._hbHudWait = false; setTimeout(function () { try { hbRenderHUD(); hbWriteStats(); hbBrickLineUpdate(); } catch (e) {} }, 0); }   // Level 1 card was on "Counting bricks…"
-    while (HB3DAPP.order.length > 4) { var old = HB3DAPP.order.shift(); if (old !== HB3DAPP.key) delete HB3DAPP.models[old]; else HB3DAPP.order.push(old); if (HB3DAPP.order.length <= 4) break; }
+    while (HB3DAPP.order.length > 8) { var old = HB3DAPP.order.shift(); if (old !== HB3DAPP.key) delete HB3DAPP.models[old]; else HB3DAPP.order.push(old); if (HB3DAPP.order.length <= 8) break; }   // room for every standard type warmed in idle time (v0.7 A2) plus a few floors
   }
   return m;
 }
@@ -16374,6 +16374,20 @@ function hb3dIdleBuild(type, floor) {
   HB3DAPP.idle[k] = 1;
   var run = function () { try { hb3dModel(type, floor); delete HB3DAPP.idle[k]; hbRenderHUD(); hbWriteStats(); } catch (e) { delete HB3DAPP.idle[k]; } };
   if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 1500 }); else setTimeout(run, 60);
+}
+// v0.7 A2 (David, 2 Nov 2026): once the first house has settled, compile the other standard types one per idle slice and keep their laying
+// plans, so a first switch to any type never pays the model compile at tap time (the switch is then the renderer's buffer fill alone)
+function hb3dWarmTypes() {
+  if (HB3DAPP.warmed || typeof HB3D === 'undefined' || !HB3D.build) return;
+  var v = HB3DAPP.viewer; if (!v || !v.settled || !v.settled()) { clearTimeout(HB3DAPP.warmT); HB3DAPP.warmT = setTimeout(hb3dWarmTypes, 700); return; }
+  HB3DAPP.warmed = true;
+  var todo = ['terraced', 'semi', 'detached', 'flat', 'apartment', 'mansion'].filter(function (t) { return hb3dHas(t) && !hb3dModelIfReady(t, state.apartmentFloor); });
+  var next = function () {
+    var t = todo.shift(); if (!t) return;
+    var go = function () { try { var m = hb3dModel(t, state.apartmentFloor); if (m && HB3D.brandPlan) HB3D.brandPlan(m); } catch (e) {} if (window.requestIdleCallback) requestIdleCallback(next, { timeout: 4000 }); else setTimeout(next, 250); };
+    if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 4000 }); else setTimeout(go, 250);
+  };
+  next();
 }
 // Which scene to show (mirrors the SVG redraw + hbAfterDraw precedence)
 // ═══════════════════════════════════════════════════════════════
@@ -16710,6 +16724,7 @@ function hb3dRedraw() {
     clearTimeout(HB3DAPP.olT1); clearTimeout(HB3DAPP.olT2);
     HB3DAPP.olT1 = setTimeout(function () { try { hb3dPlaceOverlays(); } catch (e) {} }, 300);
     HB3DAPP.olT2 = setTimeout(function () { try { hb3dPlaceOverlays(); } catch (e) {} }, 1200);
+    if (!HB3DAPP.warmed && v.engine === 'house_gl') { clearTimeout(HB3DAPP.warmT); HB3DAPP.warmT = setTimeout(hb3dWarmTypes, 1500); }   // the other types compile in idle time after the first house settles
     return true;
   } catch (e) {
     HB3D._failed = true;
