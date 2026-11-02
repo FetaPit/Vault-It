@@ -39,8 +39,17 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     ok(await p.evaluate(() => __p2hero.started() === true), 'net worth scene: once it is about half on screen the opening build starts');
     await p.context().close(); }
   { const p = await open('budget');
+    // switch to 3D with the chart well above the screen, so nothing is on screen when the intro arms (since v0.8 the compact key puts the
+    // chart about half on screen at the top of the page on a 390 x 700 phone, where starting at once is right; this test is about the scroll trigger)
+    // room above the chart, so its top edge can really sit near the bottom of the screen: since v0.8 the compact key puts the 3D canvas about
+    // half on screen at the very top of the page (508 px on a 700 px screen), where starting at once is right and "top edge only" cannot be reached
+    await p.evaluate(() => { const sp = document.createElement('div'); sp.id = 'p2-room'; sp.style.height = '400px'; const c = document.querySelector('.bd-sankey-card'); c.parentNode.insertBefore(sp, c); });
+    await place(p, '.bd-sankey-card', -900); await p.waitForTimeout(300);
+    ok(await p.evaluate(() => document.querySelector('.bd-sankey-card').getBoundingClientRect().bottom < 0), 'budget 3D: the chart is off screen before the 3D view opens');
     await p.evaluate(() => document.querySelector('#bd-view button[data-v="3d"]').click()); await p.waitForTimeout(800);
     await place(p, '#bd3d-cv', 690); await p.waitForTimeout(1500);
+    const top0 = await p.evaluate(() => Math.round(document.getElementById('bd3d-cv').getBoundingClientRect().top));
+    ok(Math.abs(top0 - 690) <= 4, 'budget 3D: the canvas top really sits at 690 px of 700 (' + top0 + ')');
     const ph0 = await p.evaluate(() => bd3d.engine().phase());
     ok(ph0 === 'waiting', 'budget 3D: with only its top edge on screen the intro waits (' + ph0 + ')');
     await place(p, '#bd3d-cv', 200); await p.waitForTimeout(500);

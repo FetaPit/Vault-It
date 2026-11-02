@@ -31,12 +31,12 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else consol
       return { vis: getComputedStyle(e).display !== 'none' && r.width > 0, bottom: r.bottom, right: r.right, fh, label: getComputedStyle(e.querySelector('span')).display !== 'none', aria: e.getAttribute('aria-label') }; });
     ok(btn.vis && btn.right <= w && btn.bottom <= (mob ? 844 : 900) - 30 && btn.aria === 'Send feedback', T + 'a Feedback button sits above the footer and nav (bottom ' + Math.round(btn.bottom) + ')');
     ok(btn.label === !mob, T + (mob ? 'on a phone it is just the icon' : 'on desktop it says Feedback'));
-    const dodged = await p.evaluate(() => { const st = document.createElement('style'); st.textContent = 'body>*:not(#vi-fb-btn):not(#fb-under){visibility:hidden!important}'; document.head.appendChild(st);
-      const b = document.getElementById('vi-fb-btn'); b.classList.remove('vi-fb-left', 'vi-fb-top', 'vi-fb-away'); const r = b.getBoundingClientRect(), x = document.createElement('button');
-      x.id = 'fb-under'; x.textContent = '+'; x.style.cssText = 'position:fixed;z-index:1;left:' + (r.left - 4) + 'px;top:' + (r.top - 4) + 'px;width:' + (r.width + 8) + 'px;height:' + (r.height + 8) + 'px';
-      document.body.appendChild(x); viFbDodge(); const moved = b.classList.contains('vi-fb-left') && b.getBoundingClientRect().left < 40; x.remove(); viFbDodge(); const back = !b.classList.contains('vi-fb-left'); st.remove(); viFbDodge(); return moved && back; });
-    ok(dodged, T + 'the button moves to the left edge when a control sits under it, and back when clear');
-    ok(await p.evaluate(() => { viFbDodge(); const b = document.getElementById('vi-fb-btn'), r = b.getBoundingClientRect(), e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.width > 0 && getComputedStyle(b).opacity !== '0' && !!e && b.contains(e) && (innerWidth <= 600 || r.top >= document.getElementById('topnav').getBoundingClientRect().bottom || r.bottom > innerHeight / 2); }), T + 'the button is visible and clickable (never under the nav tabs)');
+    // v0.8 (owner, 2 Nov): "It should stay bottom right." A control under it, a scroll or a tab change never moves it
+    const stays = await p.evaluate(async () => { const b = document.getElementById('vi-fb-btn'), r0 = b.getBoundingClientRect(), x = document.createElement('button');
+      x.id = 'fb-under'; x.textContent = '+'; x.style.cssText = 'position:fixed;z-index:1;left:' + (r0.left - 4) + 'px;top:' + (r0.top - 4) + 'px;width:' + (r0.width + 8) + 'px;height:' + (r0.height + 8) + 'px';
+      document.body.appendChild(x); viFbDodge(); window.scrollBy(0, 300); showTab('budget'); await new Promise(r => setTimeout(r, 1700)); const r1 = b.getBoundingClientRect(); x.remove(); showTab('overview');
+      return Math.abs(r1.right - r0.right) < 1 && Math.abs(r1.bottom - r0.bottom) < 1 && r1.right > innerWidth - 30 && !b.className; });
+    ok(stays, T + 'the button stays bottom right: a control under it, a scroll and a tab change never move it');
     await p.evaluate(() => setTimeout(() => { throw new Error('bad value 3217.50 at row 987'); }, 0)); await p.waitForTimeout(100);
     // not signed in: says so, sends nothing
     await p.click('#vi-fb-btn'); await p.waitForTimeout(300);
