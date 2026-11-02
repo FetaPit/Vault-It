@@ -59,3 +59,8 @@ Shots: `followup/c2-*` at 390 and 1440, Night and Daylight, including two goals 
 C2 round 2, v08/forecast-rates 5600311 (with 899a7b5): shots `followup/c2r2-*` at 360, 390 and 1440, Night and Daylight.
 - Round 1 fixes: PASS. Daylight plates are the card surface with brass text, and Night is unchanged. The hint sits 6px under the month labels. TODAY and the quarter labels no longer touch at any width.
 - New at 360 (both themes), only when two goals sit near the bottom of the plot: the lowest label ("Emergency Fund") is pushed below its line onto the month labels and hides "Sep '26" and "Mar '27". 390 and 1440 are clear. Proposed fix: keep a "below" plate inside the plot (`y + h <= H - PAD.b`); if it does not fit, put it above its line, to the left of the plate it clashes with. This is the second round, so David decides.
+
+C2 round 3, v08/forecast-rates 729ae9e: item 1 PASS. Shots: `followup/c2r3-*` at 360 and 390, Night and Daylight.
+- With the sample data, no goal label touches the month axis at 360 or 390. Clear Debt stays below its line and Emergency Fund moves above-left.
+- Crowded case: five goals between £1k and £12k at 360 and 390, both themes. No overlaps, and every plate stays inside the plot. QC's leftover risk (five or more goals crowded into a very short graph) is fine for 0.8.
+- Nit for 0.8.1, not caused by this commit: at 360 the "Dec '26" month label is missing between "Sep '26" and "Mar '27".
