@@ -42,3 +42,16 @@ The brand book draws 14,465 bricks with raw WebGL: one shader program, one insta
 ## David's view
 - Honest timing: the engine swap is hours, not minutes. Release tonight only if the owner takes the safety option (still picture by default, 3D on tap) for v0.7 and the new engine as v0.7.1; otherwise the release follows the new engine.
 - No new features in this round. Anything new goes to v0.7.1.
+
+
+## Owner's fold report (2 Nov 09:13, new engine, real phone - Adreno 740)
+fps 60 · frame ms p50 16.8 / p95 33.5 / max 53.2 · frames>33: 145 of 2313 · long tasks 9, worst 273 ms (idle compiles by design)
+first 3D frame 203.8 ms from House tab · build 191.9 ms · lay 0.2 ms · orbit p95 18.2 ms (107 frames)
+engine house_gl, one instanced draw, WebGL2, DPR 1.5, 21,000 bricks. GATE MET. Owner: "The engine looks good."
+
+## Final round part 2 (owner, 2 Nov 09:1x, from the fold test)
+1. All 3D build animations are too fast: slow by 100% (duration doubled). Applies to the house builder AND the Net-worth 3D AND the dashboard's other 3D graph. House: drop 380->760 ms, stagger min(120,900/N)->min(240,1800/N), flash 1100->2200 ms; orbit/ping/pulse feel unchanged. Pedro's brand-book timings are overridden by the owner here; tests updated to the new numbers.
+2. Build/lay animations trigger only when the viewport is near the middle of the screen (raise the IntersectionObserver threshold to ~0.5-0.6 and start the lay then), not at first pixel. Same rule for nw3d and the dashboard 3D.
+3. Dashboard on mobile: the Assets / Liabilities / Debt cards sit too close and overlap - fix spacing/stacking at phone widths.
+4. Level 1 / Level 2 / Level 3 cards: side by side even on mobile, as a swipeable carousel, freeing vertical room for the viewport.
+Split: (1house+2house) -> engine session on v07/engine; (1nw3d/dashboard + 2 + 3 + 4) -> fixes session on v07/final-fixes. Merge order unchanged; release still gated on the owner's sign-off of the combined preview.
