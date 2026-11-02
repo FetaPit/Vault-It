@@ -119,38 +119,42 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
         (mode === 'error' ? `setTimeout(function(){o['error-callback']()},50);` : mode === 'ok' ? `setTimeout(function(){o.callback('TOK123')},50);` : mode === 'slow' ? `window.__tsCb=o.callback;` : ``) +
         `return 'w1'},reset:function(){}};window.viTsLoaded&&window.viTsLoaded();` });
     });
+    // The page's 8 s give-up timer starts when the page script runs. On a busy machine the page itself can take seconds to load, so a
+    // wall-clock probe raced it (failed about half of runs under load). The page's clock is frozen from before it loads and moved only by
+    // clock.runFor, so "under 8 s" and "after 8 s" mean the page's own time, whatever the machine is doing.
+    await c.page.clock.install({ time: 0 }); await c.page.clock.pauseAt(1000);
     await c.page.goto(BASE + '/sign-up', { waitUntil: 'load' });
     await c.page.fill('#email', 'ts@example.com');
     return c;
   };
   ({ ctx, page } = await tsPage('error'));
-  await page.waitForTimeout(400);
+  await page.clock.runFor(400); await page.waitForTimeout(100);
   ok(/could not load/i.test(await page.textContent('#msg')), 'a widget error says the check could not load');
   await page.click('#go'); await page.waitForTimeout(500);
   ok(page.posts.length === 1 && page.posts[0].captchaToken === '', 'after a widget error the form still sends, without a token');
   await ctx.close();
   ({ ctx, page } = await tsPage('silent'));
-  await page.waitForTimeout(1500); await page.click('#go'); await page.waitForTimeout(300);
+  await page.clock.runFor(1500); await page.click('#go'); await page.waitForTimeout(300);
   ok(page.posts.length === 0 && /still running/i.test(await page.textContent('#msg')), 'a check that is still working (under 8 s) asks the visitor to wait a moment');
-  await page.waitForTimeout(7200);
+  await page.clock.runFor(7200); await page.waitForTimeout(100);
   ok(/could not load/i.test(await page.textContent('#msg')), 'after about 8 s with no token the page says the check could not load');
   await page.click('#go'); await page.waitForTimeout(500);
   ok(page.posts.length === 1 && page.posts[0].captchaToken === '', 'after 8 s of silence the form sends without a token');
   await ctx.close();
   ({ ctx, page } = await tsPage('blocked'));
-  await page.waitForTimeout(600);
+  await page.clock.runFor(600); await page.waitForTimeout(100);
   ok(/could not load/i.test(await page.textContent('#msg')), 'a blocked check script (ad blocker, private DNS) says the check could not load');
   await page.click('#go'); await page.waitForTimeout(500);
   ok(page.posts.length === 1 && page.posts[0].captchaToken === '', 'with the check script blocked the form still sends');
   await ctx.close();
   ({ ctx, page } = await tsPage('ok'));
-  await page.waitForTimeout(400);
+  await page.clock.runFor(400); await page.waitForTimeout(100);
   ok(!/could not load/i.test(await page.textContent('#msg')), 'a working check shows no warning');
   await page.click('#go'); await page.waitForTimeout(500);
   ok(page.posts.length === 1 && page.posts[0].captchaToken === 'TOK123', 'a working check still sends its token');
   await ctx.close();
   ({ ctx, page } = await tsPage('slow'));
-  await page.waitForTimeout(500); await page.click('#go'); await page.waitForTimeout(200);
+  await page.clock.runFor(500); await page.click('#go'); await page.waitForTimeout(200);
   ok(page.posts.length === 0, 'a slow but working check holds the form until it answers');
   await page.evaluate(() => window.__tsCb('SLOWTOK')); await page.click('#go'); await page.waitForTimeout(500);
   ok(page.posts.length === 1 && page.posts[0].captchaToken === 'SLOWTOK', 'a slow check that answers in time sends its token');
