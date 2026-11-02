@@ -14895,7 +14895,7 @@ function viRenderLedger(){
 // ── Forecast rates: the one place to update them. Both a year, compounded monthly, and named in the note. ──
 var VI_FC_RATES = {
   sav: 0.0165, savSrc: 'Bank of England easy-access average',   // BoE effective rate on instant-access (sight) deposits, Aug 2026 (published 29 Sep 2026)
-  inv: 0.05,   invSrc: 'FCA middle projection'                                  // FCA intermediate projection rate, COBS 13 Annex 2
+  inv: 0.05,   invSrc: 'FCA mid projection'                                  // FCA intermediate projection rate, COBS 13 Annex 2
 };
 function viFcIsDebtLine(e) { return (e.cat || bdGuess('exp', e.name || '')) === 'debt'; }
 // What the user holds now that grows: savings = cash accounts plus the house deposit; investments = stocks and shares.
@@ -14940,18 +14940,14 @@ function viFcPct(r) { return String(+(r * 100).toFixed(2)) + '%'; }
 function viFcNote(f, ahead) {
   var el = document.getElementById('nw-fc-note'); if (!el) return;
   var t = '';
-  if (f) {
-    var R = VI_FC_RATES, plan;
-    if (!f.hasBudget) plan = 'no Budget yet, so no new money goes in. Set up your Budget to see your plan.';
-    else {
-      plan = (f.sv > 0 || f.iv > 0 ? 'your Budget adds ' + (f.sv > 0 ? gbpFmt(f.sv) + ' a month' : 'nothing') + ' to savings and ' + (f.iv > 0 ? gbpFmt(f.iv) + (f.sv > 0 ? '' : ' a month') : 'nothing') + ' to investments'
-        : 'your Budget adds nothing to savings or investments')
-        + (f.debts ? (f.repay > 0 ? '; ' + gbpFmt(f.repay) + ' a month of debt payments come off your debts' : '; no debt payments are budgeted') : '')
-        + (f.short > 0 ? '; your plan spends ' + gbpFmt(f.short) + ' a month more than comes in, so that comes off' : '')
-        + '. Money not given a job is not counted.';
-    }
-    t = 'Forecast for the next ' + ahead + ' months: ' + plan + ' An estimate from what you\'ve entered, not a prediction. Assumes '
-      + viFcPct(R.sav) + ' a year on savings (' + R.savSrc + ') and ' + viFcPct(R.inv) + ' on investments (' + R.invSrc + '), on what you have now plus what you budget each month. Debts follow your APR and budgeted repayments. Real returns vary.';
+  if (f) {   // copy: Pedro, 2 Nov evening (short, about 45 words)
+    var R = VI_FC_RATES, plan, debt = f.debts ? (f.repay > 0 ? '; ' + gbpFmt(f.repay) + ' a month comes off your debts' : '; no debt repayments budgeted') : '',
+      over = f.short > 0 ? '; it overspends by ' + gbpFmt(f.short) + ' a month' : '';
+    if (!f.hasBudget) plan = 'No Budget yet, so no new money goes in. Set one up to see your plan.';
+    else if (f.sv > 0 || f.iv > 0) plan = 'Your Budget adds ' + gbpFmt(f.sv) + ' a month to savings and ' + gbpFmt(f.iv) + ' to investments' + debt + over + '. Money without a job isn\'t counted.';
+    else plan = 'Your Budget puts nothing into savings or investments' + debt + over + '. Money without a job isn\'t counted.';
+    t = ahead + '-month estimate, not a prediction. ' + plan + ' Savings grow ' + viFcPct(R.sav) + ' a year (' + R.savSrc + '), investments '
+      + viFcPct(R.inv) + ' (' + R.invSrc + '), debts follow their APR.';
   }
   var tx = document.getElementById('nw-fc-txt'); (tx || el).textContent = t; el.hidden = !t;
 }

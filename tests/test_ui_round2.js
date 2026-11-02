@@ -82,7 +82,7 @@ async function open(b, theme, w, phone) {
     ok(dt(r.grow).every((v, i) => v > (i ? dt(r.grow)[i - 1] : 3000)) && nw(r.grow)[5] < 10000, 'no repayment budgeted: the debt grows by its APR and net worth falls (' + dt(r.grow).join(',') + ')');
     ok(dt(r.level).every(v => v === 3000) && nw(r.level).every(v => v === 10000), 'no repayment and no APR: the debt stays level');
     ok(nw(r.neg).every((v, i) => v === 10000 - 300 * (i + 1)), 'negative cash flow means decline (£300 a month: ' + nw(r.neg).join(',') + ')');
-    ok(!r.none.hasBudget && nw(r.none).every(v => v === 10000) && /Set up your Budget/.test(r.noneNote) && /not a prediction/.test(r.noneNote), 'no budget and nothing held: no growth, and the note asks for a budget');
+    ok(!r.none.hasBudget && nw(r.none).every(v => v === 10000) && /^6-month estimate, not a prediction\. No Budget yet, so no new money goes in\. Set one up to see your plan\./.test(r.noneNote) && /not a prediction/.test(r.noneNote), 'no budget and nothing held: no growth, and the note asks for a budget');
     ok(!r.noneHeld.hasBudget && r.noneHeld.pts.every((x, k) => Math.abs(x.nw - 10000 - 10000 * (Math.pow(1 + ms, k + 1) - 1)) < 0.01), 'no budget: no new money, but savings held still grow at 1.65%');
     }
     errs.push(...p._errs); await ctx.close();
@@ -105,7 +105,7 @@ async function open(b, theme, w, phone) {
         same: JSON.stringify(proj.map(x => Math.round(x.nw))) === JSON.stringify(d.nw.slice(d.today + 1)) };
     });
     ok(!r.hid && r.w >= r.inner - 2 && r.align === 'left' && r.fs === 10.5 && r.info, T + 'the forecast note spans the tile (' + Math.round(r.w) + ' of ' + Math.round(r.inner) + ' px, ' + r.align + ')');
-    ok(/your Budget adds/.test(r.txt) && /Assumes 1\.65% a year on savings \(Bank of England easy-access average\) and 5% on investments \(FCA middle projection\), on what you have now plus what you budget each month/.test(r.txt) && /Real returns vary\./.test(r.txt) && !/\bwill\b|expected/i.test(r.txt) && /Debts follow your APR and budgeted repayments/.test(r.txt) && /debt payments|no debt payments/.test(r.txt) && /an estimate from what you've entered, not a prediction/i.test(r.txt) && !/—/.test(r.txt) && !/straight line/.test(r.txt),
+    ok(/^6-month estimate, not a prediction\. Your Budget (adds|puts nothing into)/.test(r.txt) && /Savings grow 1\.65% a year \(Bank of England easy-access average\), investments 5% \(FCA mid projection\), debts follow their APR\.$/.test(r.txt) && !/\bwill\b|expected/i.test(r.txt) && r.txt.split(/\s+/).length <= 60 && /; no debt repayments budgeted|a month comes off your debts/.test(r.txt) && !/—/.test(r.txt) && !/straight line/.test(r.txt),
       T + 'the note says what the forecast rests on: "' + r.txt.slice(0, 110) + '..."');
     ok(r.same, T + 'the 3D progress blocks forecast the same months as the graph');
 
