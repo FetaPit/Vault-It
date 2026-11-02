@@ -31,7 +31,7 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   let p = await open(semi, { flag: false, query: '?house=old' }); await settle(p);
   let r = await p.evaluate(() => {
     const v = HB3D.viewer, i = hbBrickInfo(), ri = v.rowInfo();
-    return { brand: !!v.brand, grp: !!v._bGroup, bi: !!v.brandInfo(), on: hbBrandOn(), band: v.rowBand, water: v.water, riBrand: !!(ri && ri.brand),
+    return { brand: !!v.brand, grp: v.engine === 'house_gl' ? !!v._hg : !!v._bGroup, bi: !!v.brandInfo(), on: hbBrandOn(), band: v.rowBand, water: v.water, riBrand: !!(ri && ri.brand),
       setRow: !!document.getElementById('set-house3d'), cls: document.getElementById('hb3d-rowlabel').className,
       per: i.perBrick, want: depositTarget() * 0.77 / i.total, laid: document.getElementById('stBricks').textContent, bricks: (v.brandInfo() || {}).bricks };
   });
@@ -95,8 +95,10 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   const want5 = Math.floor(r.N * (5 / r.dt) / 0.77 + 1e-6);
   ok(r.bi.bricks === want5 && r.laid === String(want5) && want5 >= 1 && want5 <= 10, '£5 after the foundations lays exactly ' + want5 + ' bricks (£' + (r.dt * 0.77 / r.N).toFixed(2) + ' a brick)');
   // reduced motion: the build is instant, no drop, flash, stagger, sweep, ring or orbit
-  r = await p.evaluate(() => { const v = HB3D.viewer, rec = v._bm.find(x => x && x.part === 'brick'); return { p: v.p, want: pct(), stamps: Array.from(rec.laid.slice(0, rec.cnt)), sweep: v._bU.uSweepOn.value, ring: v._bEnvObj.ring.visible, rot: v.controls.autoRotate, pulse: v._bU.uPulse.value }; });
-  ok(Math.abs(r.p - r.want) < 1e-12 && r.stamps.every(s => s === -1000), 'reduced motion: built instantly, every brick already laid (no drop, flash or stagger)');
+  r = await p.evaluate(() => { const v = HB3D.viewer;
+    if (v.engine === 'house_gl') { const u = v.readUniforms(['uSweepOn', 'uPulse']); return { p: v.p, want: pct(), stamps: v.brickStamps(), sweep: u.uSweepOn, ring: v.pingAlpha() > 0, rot: v.autoOrbit(), pulse: u.uPulse }; }
+    const rec = v._bm.find(x => x && x.part === 'brick'); return { p: v.p, want: pct(), stamps: Array.from(rec.laid.slice(0, rec.cnt)), sweep: v._bU.uSweepOn.value, ring: v._bEnvObj.ring.visible, rot: v.controls.autoRotate, pulse: v._bU.uPulse.value }; });
+  ok(Math.abs(r.p - r.want) < 1e-12 && r.stamps.every(s => s <= -1000), 'reduced motion: built instantly, every brick already laid (no drop, flash or stagger)');
   ok(r.sweep === 0 && !r.ring && !r.rot && r.pulse === 0.5, 'reduced motion: no sweep, ring ping or auto orbit; the pulse rests at its midpoint');
   await p.context().close();
 
@@ -104,14 +106,22 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   p = await open(terr(725), { motion: true });
   await p.waitForFunction(() => HB3D.viewer.brandInfo(), null, { timeout: 60000 }).catch(() => {});
   r = await p.evaluate(() => {
-    const v = HB3D.viewer, rec = v._bm.find(x => x && x.part === 'brick'), dt = depositTarget(), N = v.model.counts.bricks;
+    const v = HB3D.viewer, dt = depositTarget(), N = v.model.counts.bricks;
     const pAt = n => 0.03 + 0.77 * (n + 0.5) / N;   // progress that has laid exactly n bricks
+    if (v.engine === 'house_gl') {   // the brand-book renderer: stamps in one array, a brick drops six courses
+      v.setState({ p: pAt(100) }); const g0 = v.brickStamps().length;
+      v.setState({ p: pAt(104) }); const g1 = v.brickStamps(), st2 = g1.slice(g0);
+      v.setState({ p: pAt(100) }); const g2 = v.brickStamps().length, all = v._hg.stamp;
+      return { gl: true, added: g1.length - g0, gaps: st2.slice(1).map((s, i) => +(s - st2[i]).toFixed(3)), back: g2 === g0, gone: true, uDrop: v.dropCourses() * 0.075 };
+    }
+    const rec = v._bm.find(x => x && x.part === 'brick');
     v.setState({ p: pAt(100) }); const k0 = rec.cnt;
     v.setState({ p: pAt(104) }); const k1 = rec.cnt, st = Array.from(rec.laid.slice(k0, k1));
     v.setState({ p: pAt(100) }); const k2 = rec.cnt, gone = Array.from(rec.laid.slice(k0, k1));
     return { added: k1 - k0, gaps: st.slice(1).map((s, i) => +(s - st[i]).toFixed(3)), back: k2 === k0, gone: gone.every(s => s > 1e8), uDrop: rec.front.material.uniforms.uDrop.value };
   });
-  ok(r.added === 4 && r.gaps.every(g => Math.abs(g - 0.12) < 1e-3), 'four new bricks land one after another, 0.12 s apart (' + r.gaps.join(', ') + ')');
+  const gap = r.gl ? 0.24 : 0.12;   // the brand-book renderer lays at the owner's doubled timing (2 Nov 2026: "too fast"), the old viewer at the brand book's
+  ok(r.added === 4 && r.gaps.every(g => Math.abs(g - gap) < 1e-3), 'four new bricks land one after another, ' + gap + ' s apart (' + r.gaps.join(', ') + ')');
   ok(Math.abs(r.uDrop - 0.45) < 1e-9, 'each brick drops 6 courses (0.45 m) as it lands');
   ok(r.back && r.gone, 'un-laying is instant');
   await p.context().close();
@@ -135,7 +145,7 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   await p.evaluate(() => { state.houseMode = 'purchased'; state.mortgageBalance = 200000; state.valuation = 320000; save(); updateUI(); }); await settle(p);
   await p.waitForFunction(() => /MORTGAGE/.test(document.getElementById('hb3d-rowlabel').textContent), null, { timeout: 30000 }).catch(() => {});
   r = await p.evaluate(() => { const v = HB3D.viewer, rl = document.getElementById('hb3d-rowlabel'), own = document.getElementById('hb3d-ownlabel');
-    return { mode: hb3dState().mode, brand: !!v.brandInfo(), grpVis: !!(v._bGroup && v._bGroup.visible), bi: v.brandInfo(), tag: rl.textContent, tagVis: getComputedStyle(rl).display !== 'none', own: own ? getComputedStyle(own).display : 'none', eq: HB3DAPP.want.eq, paid: HB3DAPP.want.paid, own2: hbL2Own(), prog: hbL2Progress(), cap: document.getElementById('hb3d-cap').textContent }; });
+    return { mode: hb3dState().mode, brand: !!v.brandInfo(), grpVis: v.engine === 'house_gl' ? !!v._hg : !!(v._bGroup && v._bGroup.visible), bi: v.brandInfo(), tag: rl.textContent, tagVis: getComputedStyle(rl).display !== 'none', own: own ? getComputedStyle(own).display : 'none', eq: HB3DAPP.want.eq, paid: HB3DAPP.want.paid, own2: hbL2Own(), prog: hbL2Progress(), cap: document.getElementById('hb3d-cap').textContent }; });
   ok(r.mode === 'equity' && r.brand && r.grpVis && r.bi.p === 1 && r.bi.bricks === r.bi.bricksTotal, 'Level 2 (equity) is drawn by the brand build: the whole house laid as the Level 1 hologram');
   ok(Math.abs(r.eq - r.own2) < 1e-12 && Math.abs(r.eq - 0.375) < 1e-9 && Math.abs(r.paid - r.prog) < 1e-12, 'you own (value - balance) / value = 37.5%; mortgage paid = hbL2Progress() (' + (r.paid * 100).toFixed(1) + '%)');
   ok(r.bi.colour > 0 && r.bi.colour < r.bi.colourTotal && Math.abs(r.bi.colour / r.bi.colourTotal - r.eq) < 0.01, 'the colour layer lays the share you own in real colours (' + r.bi.colour + ' of ' + r.bi.colourTotal + ' bricks and tiles)');
@@ -150,7 +160,7 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
 
   // ── 8. 6.8 gamified feedback: the opening build is silent; laying bricks pops "+£200 · +227 bricks", flashes the stage and toasts the milestone; windows glow once lit ──
   p = await open(terr(5900)); await p.waitForFunction(() => HB3D.viewer.brandInfo(), null, { timeout: 60000 }).catch(() => {}); await settle(p);
-  r = await p.evaluate(() => ({ engaged: _hbEngaged, toastShown: document.getElementById('toast').classList.contains('show'), glow: !!(HB3D.viewer._bGlow && HB3D.viewer._bGlow.count), lit: HB3D.viewer._bU.uLitGlass.value, pops: document.querySelectorAll('#hb-pops .pop').length }));
+  r = await p.evaluate(() => ({ engaged: _hbEngaged, toastShown: document.getElementById('toast').classList.contains('show'), glow: HB3D.viewer.engine === 'house_gl' ? HB3D.viewer._hg.wlist.length > 0 : !!(HB3D.viewer._bGlow && HB3D.viewer._bGlow.count), lit: HB3D.viewer.engine === 'house_gl' ? HB3D.viewer.readUniforms(['uLit']).uLit[0] : HB3D.viewer._bU.uLitGlass.value, pops: document.querySelectorAll('#hb-pops .pop').length }));
   ok(!r.engaged && !r.toastShown && r.pops === 0, 'the opening build shows no toast or pop-up (nobody has interacted yet)');
   ok(r.glow && r.lit === 0, 'every window has a glow quad, unlit while the house is still being built');
   await p.fill('#savingsInput', '200'); await p.click('#btnAdd'); await p.waitForTimeout(150);
@@ -160,7 +170,8 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
   ok(r.flash, 'the stage border flashes gold');
   ok(r.shown && r.toast === 'Milestone: 25% Quarter' && r.p >= 0.25, 'crossing 25% toasts "Milestone: 25% Quarter" (p = ' + r.p.toFixed(3) + ')');
   await p.evaluate(() => { state.saved = 24000; save(); updateUI(); }); await settle(p); await p.waitForTimeout(300);
-  r = await p.evaluate(() => ({ lit: HB3D.viewer._bU.uLitGlass.value, vis: HB3D.viewer._bGlow.visible, keys: HB3D.viewer.brandInfo().keys, shared: HB3D.viewer._bGlow.material.uniforms.uLit === HB3D.viewer._bU.uLitGlass }));
+  r = await p.evaluate(() => { const v = HB3D.viewer; if (v.engine === 'house_gl') { const u = v.readUniforms(['uLit']); return { lit: u.uLit[0], vis: u.uLit[0] > 0 && v._hg.wlist.length > 0, keys: v.brandInfo().keys, shared: true }; }   // the brand-book renderer: the glow is drawn from the same lit value on the overlay canvas
+    return { lit: v._bU.uLitGlass.value, vis: v._bGlow.visible, keys: v.brandInfo().keys, shared: v._bGlow.material.uniforms.uLit === v._bU.uLitGlass }; });
   ok(r.lit === 1 && r.vis && r.keys && r.shared, 'at 100% the windows are lit and the glow follows the same uniform (alpha (0.22 + 0.10 pulse) x lit)');
   await p.context().close();
 

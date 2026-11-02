@@ -57,7 +57,7 @@ const fmt = s => `long tasks ${s.longN} (max ${s.longMax.toFixed(0)} ms, blockin
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: full ? 1.25 : 3, isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
     await routeThree(ctx); const p = await ctx.newPage(); p.setDefaultTimeout(180000);
     p.on('pageerror', e => errs.push(e.message));
-    await p.addInitScript(seed(semi)); await p.goto(INDEX); await p.waitForTimeout(1500);
+    await p.addInitScript(seed(semi)); await p.goto(INDEX + '?house=legacy'); await p.waitForTimeout(1500);   // sections 1 to 3 measure the three.js viewer (?house=legacy for one release); the cold load below runs the default, brand-book renderer
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await p.evaluate(() => { showTab('house'); document.getElementById('house-scene').scrollIntoView({ block: 'center' }); });
     await p.waitForFunction(() => window.HB3D && HB3D.viewer && HB3D.viewer.model && HB3D.viewer.brandInfo && HB3D.viewer.brandInfo(), null, { timeout: 90000 });
@@ -170,7 +170,8 @@ const fmt = s => `long tasks ${s.longN} (max ${s.longMax.toFixed(0)} ms, blockin
   let lt = c.longMaxAfter, ltRuns = [lt];
   for (let r = 0; r < (process.env.CI ? 2 : 0) && !(lt < 150 * K); r++) { const again = await coldLoad(); console.log(`[cold, again] ${fmtCold(again)}`); ltRuns.push(again.longMaxAfter); lt = Math.min(lt, again.longMaxAfter); (again.errs || []).forEach(e => errs.push(e)); }
   ok(lt < 150 * K, `cold: once the house is on screen no task over ${(150 * K).toFixed(0)} ms (longest ${lt.toFixed(0)} ms${ltRuns.length > 1 ? ', best of ' + ltRuns.map(x => x.toFixed(0)).join(' / ') : ''})`);
-  ok(c.dprLaying != null && c.dprLaying <= 1.25 + 1e-6 && c.dpr >= 2 - 1e-6, `cold: pixel ratio ${c.dprLaying} while bricks land, ${c.dpr} at rest (3x screen: 1.25 then 2)`);
+  if (c.kind === 'house_gl') ok(c.dprLaying != null && Math.abs(c.dprLaying - 1.5) < 1e-6 && Math.abs(c.dpr - 1.5) < 1e-6, `cold: pixel ratio ${c.dprLaying} while bricks land, ${c.dpr} at rest (brand-book renderer: 1.5 on a phone, as the brand book)`);
+  else ok(c.dprLaying != null && c.dprLaying <= 1.25 + 1e-6 && c.dpr >= 2 - 1e-6, `cold: pixel ratio ${c.dprLaying} while bricks land, ${c.dpr} at rest (3x screen: 1.25 then 2)`);
   const f = await coldLoad({ fresh: true, after: p => p.evaluate(() => ({ lock: getComputedStyle(document.getElementById('house-pro-lock')).display, demo: localStorage.getItem('vi_demo_mode') })) });
   console.log(`[cold fresh device] ${fmtCold(f)}`);
   ok(f.after && f.after.demo === 'true' && f.row > 0 && f.bricks > 0, `fresh device: the demo house is mid-build (row ${f.row}, ${f.bricks} bricks)`);
