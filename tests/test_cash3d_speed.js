@@ -16,7 +16,7 @@ const HOOK = () => {
   try { new PerformanceObserver(l => l.getEntries().forEach(e => T.lt.push([e.startTime, e.duration]))).observe({ entryTypes: ['longtask'] }); } catch (e) {}
   window.__arm = () => {
     const span = (n, f) => { const w = function () { const t = performance.now(), g = T.gl; try { return f.apply(this, arguments); } finally { T.spans.push([n, t, performance.now() - t, T.gl - g]); } }; w._w = 1; return w; };
-    ['renderCashISO', 'renderMetalsISO', 'v3Cash', 'v3Metals'].forEach(n => { if (typeof window[n] === 'function' && !window[n]._w) window[n] = span(n, window[n]); });
+    ['renderCashISO', 'renderMetalsISO', 'v3Cash', 'v3Metals', 'v3CashNow', 'v3MetalsNow'].forEach(n => { if (typeof window[n] === 'function' && !window[n]._w) window[n] = span(n, window[n]); });
     if (!V3Scene.prototype.clear._w) V3Scene.prototype.clear = span('clear', V3Scene.prototype.clear);
     if (!V3Scene._w) { const O = V3Scene; const W = function (h, l) { const t = performance.now(), g = T.gl; O.call(this, h, l); T.spans.push(['V3Scene', t, performance.now() - t, T.gl - g]);
       const r = this.r, rr = r.render.bind(r); r.render = function (s, c) { const t1 = performance.now(), g = T.gl, n0 = r.info.programs ? r.info.programs.length : 0; rr(s, c); T.renders.push([t1, performance.now() - t1, T.gl - g, (r.info.programs ? r.info.programs.length : 0) - n0]); }; if (!r._w) r._w = 1; };
@@ -53,7 +53,7 @@ const HOOK = () => {
   await p.waitForTimeout(5000);
   const o = await p.evaluate(t0 => { const V = V3.cash, T = __T, ours = T.spans.filter(s => s[1] >= t0);
     return { units: V && V.stats && V.stats.units, stacks: V && V.stats && V.stats.fullStacks, builds: ours.filter(s => s[0] === 'clear').length,
-      longest: Math.max(0, ...ours.filter(s => s[0] === 'renderCashISO').map(s => s[2] - s[3])), spans: ours.filter(s => s[0] === 'renderCashISO' || s[0] === 'V3Scene').map(s => s[0] + ' ' + s[2].toFixed(0) + ' (GL ' + s[3].toFixed(0) + ')').join(', '),
+      longest: Math.max(0, ...ours.filter(s => s[0] === 'renderCashISO' || s[0] === 'v3CashNow').map(s => s[2] - s[3])), spans: ours.filter(s => s[0] === 'renderCashISO' || s[0] === 'v3CashNow' || s[0] === 'V3Scene').map(s => s[0] + ' ' + s[2].toFixed(0) + ' (GL ' + s[3].toFixed(0) + ')').join(', '),
       contexts: T.contexts.filter(t => t >= t0).length, shared: !!V3._r && V3.cash && V3.cash.r === V3._r, newPrograms: T.renders.filter(x => x[0] >= t0).reduce((a, x) => a + x[3], 0), firstOwn: T.renders.filter(x => x[0] >= t0).map(x => x[1] - x[2])[0],
       pmrem: T.pmrem, shadows: !!(V && V.r.shadowMap.enabled), programs: V && V.r.info.programs ? V.r.info.programs.length : -1, pbr: !!(V && V.r.info.programs && V.r.info.programs.some(x => /standard|physical/i.test(x.name))),
       firstRender: (T.renders.find(x => x[0] >= t0) || [0, null])[1], dpr: V && V.r.getPixelRatio(), canvas: !!document.querySelector('#cashSceneCard canvas.v3-canvas') }; }, t0);
@@ -78,8 +78,8 @@ const HOOK = () => {
   ok(!eur || (!eur.gold && eur.inner && parseInt(eur.inner.slice(1, 3), 16) - parseInt(eur.inner.slice(5, 7), 16) > 30), 'the euro keeps its silver ring and gold centre (' + (eur && eur.lifted + ' / ' + eur.inner) + ')');
 
   // ── 2. the same data again (a tab switch back, a re-render): no rebuild, just a redraw ──
-  const again = await p.evaluate(() => { const V = V3.cash, kid = V.root.children[0], n = __T.spans.filter(s => s[0] === 'clear').length; renderCashISO(); renderCashISO();
-    return { same: V.root.children[0] === kid, builds: __T.spans.filter(s => s[0] === 'clear').length - n }; });
+  const again = await p.evaluate(() => new Promise(res => { const V = V3.cash, kid = V.root.children[0], n = __T.spans.filter(s => s[0] === 'clear').length; renderCashISO(); renderCashISO();
+    setTimeout(() => res({ same: V.root.children[0] === kid, builds: __T.spans.filter(s => s[0] === 'clear').length - n }), 500); }));
   ok(again.same && again.builds === 0, 'calling it again with the same balance keeps the built scene (' + again.builds + ' rebuilds)');
 
   // ── 3. orbit: main-thread cost of each frame while turning (the GPU's time is read on the owner's phone with ?perf=1) ──
@@ -94,7 +94,7 @@ const HOOK = () => {
   await p.waitForTimeout(3000);
   const m = await p.evaluate(() => { const V = V3.metals, ours = __T.spans.filter(s => s[1] >= window.__tm);
     return { gold: !!(V && V.stats.gold), silver: !!(V && V.stats.silver), shadows: !!(V && V.r.shadowMap.enabled), pmrem: __T.pmrem, builds: ours.filter(s => s[0] === 'clear').length,
-      longest: Math.max(0, ...ours.filter(s => s[0] === 'renderMetalsISO').map(s => s[2] - s[3])), spans: ours.filter(s => s[0] === 'renderMetalsISO').map(s => s[0] + ' ' + s[2].toFixed(0) + ' (GL ' + s[3].toFixed(0) + ')').join(', '), newPrograms: __T.renders.filter(x => x[0] >= window.__tm).reduce((a, x) => a + x[3], 0) }; });
+      longest: Math.max(0, ...ours.filter(s => s[0] === 'renderMetalsISO' || s[0] === 'v3MetalsNow').map(s => s[2] - s[3])), spans: ours.filter(s => s[0] === 'renderMetalsISO' || s[0] === 'v3MetalsNow').map(s => s[0] + ' ' + s[2].toFixed(0) + ' (GL ' + s[3].toFixed(0) + ')').join(', '), newPrograms: __T.renders.filter(x => x[0] >= window.__tm).reduce((a, x) => a + x[3], 0) }; });
   console.log(JSON.stringify(m));
   ok(m.gold && m.silver, 'precious metals draw gold and silver bars');
   ok(!m.shadows && m.pmrem === 0, 'metals: no shadow pass and no reflection map either');

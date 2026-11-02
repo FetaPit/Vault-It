@@ -20472,10 +20472,10 @@ V3Scene.prototype.frame=function(keep){
   this.R=R;var size=Math.ceil(R*7/10)*10,cell=Math.max(5,Math.ceil(size/160/5)*5),div=Math.round(size/cell);   /* owner, 31 Oct: a shorter draw distance, so the scene is lighter; the grid fades out in the fog, no hard edge */
   var g=this.grid=new THREE.GridHelper(size,div,0x44C0B9,0x44C0B9);g.material.transparent=true;g.material.opacity=0.3;g.material.depthWrite=false;g.material.fog=true;g.material.toneMapped=false;g.position.set(c.x,0.01,c.z);this.sc.add(g);
   /* the same floor as Net worth in 3D: a teal glow under the items and a gold-edged plinth round them */
-  if(this.deco){this.sc.remove(this.deco);this.deco.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}});}
+  if(this.deco){this.sc.remove(this.deco);this.deco.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map&&!(o.material.map.userData&&o.material.map.userData.keep))o.material.map.dispose();o.material.dispose();}});}
   var deco=this.deco=new THREE.Group(),pad=Math.max(2,R*0.08),px0=box.min.x-pad,px1=box.max.x+pad,pz0=box.min.z-pad,pz1=box.max.z+pad;
   var gc=document.createElement('canvas');gc.width=gc.height=128;var gx=gc.getContext('2d'),rg=gx.createRadialGradient(64,64,0,64,64,64);rg.addColorStop(0,'rgba(68,192,185,.22)');rg.addColorStop(1,'rgba(68,192,185,0)');gx.fillStyle=rg;gx.fillRect(0,0,128,128);
-  var glow=new THREE.Mesh(new THREE.PlaneBufferGeometry(R*3.2,R*3.2),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false,fog:false,toneMapped:false}));glow.rotation.x=-Math.PI/2;glow.position.set(c.x,0.004,c.z);deco.add(glow);
+  var glow=new THREE.Mesh(new THREE.PlaneBufferGeometry(R*3.2,R*3.2),new THREE.MeshBasicMaterial({map:V3_KEEP._glow||(V3_KEEP._glow=(function(t){t.userData={keep:true};return t;})(new THREE.CanvasTexture(gc))),transparent:true,depthWrite:false,fog:false,toneMapped:false}));glow.rotation.x=-Math.PI/2;glow.position.set(c.x,0.004,c.z);deco.add(glow);
   var fill=new THREE.Mesh(new THREE.PlaneBufferGeometry(px1-px0,pz1-pz0),new THREE.MeshBasicMaterial({color:0x0b2a2c,transparent:true,opacity:0.55,depthWrite:false,toneMapped:false}));fill.rotation.x=-Math.PI/2;fill.position.set((px0+px1)/2,0.008,(pz0+pz1)/2);deco.add(fill);
   var edge=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(px0,0.02,pz0),new THREE.Vector3(px1,0.02,pz0),new THREE.Vector3(px1,0.02,pz1),new THREE.Vector3(px0,0.02,pz1)]),new THREE.LineBasicMaterial({color:0xE8C56A,transparent:true,opacity:0.95,toneMapped:false}));deco.add(edge);
   this.sc.add(deco);
@@ -20551,15 +20551,13 @@ function v3Host(sceneEl,svgId){
   var h=sceneEl.querySelector('.v3-host');if(!h){h=document.createElement('div');h.className='v3-host';sceneEl.insertBefore(h,sceneEl.firstChild);}
   if(svg)svg.style.display='none';sceneEl.classList.add('v3-on');return h;
 }
-function v3Cash(){
-  if(!v3Ok())return false;
-  var card=document.getElementById('cashSceneCard'),scene=card&&card.querySelector('.scene');if(!scene)return false;
-  var host=v3Host(scene,'cashSvg');if(!host.clientWidth)return true;   // tab hidden: drawn when shown
-  var V=V3.cash||(V3.cash=new V3Scene(host,'3D view of your cash as coins'));
-  var cur=(window.VI_CURRENCY||(typeof viSettings!=='undefined'&&viSettings.currency)||'GBP').toUpperCase(),spec=V3_COINS[cur]||V3_COINS.GBP;
-  var units=Math.max(0,Math.floor(alTotalCash()*(window.VI_CURRENCY_RATE||1)));
-  var key=cur+'|'+units+'|'+(window.VI_CURRENCY_SYMBOL||'£');if(V._key===key&&V.root.children.length){V.kick(300);return true;}   // the same balance again (the tab and its sub-tab both ask on one tap): redraw, do not rebuild
-  V.clear();V._key=key;
+/* the cash and metals content as a ready group, keyed by the data it shows: built at the tap, or ahead of it in the idle warm-up (CI, 2 Nov:
+   the metals open ran 117 to 175 ms of our own JavaScript on the slower runner; now the tap attaches a built group and frames it) */
+function v3CashKey(){var cur=(window.VI_CURRENCY||(typeof viSettings!=='undefined'&&viSettings.currency)||'GBP').toUpperCase(),spec=V3_COINS[cur]||V3_COINS.GBP,units=Math.max(0,Math.floor(alTotalCash()*(window.VI_CURRENCY_RATE||1)));
+  return {cur:cur,spec:spec,units:units,key:cur+'|'+units+'|'+(window.VI_CURRENCY_SYMBOL||'£')};}
+function v3MetalsKey(){return JSON.stringify([alState.metals,alState.metalPrices,window.VI_CURRENCY_RATE||1,window.VI_CURRENCY_SYMBOL||'£']);}
+function v3Pre(name,key){var p=V3._pre&&V3._pre[name];if(p&&p.key===key){V3._pre[name]=null;return p;}return null;}
+function v3CashContent(spec,units,cur){var G=new THREE.Group();
   var STACK=10,PER_BLOCK=1000,pitch=spec.d+0.12,blockW=pitch*10,gap=spec.d*2.2;
   var blocks=Math.ceil(units/PER_BLOCK),cols=Math.max(1,Math.ceil(Math.sqrt(blocks||1)));
   var fullStacks=Math.floor(units/STACK),rest=units%STACK;
@@ -20567,18 +20565,33 @@ function v3Cash(){
   var m4=new THREE.Matrix4();
   if(fullStacks>0&&fullStacks<=20000){
     var st=v3Stack(spec,STACK),im=new THREE.InstancedMesh(st.geo,st.mats,fullStacks);im.castShadow=im.receiveShadow=true;
-    for(var i=0;i<fullStacks;i++){var p=pos(i);m4.makeTranslation(p[0],spec.t*STACK/2,p[1]);im.setMatrixAt(i,m4);}V.root.add(im);
+    for(var i=0;i<fullStacks;i++){var p=pos(i);m4.makeTranslation(p[0],spec.t*STACK/2,p[1]);im.setMatrixAt(i,m4);}G.add(im);
   }else if(fullStacks>20000){   // very large balances: each full block of 1,000 drawn as one solid block of stacks
     var fb=Math.floor(fullStacks/100),bk=v3Keep('block|'+spec.name+'|'+blockW,function(){var tx=v3CoinEdge(spec,STACK);tx.repeat.x=10;return {geo:new THREE.BoxBufferGeometry(blockW-0.12,spec.t*STACK,blockW-0.12),mats:[v3Shade({map:tx})]};}),bi=new THREE.InstancedMesh(bk.geo,bk.mats[0],fb);bi.castShadow=bi.receiveShadow=true;
-    for(var j=0;j<fb;j++){var q=pos(j*100);m4.makeTranslation(q[0]+blockW/2-pitch/2,spec.t*STACK/2,q[1]+blockW/2-pitch/2);bi.setMatrixAt(j,m4);}V.root.add(bi);
-    var left=fullStacks-fb*100;if(left>0){var st2=v3Stack(spec,STACK),im2=new THREE.InstancedMesh(st2.geo,st2.mats,left);im2.castShadow=true;for(var k=0;k<left;k++){var r2=pos(fb*100+k);m4.makeTranslation(r2[0],spec.t*STACK/2,r2[1]);im2.setMatrixAt(k,m4);}V.root.add(im2);}
+    for(var j=0;j<fb;j++){var q=pos(j*100);m4.makeTranslation(q[0]+blockW/2-pitch/2,spec.t*STACK/2,q[1]+blockW/2-pitch/2);bi.setMatrixAt(j,m4);}G.add(bi);
+    var left=fullStacks-fb*100;if(left>0){var st2=v3Stack(spec,STACK),im2=new THREE.InstancedMesh(st2.geo,st2.mats,left);im2.castShadow=true;for(var k=0;k<left;k++){var r2=pos(fb*100+k);m4.makeTranslation(r2[0],spec.t*STACK/2,r2[1]);im2.setMatrixAt(k,m4);}G.add(im2);}
   }
-  if(rest>0){var ps=v3Stack(spec,rest),pm=new THREE.Mesh(ps.geo,ps.mats),pp=pos(fullStacks);pm.position.set(pp[0],spec.t*rest/2,pp[1]);pm.castShadow=pm.receiveShadow=true;V.root.add(pm);}
+  if(rest>0){var ps=v3Stack(spec,rest),pm=new THREE.Mesh(ps.geo,ps.mats),pp=pos(fullStacks);pm.position.set(pp[0],spec.t*rest/2,pp[1]);pm.castShadow=pm.receiveShadow=true;G.add(pm);}
   var sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
   var full=Math.floor(units/PER_BLOCK),part=units%PER_BLOCK;
   if(units>0){var lb=v3Label('Cash · '+spec.name+' coins',sym+fmt(units),(full?full+' block'+(full>1?'s':'')+' of 1,000':'')+(full&&part?' + ':'')+(part?fmt(part)+' coins':''),Math.max(9,Math.min(60,blockW*(cols>1?1.4:0.9))));
-    var bb=new THREE.Box3().setFromObject(V.root),cc=bb.getCenter(new THREE.Vector3());v3Plant(lb,bb.min.x-lb.tag.scale.x*0.05,bb.max.y+lb.tag.scale.y*0.5+1,cc.z);V.root.add(lb);}
-  V.stats={units:units,cur:cur,coin:spec.name,fullStacks:fullStacks,rest:rest,fullBlocks:Math.floor(units/PER_BLOCK),stackHeight:spec.t*STACK};
+    var bb=new THREE.Box3().setFromObject(G),cc=bb.getCenter(new THREE.Vector3());v3Plant(lb,bb.min.x-lb.tag.scale.x*0.05,bb.max.y+lb.tag.scale.y*0.5+1,cc.z);G.add(lb);}
+  return {key:cur+'|'+units+'|'+(window.VI_CURRENCY_SYMBOL||'£'),grp:G,stats:{units:units,cur:cur,coin:spec.name,fullStacks:fullStacks,rest:rest,fullBlocks:Math.floor(units/PER_BLOCK),stackHeight:spec.t*STACK}};
+}
+function v3Cash(){
+  if(!v3Ok()||(V3._flat&&V3._flat.cash))return false;
+  var card=document.getElementById('cashSceneCard'),scene=card&&card.querySelector('.scene');if(!scene)return false;
+  v3Host(scene,'cashSvg');v3After('cash',v3CashNow,function(){var sv=document.getElementById('cashSvg');if(sv)sv.style.display='';renderCashISO();});return true;
+}
+function v3CashNow(){
+  if(!v3Ok())return false;
+  var card=document.getElementById('cashSceneCard'),scene=card&&card.querySelector('.scene');if(!scene)return false;
+  var host=v3Host(scene,'cashSvg');if(!host.clientWidth)return true;   // tab hidden: drawn when shown
+  var V=V3.cash||(V3.cash=new V3Scene(host,'3D view of your cash as coins'));
+  var K=v3CashKey(),cur=K.cur,spec=K.spec,units=K.units,key=K.key;if(V._key===key&&V.root.children.length){V.kick(300);return true;}   // the same balance again (the tab and its sub-tab both ask on one tap): redraw, do not rebuild
+  V.clear();V._key=key;
+  var C=v3Pre('cash',key)||v3CashContent(spec,units,cur);V.root.add(C.grp);V.stats=C.stats;   // built in the idle warm-up when the balance has not changed since
+  var PER_BLOCK=1000,sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
   V.frame(V3._cashUnits===units&&V3._cashCur===cur);V3._cashUnits=units;V3._cashCur=cur;
   var cap=document.getElementById('cashCap');if(cap)cap.textContent=units?sym+fmt(units)+' = '+fmt(units)+' '+spec.name+' coins ('+spec.d*10+' mm across, '+(spec.t*10).toFixed(1)+' mm thick) · '+Math.floor(units/PER_BLOCK)+' full block'+(Math.floor(units/PER_BLOCK)===1?'':'s')+' of 1,000'+(units%PER_BLOCK?' + '+fmt(units%PER_BLOCK)+' coins':''):'No cash yet. Add an account or some physical cash.';
   return true;
@@ -20597,14 +20610,8 @@ function v3BarMake(w,d,h,metal,fmt){
   var top=v3Shade({map:tx}),side=v3Shade({color:v3Col(metal.col)});   // baked studio shading (v3Matcap), no reflection map
   return {geo:geo,mats:[top,side]};
 }
-function v3Metals(){
-  if(!v3Ok())return false;
-  var scene=document.getElementById('metals-scene');if(!scene)return false;
-  var host=v3Host(scene,'metalsSvg');window._v3MetalsOn=true;if(!host.clientWidth)return true;
-  var V=V3.metals||(V3.metals=new V3Scene(host,'3D view of your precious metals as bars'));
-  var mkey=JSON.stringify([alState.metals,alState.metalPrices,window.VI_CURRENCY_RATE||1,window.VI_CURRENCY_SYMBOL||'£']);if(V._key===mkey&&V.root.children.length){V.kick(300);return true;}   // same holdings and prices: redraw, do not rebuild
-  V.clear();V._key=mkey;V.stats={};
-  var sym=window.VI_CURRENCY_SYMBOL||'£',rate=window.VI_CURRENCY_RATE||1,x0=0,parts=[],m4=new THREE.Matrix4();
+function v3MetalsContent(key){
+  var G=new THREE.Group(),stats={},sym=window.VI_CURRENCY_SYMBOL||'£',rate=window.VI_CURRENCY_RATE||1,x0=0,parts=[],m4=new THREE.Matrix4();
   ['gold','silver','platinum','palladium'].forEach(function(k){
     var oz=+(alState.metals[k]||0);if(!(oz>0))return;var M=V3_METALS[k],grams=oz*OZ_G,left=grams,zone=new THREE.Group(),z=0,zw=0;
     V3_BARS.forEach(function(B,bi){
@@ -20618,12 +20625,31 @@ function v3Metals(){
         zone.add(im);zw=Math.max(zw,perRow*(B.w+1));z+=Math.ceil(Math.ceil(n/B.pile)/perRow)*(B.d+1)+1;}
       if(frac){var fh=Math.max(0.03,h*frac),fb=v3Bar(B.w,B.d,fh,M,(left).toFixed(1)+' g'),fm=new THREE.Mesh(fb.geo,fb.mats);fm.position.set(B.w/2,0,z+B.d/2);fm.castShadow=fm.receiveShadow=true;zone.add(fm);zw=Math.max(zw,B.w+1);z+=B.d+2;}
     });
-    V.stats=V.stats||{};V.stats[k]=zone.userData.bars;
+    stats[k]=zone.userData.bars;
     var value=oz*(alState.metalPrices[k]||0);
     var lb=v3Label(M.label+' · '+oz.toFixed(2)+' oz',sym+Math.round(value*rate).toLocaleString('en-GB'),'at '+sym+Math.round((alState.metalPrices[k]||0)*rate).toLocaleString('en-GB')+' an ounce',Math.max(12,zw*0.9));
     v3Plant(lb,zw/2,Math.max(6,z*0.25)+3,-2);zone.add(lb);
-    zone.position.x=x0;V.root.add(zone);parts.push(oz.toFixed(2)+' oz '+M.label.toLowerCase()+' ('+(grams>=1000?(grams/1000).toFixed(2)+' kg':Math.round(grams)+' g')+')');x0+=zw+8;
+    zone.position.x=x0;G.add(zone);parts.push(oz.toFixed(2)+' oz '+M.label.toLowerCase()+' ('+(grams>=1000?(grams/1000).toFixed(2)+' kg':Math.round(grams)+' g')+')');x0+=zw+8;
   });
+  return {key:key,grp:G,stats:stats,parts:parts};
+}
+/* build a stage just after the browser has laid out and painted the tab that holds it (CI, 2 Nov: reading the stage size straight after the
+   tab switch made the browser lay out the whole page inside our code, 2 to 170 ms on the slow runner); errors fall back to the flat picture */
+function v3After(name,now,flat){V3._after=V3._after||{};if(V3._after[name])return;V3._after[name]=1;
+  requestAnimationFrame(function(){setTimeout(function(){V3._after[name]=0;try{if(!now()){V3._flat=V3._flat||{};V3._flat[name]=1;flat();}}catch(e){console.error('[Vault-It] 3D '+name,e);V3._flat=V3._flat||{};V3._flat[name]=1;flat();}},0);});}
+function v3Metals(){
+  if(!v3Ok()||(V3._flat&&V3._flat.metals))return false;
+  var scene=document.getElementById('metals-scene');if(!scene)return false;
+  v3Host(scene,'metalsSvg');window._v3MetalsOn=true;v3After('metals',v3MetalsNow,function(){var sv=document.getElementById('metalsSvg');if(sv)sv.style.display='';renderMetalsISO();});return true;
+}
+function v3MetalsNow(){
+  if(!v3Ok())return false;
+  var scene=document.getElementById('metals-scene');if(!scene)return false;
+  var host=v3Host(scene,'metalsSvg');window._v3MetalsOn=true;if(!host.clientWidth)return true;
+  var V=V3.metals||(V3.metals=new V3Scene(host,'3D view of your precious metals as bars'));
+  var mkey=v3MetalsKey();if(V._key===mkey&&V.root.children.length){V.kick(300);return true;}   // same holdings and prices: redraw, do not rebuild
+  V.clear();V._key=mkey;
+  var C=v3Pre('metals',mkey)||v3MetalsContent(mkey),parts=C.parts;V.root.add(C.grp);V.stats=C.stats;   // built in the idle warm-up when nothing changed since
   V.frame(V3._metalsKey===JSON.stringify(alState.metals));V3._metalsKey=JSON.stringify(alState.metals);
   var cap=document.getElementById('metalsCap');if(cap)cap.textContent=parts.length?parts.join(' · ')+' · real bar sizes from each metal\'s weight · value at the live price':'No metals yet. Add your holdings below.';
   return true;
@@ -20636,6 +20662,8 @@ function v3Metals(){
 function v3Warm(){
   if(V3._warm||V3.cash||V3.metals||!window.THREE||!THREE.OrbitControls||!viGlOk())return;V3._warm=1;
   var idle=function(f){if(window.requestIdleCallback)requestIdleCallback(f,{timeout:4000});else setTimeout(f,200);};
+  var pre=[function(){var K=v3CashKey();if(K.units>0){V3._pre=V3._pre||{};var c=v3CashContent(K.spec,K.units,K.cur);V3._pre.cash=c;}},
+    function(){var mk=v3MetalsKey();V3._pre=V3._pre||{};V3._pre.metals=v3MetalsContent(mk);}];
   var W=null,objs=[],bars=[],k=0,busy=function(){return V3.cash||V3.metals;};   // a stage opened meanwhile: stop (it compiles what it needs itself)
   var done=function(){if(W){W.dead=true;try{if(W.ro)W.ro.disconnect();if(W.io)W.io.disconnect();W.ctl.dispose();}catch(e){}W=null;}if(V3._r)V3._r._v3on=null;[V3.cash,V3.metals].forEach(function(v){if(v){v._w=0;v.kick(300);}});V3._warmed=true;};   // a stage that opened meanwhile takes the canvas back at its own size   // the warm-up stage is dropped, not disposed: disposing its materials would make three.js delete the very shaders it compiled
   var step=function(){
@@ -20656,6 +20684,7 @@ function v3Warm(){
             if(n)bars.push(function(){v3Bar(B2.w,B2.d,h2,M2,B2.name);});if(frac)bars.push(function(){v3Bar(B2.w,B2.d,Math.max(0.03,h2*frac),M2,(lf).toFixed(1)+' g');});});});}catch(e){}
         k=2;return idle(step);}
       if(bars.length){bars.shift()();return idle(step);}   // one bar shape per idle slice
+      if(pre.length){pre.shift()();return idle(step);}   // then the cash and metals content for the data as it is now, one per idle slice
       if(k-2<objs.length){   // one object's shaders per idle slice
         var tgt=objs[k-2],vis=[],fc=tgt.frustumCulled;W.sc.traverse(function(o){if(o.material){vis.push([o,o.visible]);o.visible=(o===tgt);}});tgt.frustumCulled=false;   // drawn whatever the warm-up camera sees
         var p=tgt;while(p){p.visible=true;p=p.parent;}
