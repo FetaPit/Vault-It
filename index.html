@@ -14815,6 +14815,7 @@ document.getElementById('priceInput').addEventListener('keydown',e=>{if(e.key===
 function hbBrickLineUpdate(){
   var el=document.getElementById('hb-brick-line'),inp=document.getElementById('savingsInput');if(!el||!inp)return;
   var v=parseFloat(inp.value),bi=state.houseMode==='purchased'?null:hbBrickInfo();
+  if(v>0&&!bi&&state.houseMode!=='purchased')window._hbHudWait=true;   // typed before the house model landed: hb3dModel fills the line in when it does
   if(!(v>0)||!bi||!(bi.perBrick>0)){el.textContent='';return;}
   var rate=window.VI_CURRENCY_RATE||1,sym=window.VI_CURRENCY_SYMBOL||'£',n=Math.floor(v/rate/bi.perBrick+1e-9);
   el.textContent=sym+v.toLocaleString('en-GB',{maximumFractionDigits:2})+' lays '+n.toLocaleString('en-GB')+(n===1?' brick':' bricks');
@@ -15090,7 +15091,7 @@ function hbRenderHUD(){
   var _bi=hbBrickInfo(),brickTotal=_bi?_bi.total:0,perBrick=_bi?_bi.perBrick:0;
   // the model can finish building on another path (the viewer) without this panel hearing about it: until the count is
   // known, look again every half second for up to 15 s, so it never stays on "Counting bricks…" (owner, 31 Oct: house builder)
-  clearTimeout(window._hbHudRetry);
+  clearTimeout(window._hbHudRetry); window._hbHudWait=!_bi;   // hb3dModel re-renders this panel the moment a model lands, however late (the retries below are only a backstop)
   if(_bi)window._hbHudTries=0;else if((window._hbHudTries=(window._hbHudTries||0)+1)<=30)window._hbHudRetry=setTimeout(function(){try{hbRenderHUD();hbWriteStats();}catch(e){}},500);
   var _pb=document.getElementById('hb-plan-brick');if(_pb)_pb.textContent=_bi?'Each brick is worth about '+(window.VI_CURRENCY_SYMBOL||'£')+(perBrick*(window.VI_CURRENCY_RATE||1)).toFixed(2)+' of your deposit.':'';
   var _bLaid=_bi?Math.min(brickTotal,(hbBrandModel(_bi.model)?HB3D.brandStats(_bi.model,_isPro()?p:0.04):_bi.model.stats(_isPro()?p:0.04)).bricksLaid):0,_sym=window.VI_CURRENCY_SYMBOL||'£',_rate=window.VI_CURRENCY_RATE||1;
@@ -15699,6 +15700,7 @@ function hb3dModel(type, floor) {
     m = HB3D.build(type, { floor: floor, detail: hb3dDetail() });
     if (_pt) VIPERF.phase('build', performance.now() - _pt);
     HB3DAPP.models[k] = m; HB3DAPP.order.push(k);
+    if (window._hbHudWait) { window._hbHudWait = false; setTimeout(function () { try { hbRenderHUD(); hbWriteStats(); hbBrickLineUpdate(); } catch (e) {} }, 0); }   // Level 1 card was on "Counting bricks…"
     while (HB3DAPP.order.length > 4) { var old = HB3DAPP.order.shift(); if (old !== HB3DAPP.key) delete HB3DAPP.models[old]; else HB3DAPP.order.push(old); if (HB3DAPP.order.length <= 4) break; }
   }
   return m;
@@ -15894,9 +15896,10 @@ function hb3dPlaceOverlays() {
     var what = m.focus ? (sm.mode === 'build' ? 'your floor · ' + st.stage + ' · ' : 'your floor · ') : (sm.mode === 'build' ? st.stage + ' · ' : '');
     var bInf0 = bri && v.brandInfo ? v.brandInfo() : null;
     if (bInf0 && (sm.mode === 'equity' || sm.mode === 'complete')) st = { bricksLaid: bInf0.colour, bricksTotal: bInf0.colourTotal, tilesTotal: 0, tilesLaid: 0 };   // Level 2: the bricks in full colour are yours
-    var capT = sm.mode === 'site' ? '' : (name + ' · ' + what + st.bricksLaid.toLocaleString('en-GB') + ' / ' + st.bricksTotal.toLocaleString('en-GB') + (sm.mode === 'equity' || sm.mode === 'complete' ? ' bricks and tiles yours' : ' bricks') + (st.tilesTotal && !bri ? ' · ' + st.tilesLaid.toLocaleString('en-GB') + ' tiles' : '')
+    var capStale = !!HB3DAPP.key && HB3DAPP.key.split('|')[0] !== (sm.type === 'custom' ? 'custom' : hb3dType(sm.type));   // the viewer still holds the previous house: never name it under the new selection
+    var capT = (sm.mode === 'site' || capStale) ? '' : (name + ' · ' + what + st.bricksLaid.toLocaleString('en-GB') + ' / ' + st.bricksTotal.toLocaleString('en-GB') + (sm.mode === 'equity' || sm.mode === 'complete' ? ' bricks and tiles yours' : ' bricks') + (st.tilesTotal && !bri ? ' · ' + st.tilesLaid.toLocaleString('en-GB') + ' tiles' : '')
       + (bri && sm.mode === 'build' ? ' · ' + (window.VI_CURRENCY_SYMBOL || '£') + (HB3D.brandBrickValue(depositTarget(), st.bricksTotal) * (window.VI_CURRENCY_RATE || 1)).toFixed(2) + ' a brick' : ''));
-    var bInf = bri && v.brandInfo ? v.brandInfo() : null; if (bInf && (bInf.reduced || bInf.lite)) capT += bInf.reduced ? ' · animations off: reduced motion is on in your device settings' : ' · lighter animation for this device';
+    var bInf = bri && v.brandInfo ? v.brandInfo() : null; if (capT && bInf && (bInf.reduced || bInf.lite)) capT += bInf.reduced ? ' · animations off: reduced motion is on in your device settings' : ' · lighter animation for this device';
     hbTxt(cap, capT);
     hbAttr(v.renderer.domElement, 'aria-label', '3D model: ' + (m.name || 'house') + (sm.mode === 'equity' ? ', mortgage ' + Math.round(sm.eq * 100) + '% paid' : sm.mode === 'build' ? ', ' + Math.round(p * 100) + '% built' : ''));
   }
