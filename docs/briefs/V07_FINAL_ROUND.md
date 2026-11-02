@@ -79,3 +79,7 @@ Round 2 (owner, 2 Nov ~12:58, layout and alignment):
 
 New stream C2: session_01KoffvxMhJw3izHA4HWe2G9, branch v07/ui-round2. Round 3 to follow.
 9. (owner, 13:03) House tab: merge the Level 1 card's stats and the separate PROGRESS tile, which duplicate the bar, the bricks figures and the milestones (under different names), into one illustrative tile with an icon for each statistic. Fix the empty right column at tablet width; the tile may span the full width. The 3D house viewport is untouched. Stream B2.
+10. (owner, ~13:08) The Feedback chat button stays bottom right on every tab and at every width (it currently moves between bottom left and bottom right). Stream C2.
+11. (owner, ~13:08) The fixed footer collapses once the user stops scrolling, reveals on scroll up and shows in full at the page end. "Not regulated by the FCA. Not financial advice." stays reachable at all times. Stream C2.
+
+**Retarget (owner, ~13:08): "this new round will contribute to alpha 0.8."** All of part 3 (rounds 1 and 2, items 1 to 11) merges into the new integration branch candidate/v0.8 (created from candidate/v0.7 76be8ec). candidate/v0.7 is frozen at 76be8ec, the build already sent to the owner for v0.7 sign-off. Pedro (creative director) is back for this round: session_01KoffvzkHusFTYdns2swwPx (branch v08/pedro) writes docs/briefs/V08_PEDRO_UI_SPEC.md and gives each stream's pushes a PASS or a fix list from shots at 390, ~690, 1100 and 1440 px in Night and Daylight.
