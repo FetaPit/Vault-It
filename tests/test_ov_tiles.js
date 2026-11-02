@@ -78,9 +78,9 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#trial-banner,#tester-welcome{display:none!important}' });
     let r = await p.evaluate(() => { nw3d.setMain('graph'); drawChart();
       const cv = document.getElementById('nwChart'), h = document.getElementById('nw-zoom-hint'), cb = cv.getBoundingClientRect(), hb = h.getBoundingClientRect();
-      return { inside: hb.bottom > cb.top && hb.top < cb.bottom, below: hb.top >= cb.bottom - 0.5, fs: getComputedStyle(h).fontSize, shown: h.offsetParent !== null };
+      const ax = cb.top + cv._axisBottom; return { inside: hb.top < ax, gap: hb.top - ax, below: hb.top >= ax, fs: getComputedStyle(h).fontSize, shown: h.offsetParent !== null };
     });
-    ok(r.shown && !r.inside && r.below && r.fs === '10.5px', T + 'the zoom hint is on its own row under the graph, not on the plot (' + r.fs + ')');
+    ok(r.shown && !r.inside && r.below && r.gap >= 2 && r.gap <= 8 && r.fs === '10.5px', T + 'the zoom hint is on its own row just under the month labels, not on the plot (' + r.gap.toFixed(1) + ' px gap, ' + r.fs + ')');
     ok(await p.evaluate(() => { nw3d.setMain('3d'); const v = document.getElementById('nw-zoom-hint').offsetParent === null; nw3d.setMain('graph'); return v; }), T + 'the hint leaves with the graph in the 3D view');
     // goal labels: the seeded goals, then two goals 1% apart (their lines a few px apart)
     const labs = (extra) => p.evaluate((extra) => { if (extra) { ovState.customGoals = (ovState.customGoals || []).concat(extra); } drawChart();
@@ -95,7 +95,7 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     // the plate is dark (#080808 at .72) in both themes: sample a pixel inside a plate, away from the text
     r = await p.evaluate(() => { const cv = document.getElementById('nwChart'), l = cv._msLabels[0], dpr = cv.width / cv.clientWidth;
       const d = cv.getContext('2d').getImageData(Math.round((l.x + 1) * dpr), Math.round((l.y + 1) * dpr), 1, 1).data; return [d[0], d[1], d[2]]; });
-    ok(r.every(v => v < 90), T + 'labels sit on a dark plate (pixel ' + r.join(',') + ')');
+    ok(theme === 'dark' ? r.every(v => v < 90) : r.every(v => v > 150), T + (theme === 'dark' ? 'Night: labels sit on a dark plate' : 'Daylight: labels sit on a light card-coloured plate, not a black box') + ' (pixel ' + r.join(',') + ')');
     r = await p.evaluate(() => document.getElementById('ov-nwh-card').textContent);
     ok(/Net Worth History/.test(r) && !/\p{Extended_Pictographic}/u.test(r), T + 'the Net Worth History heading has no emoji');
     ok(await p.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 1, T + 'no sideways scroll');
