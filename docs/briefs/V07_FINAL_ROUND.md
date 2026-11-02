@@ -78,3 +78,4 @@ Round 2 (owner, 2 Nov ~12:58, layout and alignment):
 8. E8 pulled forward from v0.7.1: Budget 3D tree map outlines in each group's colour (dark red ring around committed essentials) with flag-post labels, per Pedro's spec in V07_PREVIEW_EDITS.md. The owner had asked for this before; it was deferred to v0.7.1 and that was not made clear to him. Stream A2, after the coin viewport.
 
 New stream C2: session_01KoffvxMhJw3izHA4HWe2G9, branch v07/ui-round2. Round 3 to follow.
+9. (owner, 13:03) House tab: merge the Level 1 card's stats and the separate PROGRESS tile, which duplicate the bar, the bricks figures and the milestones (under different names), into one illustrative tile with an icon for each statistic. Fix the empty right column at tablet width; the tile may span the full width. The 3D house viewport is untouched. Stream B2.
