@@ -14,11 +14,21 @@ var GROUPS=[['all','All'],['assets','Assets'],['collectibles','Collectibles'],['
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function listFor(kind){return kind==='liab'?alState.liabilities:alState.otherAssets;}
 function itemFor(kind,id){return (listFor(kind)||[]).find(function(x){return x.id===id;});}
-function safeUrl(u){return /^models\/[\w\-\/.]+$/.test(u||'')?u:'';} // only ever load our own bundled files
+// Where model files live. Set window.VAULT_MODEL_BASE before this script (index.html) to move hosts.
+// Only the bundled folder or our own assets domain is accepted, so a tampered catalogue can't point elsewhere.
+var BASE=(function(){
+  var b=String(window.VAULT_MODEL_BASE||'models/');if(b.slice(-1)!=='/')b+='/';
+  return /^(models\/|https:\/\/assets\.ptlive\.design\/[\w\-\/]*\/)$/.test(b)?b:'models/';
+})();
+// Catalogue paths are relative to BASE (e.g. glb/gold-bar-1a2b3c4d5e.glb). Anything else resolves to ''.
+function safeUrl(rel){
+  rel=String(rel||'').replace(/^models\//,'');
+  return /^[\w\-]+(\/[\w\-.]+)+$/.test(rel)&&rel.indexOf('..')<0?BASE+rel:'';
+}
 
 function loadCatalog(){
   if(catalogP)return catalogP;
-  catalogP=fetch('models/catalog.json',{cache:'no-cache'}).then(function(r){
+  catalogP=fetch(BASE+'catalog.json',{cache:'no-cache'}).then(function(r){
     if(!r.ok)throw new Error('catalogue '+r.status);return r.json();
   }).then(function(c){catalog=(c&&c.models)||[];return catalog;}).catch(function(e){catalogP=null;throw e;});
   return catalogP;
@@ -102,7 +112,7 @@ window.m3dPick=function(kind,id){
     var b=e.target.closest('.m3d-card');if(!b||!grid._rows)return;
     var c=grid._rows[+b.dataset.i];if(!c||!safeUrl(c.file))return;
     item.model3d={id:c.id,file:c.file,thumb:c.thumb,title:c.title,creator:c.creator,licence:c.licence,source:c.source};
-    if(!item.image&&!item.svgIcon&&safeUrl(c.thumb))item.image=c.thumb; // thumbnail doubles as the tile picture
+    if(!item.image&&!item.svgIcon&&safeUrl(c.thumb))item.image=safeUrl(c.thumb); // thumbnail doubles as the tile picture
     saveAL();renderAlTab();m._close();
     if(typeof showToast==='function')showToast('3D model attached: '+c.title);
   };
@@ -163,7 +173,7 @@ window.m3dView=function(kind,id){
 
 window.m3dClear=function(kind,id){
   var item=itemFor(kind,id);if(!item)return;
-  if(item.image&&item.model3d&&item.image===item.model3d.thumb)item.image=null;
+  if(item.image&&item.model3d&&item.image===safeUrl(item.model3d.thumb))item.image=null;
   delete item.model3d;saveAL();renderAlTab();
 };
 })();

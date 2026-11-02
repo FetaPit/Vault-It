@@ -20,10 +20,13 @@ Open `vault-it-brand-book.html` in a browser first. It is the visual and behavio
 
 Each inventory tile and liability tile has a 🧊 button to attach an open-licence 3D model, then **View in 3D** to orbit it.
 
-Models are fetched once at build time (not scraped, no API key in the browser):
+Models are fetched at build time from Poly Pizza (CC0 and CC-BY only, under 20k triangles), compressed, and named by content hash so they can be cached forever. No API key reaches the browser.
 
 ```bash
 POLY_PIZZA_KEY=your_key node tools/fetch-models.mjs   # key: https://poly.pizza/settings/api
+tools/upload-models.sh                                # to R2: ptlive-assets/vault-it/models
 ```
 
-This writes `models/glb/`, `models/thumb/`, `models/catalog.json` and `models/CREDITS.md` (CC0 and CC-BY only, under 20k triangles). Commit the output. Serve the app over http(s), not `file://`, so the catalogue can load. Keep `models/CREDITS.md` published: CC-BY requires attribution.
+Hosting: Cloudflare R2 behind `assets.ptlive.design`. To switch the app over, set `window.VAULT_MODEL_BASE` in `index.html` to `https://assets.ptlive.design/vault-it/models/`. Until then it reads the local `models/` folder (serve over http(s), not `file://`). The picker only accepts those two bases.
+
+Keep `models/CREDITS.md` published: CC-BY requires attribution.

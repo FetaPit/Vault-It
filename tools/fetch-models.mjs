@@ -4,10 +4,16 @@
 // stores them in /models and writes models/catalog.json for the app to read.
 // The API key never ships to the browser: run this locally, commit the output.
 //
-//   POLY_PIZZA_KEY=xxxx node tools/fetch-models.mjs [--per-query 3] [--max-tris 20000] [--dry]
+//   POLY_PIZZA_KEY=xxxx node tools/fetch-models.mjs [--per-query 3] [--max-tris 20000] [--no-compress] [--dry]
+//
+// Files are named <slug>-<sha1 of content>.glb so they can be cached forever (immutable).
+// Catalogue paths are relative to the hosting base (models/ locally, R2 in production).
+// Compression uses gltf-transform (Draco + WebP textures) via npx; skip with --no-compress.
 //
 // Node 18+. Get a free key at https://poly.pizza/settings/api
-import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdir, writeFile, readFile, rename, rm } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,6 +25,8 @@ const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i > -1 
 const PER_QUERY = +arg('per-query', 3);
 const MAX_TRIS = +arg('max-tris', 20000);
 const DRY = process.argv.includes('--dry');
+const COMPRESS = !process.argv.includes('--no-compress');
+const sha = buf => createHash('sha1').update(buf).digest('hex').slice(0, 10);
 
 // group -> [{ q: search term, kind: label shown in the picker }]
 const PLAN = {
@@ -91,11 +99,12 @@ for (const [group, queries] of Object.entries(PLAN)) {
       .slice(0, PER_QUERY);
     for (const m of picks) {
       seen.add(m.ID);
-      const base = `${slug(m.Title) || 'model'}-${m.ID}`;
-      const glb = `glb/${base}.glb`, thumb = `thumb/${base}.webp`;
-      if (!DRY) {
-        if (!existsSync(join(OUT, glb))) {
-          if (!await download(m.Download, join(OUT, glb))) {
+      const prevEntry = byId.get(m.ID);
+      let glb = prevEntry?.file, thumb = prevEntry?.thumb;
+      if (!DRY && !(glb && existsSync(join(OUT, glb)))) {
+        {
+          const tmp = join(OUT, `.tmp-${m.ID}.glb`);
+          if (!await download(m.Download, tmp)) {
             console.warn('glb failed', m.ID);
             if (++failures >= 3 && !downloaded) {
               console.error('\nCannot reach static.poly.pizza (blocked by network policy or offline). Aborting.');
@@ -103,15 +112,27 @@ for (const [group, queries] of Object.entries(PLAN)) {
             }
             continue; // never list a model whose file is missing
           }
+          if (COMPRESS) {
+            try {
+              execFileSync('npx', ['--yes', '@gltf-transform/cli', 'optimize', tmp, tmp, '--compress', 'draco', '--texture-compress', 'webp', '--texture-size', '1024'], { stdio: 'ignore' });
+            } catch { console.warn('compress failed, keeping original', m.ID); }
+          }
+          const buf = await readFile(tmp);
+          const name = `${slug(m.Title) || 'model'}-${sha(buf)}`;
+          glb = `glb/${name}.glb`;
+          await rename(tmp, join(OUT, glb));
+          if (m.Thumbnail) {
+            thumb = `thumb/${name}.webp`;
+            if (!await download(m.Thumbnail, join(OUT, thumb))) thumb = undefined;
+          }
           downloaded++;
         }
-        if (m.Thumbnail && !existsSync(join(OUT, thumb))) await download(m.Thumbnail, join(OUT, thumb));
       }
-      const prevEntry = byId.get(m.ID);
+      if (DRY) { glb = glb || `glb/${slug(m.Title)}-dry.glb`; thumb = thumb || `thumb/${slug(m.Title)}-dry.webp`; }
       const groups = new Set([...(prevEntry?.groups || []), group]);
       byId.set(m.ID, {
         id: m.ID, title: m.Title, groups: [...groups], kind, query: q, tags: m.Tags || [],
-        file: 'models/' + glb, thumb: 'models/' + thumb, tris: m['Tri Count'],
+        file: glb, thumb: thumb || '', tris: m['Tri Count'],
         licence: m.Licence, creator: m.Creator?.Username || 'Unknown',
         source: `https://poly.pizza/m/${m.ID}`, attribution: m.Attribution,
       });
@@ -122,7 +143,7 @@ for (const [group, queries] of Object.entries(PLAN)) {
 }
 
 const models = [...byId.values()].sort((a, b) => a.title.localeCompare(b.title));
-const catalog = { generated: new Date().toISOString(), source: 'https://poly.pizza', count: models.length, models };
+const catalog = { generated: new Date().toISOString(), source: 'https://poly.pizza', count: models.length, models }; // paths relative to base
 if (!DRY) await writeFile(catalogPath, JSON.stringify(catalog, null, 1));
 
 // Human-readable attribution file (CC-BY requires credit)

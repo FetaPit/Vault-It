@@ -78,6 +78,11 @@ if ('serviceWorker' in navigator) {
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+/* 3D model library location. 'models/' = bundled with the app.
+   Production: 'https://assets.ptlive.design/vault-it/models/' (Cloudflare R2). */
+window.VAULT_MODEL_BASE='models/';
+</script>
 <script src="vault-it-model-picker.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <style>
