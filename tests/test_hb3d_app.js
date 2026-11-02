@@ -6,9 +6,9 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
 const seed=(o)=>`(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})();`;
 (async()=>{
   const b=await chromium.launch(); const errs=[];
-  const open=async(o,w,h,route=true)=>{const ctx=await b.newContext({viewport:{width:w||1280,height:h||900},reducedMotion:'reduce'}); if(route)await routeThree(ctx); else await ctx.route(/cdn\.jsdelivr\.net/,r=>r.abort()); const p=await ctx.newPage();
+  const open=async(o,w,h,route=true,qs='')=>{const ctx=await b.newContext({viewport:{width:w||1280,height:h||900},reducedMotion:'reduce'}); if(route)await routeThree(ctx); else await ctx.route(/cdn\.jsdelivr\.net/,r=>r.abort()); const p=await ctx.newPage();
     p.on('pageerror',e=>errs.push(e.message)); p.on('console',m=>{if(m.type()==='error'&&!/Failed to load|net::/.test(m.text()))errs.push('console: '+m.text());});
-    await p.addInitScript(seed(o)); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.addInitScript(seed(o)); await p.goto('file:///home/user/Vault-It/index.html'+qs); await p.waitForTimeout(1500);
     await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'}); await p.evaluate(()=>showTab('house')); await p.waitForTimeout(800); if(route)await p.waitForFunction(()=>window.HB3D&&HB3D.viewer&&HB3D.viewer.brandInfo&&HB3D.viewer.brandInfo()&&HB3D.viewer.settled(),null,{timeout:60000}).catch(()=>{}); else await p.waitForFunction(()=>document.getElementById('house-scene').getAttribute('data-engine')==='still',null,{timeout:20000}).catch(()=>{}); return p;};
   // Level 1 build
   let p=await open({saved:20000,target:250000,houseType:'terraced',deposits:[{amount:20000,date:'01/10/2026'}],prices:{terraced:250000}});
@@ -44,9 +44,10 @@ const seed=(o)=>`(function(){if(localStorage.getItem('ht3'))return;localStorage.
     ok(o.bi&&o.bi.bricks===wb&&o.laid===wb.toLocaleString('en-GB'),'  … and '+wb.toLocaleString('en-GB')+' bricks are laid, as the statistics say ('+o.laid+')');
   }
   await p.context().close();
-  // fallback: three.js blocked (cdn.jsdelivr.net) → the still picture, no errors
+  // fallback: the legacy viewer (?house=legacy) with three.js blocked (cdn.jsdelivr.net) → the still picture, no errors. (The brand-book renderer,
+  // the default since v0.7, needs no three.js: without WebGL at all it shows the same still, which tests/test_house_gl.js and test_hb_one_builder.js cover.)
   errs.length=0;
-  p=await open({saved:20000,target:250000,houseType:'terraced',deposits:[{amount:20000,date:'01/10/2026'}],prices:{terraced:250000}},1280,900,false);
+  p=await open({saved:20000,target:250000,houseType:'terraced',deposits:[{amount:20000,date:'01/10/2026'}],prices:{terraced:250000}},1280,900,false,'?house=legacy');
   await p.waitForTimeout(500);
   r=await p.evaluate(()=>{const cv=document.getElementById('hbStill'),c=cv.getContext('2d'),d=c.getImageData(0,0,cv.width,cv.height).data,cols=new Set();
     for(let i=0;i<d.length;i+=4*97)cols.add(d[i]+','+d[i+1]+','+d[i+2]+','+d[i+3]);

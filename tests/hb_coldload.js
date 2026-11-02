@@ -33,7 +33,7 @@ const COLD = (limit) => new Promise(done => {
     done({ firstFrame: R.firstFrame, stillAt: R.stillAt, settled: R.settled, longMax: Math.max(0, ...R.lt), longN: R.lt.length, tbt: R.lt.reduce((s, d) => s + Math.max(0, d - 50), 0),
       longMaxAfter: Math.max(0, ...after), tbtAfter: after.reduce((s, d) => s + Math.max(0, d - 50), 0), dprLaying: R.dprMin == null ? R.dprLaying : R.dprMin, courseBricks: R.courseBricks,
       lagP95: q(R.lag, 0.95), lagMax: Math.max(0, ...R.lag), laidAtFirst: R.laidAtFirst, planned: R.planned, animated: R.animatedCourse == null ? R.animated : R.animatedCourse, lite: v ? !!v._bLite : null,
-      dpr: v ? v.renderer.getPixelRatio() : null, bricks: bi ? bi.bricks : null, row: bi ? bi.row : null, engine: scene ? scene.getAttribute('data-engine') : null, err: R.err });
+      dpr: v ? v.renderer.getPixelRatio() : null, kind: R.kind, bricks: bi ? bi.bricks : null, row: bi ? bi.row : null, engine: scene ? scene.getAttribute('data-engine') : null, err: R.err });
   };
   const seen = new Set();
   const poll = () => {
@@ -42,24 +42,27 @@ const COLD = (limit) => new Promise(done => {
     const v = window.HB3D && HB3D.viewer;
     if (v && (v._bDraws || 0) > 0) {
       if (R.firstFrame == null) {
-        R.firstFrame = now; R.ltAt = R.lt.length; R.dprLaying = v.renderer.getPixelRatio();
-        try { const recs = (v._bm || []).filter(Boolean), nowS = v._bNow();
+        R.firstFrame = now; R.ltAt = R.lt.length; R.dprLaying = v.renderer.getPixelRatio(); R.kind = v.engine || 'three';
+        if (v.engine === 'house_gl') { try { const ls = v.layStats(), st = HB3D.brandStats(v.model, v._target == null ? v.p : v._target); R.laidAtFirst = ls.settledAtOpen; R.planned = st.bricksLaid; R.courseBricks = st.rowBricks; } catch (e) {} }
+        else try { const recs = (v._bm || []).filter(Boolean), nowS = v._bNow();
           let laid = 0; recs.forEach(r => { if (r.part !== 'brick') return; for (let k = 0; k < r.cnt; k++) if (r.laid[k] <= nowS - 0.9 || r.laid[k] < -999) laid++; });
           R.laidAtFirst = laid; const st = HB3D.brandStats(v.model, v._bTarget == null ? v.p : v._bTarget); R.planned = st.bricksLaid; R.courseBricks = st.rowBricks; } catch (e) {}
       }
       // bricks that drop in after the first frame: a lay time within the clock (not the instant -1000 stamp)
-      try { (v._bm || []).forEach((r, ri) => { if (!r || r.part !== 'brick') return; for (let k = 0; k < r.cnt; k++) { const key = ri + ':' + k; if (r.laid[k] > -999 && r.laid[k] < 1e8 && !seen.has(key)) { seen.add(key); R.animated++; } } }); } catch (e) {}
+      if (v.engine === 'house_gl') { try { R.animated = v.layStats().animated; } catch (e) {} }
+      else try { (v._bm || []).forEach((r, ri) => { if (!r || r.part !== 'brick') return; for (let k = 0; k < r.cnt; k++) { const key = ri + ':' + k; if (r.laid[k] > -999 && r.laid[k] < 1e8 && !seen.has(key)) { seen.add(key); R.animated++; } } }); } catch (e) {}
       if (R.settled == null && v.settled() && now - R.firstFrame > 300) {
         R.settled = now; R.animatedCourse = R.animated; R.ltAtProbe = R.lt.length;   // the on-screen window ends here: the probe below resizes the buffer twice, which costs SwiftShader seconds and a phone nothing
         // the opening course may have landed before SwiftShader's first frame here, so the pixel-ratio switch is probed on the settled house:
         // a brick stamped as landing now makes the next tick busy (1.25 on a 3x phone); stamped as long landed, a tick 350 ms later rests (2)
-        try {
+        if (v.engine === 'house_gl') { R.dprMin = v.renderer.getPixelRatio(); R.restAt = now + 350; }   // one pixel ratio throughout (the brand book's)
+        else try {
           const rec = (v._bm || []).find(r => r && r.part === 'brick' && r.cnt > 0), k = rec.cnt - 1, was = rec.laid[k];
           rec.laid[k] = v._bNow(); v._brandTick(); R.dprMin = v.renderer.getPixelRatio();
           rec.laid[k] = was; R.restAt = now + 350;
         } catch (e) { R.probeErr = String(e && e.message); }
       }
-      if (R.settled != null && R.restAt != null && now >= R.restAt && R.laySettled == null) { try { v._brandTick(); } catch (e) {} R.laySettled = now; }
+      if (R.settled != null && R.restAt != null && now >= R.restAt && R.laySettled == null) { try { if (v._brandTick) v._brandTick(); } catch (e) {} R.laySettled = now; }
     }
     if ((R.laySettled != null && now > R.laySettled + 300) || now > limit) return finish();
     requestAnimationFrame(poll);
@@ -79,7 +82,8 @@ async function coldLoad(opts) {
     // the path a phone with a working GPU takes (the default): the browser here draws WebGL in software, which the app spots and answers
     // with its lite mode; hold that off as test_hb_speed does, so the numbers are the app's work, not SwiftShader's. opts.soft = true
     // keeps the software path (an old phone whose GPU Chrome will not use) for comparison.
-    if (!opts.soft) await p.addInitScript(() => { const iv = setInterval(() => { if (window.HB3D && HB3D.Viewer && HB3D.Viewer.prototype._brandTick) { clearInterval(iv);
+    if (!opts.soft) await p.addInitScript(() => { window.VI_HB_FULL = true;   // the brand-book renderer (house_gl) reads this flag
+      const iv = setInterval(() => { if (window.HB3D && HB3D.Viewer && HB3D.Viewer.prototype._brandTick) { clearInterval(iv);
       const VP = HB3D.Viewer.prototype; Object.defineProperty(VP, '_bSoft', { get: () => false, set() {}, configurable: true }); Object.defineProperty(VP, '_bCost', { get: () => 0, set() {}, configurable: true }); } }, 5); });
     // the demo house (what a fresh device shows: 22,500 of a 48,000 deposit on the terraced house, row 62) seeded before the page runs, so
     // builds before and after the demo fix compare like for like; opts.fresh = true leaves storage empty (the demo seeds it itself)
@@ -93,7 +97,7 @@ async function coldLoad(opts) {
     const loadMs = Date.now() - tNav;
     // three.js (about 1 MB of script) is preloaded once the page sits idle; wait for that, so the tap below measures the house builder, not
     // the browser parsing three.js (the same before and after, and up to 5 s here at 4x), then open the House tab as the tester would
-    await p.waitForFunction(() => !!(window.THREE && THREE.OrbitControls), null, { timeout: 30000 }).catch(() => {});
+    await p.waitForFunction(() => !!(window.THREE && THREE.OrbitControls) || !!(window.HB3D && HB3D.HouseGL && typeof hbGLEngine === 'function' && hbGLEngine()), null, { timeout: 30000 }).catch(() => {});   // the brand-book renderer needs no three.js
     const threeMs = Date.now() - tNav;
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     const r = await p.evaluate(COLD, opts.limit || 60000);
