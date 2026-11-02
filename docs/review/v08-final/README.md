@@ -22,4 +22,14 @@ Viewports: mobile 390x844, tablet 768x1024, desktop 1440x900, each in Night and 
 - The 📅 emoji in the "Net Worth History" heading.
 - The fixed Feedback button sits over whatever scrolls beneath it (for example a Budget card's amount at 1440 mid-scroll). This is by design: it fades over 3D controls, and each tab's end has 64 px of clearance.
 
-Fix list for this round: none.
+## Folded in: David's automated sweep (84 pages)
+| # | Finding | Verdict |
+|---|---|---|
+| 1 | `#nw-fc-note` ("6-month estimate, not a prediction...") still shows under the Net worth 3D hero | **v0.8 bug (C2).** Pete asked for the forecast disclaimer to be "totally removed" from the 3D view, and the 3D view shows no forecast, so the note has nothing to explain there. Hide it while the 3D view is showing; keep it in Graph view. My miss: it is in my mobile 01-dash-top shot. |
+| 2 | Flow chip labels `.cf-chip` in `#cf-sankey` and `#bd-sankey` are about 6 px on mobile and 8 to 9.4 px on desktop (the SVG is scaled by its viewBox) | **v0.8 (F2).** The type-scale promise covers this, and it is the first chart Pete sees on the dashboard. Counter-scale: set each chip's font size to target / (rendered width / viewBox width), with name 11.5 and amount 10.5 on screen, then rerun the chip collision layout (minimum 30 px between rows). If the collision test cannot go green within the hour, it moves to v0.8.1. |
+| 3 | Debt tab `.dtm-s` 6.5 px and `.dtm-n` 8.1 px (the `font:` shorthand at index.html ~14311 to 14313 that type_floor.js skips) | **v0.8 (F2), quick.** `.dtm-n` gets max(clamp(...), var(--vi-fs-2)) and `.dtm-s` gets max(clamp(...), var(--vi-fs-1)), and teach type_floor.js the `font:` shorthand that holds a clamp(). |
+| 4 | Stocks chart label `#stk-main svg` "+20.29%" at 9 px | **v0.8 (F2), quick.** 10.5 px. |
+| 5 | Biz KPI labels cut to "MONTHLY RE...", "ACTIVE CLIE..." on mobile | **v0.8 (F2), caused by the floor and nowrap.** On the Biz KPIs let the label wrap to at most 2 lines (`white-space:normal`, letter-spacing .06em). A stub that hides the meaning is worse than a wrap. |
+| 6 | Wealth inventory and Liabilities placeholder captions at 8.6 px on mobile | **v0.8 (F2), quick.** Tier 1 (10.5 px). |
+Items 2 to 6 were all smaller still on 76be8ec (13 px root, .5rem), so they are misses in the type-scale sweep, not new breakage, apart from 5, which the nowrap caused. All of them are Pete-visible on a phone.
+
