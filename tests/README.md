@@ -58,6 +58,7 @@ node tests/test_nw3d_labels.js       # Net worth in 3D: floor names never overla
 node tests/test_signoff_a.js         # Phone sign-off A: Feedback pill never covers a 3D stage; Net worth floor names sit on the income flow label plate
 node tests/test_signoff_b.js         # Phone sign-off B: old green item pictures redrawn in the model colours; phone tap makes the tile a live orbit view
 node tests/test_signoff_c.js         # Phone sign-off C: Cash and savings 3D ground grid half the size and fading into the fog
+node tests/test_ui_round2.js         # v0.7 UI round 2 (for alpha 0.8), Net worth tile: no forecast note in the 3D card; forecast from the Budget (savings and investments only, investments compound at 4%, debt repayments after interest, shortfall comes off, no budget no growth) with a full-width note; History, Goals, Snapshots as collapsed pills at the foot of the tile
 node tests/test_signoff_d.js         # Phone sign-off D: income flow bands get a bright colour stroke and leaders; only two reds, clearly apart, AA text
 node tests/test_signoff_d.js         # Phone sign-off D: income flow bands get a bright colour stroke and leaders; only two reds, clearly apart
 node tests/test_footer.js             # footer: approved disclaimer, Privacy notice / Beta terms links in the app and landing footers, type floors, --footer-h tracks the fixed footer

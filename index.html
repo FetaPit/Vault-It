@@ -12043,15 +12043,22 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <div id="nw-zoom-hint" style="position:absolute;top:6px;right:8px;font-size:.46rem;color:rgb(var(--teal-rgb) / .4);font-family:'Share Tech Mono',monospace;pointer-events:none">Scroll=zoom · Drag=pan · Dbl-click=reset</div>
     </div>
     <div id="chart-tooltip" style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--t2);margin-top:8px;text-align:center;min-height:16px"></div>
-    <p class="vi-fc-note" id="nw-fc-note" hidden></p>
-  </div>
+    <p class="vi-fc-note" id="nw-fc-note" hidden><svg class="vi-ic" aria-hidden="true"><use href="#vi-info"/></svg><span id="nw-fc-txt"></span></p>
 
-  <!-- Milestone targets + snapshots: directly under the Net Worth chart -->
-  <div class="ov-ms-card ov-ms-wide" id="ov-ms-card" data-tab="goals" data-adv style="margin-top:16px">
-    <div class="ov-ms-top"><div class="ov-ms-title">Goals and snapshots</div>
-      <div class="ov-ms-tabs" role="tablist" aria-label="Goals and snapshots"><button role="tab" id="ov-ms-tab-goals" aria-selected="true" onclick="ovMsTab('goals')">🎯 Goals</button><button role="tab" id="ov-ms-tab-snaps" aria-selected="false" onclick="ovMsTab('snaps')">📸 Snapshots</button></div></div>
+    <!-- History, goals and snapshots: folded into the foot of this tile, collapsed until asked for (owner, 2 Nov) -->
+    <div class="nw-more" id="nw-more" data-adv>
+      <div class="nw-more-btns" role="group" aria-label="History, goals and snapshots"><button type="button" data-p="history" aria-expanded="false" aria-controls="ov-nwh-card" onclick="nwMore('history')"><svg class="vi-ic" aria-hidden="true"><use href="#vi-calendar"/></svg><span>History</span><svg class="vi-ic nw-more-chev" aria-hidden="true"><use href="#vi-chevron"/></svg></button><button type="button" data-p="goals" aria-expanded="false" aria-controls="ov-ms-card" onclick="nwMore('goals')"><svg class="vi-ic" aria-hidden="true"><use href="#vi-target"/></svg><span>Goals</span><svg class="vi-ic nw-more-chev" aria-hidden="true"><use href="#vi-chevron"/></svg></button><button type="button" data-p="snaps" aria-expanded="false" aria-controls="ov-ms-card" onclick="nwMore('snaps')"><svg class="vi-ic" aria-hidden="true"><use href="#vi-camera"/></svg><span>Snapshots</span><svg class="vi-ic nw-more-chev" aria-hidden="true"><use href="#vi-chevron"/></svg></button></div>
+      <div class="nw-more-panel nw-more-hist" id="ov-nwh-card" hidden>
+    <div style="flex:1;min-width:180px">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.7rem;color:var(--tx);margin-bottom:4px">📅 Net Worth History <span style="font-size:.44rem;color:var(--go);background:rgba(247,179,85,.12);border:1px solid rgba(247,179,85,.2);padding:2px 7px;font-family:'Share Tech Mono',monospace;letter-spacing:.08em;vertical-align:middle">PRO</span></div>
+      <div style="font-size:.55rem;color:var(--t2);line-height:1.5">Retroactively track your financial journey since 18: see every high, low and turning point.</div>
+      <div id="nwh-mini-wrap" style="margin-top:10px;height:36px;position:relative"></div>
+    </div>
+    <button onclick="openNwHistory()" style="flex-shrink:0;padding:9px 20px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:.58rem;cursor:pointer;letter-spacing:.06em">View Journey →</button>
+      </div>
+      <div class="nw-more-panel ov-ms-card" id="ov-ms-card" data-tab="goals" hidden>
     <div class="ms-grid">
-      <div class="ms-col" data-p="goals" role="tabpanel" aria-labelledby="ov-ms-tab-goals">
+      <div class="ms-col" data-p="goals" aria-label="Goals">
         <div id="ms-list">
           <div class="ms-row"><div class="ms-dot" id="msdot-0"></div><span class="ms-ic">🛡</span><label>Emergency Fund <span id="mschk-0" class="ms-chk"></span></label><input type="number" id="ms-0" value="2000" min="0" onchange="saveState();drawChart()"></div>
           <div class="ms-row"><div class="ms-dot" id="msdot-1"></div><span class="ms-ic">✂️</span><label>Clear All Debt <span id="mschk-1" class="ms-chk"></span></label><input type="number" id="ms-1" value="0" min="0" onchange="saveState();drawChart()"></div>
@@ -12069,7 +12076,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           </div>
         </details>
       </div>
-      <div class="ms-col" data-p="snaps" role="tabpanel" aria-labelledby="ov-ms-tab-snaps">
+      <div class="ms-col" data-p="snaps" aria-label="Snapshots">
         <div class="ms-col-hint">Past net worth, shown on the chart.</div>
         <div id="ms-snap-list"></div>
         <details class="ms-add" id="ms-add-snap">
@@ -12084,16 +12091,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </details>
       </div>
     </div>
-  </div>
-
-  <!-- Net Worth History entry card -->
-  <div class="ov-chart-card" id="ov-nwh-card" data-adv style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-    <div style="flex:1;min-width:180px">
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.7rem;color:var(--tx);margin-bottom:4px">📅 Net Worth History <span style="font-size:.44rem;color:var(--go);background:rgba(247,179,85,.12);border:1px solid rgba(247,179,85,.2);padding:2px 7px;font-family:'Share Tech Mono',monospace;letter-spacing:.08em;vertical-align:middle">PRO</span></div>
-      <div style="font-size:.55rem;color:var(--t2);line-height:1.5">Retroactively track your financial journey since 18: see every high, low and turning point.</div>
-      <div id="nwh-mini-wrap" style="margin-top:10px;height:36px;position:relative"></div>
+      </div>
     </div>
-    <button onclick="openNwHistory()" style="flex-shrink:0;padding:9px 20px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:.58rem;cursor:pointer;letter-spacing:.06em">View Journey →</button>
   </div>
 
   <!-- Financial Freedom Roadmap — full width -->
@@ -14293,6 +14292,26 @@ body.vi-pop-open{overflow:hidden}
 .cf-legend span{gap:9px!important;padding:6px 12px;border-radius:99px;background:rgb(var(--ink-rgb) / .03);border:1px solid color-mix(in srgb,var(--c,#8899aa) 35%,transparent)}
 .cf-legend i{width:18px!important;height:18px!important;border-radius:5px!important}
 .cf-legend s{text-decoration:none;display:inline-flex;color:var(--c,#aab)}
+/* the net worth tile's foot: History, Goals, Snapshots bottom right, each panel opens under the chart at full tile width (owner, 2 Nov; Pedro's v0.8 spec E) */
+.nw-more{margin-top:10px}
+.nw-more .nw-more-btns{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px}
+.nw-more-btns button{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 9px 0 8px;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted);font:700 10px/1 'Syne',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.nw-more-btns button .vi-ic{width:14px;height:14px}
+.nw-more-btns button .nw-more-chev{width:12px;height:12px;transition:transform .2s}
+.nw-more-btns button[aria-expanded="true"]{border-color:var(--teal);color:var(--teal)}
+.nw-more-btns button[aria-expanded="true"] .nw-more-chev{transform:rotate(180deg)}
+.nw-more-btns button:hover{color:var(--text)}.nw-more-btns button[aria-expanded="true"]:hover{color:var(--teal)}
+.nw-more-btns button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.nw-more-btns button .nw-more-chev{transition:none}}
+@media (max-width:420px){.nw-more .nw-more-btns{gap:4px}.nw-more-btns button{letter-spacing:.04em;padding:0 7px 0 6px}}   /* one row at 390 with the real Syne loaded (Pedro review 2) */
+.nw-more-panel{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd)}
+.nw-more-panel[hidden]{display:none!important}
+.nw-more-hist{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.ov-ms-card.nw-more-panel{background:none;border:0;border-top:1px solid var(--bd);border-radius:0;padding:12px 0 0;clip-path:none}
+/* the forecast note runs the full width of the tile, so it costs as few lines as possible (owner, 2 Nov; Pedro's spec E) */
+.ov-chart-card .vi-fc-note{display:flex;align-items:flex-start;gap:6px;max-width:none;width:100%;margin:8px 0 0;text-align:left;font:400 10.5px/1.45 'DM Sans',sans-serif;color:var(--muted);letter-spacing:0}
+.ov-chart-card .vi-fc-note[hidden]{display:none}
+.ov-chart-card .vi-fc-note .vi-ic{width:14px;height:14px;margin-top:1px}
 .bd-split{position:relative;display:grid;grid-template-columns:1fr;gap:14px}
 .bd-split>.ov-chart-card{min-width:0}
 @media(min-width:1000px){
@@ -14464,10 +14483,25 @@ function ovGo(t){
 // Goals / Snapshots tabs on the Overview, choice remembered on this device
 function ovMsTab(t){
   var c=document.getElementById('ov-ms-card');if(!c)return;t=t==='snaps'?'snaps':'goals';c.setAttribute('data-tab',t);
-  ['goals','snaps'].forEach(function(k){var b=document.getElementById('ov-ms-tab-'+k);if(b)b.setAttribute('aria-selected',k===t?'true':'false');});
   try{localStorage.setItem('vi-ov-ms-tab',t);}catch(e){}
+  nwMoreSync();
 }
-setTimeout(function(){try{var t=localStorage.getItem('vi-ov-ms-tab');if(t)ovMsTab(t);}catch(e){}},0);
+// History, Goals and Snapshots: small buttons at the foot of the net worth tile, each opens its panel under the chart,
+// one at a time, all closed on load (owner, 2 Nov: "by default it should be collapsed"). A second tap closes it.
+function nwMore(p){
+  var h=document.getElementById('ov-nwh-card'),m=document.getElementById('ov-ms-card');if(!h||!m)return;
+  var open=nwMoreOpen();
+  if(p===open)p='';
+  h.hidden=p!=='history';m.hidden=!(p==='goals'||p==='snaps');
+  if(p==='goals'||p==='snaps')ovMsTab(p);
+  if(p==='history')try{nwhRenderMini();}catch(e){}
+  nwMoreSync();
+}
+function nwMoreOpen(){
+  var h=document.getElementById('ov-nwh-card'),m=document.getElementById('ov-ms-card');
+  return h&&!h.hidden?'history':(m&&!m.hidden?(m.getAttribute('data-tab')==='snaps'?'snaps':'goals'):'');
+}
+function nwMoreSync(){var o=nwMoreOpen();document.querySelectorAll('#nw-more .nw-more-btns button').forEach(function(b){b.setAttribute('aria-expanded',b.getAttribute('data-p')===o?'true':'false');});}
 function showSubtab(group,id,btn){
   document.querySelectorAll('#'+group+'-page .subtab-panel').forEach(p=>{p.classList.remove('active');p.style.display='none';});
   document.querySelectorAll('#'+group+'-page .subtab-btn').forEach(b=>b.classList.remove('active'));
@@ -14780,13 +14814,62 @@ function viRenderLedger(){
 // ═══════════════════════════════════════════════════════════════
 // LINE CHART  (fixed: date-based x-axis, correct NW, forecast)
 // ═══════════════════════════════════════════════════════════════
-// What the forecast rests on (owner, 31 Oct: small text, bottom right of the tile). Written by drawChart from the same months the
-// dashed line uses, so the note and the line cannot disagree.
-function viFcNote(on, months, ahead) {
-  var t = !on ? '' : months >= 2
-    ? 'Forecast: a straight line through your last ' + months + ' months of net worth and debt, carried ' + ahead + ' months ahead. It assumes no investment growth, no inflation and no change to your income, spending or debts. A guide from what you have entered, not a prediction.'
-    : 'Forecast: starts once you have two months of net worth logged (' + months + ' so far). It is a straight line through your own recent months, nothing more.';
-  ['nw-fc-note', 'nw3d-fc-note'].forEach(function (id) { var el = document.getElementById(id); if (!el) return; el.textContent = t; el.hidden = !t; });
+// The forecast (owner, 2 Nov: "take into account ... what is available in the user's budget to add and compound, rather than
+// optimistically showing growth ... take into consideration if the user's paying off debt or not"). Driven by the Budget, never by a trend:
+// - each month adds only what the budget assigns to Savings and Investments (unassigned surplus is not counted);
+// - savings earn nothing (the app stores no savings rate); what goes into Investments compounds monthly at VI_FC_INV_RATE a year;
+// - each debt in the Debt tracker gains a month's interest at its APR, then the budget's "Debt payments" lines pay it down, shared by
+//   each debt's minimum payment (or its balance when no minimums are set); with no repayment budgeted a debt stays level or grows;
+// - spending plus saving beyond income (a shortfall) comes off net worth every month;
+// - no budget at all: no growth, only debt interest, and the note asks for a budget.
+// Pure apart from reading the app's state, so the graph, the 3D blocks and the note share one set of numbers.
+var VI_FC_INV_RATE = 0.04;   // a year, nominal, stated in the note: the app stores no growth rate for investments
+var VI_FC_SAV_RATE = 0;      // a year: the app stores no savings rate
+function viFcIsDebtLine(e) { return (e.cat || bdGuess('exp', e.name || '')) === 'debt'; }
+function viForecast(months, start) {
+  start = start || { nw: computeNetWorth(), debt: debtTotal() + alTotalLiab() };
+  var inc = cfTotalIn(), lines = (ovState.expenses || []).filter(function (e) { return (+e.amount || 0) > 0; });
+  var hasBudget = inc > 0 || lines.length > 0, sv = 0, iv = 0, spend = 0, repay = 0;
+  if (hasBudget) lines.forEach(function (e) { var t = cfType(e), a = +e.amount || 0;
+    if (t === 'sv') sv += a; else if (t === 'iv') iv += a; else { spend += a; if (viFcIsDebtLine(e)) repay += a; } });
+  var short = hasBudget ? Math.max(0, spend + sv + iv - inc) : 0;
+  var debts = ((typeof debtState !== 'undefined' && debtState.debts) || []).filter(function (d) { return (+d.balance || 0) > 0; })
+    .map(function (d) { return { b: +d.balance, apr: Math.max(0, +d.rate || 0), w: Math.max(0, +d.min || 0) }; });
+  var sum = function () { return debts.reduce(function (t, d) { return t + d.b; }, 0); };
+  var d0 = sum(), other = Math.max(0, (+start.debt || 0) - d0), mi = Math.pow(1 + VI_FC_INV_RATE, 1 / 12) - 1, ms = VI_FC_SAV_RATE / 12;
+  var savPot = 0, invPot = 0, lost = 0, out = [];
+  for (var m = 1; m <= months; m++) {
+    savPot = savPot * (1 + ms) + sv;
+    invPot = invPot * (1 + mi) + iv;
+    debts.forEach(function (d) { d.b += d.b * d.apr / 1200; });
+    var left = repay, live = debts.filter(function (d) { return d.b > 0.005; });
+    for (var k = 0; k < 20 && left > 0.005 && live.length; k++) {   // a debt cleared mid-month passes its share to the others
+      var W = live.reduce(function (t, d) { return t + (d.w || d.b); }, 0), paid = 0;
+      live.forEach(function (d) { var pay = Math.min(d.b, left * (d.w || d.b) / W); d.b -= pay; paid += pay; });
+      left -= paid; live = live.filter(function (d) { return d.b > 0.005; });
+    }
+    lost += short;
+    var dn = sum();
+    out.push({ nw: (+start.nw || 0) + savPot + invPot + (d0 - dn) - lost, debt: other + dn });
+  }
+  return { pts: out, hasBudget: hasBudget, sv: sv, iv: iv, repay: repay, short: short, debts: debts.length, apr: debts.some(function (d) { return d.apr > 0; }) };
+}
+// The note under the graph says what the forecast rests on, in plain words, from the same numbers the line uses.
+function viFcNote(f, ahead) {
+  var el = document.getElementById('nw-fc-note'); if (!el) return;
+  var t = '';
+  if (f && !f.hasBudget) t = 'Forecast: set up your Budget to see one. Until then it shows no growth' + (f.apr ? ', only interest added to debts that have a rate' : '') + '. An estimate from what you\'ve entered, not a prediction.';
+  else if (f) {
+    var p = [];
+    p.push(f.sv > 0 ? gbpFmt(f.sv) + ' a month into savings (no interest assumed)' : 'nothing into savings');
+    p.push(f.iv > 0 ? gbpFmt(f.iv) + ' into investments, growing ' + Math.round(VI_FC_INV_RATE * 100) + '% a year' : 'nothing into investments');
+    var d = f.repay > 0 ? (f.debts ? '; your ' + gbpFmt(f.repay) + ' debt payments come off your debts after interest at each APR' : '')
+      : (f.debts ? '; no debt payments are budgeted, so debts stay level' + (f.apr ? ' or grow by their interest' : '') : '');
+    t = 'Forecast for the next ' + ahead + ' months, from your Budget only: ' + p.join(' and ') + d
+      + (f.short > 0 ? '; your plan spends ' + gbpFmt(f.short) + ' a month more than comes in, so that comes off' : '')
+      + '. Money not given a job is not counted. An estimate from what you\'ve entered, not a prediction.';
+  }
+  var tx = document.getElementById('nw-fc-txt'); (tx || el).textContent = t; el.hidden = !t;
 }
 function drawChart() {
   var canvas = document.getElementById('nwChart');
@@ -14895,6 +14978,8 @@ function drawChart() {
   // ── Y scale ──
   var allVals = [];
   points.forEach(function(p) { allVals.push(p.nw, p.debt); });
+  var fc = hasForecast ? viForecast(PROJ_MO, points[points.length-1]) : null;   // the forecast stays on the chart
+  if (fc) fc.pts.forEach(function(p) { allVals.push(p.nw, p.debt); });
   (ovState.milestones||[]).forEach(function(m) { if (m > 0) allVals.push(m); });
   (ovState.customGoals||[]).forEach(function(g) { if (g.amount > 0) allVals.push(g.amount); });
   if (chartState && chartState.metrics && chartState.metrics.income)
@@ -15040,46 +15125,20 @@ function drawChart() {
   if (showIncome) drawLine(ptCoords('income'),viCss('gold'), 1.8, viRgba('gold',.05));
   if (showNW)     drawLine(ptCoords('nw'),    viCss('teal'), 2.5, viRgba('teal',.07));
 
-  // ── Forecast / Projection (dashed) ──
-  if (hasForecast && points.length >= 2) {
-    function linReg(vals) {
-      var n=vals.length,sx=0,sy=0,sxy=0,sx2=0;
-      vals.forEach(function(v,i){sx+=i;sy+=v;sxy+=i*v;sx2+=i*i;});
-      var d=n*sx2-sx*sx||1;
-      return{slope:(n*sxy-sx*sy)/d, intercept:(sy-sx*(n*sxy-sx*sy)/d/n)/n+ (sy-(n*sxy-sx*sy)/d*sx)/n};
-    }
-    // simpler linReg
-    var lr = window._viLr = function (vals) {
-      var n=vals.length,sx=0,sy=0,sxy=0,sx2=0;
-      for(var i=0;i<n;i++){sx+=i;sy+=vals[i];sxy+=i*vals[i];sx2+=i*i;}
-      var d=n*sx2-sx*sx||1;
-      var slope=(n*sxy-sx*sy)/d;
-      var intercept=(sy-slope*sx)/n;
-      return{slope:slope,intercept:intercept};
-    };
-    var projSrc = points.slice(-Math.min(points.length,6)).filter(function(p){return !p.synth;});   // only months the user really logged
-  }
-  viFcNote(hasForecast, projSrc ? projSrc.length : 0, PROJ_MO);
-  if (hasForecast && points.length >= 2 && projSrc.length >= 2) {
-    var lr = window._viLr;
-    var nwReg  = lr(projSrc.map(function(p){return p.nw;}));
-    var dtReg  = lr(projSrc.map(function(p){return p.debt;}));
-    var projN  = projSrc.length;
-
-    // Generate projected months starting from now+1
+  // ── Forecast (dashed): from the Budget, see viForecast ──
+  viFcNote(fc, PROJ_MO);
+  if (fc) {
     var projPts_nw=[], projPts_dt=[];
     var lastPt = points[points.length-1];
-    var startNW  = {x:dateToX(monthToTs(lastPt.month)), y:yp(lastPt.nw)};
-    var startDt  = {x:dateToX(monthToTs(lastPt.month)), y:yp(lastPt.debt)};
-    projPts_nw.push(startNW); projPts_dt.push(startDt);
-
+    projPts_nw.push({x:dateToX(monthToTs(lastPt.month)), y:yp(lastPt.nw)});
+    projPts_dt.push({x:dateToX(monthToTs(lastPt.month)), y:yp(lastPt.debt)});
     for (var pi=1; pi<=PROJ_MO; pi++) {
-      var pm = new Date(now); pm.setMonth(pm.getMonth()+pi);
+      var pm = new Date(now.getFullYear(), now.getMonth()+pi, 1);
       var pmStr = pm.getFullYear()+'-'+String(pm.getMonth()+1).padStart(2,'0');
-      var pmX = dateToX(monthToTs(pmStr));
-      projPts_nw.push({x:pmX, y:yp(nwReg.intercept + nwReg.slope*(projN-1+pi))});
-      projPts_dt.push({x:pmX, y:yp(Math.max(0, dtReg.intercept + dtReg.slope*(projN-1+pi)))});
-      canvas._proj.push({ month: pmStr, nw: nwReg.intercept + nwReg.slope*(projN-1+pi), debt: Math.max(0, dtReg.intercept + dtReg.slope*(projN-1+pi)) });
+      var pmX = dateToX(monthToTs(pmStr)), fp = fc.pts[pi-1];
+      projPts_nw.push({x:pmX, y:yp(fp.nw)});
+      projPts_dt.push({x:pmX, y:yp(fp.debt)});
+      canvas._proj.push({ month: pmStr, nw: fp.nw, debt: fp.debt });
     }
 
     ctx.save(); ctx.setLineDash([6,4]); ctx.globalAlpha=0.65; ctx.lineWidth=1.5;
@@ -27896,8 +27955,7 @@ function nwhRenderMini(){
 .nw3d-hud button:hover{border-color:#44C0B9;color:#44C0B9}.nw3d-hud button:focus-visible{outline:2px solid #44C0B9;outline-offset:1px}
 @media(max-width:600px){.nw3d-hud{right:8px;bottom:8px}.nw3d-hud button{width:38px;height:38px}}
 .ov-chart-card.nw3d-main-3d>.nw3d-wrap{position:absolute!important;left:0;right:0;top:0;visibility:hidden!important;pointer-events:none!important}   /* kept laid out: the graph's months feed the progress blocks */
-/* goals and snapshots leave the dashboard while the 3D view shows; they live in the Graph view (owner, 31 Oct) */
-.ov-chart-card.nw3d-main-3d ~ #ov-ms-card{display:none!important}
+/* goals and snapshots now fold into the net worth tile's foot, closed until asked for, in both views (owner, 2 Nov); the old rule hid them in 3D */
 /* owner, 31 Oct 2026: three views, one switch each, top right. Net worth card: 3D | Graph. The progress blocks have their own card below with Forecast. */
 .nw3d-top{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0}
 .nw3d-top .ov-chart-title{min-width:0;overflow-wrap:anywhere}
@@ -28425,8 +28483,7 @@ tcard.innerHTML='<div class="nw3d-top"><span class="ov-chart-title">Net worth pr
  +'<span class="nw3d-sub">Your net worth month by month, one column of blocks a month. Forecast adds the next six months as see-through blocks. Tap or hover a month to read it, drag to turn it.</span>'
  +'<div class="nw3d-stage" id="nw3d-trk-stage"><canvas id="nw3d-trk-cv" tabindex="0" role="img" aria-label="Net worth progress in 3D blocks. Tap a month to read it, drag to turn it."></canvas></div>'
  +'<p class="nw3d-read" id="nw3d-trk-read" aria-live="polite"></p>'
- +'<p class="nw3d-key" id="nw3d-trk-key"></p>'
- +'<p class="vi-fc-note" id="nw3d-fc-note" hidden></p>';
+ +'<p class="nw3d-key" id="nw3d-trk-key"></p>';   /* no forecast note here (owner, 2 Nov: "not relevant"); the Graph view keeps it */
 chartCard.parentNode.insertBefore(tcard,chartCard.nextSibling);
 var tst=document.getElementById('nw3d-trk-stage'),tkey=document.getElementById('nw3d-trk-key'),trkRead=document.getElementById('nw3d-trk-read'),fcBtn=document.getElementById('nw3d-fc');
 function fcSync(){fcBtn.setAttribute('aria-pressed',chartState.metrics.proj?'true':'false')}
