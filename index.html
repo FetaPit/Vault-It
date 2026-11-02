@@ -16,7 +16,7 @@ document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark")}c
 /* Vault-It design tokens. Night is the default, Daylight is the light mode.
  * Switch with data-theme="light" on <html>. Generated from vault-it-brand-book.html */
 html{box-sizing:border-box}
-:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live{   /* 3D viewports stay Night in Daylight too */
+:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge{   /* 3D viewports stay Night in Daylight too (the model badge sits over the Night picture) */
   color-scheme:dark;
   --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --slate:#1C2420; --line:#102221; --line2:#15302F;
   --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882; --lock:#8C939B;
@@ -7838,7 +7838,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
    PURPOSEOS GLOBAL — 2-tab build: Overview + House
 ═══════════════════════════════════════════════════════ */
 
-:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live {
+:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge {
   /* old names, kept as aliases of the brand tokens for one release */
   --c1: var(--panel); --c2: var(--surf2); --c3: var(--slate); --c4: var(--line2);
   --em: var(--teal); --em2: var(--teal); --em3: var(--faint); --dp: var(--teal-deep);
@@ -10775,11 +10775,14 @@ button.bd-ic{cursor:pointer}
 .i3d-stage canvas.i3d-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none}
 .wi-img-area .i3d-live{position:absolute;inset:0;z-index:2}.wi-img-area .i3d-live canvas{width:100%!important;height:100%!important;cursor:grab;display:block;touch-action:pan-y}
 .wi-img-area img.i3d-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;cursor:zoom-in}
-.i3d-badge{border-color:rgb(var(--green-rgb) / .6)!important;background:rgb(var(--green-rgb) / .18)!important;color:var(--green)!important}
+.i3d-badge{font-size:10px!important;display:inline-flex;align-items:center;gap:4px;border-color:rgb(var(--green-rgb) / .6)!important;background:rgb(var(--green-rgb) / .18)!important;color:var(--green)!important}
 .i3d-btn{font-family:'Share Tech Mono',monospace;font-size:.6rem;font-weight:700;color:var(--green)}
 .i3d-msg{font-size:.56rem;color:var(--t2);min-height:1em}.i3d-msg.bad{color:var(--re)}
 .i3d-credit{font-size:.5rem;color:var(--t3);word-break:break-word}
 .i3d-row{display:flex;gap:6px;flex-wrap:wrap}
+/* the viewer's Change model, Remove model, View current model and Photos buttons: the ghost pill of "Link to market value" (Pedro's round 2; .dep-btn had no style), at a tap-sized 11 px */
+.i3d-row .dep-btn{display:inline-flex;align-items:center;font:600 11px 'DM Sans',sans-serif;padding:5px 11px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
+.i3d-row .dep-btn:hover,.i3d-row .dep-btn:focus-visible{background:rgb(var(--teal-rgb) / .24)}
 .i3d-opts{display:flex;flex-direction:column;gap:10px}
 .i3d-up{display:block;text-align:center;padding:10px;cursor:pointer;font-size:.62rem}
 .i3d-lib-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;color:var(--tx);display:flex;align-items:center;gap:6px}
@@ -21687,9 +21690,11 @@ function i3dPickLib(kind,id,k){
 }
 function i3dRemove(kind,id){var it=i3dItem(kind,id);if(!it)return;delete it.model;i3dDel(kind,id);i3dClose();saveAL();renderAlTab();}
 // tile markup shared by both lists
+/* the tile's badge: on a touch screen, until the first live view this session, it invites the tap (Pedro's round 2); then plain "3D" */
+function i3dBadge(){return (window._i3dSeen||!window.matchMedia||!matchMedia('(pointer: coarse)').matches)?'3D':'<svg class="vi-ic sm" aria-hidden="true"><use href="#vi-orbit"/></svg>3D · tap to turn'}
 function i3dTile(kind,it){
   var m=it.model;if(!m||!m.thumb)return '';
-  return '<img class="i3d-thumb" src="'+m.thumb+'" alt="3D model of '+cfEsc(it.name)+'" onclick="i3dTap(\''+kind+'\','+it.id+',this)" onmouseenter="i3dLive(\''+kind+'\','+it.id+',this)"><span class="inv-badge i3d-badge" title="'+cfEsc(i3dCredit(m)||m.t||'')+'">3D</span>';
+  return '<img class="i3d-thumb" src="'+m.thumb+'" alt="3D model of '+cfEsc(it.name)+'" onclick="i3dTap(\''+kind+'\','+it.id+',this)" onmouseenter="i3dLive(\''+kind+'\','+it.id+',this)"><span class="inv-badge i3d-badge" title="'+cfEsc(i3dCredit(m)||m.t||'')+'">'+i3dBadge()+'</span>';
 }
 /* desktop (owner, 31 Oct): an item's 3D model turns in its own tile. Hovering a model tile swaps the still picture for a live view
    (one tile at a time, so only one 3D canvas is ever open); click and drag orbits round the item, a click without a drag opens the
@@ -21742,6 +21747,7 @@ function i3dLive(kind,id,img,force){
       var gone=function(){if(window._i3dHintDone)return;window._i3dHintDone=true;hint.classList.add('off');setTimeout(function(){hint.remove()},300)};
       setTimeout(gone,4000);cv.addEventListener('pointerdown',gone,{once:true})}
     img.style.visibility='hidden';
+    window._i3dSeen=true;[].forEach.call(document.querySelectorAll('.i3d-badge'),function(b){b.textContent='3D'});
   }).catch(function(){if(_i3dLive===rec)_i3dLive=null;});
 }
 /* pictures saved by the earlier green-tinted build (no tv mark) are redrawn once, from the saved model, in its own colours (owner, 31 Oct) */

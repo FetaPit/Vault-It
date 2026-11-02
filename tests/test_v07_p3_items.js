@@ -52,6 +52,7 @@ const center = (p) => p.evaluate(() => { const e = document.querySelector('#othe
   { const { ctx, p } = await load(b, { w: 1100, errs }); await upload(p);
     let c = await center(p); await p.mouse.move(c.x, c.y); await p.waitForTimeout(1500);
     ok(await p.evaluate(() => !!(window._i3dLive && _i3dLive.view)), 'mouse: hovering the tile starts the live view');
+    ok(await p.evaluate(() => [...document.querySelectorAll('.i3d-badge')].every(b => b.textContent.trim() === '3D')), 'mouse: a mouse device never shows "tap to turn"');
     const d0 = await p.evaluate(dist);
     await p.evaluate(() => { window.__wp = null; document.addEventListener('wheel', (e) => { window.__wp = e.defaultPrevented; }, { passive: true }); });
     await p.mouse.wheel(0, -300); await p.waitForTimeout(300);
@@ -80,6 +81,8 @@ const center = (p) => p.evaluate(() => { const e = document.querySelector('#othe
     ok(await p.evaluate(() => { const v = _i3dLive && _i3dLive.view; return !!v && v.cam.position.distanceTo(v.home.p) < 0.05 && v.ctl.target.distanceTo(v.home.t) < 0.05; }) && !(await p.$('#i3d-modal')), 'mouse: a double click puts the camera back and does not open the viewer');
     await p.mouse.click(c.x, c.y); await p.waitForTimeout(900);
     ok(!!(await p.$('#i3d-modal')), 'mouse: a single click still opens the full viewer');
+    { const g = await p.evaluate(() => { const bs = [...document.querySelectorAll('#i3d-modal .i3d-row .dep-btn')], ref = document.createElement('button'); ref.className = 'wi-link-btn'; document.body.appendChild(ref); const rc = getComputedStyle(ref); const out = bs.map(b => { const c = getComputedStyle(b); return { t: b.textContent.trim(), radius: c.borderTopLeftRadius, bw: c.borderTopWidth, bcol: c.borderTopColor, rb: rc.borderTopColor, bg: c.backgroundColor, ff: c.fontFamily, fw: c.fontWeight, fs: parseFloat(c.fontSize), col: c.color, rcol: rc.color, h: Math.round(b.getBoundingClientRect().height) }; }); ref.remove(); return out; });
+      ok(g.length >= 2 && g.every(x => parseFloat(x.radius) >= 99 && x.bw === '1px' && x.bcol === x.rb && x.col === x.rcol && /DM Sans/.test(x.ff) && x.fw === '600' && x.fs >= 10 && !/^rgb\(239, 239, 239\)|^rgb\(233, 233, 237\)/.test(x.bg) && x.h >= 24), 'full viewer: Change model and Remove model are the ghost pill of Link to market value (' + g.map(x => x.t + ' ' + x.radius + ' ' + x.bcol + ' ' + x.bg + ' ' + x.fs + 'px h' + x.h).join('; ') + ')'); }
     { const v = await p.evaluate(() => { const bs = [...document.querySelectorAll('#i3d-modal .inv-ctl button')], r = bs[0].getBoundingClientRect(), cs = getComputedStyle(bs[0]), ac = getComputedStyle(document.getElementById('i3d-auto'));
         return { n: bs.length, size: Math.round(r.width), radius: cs.borderTopLeftRadius, col: getComputedStyle(document.querySelector('#i3d-modal .inv-ctl')).flexDirection, icons: bs.every(x => x.querySelector('svg use')), glyphs: bs.some(x => /[+\u2212\uFF0B\uFF0D\u27F3\u2302-]/.test(x.textContent.trim())), pressed: document.getElementById('i3d-auto').getAttribute('aria-pressed'), pbc: ac.borderTopColor, tbc: getComputedStyle(bs[1]).borderTopColor }; });
       ok(v.n === 4 && v.size === 36 && v.radius === '8px' && v.col === 'column' && v.icons && !v.glyphs, 'full viewer: controls match the Net worth HUD (4 icon buttons, 36 px, radius 8, vertical, no text glyphs)');
@@ -91,9 +94,15 @@ const center = (p) => p.evaluate(() => { const e = document.querySelector('#othe
     const cdp = await ctx.newCDPSession(p);
     const touch = async (type, pts) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts.map((q, i) => ({ x: q[0], y: q[1], id: i })) });
     let c = await center(p); await p.waitForTimeout(300); c = await center(p);
+    // before the first live view of the session a phone's badge invites the tap; afterwards it is just "3D" (Pedro's round 2)
+    const bd0 = await p.evaluate(() => { const b = document.querySelector('#other-assets-list .i3d-badge'); if (!b) return null; const cs = getComputedStyle(b); return { t: b.textContent.replace(/\s+/g, ' ').trim(), orbit: !!b.querySelector('svg use[href="#vi-orbit"]'), fs: cs.fontSize, ff: cs.fontFamily, fit: b.getBoundingClientRect().right <= b.closest('.wi-img-area').getBoundingClientRect().right - 2 }; });
+    ok(bd0 && bd0.t === '3D · tap to turn' && bd0.orbit && bd0.fs === '10px' && /Share Tech Mono/.test(bd0.ff) && bd0.fit, w + ' touch: before the first live view the badge reads "3D · tap to turn" with the orbit icon, 10 px mono, inside the tile (' + JSON.stringify(bd0) + ')');
+    // Daylight: the badge sits over the Night picture, so it keeps its Night colours (a readable green, not Daylight's dark green)
+    ok(await p.evaluate(() => { const b = document.querySelector('#other-assets-list .i3d-badge'), R = document.documentElement, was = R.getAttribute('data-theme'); R.setAttribute('data-theme', 'dark'); const n = getComputedStyle(b).color + '|' + getComputedStyle(b).backgroundColor; R.setAttribute('data-theme', 'light'); const l = getComputedStyle(b).color + '|' + getComputedStyle(b).backgroundColor; R.setAttribute('data-theme', was); return n === l; }), w + ' touch: in Daylight the 3D badge keeps its Night colours over the picture');
     // first tap turns the picture into the live view
     await touch('touchStart', [[c.x, c.y]]); await touch('touchEnd', []); await p.waitForTimeout(1500);
     ok(await p.evaluate(() => !!(window._i3dLive && _i3dLive.view)), w + ' touch: the first tap starts the live view');
+    ok(await p.evaluate(() => [...document.querySelectorAll('.i3d-badge')].every(b => b.textContent.trim() === '3D')), w + ' touch: after the first live view the badge goes back to "3D"');
     ok(await p.evaluate(() => getComputedStyle(_i3dLive.view.r.domElement).touchAction === 'pan-y'), w + ' touch: the tile\'s canvas passes vertical swipes to the page (touch-action pan-y)');
     // the tile has a hint chip and no control stack (Pedro's review: too big on a 150 to 190 px tile)
     ok(await p.evaluate(() => { const h = document.querySelector('.i3d-hint'), tl = document.querySelector('.i3d-live').getBoundingClientRect(); if (!h || document.querySelectorAll('.i3d-live .inv-ctl').length) return false; const r = h.getBoundingClientRect(), cs = getComputedStyle(h);
