@@ -28330,6 +28330,7 @@ function makeTreeMap(cv,o){
   self.phase=function(){var ts=performance.now();if(pending||t0===Infinity)return 'waiting';if(t0<0)return 'done';var e=ts-t0;return e<T_IN?'pile':e<lastEnd()?'moving':'done'};
   self.replay=function(){if(reduceMotion())return;pending=true;t0=Infinity;S.kick()};
   self.kick=function(){S.kick()};
+  self.flags=function(){return (self._flags||[]).map(function(f){return JSON.parse(JSON.stringify(f))})};self.outlines=function(){return (self._outl||[]).slice()};self.plates=function(){return 0};self.tagRect=function(){return self._tag||null};   /* tests: the flag posts and outlines of the last frame; the old floor plates are gone */
   self.clock=function(){return t0>=0&&t0!==Infinity?performance.now()-t0:null};
   function lastEnd(){return cells.length?cells[cells.length-1].off+T_GO:0}
   function shade(c){var t=(c.ii%2)?.16:0;return t?mix(c.g.col,[255,255,255],t):c.g.col}
@@ -28360,22 +28361,51 @@ function makeTreeMap(cv,o){
     var P0=new Proj(st,{x:0,y:0,w:cw,h:ch}),Pr={focal:P0.focal,pos:[P0.pos[0]/SC+sx,P0.pos[1]/SC,P0.pos[2]/SC],pt:function(x,y,z){return P0.pt((x-sx)*SC,y*SC,z*SC)}};self._P=Pr;
     cx.save();
     ground(cx,Pr,st,ext.x+1,-ext.z-1,ext.z+1,false,ts,rm,BS+.5);
-    /* each group's area on the floor, tinted and outlined in its colour, so the map reads as a tree map before the blocks land */
+    /* each group's area on the floor (owner, 2 Nov 2026, E8: "a dark red outline should ring fence all of the committed essentials, and then a
+       flag post to the label. And then that should be rolled out across the rest"; Pedro's spec G): a faint fill under the blocks, then after the
+       blocks a 1.5 px outline at .95 in the group's colour, inset .3 units so neighbouring groups show a gap, and a flag post with its chip */
     var land=function(r){var last=cells.filter(function(c){return c.r===r}).pop();if(t0<0||!last)return 1;return clamp((ts-t0-last.off-T_GO*.6)/NW_D.land,0,1)};
-    rects.forEach(function(r){var a=land(r);if(a<=0)return;var x0=r.x,x1=r.x+r.w,z0=r.z,z1=r.z+r.d,q=[Pr.pt(x0,.02,z0),Pr.pt(x1,.02,z0),Pr.pt(x1,.02,z1),Pr.pt(x0,.02,z1)];
-      cx.beginPath();cx.moveTo(q[0][0],q[0][1]);for(var i=1;i<4;i++)cx.lineTo(q[i][0],q[i][1]);cx.closePath();cx.fillStyle=rgba(r.g.col,.13*a);cx.fill();cx.strokeStyle=rgba(r.g.col,.6*a);cx.lineWidth=.8;cx.stroke()});
+    var IN=.3,quad=function(r,y){var ix=Math.min(IN,r.w*.25),iz=Math.min(IN,r.d*.25),x0=r.x+ix,x1=r.x+r.w-ix,z0=r.z+iz,z1=r.z+r.d-iz;return [Pr.pt(x0,y,z0),Pr.pt(x1,y,z0),Pr.pt(x1,y,z1),Pr.pt(x0,y,z1)]},
+      path=function(q){cx.beginPath();cx.moveTo(q[0][0],q[0][1]);for(var i=1;i<4;i++)cx.lineTo(q[i][0],q[i][1]);cx.closePath()};
+    rects.forEach(function(r){var a=land(r);if(a<=0)return;path(quad(r,.02));cx.fillStyle=rgba(r.g.col,.08*a);cx.fill()});
     var items=[];cells.forEach(function(c){var g=geo(c,ts);if(g)items.push(g)});
     items.forEach(function(g){g.dz=Math.hypot(Pr.pos[0]-g.x,Pr.pos[1]-(g.y+g.h/2),Pr.pos[2]-g.z)});items.sort(function(a,b){return b.dz-a.dz});
     items.forEach(function(g){var col=g.fl>0?mix(g.col,PAL.flash,g.fl*.8):g.col;if(hover&&hover.g===g.c.g&&hover.ii===g.c.ii)col=mix(col,PAL.flash,.45);drawBox(cx,Pr,g,PL,col,PAL.fa+.16+.06*PL,.66+.25*PL,PAL.edgeK)});
-    /* each group's name and total over its rectangle, once its blocks have landed; names never overlap (pushed down a line) */
-    var lf=clamp(cw*.02,9,12),boxes=[];cx.font=lf+"px 'Share Tech Mono',monospace";cx.textBaseline="middle";cx.textAlign="left";
-    /* names sit on top of their area at its back left corner, like the debt tree map */
-    rects.map(function(r){var q=Pr.pt(r.x+.3,CH+.1,r.z+.3);return {r:r,q:q}}).sort(function(a,b){return a.q[1]-b.q[1]}).forEach(function(o2){
-      var r=o2.r,a=land(r);if(a<=0)return;
-      var txt=r.g.label+" · "+fmt(r.g.sum),tw=cx.measureText(txt).width,hh=lf*1.5,bx=clamp(o2.q[0],4,cw-tw-8),by=o2.q[1]+hh*.7;
-      for(var t=0;t<8&&boxes.some(function(b){return bx<b[0]+b[2]+6&&bx+tw+6>b[0]&&by-hh/2<b[1]+hh/2&&by+hh/2>b[1]-hh/2});t++)by+=hh+1;
-      boxes.push([bx-3,by,tw]);
-      cx.globalAlpha=a;cx.fillStyle="rgba(8,8,8,.72)";cx.fillRect(bx-3,by-hh/2,tw+6,hh);cx.fillStyle=rgba(r.g.col,1);cx.fillText(txt,bx,by);cx.globalAlpha=1});
+    var outl=[];rects.forEach(function(r){var a=land(r);if(a<=0)return;path(quad(r,.02));cx.strokeStyle=rgba(r.g.col,.95*a);cx.lineWidth=1.5;cx.lineJoin='round';cx.stroke();
+      outl.push({group:r.g.key,lineWidth:1.5,alpha:.95,fill:.08,inset:IN,afterBlocks:true})});
+    self._outl=outl;
+    /* flag posts: 1 px in the group colour from the area's back-left corner to two block heights above the blocks, a 3 px dot, and on it a chip
+       (name in DM Sans, amount in Share Tech Mono in the group colour). Projected every frame, so the posts turn with the orbit; only the chip
+       faces the screen. A chip that would cover another is raised one chip height at a time (at most three), then shows the amount only; it
+       never slides off its post. Reduced motion: the posts stand at full height at once. */
+    var NF="600 11px 'DM Sans',sans-serif",AF="10.5px 'Share Tech Mono',monospace",PX=6,PY=4,HC=19,placed=[],flags=[],todo=[];
+    (function(){var fs=clamp(cw*.026,11,17);cx.font=fs+"px 'Share Tech Mono',monospace";var w1=cx.measureText("MONTHLY INCOME").width;cx.font=(fs*1.5)+"px 'Share Tech Mono',monospace";var w2=cx.measureText(fmt(total)).width;
+      var tw=Math.max(w1,w2)+fs*1.5,th=fs*3.6;placed.push({x:cw-tw-14-4,y:14-4,w:tw+8,h:th+8});self._tag={x:cw-tw-14,y:14,w:tw,h:th}})();   // the Monthly income tag (drawn last, top right) is in the way too
+    var fl=rects.map(function(r){var ix=Math.min(IN,r.w*.25),iz=Math.min(IN,r.d*.25),bx=r.x+ix,bz=r.z+iz;return {r:r,bx:bx,bz:bz,base:Pr.pt(bx,.02,bz),top:Pr.pt(bx,CH*3,bz)}});
+    fl.sort(function(a,b){return (b.r.g.key==='ce')-(a.r.g.key==='ce')||b.top[1]-a.top[1]});   // committed essential first (the owner's own example keeps its name), then nearest post first: the chips further back rise into the open space above
+    fl.forEach(function(o){
+      var r=o.r,a=land(r);if(a<=0)return;
+      var rise=rm?1:ease3(a),tp=rise>=1?o.top:Pr.pt(o.bx,.02+(CH*3-.02)*rise,o.bz),name=r.g.label,amt=fmt(r.g.sum);
+      cx.font=NF;var nw=cx.measureText(name+' \u00b7 ').width;cx.font=AF;var aw=cx.measureText(amt).width;
+      var fit=function(only,k,left){var w=PX*2+(only?0:nw)+aw,dx=tp[0],dy=tp[1]-k*(HC+2),x=left?dx+1-w:dx-1;   // the chip hangs right of its post, or left of it
+        return {x:x,y:dy-3-HC,w:w,h:HC,dot:[dx,dy],k:k,only:only}};
+      var clash=function(c){return c.y<0||c.x<0||c.x+c.w>cw||placed.some(function(b){return c.x<b.x+b.w+3&&b.x<c.x+c.w+3&&c.y<b.y+b.h+2&&b.y<c.y+c.h+2})};
+      var c=null;[false,true].some(function(only){for(var k=0;k<=3;k++)for(var sd=0;sd<2;sd++){var t=fit(only,k,sd===1);if(!clash(t)){c=t;return true}}return false});
+      var none=!c;if(none)c=fit(true,0,false);else placed.push(c);   // no room at all: the post and its dot stand without a chip rather than cover another (the readout below names every group)
+      todo.push({o:o,r:r,a:a,c:c,none:none,name:name,amt:amt,nw:nw,rise:rise});});
+    todo.forEach(function(t){var r=t.r,c=t.c;cx.globalAlpha=t.a;   // every post first, then every chip on top, so no post crosses a chip
+      cx.strokeStyle=rgba(r.g.col,1);cx.lineWidth=1;cx.beginPath();cx.moveTo(t.o.base[0],t.o.base[1]);cx.lineTo(c.dot[0],c.dot[1]);cx.stroke();
+      cx.fillStyle=rgba(r.g.col,1);cx.beginPath();cx.arc(c.dot[0],c.dot[1],1.5,0,Math.PI*2);cx.fill();cx.globalAlpha=1});
+    todo.forEach(function(t){var r=t.r,c=t.c,a=t.a,o=t.o,name=t.name,amt=t.amt,nw=t.nw,rise=t.rise;
+      if(t.none){flags.push({group:r.g.key,name:name,amount:amt,col:r.g.col.slice(),base:o.base.slice(0,2),dot:c.dot.slice(),chip:null,raise:0,amountOnly:true,worldTop:CH*3,blockH:CH,rise:rise,alpha:a,style:null});return}
+      cx.globalAlpha=a;cx.beginPath();if(cx.roundRect)cx.roundRect(c.x+.5,c.y+.5,c.w-1,c.h-1,4);else cx.rect(c.x+.5,c.y+.5,c.w-1,c.h-1);cx.fillStyle='rgba(8,8,8,0.88)';cx.fill();cx.strokeStyle=rgba(r.g.col,.5);cx.lineWidth=1;cx.stroke();
+      cx.textBaseline='middle';cx.textAlign='left';var ty=c.y+c.h/2+.5,tx=c.x+PX;
+      if(!c.only){cx.font=NF;cx.fillStyle='#E8E8E8';cx.fillText(name+' \u00b7 ',tx,ty);tx+=nw}
+      cx.font=AF;cx.fillStyle=rgba(r.g.col,1);cx.fillText(amt,tx,ty);cx.globalAlpha=1;
+      flags.push({group:r.g.key,name:name,amount:amt,col:r.g.col.slice(),base:o.base.slice(0,2),dot:c.dot.slice(),chip:{x:c.x,y:c.y,w:c.w,h:c.h},raise:c.k,amountOnly:c.only,
+        worldTop:CH*3,blockH:CH,rise:rise,alpha:a,style:{fill:'rgba(8,8,8,0.88)',stroke:.5,radius:4,padX:PX,padY:PY,nameFont:NF,amtFont:AF,nameCol:'#E8E8E8',post:1,dot:3}})});
+    self._flags=flags;
+    var lf=clamp(cw*.02,9,12);   // the caption's size (it was set by the floor labels this replaces)
     tag(cx,cw,"MONTHLY INCOME",fmt(total),false,null);
     cx.fillStyle=PAL.label;cx.textAlign="left";cx.textBaseline="alphabetic";cx.font=lf+"px 'Share Tech Mono',monospace";cx.fillText("1 block = "+fmt(U)+(intro?"  ·  income arriving":""),12,ch-12);
     cx.restore();
