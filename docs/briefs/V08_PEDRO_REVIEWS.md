@@ -24,3 +24,6 @@ Not shot in a live tile: the sample data has no uploaded model. I'll check the t
 ## C2, v07/ui-round2 86d5e13 (round 2 of 2): one CSS tweak left
 10 px labels and the 4 px gap are in. At 690, 1100 and 1440 the pills sit on one row in Night and Daylight. At 390 they still wrap: with Syne really loaded (`document.fonts.check('700 10px Syne')` true), the widths are 111 + 99 + 133 + 8 = 351 px against a 344 px row. C2's 105/95/124 came from the fallback font, because the tests block the network.
 Fix, under 420 px only: letter-spacing .04em, padding 0 7 0 6, gap inside the button 4. That saves about 23 px, which lands at about 328. The test should allow for the real font: assert the sum is at most 336 with Syne loaded, or keep 8 px of headroom over the fallback.
+
+## C2, v07/ui-round2 1103ecc: PASS
+With the real Syne loaded, the row measures 104 + 93 + 125 + 8 = 330 px. At 390 and 420 the pills sit on one row in Night and Daylight, and at 690, 1100 and 1440 too. At 360 they wrap into two right-aligned rows with nothing clipped, which is fine.
