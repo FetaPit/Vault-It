@@ -15,3 +15,15 @@ Open `vault-it-brand-book.html` in a browser first. It is the visual and behavio
 | `vault-it-tokens.json`, `tailwind.vault-it.js` | Same tokens for other toolchains. Only if needed |
 
 `CLAUDE_ADDENDUM.md` is text to **append** to the repo's existing `CLAUDE.md`. Do not replace that file.
+
+## 3D model library (Wealth Inventory + Liabilities)
+
+Each inventory tile and liability tile has a 🧊 button to attach an open-licence 3D model, then **View in 3D** to orbit it.
+
+Models are fetched once at build time (not scraped, no API key in the browser):
+
+```bash
+POLY_PIZZA_KEY=your_key node tools/fetch-models.mjs   # key: https://poly.pizza/settings/api
+```
+
+This writes `models/glb/`, `models/thumb/`, `models/catalog.json` and `models/CREDITS.md` (CC0 and CC-BY only, under 20k triangles). Commit the output. Serve the app over http(s), not `file://`, so the catalogue can load. Keep `models/CREDITS.md` published: CC-BY requires attribution.

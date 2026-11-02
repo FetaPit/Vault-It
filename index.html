@@ -78,6 +78,8 @@ if ('serviceWorker' in navigator) {
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="vault-it-model-picker.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════════
    PURPOSEOS GLOBAL — 2-tab build: Overview + House
@@ -6154,6 +6156,7 @@ function renderAlTab(){
           +'<label class="dep-btn" title="Upload photo" style="cursor:pointer;flex:1;text-align:center">📷<input type="file" accept="image/*" style="display:none" onchange="liabUpload('+l.id+',this)"></label>'
           +'<button class="dep-btn" onclick="liabSearch('+l.id+')" title="Search image" style="flex:1">🔍</button>'
           +'<button class="dep-btn" onclick="wiIcon('+l.id+',\'liab\')" title="Set icon" style="flex:1">🎨</button>'
+          +'<button class="dep-btn" onclick="m3dPick(\'liab\','+l.id+')" title="Pick 3D model" style="flex:1">🧊</button>'
           +'</div>'
           +'<div class="wi-info">'
           +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px">'
@@ -6162,6 +6165,7 @@ function renderAlTab(){
           +'</div>'
           +(l.runningCost>0?'<div class="wi-sub">'+gbpFmt(l.runningCost)+'/mo</div>':'')
           +(l.depRate>0?'<div class="wi-sub" style="color:var(--re)">↓'+l.depRate+'%/yr</div>':'')
+          +(l.model3d?'<button class="data-item-del" style="margin-top:4px;width:100%;color:var(--em);border-color:rgba(68,192,185,.4)" onclick="m3dView(\'liab\','+l.id+')">🧊 View in 3D</button>':'')
           +'<button class="data-item-del" style="margin-top:4px;width:100%" onclick="delLiability('+l.id+')">✕ Remove</button>'
           +'</div>'
           +'</div>';
@@ -6196,11 +6200,13 @@ function renderAlTab(){
           +'<label class="wi-img-btn" title="Upload photo">📷<input type="file" accept="image/*" style="display:none" onchange="wiUpload('+a.id+',this)"></label>'
           +'<button class="wi-img-btn" onclick="wiSearch('+a.id+')" title="Search image">🔍</button>'
           +'<button class="wi-img-btn" onclick="wiIcon('+a.id+')" title="Pick icon">🎨</button>'
+          +'<button class="wi-img-btn" onclick="m3dPick(\'assets\','+a.id+')" title="Pick 3D model">🧊</button>'
           +'</div>'
           +'</div>'
           +'<div class="wi-info">'
           +'<div class="wi-name" title="'+a.name+'">'+a.name+'</div>'
           +'<div class="wi-val">£'+(a.value||0).toLocaleString('en-GB')+'</div>'
+          +(a.model3d?'<button class="data-item-del" style="margin-top:4px;width:100%;color:var(--em);border-color:rgba(68,192,185,.4)" onclick="m3dView(\'assets\','+a.id+')">🧊 View in 3D</button>':'')
           +'</div>'
           +'<button class="wi-del" onclick="delOtherAsset('+a.id+')">✕</button>'
           +'</div>';
