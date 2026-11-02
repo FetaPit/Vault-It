@@ -150,3 +150,31 @@ My spec in `V07_PREVIEW_EDITS.md` (Pedro C, items 3 and 4) stands, with these up
 ## Review: what I check on each branch
 
 `node tools/shot.js` at 390, 690, 1100 and 1440, Night and Daylight, on the changed element, against this file. Each item gets PASS or a numbered fix list, cc David; two rounds, then David decides. Fails on sight: text under 10 px, overlapping text, an empty column, a label that does not match its colour, a new hex where a token exists, sideways scroll, the FCA line off screen, any change to the house builder viewport.
+
+## H. App-wide type scale (F2, v08/type-scale; owner said yes, 2 Nov)
+
+Problem: at 390 to 690 the root is 13 px (`index.html:14020`), so .5rem renders at 6.5 px. The brand book's smallest text is 10.5 px.
+
+Pedro's position, to agree with F2 after its audit:
+- Raising only the root from 13 to 15 px is not enough, and it is the wrong way round. .5rem would still be 7.5 px, and everything already readable (headings, figures, rem-sized icons and paddings) would grow 15%. That repeats the owner's "too large for the UI scale" complaint.
+- Instead, put a floor under the small sizes and leave the rest alone. Every `font-size:<x>rem` with x under .81 becomes `max(<floor>px, <x>rem)`, so it never renders under its floor and still scales up on big screens:
+
+| Current | Floor | Use |
+|---|---|---|
+| under .56rem | 10.5 px | captions, sub-lines, legal, hints, axis labels |
+| .56 to .69rem | 11.5 px | body in tiles, list rows, buttons |
+| .70 to .80rem | 12.5 px | lead lines, inputs |
+| .81rem and up | unchanged | headings, figures |
+
+- Uppercase Syne eyebrows and labels (letter-spacing .08em or more) may floor at 10 px; their caps read larger.
+- Inline `style="font-size:..."` counts too, and so do sizes set from JS strings.
+- Fixed-height containers (pills, chips, 28 to 36 px buttons, tab bar) must still fit: no clipped descenders, no wrap that grows a row. List every one F2 had to adjust.
+
+Allowed exceptions (listed in the commit):
+- Text drawn on 3D canvases: minimum 10 px via the existing `clamp()`s.
+- The USP and PRO nav badges: 9 px uppercase.
+- The house builder 3D viewport and its HUD: not touched (hard rule).
+
+Must not grow: anything already 10.5 px or more on screen; icons; row heights in the tab bar; the C2 pills (10 px caps, measured to fit 390).
+
+Done means: an audit before and after (count of visible text nodes under 10.5 px at 390, 690 and 1100, which should be zero except for the exceptions); no sideways scroll; no new wraps in pills, chips or buttons; tab shots at 390 and 1100, Night and Daylight, for Dashboard, Budget, House, Assets, Debt and Settings.
