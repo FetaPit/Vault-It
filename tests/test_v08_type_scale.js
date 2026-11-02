@@ -29,8 +29,15 @@ const OFF = ':root{--vi-fs-0:0px!important;--vi-fs-1:0px!important;--vi-fs-2:0px
   for (const m of body.matchAll(/font-size\s*:\s*(\d*\.?\d+)(rem|px)(?![\w(])/g)) {
     const n = +m[1], u = m[2]; if (u === 'rem' ? n >= 0.81 : n >= 10.5) continue;
     const line = body.slice(body.lastIndexOf('\n', m.index) + 1, body.indexOf('\n', m.index));
-    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar|(^|[^b])tab-btn\b|#app-footer|\.ft-[a-z]|#vi-fb-btn|\.i3d-hint\{|\.i3d-badge\{/.test(line)) continue;   // KEEP rules (C2 pills, D2 card titles, house viewport HUD)
+    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar|(^|[^b])tab-btn\b|#app-footer|\.ft-[a-z]|#vi-fb-btn|\.i3d-hint\{|\.i3d-badge\{|#topnav \.vi-usp,#topnav \.vi-pro\{/.test(line)) continue;   // KEEP rules (C2 pills, D2 card titles, house viewport HUD)
     bare.push(line.trim().slice(0, 90));
+  }
+  // the font: shorthand too, including a clamp() minimum (follow-up: .dtm-n / .dtm-s on the Debt tree map)
+  for (const m of body.matchAll(/\bfont\s*:\s*(?:[a-z0-9-]+\s+){0,3}(clamp\(\s*)?(\d*\.?\d+)(rem|px)/g)) {
+    const n = +m[2], u = m[3]; if (u === 'rem' ? n >= 0.81 : n >= 10.5) continue;
+    const line = body.slice(body.lastIndexOf('\n', m.index) + 1, body.indexOf('\n', m.index));
+    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar|(^|[^b])tab-btn\b|#app-footer|\.ft-[a-z]|#vi-fb-btn|\.i3d-hint\{|\.i3d-badge\{|#topnav \.vi-usp,#topnav \.vi-pro\{/.test(line)) continue;
+    bare.push('font: ' + line.trim().slice(0, 80));
   }
   for (const m of body.matchAll(/max\((\d*\.?\d+)rem,var\(--vi-fs-(\d)\)\)/g)) {
     const n = +m[1], t = +m[2], want = n < 0.56 ? 1 : n < 0.70 ? 2 : 3;
@@ -145,6 +152,22 @@ function measure() {
     const co = await p2.evaluate(() => { try { fireCarousel(); } catch (e) {} return [...document.querySelectorAll('#fire-roadmap-svg .fire-coin')].map(g => [parseFloat(g.style.opacity || '1'), (g.style.transform.match(/scale\(([\d.]+)\)/) || [0, 1])[1] * 1]); });
     ok(co.length > 2 && co.some(x => x[0] < 0.9) && co.every(x => x[1] >= 1), `390: Roadmap coins away from the centre still fade, and none scales under 1 (opacity min ${Math.min(...co.map(x => x[0]))}, scale min ${Math.min(...co.map(x => x[1]))})`);
     await c2.close();
+  }
+  // follow-up items (David's sweep of 8b33d7c): Entrepreneur KPI labels are never cut; the Stocks donut sub-line and the item block caption draw at 10.5 px or more
+  {
+    const c3 = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); const p3 = await c3.newPage();
+    await p3.addInitScript(() => { try { localStorage.setItem('vi_declined_demo', 'true'); } catch (e) {} });
+    await p3.goto(URL_); await p3.waitForTimeout(1100); await p3.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
+    const fu = await p3.evaluate(() => { showTab('biz');
+      const biz = [...document.querySelectorAll('#tab-biz .ov-kpi-lbl')].filter(e => e.offsetParent).filter(e => e.scrollWidth > e.clientWidth + 1).map(e => e.textContent.trim());
+      const host = document.createElement('div'); host.style.cssText = 'position:fixed;left:0;top:0;width:150px;height:150px'; document.body.appendChild(host);
+      host.innerHTML = '<div style="position:relative;width:150px;height:150px">' + generateAssetISO('Laptop', '', 'asset') + '</div>' + stkDonut([{ v: 1, c: '#3ecf8e' }], 1, '£1,234', '+20.29%', '#3ecf8e');
+      const cap = host.querySelector('.iso-cap'), sub = [...host.querySelectorAll('svg text')].pop();
+      const out = { biz, cap: cap ? parseFloat(getComputedStyle(cap).fontSize) : 0, capText: cap ? cap.textContent : '', sub: +(parseFloat(sub.getAttribute('font-size')) * sub.getScreenCTM().a).toFixed(2) }; host.remove(); return out; });
+    ok(fu.biz.length === 0, `390: Entrepreneur KPI labels are not cut (${fu.biz.join(',')})`);
+    ok(fu.cap >= 10.5 && fu.capText === 'LAPTOP', `item block caption at ${fu.cap} px (${fu.capText})`);
+    ok(fu.sub >= 10.5, `Stocks donut sub-line drawn at ${fu.sub} px`);
+    await c3.close();
   }
   // the user's Text Size setting still works (Large = 15 px root on a phone)
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true }); const page = await ctx.newPage();

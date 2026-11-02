@@ -21,6 +21,7 @@ const KEEP = [
   /(^|[^b])tab-btn\b/,       // the nav tabs: sized to fit all seven tabs (Pedro's KEEP list); not .subtab-btn
   /#app-footer|\.ft-[a-z]|#vi-fb-btn/,   // E2's footer and Feedback button (Pedro's KEEP list)
   '.i3d-hint{', '.i3d-badge{',          // B2's model-tile chips: 10 px mono, spec F
+  '#topnav .vi-usp,#topnav .vi-pro{',   // USP/PRO nav badges: 9 px caps (agreed exception; set by type_scale_hand.js)
 ];
 const tierOf = (n, u) => u === 'rem' ? (n < 0.56 ? 1 : n < 0.70 ? 2 : n < 0.81 ? 3 : 0) : (n < 10.5 ? 1 : 0);
 const counts = { 0: 0, 1: 0, 2: 0, 3: 0 };
@@ -56,6 +57,8 @@ function fix(s) {
   s = s.replace(/(font-size\s*:\s*)(clamp\(\s*(\d*\.?\d+)(rem|px)\s*,[^;{}()]*(?:\([^()]*\)[^;{}()]*)*\))/g, (m, p, c, n, u, i, str) => { const f = floorFor(str, i, +n, u); return f ? `${p}max(${c},${f})` : m; });
   // font-size:<value>
   s = s.replace(/(font-size\s*:\s*)(\d*\.?\d+)(rem|px)(?![\w(])/g, (m, p, n, u, i, str) => { const f = floorFor(str, i, +n, u); return f ? `${p}max(${n}${u},${f})` : m; });
+  // font:<weight/style tokens> clamp(<min>,...)[/lh] <family>: wrap the whole clamp
+  s = s.replace(/(\bfont\s*:\s*(?:[a-z0-9-]+\s+){0,3})(clamp\(\s*(\d*\.?\d+)(rem|px)\s*,[^;{}()]*(?:\([^()]*\)[^;{}()]*)*\))/g, (m, p, c, n, u, i, str) => { const f = floorFor(str, i, +n, u); return f ? `${p}max(${c},${f})` : m; });
   // font:<weight/style tokens> <size>[/lh] <family>
   s = s.replace(/(\bfont\s*:\s*(?:[a-z0-9-]+\s+){0,3})(\d*\.?\d+)(rem|px)(?=\s*[\/\s])/g, (m, p, n, u, i, str) => { const f = floorFor(str, i, +n, u); return f ? `${p}max(${n}${u},${f})` : m; });
   return s;
