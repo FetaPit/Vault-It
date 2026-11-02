@@ -16,7 +16,7 @@ document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark")}c
 /* Vault-It design tokens. Night is the default, Daylight is the light mode.
  * Switch with data-theme="light" on <html>. Generated from vault-it-brand-book.html */
 html{box-sizing:border-box}
-:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage{   /* 3D viewports stay Night in Daylight too */
+:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge{   /* 3D viewports stay Night in Daylight too (the model badge sits over the Night picture) */
   color-scheme:dark;
   --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --slate:#1C2420; --line:#102221; --line2:#15302F;
   --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882; --lock:#8C939B;
@@ -7838,7 +7838,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
    PURPOSEOS GLOBAL — 2-tab build: Overview + House
 ═══════════════════════════════════════════════════════ */
 
-:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage {
+:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge {
   /* old names, kept as aliases of the brand tokens for one release */
   --c1: var(--panel); --c2: var(--surf2); --c3: var(--slate); --c4: var(--line2);
   --em: var(--teal); --em2: var(--teal); --em3: var(--faint); --dp: var(--teal-deep);
@@ -10790,19 +10790,30 @@ button.bd-ic{cursor:pointer}
 .inv-stage{position:relative;width:100%;aspect-ratio:4/3;max-height:58vh;border-radius:10px;overflow:hidden;background:var(--panel);border:1px solid rgb(var(--ink-rgb) / .06)}
 .inv-stage canvas{width:100%;height:100%;display:block}
 .inv-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--t3);pointer-events:none}
-.inv-ctl{position:absolute;bottom:8px;right:8px;display:flex;gap:4px}
-.inv-ctl button{width:30px;height:30px;border-radius:7px;border:1px solid rgb(var(--blue-rgb) / .4);background:rgba(0,0,0,.6);color:#9bd0ff;font-size:.8rem;cursor:pointer;padding:0}
-.inv-ctl button:hover{background:rgb(var(--blue-rgb) / .25)}
+.inv-ctl{position:absolute;bottom:8px;right:8px;display:flex;flex-direction:column;gap:6px;z-index:2}   /* one control language with .nw3d-hud (Pedro v0.8 F) */
+.inv-ctl button{width:36px;height:36px;border-radius:8px;border:1px solid rgb(var(--teal-rgb) / .35);background:rgb(var(--panel-rgb) / .82);color:var(--text);cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.inv-ctl button .vi-ic{width:18px;height:18px;--vi-sw:1.5}
+.inv-ctl button:hover{border-color:var(--teal);color:var(--teal)}.inv-ctl button:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+@media(max-width:599px){.inv-ctl button{width:40px;height:40px}}
+.i3d-hint{position:absolute;left:6px;bottom:6px;z-index:2;display:inline-flex;align-items:center;gap:4px;padding:2px 5px;border-radius:4px;background:rgba(8,8,8,.72);color:var(--text);font:400 10px/1.3 'Share Tech Mono',monospace;pointer-events:none;transition:opacity 240ms var(--ease)}
+.i3d-hint .vi-ic{width:12px;height:12px;--vi-sw:1.5}.i3d-hint.off{opacity:0}
+.inv-ctl button[aria-pressed="true"]{border-color:var(--teal)}
+.wi-img-area .i3d-live canvas:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+.wi-img-area .i3d-live canvas:active{cursor:grabbing}
+@media (prefers-reduced-motion:reduce){.i3d-hint{transition:none}}
 .inv-hint{font-size:.52rem;color:var(--t2);line-height:1.5}
 .i3d-stage{touch-action:none}
 .i3d-stage canvas.i3d-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none}
-.wi-img-area .i3d-live{position:absolute;inset:0;z-index:2}.wi-img-area .i3d-live canvas{width:100%!important;height:100%!important;cursor:grab;display:block}
+.wi-img-area .i3d-live{position:absolute;inset:0;z-index:2}.wi-img-area .i3d-live canvas{width:100%!important;height:100%!important;cursor:grab;display:block;touch-action:pan-y}
 .wi-img-area img.i3d-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;cursor:zoom-in}
-.i3d-badge{border-color:rgb(var(--green-rgb) / .6)!important;background:rgb(var(--green-rgb) / .18)!important;color:var(--green)!important}
+.i3d-badge{font-size:10px!important;display:inline-flex;align-items:center;gap:4px;border-color:rgb(var(--green-rgb) / .6)!important;background:rgb(var(--green-rgb) / .18)!important;color:var(--green)!important}
 .i3d-btn{font-family:'Share Tech Mono',monospace;font-size:.6rem;font-weight:700;color:var(--green)}
 .i3d-msg{font-size:.56rem;color:var(--t2);min-height:1em}.i3d-msg.bad{color:var(--re)}
 .i3d-credit{font-size:.5rem;color:var(--t3);word-break:break-word}
 .i3d-row{display:flex;gap:6px;flex-wrap:wrap}
+/* the viewer's Change model, Remove model, View current model and Photos buttons: the ghost pill of "Link to market value" (Pedro's round 2; .dep-btn had no style), at a tap-sized 11 px */
+.i3d-row .dep-btn{display:inline-flex;align-items:center;font:600 11px 'DM Sans',sans-serif;padding:5px 11px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
+.i3d-row .dep-btn:hover,.i3d-row .dep-btn:focus-visible{background:rgb(var(--teal-rgb) / .24)}
 .i3d-opts{display:flex;flex-direction:column;gap:10px}
 .i3d-up{display:block;text-align:center;padding:10px;cursor:pointer;font-size:.62rem}
 .i3d-lib-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;color:var(--tx);display:flex;align-items:center;gap:6px}
@@ -13468,8 +13479,9 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wi-name{font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;color:var(--t1);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wi-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--gr)}
 /* bigger item tiles (owner, 31 Oct): wealth inventory, liabilities and crypto share the grid; about four across at 1100 px, two on a phone */
-.wi-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,140px),1fr));gap:12px}
-@media(min-width:900px){.wi-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.wi-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,168px),1fr));gap:12px}   /* item tiles 20% larger (owner, 2 Nov): 140 to 168 px, 230 to 276 px */
+@media(max-width:519px){.wi-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:8px}.wi-grid .wi-img-area{aspect-ratio:5/6}}   /* a phone fits two across, so the tile is taller instead: 20% more height */
+@media(min-width:900px){.wi-grid{grid-template-columns:repeat(auto-fill,minmax(276px,1fr));gap:18px}.wi-grid .wi-img-area{aspect-ratio:5/6}   /* three across cannot get wider, so 20% taller */
   .wi-info{padding:12px 14px 14px}.wi-name{font-size:.78rem}.wi-val{font-size:.86rem}}
 .wi-link-btn{display:inline-block;margin-top:5px;font:600 .5rem 'DM Sans',sans-serif;padding:3px 7px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
 .wi-link-btn:hover,.wi-link-btn:focus-visible{background:rgb(var(--teal-rgb) / .24)}
@@ -21538,7 +21550,7 @@ async function invRenderModal(id){
     +'<div class="inv-hd"><div><div class="inv-t">'+cfEsc(a.name)+'</div><div class="inv-s">£'+(a.value||0).toLocaleString('en-GB')+' · '+(prevOnly?'preview'+((a.photos||0)>0?' · '+a.photos+' photo'+(a.photos===1?'':'s')+' on another device':''):n+' photo'+(n===1?'':'s')+(n>=2?' · 3D view':''))+'</div></div>'
     +'<button class="inv-x" onclick="invCloseViewer()" title="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>'
     +'<div class="inv-stage"><canvas id="inv-big"'+(prevOnly?' hidden':'')+'></canvas>'+(prevOnly?'<img class="inv-prev" src="'+cfEsc(a.image)+'" alt="'+cfEsc(a.name)+'">':n===0?'<div class="inv-empty">No photos yet</div>':'')
-    +'<div class="inv-ctl"><button title="Auto-rotate" onclick="invToggleAuto()" id="inv-auto">⟳</button><button title="Zoom in" onclick="invZoom(0.35)"><svg class="vi-ic g" role="img" aria-label="Add"><use href="#vi-plus"/></svg></button><button title="Zoom out" onclick="invZoom(-0.35)">－</button><button title="Previous frame" onclick="_invSpin&&_invSpin.step(-1)">◀</button><button title="Next frame" onclick="_invSpin&&_invSpin.step(1)">▶</button></div></div>'
+    +'<div class="inv-ctl"><button title="Auto-rotate" onclick="invToggleAuto()" id="inv-auto"><svg class="vi-ic sm" role="img" aria-label="Auto-rotate"><use href="#vi-orbit"/></svg></button><button title="Zoom in" onclick="invZoom(0.35)"><svg class="vi-ic sm" role="img" aria-label="Zoom in"><use href="#vi-zoom-in"/></svg></button><button title="Zoom out" onclick="invZoom(-0.35)"><svg class="vi-ic sm" role="img" aria-label="Zoom out"><use href="#vi-zoom-out"/></svg></button><button title="Previous frame" onclick="_invSpin&&_invSpin.step(-1)"><svg class="vi-ic sm" role="img" aria-label="Previous frame" style="transform:rotate(90deg)"><use href="#vi-chevron"/></svg></button><button title="Next frame" onclick="_invSpin&&_invSpin.step(1)"><svg class="vi-ic sm" role="img" aria-label="Next frame" style="transform:rotate(-90deg)"><use href="#vi-chevron"/></svg></button></div></div>'
     +'<div class="inv-hint">'+(prevOnly&&(a.photos||0)>0?'This is the saved preview. The full photos ('+a.photos+') are kept on the device they were added on, and are not copied to your account or to a new web address. Add photos here to see them on this device.':prevOnly?'This is the item\'s picture. Add photos taken from all around it to make a 3D view.':hint)+'</div>'
     +'<div class="inv-strip">'+urls.map(function(u,i){return '<div class="inv-th"><img src="'+u+'" alt="photo '+(i+1)+'"><span class="inv-n">'+(i+1)+'</span>'
       +'<span class="inv-tb"><button onclick="invMoveFrame('+id+','+i+',-1)" title="Move earlier"'+(i===0?' disabled':'')+'>◀</button><button onclick="invRemoveFrame('+id+','+i+')" title="Delete photo"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button><button onclick="invMoveFrame('+id+','+i+',1)" title="Move later"'+(i===n-1?' disabled':'')+'>▶</button></span></div>';}).join('')
@@ -21719,7 +21731,7 @@ async function i3dOpen(kind,id){
   var m=it.model,val=kind==='li'?(typeof depreciatedValue==='function'?depreciatedValue(it):it.value):it.value;
   var body=i3dShell(it.name,'£'+Math.round(val||0).toLocaleString('en-GB')+' · 3D model'+(m.src==='pp'?' from Poly Pizza':' (your file)'));
   body.innerHTML='<div class="inv-stage i3d-stage" id="i3d-stage"><div class="inv-empty" id="i3d-wait">Loading the model…</div>'
-    +'<div class="inv-ctl"><button title="Auto-rotate" id="i3d-auto" aria-pressed="true" onclick="i3dAuto()">⟳</button><button title="Zoom in" onclick="_i3dView&&_i3dView.zoom(0.8)">＋</button><button title="Zoom out" onclick="_i3dView&&_i3dView.zoom(1.25)">－</button><button title="Reset view" onclick="_i3dView&&_i3dView.reset()">⌂</button></div></div>'
+    +'<div class="inv-ctl"><button title="Auto-rotate" id="i3d-auto" aria-pressed="true" onclick="i3dAuto()"><svg class="vi-ic sm" role="img" aria-label="Auto-rotate"><use href="#vi-orbit"/></svg></button><button title="Zoom in" onclick="_i3dView&&_i3dView.zoom(0.8)"><svg class="vi-ic sm" role="img" aria-label="Zoom in"><use href="#vi-zoom-in"/></svg></button><button title="Zoom out" onclick="_i3dView&&_i3dView.zoom(1.25)"><svg class="vi-ic sm" role="img" aria-label="Zoom out"><use href="#vi-zoom-out"/></svg></button><button title="Reset view" onclick="_i3dView&&_i3dView.reset()"><svg class="vi-ic sm" role="img" aria-label="Reset view"><use href="#vi-reset"/></svg></button></div></div>'
     +'<div class="inv-hint">Drag to rotate · pinch or scroll to zoom · two fingers or right-drag to move.'+(m.lic==='CC-BY'?'<br><span class="i3d-credit">'+cfEsc(i3dCredit(m))+'</span>':m.src==='pp'?'<br><span class="i3d-credit">"'+cfEsc(m.t)+'" by '+cfEsc(m.by)+' (CC0) via Poly Pizza</span>':'')+'</div>'
     +'<div class="i3d-row"><button class="dep-btn" onclick="i3dPick(\''+kind+'\','+id+')">Change model</button><button class="dep-btn" onclick="i3dRemove(\''+kind+'\','+id+')">Remove model</button>'+(kind==='wi'&&(it.photos||0)>=1?'<button class="dep-btn" onclick="i3dClose();invOpenViewer('+id+')">Photos</button>':'')+'</div>';
   try{
@@ -21768,9 +21780,11 @@ function i3dPickLib(kind,id,k){
 }
 function i3dRemove(kind,id){var it=i3dItem(kind,id);if(!it)return;delete it.model;i3dDel(kind,id);i3dClose();saveAL();renderAlTab();}
 // tile markup shared by both lists
+/* the tile's badge: on a touch screen, until the first live view this session, it invites the tap (Pedro's round 2); then plain "3D" */
+function i3dBadge(){return (window._i3dSeen||!window.matchMedia||!matchMedia('(pointer: coarse)').matches)?'3D':'<svg class="vi-ic sm" aria-hidden="true"><use href="#vi-orbit"/></svg>3D · tap to turn'}
 function i3dTile(kind,it){
   var m=it.model;if(!m||!m.thumb)return '';
-  return '<img class="i3d-thumb" src="'+m.thumb+'" alt="3D model of '+cfEsc(it.name)+'" onclick="i3dTap(\''+kind+'\','+it.id+',this)" onmouseenter="i3dLive(\''+kind+'\','+it.id+',this)"><span class="inv-badge i3d-badge" title="'+cfEsc(i3dCredit(m)||m.t||'')+'">3D</span>';
+  return '<img class="i3d-thumb" src="'+m.thumb+'" alt="3D model of '+cfEsc(it.name)+'" onclick="i3dTap(\''+kind+'\','+it.id+',this)" onmouseenter="i3dLive(\''+kind+'\','+it.id+',this)"><span class="inv-badge i3d-badge" title="'+cfEsc(i3dCredit(m)||m.t||'')+'">'+i3dBadge()+'</span>';
 }
 /* desktop (owner, 31 Oct): an item's 3D model turns in its own tile. Hovering a model tile swaps the still picture for a live view
    (one tile at a time, so only one 3D canvas is ever open); click and drag orbits round the item, a click without a drag opens the
@@ -21791,11 +21805,39 @@ function i3dLive(kind,id,img,force){
     if(!obj||_i3dLive!==rec||!area.isConnected)return;
     var host=document.createElement('div');host.className='i3d-live';area.appendChild(host);rec.host=host;
     var it=i3dItem(kind,id);rec.view=new I3DView(host,obj,{auto:false,label:'3D model of '+(it?it.name:'the item')+'. Drag to turn it round, click to open it.'});
-    rec.view.ctl.enableZoom=false;rec.view.ctl.enablePan=false;
-    var cv=rec.view.r.domElement,d0=null;
-    cv.addEventListener('pointerdown',function(e){d0=[e.clientX,e.clientY]});
-    cv.addEventListener('pointerup',function(e){if(d0&&Math.hypot(e.clientX-d0[0],e.clientY-d0[1])<4)i3dOpen(kind,id);d0=null});
+    /* v0.7 (owner, 2 Nov): the tile is a real viewport. One finger or the mouse orbits, two fingers pinch to zoom and drag to pan (the right
+       mouse button pans), a double tap or double click puts the camera back, and a single tap or click opens the full viewer. Zoom is clamped
+       (I3DView min and max distance) and the pan is held near the model, so it can never be lost. It draws only while something moves.
+       The canvas takes touch only on the tile itself (touch-action none): a swipe that starts anywhere else still scrolls the page.
+       The plain mouse wheel belongs to the page until the tile has been clicked or dragged; Ctrl or Cmd with the wheel (and a trackpad pinch) always zooms. */
+    var V=rec.view,ctl=V.ctl,cv=V.r.domElement,d0=null,engaged=false,ptrs={},multi=false,tapAt=0,tapTimer=0;
+    ctl.enableZoom=true;ctl.enablePan=true;cv.style.touchAction='pan-y';cv.tabIndex=0;
+    /* OrbitControls (r128) calls preventDefault on every touch, which would trap the page's scroll on the tile. One finger decides after 8 px:
+       mostly vertical means the page scrolls and the camera stays put; mostly horizontal means the camera turns (touch-action pan-y keeps the browser out of it).
+       Two fingers always belong to the camera (pinch, pan). */
+    var tx0=null,tmode='';
+    host.addEventListener('touchstart',function(e){if(e.touches.length===1){tx0=[e.touches[0].clientX,e.touches[0].clientY];tmode='';e.preventDefault=function(){}}else{tx0=null;tmode=''}},{capture:true,passive:true});
+    host.addEventListener('touchmove',function(e){if(e.touches.length!==1||!tx0)return;
+      if(!tmode){var dx=e.touches[0].clientX-tx0[0],dy=e.touches[0].clientY-tx0[1];if(Math.hypot(dx,dy)<8){e.stopImmediatePropagation();return}tmode=Math.abs(dy)>Math.abs(dx)?'v':'h'}
+      if(tmode==='v'){e.stopImmediatePropagation();return}e.preventDefault=function(){}},{capture:true,passive:true});
+    host.addEventListener('wheel',function(e){if(!engaged&&!e.ctrlKey&&!e.metaKey)ctl.enableZoom=false},{capture:true,passive:true});   // the page keeps this wheel turn
+    host.addEventListener('wheel',function(){ctl.enableZoom=true},{passive:true});
+    ctl.addEventListener('change',function(){var o=ctl.target.clone().sub(V.home.t);if(o.length()>2.5){o.setLength(2.5);var nt=V.home.t.clone().add(o);V.cam.position.add(nt.clone().sub(ctl.target));ctl.target.copy(nt)}});
+    cv.addEventListener('pointerdown',function(e){engaged=true;ptrs[e.pointerId]=1;if(Object.keys(ptrs).length>1)multi=true;d0=[e.clientX,e.clientY]});
+    var up=function(e){delete ptrs[e.pointerId];var none=!Object.keys(ptrs).length,wasMulti=multi;if(none)multi=false;
+      if(e.type!=='pointerup'||wasMulti||!d0||Math.hypot(e.clientX-d0[0],e.clientY-d0[1])>=6){if(none)d0=null;return}
+      d0=null;var now=Date.now();
+      if(tapAt&&now-tapAt<340){clearTimeout(tapTimer);tapAt=0;V.reset()}
+      else{tapAt=now;tapTimer=setTimeout(function(){tapAt=0;if(_i3dLive===rec)i3dOpen(kind,id)},350)}};
+    cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+    cv.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')engaged=false});
+    /* a hint chip says the tile can be turned (Pedro's review of v0.8 spec F): it fades on the first touch or after 4 s and does not come back this session. No button stack on a small tile; a tap opens the full viewer, a double tap resets */
+    if(!window._i3dHintDone){var hint=document.createElement('div');hint.className='i3d-hint';
+      hint.innerHTML='<svg class="vi-ic sm" aria-hidden="true"><use href="#vi-orbit"/></svg><span>Drag to turn</span>';host.appendChild(hint);
+      var gone=function(){if(window._i3dHintDone)return;window._i3dHintDone=true;hint.classList.add('off');setTimeout(function(){hint.remove()},300)};
+      setTimeout(gone,4000);cv.addEventListener('pointerdown',gone,{once:true})}
     img.style.visibility='hidden';
+    window._i3dSeen=true;[].forEach.call(document.querySelectorAll('.i3d-badge'),function(b){b.textContent='3D'});
   }).catch(function(){if(_i3dLive===rec)_i3dLive=null;});
 }
 /* pictures saved by the earlier green-tinted build (no tv mark) are redrawn once, from the saved model, in its own colours (owner, 31 Oct) */
@@ -28087,6 +28129,12 @@ function clamp(v,a,b){return v<a?a:v>b?b:v}
 function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
 function rgba(c,a){return "rgba("+(c[0]|0)+","+(c[1]|0)+","+(c[2]|0)+","+a.toFixed(3)+")"}
 function ease3(t){return 1-Math.pow(1-t,3)}
+/* a column's block colour as a label colour: the colour itself, mixed toward white in 10% steps only until it reaches 4.5:1 on the dark label plate (#080808); never darkened (Pedro's v0.8 spec D) */
+var LABC={};
+function labCol(cc){var col=cc.col;if(!col)return cc.dir<0?rgba(PAL.red,.95):rgba(PAL.gold,.95);var k=col.join(","),h=LABC[k];if(h)return h;
+  var lum=function(v){var f=function(x){x/=255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)};return .2126*f(v[0])+.7152*f(v[1])+.0722*f(v[2])},t=0,o=col;
+  while(t<.95){o=col.map(function(v){return Math.round(v+(255-v)*t)});if((lum(o)+.05)/(lum([8,8,8])+.05)>=4.5)break;t+=.1}
+  return LABC[k]=rgba(o,.95)}
 /* build/intro timings, ms (owner, 2 Nov: all 3D build animations were too fast, slowed by 100%: every duration doubled) */
 var NW_D={drop:1400,flash:2000,leave:1800,dropStep:120,subStep:80,stack:1400,stackStep:90,pileMs:1800,goMs:1700,spread:4200,cellStep:140,land:1000};
 var LD=(function(){var v=[-.45,.7,.55],l=Math.hypot(v[0],v[1],v[2]);return [v[0]/l,v[1]/l,v[2]/l]})();
@@ -28288,14 +28336,14 @@ function makeNW(cv,o){
     var red=net<0;
     ground(c,P,st,box.x,box.z0,box.z1,red,ts,rm,12);
     /* column names on the floor, staggered when they would collide: the back row's behind the stacks, the front row's in front */
-    var lf=clamp(cw*.022,9,12),lines={};
+    var lf=clamp(cw*.022,10,12),lines={};
     function names(back){c.font=lf+"px 'Share Tech Mono',monospace";c.textAlign="center";c.textBaseline="alphabetic";
     cols.filter(function(cc){return (LZ[cc.key]<0)===back}).map(function(cc){return {c:cc,q:P.pt(X[cc.key],0,LZ[cc.key])}}).sort(function(a,b){return a.q[0]-b.q[0]}).forEach(function(L){
       var placed=lines.box=lines.box||[],w=c.measureText(L.c.short).width,r=-1;L.q[0]=clamp(L.q[0],w/2+4,cw-w/2-(L.q[1]>ch*.45?54:4));   /* clear of the zoom buttons */L.q[1]=Math.min(L.q[1],ch-14-2*(lf+3));   /* full names (owner, 31 Oct): up to three staggered lines, never off the stage, never over another name */
       for(var j=0;j<3&&r<0;j++){var yy=L.q[1]+j*(lf+3),x0=L.q[0]-w/2-3,x1=L.q[0]+w/2+3;if(!placed.some(function(B){return Math.abs(B.y-yy)<lf+2&&x0<B.x1&&x1>B.x0}))r=j}
       if(r<0)return;placed.push({x0:L.q[0]-w/2-3,x1:L.q[0]+w/2+3,y:L.q[1]+r*(lf+3)});
       var ly=L.q[1]+r*(lf+3);c.fillStyle="rgba(8,8,8,.72)";c.fillRect(L.q[0]-w/2-3,ly-lf*1.05,w+6,lf*1.5);   /* the income flow's label plate: transparent black behind the name (owner, 31 Oct) */
-      c.fillStyle=L.c.dir<0?rgba(PAL.red,.95):rgba(PAL.gold,.95);if(hover===L.c.key)c.fillStyle='#fff';   /* what you own in gold, like the dashboard tag; debts stay red */c.fillText(L.c.short,L.q[0],ly)})}
+      c.fillStyle=labCol(L.c);if(hover===L.c.key)c.fillStyle='#fff';   /* each name in its own column's colour (owner, 2 Nov), lightened only as far as the dark label plate needs to read */c.fillText(L.c.short,L.q[0],ly)})}
     if(narrow){items.forEach(function(g){if(g.dir>0)paint(g)});names(true);names(false)}   /* phones: names on top of the blocks, so none hides behind a column */
     else{names(true);items.forEach(function(g){if(g.dir>0)paint(g)});names(false)}
     var l1=debt<=0&&net>=0?"OUT OF THE RED":red?"IN THE RED":"NET WORTH";
