@@ -112,7 +112,7 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
       v.setState({ p: pAt(100) }); const g0 = v.brickStamps().length;
       v.setState({ p: pAt(104) }); const g1 = v.brickStamps(), st2 = g1.slice(g0);
       v.setState({ p: pAt(100) }); const g2 = v.brickStamps().length, all = v._hg.stamp;
-      return { added: g1.length - g0, gaps: st2.slice(1).map((s, i) => +(s - st2[i]).toFixed(3)), back: g2 === g0, gone: true, uDrop: v.dropCourses() * 0.075 };
+      return { gl: true, added: g1.length - g0, gaps: st2.slice(1).map((s, i) => +(s - st2[i]).toFixed(3)), back: g2 === g0, gone: true, uDrop: v.dropCourses() * 0.075 };
     }
     const rec = v._bm.find(x => x && x.part === 'brick');
     v.setState({ p: pAt(100) }); const k0 = rec.cnt;
@@ -120,7 +120,8 @@ const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 15
     v.setState({ p: pAt(100) }); const k2 = rec.cnt, gone = Array.from(rec.laid.slice(k0, k1));
     return { added: k1 - k0, gaps: st.slice(1).map((s, i) => +(s - st[i]).toFixed(3)), back: k2 === k0, gone: gone.every(s => s > 1e8), uDrop: rec.front.material.uniforms.uDrop.value };
   });
-  ok(r.added === 4 && r.gaps.every(g => Math.abs(g - 0.12) < 1e-3), 'four new bricks land one after another, 0.12 s apart (' + r.gaps.join(', ') + ')');
+  const gap = r.gl ? 0.24 : 0.12;   // the brand-book renderer lays at the owner's doubled timing (2 Nov 2026: "too fast"), the old viewer at the brand book's
+  ok(r.added === 4 && r.gaps.every(g => Math.abs(g - gap) < 1e-3), 'four new bricks land one after another, ' + gap + ' s apart (' + r.gaps.join(', ') + ')');
   ok(Math.abs(r.uDrop - 0.45) < 1e-9, 'each brick drops 6 courses (0.45 m) as it lands');
   ok(r.back && r.gone, 'un-laying is instant');
   await p.context().close();

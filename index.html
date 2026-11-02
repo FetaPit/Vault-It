@@ -7218,13 +7218,13 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     '  float age = uNow - st;',
     '  if (age < 0.0) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }',  // stamped for later in the stagger
     '  if (t < 2.5) {',                                                      // bricks and tiles: drop in, fade in, gold flash
-    '    float d = clamp(age / 0.38, 0.0, 1.0); vis = smoothstep(0.0, 0.5, d); float e = 1.0 - d; drop = e * e * e * (t < 1.5 ? 6.0 : 5.0);',
-    '    fl = uFlash * (1.0 - clamp(age / 1.1, 0.0, 1.0));',
+    '    float d = clamp(age / 0.76, 0.0, 1.0); vis = smoothstep(0.0, 0.5, d); float e = 1.0 - d; drop = e * e * e * (t < 1.5 ? 6.0 : 5.0);',   // owner, 2 Nov 2026: twice the brand book's 0.38 s ("too fast")
+    '    fl = uFlash * (1.0 - clamp(age / 2.2, 0.0, 1.0));',   // flash 2.2 s (brand book 1.1 s), the same override
     '    if (abs(aTime.y - uLast) < 0.5) last = 1.0;',
     '  } else if (t > 3.5 && t < 6.5) {',                                    // glazing and doors: in with the glazing stage
     '    vis = uGlaze; if (vis <= 0.001) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }',
     '  } else if (t < 7.5) {',                                               // trim and gold: appear in place
-    '    vis = smoothstep(0.0, 0.5, clamp(age / 0.38, 0.0, 1.0));',
+    '    vis = smoothstep(0.0, 0.5, clamp(age / 0.76, 0.0, 1.0));',
     '  }',
     '  float sa = sin(aRot.x), ca = cos(aRot.x), sb = sin(aRot.y), cb = cos(aRot.y), sg = sin(aRot.z), cg = cos(aRot.z);',
     '  mat3 R = mat3(cb * cg, sg, -sb * cg,  sb * sa - cb * sg * ca, cg * ca, sb * sg * ca + cb * sa,  cb * sg * sa + sb * ca, -cg * sa, cb * ca - sb * sg * sa);',   // Ry * Rz * Rx (YZX, as the kit)
@@ -7485,9 +7485,9 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     });
     cv.style.cursor = 'grab';
     if (typeof ResizeObserver !== 'undefined') { this._ro = new ResizeObserver(function () { self.resize(); self.wake(); }); this._ro.observe(container); }
-    this.offscreen = false;
+    this.offscreen = false; this._visRatio = typeof IntersectionObserver === 'undefined' ? 1 : 0;   // how much of the stage is on screen (the lay animation waits for half)
     if (typeof IntersectionObserver !== 'undefined') {
-      this._io = new IntersectionObserver(function (es) { var vis = es[es.length - 1].isIntersecting; if (vis === !self.offscreen) return; self.offscreen = !vis; if (vis) self.wake(); }, { threshold: 0.01 });
+      this._io = new IntersectionObserver(function (es) { var e = es[es.length - 1], vis = e.isIntersecting; self._visRatio = e.intersectionRatio || 0; if (vis === !self.offscreen) { if (vis) self.wake(); return; } self.offscreen = !vis; if (vis) self.wake(); }, { threshold: [0.01, 0.5, 0.6] });
       this._io.observe(container);
     }
     this._onVis = function () { if (!document.hidden) self.wake(); };
@@ -7602,16 +7602,18 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     if (s.eq != null) this.eq = clamp(s.eq, 0, 1);
     this.apply();
   };
-  VP.animateTo = function (p1) { this._target = clamp(p1, 0, 1); this.wake(); };
+  VP.animateTo = function (p1) { p1 = clamp(p1, 0, 1); if (this._pendingOpen != null) { this._pendingOpen = Math.max(this._pendingOpen, p1); this.wake(); return; } this._target = p1; this.wake(); };   // a deposit before the stage is half on screen joins the waiting opening
   // v0.7 opening: everything up to p0 is in place on the first frame; the bricks between p0 and p1 (the newest course at most) lay themselves
   VP.openAt = function (p0, p1) {
     p1 = clamp(p1, 0, 1); p0 = clamp(p0, 0, p1);
-    this.p = p0; this._target = p0; this._primed = false;
+    this.p = p0; this._target = p0; this._primed = false; this._pendingOpen = null;
     this.apply();
     try { this._stats.settledAtOpen = H.brandBricksLaid(H.brandPlan(this.model).N, reduced() ? p1 : p0); } catch (e) {}   // the shell that was there at once (lazy laying; reduced motion: everything)
-    if (p1 > p0) { this._open = true; this.p = p1; this._target = p1; this._applyStamps(); }
+    if (p1 > p0) { if (reduced() || this._visRatio >= 0.5) this._openNow(p1); else this._pendingOpen = p1; }   // owner, 2 Nov: the top course lays once the stage is about half on screen, not at its first pixel
     this.wake();
   };
+  VP._openNow = function (p1) { this._pendingOpen = null; this._open = true; this.p = p1; this._target = p1; this._applyStamps(); this._dirty = true; };
+  VP.layPending = function () { return this._pendingOpen != null; };
   VP.apply = function () {
     var m = this.model; if (!m || !this._hg) { this._dirty = true; return; }
     if (this._mode !== this.mode) { this._primed = false; this._mode = this.mode; this._bEq = null; }   // a new level: the hologram shows at once, the colour lays from 0
@@ -7623,9 +7625,9 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var m = this.model, HG = this._hg, P = HG.P, L2 = this.mode === 'equity' || this.mode === 'complete';
     var p = this.mode === 'site' ? 0 : (L2 ? 1 : this.p), now = this._bNow(), motion = reduced();
     var V = H.brandUnits(P, p), V0 = this._V == null ? -1 : this._V, inst = motion || !this._primed;
-    var add = Math.max(0, V - Math.max(V0, 0)), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.12, 0.9 / add) : 0;
+    var add = Math.max(0, V - Math.max(V0, 0)), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.24, 1.8 / add) : 0;   // owner, 2 Nov: twice the brand book's min(0.12, 0.9 / n)
     var open = !!this._open; this._open = false;
-    if (open && !inst && add > 0) stp = Math.min(0.04, 1.2 / add);   // the opening course: each brick 40 ms after the last, the whole course started within 1.2 s
+    if (open && !inst && add > 0) stp = Math.min(0.08, 2.4 / add);   // the opening course: each brick 80 ms after the last, the whole course started within 2.4 s (owner: twice the v0.7 preview pace)
     if (V !== V0) {
       var st = HG.stamp, S = this._stats, n0 = 0;
       HG.recs.forEach(function (rec) {
@@ -7651,7 +7653,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       var j = L - 1, bi = P.bBi[j], rec = null; for (var q = 0; q < HG.recs.length; q++) if (HG.recs[q].bi === bi) { rec = HG.recs[q]; break; }
       if (rec) {
         var gi = rec.base + P.bK[j], b = m.batches[bi], o = P.perm[bi][P.bK[j]] * 10, xf = b.xf, stv = HG.stamp[gi * 2];
-        var landed = motion || stv < -1e8 || now >= stv + 0.9;
+        var landed = motion || stv < -1e8 || now >= stv + 1.5;
         last = { n: L, x: xf[o], y: xf[o + 1], z: xf[o + 2], shown: !!landed }; if (gi !== this._lastIdxWas || landed !== this._lastLanded) this._dirty = true; this._lastIdx = gi; this._lastIdxWas = gi; this._lastLanded = landed;
       }
     }
@@ -7675,7 +7677,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var target = this._target == null ? this.p : this._target;
     if (Math.abs(target - this.p) > 1e-9) return false;
     if (this._L2 && (this._bEq == null || Math.abs(this._bEq - this.eq) > 1e-9)) return false;
-    return this._bNow() >= (this._lastStampAt || -1e9) + 2.1;
+    if (this._pendingOpen != null) return false;   // the top course is still waiting for the stage to be half on screen
+    return this._bNow() >= (this._lastStampAt || -1e9) + 3.0;   // drop 0.76 s, flash 2.2 s: then nothing moves but the ambient motion
   };
   VP._brandActive = function () { return !!this._hg; };
 
@@ -7683,13 +7686,14 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   VP._tick = function (now) {
     var m = this.model; if (!m || !this._hg) return;
     var raw = this._tickT ? (now - this._tickT) / 1000 : 1 / 60; this._tickT = now;
+    if (this._pendingOpen != null && (reduced() || this._visRatio >= 0.5)) this._openNow(this._pendingOpen);   // the stage has come half on screen: lay the top course
     var dt = this.fixedDt || Math.min(0.05, raw), red = reduced(), target = this._target == null ? this.p : this._target, moving = false;   // fixedDt: tests on a software GPU step the cadence by frame, not by the clock
     if (red) { if (this.p !== target) { this.p = target; moving = true; } }
-    else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 1.7); if (Math.abs(target - this.p) < 0.0003) this.p = target; moving = true; }   // the brand book's cadence
+    else if (this.p !== target) { this.p += (target - this.p) * Math.min(1, dt * 0.85); if (Math.abs(target - this.p) < 0.0003) this.p = target; moving = true; }   // half the brand book's cadence (dt x 1.7): owner, 2 Nov, the build is twice as slow
     if (this._L2 || this.mode === 'equity' || this.mode === 'complete') {
       if (this._bEq == null) this._bEq = red ? this.eq : 0;
       if (red) this._bEq = this.eq;
-      else if (this._bEq !== this.eq) { this._bEq += (this.eq - this._bEq) * Math.min(1, dt * 1.7); if (Math.abs(this.eq - this._bEq) < 0.0003) this._bEq = this.eq; moving = true; }
+      else if (this._bEq !== this.eq) { this._bEq += (this.eq - this._bEq) * Math.min(1, dt * 0.85); if (Math.abs(this.eq - this._bEq) < 0.0003) this._bEq = this.eq; moving = true; }
     }
     if (this._fly) {
       var f = this._fly, k = Math.min(1, (now - f.t0) / f.ms), e = 1 - Math.pow(1 - k, 3);
@@ -7804,7 +7808,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   // ── test and measurement hooks ──
   VP.layStats = function (reset) { var s = this._stats; if (reset) { s.animated = 0; s.stamped = 0; s.gapMs = null; } return { settledAtOpen: s.settledAtOpen, animated: s.animated, courseBricks: s.courseBricks, stamped: s.stamped, gapMs: s.gapMs, lastAdd: s.lastAdd, firstFrameMs: s.firstFrameMs, buildMs: s.buildMs }; };
   VP.readUniforms = function (names) { var gl = this.R.gl, out = {}, self = this; names.forEach(function (n) { var v = gl.getUniform(self.R.pr, self.R.U[n]); out[n] = v && v.length ? Array.prototype.slice.call(v) : v; }); return out; };
-  VP.dropMs = function () { return 380; };
+  VP.dropMs = function () { return 760; };   // owner, 2 Nov 2026: twice the brand book's 380 ms
   VP.yaw = function () { return this.yawA; };
   VP.frameTimes = function (reset) { if (reset) { this._ft = []; this._fg = []; this._ftOn = true; return []; } return this._ft.slice(); };   // main-thread cost of each frame (tick + draw + GL submit)
   VP.frameGaps = function () { return this._fg.slice(); };   // wall time between frames (includes the GPU and the harness)
@@ -7813,7 +7817,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   VP.gpuBytes = function () { return this._buf ? this._buf.bytes : 0; };
   VP.goLite = function () { this._lite = true; this._bLite = true; this._dirty = true; this.wake(); };   // pixel ratio 1 on demand (the old viewer's lite; nothing else to switch off here)
   VP.dropCourses = function () { return 6; };   // a brick drops six courses (0.45 m) as it lands, as the brand book
-  VP.flashMs = function () { return 1100; };   // the gold flash fades over 1.1 s (VS: age / 1.1)
+  VP.flashMs = function () { return 2200; };   // the gold flash fades over 2.2 s (VS: age / 2.2), twice the brand book's
   VP.vsSource = function () { return VS; };
   VP.pingColour = function () { return 'gold'; };   // the owner's E15 words ("gold ground ping"), kept over the brand book's teal (David, 2 Nov 2026)
   VP.brickStamps = function () { var HG = this._hg; if (!HG) return []; var rec = HG.recs.filter(function (r) { return r.type === 1 && r.rank; })[0]; if (!rec) return []; var out = []; for (var k = 0; k < (rec.cnt || 0); k++) out.push(HG.stamp[(rec.base + k) * 2]); return out; };   // lay stamps of the first brick part, in laying order (-1e9 = laid at once)

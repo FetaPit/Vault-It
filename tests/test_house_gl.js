@@ -53,7 +53,8 @@ const PAL = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2
     const palOk = close(u.uBrick, PAL.brick) && close(u.uTrim, PAL.trim) && close(u.uTile, PAL.tile) && close(u.uFrame, PAL.frame) && close(u.uGlass, PAL.glass) && close(u.uGlassLit, PAL.glassLit) && close(u.uDoor, PAL.door) && close(u.uEdge, PAL.edge) && close(u.uSheen, PAL.sheen) && close(u.uFlashCol, PAL.flash);
     ok(palOk, 'palette uniforms equal THG Night exactly (brick ' + JSON.stringify(u.uBrick) + ')');
     ok(Math.abs(u.uEdgeK - 0.62) < 1e-3 && Math.abs(u.uFrontA - 0.88) < 1e-3 && Math.abs(u.uBackA - 0.09) < 1e-3 && Math.abs(u.uShMin - 0.5) < 1e-3, 'edge, front, back alpha and shade floor match the brand book (' + [u.uEdgeK, u.uFrontA, u.uBackA, u.uShMin].join(', ') + ')');
-    // a deposit lays only the new bricks, with the brand book's drop (380 ms) and stagger min(120, 900/N) ms
+    // a deposit lays only the new bricks. OWNER OVERRIDE (Pete, 2 Nov 2026, fold test: "the build animation is too fast", slow by 100%): drop 760 ms,
+    // stagger min(240, 1800/N) ms, flash 2200 ms, twice the brand book's 380 / min(120, 900/N) / 1100. Pedro's spec records the brand book; the owner's word wins here.
     const dep = await p.evaluate(async () => {
       const v = HB3D.viewer, before = v.brandInfo().bricks, N = v.brandInfo().bricksTotal, dt = depositTarget();
       const add = Math.ceil(39 * 0.77 * dt / N / 0.77 * 0.77); // about 39 bricks' worth
@@ -65,11 +66,11 @@ const PAL = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2
     });
     console.log(JSON.stringify(dep));
     ok(dep.after === dep.want && dep.stamped === dep.want - dep.before, 'a deposit lays only the new bricks (' + dep.stamped + ' stamped, ' + dep.before + ' -> ' + dep.after + ')');
-    const wantGap = Math.min(120, 900 / Math.max(1, dep.lastAdd || 1));   // per frame's batch of new bricks, as the brand book stamps them
-    ok(dep.gapMs != null && Math.abs(dep.gapMs - wantGap) <= wantGap * 0.1 + 1, 'stagger min(120, 900/N) ms within 10% (' + (dep.gapMs == null ? '-' : dep.gapMs.toFixed(1)) + ' vs ' + wantGap.toFixed(1) + ' for a batch of ' + dep.lastAdd + ')');
-    ok(Math.abs(dep.dropMs - 380) <= 38, 'drop lasts 380 ms within 10% (' + dep.dropMs + ')');
-    const fl = await p.evaluate(() => ({ ms: HB3D.viewer.flashMs(), vs: /age \/ 1\.1,/.test(HB3D.viewer.vsSource()), drop: /age \/ 0\.38,/.test(HB3D.viewer.vsSource()) && /e \* e \* e \* \(t < 1\.5 \? 6\.0 : 5\.0\)/.test(HB3D.viewer.vsSource()) }));
-    ok(Math.abs(fl.ms - 1100) <= 110 && fl.vs && fl.drop, 'flash ends at 1100 ms and the drop is 6 courses over 380 ms, cubic, in the shader source');
+    const wantGap = Math.min(240, 1800 / Math.max(1, dep.lastAdd || 1));   // per frame's batch of new bricks, as the brand book stamps them (owner's doubled timing)
+    ok(dep.gapMs != null && Math.abs(dep.gapMs - wantGap) <= wantGap * 0.1 + 1, 'stagger min(240, 1800/N) ms within 10% (owner: twice the brand book) (' + (dep.gapMs == null ? '-' : dep.gapMs.toFixed(1)) + ' vs ' + wantGap.toFixed(1) + ' for a batch of ' + dep.lastAdd + ')');
+    ok(Math.abs(dep.dropMs - 760) <= 76, 'drop lasts 760 ms within 10% (owner: twice the brand book) (' + dep.dropMs + ')');
+    const fl = await p.evaluate(() => ({ ms: HB3D.viewer.flashMs(), vs: /age \/ 2\.2,/.test(HB3D.viewer.vsSource()), drop: /age \/ 0\.76,/.test(HB3D.viewer.vsSource()) && /e \* e \* e \* \(t < 1\.5 \? 6\.0 : 5\.0\)/.test(HB3D.viewer.vsSource()) }));
+    ok(Math.abs(fl.ms - 2200) <= 220 && fl.vs && fl.drop, 'flash ends at 2200 ms and the drop is 6 courses over 760 ms, cubic, in the shader source (owner: twice the brand book)');
     // batches: 61 new bricks drop together (no stagger); 39 are spaced 900/39 = 23 ms
     const bt = await p.evaluate(() => { const v = HB3D.viewer, N = v.brandInfo().bricksTotal, pAt = n => 0.03 + 0.77 * (n + 0.5) / N;
       v.setState({ p: pAt(100) }); const a0 = v.brickStamps().length; v.setState({ p: pAt(161) }); const s61 = v.brickStamps().slice(a0);
@@ -77,7 +78,7 @@ const PAL = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2
       const gaps = a => a.slice(1).map((x, i) => x - a[i]); v.setState({ p: Math.min(1, state.saved / depositTarget()) });
       return { n61: s61.length, same61: s61.every(x => Math.abs(x - s61[0]) < 1e-6), n39: s39.length, gap39: gaps(s39).reduce((q, x) => q + x, 0) / Math.max(1, s39.length - 1) * 1000 }; });
     ok(bt.n61 === 61 && bt.same61, 'a 61-brick batch drops together (no stagger over 60)');
-    ok(bt.n39 === 39 && Math.abs(bt.gap39 - 900 / 39) <= 900 / 39 * 0.1, 'a 39-brick batch is spaced 900/39 = 23 ms within 10% (' + bt.gap39.toFixed(1) + ' ms)');
+    ok(bt.n39 === 39 && Math.abs(bt.gap39 - 1800 / 39) <= 1800 / 39 * 0.1, 'a 39-brick batch is spaced 1800/39 = 46 ms within 10% (owner: twice the brand book) (' + bt.gap39.toFixed(1) + ' ms)');
     ok(dep.settled, 'the stage settles after the deposit');
     // the other types compile in idle time after the first house settles (David, 2 Nov): a first switch pays no model compile
     const warm = await p.waitForFunction(() => HB3DAPP.warmed && ['semi', 'detached', 'flat', 'apartment', 'mansion'].every(t => !!hb3dModelIfReady(t, state.apartmentFloor)), null, { timeout: 60000 }).then(() => true).catch(() => false);
@@ -113,6 +114,21 @@ const PAL = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2
     ok(Math.abs(Math.abs(orb.yawDelta) - 300 * 0.008) < 0.05, 'a 300 px drag turns the house 0.008 rad per px, directly (' + orb.yawDelta.toFixed(3) + ' rad)');
     ok(orb.n >= 20 && orb.max < 33 && orb.p95 <= 20, 'drag frames on the main thread: max ' + orb.max.toFixed(1) + ' ms, p95 ' + orb.p95.toFixed(1) + ' ms over ' + orb.n + ' frames (wall gap p95 ' + orb.gapP95.toFixed(0) + ' ms is SwiftShader rasterising; the GPU time is measured on the owner\'s devices)');
     ok(errs.length === 0, 'no page errors ' + errs.slice(0, 3).join(' | '));
+    await ctx.close(); }
+
+  // ── 1b. the lay animation starts only once the stage is about half on screen (owner, 2 Nov: not at the first pixel); the settled shell draws earlier ──
+  { const { ctx, p } = await open(DATA, 390, 300, '', { dpr: 2 });   // a short viewport: the stage's top third peeps in under the header
+    await p.evaluate(() => { showTab('house'); const r = document.getElementById('house-scene').getBoundingClientRect(); window.scrollTo(0, Math.max(0, r.top + scrollY - innerHeight * 0.66)); });   // the stage's top third on screen
+    await p.waitForFunction(() => window.HB3D && HB3D.viewer && HB3D.viewer._bDraws > 0, null, { timeout: 20000 }).catch(() => {});
+    await p.waitForTimeout(2500);
+    const a = await p.evaluate(() => { const v = HB3D.viewer, el = document.getElementById('house-scene'), r = el.getBoundingClientRect(); const vis = Math.max(0, Math.min(r.bottom, innerHeight) - Math.max(r.top, 0)) / r.height; return { drawn: v._bDraws > 0, vis, pending: v.layPending(), animated: v.layStats().animated, engine: el.getAttribute('data-engine') }; });
+    console.log(JSON.stringify(a));
+    ok(a.drawn && a.engine === '3d' && a.vis < 0.5, 'a quarter on screen: the settled shell is already drawn (' + (a.vis * 100).toFixed(0) + '% visible)');
+    ok(a.pending && a.animated === 0, 'but the top course has not started laying');
+    await p.evaluate(() => document.getElementById('house-scene').scrollIntoView({ block: 'center' }));
+    await p.waitForFunction(() => !HB3D.viewer.layPending() && HB3D.viewer.layStats().animated > 0, null, { timeout: 15000 }).catch(() => {});
+    const b2 = await p.evaluate(() => ({ pending: HB3D.viewer.layPending(), animated: HB3D.viewer.layStats().animated, course: HB3D.viewer.layStats().courseBricks }));
+    ok(!b2.pending && b2.animated > 0 && b2.animated <= b2.course, 'scrolled to the middle: the top course lays (' + b2.animated + ' of ' + b2.course + ')');
     await ctx.close(); }
 
   // ── 2. reduced motion: the final state at once, no ping, no sweep, no auto orbit ──
