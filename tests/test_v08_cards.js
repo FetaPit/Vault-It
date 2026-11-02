@@ -68,6 +68,9 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
         stats: st.length, icons: st.every(s => s.querySelector('svg.vi-ic')), labels: st.map(s => s.innerText.replace(/\s+/g, ' ').toLowerCase()), perRow, overlap, textOver, dead, ncards: cards.length,
         ms: ms.length, msTxt: ms.map(m => m.textContent.trim()), hit: ms.filter(m => m.classList.contains('hit')).length, badges: hud.querySelectorAll('.hb-badges').length,
         row: /ROW\s*\d+\s*of\s*\d+/i.test(hud.innerText), show: /Show it on the house/.test(hud.innerText), mort: /Preview your mortgage/.test(hud.innerText), ids: ['stBricks', 'stTiles', 'stRemain', 'stDeposit', 'pbarFill', 'savedAmt', 'ms1', 'ms100'].every(id => hud.contains(document.getElementById(id))),
+        emoji: ([...hud.childNodes].filter(n => !(n.classList && n.classList.contains('hb-tip'))).map(n => n.innerText || n.textContent).join(' ').match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu) || []).join(''), pin: !!hud.querySelector('.hb-row use[href="#vi-pin"]'),
+        hero: (s => ({ f: s.fontFamily, px: parseFloat(s.fontSize), w: s.fontWeight }))(getComputedStyle(document.getElementById('savedAmt'))),
+        noteW: [...hud.querySelectorAll('.hb-pg-note')].every(n => getComputedStyle(n).maxWidth !== 'none' && R(n).width <= parseFloat(getComputedStyle(n).maxWidth) + 1) ? Math.max(...[...hud.querySelectorAll('.hb-pg-note')].map(n => R(n).width / parseFloat(getComputedStyle(n).fontSize))) : 999,
         side: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 };
     });
     ok(!h.prog && h.panelBars === 1 && h.bars === 1, t + 'one progress tile with one bar (old PROGRESS tile gone: ' + !h.prog + ', bars ' + h.panelBars + ')');
@@ -77,6 +80,9 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
     ok(!h.overlap && !h.textOver, t + 'stats never overlap');
     ok(h.ms === 10 && h.badges === 0 && /Shared Foundation Poured/.test(h.msTxt.join('|')) && h.hit === 2, t + 'one milestone set, house-type names, 2 earned of 10 (' + h.ms + ', ' + h.hit + ')');
     ok(h.row && h.show && h.mort, t + 'ROW card, "Show it on the house" and "Preview your mortgage" stay');
+    ok(!h.emoji && h.pin, t + 'no emoji in the tile (the Budget tip aside); "Show it on the house" has the pin icon (' + h.emoji + ')');
+    ok(/Syne/.test(h.hero.f) && h.hero.px >= 23 && +h.hero.w >= 700, t + 'the saved figure is the hero: Syne 700, about 24 px (' + h.hero.px + ')');
+    ok(h.noteW <= 52, t + 'prose lines capped at 72ch ('  + Math.round(h.noteW) + ' em)');
     ok(h.ids, t + 'the bar, stats and milestones keep their ids, inside the one tile');
     ok(!h.dead, t + 'no dead columns beside the cards (' + h.ncards + ' cards)');
     ok(!h.side && errs.length === 0, t + 'House: no sideways scroll, no page errors ' + errs.slice(0, 1));

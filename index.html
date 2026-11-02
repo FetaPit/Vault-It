@@ -14350,8 +14350,9 @@ body.vi-pop-open{overflow:hidden}
 .hb-pg{display:block}
 .hb-pg-top{display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--t2)}
 .hb-pg-top b{font-size:.9rem;color:var(--text)}
+.hb-pg-top b#savedAmt{font:700 1.85rem/1.1 'Syne',sans-serif;color:var(--gold);margin-right:4px}
 .hb-pg-top b#ppct{font-size:.72rem;color:var(--brass)}
-.hb-pg-note{font-size:.5rem;color:var(--t3);margin:6px 0}
+.hb-pg-note{font-size:.5rem;color:var(--t3);margin:6px 0;max-width:72ch}
 .hb-xp-ms{position:relative}
 .hb-tick{position:absolute;top:0;bottom:0;width:1px;margin-left:-.5px;background:rgb(var(--ink-rgb) / .28)}
 .hb-tick.on{background:var(--gold)}
@@ -15730,6 +15731,7 @@ function hbSetDepositPct(v){if(viBlockEdit())return;
   state.depositPct=Math.round(v*10)/10;save();updateUI();
   toast('Deposit target: '+state.depositPct+'% = '+gbpFmt(depositTarget()));
 }
+function hbNoEmoji(t){return String(t||'').replace(/\s*[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\uFE0F?/gu,'').trim();}   // the progress tile carries line icons, not emoji (Pedro, v0.8)
 function hbXP(){return (state.deposits||[]).length*20+Math.floor((state.saved||0)/100)+(state.houseMode==='purchased'?500:0);}
 function hbStreak(){var el=document.getElementById('habit-streak-label');return el?(parseInt(String(el.textContent).replace(/\D/g,''))||0):0;}
 // money the Budget could put towards the house: unassigned £ + what is already assigned to savings/investing
@@ -15790,15 +15792,15 @@ function hbRenderHUD(){
     if(RS){
       rowHtml='<div class="hb-row"><div class="hb-row-n">'+(RS.focus?'FLOOR '+RS.floor+' · ':'')+'ROW <b>'+RS.row+'</b> <i>of '+RS.n+'</i></div>'
         +'<div class="hb-row-sub">'+(RS.brand&&RS.p>=0.999?'Keys are yours. Your deposit is funded.':RS.brand&&RS.done?'Brickwork done. The roof, glazing and finish come next.':RS.p>=0.9999?'Every row is built. Your deposit is funded.':_cs+(RS.brand?(RS.toRow*_cr).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):Math.round(RS.toRow*_cr).toLocaleString('en-GB'))+' to finish this row · '+_cs+Math.round(RS.per*_cr).toLocaleString('en-GB')+' lays one row')+'</div>'
-        +'<button class="stk-btn" onclick="hbJumpToRow()">📍 Show it on the house</button></div>';
+        +'<button class="stk-btn" onclick="hbJumpToRow()"><svg class="vi-ic" style="width:14px;height:14px;--vi-sw:1.5;vertical-align:-2px" aria-hidden="true"><use href="#vi-pin"/></svg> Show it on the house</button></div>';
     }
     // one progress tile (owner, 2 Nov, v0.8): the old Level 1 card and the PROGRESS card merged. One bar, one set of stats
     // with a line icon each, one milestone set with the house type's own names. Ids kept for updateUI and hbWriteStats.
     var _ic=function(n){return '<svg class="vi-ic" aria-hidden="true"><use href="#vi-'+n+'"/></svg>';};
     var _st=function(ic,v,l,id){return '<div class="hb-st-'+ic+'">'+_ic(ic)+'<b'+(id?' id="'+id+'"':'')+'>'+v+'</b><span>'+l+'</span></div>';};
     var _msl=(typeof MS_LABELS!=='undefined'&&(MS_LABELS[state.houseType]||MS_LABELS.terraced))||[],_mss=MS_PCTS.map(function(q,i){var hit=p>=q/100;
-      return '<div class="ms'+(hit?' hit':'')+'" id="ms'+MS_IDS[i]+'"><div class="ms-dot"></div><div class="ms-lbl" id="msl-'+MS_IDS[i]+'"><b>'+q+'%</b> '+cfEsc(_msl[i]||'')+'</div><div class="ms-ck">'+(hit?'<svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg>':'')+'</div></div>';}).join('');
-    var _nx=MS_PCTS.findIndex(function(q){return p<q/100;}),_next=_nx<0?'':'<div class="hb-pg-next">'+_ic('milestone')+'<span>Next: <b>'+MS_PCTS[_nx]+'%</b> · '+cfEsc(_msl[_nx]||'')+' · '+gbpFmt(Math.max(0,MS_PCTS[_nx]/100*dt-(state.saved||0)))+' to go</span></div>';
+      return '<div class="ms'+(hit?' hit':'')+'" id="ms'+MS_IDS[i]+'"><div class="ms-dot"></div><div class="ms-lbl" id="msl-'+MS_IDS[i]+'"><b>'+q+'%</b> '+cfEsc(hbNoEmoji(_msl[i]))+'</div><div class="ms-ck">'+(hit?'<svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg>':'')+'</div></div>';}).join('');
+    var _nx=MS_PCTS.findIndex(function(q){return p<q/100;}),_next=_nx<0?'':'<div class="hb-pg-next">'+_ic('milestone')+'<span>Next: <b>'+MS_PCTS[_nx]+'%</b> · '+cfEsc(hbNoEmoji(_msl[_nx]))+' · '+gbpFmt(Math.max(0,MS_PCTS[_nx]/100*dt-(state.saved||0)))+' to go</span></div>';
     var _ticks=MS_PCTS.slice(0,-1).map(function(q){return '<i class="hb-tick'+(p>=q/100?' on':'')+'" style="left:'+q+'%"></i>';}).join('');
     el.innerHTML='<div class="card-lbl">LEVEL 1 · FIRST DEPOSIT <span class="vi-dim">· hologram build</span></div>'
       +'<div class="hb-pg">'
@@ -15824,7 +15826,7 @@ function hbRenderHUD(){
       +'</div>'
       +'<div class="hb-sub-lbl hb-pg-ms">'+_ic('milestone')+' Milestones</div>'
       +'<div class="mss">'+_mss+'</div>'
-      +'<div style="margin-top:12px"><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Preview your mortgage</button></div>'
+      +'<div style="margin-top:12px"><button class="btn-add-data" onclick="hbOpenCalc()">Preview your mortgage</button></div>'
       +tip;
     try{hbWriteStats();}catch(e){}
   } else {
@@ -16974,7 +16976,7 @@ function updateMilestoneLabels(){
   const lbl=MS_LABELS[state.houseType]||MS_LABELS.terraced;
   MS_IDS.forEach((id,i)=>{
     const el=document.getElementById('msl-'+id);
-    if(el)el.innerHTML='<b>'+MS_PCTS[i]+'%</b> '+cfEsc(lbl[i]);
+    if(el)el.innerHTML='<b>'+MS_PCTS[i]+'%</b> '+cfEsc(hbNoEmoji(lbl[i]));
   });
 }
 
