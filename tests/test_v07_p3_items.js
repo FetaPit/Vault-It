@@ -70,6 +70,19 @@ const center = (p) => p.evaluate(() => { const e = document.querySelector('#othe
     await p.mouse.move(c.x, c.y); await p.mouse.down({ button: 'right' }); for (let i = 1; i <= 30; i++) await p.mouse.move(c.x + i * 10, c.y); await p.mouse.up({ button: 'right' }); await p.waitForTimeout(500);
     ok(await p.evaluate(() => { const v = _i3dLive.view; return v.ctl.target.distanceTo(v.home.t) <= 2.55; }), 'mouse: the right button pans, held near the model');
     // double click resets and does not open the viewer
+    // tile controls on a larger tile: four icon buttons; zoom in/out and reset work
+    { const nb = await p.evaluate(() => document.querySelectorAll('.i3d-live .inv-ctl button').length); ok(nb === 4, 'mouse: a larger tile has four control buttons (' + nb + ')');
+      const dA = await p.evaluate(dist); await p.click('.i3d-live .inv-ctl button[title="Zoom in"]'); await p.waitForTimeout(400); const dB = await p.evaluate(dist);
+      await p.click('.i3d-live .inv-ctl button[title="Zoom out"]'); await p.waitForTimeout(400); const dC = await p.evaluate(dist);
+      ok(dB < dA - 0.1 && dC > dB + 0.1, 'mouse: the Zoom in and Zoom out buttons move the camera (' + dA.toFixed(2) + ', ' + dB.toFixed(2) + ', ' + dC.toFixed(2) + ')');
+      await p.click('.i3d-live .inv-ctl button[title="Reset view"]'); await p.waitForTimeout(400);
+      ok(await p.evaluate(() => { const v = _i3dLive.view; return v.cam.position.distanceTo(v.home.p) < 0.05; }) && !(await p.$('#i3d-modal')), 'mouse: Reset view puts the camera back without opening the viewer'); }
+    // the stage stays Night in Daylight: the controls and the hint chip keep their dark plates and light icons
+    { await p.evaluate(() => document.documentElement.setAttribute('data-theme', 'light')); await p.waitForTimeout(200);
+      const dk = await p.evaluate(() => { const lum = (s) => { const m = s.match(/[\d.]+/g).map(Number); const f = (v) => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(m[0]) + .7152 * f(m[1]) + .0722 * f(m[2]); }; const b = getComputedStyle(document.querySelector('.i3d-live .inv-ctl button')); const h = document.querySelector('.i3d-hint');
+        return { bg: lum(b.backgroundColor), ic: lum(b.color), hint: h ? lum(getComputedStyle(h).color) : 1 }; });
+      ok(dk.bg < .1 && dk.ic > .6 && dk.hint > .6, 'Daylight: the tile controls keep dark plates with light icons and the hint is light text (' + JSON.stringify(dk) + ')');
+      await p.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark')); await p.waitForTimeout(200); }
     await p.mouse.dblclick(c.x, c.y); await p.waitForTimeout(700);
     ok(await p.evaluate(() => { const v = _i3dLive && _i3dLive.view; return !!v && v.cam.position.distanceTo(v.home.p) < 0.05 && v.ctl.target.distanceTo(v.home.t) < 0.05; }) && !(await p.$('#i3d-modal')), 'mouse: a double click puts the camera back and does not open the viewer');
     await p.mouse.click(c.x, c.y); await p.waitForTimeout(900);
@@ -84,26 +97,36 @@ const center = (p) => p.evaluate(() => { const e = document.querySelector('#othe
     // first tap turns the picture into the live view
     await touch('touchStart', [[c.x, c.y]]); await touch('touchEnd', []); await p.waitForTimeout(1500);
     ok(await p.evaluate(() => !!(window._i3dLive && _i3dLive.view)), w + ' touch: the first tap starts the live view');
-    ok(await p.evaluate(() => getComputedStyle(_i3dLive.view.r.domElement).touchAction === 'none'), w + ' touch: the tile\'s canvas takes the touch (touch-action none)');
+    ok(await p.evaluate(() => getComputedStyle(_i3dLive.view.r.domElement).touchAction === 'pan-y'), w + ' touch: the tile\'s canvas passes vertical swipes to the page (touch-action pan-y)');
+    // the tile's controls and hint (Pedro v0.8 F): icon buttons in the .nw3d-hud language, no text glyphs, a hint chip that fades
+    const ui = await p.evaluate(() => { const bs = [...document.querySelectorAll('.i3d-live .inv-ctl button')], r = bs[0] && bs[0].getBoundingClientRect(), cs = bs[0] && getComputedStyle(bs[0]); const h = document.querySelector('.i3d-hint');
+      return { n: bs.length, size: r && Math.round(r.width), radius: cs && cs.borderTopLeftRadius, icons: bs.every(x => x.querySelector('svg use')), glyphs: bs.some(x => /[+\u2212\uFF0B\uFF0D\u27F3\u2302-]/.test(x.textContent.trim())), hint: !!h && /Drag to turn/.test(h.textContent), flow: getComputedStyle(document.querySelector('.i3d-live .inv-ctl')).flexDirection }; });
+    ok(ui.n >= 2 && ui.icons && !ui.glyphs && ui.flow === 'column' && ui.radius === '8px' && ui.size === (w < 600 ? 40 : 36), w + ' touch: control stack is ' + ui.n + ' icon buttons, ' + ui.size + ' px, radius 8, vertical, no text glyphs');
+    ok(ui.hint, w + ' touch: the hint chip shows');
+    ok(await p.evaluate(() => { const h = document.querySelector('.i3d-hint'); if (!h) return false; const a = h.getBoundingClientRect(); return [...document.querySelectorAll('.i3d-live .inv-ctl button')].every(b => { const r = b.getBoundingClientRect(); return a.right <= r.left + 1 || a.left >= r.right - 1 || a.bottom <= r.top + 1 || a.top >= r.bottom - 1; }); }), w + ' touch: the hint chip does not sit on any control button');
     // one finger orbits
     const a0 = await p.evaluate(() => _i3dLive.view.cam.position.toArray());
     await touch('touchStart', [[c.x, c.y]]); for (let i = 1; i <= 8; i++) { await touch('touchMove', [[c.x + i * 8, c.y + i * 3]]); await p.waitForTimeout(20); } await touch('touchEnd', []); await p.waitForTimeout(500);
     const a1 = await p.evaluate(() => _i3dLive.view.cam.position.toArray());
     ok(Math.hypot(a1[0] - a0[0], a1[2] - a0[2]) > 0.3 && !(await p.$('#i3d-modal')), w + ' touch: one finger orbits, and does not open the viewer');
     // pinch out zooms in, pinch in zooms out
-    const d0 = await p.evaluate(dist), sp = Math.min(c.w / 2 - 8, 60);
+    const d0 = await p.evaluate(dist), sp = Math.min(c.w / 2 - 28, 50); c = { ...c, x: c.x - 24 };   // pinch left of centre: the controls sit bottom right
     await touch('touchStart', [[c.x - 12, c.y], [c.x + 12, c.y]]); for (let i = 1; i <= 10; i++) { await touch('touchMove', [[c.x - 12 - i * (sp - 12) / 10, c.y], [c.x + 12 + i * (sp - 12) / 10, c.y]]); await p.waitForTimeout(20); } await touch('touchEnd', []); await p.waitForTimeout(600);
     const d1 = await p.evaluate(dist); ok(d1 < d0 - 0.3, w + ' touch: pinching out zooms in (' + d0.toFixed(2) + ' to ' + d1.toFixed(2) + ')');
     await touch('touchStart', [[c.x - sp, c.y], [c.x + sp, c.y]]); for (let i = 1; i <= 10; i++) { await touch('touchMove', [[c.x - sp + i * (sp - 12) / 10, c.y], [c.x + sp - i * (sp - 12) / 10, c.y]]); await p.waitForTimeout(20); } await touch('touchEnd', []); await p.waitForTimeout(600);
     const d2 = await p.evaluate(dist); ok(d2 > d1 + 0.3 && d2 <= 12.05, w + ' touch: pinching in zooms out, within the limit (' + d1.toFixed(2) + ' to ' + d2.toFixed(2) + ')');
     // two fingers dragging together pan
     const t0 = await p.evaluate(() => _i3dLive.view.ctl.target.toArray());
-    await touch('touchStart', [[c.x - 20, c.y], [c.x + 20, c.y]]); for (let i = 1; i <= 10; i++) { await touch('touchMove', [[c.x - 20, c.y + i * 4], [c.x + 20, c.y + i * 4]]); await p.waitForTimeout(20); } await touch('touchEnd', []); await p.waitForTimeout(600);
+    await touch('touchStart', [[c.x - 20, c.y], [c.x + 20, c.y]]); for (let i = 1; i <= 10; i++) { await touch('touchMove', [[c.x - 20 + i * 3, c.y], [c.x + 20 + i * 3, c.y]]); await p.waitForTimeout(20); } await touch('touchEnd', []); await p.waitForTimeout(600);
     const t1 = await p.evaluate(() => _i3dLive.view.ctl.target.toArray());
     ok(Math.hypot(t1[0] - t0[0], t1[1] - t0[1], t1[2] - t0[2]) > 0.05, w + ' touch: two fingers dragging together pan');
     // double tap resets
     await touch('touchStart', [[c.x, c.y]]); await touch('touchEnd', []); await p.waitForTimeout(120); await touch('touchStart', [[c.x, c.y]]); await touch('touchEnd', []); await p.waitForTimeout(800);
     ok(await p.evaluate(() => { const v = _i3dLive && _i3dLive.view; return !!v && v.cam.position.distanceTo(v.home.p) < 0.05 && v.ctl.target.distanceTo(v.home.t) < 0.05; }) && !(await p.$('#i3d-modal')), w + ' touch: a double tap puts the camera back (no viewer)');
+    // a vertical swipe that starts ON the tile scrolls the page (it does not orbit)
+    { await p.evaluate(() => { document.querySelector('#other-assets-list .wi-img-area').scrollIntoView({ block: 'start' }); window.scrollBy(0, -120); }); await p.waitForTimeout(400); const cc = await p.evaluate(() => { const e = document.querySelector('#other-assets-list .wi-img-area'), r = e.getBoundingClientRect(); return { x: r.x + r.width / 2 - 20, y: r.y + r.height / 2 + 30 }; }); const yy0 = await p.evaluate(() => scrollY);
+      await touch('touchStart', [[cc.x, cc.y]]); for (let i = 1; i <= 10; i++) { await touch('touchMove', [[cc.x, cc.y - i * 25]]); await p.waitForTimeout(16); } await touch('touchEnd', []); await p.waitForTimeout(700);
+      ok(await p.evaluate(() => scrollY) > yy0 + 30, w + ' touch: a vertical swipe that starts on the tile scrolls the page (' + yy0 + ' to ' + await p.evaluate(() => scrollY) + ')'); }
     // page scroll still works: a swipe that starts outside the tile scrolls the page
     await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(300);
     const y0 = await p.evaluate(() => scrollY);
