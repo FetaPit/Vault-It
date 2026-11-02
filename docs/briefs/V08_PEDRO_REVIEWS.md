@@ -121,3 +121,5 @@ Template (the bracketed parts appear only when they apply):
 - Nothing to savings or investments: "...Your Budget puts nothing into savings or investments[; no debt repayments budgeted]..."
 - No Budget: "6-month estimate, not a prediction. No Budget yet, so no new money goes in. Set one up to see your plan. Savings grow 1.65% a year (Bank of England easy-access average), investments 5% (FCA mid projection), debts follow their APR."
 Rules kept: no "will", British English, no em dashes, figures in the same gbpFmt.
+
+Forecast note, v08/forecast-rates 2bf8669: PASS (checked by grep). The exact copy is in, '6' comes from ahead, and there is no 'will' or 'expected'. C2's two honesty extensions are accepted.
