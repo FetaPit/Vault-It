@@ -42,13 +42,16 @@ const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b
     ok(C.every(f => f.chip.x >= 0 && f.chip.y >= 0 && f.chip.x + f.chip.w <= r.cw + 0.5), T + 'every chip is inside the stage');
     ok(C.every((f, i) => C.every((g, j) => i === j || !hit(f.chip, g.chip))), T + 'no chip overlaps another');
     ok(r.tag && C.every(f => !hit(f.chip, r.tag)), T + 'no chip sits under the Monthly income tag');
-    ok(C.every(f => Math.abs(f.chip.y + f.chip.h - (f.dot[1] - 3)) < 1.5 && f.dot[0] >= f.chip.x - 1.5 && f.dot[0] <= f.chip.x + f.chip.w + 1.5), T + 'every chip sits on its own post\'s dot, never slid off it');
+    // Pedro round 1: the chip's anchored corner sits exactly on the dot centre, no gap (bottom-left, or bottom-right when it hangs left)
+    ok(C.every(f => Math.abs(f.chip.y + f.chip.h - f.dot[1]) < 0.01 && (Math.abs(f.chip.x - f.dot[0]) < 0.01 || Math.abs(f.chip.x + f.chip.w - f.dot[0]) < 0.01)), T + 'every chip\'s corner sits exactly on its own post\'s dot, no gap, never slid off it');
     ok(F.every(f => f.raise >= 0 && f.raise <= 3), T + 'a crowded chip is raised at most three chip heights (' + F.map(f => f.raise).join(',') + ')');
     ok(F.every(f => Math.abs(f.worldTop - 3 * f.blockH) < 1e-6), T + 'posts rise to two block heights above the blocks');
     ok(C.length && C.every(f => f.style.fill === 'rgba(8,8,8,0.88)' && f.style.stroke === 0.5 && f.style.radius === 4 && f.style.padX === 6 && f.style.padY === 4 && /600 11px/.test(f.style.nameFont) && /DM Sans/.test(f.style.nameFont) && /10\.5px/.test(f.style.amtFont) && /Share Tech Mono/.test(f.style.amtFont) && f.style.nameCol === '#E8E8E8' && f.style.post === 1 && f.style.dot === 3),
       T + 'chip, post and dot follow the spec (DM Sans 600 11 name, Share Tech Mono 10.5 amount, #080808 at .88, radius 4)');
     const O = r.outlines || [];
     ok(O.length === R.length && O.every(o => o.lineWidth === 1.5 && o.alpha === 0.95 && o.fill === 0.08 && o.inset === 0.3 && o.afterBlocks), T + 'each group is ring-fenced: 1.5 px outline at .95 over the blocks, fill .08, inset .3');
+    ok(O.every(o => o.group === 'iv' ? JSON.stringify(o.dash) === '[6,4]' : !(o.dash && o.dash.length)), T + 'Investments is ring-fenced with a dashed line (6 on, 4 off), the rest solid (Pedro round 1)');
+    ok(C.every(f => f.style.dash === undefined), T + 'every chip keeps a solid stroke');
     ok(r.plates === 0, T + 'the old dark floor labels are gone (replaced by the chips)');
     // the posts turn with the orbit: re-projected every frame
     const turned = await p.evaluate(() => new Promise(res => { const e = bd3d.engine(), a = e.flags().map(f => f.dot.slice()); e.zoom(1.3); e.kick && e.kick(); setTimeout(() => res({ a, b: e.flags().map(f => f.dot.slice()) }), 500); }));

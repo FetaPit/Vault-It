@@ -28409,8 +28409,9 @@ function makeTreeMap(cv,o){
     var items=[];cells.forEach(function(c){var g=geo(c,ts);if(g)items.push(g)});
     items.forEach(function(g){g.dz=Math.hypot(Pr.pos[0]-g.x,Pr.pos[1]-(g.y+g.h/2),Pr.pos[2]-g.z)});items.sort(function(a,b){return b.dz-a.dz});
     items.forEach(function(g){var col=g.fl>0?mix(g.col,PAL.flash,g.fl*.8):g.col;if(hover&&hover.g===g.c.g&&hover.ii===g.c.ii)col=mix(col,PAL.flash,.45);drawBox(cx,Pr,g,PL,col,PAL.fa+.16+.06*PL,.66+.25*PL,PAL.edgeK)});
-    var outl=[];rects.forEach(function(r){var a=land(r);if(a<=0)return;path(quad(r,.02));cx.strokeStyle=rgba(r.g.col,.95*a);cx.lineWidth=1.5;cx.lineJoin='round';cx.stroke();
-      outl.push({group:r.g.key,lineWidth:1.5,alpha:.95,fill:.08,inset:IN,afterBlocks:true})});
+    var outl=[];rects.forEach(function(r){var a=land(r);if(a<=0)return;var dash=r.g.key==='iv'?[6,4]:[];   // Investments dashed, 6 on 4 off (Pedro round 1): money that is put away but still yours to move
+      path(quad(r,.02));cx.strokeStyle=rgba(r.g.col,.95*a);cx.lineWidth=1.5;cx.lineJoin='round';if(cx.setLineDash)cx.setLineDash(dash);cx.stroke();if(cx.setLineDash)cx.setLineDash([]);
+      outl.push({group:r.g.key,lineWidth:1.5,alpha:.95,fill:.08,inset:IN,afterBlocks:true,dash:dash})});
     self._outl=outl;
     /* flag posts: 1 px in the group colour from the area's back-left corner to two block heights above the blocks, a 3 px dot, and on it a chip
        (name in DM Sans, amount in Share Tech Mono in the group colour). Projected every frame, so the posts turn with the orbit; only the chip
@@ -28425,8 +28426,8 @@ function makeTreeMap(cv,o){
       var r=o.r,a=land(r);if(a<=0)return;
       var rise=rm?1:ease3(a),tp=rise>=1?o.top:Pr.pt(o.bx,.02+(CH*3-.02)*rise,o.bz),name=r.g.label,amt=fmt(r.g.sum);
       cx.font=NF;var nw=cx.measureText(name+' \u00b7 ').width;cx.font=AF;var aw=cx.measureText(amt).width;
-      var fit=function(only,k,left){var w=PX*2+(only?0:nw)+aw,dx=tp[0],dy=tp[1]-k*(HC+2),x=left?dx+1-w:dx-1;   // the chip hangs right of its post, or left of it
-        return {x:x,y:dy-3-HC,w:w,h:HC,dot:[dx,dy],k:k,only:only}};
+      var fit=function(only,k,left){var w=PX*2+(only?0:nw)+aw,dx=tp[0],dy=tp[1]-k*(HC+2),x=left?dx-w:dx;   // the chip hangs right of its post, or left of it, its corner exactly on the dot (Pedro round 1: no gap)
+        return {x:x,y:dy-HC,w:w,h:HC,dot:[dx,dy],k:k,only:only}};
       var clash=function(c){return c.y<0||c.x<0||c.x+c.w>cw||placed.some(function(b){return c.x<b.x+b.w+3&&b.x<c.x+c.w+3&&c.y<b.y+b.h+2&&b.y<c.y+c.h+2})};
       var c=null;[false,true].some(function(only){for(var k=0;k<=3;k++)for(var sd=0;sd<2;sd++){var t=fit(only,k,sd===1);if(!clash(t)){c=t;return true}}return false});
       var none=!c;if(none)c=fit(true,0,false);else placed.push(c);   // no room at all: the post and its dot stand without a chip rather than cover another (the readout below names every group)
@@ -28439,7 +28440,7 @@ function makeTreeMap(cv,o){
       cx.globalAlpha=a;cx.beginPath();if(cx.roundRect)cx.roundRect(c.x+.5,c.y+.5,c.w-1,c.h-1,4);else cx.rect(c.x+.5,c.y+.5,c.w-1,c.h-1);cx.fillStyle='rgba(8,8,8,0.88)';cx.fill();cx.strokeStyle=rgba(r.g.col,.5);cx.lineWidth=1;cx.stroke();
       cx.textBaseline='middle';cx.textAlign='left';var ty=c.y+c.h/2+.5,tx=c.x+PX;
       if(!c.only){cx.font=NF;cx.fillStyle='#E8E8E8';cx.fillText(name+' \u00b7 ',tx,ty);tx+=nw}
-      cx.font=AF;cx.fillStyle=rgba(r.g.col,1);cx.fillText(amt,tx,ty);cx.globalAlpha=1;
+      cx.font=AF;cx.fillStyle=rgba(r.g.col,1);cx.fillText(amt,tx,ty);cx.beginPath();cx.arc(c.dot[0],c.dot[1],1.5,0,Math.PI*2);cx.fill();cx.globalAlpha=1;   // the dot again on the chip's corner, so the anchor shows
       flags.push({group:r.g.key,name:name,amount:amt,col:r.g.col.slice(),base:o.base.slice(0,2),dot:c.dot.slice(),chip:{x:c.x,y:c.y,w:c.w,h:c.h},raise:c.k,amountOnly:c.only,
         worldTop:CH*3,blockH:CH,rise:rise,alpha:a,style:{fill:'rgba(8,8,8,0.88)',stroke:.5,radius:4,padX:PX,padY:PY,nameFont:NF,amtFont:AF,nameCol:'#E8E8E8',post:1,dot:3}})});
     self._flags=flags;
