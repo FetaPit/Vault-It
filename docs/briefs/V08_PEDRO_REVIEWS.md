@@ -87,3 +87,7 @@ Seed from tests/test_bd_flags.js, reduced motion, 390/690/1100/1440 Night and Da
 Level 2 at 390: four icon cells (vi-mortgage, vi-keys, vi-coins, vi-calendar), buttons with no emoji, and vi-lock on the Level 3 line. Clean.
 Finish (checked by grep, no shot needed): the 💡 is still in the three `.hb-tip` strings (index.html ~15789, ~15901, ~16950). Replace each with `<svg class="vi-ic g" aria-hidden="true" style="color:var(--gold)"><use href="#vi-info"/></svg>`. Also remove the 🔑 in the mortgage-entry dialog title (no icon). Achievement icons elsewhere are out of scope.
 D2 cc57e1c: the finish is verified by grep: all three `.hb-tip` strings use vi-info, and there is no 💡 in a tip. PASS. One leftover, not blocking: the 🔑 in the mortgage dialog title (index.html:15862, "🔑 Your mortgage, in a minute") is still there. D2 can drop it in any later commit.
+
+## E2, v08/chrome 8d37b6f: PASS
+1. Feedback over 3D controls: at 690, with the button over the Net worth HUD, opacity is 0. Once it is clear after a scroll it fades back (0.70 mid-fade). It never moves.
+2. Key: the 60% border and 10% fill make each group's colour read as a key in Night and Daylight at 390, at the same size as before.
