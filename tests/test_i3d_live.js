@@ -1,5 +1,5 @@
 // Round 3, item 19 (owner, 31 Oct 2026): on a desktop, an item's 3D model can be orbited in its own tile by clicking and dragging.
-// Hovering a model tile swaps its picture for a live view (one at a time); a drag turns the camera round the item; a click without
+// Hovering a model tile swaps its picture for a live view (one at a time); a drag turns the camera round the item (v0.7: also pinch, pan, double tap or click resets, see test_v07_p3_items); a click without
 // a drag opens the full viewer; the wheel stays with the page. Touch screens keep the picture. Item 14: the model keeps its colours.
 // Run: node tests/test_i3d_live.js
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
@@ -43,7 +43,7 @@ const seed = theme => {
   await th.scrollIntoViewIfNeeded(); const box = await th.boundingBox();
   await p.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await p.waitForTimeout(1500);
   let r = await p.evaluate(() => ({ live: !!(window._i3dLive && _i3dLive.view), canvas: !!document.querySelector('#other-assets-list .i3d-live canvas'), hid: document.querySelector('#other-assets-list img.i3d-thumb').style.visibility, zoom: _i3dLive && _i3dLive.view.ctl.enableZoom }));
-  ok(r.live && r.canvas && r.hid === 'hidden' && r.zoom === false, 'hovering the tile starts a live 3D view in it (page wheel untouched)');
+  ok(r.live && r.canvas && r.hid === 'hidden' && r.zoom === true, 'hovering the tile starts a live 3D view in it (zoom ready for pinch and Ctrl+wheel; the plain wheel is kept for the page, see test_v07_p3_items)');
   const cam0 = await p.evaluate(() => _i3dLive.view.cam.position.toArray());
   await p.mouse.down(); for (let i = 1; i <= 8; i++) await p.mouse.move(box.x + box.width / 2 + i * 15, box.y + box.height / 2 + 2); await p.mouse.up(); await p.waitForTimeout(600);
   const cam1 = await p.evaluate(() => _i3dLive.view.cam.position.toArray());

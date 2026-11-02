@@ -10765,7 +10765,7 @@ button.bd-ic{cursor:pointer}
 .inv-hint{font-size:.52rem;color:var(--t2);line-height:1.5}
 .i3d-stage{touch-action:none}
 .i3d-stage canvas.i3d-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none}
-.wi-img-area .i3d-live{position:absolute;inset:0;z-index:2}.wi-img-area .i3d-live canvas{width:100%!important;height:100%!important;cursor:grab;display:block}
+.wi-img-area .i3d-live{position:absolute;inset:0;z-index:2}.wi-img-area .i3d-live canvas{width:100%!important;height:100%!important;cursor:grab;display:block;touch-action:none}
 .wi-img-area img.i3d-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;cursor:zoom-in}
 .i3d-badge{border-color:rgb(var(--green-rgb) / .6)!important;background:rgb(var(--green-rgb) / .18)!important;color:var(--green)!important}
 .i3d-btn{font-family:'Share Tech Mono',monospace;font-size:.6rem;font-weight:700;color:var(--green)}
@@ -13457,8 +13457,9 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wi-name{font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;color:var(--t1);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wi-val{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--gr)}
 /* bigger item tiles (owner, 31 Oct): wealth inventory, liabilities and crypto share the grid; about four across at 1100 px, two on a phone */
-.wi-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,140px),1fr));gap:12px}
-@media(min-width:900px){.wi-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.wi-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,168px),1fr));gap:12px}   /* item tiles 20% larger (owner, 2 Nov): 140 to 168 px, 230 to 276 px */
+@media(max-width:519px){.wi-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:8px}.wi-grid .wi-img-area{aspect-ratio:5/6}}   /* a phone fits two across, so the tile is taller instead: 20% more height */
+@media(min-width:900px){.wi-grid{grid-template-columns:repeat(auto-fill,minmax(276px,1fr));gap:18px}.wi-grid .wi-img-area{aspect-ratio:5/6}   /* three across cannot get wider, so 20% taller */
   .wi-info{padding:12px 14px 14px}.wi-name{font-size:.78rem}.wi-val{font-size:.86rem}}
 .wi-link-btn{display:inline-block;margin-top:5px;font:600 .5rem 'DM Sans',sans-serif;padding:3px 7px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
 .wi-link-btn:hover,.wi-link-btn:focus-visible{background:rgb(var(--teal-rgb) / .24)}
@@ -21642,10 +21643,24 @@ function i3dLive(kind,id,img,force){
     if(!obj||_i3dLive!==rec||!area.isConnected)return;
     var host=document.createElement('div');host.className='i3d-live';area.appendChild(host);rec.host=host;
     var it=i3dItem(kind,id);rec.view=new I3DView(host,obj,{auto:false,label:'3D model of '+(it?it.name:'the item')+'. Drag to turn it round, click to open it.'});
-    rec.view.ctl.enableZoom=false;rec.view.ctl.enablePan=false;
-    var cv=rec.view.r.domElement,d0=null;
-    cv.addEventListener('pointerdown',function(e){d0=[e.clientX,e.clientY]});
-    cv.addEventListener('pointerup',function(e){if(d0&&Math.hypot(e.clientX-d0[0],e.clientY-d0[1])<4)i3dOpen(kind,id);d0=null});
+    /* v0.7 (owner, 2 Nov): the tile is a real viewport. One finger or the mouse orbits, two fingers pinch to zoom and drag to pan (the right
+       mouse button pans), a double tap or double click puts the camera back, and a single tap or click opens the full viewer. Zoom is clamped
+       (I3DView min and max distance) and the pan is held near the model, so it can never be lost. It draws only while something moves.
+       The canvas takes touch only on the tile itself (touch-action none): a swipe that starts anywhere else still scrolls the page.
+       The plain mouse wheel belongs to the page until the tile has been clicked or dragged; Ctrl or Cmd with the wheel (and a trackpad pinch) always zooms. */
+    var V=rec.view,ctl=V.ctl,cv=V.r.domElement,d0=null,engaged=false,ptrs={},multi=false,tapAt=0,tapTimer=0;
+    ctl.enableZoom=true;ctl.enablePan=true;cv.style.touchAction='none';
+    host.addEventListener('wheel',function(e){if(!engaged&&!e.ctrlKey&&!e.metaKey)ctl.enableZoom=false},{capture:true,passive:true});   // the page keeps this wheel turn
+    host.addEventListener('wheel',function(){ctl.enableZoom=true},{passive:true});
+    ctl.addEventListener('change',function(){var o=ctl.target.clone().sub(V.home.t);if(o.length()>2.5){o.setLength(2.5);var nt=V.home.t.clone().add(o);V.cam.position.add(nt.clone().sub(ctl.target));ctl.target.copy(nt)}});
+    cv.addEventListener('pointerdown',function(e){engaged=true;ptrs[e.pointerId]=1;if(Object.keys(ptrs).length>1)multi=true;d0=[e.clientX,e.clientY]});
+    var up=function(e){delete ptrs[e.pointerId];var none=!Object.keys(ptrs).length,wasMulti=multi;if(none)multi=false;
+      if(e.type!=='pointerup'||wasMulti||!d0||Math.hypot(e.clientX-d0[0],e.clientY-d0[1])>=6){if(none)d0=null;return}
+      d0=null;var now=Date.now();
+      if(tapAt&&now-tapAt<340){clearTimeout(tapTimer);tapAt=0;V.reset()}
+      else{tapAt=now;tapTimer=setTimeout(function(){tapAt=0;if(_i3dLive===rec)i3dOpen(kind,id)},350)}};
+    cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+    cv.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')engaged=false});
     img.style.visibility='hidden';
   }).catch(function(){if(_i3dLive===rec)_i3dLive=null;});
 }
