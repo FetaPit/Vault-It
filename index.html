@@ -15195,9 +15195,13 @@ function drawChart() {
     ctx.beginPath(); ctx.moveTo(PAD.l,my); ctx.lineTo(W-PAD.r,my); ctx.stroke(); ctx.restore();
     var x=W-PAD.r-pw, above={x:x,y:my-2-LH,w:pw,h:LH}, below={x:x,y:my+2,w:pw,h:LH};
     var hit=function(r){return placed.some(function(q){return r.x<q.x+q.w&&q.x<r.x+r.w&&r.y<q.y+q.h&&q.y<r.y+r.h;});};
-    var close=i>0&&my-msShown[i-1].y<14;
-    var r=(close||hit(above))?below:above;
-    if(hit(r)){var y=Math.max.apply(null,placed.map(function(q){return q.y+q.h;}))+2;r={x:x,y:y,w:pw,h:LH};}
+    var close=i>0&&my-msShown[i-1].y<14, top=PAD.t, bot=H-PAD.b;   // plates stay inside the plot, never on the month axis (Pedro, 2 Nov 23:25)
+    var fits=function(q){return q.x>=PAD.l&&q.y>=top&&q.y+q.h<=bot&&!hit(q);};
+    var leftOf=function(q){var cl=placed.filter(function(p){return q.y<p.y+p.h&&p.y<q.y+q.h;});
+      if(!cl.length)return q;var lx=Math.min.apply(null,cl.map(function(p){return p.x;}));return {x:lx-4-pw,y:q.y,w:pw,h:LH};};
+    var order=(close||hit(above))?[below,above]:[above,below];
+    var r=order.filter(fits)[0]||[leftOf(above),leftOf(below)].filter(fits)[0];
+    if(!r){var y=Math.min(bot-LH,Math.max.apply(null,placed.map(function(q){return q.y+q.h;}))+2);r={x:x,y:y,w:pw,h:LH};}   // last resort, still inside the plot
     placed.push(r);
     var lt=viLight();   // Night: dark plate, gold text. Daylight: the card surface at .85, brass text (Pedro, 2 Nov 23:00)
     ctx.fillStyle=lt?viRgba('panel',.85):'rgba(8,8,8,.72)'; ctx.fillRect(r.x,r.y,r.w,r.h);

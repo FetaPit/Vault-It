@@ -68,6 +68,22 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     ok(!bad.length && r.every(x => x.n >= 2), 'top labels ' + w + ': TODAY always shows and no two labels touch, every range, Forecast on and off (all: ' + r[0].names + ')' + (bad.length ? ' BAD ' + JSON.stringify(bad[0]) : ''));
     await ctx.close();
   }
+  // v0.8 (Pedro, 2 Nov 23:25): two goals near the bottom of the plot never push a label onto the month axis, and plates never overlap
+  for (const [theme, w] of [['dark', 360], ['light', 360], ['dark', 390], ['light', 390]]) {
+    // 640 px tall: the shortest phone graph (32vh floors at 220 px), where the bottom is tightest
+    const ctx = await b.newContext({ viewport: { width: w, height: 640 }, reducedMotion: 'reduce', isMobile: true, hasTouch: true }); await ctx.route(/^https?:\/\/(?!localhost)/, r => r.abort());
+    const p = await ctx.newPage(); p.on('pageerror', e => errs.push('bottom ' + w + ' ' + e.message));
+    await p.addInitScript(seed, { theme, flag: true }); await p.goto(APP); await p.waitForTimeout(1800);
+    const r = await p.evaluate(() => { nw3d.setMain('graph'); const out = [];
+      // the sample case (Clear Debt and Emergency Fund both £1k), and a lowest-line pair just above the axis
+      for (const ms of [[1000, 1000, 5000, 20000, 50000], null]) {
+        if (ms) ovState.milestones = ms; else { ovState.milestones = [0, 0, 0, 0, 0]; ovState.customGoals = [{ id: 1, name: 'Low A', amount: 0.5 }, { id: 2, name: 'Low B', amount: 600 }]; }
+        drawChart(); const cv = document.getElementById('nwChart'), L = cv._msLabels || [], axis = cv.clientHeight - cv._PAD.b;
+        out.push({ n: L.length, onAxis: L.filter(l => l.y + l.h > axis + 0.5).map(l => l.label), ov: L.some((a, i) => L.some((c, j) => j > i && a.x < c.x + c.w && c.x < a.x + a.w && a.y < c.y + c.h && c.y < a.y + a.h)), inPlot: L.every(l => l.x >= cv._PAD.l - 0.5) });
+      } return out; });
+    ok(r.every(x => x.n >= 2 && !x.onAxis.length && !x.ov && x.inPlot), 'goals near the bottom ' + theme + ' ' + w + ': no label on the month axis, no plates overlapping (' + JSON.stringify(r.map(x => [x.n, x.onAxis, x.ov])) + ')');
+    await ctx.close();
+  }
   // v0.8 (owner un-parked, 2 Nov evening): the net worth graph's text never collides. The zoom hint has its own row under the axis,
   // goal labels sit at the right end of their line on a dark plate and never overlap, and the History heading carries no emoji.
   for (const [theme, w] of [['dark', 390], ['light', 390], ['dark', 768], ['light', 768], ['dark', 1440], ['light', 1440]]) {
