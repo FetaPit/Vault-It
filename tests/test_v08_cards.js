@@ -95,6 +95,8 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
         side: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 }; });
     ok(l2.lvl && l2.n === 4 && l2.icons === '#vi-mortgage,#vi-keys,#vi-coins,#vi-calendar', t + 'Level 2: four stats with icons (' + l2.icons + ')');
     ok(w < 600 ? l2.perRow === 2 : l2.perRow === 4, t + 'Level 2: stats ' + l2.perRow + ' across');
+    const dlg = await p.evaluate(() => { hbOpenMortgageEntry(false); const o = document.getElementById('hbm-ov'), t = o ? o.querySelector('.hbc-hd').textContent : ''; hbCloseMortgageEntry(); return t; });
+    ok(/Your mortgage, in a minute/.test(dlg) && !/[\u{1F300}-\u{1FAFF}]/u.test(dlg), t + 'Level 2: the mortgage dialog title has no emoji');
     ok(!l2.emoji.length && l2.lock && !l2.side, t + 'Level 2: no emoji on buttons or the Level 3 line (lock icon instead), no sideways scroll (' + l2.emoji.join('') + ')');
     await ctx.close();
   }

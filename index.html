@@ -15859,7 +15859,7 @@ function hbOpenMortgageEntry(first){
   hbCloseCalc(); var o=document.getElementById('hbm-ov'); if(o) o.remove();
   var m=state.mortgage||{}, bal=state.mortgageBalance||0;
   o=document.createElement('div'); o.id='hbm-ov'; o.className='hbc-ov';
-  o.innerHTML='<div class="hbc" style="width:min(560px,100%)" role="dialog" aria-label="Your mortgage"><div class="hbc-hd"><span>🔑 Your mortgage, in a minute <span style="font-weight:400;font-size:11px;color:var(--t3)">· your figures only · illustrative, not advice</span></span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="hbCloseMortgageEntry()" role="button" aria-label="Close">×</span></div>'
+  o.innerHTML='<div class="hbc" style="width:min(560px,100%)" role="dialog" aria-label="Your mortgage"><div class="hbc-hd"><span>Your mortgage, in a minute <span style="font-weight:400;font-size:11px;color:var(--t3)">· your figures only · illustrative, not advice</span></span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="hbCloseMortgageEntry()" role="button" aria-label="Close">×</span></div>'
     +'<div class="hbc-body" style="grid-template-columns:1fr"><div id="hbm-in">'
     +'<p class="hbc-note full" style="margin:0 0 4px">Level 1 built your deposit. Level 2 is what is left to pay: <b>'+hbMoney(hbL2Base())+'</b>. Copy the figures from your lender\'s offer; leave anything you do not have yet blank.</p>'
     +'<div><label for="hbm-lender">Lender</label><input id="hbm-lender" type="text" maxlength="60" value="'+hbEsc(m.lender||'')+'" placeholder="e.g. your bank"></div>'
