@@ -105,3 +105,11 @@ Reviewed from F2's sheets (docs/review/v08-type-scale on 3eafe19): House, Overvi
 2. The USP and PRO badges now cover their tabs: at 390 the top of the house and bolt icons, at 1440 the "HOUSE BUILDER" and "ENTREPRENEUR" labels. A badge must not overlap an icon or a label's text box. Lift it so it sits on the tab's top edge (half above), or shift it right of the label on desktop. 9 px stays.
 3. The house stage key (`#houseSceneCard .vp-key`) is cut with an ellipsis at 390 ("... 2 FINGERS · PAN · …"), so the instructions are lost. Let it wrap onto two centred lines instead of truncating. This is the HTML key under the stage, not the viewport, so it is in scope.
 Final check after the rebase onto the full candidate: B2, E2 and A2 have their own sizes on the KEEP list or at 10 px and above, so re-run the gate and send one 390 sheet of Assets → Wealth inventory and the Budget 3D.
+
+## F2, v08/type-scale d5a9e63 (rebased on candidate 706d384 with every stream): PASS
+My own shots at 390 (Night and Daylight) and 1440.
+1. KPI labels sit on one line. Hiding the 15 px icons under 460 is accepted: the coloured top edge still marks each tile, and an ellipsis only appears at 360.
+2. The USP and PRO badges sit on the tab's top edge, clear of icon and label at 390 and 1440.
+3. `.vp-key` wraps onto balanced centred lines.
+After the rebase: Wealth inventory and Budget 3D read correctly at 390, and B2's chips, E2's footer and Feedback, and the nav labels are kept as specced. No sideways scroll, no page errors.
+This closes my v0.8 reviews: C2, D2, B2, E2, A2 and F2 all PASS.
