@@ -56,3 +56,13 @@ Full pasted report, 09:14 (fold inner screen, 690x727 at DPR 2.625): fps 55 over
 3. Dashboard on mobile: the Assets / Liabilities / Debt cards sit too close and overlap - fix spacing/stacking at phone widths.
 4. Level 1 / Level 2 / Level 3 cards: side by side even on mobile, as a swipeable carousel, freeing vertical room for the viewport.
 Split: (1house+2house) -> engine session on v07/engine; (1nw3d/dashboard + 2 + 3 + 4) -> fixes session on v07/final-fixes. Merge order unchanged; release still gated on the owner's sign-off of the combined preview.
+## Final round part 3: owner's fold test on candidate 76be8ec (2 Nov, 12:39 to 12:46)
+
+Owner: "there'll be two rounds of edits here, smaller." Round 2 still to come. Release stays held until both rounds land and the owner signs off.
+
+Round 1:
+1. **Cash and savings 3D viewport is slow** (Wealth tab, £1 coin stacks). His ?perf=1: 70 long tasks, worst 1167 ms, 148 frames over 33 ms, p95 33.1 ms. "The viewport for the house builder is perfect, so do not change any of that whatsoever. Maybe we can learn from that viewport for the others." Stream A2 (v07/engine): rebuild the v3 coin viewer (index.html ~20392 to 20600, and Precious metals if it shares the path) with house_gl's lessons. Hard rule: zero diff on the house builder path. Gate: no task over 100 ms on open, orbit p95 20 ms or less.
+2. **Uploaded 3D models in Assets, Liabilities and Wealth inventory**: pinch zoom, rotate, orbit (and mouse drag and wheel); page scroll must still work around the tile; render on demand. Item viewport tiles 20% larger. Stream B2 (v07/final-fixes).
+3. **Net-worth 3D labels colour-coded** to match each column's block colour (colours already on each column in sceneData). Stream B2.
+
+This round changes viewports the earlier scope guard protected. That is the owner's decision. Only the items above change.
