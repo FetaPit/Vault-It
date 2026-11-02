@@ -20,6 +20,9 @@ const E = [
   ['dev links wrap rather than clip',
     "[data-theme=\"light\"] .dev-links a{color:var(--text)!important}\n",
     "[data-theme=\"light\"] .dev-links a{color:var(--text)!important}\n.dev-links{grid-template-columns:repeat(auto-fill,minmax(min(100%,124px),1fr))!important}   /* v0.8 type scale: the five links wrap rather than clip */\n"],
+  ['Budget card sub-line wraps under the amount (keeps the D2 titles clear at 10.5 px)',
+    ".bd-tile-sum small{font:max(.5rem,var(--vi-fs-1)) 'Share Tech Mono',monospace;color:var(--t3);font-weight:400}",
+    ".bd-tile-sum small{font:max(.5rem,var(--vi-fs-1))/1.2 'Share Tech Mono',monospace;color:var(--t3);font-weight:400;white-space:normal;max-width:7ch;text-align:right}"],
   // Roadmap SVG: real-pixel text (the SVG is not scaled), so the attribute sizes are the drawn sizes
   ['roadmap phase label',
     `text-anchor="middle" font-size="7.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.6')+'" letter-spacing="2.5">`,
@@ -43,7 +46,7 @@ const E = [
     `+'" y="'+(LINE_Y+NODE_R-2)+'" font-size="8" font-family="Share Tech Mono`],
   ['roadmap phone carousel never shrinks a coin under 1',
     "g.style.transform='scale('+(1.22-0.42*d).toFixed(3)+')';",
-    "g.style.transform='scale('+(1.22-0.22*d).toFixed(3)+')';   // never under 1, so stage names keep their size (v0.8 type scale)"],
+    "g.style.transform='scale('+(1.22-0.22*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */"],
   // Mortgage chart: drawn at its real width, so its text sizes are the drawn sizes (a 640-wide drawing squeezed to a phone drew ~4 px text)
   ['mortgage chart width',
     "  var W=640,H=222,L=52,R=10,T=10,B=40,n=Math.max(",

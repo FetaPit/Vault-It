@@ -29,7 +29,7 @@ const OFF = ':root{--vi-fs-0:0px!important;--vi-fs-1:0px!important;--vi-fs-2:0px
   for (const m of body.matchAll(/font-size\s*:\s*(\d*\.?\d+)(rem|px)(?![\w(])/g)) {
     const n = +m[1], u = m[2]; if (u === 'rem' ? n >= 0.81 : n >= 10.5) continue;
     const line = body.slice(body.lastIndexOf('\n', m.index) + 1, body.indexOf('\n', m.index));
-    if (/\.nw-more-btns button\{|\.hud-bar/.test(line)) continue;           // KEEP rules (C2 pills, house viewport HUD)
+    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar/.test(line)) continue;   // KEEP rules (C2 pills, D2 card titles, house viewport HUD)
     bare.push(line.trim().slice(0, 90));
   }
   for (const m of body.matchAll(/max\((\d*\.?\d+)rem,var\(--vi-fs-(\d)\)\)/g)) {
@@ -121,6 +121,16 @@ function measure() {
     const s1 = await st(); await page.addStyleTag({ content: OFF }); await page.waitForTimeout(400); const s0 = await st();
     ok(s1 === s0 && s1 !== 'none', `${w}: 3D house stage size unchanged by the floors (${s1} vs ${s0})`);
     await ctx.close();
+  }
+  // the Roadmap's phone carousel still fades the coins away from the centre (its scale floor is 1 so names keep their size)
+  {
+    const c2 = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); const p2 = await c2.newPage();
+    await p2.addInitScript(() => { try { localStorage.setItem('vi_declined_demo', 'true'); } catch (e) {} });
+    await p2.goto(URL_); await p2.waitForTimeout(1100); await p2.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
+    await p2.evaluate("showTab('overview')"); await p2.waitForTimeout(800);
+    const co = await p2.evaluate(() => { try { fireCarousel(); } catch (e) {} return [...document.querySelectorAll('#fire-roadmap-svg .fire-coin')].map(g => [parseFloat(g.style.opacity || '1'), (g.style.transform.match(/scale\(([\d.]+)\)/) || [0, 1])[1] * 1]); });
+    ok(co.length > 2 && co.some(x => x[0] < 0.9) && co.every(x => x[1] >= 1), `390: Roadmap coins away from the centre still fade, and none scales under 1 (opacity min ${Math.min(...co.map(x => x[0]))}, scale min ${Math.min(...co.map(x => x[1]))})`);
+    await c2.close();
   }
   // the user's Text Size setting still works (Large = 15 px root on a phone)
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true }); const page = await ctx.newPage();

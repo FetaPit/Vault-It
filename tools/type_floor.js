@@ -16,6 +16,7 @@ const a = src.indexOf('// <<HB3D_ENGINE'), b = src.indexOf('// HB3D_ENGINE>>');
 // Left at their own size on purpose (agreed with the creative director):
 const KEEP = [
   '.nw-more-btns button{',   // C2 Net worth pills: 10 px caps, measured to fit one row at 390
+  '.bd-tile-tt b{',          // D2 Budget card titles: .77rem caps, two balanced lines measured to fit (Pedro passed D2 item 1)
   '.hud-bar',                // the house builder 3D viewport's own HUD (hard rule: not touched)
 ];
 const tierOf = (n, u) => u === 'rem' ? (n < 0.56 ? 1 : n < 0.70 ? 2 : n < 0.81 ? 3 : 0) : (n < 10.5 ? 1 : 0);
