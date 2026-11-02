@@ -74,3 +74,11 @@ When item 4 and the 💡 change land, D2 is a PASS with no further round: this i
 Two small finishes, then PASS without another round (I'll confirm from one 390 shot):
 1. On phones the tile is a still picture until the first tap, so the hint only appears after the user has already found the tile. Before that, the only cue is the "3D" badge. On coarse pointers, make the badge read `vi-orbit` 12 px + "3D · tap to turn" (Share Tech Mono 10 px) until the first live view this session, then back to "3D".
 2. "Change model" and "Remove model" in the 3D model viewer render as unstyled browser buttons (`.dep-btn` has no CSS anywhere, so this predates B2). Give them the ghost pill used by "Link to market value" on the tile: same height, radius, border and font.
+
+### B2 63c4446: scroll trap re-test (David's ask)
+390 touch profile, a page made scrollable with spacers, CDP touch swipes of 220 px. Vertical swipe on the still tile: page scrolls (+205). Tap: live view starts. Vertical swipe on the live tile: page scrolls (+205), camera unchanged. Horizontal swipe on the live tile: camera turns (x 2.6 to -2.88, then to 3.13), including straight after a scroll. Scroll trap fixed.
+
+## A2, v07/engine 8128fd2: E8 tree map (round 1 of 2): FIX, 2 items
+Seed from tests/test_bd_flags.js, reduced motion, 390/690/1100/1440 Night and Daylight (the stage is Night in both). Outlines in group colours with committed essential in --coral, posts, chips in one style with the flow labels, amount-only fallback at 390 and the grey unassigned post: all as specced. 690 to 1440 read cleanly with no chip over another.
+1. Chips sit beside their posts, not on them. The post's dot ends about 5 css px below the chip, and at 390 the Investments dot sits past the chip's right corner, so the chip reads as detached (the £35 chip too). Make the chip's anchored corner (bottom-left, or bottom-right when it hangs left) sit on the dot's centre with no gap, at every width.
+2. Savings (`--green`) and Investments (`--green2`) are nearly the same green, so at 690 and 1100 the two ring-fences read as one. With no new hex, draw the Investments outline dashed (6 on, 4 off, same 1.5 px and .95), and let its chip stroke stay solid.
