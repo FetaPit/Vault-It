@@ -1,6 +1,7 @@
 // Round 3, items 1 to 4 (owner, 31 Oct 2026): the dashboard forecast says what it rests on (v0.7 UI round 2: from the Budget, full width);
 // the assets and liabilities tiles draw each value on one proportional scale; the debt tile shows what is left in a soft red
 // from the left and what is paid off in green from the right, both amounts underneath.
+// v0.8: the graph's zoom hint under the axis, goal labels on plates that never overlap, no emoji on the History heading.
 // Run: node tests/test_ov_tiles.js   (VI_APP=file:///path/to/index.html to test another copy)
 const { chromium } = require('playwright');
 const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
@@ -50,6 +51,39 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     ok(bc && Math.abs(bc.paidW / bc.barW - 0.2) < 0.02 && bc.paidRight < 1 && bc.remLeft < 1, T + 'Barclaycard (£2,500 to £2,000): 20% paid off in green from the right, 80% left from the left (' + (bc && (bc.paidW / bc.barW).toFixed(3)) + ')');
     ok(car && Math.abs(car.paidW / car.barW - 2350 / 6000) < 0.02 && car.labPaid === car.want[1], T + 'Car loan: £2,350 of £6,000 paid off, labelled (' + (car && car.labPaid) + ')');
     ok(bc && /rgba?\(/.test(bc.remBg) && /, 0\.2\d\)|\/ 0\.2\d\)/.test(bc.remBg) && /to pay/.test(bc.labRem), T + 'what is left is a soft red (' + (bc && bc.remBg) + ') with "to pay"');
+    ok(await p.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 1, T + 'no sideways scroll');
+    await ctx.close();
+  }
+  // v0.8 (owner un-parked, 2 Nov evening): the net worth graph's text never collides. The zoom hint has its own row under the axis,
+  // goal labels sit at the right end of their line on a dark plate and never overlap, and the History heading carries no emoji.
+  for (const [theme, w] of [['dark', 390], ['light', 390], ['dark', 768], ['light', 768], ['dark', 1440], ['light', 1440]]) {
+    const T = 'graph ' + theme + ' ' + w + ': ';
+    const ctx = await b.newContext({ viewport: { width: w, height: 900 }, reducedMotion: 'reduce', isMobile: w < 700, hasTouch: w < 700 }); await ctx.route(/^https?:\/\/(?!localhost)/, r => r.abort());
+    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(T + e.message));
+    await p.addInitScript(seed, { theme, flag: true }); await p.goto(APP); await p.waitForTimeout(1800);
+    await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#trial-banner,#tester-welcome{display:none!important}' });
+    let r = await p.evaluate(() => { nw3d.setMain('graph'); drawChart();
+      const cv = document.getElementById('nwChart'), h = document.getElementById('nw-zoom-hint'), cb = cv.getBoundingClientRect(), hb = h.getBoundingClientRect();
+      return { inside: hb.bottom > cb.top && hb.top < cb.bottom, below: hb.top >= cb.bottom - 0.5, fs: getComputedStyle(h).fontSize, shown: h.offsetParent !== null };
+    });
+    ok(r.shown && !r.inside && r.below && r.fs === '10.5px', T + 'the zoom hint is on its own row under the graph, not on the plot (' + r.fs + ')');
+    ok(await p.evaluate(() => { nw3d.setMain('3d'); const v = document.getElementById('nw-zoom-hint').offsetParent === null; nw3d.setMain('graph'); return v; }), T + 'the hint leaves with the graph in the 3D view');
+    // goal labels: the seeded goals, then two goals 1% apart (their lines a few px apart)
+    const labs = (extra) => p.evaluate((extra) => { if (extra) { ovState.customGoals = (ovState.customGoals || []).concat(extra); } drawChart();
+      const cv = document.getElementById('nwChart'), L = cv._msLabels || [], W = cv._W || cv.clientWidth, PAD = cv._PAD;
+      const ov = L.some((a, i) => L.some((b, j) => j > i && a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h));
+      return { n: L.length, ov, right: L.every(l => Math.abs(l.x + l.w - (W - PAD.r)) < 1), inCv: L.every(l => l.y >= 0 && l.y + l.h <= cv.clientHeight && l.x >= 0), L }; }, extra);
+    r = await labs(null);
+    ok(r.n >= 1 && !r.ov && r.right && r.inCv, T + r.n + ' goal labels at the right end of their lines, none overlapping');
+    r = await labs([{ id: 901, name: 'Near A', amount: 30000 }, { id: 902, name: 'Near B', amount: 30300 }]);
+    const a = r.L.find(l => l.label === 'Near A'), bb = r.L.find(l => l.label === 'Near B');
+    ok(a && bb && !r.ov && Math.abs(a.line - bb.line) < 14 && a.below && !bb.below, T + 'two goals ' + (a && bb ? Math.round(Math.abs(a.line - bb.line)) : '?') + ' px apart: the lower label moves below its line, no overlap');
+    // the plate is dark (#080808 at .72) in both themes: sample a pixel inside a plate, away from the text
+    r = await p.evaluate(() => { const cv = document.getElementById('nwChart'), l = cv._msLabels[0], dpr = cv.width / cv.clientWidth;
+      const d = cv.getContext('2d').getImageData(Math.round((l.x + 1) * dpr), Math.round((l.y + 1) * dpr), 1, 1).data; return [d[0], d[1], d[2]]; });
+    ok(r.every(v => v < 90), T + 'labels sit on a dark plate (pixel ' + r.join(',') + ')');
+    r = await p.evaluate(() => document.getElementById('ov-nwh-card').textContent);
+    ok(/Net Worth History/.test(r) && !/\p{Extended_Pictographic}/u.test(r), T + 'the Net Worth History heading has no emoji');
     ok(await p.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 1, T + 'no sideways scroll');
     await ctx.close();
   }

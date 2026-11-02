@@ -12085,8 +12085,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     </div>
     <div style="position:relative">
       <canvas id="nwChart"></canvas>
-      <div id="nw-zoom-hint" style="position:absolute;top:6px;right:8px;font-size:max(.46rem,var(--vi-fs-1));color:rgb(var(--teal-rgb) / .4);font-family:'Share Tech Mono',monospace;pointer-events:none">Scroll=zoom · Drag=pan · Dbl-click=reset</div>
     </div>
+    <div id="nw-zoom-hint" class="nw3d-graph-only" style="margin-top:4px;text-align:right;font-size:10.5px;line-height:1.3;color:var(--muted);font-family:'Share Tech Mono',monospace;pointer-events:none">Scroll=zoom · Drag=pan · Dbl-click=reset</div>   <!-- its own row under the axis, never on the plot (v0.8) -->
     <div id="chart-tooltip" style="font-family:'Share Tech Mono',monospace;font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);margin-top:8px;text-align:center;min-height:16px"></div>
     <p class="vi-fc-note" id="nw-fc-note" hidden><svg class="vi-ic" aria-hidden="true"><use href="#vi-info"/></svg><span id="nw-fc-txt"></span></p>
 
@@ -12095,7 +12095,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <div class="nw-more-btns" role="group" aria-label="History, goals and snapshots"><button type="button" data-p="history" aria-expanded="false" aria-controls="ov-nwh-card" onclick="nwMore('history')"><svg class="vi-ic" aria-hidden="true"><use href="#vi-calendar"/></svg><span>History</span><svg class="vi-ic nw-more-chev" aria-hidden="true"><use href="#vi-chevron"/></svg></button><button type="button" data-p="goals" aria-expanded="false" aria-controls="ov-ms-card" onclick="nwMore('goals')"><svg class="vi-ic" aria-hidden="true"><use href="#vi-target"/></svg><span>Goals</span><svg class="vi-ic nw-more-chev" aria-hidden="true"><use href="#vi-chevron"/></svg></button><button type="button" data-p="snaps" aria-expanded="false" aria-controls="ov-ms-card" onclick="nwMore('snaps')"><svg class="vi-ic" aria-hidden="true"><use href="#vi-camera"/></svg><span>Snapshots</span><svg class="vi-ic nw-more-chev" aria-hidden="true"><use href="#vi-chevron"/></svg></button></div>
       <div class="nw-more-panel nw-more-hist" id="ov-nwh-card" hidden>
     <div style="flex:1;min-width:180px">
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:max(.7rem,var(--vi-fs-3));color:var(--tx);margin-bottom:4px">📅 Net Worth History <span style="font-size:max(.44rem,var(--vi-fs-1));color:var(--go);background:rgba(247,179,85,.12);border:1px solid rgba(247,179,85,.2);padding:2px 7px;font-family:'Share Tech Mono',monospace;letter-spacing:.08em;vertical-align:middle">PRO</span></div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:max(.7rem,var(--vi-fs-3));color:var(--tx);margin-bottom:4px">Net Worth History <span style="font-size:max(.44rem,var(--vi-fs-1));color:var(--go);background:rgba(247,179,85,.12);border:1px solid rgba(247,179,85,.2);padding:2px 7px;font-family:'Share Tech Mono',monospace;letter-spacing:.08em;vertical-align:middle">PRO</span></div>
       <div style="font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);line-height:1.5">Retroactively track your financial journey since 18: see every high, low and turning point.</div>
       <div id="nwh-mini-wrap" style="margin-top:10px;height:36px;position:relative"></div>
     </div>
@@ -15177,17 +15177,27 @@ function drawChart() {
   var msColors=['#c9a84c','#c9a84c','#c9a84c','#c9a84c','#c9a84c'];
   var msLabels=['Emergency Fund','Clear Debt','House Deposit','FI Number','Custom'];
   var msAll=(ovState.milestones||[]).map(function(m,i){return{m:m,label:msLabels[i],c:msColors[i]};}).concat((ovState.customGoals||[]).map(function(g){return{m:g.amount,label:g.name,c:'#e8c56a'};}));
-  msAll.forEach(function(it){
-    var m=it.m;
-    if (!m||m<=0||m<minV||m>maxV) return;
-    var my=yp(m);
+  // Goal labels sit at the right end of their line on a dark plate (v0.8, Pedro); where two lines are within 14 px the lower
+  // label moves below its line, so labels never overlap. canvas._msLabels keeps the plates for the tests.
+  var msShown=msAll.filter(function(it){return it.m>0&&it.m>=minV&&it.m<=maxV;}).map(function(it){return{it:it,y:yp(it.m)};}).sort(function(a,b){return a.y-b.y;});
+  canvas._msLabels=[];
+  ctx.save(); ctx.font="10px 'Syne',sans-serif";
+  var LH=14, placed=[];
+  msShown.forEach(function(o,i){
+    var it=o.it,my=o.y,txt=it.label+' '+gbpFmt(it.m),tw=Math.ceil(ctx.measureText(txt).width),pw=tw+6;
     ctx.save(); ctx.strokeStyle=it.c; ctx.globalAlpha=0.35; ctx.lineWidth=1; ctx.setLineDash([5,4]);
-    ctx.beginPath(); ctx.moveTo(PAD.l,my); ctx.lineTo(W-PAD.r,my); ctx.stroke();
-    ctx.setLineDash([]); ctx.globalAlpha=viLight()?1:0.6;
-    ctx.fillStyle=viLight()?viCss('brass'):it.c; ctx.font="9px 'Syne',sans-serif"; ctx.textAlign='left';
-    ctx.fillText(it.label+' '+gbpFmt(m), PAD.l+4, my-4);
-    ctx.restore();
+    ctx.beginPath(); ctx.moveTo(PAD.l,my); ctx.lineTo(W-PAD.r,my); ctx.stroke(); ctx.restore();
+    var x=W-PAD.r-pw, above={x:x,y:my-2-LH,w:pw,h:LH}, below={x:x,y:my+2,w:pw,h:LH};
+    var hit=function(r){return placed.some(function(q){return r.x<q.x+q.w&&q.x<r.x+r.w&&r.y<q.y+q.h&&q.y<r.y+r.h;});};
+    var close=i>0&&my-msShown[i-1].y<14;
+    var r=(close||hit(above))?below:above;
+    if(hit(r)){var y=Math.max.apply(null,placed.map(function(q){return q.y+q.h;}))+2;r={x:x,y:y,w:pw,h:LH};}
+    placed.push(r);
+    ctx.fillStyle='rgba(8,8,8,.72)'; ctx.fillRect(r.x,r.y,r.w,r.h);
+    ctx.fillStyle=it.c; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(txt,r.x+3,r.y+r.h/2+.5);
+    canvas._msLabels.push({label:it.label,line:my,x:r.x,y:r.y,w:r.w,h:r.h,below:r===below||r.y>my});
   });
+  ctx.restore();
 
   // ── Line series helper ──
   function drawLine(pts, color, lw, fill) {
