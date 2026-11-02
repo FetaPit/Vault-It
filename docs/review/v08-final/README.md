@@ -45,3 +45,13 @@ Nit: "No clients yet — add your first!" has an em dash (pre-existing copy). Ma
 Parked for v0.8.1 (pre-existing on 8b33d7c): at 360 the header "NET WORTH" label wraps to two lines.
 
 Follow-up 2, v08/type-scale fea1747: PASS. The Entrepreneur KPIs are 2 x 2 at 460 and 599 with no lone tile, and 4 across at 768 (Monthly recurring revenue on 2 lines). The empty-clients copy has no em dash. Shots: followup/biz2_{460,599,768}.png.
+
+## Pulled into 0.8 (owner, 2 Nov evening): C2 v08/forecast-rates eecf5e0
+Shots: `followup/c2-*` at 390 and 1440, Night and Daylight, including two goals 1% apart.
+
+- Item 3, no 📅 on "Net Worth History": PASS.
+- Item 1, NW graph hint and goal labels: FIX (round 1).
+  - The hint is on its own row under the axis at 10.5px, Graph view only. Labels are right-aligned and never overlap, and close goals split below their line. No sideways scroll, no errors.
+  1. Daylight: the near-black plates sit on the paper-coloured chart as heavy black boxes. My spec only gave the Night value. Keep `rgba(8,8,8,.72)` with gold text in Night. In Daylight use the card surface at about .85 with brass text (`viCss('brass')`, as the old label used), so labels read without the black blocks.
+  2. Wasted space: at 390 there is about 25px of empty canvas between the month labels and the hint. Bring the hint up to 4 to 8px under the month labels.
+  3. The TODAY / Q4 '26 / Q1 '27 tick collision at 390 (both themes) is covered by C2's next commit; I will check it in the same shot.
