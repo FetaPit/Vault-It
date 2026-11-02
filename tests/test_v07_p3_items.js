@@ -70,23 +70,20 @@ const center = (p) => p.evaluate(() => { const e = document.querySelector('#othe
     await p.mouse.move(c.x, c.y); await p.mouse.down({ button: 'right' }); for (let i = 1; i <= 30; i++) await p.mouse.move(c.x + i * 10, c.y); await p.mouse.up({ button: 'right' }); await p.waitForTimeout(500);
     ok(await p.evaluate(() => { const v = _i3dLive.view; return v.ctl.target.distanceTo(v.home.t) <= 2.55; }), 'mouse: the right button pans, held near the model');
     // double click resets and does not open the viewer
-    // tile controls on a larger tile: four icon buttons; zoom in/out and reset work
-    { const nb = await p.evaluate(() => document.querySelectorAll('.i3d-live .inv-ctl button').length); ok(nb === 4, 'mouse: a larger tile has four control buttons (' + nb + ')');
-      const dA = await p.evaluate(dist); await p.click('.i3d-live .inv-ctl button[title="Zoom in"]'); await p.waitForTimeout(400); const dB = await p.evaluate(dist);
-      await p.click('.i3d-live .inv-ctl button[title="Zoom out"]'); await p.waitForTimeout(400); const dC = await p.evaluate(dist);
-      ok(dB < dA - 0.1 && dC > dB + 0.1, 'mouse: the Zoom in and Zoom out buttons move the camera (' + dA.toFixed(2) + ', ' + dB.toFixed(2) + ', ' + dC.toFixed(2) + ')');
-      await p.click('.i3d-live .inv-ctl button[title="Reset view"]'); await p.waitForTimeout(400);
-      ok(await p.evaluate(() => { const v = _i3dLive.view; return v.cam.position.distanceTo(v.home.p) < 0.05; }) && !(await p.$('#i3d-modal')), 'mouse: Reset view puts the camera back without opening the viewer'); }
-    // the stage stays Night in Daylight: the controls and the hint chip keep their dark plates and light icons
+    ok(await p.evaluate(() => !document.querySelector('.i3d-live .inv-ctl')), 'mouse: no control stack on the tile');
+    // the stage stays Night in Daylight: the hint chip keeps its dark plate and light text
     { await p.evaluate(() => document.documentElement.setAttribute('data-theme', 'light')); await p.waitForTimeout(200);
-      const dk = await p.evaluate(() => { const lum = (s) => { const m = s.match(/[\d.]+/g).map(Number); const f = (v) => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(m[0]) + .7152 * f(m[1]) + .0722 * f(m[2]); }; const b = getComputedStyle(document.querySelector('.i3d-live .inv-ctl button')); const h = document.querySelector('.i3d-hint');
-        return { bg: lum(b.backgroundColor), ic: lum(b.color), hint: h ? lum(getComputedStyle(h).color) : 1 }; });
-      ok(dk.bg < .1 && dk.ic > .6 && dk.hint > .6, 'Daylight: the tile controls keep dark plates with light icons and the hint is light text (' + JSON.stringify(dk) + ')');
+      const dk = await p.evaluate(() => { const lum = (s) => { const m = s.match(/[\d.]+/g).map(Number); const f = (v) => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(m[0]) + .7152 * f(m[1]) + .0722 * f(m[2]); }; const h = document.querySelector('.i3d-hint'); return h ? lum(getComputedStyle(h).color) : -1; });
+      ok(dk > .6 || dk === -1, 'Daylight: the hint chip text stays light on its dark plate (' + dk + ')');
       await p.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark')); await p.waitForTimeout(200); }
     await p.mouse.dblclick(c.x, c.y); await p.waitForTimeout(700);
     ok(await p.evaluate(() => { const v = _i3dLive && _i3dLive.view; return !!v && v.cam.position.distanceTo(v.home.p) < 0.05 && v.ctl.target.distanceTo(v.home.t) < 0.05; }) && !(await p.$('#i3d-modal')), 'mouse: a double click puts the camera back and does not open the viewer');
     await p.mouse.click(c.x, c.y); await p.waitForTimeout(900);
     ok(!!(await p.$('#i3d-modal')), 'mouse: a single click still opens the full viewer');
+    { const v = await p.evaluate(() => { const bs = [...document.querySelectorAll('#i3d-modal .inv-ctl button')], r = bs[0].getBoundingClientRect(), cs = getComputedStyle(bs[0]), ac = getComputedStyle(document.getElementById('i3d-auto'));
+        return { n: bs.length, size: Math.round(r.width), radius: cs.borderTopLeftRadius, col: getComputedStyle(document.querySelector('#i3d-modal .inv-ctl')).flexDirection, icons: bs.every(x => x.querySelector('svg use')), glyphs: bs.some(x => /[+\u2212\uFF0B\uFF0D\u27F3\u2302-]/.test(x.textContent.trim())), pressed: document.getElementById('i3d-auto').getAttribute('aria-pressed'), pbc: ac.borderTopColor, tbc: getComputedStyle(bs[1]).borderTopColor }; });
+      ok(v.n === 4 && v.size === 36 && v.radius === '8px' && v.col === 'column' && v.icons && !v.glyphs, 'full viewer: controls match the Net worth HUD (4 icon buttons, 36 px, radius 8, vertical, no text glyphs)');
+      ok(v.pressed !== 'true' || v.pbc !== v.tbc, 'full viewer: the pressed Auto-rotate button has a teal border (' + v.pbc + ' vs ' + v.tbc + ')'); }
     await ctx.close(); }
   // ── phone and fold: touch ──
   for (const w of [390, 884]) {
@@ -98,12 +95,9 @@ const center = (p) => p.evaluate(() => { const e = document.querySelector('#othe
     await touch('touchStart', [[c.x, c.y]]); await touch('touchEnd', []); await p.waitForTimeout(1500);
     ok(await p.evaluate(() => !!(window._i3dLive && _i3dLive.view)), w + ' touch: the first tap starts the live view');
     ok(await p.evaluate(() => getComputedStyle(_i3dLive.view.r.domElement).touchAction === 'pan-y'), w + ' touch: the tile\'s canvas passes vertical swipes to the page (touch-action pan-y)');
-    // the tile's controls and hint (Pedro v0.8 F): icon buttons in the .nw3d-hud language, no text glyphs, a hint chip that fades
-    const ui = await p.evaluate(() => { const bs = [...document.querySelectorAll('.i3d-live .inv-ctl button')], r = bs[0] && bs[0].getBoundingClientRect(), cs = bs[0] && getComputedStyle(bs[0]); const h = document.querySelector('.i3d-hint');
-      return { n: bs.length, size: r && Math.round(r.width), radius: cs && cs.borderTopLeftRadius, icons: bs.every(x => x.querySelector('svg use')), glyphs: bs.some(x => /[+\u2212\uFF0B\uFF0D\u27F3\u2302-]/.test(x.textContent.trim())), hint: !!h && /Drag to turn/.test(h.textContent), flow: getComputedStyle(document.querySelector('.i3d-live .inv-ctl')).flexDirection }; });
-    ok(ui.n >= 2 && ui.icons && !ui.glyphs && ui.flow === 'column' && ui.radius === '8px' && ui.size === (w < 600 ? 40 : 36), w + ' touch: control stack is ' + ui.n + ' icon buttons, ' + ui.size + ' px, radius 8, vertical, no text glyphs');
-    ok(ui.hint, w + ' touch: the hint chip shows');
-    ok(await p.evaluate(() => { const h = document.querySelector('.i3d-hint'); if (!h) return false; const a = h.getBoundingClientRect(); return [...document.querySelectorAll('.i3d-live .inv-ctl button')].every(b => { const r = b.getBoundingClientRect(); return a.right <= r.left + 1 || a.left >= r.right - 1 || a.bottom <= r.top + 1 || a.top >= r.bottom - 1; }); }), w + ' touch: the hint chip does not sit on any control button');
+    // the tile has a hint chip and no control stack (Pedro's review: too big on a 150 to 190 px tile)
+    ok(await p.evaluate(() => { const h = document.querySelector('.i3d-hint'), tl = document.querySelector('.i3d-live').getBoundingClientRect(); if (!h || document.querySelectorAll('.i3d-live .inv-ctl').length) return false; const r = h.getBoundingClientRect(), cs = getComputedStyle(h);
+      return /^Drag to turn$/.test(h.textContent.trim()) && !!h.querySelector('svg use[href="#vi-orbit"]') && Math.abs(r.left - tl.left - 6) <= 1 && Math.abs(tl.bottom - r.bottom - 6) <= 1 && cs.fontSize === '10px' && /Share Tech Mono/.test(cs.fontFamily); }), w + ' touch: a "Drag to turn" hint chip 6 px in at the bottom left, and no control stack on the tile');
     // one finger orbits
     const a0 = await p.evaluate(() => _i3dLive.view.cam.position.toArray());
     await touch('touchStart', [[c.x, c.y]]); for (let i = 1; i <= 8; i++) { await touch('touchMove', [[c.x + i * 8, c.y + i * 3]]); await p.waitForTimeout(20); } await touch('touchEnd', []); await p.waitForTimeout(500);

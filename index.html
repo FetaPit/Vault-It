@@ -10764,8 +10764,9 @@ button.bd-ic{cursor:pointer}
 .inv-ctl button .vi-ic{width:18px;height:18px;--vi-sw:1.5}
 .inv-ctl button:hover{border-color:var(--teal);color:var(--teal)}.inv-ctl button:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
 @media(max-width:599px){.inv-ctl button{width:40px;height:40px}}
-.i3d-hint{position:absolute;left:8px;bottom:8px;z-index:2;display:inline-flex;align-items:center;gap:6px;padding:3px 6px;border-radius:4px;background:rgba(8,8,8,.72);color:var(--text);font:400 10px/1.3 'Share Tech Mono',monospace;pointer-events:none;transition:opacity 240ms var(--ease)}
-.i3d-hint .vi-ic{width:14px;height:14px;--vi-sw:1.5}.i3d-hint.off{opacity:0}
+.i3d-hint{position:absolute;left:6px;bottom:6px;z-index:2;display:inline-flex;align-items:center;gap:4px;padding:2px 5px;border-radius:4px;background:rgba(8,8,8,.72);color:var(--text);font:400 10px/1.3 'Share Tech Mono',monospace;pointer-events:none;transition:opacity 240ms var(--ease)}
+.i3d-hint .vi-ic{width:12px;height:12px;--vi-sw:1.5}.i3d-hint.off{opacity:0}
+.inv-ctl button[aria-pressed="true"]{border-color:var(--teal)}
 .wi-img-area .i3d-live canvas:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
 .wi-img-area .i3d-live canvas:active{cursor:grabbing}
 @media (prefers-reduced-motion:reduce){.i3d-hint{transition:none}}
@@ -21676,14 +21677,9 @@ function i3dLive(kind,id,img,force){
       else{tapAt=now;tapTimer=setTimeout(function(){tapAt=0;if(_i3dLive===rec)i3dOpen(kind,id)},350)}};
     cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
     cv.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')engaged=false});
-    /* the tile's controls speak the same language as the Net worth 3D HUD (Pedro v0.8 F): a small icon stack bottom right (two buttons on a small tile, four on a larger one) and a hint chip that fades on the first touch or after 4 s and does not come back this session */
-    var cs=document.createElement('div');cs.className='inv-ctl';var big=host.clientHeight>=230;
-    [['zoom-in','Zoom in',function(){V.zoom(0.8)},big],['zoom-out','Zoom out',function(){V.zoom(1.25)},big],['reset','Reset view',function(){V.reset()},true],['fullscreen','Open the 3D viewer',function(){i3dOpen(kind,id)},true]].forEach(function(d){if(!d[3])return;
-      var bt=document.createElement('button');bt.type='button';bt.title=d[1];bt.setAttribute('aria-label',d[1]);bt.innerHTML='<svg class="vi-ic sm" aria-hidden="true"><use href="#vi-'+d[0]+'"/></svg>';
-      bt.addEventListener('click',function(e){e.stopPropagation();d[2]()});bt.addEventListener('pointerdown',function(e){e.stopPropagation()});cs.appendChild(bt)});
-    host.appendChild(cs);
-    if(!window._i3dHintDone){var hint=document.createElement('div');hint.className='i3d-hint';var fine=window.matchMedia&&matchMedia('(pointer: fine)').matches;
-      hint.innerHTML='<svg class="vi-ic sm" aria-hidden="true"><use href="#vi-orbit"/></svg><span>'+(fine?'Drag to turn · Ctrl + scroll to zoom':'Drag to turn · pinch to zoom')+'</span>';host.appendChild(hint);if(host.clientWidth<200){hint.style.top='8px';hint.style.bottom='auto';hint.style.maxWidth='calc(100% - 16px)'}   /* a narrow tile: the chip goes to the top, clear of the control stack */
+    /* a hint chip says the tile can be turned (Pedro's review of v0.8 spec F): it fades on the first touch or after 4 s and does not come back this session. No button stack on a small tile; a tap opens the full viewer, a double tap resets */
+    if(!window._i3dHintDone){var hint=document.createElement('div');hint.className='i3d-hint';
+      hint.innerHTML='<svg class="vi-ic sm" aria-hidden="true"><use href="#vi-orbit"/></svg><span>Drag to turn</span>';host.appendChild(hint);
       var gone=function(){if(window._i3dHintDone)return;window._i3dHintDone=true;hint.classList.add('off');setTimeout(function(){hint.remove()},300)};
       setTimeout(gone,4000);cv.addEventListener('pointerdown',gone,{once:true})}
     img.style.visibility='hidden';
