@@ -120,7 +120,7 @@ Feedback button:
 
 Message the Dev at the foot of each tab (C2): the existing card unchanged, margin-top 24, last item before the tab's bottom padding.
 
-History / Goals / Snapshots buttons (C2): bottom right of "Net worth over time", right-aligned row, gap 6. Each a 28 px pill: Syne 700 9 px .12em uppercase, `var(--muted)`, border 1 px `var(--line2)`, icon 14 px (`vi-calendar`, `vi-target`, `vi-camera`), `vi-chevron` 12 px; `aria-expanded`. Open: border and text `var(--teal)`, chevron up. Panels open under the chart, full tile width, collapsed by default. At 390 the three wrap onto one right-aligned row (about 300 px total).
+History / Goals / Snapshots buttons (C2): bottom right of "Net worth over time", right-aligned row, gap 4. Each a 28 px pill: Syne 700 10 px .08em uppercase, `var(--muted)`, border 1 px `var(--line2)`, icon 14 px (`vi-calendar`, `vi-target`, `vi-camera`), `vi-chevron` 12 px; `aria-expanded`. Open: border and text `var(--teal)`, chevron up. Panels open under the chart, full tile width, collapsed by default. At 390 the three wrap onto one right-aligned row (about 300 px total).
 
 Forecast note (C2): full tile width, DM Sans 10.5 px `var(--muted)`, `vi-info` 14 px, margin-top 8. No disclaimer inside the 3D view.
 
