@@ -1,7 +1,7 @@
 # v0.8 F2 type scale: before and after
 
 Each sheet: BEFORE Night | AFTER Night | BEFORE Daylight | AFTER Daylight, full page, sample data (`?bypass=websummit`).
-Before = candidate/v0.8 0fd2be4; after = v08/type-scale (Pedro's spec section H: tiered floors, no root bump).
+Before = candidate/v0.8 890a4a1 (C2, D2, B2, A2, E2); after = v08/type-scale at d5a9e63's app build (Pedro's spec H plus review 1: tiered floors, no root bump).
 1100 and 1440 sheets are scaled to half size.
 
 Files: `<tab>_<width>.jpg` for overview (Dashboard), budget, house, stocks (Assets), debt, settings at 390, 690, 1100 and 1440.
