@@ -66,3 +66,15 @@ Round 1:
 3. **Net-worth 3D labels colour-coded** to match each column's block colour (colours already on each column in sceneData). Stream B2.
 
 This round changes viewports the earlier scope guard protected. That is the owner's decision. Only the items above change.
+
+Round 2 (owner, 2 Nov ~12:58, layout and alignment):
+1. Remove the forecast disclaimer from the Net worth tile's 3D view (dashboard). Stream C2.
+2. Message the Dev goes to the bottom of every tab, not the top. Stream C2.
+3. The forecast note in Net worth over time spans the full tile width (responsive). The forecast itself moves from a straight line to a projection from the budget: only money assigned to Savings and Investments, compounding at stated conservative rates, debts falling by their budgeted repayments minus interest; no budget means no growth. Stream C2.
+4. Net Worth History and Goals and snapshots come off the dashboard. Buttons at the bottom right of Net worth over time expand them, collapsed by default. Stream C2.
+5. Category pills on the Cash flow tile and the Budget key scaled right down; on Cash flow they move below the chart. Stream C2.
+6. Cash flow horizontal scrollbar bigger at the bottom, plus a synced one at the top. Stream C2.
+7. Budget, Spending and saving per month: no overlapping text, smaller section icons, the stray separator between words removed. Stream B2.
+8. E8 pulled forward from v0.7.1: Budget 3D tree map outlines in each group's colour (dark red ring around committed essentials) with flag-post labels, per Pedro's spec in V07_PREVIEW_EDITS.md. The owner had asked for this before; it was deferred to v0.7.1 and that was not made clear to him. Stream A2, after the coin viewport.
+
+New stream C2: session_01KoffvxMhJw3izHA4HWe2G9, branch v07/ui-round2. Round 3 to follow.
