@@ -107,13 +107,13 @@ const seed = eval(shotSrc.slice(shotSrc.indexOf('const seed ='), shotSrc.indexOf
   await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', document.querySelector('.subtab-btn[data-sub="cash"]')); }); await p.waitForTimeout(1600);
   // headless Chromium draws this stage in software (a frame can take 200 ms), so wait for idle rather than assuming it
   const idleCash = async () => { for (let i = 0; i < 40; i++) { if (await p.evaluate(() => !!(window.V3 && V3.cash) && V3.cash.raf === 0 && Date.now() > V3.cash._until)) return true; await p.waitForTimeout(250); } return false; };
-  const r8 = await p.evaluate(() => (window.V3 && V3.cash) ? { type: V3.cash.r.shadowMap.type === THREE.PCFSoftShadowMap, off: V3.cash._off } : { none: true });
+  const r8 = await p.evaluate(() => (window.V3 && V3.cash) ? { type: V3.cash.r.shadowMap.enabled === false, off: V3.cash._off } : { none: true });   // v0.7 (owner, 2 Nov): no real-time shadow pass on this stage any more (a baked contact shadow)
   if (r8.none) console.log('skip: no 3D cash stage in this seed');
   else {
     const idle1 = await idleCash();
     const kicked = await p.evaluate(() => { V3.cash.kick(); return V3.cash.raf !== 0; });
     const idle2 = await idleCash();
-    ok(idle1 && kicked && idle2 && r8.type && r8.off === false, 'cash stage: idle, a kick draws, idle again; desktop shadow filter (' + JSON.stringify({ idle1, kicked, idle2, type: r8.type, off: r8.off }) + ')');
+    ok(idle1 && kicked && idle2 && r8.type && r8.off === false, 'cash stage: idle, a kick draws, idle again; no shadow pass (' + JSON.stringify({ idle1, kicked, idle2, type: r8.type, off: r8.off }) + ')');
   }
 
   await b.close();
