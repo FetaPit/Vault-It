@@ -31,8 +31,8 @@ After each merge: run the suite and fix on the candidate branch before the next 
 - [ ] Pedro's notes in `docs/briefs/V08_PEDRO_REVIEWS.md` (`0bd9848`) all closed
 - [ ] One batched Pedro pass on the merged candidate, not per branch
 
-**Decision needed**
-- [ ] PostHog: ship in 0.8 or park for 0.9. Needs your explicit yes/no. If yes: consent gate, `eu.i.posthog.com`, privacy notice naming PostHog, IP anonymisation confirmed. Work is on `ops-posthog-utm`.
+**Decided**
+- [x] PostHog parked for 0.9 (decided 2 Nov). Not in 0.8. Work stays on `ops-posthog-utm`. For 0.9: consent gate, `eu.i.posthog.com`, privacy notice naming PostHog, IP anonymisation confirmed.
 
 **Release commit**
 - [ ] Footer version: "Vault·It v0.6 Alpha · Released 28 May 2026" to v0.8 and the release date (`index.html` line ~10218)
