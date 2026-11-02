@@ -105,13 +105,13 @@ async function open(b, theme, w, phone) {
         flow: !!document.querySelector('#ov-page > #ov-ms-card, #ov-page > #ov-nwh-card'),
         labels: [...btns.querySelectorAll('button')].map(x => x.textContent.trim()),
         right: Math.abs(cb.right - parseFloat(cs.paddingRight) - bb.right), below,
-        hs: [...btns.querySelectorAll('button')].map(x => Math.round(x.getBoundingClientRect().height)), rows: new Set([...btns.querySelectorAll('button')].map(x => Math.round(x.getBoundingClientRect().top))).size,
+        hs: [...btns.querySelectorAll('button')].map(x => Math.round(x.getBoundingClientRect().height)), fs: getComputedStyle(btns.querySelector('button')).fontSize, rows: new Set([...btns.querySelectorAll('button')].map(x => Math.round(x.getBoundingClientRect().top))).size,
         closed: document.getElementById('ov-ms-card').hidden && document.getElementById('ov-nwh-card').hidden && document.getElementById('ov-ms-card').offsetParent === null };
     });
     ok(r.inCard && !r.flow, T + 'history, goals and snapshots are off the dashboard flow, inside the net worth tile');
     ok(r.labels.join() === 'History,Goals,Snapshots' && r.right < 3 && r.below, T + 'History, Goals and Snapshots buttons sit bottom right of the tile (' + r.right.toFixed(1) + ' px from the right edge)');
     ok(r.closed, T + 'all three are collapsed by default');
-    ok(r.hs.every(h => h === 28) && r.rows === 1, T + '28 px pills on one right-aligned row (' + r.hs.join(',') + ')');
+    ok(r.hs.every(h => h === 28) && r.rows === 1 && r.fs === '10px', T + '28 px pills, 10 px labels, on one right-aligned row (' + r.hs.join(',') + ')');
     const st = async () => p.evaluate(() => ({ ms: document.getElementById('ov-ms-card').offsetParent !== null, tab: document.getElementById('ov-ms-card').getAttribute('data-tab'),
       goals: getComputedStyle(document.querySelector('.ms-col[data-p="goals"]')).display !== 'none', snaps: getComputedStyle(document.querySelector('.ms-col[data-p="snaps"]')).display !== 'none',
       nwh: document.getElementById('ov-nwh-card').offsetParent !== null,
