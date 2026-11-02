@@ -33,3 +33,13 @@ Viewports: mobile 390x844, tablet 768x1024, desktop 1440x900, each in Night and 
 | 6 | Wealth inventory and Liabilities placeholder captions at 8.6 px on mobile | **v0.8 (F2), quick.** Tier 1 (10.5 px). |
 Items 2 to 6 were all smaller still on 76be8ec (13 px root, .5rem), so they are misses in the type-scale sweep, not new breakage, apart from 5, which the nowrap caused. All of them are Pete-visible on a phone.
 
+
+## Follow-up, v08/type-scale 5eb2d2c
+Shots are in followup/.
+1. `#nw-fc-note`: hidden in the 3D view and shown in Graph. PASS.
+2. Phone sankeys at 1:1: the SVG is 960 x 362 in the sideways scroller, with chip text about 11.5 and 10 px. Desktop is unchanged, with large readable chips. PASS.
+3. Debt tree map: names, values and sub-lines are readable at 390. PASS. The smallest seeded tile being too small to hold text is parked for v0.8.1 (show the name on tap).
+4. Stocks donut sub-line at 10.5: PASS. 6. Item caption at 10.5: PASS.
+5. Entrepreneur KPIs: 360 and 390 PASS (2 x 2, no ellipsis, on brand). FIX at 460: the grid goes 3 across and leaves "Monthly goal" alone on a second row, with "Monthly recurring revenue" wrapping to 3 lines. Keep the 2 x 2 grid up to 599 px, then 4 across.
+Nit: "No clients yet — add your first!" has an em dash (pre-existing copy). Make it "No clients yet. Add your first."
+Parked for v0.8.1 (pre-existing on 8b33d7c): at 360 the header "NET WORTH" label wraps to two lines.
