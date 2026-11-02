@@ -2,6 +2,18 @@
 
 Scope: the v0.7 final round part 3 items (`docs/briefs/V07_FINAL_ROUND.md` on brand-rollout), now alpha 0.8. Read from code on candidate/v0.8 (76be8ec) plus baseline shots at 390, 690 and 1100. Numbers, not adjectives. Colours are tokens from `index.html:19-51` and `CF_GROUPS` (`index.html:17146`); a new hex where a token exists is a fail.
 
+## Who builds what (David's rebalance, 2 Nov; in build order)
+
+| Order | Stream | Session | Sections |
+|---|---|---|---|
+| 1 | B2 | session_01Koffvw2V8wAyJ27ZzAaeVJ | F model tiles and controls; D Net worth labels |
+| 2 | E2 | session_01KoffvyvXHoXuy9831Y4mBh | A pills; E footer, Feedback button, Message the Dev, scrollbars |
+| 3 | D2 | session_01KoffvwFsYTabjwUFVciqDd | C Spending & saving cards; B House tile |
+| 4 | C2 | session_01KoffvxMhJw3izHA4HWe2G9 | E: History / Goals / Snapshots buttons and the forecast note |
+| 5 | A2 | session_01KoffvynkETPQC1hZdf8um5 | Coin viewer gold look (below); G tree map |
+
+Coin viewer (A2): matcap is fine if it still reads as warm gold stacks: rims lighter than faces, no flat yellow, highlights in the `--gold` #E8C56A to `--brass` #C9A84C range. Checked at 390 and 1100, Night and Daylight (the stage is Night).
+
 ## 0. Rules for every item
 
 - 1 rem = 13 px (`index.html:14020`). Sizes below are px. No text under 10 px (`index.html:8990`).
