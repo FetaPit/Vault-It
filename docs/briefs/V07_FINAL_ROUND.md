@@ -97,3 +97,5 @@ New stream C2: session_01KoffvxMhJw3izHA4HWe2G9, branch v07/ui-round2. Round 3 t
 | E2, chrome | session_01KoffvyvXHoXuy9831Y4mBh | v08/chrome | R2-2 Message the Dev; 10. Feedback button; 11. footer collapse; R2-5 compact pills; R2-6 flow scrollbars |
 
 Merge order into candidate/v0.8: each item when CI is green and Pedro has passed it. One combined preview goes to the owner when everything is in.
+
+**Owner, 2 Nov ~13:20: "Hold release until 0.8 signed off."** There is no separate v0.7 release. The next production release is alpha 0.8, from candidate/v0.8, after the owner signs off a combined preview on the fold and laptop. candidate/v0.7 (76be8ec) stays as the base and the record of the v0.7 work. Release steps are unchanged but aimed at the signed-off v0.8 commit: back up release/pioneer-v2, fast-forward release-mvp-20261031, rewrite PR #3 for v0.8, the owner merges, live check, tag v0.8.0-alpha. Then each server step needs the owner's separate yes: migration 013 (re-approval), the waitlist and email functions, a stripe-webhook deploy check, and the 6 auth templates the owner pastes.
