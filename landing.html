@@ -3,6 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<script>
+/* Product analytics hook. Sends to PostHog only if a PostHog snippet has already put window.posthog on the page; adds no script and no host.
+   First-touch campaign tags (utm_source, utm_medium, utm_campaign) are kept for this tab and ride along on every event. */
+(function () {
+  var clean = function (v) { return String(v || '').replace(/[^A-Za-z0-9 _.\-+|]/g, '').slice(0, 100); }, utm = {};
+  try { utm = JSON.parse(sessionStorage.getItem('vi_utm') || 'null') || {}; } catch (e) { utm = {}; }
+  if (!utm.source && !utm.campaign) {
+    try { var q = new URLSearchParams(location.search); ['source', 'medium', 'campaign'].forEach(function (k) { var v = clean(q.get('utm_' + k)); if (v) utm[k] = v; });
+      if (Object.keys(utm).length) sessionStorage.setItem('vi_utm', JSON.stringify(utm)); } catch (e) {}
+  }
+  window.viUtm = function () { var o = {}; ['source', 'medium', 'campaign'].forEach(function (k) { if (utm[k]) o['utm_' + k] = utm[k]; }); return o; };
+  window.viTrack = function (name, props) {
+    try { var p = window.viUtm(); for (var k in (props || {})) p[k] = props[k]; if (window.posthog && window.posthog.capture) window.posthog.capture(name, p); } catch (e) {}
+  };
+})();
+</script>
 <title>Vault-It: Get out of the red and into your home.</title>
 <meta name="description" content="Join the free Vault-It beta: one map of your debts, savings, house deposit and net worth, and a 3D house that builds as you save. Built in the UK. No bank login." />
 <link rel="canonical" href="https://vault-it.co/sign-up" />
@@ -570,6 +586,7 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
       clearTimeout(timer);
       if (r.s === 200 && r.b.success) {
         var parts = email.split('@'); store.set('vi_join_to', parts[0].slice(0, 2) + '…@' + parts[1]);
+        window.viTrack('waitlist_signup', { form: /sign-up/.test(location.pathname) ? 'sign-up' : 'home', marketing_optin: document.getElementById('marketing').checked, referrer: store.get('vi_ref') || referrer });
         location.href = 'sign-up/thanks';
         return;
       }

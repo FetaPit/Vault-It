@@ -3,6 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+/* Product analytics hook. Sends to PostHog only if a PostHog snippet has already put window.posthog on the page; adds no script and no host.
+   First-touch campaign tags (utm_source, utm_medium, utm_campaign) are kept for this tab and ride along on every event. */
+(function () {
+  var clean = function (v) { return String(v || '').replace(/[^A-Za-z0-9 _.\-+|]/g, '').slice(0, 100); }, utm = {};
+  try { utm = JSON.parse(sessionStorage.getItem('vi_utm') || 'null') || {}; } catch (e) { utm = {}; }
+  if (!utm.source && !utm.campaign) {
+    try { var q = new URLSearchParams(location.search); ['source', 'medium', 'campaign'].forEach(function (k) { var v = clean(q.get('utm_' + k)); if (v) utm[k] = v; });
+      if (Object.keys(utm).length) sessionStorage.setItem('vi_utm', JSON.stringify(utm)); } catch (e) {}
+  }
+  window.viUtm = function () { var o = {}; ['source', 'medium', 'campaign'].forEach(function (k) { if (utm[k]) o['utm_' + k] = utm[k]; }); return o; };
+  window.viTrack = function (name, props) {
+    try { var p = window.viUtm(); for (var k in (props || {})) p[k] = props[k]; if (window.posthog && window.posthog.capture) window.posthog.capture(name, p); } catch (e) {}
+  };
+})();
+</script>
 <title>Vault-It: Get out of the red and into your home.</title>
 <meta name="description" content="Vault-It turns every pound you save into a brick. Track net worth, clear debt and save your deposit, one stage at a time. Get out of the red and into your home.">
 <meta name="theme-color" content="#080808">
@@ -22912,6 +22928,7 @@ function viTrialStart() {
     if (t) localStorage.setItem('vi_trial_t0', String(t));   // a local-only key (not synced): the last known account date, for loads before sign-in completes
     else { t = parseInt(localStorage.getItem('vi_trial_t0') || '0', 10) || 0; if (!t) { t = Date.now(); localStorage.setItem('vi_trial_t0', String(t)); } }
   } catch (e) { if (!t) t = Date.now(); }
+  try { if (!localStorage.getItem('vi_trial_evt')) { localStorage.setItem('vi_trial_evt', '1'); var t1 = Math.max(t, VI_TRIAL_EPOCH); if (!viPaid()) viTrack('trial_started', { trial_days: VI_TRIAL_DAYS, trial_day: Math.max(1, Math.floor((Date.now() - t1) / 86400000) + 1) }); } } catch (e) {}
   return Math.max(t, VI_TRIAL_EPOCH);
 }
 function viTrialDay() { return Math.max(1, Math.floor((Date.now() - viTrialStart()) / 86400000) + 1); }   // day 1 is the first day
@@ -23352,6 +23369,7 @@ function openNetworkProfile(name, num) {
 function shareNetworkProfile() {
   var u = {}; try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
   var num = localStorage.getItem('vi_founder_num') || '?';
+  try { viTrack('card_shared', { card: 'network_profile' }); } catch (e) {}
   var url = window.location.origin + window.location.pathname + '?pioneer=' + encodeURIComponent(u.email || '') + '&num=' + num;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(url).then(function() { showToast('Profile URL copied to clipboard'); }).catch(function() { prompt('Copy your profile URL:', url); });
@@ -25123,6 +25141,7 @@ function renderJourney() {
   jrnyLoadState();
   var stage = jrnyCalcStage();
   var keysDate = jrnyKeysDate();
+  try { var kd = keysDate ? keysDate.getFullYear() + '-' + (keysDate.getMonth() + 1) : ''; if (kd && kd !== window._viKeysTracked) { window._viKeysTracked = kd; viTrack('date_calculated', { target: 'keys_date', stage: stage, months_out: Math.round((keysDate - new Date()) / 2629800000) }); } } catch (e) {}
   var selectedNode = journeyState.selectedNode >= 0 ? journeyState.selectedNode : stage;
 
   // Header
@@ -26114,6 +26133,7 @@ function showUpgrade(plan) {
   // the account id rides along as client_reference_id, so the payment can be matched to this account on the server (secure paid gateway, queued)
   try { if (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) q.push('client_reference_id=' + encodeURIComponent(_supaUser.id)); } catch (e) {}
   var checkoutUrl = link + (q.length ? '?' + q.join('&') : '');
+  try { viTrack('upgrade_clicked', { plan: plan, tester_price: viBetaTester(), trial_state: viTrialState() }); } catch (e) {}
   window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
   showToast(plan === 'founder' ? 'Opening the Founding Member checkout…' : 'Opening secure checkout…');
 }
