@@ -40,6 +40,7 @@ const PAL = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2
     ok(!r.three && !r.legacy && /house_gl/i.test(String(r.kind)), 'no three.js on the page: the house is drawn by house_gl (' + r.kind + ')');
     ok(r.dpr === 1.5, 'phone pixel ratio is min(1.5, devicePixelRatio) as in the brand book (' + r.dpr + ')');
     // lazy laying: on the first frame every brick below the current course is settled and only the current course animates
+    await p.waitForFunction(() => !HB3D.viewer.layPending(), null, { timeout: 15000 }).catch(() => {});   // the stage is scrolled to the centre; the observer's half-visible report can arrive a frame or two after the first draw
     const lay = await p.evaluate(() => { const v = HB3D.viewer, s = v.layStats(); return s; });
     console.log(JSON.stringify(lay));
     ok(lay && lay.settledAtOpen > 0 && lay.animated > 0 && lay.animated <= lay.courseBricks, 'load: a settled shell (' + (lay && lay.settledAtOpen) + ' bricks at once) and one animated course (' + (lay && lay.animated) + ' of a course of ' + (lay && lay.courseBricks) + ')');

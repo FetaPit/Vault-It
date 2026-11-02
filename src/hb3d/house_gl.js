@@ -260,7 +260,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this.active = true; this._raf = 0; this._bDraws = 0; this._bLite = false; this._bCalm = false; this.lost = false;
     this._touch = -1e9; this._drag = null; this._fly = null; this._auto = !reduced() && !this._soft;
     this._stats = { settledAtOpen: 0, animated: 0, courseBricks: 0, stamped: 0, gapMs: null, firstFrameMs: null, t0: 0 };
-    this._ft = []; this._fg = []; this._ftOn = false;
+    this._ft = []; this._fg = []; this._ftOn = false; this._fl = [];
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.enable(gl.CULL_FACE); gl.depthFunc(gl.LEQUAL);
     this._loop = function (ts) {
       self._raf = 0;
@@ -270,7 +270,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
       var t0 = now;
       var moving = self._tick(now);
       if (self._dirty || moving) { self._draw(now); self._lastDraw = now; }
-      if (self._ftOn) { self._ft.push(performance.now() - t0); if (self._lastT) self._fg.push(now - self._lastT); }
+      var js = performance.now() - t0; self._fl.push(t0, js); if (self._fl.length > 480) self._fl.splice(0, 2);   // the last 240 frames: when each began and its own main-thread cost (tests attribute a long task to the GPU wait that follows a cheap frame)
+      if (self._ftOn) { self._ft.push(js); if (self._lastT) self._fg.push(now - self._lastT); }
       self._lastT = now;
       if (self._idleFrames > 3) return;   // nothing moving: sleep until woken (reduced motion, or a software GPU; a live stage keeps its pulse, sweep and ping)
       self._raf = requestAnimationFrame(self._loop);
@@ -641,7 +642,9 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   VP.dropMs = function () { return 760; };   // owner, 2 Nov 2026: twice the brand book's 380 ms
   VP.yaw = function () { return this.yawA; };
   VP.frameTimes = function (reset) { if (reset) { this._ft = []; this._fg = []; this._ftOn = true; return []; } return this._ft.slice(); };   // main-thread cost of each frame (tick + draw + GL submit)
-  VP.frameGaps = function () { return this._fg.slice(); };   // wall time between frames (includes the GPU and the harness)
+  VP.frameGaps = function () { return this._fg.slice(); };
+  VP.frameLog = function () { var o = [], f = this._fl; for (var i = 0; i < f.length; i += 2) o.push({ t: f[i], js: f[i + 1] }); return o; };   // start (performance.now) and own cost of the last 240 frames
+  VP.softGPU = function () { return softGL(this.R.gl); };   // a software renderer (SwiftShader) is drawing, whether or not the full path was forced   // wall time between frames (includes the GPU and the harness)
   VP.pingAlpha = function () { return this._pingA || 0; };
   VP.autoOrbit = function () { return this._auto && !reduced(); };
   VP.gpuBytes = function () { return this._buf ? this._buf.bytes : 0; };
