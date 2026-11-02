@@ -52,7 +52,17 @@ const seed = t => {
     ok(!devBad.length, T + 'one Message the Dev card, the last thing on every tab ' + devBad.join('; '));
     ok(!fbBad.length, T + 'Feedback stays bottom right, clear of the nav, on every tab at top, middle and end ' + fbBad.slice(0, 3).join('; '));
     // over a 3D viewer's controls it fades out in place, and comes back once clear (Pedro's review)
+    // start from a clear spot: no real 3D control (.nw3d-hud, .inv-ctl, .hud-bar) under the button, whatever the text size or layout;
+    // if no scroll position is clear, the real controls are hidden for the two checks and put back after
     await p.evaluate(() => { showTab('overview'); scrollTo(0, 0); }); await p.waitForTimeout(300);
+    const clr = await p.evaluate(async () => { const b = document.getElementById('vi-fb-btn'), SEL = '.nw3d-hud,.inv-ctl,.hud-bar';
+      const hit = () => { const r = b.getBoundingClientRect(); return [...document.querySelectorAll(SEL)].some(h => { const t = h.getBoundingClientRect(); return t.width > 0 && t.height > 0 && !(r.right <= t.left || r.left >= t.right || r.bottom <= t.top || r.top >= t.bottom); }); };
+      const frame = () => new Promise(r => requestAnimationFrame(() => r())), max = document.documentElement.scrollHeight - innerHeight;
+      for (let y = 0; y <= max && hit(); y += 60) { scrollTo(0, y); await frame(); }
+      let hidden = 0; if (hit()) document.querySelectorAll(SEL).forEach(h => { if (!h.dataset.fbTestHid) { h.dataset.fbTestHid = h.style.display || ' '; h.style.display = 'none'; hidden++; } });
+      for (let i = 0; i < 30 && getComputedStyle(b).opacity !== '1'; i++) { window.dispatchEvent(new Event('scroll')); await new Promise(r => setTimeout(r, 100)); }
+      return { clear: !hit(), shown: getComputedStyle(b).opacity === '1', y: Math.round(scrollY), hidden }; });
+    ok(clr.clear && clr.shown, T + 'the fade checks start with no 3D control under the button and the button fully shown ' + JSON.stringify(clr));
     const fd = await p.evaluate(async () => { const b = document.getElementById('vi-fb-btn'), r0 = b.getBoundingClientRect(), h = document.createElement('div');
       h.className = window.__hudCls || 'nw3d-hud'; h.style.cssText = 'position:fixed;z-index:1;left:' + (r0.left + 4) + 'px;top:' + (r0.top + 2) + 'px;width:30px;height:28px'; document.body.appendChild(h);
       const until = async f => { for (let i = 0; i < 30 && !f(); i++) { window.dispatchEvent(new Event('scroll')); await new Promise(r => setTimeout(r, 100)); } return f(); };
@@ -68,6 +78,7 @@ const seed = t => {
       const r1 = b.getBoundingClientRect(); h.remove(); const back = await until(() => getComputedStyle(b).opacity === '1');
       return { over, back, still: Math.abs(r1.right - r0.right) < 1 && Math.abs(r1.top - r0.top) < 1 }; });
     ok(fd2.over && fd2.back && fd2.still, T + 'over a viewer zoom bar (.hud-bar) the button fades out without moving, and returns when clear ' + JSON.stringify(fd2));
+    await p.evaluate(() => document.querySelectorAll('[data-fb-test-hid]').forEach(h => { h.style.display = h.dataset.fbTestHid.trim(); delete h.dataset.fbTestHid; }));   // put back any controls hidden for the checks
     await p.evaluate(() => { window.__hudCls = ''; });
 
     // 3: the footer collapses after scrolling stops, comes back on scroll up and at the page end
