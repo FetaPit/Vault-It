@@ -113,3 +113,11 @@ My own shots at 390 (Night and Daylight) and 1440.
 3. `.vp-key` wraps onto balanced centred lines.
 After the rebase: Wealth inventory and Budget 3D read correctly at 390, and B2's chips, E2's footer and Feedback, and the nav labels are kept as specced. No sideways scroll, no page errors.
 This closes my v0.8 reviews: C2, D2, B2, E2, A2 and F2 all PASS.
+
+## Forecast rates note, v08/forecast-rates 9ebb07f: copy FIX (exact replacement)
+Shots at 390 and 1440, Night and Daylight, with the test_nw3d seed. The layout passes: full width, vi-info, muted, 10.5 px. The copy runs about 70 words over 7 lines at 390. The trim below keeps both rates with their sources and "not a prediction", and cuts the length roughly in half.
+Template (the bracketed parts appear only when they apply):
+- Budget: "6-month estimate, not a prediction. Your Budget adds £X a month to savings and £Y to investments[; £Z a month comes off your debts][; it overspends by £W a month]. Money without a job isn't counted. Savings grow 1.65% a year (Bank of England easy-access average), investments 5% (FCA mid projection), debts follow their APR."
+- Nothing to savings or investments: "...Your Budget puts nothing into savings or investments[; no debt repayments budgeted]..."
+- No Budget: "6-month estimate, not a prediction. No Budget yet, so no new money goes in. Set one up to see your plan. Savings grow 1.65% a year (Bank of England easy-access average), investments 5% (FCA mid projection), debts follow their APR."
+Rules kept: no "will", British English, no em dashes, figures in the same gbpFmt.
