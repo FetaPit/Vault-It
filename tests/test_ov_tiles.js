@@ -54,6 +54,20 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     ok(await p.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 1, T + 'no sideways scroll');
     await ctx.close();
   }
+  // v0.8: the labels along the top of the graph (TODAY and the quarters) never touch, at phone and tablet widths, every range
+  for (const w of [360, 390, 768]) {
+    const ctx = await b.newContext({ viewport: { width: w, height: 900 }, reducedMotion: 'reduce', isMobile: w < 700, hasTouch: w < 700 }); await ctx.route(/^https?:\/\/(?!localhost)/, r => r.abort());
+    const p = await ctx.newPage(); p.on('pageerror', e => errs.push('top ' + w + ' ' + e.message));
+    await p.addInitScript(seed, { theme: 'dark', flag: true }); await p.goto(APP); await p.waitForTimeout(1800);
+    const r = await p.evaluate(() => { nw3d.setMain('graph'); const out = [];
+      for (const range of ['all', '12', '6', '3']) for (const proj of [true, false]) { chartState.range = range; chartState.metrics.proj = proj; drawChart();
+        const L = (document.getElementById('nwChart')._topLabels || []).slice().sort((a, b) => a.x0 - b.x0);
+        out.push({ range, proj, n: L.length, today: L.some(l => l.t === 'TODAY'), touch: L.some((l, i) => i && l.x0 < L[i - 1].x1 + 2), names: L.map(l => l.t).join(' ') }); }
+      chartState.range = 'all'; chartState.metrics.proj = true; drawChart(); return out; });
+    const bad = r.filter(x => x.touch || !x.today);
+    ok(!bad.length && r.every(x => x.n >= 2), 'top labels ' + w + ': TODAY always shows and no two labels touch, every range, Forecast on and off (all: ' + r[0].names + ')' + (bad.length ? ' BAD ' + JSON.stringify(bad[0]) : ''));
+    await ctx.close();
+  }
   // v0.8 (owner un-parked, 2 Nov evening): the net worth graph's text never collides. The zoom hint has its own row under the axis,
   // goal labels sit at the right end of their line on a dark plate and never overlap, and the History heading carries no emoji.
   for (const [theme, w] of [['dark', 390], ['light', 390], ['dark', 768], ['light', 768], ['dark', 1440], ['light', 1440]]) {

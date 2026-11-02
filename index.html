@@ -15119,6 +15119,8 @@ function drawChart() {
     ctx.font = "bold 9px 'Syne',sans-serif";
     ctx.textAlign = NOW_FRAC >= 1 ? 'right' : 'center';
     ctx.fillText('TODAY', NOW_FRAC >= 1 ? mid + 2 : mid, PAD.t - 4);
+    var tw = ctx.measureText('TODAY').width, tx = NOW_FRAC >= 1 ? mid + 2 - tw : mid - tw / 2;
+    canvas._topLabels = [{ t: 'TODAY', x0: tx, x1: tx + tw }];   // the labels along the top: a quarter label that would touch one is left out (v0.8)
     ctx.restore();
   })();
 
@@ -15138,7 +15140,10 @@ function drawChart() {
         ctx.font = "bold 8px 'Syne',sans-serif";
         ctx.textAlign = 'center';
         var qLabel = 'Q'+(Math.floor(q.getMonth()/3)+1)+' \'' +String(q.getFullYear()).slice(2);
-        ctx.fillText(qLabel, qx, PAD.t-4);
+        var qw = ctx.measureText(qLabel).width, q0 = qx - qw / 2, q1 = qx + qw / 2, tops = canvas._topLabels || [];
+        if (!tops.some(function (r) { return q0 < r.x1 + 4 && r.x0 < q1 + 4; })) {   // keep 4 px clear of TODAY and the quarter before
+          ctx.fillText(qLabel, qx, PAD.t-4); tops.push({ t: qLabel, x0: q0, x1: q1 });
+        }
         ctx.restore();
       }
       q.setMonth(q.getMonth()+3);
