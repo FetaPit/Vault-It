@@ -83,3 +83,17 @@ New stream C2: session_01KoffvxMhJw3izHA4HWe2G9, branch v07/ui-round2. Round 3 t
 11. (owner, ~13:08) The fixed footer collapses once the user stops scrolling, reveals on scroll up and shows in full at the page end. "Not regulated by the FCA. Not financial advice." stays reachable at all times. Stream C2.
 
 **Retarget (owner, ~13:08): "this new round will contribute to alpha 0.8."** All of part 3 (rounds 1 and 2, items 1 to 11) merges into the new integration branch candidate/v0.8 (created from candidate/v0.7 76be8ec). candidate/v0.7 is frozen at 76be8ec, the build already sent to the owner for v0.7 sign-off. Pedro (creative director) is back for this round: session_01KoffvzkHusFTYdns2swwPx (branch v08/pedro) writes docs/briefs/V08_PEDRO_UI_SPEC.md and gives each stream's pushes a PASS or a fix list from shots at 390, ~690, 1100 and 1440 px in Night and Daylight.
+
+### Alpha 0.8 round: sidecar map (David, 2 Nov 13:14, rebalanced for parallel work)
+
+| Sidecar | Session | Branch | Items |
+|---|---|---|---|
+| David, coordinator | session_01Koffvw9bGnT6zw8keBi9TD | brand-rollout docs, merges to candidate/v0.8 | brief, queue, merges, CI, owner comms, v0.7 release steps |
+| Pedro, creative director | session_01KoffvzkHusFTYdns2swwPx | docs only (V08_PEDRO_UI_SPEC.md) | numeric UI spec per item; PASS or fix list on every push |
+| A2, engine | session_01KoffvynkETPQC1hZdf8um5 | v07/engine | 1. coin viewer speed (cash and metals); 8. E8 tree map outlines and flag posts |
+| B2, fixes | session_01Koffvw2V8wAyJ27ZzAaeVJ | v07/final-fixes | 2. uploaded-model controls and tiles +20%; 3. Net-worth label colours |
+| C2, dashboard | session_01KoffvxMhJw3izHA4HWe2G9 | v07/ui-round2 | R2-1 forecast disclaimer off the 3D view; R2-3 budget-driven forecast and full-width note; R2-4 History, Goals and Snapshots behind buttons |
+| D2, cards | session_01KoffvwFsYTabjwUFVciqDd | v08/cards | R2-7 Spending and saving cards; 9. House progress tile merge |
+| E2, chrome | session_01KoffvyvXHoXuy9831Y4mBh | v08/chrome | R2-2 Message the Dev; 10. Feedback button; 11. footer collapse; R2-5 compact pills; R2-6 flow scrollbars |
+
+Merge order into candidate/v0.8: each item when CI is green and Pedro has passed it. One combined preview goes to the owner when everything is in.
