@@ -7604,15 +7604,18 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   };
   VP.animateTo = function (p1) { p1 = clamp(p1, 0, 1); if (this._pendingOpen != null) { this._pendingOpen = Math.max(this._pendingOpen, p1); this.wake(); return; } this._target = p1; this.wake(); };   // a deposit before the stage is half on screen joins the waiting opening
   // v0.7 opening: everything up to p0 is in place on the first frame; the bricks between p0 and p1 (the newest course at most) lay themselves
-  VP.openAt = function (p0, p1) {
+  VP.openAt = function (p0, p1, onLaid) {
     p1 = clamp(p1, 0, 1); p0 = clamp(p0, 0, p1);
     this.p = p0; this._target = p0; this._primed = false; this._pendingOpen = null;
+    this._onLaid = typeof onLaid === 'function' ? onLaid : null; this._openLay = false;   // called once the opening course has actually laid (the app writes its "bricks seen" note then, not at open)
     this.apply();
     try { this._stats.settledAtOpen = H.brandBricksLaid(H.brandPlan(this.model).N, reduced() ? p1 : p0); } catch (e) {}   // the shell that was there at once (lazy laying; reduced motion: everything)
     if (p1 > p0) { if (reduced() || this._visRatio >= 0.5) this._openNow(p1); else this._pendingOpen = p1; }   // owner, 2 Nov: the top course lays once the stage is about half on screen, not at its first pixel
+    else this._fireLaid();   // nothing new to lay: the note can be written at once
     this.wake();
   };
-  VP._openNow = function (p1) { this._pendingOpen = null; this._open = true; this.p = p1; this._target = p1; this._applyStamps(); this._dirty = true; };
+  VP._openNow = function (p1) { this._pendingOpen = null; this._open = true; this.p = p1; this._target = p1; this._applyStamps(); this._openLay = true; this._dirty = true; };
+  VP._fireLaid = function () { var f = this._onLaid; this._onLaid = null; this._openLay = false; if (f) { try { f(this); } catch (e) {} } };
   VP.layPending = function () { return this._pendingOpen != null; };
   VP.apply = function () {
     var m = this.model; if (!m || !this._hg) { this._dirty = true; return; }
@@ -7703,6 +7706,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     }
     if (this._auto && !red && !this._drag && !this._pinch && !this._fly && now - this._touch > 2500) { this.yawA += dt * 0.12; moving = true; }
     this._applyStamps();
+    if (this._openLay && this._bNow() >= (this._lastStampAt || -1e9) + 0.76) this._fireLaid();   // the opening course's last brick has landed (drop 0.76 s): a user who left before this sees the course lay again next time
     var live = !red && !this._soft, settled = this.settled();
     this._calm = settled && !this._drag && !this._pinch && !this._fly && now - this._touch > 1500 && !moving;
     this._bCalm = this._calm;
@@ -16719,9 +16723,12 @@ function hb3dRedraw() {
     if (Math.abs(v.zoom() * _HZ_DEFAULT - _houseZoom) > 1e-6) v.setZoom(_houseZoom / _HZ_DEFAULT);
     var first = sm.mode === 'build' && HB3DAPP.lastP == null;
     if (sm.mode === 'build') {   // opening (v0.7, owner 1 Nov): the finished house up to the newest course at once, only the bricks since the last visit lay (one course at most); a deposit eases up; un-laying is instant
-      if (first) { var p0 = hbBrandModel(model) && HB3D.brandOpenFrom ? HB3D.brandOpenFrom(model, sm.p, hbSeenBricks(key2)) : sm.p; v.setState({ mode: 'build', eq: 0, p: p0 }); v.openAt(p0, sm.p); }
-      else { v.setState({ mode: 'build', eq: 0 }); if (sm.p < v.p - 1e-9) v.setState({ p: sm.p }); else v.animateTo(sm.p, 1); }
-      if (hbBrandModel(model)) hbSeenBricks(key2, HB3D.brandStats(model, sm.p).bricksLaid);
+      var seen = hbBrandModel(model) ? function () { hbSeenBricks(key2, HB3D.brandStats(model, sm.p).bricksLaid); } : null;
+      if (first) {
+        var p0 = hbBrandModel(model) && HB3D.brandOpenFrom ? HB3D.brandOpenFrom(model, sm.p, hbSeenBricks(key2)) : sm.p; v.setState({ mode: 'build', eq: 0, p: p0 });
+        if (v.engine === 'house_gl') v.openAt(p0, sm.p, seen);   // the "bricks seen" note is written once the top course has actually laid, so a user who scrolls away before it lays sees it lay next time (David, 2 Nov)
+        else { v.openAt(p0, sm.p); if (seen) seen(); }
+      } else { v.setState({ mode: 'build', eq: 0 }); if (sm.p < v.p - 1e-9) v.setState({ p: sm.p }); else v.animateTo(sm.p, 1); if (seen) seen(); }
     } else v.setState({ mode: sm.mode, p: sm.p, eq: sm.eq || 0 });   // site, or Level 2 (the paid line eases up in the frame loop)
     HB3DAPP.lastP = sm.p; HB3DAPP.lastMode = sm.mode;
     if (_lt) VIPERF.phase('lay', performance.now() - _lt);

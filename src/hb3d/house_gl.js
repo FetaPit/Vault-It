@@ -430,15 +430,18 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   };
   VP.animateTo = function (p1) { p1 = clamp(p1, 0, 1); if (this._pendingOpen != null) { this._pendingOpen = Math.max(this._pendingOpen, p1); this.wake(); return; } this._target = p1; this.wake(); };   // a deposit before the stage is half on screen joins the waiting opening
   // v0.7 opening: everything up to p0 is in place on the first frame; the bricks between p0 and p1 (the newest course at most) lay themselves
-  VP.openAt = function (p0, p1) {
+  VP.openAt = function (p0, p1, onLaid) {
     p1 = clamp(p1, 0, 1); p0 = clamp(p0, 0, p1);
     this.p = p0; this._target = p0; this._primed = false; this._pendingOpen = null;
+    this._onLaid = typeof onLaid === 'function' ? onLaid : null; this._openLay = false;   // called once the opening course has actually laid (the app writes its "bricks seen" note then, not at open)
     this.apply();
     try { this._stats.settledAtOpen = H.brandBricksLaid(H.brandPlan(this.model).N, reduced() ? p1 : p0); } catch (e) {}   // the shell that was there at once (lazy laying; reduced motion: everything)
     if (p1 > p0) { if (reduced() || this._visRatio >= 0.5) this._openNow(p1); else this._pendingOpen = p1; }   // owner, 2 Nov: the top course lays once the stage is about half on screen, not at its first pixel
+    else this._fireLaid();   // nothing new to lay: the note can be written at once
     this.wake();
   };
-  VP._openNow = function (p1) { this._pendingOpen = null; this._open = true; this.p = p1; this._target = p1; this._applyStamps(); this._dirty = true; };
+  VP._openNow = function (p1) { this._pendingOpen = null; this._open = true; this.p = p1; this._target = p1; this._applyStamps(); this._openLay = true; this._dirty = true; };
+  VP._fireLaid = function () { var f = this._onLaid; this._onLaid = null; this._openLay = false; if (f) { try { f(this); } catch (e) {} } };
   VP.layPending = function () { return this._pendingOpen != null; };
   VP.apply = function () {
     var m = this.model; if (!m || !this._hg) { this._dirty = true; return; }
@@ -529,6 +532,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     }
     if (this._auto && !red && !this._drag && !this._pinch && !this._fly && now - this._touch > 2500) { this.yawA += dt * 0.12; moving = true; }
     this._applyStamps();
+    if (this._openLay && this._bNow() >= (this._lastStampAt || -1e9) + 0.76) this._fireLaid();   // the opening course's last brick has landed (drop 0.76 s): a user who left before this sees the course lay again next time
     var live = !red && !this._soft, settled = this.settled();
     this._calm = settled && !this._drag && !this._pinch && !this._fly && now - this._touch > 1500 && !moving;
     this._bCalm = this._calm;

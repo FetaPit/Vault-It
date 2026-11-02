@@ -125,6 +125,23 @@ const PAL = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2
     console.log(JSON.stringify(a));
     ok(a.drawn && a.engine === '3d' && a.vis < 0.5, 'a quarter on screen: the settled shell is already drawn (' + (a.vis * 100).toFixed(0) + '% visible)');
     ok(a.pending && a.animated === 0, 'but the top course has not started laying');
+    // the "bricks seen" note is written only once the course has actually laid (David, 2 Nov): leave now and the course lays on the next visit
+    const s0 = await p.evaluate(() => localStorage.getItem('vi_hb_seen') || '{}');
+    ok(s0 === '{}', 'left before half visible: no "bricks seen" note yet (' + s0 + ')');
+    await p.setViewportSize({ width: 390, height: 844 }); await p.goto(INDEX); await p.waitForTimeout(1200);   // leave and come back, full height
+    await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
+    await tap(p); await settled(p, 25000);
+    const r2 = await p.evaluate(() => { const v = HB3D.viewer, st = v.layStats(); let seen = {}; try { seen = JSON.parse(localStorage.getItem('vi_hb_seen') || '{}') || {}; } catch (e) {}
+      const k = Object.keys(seen)[0]; return { animated: st.animated, course: st.courseBricks, seen: k ? seen[k] : null, laid: HB3D.brandStats(v.model, v.p).bricksLaid, pending: v.layPending() }; });
+    console.log(JSON.stringify(r2));
+    ok(r2.animated > 0 && r2.animated <= r2.course && !r2.pending, 'reopened full height: the top course still lays (' + r2.animated + ' of ' + r2.course + ')');
+    ok(r2.seen != null && r2.seen === r2.laid, 'and the note is written once the course has laid (' + r2.seen + ' of ' + r2.laid + ' bricks)');
+    // scrolled from the top third to the middle: the waiting course lays (the note cleared so a course is due again)
+    await p.evaluate(() => localStorage.removeItem('vi_hb_seen'));
+    await p.setViewportSize({ width: 390, height: 300 }); await p.goto(INDEX); await p.waitForTimeout(1200);
+    await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
+    await p.evaluate(() => { showTab('house'); const r = document.getElementById('house-scene').getBoundingClientRect(); window.scrollTo(0, Math.max(0, r.top + scrollY - innerHeight * 0.66)); });
+    await p.waitForFunction(() => window.HB3D && HB3D.viewer && HB3D.viewer._bDraws > 0 && HB3D.viewer.layPending(), null, { timeout: 20000 }).catch(() => {});
     await p.evaluate(() => document.getElementById('house-scene').scrollIntoView({ block: 'center' }));
     await p.waitForFunction(() => !HB3D.viewer.layPending() && HB3D.viewer.layStats().animated > 0, null, { timeout: 15000 }).catch(() => {});
     const b2 = await p.evaluate(() => ({ pending: HB3D.viewer.layPending(), animated: HB3D.viewer.layStats().animated, course: HB3D.viewer.layStats().courseBricks }));
