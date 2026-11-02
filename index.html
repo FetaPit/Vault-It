@@ -27907,11 +27907,11 @@ function clamp(v,a,b){return v<a?a:v>b?b:v}
 function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
 function rgba(c,a){return "rgba("+(c[0]|0)+","+(c[1]|0)+","+(c[2]|0)+","+a.toFixed(3)+")"}
 function ease3(t){return 1-Math.pow(1-t,3)}
-/* a column's block colour as a label colour: the colour itself, lightened toward white only until it reads on the dark label plate (4.5:1 AA needed, 5:1 aimed for) */
+/* a column's block colour as a label colour: the colour itself, mixed toward white in 10% steps only until it reaches 4.5:1 on the dark label plate (#080808); never darkened (Pedro's v0.8 spec D) */
 var LABC={};
 function labCol(cc){var col=cc.col;if(!col)return cc.dir<0?rgba(PAL.red,.95):rgba(PAL.gold,.95);var k=col.join(","),h=LABC[k];if(h)return h;
   var lum=function(v){var f=function(x){x/=255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)};return .2126*f(v[0])+.7152*f(v[1])+.0722*f(v[2])},t=0,o=col;
-  while(t<.9){o=col.map(function(v){return Math.round(v+(255-v)*t)});if((lum(o)+.05)/(lum([8,8,8])+.05)>=5)break;t+=.02}
+  while(t<.95){o=col.map(function(v){return Math.round(v+(255-v)*t)});if((lum(o)+.05)/(lum([8,8,8])+.05)>=4.5)break;t+=.1}
   return LABC[k]=rgba(o,.95)}
 /* build/intro timings, ms (owner, 2 Nov: all 3D build animations were too fast, slowed by 100%: every duration doubled) */
 var NW_D={drop:1400,flash:2000,leave:1800,dropStep:120,subStep:80,stack:1400,stackStep:90,pileMs:1800,goMs:1700,spread:4200,cellStep:140,land:1000};
@@ -28114,7 +28114,7 @@ function makeNW(cv,o){
     var red=net<0;
     ground(c,P,st,box.x,box.z0,box.z1,red,ts,rm,12);
     /* column names on the floor, staggered when they would collide: the back row's behind the stacks, the front row's in front */
-    var lf=clamp(cw*.022,9,12),lines={};
+    var lf=clamp(cw*.022,10,12),lines={};
     function names(back){c.font=lf+"px 'Share Tech Mono',monospace";c.textAlign="center";c.textBaseline="alphabetic";
     cols.filter(function(cc){return (LZ[cc.key]<0)===back}).map(function(cc){return {c:cc,q:P.pt(X[cc.key],0,LZ[cc.key])}}).sort(function(a,b){return a.q[0]-b.q[0]}).forEach(function(L){
       var placed=lines.box=lines.box||[],w=c.measureText(L.c.short).width,r=-1;L.q[0]=clamp(L.q[0],w/2+4,cw-w/2-(L.q[1]>ch*.45?54:4));   /* clear of the zoom buttons */L.q[1]=Math.min(L.q[1],ch-14-2*(lf+3));   /* full names (owner, 31 Oct): up to three staggered lines, never off the stage, never over another name */

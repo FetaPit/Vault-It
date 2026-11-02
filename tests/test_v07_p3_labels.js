@@ -15,7 +15,7 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
       window.__lab = { calls: [] };
       const orig = CanvasRenderingContext2D.prototype.fillText;
       CanvasRenderingContext2D.prototype.fillText = function (t, x, y) {
-        try { if (this.canvas.id === 'nw3d-hero-cv' && /Share Tech Mono/.test(this.font)) window.__lab.calls.push({ t: String(t), fill: String(this.fillStyle) }); } catch (e) {}
+        try { if (this.canvas.id === 'nw3d-hero-cv' && /Share Tech Mono/.test(this.font)) window.__lab.calls.push({ t: String(t), fill: String(this.fillStyle), px: parseFloat(this.font) }); } catch (e) {}
         return orig.apply(this, arguments);
       };
     });
@@ -24,19 +24,20 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     await p.evaluate(() => { showTab('overview'); updateKPIs(); }); await p.waitForTimeout(800);
     await p.evaluate(() => { window.__lab.calls.length = 0; nw3d.hero.kick(); }); await p.waitForTimeout(900);
     const r = await p.evaluate(() => {
-      const cols = nw3d.sceneData().cols.filter(c => c.v >= .5), last = {}; window.__lab.calls.forEach(c => { last[c.t] = c.fill; });
-      return { cols: cols.map(c => ({ short: c.short, col: c.col, fill: last[c.short] || null })) };
+      const cols = nw3d.sceneData().cols.filter(c => c.v >= .5), last = {}, minpx = {}; window.__lab.calls.forEach(c => { last[c.t] = c.fill; minpx[c.t] = c.px; });
+      return { minpx: Math.min(...cols.map(c => minpx[c.short]).filter(Boolean)), cols: cols.map(c => ({ short: c.short, col: c.col, fill: last[c.short] || null })) };
     });
     const T = w + 'px ' + theme + ': ';
     const rgb = (s) => (String(s).match(/[\d.]+/g) || []).slice(0, 3).map(Number);
     const lum = (c) => { const f = (v) => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };
     const contrast = (a, bb) => { const A = lum(a), B = lum(bb); return (Math.max(A, B) + .05) / (Math.min(A, B) + .05); };
     ok(r.cols.length >= 4 && r.cols.every(c => c.fill), T + 'every column has a label drawn (' + r.cols.map(c => c.short).join(', ') + ')');
-    // the label colour is the column colour, lightened toward white by one amount t (0 to .65) at most
-    const tint = (c) => { const L = rgb(c.fill); let best = 1e9; for (let t = 0; t <= .65; t += .01) { const m = c.col.map(v => v + (255 - v) * t); best = Math.min(best, Math.max(...m.map((v, i) => Math.abs(v - L[i])))); } return best; };
+    // the label colour is the column colour, mixed toward white in 10% steps (one amount t) in 10% steps
+    const tint = (c) => { const L = rgb(c.fill); let best = 1e9; for (let t = 0; t <= .95; t += .1) { const m = c.col.map(v => v + (255 - v) * t); best = Math.min(best, Math.max(...m.map((v, i) => Math.abs(v - L[i])))); } return best; };
     const bad = r.cols.filter(c => c.fill && tint(c) > 8);
     ok(bad.length === 0, T + 'each label is its own column\'s colour, lightened only (' + (bad.map(c => c.short + ' ' + c.fill + ' vs ' + c.col).join('; ') || 'all match') + ')');
     ok(r.cols.every(c => !c.fill || contrast(rgb(c.fill), [8, 8, 8]) >= 4.5), T + 'every label reads on the dark label plate (AA 4.5:1)');
+    ok(r.minpx >= 10, T + 'label text is at least 10 px (' + r.minpx + ')');
     ok(new Set(r.cols.map(c => c.fill)).size >= 3, T + 'the labels are not all one colour');
     await ctx.close();
   }
