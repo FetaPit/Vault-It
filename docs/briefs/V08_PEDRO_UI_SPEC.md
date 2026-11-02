@@ -70,6 +70,8 @@ Layout:
 - 1100 and 1440: two columns, tile | plan, `minmax(0,1.3fr) minmax(0,1fr)`; stat grid 3 x 2.
 - Daylight: the same tokens; cell background `var(--surf)` resolves to paper.
 
+Matched to D2's build (2 Nov 13:35): the panel is one column at every width (tile full width, then the plan); stats 2 x 3 at 390, 6 x 1 from a 560 px tile up; milestones shown open (owner: "as informative as possible") with earned ones lit and ticked. Accepted.
+
 ## C. Budget "Spending & saving per month" cards (B2)
 
 Now (390 baseline): each group header has a 62 px icon box, the title is the long label with " · " ("COMMITTED · ESSENTIAL") which wraps over two lines and breaks "NON-ESSENTIAL"; one header had a box drawn over its title.
@@ -84,6 +86,8 @@ Spec per group header:
 - Card: radius `--r-tile`, border 1 px `color-mix(in srgb,var(--c) 35%,transparent)`, 8 px between cards. Collapsed by default (owner, 1 Nov).
 - Nothing absolutely positioned over a header. At 390 every title fits on one line ("COMMITTED NON-ESSENTIAL" at 11 px is about 190 px; the column has about 230).
 - 690 and up: same header; cards one column inside the Budget page max-width (1040).
+
+Matched to D2's build (2 Nov 13:35): title may run to two balanced lines, never split at a hyphen, at no less than 10 px; icon box 32 px with a 20 px icon (not 38/24: the owner asked for smaller icons); everything else as above.
 
 ## D. Net worth in 3D: labels in their column colours (B2)
 
