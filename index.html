@@ -14353,6 +14353,7 @@ body.vi-pop-open{overflow:hidden}
 .hb-pg-top b#savedAmt{font:700 1.85rem/1.1 'Syne',sans-serif;color:var(--gold);margin-right:4px}
 .hb-pg-top b#ppct{font-size:.72rem;color:var(--brass)}
 .hb-pg-note{font-size:.5rem;color:var(--t3);margin:6px 0;max-width:72ch}
+.hb-tip-ic{width:14px;height:14px;--vi-sw:1.5;color:var(--gold);vertical-align:-2px}
 .hb-xp-ms{position:relative}
 .hb-tick{position:absolute;top:0;bottom:0;width:1px;margin-left:-.5px;background:rgb(var(--ink-rgb) / .28)}
 .hb-tick.on{background:var(--gold)}
@@ -15786,7 +15787,7 @@ function hbRenderHUD(){
       var sc=[['Right now',cur],['+ your £'+Math.round(bud.unassigned).toLocaleString('en-GB')+' unassigned',cur+bud.unassigned],['+ unassigned + £'+Math.round(bud.saving).toLocaleString('en-GB')+' already saving',cur+bud.unassigned+bud.saving]];
       if(bud.saving<=0)sc.pop();
       rows=sc.map(function(r){return '<tr><td>'+r[0]+' ('+gbpFmt(r[1])+'/mo)</td><td>'+hbMonthsTxt(hbMonthsTo(rem,r[1]))+'</td></tr>';}).join('');
-      tip='<div class="hb-tip">💡 <b>What your Budget could do for this deposit</b><br>You have <b>'+gbpFmt(bud.unassigned)+'</b> a month unassigned and <b>'+gbpFmt(bud.saving)+'</b> a month assigned to saving/investing. Time to reach your '+gbpFmt(dt)+' deposit:<table>'+rows+'</table>'
+      tip='<div class="hb-tip"><svg class="vi-ic hb-tip-ic" aria-hidden="true"><use href="#vi-info"/></svg> <b>What your Budget could do for this deposit</b><br>You have <b>'+gbpFmt(bud.unassigned)+'</b> a month unassigned and <b>'+gbpFmt(bud.saving)+'</b> a month assigned to saving/investing. Time to reach your '+gbpFmt(dt)+' deposit:<table>'+rows+'</table>'
         +'<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+(bud.unassigned>0?'<button class="stk-btn" onclick="hbUseMonthly('+Math.round(cur+bud.unassigned)+')">Plan with +'+gbpFmt(bud.unassigned)+'</button>':'')+(bud.saving>0&&bud.unassigned>0?'<button class="stk-btn" onclick="hbUseMonthly('+Math.round(cur+bud.unassigned+bud.saving)+')">Plan with all '+gbpFmt(bud.unassigned+bud.saving)+'</button>':'')+'</div></div>';
     }
     var RS=hbRowStats(),_cs=window.VI_CURRENCY_SYMBOL||'£',_cr=window.VI_CURRENCY_RATE||1,rowHtml='';
@@ -15898,7 +15899,7 @@ function hbRenderL2(el){
     var sc=hbSimulate(Object.assign({},S2.c.base,{over:{monthly:x[0],stepUpPct:0,lumps:[],roundUp:false}})),cm=hbCompare(base,sc);
     rows+='<tr><td>+'+hbMoney(x[0])+'/mo ('+x[1].split(' ').slice(0,-1).join(' ')+')</td><td>'+hbYM(cm.monthsSaved)+' sooner</td><td>'+hbMoney(cm.interestSaved)+' less interest</td></tr>';
   });
-  var tip=rows?'<div class="hb-tip">💡 <b>What your Budget could do for this mortgage</b><br>Unassigned <b>'+hbMoney(u)+'</b>/mo · already saving <b>'+hbMoney(sv)+'</b>/mo.<table>'+rows+'</table><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+(u>0?'<button class="stk-btn" onclick="hbSetOver('+u+')">Plan: overpay '+hbMoney(u)+'</button>':'')+(u+sv>0&&sv>0?'<button class="stk-btn" onclick="hbSetOver('+(u+sv)+')">Plan: overpay '+hbMoney(u+sv)+'</button>':'')+'</div>'+HB_TRADEOFF+'</div>':'';
+  var tip=rows?'<div class="hb-tip"><svg class="vi-ic hb-tip-ic" aria-hidden="true"><use href="#vi-info"/></svg> <b>What your Budget could do for this mortgage</b><br>Unassigned <b>'+hbMoney(u)+'</b>/mo · already saving <b>'+hbMoney(sv)+'</b>/mo.<table>'+rows+'</table><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+(u>0?'<button class="stk-btn" onclick="hbSetOver('+u+')">Plan: overpay '+hbMoney(u)+'</button>':'')+(u+sv>0&&sv>0?'<button class="stk-btn" onclick="hbSetOver('+(u+sv)+')">Plan: overpay '+hbMoney(u+sv)+'</button>':'')+'</div>'+HB_TRADEOFF+'</div>':'';
   el.innerHTML='<div class="card-lbl">LEVEL 2 · DELETE THE MORTGAGE</div>'
     +hbMortgageLine()
     +'<div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--text)"><span>Paid off '+hbMoney(Math.max(0,hbL2Base()-bal))+' of '+hbMoney(hbL2Base())+'</span><span>'+(Math.floor(hbL2Progress()*1000)/10).toFixed(1)+'%</span></div>'
@@ -16947,7 +16948,7 @@ function hbuUpdate(){
     var w=hbUpWalk(Object.assign({},u,{saveMonthly:(+u.saveMonthly||0)+x[0]}),S2.scn);
     rows+='<tr><td>'+x[1]+(i?'/mo':'')+'</td><td>'+when(w)+'</td></tr>';
   });
-  h+='<div class="hb-tip" style="margin-top:12px">💡 <b>What your Budget could do</b><br>Months until the move is affordable if you add:<table>'+rows+'</table></div>';
+  h+='<div class="hb-tip" style="margin-top:12px"><svg class="vi-ic hb-tip-ic" aria-hidden="true"><use href="#vi-info"/></svg> <b>What your Budget could do</b><br>Months until the move is affordable if you add:<table>'+rows+'</table></div>';
   h+='<div class="hbc-note">Stamp duty: '+HB_TAX_ASOF+'. Indicative rates by LTV are Rightmove averages (Oct 2025) and lenders vary. Affordability uses a simple income multiple; real lenders also assess outgoings and credit. This is a planning aid, not mortgage advice.</div>';
   out.innerHTML=h;
 }

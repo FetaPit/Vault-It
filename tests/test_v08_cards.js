@@ -68,7 +68,7 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
         stats: st.length, icons: st.every(s => s.querySelector('svg.vi-ic')), labels: st.map(s => s.innerText.replace(/\s+/g, ' ').toLowerCase()), perRow, overlap, textOver, dead, ncards: cards.length,
         ms: ms.length, msTxt: ms.map(m => m.textContent.trim()), hit: ms.filter(m => m.classList.contains('hit')).length, badges: hud.querySelectorAll('.hb-badges').length,
         row: /ROW\s*\d+\s*of\s*\d+/i.test(hud.innerText), show: /Show it on the house/.test(hud.innerText), mort: /Preview your mortgage/.test(hud.innerText), ids: ['stBricks', 'stTiles', 'stRemain', 'stDeposit', 'pbarFill', 'savedAmt', 'ms1', 'ms100'].every(id => hud.contains(document.getElementById(id))),
-        emoji: ([...hud.childNodes].filter(n => !(n.classList && n.classList.contains('hb-tip'))).map(n => n.innerText || n.textContent).join(' ').match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu) || []).join(''), pin: !!hud.querySelector('.hb-row use[href="#vi-pin"]'),
+        emoji: (hud.innerText.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu) || []).join(''), pin: !!hud.querySelector('.hb-row use[href="#vi-pin"]') && !!hud.querySelector('.hb-tip use[href="#vi-info"]'),
         hero: (s => ({ f: s.fontFamily, px: parseFloat(s.fontSize), w: s.fontWeight }))(getComputedStyle(document.getElementById('savedAmt'))),
         noteW: [...hud.querySelectorAll('.hb-pg-note')].every(n => getComputedStyle(n).maxWidth !== 'none' && R(n).width <= parseFloat(getComputedStyle(n).maxWidth) + 1) ? Math.max(...[...hud.querySelectorAll('.hb-pg-note')].map(n => R(n).width / parseFloat(getComputedStyle(n).fontSize))) : 999,
         side: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 };
@@ -80,7 +80,7 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
     ok(!h.overlap && !h.textOver, t + 'stats never overlap');
     ok(h.ms === 10 && h.badges === 0 && /Shared Foundation Poured/.test(h.msTxt.join('|')) && h.hit === 2, t + 'one milestone set, house-type names, 2 earned of 10 (' + h.ms + ', ' + h.hit + ')');
     ok(h.row && h.show && h.mort, t + 'ROW card, "Show it on the house" and "Preview your mortgage" stay');
-    ok(!h.emoji && h.pin, t + 'no emoji in the tile (the Budget tip aside); "Show it on the house" has the pin icon (' + h.emoji + ')');
+    ok(!h.emoji && h.pin, t + 'no emoji in the tile, Budget tip included; "Show it on the house" has the pin icon (' + h.emoji + ')');
     ok(/Syne/.test(h.hero.f) && h.hero.px >= 23 && +h.hero.w >= 700, t + 'the saved figure is the hero: Syne 700, about 24 px (' + h.hero.px + ')');
     ok(h.noteW <= 52, t + 'prose lines capped at 72ch ('  + Math.round(h.noteW) + ' em)');
     ok(h.ids, t + 'the bar, stats and milestones keep their ids, inside the one tile');
@@ -91,7 +91,7 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
     await p.evaluate(() => { state.saved = depositTarget(); save(); updateUI(); markHousePurchased(); }); await p.waitForTimeout(600);
     const l2 = await p.evaluate(() => { const hud = document.getElementById('hb-hud'), R = e => e.getBoundingClientRect(), st = [...hud.querySelectorAll('.hb-stx > div')], tops = st.map(x => Math.round(R(x).top)), lk = hud.querySelector('.hb-l3-locked');
       return { lvl: /LEVEL 2/.test(hud.innerText), n: st.length, icons: st.map(x => (x.querySelector('use') || { getAttribute: () => '' }).getAttribute('href')).join(','), perRow: tops.filter(x => x === tops[0]).length,
-        emoji: ([...hud.querySelectorAll('button')].map(b => b.textContent).join(' ') + (lk ? lk.textContent : '')).match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u270E]/gu) || [], lock: !lk || !!lk.querySelector('use[href="#vi-lock"]'),
+        emoji: hud.innerText.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u270E]/gu) || [], lock: !lk || !!lk.querySelector('use[href="#vi-lock"]'),
         side: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 }; });
     ok(l2.lvl && l2.n === 4 && l2.icons === '#vi-mortgage,#vi-keys,#vi-coins,#vi-calendar', t + 'Level 2: four stats with icons (' + l2.icons + ')');
     ok(w < 600 ? l2.perRow === 2 : l2.perRow === 4, t + 'Level 2: stats ' + l2.perRow + ' across');
