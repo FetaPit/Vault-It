@@ -70,7 +70,7 @@ const seed = (o) => {
   ok(hs.scene && hs.lay && hs.plan, 'Simplified house: the viewport, Add to your savings and Your house plan show');
   ok(!hs.hud && !hs.prog && !hs.hist && !hs.own && hs.lvl === '1', 'Simplified house at Level 1: the level card, progress, History and own-design tools wait for Advanced');
   await p.evaluate(() => { setSetting('view', 'adv'); }); await p.waitForTimeout(300);
-  const ha = await p.evaluate(() => { const shown = (sel) => { const e = document.querySelector(sel); return !!(e && getComputedStyle(e).display !== 'none' && e.getClientRects().length); }; return shown('#hb-hud') && shown('#hb-prog') && shown('#hb-hist'); });
+  const ha = await p.evaluate(() => { const shown = (sel) => { const e = document.querySelector(sel); return !!(e && getComputedStyle(e).display !== 'none' && e.getClientRects().length); }; return shown('#hb-hud') && !!document.querySelector('#hb-hud #pbarFill') && shown('#hb-hist'); });
   ok(ha, 'back to Advanced: the level card, progress and History return');
   await p.context().close();
 
