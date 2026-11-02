@@ -67,3 +67,10 @@ Items 1 to 3 PASS at 390 and 1440 in Night and Daylight: the £ figure is now th
 Item 4 (Level 2, sent after round 1) is still open: the stats have no icon cells, and 🔑, 🧮 and 🔒 are still there (390 shot, houseMode purchased).
 The 💡 in the shared Budget tip goes too: use `vi-info` at 14 px in `var(--gold)`.
 When item 4 and the 💡 change land, D2 is a PASS with no further round: this is a mechanical finish of an agreed spec, and I'll confirm it from one 390 shot.
+
+## B2, v07/final-fixes 63c4446 (round 2 of 2)
+- D labels (43409d3): PASS. 10 px minimum; lowest contrast 5.6:1, no colour needed lightening.
+- F model tiles: PASS on the controls (the .nw3d-hud stack in the tile and both full viewers, icons only, focus ring), the hint chip (1440 Daylight: "Drag to turn · Ctrl + scroll to zoom") and the gestures. Both deviations accepted: 1:1 tiles made taller where the column count cannot change, and Ctrl + scroll on mouse devices.
+Two small finishes, then PASS without another round (I'll confirm from one 390 shot):
+1. On phones the tile is a still picture until the first tap, so the hint only appears after the user has already found the tile. Before that, the only cue is the "3D" badge. On coarse pointers, make the badge read `vi-orbit` 12 px + "3D · tap to turn" (Share Tech Mono 10 px) until the first live view this session, then back to "3D".
+2. "Change model" and "Remove model" in the 3D model viewer render as unstyled browser buttons (`.dep-btn` has no CSS anywhere, so this predates B2). Give them the ghost pill used by "Link to market value" on the tile: same height, radius, border and font.
