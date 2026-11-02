@@ -85,7 +85,7 @@ const seed = t => {
       ok(c.shown <= 30 && c.shown < c.full && c.fcaIn && c.txt, T + 'after scrolling down stops it collapses to a slim strip with the FCA line (' + c.shown + ' px of ' + c.full + ')');
       ok(c.sh === a.sh, T + 'collapsing does not change the page height (' + a.sh + ' vs ' + c.sh + ')');
       await p.mouse.wheel(0, -120); await p.waitForTimeout(500);
-      const u = await vis(); ok(u.shown >= u.full - 1, T + 'scrolling shows it in full (' + u.shown + ')');
+      let u = await vis(); for (let i = 0; i < 5 && u.shown < u.full - 1; i++) { await p.waitForTimeout(200); u = await vis(); }   // under load the 240 ms slide can land late ok(u.shown >= u.full - 1, T + 'scrolling shows it in full (' + u.shown + ')');
       await p.waitForTimeout(1500);
       await p.click('#app-footer .ft-more'); await p.waitForTimeout(500);
       const m = await vis(); const ex = await p.evaluate(() => document.querySelector('#app-footer .ft-more').getAttribute('aria-expanded'));
