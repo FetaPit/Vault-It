@@ -54,3 +54,10 @@ Checked at 390, 690, 1100 and 1440 in Night and Daylight, with the demo data and
 - Footer: PASS. Collapsed it shows 24 px with the FCA line (11 px) on screen; it opens on scroll; every line wraps at 690 (the clip is fixed). E2's four calls are accepted: transform not height, 11 px, 4 lines at 690, hide rules.
 - Feedback position: PASS. 16 px from the right at every width (the 690 clip is fixed); at 390 it sits 12 px above the tab bar.
 1. The Feedback button covers 3D controls. It is fixed, so whatever scrolls under it can be hidden. At 690 on the dashboard it sits over the Net worth 3D HUD's third button (reset): HUD x 622 to 656 and the button x 556 to 674 share the band y 701 to 733. Fix: on scroll (rAF-throttled), if the button's rect intersects any `.nw3d-hud`, `.inv-ctl`, `.hud-bar` or `.bd3d` control rect, fade it out (opacity 0, `pointer-events:none`, 240 ms) and bring it back once it is clear. Do not move it. Reduced motion: switch instantly.
+
+## A2, v07/engine 605ffb6: coin viewer gold (round 1 of 2): FIX, 1 item
+My own shots, seeded with £25,300 cash and 40 oz gold plus 20 oz silver, against candidate/v0.8. Pixels sampled where red exceeds blue by more than 25 (the gold pixels only).
+- Metals: PASS. The bars are warm gold with lighter edges, silver stays silver, and the labels are unchanged.
+- Cash body colour: better. The 1100 median moves from olive #90914D to warm #A48538, so the yellow-green cast is gone.
+1. The coin tops have gone grey. At 1100 the bright end (p90) is #A79871, a beige-grey, where before it was #ADB385. At 390 it is #BBB186. From a normal distance the top faces are most of what you see, so the stacks read as dull brass rather than warm gold. Raise the top highlight (A2's one number in `v3Matcap`) until the p90 of the gold pixels sits between #D8B860 and #E8C56A at 1100 and 390, with saturation kept, not just brightness. Keep the edge band lighter than the face.
+Not a regression: at 390 the stacks are small and dark both before and after (median about #45 3E 24). The brighter tops will help; framing is not in this round.
