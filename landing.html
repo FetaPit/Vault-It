@@ -4,19 +4,57 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <script>
-/* Product analytics hook. Sends to PostHog only if a PostHog snippet has already put window.posthog on the page; adds no script and no host.
-   First-touch campaign tags (utm_source, utm_medium, utm_campaign) are kept for this tab and ride along on every event. */
+/* Product analytics (PostHog, EU). Off until the visitor says yes: nothing loads and nothing is sent before that. The choice is kept on this device
+   (vi_analytics = 1 or 0) and can be changed from the Analytics link in the footer. Events carry no email, name or figures, only the event name and
+   the campaign tags (utm_source, utm_medium, utm_campaign) of the link that brought the visitor, kept for this tab. */
 (function () {
+  var TOKEN = 'phc_A8rCvivXQ295sn3ShppUSrCyw4v8LC6VEYCfm8CzbcYD', API = 'https://eu.i.posthog.com', ASSETS = 'https://eu-assets.i.posthog.com';
   var clean = function (v) { return String(v || '').replace(/[^A-Za-z0-9 _.\-+|]/g, '').slice(0, 100); }, utm = {};
+  var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
   try { utm = JSON.parse(sessionStorage.getItem('vi_utm') || 'null') || {}; } catch (e) { utm = {}; }
   if (!utm.source && !utm.campaign) {
-    try { var q = new URLSearchParams(location.search); ['source', 'medium', 'campaign'].forEach(function (k) { var v = clean(q.get('utm_' + k)); if (v) utm[k] = v; });
+    try { var q = new URLSearchParams(location.search); ['source', 'medium', 'campaign', 'content'].forEach(function (k) { var v = clean(q.get('utm_' + k)); if (v) utm[k] = v; });
       if (Object.keys(utm).length) sessionStorage.setItem('vi_utm', JSON.stringify(utm)); } catch (e) {}
   }
   window.viUtm = function () { var o = {}; ['source', 'medium', 'campaign'].forEach(function (k) { if (utm[k]) o['utm_' + k] = utm[k]; }); return o; };
+  var loaded = false, queue = [];
+  function load() {
+    if (loaded || !/^https?:$/.test(location.protocol)) return; loaded = true;
+    /* the standard PostHog loader, trimmed: stub the API, then fetch array.js from PostHog's EU asset host */
+    var ph = window.posthog = window.posthog || []; if (ph.__SV) return;
+    ph._i = []; ph.__SV = 1;
+    ph.init = function (t, c, n) { var o = ph; if (n !== undefined) o = ph[n] = []; else n = 'posthog'; o.people = o.people || []; o.toString = function (s) { var x = 'posthog'; if (n !== 'posthog') x += '.' + n; if (!s) x += ' (stub)'; return x; };
+      o.people.toString = function () { return o.toString(1) + '.people (stub)'; };
+      'capture identify alias set_config reset opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing register register_once unregister'.split(' ').forEach(function (m) { (function f(t, m) { var p = m.split('.'); if (p.length == 2) { t = t[p[0]]; m = p[1]; } t[m] = function () { t.push([m].concat(Array.prototype.slice.call(arguments, 0))); }; })(o, m); });
+      ph._i.push([t, c, n]); };
+    ph.init(TOKEN, { api_host: API, ui_host: 'https://eu.posthog.com', defaults: '2025-05-24', person_profiles: 'identified_only', autocapture: false, capture_pageview: false, capture_pageleave: false,
+      disable_session_recording: true, disable_surveys: true, persistence: 'localStorage' });
+    var s = document.createElement('script'); s.async = true; s.src = ASSETS + '/static/array.js'; document.head.appendChild(s);
+    queue.splice(0).forEach(function (e) { window.posthog.capture(e[0], e[1]); });
+  }
+  function on() { return ls.get('vi_analytics') === '1'; }
   window.viTrack = function (name, props) {
-    try { var p = window.viUtm(); for (var k in (props || {})) p[k] = props[k]; if (window.posthog && window.posthog.capture) window.posthog.capture(name, p); } catch (e) {}
+    try { if (!on()) return; var p = window.viUtm(); for (var k in (props || {})) p[k] = props[k]; if (loaded) window.posthog.capture(name, p); else { queue.push([name, p]); load(); } } catch (e) {}
   };
+  window.viAnalyticsSet = function (yes) {
+    ls.set('vi_analytics', yes ? '1' : '0');
+    if (yes) load(); else { try { if (window.posthog && window.posthog.opt_out_capturing) window.posthog.opt_out_capturing(); } catch (e) {} }
+    var b = document.getElementById('vi-an-bar'); if (b) b.remove(); label();
+  };
+  function label() { var l = document.getElementById('vi-an-link'); if (l) l.textContent = on() ? 'Analytics: on' : 'Analytics: off'; }
+  function bar() {
+    if (ls.get('vi_analytics') !== null || !/^https?:$/.test(location.protocol)) return;
+    var b = document.createElement('div'); b.id = 'vi-an-bar'; b.setAttribute('role', 'region'); b.setAttribute('aria-label', 'Analytics choice');
+    b.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;max-width:520px;margin:0 auto;z-index:2147483000;background:#0b1f24;color:#e8f1f2;border:1px solid #2bb3a3;border-radius:10px;padding:12px 14px;font:13px/1.45 "DM Sans",system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.35)';
+    b.innerHTML = '<div style="margin-bottom:8px">Can we count which parts of Vault-It get used? It sends the name of the action (for example, “date calculated”) and the campaign link you came from, to PostHog in the EU. No email, name or figures. You can change this any time.</div>'
+      + '<button type="button" id="vi-an-yes" style="background:#2bb3a3;color:#04181c;border:0;border-radius:6px;padding:7px 14px;font:600 13px inherit;cursor:pointer;margin-right:8px">Yes, count it</button>'
+      + '<button type="button" id="vi-an-no" style="background:transparent;color:#e8f1f2;border:1px solid #8aa3a7;border-radius:6px;padding:7px 14px;font:13px inherit;cursor:pointer">No thanks</button>';
+    document.body.appendChild(b);
+    document.getElementById('vi-an-yes').onclick = function () { window.viAnalyticsSet(true); };
+    document.getElementById('vi-an-no').onclick = function () { window.viAnalyticsSet(false); };
+  }
+  document.addEventListener('DOMContentLoaded', function () { label(); bar(); });
+  if (on()) load();
 })();
 </script>
 <title>Vault-It: Get out of the red and into your home.</title>
@@ -437,7 +475,7 @@ footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
   <div class="wm">Vault<i class="dot"></i><b>It</b></div>
   <div class="fca"><strong>Not regulated by the FCA. Not financial advice.</strong></div>
   <div>Vault-It is a product of PT Live Design, run by Pete Thickett, A57, 11 St Mary’s Street, Lincoln LN5 7EQ. Contact: <a href="mailto:hello@vault-it.co">hello@vault-it.co</a></div>
-  <div class="links"><a href="https://app.vault-it.co/?privacy=1">Privacy notice</a><a href="https://app.vault-it.co/?terms=1">Beta terms</a><a href="https://app.vault-it.co/">Already testing? Open the app</a><span>© 2026 Vault-It</span></div>
+  <div class="links"><a href="https://app.vault-it.co/?privacy=1">Privacy notice</a><a href="https://app.vault-it.co/?terms=1">Beta terms</a><a href="#" id="vi-an-link" onclick="viAnalyticsSet(localStorage.getItem('vi_analytics')!=='1');return false">Analytics: off</a><a href="https://app.vault-it.co/">Already testing? Open the app</a><span>© 2026 Vault-It</span></div>
 </div></footer>
 
 <script src="brand-hero.js"></script>

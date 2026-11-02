@@ -4,19 +4,57 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script>
-/* Product analytics hook. Sends to PostHog only if a PostHog snippet has already put window.posthog on the page; adds no script and no host.
-   First-touch campaign tags (utm_source, utm_medium, utm_campaign) are kept for this tab and ride along on every event. */
+/* Product analytics (PostHog, EU). Off until the visitor says yes: nothing loads and nothing is sent before that. The choice is kept on this device
+   (vi_analytics = 1 or 0) and can be changed from the Analytics link in the footer. Events carry no email, name or figures, only the event name and
+   the campaign tags (utm_source, utm_medium, utm_campaign) of the link that brought the visitor, kept for this tab. */
 (function () {
+  var TOKEN = 'phc_A8rCvivXQ295sn3ShppUSrCyw4v8LC6VEYCfm8CzbcYD', API = 'https://eu.i.posthog.com', ASSETS = 'https://eu-assets.i.posthog.com';
   var clean = function (v) { return String(v || '').replace(/[^A-Za-z0-9 _.\-+|]/g, '').slice(0, 100); }, utm = {};
+  var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
   try { utm = JSON.parse(sessionStorage.getItem('vi_utm') || 'null') || {}; } catch (e) { utm = {}; }
   if (!utm.source && !utm.campaign) {
-    try { var q = new URLSearchParams(location.search); ['source', 'medium', 'campaign'].forEach(function (k) { var v = clean(q.get('utm_' + k)); if (v) utm[k] = v; });
+    try { var q = new URLSearchParams(location.search); ['source', 'medium', 'campaign', 'content'].forEach(function (k) { var v = clean(q.get('utm_' + k)); if (v) utm[k] = v; });
       if (Object.keys(utm).length) sessionStorage.setItem('vi_utm', JSON.stringify(utm)); } catch (e) {}
   }
   window.viUtm = function () { var o = {}; ['source', 'medium', 'campaign'].forEach(function (k) { if (utm[k]) o['utm_' + k] = utm[k]; }); return o; };
+  var loaded = false, queue = [];
+  function load() {
+    if (loaded || !/^https?:$/.test(location.protocol)) return; loaded = true;
+    /* the standard PostHog loader, trimmed: stub the API, then fetch array.js from PostHog's EU asset host */
+    var ph = window.posthog = window.posthog || []; if (ph.__SV) return;
+    ph._i = []; ph.__SV = 1;
+    ph.init = function (t, c, n) { var o = ph; if (n !== undefined) o = ph[n] = []; else n = 'posthog'; o.people = o.people || []; o.toString = function (s) { var x = 'posthog'; if (n !== 'posthog') x += '.' + n; if (!s) x += ' (stub)'; return x; };
+      o.people.toString = function () { return o.toString(1) + '.people (stub)'; };
+      'capture identify alias set_config reset opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing register register_once unregister'.split(' ').forEach(function (m) { (function f(t, m) { var p = m.split('.'); if (p.length == 2) { t = t[p[0]]; m = p[1]; } t[m] = function () { t.push([m].concat(Array.prototype.slice.call(arguments, 0))); }; })(o, m); });
+      ph._i.push([t, c, n]); };
+    ph.init(TOKEN, { api_host: API, ui_host: 'https://eu.posthog.com', defaults: '2025-05-24', person_profiles: 'identified_only', autocapture: false, capture_pageview: false, capture_pageleave: false,
+      disable_session_recording: true, disable_surveys: true, persistence: 'localStorage' });
+    var s = document.createElement('script'); s.async = true; s.src = ASSETS + '/static/array.js'; document.head.appendChild(s);
+    queue.splice(0).forEach(function (e) { window.posthog.capture(e[0], e[1]); });
+  }
+  function on() { return ls.get('vi_analytics') === '1'; }
   window.viTrack = function (name, props) {
-    try { var p = window.viUtm(); for (var k in (props || {})) p[k] = props[k]; if (window.posthog && window.posthog.capture) window.posthog.capture(name, p); } catch (e) {}
+    try { if (!on()) return; var p = window.viUtm(); for (var k in (props || {})) p[k] = props[k]; if (loaded) window.posthog.capture(name, p); else { queue.push([name, p]); load(); } } catch (e) {}
   };
+  window.viAnalyticsSet = function (yes) {
+    ls.set('vi_analytics', yes ? '1' : '0');
+    if (yes) load(); else { try { if (window.posthog && window.posthog.opt_out_capturing) window.posthog.opt_out_capturing(); } catch (e) {} }
+    var b = document.getElementById('vi-an-bar'); if (b) b.remove(); label();
+  };
+  function label() { var l = document.getElementById('vi-an-link'); if (l) l.textContent = on() ? 'Analytics: on' : 'Analytics: off'; }
+  function bar() {
+    if (ls.get('vi_analytics') !== null || !/^https?:$/.test(location.protocol)) return;
+    var b = document.createElement('div'); b.id = 'vi-an-bar'; b.setAttribute('role', 'region'); b.setAttribute('aria-label', 'Analytics choice');
+    b.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;max-width:520px;margin:0 auto;z-index:2147483000;background:#0b1f24;color:#e8f1f2;border:1px solid #2bb3a3;border-radius:10px;padding:12px 14px;font:13px/1.45 "DM Sans",system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.35)';
+    b.innerHTML = '<div style="margin-bottom:8px">Can we count which parts of Vault-It get used? It sends the name of the action (for example, “date calculated”) and the campaign link you came from, to PostHog in the EU. No email, name or figures. You can change this any time.</div>'
+      + '<button type="button" id="vi-an-yes" style="background:#2bb3a3;color:#04181c;border:0;border-radius:6px;padding:7px 14px;font:600 13px inherit;cursor:pointer;margin-right:8px">Yes, count it</button>'
+      + '<button type="button" id="vi-an-no" style="background:transparent;color:#e8f1f2;border:1px solid #8aa3a7;border-radius:6px;padding:7px 14px;font:13px inherit;cursor:pointer">No thanks</button>';
+    document.body.appendChild(b);
+    document.getElementById('vi-an-yes').onclick = function () { window.viAnalyticsSet(true); };
+    document.getElementById('vi-an-no').onclick = function () { window.viAnalyticsSet(false); };
+  }
+  document.addEventListener('DOMContentLoaded', function () { label(); bar(); });
+  if (on()) load();
 })();
 </script>
 <title>Vault-It: Get out of the red and into your home.</title>
@@ -26452,7 +26490,7 @@ function showLegalModal(title, body) {
   modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(560px,94vw);max-height:86vh;overflow-y:auto;padding:24px 22px;position:relative"><button onclick="document.getElementById(\'legal-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button><div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:14px">'+title+'</div><div style="font-family:\'DM Sans\',sans-serif;font-size:.6rem;color:var(--t2);line-height:1.7">'+body+'</div></div>';
   document.body.appendChild(modal);
 }
-var VI_LEGAL_DATE = '31 October 2026';
+var VI_LEGAL_DATE = '2 November 2026';
 function _lh(t) { return '<p style="color:var(--em);font-weight:700;margin:14px 0 3px">' + t + '</p>'; }
 function showPrivacy() {
   showLegalModal('Privacy notice', [
@@ -26478,7 +26516,7 @@ function showPrivacy() {
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
     '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank and provider logos; it is told the website of each bank, card or investment provider you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
     '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Poly Pizza</strong> supplies free 3D models of everyday items if you pick one from its library for a wealth or liability item: your browser downloads the file straight from Poly Pizza, which sees your IP address and which model you chose, and nothing else. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
-    '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or analytics. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
+    '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers or pixels. Product analytics are off unless you say yes (the choice is on the first screen and in the footer link Analytics): if you do, <strong>PostHog</strong> (hosted in the EU) receives the name of each action, such as “date calculated” or “upgrade clicked”, a random device id and the campaign tags of the link you came from. It never receives your email address, name or any figure you enter, and it sees your IP address. Switch it off any time and nothing more is sent. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected, and what that does not mean'),
     '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
     _lh('On your device'),
@@ -27364,7 +27402,7 @@ function nwhRenderMini(){
 
 <!-- ══ FOOTER ══ -->
 <div id="app-footer">
-  <span class="footer-copy"><span class="footer-cr">© 2026 PT Live Design. All rights reserved.</span> <button onclick="showPrivacy()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Privacy</button><span style="color:var(--t3);opacity:.4">·</span><button onclick="showTerms()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Terms</button> <span class="vi-fca">Not regulated by the FCA. Not financial advice.</span></span>
+  <span class="footer-copy"><span class="footer-cr">© 2026 PT Live Design. All rights reserved.</span> <button onclick="showPrivacy()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Privacy</button><span style="color:var(--t3);opacity:.4">·</span><button id="vi-an-link" onclick="viAnalyticsSet(localStorage.getItem('vi_analytics')!=='1')" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Analytics: off</button><span style="color:var(--t3);opacity:.4">·</span><button onclick="showTerms()" style="background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:.42rem;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;padding:0 4px">Terms</button> <span class="vi-fca">Not regulated by the FCA. Not financial advice.</span></span>
   <span class="footer-logo"><div style="width:14px;height:14px;flex-shrink:0;display:inline-block"><svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2020/svg" style="">
   <defs>
     <radialGradient id="vaultGlow3" cx="50%" cy="50%" r="50%">

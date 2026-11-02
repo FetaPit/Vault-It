@@ -10,6 +10,7 @@ The single list of instructed work. Every session reads it at start and before e
 ## Open
 
 
+
 ## Waiting on the owner
 
 - `STRIPE_WEBHOOK_SECRET` in Supabase secrets (the only gateway step left; I am not allowed to write secrets): Stripe Dashboard → Developers → Webhooks → endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` → Reveal signing secret, then Supabase → Edge Functions → Secrets → add `STRIPE_WEBHOOK_SECRET`. Until then payments wait (Stripe retries for three days)
@@ -23,6 +24,8 @@ The single list of instructed work. Every session reads it at start and before e
 - Poly Pizza: commercial plan and an edge function for live search, or self-host a small CC0 set (`docs/WEALTH_INVENTORY_3D_OPTIONS.md`)
 
 ## Done (30 Oct 2026)
+
+- [x] PostHog events, UTM capture and consent-gated EU init (owner yes, 2 Nov): branch `ops-posthog-utm`, privacy notice updated, not released
 
 - [x] Gateway go-live and release (owner, 31 Oct: "yes and release when ready"): migration 011 applied (guard checked live in a rolled-back transaction), `stripe-webhook` deployed, Stripe endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` created; full suite passed; released to `release/pioneer-v2` with this commit (backup branch taken first). Left for the owner: the webhook secret (see Waiting)
 - [x] Net worth 3D card controls (owner, 31 Oct 12:33): three views, one switch each, top right: the net worth card is 3D | Graph (the old Blocks | Line switch is gone); the progress blocks have their own card directly below with a Forecast switch (in step with the graph's) and their own readout and key; keys and legends are bigger and every swatch is a small 3D block in its colour. Commit 7e94db2 on `brand-rollout`, not released.
