@@ -20499,21 +20499,30 @@ V3Scene.prototype.spin=function(on){this.ctl.autoRotate=!!on;this.ctl.autoRotate
 var V3_KEEP={};
 function v3Keep(key,make){var v=V3_KEEP[key];if(!v){v=V3_KEEP[key]=make();var mark=function(x){if(x)x.userData=Object.assign(x.userData||{},{keep:true});};mark(v.geo);(v.mats||[]).forEach(function(m){mark(m);if(m.map)mark(m.map);});}return v;}
 function v3Matcap(){if(V3_KEEP._mc)return V3_KEEP._mc;var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d');
-  var b=g.createRadialGradient(64,58,0,64,64,64);b.addColorStop(0,'#ffffff');b.addColorStop(.5,'#ece8de');b.addColorStop(.78,'#c4bfb3');b.addColorStop(.92,'#f4efe2');b.addColorStop(1,'#8f8b82');g.fillStyle=b;g.fillRect(0,0,128,128);   /* key light from above; a bright band near the edge so rims read lighter than faces */
+  var b=g.createRadialGradient(64,V3_KEYY,0,64,64,64);b.addColorStop(0,'#ffffff');b.addColorStop(.55,'#f6f2e8');b.addColorStop(.82,'#d8d3c8');b.addColorStop(.93,'#f6f1e4');b.addColorStop(1,'#9a968d');g.fillStyle=b;g.fillRect(0,0,128,128);   /* key light from above; a bright band near the edge so rims read lighter than faces */
   var h=g.createRadialGradient(46,34,0,46,34,40);h.addColorStop(0,'rgba(255,250,236,.85)');h.addColorStop(.5,'rgba(255,244,220,.25)');h.addColorStop(1,'rgba(255,244,220,0)');g.fillStyle=h;g.fillRect(0,0,128,128);   /* the studio panel's highlight */
   var f=g.createRadialGradient(100,98,0,100,98,34);f.addColorStop(0,'rgba(111,184,216,.30)');f.addColorStop(1,'rgba(111,184,216,0)');g.fillStyle=f;g.fillRect(0,0,128,128);   /* the cool teal fill from the side */
   var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.userData={keep:true};return V3_KEEP._mc=t;}
-function v3Shade(o){var m=new THREE.MeshMatcapMaterial(Object.assign({matcap:v3Matcap(),toneMapped:false},o));return m;}   // the baked shading is already final: no tone mapping, so the gold stays the brand's gold
+function v3Shade(o){var m=new THREE.MeshMatcapMaterial(Object.assign({matcap:v3Matcap(),toneMapped:false,fog:false},o));return m;}   // the baked shading is already final: no tone mapping, so the gold stays the brand's gold
 function v3ContactTex(){if(V3_KEEP._cs)return V3_KEEP._cs;var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d'),gr=g.createRadialGradient(64,64,8,64,64,64);
   gr.addColorStop(0,'rgba(0,0,0,.42)');gr.addColorStop(.7,'rgba(0,0,0,.22)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);var t=new THREE.CanvasTexture(c);t.userData={keep:true};return V3_KEEP._cs=t;}
 // canvas textures: a coin edge (one band per coin) and a coin face with the currency symbol
+/* the coin's own colour, lifted toward a warm highlight for the faces and rims (Pedro, 2 Nov: tops read as dull brass; the matcap can only darken
+   a texture, so the texture carries the brightness), saturation kept */
+function v3IsGold(hex){var a=parseInt(hex.slice(1),16);return ((a>>16)&255)-(a&255)>30;}   // a warm metal (red well above blue): gold, brass; otherwise silver
+function v3Lift(hex,t){t=Math.max(0,Math.min(1,t));var a=parseInt(hex.slice(1),16),w=v3IsGold(hex)?V3_LIFTC:[0xE8,0xEB,0xEE],o=[(a>>16)&255,(a>>8)&255,a&255].map(function(c,i){return Math.round(c+(w[i]-c)*t)});return '#'+o.map(function(c){return ('0'+c.toString(16)).slice(-2)}).join('');}
+function v3Mix(a,b,t){var x=parseInt(a.slice(1),16),y=parseInt(b.slice(1),16);return '#'+[16,8,0].map(function(sh){var c=Math.round(((x>>sh)&255)*(1-t)+((y>>sh)&255)*t);return ('0'+c.toString(16)).slice(-2)}).join('');}
+/* coin gold, tuned so the gold pixels' bright end sits in the brand gold (#D8B860 to #E8C56A) at 390 and 1100 (Pedro, 2 Nov): the faces and rims
+   lifted 80% toward a warm gold (silver coins toward a neutral highlight, so they stay silver), the silver centre of a gold-ringed coin
+   mostly gold too (a few pixels across, it mipmaps to beige otherwise), the matcap's key light high where the coin tops sample it */
+var V3_INNER=0.92,V3_LIFTC=[0xF6,0xCB,0x6A],V3_KEYY=6,V3_LIFT=0.8;
 function v3CoinEdge(spec,n){var c=document.createElement('canvas');c.width=64;c.height=Math.max(16,n*16);var g=c.getContext('2d');
-  for(var i=0;i<n;i++){var y=i*16;g.fillStyle=spec.outer;g.fillRect(0,y,64,16);g.fillStyle='rgba(255,255,255,.18)';g.fillRect(0,y+2,64,3);g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+14,64,2);
+  for(var i=0;i<n;i++){var y=i*16;g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,y,64,16);g.fillStyle='rgba(255,236,170,.30)';g.fillRect(0,y+2,64,3);g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+14,64,2);
     if(spec.sides>12){g.fillStyle='rgba(0,0,0,.18)';for(var x=0;x<64;x+=4)g.fillRect(x,y+4,1,9);}}
   var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.wrapS=THREE.RepeatWrapping;t.repeat.x=spec.sides>12?6:1;return t;}
 function v3CoinFace(spec){var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d');
-  g.fillStyle=spec.outer;g.fillRect(0,0,128,128);
-  if(spec.inner){g.fillStyle=spec.inner;g.beginPath();g.arc(64,64,40,0,Math.PI*2);g.fill();}
+  g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,0,128,128);
+  if(spec.inner){g.fillStyle=v3IsGold(spec.outer)&&!v3IsGold(spec.inner)?v3Mix(spec.inner,v3Lift(spec.outer,V3_LIFT+.25),V3_INNER):v3Lift(spec.inner,V3_LIFT);g.beginPath();g.arc(64,64,40,0,Math.PI*2);g.fill();}
   g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=3;g.beginPath();g.arc(64,64,56,0,Math.PI*2);g.stroke();
   g.fillStyle='rgba(40,30,10,.55)';g.font='bold 54px Syne, sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(spec.sym,64,68);
   g.fillStyle='rgba(255,255,255,.25)';g.fillText(spec.sym,62,65);

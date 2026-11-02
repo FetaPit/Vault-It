@@ -69,6 +69,14 @@ const HOOK = () => {
   ok(o.firstOwn != null && o.firstOwn < 50, 'the first draw\'s own JavaScript is under 50 ms (' + (o.firstOwn == null ? '-' : o.firstOwn.toFixed(0)) + ' ms; ' + (o.firstRender == null ? '-' : o.firstRender.toFixed(0)) + ' ms with the software GPU)');
   ok(o.dpr <= 1.5 + 1e-9, 'pixel ratio capped at 1.5 on a touch screen (' + o.dpr + ')');
 
+  // ── 1b. the coin colours: gold coins lifted into the brand gold, silver coins stay silver (QC, 2 Nov: the euro and rupee coins must not turn gold) ──
+  const coins = await p.evaluate(() => Object.keys(V3_COINS).map(c => { const sp = V3_COINS[c], h = v3Lift(sp.outer, V3_LIFT), n = parseInt(h.slice(1), 16), r = n >> 16 & 255, b = n & 255;
+    return { c, gold: v3IsGold(sp.outer), lifted: h, warm: r - b, inner: sp.inner ? v3Lift(sp.inner, V3_LIFT) : null }; }));
+  console.log(JSON.stringify(coins));
+  ok(coins.every(x => x.gold ? x.warm > 60 : x.warm < 30), 'gold coins are lifted toward the brand gold, silver coins stay neutral (' + coins.map(x => x.c + ' ' + x.lifted).join(', ') + ')');
+  const eur = coins.find(x => x.c === 'EUR');
+  ok(!eur || (!eur.gold && eur.inner && parseInt(eur.inner.slice(1, 3), 16) - parseInt(eur.inner.slice(5, 7), 16) > 30), 'the euro keeps its silver ring and gold centre (' + (eur && eur.lifted + ' / ' + eur.inner) + ')');
+
   // ── 2. the same data again (a tab switch back, a re-render): no rebuild, just a redraw ──
   const again = await p.evaluate(() => { const V = V3.cash, kid = V.root.children[0], n = __T.spans.filter(s => s[0] === 'clear').length; renderCashISO(); renderCashISO();
     return { same: V.root.children[0] === kid, builds: __T.spans.filter(s => s[0] === 'clear').length - n }; });
