@@ -10,7 +10,12 @@ const a = src.indexOf('// <<HB3D_ENGINE'), b = src.indexOf('// HB3D_ENGINE>>');
 const small = (n, u) => (u === 'rem' ? n < 0.7 : n < 10.5);
 const wrap = v => `max(${v},var(--vi-fs-min,0px))`;
 let count = 0;
+// Rules left at their own size on purpose (agreed with the creative director): sizes a stream has just tuned to fit at 390.
+const KEEP = ['.nw-more-btns button{'];   // Net worth tile pills: 10 px labels, one row at 390 (C2, Pedro review 2)
 function fix(s) {
+  return s.split('\n').map(l => KEEP.some(k => l.includes(k)) ? l : fixLine(l)).join('\n');
+}
+function fixLine(s) {
   // font-size:<v>   (not already inside max()/clamp())
   s = s.replace(/(font-size\s*:\s*)(\d*\.?\d+)(rem|px)(?![\w(])/g, (m, p, n, u) => small(+n, u) ? (count++, p + wrap(n + u)) : m);
   // font:<weight/style tokens> <size>[/lh] <family>

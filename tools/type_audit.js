@@ -29,7 +29,9 @@ async function sweep(page) {
       const r = el.getBoundingClientRect(); if (r.width < 1 || r.height < 1 || r.right < 0 || r.left > vw) continue;
       const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || +cs.opacity === 0) continue;
       let hid = false; for (let e = el; e; e = e.parentElement) { const c = getComputedStyle(e); if (c.display === 'none' || +c.opacity === 0) { hid = true; break; } } if (hid) continue;
-      res.push({ fs: Math.round(parseFloat(cs.fontSize) * 100) / 100, sel: sel(el), txt: txt.slice(0, 40), font: cs.fontFamily.split(',')[0].replace(/"/g, '') });
+      let f = parseFloat(cs.fontSize), svg = false;
+      if (el.ownerSVGElement && el.getScreenCTM) { const m = el.getScreenCTM(); if (m) { f *= Math.sqrt(m.a * m.a + m.b * m.b); svg = true; } }   // SVG text as drawn (viewBox scaling)
+      res.push({ svg, fs: Math.round(f * 100) / 100, sel: sel(el), txt: txt.slice(0, 40), font: cs.fontFamily.split(',')[0].replace(/"/g, '') });
     }
     return { root: parseFloat(getComputedStyle(document.documentElement).fontSize), res, sideways: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 };
   });
