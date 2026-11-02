@@ -55,3 +55,7 @@ Shots: `followup/c2-*` at 390 and 1440, Night and Daylight, including two goals 
   1. Daylight: the near-black plates sit on the paper-coloured chart as heavy black boxes. My spec only gave the Night value. Keep `rgba(8,8,8,.72)` with gold text in Night. In Daylight use the card surface at about .85 with brass text (`viCss('brass')`, as the old label used), so labels read without the black blocks.
   2. Wasted space: at 390 there is about 25px of empty canvas between the month labels and the hint. Bring the hint up to 4 to 8px under the month labels.
   3. The TODAY / Q4 '26 / Q1 '27 tick collision at 390 (both themes) is covered by C2's next commit; I will check it in the same shot.
+
+C2 round 2, v08/forecast-rates 5600311 (with 899a7b5): shots `followup/c2r2-*` at 360, 390 and 1440, Night and Daylight.
+- Round 1 fixes: PASS. Daylight plates are the card surface with brass text, and Night is unchanged. The hint sits 6px under the month labels. TODAY and the quarter labels no longer touch at any width.
+- New at 360 (both themes), only when two goals sit near the bottom of the plot: the lowest label ("Emergency Fund") is pushed below its line onto the month labels and hides "Sep '26" and "Mar '27". 390 and 1440 are clear. Proposed fix: keep a "below" plate inside the plot (`y + h <= H - PAD.b`); if it does not fit, put it above its line, to the left of the plate it clashes with. This is the second round, so David decides.
