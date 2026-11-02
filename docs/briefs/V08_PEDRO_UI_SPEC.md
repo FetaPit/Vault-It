@@ -178,3 +178,5 @@ Allowed exceptions (listed in the commit):
 Must not grow: anything already 10.5 px or more on screen; icons; row heights in the tab bar; the C2 pills (10 px caps, measured to fit 390).
 
 Done means: an audit before and after (count of visible text nodes under 10.5 px at 390, 690 and 1100, which should be zero except for the exceptions); no sideways scroll; no new wraps in pills, chips or buttons; tab shots at 390 and 1100, Night and Daylight, for Dashboard, Budget, House, Assets, Debt and Settings.
+
+Agreed with F2 after its audit (2 Nov 14:3x): 410 of 475 element and size pairs are under 10.5 px at 390, and the root is 13 px everywhere under 1100. Floors are tokens: --vi-fs-1 10.5px, --vi-fs-2 11.5px, --vi-fs-3 12.5px, applied by each declaration's source value as above. They are on at every width (they are max() floors, so desktop text that is already larger does not move). No root bump. The generated HB3D block and canvas text are excluded. USP and PRO badges: 10 px if the badge can grow to fit, otherwise 9 px.
