@@ -19,6 +19,8 @@ const KEEP = [
   '.bd-tile-tt b{',          // D2 Budget card titles: .77rem caps, two balanced lines measured to fit (Pedro passed D2 item 1)
   '.hud-bar',                // the house builder 3D viewport's own HUD (hard rule: not touched)
   /(^|[^b])tab-btn\b/,       // the nav tabs: sized to fit all seven tabs (Pedro's KEEP list); not .subtab-btn
+  /#app-footer|\.ft-[a-z]|#vi-fb-btn/,   // E2's footer and Feedback button (Pedro's KEEP list)
+  '.i3d-hint{', '.i3d-badge{',          // B2's model-tile chips: 10 px mono, spec F
 ];
 const tierOf = (n, u) => u === 'rem' ? (n < 0.56 ? 1 : n < 0.70 ? 2 : n < 0.81 ? 3 : 0) : (n < 10.5 ? 1 : 0);
 const counts = { 0: 0, 1: 0, 2: 0, 3: 0 };

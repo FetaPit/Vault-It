@@ -29,7 +29,7 @@ const OFF = ':root{--vi-fs-0:0px!important;--vi-fs-1:0px!important;--vi-fs-2:0px
   for (const m of body.matchAll(/font-size\s*:\s*(\d*\.?\d+)(rem|px)(?![\w(])/g)) {
     const n = +m[1], u = m[2]; if (u === 'rem' ? n >= 0.81 : n >= 10.5) continue;
     const line = body.slice(body.lastIndexOf('\n', m.index) + 1, body.indexOf('\n', m.index));
-    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar|(^|[^b])tab-btn\b/.test(line)) continue;   // KEEP rules (C2 pills, D2 card titles, house viewport HUD)
+    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar|(^|[^b])tab-btn\b|#app-footer|\.ft-[a-z]|#vi-fb-btn|\.i3d-hint\{|\.i3d-badge\{/.test(line)) continue;   // KEEP rules (C2 pills, D2 card titles, house viewport HUD)
     bare.push(line.trim().slice(0, 90));
   }
   for (const m of body.matchAll(/max\((\d*\.?\d+)rem,var\(--vi-fs-(\d)\)\)/g)) {
@@ -52,6 +52,7 @@ function measure() {
     let hid = false; for (let e = el; e && e.nodeType === 1; e = e.parentElement) { const c = getComputedStyle(e); if (c.display === 'none' || c.visibility === 'hidden' || +c.opacity === 0) { hid = true; break; } } if (hid) continue;
     const cs = getComputedStyle(el); let f = parseFloat(cs.fontSize);
     if (el.ownerSVGElement && el.getScreenCTM) { const m = el.getScreenCTM(); if (m) f *= Math.hypot(m.a, m.b); }
+    else { for (let e = el; e && e.nodeType === 1; e = e.parentElement) f *= parseFloat(getComputedStyle(e).zoom) || 1; }   // CSS zoom (the desktop nav is zoomed to fit)
     let p = [], e = el; for (let i = 0; e && e.nodeType === 1 && i < 4; e = e.parentElement, i++) { let s = e.tagName.toLowerCase(); if (e.id) { p.unshift(s + '#' + e.id); break; } if (e.classList.length) s += '.' + [...e.classList].slice(0, 2).join('.'); p.unshift(s); }
     const sel = p.join('>') + ' | ' + t.slice(0, 24);
     small.push([Math.round(f * 100) / 100, sel]);
@@ -118,7 +119,8 @@ function measure() {
     await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await page.evaluate("showTab('house')"); await page.waitForTimeout(700);
     const st = () => page.evaluate(() => { const c = document.querySelector('#houseSceneCard canvas'); if (!c) return 'none'; const r = c.getBoundingClientRect(); return Math.round(r.width) + 'x' + Math.round(r.height); });
-    const s1 = await st(); await page.addStyleTag({ content: OFF }); await page.waitForTimeout(400); const s0 = await st();
+    const s1 = await st(); const offTag = await page.addStyleTag({ content: OFF }); await page.waitForTimeout(400); const s0 = await st();
+    await offTag.evaluate(e => e.remove()); await page.waitForTimeout(300);   // floors back on for the fit checks below
     ok(s1 === s0 && s1 !== 'none', `${w}: 3D house stage size unchanged by the floors (${s1} vs ${s0})`);
     // Pedro review 1: badges clear of their tab's icon and label; the 3D key wraps rather than losing its end; KPI labels on one line
     const fit = await page.evaluate(() => { const hit = (a, b) => Math.min(a.right, b.right) - Math.max(a.left, b.left) > 0.5 && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 0.5;
