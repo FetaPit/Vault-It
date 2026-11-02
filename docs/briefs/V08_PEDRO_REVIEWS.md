@@ -27,3 +27,17 @@ Fix, under 420 px only: letter-spacing .04em, padding 0 7 0 6, gap inside the bu
 
 ## C2, v07/ui-round2 1103ecc: PASS
 With the real Syne loaded, the row measures 104 + 93 + 125 + 8 = 330 px. At 390 and 420 the pills sit on one row in Night and Daylight, and at 690, 1100 and 1440 too. At 360 they wrap into two right-aligned rows with nothing clipped, which is fine.
+
+## D2, v08/cards 8a760da (round 1 of 2)
+
+### C, Spending & saving cards: PASS
+Shot at 390, 690, 1100 and 1440 in Night and Daylight. The 32 px icons, the separator-free titles on two balanced lines and the totals clear of the chevron all hold. One column up to 1279 is accepted. The sub-line (.56rem) and "% of income" (.5rem) stay at the app's current scale; see the global note below.
+
+### B, House tile: FIX, 3 items
+The structure matches the accepted build: one tile, six iconned stats (2 x 3 at 390, 6 x 1 from 690), the Next line, ticks on the bar, milestones open, and no empty column at any width.
+1. The headline is not the hero. "£0 saved" is DM Sans 13 px at every width, so the top of the tile is empty at 1100 and 1440. Make the saved figure Syne 700 1.85rem (24 px at the 13 px root, and it scales up with the screen) in `var(--gold)`, with "saved" kept as the small label.
+2. The prose runs too wide: at 1440 the hologram line is about 1300 px long. Cap `.hb-pg-note` and the brick line at `max-width:72ch`.
+3. Emoji in the tile: 🎉 in "Keys Are Yours!", 📍 in "Show it on the house", 🧮 in "Preview your mortgage". Remove 🎉 and 🧮; replace 📍 with `vi-pin` at 14 px.
+
+### Global note for David (not D2's)
+At 390 and 690 the root is 13 px, so the app's common sizes (.5rem, .56rem) render at 6.5 to 7.3 px. In the House tile: eyebrow 6.5, milestone names 6.8, Next line 7.0. The brand book's smallest text is 10.5 px. The 10 px floor in my spec came from `index.html:8990`, which covers only the footer. Raising the whole scale is one change (`--vi-base` or the root `font-size`), but it would reflow every tab, so it needs the owner's word and its own round. ASK raised with David.
