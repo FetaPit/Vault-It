@@ -8,12 +8,12 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   const b=await chromium.launch(); const errs=[];
   const open=async(w,h,mob)=>{const ctx=await b.newContext({viewport:{width:w,height:h},isMobile:!!mob,hasTouch:!!mob});const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));await p.addInitScript(seed);await p.goto('file:///home/user/Vault-It/index.html');await p.waitForTimeout(2000);await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});await p.evaluate(()=>showTab('overview'));await p.waitForTimeout(900);return p;};
   let p=await open(1600,900);
-  await p.evaluate(()=>{if(window.nw3d)nw3d.setMain('graph',true);}); await p.waitForTimeout(300);   // goals and snapshots show in the Graph view only (owner, 31 Oct)
+  await p.evaluate(()=>{if(window.nw3d)nw3d.setMain('graph',true);nwMore('goals');}); await p.waitForTimeout(300);   // goals and snapshots fold into the net worth tile, opened by its Goals button (v0.7 UI round 2)
   const g=await p.evaluate(()=>{const r=id=>document.querySelector(id).getBoundingClientRect();const c=document.getElementById('nwChart').closest('.ov-chart-card').getBoundingClientRect(),cb=(document.getElementById('nw3d-trk-card')||document.getElementById('nwChart').closest('.ov-chart-card')).getBoundingClientRect(),ms=r('#ov-ms-card'),road=r('#fire-roadmap-card'),nwh=document.getElementById('nwh-mini-wrap').closest('.ov-chart-card').getBoundingClientRect();
-    return{chartH:(function(){var c=document.getElementById('nwChart'),e=c.offsetParent&&getComputedStyle(c).visibility!=='hidden'?c:(document.getElementById('nw3d-hero-stage')||c);return e.getBoundingClientRect().height})(),chartW:c.width,chartLeft:c.left,roadW:road.width,roadLeft:road.left,msTop:ms.top,chartBottom:cb.bottom,roadTop:road.top,msBottom:ms.bottom,vh:innerHeight,nwhTop:nwh.top};});
+    return{chartH:(function(){var c=document.getElementById('nwChart'),e=c.offsetParent&&getComputedStyle(c).visibility!=='hidden'?c:(document.getElementById('nw3d-hero-stage')||c);return e.getBoundingClientRect().height})(),chartW:c.width,chartLeft:c.left,roadW:road.width,roadLeft:road.left,msTop:ms.top,chartBottom:cb.bottom,roadTop:road.top,msBottom:ms.bottom,vh:innerHeight,nwhTop:nwh.top,msIn:document.getElementById('nwChart').closest('.ov-chart-card').contains(document.getElementById('ov-ms-card')),cvBottom:document.getElementById('nwChart').getBoundingClientRect().bottom};});
   console.log(JSON.stringify(g));
   ok(g.chartH>=0.3*g.vh&&g.chartH<=0.45*g.vh,'net worth chart is about a third of the screen ('+Math.round(g.chartH)+'px of '+g.vh+')');
-  ok(g.msTop>=g.chartBottom-1&&g.msTop-g.chartBottom<40,'milestone targets sit directly under the net worth cards (the progress blocks card, 31 Oct, sits between)');
+  ok(g.msIn&&g.msTop>=g.cvBottom-1,'milestone targets open inside the net worth tile, under the chart (v0.7 UI round 2)');
   ok(g.roadTop>g.msBottom,'roadmap comes after the milestone targets');
   ok(Math.abs(g.roadW-g.chartW)<2&&Math.abs(g.roadLeft-g.chartLeft)<2,'roadmap is exactly as wide as the chart ('+Math.round(g.roadW)+' vs '+Math.round(g.chartW)+')');
   const cf=await p.evaluate(()=>{const s=document.querySelector('#cf-sankey svg');const r=s.getBoundingClientRect();return{h:r.height,vh:innerHeight};});
@@ -38,7 +38,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   ok(st.snaps===0&&st.goals===0,'both can be removed again'); await p.context().close();
   // mobile
   p=await open(390,844,true);
-  await p.evaluate(()=>{if(window.nw3d)nw3d.setMain('graph',true);}); await p.waitForTimeout(300);   // goals live in the Graph view (owner, 31 Oct)
+  await p.evaluate(()=>{if(window.nw3d)nw3d.setMain('graph',true);nwMore('goals');}); await p.waitForTimeout(300);   // goals open from the tile's Goals button (v0.7 UI round 2)
   await p.evaluate(()=>ovMsTab('snaps'));const mbB=await p.evaluate(()=>document.querySelector('#ms-add-snap>summary').getBoundingClientRect());await p.evaluate(()=>ovMsTab('goals'));
   const mb=await p.evaluate((bb)=>{const a=document.querySelector('#ms-add-goal>summary').getBoundingClientRect(),b=bb;return{a:a.height>30&&a.width>200,b:b.height>30&&b.width>200,open:document.getElementById('ms-add-goal').open};},mbB);
   ok(mb.a&&mb.b,'mobile: "Add your own goal" and "Add a snapshot" buttons are visible');
