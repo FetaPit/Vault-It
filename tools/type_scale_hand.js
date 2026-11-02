@@ -23,6 +23,13 @@ const E = [
   ['Budget card sub-line wraps under the amount (keeps the D2 titles clear at 10.5 px)',
     ".bd-tile-sum small{font:max(.5rem,var(--vi-fs-1)) 'Share Tech Mono',monospace;color:var(--t3);font-weight:400}",
     ".bd-tile-sum small{font:max(.5rem,var(--vi-fs-1))/1.2 'Share Tech Mono',monospace;color:var(--t3);font-weight:400;white-space:normal;max-width:7ch;text-align:right}"],
+  ['Pedro review 1: KPI labels on one line, badges clear of icons and labels, 3D key line wraps',
+    "#topnav .vi-pro{background:rgb(var(--orange-rgb) / .16);color:var(--orange);border:1px solid rgb(var(--orange-rgb) / .5)}\n",
+    "#topnav .vi-pro{background:rgb(var(--orange-rgb) / .16);color:var(--orange);border:1px solid rgb(var(--orange-rgb) / .5)}\n"
+    + "/* v0.8 type scale, Pedro review 1: a badge never sits on its tab's icon or label (it sits on the tab's top edge, above both) */\n"
+    + "html body #topnav .vi-usp,html body #topnav .vi-pro{top:0;right:2px;left:auto;width:auto;line-height:1;padding:1px 3px}html body #topnav .vi-pro{padding:0 3px}   /* about 11 px tall: clears the icon (11 px down) and the label (13 px down) */\n"
+    + "@media (max-width:699.98px){.ov-kpi-lbl{display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em!important}.ov-kpi-lbl .ov-kpi-ic{display:inline-block;vertical-align:-3px;margin-right:4px}}@media (max-width:459.98px){.ov-kpi-lbl .ov-kpi-ic{display:none}}   /* KPI labels on one line; under 460 the tile's coloured top edge stands in for the icon */\n"
+    + ".vp-key{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.45;text-wrap:balance}   /* the 3D key wraps onto centred lines rather than losing its end */\n"],
   // Roadmap SVG: real-pixel text (the SVG is not scaled), so the attribute sizes are the drawn sizes
   ['roadmap phase label',
     `text-anchor="middle" font-size="7.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.6')+'" letter-spacing="2.5">`,

@@ -18,6 +18,7 @@ const KEEP = [
   '.nw-more-btns button{',   // C2 Net worth pills: 10 px caps, measured to fit one row at 390
   '.bd-tile-tt b{',          // D2 Budget card titles: .77rem caps, two balanced lines measured to fit (Pedro passed D2 item 1)
   '.hud-bar',                // the house builder 3D viewport's own HUD (hard rule: not touched)
+  /(^|[^b])tab-btn\b/,       // the nav tabs: sized to fit all seven tabs (Pedro's KEEP list); not .subtab-btn
 ];
 const tierOf = (n, u) => u === 'rem' ? (n < 0.56 ? 1 : n < 0.70 ? 2 : n < 0.81 ? 3 : 0) : (n < 10.5 ? 1 : 0);
 const counts = { 0: 0, 1: 0, 2: 0, 3: 0 };
@@ -44,7 +45,7 @@ function isButton(s, i) {
 function lineOf(s, i) { return s.slice(s.lastIndexOf('\n', i) + 1, (s.indexOf('\n', i) + 1 || s.length + 1) - 1); }
 function floorFor(s, i, n, u) {
   let t = tierOf(n, u); if (!t) return null;
-  if (KEEP.some(k => lineOf(s, i).includes(k))) return null;
+  const ln = lineOf(s, i); if (KEEP.some(k => typeof k === 'string' ? ln.includes(k) : k.test(ln))) return null;
   if (capsSyne(context(s, i))) t = isButton(s, i) ? Math.max(t, 2) : 0;   // caps Syne: buttons 11.5 px, labels and eyebrows 10 px
   counts[t]++; return `var(--vi-fs-${t})`;
 }

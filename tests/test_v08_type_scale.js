@@ -29,7 +29,7 @@ const OFF = ':root{--vi-fs-0:0px!important;--vi-fs-1:0px!important;--vi-fs-2:0px
   for (const m of body.matchAll(/font-size\s*:\s*(\d*\.?\d+)(rem|px)(?![\w(])/g)) {
     const n = +m[1], u = m[2]; if (u === 'rem' ? n >= 0.81 : n >= 10.5) continue;
     const line = body.slice(body.lastIndexOf('\n', m.index) + 1, body.indexOf('\n', m.index));
-    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar/.test(line)) continue;   // KEEP rules (C2 pills, D2 card titles, house viewport HUD)
+    if (/\.nw-more-btns button\{|\.bd-tile-tt b\{|\.hud-bar|(^|[^b])tab-btn\b/.test(line)) continue;   // KEEP rules (C2 pills, D2 card titles, house viewport HUD)
     bare.push(line.trim().slice(0, 90));
   }
   for (const m of body.matchAll(/max\((\d*\.?\d+)rem,var\(--vi-fs-(\d)\)\)/g)) {
@@ -120,6 +120,18 @@ function measure() {
     const st = () => page.evaluate(() => { const c = document.querySelector('#houseSceneCard canvas'); if (!c) return 'none'; const r = c.getBoundingClientRect(); return Math.round(r.width) + 'x' + Math.round(r.height); });
     const s1 = await st(); await page.addStyleTag({ content: OFF }); await page.waitForTimeout(400); const s0 = await st();
     ok(s1 === s0 && s1 !== 'none', `${w}: 3D house stage size unchanged by the floors (${s1} vs ${s0})`);
+    // Pedro review 1: badges clear of their tab's icon and label; the 3D key wraps rather than losing its end; KPI labels on one line
+    const fit = await page.evaluate(() => { const hit = (a, b) => Math.min(a.right, b.right) - Math.max(a.left, b.left) > 0.5 && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 0.5;
+      const bad = [...document.querySelectorAll('#topnav .vi-usp,#topnav .vi-pro')].filter(x => x.offsetParent).filter(bd => { const t = bd.closest('.tab-btn'), br = bd.getBoundingClientRect(), lb = t.querySelector('.nav-tab-label');
+        return hit(br, t.querySelector('svg').getBoundingClientRect()) || (lb && lb.offsetParent && hit(br, lb.getBoundingClientRect())); }).map(x => x.textContent);
+      const tabs = document.querySelector('#topnav .vi-tabs'), key = document.querySelector('#houseSceneCard .vp-key');
+      showTab('overview'); const kpi = [...document.querySelectorAll('#ov-page .ov-kpi-lbl')].filter(e => e.offsetParent);
+      return { bad, tabsOver: tabs.scrollWidth - tabs.clientWidth, keyCut: key && key.offsetParent ? key.scrollWidth > key.clientWidth + 1 : false,
+        kpiCut: kpi.filter(e => e.scrollWidth > e.clientWidth + 1).map(e => e.textContent.trim()), kpiTall: kpi.filter(e => e.getBoundingClientRect().height > parseFloat(getComputedStyle(e).fontSize) * 2).map(e => e.textContent.trim()) }; });
+    ok(fit.bad.length === 0, `${w}: USP/PRO badges clear of their tab's icon and label (${fit.bad.join(',')})`);
+    ok(fit.tabsOver <= 1, `${w}: all tabs fit in the tab row (${fit.tabsOver} px over)`);
+    ok(!fit.keyCut, `${w}: the 3D key line is not cut off`);
+    ok(fit.kpiCut.length === 0 && fit.kpiTall.length === 0, `${w}: dashboard KPI labels on one line, none cut (${fit.kpiCut.concat(fit.kpiTall).join(',')})`);
     await ctx.close();
   }
   // the Roadmap's phone carousel still fades the coins away from the centre (its scale floor is 1 so names keep their size)
