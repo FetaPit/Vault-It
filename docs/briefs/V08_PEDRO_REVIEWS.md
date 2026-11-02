@@ -61,3 +61,9 @@ My own shots, seeded with £25,300 cash and 40 oz gold plus 20 oz silver, agains
 - Cash body colour: better. The 1100 median moves from olive #90914D to warm #A48538, so the yellow-green cast is gone.
 1. The coin tops have gone grey. At 1100 the bright end (p90) is #A79871, a beige-grey, where before it was #ADB385. At 390 it is #BBB186. From a normal distance the top faces are most of what you see, so the stacks read as dull brass rather than warm gold. Raise the top highlight (A2's one number in `v3Matcap`) until the p90 of the gold pixels sits between #D8B860 and #E8C56A at 1100 and 390, with saturation kept, not just brightness. Keep the edge band lighter than the face.
 Not a regression: at 390 the stacks are small and dark both before and after (median about #45 3E 24). The brighter tops will help; framing is not in this round.
+
+## D2, v08/cards fd8e30e (round 2 of 2)
+Items 1 to 3 PASS at 390 and 1440 in Night and Daylight: the £ figure is now the gold hero, the prose is capped at 72ch, and the three emoji are gone (with vi-pin in the button).
+Item 4 (Level 2, sent after round 1) is still open: the stats have no icon cells, and 🔑, 🧮 and 🔒 are still there (390 shot, houseMode purchased).
+The 💡 in the shared Budget tip goes too: use `vi-info` at 14 px in `var(--gold)`.
+When item 4 and the 💡 change land, D2 is a PASS with no further round: this is a mechanical finish of an agreed spec, and I'll confirm it from one 390 shot.
