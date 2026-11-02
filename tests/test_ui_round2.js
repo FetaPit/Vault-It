@@ -105,7 +105,7 @@ async function open(b, theme, w, phone) {
         same: JSON.stringify(proj.map(x => Math.round(x.nw))) === JSON.stringify(d.nw.slice(d.today + 1)) };
     });
     ok(!r.hid && r.w >= r.inner - 2 && r.align === 'left' && r.fs === 10.5 && r.info, T + 'the forecast note spans the tile (' + Math.round(r.w) + ' of ' + Math.round(r.inner) + ' px, ' + r.align + ')');
-    ok(/your Budget adds/.test(r.txt) && /Savings grow at 1\.65% a year \(Bank of England average for easy-access savings\)/.test(r.txt) && /investments at 5% \(FCA mid projection\)/.test(r.txt) && /Debts follow your APR and budgeted repayments/.test(r.txt) && /debt payments|no debt payments/.test(r.txt) && /an estimate from what you've entered, not a prediction/i.test(r.txt) && !/—/.test(r.txt) && !/straight line/.test(r.txt),
+    ok(/your Budget adds/.test(r.txt) && /Assumes 1\.65% a year on savings \(Bank of England easy-access average\) and 5% on investments \(FCA middle projection\), on what you have now plus what you budget each month/.test(r.txt) && /Real returns vary\./.test(r.txt) && !/\bwill\b|expected/i.test(r.txt) && /Debts follow your APR and budgeted repayments/.test(r.txt) && /debt payments|no debt payments/.test(r.txt) && /an estimate from what you've entered, not a prediction/i.test(r.txt) && !/—/.test(r.txt) && !/straight line/.test(r.txt),
       T + 'the note says what the forecast rests on: "' + r.txt.slice(0, 110) + '..."');
     ok(r.same, T + 'the 3D progress blocks forecast the same months as the graph');
 
