@@ -20,7 +20,7 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
       const pts = document.getElementById('nwChart')._points || [], real = pts.filter(x => !x.synth).length, el = document.getElementById('nw-fc-note'), e3 = document.getElementById('nw3d-fc-note');
       const cs = getComputedStyle(el); return { real, txt: el.textContent, hid: el.hidden, t3: e3 && e3.textContent, align: cs.textAlign, proj: document.getElementById('nwChart')._proj.length }; });
     // v0.7 UI round 2 (owner, 2 Nov): the forecast comes from the Budget, the note runs the full width, the 3D card carries none
-    ok(!r.hid && /from your Budget only/.test(r.txt) && /not a prediction/.test(r.txt) && r.align === 'left' && r.proj === 6, T + 'the forecast note says it comes from the Budget, and that it is not a prediction (' + r.proj + ' months)');
+    ok(!r.hid && /^6-month estimate, not a prediction\. Your Budget/.test(r.txt) && /not a prediction/.test(r.txt) && r.align === 'left' && r.proj === 6, T + 'the forecast note says it comes from the Budget, and that it is not a prediction (' + r.proj + ' months)');
     ok(r.t3 == null, T + 'the 3D progress card carries no forecast note');
     ok(!/—/.test(r.txt), T + 'no em dashes in the note');
     r = await p.evaluate(() => { chartState.metrics.proj = false; drawChart(); const h = document.getElementById('nw-fc-note').hidden; chartState.metrics.proj = true; drawChart(); return h; });
@@ -29,7 +29,7 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     r = await p.evaluate(() => { const keep = JSON.stringify(ovState.snapshots || []); ovState.snapshots = []; drawChart();
       const out = { txt: document.getElementById('nw-fc-note').textContent, proj: document.getElementById('nwChart')._proj.length, real: (document.getElementById('nwChart')._points || []).filter(x => !x.synth).length };
       ovState.snapshots = JSON.parse(keep); drawChart(); return out; });
-    ok(r.real === 1 && r.proj === 6 && /from your Budget only/.test(r.txt), T + 'with only this month known the forecast still comes from the budget (' + r.proj + ' months)');
+    ok(r.real === 1 && r.proj === 6 && /^6-month estimate, not a prediction\. Your Budget/.test(r.txt), T + 'with only this month known the forecast still comes from the budget (' + r.proj + ' months)');
     // 2. assets and liabilities: one proportional scale per card
     r = await p.evaluate(() => { renderSummaryCards(); const card = (id) => { const el = document.getElementById(id);
         const rows = [...el.querySelectorAll('.ov-sum-drow')].map(d => ({ v: d.querySelector('.ov-sum-v').textContent, w: d.querySelector('.ov-sum-sbar span').getBoundingClientRect().width, tw: d.querySelector('.ov-sum-sbar').getBoundingClientRect().width }));
