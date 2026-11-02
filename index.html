@@ -27892,6 +27892,12 @@ function clamp(v,a,b){return v<a?a:v>b?b:v}
 function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
 function rgba(c,a){return "rgba("+(c[0]|0)+","+(c[1]|0)+","+(c[2]|0)+","+a.toFixed(3)+")"}
 function ease3(t){return 1-Math.pow(1-t,3)}
+/* a column's block colour as a label colour: the colour itself, lightened toward white only until it reads on the dark label plate (4.5:1 AA needed, 5:1 aimed for) */
+var LABC={};
+function labCol(cc){var col=cc.col;if(!col)return cc.dir<0?rgba(PAL.red,.95):rgba(PAL.gold,.95);var k=col.join(","),h=LABC[k];if(h)return h;
+  var lum=function(v){var f=function(x){x/=255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)};return .2126*f(v[0])+.7152*f(v[1])+.0722*f(v[2])},t=0,o=col;
+  while(t<.9){o=col.map(function(v){return Math.round(v+(255-v)*t)});if((lum(o)+.05)/(lum([8,8,8])+.05)>=5)break;t+=.02}
+  return LABC[k]=rgba(o,.95)}
 /* build/intro timings, ms (owner, 2 Nov: all 3D build animations were too fast, slowed by 100%: every duration doubled) */
 var NW_D={drop:1400,flash:2000,leave:1800,dropStep:120,subStep:80,stack:1400,stackStep:90,pileMs:1800,goMs:1700,spread:4200,cellStep:140,land:1000};
 var LD=(function(){var v=[-.45,.7,.55],l=Math.hypot(v[0],v[1],v[2]);return [v[0]/l,v[1]/l,v[2]/l]})();
@@ -28100,7 +28106,7 @@ function makeNW(cv,o){
       for(var j=0;j<3&&r<0;j++){var yy=L.q[1]+j*(lf+3),x0=L.q[0]-w/2-3,x1=L.q[0]+w/2+3;if(!placed.some(function(B){return Math.abs(B.y-yy)<lf+2&&x0<B.x1&&x1>B.x0}))r=j}
       if(r<0)return;placed.push({x0:L.q[0]-w/2-3,x1:L.q[0]+w/2+3,y:L.q[1]+r*(lf+3)});
       var ly=L.q[1]+r*(lf+3);c.fillStyle="rgba(8,8,8,.72)";c.fillRect(L.q[0]-w/2-3,ly-lf*1.05,w+6,lf*1.5);   /* the income flow's label plate: transparent black behind the name (owner, 31 Oct) */
-      c.fillStyle=L.c.dir<0?rgba(PAL.red,.95):rgba(PAL.gold,.95);if(hover===L.c.key)c.fillStyle='#fff';   /* what you own in gold, like the dashboard tag; debts stay red */c.fillText(L.c.short,L.q[0],ly)})}
+      c.fillStyle=labCol(L.c);if(hover===L.c.key)c.fillStyle='#fff';   /* each name in its own column's colour (owner, 2 Nov), lightened only as far as the dark label plate needs to read */c.fillText(L.c.short,L.q[0],ly)})}
     if(narrow){items.forEach(function(g){if(g.dir>0)paint(g)});names(true);names(false)}   /* phones: names on top of the blocks, so none hides behind a column */
     else{names(true);items.forEach(function(g){if(g.dir>0)paint(g)});names(false)}
     var l1=debt<=0&&net>=0?"OUT OF THE RED":red?"IN THE RED":"NET WORTH";
