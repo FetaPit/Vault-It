@@ -16420,6 +16420,7 @@ function setViewFlag(name, on, btn) {   // Settings: 3D or classic net worth cha
   if (!on) return;
   var S = { frames: 0, dts: [], orbit: [], draws: [], over33: 0, longN: 0, longMax: 0, last: 0, tabAt: null, firstFrameMs: null, build: null, lay: null, dragging: false, v: null };
   var MAXN = 400;
+  var S3 = { name: null, dts: [], over33: 0, last: 0, frames: 0 };   // the coin and metals stages (v0.8, owner 2 Nov: the overlay named the house while on Cash and savings)
   function pct(a, q) { if (!a.length) return null; var s = a.slice().sort(function (x, y) { return x - y; }); return s[Math.min(s.length - 1, Math.floor(q * s.length))]; }
   function f1(x) { return x == null ? '-' : (Math.round(x * 10) / 10).toString(); }
   function glInfo(v) {
@@ -16436,20 +16437,24 @@ function setViewFlag(name, on, btn) {   // Settings: 3D or classic net worth cha
       longN: S.longN, longMax: S.longMax, heapMB: mem ? Math.round(mem.usedJSHeapSize / 1048576) : null, dpr: v && v.renderer ? v.renderer.getPixelRatio() : window.devicePixelRatio,
       canvas: cv ? cv.width + 'x' + cv.height : null, gl: v && v.renderer ? glInfo(v) : null, bricks: v && v.model ? v.model.counts.bricks : null, bricksTotal: info ? info.bricksTotal : null,
       engine: v ? (v.engine === 'house_gl' ? 'house_gl · one instanced draw' + (v._bCalm ? ' · at rest' : ' · live') : 'three.js r' + (window.THREE ? THREE.REVISION : '?') + (v.brand ? ' · brand shaders' : ' · standard') + (v._bLite ? ' · lite' : (v._bCalm ? ' · at rest' : ' · full'))) : 'not started',
-      firstFrameMs: S.firstFrameMs, buildMs: S.build, layMs: S.lay, orbitP95: pct(S.orbit, 0.95), orbitN: S.orbit.length, type: sm.type || (window.state && state.houseType) || null };
+      firstFrameMs: S.firstFrameMs, buildMs: S.build, layMs: S.lay, orbitP95: pct(S.orbit, 0.95), orbitN: S.orbit.length, type: sm.type || (window.state && state.houseType) || null,
+      viewport: S3.last > S.last ? S3.name : 'house builder', stageFrames: S3.frames, stageP50: pct(S3.dts, 0.5), stageP95: pct(S3.dts, 0.95), stageOver33: S3.over33 };
   }
   function lines(k) {
-    return ['fps ' + k.fps + '   frames ' + k.frames, 'frame ms p50 ' + f1(k.p50) + ' · p95 ' + f1(k.p95) + ' · max ' + f1(k.max), 'frames >33 ms: ' + k.over33,
+    var st = k.viewport && k.viewport !== 'house builder' ? ['viewport ' + k.viewport + ' (three.js, matcap) · stage frames ' + k.stageFrames + ' · p50 ' + f1(k.stageP50) + ' · p95 ' + f1(k.stageP95) + ' ms · >33 ms: ' + k.stageOver33, 'house figures below are from its last visit'] : ['viewport house builder'];
+    return st.concat(['fps ' + k.fps + '   frames ' + k.frames, 'frame ms p50 ' + f1(k.p50) + ' · p95 ' + f1(k.p95) + ' · max ' + f1(k.max), 'frames >33 ms: ' + k.over33,
       'long tasks ' + k.longN + ' · worst ' + f1(k.longMax) + ' ms', 'JS heap ' + (k.heapMB == null ? 'n/a' : k.heapMB + ' MB'),
       'DPR ' + f1(k.dpr) + ' · canvas ' + (k.canvas || '-'), 'renderer ' + (k.gl || '-'), 'bricks ' + (k.bricks == null ? '-' : k.bricks) + (k.bricksTotal ? ' (' + k.bricksTotal + ' UK)' : ''),
       'engine ' + k.engine, 'first 3D frame ' + (k.firstFrameMs == null ? 'waiting' : f1(k.firstFrameMs) + ' ms from House tab'), 'build ' + f1(k.buildMs) + ' ms · lay ' + f1(k.layMs) + ' ms',
-      'orbit p95 ' + f1(k.orbitP95) + ' ms (' + k.orbitN + ' frames)'];
+      'orbit p95 ' + f1(k.orbitP95) + ' ms (' + k.orbitN + ' frames)']);
   }
   function report() {
     var k = snapshot();
     return ['Vault-It performance report', 'date ' + new Date().toISOString(), 'userAgent ' + navigator.userAgent, 'viewport ' + innerWidth + 'x' + innerHeight, 'devicePixelRatio ' + window.devicePixelRatio, 'house type ' + (k.type || '-'), ''].concat(lines(k)).join('\n');
   }
   window.VIPERF = { snapshot: snapshot, report: report,
+    stageFrame: function (name) { var t = performance.now(); if (S3.name !== name) { S3.name = name; S3.dts = []; S3.over33 = 0; S3.frames = 0; S3.last = 0; } S3.frames++;
+      if (S3.last) { var dt = t - S3.last; if (dt < 1000) { S3.dts.push(dt); if (S3.dts.length > MAXN) S3.dts.shift(); if (dt > 33) S3.over33++; } } S3.last = t; },
     mark: function (n) { if (n === 'tab') { S.tabAt = performance.now(); S.firstFrameMs = null; } },
     phase: function (n, ms) { S[n] = ms; } };
   // the engine calls this once per drawn frame
@@ -20550,7 +20555,7 @@ function computeNetWorth(){return alTotalAssets()+totalAssets()-alTotalLiab()-de
 // Falls back to the older drawings if 3D is not available on the device.
 // ═══════════════════════════════════════════════════════════════
 var V3={};
-function v3Ok(){try{if(!window.THREE||!THREE.OrbitControls)return false;if(V3._gl===undefined){var c=document.createElement('canvas');V3._gl=!!(c.getContext('webgl')||c.getContext('experimental-webgl'));}return V3._gl;}catch(e){return false;}}
+function v3Ok(){try{if(!window.THREE||!THREE.OrbitControls)return false;if(V3._r)return true;return viGlOk();}catch(e){return false;}}   // the app's one cached WebGL check (a second probe context cost a phone half a second at the tap)
 function v3Col(h){return new THREE.Color(h).convertSRGBToLinear();}
 var V3_COINS={   // real sizes (cm): diameter, thickness, edge sides; outer and inner metal colours
   GBP:{d:2.343,t:0.28,sides:12,outer:'#C8A445',inner:'#C9CDD2',sym:'£',name:'£1'},
@@ -20565,37 +20570,39 @@ var OZ_G=31.1035;
 function viCoarse(){try{return !!(window.matchMedia&&matchMedia('(pointer: coarse)').matches)}catch(e){return false}}
 function viGlDpr(host){var w=Math.max(1,host.clientWidth||300),h=Math.max(1,host.clientHeight||200),budget=viCoarse()?2.2e6:4e6;return Math.max(1,Math.min(window.devicePixelRatio||1,viCoarse()?1.5:2,Math.sqrt(budget/(w*h))));}
 // the House Builder's look (src/hb3d/viewer.js): same sky, fog, ground, grid and lights
-function V3Scene(host,label){
-  var self=this;this.host=host;
-  var r=this.r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:true});r.setClearColor(0x000000,0);   /* transparent: the Net worth in 3D stage shows through (owner, 31 Oct) */
-  r.setPixelRatio(viGlDpr(host));r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;
-  r.domElement.addEventListener('webglcontextlost',function(e){e.preventDefault();self._lost=true;});r.domElement.addEventListener('webglcontextrestored',function(){self._lost=false;self.kick(800);});
-  r.shadowMap.enabled=true;r.shadowMap.type=viCoarse()?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;   // touch devices: the cheaper filter and a smaller map
-  var cv=r.domElement;cv.className='v3-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',label);
+/* one WebGL renderer for the cash and the metals stage (one is on screen at a time): one context and one set of compiled shaders,
+   created ahead of time in an idle moment (v3Warm) rather than when the tab is tapped. The canvas moves to whichever stage draws. */
+function v3Renderer(){if(V3._r)return V3._r;
+  var r=V3._r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:true});r.setClearColor(0x000000,0);   /* transparent: the Net worth in 3D stage shows through (owner, 31 Oct) */
+  r.setPixelRatio(1);r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;
+  r.shadowMap.enabled=false;   /* v0.7 (owner, 2 Nov: "learn from" the house builder's viewport): no real-time shadow pass; a baked contact shadow sits under the content */
+  var cv=r.domElement;cv.className='v3-canvas';cv.setAttribute('role','img');
   cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none';
-  host.insertBefore(cv,host.firstChild);
+  cv.addEventListener('webglcontextlost',function(e){e.preventDefault();[V3.cash,V3.metals].forEach(function(v){if(v)v._lost=true;});});
+  cv.addEventListener('webglcontextrestored',function(){[V3.cash,V3.metals].forEach(function(v){if(v){v._lost=false;v._w=0;v.kick(800);}});});
+  return r;}
+function V3Scene(host,label){
+  var self=this;this.host=host;this.label=label;
+  var r=this.r=v3Renderer(),cv=r.domElement;
+  host.style.touchAction='none';this._attach();
   var sc=this.sc=new THREE.Scene();sc.background=null;sc.fog=new THREE.Fog(0x080808,600,1600);
   sc.add(new THREE.HemisphereLight(v3Col(0xa8dcd6),v3Col(0x10302e),0.66));
-  var sun=this.sun=new THREE.DirectionalLight(v3Col(0xfff0de),1.2);sun.castShadow=true;var sms=viCoarse()?1024:2048;sun.shadow.mapSize.set(sms,sms);sun.shadow.bias=-0.0004;sun.shadow.normalBias=0.02;sc.add(sun);sc.add(sun.target);
+  var sun=this.sun=new THREE.DirectionalLight(v3Col(0xfff0de),1.2);sun.castShadow=false;sc.add(sun);sc.add(sun.target);
   var fill=new THREE.DirectionalLight(v3Col(0x6fb8d8),0.35);fill.position.set(-200,120,-100);sc.add(fill);
   this.ground=new THREE.Mesh(new THREE.CircleBufferGeometry(5000,64),new THREE.MeshStandardMaterial({color:v3Col(0x0c1a20),roughness:1}));
   this.ground.rotation.x=-Math.PI/2;this.ground.position.y=-0.02;this.ground.visible=false;sc.add(this.ground);   /* the stage itself is the floor now */
   // shadows fall on a shadow-only plane sized to the content (the big floor stays evenly lit)
-  this.catcher=new THREE.Mesh(new THREE.PlaneBufferGeometry(1,1),new THREE.ShadowMaterial({opacity:0.38}));this.catcher.rotation.x=-Math.PI/2;this.catcher.position.y=0.005;this.catcher.receiveShadow=true;sc.add(this.catcher);
+  this.catcher=new THREE.Mesh(new THREE.PlaneBufferGeometry(1,1),new THREE.MeshBasicMaterial({map:v3ContactTex(),transparent:true,depthWrite:false,fog:false,toneMapped:false}));this.catcher.rotation.x=-Math.PI/2;this.catcher.position.y=0.005;this.catcher.receiveShadow=true;sc.add(this.catcher);
   this.grid=null;
-  // soft studio reflections so metal reads as metal
-  try{var pm=new THREE.PMREMGenerator(r),es=new THREE.Scene(),cvs=document.createElement('canvas');cvs.width=4;cvs.height=64;var g=cvs.getContext('2d'),gr=g.createLinearGradient(0,0,0,64);gr.addColorStop(0,'#cfe9e6');gr.addColorStop(.45,'#3c6b6a');gr.addColorStop(1,'#071216');g.fillStyle=gr;g.fillRect(0,0,4,64);
-    var tx=new THREE.CanvasTexture(cvs);es.add(new THREE.Mesh(new THREE.SphereBufferGeometry(50,32,16),new THREE.MeshBasicMaterial({map:tx,side:THREE.BackSide})));
-    var panel=new THREE.Mesh(new THREE.PlaneBufferGeometry(30,12),new THREE.MeshBasicMaterial({color:0xffffff}));panel.position.set(0,30,-20);panel.lookAt(0,0,0);es.add(panel);
-    this.env=pm.fromScene(es,0.04).texture;pm.dispose();}catch(e){this.env=null;}
+  this.env=null;   /* v0.7: no PMREM reflection map (it cost a phone up to a second at every open); the studio sheen is baked into v3Matcap() */
   this.root=new THREE.Group();sc.add(this.root);
   var cam=this.cam=new THREE.PerspectiveCamera(36,1,0.5,8000);
-  var ctl=this.ctl=new THREE.OrbitControls(cam,cv);
+  var ctl=this.ctl=new THREE.OrbitControls(cam,host);   // controls on the stage's own box: the shared canvas moves between stages
   ctl.enableDamping=true;ctl.dampingFactor=0.09;ctl.rotateSpeed=0.8;ctl.maxPolarAngle=Math.PI/2-0.04;ctl.screenSpacePanning=true;
   ctl.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
   ctl.addEventListener('change',function(){self.kick();});
   // draws only while something moves (orbit, spin, a kick after a change), never off screen or in a background tab
-  this._loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}self.size();var moving=self.ctl.update();var t=performance.now();self.r.render(self.sc,self.cam);
+  this._loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}self._attach();self.size();var moving=self.ctl.update();var t=performance.now();self.r.render(self.sc,self.cam);if(window.VIPERF&&VIPERF.stageFrame)VIPERF.stageFrame(self===V3.metals?'Precious metals bars':'Cash and savings coins');
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}   // adaptive quality from the measured frame gap
     self._lastT=moving?t:0;
     if(moving||self._spin||Date.now()<self._until)self.raf=requestAnimationFrame(self._loop);};
@@ -20605,29 +20612,31 @@ function V3Scene(host,label){
   document.addEventListener('visibilitychange',function(){if(!document.hidden)self.kick(200);});
 }
 // lite quality for a device that cannot keep up (under ~14 frames a second while orbiting): shadows off, pixel ratio 1
+V3Scene.prototype._attach=function(){var cv=this.r.domElement;if(cv.parentNode!==this.host){this.host.insertBefore(cv,this.host.firstChild);cv.setAttribute('aria-label',this.label);this._w=0;}};   // the shared canvas comes to this stage (it was on the other one, or nowhere yet)
 V3Scene.prototype.goLite=function(){if(this._lite)return;this._lite=true;this.r.shadowMap.enabled=false;this.sun.castShadow=false;this.r.setPixelRatio(1);this._w=0;
   this.sc.traverse(function(o){var m=o.material;if(!m)return;(Array.isArray(m)?m:[m]).forEach(function(x){x.needsUpdate=true;});});this.kick(300);};
-V3Scene.prototype.size=function(){var w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;if(w!==this._w||h!==this._h){this._w=w;this._h=h;this.r.setSize(w,h,false);this.cam.aspect=w/h;this.cam.updateProjectionMatrix();}};
+V3Scene.prototype.size=function(){var w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;if(w!==this._w||h!==this._h||this.r._v3on!==this){this._w=w;this._h=h;this.r._v3on=this;var pr=this._lite?1:viGlDpr(this.host);if(this.r.getPixelRatio()!==pr)this.r.setPixelRatio(pr);this.r.setSize(w,h,false);this.cam.aspect=w/h;this.cam.updateProjectionMatrix();}};   // the shared renderer takes this stage's size and pixel ratio
 V3Scene.prototype.kick=function(ms){this._until=Math.max(this._until||0,Date.now()+(ms||600));if(!this.raf)this.raf=requestAnimationFrame(this._loop);};
-V3Scene.prototype.clear=function(){var g=this.root;while(g.children.length){var o=g.children.pop();o.traverse(function(m){if(m.geometry)m.geometry.dispose();var ms=m.material?(Array.isArray(m.material)?m.material:[m.material]):[];ms.forEach(function(x){if(x.map)x.map.dispose();x.dispose();});});}};
+V3Scene.prototype.clear=function(){var g=this.root,keep=function(x){return x&&x.userData&&x.userData.keep;};while(g.children.length){var o=g.children.pop();o.traverse(function(m){if(m.isInstancedMesh&&m.dispose)m.dispose();if(m.geometry&&!keep(m.geometry))m.geometry.dispose();var ms=m.material?(Array.isArray(m.material)?m.material:[m.material]):[];ms.forEach(function(x){if(keep(x))return;if(x.map&&!keep(x.map))x.map.dispose();x.dispose();});});}};   // the kept coin and bar shapes and materials are reused by the next build
 // survey grid sized to the content (cell 5 cm), framed like the House Builder: three-quarter view from above
 V3Scene.prototype.frame=function(keep){
   this.size();
   var box=new THREE.Box3().setFromObject(this.root),m4=new THREE.Matrix4(),gb=new THREE.Box3();
   this.root.updateMatrixWorld(true);
-  this.root.traverse(function(o){if(!o.isInstancedMesh||!o.count)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();   // batched coins: measure every instance, not just the one coin shape
-    for(var i=0;i<o.count;i++){o.getMatrixAt(i,m4);m4.premultiply(o.matrixWorld);box.union(gb.copy(o.geometry.boundingBox).applyMatrix4(m4));}});
+  this.root.traverse(function(o){if(!o.isInstancedMesh||!o.count)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();   // batched coins and bars: every instance counts, not just the one shape
+    var a=o.instanceMatrix.array,x0=1e9,y0=1e9,z0=1e9,x1=-1e9,y1=-1e9,z1=-1e9;for(var i=0,k=12;i<o.count;i++,k+=16){var x=a[k],y=a[k+1],z=a[k+2];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z;}   // instances are placed by translation only: one pass over the matrices, not a box per instance (seconds on a phone for 2,500 stacks)
+    var bb=o.geometry.boundingBox;gb.min.set(x0+bb.min.x,y0+bb.min.y,z0+bb.min.z);gb.max.set(x1+bb.max.x,y1+bb.max.y,z1+bb.max.z);box.union(gb.applyMatrix4(o.matrixWorld));});
   if(box.isEmpty())box.set(new THREE.Vector3(-20,0,-20),new THREE.Vector3(20,5,20));
   var c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3()),R=Math.max(s.x,s.z,s.y*1.6,20);
-  this.catcher.scale.set(R*3,R*3,1);this.catcher.position.x=c.x;this.catcher.position.z=c.z;
+  this.catcher.scale.set(s.x*1.25+2,s.z*1.25+2,1);this.catcher.position.x=c.x;this.catcher.position.z=c.z;   // the baked contact shadow, just wider than the content
   if(this.grid){this.sc.remove(this.grid);this.grid.geometry.dispose();this.grid.material.dispose();}
   this.R=R;var size=Math.ceil(R*7/10)*10,cell=Math.max(5,Math.ceil(size/160/5)*5),div=Math.round(size/cell);   /* owner, 31 Oct: a shorter draw distance, so the scene is lighter; the grid fades out in the fog, no hard edge */
   var g=this.grid=new THREE.GridHelper(size,div,0x44C0B9,0x44C0B9);g.material.transparent=true;g.material.opacity=0.3;g.material.depthWrite=false;g.material.fog=true;g.material.toneMapped=false;g.position.set(c.x,0.01,c.z);this.sc.add(g);
   /* the same floor as Net worth in 3D: a teal glow under the items and a gold-edged plinth round them */
-  if(this.deco){this.sc.remove(this.deco);this.deco.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}});}
+  if(this.deco){this.sc.remove(this.deco);this.deco.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map&&!(o.material.map.userData&&o.material.map.userData.keep))o.material.map.dispose();o.material.dispose();}});}
   var deco=this.deco=new THREE.Group(),pad=Math.max(2,R*0.08),px0=box.min.x-pad,px1=box.max.x+pad,pz0=box.min.z-pad,pz1=box.max.z+pad;
   var gc=document.createElement('canvas');gc.width=gc.height=128;var gx=gc.getContext('2d'),rg=gx.createRadialGradient(64,64,0,64,64,64);rg.addColorStop(0,'rgba(68,192,185,.22)');rg.addColorStop(1,'rgba(68,192,185,0)');gx.fillStyle=rg;gx.fillRect(0,0,128,128);
-  var glow=new THREE.Mesh(new THREE.PlaneBufferGeometry(R*3.2,R*3.2),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false,fog:false,toneMapped:false}));glow.rotation.x=-Math.PI/2;glow.position.set(c.x,0.004,c.z);deco.add(glow);
+  var glow=new THREE.Mesh(new THREE.PlaneBufferGeometry(R*3.2,R*3.2),new THREE.MeshBasicMaterial({map:V3_KEEP._glow||(V3_KEEP._glow=(function(t){t.userData={keep:true};return t;})(new THREE.CanvasTexture(gc))),transparent:true,depthWrite:false,fog:false,toneMapped:false}));glow.rotation.x=-Math.PI/2;glow.position.set(c.x,0.004,c.z);deco.add(glow);
   var fill=new THREE.Mesh(new THREE.PlaneBufferGeometry(px1-px0,pz1-pz0),new THREE.MeshBasicMaterial({color:0x0b2a2c,transparent:true,opacity:0.55,depthWrite:false,toneMapped:false}));fill.rotation.x=-Math.PI/2;fill.position.set((px0+px1)/2,0.008,(pz0+pz1)/2);deco.add(fill);
   var edge=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(px0,0.02,pz0),new THREE.Vector3(px1,0.02,pz0),new THREE.Vector3(px1,0.02,pz1),new THREE.Vector3(px0,0.02,pz1)]),new THREE.LineBasicMaterial({color:0xE8C56A,transparent:true,opacity:0.95,toneMapped:false}));deco.add(edge);
   this.sc.add(deco);
@@ -20644,24 +20653,46 @@ V3Scene.prototype.frame=function(keep){
 V3Scene.prototype.reset=function(){if(!this.home)return;this.cam.position.copy(this.home.p);this.ctl.target.copy(this.home.t);this.ctl.update();this.kick();};
 V3Scene.prototype.zoom=function(f){var t=this.ctl.target,v=this.cam.position.clone().sub(t),d=Math.min(this.ctl.maxDistance,Math.max(this.ctl.minDistance,v.length()*f));this.cam.position.copy(t).add(v.setLength(d));this.kick();};
 V3Scene.prototype.spin=function(on){this.ctl.autoRotate=!!on;this.ctl.autoRotateSpeed=1.2;this._spin=!!on;this.kick();};
-function v3Mat(hex,rough,metal,env){var m=new THREE.MeshStandardMaterial({color:v3Col(hex),roughness:rough,metalness:metal});if(env){m.envMap=env;m.envMapIntensity=1.1;}return m;}
+/* v0.7 (owner, 2 Nov 2026, fold test: the coins froze a phone; "the viewport for the house builder is perfect ... learn from that viewport
+   for the others"): the house builder's lessons. One cheap shader family with the shading baked in (a matcap: a small painted sphere of
+   the old studio light and sheen) instead of physically based metal with a generated reflection map and soft real-time shadows; the
+   coins, bars and their materials are built once and kept (marked keep, so a rebuild or clear never re-creates or re-uploads them). */
+var V3_KEEP={};
+function v3Keep(key,make){var v=V3_KEEP[key];if(!v){v=V3_KEEP[key]=make();var mark=function(x){if(x)x.userData=Object.assign(x.userData||{},{keep:true});};mark(v.geo);(v.mats||[]).forEach(function(m){mark(m);if(m.map)mark(m.map);});}return v;}
+function v3Matcap(){if(V3_KEEP._mc)return V3_KEEP._mc;var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d');
+  var b=g.createRadialGradient(64,V3_KEYY,0,64,64,64);b.addColorStop(0,'#ffffff');b.addColorStop(.55,'#f6f2e8');b.addColorStop(.82,'#d8d3c8');b.addColorStop(.93,'#f6f1e4');b.addColorStop(1,'#9a968d');g.fillStyle=b;g.fillRect(0,0,128,128);   /* key light from above; a bright band near the edge so rims read lighter than faces */
+  var h=g.createRadialGradient(46,34,0,46,34,40);h.addColorStop(0,'rgba(255,250,236,.85)');h.addColorStop(.5,'rgba(255,244,220,.25)');h.addColorStop(1,'rgba(255,244,220,0)');g.fillStyle=h;g.fillRect(0,0,128,128);   /* the studio panel's highlight */
+  var f=g.createRadialGradient(100,98,0,100,98,34);f.addColorStop(0,'rgba(111,184,216,.30)');f.addColorStop(1,'rgba(111,184,216,0)');g.fillStyle=f;g.fillRect(0,0,128,128);   /* the cool teal fill from the side */
+  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.userData={keep:true};return V3_KEEP._mc=t;}
+function v3Shade(o){var m=new THREE.MeshMatcapMaterial(Object.assign({matcap:v3Matcap(),toneMapped:false,fog:false},o));return m;}   // the baked shading is already final: no tone mapping, so the gold stays the brand's gold
+function v3ContactTex(){if(V3_KEEP._cs)return V3_KEEP._cs;var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d'),gr=g.createRadialGradient(64,64,8,64,64,64);
+  gr.addColorStop(0,'rgba(0,0,0,.42)');gr.addColorStop(.7,'rgba(0,0,0,.22)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);var t=new THREE.CanvasTexture(c);t.userData={keep:true};return V3_KEEP._cs=t;}
 // canvas textures: a coin edge (one band per coin) and a coin face with the currency symbol
+/* the coin's own colour, lifted toward a warm highlight for the faces and rims (Pedro, 2 Nov: tops read as dull brass; the matcap can only darken
+   a texture, so the texture carries the brightness), saturation kept */
+function v3IsGold(hex){var a=parseInt(hex.slice(1),16);return ((a>>16)&255)-(a&255)>30;}   // a warm metal (red well above blue): gold, brass; otherwise silver
+function v3Lift(hex,t){t=Math.max(0,Math.min(1,t));var a=parseInt(hex.slice(1),16),w=v3IsGold(hex)?V3_LIFTC:[0xE8,0xEB,0xEE],o=[(a>>16)&255,(a>>8)&255,a&255].map(function(c,i){return Math.round(c+(w[i]-c)*t)});return '#'+o.map(function(c){return ('0'+c.toString(16)).slice(-2)}).join('');}
+function v3Mix(a,b,t){var x=parseInt(a.slice(1),16),y=parseInt(b.slice(1),16);return '#'+[16,8,0].map(function(sh){var c=Math.round(((x>>sh)&255)*(1-t)+((y>>sh)&255)*t);return ('0'+c.toString(16)).slice(-2)}).join('');}
+/* coin gold, tuned so the gold pixels' bright end sits in the brand gold (#D8B860 to #E8C56A) at 390 and 1100 (Pedro, 2 Nov): the faces and rims
+   lifted 80% toward a warm gold (silver coins toward a neutral highlight, so they stay silver), the silver centre of a gold-ringed coin
+   mostly gold too (a few pixels across, it mipmaps to beige otherwise), the matcap's key light high where the coin tops sample it */
+var V3_INNER=0.92,V3_LIFTC=[0xF6,0xCB,0x6A],V3_KEYY=6,V3_LIFT=0.8;
 function v3CoinEdge(spec,n){var c=document.createElement('canvas');c.width=64;c.height=Math.max(16,n*16);var g=c.getContext('2d');
-  for(var i=0;i<n;i++){var y=i*16;g.fillStyle=spec.outer;g.fillRect(0,y,64,16);g.fillStyle='rgba(255,255,255,.18)';g.fillRect(0,y+2,64,3);g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+14,64,2);
+  for(var i=0;i<n;i++){var y=i*16;g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,y,64,16);g.fillStyle='rgba(255,236,170,.30)';g.fillRect(0,y+2,64,3);g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+14,64,2);
     if(spec.sides>12){g.fillStyle='rgba(0,0,0,.18)';for(var x=0;x<64;x+=4)g.fillRect(x,y+4,1,9);}}
   var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.wrapS=THREE.RepeatWrapping;t.repeat.x=spec.sides>12?6:1;return t;}
 function v3CoinFace(spec){var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d');
-  g.fillStyle=spec.outer;g.fillRect(0,0,128,128);
-  if(spec.inner){g.fillStyle=spec.inner;g.beginPath();g.arc(64,64,40,0,Math.PI*2);g.fill();}
+  g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,0,128,128);
+  if(spec.inner){g.fillStyle=v3IsGold(spec.outer)&&!v3IsGold(spec.inner)?v3Mix(spec.inner,v3Lift(spec.outer,V3_LIFT+.25),V3_INNER):v3Lift(spec.inner,V3_LIFT);g.beginPath();g.arc(64,64,40,0,Math.PI*2);g.fill();}
   g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=3;g.beginPath();g.arc(64,64,56,0,Math.PI*2);g.stroke();
   g.fillStyle='rgba(40,30,10,.55)';g.font='bold 54px Syne, sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(spec.sym,64,68);
   g.fillStyle='rgba(255,255,255,.25)';g.fillText(spec.sym,62,65);
   var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.center.set(.5,.5);t.rotation=-Math.PI/2;return t;}
-function v3Stack(spec,n,env){
-  var geo=new THREE.CylinderBufferGeometry(spec.d/2,spec.d/2,spec.t*n,spec.sides,1,false,spec.sides===12?Math.PI/12:0);
-  var side=new THREE.MeshStandardMaterial({map:v3CoinEdge(spec,n),roughness:.35,metalness:.85,envMap:env||null,envMapIntensity:1});
-  var face=new THREE.MeshStandardMaterial({map:v3CoinFace(spec),roughness:.3,metalness:.85,envMap:env||null,envMapIntensity:1});
-  return {geo:geo,mats:[side,face,face]};
+function v3Stack(spec,n){
+  return v3Keep('stack|'+spec.name+'|'+spec.d+'|'+n,function(){
+    var geo=new THREE.CylinderBufferGeometry(spec.d/2,spec.d/2,spec.t*n,spec.sides,1,false,spec.sides===12?Math.PI/12:0);
+    var face=v3Shade({map:v3CoinFace(spec)});
+    return {geo:geo,mats:[v3Shade({map:v3CoinEdge(spec,n)}),face,face]};});
 }
 // a label that always faces the camera
 /* the gold tag from Net worth in 3D (owner, 31 Oct: "flag post labels in gold, the same as the dashboard"): what it is in small capitals,
@@ -20681,39 +20712,54 @@ function v3Host(sceneEl,svgId){
   var h=sceneEl.querySelector('.v3-host');if(!h){h=document.createElement('div');h.className='v3-host';sceneEl.insertBefore(h,sceneEl.firstChild);}
   if(svg)svg.style.display='none';sceneEl.classList.add('v3-on');return h;
 }
-function v3Cash(){
-  if(!v3Ok())return false;
-  var card=document.getElementById('cashSceneCard'),scene=card&&card.querySelector('.scene');if(!scene)return false;
-  var host=v3Host(scene,'cashSvg');if(!host.clientWidth)return true;   // tab hidden: drawn when shown
-  var V=V3.cash||(V3.cash=new V3Scene(host,'3D view of your cash as coins'));V.clear();
-  var cur=(window.VI_CURRENCY||(typeof viSettings!=='undefined'&&viSettings.currency)||'GBP').toUpperCase(),spec=V3_COINS[cur]||V3_COINS.GBP;
-  var units=Math.max(0,Math.floor(alTotalCash()*(window.VI_CURRENCY_RATE||1)));
+/* the cash and metals content as a ready group, keyed by the data it shows: built at the tap, or ahead of it in the idle warm-up (CI, 2 Nov:
+   the metals open ran 117 to 175 ms of our own JavaScript on the slower runner; now the tap attaches a built group and frames it) */
+function v3CashKey(){var cur=(window.VI_CURRENCY||(typeof viSettings!=='undefined'&&viSettings.currency)||'GBP').toUpperCase(),spec=V3_COINS[cur]||V3_COINS.GBP,units=Math.max(0,Math.floor(alTotalCash()*(window.VI_CURRENCY_RATE||1)));
+  return {cur:cur,spec:spec,units:units,key:cur+'|'+units+'|'+(window.VI_CURRENCY_SYMBOL||'£')};}
+function v3MetalsKey(){return JSON.stringify([alState.metals,alState.metalPrices,window.VI_CURRENCY_RATE||1,window.VI_CURRENCY_SYMBOL||'£']);}
+function v3Pre(name,key){var p=V3._pre&&V3._pre[name];if(p&&p.key===key){V3._pre[name]=null;return p;}return null;}
+function v3CashContent(spec,units,cur){var G=new THREE.Group();
   var STACK=10,PER_BLOCK=1000,pitch=spec.d+0.12,blockW=pitch*10,gap=spec.d*2.2;
   var blocks=Math.ceil(units/PER_BLOCK),cols=Math.max(1,Math.ceil(Math.sqrt(blocks||1)));
   var fullStacks=Math.floor(units/STACK),rest=units%STACK;
   var pos=function(stackIdx){var b=Math.floor(stackIdx/100),s=stackIdx%100,bx=b%cols,bz=Math.floor(b/cols);return [bx*(blockW+gap)+(s%10)*pitch,bz*(blockW+gap)+Math.floor(s/10)*pitch];};
   var m4=new THREE.Matrix4();
   if(fullStacks>0&&fullStacks<=20000){
-    var st=v3Stack(spec,STACK,V.env),im=new THREE.InstancedMesh(st.geo,st.mats,fullStacks);im.castShadow=im.receiveShadow=true;
-    for(var i=0;i<fullStacks;i++){var p=pos(i);m4.makeTranslation(p[0],spec.t*STACK/2,p[1]);im.setMatrixAt(i,m4);}V.root.add(im);
+    var st=v3Stack(spec,STACK),im=new THREE.InstancedMesh(st.geo,st.mats,fullStacks);im.castShadow=im.receiveShadow=true;
+    for(var i=0;i<fullStacks;i++){var p=pos(i);m4.makeTranslation(p[0],spec.t*STACK/2,p[1]);im.setMatrixAt(i,m4);}G.add(im);
   }else if(fullStacks>20000){   // very large balances: each full block of 1,000 drawn as one solid block of stacks
-    var fb=Math.floor(fullStacks/100),bg=new THREE.BoxBufferGeometry(blockW-0.12,spec.t*STACK,blockW-0.12),tx=v3CoinEdge(spec,STACK);tx.repeat.x=10;
-    var bm=new THREE.MeshStandardMaterial({map:tx,roughness:.35,metalness:.85,envMap:V.env}),bi=new THREE.InstancedMesh(bg,bm,fb);bi.castShadow=bi.receiveShadow=true;
-    for(var j=0;j<fb;j++){var q=pos(j*100);m4.makeTranslation(q[0]+blockW/2-pitch/2,spec.t*STACK/2,q[1]+blockW/2-pitch/2);bi.setMatrixAt(j,m4);}V.root.add(bi);
-    var left=fullStacks-fb*100;if(left>0){var st2=v3Stack(spec,STACK,V.env),im2=new THREE.InstancedMesh(st2.geo,st2.mats,left);im2.castShadow=true;for(var k=0;k<left;k++){var r2=pos(fb*100+k);m4.makeTranslation(r2[0],spec.t*STACK/2,r2[1]);im2.setMatrixAt(k,m4);}V.root.add(im2);}
+    var fb=Math.floor(fullStacks/100),bk=v3Keep('block|'+spec.name+'|'+blockW,function(){var tx=v3CoinEdge(spec,STACK);tx.repeat.x=10;return {geo:new THREE.BoxBufferGeometry(blockW-0.12,spec.t*STACK,blockW-0.12),mats:[v3Shade({map:tx})]};}),bi=new THREE.InstancedMesh(bk.geo,bk.mats[0],fb);bi.castShadow=bi.receiveShadow=true;
+    for(var j=0;j<fb;j++){var q=pos(j*100);m4.makeTranslation(q[0]+blockW/2-pitch/2,spec.t*STACK/2,q[1]+blockW/2-pitch/2);bi.setMatrixAt(j,m4);}G.add(bi);
+    var left=fullStacks-fb*100;if(left>0){var st2=v3Stack(spec,STACK),im2=new THREE.InstancedMesh(st2.geo,st2.mats,left);im2.castShadow=true;for(var k=0;k<left;k++){var r2=pos(fb*100+k);m4.makeTranslation(r2[0],spec.t*STACK/2,r2[1]);im2.setMatrixAt(k,m4);}G.add(im2);}
   }
-  if(rest>0){var ps=v3Stack(spec,rest,V.env),pm=new THREE.Mesh(ps.geo,ps.mats),pp=pos(fullStacks);pm.position.set(pp[0],spec.t*rest/2,pp[1]);pm.castShadow=pm.receiveShadow=true;V.root.add(pm);}
+  if(rest>0){var ps=v3Stack(spec,rest),pm=new THREE.Mesh(ps.geo,ps.mats),pp=pos(fullStacks);pm.position.set(pp[0],spec.t*rest/2,pp[1]);pm.castShadow=pm.receiveShadow=true;G.add(pm);}
   var sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
   var full=Math.floor(units/PER_BLOCK),part=units%PER_BLOCK;
   if(units>0){var lb=v3Label('Cash · '+spec.name+' coins',sym+fmt(units),(full?full+' block'+(full>1?'s':'')+' of 1,000':'')+(full&&part?' + ':'')+(part?fmt(part)+' coins':''),Math.max(9,Math.min(60,blockW*(cols>1?1.4:0.9))));
-    var bb=new THREE.Box3().setFromObject(V.root),cc=bb.getCenter(new THREE.Vector3());v3Plant(lb,bb.min.x-lb.tag.scale.x*0.05,bb.max.y+lb.tag.scale.y*0.5+1,cc.z);V.root.add(lb);}
-  V.stats={units:units,cur:cur,coin:spec.name,fullStacks:fullStacks,rest:rest,fullBlocks:Math.floor(units/PER_BLOCK),stackHeight:spec.t*STACK};
+    var bb=new THREE.Box3().setFromObject(G),cc=bb.getCenter(new THREE.Vector3());v3Plant(lb,bb.min.x-lb.tag.scale.x*0.05,bb.max.y+lb.tag.scale.y*0.5+1,cc.z);G.add(lb);}
+  return {key:cur+'|'+units+'|'+(window.VI_CURRENCY_SYMBOL||'£'),grp:G,stats:{units:units,cur:cur,coin:spec.name,fullStacks:fullStacks,rest:rest,fullBlocks:Math.floor(units/PER_BLOCK),stackHeight:spec.t*STACK}};
+}
+function v3Cash(){
+  if(!v3Ok()||(V3._flat&&V3._flat.cash))return false;
+  var card=document.getElementById('cashSceneCard'),scene=card&&card.querySelector('.scene');if(!scene)return false;
+  v3Host(scene,'cashSvg');v3After('cash',v3CashNow,function(){var sv=document.getElementById('cashSvg');if(sv)sv.style.display='';renderCashISO();});return true;
+}
+function v3CashNow(){
+  if(!v3Ok())return false;
+  var card=document.getElementById('cashSceneCard'),scene=card&&card.querySelector('.scene');if(!scene)return false;
+  var host=v3Host(scene,'cashSvg');if(!host.clientWidth)return true;   // tab hidden: drawn when shown
+  var V=V3.cash||(V3.cash=new V3Scene(host,'3D view of your cash as coins'));
+  var K=v3CashKey(),cur=K.cur,spec=K.spec,units=K.units,key=K.key;if(V._key===key&&V.root.children.length){V.kick(300);return true;}   // the same balance again (the tab and its sub-tab both ask on one tap): redraw, do not rebuild
+  V.clear();V._key=key;
+  var C=v3Pre('cash',key)||v3CashContent(spec,units,cur);V.root.add(C.grp);V.stats=C.stats;   // built in the idle warm-up when the balance has not changed since
+  var PER_BLOCK=1000,sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
   V.frame(V3._cashUnits===units&&V3._cashCur===cur);V3._cashUnits=units;V3._cashCur=cur;
   var cap=document.getElementById('cashCap');if(cap)cap.textContent=units?sym+fmt(units)+' = '+fmt(units)+' '+spec.name+' coins ('+spec.d*10+' mm across, '+(spec.t*10).toFixed(1)+' mm thick) · '+Math.floor(units/PER_BLOCK)+' full block'+(Math.floor(units/PER_BLOCK)===1?'':'s')+' of 1,000'+(units%PER_BLOCK?' + '+fmt(units%PER_BLOCK)+' coins':''):'No cash yet. Add an account or some physical cash.';
   return true;
 }
 // a cast-style bar: bevelled block with the weight and fineness stamped on top
-function v3Bar(w,d,h,metal,fmt,env){
+function v3Bar(w,d,h,metal,fmt){return v3Keep('bar|'+w+'|'+d+'|'+h.toFixed(4)+'|'+metal.label+'|'+fmt,function(){return v3BarMake(w,d,h,metal,fmt);});}
+function v3BarMake(w,d,h,metal,fmt){
   var shape=new THREE.Shape(),bw=w/2,bd=d/2,rr=Math.min(w,d)*0.08;
   shape.moveTo(-bw+rr,-bd);shape.lineTo(bw-rr,-bd);shape.quadraticCurveTo(bw,-bd,bw,-bd+rr);shape.lineTo(bw,bd-rr);shape.quadraticCurveTo(bw,bd,bw-rr,bd);shape.lineTo(-bw+rr,bd);shape.quadraticCurveTo(-bw,bd,-bw,bd-rr);shape.lineTo(-bw,-bd+rr);shape.quadraticCurveTo(-bw,-bd,-bw+rr,-bd);
   var bev=Math.min(h*0.3,0.12),geo=new THREE.ExtrudeBufferGeometry(shape,{depth:Math.max(0.02,h-bev*2),bevelEnabled:true,bevelThickness:bev,bevelSize:bev*0.8,bevelSegments:2,curveSegments:4});
@@ -20722,16 +20768,11 @@ function v3Bar(w,d,h,metal,fmt,env){
   g.strokeStyle='rgba(0,0,0,.28)';g.lineWidth=4;g.strokeRect(14,14,c.width-28,c.height-28);g.fillStyle='rgba(50,36,8,.5)';g.textAlign='center';g.textBaseline='middle';
   var fs=Math.max(14,Math.round(c.height*0.2));g.font='700 '+fs+'px "Share Tech Mono", monospace';g.fillText(metal.label.toUpperCase(),128,c.height*0.33);g.fillText(fmt,128,c.height*0.55);g.font=Math.round(fs*0.8)+'px "Share Tech Mono", monospace';g.fillText('999.9',128,c.height*0.76);
   var tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;tx.repeat.set(1/w,1/d);tx.offset.set(0.5,0.5);
-  var top=new THREE.MeshStandardMaterial({map:tx,roughness:metal.rough,metalness:1,envMap:env||null,envMapIntensity:1.2});
-  var side=new THREE.MeshStandardMaterial({color:v3Col(metal.col),roughness:metal.rough+.06,metalness:1,envMap:env||null,envMapIntensity:1.2});
+  var top=v3Shade({map:tx}),side=v3Shade({color:v3Col(metal.col)});   // baked studio shading (v3Matcap), no reflection map
   return {geo:geo,mats:[top,side]};
 }
-function v3Metals(){
-  if(!v3Ok())return false;
-  var scene=document.getElementById('metals-scene');if(!scene)return false;
-  var host=v3Host(scene,'metalsSvg');window._v3MetalsOn=true;if(!host.clientWidth)return true;
-  var V=V3.metals||(V3.metals=new V3Scene(host,'3D view of your precious metals as bars'));V.clear();V.stats={};
-  var sym=window.VI_CURRENCY_SYMBOL||'£',rate=window.VI_CURRENCY_RATE||1,x0=0,parts=[],m4=new THREE.Matrix4();
+function v3MetalsContent(key){
+  var G=new THREE.Group(),stats={},sym=window.VI_CURRENCY_SYMBOL||'£',rate=window.VI_CURRENCY_RATE||1,x0=0,parts=[],m4=new THREE.Matrix4();
   ['gold','silver','platinum','palladium'].forEach(function(k){
     var oz=+(alState.metals[k]||0);if(!(oz>0))return;var M=V3_METALS[k],grams=oz*OZ_G,left=grams,zone=new THREE.Group(),z=0,zw=0;
     V3_BARS.forEach(function(B,bi){
@@ -20739,22 +20780,84 @@ function v3Metals(){
       var isLast=bi===V3_BARS.length-1,frac=isLast&&left>0.05?left/B.g:0;if(!n&&!frac)return;
       zone.userData.bars=zone.userData.bars||{};zone.userData.bars[B.name]={n:n,h:+((B.g/M.rho)/(B.w*B.d)).toFixed(3)};if(frac)zone.userData.bars.rest_g=+left.toFixed(2);
       var h=(B.g/M.rho)/(B.w*B.d);
-      if(n){var bar=v3Bar(B.w,B.d,h,M,B.name,V.env),im=new THREE.InstancedMesh(bar.geo,bar.mats,n);im.castShadow=im.receiveShadow=true;
+      if(n){var bar=v3Bar(B.w,B.d,h,M,B.name),im=new THREE.InstancedMesh(bar.geo,bar.mats,n);im.castShadow=im.receiveShadow=true;
         var perRow=Math.max(1,Math.min(10,Math.ceil(Math.sqrt(n/B.pile))));
         for(var i=0;i<n;i++){var pile=Math.floor(i/B.pile),lvl=i%B.pile,cx=(pile%perRow)*(B.w+1),cz=z+Math.floor(pile/perRow)*(B.d+1);m4.makeTranslation(cx+B.w/2,lvl*h,cz+B.d/2);im.setMatrixAt(i,m4);}
         zone.add(im);zw=Math.max(zw,perRow*(B.w+1));z+=Math.ceil(Math.ceil(n/B.pile)/perRow)*(B.d+1)+1;}
-      if(frac){var fh=Math.max(0.03,h*frac),fb=v3Bar(B.w,B.d,fh,M,(left).toFixed(1)+' g',V.env),fm=new THREE.Mesh(fb.geo,fb.mats);fm.position.set(B.w/2,0,z+B.d/2);fm.castShadow=fm.receiveShadow=true;zone.add(fm);zw=Math.max(zw,B.w+1);z+=B.d+2;}
+      if(frac){var fh=Math.max(0.03,h*frac),fb=v3Bar(B.w,B.d,fh,M,(left).toFixed(1)+' g'),fm=new THREE.Mesh(fb.geo,fb.mats);fm.position.set(B.w/2,0,z+B.d/2);fm.castShadow=fm.receiveShadow=true;zone.add(fm);zw=Math.max(zw,B.w+1);z+=B.d+2;}
     });
-    V.stats=V.stats||{};V.stats[k]=zone.userData.bars;
+    stats[k]=zone.userData.bars;
     var value=oz*(alState.metalPrices[k]||0);
     var lb=v3Label(M.label+' · '+oz.toFixed(2)+' oz',sym+Math.round(value*rate).toLocaleString('en-GB'),'at '+sym+Math.round((alState.metalPrices[k]||0)*rate).toLocaleString('en-GB')+' an ounce',Math.max(12,zw*0.9));
     v3Plant(lb,zw/2,Math.max(6,z*0.25)+3,-2);zone.add(lb);
-    zone.position.x=x0;V.root.add(zone);parts.push(oz.toFixed(2)+' oz '+M.label.toLowerCase()+' ('+(grams>=1000?(grams/1000).toFixed(2)+' kg':Math.round(grams)+' g')+')');x0+=zw+8;
+    zone.position.x=x0;G.add(zone);parts.push(oz.toFixed(2)+' oz '+M.label.toLowerCase()+' ('+(grams>=1000?(grams/1000).toFixed(2)+' kg':Math.round(grams)+' g')+')');x0+=zw+8;
   });
+  return {key:key,grp:G,stats:stats,parts:parts};
+}
+/* build a stage just after the browser has laid out and painted the tab that holds it (CI, 2 Nov: reading the stage size straight after the
+   tab switch made the browser lay out the whole page inside our code, 2 to 170 ms on the slow runner); errors fall back to the flat picture */
+function v3After(name,now,flat){V3._after=V3._after||{};if(V3._after[name])return;V3._after[name]=1;
+  requestAnimationFrame(function(){setTimeout(function(){V3._after[name]=0;try{if(!now()){V3._flat=V3._flat||{};V3._flat[name]=1;flat();}}catch(e){console.error('[Vault-It] 3D '+name,e);V3._flat=V3._flat||{};V3._flat[name]=1;flat();}},0);});}
+function v3Metals(){
+  if(!v3Ok()||(V3._flat&&V3._flat.metals))return false;
+  var scene=document.getElementById('metals-scene');if(!scene)return false;
+  v3Host(scene,'metalsSvg');window._v3MetalsOn=true;v3After('metals',v3MetalsNow,function(){var sv=document.getElementById('metalsSvg');if(sv)sv.style.display='';renderMetalsISO();});return true;
+}
+function v3MetalsNow(){
+  if(!v3Ok())return false;
+  var scene=document.getElementById('metals-scene');if(!scene)return false;
+  var host=v3Host(scene,'metalsSvg');window._v3MetalsOn=true;if(!host.clientWidth)return true;
+  var V=V3.metals||(V3.metals=new V3Scene(host,'3D view of your precious metals as bars'));
+  var mkey=v3MetalsKey();if(V._key===mkey&&V.root.children.length){V.kick(300);return true;}   // same holdings and prices: redraw, do not rebuild
+  V.clear();V._key=mkey;
+  var C=v3Pre('metals',mkey)||v3MetalsContent(mkey),parts=C.parts;V.root.add(C.grp);V.stats=C.stats;   // built in the idle warm-up when nothing changed since
   V.frame(V3._metalsKey===JSON.stringify(alState.metals));V3._metalsKey=JSON.stringify(alState.metals);
   var cap=document.getElementById('metalsCap');if(cap)cap.textContent=parts.length?parts.join(' · ')+' · real bar sizes from each metal\'s weight · value at the live price':'No metals yet. Add your holdings below.';
   return true;
 }
+
+/* v0.7: warm the coin and bar stage in idle time once three.js is in (the house builder's idle precompile, owner 2 Nov "learn from that
+   viewport"): the shared renderer, then the real coin, bar, tag and floor objects built in a stage that is not on the page, each one
+   drawn once in its own idle slice (which compiles its shaders), so opening Cash and savings or Precious metals compiles nothing and creates no context. Skipped when
+   either stage has already opened, when the device asks to save data, or without WebGL. */
+function v3Warm(){
+  if(V3._warm||V3.cash||V3.metals||!window.THREE||!THREE.OrbitControls||!viGlOk())return;V3._warm=1;
+  var idle=function(f){if(window.requestIdleCallback)requestIdleCallback(f,{timeout:4000});else setTimeout(f,200);};
+  var pre=[function(){var K=v3CashKey();if(K.units>0){V3._pre=V3._pre||{};var c=v3CashContent(K.spec,K.units,K.cur);V3._pre.cash=c;}},
+    function(){var mk=v3MetalsKey();V3._pre=V3._pre||{};V3._pre.metals=v3MetalsContent(mk);}];
+  var W=null,objs=[],bars=[],k=0,busy=function(){return V3.cash||V3.metals;};   // a stage opened meanwhile: stop (it compiles what it needs itself)
+  var done=function(){if(W){W.dead=true;try{if(W.ro)W.ro.disconnect();if(W.io)W.io.disconnect();W.ctl.dispose();}catch(e){}W=null;}if(V3._r)V3._r._v3on=null;[V3.cash,V3.metals].forEach(function(v){if(v){v._w=0;v.kick(300);}});V3._warmed=true;};   // a stage that opened meanwhile takes the canvas back at its own size   // the warm-up stage is dropped, not disposed: disposing its materials would make three.js delete the very shaders it compiled
+  var step=function(){
+    if(k>0&&busy())return done();   // a stage opened meanwhile: stop before touching the shared canvas
+    try{
+      if(k===0){v3Renderer();k=1;return idle(step);}   // the context, on its own
+      if(k===1){   // the objects the real stages draw, at their real settings (same shaders, so the compile is reused)
+        var host=document.createElement('div');host.style.cssText='position:absolute;width:0;height:0;overflow:hidden';
+        W=new V3Scene(host,'');W._off=true;var cur=(window.VI_CURRENCY||(typeof viSettings!=='undefined'&&viSettings.currency)||'GBP').toUpperCase(),spec=V3_COINS[cur]||V3_COINS.GBP,m4=new THREE.Matrix4();
+        var st=v3Stack(spec,10),im=new THREE.InstancedMesh(st.geo,st.mats,2);im.setMatrixAt(0,m4);im.setMatrixAt(1,m4.makeTranslation(3,0,0));W.root.add(im);
+        var ps=v3Stack(spec,3);W.root.add(new THREE.Mesh(ps.geo,ps.mats));
+        var M=V3_METALS.gold,B=V3_BARS[V3_BARS.length-1],bh=(B.g/M.rho)/(B.w*B.d),bar=v3Bar(B.w,B.d,bh,M,B.name),bi=new THREE.InstancedMesh(bar.geo,bar.mats,1);bi.setMatrixAt(0,new THREE.Matrix4());W.root.add(bi);W.root.add(new THREE.Mesh(bar.geo,bar.mats));
+        var lb=v3Label('Warm','£0','',10);v3Plant(lb,0,2,0);W.root.add(lb);W.frame(false);
+        W.sc.traverse(function(o){if(o.material&&o.visible&&(o.isMesh||o.isLine||o.isSprite))objs.push(o);});W.r.setPixelRatio(1);W.r.setSize(1,1,false);
+        // the bars for the metals actually held, the same sizes v3Metals will ask for (kept, so opening Precious metals builds none of them)
+        try{['gold','silver','platinum','palladium'].forEach(function(mk){var oz=+((alState.metals||{})[mk]||0);if(!(oz>0))return;var M2=V3_METALS[mk],left=oz*OZ_G;
+          V3_BARS.forEach(function(B2,bi){var n=Math.floor((left+1e-6)/B2.g);left-=n*B2.g;var isLast=bi===V3_BARS.length-1,frac=isLast&&left>0.05?left/B2.g:0,h2=(B2.g/M2.rho)/(B2.w*B2.d),lf=left;
+            if(n)bars.push(function(){v3Bar(B2.w,B2.d,h2,M2,B2.name);});if(frac)bars.push(function(){v3Bar(B2.w,B2.d,Math.max(0.03,h2*frac),M2,(lf).toFixed(1)+' g');});});});}catch(e){}
+        k=2;return idle(step);}
+      if(bars.length){bars.shift()();return idle(step);}   // one bar shape per idle slice
+      if(pre.length){pre.shift()();return idle(step);}   // then the cash and metals content for the data as it is now, one per idle slice
+      if(k-2<objs.length){   // one object's shaders per idle slice
+        var tgt=objs[k-2],vis=[],fc=tgt.frustumCulled;W.sc.traverse(function(o){if(o.material){vis.push([o,o.visible]);o.visible=(o===tgt);}});tgt.frustumCulled=false;   // drawn whatever the warm-up camera sees
+        var p=tgt;while(p){p.visible=true;p=p.parent;}
+        W.r.render(W.sc,W.cam);tgt.frustumCulled=fc;vis.forEach(function(v){v[0].visible=v[1];});k++;if(busy())return done();return idle(step);}
+      if(k-2===objs.length){var cull=[];W.sc.traverse(function(o){cull.push([o,o.frustumCulled]);o.frustumCulled=false;});W.r.render(W.sc,W.cam);cull.forEach(function(c){c[0].frustumCulled=c[1];});k++;}   // last, the whole stage once: picks up the few small shaders (tag, post, glow) the single-object draws leave out   // drawn once into a 1x1 canvas: the same path as a real frame (three's compile() keys fog differently)
+    }catch(e){console.warn('[Vault-It] 3D warm-up',e);}
+    done();
+  };
+  idle(step);
+}
+window.addEventListener('load',function(){var saveData=false;try{saveData=!!(navigator.connection&&navigator.connection.saveData);}catch(e){}if(saveData)return;
+  var n=0,wait=function(){if(window.THREE&&THREE.OrbitControls)return v3Warm();if(++n<30)setTimeout(wait,1500);};setTimeout(wait,1500);});
 
 function renderMetalsISO(){
   if(!window.THREE&&viGlOk()&&viThreeState()<3)viThree(function(){try{renderMetalsISO();}catch(e){}});   // engine on its way: the SVG shows meanwhile
@@ -28508,6 +28611,7 @@ function makeTreeMap(cv,o){
   self.phase=function(){var ts=performance.now();if(pending||t0===Infinity)return 'waiting';if(t0<0)return 'done';var e=ts-t0;return e<T_IN?'pile':e<lastEnd()?'moving':'done'};
   self.replay=function(){if(reduceMotion())return;pending=true;t0=Infinity;S.kick()};
   self.kick=function(){S.kick()};
+  self.flags=function(){return (self._flags||[]).map(function(f){return JSON.parse(JSON.stringify(f))})};self.outlines=function(){return (self._outl||[]).slice()};self.plates=function(){return 0};self.tagRect=function(){return self._tag||null};   /* tests: the flag posts and outlines of the last frame; the old floor plates are gone */
   self.clock=function(){return t0>=0&&t0!==Infinity?performance.now()-t0:null};
   function lastEnd(){return cells.length?cells[cells.length-1].off+T_GO:0}
   function shade(c){var t=(c.ii%2)?.16:0;return t?mix(c.g.col,[255,255,255],t):c.g.col}
@@ -28538,22 +28642,52 @@ function makeTreeMap(cv,o){
     var P0=new Proj(st,{x:0,y:0,w:cw,h:ch}),Pr={focal:P0.focal,pos:[P0.pos[0]/SC+sx,P0.pos[1]/SC,P0.pos[2]/SC],pt:function(x,y,z){return P0.pt((x-sx)*SC,y*SC,z*SC)}};self._P=Pr;
     cx.save();
     ground(cx,Pr,st,ext.x+1,-ext.z-1,ext.z+1,false,ts,rm,BS+.5);
-    /* each group's area on the floor, tinted and outlined in its colour, so the map reads as a tree map before the blocks land */
+    /* each group's area on the floor (owner, 2 Nov 2026, E8: "a dark red outline should ring fence all of the committed essentials, and then a
+       flag post to the label. And then that should be rolled out across the rest"; Pedro's spec G): a faint fill under the blocks, then after the
+       blocks a 1.5 px outline at .95 in the group's colour, inset .3 units so neighbouring groups show a gap, and a flag post with its chip */
     var land=function(r){var last=cells.filter(function(c){return c.r===r}).pop();if(t0<0||!last)return 1;return clamp((ts-t0-last.off-T_GO*.6)/NW_D.land,0,1)};
-    rects.forEach(function(r){var a=land(r);if(a<=0)return;var x0=r.x,x1=r.x+r.w,z0=r.z,z1=r.z+r.d,q=[Pr.pt(x0,.02,z0),Pr.pt(x1,.02,z0),Pr.pt(x1,.02,z1),Pr.pt(x0,.02,z1)];
-      cx.beginPath();cx.moveTo(q[0][0],q[0][1]);for(var i=1;i<4;i++)cx.lineTo(q[i][0],q[i][1]);cx.closePath();cx.fillStyle=rgba(r.g.col,.13*a);cx.fill();cx.strokeStyle=rgba(r.g.col,.6*a);cx.lineWidth=.8;cx.stroke()});
+    var IN=.3,quad=function(r,y){var ix=Math.min(IN,r.w*.25),iz=Math.min(IN,r.d*.25),x0=r.x+ix,x1=r.x+r.w-ix,z0=r.z+iz,z1=r.z+r.d-iz;return [Pr.pt(x0,y,z0),Pr.pt(x1,y,z0),Pr.pt(x1,y,z1),Pr.pt(x0,y,z1)]},
+      path=function(q){cx.beginPath();cx.moveTo(q[0][0],q[0][1]);for(var i=1;i<4;i++)cx.lineTo(q[i][0],q[i][1]);cx.closePath()};
+    rects.forEach(function(r){var a=land(r);if(a<=0)return;path(quad(r,.02));cx.fillStyle=rgba(r.g.col,.08*a);cx.fill()});
     var items=[];cells.forEach(function(c){var g=geo(c,ts);if(g)items.push(g)});
     items.forEach(function(g){g.dz=Math.hypot(Pr.pos[0]-g.x,Pr.pos[1]-(g.y+g.h/2),Pr.pos[2]-g.z)});items.sort(function(a,b){return b.dz-a.dz});
     items.forEach(function(g){var col=g.fl>0?mix(g.col,PAL.flash,g.fl*.8):g.col;if(hover&&hover.g===g.c.g&&hover.ii===g.c.ii)col=mix(col,PAL.flash,.45);drawBox(cx,Pr,g,PL,col,PAL.fa+.16+.06*PL,.66+.25*PL,PAL.edgeK)});
-    /* each group's name and total over its rectangle, once its blocks have landed; names never overlap (pushed down a line) */
-    var lf=clamp(cw*.02,9,12),boxes=[];cx.font=lf+"px 'Share Tech Mono',monospace";cx.textBaseline="middle";cx.textAlign="left";
-    /* names sit on top of their area at its back left corner, like the debt tree map */
-    rects.map(function(r){var q=Pr.pt(r.x+.3,CH+.1,r.z+.3);return {r:r,q:q}}).sort(function(a,b){return a.q[1]-b.q[1]}).forEach(function(o2){
-      var r=o2.r,a=land(r);if(a<=0)return;
-      var txt=r.g.label+" · "+fmt(r.g.sum),tw=cx.measureText(txt).width,hh=lf*1.5,bx=clamp(o2.q[0],4,cw-tw-8),by=o2.q[1]+hh*.7;
-      for(var t=0;t<8&&boxes.some(function(b){return bx<b[0]+b[2]+6&&bx+tw+6>b[0]&&by-hh/2<b[1]+hh/2&&by+hh/2>b[1]-hh/2});t++)by+=hh+1;
-      boxes.push([bx-3,by,tw]);
-      cx.globalAlpha=a;cx.fillStyle="rgba(8,8,8,.72)";cx.fillRect(bx-3,by-hh/2,tw+6,hh);cx.fillStyle=rgba(r.g.col,1);cx.fillText(txt,bx,by);cx.globalAlpha=1});
+    var outl=[];rects.forEach(function(r){var a=land(r);if(a<=0)return;var dash=r.g.key==='iv'?[6,4]:[];   // Investments dashed, 6 on 4 off (Pedro round 1): money that is put away but still yours to move
+      path(quad(r,.02));cx.strokeStyle=rgba(r.g.col,.95*a);cx.lineWidth=1.5;cx.lineJoin='round';if(cx.setLineDash)cx.setLineDash(dash);cx.stroke();if(cx.setLineDash)cx.setLineDash([]);
+      outl.push({group:r.g.key,lineWidth:1.5,alpha:.95,fill:.08,inset:IN,afterBlocks:true,dash:dash})});
+    self._outl=outl;
+    /* flag posts: 1 px in the group colour from the area's back-left corner to two block heights above the blocks, a 3 px dot, and on it a chip
+       (name in DM Sans, amount in Share Tech Mono in the group colour). Projected every frame, so the posts turn with the orbit; only the chip
+       faces the screen. A chip that would cover another is raised one chip height at a time (at most three), then shows the amount only; it
+       never slides off its post. Reduced motion: the posts stand at full height at once. */
+    var NF="600 11px 'DM Sans',sans-serif",AF="10.5px 'Share Tech Mono',monospace",PX=6,PY=4,HC=19,placed=[],flags=[],todo=[];
+    (function(){var fs=clamp(cw*.026,11,17);cx.font=fs+"px 'Share Tech Mono',monospace";var w1=cx.measureText("MONTHLY INCOME").width;cx.font=(fs*1.5)+"px 'Share Tech Mono',monospace";var w2=cx.measureText(fmt(total)).width;
+      var tw=Math.max(w1,w2)+fs*1.5,th=fs*3.6;placed.push({x:cw-tw-14-4,y:14-4,w:tw+8,h:th+8});self._tag={x:cw-tw-14,y:14,w:tw,h:th}})();   // the Monthly income tag (drawn last, top right) is in the way too
+    var fl=rects.map(function(r){var ix=Math.min(IN,r.w*.25),iz=Math.min(IN,r.d*.25),bx=r.x+ix,bz=r.z+iz;return {r:r,bx:bx,bz:bz,base:Pr.pt(bx,.02,bz),top:Pr.pt(bx,CH*3,bz)}});
+    fl.sort(function(a,b){return (b.r.g.key==='ce')-(a.r.g.key==='ce')||b.top[1]-a.top[1]});   // committed essential first (the owner's own example keeps its name), then nearest post first: the chips further back rise into the open space above
+    fl.forEach(function(o){
+      var r=o.r,a=land(r);if(a<=0)return;
+      var rise=rm?1:ease3(a),tp=rise>=1?o.top:Pr.pt(o.bx,.02+(CH*3-.02)*rise,o.bz),name=r.g.label,amt=fmt(r.g.sum);
+      cx.font=NF;var nw=cx.measureText(name+' \u00b7 ').width;cx.font=AF;var aw=cx.measureText(amt).width;
+      var fit=function(only,k,left){var w=PX*2+(only?0:nw)+aw,dx=tp[0],dy=tp[1]-k*(HC+2),x=left?dx-w:dx;   // the chip hangs right of its post, or left of it, its corner exactly on the dot (Pedro round 1: no gap)
+        return {x:x,y:dy-HC,w:w,h:HC,dot:[dx,dy],k:k,only:only}};
+      var clash=function(c){return c.y<0||c.x<0||c.x+c.w>cw||placed.some(function(b){return c.x<b.x+b.w+3&&b.x<c.x+c.w+3&&c.y<b.y+b.h+2&&b.y<c.y+c.h+2})};
+      var c=null;[false,true].some(function(only){for(var k=0;k<=3;k++)for(var sd=0;sd<2;sd++){var t=fit(only,k,sd===1);if(!clash(t)){c=t;return true}}return false});
+      var none=!c;if(none)c=fit(true,0,false);else placed.push(c);   // no room at all: the post and its dot stand without a chip rather than cover another (the readout below names every group)
+      todo.push({o:o,r:r,a:a,c:c,none:none,name:name,amt:amt,nw:nw,rise:rise});});
+    todo.forEach(function(t){var r=t.r,c=t.c;cx.globalAlpha=t.a;   // every post first, then every chip on top, so no post crosses a chip
+      cx.strokeStyle=rgba(r.g.col,1);cx.lineWidth=1;cx.beginPath();cx.moveTo(t.o.base[0],t.o.base[1]);cx.lineTo(c.dot[0],c.dot[1]);cx.stroke();
+      cx.fillStyle=rgba(r.g.col,1);cx.beginPath();cx.arc(c.dot[0],c.dot[1],1.5,0,Math.PI*2);cx.fill();cx.globalAlpha=1});
+    todo.forEach(function(t){var r=t.r,c=t.c,a=t.a,o=t.o,name=t.name,amt=t.amt,nw=t.nw,rise=t.rise;
+      if(t.none){flags.push({group:r.g.key,name:name,amount:amt,col:r.g.col.slice(),base:o.base.slice(0,2),dot:c.dot.slice(),chip:null,raise:0,amountOnly:true,worldTop:CH*3,blockH:CH,rise:rise,alpha:a,style:null});return}
+      cx.globalAlpha=a;cx.beginPath();if(cx.roundRect)cx.roundRect(c.x+.5,c.y+.5,c.w-1,c.h-1,4);else cx.rect(c.x+.5,c.y+.5,c.w-1,c.h-1);cx.fillStyle='rgba(8,8,8,0.88)';cx.fill();cx.strokeStyle=rgba(r.g.col,.5);cx.lineWidth=1;cx.stroke();
+      cx.textBaseline='middle';cx.textAlign='left';var ty=c.y+c.h/2+.5,tx=c.x+PX;
+      if(!c.only){cx.font=NF;cx.fillStyle='#E8E8E8';cx.fillText(name+' \u00b7 ',tx,ty);tx+=nw}
+      cx.font=AF;cx.fillStyle=rgba(r.g.col,1);cx.fillText(amt,tx,ty);cx.beginPath();cx.arc(c.dot[0],c.dot[1],1.5,0,Math.PI*2);cx.fill();cx.globalAlpha=1;   // the dot again on the chip's corner, so the anchor shows
+      flags.push({group:r.g.key,name:name,amount:amt,col:r.g.col.slice(),base:o.base.slice(0,2),dot:c.dot.slice(),chip:{x:c.x,y:c.y,w:c.w,h:c.h},raise:c.k,amountOnly:c.only,
+        worldTop:CH*3,blockH:CH,rise:rise,alpha:a,style:{fill:'rgba(8,8,8,0.88)',stroke:.5,radius:4,padX:PX,padY:PY,nameFont:NF,amtFont:AF,nameCol:'#E8E8E8',post:1,dot:3}})});
+    self._flags=flags;
+    var lf=clamp(cw*.02,9,12);   // the caption's size (it was set by the floor labels this replaces)
     tag(cx,cw,"MONTHLY INCOME",fmt(total),false,null);
     cx.fillStyle=PAL.label;cx.textAlign="left";cx.textBaseline="alphabetic";cx.font=lf+"px 'Share Tech Mono',monospace";cx.fillText("1 block = "+fmt(U)+(intro?"  ·  income arriving":""),12,ch-12);
     cx.restore();
