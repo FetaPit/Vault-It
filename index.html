@@ -12365,31 +12365,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
         <div class="hb-plan-note" id="hb-plan-brick" style="margin-top:14px"></div>
       </div>
-      <div class="card hb-prog" id="hb-prog" data-adv>
-        <div class="card-lbl">Progress</div>
-        <div class="pnums"><div class="saved-amt" id="savedAmt">£0</div><div class="tgt-amt" id="tgtAmt">of £200,000</div></div>
-        <div class="pbar-wrap"><div class="pbar-fill" id="pbarFill" style="width:0%"></div></div>
-        <div class="ppct" id="ppct">0.0%</div>
-        <div class="stats">
-          <div class="stat"><div class="sv" id="stBricks">0</div><div class="sl">Bricks Laid</div></div>
-          <div class="stat"><div class="sv" id="stTiles">0</div><div class="sl">Roof Tiles</div></div>
-          <div class="stat"><div class="sv" id="stRemain">£0</div><div class="sl">Remaining</div></div>
-          <div class="stat"><div class="sv" id="stDeposit">£0</div><div class="sl">10% Deposit</div></div>
-        </div>
-        <div class="hb-sub-lbl">Milestones</div>
-        <div class="mss">
-          <div class="ms" id="ms1"><div class="ms-dot"></div><div class="ms-lbl" id="msl-1">1% · Site Cleared</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
-          <div class="ms" id="ms5"><div class="ms-dot"></div><div class="ms-lbl" id="msl-5">5% · Foundation Poured</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
-          <div class="ms" id="ms15"><div class="ms-dot"></div><div class="ms-lbl" id="msl-15">15% · Ground Floor Walls</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
-          <div class="ms" id="ms30"><div class="ms-dot"></div><div class="ms-lbl" id="msl-30">30% · Ground Floor Up</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
-          <div class="ms" id="ms50"><div class="ms-dot"></div><div class="ms-lbl" id="msl-50">50% · First Floor Up</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
-          <div class="ms" id="ms65"><div class="ms-dot"></div><div class="ms-lbl" id="msl-65">65% · Roof Structure</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
-          <div class="ms" id="ms80"><div class="ms-dot"></div><div class="ms-lbl" id="msl-80">80% · Lights Are On!</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
-          <div class="ms" id="ms90"><div class="ms-dot"></div><div class="ms-lbl" id="msl-90">90% · Final Fitting</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
-          <div class="ms" id="ms95"><div class="ms-dot"></div><div class="ms-lbl" id="msl-95">95% · Final Touches</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
-          <div class="ms" id="ms100"><div class="ms-dot"></div><div class="ms-lbl" id="msl-100">100% · It's Yours! 🎉</div><div class="ms-ck"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div></div>
-        </div>
-      </div>
     </div>
     <!-- History: contribution streak, savings log, reset -->
     <div class="card hb-hist" id="hb-hist" data-adv>
@@ -13340,9 +13315,15 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .grid .scene-card .scene{aspect-ratio:unset;min-height:320px;height:clamp(320px,45vw,520px)}
 @media(max-width:600px){.grid .scene-card .scene{min-height:260px;height:56vw}}
 @media(max-width:320px){.grid .scene-card .scene{min-height:200px;height:62vw}}
-.grid .panel{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media(max-width:900px){.grid .panel{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.grid .panel{grid-template-columns:1fr}}
+.grid .panel{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}   /* the progress tile and the plan each take the full width: no dead columns (owner, 2 Nov, v0.8) */
+@media(min-width:901px){   /* the plan at full width: house types on the left, price and deposit on the right */
+  .hb-plan{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);column-gap:28px;align-content:start}
+  .hb-plan>*{grid-column:2}
+  .hb-plan>.card-lbl{grid-column:1/-1}
+  .hb-plan>.hb-sub-lbl,.hb-plan>.htypes{grid-column:1}
+  .hb-plan>.htypes{grid-row:span 4;align-self:start}
+  .hb-plan>.price-edit-row{margin-top:8px!important}
+}
 .scene-card{position:relative;background:rgb(var(--panel-rgb) / .95);border:1px solid rgb(var(--teal-rgb) / .15);border-radius:6px;padding:16px}
 .scene-lbl{font-family:'Syne',sans-serif;font-size:.5rem;letter-spacing:.3em;text-transform:uppercase;color:var(--teal);opacity:.5;margin-bottom:8px;text-align:center}
 .scene{position:relative;width:100%;aspect-ratio:unset;min-height:320px;height:clamp(320px,45vw,520px);overflow:hidden;border-radius:3px;cursor:grab;-webkit-user-select:none;user-select:none;touch-action:none;will-change:transform}
@@ -14364,6 +14345,40 @@ body.vi-pop-open{overflow:hidden}
 @media (prefers-reduced-motion:reduce){#house-scene #hbStill{transition:none}}
 #house-scene[data-engine="still"] .hud-bar,#house-scene[data-engine="still"] .vp-key{display:none!important}   /* the still picture has nothing to zoom or orbit */
 #hb3d-ov{position:absolute;inset:0;z-index:10;pointer-events:none;overflow:hidden;font-family:'Share Tech Mono',monospace}
+ /* one progress tile (v0.8): it sizes its own stats and milestones from its own width */
+#hb-hud{container-type:inline-size;min-width:0}
+.hb-pg{display:block}
+.hb-pg-top{display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--t2)}
+.hb-pg-top b{font-size:.9rem;color:var(--text)}
+.hb-pg-top b#ppct{font-size:.72rem;color:var(--brass)}
+.hb-pg-note{font-size:.5rem;color:var(--t3);margin:6px 0}
+.hb-xp-ms{position:relative}
+.hb-tick{position:absolute;top:0;bottom:0;width:1px;margin-left:-.5px;background:rgb(var(--ink-rgb) / .28)}
+.hb-tick.on{background:var(--gold)}
+.hb-pg-next{display:flex;align-items:center;gap:6px;margin:6px 0 2px;font-size:.54rem;color:var(--t2)}
+.hb-pg-next b{color:var(--text)}
+.hb-pg-next .vi-ic{width:14px;height:14px;--vi-sw:1.5;color:var(--gold);flex:none}
+.hb-stx .hb-st-streak .vi-ic{color:var(--gold)}
+.hb-stx{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0 4px}
+.hb-stx>div{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:8px;align-items:center;min-width:0;padding:9px 10px;border-radius:8px;background:rgb(var(--ink-rgb) / .04);border:1px solid rgb(var(--teal-rgb) / .12)}
+.hb-stx .vi-ic{grid-row:1/3;width:22px;height:22px;--vi-sw:1.5;color:var(--em)}
+.hb-stx b{display:block;min-width:0;font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb-stx span{display:block;min-width:0;font-size:.48rem;line-height:1.3;color:var(--t3);overflow-wrap:anywhere}
+.hb-pg-ms{display:flex;align-items:center;gap:6px;margin-top:14px}
+.hb-pg-ms .vi-ic{width:16px;height:16px;--vi-sw:1.5;color:var(--em)}
+#hb-hud .mss{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#hb-hud .ms{padding:7px 8px;font-size:.52rem;gap:7px;align-items:flex-start;min-width:0;border-radius:6px}
+#hb-hud .ms-dot{margin-top:4px}
+#hb-hud .ms-lbl{min-width:0;line-height:1.35}
+#hb-hud .ms-lbl b{display:block;font-family:'Share Tech Mono',monospace;font-weight:400;font-size:.5rem;opacity:.85}
+#hb-hud .ms-ck{font-size:.7rem}
+#hb-hud .ms:not(.hit) .ms-ck{display:none}
+@container (min-width:520px){
+  .hb-stx{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #hb-hud .mss{grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+@container (min-width:560px){.hb-stx{grid-template-columns:repeat(6,minmax(0,1fr))}.hb-stx>div{grid-template-columns:minmax(0,1fr);text-align:center;justify-items:center;padding:10px 6px}.hb-stx .vi-ic{grid-row:auto;margin-bottom:4px}}
+@container (min-width:820px){.hb-stx .vi-ic{width:26px;height:26px}.hb-stx b{font-size:.9rem}.hb-stx span{font-size:.52rem}}
 .hb-row{margin:8px 0 6px;padding:10px 12px;border:1px solid rgb(var(--gold-rgb) / .5);border-radius:8px;background:rgb(var(--gold-rgb) / .07)}
 .hb-row-n{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--gold);letter-spacing:.12em}
 .hb-row-n b{font-size:1.5rem;color:#fff;letter-spacing:0;margin:0 2px}
@@ -15363,12 +15378,14 @@ function hbStill(){
 function updateUI(){
   const p=pct();
   const _sym=window.VI_CURRENCY_SYMBOL||'£';
-  document.getElementById('pbarFill').style.width=(p*100)+'%';
-  document.getElementById('ppct').textContent=(p*100).toFixed(1)+'%';
-  document.getElementById('savedAmt').textContent=gbpFmt(state.saved);
-  document.getElementById('tgtAmt').textContent='of '+gbpFmt(depositTarget())+' deposit ('+state.depositPct+'% of '+gbpFmt(state.target)+')';
-  document.getElementById('stRemain').textContent=gbpFmt(Math.max(0,depositTarget()-state.saved));
-  document.getElementById('stDeposit').textContent=gbpFmt(depositTarget());
+  // the bar, stats and milestones live in the one Level 1 progress tile (hbRenderHUD), which Level 2 does not show (v0.8)
+  var _q=function(id){return document.getElementById(id)||{style:{}};};
+  _q('pbarFill').style.width=(p*100)+'%';
+  _q('ppct').textContent=(p*100).toFixed(1)+'%';
+  _q('savedAmt').textContent=gbpFmt(state.saved);
+  _q('tgtAmt').textContent=gbpFmt(depositTarget())+' deposit';
+  _q('stRemain').textContent=gbpFmt(Math.max(0,depositTarget()-state.saved));
+  _q('stDeposit').textContent=gbpFmt(depositTarget());
   [{id:'ms1',t:.01},{id:'ms5',t:.05},{id:'ms15',t:.15},{id:'ms30',t:.30},{id:'ms50',t:.50},{id:'ms65',t:.65},{id:'ms80',t:.80},{id:'ms90',t:.90},{id:'ms95',t:.95},{id:'ms100',t:1}].forEach(m=>{const el=document.getElementById(m.id);if(el)el.classList.toggle('hit',p>=m.t);});
   const cap=document.getElementById('sceneCap');
   var purchasedBanner=document.getElementById('house-purchased-banner');
@@ -15759,9 +15776,7 @@ function hbRenderHUD(){
   var _bLaid=_bi?Math.min(brickTotal,(hbBrandModel(_bi.model)?HB3D.brandStats(_bi.model,_isPro()?p:0.04):_bi.model.stats(_isPro()?p:0.04)).bricksLaid):0,_sym=window.VI_CURRENCY_SYMBOL||'£',_rate=window.VI_CURRENCY_RATE||1;
   var inp=document.getElementById('depositPctInput');if(inp&&document.activeElement!==inp)inp.value=state.depositPct;
   var amt=document.getElementById('depositPctAmt');if(amt)amt.textContent='= '+gbpFmt(dt);
-  var sl=document.querySelector('#stDeposit');if(sl&&sl.nextElementSibling)sl.nextElementSibling.textContent=state.depositPct+'% Deposit';
   if(view===1){
-    var got=HB_BADGES.filter(function(b){return p>=b[0];}).length;
     var bud=hbBudget(),cur=+state.monthly>0?+state.monthly:0;
     var rows='',tip='';
     if(rem>0&&(bud.unassigned>0||bud.saving>0)){
@@ -15777,17 +15792,41 @@ function hbRenderHUD(){
         +'<div class="hb-row-sub">'+(RS.brand&&RS.p>=0.999?'Keys are yours. Your deposit is funded.':RS.brand&&RS.done?'Brickwork done. The roof, glazing and finish come next.':RS.p>=0.9999?'Every row is built. Your deposit is funded.':_cs+(RS.brand?(RS.toRow*_cr).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):Math.round(RS.toRow*_cr).toLocaleString('en-GB'))+' to finish this row · '+_cs+Math.round(RS.per*_cr).toLocaleString('en-GB')+' lays one row')+'</div>'
         +'<button class="stk-btn" onclick="hbJumpToRow()">📍 Show it on the house</button></div>';
     }
+    // one progress tile (owner, 2 Nov, v0.8): the old Level 1 card and the PROGRESS card merged. One bar, one set of stats
+    // with a line icon each, one milestone set with the house type's own names. Ids kept for updateUI and hbWriteStats.
+    var _ic=function(n){return '<svg class="vi-ic" aria-hidden="true"><use href="#vi-'+n+'"/></svg>';};
+    var _st=function(ic,v,l,id){return '<div class="hb-st-'+ic+'">'+_ic(ic)+'<b'+(id?' id="'+id+'"':'')+'>'+v+'</b><span>'+l+'</span></div>';};
+    var _msl=(typeof MS_LABELS!=='undefined'&&(MS_LABELS[state.houseType]||MS_LABELS.terraced))||[],_mss=MS_PCTS.map(function(q,i){var hit=p>=q/100;
+      return '<div class="ms'+(hit?' hit':'')+'" id="ms'+MS_IDS[i]+'"><div class="ms-dot"></div><div class="ms-lbl" id="msl-'+MS_IDS[i]+'"><b>'+q+'%</b> '+cfEsc(_msl[i]||'')+'</div><div class="ms-ck">'+(hit?'<svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg>':'')+'</div></div>';}).join('');
+    var _nx=MS_PCTS.findIndex(function(q){return p<q/100;}),_next=_nx<0?'':'<div class="hb-pg-next">'+_ic('milestone')+'<span>Next: <b>'+MS_PCTS[_nx]+'%</b> · '+cfEsc(_msl[_nx]||'')+' · '+gbpFmt(Math.max(0,MS_PCTS[_nx]/100*dt-(state.saved||0)))+' to go</span></div>';
+    var _ticks=MS_PCTS.slice(0,-1).map(function(q){return '<i class="hb-tick'+(p>=q/100?' on':'')+'" style="left:'+q+'%"></i>';}).join('');
     el.innerHTML='<div class="card-lbl">LEVEL 1 · FIRST DEPOSIT <span class="vi-dim">· hologram build</span></div>'
-      +'<div style="display:flex;justify-content:space-between;font-family:\'Share Tech Mono\',monospace;font-size:.62rem;color:var(--text)"><span>'+gbpFmt(state.saved||0)+' saved</span><span>'+(p*100).toFixed(1)+'% of '+gbpFmt(dt)+'</span></div>'
-      +'<div class="hb-xp"><div style="width:'+(p*100).toFixed(1)+'%"></div></div>'
+      +'<div class="hb-pg">'
+      +'<div class="hb-pg-main">'
+      +'<div class="hb-pg-top"><span><b id="savedAmt">'+gbpFmt(state.saved||0)+'</b> saved</span><span><b id="ppct">'+(p*100).toFixed(1)+'%</b> of <span id="tgtAmt">'+gbpFmt(dt)+' deposit</span></span></div>'
+      +'<div class="hb-xp hb-xp-ms"><div id="pbarFill" style="width:'+(p*100).toFixed(1)+'%"></div>'+_ticks+'</div>'
+      +_next
       +rowHtml
-      +(_bi&&hbBrandModel(_bi.model)?'<div style="font-size:.5rem;color:var(--t3)">Your house builds as a <b style="color:var(--em)">hologram</b>: 77% of the deposit lays the bricks, course by course, and the rest pays for the roof, glazing and finish. You are <b>'+(p*100).toFixed(1)+'%</b> of the way there. Full colour comes once you own it.</div>'
-        :'<div style="font-size:.5rem;color:var(--t3)">Your house builds from the ground up as a <b style="color:var(--em)">hologram</b>: <b>'+(p*100).toFixed(1)+'%</b> of the deposit is <b>'+(p*100).toFixed(1)+'%</b> of the house. Full colour comes once you own it.</div>')
-      +'<div class="hb-st"><div><b>'+(_bi?_bLaid.toLocaleString('en-GB'):'…')+'</b><span>of '+(_bi?brickTotal.toLocaleString('en-GB'):'…')+' UK bricks</span></div><div><b>'+gbpFmt(rem)+'</b><span>to go</span></div><div><b>'+hbXP().toLocaleString('en-GB')+'</b><span>XP</span></div><div><b>'+hbStreak()+'🔥</b><span>streak</span></div></div>'
-      +'<div style="font-size:.46rem;color:var(--t3)">'+(_bi?'Each brick ≈ '+_sym+(perBrick*_rate).toFixed(2)+' · real 215 × 102.5 × 65 mm bricks, laid course by course':'Counting bricks…')+'</div>'
-      +'<div class="hb-badges">'+HB_BADGES.map(function(b,i){return '<span class="hb-bd'+(p>=b[0]?' got':'')+'">'+(p>=b[0]?'🏅 ':'')+(b[0]*100)+'% · '+b[1]+'</span>';}).join('')+'</div>'
-      +'<div style="margin-top:10px"><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Preview your mortgage</button></div>'
+      +(_bi&&hbBrandModel(_bi.model)?'<div class="hb-pg-note">Your house builds as a <b style="color:var(--em)">hologram</b>: 77% of the deposit lays the bricks, course by course, and the rest pays for the roof, glazing and finish. You are <b>'+(p*100).toFixed(1)+'%</b> of the way there. Full colour comes once you own it.</div>'
+        :'<div class="hb-pg-note">Your house builds from the ground up as a <b style="color:var(--em)">hologram</b>: <b>'+(p*100).toFixed(1)+'%</b> of the deposit is <b>'+(p*100).toFixed(1)+'%</b> of the house. Full colour comes once you own it.</div>')
+      +'</div>'
+      +'<div class="hb-pg-side">'
+      +'<div class="hb-stx">'
+        +_st('brick',_bi?_bLaid.toLocaleString('en-GB'):'…','of '+(_bi?brickTotal.toLocaleString('en-GB'):'…')+' UK bricks','stBricks')
+        +_st('target',gbpFmt(rem),'to go','stRemain')
+        +_st('vault',gbpFmt(dt),state.depositPct+'% deposit of '+gbpFmt(state.target||0),'stDeposit')
+        +_st('house-builder','…','roof tiles','stTiles')
+        +_st('xp',hbXP().toLocaleString('en-GB'),'XP')
+        +_st('streak',String(hbStreak()),'streak')
+      +'</div>'
+      +'<div class="hb-pg-note">'+(_bi?'Each brick ≈ '+_sym+(perBrick*_rate).toFixed(2)+' · real 215 × 102.5 × 65 mm bricks, laid course by course':'Counting bricks…')+'</div>'
+      +'</div>'
+      +'</div>'
+      +'<div class="hb-sub-lbl hb-pg-ms">'+_ic('milestone')+' Milestones</div>'
+      +'<div class="mss">'+_mss+'</div>'
+      +'<div style="margin-top:12px"><button class="btn-add-data" onclick="hbOpenCalc()">🧮 Preview your mortgage</button></div>'
       +tip;
+    try{hbWriteStats();}catch(e){}
   } else {
     hbRenderL2(el);
   }
@@ -16935,7 +16974,7 @@ function updateMilestoneLabels(){
   const lbl=MS_LABELS[state.houseType]||MS_LABELS.terraced;
   MS_IDS.forEach((id,i)=>{
     const el=document.getElementById('msl-'+id);
-    if(el)el.textContent=MS_PCTS[i]+'% · '+lbl[i];
+    if(el)el.innerHTML='<b>'+MS_PCTS[i]+'%</b> '+cfEsc(lbl[i]);
   });
 }
 
