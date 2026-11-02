@@ -91,3 +91,6 @@ D2 cc57e1c: the finish is verified by grep: all three `.hb-tip` strings use vi-i
 ## E2, v08/chrome 8d37b6f: PASS
 1. Feedback over 3D controls: at 690, with the button over the Net worth HUD, opacity is 0. Once it is clear after a scroll it fades back (0.70 mid-fade). It never moves.
 2. Key: the 60% border and 10% fill make each group's colour read as a key in Night and Daylight at 390, at the same size as before.
+
+## B2, v07/final-fixes c017efc: PASS
+390, Night and Daylight, live GLB seed. The badge reads "3D · tap to turn" with vi-orbit on touch, in Night colours on the stage in both themes (good QC catch on the 2:1 contrast). "Change model" and "Remove model" are teal ghost pills. Accepted deviation: 11 px with 5 11 padding in the modal, a better tap target that sits within the type floors.
