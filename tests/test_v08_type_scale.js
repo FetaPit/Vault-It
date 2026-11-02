@@ -170,6 +170,13 @@ function measure() {
     await p3.setViewportSize({ width: 360, height: 780 }); await p3.waitForTimeout(300);
     const bl360 = await p3.evaluate(() => [...document.querySelectorAll('#tab-biz .ov-kpi-lbl')].filter(e => e.offsetParent).map(e => [Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight === 'normal' ? parseFloat(getComputedStyle(e).fontSize) * 1.2 : getComputedStyle(e).lineHeight)), e.scrollWidth > e.clientWidth + 1]));
     ok(bl360.length > 0 && bl360.every(x => x[0] <= 2 && !x[1]), `360: Entrepreneur KPI labels wrap to at most two lines, none cut (${bl360.map(x => x[0]).join(',')})`);
+    // David / Pedro (2 Nov): 2x2 on phones and small tablets, 4 across once the labels fit in two lines; never a lone tile on its own row
+    for (const w of [460, 599, 700, 768, 1100]) {
+      await p3.setViewportSize({ width: w, height: 844 }); await p3.waitForTimeout(300);
+      const g = await p3.evaluate(() => { const k = [...document.querySelectorAll('#tab-biz .ov-kpis:not(.debt-strip)>.ov-kpi')].filter(e => e.offsetParent); const rows = {}; k.forEach(e => { const t = Math.round(e.getBoundingClientRect().top); rows[t] = (rows[t] || 0) + 1; });
+        const l = k.map(e => e.querySelector('.ov-kpi-lbl')); return { rows: Object.values(rows), lines: l.map(e => Math.round(e.getBoundingClientRect().height / (parseFloat(getComputedStyle(e).fontSize) * 1.2))), cut: l.some(e => e.scrollWidth > e.clientWidth + 1) }; });
+      ok(g.rows.length && g.rows.every(n => n === g.rows[0]) && (w < 768 ? g.rows[0] === 2 : g.rows[0] === 4) && g.lines.every(n => n <= 2) && !g.cut, `${w}: Entrepreneur KPIs ${w < 768 ? '2x2' : '4 across'}, no lone tile, labels at most two lines (rows ${g.rows.join('+')}, lines ${g.lines.join(',')})`);
+    }
     await p3.setViewportSize({ width: 390, height: 844 }); await p3.waitForTimeout(300);
     ok(fu.cap >= 10.5 && fu.capText === 'LAPTOP', `item block caption at ${fu.cap} px (${fu.capText})`);
     ok(fu.sub >= 10.5, `Stocks donut sub-line drawn at ${fu.sub} px`);
