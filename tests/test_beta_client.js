@@ -30,7 +30,7 @@ const fresh = async (b, seed) => {
   const ctx = await b.newContext({ viewport: { width: 430, height: 900 }, acceptDownloads: true }); const page = await ctx.newPage(); const errs = []; page.errs = errs;
   page.on('pageerror', e => errs.push(e.message));
   await page.addInitScript((seed) => { if (window.name === '__seeded') return; window.name = '__seeded'; localStorage.setItem('vi_declined_demo', 'true'); if (seed) for (const k in seed) localStorage.setItem(k, seed[k]); }, seed || null);
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1200);
+  await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')); await page.waitForTimeout(1200);
   await page.evaluate(MOCK); return { ctx, page };
 };
 const err = page => page.evaluate(() => document.getElementById('auth-err').textContent);
@@ -275,7 +275,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   const rc = await page.evaluate(() => { let m = ''; window.confirm = (x) => { m = x; return false; }; resetVaultData(); return m; });
   ok(/Earlier versions stay in Version history & restore for up to 180 days/.test(rc) && !/permanently delete/i.test(rc), 'Reset no longer claims to "permanently delete" — it says earlier versions stay restorable');
   // deep links from the website
-  await page.goto('file:///home/user/Vault-It/index.html?privacy=1'); await page.waitForTimeout(2500);
+  await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')+'?privacy=1'); await page.waitForTimeout(2500);
   ok(await page.evaluate(() => /Privacy notice/.test((document.getElementById('legal-modal') || {}).innerText || '')), '?privacy=1 opens the privacy notice (linked from the website sign-up)');
   ok(page.errs.length === 0, 'no page errors ' + page.errs.slice(0, 2).join(' | '));
   await ctx.close();
@@ -289,7 +289,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   // a key on the real address: the widget starts as soon as the sign-in screen shows, before anyone taps Continue
   ctx = await b.newContext({ viewport: { width: 430, height: 900 } }); page = await ctx.newPage(); page.errs = []; page.on('pageerror', e => page.errs.push(e.message));
   await page.addInitScript(() => { window.__VI_TS_KEY = '1x00000000000000000000AA'; window.__vi_captcha_force = true; window.__reset = 0; window.turnstile = { render: (sel, o) => { window.__ts = o; window.__sel = sel; window.__renders = (window.__renders || 0) + 1; return 'w1'; }, reset: () => { window.__reset++; } }; localStorage.setItem('vi_declined_demo', 'true'); });
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500); await page.evaluate(MOCK);
+  await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')); await page.waitForTimeout(1500); await page.evaluate(MOCK);
   ok(await page.evaluate(() => window.__renders === 1 && window.__ts.sitekey === '1x00000000000000000000AA' && window.__sel === '#auth-captcha' && getComputedStyle(document.getElementById('auth-captcha')).display === 'block'), 'the check is drawn as soon as the sign-in screen appears (not on the first Continue tap)');
   await page.fill('#auth-email', 'pete@example.com'); await page.evaluate(() => { _m.calls.length = 0; });
   await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(500);

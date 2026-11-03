@@ -17,7 +17,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
         H(6, 2, '0P0001OXYZ12', 'Vanguard FTSE Global All Cap Index Fund GBP Acc', 60, 180), H(7, 2, 'ZZ', 'Zed', 3, 3), { id: 8, pie: 1, sym: 'OLDX', name: 'Old', units: 10, avgCost: 4200, price: 300, updated: n }, H(9, 3, 'QQ', 'Quill', 1, 1)
       ], stockPies: [{ id: 1, name: 'Trading 212 ISA' }, { id: 2, name: 'Vanguard', kind: 'fund' }, { id: 3, name: 'Tiny pie' }], activePie: 'all', cashAccounts: [], otherAssets: [], crypto: [], liabilities: [], metals: { gold: 0, silver: 0, platinum: 0, palladium: 0 } }));
     });
-    await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1200);
+    await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')); await page.waitForTimeout(1200);
     await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await page.evaluate(() => { showTab('assets'); showSubtab('assets', 'stocks', null); stkSetAlloc('tree'); });
     await page.waitForTimeout(800);
@@ -69,8 +69,17 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
       const dn = document.querySelector('#stk-main svg[aria-label="Portfolio allocation"]'), fsz = dn ? [...dn.querySelectorAll('text')].map(x => x.getBoundingClientRect().height && parseFloat(getComputedStyle(x).fontSize) * (dn.getBoundingClientRect().width / 150)) : [];
       const ring = dn ? Math.min(...[...dn.querySelectorAll('circle')].map(c => +c.getAttribute('r'))) - 8 : 0;
       const tw = dn ? Math.max(...[...dn.querySelectorAll('text')].map(x => x.getBBox().width)) / 2 : 0;
-      return { ph, chkLines: chk ? Math.round((chk.getBoundingClientRect().height - 8) / lh) : 0, av, fsz, inner: ring, half: tw };
+      const lum = c => { const f = c.map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * f[0] + .7152 * f[1] + .0722 * f[2]; };
+      const tiles = [...document.querySelectorAll('#stk-treemap .dtm-cell')].map(c => { const m = getComputedStyle(c).backgroundColor.match(/[\d.]+/g).map(Number), t = getComputedStyle(c).color.match(/[\d.]+/g).map(Number);
+        const [r, g, b] = m.map(v => v / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; let h = 0; if (mx !== mn) { const d = mx - mn; h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h = (h * 60 + 360) % 360; }
+        return { ratio: (Math.max(lum(m), lum(t)) + .05) / (Math.min(lum(m), lum(t)) + .05), overlay: getComputedStyle(c, '::after').backgroundImage, brown: h >= 15 && h <= 50 && l < .5, bg: getComputedStyle(c).backgroundColor }; });
+      const gv = [...document.querySelectorAll('#stk-holdings .stk-gv small')].map(x => parseFloat(getComputedStyle(x).fontSize));
+      return { tiles, gv, ph, chkLines: chk ? Math.round((chk.getBoundingClientRect().height - 8) / lh) : 0, av, fsz, inner: ring, half: tw };
     });
+    ok(extra.tiles.length > 0 && extra.tiles.every(x => x.ratio >= 4.5), t + 'tile text is at least 4.5:1 (' + extra.tiles.map(x => x.ratio.toFixed(1)).join(',') + ')');
+    ok(extra.tiles.every(x => x.overlay === 'none'), t + 'no darkening overlay on the tiles (' + extra.tiles.map(x => x.overlay.slice(0, 20)).join('|') + ')');
+    ok(extra.tiles.every(x => !x.brown), t + 'no tile is brown or olive ' + JSON.stringify(extra.tiles.filter(x => x.brown).map(x => x.bg)));
+    ok(extra.gv.length > 0 && extra.gv.every(f => f >= 10.5), t + 'the % in each pie header is 10.5px or more (' + extra.gv + ')');
     ok(extra.ph === 'Cost per unit £', t + 'add-row placeholder reads "Cost per unit £" (' + extra.ph + ')');
     ok(extra.chkLines === 1, t + 'the "Check your average cost" nudge sits on one line (' + extra.chkLines + ')');
     ok(extra.av.every(a => a.fits), t + 'no avg-cost placeholder is clipped ' + JSON.stringify(extra.av.filter(a => !a.fits)));

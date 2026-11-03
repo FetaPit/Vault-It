@@ -10731,11 +10731,12 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .stk-chev{width:16px;height:16px;flex:none;transition:transform .2s;transform:rotate(-90deg);color:var(--teal)}.stk-grp.open .stk-chev{transform:none}
 .stk-gn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Syne',sans-serif;font-weight:700}
 .stk-gc{font:max(.5rem,var(--vi-fs-1)) 'Share Tech Mono',monospace;color:var(--t3);white-space:nowrap}
-.stk-gv{font:700 max(.66rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--tx);white-space:nowrap;text-align:right}.stk-gv small{color:var(--t3);font-weight:400}
+.stk-gv{font:700 max(.66rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--tx);white-space:nowrap;text-align:right}.stk-gv small{color:var(--t3);font-weight:400;font-size:max(10.5px,.9em)}
 .stk-gb{overflow-x:auto;padding:0 12px}
 @media(prefers-reduced-motion:reduce){.stk-chev{transition:none}}
 .stk-tm{margin:6px 0 2px}.stk-tm-pie{position:absolute;border:1.5px solid;border-radius:9px;pointer-events:none;opacity:.9}
-.stk-tm-c .dtm-n,.stk-tm-c .dtm-v,.stk-tm-c .dtm-s{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.stk-tm-c .dtm-n,.stk-tm-c .dtm-v,.stk-tm-c .dtm-s{color:inherit;text-shadow:none;opacity:1}
+.stk-tm-c.dtm-cell::after{background:none}
 .c-tk{display:flex;gap:8px;align-items:flex-start;min-width:0}.stk-tkb{min-width:0;flex:1}
 .stk-hl{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:7px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
 .stk-hl img{width:100%;height:100%;object-fit:contain;display:block;padding:2px;box-sizing:border-box}
@@ -20545,6 +20546,14 @@ function stkTmName(h){
   var n=String(h.name||'').replace(/\b(GBP|USD|EUR|Acc|Inc|Accumulation|Income|Distributing)\b\.?/gi,'').replace(/\bClass\s+\w+\b/gi,'').replace(/\s+/g,' ').trim();
   return n||s;
 }
+// Tile colours: the pie colour lightened (never darkened to olive or brown), with dark ink picked so the text is at least 4.5:1.
+function stkHexRgb(h){h=String(h).replace('#','');if(h.length===3)h=h.replace(/./g,'$&$&');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
+function stkLum(c){var f=c.map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});return .2126*f[0]+.7152*f[1]+.0722*f[2];}
+function stkTileCol(col,j,other){
+  var c=stkHexRgb(col),k=other?.58:Math.min(.04+Math.min(j,5)*.035,.22),rgb;
+  for(;;){rgb=c.map(function(v){return Math.round(v+(255-v)*k);});if((stkLum(rgb)+.05)/(stkLum([11,16,24])+.05)>=5.2||k>=.95)break;k+=.04;}   // 5.2 leaves room for the hatch
+  return 'rgb('+rgb.join(',')+')';
+}
 function stkDrawTreemap(){
   var el=document.getElementById('stk-treemap'),key=document.getElementById('stk-tm-key'),lg=document.getElementById('stk-tm-other');if(!el)return;
   var W=el.parentElement.clientWidth-(parseFloat(getComputedStyle(el.parentElement).paddingLeft)||0)*2;
@@ -20562,14 +20571,14 @@ function stkDrawTreemap(){
     var it=c.it,col=c.g.col,bg;
     if(it.other){
       var names=it.items.map(function(x){return x.name+' '+x.val;}).join(', ');
-      bg='repeating-linear-gradient(135deg,rgba(255,255,255,.14) 0 6px,transparent 6px 12px),color-mix(in srgb,'+col+' 58%,#0b1018)';
-      out+='<div class="dtm-cell stk-tm-c dtm-other" tabindex="0" data-n="'+stkEsc(it.name+' · '+c.g.p.name)+'" data-v="'+stkEsc(names)+'" title="'+stkEsc(it.name+' in '+c.g.p.name+': '+names)+'" style="left:'+c.x+'px;top:'+c.y+'px;width:'+c.w+'px;height:'+c.h+'px;background:'+bg+'">'
+      bg='repeating-linear-gradient(135deg,rgba(11,16,24,.12) 0 6px,transparent 6px 12px),'+stkTileCol(col,0,true);
+      out+='<div class="dtm-cell stk-tm-c dtm-other" tabindex="0" data-n="'+stkEsc(it.name+' · '+c.g.p.name)+'" data-v="'+stkEsc(names)+'" title="'+stkEsc(it.name+' in '+c.g.p.name+': '+names)+'" style="left:'+c.x+'px;top:'+c.y+'px;width:'+c.w+'px;height:'+c.h+'px;color:#0b1018;background:'+bg+'">'
         +(c.fit?'<b class="dtm-n">'+stkEsc(it.name)+'</b><span class="dtm-v">'+stkEsc(it.val)+'</span>'+(c.fit.share?'<span class="dtm-s">'+stkEsc(c.fit.share)+'</span>':''):'')+'</div>';
       return;
     }
     var h=it.h,r=stkReturns([h]),chg=r.counted.length?' · '+(r.change>=0?'+':'-')+cfMoney(Math.abs(r.change))+' since added':'';
-    bg='color-mix(in srgb,'+col+' '+(86-Math.min(c.j,5)*9)+'%,#0b1018)';
-    out+='<div class="dtm-cell stk-tm-c" title="'+stkEsc((h.name||it.name)+' · '+c.g.p.name+' · '+it.val+' ('+it.pct+'%)'+chg)+'" style="left:'+c.x+'px;top:'+c.y+'px;width:'+c.w+'px;height:'+c.h+'px;background:'+bg+'">'
+    bg=stkTileCol(col,c.j);
+    out+='<div class="dtm-cell stk-tm-c" title="'+stkEsc((h.name||it.name)+' · '+c.g.p.name+' · '+it.val+' ('+it.pct+'%)'+chg)+'" style="left:'+c.x+'px;top:'+c.y+'px;width:'+c.w+'px;height:'+c.h+'px;color:#0b1018;background:'+bg+'">'
       +'<div class="dtm-hd">'+(c.fit.logo?stkHoldLogo(h,20,col):'')+'<b class="dtm-n">'+c.fit.lines.map(stkEsc).join('<br>')+'</b></div><span class="dtm-v">'+stkEsc(it.val)+'</span>'+(c.fit.share?'<span class="dtm-s">'+stkEsc(c.fit.share)+'</span>':'')+'</div>';
   });
   el.innerHTML=out+'<div class="dtm-tip" aria-live="polite" hidden></div>';
@@ -27946,7 +27955,7 @@ function showPrivacy() {
       + '<li><strong>Resend</strong>: delivers your sign-in emails (your email address and the code) and the beta-list emails. If it is unavailable, Supabase’s own mailer is used for sign-in emails instead.</li>'
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
-    '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank and provider logos; it is told the website of each bank, card or investment provider you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
+    '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank, provider, company and ticker logos; it is told the website of each bank, card, investment provider or company you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
     '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Poly Pizza</strong> supplies free 3D models of everyday items if you pick one from its library for a wealth or liability item: your browser downloads the file straight from Poly Pizza, which sees your IP address and which model you chose, and nothing else. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
     '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or third-party analytics. During the beta the app records how it is used (screens opened, features used, errors and how long a visit lasts, never your figures or what you type) in our own database, to improve it; you can switch this off in Settings (Share usage). Feedback you send from the app is stored by us with the screen you were on, your last few taps and, unless you untick it, a picture of that screen with every figure hidden. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected, and what that does not mean'),
