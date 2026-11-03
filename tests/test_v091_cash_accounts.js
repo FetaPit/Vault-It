@@ -12,7 +12,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     await ctx.route(/^https?:\/\//, r => r.abort());
     await p.addInitScript(t => {
       if (localStorage.getItem('pos_al1')) return;
-      localStorage.setItem('vi_theme', t); localStorage.setItem('vi_declined_demo', 'true');
+      localStorage.setItem('vi-theme', t); localStorage.setItem('vi_declined_demo', 'true');
       localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
       localStorage.setItem('pos_al1', JSON.stringify({ cashAccounts: [
         { id: 1, name: 'Marcus saver', type: 'Savings', balance: 10000, rate: 4.5 },
@@ -66,6 +66,8 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     a2 = await st(2); const msg = await p.textContent(row(2) + ' .ca-mv-msg');
     ok(a2.balance === 700 && a2.moves.length === 1 && /Debt tracker/.test(msg), T + 'a take-out above the balance is refused with the Debt tracker pointer: ' + msg.trim());
     ok(await p.isVisible(row(2) + ' .ca-mv-msg a, ' + row(2) + ' .ca-mv-msg button'), T + 'the message links to the Debt tracker');
+    const lk = await p.evaluate(s => { const a = document.querySelector(s + ' .ca-mv-msg a'), m = document.querySelector(s + ' .ca-mv-msg'); return { h: Math.round(a.getBoundingClientRect().height), c: getComputedStyle(m).color, re: (() => { const d = document.createElement('i'); d.style.color = 'var(--re)'; document.body.appendChild(d); const c = getComputedStyle(d).color; d.remove(); return c; })() }; }, row(2));
+    ok(lk.h >= 44 && lk.c !== lk.re, T + 'the refusal link target is 44 px and the message is calm text (' + lk.h + ' px, ' + lk.c + ')');
     await p.fill(row(2) + ' .ca-mv-amt', '700'); await p.click(row(2) + ' .ca-mv-ok'); await p.waitForTimeout(300);
     ok((await st(2)).balance === 0, T + 'taking out the whole balance is allowed and lands on exactly 0');
     ok(JSON.stringify(await p.evaluate(() => window.__land)) === '[[250,1],[-300,2],[-700,2]]', T + 'v3CashLand: take-out signed, refused take-out not called ' + JSON.stringify(await p.evaluate(() => window.__land)));
@@ -80,6 +82,9 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     ok(saved.find(a => a.id === 1).rate === 4.5 && saved.find(a => a.id === 2).moves.length === 2 && saved.find(a => a.id === 3).moves.length === 1, T + 'rate and moves are saved to the device copy');
     ok(await p.evaluate(() => { const a = JSON.parse(JSON.stringify(alState.cashAccounts)); alState.cashAccounts = JSON.parse(localStorage.getItem('pos_al1')).cashAccounts; renderAlTab(); const ok2 = /£450/.test(document.getElementById('cash-table').textContent); alState.cashAccounts = a; renderAlTab(); return ok2; }), T + 'a saved copy renders with its rate');
     // targets and layout
+    const bw = await p.evaluate(() => Math.max(...[...document.querySelectorAll('#cash-table .ca-add,#cash-table .ca-out')].map(e => Math.round(e.getBoundingClientRect().width))));
+    ok(bw <= 150, T + 'Add and Take out buttons are capped in width (' + bw + ' px)');
+    ok(/Interest rate \(AER\)/.test(await txt(1)) && /\(estimate\)/.test(await txt(1)) && !/\babout\b/.test(await txt(1)), T + 'rows say interest and estimate, the field says Interest rate (AER)');
     const hs = await p.evaluate(() => [...document.querySelectorAll('#cash-table .ca-add,#cash-table .ca-out')].map(e => Math.round(e.getBoundingClientRect().height)));
     ok(hs.length >= 4 && hs.every(h => h >= 44), T + 'Add and Take out targets are at least 44 px high (' + hs.join(',') + ')');
     const small = await p.evaluate(() => [...document.querySelectorAll('#cash-table .ca-sub, #cash-table .ca-sub *')].filter(e => e.children.length === 0 && e.textContent.trim() && parseFloat(getComputedStyle(e).fontSize) < 10.5).map(e => e.textContent.trim().slice(0, 20)));

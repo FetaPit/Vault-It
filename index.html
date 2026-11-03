@@ -10617,14 +10617,14 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .ca-rate{display:inline-flex;align-items:center;gap:6px}
 .ca-rate-in{width:84px;min-height:36px;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:4px 8px}
 .ca-int{color:var(--gr);font-family:'Share Tech Mono',monospace}
-.ca-act{display:flex;gap:8px;margin-top:8px}.ca-act button{flex:1 1 0;min-width:0;padding:6px 8px;white-space:nowrap}
+.ca-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.ca-act button{flex:1 1 auto;max-width:150px;padding:6px 14px;white-space:nowrap}
 .ca-add,.ca-out,.ca-mv-ok,.ca-mv-no,.ca-undo-btn{min-height:44px;min-width:44px;padding:6px 14px;border-radius:4px;border:1px solid var(--gr);background:transparent;color:var(--gr);font-family:'Share Tech Mono',monospace;font-size:max(.7rem,var(--vi-fs-3));cursor:pointer}
 .ca-out{border-color:var(--re);color:var(--re)}
 .ca-mv-no{border-color:var(--bd);color:var(--t3)}
 .ca-mv{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;align-items:center}
 .ca-mv input{min-height:44px;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;min-width:0;flex:1 1 120px}
-.ca-mv-msg{flex:1 1 100%;margin-top:0}
-.ca-mv-msg a{color:var(--gr);text-decoration:underline}
+.ca-mv .ca-mv-msg{flex:1 1 100%;margin-top:0;color:var(--t2)}
+.ca-mv-msg a{color:var(--gr);text-decoration:underline;display:inline-flex;align-items:center;min-height:44px;padding:0 6px}
 .ca-log{margin-top:8px;font-size:max(.66rem,var(--vi-fs-2));color:var(--t3)}
 .ca-log summary{cursor:pointer;min-height:24px}
 .ca-log-l{display:flex;justify-content:space-between;gap:12px;padding:2px 0;font-family:'Share Tech Mono',monospace}
@@ -12471,7 +12471,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div class="nw3d-seg" id="bd-fz" role="group" aria-label="Zoom the income flow"><button type="button" data-fz="out" aria-label="Zoom out" title="Zoom out">&minus;</button><button type="button" data-fz="fit" aria-label="Fit the whole flow on screen" title="Fit the whole flow on screen">Fit</button><button type="button" data-fz="in" aria-label="Zoom in" title="Zoom in">+</button></div></div>
       <div id="bd-sankey" class="cf-scroll"></div>
       <div id="bd-3d" hidden>
-        <span class="nw3d-sub bd3d-sub">A tree map of your monthly income: each type of spending or saving is one area, filled with £100 blocks (smaller blocks for the pounds left over). Tap or hover a block to read its line, drag to turn it.</span>
         <div class="nw3d-stage" id="bd3d-stage"><canvas id="bd3d-cv" tabindex="0" role="img" aria-label="Your monthly budget as a tree map of £100 blocks, one area per type of spending or saving. Tap a block to read it, drag to turn it."></canvas><div class="nw3d-hud" role="group" aria-label="View controls"><button type="button" data-z="in" aria-label="Zoom in" title="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out" title="Zoom out">&minus;</button><button type="button" data-z="reset" aria-label="Reset view" title="Reset view">&#8634;</button></div></div>
         <p class="nw3d-read" id="bd3d-read" aria-live="polite"></p>
       </div>
@@ -12798,16 +12797,16 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <span class="ov-chart-title">Cash &amp; Savings Accounts</span>
           <span style="font-family:'Share Tech Mono',monospace;font-size:max(.68rem,var(--vi-fs-2));color:var(--gr)">Total: <span id="subtab-total-cash" style="font-weight:700">£0</span></span>
         </div>
-        <div class="ca-head-int" id="ca-int-wrap" hidden>Estimated interest <span id="ca-int-total"></span></div>
+        <div class="ca-head-int" id="ca-int-wrap" hidden>Total interest <span id="ca-int-total"></span></div>
         <div id="cash-table"></div>
         <div class="data-input-row" style="margin-top:12px">
           <input type="text" id="ca-name" placeholder="Account name">
           <select id="ca-type" style="background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;outline:none"><option>Current</option><option>Savings</option><option>ISA</option><option>LISA</option></select>
           <input type="number" id="ca-bal" placeholder="Balance £">
-          <input type="number" id="ca-rate" min="0" max="100" step="0.01" inputmode="decimal" placeholder="Interest AER % (optional)" aria-label="Interest rate, AER percent, optional">
+          <input type="number" id="ca-rate" min="0" max="100" step="0.01" inputmode="decimal" placeholder="Interest rate (AER) % (optional)" aria-label="Interest rate (AER), percent, optional">
           <button class="btn-add-data" onclick="addCashAccount()">+ Add</button>
         </div>
-        <div class="ca-note">Interest is an estimate from the rate you enter (balance times AER, before tax). It is not added to your net worth. Not regulated by the FCA. Not financial advice.</div>
+        <div class="ca-note">Interest is an estimate from the rate you enter (balance times the rate, before tax). It is not added to your net worth. Not regulated by the FCA. Not financial advice.</div>
       </div>
       <div class="ov-chart-card pc-card" id="pc-card" style="margin-top:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap">
@@ -14415,6 +14414,8 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 @media(max-width:699px){.ov-kpis>.ov-kpi:last-child:nth-child(odd){grid-column:1/-1}}
 /* cash-flow diagram: the whole thing fits one screen on desktop */
 @media(min-width:900px){.cf-scroll{display:flex;justify-content:center}.cf-scroll svg{width:100%!important;height:auto;margin:0 auto}}
+/* v0.9.1 E4: the dashboard tile is 3D only; display:flex above must not beat the hidden attribute */
+#cf-sankey[hidden]{display:none!important}
 /* KPI tiles + summaries: bigger, icon-led, colour-coded */
 .ov-kpi-lbl{display:flex;align-items:center;gap:6px;font-size:max(.58rem,var(--vi-fs-2))!important}
 .ov-kpi-ic{width:15px;height:15px;flex:none}
@@ -14616,6 +14617,15 @@ body.vi-pop-open{overflow:hidden}
 #bd-sankey[hidden],#bd-3d[hidden]{display:none!important}
 #bd3d-stage,#cf3d-stage{height:clamp(300px,46vh,520px);margin-top:10px}
 @media(max-width:600px){#bd3d-stage,#cf3d-stage{height:min(96vw,380px)}}
+/* v0.9.1 E6: the Budget viewport is larger now its paragraph is gone; the dashboard tile keeps its own height */
+@media(min-width:601px){#bd3d-stage{height:clamp(360px,56vh,560px)}}
+@media(min-width:1100px){#bd3d-stage{height:clamp(400px,64vh,720px)}}
+@media(max-width:600px){#bd3d-stage{height:min(104vw,440px)}}
+/* v0.9.1 E5: Budget group key, larger and the width of the card on desktop */
+@media(min-width:610px){#bd-legend{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important}
+  #bd-legend span{height:36px;justify-content:center;font-size:12px;overflow:hidden}#bd-legend s svg{width:20px!important;height:20px!important}}
+@media(min-width:1100px){#bd-legend span{height:40px;font-size:13px}#bd-legend s svg{width:22px!important;height:22px!important}}
+@media(min-width:1400px){#bd-legend{grid-template-columns:repeat(6,minmax(0,1fr))}}
 #cf-3d .nw3d-read{margin:8px 0 0}
 #bd-fz{margin-left:auto}.bd-is-3d #bd-fz{display:none}
 .bd-exp-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
@@ -14758,6 +14768,7 @@ body.vi-pop-open{overflow:hidden}
 #hb-hud .hb-da-fca{font-size:11px;color:var(--t3);line-height:1.5}
 .log-entry .hb-da-log{display:inline-flex;align-items:center;gap:5px;margin-left:8px;vertical-align:middle}
 .log-entry .hb-da-log .cash-logo{width:16px;height:16px;border-radius:4px}
+@container (max-width:899px){#hb-hud .ms.next{flex-wrap:wrap}#hb-hud .ms.next .ms-lbl{flex:1 1 0}#hb-hud .ms.next .ms-tg{flex:0 0 100%;padding-left:32px;margin-top:-2px}}   /* narrow: "£x to go" sits under its label, not at the row edge (chunk F); done rows keep "+n XP" on the line (G) */
 @container (min-width:520px){
   .hb-stx6{grid-template-columns:repeat(3,minmax(0,1fr))}
   .hb-stx6>div{flex-direction:row;text-align:left;justify-content:flex-start;gap:0 10px;padding:12px 12px 10px;flex-wrap:wrap}
@@ -19812,7 +19823,7 @@ function cfModel(){
 }
 // ── Sankey: income sources → Income → Committed / Optional / Saved → each category ──
 function drawCashflowDiagram(){
-  var hosts=['cf-sankey','bd-sankey'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var hosts=['bd-sankey'].map(function(id){return document.getElementById(id);}).filter(Boolean);
   if(!hosts.length)return;
   var m=cfModel();
   if(m.total<=0){hosts.forEach(function(h){h.__sig=null;h.innerHTML='<div class="cf-empty">Add your income and spending to see where every pound goes</div>';});return;}
@@ -21837,8 +21848,8 @@ function caRowHtml(a){
   var it=caInterest(a),open=caMv&&caMv.id===a.id,mv=(a.moves||[]).slice().sort(function(x,y){return (y.date||'').localeCompare(x.date||'')||y.id-x.id;});
   var rate=(a.rate===0||+a.rate>0)?a.rate:'';
   return '<tr data-ca="'+a.id+'"><td class="ca-cell"><span class="cash-acc">'+viBankLogo(a.name)+'<span>'+cfEsc(a.name)+'</span></span>'
-    +'<div class="ca-sub"><label class="ca-rate"><span>Interest AER %</span><input class="ca-rate-in" type="number" min="0" max="100" step="0.01" inputmode="decimal" value="'+rate+'" placeholder="none" aria-label="Interest rate, AER percent, for '+cfEsc(a.name).replace(/"/g,'&quot;')+'" onchange="caSetRate('+a.id+',this.value)"></label>'
-    +(it?'<span class="ca-int">about '+caFmt(it.year)+' a year, about '+caFmt(it.month)+' a month</span>':'')+'</div>'
+    +'<div class="ca-sub"><label class="ca-rate"><span>Interest rate (AER)</span><input class="ca-rate-in" type="number" min="0" max="100" step="0.01" inputmode="decimal" value="'+rate+'" placeholder="none" aria-label="Interest rate (AER), percent, for '+cfEsc(a.name).replace(/"/g,'&quot;')+'" onchange="caSetRate('+a.id+',this.value)"></label>'
+    +(it?'<span class="ca-int">Interest '+caFmt(it.year)+' a year (estimate), '+caFmt(it.month)+' a month</span>':'')+'</div>'
     +'<div class="ca-act"><button type="button" class="ca-add" onclick="caMoveOpen('+a.id+',1)">+ Add</button><button type="button" class="ca-out" onclick="caMoveOpen('+a.id+',-1)">− Take out</button></div>'
     +(open?'<div class="ca-mv" role="group" aria-label="'+(caMv.sign>0?'Add money to':'Take money out of')+' this account"><input class="ca-mv-amt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Amount £" aria-label="Amount" value="'+(caMv.amt||'')+'" oninput="caMv.amt=this.value" onkeydown="if(event.key===\'Enter\')caMoveDo('+a.id+')"><input class="ca-mv-date" type="date" aria-label="Date" value="'+(caMv.date||caToday())+'" onchange="caMv.date=this.value"><button type="button" class="ca-mv-ok" onclick="caMoveDo('+a.id+')">'+(caMv.sign>0?'Add':'Take out')+'</button><button type="button" class="ca-mv-no" onclick="caMoveClose()">Cancel</button><div class="ca-mv-msg vi-pop-msg" role="status"></div></div>':'')
     +(mv.length?'<details class="ca-log"><summary>Movements ('+mv.length+')</summary>'+mv.slice(0,8).map(function(m){var inn=(+m.amount||0)>=0,d=m.date?new Date(m.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';return '<div class="ca-log-l"><span>'+d+'</span><span class="'+(inn?'in':'out')+'">'+(inn?'+':'−')+caFmt(Math.abs(caP(m.amount)))+'</span></div>';}).join('')+'</details>':'')
@@ -21852,7 +21863,7 @@ function caTableHtml(){
 function caAfterRender(){
   var yr=0,any=false;(alState.cashAccounts||[]).forEach(function(a){var it=caInterest(a);if(it){yr+=it.year;any=true;}});
   var w=document.getElementById('ca-int-wrap'),t=document.getElementById('ca-int-total');
-  if(w)w.hidden=!any;if(t)t.textContent=any?'about '+caFmt(yr)+' a year':'';
+  if(w)w.hidden=!any;if(t)t.textContent=any?caFmt(yr)+' a year (estimate)':'';
 }
 function caRedraw(){setTimeout(function(){try{renderAlTab();}catch(e){console.error('[Vault-It] cash accounts',e);}},0);}  // after the change event settles: a render during blur throws
 function caSetRate(id,v){if(viBlockEdit()){caRedraw();return;}
@@ -24264,7 +24275,7 @@ viOnWidthResize(function () { drawChart(); renderFIREroadmap(); }, 200);
 // Self-heal: when a chart scrolls back into view (or the page returns from the background) redraw it and nudge the browser to
 // repaint it, so a tile the phone dropped while you were scrolling comes back whole instead of staying half-drawn.
 (function () {
-  var T = [['nwChart', function () { drawChart(); }], ['cf-sankey', function () { drawCashflowDiagram(); }], ['bd-sankey', function () { drawCashflowDiagram(); }],
+  var T = [['nwChart', function () { drawChart(); }], ['bd-sankey', function () { drawCashflowDiagram(); }],
     ['fire-timeline-scroll', function () { renderFIREroadmap(); }], ['debt-bar-chart', function () { drawDebtHistogram(); }], ['debt-donut-chart', function () { drawDebtDonut(); }]];
   function heal(el, fn) {
     if (!el || !(el.offsetWidth > 0)) return;
@@ -24471,9 +24482,8 @@ function viCfRails(el){
 }
 function viSwipeInit(){
   viSwipeWrap(document.getElementById('stk-pies'));
-  viSwipeWrap(document.getElementById('cf-sankey'),'← swipe sideways to follow the flow →');
   viSwipeWrap(document.getElementById('bd-sankey'),'← swipe sideways to follow the flow →');
-  viCfRails(document.getElementById('cf-sankey'));viCfRails(document.getElementById('bd-sankey'));
+  viCfRails(document.getElementById('bd-sankey'));
 }
 window.addEventListener('load',function(){setTimeout(viSwipeInit,400);});
 function closePaywall(){
@@ -28973,6 +28983,7 @@ function nwhRenderMini(){
 @keyframes nw3d-sflashg{0%{box-shadow:0 0 0 0 rgba(62,207,142,0)}25%{box-shadow:0 0 44px 2px rgba(62,207,142,.5);border-color:var(--green)}100%{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){.nw3d-stage.flash,.nw3d-stage.flashg{animation:none}}
 #nw3d-hero-stage{height:clamp(300px,44vh,520px)}
+@media(min-width:769px){#nw3d-hero-stage{height:clamp(360px,52.8vh,624px)}}   /* v0.9.1 E23: 20% taller on desktop */
 #nw3d-trk-stage{height:clamp(280px,40vh,560px)}
 @media(max-width:600px){#nw3d-hero-stage{height:min(88vw,340px)}#nw3d-trk-stage{height:min(92vw,360px)}}
 .nw3d-seg{display:inline-flex;border:1px solid var(--line2);border-radius:999px;overflow:hidden;flex:none}
@@ -29706,7 +29717,7 @@ function make(cvId,readId){
   if(!window.ViNW3D||!ViNW3D.makeTreeMap||!el(cvId))return null;
   var read=el(readId);
   var e=ViNW3D.makeTreeMap(el(cvId),{fmt:function(v){return gbpFmt(v)},onPick:function(p){if(!read)return;
-    read.textContent=p?p.group+' · '+p.name+': '+gbpFmt(p.v)+' a month, '+Math.round(p.share*100)+'% of your income ('+p.blocks+' block'+(p.blocks===1?'':'s')+' of up to '+gbpFmt(p.unit)+')':readDefault()}});
+    read.textContent=p?p.group+' · '+p.name+': '+gbpFmt(p.v)+' a month, '+Math.round(p.share*100)+'% of your income ('+p.blocks+' block'+(p.blocks===1?'':'s')+' of up to '+gbpFmt(p.unit)+')':readDefault()+(readId==='bd3d-read'?' · Tap or hover a block to read it, drag to turn it':'')}});
   /* zoom out / in / reset on every viewport (owner, 3 Nov: "add a zoom out function on each of the viewports") */
   var stage=el(cvId).parentNode;
   stage.addEventListener('click',function(ev){var b=ev.target.closest('[data-z]');if(!b)return;if(b.dataset.z==='reset')e.reset();else e.zoom(b.dataset.z==='in'?1.25:.8)});
@@ -29718,7 +29729,7 @@ function sigOf(d){return JSON.stringify(d.groups.map(function(g){return [g.key,g
 function refresh(force){
   if(cur==='3d'&&ensure()){
     var d=data(),sg=sigOf(d);
-    var read=el('bd3d-read');if(read&&!read.dataset.hold)read.textContent=readDefault();
+    var read=el('bd3d-read');if(read&&!read.dataset.hold)read.textContent=readDefault()+' · Tap or hover a block to read it, drag to turn it';
     if(sg!==sig||force){sig=sg;eng.setData(d)}
   }
   if(!dash)dash=make('cf3d-cv','cf3d-read');
