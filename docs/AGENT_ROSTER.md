@@ -13,7 +13,7 @@ Method for adding or changing agents: `.claude/skills/agent-methodology/SKILL.md
 | grunt | `.claude/agents/grunt.md` | Subagent | Haiku | edit | Exact mechanical edits |
 | architect | `.claude/agents/architect.md` | Subagent | Opus | read-only | Deep explains and plans |
 | One B | `.claude/agents/one-b.md` | Subagent | Sonnet | run tests | Cross-device and sign-in tests |
-| fintech-dev (fintech software engineer) | `.claude/agents/fintech-dev.md` + skill `.claude/skills/fintech-engineering` | Subagent + standards skill | Opus, high | edit + run tests | Money logic, payments, auth, saved data and Supabase changes: failing test first, stages for rollout-qc. Any session can load the skill alone |
+| fintech-dev (fintech software engineer) | `.claude/agents/fintech-dev.md` + skill `.claude/skills/fintech-engineering` | Subagent + standards skill | Opus, high | edit + run tests | Money logic, payments, auth, saved data and Supabase changes: failing test first, stages for rollout-qc. Any session can load the skill alone. Tested 3 Nov in review mode on `debtPayoffMonths` (known answer): found both planted-in-the-wild faults (payment below interest returns the 600-month cap; no rollover of freed minimums) plus string-concatenated extra and unchecked negatives, each with a reproducing input, and spotted the function is unused |
 | rollout-qc | `.claude/agents/rollout-qc.md` | Subagent | Sonnet, high | read-only | Gate: PASS writes the commit marker |
 | Builders | per chunk | Cloud session | Sonnet (Opus for 3D, money, hard bugs) | all | One chunk, one branch |
 
