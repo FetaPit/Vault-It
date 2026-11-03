@@ -10907,6 +10907,8 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 #topnav .nav-brand .logo{display:inline!important}
 #topnav .vi-nw-wrap{grid-row:1;grid-column:2;justify-self:end;padding-left:0!important}
 #topnav .vi-nw-wrap>span:first-child{display:inline!important}
+#topnav .vi-nw-wrap>span:first-child{white-space:nowrap}   /* v0.8: the label never wraps; under 380 px it reads NW (Pedro, 2 Nov) */
+@media (max-width:379.98px){#topnav .vi-nw-wrap>span:first-child{font-size:0!important;letter-spacing:0!important}#topnav .vi-nw-wrap>span:first-child::after{content:'NW';font-size:max(.44rem,var(--vi-fs-0));letter-spacing:.22em}}
 #vi-back-us-btn{grid-row:1;grid-column:3}
 #vi-theme-btn{grid-row:1;grid-column:4;margin-left:0!important}
 #vi-density-btn{grid-row:1;grid-column:5;margin-left:0!important}
@@ -14321,6 +14323,8 @@ body.vi-pop-open{overflow:hidden}
 .dtm-n{font:700 max(clamp(.62rem,1vw,.95rem),var(--vi-fs-2)) 'Syne',sans-serif;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dtm-v{font:700 max(clamp(.7rem,1.2vw,1.15rem),var(--vi-fs-3)) 'Share Tech Mono',monospace}
 .dtm-s{font:max(clamp(.5rem,.7vw,.68rem),var(--vi-fs-1)) 'Share Tech Mono',monospace;opacity:.85;margin-top:auto}
+.dtm-sm{cursor:pointer}.dtm-sm:focus-visible{outline:2px solid var(--em);outline-offset:-2px}
+.dtm-tip{position:absolute;z-index:3;display:flex;flex-direction:column;gap:1px;padding:4px 8px;border-radius:5px;background:#080808;border:1px solid #44C0B9;color:#E8E8E8;pointer-events:none;white-space:nowrap;max-width:calc(100% - 4px)}.dtm-tip[hidden]{display:none}.dtm-tip b{font:600 12px/1.2 'DM Sans',sans-serif;overflow:hidden;text-overflow:ellipsis}.dtm-tip span{font:400 11px/1.2 'Share Tech Mono',monospace;color:#5FD6C9}
 .dtm-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3)}
 .chart-filter-btn.on{background:rgb(var(--teal-rgb) / .18);color:var(--em)}
 @media(min-width:1100px){.debt-card-grid.has-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))!important;gap:16px}}
@@ -19369,14 +19373,14 @@ function drawCashflowDiagram(){
   var srcTotal=sources.reduce(function(a,s){return a+Math.max(s.amt*k,MINSLOT);},0)+(sources.length-1)*gapSrc;
   var srcY=Math.max(padT,cy-srcTotal/2);
   var H=Math.max(itemsBottom,incY+incH,srcY+srcTotal)+padB;
-  if(wide){   // widen the canvas (not the text) until the whole diagram fits the window height
+  if(wide&&window.innerWidth>=1100){   // widen the canvas (not the text) until the whole diagram fits the window height (under 1100 the diagram is 1:1 in its scroller)
     var host0=hosts.filter(function(h){return h.clientWidth>0;})[0],cw=host0?host0.clientWidth:960;
     var isBd=host0&&host0.id==='bd-sankey',Hmax=Math.max(380,window.innerHeight-(isBd?150:170));
     var Wv=Math.max(960,cw*H/Hmax),sx=Wv/960;
     if(sx>1.001){XS*=sx;XI*=sx;XG*=sx;XT*=sx;W=Wv;}
   }
   try{document.documentElement.style.setProperty('--bd-split',((XI+nodeW)/W*100).toFixed(2)+'%');}catch(e){}   // the Budget page's income | spending divider follows the diagram's income block
-  var one=window.innerWidth<600;   // phones: 1:1, scrolled sideways (v0.8 type scale)
+  var one=window.innerWidth<1100;   // phones and tablets: 1:1, scrolled sideways, so the chips draw at their real size (v0.8 type scale)
   var out='<svg viewBox="0 0 '+W+' '+H.toFixed(0)+'" width="'+(one?W:'100%')+'"'+(one?' height="'+H.toFixed(0)+'" class="cf-1to1"':'')+' style="min-width:'+(one?W+'px':wide?'0':'640px')+'" font-family="Syne,DM Sans,sans-serif" role="img" aria-label="Cash flow diagram">';
   // -- links
   var sy=srcY,io=0;
@@ -24473,13 +24477,28 @@ function drawDebtTreemap(){
   var ramp=debtChartRamp(debts);
   var cells=dtmSquarify(debts.map(function(d){return{v:d.balance,d:d};}),0,0,W,H);
   el.innerHTML=cells.map(function(c){
-    var pal=ramp[c.d.id],big=c.w>110&&c.h>70,mid=c.w>70&&c.h>46,pct=Math.round(c.d.balance/total*100);
-    return '<div class="dtm-cell" title="'+ccEsc(c.d.name)+' · '+gbpFmt(c.d.balance)+' ('+pct+'%) · '+(+c.d.rate||0)+'% APR" style="left:'+(c.x+gap/2)+'px;top:'+(c.y+gap/2)+'px;width:'+(c.w-gap)+'px;height:'+(c.h-gap)+'px;background:linear-gradient(135deg,'+pal.c1+','+pal.c2+');color:'+pal.fg+(pal.edge?';outline:1px solid rgb(var(--ink-rgb) / .3);outline-offset:-1px':'')+'">'
+    var pal=ramp[c.d.id],sm=c.w-gap<56||c.h-gap<56,big=!sm&&c.w>110&&c.h>70,mid=!sm&&c.w>70&&c.h>46,pct=Math.round(c.d.balance/total*100);   // sm: under 56 px a side, no text; name and amount show in a chip on tap or hover
+    return '<div class="dtm-cell'+(sm?' dtm-sm" tabindex="0" data-n="'+ccEsc(c.d.name)+'" data-v="'+ccEsc(gbpFmt(c.d.balance))+'"':'"')+' title="'+ccEsc(c.d.name)+' · '+gbpFmt(c.d.balance)+' ('+pct+'%) · '+(+c.d.rate||0)+'% APR" style="left:'+(c.x+gap/2)+'px;top:'+(c.y+gap/2)+'px;width:'+(c.w-gap)+'px;height:'+(c.h-gap)+'px;background:linear-gradient(135deg,'+pal.c1+','+pal.c2+');color:'+pal.fg+(pal.edge?';outline:1px solid rgb(var(--ink-rgb) / .3);outline-offset:-1px':'')+'">'
       +(mid?'<b class="dtm-n">'+ccEsc(c.d.name)+'</b>':'')
       +(mid?'<span class="dtm-v">'+gbpFmt(c.d.balance)+'</span>':'')
       +(big?'<span class="dtm-s">'+pct+'% of debt · '+(+c.d.rate||0)+'% APR</span>':'')
       +'</div>';
-  }).join('');
+  }).join('')+'<div class="dtm-tip" aria-live="polite" hidden></div>';
+  if(!el._dtmTip){el._dtmTip=1;   // one set of listeners per tree map
+    el.addEventListener('pointerover',function(e){if(e.pointerType==='mouse')dtmTip(el,e.target.closest('.dtm-sm'));});
+    el.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')dtmTip(el,null);});
+    el.addEventListener('click',function(e){dtmTip(el,e.target.closest('.dtm-sm'));});
+    el.addEventListener('focusin',function(e){dtmTip(el,e.target.closest('.dtm-sm'));});
+    el.addEventListener('focusout',function(){dtmTip(el,null);});
+  }
+}
+function dtmTip(el,c){   // the small-tile chip: name and amount, kept inside the tree map
+  var t=el.querySelector('.dtm-tip');if(!t)return;
+  if(!c){t.hidden=true;return;}
+  t.innerHTML='<b>'+ccEsc(c.getAttribute('data-n'))+'</b><span>'+ccEsc(c.getAttribute('data-v'))+'</span>';t.hidden=false;
+  var W=el.clientWidth,x=c.offsetLeft+c.offsetWidth/2-t.offsetWidth/2,y=c.offsetTop-t.offsetHeight-4;
+  if(y<2)y=Math.min(c.offsetTop+c.offsetHeight+4,el.clientHeight-t.offsetHeight-2);
+  t.style.left=Math.max(2,Math.min(W-t.offsetWidth-2,x))+'px';t.style.top=Math.max(2,y)+'px';
 }
 function setDebtView(v){try{localStorage.setItem('vi_debt_view',v);}catch(e){}if(v==='donut')setDebtChart('donut');else drawDebtTreemap();}   // older callers
 // the pay-off tile: Histogram or Donut (the tree map is always shown above); choice remembered on this device

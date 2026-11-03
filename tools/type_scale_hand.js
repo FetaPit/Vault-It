@@ -46,7 +46,7 @@ const E = [
     ".ov-chart-card.nw3d-main-3d .nw3d-graph-only{display:none!important}\n.ov-chart-card.nw3d-main-3d #nw-fc-note{display:none!important}\n"],
   ['Pedro (2 Nov): on phones the cash-flow diagram is drawn 1:1 in its sideways scroller, so the chips render at their real 11 / 10.5 px',
     `  var out='<svg viewBox="0 0 '+W+' '+H.toFixed(0)+'" width="100%" style="min-width:'+(wide?'0':'640px')+'"`,
-    `  var one=window.innerWidth<600;   // phones: 1:1, scrolled sideways (v0.8 type scale)
+    `  var one=window.innerWidth<1100;   // phones and tablets: 1:1, scrolled sideways, so the chips draw at their real size (v0.8 type scale)
   var out='<svg viewBox="0 0 '+W+' '+H.toFixed(0)+'" width="'+(one?W:'100%')+'"'+(one?' height="'+H.toFixed(0)+'" class="cf-1to1"':'')+' style="min-width:'+(one?W+'px':wide?'0':'640px')+'"`],
   ['phone 1:1 diagram style',
     ".cf-scroll svg{display:block}\n",
