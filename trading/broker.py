@@ -75,6 +75,14 @@ class PaperBroker:
         by_risk = st.risk_used / st.budget_units if st.budget_units > 0 else 0.0
         return min(1.0, max(st.filled_qty / st.order.quantity, by_risk))
 
+    def _consumed_gbp(self, st: _OrderState) -> float:
+        """Risk consumed by fills: fixed commissions in full once any fill happened, rest pro rata."""
+        if st.n_fills == 0:
+            return 0.0
+        p = self._cfg.fee_profile_for(st.order.symbol)
+        fixed = 2 * (p.min_commission_gbp + p.commission_per_order_gbp)
+        return min(st.risk_gbp, fixed + max(0.0, st.risk_gbp - fixed) * self._consumed_frac(st))
+
     @staticmethod
     def _is_live(s: _OrderState) -> bool:
         return s.status in (OrderStatus.PENDING, OrderStatus.PARTIALLY_FILLED)
@@ -99,7 +107,7 @@ class PaperBroker:
 
     def pending_risk_gbp(self, sleeve: Sleeve | None = None) -> float:
         """Risk still reserved by live (unfilled remainder of) orders."""
-        return sum(st.risk_gbp * (1.0 - self._consumed_frac(st))
+        return sum(st.risk_gbp - self._consumed_gbp(st)
                    for st in self._orders.values()
                    if self._is_live(st) and (sleeve is None or st.order.sleeve == sleeve))
 
@@ -267,7 +275,7 @@ class PaperBroker:
             pos.entry_price = (pos.quantity * pos.entry_price + fill_qty * fill_px) / (pos.quantity + fill_qty)
             pos.quantity += fill_qty
             pos.entry_fees_gbp += costs.total_fees_gbp
-        pos.initial_risk_gbp = st.risk_gbp * self._consumed_frac(st)
+        pos.initial_risk_gbp = self._consumed_gbp(st)
         filled = st.filled_qty >= o.quantity - EPS
         self._set_status(st, OrderStatus.FILLED if filled else OrderStatus.PARTIALLY_FILLED)
         fill = Fill(f"{o.order_id}-f{st.n_fills}", o.order_id, o.symbol, action, fill_qty, fill_px, bar.open,
