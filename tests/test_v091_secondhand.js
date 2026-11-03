@@ -1,5 +1,6 @@
 // E28 part 1 (v0.9.1): second-hand price estimate in the Wealth inventory value link. Run: node tests/test_v091_secondhand.js
 // The edge function is stubbed (its own maths is in test_secondhand_server.js). The estimate must never be applied without a tap.
+const IDX = process.env.VI_INDEX || '/home/user/Vault-It/index.html';   // VI_INDEX=/path/to/index.html runs against another copy (a worktree)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const EST = { status: 'ok', q: 'Gibson Les Paul', cond: 'excellent', cat: 'instruments', value: 1148, low: 1001, high: 1294, n: 20, basis: 'current asking prices', combine: 'single', haircut: 0.1, condFactor: 1,
@@ -28,7 +29,7 @@ const EST = { status: 'ok', q: 'Gibson Les Paul', cond: 'excellent', cat: 'instr
       await p.waitForSelector('#other-assets-list .wi-link-btn', { timeout: 20000 }); await p.waitForTimeout(200); };
     const tile = () => p.evaluate(() => { const t = document.querySelector('#other-assets-list .wi-tile'); return { val: t.querySelector('.wi-val').textContent, btn: t.querySelector('.wi-link-btn').textContent, work: (t.querySelector('.wi-work') || {}).textContent || '', total: alTotalOther() }; });
     const saved = () => p.evaluate(() => JSON.parse(localStorage.getItem('pos_al1')).otherAssets[0]);
-    await boot('file:///home/user/Vault-It/index.html?seed');
+    await boot('file://'+IDX+'?seed');
     let t = await tile(); let s = await saved();
     ok(t.val === '£300' && t.btn === 'Link to market value' && s.cond === undefined && s.link === undefined, w + ': an old item loads untouched (own figure, no condition, no link)');
     await p.evaluate(() => wiLinkOpen(1)); await p.waitForTimeout(100);
@@ -43,12 +44,14 @@ const EST = { status: 'ok', q: 'Gibson Les Paul', cond: 'excellent', cat: 'instr
     const lk = await p.evaluate(() => Array.from(document.querySelectorAll('#wl-mlinks a')).map(a => ({ h: a.href, tg: a.target, rel: a.rel, tx: a.textContent })));
     ok(lk.length === 2 && /ebay\.co\.uk.*LH_Sold=1.*Gibson%20Les%20Paul|ebay\.co\.uk.*Gibson%20Les%20Paul.*LH_Sold=1/.test(lk[0].h) && /discogs\.com\/search.*Gibson%20Les%20Paul/.test(lk[1].h) && lk.every(a => a.tg === '_blank' && /noopener/.test(a.rel)), w + ': "Not available yet" and the two manual search links (eBay sold items, Discogs) open in a new tab: ' + JSON.stringify(lk.map(a => a.tx)));
     ok((await tile()).val === '£300' && (await saved()).link === undefined, w + ': nothing applied when the function is not there');
+    ok(/then choose My own figure and type it/.test(await p.textContent('#wl-mres')) && await p.evaluate(() => getComputedStyle(document.getElementById('wi-link-guess')).display === 'none'), w + ': Wealth "Not available yet" tells the user to choose My own figure; the no-live-source hint is hidden under Second-hand prices');
     // deployed
     mode = 'ok'; await p.click('#wl-msearch'); await p.waitForFunction(() => /Estimate from 20 current asking prices/.test(document.getElementById('wl-mres').textContent), null, { timeout: 20000 });
     const res = await p.textContent('#wl-mres');
     ok(/Estimate from 20 current asking prices, typically £1,001 to £1,294, adjusted for excellent condition/.test(res), w + ': result wording: ' + res.slice(0, 160));
     ok(!/\bsold\b/i.test(res.replace(/Search eBay sold items/g, '')) && !/\bworth\b/i.test(res) && /not a valuation/i.test(res) && /Real sale prices are usually lower/.test(res) && /Not financial advice/.test(res), w + ': honest wording: asking prices, never "sold" or "worth", not a valuation, not advice');
     ok((await tile()).val === '£300' && (await saved()).link === undefined && (await saved()).value === 300, w + ': the estimate is NOT applied until the user taps');
+    ok(await p.evaluate(() => ['wl-msearch', 'wl-mapply'].every(i => document.getElementById(i).getBoundingClientRect().height >= 43.5) && Array.from(document.querySelectorAll('#wl-mlinks a')).every(a => a.getBoundingClientRect().height >= 30)), w + ': Search and Use this estimate are 44 px tall, the links have a comfortable target');
     const sz = await p.evaluate(() => Array.from(document.querySelectorAll('#wi-lk-market label, #wi-lk-market select, #wi-lk-market input, #wi-lk-market button, #wl-mres, #wl-mres *, #wl-mlinks a')).filter(e => e.offsetParent && e.textContent.trim() !== '' || e.matches('select,input')).map(e => parseFloat(getComputedStyle(e).fontSize)).filter(x => x > 0));
     ok(sz.length > 5 && Math.min.apply(null, sz) >= 10.5, w + ': every word in the panel is 10.5 px or more (min ' + Math.min.apply(null, sz) + ')');
     ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1 && document.getElementById('wi-link-card').scrollWidth <= document.getElementById('wi-link-card').clientWidth + 1), w + ': no sideways scroll in the pop-up');
@@ -58,7 +61,7 @@ const EST = { status: 'ok', q: 'Gibson Les Paul', cond: 'excellent', cat: 'instr
     ok(t.val === '£1,148' && t.btn === 'Estimated' && t.total === 1148 + 80, w + ': after the tap the tile shows £1,148 and counts in the total: ' + JSON.stringify(t));
     ok(s.value === 300 && s.cond === 'excellent' && s.link.type === 'market' && s.link.v === 1148 && s.link.lo === 1001 && s.link.hi === 1294 && s.link.n === 20 && !JSON.stringify(s).includes('itemSummaries'), w + ': saved additively: own figure kept, condition saved, derived numbers only: ' + JSON.stringify(s.link));
     ok(/Estimate from 20 current asking prices/.test(t.work) && /eBay \(UK\)/.test(t.work) && /10% allowance/.test(t.work) && /Your own figure: £300/.test(t.work) && /Real sale prices are usually lower/.test(t.work) && /Not financial advice/.test(t.work), w + ': show working has the count, source, allowance, own figure and the guard rails');
-    await boot('file:///home/user/Vault-It/index.html'); t = await tile();
+    await boot('file://'+IDX+''); t = await tile();
     ok(t.val === '£1,148' && errs.length === 0, w + ': after a reload the estimate is still there, no page errors ' + errs.join('|'));
     // changing the condition on an applied estimate must not relabel a figure that was worked out for another condition
     await p.evaluate(() => wiLinkOpen(1)); await p.check('input[name="wi-lk"][value="market"]'); await p.selectOption('#wl-mcond', 'poor'); await p.click('#wi-link-card button[onclick="wiLinkSave()"]'); await p.waitForTimeout(250);
@@ -77,11 +80,14 @@ const EST = { status: 'ok', q: 'Gibson Les Paul', cond: 'excellent', cat: 'instr
     const lt = () => p.evaluate(() => JSON.parse(localStorage.getItem('pos_al1')).liabilities);
     ok(await p.evaluate(() => document.querySelectorAll('#liabilities-list button[onclick^="wiLiabOpen"]').length === 2), w + ': every liability tile offers Second-hand prices');
     let L0 = await lt(); ok(L0[0].cond === undefined && L0[0].est === undefined && L0[0].value === 500, w + ': old liabilities load untouched');
+    mode = '404'; await p.evaluate(() => wiLiabOpen(11)); await p.click('#wl-msearch'); await p.waitForFunction(() => /Not available yet/.test(document.getElementById('wl-mres').textContent), null, { timeout: 20000 });
+    ok(/Your figure is unchanged/.test(await p.textContent('#wl-mres')) && !/type your own figure|My own figure/.test(await p.textContent('#wl-mres')), w + ': Liabilities "Not available yet" says the figure is unchanged (no manual field there)'); await p.evaluate(() => wiLinkClose());
     mode = 'ok'; await p.evaluate(() => wiLiabOpen(11)); await p.waitForTimeout(100);
     ok(await p.evaluate(() => !document.getElementById('wi-lk-market').hidden && !document.querySelector('.wi-link-kinds').offsetParent && document.getElementById('wl-mq').value === 'Gibson guitar amp' && document.getElementById('wl-mcat').value === 'instruments'), w + ': liability pop-up shows only the second-hand panel, words from the name');
     await p.selectOption('#wl-mcond', 'fair'); await p.click('#wl-msearch'); await p.waitForFunction(() => /Estimate from 20 current asking prices/.test(document.getElementById('wl-mres').textContent), null, { timeout: 20000 });
     L0 = await lt(); ok(L0[0].value === 500 && L0[0].est === undefined, w + ': the liability estimate is not applied until the tap');
     await p.click('#wl-mapply'); await p.waitForTimeout(250); L0 = await lt();
+    ok(await p.evaluate(() => { const e = document.querySelector('#liabilities-list .wi-tile .wi-sub'); const all = Array.from(document.querySelectorAll('#liabilities-list .wi-sub')).map(x => x.textContent).join('|'); return /Estimate from eBay \(UK\): £1,001 to £1,294, fair condition/.test(all); }), w + ': the liability tile names the source, range and condition');
     ok(L0[0].value === 1148 && L0[0].estWas === 500 && L0[0].cond === 'fair' && L0[0].est.v === 1148 && L0[0].depRate === 0, w + ': tap sets the liability value (old figure kept as estWas), saves the condition: ' + JSON.stringify(L0[0]));
     await p.evaluate(() => wiLiabOpen(12)); await p.click('#wl-msearch'); await p.waitForFunction(() => /Estimate from 20 current asking prices/.test(document.getElementById('wl-mres').textContent), null, { timeout: 20000 });
     ok(/for information only/.test(await p.textContent('#wl-mres')) && !(await p.isVisible('#wl-mapply')), w + ': a depreciating liability gets the estimate for information only, no apply button');

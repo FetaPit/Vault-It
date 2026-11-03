@@ -13767,13 +13767,15 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wi-link-prev{font:max(.6rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--t1);background:rgb(var(--teal-rgb) / .08);border-radius:6px;padding:8px 10px;margin:10px 0;overflow-wrap:anywhere}
 #wi-link-card [hidden]{display:none!important}
 .vi-pop.wi-liab .wi-link-kinds,.vi-pop.wi-liab #wi-link-guess,.vi-pop.wi-liab #wi-link-prev{display:none}
+.wi-link-prev:empty{display:none}
 .wi-mres{margin:10px 0 0;font-size:max(.66rem,var(--vi-fs-2));color:var(--t1);line-height:1.45;overflow-wrap:anywhere}
 .wi-mres p{margin:0 0 6px}
 .wi-mres details{margin:2px 0 8px;color:var(--t2)}.wi-mres summary{cursor:pointer;color:var(--teal);font-weight:600}
 #wl-mapply{margin-top:4px}
+#wl-msearch,#wl-mapply{min-height:44px}
 .wi-mlinks{display:flex;gap:6px 16px;flex-wrap:wrap;margin:10px 0 0}
-.wi-mlinks a{font-size:max(.66rem,var(--vi-fs-2));color:var(--teal);font-weight:600;text-decoration:underline;text-underline-offset:2px}
-.wi-link-hint{font-size:max(.52rem,var(--vi-fs-1));color:var(--t2);margin:6px 0 0}
+.wi-mlinks a{display:inline-block;padding:8px 0;font-size:max(.66rem,var(--vi-fs-2));color:var(--teal);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.wi-link-hint{font-size:max(.52rem,var(--vi-fs-1));color:var(--t2);margin:6px 0 8px}
 .wi-del{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.5);border:none;color:rgba(255,80,80,.6);font-size:max(.7rem,var(--vi-fs-3));cursor:pointer;width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;line-height:1}
 .wi-del:hover{color:#ff4444;background:rgba(255,0,0,.15)}
 /* Icon picker */
@@ -21725,7 +21727,7 @@ function renderAlTab(){
           +'</div>'
           +(l.runningCost>0?'<div class="wi-sub">'+gbpFmt(l.runningCost)+'/mo</div>':'')
           +(l.depRate>0?'<div class="wi-sub" style="color:var(--re)">↓'+l.depRate+'%/yr</div>':'')
-          +(l.est&&l.est.v>0?'<div class="wi-sub">Value set from a second-hand estimate, '+cfEsc(wiMoney(l.est.v))+'</div>':'')
+          +(l.est&&l.est.v>0?'<div class="wi-sub" style="font-size:max(.55rem,var(--vi-fs-1))">'+(l.est.srcs&&l.est.srcs.length?'Estimate from '+cfEsc(l.est.srcs.join(', '))+': '+cfEsc(wiMoney(l.est.lo))+' to '+cfEsc(wiMoney(l.est.hi))+', '+cfEsc(l.est.cond||'good')+' condition':'Value set from a second-hand estimate, '+cfEsc(wiMoney(l.est.v)))+'</div>':'')
           +'<button class="wi-link-btn" type="button" onclick="wiLiabOpen('+l.id+')" aria-label="Second-hand prices for '+cfEsc(l.name)+'">Second-hand prices</button>'
           +'<button class="data-item-del" style="margin-top:4px;width:100%" onclick="delLiability('+l.id+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg> Remove</button>'
           +'</div>'
@@ -22079,7 +22081,7 @@ function wiLinkModal(){
     +'<div id="wl-mlinks" class="wi-mlinks"></div>'
     +'<p class="wi-link-hint">An estimate from current asking prices, not a valuation or a sale price. It is only used if you tap Use this estimate. The item words, kind and condition go through our server to the price sources named in the Privacy Notice.</p></div>'
     +'<div id="wi-link-prev" class="wi-link-prev" aria-live="polite"></div>'
-    +'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-add-data" type="button" onclick="wiLinkSave()">Save</button>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn-add-data" type="button" onclick="wiLinkSave()">Save</button>'
     +'<button class="btn-add-data" type="button" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="wiLinkClose()">Cancel</button></div>'
     +'<div id="wi-link-msg" class="vi-pop-msg" role="alert"></div>'
     +'<p class="wi-link-hint">Estimated market value, not an offer or a valuation. Not financial advice.</p></div>';
@@ -22092,7 +22094,7 @@ function wiLinkPurity(sel){
 }
 function wiLinkKind(){
   var k=(document.querySelector('input[name="wi-lk"]:checked')||{}).value||'manual';
-  document.getElementById('wi-lk-manual').hidden=k!=='manual';document.getElementById('wi-lk-metal').hidden=k!=='metal';document.getElementById('wi-lk-holding').hidden=k!=='holding';document.getElementById('wi-lk-market').hidden=k!=='market';if(k==='market')wiMkLinks();
+  document.getElementById('wi-lk-manual').hidden=k!=='manual';document.getElementById('wi-lk-metal').hidden=k!=='metal';document.getElementById('wi-lk-holding').hidden=k!=='holding';document.getElementById('wi-lk-market').hidden=k!=='market';if(k==='market')wiMkLinks();var gu=document.getElementById('wi-link-guess');if(gu)gu.style.display=k==='market'?'none':'';
   document.getElementById('wi-link-msg').textContent='';wiLinkPreview();
 }
 function wiLinkRead(){
@@ -22193,7 +22195,7 @@ async function wiMkSearch(){
   if(_wiLinkId!==a.id||!document.getElementById('wl-mres'))return;
   var d=r&&!r.error?r.data:null;res.textContent='';
   function line(t){var p=document.createElement('p');p.textContent=t;res.appendChild(p);return p;}
-  if(!d||d.status==='unavailable'){line('Not available yet. You can still check prices yourself with the links below, then type your own figure.');return;}
+  if(!d||d.status==='unavailable'){line(_wiLiab?'Not available yet. You can still check prices yourself with the links below. Your figure is unchanged.':'Not available yet. You can still check prices yourself with the links below, then choose My own figure and type it.');return;}
   if(d.status==='busy'||d.status==='error'){line('Could not get an estimate just now. Try again in a minute, or use the links below.');return;}
   var ok=d.status==='ok'&&isFinite(d.value)&&d.value>0&&isFinite(d.low)&&isFinite(d.high);
   if(!ok){line('No reliable match found. Your figure is used. Try adding the model, year or colour, or pick a broader kind of item, or use the links below.');return;}
@@ -22210,7 +22212,7 @@ async function wiMkSearch(){
 function wiMkApply(){if(viBlockEdit())return;
   var a=wiMkItem();if(!a||!_wiMk)return;
   if(_wiLiab){if(+a.depRate>0)return;   // never double-count an item that depreciates on its own
-    if(a.estWas==null)a.estWas=+a.value||0;a.value=_wiMk.v;a.est={v:_wiMk.v,lo:_wiMk.lo,hi:_wiMk.hi,n:_wiMk.n,at:_wiMk.at,q:_wiMk.q,cond:_wiMk.cond};a.cond=document.getElementById('wl-mcond').value;
+    if(a.estWas==null)a.estWas=+a.value||0;a.value=_wiMk.v;a.est={v:_wiMk.v,lo:_wiMk.lo,hi:_wiMk.hi,n:_wiMk.n,at:_wiMk.at,q:_wiMk.q,cond:_wiMk.cond,srcs:_wiMk.srcs};a.cond=document.getElementById('wl-mcond').value;
     saveAL();wiLinkClose();renderAlTab();updateKPIs();showToast('Estimate applied');return;}
   a.link=_wiMk;a.cond=document.getElementById('wl-mcond').value;a.linkSnap=null;a.linkPrev=null;
   saveAL();wiLinkClose();renderAlTab();updateKPIs();showToast('Estimate applied');
