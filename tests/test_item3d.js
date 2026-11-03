@@ -1,6 +1,6 @@
 // Item 3D models for the wealth inventory and liabilities: upload a .glb, the Night viewer (orbit, zoom, reset),
-// each model in its own colours (no tint, owner 31 Oct), the preview on the tile, the Poly Pizza library test path (?modeltest=1)
-// with the CDN mocked (ok and bot-check refusal), remove, and clean-up when an item is deleted.
+// each model in its own colours (no tint, owner 31 Oct), the preview on the tile, the model library (models/catalog.json, answered here because fetch cannot read file:// pages)
+// with a refusal, a CC-BY pick on a liability, remove, and clean-up when an item is deleted.
 // Run: node tests/test_item3d.js
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
@@ -36,20 +36,20 @@ const idbHas = (p, key) => p.evaluate(k => invTx('readonly', s => s.get(k)).then
   for (const theme of ['light', 'dark']) {
     const ctx = await b.newContext({ viewport: { width: 1100, height: 900 } }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     let cdn = 'ok';
-    await p.route('https://static.poly.pizza/**', r => r.request().url().endsWith('.glb')
-      ? (cdn === 'ok' ? r.fulfill({ status: 200, contentType: 'model/gltf-binary', body: GLB, headers: { 'access-control-allow-origin': '*' } }) : r.fulfill({ status: 403, contentType: 'text/html', body: '<title>Just a moment...</title>' }))
-      : r.fulfill({ status: 404, body: '' }));
+    const CATJ = { models: [
+      { id: 'CAR1', set: 'cars', item: 'Ford Fiesta', title: 'Car Hatchback', tags: ['car'], standin: true, standinFor: 'Ford Fiesta', licence: 'CC0 1.0', creator: 'Kay Lousberg', source: 'https://poly.pizza/m/CAR1', attribution: '', file: 'glb/car1.glb', thumb: 'thumb/car1.webp' },
+      { id: 'BIK1', set: 'top100', item: 'Bicycle', title: 'Bicycle', tags: ['bike'], licence: 'CC-BY 3.0', creator: 'Poly by Google', source: 'https://poly.pizza/m/BIK1', attribution: '"Bicycle" by Poly by Google, https://poly.pizza/m/BIK1. Licence at https://creativecommons.org/licenses/by/3.0', file: 'glb/bik1.glb', thumb: 'thumb/bik1.webp' }] };
+    await ctx.exposeFunction('__models', (url) => /catalog\.json$/.test(url) ? { s: 200, type: 'application/json', b64: Buffer.from(JSON.stringify(CATJ)).toString('base64') }
+      : /\.glb$/.test(url) ? (cdn === 'ok' ? { s: 200, type: 'model/gltf-binary', b64: GLB.toString('base64') } : { s: 403, type: 'text/html', b64: Buffer.from('<title>no</title>').toString('base64') }) : { s: 404, type: 'text/plain', b64: '' });
+    await ctx.addInitScript(() => { const of = window.fetch; window.fetch = function (u) { const url = String(u && u.url || u); if (!/(^|\/)models\//.test(url)) return of.apply(this, arguments);
+      return window.__models(url).then(r => { const bin = atob(r.b64), a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return new Response(r.s === 404 ? null : a, { status: r.s, headers: { 'content-type': r.type } }); }); }; });
     await p.addInitScript(seed, theme); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await p.evaluate(() => { showTab('assets'); renderAlTab(); }); await p.waitForTimeout(500);
-    if (theme === 'light') {
-      const m = await p.evaluate(() => ['Gibson Les Paul Standard', 'Rolex Submariner', 'BMW 3 Series', 'Harley-Davidson motorbike', 'Brompton bike', 'Gold bullion 1oz', 'Sofa'].map(i3dMatch));
-      ok(JSON.stringify(m) === JSON.stringify(['guitar', 'watch', 'car', 'motorbike', 'bicycle', 'gold', 'sofa']), 'item names map to the right model ' + JSON.stringify(m));
-      ok(await p.evaluate(() => !!document.querySelector('#other-assets-list .i3d-btn') && !!document.querySelector('#liabilities-list .i3d-btn')), 'both lists have a 3D button on every tile');
-    }
+    ok(await p.evaluate(() => !!document.querySelector('#other-assets-list .i3d-btn') && !!document.querySelector('#liabilities-list .i3d-btn')), theme + ': both lists have a 3D button on every tile');
     // 1. upload a .glb on the wealth item
     await p.evaluate(() => i3dPick('wi', 11));
-    ok(await p.evaluate(() => !document.querySelector('.i3d-lib')), theme + ': library is hidden without the test flag');
+    ok(await p.evaluate(() => !!document.querySelector('#i3d-q') && !!document.querySelector('.i3d-lib')), theme + ': the picker shows the search and the library grid');
     await p.setInputFiles('#i3d-modal input[type=file]', { name: 'guitar.glb', mimeType: 'model/gltf-binary', buffer: GLB });
     await p.waitForFunction(() => window._i3dView && _i3dView.ctl, null, { timeout: 15000 }).catch(() => {});
     const v = await p.evaluate(() => { const V = _i3dView, it = i3dItem('wi', 11); let mat = null; V.obj.traverse(o => { if (o.isMesh) mat = o.material; });
@@ -70,14 +70,14 @@ const idbHas = (p, key) => p.evaluate(k => invTx('readonly', s => s.get(k)).then
     await p.evaluate(() => document.querySelector('#other-assets-list img.i3d-thumb').click()); await p.waitForFunction(() => window._i3dView, null, { timeout: 15000 }).catch(() => {});
     ok(await p.evaluate(() => !!window._i3dView), theme + ': tapping the preview opens the viewer'); await p.evaluate(() => i3dClose());
     // 2. library test path on the liability (?modeltest=1 sets the flag for this browser)
-    await p.evaluate(() => { localStorage.setItem('vi-flag-models', '1'); i3dPick('li', 21); });
-    const lib = await p.evaluate(() => { const l = [...document.querySelectorAll('.i3d-li')]; return { n: l.length, first: l[0] && l[0].dataset.k, best: l[0] && l[0].classList.contains('best') }; });
-    ok(lib.n === 17 && lib.first === 'car' && lib.best, theme + ': library shows 17 models, best match (car) first');
-    cdn = 'blocked'; await p.evaluate(() => i3dPickLib('li', 21, 'car')); await p.waitForTimeout(800);
-    ok(await p.evaluate(() => /bot/.test(document.getElementById('i3d-msg').textContent) && !i3dItem('li', 21).model), theme + ': a bot-check refusal is explained and nothing is saved');
-    cdn = 'ok'; await p.evaluate(() => i3dPickLib('li', 21, 'bicycle')); await p.waitForFunction(() => window._i3dView, null, { timeout: 15000 }).catch(() => {});
-    const li = await p.evaluate(() => { const m = i3dItem('li', 21).model; return { src: m.src, lic: m.lic, credit: (document.querySelector('.i3d-credit') || {}).textContent || '', tile: !!document.querySelector('#liabilities-list img.i3d-thumb') }; });
-    ok(li.src === 'pp' && li.lic === 'CC-BY' && /by Poly by Google, https:\/\/poly\.pizza\/m\//.test(li.credit) && li.tile, theme + ': library model saved on the liability with its CC-BY credit');
+    await p.evaluate(() => i3dPick('li', 21)); await p.waitForSelector('.i3d-li', { timeout: 8000 }).catch(() => {});
+    const lib = await p.evaluate(() => { const l = [...document.querySelectorAll('.i3d-li')]; return { n: l.length, first: l[0] && l[0].dataset.cid }; });
+    ok(lib.n === 2 && lib.first === 'CAR1', theme + ': library shows the catalogue, best match (car) first');
+    cdn = 'blocked'; await p.evaluate(() => i3dPickLib('li', 21, 'CAR1')); await p.waitForTimeout(800);
+    ok(await p.evaluate(() => /library answered 403/.test(document.getElementById('i3d-msg').textContent) && !i3dItem('li', 21).model), theme + ': a refusal is explained and nothing is saved');
+    cdn = 'ok'; await p.evaluate(() => i3dPickLib('li', 21, 'BIK1')); await p.waitForFunction(() => window._i3dView, null, { timeout: 15000 }).catch(() => {});
+    const li = await p.evaluate(() => { const m = i3dItem('li', 21).model; return { src: m.src, lic: m.lic, credit: (document.querySelector('#i3d-modal .i3d-credit') || {}).textContent || '', tile: !!document.querySelector('#liabilities-list img.i3d-thumb') }; });
+    ok(li.src === 'lib' && li.lic === 'CC-BY' && /by Poly by Google, https:\/\/poly\.pizza\/m\//.test(li.credit) && li.tile, theme + ': library model saved on the liability with its CC-BY credit');
     // 3. remove, and delete clean-up
     await p.evaluate(() => i3dRemove('li', 21)); await p.waitForTimeout(150);
     ok(await p.evaluate(() => !i3dItem('li', 21).model && !document.querySelector('#liabilities-list img.i3d-thumb')) && !(await idbHas(p, 'm:li:21')), theme + ': remove model clears the item and the device copy');
