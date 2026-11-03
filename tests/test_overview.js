@@ -16,8 +16,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   ok(g.msIn&&g.msTop>=g.cvBottom-1,'milestone targets open inside the net worth tile, under the chart (v0.7 UI round 2)');
   ok(g.roadTop>g.msBottom,'roadmap comes after the milestone targets');
   ok(Math.abs(g.roadW-g.chartW)<2&&Math.abs(g.roadLeft-g.chartLeft)<2,'roadmap is exactly as wide as the chart ('+Math.round(g.roadW)+' vs '+Math.round(g.chartW)+')');
-  const cf=await p.evaluate(()=>{const s=document.querySelector('#cf-sankey svg');const r=s.getBoundingClientRect();return{h:r.height,vh:innerHeight};});
-  ok(cf.h<=cf.vh-100,'cash-flow diagram fits on one screen ('+Math.round(cf.h)+'px high in a '+cf.vh+'px window)');
+  // v0.9.1 E4: the dashboard has no flow diagram any more; the Budget diagram fit is checked in test_sankey_fit
   const fs=await p.evaluate(()=>({row:parseFloat(getComputedStyle(document.querySelector('.ov-sum-row')).fontSize),tot:parseFloat(getComputedStyle(document.querySelector('.ov-sum-total')).fontSize),icon:document.querySelectorAll('.ov-sum-ic svg').length,col:[...document.querySelectorAll('.ov-sum')].map(e=>getComputedStyle(e).borderLeftColor)}));
   console.log(JSON.stringify(fs)); ok(fs.row>=12&&fs.tot>=20,'summary text is larger ('+fs.row.toFixed(1)+'px rows, '+fs.tot.toFixed(1)+'px totals)'); ok(fs.icon===3&&new Set(fs.col).size===3,'each summary has an icon and its own colour');
   const own=await p.evaluate(()=>({cards:document.querySelectorAll('#ov-own-card .ov-sum').length,inOne:!document.querySelector('.ov-sum.ov-chart-card')}));
