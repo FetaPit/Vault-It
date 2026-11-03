@@ -21878,7 +21878,7 @@ function i3dResults(cat,q,set,name){
   return out.map(function(o){return o.m;});
 }
 function i3dMeta(m){return {src:'lib',cid:m.id,t:m.title,by:m.creator,lic:/CC-BY/i.test(m.licence||'')?'CC-BY':'CC0',licFull:m.licence||'',file:m.file,item:m.item||'',standin:!!m.standin,standinFor:m.standinFor||'',url:m.source||'',attr:m.attribution||''};}
-function i3dCredit(m){return m&&m.lic==='CC-BY'?(m.attr||'"'+m.t+'" by '+m.by+', '+(m.url||'https://poly.pizza/m/'+m.id)+'. Licence at https://creativecommons.org/licenses/by/3.0'):'';}
+function i3dCredit(m){return m&&m.lic==='CC-BY'?(m.attr||'"'+m.t+'" by '+m.by+(m.url?', '+m.url:'')+'. Licence: CC-BY 3.0, https://creativecommons.org/licenses/by/3.0. Full credit under 3D model credits.'):'';}
 function i3dCreditShort(m){return '"'+m.t+'" by '+m.by+' · '+(m.licFull||m.lic||'');}
 /* the credit line on the item's tile: CC-BY credit, and a plain "close match" note when the model only stands in for the item */
 function i3dItemCredit(it){var m=it&&it.model;if(!m||(m.lic!=='CC-BY'&&!m.standin))return '';

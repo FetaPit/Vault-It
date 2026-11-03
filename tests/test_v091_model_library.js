@@ -92,7 +92,8 @@ const search = async (p, q) => { await p.fill('#i3d-q', q); await p.waitForTimeo
     // reload keeps it, no refetch
     await p.evaluate(() => i3dClose()); await p.reload(); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
-    await p.evaluate(() => { showTab('assets'); renderAlTab(); }); await p.waitForTimeout(400);
+    await p.evaluate(() => { showTab('assets'); renderAlTab(); });
+    await p.waitForFunction(() => { const x = window.i3dItem && i3dItem('wi', 11); return !!(x && x.model); }, null, { timeout: 8000 }).catch(() => {}); await p.evaluate(() => renderAlTab()); await p.waitForTimeout(400);
     ok(await p.evaluate(() => { const x = i3dItem('wi', 11); return !!(x && x.model && x.model.src === 'lib'); }) && await p.evaluate(() => !!document.querySelector('#other-assets-list img.i3d-thumb')), theme + ': the attached model and its preview survive a reload');
     await p.evaluate(() => i3dOpen('wi', 11)); await p.waitForFunction(() => window._i3dView, null, { timeout: 15000 }).catch(() => {});
     ok(await p.evaluate(() => !!window._i3dView) && st.glb === 1, theme + ': it reopens from the device copy without downloading again (' + st.glb + ')');
