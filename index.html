@@ -11286,6 +11286,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wr-xpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--brass));transition:width .6s var(--ease,ease)}
 .wr-xpbar b{position:absolute;top:0;bottom:0;width:1px;background:var(--panel)}
 .wr-xp{font-family:'Share Tech Mono',monospace;font-size:max(.62rem,10.5px);color:var(--brass);margin-top:6px}
+.wr-recalc{margin:8px 0 0;font-size:max(.58rem,10.5px);color:var(--teal);line-height:1.5}
 .wr-split{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:max(.56rem,10.5px);color:var(--t2)}
 .wr-split b{font-family:'Share Tech Mono',monospace;color:var(--tx);font-weight:400}
 .wr-reward{display:flex;gap:12px;align-items:flex-start;margin-top:16px;padding:12px;border:1px dashed rgb(var(--brass-rgb) / .45)}
@@ -15805,7 +15806,7 @@ function updatePriceLabels(){
 function updatePriceInput(){document.getElementById('priceInput').value=state.prices[state.houseType]||'';}
 
 let tT2;
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT2);tT2=setTimeout(()=>t.classList.remove('show'),3000);}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT2);const tok=(toast._n=(toast._n||0)+1);requestAnimationFrame(()=>requestAnimationFrame(()=>{if(tok!==toast._n)return;clearTimeout(tT2);tT2=setTimeout(()=>t.classList.remove('show'),3000);}));}   // the 3 s count starts once it is drawn: the house rebuild after a deposit can hold the page long enough for it to vanish unseen
 
 function markHousePurchased(){if(viBlockEdit())return;
   state.houseMode='purchased';
@@ -16755,7 +16756,7 @@ function setViewFlag(name, on, btn) {   // Settings: 3D or classic net worth cha
 function hbBrandOn() { return typeof HB3D !== 'undefined' && !!HB3D.brandStats; }
 // 6.8 gamified feedback (brand build): pop-up, stage flash and milestone toasts. Toasts only after the person has interacted, never during the opening build.
 var _hbEngaged = false, _hbMS = [[1, 'Site cleared'], [5, 'Foundations'], [10, '10%'], [25, 'Quarter'], [50, 'Halfway'], [75, 'Three-quarters'], [100, 'Deposit ready']];
-function hbPop(txt) { var h = document.getElementById('hb-pops'); if (!h) return; var e = document.createElement('div'); e.className = 'pop'; e.textContent = txt; h.appendChild(e); setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 1300); }
+function hbPop(txt) { var h = document.getElementById('hb-pops'); if (!h) return; var e = document.createElement('div'); e.className = 'pop'; e.textContent = txt; h.appendChild(e); requestAnimationFrame(function () { requestAnimationFrame(function () { setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 1300); }); }); }   // the 1.3 s count starts once it is drawn (two frames: a click can run inside the current frame): the house rebuild after a deposit can hold the page for over a second, and the pop used to vanish unseen
 function hbFlash() { var sc = document.getElementById('house-scene'); if (!sc) return; sc.classList.remove('flash'); void sc.offsetWidth; sc.classList.add('flash'); }
 function hbBrandMS(p0, p1) {
   if (!_hbEngaged) return; var hit = null;
@@ -23353,6 +23354,8 @@ function resetAllAchievements(){if(viBlockEdit())return;
   saveAch();renderAchievements();showToast('Achievements reset');
 }
 function wrStageTier(k){return WR_STAGE_TIER[k]||'summit';}
+// set by the user's first tap, click or key press: XP toasts wait for it
+['pointerdown','keydown','touchstart'].forEach(function(ev){window.addEventListener(ev,function(){window._viActed=true;},{capture:true,once:true,passive:true});});
 function wrXpTier(xp){return xp<=50?'starter':xp<=150?'solid':xp<=400?'strong':'summit';}
 // the token outline: an octagon with 45 degree chamfers in a 100 x 100 box, inset by d
 function wrOct(d){var a=22+d*.4142,b=78-d*.4142,f=100-d;return [[a,d],[b,d],[f,a],[f,b],[b,f],[a,f],[d,b],[d,a]];}
@@ -23417,10 +23420,12 @@ function wrSync(S){
   WR_QUESTS.forEach(function(q){if(wrQuestDone(q)||!wrQuestMet(q))return;if(q.month){var m=w.m[wrYm()]||(w.m[wrYm()]={});m[q.id]=q.xp;}else w.q[q.id]=q.xp;gain.push(q.name);});
   var after=wrTotalXp();
   if(after===before&&!first)return;
+  if(first&&after>0)w.recalc=1;   // told once, quietly, on the Wealth Roadmap tab (never a toast on the opening build)
   w.v=1;saveAch();
-  var lv=wrLevel(after);
-  if(first){if(after>0&&typeof showToast==='function')showToast('Your level now counts roadmap steps and habits too: Level '+lv.n+', '+lv.name+'.');}
-  else if(typeof showToast==='function'){showToast(lv.n>lv0?'Level up: Level '+lv.n+', '+lv.name+'. +'+(after-before)+' XP':'+'+(after-before)+' XP · '+gain[0]);}
+  var lv=wrLevel(after),tb=document.getElementById('toast');
+  // XP and level toasts only follow something the user did, never on the House Builder tab, and never replace a toast already showing
+  var onHouse=!!(document.getElementById('tab-house')&&document.getElementById('tab-house').classList.contains('active'));   // the House Builder has its own pop-ups and milestone toasts
+  if(!first&&!onHouse&&window._viActed&&!(tb&&tb.classList.contains('show'))&&typeof showToast==='function')showToast(lv.n>lv0?'Level up: Level '+lv.n+', '+lv.name+'. +'+(after-before)+' XP':'+'+(after-before)+' XP · '+gain[0]);
   if(document.getElementById('tab-achievements')&&document.getElementById('tab-achievements').classList.contains('active'))setTimeout(renderAchievements,0);
   try{renderOvAch();}catch(e){}
 }
@@ -23471,7 +23476,9 @@ function renderAchievements(){
     +'<div class="wr-rank-meta"><span class="wr-eyebrow">Rank: '+rk.n+' · Level '+lv.n+' of 20</span><div class="wr-rank-name" id="wr-rank-name">'+lv.name+'</div>'
     +'<div class="wr-xpbar" role="progressbar" aria-label="XP to the next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pc*100)+'"><i style="width:'+(pc*100).toFixed(1)+'%"></i>'+[1,2,3,4,5,6,7].map(function(k){return '<b style="left:'+(k*12.5)+'%"></b>';}).join('')+'</div>'
     +'<div class="wr-xp" id="wr-xp-label">'+fmt(xp)+' XP'+(nx?' · '+fmt(nx.xp-xp)+' XP to '+nx.name:' · top level')+'</div>'
+    +(wrState().recalc?'<p class="wr-recalc">Your level now counts roadmap steps and saving habits as well as badges.</p>':'')
     +'<div class="wr-split"><span>Roadmap steps <b>'+fmt(src.steps)+'</b></span><span>Side quests <b>'+fmt(src.quests)+'</b></span><span>Badges <b>'+fmt(src.badges)+'</b></span></div></div></div>'+wrRewardHtml();
+  if(wrState().recalc&&document.getElementById('tab-achievements').classList.contains('active')){delete wrState().recalc;saveAch();}   // shown once
   var nEl=document.getElementById('wr-next');
   if(nEl)nEl.innerHTML=wrNextGoals(S).map(function(g){return '<div class="wr-goal"'+(g.go?' role="button" tabindex="0" onclick="'+g.go+'"':'')+'>'+wrTokSvg(g.tok,52)+'<div class="wr-g-body"><span class="wr-g-h">'+g.h+'</span><span class="wr-g-l">'+g.l+'</span>'+wrBar(g.f,g.h)+'</div><span class="wr-xpchip">+'+g.xp+' XP</span></div>';}).join('')||'<p class="wr-none">Every stage and quest is done. Nothing left but to enjoy it.</p>';
   var qEl=document.getElementById('wr-quests');
