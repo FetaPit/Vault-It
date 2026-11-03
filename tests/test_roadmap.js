@@ -28,7 +28,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   // ── 1. a fresh user starts at stage 1, nothing is "waiting"
   await reset(); let r = await S();
   ok(r.nextKey === 'firstLog' && r.done === 0 && r.waiting.length === 0, 'fresh user: stage 1 is next, nothing waiting');
-  ok(await p.evaluate(() => document.getElementById('fire-block').style.display === 'none'), 'no blocker banner for a fresh user');
+  ok(await p.evaluate(() => !document.getElementById('fire-block')), 'the gold blocker tile is gone (v0.7 E3)');
 
   // ── 2. the reported case: debts mapped, other things met, but stage 1 (no snapshot) holds everything back
   await p.evaluate(() => {
@@ -39,8 +39,8 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   r = await S();
   ok(r.nextKey === 'firstLog' && r.done === 0, 'debts + savings but no snapshot: still stuck on stage 1');
   ok(r.waiting.includes('firstSaved') && r.waiting.includes('buf500') && r.waiting.includes('buf1k'), 'later stages that are already met are recognised as waiting: ' + r.waiting.join(','));
-  const bn = await p.evaluate(() => { const e = document.getElementById('fire-block'); return { shown: e.style.display !== 'none', txt: e.innerText }; });
-  ok(bn.shown && /already met/i.test(bn.txt) && /First Log/.test(bn.txt), 'banner names the blocker: ' + bn.txt.replace(/\n/g, ' | ').slice(0, 120));
+  await p.evaluate(() => fireShowDetail(renderFIREroadmap._stages.nextIdx)); const bn = await p.evaluate(() => { const e = document.getElementById('fire-detail-inner'); return { shown: !document.getElementById('fire-block'), txt: e.innerText }; });
+  ok(bn.shown && /already met/i.test(bn.txt) && /First Log/.test(bn.txt), 'the next stage panel names what is waiting on it: ' + bn.txt.replace(/\n/g, ' | ').slice(0, 120));
   // a locked-but-met stage says so in its detail panel
   await p.evaluate(() => fireShowDetail(4));
   ok(/already meet this/i.test(await p.evaluate(() => document.getElementById('fire-detail-inner').innerText)), 'a met-but-locked stage explains it is waiting on First Log');

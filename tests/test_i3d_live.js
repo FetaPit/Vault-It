@@ -1,5 +1,5 @@
 // Round 3, item 19 (owner, 31 Oct 2026): on a desktop, an item's 3D model can be orbited in its own tile by clicking and dragging.
-// Hovering a model tile swaps its picture for a live view (one at a time); a drag turns the camera round the item; a click without
+// Hovering a model tile swaps its picture for a live view (one at a time); a drag turns the camera round the item (v0.7: also pinch, pan, double tap or click resets, see test_v07_p3_items); a click without
 // a drag opens the full viewer; the wheel stays with the page. Touch screens keep the picture. Item 14: the model keeps its colours.
 // Run: node tests/test_i3d_live.js
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
@@ -43,13 +43,16 @@ const seed = theme => {
   await th.scrollIntoViewIfNeeded(); const box = await th.boundingBox();
   await p.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await p.waitForTimeout(1500);
   let r = await p.evaluate(() => ({ live: !!(window._i3dLive && _i3dLive.view), canvas: !!document.querySelector('#other-assets-list .i3d-live canvas'), hid: document.querySelector('#other-assets-list img.i3d-thumb').style.visibility, zoom: _i3dLive && _i3dLive.view.ctl.enableZoom }));
-  ok(r.live && r.canvas && r.hid === 'hidden' && r.zoom === false, 'hovering the tile starts a live 3D view in it (page wheel untouched)');
+  ok(r.live && r.canvas && r.hid === 'hidden' && r.zoom === true, 'hovering the tile starts a live 3D view in it (zoom ready for pinch and Ctrl+wheel; the plain wheel is kept for the page, see test_v07_p3_items)');
   const cam0 = await p.evaluate(() => _i3dLive.view.cam.position.toArray());
   await p.mouse.down(); for (let i = 1; i <= 8; i++) await p.mouse.move(box.x + box.width / 2 + i * 15, box.y + box.height / 2 + 2); await p.mouse.up(); await p.waitForTimeout(600);
   const cam1 = await p.evaluate(() => _i3dLive.view.cam.position.toArray());
   const moved = Math.hypot(cam1[0] - cam0[0], cam1[2] - cam0[2]);
   ok(moved > 0.3 && !(await p.$('#i3d-modal')), 'click and drag orbits round the item, and does not open the viewer (camera moved ' + moved.toFixed(2) + ')');
-  await p.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await p.waitForTimeout(800);
+  // the viewer opens 350 ms after a single click (the double-click window); on a CPU-only machine the software WebGL shader compiles can hold
+  // the page for several seconds, so wait for the outcome (up to 10 s) rather than a fixed 800 ms (measured: 1.4 to 6 s on the same build)
+  await p.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await p.waitForFunction(() => document.getElementById('i3d-modal') && !window._i3dLive && document.querySelectorAll('canvas.i3d-canvas').length === 1, null, { timeout: 10000 }).catch(() => {});
   ok(!!(await p.$('#i3d-modal')) && await p.evaluate(() => !window._i3dLive), 'a click without a drag opens the full viewer (and the tile\'s live view stops)');
   ok(await p.evaluate(() => document.querySelectorAll('canvas.i3d-canvas').length === 1), 'only one 3D view is open at a time');
   await ctx.close();

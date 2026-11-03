@@ -39,7 +39,7 @@ const L2 = { saved: 37500, target: 250000, houseType: 'semi', houseMode: 'purcha
   ok(!r.sw && r.flag === 'nw', 'no house builder switch in Settings; only the net worth flag is left (' + r.flag + ')');
   // ── 6. the old code is gone ──
   r = await p.evaluate(() => ({ svg: !!document.getElementById('houseSvg'), iso: typeof _iso, draw: typeof DRAW, ghost: typeof hbGhostWrap, eq: typeof hbShadeEquity,
-    band: 'rowBand' in HB3D.viewer && !!HB3D.viewer.rowBand, water: !!HB3D.viewer.water, cust: typeof HB3D.Viewer.prototype._stepAnim, holoMat: typeof HB3D._holoMaterial }));
+    band: 'rowBand' in HB3D.viewer && !!HB3D.viewer.rowBand, water: !!HB3D.viewer.water, cust: HB3D.Viewer ? typeof HB3D.Viewer.prototype._stepAnim : 'undefined', holoMat: typeof HB3D._holoMaterial }));
   ok(!r.svg && r.iso === 'undefined' && r.draw === 'undefined' && r.ghost === 'undefined' && r.eq === 'undefined', 'the SVG blueprint engine is gone');
   ok(!r.band && !r.water && r.cust === 'undefined' && r.holoMat === 'undefined', 'the classic 3D look is gone (no row band, waterline ring, tween or hologram material)');
   // ── 3. Level 3 locked ──
@@ -57,7 +57,11 @@ const L2 = { saved: 37500, target: 250000, houseType: 'semi', houseMode: 'purcha
   ok(r.same, 'choosing Level 3 or unlocking it changes nothing saved');
   // ── 2. Level 2 in the brand look: the hologram house, the equity share of its value laid in real colours ──
   await p.waitForFunction(() => HB3D.viewer.mode === 'equity' && HB3D.viewer.settled(), null, { timeout: 60000, polling: 300 }).catch(() => {});
-  const L2info = () => { const v = HB3D.viewer, i = v.brandInfo(), recs = v._bm.filter(Boolean);
+  const L2info = () => { const v = HB3D.viewer, i = v.brandInfo();
+    if (v.engine === 'house_gl') { const u = v.readUniforms(['uLit']), bb = v.model.batches.find(b => b.kinds && b.kinds.brick), hex = bb ? HB3D.brandColourOf(bb, 0) : 0;   // the brand-book renderer: one draw, colour by a uniform threshold
+      return { info: !!i, tag: document.getElementById('hb3d-rowlabel').textContent, own: getComputedStyle(document.getElementById('hb3d-ownlabel')).display, colour: i && i.colour, total: i && i.colourTotal,
+        holo: v.laidAll(), layers: i && i.colour > 0 ? 1 : 0, eq: v.eq, want: hbL2Own(), paid: hbL2Progress(), lit: u.uLit[0], door: u.uLit[1], cap: document.getElementById('hb3d-cap').textContent, rgb: [(hex >> 16) & 255, (hex >> 8) & 255, hex & 255] }; }
+    const recs = v._bm.filter(Boolean);
     return { info: !!i, tag: document.getElementById('hb3d-rowlabel').textContent, own: getComputedStyle(document.getElementById('hb3d-ownlabel')).display, colour: i && i.colour, total: i && i.colourTotal,
       holo: recs.every(r => r.cnt === r.n), layers: recs.filter(r => r.C).length, eq: v.eq, want: hbL2Own(), paid: hbL2Progress(), lit: v._bU.uLitGlass.value, door: v._bU.uLitDoor.value,
       cap: document.getElementById('hb3d-cap').textContent, rgb: (() => { const r = recs.find(x => x.part === 'brick'); return r ? [r.rgb[0], r.rgb[1], r.rgb[2]] : null; })() }; };
@@ -82,7 +86,9 @@ const L2 = { saved: 37500, target: 250000, houseType: 'semi', houseMode: 'purcha
   p = await open(L2, { motion: true });
   await p.waitForFunction(() => HB3D.viewer.settled(), null, { timeout: 90000, polling: 500 }).catch(() => {});
   r = await p.evaluate(async () => { const v = HB3D.viewer; state.mortgageBalance -= 2000; save(); updateUI();
-    await new Promise(res => setTimeout(res, 400)); const rec = v._bm.find(x => x && x.part === 'brick'), C = rec.C, t = v._bNow();
+    await new Promise(res => setTimeout(res, 400));
+    if (v.engine === 'house_gl') { const c0 = v._Vc; await new Promise(res => setTimeout(res, 600)); return { dropping: v._Vc > c0, future: v.eq > v._bEq, drop: v.dropCourses() * 0.075 }; }   // the brand-book renderer eases the colour line up over the frames
+    const rec = v._bm.find(x => x && x.part === 'brick'), C = rec.C, t = v._bNow();
     return { dropping: C.front.visible && C.front.count > 0, future: Array.from(C.laid.slice(Math.max(0, C.cnt - 3), C.cnt)).some(x => x > t - 0.9), drop: C.front.material.uniforms.uDrop.value };
   });
   ok(r.dropping && r.future && r.drop > 0, 'new colour bricks drop in like Level 1 (instanced while landing, drop ' + (r.drop || 0).toFixed(2) + ' m)');
@@ -91,9 +97,9 @@ const L2 = { saved: 37500, target: 250000, houseType: 'semi', houseMode: 'purcha
   ok(/Coming later as part of Pro/.test(r.txt) && /PRO/.test(r.txt) && !r.input && !r.meshy, 'Your own design is shown under Pro, locked: no upload, no AI prompt');
   ok(r.on === false && r.type !== 'custom', 'nothing can switch the house to an uploaded design');
   await p.context().close();
-  // ── 5. still picture when 3D cannot run ──
+  // ── 5. still picture when 3D cannot run (the old viewer without three.js; the brand-book renderer needs no three.js and shows the same still without WebGL, tests/test_house_gl.js) ──
   for (const [nm, o] of [['Level 1', L1], ['Level 2', L2]]) for (const w of [390, 1100]) {
-    p = await open(o, { noThree: true, w });
+    p = await open(o, { noThree: true, w, query: '?house=legacy' });
     r = await p.evaluate(() => { const el = document.getElementById('house-scene'), cv = document.getElementById('hbStill'), g = cv.getContext('2d'), d = g.getImageData(0, 0, cv.width, cv.height).data;
       let lit = 0; for (let i = 0; i < d.length; i += 16) if (d[i + 1] > 120) lit++;
       return { eng: el.getAttribute('data-engine'), w: cv.width, lit: lit, hud: document.getElementById('hb-hud').innerText, rail: getComputedStyle(el.querySelector('.hud-bar') || el).display, side: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 }; });

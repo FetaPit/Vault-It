@@ -21,7 +21,8 @@ node tests/test_signup_page.js       # vault-it.co/sign-up and its confirm / tha
 node tests/test_beta_client.js     # privacy/terms wording, 429 handling, Download my data, Delete my account
 node tests/journey_one_b.js        # One B's two-device journey: phone signs up (code + PIN), desktop PINs in with the same data, sync both ways on background/foreground, sign out and back, install readiness (VI_APP=<url> also checks the live service worker)
 node tests/test_hb_l2_entry.js      # Level 2 onboarding: purchase-day mortgage entry (lender, balance, rate, fix end, term), panel summary, what-ifs on those figures
-node tests/test_hb_speed.js          # house builder speed (phone, CPU 4x): landed bricks drawn as one static mesh, same pixels as the old way at a fraction of the GPU work; page blocked far less while a deposit lays bricks; 30 frames a second at rest
+node tests/test_house_gl.js          # the brand-book renderer (src/hb3d/house_gl.js, no three.js): palette, lazy laying, deposit delta and stagger, type switch under 100 ms, orbit, reduced motion, every house type, ?house=legacy
+node tests/test_hb_speed.js          # house builder speed (phone, CPU 4x): landed bricks drawn as one static mesh, same pixels as the old way at a fraction of the GPU work; page blocked far less while a deposit lays bricks; 30 frames a second at rest; cold load (tests/hb_coldload.js): still picture first, the house below the newest course at once, only that course lays, pixel ratio 1.25 laying / 2 at rest, demo house mid-build on a fresh device, reduced motion final state
 node tests/test_hb_one_builder.js    # one house builder: no house flag or switch, old SVG/classic code gone, Level 2 in the brand look (paid line rises, mortgage free lit), Level 3 and own design locked under Pro, still picture without 3D
 node tests/test_hb3d_app.js          # brand 3D build in the app: clean shell, bricks laid = deposit %, ROW tag and gold slice; three.js blocked -> the still picture with the same HUD figures
 node tests/test_hb3d_levels.js       # Level 2 in the brand build (whole house as the hologram, the share you own laid in colour, gold tag MORTGAGE x% PAID / YOU OWN y%, MORTGAGE FREE), Level 3 locked, plot, types, floors, pinch zoom
@@ -37,6 +38,7 @@ node tests/test_paid_gateway.js     # secure paid gateway, app side: the Stripe 
 node tests/test_stripe_server.js     # stripe-webhook: signature checks, plan from link / metadata / price, unpaid and test-mode ignored, retry on database failure
 node tests/test_011.mjs              # migration 011 on pglite: browser cannot set paid columns, events once and in order, founders, testers from the waitlist, erase unlinks events
 node tests/test_012.mjs              # migration 012 on pglite: tester feedback, surveys, events and reports; RLS with no client access, checks, per-tester limits, activity totals, retention, erase
+node tests/test_v08_type_scale.js     # v0.8 type scale: tiered floors (10/10.5/11.5/12.5 px) on every small size in the source, no text under 10 px as drawn at 390-1440 (agreed exceptions), no new clipping or overlap (scale on vs off), no sideways scroll at 390-1440, root, tab bar height and 3D stage size unchanged
 node tests/test_feedback_server.js   # tester-feedback + feedback-digest: auth, 400/413/429, trail amounts stripped, Claude triage (bad reply stays untriaged), severity 4 e-mail, surveys, events, digest key, daily and weekly digests
 node tests/test_view_mode.js        # Simplified / Advanced view: Advanced when nothing is saved, the Simplified tile list on Overview / Budget / House, achievements card, tabs, synced choice, welcome default, phone KPIs in two rows, Sankey flow animation and reduced motion
 node tests/test_tester_welcome.js    # tester welcome note: shown once after the welcome flow for beta accounts, agreed wording with the 30-day first sentence, closes with Esc / outside / Let's go, phone fit
@@ -57,11 +59,24 @@ node tests/test_nw3d_labels.js       # Net worth in 3D: floor names never overla
 node tests/test_signoff_a.js         # Phone sign-off A: Feedback pill never covers a 3D stage; Net worth floor names sit on the income flow label plate
 node tests/test_signoff_b.js         # Phone sign-off B: old green item pictures redrawn in the model colours; phone tap makes the tile a live orbit view
 node tests/test_signoff_c.js         # Phone sign-off C: Cash and savings 3D ground grid half the size and fading into the fog
+node tests/test_ui_round2.js         # v0.7 UI round 2 (for alpha 0.8), Net worth tile: no forecast note in the 3D card; forecast from the Budget (savings and investments only, investments compound at 4%, debt repayments after interest, shortfall comes off, no budget no growth) with a full-width note; History, Goals, Snapshots as collapsed pills at the foot of the tile
 node tests/test_signoff_d.js         # Phone sign-off D: income flow bands get a bright colour stroke and leaders; only two reds, clearly apart, AA text
 node tests/test_signoff_d.js         # Phone sign-off D: income flow bands get a bright colour stroke and leaders; only two reds, clearly apart
 node tests/test_footer.js             # footer: approved disclaimer, Privacy notice / Beta terms links in the app and landing footers, type floors, --footer-h tracks the fixed footer
+node tests/test_v08_chrome.js         # v0.8 chrome: Message the Dev last on every tab, Feedback fixed bottom right, footer collapses to the FCA strip (full on scroll up / page end), compact category pills (below Cash flow), synced scroll rails above and below the flow charts
 node tests/test_csp_report_only.mjs   # Worker: Content-Security-Policy-Report-Only lists every outside host the app calls; enforced CSP unchanged
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width
 node tests/test_nw3d.js            # net worth in 3D (on by default): flag off unchanged, 3D | Graph toggle, same numbers in both views, debts grouped by kind (cards stacked in one column, each in its own colour), zoom buttons / ctrl+wheel / reset (VI_APP=file:///… to test another copy)
 node tests/test_email_brand.js   # every e-mail the functions send: brand lockup (Vault, brick, teal It), Night colours, Syne, tagline, FCA line
 ```
+node tests/test_v07_e16.js         # v0.7 E16: "Add to your savings" gone, button "Lay the bricks" with the brick-wall icon, input aria-label
+node tests/test_v07_e17.js         # v0.7 E17: amount box 56 px, 24 px mono digits, gold pound, 599/600 px layout, live "£n lays n bricks" line
+node tests/test_v07_e18.js         # v0.7 E18: house camera buttons in a bottom-centre pill, sprite icons, no emoji, orbit glow
+node tests/test_v07_e1.js          # v0.7 E1: bottom tab bar at 599 px and under only; icon nav at the top from 600 px
+node tests/test_v07_e2.js          # v0.7 E2: the roadmap opens centred on the next achievement, each time the tab opens
+node tests/test_v07_e3.js          # v0.7 E3: gold roadmap tile gone; stage detail on tap (Next up, Met. Waiting on, ring, close x/Esc)
+node tests/test_v07_e9.js          # v0.7 E9: budget spending groups folded by default; a saved choice wins
+node tests/test_v07_e10.js         # v0.7 E10: expense bar arrow: sprite chevron 20 px in a 44 px target, down folded, up open
+node tests/test_v08_cards.js        # v0.8 D2: budget cards (no separator, 30-32 px icons, 10 px titles, titles clear of the amount) and the one House progress tile (iconned stats, house-type milestones, no dead columns)
+node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, identical on #cf-sankey and #bd-sankey, Night and Daylight
+node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload

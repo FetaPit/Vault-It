@@ -100,20 +100,20 @@ const seed = eval(shotSrc.slice(shotSrc.indexOf('const seed ='), shotSrc.indexOf
   ok(r6d.hidden.raf === 0 && r6d.back, 'a hidden page stops the frames; showing it again redraws (' + JSON.stringify(r6d) + ')');
 
   // ── 7. lite quality on demand ──
-  const r7 = await p.evaluate(async () => { const v = HB3DAPP.viewer; v.goLite(); for (let i = 0; i < 40 && v.dirty !== false; i++) await new Promise(r => setTimeout(r, 100)); return { sh: v.renderer.shadowMap.enabled, sun: v.sun.castShadow, dpr: v.renderer.getPixelRatio(), drawn: v.dirty === false, lite: v._lite }; });
-  ok(r7.lite && r7.sh === false && r7.sun === false && r7.dpr === 1 && r7.drawn, 'goLite: shadows off, pixel ratio 1, still drawing (' + JSON.stringify(r7) + ')');
+  const r7 = await p.evaluate(async () => { const v = HB3DAPP.viewer; v.goLite(); for (let i = 0; i < 40 && v.dirty !== false; i++) await new Promise(r => setTimeout(r, 100)); return { gl: v.engine === 'house_gl', sh: v.renderer.shadowMap ? v.renderer.shadowMap.enabled : false, sun: v.sun ? v.sun.castShadow : false, dpr: v.renderer.getPixelRatio(), drawn: v.dirty === false, lite: v._lite }; });
+  ok(r7.lite && r7.sh === false && r7.sun === false && r7.dpr === 1 && r7.drawn, 'goLite: ' + (r7.gl ? 'pixel ratio 1 (no shadows to switch off in the brand-book renderer)' : 'shadows off, pixel ratio 1') + ', still drawing (' + JSON.stringify(r7) + ')');
 
   // ── 8. the coin stage draws only on a kick ──
   await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', document.querySelector('.subtab-btn[data-sub="cash"]')); }); await p.waitForTimeout(1600);
   // headless Chromium draws this stage in software (a frame can take 200 ms), so wait for idle rather than assuming it
   const idleCash = async () => { for (let i = 0; i < 40; i++) { if (await p.evaluate(() => !!(window.V3 && V3.cash) && V3.cash.raf === 0 && Date.now() > V3.cash._until)) return true; await p.waitForTimeout(250); } return false; };
-  const r8 = await p.evaluate(() => (window.V3 && V3.cash) ? { type: V3.cash.r.shadowMap.type === THREE.PCFSoftShadowMap, off: V3.cash._off } : { none: true });
+  const r8 = await p.evaluate(() => (window.V3 && V3.cash) ? { type: V3.cash.r.shadowMap.enabled === false, off: V3.cash._off } : { none: true });   // v0.7 (owner, 2 Nov): no real-time shadow pass on this stage any more (a baked contact shadow)
   if (r8.none) console.log('skip: no 3D cash stage in this seed');
   else {
     const idle1 = await idleCash();
     const kicked = await p.evaluate(() => { V3.cash.kick(); return V3.cash.raf !== 0; });
     const idle2 = await idleCash();
-    ok(idle1 && kicked && idle2 && r8.type && r8.off === false, 'cash stage: idle, a kick draws, idle again; desktop shadow filter (' + JSON.stringify({ idle1, kicked, idle2, type: r8.type, off: r8.off }) + ')');
+    ok(idle1 && kicked && idle2 && r8.type && r8.off === false, 'cash stage: idle, a kick draws, idle again; no shadow pass (' + JSON.stringify({ idle1, kicked, idle2, type: r8.type, off: r8.off }) + ')');
   }
 
   await b.close();

@@ -32,17 +32,17 @@ const seed = (o) => {
     return p;
   };
   const shown = (sel) => { const e = document.querySelector(sel); return !!(e && getComputedStyle(e).display !== 'none' && e.getClientRects().length); };
-  const ov = () => ({ ms: shown('#ov-ms-card'), nwh: shown('#ov-nwh-card'), cf: shown('#ov-cf-card'), own: shown('#ov-own-card'), ach: shown('#ov-ach-card'), road: shown('#fire-roadmap-card'), kpis: [...document.querySelectorAll('.ov-kpis:not(.debt-strip) .ov-kpi')].filter(e => e.getClientRects().length).length,
+  const ov = () => ({ ms: shown('#nw-more .nw-more-btns button[data-p="goals"]'), nwh: shown('#nw-more .nw-more-btns button[data-p="history"]'), cf: shown('#ov-cf-card'), own: shown('#ov-own-card'), ach: shown('#ov-ach-card'), road: shown('#fire-roadmap-card'), kpis: [...document.querySelectorAll('.ov-kpis:not(.debt-strip) .ov-kpi')].filter(e => e.getClientRects().length).length,
     nw: shown('#nwChart') || shown('#nw3d-hero'), tabs: [...document.querySelectorAll('#vi-tabs .tab-btn')].filter(x => !x.hidden && getComputedStyle(x).display !== 'none').map(x => x.dataset.tab).join(','), simple: document.body.classList.contains('vi-simple') });
 
   // ── 1. no view saved: Advanced ──
   let p = await open({});
   await p.evaluate(() => showTab('overview')); await p.waitForTimeout(400);
-  await p.evaluate(() => { if (window.nw3d) nw3d.setMain('graph', true); }); await p.waitForTimeout(300);   // goals and snapshots live in the Graph view (owner, 31 Oct)
+  await p.evaluate(() => { if (window.nw3d) nw3d.setMain('graph', true); }); await p.waitForTimeout(300);   // History, Goals and Snapshots buttons sit in the net worth tile (v0.7 UI round 2)
   let o = await p.evaluate(() => window.__ov());
   ok(!o.simple && o.ms && o.nwh && o.cf && o.own && !o.ach && /achievements/.test(o.tabs) && /biz/.test(o.tabs), 'no view saved: Advanced, every Overview tile and tab shows, no achievements card');
   const fold0 = await p.evaluate(() => { showTab('budget'); return [...document.querySelectorAll('.bd-tile')].map(t => t.classList.contains('folded')); });
-  ok(fold0.length >= 3 && fold0.every(f => !f), 'Advanced: budget sections start open');
+  ok(fold0.length >= 3 && fold0.every(f => f), 'Advanced: budget sections start folded (v0.7 E9: folded for everyone)');
 
   // ── 2. switch to Simplified from Settings ──
   await p.evaluate(() => { showSettings(); document.querySelector('#set-view [data-val="simple"]').click(); closeSettings(); showTab('overview'); }); await p.waitForTimeout(400);
@@ -70,7 +70,7 @@ const seed = (o) => {
   ok(hs.scene && hs.lay && hs.plan, 'Simplified house: the viewport, Add to your savings and Your house plan show');
   ok(!hs.hud && !hs.prog && !hs.hist && !hs.own && hs.lvl === '1', 'Simplified house at Level 1: the level card, progress, History and own-design tools wait for Advanced');
   await p.evaluate(() => { setSetting('view', 'adv'); }); await p.waitForTimeout(300);
-  const ha = await p.evaluate(() => { const shown = (sel) => { const e = document.querySelector(sel); return !!(e && getComputedStyle(e).display !== 'none' && e.getClientRects().length); }; return shown('#hb-hud') && shown('#hb-prog') && shown('#hb-hist'); });
+  const ha = await p.evaluate(() => { const shown = (sel) => { const e = document.querySelector(sel); return !!(e && getComputedStyle(e).display !== 'none' && e.getClientRects().length); }; return shown('#hb-hud') && !!document.querySelector('#hb-hud #pbarFill') && shown('#hb-hist'); });
   ok(ha, 'back to Advanced: the level card, progress and History return');
   await p.context().close();
 

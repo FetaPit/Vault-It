@@ -29,7 +29,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   ok(h.pie&&h.pie.kind==='fund'&&h.pie.name==='iShares Blockchain Technology UCITS ETF'&&h.pie.platform.name==='Monzo'&&h.active===h.pie.id,'fund got its own pie named after the fund, kind=fund, platform Monzo, selected');
   ok(/FUND/.test(await page.innerHTML('#stk-pies'))&&/All investments/.test(await page.innerText('#stk-pies')),'FUND tag on the tile; "All pies" now reads "All investments"');
   ok(/10 units owned/.test(await page.innerText('#stk-main')),'summary shows the units owned worked out from the £ held');
-  const tx=await page.innerText('#stk-holdings'); ok(/iShares Blockchain/.test(tx)&&/BlackRock \(iShares\)[\s\S]*on[\s\S]*Monzo/.test(tx),'holdings row shows name, provider and "on Monzo"');
+  const tx=await page.textContent('#stk-holdings'); ok(/iShares Blockchain/.test(tx)&&/BlackRock \(iShares\)[\s\S]*on[\s\S]*Monzo/.test(tx),'holdings row shows name, provider and "on Monzo"');
   ok(/Monzo/.test(await page.innerHTML('#stk-pies')),'Monzo badge on the pie tile');
   // picked listing has no price but another listing of the same fund does → it is used automatically
   await page.evaluate(()=>{_supaClient.functions.invoke=async(n,o)=>{ if(o.body.search)return{data:{results:[{symbol:'BLKC.AS',name:'iShares Blockchain Technology UCITS ETF',exchange:'Amsterdam',type:'ETF'},{symbol:'BLKC.L',name:'iShares Blockchain Technology UCITS ETF',exchange:'London',type:'ETF'}]},error:null}; if(o.body.history)return{data:{series:{}},error:null}; const q={};(o.body.symbols||[]).forEach(x=>{if(x==='BLKC.L')q[x]={price:1124,currency:'GBp',name:x,changePct:0};});return{data:{quotes:q},error:null};};});
