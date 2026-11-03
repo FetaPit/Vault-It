@@ -143,6 +143,14 @@ const HDEF = () => { window.H = () => { const w = (achState.wr || {}).h || null,
   ok(r.has && r.fits && !r.side, '390 px: the account chip fits the tile, no sideways scroll');
   ok(/Estimated 25% bonus: £625/.test(r.txt), '390 px: bonus estimate on £2,500 paid in is £625');
   ok(r.small.length === 0, 'no text under 10.5 px (' + r.small.join(', ') + ')');
+  // Pedro (3 Nov): the tile label at 11.5 px, every tap 44 px, the rate kept on one line
+  r = await p.evaluate(() => { const c = document.getElementById('hb-dacct'), R = e => e.getBoundingClientRect();
+    const hd = parseFloat(getComputedStyle(c.querySelector('.hb-da-hd')).fontSize), ed = R(c.querySelector('.stk-btn')), rate = c.querySelector('.hb-da-rate');
+    hbOpenDepAcct(); const o = document.getElementById('hbd-ov'), taps = [...o.querySelectorAll('button,input,select,.hbd-x')].map(e => R(e)).filter(q => q.height < 44 || q.width < 44).length;
+    const small = [...o.querySelectorAll('*')].filter(e => !e.children.length && e.textContent.trim() && parseFloat(getComputedStyle(e).fontSize) < 11.5).map(e => e.textContent.trim().slice(0, 12));
+    hbCloseDepAcct(); return { hd, edit: ed.height >= 44 && ed.width >= 44, rate: rate ? rate.getClientRects().length : 0, taps, small }; });
+  ok(r.hd >= 11.5 && r.edit && r.taps === 0 && r.rate === 1, '390 px: label 11.5 px, every tap at least 44 px, the rate on one line (' + JSON.stringify(r) + ')');
+  ok(r.small.length === 0, '390 px: the account form has no text under 11.5 px (' + r.small.join(', ') + ')');
   ok(p._errs.length === 0, 'no page errors ' + p._errs.slice(0, 3).join(' | '));
   await p.context().close();
 
