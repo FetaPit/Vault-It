@@ -8455,7 +8455,7 @@ body::before {
 .cc3-face{position:absolute;inset:0;border-radius:3.7cqw;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 1cqw 3cqw rgba(0,0,0,.45)}
 .cc3-front{transform:translateZ(.45cqw)}
 .cc3-back{transform:rotateY(180deg) translateZ(.45cqw);color:#dfe8ea;background:none!important;overflow:visible;box-shadow:none;border-radius:0}
-.cc3-bbase,.cc3-bpiece{background:linear-gradient(135deg,#2b3138,var(--panel))}
+.cc3-bbase,.cc3-bpiece{background:linear-gradient(135deg,#2b3138,#12161a)}   /* dark in both themes: the back carries figures (E33b) */
 .cc3-bpiece{background:linear-gradient(135deg,#6a7076,#4a4f55);filter:grayscale(1) brightness(.75);transform:translate(-.8cqw,.5cqw) rotate(-1.1deg);transform-origin:0 100%;box-shadow:none}
 .cc3-edge{position:absolute;background:linear-gradient(#cfd3d6,#8c9296)}
 .cc3-e-t,.cc3-e-b{left:3.7cqw;right:3.7cqw;height:.9cqw}
@@ -8475,6 +8475,19 @@ body::before {
 .cc3-chip i:nth-child(2){border-radius:1cqw}
 .cc3-nfc{position:absolute;left:21cqw;top:38%;width:7.5cqw;height:7.5cqw;opacity:.85}
 .cc3-num{position:absolute;left:6cqw;right:6cqw;bottom:20%;font:500 6.2cqw 'Share Tech Mono',monospace;letter-spacing:.14em;text-shadow:0 .2cqw .5cqw rgba(0,0,0,.45);white-space:nowrap;overflow:hidden}
+.cc3-type{position:absolute;left:6cqw;right:6cqw;bottom:22%;font:600 max(10.5px,5.2cqw) 'DM Sans',sans-serif;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 .2cqw .5cqw rgba(0,0,0,.45)}
+.cc3-btype{bottom:auto;top:6%;opacity:.85}
+.cc3-ticon{position:absolute;left:6cqw;top:20cqw;width:max(18px,9cqw);height:max(18px,9cqw);--vi-sw:1.6;opacity:.92;filter:drop-shadow(0 .2cqw .5cqw rgba(0,0,0,.4))}
+.cc3-bfacts{background:none!important;pointer-events:none;z-index:4}
+.cc3-bk{position:absolute;left:6cqw;right:6cqw;top:19%;bottom:5%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto 1fr;column-gap:4cqw;row-gap:2.4cqw;align-content:start;font-family:'DM Sans',sans-serif;line-height:1.2}
+.cc3:not(.cc3-loan) .cc3-bk{top:26%}
+.cc3-bk>div{min-width:0}
+.cc3-bk span{display:block;font:600 max(10.5px,3.3cqw) 'DM Sans',sans-serif;opacity:.7;letter-spacing:.02em}
+.cc3-bk b{display:block;font:500 max(12px,5cqw) 'Share Tech Mono',monospace;overflow-wrap:anywhere}
+.cc3-bk i{display:block;font:400 max(10.5px,3.3cqw) 'DM Sans',sans-serif;font-style:normal;opacity:.85}
+.cc3-bk-pay{grid-column:1/-1}
+.cc3-bk-note{grid-column:1/-1;align-self:end;font:400 max(10.5px,3cqw) 'DM Sans',sans-serif;opacity:.8}
+.cc3-loan .cc3-name{right:6cqw}
 .cc3-name{position:absolute;left:6cqw;right:26cqw;bottom:10%;font:700 4.6cqw 'Syne',sans-serif;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.92}
 .cc3-net{position:absolute;right:6cqw;bottom:7%;display:flex;align-items:center}
 .cc3-visa{font:italic 800 9cqw 'Syne',sans-serif;letter-spacing:-.02em;color:#fff;text-shadow:0 .2cqw .6cqw rgba(0,0,0,.4)}
@@ -8484,7 +8497,7 @@ body::before {
 .cc3-paid{position:absolute;left:0;right:0;bottom:0;height:1.6cqw;background:rgba(0,0,0,.3)}
 .cc3-paid span{display:block;height:100%;background:var(--green)}
 .cc3-pct{position:absolute;right:6cqw;top:6cqw;font:700 3.8cqw 'Share Tech Mono',monospace;color:#fff;background:rgba(0,0,0,.42);border-radius:5cqw;padding:.8cqw 2.4cqw}
-.cc3-stripe{position:absolute;left:0;right:0;top:11%;height:17%;background:var(--panel)}
+.cc3-stripe{position:absolute;left:0;right:0;top:7%;height:14%;background:#07090b}
 .cc3-sig{position:absolute;left:6cqw;right:30cqw;top:38%;height:13%;background:repeating-linear-gradient(135deg,#f4f1ea 0 1.2cqw,#e6e1d6 1.2cqw 2.4cqw);border-radius:.6cqw;display:flex;justify-content:space-between;align-items:center;padding:0 2cqw;color:#555}
 .cc3-sig span{font:500 3cqw 'DM Sans',sans-serif}.cc3-sig b{font:italic 700 4.4cqw 'Share Tech Mono',monospace;color:#111}
 .cc3-bk-info{position:absolute;left:6cqw;right:6cqw;bottom:9%;display:flex;gap:5cqw;font-family:'Share Tech Mono',monospace}
@@ -10836,7 +10849,7 @@ button.bd-ic{cursor:pointer}
 .inv-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .inv-t{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--tx)}
 .inv-s{font-family:'Share Tech Mono',monospace;font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);margin-top:2px}
-.inv-x{background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:30px;height:30px;cursor:pointer}
+.inv-x{background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:44px;height:44px;cursor:pointer}
 .inv-x:hover{color:#fff;border-color:var(--blue)}
 .inv-stage{position:relative;width:100%;aspect-ratio:4/3;max-height:58vh;border-radius:10px;overflow:hidden;background:var(--panel);border:1px solid rgb(var(--ink-rgb) / .06)}
 .inv-stage canvas{width:100%;height:100%;display:block}
@@ -10863,10 +10876,10 @@ button.bd-ic{cursor:pointer}
 .i3d-credit{font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);word-break:break-word}
 .i3d-row{display:flex;gap:6px;flex-wrap:wrap}
 /* the viewer's Change model, Remove model, View current model and Photos buttons: the ghost pill of "Link to market value" (Pedro's round 2; .dep-btn had no style), at a tap-sized 11 px */
-.i3d-row .dep-btn{display:inline-flex;align-items:center;font:600 11px 'DM Sans',sans-serif;padding:5px 11px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
+.i3d-row .dep-btn{display:inline-flex;align-items:center;font:600 11px 'DM Sans',sans-serif;min-height:44px;padding:5px 14px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
 .i3d-row .dep-btn:hover,.i3d-row .dep-btn:focus-visible{background:rgb(var(--teal-rgb) / .24)}
 .i3d-opts{display:flex;flex-direction:column;gap:10px}
-.i3d-up{display:block;text-align:center;padding:10px;cursor:pointer;font-size:max(.62rem,var(--vi-fs-2))}
+.i3d-up{display:flex;align-items:center;justify-content:center;min-height:44px;text-align:center;padding:10px;cursor:pointer;font-size:max(.62rem,var(--vi-fs-2))}
 .i3d-lib-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.7rem,var(--vi-fs-3));color:var(--tx);display:flex;align-items:center;gap:6px}
 .i3d-tag{font-family:'Share Tech Mono',monospace;font-size:max(.46rem,var(--vi-fs-1));padding:1px 6px;border-radius:99px;border:1px solid var(--amber);color:var(--amber);letter-spacing:.08em;text-transform:uppercase}
 .i3d-lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
@@ -12972,6 +12985,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div><label class="ov-kpi-lbl">Interest Rate %</label><input type="number" id="df-rate" step="0.1" class="al-inp"></div>
         <div><label class="ov-kpi-lbl">Min Payment £/mo</label><input type="number" id="df-min" class="al-inp"></div>
         <div><label class="ov-kpi-lbl">Type</label><select id="di-type" class="al-inp"><option value="credit">Credit Card</option><option value="personal">Personal Loan</option><option value="student">Student Loan</option><option value="car">Car / Vehicle Finance</option><option value="bnpl">Buy Now Pay Later</option><option value="overdraft">Overdraft</option><option value="mortgage">Mortgage</option><option value="other">Other</option></select></div>
+        <div><label class="ov-kpi-lbl" for="df-provider">Lender or bank (for its logo)</label><input type="text" id="df-provider" class="al-inp" maxlength="40" autocomplete="off" placeholder="e.g. Santander, Zopa"></div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn-add-data" onclick="saveDebt()">Save debt</button>
@@ -15743,12 +15757,13 @@ function addSnapshot() {if(viBlockEdit())return;
 // ═══════════════════════════════════════════════════════════════
 // TOAST (shared)
 // ═══════════════════════════════════════════════════════════════
-var _toastT;
-function showToast(msg, ms) {
-  var t = document.getElementById('toast');
+var _toastT, _toastN = 0;
+function showToast(msg, ms) {   // the one toast: toast() shares it, so only the newest toast's timer can hide it
+  var t = document.getElementById('toast'); if (!t) return;
   t.textContent = msg; t.classList.add('show');
-  clearTimeout(_toastT);
-  _toastT = setTimeout(function() { t.classList.remove("show"); }, ms || 3000);
+  clearTimeout(_toastT); var tok = ++_toastN;
+  // the count starts once it is drawn (two frames): a long task, such as the house rebuild after a deposit, cannot use it up unseen
+  requestAnimationFrame(function () { requestAnimationFrame(function () { if (tok !== _toastN) return; clearTimeout(_toastT); _toastT = setTimeout(function () { if (tok === _toastN) t.classList.remove('show'); }, ms || 3000); }); });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -15904,8 +15919,7 @@ function updatePriceLabels(){
 }
 function updatePriceInput(){document.getElementById('priceInput').value=state.prices[state.houseType]||'';}
 
-let tT2;
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT2);const tok=(toast._n=(toast._n||0)+1);requestAnimationFrame(()=>requestAnimationFrame(()=>{if(tok!==toast._n)return;clearTimeout(tT2);tT2=setTimeout(()=>t.classList.remove('show'),3000);}));}   // the 3 s count starts once it is drawn: the house rebuild after a deposit can hold the page long enough for it to vanish unseen
+function toast(msg){showToast(msg);}   // the house tracker's name for the shared toast (one timer, counted from when it is drawn)
 
 function markHousePurchased(){if(viBlockEdit())return;
   state.houseMode='purchased';
@@ -17860,6 +17874,46 @@ var OV_ICO={
   biz:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
   owed:'<path d="M4 12h12M12 7l5 5-5 5"/><path d="M20 5v14"/>'
 };
+// Credit cards and BNPL are drawn as cards (chip, number, network); every other debt uses the same tile without them (E33)
+function ccIsCard(d){return !!d&&(d.type==='credit'||d.type==='bnpl');}
+var DEBT_TYPE_ICONS={personal:'vi-loan',student:'vi-book',car:'vi-car',overdraft:'vi-overdraft',mortgage:'vi-mortgage',other:'vi-loan'};
+// What a debt tile's back shows (E33b). An estimate from the user's own figures: nominal monthly rate = APR / 100 / 12,
+// interest added each month, the minimum paid at each month end. A minimum at or below the interest never clears it.
+function debtTileFacts(d,now){
+  var B=parseFloat(d&&d.balance)||0,apr=parseFloat(d&&d.rate)||0,M=parseFloat(d&&d.minPay)||parseFloat(d&&d.min)||0,r=Math.max(0,apr)/100/12;
+  var out={monthInterest:Math.max(0,B)*r,yearInterest:Math.max(0,B)*r*12,min:M,rate:apr};
+  if(!(B>0.005)){out.cleared=true;return out;}
+  if(!(M>0)){out.noMin=true;return out;}
+  if(r>0&&M<=B*r+1e-9){out.never=true;return out;}
+  var n=0,I=0;
+  while(B>0.005&&n<600){var i=B*r;I+=i;B=B+i-Math.min(M,B+i);n++;}
+  if(B>0.005){out.capped=true;return out;}
+  now=now||new Date();var dt=new Date(now.getFullYear(),now.getMonth()+n,1);
+  out.months=n;out.interest=I;out.date=dt.toLocaleDateString('en-GB',{month:'short',year:'numeric'}).replace('Sept','Sep');
+  return out;
+}
+function ccMoney(v,whole){   // £ through the app's currency converter; pence only when there are any
+  var k=(window.VI_CURRENCY_RATE||1),sym=(window.VI_CURRENCY_SYMBOL||'£'),p=Math.round((+v||0)*k*100)/100;
+  if(whole)p=Math.round(p);
+  return sym+(Math.abs(p%1)>0.004?p.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):Math.round(p).toLocaleString('en-GB'));
+}
+function ccBackFacts(d){
+  var f=debtTileFacts(d),minTxt=ccMoney(f.min)+'/mo';
+  var when,whenSub;
+  if(f.cleared){when='Cleared';whenSub='Nothing left to pay';}
+  else if(f.noMin){when='Add a minimum';whenSub='to see a date';}
+  else if(f.never){when='Never';whenSub='at '+minTxt+': '+(f.min<f.monthInterest-0.005?'the interest is more':'it only covers the interest');}
+  else if(f.capped){when='Over 50 years';whenSub='at '+minTxt;}
+  else {when=f.date;whenSub=ccMoney(f.interest,true)+' interest to go';}
+  var pays=(d.payments||[]).slice(-3).reverse().map(function(p){var t=new Date(p.date);return ccMoney(p.amt)+' · '+(isNaN(t)?'':t.toLocaleDateString('en-GB',{day:'numeric',month:'short'}).replace('Sept','Sep'));});
+  var orig=+(d.original||d.total||d.balance)||0,paid=Math.max(0,orig-(+d.balance||0));
+  return '<div class="cc3-bk">'
+    +'<div class="cc3-bk-col"><span>Debt-free</span><b>'+ccEsc(when)+'</b><i>'+ccEsc(whenSub)+'</i></div>'
+    +'<div class="cc3-bk-col"><span>Interest this month</span><b>'+ccMoney(f.monthInterest)+'</b><i>'+ccMoney(f.yearInterest,true)+' a year</i></div>'
+    +'<div class="cc3-bk-pay"><span>Payments</span><i>'+(pays.length?ccEsc(pays.join(', ')):'No payments yet')+'</i><i>Paid so far '+ccMoney(paid)+'</i></div>'
+    +'<div class="cc3-bk-note">'+(f.cleared?'Paid off':'Estimate: '+(f.noMin?'':ccEsc(minTxt)+' at ')+ccEsc(String(f.rate))+'% APR (÷ 12 a month)')+'</div>'
+    +'</div>';
+}
 var _ccPct={};   // % shown last time for each card, so a payment cuts from where it was and an undo joins it back up
 var _ccIO=null;
 var CC_BRANDS=[
@@ -17886,10 +17940,22 @@ var CC_BRANDS=[
  {n:'M&S Bank',d:'marksandspencer.com',g:['#1a1a1a','#050505'],fg:'#fff',acc:'#3f9a67',re:/m\s*&\s*s|marks\s*(and|&)?\s*spencer/i},
  {n:'MBNA',d:'mbna.co.uk',g:['#1a5da8','#082b52'],fg:'#fff',re:/mbna/i},
  {n:'Axis Bank',d:'axisbank.com',g:['#a8185a','#5c0b2e'],fg:'#fff',re:/axis/i},
+ {n:'Zopa',d:'zopa.com',g:['#1b2a4a','#0a1430'],fg:'#fff',acc:'#8f9bb3',re:/zopa/i},
+ {n:'Novuna',d:'novuna.co.uk',g:['#24307a','#0d1440'],fg:'#fff',re:/novuna|hitachi\s*capital/i},
+ {n:'Sainsbury\u2019s Bank',d:'sainsburysbank.co.uk',g:['#b85200','#7a3600'],fg:'#fff',re:/sainsbury/i},
+ {n:'TSB',d:'tsb.co.uk',g:['#1c3f94','#0a1f52'],fg:'#fff',re:/\btsb\b/i},
+ {n:'Co-op Bank',d:'co-operativebank.co.uk',g:['#0079a8','#00466a'],fg:'#fff',re:/\bco-?op(erative)?\s*bank/i},
+ {n:'Metro Bank',d:'metrobankonline.co.uk',g:['#0033a0','#001a54'],fg:'#fff',acc:'#e4002b',re:/metro\s*bank/i},
+ {n:'First Direct',d:'firstdirect.com',g:['#2b2b2b','#050505'],fg:'#fff',re:/first\s*direct/i},
+ {n:'Revolut',d:'revolut.com',g:['#3a3d42','#0b0c0e'],fg:'#fff',re:/revolut/i},
+ {n:'Chase',d:'chase.co.uk',g:['#117aca','#0b3d6b'],fg:'#fff',re:/\bchase\b/i},
+ {n:'Student Loans Company',d:'gov.uk',g:['#1d70b8','#0b3c66'],fg:'#fff',re:/student\s*loans?\s*company|\bslc\b/i},
+ {n:'Black Horse',d:'blackhorse.co.uk',g:['#1b1b1b','#050505'],fg:'#fff',acc:'#7a7a7a',re:/black\s*horse/i},
+ {n:'Close Brothers',d:'closebrothers.com',g:['#0d2340','#050f1e'],fg:'#fff',re:/close\s*brothers/i},
  {n:'Visa',d:'visa.com',g:['#1a2f8f','#0b1650'],fg:'#fff',net:'visa',re:/\bvisa\b/i},
  {n:'Mastercard',d:'mastercard.com',g:['#2a2a33','#101014'],fg:'#fff',net:'mc',re:/master\s*card/i}
 ];
-var CC_GENERIC={n:'',g:['#1d3b46','#0b1b22'],fg:'#e8f0ef'};
+var CC_GENERIC={n:'',g:['#3a3f47','#16181c'],fg:'#eef0f3'};   // neutral slate: teal is net worth, green is assets
 var debtState={debts:[]};
 var BIZ_KEY='pos_biz1';
 var bizState={clients:[],streams:[],incomeStreams:[],leads:[]};
@@ -22274,8 +22340,9 @@ function i3dMatch(name){var n=String(name||'').toLowerCase();for(var i=0;i<I3D_W
 function i3dCredit(m){return m&&m.lic==='CC-BY'?'"'+m.t+'" by '+m.by+', https://poly.pizza/m/'+m.id+'. Licence at https://creativecommons.org/licenses/by/3.0':'';}
 function i3dItem(kind,id){return ((kind==='li'?alState.liabilities:alState.otherAssets)||[]).find(function(x){return x.id===id;});}
 function i3dKey(kind,id){return 'm:'+kind+':'+id;}
-function i3dPut(kind,id,buf){return invTx('readwrite',function(s){return s.put({glb:buf,updated:Date.now()},i3dKey(kind,id));});}
-function i3dGetBuf(kind,id){return invTx('readonly',function(s){return s.get(i3dKey(kind,id));}).then(function(v){return v&&v.glb||null;});}
+function i3dPut(kind,id,buf,fmt){return invTx('readwrite',function(s){return s.put({glb:buf,fmt:fmt||'glb',updated:Date.now()},i3dKey(kind,id));});}   // the bytes stay under `glb` (old records); `fmt` says which format they are
+function i3dGetRec(kind,id){return invTx('readonly',function(s){return s.get(i3dKey(kind,id));}).then(function(v){return v&&v.glb?{buf:v.glb,fmt:v.fmt||'glb'}:null;});}
+function i3dGetBuf(kind,id){return i3dGetRec(kind,id).then(function(r){return r&&r.buf;});}
 function i3dDel(kind,id){try{return invTx('readwrite',function(s){return s.delete(i3dKey(kind,id));});}catch(e){return Promise.resolve();}}
 // fetch a library model in the browser (Poly Pizza's CDN checks for bots, so only a real browser gets through)
 function i3dFetchLib(m){
@@ -22285,9 +22352,52 @@ function i3dFetchLib(m){
     return r.arrayBuffer();
   },function(){throw new Error('Could not reach Poly Pizza from this site (blocked by the browser or offline). Upload a .glb file instead.');});
 }
-function i3dParse(buf){
+/* E29 (v0.9.1): one file per item, in any of six formats. Each loader (and fflate, which FBX and 3MF need to unzip) is fetched from the
+   same jsDelivr three@0.128.0 examples path as GLTFLoader, only when a file of that type is picked. */
+var I3D_EXT={glb:1,gltf:1,stl:1,obj:1,fbx:1,'3mf':1};
+var I3D_ACCEPT='.glb,.gltf,.stl,.obj,.fbx,.3mf,model/gltf-binary,model/gltf+json,model/stl,model/obj,model/3mf';
+var I3D_LD={stl:'STLLoader',obj:'OBJLoader',fbx:'FBXLoader','3mf':'3MFLoader'},I3D_LDP={};
+function i3dExt(name){var m=/\.([a-z0-9]+)$/i.exec(name||'');return m?m[1].toLowerCase():'';}
+function i3dScript(src,ready){return new Promise(function(res,rej){if(ready())return res();var sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=function(){rej(new Error('Could not load the 3D file reader. Check the connection and try again.'));};document.head.appendChild(sc);});}
+function i3dLoader(fmt){
+  if(fmt==='glb'||fmt==='gltf')return _hbGltfLoader();
+  var nm=I3D_LD[fmt];if(!nm)return Promise.reject(new Error('That file type is not supported.'));
+  if(I3D_LDP[fmt])return I3D_LDP[fmt];
+  var base='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/',cls=fmt==='3mf'?'ThreeMFLoader':nm;
+  var p=((fmt==='fbx'||fmt==='3mf')?i3dScript(base+'libs/fflate.min.js',function(){return !!window.fflate;}):Promise.resolve())
+    .then(function(){return i3dScript(base+'loaders/'+nm+'.js',function(){return !!THREE[cls];});})
+    .then(function(){if(!THREE[cls])throw new Error('The 3D file reader is unavailable.');return THREE[cls];});
+  I3D_LDP[fmt]=p;p.catch(function(){delete I3D_LDP[fmt];});return p;
+}
+// STL and OBJ (when it has no colours of its own) take the item's colour: green for wealth, red for liabilities, the same as the app's tiles
+var I3D_TINT={wi:0x2A9A68,li:0xA84444};   // the brand green and red, a shade down because the stage lights brighten them
+function i3dTintNone(obj,hex){
+  obj.traverse(function(o){if(!o.isMesh)return;
+    var mats=Array.isArray(o.material)?o.material:[o.material];
+    var out=mats.map(function(m){return (m&&m.map)?m:new THREE.MeshStandardMaterial({color:i3dCol(hex),roughness:0.55,metalness:0.1,side:THREE.DoubleSide});});
+    o.material=Array.isArray(o.material)?out:out[0];
+  });
+}
+function i3dParse(buf,fmt,kind){
+  fmt=fmt||'glb';
   if(!viGlOk())return Promise.reject(new Error('3D is not available on this device.'));
-  return new Promise(function(res,rej){viThree(res,function(){rej(new Error('The 3D engine could not be downloaded. Check the connection and try again.'));});}).then(_hbGltfLoader).then(function(G){return new Promise(function(res,rej){try{new G().parse(buf,'',function(g){res(g.scene||(g.scenes&&g.scenes[0]));},function(e){rej(new Error('Could not read that 3D file'+(e&&e.message?': '+e.message:'.')));});}catch(e){rej(e);}});});
+  var bad=function(e){return new Error('Could not read that .'+fmt+' file'+(e&&e.message?': '+String(e.message).slice(0,80):'.'));};
+  return new Promise(function(res,rej){viThree(res,function(){rej(new Error('The 3D engine could not be downloaded. Check the connection and try again.'));});}).then(function(){return i3dLoader(fmt);}).then(function(L){return new Promise(function(res,rej){
+    try{
+      if(fmt==='glb'||fmt==='gltf'){new L().parse(buf,'',function(g){var o=g.scene||(g.scenes&&g.scenes[0]);o?res(o):rej(bad());},function(e){rej(bad(e));});return;}
+      var root=new THREE.Group(),obj;
+      if(fmt==='stl'){var geo=new L().parse(buf);if(!geo||!geo.attributes||!geo.attributes.position||!geo.attributes.position.count)throw new Error('empty file');
+        geo.computeVertexNormals();   // many exporters write zero normals in binary STL, which lights as black; face normals are recomputed
+        obj=new THREE.Mesh(geo,geo.hasColors?new THREE.MeshStandardMaterial({vertexColors:true,roughness:0.55,metalness:0.1,side:THREE.DoubleSide}):new THREE.MeshStandardMaterial({color:i3dCol(I3D_TINT[kind]||I3D_TINT.wi),roughness:0.55,metalness:0.1,side:THREE.DoubleSide}));}
+      else if(fmt==='obj'){obj=new L().parse(new TextDecoder().decode(buf));i3dTintNone(obj,I3D_TINT[kind]||I3D_TINT.wi);}
+      else if(fmt==='fbx')obj=new L().parse(buf,'');
+      else obj=new L().parse(buf);
+      var has=false;obj.traverse(function(o){if(o.isMesh)has=true;});if(!has)throw new Error('no 3D shape found');
+      root.add(obj);
+      if(fmt==='stl'||fmt==='3mf')obj.rotation.x=-Math.PI/2;   // printing formats are Z-up; the viewer is Y-up
+      res(root);
+    }catch(e){rej(bad(e));}
+  });});
 }
 // the house style: same green on every model, lightly
 // colours as the house viewer gives them (sRGB hex to the renderer's linear space)
@@ -22336,6 +22446,8 @@ function I3DView(host,obj,opts){
   var grid=new THREE.GridHelper(24,48,i3dCol(0x1f5e5a),i3dCol(0x123734));grid.material.transparent=true;grid.material.opacity=0.35;grid.position.y=0.002;sc.add(grid);
   this.tinted=i3dStyle(obj);var bb=i3dFit(obj);sc.add(obj);this.obj=obj;
   var cam=this.cam=new THREE.PerspectiveCamera(35,w/h,0.02,100);
+  /* on a narrow stage the control column (40 px) sits over the model's right edge: slide the picture left so nothing runs under it */
+  this._vo=function(W,H){if(host.id==='i3d-stage'&&W<520)cam.setViewOffset(W,H,28,0,W,H);else if(cam.view)cam.clearViewOffset();};this._vo(w,h);
   var ty=Math.max(0.3,(bb.max.y)/2);this.home={p:new THREE.Vector3(2.6,1.7+ty*0.4,3.4),t:new THREE.Vector3(0,ty,0)};
   cam.position.copy(this.home.p);cam.lookAt(this.home.t);
   if(opts.still){r.render(sc,cam);return;}
@@ -22348,7 +22460,7 @@ function I3DView(host,obj,opts){
   ctl.addEventListener('change',function(){self.kick();});
   ctl.update();
   // draws only while something moves (drag, pinch, auto-rotate, a kick), never off screen or in a background tab
-  var loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}var W=host.clientWidth,H=host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();}
+  var loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}var W=host.clientWidth,H=host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;self._vo(W,H);cam.updateProjectionMatrix();}
     var moving=ctl.update();var t=performance.now();r.render(sc,cam);
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}
     self._lastT=moving?t:0;
@@ -22379,11 +22491,12 @@ async function i3dSave(kind,id,buf,meta){
   var it=i3dItem(kind,id);if(!it)return;
   var tick=function(){return new Promise(function(r){requestAnimationFrame(function(){setTimeout(r,0)})})};
   i3dMsg('Reading the model…');await tick();
-  var obj=await i3dParse(buf.slice(0));
+  var fmt=(meta&&meta.fmt)||'glb';
+  var obj=await i3dParse(buf.slice(0),fmt,kind);
   i3dMsg('Saving it on this device…');await tick();
-  await i3dPut(kind,id,buf);
+  await i3dPut(kind,id,buf,fmt);
   i3dStyle(obj);await tick();
-  it.model=Object.assign({},meta,{thumb:i3dThumb(obj),tv:2,at:Date.now()});
+  it.model=Object.assign({},meta,{fmt:fmt,thumb:i3dThumb(obj),tv:2,at:Date.now()});
   saveAL();renderAlTab();_i3dReady={kind:kind,id:id,obj:obj};return it.model;
 }
 var _i3dView=null,_i3dBusy=false,_i3dReady=null;   // _i3dReady: the model just saved, already read, so the viewer does not read it twice
@@ -22411,10 +22524,10 @@ async function i3dOpen(kind,id){
   try{
     var obj=null,pre=_i3dReady;_i3dReady=null;
     if(pre&&pre.kind===kind&&pre.id===id)obj=pre.obj;
-    else{var buf=await i3dGetBuf(kind,id);
-      if(!buf&&m.src==='pp'){i3dMsg('Downloading the model from Poly Pizza…');buf=await i3dFetchLib(m);await i3dPut(kind,id,buf);i3dMsg('');}
+    else{var rec=await i3dGetRec(kind,id),buf=rec&&rec.buf,fmt=(rec&&rec.fmt)||m.fmt||'glb';
+      if(!buf&&m.src==='pp'){i3dMsg('Downloading the model from Poly Pizza…');buf=await i3dFetchLib(m);await i3dPut(kind,id,buf,'glb');fmt='glb';i3dMsg('');}
       if(!buf)throw new Error('The 3D file is on the device you added it from. Upload it again here to see it on this device.');
-      obj=await i3dParse(buf.slice(0));}
+      obj=await i3dParse(buf.slice(0),fmt,kind);}
     var st=document.getElementById('i3d-stage');if(!st)return;
     var w=document.getElementById('i3d-wait');w&&w.remove();
     _i3dView=new I3DView(st,obj,{label:'3D model of '+it.name});
@@ -22430,7 +22543,7 @@ function i3dPick(kind,id){
   var body=i3dShell('3D model for '+it.name,kind==='li'?'Liability':'Wealth inventory');
   var list=I3D_LIB.slice().sort(function(a,b){return (b.k===best)-(a.k===best);});
   body.innerHTML='<div class="i3d-opts">'
-    +'<label class="i3d-up dep-btn">Upload a 3D file (.glb)<input type="file" accept=".glb,model/gltf-binary" style="display:none" onchange="i3dUpload(\''+kind+'\','+id+',this)"></label>'
+    +'<label class="i3d-up dep-btn">Upload a 3D file (.glb, .gltf, .stl, .obj, .fbx, .3mf)<input type="file" accept="'+I3D_ACCEPT+'" style="display:none" onchange="i3dUpload(\''+kind+'\','+id+',this)"></label>'
     +'<div class="inv-hint">The file stays on this device; only a small preview picture is saved with the item. Photos still work as before.</div>'
     +(lib?'<div class="i3d-lib-hd">Library models <span class="i3d-tag">test</span></div>'
       +'<div class="inv-hint">Free models from Poly Pizza, downloaded by your browser. '+(best?'Best match for this item first.':'No match for this name yet, so all are shown.')+'</div>'
@@ -22441,9 +22554,11 @@ function i3dPick(kind,id){
 }
 function i3dUpload(kind,id,input){
   var f=input.files&&input.files[0];if(!f)return;
-  if(f.size>25*1048576){i3dMsg('That file is over 25 MB. Try a smaller .glb.',true);return;}
+  var ext=i3dExt(f.name);input.value='';
+  if(!I3D_EXT[ext]){i3dMsg('That file type is not supported. Use .glb, .gltf, .stl, .obj, .fbx or .3mf.',true);return;}
+  if(f.size>25*1048576){i3dMsg('That file is over 25 MB. Try a smaller file.',true);return;}
   i3dMsg('Reading '+f.name+'…');
-  f.arrayBuffer().then(function(buf){return i3dSave(kind,id,buf,{src:'file',t:f.name.replace(/\.glb$/i,'')});})
+  f.arrayBuffer().then(function(buf){return i3dSave(kind,id,buf,{src:'file',fmt:ext,t:f.name.replace(/\.[a-z0-9]+$/i,'')});})
     .then(function(){i3dOpen(kind,id);},function(e){i3dMsg(e.message||String(e),true);});
 }
 function i3dPickLib(kind,id,k){
@@ -22475,7 +22590,7 @@ function i3dLive(kind,id,img,force){
   if(!window.matchMedia||!(force||matchMedia('(hover: hover) and (pointer: fine)').matches)||!viGlOk())return;
   var key=kind+':'+id;if(_i3dLive&&_i3dLive.key===key&&_i3dLive.area.isConnected)return;
   i3dLiveStop();var area=img.parentNode,rec={key:key,area:area,img:img};_i3dLive=rec;
-  i3dGetBuf(kind,id).then(function(buf){return _i3dLive===rec&&buf?i3dParse(buf.slice(0)):null}).then(function(obj){
+  i3dGetRec(kind,id).then(function(r){return _i3dLive===rec&&r?i3dParse(r.buf.slice(0),r.fmt,kind):null}).then(function(obj){
     if(!obj||_i3dLive!==rec||!area.isConnected)return;
     var host=document.createElement('div');host.className='i3d-live';area.appendChild(host);rec.host=host;
     var it=i3dItem(kind,id);rec.view=new I3DView(host,obj,{auto:false,label:'3D model of '+(it?it.name:'the item')+'. Drag to turn it round, click to open it.'});
@@ -22522,7 +22637,7 @@ function i3dRefreshThumbs(){
   if(!todo.length)return;_i3dRe.run=true;
   (async function(){
     for(var i=0;i<todo.length;i++){var k=todo[i][0],it=todo[i][1];_i3dRe.tried[k+it.id]=1;
-      try{var buf=await i3dGetBuf(k,it.id);if(!buf)continue;var obj=await i3dParse(buf.slice(0));i3dStyle(obj);
+      try{var rc=await i3dGetRec(k,it.id);if(!rc)continue;var obj=await i3dParse(rc.buf.slice(0),rc.fmt,k);i3dStyle(obj);
         it.model.thumb=i3dThumb(obj);it.model.tv=2;saveAL();
         [].forEach.call(document.querySelectorAll('img.i3d-thumb'),function(im){if((im.getAttribute('onclick')||'').indexOf("'"+k+"',"+it.id+",")>-1)im.src=it.model.thumb});
       }catch(e){}}
@@ -22820,7 +22935,10 @@ function saveDebt(){if(viBlockEdit())return;
   var m=(parseFloat(document.getElementById('df-min').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n){var mm=document.getElementById('debt-form-msg');if(mm)mm.textContent='Give the debt a name, for example "Barclaycard".';var fn=document.getElementById('df-name');if(fn)fn.focus();return;}
   var dtype=(document.getElementById('di-type')||{}).value||'other';
-  debtState.debts.push({id:Date.now(),name:n,original:b,balance:b,rate:r,min:m,type:dtype});
+  var prov=viClean((document.getElementById('df-provider')||{}).value||'').trim().slice(0,40);
+  var nd={id:Date.now(),name:n,original:b,balance:b,rate:r,min:m,type:dtype};if(prov)nd.card={issuer:prov,network:'auto',last4:'',art:'',logo:''};   // provider only when typed: older saves keep their shape
+  debtState.debts.push(nd);
+  var dpv=document.getElementById('df-provider');if(dpv)dpv.value='';
   document.getElementById('df-name').value='';document.getElementById('df-balance').value='';document.getElementById('df-rate').value='';document.getElementById('df-min').value='';
   var dit=document.getElementById('di-type');if(dit)dit.value='credit';
   hideDebtForm();
@@ -22893,15 +23011,16 @@ function cc3dHTML(d,pctNum,shown){
   var b=ccBrand(d)||CC_GENERIC,c=d.card||{},net=ccNetwork(d,b),fg=b.fg;
   var bg=c.art?'background:#000 url('+c.art+') center/cover':'background:linear-gradient(135deg,'+b.g[0]+','+b.g[1]+')';
   var domain=b.d,logo=c.logo?'<img alt="" src="'+c.logo+'">':(domain?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=64" onerror="this.style.display=\'none\'">':'');
-  var mono=ccEsc((b.n||d.name||'?').trim().charAt(0).toUpperCase());
+  var isCard=ccIsCard(d),tlabel=(typeof DEBT_TYPE_LABELS!=='undefined'&&DEBT_TYPE_LABELS[d.type])||'Loan';
+  var mono=ccEsc((b.n||c.issuer||d.name||'?').trim().charAt(0).toUpperCase());
   var last4=/^\d{4}$/.test(c.last4||'')?c.last4:'••••';
   var shownName=ccEsc(d.name);
-  var bal=gbpFmt(d.balance),apr=(+d.rate||0)+'% APR',minp=gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0);
   var art=!!c.art;
   var inner=(art?'':'<div class="cc3-sheen"></div>'+(b.acc?'<div class="cc3-acc" style="background:'+b.acc+'"></div>':''))
     +(art?'':'<div class="cc3-logo"><span>'+mono+'</span>'+logo+'</div>')
-    +(art?'':'<div class="cc3-chip"><i></i><i></i><i></i></div><svg class="cc3-nfc" viewBox="0 0 24 24" fill="none" stroke="'+fg+'" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.500 0 12M12 4c4.500 5 4.500 11 0 16M16 2c6 6.500 6 13.500 0 20"/></svg>')
-    +(art?'':'<div class="cc3-num">•••• •••• •••• '+last4+'</div><div class="cc3-name">'+shownName+'</div>'+ccNetMark(net));
+    +(art||isCard?'':'<svg class="vi-ic cc3-ticon" aria-hidden="true"><use href="#'+(DEBT_TYPE_ICONS[d.type]||'vi-loan')+'"/></svg>')
+    +(art||!isCard?'':'<div class="cc3-chip"><i></i><i></i><i></i></div><svg class="cc3-nfc" viewBox="0 0 24 24" fill="none" stroke="'+fg+'" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.500 0 12M12 4c4.500 5 4.500 11 0 16M16 2c6 6.500 6 13.500 0 20"/></svg>')
+    +(art?'':(isCard?'<div class="cc3-num">•••• •••• •••• '+last4+'</div>':'<div class="cc3-type">'+ccEsc(tlabel)+'</div>')+(isCard||String(d.name||'').toLowerCase().indexOf(tlabel.toLowerCase())===-1?'<div class="cc3-name">'+shownName+'</div>':'')+(isCard?ccNetMark(net):''));
   // the card is cut along its x axis: the paid share on the right is cut off and greyed, the unpaid share on the left stays full colour
   var P=Math.max(0,Math.min(100,shown));
   var f='<div class="cc3-face cc3-front">'
@@ -22913,15 +23032,17 @@ function cc3dHTML(d,pctNum,shown){
     +(pctNum>0&&pctNum<100?'<div class="cc3-pct">'+pctNum+'% paid</div>':'')
     +'<div class="cc3-stamp">PAID OFF ✓</div>'
     +'<div class="cc3-gloss"></div></div>';
-  var binner='<div class="cc3-stripe"></div><div class="cc3-sig"><span>Authorised signature</span><b>•••</b></div>'
-    +'<div class="cc3-bk-info"><div><span>Owed</span><b>'+bal+'</b></div><div><span>Rate</span><b>'+apr+'</b></div><div><span>Min</span><b>'+minp+'/mo</b></div></div>'+ccNetMark(net);
+  // the back earns the turn: debt-free date, what the debt costs, and the payments made (E33b)
+  // the cut layers carry only the stripe; the words sit on one layer above them, so the cut never splits a figure
+  var binner=isCard?'<div class="cc3-stripe"></div>':'';
+  var bfacts='<div class="cc3-lay cc3-bfacts">'+(isCard?'':'<div class="cc3-type cc3-btype">'+ccEsc(tlabel)+'</div>')+ccBackFacts(d)+'</div>';
   // seen from behind the x axis is mirrored, so the cut-off (paid) part is on the left of the back
   var back='<div class="cc3-face cc3-back">'
     +'<div class="cc3-lay cc3-bbase" style="clip-path:inset(0 0 0 '+P+'%)">'+binner+'</div>'
     +'<div class="cc3-lay cc3-bpiece" style="clip-path:inset(0 '+(100-P)+'% 0 0)">'+binner+'</div>'
     +(P>0&&P<100?'<div class="cc3-cutline cc3-bcl" style="left:'+P+'%"></div>':'')
-    +'<div class="cc3-gloss"></div></div>';
-  return '<div class="cc3'+(P>=100?' cc3-ghost':'')+'" data-id="'+d.id+'" data-from="'+shown+'" data-to="'+pctNum+'" role="img" aria-label="'+ccEsc(d.name)+' credit card. Drag to rotate, double-click to flip">'
+    +bfacts+'<div class="cc3-gloss"></div></div>';
+  return '<div class="cc3'+(isCard?'':' cc3-loan')+(P>=100?' cc3-ghost':'')+'" data-id="'+d.id+'" data-from="'+shown+'" data-to="'+pctNum+'" role="img" aria-label="'+ccEsc(d.name)+(isCard?' credit card':', '+ccEsc(tlabel))+'. Drag to rotate, double-click to flip">'
     +'<div class="cc3-body" style="--ry:-16deg;--rx:6deg">'+f+back
     +'<div class="cc3-edge cc3-e-t"></div><div class="cc3-edge cc3-e-b"></div><div class="cc3-edge cc3-e-l"></div><div class="cc3-edge cc3-e-r"></div></div></div>';
 }
@@ -22958,21 +23079,21 @@ var _ccEdit=null;
 function ccOpenEdit(id){
   var d=debtState.debts.find(function(x){return x.id===id;});if(!d)return;
   _ccEdit={id:id,art:(d.card&&d.card.art)||'',logo:(d.card&&d.card.logo)||''};
-  var c=d.card||{},o=document.getElementById('cc-ov');if(o)o.remove();
+  var c=d.card||{},o=document.getElementById('cc-ov'),isCard=ccIsCard(d);if(o)o.remove();
   o=document.createElement('div');o.id='cc-ov';o.className='hbc-ov';
-  o.innerHTML='<div class="hbc" style="width:min(520px,100%)" role="dialog" aria-label="Card design"><div class="hbc-hd"><span>💳 Card design</span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="ccCloseEdit()" aria-label="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div>'
+  o.innerHTML='<div class="hbc" style="width:min(520px,100%)" role="dialog" aria-label="'+(isCard?'Card design':'Lender and logo')+'"><div class="hbc-hd"><span>'+(isCard?'💳 Card design':'Lender and logo')+'</span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="ccCloseEdit()" aria-label="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div>'
    +'<div style="padding:14px 16px"><div id="cc-prev" style="max-width:340px;margin:0 auto 12px"></div>'
    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
-   +'<div style="grid-column:1/-1"><label style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">Issuer / company on the card (we scan this and the card name for a known company)</label><input id="cc-issuer" type="text" maxlength="40" class="al-inp" style="width:100%" value="'+ccEsc(c.issuer||'')+'" placeholder="e.g. Barclaycard, Monzo, Amex"></div>'
-   +'<div><label style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">Network</label><select id="cc-net" class="al-inp" style="width:100%"><option value="auto">Auto-detect</option><option value="visa">Visa</option><option value="mc">Mastercard</option><option value="amex">Amex</option><option value="none">None</option></select></div>'
-   +'<div><label style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">Last 4 digits (optional)</label><input id="cc-last4" type="text" inputmode="numeric" maxlength="4" class="al-inp" style="width:100%" value="'+ccEsc(c.last4||'')+'"></div>'
+   +'<div style="grid-column:1/-1"><label for="cc-issuer" style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">'+(isCard?'Issuer / company on the card (we scan this and the card name for a known company)':'Lender or bank (we scan this and the debt name for a known company)')+'</label><input id="cc-issuer" type="text" maxlength="40" class="al-inp" style="width:100%" value="'+ccEsc(c.issuer||'')+'" placeholder="e.g. Barclaycard, Monzo, Amex"></div>'
+   +(isCard?'<div><label style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">Network</label><select id="cc-net" class="al-inp" style="width:100%"><option value="auto">Auto-detect</option><option value="visa">Visa</option><option value="mc">Mastercard</option><option value="amex">Amex</option><option value="none">None</option></select></div>'
+   +'<div><label style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">Last 4 digits (optional)</label><input id="cc-last4" type="text" inputmode="numeric" maxlength="4" class="al-inp" style="width:100%" value="'+ccEsc(c.last4||'')+'"></div>':'')
    +'</div>'
-   +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><label class="stk-btn" style="cursor:pointer">📷 Imprint a photo of my card<input type="file" accept="image/*" style="display:none" onchange="ccArtFile(this,\'art\')"></label><label class="stk-btn" style="cursor:pointer">🖼 Upload a logo<input type="file" accept="image/*" style="display:none" onchange="ccArtFile(this,\'logo\')"></label><button class="stk-btn" onclick="ccClearArt()">Use brand design</button></div>'
-   +'<div style="font-size:10.5px;color:var(--t3);line-height:1.5;margin-top:8px">Brand designs use each company’s colours and logo, not the official card artwork. For the exact design, photograph the front of your card and imprint it. The photo stays in your account only. Hide the card number first if you prefer.</div>'
+   +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">'+(isCard?'<label class="stk-btn" style="cursor:pointer">📷 Imprint a photo of my card<input type="file" accept="image/*" style="display:none" onchange="ccArtFile(this,\'art\')"></label>':'')+'<label class="stk-btn" style="cursor:pointer">🖼 Upload a logo<input type="file" accept="image/*" style="display:none" onchange="ccArtFile(this,\'logo\')"></label><button class="stk-btn" onclick="ccClearArt()">Use brand design</button></div>'
+   +'<div style="font-size:10.5px;color:var(--t3);line-height:1.5;margin-top:8px">'+(isCard?'Brand designs use each company’s colours and logo, not the official card artwork. For the exact design, photograph the front of your card and imprint it. The photo stays in your account only. Hide the card number first if you prefer.':'Brand designs use each company’s colours and logo. If your lender is not recognised, upload its logo instead. It stays in your account only.')+'</div>'
    +'<div style="margin-top:12px;display:flex;gap:6px;justify-content:flex-end"><button class="stk-btn" onclick="ccCloseEdit()">Cancel</button><button class="btn-add-data" onclick="ccSaveEdit()">Save</button></div></div></div>';
   document.body.appendChild(o);
-  document.getElementById('cc-net').value=c.network||'auto';
-  ['cc-issuer','cc-net','cc-last4'].forEach(function(i){document.getElementById(i).addEventListener('input',ccPreview);});
+  var cn=document.getElementById('cc-net');if(cn)cn.value=c.network||'auto';
+  ['cc-issuer','cc-net','cc-last4'].forEach(function(i){var e=document.getElementById(i);if(e)e.addEventListener('input',ccPreview);});
   ccPreview();
 }
 function ccDraft(){
@@ -23002,7 +23123,7 @@ function ccSaveEdit(){if(viBlockEdit())return;
   var d=debtState.debts.find(function(x){return x.id===_ccEdit.id;});if(!d)return;
   var nd=ccDraft().card;
   if(!nd.issuer&&nd.network==='auto'&&!nd.last4&&!nd.art&&!nd.logo)delete d.card;else d.card=nd;
-  ccCloseEdit();saveDebtState();renderDebtTab();showToast('Card design saved ✓');
+  var wasCard=ccIsCard(d);ccCloseEdit();saveDebtState();renderDebtTab();showToast(wasCard?'Card design saved ✓':'Lender and logo saved ✓');
 }
 
 
@@ -23157,22 +23278,17 @@ function renderDebtTab(){
   var _obBanner=sorted.some(function(d){return d._onboarding;})
     ?'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;background:rgb(var(--orange-rgb) / .08);border:1px solid rgb(var(--orange-rgb) / .3);border-radius:8px;font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);line-height:1.5"><span style="flex:1;min-width:200px"><b style="color:var(--or)">One lump-sum entered at setup.</b> Replace it with each separate debt (type, interest rate, minimum payment) so your payoff plan is accurate.</span><button class="btn-add-data" style="padding:5px 12px;font-size:max(.52rem,var(--vi-fs-1))" onclick="removeOnboardingDebt()">Replace it →</button></div>'
     :'';
-  var _ramp=debtChartRamp(sorted);
   var _rank={},_rk=0;sorted.forEach(function(d){if(d.balance>0)_rank[d.id]=++_rk;});   // payoff order: Avalanche = highest rate first, Snowball = smallest balance first
   var _rankBadge=function(d){return _rank[d.id]?'<span class="debt-rank" title="Payoff order #'+_rank[d.id]+' ('+(_debtMethod==='avalanche'?'Avalanche: highest interest rate first':'Snowball: smallest balance first')+')">'+_rank[d.id]+'</span>':'<span class="debt-rank done" title="Paid off"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></span>';};
   var _rankNote='<div class="debt-rank-note"><b>Payoff order</b>: <span class="debt-rank sm">1</span> = '+(_debtMethod==='avalanche'?'highest interest rate (Avalanche): clear this first':'smallest balance (Snowball): clear this first')+'</div>';
-  dl.innerHTML=_obBanner+_rankNote+'<div class="debt-card-grid'+(sorted.some(function(d){return d.type==='credit'||d.type==='bnpl';})?' has-cards':'')+'">'
+  dl.innerHTML=_obBanner+_rankNote+'<div class="debt-card-grid has-cards">'
     +sorted.map(function(d){
       var orig=d.original||d.total||d.balance;
       var paidPct=orig>0?Math.max(0,Math.min(1,(orig-d.balance)/orig)):0;
       var pctNum=Math.round(paidPct*100);
-      var remainH=100-pctNum; // % of card still "owed"
-      var isCard=d.type==='credit'||d.type==='bnpl';
-      var ccLogo=getCreditCardLogo(d.name);
-
-      if(isCard){
-        // real-proportion 3D card (drag to rotate, double-tap to flip); progress shown on the card's bottom edge
-        return '<div data-did="'+d.id+'" style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px">'
+      var isCard=ccIsCard(d);
+      // every debt is a real-proportion 3D tile (drag to rotate, double-tap to flip); cards add the chip and number (E33)
+      return '<div data-did="'+d.id+'" style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px">'
           +'<div style="font-size:max(.55rem,var(--vi-fs-1));font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px">'+_rankBadge(d)+'<span style="overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</span></div>'
           +cc3dHTML(d,pctNum,ccReduced()?pctNum:(_ccPct[d.id]!=null?_ccPct[d.id]:0))
           +'<div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--re);font-family:\'Share Tech Mono\',monospace;font-weight:700;display:flex;justify-content:space-between"><span>'+gbpFmt(d.balance)+'</span><span style="color:var(--gr);font-weight:400">'+pctNum+'% paid</span></div>'
@@ -23182,35 +23298,10 @@ function renderDebtTab(){
           +(d.payments&&d.payments.length?'<button class="btn-add-data" style="padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;background:transparent;border-color:var(--t3);color:var(--t2)" title="Undo your last payment of £'+d.payments[d.payments.length-1].amt+'" onclick="undoPayment('+d.id+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-undo"/></svg> Undo £'+Math.round(d.payments[d.payments.length-1].amt*100)/100+'</button>':'')
           +'</div>'
           +'<div style="display:flex;justify-content:space-between;align-items:center">'
-          +'<span style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3)">'+d.rate+'% APR</span>'
-          +'<span class="cc-tile-actions"><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" title="Flip card" onclick="ccFlipId('+d.id+')">⟲</button><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" title="Card design" onclick="ccOpenEdit('+d.id+')">🎨</button><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" onclick="deleteDebt('+d.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></span>'
+          +'<span style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);flex:1;min-width:0">'+(isCard?d.rate+'% APR':ccEsc(DEBT_TYPE_LABELS[d.type]||'Loan')+' · '+d.rate+'% · Min '+gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0)+'/mo')+'</span>'
+          +'<span class="cc-tile-actions"><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" title="Flip card" onclick="ccFlipId('+d.id+')">⟲</button><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" title="'+(isCard?'Card design':'Lender and logo')+'" onclick="ccOpenEdit('+d.id+')">🎨</button><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" onclick="deleteDebt('+d.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></span>'
           +'</div>'
           +'</div>';
-      } else {
-        var _lp=_ramp[d.id]||{c1:'var(--red)',c2:'var(--red)'};
-        // Loan / other — vertical progress bar (y-axis = monetary value, bar shrinks from top as paid)
-        return '<div data-did="'+d.id+'" style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px">'
-          +'<div style="font-size:max(.55rem,var(--vi-fs-1));font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px">'+_rankBadge(d)+'<span style="overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</span></div>'
-          +'<div style="flex:1;background:rgb(var(--ink-rgb) / .04);border-radius:5px;overflow:hidden;position:relative;min-height:100px">'
-          +'<div style="position:absolute;bottom:0;left:0;right:0;height:'+pctNum+'%;background:linear-gradient(to top,rgb(var(--green-rgb) / .35),rgb(var(--green-rgb) / .15));border-radius:5px;transition:height .5s ease"></div>'
-          +'<div style="position:absolute;top:0;left:0;right:0;height:'+(100-pctNum)+'%;background:linear-gradient(to bottom,'+_lp.c1+','+_lp.c2+');opacity:.55;border-radius:5px"></div>'
-          // Horizontal "cut" line showing how much paid
-          +'<div style="position:absolute;left:0;right:0;top:'+(100-pctNum)+'%;height:2px;background:rgb(var(--green-rgb) / .7);box-shadow:0 0 6px rgb(var(--green-rgb) / .5)"></div>'
-          +'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px">'
-          +'<span style="font-size:max(.62rem,var(--vi-fs-2));color:var(--re);font-family:\'Share Tech Mono\',monospace;font-weight:700">'+gbpFmt(d.balance)+'</span>'
-          +'<span style="font-size:max(.46rem,var(--vi-fs-1));color:var(--gr)">'+pctNum+'% paid</span>'
-          +'</div></div>'
-          +'<div style="display:flex;align-items:center;gap:4px">'
-          +'<input type="number" id="debt-pay-inp-'+d.id+'" class="al-inp" placeholder="£ pay" style="flex:1;font-size:max(.52rem,var(--vi-fs-1));padding:3px 6px;min-width:0">'
-          +'<button class="btn-add-data" style="padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap" onclick="makePayment('+d.id+')">Pay</button>'
-          +(d.payments&&d.payments.length?'<button class="btn-add-data" style="padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;background:transparent;border-color:var(--t3);color:var(--t2)" title="Undo your last payment of £'+d.payments[d.payments.length-1].amt+'" onclick="undoPayment('+d.id+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-undo"/></svg> Undo £'+Math.round(d.payments[d.payments.length-1].amt*100)/100+'</button>':'')
-          +'</div>'
-          +'<div style="display:flex;justify-content:space-between;align-items:center">'
-          +'<span style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3)">'+(DEBT_TYPE_LABELS[d.type]||'Debt')+' · '+d.rate+'% · Min '+gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0)+'/mo</span>'
-          +'<button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" onclick="deleteDebt('+d.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
-          +'</div>'
-          +'</div>';
-      }
     }).join('')
     +'</div>';
   setTimeout(function(){drawDebtHistogram();drawDebtDonut();updateDebtInterestPanel();ccWatchCuts(dl);},50);
@@ -23533,7 +23624,7 @@ function checkAchievements(){
       achState.unlocked.push(b.id);
       achState.xp=(achState.xp||0)+(b.xp||50);
       gained++;
-      showToast('Badge unlocked: '+b.name+'. +'+b.xp+' XP');
+      var tb=document.getElementById('toast');if(window._viActed&&!(tb&&tb.classList.contains('show')))showToast('Badge unlocked: '+b.name+'. +'+b.xp+' XP');   // as wrSync: only after the user did something, never over a toast already showing; the badge and its XP still count
     }
   });
   if(gained>0){saveAch();renderAchievements();}
