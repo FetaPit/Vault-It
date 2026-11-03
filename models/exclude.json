@@ -1,0 +1,145 @@
+{
+ "note": "Poly Pizza IDs rejected on review (wrong object). Skipped by search-models.mjs.",
+ "ids": [
+  {
+   "id": "BwwnUrWGmV",
+   "title": "Police Car",
+   "item": "Car (family hatchback)"
+  },
+  {
+   "id": "xs1ULyDMUb",
+   "title": "Blood Ring",
+   "item": "Ring (jewellery)"
+  },
+  {
+   "id": "a6J7IDufQP",
+   "title": "Security Camera",
+   "item": "Camera"
+  },
+  {
+   "id": "RRu7S6WzOC",
+   "title": "Guitar Character",
+   "item": "Electric guitar"
+  },
+  {
+   "id": "vsqTUPFSw6",
+   "title": "Computer Keyboard",
+   "item": "Keyboard (musical)"
+  },
+  {
+   "id": "B5nWfdzHzO",
+   "title": "Hair Dryer",
+   "item": "Tumble dryer"
+  },
+  {
+   "id": "CFEAQQPh54",
+   "title": "Space Truck Trailer",
+   "item": "Caravan"
+  },
+  {
+   "id": "6jGuvmwkDly",
+   "title": "Blocks Trailer Map",
+   "item": "Trailer"
+  },
+  {
+   "id": "O8IbRMytLf",
+   "title": "Gold Bars",
+   "item": "Silver bar"
+  },
+  {
+   "id": "EDvCEBvs8k",
+   "title": "Pickup Key Card",
+   "item": "Trading cards"
+  },
+  {
+   "id": "8DnpFRLldK",
+   "title": "Rubber Duck Pool Toy",
+   "item": "Lego or toys"
+  },
+  {
+   "id": "woQPFlzPHM",
+   "title": "Locomotive Passenger Carriage",
+   "item": "Pushchair"
+  },
+  {
+   "id": "YDGLLT0emC",
+   "title": "Cottage",
+   "item": "Cot"
+  },
+  {
+   "id": "dtfi0MpW8a5",
+   "title": "projector screen",
+   "item": "Projector"
+  },
+  {
+   "id": "2MbbdwbTjt",
+   "title": "Bathtub",
+   "item": "Hot tub"
+  },
+  {
+   "id": "GvJwdVdt2W",
+   "title": "Money Bag Character",
+   "item": "Banknotes"
+  },
+  {
+   "id": "lHRTD47DCP",
+   "title": "Pci E Card",
+   "item": "Credit card"
+  },
+  {
+   "id": "BH2XHWUNmF",
+   "title": "Fantasy House",
+   "item": "Mortgage (house)"
+  },
+  {
+   "id": "79z-QarmPO7",
+   "title": "CCTV Camera",
+   "item": "Camera"
+  },
+  {
+   "id": "UFxsKNSl8W",
+   "title": "Washing Machine",
+   "item": "Tumble dryer"
+  },
+  {
+   "id": "unqqkULtRU",
+   "title": "Car",
+   "item": "Trailer"
+  },
+  {
+   "id": "coWUgQr3Pe8",
+   "title": "Metal Bars",
+   "item": "Silver bar"
+  },
+  {
+   "id": "i2JCd3w8gh",
+   "title": "Baseball Bat",
+   "item": "Trading cards"
+  },
+  {
+   "id": "PW9q10xh5g",
+   "title": "Dumbbell",
+   "item": "Treadmill and gym kit"
+  },
+  {
+   "id": "eMOTyGEAxj",
+   "title": "Fitness Character",
+   "item": "Smartwatch"
+  },
+  {
+   "id": "4XJ-DH66eKY",
+   "title": "Radiator",
+   "item": "Boiler"
+  },
+  {
+   "id": "fZTY7mCI_lv",
+   "title": "Swimming pool",
+   "item": "Hot tub"
+  },
+  {
+   "id": "ZhjtUap8Ng",
+   "title": "Card Reader",
+   "item": "Credit card"
+  }
+ ]
+}
