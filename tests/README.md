@@ -84,7 +84,7 @@ node tests/test_v091_debt_cards.js  # v0.9.1 E33: every debt type is a 3D tile w
 node tests/test_v091_debt_reverse.js # v0.9.1 E33b: type icon under the logo on debt tiles; the back shows the debt-free date (estimate), interest this month and year, last three payments and paid so far
 node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, on #bd-sankey, Night and Daylight
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
-node tests/test_v091_chrome.js      # v0.9.1 chrome: rotating dial mark (turns on load and click, still under reduced motion), bigger desktop menu bar (icons 24 / 22 px, no zoom), pinned Assets sub-menu (one row of six icons on phones), Message the Dev on Overview only, sidebar colours, crowdfund Vaulter card (prices from VI_PLANS, real counts, Open days)
+node tests/test_v091_chrome.js      # v0.9.1 chrome: rotating dial mark (turns on load and click, static under reduced motion), bigger desktop menu bar (icons 24 / 22 px, no zoom), pinned Assets sub-menu (one row of six icons on phones), Message the Dev on Overview only, sidebar colours, crowdfund Vaulter card (prices from VI_PLANS, real counts, Open days)
 node tests/test_014.mjs             # migration 014 on pglite: campaign_counts() gives backers per paid plan and nothing personal; anon may call it
 node tests/test_v091_overview_budget.js  # v0.9.1 E4/E23/E5/E6: Cash Flow tile 3D only, Net worth window +20%, Budget pills full width, Budget 3D viewport larger
 node tests/test_v091_inventory_files.js  # v0.9.1 E29: inventory 3D uploads: .glb .gltf .stl .obj .fbx .3mf preview, persist across reload, old glb-only record opens, STL/OBJ tinted, oversize and wrong type error

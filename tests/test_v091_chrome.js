@@ -2,6 +2,7 @@
 // dashboard only, sidebar summary colours, E25 crowdfund Vaulter card (prices from VI_PLANS, real counts, "Open" days left).
 // Run: node tests/test_v091_chrome.js
 const { chromium } = require('playwright');
+const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');   // VI_INDEX points the test at another checkout
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const SUBS = ['cash', 'stocks', 'metals', 'other', 'crypto', 'liabilities'];
 const seed = ({ t, neg }) => {
@@ -16,7 +17,7 @@ const open = async (b, w, h, theme, o = {}) => {
   const p = await ctx.newPage(); p.errs = []; p.on('pageerror', e => p.errs.push(e.message));
   if (o.rpc) await p.route('**/rest/v1/rpc/campaign_counts', r => o.rpc === 'fail' ? r.abort() : r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o.rpc) }));
   await p.addInitScript(seed, { t: theme, neg: !!o.neg });
-  await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1600);
+  await p.goto(INDEX); await p.waitForTimeout(1600);
   await p.addStyleTag({ content: HIDE });
   return p;
 };
@@ -67,6 +68,13 @@ const open = async (b, w, h, theme, o = {}) => {
     const ico = await p.evaluate(() => { const i = document.querySelector('#assets-page .subtab-btn .vi-ic.sti'); return { w: Math.round(i.getBoundingClientRect().width), o: getComputedStyle(i).opacity }; });
     if (w < 600) ok(ico.w === 30 && ico.o === '1', T + 'phone sub-menu icons 30 px at full opacity (' + JSON.stringify(ico) + ')');
     else if (w < 1100) ok(ico.w === 26 && ico.o === '1', T + 'tablet sub-menu icons 26 px at full opacity (' + JSON.stringify(ico) + ')');
+    if (w >= 1100) { const d = await p.evaluate(() => { const i = document.querySelector('#assets-page .subtab-btn .vi-ic.sti'), bt = document.querySelector('#assets-page .subtab-btn'); return [Math.round(i.getBoundingClientRect().width), Math.round(bt.getBoundingClientRect().height)]; });
+      ok(d[0] === 24 && d[1] >= 44, T + 'desktop sub-menu icons 24 px in 44 px buttons (' + d + ')'); }
+    // type floor and tap size (Pedro): sidebar labels, crowdfund labels, USP / PRO pills at least 10.5 px; crowdfund close 44 px
+    const ty = await p.evaluate(() => { if (!document.getElementById('left-sidebar').classList.contains('open')) toggleSidebar(); viShowCampaign(); const fs = sel => Math.min(...[...document.querySelectorAll(sel)].filter(e => getComputedStyle(e).display !== 'none').map(e => parseFloat(getComputedStyle(e).fontSize)));
+      const c = document.querySelector('.vi-camp-close').getBoundingClientRect(); document.getElementById('vi-campaign-modal').classList.add('hidden');
+      return { sb: fs('.sb-label'), camp: fs('#vi-campaign-modal .vi-camp-eyebrow,#vi-campaign-modal .vi-camp-stat-lbl,#vi-campaign-modal .vi-camp-tier-badge'), pill: fs('#topnav .vi-usp,#topnav .vi-pro'), cw: Math.round(c.width), ch: Math.round(c.height) }; });
+    ok(ty.sb >= 10.5 && ty.camp >= 10.5 && ty.pill >= 10.5 && ty.cw >= 44 && ty.ch >= 44, T + 'labels and pills at least 10.5 px, crowdfund close 44 px (' + JSON.stringify(ty) + ')');
     // tapping a sub-tab keeps the new panel's top in view under the bar
     await p.evaluate(() => scrollTo(0, 1500)); await p.waitForTimeout(150);
     await p.click('.subtab-btn[data-sub=crypto]'); await p.waitForTimeout(500);
@@ -101,7 +109,7 @@ const open = async (b, w, h, theme, o = {}) => {
     ok(camp.ok, T + 'Vaulter card reads the owner\'s sentence ' + camp.txt);
     ok(camp.live, T + 'both prices come from VI_PLANS (change them and the card follows)');
     ok(camp.tester && camp.tester.indexOf(camp.links[0]) === 0 && camp.full && camp.full.indexOf(camp.links[1]) === 0, T + 'the button opens the existing tester link, or the full-price link when not a tester');
-    ok(camp.days === 'Open' && camp.back === '0', T + 'no deadline: days left "Open"; no data yet: backers 0, not a dash (' + camp.days + ' / ' + camp.back + ')');
+    ok(camp.days === 'Open' && camp.back === '–', T + 'no deadline: days left "Open"; no count yet: backers a dash, never an invented 0 (' + camp.days + ' / ' + camp.back + ')');
     ok(!p.errs.length, T + 'no page errors ' + p.errs.slice(0, 2).join('; '));
     await p.context().close();
   }
@@ -111,10 +119,14 @@ const open = async (b, w, h, theme, o = {}) => {
     const r = await p.evaluate(() => ({ b: document.getElementById('camp-backers').textContent, pct: document.getElementById('camp-pct').textContent, lbl: document.getElementById('camp-bar-lbl').textContent }));
     ok(r.b === '6' && /3%/.test(r.pct) && /6 of 200/.test(r.lbl), 'E25 real counts 2+1+3 show 6 backers, 3% of the 200 goal (' + JSON.stringify(r) + ')');
     await p.context().close(); }
+  { const p = await open(b, 1100, 900, 'dark', { rpc: [] });
+    await p.evaluate(() => viShowCampaign()); await p.waitForTimeout(800);
+    const r = await p.evaluate(() => [document.getElementById('camp-backers').textContent, document.getElementById('camp-pct').textContent]);
+    ok(r[0] === '0' && r[1] === '0%', 'E25 the server answers with no paid accounts: a real 0 and 0% (' + r + ')'); await p.context().close(); }
   { const p = await open(b, 1100, 900, 'dark', { rpc: 'fail' });
     await p.evaluate(() => viShowCampaign()); await p.waitForTimeout(800);
     const r = await p.evaluate(() => [document.getElementById('camp-backers').textContent, document.getElementById('camp-pct').textContent]);
-    ok(r[0] === '0' && r[1] === '0%', 'E25 function not live yet: backers 0 and 0%, nothing invented (' + r + ')'); await p.context().close(); }
+    ok(r[0] === '–' && r[1] === '–', 'E25 function not live yet: backers and funded are dashes, nothing invented (' + r + ')'); await p.context().close(); }
   // negative surplus turns red
   { const p = await open(b, 1100, 900, 'dark', { neg: true });
     await p.evaluate(() => { if (!document.getElementById('left-sidebar').classList.contains('open')) toggleSidebar(); viRenderLedger(); });

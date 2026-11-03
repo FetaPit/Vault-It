@@ -3,6 +3,7 @@
 // and big synced scroll rails above and below the flow charts. 390 / 690 / 1100 / 1440 px, Night and Daylight.
 // Run: node tests/test_v08_chrome.js
 const { chromium } = require('playwright');
+const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');   // VI_INDEX points the test at another checkout
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const TABS = ['overview', 'budget', 'house', 'assets', 'debt', 'biz', 'achievements', 'network'];
 const FCA = 'Not regulated by the FCA. Not financial advice.';
@@ -19,7 +20,7 @@ const seed = t => {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: phone, hasTouch: phone, colorScheme: theme === 'light' ? 'light' : 'dark', reducedMotion: 'no-preference' });
     const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(seed, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1600);
+    await p.goto(INDEX); await p.waitForTimeout(1600);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal,#trial-banner,#tester-welcome,#vi-fb-nudge,#demo-chip,#pwa-install-banner{display:none!important}' });
     const T = w + ' ' + theme + ': ';
 
@@ -174,7 +175,7 @@ const seed = t => {
   }
   // reduced motion: the footer still collapses, with no transition
   { const ctx = await b.newContext({ viewport: { width: 1100, height: 900 }, reducedMotion: 'reduce' }); const p = await ctx.newPage();
-    await p.addInitScript(seed, 'dark'); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.addInitScript(seed, 'dark'); await p.goto(INDEX); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     const d = await p.evaluate(() => getComputedStyle(document.getElementById('app-footer')).transitionDuration);
     ok(d.split(',').every(x => parseFloat(x) === 0), '1100 reduced motion: the footer moves without a transition (' + d + ')');
