@@ -16,8 +16,6 @@ const money = s => { const m = String(s).replace(/,/g, '').match(/([+\-−]?)£(
   const ctx = await b.newContext({ viewport: { width: 1100, height: 1100 } });
   const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message)); page.on('dialog', d => d.accept());
   await page.addInitScript(() => {
-    const kept = sessionStorage.getItem('__ls');   // after a reload: put back exactly what the page had saved, so the test never races the browser's storage flush
-    if (kept) { JSON.parse(kept).forEach(([k, v]) => localStorage.setItem(k, v)); return; }
     if (localStorage.getItem('pos_al1')) return;
     localStorage.setItem('vi_declined_demo', 'true');
     localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
@@ -129,7 +127,9 @@ const money = s => { const m = String(s).replace(/,/g, '').match(/([+\-−]?)£(
   // 8. The stored average costs are untouched, and the new field survives a reload
   const o = await stock('OLD'), g = await stock('GOOD');
   ok(o.avgCost === 4200 && g.avgCost === 30, 'stored average costs never rewritten (OLD 4200, GOOD 30)');
-  await page.evaluate(() => sessionStorage.setItem('__ls', JSON.stringify(Object.entries(localStorage))));
+  // carry what the page saved through Node, not the browser: file:// storage (even sessionStorage) can lose writes across a reload
+  const snap = await page.evaluate(() => Object.entries(localStorage));
+  await page.addInitScript(entries => { localStorage.clear(); entries.forEach(([k, v]) => localStorage.setItem(k, v)); }, snap);
   await page.reload(); await page.waitForFunction(() => typeof alState !== 'undefined' && alState.stocks && alState.stocks.some(h => h.sym === 'GOOD') && typeof showSubtab === 'function', null, { timeout: 15000 });
   await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await page.evaluate(() => { showTab('assets'); showSubtab('assets', 'stocks', null); }); await settle();
