@@ -1,0 +1,8 @@
+{
+ "lowest_price": {
+  "currency": "GBP",
+  "value": 400
+ },
+ "num_for_sale": 10,
+ "blocked_from_sale": false
+}
