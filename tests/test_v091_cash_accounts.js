@@ -12,7 +12,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     await ctx.route(/^https?:\/\//, r => r.abort());
     await p.addInitScript(t => {
       if (localStorage.getItem('pos_al1')) return;
-      localStorage.setItem('vi_theme', t); localStorage.setItem('vi_declined_demo', 'true');
+      localStorage.setItem('vi-theme', t); localStorage.setItem('vi_declined_demo', 'true');
       localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
       localStorage.setItem('pos_al1', JSON.stringify({ cashAccounts: [
         { id: 1, name: 'Marcus saver', type: 'Savings', balance: 10000, rate: 4.5 },
