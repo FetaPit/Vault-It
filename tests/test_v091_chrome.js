@@ -63,6 +63,10 @@ const open = async (b, w, h, theme, o = {}) => {
       if (w >= 600 && !r.lbl.every(Boolean)) bad.push(s + ' labels hidden ' + JSON.stringify(r));
     }
     ok(!bad.length, T + 'six sub-tabs stay pinned under the header after scrolling 1500 px, no sideways scroll ' + bad.slice(0, 2).join('; '));
+    // E24b: the sub-menu icons are big and crisp enough to read (owner: "too low fidelity")
+    const ico = await p.evaluate(() => { const i = document.querySelector('#assets-page .subtab-btn .vi-ic.sti'); return { w: Math.round(i.getBoundingClientRect().width), o: getComputedStyle(i).opacity }; });
+    if (w < 600) ok(ico.w === 30 && ico.o === '1', T + 'phone sub-menu icons 30 px at full opacity (' + JSON.stringify(ico) + ')');
+    else if (w < 1100) ok(ico.w === 26 && ico.o === '1', T + 'tablet sub-menu icons 26 px at full opacity (' + JSON.stringify(ico) + ')');
     // tapping a sub-tab keeps the new panel's top in view under the bar
     await p.evaluate(() => scrollTo(0, 1500)); await p.waitForTimeout(150);
     await p.click('.subtab-btn[data-sub=crypto]'); await p.waitForTimeout(500);
