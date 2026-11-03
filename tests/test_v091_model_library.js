@@ -40,7 +40,7 @@ const seed = theme => {
 };
 const idb = (p, key) => p.evaluate(k => invTx('readonly', s => s.get(k)).then(v => !!(v && v.glb)), key);
 async function boot(b, theme, vp, extra) {
-  const ctx = await b.newContext(Object.assign({ viewport: vp }, extra || {})); await routeThree(ctx);
+  const ctx = await b.newContext(Object.assign({ viewport: vp, serviceWorkers: 'block' }, extra || {})); await routeThree(ctx);
   const st = { glb: 0, thumbs: 0, hosts: new Set(), cat: 0 };
   ctx.on('request', r => { try { const u = new URL(r.url()); if (u.protocol.startsWith('http')) st.hosts.add(u.host); } catch (e) {} });
   // fetch() cannot read file:// pages, so models/ requests are answered here, like the CDN: catalogue, files, thumbnails, credits
@@ -55,14 +55,21 @@ async function boot(b, theme, vp, extra) {
   await ctx.addInitScript(() => { const of = window.fetch; window.fetch = function (u, o) { const url = String(u && u.url || u); if (!/(^|\/)models\//.test(url)) return of.apply(this, arguments);
     return window.__models(url).then(r => { if (!r) return new Response('', { status: 404 }); const bin = atob(r.b64), a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return new Response(a, { status: 200, headers: { 'content-type': r.type } }); }); }; });
   const p = await ctx.newPage(); p.on('pageerror', e => st.err = (st.err || []).concat(e.message));
-  await p.addInitScript(seed, theme); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+  await p.addInitScript(seed, theme); await p.goto(BASE); await p.waitForFunction(() => typeof showTab === 'function' && typeof i3dPick === 'function' && window.alState && typeof renderAlTab === 'function', null, { timeout: 15000 });
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await p.evaluate(() => { showTab('assets'); renderAlTab(); }); await p.waitForTimeout(400);
   return { ctx, p, st };
 }
 const names = p => p.evaluate(() => [...document.querySelectorAll('#i3d-modal .i3d-li')].map(b => b.dataset.cid));
 const search = async (p, q) => { await p.fill('#i3d-q', q); await p.waitForTimeout(150); return names(p); };
+// The page is served over http from the repo (a file:// page's localStorage can come back empty after a reload in headless Chromium,
+// which made the reload checks flaky); models/ requests are still answered by the stand-ins below, so nothing real is fetched.
+const http = require('http'), fsx = require('fs'), pathx = require('path');
+const ROOT = pathx.join(__dirname, '..');
+const srv = http.createServer((q, r) => { const f = pathx.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : decodeURIComponent(q.url.split('?')[0])); if (!f.startsWith(ROOT) || !fsx.existsSync(f) || fsx.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': /\.html$/.test(f) ? 'text/html; charset=utf-8' : 'application/octet-stream' }); fsx.createReadStream(f).pipe(r); });
+let BASE = '';
 (async () => {
+  await new Promise(res => srv.listen(0, '127.0.0.1', res)); BASE = 'http://127.0.0.1:' + srv.address().port + '/index.html';
   const b = await chromium.launch();
   for (const theme of ['dark', 'light']) {
     const { ctx, p, st } = await boot(b, theme, { width: 1100, height: 900 });
@@ -90,7 +97,7 @@ const search = async (p, q) => { await p.fill('#i3d-q', q); await p.waitForTimeo
     ok(/Electric guitar/.test(m.credit) && /Ada Maker/.test(m.credit), theme + ': the viewer shows the CC-BY credit');
     ok(/Electric guitar/.test(m.tile) && /Ada Maker/.test(m.tile) && /CC-BY/.test(m.tile), theme + ': the item tile shows the CC-BY credit line (' + m.tile + ')');
     // reload keeps it, no refetch
-    await p.evaluate(() => i3dClose()); await p.reload(); await p.waitForTimeout(1800);
+    await p.evaluate(() => i3dClose()); await p.reload(); await p.waitForFunction(() => typeof showTab === 'function' && typeof i3dPick === 'function' && window.alState && typeof renderAlTab === 'function', null, { timeout: 15000 });
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await p.evaluate(() => { showTab('assets'); renderAlTab(); });
     await p.waitForFunction(() => { const x = window.i3dItem && i3dItem('wi', 11); return !!(x && x.model); }, null, { timeout: 8000 }).catch(() => {}); await p.evaluate(() => renderAlTab()); await p.waitForTimeout(400);
@@ -138,6 +145,6 @@ const search = async (p, q) => { await p.fill('#i3d-q', q); await p.waitForTimeo
   const fs = require('fs'), sw = fs.readFileSync(__dirname + '/../sw.js', 'utf8'), bs = fs.readFileSync(__dirname + '/../tools/build_site.js', 'utf8');
   ok(/\\\/models\\\//.test(sw) && !/models/.test(sw.slice(0, sw.indexOf('addEventListener'))), 'the service worker neither precaches nor caches models/');
   ok(/'glb', 'thumb'/.test(bs) && /catalog\.json/.test(bs) && /CREDITS\.md/.test(bs), 'tools/build_site.js copies models/ into the app build');
-  await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED'); process.exit(fails ? 1 : 0);
+  await b.close(); srv.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED'); process.exit(fails ? 1 : 0);
 })();
 function document_text(s) { return String(s); }
