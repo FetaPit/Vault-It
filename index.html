@@ -8475,6 +8475,9 @@ body::before {
 .cc3-chip i:nth-child(2){border-radius:1cqw}
 .cc3-nfc{position:absolute;left:21cqw;top:38%;width:7.5cqw;height:7.5cqw;opacity:.85}
 .cc3-num{position:absolute;left:6cqw;right:6cqw;bottom:20%;font:500 6.2cqw 'Share Tech Mono',monospace;letter-spacing:.14em;text-shadow:0 .2cqw .5cqw rgba(0,0,0,.45);white-space:nowrap;overflow:hidden}
+.cc3-type{position:absolute;left:6cqw;right:6cqw;bottom:22%;font:600 max(10.5px,5.2cqw) 'DM Sans',sans-serif;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 .2cqw .5cqw rgba(0,0,0,.45)}
+.cc3-btype{bottom:auto;top:12%;opacity:.85}
+.cc3-loan .cc3-name{right:6cqw}
 .cc3-name{position:absolute;left:6cqw;right:26cqw;bottom:10%;font:700 4.6cqw 'Syne',sans-serif;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.92}
 .cc3-net{position:absolute;right:6cqw;bottom:7%;display:flex;align-items:center}
 .cc3-visa{font:italic 800 9cqw 'Syne',sans-serif;letter-spacing:-.02em;color:#fff;text-shadow:0 .2cqw .6cqw rgba(0,0,0,.4)}
@@ -12764,6 +12767,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div><label class="ov-kpi-lbl">Interest Rate %</label><input type="number" id="df-rate" step="0.1" class="al-inp"></div>
         <div><label class="ov-kpi-lbl">Min Payment £/mo</label><input type="number" id="df-min" class="al-inp"></div>
         <div><label class="ov-kpi-lbl">Type</label><select id="di-type" class="al-inp"><option value="credit">Credit Card</option><option value="personal">Personal Loan</option><option value="student">Student Loan</option><option value="car">Car / Vehicle Finance</option><option value="bnpl">Buy Now Pay Later</option><option value="overdraft">Overdraft</option><option value="mortgage">Mortgage</option><option value="other">Other</option></select></div>
+        <div><label class="ov-kpi-lbl" for="df-provider">Lender or bank (for its logo)</label><input type="text" id="df-provider" class="al-inp" maxlength="40" autocomplete="off" placeholder="e.g. Santander, Zopa"></div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn-add-data" onclick="saveDebt()">Save debt</button>
@@ -17558,6 +17562,8 @@ var OV_ICO={
   biz:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
   owed:'<path d="M4 12h12M12 7l5 5-5 5"/><path d="M20 5v14"/>'
 };
+// Credit cards and BNPL are drawn as cards (chip, number, network); every other debt uses the same tile without them (E33)
+function ccIsCard(d){return !!d&&(d.type==='credit'||d.type==='bnpl');}
 var _ccPct={};   // % shown last time for each card, so a payment cuts from where it was and an undo joins it back up
 var _ccIO=null;
 var CC_BRANDS=[
@@ -17584,6 +17590,18 @@ var CC_BRANDS=[
  {n:'M&S Bank',d:'marksandspencer.com',g:['#1a1a1a','#050505'],fg:'#fff',acc:'#3f9a67',re:/m\s*&\s*s|marks\s*(and|&)?\s*spencer/i},
  {n:'MBNA',d:'mbna.co.uk',g:['#1a5da8','#082b52'],fg:'#fff',re:/mbna/i},
  {n:'Axis Bank',d:'axisbank.com',g:['#a8185a','#5c0b2e'],fg:'#fff',re:/axis/i},
+ {n:'Zopa',d:'zopa.com',g:['#1b2a4a','#0a1430'],fg:'#fff',acc:'#3cd3ad',re:/zopa/i},
+ {n:'Novuna',d:'novuna.co.uk',g:['#24307a','#0d1440'],fg:'#fff',re:/novuna|hitachi\s*capital/i},
+ {n:'Sainsbury\u2019s Bank',d:'sainsburysbank.co.uk',g:['#f06c00','#a84700'],fg:'#fff',re:/sainsbury/i},
+ {n:'TSB',d:'tsb.co.uk',g:['#1c3f94','#0a1f52'],fg:'#fff',re:/\btsb\b/i},
+ {n:'Co-op Bank',d:'co-operativebank.co.uk',g:['#00a0d6','#00527a'],fg:'#fff',re:/\bco-?op(erative)?\s*bank/i},
+ {n:'Metro Bank',d:'metrobankonline.co.uk',g:['#0033a0','#001a54'],fg:'#fff',acc:'#e4002b',re:/metro\s*bank/i},
+ {n:'First Direct',d:'firstdirect.com',g:['#2b2b2b','#050505'],fg:'#fff',re:/first\s*direct/i},
+ {n:'Revolut',d:'revolut.com',g:['#3a3d42','#0b0c0e'],fg:'#fff',re:/revolut/i},
+ {n:'Chase',d:'chase.co.uk',g:['#117aca','#0b3d6b'],fg:'#fff',re:/\bchase\b/i},
+ {n:'Student Loans Company',d:'gov.uk',g:['#1d70b8','#0b3c66'],fg:'#fff',re:/student\s*loans?\s*company|\bslc\b/i},
+ {n:'Black Horse',d:'blackhorse.co.uk',g:['#1b1b1b','#050505'],fg:'#fff',acc:'#0b8a63',re:/black\s*horse/i},
+ {n:'Close Brothers',d:'closebrothers.com',g:['#0d2340','#050f1e'],fg:'#fff',re:/close\s*brothers/i},
  {n:'Visa',d:'visa.com',g:['#1a2f8f','#0b1650'],fg:'#fff',net:'visa',re:/\bvisa\b/i},
  {n:'Mastercard',d:'mastercard.com',g:['#2a2a33','#101014'],fg:'#fff',net:'mc',re:/master\s*card/i}
 ];
@@ -22408,7 +22426,10 @@ function saveDebt(){if(viBlockEdit())return;
   var m=(parseFloat(document.getElementById('df-min').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n){var mm=document.getElementById('debt-form-msg');if(mm)mm.textContent='Give the debt a name, for example "Barclaycard".';var fn=document.getElementById('df-name');if(fn)fn.focus();return;}
   var dtype=(document.getElementById('di-type')||{}).value||'other';
-  debtState.debts.push({id:Date.now(),name:n,original:b,balance:b,rate:r,min:m,type:dtype});
+  var prov=viClean((document.getElementById('df-provider')||{}).value||'').trim().slice(0,40);
+  var nd={id:Date.now(),name:n,original:b,balance:b,rate:r,min:m,type:dtype};if(prov)nd.card={issuer:prov,network:'auto',last4:'',art:'',logo:''};   // provider only when typed: older saves keep their shape
+  debtState.debts.push(nd);
+  var dpv=document.getElementById('df-provider');if(dpv)dpv.value='';
   document.getElementById('df-name').value='';document.getElementById('df-balance').value='';document.getElementById('df-rate').value='';document.getElementById('df-min').value='';
   var dit=document.getElementById('di-type');if(dit)dit.value='credit';
   hideDebtForm();
@@ -22481,15 +22502,16 @@ function cc3dHTML(d,pctNum,shown){
   var b=ccBrand(d)||CC_GENERIC,c=d.card||{},net=ccNetwork(d,b),fg=b.fg;
   var bg=c.art?'background:#000 url('+c.art+') center/cover':'background:linear-gradient(135deg,'+b.g[0]+','+b.g[1]+')';
   var domain=b.d,logo=c.logo?'<img alt="" src="'+c.logo+'">':(domain?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=64" onerror="this.style.display=\'none\'">':'');
-  var mono=ccEsc((b.n||d.name||'?').trim().charAt(0).toUpperCase());
+  var isCard=ccIsCard(d),tlabel=(typeof DEBT_TYPE_LABELS!=='undefined'&&DEBT_TYPE_LABELS[d.type])||'Loan';
+  var mono=ccEsc((b.n||c.issuer||d.name||'?').trim().charAt(0).toUpperCase());
   var last4=/^\d{4}$/.test(c.last4||'')?c.last4:'••••';
   var shownName=ccEsc(d.name);
   var bal=gbpFmt(d.balance),apr=(+d.rate||0)+'% APR',minp=gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0);
   var art=!!c.art;
   var inner=(art?'':'<div class="cc3-sheen"></div>'+(b.acc?'<div class="cc3-acc" style="background:'+b.acc+'"></div>':''))
     +(art?'':'<div class="cc3-logo"><span>'+mono+'</span>'+logo+'</div>')
-    +(art?'':'<div class="cc3-chip"><i></i><i></i><i></i></div><svg class="cc3-nfc" viewBox="0 0 24 24" fill="none" stroke="'+fg+'" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.500 0 12M12 4c4.500 5 4.500 11 0 16M16 2c6 6.500 6 13.500 0 20"/></svg>')
-    +(art?'':'<div class="cc3-num">•••• •••• •••• '+last4+'</div><div class="cc3-name">'+shownName+'</div>'+ccNetMark(net));
+    +(art||!isCard?'':'<div class="cc3-chip"><i></i><i></i><i></i></div><svg class="cc3-nfc" viewBox="0 0 24 24" fill="none" stroke="'+fg+'" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.500 0 12M12 4c4.500 5 4.500 11 0 16M16 2c6 6.500 6 13.500 0 20"/></svg>')
+    +(art?'':(isCard?'<div class="cc3-num">•••• •••• •••• '+last4+'</div>':'<div class="cc3-type">'+ccEsc(tlabel)+'</div>')+(isCard||String(d.name||'').trim().toLowerCase()!==tlabel.toLowerCase()?'<div class="cc3-name">'+shownName+'</div>':'')+(isCard?ccNetMark(net):''));
   // the card is cut along its x axis: the paid share on the right is cut off and greyed, the unpaid share on the left stays full colour
   var P=Math.max(0,Math.min(100,shown));
   var f='<div class="cc3-face cc3-front">'
@@ -22501,15 +22523,15 @@ function cc3dHTML(d,pctNum,shown){
     +(pctNum>0&&pctNum<100?'<div class="cc3-pct">'+pctNum+'% paid</div>':'')
     +'<div class="cc3-stamp">PAID OFF ✓</div>'
     +'<div class="cc3-gloss"></div></div>';
-  var binner='<div class="cc3-stripe"></div><div class="cc3-sig"><span>Authorised signature</span><b>•••</b></div>'
-    +'<div class="cc3-bk-info"><div><span>Owed</span><b>'+bal+'</b></div><div><span>Rate</span><b>'+apr+'</b></div><div><span>Min</span><b>'+minp+'/mo</b></div></div>'+ccNetMark(net);
+  var binner=(isCard?'<div class="cc3-stripe"></div><div class="cc3-sig"><span>Authorised signature</span><b>•••</b></div>':'<div class="cc3-type cc3-btype">'+ccEsc(tlabel)+'</div>')
+    +'<div class="cc3-bk-info"><div><span>Owed</span><b>'+bal+'</b></div><div><span>Rate</span><b>'+apr+'</b></div><div><span>Min</span><b>'+minp+'/mo</b></div></div>'+(isCard?ccNetMark(net):'');
   // seen from behind the x axis is mirrored, so the cut-off (paid) part is on the left of the back
   var back='<div class="cc3-face cc3-back">'
     +'<div class="cc3-lay cc3-bbase" style="clip-path:inset(0 0 0 '+P+'%)">'+binner+'</div>'
     +'<div class="cc3-lay cc3-bpiece" style="clip-path:inset(0 '+(100-P)+'% 0 0)">'+binner+'</div>'
     +(P>0&&P<100?'<div class="cc3-cutline cc3-bcl" style="left:'+P+'%"></div>':'')
     +'<div class="cc3-gloss"></div></div>';
-  return '<div class="cc3'+(P>=100?' cc3-ghost':'')+'" data-id="'+d.id+'" data-from="'+shown+'" data-to="'+pctNum+'" role="img" aria-label="'+ccEsc(d.name)+' credit card. Drag to rotate, double-click to flip">'
+  return '<div class="cc3'+(isCard?'':' cc3-loan')+(P>=100?' cc3-ghost':'')+'" data-id="'+d.id+'" data-from="'+shown+'" data-to="'+pctNum+'" role="img" aria-label="'+ccEsc(d.name)+(isCard?' credit card':', '+ccEsc(tlabel))+'. Drag to rotate, double-click to flip">'
     +'<div class="cc3-body" style="--ry:-16deg;--rx:6deg">'+f+back
     +'<div class="cc3-edge cc3-e-t"></div><div class="cc3-edge cc3-e-b"></div><div class="cc3-edge cc3-e-l"></div><div class="cc3-edge cc3-e-r"></div></div></div>';
 }
@@ -22546,21 +22568,21 @@ var _ccEdit=null;
 function ccOpenEdit(id){
   var d=debtState.debts.find(function(x){return x.id===id;});if(!d)return;
   _ccEdit={id:id,art:(d.card&&d.card.art)||'',logo:(d.card&&d.card.logo)||''};
-  var c=d.card||{},o=document.getElementById('cc-ov');if(o)o.remove();
+  var c=d.card||{},o=document.getElementById('cc-ov'),isCard=ccIsCard(d);if(o)o.remove();
   o=document.createElement('div');o.id='cc-ov';o.className='hbc-ov';
-  o.innerHTML='<div class="hbc" style="width:min(520px,100%)" role="dialog" aria-label="Card design"><div class="hbc-hd"><span>💳 Card design</span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="ccCloseEdit()" aria-label="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div>'
+  o.innerHTML='<div class="hbc" style="width:min(520px,100%)" role="dialog" aria-label="'+(isCard?'Card design':'Lender and logo')+'"><div class="hbc-hd"><span>'+(isCard?'💳 Card design':'Lender and logo')+'</span><span style="cursor:pointer;font-size:20px;padding:0 6px" onclick="ccCloseEdit()" aria-label="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span></div>'
    +'<div style="padding:14px 16px"><div id="cc-prev" style="max-width:340px;margin:0 auto 12px"></div>'
    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
-   +'<div style="grid-column:1/-1"><label style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">Issuer / company on the card (we scan this and the card name for a known company)</label><input id="cc-issuer" type="text" maxlength="40" class="al-inp" style="width:100%" value="'+ccEsc(c.issuer||'')+'" placeholder="e.g. Barclaycard, Monzo, Amex"></div>'
-   +'<div><label style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">Network</label><select id="cc-net" class="al-inp" style="width:100%"><option value="auto">Auto-detect</option><option value="visa">Visa</option><option value="mc">Mastercard</option><option value="amex">Amex</option><option value="none">None</option></select></div>'
-   +'<div><label style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">Last 4 digits (optional)</label><input id="cc-last4" type="text" inputmode="numeric" maxlength="4" class="al-inp" style="width:100%" value="'+ccEsc(c.last4||'')+'"></div>'
+   +'<div style="grid-column:1/-1"><label for="cc-issuer" style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">'+(isCard?'Issuer / company on the card (we scan this and the card name for a known company)':'Lender or bank (we scan this and the debt name for a known company)')+'</label><input id="cc-issuer" type="text" maxlength="40" class="al-inp" style="width:100%" value="'+ccEsc(c.issuer||'')+'" placeholder="e.g. Barclaycard, Monzo, Amex"></div>'
+   +(isCard?'<div><label style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">Network</label><select id="cc-net" class="al-inp" style="width:100%"><option value="auto">Auto-detect</option><option value="visa">Visa</option><option value="mc">Mastercard</option><option value="amex">Amex</option><option value="none">None</option></select></div>'
+   +'<div><label style="display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px">Last 4 digits (optional)</label><input id="cc-last4" type="text" inputmode="numeric" maxlength="4" class="al-inp" style="width:100%" value="'+ccEsc(c.last4||'')+'"></div>':'')
    +'</div>'
-   +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><label class="stk-btn" style="cursor:pointer">📷 Imprint a photo of my card<input type="file" accept="image/*" style="display:none" onchange="ccArtFile(this,\'art\')"></label><label class="stk-btn" style="cursor:pointer">🖼 Upload a logo<input type="file" accept="image/*" style="display:none" onchange="ccArtFile(this,\'logo\')"></label><button class="stk-btn" onclick="ccClearArt()">Use brand design</button></div>'
-   +'<div style="font-size:10.5px;color:var(--t3);line-height:1.5;margin-top:8px">Brand designs use each company’s colours and logo, not the official card artwork. For the exact design, photograph the front of your card and imprint it. The photo stays in your account only. Hide the card number first if you prefer.</div>'
+   +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">'+(isCard?'<label class="stk-btn" style="cursor:pointer">📷 Imprint a photo of my card<input type="file" accept="image/*" style="display:none" onchange="ccArtFile(this,\'art\')"></label>':'')+'<label class="stk-btn" style="cursor:pointer">🖼 Upload a logo<input type="file" accept="image/*" style="display:none" onchange="ccArtFile(this,\'logo\')"></label><button class="stk-btn" onclick="ccClearArt()">Use brand design</button></div>'
+   +'<div style="font-size:10.5px;color:var(--t3);line-height:1.5;margin-top:8px">'+(isCard?'Brand designs use each company’s colours and logo, not the official card artwork. For the exact design, photograph the front of your card and imprint it. The photo stays in your account only. Hide the card number first if you prefer.':'Brand designs use each company’s colours and logo. If your lender is not recognised, upload its logo instead. It stays in your account only.')+'</div>'
    +'<div style="margin-top:12px;display:flex;gap:6px;justify-content:flex-end"><button class="stk-btn" onclick="ccCloseEdit()">Cancel</button><button class="btn-add-data" onclick="ccSaveEdit()">Save</button></div></div></div>';
   document.body.appendChild(o);
-  document.getElementById('cc-net').value=c.network||'auto';
-  ['cc-issuer','cc-net','cc-last4'].forEach(function(i){document.getElementById(i).addEventListener('input',ccPreview);});
+  var cn=document.getElementById('cc-net');if(cn)cn.value=c.network||'auto';
+  ['cc-issuer','cc-net','cc-last4'].forEach(function(i){var e=document.getElementById(i);if(e)e.addEventListener('input',ccPreview);});
   ccPreview();
 }
 function ccDraft(){
@@ -22590,7 +22612,7 @@ function ccSaveEdit(){if(viBlockEdit())return;
   var d=debtState.debts.find(function(x){return x.id===_ccEdit.id;});if(!d)return;
   var nd=ccDraft().card;
   if(!nd.issuer&&nd.network==='auto'&&!nd.last4&&!nd.art&&!nd.logo)delete d.card;else d.card=nd;
-  ccCloseEdit();saveDebtState();renderDebtTab();showToast('Card design saved ✓');
+  var wasCard=ccIsCard(d);ccCloseEdit();saveDebtState();renderDebtTab();showToast(wasCard?'Card design saved ✓':'Lender and logo saved ✓');
 }
 
 
@@ -22745,22 +22767,17 @@ function renderDebtTab(){
   var _obBanner=sorted.some(function(d){return d._onboarding;})
     ?'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;background:rgb(var(--orange-rgb) / .08);border:1px solid rgb(var(--orange-rgb) / .3);border-radius:8px;font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);line-height:1.5"><span style="flex:1;min-width:200px"><b style="color:var(--or)">One lump-sum entered at setup.</b> Replace it with each separate debt (type, interest rate, minimum payment) so your payoff plan is accurate.</span><button class="btn-add-data" style="padding:5px 12px;font-size:max(.52rem,var(--vi-fs-1))" onclick="removeOnboardingDebt()">Replace it →</button></div>'
     :'';
-  var _ramp=debtChartRamp(sorted);
   var _rank={},_rk=0;sorted.forEach(function(d){if(d.balance>0)_rank[d.id]=++_rk;});   // payoff order: Avalanche = highest rate first, Snowball = smallest balance first
   var _rankBadge=function(d){return _rank[d.id]?'<span class="debt-rank" title="Payoff order #'+_rank[d.id]+' ('+(_debtMethod==='avalanche'?'Avalanche: highest interest rate first':'Snowball: smallest balance first')+')">'+_rank[d.id]+'</span>':'<span class="debt-rank done" title="Paid off"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></span>';};
   var _rankNote='<div class="debt-rank-note"><b>Payoff order</b>: <span class="debt-rank sm">1</span> = '+(_debtMethod==='avalanche'?'highest interest rate (Avalanche): clear this first':'smallest balance (Snowball): clear this first')+'</div>';
-  dl.innerHTML=_obBanner+_rankNote+'<div class="debt-card-grid'+(sorted.some(function(d){return d.type==='credit'||d.type==='bnpl';})?' has-cards':'')+'">'
+  dl.innerHTML=_obBanner+_rankNote+'<div class="debt-card-grid has-cards">'
     +sorted.map(function(d){
       var orig=d.original||d.total||d.balance;
       var paidPct=orig>0?Math.max(0,Math.min(1,(orig-d.balance)/orig)):0;
       var pctNum=Math.round(paidPct*100);
-      var remainH=100-pctNum; // % of card still "owed"
-      var isCard=d.type==='credit'||d.type==='bnpl';
-      var ccLogo=getCreditCardLogo(d.name);
-
-      if(isCard){
-        // real-proportion 3D card (drag to rotate, double-tap to flip); progress shown on the card's bottom edge
-        return '<div data-did="'+d.id+'" style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px">'
+      var isCard=ccIsCard(d);
+      // every debt is a real-proportion 3D tile (drag to rotate, double-tap to flip); cards add the chip and number (E33)
+      return '<div data-did="'+d.id+'" style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px">'
           +'<div style="font-size:max(.55rem,var(--vi-fs-1));font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px">'+_rankBadge(d)+'<span style="overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</span></div>'
           +cc3dHTML(d,pctNum,ccReduced()?pctNum:(_ccPct[d.id]!=null?_ccPct[d.id]:0))
           +'<div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--re);font-family:\'Share Tech Mono\',monospace;font-weight:700;display:flex;justify-content:space-between"><span>'+gbpFmt(d.balance)+'</span><span style="color:var(--gr);font-weight:400">'+pctNum+'% paid</span></div>'
@@ -22770,35 +22787,10 @@ function renderDebtTab(){
           +(d.payments&&d.payments.length?'<button class="btn-add-data" style="padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;background:transparent;border-color:var(--t3);color:var(--t2)" title="Undo your last payment of £'+d.payments[d.payments.length-1].amt+'" onclick="undoPayment('+d.id+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-undo"/></svg> Undo £'+Math.round(d.payments[d.payments.length-1].amt*100)/100+'</button>':'')
           +'</div>'
           +'<div style="display:flex;justify-content:space-between;align-items:center">'
-          +'<span style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3)">'+d.rate+'% APR</span>'
-          +'<span class="cc-tile-actions"><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" title="Flip card" onclick="ccFlipId('+d.id+')">⟲</button><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" title="Card design" onclick="ccOpenEdit('+d.id+')">🎨</button><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" onclick="deleteDebt('+d.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></span>'
+          +'<span style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);flex:1;min-width:0">'+(isCard?d.rate+'% APR':ccEsc(DEBT_TYPE_LABELS[d.type]||'Loan')+' · '+d.rate+'% · Min '+gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0)+'/mo')+'</span>'
+          +'<span class="cc-tile-actions"><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" title="Flip card" onclick="ccFlipId('+d.id+')">⟲</button><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" title="'+(isCard?'Card design':'Lender and logo')+'" onclick="ccOpenEdit('+d.id+')">🎨</button><button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" onclick="deleteDebt('+d.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></span>'
           +'</div>'
           +'</div>';
-      } else {
-        var _lp=_ramp[d.id]||{c1:'var(--red)',c2:'var(--red)'};
-        // Loan / other — vertical progress bar (y-axis = monetary value, bar shrinks from top as paid)
-        return '<div data-did="'+d.id+'" style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px">'
-          +'<div style="font-size:max(.55rem,var(--vi-fs-1));font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px">'+_rankBadge(d)+'<span style="overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</span></div>'
-          +'<div style="flex:1;background:rgb(var(--ink-rgb) / .04);border-radius:5px;overflow:hidden;position:relative;min-height:100px">'
-          +'<div style="position:absolute;bottom:0;left:0;right:0;height:'+pctNum+'%;background:linear-gradient(to top,rgb(var(--green-rgb) / .35),rgb(var(--green-rgb) / .15));border-radius:5px;transition:height .5s ease"></div>'
-          +'<div style="position:absolute;top:0;left:0;right:0;height:'+(100-pctNum)+'%;background:linear-gradient(to bottom,'+_lp.c1+','+_lp.c2+');opacity:.55;border-radius:5px"></div>'
-          // Horizontal "cut" line showing how much paid
-          +'<div style="position:absolute;left:0;right:0;top:'+(100-pctNum)+'%;height:2px;background:rgb(var(--green-rgb) / .7);box-shadow:0 0 6px rgb(var(--green-rgb) / .5)"></div>'
-          +'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px">'
-          +'<span style="font-size:max(.62rem,var(--vi-fs-2));color:var(--re);font-family:\'Share Tech Mono\',monospace;font-weight:700">'+gbpFmt(d.balance)+'</span>'
-          +'<span style="font-size:max(.46rem,var(--vi-fs-1));color:var(--gr)">'+pctNum+'% paid</span>'
-          +'</div></div>'
-          +'<div style="display:flex;align-items:center;gap:4px">'
-          +'<input type="number" id="debt-pay-inp-'+d.id+'" class="al-inp" placeholder="£ pay" style="flex:1;font-size:max(.52rem,var(--vi-fs-1));padding:3px 6px;min-width:0">'
-          +'<button class="btn-add-data" style="padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap" onclick="makePayment('+d.id+')">Pay</button>'
-          +(d.payments&&d.payments.length?'<button class="btn-add-data" style="padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;background:transparent;border-color:var(--t3);color:var(--t2)" title="Undo your last payment of £'+d.payments[d.payments.length-1].amt+'" onclick="undoPayment('+d.id+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-undo"/></svg> Undo £'+Math.round(d.payments[d.payments.length-1].amt*100)/100+'</button>':'')
-          +'</div>'
-          +'<div style="display:flex;justify-content:space-between;align-items:center">'
-          +'<span style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3)">'+(DEBT_TYPE_LABELS[d.type]||'Debt')+' · '+d.rate+'% · Min '+gbpFmt(parseFloat(d.minPay)||parseFloat(d.min)||0)+'/mo</span>'
-          +'<button class="data-item-del" style="font-size:max(.48rem,var(--vi-fs-1));padding:2px 5px" onclick="deleteDebt('+d.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
-          +'</div>'
-          +'</div>';
-      }
     }).join('')
     +'</div>';
   setTimeout(function(){drawDebtHistogram();drawDebtDonut();updateDebtInterestPanel();ccWatchCuts(dl);},50);
