@@ -19485,18 +19485,18 @@ function drawCashflowDiagram(){
   out=viDay(out);
   hosts.forEach(function(h){if(h.__sig!==out){h.__sig=out;h.innerHTML=out;}viCfZoom(h);});   // identical markup = no repaint
 }
-/* Flow zoom (owner, 3 Nov): the diagram opens as near to the whole picture as stays readable, and − / Fit / + scale it from there. */
+/* Flow zoom (owner, 3 Nov): the diagram opens at its real size (v0.8 labels never under 10.5 px); − / Fit / + scale it from there, Fit puts the whole flow on one screen. */
 var _cfZ=1;
 function viCfZoom(h){
   var svg=h&&h.querySelector('svg');if(!svg)return;
   var vb=(svg.getAttribute('viewBox')||'').split(/\s+/).map(Number),W=vb[2],H=vb[3];if(!(W>0&&H>0))return;
   var cw=h.clientWidth||W,vh=Math.max(260,window.innerHeight-230),one=window.innerWidth<1100;
-  var whole=Math.min(cw/W,vh/H),auto=one?Math.min(1,Math.max(.45,whole)):cw/W;   // phones open at the whole-picture size, but never below .45 so the labels stay readable
-  var sc=Math.min(2.2,Math.max(Math.min(whole,auto)*.7,auto*_cfZ)),w=Math.round(W*sc),ht=Math.round(H*sc);
-  svg.classList.remove('cf-1to1');
+  var whole=Math.min(cw/W,vh/H),auto=one?1:cw/W;   // default = the drawing as it is (labels at their real size, v0.8 type floor); − and Fit shrink it, + enlarges
+  h.__auto=auto;h.__whole=whole;
+  if(_cfZ===1){['width','min-width','max-width','height'].forEach(function(k){svg.style.removeProperty(k)});h.style.justifyContent='';return}
+  var sc=Math.min(2.2,Math.max(whole*.7,auto*_cfZ)),w=Math.round(W*sc),ht=Math.round(H*sc);
   [['width',w+'px'],['min-width',w+'px'],['max-width','none'],['height',ht+'px']].forEach(function(p){svg.style.setProperty(p[0],p[1],'important')});
   h.style.justifyContent=w<cw?'center':'flex-start';
-  h.__auto=auto;h.__whole=whole;
 }
 function viCfZoomBy(k){
   var h=document.getElementById('bd-sankey');viCfZoom(h);var auto=(h&&h.__auto)||1,whole=(h&&h.__whole)||.5;

@@ -13,7 +13,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   const r=await page.evaluate(()=>({pies:alState.stockPies.map(p=>p.name),stocks:alState.stocks.map(h=>h.sym),active:alState.activePie}));
   ok(r.pies.join()==='ISA'&&r.stocks.join()==='SONY,TTWO'&&r.active==='all','fund and its holding deleted; back to All investments');
   // remove a single holding with the labelled button
-  await page.click('.stk-row button:has-text("Remove")'); await page.waitForTimeout(300);
+  await page.click('.stk-gh'); await page.waitForTimeout(200); await page.click('.stk-row button:has-text("Remove")'); await page.waitForTimeout(300);
   ok(await page.evaluate(()=>alState.stocks.length)===1,'"🗑 Remove" deletes one holding');
   ok(errs.length===0,'no page errors '+errs.join('|'));
   await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');

@@ -203,7 +203,8 @@ function measure() {
     ok(!ag.is3d && ag.shown, 'forecast note shown in Graph view ' + JSON.stringify(ag));
     ok(!ar.is3d && ar.shown && ar3.is3d && !ar3.shown, 'after a reload the note follows the remembered view (Graph: shown, 3D: hidden) ' + JSON.stringify([ar, ar3]));
     // Pedro (2 Nov): on phones the cash-flow diagram is drawn 1:1 in its sideways scroller, so its chips read at 10.5 px or more
-    for (const [tab, id] of [['overview', 'cf-sankey'], ['budget', 'bd-sankey']]) {
+    // the dashboard Cash Flow tile is now the 3D income flow (owner, 3 Nov), so only the Budget flow chart is checked here
+    for (const [tab, id] of [['budget', 'bd-sankey']]) {
       await p4.evaluate(t => showTab(t), tab); await p4.waitForTimeout(800);
       const sk = await p4.evaluate(id => { const host = document.getElementById(id), sv = host.querySelector('svg'); const sz = [...sv.querySelectorAll('.cf-chip text')].map(t => parseFloat(t.getAttribute('font-size')) * t.getScreenCTM().a);
         const ch = [...sv.querySelectorAll('.cf-chip rect')].map(x => x.getBoundingClientRect()); let ov = 0; for (let i = 0; i < ch.length; i++) for (let j = i + 1; j < ch.length; j++) { const a = ch[i], c = ch[j]; if (Math.min(a.right, c.right) - Math.max(a.left, c.left) > 1 && Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top) > 1) ov++; }
@@ -213,7 +214,7 @@ function measure() {
     // Pete (2 Nov, into 0.8): the same 1:1 treatment at 600 to 1099 px; 1440 keeps its fitted diagram
     for (const w of [690, 1024, 1440]) {
       await p4.setViewportSize({ width: w, height: 900 });
-      for (const [tab, id] of [['overview', 'cf-sankey'], ['budget', 'bd-sankey']]) {
+      for (const [tab, id] of [['budget', 'bd-sankey']]) {
         await p4.evaluate(t => { showTab(t); try { drawCashflowDiagram(); } catch (e) {} }, tab); await p4.waitForTimeout(700);
         const sk = await p4.evaluate(id => { const host = document.getElementById(id), sv = host.querySelector('svg'); const sz = [...sv.querySelectorAll('.cf-chip text')].map(t => parseFloat(t.getAttribute('font-size')) * t.getScreenCTM().a);
           return { n: sz.length, min: +Math.min(...sz).toFixed(1), one: sv.classList.contains('cf-1to1'), side: document.documentElement.scrollWidth > innerWidth + 1 }; }, id);
