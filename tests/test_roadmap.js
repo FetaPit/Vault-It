@@ -162,13 +162,13 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   // ── coins (owner, 31 Oct): the rail runs between the coins, the stage to work on is the largest, phones get a carousel
   await p.evaluate(() => { renderFIREroadmap(); const SC = document.getElementById('fire-timeline-scroll'), st = renderFIREroadmap._stages; SC.scrollLeft = Math.max(0, st.nextIdx * FIRE_NODE + FIRE_LEFT - SC.clientWidth / 2); renderFIREroadmap(); fireCarousel(); }); await p.waitForTimeout(400);
   const coins = await p.evaluate(() => { const svg = document.getElementById('fire-roadmap-svg'), SC = document.getElementById('fire-timeline-scroll'), st = renderFIREroadmap._stages;
-    const gs = [...svg.querySelectorAll('g.fire-coin')]; const faces = gs.map(g => { const c = [...g.querySelectorAll('circle')].filter(x => x.getAttribute('fill') === '#071018')[0]; return { i: +g.dataset.i, cx: +c.getAttribute('cx'), r: +c.getAttribute('r'), next: g.classList.contains('next'), sc: g.style.transform }; });
-    const rails = [...svg.querySelectorAll(':scope > line')].filter(l => l.getAttribute('y1') === '148' && l.getAttribute('y2') === '148').map(l => [+l.getAttribute('x1'), +l.getAttribute('x2')]);
+    const gs = [...svg.querySelectorAll('g.fire-coin')]; const faces = gs.map(g => { const c = g.querySelector('.fire-face'); return { i: +g.dataset.i, cx: +g.dataset.cx, r: +c.getAttribute('data-r'), next: g.classList.contains('next'), sc: g.style.transform }; });
+    const rails = [...svg.querySelectorAll('line.fire-rail')].map(l => [+l.getAttribute('x1'), +l.getAttribute('x2')]);
     const crosses = rails.some(([a, b]) => faces.some(f => f.cx > a && f.cx < b));
     const mid = SC.scrollLeft + SC.clientWidth / 2, near = faces.slice().sort((p, q) => Math.abs(p.cx - mid) - Math.abs(q.cx - mid));
     const sc = t => +(t.match(/scale\(([\d.]+)\)/) || [0, 1])[1];
     return { n: gs.length, nextR: (faces.find(f => f.next) || {}).r, otherR: (faces.find(f => !f.next) || {}).r, rails: rails.length, crosses, centred: near[0].i === Math.max(0, Math.min(st.length - 1, Math.round((mid - FIRE_LEFT) / FIRE_NODE))), centreScale: sc(near[0].sc), edgeScale: sc(near[near.length - 1].sc) }; });
-  ok(coins.n > 3 && coins.nextR === 30 && coins.otherR === 22, 'coins drawn; the stage to work on is the largest (r 30 vs 22)');
+  ok(coins.n > 3 && coins.nextR === 40 && coins.otherR === 32, 'tokens drawn; the stage to work on is the largest (80 px vs 64 px)');
   ok(coins.rails > 2 && !coins.crosses, 'the rail runs between the coins, never through one (' + coins.rails + ' segments)');
   ok(coins.centred && coins.centreScale > coins.edgeScale && coins.centreScale > 1.1, 'phone carousel: the current stage sits in the centre, largest, the edges shrink (' + coins.centreScale + ' vs ' + coins.edgeScale + ')');
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED');

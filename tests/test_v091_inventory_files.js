@@ -206,6 +206,21 @@ const probe = p => p.evaluate(() => { const V = _i3dView; if (!V || !V.obj) retu
     await p.waitForTimeout(2500);
     ok(await p.evaluate(() => /bad/.test(document.getElementById('i3d-msg').className) && !i3dItem('wi', 15).model), theme + ': a broken .fbx shows an error and saves nothing');
     await p.keyboard.press('Escape');
+    // Pedro's targets: 44 px controls in the picker and viewer, and at 390 the picture slides clear of the control column
+    for (const w of [390, 1440]) {
+      await p.setViewportSize({ width: w, height: 900 });
+      await p.evaluate(() => i3dPick('wi', 13)); await p.waitForTimeout(150);
+      const up = await p.evaluate(() => document.querySelector('#i3d-modal label.i3d-up').getBoundingClientRect().height);
+      ok(up >= 43.5, theme + ' ' + w + ': upload button is at least 44 px high (' + up + ')');
+      await p.evaluate(() => i3dOpen('wi', 13));
+      await p.waitForFunction(() => window._i3dView && _i3dView.ctl, null, { timeout: 20000 }).catch(() => {});
+      const t = await p.evaluate(() => { const r = q => { const b = document.querySelector(q).getBoundingClientRect(); return [b.width, b.height]; }; const v = _i3dView.cam.view; return { x: r('#i3d-modal .inv-x'), d: [...document.querySelectorAll('#i3d-modal .i3d-row .dep-btn')].map(b => b.getBoundingClientRect().height), off: v && v.enabled ? v.offsetX : null }; });
+      ok(t.x[0] >= 43.5 && t.x[1] >= 43.5, theme + ' ' + w + ': close button is 44 px (' + t.x + ')');
+      ok(t.d.length >= 2 && t.d.every(h => h >= 43.5), theme + ' ' + w + ': Change and Remove are 44 px high (' + t.d + ')');
+      ok(w === 390 ? t.off === 28 : t.off === null, theme + ' ' + w + ': picture offset clear of the controls only on a narrow stage (' + t.off + ')');
+      await p.keyboard.press('Escape');
+    }
+    await p.setViewportSize({ width: 1100, height: 900 });
     // no sideways scroll at 320 and 390
     for (const w of [320, 390]) {
       await p.setViewportSize({ width: w, height: 800 }); await p.evaluate(() => i3dPick('wi', 11)); await p.waitForTimeout(200);
