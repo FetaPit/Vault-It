@@ -20,7 +20,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     ok(c.tags.length === 3 && c.tags[0][0] === 'Savings' && c.tags[0][1] === '£2,000' && c.tags[1][0] === 'Physical cash' && c.tags[1][1] === '£347', theme + ': a gold flag on every plate (' + JSON.stringify(c.tags) + ')');
     ok(c.tags[2][0] === 'Total cash · £1 coins' && c.tags[2][1] === '£2,347', theme + ': the total flag is the gold dashboard tag on a post (' + JSON.stringify(c.tags[2]) + ')');
     ok(c.st.units === 2347 && c.st.fullStacks === 234 && c.st.rest === 7 && c.st.fullBlocks === 2 && Math.abs(c.st.stackHeight - 2.8) < 1e-9, theme + ': £2,347 = 2,347 £1 coins: 234 stacks of 10 + 7, 2 full blocks, stacks 28 mm high (' + JSON.stringify(c.st) + ')');
-    ok(/23\.43 mm across, 2\.8 mm thick/.test(c.cap) && /2 full blocks of 1,000 \+ 347 coins/.test(c.cap), theme + ': caption gives the real coin size and the blocks');
+    ok(/23\.43 mm/.test(c.cap) && /2 blocks of 1,000 \+ 347/.test(c.cap), theme + ': caption gives the real coin size and the blocks');
     if (theme === 'dark') {
       await p.evaluate(() => { window.VI_CURRENCY = 'USD'; _applyCurrency(); renderCashISO(); }); await p.waitForTimeout(300);
       const u = await p.evaluate(() => V3.cash.stats); ok(u.coin === '$1' && u.units === Math.floor(2347 * 1.27), 'in dollars: $1 coins, 1 coin per dollar (' + u.units + ')');

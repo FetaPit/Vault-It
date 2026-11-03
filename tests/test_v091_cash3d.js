@@ -26,6 +26,18 @@ const READ = () => {
   return { tags, pos, stats: V.stats };
 };
 
+// each flag line's text height on screen, in CSS px: the label sprite projected through the camera, then each line's
+// font size as a share of the label canvas (Pedro, 3 Nov: nothing under 10.5 px)
+const LABEL_PX = () => {
+  const out = [];
+  ['cash', 'metals'].forEach(k => { const V = V3[k]; if (!V) return;
+    V.root.updateMatrixWorld(true); V.cam.updateMatrixWorld(); const H = V.r.domElement.clientHeight, up = new THREE.Vector3(0, 1, 0).applyQuaternion(V.cam.quaternion);
+    V.root.traverse(o => { const F = o.userData && o.userData.v3Font; if (!F) return; const sp = o.tag || o.children[0], p = new THREE.Vector3(); sp.getWorldPosition(p);
+      const a = p.clone().addScaledVector(up, -sp.scale.y / 2).project(V.cam), b = p.clone().addScaledVector(up, sp.scale.y / 2).project(V.cam), sh = Math.abs(b.y - a.y) / 2 * H;
+      const px = F.f.filter(Boolean).map(f => +(f / F.h * sh).toFixed(1)); out.push({ stage: k, tag: o.userData.v3Tag[0], px, min: Math.min(...px) }); }); });
+  return out;
+};
+
 (async () => {
   const b = await chromium.launch({ args: GPU_ARGS }); const errs = [];
   const open = async (ctx, sub, seed) => {
@@ -210,6 +222,18 @@ const READ = () => {
     const f = await p.evaluate(() => ({ svg: getComputedStyle(document.getElementById('cashSvg')).display, cap: (document.getElementById('cashCap') || {}).textContent || '' }));
     ok(f.svg !== 'none' && /£4(,000|\.0k)/.test(f.cap), 'without WebGL the flat drawing still shows the one total (' + f.cap.slice(0, 70) + ')');
     await ctx.close();
+  }
+
+  // ── flag text is readable: every line of every flag at least 10.5 px on screen, phone and desktop ──
+  for (const [w, h, mobile] of [[390, 844, true], [1100, 800, false]]) {
+    for (const sub of ['cash', 'metals']) {
+      const ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: mobile, hasTouch: mobile }); await routeThree(ctx);
+      const p = await open(ctx, sub, SEED(ACCTS, { gold: 10, silver: 200, platinum: 0, palladium: 0 }));
+      const L = await p.evaluate(LABEL_PX);
+      const small = L.filter(x => !(x.min >= 10.5));
+      ok(L.length >= (sub === 'cash' ? 5 : 2) && !small.length, w + ' ' + sub + ': every flag line is 10.5 px or more on screen (' + L.map(x => x.tag.slice(0, 14) + ' ' + x.px.join('/')).join('; ') + ')');
+      await ctx.close();
+    }
   }
 
   ok(!errs.length, 'no page errors ' + errs.slice(0, 3).join(' | '));
