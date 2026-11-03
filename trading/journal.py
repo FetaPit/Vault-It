@@ -42,10 +42,14 @@ CREATE TABLE IF NOT EXISTS sweep_recommendations(rec_id INTEGER PRIMARY KEY AUTO
   all_in_cost_gbp REAL NOT NULL, threshold_gbp REAL NOT NULL, eligible_profit_gbp REAL NOT NULL, price_stale INTEGER NOT NULL,
   status TEXT NOT NULL CHECK(status IN ('open','acknowledged')), actual_cost_gbp REAL, acknowledged_ts TEXT);
 CREATE TABLE IF NOT EXISTS kill_switch_events(event_id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, action TEXT NOT NULL, reason TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS trials(id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, config_version TEXT NOT NULL, description TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS pledge_ledger(id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL UNIQUE, earnings_gbp REAL NOT NULL,
+  accrual_gbp REAL NOT NULL, cumulative_accrued_gbp REAL NOT NULL, hwm_gbp REAL NOT NULL);
 """
 
 _TABLES = frozenset({"meta", "config_versions", "signals", "features", "decisions", "orders", "fills",
-                     "trades", "daily_equity", "cash_flows", "sweep_recommendations", "kill_switch_events"})
+                     "trades", "daily_equity", "cash_flows", "sweep_recommendations", "kill_switch_events",
+                     "trials", "pledge_ledger"})
 _CASH_KINDS = frozenset({"initial", "topup", "dividend", "sweep_withdrawal"})
 
 
@@ -221,3 +225,69 @@ class TradeJournal:
     def daily_equity_rows(self) -> list[tuple[str, float, float]]:
         return [(r[0], r[1], r[2]) for r in self._conn.execute(
             "SELECT date, start_equity, end_equity FROM daily_equity ORDER BY date").fetchall()]
+
+    # -- trials (every backtest / config variant tried; feeds the deflated Sharpe gate)
+    def record_trial(self, ts: datetime, config_version: str, description: str = "") -> int:
+        cur = self._write("INSERT INTO trials(ts, config_version, description) VALUES(?,?,?)",
+                          (_ts(ts), config_version, description))
+        return int(cur.lastrowid or 0)
+
+    def trial_count(self) -> int:
+        return int(self._conn.execute("SELECT COUNT(*) FROM trials").fetchone()[0])
+
+    # -- evaluation queries
+    def closed_trade_rows(self, sleeve: str | None = None) -> list[tuple[str, float, float, float]]:
+        """(closed_ts, gross_pnl, fees, net_pnl) ordered by close time, optionally for one sleeve."""
+        sql = "SELECT closed_ts, gross_pnl_gbp, fees_gbp, net_pnl_gbp FROM trades"
+        params: tuple[Any, ...] = ()
+        if sleeve is not None:
+            sql += " WHERE sleeve=?"
+            params = (sleeve,)
+        rows = self._conn.execute(sql + " ORDER BY closed_ts, trade_id", params).fetchall()
+        return [(r[0], r[1], r[2], r[3]) for r in rows]
+
+    def llm_signal_blind_flags(self) -> list[tuple[str, bool]]:
+        """(signal_id, blind_tested) for every signal with source 'llm'. Flag = feature blind_tested == 1."""
+        rows = self._conn.execute(
+            "SELECT s.signal_id, COALESCE(f.value, 0.0) FROM signals s LEFT JOIN features f "
+            "ON f.signal_id = s.signal_id AND f.name = 'blind_tested' WHERE s.source = 'llm' "
+            "ORDER BY s.signal_id").fetchall()
+        return [(r[0], r[1] == 1.0) for r in rows]
+
+    def daily_equity_full(self) -> list[tuple[str, float, float, float]]:
+        """(date, start_equity, end_equity, deposits_gbp) ordered by date."""
+        return [(r[0], r[1], r[2], r[3]) for r in self._conn.execute(
+            "SELECT date, start_equity, end_equity, deposits_gbp FROM daily_equity ORDER BY date").fetchall()]
+
+    # -- pledge ledger (recommendation only)
+    def pledge_last(self) -> tuple[str, float, float, float, float] | None:
+        """Latest row: (ts, earnings, accrual, cumulative_accrued, hwm)."""
+        r = self._conn.execute("SELECT ts, earnings_gbp, accrual_gbp, cumulative_accrued_gbp, hwm_gbp "
+                               "FROM pledge_ledger ORDER BY ts DESC LIMIT 1").fetchone()
+        return None if r is None else (r[0], r[1], r[2], r[3], r[4])
+
+    def pledge_has_day(self, day: str) -> bool:
+        return self._conn.execute("SELECT 1 FROM pledge_ledger WHERE ts=?", (day,)).fetchone() is not None
+
+    def record_pledge_row(self, day: str, earnings: float, accrual: float, cumulative: float, hwm: float) -> bool:
+        """Insert one day; False (no change) if the day is already recorded."""
+        try:
+            with self._conn:
+                self._conn.execute("INSERT INTO pledge_ledger(ts, earnings_gbp, accrual_gbp, "
+                                   "cumulative_accrued_gbp, hwm_gbp) VALUES(?,?,?,?,?)",
+                                   (day, earnings, accrual, cumulative, hwm))
+            return True
+        except sqlite3.IntegrityError:
+            return False
+
+    def daily_earnings(self) -> dict[str, float]:
+        """Realised net P&L of closed trades (by UTC close date) + dividend cash flows, per day.
+        Excludes topup/initial/sweep flows and anything unrealised."""
+        out: dict[str, float] = {}
+        for ts, net in self._conn.execute("SELECT closed_ts, net_pnl_gbp FROM trades").fetchall():
+            d = _parse(ts).astimezone(timezone.utc).date().isoformat()
+            out[d] = out.get(d, 0.0) + net
+        for ts, amt in self._conn.execute("SELECT ts, amount_gbp FROM cash_flows WHERE kind='dividend'").fetchall():
+            d = _parse(ts).astimezone(timezone.utc).date().isoformat()
+            out[d] = out.get(d, 0.0) + amt
+        return dict(sorted(out.items()))

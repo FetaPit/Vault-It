@@ -148,6 +148,14 @@ class GoalConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class PledgeConfig:
+    """Ledger-only pledge of a share of earnings. Never trades, never touches sizing or risk equity."""
+    enabled: bool = True
+    rate_pct: float = 1.0
+    destination: str = "UNSET"
+
+
+@dataclass(frozen=True, slots=True)
 class PathsConfig:
     journal: str = "runtime/journal.sqlite"
     kill_switch: str = "runtime/KILL_SWITCH"
@@ -173,6 +181,7 @@ class TradingConfig:
     topup: TopUpConfig
     goal: GoalConfig
     paths: PathsConfig
+    pledge: PledgeConfig = dataclasses.field(default_factory=PledgeConfig)
 
     def instrument(self, symbol: str) -> InstrumentSpec | None:
         return self.instruments.get(symbol)
@@ -320,6 +329,7 @@ def config_from_dict(data: Mapping[str, object]) -> TradingConfig:
         topup=sec(TopUpConfig, "topup"),
         goal=sec(GoalConfig, "goal"),
         paths=sec(PathsConfig, "paths"),
+        pledge=sec(PledgeConfig, "pledge"),
     )
     validate_config(cfg)
     return cfg
@@ -343,6 +353,9 @@ def config_to_dict(cfg: TradingConfig) -> dict[str, object]:
     assert isinstance(out, dict)
     for sym, spec in out["instruments"].items():  # type: ignore[union-attr]
         spec.pop("symbol", None)
+    # Omit the default pledge block so hashes of configs stored before it existed stay unchanged.
+    if cfg.pledge == PledgeConfig():
+        out.pop("pledge", None)  # type: ignore[union-attr]
     return out
 
 
@@ -488,6 +501,10 @@ def validate_config(cfg: TradingConfig) -> None:
     except ValueError as e:
         raise ConfigError("topup.start_month: must be YYYY-MM") from e
     _check(cfg.goal.target_gbp > 0, "goal.target_gbp", "must be > 0")
+
+    pl = cfg.pledge
+    _check(0 <= pl.rate_pct <= 100, "pledge.rate_pct", "must be in [0, 100]")
+    _check(bool(pl.destination.strip()), "pledge.destination", "must be non-empty (use UNSET)")
 
 
 # ---------------------------------------------------------------- loading
