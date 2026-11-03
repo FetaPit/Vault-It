@@ -13766,6 +13766,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wi-link-kinds label{display:flex;gap:8px;align-items:center;cursor:pointer}
 .wi-link-prev{font:max(.6rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--t1);background:rgb(var(--teal-rgb) / .08);border-radius:6px;padding:8px 10px;margin:10px 0;overflow-wrap:anywhere}
 #wi-link-card [hidden]{display:none!important}
+.vi-pop.wi-liab .wi-link-kinds,.vi-pop.wi-liab #wi-link-guess,.vi-pop.wi-liab #wi-link-prev{display:none}
 .wi-mres{margin:10px 0 0;font-size:max(.66rem,var(--vi-fs-2));color:var(--t1);line-height:1.45;overflow-wrap:anywhere}
 .wi-mres p{margin:0 0 6px}
 .wi-mres details{margin:2px 0 8px;color:var(--t2)}.wi-mres summary{cursor:pointer;color:var(--teal);font-weight:600}
@@ -21724,6 +21725,8 @@ function renderAlTab(){
           +'</div>'
           +(l.runningCost>0?'<div class="wi-sub">'+gbpFmt(l.runningCost)+'/mo</div>':'')
           +(l.depRate>0?'<div class="wi-sub" style="color:var(--re)">↓'+l.depRate+'%/yr</div>':'')
+          +(l.est&&l.est.v>0?'<div class="wi-sub">Value set from a second-hand estimate, '+cfEsc(wiMoney(l.est.v))+'</div>':'')
+          +'<button class="wi-link-btn" type="button" onclick="wiLiabOpen('+l.id+')" aria-label="Second-hand prices for '+cfEsc(l.name)+'">Second-hand prices</button>'
           +'<button class="data-item-del" style="margin-top:4px;width:100%" onclick="delLiability('+l.id+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg> Remove</button>'
           +'</div>'
           +'</div>';
@@ -22109,7 +22112,7 @@ function wiLinkPreview(){
   el.textContent=i.ok?i.work+' ('+i.src+(i.at?', checked '+wiWhen(i.at):'')+')':i.note;
 }
 function wiLinkOpen(id){
-  var a=invItem(id);if(!a)return;_wiLinkId=id;_wiLinkReturn=document.activeElement;
+  var a=invItem(id);if(!a)return;_wiLinkId=id;_wiLiab=false;document.getElementById('wi-link-modal')&&document.getElementById('wi-link-modal').classList.remove('wi-liab');_wiLinkReturn=document.activeElement;
   var m=wiLinkModal(),L=a.link||{};
   document.getElementById('wi-link-title').textContent='Value of '+a.name;
   var st=document.getElementById('wl-stock'),hs=alState.stocks||[];
@@ -22130,9 +22133,10 @@ function wiLinkOpen(id){
 }
 function wiLinkClose(){
   var m=document.getElementById('wi-link-modal');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');
-  var back=_wiLinkReturn;_wiLinkReturn=null;_wiLinkId=null;_wiMk=null;if(back&&back.focus)setTimeout(function(){try{back.focus();}catch(e){}},0);
+  var back=_wiLinkReturn;_wiLinkReturn=null;_wiLinkId=null;_wiMk=null;_wiLiab=false;if(m)m.classList.remove('wi-liab');if(back&&back.focus)setTimeout(function(){try{back.focus();}catch(e){}},0);
 }
 function wiLinkSave(){if(viBlockEdit())return;
+  if(_wiLiab){var lb=wiMkItem();if(lb){lb.cond=document.getElementById('wl-mcond').value;saveAL();}wiLinkClose();renderAlTab();showToast('Condition saved');return;}
   var a=invItem(_wiLinkId),msg=document.getElementById('wi-link-msg');if(!a)return;
   var L=wiLinkRead();
   if(L&&L.type==='market'){   // Save with the market kind keeps the estimate already applied and the condition; a new estimate needs its own tap
@@ -22149,7 +22153,24 @@ function wiLinkSave(){if(viBlockEdit())return;
 }
 /* E28 part 1 (v0.9.1): second-hand price estimate. The browser talks to Supabase only (secondhand-estimate); the result is shown,
    never applied until the user taps "Use this estimate". Only derived numbers are saved on the item (no listings). */
-var _wiMk=null;
+var _wiMk=null,_wiLiab=false;
+function wiMkItem(){return _wiLiab?(alState.liabilities||[]).find(function(x){return x.id===_wiLinkId;}):invItem(_wiLinkId);}
+/* Liabilities (E28, "as well as the liabilities"): the same search from a liability tile. depreciatedValue() is untouched. A tap sets the
+   item's own value only when the item has no yearly depreciation of its own (otherwise the estimate would be counted twice); with a
+   depreciation rate the estimate is shown for information only. */
+function wiLiabOpen(id){
+  var l=(alState.liabilities||[]).find(function(x){return x.id===id;});if(!l)return;
+  _wiLinkId=id;_wiLiab=true;_wiLinkReturn=document.activeElement;_wiMk=null;
+  var m=wiLinkModal();m.classList.add('wi-liab');
+  document.getElementById('wi-link-title').textContent='Second-hand prices for '+l.name;
+  document.getElementById('wl-mq').value=(l.est&&l.est.q)||l.name||'';document.getElementById('wl-mcat').value=wiMkGuessCat(l.name);
+  document.getElementById('wl-mcond').value=l.cond||'good';document.getElementById('wl-mres').textContent='';document.getElementById('wl-mapply').hidden=true;
+  document.getElementById('wi-link-msg').textContent='';
+  ['wi-lk-manual','wi-lk-metal','wi-lk-holding'].forEach(function(i){document.getElementById(i).hidden=true;});
+  document.getElementById('wi-lk-market').hidden=false;wiMkLinks();
+  m.hidden=false;document.body.classList.add('vi-pop-open');
+  setTimeout(function(){var f=document.getElementById('wl-mq');if(f)f.focus();},30);
+}
 function wiMkGuessCat(n){n=String(n||'').toLowerCase();
   if(/\b(guitar|les paul|stratocaster|telecaster|strat|bass|amp|amplifier|pedal|synth|synthesi[sz]er|drum|violin|piano|keyboard|ukulele|fender|gibson|marshall|ibanez)\b/.test(n))return 'instruments';
   if(/\b(vinyl|lp|album|record|cd)\b/.test(n))return 'records';
@@ -22161,7 +22182,7 @@ function wiMkLinks(){
     +'<a href="https://www.discogs.com/search/?type=all&q='+q+'" target="_blank" rel="noopener noreferrer">Search Discogs</a>';
 }
 async function wiMkSearch(){
-  var a=invItem(_wiLinkId);if(!a)return;
+  var a=wiMkItem();if(!a)return;
   var q=document.getElementById('wl-mq').value.trim().slice(0,80),cond=document.getElementById('wl-mcond').value,cat=document.getElementById('wl-mcat').value;
   var res=document.getElementById('wl-mres'),ap=document.getElementById('wl-mapply'),btn=document.getElementById('wl-msearch');
   _wiMk=null;ap.hidden=true;wiMkLinks();
@@ -22183,10 +22204,14 @@ async function wiMkSearch(){
   line(i.work.split(' (')[0]+'.');
   line('From '+i.src.replace('Second-hand estimate (','').replace(/\)$/,'')+', checked '+when+'. '+(i.guide?'From a price guide, not a valuation, offer or sale price.':'Estimated from current asking prices, not a valuation, offer or sale price. Real sale prices are usually lower.')+' Not financial advice.');
   var dt=document.createElement('details');dt.innerHTML='<summary>Show working</summary>';var dv=document.createElement('div');dv.textContent=i.work+'.';dt.appendChild(dv);res.appendChild(dt);
+  if(_wiLiab&&+a.depRate>0){line('This item already loses '+a.depRate+'% a year in your liabilities, so this estimate is for information only and is not applied.');wiLinkPreview();return;}
   ap.hidden=false;wiLinkPreview();
 }
 function wiMkApply(){if(viBlockEdit())return;
-  var a=invItem(_wiLinkId);if(!a||!_wiMk)return;
+  var a=wiMkItem();if(!a||!_wiMk)return;
+  if(_wiLiab){if(+a.depRate>0)return;   // never double-count an item that depreciates on its own
+    if(a.estWas==null)a.estWas=+a.value||0;a.value=_wiMk.v;a.est={v:_wiMk.v,lo:_wiMk.lo,hi:_wiMk.hi,n:_wiMk.n,at:_wiMk.at,q:_wiMk.q,cond:_wiMk.cond};a.cond=document.getElementById('wl-mcond').value;
+    saveAL();wiLinkClose();renderAlTab();updateKPIs();showToast('Estimate applied');return;}
   a.link=_wiMk;a.cond=document.getElementById('wl-mcond').value;a.linkSnap=null;a.linkPrev=null;
   saveAL();wiLinkClose();renderAlTab();updateKPIs();showToast('Estimate applied');
 }

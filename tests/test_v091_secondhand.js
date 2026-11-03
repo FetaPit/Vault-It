@@ -21,7 +21,7 @@ const EST = { status: 'ok', q: 'Gibson Les Paul', cond: 'excellent', cat: 'instr
     });
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(t => { if (!/[?&]seed\b/.test(location.search) || localStorage.getItem('pos_al1')) return; localStorage.setItem('vi_theme', t); localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' })); localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' }));
-      localStorage.setItem('pos_al1', JSON.stringify({ otherAssets: [{ id: 1, name: 'Gibson Les Paul', value: 300 }, { id: 2, name: 'Old watch', value: 80 }], metalPrices: { gold: 2000, silver: 25, platinum: 800, palladium: 900, lastUpdated: new Date().toISOString() }, stocks: [] })); }, theme);
+      localStorage.setItem('pos_al1', JSON.stringify({ otherAssets: [{ id: 1, name: 'Gibson Les Paul', value: 300 }, { id: 2, name: 'Old watch', value: 80 }], liabilities: [{ id: 11, name: 'Gibson guitar amp', value: 500, depRate: 0, runningCost: 0, addedDate: '2025-01-01T00:00:00.000Z' }, { id: 12, name: 'Old car', value: 4000, depRate: 10, runningCost: 20, addedDate: '2025-01-01T00:00:00.000Z' }], metalPrices: { gold: 2000, silver: 25, platinum: 800, palladium: 900, lastUpdated: new Date().toISOString() }, stocks: [] })); }, theme);
     const boot = async url => { await p.goto(url); await p.waitForFunction(() => typeof wiValue === 'function' && typeof showTab === 'function', null, { timeout: 20000 }); await p.waitForTimeout(900);
       await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
       await p.evaluate(t => { if ((document.documentElement.dataset.theme || 'dark') !== t && window.viToggleTheme) viToggleTheme(); showTab('assets'); showSubtab('assets', 'other', null); }, theme);
@@ -72,6 +72,23 @@ const EST = { status: 'ok', q: 'Gibson Les Paul', cond: 'excellent', cat: 'instr
     ok(true, w + ': a deployed function with no source switched on also reads "Not available yet"');
     await p.evaluate(() => wiLinkClose()); await p.evaluate(() => wiLinkOpen(1)); await p.check('input[name="wi-lk"][value="manual"]'); await p.fill('#wl-own', '450'); await p.click('#wi-link-card button[onclick="wiLinkSave()"]'); await p.waitForTimeout(250);
     t = await tile(); ok(t.val === '£450' && t.btn === 'Link to market value', w + ': back to my own figure works');
+    // Liabilities: same search, a tap to apply, and no double counting of an item that depreciates on its own
+    await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'liabilities', null); }).catch(() => {}); await p.waitForTimeout(300);
+    const lt = () => p.evaluate(() => JSON.parse(localStorage.getItem('pos_al1')).liabilities);
+    ok(await p.evaluate(() => document.querySelectorAll('#liabilities-list button[onclick^="wiLiabOpen"]').length === 2), w + ': every liability tile offers Second-hand prices');
+    let L0 = await lt(); ok(L0[0].cond === undefined && L0[0].est === undefined && L0[0].value === 500, w + ': old liabilities load untouched');
+    mode = 'ok'; await p.evaluate(() => wiLiabOpen(11)); await p.waitForTimeout(100);
+    ok(await p.evaluate(() => !document.getElementById('wi-lk-market').hidden && !document.querySelector('.wi-link-kinds').offsetParent && document.getElementById('wl-mq').value === 'Gibson guitar amp' && document.getElementById('wl-mcat').value === 'instruments'), w + ': liability pop-up shows only the second-hand panel, words from the name');
+    await p.selectOption('#wl-mcond', 'fair'); await p.click('#wl-msearch'); await p.waitForFunction(() => /Estimate from 20 current asking prices/.test(document.getElementById('wl-mres').textContent), null, { timeout: 20000 });
+    L0 = await lt(); ok(L0[0].value === 500 && L0[0].est === undefined, w + ': the liability estimate is not applied until the tap');
+    await p.click('#wl-mapply'); await p.waitForTimeout(250); L0 = await lt();
+    ok(L0[0].value === 1148 && L0[0].estWas === 500 && L0[0].cond === 'fair' && L0[0].est.v === 1148 && L0[0].depRate === 0, w + ': tap sets the liability value (old figure kept as estWas), saves the condition: ' + JSON.stringify(L0[0]));
+    await p.evaluate(() => wiLiabOpen(12)); await p.click('#wl-msearch'); await p.waitForFunction(() => /Estimate from 20 current asking prices/.test(document.getElementById('wl-mres').textContent), null, { timeout: 20000 });
+    ok(/for information only/.test(await p.textContent('#wl-mres')) && !(await p.isVisible('#wl-mapply')), w + ': a depreciating liability gets the estimate for information only, no apply button');
+    await p.selectOption('#wl-mcond', 'poor'); await p.click('#wi-link-card button[onclick="wiLinkSave()"]'); await p.waitForTimeout(250); L0 = await lt();
+    ok(L0[1].value === 4000 && L0[1].depRate === 10 && L0[1].cond === 'poor' && L0[1].est === undefined, w + ': its value and depreciation stay, only the condition is saved');
+    ok(await p.evaluate(() => depreciatedValue.toString().replace(/\s/g, '') === 'functiondepreciatedValue(l){if(!l.depRate||l.depRate<=0)returnl.value||0;varyrs=(Date.now()-newDate(l.addedDate||Date.now()).getTime())/(1000*60*60*24*365.25);return(l.value||0)*Math.pow(1-l.depRate/100,yrs);}'), w + ': depreciatedValue() is unchanged');
+    ok(errs.length === 0, w + ': no page errors ' + errs.join('|'));
     await ctx.close();
   }
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED'); process.exit(fails ? 1 : 0);
