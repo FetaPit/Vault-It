@@ -93,7 +93,7 @@ The single list of instructed work. Every session reads it at start and before e
   - [~] (cloud) v09x/debt-cards: E33 ready for review, 78309f5, CI green (run 41672816331), rollout-qc PASS (session session_01KoffvwCD2twn9yTjpdFdQd)
   - [ ] (cloud) v09x/debt-cards follow-up E33b (owner, 3 Nov ~16:50): "What do we have iconography for these debt types if so let's apply them to the space uner the logo top right. What could we include on the reverse to give the user a reason to rotate and just give the reverse a purpose so its not just a gimmick". Pedro's 3 nits on E33 being cleared first.
   - [~] (cloud) v09x/stocks-return: E17 started (session session_01Koffvyw2o8fx22xCknVKyw)
-  - [~] (cloud) v09x/cash-accounts: E15, E16 started (session session_01KoffvwhYtD2e8aZcLKS6bj)
+  - [~] (cloud) v09x/cash-accounts: E15, E16 ready for review (green c1a9bf5, CI run 41684441447, session session_01KoffvwhYtD2e8aZcLKS6bj)
   - [~] (cloud) v09x/model-library: E30 picker started (session session_01KoffvwvF7z5Yrp72QnsYm4)
   - [~] (cloud) v09x/overview-budget: E4, E23, E5, E6 started (session session_01Koffvym9zCiVwrwgean5Mp)
   - [~] (cloud) v09x/inventory-files: E29 started, E31 later (session session_01Koffvxw7ExHqfchhM8xJfE)
