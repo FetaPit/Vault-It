@@ -13719,6 +13719,12 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wi-link-kinds label{display:flex;gap:8px;align-items:center;cursor:pointer}
 .wi-link-prev{font:max(.6rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--t1);background:rgb(var(--teal-rgb) / .08);border-radius:6px;padding:8px 10px;margin:10px 0;overflow-wrap:anywhere}
 #wi-link-card [hidden]{display:none!important}
+.wi-mres{margin:10px 0 0;font-size:max(.66rem,var(--vi-fs-2));color:var(--t1);line-height:1.45;overflow-wrap:anywhere}
+.wi-mres p{margin:0 0 6px}
+.wi-mres details{margin:2px 0 8px;color:var(--t2)}.wi-mres summary{cursor:pointer;color:var(--teal);font-weight:600}
+#wl-mapply{margin-top:4px}
+.wi-mlinks{display:flex;gap:6px 16px;flex-wrap:wrap;margin:10px 0 0}
+.wi-mlinks a{font-size:max(.66rem,var(--vi-fs-2));color:var(--teal);font-weight:600;text-decoration:underline;text-underline-offset:2px}
 .wi-link-hint{font-size:max(.52rem,var(--vi-fs-1));color:var(--t2);margin:6px 0 0}
 .wi-del{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.5);border:none;color:rgba(255,80,80,.6);font-size:max(.7rem,var(--vi-fs-3));cursor:pointer;width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;line-height:1}
 .wi-del:hover{color:#ff4444;background:rgba(255,0,0,.15)}
@@ -21783,6 +21789,15 @@ function wiLinkInfo(a){
     return {v:v2,ok:true,src:sym+(live?' live price':(+h.price>0?' price you typed':' average cost (no live price yet)')),at:live?h.updated:0,
       work:(+u.toFixed(4))+' × '+wiMoney2(px)+' ('+sym+') = '+wiMoney(v2)};
   }
+  if(L.type==='market'){   // a second-hand estimate the user chose to apply (secondhand-estimate); only the derived numbers are kept
+    var mv=+L.v||0;
+    if(!(mv>0))return {v:own,ok:false,src:'Second-hand estimate',note:'No estimate saved: showing your own figure.'};
+    var sd=(L.srcd||[]).map(function(x){return x.l+': '+x.n+' prices, middle '+wiMoney(x.m);}).join('; ');
+    var stale=L.at>0&&Date.now()-L.at>30*864e5;
+    return {v:mv,ok:true,market:true,guide:!(L.n>0),src:'Second-hand estimate ('+((L.srcs||[]).join(', ')||'listings')+')',at:L.at,
+      work:'Estimate from '+(L.n>0?L.n+' current asking prices':'a price guide')+', typically '+wiMoney(L.lo)+' to '+wiMoney(L.hi)+', adjusted for '+(L.cond||'good')+' condition ('+Math.round((+L.haircut||0)*100)+'% allowance for asking prices running above sale prices'+(+L.cf&&+L.cf!==1?', condition factor '+L.cf:'')+')'
+        +(sd?'. '+sd:'')+(L.combine==='largest source'?'. The sources disagreed, so the one with most prices is used':'')+(stale?'. Checked over 30 days ago: search again':'')};
+  }
   return null;
 }
 function wiValue(a){var i=wiLinkInfo(a);return i?i.v:(+a.value||0);}
@@ -21833,11 +21848,12 @@ function wiGuessSource(a){
 }
 function wiLinkHtml(a){
   var i=wiLinkInfo(a),chg=i&&wiSnap(a,i),hist=wiSpark(wiHist(a,i));
-  var btn='<button class="wi-link-btn" type="button" onclick="wiLinkOpen('+a.id+')" aria-label="Value of '+cfEsc(a.name)+': '+(i?'linked':'your own figure')+'. Change">'+(i?(i.ok?'Linked':'Link paused'):'Link to market value')+'</button>';
+  var btn='<button class="wi-link-btn" type="button" onclick="wiLinkOpen('+a.id+')" aria-label="Value of '+cfEsc(a.name)+': '+(i?'linked':'your own figure')+'. Change">'+(i?(i.ok?(i.market?'Estimated':'Linked'):'Link paused'):'Link to market value')+'</button>';
   if(!i)return hist+btn;
   return hist+btn+'<details class="wi-work"><summary>Show working</summary>'
     +(i.ok?'<div>'+cfEsc(i.work)+'</div><div class="wi-src">'+cfEsc(i.src)+(i.at?', checked '+wiWhen(i.at):'')+'</div>'+(chg?'<div class="wi-chg">'+chg+' ('+cfEsc(i.src)+')</div>':''):'<div>'+cfEsc(i.note)+'</div>')
     +'<div class="wi-src">Your own figure: '+wiMoney(a.value)+'</div>'
+    +(i.market?'<div class="wi-src">'+(i.guide?'From a price guide, not a valuation, offer or sale price.':'Estimated from current asking prices, not a valuation, offer or sale price. Real sale prices are usually lower.')+'</div>':'')
     +'<div class="wi-src">Estimated market value, not an offer or a valuation. Not financial advice.</div></details>';
 }
 function wiLinkModal(){
@@ -21849,7 +21865,8 @@ function wiLinkModal(){
     +'<div class="wi-link-kinds" role="radiogroup" aria-label="How this item is valued">'
     +'<label><input type="radio" name="wi-lk" value="manual" onchange="wiLinkKind()"> My own figure</label>'
     +'<label><input type="radio" name="wi-lk" value="metal" onchange="wiLinkKind()"> Precious metal by weight</label>'
-    +'<label><input type="radio" name="wi-lk" value="holding" onchange="wiLinkKind()"> Shares or a fund</label></div>'
+    +'<label><input type="radio" name="wi-lk" value="holding" onchange="wiLinkKind()"> Shares or a fund</label>'
+    +'<label><input type="radio" name="wi-lk" value="market" onchange="wiLinkKind()"> Second-hand prices (estimate)</label></div>'
     +'<p id="wi-link-guess" class="wi-link-hint wi-guess" aria-live="polite"></p>'
     +'<div id="wi-lk-manual" class="g-form" hidden><div><label class="ov-kpi-lbl" for="wl-own">Your figure (£)</label><input type="number" id="wl-own" class="al-inp" min="0" step="any" inputmode="decimal" oninput="wiLinkPreview()"></div></div>'
     +'<div id="wi-lk-metal" class="g-form" hidden>'
@@ -21861,6 +21878,15 @@ function wiLinkModal(){
     +'<div><label class="ov-kpi-lbl" for="wl-stock">Holding</label><select id="wl-stock" class="al-inp" onchange="wiLinkPreview()"></select></div>'
     +'<div><label class="ov-kpi-lbl" for="wl-units">Units</label><input type="number" id="wl-units" class="al-inp" min="0" step="any" inputmode="decimal" oninput="wiLinkPreview()"></div>'
     +'<p class="wi-link-hint">The price comes from that holding in Stocks and shares. Count these units here or there, not in both.</p></div>'
+    +'<div id="wi-lk-market" hidden>'
+    +'<div class="g-form"><div><label class="ov-kpi-lbl" for="wl-mq">Search words</label><input type="text" id="wl-mq" class="al-inp" maxlength="80" autocomplete="off" oninput="wiMkLinks()"></div>'
+    +'<div><label class="ov-kpi-lbl" for="wl-mcat">Kind of item</label><select id="wl-mcat" class="al-inp"><option value="general">Anything else</option><option value="instruments">Guitars and instruments</option><option value="records">Records and music</option><option value="games">Games and consoles</option></select></div>'
+    +'<div><label class="ov-kpi-lbl" for="wl-mcond">Condition</label><select id="wl-mcond" class="al-inp"><option value="new">New</option><option value="excellent">Excellent</option><option value="good">Good</option><option value="fair">Fair</option><option value="poor">Poor</option></select></div></div>'
+    +'<button class="btn-add-data" type="button" id="wl-msearch" onclick="wiMkSearch()" style="margin-top:10px">Search second-hand prices</button>'
+    +'<div id="wl-mres" class="wi-mres" aria-live="polite"></div>'
+    +'<button class="btn-add-data" type="button" id="wl-mapply" onclick="wiMkApply()" hidden>Use this estimate</button>'
+    +'<div id="wl-mlinks" class="wi-mlinks"></div>'
+    +'<p class="wi-link-hint">An estimate from current asking prices, not a valuation or a sale price. It is only used if you tap Use this estimate. The item words, kind and condition go through our server to the price sources named in the Privacy Notice.</p></div>'
     +'<div id="wi-link-prev" class="wi-link-prev" aria-live="polite"></div>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-add-data" type="button" onclick="wiLinkSave()">Save</button>'
     +'<button class="btn-add-data" type="button" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="wiLinkClose()">Cancel</button></div>'
@@ -21875,7 +21901,7 @@ function wiLinkPurity(sel){
 }
 function wiLinkKind(){
   var k=(document.querySelector('input[name="wi-lk"]:checked')||{}).value||'manual';
-  document.getElementById('wi-lk-manual').hidden=k!=='manual';document.getElementById('wi-lk-metal').hidden=k!=='metal';document.getElementById('wi-lk-holding').hidden=k!=='holding';
+  document.getElementById('wi-lk-manual').hidden=k!=='manual';document.getElementById('wi-lk-metal').hidden=k!=='metal';document.getElementById('wi-lk-holding').hidden=k!=='holding';document.getElementById('wi-lk-market').hidden=k!=='market';if(k==='market')wiMkLinks();
   document.getElementById('wi-link-msg').textContent='';wiLinkPreview();
 }
 function wiLinkRead(){
@@ -21883,11 +21909,14 @@ function wiLinkRead(){
   if(k==='metal'){var w=parseFloat(document.getElementById('wl-weight').value),u=document.getElementById('wl-unit').value,ps=document.getElementById('wl-purity');
     return {type:'metal',metal:document.getElementById('wl-metal').value,unit:u,grams:w>0?(u==='oz'?w*wiTroyG():w):0,purity:+ps.value,label:ps.options[ps.selectedIndex]?ps.options[ps.selectedIndex].text:''};}
   if(k==='holding'){var s=document.getElementById('wl-stock').value,un=parseFloat(document.getElementById('wl-units').value);return {type:'holding',stockId:s===''?null:+s,units:un>0?un:0};}
+  if(k==='market'){var cur=invItem(_wiLinkId),pl=_wiMk||(cur&&cur.link&&cur.link.type==='market'?cur.link:null);return pl||{type:'market',v:0};}
   return null;
 }
 function wiLinkPreview(){
   var a=invItem(_wiLinkId),el=document.getElementById('wi-link-prev');if(!a||!el)return;
   var L=wiLinkRead();if(!L){var ow=parseFloat(document.getElementById('wl-own').value);el.textContent='Shown as your own figure: '+wiMoney(ow>0?ow:a.value)+'.';return;}
+  if(L.type==='market'&&_wiMk){el.textContent='';return;}
+  if(L.type==='market'&&!_wiMk&&!(L.v>0)){el.textContent='Search, then tap Use this estimate. Nothing changes until you do.';return;}
   var i=wiLinkInfo({value:a.value,link:L});
   el.textContent=i.ok?i.work+' ('+i.src+(i.at?', checked '+wiWhen(i.at):'')+')':i.note;
 }
@@ -21902,6 +21931,8 @@ function wiLinkOpen(id){
   document.getElementById('wl-weight').value=L.grams?(L.unit==='oz'?+(L.grams/wiTroyG()).toFixed(4):+(+L.grams).toFixed(3)):'';
   if(L.stockId!=null)st.value=String(L.stockId);document.getElementById('wl-units').value=L.units||'';
   document.getElementById('wl-own').value=+a.value>0?+a.value:'';
+  _wiMk=null;document.getElementById('wl-mq').value=L.q||a.name||'';document.getElementById('wl-mcat').value=L.cat||wiMkGuessCat(a.name);
+  document.getElementById('wl-mcond').value=a.cond||L.cond||'good';document.getElementById('wl-mres').textContent='';document.getElementById('wl-mapply').hidden=true;
   var k=L.type||'manual',gs=document.getElementById('wi-link-guess');gs.textContent='';
   if(!a.link){var g=wiGuessSource(a);k=g.kind;gs.textContent=g.why;
     if(g.kind==='metal'){document.getElementById('wl-metal').value=g.metal;wiLinkPurity();}
@@ -21911,11 +21942,15 @@ function wiLinkOpen(id){
 }
 function wiLinkClose(){
   var m=document.getElementById('wi-link-modal');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');
-  var back=_wiLinkReturn;_wiLinkReturn=null;_wiLinkId=null;if(back&&back.focus)setTimeout(function(){try{back.focus();}catch(e){}},0);
+  var back=_wiLinkReturn;_wiLinkReturn=null;_wiLinkId=null;_wiMk=null;if(back&&back.focus)setTimeout(function(){try{back.focus();}catch(e){}},0);
 }
 function wiLinkSave(){if(viBlockEdit())return;
   var a=invItem(_wiLinkId),msg=document.getElementById('wi-link-msg');if(!a)return;
   var L=wiLinkRead();
+  if(L&&L.type==='market'){   // Save with the market kind keeps the estimate already applied and the condition; a new estimate needs its own tap
+    if(!(a.link&&a.link.type==='market')){msg.textContent='Search, then tap Use this estimate.';return;}
+    a.cond=document.getElementById('wl-mcond').value;saveAL();wiLinkClose();renderAlTab();updateKPIs();showToast(a.cond===a.link.cond?'Condition saved':'Condition saved. Search again to update the estimate');return;
+  }
   if(L&&L.type==='metal'&&!(L.grams>0)){msg.textContent='Enter the weight.';document.getElementById('wl-weight').focus();return;}
   if(L&&L.type==='holding'&&L.stockId==null){msg.textContent='Add the holding in Stocks and shares first.';return;}
   if(L&&L.type==='holding'&&!(L.units>0)){msg.textContent='Enter how many units.';document.getElementById('wl-units').focus();return;}
@@ -21923,6 +21958,49 @@ function wiLinkSave(){if(viBlockEdit())return;
   if(L){a.link=L;a.linkSnap=null;a.linkPrev=null;}else{delete a.link;delete a.linkSnap;delete a.linkPrev;}
   saveAL();wiLinkClose();renderAlTab();updateKPIs();
   showToast(L?'Value linked':'Back to your own figure');
+}
+/* E28 part 1 (v0.9.1): second-hand price estimate. The browser talks to Supabase only (secondhand-estimate); the result is shown,
+   never applied until the user taps "Use this estimate". Only derived numbers are saved on the item (no listings). */
+var _wiMk=null;
+function wiMkGuessCat(n){n=String(n||'').toLowerCase();
+  if(/\b(guitar|les paul|stratocaster|telecaster|strat|bass|amp|amplifier|pedal|synth|synthesi[sz]er|drum|violin|piano|keyboard|ukulele|fender|gibson|marshall|ibanez)\b/.test(n))return 'instruments';
+  if(/\b(vinyl|lp|album|record|cd)\b/.test(n))return 'records';
+  if(/\b(ps[1-5]|playstation|xbox|nintendo|switch|n64|snes|game ?boy|console|mega drive|sega)\b/.test(n))return 'games';
+  return 'general';}
+function wiMkLinks(){
+  var q=encodeURIComponent((document.getElementById('wl-mq').value||'').trim().slice(0,80)),el=document.getElementById('wl-mlinks');if(!el)return;
+  el.innerHTML='<a href="https://www.ebay.co.uk/sch/i.html?LH_Sold=1&LH_Complete=1&_nkw='+q+'" target="_blank" rel="noopener noreferrer">Search eBay sold items</a>'
+    +'<a href="https://www.discogs.com/search/?type=all&q='+q+'" target="_blank" rel="noopener noreferrer">Search Discogs</a>';
+}
+async function wiMkSearch(){
+  var a=invItem(_wiLinkId);if(!a)return;
+  var q=document.getElementById('wl-mq').value.trim().slice(0,80),cond=document.getElementById('wl-mcond').value,cat=document.getElementById('wl-mcat').value;
+  var res=document.getElementById('wl-mres'),ap=document.getElementById('wl-mapply'),btn=document.getElementById('wl-msearch');
+  _wiMk=null;ap.hidden=true;wiMkLinks();
+  if(q.length<2){res.textContent='Type what the item is first.';return;}
+  btn.disabled=true;res.textContent='Searching…';
+  var r=null;try{r=await _fnInvoke('secondhand-estimate',{q:q,cond:cond,cat:cat},15000);}catch(e){r=null;}
+  btn.disabled=false;
+  if(_wiLinkId!==a.id||!document.getElementById('wl-mres'))return;
+  var d=r&&!r.error?r.data:null;res.textContent='';
+  function line(t){var p=document.createElement('p');p.textContent=t;res.appendChild(p);return p;}
+  if(!d||d.status==='unavailable'){line('Not available yet. You can still check prices yourself with the links below, then type your own figure.');return;}
+  if(d.status==='busy'||d.status==='error'){line('Could not get an estimate just now. Try again in a minute, or use the links below.');return;}
+  var ok=d.status==='ok'&&isFinite(d.value)&&d.value>0&&isFinite(d.low)&&isFinite(d.high);
+  if(!ok){line('No reliable match found. Your figure is used. Try adding the model, year or colour, or pick a broader kind of item, or use the links below.');return;}
+  var srcs=(d.sources||[]).concat(d.guides||[]);
+  _wiMk={type:'market',v:Math.round(d.value),lo:Math.round(d.low),hi:Math.round(d.high),n:+d.n||0,at:Date.parse(d.checked)||Date.now(),q:q,cat:cat,cond:cond,haircut:+d.haircut||0,cf:+d.condFactor||1,combine:String(d.combine||''),
+    srcs:srcs.map(function(x){return String(x.label||'').slice(0,40);}),srcd:srcs.map(function(x){return {l:String(x.label||'').slice(0,40),n:+x.n||0,m:Math.round(+x.median||0)};})};
+  var i=wiLinkInfo({value:a.value,link:_wiMk}),when=new Date(_wiMk.at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  line(i.work.split(' (')[0]+'.');
+  line('From '+i.src.replace('Second-hand estimate (','').replace(/\)$/,'')+', checked '+when+'. '+(i.guide?'From a price guide, not a valuation, offer or sale price.':'Estimated from current asking prices, not a valuation, offer or sale price. Real sale prices are usually lower.')+' Not financial advice.');
+  var dt=document.createElement('details');dt.innerHTML='<summary>Show working</summary>';var dv=document.createElement('div');dv.textContent=i.work+'.';dt.appendChild(dv);res.appendChild(dt);
+  ap.hidden=false;wiLinkPreview();
+}
+function wiMkApply(){if(viBlockEdit())return;
+  var a=invItem(_wiLinkId);if(!a||!_wiMk)return;
+  a.link=_wiMk;a.cond=document.getElementById('wl-mcond').value;a.linkSnap=null;a.linkPrev=null;
+  saveAL();wiLinkClose();renderAlTab();updateKPIs();showToast('Estimate applied');
 }
 function invItem(id){return (alState.otherAssets||[]).find(function(x){return x.id===id;});}
 
@@ -27658,7 +27736,7 @@ function showPrivacy() {
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
     '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank and provider logos; it is told the website of each bank, card or investment provider you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
-    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Poly Pizza</strong> supplies free 3D models of everyday items if you pick one from its library for a wealth or liability item: your browser downloads the file straight from Poly Pizza, which sees your IP address and which model you chose, and nothing else. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
+    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Poly Pizza</strong> supplies free 3D models of everyday items if you pick one from its library for a wealth or liability item: your browser downloads the file straight from Poly Pizza, which sees your IP address and which model you chose, and nothing else. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
     '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or third-party analytics. During the beta the app records how it is used (screens opened, features used, errors and how long a visit lasts, never your figures or what you type) in our own database, to improve it; you can switch this off in Settings (Share usage). Feedback you send from the app is stored by us with the screen you were on, your last few taps and, unless you untick it, a picture of that screen with every figure hidden. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected, and what that does not mean'),
     '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
