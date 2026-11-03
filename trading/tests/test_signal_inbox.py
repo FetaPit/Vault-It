@@ -106,6 +106,14 @@ class TestInbox(unittest.TestCase):
                 self.put("a.json", {**GOOD, **bad})
                 self.assertEqual(self.one().error, f"INVALID_VALUE:{next(iter(bad))}")
 
+    def test_nonfinite_values_rejected(self) -> None:
+        for bad in ({"entry": float("nan")}, {"entry": float("inf")}, {"stop": float("nan")}):
+            with self.subTest(bad):
+                for p in self.d.glob("*.json"):
+                    p.unlink()
+                self.put("a.json", {**GOOD, **bad})
+                self.assertEqual(self.one().error, f"INVALID_VALUE:{next(iter(bad))}")
+
     def test_no_move(self) -> None:
         self.put("a.json", GOOD)
         r = read_inbox(self.d, move_files=False)

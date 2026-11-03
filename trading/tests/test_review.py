@@ -75,7 +75,9 @@ class TestReview(unittest.TestCase):
         self.assertEqual(load_config(p).sleeve_a.target_r_multiple, 1.5)
 
     def test_forbidden_key(self) -> None:
-        for key in ("risk.max_risk_per_trade_pct", "mode", "paths.journal", "version"):
+        for key in ("risk.max_risk_per_trade_pct", "mode", "paths.journal", "version",
+                    "fees.zero.slippage", "instruments.TEST.stamp_duty_rate", "fx.rates_gbp_per_unit",
+                    "sweep.multiple"):
             with self.subTest(key), self.assertRaises(ConfigError):
                 write_proposal(self.dir, self.base, {key: 0.01}, "x")
         self.assertEqual(sorted(p.name for p in self.dir.iterdir()), ["v0001.json"])

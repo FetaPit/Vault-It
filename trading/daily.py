@@ -65,11 +65,17 @@ def run_daily_close(ctx: DailyContext, d: date, now: datetime, prices_gbp: Mappi
             pf.deposit(credit.sleeve_b_gbp)
         credits.append(credit)
 
+    deposits_today = sum(c.amount_gbp for c in credits)   # top-ups must not mask the day's losses
+
+    # drawdown kill check at close (before Sleeve B can buy or DRIP)
+    pre = broker.equity_gbp(sleeve_a_marks) + pf.equity(prices_gbp)
+    ctx.risk.update_drawdown(pre, max(peak_equity_gbp, pre), now)
+
     # 2. Sleeve B daily step
     rep = ctx.sleeve_b.daily_step(d, prices_gbp, now)
     for a in rep.actions:
         if a.kind == "dividend_credit":
-            j.record_cash_flow(now, "dividend", a.amount_gbp, note=a.symbol, dedupe_key=f"div:{a.symbol}:{d}")
+            j.record_cash_flow(now, "dividend", a.amount_gbp, note=a.symbol, dedupe_key=f"div:{a.symbol}:{d}:{a.note}")
 
     # 3. buy signals through the risk engine
     decisions: list[RiskDecision] = []
@@ -80,7 +86,8 @@ def run_daily_close(ctx: DailyContext, d: date, now: datetime, prices_gbp: Mappi
             continue   # same signal id already journaled today (rerun): skip, stay idempotent
         acct = AccountState(
             fund_equity_gbp=broker.equity_gbp(sleeve_a_marks) + pf.equity(prices_gbp),
-            day_start_equity_gbp=day_start_equity_gbp, peak_equity_gbp=peak_equity_gbp,
+            day_start_equity_gbp=day_start_equity_gbp + deposits_today,
+            peak_equity_gbp=peak_equity_gbp,
             trades_today=trades_today, open_positions=broker.open_positions(),
             sleeve_equity_gbp=pf.equity(prices_gbp), sleeve_open_notional_gbp=pf.market_value(prices_gbp),
             sleeve_cash_gbp=pf.cash_gbp,

@@ -99,6 +99,7 @@ class Backtester:
         trades_before = len(b.closed_trades)
         trades_today = 0
         halted = False
+        ks_logged = False
         self._strategy.on_session_start(d, window)
         bars: list[Bar] = []
         for sym in cfg.sleeve_a.symbols:
@@ -106,6 +107,8 @@ class Backtester:
         bars.sort(key=lambda x: (x.ts, x.symbol))
 
         for bar in bars:
+            if self._ks.is_active():
+                b.cancel_all_pending(bar.ts, Sleeve.A)   # no new entries once the kill switch is on
             b.on_bar(bar)
             self._marks[bar.symbol] = bar.close
             eq = self._fund_equity()
@@ -116,12 +119,14 @@ class Backtester:
             if reason in (ExitReason.KILL_SWITCH, ExitReason.DAILY_CAP) and not halted:
                 had_exposure = bool(b.open_positions() or b.pending_orders())
                 b.flatten(self._marks, bar.end_ts, reason)
+                if reason == ExitReason.KILL_SWITCH and j is not None and not ks_logged:
+                    ks_logged = True   # journal once per day, with or without exposure
+                    j.record_kill_event(bar.end_ts, "flatten" if had_exposure else "active",
+                                        self._ks.reason() or "kill switch")
                 if had_exposure:
                     # Stop generating signals only once exposure was actually flattened; otherwise let
                     # the risk engine veto (and journal) any signal with its reason codes.
                     halted = True
-                    if reason == ExitReason.KILL_SWITCH and j is not None:
-                        j.record_kill_event(bar.end_ts, "flatten", self._ks.reason() or "kill switch")
             elif reason == ExitReason.TIME_FLAT:
                 b.flatten(self._marks, bar.end_ts, ExitReason.TIME_FLAT)
                 continue

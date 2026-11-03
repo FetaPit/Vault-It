@@ -42,6 +42,18 @@ class TestSleeveBManager(unittest.TestCase):
         a = [x for x in rep.actions if x.kind == "dividend_credit"][0]
         self.assertAlmostEqual(a.amount_gbp, 5.0, places=6)
 
+    def test_same_day_rerun_no_double_credit(self) -> None:
+        pf, _, m = mk(events=[exdiv(date(2027, 3, 1)), pay(date(2027, 3, 20), date(2027, 3, 1))])
+        pf.buy("DIVA", 10, 20.0, 0.0, 16.0)
+        m.daily_step(date(2027, 3, 1), {"DIVA": 20.0}, NOW)
+        m.daily_step(date(2027, 3, 1), {"DIVA": 20.0}, NOW)   # rerun must not re-snapshot
+        self.assertEqual(m.entitlements()[("DIVA", date(2027, 3, 1))], 10)
+        m.daily_step(date(2027, 3, 20), {"DIVA": 20.0}, NOW)
+        cash = pf.cash_gbp
+        rep = m.daily_step(date(2027, 3, 20), {"DIVA": 20.0}, NOW)
+        self.assertNotIn("dividend_credit", kinds(rep))
+        self.assertAlmostEqual(pf.cash_gbp, cash, places=9)
+
     def test_bought_on_exdate_not_entitled(self) -> None:
         pf, _, m = mk(events=[exdiv(date(2027, 3, 1)), pay(date(2027, 3, 20), date(2027, 3, 1))])
         m.daily_step(date(2027, 3, 1), {"DIVA": 20.0}, NOW)

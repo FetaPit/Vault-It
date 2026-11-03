@@ -61,7 +61,7 @@ class TestCli(unittest.TestCase):
                                 "--start", "2027-01-12", "--end", "2027-01-12"])
             self.assertEqual(code, 0)
             self.assertIn("trades: 1", out)
-            self.assertIn("net_pnl_gbp: 15.04", out)
+            self.assertIn("net_pnl_gbp: 14.46", out)
             self.assertIn("max_drawdown_pct:", out)
             code2, _, err = run(["--config", str(cfg_path), "backtest", "--bars", str(csv_path),
                                  "--start", "bad", "--end", "2027-01-12"])

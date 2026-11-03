@@ -38,6 +38,9 @@ class TestConfig(unittest.TestCase):
     def test_risk_over_3pct_rejected(self) -> None:
         self._raises({"risk": {"max_risk_per_trade_pct": 0.031}})
 
+    def test_sweep_multiple_below_2_rejected(self) -> None:
+        self._raises({"sweep": {"multiple": 1.5}})
+
     def test_daily_cap_over_3pct_rejected(self) -> None:
         self._raises({"risk": {"daily_loss_cap_pct": 0.05}})
 

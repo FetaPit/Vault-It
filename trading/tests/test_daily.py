@@ -24,7 +24,7 @@ class TestDaily(unittest.TestCase):
         self.addCleanup(self.j.close)
         self.broker = PaperBroker(cfg, fx, 312.5, self.j)
         self.pf = DividendPortfolio(312.5)
-        ks = KillSwitch(None)
+        ks = self.ks = KillSwitch(None)
         self.ctx = DailyContext(cfg, self.j, self.broker, self.pf,
                                 SleeveBManager(cfg, self.pf, EventCalendar([]), ks, fx),
                                 RiskEngine(cfg, ks, fx), TopUpScheduler.from_config(cfg),
@@ -70,6 +70,25 @@ class TestDaily(unittest.TestCase):
         self.assertEqual(self.j.count("decisions"), len(rep.decisions))
         again = self.close(date(2027, 3, 2), {"DIVA": 20.0})   # same-day rerun: duplicate signal skipped
         self.assertEqual(again.decisions, ())
+
+    def test_topup_does_not_hide_daily_loss(self) -> None:
+        # top-up day (+100): day-start is lifted by the deposit, so a Sleeve A loss above 3% still trips the cap
+        self.broker._cash -= 22.0
+        rep = self.close(date(2027, 2, 1), {"DIVA": 20.0})
+        self.assertGreaterEqual(len(rep.decisions), 1)
+        for d in rep.decisions:
+            self.assertFalse(d.approved)
+            self.assertIn("DAILY_LOSS_CAP_HIT", d.reasons)
+
+    def test_drawdown_kill_at_close(self) -> None:
+        self.broker._cash += 115.0   # fund 840 after the 100 top-up, 16% below the 1000 peak
+        self.pf.buy("DIVA", 1, 20.0, 0.0, 16.0)
+        self.pf.credit_dividend("DIVA", 5.0, 0.0)   # DRIP would normally buy
+        rep = run_daily_close(self.ctx, date(2027, 2, 1), utc(2027, 2, 1, 17, 0), {"DIVA": 20.0}, {}, 840.0,
+                              1000.0, 0)
+        self.assertTrue(self.ks.is_active())
+        self.assertNotIn("drip_buy", [a.kind for a in rep.sleeve_b.actions])
+        self.assertFalse(any(d.approved for d in rep.decisions))
 
 
 if __name__ == "__main__":

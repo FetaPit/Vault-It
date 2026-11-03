@@ -36,11 +36,12 @@ class TestBacktest(unittest.TestCase):
         r = bt(BT1).run(D, D)
         self.assertEqual(len(r.trades), 1)
         t = r.trades[0]
-        self.assertAlmostEqual(t.quantity, 3.07, places=6)
+        # FIX-002: fill 101.6 vs signal 101.5 -> qty 3.07 reduced to 2.95 (3.07*2.5/2.6)
+        self.assertAlmostEqual(t.quantity, 2.95, places=6)
         self.assertAlmostEqual(t.entry_price, 101.6, places=6)
         self.assertAlmostEqual(t.exit_price, 106.5, places=6)
-        self.assertAlmostEqual(t.net_pnl_gbp, 15.043, places=3)
-        self.assertAlmostEqual(r.final_equity_gbp, 327.543, places=3)
+        self.assertAlmostEqual(t.net_pnl_gbp, 14.455, places=3)
+        self.assertAlmostEqual(r.final_equity_gbp, 326.955, places=3)
         self.assertEqual(t.exit_reason, ExitReason.TARGET)
 
     def test_time_flat(self) -> None:
@@ -48,13 +49,21 @@ class TestBacktest(unittest.TestCase):
         t = r.trades[0]
         self.assertEqual(t.exit_reason, ExitReason.TIME_FLAT)
         self.assertAlmostEqual(t.exit_price, 102.2, places=6)
-        self.assertAlmostEqual(t.net_pnl_gbp, 1.842, places=3)
+        self.assertAlmostEqual(t.net_pnl_gbp, 1.77, places=3)
 
     def test_kill_switch_blocks(self) -> None:
         ks = KillSwitch(None)
         ks.activate("test", START)
         r = bt(BT1, ks=ks).run(D, D)
         self.assertEqual((r.n_signals, r.n_rejected, len(r.trades)), (1, 1, 0))
+
+    def test_kill_event_journaled_once_without_exposure(self) -> None:
+        ks = KillSwitch(None)
+        ks.activate("test", START)
+        j = TradeJournal(":memory:")
+        bt(BT1, journal=j, ks=ks).run(D, D)
+        self.assertEqual(j.count("kill_switch_events"), 1)
+        j.close()
 
     def test_dst_mismatch_day(self) -> None:
         r = bt(BT1, start=utc(2027, 3, 15, 13, 30)).run(date(2027, 3, 15), date(2027, 3, 15))
@@ -78,6 +87,24 @@ class TestBacktest(unittest.TestCase):
         self.assertLessEqual(sum(d.risk_gbp for d in decisions if d.approved), 18.75 + 1e-9)
         j.close()
 
+    def test_kill_switch_between_bars_blocks_pending_fill(self) -> None:
+        ks = KillSwitch(None)
+        j = TradeJournal(":memory:")
+        bk = bt(BT1, journal=j, ks=ks)
+        orig = bk._risk.evaluate
+
+        def spy(*a, **k):
+            d = orig(*a, **k)
+            if d.approved:
+                ks.activate("test", START)   # kill switch appears after submit, before the next bar
+            return d
+        bk._risk.evaluate = spy  # type: ignore[method-assign]
+        r = bk.run(D, D)
+        self.assertEqual(len(r.trades), 0)
+        self.assertEqual(j.count("fills"), 0)
+        self.assertEqual(j.count("orders"), 1)
+        j.close()
+
     def test_weekend_skipped(self) -> None:
         r = bt(BT1).run(date(2027, 1, 16), date(2027, 1, 17))
         self.assertEqual(len(r.trades), 0)
@@ -97,7 +124,7 @@ class TestBacktest(unittest.TestCase):
         r = bt([(20, 101.6, 102, 101.2, 101.9), (25, 95, 95.5, 94, 94.5)], journal=j).run(D, D)
         t = r.trades[0]
         self.assertAlmostEqual(t.exit_price, 95.0, places=6)
-        self.assertAlmostEqual(t.net_pnl_gbp, 3.07 * (95 - 101.6), places=6)
+        self.assertAlmostEqual(t.net_pnl_gbp, 2.95 * (95 - 101.6), places=6)
         self.assertLess(t.net_pnl_gbp, -7.675)
         self.assertLess(r.daily_equity[0][1], 312.5)
         row = j.daily_equity_rows()[0]
@@ -112,7 +139,7 @@ class TestBacktest(unittest.TestCase):
         r = bt(BT1).run(D, D)
         self.assertEqual(r.win_rate, 1.0)
         self.assertEqual(r.max_drawdown_pct, 0.0)
-        self.assertAlmostEqual(r.net_pnl_gbp, 15.043, places=3)
+        self.assertAlmostEqual(r.net_pnl_gbp, 14.455, places=3)
 
 
 if __name__ == "__main__":

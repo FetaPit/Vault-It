@@ -43,6 +43,7 @@ class SleeveBManager:
         self._ks = kill_switch
         self._fx = fx
         self._entitlements: dict[tuple[str, date], float] = {}
+        self._paid: set[tuple[str, date, date]] = set()
 
     def entitlements(self) -> dict[tuple[str, date], float]:
         return dict(self._entitlements)
@@ -56,14 +57,16 @@ class SleeveBManager:
         for e in self._cal.events_on(d, [EventType.EX_DIVIDEND]):
             assert e.symbol is not None
             h = pf.holding(e.symbol)
-            self._entitlements[(e.symbol, d)] = h.quantity if h is not None else 0.0
+            if (e.symbol, d) not in self._entitlements:
+                self._entitlements[(e.symbol, d)] = h.quantity if h is not None else 0.0
 
         # 2. dividend payments
         for e in self._cal.events_on(d, [EventType.DIVIDEND_PAY]):
             assert e.symbol is not None and e.amount is not None and e.ref_date is not None
             qty = self._entitlements.get((e.symbol, e.ref_date), 0.0)
             inst = cfg.instrument(e.symbol)
-            if qty > 0 and inst is not None:
+            if qty > 0 and inst is not None and (e.symbol, d, e.ref_date) not in self._paid:
+                self._paid.add((e.symbol, d, e.ref_date))
                 net = pf.credit_dividend(e.symbol, qty * e.amount, inst.dividend_withholding_pct)
                 actions.append(SleeveBAction("dividend_credit", e.symbol, qty, e.amount, net, 0.0,
                                              f"ref {e.ref_date.isoformat()}"))

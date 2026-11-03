@@ -468,7 +468,7 @@ def validate_config(cfg: TradingConfig) -> None:
                f"no fx rate for {i.currency}")
 
     sw = cfg.sweep
-    _check(sw.multiple >= 1.0, "sweep.multiple", "must be >= 1.0")
+    _check(sw.multiple >= 2.0, "sweep.multiple", "must be >= 2.0")
     _check(sw.stale_price_days >= 1, "sweep.stale_price_days", "must be >= 1")
     for c in sw.coins:
         key = f"sweep.coins.{c.name}"

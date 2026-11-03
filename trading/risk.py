@@ -1,6 +1,7 @@
 """Risk engine: veto and position sizing between every signal source and the broker."""
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -93,11 +94,14 @@ class RiskEngine:
             reasons.append(MODE_NOT_PAPER)
         if inst is None:
             reasons.append(UNKNOWN_INSTRUMENT)
-        if signal.entry <= 0:
+        entry_ok = math.isfinite(signal.entry) and signal.entry > 0
+        if not entry_ok:
             reasons.append(INVALID_ENTRY_PRICE)
         if signal.stop is None:
             reasons.append(NO_STOP)
-        elif signal.entry > 0:
+        elif not math.isfinite(signal.stop) or signal.stop <= 0:
+            reasons.append(STOP_WRONG_SIDE)
+        elif entry_ok:
             dist = abs(signal.entry - signal.stop)
             if dist <= 1e-12:
                 reasons.append(STOP_ZERO)

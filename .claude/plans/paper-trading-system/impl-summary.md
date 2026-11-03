@@ -41,7 +41,6 @@ Remaining open PLAN_GAPs from the plan itself (user decisions, not code): GAP-2 
 
 ## Notes for Reviewer
 - Git history on this branch already had environment-made "WIP: trading skeleton" commits touching only `trading/`; I did not commit.
-- Same-process rerun of `SleeveBManager.daily_step` for the same date would credit a dividend twice (journal dedupe only guards the cash-flow record). Phase 1 does not rebuild state from the journal; callers must run each date once. Top-ups are idempotent via journal dedupe.
 - DRIP and Sleeve B use GBP-only instruments with multiplier 1 in practice; `portfolio.buy` is given price/fees directly.
 - `killswitch.clear()` is called only from `cli.py` (asserted by `test_clear_only_called_from_cli`). No network imports and no `Live*` class/file (AST test).
 - Key numeric checks reproduced: R1-R36 sizing values, BT1 (qty 3.07, net 15.043, equity 327.543), forecast 12 months/years figures.

@@ -44,6 +44,7 @@ LLM path
   LLM writes runtime/inbox/*.json -> read_inbox (schema; size fields rejected)
     -> Signal(source="llm") -> the SAME RiskEngine.evaluate -> broker
   (the LLM never imports or calls the broker)
+  Phase 1: `read_inbox` is not wired to any runner; any runner MUST pass each Signal through `RiskEngine.evaluate` before `submit_bracket`.
 
 Daily close (17:00 London)
   run_daily_close -> TopUpScheduler.pending (journal dedupe) -> deposits (broker, portfolio)
@@ -93,7 +94,7 @@ Entry drift is capped at fill time: each entry fill is re-checked against the pl
 
 ## 4. Kill switch
 
-A file at `runtime/KILL_SWITCH` or an in-memory flag. Fail-closed: any `OSError` while checking counts as active. Auto-tripped at 15% drawdown from peak. Effects: Sleeve A flattened, pending orders cancelled, all buys including DRIP blocked, exits (stops, targets, tranche sells) still allowed. Sleeve B holdings are frozen, not liquidated. Cleared only by a human via `python3 -m trading.cli killswitch off`; no engine code calls `clear()`.
+A file at `runtime/KILL_SWITCH` or an in-memory flag. Fail-closed: any `OSError` while checking counts as active. Auto-tripped at 15% drawdown from peak (checked on every bar in the backtester and at daily close, after top-ups and before Sleeve B actions). Effects: Sleeve A flattened, pending orders cancelled, all buys including DRIP blocked, exits (stops, targets, tranche sells) still allowed. Sleeve B holdings are frozen, not liquidated. Cleared only by a human via `python3 -m trading.cli killswitch off`; no engine code calls `clear()`.
 
 ## 5. Paper-only guard (three layers)
 

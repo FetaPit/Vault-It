@@ -58,6 +58,17 @@ class TestRisk(unittest.TestCase):
     def test_stop_wrong_side(self) -> None:
         self.assertIn("STOP_WRONG_SIDE", self.ev(make_signal(stop=101.0)).reasons)
 
+    def test_negative_or_nonfinite_stop_rejected(self) -> None:
+        for stop in (-1.0, 0.0, float("nan"), float("inf")):
+            with self.subTest(stop):
+                d = self.ev(make_signal(stop=stop))
+                self.assertFalse(d.approved)
+                self.assertIn("STOP_WRONG_SIDE", d.reasons)
+
+    def test_nonfinite_entry_rejected(self) -> None:
+        d = self.ev(make_signal(entry=float("nan")))
+        self.assertIn("INVALID_ENTRY_PRICE", d.reasons)
+
     def test_stop_too_tight(self) -> None:
         self.assertIn("STOP_TOO_TIGHT", self.ev(make_signal(stop=99.97)).reasons)
 

@@ -34,7 +34,8 @@ class ReviewReport:
     message: str
 
 
-FORBIDDEN_PROPOSAL_PREFIXES: tuple[str, ...] = ("risk.", "mode", "paths.", "schema_version", "version")
+FORBIDDEN_PROPOSAL_PREFIXES: tuple[str, ...] = ("risk.", "mode", "paths.", "schema_version", "version",
+                                                       "fees.", "instruments.", "fx.", "sweep.multiple")
 
 
 def compute_stats(trades: Sequence[ClosedTrade]) -> ReviewStats:
