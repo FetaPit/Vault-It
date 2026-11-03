@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /* Builds the Vault-It icon pack v2 from brand/icons/icons-v2.src.js.
- * Names, groups, colours and uses come from the v1 pack in the brand book, so ids stay the same (vi-<id>).
+ * Names, groups, colours and uses come from the frozen v1 pack (brand/icons/icons-v1.json), so ids stay the same (vi-<id>).
  * Writes:
+ *   brand/vault-it-brand-book.html     its ICONS data becomes v2 (plus ICONS_V1 for the Weight comparison)
  *   brand/vault-it-icons-v2.svg        sprite, currentColor, paste once per page
  *   brand/vault-it-icons-v2.json       manifest (id, name, group, colour token, Night and Daylight hex, uses)
  *   brand/icons/svg/night/vi-*.svg     one file per icon in its Night colour (for decks, Canva, print)
@@ -18,9 +19,8 @@ const BOOK = path.join(ROOT, 'brand', 'vault-it-brand-book.html');
 const { ICONS: V2 } = require(path.join(ROOT, 'brand', 'icons', 'icons-v2.src.js'));
 
 const book = fs.readFileSync(BOOK, 'utf8');
-const line = book.split('\n').find((l) => l.startsWith('var ICONS='));
-if (!line) throw new Error('ICONS not found in the brand book');
-const V1 = JSON.parse(line.slice('var ICONS='.length).trim().replace(/;$/, ''));
+// v1 is frozen in its own file; the brand book itself now carries v2 (written below).
+const V1 = JSON.parse(fs.readFileSync(path.join(ROOT, 'brand', 'icons', 'icons-v1.json'), 'utf8'));
 
 const TOK = {};
 for (const m of book.matchAll(/v:"(--[a-z0-9]+)",hex:"(#[0-9A-Fa-f]+)",lt:"(#[0-9A-Fa-f]+)"/g)) TOK[m[1]] = { hex: m[2], lt: m[3] };
@@ -178,6 +178,30 @@ var q=new URLSearchParams(location.search);if(q.get("theme"))r.setAttribute("dat
 </body></html>
 `;
 save('brand/icons/preview-v2.html', html);
+
+// Brand book: replace its icon data with v2 (layers f k s d, nodes as o since n is the name),
+// plus the v1 drawings the Weight section compares against.
+{
+  const CMP = ['vault', 'house-builder', 'overview', 'debt-total', 'calendar'];
+  const data = list.map((ic) => {
+    const o = { id: ic.id, n: ic.n, g: ic.g, c: ic.c, u: ic.u };
+    for (const k of ['f', 'k', 's', 'd']) if (ic.v2[k]) o[k] = ic.v2[k];
+    if (ic.v2.n) o.o = ic.v2.n;
+    return o;
+  });
+  const v1cmp = {};
+  CMP.forEach((id) => { const m = V1.find((x) => x.id === id); v1cmp[id] = { f: m.f, s: m.s, d: m.d }; });
+  const eol = book.includes('\r\n') ? '\r\n' : '\n';
+  const lines = book.split(/\r?\n/);
+  const i = lines.findIndex((l) => l.startsWith('var ICONS='));
+  if (i < 0) throw new Error('ICONS not found in the brand book');
+  const j = lines.findIndex((l) => l.startsWith('var ICONS_V1='));
+  const newLines = ['var ICONS=' + JSON.stringify(data) + ';', 'var ICONS_V1=' + JSON.stringify(v1cmp) + ';'];
+  if (j === i + 1) lines.splice(i, 2, ...newLines);
+  else lines.splice(i, 1, ...newLines);
+  fs.writeFileSync(BOOK, lines.join(eol));
+  out.push('brand/vault-it-brand-book.html (ICONS now v2)');
+}
 
 // Optional copy
 const oi = process.argv.indexOf('--out');
