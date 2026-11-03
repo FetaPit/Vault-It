@@ -20,10 +20,12 @@ Open `vault-it-brand-book.html` in a browser first. It is the visual and behavio
 
 Each inventory tile and liability tile has a 🧊 button to attach an open-licence 3D model, then **View in 3D** to orbit it.
 
-Models are fetched at build time from Poly Pizza (CC0 and CC-BY only, under 20k triangles), compressed, and named by content hash so they can be cached forever. No API key reaches the browser.
+Models are fetched at build time from Poly Pizza and Sketchfab (downloadable, CC0 and CC-BY only, under 20k triangles), compressed, and named by content hash so they can be cached forever. No API key reaches the browser.
 
 ```bash
-POLY_PIZZA_KEY=your_key node tools/fetch-models.mjs   # key: https://poly.pizza/settings/api
+POLY_PIZZA_KEY=your_key SKETCHFAB_TOKEN=your_token node tools/fetch-models.mjs
+# keys: https://poly.pizza/settings/api and https://sketchfab.com/settings/password (API token)
+# Sketchfab only runs when SKETCHFAB_TOKEN is set; --sources polypizza,sketchfab picks sources
 tools/upload-models.sh                                # to R2: ptlive-assets/vault-it/models
 ```
 

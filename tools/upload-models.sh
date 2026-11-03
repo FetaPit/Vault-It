@@ -12,6 +12,8 @@ put() { npx --yes wrangler r2 object put "$BUCKET/$PREFIX/$1" --file "$1" --cont
 
 for f in glb/*.glb;   do [ -e "$f" ] && put "$f" model/gltf-binary "$IMMUTABLE"; done
 for f in thumb/*.webp; do [ -e "$f" ] && put "$f" image/webp "$IMMUTABLE"; done
+for f in thumb/*.jpg;  do [ -e "$f" ] && put "$f" image/jpeg "$IMMUTABLE"; done
+for f in thumb/*.png;  do [ -e "$f" ] && put "$f" image/png "$IMMUTABLE"; done
 # catalogue last, so it never points at files that haven't landed; short cache so updates show up quickly
 put catalog.json application/json "public, max-age=300"
 put CREDITS.md text/markdown "public, max-age=3600"
