@@ -10894,6 +10894,7 @@ button.bd-ic{cursor:pointer}
 .i3d-li small{font-size:11px;color:var(--t2);text-align:center;overflow-wrap:anywhere}
 .i3d-li small.i3d-close{color:var(--amber);font-weight:600}
 .i3d-li:hover{border-color:var(--teal)}
+@media (pointer:coarse){.i3d-q{min-height:44px}.i3d-chip{min-height:44px;padding:8px 14px}}
 .i3d-link{background:none;border:0;padding:0;font:inherit;color:var(--teal);text-decoration:underline;cursor:pointer}
 .i3d-credits{max-height:min(60vh,520px);overflow:auto;font-size:12px;color:var(--t2);line-height:1.5}
 .i3d-credits ul{margin:0;padding-left:18px}.i3d-credits li{margin:0 0 6px;overflow-wrap:anywhere}.i3d-credits a{color:var(--teal)}
@@ -22332,7 +22333,7 @@ var _i3dCat=null,_i3dCatP=null,_i3dQ={set:'all'};
 function i3dCatalog(){
   if(_i3dCat)return Promise.resolve(_i3dCat);
   return _i3dCatP||(_i3dCatP=fetch(I3D_BASE+'catalog.json',{credentials:'omit'}).then(function(r){if(!r.ok)throw new Error('status '+r.status);return r.json();})
-    .then(function(j){_i3dCat=(j&&j.models)||[];return _i3dCat;})
+    .then(function(j){_i3dCat=(j&&j.models)||[];_i3dCat.forEach(function(m){if(!m.uid)m.uid=(m.set||'')+':'+String(m.item||m.title||m.id).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');});return _i3dCat;})
     .catch(function(){_i3dCatP=null;throw new Error('Could not load the model library. Check the connection and try again, or upload a 3D file instead.');}));
 }
 function i3dNorm(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();}
@@ -22355,7 +22356,7 @@ function i3dResults(cat,q,set,name){
   out.sort(function(a,b){return b.sc-a.sc||a.ix-b.ix;});
   return out.map(function(o){return o.m;});
 }
-function i3dMeta(m){return {src:'lib',cid:m.id,t:m.title,by:m.creator,lic:/CC-BY/i.test(m.licence||'')?'CC-BY':'CC0',licFull:m.licence||'',file:m.file,item:m.item||'',standin:!!m.standin,standinFor:m.standinFor||'',url:m.source||'',attr:m.attribution||''};}
+function i3dMeta(m){return {src:'lib',cid:m.uid,pid:m.id,t:m.title,by:m.creator,lic:/CC-BY/i.test(m.licence||'')?'CC-BY':'CC0',licFull:m.licence||'',file:m.file,item:m.item||'',standin:!!m.standin,standinFor:m.standinFor||'',url:m.source||'',attr:m.attribution||''};}
 function i3dCredit(m){return m&&m.lic==='CC-BY'?(m.attr||'"'+m.t+'" by '+m.by+(m.url?', '+m.url:'')+'. Licence: CC-BY 3.0, https://creativecommons.org/licenses/by/3.0. Full credit under 3D model credits.'):'';}
 function i3dCreditShort(m){return '"'+m.t+'" by '+m.by+' · '+(m.licFull||m.lic||'');}
 /* the credit line on the item's tile: CC-BY credit, and a plain "close match" note when the model only stands in for the item */
@@ -22443,9 +22444,9 @@ function i3dCol(h){return new THREE.Color(h).convertSRGBToLinear();}
 /* owner, 31 Oct: no green tint; every model shows its own colours and textures. Oversized textures are scaled down once (2048 px,
    1024 on touch devices) so a big upload does not stall the page or run a phone out of graphics memory. */
 function i3dSlimTex(t,max){
-  var im=t&&t.image;if(!im||t.userData.i3dSlim)return;var w=im.width||0,h=im.height||0;if(!(w>max||h>max))return;
+  var im=t&&t.image;if(!im||t._i3dSlim)return;var w=im.width||0,h=im.height||0;if(!(w>max||h>max))return;
   try{var k=max/Math.max(w,h),c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));
-    c.getContext('2d').drawImage(im,0,0,c.width,c.height);t.image=c;t.needsUpdate=true;t.userData.i3dSlim=true;}catch(e){}
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);t.image=c;t.needsUpdate=true;t._i3dSlim=true;}catch(e){}
 }
 function i3dStyle(obj){
   var n=0,max=viCoarse()?1024:2048;
@@ -22601,7 +22602,7 @@ function i3dFilter(){
   if(c)c.textContent=list.length?list.length+(list.length===1?' model':' models')+(q.trim()?'':' (best matches for this item first)'):'No models match "'+q.trim()+'". Try another word, or upload your own file.';
   g.innerHTML=list.map(function(m){
     var set=(I3D_SETS.find(function(s){return s[0]===m.set;})||[0,m.set])[1];
-    return '<button type="button" class="i3d-li" data-cid="'+cfEsc(m.id)+'" onclick="i3dPickLib('+K+',\''+cfEsc(m.id)+'\')">'
+    return '<button type="button" class="i3d-li" data-cid="'+cfEsc(m.uid)+'" onclick="i3dPickLib('+K+',\''+cfEsc(m.uid)+'\')">'
       +'<img src="'+I3D_BASE+cfEsc(m.thumb)+'" alt="" loading="lazy" decoding="async" onerror="this.style.visibility=\'hidden\'">'
       +'<span>'+cfEsc(m.title)+'</span>'
       +'<small>'+cfEsc(set)+' · '+(/CC-BY/i.test(m.licence||'')?'CC-BY':'CC0')+'</small>'
@@ -22638,7 +22639,7 @@ function i3dUpload(kind,id,input){
     .then(function(){i3dOpen(kind,id);},function(e){i3dMsg(e.message||String(e),true);});
 }
 function i3dPickLib(kind,id,cid){
-  if(_i3dBusy)return;var m=(_i3dCat||[]).find(function(x){return x.id===cid;});if(!m)return;
+  if(_i3dBusy)return;var m=(_i3dCat||[]).find(function(x){return x.uid===cid;});if(!m)return;
   _i3dBusy=true;i3dMsg('Loading "'+m.title+'"…');
   i3dFetchLib(m.file).then(function(buf){return i3dSave(kind,id,buf,i3dMeta(m));})
     .then(function(){_i3dBusy=false;i3dOpen(kind,id);},function(e){_i3dBusy=false;i3dMsg(e.message||String(e),true);});

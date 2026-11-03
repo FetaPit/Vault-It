@@ -4,6 +4,7 @@
 // Run: node tests/test_item3d.js
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
+const INDEX_URL = process.env.VI_INDEX ? 'file://' + process.env.VI_INDEX : 'file:///home/user/Vault-It/index.html';   // VI_INDEX: test another copy of index.html
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 // a tiny red pyramid as a .glb (built here so the test needs no model files)
 function glb() {
@@ -43,7 +44,7 @@ const idbHas = (p, key) => p.evaluate(k => invTx('readonly', s => s.get(k)).then
       : /\.glb$/.test(url) ? (cdn === 'ok' ? { s: 200, type: 'model/gltf-binary', b64: GLB.toString('base64') } : { s: 403, type: 'text/html', b64: Buffer.from('<title>no</title>').toString('base64') }) : { s: 404, type: 'text/plain', b64: '' });
     await ctx.addInitScript(() => { const of = window.fetch; window.fetch = function (u) { const url = String(u && u.url || u); if (!/(^|\/)models\//.test(url)) return of.apply(this, arguments);
       return window.__models(url).then(r => { const bin = atob(r.b64), a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return new Response(r.s === 404 ? null : a, { status: r.s, headers: { 'content-type': r.type } }); }); }; });
-    await p.addInitScript(seed, theme); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+    await p.addInitScript(seed, theme); await p.goto(INDEX_URL); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await p.evaluate(() => { showTab('assets'); renderAlTab(); }); await p.waitForTimeout(500);
     ok(await p.evaluate(() => !!document.querySelector('#other-assets-list .i3d-btn') && !!document.querySelector('#liabilities-list .i3d-btn')), theme + ': both lists have a 3D button on every tile');
@@ -72,10 +73,10 @@ const idbHas = (p, key) => p.evaluate(k => invTx('readonly', s => s.get(k)).then
     // 2. library test path on the liability (?modeltest=1 sets the flag for this browser)
     await p.evaluate(() => i3dPick('li', 21)); await p.waitForSelector('.i3d-li', { timeout: 8000 }).catch(() => {});
     const lib = await p.evaluate(() => { const l = [...document.querySelectorAll('.i3d-li')]; return { n: l.length, first: l[0] && l[0].dataset.cid }; });
-    ok(lib.n === 2 && lib.first === 'CAR1', theme + ': library shows the catalogue, best match (car) first');
-    cdn = 'blocked'; await p.evaluate(() => i3dPickLib('li', 21, 'CAR1')); await p.waitForTimeout(800);
+    ok(lib.n === 2 && lib.first === 'cars:ford-fiesta', theme + ': library shows the catalogue, best match (car) first');
+    cdn = 'blocked'; await p.evaluate(() => i3dPickLib('li', 21, 'cars:ford-fiesta')); await p.waitForTimeout(800);
     ok(await p.evaluate(() => /library answered 403/.test(document.getElementById('i3d-msg').textContent) && !i3dItem('li', 21).model), theme + ': a refusal is explained and nothing is saved');
-    cdn = 'ok'; await p.evaluate(() => i3dPickLib('li', 21, 'BIK1')); await p.waitForFunction(() => window._i3dView, null, { timeout: 15000 }).catch(() => {});
+    cdn = 'ok'; await p.evaluate(() => i3dPickLib('li', 21, 'top100:bicycle')); await p.waitForFunction(() => window._i3dView, null, { timeout: 15000 }).catch(() => {});
     const li = await p.evaluate(() => { const m = i3dItem('li', 21).model; return { src: m.src, lic: m.lic, credit: (document.querySelector('#i3d-modal .i3d-credit') || {}).textContent || '', tile: !!document.querySelector('#liabilities-list img.i3d-thumb') }; });
     ok(li.src === 'lib' && li.lic === 'CC-BY' && /by Poly by Google, https:\/\/poly\.pizza\/m\//.test(li.credit) && li.tile, theme + ': library model saved on the liability with its CC-BY credit');
     // 3. remove, and delete clean-up
@@ -87,7 +88,7 @@ const idbHas = (p, key) => p.evaluate(k => invTx('readonly', s => s.get(k)).then
   }
   // phone width, reduced motion: no sideways scroll, no auto-spin
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-  await p.addInitScript(seed, 'dark'); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+  await p.addInitScript(seed, 'dark'); await p.goto(INDEX_URL); await p.waitForTimeout(1800);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await p.evaluate(() => { showTab('assets'); i3dPick('wi', 11); });
   await p.setInputFiles('#i3d-modal input[type=file]', { name: 'x.glb', mimeType: 'model/gltf-binary', buffer: GLB });

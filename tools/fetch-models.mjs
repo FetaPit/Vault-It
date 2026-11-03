@@ -105,7 +105,8 @@ for (const m of targets) {
   if (ONLY && !ONLY.has(m.slug)) continue;
   const have = byId.get(key(m));
   const entryBase = {
-    id: m.id, set: m.set, item: m.item, title: m.title, rank: m.rank, group: m.group, kind: m.kind, tags: m.tags, tris: m.tris,
+    id: m.id, uid: `${m.set || 'top100'}:${m.item.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`, // unique per catalogue entry (one model can serve several items, so id repeats)
+    set: m.set, item: m.item, title: m.title, rank: m.rank, group: m.group, kind: m.kind, tags: m.tags, tris: m.tris,
     standin: !!m.standin, ...(m.standinFor ? { standinFor: m.standinFor } : {}), provider: m.provider,
     licence: m.licence, creator: m.creator, source: m.source, attribution: m.attribution,
   };
