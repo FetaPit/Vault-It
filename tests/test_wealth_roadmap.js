@@ -55,6 +55,14 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
       ok(await p.evaluate(() => { const g = document.querySelector('#fire-ground'); return !!g && g.querySelectorAll('line.fg-v').length > 4 && g.querySelectorAll('line.fg-h').length >= 6; }), 'the ground strip has a perspective grid');
       ok(await p.evaluate(() => { const S = renderFIREroadmap._stages, g = document.querySelector('#fire-roadmap-svg g.fire-coin[data-i="' + S.nextIdx + '"]'), c = g.querySelector('.fire-face').getBoundingClientRect(), sh = g.querySelector('ellipse').getBoundingClientRect(); return sh.top - c.bottom > 40; }), 'the stage to work on floats well clear of its shadow on the ground');
       ok(await p.evaluate(() => [...document.querySelectorAll('#fire-roadmap-svg use')].every(u => /^#vi-/.test(u.getAttribute('href'))) && document.querySelectorAll('#fire-roadmap-svg use').length > 3), 'stage icons come from the brand sprite');
+      // round 5 (owner, 3 Nov): scrolling moves the cards, not the environment; the card nearest the middle is the largest
+      const env = await p.evaluate(async () => { const SC = document.getElementById('fire-timeline-scroll'), grid = () => [...document.querySelectorAll('#fire-ground line')].map(l => l.getAttribute('x1') + ',' + l.getAttribute('x2')).join('|');
+        SC.scrollLeft = 0; SC.dispatchEvent(new Event('scroll')); await new Promise(f => setTimeout(f, 400)); const g0 = grid(), c0 = document.querySelector('#fire-roadmap-svg g.fire-coin').getBoundingClientRect().left;
+        SC.scrollLeft = 300; SC.dispatchEvent(new Event('scroll')); await new Promise(f => setTimeout(f, 400)); const g1 = grid(), c1 = document.querySelector('#fire-roadmap-svg g.fire-coin').getBoundingClientRect().left;
+        const mid = SC.scrollLeft + SC.clientWidth / 2, gs = [...document.querySelectorAll('#fire-roadmap-svg g.fire-coin')].map(g => ({ d: Math.abs(+g.dataset.cx - mid), s: +((g.style.transform.match(/scale\(([\d.]+)\)/) || [0, 1])[1]) })).sort((a, b) => a.d - b.d);
+        return { same: g0 === g1 && g0.length > 0, moved: Math.round(c0 - c1), centre: gs[0].s, edge: gs[gs.length - 1].s }; });
+      ok(env.same && env.moved > 250, 'scrolling slides the cards (' + env.moved + ' px) while the perspective grid stays still');
+      ok(env.centre > 1.08 && env.centre > env.edge, 'desktop: the card nearest the middle is the largest (' + env.centre + ' vs ' + env.edge + ')');
       const nx = f.find(x => x.next), ot = f.find(x => !x.next);
       ok(nx && ot && nx.r > ot.r, 'the stage to work on is the largest token (' + (nx && nx.r) + ' vs ' + (ot && ot.r) + ')');
       ok(tok.tiers.every(t => /^(starter|solid|strong|summit)$/.test(t)), 'each token carries a tier (' + [...new Set(tok.tiers)].join(',') + ')');

@@ -25216,7 +25216,6 @@ function renderFIREroadmap(){
   phaseSpans.forEach(function(sp,pi){
     var a=Math.max(x0,sp.x0),b=Math.min(x1,sp.x1);
     if(b<=a)return;
-    out+='<rect x="'+a+'" y="'+GY+'" width="'+(b-a)+'" height="'+(H-GY)+'" fill="'+sp.col+'" opacity="'+(pi%2===0?'0.10':'0.05')+'"/>';
     if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line x1="'+sp.x0+'" y1="'+GY+'" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="1" opacity="0.45" stroke-dasharray="3 3"/>';
     out+='<text x="'+((a+b)/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.7')+'" letter-spacing="2.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
   });
@@ -25263,12 +25262,12 @@ function renderFIREroadmap(){
 }
 /* phones (owner, 31 Oct): the roadmap behaves like a carousel: the coin in the centre is the largest, the others shrink and fade
    towards the edges, and a swipe settles on the nearest stage */
-// the ground grid: horizontal lines closer together towards the horizon, verticals converging on a point above the middle of the
-// view; it does not scroll, but the verticals slide with the track so the floor moves under the tokens
+// the ground grid: horizontal lines closer together towards the horizon, verticals converging on one point above the middle of the
+// view. It is the environment and stays still while the cards scroll across it (owner, 3 Nov round 5); redrawn only when the width changes
 function fireGround(){
   var g=document.getElementById('fire-ground'),SC=document.getElementById('fire-timeline-scroll');if(!g||!SC)return;
-  var w=SC.clientWidth,h=56,vx=w/2,vy=-240,sp=54,off=-(SC.scrollLeft%sp),f=(h-vy)/(0-vy),o='';
-  if(!(w>0))return;
+  var w=SC.clientWidth,h=56,vx=w/2,vy=-240,sp=54,off=(w/2)%sp,f=(h-vy)/(0-vy),o='';
+  if(!(w>0)||g.__w===w)return;g.__w=w;
   [0,3,7,12,19,28,40,55].forEach(function(d,k){o+='<line class="fg-h" x1="0" y1="'+d+'" x2="'+w+'" y2="'+d+'" style="stroke-opacity:'+(k?(.1+k*.025).toFixed(3):.5)+'"/>';});
   for(var x=off-sp*12;x<w+sp*12;x+=sp){var xb=vx+(x-vx)*f;if(Math.max(x,xb)<-10||Math.min(x,xb)>w+10)continue;o+='<line class="fg-v" x1="'+x.toFixed(1)+'" y1="0" x2="'+xb.toFixed(1)+'" y2="'+h+'"/>';}
   g.setAttribute('viewBox','0 0 '+w+' '+h);g.innerHTML=o;
@@ -25278,9 +25277,8 @@ function fireCarousel(){
   var SC=document.getElementById('fire-timeline-scroll'),svg=document.getElementById('fire-roadmap-svg');if(!SC||!svg)return;
   var mob=window.innerWidth<=700,mid=SC.scrollLeft+SC.clientWidth/2;
   [].forEach.call(svg.querySelectorAll('.fire-coin'),function(g){
-    if(!mob){g.style.transform='';g.style.opacity='';return;}
-    var cx=(+g.getAttribute('data-i'))*FIRE_NODE+FIRE_LEFT,d=Math.min(1,Math.abs(cx-mid)/(SC.clientWidth*0.6));
-    g.style.transform='scale('+(1.12-0.12*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */g.style.opacity=(1-0.72*d).toFixed(2);
+    var cx=(+g.getAttribute('data-i'))*FIRE_NODE+FIRE_LEFT,d=Math.min(1,Math.abs(cx-mid)/(SC.clientWidth*(mob?0.6:0.5)));
+    g.style.transform='scale('+(1.12-0.12*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */g.style.opacity=(1-(mob?0.72:0.4)*d).toFixed(2);
   });
 }
 var _fireSnapT=0,_fireSnapping=0;
