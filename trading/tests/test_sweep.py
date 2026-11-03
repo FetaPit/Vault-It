@@ -18,6 +18,7 @@ TODAY = date(2026, 11, 3)
 class TestSweep(unittest.TestCase):
     def tracker(self) -> tuple[SweepTracker, TradeJournal]:
         j = TradeJournal(":memory:")
+        self.addCleanup(j.close)
         j.record_cash_flow(utc(2026, 11, 2), "initial", 625.0, dedupe_key="initial")
         return SweepTracker(make_cfg(), j), j
 

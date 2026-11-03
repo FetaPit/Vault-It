@@ -22,6 +22,9 @@ class TestJournal(unittest.TestCase):
     def setUp(self) -> None:
         self.j = TradeJournal(":memory:")
 
+    def tearDown(self) -> None:
+        self.j.close()
+
     def test_schema_idempotent(self) -> None:
         self.j.init_schema()
         self.j.init_schema()
