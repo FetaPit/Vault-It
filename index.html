@@ -10604,6 +10604,37 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .stk-tag{font-style:normal;font-family:'Share Tech Mono',monospace;font-size:max(.38rem,var(--vi-fs-1));letter-spacing:.08em;color:var(--gold);border:1px solid rgb(var(--gold-rgb) / .5);border-radius:3px;padding:1px 4px;margin-right:6px;vertical-align:middle}
 .stk-mini-logo{display:inline-flex;width:14px;height:14px;border-radius:4px;overflow:hidden;background:#fff;vertical-align:middle}
 .cash-acc{display:inline-flex;align-items:center;gap:8px;min-width:0}
+/* v0.9.1 E15/E16 cash accounts: rate, interest, add and take out */
+.ca-tbl{width:100%;border-collapse:collapse}
+.ca-th{font-size:max(.66rem,var(--vi-fs-2));font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left}
+.ca-th.ca-bal{text-align:right}
+#cash-table td{padding:7px 10px;vertical-align:top;border-bottom:1px solid var(--bd)}
+#cash-table td.ca-type{font-size:max(.66rem,var(--vi-fs-2));color:var(--t3)}
+#cash-table td.ca-bal{font-size:max(.74rem,var(--vi-fs-3));font-family:'Share Tech Mono',monospace;color:var(--gr);text-align:right;white-space:nowrap}
+#cash-table .ca-cell{font-size:max(.74rem,var(--vi-fs-3))}
+.ca-sub{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:6px;font-size:max(.66rem,var(--vi-fs-2));color:var(--t3)}
+.ca-rate{display:inline-flex;align-items:center;gap:6px}
+.ca-rate-in{width:84px;min-height:36px;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:4px 8px}
+.ca-int{color:var(--gr);font-family:'Share Tech Mono',monospace}
+.ca-act{display:flex;gap:8px;margin-top:8px}.ca-act button{flex:1 1 0;min-width:0;padding:6px 8px;white-space:nowrap}
+.ca-add,.ca-out,.ca-mv-ok,.ca-mv-no,.ca-undo-btn{min-height:44px;min-width:44px;padding:6px 14px;border-radius:4px;border:1px solid var(--gr);background:transparent;color:var(--gr);font-family:'Share Tech Mono',monospace;font-size:max(.7rem,var(--vi-fs-3));cursor:pointer}
+.ca-out{border-color:var(--re);color:var(--re)}
+.ca-mv-no{border-color:var(--bd);color:var(--t3)}
+.ca-mv{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;align-items:center}
+.ca-mv input{min-height:44px;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;min-width:0;flex:1 1 120px}
+.ca-mv-msg{flex:1 1 100%;margin-top:0}
+.ca-mv-msg a{color:var(--gr);text-decoration:underline}
+.ca-log{margin-top:8px;font-size:max(.66rem,var(--vi-fs-2));color:var(--t3)}
+.ca-log summary{cursor:pointer;min-height:24px}
+.ca-log-l{display:flex;justify-content:space-between;gap:12px;padding:2px 0;font-family:'Share Tech Mono',monospace}
+.ca-log-l .in{color:var(--gr)}.ca-log-l .out{color:var(--re)}
+.ca-head-int{font-family:'Share Tech Mono',monospace;font-size:max(.68rem,var(--vi-fs-2));color:var(--gr);margin:-4px 0 8px}
+.ca-note{margin-top:10px;font-size:max(.66rem,var(--vi-fs-2));color:var(--t3);line-height:1.5}
+#ca-undo{position:fixed;left:50%;bottom:calc(var(--footer-h,30px) + 72px);transform:translate(-50%,24px);z-index:10002;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 32px);background:var(--c2,var(--c3));border:1px solid var(--gr);border-radius:6px;padding:6px 8px 6px 14px;color:var(--tx);font-size:max(.72rem,var(--vi-fs-3));opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#ca-undo.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+@media(prefers-reduced-motion:reduce){#ca-undo{transition:none}}
+@media(max-width:600px){.ca-rate-in{width:72px}}
+
 .cash-logo{display:inline-flex;flex:none;width:22px;height:22px;border-radius:6px;overflow:hidden;background:#fff;align-items:center;justify-content:center}
 .cash-logo img{width:100%;height:100%;object-fit:contain}
 .cash-logo .cash-mono{width:100%;height:100%}
@@ -12766,13 +12797,16 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <span class="ov-chart-title">Cash &amp; Savings Accounts</span>
           <span style="font-family:'Share Tech Mono',monospace;font-size:max(.68rem,var(--vi-fs-2));color:var(--gr)">Total: <span id="subtab-total-cash" style="font-weight:700">£0</span></span>
         </div>
+        <div class="ca-head-int" id="ca-int-wrap" hidden>Estimated interest <span id="ca-int-total"></span></div>
         <div id="cash-table"></div>
         <div class="data-input-row" style="margin-top:12px">
           <input type="text" id="ca-name" placeholder="Account name">
           <select id="ca-type" style="background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;outline:none"><option>Current</option><option>Savings</option><option>ISA</option><option>LISA</option></select>
           <input type="number" id="ca-bal" placeholder="Balance £">
+          <input type="number" id="ca-rate" min="0" max="100" step="0.01" inputmode="decimal" placeholder="Interest AER % (optional)" aria-label="Interest rate, AER percent, optional">
           <button class="btn-add-data" onclick="addCashAccount()">+ Add</button>
         </div>
+        <div class="ca-note">Interest is an estimate from the rate you enter (balance times AER, before tax). It is not added to your net worth. Not regulated by the FCA. Not financial advice.</div>
       </div>
       <div class="ov-chart-card pc-card" id="pc-card" style="margin-top:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap">
@@ -21576,7 +21610,7 @@ function renderAlTab(){
   // Cash accounts
   var cas=document.getElementById('cash-table');
   try{renderPhysicalCash();}catch(e){console.error('[Vault-It] physical cash',e);}
-  if(cas)cas.innerHTML=alState.cashAccounts.length?'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="font-size:max(.54rem,var(--vi-fs-1));font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Account</th><th style="font-size:max(.54rem,var(--vi-fs-1));font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Type</th><th style="font-size:max(.54rem,var(--vi-fs-1));font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:right">Balance</th><th></th></tr></thead><tbody>'+alState.cashAccounts.map(function(a){return'<tr><td style="padding:7px 10px;font-size:max(.74rem,var(--vi-fs-3))"><span class="cash-acc">'+viBankLogo(a.name)+'<span>'+cfEsc(a.name)+'</span></span></td><td style="padding:7px 10px;font-size:max(.62rem,var(--vi-fs-2));color:var(--t3)">'+a.type+'</td><td style="padding:7px 10px;font-size:max(.74rem,var(--vi-fs-3));font-family:\'Share Tech Mono\',monospace;color:var(--gr);text-align:right">\u00a3'+a.balance.toLocaleString('en-GB')+'</td><td style="padding:7px 10px"><button class="data-item-del" onclick="delCashAccount('+a.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></td></tr>';}).join('')+'</tbody></table>':'<div style="font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:16px">No accounts added yet</div>';
+  if(cas){cas.innerHTML=caTableHtml();caAfterRender();}
   // Liabilities
   var ll=document.getElementById('liabilities-list');
   if(ll){
@@ -21678,8 +21712,85 @@ function addCashAccount(){if(viBlockEdit())return;
   var t=document.getElementById('ca-type').value;
   var b=(parseFloat(document.getElementById('ca-bal').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
-  alState.cashAccounts.push({id:Date.now(),name:n,type:t,balance:b});
-  document.getElementById('ca-name').value='';document.getElementById('ca-bal').value='';
+  var acc={id:Date.now(),name:n,type:t,balance:b};
+  var rt=parseFloat((document.getElementById('ca-rate')||{}).value);
+  if(isFinite(rt)&&rt>=0&&rt<=100)acc.rate=rt;
+  alState.cashAccounts.push(acc);
+  document.getElementById('ca-name').value='';document.getElementById('ca-bal').value='';var _cr=document.getElementById('ca-rate');if(_cr)_cr.value='';
+  saveAL();renderAlTab();updateKPIs();renderCashISO();
+}
+// v0.9.1 E15/E16 cash accounts. Optional `rate` (AER %, the user's own number) and a `moves` list [{id,amount (signed GBP),date}] per
+// account; both are additive, so old saves load as they are. Every sum is in whole pence; the interest is an illustrative estimate
+// (balance x AER) and is never added to cash or net worth. A take-out above the balance is refused: overdrafts belong in the Debt tracker.
+var caMv=null,caUndoT=null,caLast=null;
+function caP(x){return Math.round((+x||0)*100);}
+function caFmt(p){var r=window.VI_CURRENCY_RATE||1,sy=window.VI_CURRENCY_SYMBOL||'£',v=(p/100)*r,whole=Math.abs(v-Math.round(v))<0.005;return (v<0?'-':'')+sy+Math.abs(v).toLocaleString('en-GB',{minimumFractionDigits:whole?0:2,maximumFractionDigits:2});}
+function caInterest(a){var r=+a.rate;if(!(r>0)||!isFinite(r))return null;var bp=Math.max(0,caP(a.balance));return {year:Math.round(bp*r/100),month:Math.round(bp*r/1200)};}
+function caToday(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function caRowHtml(a){
+  var it=caInterest(a),open=caMv&&caMv.id===a.id,mv=(a.moves||[]).slice().sort(function(x,y){return (y.date||'').localeCompare(x.date||'')||y.id-x.id;});
+  var rate=(a.rate===0||+a.rate>0)?a.rate:'';
+  return '<tr data-ca="'+a.id+'"><td class="ca-cell"><span class="cash-acc">'+viBankLogo(a.name)+'<span>'+cfEsc(a.name)+'</span></span>'
+    +'<div class="ca-sub"><label class="ca-rate"><span>Interest AER %</span><input class="ca-rate-in" type="number" min="0" max="100" step="0.01" inputmode="decimal" value="'+rate+'" placeholder="none" aria-label="Interest rate, AER percent, for '+cfEsc(a.name).replace(/"/g,'&quot;')+'" onchange="caSetRate('+a.id+',this.value)"></label>'
+    +(it?'<span class="ca-int">about '+caFmt(it.year)+' a year, about '+caFmt(it.month)+' a month</span>':'')+'</div>'
+    +'<div class="ca-act"><button type="button" class="ca-add" onclick="caMoveOpen('+a.id+',1)">+ Add</button><button type="button" class="ca-out" onclick="caMoveOpen('+a.id+',-1)">− Take out</button></div>'
+    +(open?'<div class="ca-mv" role="group" aria-label="'+(caMv.sign>0?'Add money to':'Take money out of')+' this account"><input class="ca-mv-amt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Amount £" aria-label="Amount" value="'+(caMv.amt||'')+'" oninput="caMv.amt=this.value" onkeydown="if(event.key===\'Enter\')caMoveDo('+a.id+')"><input class="ca-mv-date" type="date" aria-label="Date" value="'+(caMv.date||caToday())+'" onchange="caMv.date=this.value"><button type="button" class="ca-mv-ok" onclick="caMoveDo('+a.id+')">'+(caMv.sign>0?'Add':'Take out')+'</button><button type="button" class="ca-mv-no" onclick="caMoveClose()">Cancel</button><div class="ca-mv-msg vi-pop-msg" role="status"></div></div>':'')
+    +(mv.length?'<details class="ca-log"><summary>Movements ('+mv.length+')</summary>'+mv.slice(0,8).map(function(m){var inn=(+m.amount||0)>=0,d=m.date?new Date(m.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';return '<div class="ca-log-l"><span>'+d+'</span><span class="'+(inn?'in':'out')+'">'+(inn?'+':'−')+caFmt(Math.abs(caP(m.amount)))+'</span></div>';}).join('')+'</details>':'')
+    +'</td><td class="ca-type">'+a.type+'</td><td class="ca-bal">'+caFmt(caP(a.balance))+'</td><td class="ca-del"><button class="data-item-del" onclick="delCashAccount('+a.id+')" aria-label="Remove this account"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></td></tr>';
+}
+function caTableHtml(){
+  var L=alState.cashAccounts||[];
+  if(!L.length)return '<div style="font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:16px">No accounts added yet</div>';
+  return '<table class="ca-tbl"><thead><tr><th class="ca-th">Account</th><th class="ca-th">Type</th><th class="ca-th ca-bal">Balance</th><th></th></tr></thead><tbody>'+L.map(caRowHtml).join('')+'</tbody></table>';
+}
+function caAfterRender(){
+  var yr=0,any=false;(alState.cashAccounts||[]).forEach(function(a){var it=caInterest(a);if(it){yr+=it.year;any=true;}});
+  var w=document.getElementById('ca-int-wrap'),t=document.getElementById('ca-int-total');
+  if(w)w.hidden=!any;if(t)t.textContent=any?'about '+caFmt(yr)+' a year':'';
+}
+function caRedraw(){setTimeout(function(){try{renderAlTab();}catch(e){console.error('[Vault-It] cash accounts',e);}},0);}  // after the change event settles: a render during blur throws
+function caSetRate(id,v){if(viBlockEdit()){caRedraw();return;}
+  var a=alState.cashAccounts.find(function(x){return x.id===id;});if(!a)return;
+  v=String(v==null?'':v).trim();
+  if(v==='')delete a.rate;else{var n=parseFloat(v);if(!(n>=0&&n<=100)){caRedraw();return;}a.rate=n;}
+  saveAL();caRedraw();
+}
+function caMoveOpen(id,sign){if(viBlockEdit())return;
+  if(caMv&&caMv.id===id&&caMv.sign===sign)return;
+  caMv={id:id,sign:sign,amt:'',date:caToday()};renderAlTab();
+  var f=document.querySelector('#cash-table tr[data-ca="'+id+'"] .ca-mv-amt');if(f)try{f.focus({preventScroll:true});}catch(e){}
+}
+function caMoveClose(){caMv=null;renderAlTab();}
+function caToDebts(){caMv=null;try{showTab('debt');}catch(e){}return false;}
+function caMoveDo(id){if(viBlockEdit())return;
+  var a=alState.cashAccounts.find(function(x){return x.id===id;});if(!a||!caMv||caMv.id!==id)return;
+  var row=document.querySelector('#cash-table tr[data-ca="'+id+'"]'),msg=row&&row.querySelector('.ca-mv-msg');
+  var amt=(parseFloat((row.querySelector('.ca-mv-amt')||{}).value)||0)/(window.VI_CURRENCY_RATE||1),ap=caP(amt),bp=caP(a.balance),sign=caMv.sign;
+  var date=(row.querySelector('.ca-mv-date')||{}).value||caToday();
+  if(!(ap>0)){if(msg)msg.textContent='Enter an amount above zero.';return;}
+  if(sign<0&&ap>bp){if(msg)msg.innerHTML='Only '+caFmt(bp)+' is in this account. <a href="#" onclick="return caToDebts()">Overdraft? Add it in the Debt tracker</a>';return;}
+  var mv={id:Date.now(),amount:sign*ap/100,date:date};
+  a.moves=(a.moves||[]);a.moves.push(mv);a.balance=(bp+sign*ap)/100;
+  caMv=null;caLast={acc:id,mv:mv.id};
+  saveAL();renderAlTab();updateKPIs();
+  if(typeof v3CashLand==='function'){try{v3CashLand(sign*ap/100,id);}catch(e){}}  // chunk A hook: coins land or lift on the plate; no-op when 3D is off
+  renderCashISO();
+  caUndoShow((sign>0?'Added ':'Took out ')+caFmt(ap)+(sign>0?' to ':' from ')+a.name);
+}
+function caUndoShow(text){
+  var el=document.getElementById('ca-undo');
+  if(!el){el=document.createElement('div');el.id='ca-undo';el.setAttribute('role','status');el.innerHTML='<span class="ca-undo-t"></span><button type="button" class="ca-undo-btn" onclick="caUndoDo()">Undo</button>';document.body.appendChild(el);}
+  el.querySelector('.ca-undo-t').textContent=text;el.classList.add('show');clearTimeout(caUndoT);caUndoT=setTimeout(caUndoHide,6000);
+}
+function caUndoHide(){var el=document.getElementById('ca-undo');if(el)el.classList.remove('show');caLast=null;}
+function caUndoDo(){if(viBlockEdit())return;
+  var l=caLast;if(!l){caUndoHide();return;}
+  var a=alState.cashAccounts.find(function(x){return x.id===l.acc;}),m=a&&(a.moves||[]).find(function(x){return x.id===l.mv;});
+  if(!a||!m){caUndoHide();return;}
+  var np=caP(a.balance)-caP(m.amount);
+  if(np<0){showToast('Cannot undo: it would take the account below zero.');caUndoHide();return;}
+  a.moves=a.moves.filter(function(x){return x.id!==l.mv;});if(!a.moves.length)delete a.moves;
+  a.balance=np/100;caUndoHide();
   saveAL();renderAlTab();updateKPIs();renderCashISO();
 }
 // Physical cash log: each line is money put in (+) or taken out (-), with where it is kept and the date.

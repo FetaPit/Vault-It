@@ -83,3 +83,4 @@ node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow dia
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
 node tests/test_secondhand_server.js  # v0.9.1 E28: secondhand-estimate edge function (junk filter, trimmed median and IQR, haircut, condition factors, minimum 5, cache, flags off means no call), fixtures in tests/fixtures/secondhand
 node tests/test_v091_secondhand.js    # v0.9.1 E28: condition field, estimate needs a tap to apply, "Not available yet" with manual links, old items untouched, wording, 10.5 px floor
+- `test_v091_cash_accounts.js`: v0.9.1 E15/E16, cash account interest rate (AER), add and take out with Undo, over-balance refused, old saves load, pence-exact.
