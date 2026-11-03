@@ -126,7 +126,7 @@ const READ = () => {
     await p.click('.metal-commit[data-m="gold"]'); await p.waitForTimeout(1800);
     const anim = await p.evaluate(() => V3.metals._lastAnim);
     ok(anim && anim.zone === 'gold', 'the button itself plays the animation, even though tapping it leaves the field first (' + JSON.stringify(anim) + ')');
-    const done = await p.evaluate(() => ({ saved: alState.metals.gold, store: JSON.parse(localStorage.getItem('pos_al1')).metals.gold, msg: (document.getElementById('metal-draft-gold') || {}).textContent || '', zones: Object.keys(V3.metals.stats), played: !!V3.metals._introPlayed || !!V3.metals._introWait }));
+    const done = await p.evaluate(() => ({ saved: alState.metals.gold, store: JSON.parse(localStorage.getItem('pos_al1')).metals.gold, msg: (document.getElementById('metal-draft-gold') || {}).textContent || '', zones: Object.keys(V3.metals.stats), played: !!V3.metals._introPlayed || !!V3.metals._introWait || !!V3.metals._introRun }));   // under load the drop can still be running
     ok(done.saved === 5 && done.store === 5, 'the button commits the typed ounces to saved data (' + done.saved + ')');
     ok(/\+4\.00 oz gold/.test(done.msg) && /£/.test(done.msg), 'a one-line confirm shows what went in (' + done.msg.trim() + ')');
     ok(done.zones.join() === 'gold' && done.played, 'only that metal\'s zone is drawn, and it is the one set going (' + done.zones.join() + ')');
