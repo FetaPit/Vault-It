@@ -2,7 +2,7 @@
 
 **Subtitle:** What the research says about money, attention and time, and what it does not.
 
-**Type:** Weekly post · **Pillar:** debt to deposit · **Header image:** `images/02-money-admin-night.png` · **Status:** draft, waiting for Pete's approval
+**Type:** Weekly post · **Pillar:** debt to deposit · **Header image:** `images/02-money-admin-night.png` · **Status:** approved by Pete, 3 Nov 2026; publish after the checks in the README
 
 ---
 

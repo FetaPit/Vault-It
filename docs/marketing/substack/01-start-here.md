@@ -2,7 +2,7 @@
 
 **Subtitle:** Why Vault-It exists, why I was the one to design it, and what lands in your inbox each week.
 
-**Type:** Pinned "start here" post · **Pillar:** about · **Header image:** `images/01-start-here-night.png` · **Status:** draft, waiting for Pete's approval
+**Type:** Pinned "start here" post · **Pillar:** about · **Header image:** `images/01-start-here-night.png` · **Status:** approved by Pete, 3 Nov 2026; publish after the checks in the README
 
 ---
 

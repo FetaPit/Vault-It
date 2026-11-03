@@ -2,7 +2,7 @@
 
 **Subtitle:** A plain tour of the free beta, and what I ask of testers.
 
-**Type:** Weekly post · **Pillar:** what changed in Vault-It · **Header image:** `images/04-whats-in-vault-it-night.png` · **Status:** draft, waiting for Pete's approval
+**Type:** Weekly post · **Pillar:** what changed in Vault-It · **Header image:** `images/04-whats-in-vault-it-night.png` · **Status:** approved by Pete, 3 Nov 2026; publish after the checks in the README
 
 ---
 

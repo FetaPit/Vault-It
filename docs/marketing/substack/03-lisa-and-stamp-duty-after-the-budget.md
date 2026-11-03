@@ -2,7 +2,7 @@
 
 **Subtitle:** What changed on 29 October, what did not, and what stamp duty costs a first-time buyer today.
 
-**Type:** Weekly post · **Pillar:** UK housing money, explained · **Header image:** `images/03-lisa-stamp-duty-night.png` · **Status:** draft, waiting for Pete's approval. Check the figures against gov.uk on the day it is published.
+**Type:** Weekly post · **Pillar:** UK housing money, explained · **Header image:** `images/03-lisa-stamp-duty-night.png` · **Status:** approved by Pete, 3 Nov 2026; publish after the checks in the README. Check the figures against gov.uk on the day it is published.
 
 ---
 

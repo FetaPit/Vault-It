@@ -4,7 +4,7 @@ Decided by the owner, 3 Nov 2026: one Vault-It Substack written by Pete, with PT
 
 Owner, 3 Nov: lean on Pete's credentials, and on the fact that he designed Vault-It for himself because it did not exist, as a designer with neurodivergent traits. Apply the brand book.
 
-Nothing here is published. Pete approves each post before it goes out.
+Nothing here is published yet. Pete approved the four posts on 3 Nov 2026; each still goes through the checks below on the day it is published.
 
 ## Brand book applied
 
@@ -59,9 +59,9 @@ Night is the brand default. Every image also comes in a Daylight version (`-dayl
 
 Suggested order: 1 at launch and pinned, then 3 while the Budget is news, then 2, then 4.
 
-## Wording for Pete to confirm
+## Wording approved by Pete (3 Nov 2026)
 
-These lines put Pete's story into words he has not used himself. Approve or change each:
+These lines put Pete's story into words he had not used himself. Pete approved all of them, and the four posts, on 3 Nov 2026 ("Approved").
 
 - Post 1: "Three things meet in one person here."
 - Post 1: "I am trained in how people think and decide." (from the Psychology of Design certificate)
