@@ -76,8 +76,20 @@ const near = (a, b, e) => Math.abs(a - b) <= (e || 0.005);
   ok(await page.evaluate(() => { const f = document.querySelector('.cc3[data-id="2"] .cc3-bfacts'); return getComputedStyle(f).clipPath === 'none' && !document.querySelector('.cc3[data-id="2"] .cc3-bpiece .cc3-bk'); }), 'back figures sit above the cut, never split by it');
   ok(/estimate/i.test(zb), 'back says it is an estimate');
   const ob = await back(3); console.log('back 3:', ob);
-  ok(/Never at £20\/mo/i.test(ob) && /Interest this month £26\.60/.test(ob), 'overdraft back: never clears at £20/mo; £26.60 interest this month');
+  ok(/Debt-free Never at £20\/mo/i.test(ob) && /Interest this month £26\.60/.test(ob), 'overdraft back: never clears at £20/mo; £26.60 interest this month');
   const sb = await back(4); ok(/Add a minimum/i.test(sb), 'student loan back: asks for a minimum to show a date');
+  ok(/Estimate: [\d.]+% APR \(÷ 12 a month\)/.test(sb) && !/uses your minimum|Add a minimum payment for a date/.test(sb), 'student loan note gives the rate convention, not the minimum again');
+  ok(/Debt-free Never at £20\/mo: the interest is more/.test(ob), 'overdraft: headline is just "Never", the sub says why');
+  // Pedro FIX 1 to 3: no truncated headline, figures above every cut line, readable note
+  const zz = await page.evaluate(() => { const c = document.querySelector('.cc3[data-id="3"]'); const hb = c.querySelector('.cc3-bfacts .cc3-bk b');
+    const f = +getComputedStyle(c.querySelector('.cc3-bfacts')).zIndex || 0, cuts = [...document.querySelectorAll('.cc3-cutline')].map(e => +getComputedStyle(e).zIndex || 0);
+    const trunc = [...document.querySelectorAll('.cc3-bk b')].filter(b => getComputedStyle(b).textOverflow === 'ellipsis' || b.scrollWidth > b.clientWidth + 1).length;
+    return { head: hb.textContent, f, maxCut: Math.max(0, ...cuts), op: +getComputedStyle(c.querySelector('.cc3-bk-note')).opacity, trunc }; });
+  ok(zz.head === 'Never' && zz.trunc === 0, 'no back headline is cut short ' + JSON.stringify(zz));
+  ok(zz.f > zz.maxCut, 'back figures sit above the cut line (z ' + zz.f + ' over ' + zz.maxCut + ')');
+  ok(zz.op >= 0.75, 'back note is readable (opacity ' + zz.op + ')');
+  // payment exactly equal to the interest: true wording
+  ok(await page.evaluate(() => /it only covers the interest/.test(ccBackFacts({ balance: 1000, rate: 24, min: 20, original: 1000 }))), 'payment equal to the interest: "it only covers the interest"');
   const cb = await back(1); console.log('back 1:', cb);
   ok(/Jan 2029|Debt-free/.test(cb) && /Interest this month £20 /.test(cb) && /No payments yet/.test(cb), 'credit card back: date, cost, no payments yet');
   ok(await page.locator('.cc3[data-id="1"] .cc3-stripe').count() >= 1 && await page.locator('.cc3[data-id="2"] .cc3-stripe').count() === 0, 'card keeps its magnetic stripe; loans have none');

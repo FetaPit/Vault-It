@@ -8478,15 +8478,15 @@ body::before {
 .cc3-type{position:absolute;left:6cqw;right:6cqw;bottom:22%;font:600 max(10.5px,5.2cqw) 'DM Sans',sans-serif;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 .2cqw .5cqw rgba(0,0,0,.45)}
 .cc3-btype{bottom:auto;top:6%;opacity:.85}
 .cc3-ticon{position:absolute;left:6cqw;top:20cqw;width:max(18px,9cqw);height:max(18px,9cqw);--vi-sw:1.6;opacity:.92;filter:drop-shadow(0 .2cqw .5cqw rgba(0,0,0,.4))}
-.cc3-bfacts{background:none!important;pointer-events:none;z-index:2}
+.cc3-bfacts{background:none!important;pointer-events:none;z-index:4}
 .cc3-bk{position:absolute;left:6cqw;right:6cqw;top:19%;bottom:5%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto 1fr;column-gap:4cqw;row-gap:2.4cqw;align-content:start;font-family:'DM Sans',sans-serif;line-height:1.2}
 .cc3:not(.cc3-loan) .cc3-bk{top:26%}
 .cc3-bk>div{min-width:0}
 .cc3-bk span{display:block;font:600 max(10.5px,3.3cqw) 'DM Sans',sans-serif;opacity:.7;letter-spacing:.02em}
-.cc3-bk b{display:block;font:500 max(12px,5cqw) 'Share Tech Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc3-bk b{display:block;font:500 max(12px,5cqw) 'Share Tech Mono',monospace;overflow-wrap:anywhere}
 .cc3-bk i{display:block;font:400 max(10.5px,3.3cqw) 'DM Sans',sans-serif;font-style:normal;opacity:.85}
 .cc3-bk-pay{grid-column:1/-1}
-.cc3-bk-note{grid-column:1/-1;align-self:end;font:400 max(10.5px,3cqw) 'DM Sans',sans-serif;opacity:.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc3-bk-note{grid-column:1/-1;align-self:end;font:400 max(10.5px,3cqw) 'DM Sans',sans-serif;opacity:.8}
 .cc3-loan .cc3-name{right:6cqw}
 .cc3-name{position:absolute;left:6cqw;right:26cqw;bottom:10%;font:700 4.6cqw 'Syne',sans-serif;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.92}
 .cc3-net{position:absolute;right:6cqw;bottom:7%;display:flex;align-items:center}
@@ -17788,16 +17788,16 @@ function ccBackFacts(d){
   var when,whenSub;
   if(f.cleared){when='Cleared';whenSub='Nothing left to pay';}
   else if(f.noMin){when='Add a minimum';whenSub='to see a date';}
-  else if(f.never){when='Never at '+minTxt;whenSub='The minimum is below the interest';}
+  else if(f.never){when='Never';whenSub='at '+minTxt+': '+(f.min<f.monthInterest-0.005?'the interest is more':'it only covers the interest');}
   else if(f.capped){when='Over 50 years';whenSub='at '+minTxt;}
   else {when=f.date;whenSub=ccMoney(f.interest,true)+' interest to go';}
   var pays=(d.payments||[]).slice(-3).reverse().map(function(p){var t=new Date(p.date);return ccMoney(p.amt)+' · '+(isNaN(t)?'':t.toLocaleDateString('en-GB',{day:'numeric',month:'short'}).replace('Sept','Sep'));});
   var orig=+(d.original||d.total||d.balance)||0,paid=Math.max(0,orig-(+d.balance||0));
   return '<div class="cc3-bk">'
     +'<div class="cc3-bk-col"><span>Debt-free</span><b>'+ccEsc(when)+'</b><i>'+ccEsc(whenSub)+'</i></div>'
-    +'<div class="cc3-bk-col"><span>Interest this month</span><b>'+ccMoney(f.monthInterest)+'</b><i>'+ccMoney(f.yearInterest,true)+' a year at this balance</i></div>'
+    +'<div class="cc3-bk-col"><span>Interest this month</span><b>'+ccMoney(f.monthInterest)+'</b><i>'+ccMoney(f.yearInterest,true)+' a year</i></div>'
     +'<div class="cc3-bk-pay"><span>Payments</span><i>'+(pays.length?ccEsc(pays.join(', ')):'No payments yet')+'</i><i>Paid so far '+ccMoney(paid)+'</i></div>'
-    +'<div class="cc3-bk-note">'+(f.noMin||f.cleared?'Estimates use your minimum payment':'Estimate: '+ccEsc(minTxt)+' at '+ccEsc(String(f.rate))+'% APR')+'</div>'
+    +'<div class="cc3-bk-note">'+(f.cleared?'Paid off':'Estimate: '+(f.noMin?'':ccEsc(minTxt)+' at ')+ccEsc(String(f.rate))+'% APR (÷ 12 a month)')+'</div>'
     +'</div>';
 }
 var _ccPct={};   // % shown last time for each card, so a payment cuts from where it was and an undo joins it back up
