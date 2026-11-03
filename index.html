@@ -15732,12 +15732,13 @@ function addSnapshot() {if(viBlockEdit())return;
 // ═══════════════════════════════════════════════════════════════
 // TOAST (shared)
 // ═══════════════════════════════════════════════════════════════
-var _toastT;
-function showToast(msg, ms) {
-  var t = document.getElementById('toast');
+var _toastT, _toastN = 0;
+function showToast(msg, ms) {   // the one toast: toast() shares it, so only the newest toast's timer can hide it
+  var t = document.getElementById('toast'); if (!t) return;
   t.textContent = msg; t.classList.add('show');
-  clearTimeout(_toastT);
-  _toastT = setTimeout(function() { t.classList.remove("show"); }, ms || 3000);
+  clearTimeout(_toastT); var tok = ++_toastN;
+  // the count starts once it is drawn (two frames): a long task, such as the house rebuild after a deposit, cannot use it up unseen
+  requestAnimationFrame(function () { requestAnimationFrame(function () { if (tok !== _toastN) return; clearTimeout(_toastT); _toastT = setTimeout(function () { if (tok === _toastN) t.classList.remove('show'); }, ms || 3000); }); });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -15893,8 +15894,7 @@ function updatePriceLabels(){
 }
 function updatePriceInput(){document.getElementById('priceInput').value=state.prices[state.houseType]||'';}
 
-let tT2;
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT2);const tok=(toast._n=(toast._n||0)+1);requestAnimationFrame(()=>requestAnimationFrame(()=>{if(tok!==toast._n)return;clearTimeout(tT2);tT2=setTimeout(()=>t.classList.remove('show'),3000);}));}   // the 3 s count starts once it is drawn: the house rebuild after a deposit can hold the page long enough for it to vanish unseen
+function toast(msg){showToast(msg);}   // the house tracker's name for the shared toast (one timer, counted from when it is drawn)
 
 function markHousePurchased(){if(viBlockEdit())return;
   state.houseMode='purchased';
@@ -23522,7 +23522,7 @@ function checkAchievements(){
       achState.unlocked.push(b.id);
       achState.xp=(achState.xp||0)+(b.xp||50);
       gained++;
-      showToast('Badge unlocked: '+b.name+'. +'+b.xp+' XP');
+      var tb=document.getElementById('toast');if(window._viActed&&!(tb&&tb.classList.contains('show')))showToast('Badge unlocked: '+b.name+'. +'+b.xp+' XP');   // as wrSync: only after the user did something, never over a toast already showing; the badge and its XP still count
     }
   });
   if(gained>0){saveAch();renderAchievements();}
