@@ -63,7 +63,7 @@ node tests/test_ui_round2.js         # v0.7 UI round 2 (for alpha 0.8), Net wort
 node tests/test_signoff_d.js         # Phone sign-off D: income flow bands get a bright colour stroke and leaders; only two reds, clearly apart, AA text
 node tests/test_signoff_d.js         # Phone sign-off D: income flow bands get a bright colour stroke and leaders; only two reds, clearly apart
 node tests/test_footer.js             # footer: approved disclaimer, Privacy notice / Beta terms links in the app and landing footers, type floors, --footer-h tracks the fixed footer
-node tests/test_v08_chrome.js         # v0.8 chrome: Message the Dev last on every tab, Feedback fixed bottom right, footer collapses to the FCA strip (full on scroll up / page end), compact category pills (below Cash flow), synced scroll rails above and below the flow charts
+node tests/test_v08_chrome.js         # v0.8 chrome: Message the Dev last on Overview and gone from every other tab (v0.9.1), Feedback fixed bottom right, footer collapses to the FCA strip (full on scroll up / page end), compact category pills (below Cash flow), synced scroll rails above and below the flow charts
 node tests/test_csp_report_only.mjs   # Worker: Content-Security-Policy-Report-Only lists every outside host the app calls; enforced CSP unchanged
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width
 node tests/test_nw3d.js            # net worth in 3D (on by default): flag off unchanged, 3D | Graph toggle, same numbers in both views, debts grouped by kind (cards stacked in one column, each in its own colour), zoom buttons / ctrl+wheel / reset (VI_APP=file:///… to test another copy)
@@ -81,3 +81,5 @@ node tests/test_v07_e10.js         # v0.7 E10: expense bar arrow: sprite chevron
 node tests/test_v08_cards.js        # v0.8 D2: budget cards (no separator, 30-32 px icons, 10 px titles, titles clear of the amount) and the one House progress tile (iconned stats, house-type milestones, no dead columns)
 node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, identical on #cf-sankey and #bd-sankey, Night and Daylight
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
+node tests/test_v091_chrome.js      # v0.9.1 chrome: rotating dial mark (turns on load and click, still under reduced motion), bigger desktop menu bar (icons 24 / 22 px, no zoom), pinned Assets sub-menu (one row of six icons on phones), Message the Dev on Overview only, sidebar colours, crowdfund Vaulter card (prices from VI_PLANS, real counts, Open days)
+node tests/test_014.mjs             # migration 014 on pglite: campaign_counts() gives backers per paid plan and nothing personal; anon may call it
