@@ -1,6 +1,6 @@
 // v0.7 E18 (owner, 1 Nov: "Build your dream home buttons: smaller, on brand, moved to the bottom of the viewport"; ASK 1 answer: the camera buttons).
 // Pedro A3: #hud-bar-house bottom centre, 12 px up, one row; pill (--rail-bg, 1 px teal border, pill radius); buttons drawn 36 px in a 44 px hit area;
-// 18 px sprite icons in teal (vi-zoom-out, vi-zoom-in, vi-orbit, vi-pin, vi-reset, vi-fullscreen); no emoji fallbacks; orbit on = teal border + glow;
+// 18 px sprite icons in teal (vi-zoom-out, vi-zoom-in, vi-orbit, vi-reset, vi-fullscreen); no emoji fallbacks; orbit on = teal border + glow;
 // nothing over the caption. Run: node tests/test_v07_e18.js
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
 const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
@@ -31,12 +31,12 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     ok(r.shown, t + 'camera bar is visible (engine ' + r.engine + ')');
     ok(r.cx <= 3, t + 'bar centred at the bottom (off by ' + Math.round(r.cx) + ')');
     ok(r.gap >= 11 && r.gap <= 13, t + 'bar sits 12 px up (gap ' + r.gap + ')');
-    ok(r.n === 6 && r.tops === 1, t + 'one row of six buttons (' + r.n + ' buttons, ' + r.tops + ' rows)');
+    ok(r.n === 5 && r.tops === 1, t + 'one row of five buttons (the locate button was removed, owner 3 Nov) (' + r.n + ' buttons, ' + r.tops + ' rows)');
     ok(parseFloat(r.radius) >= 20, t + 'pill radius (' + r.radius + ')');
     ok(/68, ?192, ?185/.test(r.border), t + '1 px teal border (' + r.border + ')');
     ok(r.hit && r.draw, t + 'buttons 44 px hit area, 36 px drawn');
     ok(r.ico, t + 'icons 18 px');
-    ok(['#vi-zoom-out', '#vi-zoom-in', '#vi-orbit', '#vi-pin', '#vi-reset', '#vi-fullscreen'].every(h => r.icons.includes(h)), t + 'sprite icons ' + r.icons.join(','));
+    ok(['#vi-zoom-out', '#vi-zoom-in', '#vi-orbit', '#vi-reset', '#vi-fullscreen'].every(h => r.icons.includes(h)), t + 'sprite icons ' + r.icons.join(','));
     ok(!/[\u{1F300}-\u{1FAFF}✳-➿↺⟳⛶⊕✕✵+−]/u.test(r.text) && r.text === '', t + 'no emoji or glyph fallbacks (text "' + r.text + '")');
     ok(/68, ?192, ?185/.test(r.orbBorder) && r.orbShadow !== 'none', t + 'orbit on: teal border and glow');
     ok(r.capClear, t + 'caption clear of the bar');
