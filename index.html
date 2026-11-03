@@ -10616,14 +10616,14 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .ca-rate{display:inline-flex;align-items:center;gap:6px}
 .ca-rate-in{width:84px;min-height:36px;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:4px 8px}
 .ca-int{color:var(--gr);font-family:'Share Tech Mono',monospace}
-.ca-act{display:flex;gap:8px;margin-top:8px}.ca-act button{flex:1 1 0;min-width:0;padding:6px 8px;white-space:nowrap}
+.ca-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.ca-act button{flex:1 1 auto;max-width:150px;padding:6px 14px;white-space:nowrap}
 .ca-add,.ca-out,.ca-mv-ok,.ca-mv-no,.ca-undo-btn{min-height:44px;min-width:44px;padding:6px 14px;border-radius:4px;border:1px solid var(--gr);background:transparent;color:var(--gr);font-family:'Share Tech Mono',monospace;font-size:max(.7rem,var(--vi-fs-3));cursor:pointer}
 .ca-out{border-color:var(--re);color:var(--re)}
 .ca-mv-no{border-color:var(--bd);color:var(--t3)}
 .ca-mv{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;align-items:center}
 .ca-mv input{min-height:44px;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;min-width:0;flex:1 1 120px}
-.ca-mv-msg{flex:1 1 100%;margin-top:0}
-.ca-mv-msg a{color:var(--gr);text-decoration:underline}
+.ca-mv .ca-mv-msg{flex:1 1 100%;margin-top:0;color:var(--t2)}
+.ca-mv-msg a{color:var(--gr);text-decoration:underline;display:inline-flex;align-items:center;min-height:44px;padding:0 6px}
 .ca-log{margin-top:8px;font-size:max(.66rem,var(--vi-fs-2));color:var(--t3)}
 .ca-log summary{cursor:pointer;min-height:24px}
 .ca-log-l{display:flex;justify-content:space-between;gap:12px;padding:2px 0;font-family:'Share Tech Mono',monospace}
@@ -12797,16 +12797,16 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <span class="ov-chart-title">Cash &amp; Savings Accounts</span>
           <span style="font-family:'Share Tech Mono',monospace;font-size:max(.68rem,var(--vi-fs-2));color:var(--gr)">Total: <span id="subtab-total-cash" style="font-weight:700">£0</span></span>
         </div>
-        <div class="ca-head-int" id="ca-int-wrap" hidden>Estimated interest <span id="ca-int-total"></span></div>
+        <div class="ca-head-int" id="ca-int-wrap" hidden>Total interest <span id="ca-int-total"></span></div>
         <div id="cash-table"></div>
         <div class="data-input-row" style="margin-top:12px">
           <input type="text" id="ca-name" placeholder="Account name">
           <select id="ca-type" style="background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;outline:none"><option>Current</option><option>Savings</option><option>ISA</option><option>LISA</option></select>
           <input type="number" id="ca-bal" placeholder="Balance £">
-          <input type="number" id="ca-rate" min="0" max="100" step="0.01" inputmode="decimal" placeholder="Interest AER % (optional)" aria-label="Interest rate, AER percent, optional">
+          <input type="number" id="ca-rate" min="0" max="100" step="0.01" inputmode="decimal" placeholder="Interest rate (AER) % (optional)" aria-label="Interest rate (AER), percent, optional">
           <button class="btn-add-data" onclick="addCashAccount()">+ Add</button>
         </div>
-        <div class="ca-note">Interest is an estimate from the rate you enter (balance times AER, before tax). It is not added to your net worth. Not regulated by the FCA. Not financial advice.</div>
+        <div class="ca-note">Interest is an estimate from the rate you enter (balance times the rate, before tax). It is not added to your net worth. Not regulated by the FCA. Not financial advice.</div>
       </div>
       <div class="ov-chart-card pc-card" id="pc-card" style="margin-top:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap">
@@ -21725,8 +21725,8 @@ function caRowHtml(a){
   var it=caInterest(a),open=caMv&&caMv.id===a.id,mv=(a.moves||[]).slice().sort(function(x,y){return (y.date||'').localeCompare(x.date||'')||y.id-x.id;});
   var rate=(a.rate===0||+a.rate>0)?a.rate:'';
   return '<tr data-ca="'+a.id+'"><td class="ca-cell"><span class="cash-acc">'+viBankLogo(a.name)+'<span>'+cfEsc(a.name)+'</span></span>'
-    +'<div class="ca-sub"><label class="ca-rate"><span>Interest AER %</span><input class="ca-rate-in" type="number" min="0" max="100" step="0.01" inputmode="decimal" value="'+rate+'" placeholder="none" aria-label="Interest rate, AER percent, for '+cfEsc(a.name).replace(/"/g,'&quot;')+'" onchange="caSetRate('+a.id+',this.value)"></label>'
-    +(it?'<span class="ca-int">about '+caFmt(it.year)+' a year, about '+caFmt(it.month)+' a month</span>':'')+'</div>'
+    +'<div class="ca-sub"><label class="ca-rate"><span>Interest rate (AER)</span><input class="ca-rate-in" type="number" min="0" max="100" step="0.01" inputmode="decimal" value="'+rate+'" placeholder="none" aria-label="Interest rate (AER), percent, for '+cfEsc(a.name).replace(/"/g,'&quot;')+'" onchange="caSetRate('+a.id+',this.value)"></label>'
+    +(it?'<span class="ca-int">Interest '+caFmt(it.year)+' a year (estimate), '+caFmt(it.month)+' a month</span>':'')+'</div>'
     +'<div class="ca-act"><button type="button" class="ca-add" onclick="caMoveOpen('+a.id+',1)">+ Add</button><button type="button" class="ca-out" onclick="caMoveOpen('+a.id+',-1)">− Take out</button></div>'
     +(open?'<div class="ca-mv" role="group" aria-label="'+(caMv.sign>0?'Add money to':'Take money out of')+' this account"><input class="ca-mv-amt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Amount £" aria-label="Amount" value="'+(caMv.amt||'')+'" oninput="caMv.amt=this.value" onkeydown="if(event.key===\'Enter\')caMoveDo('+a.id+')"><input class="ca-mv-date" type="date" aria-label="Date" value="'+(caMv.date||caToday())+'" onchange="caMv.date=this.value"><button type="button" class="ca-mv-ok" onclick="caMoveDo('+a.id+')">'+(caMv.sign>0?'Add':'Take out')+'</button><button type="button" class="ca-mv-no" onclick="caMoveClose()">Cancel</button><div class="ca-mv-msg vi-pop-msg" role="status"></div></div>':'')
     +(mv.length?'<details class="ca-log"><summary>Movements ('+mv.length+')</summary>'+mv.slice(0,8).map(function(m){var inn=(+m.amount||0)>=0,d=m.date?new Date(m.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';return '<div class="ca-log-l"><span>'+d+'</span><span class="'+(inn?'in':'out')+'">'+(inn?'+':'−')+caFmt(Math.abs(caP(m.amount)))+'</span></div>';}).join('')+'</details>':'')
@@ -21740,7 +21740,7 @@ function caTableHtml(){
 function caAfterRender(){
   var yr=0,any=false;(alState.cashAccounts||[]).forEach(function(a){var it=caInterest(a);if(it){yr+=it.year;any=true;}});
   var w=document.getElementById('ca-int-wrap'),t=document.getElementById('ca-int-total');
-  if(w)w.hidden=!any;if(t)t.textContent=any?'about '+caFmt(yr)+' a year':'';
+  if(w)w.hidden=!any;if(t)t.textContent=any?caFmt(yr)+' a year (estimate)':'';
 }
 function caRedraw(){setTimeout(function(){try{renderAlTab();}catch(e){console.error('[Vault-It] cash accounts',e);}},0);}  // after the change event settles: a render during blur throws
 function caSetRate(id,v){if(viBlockEdit()){caRedraw();return;}
