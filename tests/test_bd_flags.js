@@ -29,6 +29,8 @@ const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b
     const T = theme + ' ' + w + (rm ? ' (reduced motion)' : '') + ': ';
     // wait for every group's blocks to land (at once with reduced motion)
     await p.waitForFunction(() => { const e = bd3d.engine(); return e && e.flags && e.flags().length && e.flags().every(f => f.alpha >= 1); }, null, { timeout: rm ? 8000 : 40000 }).catch(() => {});
+    // the camera is still settling after the intro (longer in a taller stage): give every post up to 8 s to find room for its chip
+    await p.waitForFunction(() => { const e = bd3d.engine(); return e && e.flags().every(f => f.chip); }, null, { timeout: 8000 }).catch(() => {});
     await p.waitForTimeout(400);
     const r = await p.evaluate(() => { const e = bd3d.engine(), cv = document.getElementById('bd3d-cv'), cw = cv.clientWidth, ch = cv.clientHeight;
       return { flags: e.flags ? e.flags() : null, outlines: e.outlines ? e.outlines() : null, rects: e.rects(), cw, ch, fmt: e.rects().map(x => gbpFmt(x.sum)), plates: e.plates ? e.plates() : null, tag: e.tagRect ? e.tagRect() : null }; });
