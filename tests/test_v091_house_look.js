@@ -56,7 +56,7 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
         tSw: new Set(tsvg.map(s => s.getAttribute('stroke-width') + '|' + s.getAttribute('viewBox'))).size,
         tActive: types.filter(x => x.classList.contains('active')).length, tLabelFs: parseFloat(cs(types[0].querySelector('.nm')).fontSize),
         xpGap: (() => { const g = st[2] && cs(st[2]).borderTopColor, x = st[4] && cs(st[4]).borderTopColor; return g !== x && /^rgb\(\s*(\d+)/.test(x) && (+x.match(/\d+/g)[2] > +x.match(/\d+/g)[0] - 40); })(),
-        tgGap: next ? Math.round(R(next.querySelector('.ms-tg')).left - R(next.querySelector('.ms-lbl')).right) : 999, tgNear: next ? (R(next.querySelector('.ms-tg')).left - R(next.querySelector('.ms-lbl')).right) <= 24 : false,
+        tgGap: next ? Math.round(R(next.querySelector('.ms-tg')).left - R(next.querySelector('.ms-lbl')).right) : 999, tgNear: next ? ((R(next.querySelector('.ms-tg')).left - R(next.querySelector('.ms-lbl')).right) <= 24 || (Math.abs(R(next.querySelector('.ms-tg')).left - R(next.querySelector('.ms-lbl')).left) <= 40 && R(next.querySelector('.ms-tg')).top - R(next.querySelector('.ms-lbl')).bottom <= 8)) : false,
         noteFs: note ? parseFloat(cs(note).fontSize) : 0, lblCardFs: lbl ? parseFloat(cs(lbl.querySelector('.vi-dim') || lbl).fontSize) : 0, small,
         holoBold: !!hud.querySelector('.hb-pg-note b'),
         side: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
