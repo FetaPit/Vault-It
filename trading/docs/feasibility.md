@@ -115,3 +115,16 @@ Years to reach £15,000 (months in brackets), from `trading.forecast.forecast_ta
 - [ ] Retail CFD loss percentages: provider risk warnings.
 - [ ] Equity return and dividend-yield ranges, day-trader studies: cited papers and index provider factsheets.
 - [ ] US ETF access under PRIIPs/CCI: FCA and broker notices.
+
+## Go-live and pledge checklist
+
+- [ ] >= 100 closed Sleeve A trades and >= 60 paper days in the journal.
+- [ ] Every backtest/config variant recorded via `record_trial` (n_trials honest).
+- [ ] Net expectancy > 0 with 90% CI lower bound > 0; still > 0 with costs doubled.
+- [ ] Beats the benchmark on total return and Sharpe over the same days (supply `--benchmark-csv`).
+- [ ] PSR and DSR >= 0.95; walk-forward folds supplied (`--walkforward-json`) and passing.
+- [ ] Max drawdown within `risk.max_drawdown_kill_pct`.
+- [ ] Any LLM-originated signal carries `blind_tested=1` (anonymised tickers, shifted dates).
+- [ ] `python -m trading.cli evaluate` exits 0. Anything else means do not go live.
+- [ ] Pledge: owner confirms rate_pct (default 1.0) and the high-water-mark rule.
+- [ ] Pledge: destination stays UNSET; Anthropic is private with no public ticker, so the accrual is set-aside cash until an eligible route is verified by the owner [VERIFY].

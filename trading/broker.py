@@ -27,6 +27,7 @@ class _OrderState:
     filled_qty: float = 0.0
     n_fills: int = 0
     risk_used: float = 0.0
+    budget_units: float = 0.0
 
 
 class PaperBroker:
@@ -69,6 +70,12 @@ class PaperBroker:
         return self._orders[order_id].status
 
     @staticmethod
+    def _consumed_frac(st: _OrderState) -> float:
+        """Fraction of an order's risk budget consumed by fills (by quantity or by real risk)."""
+        by_risk = st.risk_used / st.budget_units if st.budget_units > 0 else 0.0
+        return min(1.0, max(st.filled_qty / st.order.quantity, by_risk))
+
+    @staticmethod
     def _is_live(s: _OrderState) -> bool:
         return s.status in (OrderStatus.PENDING, OrderStatus.PARTIALLY_FILLED)
 
@@ -92,7 +99,7 @@ class PaperBroker:
 
     def pending_risk_gbp(self, sleeve: Sleeve | None = None) -> float:
         """Risk still reserved by live (unfilled remainder of) orders."""
-        return sum(st.risk_gbp * (st.order.quantity - st.filled_qty) / st.order.quantity
+        return sum(st.risk_gbp * (1.0 - self._consumed_frac(st))
                    for st in self._orders.values()
                    if self._is_live(st) and (sleeve is None or st.order.sleeve == sleeve))
 
@@ -130,7 +137,10 @@ class PaperBroker:
             raise OrderError("long stop must be below entry")
         if order.side == Side.SHORT and order.stop_price <= order.entry_price:
             raise OrderError("short stop must be above entry")
-        self._orders[order.order_id] = _OrderState(order, risk_gbp)
+        profile = self._cfg.fee_profile_for(order.symbol)
+        budget_units = order.quantity * (abs(order.entry_price - order.stop_price)
+                                         + 2 * (profile.half_spread + profile.slippage))
+        self._orders[order.order_id] = _OrderState(order, risk_gbp, budget_units=budget_units)
         if self._journal:
             self._journal.record_order(order, OrderStatus.PENDING)
 
@@ -201,8 +211,8 @@ class PaperBroker:
             fill_qty = min(remaining, cap, max_by_risk)
             if fill_qty < min(remaining, inst_cfg.min_size) - EPS or fill_qty <= 0:
                 continue
-            fills.append(self._apply_entry(st, bar, fill_px, fill_qty))
             st.risk_used += fill_qty * (d_act + c)
+            fills.append(self._apply_entry(st, bar, fill_px, fill_qty))
             if fill_qty < remaining - EPS and max_by_risk < min(remaining, cap) - EPS:
                 self._set_status(st, OrderStatus.CANCELLED)
 
@@ -252,7 +262,7 @@ class PaperBroker:
             pos.entry_price = (pos.quantity * pos.entry_price + fill_qty * fill_px) / (pos.quantity + fill_qty)
             pos.quantity += fill_qty
             pos.entry_fees_gbp += costs.total_fees_gbp
-        pos.initial_risk_gbp = st.risk_gbp * pos.quantity / o.quantity
+        pos.initial_risk_gbp = st.risk_gbp * self._consumed_frac(st)
         filled = st.filled_qty >= o.quantity - EPS
         self._set_status(st, OrderStatus.FILLED if filled else OrderStatus.PARTIALLY_FILLED)
         fill = Fill(f"{o.order_id}-f{st.n_fills}", o.order_id, o.symbol, action, fill_qty, fill_px, bar.open,

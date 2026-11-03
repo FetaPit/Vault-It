@@ -137,3 +137,31 @@ US holidays and early closes come from calendar data. Early closes (13:00 NY) do
 ## 9. Phase-2 roadmap (not built)
 
 A live adapter behind a separate review, a real data feed (PLAN_GAP-6), the ISA decision (PLAN_GAP-3), the broker choice (PLAN_GAP-2) and rebuilding broker state from the journal.
+
+## 10. Go-live evaluation gates and pledge ledger
+
+### Go-live gates (`trading/evaluation.py`, CLI `evaluate`)
+
+Pure, deterministic functions. Live is permitted only if ALL gates pass; missing or degenerate data makes a gate FAIL, never pass. `python -m trading.cli evaluate --journal J [--benchmark-csv F] [--walkforward-json F] [--json]` prints the report and exits 1 if any gate fails. It has no order path.
+
+| Gate | Pass condition |
+|---|---|
+| min_sample | >= 100 closed Sleeve A trades and >= 60 calendar paper days |
+| net_expectancy | mean net P&L/trade > 0 and the lower bound of the 90% CI > 0 (seeded bootstrap AND t-stat, both) |
+| cost_stress | mean(gross - 2 x cost) per trade > 0 |
+| benchmark | net return after costs beats the benchmark buy-and-hold on total return and Sharpe over the same days |
+| probabilistic_sharpe | PSR(SR* = 0) >= 0.95 (skew and kurtosis from the data) |
+| deflated_sharpe | DSR >= 0.95 using n_trials = rows in journal table `trials` |
+| walk_forward | >= 70% of OOS folds net-positive and mean OOS Sharpe >= 50% of a positive mean IS Sharpe (>= 3 folds) |
+| max_drawdown | compounded daily-return drawdown <= `risk.max_drawdown_kill_pct` |
+| blind_llm | every `source='llm'` signal has feature `blind_tested = 1` (tickers anonymised, dates shifted); none present passes |
+
+Trials: `TradeJournal.record_trial(ts, config_version, description)` writes the `trials` table; the CLI `backtest` command records one per run. Every backtest or config variant must be recorded, otherwise DSR is overstated. The cross-trial Sharpe variance is not stored, so DSR uses the null sampling variance 1/(n-1) (PLAN_GAP, see impl-summary-gates.md). Daily returns are `(end - start - deposits) / start` from `daily_equity` (assumes `end_equity` includes deposits). Benchmark returns and walk-forward folds are supplied as files; if absent those gates fail.
+
+### Pledge ledger (`trading/pledge.py`, CLI `pledge status|update`)
+
+Ledger and recommendation only: no purchase, no network, no order path, and it never changes sizing or risk equity. Config block `pledge: {enabled, rate_pct, destination}` (defaults true, 1.0, "UNSET"; `rate_pct` must be in [0, 100]). v0001.json loads unchanged; the default block is omitted from `config_to_dict`, so stored config hashes are unaffected and no new config file is required. Journal table `pledge_ledger(id, ts, earnings_gbp, accrual_gbp, cumulative_accrued_gbp, hwm_gbp)`, one row per day with earnings (`ts` unique, so re-running a day is a no-op).
+
+- Earnings = realised net P&L on closed trades (net of fees, stamp duty, FX, slippage) + dividends credited (net of withholding). Deposits, top-ups, initial capital, sweep flows and unrealised P&L are excluded.
+- DEFAULT CHOICE the owner can change: accrual only on earnings above the running high-water mark of cumulative realised earnings (HWM starts at 0), so losses are recovered first. Changing to accrue on every positive day means removing the HWM test in `accrue_step`.
+- Anthropic is a private company with no public ticker. The destination therefore stays `UNSET` and the accrued amount is simply set-aside cash until the owner verifies an eligible route [VERIFY]. Nothing is bought.
