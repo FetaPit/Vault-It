@@ -136,6 +136,11 @@ const READ = () => {
     const blur = await p.evaluate(() => ({ saved: alState.metals.silver, anim: V3.metals._lastAnim, msg: (document.getElementById('metal-draft-silver') || {}).textContent || '' }));
     ok(blur.saved === 3, 'blurring saves the typed value, so nothing is lost (' + blur.saved + ')');
     ok(!blur.anim && !/not in your vault yet/i.test(blur.msg), 'blurring plays no animation (' + JSON.stringify(blur.anim) + ')');
+    // clearing the field and leaving it means none held, as it did before E22
+    await p.fill('#metal-hold-silver', '');
+    await p.evaluate(() => document.getElementById('metal-hold-silver').blur()); await p.waitForTimeout(600);
+    const cleared = await p.evaluate(() => alState.metals.silver);
+    ok(cleared === 0, 'clearing the field and leaving it saves 0 oz (' + cleared + ')');
     await ctx.close();
   }
 

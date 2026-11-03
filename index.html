@@ -21635,9 +21635,12 @@ function renderMetalsInputs(){
   var metals=[{k:'gold',lbl:'Gold',col:'var(--gold)'},{k:'silver',lbl:'Silver',col:'var(--m-silver)'},{k:'platinum',lbl:'Platinum',col:'var(--m-platinum)'},{k:'palladium',lbl:'Palladium',col:'var(--m-palladium)'}];
   // one row per metal: holdings and the price beside it, value at the end (A1)
   var mi=document.getElementById('metals-inputs'),sym=window.VI_CURRENCY_SYMBOL||'\u00a3';
+  // a quiet save (leaving the field, or a change event) keeps the rows as they are: redrawing them would replace the
+  // "Add to vault" button under the user's finger, and the tap would never land (E22).
+  if(window.V3&&V3._keepRows){metals.forEach(function(m){metalValCell(m.k);});mi=null;}
   if(mi)mi.innerHTML=metals.map(function(m){
     return'<div class="metal-row mh-row"><span class="metal-lbl" style="color:'+m.col+'">'+m.lbl+'</span>'
-      +'<label class="mh-cell"><span class="mh-k">Hold</span><input class="metal-inp" id="metal-hold-'+m.k+'" type="number" min="0" step="0.01" value="'+(alState.metals[m.k]||0)+'" aria-label="'+m.lbl+' held, troy ounces" oninput="metalStage(\''+m.k+'\',this.value)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();metalCommit(\''+m.k+'\',true);}" onblur="metalBlur(\''+m.k+'\')"><span class="metal-unit">oz</span></label>'
+      +'<label class="mh-cell"><span class="mh-k">Hold</span><input class="metal-inp" id="metal-hold-'+m.k+'" type="number" min="0" step="0.01" value="'+(alState.metals[m.k]||0)+'" aria-label="'+m.lbl+' held, troy ounces" oninput="metalStage(\''+m.k+'\',this.value)" onchange="metalCommit(\''+m.k+'\',false)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();metalCommit(\''+m.k+'\',true);}" onblur="metalBlur(\''+m.k+'\')"><span class="metal-unit">oz</span></label>'
       +'<label class="mh-cell"><span class="mh-k">Price</span><input class="metal-inp" type="number" min="0" step="0.01" value="'+(alState.metalPrices[m.k]||0)+'" aria-label="'+m.lbl+' price per ounce" onchange="updateMetalPrice(\''+m.k+'\',this.value)"><span class="metal-unit">'+sym+'/oz</span></label>'
       +'<button class="btn-add-data metal-commit" data-m="'+m.k+'" onclick="metalCommit(\''+m.k+'\',true)" aria-label="Add your '+m.lbl.toLowerCase()+' to the vault">Add to vault</button>'
       +'<span class="mh-val" id="metal-val-'+m.k+'" style="color:'+m.col+'">'+sym+Math.round((alState.metals[m.k]||0)*(alState.metalPrices[m.k]||0)).toLocaleString('en-GB')+'</span>'
@@ -21673,14 +21676,21 @@ function metalCommit(k,animate){
   if(viBlockEdit())return;
   clearTimeout(V3_BLUR[k]);V3_BLUR[k]=null;
   var d=document.getElementById('metal-draft-'+k),inp=document.getElementById('metal-hold-'+k);
-  var raw=V3_STAGE[k]!=null?V3_STAGE[k]:(inp?inp.value:null),n=parseFloat(raw);
+  var raw=V3_STAGE[k]!=null?V3_STAGE[k]:(inp?inp.value:null),n=(raw!=null&&String(raw).trim()==='')?0:parseFloat(raw);   // a cleared field means none held, as before E22
   var was=+alState.metals[k]||0;
-  if(raw==null||!isFinite(n)||n<0){if(d){d.textContent='';d.classList.remove('on');}return;}
+  if(raw==null||!isFinite(n)||n<0||Math.abs(n-was)<1e-9){   // nothing new to save; the button still shows that metal arriving
+    if(d&&d.classList.contains('on')){d.textContent='';d.classList.remove('on');}
+    if(animate&&was>0){   // leaving the field already saved it, so the button just plays that metal's arrival
+      V3._animZone=k;V3._animSilent=false;
+      var V=V3.metals,pending=V3._after&&V3._after.metals;
+      if(!pending&&V&&V.introArm){V3._animZone=null;V.introArm(V._introTag||'metals',k,false);}   // no rebuild on the way: arm it here
+    }
+    return;
+  }
   delete V3_STAGE[k];
-  if(Math.abs(n-was)<1e-9){if(d){d.textContent='';d.classList.remove('on');}return;}
   alState.metals[k]=n;metalValCell(k);saveAL();
-  if(animate){V3._animZone=k;}else{V3._animSilent=true;}
-  renderMetalsISO();updateKPIs();checkAchievements();
+  if(animate){V3._animZone=k;}else{V3._animSilent=true;V3._keepRows=1;}
+  try{renderMetalsISO();updateKPIs();checkAchievements();}finally{V3._keepRows=0;}
   var diff=n-was,sym=window.VI_CURRENCY_SYMBOL||'\u00a3',rate=window.VI_CURRENCY_RATE||1;
   var worth=Math.round(Math.abs(diff)*(alState.metalPrices[k]||0)*rate).toLocaleString('en-GB');
   d=document.getElementById('metal-draft-'+k);   // the row was redrawn above, so the line goes on the new one
