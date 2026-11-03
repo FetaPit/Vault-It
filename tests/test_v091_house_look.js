@@ -55,6 +55,8 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
         tN: types.length, tKeys: types.map(x => x.dataset.type).join(','), tW: tsvg.map(s => R(s).width), tGold: tsvg.map(s => /E8C56A|gold|#e8c56a/i.test(s.innerHTML) || !!s.querySelector('.ti-gold')),
         tSw: new Set(tsvg.map(s => s.getAttribute('stroke-width') + '|' + s.getAttribute('viewBox'))).size,
         tActive: types.filter(x => x.classList.contains('active')).length, tLabelFs: parseFloat(cs(types[0].querySelector('.nm')).fontSize),
+        xpGap: (() => { const g = st[2] && cs(st[2]).borderTopColor, x = st[4] && cs(st[4]).borderTopColor; return g !== x && /^rgb\(\s*(\d+)/.test(x) && (+x.match(/\d+/g)[2] > +x.match(/\d+/g)[0] - 40); })(),
+        tgGap: next ? Math.round(R(next.querySelector('.ms-tg')).left - R(next.querySelector('.ms-lbl')).right) : 999, tgNear: next ? (R(next.querySelector('.ms-tg')).left - R(next.querySelector('.ms-lbl')).right) <= 24 : false,
         noteFs: note ? parseFloat(cs(note).fontSize) : 0, lblCardFs: lbl ? parseFloat(cs(lbl.querySelector('.vi-dim') || lbl).fontSize) : 0, small,
         holoBold: !!hud.querySelector('.hb-pg-note b'),
         side: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
@@ -64,10 +66,12 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
     // E7
     ok(h.roles === 6, t + 'E7 six tiles, six different colour roles (' + h.roles + ')');
     ok(h.topW.every(x => x >= 3), t + 'E7 3 px role rule on top (' + h.topW.join(',') + ')');
-    ok(w >= 1100 ? h.icW >= 28 : w >= 600 ? h.icW >= 26 : h.icW >= 22, t + 'E7 icon size (' + h.icW + ')');
+    ok(w >= 1100 ? h.icW >= 32 : w >= 600 ? h.icW >= 26 : h.icW >= 22, t + 'E7 icon size (' + h.icW + ')');
     ok(h.disc, t + 'E7 icon sits in a tinted disc');
-    ok(h.valFs >= 18 && h.lblFs >= 11, t + 'E7 value >= 18 px, label >= 11 px (' + h.valFs + ', ' + h.lblFs + ')');
+    ok(h.valFs >= (w >= 1100 ? 22 : 18) && h.lblFs >= 11, t + 'E7 value >= 18 px, label >= 11 px (' + h.valFs + ', ' + h.lblFs + ')');
     ok(!h.valClip, t + 'E7 no value is cut off');
+    ok(h.xpGap, t + 'E7 XP role colour is clearly apart from the deposit gold');
+    ok(h.tgNear, t + 'E11 "to go" sits next to its milestone label (gap ' + h.tgGap + ')');
     // E11
     ok(h.msN === 10 && h.asc && h.vertical, t + 'E11 ten milestones, earliest first, one vertical timeline');
     ok(w >= 1100 ? h.right : h.below, t + 'E11 timeline is ' + (w >= 1100 ? 'the right column' : 'below the stats') + ' (right ' + h.right + ', below ' + h.below + ')');
