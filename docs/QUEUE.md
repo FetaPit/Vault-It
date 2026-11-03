@@ -90,6 +90,7 @@ The single list of instructed work. Every session reads it at start and before e
   - Carried in (Pedro's test run, 3 Nov, verified): sidebar summary, Total assets and Monthly surplus still teal; should be green and blue, net worth teal, red when negative, Night and Daylight.
   - [~] (cloud) v09x/cash3d: E13, E12, E14, E21, E22 started (session session_01KoffvxLsCqmaAdJoF33Tsx)
   - [~] (cloud) v09x/debt-cards: E33 ready for review, 78309f5, CI green (run 41672816331), rollout-qc PASS (session session_01KoffvwCD2twn9yTjpdFdQd)
+  - [ ] (cloud) v09x/debt-cards follow-up E33b (owner, 3 Nov ~16:50): "What do we have iconography for these debt types if so let's apply them to the space uner the logo top right. What could we include on the reverse to give the user a reason to rotate and just give the reverse a purpose so its not just a gimmick". Pedro's 3 nits on E33 being cleared first.
   - [~] (cloud) v09x/stocks-return: E17 started (session session_01Koffvyw2o8fx22xCknVKyw)
   - [~] (cloud) v09x/cash-accounts: E15, E16 started (session session_01KoffvwhYtD2e8aZcLKS6bj)
   - [~] (cloud) v09x/model-library: E30 picker started (session session_01KoffvwvF7z5Yrp72QnsYm4)
