@@ -114,7 +114,7 @@ const seed = t => {
     }
 
     // 4: compact pills, below the chart on Cash flow, same style on Budget
-    for (const [tab, lg, sk] of [['overview', 'cf-legend', 'cf-sankey'], ['budget', 'bd-legend', 'bd-sankey']]) {
+    for (const [tab, lg, sk] of [['overview', 'cf-legend', 'cf-3d'], ['budget', 'bd-legend', 'bd-sankey']]) {
       await p.evaluate(t => { showTab(t); }, tab); await p.waitForTimeout(500);
       const L = await p.evaluate(([lg, sk]) => {
         const l = document.getElementById(lg), s = document.getElementById(sk), sp = [...l.children];
@@ -127,15 +127,16 @@ const seed = t => {
         const strong = sp.every(x => { const cs = getComputedStyle(x); return alpha(cs.borderTopColor) >= 0.55 && alpha(cs.backgroundColor) >= 0.08; });
         return { strong, n: sp.length, rows: tops.size, fsz, hh, ic, same, below: l.getBoundingClientRect().top >= s.getBoundingClientRect().bottom, lh: Math.round(l.getBoundingClientRect().height) };
       }, [lg, sk]);
-      ok(L.n === 6 && L.fsz <= 11.5 && L.hh <= 22 && L.ic <= 14 && L.same, T + tab + ' pills are compact, colours unchanged (font ' + L.fsz + ', height ' + L.hh + ', icon ' + L.ic + ')');
-      ok(L.rows <= (w < 600 ? 3 : w < 1000 ? 2 : 1), T + tab + ' six pills fit in ' + L.rows + ' rows (' + L.lh + ' px)');
+      const bigBd = tab === 'budget' && w > 600;   // v0.9.1 E5: larger pills on tablet and desktop
+      ok(L.n === 6 && (bigBd || (L.fsz <= 11.5 && L.hh <= 22 && L.ic <= 14)) && L.same, T + tab + ' pills are compact, colours unchanged (font ' + L.fsz + ', height ' + L.hh + ', icon ' + L.ic + ')');
+      if (!bigBd) ok(L.rows <= (w < 600 ? 3 : w < 1000 ? 2 : 1), T + tab + ' six pills fit in ' + L.rows + ' rows (' + L.lh + ' px)');
       ok(L.strong, T + tab + ' each pill carries its colour: 60% border and a 10% fill (Pedro, review 1)');
       if (tab === 'overview') ok(L.below, T + 'on Cash flow the key sits below the chart');
     }
 
     // 5: rails above and below the flow chart, synced both ways, draggable
-    for (const tab of ['overview', 'budget']) {
-      const sk = tab === 'overview' ? 'cf-sankey' : 'bd-sankey';
+    for (const tab of ['budget']) {
+      const sk = 'bd-sankey';
       await p.evaluate(t => { showTab(t); }, tab); await p.waitForTimeout(600);
       await p.evaluate(s => document.getElementById(s).scrollIntoView({ block: 'center' }), sk); await p.waitForTimeout(300);
       const R = await p.evaluate(s => {

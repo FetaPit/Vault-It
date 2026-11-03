@@ -10,7 +10,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   for(const [w,h] of [[1600,900],[1366,768],[1920,1080]]){
     const ctx=await b.newContext({viewport:{width:w,height:h}}); const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(e.message));
     await p.addInitScript(seed); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2200); await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
-    for(const [tab,id] of [['budget','bd-sankey'],['overview','cf-sankey']]){
+    for(const [tab,id] of [['budget','bd-sankey']]){
       await p.evaluate(t=>showTab(t),tab); await p.waitForTimeout(1000);
       await p.evaluate(id=>document.getElementById(id).scrollIntoView({block:'start'}),id); await p.waitForTimeout(300);
       const r=await p.evaluate(id=>{const s=document.querySelector('#'+id+' svg').getBoundingClientRect();return{top:s.top,bottom:s.bottom,h:s.height,w:s.width,vh:innerHeight};},id);
