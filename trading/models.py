@@ -180,6 +180,7 @@ class AccountState:
     sleeve_cash_gbp: float
     pending_risk_gbp: float = 0.0
     pending_notional_gbp: float = 0.0
+    deposits_today_gbp: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)

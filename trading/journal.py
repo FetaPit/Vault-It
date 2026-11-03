@@ -170,6 +170,15 @@ class TradeJournal:
                                  (kind,)).fetchone()
         return float(row[0])
 
+    def cash_flow_total(self, kind: str, d: date) -> float:
+        """Sum of cash flows of `kind` whose UTC date of `ts` equals `d`."""
+        total = 0.0
+        for ts, amt in self._conn.execute("SELECT ts, amount_gbp FROM cash_flows WHERE kind=?",
+                                          (kind,)).fetchall():
+            if _parse(ts).astimezone(timezone.utc).date() == d:
+                total += amt
+        return total
+
     def cash_flow_dedupe_keys(self, prefix: str) -> set[str]:
         rows = self._conn.execute("SELECT dedupe_key FROM cash_flows WHERE dedupe_key IS NOT NULL").fetchall()
         return {r[0] for r in rows if r[0].startswith(prefix)}

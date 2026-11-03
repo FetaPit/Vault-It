@@ -72,11 +72,26 @@ class TestDaily(unittest.TestCase):
         self.assertEqual(again.decisions, ())
 
     def test_topup_does_not_hide_daily_loss(self) -> None:
-        # top-up day (+100): day-start is lifted by the deposit, so a Sleeve A loss above 3% still trips the cap
-        self.broker._cash -= 22.0
+        # top-up day (+100): the deposit is netted out of the loss, so a loss equal to the 3% cap
+        # (18.75 on 625 day-start) still trips it
+        self.broker._cash -= 18.75
         rep = self.close(date(2027, 2, 1), {"DIVA": 20.0})
         self.assertGreaterEqual(len(rep.decisions), 1)
         for d in rep.decisions:
+            self.assertFalse(d.approved)
+            self.assertIn("DAILY_LOSS_CAP_HIT", d.reasons)
+
+    def test_topup_loss_still_visible_on_rerun(self) -> None:
+        # FIX-103: the same-day rerun dedupes the deposit but must still net out today's top-up
+        self.broker._cash -= 19.0
+        first = self.close(date(2027, 2, 1))   # no prices: top-up applied, no buy signals yet
+        self.assertEqual(first.decisions, ())
+        self.assertAlmostEqual(self.j.cash_flow_total("topup", date(2027, 2, 1)), 100.0, places=6)
+        self.assertEqual(self.j.cash_flow_total("topup", date(2027, 2, 2)), 0.0)
+        second = self.close(date(2027, 2, 1), {"DIVA": 20.0})   # rerun: deposit deduped, signals now appear
+        self.assertEqual(second.topups, ())
+        self.assertGreaterEqual(len(second.decisions), 1)
+        for d in second.decisions:
             self.assertFalse(d.approved)
             self.assertIn("DAILY_LOSS_CAP_HIT", d.reasons)
 

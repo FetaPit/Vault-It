@@ -106,6 +106,22 @@ class TestBroker(BrokerBase):
         # FIX-101: real risk of the two fills = 2*5 + 1.45*6 = 18.70, not a pro-rata share
         self.assertAlmostEqual(self.b.open_positions()[0].initial_risk_gbp, 18.70, places=6)
 
+    def test_partial_fill_commissions_reserved(self) -> None:
+        # FIX-102: each partial fill pays the minimum commission again; it must come out of the budget
+        cfg = make_cfg({"fees": {"mc": {"min_commission_gbp": 1.0}},
+                        "instruments": {"TESTMC": {"kind": "share", "currency": "GBP", "min_size": 0.01,
+                                                   "size_step": 0.01, "fee_profile": "mc"}}})
+        b = PaperBroker(cfg, FxConverter.from_config(cfg), 625.0)
+        b.submit_bracket(order(symbol="TESTMC", qty=3.35, target=None), 18.75)   # sizing: (18.75-2)/5
+        fills = b.on_bar(self.bar(0, 100, 101, 99, 100.5, v=20, sym="TESTMC"))
+        fills += b.on_bar(self.bar(1, 100, 101, 99, 100.5, v=0, sym="TESTMC"))
+        self.assertEqual(len(fills), 2)
+        self.assertAlmostEqual(fills[0].quantity, 2.0, places=6)
+        # entry fills + one exit commission (1.0) must stay within the budget
+        total = sum(f.quantity * (f.price - 95.0) + f.commission_gbp for f in fills) + 1.0
+        self.assertLessEqual(total, 18.75 + 1e-9)
+        self.assertAlmostEqual(fills[1].quantity, 1.15, places=6)
+
     def test_entry_drift_capped_by_risk(self) -> None:
         self.submit(order(target=None))
         f = self.b.on_bar(self.bar(0, 105, 106, 104, 105))
@@ -130,7 +146,12 @@ class TestBroker(BrokerBase):
         window = session_window(date(2027, 1, 12), self.cfg.session)
         d = eng.evaluate(make_signal(symbol="TESTC", signal_id="sig-2"), acct, utc(2027, 1, 12, 15, 0), window)
         self.assertFalse(d.approved)
-        self.assertIn("DAILY_LOSS_BUDGET_EXHAUSTED", d.reasons)
+        # PLAN_GAP: review-002 expected DAILY_LOSS_BUDGET_EXHAUSTED, but the real remaining budget is
+        # 18.75 - 18.70 = 0.05 (> EPS), so sizing fails one step later on fixed fees.
+        # Implemented as: assert total counted risk is 18.70 and the signal is rejected (FEES_EXCEED_BUDGET).
+        self.assertAlmostEqual(sum(p.initial_risk_gbp for p in acct.open_positions) + acct.pending_risk_gbp,
+                               18.70, places=6)
+        self.assertEqual(d.reasons, ("FEES_EXCEED_BUDGET",))
 
     def test_zero_volume_full_fill(self) -> None:
         self.submit(order())

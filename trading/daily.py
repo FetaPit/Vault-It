@@ -65,7 +65,7 @@ def run_daily_close(ctx: DailyContext, d: date, now: datetime, prices_gbp: Mappi
             pf.deposit(credit.sleeve_b_gbp)
         credits.append(credit)
 
-    deposits_today = sum(c.amount_gbp for c in credits)   # top-ups must not mask the day's losses
+    deposits_today = j.cash_flow_total("topup", d)   # all of today's top-ups (incl. earlier runs) must not mask losses
 
     # drawdown kill check at close (before Sleeve B can buy or DRIP)
     pre = broker.equity_gbp(sleeve_a_marks) + pf.equity(prices_gbp)
@@ -86,7 +86,8 @@ def run_daily_close(ctx: DailyContext, d: date, now: datetime, prices_gbp: Mappi
             continue   # same signal id already journaled today (rerun): skip, stay idempotent
         acct = AccountState(
             fund_equity_gbp=broker.equity_gbp(sleeve_a_marks) + pf.equity(prices_gbp),
-            day_start_equity_gbp=day_start_equity_gbp + deposits_today,
+            day_start_equity_gbp=day_start_equity_gbp,
+            deposits_today_gbp=deposits_today,
             peak_equity_gbp=peak_equity_gbp,
             trades_today=trades_today, open_positions=broker.open_positions(),
             sleeve_equity_gbp=pf.equity(prices_gbp), sleeve_open_notional_gbp=pf.market_value(prices_gbp),

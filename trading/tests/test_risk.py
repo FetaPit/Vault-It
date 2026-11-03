@@ -38,6 +38,13 @@ class TestRisk(unittest.TestCase):
         self.assertEqual(d.order.expires_ts, utc(2027, 1, 12, 16, 0))
         self.assertEqual(d.order.config_version, "v0001")
 
+    def test_pending_notional_equal_to_equity_blocks_cash_only(self) -> None:
+        # FIX-104: all sleeve equity already tied up in pending orders -> no room under cash_only
+        acct = replace(make_account(), pending_notional_gbp=625.0)
+        d = self.ev(acct=acct)
+        self.assertFalse(d.approved)
+        self.assertEqual(d.reasons, ("SIZE_BELOW_MINIMUM",))
+
     def test_pending_risk_reserves_daily_budget(self) -> None:
         acct = replace(make_account(), pending_risk_gbp=18.75)
         d = self.ev(acct=acct)

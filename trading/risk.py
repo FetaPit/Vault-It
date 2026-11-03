@@ -59,7 +59,7 @@ class RiskEngine:
 
     # -- helpers
     def daily_loss_gbp(self, account: AccountState) -> float:
-        return max(0.0, account.day_start_equity_gbp - account.fund_equity_gbp)
+        return max(0.0, account.day_start_equity_gbp + account.deposits_today_gbp - account.fund_equity_gbp)
 
     def daily_cap_gbp(self, account: AccountState) -> float:
         return account.day_start_equity_gbp * self._cfg.risk.daily_loss_cap_pct

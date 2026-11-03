@@ -203,7 +203,12 @@ class PaperBroker:
             c = 2 * (hs + slip)
             d_plan = abs(o.entry_price - o.stop_price)
             d_act = max(0.0, abs(fill_px - o.stop_price) - (hs + slip))
-            numerator = o.quantity * (d_plan + c) - st.risk_used
+            inst_fx, fxr = self._spec(o.symbol)
+            fx_m = inst_fx.multiplier * fxr
+            # Every fill after the first pays the fixed commission again; sizing only reserved one.
+            extra = ((profile.min_commission_gbp + profile.commission_per_order_gbp) / fx_m
+                     if st.n_fills >= 1 else 0.0)
+            numerator = o.quantity * (d_plan + c) - st.risk_used - extra
             max_by_risk = floor_to_step(numerator / (d_act + c), inst_cfg.size_step) if numerator > 0 else 0.0
             if max_by_risk < min(remaining, inst_cfg.min_size) - EPS:
                 self._set_status(st, OrderStatus.CANCELLED)
@@ -211,7 +216,7 @@ class PaperBroker:
             fill_qty = min(remaining, cap, max_by_risk)
             if fill_qty < min(remaining, inst_cfg.min_size) - EPS or fill_qty <= 0:
                 continue
-            st.risk_used += fill_qty * (d_act + c)
+            st.risk_used += fill_qty * (d_act + c) + extra
             fills.append(self._apply_entry(st, bar, fill_px, fill_qty))
             if fill_qty < remaining - EPS and max_by_risk < min(remaining, cap) - EPS:
                 self._set_status(st, OrderStatus.CANCELLED)
