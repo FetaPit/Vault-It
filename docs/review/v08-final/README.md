@@ -64,3 +64,9 @@ C2 round 3, v08/forecast-rates 729ae9e: item 1 PASS. Shots: `followup/c2r3-*` at
 - With the sample data, no goal label touches the month axis at 360 or 390. Clear Debt stays below its line and Emergency Fund moves above-left.
 - Crowded case: five goals between £1k and £12k at 360 and 390, both themes. No overlaps, and every plate stays inside the plot. QC's leftover risk (five or more goals crowded into a very short graph) is fine for 0.8.
 - Nit for 0.8.1, not caused by this commit: at 360 the "Dec '26" month label is missing between "Sep '26" and "Mar '27".
+
+## Pulled into 0.8: F2 v08/type-scale 48bac74 (items 4, 5, 6)
+Shots: `followup/f2-*`, Night and Daylight. No sideways page scroll and no errors at any width.
+- Item 6, header at 360: PASS. "NW £17.1k" stays on one 12px line next to the theme and help buttons.
+- Item 4, smallest debt tiles at 390: PASS. With a £150 and a £60 debt added, the 84 x 17 and 32 x 17 tiles show no text. A tap shows a dark chip, "Vanquis / £150" (12 / 11px), inside the map, and it reads in both themes. The chip covers part of the neighbouring tile while it is open, which is fine for a tap.
+- Item 5, flow charts at 690 and 1024: PASS. At 1024 the whole diagram fits at 1:1 (982px) with labels at 10.7px or larger. At 690 it is 1:1 in its own scroller (960 in 624), with the swipe hint and labels at 10.5px or larger. This is not the counter-scaled fit my spec asked for. I accept it: shrinking the diagram to fit under about 700px would push the middle column's labels into the right column's.
