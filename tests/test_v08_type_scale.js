@@ -245,6 +245,16 @@ function measure() {
     ok(nl.h < 24 && nl.fig && (w < 380 ? nl.after === '"NW"' : nl.after === 'none' || nl.after === 'normal'), `${w}: header net worth label on one line${w < 380 ? ', reads NW' : ''}, figure shown ` + JSON.stringify(nl));
     await cx.close();
   }
+  // Pete (2 Nov): the house builder caption starts 44 px in on phones (clear of the controls); caption only, from 600 px it keeps its 14 px
+  for (const [w, want] of [[390, 44], [599, 44], [600, 14]]) {
+    const cx = await b.newContext({ viewport: { width: w, height: 844 } }); const pg = await cx.newPage();
+    await pg.addInitScript(() => { try { localStorage.setItem('vi_declined_demo', 'true'); } catch (e) {} });
+    await pg.goto(URL_); await pg.waitForTimeout(800);
+    const l = await pg.evaluate(() => { const h = document.createElement('div'); h.id = 'house-scene'; h.className = 'hb-brand'; h.style.cssText = 'position:fixed;left:0;top:0;width:300px;height:200px'; h.innerHTML = '<div id="hb3d-cap-t" style="position:absolute"></div>'; document.body.appendChild(h);
+      const c = h.firstChild; c.id = 'hb3d-cap'; const v = getComputedStyle(c).left; h.remove(); return parseFloat(v); });
+    ok(l === want, `${w}: house builder caption left ${l} px (want ${want})`);
+    await cx.close();
+  }
   // the user's Text Size setting still works (Large = 15 px root on a phone)
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true }); const page = await ctx.newPage();
   await page.addInitScript(() => { try { localStorage.setItem('vi_declined_demo', 'true'); } catch (e) {} });
