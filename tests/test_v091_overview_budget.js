@@ -1,6 +1,7 @@
 // v0.9.1 chunk E (owner, 3 Nov 2026): E4 dashboard Cash Flow tile shows only the 3D version, E23 Net worth 3D window 20% taller on desktop,
 // E5 Budget pills larger and full width on desktop, E6 Budget 3D text gone and viewport larger. Run: node tests/test_v091_overview_budget.js
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
+const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = theme => () => {
   localStorage.setItem('vi-theme', '%T%'); localStorage.setItem('vi_declined_demo', 'true');
@@ -14,7 +15,7 @@ const seed = theme => () => {
     const t = theme + ' ' + w + 'x' + h + ': ';
     const ctx = await b.newContext({ viewport: { width: w, height: h } }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript('(' + seed().toString().replace('%T%', theme) + ')()');
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+    await p.goto(INDEX); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal{display:none!important}' });
     const noSide = () => p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1);
     // E4: the dashboard Cash Flow tile shows only the 3D version
