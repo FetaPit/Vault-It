@@ -1,8 +1,9 @@
-// v0.8 chrome (stream E2, owner's 2 Nov fold test): Message the Dev at the foot of every tab, the Feedback button fixed bottom right,
+// v0.8 chrome (stream E2, owner's 2 Nov fold test): Message the Dev at the foot of Overview only (v0.9.1, E27: removed from every other tab), the Feedback button fixed bottom right,
 // the fixed footer collapsing to a slim FCA strip once scrolling stops, compact category pills (below the Cash flow chart),
 // and big synced scroll rails above and below the flow charts. 390 / 690 / 1100 / 1440 px, Night and Daylight.
 // Run: node tests/test_v08_chrome.js
 const { chromium } = require('playwright');
+const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');   // VI_INDEX points the test at another checkout
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const TABS = ['overview', 'budget', 'house', 'assets', 'debt', 'biz', 'achievements', 'network'];
 const FCA = 'Not regulated by the FCA. Not financial advice.';
@@ -19,7 +20,7 @@ const seed = t => {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: phone, hasTouch: phone, colorScheme: theme === 'light' ? 'light' : 'dark', reducedMotion: 'no-preference' });
     const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(seed, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1600);
+    await p.goto(INDEX); await p.waitForTimeout(1600);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal,#trial-banner,#tester-welcome,#vi-fb-nudge,#demo-chip,#pwa-install-banner{display:none!important}' });
     const T = w + ' ' + theme + ': ';
 
@@ -28,14 +29,16 @@ const seed = t => {
     for (const tab of TABS) {
       await p.evaluate(t => { showTab(t); scrollTo(0, 0); }, tab); await p.waitForTimeout(250);
       const d = await p.evaluate(() => {
-        const cards = document.querySelectorAll('#vi-devcard'); const c = cards[0]; if (cards.length !== 1) return 'cards ' + cards.length;
+        const cards = document.querySelectorAll('#vi-devcard'); const c = cards[0];
+        if (document.querySelector('.tab-panel.active').id !== 'tab-overview') return cards.length ? 'still on a tab other than Overview (v0.9.1, E27)' : '-';   // gone from the page, not hidden
+        if (cards.length !== 1) return 'cards ' + cards.length;
         const panel = document.querySelector('.tab-panel.active'); if (!panel.contains(c)) return 'not in the open tab';
         const host = c.parentElement, kids = [...host.children].filter(k => !/^(SCRIPT|STYLE)$/.test(k.tagName) && getComputedStyle(k).display !== 'none' && getComputedStyle(k).position !== 'fixed' && getComputedStyle(k).position !== 'absolute');
         if (kids[kids.length - 1] !== c) return 'not last (' + kids.slice(-2).map(k => k.id || k.className).join('|') + ')';
         const r = c.getBoundingClientRect(); if (r.width < 200) return 'too narrow ' + r.width;
         return '';
       });
-      if (d) devBad.push(tab + ': ' + d);
+      if (d && d !== '-') devBad.push(tab + ': ' + d);
       for (const at of ['top', 'mid', 'end']) {
         await p.evaluate(a => { const m = document.documentElement.scrollHeight - innerHeight; scrollTo(0, a === 'top' ? 0 : a === 'mid' ? m / 2 : m); }, at);
         await p.waitForTimeout(450);
@@ -49,7 +52,7 @@ const seed = t => {
         if (!(f.vis && f.w > 0 && (phone ? f.w === 40 : f.h === 32) && f.r <= w && f.r >= w - 30 && f.b <= f.nav - 6 && f.l > w / 2 && !f.cls && !f.top)) fbBad.push(tab + '@' + at + ' ' + JSON.stringify(f));
       }
     }
-    ok(!devBad.length, T + 'one Message the Dev card, the last thing on every tab ' + devBad.join('; '));
+    ok(!devBad.length, T + 'Message the Dev only on Overview (the last thing there), absent from every other tab ' + devBad.join('; '));
     ok(!fbBad.length, T + 'Feedback stays bottom right, clear of the nav, on every tab at top, middle and end ' + fbBad.slice(0, 3).join('; '));
     // over a 3D viewer's controls it fades out in place, and comes back once clear (Pedro's review)
     // start from a clear spot: no real 3D control (.nw3d-hud, .inv-ctl, .hud-bar) under the button, whatever the text size or layout;
@@ -172,7 +175,7 @@ const seed = t => {
   }
   // reduced motion: the footer still collapses, with no transition
   { const ctx = await b.newContext({ viewport: { width: 1100, height: 900 }, reducedMotion: 'reduce' }); const p = await ctx.newPage();
-    await p.addInitScript(seed, 'dark'); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.addInitScript(seed, 'dark'); await p.goto(INDEX); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     const d = await p.evaluate(() => getComputedStyle(document.getElementById('app-footer')).transitionDuration);
     ok(d.split(',').every(x => parseFloat(x) === 0), '1100 reduced motion: the footer moves without a transition (' + d + ')');

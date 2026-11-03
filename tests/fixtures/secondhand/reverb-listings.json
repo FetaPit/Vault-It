@@ -1,0 +1,53 @@
+{
+ "listings": [
+  {
+   "title": "Gibson Les Paul 0",
+   "price": {
+    "amount": "1000",
+    "currency": "GBP"
+   }
+  },
+  {
+   "title": "Gibson Les Paul 1",
+   "price": {
+    "amount": "1100",
+    "currency": "GBP"
+   }
+  },
+  {
+   "title": "Gibson Les Paul 2",
+   "price": {
+    "amount": "1200",
+    "currency": "GBP"
+   }
+  },
+  {
+   "title": "Gibson Les Paul 3",
+   "price": {
+    "amount": "1300",
+    "currency": "GBP"
+   }
+  },
+  {
+   "title": "Gibson Les Paul 4",
+   "price": {
+    "amount": "1400",
+    "currency": "GBP"
+   }
+  },
+  {
+   "title": "Gibson Les Paul 5",
+   "price": {
+    "amount": "1500",
+    "currency": "GBP"
+   }
+  },
+  {
+   "title": "Gibson Les Paul 6",
+   "price": {
+    "amount": "1600",
+    "currency": "GBP"
+   }
+  }
+ ]
+}
