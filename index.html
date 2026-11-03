@@ -10849,7 +10849,7 @@ button.bd-ic{cursor:pointer}
 .inv-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .inv-t{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--tx)}
 .inv-s{font-family:'Share Tech Mono',monospace;font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);margin-top:2px}
-.inv-x{background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:30px;height:30px;cursor:pointer}
+.inv-x{background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:44px;height:44px;cursor:pointer}
 .inv-x:hover{color:#fff;border-color:var(--blue)}
 .inv-stage{position:relative;width:100%;aspect-ratio:4/3;max-height:58vh;border-radius:10px;overflow:hidden;background:var(--panel);border:1px solid rgb(var(--ink-rgb) / .06)}
 .inv-stage canvas{width:100%;height:100%;display:block}
@@ -10876,10 +10876,10 @@ button.bd-ic{cursor:pointer}
 .i3d-credit{font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);word-break:break-word}
 .i3d-row{display:flex;gap:6px;flex-wrap:wrap}
 /* the viewer's Change model, Remove model, View current model and Photos buttons: the ghost pill of "Link to market value" (Pedro's round 2; .dep-btn had no style), at a tap-sized 11 px */
-.i3d-row .dep-btn{display:inline-flex;align-items:center;font:600 11px 'DM Sans',sans-serif;padding:5px 11px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
+.i3d-row .dep-btn{display:inline-flex;align-items:center;font:600 11px 'DM Sans',sans-serif;min-height:44px;padding:5px 14px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
 .i3d-row .dep-btn:hover,.i3d-row .dep-btn:focus-visible{background:rgb(var(--teal-rgb) / .24)}
 .i3d-opts{display:flex;flex-direction:column;gap:10px}
-.i3d-up{display:block;text-align:center;padding:10px;cursor:pointer;font-size:max(.62rem,var(--vi-fs-2))}
+.i3d-up{display:flex;align-items:center;justify-content:center;min-height:44px;text-align:center;padding:10px;cursor:pointer;font-size:max(.62rem,var(--vi-fs-2))}
 .i3d-lib-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.7rem,var(--vi-fs-3));color:var(--tx);display:flex;align-items:center;gap:6px}
 .i3d-tag{font-family:'Share Tech Mono',monospace;font-size:max(.46rem,var(--vi-fs-1));padding:1px 6px;border-radius:99px;border:1px solid var(--amber);color:var(--amber);letter-spacing:.08em;text-transform:uppercase}
 .i3d-lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
@@ -22340,8 +22340,9 @@ function i3dMatch(name){var n=String(name||'').toLowerCase();for(var i=0;i<I3D_W
 function i3dCredit(m){return m&&m.lic==='CC-BY'?'"'+m.t+'" by '+m.by+', https://poly.pizza/m/'+m.id+'. Licence at https://creativecommons.org/licenses/by/3.0':'';}
 function i3dItem(kind,id){return ((kind==='li'?alState.liabilities:alState.otherAssets)||[]).find(function(x){return x.id===id;});}
 function i3dKey(kind,id){return 'm:'+kind+':'+id;}
-function i3dPut(kind,id,buf){return invTx('readwrite',function(s){return s.put({glb:buf,updated:Date.now()},i3dKey(kind,id));});}
-function i3dGetBuf(kind,id){return invTx('readonly',function(s){return s.get(i3dKey(kind,id));}).then(function(v){return v&&v.glb||null;});}
+function i3dPut(kind,id,buf,fmt){return invTx('readwrite',function(s){return s.put({glb:buf,fmt:fmt||'glb',updated:Date.now()},i3dKey(kind,id));});}   // the bytes stay under `glb` (old records); `fmt` says which format they are
+function i3dGetRec(kind,id){return invTx('readonly',function(s){return s.get(i3dKey(kind,id));}).then(function(v){return v&&v.glb?{buf:v.glb,fmt:v.fmt||'glb'}:null;});}
+function i3dGetBuf(kind,id){return i3dGetRec(kind,id).then(function(r){return r&&r.buf;});}
 function i3dDel(kind,id){try{return invTx('readwrite',function(s){return s.delete(i3dKey(kind,id));});}catch(e){return Promise.resolve();}}
 // fetch a library model in the browser (Poly Pizza's CDN checks for bots, so only a real browser gets through)
 function i3dFetchLib(m){
@@ -22351,9 +22352,52 @@ function i3dFetchLib(m){
     return r.arrayBuffer();
   },function(){throw new Error('Could not reach Poly Pizza from this site (blocked by the browser or offline). Upload a .glb file instead.');});
 }
-function i3dParse(buf){
+/* E29 (v0.9.1): one file per item, in any of six formats. Each loader (and fflate, which FBX and 3MF need to unzip) is fetched from the
+   same jsDelivr three@0.128.0 examples path as GLTFLoader, only when a file of that type is picked. */
+var I3D_EXT={glb:1,gltf:1,stl:1,obj:1,fbx:1,'3mf':1};
+var I3D_ACCEPT='.glb,.gltf,.stl,.obj,.fbx,.3mf,model/gltf-binary,model/gltf+json,model/stl,model/obj,model/3mf';
+var I3D_LD={stl:'STLLoader',obj:'OBJLoader',fbx:'FBXLoader','3mf':'3MFLoader'},I3D_LDP={};
+function i3dExt(name){var m=/\.([a-z0-9]+)$/i.exec(name||'');return m?m[1].toLowerCase():'';}
+function i3dScript(src,ready){return new Promise(function(res,rej){if(ready())return res();var sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=function(){rej(new Error('Could not load the 3D file reader. Check the connection and try again.'));};document.head.appendChild(sc);});}
+function i3dLoader(fmt){
+  if(fmt==='glb'||fmt==='gltf')return _hbGltfLoader();
+  var nm=I3D_LD[fmt];if(!nm)return Promise.reject(new Error('That file type is not supported.'));
+  if(I3D_LDP[fmt])return I3D_LDP[fmt];
+  var base='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/',cls=fmt==='3mf'?'ThreeMFLoader':nm;
+  var p=((fmt==='fbx'||fmt==='3mf')?i3dScript(base+'libs/fflate.min.js',function(){return !!window.fflate;}):Promise.resolve())
+    .then(function(){return i3dScript(base+'loaders/'+nm+'.js',function(){return !!THREE[cls];});})
+    .then(function(){if(!THREE[cls])throw new Error('The 3D file reader is unavailable.');return THREE[cls];});
+  I3D_LDP[fmt]=p;p.catch(function(){delete I3D_LDP[fmt];});return p;
+}
+// STL and OBJ (when it has no colours of its own) take the item's colour: green for wealth, red for liabilities, the same as the app's tiles
+var I3D_TINT={wi:0x2A9A68,li:0xA84444};   // the brand green and red, a shade down because the stage lights brighten them
+function i3dTintNone(obj,hex){
+  obj.traverse(function(o){if(!o.isMesh)return;
+    var mats=Array.isArray(o.material)?o.material:[o.material];
+    var out=mats.map(function(m){return (m&&m.map)?m:new THREE.MeshStandardMaterial({color:i3dCol(hex),roughness:0.55,metalness:0.1,side:THREE.DoubleSide});});
+    o.material=Array.isArray(o.material)?out:out[0];
+  });
+}
+function i3dParse(buf,fmt,kind){
+  fmt=fmt||'glb';
   if(!viGlOk())return Promise.reject(new Error('3D is not available on this device.'));
-  return new Promise(function(res,rej){viThree(res,function(){rej(new Error('The 3D engine could not be downloaded. Check the connection and try again.'));});}).then(_hbGltfLoader).then(function(G){return new Promise(function(res,rej){try{new G().parse(buf,'',function(g){res(g.scene||(g.scenes&&g.scenes[0]));},function(e){rej(new Error('Could not read that 3D file'+(e&&e.message?': '+e.message:'.')));});}catch(e){rej(e);}});});
+  var bad=function(e){return new Error('Could not read that .'+fmt+' file'+(e&&e.message?': '+String(e.message).slice(0,80):'.'));};
+  return new Promise(function(res,rej){viThree(res,function(){rej(new Error('The 3D engine could not be downloaded. Check the connection and try again.'));});}).then(function(){return i3dLoader(fmt);}).then(function(L){return new Promise(function(res,rej){
+    try{
+      if(fmt==='glb'||fmt==='gltf'){new L().parse(buf,'',function(g){var o=g.scene||(g.scenes&&g.scenes[0]);o?res(o):rej(bad());},function(e){rej(bad(e));});return;}
+      var root=new THREE.Group(),obj;
+      if(fmt==='stl'){var geo=new L().parse(buf);if(!geo||!geo.attributes||!geo.attributes.position||!geo.attributes.position.count)throw new Error('empty file');
+        geo.computeVertexNormals();   // many exporters write zero normals in binary STL, which lights as black; face normals are recomputed
+        obj=new THREE.Mesh(geo,geo.hasColors?new THREE.MeshStandardMaterial({vertexColors:true,roughness:0.55,metalness:0.1,side:THREE.DoubleSide}):new THREE.MeshStandardMaterial({color:i3dCol(I3D_TINT[kind]||I3D_TINT.wi),roughness:0.55,metalness:0.1,side:THREE.DoubleSide}));}
+      else if(fmt==='obj'){obj=new L().parse(new TextDecoder().decode(buf));i3dTintNone(obj,I3D_TINT[kind]||I3D_TINT.wi);}
+      else if(fmt==='fbx')obj=new L().parse(buf,'');
+      else obj=new L().parse(buf);
+      var has=false;obj.traverse(function(o){if(o.isMesh)has=true;});if(!has)throw new Error('no 3D shape found');
+      root.add(obj);
+      if(fmt==='stl'||fmt==='3mf')obj.rotation.x=-Math.PI/2;   // printing formats are Z-up; the viewer is Y-up
+      res(root);
+    }catch(e){rej(bad(e));}
+  });});
 }
 // the house style: same green on every model, lightly
 // colours as the house viewer gives them (sRGB hex to the renderer's linear space)
@@ -22402,6 +22446,8 @@ function I3DView(host,obj,opts){
   var grid=new THREE.GridHelper(24,48,i3dCol(0x1f5e5a),i3dCol(0x123734));grid.material.transparent=true;grid.material.opacity=0.35;grid.position.y=0.002;sc.add(grid);
   this.tinted=i3dStyle(obj);var bb=i3dFit(obj);sc.add(obj);this.obj=obj;
   var cam=this.cam=new THREE.PerspectiveCamera(35,w/h,0.02,100);
+  /* on a narrow stage the control column (40 px) sits over the model's right edge: slide the picture left so nothing runs under it */
+  this._vo=function(W,H){if(host.id==='i3d-stage'&&W<520)cam.setViewOffset(W,H,28,0,W,H);else if(cam.view)cam.clearViewOffset();};this._vo(w,h);
   var ty=Math.max(0.3,(bb.max.y)/2);this.home={p:new THREE.Vector3(2.6,1.7+ty*0.4,3.4),t:new THREE.Vector3(0,ty,0)};
   cam.position.copy(this.home.p);cam.lookAt(this.home.t);
   if(opts.still){r.render(sc,cam);return;}
@@ -22414,7 +22460,7 @@ function I3DView(host,obj,opts){
   ctl.addEventListener('change',function(){self.kick();});
   ctl.update();
   // draws only while something moves (drag, pinch, auto-rotate, a kick), never off screen or in a background tab
-  var loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}var W=host.clientWidth,H=host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();}
+  var loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}var W=host.clientWidth,H=host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;self._vo(W,H);cam.updateProjectionMatrix();}
     var moving=ctl.update();var t=performance.now();r.render(sc,cam);
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}
     self._lastT=moving?t:0;
@@ -22445,11 +22491,12 @@ async function i3dSave(kind,id,buf,meta){
   var it=i3dItem(kind,id);if(!it)return;
   var tick=function(){return new Promise(function(r){requestAnimationFrame(function(){setTimeout(r,0)})})};
   i3dMsg('Reading the model…');await tick();
-  var obj=await i3dParse(buf.slice(0));
+  var fmt=(meta&&meta.fmt)||'glb';
+  var obj=await i3dParse(buf.slice(0),fmt,kind);
   i3dMsg('Saving it on this device…');await tick();
-  await i3dPut(kind,id,buf);
+  await i3dPut(kind,id,buf,fmt);
   i3dStyle(obj);await tick();
-  it.model=Object.assign({},meta,{thumb:i3dThumb(obj),tv:2,at:Date.now()});
+  it.model=Object.assign({},meta,{fmt:fmt,thumb:i3dThumb(obj),tv:2,at:Date.now()});
   saveAL();renderAlTab();_i3dReady={kind:kind,id:id,obj:obj};return it.model;
 }
 var _i3dView=null,_i3dBusy=false,_i3dReady=null;   // _i3dReady: the model just saved, already read, so the viewer does not read it twice
@@ -22477,10 +22524,10 @@ async function i3dOpen(kind,id){
   try{
     var obj=null,pre=_i3dReady;_i3dReady=null;
     if(pre&&pre.kind===kind&&pre.id===id)obj=pre.obj;
-    else{var buf=await i3dGetBuf(kind,id);
-      if(!buf&&m.src==='pp'){i3dMsg('Downloading the model from Poly Pizza…');buf=await i3dFetchLib(m);await i3dPut(kind,id,buf);i3dMsg('');}
+    else{var rec=await i3dGetRec(kind,id),buf=rec&&rec.buf,fmt=(rec&&rec.fmt)||m.fmt||'glb';
+      if(!buf&&m.src==='pp'){i3dMsg('Downloading the model from Poly Pizza…');buf=await i3dFetchLib(m);await i3dPut(kind,id,buf,'glb');fmt='glb';i3dMsg('');}
       if(!buf)throw new Error('The 3D file is on the device you added it from. Upload it again here to see it on this device.');
-      obj=await i3dParse(buf.slice(0));}
+      obj=await i3dParse(buf.slice(0),fmt,kind);}
     var st=document.getElementById('i3d-stage');if(!st)return;
     var w=document.getElementById('i3d-wait');w&&w.remove();
     _i3dView=new I3DView(st,obj,{label:'3D model of '+it.name});
@@ -22496,7 +22543,7 @@ function i3dPick(kind,id){
   var body=i3dShell('3D model for '+it.name,kind==='li'?'Liability':'Wealth inventory');
   var list=I3D_LIB.slice().sort(function(a,b){return (b.k===best)-(a.k===best);});
   body.innerHTML='<div class="i3d-opts">'
-    +'<label class="i3d-up dep-btn">Upload a 3D file (.glb)<input type="file" accept=".glb,model/gltf-binary" style="display:none" onchange="i3dUpload(\''+kind+'\','+id+',this)"></label>'
+    +'<label class="i3d-up dep-btn">Upload a 3D file (.glb, .gltf, .stl, .obj, .fbx, .3mf)<input type="file" accept="'+I3D_ACCEPT+'" style="display:none" onchange="i3dUpload(\''+kind+'\','+id+',this)"></label>'
     +'<div class="inv-hint">The file stays on this device; only a small preview picture is saved with the item. Photos still work as before.</div>'
     +(lib?'<div class="i3d-lib-hd">Library models <span class="i3d-tag">test</span></div>'
       +'<div class="inv-hint">Free models from Poly Pizza, downloaded by your browser. '+(best?'Best match for this item first.':'No match for this name yet, so all are shown.')+'</div>'
@@ -22507,9 +22554,11 @@ function i3dPick(kind,id){
 }
 function i3dUpload(kind,id,input){
   var f=input.files&&input.files[0];if(!f)return;
-  if(f.size>25*1048576){i3dMsg('That file is over 25 MB. Try a smaller .glb.',true);return;}
+  var ext=i3dExt(f.name);input.value='';
+  if(!I3D_EXT[ext]){i3dMsg('That file type is not supported. Use .glb, .gltf, .stl, .obj, .fbx or .3mf.',true);return;}
+  if(f.size>25*1048576){i3dMsg('That file is over 25 MB. Try a smaller file.',true);return;}
   i3dMsg('Reading '+f.name+'…');
-  f.arrayBuffer().then(function(buf){return i3dSave(kind,id,buf,{src:'file',t:f.name.replace(/\.glb$/i,'')});})
+  f.arrayBuffer().then(function(buf){return i3dSave(kind,id,buf,{src:'file',fmt:ext,t:f.name.replace(/\.[a-z0-9]+$/i,'')});})
     .then(function(){i3dOpen(kind,id);},function(e){i3dMsg(e.message||String(e),true);});
 }
 function i3dPickLib(kind,id,k){
@@ -22541,7 +22590,7 @@ function i3dLive(kind,id,img,force){
   if(!window.matchMedia||!(force||matchMedia('(hover: hover) and (pointer: fine)').matches)||!viGlOk())return;
   var key=kind+':'+id;if(_i3dLive&&_i3dLive.key===key&&_i3dLive.area.isConnected)return;
   i3dLiveStop();var area=img.parentNode,rec={key:key,area:area,img:img};_i3dLive=rec;
-  i3dGetBuf(kind,id).then(function(buf){return _i3dLive===rec&&buf?i3dParse(buf.slice(0)):null}).then(function(obj){
+  i3dGetRec(kind,id).then(function(r){return _i3dLive===rec&&r?i3dParse(r.buf.slice(0),r.fmt,kind):null}).then(function(obj){
     if(!obj||_i3dLive!==rec||!area.isConnected)return;
     var host=document.createElement('div');host.className='i3d-live';area.appendChild(host);rec.host=host;
     var it=i3dItem(kind,id);rec.view=new I3DView(host,obj,{auto:false,label:'3D model of '+(it?it.name:'the item')+'. Drag to turn it round, click to open it.'});
@@ -22588,7 +22637,7 @@ function i3dRefreshThumbs(){
   if(!todo.length)return;_i3dRe.run=true;
   (async function(){
     for(var i=0;i<todo.length;i++){var k=todo[i][0],it=todo[i][1];_i3dRe.tried[k+it.id]=1;
-      try{var buf=await i3dGetBuf(k,it.id);if(!buf)continue;var obj=await i3dParse(buf.slice(0));i3dStyle(obj);
+      try{var rc=await i3dGetRec(k,it.id);if(!rc)continue;var obj=await i3dParse(rc.buf.slice(0),rc.fmt,k);i3dStyle(obj);
         it.model.thumb=i3dThumb(obj);it.model.tv=2;saveAL();
         [].forEach.call(document.querySelectorAll('img.i3d-thumb'),function(im){if((im.getAttribute('onclick')||'').indexOf("'"+k+"',"+it.id+",")>-1)im.src=it.model.thumb});
       }catch(e){}}
