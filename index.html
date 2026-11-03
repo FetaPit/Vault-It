@@ -9580,7 +9580,7 @@ body.reduced-motion #app-footer, body.reduced-motion #app-footer * { transition:
 
 .fire-timeline-svg {
   display: block;
-  height: 280px;
+  height: 300px;
   position: absolute;
   top: 0; left: 0;
 }
@@ -11220,13 +11220,17 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .st-skip .wt-rimline{stroke:#e8a23c;stroke-dasharray:2 3}
 .wt-metal{stroke:#05080c;stroke-opacity:.5;stroke-width:1}
 .wt-tick{stroke:#0a0e12;stroke-width:.8;fill:none}
-.wt-mface{fill:#0b1015;stroke:var(--wt-l);stroke-width:1.4}
+.wt-mface{fill:#0b1015;stroke:var(--wt-l);stroke-width:1.6}
+.wt-mrim{fill:none;stroke:#fff;stroke-opacity:.35;stroke-width:.6}
+.wt-gloss{fill:none;stroke:#fff;stroke-opacity:.16;stroke-width:2.2;stroke-linecap:round}
+.wt-icon g[fill-opacity]{fill-opacity:.32}
+.wt-icon g[opacity]{opacity:.95}
 .wt-mring{fill:none;stroke:var(--wt-l);stroke-opacity:.5;stroke-width:.6;stroke-dasharray:1.5 2}
-.wt-icon{color:var(--wt-l);--vi-sw:1.3;overflow:visible}
+.wt-icon{color:var(--wt-l);--vi-sw:1.45;overflow:visible}
 .st-lock .wt-icon,.st-skip .wt-icon{color:#7d868e}
 .wt-icf{fill:var(--wt-l);fill-opacity:.2}
 .wt-ics{fill:none;stroke:var(--wt-l);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
-.wt-num{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;fill:var(--wt-l)}
+.wt-num{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;fill:var(--wt-l)}
 .wt-tl{font-family:'Share Tech Mono',monospace;font-size:16px;fill:#fff}
 .st-lock .wt-tl,.st-skip .wt-tl{fill:#7d868e}
 .wt-side{font-family:'Syne',sans-serif;font-weight:800;font-size:12.5px;letter-spacing:1px;fill:var(--wt-l)}
@@ -12352,7 +12356,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <!-- Horizontal scrolling timeline: the SVG is only the window of stages on screen -->
       <div class="fire-stage"><svg class="fire-ground" id="fire-ground" aria-hidden="true" focusable="false"></svg>
       <div class="fire-timeline-scroll" id="fire-timeline-scroll">
-        <div id="fire-track" style="position:relative;height:280px"><svg id="fire-roadmap-svg" class="fire-timeline-svg"></svg></div>
+        <div id="fire-track" style="position:relative;height:300px"><svg id="fire-roadmap-svg" class="fire-timeline-svg"></svg></div>
       </div>
       </div>
       <!-- Stage detail panel — shown on click -->
@@ -17625,7 +17629,7 @@ var FIRE_PHASES=[
 ];
 // roadmap window geometry + state (declared early: the roadmap is first drawn during start-up)
 var _fireFirstPaint=true,_fireDetailIdx=-1,_fireSkipAsk=-1;
-var FIRE_NODE=108,FIRE_LEFT=60,FIRE_H=280;
+var FIRE_NODE=128,FIRE_LEFT=70,FIRE_H=300;   // round 3 (owner, 3 Nov): larger tokens need wider spacing and a taller stage
 var STK_COLORS=['#44c0b9','#c9a84c','#3ecf8e','#9b7ec8','#64b5f6','#e0894a','#e05c5c','#e8c56a'];
 // ── Budget categories + icons (declared before the init block runs) ──
 var BD_ICONS={
@@ -17803,7 +17807,7 @@ var WR_BADGE_IC={nw100:'vi-coin',nw500:'vi-coins',nw1k:'vi-cash',nw2k:'vi-piggy'
   gold:'vi-metals',stream1:'vi-rocket',fullfi:'vi-flame',ef1k:'vi-lifebuoy',coast:'vi-boat'};
 // the token card (Apex-style clipped card, owner's pick A, 3 Nov) in a 100 x 132 box, and its medallion dial
 var WR_CARD=[[0,0],[72,0],[100,28],[100,132],[14,132],[0,118]];
-var WR_DIAL=(function(){var d='';for(var a=0;a<360;a+=10){var r=a%30?22.5:24,x=Math.cos(a*Math.PI/180),y=Math.sin(a*Math.PI/180);d+='M'+(44+x*21).toFixed(1)+' '+(76+y*21).toFixed(1)+'L'+(44+x*r).toFixed(1)+' '+(76+y*r).toFixed(1);}return '<path class="wt-tick" d="'+d+'"/>';})();   // one path, so a rail of tokens stays light
+var WR_DIAL=(function(){var d='';for(var a=0;a<360;a+=10){var r=a%30?26:28,x=Math.cos(a*Math.PI/180),y=Math.sin(a*Math.PI/180);d+='M'+(44+x*24).toFixed(1)+' '+(76+y*24).toFixed(1)+'L'+(44+x*r).toFixed(1)+' '+(76+y*r).toFixed(1);}return '<path class="wt-tick" d="'+d+'"/>';})();   // one path, so a rail of tokens stays light
 var WR_CHIP={done:'<path class="wt-cg" d="M8.5 16.5l5 5L24 11"/>',wait:'<path class="wt-cg" d="M8.5 16.5l5 5L24 11"/>',
   skip:'<path class="wt-cg" d="M8 10l6 6-6 6M16 10l6 6-6 6"/>',lock:'<rect class="wt-cgf" x="10" y="15" width="12" height="9.5" rx="1.6"/><path class="wt-cg" d="M12.6 15v-2.6a3.4 3.4 0 0 1 6.8 0V15"/>'};
 var LVS=WR_LEVELS.map(function(l){return {n:l.name,xp:l.xp};});
@@ -23367,9 +23371,10 @@ function wrTok(o){
   if(!dim)out+='<polygon points="0,0 60,0 0,60" fill="url(#wts-'+t+')"/><polygon points="100,78 100,132 38,132" fill="url(#wth-'+t+')"/>';
   else out+='<rect width="100" height="132" fill="url(#'+(st==='skip'?'wt-hatch':'wth-lock')+')"/>';
   out+='</g><polygon class="wt-rimline" points="'+K+'"/>';
-  out+='<circle cx="44" cy="76" r="28" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/>'+WR_DIAL+'<circle class="wt-mface" cx="44" cy="76" r="19.5"/><circle class="wt-mring" cx="44" cy="76" r="16"/>';
-  if(o.num!=null)out+='<text class="wt-num" x="44" y="85" text-anchor="middle">'+o.num+'</text>';
-  else out+=wrIcon(L?'vi-lock':o.ic,31,63,26);
+  out+='<circle cx="44" cy="76" r="31" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/><circle class="wt-mrim" cx="44" cy="76" r="29.4"/>'+WR_DIAL+'<circle class="wt-mface" cx="44" cy="76" r="23"/><circle class="wt-mring" cx="44" cy="76" r="20.6"/>'
+    +'<path class="wt-gloss" d="M26.5 70a18 18 0 0 1 24-14.5"/>';
+  if(o.num!=null)out+='<text class="wt-num" x="44" y="86" text-anchor="middle">'+o.num+'</text>';
+  else out+=wrIcon(L?'vi-lock':o.ic,27,59,34);
   if(n>0){var bw=2.6,gp=n>4?1.8:2.6,x0=44-(n*bw+(n-1)*gp)/2;for(k=0;k<n;k++)out+='<rect class="fire-stud wt-bar'+(k<lit?' on':'')+'" x="'+(x0+k*(bw+gp)).toFixed(1)+'" y="118" width="'+bw+'" height="8"/>';}
   if(o.tl!=null&&16*sc>=10.5)out+='<text class="wt-tl" x="6" y="18">'+o.tl+'</text>';   // text only where it renders at 10.5 px or more (Pedro, round 2)
   if(o.name&&12.5*sc>=10.5){var nm=String(o.name).toUpperCase();out+='<text class="wt-side" transform="translate(94 102) rotate(-90)"'+(nm.length>9?' textLength="80" lengthAdjust="spacingAndGlyphs"':'')+'>'+nm+'</text>';}
@@ -23463,9 +23468,9 @@ function renderAchievements(){
     +'<div class="wr-xp" id="wr-xp-label">'+fmt(xp)+' XP'+(nx?' · '+fmt(nx.xp-xp)+' XP to '+nx.name:' · top level')+'</div>'
     +'<div class="wr-split"><span>Roadmap steps <b>'+fmt(src.steps)+'</b></span><span>Side quests <b>'+fmt(src.quests)+'</b></span><span>Badges <b>'+fmt(src.badges)+'</b></span></div></div></div>'+wrRewardHtml();
   var nEl=document.getElementById('wr-next');
-  if(nEl)nEl.innerHTML=wrNextGoals(S).map(function(g){return '<div class="wr-goal"'+(g.go?' role="button" tabindex="0" onclick="'+g.go+'"':'')+'>'+wrTokSvg(g.tok,44)+'<div class="wr-g-body"><span class="wr-g-h">'+g.h+'</span><span class="wr-g-l">'+g.l+'</span>'+wrBar(g.f,g.h)+'</div><span class="wr-xpchip">+'+g.xp+' XP</span></div>';}).join('')||'<p class="wr-none">Every stage and quest is done. Nothing left but to enjoy it.</p>';
+  if(nEl)nEl.innerHTML=wrNextGoals(S).map(function(g){return '<div class="wr-goal"'+(g.go?' role="button" tabindex="0" onclick="'+g.go+'"':'')+'>'+wrTokSvg(g.tok,52)+'<div class="wr-g-body"><span class="wr-g-h">'+g.h+'</span><span class="wr-g-l">'+g.l+'</span>'+wrBar(g.f,g.h)+'</div><span class="wr-xpchip">+'+g.xp+' XP</span></div>';}).join('')||'<p class="wr-none">Every stage and quest is done. Nothing left but to enjoy it.</p>';
   var qEl=document.getElementById('wr-quests');
-  if(qEl)qEl.innerHTML=WR_QUESTS.map(function(q){var d=wrQuestDone(q),tier=wrXpTier(q.xp);return '<div class="wr-tok wr-quest t-'+tier+(d?' got':'')+'">'+wrTokSvg({tier:tier,st:d?'done':'lock',ic:q.ic,chip:d?'done':'lock',tl:'+'+q.xp,name:q.name},100,q.name+(d?', earned':', not yet'))
+  if(qEl)qEl.innerHTML=WR_QUESTS.map(function(q){var d=wrQuestDone(q),tier=wrXpTier(q.xp);return '<div class="wr-tok wr-quest t-'+tier+(d?' got':'')+'">'+wrTokSvg({tier:tier,st:d?'done':'lock',ic:q.ic,chip:d?'done':'lock',tl:'+'+q.xp,name:q.name},112,q.name+(d?', earned':', not yet'))
     +'<b>'+q.name+'</b><small>+'+q.xp+' XP'+(q.month?' a month':'')+' · '+WR_TIERS[tier].n+'</small><span>'+(d?(q.month?'Done this month':'Earned'):q.desc)+'</span></div>';}).join('');
   var lEl=document.getElementById('wr-ladder');
   if(lEl)lEl.innerHTML=WR_RANKS.map(function(r,ri){var ls=WR_LEVELS.filter(function(l){return l.rank===ri;}),here=lv.rank===ri;
@@ -23476,7 +23481,7 @@ function renderAchievements(){
     tEl.innerHTML='<button type="button" class="wr-chip'+(f==='all'?' on':'')+'" onclick="wrFilter(\'all\')">All '+un.length+'/'+BADGES.length+'</button>'+Object.keys(WR_TIERS).map(function(k){var all=BADGES.filter(function(b){return wrXpTier(b.xp||50)===k;});
       return '<button type="button" class="wr-chip wr-tier t-'+k+(f===k?' on':'')+'" onclick="wrFilter(\''+k+'\')">'+WR_TIERS[k].n+' '+all.filter(function(b){return un.indexOf(b.id)>-1;}).length+'/'+all.length+'</button>';}).join('');}
   if(cEl)cEl.innerHTML=BADGES.map(function(b){var u=un.indexOf(b.id)>-1,tier=wrXpTier(b.xp||50);
-    return '<div class="wr-tok t-'+tier+(u?' got':'')+'">'+wrTokSvg({tier:tier,st:u?'own':'lock',ic:WR_BADGE_IC[b.id]||'vi-gem',chip:u?'':'lock',tl:'+'+(b.xp||50),name:b.name},100,b.name+(u?', earned':', locked'))+'<b>'+b.name+'</b><small>+'+(b.xp||50)+' XP · '+WR_TIERS[tier].n+'</small><span>'+(u?'Earned':b.desc)+'</span></div>';}).join('');
+    return '<div class="wr-tok t-'+tier+(u?' got':'')+'">'+wrTokSvg({tier:tier,st:u?'own':'lock',ic:WR_BADGE_IC[b.id]||'vi-gem',chip:u?'':'lock',tl:'+'+(b.xp||50),name:b.name},112,b.name+(u?', earned':', locked'))+'<b>'+b.name+'</b><small>+'+(b.xp||50)+' XP · '+WR_TIERS[tier].n+'</small><span>'+(u?'Earned':b.desc)+'</span></div>';}).join('');
   if(!_isPro()){document.querySelectorAll('#tab-achievements .wr-pro').forEach(function(e){e.style.filter='blur(5px)';e.style.pointerEvents='none';});}
 }
 function wrFilter(k){var c=document.getElementById('wr-collection');if(c)c.setAttribute('data-f',k);renderAchievements();}
@@ -25210,7 +25215,7 @@ function renderFIREroadmap(){
     if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line x1="'+sp.x0+'" y1="'+GY+'" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="1" opacity="0.45" stroke-dasharray="3 3"/>';
     out+='<text x="'+((a+b)/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.7')+'" letter-spacing="2.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
   });
-  var tokW=function(k){return k===nextIdx?64:50;},coinR=function(k){return tokW(k)/2;};   // card widths: 64 px for the stage to work on, 50 px for the rest
+  var tokW=function(k){return k===nextIdx?80:64;},coinR=function(k){return tokW(k)/2;};   // card widths (owner, 3 Nov round 3: "larger"): 80 px for the stage to work on, 64 px for the rest
   // the path on the ground: solid up to the last passed stage, dashed beyond, running between the light pads (owner, 31 Oct)
   for(var si=Math.max(0,i0);si<Math.min(stages.length-1,i1);si++){var ax=si*NODE_SPACING+LEFT,bx=(si+1)*NODE_SPACING+LEFT,passed=si<stages.passedIdx;
     out+='<line class="fire-rail" x1="'+(ax+coinR(si)+6)+'" y1="'+PATH_Y+'" x2="'+(bx-coinR(si+1)-6)+'" y2="'+PATH_Y+'" stroke="rgba(68,192,185,'+(passed?'0.9':'0.3')+')" stroke-width="'+(passed?2.6:1.6)+'"'+(passed?'':' stroke-dasharray="6 5"')+'/>';}
@@ -25270,7 +25275,7 @@ function fireCarousel(){
   [].forEach.call(svg.querySelectorAll('.fire-coin'),function(g){
     if(!mob){g.style.transform='';g.style.opacity='';return;}
     var cx=(+g.getAttribute('data-i'))*FIRE_NODE+FIRE_LEFT,d=Math.min(1,Math.abs(cx-mid)/(SC.clientWidth*0.6));
-    g.style.transform='scale('+(1.22-0.22*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */g.style.opacity=(1-0.72*d).toFixed(2);
+    g.style.transform='scale('+(1.12-0.12*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */g.style.opacity=(1-0.72*d).toFixed(2);
   });
 }
 var _fireSnapT=0,_fireSnapping=0;
@@ -27683,7 +27688,7 @@ function renderOvAch() {
     + '<div class="ov-ach-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pc) + '"><i style="width:' + pc.toFixed(1) + '%"></i></div>'
     + '<small>' + xp.toLocaleString('en-GB') + ' XP' + (nx ? ' · ' + (nx.xp - xp).toLocaleString('en-GB') + ' to ' + nx.name : ' · top level') + '</small></div>'
     + '<div class="ov-ach-streak"><b>' + streak + '</b><small>day' + (streak === 1 ? '' : 's') + ' in a row</small></div></div>'
-    + '<div class="ov-ach-badges">' + (got.length ? got.slice(-8).map(function (b) { return '<span class="ov-ach-badge" title="' + b.name.replace(/"/g, '&quot;') + '">' + wrTokSvg({ tier: wrXpTier(b.xp || 50), st: 'own', ic: WR_BADGE_IC[b.id] || 'vi-gem' }, 36, b.name) + '</span>'; }).join('')
+    + '<div class="ov-ach-badges">' + (got.length ? got.slice(-8).map(function (b) { return '<span class="ov-ach-badge" title="' + b.name.replace(/"/g, '&quot;') + '">' + wrTokSvg({ tier: wrXpTier(b.xp || 50), st: 'own', ic: WR_BADGE_IC[b.id] || 'vi-gem' }, 40, b.name) + '</span>'; }).join('')
       : '<span class="ov-ach-none">No badges yet. Your first one comes with your first deposit or your first budget line.</span>')
     + '<span class="ov-ach-count">' + got.length + ' of ' + BADGES.length + ' badges</span></div>';
 }
