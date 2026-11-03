@@ -43,7 +43,18 @@ async function boot(b, c, slow, blank) {
     if (drop) localStorage.removeItem('vi_declined_demo'); }, [c.keys, !!c.dropDeclined]);
   return { ctx, p, errs };
 }
-const settle = async (p, slow) => { await p.waitForFunction(() => typeof initDemoMode === 'function', null, { timeout: 30000 }); await p.waitForTimeout(slow ? 4000 : 1500); };
+// a page has settled when the app has booted, the saved-data guard is not holding writes and no reload is pending.
+// The guard reloads the page itself when Chrome gives it an empty view, so reads before that would see nothing.
+const settled = p => p.evaluate(() => typeof initDemoMode === 'function' && !window._viStorageHeld && !window._viDeleted && !document.getElementById('vi-storage-msg'));
+const settle = async (p, slow) => {
+  const end = Date.now() + 120000;
+  while (Date.now() < end) {
+    try { await p.waitForLoadState('load'); if (await settled(p)) { await p.waitForTimeout(slow ? 4000 : 1500); if (await settled(p)) return; } } catch (e) {}
+    await p.waitForTimeout(250);
+  }
+  throw new Error('the page never settled (stuck holding writes or showing the did-not-load message)');
+};
+const go = async (p, u) => { try { await p.goto(u); } catch (e) { if (!/interrupted by another navigation|ERR_ABORTED/.test(e.message)) throw e; } };
 const read = p => p.evaluate(() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); o[k] = localStorage.getItem(k); } return o; });
 
 (async () => {
@@ -52,11 +63,11 @@ const read = p => p.evaluate(() => { const o = {}; for (let i = 0; i < localStor
     const slow = mode === 'slow', blank = mode === 'blank';
     const t = (slow ? 'slow start, ' : blank ? 'empty view on reload, ' : '') + c.name + ': ';
     const { ctx, p, errs } = await boot(b, c, slow, blank);
-    await p.goto(URL + '?seed'); await settle(p, slow);
+    await go(p, URL + '?seed'); await settle(p, slow);
     if (blank) { const navs = []; p.on('framenavigated', f => { if (f === p.mainFrame()) navs.push(f.url()); });
-      await p.goto(URL + '?blank'); await settle(p, false);
+      await go(p, URL + '?blank'); await settle(p, false);
       ok(navs.some(u => /vi_rt=1/.test(u)), t + 'the page saw the empty view, wrote nothing and loaded again'); }
-    for (let r = 0; r < 2; r++) { await p.goto(URL); await settle(p, slow); }
+    for (let r = 0; r < 2; r++) { await go(p, URL); await settle(p, slow); }
     const ls = await read(p);
     const saved = Object.keys(c.keys).map(k => ls[k] || '').join('|');
     ok(Object.keys(c.keys).every(k => !!ls[k]) && saved.indexOf(c.mark) > -1, t + 'saved data is still there after boot and two reloads');
@@ -72,7 +83,7 @@ const read = p => p.evaluate(() => { const o = {}; for (let i = 0; i < localStor
     const ctx = await b.newContext({ viewport: { width: 390, height: 800 } }); await ctx.route(/^https?:/, r => r.abort());
     const p = await ctx.newPage();
     if (seedDeclined) await p.addInitScript(() => { if (/[?&]seed\b/.test(location.search)) localStorage.setItem('vi_declined_demo', 'true'); });
-    await p.goto(URL + '?seed'); await settle(p, false);
+    await go(p, URL + '?seed'); await settle(p, false);
     const ls = await read(p);
     ok((ls.vi_demo_mode === 'true' && /Honda Civic/.test(ls.pos_al1 || '')) === wantDemo, 'control, ' + name + ': demo ' + (wantDemo ? 'loads' : 'stays off') + ' (vi_demo_mode ' + ls.vi_demo_mode + ')');
     await ctx.close();
