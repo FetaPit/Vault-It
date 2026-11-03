@@ -10666,6 +10666,8 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .stk-inp:focus{outline:none;border-color:var(--em)}
 .stk-val{font-family:'Share Tech Mono',monospace;font-size:max(.62rem,var(--vi-fs-2));color:var(--tx);text-align:right}
 .stk-pl{font-family:'Share Tech Mono',monospace;font-size:max(.56rem,var(--vi-fs-2));text-align:right}
+.stk-chk{font:inherit;font-family:'DM Sans',sans-serif;font-size:max(.56rem,var(--vi-fs-1));line-height:1.25;color:var(--gold);background:rgb(var(--gold-rgb) / .1);border:1px solid rgb(var(--gold-rgb) / .5);border-radius:4px;padding:3px 6px;cursor:pointer;text-align:right;white-space:normal}
+.stk-chk:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .stk-src{font-size:max(.4rem,var(--vi-fs-1));color:var(--t3);margin-top:2px;font-family:'Share Tech Mono',monospace}
 .stk-add{display:grid;grid-template-columns:2fr .7fr .8fr 1fr auto;gap:8px;margin-top:12px}
 @media(max-width:700px){.stk-add{grid-template-columns:1fr 1fr}.stk-add>div:first-child{grid-column:1/-1}}
@@ -12681,7 +12683,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
             <div style="position:relative"><input type="text" id="stk-sym" class="al-inp" style="width:100%" placeholder="Search a fund, ETF or share by name, ticker or ISIN" autocomplete="off" oninput="stkSuggest(this.value)" onkeydown="if(event.key==='Enter')stkAdd()"><div id="stk-suggest" class="stk-suggest"></div></div>
             <input type="number" id="stk-units" class="al-inp" placeholder="Units" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
             <input type="number" id="stk-amt" class="al-inp" placeholder="…or £ held" min="0" step="any" title="Don't know the units? Enter the £ value you hold and the units are worked out from the live price" onkeydown="if(event.key==='Enter')stkAdd()">
-            <input type="number" id="stk-cost" class="al-inp" placeholder="Avg cost £ (optional)" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
+            <input type="number" id="stk-cost" class="al-inp" placeholder="Avg cost per unit £ (optional)" title="What you paid for one unit, in £. Leave empty and the price when you add it is used" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
             <button class="btn-add-data" onclick="stkAdd()">+ Add holding</button>
           </div>
           <div class="stk-note">UK-listed funds &amp; ETFs end in <b>.L</b> (VUSA.L, VWRL.L). US shares are plain (AAPL, MSFT). Or just <b>search by name or ISIN</b> and pick the fund. Prices convert to £ automatically. Edit units, cost or price any time. Everything here counts towards your net worth.</div>
@@ -19932,8 +19934,44 @@ function stkEnsure(){
 }
 function stkEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 // Holdings with no live price fall back to cost so net worth never silently drops to £0.
-function stkPrice(h){return (+h.price>0)?+h.price:((+h.avgCost>0)?+h.avgCost:0);}
+function stkPrice(h){return (+h.price>0)?+h.price:stkBasis(h);}
 function stkValue(h){return (+h.units||0)*stkPrice(h);}
+// v0.9.1 E17: returns are judged from when the holding was added (owner, Q8). The basis per unit is the average cost
+// the user typed or imported (avgCost, never rewritten here) or else the price when it was added (addPx, recorded once).
+function stkBasis(h){return (+h.avgCost>0)?+h.avgCost:((+h.addPx>0)?+h.addPx:0);}
+// A basis over 3x today's price is almost always pence typed as pounds or a total typed as a unit cost: nudge, don't show a loss.
+function stkSuspect(h){var b=stkBasis(h),p=+h.price;return b>0&&p>0&&b>3*p;}
+// Value, invested and change over the holdings with a usable basis; the rest are listed in `left` with why.
+function stkReturns(hs){
+  var r={value:0,invested:0,change:0,total:0,counted:[],left:[],leftValue:0,suspect:0,noBasis:0};
+  (hs||[]).forEach(function(h){
+    if(!((+h.units||0)>0))return;
+    var v=stkValue(h);r.total+=v;
+    if(stkSuspect(h)){r.left.push({sym:h.sym,why:'cost'});r.suspect++;r.leftValue+=v;return;}
+    var b=stkBasis(h);
+    if(!(b>0)){r.left.push({sym:h.sym,why:'none'});r.noBasis++;r.leftValue+=v;return;}
+    r.counted.push(h);r.value+=v;r.invested+=h.units*b;
+  });
+  r.change=r.value-r.invested;
+  return r;
+}
+// Tile figures in pence under £10,000, whole pounds above; change is taken from the shown parts so the tiles always add up.
+function stkTileMoney(total,valC,inv){
+  var rate=window.VI_CURRENCY_RATE||1,sym=window.VI_CURRENCY_SYMBOL||'£',dp=Math.abs(total*rate)<10000?2:0,k=dp?100:1;
+  var q=function(n){return Math.round((isNaN(n)||n==null?0:n)*rate*k);};
+  var f=function(u,sign){var a=Math.abs(u)/k;return (u<0?(sign?'−':'-'):(sign&&u>0?'+':''))+sym+a.toLocaleString('en-GB',{minimumFractionDigits:dp,maximumFractionDigits:dp});};
+  var vP=q(valC),iP=q(inv),cP=vP-iP;
+  return{val:f(q(total)),inv:f(iP),chg:f(cP,true),chgN:cP/k/rate,chgP:cP,invP:iP};
+}
+// The first price seen after adding (live or the user's own) becomes the entry price of the units still waiting for one.
+function stkResolveEntry(h){
+  var pu=+h.addPendU||0;if(!(pu>0))return;
+  if(+h.avgCost>0){delete h.addPendU;delete h.addPendAt;return;}
+  var p=+h.price;if(!(p>0)||!(h.manualPrice||(+h.updated||0)>=(+h.addPendAt||0)))return;
+  var u=+h.units||0;pu=Math.min(pu,u);var ku=u-pu;
+  h.addPx=(ku>0&&+h.addPx>0)?(ku*h.addPx+pu*p)/u:p;
+  delete h.addPendU;delete h.addPendAt;
+}
 function alTotalStocks(){return (alState.stocks||[]).reduce(function(s,h){return s+stkValue(h);},0);}
 function stkVisible(){
   stkEnsure();
@@ -19953,7 +19991,7 @@ function stkAgo(ts){
   var m=Math.round((Date.now()-ts)/60000);
   return m<1?'just now':m<60?m+'m ago':m<1440?Math.round(m/60)+'h ago':Math.round(m/1440)+'d ago';
 }
-function stkSave(){if(viBlockEdit())return;saveAL();if(typeof updateKPIs==='function')updateKPIs();stkRender();if(typeof renderSummaryCards==='function')try{renderSummaryCards();}catch(e){}}
+function stkSave(){if(viBlockEdit())return;(alState.stocks||[]).forEach(stkResolveEntry);saveAL();if(typeof updateKPIs==='function')updateKPIs();stkRender();if(typeof renderSummaryCards==='function')try{renderSummaryCards();}catch(e){}}
 
 // ── donut ──
 function stkDonut(slices,total,top,sub,subCol){
@@ -19985,24 +20023,23 @@ function stkRender(){
 
   var hs=stkVisible().slice().sort(function(a,b){return stkValue(b)-stkValue(a);});
   var total=hs.reduce(function(s,h){return s+stkValue(h);},0);
-  // returns: only over holdings that have a cost basis
-  var withCost=hs.filter(function(h){return +h.avgCost>0&&(+h.units||0)>0;});
-  var cost=withCost.reduce(function(s,h){return s+h.units*h.avgCost;},0);
-  var valC=withCost.reduce(function(s,h){return s+stkValue(h);},0);
-  var ret=valC-cost,retPct=cost>0?ret/cost*100:0;
+  // returns (E17): judged from when each holding was added; holdings with no entry price or a doubtful cost are left out and named
+  var rr=stkReturns(hs),tm=stkTileMoney(total,rr.value,rr.invested),ret=tm.chgN,up=ret>=0,hasRet=rr.counted.length>0;
+  var nm=function(w){var l=rr.left.filter(function(x){return x.why===w;});return l.length<=2?l.map(function(x){return stkEsc(x.sym);}).join(' and '):l.length;};
+  var leftTxt=(rr.suspect?nm('cost')+' left out: check '+(rr.suspect===1?'its':'their')+' average cost':'')+(rr.suspect&&rr.noBasis?' · ':'')+(rr.noBasis?nm('none')+(rr.noBasis===1?' has':' have')+' no entry price yet':'');
   var dayChg=hs.reduce(function(s,h){var v=stkValue(h),c=+h.change||0;return s+(c?v-v/(1+c/100):0);},0);
   var dayPct=total>0?dayChg/(total-dayChg)*100:0;
   var slices=hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){return{v:stkValue(h),c:STK_COLORS[i%STK_COLORS.length],t:h.sym};});
   var main=document.getElementById('stk-main');
   if(main){
-    var up=ret>=0,dUp=dayChg>=0;
+    var dUp=dayChg>=0;
     var _ap=alState.activePie!=='all'?alState.stockPies.find(function(x){return x.id===alState.activePie;}):null;
-    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-edit"/></svg> Rename</button><button class="stk-btn" style="border-color:rgb(var(--red-rgb) / .5);color:var(--red)" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>'+stkFundControls(_ap,hs):'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
+    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-edit"/></svg> Rename</button><button class="stk-btn" style="border-color:rgb(var(--red-rgb) / .5);color:var(--red)" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>'+stkFundControls(_ap,hs):'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),(hasRet&&tm.invP>0)?((up?'+':'')+(tm.chgP/tm.invP*100).toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
       +'<div class="stk-stats">'
-      +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+cfMoney(total)+'</div><div class="s">'+((_ap&&_ap.kind==='fund'&&hs.length===1)?'<b style="color:var(--gold)">'+(+hs[0].units||0).toLocaleString('en-GB',{maximumFractionDigits:4})+' units owned</b>'+(stkPrice(hs[0])>0?' × £'+stkPrice(hs[0]).toFixed(2):''):hs.length+' holding'+(hs.length===1?'':'s'))+' · counts towards net worth</div></div>'
-      +'<div class="stk-stat" style="background:'+(withCost.length?(up?'rgb(var(--green-rgb) / .07)':'rgb(var(--red-rgb) / .08)'):'rgb(var(--teal-rgb) / .06)')+'"><div class="l">Total return</div><div class="v" style="color:'+(withCost.length?(up?'var(--green)':'var(--red)'):'var(--t3)')+'">'+(withCost.length?((up?'+':'−')+cfMoney(Math.abs(ret))):'–')+'</div><div class="s">'+(withCost.length?(withCost.length<hs.length?'on '+withCost.length+' of '+hs.length+' with a cost basis':'vs your average cost'):'add an average cost to see returns')+'</div></div>'
+      +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+tm.val+'</div><div class="s">'+((_ap&&_ap.kind==='fund'&&hs.length===1)?'<b style="color:var(--gold)">'+(+hs[0].units||0).toLocaleString('en-GB',{maximumFractionDigits:4})+' units owned</b>'+(stkPrice(hs[0])>0?' × £'+stkPrice(hs[0]).toFixed(2):''):hs.length+' holding'+(hs.length===1?'':'s'))+' · counts towards net worth</div></div>'
+      +'<div class="stk-stat"><div class="l">Invested (at the time you added it)</div><div class="v">'+(hasRet?tm.inv:'–')+'</div><div class="s">'+(hasRet?(leftTxt||'what your holdings cost when you added them'):(leftTxt||'add a holding to see what went in'))+'</div></div>'
+      +'<div class="stk-stat" style="background:'+(hasRet?(tm.chgP===0?'rgb(var(--teal-rgb) / .06)':up?'rgb(var(--green-rgb) / .07)':'rgb(var(--red-rgb) / .08)'):'rgb(var(--teal-rgb) / .06)')+'"><div class="l">Change since you added it</div><div class="v" style="color:'+(hasRet&&tm.chgP!==0?(up?'var(--green)':'var(--red)'):'var(--t3)')+'">'+(hasRet?tm.chg:'–')+'</div><div class="s">'+(hasRet?(rr.left.length?'on '+rr.counted.length+' of '+(rr.counted.length+rr.left.length)+' holdings':(tm.invP>0?((tm.chgP>=0?'+':'')+(tm.chgP/tm.invP*100).toFixed(1)+'% on what you put in'):'')):'shows once a holding has a price')+'</div></div>'
       +'<div class="stk-stat"><div class="l">Today</div><div class="v" style="color:'+(dayChg?(dUp?'var(--green)':'var(--red)'):'var(--t3)')+'">'+(dayChg?((dUp?'+':'−')+cfMoney(Math.abs(dayChg))):'–')+'</div><div class="s">'+(dayChg?((dUp?'+':'')+dayPct.toFixed(2)+'% since yesterday'):'refresh for live moves')+'</div></div>'
-      +'<div class="stk-stat"><div class="l">Invested</div><div class="v">'+(withCost.length?cfMoney(cost):'–')+'</div><div class="s">cost basis of tracked holdings</div></div>'
       +'</div>';
   }
   // status
@@ -20024,16 +20061,17 @@ function stkRender(){
       +stkGroups(hs).map(function(g){var open=stkGrpOpen(g.p.id);
         return '<div class="stk-grp'+(open?' open':'')+'"><button type="button" class="stk-gh" aria-expanded="'+open+'" onclick="stkToggleGrp('+g.p.id+')"><svg class="vi-ic stk-chev" aria-hidden="true"><use href="#vi-chevron"/></svg>'+stkLogoBadge(g.p)+'<span class="stk-gn">'+(g.p.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(g.p.name)+'</span><span class="stk-gc">'+g.hs.length+' holding'+(g.hs.length===1?'':'s')+'</span><span class="stk-gv">'+cfMoney(g.v)+(total>0?' <small>'+(g.v/total*100).toFixed(1)+'%</small>':'')+'</span></button>'
           +'<div class="stk-gb"'+(open?'':' hidden')+'>'+g.hs.map(function(h){var i=hs.indexOf(h);
-        var v=stkValue(h),c=(+h.avgCost>0)?(h.units*h.avgCost):0,pl=c>0?(v-c)/c*100:null;
-        var srcTxt=h.manualPrice?'manual price':(h.updated?'live · '+stkAgo(h.updated):(+h.price>0?'saved price':(+h.avgCost>0?'valued at cost':'no price')));
+        var v=stkValue(h),sus=stkSuspect(h),c=sus?0:(h.units*stkBasis(h)),pl=c>0?(v-c)/c*100:null;
+        var srcTxt=h.manualPrice?'manual price':(h.updated?'live · '+stkAgo(h.updated):(+h.price>0?'saved price':(stkBasis(h)>0?'valued at cost':'no price')));
         var ch=+h.change||0;
         return '<div class="stk-row">'
           +'<div class="c-tk"><div class="stk-tk"><i style="background:'+STK_COLORS[i%STK_COLORS.length]+'"></i>'+stkEsc(h.sym)+(alState.activePie==='all'?' <span style="color:var(--t3);font-weight:400;font-size:max(.44rem,var(--vi-fs-1))">· '+stkEsc(stkPieName(h.pie))+'</span>':'')+'</div><div class="stk-nm">'+stkEsc(h.name||'')+'</div>'+stkHoldMeta(h)+'</div>'
           +'<div class="c-un"><span class="stk-lb">Units</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.units||0)+'" onchange="stkSet('+h.id+',\'units\',this.value)" title="Units held"></div>'
-          +'<div class="c-av"><span class="stk-lb">Avg cost £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.avgCost>0?(+h.avgCost).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="–" onchange="stkSet('+h.id+',\'avgCost\',this.value)" title="Your average buy price in £"></div>'
+          +'<div class="c-av"><span class="stk-lb">Avg cost £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.avgCost>0?(+h.avgCost).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="'+(+h.addPx>0?(+h.addPx).toFixed(4).replace(/\.?0+$/,'')+' added':'–')+'" onchange="stkSet('+h.id+',\'avgCost\',this.value)" title="'+(+h.addPx>0&&!(+h.avgCost>0)?'Empty, so the price when you added it is used. Type what you paid per unit in £ to use that instead':'Your average buy price per unit in £')+'"></div>'
           +'<div class="c-pr"><span class="stk-lb">Price £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.price>0?(+h.price).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="live" onchange="stkSet('+h.id+',\'price\',this.value)" title="Price in £. Type one to override the live price, clear it to go back to live"><div class="stk-src">'+srcTxt+(ch&&!h.manualPrice?' · <span style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
           +'<div class="stk-val c-va"><span class="stk-lb">Value</span>'+cfMoney(v)+'</div>'
-          +'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'var(--green)':'var(--red)')+'">'+(pl==null?'–':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>'
+          +(sus?'<div class="stk-pl c-pl"><button type="button" class="stk-chk" onclick="stkCheckCost(this)" title="Your average cost is more than 3 times today’s price. It should be the price you paid per unit, in £ (not pence, and not the total)">Check your average cost</button></div>'
+            :'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'var(--green)':'var(--red)')+'" title="'+(pl==null?'':(+h.avgCost>0?'vs your average cost':'since you added it'))+'">'+(pl==null?'–':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>')
           +'<button class="data-item-del c-x" style="width:auto;padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;opacity:1;border:1px solid rgb(var(--red-rgb) / .45);border-radius:4px" onclick="stkRemove('+h.id+')" title="Remove this holding">🗑 Remove</button></div>';
 }).join('')+'</div></div>';
       }).join('')+'</div>';
@@ -20051,6 +20089,7 @@ function stkRender(){
     if(av==='tree'){stkDrawTreemap();if(!al._ro&&window.ResizeObserver){al._ro=new ResizeObserver(function(){if(stkAllocView()==='tree'&&al.clientWidth!==al._rw){al._rw=al.clientWidth;stkDrawTreemap();}});al._ro.observe(al);}}
   }
 }
+function stkCheckCost(btn){var r=btn.closest('.stk-row'),i=r&&r.querySelector('.c-av input');if(i){i.focus();if(i.select)i.select();}}
 // ── holdings grouped by pie / fund, collapsed by default (owner, 3 Nov) ──
 function stkOpenMap(){try{return JSON.parse(localStorage.getItem('vi-stk-open')||'{}')||{};}catch(e){return {};}}
 function stkGrpOpen(id){return !!stkOpenMap()[id];}
@@ -20160,7 +20199,7 @@ async function stkAddCore(o){if(viBlockEdit())return;
   var sym=String(o.sym||'').trim().toUpperCase(),units=o.units,amt=o.amt,cost=o.cost;
   if(!/^[A-Z0-9.\-^=]{1,15}$/.test(sym))return{err:'Search for a fund or share, or enter a ticker, e.g. VUSA.L or AAPL'};
   if(!(units>0)&&!(amt>0))return{err:'Enter how many units you hold, or the £ value you hold'};
-  var mpx=+o.manualPrice>0?+o.manualPrice:0;
+  var mpx=+o.manualPrice>0?+o.manualPrice:0,entryPx=mpx;   // entryPx: the price at this moment, when we know it (E17)
   if(!(units>0)&&mpx>0)units=+(amt/mpx).toFixed(6);   // your own unit price
   if(!(units>0)){   // worked out from the £ you hold ÷ the live price
     showToast('Looking up the live price…');
@@ -20177,7 +20216,7 @@ async function stkAddCore(o){if(viBlockEdit())return;
         }
       }
       if(!(g>0))return{err:'No live price found for '+sym+((window._stkMisses&&window._stkMisses[sym]&&window._stkMisses[sym][0])?' ('+window._stkMisses[sym][0]+')':'')+'. Enter the units you hold instead (or pick a different listing of the fund)'};
-      units=+(amt/g).toFixed(6);if(note)showToast(note);
+      units=+(amt/g).toFixed(6);if(!(entryPx>0))entryPx=g;if(note)showToast(note);
     }catch(e){return{err:'Could not look up the price. Enter the units instead'};}
   }
   stkEnsure();
@@ -20194,12 +20233,22 @@ async function stkAddCore(o){if(viBlockEdit())return;
   if(platform&&!pie.platform){pie.platform={name:(stkPlatformMatch(platform)||{}).n||platform};delete pie.platformOff;}
   var h=alState.stocks.find(function(x){return x.pie===pie.id&&x.sym===sym;});
   if(h){ // merge into the existing position (weighted average cost)
-    var tc=(h.avgCost>0?h.units*h.avgCost:0)+(cost>0?units*cost:0);
+    var tc=(h.avgCost>0?h.units*h.avgCost:0)+(cost>0?units*cost:0),u0=+h.units||0;
     h.units=+(h.units+units).toFixed(8);
-    if(h.avgCost>0&&cost>0)h.avgCost=tc/h.units;else if(cost>0&&!(h.avgCost>0))h.avgCost=cost;
+    if(h.avgCost>0&&cost>0)h.avgCost=tc/h.units;
+    else if(cost>0&&!(h.avgCost>0)){   // first typed cost: earlier units keep their entry price (E17); units still waiting for a price take this cost
+      var ku=Math.max(0,u0-(+h.addPendU||0));
+      h.avgCost=(ku>0&&+h.addPx>0)?(ku*h.addPx+(h.units-ku)*cost)/h.units:cost;
+      delete h.addPendU;delete h.addPendAt;
+    }
+    else if(!(cost>0)&&!(h.avgCost>0)&&(+h.addPx>0||+h.addPendU>0||!(u0>0))){   // no cost typed: these units go in at today's price (E17)
+      if(entryPx>0&&!(+h.addPendU>0))h.addPx=(u0>0&&+h.addPx>0)?(u0*h.addPx+units*entryPx)/h.units:entryPx;
+      else{h.addPendU=(+h.addPendU||0)+units;h.addPendAt=Date.now();}
+    }
     if(!h.name&&nm)h.name=nm;
   } else {
     h={id:Date.now(),pie:pie.id,sym:sym,name:nm,units:units,avgCost:cost>0?cost:0,price:0};
+    if(!(cost>0)){if(entryPx>0)h.addPx=entryPx;else{h.addPendU=units;h.addPendAt=Date.now();}}
     alState.stocks.push(h);
   }
   if(mpx>0){h.price=mpx;h.manualPrice=true;h.updated=0;}   // your price, kept until you clear it
@@ -20381,7 +20430,7 @@ function stkBuildSeries(hs,hist,fromMs){
       var i=ptr[h.sym]||0;while(i+1<d.t.length&&d.t[i+1]<=t)i++;ptr[h.sym]=i;
       var px=stkToGBP(d.c[i],d.currency);if(px==null)return;
       var v=(+h.units||0)*px;val+=v;
-      if(+h.avgCost>0){cost+=h.units*h.avgCost;costVal+=v;}
+      var bs=stkSuspect(h)?0:stkBasis(h);if(bs>0){cost+=h.units*bs;costVal+=v;}
     });
     return{t:t*1000,v:val,ret:cost>0?(costVal-cost)/cost*100:null,cost:cost};
   });
@@ -20423,7 +20472,7 @@ async function stkChartRender(){
   var have=hs.filter(function(h){return hist[h.sym];}),skipped=hs.length-have.length;
   var pts=have.length?stkBuildSeries(have,hist,from):null;
   if(!pts){box.innerHTML=head+'<div class="stk-note" style="text-align:center;padding:24px">Price history is not available right now'+(skipped?' for '+skipped+' holding'+(skipped===1?'':'s'):'')+'. Try again in a moment.</div>';return;}
-  var costKnown=have.every(function(h){return +h.avgCost>0;}),cost=have.reduce(function(s,h){return s+((+h.avgCost>0)?h.units*h.avgCost:0);},0);
+  var costKnown=have.every(function(h){return stkBasis(h)>0&&!stkSuspect(h);}),cost=have.reduce(function(s,h){return s+((stkBasis(h)>0&&!stkSuspect(h))?h.units*stkBasis(h):0);},0);
   var view=_stkCh.view;if(view==='return'&&pts.every(function(p){return p.ret==null;}))view='value';
   var lastP=pts[pts.length-1],firstP=pts[0];
   var chg=view==='value'?(lastP.v-firstP.v):(lastP.ret-firstP.ret);
