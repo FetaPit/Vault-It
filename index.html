@@ -9580,19 +9580,25 @@ body.reduced-motion #app-footer, body.reduced-motion #app-footer * { transition:
 
 .fire-timeline-svg {
   display: block;
-  height: 280px;
+  height: 300px;
   position: absolute;
   top: 0; left: 0;
 }
 .fire-timeline-scroll { contain: layout paint; overscroll-behavior-x: contain; }
-/* roadmap depth (owner, 31 Oct): the road sits in slight perspective, coins turn and grow */
-#fire-track{transform:perspective(1100px) rotateX(8deg);transform-origin:50% 100%}
-.fire-coin{transform-box:fill-box;transform-origin:center;transition:transform .25s var(--ease),opacity .25s}
-.fire-coin:hover{transform:scale(1.12)}
-.fire-coin.next{animation:fire-spin 3.4s ease-in-out infinite}
+/* roadmap depth (owner, 3 Nov round 2): the perspective is drawn, not tilted: a thin ground strip with a converging grid (#fire-ground)
+   and the tokens floating above it; a token lifts a little more on hover, and the stage to work on turns slowly (owner, 31 Oct) */
+.fire-stage{position:relative}
+.fire-ground{position:absolute;left:0;right:0;bottom:0;height:56px;width:100%;pointer-events:none;z-index:0}
+.fire-ground .fg-h,.fire-ground .fg-v{stroke:var(--teal);fill:none;vector-effect:non-scaling-stroke}
+.fire-ground .fg-v{stroke-opacity:.16}
+.fire-stage .fire-timeline-scroll{position:relative;z-index:1}
+.fire-coin{transform-box:fill-box;transform-origin:50% 70%;transition:transform .25s var(--ease),opacity .25s}
+.fire-card{transform-box:fill-box;transform-origin:center;transition:transform .25s var(--ease)}
+.fire-coin:hover .fire-card{transform:translateY(-5px)}
+.fire-coin.next .fire-card{animation:fire-spin 3.4s ease-in-out infinite}
 @keyframes fire-spin{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.84)}}
-@media(max-width:700px){#fire-track{transform:none}.fire-coin.next{animation:none}}
-@media(prefers-reduced-motion:reduce){.fire-coin.next{animation:none}.fire-coin{transition:none}}
+@media(max-width:700px){.fire-coin.next .fire-card{animation:none}}
+@media(prefers-reduced-motion:reduce){.fire-coin.next .fire-card{animation:none}.fire-coin,.fire-card{transition:none}}
 .fd-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.54rem,var(--vi-fs-1));letter-spacing:.04em;padding:7px 12px;border-radius:6px;cursor:pointer;color:var(--gold);background:rgb(var(--gold-rgb) / .12);border:1px solid rgb(var(--gold-rgb) / .55)}
 .fd-btn.ghost{color:var(--t2);background:transparent;border-color:var(--bd)}
 .fd-box{margin-top:8px;padding:9px 11px;border:1px solid rgb(var(--teal-rgb) / .25);border-radius:7px;background:rgb(var(--teal-rgb) / .05);font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);line-height:1.5}
@@ -11198,8 +11204,172 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 /* outside brand colours on paper */
 [data-theme="light"] a[href*="wa.me"]{color:#08502C!important}
 </style>
+<style>
+/* ══ WEALTH ROADMAP: tokens and levelling (owner, 3 Nov 2026; brief docs/creative/wealth-roadmap/BRIEF.md) ══
+   Tier colours are brand tokens, so Night and Daylight both work: Starter grey, Solid teal, Strong purple, Summit brass.
+   Never blue (surplus) or red (debt); green only on the achieved tick, amber only for skipped. */
+.wt{--wt:#8C939B;--wt-d:#2a3036;--wt-dd:#1a1f24;--wt-l:#c9ced3}
+.wt.t-solid{--wt:#44C0B9;--wt-d:#0f4a47;--wt-dd:#0a2b2a;--wt-l:#a9ece8}
+.wt.t-strong{--wt:#9B7EC8;--wt-d:#3b2a5c;--wt-dd:#22183a;--wt-l:#d9c9f2}
+.wt.t-summit{--wt:#C9A84C;--wt-d:#5e4614;--wt-dd:#2e220a;--wt-l:#f3e2a8}
+/* token art keeps the same colours in Night and Daylight: it is an object on the page, like a coin. Only chips follow the theme */
+.wt.st-lock,.wt.st-skip{--wt-d:#232a31;--wt-dd:#151a1f;--wt-l:#5d666e}
+.wt-edge{fill:var(--wt-dd);stroke:var(--wt-d);stroke-width:.6}
+.wt-rimline{fill:none;stroke:var(--wt-l);stroke-width:.8;stroke-opacity:.85}
+.st-wait .wt-rimline{stroke-dasharray:4 3}
+.st-skip .wt-rimline{stroke:#e8a23c;stroke-dasharray:2 3}
+.wt-metal{stroke:#05080c;stroke-opacity:.5;stroke-width:1}
+.wt-tick{stroke:#0a0e12;stroke-width:.8;fill:none}
+.wt-mface{fill:#0b1015;stroke:var(--wt-l);stroke-width:2}
+.wt-mrim{fill:none;stroke:#fff;stroke-opacity:.35;stroke-width:.6}
+.wt-gloss{fill:none;stroke:#fff;stroke-opacity:.18;stroke-width:2.6;stroke-linecap:round}
+.wt-rivet{fill:#3a434c;stroke:#f4f6f8;stroke-opacity:.55;stroke-width:.5}
+.wt-mdots{fill:none;stroke:var(--wt-l);stroke-opacity:.45;stroke-width:1.1;stroke-dasharray:.1 2.6;stroke-linecap:round}
+.wt-icon g[fill-opacity]{fill-opacity:.32}
+.wt-icon g[opacity]{opacity:.95}
+.wt-mring{fill:none;stroke:var(--wt-l);stroke-opacity:.5;stroke-width:.6;stroke-dasharray:1.5 2}
+.wt-icon{color:var(--wt-l);--vi-sw:1.35;overflow:visible}
+.st-lock .wt-icon,.st-skip .wt-icon{color:#7d868e}
+.wt-icf{fill:var(--wt-l);fill-opacity:.2}
+.wt-ics{fill:none;stroke:var(--wt-l);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.wt-num{font-family:'Syne',sans-serif;font-weight:800;font-size:34px;fill:var(--wt-l)}
+.wt-tl{font-family:'Share Tech Mono',monospace;font-size:16px;fill:#fff}
+.st-lock .wt-tl,.st-skip .wt-tl{fill:#7d868e}
+.wt-side{font-family:'Syne',sans-serif;font-weight:800;font-size:12.5px;letter-spacing:1px;fill:var(--wt-l)}
+.wt-bar{fill:#fff;fill-opacity:.16}
+.wt-bar.on{fill:var(--wt-l);fill-opacity:1}
+.wt-halo{fill:none;stroke:#44C0B9;stroke-width:1.4;stroke-opacity:.85;vector-effect:non-scaling-stroke}
+.wt-chipbg{fill:var(--panel);stroke:var(--wt);stroke-width:2.2;stroke-linejoin:round}
+.wt-cg{fill:none;stroke:var(--wt);stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.wt-cgf{fill:var(--wt)}
+.c-done .wt-chipbg{fill:var(--green);stroke:var(--panel)}
+.c-done .wt-cg{stroke:var(--panel)}
+.c-wait .wt-chipbg{stroke-dasharray:3 2.4}
+.c-skip .wt-chipbg,.c-skip .wt-cg{stroke:var(--amber)}
+.c-lock .wt-chipbg,.c-lock .wt-cg{stroke:var(--lock)}.c-lock .wt-cgf{fill:var(--lock)}
+.wt-svg{display:block;flex:none;overflow:visible}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* roadmap card additions */
+.fire-next-step{padding:0 16px 8px;font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2),10.5px);color:var(--t2);line-height:1.5}
+.fire-next-step b{font-family:'Syne',sans-serif;color:var(--tx);margin-right:4px}
+.fire-next-step span{font-family:'Share Tech Mono',monospace;color:var(--brass);white-space:nowrap}
+.wr-dtok{flex:none;width:100px}@media(max-width:480px){.wr-dtok{width:80px}}
+.wr-steps-h{margin-top:10px}
+.wr-steps{list-style:none;margin:6px 0 4px;padding:0;display:grid;gap:6px}
+.wr-steps li{display:flex;align-items:center;gap:8px;font-size:max(.58rem,var(--vi-fs-2),10.5px);color:var(--t2)}
+.wr-sdot{flex:none;width:12px;height:12px;border-radius:3px;border:1.5px solid var(--lock)}
+.wr-steps li.ok .wr-sdot{background:var(--green);border-color:var(--green)}
+.wr-steps li.cur .wr-sdot{border-color:var(--teal);box-shadow:0 0 0 3px rgb(var(--teal-rgb) / .18)}
+.wr-steps li.ok .wr-slbl{color:var(--tx)}
+.wr-steps li.cur .wr-slbl{color:var(--tx);font-weight:600}
+.wr-slbl{flex:1;min-width:0}
+.wr-sxp{font-family:'Share Tech Mono',monospace;color:var(--brass);white-space:nowrap}
+/* the tab */
+.wr-wrap{max-width:1100px;margin:0 auto;padding:24px 20px 60px;display:grid;gap:16px;min-width:0}
+.wr-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.wr-title{font-family:'Syne',sans-serif;font-weight:800;font-size:max(1.1rem,var(--vi-fs-5,1.1rem));margin:0;color:var(--tx)}
+.wr-sub,.wr-note{margin:4px 0 0;font-size:max(.6rem,var(--vi-fs-2),10.5px);color:var(--t2);line-height:1.5;max-width:60ch}
+.wr-note{margin:0 0 12px}
+.wr-count{font-family:'Share Tech Mono',monospace;font-size:max(.6rem,var(--vi-fs-2),10.5px);color:var(--teal);border:1px solid rgb(var(--teal-rgb) / .3);padding:4px 10px}
+.wr-top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px}
+@media(max-width:820px){.wr-top{grid-template-columns:minmax(0,1fr)}}
+.wr-card{min-width:0}
+#wr-roadmap-slot{min-width:0}
+#wr-roadmap-slot>.fire-roadmap-card{margin:0}
+.wr-rank-main{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.wr-rank-tok{position:relative;flex:none}
+.wr-ribbon{position:absolute;left:50%;bottom:0;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:max(.6rem,10.5px);letter-spacing:.1em;text-transform:uppercase;color:var(--tx);background:var(--panel);border:1px solid var(--brass);padding:2px 10px;white-space:nowrap;clip-path:polygon(6px 0,calc(100% - 6px) 0,100% 50%,calc(100% - 6px) 100%,6px 100%,0 50%)}
+.wr-rank-meta{flex:1;min-width:200px}
+.wr-eyebrow{font-family:'Share Tech Mono',monospace;font-size:max(.58rem,10.5px);letter-spacing:.12em;text-transform:uppercase;color:var(--t2)}
+.wr-rank-name{font-family:'Syne',sans-serif;font-weight:800;font-size:max(1.2rem,var(--vi-fs-5,1.2rem));color:var(--tx);margin:2px 0 8px}
+.wr-xpbar{position:relative;height:8px;background:rgb(var(--ink-rgb) / .08);overflow:hidden}
+.wr-xpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--brass));transition:width .6s var(--ease,ease)}
+.wr-xpbar b{position:absolute;top:0;bottom:0;width:1px;background:var(--panel)}
+.wr-xp{font-family:'Share Tech Mono',monospace;font-size:max(.62rem,10.5px);color:var(--brass);margin-top:6px}
+.wr-recalc{margin:8px 0 0;font-size:max(.58rem,10.5px);color:var(--teal);line-height:1.5}
+.wr-split{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:max(.56rem,10.5px);color:var(--t2)}
+.wr-split b{font-family:'Share Tech Mono',monospace;color:var(--tx);font-weight:400}
+.wr-reward{display:flex;gap:12px;align-items:flex-start;margin-top:16px;padding:12px;border:1px dashed rgb(var(--brass-rgb) / .45)}
+.wr-reward.ready{border-style:solid;border-color:var(--brass);background:rgb(var(--brass-rgb) / .08)}
+.wr-reward.claimed{border-style:solid;border-color:rgb(var(--green-rgb,62 207 142) / .5)}
+.wr-rw-body{flex:1;min-width:0;display:grid;gap:4px}
+.wr-rw-body b{font-family:'Syne',sans-serif;font-size:max(.7rem,10.5px);color:var(--tx)}
+.wr-rw-body>span{font-size:max(.58rem,10.5px);color:var(--t2);line-height:1.5}
+.wr-rw-row{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;align-items:center}
+.wr-rw-row small{font-family:'Share Tech Mono',monospace;font-size:max(.56rem,10.5px);color:var(--t2)}
+.wr-claim{justify-self:start;margin-top:4px;padding:8px 14px;border:none;background:var(--brass);color:var(--panel);font-family:'Syne',sans-serif;font-weight:800;font-size:max(.62rem,10.5px);cursor:pointer;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))}
+.wr-claim:disabled{opacity:.6;cursor:default}
+.wr-bar{height:5px;background:rgb(var(--ink-rgb) / .08);overflow:hidden}
+.wr-bar i{display:block;height:100%;background:var(--teal)}
+.wr-goal{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)}
+.wr-goal:last-child{border-bottom:none}
+.wr-goal[role=button]{cursor:pointer}
+.wr-goal[role=button]:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.wr-g-body{flex:1;min-width:0;display:grid;gap:3px}
+.wr-g-h{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.62rem,10.5px);color:var(--tx)}
+.wr-g-l{font-size:max(.56rem,10.5px);color:var(--t2)}
+.wr-xpchip{font-family:'Share Tech Mono',monospace;font-size:max(.58rem,10.5px);color:var(--brass);white-space:nowrap}
+.wr-none{font-size:max(.6rem,10.5px);color:var(--t2)}
+.wr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+@media(max-width:480px){.wr-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.wr-tok{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:12px 8px;border:1px solid var(--bd);background:rgb(var(--panel-rgb) / .5);min-width:0}
+.wr-tok.got{border-color:color-mix(in srgb,var(--teal) 35%,transparent)}
+.wr-tok b{font-family:'Syne',sans-serif;font-size:max(.62rem,10.5px);color:var(--tx);overflow-wrap:anywhere}
+.wr-tok small{font-family:'Share Tech Mono',monospace;font-size:max(.56rem,10.5px);color:var(--brass)}
+.wr-tok span{font-size:max(.56rem,10.5px);color:var(--t2);line-height:1.4}
+.wr-tok:not(.got) b{color:var(--t2)}
+.wr-grid[data-f="starter"] .wr-tok:not(.t-starter),.wr-grid[data-f="solid"] .wr-tok:not(.t-solid),.wr-grid[data-f="strong"] .wr-tok:not(.t-strong),.wr-grid[data-f="summit"] .wr-tok:not(.t-summit){display:none}
+.wr-coll-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.wr-tiers{display:flex;flex-wrap:wrap;gap:6px}
+.wr-chip{font-family:'Share Tech Mono',monospace;font-size:max(.56rem,10.5px);padding:5px 10px;background:none;border:1px solid var(--bd2);color:var(--t2);cursor:pointer;min-height:32px}
+.wr-chip.on{color:var(--tx);border-color:var(--teal);background:rgb(var(--teal-rgb) / .1)}
+.wr-chip.t-solid{border-left:3px solid var(--teal)}.wr-chip.t-strong{border-left:3px solid var(--purple)}.wr-chip.t-summit{border-left:3px solid var(--brass)}.wr-chip.t-starter{border-left:3px solid var(--lock)}
+.wr-ladder{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media(max-width:900px){.wr-ladder{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
+.wr-rank-grp{border:1px solid var(--bd);padding:10px;display:grid;gap:4px;align-content:start;min-width:0}
+.wr-rank-grp.here{border-color:var(--teal)}
+.wr-grp-h{font-family:'Share Tech Mono',monospace;font-size:max(.58rem,10.5px);letter-spacing:.12em;text-transform:uppercase;color:var(--t2);margin-bottom:4px}
+.wr-step{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.wr-st-n{flex:1;min-width:0;font-family:'Syne',sans-serif;font-weight:700;font-size:max(.58rem,10.5px);color:var(--t2)}
+.wr-step.got .wr-st-n{color:var(--tx)}
+.wr-step.cur .wr-st-n{color:var(--teal);font-size:max(.66rem,11.5px)}
+.wr-step small{font-family:'Share Tech Mono',monospace;font-size:max(.54rem,10.5px);color:var(--t2)}
+.wr-rw-tag{font-family:'Share Tech Mono',monospace;font-size:max(.54rem,10.5px);color:var(--panel);background:var(--brass);padding:1px 6px}
+.wr-how summary{cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:max(.66rem,10.5px);color:var(--tx)}
+.wr-how ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px;font-size:max(.58rem,10.5px);color:var(--t2);line-height:1.5}
+.wr-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.wr-fca{margin:0;font-size:max(.56rem,10.5px);color:var(--t2)}
+.wr-reset{background:none;border:1px solid rgb(var(--red-rgb) / .3);color:var(--re);font-family:'Syne',sans-serif;font-weight:700;font-size:max(.54rem,10.5px);padding:6px 12px;cursor:pointer}
+.ov-ach-tok{flex:none}
+.ov-ach-badge{width:auto;height:auto;background:none;border:none}
+@media(prefers-reduced-motion:reduce){.wr-xpbar i{transition:none}}
+</style>
 </head>
 <body>
+<!-- Wealth Roadmap token art, defined once for every token on the page (owner, 3 Nov round 2: Apex-style medallion cards) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<linearGradient id="wtc-starter" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8C939B"/><stop offset=".55" stop-color="#2a3036"/><stop offset="1" stop-color="#1a1f24"/></linearGradient>
+<pattern id="wts-starter" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="2.2" height="6" fill="#c9ced3" opacity=".35"/></pattern>
+<pattern id="wth-starter" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#c9ced3" opacity=".45"/></pattern>
+<linearGradient id="wtc-solid" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#44C0B9"/><stop offset=".55" stop-color="#0f4a47"/><stop offset="1" stop-color="#0a2b2a"/></linearGradient>
+<pattern id="wts-solid" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="2.2" height="6" fill="#a9ece8" opacity=".35"/></pattern>
+<pattern id="wth-solid" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#a9ece8" opacity=".45"/></pattern>
+<linearGradient id="wtc-strong" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B7EC8"/><stop offset=".55" stop-color="#3b2a5c"/><stop offset="1" stop-color="#22183a"/></linearGradient>
+<pattern id="wts-strong" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="2.2" height="6" fill="#d9c9f2" opacity=".35"/></pattern>
+<pattern id="wth-strong" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#d9c9f2" opacity=".45"/></pattern>
+<linearGradient id="wtc-summit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9A84C"/><stop offset=".55" stop-color="#5e4614"/><stop offset="1" stop-color="#2e220a"/></linearGradient>
+<pattern id="wts-summit" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="2.2" height="6" fill="#f3e2a8" opacity=".35"/></pattern>
+<pattern id="wth-summit" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#f3e2a8" opacity=".45"/></pattern>
+<linearGradient id="wtc-lock" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d2329"/><stop offset=".55" stop-color="#12171c"/><stop offset="1" stop-color="#0c1014"/></linearGradient>
+<pattern id="wth-lock" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#8C939B" opacity=".14"/></pattern>
+<linearGradient id="wtm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".45" stop-color="#9aa3ad"/><stop offset=".55" stop-color="#d7dde2"/><stop offset="1" stop-color="#5c656e"/></linearGradient>
+<linearGradient id="wtm-lock" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a929a"/><stop offset=".5" stop-color="#4a5259"/><stop offset="1" stop-color="#2c3237"/></linearGradient>
+<clipPath id="wt-clip"><polygon points="0,0 72,0 100,28 100,132 14,132 0,118"/></clipPath>
+<radialGradient id="wt-shadow"><stop offset="0" stop-color="#000" stop-opacity=".7"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+<radialGradient id="wt-pad"><stop offset="0" stop-color="#44C0B9" stop-opacity=".55"/><stop offset="1" stop-color="#44C0B9" stop-opacity="0"/></radialGradient>
+<linearGradient id="wt-beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#44C0B9" stop-opacity="0"/><stop offset="1" stop-color="#44C0B9" stop-opacity=".38"/></linearGradient>
+<pattern id="wt-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#e8a23c" stroke-opacity=".45" stroke-width="2"/></pattern>
+</defs></svg>
 <svg xmlns="http://www.w3.org/2000/svg" id="vi-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
 <symbol id="vi-coins" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 8c0 1.4 3.6 2.5 8 2.5S20 9.4 20 8s-3.6-2.5-8-2.5S4 6.6 4 8z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4 8c0 1.4 3.6 2.5 8 2.5S20 9.4 20 8s-3.6-2.5-8-2.5S4 6.6 4 8z'/><path d='M4 8v4c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V8'/><path d='M4 12v4c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5v-4'/></g></symbol>
 <symbol id="vi-dots" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/><path d='M10.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/><path d='M16.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/><path d='M10.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/><path d='M16.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z'/></g></symbol>
@@ -11988,7 +12158,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     <button class="tab-btn" data-tab="assets" role="tab" aria-label="Assets and liabilities" title="Assets and liabilities" onclick="showTab('assets')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-assets"/></svg><span class="nav-tab-label">Assets &amp; liabilities</span></button>
     <button class="tab-btn" data-tab="debt" role="tab" aria-label="Debt tracker" title="Debt tracker" onclick="showTab('debt')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-debt-tracker"/></svg><span class="nav-tab-label">Debt tracker</span></button>
     <button class="tab-btn" data-tab="biz" data-adv role="tab" aria-label="Entrepreneur" title="Entrepreneur" onclick="showTab('biz');setTimeout(function(){var g=document.getElementById('pro-gate-biz');if(g&&g.style.display!=='none'){gateNudge('Entrepreneur','Income streams + CRM');}},100)"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-entrepreneur"/></svg><span class="nav-tab-label">Entrepreneur</span><span class="vi-pro pro-badge" aria-hidden="true">PRO</span></button>
-    <button class="tab-btn" data-tab="achievements" data-adv role="tab" aria-label="Achievements" title="Achievements" onclick="showTab('achievements')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-trophy"/></svg><span class="nav-tab-label">Achievements</span></button>
+    <button class="tab-btn" data-tab="achievements" data-adv role="tab" aria-label="Wealth Roadmap" title="Wealth Roadmap" onclick="showTab('achievements')"><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-trophy"/></svg><span class="nav-tab-label">Wealth Roadmap</span></button>
     <button class="tab-btn" data-tab="connections" role="tab" aria-label="Connections" title="Connections" onclick="showTab('connections')" hidden><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-connections"/></svg><span class="nav-tab-label">Connections</span></button>
     <button class="tab-btn" data-tab="network" role="tab" aria-label="Network" title="Network" onclick="showTab('network')" hidden><svg class="vi-ic ti" aria-hidden="true"><use href="#vi-network"/></svg><span class="nav-tab-label">Network</span></button>
   </div>
@@ -12164,8 +12334,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     </div>
   </div>
 
-  <!-- Financial Freedom Roadmap — full width -->
-  <div style="margin-top:16px">
+  <!-- Financial Freedom Roadmap, full width. One card: it moves into the Wealth Roadmap tab while that tab is open (owner, 3 Nov: "mirrored on the dashboard") -->
+  <div style="margin-top:16px" id="ov-roadmap-slot">
     <div class="ov-chart-card fire-roadmap-card" id="fire-roadmap-card">
       <div class="fire-rm-header">
         <div>
@@ -12178,14 +12348,19 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
       </div>
       <div class="fr-legend">
-        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#44c0b9"/><path d="M4.6 8.2l2.3 2.3 4.4-4.9" fill="none" stroke="#030810" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Achieved</span>
-        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#44c0b9" stroke-width="1.5"/><circle cx="8" cy="8" r="2.4" fill="#44c0b9"/></svg>Next up</span>
-        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#7d8793" stroke-width="1.2" stroke-dasharray="2.5 2.5"/><rect x="5.6" y="7.6" width="4.8" height="3.8" rx=".8" fill="#7d8793"/><path d="M6.6 7.6V6.4a1.4 1.4 0 0 1 2.8 0v1.2" fill="none" stroke="#7d8793" stroke-width="1"/></svg>Locked: finish earlier stages first</span>
+        <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-done"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><path class="wt-cg" d="M8.5 16.5l5 5L24 11"/></g></g></svg>Achieved</span>
+        <span><svg width="13" height="17" viewBox="-8 -10 116 150" aria-hidden="true"><g class="wt t-solid st-next"><polygon points="0,0 72,0 100,28 100,132 14,132 0,118" fill="url(#wtc-solid)"/><polygon class="wt-halo" points="-6,-7 74.6,-7 106,24.4 106,140.8 9.7,140.8 -6,125.2" style="stroke-width:10;vector-effect:none"/></g></svg>Next up</span>
+        <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-wait"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><path class="wt-cg" d="M8.5 16.5l5 5L24 11"/></g></g></svg>Met, waiting</span>
+        <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-skip"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><path class="wt-cg" d="M8 10l6 6-6 6M16 10l6 6-6 6"/></g></g></svg>Skipped</span>
+        <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-lock"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><rect class="wt-cgf" x="10" y="15" width="12" height="9.5" rx="1.6"/><path class="wt-cg" d="M12.6 15v-2.6a3.4 3.4 0 0 1 6.8 0V15"/></g></g></svg>Locked: finish earlier stages first</span>
         <span id="fire-progress-txt" style="margin-left:auto;color:var(--em)">0 of 30 achieved</span>
       </div>
+      <div class="fire-next-step" id="fire-next-step" aria-live="polite"></div>
       <!-- Horizontal scrolling timeline: the SVG is only the window of stages on screen -->
+      <div class="fire-stage"><svg class="fire-ground" id="fire-ground" aria-hidden="true" focusable="false"></svg>
       <div class="fire-timeline-scroll" id="fire-timeline-scroll">
-        <div id="fire-track" style="position:relative;height:280px"><svg id="fire-roadmap-svg" class="fire-timeline-svg"></svg></div>
+        <div id="fire-track" style="position:relative;height:300px"><svg id="fire-roadmap-svg" class="fire-timeline-svg"></svg></div>
+      </div>
       </div>
       <!-- Stage detail panel — shown on click -->
       <div class="fire-detail-panel" id="fire-detail-panel" style="display:none">
@@ -12196,9 +12371,9 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 
   </div>
 
-  <!-- Achievements on the Overview: Simplified view shows this card instead of the Achievements tab (owner, 31 Oct) -->
+  <!-- Level card on the Overview: Simplified view shows this card instead of the Wealth Roadmap tab (owner, 31 Oct) -->
   <div class="ov-chart-card ov-ach-card" id="ov-ach-card" data-simple style="margin-top:16px">
-    <div class="ov-chart-hd"><span class="ov-chart-title">Achievements</span><button type="button" class="ov-ach-all" onclick="showTab('achievements')">See all badges</button></div>
+    <div class="ov-chart-hd"><span class="ov-chart-title">Wealth Roadmap</span><button type="button" class="ov-ach-all" onclick="showTab('achievements')">Open roadmap</button></div>
     <div id="ov-ach-body"></div>
   </div>
 
@@ -12935,28 +13110,33 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 
 <!-- ═══════════════════════════ ACHIEVEMENTS ═══════════════════════════ -->
 <div id="tab-achievements" class="tab-panel" style="display:none">
-  <div style="max-width:1000px;margin:0 auto;padding:24px 20px 60px">
-    <div class="ov-chart-card" style="margin-bottom:20px">
-      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-        <div id="ach-level-badge" style="width:72px;height:72px;background:linear-gradient(135deg,var(--dp),var(--em));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#fff;flex-shrink:0">1</div>
-        <div style="flex:1;min-width:180px">
-          <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:2px" id="ach-level-name">Seeker</div>
-          <div style="font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);margin-bottom:8px" id="ach-xp-label">0 XP · Next: Wanderer at 500 XP</div>
-          <div style="height:6px;background:rgb(var(--ink-rgb) / .06);border-radius:3px;overflow:hidden">
-            <div id="ach-xp-bar" style="height:100%;background:linear-gradient(90deg,var(--dp),var(--em));border-radius:3px;transition:width .6s ease;width:0%"></div>
-          </div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:1.2rem;color:var(--go)" id="ach-xp-total">0 XP</div>
-          <div style="font-size:max(.55rem,var(--vi-fs-1));color:var(--t3);text-transform:uppercase;letter-spacing:.12em">Total XP</div>
-        </div>
-      </div>
+  <!-- Wealth Roadmap (owner, 3 Nov 2026): the same roadmap card as the Overview moves in here, plus the levelling system -->
+  <div class="wr-wrap">
+    <div class="wr-head">
+      <div><h2 class="wr-title">Wealth Roadmap</h2><p class="wr-sub">One path from the red to your own home, step by step. Every step, badge and saving habit earns XP.</p></div>
+      <span class="wr-count" id="wr-count"></span>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div class="ov-ms-title" style="margin-bottom:0">Achievements</div>
-      <button onclick="resetAllAchievements()" style="padding:5px 12px;background:rgb(var(--red-rgb) / .12);border:1px solid rgb(var(--red-rgb) / .3);border-radius:4px;color:var(--re);font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-2));font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer">↺ Reset All</button>
+    <div class="wr-top">
+      <div class="ov-chart-card wr-card" id="wr-rank"></div>
+      <div class="ov-chart-card wr-card wr-pro"><div class="ov-chart-title">Next steps</div><div id="wr-next"></div></div>
     </div>
-    <div id="badges-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px"></div>
+    <div id="wr-roadmap-slot"></div>
+    <div class="ov-chart-card wr-card wr-pro"><div class="ov-chart-title">Side quests</div><p class="wr-note">Habits that count in any order. Saving streaks come from the House Builder; the monthly ones reset each month, up to 25 XP a month.</p><div class="wr-grid" id="wr-quests"></div></div>
+    <div class="ov-chart-card wr-card wr-pro"><div class="ov-chart-title">Levels</div><div class="wr-ladder" id="wr-ladder"></div></div>
+    <div class="ov-chart-card wr-card wr-pro">
+      <div class="wr-coll-hd"><div class="ov-chart-title">Badge tokens</div><div class="wr-tiers" id="wr-tiers"></div></div>
+      <div class="wr-grid" id="wr-collection" data-f="all"></div>
+    </div>
+    <details class="ov-chart-card wr-card wr-how"><summary>How XP works</summary><ul>
+      <li>The roadmap is one path of 30 stages in order. Each stage has up to three steps, and every step earns XP: Starter 20, Solid 40, Strong 80, Summit 150.</li>
+      <li>Steps count once you reach their stage, so the path stays in order. A skipped stage earns nothing and costs nothing.</li>
+      <li>Badges and saving habits are side quests. They count in any order.</li>
+      <li>XP you earn stays earned, even if a figure drops later.</li>
+      <li>Twenty levels in five ranks: Groundwork, Shield, Growth, Keys and Freedom.</li>
+      <li>Reach Level 8, Vault Guard, and use Vault-It on 30 different days to claim one free month. We add it to your account by hand.</li>
+    </ul></details>
+    <div class="wr-foot"><p class="wr-fca">Illustrative only. Not regulated by the FCA. Not financial advice.</p>
+      <button type="button" class="wr-reset" onclick="resetAllAchievements()">Reset badges and XP</button></div>
   </div>
 </div>
 
@@ -14605,6 +14785,7 @@ function showTab(id){
   const panel=document.getElementById('tab-'+id);
   if(panel){panel.classList.add('active');panel.style.display='block';}
   try{viDevCardPlace(panel);}catch(e){}
+  try{viRoadmapPlace(id);}catch(e){}
   document.querySelectorAll('.tab-btn').forEach(b=>{
     if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'"))b.classList.add('active');
   });
@@ -14624,6 +14805,13 @@ function showTab(id){
     var hasLive = achState && achState.connected && ['coingecko','metals_live','exchangerate','yahoo'].some(function(lid){ return achState.connected[lid]; });
     if (hasLive) refreshAllLiveConns();
   }
+}
+// The Financial Freedom Roadmap is one card: it sits on the dashboard and moves into the Wealth Roadmap tab while that tab is open (owner, 3 Nov), so both always show the same roadmap
+function viRoadmapPlace(id){
+  var c=document.getElementById('fire-roadmap-card'),slot=document.getElementById(id==='achievements'?'wr-roadmap-slot':'ov-roadmap-slot');
+  if(!c||!slot||c.parentNode===slot)return;
+  slot.appendChild(c);_fireFirstPaint=true;
+  if(id==='achievements')setTimeout(function(){try{renderFIREroadmap();}catch(e){}},0);
 }
 // Message the Dev sits at the foot of every tab (owner, 2 Nov: "at the bottom of each tab, not at the top"): one card, moved into the open tab's page as its last block
 function viDevCardPlace(panel){
@@ -15672,7 +15860,7 @@ function updatePriceLabels(){
 function updatePriceInput(){document.getElementById('priceInput').value=state.prices[state.houseType]||'';}
 
 let tT2;
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT2);tT2=setTimeout(()=>t.classList.remove('show'),3000);}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT2);const tok=(toast._n=(toast._n||0)+1);requestAnimationFrame(()=>requestAnimationFrame(()=>{if(tok!==toast._n)return;clearTimeout(tT2);tT2=setTimeout(()=>t.classList.remove('show'),3000);}));}   // the 3 s count starts once it is drawn: the house rebuild after a deposit can hold the page long enough for it to vanish unseen
 
 function markHousePurchased(){if(viBlockEdit())return;
   state.houseMode='purchased';
@@ -16623,7 +16811,7 @@ function setViewFlag(name, on, btn) {   // Settings: 3D or classic net worth cha
 function hbBrandOn() { return typeof HB3D !== 'undefined' && !!HB3D.brandStats; }
 // 6.8 gamified feedback (brand build): pop-up, stage flash and milestone toasts. Toasts only after the person has interacted, never during the opening build.
 var _hbEngaged = false, _hbMS = [[1, 'Site cleared'], [5, 'Foundations'], [10, '10%'], [25, 'Quarter'], [50, 'Halfway'], [75, 'Three-quarters'], [100, 'Deposit ready']];
-function hbPop(txt) { var h = document.getElementById('hb-pops'); if (!h) return; var e = document.createElement('div'); e.className = 'pop'; e.textContent = txt; h.appendChild(e); setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 1300); }
+function hbPop(txt) { var h = document.getElementById('hb-pops'); if (!h) return; var e = document.createElement('div'); e.className = 'pop'; e.textContent = txt; h.appendChild(e); requestAnimationFrame(function () { requestAnimationFrame(function () { setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 1300); }); }); }   // the 1.3 s count starts once it is drawn (two frames: a click can run inside the current frame): the house rebuild after a deposit can hold the page for over a second, and the pop used to vanish unseen
 function hbFlash() { var sc = document.getElementById('house-scene'); if (!sc) return; sc.classList.remove('flash'); void sc.offsetWidth; sc.classList.add('flash'); }
 function hbBrandMS(p0, p1) {
   if (!_hbEngaged) return; var hit = null;
@@ -17513,7 +17701,7 @@ var FIRE_PHASES=[
 ];
 // roadmap window geometry + state (declared early: the roadmap is first drawn during start-up)
 var _fireFirstPaint=true,_fireDetailIdx=-1,_fireSkipAsk=-1;
-var FIRE_NODE=108,FIRE_LEFT=60,FIRE_H=280;
+var FIRE_NODE=128,FIRE_LEFT=70,FIRE_H=300;   // round 3 (owner, 3 Nov): larger tokens need wider spacing and a taller stage
 var STK_COLORS=['#44c0b9','#c9a84c','#3ecf8e','#9b7ec8','#64b5f6','#e0894a','#e05c5c','#e8c56a'];
 // ── Budget categories + icons (declared before the init block runs) ──
 var BD_ICONS={
@@ -17662,7 +17850,40 @@ var BIZ_KEY='pos_biz1';
 var bizState={clients:[],streams:[],incomeStreams:[],leads:[]};
 var ACH_KEY='pos_ach1';
 var achState={xp:0,unlocked:[],connected:{}};
-var LVS=[{n:'Seeker',xp:0},{n:'Sapling',xp:200},{n:'Grounded',xp:500},{n:'Builder',xp:1000},{n:'Investor',xp:2000},{n:'Coasting',xp:3500},{n:'Free',xp:5500},{n:'Archon',xp:8000},{n:'Legacy',xp:12000}];
+/* Wealth Roadmap (owner, 3 Nov 2026; brief docs/creative/wealth-roadmap/BRIEF.md): the 30 roadmap stages are the linear spine, each
+   split into up to three steps that pay XP by tier; badges and saving habits are side quests that count in any order; 20 levels in
+   five ranks; a free month at Level 8 with 30 days of use. Step and quest XP is latched in achState.wr, so it never goes down. */
+var WR_TIERS={starter:{n:'Starter',xp:20},solid:{n:'Solid',xp:40},strong:{n:'Strong',xp:80},summit:{n:'Summit',xp:150}};
+var WR_STAGE_TIER={firstLog:'starter',mapDebts:'starter',zeroBudget:'starter',firstSaved:'starter',buf500:'starter',firstCut:'starter',
+  buf1k:'solid',debtHalf:'solid',nw1k:'solid',debtFree:'solid',ef3:'solid',isa:'solid',dep1:'solid',dep5:'solid',nw5k:'solid',
+  ef6:'strong',depReady:'strong',nw10k:'strong',applied:'strong',exchanged:'strong',keys:'strong',nw25k:'strong',nw50k:'strong'};   // the rest are Summit
+var WR_RANKS=[{n:'Groundwork',t:'starter'},{n:'Shield',t:'solid'},{n:'Growth',t:'strong'},{n:'Keys',t:'strong'},{n:'Freedom',t:'summit'}];
+var WR_LEVELS=[['Spare Change',0],['Penny Pincher',100],['Budget Builder',250],['Ledger Keeper',400],['Buffer Builder',600],['Debt Breaker',850],['Rate Slayer',1150],['Vault Guard',1550],
+  ['Compounder',2050],['Yield Hunter',2650],['Market Rider',3350],['Portfolio Pilot',4150],['Goal Hunter',5050],['Brick Stacker',6000],['Key Holder',7050],['Equity Builder',8150],
+  ['Coast Captain',9350],['Wealth Architect',10600],['Freedom Maker',11800],['Vault Legend',13000]].map(function(l,i){return {n:i+1,name:l[0],xp:l[1],rank:Math.floor(i/4)};});
+var WR_REWARD={level:8,days:30};
+// side quests from saving habits: the House Builder contribution streak (weekly or monthly) and two monthly habits, capped at 25 XP a month
+var WR_QUESTS=[{id:'q3',ic:'vi-streak',name:'Three in a row',desc:'Save towards your goal 3 periods in a row',need:3,xp:10},
+  {id:'q6',ic:'vi-repeat',name:'Six in a row',desc:'Save towards your goal 6 periods in a row',need:6,xp:25},
+  {id:'q12',ic:'vi-flame',name:'Twelve in a row',desc:'Save towards your goal 12 periods in a row',need:12,xp:60},
+  {id:'snap',ic:'vi-camera',name:'Monthly snapshot',desc:'Record your net worth this month',month:true,xp:10},
+  {id:'bud',ic:'vi-budget',name:'Budget kept',desc:'Income and spending filled in this month',month:true,xp:15}];
+// brand-library icons (owner, 3 Nov round 2: "utilize our brand book ... icon library"), drawn inside each token's medallion
+var WR_STAGE_IC={firstLog:'vi-net-worth',mapDebts:'vi-debt-tracker',zeroBudget:'vi-budget',firstSaved:'vi-coin',buf500:'vi-lifebuoy',buf1k:'vi-shield',firstCut:'vi-paid-off',
+  debtHalf:'vi-snowball',nw1k:'vi-gem',debtFree:'vi-unlock',ef3:'vi-umbrella',ef6:'vi-safe',isa:'vi-piggy',dep1:'vi-brick',dep5:'vi-brick-wall',nw5k:'vi-trend-base',
+  depReady:'vi-house-builder',nw10k:'vi-coins',applied:'vi-target',exchanged:'vi-sync',keys:'vi-keys',nw25k:'vi-assets-total',nw50k:'vi-candles',nw100k:'vi-milestone',
+  coastFI:'vi-boat',mortFree:'vi-home',nw250k:'vi-crown',fullFI:'vi-flame',fatFIRE:'vi-sparkle',legacy:'vi-vault'};
+var WR_BADGE_IC={nw100:'vi-coin',nw500:'vi-coins',nw1k:'vi-cash',nw2k:'vi-piggy',nw5k:'vi-trend-base',nw10k:'vi-candles',nw25k:'vi-assets-total',nw50k:'vi-gem',nw75k:'vi-bolt',
+  nw100k:'vi-milestone',nw150k:'vi-ring',nw200k:'vi-metals',nw250k:'vi-crown',nw500k:'vi-vault',nw750k:'vi-sparkle',nw1m:'vi-trophy',save10:'vi-piggy',save25:'vi-safe',
+  save50:'vi-slice',snap1:'vi-camera',snap3:'vi-calendar',snap12:'vi-forecast',debtstart:'vi-debt-tracker',debt50:'vi-snowball',debtfree:'vi-paid-off',home:'vi-home',
+  gold:'vi-metals',stream1:'vi-rocket',fullfi:'vi-flame',ef1k:'vi-lifebuoy',coast:'vi-boat'};
+// the token card (Apex-style clipped card, owner's pick A, 3 Nov) in a 100 x 132 box, and its medallion dial
+var WR_CARD=[[0,0],[72,0],[100,28],[100,132],[14,132],[0,118]];
+var WR_DIAL=(function(){var d='';for(var a=0;a<360;a+=10){var r=a%30?32.4:34.4,x=Math.cos(a*Math.PI/180),y=Math.sin(a*Math.PI/180);d+='M'+(46+x*30.2).toFixed(1)+' '+(74+y*30.2).toFixed(1)+'L'+(46+x*r).toFixed(1)+' '+(74+y*r).toFixed(1);}return '<path class="wt-tick" d="'+d+'"/>';})();   // one path, so a rail of tokens stays light
+var WR_CHIP={done:'<path class="wt-cg" d="M8.5 16.5l5 5L24 11"/>',wait:'<path class="wt-cg" d="M8.5 16.5l5 5L24 11"/>',
+  skip:'<path class="wt-cg" d="M8 10l6 6-6 6M16 10l6 6-6 6"/>',lock:'<rect class="wt-cgf" x="10" y="15" width="12" height="9.5" rx="1.6"/><path class="wt-cg" d="M12.6 15v-2.6a3.4 3.4 0 0 1 6.8 0V15"/>'};
+var WR_RIVETS=(function(){var d='';[[46,37.6],[82.4,74],[46,110.4],[9.6,74]].forEach(function(p){d+='M'+(p[0]-1.5)+' '+p[1]+'a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0';});return '<path class="wt-rivet" d="'+d+'"/>';})();   // four rivets on the medal rim, one path
+var LVS=WR_LEVELS.map(function(l){return {n:l.name,xp:l.xp};});
 var BADGES=[
   {id:'nw100',    icon:'🌱', get name(){return 'First '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(100*(window.VI_CURRENCY_RATE||1)).toLocaleString();},       get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(100*(window.VI_CURRENCY_RATE||1)).toLocaleString();},           xp:10},
   {id:'nw500',    icon:'🪙', get name(){return 'First '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(500*(window.VI_CURRENCY_RATE||1)).toLocaleString();},       get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(500*(window.VI_CURRENCY_RATE||1)).toLocaleString();},           xp:20},
@@ -23138,7 +23359,7 @@ function tryUnlock(id){
   if(!achState.unlocked.includes(id)){
     achState.unlocked.push(id);
     var b=BADGES.find(function(b){return b.id===id;});
-    if(b)showToast(b.icon+' '+b.name+': achievement unlocked!');
+    if(b)showToast('Badge unlocked: '+b.name);
     achState.xp+=150;saveAch();
   }
 }
@@ -23190,62 +23411,161 @@ function checkAchievements(){
       achState.unlocked.push(b.id);
       achState.xp=(achState.xp||0)+(b.xp||50);
       gained++;
-      showToast('Achievement unlocked: '+b.icon+' '+b.name+'! +'+b.xp+'XP');
+      showToast('Badge unlocked: '+b.name+'. +'+b.xp+' XP');
     }
   });
   if(gained>0){saveAch();renderAchievements();}
 }
 function resetAllAchievements(){if(viBlockEdit())return;
-  if(!confirm('Reset all achievements and XP? This cannot be undone.'))return;
-  achState={unlocked:[],xp:0,snapshots:[],connected:achState.connected||{}};
+  if(!confirm('Reset all badges and XP? Roadmap steps you still meet are counted again. This cannot be undone.'))return;
+  var _wr=achState.wr||{};   // the free-month claim and days of use are never reset
+  achState={unlocked:[],xp:0,snapshots:[],connected:achState.connected||{},wr:{s:{},q:{},m:{},days:_wr.days||0,last:_wr.last,claim:_wr.claim,v:1}};
   saveAch();renderAchievements();showToast('Achievements reset');
 }
-function renderAchievements(){
-  if (!_isPro()) {
-    var achTab = document.getElementById('tab-achievements');
-    if (achTab) {
-      // Show blurred content with overlay
-      if (!document.getElementById('ach-pro-overlay')) {
-        var ov = document.createElement('div');
-        ov.id = 'ach-pro-overlay';
-        ov.style.cssText = 'position:sticky;top:0;z-index:40;margin:0 0 16px;background:rgb(var(--panel-rgb) / .88);border-bottom:1px solid rgb(var(--brass-rgb) / .25);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;backdrop-filter:blur(8px)';
-        ov.innerHTML = '<div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:max(.72rem,var(--vi-fs-3));color:var(--go);margin-bottom:4px">🏆 Achievements &amp; XP · Pro</div><div style="font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);line-height:1.5">Unlock badges, build streaks, level up from Pioneer to Homeowner. Every action earns XP.</div></div>'
-          + '<button onclick="showUpgrade(\'annual\')" style="flex-shrink:0;padding:8px 16px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));color:#080808;font-family:\'Syne\',sans-serif;font-weight:800;font-size:max(.55rem,var(--vi-fs-1));cursor:pointer">Upgrade to Pro →</button>';
-        achTab.insertBefore(ov, achTab.firstChild);
-      }
-    }
-    // Blur the badges grid and XP bar
-    var bg = document.getElementById('badges-grid');
-    if (bg) { bg.style.filter = 'blur(5px)'; bg.style.pointerEvents = 'none'; }
-    var xpBar = document.getElementById('ach-xp-bar');
-    if (xpBar) xpBar.style.filter = 'blur(3px)';
-    var xpTotal = document.getElementById('ach-xp-total');
-    if (xpTotal) { xpTotal.textContent = '••• XP'; }
-    return; // don't render the detail
-  } else {
-    var existOv = document.getElementById('ach-pro-overlay');
-    if (existOv) existOv.remove();
-    var bg2 = document.getElementById('badges-grid');
-    if (bg2) { bg2.style.filter = ''; bg2.style.pointerEvents = ''; }
-    var xpBar2 = document.getElementById('ach-xp-bar');
-    if (xpBar2) xpBar2.style.filter = '';
-  }
-  var lv=currentLevel(),nxt=nextLevel();
-  var i=LVS.indexOf(lv)+1;
-  var badge=document.getElementById('ach-level-badge');if(badge)badge.textContent=i;
-  var ln=document.getElementById('ach-level-name');if(ln)ln.textContent=lv.n;
-  var xt=document.getElementById('ach-xp-total');if(xt)xt.textContent=achState.xp.toLocaleString()+' XP';
-  var xpPct=nxt?Math.min(100,(achState.xp-lv.xp)/(nxt.xp-lv.xp)*100):100;
-  var xb=document.getElementById('ach-xp-bar');if(xb)xb.style.width=xpPct+'%';
-  var xl=document.getElementById('ach-xp-label');if(xl)xl.textContent=achState.xp+' XP'+(nxt?' \u00b7 Next: '+nxt.n+' at '+nxt.xp+' XP':' \u00b7 MAX LEVEL \uD83C\uDFC6');
-  var bg=document.getElementById('badges-grid');
-  if(bg)bg.innerHTML=BADGES.map(function(b){
-    var u=achState.unlocked.includes(b.id);
-    return'<div class="badge-card '+(u?'unlocked':'locked')+'"><span class="badge-icon">'+b.icon+'</span><div class="badge-name">'+b.name+'</div><div class="badge-desc">'+b.desc+'</div>'+(u?'<div style="font-size:max(.55rem,var(--vi-fs-1));color:var(--em);margin-top:4px">\u2713 Unlocked</div>':'')+'</div>';
-  }).join('');
-  renderFIREroadmap();
+function wrStageTier(k){return WR_STAGE_TIER[k]||'summit';}
+// set by the user's first tap, click or key press: XP toasts wait for it
+['pointerdown','keydown','touchstart'].forEach(function(ev){window.addEventListener(ev,function(){window._viActed=true;},{capture:true,once:true,passive:true});});
+function wrXpTier(xp){return xp<=50?'starter':xp<=150?'solid':xp<=400?'strong':'summit';}
+// the token outline: an octagon with 45 degree chamfers in a 100 x 100 box, inset by d
+function wrOct(d){var a=22+d*.4142,b=78-d*.4142,f=100-d;return [[a,d],[b,d],[f,a],[f,b],[b,f],[a,f],[d,b],[d,a]];}
+function wrPts(p,ox,oy,sc){ox=ox||0;oy=oy||0;sc=sc||1;return p.map(function(q){return (ox+q[0]*sc).toFixed(1)+','+(oy+q[1]*sc).toFixed(1);}).join(' ');}
+/* one token: an Apex-style clipped card (owner's pick A, 3 Nov round 2) in a 100 x 132 box, with a stacked edge down and left,
+   diagonal stripes, halftone, and a metal medallion holding a brand-library icon (or the level number).
+   o: tier, st (done, next, wait, skip, lock, own = earned in the collection), ic (a vi- sprite id), num, bars and lit (step bars),
+   chip, px (the drawn width: text shows only where it renders at 10.5 px or more), tl (top-left text), name (runs up the side), r */
+function wrIcon(id,x,y,s){
+  if(/^vi-/.test(id||''))return '<svg class="wt-icon" x="'+x+'" y="'+y+'" width="'+s+'" height="'+s+'" viewBox="0 0 24 24"><use href="#'+id+'"/></svg>';
+  var ic=FIRE_ICONS[id]||(typeof BD_ICONS!=='undefined'&&BD_ICONS[id])||FIRE_ICONS.gem,pth=function(d){return '<path d="'+d+'"/>';};
+  return '<g transform="translate('+x+' '+y+') scale('+(s/24).toFixed(3)+')"><g class="wt-icf">'+ic.f.map(pth).join('')+'</g><g class="wt-ics">'+ic.d.map(pth).join('')+'</g></g>';
 }
+function wrTok(o){
+  var t=o.tier||'starter',st=o.st||'done',px=o.px||100,sc=o.sc||px/118,L=st==='lock',dim=L||st==='skip',K=wrPts(WR_CARD),n=o.bars||0,lit=o.lit==null?n:o.lit,k;
+  var out='<g class="wt t-'+t+' st-'+st+'">';
+  for(k=2;k>=1;k--)out+='<polygon class="wt-edge" points="'+K+'" transform="translate('+(-k*3)+' '+(k*3)+')"/>';   // the stacked card edge
+  out+='<polygon class="wt-card fire-face" data-r="'+(o.r||50)+'" points="'+K+'" fill="url(#'+(dim?'wtc-lock':'wtc-'+t)+')"/><g clip-path="url(#wt-clip)">';
+  if(!dim)out+='<polygon points="0,0 60,0 0,60" fill="url(#wts-'+t+')"/><polygon points="100,78 100,132 38,132" fill="url(#wth-'+t+')"/>';
+  else out+='<rect width="100" height="132" fill="url(#'+(st==='skip'?'wt-hatch':'wth-lock')+')"/>';
+  out+='</g><polygon class="wt-rimline" points="'+K+'"/>';
+  // the medal (round 4): a metal rim with four rivets, a deep tick dial, a tier-edged face, an engraved ring and a glass highlight
+  out+='<circle cx="46" cy="74" r="37.5" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/><circle class="wt-mrim" cx="46" cy="74" r="35.8"/>'+WR_DIAL+WR_RIVETS
+    +'<circle class="wt-mface" cx="46" cy="74" r="29"/><circle class="wt-mring" cx="46" cy="74" r="26.4"/><circle class="wt-mdots" cx="46" cy="74" r="27.7"/>'
+    +'<path class="wt-gloss" d="M22.5 66a24 24 0 0 1 32-18.5"/>';
+  if(o.num!=null)out+='<text class="wt-num" x="46" y="86.5" text-anchor="middle">'+o.num+'</text>';
+  else out+=wrIcon(L?'vi-lock':o.ic,24,52,44);
+  if(n>0){var bw=2.6,gp=n>4?1.8:2.6,x0=46-(n*bw+(n-1)*gp)/2;for(k=0;k<n;k++)out+='<rect class="fire-stud wt-bar'+(k<lit?' on':'')+'" x="'+(x0+k*(bw+gp)).toFixed(1)+'" y="118" width="'+bw+'" height="8"/>';}
+  if(o.tl!=null&&16*sc>=10.5)out+='<text class="wt-tl" x="6" y="18">'+o.tl+'</text>';   // text only where it renders at 10.5 px or more (Pedro, round 2)
+  if(o.name&&12.5*sc>=10.5){var nm=String(o.name).toUpperCase();out+='<text class="wt-side" transform="translate(94 102) rotate(-90)"'+(nm.length>9?' textLength="80" lengthAdjust="spacingAndGlyphs"':'')+'>'+nm+'</text>';}
+  if(st==='next')out+='<polygon class="wt-halo" points="'+wrPts(WR_CARD,-6,-7,1.12)+'"/>';
+  if(o.chip&&WR_CHIP[o.chip])out+='<g class="wt-chip c-'+o.chip+'" transform="translate(72 106)"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/>'+WR_CHIP[o.chip]+'</g>';
+  return out+'</g>';
+}
+// a token as its own small picture, for HTML (rank card, steps, quests, ladder, collection)
+function wrTokSvg(o,px,lbl){o.px=px;return '<svg class="wt-svg" viewBox="-10 -9 118 148" width="'+px+'" height="'+Math.round(px*148/118)+'"'+(lbl?' role="img" aria-label="'+String(lbl).replace(/"/g,'&quot;')+'"':' aria-hidden="true"')+'>'+wrTok(o)+'</svg>';}
 
+// ── XP: latched, so a figure that falls later never takes XP away ──
+function wrState(){if(!achState.wr)achState.wr={s:{},q:{},m:{},days:0};var w=achState.wr;w.s=w.s||{};w.q=w.q||{};w.m=w.m||{};return w;}
+function wrSum(o){var t=0;for(var k in o)t+=+o[k]||0;return t;}
+function wrMonthXp(w){var t=0;for(var k in w.m)t+=Math.min(25,wrSum(w.m[k]));return t;}
+function wrStepXp(key,n){return Math.round(3*WR_TIERS[wrStageTier(key)].xp/Math.max(1,n));}
+function wrTotalXp(){var w=wrState();return (achState.xp||0)+wrSum(w.s)+wrSum(w.q)+wrMonthXp(w);}
+function wrLevel(xp){if(xp==null)xp=wrTotalXp();var l=WR_LEVELS[0];WR_LEVELS.forEach(function(v){if(xp>=v.xp)l=v;});return l;}
+function wrNextLevel(xp){return WR_LEVELS[wrLevel(xp).n]||null;}
+function wrYm(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function wrQuestMet(q){
+  if(q.need)return (typeof hbStreak==='function'?hbStreak():0)>=q.need;
+  if(q.id==='snap'){var ym=wrYm();return (ovState.snapshots||[]).some(function(x){return x.month===ym;});}
+  if(q.id==='bud'){try{var b=bdState();return b.m.tIn>0&&(ovState.expenses||[]).length>0;}catch(e){return false;}}
+  return false;
+}
+function wrQuestDone(q){var w=wrState();return q.month?!!(w.m[wrYm()]||{})[q.id]:!!w.q[q.id];}
+// called with the roadmap's stages: steps of every stage up to the one to work on (in order, skipped stages excluded) earn their XP once
+function wrSync(S){
+  if(!S||typeof achState==='undefined'||window._viDeleted)return;   // nothing writes back after the account is deleted
+  var w=wrState(),first=!w.v,before=wrTotalXp(),lv0=wrLevel(before).n,gain=[],lim=S.nextIdx<0?S.length-1:S.nextIdx;
+  S.forEach(function(s,i){
+    if(i>lim||s.skipPass)return;
+    var st=s.steps||[];st.forEach(function(x,j){var id=s.key+'.'+j;if(x.met&&!w.s[id]){w.s[id]=wrStepXp(s.key,st.length);gain.push(x.lbl);}});
+  });
+  WR_QUESTS.forEach(function(q){if(wrQuestDone(q)||!wrQuestMet(q))return;if(q.month){var m=w.m[wrYm()]||(w.m[wrYm()]={});m[q.id]=q.xp;}else w.q[q.id]=q.xp;gain.push(q.name);});
+  var after=wrTotalXp();
+  if(after===before&&!first)return;
+  if(first&&after>0)w.recalc=1;   // told once, quietly, on the Wealth Roadmap tab (never a toast on the opening build)
+  w.v=1;saveAch();
+  var lv=wrLevel(after),tb=document.getElementById('toast');
+  // XP and level toasts only follow something the user did, never on the House Builder tab, and never replace a toast already showing
+  var onHouse=!!(document.getElementById('tab-house')&&document.getElementById('tab-house').classList.contains('active'));   // the House Builder has its own pop-ups and milestone toasts
+  if(!first&&!onHouse&&window._viActed&&!(tb&&tb.classList.contains('show'))&&typeof showToast==='function')showToast(lv.n>lv0?'Level up: Level '+lv.n+', '+lv.name+'. +'+(after-before)+' XP':'+'+(after-before)+' XP · '+gain[0]);
+  if(document.getElementById('tab-achievements')&&document.getElementById('tab-achievements').classList.contains('active'))setTimeout(renderAchievements,0);
+  try{renderOvAch();}catch(e){}
+}
+// ── the free month: Level 8 and 30 days of use, claimed by a request the owner grants by hand (owner, 3 Nov) ──
+function wrRewardState(){var w=wrState(),lv=wrLevel(),d=w.days||0;return {claimed:w.claim||null,lvOk:lv.n>=WR_REWARD.level,daysOk:d>=WR_REWARD.days,days:d,lv:lv};}
+function wrClaim(btn){
+  var w=wrState(),r=wrRewardState();if(w.claim||!r.lvOk||!r.daysOk)return;
+  var signed=false;try{signed=typeof _supaUser!=='undefined'&&_supaUser&&_supaUser.id;}catch(e){}
+  if(!signed||typeof _fnInvoke!=='function'){showToast('Sign in to claim your free month');return;}
+  var ctx={};try{ctx=window.viFb&&viFb.context?viFb.context():{};}catch(e){}ctx.screen='wealth_roadmap';
+  if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  var fail=function(){if(btn){btn.disabled=false;btn.textContent='Claim my free month';}showToast('The claim did not send. Try again in a moment.');};
+  _fnInvoke('tester-feedback',{kind:'feedback',text:'Free month claim: reached Level '+r.lv.n+' ('+r.lv.name+') with '+wrTotalXp()+' XP on '+r.days+' days of use.',moment:'reward_claim',context:ctx},8000)
+    .then(function(res){if(!res||res.error){fail();return;}w.claim={at:new Date().toISOString().slice(0,10),lvl:r.lv.n};saveAch();renderAchievements();showToast('Claim sent. We will add your free month and e-mail you.');}).catch(fail);
+}
+function wrDate(iso){try{return new Date(iso+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(e){return iso;}}
+function wrBar(f,lbl){f=Math.max(0,Math.min(1,f||0));return '<div class="wr-bar" role="progressbar" aria-label="'+lbl+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(f*100)+'"><i style="width:'+(f*100).toFixed(1)+'%"></i></div>';}
+function wrRewardHtml(){
+  var r=wrRewardState(),need=WR_LEVELS[WR_REWARD.level-1],xp=wrTotalXp(),h='<div class="wr-reward'+(r.claimed?' claimed':r.lvOk&&r.daysOk?' ready':'')+'">'
+    +wrTokSvg({tier:'summit',st:r.claimed||(r.lvOk&&r.daysOk)?'done':'lock',ic:'vi-gift',chip:r.claimed?'done':''},44)+'<div class="wr-rw-body">';
+  if(r.claimed)h+='<b>Free month claimed</b><span>Sent on '+wrDate(r.claimed.at)+'. We add it to your account by hand and e-mail you when it is on.</span>';
+  else if(r.lvOk&&r.daysOk)h+='<b>Your free month of Vault-It is ready</b><span>You reached Level '+WR_REWARD.level+', '+need.name+'. One free month per account.</span><button type="button" class="wr-claim" onclick="wrClaim(this)">Claim my free month</button>';
+  else h+='<b>Earn a free month of Vault-It</b><span>Reach Level '+WR_REWARD.level+', '+need.name+', and use Vault-It on '+WR_REWARD.days+' different days. One free month per account.</span>'
+    +'<div class="wr-rw-row"><small>Level '+Math.min(r.lv.n,WR_REWARD.level)+' of '+WR_REWARD.level+'</small>'+wrBar(xp/need.xp,'XP towards Level '+WR_REWARD.level)+'</div>'
+    +'<div class="wr-rw-row"><small>'+Math.min(r.days,WR_REWARD.days)+' of '+WR_REWARD.days+' days</small>'+wrBar(r.days/WR_REWARD.days,'Days of use')+'</div>';
+  return h+'</div></div>';
+}
+// next steps: the next step on the roadmap first, then the two side quests closest to done
+function wrNextGoals(S){
+  var out=[],w=wrState(),nw=0;try{nw=computeNetWorth();}catch(e){}
+  if(S&&S.nextIdx>=0){var s=S[S.nextIdx],st=s.steps||[],j=st.findIndex(function(x){return !x.met;});if(j<0)j=st.length-1;
+    out.push({tok:{tier:wrStageTier(s.key),st:'next',ic:WR_STAGE_IC[s.key]||s.ic,bars:st.length,lit:j},h:'Stage '+(S.nextIdx+1)+': '+s.name,l:st[j]?st[j].lbl:s.desc,f:s.prog?s.prog():j/Math.max(1,st.length),xp:wrStepXp(s.key,st.length),go:'fireScrollTo('+S.nextIdx+');fireShowDetail('+S.nextIdx+')'});}
+  var c=[];
+  WR_QUESTS.forEach(function(q){if(wrQuestDone(q))return;var f=q.need?Math.min(.99,(typeof hbStreak==='function'?hbStreak():0)/q.need):0.5;c.push({tok:{tier:wrXpTier(q.xp),st:'own',ic:q.ic},h:'Side quest: '+q.name,l:q.desc,f:f,xp:q.xp});});
+  BADGES.forEach(function(b){var m=/^nw(\d+)(k|m)?$/.exec(b.id);if(!m||(achState.unlocked||[]).indexOf(b.id)>-1)return;var thr=+m[1]*(m[2]==='k'?1e3:m[2]==='m'?1e6:1);c.push({tok:{tier:wrXpTier(b.xp||50),st:'own',ic:WR_BADGE_IC[b.id]},h:'Badge: '+b.name,l:b.desc,f:Math.max(0,nw/thr),xp:b.xp||50});});
+  c.sort(function(a,b){return b.f-a.f;});
+  return out.concat(c.slice(0,2));
+}
+function wrSourceSplit(){var w=wrState();return {steps:wrSum(w.s),quests:wrSum(w.q)+wrMonthXp(w),badges:achState.xp||0};}
+function renderAchievements(){
+  if(!renderAchievements._busy){renderAchievements._busy=1;try{checkAchievements();}catch(e){}renderAchievements._busy=0;}   // badges already met unlock before the tab draws
+  var S=null;try{S=renderFIREroadmap._stages||fireBuildStages();}catch(e){}
+  try{renderFIREroadmap();}catch(e){}
+  var xp=wrTotalXp(),lv=wrLevel(xp),nx=wrNextLevel(xp),rk=WR_RANKS[lv.rank],pc=nx?(xp-lv.xp)/(nx.xp-lv.xp):1,src=wrSourceSplit(),fmt=function(v){return Math.round(v).toLocaleString('en-GB');};
+  var cnt=document.getElementById('wr-count');if(cnt&&S)cnt.textContent=S.doneCount+' of '+S.length+' stages';
+  var rkEl=document.getElementById('wr-rank');
+  if(rkEl)rkEl.innerHTML='<div class="wr-rank-main"><div class="wr-rank-tok" id="ach-level-badge">'+wrTokSvg({tier:rk.t,st:'done',bars:8,lit:Math.floor(pc*8),num:lv.n,tl:'LV',name:rk.n},112,'Level '+lv.n+' of 20, '+lv.name+', rank '+rk.n)+'</div>'
+    +'<div class="wr-rank-meta"><span class="wr-eyebrow">Rank: '+rk.n+' · Level '+lv.n+' of 20</span><div class="wr-rank-name" id="wr-rank-name">'+lv.name+'</div>'
+    +'<div class="wr-xpbar" role="progressbar" aria-label="XP to the next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pc*100)+'"><i style="width:'+(pc*100).toFixed(1)+'%"></i>'+[1,2,3,4,5,6,7].map(function(k){return '<b style="left:'+(k*12.5)+'%"></b>';}).join('')+'</div>'
+    +'<div class="wr-xp" id="wr-xp-label">'+fmt(xp)+' XP'+(nx?' · '+fmt(nx.xp-xp)+' XP to '+nx.name:' · top level')+'</div>'
+    +(wrState().recalc?'<p class="wr-recalc">Your level now counts roadmap steps and saving habits as well as badges.</p>':'')
+    +'<div class="wr-split"><span>Roadmap steps <b>'+fmt(src.steps)+'</b></span><span>Side quests <b>'+fmt(src.quests)+'</b></span><span>Badges <b>'+fmt(src.badges)+'</b></span></div></div></div>'+wrRewardHtml();
+  if(wrState().recalc&&document.getElementById('tab-achievements').classList.contains('active')){delete wrState().recalc;saveAch();}   // shown once
+  var nEl=document.getElementById('wr-next');
+  if(nEl)nEl.innerHTML=wrNextGoals(S).map(function(g){return '<div class="wr-goal"'+(g.go?' role="button" tabindex="0" onclick="'+g.go+'"':'')+'>'+wrTokSvg(g.tok,52)+'<div class="wr-g-body"><span class="wr-g-h">'+g.h+'</span><span class="wr-g-l">'+g.l+'</span>'+wrBar(g.f,g.h)+'</div><span class="wr-xpchip">+'+g.xp+' XP</span></div>';}).join('')||'<p class="wr-none">Every stage and quest is done. Nothing left but to enjoy it.</p>';
+  var qEl=document.getElementById('wr-quests');
+  if(qEl)qEl.innerHTML=WR_QUESTS.map(function(q){var d=wrQuestDone(q),tier=wrXpTier(q.xp);return '<div class="wr-tok wr-quest t-'+tier+(d?' got':'')+'">'+wrTokSvg({tier:tier,st:d?'done':'lock',ic:q.ic,chip:d?'done':'lock',tl:'+'+q.xp,name:q.name},112,q.name+(d?', earned':', not yet'))
+    +'<b>'+q.name+'</b><small>+'+q.xp+' XP'+(q.month?' a month':'')+' · '+WR_TIERS[tier].n+'</small><span>'+(d?(q.month?'Done this month':'Earned'):q.desc)+'</span></div>';}).join('');
+  var lEl=document.getElementById('wr-ladder');
+  if(lEl)lEl.innerHTML=WR_RANKS.map(function(r,ri){var ls=WR_LEVELS.filter(function(l){return l.rank===ri;}),here=lv.rank===ri;
+    return '<div class="wr-rank-grp'+(here?' here':'')+'"><div class="wr-grp-h">'+r.n+'</div>'+ls.map(function(l){var got=xp>=l.xp,cur=l.n===lv.n,rw=l.n===WR_REWARD.level;
+      return '<div class="wr-step'+(cur?' cur':'')+(got?' got':'')+'">'+wrTokSvg({tier:r.t,st:got?'done':'own',num:l.n},cur?56:48)+'<span class="wr-st-n">'+l.name+'</span><small>'+fmt(l.xp)+' XP</small>'+(rw?'<span class="wr-rw-tag">Free month</span>':'')+'</div>';}).join('')+'</div>';}).join('');
+  var tEl=document.getElementById('wr-tiers'),cEl=document.getElementById('wr-collection'),un=achState.unlocked||[];
+  if(tEl){var f=cEl&&cEl.getAttribute('data-f')||'all';
+    tEl.innerHTML='<button type="button" class="wr-chip'+(f==='all'?' on':'')+'" onclick="wrFilter(\'all\')">All '+un.length+'/'+BADGES.length+'</button>'+Object.keys(WR_TIERS).map(function(k){var all=BADGES.filter(function(b){return wrXpTier(b.xp||50)===k;});
+      return '<button type="button" class="wr-chip wr-tier t-'+k+(f===k?' on':'')+'" onclick="wrFilter(\''+k+'\')">'+WR_TIERS[k].n+' '+all.filter(function(b){return un.indexOf(b.id)>-1;}).length+'/'+all.length+'</button>';}).join('');}
+  if(cEl)cEl.innerHTML=BADGES.map(function(b){var u=un.indexOf(b.id)>-1,tier=wrXpTier(b.xp||50);
+    return '<div class="wr-tok t-'+tier+(u?' got':'')+'">'+wrTokSvg({tier:tier,st:u?'own':'lock',ic:WR_BADGE_IC[b.id]||'vi-gem',chip:u?'':'lock',tl:'+'+(b.xp||50),name:b.name},112,b.name+(u?', earned':', locked'))+'<b>'+b.name+'</b><small>+'+(b.xp||50)+' XP · '+WR_TIERS[tier].n+'</small><span>'+(u?'Earned':b.desc)+'</span></div>';}).join('');
+  if(!_isPro()){document.querySelectorAll('#tab-achievements .wr-pro').forEach(function(e){e.style.filter='blur(5px)';e.style.pointerEvents='none';});}
+}
+function wrFilter(k){var c=document.getElementById('wr-collection');if(c)c.setAttribute('data-f',k);renderAchievements();}
 // ═══════════════════════════════════════════════════════════════
 // CONNECTIONS JS
 // ═══════════════════════════════════════════════════════════════
@@ -24857,6 +25177,15 @@ function fireBuildStages(){
     {key:'fatFIRE',phase:5,ic:'flame2',name:'Fat FIRE',desc:'33× expenses',col:'#c9a84c',check:function(){return nw>=annualExp*33;},prog:function(){return ratio(nw,annualExp*33);},cur:function(){return nw;},target:annualExp*33,why:function(){return['Your net worth is '+gbpFmt(nw)+'. This needs 33× a year of spending ('+gbpFmt(annualExp*33)+').'];},acts:[GO_AL]},
     {key:'legacy',phase:5,ic:'tree',name:'Legacy',desc:'50×, next gen',col:'#c9a84c',check:function(){return nw>=annualExp*50;},prog:function(){return ratio(nw,annualExp*50);},cur:function(){return nw;},target:annualExp*50,why:function(){return['Your net worth is '+gbpFmt(nw)+'. This needs 50× a year of spending ('+gbpFmt(annualExp*50)+').'];},acts:[GO_AL]}
   ];
+  // sub-milestones (owner, 3 Nov: "a clear linear step by step progression with sub milestones for each achievement"): stages with a
+  // target step at 30%, 60% and 100% of it; stages the app can partly measure get their own steps; a confirm-only stage is one step
+  var anyListed=nw!==0||cashSaved>0||debts.length>0||libs>0||(alState.cashAccounts||[]).length>0;
+  var STEPS={
+    firstLog:[['First figure added',function(){return anyListed;}],['Snapshot saved',null]],
+    mapDebts:[['First debt listed, or no debts ticked',function(){return debts.length>0||libs>0||noDebt;}],['List confirmed',null]],
+    zeroBudget:[['Income added',function(){return !!bud&&bud.m.tIn>0;}],['Spending listed',function(){return (ovState.expenses||[]).length>0;}],['Every pound given a job',null]],
+    firstSaved:[['Account added',function(){return (alState.cashAccounts||[]).length>0||(hasState&&state.target>0);}],['First £1 saved',null]]
+  };
   // sequential evaluation: a stage unlocks when everything before it is achieved or skipped
   var run=true,current=-1;
   S.forEach(function(s,i){
@@ -24868,6 +25197,13 @@ function fireBuildStages(){
     else if(run&&s.skip){s.done=false;s.skipPass=true;}      // passed over by the user’s choice: not “achieved”, but it doesn’t hold anything up
     else{s.done=false;run=false;}
   });
+  S.forEach(function(s){
+    var c=STEPS[s.key],p=0;
+    if(c)s.steps=c.map(function(x){return {lbl:x[0],met:x[1]?!!x[1]():s.raw};});
+    else if(s.prog){p=Math.max(0,Math.min(1,s.prog()||0));s.steps=[.3,.6,1].map(function(f){return {lbl:fireStepLbl(s,f),met:f<1?p>=f-1e-9:s.raw};});}
+    else s.steps=[{lbl:s.desc,met:s.raw}];
+    if(s.done)s.steps.forEach(function(x){x.met=true;});
+  });
   S.currentIdx=current;
   S.nextIdx=-1;for(var i=0;i<S.length;i++){if(!S[i].done&&!S[i].skipPass){S.nextIdx=i;break;}}
   S.doneCount=S.filter(function(s){return s.done;}).length;
@@ -24875,6 +25211,13 @@ function fireBuildStages(){
   S.passedIdx=S.nextIdx<0?S.length-1:S.nextIdx-1;            // rail is solid up to the last stage that was passed
   S.waiting=S.nextIdx<0?[]:S.filter(function(s,i){return i>S.nextIdx&&s.raw;});   // later stages already met, held back by the next-up stage
   return S;
+}
+// a sub-milestone's label: money where the stage has a target, otherwise how far along it is
+function fireStepLbl(s,f){
+  if(typeof s.target==='number'&&s.target>0)return gbpFmt(Math.round(s.target*f/10)*10)+(f<1?' of '+gbpFmt(Math.round(s.target)):' reached');
+  if(s.key==='debtHalf')return Math.round(f*50)+'% of consumer debt cleared';
+  if(s.key==='firstCut')return f<1?Math.round(f*100)+'% of one debt paid off':'One debt at £0';
+  return f<1?Math.round(f*100)+'% of the way':s.desc;
 }
 // Draw a stage icon (duo-tone) centred on cx,cy
 function fireIcon(key,cx,cy,size,col,strokeOp,fillOp){
@@ -24906,6 +25249,7 @@ function renderFIREroadmap(){
   var phases=FIRE_PHASES;
   var stages=fireBuildStages();
   renderFIREroadmap._stages=stages;
+  try{wrSync(stages);}catch(e){}
   var nextIdx=stages.nextIdx;
   var doneCount=stages.doneCount,skipCount=stages.skipCount;
 
@@ -24919,6 +25263,9 @@ function renderFIREroadmap(){
   }
   var pt=document.getElementById('fire-progress-txt');
   if(pt)pt.textContent=doneCount+' of '+stages.length+' achieved'+(skipCount?' · '+skipCount+' skipped':'');
+  var ns=document.getElementById('fire-next-step');
+  if(ns){var nxS=nextIdx>=0?stages[nextIdx]:null,sts=nxS?nxS.steps||[]:[],nj=sts.findIndex(function(x){return !x.met;});
+    ns.innerHTML=nxS?'<b>Next step</b> '+nxS.name+': '+(sts[nj<0?sts.length-1:nj]||{lbl:nxS.desc}).lbl+' <span>+'+wrStepXp(nxS.key,sts.length)+' XP</span>':'<b>Every stage done.</b> Your roadmap is complete.';}
   if(_fireDetailIdx>=0&&document.getElementById('fire-detail-panel')&&document.getElementById('fire-detail-panel').style.display!=='none')fireShowDetail(_fireDetailIdx,{keepAsk:true});
 
   var containerW=SC?SC.clientWidth:0;
@@ -24938,84 +25285,47 @@ function renderFIREroadmap(){
       done:idxs.every(function(i){return stages[i].done||stages[i].skipPass;})};
   });
 
-  var out='<rect x="'+x0+'" y="0" width="'+(x1-x0)+'" height="'+H+'" fill="#030810"/>';
+  /* ground plane (owner, 3 Nov round 2: "a steeper perspective so the ground plane takes up less space ... the grid perspective ground
+     line ... achievement icons lifted higher above that ground plane"): a thin strip at the foot (its grid is #fire-ground, which stays
+     put while the track scrolls); the path runs on the ground and each token floats above it on a light beam with its shadow below */
+  var GY=H-56,PATH_Y=GY+14,out='<rect x="'+x0+'" y="0" width="'+(x1-x0)+'" height="'+GY+'" fill="#030810" opacity=".6"/>';   // the stage behind the tokens (paper in Daylight)
   phaseSpans.forEach(function(sp,pi){
     var a=Math.max(x0,sp.x0),b=Math.min(x1,sp.x1);
     if(b<=a)return;
-    out+='<rect x="'+a+'" y="0" width="'+(b-a)+'" height="'+H+'" fill="'+sp.col+'" opacity="'+(pi%2===0?'0.07':'0.04')+'"/>';
-    if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line x1="'+sp.x0+'" y1="0" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="0.8" opacity="0.25" stroke-dasharray="4 3"/>';
-    out+='<text x="'+((a+b)/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="10.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.6')+'" letter-spacing="1.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
-    out+='<line x1="'+(a+4)+'" y1="'+(H-16)+'" x2="'+(b-4)+'" y2="'+(H-16)+'" stroke="'+sp.col+'" stroke-width="'+(sp.done?'1.6':'0.6')+'" opacity="'+(sp.done?'0.7':'0.25')+'"/>';
+    if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line x1="'+sp.x0+'" y1="'+GY+'" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="1" opacity="0.45" stroke-dasharray="3 3"/>';
+    out+='<text x="'+((a+b)/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.7')+'" letter-spacing="2.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
   });
-
-  // rail: solid up to the last passed stage, dashed beyond
-  var railX0=LEFT,railX1=(stages.length-1)*NODE_SPACING+LEFT;
-  var doneX=stages.passedIdx>=0?stages.passedIdx*NODE_SPACING+LEFT:railX0;
-  /* the rail runs between the coins, never through or behind them (owner, 31 Oct); solid where the stages are passed */
-  var coinR=function(k){return k===nextIdx?30:22;};
+  var tokW=function(k){return k===nextIdx?80:64;},coinR=function(k){return tokW(k)/2;};   // card widths (owner, 3 Nov round 3: "larger"): 80 px for the stage to work on, 64 px for the rest
+  // the path on the ground: solid up to the last passed stage, dashed beyond, running between the light pads (owner, 31 Oct)
   for(var si=Math.max(0,i0);si<Math.min(stages.length-1,i1);si++){var ax=si*NODE_SPACING+LEFT,bx=(si+1)*NODE_SPACING+LEFT,passed=si<stages.passedIdx;
-    out+='<line x1="'+(ax+coinR(si)+6)+'" y1="'+LINE_Y+'" x2="'+(bx-coinR(si+1)-6)+'" y2="'+LINE_Y+'" stroke="rgba(68,192,185,'+(passed?'0.85':'0.18')+'" stroke-width="'+(passed?3:2)+'"'+(passed?'':' stroke-dasharray="6 4"')+'/>';}
+    out+='<line class="fire-rail" x1="'+(ax+coinR(si)+6)+'" y1="'+PATH_Y+'" x2="'+(bx-coinR(si+1)-6)+'" y2="'+PATH_Y+'" stroke="rgba(68,192,185,'+(passed?'0.9':'0.3')+')" stroke-width="'+(passed?2.6:1.6)+'"'+(passed?'':' stroke-dasharray="6 5"')+'/>';}
 
   for(var i=i0;i<=i1;i++){
     var s=stages[i];
-    var cx=i*NODE_SPACING+LEFT;NODE_R=coinR(i);
-    var done=s.done,isNext=i===nextIdx,skipped=s.skipPass,waiting=s.raw&&!done&&!skipped,locked=!done&&!isNext&&!skipped;
+    var cx=i*NODE_SPACING+LEFT,W=tokW(i);NODE_R=W/2;
+    var done=s.done,isNext=i===nextIdx,skipped=s.skipPass,waiting=s.raw&&!done&&!skipped;
     var col=s.col||'#44c0b9';
-    var above=i%2===0;
-    var namY=above?(LINE_Y-NODE_R-10):(LINE_Y+NODE_R+26);
-    var descY=above?(LINE_Y-NODE_R-24):(LINE_Y+NODE_R+40);
+    var CH=W*1.32,bot=GY-(isNext?74:60),top=bot-CH;
     var click=' style="cursor:pointer" onclick="fireNodeTap('+i+')"';
-
-    out+='<g class="fire-coin'+(isNext?' next':'')+(done?' done':'')+'" data-i="'+i+'">';
-    out+='<line x1="'+cx+'" y1="'+(above?LINE_Y-NODE_R:LINE_Y+3)+'" x2="'+cx+'" y2="'+(above?LINE_Y-3:LINE_Y+NODE_R)+'" stroke="'+(done?col:'rgba(68,192,185,0.12)')+'" stroke-width="1"/>';
-    // a coin with depth: shadow on the ground, a rim, then the opaque face (the rail can never show through)
-    out+='<ellipse cx="'+cx+'" cy="'+(LINE_Y+NODE_R+4)+'" rx="'+(NODE_R*0.85).toFixed(1)+'" ry="3" fill="rgba(0,0,0,0.35)"/>'
-      +'<circle cx="'+cx+'" cy="'+(LINE_Y+3)+'" r="'+NODE_R+'" fill="'+(done?col:'rgba(68,192,185,0.45)')+'" opacity="0.6"/>'
-      +'<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+NODE_R+'" fill="#071018"/>';
-
-    if(isNext){   // static halo (no blur filter, no endless animation: those made the whole timeline repaint every frame)
-      out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+6)+'" fill="none" stroke="'+col+'" stroke-width="1.2" opacity="0.55"/>'
-        +'<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+11)+'" fill="none" stroke="'+col+'" stroke-width="3" opacity="0.14"/>';
-    }
-    if(done)out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+3)+'" fill="none" stroke="'+col+'" stroke-width="3" opacity="0.2"/>';
-    if(i===_fireDetailIdx)out+='<circle class="fire-sel" cx="'+cx+'" cy="'+LINE_Y+'" r="'+(NODE_R+5)+'" fill="none" stroke="var(--gold)" stroke-width="1"/>';   // the tapped stage: a 1 px gold ring (E3)
-    // node body
-    out+='<circle cx="'+cx+'" cy="'+LINE_Y+'" r="'+NODE_R+'" fill="'+(done?col+'38':isNext?'rgba(10,18,30,0.95)':'rgba(6,12,22,0.92)')+'"'
-      +' stroke="'+(done?col:(isNext||waiting)?col:skipped?'#e8a23c':'rgba(68,192,185,0.14)')+'" stroke-width="'+(done?2.4:isNext?2.2:(waiting||skipped)?1.6:1)+'"'
-      +((locked&&!waiting)||skipped?' stroke-dasharray="3 3"':'')+click+'/>';
-    // progress ring on the next stage
-    if(isNext&&s.prog){
-      var prog=Math.max(0,Math.min(1,s.prog()));
-      if(prog>0&&prog<1){
-        var ang=-Math.PI/2+prog*2*Math.PI;
-        out+='<path d="M'+cx+' '+(LINE_Y-NODE_R)+' A'+NODE_R+' '+NODE_R+' 0 '+(prog>0.5?1:0)+' 1 '+(cx+NODE_R*Math.cos(ang)).toFixed(1)+' '+(LINE_Y+NODE_R*Math.sin(ang)).toFixed(1)+'" fill="none" stroke="'+col+'" stroke-width="3.2" stroke-linecap="round" style="pointer-events:none"/>';
-      }
-    }
-    // the stage's own icon
-    out+=fireIcon(s.ic,cx,LINE_Y,done?24:22,done?col:(isNext||waiting)?col:'#7d8793',done?1:(isNext||waiting)?0.95:0.62,done?0.30:isNext?0.2:0.1);
-    if(done){   // achieved: bold tick badge
-      out+='<g style="pointer-events:none"><circle cx="'+(cx+NODE_R-2)+'" cy="'+(LINE_Y-NODE_R+3)+'" r="8" fill="'+col+'" stroke="#030810" stroke-width="2"/>'
-        +'<path d="M'+(cx+NODE_R-5.6)+' '+(LINE_Y-NODE_R+3.2)+'l2.6 2.6 4.6-5.2" fill="none" stroke="#030810" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>';
-    }else if(skipped){   // skipped by choice: amber “forward” badge
-      out+='<g style="pointer-events:none"><circle cx="'+(cx+NODE_R-2)+'" cy="'+(LINE_Y-NODE_R+3)+'" r="8" fill="#030810" stroke="#e8a23c" stroke-width="1.4"/>'
-        +'<path d="M'+(cx+NODE_R-5.4)+' '+(LINE_Y-NODE_R+0.2)+'l3 2.8-3 2.8M'+(cx+NODE_R-1.2)+' '+(LINE_Y-NODE_R+0.2)+'l3 2.8-3 2.8" fill="none" stroke="#e8a23c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>';
-    }else if(waiting){   // requirement already met, but an earlier stage is holding it: outlined tick
-      out+='<g style="pointer-events:none"><circle cx="'+(cx+NODE_R-2)+'" cy="'+(LINE_Y-NODE_R+3)+'" r="8" fill="#050c14" stroke="'+col+'" stroke-width="1.4" stroke-dasharray="2 2"/>'
-        +'<path d="M'+(cx+NODE_R-5.6)+' '+(LINE_Y-NODE_R+3.2)+'l2.6 2.6 4.6-5.2" fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>';
-    }
-    if(locked&&!waiting){   // locked: small padlock badge (icon stays visible underneath)
-      out+='<g style="pointer-events:none" transform="translate('+(cx+NODE_R-3)+' '+(LINE_Y+NODE_R-3)+')"><circle r="7.5" fill="#050c14" stroke="rgba(125,135,147,0.55)" stroke-width="1"/>'
-        +'<rect x="-3" y="-0.6" width="6" height="4.6" rx="1" fill="rgba(125,135,147,0.7)"/><path d="M-1.8 -0.6v-1.5a1.8 1.8 0 0 1 3.6 0v1.5" fill="none" stroke="rgba(125,135,147,0.8)" stroke-width="1.1"/></g>';
-    }
-    var nameCol=done?col:(isNext||waiting)?'#e9f1f1':skipped?'#e8a23c':'rgba(154,160,166,0.55)';
-    out+='<text x="'+cx+'" y="'+namY+'" text-anchor="middle" font-size="11.5" font-family="Syne,sans-serif" font-weight="800" fill="'+nameCol+'"'+click+'>'+s.name+'</text>';
-    out+='<text x="'+cx+'" y="'+descY+'" text-anchor="middle" font-size="10.5" font-family="DM Sans,sans-serif" fill="rgba(110,120,132,'+(done?0.9:0.65)+')">'+(waiting?'met · waiting':skipped?'skipped':s.desc)+'</text>';
+    var tier=wrStageTier(s.key),stt=done?'done':isNext?'next':skipped?'skip':waiting?'wait':'lock';
+    var sts=s.steps||[],lit=stt==='done'||stt==='wait'?sts.length:stt==='next'?sts.filter(function(x){return x.met;}).length:0;
+    out+='<g class="fire-coin'+(isNext?' next':'')+(done?' done':'')+'" data-i="'+i+'" data-cx="'+cx+'" data-tier="'+tier+'"'+click+'>'
+      +'<title>Stage '+(i+1)+' of '+stages.length+', '+s.name+', '+WR_TIERS[tier].n+', '+({done:'achieved',next:'next up',skip:'skipped',wait:'met, waiting on earlier stages',lock:'locked'})[stt]+'</title>';
+    // on the ground: shadow, the glowing pad under the stage to work on, then the beam (or a dotted tether for locked and skipped)
+    out+='<ellipse cx="'+cx+'" cy="'+PATH_Y+'" rx="'+(W*.55).toFixed(1)+'" ry="'+(W*.1).toFixed(1)+'" fill="url(#wt-shadow)"/>';
+    if(isNext)out+='<ellipse cx="'+cx+'" cy="'+PATH_Y+'" rx="'+(W*.82).toFixed(1)+'" ry="'+(W*.15).toFixed(1)+'" fill="url(#wt-pad)"/><ellipse cx="'+cx+'" cy="'+PATH_Y+'" rx="'+(W*.6).toFixed(1)+'" ry="'+(W*.1).toFixed(1)+'" fill="none" stroke="#44c0b9" stroke-width="1.2"/>';
+    if(stt==='done'||stt==='next'||stt==='wait')out+='<polygon points="'+(cx-W*.3).toFixed(1)+','+PATH_Y+' '+(cx+W*.3).toFixed(1)+','+PATH_Y+' '+(cx+W*.42).toFixed(1)+','+bot+' '+(cx-W*.42).toFixed(1)+','+bot+'" fill="url(#wt-beam)" opacity="'+(isNext?1:stt==='done'?0.55:0.3)+'"/>';
+    else out+='<line x1="'+cx+'" y1="'+(bot+4)+'" x2="'+cx+'" y2="'+(PATH_Y-3)+'" stroke="'+(skipped?'#e8a23c':'#7d8793')+'" stroke-opacity=".45" stroke-dasharray="2 3"/>';
+    if(i===_fireDetailIdx)out+='<polygon class="fire-sel" points="'+wrPts(WR_CARD,cx-W/2-W*.08,top-W*.08,W*1.16/100)+'" fill="none" stroke="var(--gold)" style="stroke:var(--gold)" stroke-width="1"/>';   // the tapped stage: a 1 px gold outline (E3)
+    out+='<g class="fire-card"><g transform="translate('+(cx-W/2)+' '+top.toFixed(1)+') scale('+(W/100).toFixed(3)+')">'+wrTok({tier:tier,st:stt,bars:sts.length,lit:lit,ic:WR_STAGE_IC[s.key]||s.ic,r:NODE_R,px:W,sc:W/100,chip:stt==='next'?'':stt})+'</g></g>';
+    // the name sits under the card, in the air above the ground (owner, 3 Nov: not on the card at this size)
+    var nameCol=done?col:(isNext||waiting)?'#e9f1f1':skipped?'#e8a23c':'rgba(154,160,166,0.75)';
+    out+='<text x="'+cx+'" y="'+(bot+(isNext?24:17))+'" text-anchor="middle" font-size="11.5" font-family="Syne,sans-serif" font-weight="800" fill="'+nameCol+'"'+click+'>'+s.name+'</text>';
     if(isNext){   // tag for the stage to work on now
       var tag=(i===0)?'START HERE':'NEXT UP';
-      out+='<rect x="'+(cx-40)+'" y="'+(LINE_Y-NODE_R-53)+'" width="80" height="16" fill="'+col+'26" stroke="'+col+'" stroke-width="0.8"/>'
-        +'<text x="'+cx+'" y="'+(LINE_Y-NODE_R-41.5)+'" text-anchor="middle" font-size="10" font-family="Share Tech Mono,monospace" fill="'+col+'" letter-spacing="1.2" font-weight="700">'+tag+'</text>';
-    }
-    out+='<text x="'+(cx-NODE_R+3)+'" y="'+(LINE_Y+NODE_R-2)+'" font-size="8" font-family="Share Tech Mono,monospace" fill="rgba(68,192,185,0.3)" style="pointer-events:none">'+String(i+1).padStart(2,'0')+'</text>';
+      out+='<rect x="'+(cx-40)+'" y="'+(top-30)+'" width="80" height="16" fill="'+col+'26" stroke="'+col+'" stroke-width="0.8"/>'
+        +'<text x="'+cx+'" y="'+(top-18.5)+'" text-anchor="middle" font-size="10.5" font-family="Share Tech Mono,monospace" fill="'+col+'" letter-spacing="1.2" font-weight="700">'+tag+'</text>';
+    }else out+='<text x="'+cx+'" y="'+(top-9)+'" text-anchor="middle" font-size="10.5" font-family="DM Sans,sans-serif" fill="rgba(140,150,160,'+(done?0.95:0.75)+')">'+(waiting?'met · waiting':skipped?'skipped':s.desc)+'</text>';
     out+='</g>';
   }
   svgEl.setAttribute('viewBox',x0+' 0 '+(x1-x0)+' '+H);
@@ -25028,13 +25338,23 @@ function renderFIREroadmap(){
 }
 /* phones (owner, 31 Oct): the roadmap behaves like a carousel: the coin in the centre is the largest, the others shrink and fade
    towards the edges, and a swipe settles on the nearest stage */
+// the ground grid: horizontal lines closer together towards the horizon, verticals converging on one point above the middle of the
+// view. It is the environment and stays still while the cards scroll across it (owner, 3 Nov round 5); redrawn only when the width changes
+function fireGround(){
+  var g=document.getElementById('fire-ground'),SC=document.getElementById('fire-timeline-scroll');if(!g||!SC)return;
+  var w=SC.clientWidth,h=56,vx=w/2,vy=-240,sp=54,off=(w/2)%sp,f=(h-vy)/(0-vy),o='';
+  if(!(w>0)||g.__w===w)return;g.__w=w;
+  [0,3,7,12,19,28,40,55].forEach(function(d,k){o+='<line class="fg-h" x1="0" y1="'+d+'" x2="'+w+'" y2="'+d+'" style="stroke-opacity:'+(k?(.1+k*.025).toFixed(3):.5)+'"/>';});
+  for(var x=off-sp*12;x<w+sp*12;x+=sp){var xb=vx+(x-vx)*f;if(Math.max(x,xb)<-10||Math.min(x,xb)>w+10)continue;o+='<line class="fg-v" x1="'+x.toFixed(1)+'" y1="0" x2="'+xb.toFixed(1)+'" y2="'+h+'"/>';}
+  g.setAttribute('viewBox','0 0 '+w+' '+h);g.innerHTML=o;
+}
 function fireCarousel(){
+  try{fireGround();}catch(e){}
   var SC=document.getElementById('fire-timeline-scroll'),svg=document.getElementById('fire-roadmap-svg');if(!SC||!svg)return;
   var mob=window.innerWidth<=700,mid=SC.scrollLeft+SC.clientWidth/2;
   [].forEach.call(svg.querySelectorAll('.fire-coin'),function(g){
-    if(!mob){g.style.transform='';g.style.opacity='';return;}
-    var cx=(+g.getAttribute('data-i'))*FIRE_NODE+FIRE_LEFT,d=Math.min(1,Math.abs(cx-mid)/(SC.clientWidth*0.6));
-    g.style.transform='scale('+(1.22-0.22*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */g.style.opacity=(1-0.72*d).toFixed(2);
+    var cx=(+g.getAttribute('data-i'))*FIRE_NODE+FIRE_LEFT,d=Math.min(1,Math.abs(cx-mid)/(SC.clientWidth*(mob?0.6:0.5)));
+    g.style.transform='scale('+(1.12-0.12*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */g.style.opacity=(1-(mob?0.72:0.4)*d).toFixed(2);
   });
 }
 var _fireSnapT=0,_fireSnapping=0;
@@ -25145,13 +25465,16 @@ function fireShowDetail(idx,opts){
     }
   }
   var btn=(acts||skip)?'<div class="fd-acts">'+acts+skip+'</div>':'';
-  inner.innerHTML=viDay('<div style="flex-shrink:0;width:46px;height:46px;border-radius:50%;border:2px solid '+(s.done?col:'rgb(var(--teal-rgb) / .25)')+';background:'+(s.done?col+'26':'rgb(var(--panel-rgb) / .9)')+';display:flex;align-items:center;justify-content:center">'
-      +'<svg width="28" height="28" viewBox="0 0 28 28">'+fireIcon(s.ic,14,14,24,s.done||isNext||waiting?col:'#7d8793',s.done||isNext||waiting?1:.6,.25)+'</svg></div>'
+  var dTier=wrStageTier(s.key),dSt=s.done?'done':s.skipPass?'skip':isNext?'next':waiting?'wait':'lock',dSteps=s.steps||[],dPer=wrStepXp(s.key,dSteps.length),dW=wrState();
+  var dLit=dSt==='done'||dSt==='wait'?dSteps.length:dSt==='next'?dSteps.filter(function(x){return x.met;}).length:0;
+  var stepsHtml='<div class="fd-h wr-steps-h">STEPS · '+WR_TIERS[dTier].n.toUpperCase()+' TIER</div><ol class="wr-steps">'+dSteps.map(function(x,k){var got=!!dW.s[s.key+'.'+k],cur=!x.met&&dSteps.slice(0,k).every(function(y){return y.met;});
+    return '<li class="'+(x.met?'ok':cur?'cur':'')+'"><span class="wr-sdot" aria-hidden="true"></span><span class="wr-slbl">'+x.lbl+(x.met?'<span class="vh"> (done)</span>':'')+'</span><span class="wr-sxp">'+(got?'+'+dPer+' XP earned':'+'+dPer+' XP')+'</span></li>';}).join('')+'</ol>';
+  inner.innerHTML=viDay('<div class="wr-dtok">'+wrTokSvg({tier:dTier,st:dSt,bars:dSteps.length,lit:dLit,ic:WR_STAGE_IC[s.key]||s.ic,chip:dSt==='next'?'':dSt,tl:seq,name:s.name},window.innerWidth<=480?80:100,'Stage '+seq+', '+s.name)+'</div>'
     +'<div style="flex:1;min-width:0">'
-    +'<div style="font-family:\'Syne\',sans-serif;font-size:max(.74rem,var(--vi-fs-3));font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+state_+'</span></div>'
+    +'<div style="font-family:\'Syne\',sans-serif;font-size:max(.74rem,var(--vi-fs-3));font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="white-space:nowrap;display:inline-block;font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+state_+'</span></div>'
     +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));color:var(--t2);letter-spacing:.1em;margin-bottom:4px">'+ph.label+' PHASE · STEP '+seq+' OF 30</div>'
     +'<div style="font-family:\'DM Sans\',sans-serif;font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.5">'+long+'</div>'
-    +progTxt+need+ticks+btn+'</div>');
+    +progTxt+stepsHtml+need+ticks+btn+'</div>');
   panel.style.display='';
   if(!opts.keepAsk)renderFIREroadmap();   // draws the gold ring on the tapped stage
 }
@@ -26443,7 +26766,7 @@ function renderJrnyPanel(selectedIdx, currentStage) {
       { lbl: 'Monthly Freed Up', val: 'Your mortgage payment', sub: 'Every pound you were paying the bank is now yours. Invest it.', col: '#3ecf8e' },
       { lbl: 'Journey Complete', val: 'Stage 6 of 6', sub: 'From debt to outright ownership. Share this moment.', col: '#e8c56a' },
       { lbl: 'Next Chapter', val: 'Financial freedom', sub: 'With no housing cost and an owned asset, FIRE is achievable. See your roadmap in the Overview tab.', col: '#44c0b9' },
-      { lbl: 'XP Reward', val: '+5,000 XP', sub: 'Stage 6 achievement unlocked. Check your Achievements tab.', col: '#9b7ec8' }
+      { lbl: 'XP Reward', val: '+5,000 XP', sub: 'Stage 6 token unlocked. Check your Wealth Roadmap tab.', col: '#9b7ec8' }
     ];
   }
 
@@ -27435,16 +27758,16 @@ function wPickView(v, btn) {
 }
 // the Overview achievements card: level, XP to the next level, streak and the badges earned so far
 function renderOvAch() {
-  var el = document.getElementById('ov-ach-body'); if (!el || typeof achState === 'undefined' || typeof currentLevel !== 'function') return;
-  var lv = currentLevel(), nx = nextLevel(), i = LVS.indexOf(lv) + 1, xp = achState.xp || 0;
+  var el = document.getElementById('ov-ach-body'); if (!el || typeof achState === 'undefined' || typeof wrLevel !== 'function') return;
+  var xp = wrTotalXp(), lv = wrLevel(xp), nx = wrNextLevel(xp), rk = WR_RANKS[lv.rank];
   var pc = nx ? Math.max(0, Math.min(100, (xp - lv.xp) / (nx.xp - lv.xp) * 100)) : 100;
   var got = BADGES.filter(function (b) { return (achState.unlocked || []).indexOf(b.id) > -1; });
   var streak = +(achState.streak || localStorage.getItem('vi_streak') || 0);
-  el.innerHTML = '<div class="ov-ach-top"><span class="ov-ach-lv" aria-label="Level ' + i + '">' + i + '</span><div class="ov-ach-meta"><b>' + lv.n + '</b>'
+  el.innerHTML = '<div class="ov-ach-top"><span class="ov-ach-tok">' + wrTokSvg({ tier: rk.t, st: 'done', bars: 8, lit: Math.floor(pc / 12.5), num: lv.n }, 48, 'Level ' + lv.n) + '</span><div class="ov-ach-meta"><b>' + lv.name + '</b>'
     + '<div class="ov-ach-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pc) + '"><i style="width:' + pc.toFixed(1) + '%"></i></div>'
-    + '<small>' + xp.toLocaleString() + ' XP' + (nx ? ' · ' + (nx.xp - xp).toLocaleString() + ' to ' + nx.n : ' · top level') + '</small></div>'
+    + '<small>' + xp.toLocaleString('en-GB') + ' XP' + (nx ? ' · ' + (nx.xp - xp).toLocaleString('en-GB') + ' to ' + nx.name : ' · top level') + '</small></div>'
     + '<div class="ov-ach-streak"><b>' + streak + '</b><small>day' + (streak === 1 ? '' : 's') + ' in a row</small></div></div>'
-    + '<div class="ov-ach-badges">' + (got.length ? got.slice(-8).map(function (b) { return '<span class="ov-ach-badge" title="' + b.name.replace(/"/g, '&quot;') + '">' + b.icon + '</span>'; }).join('')
+    + '<div class="ov-ach-badges">' + (got.length ? got.slice(-8).map(function (b) { return '<span class="ov-ach-badge" title="' + b.name.replace(/"/g, '&quot;') + '">' + wrTokSvg({ tier: wrXpTier(b.xp || 50), st: 'own', ic: WR_BADGE_IC[b.id] || 'vi-gem' }, 40, b.name) + '</span>'; }).join('')
       : '<span class="ov-ach-none">No badges yet. Your first one comes with your first deposit or your first budget line.</span>')
     + '<span class="ov-ach-count">' + got.length + ' of ' + BADGES.length + ' badges</span></div>';
 }
@@ -27518,7 +27841,13 @@ function checkStreak() {
   else { streak = 1; }
   localStorage.setItem('vi_last_visit', today);
   localStorage.setItem('vi_streak', String(streak));
-  if (typeof achState !== 'undefined' && achState) { achState.streak = streak; if (typeof saveAch === 'function') saveAch(); }
+  if (typeof achState !== 'undefined' && achState) {
+    achState.streak = streak;
+    // days of use for the free month (owner, 3 Nov: 30 different days): one per calendar day, kept in the synced record so two devices on the same day count once (Pedro, 3 Nov)
+    var _w = achState.wr || (achState.wr = { s: {}, q: {}, m: {}, days: 0 }), _d = new Date(), _iso = _d.getFullYear() + '-' + String(_d.getMonth() + 1).padStart(2, '0') + '-' + String(_d.getDate()).padStart(2, '0');
+    if (_w.last !== _iso) { _w.days = (_w.days || 0) + 1; _w.last = _iso; }
+    if (typeof saveAch === 'function') saveAch();
+  }
 }
 
 // ── TASK 1: DEMO MODE ────────────────────────────────────────────
@@ -29509,7 +29838,7 @@ var STEPS=[
   {id:'assets',tab:'assets',sel:'#assets-page .subtab-nav',optional:true,title:'Assets and liabilities',body:'Cash and savings, shares, metals, crypto, valuables and other liabilities. Live prices can keep the values up to date.'},
   {id:'debt',tab:'debt',find:function(){var b=document.getElementById('debt-method-btn-avalanche');return b&&(b.closest('.ov-chart-card')||b.parentNode)},optional:true,title:'Debt tracker',body:'List every debt, then choose Avalanche (highest interest first, saves the most) or Snowball (smallest balance first, quick wins). Tick "I’ve mapped every debt" to unlock the next roadmap step.'},
   {id:'biz',sel:'#vi-tabs .tab-btn[data-tab="biz"]',optional:true,when:function(){return !simple()},title:'Entrepreneur',body:'Build a second income with income streams, leads and clients.'},
-  {id:'ach',tab:'achievements',find:function(){var b=document.getElementById('ach-level-badge');return b&&(b.closest('.ov-chart-card')||b)},optional:true,when:function(){return !simple()},title:'Achievements',body:'Earn XP and badges as you hit milestones, from Seeker to Legacy.'},
+  {id:'ach',tab:'achievements',find:function(){var b=document.getElementById('ach-level-badge');return b&&(b.closest('.ov-chart-card')||b)},optional:true,when:function(){return !simple()},title:'Wealth Roadmap',body:'Every roadmap step, badge and saving habit earns XP. Twenty levels run from Spare Change to Vault Legend, and Level 8 with 30 days of use earns a free month.'},
   {id:'ach-simple',tab:'overview',sel:'#ov-ach-card',optional:true,when:simple,title:'Achievements',body:'Earn XP and badges as you hit milestones. Coming back each day builds a streak.'},
   {id:'feedback',sel:'#vi-fb-btn',optional:true,title:'Tell Pete what you think',body:'Tap Feedback on any screen to send a sentence and, if you like, a picture of the screen with every figure hidden.'},
   {id:'settings',sel:'#sidebar-toggle',optional:true,title:'Quick view and Settings',body:'Open this side panel for your key numbers. Settings is at the bottom of it: your plan, data, sign-in PIN and a button to replay this tour.'},
@@ -29552,7 +29881,7 @@ var KB=[
   {c:'Assets and tracking',q:'How do live prices work?',k:'live prices crypto gold silver metals shares stocks refresh',a:'Crypto prices come from CoinGecko, metals from metals.live and shares from Yahoo Finance via our server. Turn them on and refresh in Settings, Connections.',act:[{l:'Open Settings',fn:'showSettings'}]},
   {c:'Assets and tracking',q:'Can I connect my bank?',k:'bank open banking monzo starling barclays connect broker',a:'Not yet. For now, enter balances by hand in Assets and liabilities. Share holdings can be read from a screenshot of your investing app.'},
   {c:'Assets and tracking',q:'What is net worth?',k:'net worth own owe assets liabilities difference',a:'Everything you own (cash, savings, shares, metals, crypto, valuables, deposit saved) minus everything you owe. It shows on Overview.',act:[{l:'Show me',show:'ov-kpis'}]},
-  {c:'Assets and tracking',q:'What are achievements and XP?',k:'xp level badge points reward streak',a:'You earn XP and badges for milestones such as your first snapshot or first debt cleared. Nine levels run from Seeker to Legacy, and coming back each day builds a streak.'},
+  {c:'Assets and tracking',q:'What is the Wealth Roadmap and XP?',k:'xp level badge points reward streak achievements roadmap token free month',a:'The Wealth Roadmap tab shows the same roadmap as the Overview, plus your level. Each of the 30 stages has up to three steps, and every step earns XP. Badges and saving habits are side quests that count in any order. Twenty levels run from Spare Change to Vault Legend. Reach Level 8 and use Vault-It on 30 different days to claim a free month.'},
 
   {c:'Plans and trial',q:'How long is the free trial?',k:'trial free 30 days how long',a:'You get the full app free for 30 days, no card needed. A countdown shows in the last week.'},
   {c:'Plans and trial',q:'What happens when the trial ends?',k:'trial ends after read only vaulter',a:'Your vault becomes read-only: everything stays visible, your cloud copy and Download my data keep working, but adding and editing stop until you pick a plan.'},
