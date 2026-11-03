@@ -80,6 +80,7 @@ node tests/test_toast_race.js      # shared toast (v0.9.1): the opening build un
 node tests/test_v07_e9.js          # v0.7 E9: budget spending groups folded by default; a saved choice wins
 node tests/test_v07_e10.js         # v0.7 E10: expense bar arrow: sprite chevron 20 px in a 44 px target, down folded, up open
 node tests/test_v08_cards.js        # v0.8 D2: budget cards (no separator, 30-32 px icons, 10 px titles, titles clear of the amount) and the one House progress tile (iconned stats, house-type milestones, no dead columns)
+node tests/test_v091_house_xp_deposit.js  # v0.9.1 G: house milestones pay Wealth Roadmap XP once (E9: 20 to 200, 300 last; silent backfill; latched) and the deposit account note (E26: logo, AER, Lifetime ISA bonus estimate not added to saved, First Time Buyer ISA not open yet)
 node tests/test_v091_debt_cards.js  # v0.9.1 E33: every debt type is a 3D tile with its lender icon (no chip, number or network off cards), pays down right to left, undo, provider field, old saves load
 node tests/test_v091_debt_reverse.js # v0.9.1 E33b: type icon under the logo on debt tiles; the back shows the debt-free date (estimate), interest this month and year, last three payments and paid so far
 node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, on #bd-sankey, Night and Daylight
