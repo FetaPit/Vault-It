@@ -2,6 +2,7 @@
 // The camera fit measured once and ignored the idle yaw swing; now it iterates and covers the swing. With real demo data, at 1100 and 1440  no gold plate outline touches the stage's bottom, left or right edge at any point of the swing, and the Budget map's blocks stay inside.
 // Run: node tests/test_v091_3d_fit.js
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
+const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_nw3d.js', 'utf8');
 const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const seed = '.length, src.indexOf('// WCAG AA')).trim().replace(/;$/, '') + ')');
@@ -18,7 +19,7 @@ const edgeGold = (id) => { const cv = document.getElementById(id), x = cv.getCon
     const ctx = await b.newContext({ viewport: { width: w, height: h } }); await routeThree(ctx); await ctx.route(/open\.er-api\.com/, r => r.abort());
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(seed, { theme: 'dark', flag: true }); await p.addInitScript((e) => { const o = JSON.parse(localStorage.getItem('pos_ov1')); if (o.expenses.length < 3) { o.expenses = e; localStorage.setItem('pos_ov1', JSON.stringify(o)); } }, EXP);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2000);
+    await p.goto(INDEX); await p.waitForTimeout(2000);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#trial-banner,#tester-welcome{display:none!important}' });
     const T = w + 'x' + h + ': ';
     await p.evaluate(() => document.getElementById('nw3d-hero-stage').scrollIntoView({ block: 'center' })); await p.waitForTimeout(7000);
