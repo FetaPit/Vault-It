@@ -12470,7 +12470,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div class="nw3d-seg" id="bd-fz" role="group" aria-label="Zoom the income flow"><button type="button" data-fz="out" aria-label="Zoom out" title="Zoom out">&minus;</button><button type="button" data-fz="fit" aria-label="Fit the whole flow on screen" title="Fit the whole flow on screen">Fit</button><button type="button" data-fz="in" aria-label="Zoom in" title="Zoom in">+</button></div></div>
       <div id="bd-sankey" class="cf-scroll"></div>
       <div id="bd-3d" hidden>
-        <span class="nw3d-sub bd3d-sub">A tree map of your monthly income: each type of spending or saving is one area, filled with £100 blocks (smaller blocks for the pounds left over). Tap or hover a block to read its line, drag to turn it.</span>
         <div class="nw3d-stage" id="bd3d-stage"><canvas id="bd3d-cv" tabindex="0" role="img" aria-label="Your monthly budget as a tree map of £100 blocks, one area per type of spending or saving. Tap a block to read it, drag to turn it."></canvas><div class="nw3d-hud" role="group" aria-label="View controls"><button type="button" data-z="in" aria-label="Zoom in" title="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out" title="Zoom out">&minus;</button><button type="button" data-z="reset" aria-label="Reset view" title="Reset view">&#8634;</button></div></div>
         <p class="nw3d-read" id="bd3d-read" aria-live="polite"></p>
       </div>
@@ -14414,6 +14413,8 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 @media(max-width:699px){.ov-kpis>.ov-kpi:last-child:nth-child(odd){grid-column:1/-1}}
 /* cash-flow diagram: the whole thing fits one screen on desktop */
 @media(min-width:900px){.cf-scroll{display:flex;justify-content:center}.cf-scroll svg{width:100%!important;height:auto;margin:0 auto}}
+/* v0.9.1 E4: the dashboard tile is 3D only; display:flex above must not beat the hidden attribute */
+#cf-sankey[hidden]{display:none!important}
 /* KPI tiles + summaries: bigger, icon-led, colour-coded */
 .ov-kpi-lbl{display:flex;align-items:center;gap:6px;font-size:max(.58rem,var(--vi-fs-2))!important}
 .ov-kpi-ic{width:15px;height:15px;flex:none}
@@ -14615,6 +14616,15 @@ body.vi-pop-open{overflow:hidden}
 #bd-sankey[hidden],#bd-3d[hidden]{display:none!important}
 #bd3d-stage,#cf3d-stage{height:clamp(300px,46vh,520px);margin-top:10px}
 @media(max-width:600px){#bd3d-stage,#cf3d-stage{height:min(96vw,380px)}}
+/* v0.9.1 E6: the Budget viewport is larger now its paragraph is gone; the dashboard tile keeps its own height */
+@media(min-width:601px){#bd3d-stage{height:clamp(360px,56vh,560px)}}
+@media(min-width:1100px){#bd3d-stage{height:clamp(400px,64vh,720px)}}
+@media(max-width:600px){#bd3d-stage{height:min(104vw,440px)}}
+/* v0.9.1 E5: Budget group key, larger and the width of the card on desktop */
+@media(min-width:610px){#bd-legend{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important}
+  #bd-legend span{height:36px;justify-content:center;font-size:12px;overflow:hidden}#bd-legend s svg{width:20px!important;height:20px!important}}
+@media(min-width:1100px){#bd-legend span{height:40px;font-size:13px}#bd-legend s svg{width:22px!important;height:22px!important}}
+@media(min-width:1400px){#bd-legend{grid-template-columns:repeat(6,minmax(0,1fr))}}
 #cf-3d .nw3d-read{margin:8px 0 0}
 #bd-fz{margin-left:auto}.bd-is-3d #bd-fz{display:none}
 .bd-exp-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
@@ -19700,7 +19710,7 @@ function cfModel(){
 }
 // ── Sankey: income sources → Income → Committed / Optional / Saved → each category ──
 function drawCashflowDiagram(){
-  var hosts=['cf-sankey','bd-sankey'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var hosts=['bd-sankey'].map(function(id){return document.getElementById(id);}).filter(Boolean);
   if(!hosts.length)return;
   var m=cfModel();
   if(m.total<=0){hosts.forEach(function(h){h.__sig=null;h.innerHTML='<div class="cf-empty">Add your income and spending to see where every pound goes</div>';});return;}
@@ -24152,7 +24162,7 @@ viOnWidthResize(function () { drawChart(); renderFIREroadmap(); }, 200);
 // Self-heal: when a chart scrolls back into view (or the page returns from the background) redraw it and nudge the browser to
 // repaint it, so a tile the phone dropped while you were scrolling comes back whole instead of staying half-drawn.
 (function () {
-  var T = [['nwChart', function () { drawChart(); }], ['cf-sankey', function () { drawCashflowDiagram(); }], ['bd-sankey', function () { drawCashflowDiagram(); }],
+  var T = [['nwChart', function () { drawChart(); }], ['bd-sankey', function () { drawCashflowDiagram(); }],
     ['fire-timeline-scroll', function () { renderFIREroadmap(); }], ['debt-bar-chart', function () { drawDebtHistogram(); }], ['debt-donut-chart', function () { drawDebtDonut(); }]];
   function heal(el, fn) {
     if (!el || !(el.offsetWidth > 0)) return;
@@ -24359,9 +24369,8 @@ function viCfRails(el){
 }
 function viSwipeInit(){
   viSwipeWrap(document.getElementById('stk-pies'));
-  viSwipeWrap(document.getElementById('cf-sankey'),'← swipe sideways to follow the flow →');
   viSwipeWrap(document.getElementById('bd-sankey'),'← swipe sideways to follow the flow →');
-  viCfRails(document.getElementById('cf-sankey'));viCfRails(document.getElementById('bd-sankey'));
+  viCfRails(document.getElementById('bd-sankey'));
 }
 window.addEventListener('load',function(){setTimeout(viSwipeInit,400);});
 function closePaywall(){
@@ -28861,6 +28870,7 @@ function nwhRenderMini(){
 @keyframes nw3d-sflashg{0%{box-shadow:0 0 0 0 rgba(62,207,142,0)}25%{box-shadow:0 0 44px 2px rgba(62,207,142,.5);border-color:var(--green)}100%{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){.nw3d-stage.flash,.nw3d-stage.flashg{animation:none}}
 #nw3d-hero-stage{height:clamp(300px,44vh,520px)}
+@media(min-width:769px){#nw3d-hero-stage{height:clamp(360px,52.8vh,624px)}}   /* v0.9.1 E23: 20% taller on desktop */
 #nw3d-trk-stage{height:clamp(280px,40vh,560px)}
 @media(max-width:600px){#nw3d-hero-stage{height:min(88vw,340px)}#nw3d-trk-stage{height:min(92vw,360px)}}
 .nw3d-seg{display:inline-flex;border:1px solid var(--line2);border-radius:999px;overflow:hidden;flex:none}
@@ -29594,7 +29604,7 @@ function make(cvId,readId){
   if(!window.ViNW3D||!ViNW3D.makeTreeMap||!el(cvId))return null;
   var read=el(readId);
   var e=ViNW3D.makeTreeMap(el(cvId),{fmt:function(v){return gbpFmt(v)},onPick:function(p){if(!read)return;
-    read.textContent=p?p.group+' · '+p.name+': '+gbpFmt(p.v)+' a month, '+Math.round(p.share*100)+'% of your income ('+p.blocks+' block'+(p.blocks===1?'':'s')+' of up to '+gbpFmt(p.unit)+')':readDefault()}});
+    read.textContent=p?p.group+' · '+p.name+': '+gbpFmt(p.v)+' a month, '+Math.round(p.share*100)+'% of your income ('+p.blocks+' block'+(p.blocks===1?'':'s')+' of up to '+gbpFmt(p.unit)+')':readDefault()+(readId==='bd3d-read'?' · Tap or hover a block to read it, drag to turn it':'')}});
   /* zoom out / in / reset on every viewport (owner, 3 Nov: "add a zoom out function on each of the viewports") */
   var stage=el(cvId).parentNode;
   stage.addEventListener('click',function(ev){var b=ev.target.closest('[data-z]');if(!b)return;if(b.dataset.z==='reset')e.reset();else e.zoom(b.dataset.z==='in'?1.25:.8)});
@@ -29606,7 +29616,7 @@ function sigOf(d){return JSON.stringify(d.groups.map(function(g){return [g.key,g
 function refresh(force){
   if(cur==='3d'&&ensure()){
     var d=data(),sg=sigOf(d);
-    var read=el('bd3d-read');if(read&&!read.dataset.hold)read.textContent=readDefault();
+    var read=el('bd3d-read');if(read&&!read.dataset.hold)read.textContent=readDefault()+' · Tap or hover a block to read it, drag to turn it';
     if(sg!==sig||force){sig=sg;eng.setData(d)}
   }
   if(!dash)dash=make('cf3d-cv','cf3d-read');
