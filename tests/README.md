@@ -83,3 +83,4 @@ node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow dia
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
 node tests/test_v091_overview_budget.js  # v0.9.1 E4/E23/E5/E6: Cash Flow tile 3D only, Net worth window +20%, Budget pills full width, Budget 3D viewport larger
 - `test_v091_cash_accounts.js`: v0.9.1 E15/E16, cash account interest rate (AER), add and take out with Undo, over-balance refused, old saves load, pence-exact.
+node tests/test_v091_3d_fit.js  # v0.9.1: Net worth plate and Budget tree map never touch the stage edges with real data, at 1100 to 1920 wide, through the idle camera swing
