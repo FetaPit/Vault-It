@@ -10,7 +10,7 @@ const seed = theme => () => {
 };
 (async () => {
   const b = await chromium.launch(); const errs = [];
-  for (const theme of ['dark', 'light']) for (const [w, h] of [[320, 700], [390, 800], [768, 900], [1100, 800], [1440, 900]]) {
+  for (const theme of ['dark', 'light']) for (const [w, h] of [[320, 700], [390, 800], [606, 900], [620, 900], [768, 900], [1100, 800], [1440, 900]]) {
     const t = theme + ' ' + w + 'x' + h + ': ';
     const ctx = await b.newContext({ viewport: { width: w, height: h } }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript('(' + seed().toString().replace('%T%', theme) + ')()');
@@ -29,7 +29,7 @@ const seed = theme => () => {
     const nh = await p.evaluate(() => document.getElementById('nw3d-hero-stage').getBoundingClientRect().height);
     const old = Math.min(520, Math.max(300, 0.44 * h)), nw = Math.min(624, Math.max(360, 0.528 * h));
     if (w >= 1100) ok(Math.abs(nh - nw) <= 2 && Math.abs(nh / old - 1.2) < 0.02, t + 'Net worth window is 1.2 times today\'s (' + Math.round(nh) + ' vs ' + Math.round(old) + ')');
-    else if (w >= 700) ok(w > 768 || Math.abs(nh - old) <= 2 || w === 768, t + 'Net worth window at tablet width (' + Math.round(nh) + ')');
+    else if (w > 600) ok(Math.abs(nh - old) <= 2, t + 'tablet Net worth window unchanged (' + Math.round(nh) + ' vs ' + Math.round(old) + ')');
     else ok(nh <= 340 + 1, t + 'phone Net worth window unchanged (' + Math.round(nh) + ')');
     ok(await noSide(), t + 'dashboard: no sideways scroll');
     // Budget
@@ -44,7 +44,7 @@ const seed = theme => () => {
       ok(lg.rows === (w >= 1400 ? 1 : 2), t + 'pills in ' + lg.rows + ' row(s)');
       ok(Math.abs(lg.left - lg.cardL) <= 2 && Math.abs(lg.right - lg.cardR) <= 2, t + 'pills span the card width (' + lg.left + '-' + lg.right + ' vs ' + lg.cardL + '-' + lg.cardR + ')');
       ok(lg.hh >= 40 && lg.fs >= 13 && lg.ic >= 22, t + 'pills 40 px high, 13 px label, 22 px icon (' + lg.hh + ', ' + lg.fs + ', ' + lg.ic + ')');
-    } else if (w >= 700) ok(lg.rows === 2 && lg.fs >= 12, t + 'tablet: three per row at 12 px (' + lg.rows + ' rows, ' + lg.fs + ')');
+    } else if (w >= 610) ok(lg.rows === 2 && lg.fs >= 12, t + 'tablet: three per row at 12 px (' + lg.rows + ' rows, ' + lg.fs + ')');
     else ok(lg.fs >= 10.5 && lg.hh <= 24, t + 'phone keeps the compact key (' + lg.fs + ' px, ' + lg.hh + ' high)');
     ok(await noSide(), t + 'budget: no sideways scroll');
     // E6: the paragraph is gone, the viewport larger
