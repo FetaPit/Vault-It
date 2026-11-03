@@ -20839,7 +20839,14 @@ async function stkFetchQuotes(symbols){
   }
   return null;
 }
+// A refresh asked for while another is running waits for it, then runs: a holding added in that window still gets its price
+// (it used to return at once and the new holding stayed valued at cost until the next automatic refresh).
 async function stkRefresh(silent){
+  if(window._stkBusy&&window._stkP){try{await window._stkP;}catch(e){}}
+  window._stkP=_stkRefreshRun(silent);
+  return window._stkP;
+}
+async function _stkRefreshRun(silent){
   stkEnsure();
   var targets=alState.stocks.filter(function(h){return !h.manualPrice;});
   var syms=[];targets.forEach(function(h){if(syms.indexOf(h.sym)<0)syms.push(h.sym);});
