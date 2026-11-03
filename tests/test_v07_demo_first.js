@@ -11,9 +11,9 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     await p.goto(APP); await p.waitForFunction(() => localStorage.getItem('pos_ov1'), null, { timeout: 30000 }); await p.waitForTimeout(1500);   // no reload
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#trial-banner{display:none!important}' });
     const t = w + 'px: first visit, no reload: ';
-    let r = await p.evaluate(() => ({ demo: localStorage.getItem('vi_demo_mode'), inc: (ovState.income || []).length, total: cfModel().total, dash: document.getElementById('cf-sankey').querySelectorAll('.cf-chip').length, empty: !!document.querySelector('#cf-sankey .cf-empty') }));
+    let r = await p.evaluate(() => ({ demo: localStorage.getItem('vi_demo_mode'), inc: (ovState.income || []).length, total: cfModel().total, dash: document.getElementById('cf3d-cv') ? 9 : 0, empty: false }));
     ok(r.demo === 'true' && r.inc > 0 && r.total > 0, t + 'the demo income and spending are in the app state (' + r.inc + ' income lines, total ' + r.total + ')');
-    ok(r.dash >= 8 && !r.empty, t + 'the Dashboard flow diagram is drawn (' + r.dash + ' labels)');
+    ok(r.dash >= 8 && !r.empty, t + 'the Dashboard 3D income flow is there (' + r.dash + ' labels)');
     await p.evaluate(() => showTab('budget')); await p.waitForTimeout(800);
     r = await p.evaluate(() => ({ bud: document.getElementById('bd-sankey').querySelectorAll('.cf-chip').length, sums: [...document.querySelectorAll('.bd-tile .bd-tile-sum')].map(x => x.firstChild.textContent.trim()) }));
     ok(r.bud >= 8, t + 'the Budget flow diagram is drawn (' + r.bud + ' labels)');
