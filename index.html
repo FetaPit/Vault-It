@@ -17590,22 +17590,22 @@ var CC_BRANDS=[
  {n:'M&S Bank',d:'marksandspencer.com',g:['#1a1a1a','#050505'],fg:'#fff',acc:'#3f9a67',re:/m\s*&\s*s|marks\s*(and|&)?\s*spencer/i},
  {n:'MBNA',d:'mbna.co.uk',g:['#1a5da8','#082b52'],fg:'#fff',re:/mbna/i},
  {n:'Axis Bank',d:'axisbank.com',g:['#a8185a','#5c0b2e'],fg:'#fff',re:/axis/i},
- {n:'Zopa',d:'zopa.com',g:['#1b2a4a','#0a1430'],fg:'#fff',acc:'#3cd3ad',re:/zopa/i},
+ {n:'Zopa',d:'zopa.com',g:['#1b2a4a','#0a1430'],fg:'#fff',acc:'#8f9bb3',re:/zopa/i},
  {n:'Novuna',d:'novuna.co.uk',g:['#24307a','#0d1440'],fg:'#fff',re:/novuna|hitachi\s*capital/i},
- {n:'Sainsbury\u2019s Bank',d:'sainsburysbank.co.uk',g:['#f06c00','#a84700'],fg:'#fff',re:/sainsbury/i},
+ {n:'Sainsbury\u2019s Bank',d:'sainsburysbank.co.uk',g:['#b85200','#7a3600'],fg:'#fff',re:/sainsbury/i},
  {n:'TSB',d:'tsb.co.uk',g:['#1c3f94','#0a1f52'],fg:'#fff',re:/\btsb\b/i},
- {n:'Co-op Bank',d:'co-operativebank.co.uk',g:['#00a0d6','#00527a'],fg:'#fff',re:/\bco-?op(erative)?\s*bank/i},
+ {n:'Co-op Bank',d:'co-operativebank.co.uk',g:['#0079a8','#00466a'],fg:'#fff',re:/\bco-?op(erative)?\s*bank/i},
  {n:'Metro Bank',d:'metrobankonline.co.uk',g:['#0033a0','#001a54'],fg:'#fff',acc:'#e4002b',re:/metro\s*bank/i},
  {n:'First Direct',d:'firstdirect.com',g:['#2b2b2b','#050505'],fg:'#fff',re:/first\s*direct/i},
  {n:'Revolut',d:'revolut.com',g:['#3a3d42','#0b0c0e'],fg:'#fff',re:/revolut/i},
  {n:'Chase',d:'chase.co.uk',g:['#117aca','#0b3d6b'],fg:'#fff',re:/\bchase\b/i},
  {n:'Student Loans Company',d:'gov.uk',g:['#1d70b8','#0b3c66'],fg:'#fff',re:/student\s*loans?\s*company|\bslc\b/i},
- {n:'Black Horse',d:'blackhorse.co.uk',g:['#1b1b1b','#050505'],fg:'#fff',acc:'#0b8a63',re:/black\s*horse/i},
+ {n:'Black Horse',d:'blackhorse.co.uk',g:['#1b1b1b','#050505'],fg:'#fff',acc:'#7a7a7a',re:/black\s*horse/i},
  {n:'Close Brothers',d:'closebrothers.com',g:['#0d2340','#050f1e'],fg:'#fff',re:/close\s*brothers/i},
  {n:'Visa',d:'visa.com',g:['#1a2f8f','#0b1650'],fg:'#fff',net:'visa',re:/\bvisa\b/i},
  {n:'Mastercard',d:'mastercard.com',g:['#2a2a33','#101014'],fg:'#fff',net:'mc',re:/master\s*card/i}
 ];
-var CC_GENERIC={n:'',g:['#1d3b46','#0b1b22'],fg:'#e8f0ef'};
+var CC_GENERIC={n:'',g:['#3a3f47','#16181c'],fg:'#eef0f3'};   // neutral slate: teal is net worth, green is assets
 var debtState={debts:[]};
 var BIZ_KEY='pos_biz1';
 var bizState={clients:[],streams:[],incomeStreams:[],leads:[]};
@@ -22511,7 +22511,7 @@ function cc3dHTML(d,pctNum,shown){
   var inner=(art?'':'<div class="cc3-sheen"></div>'+(b.acc?'<div class="cc3-acc" style="background:'+b.acc+'"></div>':''))
     +(art?'':'<div class="cc3-logo"><span>'+mono+'</span>'+logo+'</div>')
     +(art||!isCard?'':'<div class="cc3-chip"><i></i><i></i><i></i></div><svg class="cc3-nfc" viewBox="0 0 24 24" fill="none" stroke="'+fg+'" stroke-width="2" stroke-linecap="round"><path d="M8 6c3 3.5 3 8.500 0 12M12 4c4.500 5 4.500 11 0 16M16 2c6 6.500 6 13.500 0 20"/></svg>')
-    +(art?'':(isCard?'<div class="cc3-num">•••• •••• •••• '+last4+'</div>':'<div class="cc3-type">'+ccEsc(tlabel)+'</div>')+(isCard||String(d.name||'').trim().toLowerCase()!==tlabel.toLowerCase()?'<div class="cc3-name">'+shownName+'</div>':'')+(isCard?ccNetMark(net):''));
+    +(art?'':(isCard?'<div class="cc3-num">•••• •••• •••• '+last4+'</div>':'<div class="cc3-type">'+ccEsc(tlabel)+'</div>')+(isCard||String(d.name||'').toLowerCase().indexOf(tlabel.toLowerCase())===-1?'<div class="cc3-name">'+shownName+'</div>':'')+(isCard?ccNetMark(net):''));
   // the card is cut along its x axis: the paid share on the right is cut off and greyed, the unpaid share on the left stays full colour
   var P=Math.max(0,Math.min(100,shown));
   var f='<div class="cc3-face cc3-front">'

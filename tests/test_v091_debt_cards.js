@@ -87,6 +87,12 @@ const seed = (old) => {
       const canon = o => JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]));
       ok(canon(stored) === canon(OLD_LOAN), 'old saved loan loads untouched ' + JSON.stringify(stored));
       ok(await page.locator('.cc3[data-id="3"]').count() === 1 && await page.evaluate(() => /30% paid/.test(document.querySelector('#debt-list-el [data-did="3"]').textContent)), 'old car loan shows as a tile at 30% paid');
+      // Pedro's nits: no name line when it repeats the type; no teal or green on the generic tile
+      await page.evaluate(() => { debtState.debts.push({ id: 9, name: 'Sofa loan', original: 500, balance: 500, rate: 0, min: 20, type: 'other' }); renderDebtTab(); }); await page.waitForTimeout(300);
+      ok(await page.evaluate(() => { const c = document.querySelector('.cc3[data-id="9"]'); return c && !c.querySelector('.cc3-name') && /Loan/.test(c.querySelector('.cc3-type').textContent); }), 'name line hidden when it contains the type ("Sofa loan" / "Loan")');
+      ok(await page.evaluate(() => /#3a3f47/i.test(document.querySelector('.cc3[data-id="9"] .cc3-base').getAttribute('style'))), 'no-lender tile uses the neutral slate, not teal');
+      ok(await page.evaluate(() => CC_BRANDS.every(b => !b.acc || !/^#(3cd3ad|0b8a63)$/i.test(b.acc))), 'no lender accent in brand teal or green');
+      await page.evaluate(() => { debtState.debts = debtState.debts.filter(x => x.id !== 9); saveDebtState(); renderDebtTab(); });
       // 390 and 320: no sideways scroll
       for (const w of [390, 320]) { await page.setViewportSize({ width: w, height: 800 }); await page.waitForTimeout(300);
         const sx = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); ok(sx <= 0, w + ' px: no sideways scroll (' + sx + ')'); }
