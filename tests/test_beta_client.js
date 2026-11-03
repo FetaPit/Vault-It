@@ -1,7 +1,8 @@
 // Beta-readiness in the app: honest privacy/terms (and no false “end-to-end encrypted” claim), consent line on sign-in,
 // abuse-limit (429) messages that do NOT fall back to the built-in sender, “Download my data”, and “Delete my account”.
 const { chromium } = require('playwright');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');   // VI_INDEX points the test at another checkout
+const INDEX_PATH = process.env.VI_INDEX || '/home/user/Vault-It/index.html', REPO = require('path').dirname(INDEX_PATH);
+const INDEX = 'file://' + INDEX_PATH;   // VI_INDEX points the test at another checkout
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const SHOT = (() => { const d = require('os').tmpdir() + '/vaultit-shots/'; try { require('fs').mkdirSync(d, { recursive: true }); } catch (e) {} return d; })();
 const MOCK = `
@@ -58,7 +59,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
     'api.resend.com': /Resend/, 'query1.finance.yahoo.com': /Yahoo/, 'query2.finance.yahoo.com': /Yahoo/, 'api.meshy.ai': /Meshy/, 'api.openverse.org': /Openverse/, 'static.poly.pizza': /Poly Pizza/, 'poly.pizza': /Poly Pizza/, 'esm.sh': /Supabase/, 'challenges.cloudflare.com': /Turnstile/,
     'api.discogs.com': /Discogs/, 'www.discogs.com': /Discogs/, 'api.ebay.com': /eBay/, 'www.ebay.co.uk': /eBay/, 'api.reverb.com': /Reverb/, 'www.pricecharting.com': /PriceCharting/ };
   const NOT_USED_FOR_TESTERS = ['www.w3.org', 'creativecommons.org', 'vault-it.uk', 'vault-it.co', 'app.vault-it.co', 'wa.me', 'www.linkedin.com', 'instagram.com', 'ptlive.my.canva.site', 'shibariumscan.io', 'corsproxy.io', 'api.notion.com', 'api.convertkit.com', 'www.shibrpc.com', 'auth.truelayer.com'];   // links, or owner-only connections that do nothing without keys (the notice says so)
-  const found = hostsOf(fsx.readFileSync(process.env.VI_INDEX || '/home/user/Vault-It/index.html', 'utf8')).concat(...fsx.readdirSync('/home/user/Vault-It/supabase/functions').filter(d => fsx.existsSync('/home/user/Vault-It/supabase/functions/' + d + '/index.ts')).map(d => hostsOf(fsx.readFileSync('/home/user/Vault-It/supabase/functions/' + d + '/index.ts', 'utf8'))));
+  const found = hostsOf(fsx.readFileSync(INDEX_PATH, 'utf8')).concat(...fsx.readdirSync(REPO + '/supabase/functions').filter(d => fsx.existsSync(REPO + '/supabase/functions/' + d + '/index.ts')).map(d => hostsOf(fsx.readFileSync(REPO + '/supabase/functions/' + d + '/index.ts', 'utf8'))));
   const unlisted = [...new Set(found)].filter(h => !COVERED[h] && !NOT_USED_FOR_TESTERS.includes(h));
   ok(unlisted.length === 0, 'no outside host is missing from this check' + (unlisted.length ? ' — NEW: ' + unlisted.join(', ') + ' (add it to the privacy notice, then to COVERED)' : ''));
   const missing = Object.keys(COVERED).filter(h => !COVERED[h].test(lg)); ok(missing.length === 0, 'the privacy notice names every outside company in use' + (missing.length ? ' — missing: ' + missing.join(', ') : ''));
