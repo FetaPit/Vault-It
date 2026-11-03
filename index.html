@@ -11220,17 +11220,19 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .st-skip .wt-rimline{stroke:#e8a23c;stroke-dasharray:2 3}
 .wt-metal{stroke:#05080c;stroke-opacity:.5;stroke-width:1}
 .wt-tick{stroke:#0a0e12;stroke-width:.8;fill:none}
-.wt-mface{fill:#0b1015;stroke:var(--wt-l);stroke-width:1.6}
+.wt-mface{fill:#0b1015;stroke:var(--wt-l);stroke-width:2}
 .wt-mrim{fill:none;stroke:#fff;stroke-opacity:.35;stroke-width:.6}
-.wt-gloss{fill:none;stroke:#fff;stroke-opacity:.16;stroke-width:2.2;stroke-linecap:round}
+.wt-gloss{fill:none;stroke:#fff;stroke-opacity:.18;stroke-width:2.6;stroke-linecap:round}
+.wt-rivet{fill:#3a434c;stroke:#f4f6f8;stroke-opacity:.55;stroke-width:.5}
+.wt-mdots{fill:none;stroke:var(--wt-l);stroke-opacity:.45;stroke-width:1.1;stroke-dasharray:.1 2.6;stroke-linecap:round}
 .wt-icon g[fill-opacity]{fill-opacity:.32}
 .wt-icon g[opacity]{opacity:.95}
 .wt-mring{fill:none;stroke:var(--wt-l);stroke-opacity:.5;stroke-width:.6;stroke-dasharray:1.5 2}
-.wt-icon{color:var(--wt-l);--vi-sw:1.45;overflow:visible}
+.wt-icon{color:var(--wt-l);--vi-sw:1.35;overflow:visible}
 .st-lock .wt-icon,.st-skip .wt-icon{color:#7d868e}
 .wt-icf{fill:var(--wt-l);fill-opacity:.2}
 .wt-ics{fill:none;stroke:var(--wt-l);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
-.wt-num{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;fill:var(--wt-l)}
+.wt-num{font-family:'Syne',sans-serif;font-weight:800;font-size:34px;fill:var(--wt-l)}
 .wt-tl{font-family:'Share Tech Mono',monospace;font-size:16px;fill:#fff}
 .st-lock .wt-tl,.st-skip .wt-tl{fill:#7d868e}
 .wt-side{font-family:'Syne',sans-serif;font-weight:800;font-size:12.5px;letter-spacing:1px;fill:var(--wt-l)}
@@ -17807,9 +17809,10 @@ var WR_BADGE_IC={nw100:'vi-coin',nw500:'vi-coins',nw1k:'vi-cash',nw2k:'vi-piggy'
   gold:'vi-metals',stream1:'vi-rocket',fullfi:'vi-flame',ef1k:'vi-lifebuoy',coast:'vi-boat'};
 // the token card (Apex-style clipped card, owner's pick A, 3 Nov) in a 100 x 132 box, and its medallion dial
 var WR_CARD=[[0,0],[72,0],[100,28],[100,132],[14,132],[0,118]];
-var WR_DIAL=(function(){var d='';for(var a=0;a<360;a+=10){var r=a%30?26:28,x=Math.cos(a*Math.PI/180),y=Math.sin(a*Math.PI/180);d+='M'+(44+x*24).toFixed(1)+' '+(76+y*24).toFixed(1)+'L'+(44+x*r).toFixed(1)+' '+(76+y*r).toFixed(1);}return '<path class="wt-tick" d="'+d+'"/>';})();   // one path, so a rail of tokens stays light
+var WR_DIAL=(function(){var d='';for(var a=0;a<360;a+=10){var r=a%30?32.4:34.4,x=Math.cos(a*Math.PI/180),y=Math.sin(a*Math.PI/180);d+='M'+(46+x*30.2).toFixed(1)+' '+(74+y*30.2).toFixed(1)+'L'+(46+x*r).toFixed(1)+' '+(74+y*r).toFixed(1);}return '<path class="wt-tick" d="'+d+'"/>';})();   // one path, so a rail of tokens stays light
 var WR_CHIP={done:'<path class="wt-cg" d="M8.5 16.5l5 5L24 11"/>',wait:'<path class="wt-cg" d="M8.5 16.5l5 5L24 11"/>',
   skip:'<path class="wt-cg" d="M8 10l6 6-6 6M16 10l6 6-6 6"/>',lock:'<rect class="wt-cgf" x="10" y="15" width="12" height="9.5" rx="1.6"/><path class="wt-cg" d="M12.6 15v-2.6a3.4 3.4 0 0 1 6.8 0V15"/>'};
+var WR_RIVETS=(function(){var d='';[[46,37.6],[82.4,74],[46,110.4],[9.6,74]].forEach(function(p){d+='M'+(p[0]-1.5)+' '+p[1]+'a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0';});return '<path class="wt-rivet" d="'+d+'"/>';})();   // four rivets on the medal rim, one path
 var LVS=WR_LEVELS.map(function(l){return {n:l.name,xp:l.xp};});
 var BADGES=[
   {id:'nw100',    icon:'🌱', get name(){return 'First '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(100*(window.VI_CURRENCY_RATE||1)).toLocaleString();},       get desc(){return 'Net worth reaches '+(window.VI_CURRENCY_SYMBOL||'£')+Math.round(100*(window.VI_CURRENCY_RATE||1)).toLocaleString();},           xp:10},
@@ -23371,11 +23374,13 @@ function wrTok(o){
   if(!dim)out+='<polygon points="0,0 60,0 0,60" fill="url(#wts-'+t+')"/><polygon points="100,78 100,132 38,132" fill="url(#wth-'+t+')"/>';
   else out+='<rect width="100" height="132" fill="url(#'+(st==='skip'?'wt-hatch':'wth-lock')+')"/>';
   out+='</g><polygon class="wt-rimline" points="'+K+'"/>';
-  out+='<circle cx="44" cy="76" r="31" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/><circle class="wt-mrim" cx="44" cy="76" r="29.4"/>'+WR_DIAL+'<circle class="wt-mface" cx="44" cy="76" r="23"/><circle class="wt-mring" cx="44" cy="76" r="20.6"/>'
-    +'<path class="wt-gloss" d="M26.5 70a18 18 0 0 1 24-14.5"/>';
-  if(o.num!=null)out+='<text class="wt-num" x="44" y="86" text-anchor="middle">'+o.num+'</text>';
-  else out+=wrIcon(L?'vi-lock':o.ic,27,59,34);
-  if(n>0){var bw=2.6,gp=n>4?1.8:2.6,x0=44-(n*bw+(n-1)*gp)/2;for(k=0;k<n;k++)out+='<rect class="fire-stud wt-bar'+(k<lit?' on':'')+'" x="'+(x0+k*(bw+gp)).toFixed(1)+'" y="118" width="'+bw+'" height="8"/>';}
+  // the medal (round 4): a metal rim with four rivets, a deep tick dial, a tier-edged face, an engraved ring and a glass highlight
+  out+='<circle cx="46" cy="74" r="37.5" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/><circle class="wt-mrim" cx="46" cy="74" r="35.8"/>'+WR_DIAL+WR_RIVETS
+    +'<circle class="wt-mface" cx="46" cy="74" r="29"/><circle class="wt-mring" cx="46" cy="74" r="26.4"/><circle class="wt-mdots" cx="46" cy="74" r="27.7"/>'
+    +'<path class="wt-gloss" d="M22.5 66a24 24 0 0 1 32-18.5"/>';
+  if(o.num!=null)out+='<text class="wt-num" x="46" y="86.5" text-anchor="middle">'+o.num+'</text>';
+  else out+=wrIcon(L?'vi-lock':o.ic,24,52,44);
+  if(n>0){var bw=2.6,gp=n>4?1.8:2.6,x0=46-(n*bw+(n-1)*gp)/2;for(k=0;k<n;k++)out+='<rect class="fire-stud wt-bar'+(k<lit?' on':'')+'" x="'+(x0+k*(bw+gp)).toFixed(1)+'" y="118" width="'+bw+'" height="8"/>';}
   if(o.tl!=null&&16*sc>=10.5)out+='<text class="wt-tl" x="6" y="18">'+o.tl+'</text>';   // text only where it renders at 10.5 px or more (Pedro, round 2)
   if(o.name&&12.5*sc>=10.5){var nm=String(o.name).toUpperCase();out+='<text class="wt-side" transform="translate(94 102) rotate(-90)"'+(nm.length>9?' textLength="80" lengthAdjust="spacingAndGlyphs"':'')+'>'+nm+'</text>';}
   if(st==='next')out+='<polygon class="wt-halo" points="'+wrPts(WR_CARD,-6,-7,1.12)+'"/>';
