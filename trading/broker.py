@@ -26,6 +26,7 @@ class _OrderState:
     status: OrderStatus = OrderStatus.PENDING
     filled_qty: float = 0.0
     n_fills: int = 0
+    risk_used: float = 0.0
 
 
 class PaperBroker:
@@ -88,6 +89,22 @@ class PaperBroker:
 
     def equity_gbp(self, marks: Mapping[str, float]) -> float:
         return self._cash + self.unrealised_gbp(marks)
+
+    def pending_risk_gbp(self, sleeve: Sleeve | None = None) -> float:
+        """Risk still reserved by live (unfilled remainder of) orders."""
+        return sum(st.risk_gbp * (st.order.quantity - st.filled_qty) / st.order.quantity
+                   for st in self._orders.values()
+                   if self._is_live(st) and (sleeve is None or st.order.sleeve == sleeve))
+
+    def pending_notional_gbp(self, sleeve: Sleeve | None = None) -> float:
+        """Notional still reserved by live (unfilled remainder of) orders."""
+        total = 0.0
+        for st in self._orders.values():
+            o = st.order
+            if self._is_live(st) and (sleeve is None or o.sleeve == sleeve):
+                inst, fxr = self._spec(o.symbol)
+                total += (o.quantity - st.filled_qty) * o.entry_price * inst.multiplier * fxr
+        return total
 
     def open_notional_gbp(self, sleeve: Sleeve | None = None) -> float:
         total = 0.0
@@ -172,10 +189,22 @@ class PaperBroker:
             remaining = o.quantity - st.filled_qty
             cap = remaining if bar.volume <= 0 else floor_to_step(
                 bar.volume * self._cfg.execution.participation_rate, inst_cfg.size_step)
-            fill_qty = min(remaining, cap)
+            # Re-check planned risk at the actual fill price (entry drift must not exceed the budget).
+            c = 2 * (hs + slip)
+            d_plan = abs(o.entry_price - o.stop_price)
+            d_act = max(0.0, abs(fill_px - o.stop_price) - (hs + slip))
+            numerator = o.quantity * (d_plan + c) - st.risk_used
+            max_by_risk = floor_to_step(numerator / (d_act + c), inst_cfg.size_step) if numerator > 0 else 0.0
+            if max_by_risk < min(remaining, inst_cfg.min_size) - EPS:
+                self._set_status(st, OrderStatus.CANCELLED)
+                continue
+            fill_qty = min(remaining, cap, max_by_risk)
             if fill_qty < min(remaining, inst_cfg.min_size) - EPS or fill_qty <= 0:
                 continue
             fills.append(self._apply_entry(st, bar, fill_px, fill_qty))
+            st.risk_used += fill_qty * (d_act + c)
+            if fill_qty < remaining - EPS and max_by_risk < min(remaining, cap) - EPS:
+                self._set_status(st, OrderStatus.CANCELLED)
 
         # 3. exits
         for pos in [p for p in self._positions.values() if p.symbol == bar.symbol]:

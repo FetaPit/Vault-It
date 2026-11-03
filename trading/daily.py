@@ -11,7 +11,7 @@ from trading.errors import JournalError
 from trading.fees import fill_costs, market_fill_price
 from trading.fx import FxConverter
 from trading.journal import TradeJournal
-from trading.models import AccountState, RiskDecision
+from trading.models import AccountState, RiskDecision, Sleeve
 from trading.risk import RiskEngine
 from trading.sleeve_b.manager import SleeveBManager, SleeveBReport
 from trading.sleeve_b.portfolio import DividendPortfolio
@@ -83,7 +83,9 @@ def run_daily_close(ctx: DailyContext, d: date, now: datetime, prices_gbp: Mappi
             day_start_equity_gbp=day_start_equity_gbp, peak_equity_gbp=peak_equity_gbp,
             trades_today=trades_today, open_positions=broker.open_positions(),
             sleeve_equity_gbp=pf.equity(prices_gbp), sleeve_open_notional_gbp=pf.market_value(prices_gbp),
-            sleeve_cash_gbp=pf.cash_gbp)
+            sleeve_cash_gbp=pf.cash_gbp,
+            pending_risk_gbp=broker.pending_risk_gbp(Sleeve.A),
+            pending_notional_gbp=broker.pending_notional_gbp(Sleeve.A))
         decision = ctx.risk.evaluate(sig, acct, now, None)
         j.record_decision(decision, now, cfg.version)
         decisions.append(decision)

@@ -89,7 +89,7 @@ Phase 2 (sizing) returns the first failure as a single reason:
 - `quantity = min(qty_by_risk, qty_by_notional, max_size)`; if below `min_size`: `SIZE_BELOW_MINIMUM`
 - `risk_gbp = quantity*risk_per_unit + fixed` (never above the budget)
 
-Gap fills can exceed the planned risk. That is modelled, tested and counted toward the daily cap.
+Entry drift is capped at fill time: each entry fill is re-checked against the planned risk budget (`quantity*(|entry-stop|+costs)`) at the actual fill price, so a fill away from the signal price is reduced and the order remainder cancelled. Only gaps through the stop can exceed the budget. That is modelled, tested and counted toward the daily cap.
 
 ## 4. Kill switch
 

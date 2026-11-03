@@ -85,7 +85,9 @@ class Backtester:
         return AccountState(
             fund_equity_gbp=self._fund_equity(), day_start_equity_gbp=day_start, peak_equity_gbp=self._peak,
             trades_today=trades_today, open_positions=b.open_positions(), sleeve_equity_gbp=eq,
-            sleeve_open_notional_gbp=b.open_notional_gbp(Sleeve.A), sleeve_cash_gbp=b.cash_gbp)
+            sleeve_open_notional_gbp=b.open_notional_gbp(Sleeve.A), sleeve_cash_gbp=b.cash_gbp,
+            pending_risk_gbp=b.pending_risk_gbp(Sleeve.A),
+            pending_notional_gbp=b.pending_notional_gbp(Sleeve.A))
 
     def run_day(self, d: date) -> None:
         cfg, b, j = self._cfg, self._broker, self._journal

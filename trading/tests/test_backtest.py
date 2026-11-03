@@ -60,6 +60,24 @@ class TestBacktest(unittest.TestCase):
         r = bt(BT1, start=utc(2027, 3, 15, 13, 30)).run(date(2027, 3, 15), date(2027, 3, 15))
         self.assertEqual(len(r.trades), 1)
 
+    def test_two_symbols_same_bar_respect_daily_cap(self) -> None:
+        cfg = make_cfg({"sleeve_a": {"symbols": ["TEST", "TESTC"]}})
+        rows = bars_for(START, BT1) + bars_for(START, BT1, sym="TESTC")
+        j = TradeJournal(":memory:")
+        bk = Backtester(cfg, InMemoryMarketData(rows), OpeningRangeBreakout(cfg.sleeve_a), journal=j)
+        decisions: list = []
+        orig = bk._risk.evaluate
+
+        def spy(*a, **k):
+            d = orig(*a, **k)
+            decisions.append(d)
+            return d
+        bk._risk.evaluate = spy  # type: ignore[method-assign]
+        bk.run(D, D)
+        self.assertEqual(len(decisions), 2)
+        self.assertLessEqual(sum(d.risk_gbp for d in decisions if d.approved), 18.75 + 1e-9)
+        j.close()
+
     def test_weekend_skipped(self) -> None:
         r = bt(BT1).run(date(2027, 1, 16), date(2027, 1, 17))
         self.assertEqual(len(r.trades), 0)

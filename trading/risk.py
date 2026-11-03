@@ -168,7 +168,8 @@ class RiskEngine:
 
         per_trade_budget = account.fund_equity_gbp * cfg.risk.max_risk_per_trade_pct
         open_risk = sum(pos.initial_risk_gbp for pos in account.open_positions)
-        remaining = self.daily_cap_gbp(account) - self.daily_loss_gbp(account) - open_risk
+        remaining = (self.daily_cap_gbp(account) - self.daily_loss_gbp(account) - open_risk
+                     - account.pending_risk_gbp)
         budget = min(per_trade_budget, remaining)
         if budget <= EPS:
             return fail(DAILY_LOSS_BUDGET_EXHAUSTED, budget)
@@ -188,7 +189,8 @@ class RiskEngine:
             max_notional = account.sleeve_cash_gbp
         else:
             lev = 1.0 if cfg.risk.leverage_mode == "cash_only" else cfg.risk.max_leverage
-            max_notional = account.sleeve_equity_gbp * lev - account.sleeve_open_notional_gbp
+            max_notional = (account.sleeve_equity_gbp * lev - account.sleeve_open_notional_gbp
+                            - account.pending_notional_gbp)
         fixed_buy = p.min_commission_gbp + p.commission_per_order_gbp
         unit_buy = ((E + p.half_spread + p.slippage) * m * fxr
                     * (1 + (inst.stamp_duty_rate if is_long_share else 0.0) + p.commission_pct

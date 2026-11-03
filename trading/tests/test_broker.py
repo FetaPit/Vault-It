@@ -98,10 +98,18 @@ class TestBroker(BrokerBase):
         self.assertAlmostEqual(self.b.open_positions()[0].initial_risk_gbp, 10.0, places=6)
         self.assertEqual(self.b.order_status("o1"), OrderStatus.PARTIALLY_FILLED)
         f2 = self.b.on_bar(self.bar(1, 101, 102, 100, 101.5, v=20))
-        self.assertAlmostEqual(f2[0].quantity, 1.75, places=6)
-        self.assertFalse(f2[0].is_partial)
-        self.assertAlmostEqual(self.b.open_positions()[0].entry_price, 100.466667, places=5)
-        self.assertEqual(self.b.order_status("o1"), OrderStatus.FILLED)
+        # FIX-002: remaining risk budget (8.75) / 6 per unit at 101 -> 1.45, order then cancelled
+        self.assertAlmostEqual(f2[0].quantity, 1.45, places=6)
+        self.assertTrue(f2[0].is_partial)
+        self.assertAlmostEqual(self.b.open_positions()[0].entry_price, (200 + 146.45) / 3.45, places=5)
+        self.assertEqual(self.b.order_status("o1"), OrderStatus.CANCELLED)
+
+    def test_entry_drift_capped_by_risk(self) -> None:
+        self.submit(order(target=None))
+        f = self.b.on_bar(self.bar(0, 105, 106, 104, 105))
+        self.assertAlmostEqual(f[0].quantity, 1.87, places=6)
+        self.assertEqual(self.b.order_status("o1"), OrderStatus.CANCELLED)
+        self.assertAlmostEqual(self.b.open_positions()[0].quantity, 1.87, places=6)
 
     def test_zero_volume_full_fill(self) -> None:
         self.submit(order())
