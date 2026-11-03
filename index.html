@@ -29303,9 +29303,15 @@ function niceUnit(mx,cap){var u=1000,s=[1,2,5],k=0;cap=cap||14;while(Math.floor(
 function split(v,U){var b=Math.floor(v/U+1e-9),r=(v-b*U)/(U/10),s=Math.floor(r+1e-9);if(s>9)s=9;return {b:b,s:s,f:clamp(r-s,0,1)}}
 /* camera distance that fits a set of boxes [x0,x1,y0,y1,z0,z1] on the canvas: project them once at a trial distance and scale (projection goes as 1/distance) */
 function fitDist(st,cw,ch,boxes,yaw,ty,mx,my){
-  var t={yaw:yaw,pitch:st.pitch,dist:400,zoom:1,ty:ty,fit:st.fit},P=new Proj(t,{x:0,y:0,w:cw,h:ch}),ex=1,ey=1;
-  boxes.forEach(function(b){[b[0],b[1]].forEach(function(x){[b[2],b[3]].forEach(function(y){[b[4],b[5]].forEach(function(z){var q=P.pt(x,y,z);ex=Math.max(ex,Math.abs(q[0]-cw/2));ey=Math.max(ey,Math.abs(q[1]-ch/2))})})})});
-  return Math.max(50,400*Math.max(ex/(cw/2*mx),ey/(ch/2*my)));
+  /* v0.9.1 (Chief of Staff, 3 Nov: the plate was cropped at the bottom at 1440): perspective is not linear in distance, so one measurement at 400 left the
+     near corners outside the stage. Measure, move the camera, and measure again until the whole box sits inside the margins. */
+  var t={yaw:yaw,pitch:st.pitch,dist:400,zoom:st.z0||1,ty:ty,fit:st.fit},d=400;   /* the scene's starting zoom (z0: 1.15 to 1.2), which the old fit left out, so they were drawn that much too big; the user's own zoom stays on top of it */
+  for(var it=0;it<6;it++){
+    t.dist=d;var P=new Proj(t,{x:0,y:0,w:cw,h:ch}),ex=1,ey=1;
+    boxes.forEach(function(b){[b[0],b[1]].forEach(function(x){[b[2],b[3]].forEach(function(y){[b[4],b[5]].forEach(function(z){var q=P.pt(x,y,z);ex=Math.max(ex,Math.abs(q[0]-cw/2));ey=Math.max(ey,Math.abs(q[1]-ch/2))})})})});
+    var r=Math.max(ex/(cw/2*mx),ey/(ch/2*my));d=Math.max(50,d*r);if(Math.abs(r-1)<.01)break;
+  }
+  return d;
 }
 function faces(x0,x1,y0,y1,z0,z1){return [[[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1],[0,1,0]],[[x0,y0,z0],[x1,y0,z0],[x1,y0,z1],[x0,y0,z1],[0,-1,0]],[[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1],[0,0,1]],[[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[0,0,-1]],[[x1,y0,z0],[x1,y0,z1],[x1,y1,z1],[x1,y1,z0],[1,0,0]],[[x0,y0,z0],[x0,y0,z1],[x0,y1,z1],[x0,y1,z0],[-1,0,0]]]}
 /* one box, back faces culled, lit from the brand light, fill and edge on the pulse */
@@ -29370,7 +29376,7 @@ function tag(c,cw,l1,l2,red,anchor){
  * New blocks drop 18 units over 700 ms with a 1000 ms gold flash; removed ones rise 16 units over 900 ms, turn gold and fade. */
 function makeNW(cv,o){
   o=o||{};
-  var st={yaw:-.55,pitch:.46,dist:125,zoom:1.2,ty:2,fit:.9},self={st:st},idle=-9999,boxes=[],uid=0,cols=[],byKey={},X={},Z={},LZ={},U=1000,first=true,pendingOpen=false,narrow=null;
+  var st={yaw:-.55,pitch:.46,dist:125,zoom:1.2,z0:1.2,ty:2,fit:.9},self={st:st},idle=-9999,boxes=[],uid=0,cols=[],byKey={},X={},Z={},LZ={},U=1000,first=true,pendingOpen=false,narrow=null;
   var net=0,debt=0,hover=null,tD=125,tTy=2,SP=15,BH=3.2,SM=3.1,fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},PL=.5,box={x:40,z0:-17,z1:17};
   function spawn(k,s,i,born,off){boxes.push({id:uid++,k:k,s:s,i:i,born:born,off:off||0,leave:0,merge:false})}
   /* colour of the piece whose value runs from v0 for len: the segment holding its middle */
@@ -29438,7 +29444,7 @@ function makeNW(cv,o){
     if(!rm&&!ob.isDrag()&&ts-idle>2500)st.yaw=-.55+Math.sin(ts/4200)*.35;
     st.fit=cw<520?1.1:.9;var hx=box.x+2,fb=[[-hx,hx,0,0,box.z0,box.z1]];
     cols.forEach(function(cc){var q=byKey[cc.key],h=q.b*BH+SM,x=X[cc.key],z=Z[cc.key];fb.push(cc.dir>0?[x-5,x+5,0,h,z-5,z+5]:[x-5,x+5,-h,0,z-5,z+5],[x-4,x+4,0,0,LZ[cc.key]-2,LZ[cc.key]+6])});
-    tD=fitDist(st,cw,ch,fb,-.55,tTy,.92,.8);
+    tD=Math.max(fitDist(st,cw,ch,fb,-.9,tTy,.92,.92),fitDist(st,cw,ch,fb,-.55,tTy,.92,.92),fitDist(st,cw,ch,fb,-.2,tTy,.92,.92));   /* the idle camera swings -.55 +/- .35: the plate must stay inside at both ends */
     var k=rm||self._snap?1:Math.min(1,dt*3);self._snap=false;st.dist+=(tD-st.dist)*k;st.ty+=(tTy-st.ty)*k;
     PL=rm?.5:.5+.5*Math.sin(ts*0.002244);
     var P=new Proj(st,{x:0,y:0,w:cw,h:ch});self._P=P;
@@ -29575,7 +29581,7 @@ function makeTracker(cv,o){
  * taking their group's colour as they land. Reduced motion shows the finished map. */
 function makeTreeMap(cv,o){
   o=o||{};
-  var st={yaw:-.5,pitch:.98,dist:125,zoom:1.15,ty:1,fit:.9},self={st:st},idle=-9999,cells=[],groups=[],rects=[],raw=[],total=0,hover=null,first=true,pending=false,PL=.5,
+  var st={yaw:-.5,pitch:.98,dist:125,zoom:1.15,z0:1.15,ty:1,fit:.9},self={st:st},idle=-9999,cells=[],groups=[],rects=[],raw=[],total=0,hover=null,first=true,pending=false,PL=.5,
     fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},U=100,BS=3.3,GG=.035,LG=.02,CH=.85,ext={x:10,z:10},plate={W:20,D:20},pile={x0:0,x1:0},
     T_IN=NW_D.pileMs,T_GO=NW_D.goMs,SPREAD=NW_D.spread,t0=0,sx=0;
   function unitFor(t){var u=100,steps=[100,200,500,1000,2000,5000,10000],k=0;while(t/u>360&&k<steps.length-1){k++;u=steps[k]}return u}
@@ -29647,7 +29653,7 @@ function makeTreeMap(cv,o){
     st.fit=narrow?1.05:.92;if(narrow&&!self._pitchSet&&!ob.engaged()){st.pitch=1.12;self._pitchSet=true}
     /* while the income arrives the camera frames the pile and the map together, then settles on the map */
     var intro=t0>=0&&ts-t0<lastEnd()+600,x0=intro?pile.x0-1:-ext.x-2,cxm=(x0+ext.x+2)/2;
-    var SC=2.4,fb=[[(x0-cxm)*SC,(ext.x+1-cxm)*SC,0,(CH+1)*SC,(-ext.z-1)*SC,(ext.z+1)*SC]],tD=fitDist(st,cw,ch,fb,Y0,1,narrow?.92:.95,narrow?.8:.8);   /* SC: the map is drawn 2.4x larger, so the camera can come close enough */
+    var SC=2.4,fb=[[(x0-cxm)*SC,(ext.x+1-cxm)*SC,0,(CH+1)*SC,(-ext.z-1)*SC,(ext.z+1)*SC]],tD=Math.max.apply(null,[-1,0,1].map(function(m){return fitDist(st,cw,ch,fb,Y0+m*(narrow?.1:.22),1,narrow?.92:.95,narrow?.8:.8)}));   /* the idle camera swings Y0 +/- .22 (.1 narrow): the map stays inside at both ends */   /* SC: the map is drawn 2.4x larger, so the camera can come close enough */
     var k=rm||self._snapD?1:Math.min(1,dt*2.2);if(!self._d0){st.dist=tD;self._d0=true}self._snapD=false;st.dist+=(tD-st.dist)*k;
     sx+=(cxm-sx)*k;
     PL=rm?.5:.5+.5*Math.sin(ts*0.002244);
