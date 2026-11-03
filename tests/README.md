@@ -83,3 +83,4 @@ node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow dia
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
 node tests/test_v091_stocks_return.js # v0.9.1 E17: Stocks tiles judged from when a holding was added (entry price kept in addPx, avgCost never rewritten), "Check your average cost" nudge, tiles reconcile
 node tests/test_v091_stocks_map.js # v0.9.1 E19, E20: Stocks tree map is taller, no label clipped or under 10.5px, tiny holdings merge into "Other (n)" with a list, fund names not codes, logos in rows and tiles with initials fallback
+- `test_v091_cash_accounts.js`: v0.9.1 E15/E16, cash account interest rate (AER), add and take out with Undo, over-balance refused, old saves load, pence-exact.
