@@ -103,6 +103,8 @@ class TestBroker(BrokerBase):
         self.assertTrue(f2[0].is_partial)
         self.assertAlmostEqual(self.b.open_positions()[0].entry_price, (200 + 146.45) / 3.45, places=5)
         self.assertEqual(self.b.order_status("o1"), OrderStatus.CANCELLED)
+        # FIX-101: real risk of the two fills = 2*5 + 1.45*6 = 18.70, not a pro-rata share
+        self.assertAlmostEqual(self.b.open_positions()[0].initial_risk_gbp, 18.70, places=6)
 
     def test_entry_drift_capped_by_risk(self) -> None:
         self.submit(order(target=None))
@@ -110,6 +112,25 @@ class TestBroker(BrokerBase):
         self.assertAlmostEqual(f[0].quantity, 1.87, places=6)
         self.assertEqual(self.b.order_status("o1"), OrderStatus.CANCELLED)
         self.assertAlmostEqual(self.b.open_positions()[0].quantity, 1.87, places=6)
+        self.assertAlmostEqual(self.b.open_positions()[0].initial_risk_gbp, 18.70, places=6)
+
+    def test_drift_fill_leaves_no_budget_for_second_signal(self) -> None:
+        from helpers import make_account, make_signal
+        from dataclasses import replace as rep
+        from trading.killswitch import KillSwitch
+        from trading.risk import RiskEngine
+        self.submit(order(target=None))
+        self.b.on_bar(self.bar(0, 105, 106, 104, 105))
+        self.assertEqual(self.b.order_status("o1"), OrderStatus.CANCELLED)
+        acct = rep(make_account(positions=self.b.open_positions()),
+                   pending_risk_gbp=self.b.pending_risk_gbp(Sleeve.A))
+        eng = RiskEngine(self.cfg, KillSwitch(None), self.fx)
+        from datetime import date
+        from trading.session import session_window
+        window = session_window(date(2027, 1, 12), self.cfg.session)
+        d = eng.evaluate(make_signal(symbol="TESTC", signal_id="sig-2"), acct, utc(2027, 1, 12, 15, 0), window)
+        self.assertFalse(d.approved)
+        self.assertIn("DAILY_LOSS_BUDGET_EXHAUSTED", d.reasons)
 
     def test_zero_volume_full_fill(self) -> None:
         self.submit(order())
