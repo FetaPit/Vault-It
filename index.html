@@ -10717,6 +10717,9 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .stk-inp:focus{outline:none;border-color:var(--em)}
 .stk-val{font-family:'Share Tech Mono',monospace;font-size:max(.62rem,var(--vi-fs-2));color:var(--tx);text-align:right}
 .stk-pl{font-family:'Share Tech Mono',monospace;font-size:max(.56rem,var(--vi-fs-2));text-align:right}
+.stk-chk{font:inherit;font-family:'DM Sans',sans-serif;font-size:max(.56rem,var(--vi-fs-2));line-height:1.25;color:var(--gold);background:rgb(var(--gold-rgb) / .1);border:1px solid rgb(var(--gold-rgb) / .5);border-radius:4px;padding:3px 6px;cursor:pointer;text-align:right;white-space:normal}
+.stk-pl:has(.stk-chk){grid-column:1/-1;text-align:left!important;grid-area:auto}.stk-chk{white-space:nowrap!important}
+.stk-chk:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .stk-src{font-size:max(.4rem,var(--vi-fs-1));color:var(--t3);margin-top:2px;font-family:'Share Tech Mono',monospace}
 .stk-add{display:grid;grid-template-columns:2fr .7fr .8fr 1fr auto;gap:8px;margin-top:12px}
 @media(max-width:700px){.stk-add{grid-template-columns:1fr 1fr}.stk-add>div:first-child{grid-column:1/-1}}
@@ -10738,14 +10741,33 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .stk-grp{border:1px solid rgb(var(--ink-rgb) / .08);border-radius:10px;margin:8px 0;overflow:hidden}
 .stk-gh{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:rgb(var(--ink-rgb) / .03);border:0;color:var(--tx);cursor:pointer;text-align:left;font:600 max(.66rem,var(--vi-fs-2)) 'DM Sans',sans-serif}
 .stk-gh:hover{background:rgb(var(--teal-rgb) / .08)}.stk-gh:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+.stk-gh .stk-plat{position:static;flex-shrink:0}   /* it was positioned against the page and pushed it sideways */
 .stk-chev{width:16px;height:16px;flex:none;transition:transform .2s;transform:rotate(-90deg);color:var(--teal)}.stk-grp.open .stk-chev{transform:none}
 .stk-gn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Syne',sans-serif;font-weight:700}
 .stk-gc{font:max(.5rem,var(--vi-fs-1)) 'Share Tech Mono',monospace;color:var(--t3);white-space:nowrap}
-.stk-gv{font:700 max(.66rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--tx);white-space:nowrap;text-align:right}.stk-gv small{color:var(--t3);font-weight:400}
+.stk-gv{font:700 max(.66rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--tx);white-space:nowrap;text-align:right}.stk-gv small{color:var(--t3);font-weight:400;font-size:max(10.5px,.9em)}
 .stk-gb{overflow-x:auto;padding:0 12px}
 @media(prefers-reduced-motion:reduce){.stk-chev{transition:none}}
 .stk-tm{margin:6px 0 2px}.stk-tm-pie{position:absolute;border:1.5px solid;border-radius:9px;pointer-events:none;opacity:.9}
-.stk-tm-c .dtm-n,.stk-tm-c .dtm-v,.stk-tm-c .dtm-s{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.stk-tm-c .dtm-n,.stk-tm-c .dtm-v,.stk-tm-c .dtm-s{color:inherit;text-shadow:none;opacity:1}
+.stk-tm-c.dtm-cell::after{background:none}
+.c-tk{display:flex;gap:8px;align-items:flex-start;min-width:0}.stk-tkb{min-width:0;flex:1}
+.stk-hl{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:7px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
+.stk-hl img{width:100%;height:100%;object-fit:contain;display:block;padding:2px;box-sizing:border-box}
+.stk-hl .stk-mono{font-size:max(10.5px,var(--vi-fs-1))}.stk-hl-fb{align-items:center;justify-content:center}
+.stk-fundb{display:flex;align-items:center;justify-content:center;width:100%;height:100%}.stk-fundb svg{width:70%;height:70%}
+.stk-tm-c{padding:6px 8px;gap:2px;--tm-fs:12px}
+.stk-tm-c .dtm-hd{display:flex;align-items:flex-start;gap:6px;min-width:0}
+.stk-tm-c .dtm-n{font-size:var(--tm-fs);line-height:1.2;white-space:nowrap;overflow:visible;text-overflow:clip}
+.stk-tm-c .dtm-v{font-size:calc(var(--tm-fs) + .5px);line-height:1.3}
+.stk-tm-c .dtm-s{font-size:var(--tm-fs);margin-top:auto}
+.stk-tm-c .stk-hl{border-radius:5px}
+.dtm-other{cursor:pointer}.dtm-other:focus-visible{outline:2px solid var(--em);outline-offset:-2px}
+.stk-tm .dtm-tip{white-space:normal;max-width:min(280px,calc(100% - 4px))}
+.stk-tm-other{margin:8px 0 2px;font:max(11px,var(--vi-fs-1)) 'DM Sans',sans-serif;color:var(--t2)}.stk-tm-other:empty{display:none}
+.stk-tm-other>b{color:var(--tx);font-weight:700}
+.stk-tm-ol{display:flex;gap:6px;align-items:baseline;margin-top:4px;overflow-wrap:anywhere}.stk-tm-ol i{width:10px;height:10px;border-radius:3px;flex-shrink:0;position:relative;top:1px}.stk-tm-ol em{font:normal 11px 'Share Tech Mono',monospace;color:var(--tx)}
+@media(prefers-reduced-motion:reduce){.stk-tm-c{transition:none}.stk-tm-c:hover{transform:none}}
 .stk-tm-key{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 8px;font:max(.52rem,var(--vi-fs-1)) 'DM Sans',sans-serif;color:var(--t2)}
 .stk-tm-k i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}.stk-tm-k b{font-family:'Share Tech Mono',monospace;color:var(--tx);font-weight:400}
 .stk-bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:max(.52rem,var(--vi-fs-1))}
@@ -12962,7 +12984,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
             <div style="position:relative"><input type="text" id="stk-sym" class="al-inp" style="width:100%" placeholder="Search a fund, ETF or share by name, ticker or ISIN" autocomplete="off" oninput="stkSuggest(this.value)" onkeydown="if(event.key==='Enter')stkAdd()"><div id="stk-suggest" class="stk-suggest"></div></div>
             <input type="number" id="stk-units" class="al-inp" placeholder="Units" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
             <input type="number" id="stk-amt" class="al-inp" placeholder="…or £ held" min="0" step="any" title="Don't know the units? Enter the £ value you hold and the units are worked out from the live price" onkeydown="if(event.key==='Enter')stkAdd()">
-            <input type="number" id="stk-cost" class="al-inp" placeholder="Avg cost £ (optional)" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
+            <input type="number" id="stk-cost" class="al-inp" placeholder="Cost per unit £" title="What you paid for one unit, in £. Leave empty and the price when you add it is used" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
             <button class="btn-add-data" onclick="stkAdd()">+ Add holding</button>
           </div>
           <div class="stk-note">UK-listed funds &amp; ETFs end in <b>.L</b> (VUSA.L, VWRL.L). US shares are plain (AAPL, MSFT). Or just <b>search by name or ISIN</b> and pick the fund. Prices convert to £ automatically. Edit units, cost or price any time. Everything here counts towards your net worth.</div>
@@ -20527,8 +20549,44 @@ function stkEnsure(){
 }
 function stkEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 // Holdings with no live price fall back to cost so net worth never silently drops to £0.
-function stkPrice(h){return (+h.price>0)?+h.price:((+h.avgCost>0)?+h.avgCost:0);}
+function stkPrice(h){return (+h.price>0)?+h.price:stkBasis(h);}
 function stkValue(h){return (+h.units||0)*stkPrice(h);}
+// v0.9.1 E17: returns are judged from when the holding was added (owner, Q8). The basis per unit is the average cost
+// the user typed or imported (avgCost, never rewritten here) or else the price when it was added (addPx, recorded once).
+function stkBasis(h){return (+h.avgCost>0)?+h.avgCost:((+h.addPx>0)?+h.addPx:0);}
+// A basis over 3x today's price is almost always pence typed as pounds or a total typed as a unit cost: nudge, don't show a loss.
+function stkSuspect(h){var b=stkBasis(h),p=+h.price;return b>0&&p>0&&b>3*p;}
+// Value, invested and change over the holdings with a usable basis; the rest are listed in `left` with why.
+function stkReturns(hs){
+  var r={value:0,invested:0,change:0,total:0,counted:[],left:[],leftValue:0,suspect:0,noBasis:0};
+  (hs||[]).forEach(function(h){
+    if(!((+h.units||0)>0))return;
+    var v=stkValue(h);r.total+=v;
+    if(stkSuspect(h)){r.left.push({sym:h.sym,why:'cost'});r.suspect++;r.leftValue+=v;return;}
+    var b=stkBasis(h);
+    if(!(b>0)){r.left.push({sym:h.sym,why:'none'});r.noBasis++;r.leftValue+=v;return;}
+    r.counted.push(h);r.value+=v;r.invested+=h.units*b;
+  });
+  r.change=r.value-r.invested;
+  return r;
+}
+// Tile figures in pence under £10,000, whole pounds above; change is taken from the shown parts so the tiles always add up.
+function stkTileMoney(total,valC,inv){
+  var rate=window.VI_CURRENCY_RATE||1,sym=window.VI_CURRENCY_SYMBOL||'£',dp=Math.abs(total*rate)<10000?2:0,k=dp?100:1;
+  var q=function(n){return Math.round((isNaN(n)||n==null?0:n)*rate*k);};
+  var f=function(u,sign){var a=Math.abs(u)/k;return (u<0?(sign?'−':'-'):(sign&&u>0?'+':''))+sym+a.toLocaleString('en-GB',{minimumFractionDigits:dp,maximumFractionDigits:dp});};
+  var vP=q(valC),iP=q(inv),cP=vP-iP;
+  return{val:f(q(total)),inv:f(iP),chg:f(cP,true),chgN:cP/k/rate,chgP:cP,invP:iP};
+}
+// The first price seen after adding (live or the user's own) becomes the entry price of the units still waiting for one.
+function stkResolveEntry(h){
+  var pu=+h.addPendU||0;if(!(pu>0))return;
+  if(+h.avgCost>0){delete h.addPendU;delete h.addPendAt;return;}
+  var p=+h.price;if(!(p>0)||!(h.manualPrice||(+h.updated||0)>=(+h.addPendAt||0)))return;
+  var u=+h.units||0;pu=Math.min(pu,u);var ku=u-pu;
+  h.addPx=(ku>0&&+h.addPx>0)?(ku*h.addPx+pu*p)/u:p;
+  delete h.addPendU;delete h.addPendAt;
+}
 function alTotalStocks(){return (alState.stocks||[]).reduce(function(s,h){return s+stkValue(h);},0);}
 function stkVisible(){
   stkEnsure();
@@ -20548,19 +20606,19 @@ function stkAgo(ts){
   var m=Math.round((Date.now()-ts)/60000);
   return m<1?'just now':m<60?m+'m ago':m<1440?Math.round(m/60)+'h ago':Math.round(m/1440)+'d ago';
 }
-function stkSave(){if(viBlockEdit())return;saveAL();if(typeof updateKPIs==='function')updateKPIs();stkRender();if(typeof renderSummaryCards==='function')try{renderSummaryCards();}catch(e){}}
+function stkSave(){if(viBlockEdit())return;(alState.stocks||[]).forEach(stkResolveEntry);saveAL();if(typeof updateKPIs==='function')updateKPIs();stkRender();if(typeof renderSummaryCards==='function')try{renderSummaryCards();}catch(e){}}
 
 // ── donut ──
 function stkDonut(slices,total,top,sub,subCol){
-  var R=52,C=2*Math.PI*R,off=0,out='<svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="Portfolio allocation">'
-    +'<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="22"/>';
+  var R=58,C=2*Math.PI*R,off=0,out='<svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="Portfolio allocation">'
+    +'<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="16"/>';
   if(total>0)slices.forEach(function(s){
     var len=s.v/total*C;
-    out+='<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="'+s.c+'" stroke-width="22" stroke-dasharray="'+Math.max(0,len-1.5).toFixed(2)+' '+(C-Math.max(0,len-1.5)).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 75 75)"><title>'+stkEsc(s.t)+' '+(s.v/total*100).toFixed(1)+'%</title></circle>';
+    out+='<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="'+s.c+'" stroke-width="16" stroke-dasharray="'+Math.max(0,len-1.5).toFixed(2)+' '+(C-Math.max(0,len-1.5)).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 75 75)"><title>'+stkEsc(s.t)+' '+(s.v/total*100).toFixed(1)+'%</title></circle>';
     off+=len;
   });
-  out+='<text x="75" y="'+(sub?72:78)+'" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="15" fill="#fff">'+top+'</text>';
-  if(sub)out+='<text x="75" y="90" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="10.5" fill="'+(subCol||'#8fb4b1')+'">'+sub+'</text>';
+  out+='<text x="75" y="'+(sub?71:79)+'" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="14" style="fill:var(--tx,#fff)">'+top+'</text>';
+  if(sub)out+='<text x="75" y="92" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="12" fill="'+(subCol||'#8fb4b1')+'">'+sub+'</text>';
   return out+'</svg>';
 }
 function stkRender(){
@@ -20580,24 +20638,23 @@ function stkRender(){
 
   var hs=stkVisible().slice().sort(function(a,b){return stkValue(b)-stkValue(a);});
   var total=hs.reduce(function(s,h){return s+stkValue(h);},0);
-  // returns: only over holdings that have a cost basis
-  var withCost=hs.filter(function(h){return +h.avgCost>0&&(+h.units||0)>0;});
-  var cost=withCost.reduce(function(s,h){return s+h.units*h.avgCost;},0);
-  var valC=withCost.reduce(function(s,h){return s+stkValue(h);},0);
-  var ret=valC-cost,retPct=cost>0?ret/cost*100:0;
+  // returns (E17): judged from when each holding was added; holdings with no entry price or a doubtful cost are left out and named
+  var rr=stkReturns(hs),tm=stkTileMoney(total,rr.value,rr.invested),ret=tm.chgN,up=ret>=0,hasRet=rr.counted.length>0;
+  var nm=function(w){var l=rr.left.filter(function(x){return x.why===w;});return l.length<=2?l.map(function(x){return stkEsc(x.sym);}).join(' and '):l.length;};
+  var leftTxt=(rr.suspect?nm('cost')+' left out: check '+(rr.suspect===1?'its':'their')+' average cost':'')+(rr.suspect&&rr.noBasis?' · ':'')+(rr.noBasis?nm('none')+(rr.noBasis===1?' has':' have')+' no entry price yet':'');
   var dayChg=hs.reduce(function(s,h){var v=stkValue(h),c=+h.change||0;return s+(c?v-v/(1+c/100):0);},0);
   var dayPct=total>0?dayChg/(total-dayChg)*100:0;
   var slices=hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){return{v:stkValue(h),c:STK_COLORS[i%STK_COLORS.length],t:h.sym};});
   var main=document.getElementById('stk-main');
   if(main){
-    var up=ret>=0,dUp=dayChg>=0;
+    var dUp=dayChg>=0;
     var _ap=alState.activePie!=='all'?alState.stockPies.find(function(x){return x.id===alState.activePie;}):null;
-    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-edit"/></svg> Rename</button><button class="stk-btn" style="border-color:rgb(var(--red-rgb) / .5);color:var(--red)" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>'+stkFundControls(_ap,hs):'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
+    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-edit"/></svg> Rename</button><button class="stk-btn" style="border-color:rgb(var(--red-rgb) / .5);color:var(--red)" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>'+stkFundControls(_ap,hs):'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),(hasRet&&tm.invP>0)?((up?'+':'')+(tm.chgP/tm.invP*100).toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
       +'<div class="stk-stats">'
-      +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+cfMoney(total)+'</div><div class="s">'+((_ap&&_ap.kind==='fund'&&hs.length===1)?'<b style="color:var(--gold)">'+(+hs[0].units||0).toLocaleString('en-GB',{maximumFractionDigits:4})+' units owned</b>'+(stkPrice(hs[0])>0?' × £'+stkPrice(hs[0]).toFixed(2):''):hs.length+' holding'+(hs.length===1?'':'s'))+' · counts towards net worth</div></div>'
-      +'<div class="stk-stat" style="background:'+(withCost.length?(up?'rgb(var(--green-rgb) / .07)':'rgb(var(--red-rgb) / .08)'):'rgb(var(--teal-rgb) / .06)')+'"><div class="l">Total return</div><div class="v" style="color:'+(withCost.length?(up?'var(--green)':'var(--red)'):'var(--t3)')+'">'+(withCost.length?((up?'+':'−')+cfMoney(Math.abs(ret))):'–')+'</div><div class="s">'+(withCost.length?(withCost.length<hs.length?'on '+withCost.length+' of '+hs.length+' with a cost basis':'vs your average cost'):'add an average cost to see returns')+'</div></div>'
+      +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+tm.val+'</div><div class="s">'+((_ap&&_ap.kind==='fund'&&hs.length===1)?'<b style="color:var(--gold)">'+(+hs[0].units||0).toLocaleString('en-GB',{maximumFractionDigits:4})+' units owned</b>'+(stkPrice(hs[0])>0?' × £'+stkPrice(hs[0]).toFixed(2):''):hs.length+' holding'+(hs.length===1?'':'s'))+' · counts towards net worth</div></div>'
+      +'<div class="stk-stat"><div class="l">Invested (at the time you added it)</div><div class="v">'+(hasRet?tm.inv:'–')+'</div><div class="s">'+(hasRet?(leftTxt||'what your holdings cost when you added them'):(leftTxt||'add a holding to see what went in'))+'</div></div>'
+      +'<div class="stk-stat" style="background:'+(hasRet?(tm.chgP===0?'rgb(var(--teal-rgb) / .06)':up?'rgb(var(--green-rgb) / .07)':'rgb(var(--red-rgb) / .08)'):'rgb(var(--teal-rgb) / .06)')+'"><div class="l">Change since you added it</div><div class="v" style="color:'+(hasRet&&tm.chgP!==0?(up?'var(--green)':'var(--red)'):'var(--t3)')+'">'+(hasRet?tm.chg:'–')+'</div><div class="s">'+(hasRet?(rr.left.length?'on '+rr.counted.length+' of '+(rr.counted.length+rr.left.length)+' holdings':(tm.invP>0?((tm.chgP>=0?'+':'')+(tm.chgP/tm.invP*100).toFixed(1)+'% on what you put in'):'')):'shows once a holding has a price')+'</div></div>'
       +'<div class="stk-stat"><div class="l">Today</div><div class="v" style="color:'+(dayChg?(dUp?'var(--green)':'var(--red)'):'var(--t3)')+'">'+(dayChg?((dUp?'+':'−')+cfMoney(Math.abs(dayChg))):'–')+'</div><div class="s">'+(dayChg?((dUp?'+':'')+dayPct.toFixed(2)+'% since yesterday'):'refresh for live moves')+'</div></div>'
-      +'<div class="stk-stat"><div class="l">Invested</div><div class="v">'+(withCost.length?cfMoney(cost):'–')+'</div><div class="s">cost basis of tracked holdings</div></div>'
       +'</div>';
   }
   // status
@@ -20619,16 +20676,17 @@ function stkRender(){
       +stkGroups(hs).map(function(g){var open=stkGrpOpen(g.p.id);
         return '<div class="stk-grp'+(open?' open':'')+'"><button type="button" class="stk-gh" aria-expanded="'+open+'" onclick="stkToggleGrp('+g.p.id+')"><svg class="vi-ic stk-chev" aria-hidden="true"><use href="#vi-chevron"/></svg>'+stkLogoBadge(g.p)+'<span class="stk-gn">'+(g.p.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(g.p.name)+'</span><span class="stk-gc">'+g.hs.length+' holding'+(g.hs.length===1?'':'s')+'</span><span class="stk-gv">'+cfMoney(g.v)+(total>0?' <small>'+(g.v/total*100).toFixed(1)+'%</small>':'')+'</span></button>'
           +'<div class="stk-gb"'+(open?'':' hidden')+'>'+g.hs.map(function(h){var i=hs.indexOf(h);
-        var v=stkValue(h),c=(+h.avgCost>0)?(h.units*h.avgCost):0,pl=c>0?(v-c)/c*100:null;
-        var srcTxt=h.manualPrice?'manual price':(h.updated?'live · '+stkAgo(h.updated):(+h.price>0?'saved price':(+h.avgCost>0?'valued at cost':'no price')));
+        var v=stkValue(h),sus=stkSuspect(h),c=sus?0:(h.units*stkBasis(h)),pl=c>0?(v-c)/c*100:null;
+        var srcTxt=h.manualPrice?'manual price':(h.updated?'live · '+stkAgo(h.updated):(+h.price>0?'saved price':(stkBasis(h)>0?'valued at cost':'no price')));
         var ch=+h.change||0;
         return '<div class="stk-row">'
-          +'<div class="c-tk"><div class="stk-tk"><i style="background:'+STK_COLORS[i%STK_COLORS.length]+'"></i>'+stkEsc(h.sym)+(alState.activePie==='all'?' <span style="color:var(--t3);font-weight:400;font-size:max(.44rem,var(--vi-fs-1))">· '+stkEsc(stkPieName(h.pie))+'</span>':'')+'</div><div class="stk-nm">'+stkEsc(h.name||'')+'</div>'+stkHoldMeta(h)+'</div>'
+          +'<div class="c-tk">'+stkHoldLogo(h,24,STK_COLORS[i%STK_COLORS.length])+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+STK_COLORS[i%STK_COLORS.length]+'"></i>'+stkEsc(h.sym)+(alState.activePie==='all'?' <span style="color:var(--t3);font-weight:400;font-size:max(.44rem,var(--vi-fs-1))">· '+stkEsc(stkPieName(h.pie))+'</span>':'')+'</div><div class="stk-nm">'+stkEsc(h.name||'')+'</div>'+stkHoldMeta(h)+'</div></div>'
           +'<div class="c-un"><span class="stk-lb">Units</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.units||0)+'" onchange="stkSet('+h.id+',\'units\',this.value)" title="Units held"></div>'
-          +'<div class="c-av"><span class="stk-lb">Avg cost £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.avgCost>0?(+h.avgCost).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="–" onchange="stkSet('+h.id+',\'avgCost\',this.value)" title="Your average buy price in £"></div>'
+          +'<div class="c-av"><span class="stk-lb">Avg cost £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.avgCost>0?(+h.avgCost).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="'+(+h.addPx>0?(+h.addPx).toFixed(4).replace(/\.?0+$/,''):'–')+'" onchange="stkSet('+h.id+',\'avgCost\',this.value)" title="'+(+h.addPx>0&&!(+h.avgCost>0)?'Empty, so the price when you added it is used. Type what you paid per unit in £ to use that instead':'Your average buy price per unit in £')+'"></div>'
           +'<div class="c-pr"><span class="stk-lb">Price £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.price>0?(+h.price).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="live" onchange="stkSet('+h.id+',\'price\',this.value)" title="Price in £. Type one to override the live price, clear it to go back to live"><div class="stk-src">'+srcTxt+(ch&&!h.manualPrice?' · <span style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
           +'<div class="stk-val c-va"><span class="stk-lb">Value</span>'+cfMoney(v)+'</div>'
-          +'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'var(--green)':'var(--red)')+'">'+(pl==null?'–':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>'
+          +(sus?'<div class="stk-pl c-pl"><button type="button" class="stk-chk" onclick="stkCheckCost(this)" title="Your average cost is more than 3 times today’s price. It should be the price you paid per unit, in £ (not pence, and not the total)">Check your average cost</button></div>'
+            :'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'var(--green)':'var(--red)')+'" title="'+(pl==null?'':(+h.avgCost>0?'vs your average cost':'since you added it'))+'">'+(pl==null?'–':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>')
           +'<button class="data-item-del c-x" style="width:auto;padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;opacity:1;border:1px solid rgb(var(--red-rgb) / .45);border-radius:4px" onclick="stkRemove('+h.id+')" title="Remove this holding">🗑 Remove</button></div>';
 }).join('')+'</div></div>';
       }).join('')+'</div>';
@@ -20639,13 +20697,14 @@ function stkRender(){
     var av=stkAllocView();
     al.style.display=hs.length?'':'none';
     al.innerHTML='<div class="stk-hd"><span>Allocation</span><div class="nw3d-seg" role="group" aria-label="Allocation view"><button type="button" aria-pressed="'+(av==='bars')+'" onclick="stkSetAlloc(\'bars\')">Bars</button><button type="button" aria-pressed="'+(av==='tree')+'" onclick="stkSetAlloc(\'tree\')">Tree map</button></div></div>'
-    +(av==='tree'?'<div class="stk-tm-key" id="stk-tm-key"></div><div class="dtm stk-tm" id="stk-treemap"></div>':hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){
+    +(av==='tree'?'<div class="stk-tm-key" id="stk-tm-key"></div><div class="dtm stk-tm" id="stk-treemap"></div><div class="stk-tm-other" id="stk-tm-other"></div>':hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){
       var p=total>0?stkValue(h)/total*100:0,c=STK_COLORS[i%STK_COLORS.length];
       return '<div class="stk-bar"><span class="t" title="'+stkEsc(h.name||h.sym)+'">'+stkEsc(h.sym)+'</span><span class="b"><div style="width:'+p.toFixed(1)+'%;background:'+c+'"></div></span><span class="p">'+p.toFixed(1)+'%</span></div>';
     }).join(''));
     if(av==='tree'){stkDrawTreemap();if(!al._ro&&window.ResizeObserver){al._ro=new ResizeObserver(function(){if(stkAllocView()==='tree'&&al.clientWidth!==al._rw){al._rw=al.clientWidth;stkDrawTreemap();}});al._ro.observe(al);}}
   }
 }
+function stkCheckCost(btn){var r=btn.closest('.stk-row'),i=r&&r.querySelector('.c-av input');if(i){i.focus();if(i.select)i.select();}}
 // ── holdings grouped by pie / fund, collapsed by default (owner, 3 Nov) ──
 function stkOpenMap(){try{return JSON.parse(localStorage.getItem('vi-stk-open')||'{}')||{};}catch(e){return {};}}
 function stkGrpOpen(id){return !!stkOpenMap()[id];}
@@ -20657,36 +20716,144 @@ function stkGroups(hs){
 }
 function stkAllocView(){try{return localStorage.getItem('vi-stk-alloc')==='tree'?'tree':'bars';}catch(e){return 'bars';}}
 function stkSetAlloc(v){try{localStorage.setItem('vi-stk-alloc',v);}catch(e){}stkRender();}
+// ── fitted tree map: the layout engine is shared (Stocks now, Crypto next); only stkDrawTreemap knows about holdings ──
+var _dtmCv=null;
+function dtmMeasure(txt,font){try{_dtmCv=_dtmCv||document.createElement('canvas').getContext('2d');_dtmCv.font=font;return _dtmCv.measureText(String(txt)).width*1.06+1;}catch(e){return String(txt).length*9;}}
+// wrap a name into at most maxLines lines that fit maxW; a word that cannot fit on a line fails the whole name (the tile then merges into "Other")
+function dtmWrap(txt,font,maxW,maxLines){
+  var ws=String(txt||'').split(/\s+/).filter(Boolean),lines=[],cur='',i;
+  if(!ws.length)return null;
+  for(i=0;i<ws.length;i++){
+    if(dtmMeasure(ws[i],font)>maxW)return null;
+    var t=cur?cur+' '+ws[i]:ws[i];
+    if(dtmMeasure(t,font)<=maxW)cur=t;else{lines.push(cur);cur=ws[i];}
+  }
+  lines.push(cur);
+  if(lines.length>maxLines){
+    lines=lines.slice(0,maxLines);var w=lines[maxLines-1].split(' ');
+    while(w.length&&dtmMeasure(w.join(' ')+'…',font)>maxW)w.pop();
+    if(!w.length)return null;
+    lines[maxLines-1]=w.join(' ')+'…';
+  }
+  return lines;
+}
+// can this item's label (logo, name, amount, share) sit inside a cw x ch tile? returns what to draw, or null
+function dtmFitCell(it,cw,ch,o){
+  var fs=o.fs,padX=8,padY=6,iw=cw-padX*2,ih=ch-padY*2,
+      nf='700 '+fs+'px Syne,sans-serif',vf='700 '+(fs+.5)+'px "Share Tech Mono",monospace',
+      lh=Math.ceil(fs*1.2),vh=Math.ceil((fs+.5)*1.3);
+  if(iw<30||ih<vh||dtmMeasure(it.val,vf)>iw)return null;
+  for(var k=0;k<2;k++){
+    var logo=k===0&&!it.noLogo,aw=iw-(logo?26:0);if(aw<28)continue;
+    var lines=dtmWrap(it.name,nf,aw,it.other?1:2);if(!lines)continue;
+    var hh=Math.max(logo?20:0,lines.length*lh)+2+vh;if(hh>ih)continue;
+    var room=ih-hh-2,share=null;
+    if(it.other&&room>=Math.ceil(fs*1.25)){var nl=dtmWrap(it.names,fs+'px "Share Tech Mono",monospace',iw,1);if(nl)share=nl[0];}
+    else if(room>=Math.ceil(fs*1.25)){var s1=it.pct+'% of portfolio',sf=fs+'px "Share Tech Mono",monospace';share=dtmMeasure(s1,sf)<=iw?s1:(dtmMeasure(it.pct+'%',sf)<=iw?it.pct+'%':null);}
+    return{logo:logo,lines:lines,share:share};
+  }
+  return null;
+}
+// groups: [{id,col,v,items:[{name,val,v,pct,...}]}]. Squarifies the groups, then each group's items; an item whose label will not fit
+// joins that group's "Other (n)" tile and the group is laid out again. Returns {pies,cells,listed}.
+function dtmFitMap(groups,W,H,o){
+  var gap=3,pad=4,merged={},res,again,guard=0;
+  groups.forEach(function(g){merged[g.id]=[];});
+  do{
+    res={pies:[],cells:[],listed:[]};again=false;guard++;
+    dtmSquarify(groups.map(function(g){return{v:g.v,d:g};}),0,0,W,H).forEach(function(r){
+      var g=r.d;res.pies.push({x:r.x+1,y:r.y+1,w:r.w-2,h:r.h-2,col:g.col});
+      var ix=r.x+pad,iy=r.y+pad,iw=r.w-pad*2,ih=r.h-pad*2;
+      if(iw<10||ih<10){g.items.forEach(function(it){res.listed.push({g:g,it:it});});return;}
+      var list=g.items.filter(function(it){return merged[g.id].indexOf(it)<0;}),mv=merged[g.id],oth=null;
+      if(mv.length){   // the "Other (n)" tile is a shelf along the bottom of its pie, never thinner than a readable label
+        var sv=mv.reduce(function(a,it){return a+it.v;},0),oh=Math.min(ih*.4,Math.max(56,sv/g.v*iw*ih/iw));
+        oth={other:true,items:mv,v:sv,name:mv.length===1?mv[0].name:'Other ('+mv.length+')',val:o.money(sv),pct:o.pct(sv),noLogo:true,names:mv.map(function(x){return x.name;}).join(', ')};
+        var of=dtmFitCell(oth,iw-gap,oh-gap,o);
+        if(of){res.cells.push({x:ix+gap/2,y:iy+ih-oh+gap/2,w:Math.max(2,iw-gap),h:Math.max(2,oh-gap),it:oth,fit:of,g:g,j:9});ih-=oh;}   // no room for a label: they are listed under the map instead
+      }
+      if(ih<10)return;
+      list.sort(function(a,b){return b.v-a.v;});
+      dtmSquarify(list.map(function(it){return{v:it.v,d:it};}),ix,iy,iw,ih).forEach(function(c,j){
+        var it=c.d,fit=dtmFitCell(it,c.w-gap,c.h-gap,o);
+        if(!fit&&guard<40){merged[g.id].push(it);again=true;return;}
+        res.cells.push({x:c.x+gap/2,y:c.y+gap/2,w:Math.max(2,c.w-gap),h:Math.max(2,c.h-gap),it:it,fit:fit,g:g,j:j});
+      });
+    });
+  }while(again);
+  groups.forEach(function(g){merged[g.id].forEach(function(it){res.listed.push({g:g,it:it});});});
+  return res;
+}
+// ── holding logos (owner, 3 Nov: "ticker icons or the company icons") ──
+// Company logo from the favicon service the privacy notice already names; no new host. A round monogram on the pie colour when it
+// cannot load; a fund badge for funds. Ticker domains below are the common UK and US shares; funds use their provider's logo.
+var STK_TICKERS={AAPL:'apple.com',MSFT:'microsoft.com',GOOGL:'google.com',GOOG:'google.com',AMZN:'amazon.com',TSLA:'tesla.com',NVDA:'nvidia.com',META:'meta.com',NFLX:'netflix.com',DIS:'disney.com',KO:'coca-cola.com',PEP:'pepsico.com',JPM:'jpmorganchase.com',V:'visa.com',MA:'mastercard.com',PYPL:'paypal.com',INTC:'intel.com',AMD:'amd.com',BA:'boeing.com',WMT:'walmart.com',NKE:'nike.com',MCD:'mcdonalds.com',SBUX:'starbucks.com',UBER:'uber.com',
+  BP:'bp.com',SHEL:'shell.com',LLOY:'lloydsbankinggroup.com',BARC:'barclays.com',HSBA:'hsbc.com',NWG:'natwestgroup.com',STAN:'sc.com',VOD:'vodafone.com',AZN:'astrazeneca.com',GSK:'gsk.com',ULVR:'unilever.com',DGE:'diageo.com',RIO:'riotinto.com',BHP:'bhp.com',GLEN:'glencore.com',BATS:'bat.com',IMB:'imperialbrandsplc.com',TSCO:'tescoplc.com',SBRY:'about.sainsburys.co.uk',MKS:'marksandspencer.com',BT:'bt.com',RR:'rolls-royce.com',BAE:'baesystems.com',LSEG:'lseg.com',REL:'relx.com',NG:'nationalgrid.com',SSE:'sse.com',AV:'aviva.com',LGEN:'legalandgeneral.com',PRU:'prudentialplc.com',RKT:'reckitt.com',EXPN:'experian.com',CPG:'compass-group.com',WPP:'wpp.com',IAG:'iairgroup.com',EZJ:'easyjet.com',JD:'jdplc.com',OCDO:'ocadogroup.com',AUTO:'autotrader.co.uk',RMV:'rightmove.co.uk',SMT:'scottishmortgageit.com'};
+function stkTickerDomain(sym){var s=String(sym||'').toUpperCase().replace(/\.(L|LON|US|O|N|OQ)$/,'');return Object.prototype.hasOwnProperty.call(STK_TICKERS,s)?STK_TICKERS[s]:null;}
+function stkIsFundCode(sym){var s=String(sym||'');return /^0P/i.test(s)||s.length>8;}
+function stkFundBadge(){return '<span class="stk-fundb"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z" fill="#fff"/><path d="M14 2.2A9 9 0 0 1 21.8 10H14z" fill="#fff" opacity=".7"/></svg></span>';}
+function stkHoldLogo(h,px,col){
+  var sym=String(h.sym||''),fundish=stkIsFundCode(sym)||(h.pie!=null&&(alState.stockPies||[]).some(function(p){return p.id===h.pie&&p.kind==='fund';})),
+      dom=stkTickerDomain(sym),pc=col;
+  if(!dom){var m=stkProviderMatch(h.provider||h.name||'');if(m){dom=m.d;pc=pc||m.c;}}
+  var fb=fundish?stkFundBadge():stkMono(sym||h.name,pc);
+  return '<span class="stk-hl'+(fundish?' is-fund':'')+'" style="width:'+px+'px;height:'+px+'px'+(fundish?';background:'+(pc||'#2b6f6b'):'')+'">'
+    +(dom?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain='+dom+'&sz=64" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="stk-hl-fb" style="display:none;width:100%;height:100%">'+fb+'</span>':fb)+'</span>';
+}
+// the name a tile shows: the ticker, or a fund's name with the share-class noise taken off (never a code like 0P0001O...)
+function stkTmName(h){
+  var s=String(h.sym||'');if(!stkIsFundCode(s))return s||String(h.name||'');
+  var n=String(h.name||'').replace(/\b(GBP|USD|EUR|Acc|Inc|Accumulation|Income|Distributing)\b\.?/gi,'').replace(/\bClass\s+\w+\b/gi,'').replace(/\s+/g,' ').trim();
+  return n||s;
+}
+// Tile colours: the pie colour lightened (never darkened to olive or brown), with dark ink picked so the text is at least 4.5:1.
+function stkHexRgb(h){h=String(h).replace('#','');if(h.length===3)h=h.replace(/./g,'$&$&');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
+function stkLum(c){var f=c.map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});return .2126*f[0]+.7152*f[1]+.0722*f[2];}
+function stkTileCol(col,j,other){
+  var c=stkHexRgb(col),k=other?.58:Math.min(.04+Math.min(j,5)*.035,.22),rgb;
+  for(;;){rgb=c.map(function(v){return Math.round(v+(255-v)*k);});if((stkLum(rgb)+.05)/(stkLum([11,16,24])+.05)>=5.2||k>=.95)break;k+=.04;}   // 5.2 leaves room for the hatch
+  return 'rgb('+rgb.join(',')+')';
+}
 function stkDrawTreemap(){
-  var el=document.getElementById('stk-treemap'),key=document.getElementById('stk-tm-key');if(!el)return;
+  var el=document.getElementById('stk-treemap'),key=document.getElementById('stk-tm-key'),lg=document.getElementById('stk-tm-other');if(!el)return;
   var W=el.parentElement.clientWidth-(parseFloat(getComputedStyle(el.parentElement).paddingLeft)||0)*2;
   if(!(W>80))return;
-  var H=Math.round(Math.max(240,Math.min(460,W*.72)));el.style.height=H+'px';el.style.width=W+'px';
+  var H=Math.round(Math.max(360,Math.min(640,W*.9))),fs=W>=560?12:11;el.style.height=H+'px';el.style.width=W+'px';el.style.setProperty('--tm-fs',fs+'px');
   var all=(alState.stocks||[]).filter(function(h){return stkValue(h)>0;}),tot=all.reduce(function(a,h){return a+stkValue(h);},0);
-  if(!all.length||!(tot>0)){el.innerHTML='<div class="dtm-empty">No priced holdings yet</div>';if(key)key.innerHTML='';return;}
-  var gs=stkGroups(all),gap=3,cells=[],pad=4,out='';
-  var pieCol={};gs.forEach(function(g,i){pieCol[g.p.id]=STK_COLORS[i%STK_COLORS.length];});
+  if(!all.length||!(tot>0)){el.innerHTML='<div class="dtm-empty">No priced holdings yet</div>';if(key)key.innerHTML='';if(lg)lg.innerHTML='';return;}
+  var gs=stkGroups(all),pieCol={};gs.forEach(function(g,i){pieCol[g.p.id]=STK_COLORS[i%STK_COLORS.length];});
   if(key)key.innerHTML=gs.map(function(g){return '<span class="stk-tm-k"><i style="background:'+pieCol[g.p.id]+'"></i>'+stkEsc(g.p.name)+' <b>'+(g.v/tot*100).toFixed(0)+'%</b></span>';}).join('');
-  dtmSquarify(gs.map(function(g){return {v:g.v,d:g};}),0,0,W,H).forEach(function(r){
-    var g=r.d,col=pieCol[g.p.id];
-    out+='<div class="stk-tm-pie" style="left:'+(r.x+1)+'px;top:'+(r.y+1)+'px;width:'+(r.w-2)+'px;height:'+(r.h-2)+'px;border-color:'+col+'"></div>';
-    var ix=r.x+pad,iy=r.y+pad,iw=r.w-pad*2,ih=r.h-pad*2;if(iw<10||ih<10)return;
-    var hs2=g.hs.slice().sort(function(a,b){return stkValue(b)-stkValue(a);});
-    dtmSquarify(hs2.map(function(h){return {v:stkValue(h),d:h};}),ix,iy,iw,ih).forEach(function(c,j){
-      var h=c.d,v=stkValue(h),sm=c.w-gap<56||c.h-gap<44,mid=!sm&&c.w>70&&c.h>46,pct=(v/tot*100).toFixed(1);
-      var nm=h.sym||h.name||'';
-      out+='<div class="dtm-cell stk-tm-c'+(sm?' dtm-sm" tabindex="0" data-n="'+stkEsc(nm)+' · '+stkEsc(g.p.name)+'" data-v="'+stkEsc(cfMoney(v))+' · '+pct+'%"':'"')+' title="'+stkEsc((h.name||nm)+' · '+g.p.name)+' · '+stkEsc(cfMoney(v))+' ('+pct+'%)" style="left:'+(c.x+gap/2)+'px;top:'+(c.y+gap/2)+'px;width:'+Math.max(2,c.w-gap)+'px;height:'+Math.max(2,c.h-gap)+'px;background:color-mix(in srgb,'+col+' '+(86-Math.min(j,5)*9)+'%,#0b1018)">'
-        +(mid?'<b class="dtm-n">'+stkEsc(nm)+'</b><span class="dtm-v">'+cfMoney(v)+'</span>':'')+(mid&&c.h>70?'<span class="dtm-s">'+pct+'% of portfolio</span>':'')+'</div>';
-    });
+  var money=function(v){return cfMoney(v);},pct=function(v){return (v/tot*100).toFixed(1);};
+  var groups=gs.map(function(g){return{id:g.p.id,p:g.p,col:pieCol[g.p.id],v:g.v,items:g.hs.map(function(h){var v=stkValue(h);return{h:h,v:v,name:stkTmName(h),val:money(v),pct:pct(v)};})};});
+  var res=dtmFitMap(groups,W,H,{fs:fs,money:money,pct:pct}),out='';
+  res.pies.forEach(function(r){out+='<div class="stk-tm-pie" style="left:'+r.x+'px;top:'+r.y+'px;width:'+r.w+'px;height:'+r.h+'px;border-color:'+r.col+'"></div>';});
+  res.cells.forEach(function(c){
+    var it=c.it,col=c.g.col,bg;
+    if(it.other){
+      var names=it.items.map(function(x){return x.name+' '+x.val;}).join(', ');
+      bg='repeating-linear-gradient(135deg,rgba(11,16,24,.12) 0 6px,transparent 6px 12px),'+stkTileCol(col,0,true);
+      out+='<div class="dtm-cell stk-tm-c dtm-other" tabindex="0" data-n="'+stkEsc(it.name+' · '+c.g.p.name)+'" data-v="'+stkEsc(names)+'" title="'+stkEsc(it.name+' in '+c.g.p.name+': '+names)+'" style="left:'+c.x+'px;top:'+c.y+'px;width:'+c.w+'px;height:'+c.h+'px;color:#0b1018;background:'+bg+'">'
+        +(c.fit?'<b class="dtm-n">'+stkEsc(it.name)+'</b><span class="dtm-v">'+stkEsc(it.val)+'</span>'+(c.fit.share?'<span class="dtm-s">'+stkEsc(c.fit.share)+'</span>':''):'')+'</div>';
+      return;
+    }
+    var h=it.h,r=stkReturns([h]),chg=r.counted.length?' · '+(r.change>=0?'+':'-')+cfMoney(Math.abs(r.change))+' since added':'';
+    bg=stkTileCol(col,c.j);
+    out+='<div class="dtm-cell stk-tm-c" title="'+stkEsc((h.name||it.name)+' · '+c.g.p.name+' · '+it.val+' ('+it.pct+'%)'+chg)+'" style="left:'+c.x+'px;top:'+c.y+'px;width:'+c.w+'px;height:'+c.h+'px;color:#0b1018;background:'+bg+'">'
+      +'<div class="dtm-hd">'+(c.fit.logo?stkHoldLogo(h,20,col):'')+'<b class="dtm-n">'+c.fit.lines.map(stkEsc).join('<br>')+'</b></div><span class="dtm-v">'+stkEsc(it.val)+'</span>'+(c.fit.share?'<span class="dtm-s">'+stkEsc(c.fit.share)+'</span>':'')+'</div>';
   });
   el.innerHTML=out+'<div class="dtm-tip" aria-live="polite" hidden></div>';
+  if(lg){
+    var by=[];res.listed.forEach(function(x){var b=by.find(function(y){return y.g===x.g;});if(!b){b={g:x.g,xs:[]};by.push(b);}b.xs.push(x.it);});
+    lg.innerHTML=by.length?'<b>Grouped as Other</b> (too small to label)'+by.map(function(b){return '<div class="stk-tm-ol"><i style="background:'+b.g.col+'"></i><span>'+stkEsc(b.g.p.name)+': '+b.xs.map(function(x){return stkEsc(x.name)+' <em>'+stkEsc(x.val)+'</em>';}).join(' · ')+'</span></div>';}).join(''):'';
+  }
   if(!el._dtmTip){el._dtmTip=1;
-    el.addEventListener('pointerover',function(e){if(e.pointerType==='mouse')dtmTip(el,e.target.closest('.dtm-sm'));});
+    el.addEventListener('pointerover',function(e){if(e.pointerType==='mouse')dtmTip(el,e.target.closest('.dtm-other'));});
     el.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')dtmTip(el,null);});
-    el.addEventListener('click',function(e){dtmTip(el,e.target.closest('.dtm-sm'));});
-    el.addEventListener('focusin',function(e){dtmTip(el,e.target.closest('.dtm-sm'));});
+    el.addEventListener('click',function(e){dtmTip(el,e.target.closest('.dtm-other'));});
+    el.addEventListener('focusin',function(e){dtmTip(el,e.target.closest('.dtm-other'));});
     el.addEventListener('focusout',function(){dtmTip(el,null);});
   }
+  if(!window._stkTmFonts&&document.fonts&&document.fonts.ready){window._stkTmFonts=1;document.fonts.ready.then(function(){try{if(stkAllocView()==='tree')stkDrawTreemap();}catch(e){}});}
 }
 
 // ── pies ──
@@ -20755,7 +20922,7 @@ async function stkAddCore(o){if(viBlockEdit())return;
   var sym=String(o.sym||'').trim().toUpperCase(),units=o.units,amt=o.amt,cost=o.cost;
   if(!/^[A-Z0-9.\-^=]{1,15}$/.test(sym))return{err:'Search for a fund or share, or enter a ticker, e.g. VUSA.L or AAPL'};
   if(!(units>0)&&!(amt>0))return{err:'Enter how many units you hold, or the £ value you hold'};
-  var mpx=+o.manualPrice>0?+o.manualPrice:0;
+  var mpx=+o.manualPrice>0?+o.manualPrice:0,entryPx=mpx;   // entryPx: the price at this moment, when we know it (E17)
   if(!(units>0)&&mpx>0)units=+(amt/mpx).toFixed(6);   // your own unit price
   if(!(units>0)){   // worked out from the £ you hold ÷ the live price
     showToast('Looking up the live price…');
@@ -20772,7 +20939,7 @@ async function stkAddCore(o){if(viBlockEdit())return;
         }
       }
       if(!(g>0))return{err:'No live price found for '+sym+((window._stkMisses&&window._stkMisses[sym]&&window._stkMisses[sym][0])?' ('+window._stkMisses[sym][0]+')':'')+'. Enter the units you hold instead (or pick a different listing of the fund)'};
-      units=+(amt/g).toFixed(6);if(note)showToast(note);
+      units=+(amt/g).toFixed(6);if(!(entryPx>0))entryPx=g;if(note)showToast(note);
     }catch(e){return{err:'Could not look up the price. Enter the units instead'};}
   }
   stkEnsure();
@@ -20789,12 +20956,22 @@ async function stkAddCore(o){if(viBlockEdit())return;
   if(platform&&!pie.platform){pie.platform={name:(stkPlatformMatch(platform)||{}).n||platform};delete pie.platformOff;}
   var h=alState.stocks.find(function(x){return x.pie===pie.id&&x.sym===sym;});
   if(h){ // merge into the existing position (weighted average cost)
-    var tc=(h.avgCost>0?h.units*h.avgCost:0)+(cost>0?units*cost:0);
+    var tc=(h.avgCost>0?h.units*h.avgCost:0)+(cost>0?units*cost:0),u0=+h.units||0;
     h.units=+(h.units+units).toFixed(8);
-    if(h.avgCost>0&&cost>0)h.avgCost=tc/h.units;else if(cost>0&&!(h.avgCost>0))h.avgCost=cost;
+    if(h.avgCost>0&&cost>0)h.avgCost=tc/h.units;
+    else if(cost>0&&!(h.avgCost>0)){   // first typed cost: earlier units keep their entry price (E17); units still waiting for a price take this cost
+      var ku=Math.max(0,u0-(+h.addPendU||0));
+      h.avgCost=(ku>0&&+h.addPx>0)?(ku*h.addPx+(h.units-ku)*cost)/h.units:cost;
+      delete h.addPendU;delete h.addPendAt;
+    }
+    else if(!(cost>0)&&!(h.avgCost>0)&&(+h.addPx>0||+h.addPendU>0||!(u0>0))){   // no cost typed: these units go in at today's price (E17)
+      if(entryPx>0&&!(+h.addPendU>0))h.addPx=(u0>0&&+h.addPx>0)?(u0*h.addPx+units*entryPx)/h.units:entryPx;
+      else{h.addPendU=(+h.addPendU||0)+units;h.addPendAt=Date.now();}
+    }
     if(!h.name&&nm)h.name=nm;
   } else {
     h={id:Date.now(),pie:pie.id,sym:sym,name:nm,units:units,avgCost:cost>0?cost:0,price:0};
+    if(!(cost>0)){if(entryPx>0)h.addPx=entryPx;else{h.addPendU=units;h.addPendAt=Date.now();}}
     alState.stocks.push(h);
   }
   if(mpx>0){h.price=mpx;h.manualPrice=true;h.updated=0;}   // your price, kept until you clear it
@@ -20922,7 +21099,14 @@ async function stkFetchQuotes(symbols){
   }
   return null;
 }
+// A refresh asked for while another is running waits for it, then runs: a holding added in that window still gets its price
+// (it used to return at once and the new holding stayed valued at cost until the next automatic refresh).
 async function stkRefresh(silent){
+  if(window._stkBusy&&window._stkP){try{await window._stkP;}catch(e){}}
+  window._stkP=_stkRefreshRun(silent);
+  return window._stkP;
+}
+async function _stkRefreshRun(silent){
   stkEnsure();
   var targets=alState.stocks.filter(function(h){return !h.manualPrice;});
   var syms=[];targets.forEach(function(h){if(syms.indexOf(h.sym)<0)syms.push(h.sym);});
@@ -20976,7 +21160,7 @@ function stkBuildSeries(hs,hist,fromMs){
       var i=ptr[h.sym]||0;while(i+1<d.t.length&&d.t[i+1]<=t)i++;ptr[h.sym]=i;
       var px=stkToGBP(d.c[i],d.currency);if(px==null)return;
       var v=(+h.units||0)*px;val+=v;
-      if(+h.avgCost>0){cost+=h.units*h.avgCost;costVal+=v;}
+      var bs=stkSuspect(h)?0:stkBasis(h);if(bs>0){cost+=h.units*bs;costVal+=v;}
     });
     return{t:t*1000,v:val,ret:cost>0?(costVal-cost)/cost*100:null,cost:cost};
   });
@@ -21018,7 +21202,7 @@ async function stkChartRender(){
   var have=hs.filter(function(h){return hist[h.sym];}),skipped=hs.length-have.length;
   var pts=have.length?stkBuildSeries(have,hist,from):null;
   if(!pts){box.innerHTML=head+'<div class="stk-note" style="text-align:center;padding:24px">Price history is not available right now'+(skipped?' for '+skipped+' holding'+(skipped===1?'':'s'):'')+'. Try again in a moment.</div>';return;}
-  var costKnown=have.every(function(h){return +h.avgCost>0;}),cost=have.reduce(function(s,h){return s+((+h.avgCost>0)?h.units*h.avgCost:0);},0);
+  var costKnown=have.every(function(h){return stkBasis(h)>0&&!stkSuspect(h);}),cost=have.reduce(function(s,h){return s+((stkBasis(h)>0&&!stkSuspect(h))?h.units*stkBasis(h):0);},0);
   var view=_stkCh.view;if(view==='return'&&pts.every(function(p){return p.ret==null;}))view='value';
   var lastP=pts[pts.length-1],firstP=pts[0];
   var chg=view==='value'?(lastP.v-firstP.v):(lastP.ret-firstP.ret);
@@ -28186,7 +28370,7 @@ function showPrivacy() {
       + '<li><strong>Resend</strong>: delivers your sign-in emails (your email address and the code) and the beta-list emails. If it is unavailable, Supabase’s own mailer is used for sign-in emails instead.</li>'
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
-    '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank and provider logos; it is told the website of each bank, card or investment provider you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
+    '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank, provider, company and ticker logos; it is told the website of each bank, card, investment provider or company you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
     '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Poly Pizza</strong> supplies free 3D models of everyday items if you pick one from its library for a wealth or liability item: your browser downloads the file straight from Poly Pizza, which sees your IP address and which model you chose, and nothing else. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
     '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or third-party analytics. During the beta the app records how it is used (screens opened, features used, errors and how long a visit lasts, never your figures or what you type) in our own database, to improve it; you can switch this off in Settings (Share usage). Feedback you send from the app is stored by us with the screen you were on, your last few taps and, unless you untick it, a picture of that screen with every figure hidden. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected, and what that does not mean'),

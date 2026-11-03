@@ -89,6 +89,8 @@ node tests/test_secondhand_server.js  # v0.9.1 E28: secondhand-estimate edge fun
 node tests/test_v091_secondhand.js    # v0.9.1 E28: condition field, estimate needs a tap to apply, "Not available yet" with manual links, old items untouched, wording, 10.5 px floor
 node tests/test_v091_chrome.js      # v0.9.1 chrome: rotating dial mark (turns on load and click, static under reduced motion), bigger desktop menu bar (icons 24 / 22 px, no zoom), pinned Assets sub-menu (one row of six icons on phones), Message the Dev on Overview only, sidebar colours, crowdfund Vaulter card (prices from VI_PLANS, real counts, Open days)
 node tests/test_014.mjs             # migration 014 on pglite: campaign_counts() gives backers per paid plan and nothing personal; anon may call it
+node tests/test_v091_stocks_return.js # v0.9.1 E17: Stocks tiles judged from when a holding was added (entry price kept in addPx, avgCost never rewritten), "Check your average cost" nudge, tiles reconcile
+node tests/test_v091_stocks_map.js # v0.9.1 E19, E20: Stocks tree map is taller, no label clipped or under 10.5px, tiny holdings merge into "Other (n)" with a list, fund names not codes, logos in rows and tiles with initials fallback
 node tests/test_v091_overview_budget.js  # v0.9.1 E4/E23/E5/E6: Cash Flow tile 3D only, Net worth window +20%, Budget pills full width, Budget 3D viewport larger
 node tests/test_v091_inventory_files.js  # v0.9.1 E29: inventory 3D uploads: .glb .gltf .stl .obj .fbx .3mf preview, persist across reload, old glb-only record opens, STL/OBJ tinted, oversize and wrong type error
 - `test_v091_cash_accounts.js`: v0.9.1 E15/E16, cash account interest rate (AER), add and take out with Undo, over-balance refused, old saves load, pence-exact.
