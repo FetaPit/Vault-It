@@ -15,7 +15,7 @@ for (const host of ['app.vault-it.co', 'vault-it.co']) {
 const ro = (await worker.fetch(new Request('https://app.vault-it.co/'), env)).headers.get('Content-Security-Policy-Report-Only') || '';
 const policyHosts = new Set([...ro.matchAll(/(?:https?|wss):\/\/([A-Za-z0-9.*-]+\.[a-z]{2,})/g)].map(m => m[1]));
 // links the app opens or shows as text, never fetched or embedded, plus XML namespaces
-const LINK_ONLY = ['www.w3.org', 'creativecommons.org', 'vault-it.co', 'app.vault-it.co', 'wa.me', 'www.linkedin.com', 'instagram.com', 'ptlive.my.canva.site', 'shibariumscan.io', 'buy.stripe.com', 'auth.truelayer.com'];
+const LINK_ONLY = ['www.w3.org', 'creativecommons.org', 'vault-it.co', 'app.vault-it.co', 'wa.me', 'www.linkedin.com', 'instagram.com', 'ptlive.my.canva.site', 'shibariumscan.io', 'buy.stripe.com', 'auth.truelayer.com', 'www.ebay.co.uk', 'www.discogs.com'];
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const used = [...new Set([...html.matchAll(/https?:\/\/([A-Za-z0-9.-]+\.[a-z]{2,})/g)].map(m => m[1]))].filter(h => !LINK_ONLY.includes(h));
 const missing = used.filter(h => !policyHosts.has(h));
