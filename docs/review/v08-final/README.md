@@ -70,3 +70,8 @@ Shots: `followup/f2-*`, Night and Daylight. No sideways page scroll and no error
 - Item 6, header at 360: PASS. "NW £17.1k" stays on one 12px line next to the theme and help buttons.
 - Item 4, smallest debt tiles at 390: PASS. With a £150 and a £60 debt added, the 84 x 17 and 32 x 17 tiles show no text. A tap shows a dark chip, "Vanquis / £150" (12 / 11px), inside the map, and it reads in both themes. The chip covers part of the neighbouring tile while it is open, which is fine for a tap.
 - Item 5, flow charts at 690 and 1024: PASS. At 1024 the whole diagram fits at 1:1 (982px) with labels at 10.7px or larger. At 690 it is 1:1 in its own scroller (960 in 624), with the swipe hint and labels at 10.5px or larger. This is not the counter-scaled fit my spec asked for. I accept it: shrinking the diagram to fit under about 700px would push the middle column's labels into the right column's.
+
+## Pulled into 0.8: F2 v08/type-scale 18b4496 (item 2, house caption)
+Shots: `followup/f2-hcap-{before,after}-{390,599}_dark.png`, 48bac74 against 18b4496.
+- PASS. The caption starts 44px in (was 14) at 390 and 599, so "Victorian mid-terrace" shows in full. Before, the "V" sat under the side rail. The scene (316 x 490 at 390, 525 x 522 at 599), canvas, controls and brick tags are identical. It is one CSS line, and the engine is untouched.
+- Nit for 0.8.1: at 390 the caption wraps to three lines and leaves "brick" alone on the last one. Keep "£1.47 a brick" together (nowrap on that part).
