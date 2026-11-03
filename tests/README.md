@@ -83,3 +83,4 @@ node tests/test_v091_debt_cards.js  # v0.9.1 E33: every debt type is a 3D tile w
 node tests/test_v091_debt_reverse.js # v0.9.1 E33b: type icon under the logo on debt tiles; the back shows the debt-free date (estimate), interest this month and year, last three payments and paid so far
 node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, identical on #cf-sankey and #bd-sankey, Night and Daylight
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
+- `test_v091_cash_accounts.js`: v0.9.1 E15/E16, cash account interest rate (AER), add and take out with Undo, over-balance refused, old saves load, pence-exact.
