@@ -8,7 +8,7 @@
 //      is a separate estimate, not added to saved; the First Time Buyer ISA is listed as not open yet, with no rate, bonus or date.
 // Run: node tests/test_v091_house_xp_deposit.js
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || (process.env.VI_INDEX ? 'file://' + process.env.VI_INDEX : 'file:///home/user/Vault-It/index.html');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const SEED = (o) => {
   localStorage.setItem('vi_declined_demo', 'true');
