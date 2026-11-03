@@ -1,10 +1,13 @@
 name: CI
 
-# Runs the whole suite on every push and pull request. Nothing here deploys anything.
+# Runs the whole suite on pushes and pull requests. Nothing here deploys anything.
+# Queue and docs-only pushes skip the suite (owner, 3 Nov 2026). Any other file in the push runs it.
 on:
   push:
     branches-ignore: ['backup/**']
+    paths-ignore: ['docs/**', '**/*.md']
   pull_request:
+    paths-ignore: ['docs/**', '**/*.md']
   workflow_dispatch:
 
 permissions:
