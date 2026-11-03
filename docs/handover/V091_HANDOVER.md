@@ -17,6 +17,13 @@ Read this, then `CLAUDE.md`, `docs/QUEUE.md`, `docs/AGENT_ROSTER.md`. Nothing el
 ## Waiting for input
 The owner's **v0.9.1 edit list** (not yet given). Also candidates: Pedro's two cosmetic nits deferred to 0.8.1 (`docs/review/v08-type-scale/README.md`), PostHog (parked, needs consent-first setup), the Chief of Staff connectors (Slack, meeting capture, Notion command centre).
 
+## Known gaps for 0.9.1 (found by Pedro's test run, verified)
+- Sidebar summary (`index.html` around line 14889-14893): Total assets and Monthly surplus are still teal. Should be green and blue, net worth teal, red when negative, Night and Daylight.
+- Open question for the owner: is "location icon" the one removed from the House Builder viewport, or also the pin on "Show it on the house" (`hbJumpToRow`)? The viewport button is gone; the text button remains.
+
+## Agent test run (3 Nov)
+Pedro turned the v0.9 dictation into a correct brief and found the sidebar miss. David split the same round into six chunks with branches, models, tests and merge order, and noticed the round was already marked done. Both passed. David over-specified Opus for the dashboard chunk; use Sonnet unless the 3D engine changes.
+
 ## Roles and models
 See `docs/AGENT_ROSTER.md`. Start the main session as the Chief of Staff (`/chief-of-staff`). Sonnet builds, Opus plans, the 3D engine, money logic and hard bugs. Never switch model mid-session.
 
