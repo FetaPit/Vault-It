@@ -43,6 +43,8 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     await p.fill(row(1) + ' .ca-rate-in', '4.5'); await p.dispatchEvent(row(1) + ' .ca-rate-in', 'change'); await p.waitForTimeout(200);
     const cashBefore = await p.evaluate(() => alTotalCash());
     ok(cashBefore === 11000.1, T + 'interest is never added to cash or net worth (' + cashBefore + ')');
+    // chunk A hook: v3CashLand(delta, accountId) is called once per successful move, never for a refused one
+    await p.evaluate(() => { window.__land = []; window.v3CashLand = (d, id) => window.__land.push([d, id]); });
     // E16 add 250 then undo
     await p.click(row(1) + ' .ca-add'); await p.waitForTimeout(150);
     ok(await p.isVisible(row(1) + ' .ca-mv'), T + 'Add opens an inline amount and date field');
@@ -54,6 +56,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     await p.click('#ca-undo .ca-undo-btn'); await p.waitForTimeout(300);
     a1 = await st(1);
     ok(a1.balance === 10000 && (a1.moves || []).length === 0, T + 'Undo restores exactly (balance ' + a1.balance + ', moves ' + (a1.moves || []).length + ')');
+    ok(JSON.stringify(await p.evaluate(() => window.__land)) === '[[250,1]]', T + 'v3CashLand called once with +250 and the account id');
     // take out
     await p.click(row(2) + ' .ca-out'); await p.fill(row(2) + ' .ca-mv-amt', '300'); await p.click(row(2) + ' .ca-mv-ok'); await p.waitForTimeout(300);
     let a2 = await st(2);
@@ -65,6 +68,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     ok(await p.isVisible(row(2) + ' .ca-mv-msg a, ' + row(2) + ' .ca-mv-msg button'), T + 'the message links to the Debt tracker');
     await p.fill(row(2) + ' .ca-mv-amt', '700'); await p.click(row(2) + ' .ca-mv-ok'); await p.waitForTimeout(300);
     ok((await st(2)).balance === 0, T + 'taking out the whole balance is allowed and lands on exactly 0');
+    ok(JSON.stringify(await p.evaluate(() => window.__land)) === '[[250,1],[-300,2],[-700,2]]', T + 'v3CashLand: take-out signed, refused take-out not called ' + JSON.stringify(await p.evaluate(() => window.__land)));
     // pence safety: 0.10 + 0.20 = 0.30 exactly
     await p.click(row(3) + ' .ca-add'); await p.fill(row(3) + ' .ca-mv-amt', '0.2'); await p.click(row(3) + ' .ca-mv-ok'); await p.waitForTimeout(300);
     ok((await st(3)).balance === 0.3, T + '£0.10 + £0.20 is exactly £0.30 (' + (await st(3)).balance + ')');
@@ -72,7 +76,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     await p.click(row(3) + ' .ca-add'); await p.click(row(3) + ' .ca-mv-ok');
     ok((await st(3)).balance === 0.3 && /above zero/.test(await p.textContent(row(3) + ' .ca-mv-msg')), T + 'an empty amount is refused');
     // cloud-copy shape survives a save and reload
-    await p.reload(); await p.waitForTimeout(1500);
+    await p.waitForTimeout(600); await p.reload(); await p.waitForTimeout(1500);
     await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', null); }); await p.waitForTimeout(500);
     ok((await st(1)).rate === 4.5 && (await st(2)).moves.length === 2, T + 'rate and moves survive a reload');
     // targets and layout

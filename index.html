@@ -21476,7 +21476,9 @@ function caMoveDo(id){if(viBlockEdit())return;
   var mv={id:Date.now(),amount:sign*ap/100,date:date};
   a.moves=(a.moves||[]);a.moves.push(mv);a.balance=(bp+sign*ap)/100;
   caMv=null;caLast={acc:id,mv:mv.id};
-  saveAL();renderAlTab();updateKPIs();renderCashISO();
+  saveAL();renderAlTab();updateKPIs();
+  if(typeof v3CashLand==='function'){try{v3CashLand(sign*ap/100,id);}catch(e){}}  // chunk A hook: coins land or lift on the plate; no-op when 3D is off
+  renderCashISO();
   caUndoShow((sign>0?'Added ':'Took out ')+caFmt(ap)+(sign>0?' to ':' from ')+a.name);
 }
 function caUndoShow(text){
