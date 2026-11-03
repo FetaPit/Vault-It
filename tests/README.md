@@ -75,9 +75,15 @@ node tests/test_v07_e18.js         # v0.7 E18: house camera buttons in a bottom-
 node tests/test_v07_e1.js          # v0.7 E1: bottom tab bar at 599 px and under only; icon nav at the top from 600 px
 node tests/test_v07_e2.js          # v0.7 E2: the roadmap opens centred on the next achievement, each time the tab opens
 node tests/test_v07_e3.js          # v0.7 E3: gold roadmap tile gone; stage detail on tap (Next up, Met. Waiting on, ring, close x/Esc)
+node tests/test_wealth_roadmap.js   # Wealth Roadmap (3 Nov): tab label, one roadmap card mirrored, octagon tokens with studs and tiers, levels, XP, side quests, badge tokens, phone floor
 node tests/test_v07_e9.js          # v0.7 E9: budget spending groups folded by default; a saved choice wins
 node tests/test_v07_e10.js         # v0.7 E10: expense bar arrow: sprite chevron 20 px in a 44 px target, down folded, up open
 node tests/test_v08_cards.js        # v0.8 D2: budget cards (no separator, 30-32 px icons, 10 px titles, titles clear of the amount) and the one House progress tile (iconned stats, house-type milestones, no dead columns)
-node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, identical on #cf-sankey and #bd-sankey, Night and Daylight
+node tests/test_v091_debt_cards.js  # v0.9.1 E33: every debt type is a 3D tile with its lender icon (no chip, number or network off cards), pays down right to left, undo, provider field, old saves load
+node tests/test_v091_debt_reverse.js # v0.9.1 E33b: type icon under the logo on debt tiles; the back shows the debt-free date (estimate), interest this month and year, last three payments and paid so far
+node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, on #bd-sankey, Night and Daylight
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
 node tests/test_v091_model_library.js  # v0.9.1 E30: the 3D button opens a search over models/catalog.json (title, tags, item, set), pick attaches and persists, CC-BY credit on the item and in a credits panel, stand-ins say "Close match", files load only when picked or opened, service worker and build handle models/, no new host, 320/390 px
+node tests/test_v091_overview_budget.js  # v0.9.1 E4/E23/E5/E6: Cash Flow tile 3D only, Net worth window +20%, Budget pills full width, Budget 3D viewport larger
+node tests/test_v091_inventory_files.js  # v0.9.1 E29: inventory 3D uploads: .glb .gltf .stl .obj .fbx .3mf preview, persist across reload, old glb-only record opens, STL/OBJ tinted, oversize and wrong type error
+- `test_v091_cash_accounts.js`: v0.9.1 E15/E16, cash account interest rate (AER), add and take out with Undo, over-balance refused, old saves load, pence-exact.
