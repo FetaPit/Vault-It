@@ -170,6 +170,13 @@ function measure() {
     await p3.setViewportSize({ width: 360, height: 780 }); await p3.waitForTimeout(300);
     const bl360 = await p3.evaluate(() => [...document.querySelectorAll('#tab-biz .ov-kpi-lbl')].filter(e => e.offsetParent).map(e => [Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight === 'normal' ? parseFloat(getComputedStyle(e).fontSize) * 1.2 : getComputedStyle(e).lineHeight)), e.scrollWidth > e.clientWidth + 1]));
     ok(bl360.length > 0 && bl360.every(x => x[0] <= 2 && !x[1]), `360: Entrepreneur KPI labels wrap to at most two lines, none cut (${bl360.map(x => x[0]).join(',')})`);
+    // David / Pedro (2 Nov): 2x2 on phones and small tablets, 4 across once the labels fit in two lines; never a lone tile on its own row
+    for (const w of [460, 599, 700, 768, 1100]) {
+      await p3.setViewportSize({ width: w, height: 844 }); await p3.waitForTimeout(300);
+      const g = await p3.evaluate(() => { const k = [...document.querySelectorAll('#tab-biz .ov-kpis:not(.debt-strip)>.ov-kpi')].filter(e => e.offsetParent); const rows = {}; k.forEach(e => { const t = Math.round(e.getBoundingClientRect().top); rows[t] = (rows[t] || 0) + 1; });
+        const l = k.map(e => e.querySelector('.ov-kpi-lbl')); return { rows: Object.values(rows), lines: l.map(e => Math.round(e.getBoundingClientRect().height / (parseFloat(getComputedStyle(e).fontSize) * 1.2))), cut: l.some(e => e.scrollWidth > e.clientWidth + 1) }; });
+      ok(g.rows.length && g.rows.every(n => n === g.rows[0]) && (w < 768 ? g.rows[0] === 2 : g.rows[0] === 4) && g.lines.every(n => n <= 2) && !g.cut, `${w}: Entrepreneur KPIs ${w < 768 ? '2x2' : '4 across'}, no lone tile, labels at most two lines (rows ${g.rows.join('+')}, lines ${g.lines.join(',')})`);
+    }
     await p3.setViewportSize({ width: 390, height: 844 }); await p3.waitForTimeout(300);
     ok(fu.cap >= 10.5 && fu.capText === 'LAPTOP', `item block caption at ${fu.cap} px (${fu.capText})`);
     ok(fu.sub >= 10.5, `Stocks donut sub-line drawn at ${fu.sub} px`);
@@ -203,7 +210,50 @@ function measure() {
         return { n: sz.length, min: +Math.min(...sz).toFixed(1), scrolls: host.scrollWidth > host.clientWidth, ov, side: document.documentElement.scrollWidth > innerWidth + 1 }; }, id);
       ok(sk.n > 0 && sk.min >= 10.5 && sk.scrolls && sk.ov === 0 && !sk.side, `390 ${id}: chips drawn at ${sk.min} px or more (1:1 in the sideways scroller), none overlapping, page not sideways ` + JSON.stringify(sk));
     }
+    // Pete (2 Nov, into 0.8): the same 1:1 treatment at 600 to 1099 px; 1440 keeps its fitted diagram
+    for (const w of [690, 1024, 1440]) {
+      await p4.setViewportSize({ width: w, height: 900 });
+      for (const [tab, id] of [['overview', 'cf-sankey'], ['budget', 'bd-sankey']]) {
+        await p4.evaluate(t => { showTab(t); try { drawCashflowDiagram(); } catch (e) {} }, tab); await p4.waitForTimeout(700);
+        const sk = await p4.evaluate(id => { const host = document.getElementById(id), sv = host.querySelector('svg'); const sz = [...sv.querySelectorAll('.cf-chip text')].map(t => parseFloat(t.getAttribute('font-size')) * t.getScreenCTM().a);
+          return { n: sz.length, min: +Math.min(...sz).toFixed(1), one: sv.classList.contains('cf-1to1'), side: document.documentElement.scrollWidth > innerWidth + 1 }; }, id);
+        if (w < 1100) ok(sk.n > 0 && sk.min >= 10.5 && sk.one && !sk.side, `${w} ${id}: chips drawn at ${sk.min} px or more, 1:1 in the scroller, page not sideways ` + JSON.stringify(sk));
+        else ok(sk.n > 0 && !sk.one && !sk.side, `${w} ${id}: the fitted diagram is unchanged (not 1:1) ` + JSON.stringify(sk));
+      }
+    }
+    // Pete (2 Nov, into 0.8): a debt tile under 56 px a side shows no text; tap shows its name and amount in a #080808 chip inside the tree map
+    await p4.setViewportSize({ width: 390, height: 844 });
+    await p4.evaluate(() => { showTab('debt'); debtState.debts = [{ id: 1, name: 'Card', original: 2500, balance: 2000, rate: 20, min: 60, type: 'credit' }, { id: 2, name: 'Car loan', original: 6000, balance: 4200, rate: 9, min: 180, type: 'loan' }, { id: 3, name: 'Overdraft', original: 800, balance: 650, rate: 39, min: 25, type: 'overdraft' }, { id: 4, name: 'Catalogue', original: 400, balance: 310, rate: 44, min: 20, type: 'credit' }]; drawDebtTreemap(); });
+    await p4.waitForTimeout(400);
+    const dt = await p4.evaluate(() => { const el = document.getElementById('debt-treemap'), cells = [...el.querySelectorAll('.dtm-cell')];
+      const small = cells.filter(c => c.offsetWidth < 56 || c.offsetHeight < 56), sm = el.querySelector('.dtm-sm');
+      const bad = cells.filter(c => (c.offsetWidth < 56 || c.offsetHeight < 56) && (c.textContent.trim() || !c.classList.contains('dtm-sm'))).length;
+      if (sm) sm.click(); const t = el.querySelector('.dtm-tip'), r = t.getBoundingClientRect(), R = el.getBoundingClientRect(), cs = getComputedStyle(t);
+      const out = { small: small.length, bad, shown: !t.hidden && t.offsetWidth > 0, text: t.textContent, bg: cs.backgroundColor, fs: Math.min(...[...t.children].map(x => parseFloat(getComputedStyle(x).fontSize))), inside: r.left >= R.left - 0.5 && r.right <= R.right + 0.5 && r.top >= R.top - 0.5 && r.bottom <= R.bottom + 0.5 };
+      document.body.click(); el.click(); out.hides = t.hidden; return out; });
+    ok(dt.small > 0 && dt.bad === 0, `390 debt tree map: tiles under 56 px show no text (${dt.small} small)`);
+    ok(dt.shown && /Catalogue/.test(dt.text) && /310/.test(dt.text) && dt.bg === 'rgb(8, 8, 8)' && dt.fs >= 10.5 && dt.inside && dt.hides, '390 debt tree map: tap shows name and amount in a #080808 chip inside the map, and it closes ' + JSON.stringify(dt));
     await c4.close();
+  }
+  // Pete (2 Nov, into 0.8): the header NET WORTH label never wraps; under 380 px it reads NW and the figure stays
+  for (const w of [360, 390]) {
+    const cx = await b.newContext({ viewport: { width: w, height: 800 }, isMobile: true, hasTouch: true }); const pg = await cx.newPage();
+    await pg.addInitScript(() => { try { localStorage.setItem('vi_declined_demo', 'true'); } catch (e) {} });
+    await pg.goto(URL_); await pg.waitForTimeout(1000);
+    const nl = await pg.evaluate(() => { const s = document.querySelector('#topnav .vi-nw-wrap>span:first-child'), v = document.getElementById('nav-nw'), a = getComputedStyle(s, '::after');
+      const lh = parseFloat(getComputedStyle(s).lineHeight) || 16; return { h: s.getBoundingClientRect().height, after: a.content, fig: !!(v && v.offsetParent && v.textContent.trim()) }; });
+    ok(nl.h < 24 && nl.fig && (w < 380 ? nl.after === '"NW"' : nl.after === 'none' || nl.after === 'normal'), `${w}: header net worth label on one line${w < 380 ? ', reads NW' : ''}, figure shown ` + JSON.stringify(nl));
+    await cx.close();
+  }
+  // Pete (2 Nov): the house builder caption starts 44 px in on phones (clear of the controls); caption only, from 600 px it keeps its 14 px
+  for (const [w, want] of [[390, 44], [599, 44], [600, 14]]) {
+    const cx = await b.newContext({ viewport: { width: w, height: 844 } }); const pg = await cx.newPage();
+    await pg.addInitScript(() => { try { localStorage.setItem('vi_declined_demo', 'true'); } catch (e) {} });
+    await pg.goto(URL_); await pg.waitForTimeout(800);
+    const l = await pg.evaluate(() => { const h = document.createElement('div'); h.id = 'house-scene'; h.className = 'hb-brand'; h.style.cssText = 'position:fixed;left:0;top:0;width:300px;height:200px'; h.innerHTML = '<div id="hb3d-cap-t" style="position:absolute"></div>'; document.body.appendChild(h);
+      const c = h.firstChild; c.id = 'hb3d-cap'; const v = getComputedStyle(c).left; h.remove(); return parseFloat(v); });
+    ok(l === want, `${w}: house builder caption left ${l} px (want ${want})`);
+    await cx.close();
   }
   // the user's Text Size setting still works (Large = 15 px root on a phone)
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true }); const page = await ctx.newPage();

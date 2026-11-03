@@ -49,7 +49,10 @@ const seed = theme => {
   const cam1 = await p.evaluate(() => _i3dLive.view.cam.position.toArray());
   const moved = Math.hypot(cam1[0] - cam0[0], cam1[2] - cam0[2]);
   ok(moved > 0.3 && !(await p.$('#i3d-modal')), 'click and drag orbits round the item, and does not open the viewer (camera moved ' + moved.toFixed(2) + ')');
-  await p.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await p.waitForTimeout(800);
+  // the viewer opens 350 ms after a single click (the double-click window); on a CPU-only machine the software WebGL shader compiles can hold
+  // the page for several seconds, so wait for the outcome (up to 10 s) rather than a fixed 800 ms (measured: 1.4 to 6 s on the same build)
+  await p.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await p.waitForFunction(() => document.getElementById('i3d-modal') && !window._i3dLive && document.querySelectorAll('canvas.i3d-canvas').length === 1, null, { timeout: 10000 }).catch(() => {});
   ok(!!(await p.$('#i3d-modal')) && await p.evaluate(() => !window._i3dLive), 'a click without a drag opens the full viewer (and the tile\'s live view stops)');
   ok(await p.evaluate(() => document.querySelectorAll('canvas.i3d-canvas').length === 1), 'only one 3D view is open at a time');
   await ctx.close();
