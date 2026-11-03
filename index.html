@@ -10799,7 +10799,7 @@ button.bd-ic{cursor:pointer}
 .inv-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .inv-t{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--tx)}
 .inv-s{font-family:'Share Tech Mono',monospace;font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);margin-top:2px}
-.inv-x{background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:30px;height:30px;cursor:pointer}
+.inv-x{background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:44px;height:44px;cursor:pointer}
 .inv-x:hover{color:#fff;border-color:var(--blue)}
 .inv-stage{position:relative;width:100%;aspect-ratio:4/3;max-height:58vh;border-radius:10px;overflow:hidden;background:var(--panel);border:1px solid rgb(var(--ink-rgb) / .06)}
 .inv-stage canvas{width:100%;height:100%;display:block}
@@ -10826,10 +10826,10 @@ button.bd-ic{cursor:pointer}
 .i3d-credit{font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);word-break:break-word}
 .i3d-row{display:flex;gap:6px;flex-wrap:wrap}
 /* the viewer's Change model, Remove model, View current model and Photos buttons: the ghost pill of "Link to market value" (Pedro's round 2; .dep-btn had no style), at a tap-sized 11 px */
-.i3d-row .dep-btn{display:inline-flex;align-items:center;font:600 11px 'DM Sans',sans-serif;padding:5px 11px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
+.i3d-row .dep-btn{display:inline-flex;align-items:center;font:600 11px 'DM Sans',sans-serif;min-height:44px;padding:5px 14px;border-radius:999px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .45);color:var(--teal);cursor:pointer}
 .i3d-row .dep-btn:hover,.i3d-row .dep-btn:focus-visible{background:rgb(var(--teal-rgb) / .24)}
 .i3d-opts{display:flex;flex-direction:column;gap:10px}
-.i3d-up{display:block;text-align:center;padding:10px;cursor:pointer;font-size:max(.62rem,var(--vi-fs-2))}
+.i3d-up{display:flex;align-items:center;justify-content:center;min-height:44px;text-align:center;padding:10px;cursor:pointer;font-size:max(.62rem,var(--vi-fs-2))}
 .i3d-lib-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.7rem,var(--vi-fs-3));color:var(--tx);display:flex;align-items:center;gap:6px}
 .i3d-tag{font-family:'Share Tech Mono',monospace;font-size:max(.46rem,var(--vi-fs-1));padding:1px 6px;border-radius:99px;border:1px solid var(--amber);color:var(--amber);letter-spacing:.08em;text-transform:uppercase}
 .i3d-lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
@@ -21892,7 +21892,7 @@ function i3dLoader(fmt){
   I3D_LDP[fmt]=p;p.catch(function(){delete I3D_LDP[fmt];});return p;
 }
 // STL and OBJ (when it has no colours of its own) take the item's colour: green for wealth, red for liabilities, the same as the app's tiles
-var I3D_TINT={wi:0x3ECF8E,li:0xE05C5C};
+var I3D_TINT={wi:0x2A9A68,li:0xA84444};   // the brand green and red, a shade down because the stage lights brighten them
 function i3dTintNone(obj,hex){
   obj.traverse(function(o){if(!o.isMesh)return;
     var mats=Array.isArray(o.material)?o.material:[o.material];
@@ -21968,6 +21968,8 @@ function I3DView(host,obj,opts){
   var grid=new THREE.GridHelper(24,48,i3dCol(0x1f5e5a),i3dCol(0x123734));grid.material.transparent=true;grid.material.opacity=0.35;grid.position.y=0.002;sc.add(grid);
   this.tinted=i3dStyle(obj);var bb=i3dFit(obj);sc.add(obj);this.obj=obj;
   var cam=this.cam=new THREE.PerspectiveCamera(35,w/h,0.02,100);
+  /* on a narrow stage the control column (40 px) sits over the model's right edge: slide the picture left so nothing runs under it */
+  this._vo=function(W,H){if(host.id==='i3d-stage'&&W<520)cam.setViewOffset(W,H,28,0,W,H);else if(cam.view)cam.clearViewOffset();};this._vo(w,h);
   var ty=Math.max(0.3,(bb.max.y)/2);this.home={p:new THREE.Vector3(2.6,1.7+ty*0.4,3.4),t:new THREE.Vector3(0,ty,0)};
   cam.position.copy(this.home.p);cam.lookAt(this.home.t);
   if(opts.still){r.render(sc,cam);return;}
@@ -21980,7 +21982,7 @@ function I3DView(host,obj,opts){
   ctl.addEventListener('change',function(){self.kick();});
   ctl.update();
   // draws only while something moves (drag, pinch, auto-rotate, a kick), never off screen or in a background tab
-  var loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}var W=host.clientWidth,H=host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();}
+  var loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}var W=host.clientWidth,H=host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;self._vo(W,H);cam.updateProjectionMatrix();}
     var moving=ctl.update();var t=performance.now();r.render(sc,cam);
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}
     self._lastT=moving?t:0;

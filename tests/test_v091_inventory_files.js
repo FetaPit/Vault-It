@@ -152,7 +152,7 @@ const probe = p => p.evaluate(() => { const V = _i3dView; if (!V || !V.obj) retu
         ok(pr.h > 0.9 && pr.h < 1.2, theme + ' ' + f.fmt + ': stands upright (height ' + pr.h + ')');
       }
       if (f.fmt === 'stl') ok(await p.evaluate(() => { let bad = 0; _i3dView.obj.traverse(o => { if (o.isMesh) { const n = o.geometry.attributes.normal; for (let i = 0; i < n.count; i++) if (!(Math.hypot(n.getX(i), n.getY(i), n.getZ(i)) > 0.5)) bad++; } }); return bad === 0; }), theme + ' stl: a file with zero normals is relit (not black)');
-      if (f.fmt === 'stl' || f.fmt === 'obj') ok(pr && pr.col === '3ecf8e', theme + ' ' + f.fmt + ': tinted with the item colour (' + (pr && pr.col) + ')');
+      if (f.fmt === 'stl' || f.fmt === 'obj') ok(pr && pr.col === '2a9a68', theme + ' ' + f.fmt + ': tinted with the item colour (' + (pr && pr.col) + ')');
       const rec = await p.evaluate(([k, i]) => invTx('readonly', s => s.get(i3dKey(k, i))).then(v => v && { fmt: v.fmt, n: v.glb && v.glb.byteLength }), ['wi', item]);
       const it = await p.evaluate(i => i3dItem('wi', i).model, item);
       ok(rec && rec.fmt === f.fmt && rec.n === f.buf.length, theme + ' ' + f.fmt + ': buffer and fmt kept on the device ' + JSON.stringify(rec));
@@ -187,7 +187,7 @@ const probe = p => p.evaluate(() => { const V = _i3dView; if (!V || !V.obj) retu
       await p.evaluate(() => i3dPick('li', 21));
       await p.setInputFiles('#i3d-modal input[type=file]', { name: 'p.stl', mimeType: 'model/stl', buffer: stlBuf() });
       await p.waitForFunction(() => window._i3dView && _i3dView.ctl, null, { timeout: 20000 }).catch(() => {});
-      const li = await probe(p); ok(li && li.col === 'e05c5c', theme + ': liability STL is tinted with the liability colour (' + (li && li.col) + ')');
+      const li = await probe(p); ok(li && li.col === 'a84444', theme + ': liability STL is tinted with the liability colour (' + (li && li.col) + ')');
       await p.keyboard.press('Escape');
     }
     // oversize and wrong type: one-line error, nothing saved
