@@ -9585,14 +9585,20 @@ body.reduced-motion #app-footer, body.reduced-motion #app-footer * { transition:
   top: 0; left: 0;
 }
 .fire-timeline-scroll { contain: layout paint; overscroll-behavior-x: contain; }
-/* roadmap depth (owner, 31 Oct): the road sits in slight perspective, coins turn and grow */
-#fire-track{transform:perspective(1100px) rotateX(8deg);transform-origin:50% 100%}
-.fire-coin{transform-box:fill-box;transform-origin:center;transition:transform .25s var(--ease),opacity .25s}
-.fire-coin:hover{transform:scale(1.12)}
-.fire-coin.next{animation:fire-spin 3.4s ease-in-out infinite}
+/* roadmap depth (owner, 3 Nov round 2): the perspective is drawn, not tilted: a thin ground strip with a converging grid (#fire-ground)
+   and the tokens floating above it; a token lifts a little more on hover, and the stage to work on turns slowly (owner, 31 Oct) */
+.fire-stage{position:relative}
+.fire-ground{position:absolute;left:0;right:0;bottom:0;height:56px;width:100%;pointer-events:none;z-index:0}
+.fire-ground .fg-h,.fire-ground .fg-v{stroke:var(--teal);fill:none;vector-effect:non-scaling-stroke}
+.fire-ground .fg-v{stroke-opacity:.16}
+.fire-stage .fire-timeline-scroll{position:relative;z-index:1}
+.fire-coin{transform-box:fill-box;transform-origin:50% 70%;transition:transform .25s var(--ease),opacity .25s}
+.fire-card{transform-box:fill-box;transform-origin:center;transition:transform .25s var(--ease)}
+.fire-coin:hover .fire-card{transform:translateY(-5px)}
+.fire-coin.next .fire-card{animation:fire-spin 3.4s ease-in-out infinite}
 @keyframes fire-spin{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.84)}}
-@media(max-width:700px){#fire-track{transform:none}.fire-coin.next{animation:none}}
-@media(prefers-reduced-motion:reduce){.fire-coin.next{animation:none}.fire-coin{transition:none}}
+@media(max-width:700px){.fire-coin.next .fire-card{animation:none}}
+@media(prefers-reduced-motion:reduce){.fire-coin.next .fire-card{animation:none}.fire-coin,.fire-card{transition:none}}
 .fd-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.54rem,var(--vi-fs-1));letter-spacing:.04em;padding:7px 12px;border-radius:6px;cursor:pointer;color:var(--gold);background:rgb(var(--gold-rgb) / .12);border:1px solid rgb(var(--gold-rgb) / .55)}
 .fd-btn.ghost{color:var(--t2);background:transparent;border-color:var(--bd)}
 .fd-box{margin-top:8px;padding:9px 11px;border:1px solid rgb(var(--teal-rgb) / .25);border-radius:7px;background:rgb(var(--teal-rgb) / .05);font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);line-height:1.5}
@@ -11202,29 +11208,31 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 /* ══ WEALTH ROADMAP: tokens and levelling (owner, 3 Nov 2026; brief docs/creative/wealth-roadmap/BRIEF.md) ══
    Tier colours are brand tokens, so Night and Daylight both work: Starter grey, Solid teal, Strong purple, Summit brass.
    Never blue (surplus) or red (debt); green only on the achieved tick, amber only for skipped. */
-:root{--wt-tint:.34}
-[data-theme="light"]{--wt-tint:.16}
-.wt{--wt:var(--lock)}.wt.t-solid{--wt:var(--teal)}.wt.t-strong{--wt:var(--purple)}.wt.t-summit{--wt:var(--brass)}
-.wt.st-lock{--wt:var(--lock)}
-.wt-depth{fill:color-mix(in srgb,var(--wt) 55%,var(--bg))}
-.wt-base{fill:var(--panel)}
-.wt-rim{fill:none;stroke:var(--slate);stroke-width:8;stroke-linejoin:round}
-.wt-edge{fill:none;stroke:var(--wt);stroke-width:1.4;vector-effect:non-scaling-stroke}
-.wt-hair{fill:none;stroke:var(--wt);stroke-opacity:.4;stroke-width:1;vector-effect:non-scaling-stroke}
-.wt-notch{fill:var(--wt)}
-.wt-stud{fill:var(--panel);stroke:var(--wt);stroke-width:1;vector-effect:non-scaling-stroke}
-.wt-stud.on{fill:var(--wt)}
-.wt-icf{fill:var(--wt);fill-opacity:.18}
-.wt-ics{fill:none;stroke:var(--wt);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.wt.t-starter:not(.st-lock) .wt-ics{stroke:var(--text)}
-.wt.st-done .wt-icf,.wt.st-own .wt-icf{fill-opacity:.3}
-.wt-num{font-family:'Syne',sans-serif;font-weight:800;font-size:40px;fill:var(--wt)}
-.wt.t-starter .wt-num{fill:var(--text)}
-.wt-halo{fill:none;stroke:var(--wt);stroke-width:1.4;stroke-opacity:.7;vector-effect:non-scaling-stroke}
-.st-wait .wt-edge{stroke-dasharray:4 3}
-.st-skip .wt-edge{stroke:var(--amber);stroke-dasharray:1.5 2.5}
-.st-lock .wt-edge:not(.o){display:none}
-.st-lock .wt-rim{stroke-width:3}
+.wt{--wt:#8C939B;--wt-d:#2a3036;--wt-dd:#1a1f24;--wt-l:#c9ced3}
+.wt.t-solid{--wt:#44C0B9;--wt-d:#0f4a47;--wt-dd:#0a2b2a;--wt-l:#a9ece8}
+.wt.t-strong{--wt:#9B7EC8;--wt-d:#3b2a5c;--wt-dd:#22183a;--wt-l:#d9c9f2}
+.wt.t-summit{--wt:#C9A84C;--wt-d:#5e4614;--wt-dd:#2e220a;--wt-l:#f3e2a8}
+/* token art keeps the same colours in Night and Daylight: it is an object on the page, like a coin. Only chips follow the theme */
+.wt.st-lock,.wt.st-skip{--wt-d:#232a31;--wt-dd:#151a1f;--wt-l:#5d666e}
+.wt-edge{fill:var(--wt-dd);stroke:var(--wt-d);stroke-width:.6}
+.wt-rimline{fill:none;stroke:var(--wt-l);stroke-width:.8;stroke-opacity:.85}
+.st-wait .wt-rimline{stroke-dasharray:4 3}
+.st-skip .wt-rimline{stroke:#e8a23c;stroke-dasharray:2 3}
+.wt-metal{stroke:#05080c;stroke-opacity:.5;stroke-width:1}
+.wt-tick{stroke:#0a0e12;stroke-width:.8;fill:none}
+.wt-mface{fill:#0b1015;stroke:var(--wt-l);stroke-width:1.4}
+.wt-mring{fill:none;stroke:var(--wt-l);stroke-opacity:.5;stroke-width:.6;stroke-dasharray:1.5 2}
+.wt-icon{color:var(--wt-l);--vi-sw:1.3;overflow:visible}
+.st-lock .wt-icon,.st-skip .wt-icon{color:#7d868e}
+.wt-icf{fill:var(--wt-l);fill-opacity:.2}
+.wt-ics{fill:none;stroke:var(--wt-l);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.wt-num{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;fill:var(--wt-l)}
+.wt-tl{font-family:'Share Tech Mono',monospace;font-size:16px;fill:#fff}
+.st-lock .wt-tl,.st-skip .wt-tl{fill:#7d868e}
+.wt-side{font-family:'Syne',sans-serif;font-weight:800;font-size:12.5px;letter-spacing:1px;fill:var(--wt-l)}
+.wt-bar{fill:#fff;fill-opacity:.16}
+.wt-bar.on{fill:var(--wt-l);fill-opacity:1}
+.wt-halo{fill:none;stroke:#44C0B9;stroke-width:1.4;stroke-opacity:.85;vector-effect:non-scaling-stroke}
 .wt-chipbg{fill:var(--panel);stroke:var(--wt);stroke-width:2.2;stroke-linejoin:round}
 .wt-cg{fill:none;stroke:var(--wt);stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
 .wt-cgf{fill:var(--wt)}
@@ -11239,7 +11247,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .fire-next-step{padding:0 16px 8px;font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2),10.5px);color:var(--t2);line-height:1.5}
 .fire-next-step b{font-family:'Syne',sans-serif;color:var(--tx);margin-right:4px}
 .fire-next-step span{font-family:'Share Tech Mono',monospace;color:var(--brass);white-space:nowrap}
-.wr-dtok{flex:none;width:64px}
+.wr-dtok{flex:none;width:100px}@media(max-width:480px){.wr-dtok{width:80px}}
 .wr-steps-h{margin-top:10px}
 .wr-steps{list-style:none;margin:6px 0 4px;padding:0;display:grid;gap:6px}
 .wr-steps li{display:flex;align-items:center;gap:8px;font-size:max(.58rem,var(--vi-fs-2),10.5px);color:var(--t2)}
@@ -11263,7 +11271,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 #wr-roadmap-slot{min-width:0}
 #wr-roadmap-slot>.fire-roadmap-card{margin:0}
 .wr-rank-main{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-.wr-rank-tok{position:relative;flex:none;padding-bottom:12px}
+.wr-rank-tok{position:relative;flex:none}
 .wr-ribbon{position:absolute;left:50%;bottom:0;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:max(.6rem,10.5px);letter-spacing:.1em;text-transform:uppercase;color:var(--tx);background:var(--panel);border:1px solid var(--brass);padding:2px 10px;white-space:nowrap;clip-path:polygon(6px 0,calc(100% - 6px) 0,100% 50%,calc(100% - 6px) 100%,6px 100%,0 50%)}
 .wr-rank-meta{flex:1;min-width:200px}
 .wr-eyebrow{font-family:'Share Tech Mono',monospace;font-size:max(.58rem,10.5px);letter-spacing:.12em;text-transform:uppercase;color:var(--t2)}
@@ -11331,13 +11339,29 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 </style>
 </head>
 <body>
-<!-- Wealth Roadmap token fills, defined once for every token on the page (tier tints follow the theme through CSS variables) -->
+<!-- Wealth Roadmap token art, defined once for every token on the page (owner, 3 Nov round 2: Apex-style medallion cards) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
-<linearGradient id="wtg-starter" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--lock);stop-opacity:var(--wt-tint)"/><stop offset=".6" style="stop-color:var(--lock);stop-opacity:calc(var(--wt-tint) * .25)"/><stop offset="1" style="stop-color:var(--lock);stop-opacity:0"/></linearGradient>
-<linearGradient id="wtg-solid" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--teal);stop-opacity:var(--wt-tint)"/><stop offset=".6" style="stop-color:var(--teal);stop-opacity:calc(var(--wt-tint) * .25)"/><stop offset="1" style="stop-color:var(--teal);stop-opacity:0"/></linearGradient>
-<linearGradient id="wtg-strong" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--purple);stop-opacity:var(--wt-tint)"/><stop offset=".6" style="stop-color:var(--purple);stop-opacity:calc(var(--wt-tint) * .25)"/><stop offset="1" style="stop-color:var(--purple);stop-opacity:0"/></linearGradient>
-<linearGradient id="wtg-summit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--brass);stop-opacity:var(--wt-tint)"/><stop offset=".6" style="stop-color:var(--brass);stop-opacity:calc(var(--wt-tint) * .25)"/><stop offset="1" style="stop-color:var(--brass);stop-opacity:0"/></linearGradient>
-<pattern id="wt-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" style="stroke:var(--amber);stroke-opacity:.5" stroke-width="2"/></pattern>
+<linearGradient id="wtc-starter" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8C939B"/><stop offset=".55" stop-color="#2a3036"/><stop offset="1" stop-color="#1a1f24"/></linearGradient>
+<pattern id="wts-starter" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="2.2" height="6" fill="#c9ced3" opacity=".35"/></pattern>
+<pattern id="wth-starter" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#c9ced3" opacity=".45"/></pattern>
+<linearGradient id="wtc-solid" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#44C0B9"/><stop offset=".55" stop-color="#0f4a47"/><stop offset="1" stop-color="#0a2b2a"/></linearGradient>
+<pattern id="wts-solid" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="2.2" height="6" fill="#a9ece8" opacity=".35"/></pattern>
+<pattern id="wth-solid" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#a9ece8" opacity=".45"/></pattern>
+<linearGradient id="wtc-strong" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B7EC8"/><stop offset=".55" stop-color="#3b2a5c"/><stop offset="1" stop-color="#22183a"/></linearGradient>
+<pattern id="wts-strong" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="2.2" height="6" fill="#d9c9f2" opacity=".35"/></pattern>
+<pattern id="wth-strong" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#d9c9f2" opacity=".45"/></pattern>
+<linearGradient id="wtc-summit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9A84C"/><stop offset=".55" stop-color="#5e4614"/><stop offset="1" stop-color="#2e220a"/></linearGradient>
+<pattern id="wts-summit" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="2.2" height="6" fill="#f3e2a8" opacity=".35"/></pattern>
+<pattern id="wth-summit" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#f3e2a8" opacity=".45"/></pattern>
+<linearGradient id="wtc-lock" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d2329"/><stop offset=".55" stop-color="#12171c"/><stop offset="1" stop-color="#0c1014"/></linearGradient>
+<pattern id="wth-lock" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#8C939B" opacity=".14"/></pattern>
+<linearGradient id="wtm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".45" stop-color="#9aa3ad"/><stop offset=".55" stop-color="#d7dde2"/><stop offset="1" stop-color="#5c656e"/></linearGradient>
+<linearGradient id="wtm-lock" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a929a"/><stop offset=".5" stop-color="#4a5259"/><stop offset="1" stop-color="#2c3237"/></linearGradient>
+<clipPath id="wt-clip"><polygon points="0,0 72,0 100,28 100,132 14,132 0,118"/></clipPath>
+<radialGradient id="wt-shadow"><stop offset="0" stop-color="#000" stop-opacity=".7"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+<radialGradient id="wt-pad"><stop offset="0" stop-color="#44C0B9" stop-opacity=".55"/><stop offset="1" stop-color="#44C0B9" stop-opacity="0"/></radialGradient>
+<linearGradient id="wt-beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#44C0B9" stop-opacity="0"/><stop offset="1" stop-color="#44C0B9" stop-opacity=".38"/></linearGradient>
+<pattern id="wt-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#e8a23c" stroke-opacity=".45" stroke-width="2"/></pattern>
 </defs></svg>
 <svg xmlns="http://www.w3.org/2000/svg" id="vi-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
 <symbol id="vi-coins" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 8c0 1.4 3.6 2.5 8 2.5S20 9.4 20 8s-3.6-2.5-8-2.5S4 6.6 4 8z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M4 8c0 1.4 3.6 2.5 8 2.5S20 9.4 20 8s-3.6-2.5-8-2.5S4 6.6 4 8z'/><path d='M4 8v4c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V8'/><path d='M4 12v4c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5v-4'/></g></symbol>
@@ -12318,7 +12342,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       </div>
       <div class="fr-legend">
         <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-done"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><path class="wt-cg" d="M8.5 16.5l5 5L24 11"/></g></g></svg>Achieved</span>
-        <span><svg width="16" height="16" viewBox="-8 -8 116 116" aria-hidden="true"><g class="wt t-solid st-next"><polygon class="wt-base" points="22,0 78,0 100,22 100,78 78,100 22,100 0,78 0,22"/><polygon class="wt-halo" points="19.5,-6 80.5,-6 106,19.5 106,80.5 80.5,106 19.5,106 -6,80.5 -6,19.5" style="stroke-width:10"/></g></svg>Next up</span>
+        <span><svg width="13" height="17" viewBox="-8 -10 116 150" aria-hidden="true"><g class="wt t-solid st-next"><polygon points="0,0 72,0 100,28 100,132 14,132 0,118" fill="url(#wtc-solid)"/><polygon class="wt-halo" points="-6,-7 74.6,-7 106,24.4 106,140.8 9.7,140.8 -6,125.2" style="stroke-width:10;vector-effect:none"/></g></svg>Next up</span>
         <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-wait"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><path class="wt-cg" d="M8.5 16.5l5 5L24 11"/></g></g></svg>Met, waiting</span>
         <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-skip"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><path class="wt-cg" d="M8 10l6 6-6 6M16 10l6 6-6 6"/></g></g></svg>Skipped</span>
         <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-lock"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><rect class="wt-cgf" x="10" y="15" width="12" height="9.5" rx="1.6"/><path class="wt-cg" d="M12.6 15v-2.6a3.4 3.4 0 0 1 6.8 0V15"/></g></g></svg>Locked: finish earlier stages first</span>
@@ -12326,8 +12350,10 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       </div>
       <div class="fire-next-step" id="fire-next-step" aria-live="polite"></div>
       <!-- Horizontal scrolling timeline: the SVG is only the window of stages on screen -->
+      <div class="fire-stage"><svg class="fire-ground" id="fire-ground" aria-hidden="true" focusable="false"></svg>
       <div class="fire-timeline-scroll" id="fire-timeline-scroll">
         <div id="fire-track" style="position:relative;height:280px"><svg id="fire-roadmap-svg" class="fire-timeline-svg"></svg></div>
+      </div>
       </div>
       <!-- Stage detail panel — shown on click -->
       <div class="fire-detail-panel" id="fire-detail-panel" style="display:none">
@@ -17761,14 +17787,23 @@ var WR_LEVELS=[['Spare Change',0],['Penny Pincher',100],['Budget Builder',250],[
   ['Coast Captain',9350],['Wealth Architect',10600],['Freedom Maker',11800],['Vault Legend',13000]].map(function(l,i){return {n:i+1,name:l[0],xp:l[1],rank:Math.floor(i/4)};});
 var WR_REWARD={level:8,days:30};
 // side quests from saving habits: the House Builder contribution streak (weekly or monthly) and two monthly habits, capped at 25 XP a month
-var WR_QUESTS=[{id:'q3',ic:'repeat',name:'Three in a row',desc:'Save towards your goal 3 periods in a row',need:3,xp:10},
-  {id:'q6',ic:'trend',name:'Six in a row',desc:'Save towards your goal 6 periods in a row',need:6,xp:25},
-  {id:'q12',ic:'flame2',name:'Twelve in a row',desc:'Save towards your goal 12 periods in a row',need:12,xp:60},
-  {id:'snap',ic:'snapshot',name:'Monthly snapshot',desc:'Record your net worth this month',month:true,xp:10},
-  {id:'bud',ic:'card',name:'Budget kept',desc:'Income and spending filled in this month',month:true,xp:15}];
-var WR_BADGE_IC={nw100:'sprout',nw500:'coin',nw1k:'coins',nw2k:'piggy',nw5k:'trend',nw10k:'bars',nw25k:'barsUp',nw50k:'gem',nw75k:'bolt',nw100k:'medal',nw150k:'gem2',nw200k:'mountain',
-  nw250k:'sparkle',nw500k:'tree',nw750k:'flame2',nw1m:'bank',save10:'piggy',save25:'safe',save50:'halfPie',snap1:'snapshot',snap3:'repeat',snap12:'book',debtstart:'scissors',
-  debt50:'halfPie',debtfree:'unlock',home:'house',gold:'coin',stream1:'rocket',fullfi:'flame',ef1k:'shield',coast:'sail'};
+var WR_QUESTS=[{id:'q3',ic:'vi-streak',name:'Three in a row',desc:'Save towards your goal 3 periods in a row',need:3,xp:10},
+  {id:'q6',ic:'vi-repeat',name:'Six in a row',desc:'Save towards your goal 6 periods in a row',need:6,xp:25},
+  {id:'q12',ic:'vi-flame',name:'Twelve in a row',desc:'Save towards your goal 12 periods in a row',need:12,xp:60},
+  {id:'snap',ic:'vi-camera',name:'Monthly snapshot',desc:'Record your net worth this month',month:true,xp:10},
+  {id:'bud',ic:'vi-budget',name:'Budget kept',desc:'Income and spending filled in this month',month:true,xp:15}];
+// brand-library icons (owner, 3 Nov round 2: "utilize our brand book ... icon library"), drawn inside each token's medallion
+var WR_STAGE_IC={firstLog:'vi-net-worth',mapDebts:'vi-debt-tracker',zeroBudget:'vi-budget',firstSaved:'vi-coin',buf500:'vi-lifebuoy',buf1k:'vi-shield',firstCut:'vi-paid-off',
+  debtHalf:'vi-snowball',nw1k:'vi-gem',debtFree:'vi-unlock',ef3:'vi-umbrella',ef6:'vi-safe',isa:'vi-piggy',dep1:'vi-brick',dep5:'vi-brick-wall',nw5k:'vi-trend-base',
+  depReady:'vi-house-builder',nw10k:'vi-coins',applied:'vi-target',exchanged:'vi-sync',keys:'vi-keys',nw25k:'vi-assets-total',nw50k:'vi-candles',nw100k:'vi-milestone',
+  coastFI:'vi-boat',mortFree:'vi-home',nw250k:'vi-crown',fullFI:'vi-flame',fatFIRE:'vi-sparkle',legacy:'vi-vault'};
+var WR_BADGE_IC={nw100:'vi-coin',nw500:'vi-coins',nw1k:'vi-cash',nw2k:'vi-piggy',nw5k:'vi-trend-base',nw10k:'vi-candles',nw25k:'vi-assets-total',nw50k:'vi-gem',nw75k:'vi-bolt',
+  nw100k:'vi-milestone',nw150k:'vi-ring',nw200k:'vi-metals',nw250k:'vi-crown',nw500k:'vi-vault',nw750k:'vi-sparkle',nw1m:'vi-trophy',save10:'vi-piggy',save25:'vi-safe',
+  save50:'vi-slice',snap1:'vi-camera',snap3:'vi-calendar',snap12:'vi-forecast',debtstart:'vi-debt-tracker',debt50:'vi-snowball',debtfree:'vi-paid-off',home:'vi-home',
+  gold:'vi-metals',stream1:'vi-rocket',fullfi:'vi-flame',ef1k:'vi-lifebuoy',coast:'vi-boat'};
+// the token card (Apex-style clipped card, owner's pick A, 3 Nov) in a 100 x 132 box, and its medallion dial
+var WR_CARD=[[0,0],[72,0],[100,28],[100,132],[14,132],[0,118]];
+var WR_DIAL=(function(){var d='';for(var a=0;a<360;a+=10){var r=a%30?22.5:24,x=Math.cos(a*Math.PI/180),y=Math.sin(a*Math.PI/180);d+='M'+(44+x*21).toFixed(1)+' '+(76+y*21).toFixed(1)+'L'+(44+x*r).toFixed(1)+' '+(76+y*r).toFixed(1);}return '<path class="wt-tick" d="'+d+'"/>';})();   // one path, so a rail of tokens stays light
 var WR_CHIP={done:'<path class="wt-cg" d="M8.5 16.5l5 5L24 11"/>',wait:'<path class="wt-cg" d="M8.5 16.5l5 5L24 11"/>',
   skip:'<path class="wt-cg" d="M8 10l6 6-6 6M16 10l6 6-6 6"/>',lock:'<rect class="wt-cgf" x="10" y="15" width="12" height="9.5" rx="1.6"/><path class="wt-cg" d="M12.6 15v-2.6a3.4 3.4 0 0 1 6.8 0V15"/>'};
 var LVS=WR_LEVELS.map(function(l){return {n:l.name,xp:l.xp};});
@@ -23315,29 +23350,35 @@ function wrXpTier(xp){return xp<=50?'starter':xp<=150?'solid':xp<=400?'strong':'
 // the token outline: an octagon with 45 degree chamfers in a 100 x 100 box, inset by d
 function wrOct(d){var a=22+d*.4142,b=78-d*.4142,f=100-d;return [[a,d],[b,d],[f,a],[f,b],[b,f],[a,f],[d,b],[d,a]];}
 function wrPts(p,ox,oy,sc){ox=ox||0;oy=oy||0;sc=sc||1;return p.map(function(q){return (ox+q[0]*sc).toFixed(1)+','+(oy+q[1]*sc).toFixed(1);}).join(' ');}
-/* one token, drawn in a 100 x 105 box (the extra 5 is the depth plate of Strong and Summit). o: tier, st (done, next, wait, skip, lock,
-   own = unlocked in the collection), lit (studs lit), studs (6 on stages and quests, 8 on the rank token), ic or num, chip, r */
+/* one token: an Apex-style clipped card (owner's pick A, 3 Nov round 2) in a 100 x 132 box, with a stacked edge down and left,
+   diagonal stripes, halftone, and a metal medallion holding a brand-library icon (or the level number).
+   o: tier, st (done, next, wait, skip, lock, own = earned in the collection), ic (a vi- sprite id), num, bars and lit (step bars),
+   chip, px (the drawn width: text shows only where it renders at 10.5 px or more), tl (top-left text), name (runs up the side), r */
+function wrIcon(id,x,y,s){
+  if(/^vi-/.test(id||''))return '<svg class="wt-icon" x="'+x+'" y="'+y+'" width="'+s+'" height="'+s+'" viewBox="0 0 24 24"><use href="#'+id+'"/></svg>';
+  var ic=FIRE_ICONS[id]||(typeof BD_ICONS!=='undefined'&&BD_ICONS[id])||FIRE_ICONS.gem,pth=function(d){return '<path d="'+d+'"/>';};
+  return '<g transform="translate('+x+' '+y+') scale('+(s/24).toFixed(3)+')"><g class="wt-icf">'+ic.f.map(pth).join('')+'</g><g class="wt-ics">'+ic.d.map(pth).join('')+'</g></g>';
+}
 function wrTok(o){
-  var t=o.tier||'starter',st=o.st||'done',n=o.studs||6,lit=o.lit==null?n:o.lit,O=wrPts(wrOct(0));
+  var t=o.tier||'starter',st=o.st||'done',px=o.px||100,sc=o.sc||px/118,L=st==='lock',dim=L||st==='skip',K=wrPts(WR_CARD),n=o.bars||0,lit=o.lit==null?n:o.lit,k;
   var out='<g class="wt t-'+t+' st-'+st+'">';
-  if(t==='strong'||t==='summit')out+='<polygon class="wt-depth" points="'+O+'" transform="translate(0 5)"/>';
-  out+='<polygon class="wt-base fire-face" data-r="'+(o.r||50)+'" points="'+O+'"/>';
-  if(st==='skip')out+='<polygon points="'+wrPts(wrOct(8))+'" fill="url(#wt-hatch)"/>';
-  else if(st!=='lock')out+='<polygon class="wt-tint" points="'+wrPts(wrOct(8))+'" fill="url(#wtg-'+t+')"/>';
-  out+='<polygon class="wt-rim" points="'+wrPts(wrOct(4))+'"/><polygon class="wt-edge o" points="'+wrPts(wrOct(.8))+'"/><polygon class="wt-edge" points="'+wrPts(wrOct(8))+'"/>'
-    +'<polygon class="wt-hair" points="'+wrPts(wrOct(14))+'"/>';
-  if(t==='summit')out+='<polygon class="wt-hair" points="'+wrPts(wrOct(17.5))+'"/><path class="wt-notch" d="M44 0h12l-6 5z"/>';
-  var V=wrOct(4),idx=n===8?[0,1,2,3,4,5,6,7]:[0,1,2,5,6,7];
-  idx.forEach(function(k,i){out+='<circle class="fire-stud wt-stud'+(i<lit?' on':'')+'" cx="'+V[k][0].toFixed(1)+'" cy="'+V[k][1].toFixed(1)+'" r="3.4"/>';});
-  if(o.num!=null)out+='<text class="wt-num" x="50" y="63" text-anchor="middle">'+o.num+'</text>';
-  else{var ic=FIRE_ICONS[o.ic]||(typeof BD_ICONS!=='undefined'&&BD_ICONS[o.ic])||FIRE_ICONS.gem,pth=function(d){return '<path d="'+d+'"/>';};
-    out+='<g transform="translate(27 24) scale(1.9167)"><g class="wt-icf">'+ic.f.map(pth).join('')+'</g><g class="wt-ics">'+ic.d.map(pth).join('')+'</g></g>';}
-  if(st==='next')out+='<polygon class="wt-halo" points="'+wrPts(wrOct(-6))+'"/>';
-  if(o.chip&&WR_CHIP[o.chip])out+='<g class="wt-chip c-'+o.chip+'" transform="translate(68 68)"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/>'+WR_CHIP[o.chip]+'</g>';
+  for(k=2;k>=1;k--)out+='<polygon class="wt-edge" points="'+K+'" transform="translate('+(-k*3)+' '+(k*3)+')"/>';   // the stacked card edge
+  out+='<polygon class="wt-card fire-face" data-r="'+(o.r||50)+'" points="'+K+'" fill="url(#'+(dim?'wtc-lock':'wtc-'+t)+')"/><g clip-path="url(#wt-clip)">';
+  if(!dim)out+='<polygon points="0,0 60,0 0,60" fill="url(#wts-'+t+')"/><polygon points="100,78 100,132 38,132" fill="url(#wth-'+t+')"/>';
+  else out+='<rect width="100" height="132" fill="url(#'+(st==='skip'?'wt-hatch':'wth-lock')+')"/>';
+  out+='</g><polygon class="wt-rimline" points="'+K+'"/>';
+  out+='<circle cx="44" cy="76" r="28" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/>'+WR_DIAL+'<circle class="wt-mface" cx="44" cy="76" r="19.5"/><circle class="wt-mring" cx="44" cy="76" r="16"/>';
+  if(o.num!=null)out+='<text class="wt-num" x="44" y="85" text-anchor="middle">'+o.num+'</text>';
+  else out+=wrIcon(L?'vi-lock':o.ic,31,63,26);
+  if(n>0){var bw=2.6,gp=n>4?1.8:2.6,x0=44-(n*bw+(n-1)*gp)/2;for(k=0;k<n;k++)out+='<rect class="fire-stud wt-bar'+(k<lit?' on':'')+'" x="'+(x0+k*(bw+gp)).toFixed(1)+'" y="118" width="'+bw+'" height="8"/>';}
+  if(o.tl!=null&&16*sc>=10.5)out+='<text class="wt-tl" x="6" y="18">'+o.tl+'</text>';   // text only where it renders at 10.5 px or more (Pedro, round 2)
+  if(o.name&&12.5*sc>=10.5){var nm=String(o.name).toUpperCase();out+='<text class="wt-side" transform="translate(94 102) rotate(-90)"'+(nm.length>9?' textLength="80" lengthAdjust="spacingAndGlyphs"':'')+'>'+nm+'</text>';}
+  if(st==='next')out+='<polygon class="wt-halo" points="'+wrPts(WR_CARD,-6,-7,1.12)+'"/>';
+  if(o.chip&&WR_CHIP[o.chip])out+='<g class="wt-chip c-'+o.chip+'" transform="translate(72 106)"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/>'+WR_CHIP[o.chip]+'</g>';
   return out+'</g>';
 }
 // a token as its own small picture, for HTML (rank card, steps, quests, ladder, collection)
-function wrTokSvg(o,px,lbl){return '<svg class="wt-svg" viewBox="-8 -8 116 122" width="'+px+'" height="'+Math.round(px*1.052)+'"'+(lbl?' role="img" aria-label="'+String(lbl).replace(/"/g,'&quot;')+'"':' aria-hidden="true"')+'>'+wrTok(o)+'</svg>';}
+function wrTokSvg(o,px,lbl){o.px=px;return '<svg class="wt-svg" viewBox="-10 -9 118 148" width="'+px+'" height="'+Math.round(px*148/118)+'"'+(lbl?' role="img" aria-label="'+String(lbl).replace(/"/g,'&quot;')+'"':' aria-hidden="true"')+'>'+wrTok(o)+'</svg>';}
 
 // ── XP: latched, so a figure that falls later never takes XP away ──
 function wrState(){if(!achState.wr)achState.wr={s:{},q:{},m:{},days:0};var w=achState.wr;w.s=w.s||{};w.q=w.q||{};w.m=w.m||{};return w;}
@@ -23389,7 +23430,7 @@ function wrDate(iso){try{return new Date(iso+'T12:00:00').toLocaleDateString('en
 function wrBar(f,lbl){f=Math.max(0,Math.min(1,f||0));return '<div class="wr-bar" role="progressbar" aria-label="'+lbl+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(f*100)+'"><i style="width:'+(f*100).toFixed(1)+'%"></i></div>';}
 function wrRewardHtml(){
   var r=wrRewardState(),need=WR_LEVELS[WR_REWARD.level-1],xp=wrTotalXp(),h='<div class="wr-reward'+(r.claimed?' claimed':r.lvOk&&r.daysOk?' ready':'')+'">'
-    +wrTokSvg({tier:'summit',st:r.claimed||(r.lvOk&&r.daysOk)?'done':'lock',ic:'gift',chip:r.claimed?'done':''},44)+'<div class="wr-rw-body">';
+    +wrTokSvg({tier:'summit',st:r.claimed||(r.lvOk&&r.daysOk)?'done':'lock',ic:'vi-gift',chip:r.claimed?'done':''},44)+'<div class="wr-rw-body">';
   if(r.claimed)h+='<b>Free month claimed</b><span>Sent on '+wrDate(r.claimed.at)+'. We add it to your account by hand and e-mail you when it is on.</span>';
   else if(r.lvOk&&r.daysOk)h+='<b>Your free month of Vault-It is ready</b><span>You reached Level '+WR_REWARD.level+', '+need.name+'. One free month per account.</span><button type="button" class="wr-claim" onclick="wrClaim(this)">Claim my free month</button>';
   else h+='<b>Earn a free month of Vault-It</b><span>Reach Level '+WR_REWARD.level+', '+need.name+', and use Vault-It on '+WR_REWARD.days+' different days. One free month per account.</span>'
@@ -23401,10 +23442,10 @@ function wrRewardHtml(){
 function wrNextGoals(S){
   var out=[],w=wrState(),nw=0;try{nw=computeNetWorth();}catch(e){}
   if(S&&S.nextIdx>=0){var s=S[S.nextIdx],st=s.steps||[],j=st.findIndex(function(x){return !x.met;});if(j<0)j=st.length-1;
-    out.push({tok:{tier:wrStageTier(s.key),st:'next',ic:s.ic,lit:Math.round(6*j/Math.max(1,st.length))},h:'Stage '+(S.nextIdx+1)+': '+s.name,l:st[j]?st[j].lbl:s.desc,f:s.prog?s.prog():j/Math.max(1,st.length),xp:wrStepXp(s.key,st.length),go:'fireScrollTo('+S.nextIdx+');fireShowDetail('+S.nextIdx+')'});}
+    out.push({tok:{tier:wrStageTier(s.key),st:'next',ic:WR_STAGE_IC[s.key]||s.ic,bars:st.length,lit:j},h:'Stage '+(S.nextIdx+1)+': '+s.name,l:st[j]?st[j].lbl:s.desc,f:s.prog?s.prog():j/Math.max(1,st.length),xp:wrStepXp(s.key,st.length),go:'fireScrollTo('+S.nextIdx+');fireShowDetail('+S.nextIdx+')'});}
   var c=[];
-  WR_QUESTS.forEach(function(q){if(wrQuestDone(q))return;var f=q.need?Math.min(.99,(typeof hbStreak==='function'?hbStreak():0)/q.need):0.5;c.push({tok:{tier:wrXpTier(q.xp),st:'own',ic:q.ic,lit:0},h:'Side quest: '+q.name,l:q.desc,f:f,xp:q.xp});});
-  BADGES.forEach(function(b){var m=/^nw(\d+)(k|m)?$/.exec(b.id);if(!m||(achState.unlocked||[]).indexOf(b.id)>-1)return;var thr=+m[1]*(m[2]==='k'?1e3:m[2]==='m'?1e6:1);c.push({tok:{tier:wrXpTier(b.xp||50),st:'own',ic:WR_BADGE_IC[b.id],lit:0},h:'Badge: '+b.name,l:b.desc,f:Math.max(0,nw/thr),xp:b.xp||50});});
+  WR_QUESTS.forEach(function(q){if(wrQuestDone(q))return;var f=q.need?Math.min(.99,(typeof hbStreak==='function'?hbStreak():0)/q.need):0.5;c.push({tok:{tier:wrXpTier(q.xp),st:'own',ic:q.ic},h:'Side quest: '+q.name,l:q.desc,f:f,xp:q.xp});});
+  BADGES.forEach(function(b){var m=/^nw(\d+)(k|m)?$/.exec(b.id);if(!m||(achState.unlocked||[]).indexOf(b.id)>-1)return;var thr=+m[1]*(m[2]==='k'?1e3:m[2]==='m'?1e6:1);c.push({tok:{tier:wrXpTier(b.xp||50),st:'own',ic:WR_BADGE_IC[b.id]},h:'Badge: '+b.name,l:b.desc,f:Math.max(0,nw/thr),xp:b.xp||50});});
   c.sort(function(a,b){return b.f-a.f;});
   return out.concat(c.slice(0,2));
 }
@@ -23416,26 +23457,26 @@ function renderAchievements(){
   var xp=wrTotalXp(),lv=wrLevel(xp),nx=wrNextLevel(xp),rk=WR_RANKS[lv.rank],pc=nx?(xp-lv.xp)/(nx.xp-lv.xp):1,src=wrSourceSplit(),fmt=function(v){return Math.round(v).toLocaleString('en-GB');};
   var cnt=document.getElementById('wr-count');if(cnt&&S)cnt.textContent=S.doneCount+' of '+S.length+' stages';
   var rkEl=document.getElementById('wr-rank');
-  if(rkEl)rkEl.innerHTML='<div class="wr-rank-main"><div class="wr-rank-tok" id="ach-level-badge">'+wrTokSvg({tier:rk.t,st:'done',studs:8,lit:Math.floor(pc*8),num:lv.n},104,'Level '+lv.n+' of 20, '+lv.name)+'<span class="wr-ribbon">'+rk.n+'</span></div>'
+  if(rkEl)rkEl.innerHTML='<div class="wr-rank-main"><div class="wr-rank-tok" id="ach-level-badge">'+wrTokSvg({tier:rk.t,st:'done',bars:8,lit:Math.floor(pc*8),num:lv.n,tl:'LV',name:rk.n},112,'Level '+lv.n+' of 20, '+lv.name+', rank '+rk.n)+'</div>'
     +'<div class="wr-rank-meta"><span class="wr-eyebrow">Rank: '+rk.n+' · Level '+lv.n+' of 20</span><div class="wr-rank-name" id="wr-rank-name">'+lv.name+'</div>'
     +'<div class="wr-xpbar" role="progressbar" aria-label="XP to the next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pc*100)+'"><i style="width:'+(pc*100).toFixed(1)+'%"></i>'+[1,2,3,4,5,6,7].map(function(k){return '<b style="left:'+(k*12.5)+'%"></b>';}).join('')+'</div>'
     +'<div class="wr-xp" id="wr-xp-label">'+fmt(xp)+' XP'+(nx?' · '+fmt(nx.xp-xp)+' XP to '+nx.name:' · top level')+'</div>'
     +'<div class="wr-split"><span>Roadmap steps <b>'+fmt(src.steps)+'</b></span><span>Side quests <b>'+fmt(src.quests)+'</b></span><span>Badges <b>'+fmt(src.badges)+'</b></span></div></div></div>'+wrRewardHtml();
   var nEl=document.getElementById('wr-next');
-  if(nEl)nEl.innerHTML=wrNextGoals(S).map(function(g){return '<div class="wr-goal"'+(g.go?' role="button" tabindex="0" onclick="'+g.go+'"':'')+'>'+wrTokSvg(g.tok,40)+'<div class="wr-g-body"><span class="wr-g-h">'+g.h+'</span><span class="wr-g-l">'+g.l+'</span>'+wrBar(g.f,g.h)+'</div><span class="wr-xpchip">+'+g.xp+' XP</span></div>';}).join('')||'<p class="wr-none">Every stage and quest is done. Nothing left but to enjoy it.</p>';
+  if(nEl)nEl.innerHTML=wrNextGoals(S).map(function(g){return '<div class="wr-goal"'+(g.go?' role="button" tabindex="0" onclick="'+g.go+'"':'')+'>'+wrTokSvg(g.tok,44)+'<div class="wr-g-body"><span class="wr-g-h">'+g.h+'</span><span class="wr-g-l">'+g.l+'</span>'+wrBar(g.f,g.h)+'</div><span class="wr-xpchip">+'+g.xp+' XP</span></div>';}).join('')||'<p class="wr-none">Every stage and quest is done. Nothing left but to enjoy it.</p>';
   var qEl=document.getElementById('wr-quests');
-  if(qEl)qEl.innerHTML=WR_QUESTS.map(function(q){var d=wrQuestDone(q),tier=wrXpTier(q.xp);return '<div class="wr-tok wr-quest t-'+tier+(d?' got':'')+'">'+wrTokSvg({tier:tier,st:d?'done':'lock',ic:q.ic,chip:d?'done':'lock'},64,q.name+(d?', earned':', not yet'))
+  if(qEl)qEl.innerHTML=WR_QUESTS.map(function(q){var d=wrQuestDone(q),tier=wrXpTier(q.xp);return '<div class="wr-tok wr-quest t-'+tier+(d?' got':'')+'">'+wrTokSvg({tier:tier,st:d?'done':'lock',ic:q.ic,chip:d?'done':'lock',tl:'+'+q.xp,name:q.name},100,q.name+(d?', earned':', not yet'))
     +'<b>'+q.name+'</b><small>+'+q.xp+' XP'+(q.month?' a month':'')+' · '+WR_TIERS[tier].n+'</small><span>'+(d?(q.month?'Done this month':'Earned'):q.desc)+'</span></div>';}).join('');
   var lEl=document.getElementById('wr-ladder');
   if(lEl)lEl.innerHTML=WR_RANKS.map(function(r,ri){var ls=WR_LEVELS.filter(function(l){return l.rank===ri;}),here=lv.rank===ri;
     return '<div class="wr-rank-grp'+(here?' here':'')+'"><div class="wr-grp-h">'+r.n+'</div>'+ls.map(function(l){var got=xp>=l.xp,cur=l.n===lv.n,rw=l.n===WR_REWARD.level;
-      return '<div class="wr-step'+(cur?' cur':'')+(got?' got':'')+'">'+wrTokSvg({tier:r.t,st:got?'done':'lock',num:l.n,studs:8,lit:got?8:0},cur?40:32)+'<span class="wr-st-n">'+l.name+'</span><small>'+fmt(l.xp)+' XP</small>'+(rw?'<span class="wr-rw-tag">Free month</span>':'')+'</div>';}).join('')+'</div>';}).join('');
+      return '<div class="wr-step'+(cur?' cur':'')+(got?' got':'')+'">'+wrTokSvg({tier:r.t,st:got?'done':'own',num:l.n},cur?56:48)+'<span class="wr-st-n">'+l.name+'</span><small>'+fmt(l.xp)+' XP</small>'+(rw?'<span class="wr-rw-tag">Free month</span>':'')+'</div>';}).join('')+'</div>';}).join('');
   var tEl=document.getElementById('wr-tiers'),cEl=document.getElementById('wr-collection'),un=achState.unlocked||[];
   if(tEl){var f=cEl&&cEl.getAttribute('data-f')||'all';
     tEl.innerHTML='<button type="button" class="wr-chip'+(f==='all'?' on':'')+'" onclick="wrFilter(\'all\')">All '+un.length+'/'+BADGES.length+'</button>'+Object.keys(WR_TIERS).map(function(k){var all=BADGES.filter(function(b){return wrXpTier(b.xp||50)===k;});
       return '<button type="button" class="wr-chip wr-tier t-'+k+(f===k?' on':'')+'" onclick="wrFilter(\''+k+'\')">'+WR_TIERS[k].n+' '+all.filter(function(b){return un.indexOf(b.id)>-1;}).length+'/'+all.length+'</button>';}).join('');}
   if(cEl)cEl.innerHTML=BADGES.map(function(b){var u=un.indexOf(b.id)>-1,tier=wrXpTier(b.xp||50);
-    return '<div class="wr-tok t-'+tier+(u?' got':'')+'">'+wrTokSvg({tier:tier,st:u?'own':'lock',ic:WR_BADGE_IC[b.id]||'gem',chip:u?'':'lock'},64,b.name+(u?', earned':', locked'))+'<b>'+b.name+'</b><small>+'+(b.xp||50)+' XP · '+WR_TIERS[tier].n+'</small><span>'+(u?'Earned':b.desc)+'</span></div>';}).join('');
+    return '<div class="wr-tok t-'+tier+(u?' got':'')+'">'+wrTokSvg({tier:tier,st:u?'own':'lock',ic:WR_BADGE_IC[b.id]||'vi-gem',chip:u?'':'lock',tl:'+'+(b.xp||50),name:b.name},100,b.name+(u?', earned':', locked'))+'<b>'+b.name+'</b><small>+'+(b.xp||50)+' XP · '+WR_TIERS[tier].n+'</small><span>'+(u?'Earned':b.desc)+'</span></div>';}).join('');
   if(!_isPro()){document.querySelectorAll('#tab-achievements .wr-pro').forEach(function(e){e.style.filter='blur(5px)';e.style.pointerEvents='none';});}
 }
 function wrFilter(k){var c=document.getElementById('wr-collection');if(c)c.setAttribute('data-f',k);renderAchievements();}
@@ -25158,52 +25199,48 @@ function renderFIREroadmap(){
       done:idxs.every(function(i){return stages[i].done||stages[i].skipPass;})};
   });
 
-  var out='<rect x="'+x0+'" y="0" width="'+(x1-x0)+'" height="'+H+'" fill="#030810"/>';
+  /* ground plane (owner, 3 Nov round 2: "a steeper perspective so the ground plane takes up less space ... the grid perspective ground
+     line ... achievement icons lifted higher above that ground plane"): a thin strip at the foot (its grid is #fire-ground, which stays
+     put while the track scrolls); the path runs on the ground and each token floats above it on a light beam with its shadow below */
+  var GY=H-56,PATH_Y=GY+14,out='<rect x="'+x0+'" y="0" width="'+(x1-x0)+'" height="'+GY+'" fill="#030810" opacity=".6"/>';   // the stage behind the tokens (paper in Daylight)
   phaseSpans.forEach(function(sp,pi){
     var a=Math.max(x0,sp.x0),b=Math.min(x1,sp.x1);
     if(b<=a)return;
-    out+='<rect x="'+a+'" y="0" width="'+(b-a)+'" height="'+H+'" fill="'+sp.col+'" opacity="'+(pi%2===0?'0.07':'0.04')+'"/>';
-    if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line x1="'+sp.x0+'" y1="0" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="0.8" opacity="0.25" stroke-dasharray="4 3"/>';
-    out+='<text x="'+((a+b)/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="10.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.6')+'" letter-spacing="1.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
-    out+='<line x1="'+(a+4)+'" y1="'+(H-16)+'" x2="'+(b-4)+'" y2="'+(H-16)+'" stroke="'+sp.col+'" stroke-width="'+(sp.done?'1.6':'0.6')+'" opacity="'+(sp.done?'0.7':'0.25')+'"/>';
+    out+='<rect x="'+a+'" y="'+GY+'" width="'+(b-a)+'" height="'+(H-GY)+'" fill="'+sp.col+'" opacity="'+(pi%2===0?'0.10':'0.05')+'"/>';
+    if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line x1="'+sp.x0+'" y1="'+GY+'" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="1" opacity="0.45" stroke-dasharray="3 3"/>';
+    out+='<text x="'+((a+b)/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.7')+'" letter-spacing="2.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
   });
-
-  // rail: solid up to the last passed stage, dashed beyond
-  var railX0=LEFT,railX1=(stages.length-1)*NODE_SPACING+LEFT;
-  var doneX=stages.passedIdx>=0?stages.passedIdx*NODE_SPACING+LEFT:railX0;
-  /* the rail runs between the coins, never through or behind them (owner, 31 Oct); solid where the stages are passed */
-  var coinR=function(k){return k===nextIdx?32:26;};   // tokens: 64 px for the stage to work on, 52 px for the rest (Pedro, 3 Nov)
+  var tokW=function(k){return k===nextIdx?64:50;},coinR=function(k){return tokW(k)/2;};   // card widths: 64 px for the stage to work on, 50 px for the rest
+  // the path on the ground: solid up to the last passed stage, dashed beyond, running between the light pads (owner, 31 Oct)
   for(var si=Math.max(0,i0);si<Math.min(stages.length-1,i1);si++){var ax=si*NODE_SPACING+LEFT,bx=(si+1)*NODE_SPACING+LEFT,passed=si<stages.passedIdx;
-    out+='<line x1="'+(ax+coinR(si)+6)+'" y1="'+LINE_Y+'" x2="'+(bx-coinR(si+1)-6)+'" y2="'+LINE_Y+'" stroke="rgba(68,192,185,'+(passed?'0.85':'0.18')+'" stroke-width="'+(passed?3:2)+'"'+(passed?'':' stroke-dasharray="6 4"')+'/>';}
+    out+='<line class="fire-rail" x1="'+(ax+coinR(si)+6)+'" y1="'+PATH_Y+'" x2="'+(bx-coinR(si+1)-6)+'" y2="'+PATH_Y+'" stroke="rgba(68,192,185,'+(passed?'0.9':'0.3')+')" stroke-width="'+(passed?2.6:1.6)+'"'+(passed?'':' stroke-dasharray="6 5"')+'/>';}
 
   for(var i=i0;i<=i1;i++){
     var s=stages[i];
-    var cx=i*NODE_SPACING+LEFT;NODE_R=coinR(i);
-    var done=s.done,isNext=i===nextIdx,skipped=s.skipPass,waiting=s.raw&&!done&&!skipped,locked=!done&&!isNext&&!skipped;
+    var cx=i*NODE_SPACING+LEFT,W=tokW(i);NODE_R=W/2;
+    var done=s.done,isNext=i===nextIdx,skipped=s.skipPass,waiting=s.raw&&!done&&!skipped;
     var col=s.col||'#44c0b9';
-    var above=i%2===0;
-    var namY=above?(LINE_Y-NODE_R-10):(LINE_Y+NODE_R+26);
-    var descY=above?(LINE_Y-NODE_R-24):(LINE_Y+NODE_R+40);
+    var CH=W*1.32,bot=GY-(isNext?74:60),top=bot-CH;
     var click=' style="cursor:pointer" onclick="fireNodeTap('+i+')"';
-
-    // the stage as a token (owner, 3 Nov: "think futuristic tokens"): studs light two per step, a chip tells the state
-    var tier=wrStageTier(s.key),stt=done?'done':isNext?'next':skipped?'skip':waiting?'wait':'lock',W=NODE_R*2;
-    var nSteps=(s.steps||[]).length||1,lit=stt==='done'||stt==='wait'?6:stt==='next'?Math.round(6*(s.steps||[]).filter(function(x){return x.met;}).length/nSteps):0;
+    var tier=wrStageTier(s.key),stt=done?'done':isNext?'next':skipped?'skip':waiting?'wait':'lock';
+    var sts=s.steps||[],lit=stt==='done'||stt==='wait'?sts.length:stt==='next'?sts.filter(function(x){return x.met;}).length:0;
     out+='<g class="fire-coin'+(isNext?' next':'')+(done?' done':'')+'" data-i="'+i+'" data-cx="'+cx+'" data-tier="'+tier+'"'+click+'>'
       +'<title>Stage '+(i+1)+' of '+stages.length+', '+s.name+', '+WR_TIERS[tier].n+', '+({done:'achieved',next:'next up',skip:'skipped',wait:'met, waiting on earlier stages',lock:'locked'})[stt]+'</title>';
-    out+='<line x1="'+cx+'" y1="'+(above?LINE_Y-NODE_R:LINE_Y+3)+'" x2="'+cx+'" y2="'+(above?LINE_Y-3:LINE_Y+NODE_R)+'" stroke="'+(done?col:'rgba(68,192,185,0.12)')+'" stroke-width="1"/>';
-    out+='<ellipse cx="'+cx+'" cy="'+(LINE_Y+NODE_R+5)+'" rx="'+(NODE_R*0.8).toFixed(1)+'" ry="3" fill="rgba(0,0,0,0.35)"/>';
-    if(i===_fireDetailIdx)out+='<polygon class="fire-sel" points="'+wrPts(wrOct(-7),cx-NODE_R,LINE_Y-NODE_R,W/100)+'" fill="none" stroke="var(--gold)" style="stroke:var(--gold)" stroke-width="1"/>';   // the tapped stage: a 1 px gold outline (E3)
-    out+='<g transform="translate('+(cx-NODE_R)+' '+(LINE_Y-NODE_R)+') scale('+(W/100).toFixed(3)+')">'+wrTok({tier:tier,st:stt,lit:lit,ic:s.ic,r:NODE_R,chip:stt==='next'?'':stt})+'</g>';
-    var nameCol=done?col:(isNext||waiting)?'#e9f1f1':skipped?'#e8a23c':'rgba(154,160,166,0.55)';
-    out+='<text x="'+cx+'" y="'+namY+'" text-anchor="middle" font-size="11.5" font-family="Syne,sans-serif" font-weight="800" fill="'+nameCol+'"'+click+'>'+s.name+'</text>';
-    out+='<text x="'+cx+'" y="'+descY+'" text-anchor="middle" font-size="10.5" font-family="DM Sans,sans-serif" fill="rgba(110,120,132,'+(done?0.9:0.65)+')">'+(waiting?'met · waiting':skipped?'skipped':s.desc)+'</text>';
+    // on the ground: shadow, the glowing pad under the stage to work on, then the beam (or a dotted tether for locked and skipped)
+    out+='<ellipse cx="'+cx+'" cy="'+PATH_Y+'" rx="'+(W*.55).toFixed(1)+'" ry="'+(W*.1).toFixed(1)+'" fill="url(#wt-shadow)"/>';
+    if(isNext)out+='<ellipse cx="'+cx+'" cy="'+PATH_Y+'" rx="'+(W*.82).toFixed(1)+'" ry="'+(W*.15).toFixed(1)+'" fill="url(#wt-pad)"/><ellipse cx="'+cx+'" cy="'+PATH_Y+'" rx="'+(W*.6).toFixed(1)+'" ry="'+(W*.1).toFixed(1)+'" fill="none" stroke="#44c0b9" stroke-width="1.2"/>';
+    if(stt==='done'||stt==='next'||stt==='wait')out+='<polygon points="'+(cx-W*.3).toFixed(1)+','+PATH_Y+' '+(cx+W*.3).toFixed(1)+','+PATH_Y+' '+(cx+W*.42).toFixed(1)+','+bot+' '+(cx-W*.42).toFixed(1)+','+bot+'" fill="url(#wt-beam)" opacity="'+(isNext?1:stt==='done'?0.55:0.3)+'"/>';
+    else out+='<line x1="'+cx+'" y1="'+(bot+4)+'" x2="'+cx+'" y2="'+(PATH_Y-3)+'" stroke="'+(skipped?'#e8a23c':'#7d8793')+'" stroke-opacity=".45" stroke-dasharray="2 3"/>';
+    if(i===_fireDetailIdx)out+='<polygon class="fire-sel" points="'+wrPts(WR_CARD,cx-W/2-W*.08,top-W*.08,W*1.16/100)+'" fill="none" stroke="var(--gold)" style="stroke:var(--gold)" stroke-width="1"/>';   // the tapped stage: a 1 px gold outline (E3)
+    out+='<g class="fire-card"><g transform="translate('+(cx-W/2)+' '+top.toFixed(1)+') scale('+(W/100).toFixed(3)+')">'+wrTok({tier:tier,st:stt,bars:sts.length,lit:lit,ic:WR_STAGE_IC[s.key]||s.ic,r:NODE_R,px:W,sc:W/100,chip:stt==='next'?'':stt})+'</g></g>';
+    // the name sits under the card, in the air above the ground (owner, 3 Nov: not on the card at this size)
+    var nameCol=done?col:(isNext||waiting)?'#e9f1f1':skipped?'#e8a23c':'rgba(154,160,166,0.75)';
+    out+='<text x="'+cx+'" y="'+(bot+(isNext?24:17))+'" text-anchor="middle" font-size="11.5" font-family="Syne,sans-serif" font-weight="800" fill="'+nameCol+'"'+click+'>'+s.name+'</text>';
     if(isNext){   // tag for the stage to work on now
       var tag=(i===0)?'START HERE':'NEXT UP';
-      out+='<rect x="'+(cx-40)+'" y="'+(LINE_Y-NODE_R-53)+'" width="80" height="16" fill="'+col+'26" stroke="'+col+'" stroke-width="0.8"/>'
-        +'<text x="'+cx+'" y="'+(LINE_Y-NODE_R-41.5)+'" text-anchor="middle" font-size="10.5" font-family="Share Tech Mono,monospace" fill="'+col+'" letter-spacing="1.2" font-weight="700">'+tag+'</text>';
-    }
-    /* stage numbers now live in the token's title and the detail panel (8 px text was under the type floor) */
+      out+='<rect x="'+(cx-40)+'" y="'+(top-30)+'" width="80" height="16" fill="'+col+'26" stroke="'+col+'" stroke-width="0.8"/>'
+        +'<text x="'+cx+'" y="'+(top-18.5)+'" text-anchor="middle" font-size="10.5" font-family="Share Tech Mono,monospace" fill="'+col+'" letter-spacing="1.2" font-weight="700">'+tag+'</text>';
+    }else out+='<text x="'+cx+'" y="'+(top-9)+'" text-anchor="middle" font-size="10.5" font-family="DM Sans,sans-serif" fill="rgba(140,150,160,'+(done?0.95:0.75)+')">'+(waiting?'met · waiting':skipped?'skipped':s.desc)+'</text>';
     out+='</g>';
   }
   svgEl.setAttribute('viewBox',x0+' 0 '+(x1-x0)+' '+H);
@@ -25216,7 +25253,18 @@ function renderFIREroadmap(){
 }
 /* phones (owner, 31 Oct): the roadmap behaves like a carousel: the coin in the centre is the largest, the others shrink and fade
    towards the edges, and a swipe settles on the nearest stage */
+// the ground grid: horizontal lines closer together towards the horizon, verticals converging on a point above the middle of the
+// view; it does not scroll, but the verticals slide with the track so the floor moves under the tokens
+function fireGround(){
+  var g=document.getElementById('fire-ground'),SC=document.getElementById('fire-timeline-scroll');if(!g||!SC)return;
+  var w=SC.clientWidth,h=56,vx=w/2,vy=-240,sp=54,off=-(SC.scrollLeft%sp),f=(h-vy)/(0-vy),o='';
+  if(!(w>0))return;
+  [0,3,7,12,19,28,40,55].forEach(function(d,k){o+='<line class="fg-h" x1="0" y1="'+d+'" x2="'+w+'" y2="'+d+'" style="stroke-opacity:'+(k?(.1+k*.025).toFixed(3):.5)+'"/>';});
+  for(var x=off-sp*12;x<w+sp*12;x+=sp){var xb=vx+(x-vx)*f;if(Math.max(x,xb)<-10||Math.min(x,xb)>w+10)continue;o+='<line class="fg-v" x1="'+x.toFixed(1)+'" y1="0" x2="'+xb.toFixed(1)+'" y2="'+h+'"/>';}
+  g.setAttribute('viewBox','0 0 '+w+' '+h);g.innerHTML=o;
+}
 function fireCarousel(){
+  try{fireGround();}catch(e){}
   var SC=document.getElementById('fire-timeline-scroll'),svg=document.getElementById('fire-roadmap-svg');if(!SC||!svg)return;
   var mob=window.innerWidth<=700,mid=SC.scrollLeft+SC.clientWidth/2;
   [].forEach.call(svg.querySelectorAll('.fire-coin'),function(g){
@@ -25334,12 +25382,12 @@ function fireShowDetail(idx,opts){
   }
   var btn=(acts||skip)?'<div class="fd-acts">'+acts+skip+'</div>':'';
   var dTier=wrStageTier(s.key),dSt=s.done?'done':s.skipPass?'skip':isNext?'next':waiting?'wait':'lock',dSteps=s.steps||[],dPer=wrStepXp(s.key,dSteps.length),dW=wrState();
-  var dLit=dSt==='done'||dSt==='wait'?6:dSt==='next'?Math.round(6*dSteps.filter(function(x){return x.met;}).length/Math.max(1,dSteps.length)):0;
+  var dLit=dSt==='done'||dSt==='wait'?dSteps.length:dSt==='next'?dSteps.filter(function(x){return x.met;}).length:0;
   var stepsHtml='<div class="fd-h wr-steps-h">STEPS · '+WR_TIERS[dTier].n.toUpperCase()+' TIER</div><ol class="wr-steps">'+dSteps.map(function(x,k){var got=!!dW.s[s.key+'.'+k],cur=!x.met&&dSteps.slice(0,k).every(function(y){return y.met;});
     return '<li class="'+(x.met?'ok':cur?'cur':'')+'"><span class="wr-sdot" aria-hidden="true"></span><span class="wr-slbl">'+x.lbl+(x.met?'<span class="vh"> (done)</span>':'')+'</span><span class="wr-sxp">'+(got?'+'+dPer+' XP earned':'+'+dPer+' XP')+'</span></li>';}).join('')+'</ol>';
-  inner.innerHTML=viDay('<div class="wr-dtok">'+wrTokSvg({tier:dTier,st:dSt,lit:dLit,ic:s.ic,chip:dSt==='next'?'':dSt},64,'Stage '+seq+', '+s.name)+'</div>'
+  inner.innerHTML=viDay('<div class="wr-dtok">'+wrTokSvg({tier:dTier,st:dSt,bars:dSteps.length,lit:dLit,ic:WR_STAGE_IC[s.key]||s.ic,chip:dSt==='next'?'':dSt,tl:seq,name:s.name},window.innerWidth<=480?80:100,'Stage '+seq+', '+s.name)+'</div>'
     +'<div style="flex:1;min-width:0">'
-    +'<div style="font-family:\'Syne\',sans-serif;font-size:max(.74rem,var(--vi-fs-3));font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+state_+'</span></div>'
+    +'<div style="font-family:\'Syne\',sans-serif;font-size:max(.74rem,var(--vi-fs-3));font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="white-space:nowrap;display:inline-block;font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+state_+'</span></div>'
     +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));color:var(--t2);letter-spacing:.1em;margin-bottom:4px">'+ph.label+' PHASE · STEP '+seq+' OF 30</div>'
     +'<div style="font-family:\'DM Sans\',sans-serif;font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.5">'+long+'</div>'
     +progTxt+stepsHtml+need+ticks+btn+'</div>');
@@ -27631,11 +27679,11 @@ function renderOvAch() {
   var pc = nx ? Math.max(0, Math.min(100, (xp - lv.xp) / (nx.xp - lv.xp) * 100)) : 100;
   var got = BADGES.filter(function (b) { return (achState.unlocked || []).indexOf(b.id) > -1; });
   var streak = +(achState.streak || localStorage.getItem('vi_streak') || 0);
-  el.innerHTML = '<div class="ov-ach-top"><span class="ov-ach-tok">' + wrTokSvg({ tier: rk.t, st: 'done', studs: 8, lit: Math.floor(pc / 12.5), num: lv.n }, 44, 'Level ' + lv.n) + '</span><div class="ov-ach-meta"><b>' + lv.name + '</b>'
+  el.innerHTML = '<div class="ov-ach-top"><span class="ov-ach-tok">' + wrTokSvg({ tier: rk.t, st: 'done', bars: 8, lit: Math.floor(pc / 12.5), num: lv.n }, 48, 'Level ' + lv.n) + '</span><div class="ov-ach-meta"><b>' + lv.name + '</b>'
     + '<div class="ov-ach-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pc) + '"><i style="width:' + pc.toFixed(1) + '%"></i></div>'
     + '<small>' + xp.toLocaleString('en-GB') + ' XP' + (nx ? ' · ' + (nx.xp - xp).toLocaleString('en-GB') + ' to ' + nx.name : ' · top level') + '</small></div>'
     + '<div class="ov-ach-streak"><b>' + streak + '</b><small>day' + (streak === 1 ? '' : 's') + ' in a row</small></div></div>'
-    + '<div class="ov-ach-badges">' + (got.length ? got.slice(-8).map(function (b) { return '<span class="ov-ach-badge" title="' + b.name.replace(/"/g, '&quot;') + '">' + wrTokSvg({ tier: wrXpTier(b.xp || 50), st: 'own', ic: WR_BADGE_IC[b.id] || 'gem' }, 34, b.name) + '</span>'; }).join('')
+    + '<div class="ov-ach-badges">' + (got.length ? got.slice(-8).map(function (b) { return '<span class="ov-ach-badge" title="' + b.name.replace(/"/g, '&quot;') + '">' + wrTokSvg({ tier: wrXpTier(b.xp || 50), st: 'own', ic: WR_BADGE_IC[b.id] || 'vi-gem' }, 36, b.name) + '</span>'; }).join('')
       : '<span class="ov-ach-none">No badges yet. Your first one comes with your first deposit or your first budget line.</span>')
     + '<span class="ov-ach-count">' + got.length + ' of ' + BADGES.length + ' badges</span></div>';
 }

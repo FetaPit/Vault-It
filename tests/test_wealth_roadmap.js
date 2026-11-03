@@ -51,7 +51,10 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
       const f = tok.faces.filter(Boolean);
       ok(f.length === tok.faces.length && f.every(x => x.tag === 'polygon'), 'every stage has a polygon token face (' + f.length + ')');
       ok(tok.round === 0, 'no round coin faces left');
-      ok(f.length > 0 && f.every(x => x.studs >= 6), 'each token has six rim studs (two per step)');
+      ok(f.length > 0 && f.every(x => x.studs >= 1 && x.studs <= 3), 'each token has one step bar per step (1 to 3)');
+      ok(await p.evaluate(() => { const g = document.querySelector('#fire-ground'); return !!g && g.querySelectorAll('line.fg-v').length > 4 && g.querySelectorAll('line.fg-h').length >= 6; }), 'the ground strip has a perspective grid');
+      ok(await p.evaluate(() => { const S = renderFIREroadmap._stages, g = document.querySelector('#fire-roadmap-svg g.fire-coin[data-i="' + S.nextIdx + '"]'), c = g.querySelector('.fire-face').getBoundingClientRect(), sh = g.querySelector('ellipse').getBoundingClientRect(); return sh.top - c.bottom > 40; }), 'the stage to work on floats well clear of its shadow on the ground');
+      ok(await p.evaluate(() => [...document.querySelectorAll('#fire-roadmap-svg use')].every(u => /^#vi-/.test(u.getAttribute('href'))) && document.querySelectorAll('#fire-roadmap-svg use').length > 3), 'stage icons come from the brand sprite');
       const nx = f.find(x => x.next), ot = f.find(x => !x.next);
       ok(nx && ot && nx.r > ot.r, 'the stage to work on is the largest token (' + (nx && nx.r) + ' vs ' + (ot && ot.r) + ')');
       ok(tok.tiers.every(t => /^(starter|solid|strong|summit)$/.test(t)), 'each token carries a tier (' + [...new Set(tok.tiers)].join(',') + ')');
@@ -111,6 +114,12 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
       ok(sw <= 1, 'phone 390: no sideways scroll on Wealth Roadmap (' + sw + ')');
       const small = await p.evaluate(() => [...document.querySelectorAll('#tab-achievements .wr-wrap *')].filter(e => e.childNodes.length && [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) && e.getClientRects().length && parseFloat(getComputedStyle(e).fontSize) < 10.5).map(e => e.className + ':' + getComputedStyle(e).fontSize).slice(0, 5));
       ok(small.length === 0, 'phone 390: no text under 10.5 px in the levelling panel (' + small.join(' ') + ')');
+      // SVG text scales with its picture, so measure what is drawn (Pedro, round 2: card text was under the floor)
+      for (const tab of ['achievements', 'overview']) {
+        await p.evaluate(tb => { showTab(tb); try { fireJumpToCurrent(); } catch (e) {} }, tab); await p.waitForTimeout(500);
+        const tiny = await p.evaluate(() => [...document.querySelectorAll('.wt text, #fire-roadmap-svg text')].filter(t => t.getClientRects().length).map(t => { const m = t.getScreenCTM(); return { c: t.getAttribute('class') || 'rail', px: +(parseFloat(getComputedStyle(t).fontSize) * Math.hypot(m.a, m.b)).toFixed(2) }; }).filter(x => x.px < 10.45));
+        ok(tiny.length === 0, 'phone 390 ' + tab + ': every token and rail text renders at 10.5 px or more (' + JSON.stringify(tiny.slice(0, 4)) + ')');
+      }
     }
     await ctx.close();
   }
