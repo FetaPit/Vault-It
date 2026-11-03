@@ -162,3 +162,7 @@ Suggested fills for the misses (all CC0 or similar, no sign-up needed unless sta
 ## Connectors and MCP tools
 
 Checked this session: no 3D model, Sketchfab or Poly Pizza tool is available. The Treg catalogue (4,100+ endpoints) returned only web search and scraping for a 3D query. Figma, Canva and Cloudflare connectors are present but do not help find models. The Cloudflare connector can manage the R2 bucket for the upload step. No new connector is needed for the first pass. A Sketchfab token would unlock the misses. Kenney and Quaternius are plain downloads that could be added to the fetch script with a second source list if wanted.
+
+## More sets
+
+Cars, instruments by brand and model, and collectibles by model are in [MODEL_LIBRARY_SETS.md](MODEL_LIBRARY_SETS.md), with the Sketchfab step for brand-specific models. CC licences cover the model, not trademarks or logos: branded models are fine shown privately in a user's inventory, never in marketing. Combined size estimate for all sets is in that document.
