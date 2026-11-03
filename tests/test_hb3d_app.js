@@ -31,8 +31,7 @@ const seed=(o)=>`(function(){if(localStorage.getItem('ht3'))return;localStorage.
   ok(cl.label!=='none'&&/ROW \d+ \/ \d+/i.test(cl.labelTxt)&&/40\.0% OF DEPOSIT/i.test(cl.labelTxt),'the house is labelled with the current row and deposit % ('+cl.labelTxt.replace(/\n/g,' ')+')');
   ok(/ROW\s*\d+\s*of\s*\d+/i.test(cl.card)&&/to finish this row/i.test(cl.card),'HUD says which row you are on and what is left to finish it');
   ok(cl.edgesVisible,'the unbuilt remainder is an outline only');
-  await p.evaluate(()=>document.getElementById('hud-row').click()); await p.waitForTimeout(200);
-  ok(await p.evaluate(()=>!!HB3D.viewer._fly||HB3D.viewer.zoom()>1.5),'📍 button glides the camera to the current row');
+  ok(await p.evaluate(()=>!document.getElementById('hud-row')),'the locate button is gone from the house viewport (owner, 3 Nov)');
   await p.waitForFunction(()=>!HB3D.viewer._fly,null,{timeout:5000}).catch(()=>{});
   for(const sv of [500,5000,12500,25000,37500,50000,70000]){
     await p.evaluate(v=>{state.saved=v;state.deposits=[{amount:v,date:'01/10/2026'}];save();updateUI();},sv);

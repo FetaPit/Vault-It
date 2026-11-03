@@ -53,7 +53,7 @@ const probe = () => {
     ok(r.theme === theme, nm + ': theme is applied');
     ok(r.liabTab, nm + ': liabilities sub-tab is amber');
     ok(r.ov.kpiBorder === T.amber && r.ov.kpiVal === T.amber, nm + ': liabilities KPI is amber');
-    ok(r.ov.asVal === T.teal && r.ov.asBorder === T.teal && r.ov.asCard === T.teal, nm + ': total assets KPI and assets summary are teal (owner, 30 Oct)');
+    ok(r.ov.asVal === T.green && r.ov.asBorder === T.green && r.ov.asCard === T.teal, nm + ': total assets KPI is green (owner, 3 Nov), assets summary stays teal');
     ok(r.ov.card === T.amber && r.ov.total === T.amber, nm + ': liabilities summary card is amber (' + r.ov.card + ' / ' + r.ov.total + ' vs ' + T.amber + ')');
     ok(r.align.every(a => a.tab && a.side), nm + ': each asset class wears its sub-tab colour (stocks green 2) ' + JSON.stringify(r.align.filter(a => !a.tab || !a.side)));
     ok(!r.hexLeft, nm + ': Budget groups use tokens, no hex');

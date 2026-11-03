@@ -10684,6 +10684,19 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
   .stk-lb{display:block}
   .c-va .stk-lb{display:inline;margin-right:8px}
 }
+.stk-grp{border:1px solid rgb(var(--ink-rgb) / .08);border-radius:10px;margin:8px 0;overflow:hidden}
+.stk-gh{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:rgb(var(--ink-rgb) / .03);border:0;color:var(--tx);cursor:pointer;text-align:left;font:600 max(.66rem,var(--vi-fs-2)) 'DM Sans',sans-serif}
+.stk-gh:hover{background:rgb(var(--teal-rgb) / .08)}.stk-gh:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+.stk-chev{width:16px;height:16px;flex:none;transition:transform .2s;transform:rotate(-90deg);color:var(--teal)}.stk-grp.open .stk-chev{transform:none}
+.stk-gn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Syne',sans-serif;font-weight:700}
+.stk-gc{font:max(.5rem,var(--vi-fs-1)) 'Share Tech Mono',monospace;color:var(--t3);white-space:nowrap}
+.stk-gv{font:700 max(.66rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--tx);white-space:nowrap;text-align:right}.stk-gv small{color:var(--t3);font-weight:400}
+.stk-gb{overflow-x:auto;padding:0 12px}
+@media(prefers-reduced-motion:reduce){.stk-chev{transition:none}}
+.stk-tm{margin:6px 0 2px}.stk-tm-pie{position:absolute;border:1.5px solid;border-radius:9px;pointer-events:none;opacity:.9}
+.stk-tm-c .dtm-n,.stk-tm-c .dtm-v,.stk-tm-c .dtm-s{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.stk-tm-key{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 8px;font:max(.52rem,var(--vi-fs-1)) 'DM Sans',sans-serif;color:var(--t2)}
+.stk-tm-k i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}.stk-tm-k b{font-family:'Share Tech Mono',monospace;color:var(--tx);font-weight:400}
 .stk-bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:max(.52rem,var(--vi-fs-1))}
 .stk-bar .t{width:78px;font-family:'Share Tech Mono',monospace;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stk-bar .b{flex:1;height:7px;background:rgb(var(--ink-rgb) / .06);border-radius:4px;overflow:hidden}
@@ -10876,6 +10889,10 @@ html #assets-page .subtab-btn.active{color:var(--text)!important;border-color:va
 html[data-theme="light"] #assets-page .subtab-btn.active{box-shadow:none!important}
 html #assets-page .subtab-btn.active .vi-ic.sti{opacity:1}
 html #assets-page .subtab-btn:focus-visible{outline:2px solid var(--sa);outline-offset:2px}
+/* owner, 3 Nov: Assets & liabilities sub-tab icons all sit on the left edge, labels beside them, every icon fully visible */
+html #assets-page .subtab-btn{justify-content:flex-start!important;text-align:left!important;padding-left:14px!important}
+html #assets-page .subtab-btn .vi-ic.sti{opacity:1!important;flex:none}
+
 @keyframes vi-tabglow{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 4px currentColor)}}
 html #topnav .tab-btn:focus-visible{outline:2px solid var(--tc)!important;outline-offset:2px}
 #topnav .vi-usp,#topnav .vi-pro{position:absolute;top:1px;right:2px;padding:1px 4px;border-radius:3px;font:800 9px/1.2 var(--font-display);letter-spacing:.08em;animation:none!important;display:inline-block!important}
@@ -12039,12 +12056,12 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
   <div class="ov-kpis">
     <div class="ov-kpi ov-kpi-nw">
       <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M3 17 9 11l4 4 8-9"/><path d="M15 6h6v6"/></svg>Net Worth</div>
-      <div class="ov-kpi-val" id="kpi-nw" style="color:var(--em)">£0</div>
+      <div class="ov-kpi-val" id="kpi-nw" style="color:var(--teal)">£0</div>
       <div class="ov-kpi-sub" id="kpi-nw-sub">own − owe</div>
     </div>
     <div class="ov-kpi ov-kpi-as">
       <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><path d="M3 21h18M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/></svg>Total Assets</div>
-      <div class="ov-kpi-val" id="kpi-assets" style="color:var(--teal)">£0</div>
+      <div class="ov-kpi-val" id="kpi-assets" style="color:var(--green)">£0</div>
       <div class="ov-kpi-sub">all holdings</div>
     </div>
     <div class="ov-kpi ov-kpi-db">
@@ -12059,7 +12076,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     </div>
     <div class="ov-kpi ov-kpi-su">
       <div class="ov-kpi-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="ov-kpi-ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.8 1.8 0 0 1 0 3.5h-3a1.8 1.8 0 0 0 0 3.500h4.500"/></svg>Monthly Surplus</div>
-      <div class="ov-kpi-val" id="kpi-debt" style="color:var(--em)">£0</div>
+      <div class="ov-kpi-val" id="kpi-debt" style="color:var(--blue)">£0</div>
       <div class="ov-kpi-sub" id="kpi-debt-sub">monthly surplus</div>
     </div>
   </div>
@@ -12193,7 +12210,10 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div id="cf-summary" style="display:flex;gap:14px;flex-wrap:wrap"></div>
       </div>
       <div id="cf-nudge"></div>
-      <div id="cf-sankey" class="cf-scroll"></div>
+      <div id="cf-sankey" class="cf-scroll" hidden></div>
+      <!-- owner, 3 Nov: the dashboard tile now shows the same 3D income flow as the Budget tab -->
+      <div id="cf-3d"><div class="nw3d-stage" id="cf3d-stage"><canvas id="cf3d-cv" tabindex="0" role="img" aria-label="Your monthly budget as a tree map of £100 blocks, one area per type of spending or saving. Tap a block to read it, drag to turn it."></canvas><div class="nw3d-hud" role="group" aria-label="View controls"><button type="button" data-z="in" aria-label="Zoom in" title="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out" title="Zoom out">&minus;</button><button type="button" data-z="reset" aria-label="Reset view" title="Reset view">&#8634;</button></div></div>
+        <p class="nw3d-read" id="cf3d-read" aria-live="polite"></p></div>
       <div class="cf-legend" id="cf-legend"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
         <span style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);line-height:1.5">Plan every pound in your <b style="color:var(--blue)">Budget</b>.</span>
@@ -12240,11 +12260,12 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     <!-- owner, 31 Oct: the income flow sits at the top, straight above the income | spending split, so the dashed divider runs on from it -->
     <div class="ov-chart-card bd-sankey-card" style="margin:4px 0 0">
       <div class="ov-chart-hd bd-flow-hd" style="flex-wrap:wrap;gap:10px;padding:0 16px"><span class="ov-chart-title">Where your income flows</span>
-        <div class="nw3d-seg" id="bd-view" role="group" aria-label="Income flow view"><button type="button" data-v="flow" aria-pressed="true"><svg class="vi-ic" aria-hidden="true"><use href="#vi-forecast"/></svg>Flow</button><button type="button" data-v="3d" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick"/></svg>3D</button></div></div>
+        <div class="nw3d-seg" id="bd-view" role="group" aria-label="Income flow view"><button type="button" data-v="flow" aria-pressed="true"><svg class="vi-ic" aria-hidden="true"><use href="#vi-forecast"/></svg>Flow</button><button type="button" data-v="3d" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick"/></svg>3D</button></div>
+        <div class="nw3d-seg" id="bd-fz" role="group" aria-label="Zoom the income flow"><button type="button" data-fz="out" aria-label="Zoom out" title="Zoom out">&minus;</button><button type="button" data-fz="fit" aria-label="Fit the whole flow on screen" title="Fit the whole flow on screen">Fit</button><button type="button" data-fz="in" aria-label="Zoom in" title="Zoom in">+</button></div></div>
       <div id="bd-sankey" class="cf-scroll"></div>
       <div id="bd-3d" hidden>
         <span class="nw3d-sub bd3d-sub">A tree map of your monthly income: each type of spending or saving is one area, filled with £100 blocks (smaller blocks for the pounds left over). Tap or hover a block to read its line, drag to turn it.</span>
-        <div class="nw3d-stage" id="bd3d-stage"><canvas id="bd3d-cv" tabindex="0" role="img" aria-label="Your monthly budget as a tree map of £100 blocks, one area per type of spending or saving. Tap a block to read it, drag to turn it."></canvas></div>
+        <div class="nw3d-stage" id="bd3d-stage"><canvas id="bd3d-cv" tabindex="0" role="img" aria-label="Your monthly budget as a tree map of £100 blocks, one area per type of spending or saving. Tap a block to read it, drag to turn it."></canvas><div class="nw3d-hud" role="group" aria-label="View controls"><button type="button" data-z="in" aria-label="Zoom in" title="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out" title="Zoom out">&minus;</button><button type="button" data-z="reset" aria-label="Reset view" title="Reset view">&#8634;</button></div></div>
         <p class="nw3d-read" id="bd3d-read" aria-live="polite"></p>
       </div>
     </div>
@@ -12361,7 +12382,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <button class="hud-btn" id="hud-zoom-out" onclick="houseZoomOut()" title="Zoom out" aria-label="Zoom out"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-zoom-out"/></svg></button>
           <button class="hud-btn" id="hud-zoom-in" onclick="houseZoomIn()" title="Zoom in" aria-label="Zoom in"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-zoom-in"/></svg></button>
           <button class="hud-btn hud-toggle" id="hud-orbit-toggle" onclick="toggleOrbitMode()" title="Toggle orbit mode" aria-label="Toggle orbit mode"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-orbit"/></svg></button>
-          <button class="hud-btn" id="hud-row" onclick="hbJumpToRow()" title="Show the row I am on" aria-label="Show the row I am on"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-pin"/></svg></button>
           <button class="hud-btn" id="hud-reset" onclick="resetView()" title="Reset camera" aria-label="Reset camera"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-reset"/></svg></button>
           <button class="hud-btn" id="hud-full" onclick="toggleExpand()" title="Full screen" aria-label="Full screen"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-fullscreen"/></svg></button>
         </div>
@@ -14183,7 +14203,7 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .ov-kpi-val{font-size:clamp(1.15rem,1.9vw,1.7rem)!important}
 .ov-kpi-sub{font-size:max(.54rem,var(--vi-fs-1))!important}
 .ov-kpi-nw{border-top:2px solid var(--teal)}.ov-kpi-nw .ov-kpi-lbl{color:var(--teal)}
-.ov-kpi-as{border-top:2px solid var(--teal)}.ov-kpi-as .ov-kpi-lbl{color:var(--teal)}
+.ov-kpi-as{border-top:2px solid var(--green)}.ov-kpi-as .ov-kpi-lbl{color:var(--green)}
 .ov-kpi-db{border-top:2px solid var(--red)}.ov-kpi-db .ov-kpi-lbl{color:var(--red)}
 .ov-kpi-li{border-top:2px solid var(--amber)}.ov-kpi-li .ov-kpi-lbl{color:var(--amber)}
 .ov-kpi-su{border-top:2px solid var(--blue)}.ov-kpi-su .ov-kpi-lbl{color:var(--blue)}
@@ -14376,8 +14396,10 @@ body.vi-pop-open{overflow:hidden}
 .bd-flow-hd{display:flex;justify-content:space-between;align-items:center}
 #bd-3d{padding:0 16px 6px}
 #bd-sankey[hidden],#bd-3d[hidden]{display:none!important}
-#bd3d-stage{height:clamp(300px,46vh,520px);margin-top:10px}
-@media(max-width:600px){#bd3d-stage{height:min(96vw,380px)}}
+#bd3d-stage,#cf3d-stage{height:clamp(300px,46vh,520px);margin-top:10px}
+@media(max-width:600px){#bd3d-stage,#cf3d-stage{height:min(96vw,380px)}}
+#cf-3d .nw3d-read{margin:8px 0 0}
+#bd-fz{margin-left:auto}.bd-is-3d #bd-fz{display:none}
 .bd-exp-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .bd-fold-btns{display:flex;gap:6px}
 .bd-fold-btns button{background:rgb(var(--ink-rgb) / .04);border:1px solid rgb(var(--ink-rgb) / .14);border-radius:6px;color:var(--t2);font:600 max(.56rem,var(--vi-fs-2)) 'DM Sans',sans-serif;padding:5px 10px;cursor:pointer}
@@ -14759,7 +14781,7 @@ function updateKPIs() {
 
   var el = function(id) { return document.getElementById(id); };
   el('kpi-nw').textContent     = gbpFmt(nw);
-  el('kpi-nw').style.color     = nw >= 0 ? 'var(--em)' : 'var(--re)';
+  el('kpi-nw').style.color     = nw >= 0 ? 'var(--teal)' : 'var(--re)';
   var navNW = document.getElementById('nav-nw');
   if (navNW) { navNW.textContent = gbpFmt(nw); navNW.style.color = nw >= 0 ? 'var(--em)' : 'var(--re)'; }
   el('kpi-assets').textContent  = gbpFmt(assets);
@@ -14773,7 +14795,7 @@ function updateKPIs() {
     bizState.incomeStreams.forEach(function(s){ bizMonthly += (+s.monthlyIncome || 0); });
   }
   el('kpi-debt').textContent    = gbpFmt(cfTotalIn()+bizMonthly-cfTotalOut());
-  el('kpi-debt').style.color    = (cfTotalIn()+bizMonthly-cfTotalOut())>=0?'var(--em)':'var(--re)';
+  el('kpi-debt').style.color    = (cfTotalIn()+bizMonthly-cfTotalOut())>=0?'var(--blue)':'var(--re)';
   el('kpi-debt-sub').textContent = 'monthly surplus';
 
   // Update milestone dots + checkmarks
@@ -19461,8 +19483,27 @@ function drawCashflowDiagram(){
   });
   out+='</svg>';
   out=viDay(out);
-  hosts.forEach(function(h){if(h.__sig!==out){h.__sig=out;h.innerHTML=out;}});   // identical markup = no repaint
+  hosts.forEach(function(h){if(h.__sig!==out){h.__sig=out;h.innerHTML=out;}viCfZoom(h);});   // identical markup = no repaint
 }
+/* Flow zoom (owner, 3 Nov): the diagram opens as near to the whole picture as stays readable, and − / Fit / + scale it from there. */
+var _cfZ=1;
+function viCfZoom(h){
+  var svg=h&&h.querySelector('svg');if(!svg)return;
+  var vb=(svg.getAttribute('viewBox')||'').split(/\s+/).map(Number),W=vb[2],H=vb[3];if(!(W>0&&H>0))return;
+  var cw=h.clientWidth||W,vh=Math.max(260,window.innerHeight-230),one=window.innerWidth<1100;
+  var whole=Math.min(cw/W,vh/H),auto=one?Math.min(1,Math.max(.45,whole)):cw/W;   // phones open at the whole-picture size, but never below .45 so the labels stay readable
+  var sc=Math.min(2.2,Math.max(Math.min(whole,auto)*.7,auto*_cfZ)),w=Math.round(W*sc),ht=Math.round(H*sc);
+  svg.classList.remove('cf-1to1');
+  [['width',w+'px'],['min-width',w+'px'],['max-width','none'],['height',ht+'px']].forEach(function(p){svg.style.setProperty(p[0],p[1],'important')});
+  h.style.justifyContent=w<cw?'center':'flex-start';
+  h.__auto=auto;h.__whole=whole;
+}
+function viCfZoomBy(k){
+  var h=document.getElementById('bd-sankey');viCfZoom(h);var auto=(h&&h.__auto)||1,whole=(h&&h.__whole)||.5;
+  if(k==='fit')_cfZ=Math.min(1,whole/auto);else if(k==='in')_cfZ=Math.min(2.2/auto,_cfZ*1.25);else _cfZ=Math.max(whole*.7/auto,_cfZ*.8);
+  viCfZoom(h);if(h)h.scrollLeft=0;
+}
+window.viCfZoomBy=viCfZoomBy;
 // ── Budget tab rendering ──
 function bdRowHTML(kind,r){
   var rate=window.VI_CURRENCY_RATE||1;
@@ -19643,7 +19684,7 @@ function renderCashflow(){
   if(sum)sum.innerHTML=
     '<span style="'+mono+'color:var(--gr)">In: '+gbpFmt(tIn)+'/mo</span>'+
     '<span style="'+mono+'color:var(--re)">Spend: '+gbpFmt(tOut)+'/mo</span>'+
-    '<span style="'+mono+'color:'+(surplus>=0?'var(--em)':'var(--re)')+'">Surplus: '+gbpFmt(surplus)+'/mo</span>'+
+    '<span style="'+mono+'color:'+(surplus>=0?'var(--blue)':'var(--re)')+'">Surplus: '+gbpFmt(surplus)+'/mo</span>'+
     '<span style="'+mono+'color:var(--gr)">Save rate: '+rate+'%</span>';
   ['cf-legend','bd-legend'].forEach(function(id){var e=document.getElementById(id);if(e)e.innerHTML=cfLegendHTML();});
   // dashboard nudge: unassigned pounds → Budget tab
@@ -19980,7 +20021,9 @@ function stkRender(){
   if(ht){
     if(!hs.length)ht.innerHTML='<div style="font-size:max(.58rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:18px">No holdings in '+(alState.activePie==='all'?'any pie':'this pie')+' yet.</div>';
     else ht.innerHTML='<div class="stk-tbl"><div class="stk-row h"><span>Holding</span><span>Units</span><span>Avg cost £</span><span>Price £</span><span style="text-align:right">Value</span><span style="text-align:right">P/L</span><span></span></div>'
-      +hs.map(function(h,i){
+      +stkGroups(hs).map(function(g){var open=stkGrpOpen(g.p.id);
+        return '<div class="stk-grp'+(open?' open':'')+'"><button type="button" class="stk-gh" aria-expanded="'+open+'" onclick="stkToggleGrp('+g.p.id+')"><svg class="vi-ic stk-chev" aria-hidden="true"><use href="#vi-chevron"/></svg>'+stkLogoBadge(g.p)+'<span class="stk-gn">'+(g.p.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(g.p.name)+'</span><span class="stk-gc">'+g.hs.length+' holding'+(g.hs.length===1?'':'s')+'</span><span class="stk-gv">'+cfMoney(g.v)+(total>0?' <small>'+(g.v/total*100).toFixed(1)+'%</small>':'')+'</span></button>'
+          +'<div class="stk-gb"'+(open?'':' hidden')+'>'+g.hs.map(function(h){var i=hs.indexOf(h);
         var v=stkValue(h),c=(+h.avgCost>0)?(h.units*h.avgCost):0,pl=c>0?(v-c)/c*100:null;
         var srcTxt=h.manualPrice?'manual price':(h.updated?'live · '+stkAgo(h.updated):(+h.price>0?'saved price':(+h.avgCost>0?'valued at cost':'no price')));
         var ch=+h.change||0;
@@ -19992,16 +20035,62 @@ function stkRender(){
           +'<div class="stk-val c-va"><span class="stk-lb">Value</span>'+cfMoney(v)+'</div>'
           +'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'var(--green)':'var(--red)')+'">'+(pl==null?'–':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>'
           +'<button class="data-item-del c-x" style="width:auto;padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;opacity:1;border:1px solid rgb(var(--red-rgb) / .45);border-radius:4px" onclick="stkRemove('+h.id+')" title="Remove this holding">🗑 Remove</button></div>';
+}).join('')+'</div></div>';
       }).join('')+'</div>';
   }
-  // allocation
+  // allocation: bars (the visible pie) or a tree map of the whole portfolio (owner, 3 Nov)
   var al=document.getElementById('stk-alloc');
   if(al){
+    var av=stkAllocView();
     al.style.display=hs.length?'':'none';
-    al.innerHTML='<div class="stk-hd"><span>Allocation</span></div>'+hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){
+    al.innerHTML='<div class="stk-hd"><span>Allocation</span><div class="nw3d-seg" role="group" aria-label="Allocation view"><button type="button" aria-pressed="'+(av==='bars')+'" onclick="stkSetAlloc(\'bars\')">Bars</button><button type="button" aria-pressed="'+(av==='tree')+'" onclick="stkSetAlloc(\'tree\')">Tree map</button></div></div>'
+    +(av==='tree'?'<div class="stk-tm-key" id="stk-tm-key"></div><div class="dtm stk-tm" id="stk-treemap"></div>':hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){
       var p=total>0?stkValue(h)/total*100:0,c=STK_COLORS[i%STK_COLORS.length];
       return '<div class="stk-bar"><span class="t" title="'+stkEsc(h.name||h.sym)+'">'+stkEsc(h.sym)+'</span><span class="b"><div style="width:'+p.toFixed(1)+'%;background:'+c+'"></div></span><span class="p">'+p.toFixed(1)+'%</span></div>';
-    }).join('');
+    }).join(''));
+    if(av==='tree'){stkDrawTreemap();if(!al._ro&&window.ResizeObserver){al._ro=new ResizeObserver(function(){if(stkAllocView()==='tree'&&al.clientWidth!==al._rw){al._rw=al.clientWidth;stkDrawTreemap();}});al._ro.observe(al);}}
+  }
+}
+// ── holdings grouped by pie / fund, collapsed by default (owner, 3 Nov) ──
+function stkOpenMap(){try{return JSON.parse(localStorage.getItem('vi-stk-open')||'{}')||{};}catch(e){return {};}}
+function stkGrpOpen(id){return !!stkOpenMap()[id];}
+function stkToggleGrp(id){var m=stkOpenMap();if(m[id])delete m[id];else m[id]=1;try{localStorage.setItem('vi-stk-open',JSON.stringify(m));}catch(e){}stkRender();}
+function stkGroups(hs){
+  var by={},order=[];
+  hs.forEach(function(h){var k=h.pie;if(!by[k]){var p=(alState.stockPies||[]).find(function(x){return x.id===k;})||{id:k,name:'Other'};by[k]={p:p,hs:[],v:0};order.push(k);}by[k].hs.push(h);by[k].v+=stkValue(h);});
+  return order.map(function(k){return by[k];}).sort(function(a,b){return b.v-a.v;});
+}
+function stkAllocView(){try{return localStorage.getItem('vi-stk-alloc')==='tree'?'tree':'bars';}catch(e){return 'bars';}}
+function stkSetAlloc(v){try{localStorage.setItem('vi-stk-alloc',v);}catch(e){}stkRender();}
+function stkDrawTreemap(){
+  var el=document.getElementById('stk-treemap'),key=document.getElementById('stk-tm-key');if(!el)return;
+  var W=el.parentElement.clientWidth-(parseFloat(getComputedStyle(el.parentElement).paddingLeft)||0)*2;
+  if(!(W>80))return;
+  var H=Math.round(Math.max(240,Math.min(460,W*.72)));el.style.height=H+'px';el.style.width=W+'px';
+  var all=(alState.stocks||[]).filter(function(h){return stkValue(h)>0;}),tot=all.reduce(function(a,h){return a+stkValue(h);},0);
+  if(!all.length||!(tot>0)){el.innerHTML='<div class="dtm-empty">No priced holdings yet</div>';if(key)key.innerHTML='';return;}
+  var gs=stkGroups(all),gap=3,cells=[],pad=4,out='';
+  var pieCol={};gs.forEach(function(g,i){pieCol[g.p.id]=STK_COLORS[i%STK_COLORS.length];});
+  if(key)key.innerHTML=gs.map(function(g){return '<span class="stk-tm-k"><i style="background:'+pieCol[g.p.id]+'"></i>'+stkEsc(g.p.name)+' <b>'+(g.v/tot*100).toFixed(0)+'%</b></span>';}).join('');
+  dtmSquarify(gs.map(function(g){return {v:g.v,d:g};}),0,0,W,H).forEach(function(r){
+    var g=r.d,col=pieCol[g.p.id];
+    out+='<div class="stk-tm-pie" style="left:'+(r.x+1)+'px;top:'+(r.y+1)+'px;width:'+(r.w-2)+'px;height:'+(r.h-2)+'px;border-color:'+col+'"></div>';
+    var ix=r.x+pad,iy=r.y+pad,iw=r.w-pad*2,ih=r.h-pad*2;if(iw<10||ih<10)return;
+    var hs2=g.hs.slice().sort(function(a,b){return stkValue(b)-stkValue(a);});
+    dtmSquarify(hs2.map(function(h){return {v:stkValue(h),d:h};}),ix,iy,iw,ih).forEach(function(c,j){
+      var h=c.d,v=stkValue(h),sm=c.w-gap<56||c.h-gap<44,mid=!sm&&c.w>70&&c.h>46,pct=(v/tot*100).toFixed(1);
+      var nm=h.sym||h.name||'';
+      out+='<div class="dtm-cell stk-tm-c'+(sm?' dtm-sm" tabindex="0" data-n="'+stkEsc(nm)+' · '+stkEsc(g.p.name)+'" data-v="'+stkEsc(cfMoney(v))+' · '+pct+'%"':'"')+' title="'+stkEsc((h.name||nm)+' · '+g.p.name)+' · '+stkEsc(cfMoney(v))+' ('+pct+'%)" style="left:'+(c.x+gap/2)+'px;top:'+(c.y+gap/2)+'px;width:'+Math.max(2,c.w-gap)+'px;height:'+Math.max(2,c.h-gap)+'px;background:color-mix(in srgb,'+col+' '+(86-Math.min(j,5)*9)+'%,#0b1018)">'
+        +(mid?'<b class="dtm-n">'+stkEsc(nm)+'</b><span class="dtm-v">'+cfMoney(v)+'</span>':'')+(mid&&c.h>70?'<span class="dtm-s">'+pct+'% of portfolio</span>':'')+'</div>';
+    });
+  });
+  el.innerHTML=out+'<div class="dtm-tip" aria-live="polite" hidden></div>';
+  if(!el._dtmTip){el._dtmTip=1;
+    el.addEventListener('pointerover',function(e){if(e.pointerType==='mouse')dtmTip(el,e.target.closest('.dtm-sm'));});
+    el.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')dtmTip(el,null);});
+    el.addEventListener('click',function(e){dtmTip(el,e.target.closest('.dtm-sm'));});
+    el.addEventListener('focusin',function(e){dtmTip(el,e.target.closest('.dtm-sm'));});
+    el.addEventListener('focusout',function(){dtmTip(el,null);});
   }
 }
 
@@ -21208,6 +21297,7 @@ function renderAlTab(){
           imgHtml=generateAssetISO(l.name,viItemIcon(iconDisplay),'liab');
         }
         imgHtml+=i3dTile('li',l);
+        if(l.model||imgSrc)imgHtml+='<button class="inv-exp" title="Expand: open the full viewer" aria-label="Expand '+cfEsc(l.name)+' to the full viewer" onclick="liExpand('+l.id+')">⤢</button>';
         var dv=depreciatedValue(l);
         return'<div class="wi-tile">'
           +'<div class="wi-img-area">'
@@ -21250,7 +21340,7 @@ function renderAlTab(){
         }
         var i3=i3dTile('wi',a);if(i3){imgHtml+=i3;spin=false;}
         if(spin)imgHtml+='<canvas class="inv-spin" data-id="'+a.id+'" aria-label="3D view of '+cfEsc(a.name)+'. Drag to rotate"></canvas><span class="inv-badge">3D · '+a.photos+'</span>';
-        if((a.photos||0)>=1||imgSrc)imgHtml+='<button class="inv-exp" title="Open the photo viewer" aria-label="Open the photo viewer for '+cfEsc(a.name)+'" onclick="invOpenViewer('+a.id+')">⤢</button>';
+        if((a.photos||0)>=1||imgSrc||a.model)imgHtml+='<button class="inv-exp" title="Expand: open the full viewer" aria-label="Expand '+cfEsc(a.name)+' to the full viewer" onclick="'+(a.model?'i3dOpen(\'wi\','+a.id+')':'invOpenViewer('+a.id+')')+'">⤢</button>';
         return '<div class="wi-tile">'
           +'<div class="wi-img-area">'
           +imgHtml
@@ -21683,6 +21773,16 @@ function invHydrate(){
   } else cs.forEach(load);
 }
 // ── expanded viewport ──
+/* Liabilities tiles expand like Wealth inventory ones (owner, 3 Nov): a 3D model opens the full orbit viewer, a photo opens large */
+function liExpand(id){
+  var l=(alState.liabilities||[]).find(function(x){return x.id===id;});if(!l)return;
+  if(l.model)return i3dOpen('li',id);
+  if(!l.image)return;
+  invCloseViewer();var o=document.createElement('div');o.id='inv-modal';o.className='inv-modal';o.setAttribute('tabindex','-1');
+  o.addEventListener('keydown',function(e){if(e.key==='Escape')invCloseViewer();});
+  o.innerHTML='<div class="inv-card"><div class="inv-hd"><div><div class="inv-t">'+cfEsc(l.name)+'</div><div class="inv-s">'+gbpFmt(depreciatedValue(l))+'</div></div><button class="inv-x" onclick="invCloseViewer()" title="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div><div class="inv-stage"><img class="inv-prev" src="'+cfEsc(l.image)+'" alt="'+cfEsc(l.name)+'"></div></div>';
+  document.body.appendChild(o);o.focus();
+}
 async function invOpenViewer(id){
   var a=invItem(id);if(!a)return;
   invCloseViewer();
@@ -28971,29 +29071,37 @@ if(nw3dFlag())window.nw3dMount();
  * 3D is a tree map of the same budget the flow chart draws: one area per group filled with £100 blocks (each line a run of blocks), coloured by
  * group, with what is not yet assigned as its own grey group. The choice is kept per device (vi-bd-view); Flow is the default. */
 (function(){
-var KEY='vi-bd-view',eng=null,sig='',cur='flow';
+var KEY='vi-bd-view',eng=null,sig='',cur='flow',dash=null,dsig='';   // eng = the Budget tab's tree map, dash = the dashboard Cash Flow tile's (always 3D, owner 3 Nov)
 function el(id){return document.getElementById(id)}
 /* the stage is always Night (tokens redefined inside it), so colours are read there */
 function rgbIn(host,v){var sp=document.createElement('span');sp.style.color=v;sp.style.display='none';host.appendChild(sp);var m=(getComputedStyle(sp).color.match(/[\d.]+/g)||[0,0,0]);sp.remove();return [+m[0],+m[1],+m[2]]}
-function data(){
-  var m=cfModel(),host=el('bd3d-stage')||document.body;
+function data(stageId){
+  var m=cfModel(),host=el(stageId||'bd3d-stage')||document.body;
   var groups=CF_GROUP_ORDER.map(function(g){return {key:g,label:CF_GROUPS[g].short,col:rgbIn(host,CF_GROUPS[g].col),items:(m.by[g]||[]).map(function(r){return {name:r.name,v:+r.amount||0}})}});
   if(m.overflow>0)groups.push({key:'un',label:'Unassigned',col:[138,147,166],items:[{name:'Unassigned',v:m.overflow}]});
   return {groups:groups,total:m.tIn,shortfall:m.shortfall,fmt:function(v){return gbpFmt(v)}};
 }
-function ensure(){
-  if(eng||!window.ViNW3D||!ViNW3D.makeTreeMap||!el('bd3d-cv'))return eng;
-  var read=el('bd3d-read');
-  eng=ViNW3D.makeTreeMap(el('bd3d-cv'),{fmt:function(v){return gbpFmt(v)},onPick:function(p){if(!read)return;
+function make(cvId,readId){
+  if(!window.ViNW3D||!ViNW3D.makeTreeMap||!el(cvId))return null;
+  var read=el(readId);
+  var e=ViNW3D.makeTreeMap(el(cvId),{fmt:function(v){return gbpFmt(v)},onPick:function(p){if(!read)return;
     read.textContent=p?p.group+' · '+p.name+': '+gbpFmt(p.v)+' a month, '+Math.round(p.share*100)+'% of your income ('+p.blocks+' block'+(p.blocks===1?'':'s')+' of up to '+gbpFmt(p.unit)+')':readDefault()}});
-  return eng;
+  /* zoom out / in / reset on every viewport (owner, 3 Nov: "add a zoom out function on each of the viewports") */
+  var stage=el(cvId).parentNode;
+  stage.addEventListener('click',function(ev){var b=ev.target.closest('[data-z]');if(!b)return;if(b.dataset.z==='reset')e.reset();else e.zoom(b.dataset.z==='in'?1.25:.8)});
+  return e;
 }
+function ensure(){if(!eng)eng=make('bd3d-cv','bd3d-read');return eng}
 function readDefault(){var m=cfModel();return m.tIn>0?'Income '+gbpFmt(m.tIn)+' a month'+(m.overflow>0?' · '+gbpFmt(m.overflow)+' not assigned yet':'')+(m.shortfall>0?' · spending is '+gbpFmt(m.shortfall)+' more than income':''):'Add your income and spending to see where every pound goes'}
+function sigOf(d){return JSON.stringify(d.groups.map(function(g){return [g.key,g.items.map(function(i){return [i.name,i.v]})]}))+'|'+d.total}
 function refresh(force){
-  if(cur!=='3d'||!ensure())return;
-  var d=data(),sg=JSON.stringify(d.groups.map(function(g){return [g.key,g.items.map(function(i){return [i.name,i.v]})]}))+'|'+d.total;
-  var read=el('bd3d-read');if(read&&!read.dataset.hold)read.textContent=readDefault();
-  if(sg===sig&&!force)return;sig=sg;eng.setData(d);
+  if(cur==='3d'&&ensure()){
+    var d=data(),sg=sigOf(d);
+    var read=el('bd3d-read');if(read&&!read.dataset.hold)read.textContent=readDefault();
+    if(sg!==sig||force){sig=sg;eng.setData(d)}
+  }
+  if(!dash)dash=make('cf3d-cv','cf3d-read');
+  if(dash){var d2=data('cf3d-stage'),s2=sigOf(d2),r2=el('cf3d-read');if(r2&&!r2.dataset.hold)r2.textContent=readDefault();if(s2!==dsig||force){dsig=s2;dash.setData(d2)}}
 }
 function show(v,user){
   cur=v==='3d'?'3d':'flow';var card=document.querySelector('.bd-sankey-card');
@@ -29006,9 +29114,12 @@ function show(v,user){
 var _dcd=window.drawCashflowDiagram;if(typeof _dcd==='function'){window.drawCashflowDiagram=drawCashflowDiagram=function(){var r=_dcd.apply(this,arguments);try{refresh()}catch(e){console.warn('budget 3D',e)}return r}}
 function init(){var seg=el('bd-view');if(!seg)return;
   seg.addEventListener('click',function(e){var b=e.target.closest('button[data-v]');if(b)show(b.dataset.v,true)});
-  var saved='flow';try{saved=localStorage.getItem(KEY)==='3d'?'3d':'flow'}catch(e){}show(saved,false);}
+  try{var bs=el('bd-sankey');if(bs&&window.ResizeObserver&&window.viCfZoom){var lw=0;new ResizeObserver(function(){if(bs.clientWidth!==lw){lw=bs.clientWidth;if(lw)viCfZoom(bs)}}).observe(bs)}}catch(e){}
+  var fz=el('bd-fz');if(fz)fz.addEventListener('click',function(e){var b=e.target.closest('button[data-fz]');if(b&&window.viCfZoomBy)viCfZoomBy(b.dataset.fz)});
+  var saved='flow';try{saved=localStorage.getItem(KEY)==='3d'?'3d':'flow'}catch(e){}show(saved,false);
+  try{refresh(true)}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-window.bd3d={show:show,engine:function(){return eng},data:data,view:function(){return cur}};
+window.bd3d={show:show,engine:function(){return eng},dashEngine:function(){return dash},data:data,view:function(){return cur}};
 })();
 </script>
 <script id="vi-feedback">
