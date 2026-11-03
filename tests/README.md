@@ -75,6 +75,7 @@ node tests/test_v07_e18.js         # v0.7 E18: house camera buttons in a bottom-
 node tests/test_v07_e1.js          # v0.7 E1: bottom tab bar at 599 px and under only; icon nav at the top from 600 px
 node tests/test_v07_e2.js          # v0.7 E2: the roadmap opens centred on the next achievement, each time the tab opens
 node tests/test_v07_e3.js          # v0.7 E3: gold roadmap tile gone; stage detail on tap (Next up, Met. Waiting on, ring, close x/Esc)
+node tests/test_wealth_roadmap.js   # Wealth Roadmap (3 Nov): tab label, one roadmap card mirrored, octagon tokens with studs and tiers, levels, XP, side quests, badge tokens, phone floor
 node tests/test_v07_e9.js          # v0.7 E9: budget spending groups folded by default; a saved choice wins
 node tests/test_v07_e10.js         # v0.7 E10: expense bar arrow: sprite chevron 20 px in a 44 px target, down folded, up open
 node tests/test_v08_cards.js        # v0.8 D2: budget cards (no separator, 30-32 px icons, 10 px titles, titles clear of the amount) and the one House progress tile (iconned stats, house-type milestones, no dead columns)
