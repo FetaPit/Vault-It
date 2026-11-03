@@ -2,9 +2,11 @@
 
 **Subtitle:** What changed on 29 October, what did not, and what stamp duty costs a first-time buyer today.
 
-**Type:** Weekly post · **Pillar:** UK housing money, explained · **Status:** draft, waiting for Pete's approval. Check the figures against gov.uk on the day it is published.
+**Type:** Weekly post · **Pillar:** UK housing money, explained · **Header image:** `images/03-lisa-stamp-duty-night.png` · **Status:** draft, waiting for Pete's approval. Check the figures against gov.uk on the day it is published.
 
 ---
+
+I designed Vault-It so a deposit becomes a date and a house you can see. That only works if the numbers behind it are right.
 
 The Budget on 28 October changed one Lifetime ISA rule and announced a new account for first-time buyers. Stamp duty did not change. Here are the facts in one place.
 
@@ -74,5 +76,9 @@ Pete
 - MoneySavingExpert, 28 October 2026, Budget 2026 Lifetime ISA changes: https://www.moneysavingexpert.com/news/2026/10/budget-lifetime-isa/
 
 ---
+
+**About the author.** Pete Thickett is a designer with neurodivergent traits and the founder of Vault-It. He runs PT Live Design in Lincoln, holds a Certified Professional in Psychology of Design from the London School of International Business, and is a local leader for the Interaction Design Foundation. He designed Vault-It for himself because it did not exist.
+
+*Get out of the red and into your home.*
 
 *Not regulated by the FCA. Not financial advice. Vault-It is run by PT Live Design, Lincoln.*

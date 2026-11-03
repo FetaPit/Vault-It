@@ -2,11 +2,11 @@
 
 **Subtitle:** What the research says about money, attention and time, and what it does not.
 
-**Type:** Weekly post · **Pillar:** debt to deposit · **Status:** draft, waiting for Pete's approval
+**Type:** Weekly post · **Pillar:** debt to deposit · **Header image:** `images/02-money-admin-night.png` · **Status:** draft, waiting for Pete's approval
 
 ---
 
-Some people find money admin harder than others. Some of that is down to how attention and time work. Here is what the research says, and what it does not.
+I have neurodivergent traits, and I designed Vault-It for me because what I needed did not exist. I am also trained in the psychology of design, so before I claim anything, I want to know what the research actually says. Here it is, including what it does not say.
 
 ## Money and ADHD
 
@@ -18,7 +18,7 @@ These are links, not proof of cause.
 
 In children and teenagers with ADHD, a review of 27 studies found time is judged less accurately [3]. I have not found the same kind of review for adults, so I will not claim it.
 
-If "later" feels vague, a saving goal is hard to hold on to. That is the problem Vault-It tries to work on: it turns "later" into a date and a house you can see.
+If "later" feels vague, a saving goal is hard to hold on to. That is the problem I designed Vault-It around: it turns "later" into a date and a house you can see.
 
 ## Seeing the future
 
@@ -45,5 +45,9 @@ Pete
 4. Hershfield, H. E. and others (2011). Increasing saving behavior through age-progressed renderings of the future self. *Journal of Marketing Research*, 48(SPL), S23-S37.
 
 ---
+
+**About the author.** Pete Thickett is a designer with neurodivergent traits and the founder of Vault-It. He runs PT Live Design in Lincoln, holds a Certified Professional in Psychology of Design from the London School of International Business, and is a local leader for the Interaction Design Foundation. He designed Vault-It for himself because it did not exist.
+
+*Get out of the red and into your home.*
 
 *Not regulated by the FCA. Not financial advice. Vault-It is run by PT Live Design, Lincoln.*

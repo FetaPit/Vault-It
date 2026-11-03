@@ -1,30 +1,35 @@
-# Start here: why Vault-It exists
+# I designed the money app I could not find
 
-**Subtitle:** What this is, who it is for, and what lands in your inbox each week.
+**Subtitle:** Why Vault-It exists, why I was the one to design it, and what lands in your inbox each week.
 
-**Type:** Pinned "start here" post · **Pillar:** about · **Status:** draft, waiting for Pete's approval
+**Type:** Pinned "start here" post · **Pillar:** about · **Header image:** `images/01-start-here-night.png` · **Status:** draft, waiting for Pete's approval
 
 ---
 
-Hi, I'm Pete, the person behind Vault-It.
+Hi, I'm Pete Thickett. I'm a designer, and I have neurodivergent traits.
 
-This publication is for anyone in the UK who wants to get out of the red and into their own home. Maybe you are paying off a card, a loan or an overdraft. Maybe you have a little saved and no idea how far it gets you. Either way, you are in the right place.
+Vault-It is the money app I needed and could not find. So I designed it for me.
 
-## The story
+## The problem
 
-I could not see where my contributions were going, or what value I actually owned. I looked for a whole strategy for building wealth and could not find one. So I made one.
+I could not see where my contributions were going, or what value I actually owned. I looked for a whole strategy for building wealth and could not find one.
 
-I wanted to see what I was working towards, and exactly how much I needed to put in to lay one more brick, with real visual feedback.
+I wanted to see what I was working towards, and exactly how much I needed to put in to lay one more brick, with real visual feedback. It did not exist.
 
-## What Vault-It is for
+## Why I felt best placed to design it
 
-Vault-It puts your debts, savings and house deposit on one map. You type in your own figures, and it never asks for your bank login.
+Three things meet in one person here.
 
-Every pound you save lays a brick on your house. What you owe sits below the ground, so being in debt is a starting line, not a failure screen. The aim is to give anyone, even someone in debt, a live date for when they will hold the keys to their own home.
+- **I am a designer.** I run PT Live Design in Lincoln, where I have worked on branding and design since 2019. I have been a multimedia designer, including producing training resources for the Royal Air Force Officer Training Academy at Cranwell.
+- **I am trained in how people think and decide.** I hold a Certified Professional in Psychology of Design from the London School of International Business, and I am a local leader for the Interaction Design Foundation.
+- **I have neurodivergent traits.** As a designer with those traits, I felt best placed to bring this to fruition.
 
-## Who is behind it
+## How that shows up in Vault-It
 
-I'm a designer and founder. I run PT Live Design in Lincoln, where I have worked on branding and design since 2019. I have been a multimedia designer, including producing training resources for the Royal Air Force Officer Training Academy at Cranwell. I hold a Certified Professional in Psychology of Design from the London School of International Business, and I am a local leader for the Interaction Design Foundation.
+- **You can see the goal.** Every pound you save lays a brick on a 3D house.
+- **Debt is a starting line.** What you owe sits below the ground, not on a failure screen.
+- **"Later" becomes a date.** The aim is a live date for when you could hold the keys to your own home.
+- **Your figures, your control.** You type your numbers in. Vault-It never asks for your bank login.
 
 ## What you will get here
 
@@ -46,5 +51,9 @@ Thanks,
 Pete
 
 ---
+
+**About the author.** Pete Thickett is a designer with neurodivergent traits and the founder of Vault-It. He runs PT Live Design in Lincoln, holds a Certified Professional in Psychology of Design from the London School of International Business, and is a local leader for the Interaction Design Foundation. He designed Vault-It for himself because it did not exist.
+
+*Get out of the red and into your home.*
 
 *Not regulated by the FCA. Not financial advice. Vault-It is run by PT Live Design, Lincoln.*

@@ -2,11 +2,11 @@
 
 **Subtitle:** A plain tour of the free beta, and what I ask of testers.
 
-**Type:** Weekly post · **Pillar:** what changed in Vault-It · **Status:** draft, waiting for Pete's approval
+**Type:** Weekly post · **Pillar:** what changed in Vault-It · **Header image:** `images/04-whats-in-vault-it-night.png` · **Status:** draft, waiting for Pete's approval
 
 ---
 
-This is a tour of what you can use in the free Vault-It beta today. Each week after this, the "what changed" posts will cover only what is new.
+I designed Vault-It for me first, because the tool I needed did not exist. Now it is in a free beta, and this is a tour of what you can use today. Each week after this, the "what changed" posts will cover only what is new.
 
 ## Set up in a few minutes
 
@@ -45,5 +45,9 @@ Thanks,
 Pete
 
 ---
+
+**About the author.** Pete Thickett is a designer with neurodivergent traits and the founder of Vault-It. He runs PT Live Design in Lincoln, holds a Certified Professional in Psychology of Design from the London School of International Business, and is a local leader for the Interaction Design Foundation. He designed Vault-It for himself because it did not exist.
+
+*Get out of the red and into your home.*
 
 *Not regulated by the FCA. Not financial advice. Vault-It is run by PT Live Design, Lincoln.*
