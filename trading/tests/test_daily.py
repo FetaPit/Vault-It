@@ -43,6 +43,10 @@ class TestDaily(unittest.TestCase):
         self.assertAlmostEqual(self.pf.cash_gbp, 362.5, places=6)
         self.assertAlmostEqual(self.j.sum_cash_flows("topup"), 100.0, places=6)
 
+    def test_now_must_fall_on_d(self) -> None:
+        with self.assertRaises(ValueError):
+            run_daily_close(self.ctx, date(2027, 2, 1), utc(2027, 2, 2, 0, 30), {}, {}, 625.0, 625.0, 0)
+
     def test_idempotent_rerun(self) -> None:
         self.close(date(2027, 2, 1))
         rep = self.close(date(2027, 2, 1))

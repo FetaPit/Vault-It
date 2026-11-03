@@ -60,6 +60,8 @@ def _cmd_killswitch(cfg: TradingConfig, args: argparse.Namespace) -> int:
 
 
 def _cmd_backtest(cfg: TradingConfig, args: argparse.Namespace) -> int:
+    if args.journal != ":memory:" and Path(args.journal).resolve() == resolve_path(cfg.paths.journal).resolve():
+        raise ValueError("backtest must not write to the paper journal")
     start, end = date.fromisoformat(args.start), date.fromisoformat(args.end)
     data = CsvMarketData(Path(args.bars))
     cal = EventCalendar.from_csv(Path(args.calendar)) if args.calendar else None

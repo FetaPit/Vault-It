@@ -187,6 +187,13 @@ class TestBroker(BrokerBase):
         self.assertEqual(t.exit_price, 110.0)
         self.assertAlmostEqual(t.gross_pnl_gbp, -37.5, places=6)
 
+    def test_partial_then_cancel_keeps_fixed_commission_risk(self) -> None:
+        self.submit(order(symbol="TESTC", qty=3.22, target=None), risk=18.744)
+        self.b.on_bar(self.bar(0, 100, 101, 99, 100, v=3.2, sym="TESTC"))
+        self.b.cancel("o1", utc(2027, 1, 12, 15, 0))
+        self.assertGreaterEqual(self.b.open_positions()[0].initial_risk_gbp, 0.32 * 5.15 + 2.0 - 1e-9)
+        self.assertAlmostEqual(self.b.pending_risk_gbp(), 0.0, places=9)
+
     def test_costs_round_trip(self) -> None:
         self.submit(order(symbol="TESTC", qty=3.22, target=None), risk=18.744)
         f = self.b.on_bar(self.bar(0, 100, 101, 99, 100, sym="TESTC"))

@@ -67,6 +67,20 @@ class TestCli(unittest.TestCase):
                                  "--start", "bad", "--end", "2027-01-12"])
             self.assertEqual(code2, 2)
 
+    def test_backtest_refuses_paper_journal(self) -> None:
+        with tempfile.TemporaryDirectory() as t:
+            jp = Path(t) / "paper.sqlite"
+            cfg = make_cfg()
+            d = config_to_dict(cfg)
+            d["paths"]["journal"] = str(jp)
+            cfg_path = Path(t) / "cfg.json"
+            cfg_path.write_text(json.dumps(d))
+            code, _, err = run(["--config", str(cfg_path), "backtest", "--bars", str(Path(t) / "x.csv"),
+                                "--start", "2027-01-12", "--end", "2027-01-12", "--journal", str(jp)])
+            self.assertEqual(code, 2)
+            self.assertIn("paper journal", err)
+            self.assertFalse(jp.exists())
+
     def test_bad_config(self) -> None:
         code, _, err = run(["--config", "/nonexistent/cfg.json", "forecast"])
         self.assertEqual(code, 2)

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Mapping
 
 from trading.broker import PaperBroker
@@ -51,6 +51,8 @@ def run_daily_close(ctx: DailyContext, d: date, now: datetime, prices_gbp: Mappi
                     sleeve_a_marks: Mapping[str, float], day_start_equity_gbp: float,
                     peak_equity_gbp: float, trades_today: int) -> DailyCloseReport:
     cfg, j, pf, broker = ctx.cfg, ctx.journal, ctx.portfolio, ctx.broker
+    if now.astimezone(timezone.utc).date() != d:
+        raise ValueError("run_daily_close: now must fall on d (UTC)")
 
     # 1. top-ups (journal dedupe makes reruns safe)
     applied = {date.fromisoformat(k[len("topup:"):]) for k in j.cash_flow_dedupe_keys("topup:")}
@@ -65,7 +67,7 @@ def run_daily_close(ctx: DailyContext, d: date, now: datetime, prices_gbp: Mappi
             pf.deposit(credit.sleeve_b_gbp)
         credits.append(credit)
 
-    deposits_today = j.cash_flow_total("topup", d)   # all of today's top-ups (incl. earlier runs) must not mask losses
+    deposits_today = j.cash_flow_total("topup", now.astimezone(timezone.utc).date())   # all of today's top-ups (incl. earlier runs) must not mask losses
 
     # drawdown kill check at close (before Sleeve B can buy or DRIP)
     pre = broker.equity_gbp(sleeve_a_marks) + pf.equity(prices_gbp)
