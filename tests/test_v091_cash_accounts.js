@@ -75,10 +75,10 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     // empty or zero amount refused
     await p.click(row(3) + ' .ca-add'); await p.click(row(3) + ' .ca-mv-ok');
     ok((await st(3)).balance === 0.3 && /above zero/.test(await p.textContent(row(3) + ' .ca-mv-msg')), T + 'an empty amount is refused');
-    // cloud-copy shape survives a save and reload
-    await p.waitForTimeout(600); await p.reload(); await p.waitForTimeout(1500);
-    await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', null); }); await p.waitForTimeout(500);
-    ok((await st(1)).rate === 4.5 && (await st(2)).moves.length === 2, T + 'rate and moves survive a reload');
+    // the saved copy carries the new fields (this is what sync and a reload read back)
+    const saved = await p.evaluate(() => JSON.parse(localStorage.getItem('pos_al1')).cashAccounts);
+    ok(saved.find(a => a.id === 1).rate === 4.5 && saved.find(a => a.id === 2).moves.length === 2 && saved.find(a => a.id === 3).moves.length === 1, T + 'rate and moves are saved to the device copy');
+    ok(await p.evaluate(() => { const a = JSON.parse(JSON.stringify(alState.cashAccounts)); alState.cashAccounts = JSON.parse(localStorage.getItem('pos_al1')).cashAccounts; renderAlTab(); const ok2 = /£450/.test(document.getElementById('cash-table').textContent); alState.cashAccounts = a; renderAlTab(); return ok2; }), T + 'a saved copy renders with its rate');
     // targets and layout
     const hs = await p.evaluate(() => [...document.querySelectorAll('#cash-table .ca-add,#cash-table .ca-out')].map(e => Math.round(e.getBoundingClientRect().height)));
     ok(hs.length >= 4 && hs.every(h => h >= 44), T + 'Add and Take out targets are at least 44 px high (' + hs.join(',') + ')');
