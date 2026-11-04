@@ -2,7 +2,8 @@
 
 All 13 chunks plus follow-ups are merged into `candidate/v0.9.1`, and CI is green on each merge.
 The demo-seed data-loss guard (`v09x/demo-guard`) went in last.
-The release candidate is `248e7e4` on `candidate/v0.9.1`. Full CI is green on that exact SHA (run 41768973204, server plus 3 browser shards).
+**On hold (owner, 4 Nov 08:30): v0.9.1 waits for the cash 3D look (bank chips with logos, better coins, `v09x/cash3d-look`).** Do not run the release step below until this line is replaced with the final SHA.
+Last green candidate: `248e7e4` (run 41768973204). Cash 3D phone framing merged since as `6b1ba9f` (CI run 41792595429, shard 2 re-running after a timing flake).
 
 ## Done already
 - Migration 014 (`campaign_counts`) is applied to production (owner's yes, 3 Nov). The Founding badge reads "100 left".
