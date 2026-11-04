@@ -109,9 +109,11 @@ const last = (p, l) => p.evaluate(l => { const x = __P.r.filter(r => r[2] === l)
   r = await p.evaluate(t0 => { const f = __P.r.find(x => x[0] >= t0 && x[2] === 'modal'); return f ? Math.round(f[0] - t0) : null; }, t0);
   ok(r != null, 'wealth inventory: expand opens the full viewer'); info('full viewer: tap to first frame ' + r + ' ms');
   ok(await p.evaluate(() => window.__parses) === 1, 'the tile hands its model to the full viewer: the file is read once, not twice (' + await p.evaluate(() => window.__parses) + ')');
-  const t1 = await p.evaluate(() => performance.now()); await settle(p, 2000);
+  // sample at least 20 frames of the turning model (under CI load 2 s gave as few as 4), up to 20 s; the gate stays at one draw a frame
+  const t1 = await p.evaluate(() => performance.now());
+  await p.waitForFunction(t1 => new Set(__P.r.filter(x => x[0] >= t1 && x[2] === 'modal').map(x => x[1])).size >= 20, t1, { timeout: 20000 }).catch(() => {});
   const pf = await perFrame(p, t1, 'modal'); const lm = await last(p, 'modal');
-  ok(pf.frames > 5 && pf.worst <= 1, 'the turning model is drawn once a frame (' + pf.frames + ' frames, at most ' + pf.worst + ' draws in one)');
+  ok(pf.frames >= 20 && pf.worst <= 1, 'the turning model is drawn once a frame (' + pf.frames + ' frames, at most ' + pf.worst + ' draws in one)');
   ok(lm && lm.calls <= ITEM_CALLS && lm.tris <= ITEM_TRIS, 'full viewer: ' + (lm && lm.calls) + ' draw calls, ' + (lm && lm.tris) + ' triangles a frame (budget ' + ITEM_CALLS + ', ' + ITEM_TRIS + ')');
   t0 = await p.evaluate(() => performance.now()); await tap(p, '#i3d-modal .inv-x'); await p.waitForFunction(() => !document.getElementById('i3d-modal'), null, { timeout: 20000 }).catch(() => {});
   const gone = await p.evaluate(() => performance.now()), closeMs = Math.round(gone - t0); await settle(p, 1200);
