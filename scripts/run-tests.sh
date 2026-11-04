@@ -63,8 +63,9 @@ fi
 run_one() {   # prints "name PASS|FAIL reason"
   local t="$1" n; n="$(basename "$t")"; n="${n%.*}"
   local log="$LOG_DIR/$n.log" rc
-  timeout "${TEST_TIMEOUT:-900}" node "$t" > "$log" 2>&1; rc=$?
-  if [ $rc -ne 0 ]; then echo "$n FAIL exit=$rc"; return; fi
+  local t0=$SECONDS; timeout "${TEST_TIMEOUT:-900}" node "$t" > "$log" 2>&1; rc=$?
+  local dt=$((SECONDS-t0)); [ -n "${GITHUB_ACTIONS:-}" ] && [ $dt -ge "${SLOW_NOTE:-240}" ] && echo "::notice title=Slow test::$n took ${dt}s (exit $rc)" >&2   # visible on the run page without signing in
+  if [ $rc -ne 0 ]; then echo "$n FAIL exit=$rc after ${dt}s"; return; fi
   if grep -qE "^FAIL|FAILURES|[0-9]+ FAILED|problems=[1-9]|XSS executed: [1-9]|injected <img> elements in DOM: [1-9]|^errors \[[^]]" "$log"; then
     echo "$n FAIL $(grep -m1 -E '^FAIL|FAILURES|[0-9]+ FAILED|problems=[1-9]|XSS executed: [1-9]|^errors \[[^]]' "$log" | cut -c1-110)"; return
   fi
@@ -84,9 +85,11 @@ while read -r name status rest; do
   grep -E "^FAIL" "$LOG_DIR/$name.attempt1.log" | head -3 | cut -c1-200 | sed 's/^/         first attempt: /'
   t="$(ls tests/$name.js tests/$name.mjs 2>/dev/null | head -1)"
   again="$(run_one "$t")"
-  if [ "${again#* }" = "PASS" ]; then echo "  FLAKY  $name — passed on its own"; FLAKY="$FLAKY $name"
+  if [ "${again#* }" = "PASS" ]; then echo "  FLAKY  $name — passed on its own"; FLAKY="$FLAKY $name"; [ -n "${GITHUB_ACTIONS:-}" ] && echo "::warning title=Flaky test: $name::first attempt: $rest"
   else
     echo "  FAILED $name — ${again#* FAIL }  (log: $LOG_DIR/$name.log)"; FINAL_FAIL=$((FINAL_FAIL+1))
+    [ -n "${GITHUB_ACTIONS:-}" ] && echo "::error title=Test failed: $name::first: $rest / again: ${again#* FAIL } / $(grep -m2 -E '^FAIL' "$LOG_DIR/$name.log" | cut -c1-150 | tr '
+' ' ')"   # the run page shows this without a sign-in
     echo "  ----- last lines of $name.log -----"; grep -E "^FAIL|^ok|Error|error" "$LOG_DIR/$name.log" | tail -${FAIL_LINES:-25} | cut -c1-220 | sed 's/^/  | /'; echo "  -----"
   fi
 done <<< "$RESULTS"

@@ -85,9 +85,8 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
     ok(h.ids, t + 'E11 ids kept');
     // E8
     ok(h.tN === 6 && h.tKeys === 'terraced,semi,detached,mansion,flat,apartment' && h.tActive === 1, t + 'E8 six types, keys kept, one active (' + h.tKeys + ')');
-    ok(h.tW.every(x => (w >= 1100 ? x >= 40 : w >= 600 ? x >= 34 : x >= 30)), t + 'E8 icon size (' + h.tW.join(',') + ')');
-    ok(h.tGold.every(Boolean), t + 'E8 each icon has a gold accent');
-    ok(h.tSw === 1, t + 'E8 same stroke weight and grid across the six (' + h.tSw + ')');
+    // E8's icon size, gold accent and stroke checks gave way to R12 (v0.9.1 round 2): the types are roadmap slates in the
+    // viewport chip's panel now, checked by tests/test_v091r2_house_type.js
     ok(h.tLabelFs >= 11.5, t + 'E8 labels >= 11.5 px (' + h.tLabelFs + ')');
     // E10
     ok(h.noteFs >= (w >= 1100 ? 13 : w >= 600 ? 12 : 11.5), t + 'E10 note size (' + h.noteFs + ')');
