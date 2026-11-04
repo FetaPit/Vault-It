@@ -81,3 +81,4 @@ node tests/test_v08_cards.js        # v0.8 D2: budget cards (no separator, 30-32
 node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, identical on #cf-sankey and #bd-sankey, Night and Daylight
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
 node tests/test_pitch_page.js      # vault-it.co/pitch-Eligent: 15 slides, no sideways scroll, Present one-slide view (keys, buttons, swipe, Esc), live 3D viewports (Net worth in 3D, Net worth progress) with demo data
+node tests/test_pete_card.js       # vault-it.co/pete: digital business card flips (tap, Flip button, drag in 3D), house build corner on the front (still with reduced motion), Save contact vCard, no placeholders, no outside hosts
