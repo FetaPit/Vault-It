@@ -1,0 +1,10 @@
+// Email images only (signature footers, founder photo), served at https://media.vault-it.co.
+// Separate from the site Worker in the repo root: deploying this never touches app.vault-it.co or vault-it.co.
+// Deploy (Git Bash): cd ~/Projects/Vault-It/docs/marketing/email-media && npx wrangler deploy
+{
+  "name": "vault-it-email-media",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./public", "not_found_handling": "none" },
+  "routes": [{ "pattern": "media.vault-it.co", "custom_domain": true }],
+  "workers_dev": false
+}
