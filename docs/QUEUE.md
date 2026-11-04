@@ -111,6 +111,7 @@ The single list of instructed work. Every session reads it at start and before e
   - E coins one by one, R16 (d4a5ffc): merged as 8aff519.
   - Roadmap follow-ups C2, C3 and C3b (ab2406b): merged as ca4750d.
   - B labels and flow, R2, R9 to R11: ready for review, `v091r2/labels-flow` 0143c09 (icons on the Net worth 3D and Cash flow 3D labels, income flow 15 to 20% shorter, solid 1.5 px divider; Pedro PASS, rollout-qc PASS, CI running), not merged.
+  - A chrome, R1 and R23 to R27 (wordmark and swinging dial, credit-card profile card with a bigger still photo, Daylight page background #D3CCB4, Night header bar in Daylight with `?hdr=paper` to compare, animated Night/Daylight switch): ready for review, `v091r2/chrome` fcae04e (Pedro PASS, rollout-qc PASS, new test_v091r2_chrome; CI run 41851024972 was still running when last seen, result not yet read), not merged.
   - G crypto, R19, R20 and the owner's follow-ups on the coins: ready for review, `v091r2/crypto` fdaeb30, CI green run 41853139998, Pedro PASS (tiles), rollout-qc PASS on each commit (teal bitcoin Crypto sub-tab icon; holding tiles led by a large coin icon with price, then amount and cost in their own row; coins swing at most 10 degrees with gold edge thickness, a light streak and a semi photo realistic bevelled rim in each coin's own colour; still under reduced motion). Test `tests/test_v091r2_crypto.js`. Not merged into the candidate.
 
 ## Done (3 Nov 2026)
