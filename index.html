@@ -22507,9 +22507,12 @@ function v3Warm(){
   };
   idle(step);
 }
+/* v0.9.2: the warm-up starts the moment both are true, the page has loaded and the 3D engine is in (its 'vi-three' event, which can
+   come before or after 'load'), not on the next 1.5 s poll; the poll stays as a fallback */
+function v3WarmSoon(){if(document.readyState!=='complete'||!window.THREE||!THREE.OrbitControls)return;var saveData=false;try{saveData=!!(navigator.connection&&navigator.connection.saveData);}catch(e){}if(!saveData)setTimeout(v3Warm,50);}
+document.addEventListener('vi-three',function(e){if(e.detail&&e.detail.ok)v3WarmSoon();});
 window.addEventListener('load',function(){var saveData=false;try{saveData=!!(navigator.connection&&navigator.connection.saveData);}catch(e){}if(saveData)return;
-  /* v0.9.2: start the moment the 3D engine is in (its 'vi-three' event), not on the next 1.5 s poll */
-  document.addEventListener('vi-three',function(e){if(e.detail&&e.detail.ok)setTimeout(v3Warm,50);});
+  v3WarmSoon();
   var n=0,wait=function(){if(window.THREE&&THREE.OrbitControls)return v3Warm();if(++n<30)setTimeout(wait,1500);};setTimeout(wait,1500);});
 
 function renderMetalsISO(){

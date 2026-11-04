@@ -31,6 +31,7 @@ const SEED = `(function(){if(localStorage.getItem('pos_al1'))return;localStorage
 const HOOK = () => {
   const T = window.__P = { made: [], r: [], buf: [], frame: 0 };
   document.addEventListener('vi-three', () => { T.three = performance.now(); });
+  document.addEventListener('DOMContentLoaded', () => { const f = window.v3Warm; if (typeof f === 'function') window.v3Warm = function () { if (T.warmAt == null) T.warmAt = performance.now(); return f.apply(this, arguments); }; });
   const tick = () => { T.frame++; requestAnimationFrame(tick); }; requestAnimationFrame(tick);
   const lab = cv => !cv.isConnected ? 'off' : cv.closest('#i3d-modal') ? 'modal' : cv.closest('.i3d-live') ? 'tile' : cv.closest('#cashSceneCard') ? 'cash' : cv.closest('#metalsSceneCard') ? 'metals' : 'other';
   const wrap = O => { const W = function (o) { O.call(this, o); T.made.push([performance.now(), !!(o && o.preserveDrawingBuffer)]); const self = this, rr = this.render;
@@ -64,9 +65,9 @@ const last = (p, l) => p.evaluate(l => { const x = __P.r.filter(r => r[2] === l)
   await p.goto(origin + '/index.html', { waitUntil: 'load' }); await p.addStyleTag({ content: HIDE });
   await p.waitForFunction(() => !!window.THREE && !!THREE.OrbitControls && !!THREE.GLTFLoader, null, { timeout: 60000 }).catch(() => {});
   await settle(p, 3000);
-  // the cash and metals warm-up starts as soon as the 3D engine is in: its renderer (the first one made) follows the 'vi-three' event
-  const ws = await p.evaluate(() => ({ three: __P.three, first: (__P.made.find(m => !m[1] && m[0] >= (__P.three || 0)) || [null])[0] }));
-  ok(ws.three != null && ws.first != null && ws.first - ws.three < 1000, 'the cash and metals warm-up starts within 1 s of the 3D engine arriving (' + (ws.first != null && ws.three != null ? Math.round(ws.first - ws.three) + ' ms' : 'not seen') + '; it waited for a 1.5 s poll)');
+  // the cash and metals warm-up is asked for as soon as the page has loaded and the 3D engine is in (whichever comes last)
+  const ws = await p.evaluate(() => { const ld = performance.getEntriesByType('navigation')[0], ready = Math.max(__P.three || 0, ld ? ld.loadEventEnd : 0); return { three: __P.three, ready, first: __P.warmAt == null ? null : __P.warmAt }; });
+  ok(ws.three != null && ws.first != null && ws.first - ws.ready < 500, 'the cash and metals warm-up starts within 0.5 s of the page and the 3D engine both being ready (' + (ws.first != null && ws.three != null ? Math.round(ws.first - ws.ready) + ' ms' : 'not seen') + '; it waited for a 1.5 s poll)');
   await p.evaluate(() => { const f = window.i3dParse; window.__parses = 0; window.i3dParse = function () { window.__parses++; return f.apply(this, arguments); }; });
 
   // ── 1. cash and savings: tab, sub-tab, scroll down to the stage ──
