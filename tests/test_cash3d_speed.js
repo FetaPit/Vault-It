@@ -12,9 +12,10 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
 // wall-clock times swing with machine load (CI shards run two browsers at once), so they are reported, never gated;
 // the gates are the fixed numbers that make a stage slow: builds, compiles, shader kinds, draw calls and triangles (CoS, 3 Nov)
 const info = m => console.log('info:', m);
-const CASH_CALLS = 16, CASH_TRIS = 2500, METAL_CALLS = 20, METAL_TRIS = 4000;   // measured 13 / 1,756 and 17 / 2,874 on 40c6018 (the old coin stacks drew 121,464 triangles)
-// v0.9.1 cash 3D look: up to 12 blocks of 1,000 each block is its hundred real stacks in one shape; past that (as here at £25,300)
-// a block is the painted box again, so this budget is unchanged.
+const CASH_CALLS = 16, CASH_TRIS = 130000, METAL_CALLS = 20, METAL_TRIS = 4000;   // measured 13 / 1,756 and 17 / 2,874 on 40c6018 (the old coin stacks drew 121,464 triangles)
+// v0.9.2 cash 3D solid stacks (owner, 4 Nov: "Each stack must be its own solid model once stacked, not the grid as a whole"): every
+// stack is closed (top, side, bottom), so at £25,300 (25 blocks) the scene is 121,450 triangles in the same 9 draws (live v0.9.1:
+// 1,390, painted boxes). Past about 160,000 triangles of stacks (33 blocks in £1) a block is a closed painted box again.
 const SEED = (cash, metals) => `(function(){if(localStorage.getItem('pos_al1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true,plan:'annual'}));localStorage.setItem('pos_al1',JSON.stringify({cashAccounts:[{id:5,name:'Savings',type:'Savings',balance:${cash}}],physicalCash:[{id:1,where:'Safe',amount:300,date:'2026-10-01'}],metals:${JSON.stringify(metals)},metalPrices:{gold:2000,silver:25,platinum:900,palladium:1000}}));})()`;
 // timed spans of the viewer's own code, long tasks with their start, and every render call's own main-thread cost
 const HOOK = () => {
@@ -120,8 +121,10 @@ const HOOK = () => {
     await p2.waitForFunction(() => !!window.THREE && !!THREE.OrbitControls, null, { timeout: 30000 }).catch(() => {});
     await p2.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', null); });
     await p2.waitForFunction(() => window.VIPERF && VIPERF.snapshot().stageFrames > 0, null, { timeout: 30000 }).catch(() => {});
-    const k = await p2.evaluate(() => { const k = VIPERF.snapshot(); return { viewport: k.viewport, frames: k.stageFrames, line: VIPERF.report().split('\n').find(l => /^viewport (Cash|Precious|house)/.test(l)) }; });
+    const k = await p2.evaluate(() => { const k = VIPERF.snapshot(), V = V3.cash; V.r.info.autoReset = true; V.r.render(V.sc, V.cam); return { viewport: k.viewport, frames: k.stageFrames, calls: k.stageCalls, tris: k.stageTris, real: [V.r.info.render.calls, V.r.info.render.triangles], line: VIPERF.report().split('\n').find(l => /^viewport (Cash|Precious|house)/.test(l)) }; });
     ok(k.viewport === 'Cash and savings coins' && k.frames > 0 && /Cash and savings/.test(k.line || ''), 'the ?perf=1 overlay names the stage on screen and counts its frames (' + k.line + ')');
+    // v0.9.2 (CoS, 4 Nov): the overlay also reads out the stage's draws and triangles, the same numbers the renderer counts, so the owner can check on his phone
+    ok(k.calls === k.real[0] && k.tris === k.real[1] && /draws \d+ · triangles [\d,]+/.test(k.line || ''), 'the ?perf=1 overlay shows the stage\'s draws and triangles (' + k.calls + ' / ' + k.tris + '; renderer ' + k.real.join(' / ') + ')');
     await p2.evaluate(() => localStorage.removeItem('vi-perf')); await p2.close(); }
   ok(!errs.length, 'no page errors ' + errs.slice(0, 2).join(' | '));
   await b.close();
