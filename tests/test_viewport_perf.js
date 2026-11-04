@@ -47,6 +47,16 @@ async function tap(p, sel) { const h = await p.$(sel); if (!h) return false; awa
 const settle = (p, ms) => p.waitForTimeout(ms);
 const perFrame = (p, t0, l) => p.evaluate(([t0, l]) => { const by = {}; __P.r.filter(x => x[0] >= t0 && x[2] === l).forEach(x => by[x[1]] = (by[x[1]] || 0) + 1); const v = Object.values(by); return { frames: v.length, worst: Math.max(0, ...v) }; }, [t0, l]);
 const last = (p, l) => p.evaluate(l => { const x = __P.r.filter(r => r[2] === l).pop(); return x ? { calls: x[3], tris: x[4] } : null; }, l);
+// a finger turns a stage, then lets go: while the camera glides to a stop it is drawn once a frame, and it does draw (not frozen).
+// The cash and metals loop queued itself twice a frame, the R18 doubling the item viewer had, so draws doubled every frame until the
+// glide ended, on screen or after leaving the tab (1,054 draws in one frame before the fix).
+async function dragGlide(p, ctx, sel, label) {
+  const bb = await (await p.$(sel)).boundingBox(); const c = await ctx.newCDPSession(p), cx = bb.x + bb.width / 2, cy = bb.y + bb.height / 2;
+  await c.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: cx - 90, y: cy }] });
+  for (let i = 1; i <= 12; i++) { await c.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: cx - 90 + i * 15, y: cy }] }); await p.waitForTimeout(16); }
+  const tr = await p.evaluate(() => performance.now()); await c.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await c.detach();
+  await p.waitForTimeout(2500); return perFrame(p, tr - 250, label);
+}
 (async () => {
   const srv = await serve(), origin = 'http://127.0.0.1:' + srv.address().port;
   const b = await chromium.launch({ args: GPU_ARGS }); const errs = [];
@@ -82,6 +92,8 @@ const last = (p, l) => p.evaluate(l => { const x = __P.r.filter(r => r[2] === l)
   info('cash: tab tap to first frame ' + r.first + ' ms (software GPU here; read on a phone with ?perf=1)');
   if (process.env.VP_DEBUG) console.log(JSON.stringify(r.buf.map(x => [Math.round(x[0] - t0), x[2], x[3]])));
   ok(reallocs(r.buf) <= REALLOCS, 'cash: the drawing buffer is reallocated ' + reallocs(r.buf) + ' times while it opens (budget ' + REALLOCS + ')');
+  { const g = await dragGlide(p, ctx, '#cashSceneCard canvas', 'cash');
+    ok(g.frames > 3 && g.worst <= 1, 'cash: a drag turns the stage and it glides to a stop drawn once a frame (' + g.frames + ' frames, at most ' + g.worst + ' draws in one)'); }
   ok(lc && lc.calls <= CASH_CALLS && lc.tris <= CASH_TRIS, 'cash: ' + (lc && lc.calls) + ' draw calls, ' + (lc && lc.tris) + ' triangles a frame (budget ' + CASH_CALLS + ', ' + CASH_TRIS + ')');
 
   // ── 2. precious metals ──
@@ -94,6 +106,8 @@ const last = (p, l) => p.evaluate(l => { const x = __P.r.filter(r => r[2] === l)
   lc = await last(p, 'metals');
   ok(r.first != null, 'precious metals draws in 3D once scrolled into view'); info('metals: sub-tab tap to first frame ' + r.first + ' ms');
   ok(reallocs(r.buf) <= REALLOCS, 'metals: the drawing buffer is reallocated ' + reallocs(r.buf) + ' times while it opens (budget ' + REALLOCS + ')');
+  { const g = await dragGlide(p, ctx, '#metalsSceneCard canvas', 'metals');
+    ok(g.frames > 3 && g.worst <= 1, 'metals: a drag turns the stage and it glides to a stop drawn once a frame (' + g.frames + ' frames, at most ' + g.worst + ' draws in one)'); }
   ok(lc && lc.calls <= METAL_CALLS && lc.tris <= METAL_TRIS, 'metals: ' + (lc && lc.calls) + ' draw calls, ' + (lc && lc.tris) + ' triangles a frame (budget ' + METAL_CALLS + ', ' + METAL_TRIS + ')');
 
   // ── 3. wealth inventory: tap a tile (live view), expand (full viewer), close, expand another, close ──
