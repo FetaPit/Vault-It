@@ -9,7 +9,7 @@
 // (brand/vault-it-logo-mark-full.svg) the tick ring turns 60 degrees in 900 ms on cubic-bezier(.2,.8,.2,1); the V, bolts and brick stay still.
 // 60 ticks with a long one every 30 degrees, so the turned ring matches the start and the loop is seamless.
 // Frame one is the finished still (Outlook on Windows shows only frame one); plays 3 times, then rests.
-// PT Live Design: the owner's own logo, brand/ptlive/pt-live-design-logo.png, used as supplied (or --ptl-logo another file).
+// PT Live Design: the owner's own logo, brand/ptlive/pt-live-design-logo.png, used as supplied with no words beside it (or --ptl-logo another file).
 // Run (Git Bash, repo root):  node docs/marketing/founder-email/build.js [--ptl-logo path/to/logo.png] [--shots]
 // Needs Chromium (Playwright's copy, or set CHROME=path) and network once for the Google Fonts files.
 const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
@@ -28,32 +28,32 @@ const icon = fs.readFileSync(path.join(ROOT, 'brand/vault-it-logo-mark-full.svg'
 if (!icon.includes('id="ticks"')) throw new Error('The full dial has no .ticks group to turn');
 // PT Live Design colours (owner's slide, 4 Nov): black and white with deep teal #006A80, bold wide capitals.
 const PTL_TEAL = '#006A80';
-const logoPath = arg('--ptl-logo') || path.join(ROOT, 'brand/ptlive/pt-live-design-logo.png');
+// Only the P and T (brand/ptlive/pt-live-design-mark.png: the owner's logo with its construction grid taken out).
+const logoPath = arg('--ptl-logo') || path.join(ROOT, 'brand/ptlive/pt-live-design-mark.png');
 const logoExt = path.extname(logoPath).slice(1).toLowerCase(), logoMime = logoExt === 'svg' ? 'image/svg+xml' : 'image/' + (logoExt === 'jpg' ? 'jpeg' : logoExt);
-const ptl = `<div class="pt"><img class="ptlogo" src="data:${logoMime};base64,${fs.readFileSync(logoPath).toString('base64')}" alt="">
-<div class="ptn"><div class="ptw">PT LIVE</div><div class="ptd">DESIGN</div></div></div>`;
+// Owner, 4 Nov: Vault-It leads; the PT mark small in the bottom right with "Published by PT Live Design" at 6 pt (8 px).
+const credit = `<div class="cr"><img src="data:${logoMime};base64,${fs.readFileSync(logoPath).toString('base64')}" alt=""><span>Published by PT Live Design</span></div>`;
 const tagline = (eyebrow, colour) => `<div class="tg"><div class="eb" style="color:${colour}">${eyebrow}</div><div class="tg1">Get out of the red</div><div class="tg2">and into your home.</div></div>`;
 const FOOTERS = {
-  'founder': { right: ptl, alt: 'Vault-It and PT Live Design' },
+  'founder': { right: '', credit: true, alt: 'Vault-It, published by PT Live Design' },
   'vault-it-founder': { right: tagline('From the founder', '#E8C56A'), alt: 'Vault-It. Get out of the red and into your home.' },
   'vault-it': { right: tagline('The Vault-It team', '#44C0B9'), alt: 'Vault-It. Get out of the red and into your home.' },
 };
-const frameHtml = (right) => `<!doctype html><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Lexend:wght@800&family=Share+Tech+Mono&display=block" rel="stylesheet">
+const frameHtml = (f) => `<!doctype html><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Lexend:wght@400;800&family=Share+Tech+Mono&display=block" rel="stylesheet">
 <style>html,body{margin:0;width:${W}px;height:${H}px;background:#080D14;overflow:hidden}
 #s{width:${W}px;height:${H}px;display:flex;align-items:center;justify-content:center;gap:22px}
 .vi{display:flex;align-items:center;gap:10px}.ic{width:58px;height:58px}.ic svg{width:100%;height:100%;display:block}
 .wm{font-family:'Syne';font-weight:800;font-size:30px;letter-spacing:-.02em;color:#E8E8E8;display:inline-flex;align-items:baseline;white-space:nowrap}
 .wm b{font-weight:inherit;color:#44C0B9}.wm .dot{display:inline-block;width:.3em;height:.17em;background:#44C0B9;border-radius:2px;margin:0 .07em;transform:translateY(-.06em)}
 .div{width:1px;height:52px;background:#15302F}
-.pt{display:flex;align-items:center;gap:10px;font-family:'Lexend';text-transform:uppercase;white-space:nowrap}
-.ptlogo{height:58px;width:auto;display:block}
-.ptw,.ptd{font-weight:800;font-size:15px;line-height:1.1;letter-spacing:.14em}.ptw{color:#fff}.ptd{color:${PTL_TEAL}}
+#s{position:relative}.cr{position:absolute;right:12px;bottom:7px;display:flex;align-items:center;gap:5px;font-family:'Lexend';font-weight:400;font-size:8px;line-height:1;color:#9AA0A6;white-space:nowrap}
+.cr img{height:11px;width:auto;display:block}
 .tg{font-family:'Syne';font-weight:800;font-size:15px;line-height:1.2;letter-spacing:-.01em;white-space:nowrap}
 .eb{font-family:'Share Tech Mono';font-weight:400;font-size:10px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:4px}
 .tg1{color:#E8E8E8}.tg2{color:#44C0B9}</style>
 <div id="s"><div class="vi"><span class="ic">${icon}</span><span class="wm">Vault<i class="dot"></i><b>It</b></span></div>
-<div class="div"></div>${right}</div>
+${f.right ? '<div class="div"></div>' + f.right : ''}${f.credit ? credit : ''}</div>
 <script>
 // cubic-bezier(.2,.8,.2,1), the brand book's transition on the tick ring
 const bez = (x1, y1, x2, y2) => { const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx, cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
@@ -165,9 +165,9 @@ async function browser() {
   fs.mkdirSync(MEDIA, { recursive: true });
   try {
     for (const [who, f] of Object.entries(FOOTERS)) {
-      const tmp = path.join(os.tmpdir(), `footer-${who}.html`); fs.writeFileSync(tmp, frameHtml(f.right));
+      const tmp = path.join(os.tmpdir(), `footer-${who}.html`); fs.writeFileSync(tmp, frameHtml(f));
       await b.open(tmp, W, H);
-      const fonts = await b.evaluate(`(async()=>{const f=["800 34px Syne","800 27px Lexend","12px 'Share Tech Mono'"];await Promise.all(f.map(x=>document.fonts.load(x)));return f.map(x=>document.fonts.check(x))})()`);
+      const fonts = await b.evaluate(`(async()=>{const f=["800 34px Syne","400 8px Lexend","12px 'Share Tech Mono'"];await Promise.all(f.map(x=>document.fonts.load(x)));return f.map(x=>document.fonts.check(x))})()`);
       if (fonts.includes(false)) throw new Error('A font did not load (Syne, Lexend, Share Tech Mono): ' + fonts);
       const frames = [];
       for (let i = 0; i <= N; i++) { await b.evaluate(`setFrame(${i / N})`); frames.push(await b.shot(W, H)); }
