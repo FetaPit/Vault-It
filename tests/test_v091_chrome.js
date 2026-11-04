@@ -101,13 +101,14 @@ const open = async (b, w, h, theme, o = {}) => {
     // E25: crowdfund Vaulter card
     const camp = await p.evaluate(() => { const orig = window.open; window.__opened = []; window.open = u => { window.__opened.push(u); return null; };
       viShowCampaign(); const card = [...document.querySelectorAll('#vi-campaign-modal .vi-camp-tier')].find(x => /Vaulter/.test(x.textContent)); const txt = card.innerText.replace(/\s+/g, ' ');
+      // owner, 4 Nov 2026 (chunk I) replaces the 3 Nov sentence: the tester price, then "£X after the beta"
       const P = VI_PLANS.monthly; const f = v => '£' + v.toFixed(2);
-      const out = { ok: txt.indexOf(f(P.price) + ' a month after the 30-day free trial; ' + f(P.tester) + ' for testers and early adopters') >= 0, txt: txt.slice(0, 160) };
-      VI_PLANS.monthly.price = 6.49; VI_PLANS.monthly.tester = 4.49; viShowCampaign(); out.live = document.querySelector('#vi-campaign-modal').innerText.replace(/\s+/g, ' ').indexOf('£6.49 a month after the 30-day free trial; £4.49 for testers') >= 0;
+      const out = { ok: txt.indexOf(f(P.tester) + '/mo ' + f(P.price) + ' after the beta') >= 0 && /after your 30 free days/.test(txt), txt: txt.slice(0, 160) };
+      VI_PLANS.monthly.price = 6.49; VI_PLANS.monthly.tester = 4.49; viShowCampaign(); out.live = document.querySelector('#vi-campaign-modal').innerText.replace(/\s+/g, ' ').indexOf('£4.49/mo £6.49 after the beta') >= 0;
       VI_PLANS.monthly.price = P.price; VI_PLANS.monthly.tester = P.tester;
       const cta = [...card.querySelectorAll('button')].pop(); localStorage.removeItem('vi_beta'); cta.click(); out.tester = window.__opened[0]; localStorage.setItem('vi_beta', 'false'); cta.click(); out.full = window.__opened[1]; localStorage.removeItem('vi_beta');
       out.links = [VI_STRIPE_LINKS.monthly_tester, VI_STRIPE_LINKS.monthly]; out.badge = document.getElementById('camp-founder-slots').textContent; out.stats = !!document.querySelector('#vi-campaign-modal .vi-camp-stats'); return out; });
-    ok(camp.ok, T + 'Vaulter card reads the owner\'s sentence ' + camp.txt);
+    ok(camp.ok, T + 'Vaulter card shows the tester price and "£5.99 after the beta" (owner, 4 Nov) ' + camp.txt);
     ok(camp.live, T + 'both prices come from VI_PLANS (change them and the card follows)');
     ok(camp.tester && camp.tester.indexOf(camp.links[0]) === 0 && camp.full && camp.full.indexOf(camp.links[1]) === 0, T + 'the button opens the existing tester link, or the full-price link when not a tester');
     ok(camp.badge === '100 places' && !camp.stats, T + 'no counts yet: the Founding badge says "100 places" and the backer and funded stats are gone (' + camp.badge + ')');
