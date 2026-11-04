@@ -9,6 +9,8 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [ ] (cloud, Marketing) Eligent live pitch prep: full prep plan from the owner's written notes (owner, 4 Nov evening: "he has invited me to pitch at eligent, detail on everything i need to do to prep, stand by for me to upload written notes").
+- [ ] (cloud, Marketing) Business cards for Eligent: NFC + QR cards and paper cards, Vault-It brand, print-ready (owner, 4 Nov evening: "i need NFT QR code business cards and paper business cards").
 - [x] (cloud, Marketing) Eligent presenter view: add the approved script in the lower right of the presenter (owner, 4 Nov ~15:00: "I actually want the script too in the lower right quarter of the presenter"). Done: e9f1d46, released 4 Nov 15:05 (backup backup/release-pioneer-v2-20261104-1505).
 - [ ] Owner: sign in on the phone at app.vault-it.co after the v0.9.1 release and check saved data and the pitch page (release confirmed live by the Chief of Staff, 4 Nov 16:12).
 - [ ] Eligent pitch, Sat 7 Nov (owner). The pitch page is live at vault-it.co/pitch-Eligent. The 17:00 4 Nov Zoom pitch is the item below.
