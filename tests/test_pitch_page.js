@@ -29,6 +29,9 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   // Phone: the scrolling deck
   let p = await open(390, 844);
   ok((await p.locator('.frame').count()) === 15, 'the page has the 15 slides');
+  { const ne = await p.evaluate(() => { const r = document.querySelector('#cover .vi-neon-red'), g = document.querySelector('#cover .vi-neon-gold'); if (!r || !g) return null;
+      const s = (el) => getComputedStyle(el, '::before'); return { r: r.textContent, g: g.textContent, clipR: s(r).webkitBackgroundClip || s(r).backgroundClip, clipG: s(g).webkitBackgroundClip || s(g).backgroundClip, grad: /gradient/.test(s(g).backgroundImage) }; });
+    ok(ne && ne.r === 'red' && ne.g === 'home' && /text/.test(ne.clipR) && /text/.test(ne.clipG) && ne.grad, 'the tagline draws red in neon red and home in a gold gradient neon: ' + JSON.stringify(ne)); }
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll on a phone');
   const btn = p.locator('#pv-open');
   ok((await btn.count()) === 1 && await btn.isVisible(), 'a Present button is on the page');

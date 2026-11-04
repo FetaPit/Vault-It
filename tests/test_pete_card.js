@@ -37,6 +37,9 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   ok(await facing(p) === 'front', 'it starts on the front');
   const front = await p.evaluate(() => document.querySelector('.pc-front').innerText);
   ok(/Get out of the red and into your home\./.test(front), 'the front carries the tagline');
+  { const ne = await p.evaluate(() => { const r = document.querySelector('.pc-front .vi-neon-red'), g = document.querySelector('.pc-front .vi-neon-gold'); if (!r || !g) return null;
+      const s = (el) => getComputedStyle(el, '::before'); return { r: r.textContent, g: g.textContent, clipR: s(r).webkitBackgroundClip || s(r).backgroundClip, clipG: s(g).webkitBackgroundClip || s(g).backgroundClip, grad: /gradient/.test(s(g).backgroundImage) }; });
+    ok(ne && ne.r === 'red' && ne.g === 'home' && /text/.test(ne.clipR) && /text/.test(ne.clipG) && ne.grad, 'the tagline draws red in neon red and home in a gold gradient neon: ' + JSON.stringify(ne)); }
   const v = await p.evaluate(() => { const el = document.querySelector('.pc-front .pc-corner video'); if (!el) return null;
     const box = el.parentNode.getBoundingClientRect(), card = document.querySelector('.pc-front').getBoundingClientRect();
     return { src: el.currentSrc || el.getAttribute('src'), muted: el.muted, loop: el.loop, inline: el.playsInline,
