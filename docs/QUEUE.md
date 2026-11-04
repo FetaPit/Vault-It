@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [ ] (cloud, Marketing) Eligent deck v1.1 from the owner's handwritten notes after the Slava call (owner, 4 Nov evening: "Notes to incorporate into v1.1 of pitch deck"): financials focus, seed ask and use of funds, breakeven, ROI, forecast 2027, roadmap, team change and cofounder, B2B/B2C split, scalability and distribution, neurodiverse audience, UoL study, brand deals and affiliates.
 - [ ] (cloud, Marketing) Eligent live pitch prep: full prep plan from the owner's written notes (owner, 4 Nov evening: "he has invited me to pitch at eligent, detail on everything i need to do to prep, stand by for me to upload written notes").
 - [ ] (cloud, Marketing) Business cards for Eligent: NFC + QR cards and paper cards, Vault-It brand, print-ready (owner, 4 Nov evening: "i need NFT QR code business cards and paper business cards").
 - [x] (cloud, Marketing) Eligent presenter view: add the approved script in the lower right of the presenter (owner, 4 Nov ~15:00: "I actually want the script too in the lower right quarter of the presenter"). Done: e9f1d46, released 4 Nov 15:05 (backup backup/release-pioneer-v2-20261104-1505).
