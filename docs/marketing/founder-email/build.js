@@ -1,14 +1,16 @@
 // E-mail kit for Pete Thickett: founder of PT Live Design and Vault-It. Draft only: nothing here sends anything.
-// Three footers (animated GIF, 560 x 120 shown, drawn at 2x) and the signature that goes with each:
+// Three footers (animated GIF, 560 x 80 shown, drawn at 2x) and the signature that goes with each:
 //   founder           both brands, for ptlived@gmail.com and pete@ptlive.design       -> founder-signature.html
 //   vault-it-founder  Vault-It, "From the founder", for pete@vault-it.co              -> vault-it-founder-signature.html
 //   vault-it          Vault-It, "The Vault-It team", for hello@vault-it.co            -> hello-signature.html
 // plus founder-email.html, the full founder template (and -preview.html with local images).
 // Images go to ../email-media/public/ and are served at https://media.vault-it.co (deploy: see ../email-media/README.md).
-// Motion: the Vault-It dial ring turns a quarter turn around the fixed V (the brand book's motion), the brick catches the light,
-// a spark runs down the divider, light sweeps across the right-hand words and the PT Live dot pulses. Frame one is the finished
-// still (Outlook on Windows shows only frame one); plays 3 times, then rests.
-// Run (Git Bash, repo root):  node docs/marketing/founder-email/build.js [--ptl-logo path/to/logo.svg|png] [--shots]
+// Motion is the brand book's own "Turn the dial" (brand/vault-it-brand-book.html, turnDial): on the full dial
+// (brand/vault-it-logo-mark-full.svg) the tick ring turns 60 degrees in 900 ms on cubic-bezier(.2,.8,.2,1); the V, bolts and brick stay still.
+// 60 ticks with a long one every 30 degrees, so the turned ring matches the start and the loop is seamless.
+// Frame one is the finished still (Outlook on Windows shows only frame one); plays 3 times, then rests.
+// PT Live Design: the owner's own logo, brand/ptlive/pt-live-design-logo.png, used as supplied (or --ptl-logo another file).
+// Run (Git Bash, repo root):  node docs/marketing/founder-email/build.js [--ptl-logo path/to/logo.png] [--shots]
 // Needs Chromium (Playwright's copy, or set CHROME=path) and network once for the Google Fonts files.
 const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
 const sharp = require('sharp');
@@ -16,21 +18,21 @@ const ROOT = path.resolve(__dirname, '../../..'), OUT = __dirname, MEDIA = path.
 const MEDIA_URL = 'https://media.vault-it.co/';
 const arg = (k) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : null; };
 const CHROME = process.env.CHROME || path.join(os.homedir(), 'AppData/Local/ms-playwright/chromium-1248/chrome-win64/chrome.exe');
-const W = 560, H = 120, SCALE = 2, N = 30;          // N motion steps; frame N is the rest state again
+const W = 560, H = 80, SCALE = 2;
+const TURN_MS = 900, FRAME_MS = 40, N = Math.round(TURN_MS / FRAME_MS);   // frames 0..N; frame N is the rest state again
+const HOLD_MS = 2400;
 
 // ---------- footer graphics ----------
-const icon = fs.readFileSync(path.join(ROOT, 'brand/vault-it-logo-mark-mid.svg'), 'utf8').replace(/<metadata>[\s\S]*?<\/metadata>/, '')
-  .replace(/(<g transform="rotate\(0 120 120\)">)/, '<g id="ring">$1').replace(/(<g transform="rotate\(270 120 120\)">.*?<\/g>)/, '$1</g>')
-  .replace('<rect x="114" y="108"', '<rect id="brick" x="114" y="108"');
-// PT Live Design look (owner's slide, 4 Nov): black and white with deep teal #006A80, bold wide capitals (Lexend), a white rule.
+const icon = fs.readFileSync(path.join(ROOT, 'brand/vault-it-logo-mark-full.svg'), 'utf8').replace(/<metadata>[\s\S]*?<\/metadata>/, '')
+  .replace('<g class="ticks" style="', '<g class="ticks" id="ticks" style="');
+if (!icon.includes('id="ticks"')) throw new Error('The full dial has no .ticks group to turn');
+// PT Live Design colours (owner's slide, 4 Nov): black and white with deep teal #006A80, bold wide capitals.
 const PTL_TEAL = '#006A80';
-const logoPath = arg('--ptl-logo');
-let ptl = `<div class="pt"><div class="ptw"><span id="sw">PT LIVE</span><span class="live"><i id="pulse"></i></span></div><div class="ptd">DESIGN</div><div class="ptr"></div></div>`;
-if (logoPath) {
-  const ext = path.extname(logoPath).slice(1).toLowerCase(), mime = ext === 'svg' ? 'image/svg+xml' : 'image/' + (ext === 'jpg' ? 'jpeg' : ext);
-  ptl = `<div class="pt"><div class="ptw"><img src="data:${mime};base64,${fs.readFileSync(logoPath).toString('base64')}" style="height:64px;width:auto;display:block" alt=""><span class="live"><i id="pulse"></i></span></div></div>`;
-}
-const tagline = (eyebrow, colour) => `<div class="tg"><div class="eb" style="color:${colour}">${eyebrow}</div><div class="tg1">Get out of the red</div><div class="tg2"><span id="sw" class="swt">and into your home.</span></div></div>`;
+const logoPath = arg('--ptl-logo') || path.join(ROOT, 'brand/ptlive/pt-live-design-logo.png');
+const logoExt = path.extname(logoPath).slice(1).toLowerCase(), logoMime = logoExt === 'svg' ? 'image/svg+xml' : 'image/' + (logoExt === 'jpg' ? 'jpeg' : logoExt);
+const ptl = `<div class="pt"><img class="ptlogo" src="data:${logoMime};base64,${fs.readFileSync(logoPath).toString('base64')}" alt="">
+<div class="ptn"><div class="ptw">PT LIVE</div><div class="ptd">DESIGN</div></div></div>`;
+const tagline = (eyebrow, colour) => `<div class="tg"><div class="eb" style="color:${colour}">${eyebrow}</div><div class="tg1">Get out of the red</div><div class="tg2">and into your home.</div></div>`;
 const FOOTERS = {
   'founder': { right: ptl, alt: 'Vault-It and PT Live Design' },
   'vault-it-founder': { right: tagline('From the founder', '#E8C56A'), alt: 'Vault-It. Get out of the red and into your home.' },
@@ -39,36 +41,27 @@ const FOOTERS = {
 const frameHtml = (right) => `<!doctype html><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Lexend:wght@800&family=Share+Tech+Mono&display=block" rel="stylesheet">
 <style>html,body{margin:0;width:${W}px;height:${H}px;background:#080D14;overflow:hidden}
-#s{width:${W}px;height:${H}px;display:flex;align-items:center;justify-content:center;gap:26px}#s:has(.tg){gap:20px}
-.vi{display:flex;align-items:center;gap:12px}.ic{width:60px;height:60px}.ic svg{width:100%;height:100%;display:block}
-.wm{font-family:'Syne';font-weight:800;font-size:34px;letter-spacing:-.02em;color:#E8E8E8;display:inline-flex;align-items:baseline;white-space:nowrap}
+#s{width:${W}px;height:${H}px;display:flex;align-items:center;justify-content:center;gap:22px}
+.vi{display:flex;align-items:center;gap:10px}.ic{width:58px;height:58px}.ic svg{width:100%;height:100%;display:block}
+.wm{font-family:'Syne';font-weight:800;font-size:30px;letter-spacing:-.02em;color:#E8E8E8;display:inline-flex;align-items:baseline;white-space:nowrap}
 .wm b{font-weight:inherit;color:#44C0B9}.wm .dot{display:inline-block;width:.3em;height:.17em;background:#44C0B9;border-radius:2px;margin:0 .07em;transform:translateY(-.06em)}
-.div{position:relative;width:1px;height:76px;background:#15302F}
-#spark{position:absolute;left:-2px;top:0;width:5px;height:22px;border-radius:3px;background:linear-gradient(180deg,rgba(68,192,185,0),#44C0B9 50%,${PTL_TEAL});opacity:0}
-.pt{font-family:'Lexend';text-transform:uppercase;white-space:nowrap}
-.ptw{font-weight:800;font-size:27px;line-height:1;letter-spacing:.09em;display:flex;align-items:center;gap:10px}
-#sw{background:linear-gradient(100deg,#fff 0 42%,#4FB3C6 50%,#fff 58% 100%);background-size:300% 100%;background-position:0% 0;-webkit-background-clip:text;background-clip:text;color:transparent}
-#sw.swt{background-image:linear-gradient(100deg,#44C0B9 0 42%,#E8FFFD 50%,#44C0B9 58% 100%)}
-.live{position:relative;width:10px;height:10px;border-radius:50%;background:${PTL_TEAL};box-shadow:0 0 0 1.5px #fff inset;flex:none}
-#pulse{position:absolute;inset:-1px;border-radius:50%;border:2px solid ${PTL_TEAL};opacity:0}
-.ptd{font-weight:800;font-size:27px;line-height:1;letter-spacing:.09em;color:${PTL_TEAL};margin-top:4px}
-.ptr{height:2px;background:#fff;margin-top:8px;width:100%}
+.div{width:1px;height:52px;background:#15302F}
+.pt{display:flex;align-items:center;gap:10px;font-family:'Lexend';text-transform:uppercase;white-space:nowrap}
+.ptlogo{height:58px;width:auto;display:block}
+.ptw,.ptd{font-weight:800;font-size:15px;line-height:1.1;letter-spacing:.14em}.ptw{color:#fff}.ptd{color:${PTL_TEAL}}
 .tg{font-family:'Syne';font-weight:800;font-size:15px;line-height:1.2;letter-spacing:-.01em;white-space:nowrap}
-.eb{font-family:'Share Tech Mono';font-weight:400;font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px}
-.tg1{color:#E8E8E8}</style>
+.eb{font-family:'Share Tech Mono';font-weight:400;font-size:10px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:4px}
+.tg1{color:#E8E8E8}.tg2{color:#44C0B9}</style>
 <div id="s"><div class="vi"><span class="ic">${icon}</span><span class="wm">Vault<i class="dot"></i><b>It</b></span></div>
-<div class="div"><i id="spark"></i></div>${right}</div>
+<div class="div"></div>${right}</div>
 <script>
-const ease = (x) => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2, cl = (x) => Math.max(0, Math.min(1, x));
-const mix = (a, b, k) => '#' + [0, 2, 4].map(i => Math.round(parseInt(a.substr(i, 2), 16) * (1 - k) + parseInt(b.substr(i, 2), 16) * k).toString(16).padStart(2, '0')).join('');
-window.setFrame = (t) => {
-  document.getElementById('ring').setAttribute('transform', 'rotate(' + 90 * ease(cl(t / .6)) + ' 120 120)');
-  const g = cl((t - .45) / .35); document.getElementById('brick').setAttribute('fill', mix('E8C56A', 'FFF1BF', Math.sin(Math.PI * g)));
-  const sp = document.getElementById('spark'); sp.style.top = (-22 + 98 * ease(t)) + 'px'; sp.style.opacity = Math.sin(Math.PI * t).toFixed(3);
-  const sw = document.getElementById('sw'); if (sw) sw.style.backgroundPosition = (100 * ease(cl((t - .2) / .65))) + '% 0';
-  const pu = document.getElementById('pulse'); if (pu) { const ph = (t * 2) % 1;
-    pu.style.transform = 'scale(' + (1 + 1.6 * ph) + ')'; pu.style.opacity = (0.8 * (1 - ph) * Math.min(1, ph * 6)).toFixed(3); }
-};
+// cubic-bezier(.2,.8,.2,1), the brand book's transition on the tick ring
+const bez = (x1, y1, x2, y2) => { const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx, cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  const X = (t) => ((ax * t + bx) * t + cx) * t, Y = (t) => ((ay * t + by) * t + cy) * t, dX = (t) => (3 * ax * t + 2 * bx) * t + cx;
+  return (x) => { let t = x; for (let i = 0; i < 8; i++) { const d = dX(t); if (Math.abs(d) < 1e-6) break; t -= (X(t) - x) / d; } let lo = 0, hi = 1;
+    for (let i = 0; i < 30 && Math.abs(X(t) - x) > 1e-6; i++) { if (X(t) < x) lo = t; else hi = t; t = (lo + hi) / 2; } return Y(t); }; };
+const ease = bez(.2, .8, .2, 1);
+window.setFrame = (t) => { document.getElementById('ticks').style.transition = 'none'; document.getElementById('ticks').style.transform = 'rotate(' + (60 * ease(t)) + 'deg)'; };
 </script>`;
 
 // ---------- e-mail pieces (same shell and inline styles as docs/marketing/build_emails.js) ----------
@@ -180,7 +173,7 @@ async function browser() {
       for (let i = 0; i <= N; i++) { await b.evaluate(`setFrame(${i / N})`); frames.push(await b.shot(W, H)); }
       fs.writeFileSync(path.join(MEDIA, `${who}-footer.png`), frames[0]);
       if (shots) fs.writeFileSync(path.join(sd, `${who}-footer-mid.png`), frames[Math.round(N * .55)]);
-      const delay = frames.map((_, i) => i === 0 ? 2600 : i === N ? 200 : 50);   // ms; frame 0 is the long still
+      const delay = frames.map((_, i) => i === 0 ? HOLD_MS : i === N ? 100 : FRAME_MS);   // ms; frame 0 is the long still
       const out = path.join(MEDIA, `${who}-footer.gif`);
       await sharp(frames, { join: { animated: true } }).gif({ delay, loop: 3, colours: 128, effort: 8, dither: 0, interFrameMaxError: 2 }).toFile(out);
       console.log(`${who}-footer.gif`, Math.round(fs.statSync(out).size / 1024) + ' KB');
