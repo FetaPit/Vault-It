@@ -14580,6 +14580,23 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .owe-pay{display:flex;gap:6px;margin-top:8px}.owe-pay input{flex:1;min-width:0;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.7rem,var(--vi-fs-3));padding:6px 8px}
 .owe-del{margin-top:8px}
 .v3-host{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;background-color:#080808;background-image:var(--stage-bg)}
+/* cash account flags in the Budget chips' style (owner, 4 Nov: "a similar asset as expense labels in budget ... bank logo ... stroke
+   color to bank or account provider brand color black bg ... related text in white and balance in brand colour. Logo top left of box
+   small"). Screen-space chips over the 3D stage: a fixed size at any zoom, the bank's real logo as a plain image. */
+.v3-chips{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .35s ease}
+.v3-chips.on{opacity:1}
+.v3-posts{position:absolute;left:0;top:0}
+.v3-chip{position:absolute;left:0;top:0;display:flex;align-items:center;gap:5px;height:20px;padding:0 6px 0 3px;box-sizing:border-box;background:rgba(8,8,8,.97);border:1px solid var(--bc);border-radius:4px;white-space:nowrap;font:600 11px 'DM Sans',sans-serif;color:#E8E8E8;will-change:transform}
+.v3-chip .cash-logo{width:14px;height:14px;border-radius:3px}
+.v3-chip .cash-logo-none{background:transparent;color:var(--bc)}
+.v3-chip .cash-logo-none .vi-ic{width:14px;height:14px}
+.v3-chip-s{color:#8A93A6}
+.v3-chip-a{font:10.5px 'Share Tech Mono',monospace;color:var(--bc)}
+.v3-chip-r{font:10.5px 'Share Tech Mono',monospace;color:#E8E8E8;opacity:.85}
+.v3-total{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:1px;padding:6px 10px 7px;background:#E8C56A;color:#1A1400;border-radius:4px;font-family:'Share Tech Mono',monospace;box-shadow:0 0 14px rgba(232,197,106,.35)}
+.v3-total-l{font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.v3-total-a{font-size:18px;line-height:1.1}
+@media (prefers-reduced-motion:reduce){.v3-chips{transition:none}}
 .v3-host::after{content:"";position:absolute;inset:0;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none;z-index:1}
 .scene.v3-on{position:relative;min-height:380px}
 #cashSceneCard .scene.v3-on{min-height:420px}
@@ -21553,7 +21570,7 @@ function V3Scene(host,label){
   ctl.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
   ctl.addEventListener('change',function(){self.kick();});
   // draws only while something moves (orbit, spin, a kick after a change), never off screen or in a background tab
-  this._loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;if(self._introRun){self.introStop();self._introPlayed=false;self._introWait=1;}return;}self._attach();self.size();var moving=self.ctl.update();var t=performance.now();if(self._introRun)self._introStep(t);self.r.render(self.sc,self.cam);if(window.VIPERF&&VIPERF.stageFrame)VIPERF.stageFrame(self===V3.metals?'Precious metals bars':'Cash and savings coins');
+  this._loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;if(self._introRun){self.introStop();self._introPlayed=false;self._introWait=1;}return;}self._attach();self.size();var moving=self.ctl.update();var t=performance.now();if(self._introRun)self._introStep(t);self.r.render(self.sc,self.cam);if(self.onDraw)self.onDraw();if(window.VIPERF&&VIPERF.stageFrame)VIPERF.stageFrame(self===V3.metals?'Precious metals bars':'Cash and savings coins');
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}   // adaptive quality from the measured frame gap
     self._lastT=moving?t:0;
     if(moving||self._spin||self._introRun||Date.now()<self._until)self.raf=requestAnimationFrame(self._loop);};
@@ -21743,48 +21760,83 @@ function v3Lift(hex,t){t=Math.max(0,Math.min(1,t));var a=parseInt(hex.slice(1),1
 function v3Mix(a,b,t){var x=parseInt(a.slice(1),16),y=parseInt(b.slice(1),16);return '#'+[16,8,0].map(function(sh){var c=Math.round(((x>>sh)&255)*(1-t)+((y>>sh)&255)*t);return ('0'+c.toString(16)).slice(-2)}).join('');}
 /* coin gold, tuned so the gold pixels' bright end sits in the brand gold (#D8B860 to #E8C56A) at 390 and 1100 (Pedro, 2 Nov): the faces and rims
    lifted 80% toward a warm gold (silver coins toward a neutral highlight, so they stay silver), the silver centre of a gold-ringed coin
-   mostly gold too (a few pixels across, it mipmaps to beige otherwise), the matcap's key light high where the coin tops sample it */
-var V3_INNER=0.92,V3_LIFTC=[0xF6,0xCB,0x6A],V3_KEYY=6,V3_LIFT=0.8;
+   mostly gold too (a few pixels across, it mipmaps to beige otherwise), the matcap's key light high where the coin tops sample it.
+   v0.9.1 cash 3D look: the 512 px coin face keeps the £1's centre silver-gold (V3_INNER 0.45), so it reads as the bimetallic £1 */
+var V3_INNER=0.45,V3_LIFTC=[0xF6,0xCB,0x6A],V3_KEYY=6,V3_LIFT=0.8;
 function v3CoinEdge(spec,n){var c=document.createElement('canvas');c.width=64;c.height=Math.max(16,n*16);var g=c.getContext('2d');
   for(var i=0;i<n;i++){var y=i*16;g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,y,64,16);g.fillStyle='rgba(255,236,170,.30)';g.fillRect(0,y+2,64,3);g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+14,64,2);
     if(spec.sides>12){g.fillStyle='rgba(0,0,0,.18)';for(var x=0;x<64;x+=4)g.fillRect(x,y+4,1,9);}}
   var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.wrapS=THREE.RepeatWrapping;t.repeat.x=spec.sides>12?6:1;return t;}
-/* v0.9.1 E13 (owner, 3 Nov: "Once the coins are stacked ... treated as one shape"): a stack used to be three
-   materials (the milled edge and the two faces), so every batch of stacks cost three draws. Edge and face now share
-   one small texture, the edge on the left half and the face in the lower right quarter, and the shape's three groups
-   are folded into one: one draw per batch of stacks, whatever the balance. */
-function v3StackTex(spec,n){var c=document.createElement('canvas');c.width=c.height=256;var g=c.getContext('2d');
-  for(var i=0;i<n;i++){var y=256*i/n,h=256/n;g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,y,128,h+1);
-    g.fillStyle='rgba(255,236,170,.30)';g.fillRect(0,y+h*0.12,128,Math.max(1,h*0.2));
-    g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+h-Math.max(1,h*0.13),128,Math.max(1,h*0.13));}
-  if(spec.sides>12){g.fillStyle='rgba(0,0,0,.18)';for(var x=0;x<128;x+=2)g.fillRect(x,0,1,256);}   // the milled edge at its final density: an atlas cannot repeat a texture
-  g.save();g.translate(192,192);g.rotate(-Math.PI/2);g.translate(-64,-64);   // the face, turned the way the old face texture turned itself
-  g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,0,128,128);
-  if(spec.inner){g.fillStyle=v3IsGold(spec.outer)&&!v3IsGold(spec.inner)?v3Mix(spec.inner,v3Lift(spec.outer,V3_LIFT+.25),V3_INNER):v3Lift(spec.inner,V3_LIFT);g.beginPath();g.arc(64,64,40,0,Math.PI*2);g.fill();}
-  g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=3;g.beginPath();g.arc(64,64,56,0,Math.PI*2);g.stroke();
-  g.fillStyle='rgba(40,30,10,.55)';g.font='bold 54px Syne, sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(spec.sym,64,68);
-  g.fillStyle='rgba(255,255,255,.25)';g.fillText(spec.sym,62,65);g.restore();
-  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;}
-/* a finished block of 1,000 coins: ten courses of milled edges round the sides and the hundred coin tops on top, so
-   the one shape still reads as stacked coins (E13). One texture, one draw, like the stacks. */
-function v3BlockTex(spec,n){var c=document.createElement('canvas');c.width=c.height=256;var g=c.getContext('2d');
-  for(var i=0;i<n;i++){var y=256*i/n,h=256/n;g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,y,128,h+1);
-    g.fillStyle='rgba(255,236,170,.28)';g.fillRect(0,y+h*0.1,128,Math.max(1,h*0.18));
-    g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+h-Math.max(1,h*0.14),128,Math.max(1,h*0.14));}
-  g.fillStyle='rgba(0,0,0,.22)';for(var x=0;x<128;x+=12.8)g.fillRect(Math.round(x),0,1,256);   // where one stack meets the next
-  g.fillStyle='#0b1418';g.fillRect(128,128,128,128);
-  for(var r=0;r<10;r++)for(var cx=0;cx<10;cx++){var px=128+cx*12.8+6.4,py=128+r*12.8+6.4;
-    g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.beginPath();g.arc(px,py,5.6,0,Math.PI*2);g.fill();
-    g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=1;g.stroke();
-    if(spec.inner){g.fillStyle=v3IsGold(spec.outer)&&!v3IsGold(spec.inner)?v3Mix(spec.inner,v3Lift(spec.outer,V3_LIFT+.25),V3_INNER):v3Lift(spec.inner,V3_LIFT);g.beginPath();g.arc(px,py,3.6,0,Math.PI*2);g.fill();}}
-  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;}
+/* v0.9.1 cash 3D look (owner, 4 Nov: "They should read as actual pounds, euros etc dollars (coins) but once stacked ... treated as
+   groups, stacks of ten and groups of 100 ... this does not change the aesthetic, just performance"). One 512 px texture per coin:
+   the edge courses on the left half, the face in the lower right quarter, a shadow tone in the upper right. The face has a raised
+   rim, the bimetallic seam, the symbol in relief and the coin's name round the ring; the £1's twelve flat sides alternate milled
+   and plain, round coins are milled all round. Edge and face still share one texture, so a batch of stacks is still one draw. */
+var V3_FACEA=0.627;   // the default camera looks from about 36 degrees round, so the faces turn that much to stand upright
+var V3_COIN_WORD={GBP:'ONE POUND',USD:'ONE DOLLAR',EUR:'EURO',INR:'RUPEE'};
+function v3CoinSides(spec){return spec.sides>12?32:spec.sides;}   // a round coin's outline in 32 sides: round at any zoom on a phone
+function v3StackTex(spec,n){var S=512,H=S/2,c=document.createElement('canvas');c.width=c.height=S;var g=c.getContext('2d');
+  var base=v3Lift(spec.outer,V3_LIFT),hi=v3Lift(spec.outer,Math.min(1,V3_LIFT+.18)),sides=v3CoinSides(spec);
+  for(var i=0;i<n;i++){var y=S*i/n,h=S/n,k=((i*37)%7)/7;   // each coin a touch lighter or darker than the next, as real coins are
+    g.fillStyle=base;g.fillRect(0,y,H,h+1);g.fillStyle='rgba(0,0,0,'+(0.04+k*0.06).toFixed(3)+')';g.fillRect(0,y,H,h+1);
+    g.fillStyle='rgba(255,240,190,.34)';g.fillRect(0,y+h*0.1,H,Math.max(1,h*0.16));
+    g.fillStyle='rgba(0,0,0,.5)';g.fillRect(0,y+h-Math.max(1,h*0.14),H,Math.max(1,h*0.14));}
+  g.fillStyle='rgba(0,0,0,.2)';
+  if(spec.sides>12){for(var x=0;x<H;x+=2)g.fillRect(x,0,1,S);}
+  else{var fw=H/sides;for(var f=0;f<sides;f+=2)for(var x2=f*fw+2;x2<(f+1)*fw-2;x2+=2.5)g.fillRect(Math.round(x2),0,1,S);}   // the £1: milled and plain sides in turn
+  g.fillStyle=v3Mix(base,'#000000',.62);g.fillRect(H,0,H,H);   // the shadow between stacks
+  var cx=H+H/2,cy=H+H/2,R=H/2-1,ring=function(r,fill){g.beginPath();if(spec.sides===12){for(var j=0;j<12;j++){var a=Math.PI/12+j*Math.PI/6-V3_FACEA;g[j?'lineTo':'moveTo'](cx+Math.sin(a)*r,cy+Math.cos(a)*r);}g.closePath();}else g.arc(cx,cy,r,0,Math.PI*2);g.fillStyle=fill;g.fill();};
+  var dome=g.createRadialGradient(cx-R*.3,cy-R*.35,R*.1,cx,cy,R);dome.addColorStop(0,hi);dome.addColorStop(1,base);
+  g.fillStyle=v3Mix(base,'#000000',.45);g.fillRect(H,H,H,H);ring(R,v3Mix(base,'#000000',.25));ring(R-3,hi);ring(R*0.9,dome);   // the raised rim
+  var ic=null;if(spec.inner){ic=v3IsGold(spec.outer)&&!v3IsGold(spec.inner)?v3Mix(spec.inner,v3Lift(spec.outer,V3_LIFT+.25),V3_INNER):v3Lift(spec.inner,V3_LIFT);
+    var ri=R*0.6;g.beginPath();g.arc(cx,cy,ri+2.5,0,Math.PI*2);g.fillStyle='rgba(0,0,0,.42)';g.fill();   // the seam between the two metals
+    var id=g.createRadialGradient(cx-ri*.35,cy-ri*.4,ri*.1,cx,cy,ri);id.addColorStop(0,v3Lift(ic,.35));id.addColorStop(1,ic);g.beginPath();g.arc(cx,cy,ri,0,Math.PI*2);g.fillStyle=id;g.fill();}
+  else{g.strokeStyle='rgba(0,0,0,.22)';g.lineWidth=1.5;for(var b=0;b<56;b++){var ba=b*Math.PI*2/56;g.beginPath();g.arc(cx+Math.cos(ba)*R*0.82,cy+Math.sin(ba)*R*0.82,1.6,0,Math.PI*2);g.stroke();}}   // a beaded ring
+  var word=V3_COIN_WORD[Object.keys(V3_COINS).filter(function(k){return V3_COINS[k]===spec;})[0]]||'';
+  if(word){g.save();g.font='bold 19px "DM Sans", sans-serif';g.textAlign='center';g.textBaseline='middle';var rr=spec.inner?R*0.76:R*0.7,step=0.105,a0=Math.PI/2+(word.length-1)*step/2;
+    for(var w=0;w<word.length;w++){var a=a0-w*step;g.save();g.translate(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);g.rotate(a-Math.PI/2);
+      g.fillStyle='rgba(255,250,230,.45)';g.fillText(word[w],-0.8,-0.8);g.fillStyle='rgba(40,28,6,.6)';g.fillText(word[w],0.8,0.8);g.restore();}g.restore();}
+  g.font='bold '+(spec.inner?86:104)+'px Syne, sans-serif';g.textAlign='center';g.textBaseline='middle';var sy=cy+(spec.inner?2:-6);
+  g.fillStyle='rgba(30,20,4,.55)';g.fillText(spec.sym,cx+2.5,sy+3);g.fillStyle='rgba(255,252,236,.6)';g.fillText(spec.sym,cx-2,sy-2);   // the symbol in relief: lit from the top left
+  g.fillStyle=ic?v3Lift(ic,.15):hi;g.fillText(spec.sym,cx,sy);
+  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;}
+/* the coin shape, built here rather than from three.js's cylinder: flat sides for the 12-sided £1, no hidden bottom face, and the
+   option to leave the side off where a neighbour hides it. Pushes triangles onto P (positions), N (normals), U (texture). */
+function v3CoinPart(spec,n,ox,oz,side,P,N,U){var sides=v3CoinSides(spec),r=spec.d/2,h=spec.t*n,y0=-h/2,y1=h/2,flat=sides<=12,a0=flat?Math.PI/12:0,rr=r;
+  var pt=function(j){var a=a0+j*Math.PI*2/sides;return [Math.sin(a)*rr,Math.cos(a)*rr,a];};
+  var tri=function(a,b,c,na,nb,nc,ua,ub,uc){P.push(a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2]);N.push(na[0],na[1],na[2],nb[0],nb[1],nb[2],nc[0],nc[1],nc[2]);U.push(ua[0],ua[1],ub[0],ub[1],uc[0],uc[1]);};
+  var cf=Math.cos(V3_FACEA),sf=Math.sin(V3_FACEA),fu=function(x,z){var x2=x*cf-z*sf,z2=x*sf+z*cf;return [0.75+0.25*(x2/r),0.25-0.25*(z2/r)];},up=[0,1,0];
+  for(var j=0;j<sides;j++){var p=pt(j),q=pt(j+1);
+    tri([ox,y1,oz],[ox+p[0],y1,oz+p[1]],[ox+q[0],y1,oz+q[1]],up,up,up,fu(0,0),fu(p[0],p[1]),fu(q[0],q[1]));
+    if(side){var na,nb;if(flat){var m=(p[2]+q[2])/2;na=nb=[Math.sin(m),0,Math.cos(m)];}else{na=[Math.sin(p[2]),0,Math.cos(p[2])];nb=[Math.sin(q[2]),0,Math.cos(q[2])];}
+      var u0=0.5*j/sides,u1=0.5*(j+1)/sides,A=[ox+p[0],y0,oz+p[1]],B=[ox+q[0],y0,oz+q[1]],C=[ox+q[0],y1,oz+q[1]],D=[ox+p[0],y1,oz+p[1]];
+      tri(A,C,B,na,nb,nb,[u0,0],[u1,1],[u1,0]);tri(A,D,C,na,na,nb,[u0,0],[u0,1],[u1,1]);}}
+};
+function v3CoinGeo(P,N,U){var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(N,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(U,2));g.computeBoundingBox();g.computeBoundingSphere();return g;}
 function v3Stack(spec,n){
-  return v3Keep('stack1|'+spec.name+'|'+spec.d+'|'+n,function(){
-    var geo=new THREE.CylinderBufferGeometry(spec.d/2,spec.d/2,spec.t*n,spec.sides,1,false,spec.sides===12?Math.PI/12:0);
-    var uv=geo.attributes.uv,nr=geo.attributes.normal;   // the side's points go into the left half of the texture, the flat faces into the lower right quarter
+  return v3Keep('stack2|'+spec.name+'|'+spec.d+'|'+n,function(){var P=[],N=[],U=[];v3CoinPart(spec,n,0,0,true,P,N,U);
+    return {geo:v3CoinGeo(P,N,U),mats:[v3Shade({map:v3StackTex(spec,n)})]};});
+}
+/* a finished block of 1,000: the hundred stacks of ten as one shape, so it looks exactly like the loose stacks and still draws as
+   one batch. The stacks inside the block show only their tops (their neighbours hide their sides) over a shadow floor. */
+/* a big balance (more than V3_REAL_BLOCKS blocks): each coin is a pixel or two on screen, so a block is one box wearing the same
+   coins painted on (the coin faces copied from the coin texture, the edges ten stacks round), at a fraction of the triangles */
+var V3_REAL_BLOCKS=12;
+function v3BlockLite(spec,pitch){
+  return v3Keep('blocklite|'+spec.name+'|'+pitch.toFixed(3),function(){var w=pitch*10-0.12,h=spec.t*10,geo=new THREE.BoxBufferGeometry(w,h,w),uv=geo.attributes.uv,nr=geo.attributes.normal;
     for(var i=0;i<uv.count;i++){var cap=Math.abs(nr.getY(i))>0.9,u=uv.getX(i),v=uv.getY(i);uv.setXY(i,cap?0.5+u*0.5:u*0.5,cap?v*0.5:v);}
     uv.needsUpdate=true;geo.clearGroups();geo.addGroup(0,Infinity,0);
-    return {geo:geo,mats:[v3Shade({map:v3StackTex(spec,n)})]};});
+    var src=v3Stack(spec,10).mats[0].map.image,S=512,H=S/2,c=document.createElement('canvas');c.width=c.height=S;var g=c.getContext('2d');
+    g.drawImage(src,0,0,H,S,0,0,H,S);g.fillStyle='rgba(0,0,0,.3)';for(var k=1;k<10;k++)g.fillRect(Math.round(k*H/10),0,2,S);   // the edges, ten stacks to a side
+    g.drawImage(src,H,0,H,H,H,0,H,H);g.drawImage(src,H,0,H,H,H,H,H,H);   // the shadow between the stacks
+    var cell=H/10;for(var r=0;r<10;r++)for(var q=0;q<10;q++)g.drawImage(src,H,H,H,H,H+q*cell+0.6,H+r*cell+0.6,cell-1.2,cell-1.2);
+    var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return {geo:geo,mats:[v3Shade({map:t})]};});
+}
+function v3Block(spec,pitch){
+  return v3Keep('block2|'+spec.name+'|'+pitch.toFixed(3),function(){var P=[],N=[],U=[],h=spec.t*10,e=pitch*4.5+spec.d/2-0.02,y=h/2-spec.t*0.5,up=[0,1,0],dk=[0.75,0.75];
+    for(var rw=0;rw<10;rw++)for(var cl=0;cl<10;cl++)v3CoinPart(spec,10,(cl-4.5)*pitch,(rw-4.5)*pitch,rw===0||rw===9||cl===0||cl===9,P,N,U);
+    P.push(-e,y,-e,-e,y,e,e,y,e,-e,y,-e,e,y,e,e,y,-e);for(var i=0;i<6;i++){N.push(0,1,0);U.push(dk[0],dk[1]);}
+    return {geo:v3CoinGeo(P,N,U),mats:[v3Shade({map:v3StackTex(spec,10)})]};});
 }
 // a label that always faces the camera
 /* the gold tag from Net worth in 3D (owner, 31 Oct: "flag post labels in gold, the same as the dashboard"): what it is in small capitals,
@@ -21849,16 +21901,12 @@ function v3CashPlates(units){
      each account's own balance and the total flag keeps showing the cash the rest of the app shows. */
   return list;
 }
-function v3CashPlate(spec,n){   // one plate's coins; finished blocks of 1,000 as one shape each, the rest as stacks
+function v3CashPlate(spec,n,lite){   // one plate's coins; finished blocks of 1,000 as one shape each, the rest as stacks
   var G=new THREE.Group(),STACK=10,PER_BLOCK=1000,pitch=spec.d+0.12,blockW=pitch*10,gap=spec.d*2.2,m4=new THREE.Matrix4();
   var blocks=Math.max(1,Math.ceil(n/PER_BLOCK)),cols=Math.max(1,Math.ceil(Math.sqrt(blocks)));
   var pos=function(i){var b=Math.floor(i/100),s=i%100;return [(b%cols)*(blockW+gap)+(s%10)*pitch,Math.floor(b/cols)*(blockW+gap)+Math.floor(s/10)*pitch];};
   var fullStacks=Math.floor(n/STACK),rest=n%STACK,merged=Math.floor(fullStacks/100),loose=fullStacks-merged*100;
-  if(merged){var bk=v3Keep('block1|'+spec.name+'|'+blockW.toFixed(3),function(){
-      var geo=new THREE.BoxBufferGeometry(blockW-0.12,spec.t*STACK,blockW-0.12),uv=geo.attributes.uv,nr=geo.attributes.normal;
-      for(var i=0;i<uv.count;i++){var cap=Math.abs(nr.getY(i))>0.9,u=uv.getX(i),v=uv.getY(i);uv.setXY(i,cap?0.5+u*0.5:u*0.5,cap?v*0.5:v);}
-      uv.needsUpdate=true;geo.clearGroups();geo.addGroup(0,Infinity,0);
-      return {geo:geo,mats:[v3Shade({map:v3BlockTex(spec,STACK)})]};});
+  if(merged){var bk=lite?v3BlockLite(spec,pitch):v3Block(spec,pitch);
     var bi=new THREE.InstancedMesh(bk.geo,bk.mats[0],merged);
     for(var j=0;j<merged;j++){var q=pos(j*100);m4.makeTranslation(q[0]+blockW/2-pitch/2,spec.t*STACK/2,q[1]+blockW/2-pitch/2);bi.setMatrixAt(j,m4);}
     bi.userData.v3Full=merged;bi.userData.v3Intro=true;G.add(bi);}
@@ -21873,7 +21921,7 @@ function v3CashPlate(spec,n){   // one plate's coins; finished blocks of 1,000 a
 }
 function v3CashContent(spec,units,cur){var G=new THREE.Group(),PER_BLOCK=1000;
   var sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return Math.round(n).toLocaleString('en-GB');};
-  var plates=v3CashPlates(units),built=plates.map(function(p){return v3CashPlate(spec,p.units);});
+  var plates=v3CashPlates(units),lite=plates.reduce(function(s,p){return s+Math.floor(p.units/1000);},0)>V3_REAL_BLOCKS,built=plates.map(function(p){return v3CashPlate(spec,p.units,lite);});
   var m=spec.d*3,pad=spec.d*6,area=built.reduce(function(s,b){return s+(b.w+pad)*(b.d+pad);},0);
   var target=Math.max(Math.max.apply(null,built.map(function(b){return b.w;}).concat([0])),Math.sqrt(area)*1.2);
   var x=0,z=0,rowD=0,rows=1,X0=1e9,X1=-1e9,Z0=1e9,Z1=-1e9;
@@ -21894,22 +21942,70 @@ function v3CashContent(spec,units,cur){var G=new THREE.Group(),PER_BLOCK=1000;
     G.add(ti);
     G.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ep),new THREE.LineBasicMaterial({color:0xE8C56A,toneMapped:false,fog:false})));
   }
-  var posts=[],stackH=spec.t*10;
-  plates.forEach(function(p,i){
-    var l3=p.rate!=null?p.rate+'% AER':'';
-    var lb=v3Label(p.name.length>22?p.name.slice(0,21)+'…':p.name,sym+fmt(p.units),l3,Math.max(30,Math.min(46,p.rect[2]*0.95))*(v3Narrow()?1.6:1),p.glyph);
-    v3Plant(lb,p.rect[0]+lb.tag.scale.x*0.12,stackH+Math.max(4,p.rect[3]*0.5)+(i%2?lb.tag.scale.y*0.8:0),p.rect[1]+p.rect[3]*0.5,posts);G.add(lb);
-  });
+  var stackH=spec.t*10,chips=plates.map(function(p){return {id:p.id,name:p.name.length>24?p.name.slice(0,23)+'…':p.name,kind:p.kind,rate:p.rate,amount:sym+fmt(p.units),
+      base:[p.rect[0]+p.rect[2]/2,p.units>0?stackH:0.03,p.rect[1]+p.rect[3]/2]};});   // each post stands on its plate's coins
   var plateSum=plates.reduce(function(s,p){return s+p.units;},0),total=Math.max(0,Math.floor(units)),fullBlocks=Math.floor(total/PER_BLOCK),part=total%PER_BLOCK;
-  if(total>0){
-    var lbT=v3Label('Total cash · '+spec.name+' coins',sym+fmt(total),'',Math.max(12,Math.min(60,(X1-X0)*0.4)),'vault');
-    v3Plant(lbT,(X0+X1)/2-lbT.tag.scale.x*0.5,stackH+Math.max(6,(Z1-Z0)*0.16),Z0-spec.d*3,posts);G.add(lbT);   // the total stands behind the plates, clear of the account flags
-  }
-  if(posts.length)G.add(v3Posts(posts));
   var stacks=built.reduce(function(s,b){return s+b.stacks;},0),restN=built.reduce(function(s,b){return s+b.rest;},0);
-  return {key:v3CashKey().key,grp:G,stats:{units:total,plateSum:plateSum,cur:cur,coin:spec.name,fullStacks:stacks,rest:restN,fullBlocks:fullBlocks,stackHeight:stackH,
+  return {key:v3CashKey().key,grp:G,chips:chips,total:total>0?{label:'Total cash · '+spec.name+' coins',amount:sym+fmt(total)}:null,stats:{units:total,plateSum:plateSum,cur:cur,coin:spec.name,fullStacks:stacks,rest:restN,fullBlocks:fullBlocks,stackHeight:stackH,
     plates:plates.map(function(p){return {id:p.id,name:p.name,type:p.type,rate:p.rate,units:p.units,kind:p.kind,glyph:p.glyph};}),plateRows:rows}};
 }
+/* the chips' colour: the bank's own brand colour (STK_PLATFORMS), lifted toward white until it reads at 4.5:1 on the chip's
+   near-black, so a navy brand still shows; the brand gold for physical cash and an account that is not a known bank */
+function v3Ink(hex){var c=String(hex||'').replace('#','');if(c.length===3)c=c.split('').map(function(x){return x+x;}).join('');if(!/^[0-9a-f]{6}$/i.test(c))c='E8C56A';
+  var rgb=[0,2,4].map(function(i){return parseInt(c.substr(i,2),16);}),lum=function(a){var l=a.map(function(v){v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);});return .2126*l[0]+.7152*l[1]+.0722*l[2];},bg=lum([8,8,8]);
+  for(var t=0;t<=1.0001;t+=0.04){var m=rgb.map(function(v){return Math.round(v+(255-v)*t);});if((lum(m)+.05)/(bg+.05)>=4.5)return '#'+m.map(function(v){return ('0'+v.toString(16)).slice(-2);}).join('');}
+  return '#ffffff';}
+function v3ChipBrand(p){
+  if(p.kind==='physical')return {c:'#E8C56A',logo:'<span class="cash-logo cash-logo-none"><svg class="vi-ic" aria-hidden="true"><use href="#vi-cash"/></svg></span>'};
+  var m=typeof stkPlatformMatch==='function'?stkPlatformMatch(p.name):null;
+  return {c:v3Ink(m?m.c:'#E8C56A'),logo:typeof viBankLogo==='function'?viBankLogo(p.name):''};}
+function v3ChipEsc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+/* the chips for one built scene: one per plate and the total as a gold corner tag, like Budget's Monthly income. The posts are
+   drawn on a canvas under the chips. Every coin's top corners are kept in world space, so a chip is never placed over coins. */
+function v3ChipsSet(V,chips,total){
+  var L=V._chipL;if(!L||L.parentNode!==V.host){L=document.createElement('div');L.className='v3-chips';var pc=document.createElement('canvas');pc.className='v3-posts';pc.setAttribute('aria-hidden','true');L.appendChild(pc);V.host.appendChild(L);V._chipL=L;}
+  Array.prototype.slice.call(L.querySelectorAll('.v3-chip,.v3-total')).forEach(function(e){e.remove();});
+  V._chips=(chips||[]).map(function(ch){var b=v3ChipBrand(ch),el=document.createElement('div');el.className='v3-chip';el.style.setProperty('--bc',b.c);el.dataset.id=ch.id;
+    el.innerHTML=b.logo+'<span class="v3-chip-n">'+v3ChipEsc(ch.name)+'</span><span class="v3-chip-s">·</span><span class="v3-chip-a">'+v3ChipEsc(ch.amount)+'</span>'+(ch.rate!=null?'<span class="v3-chip-r">'+v3ChipEsc(ch.rate)+'% AER</span>':'');
+    L.appendChild(el);return {d:ch,el:el,col:b.c,w:0,h:0,r:null};});
+  V._total=null;if(total){var t=document.createElement('div');t.className='v3-total';t.innerHTML='<span class="v3-total-l">'+v3ChipEsc(total.label)+'</span><span class="v3-total-a">'+v3ChipEsc(total.amount)+'</span>';L.appendChild(t);V._total=t;}
+  var pts=[],m=new THREE.Matrix4(),q=new THREE.Vector3();V.root.updateMatrixWorld(true);
+  V.root.traverse(function(o){if(!o.userData||!o.userData.v3Intro)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();var bb=o.geometry.boundingBox,n=o.isInstancedMesh?(o.userData.v3Full||o.count):1;
+    for(var i=0;i<n;i++){if(o.isInstancedMesh)o.getMatrixAt(i,m);else m.identity();
+      [[bb.min.x,bb.min.z],[bb.max.x,bb.min.z],[bb.min.x,bb.max.z],[bb.max.x,bb.max.z],[(bb.min.x+bb.max.x)/2,(bb.min.z+bb.max.z)/2]].forEach(function(c){q.set(c[0],bb.max.y,c[1]).applyMatrix4(m).applyMatrix4(o.matrixWorld);pts.push(q.x,q.y,q.z);});}});
+  V._coinW=pts;V.onDraw=function(){v3ChipsPlace(V);};V.kick(300);}
+/* place the chips on screen, nearest post first: a chip hangs right of its post (or left), rising a step at a time until it is
+   clear of the coins, the other chips, the total tag, the stage's edges and the zoom buttons (56 px on the right). Hidden while
+   the coins are still arriving. */
+function v3ChipsPlace(V){
+  var L=V._chipL,C=V._chips;if(!L||!C)return;
+  var W=V.host.clientWidth,H=V.host.clientHeight;if(!W||!H)return;
+  var on=!V._introRun&&!V._introWait;L.classList.toggle('on',on);
+  var cv=L.firstChild,dpr=Math.min(2,window.devicePixelRatio||1);
+  if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cv.style.width=W+'px';cv.style.height=H+'px';}
+  var g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);if(!on)return;
+  V.cam.updateMatrixWorld();var v=new THREE.Vector3(),px=function(x,y,z){v.set(x,y,z).project(V.cam);return [(v.x+1)/2*W,(1-v.y)/2*H,v.z];};
+  var cp=[],P=V._coinW||[];for(var i=0;i<P.length;i+=3)cp.push(px(P[i],P[i+1],P[i+2]));
+  var placed=[],RM=56,POST=22;
+  if(V._total)placed.push({x:V._total.offsetLeft-4,y:V._total.offsetTop-4,w:V._total.offsetWidth+8,h:V._total.offsetHeight+8});
+  var clash=function(r,free){if(r.x<4||r.y<4||r.x+r.w>W-RM||r.y+r.h>H-4)return true;
+    for(var j=0;j<placed.length;j++){var b=placed[j];if(r.x<b.x+b.w+3&&b.x<r.x+r.w+3&&r.y<b.y+b.h+2&&b.y<r.y+r.h+2)return true;}
+    if(free)return false;for(var k=0;k<cp.length;k++){var c=cp[k];if(c[0]>r.x-2&&c[0]<r.x+r.w+2&&c[1]>r.y-2&&c[1]<r.y+r.h+2)return true;}return false;};
+  C.map(function(c){if(!c.w){c.w=c.el.offsetWidth;c.h=c.el.offsetHeight;}return {c:c,b:px(c.d.base[0],c.d.base[1],c.d.base[2])};})
+   .sort(function(a,b){return b.b[1]-a.b[1];})
+   .forEach(function(it){var c=it.c,b=it.b,best=null;
+    if(b[2]>1){c.el.style.visibility='hidden';c.r=null;return;}c.el.style.visibility='';
+    for(var pass=0;pass<2&&!best;pass++)for(var k=0;k<(pass?40:16)&&!best;k++)for(var sd=0;sd<3&&!best;sd++){var up=k<16,dy=up?b[1]-POST-k*(c.h+3):b[1]+POST+c.h+(k-16)*(c.h+3),rx=sd===2?Math.max(4,Math.min(W-RM-c.w,b[0]-c.w/2)):sd?b[0]-c.w:b[0],r={x:rx,y:dy-c.h,w:c.w,h:c.h,dot:[Math.max(rx,Math.min(rx+c.w,b[0])),up?dy:dy-c.h]};if(!clash(r,pass))best=r;}   // zoomed right in, the coins fill the stage: then a chip may sit over coins, never over another chip or the total
+    if(!best){var y0=Math.max(4,b[1]-POST-c.h),x0=Math.max(4,Math.min(W-RM-c.w,b[0]));best={x:x0,y:y0,w:c.w,h:c.h,dot:[Math.max(x0,Math.min(x0+c.w,b[0])),y0+c.h]};}   // no room at all: the nearest spot inside the stage
+    placed.push(best);c.r=best;c.el.style.transform='translate('+Math.round(best.x)+'px,'+Math.round(best.y)+'px)';
+    g.strokeStyle=c.col;g.fillStyle=c.col;g.globalAlpha=.9;g.lineWidth=1;g.beginPath();g.moveTo(b[0],b[1]);g.lineTo(best.dot[0],best.dot[1]);g.stroke();
+    g.beginPath();g.arc(b[0],b[1],2,0,Math.PI*2);g.fill();g.beginPath();g.arc(best.dot[0],best.dot[1],1.5,0,Math.PI*2);g.fill();g.globalAlpha=1;});}
+/* what the chips show and where they sit, for the tests */
+V3Scene.prototype.chipInfo=function(){var hr=this.host.getBoundingClientRect();return {total:this._total?{text:this._total.textContent,x0:this._total.offsetLeft,y0:this._total.offsetTop,x1:this._total.offsetLeft+this._total.offsetWidth,y1:this._total.offsetTop+this._total.offsetHeight}:null,W:this.host.clientWidth,H:this.host.clientHeight,on:!!(this._chipL&&this._chipL.classList.contains('on')),
+  chips:(this._chips||[]).map(function(c){var cs=getComputedStyle(c.el),a=c.el.querySelector('.v3-chip-a'),n=c.el.querySelector('.v3-chip-n'),img=c.el.querySelector('img');
+    return {id:c.d.id,name:n?n.textContent:'',amount:a?a.textContent:'',rate:c.d.rate,color:c.col,stroke:cs.borderTopColor,bg:cs.backgroundColor,amtColor:a?getComputedStyle(a).color:'',nameColor:n?getComputedStyle(n).color:'',
+      fonts:[n?parseFloat(getComputedStyle(n).fontSize):0,a?parseFloat(getComputedStyle(a).fontSize):0],logo:img?img.getAttribute('src'):(c.el.querySelector('use')?'icon':''),r:c.r?{x0:c.r.x,y0:c.r.y,x1:c.r.x+c.r.w,y1:c.r.y+c.r.h}:null};}),
+  coins:(function(V){var W=V.host.clientWidth,H=V.host.clientHeight,v=new THREE.Vector3(),o=[],P=V._coinW||[];for(var i=0;i<P.length;i+=3){v.set(P[i],P[i+1],P[i+2]).project(V.cam);o.push([(v.x+1)/2*W,(1-v.y)/2*H]);}return o;})(this)};};
 /* v0.9.1: the hook the cash accounts chunk calls when money moves (E16). The next build of the scene plays the
    coins landing (or lifting, when money came out); with 3D off it does nothing. Safe to call before the stage exists. */
 function v3CashLand(delta,accountId){
@@ -21931,10 +22027,10 @@ function v3CashNow(){
   V.clear();V._key=key;
   var C=v3Pre('cash',key)||v3CashContent(spec,units,cur);V.root.add(C.grp);V.stats=C.stats;   // built in the idle warm-up when the balance has not changed since
   var PER_BLOCK=1000,sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
-  var kc=V3._cashUnits===units&&V3._cashCur===cur;V.frame(kc);v3Settle(V,kc);V3._cashUnits=units;V3._cashCur=cur;
+  var kc=V3._cashUnits===units&&V3._cashCur===cur;V.frame(kc);V3._cashUnits=units;V3._cashCur=cur;v3ChipsSet(V,C.chips,C.total);
   V.introArm('cash|'+key,V3._cashZone||null,V3._cashSilent);V3._cashZone=null;V3._cashSilent=false;   // E14: the coins lay themselves out when the scene is first seen, and again when the balance changes
   var st=V.stats,plates=(st&&st.plates)||[],laid=(st?st.fullStacks:0)+(st&&st.rest?1:0);
-  var cap=document.getElementById('cashCap');if(cap)cap.textContent=units?sym+fmt(st.units)+' laid · '+plates.length+' plate'+(plates.length===1?'':'s')+' · '+Math.floor(st.units/PER_BLOCK)+' block'+(Math.floor(st.units/PER_BLOCK)===1?'':'s')+' of 1,000'+(st.units%PER_BLOCK?' + '+fmt(st.units%PER_BLOCK):'')+' · '+spec.name+' coins, '+spec.d*10+' mm':'No cash yet. Add an account or some physical cash.';
+  var cap=document.getElementById('cashCap');if(cap)cap.textContent=units?sym+fmt(st.units)+' laid · '+plates.length+' plate'+(plates.length===1?'':'s')+' · '+Math.floor(st.units/PER_BLOCK)+' block'+(Math.floor(st.units/PER_BLOCK)===1?'':'s')+' of 1,000'+(st.units%PER_BLOCK?' + '+fmt(st.units%PER_BLOCK):'')+' · '+spec.name+' coins, '+(+(spec.d*10).toFixed(2))+' mm':'No cash yet. Add an account or some physical cash.';
   return true;
 }
 // a cast-style bar: bevelled block with the weight and fineness stamped on top

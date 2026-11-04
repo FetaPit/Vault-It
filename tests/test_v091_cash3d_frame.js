@@ -1,6 +1,7 @@
 // v0.9.1 cash 3D phone framing (owner approved via CoS, 4 Nov: "at 390 px wide the cash 3D flags cover the coins").
 // At phone width the coins show clearly beneath the flags: no coin's top corner, projected through the camera, falls inside a
 // flag box. Desktop framing does not change. The 10.5 px flag floor and the 56 px clamp still hold.
+// v0.9.1 cash 3D look: the flags are now Budget-style chips over the canvas (V3.cash.chipInfo()); the same checks apply to them.
 // Served over http://127.0.0.1 from the folder that holds VI_INDEX (file:// can lose localStorage in headless Chrome).
 // Run: node tests/test_v091_cash3d_frame.js
 const { chromium } = require('playwright'); const http = require('http'), fs = require('fs'), path = require('path');
@@ -21,7 +22,7 @@ const SEED = `(function(){if(localStorage.getItem('pos_al1'))return;localStorage
 
 // every flag box and every coin's top corners, in CSS px of the stage, as drawn now
 const MEASURE = () => {
-  const V = V3.cash, cam = V.cam, W = V.r.domElement.clientWidth, H = V.r.domElement.clientHeight;
+  const V = V3.cash, I = V.chipInfo(), cam = V.cam, W = V.r.domElement.clientWidth, H = V.r.domElement.clientHeight;
   V.root.updateMatrixWorld(true); cam.updateMatrixWorld();
   const up = new THREE.Vector3(0, 1, 0).applyQuaternion(cam.quaternion), rt = new THREE.Vector3(1, 0, 0).applyQuaternion(cam.quaternion);
   const px = v => { const q = v.clone().project(cam); return [(q.x + 1) / 2 * W, (1 - q.y) / 2 * H]; };
@@ -36,8 +37,9 @@ const MEASURE = () => {
       for (let i = 0; i < n; i++) { o.getMatrixAt(i, m); top.forEach(t => pts.push(px(new THREE.Vector3(t[0], bb.max.y, t[1]).applyMatrix4(m).applyMatrix4(o.matrixWorld)))); }
     }
   });
+  I.chips.forEach(c => flags.push({ tag: c.name, x0: c.r.x0, x1: c.r.x1, y0: c.r.y0, y1: c.r.y1, lines: c.fonts }));
   const under = pts.filter(q => flags.some(f => q[0] > f.x0 && q[0] < f.x1 && q[1] > f.y0 && q[1] < f.y1)).length;
-  return { W, H, flags, pts: pts.length, under, cam: cam.position.toArray().map(v => +v.toFixed(2)), target: V.ctl.target.toArray().map(v => +v.toFixed(2)) };
+  return { W, H, flags, pts: pts.length, under, chipCoins: I.coins.filter(q => I.chips.some(c => q[0] > c.r.x0 && q[0] < c.r.x1 && q[1] > c.r.y0 && q[1] < c.r.y1)).length, cam: cam.position.toArray().map(v => +v.toFixed(2)), target: V.ctl.target.toArray().map(v => +v.toFixed(2)) };
 };
 
 (async () => {
@@ -47,29 +49,26 @@ const MEASURE = () => {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: mobile, hasTouch: mobile, reducedMotion: 'reduce' }); await routeThree(ctx);
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(SEED);
-    // record what every flag pass is asked to avoid: the phone-only coin check must never run on a desktop width
-    await p.addInitScript(() => { window.__dc = []; const t = setInterval(() => { if (window.V3Scene && V3Scene.prototype.declutter && !V3Scene.prototype.declutter._w) { const f = V3Scene.prototype.declutter; V3Scene.prototype.declutter = function (c) { window.__dc.push(!!c); return f.apply(this, arguments); }; V3Scene.prototype.declutter._w = 1; clearInterval(t); } }, 5); });
     await p.goto(URL, { waitUntil: 'load' }); await p.waitForTimeout(1400);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.waitForFunction(() => !!window.THREE && !!THREE.OrbitControls, null, { timeout: 30000 }).catch(() => {});
     await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', null); });
     await p.waitForFunction(() => window.V3 && V3.cash && V3.cash.root.children.length, null, { timeout: 60000 }).catch(() => {});
     await p.evaluate(() => document.getElementById('cashSceneCard').scrollIntoView({ block: 'center' })); await p.waitForTimeout(2500);
-    const r = await p.evaluate(MEASURE); r.dc = await p.evaluate(() => window.__dc); await ctx.close(); return r;
+    const r = await p.evaluate(MEASURE); r.cam0 = await p.evaluate(() => { const V = V3.cash; return V.cam.position.clone().sub(V.ctl.target).normalize().toArray().map(v => +v.toFixed(3)); }); await ctx.close(); return r;
   };
 
   // ── phone: the coins show beneath the flags ──
   const m = await measure(390, 844, true);
-  ok(m.pts > 0 && m.flags.length === 5, '390: the stage draws the coins and five flags (' + m.pts + ' coin points, ' + m.flags.length + ' flags)');
-  ok(m.under === 0, '390: no coin sits under a flag (' + m.under + ' of ' + m.pts + ' coin points covered)');
+  ok(m.pts > 0 && m.flags.length === 4, '390: the stage draws the coins and four account chips (' + m.pts + ' coin points, ' + m.flags.length + ' chips)');
+  ok(m.under === 0 && m.chipCoins === 0, '390: no coin sits under a chip (' + m.under + ' of ' + m.pts + ' coin points covered)');
   ok(m.flags.every(f => Math.min(...f.lines) >= 10.5), '390: every flag line is still 10.5 px or more (' + m.flags.map(f => Math.min(...f.lines).toFixed(1)).join(', ') + ')');
   ok(m.flags.every(f => f.x1 <= m.W - 55 && f.x0 >= 0), '390: every flag is still clear of the zoom controls (' + m.flags.map(f => Math.round(f.x0) + '-' + Math.round(f.x1)).join(', ') + ' of ' + m.W + ')');
 
   // ── desktop: the framing does not change ──
   const d = await measure(1280, 800, false);
-  // the desktop takes the same path as before this change (exact camera numbers vary a little between machines' fonts)
-  ok(m.dc.length > 0 && m.dc.some(Boolean), '390: the flag pass keeps flags off the coins (' + m.dc.length + ' passes)');
-  ok(d.dc.length > 0 && !d.dc.some(Boolean), '1280: desktop framing unchanged: the coin check never runs on a desktop width (' + d.dc.length + ' passes, camera ' + d.cam.join(',') + ')');
+  // the chips sit over the canvas, so the camera is the plain framing on both widths: the same viewing direction (the old phone pull-back is gone)
+  ok(m.cam0.every((v, i) => Math.abs(v - d.cam0[i]) < 0.02), 'the desktop framing is unchanged and the phone looks from the same direction (' + m.cam0.join(',') + ' / ' + d.cam0.join(',') + ')');
   ok(d.flags.every(f => Math.min(...f.lines) >= 10.5) && d.flags.every(f => f.x1 <= d.W - 55 && f.x0 >= 0), '1280: flags keep the floor and the clamp');
   console.log('info: 1280 coin points under a flag: ' + d.under + ' of ' + d.pts);
 

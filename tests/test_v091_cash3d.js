@@ -20,9 +20,11 @@ const HIDE = '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{disp
 const READ = () => {
   const V = V3.cash, tags = [], pos = [];
   V.root.traverse(o => {
-    if (o.userData && o.userData.v3Tag) tags.push(o.userData.v3Tag.slice());
     if (o.isInstancedMesh) { const a = o.instanceMatrix.array; for (let i = 0; i < o.count; i++) pos.push([+a[i * 16 + 12].toFixed(3), +a[i * 16 + 13].toFixed(3), +a[i * 16 + 14].toFixed(3)]); }
   });
+  // v0.9.1 cash 3D look: the flags are Budget-style chips over the canvas; each reads [name, amount, rate], the total [label, amount]
+  (V._chips || []).forEach(c => { const q = s => { const e = c.el.querySelector(s); return e ? e.textContent : ''; }; tags.push([q('.v3-chip-n'), q('.v3-chip-a'), q('.v3-chip-r')]); });
+  if (V._total) { const t = V._total.textContent, m = t.match(/[£$€₹][\d,]+$/); tags.push([m ? t.slice(0, m.index) : t, m ? m[0] : '']); }
   return { tags, pos, stats: V.stats };
 };
 
@@ -37,6 +39,7 @@ const LABEL_PX = () => {
       const px = F.f.filter(Boolean).map(f => +(f / F.h * sh).toFixed(1)); const rt = new THREE.Vector3(1, 0, 0).applyQuaternion(V.cam.quaternion), W = V.r.domElement.clientWidth;
       const l = p.clone().addScaledVector(rt, -sp.scale.x / 2).project(V.cam), r = p.clone().addScaledVector(rt, sp.scale.x / 2).project(V.cam);
       out.push({ stage: k, tag: o.userData.v3Tag[0], px, min: Math.min(...px), x0: Math.round((Math.min(l.x, r.x) + 1) / 2 * W), x1: Math.round((Math.max(l.x, r.x) + 1) / 2 * W), W }); }); });
+  if (V3.cash && V3.cash.chipInfo) { const I = V3.cash.chipInfo(); I.chips.filter(c => I.on && c.r && I.W).forEach(c => out.push({ stage: 'cash', tag: c.name, px: c.fonts, min: Math.min(...c.fonts), x0: Math.round(c.r.x0), x1: Math.round(c.r.x1), W: I.W })); }   // cash flags are DOM chips now
   return out;
 };
 
@@ -67,24 +70,25 @@ const LABEL_PX = () => {
     ok(bar && bar.units === 2000 && bar.rate === 4.5, 'each plate holds its own account\'s balance and rate');
     ok(!!phys && phys.units === 460, 'physical cash has its own plate (' + (phys && phys.units) + ')');
     const names = r.tags.map(t => t[0]);
-    ok(r.tags.length === 5, 'a flag on every plate and one for the total (' + r.tags.length + ' flags)');
+    ok(r.tags.length === 5, 'a chip on every plate and the total tag (' + r.tags.length + ' flags)');
     ok(names.some(n => /Barclays Savings/.test(n)) && names.some(n => /Monzo/.test(n)) && names.some(n => /Physical cash/i.test(n)), 'the flags name the accounts (' + names.join(' | ') + ')');
     const bt = r.tags.find(t => /Barclays Savings/.test(t[0]));
     ok(bt && bt[1] === '£2,000' && /4\.5% AER/.test(bt[2] || ''), 'the Barclays flag shows its amount and its rate (' + JSON.stringify(bt) + ')');
     const mt = r.tags.find(t => /Monzo/.test(t[0]));
     ok(mt && !/AER/.test(mt[2] || ''), 'an account with no rate shows no rate (' + JSON.stringify(mt) + ')');
     ok(r.tags.some(t => /Total/i.test(t[0]) && t[1] === '£4,000'), 'the total flag stays (' + JSON.stringify(r.tags.find(t => /Total/i.test(t[0]))) + ')');
-    const wide = await p.evaluate(() => { let w = 0; V3.cash.root.traverse(o => { if (o.userData && /Barclays/.test(o.userData.v3Tag ? o.userData.v3Tag[0] : '')) w = o.children[0].scale.x; }); return w; });
+    const wide = await p.evaluate(() => { const c = V3.cash.chipInfo().chips.find(x => /Barclays/.test(x.name)); return c ? Math.min(...c.fonts) : 0; });
     const icons = await p.evaluate(() => V3.cash.stats.plates.map(x => x.glyph));
-    ok(icons.every(g => !!g), 'every flag draws a glyph locally, no outside image (' + icons.join(',') + ')');
+    ok(icons.every(g => !!g), 'every plate keeps its glyph (' + icons.join(',') + ')');
     const hosts = await p.evaluate(() => { const u = []; document.querySelectorAll('#cashSceneCard img').forEach(i => u.push(i.src)); return u; });
-    ok(hosts.every(u => !/^https?:/.test(u)), 'the 3D card loads no outside image (' + hosts.join(',') + ')');
-    // on a phone the flags are drawn larger, from the first open (the scene may come from the idle warm-up)
+    // the chips carry the bank's real logo (owner, 4 Nov), from the same host the account list already uses; no other outside image
+    ok(hosts.length > 0 && hosts.every(u => !/^https?:/.test(u) || /^https:\/\/www\.google\.com\/s2\/favicons\?/.test(u)), 'the 3D card loads only the bank logos the account list already shows (' + hosts.join(',') + ')');
+    // on a phone the chips are as readable as on a desktop, from the first open (the scene may come from the idle warm-up)
     {
       const pc = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }); await routeThree(pc);
       const pp = await open(pc, 'cash', SEED(ACCTS, { gold: 0 }));
-      const narrow = await pp.evaluate(() => { let w = 0; V3.cash.root.traverse(o => { if (o.userData && /Barclays/.test(o.userData.v3Tag ? o.userData.v3Tag[0] : '')) w = o.children[0].scale.x; }); return w; });
-      ok(narrow > wide * 1.3, 'the account flags are drawn larger on a phone, on the first open (' + narrow + ' at 390 against ' + wide + ' at 1100)');
+      const narrow = await pp.evaluate(() => { const c = V3.cash.chipInfo().chips.find(x => /Barclays/.test(x.name)); return c ? Math.min(...c.fonts) : 0; });
+      ok(narrow >= 10.5 && narrow === wide, 'the account chips read the same on a phone, on the first open (' + narrow + ' px at 390 against ' + wide + ' px at 1100)');
       await pc.close();
     }
 
@@ -191,7 +195,7 @@ const LABEL_PX = () => {
     const c = await p.evaluate(() => { const V = V3.cash; V.r.info.autoReset = true; V.r.render(V.sc, V.cam); return { calls: V.r.info.render.calls, tris: V.r.info.render.triangles, plates: V.stats.plates.length, dpr: V.r.getPixelRatio() }; });
     console.log(JSON.stringify(c));
     ok(c.calls <= c.plates * 3 + 10, 'cash at £250,300: at most three draws a plate plus the fixed floor and flags (' + c.calls + ' for ' + c.plates + ' plates)');
-    ok(c.tris < 120000, 'cash at £250,300: finished blocks are one shape, so the triangle count stays low (' + c.tris + ')');
+    ok(c.tris < 120000, 'cash at £250,300: past ' + 12 + ' blocks each block is one painted box, so the triangle count stays low (' + c.tris + ')');
     ok(c.dpr <= 1.5 + 1e-9, 'pixel ratio capped at 1.5 (' + c.dpr + ')');
     await p.evaluate(() => showSubtab('assets', 'metals', null));
     await p.evaluate(() => { alState.metals = { gold: 1000, silver: 0, platinum: 0, palladium: 0 }; renderMetalsISO(); });
@@ -231,11 +235,13 @@ const LABEL_PX = () => {
     for (const sub of ['cash', 'metals']) {
       const ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: mobile, hasTouch: mobile }); await routeThree(ctx);
       const p = await open(ctx, sub, SEED(ACCTS, { gold: 10, silver: 200, platinum: 0, palladium: 0 }));
+      if (sub === 'cash') await p.evaluate(() => document.getElementById('cashSceneCard').scrollIntoView({ block: 'center' }));
+      if (sub === 'cash') await p.waitForFunction(() => V3.cash.chipInfo().on, null, { timeout: 8000 }).catch(() => {});   // the chips show once the coins have landed
       const L = await p.evaluate(LABEL_PX);
       const small = L.filter(x => !(x.min >= 10.5));
       const clip = L.filter(x => x.x1 > x.W - 55 || x.x0 < 0);
       ok(L.length && !clip.length, w + ' ' + sub + ': every flag is clear of the zoom controls, right edge 56 px or more inside the stage (' + L.map(x => x.tag.slice(0, 10) + ' ' + x.x0 + '-' + x.x1 + '/' + x.W).join('; ') + ')');
-      ok(L.length >= (sub === 'cash' ? 5 : 2) && !small.length, w + ' ' + sub + ': every flag line is 10.5 px or more on screen (' + L.map(x => x.tag.slice(0, 14) + ' ' + x.px.join('/')).join('; ') + ')');
+      ok(L.length >= (sub === 'cash' ? 4 : 2) && !small.length, w + ' ' + sub + ': every flag line is 10.5 px or more on screen (' + L.map(x => x.tag.slice(0, 14) + ' ' + x.px.join('/')).join('; ') + ')');
       await ctx.close();
     }
   }
