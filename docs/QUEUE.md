@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [ ] (owner, Admin) Send the Plaza Futura PDF to Steve on LinkedIn (owner, 4 Nov ~20:55: "send to Exec Assistant to remind me to email it on linkedin to steve"). Reminder in Google Calendar Thu 5 Nov 09:10 with the draft message and Drive link.
 - [ ] (cloud, Marketing) Card corner: the detached house mid-build (owner's screenshot, ROW 35 / 115, 37.0% of deposit) with a brick-laying animation, in the bottom-right corner of the digital and printed card (owner, 4 Nov ~20:25: "More like this with brick laying animation", "but that image in the corner").
 - [x] (cloud, Marketing) Tagline style from now on: thin neon red stroke on "red", thin gold gradient neon stroke on "home", in all new comms plus the pitch deck (owner, 4 Nov ~20:30: "add a thin neon red to the word red and i thin gold gradient neon stroke to home in all comms going forward plus pitchdeck"). Done: e97a16c (deck cover, presenter, vault-it.co/pete, brand/vault-it-tagline-neon.css, CLAUDE.md rule); printed card artwork updated in the scratch build.
 - [ ] (cloud, Marketing) Deck v1.1 research: synthesise what Slava found missing (from the owner's notes) and research slides for route to market, financial forecasts, route to B2B licensing and white-label costs, the ask and use of funds (owner, 4 Nov ~20:30: "Biggest was route to market, financial forecasts, route to B2B licencing White labeling costs, and how much i am asking for and what that money will contribute to").
