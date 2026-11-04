@@ -110,7 +110,7 @@ const open = async (b, w, h, theme, o = {}) => {
     ok(camp.ok, T + 'Vaulter card reads the owner\'s sentence ' + camp.txt);
     ok(camp.live, T + 'both prices come from VI_PLANS (change them and the card follows)');
     ok(camp.tester && camp.tester.indexOf(camp.links[0]) === 0 && camp.full && camp.full.indexOf(camp.links[1]) === 0, T + 'the button opens the existing tester link, or the full-price link when not a tester');
-    ok(camp.badge === '100 places' && !camp.stats, T + 'no counts yet: the Founding badge says "100 places" and the backer and funded stats are gone (' + camp.badge + ')');
+    ok(camp.badge === '100 founding places · Be one of the first' && !camp.stats, T + 'no counts yet: the Founding badge says "100 founding places · Be one of the first" and the backer and funded stats are gone (' + camp.badge + ')');
     ok(!p.errs.length, T + 'no page errors ' + p.errs.slice(0, 2).join('; '));
     await p.context().close();
   }
@@ -118,16 +118,16 @@ const open = async (b, w, h, theme, o = {}) => {
   { const p = await open(b, 1100, 900, 'dark', { rpc: [{ plan: 'monthly', backers: 2 }, { plan: 'yearly', backers: 1 }, { plan: 'founder', backers: 3 }] });
     await p.evaluate(() => viShowCampaign()); await p.waitForTimeout(800);
     const r = await p.evaluate(() => document.getElementById('camp-founder-slots').textContent);
-    ok(r === '97 left', 'E25 3 real founding backers (plus 2 monthly and 1 yearly, which do not count) show "97 left" (' + r + ')');
+    ok(r === '97 of 100 founding places left', 'E25 3 real founding backers (plus 2 monthly and 1 yearly, which do not count) show "97 of 100 founding places left" (' + r + ')');
     await p.context().close(); }
   { const p = await open(b, 1100, 900, 'dark', { rpc: [] });
     await p.evaluate(() => viShowCampaign()); await p.waitForTimeout(800);
     const r = await p.evaluate(() => document.getElementById('camp-founder-slots').textContent);
-    ok(r === '100 left', 'E25 the server answers with no paid accounts: "100 left" (' + r + ')'); await p.context().close(); }
+    ok(r === '100 founding places · Be one of the first', 'E25 the server answers with no paid accounts: "100 founding places · Be one of the first" (' + r + ')'); await p.context().close(); }
   { const p = await open(b, 1100, 900, 'dark', { rpc: 'fail' });
     await p.evaluate(() => viShowCampaign()); await p.waitForTimeout(800);
     const r = await p.evaluate(() => document.getElementById('camp-founder-slots').textContent);
-    ok(r === '100 places', 'E25 function not live yet: "100 places", nothing invented (' + r + ')'); await p.context().close(); }
+    ok(r === '100 founding places · Be one of the first', 'E25 function not live yet: "100 founding places · Be one of the first", nothing invented (' + r + ')'); await p.context().close(); }
   // negative surplus turns red
   { const p = await open(b, 1100, 900, 'dark', { neg: true });
     await p.evaluate(() => { if (!document.getElementById('left-sidebar').classList.contains('open')) toggleSidebar(); viRenderLedger(); });

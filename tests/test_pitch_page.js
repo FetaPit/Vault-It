@@ -131,10 +131,16 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   ok((await counter(aud)).trim() === '5 / 15' && /\b5 \/ 15/.test(await pn()), 'arrow keys in the presenter view drive the audience deck too');
   ok(/drag/i.test(await pre.evaluate(() => document.getElementById('pr-cues').textContent)), 'the live demo slide carries its DO cue');
   ok((await pre.locator('#pr-cues svg').count()) >= 2, 'the cues carry their icons');
+  ok(/^This is the app, live/m.test(await pre.evaluate(() => document.getElementById('pr-script').innerText)), 'the script panel shows this slide\'s script');
+  { const r = await pre.evaluate(() => { const a = document.querySelector('.pr-sc').getBoundingClientRect(), s = document.querySelector('.pr-side').getBoundingClientRect(); return { l: a.left > innerWidth / 2, below: a.top >= s.bottom - 1 }; });
+    ok(r.l && r.below, 'the script sits in the lower right, under the notes: ' + JSON.stringify(r)); }
   ok(await pre.evaluate(() => document.querySelector('#pr-cur .frame, #pr-cur section') !== null && document.querySelector('#pr-nxt section') !== null), 'the mirror shows the current and next slide');
   ok(!/pr-|presenter/.test(await aud.evaluate(() => document.body.innerText)), 'nothing from the presenter view shows in the audience window');
   for (const [w, h] of [[1280, 800], [390, 844]]) { await pre.setViewportSize({ width: w, height: h }); await pre.waitForTimeout(200);
-    ok(await pre.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'presenter view has no sideways scroll at ' + w + ' px'); }
+    ok(await pre.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'presenter view has no sideways scroll at ' + w + ' px');
+    const lay = await pre.evaluate(() => { const sc = document.querySelector('.pr-sc'), sd = document.querySelector('.pr-side'), m = document.querySelector('.pr-mir').getBoundingClientRect(), a = sc.getBoundingClientRect(), b = sd.getBoundingClientRect();
+      return { sideFits: sd.scrollHeight <= sd.clientHeight + 2, scFits: w => true, apart: a.bottom <= m.top + 1 || a.left >= m.right - 1, scH: sc.clientHeight, scS: sc.scrollHeight }; });
+    ok(lay.sideFits && lay.apart && (w > 820 || lay.scH + 2 >= lay.scS), 'at ' + w + ' px the notes and script do not overlap the mirror and the script shows in full on a phone: ' + JSON.stringify(lay)); }
   ok(aud.errs.length === 0 && pre.errs.length === 0, 'no page errors in either window: ' + aud.errs.concat(pre.errs).join(' | '));
   await ctx2.close();
 

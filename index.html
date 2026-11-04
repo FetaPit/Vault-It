@@ -30144,7 +30144,9 @@ function viApplyFounderBadge() {
 function viCampaignPaint() {   // owner, 3 Nov: the Founding badge says just "N left": the Stripe cap (founderSlots) minus real paid founders from campaign_counts(); "100 places" until the counts load
   var c = VI_CAMPAIGN, e = document.getElementById('camp-founder-slots'); if (!e) return;
   var known = typeof c.founderTaken === 'number';
-  e.textContent = known ? Math.max(0, c.founderSlots - c.founderTaken) + ' left' : c.founderSlots + ' places';
+  // owner, 4 Nov: "100 founding places · Be one of the first" until a real founder has paid; then the real count left. Never seeded.
+  var taken = known ? Math.min(c.founderSlots, Math.max(0, c.founderTaken)) : 0;
+  e.textContent = taken > 0 ? (c.founderSlots - taken) + ' of ' + c.founderSlots + ' founding places left' : c.founderSlots + ' founding places · Be one of the first';
 }
 // the Vaulter card: both prices come from VI_PLANS, so a price change there is the only edit
 function viCampaignPrices() {
