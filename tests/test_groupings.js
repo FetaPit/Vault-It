@@ -26,7 +26,7 @@ const seed = () => {
     const h = await p.evaluate(() => {
       const plan = document.getElementById('hb-plan'), prog = document.getElementById('hb-hud'), hist = document.getElementById('hb-hist'), own = document.getElementById('hb-own-design');
       const inn = (c, ids) => ids.every(id => c && c.contains(document.getElementById(id)));
-      return { h1: inn(plan, ['htypes', 'priceInput', 'depositPctInput', 'floor-selector-card']), lay: inn(document.getElementById('houseSceneCard'), ['savingsInput', 'btnAdd']) && document.getElementById('hb-lay').compareDocumentPosition(document.getElementById('sceneCap')) & 4, brick: /Each brick is worth about £\d/.test((document.getElementById('hb-plan-brick') || {}).textContent || ''),
+      return { h1: inn(plan, ['priceInput', 'depositPctInput', 'floor-selector-card']) && !plan.contains(document.getElementById('htypes')), lay: inn(document.getElementById('houseSceneCard'), ['savingsInput', 'btnAdd']) && document.getElementById('hb-lay').compareDocumentPosition(document.getElementById('sceneCap')) & 4, brick: /Each brick is worth about £\d/.test((document.getElementById('hb-plan-brick') || {}).textContent || ''),
         h2: inn(prog, ['savedAmt', 'pbarFill', 'stBricks', 'stRemain', 'ms1', 'ms100']),
         h3: inn(hist, ['habit-circles', 'logList', 'btnReset']) && hist.querySelector('#habit-circles').compareDocumentPosition(hist.querySelector('#logList')) & 4 && hist.querySelector('#logList').compareDocumentPosition(hist.querySelector('#btnReset')) & 4,
         h4: own && own.tagName === 'DETAILS' && !own.open && !own.querySelector('input,textarea,button') && /Coming later as part of Pro/.test(own.textContent),
