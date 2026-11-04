@@ -10,19 +10,12 @@ The single list of instructed work. Every session reads it at start and before e
 ## Open
 
 - [x] (cloud, Marketing) Eligent presenter view: add the approved script in the lower right of the presenter (owner, 4 Nov ~15:00: "I actually want the script too in the lower right quarter of the presenter"). Done: e9f1d46, released 4 Nov 15:05 (backup backup/release-pioneer-v2-20261104-1505).
-- [~] v0.9.1 MVP release, hard deadline 16:00 UK today (owner via Exec Assistant, 4 Nov).
-  - Release build 51b2848, CI green, run 41832893910.
-  - Includes the pitch page merge, so the push is a fast-forward from live 6e9c618.
-  - Owner pushes from the laptop, after the backup: `git push origin 51b2848929c8eb016d5f19010930f5a27f8a39d1:refs/heads/release/pioneer-v2`
-  - Steps: `docs/handover/V091_RELEASE_CHECKLIST.md` on branch `claude/serene-pascal-ycz6dr`.
-- [ ] Owner: phone sign-off on the preview, then a live check after the push (version.json, sign in, pitch page).
-- [ ] Optional second push around 14:45 to 15:05: ca4750d (round 2 E coins plus roadmap follow-ups), if its CI is green. Or 20bb19e on `v09x/founder-copy`, which is ca4750d plus the Founding badge copy, if that CI is green.
-- [~] Founding badge copy (owner approved 4 Nov): "100 founding places · Be one of the first" until a real founder pays, then "N of 100 founding places left", from real counts only. Branch `v09x/founder-copy` 20bb19e, CI running. Goes in the second push if green, else 0.9.2.
+- [ ] Owner: sign in on the phone at app.vault-it.co after the v0.9.1 release and check saved data and the pitch page (release confirmed live by the Chief of Staff, 4 Nov 16:12).
 - [ ] Eligent pitch, Sat 7 Nov (owner). The pitch page is live at vault-it.co/pitch-Eligent. The 17:00 4 Nov Zoom pitch is the item below.
 - [ ] v0.9.2 parked list (owner, 4 Nov, cut for the 16:00 MVP):
   - Round 2 A chrome (R1, R23 to R26), B labels and flow (R2, R9 to R11) and G crypto (R19, R20): sessions paused 4 Nov ~10:15, worktrees kept.
-  - Round 2 F item viewer (R17, R18, R21): `v091r2/item-viewer` 86474be, not merged.
-  - I tier prices and icons: `v091r2/tiers` 68edfab, not merged.
+  - Round 2 F item viewer (R17, R18, R21): merged into `candidate/v0.9.1` 4a0ce74 at 14:48 but not in the v0.9.1 release; ships with 0.9.2.
+  - I tier prices and icons: `v091r2/tiers` 68edfab, not merged. Merges cleanly with the released badge copy (checked 4 Nov).
   - Second-hand prices function deploy, plus the DISCOGS_TOKEN secret (owner types it on the laptop).
   - Cash 3D default view, where blocks read as gold cubes, not a fine coin grid (owner to decide).
   - Tests: serve all browser tests over http, not file://; make every test honour VI_INDEX, with the repo root derived from it.
@@ -69,6 +62,9 @@ The single list of instructed work. Every session reads it at start and before e
 - Poly Pizza: commercial plan and an edge function for live search, or self-host a small CC0 set (`docs/WEALTH_INVENTORY_3D_OPTIONS.md`)
 
 ## Done (4 Nov 2026)
+
+- [x] v0.9.1 MVP released, 4 Nov ~15:45 by the owner from the laptop, live by 16:09 (hard deadline 16:00 to 16:10 UK). Release `fce1d89`: round 1, round 2 C roadmap, D house type, E coins one by one, roadmap follow-ups, cash 3D look, Founding badge copy, and production's pitch updates (presenter view, approved script) merged in so the push was a plain fast-forward from e9f1d46. CI run 41854535512 all 4 jobs green. app.vault-it.co/version.json shows fce1d89; vault-it.co/pitch-Eligent returns 200. Backup `backup/release-pioneer-v2-20261104-1430` (0e009b3).
+- [x] Founding badge copy (owner approved 4 Nov): "100 founding places · Be one of the first" until a real founder pays, then "N of 100 founding places left" from campaign_counts(), never seeded. `v09x/founder-copy`, released in fce1d89.
 
 - [x] (laptop, Research) Two family personas, sourced average UK data (owner, 4 Nov 2026: "Pull 2 sets of new average data for 2 personas, name them but do not create their logins or populated logins yet"). Docs only: no app code, no logins, no seeded accounts. Done: Paul and Claire Ashworth in `docs/research/family_personas.md` (17df225). Children and balances not sourced yet.
 - [x] (cloud, Marketing) Eligent 5-minute pitch prep (owner, 4 Nov ~12:25, Slava: "zoom link for 5pm ... prepare to deliver 5 mins pitch"; owner: "5 mins time limit script with instructions on how to deliver over zoom, build into a copied version of the live eligent deck with the created concise bullets and talking point from the script once reviewed and signed off with iconography"). Script first for sign-off, then a presenter copy of the deck. Session ccr-979f44d8-pxeak8. Done: script approved; presenter view at vault-it.co/pitch-Eligent-presenter synced with the audience deck (0e009b3), released 4 Nov 14:38, backup backup/release-pioneer-v2-20261104-1438.
