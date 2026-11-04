@@ -6,10 +6,11 @@ const app = fs.readFileSync('/home/user/Vault-It/index.html', 'utf8'), page = fs
 for (const [re, what] of [[/was £\d/, '"was £…" reference prices'], [/50% off/i, '"50% off" claims'], [/Offer expires/i, 'expiring-offer messages'],
   [/£3\.59|£4\.49|£5\.09/, 'the old time-based discount prices'], [/Buffett|Munger|Squibb|Stevenson/, 'celebrity advisor names, including code comments'],
   [/Invest once|Invest in you/i, 'investment wording'], [/spots left/i, 'a "spots left" countdown'],
-  [/3cIfZbddA6UV5yR4GG2VG01/, 'the retired £59.99 annual Stripe link'], [/£59\.99/, 'the old £59.99 annual price']]) {
+  [/3cIfZbddA6UV5yR4GG2VG01/, 'the retired £59.99 annual Stripe link'], [/3cI8wJ0qO9337GZa102VG06|£39\.99/, 'the old £39.99 tester yearly price and link (owner, 4 Nov)'],
+  [/<s>£|\(was £/, 'struck-through prices (later prices read "£X after the beta", owner 4 Nov)']]) {
   ok(!re.test(app), 'app has no ' + what);
 }
-ok(/£49\.99/.test(app) && /£5\.99/.test(app) && /£149/.test(app), 'the app shows the decided prices (£5.99/mo, £49.99/yr, £149 founder)');
+ok(/monthly: \{ price: 5\.99, tester: 3\.99,/.test(app) && /annual: \{ price: 59\.99, tester: 49\.99,/.test(app) && /founder: \{ price: 149, tester: 99,/.test(app), 'VI_PLANS holds the decided prices (owner, 4 Nov: £3.99 then £5.99 a month, £49.99 then £59.99 a year, £99 then £149 Founding)');
 ok(/founderSlots: 100,/.test(app), 'founding cap is 100');
 // Prices are amounts with a billing period or a one-off. The hero demo's lay buttons (£5, £50, £500), the deposit figure and the block key (£1,000, £100) are illustrations, not prices.
 const priced = page.match(/£[\d,.]+k?\s*(a month|\/mo\b|per month|a year|\/yr\b|per year|once|one-off)/g) || [];
