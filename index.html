@@ -10885,6 +10885,8 @@ button.bd-ic{cursor:pointer}
 .inv-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .inv-t{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--tx)}
 .inv-s{font-family:'Share Tech Mono',monospace;font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);margin-top:2px}
+/* F2 (R18): while the item 3D viewer is open, decorative animations behind it hold still, so they do not restyle the page every frame */
+body.i3d-open :not(#i3d-modal,#i3d-modal *){animation-play-state:paused!important}
 .inv-x{background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:44px;height:44px;cursor:pointer;flex-shrink:0}
 .inv-card>.inv-hd{position:sticky;top:-14px;z-index:5;background:var(--panel);margin:-14px -14px 0;padding:14px 14px 0}   /* R17 (owner, 4 Nov): the close X stays top right even when the panel scrolls */
 .inv-x:hover{color:#fff;border-color:var(--blue)}
@@ -23718,7 +23720,10 @@ function I3DView(host,obj,opts){
   ctl.addEventListener('change',function(){self.kick();});
   ctl.update();
   // draws only while something moves (drag, pinch, auto-rotate, a kick), never off screen or in a background tab
-  var loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}var W=host.clientWidth,H=host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;self._vo(W,H);cam.updateProjectionMatrix();}
+  /* F2 (R18 "it should run smooth"): the stage size comes from the ResizeObserver below; reading clientWidth here forced a style and layout
+     pass every frame (about 5 ms a frame on a phone, with decorative animations behind the viewer). Without ResizeObserver it reads as before. */
+  this._rw=w;this._rh=h;
+  var loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}var W=self.ro?self._rw:host.clientWidth,H=self.ro?self._rh:host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;self._vo(W,H);cam.updateProjectionMatrix();}
     var moving=ctl.update();var t=performance.now();r.render(sc,cam);
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}
     self._lastT=moving?t:0;
@@ -23726,7 +23731,7 @@ function I3DView(host,obj,opts){
        Queuing both doubled the draws every frame (2, 4, 8 ...) until the page froze and a tap on X waited behind them. */
     if((moving||ctl.autoRotate||Date.now()<self._until)&&!self.raf)self.raf=requestAnimationFrame(loop);};
   this._loop=loop;this._off=false;
-  if(window.ResizeObserver){this.ro=new ResizeObserver(function(){self.kick();});this.ro.observe(host);}
+  if(window.ResizeObserver){this.ro=new ResizeObserver(function(es){var cr=es[es.length-1].contentRect;self._rw=Math.round(cr.width);self._rh=Math.round(cr.height);self.kick();});this.ro.observe(host);}
   if(window.IntersectionObserver){this.io=new IntersectionObserver(function(es){var vis=es[es.length-1].isIntersecting;if(vis===!self._off)return;self._off=!vis;if(vis)self.kick(200);},{threshold:.01});this.io.observe(host);}
   this._onVis=function(){if(!document.hidden)self.kick(200);};document.addEventListener('visibilitychange',this._onVis);
   this.kick(600);
@@ -23761,7 +23766,7 @@ async function i3dSave(kind,id,buf,meta){
   saveAL();renderAlTab();_i3dReady={kind:kind,id:id,obj:obj};return it.model;
 }
 var _i3dView=null,_i3dBusy=false,_i3dReady=null;   // _i3dReady: the model just saved, already read, so the viewer does not read it twice
-function i3dClose(){var o=document.getElementById('i3d-modal');if(o)o.remove();if(_i3dView){_i3dView.dispose();_i3dView=null;}}
+function i3dClose(){var o=document.getElementById('i3d-modal');if(o)o.remove();document.body.classList.remove('i3d-open');if(_i3dView){_i3dView.dispose();_i3dView=null;}}
 function i3dMsg(t,bad){var e=document.getElementById('i3d-msg');if(e){e.textContent=t||'';e.className='i3d-msg'+(bad?' bad':'');}}
 function i3dShell(title,sub){
   i3dClose();
@@ -23770,7 +23775,7 @@ function i3dShell(title,sub){
   o.addEventListener('click',function(e){if(e.target===o)i3dClose();});
   o.innerHTML='<div class="inv-card"><div class="inv-hd"><div><div class="inv-t">'+cfEsc(title)+'</div><div class="inv-s">'+sub+'</div></div>'
     +'<button class="inv-x" onclick="i3dClose()" title="Close"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div><div id="i3d-body"></div><div id="i3d-msg" class="i3d-msg" role="status" aria-live="polite"></div></div>';
-  document.body.appendChild(o);o.focus();return document.getElementById('i3d-body');
+  document.body.appendChild(o);document.body.classList.add('i3d-open');o.focus();return document.getElementById('i3d-body');
 }
 // open the viewer for an item that has a model
 async function i3dOpen(kind,id){

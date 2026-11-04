@@ -58,6 +58,34 @@ const instrument = p => p.evaluate(() => {
       let f = 0, worst = 0, last = performance.now(); await new Promise(res => { const step = () => { const t = performance.now(); worst = Math.max(worst, t - last); last = t; if (++f < 30) requestAnimationFrame(step); else res(); }; requestAnimationFrame(step); setTimeout(res, 6000); });
       r.render = o; return { perFrame: n / f, worst: Math.round(worst), frames: f }; });
     T[tag] = { turning: run };
+    // F2 (R18 "it should run smooth"): the loop takes the stage size from the ResizeObserver, never by reading layout each frame
+    const reads = await p.evaluate(async () => { const host = _i3dView.r.domElement.parentNode; let n = 0;
+      for (const k of ['clientWidth', 'clientHeight', 'offsetWidth', 'offsetHeight']) { let pr = Object.getPrototypeOf(host), d; while (pr && !(d = Object.getOwnPropertyDescriptor(pr, k))) pr = Object.getPrototypeOf(pr);
+        Object.defineProperty(host, k, { configurable: true, get() { n++; return d.get.call(this); } }); }
+      let f = 0; await new Promise(res => { const s = () => { if (++f < 30) requestAnimationFrame(s); else res(); }; requestAnimationFrame(s); });
+      for (const k of ['clientWidth', 'clientHeight', 'offsetWidth', 'offsetHeight']) delete host[k]; return n; });
+    ok(reads <= 2, tag + ': the turning viewer reads no layout size per frame (' + reads + ' reads over 30 frames)');
+    // F2: a size change still reaches the viewer (through the ResizeObserver): the canvas follows the stage
+    const rs = await p.evaluate(async () => { const st = document.getElementById('i3d-stage'), cv = _i3dView.r.domElement, w0 = cv.width;
+      st.style.width = Math.round(st.clientWidth * 0.7) + 'px'; await new Promise(r => setTimeout(r, 400)); await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      const want = Math.round(st.clientWidth * _i3dView.r.getPixelRatio()), got = cv.width; st.style.width = ''; await new Promise(r => setTimeout(r, 300)); return { w0, want, got }; });
+    ok(Math.abs(rs.got - rs.want) <= 2 && rs.got < rs.w0, tag + ': when the stage narrows, the canvas follows it (' + rs.w0 + ' to ' + rs.got + ', want ' + rs.want + ')');
+    // F2: decorative animations behind the open viewer are paused, so they do not dirty styles every frame
+    const anim = await p.evaluate(() => { const m = document.getElementById('i3d-modal'); let running = 0, names = new Set();
+      document.querySelectorAll('body *').forEach(e => { if (m.contains(e)) return; const cs = getComputedStyle(e); if (cs.animationName !== 'none' && cs.animationPlayState.split(',').some(s => s.trim() === 'running') && e.getClientRects().length) { running++; names.add(cs.animationName); } });
+      return { running, names: [...names].slice(0, 6) }; });
+    ok(anim.running === 0, tag + ': no decorative animation runs behind the open viewer (' + anim.running + ' running: ' + anim.names.join(', ') + ')');
+    if (mobile) {   // per-frame cost on the phone profile at 4x CPU (reported, the budget is the owner's 33 ms p95)
+      const cdp = await p.context().newCDPSession(p); await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+      T[tag].phone4x = await p.evaluate(async () => { const v = _i3dView, L = []; const oR = requestAnimationFrame;
+        window.requestAnimationFrame = function (cb) { return oR(cb === v._loop || cb.name === 'loop' ? function (t) { const s = performance.now(); cb(t); L.push(performance.now() - s); } : cb); };
+        v.ctl.autoRotate = true; v.kick(4000); const F = []; let last = performance.now();
+        await new Promise(res => { let n = 0; const s = () => { const t = performance.now(); F.push(t - last); last = t; if (++n < 90) oR(s); else res(); }; oR(s); });
+        window.requestAnimationFrame = oR; const q = (a, p) => { const b = a.slice().sort((x, y) => x - y); return +b[Math.min(b.length - 1, Math.floor(p * b.length))].toFixed(1); };
+        const mean = a => a.length ? +(a.reduce((x, y) => x + y, 0) / a.length).toFixed(2) : null;
+        return { loopMean: mean(L), loopMax: L.length ? +Math.max(...L).toFixed(1) : null, frameP95: q(F.slice(5), 0.95), frameMean: mean(F.slice(5)) }; });
+      await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+    }
     // R17: the stage is lit teal, the model is lit white
     // the teal lives in the stage (sky dome, pool of light on the floor, fog), never in a light, so no colour reaches the model
     const lit = await p.evaluate(() => { const L = [], E = []; _i3dView.sc.traverse(o => { if (o.isLight) L.push(o.color.getHex()); if (o.userData && o.userData.i3dEnv) E.push(o.userData.i3dEnv); });
