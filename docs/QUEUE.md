@@ -111,6 +111,7 @@ The single list of instructed work. Every session reads it at start and before e
   - E coins one by one, R16 (d4a5ffc): merged as 8aff519.
   - Roadmap follow-ups C2, C3 and C3b (ab2406b): merged as ca4750d.
   - B labels and flow, R2, R9 to R11: ready for review, `v091r2/labels-flow` 0143c09 (icons on the Net worth 3D and Cash flow 3D labels, income flow 15 to 20% shorter, solid 1.5 px divider; Pedro PASS, rollout-qc PASS, CI running), not merged.
+  - G crypto, R19, R20 and the owner's follow-ups on the coins: ready for review, `v091r2/crypto` fdaeb30, CI green run 41853139998, Pedro PASS (tiles), rollout-qc PASS on each commit (teal bitcoin Crypto sub-tab icon; holding tiles led by a large coin icon with price, then amount and cost in their own row; coins swing at most 10 degrees with gold edge thickness, a light streak and a semi photo realistic bevelled rim in each coin's own colour; still under reduced motion). Test `tests/test_v091r2_crypto.js`. Not merged into the candidate.
 
 ## Done (3 Nov 2026)
 - [x] Release v0.8 + v0.9 to app.vault-it.co: 5e8b5a5 live 3 Nov 2026 (version.json checked), CI green, backup `backup/release-pioneer-v2-20261103-0203`; replaces Release the MVP and Alpha rollout v0.7 (owner's yes). Server: migration 013 applied; waitlist-join, waitlist-welcome, send-auth-email, tester-feedback, feedback-digest deployed. Still by hand: paste the six email templates from supabase/auth-templates/ into the Supabase dashboard; owner to open the live app once on the phone.
