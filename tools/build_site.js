@@ -12,7 +12,7 @@ const SITE = {
             ['site/sign-up/thanks.html', 'sign-up/thanks.html'], ['site/sign-up/confirm.html', 'sign-up/confirm.html'],
             ['site/sign-up/unsubscribe.html', 'sign-up/unsubscribe.html'], ['site/sign-up/style.css', 'sign-up/style.css'],
             // investor pitch for the Eligent Club event: vault-it.co/pitch-Eligent (and a lower-case alias)
-            ['site/pitch-eligent/index.html', 'pitch-Eligent.html'], ['site/pitch-eligent/index.html', 'pitch-eligent.html'],
+            ['site/pitch-eligent/index.html', 'pitch-Eligent.html'], ['site/pitch-eligent/index.html', 'pitch-eligent.html'], ['site/pitch-eligent/presenter.html', 'pitch-Eligent-presenter.html'], ['site/pitch-eligent/presenter.html', 'pitch-eligent-presenter.html'],
             ['site/pitch-eligent/pitch/house-build.mp4', 'pitch/house-build.mp4'], ['site/pitch-eligent/pitch/house-still.jpg', 'pitch/house-still.jpg'],
             ['site/pitch-eligent/pitch/nw3d-live.js', 'pitch/nw3d-live.js'], ['site/pitch-eligent/pitch/live-nw.jpg', 'pitch/live-nw.jpg'], ['site/pitch-eligent/pitch/live-trk.jpg', 'pitch/live-trk.jpg'],
             ['site/pitch-eligent/pitch/logo-full.png', 'pitch/logo-full.png'], ['site/pitch-eligent/pitch/logo-mid.png', 'pitch/logo-mid.png']],
