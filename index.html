@@ -10883,7 +10883,8 @@ button.bd-ic{cursor:pointer}
 .inv-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .inv-t{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--tx)}
 .inv-s{font-family:'Share Tech Mono',monospace;font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);margin-top:2px}
-.inv-x{background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:44px;height:44px;cursor:pointer}
+.inv-x{background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;width:44px;height:44px;cursor:pointer;flex-shrink:0}
+.inv-card>.inv-hd{position:sticky;top:-14px;z-index:5;background:var(--panel);margin:-14px -14px 0;padding:14px 14px 0}   /* R17 (owner, 4 Nov): the close X stays top right even when the panel scrolls */
 .inv-x:hover{color:#fff;border-color:var(--blue)}
 .inv-stage{position:relative;width:100%;aspect-ratio:4/3;max-height:58vh;border-radius:10px;overflow:hidden;background:var(--panel);border:1px solid rgb(var(--ink-rgb) / .06)}
 .inv-stage canvas{width:100%;height:100%;display:block}
@@ -10905,6 +10906,7 @@ button.bd-ic{cursor:pointer}
 .wi-img-area .i3d-live{position:absolute;inset:0;z-index:2}.wi-img-area .i3d-live canvas{width:100%!important;height:100%!important;cursor:grab;display:block;touch-action:pan-y}
 .wi-img-area img.i3d-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;cursor:zoom-in}
 .i3d-badge{font-size:10px!important;display:inline-flex;align-items:center;gap:4px;border-color:rgb(var(--green-rgb) / .6)!important;background:rgb(var(--green-rgb) / .18)!important;color:var(--green)!important}
+.wi-img-area .i3d-badge{max-width:calc(100% - 62px);line-height:1.25}   /* R17: clear of the expand and remove buttons top right (it wraps on a narrow phone tile) */
 .i3d-btn{font-family:'Share Tech Mono',monospace;font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--green)}
 .i3d-msg{font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);min-height:1em}.i3d-msg.bad{color:var(--re)}
 .i3d-credit{font-size:max(11px,var(--vi-fs-1));color:var(--t2);word-break:break-word}
@@ -13864,7 +13866,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wi-mlinks{display:flex;gap:6px 16px;flex-wrap:wrap;margin:10px 0 0}
 .wi-mlinks a{display:inline-flex;align-items:center;min-height:44px;padding:8px 0;font-size:max(.66rem,var(--vi-fs-2));color:var(--teal);font-weight:600;text-decoration:underline;text-underline-offset:2px}
 .wi-link-hint{font-size:max(.52rem,var(--vi-fs-1));color:var(--t2);margin:6px 0 8px}
-.wi-del{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.5);border:none;color:rgba(255,80,80,.6);font-size:max(.7rem,var(--vi-fs-3));cursor:pointer;width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;line-height:1}
+.wi-del{position:absolute;top:5px;right:5px;z-index:4;background:rgba(0,0,0,.5);border:none;color:rgba(255,80,80,.6);font-size:max(.7rem,var(--vi-fs-3));cursor:pointer;width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;line-height:1}
 .wi-del:hover{color:#ff4444;background:rgba(255,0,0,.15)}
 /* Icon picker */
 .wi-icon-picker{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:600;background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:10px;padding:16px;width:300px;max-height:400px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.7)}
@@ -22935,8 +22937,7 @@ function wiMkGuessCat(n){n=String(n||'').toLowerCase();
   return 'general';}
 function wiMkLinks(){
   var q=encodeURIComponent((document.getElementById('wl-mq').value||'').trim().slice(0,80)),el=document.getElementById('wl-mlinks');if(!el)return;
-  el.innerHTML='<a href="https://www.ebay.co.uk/sch/i.html?LH_Sold=1&LH_Complete=1&_nkw='+q+'" target="_blank" rel="noopener noreferrer">Search eBay sold items</a>'
-    +'<a href="https://www.discogs.com/search/?type=all&q='+q+'" target="_blank" rel="noopener noreferrer">Search Discogs</a>';
+  el.innerHTML='<a href="https://www.ebay.co.uk/sch/i.html?LH_Sold=1&LH_Complete=1&_nkw='+q+'" target="_blank" rel="noopener noreferrer">Search eBay sold items</a>';   // v0.9.1 R21 (owner, 4 Nov): no Discogs search here
 }
 async function wiMkSearch(){
   var a=wiMkItem();if(!a)return;
@@ -23313,6 +23314,13 @@ function i3dFit(obj){
   obj.position.x-=c.x;obj.position.z-=c.z;obj.position.y-=b.min.y;
   return b.setFromObject(obj);
 }
+/* the floor grid as short pieces (1 unit each) rather than one long line per row: a long line that runs behind the camera can drop out
+   on some graphics drivers (seen in software rendering), and short pieces keep every line crisp right up to the model */
+function i3dGrid(half,step,hex,op,y){
+  var v=[];for(var a=-half;a<=half+1e-6;a+=step)for(var b=-half;b<half-1e-6;b+=1){var e=Math.min(half,b+1);v.push(a,y,b,a,y,e,b,y,a,e,y,a);}
+  var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
+  return new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:i3dCol(hex),transparent:true,opacity:op,depthWrite:false}));
+}
 function I3DView(host,obj,opts){
   opts=opts||{};var self=this;
   var w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);
@@ -23324,13 +23332,27 @@ function I3DView(host,obj,opts){
   var cv=r.domElement;cv.className='i3d-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',opts.label||'3D model');
   host.insertBefore(cv,host.firstChild);
   var sc=this.sc=new THREE.Scene();sc.background=new THREE.Color(0x05101b);sc.fog=new THREE.Fog(0x05101b,9,26);
-  /* neutral white light, so nothing tints the model (the stage keeps the brand floor and grid) */
-  sc.add(new THREE.HemisphereLight(0xffffff,0x3a3a3a,0.9));
-  var key=new THREE.DirectionalLight(0xffffff,1.1);key.position.set(3,6,4);key.castShadow=!opts.still;var kms=viCoarse()?512:1024;key.shadow.mapSize.set(kms,kms);key.shadow.bias=-0.0005;sc.add(key);
+  /* v0.9.1 R17 (owner, 4 Nov): more contrast in the sky and the floor, sharper floor lines, the environment glows teal while the
+     model is lit only by white light. The teal is in the stage itself (sky dome and a pool of light on the floor, both unlit), so no
+     coloured light ever reaches the model. The sky runs from near black overhead to a teal horizon; fog melts the floor into it. */
+  var hz=0x0f4446;sc.background=new THREE.Color(0x02070c);sc.fog=new THREE.Fog(i3dCol(hz),10,27);   // fog and vertex colours are mixed in linear light, so they take linear values
+  var sky=new THREE.Mesh(new THREE.SphereBufferGeometry(60,32,16),new THREE.MeshBasicMaterial({side:THREE.BackSide,vertexColors:true,fog:false,depthWrite:false}));
+  (function(g){var p=g.attributes.position,c=new Float32Array(p.count*3),top=i3dCol(0x02070c),mid=i3dCol(0x08262e),low=i3dCol(hz),t=new THREE.Color();
+    for(var i=0;i<p.count;i++){var y=p.getY(i)/60;if(y>0.28)t.copy(mid).lerp(top,Math.min(1,(y-0.28)/0.5));else t.copy(low).lerp(mid,Math.max(0,y)/0.28);c[i*3]=t.r;c[i*3+1]=t.g;c[i*3+2]=t.b;}
+    g.setAttribute('color',new THREE.BufferAttribute(c,3));})(sky.geometry);
+  sky.userData.i3dEnv=hz;sky.renderOrder=-1;sc.add(sky);
+  var gcv=document.createElement('canvas');gcv.width=gcv.height=256;var gx=gcv.getContext('2d'),gr=gx.createRadialGradient(128,128,0,128,128,128);
+  gr.addColorStop(0,'#15504e');gr.addColorStop(0.07,'#0e3638');gr.addColorStop(0.22,'#081b1f');gr.addColorStop(1,'#030a0d');gx.fillStyle=gr;gx.fillRect(0,0,256,256);
+  var gtex=this._gtex=new THREE.CanvasTexture(gcv);gtex.encoding=THREE.sRGBEncoding;
+  var ground=new THREE.Mesh(new THREE.CircleBufferGeometry(30,64),new THREE.MeshBasicMaterial({map:gtex}));ground.rotation.x=-Math.PI/2;ground.userData.i3dEnv=0x15504e;sc.add(ground);
+  sc.add(i3dGrid(12,0.5,0x2c837c,0.45,0.002));sc.add(i3dGrid(12,2,0x5fd6cb,0.6,0.003));   // fine lines every 0.5, bright ones every 2
+  /* white light only, so nothing tints the model */
+  sc.add(new THREE.HemisphereLight(0xffffff,0x404040,0.9));
+  var key=new THREE.DirectionalLight(0xffffff,1.15);key.position.set(3,6,4);key.castShadow=!opts.still;var kms=viCoarse()?512:1024;key.shadow.mapSize.set(kms,kms);key.shadow.bias=-0.0005;
+  key.shadow.camera.left=key.shadow.camera.bottom=-2.5;key.shadow.camera.right=key.shadow.camera.top=2.5;sc.add(key);   // the shadow map covers just the model, so it stays crisp
   var fill=new THREE.DirectionalLight(0xffffff,0.35);fill.position.set(-4,3,-2);sc.add(fill);
-  var rim=new THREE.DirectionalLight(0xffffff,0.3);rim.position.set(-2,3,-5);sc.add(rim);
-  var ground=new THREE.Mesh(new THREE.CircleBufferGeometry(30,48),new THREE.MeshStandardMaterial({color:i3dCol(0x0c1a20),roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;sc.add(ground);
-  var grid=new THREE.GridHelper(24,48,i3dCol(0x1f5e5a),i3dCol(0x123734));grid.material.transparent=true;grid.material.opacity=0.35;grid.position.y=0.002;sc.add(grid);
+  var rim=new THREE.DirectionalLight(0xffffff,0.45);rim.position.set(-2,3,-5);sc.add(rim);
+  if(!opts.still){var catcher=new THREE.Mesh(new THREE.PlaneBufferGeometry(6,6),new THREE.ShadowMaterial({opacity:0.55,depthWrite:false}));catcher.rotation.x=-Math.PI/2;catcher.position.y=0.001;catcher.renderOrder=-1;catcher.receiveShadow=true;sc.add(catcher);}
   this.tinted=i3dStyle(obj);var bb=i3dFit(obj);sc.add(obj);this.obj=obj;
   var cam=this.cam=new THREE.PerspectiveCamera(35,w/h,0.02,100);
   /* on a narrow stage the control column (40 px) sits over the model's right edge: slide the picture left so nothing runs under it */
@@ -23351,7 +23373,9 @@ function I3DView(host,obj,opts){
     var moving=ctl.update();var t=performance.now();r.render(sc,cam);
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}
     self._lastT=moving?t:0;
-    if(moving||ctl.autoRotate||Date.now()<self._until)self.raf=requestAnimationFrame(loop);};
+    /* R18 (owner, 4 Nov: closing took 5 s): ctl.update() fires 'change', which kicks a frame, so only queue one if none is queued yet.
+       Queuing both doubled the draws every frame (2, 4, 8 ...) until the page froze and a tap on X waited behind them. */
+    if((moving||ctl.autoRotate||Date.now()<self._until)&&!self.raf)self.raf=requestAnimationFrame(loop);};
   this._loop=loop;this._off=false;
   if(window.ResizeObserver){this.ro=new ResizeObserver(function(){self.kick();});this.ro.observe(host);}
   if(window.IntersectionObserver){this.io=new IntersectionObserver(function(es){var vis=es[es.length-1].isIntersecting;if(vis===!self._off)return;self._off=!vis;if(vis)self.kick(200);},{threshold:.01});this.io.observe(host);}
@@ -23361,16 +23385,17 @@ function I3DView(host,obj,opts){
 I3DView.prototype.kick=function(ms){this._until=Math.max(this._until||0,Date.now()+(ms||400));if(!this.raf&&!this.dead&&this._loop)this.raf=requestAnimationFrame(this._loop);};
 I3DView.prototype.goLite=function(){if(this._lite)return;this._lite=true;this.r.shadowMap.enabled=false;this.sc.traverse(function(o){if(o.isDirectionalLight)o.castShadow=false;var m=o.material;if(!m)return;(Array.isArray(m)?m:[m]).forEach(function(x){x.needsUpdate=true;});});this.r.setPixelRatio(1);this._w=0;this.kick(300);};
 I3DView.prototype.zoom=function(f){var c=this.cam,t=this.ctl.target,v=c.position.clone().sub(t),d=Math.min(this.ctl.maxDistance,Math.max(this.ctl.minDistance,v.length()*f));c.position.copy(t).add(v.setLength(d));this.kick();};
-I3DView.prototype.reset=function(){this.cam.position.copy(this.home.p);this.ctl.target.copy(this.home.t);this.kick();};
+I3DView.prototype.reset=function(){var c=this.ctl,d=c.enableDamping;c.enableDamping=false;c.update();c.enableDamping=d;   // spend any drag momentum first (one update a frame now, R18), so the camera stays home
+  this.cam.position.copy(this.home.p);c.target.copy(this.home.t);c.update();this.kick();};
 I3DView.prototype.dispose=function(){
   this.dead=true;cancelAnimationFrame(this.raf);this.raf=0;try{this.ctl&&this.ctl.dispose();}catch(e){}
   try{this.ro&&this.ro.disconnect();this.io&&this.io.disconnect();this._onVis&&document.removeEventListener('visibilitychange',this._onVis);}catch(e){}
   this.sc.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(function(m){m&&m.dispose&&m.dispose();});});
-  try{this.r.dispose();this.r.forceContextLoss();}catch(e){}var cv=this.r.domElement;cv.parentNode&&cv.parentNode.removeChild(cv);
+  try{this._gtex&&this._gtex.dispose();this.r.dispose();this.r.forceContextLoss();}catch(e){}var cv=this.r.domElement;cv.parentNode&&cv.parentNode.removeChild(cv);
 };
 // small still picture for the tile (one short-lived renderer, so tiles never hold WebGL contexts)
 function i3dThumb(obj){
-  var d=document.createElement('div');d.style.cssText='position:fixed;left:-9999px;top:0;width:240px;height:240px';document.body.appendChild(d);
+  var d=document.createElement('div');d.style.cssText='position:fixed;left:-9999px;top:0;width:360px;height:360px';document.body.appendChild(d);
   try{var v=new I3DView(d,obj,{still:true});var url=v.r.domElement.toDataURL('image/jpeg',0.78);v.sc.remove(obj);v.dispose();return url;}finally{d.remove();}
 }
 // save a model (ArrayBuffer) on an item
@@ -23383,7 +23408,7 @@ async function i3dSave(kind,id,buf,meta){
   i3dMsg('Saving it on this device…');await tick();
   await i3dPut(kind,id,buf,fmt);
   i3dStyle(obj);await tick();
-  it.model=Object.assign({},meta,{fmt:fmt,thumb:i3dThumb(obj),tv:2,at:Date.now()});
+  it.model=Object.assign({},meta,{fmt:fmt,thumb:i3dThumb(obj),tv:3,at:Date.now()});
   saveAL();renderAlTab();_i3dReady={kind:kind,id:id,obj:obj};return it.model;
 }
 var _i3dView=null,_i3dBusy=false,_i3dReady=null;   // _i3dReady: the model just saved, already read, so the viewer does not read it twice
@@ -23554,16 +23579,16 @@ function i3dLive(kind,id,img,force){
     window._i3dSeen=true;[].forEach.call(document.querySelectorAll('.i3d-badge'),function(b){b.textContent='3D'});
   }).catch(function(){if(_i3dLive===rec)_i3dLive=null;});
 }
-/* pictures saved by the earlier green-tinted build (no tv mark) are redrawn once, from the saved model, in its own colours (owner, 31 Oct) */
+/* pictures saved by an earlier build (tv below 3: the green tint, then the flat stage before v0.9.1 R17) are redrawn once, from the saved model, in the current look and at 360 px (owner, 31 Oct and 4 Nov) */
 var _i3dRe={run:false,tried:{}};
 function i3dRefreshThumbs(){
   if(_i3dRe.run||!viGlOk())return;
-  var todo=[];[['wi',alState.otherAssets],['li',alState.liabilities]].forEach(function(g){(g[1]||[]).forEach(function(it){if(it.model&&it.model.thumb&&it.model.tv!==2&&!_i3dRe.tried[g[0]+it.id])todo.push([g[0],it])})});
+  var todo=[];[['wi',alState.otherAssets],['li',alState.liabilities]].forEach(function(g){(g[1]||[]).forEach(function(it){if(it.model&&it.model.thumb&&it.model.tv!==3&&!_i3dRe.tried[g[0]+it.id])todo.push([g[0],it])})});
   if(!todo.length)return;_i3dRe.run=true;
   (async function(){
     for(var i=0;i<todo.length;i++){var k=todo[i][0],it=todo[i][1];_i3dRe.tried[k+it.id]=1;
       try{var rc=await i3dGetRec(k,it.id);if(!rc)continue;var obj=await i3dParse(rc.buf.slice(0),rc.fmt,k);i3dStyle(obj);
-        it.model.thumb=i3dThumb(obj);it.model.tv=2;saveAL();
+        it.model.thumb=i3dThumb(obj);it.model.tv=3;saveAL();
         [].forEach.call(document.querySelectorAll('img.i3d-thumb'),function(im){if((im.getAttribute('onclick')||'').indexOf("'"+k+"',"+it.id+",")>-1)im.src=it.model.thumb});
       }catch(e){}}
     _i3dRe.run=false;
