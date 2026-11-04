@@ -18,7 +18,7 @@ The single list of instructed work. Every session reads it at start and before e
   - No production pushes before the owner's 17:00 pitch call (owner, 4 Nov).
   - Round 2 A chrome (R1, R23 to R26), B labels and flow (R2, R9 to R11) and G crypto (R19, R20): sessions paused 4 Nov ~10:15, worktrees kept.
   - Round 2 F item viewer (R17, R18, R21): merged into `candidate/v0.9.1` 4a0ce74 at 14:48 but not in the v0.9.1 release; ships with 0.9.2.
-  - I tier prices and icons: `v091r2/tiers` 68edfab, not merged. Merges cleanly with the released badge copy (checked 4 Nov).
+  - I tier prices and icons: `v091r2/tiers` 3aaa2ac (candidate 4a0ce74 merged in), CI green run 41865489011, Pedro PASS, rollout-qc PASS, not merged. Merges cleanly with the released badge copy (checked 4 Nov).
   - Second-hand prices function deploy, plus the DISCOGS_TOKEN secret (owner types it on the laptop).
   - Cash 3D default view, where blocks read as gold cubes, not a fine coin grid (owner to decide).
   - Tests: serve all browser tests over http, not file://; make every test honour VI_INDEX, with the repo root derived from it.
