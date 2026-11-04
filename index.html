@@ -12045,27 +12045,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <p class="vi-camp-sub">Vault-It is the financial operating system you own. Back the build early: lock in your price forever, and help shape what gets built next.</p>
     </div>
     <div class="vi-camp-body">
-      <!-- Progress -->
-      <div class="vi-camp-progress">
-        <div class="vi-camp-stats">
-          <div class="vi-camp-stat">
-            <span class="vi-camp-stat-val" id="camp-backers">–</span>
-            <span class="vi-camp-stat-lbl">Backers</span>
-          </div>
-          <div class="vi-camp-stat">
-            <span class="vi-camp-stat-val" id="camp-pct">–</span>
-            <span class="vi-camp-stat-lbl">Funded</span>
-          </div>
-          <div class="vi-camp-stat">
-            <span class="vi-camp-stat-val" id="camp-days">Open</span>
-            <span class="vi-camp-stat-lbl">Days left</span>
-          </div>
-        </div>
-        <div class="vi-camp-bar-track">
-          <div class="vi-camp-bar-fill" id="camp-bar-fill" style="width:0%"></div>
-        </div>
-        <div class="vi-camp-bar-lbl" id="camp-bar-lbl"></div>
-      </div>
       <!-- Tier cards -->
       <div class="vi-camp-tiers">
         <!-- Free -->
@@ -28053,7 +28032,7 @@ var VI_CAMPAIGN = {
   raisedGBP:    0,       // total £ raised
   goalGBP:      9980,    // funding target (200 × £49.90 avg)
   founderSlots: 100,     // max founding member places (enforced by the Stripe link's payment limit)
-  founderTaken: 0,       // founding member spots taken
+  founderTaken: null,    // paid founding members: from the server's campaign_counts() (migration 014); null until it answers, never seeded
   deadline:     ''       // an end date (YYYY-MM-DD) when the owner sets one; until then the modal says Open
 };
 
@@ -29170,19 +29149,10 @@ function viApplyFounderBadge() {
 }
 
 // ── CAMPAIGN MODAL ─────────────────────────────────────────
-function viCampaignPaint() {
-  var c = VI_CAMPAIGN;
-  var known = typeof c.backers === 'number';   // a missing count is a dash, never a zero: 0 only when the server says 0
-  var pct = known && c.goal > 0 ? Math.min(Math.round((c.backers / c.goal) * 100), 100) : 0;
-  var daysLeft = null;
-  if (c.deadline) { var dl = new Date(c.deadline); if (!isNaN(dl)) daysLeft = Math.max(0, Math.ceil((dl - new Date()) / 86400000)); }
-  var set = function (id, t) { var e = document.getElementById(id); if (e) e.textContent = t; };
-  set('camp-backers', known ? c.backers.toLocaleString() : '–');
-  set('camp-pct', known ? pct + '%' : '–');
-  set('camp-days', daysLeft === null ? 'Open' : String(daysLeft));
-  var bar = document.getElementById('camp-bar-fill'); if (bar) setTimeout(function () { bar.style.width = pct + '%'; }, 100);
-  set('camp-bar-lbl', known ? c.backers + ' of ' + c.goal + ' backers' : '');
-  set('camp-founder-slots', Math.max(0, c.founderSlots - c.founderTaken) + ' places');
+function viCampaignPaint() {   // owner, 3 Nov: the Founding badge says just "N left": the Stripe cap (founderSlots) minus real paid founders from campaign_counts(); "100 places" until the counts load
+  var c = VI_CAMPAIGN, e = document.getElementById('camp-founder-slots'); if (!e) return;
+  var known = typeof c.founderTaken === 'number';
+  e.textContent = known ? Math.max(0, c.founderSlots - c.founderTaken) + ' left' : c.founderSlots + ' places';
 }
 // the Vaulter card: both prices come from VI_PLANS, so a price change there is the only edit
 function viCampaignPrices() {
