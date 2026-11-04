@@ -21972,7 +21972,7 @@ V3Scene.prototype.introStop=function(done){
   if(done===true)v3Seen(this._stageName(),R.note);
   this.kick(200);
 };
-V3Scene.prototype.size=function(){var w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;if(w!==this._w||h!==this._h||this.r._v3on!==this){this._w=w;this._h=h;this.r._v3on=this;var pr=this._lite?1:this._dpr(w,h);if(this.r.getPixelRatio()!==pr)this.r.setPixelRatio(pr);this.r.setSize(w,h,false);this.cam.aspect=w/h;this.cam.updateProjectionMatrix();}};   // the shared renderer takes this stage's size and pixel ratio
+V3Scene.prototype.size=function(){var w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;if(w!==this._w||h!==this._h||this.r._v3on!==this){this._w=w;this._h=h;this.r._v3on=this;var pr=this._lite?1:this._dpr(w,h),sz=this.r.getDrawingBufferSize(new THREE.Vector2());if(sz.x!==Math.floor(w*pr)||sz.y!==Math.floor(h*pr)||this.r.getPixelRatio()!==pr)this.r.setDrawingBufferSize(w,h,pr);else this.r.setViewport(0,0,w,h);this.cam.aspect=w/h;this.cam.updateProjectionMatrix();}};   // the shared renderer takes this stage's size and pixel ratio in one step: a pixel ratio change and a resize each reallocate the drawing buffer, so they are one call, and none when nothing changed (v0.9.2)
 /* R16 (owner, 4 Nov: "learn from housebuilder viewport"): the house builder's pixel ratio. Full at rest (up to 2, inside the
    same pixel budget) for sharp coin rims; 1.25 on a phone (1.5 wider) while coins land, the camera turns or a finger is down.
    The drawing buffer is resized only when that changes. This replaces the flat 1.5 cap of E13. */
@@ -23671,10 +23671,10 @@ function i3dHintHtml(m){
 }
 function i3dItem(kind,id){return ((kind==='li'?alState.liabilities:alState.otherAssets)||[]).find(function(x){return x.id===id;});}
 function i3dKey(kind,id){return 'm:'+kind+':'+id;}
-function i3dPut(kind,id,buf,fmt){return invTx('readwrite',function(s){return s.put({glb:buf,fmt:fmt||'glb',updated:Date.now()},i3dKey(kind,id));});}   // the bytes stay under `glb` (old records); `fmt` says which format they are
+function i3dPut(kind,id,buf,fmt){i3dCacheDrop(i3dKey(kind,id),true);return invTx('readwrite',function(s){return s.put({glb:buf,fmt:fmt||'glb',updated:Date.now()},i3dKey(kind,id));});}   // the bytes stay under `glb` (old records); `fmt` says which format they are
 function i3dGetRec(kind,id){return invTx('readonly',function(s){return s.get(i3dKey(kind,id));}).then(function(v){return v&&v.glb?{buf:v.glb,fmt:v.fmt||'glb'}:null;});}
 function i3dGetBuf(kind,id){return i3dGetRec(kind,id).then(function(r){return r&&r.buf;});}
-function i3dDel(kind,id){try{return invTx('readwrite',function(s){return s.delete(i3dKey(kind,id));});}catch(e){return Promise.resolve();}}
+function i3dDel(kind,id){i3dCacheDrop(i3dKey(kind,id),true);try{return invTx('readwrite',function(s){return s.delete(i3dKey(kind,id));});}catch(e){return Promise.resolve();}}
 // fetch a library model from our own copy (same origin); a web page or an error is never mistaken for a model
 function i3dFetchLib(file){
   return fetch(I3D_BASE+file,{credentials:'omit'}).then(function(r){
@@ -23772,17 +23772,41 @@ function i3dGrid(half,step,hex,op,y){
   var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
   return new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:i3dCol(hex),transparent:true,opacity:op,depthWrite:false}));
 }
+/* v0.9.2 (owner, 4 Nov: "viewports still too slow"): the tile's live view and the full viewer share one WebGL renderer and one
+   stage (sky, floor, grid, lights), made on the first open and kept. Opening another item, or going from the tile to the full
+   viewer, only swaps the model: no new WebGL context, no shaders compiled again, and closing no longer waits for a context to be
+   torn down. Only one live view is open at a time; a second one at the same moment (never in normal use) gets its own renderer. */
+var _i3dSh=null;
+function i3dRenderer(still){
+  var r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:false,preserveDrawingBuffer:!!still});
+  r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.NoToneMapping;   // the model's own colours, not a film curve (owner, 31 Oct)
+  r.shadowMap.enabled=!still;r.shadowMap.type=THREE.PCFShadowMap;   // the still preview needs no shadows; the cheaper filter everywhere
+  return r;
+}
+function i3dShared(){
+  if(_i3dSh)return _i3dSh;
+  var S=_i3dSh={r:i3dRenderer(false),sc:new THREE.Scene(),view:null,lost:false};
+  i3dStage(S.sc,false);
+  var cv=S.r.domElement;cv.addEventListener('webglcontextlost',function(e){e.preventDefault();S.lost=true;});
+  cv.addEventListener('webglcontextrestored',function(){S.lost=false;if(S.view){S.view._w=0;S.view.kick(400);}});
+  return S;
+}
 function I3DView(host,obj,opts){
   opts=opts||{};var self=this;
   var w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);
-  var r=this.r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:false,preserveDrawingBuffer:!!opts.still});
-  r.setPixelRatio(viGlDpr(host));r.setSize(w,h,false);
-  r.domElement.addEventListener('webglcontextlost',function(e){e.preventDefault();self._lost=true;});r.domElement.addEventListener('webglcontextrestored',function(){self._lost=false;});
-  r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.NoToneMapping;   // the model's own colours, not a film curve (owner, 31 Oct)
-  r.shadowMap.enabled=!opts.still;r.shadowMap.type=THREE.PCFShadowMap;   // the still preview needs no shadows; the cheaper filter everywhere
-  var cv=r.domElement;cv.className='i3d-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',opts.label||'3D model');
+  var S=!opts.still&&viGlOk()?i3dShared():null;if(S&&S.view&&!S.view.dead)S=null;   // the shared stage is taken: this one has its own
+  var r=this.r=S?S.r:i3dRenderer(!!opts.still);this._sh=S;
+  if(S){S.view=this;if(S.lite)this._lite=true;}
+  else{r.domElement.addEventListener('webglcontextlost',function(e){e.preventDefault();self._lost=true;});r.domElement.addEventListener('webglcontextrestored',function(){self._lost=false;});}
+  r.setDrawingBufferSize(w,h,S&&S.lite?1:viGlDpr(host));   // size and pixel ratio in one go: each change reallocates the drawing buffer
+  var cv=r.domElement;cv.className='i3d-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',opts.label||'3D model');cv.removeAttribute('tabindex');cv.style.touchAction='';
   host.insertBefore(cv,host.firstChild);
-  var sc=this.sc=new THREE.Scene();sc.background=new THREE.Color(0x05101b);sc.fog=new THREE.Fog(0x05101b,9,26);
+  var sc=this.sc=S?S.sc:new THREE.Scene();if(!S)this._gtex=i3dStage(sc,!!opts.still);
+  this.tinted=i3dStyle(obj);var bb=i3dFit(obj);sc.add(obj);this.obj=obj;
+  this._rest(host,w,h,bb,opts);
+}
+// the stage every item stands on (see R17 below); returns the floor texture, which the owner of the scene disposes
+function i3dStage(sc,still){
   /* v0.9.1 R17 (owner, 4 Nov): more contrast in the sky and the floor, sharper floor lines, the environment glows teal while the
      model is lit only by white light. The teal is in the stage itself (sky dome and a pool of light on the floor, both unlit), so no
      coloured light ever reaches the model. The sky runs from near black overhead to a teal horizon; fog melts the floor into it. */
@@ -23794,17 +23818,20 @@ function I3DView(host,obj,opts){
   sky.userData.i3dEnv=hz;sky.renderOrder=-1;sc.add(sky);
   var gcv=document.createElement('canvas');gcv.width=gcv.height=256;var gx=gcv.getContext('2d'),gr=gx.createRadialGradient(128,128,0,128,128,128);
   gr.addColorStop(0,'#15504e');gr.addColorStop(0.07,'#0e3638');gr.addColorStop(0.22,'#081b1f');gr.addColorStop(1,'#030a0d');gx.fillStyle=gr;gx.fillRect(0,0,256,256);
-  var gtex=this._gtex=new THREE.CanvasTexture(gcv);gtex.encoding=THREE.sRGBEncoding;
+  var gtex=new THREE.CanvasTexture(gcv);gtex.encoding=THREE.sRGBEncoding;
   var ground=new THREE.Mesh(new THREE.CircleBufferGeometry(30,64),new THREE.MeshBasicMaterial({map:gtex}));ground.rotation.x=-Math.PI/2;ground.userData.i3dEnv=0x15504e;sc.add(ground);
   sc.add(i3dGrid(12,0.5,0x2c837c,0.45,0.002));sc.add(i3dGrid(12,2,0x5fd6cb,0.6,0.003));   // fine lines every 0.5, bright ones every 2
   /* white light only, so nothing tints the model */
   sc.add(new THREE.HemisphereLight(0xffffff,0x404040,0.9));
-  var key=new THREE.DirectionalLight(0xffffff,1.15);key.position.set(3,6,4);key.castShadow=!opts.still;var kms=viCoarse()?512:1024;key.shadow.mapSize.set(kms,kms);key.shadow.bias=-0.0005;
+  var key=new THREE.DirectionalLight(0xffffff,1.15);key.position.set(3,6,4);key.castShadow=!still;var kms=viCoarse()?512:1024;key.shadow.mapSize.set(kms,kms);key.shadow.bias=-0.0005;
   key.shadow.camera.left=key.shadow.camera.bottom=-2.5;key.shadow.camera.right=key.shadow.camera.top=2.5;sc.add(key);   // the shadow map covers just the model, so it stays crisp
   var fill=new THREE.DirectionalLight(0xffffff,0.35);fill.position.set(-4,3,-2);sc.add(fill);
   var rim=new THREE.DirectionalLight(0xffffff,0.45);rim.position.set(-2,3,-5);sc.add(rim);
-  if(!opts.still){var catcher=new THREE.Mesh(new THREE.PlaneBufferGeometry(6,6),new THREE.ShadowMaterial({opacity:0.55,depthWrite:false}));catcher.rotation.x=-Math.PI/2;catcher.position.y=0.001;catcher.renderOrder=-1;catcher.receiveShadow=true;sc.add(catcher);}
-  this.tinted=i3dStyle(obj);var bb=i3dFit(obj);sc.add(obj);this.obj=obj;
+  if(!still){var catcher=new THREE.Mesh(new THREE.PlaneBufferGeometry(6,6),new THREE.ShadowMaterial({opacity:0.55,depthWrite:false}));catcher.rotation.x=-Math.PI/2;catcher.position.y=0.001;catcher.renderOrder=-1;catcher.receiveShadow=true;sc.add(catcher);}
+  return gtex;
+}
+I3DView.prototype._rest=function(host,w,h,bb,opts){
+  var self=this,r=this.r,sc=this.sc,cv=r.domElement;
   var cam=this.cam=new THREE.PerspectiveCamera(35,w/h,0.02,100);
   /* on a narrow stage the control column (40 px) sits over the model's right edge: slide the picture left so nothing runs under it */
   this._vo=function(W,H){if(host.id==='i3d-stage'&&W<520)cam.setViewOffset(W,H,28,0,W,H);else if(cam.view)cam.clearViewOffset();};this._vo(w,h);
@@ -23822,8 +23849,8 @@ function I3DView(host,obj,opts){
   // draws only while something moves (drag, pinch, auto-rotate, a kick), never off screen or in a background tab
   /* F2 (R18 "it should run smooth"): the stage size comes from the ResizeObserver below; reading clientWidth here forced a style and layout
      pass every frame (about 5 ms a frame on a phone, with decorative animations behind the viewer). Without ResizeObserver it reads as before. */
-  this._rw=w;this._rh=h;
-  var loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}var W=self.ro?self._rw:host.clientWidth,H=self.ro?self._rh:host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;self._vo(W,H);cam.updateProjectionMatrix();}
+  this._rw=w;this._rh=h;this._w=w;this._h=h;
+  var loop=function(){self.raf=0;if(self.dead||self._lost||(self._sh&&self._sh.lost)||self._off||document.hidden){self._lastT=0;return;}var W=self.ro?self._rw:host.clientWidth,H=self.ro?self._rh:host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setDrawingBufferSize(W,H,self._lite?1:viGlDpr(host));cam.aspect=W/H;self._vo(W,H);cam.updateProjectionMatrix();}
     var moving=ctl.update();var t=performance.now();r.render(sc,cam);
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}
     self._lastT=moving?t:0;
@@ -23835,18 +23862,35 @@ function I3DView(host,obj,opts){
   if(window.IntersectionObserver){this.io=new IntersectionObserver(function(es){var vis=es[es.length-1].isIntersecting;if(vis===!self._off)return;self._off=!vis;if(vis)self.kick(200);},{threshold:.01});this.io.observe(host);}
   this._onVis=function(){if(!document.hidden)self.kick(200);};document.addEventListener('visibilitychange',this._onVis);
   this.kick(600);
-}
+};
 I3DView.prototype.kick=function(ms){this._until=Math.max(this._until||0,Date.now()+(ms||400));if(!this.raf&&!this.dead&&this._loop)this.raf=requestAnimationFrame(this._loop);};
-I3DView.prototype.goLite=function(){if(this._lite)return;this._lite=true;this.r.shadowMap.enabled=false;this.sc.traverse(function(o){if(o.isDirectionalLight)o.castShadow=false;var m=o.material;if(!m)return;(Array.isArray(m)?m:[m]).forEach(function(x){x.needsUpdate=true;});});this.r.setPixelRatio(1);this._w=0;this.kick(300);};
+I3DView.prototype.goLite=function(){if(this._lite)return;this._lite=true;if(this._sh)this._sh.lite=true;   // the shared stage stays lite for the rest of the visit: this phone cannot keep up
+  this.r.shadowMap.enabled=false;this.sc.traverse(function(o){if(o.isDirectionalLight)o.castShadow=false;var m=o.material;if(!m)return;(Array.isArray(m)?m:[m]).forEach(function(x){x.needsUpdate=true;});});this.r.setPixelRatio(1);this._w=0;this.kick(300);};
 I3DView.prototype.zoom=function(f){var c=this.cam,t=this.ctl.target,v=c.position.clone().sub(t),d=Math.min(this.ctl.maxDistance,Math.max(this.ctl.minDistance,v.length()*f));c.position.copy(t).add(v.setLength(d));this.kick();};
 I3DView.prototype.reset=function(){var c=this.ctl,d=c.enableDamping;c.enableDamping=false;c.update();c.enableDamping=d;   // spend any drag momentum first (one update a frame now, R18), so the camera stays home
   this.cam.position.copy(this.home.p);c.target.copy(this.home.t);c.update();this.kick();};
 I3DView.prototype.dispose=function(){
   this.dead=true;cancelAnimationFrame(this.raf);this.raf=0;try{this.ctl&&this.ctl.dispose();}catch(e){}
   try{this.ro&&this.ro.disconnect();this.io&&this.io.disconnect();this._onVis&&document.removeEventListener('visibilitychange',this._onVis);}catch(e){}
+  var S=this._sh;
+  if(S){   // the shared stage stays for the next open: take the model off it and the canvas off the page; the model is freed unless it is kept for a reopen
+    if(this.obj){S.sc.remove(this.obj);if(!i3dCached(this.obj))i3dFree(this.obj);}
+    if(S.view===this)S.view=null;var c0=S.r.domElement;c0.parentNode&&c0.parentNode.removeChild(c0);return;}
+  if(this.obj&&i3dCached(this.obj))this.sc.remove(this.obj);
   this.sc.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(function(m){m&&m.dispose&&m.dispose();});});
   try{this._gtex&&this._gtex.dispose();this.r.dispose();this.r.forceContextLoss();}catch(e){}var cv=this.r.domElement;cv.parentNode&&cv.parentNode.removeChild(cv);
 };
+/* v0.9.2: the last two models read are kept, already parsed, so the tile's live view hands its model to the full viewer and a
+   reopen reads nothing from the device again. A new file or a removed model drops the kept copy (i3dPut, i3dDel). */
+var _i3dKeep=[],_i3dVer={};   // _i3dVer: bumped when an item's file changes or goes, so a read that started before it is not kept
+function i3dCacheGet(kind,id){var k=i3dKey(kind,id);for(var i=0;i<_i3dKeep.length;i++)if(_i3dKeep[i].k===k)return _i3dKeep[i].obj;return null;}
+function i3dCachePut(kind,id,obj,ver){var k=i3dKey(kind,id);if(ver!=null&&ver!==(_i3dVer[k]||0))return false;i3dCacheDrop(k);_i3dKeep.unshift({k:k,obj:obj});
+  while(_i3dKeep.length>2){var old=_i3dKeep.pop();if(!old.obj.parent)i3dFree(old.obj);}return true;}
+function i3dVer(kind,id){return _i3dVer[i3dKey(kind,id)]||0;}
+function i3dCacheDrop(k,changed){if(changed)_i3dVer[k]=(_i3dVer[k]||0)+1;for(var i=_i3dKeep.length-1;i>=0;i--)if(_i3dKeep[i].k===k){var o=_i3dKeep.splice(i,1)[0].obj;if(!o.parent)i3dFree(o);}}
+function i3dCached(obj){return _i3dKeep.some(function(x){return x.obj===obj;});}
+function i3dFree(obj){obj.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(function(m){if(!m)return;
+  ['map','normalMap','roughnessMap','metalnessMap','emissiveMap','aoMap','alphaMap','bumpMap'].forEach(function(t){m[t]&&m[t].dispose&&m[t].dispose();});m.dispose&&m.dispose();});});}
 // small still picture for the tile (one short-lived renderer, so tiles never hold WebGL contexts)
 function i3dThumb(obj){
   var d=document.createElement('div');d.style.cssText='position:fixed;left:-9999px;top:0;width:360px;height:360px';document.body.appendChild(d);
@@ -23890,10 +23934,13 @@ async function i3dOpen(kind,id){
   try{
     var obj=null,pre=_i3dReady;_i3dReady=null;
     if(pre&&pre.kind===kind&&pre.id===id)obj=pre.obj;
-    else{var rec=await i3dGetRec(kind,id),buf=rec&&rec.buf,fmt=(rec&&rec.fmt)||m.fmt||'glb';
-      if(!buf&&(m.src==='lib'||m.src==='pp')){var lf=await i3dFileOf(m);if(lf){i3dMsg('Loading the model from the library…');buf=await i3dFetchLib(lf);await i3dPut(kind,id,buf,'glb');fmt='glb';i3dMsg('');}}
+    else if((obj=i3dCacheGet(kind,id))&&obj.parent)obj=null;   // read already (the tile's live view, or the last open); one in use elsewhere is read again
+    var ver=i3dVer(kind,id);
+    if(!obj){var rec=await i3dGetRec(kind,id),buf=rec&&rec.buf,fmt=(rec&&rec.fmt)||m.fmt||'glb';
+      if(!buf&&(m.src==='lib'||m.src==='pp')){var lf=await i3dFileOf(m);if(lf){i3dMsg('Loading the model from the library…');buf=await i3dFetchLib(lf);await i3dPut(kind,id,buf,'glb');ver=i3dVer(kind,id);fmt='glb';i3dMsg('');}}
       if(!buf)throw new Error('The 3D file is on the device you added it from. Upload it again here to see it on this device.');
       obj=await i3dParse(buf.slice(0),fmt,kind);}
+    i3dCachePut(kind,id,obj,ver);
     var st=document.getElementById('i3d-stage');if(!st)return;
     var w=document.getElementById('i3d-wait');w&&w.remove();
     _i3dView=new I3DView(st,obj,{label:'3D model of '+it.name});
@@ -23994,7 +24041,9 @@ function i3dLive(kind,id,img,force){
   if(!window.matchMedia||!(force||matchMedia('(hover: hover) and (pointer: fine)').matches)||!viGlOk())return;
   var key=kind+':'+id;if(_i3dLive&&_i3dLive.key===key&&_i3dLive.area.isConnected)return;
   i3dLiveStop();var area=img.parentNode,rec={key:key,area:area,img:img};_i3dLive=rec;
-  i3dGetRec(kind,id).then(function(r){return _i3dLive===rec&&r?i3dParse(r.buf.slice(0),r.fmt,kind):null}).then(function(obj){
+  var kept=i3dCacheGet(kind,id),ver=i3dVer(kind,id);if(kept&&kept.parent)kept=null;
+  (kept?Promise.resolve(kept):i3dGetRec(kind,id).then(function(r){return _i3dLive===rec&&r?i3dParse(r.buf.slice(0),r.fmt,kind):null})).then(function(obj){
+    if(obj&&_i3dLive===rec)i3dCachePut(kind,id,obj,ver);
     if(!obj||_i3dLive!==rec||!area.isConnected)return;
     var host=document.createElement('div');host.className='i3d-live';area.appendChild(host);rec.host=host;
     var it=i3dItem(kind,id);rec.view=new I3DView(host,obj,{auto:false,label:'3D model of '+(it?it.name:'the item')+'. Drag to turn it round, click to open it.'});
@@ -24016,19 +24065,19 @@ function i3dLive(kind,id,img,force){
     host.addEventListener('wheel',function(e){if(!engaged&&!e.ctrlKey&&!e.metaKey)ctl.enableZoom=false},{capture:true,passive:true});   // the page keeps this wheel turn
     host.addEventListener('wheel',function(){ctl.enableZoom=true},{passive:true});
     ctl.addEventListener('change',function(){var o=ctl.target.clone().sub(V.home.t);if(o.length()>2.5){o.setLength(2.5);var nt=V.home.t.clone().add(o);V.cam.position.add(nt.clone().sub(ctl.target));ctl.target.copy(nt)}});
-    cv.addEventListener('pointerdown',function(e){engaged=true;ptrs[e.pointerId]=1;if(Object.keys(ptrs).length>1)multi=true;d0=[e.clientX,e.clientY]});
+    host.addEventListener('pointerdown',function(e){engaged=true;ptrs[e.pointerId]=1;if(Object.keys(ptrs).length>1)multi=true;d0=[e.clientX,e.clientY]});
     var up=function(e){delete ptrs[e.pointerId];var none=!Object.keys(ptrs).length,wasMulti=multi;if(none)multi=false;
       if(e.type!=='pointerup'||wasMulti||!d0||Math.hypot(e.clientX-d0[0],e.clientY-d0[1])>=6){if(none)d0=null;return}
       d0=null;var now=Date.now();
       if(tapAt&&now-tapAt<340){clearTimeout(tapTimer);tapAt=0;V.reset()}
       else{tapAt=now;tapTimer=setTimeout(function(){tapAt=0;if(_i3dLive===rec)i3dOpen(kind,id)},350)}};
-    cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
-    cv.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')engaged=false});
+    host.addEventListener('pointerup',up);host.addEventListener('pointercancel',up);   // on the tile's own box, not the canvas: the canvas is shared with the full viewer (v0.9.2)
+    host.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')engaged=false});
     /* a hint chip says the tile can be turned (Pedro's review of v0.8 spec F): it fades on the first touch or after 4 s and does not come back this session. No button stack on a small tile; a tap opens the full viewer, a double tap resets */
     if(!window._i3dHintDone){var hint=document.createElement('div');hint.className='i3d-hint';
       hint.innerHTML='<svg class="vi-ic sm" aria-hidden="true"><use href="#vi-orbit"/></svg><span>Drag to turn</span>';host.appendChild(hint);
       var gone=function(){if(window._i3dHintDone)return;window._i3dHintDone=true;hint.classList.add('off');setTimeout(function(){hint.remove()},300)};
-      setTimeout(gone,4000);cv.addEventListener('pointerdown',gone,{once:true})}
+      setTimeout(gone,4000);host.addEventListener('pointerdown',gone,{once:true})}
     img.style.visibility='hidden';
     window._i3dSeen=true;[].forEach.call(document.querySelectorAll('.i3d-badge'),function(b){b.textContent='3D'});
   }).catch(function(){if(_i3dLive===rec)_i3dLive=null;});
@@ -24048,7 +24097,22 @@ function i3dRefreshThumbs(){
     _i3dRe.run=false;
   })();
 }
-(function(){var _rat=window.renderAlTab;if(typeof _rat==='function')window.renderAlTab=renderAlTab=function(){i3dLiveStop();var r=_rat.apply(this,arguments);try{setTimeout(i3dRefreshThumbs,400)}catch(e){}return r};})();
+/* v0.9.2: once Assets is open and an item has a 3D model, the shared viewer (renderer, stage, and the model shader in its plain and
+   textured kinds) is made in an idle moment, so the first tap on a tile compiles little. Nothing is drawn on screen; it is drawn once
+   into the hidden canvas. The materials are kept, so three.js keeps their compiled shaders. */
+function i3dWarm(){
+  if(_i3dSh&&_i3dSh.warm)return;if(!window.THREE||!THREE.OrbitControls||!viGlOk())return;
+  var any=[].concat(alState.otherAssets||[],alState.liabilities||[]).some(function(it){return it.model&&it.model.thumb;});if(!any)return;
+  var pg=document.getElementById('assets-page');if(!pg||!pg.offsetParent)return;
+  var go=function(){if(_i3dSh&&_i3dSh.warm)return;try{var S=i3dShared();if(S.view)return;S.warm=1;
+    var tx=new THREE.DataTexture(new Uint8Array([200,200,200,255]),1,1,THREE.RGBAFormat);tx.encoding=THREE.sRGBEncoding;tx.needsUpdate=true;
+    var g=new THREE.BoxBufferGeometry(1,1,1),mk=[new THREE.MeshStandardMaterial({color:0x888888}),new THREE.MeshStandardMaterial({color:0xffffff,map:tx})];S.keep=mk;
+    var grp=new THREE.Group();mk.forEach(function(m){var o=new THREE.Mesh(g,m);o.castShadow=o.receiveShadow=true;grp.add(o);});S.sc.add(grp);
+    var cam=new THREE.PerspectiveCamera(35,1,0.02,100);cam.position.set(2.6,2,3.4);cam.lookAt(0,0.5,0);
+    S.r.setDrawingBufferSize(1,1,1);S.r.render(S.sc,cam);S.sc.remove(grp);g.dispose();}catch(e){}};
+  if(window.requestIdleCallback)requestIdleCallback(go,{timeout:5000});else setTimeout(go,800);
+}
+(function(){var _rat=window.renderAlTab;if(typeof _rat==='function')window.renderAlTab=renderAlTab=function(){i3dLiveStop();var r=_rat.apply(this,arguments);try{setTimeout(i3dRefreshThumbs,400);setTimeout(i3dWarm,600)}catch(e){}return r};})();
 
 function wiSearch(id){
   var a=(alState.otherAssets||[]).find(function(x){return x.id===id;});
