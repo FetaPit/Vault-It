@@ -3,6 +3,7 @@
 //  R4  each section has its own colour; every slate is outlined in its section's colour
 //  R5  (reversed in C2, 4 Nov ~12:40) only slates not achieved yet are greyed; achieved ones are in full colour
 //  C2  slate names are boxed labels, lower down, in the Next goals heading font, never overlapping
+//  C3  section names are wide Syne lettering painted on the ground in perspective
 //  R6  section dividers on the ground follow the perspective (they lean away from the middle of the view)
 //  R7  teal = standard, purple = big milestone, gold = one graduation slate per section, the last one in it
 //  R8  50 achievements, most in Foundation, Stabilise and Save; the new ones are triggered by data the app holds and never hold
@@ -156,6 +157,24 @@ const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
     ok(L2.every(x => /Syne/.test(x.font) && +x.wt >= 700), t + 'labels use the Next goals heading font, Syne bold (' + L2[0].font + ' ' + L2[0].wt + ')');
     const byX = L2.slice().sort((a, b) => a.l - b.l), clash = byX.filter((x, k) => k && x.l < byX[k - 1].r + 1).map(x => x.name);
     ok(clash.length === 0, t + 'no two labels overlap (' + clash.join(', ') + ')');
+    // C3 (owner, 4 Nov: "I do not like the stabilise font change to a wider version of the font and project the text for these stages across
+    // the ground plane in perspective"): each section name is wide Syne lettering lying flat on the ground: squashed in depth, stretched
+    // in width, and leaning away from the middle of the view like the grid; the lean follows the view as it scrolls
+    const sec = await p.evaluate(async () => {
+      const SC = document.getElementById('fire-timeline-scroll'), S = renderFIREroadmap._stages, gTop = document.getElementById('fire-ground').getBoundingClientRect().top;
+      const read = () => { const mid = SC.scrollLeft + SC.clientWidth / 2;
+        return [...document.querySelectorAll('#fire-roadmap-svg text.fire-sec')].map(t => { const m = t.transform.baseVal.consolidate(), mx = m && m.matrix, r = t.getBoundingClientRect(), cs = getComputedStyle(t);
+          return { txt: t.textContent, a: mx ? mx.a : 1, c: mx ? mx.c : 0, d: mx ? mx.d : 1, x: +t.getAttribute('data-x'), mid, top: r.top - gTop, w: r.width, h: r.height, font: cs.fontFamily, wt: +cs.fontWeight }; }); };
+      SC.scrollLeft = Math.max(0, S.findIndex(s => s.phase === 1) * FIRE_NODE); SC.dispatchEvent(new Event('scroll')); await new Promise(f => setTimeout(f, 500));
+      const r1 = read(); SC.scrollLeft += 200; SC.dispatchEvent(new Event('scroll')); await new Promise(f => setTimeout(f, 500));
+      const r2 = read(); return { r1, r2 };
+    });
+    const s1 = sec.r1.filter(x => Math.abs(x.x - x.mid) > 40);
+    ok(sec.r1.length > 0 && sec.r1.every(x => /Syne/.test(x.font) && x.wt >= 800 && x.top >= -2), t + 'section names are Syne lettering on the ground (' + sec.r1.map(x => x.txt + '@' + Math.round(x.top)).join(', ') + ')');
+    ok(sec.r1.every(x => x.a >= 1.2 && x.d <= 0.7 && x.w > x.h * 6), t + 'they are wide and lie flat: stretched across, squashed in depth (' + sec.r1.map(x => [x.a.toFixed(2), x.d.toFixed(2)].join('/')).join(' ') + ')');
+    ok(s1.length > 0 && s1.every(x => Math.abs(x.c) > 0.05 && Math.sign(x.c) === Math.sign(x.x - x.mid)), t + 'they lean away from the middle, with the ground perspective (' + s1.map(x => (x.x - x.mid).toFixed(0) + ':' + x.c.toFixed(2)).join(' ') + ')');
+    const moved = sec.r2.find(x => sec.r1.some(y => y.txt === x.txt && Math.abs(y.c - x.c) > 0.02));
+    ok(!!moved, t + 'the lean follows the view as the strip scrolls');
     await p.evaluate(() => { const SC = document.getElementById('fire-timeline-scroll'); SC.scrollLeft = 0; renderFIREroadmap(); });
     const side = await p.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
     ok(!side, t + 'no sideways scroll');

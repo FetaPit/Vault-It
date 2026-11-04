@@ -26694,7 +26694,10 @@ function renderFIREroadmap(){
     var a=Math.max(x0,sp.x0),b=Math.min(x1,sp.x1);
     if(b<=a)return;
     if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line class="fire-div" x1="'+sp.x0+'" y1="'+GT+'" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="1.2" opacity="0.6" stroke-dasharray="4 3"/>';
-    out+='<text x="'+((a+b)/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.7')+'" letter-spacing="2.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
+    // C3 (owner, 4 Nov: "change to a wider version of the font and project the text for these stages across the ground plane in perspective"):
+    // the section name is painted on the ground: big Syne lettering, stretched wide, squashed in depth and leaning with the grid (fireSecTf)
+    var scx=(a+b)/2,sby=H-15,vx0=SC.scrollLeft+containerW/2;
+    out+='<text class="fire-sec" data-x="'+scx+'" data-y="'+sby+'" x="'+scx+'" y="'+sby+'" transform="'+fireSecTf(scx,sby,vx0)+'" text-anchor="middle" font-size="26" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.9':'0.65')+'" letter-spacing="8">'+sp.label+(sp.done?' ✓':'')+'</text>';
   });
   var tokW=function(k){return k===nextIdx?80:64;},coinR=function(k){return tokW(k)/2;};   // card widths (owner, 3 Nov round 3: "larger"): 80 px for the stage to work on, 64 px for the rest
   // the path on the ground: solid up to the last passed stage, dashed beyond, running between the light pads (owner, 31 Oct)
@@ -26773,10 +26776,17 @@ function fireGround(){
   for(var x=vx-Math.floor((vx-L)/sp)*sp;x<=R+.1;x+=sp)o+='<line class="fg-v" x1="'+x.toFixed(1)+'" y1="0" x2="'+at(x,h)+'" y2="'+h+'"/>';
   g.setAttribute('viewBox','0 0 '+w+' '+h);g.innerHTML=o;
 }
+// lettering lying on the ground (C3): about its baseline point (x,y), 1.35 times wider (the "wider version of the font"), squashed to half
+// its height by the depth, and sheared so its uprights run towards the grid's vanishing point, as the dividers do
+function fireSecTf(x,y,vx){
+  var gy=y-(FIRE_H-FIRE_GH),k=1+(FIRE_GF-1)*gy/FIRE_GH,a=1.35,d=.5,c=(x-vx)*(FIRE_GF-1)/(FIRE_GH*k)*d;
+  return 'matrix('+a+' 0 '+c.toFixed(4)+' '+d+' '+(x-a*x-c*y).toFixed(2)+' '+(y-d*y).toFixed(2)+')';
+}
 // the section dividers lie on the ground, so their near end follows the same perspective as the grid (R6); the view's middle moves as it scrolls
 function fireDividers(SC){
   var vx=SC.scrollLeft+SC.clientWidth/2;
   [].forEach.call(document.querySelectorAll('#fire-roadmap-svg line.fire-div'),function(l){var x=+l.getAttribute('x1');l.setAttribute('x2',fireGroundX(x,FIRE_GH,vx).toFixed(1));});
+  [].forEach.call(document.querySelectorAll('#fire-roadmap-svg text.fire-sec'),function(t){t.setAttribute('transform',fireSecTf(+t.getAttribute('data-x'),+t.getAttribute('data-y'),vx));});
 }
 function fireCarousel(){
   try{fireGround();}catch(e){}
