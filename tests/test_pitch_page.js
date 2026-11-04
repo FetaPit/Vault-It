@@ -111,6 +111,33 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll in the one-slide view on a phone');
   ok(p.errs.length === 0, 'no page errors: ' + p.errs.join(' | '));
 
+  // Presenter view: a private second window with beats and cues that follows the audience deck, and drives it
+  const ctx2 = await b.newContext({ viewport: { width: 1280, height: 800 } });
+  const aud = await ctx2.newPage(); aud.errs = []; aud.on('pageerror', (e) => aud.errs.push(e.message));
+  const pre = await ctx2.newPage(); pre.errs = []; pre.on('pageerror', (e) => pre.errs.push(e.message));
+  await aud.goto(BASE + '/pitch-Eligent?present=1', { waitUntil: 'domcontentloaded' });
+  await pre.goto(BASE + '/pitch-Eligent-presenter', { waitUntil: 'domcontentloaded' }); await pre.waitForTimeout(500);
+  const pn = () => pre.evaluate(() => document.getElementById('pr-n').textContent.trim());
+  const beat = () => pre.evaluate(() => document.getElementById('pr-beat').textContent.trim());
+  ok(await aud.evaluate(() => document.body.classList.contains('present')) && (await counter(aud)).trim() === '1 / 15', '?present=1 opens the audience deck in the one-slide view');
+  ok(/linked/i.test(await pre.evaluate(() => document.getElementById('pr-link').textContent)), 'the presenter view shows it is linked to the audience window');
+  ok(/\b1 \/ 15/.test(await pn()) && (await beat()).length > 3, 'the presenter view starts on slide 1 with its beat: ' + (await pn()) + ' · ' + (await beat()));
+  const b1 = await beat();
+  await aud.keyboard.press('ArrowRight'); await pre.waitForTimeout(300);
+  ok(/\b2 \/ 15/.test(await pn()) && (await beat()) !== b1, 'moving the audience deck switches the notes: ' + (await pn()) + ' · ' + (await beat()));
+  await pre.click('#pr-next'); await pre.waitForTimeout(300);
+  ok((await counter(aud)).trim() === '3 / 15', 'Next in the presenter view moves the audience deck: ' + (await counter(aud)));
+  await pre.keyboard.press('ArrowRight'); await pre.keyboard.press('ArrowRight'); await pre.waitForTimeout(300);
+  ok((await counter(aud)).trim() === '5 / 15' && /\b5 \/ 15/.test(await pn()), 'arrow keys in the presenter view drive the audience deck too');
+  ok(/drag/i.test(await pre.evaluate(() => document.getElementById('pr-cues').textContent)), 'the live demo slide carries its DO cue');
+  ok((await pre.locator('#pr-cues svg').count()) >= 2, 'the cues carry their icons');
+  ok(await pre.evaluate(() => document.querySelector('#pr-cur .frame, #pr-cur section') !== null && document.querySelector('#pr-nxt section') !== null), 'the mirror shows the current and next slide');
+  ok(!/pr-|presenter/.test(await aud.evaluate(() => document.body.innerText)), 'nothing from the presenter view shows in the audience window');
+  for (const [w, h] of [[1280, 800], [390, 844]]) { await pre.setViewportSize({ width: w, height: h }); await pre.waitForTimeout(200);
+    ok(await pre.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'presenter view has no sideways scroll at ' + w + ' px'); }
+  ok(aud.errs.length === 0 && pre.errs.length === 0, 'no page errors in either window: ' + aud.errs.concat(pre.errs).join(' | '));
+  await ctx2.close();
+
   await b.close(); srv.close();
   console.log(fails ? 'FAILURES ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);
 })().catch((e) => { console.log('FAIL:', e.message); process.exit(1); });
