@@ -10895,9 +10895,13 @@ button.bd-ic{cursor:pointer}
 /* the coin (owner, 4 Nov: "light turn animations like the Financial freedom roadmap", then "a satisfying thickness and light reflections upon rotating, no more than 10 degrees"):
    a gentle swing of 10 degrees either way; fourteen thin gold discs behind the face give it real edge thickness; a soft light streak sweeps the face as it swings; all still for reduced motion */
 .cr-coin{position:relative;display:flex;flex:none;transform-style:preserve-3d;animation:cr-turn 5s ease-in-out infinite;animation-delay:calc(var(--i,0) * -1.3s)}
-.cr-coin .cr-edge{position:absolute;inset:0;border-radius:50%;transform:translateZ(calc(var(--k) * -3.2px));background:linear-gradient(180deg,#fbefc4,#e0b552 50%,#9a6f22);box-shadow:inset 0 0 0 1px rgba(0,0,0,.28)}
-.cr-coin .cr-edge:nth-child(even){filter:brightness(.88)}
-.cr-tile .stk-hl{position:relative}
+.cr-coin .cr-edge{position:absolute;inset:0;border-radius:50%;transform:translateZ(calc(var(--k) * -3.2px));background:linear-gradient(180deg,color-mix(in srgb,var(--coin,#d9a93a) 40%,#fff),var(--coin,#d9a93a) 50%,color-mix(in srgb,var(--coin,#d9a93a) 50%,#000));box-shadow:inset 0 0 0 1px rgba(0,0,0,.3)}
+.cr-coin .cr-edge:nth-child(even){filter:brightness(.8)}   /* alternate darker discs read as a milled edge */
+.cr-tile .stk-hl{position:relative;padding:10%;box-sizing:border-box;background:linear-gradient(135deg,color-mix(in srgb,var(--coin,#d9a93a) 42%,#fff),var(--coin,#d9a93a) 42%,color-mix(in srgb,var(--coin,#d9a93a) 55%,#000));box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset 0 -2px 4px rgba(0,0,0,.3),0 0 20px -6px rgb(var(--teal-rgb) / .5)}
+/* semi photo realistic (owner's two reference coins): a raised bevelled rim in the coin's own colour, the logo set in a groove, a soft spherical highlight over the face */
+.cr-tile .stk-hl img,.cr-tile .stk-hl .stk-hl-fb{border-radius:50%}
+.cr-tile .stk-hl img{box-shadow:0 0 0 1.5px rgba(0,0,0,.42),0 1px 0 3px rgba(255,255,255,.3)}
+.cr-tile .stk-hl::before{content:'';position:absolute;inset:10%;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.42),rgba(255,255,255,0) 46%),radial-gradient(circle at 72% 82%,rgba(0,0,0,.24),rgba(0,0,0,0) 55%)}
 .cr-tile .stk-hl::after{content:'';position:absolute;top:0;bottom:0;left:-60%;width:220%;pointer-events:none;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.55) 49%,rgba(255,255,255,.14) 54%,transparent 60%);transform:translateX(-30%);animation:cr-sheen 5s ease-in-out infinite;animation-delay:calc(var(--i,0) * -1.3s)}
 @keyframes cr-turn{0%,100%{transform:perspective(1200px) rotateY(-10deg)}50%{transform:perspective(1200px) rotateY(10deg)}}
 @keyframes cr-sheen{0%,100%{transform:translateX(-30%)}50%{transform:translateX(30%)}}
@@ -22850,7 +22854,8 @@ function crCoinBadge(h,px,col){
   return '<span class="stk-hl cr-hl" style="width:'+px+'px;height:'+px+'px;border-radius:50%">'
     +(url?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+stkEsc(url)+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="stk-hl-fb" style="display:none;width:100%;height:100%">'+fb+'</span>':fb)+'</span>';
 }
-function crCoin3d(h,px,col){var e='';for(var k=1;k<=14;k++)e+='<i class="cr-edge" style="--k:'+k+'"></i>';return '<span class="cr-coin" aria-hidden="true">'+e+crCoinBadge(h,px,col)+'</span>';}
+function crCoinHue(sym){var m=VI_COIN_SVG[sym]&&/<circle[^>]*fill='(#[0-9a-fA-F]{6})'/.exec(VI_COIN_SVG[sym]);return m?m[1]:'#d9a93a';}   // the coin's own colour from its logo; gold for a coin with none
+function crCoin3d(h,px,col){var e='';for(var k=1;k<=14;k++)e+='<i class="cr-edge" style="--k:'+k+'"></i>';return '<span class="cr-coin" aria-hidden="true" style="--coin:'+crCoinHue(h.sym)+'">'+e+crCoinBadge(h,px,col)+'</span>';}
 function crAllocView(){try{return localStorage.getItem('vi-cr-alloc')==='tree'?'tree':'bars';}catch(e){return 'bars';}}
 function crSetAlloc(v){try{localStorage.setItem('vi-cr-alloc',v);}catch(e){}crRender();}
 function crGrpOpen(w,n){var m=stkOpenMap(),k='cr:'+w;return m[k]===undefined?n<=1:!!m[k];}

@@ -94,6 +94,23 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     ok(am.moved && am.staggered, t + 'the coins are actually swinging, each out of step with the next');
     ok(am.style3d === 'preserve-3d' && am.edges >= 8 && am.depth >= 12, t + 'each coin has real thickness: ' + am.edges + ' edge layers, ' + am.depth + ' px deep');
     ok(am.sheenName === 'cr-sheen' && /gradient/.test(am.sheenBg) && am.sheenMoved, t + 'a light reflection sweeps across the face as the coin swings (' + am.sheenName + ')');
+    // R20d (owner, 4 Nov, two reference coins): "inspiration for a semi photo realistic style": a raised bevelled rim in the coin's own colour, a recessed groove round the logo,
+    //  a soft spherical highlight on the face, and a milled edge, instead of a flat sticker.
+    const ph = await page.evaluate(() => {
+      const els = [...document.querySelectorAll('#crypto-table .cr-tile')];
+      return els.map(t => {
+        const coin = t.querySelector('.cr-coin'), face = coin.querySelector('.stk-hl'), img = face.querySelector('img'), edge = coin.querySelector('.cr-edge');
+        const cs = getComputedStyle(face), bef = getComputedStyle(face, '::before'), im = img ? getComputedStyle(img) : null;
+        return { sym: (t.querySelector('.stk-tk') || {}).textContent.trim(), hue: coin.style.getPropertyValue('--coin').trim(), rimPad: parseFloat(cs.paddingLeft), face: face.offsetWidth,
+          rimBg: /gradient/.test(cs.backgroundImage), spec: /radial-gradient/.test(bef.backgroundImage) && bef.content !== 'none', groove: im ? im.boxShadow !== 'none' : true,
+          imgW: img ? img.offsetWidth : 0, edgeBg: getComputedStyle(edge).backgroundImage };
+      });
+    });
+    ok(ph.every(x => /^#[0-9a-f]{6}$/i.test(x.hue)) && /f7931a/i.test(ph[0].hue) && ph[0].hue !== ph[1].hue, t + 'each coin carries its own colour for the rim and edge (' + ph.map(x => x.sym + ' ' + x.hue).join(', ') + ')');
+    ok(ph.every(x => x.rimBg && x.rimPad >= x.face * 0.07), t + 'a raised bevelled rim surrounds the logo (' + ph.map(x => Math.round(x.rimPad)).join(',') + ' px of ' + ph[0].face + ')');
+    ok(ph.every(x => x.groove && x.imgW >= x.face * 0.66), t + 'the logo sits in a recessed groove and stays large enough to read (' + ph.map(x => x.imgW).join(',') + ' px)');
+    ok(ph.every(x => x.spec), t + 'a soft spherical highlight lies over the face');
+    ok(ph.every(x => /gradient/.test(x.edgeBg)) && ph[0].edgeBg !== ph[1].edgeBg, t + 'the edge is metal in each coin\'s own colour');
     await page.emulateMedia({ reducedMotion: 'reduce' }); await page.waitForTimeout(200); am = await an();
     ok(am.name.every(x => x === 'none') && !am.moved && !am.sheenMoved && am.sheenName === 'none', t + 'with reduced motion the coins and their reflections stay still');
     ok(!errs.length, t + 'no page errors ' + errs.slice(0, 2).join('|'));
