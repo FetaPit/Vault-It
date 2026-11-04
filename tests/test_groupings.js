@@ -19,7 +19,7 @@ const seed = () => {
   const b = await chromium.launch(); const errs = [];
   for (const w of [1100, 390]) {
     const ctx = await b.newContext({ viewport: { width: w, height: 900 } }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-    await p.addInitScript(seed); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+    await p.addInitScript(seed); await p.goto('file://' + (process.env.VI_INDEX || require('path').join(__dirname, '..', 'index.html'))); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     // House
     await p.evaluate(() => showTab('house')); await p.waitForTimeout(2500);

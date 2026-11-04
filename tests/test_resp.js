@@ -17,14 +17,14 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
     ok(cols===1,w+'px: all six sub-tabs on one line');
     await p.context().close();
   }
-  // tablet: three across
+  // tablet: one row of six (v0.9.1, E24)
   let p=await open(768,1000); await p.evaluate(()=>showTab('assets')); await p.waitForTimeout(500);
   let rows=await p.evaluate(()=>{const m={};[...document.querySelectorAll('#assets-page .subtab-btn')].forEach(x=>{const t=Math.round(x.getBoundingClientRect().top);m[t]=(m[t]||0)+1;});return Object.values(m);});
-  ok(rows.join()==='3,3','tablet: sub-tabs three across ('+rows+')'); await p.context().close();
+  ok(rows.join()==='6','tablet: sub-tabs in one row of six, pinned (v0.9.1) ('+rows+')'); await p.context().close();
   // mobile
   p=await open(390,844,true); await p.evaluate(()=>showTab('assets')); await p.waitForTimeout(500);
   rows=await p.evaluate(()=>{const m={};[...document.querySelectorAll('#assets-page .subtab-btn')].forEach(x=>{const t=Math.round(x.getBoundingClientRect().top);m[t]=(m[t]||0)+1;});return Object.values(m);});
-  ok(rows.join()==='2,2,2','mobile: sub-tabs two across ('+rows+')');
+  ok(rows.join()==='6','mobile: sub-tabs in one row of six icons, pinned (v0.9.1) ('+rows+')');
   const st=await p.evaluate(()=>{const a=document.querySelector('#assets-page .subtab-btn.active'),i=document.querySelectorAll('#assets-page .subtab-btn:not(.active)')[0];const ca=getComputedStyle(a),ci=getComputedStyle(i);return{a:ca.borderTopColor,i:ci.borderTopColor,ac:ca.color,ic:ci.color};});
   console.log(JSON.stringify(st)); ok(st.a!==st.i&&st.ac!==st.ic,'selected tab is bright, idle tabs dark outlined');
   await p.evaluate(()=>{showSubtab('assets','stocks',document.querySelector('.subtab-btn[onclick*="stocks"]'));}); await p.waitForTimeout(700);

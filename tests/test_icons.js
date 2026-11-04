@@ -28,10 +28,10 @@ const EMOJI = /\p{Extended_Pictographic}/u;
     await p.waitForTimeout(800);
     const T = w + ' ' + theme + ': ';
     // crypto
-    const cr = await p.evaluate(() => [...document.querySelectorAll('#crypto-table .wi-tile')].map(t => { const im = t.querySelector('img.cr-logo'); const area = t.querySelector('.wi-img-area');
-      return { src: im ? im.getAttribute('src').slice(0, 26) : '', w: im ? im.naturalWidth : 0, vis: im ? getComputedStyle(im).display !== 'none' : false, text: area.textContent, fb: (t.querySelector('.cr-glyph:not([style*="none"])') || {}).textContent || '' }; }));
+    const cr = await p.evaluate(() => [...document.querySelectorAll('#crypto-table .cr-row')].map(t => { const im = t.querySelector('.stk-hl img'); const area = t.querySelector('.c-tk');
+      return { src: im ? im.getAttribute('src').slice(0, 26) : '', w: im ? im.naturalWidth : 0, vis: im ? getComputedStyle(im).display !== 'none' : false, text: area.textContent, fb: (t.querySelector('.stk-hl .stk-mono') || {}).textContent || '' }; }));
     ok(cr.length === 3 && cr.slice(0, 2).every(c => /^data:image\/svg\+xml/.test(c.src) && c.w > 0 && c.vis), T + 'BTC and ETH show their own logos with no network (' + cr.slice(0, 2).map(c => c.src + ' ' + c.w).join(', ') + ')');
-    ok(cr.every(c => !EMOJI.test(c.text)) && /ZZQ/.test(cr[2].fb), T + 'no emoji on any coin; a coin with no logo shows its ticker in a ring (' + JSON.stringify(cr[2].fb) + ')');
+    ok(cr.every(c => !EMOJI.test(c.text)) && /ZZ/.test(cr[2].fb), T + 'no emoji on any coin; a coin with no logo shows its ticker in a ring (' + JSON.stringify(cr[2].fb) + ')');
     // wealth inventory
     await p.evaluate(() => showSubtab('assets', 'other', null)); await p.waitForTimeout(500);
     const inv = () => p.evaluate(() => [...document.querySelectorAll('#other-assets-list .wi-tile')].map(t => ({ text: t.querySelector('.wi-img-area').textContent + [...t.querySelectorAll('button,label')].map(x => x.textContent).join(''), cube: !!t.querySelector('.wi-img-area svg polygon'), use: ((t.querySelector('.wi-img-area > svg use') || { getAttribute: () => '' }).getAttribute('href')) })));
