@@ -45,6 +45,8 @@ Catch: mail goes out through gmail.com, so some recipients see "via gmail.com" a
 
 ### Option B: a proper mailbox through your Google Workspace (recommended for pete@vault-it.co)
 
+**Blocked (4 Nov 2026):** adding vault-it.co to the ptlive.design Workspace fails with "This domain name has already been used as an alias or domain": another Google Workspace or Cloud Identity account holds it. The vault-it.co DNS has no `google-site-verification` record, so that account may never have verified it. The owner is checking old accounts (Wix's Google Workspace mailboxes, any trial). If none turns up, use Google's domain reclaim (the "Learn more" link next to that error), which proves ownership with a DNS TXT record. DNS edits from Claude also need the owner to allow the Cloudflare tool in this session.
+
 1. In the Workspace admin console (admin.google.com, signed in as the ptlive.design admin): **Account**, **Domains**, **Manage domains**, **Add a domain**, enter `vault-it.co` as a **secondary domain**.
 2. Google shows a TXT record to prove you own it. Claude adds it to Cloudflare DNS.
 3. Turn on DKIM for vault-it.co in Workspace (**Apps**, **Gmail**, **Authenticate email**) and Claude adds that TXT record too, plus `include:_spf.google.com` in the vault-it.co SPF record.
