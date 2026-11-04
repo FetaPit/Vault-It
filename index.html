@@ -8132,11 +8132,17 @@ html, body { background: var(--bg); color: var(--tx); font-family: var(--font-bo
 .mh-head{display:grid;grid-template-columns:78px 1fr 1fr 76px;gap:8px;font-size:max(.48rem,var(--vi-fs-1));letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin:0 0 6px}
 .mh-row{display:grid!important;grid-template-columns:78px 1fr 1fr 76px;gap:8px;align-items:center}
 .mh-cell{display:flex;align-items:center;gap:4px;min-width:0}
-.mh-cell .metal-inp{min-width:0;width:100%}
+.mh-cell .metal-inp{min-width:0;width:100%;min-height:44px}   /* Pedro, 3 Nov: Hold and Price are 44 px targets like the button */
 .mh-cell .metal-unit{width:34px;flex:none}
 .mh-k{display:none;font-size:max(.48rem,var(--vi-fs-1));color:var(--t2);text-transform:uppercase;letter-spacing:.08em;width:34px;flex:none}
 .mh-val{font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));text-align:right;white-space:nowrap}
-@media(max-width:600px){.mh-head{display:none}.mh-row{grid-template-columns:1fr auto;row-gap:6px;padding-bottom:8px;border-bottom:1px solid rgb(var(--ink-rgb) / .06)}.mh-row .mh-cell{grid-column:1 / -1}.mh-row .mh-val{grid-column:2;grid-row:1}.mh-k{display:inline}}
+/* v0.9.1 E22: one "Add to vault" button a metal, and the line that says a typed number is not in the vault yet */
+.mh-row{grid-template-columns:78px 1fr 1fr 124px 76px}
+.mh-head{grid-template-columns:78px 1fr 1fr 124px 76px}
+.metal-commit{min-height:44px;padding:0 10px;white-space:nowrap;font-size:max(.66rem,var(--vi-fs-2))}
+.metal-draft{grid-column:1 / -1;font-family:'Share Tech Mono',monospace;font-size:max(.66rem,var(--vi-fs-2));color:var(--t2);min-height:0}
+.metal-draft.on{color:var(--gold)}
+@media(max-width:600px){.mh-head{display:none}.mh-row{grid-template-columns:1fr auto;row-gap:6px;padding-bottom:8px;border-bottom:1px solid rgb(var(--ink-rgb) / .06)}.mh-row .mh-cell{grid-column:1 / -1}.mh-row .mh-val{grid-column:2;grid-row:1}.mh-k{display:inline}.metal-commit{grid-column:1 / -1;width:100%}}
 /* Chart filter/metric buttons */
 .chart-filter-group{display:flex;gap:0;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
 .chart-filter-btn,.chart-metric-btn{padding:4px 10px;background:transparent;border:none;border-right:1px solid var(--bd);color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:max(.55rem,var(--vi-fs-1));cursor:pointer;transition:all .15s;letter-spacing:.06em;text-transform:uppercase}
@@ -12853,7 +12859,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
         <div class="ov-data-card mh-card" style="margin-top:12px">
           <div class="ov-data-title" style="color:var(--gold)">Your metals and today's prices</div>
-          <div class="mh-head" aria-hidden="true"><span>Metal</span><span>You hold (troy oz)</span><span>Price per oz</span><span>Value</span></div>
+          <div class="mh-head" aria-hidden="true"><span>Metal</span><span>You hold (troy oz)</span><span>Price per oz</span><span>Add</span><span>Value</span></div>
           <div id="metals-inputs"></div>
           <button class="btn-add-data" style="width:100%;margin-top:8px" onclick="fetchMetalPrices()">↻ Fetch live prices</button>
         </div>
@@ -21547,23 +21553,135 @@ function V3Scene(host,label){
   ctl.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
   ctl.addEventListener('change',function(){self.kick();});
   // draws only while something moves (orbit, spin, a kick after a change), never off screen or in a background tab
-  this._loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}self._attach();self.size();var moving=self.ctl.update();var t=performance.now();self.r.render(self.sc,self.cam);if(window.VIPERF&&VIPERF.stageFrame)VIPERF.stageFrame(self===V3.metals?'Precious metals bars':'Cash and savings coins');
+  this._loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;if(self._introRun){self.introStop();self._introPlayed=false;self._introWait=1;}return;}self._attach();self.size();var moving=self.ctl.update();var t=performance.now();if(self._introRun)self._introStep(t);self.r.render(self.sc,self.cam);if(window.VIPERF&&VIPERF.stageFrame)VIPERF.stageFrame(self===V3.metals?'Precious metals bars':'Cash and savings coins');
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}   // adaptive quality from the measured frame gap
     self._lastT=moving?t:0;
-    if(moving||self._spin||Date.now()<self._until)self.raf=requestAnimationFrame(self._loop);};
+    if(moving||self._spin||self._introRun||Date.now()<self._until)self.raf=requestAnimationFrame(self._loop);};
   if(window.ResizeObserver){this.ro=new ResizeObserver(function(){self.kick();});this.ro.observe(host);}
   this._off=false;
-  if(window.IntersectionObserver){this.io=new IntersectionObserver(function(es){var vis=es[es.length-1].isIntersecting;if(vis===!self._off)return;self._off=!vis;if(vis)self.kick(200);},{threshold:.01});this.io.observe(host);}
+  if(window.IntersectionObserver){this.io=new IntersectionObserver(function(es){var vis=es[es.length-1].isIntersecting;if(vis===!self._off)return;self._off=!vis;if(vis){if(self._introRun)self._introRun.t0=performance.now();else if(self._introWait)self.introStart();self.kick(200);}},{threshold:.01});this.io.observe(host);}
   document.addEventListener('visibilitychange',function(){if(!document.hidden)self.kick(200);});
 }
 // lite quality for a device that cannot keep up (under ~14 frames a second while orbiting): shadows off, pixel ratio 1
 V3Scene.prototype._attach=function(){var cv=this.r.domElement;if(cv.parentNode!==this.host){this.host.insertBefore(cv,this.host.firstChild);cv.setAttribute('aria-label',this.label);this._w=0;}};   // the shared canvas comes to this stage (it was on the other one, or nowhere yet)
 V3Scene.prototype.goLite=function(){if(this._lite)return;this._lite=true;this.r.shadowMap.enabled=false;this.sun.castShadow=false;this.r.setPixelRatio(1);this._w=0;
   this.sc.traverse(function(o){var m=o.material;if(!m)return;(Array.isArray(m)?m:[m]).forEach(function(x){x.needsUpdate=true;});});this.kick(300);};
-V3Scene.prototype.size=function(){var w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;if(w!==this._w||h!==this._h||this.r._v3on!==this){this._w=w;this._h=h;this.r._v3on=this;var pr=this._lite?1:viGlDpr(this.host);if(this.r.getPixelRatio()!==pr)this.r.setPixelRatio(pr);this.r.setSize(w,h,false);this.cam.aspect=w/h;this.cam.updateProjectionMatrix();}};   // the shared renderer takes this stage's size and pixel ratio
+/* v0.9.1 E14 and E21 (owner, 3 Nov: "we don't have an intro animation here. Stacking the coins like we stack the
+   bricks ... triggered on view", and the same for the metal bars): the house builder's brick language. The coins and
+   bars arrive in groups, each group dropping onto its plate behind a gold copy of itself that disappears as the real
+   batch lands and settles to the coin or metal colour. The batches' own positions are never touched, so the scene
+   ends exactly as it would have been drawn with no animation, and the drop costs a handful of draws whatever the
+   balance. Off under reduced motion. introArm(tag, zone) plays it once per change of the figures; a zone limits it
+   to one metal (E22). */
+function v3Still(){try{return !!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);}catch(e){return false;}}
+V3Scene.prototype.introArm=function(tag,zone,silent){
+  if(this._introTag===tag&&this._introPlayed&&!zone)return;
+  this._introTag=tag;this._introPlayed=false;this._introZone=zone||null;
+  if(silent||v3Still()){this.introStop();this._introMs=0;return;}
+  this._introWait=1;if(!this._off)this.introStart();
+};
+V3Scene.prototype.introStart=function(){
+  this._introWait=0;
+  var zone=this._introZone,groups=[];
+  this.root.traverse(function(o){
+    if(!o.userData.v3Intro)return;
+    if(zone&&o.userData.v3Zone!==zone)return;
+    if(o.isInstancedMesh){var full=o.userData.v3Full||o.count,gs=Math.max(1,Math.ceil(full/14));
+      for(var i=0;i<full;i+=gs)groups.push({im:o,from:i,to:Math.min(full,i+gs)});
+      o.count=0;}
+    else{o.visible=false;o.userData.v3Hide=1;groups.push({mesh:o});}
+  });
+  if(!groups.length){this.introStop();this._introMs=0;return;}
+  var ms=Math.max(500,Math.min(1600,320+groups.length*55));
+  this._introRun={t0:performance.now(),ms:ms,groups:groups,drop:Math.max(6,(this.R||20)*0.35)};
+  this._introMs=ms;this._lastAnim={zone:zone||'all',at:Date.now()};
+  this.kick(ms+400);
+};
+V3Scene.prototype._introStep=function(t){
+  var R=this._introRun,n=R.groups.length,p=Math.min(1,(t-R.t0)/R.ms),m4=new THREE.Matrix4();
+  var reveal=(1-Math.pow(1-p,3))*n;   // the groups land in order, quickly at first and easing out
+  for(var i=0;i<n;i++){
+    var g=R.groups[i],q=reveal-i;
+    if(g.im){if(q>=1&&g.im.count<g.to)g.im.count=g.to;}
+    else if(g.mesh&&q>=1&&!g.mesh.visible){g.mesh.visible=true;g.mesh.userData.v3Hide=0;}
+    if(g.ghost)g.ghost.visible=false;
+  }
+  var cur=Math.floor(reveal),g2=R.groups[cur],frac=reveal-cur;
+  if(cur<n&&g2&&g2.im){   // the gold copy of the batch now in the air
+    var gh=g2.im.userData.v3Ghost;
+    if(!gh){gh=new THREE.InstancedMesh(g2.im.geometry,v3Keep('gold-flash',function(){return {mats:[v3Shade({color:v3Col(0xF6CB6A)})]};}).mats[0],Math.max(1,g2.to-g2.from));
+      gh.frustumCulled=false;g2.im.parent.add(gh);g2.im.userData.v3Ghost=gh;}
+    gh.count=Math.min(gh.instanceMatrix.count,g2.to-g2.from);gh.visible=true;g2.ghost=gh;
+    var lift=R.drop*Math.pow(1-frac,2);
+    for(var k=0;k<gh.count;k++){g2.im.getMatrixAt(g2.from+k,m4);m4.elements[13]+=lift;gh.setMatrixAt(k,m4);}
+    gh.instanceMatrix.needsUpdate=true;
+  }
+  if(p>=1)this.introStop();
+};
+V3Scene.prototype.introStop=function(){
+  var R=this._introRun,ghosts=[];
+  this.root.traverse(function(o){
+    if(o.isInstancedMesh&&o.userData.v3Full!=null)o.count=o.userData.v3Full;
+    if(o.userData.v3Hide){o.visible=true;o.userData.v3Hide=0;}
+    if(o.userData.v3Ghost){ghosts.push(o);}
+  });
+  ghosts.forEach(function(o){var gh=o.userData.v3Ghost;if(gh.parent)gh.parent.remove(gh);if(gh.dispose)gh.dispose();o.userData.v3Ghost=null;});   // taken out after the walk, never during it
+  this._introRun=null;this._introWait=0;this._introPlayed=true;if(R)this.kick(200);
+};
+V3Scene.prototype.size=function(){var w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;if(w!==this._w||h!==this._h||this.r._v3on!==this){this._w=w;this._h=h;this.r._v3on=this;var pr=this._lite?1:Math.min(1.5,viGlDpr(this.host));   /* v0.9.1 E13: the coin and bar stages never draw above 1.5 device pixels, on any device */if(this.r.getPixelRatio()!==pr)this.r.setPixelRatio(pr);this.r.setSize(w,h,false);this.cam.aspect=w/h;this.cam.updateProjectionMatrix();}};   // the shared renderer takes this stage's size and pixel ratio
 V3Scene.prototype.kick=function(ms){this._until=Math.max(this._until||0,Date.now()+(ms||600));if(!this.raf)this.raf=requestAnimationFrame(this._loop);};
 V3Scene.prototype.clear=function(){var g=this.root,keep=function(x){return x&&x.userData&&x.userData.keep;};while(g.children.length){var o=g.children.pop();o.traverse(function(m){if(m.isInstancedMesh&&m.dispose)m.dispose();if(m.geometry&&!keep(m.geometry))m.geometry.dispose();var ms=m.material?(Array.isArray(m.material)?m.material:[m.material]):[];ms.forEach(function(x){if(keep(x))return;if(x.map&&!keep(x.map))x.map.dispose();x.dispose();});});}};   // the kept coin and bar shapes and materials are reused by the next build
 // survey grid sized to the content (cell 5 cm), framed like the House Builder: three-quarter view from above
+/* Pedro, 3 Nov: no flag line under 10.5 px on screen. Each label is measured through the camera as framed and any
+   label whose smallest line would show under minPx grows (its lower edge stays on the post). Returns true if one grew. */
+// size the flags (labelFloor) and clear them of each other (declutter), re-framing so the raised flags stay in view
+function v3Settle(V,keep){for(var i=0;i<3;i++){var g=V.labelFloor(10.8),c=V.clampFlags(56,8),m=V.declutter();if(!g&&!c&&!m)break;V.frame(keep&&V._framed);}V.labelFloor(10.8);V.clampFlags(56,8);V.declutter();}
+V3Scene.prototype.labelFloor=function(minPx){
+  var H=this.host.clientHeight,cam=this.cam;if(!H)return false;
+  this.root.updateMatrixWorld(true);cam.updateMatrixWorld();
+  var up=new THREE.Vector3(0,1,0).applyQuaternion(cam.quaternion),p=new THREE.Vector3(),a=new THREE.Vector3(),b=new THREE.Vector3(),grew=false;
+  this.root.traverse(function(o){var F=o.userData&&o.userData.v3Font,sp=o.tag;if(!F||!sp)return;
+    sp.getWorldPosition(p);a.copy(p).addScaledVector(up,-sp.scale.y/2).project(cam);b.copy(p).addScaledVector(up,sp.scale.y/2).project(cam);
+    var px=Math.min.apply(null,F.f.filter(Boolean))/F.h*Math.abs(b.y-a.y)/2*H;
+    if(!(px>0)||Math.abs(px-minPx)<0.05)return;var h0=sp.scale.y;sp.scale.multiplyScalar(minPx/px);sp.position.y+=(sp.scale.y-h0)/2;grew=true;});   // exactly the floor: never smaller, never bigger than it needs
+  return grew;
+};
+/* no flag hides another: each label's rectangle is projected on screen and, nearest first, a label that overlaps one
+   already placed rises up its post until it is clear. Returns true if any moved. */
+V3Scene.prototype.declutter=function(){
+  var H=this.host.clientHeight,cam=this.cam;if(!H)return false;
+  this.root.updateMatrixWorld(true);cam.updateMatrixWorld();
+  var up=new THREE.Vector3(0,1,0).applyQuaternion(cam.quaternion),rt=new THREE.Vector3(1,0,0).applyQuaternion(cam.quaternion),gap=8/H,L=[],posts=null,moved=false;
+  this.root.traverse(function(o){if(o.userData&&o.userData.v3Font&&o.tag)L.push(o);if(o.userData&&o.userData.v3Posts)posts=o;});
+  var rect=function(o){var sp=o.tag,p=new THREE.Vector3(),x0=9,y0=9,x1=-9,y1=-9;sp.getWorldPosition(p);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){var q=p.clone().addScaledVector(rt,c[0]*sp.scale.x/2).addScaledVector(up,c[1]*sp.scale.y/2).project(cam);
+      if(q.x<x0)x0=q.x;if(q.x>x1)x1=q.x;if(q.y<y0)y0=q.y;if(q.y>y1)y1=q.y;});return [x0,y0,x1,y1];};
+  var hit=function(a,b){return a[0]<b[2]+gap&&b[0]<a[2]+gap&&a[1]<b[3]+gap&&b[1]<a[3]+gap;};
+  L.forEach(function(o){o._r=rect(o);});L.sort(function(a,b){return a._r[1]-b._r[1];});   // lowest on screen (nearest) keeps its place
+  var placed=[];
+  L.forEach(function(o){var sp=o.tag,n=0;
+    while(n<60&&placed.some(function(r){return hit(o._r,r);})){sp.position.y+=sp.scale.y*0.2;sp.updateMatrixWorld();o._r=rect(o);n++;}
+    if(n){moved=true;var top=sp.position.y-sp.scale.y*0.4;
+      if(posts&&o.userData.v3PostI!=null){var pa=posts.geometry.attributes.position;pa.setY(o.userData.v3PostI,top);pa.needsUpdate=true;posts.geometry.computeBoundingSphere();}
+      else o.children.forEach(function(c){if(c.isLine&&!c.isLineSegments){var a=c.geometry.attributes.position;a.setY(1,top);a.needsUpdate=true;c.geometry.computeBoundingSphere();}});}
+    placed.push(o._r);});
+  L.forEach(function(o){delete o._r;});
+  return moved;
+};
+/* CoS, 3 Nov: no flag under the zoom controls. Each label slides sideways along the screen so its right edge stays at
+   least `right` px and its left edge `left` px inside the stage; its post stays put. Returns true if any moved. */
+V3Scene.prototype.clampFlags=function(right,left){
+  var W=this.host.clientWidth,cam=this.cam;if(!W)return false;
+  this.root.updateMatrixWorld(true);cam.updateMatrixWorld();
+  var rt=new THREE.Vector3(1,0,0).applyQuaternion(cam.quaternion),p=new THREE.Vector3(),moved=false;
+  this.root.traverse(function(o){var F=o.userData&&o.userData.v3Font,sp=o.tag;if(!F||!sp)return;
+    sp.getWorldPosition(p);
+    var a=p.clone().addScaledVector(rt,-sp.scale.x/2).project(cam),b=p.clone().addScaledVector(rt,sp.scale.x/2).project(cam);
+    var x0=(Math.min(a.x,b.x)+1)/2*W,x1=(Math.max(a.x,b.x)+1)/2*W,wpx=x1-x0;if(!(wpx>0))return;
+    var dx=0;if(x1>W-right)dx=(W-right)-x1;if(x0+dx<left)dx=left-x0;if(!dx)return;
+    var k=dx/wpx*sp.scale.x;sp.position.x+=rt.x*k;sp.position.z+=rt.z*k;moved=true;});   // the flag's group is never rotated, so world and local axes agree
+  return moved;
+};
 V3Scene.prototype.frame=function(keep){
   this.size();
   var box=new THREE.Box3().setFromObject(this.root),m4=new THREE.Matrix4(),gb=new THREE.Box3();
@@ -21626,32 +21744,71 @@ function v3CoinEdge(spec,n){var c=document.createElement('canvas');c.width=64;c.
   for(var i=0;i<n;i++){var y=i*16;g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,y,64,16);g.fillStyle='rgba(255,236,170,.30)';g.fillRect(0,y+2,64,3);g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+14,64,2);
     if(spec.sides>12){g.fillStyle='rgba(0,0,0,.18)';for(var x=0;x<64;x+=4)g.fillRect(x,y+4,1,9);}}
   var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.wrapS=THREE.RepeatWrapping;t.repeat.x=spec.sides>12?6:1;return t;}
-function v3CoinFace(spec){var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d');
+/* v0.9.1 E13 (owner, 3 Nov: "Once the coins are stacked ... treated as one shape"): a stack used to be three
+   materials (the milled edge and the two faces), so every batch of stacks cost three draws. Edge and face now share
+   one small texture, the edge on the left half and the face in the lower right quarter, and the shape's three groups
+   are folded into one: one draw per batch of stacks, whatever the balance. */
+function v3StackTex(spec,n){var c=document.createElement('canvas');c.width=c.height=256;var g=c.getContext('2d');
+  for(var i=0;i<n;i++){var y=256*i/n,h=256/n;g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,y,128,h+1);
+    g.fillStyle='rgba(255,236,170,.30)';g.fillRect(0,y+h*0.12,128,Math.max(1,h*0.2));
+    g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+h-Math.max(1,h*0.13),128,Math.max(1,h*0.13));}
+  if(spec.sides>12){g.fillStyle='rgba(0,0,0,.18)';for(var x=0;x<128;x+=2)g.fillRect(x,0,1,256);}   // the milled edge at its final density: an atlas cannot repeat a texture
+  g.save();g.translate(192,192);g.rotate(-Math.PI/2);g.translate(-64,-64);   // the face, turned the way the old face texture turned itself
   g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,0,128,128);
   if(spec.inner){g.fillStyle=v3IsGold(spec.outer)&&!v3IsGold(spec.inner)?v3Mix(spec.inner,v3Lift(spec.outer,V3_LIFT+.25),V3_INNER):v3Lift(spec.inner,V3_LIFT);g.beginPath();g.arc(64,64,40,0,Math.PI*2);g.fill();}
   g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=3;g.beginPath();g.arc(64,64,56,0,Math.PI*2);g.stroke();
   g.fillStyle='rgba(40,30,10,.55)';g.font='bold 54px Syne, sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(spec.sym,64,68);
-  g.fillStyle='rgba(255,255,255,.25)';g.fillText(spec.sym,62,65);
-  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.center.set(.5,.5);t.rotation=-Math.PI/2;return t;}
+  g.fillStyle='rgba(255,255,255,.25)';g.fillText(spec.sym,62,65);g.restore();
+  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;}
+/* a finished block of 1,000 coins: ten courses of milled edges round the sides and the hundred coin tops on top, so
+   the one shape still reads as stacked coins (E13). One texture, one draw, like the stacks. */
+function v3BlockTex(spec,n){var c=document.createElement('canvas');c.width=c.height=256;var g=c.getContext('2d');
+  for(var i=0;i<n;i++){var y=256*i/n,h=256/n;g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.fillRect(0,y,128,h+1);
+    g.fillStyle='rgba(255,236,170,.28)';g.fillRect(0,y+h*0.1,128,Math.max(1,h*0.18));
+    g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,y+h-Math.max(1,h*0.14),128,Math.max(1,h*0.14));}
+  g.fillStyle='rgba(0,0,0,.22)';for(var x=0;x<128;x+=12.8)g.fillRect(Math.round(x),0,1,256);   // where one stack meets the next
+  g.fillStyle='#0b1418';g.fillRect(128,128,128,128);
+  for(var r=0;r<10;r++)for(var cx=0;cx<10;cx++){var px=128+cx*12.8+6.4,py=128+r*12.8+6.4;
+    g.fillStyle=v3Lift(spec.outer,V3_LIFT);g.beginPath();g.arc(px,py,5.6,0,Math.PI*2);g.fill();
+    g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=1;g.stroke();
+    if(spec.inner){g.fillStyle=v3IsGold(spec.outer)&&!v3IsGold(spec.inner)?v3Mix(spec.inner,v3Lift(spec.outer,V3_LIFT+.25),V3_INNER):v3Lift(spec.inner,V3_LIFT);g.beginPath();g.arc(px,py,3.6,0,Math.PI*2);g.fill();}}
+  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;}
 function v3Stack(spec,n){
-  return v3Keep('stack|'+spec.name+'|'+spec.d+'|'+n,function(){
+  return v3Keep('stack1|'+spec.name+'|'+spec.d+'|'+n,function(){
     var geo=new THREE.CylinderBufferGeometry(spec.d/2,spec.d/2,spec.t*n,spec.sides,1,false,spec.sides===12?Math.PI/12:0);
-    var face=v3Shade({map:v3CoinFace(spec)});
-    return {geo:geo,mats:[v3Shade({map:v3CoinEdge(spec,n)}),face,face]};});
+    var uv=geo.attributes.uv,nr=geo.attributes.normal;   // the side's points go into the left half of the texture, the flat faces into the lower right quarter
+    for(var i=0;i<uv.count;i++){var cap=Math.abs(nr.getY(i))>0.9,u=uv.getX(i),v=uv.getY(i);uv.setXY(i,cap?0.5+u*0.5:u*0.5,cap?v*0.5:v);}
+    uv.needsUpdate=true;geo.clearGroups();geo.addGroup(0,Infinity,0);
+    return {geo:geo,mats:[v3Shade({map:v3StackTex(spec,n)})]};});
 }
 // a label that always faces the camera
 /* the gold tag from Net worth in 3D (owner, 31 Oct: "flag post labels in gold, the same as the dashboard"): what it is in small capitals,
    the value large, a detail line, on a thin gold post planted in the floor. Returns a group; .tag is the sprite. */
-function v3Label(l1,l2,l3,scale){var c=document.createElement('canvas'),g=c.getContext('2d');c.width=512;c.height=l3?196:150;
-  var w=c.width-24,h=c.height-24;g.shadowColor='rgba(232,197,106,.55)';g.shadowBlur=12;g.fillStyle='#E8C56A';g.beginPath();if(g.roundRect)g.roundRect(12,12,w,h,16);else g.rect(12,12,w,h);g.fill();g.shadowBlur=0;
-  g.fillStyle='#1A1400';g.textAlign='left';g.textBaseline='alphabetic';g.font='30px "Share Tech Mono", monospace';g.fillText(String(l1).toUpperCase(),34,56);
-  g.font='58px "Share Tech Mono", monospace';g.fillText(l2,34,116);if(l3){g.globalAlpha=.78;g.font='24px "Share Tech Mono", monospace';g.fillText(l3,34,160);g.globalAlpha=1;}
-  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true,fog:false,toneMapped:false}));sp.renderOrder=10;var k=scale||10;sp.scale.set(k,k*c.height/c.width,1);
-  var grp=new THREE.Group();grp.add(sp);grp.tag=sp;grp.userData.v3Tag=[l1,l2,l3||''];return grp;}
-/* plant the tag: its foot at (x,0,z), the tag's lower edge at height y */
-function v3Plant(grp,x,y,z){var sp=grp.tag,hy=sp.scale.y/2;sp.position.set(0,y+hy,0);grp.position.set(x,0,z);
+/* v0.9.1 E12 / Q6: the flag can carry a glyph, drawn here on the canvas. A bank's real logo is an image from an
+   outside host, which would taint the WebGL texture, so the flag wears the brand bank mark and the account row keeps
+   the real logo. */
+function v3Glyph(g,kind,x,y,s){g.save();g.translate(x,y);g.scale(s/24,s/24);g.strokeStyle='#1A1400';g.fillStyle='#1A1400';g.lineWidth=1.8;g.lineJoin='round';g.lineCap='round';
+  if(kind==='wallet'){g.beginPath();if(g.roundRect)g.roundRect(2,6,20,13,2.5);else g.rect(2,6,20,13);g.stroke();g.beginPath();g.moveTo(2,10);g.lineTo(16,10);g.lineTo(16,6);g.stroke();g.beginPath();g.arc(17,12.5,1.6,0,Math.PI*2);g.fill();}
+  else if(kind==='vault'){g.beginPath();g.arc(12,12,9,0,Math.PI*2);g.stroke();g.beginPath();g.arc(12,12,3.4,0,Math.PI*2);g.stroke();[0,1,2,3].forEach(function(i){var a=i*Math.PI/2+Math.PI/4;g.beginPath();g.moveTo(12+Math.cos(a)*4.4,12+Math.sin(a)*4.4);g.lineTo(12+Math.cos(a)*8,12+Math.sin(a)*8);g.stroke();});}
+  else{g.beginPath();g.moveTo(2,9);g.lineTo(12,4);g.lineTo(22,9);g.closePath();g.stroke();[5.5,9.8,14.2,18.5].forEach(function(cx){g.beginPath();g.moveTo(cx,10);g.lineTo(cx,17);g.stroke();});g.beginPath();g.moveTo(2.5,19.5);g.lineTo(21.5,19.5);g.stroke();}
+  g.restore();}
+function v3Label(l1,l2,l3,scale,glyph){   // owner, 3 Nov: smaller flags. Two lines: the name, then the amount with the rate beside it; sized on screen by labelFloor
+  var F1=36,F2=46,FONT='px "Share Tech Mono", monospace',c=document.createElement('canvas'),g=c.getContext('2d'),tx=glyph?70:24,s1=String(l1).toUpperCase(),s3=l3?'  '+l3:'';
+  g.font=F1+FONT;var w1=tx+g.measureText(s1).width,w3=s3?g.measureText(s3).width:0;g.font=F2+FONT;var w2=24+g.measureText(l2).width;
+  c.width=Math.max(160,Math.min(1024,Math.ceil(Math.max(w1,w2+w3)+24)));c.height=124;
+  var w=c.width-16,h=c.height-16;g.shadowColor='rgba(232,197,106,.55)';g.shadowBlur=8;g.fillStyle='#E8C56A';g.beginPath();if(g.roundRect)g.roundRect(8,8,w,h,12);else g.rect(8,8,w,h);g.fill();g.shadowBlur=0;
+  if(glyph)v3Glyph(g,glyph,24,18,36);
+  g.fillStyle='#1A1400';g.textAlign='left';g.textBaseline='alphabetic';g.font=F1+FONT;g.fillText(s1,tx,50);
+  g.font=F2+FONT;g.fillText(l2,24,104);if(s3){g.globalAlpha=.78;g.font=F1+FONT;g.fillText(s3,w2,104);g.globalAlpha=1;}
+  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,transparent:true,fog:false,toneMapped:false}));sp.renderOrder=10;var k=scale||10;sp.scale.set(k*c.width/512,k*c.height/512,1);
+  var grp=new THREE.Group();grp.add(sp);grp.tag=sp;grp.userData.v3Tag=[l1,l2,l3||''];grp.userData.v3Font={f:[F1,F2,s3?F1:0],h:c.height};return grp;}
+/* plant the tag: its foot at (x,0,z), the tag's lower edge at height y. With a points array (one plate per account,
+   E12) the posts are collected and drawn as one set of lines, so a dozen flags still cost one draw. */
+function v3Plant(grp,x,y,z,pts){var sp=grp.tag,hy=sp.scale.y/2;sp.position.set(0,y+hy,0);grp.position.set(x,0,z);
+  if(pts){grp.userData.v3PostI=pts.length+1;pts.push(new THREE.Vector3(x,0,z),new THREE.Vector3(x,y+hy*0.2,z));return grp;}
   var post=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(0,y+hy*0.2,0)]),new THREE.LineBasicMaterial({color:0xE8C56A,transparent:true,opacity:.95,depthTest:false,fog:false,toneMapped:false}));post.renderOrder=9;grp.add(post);
   var dot=new THREE.Mesh(new THREE.CircleBufferGeometry(Math.max(0.25,sp.scale.x*0.018),16),new THREE.MeshBasicMaterial({color:0xE8C56A,depthTest:false,fog:false,toneMapped:false}));dot.rotation.x=-Math.PI/2;dot.position.y=0.03;dot.renderOrder=9;grp.add(dot);return grp;}
+function v3Posts(pts){var l=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xE8C56A,transparent:true,opacity:.95,depthTest:false,fog:false,toneMapped:false}));l.renderOrder=9;l.userData.v3Posts=1;return l;}
 function v3Host(sceneEl,svgId){
   var svg=document.getElementById(svgId);if(!sceneEl)return null;
   var h=sceneEl.querySelector('.v3-host');if(!h){h=document.createElement('div');h.className='v3-host';sceneEl.insertBefore(h,sceneEl.firstChild);}
@@ -21659,30 +21816,101 @@ function v3Host(sceneEl,svgId){
 }
 /* the cash and metals content as a ready group, keyed by the data it shows: built at the tap, or ahead of it in the idle warm-up (CI, 2 Nov:
    the metals open ran 117 to 175 ms of our own JavaScript on the slower runner; now the tap attaches a built group and frames it) */
+function v3Narrow(){try{return (window.innerWidth||1000)<700;}catch(e){return false;}}   // on a phone the flags are drawn larger, or the amounts are too small to read. Part of the key, so a scene built for the other size is rebuilt.
+function v3CashAccts(){var a=(typeof alState!=='undefined'&&alState.cashAccounts)||[];return a.map(function(x){return [x.id,x.name,x.type,x.balance,(x.rate==null||!isFinite(x.rate))?null:+x.rate];});}
 function v3CashKey(){var cur=(window.VI_CURRENCY||(typeof viSettings!=='undefined'&&viSettings.currency)||'GBP').toUpperCase(),spec=V3_COINS[cur]||V3_COINS.GBP,units=Math.max(0,Math.floor(alTotalCash()*(window.VI_CURRENCY_RATE||1)));
-  return {cur:cur,spec:spec,units:units,key:cur+'|'+units+'|'+(window.VI_CURRENCY_SYMBOL||'£')};}
+  var phys=0;try{phys=alTotalPhysical();}catch(e){}
+  return {cur:cur,spec:spec,units:units,key:cur+'|'+units+'|'+(window.VI_CURRENCY_SYMBOL||'£')+'|'+JSON.stringify(v3CashAccts())+'|'+phys.toFixed(2)+'|'+(v3Narrow()?'n':'w')};}
 function v3MetalsKey(){return JSON.stringify([alState.metals,alState.metalPrices,window.VI_CURRENCY_RATE||1,window.VI_CURRENCY_SYMBOL||'£']);}
 function v3Pre(name,key){var p=V3._pre&&V3._pre[name];if(p&&p.key===key){V3._pre[name]=null;return p;}return null;}
-function v3CashContent(spec,units,cur){var G=new THREE.Group();
-  var STACK=10,PER_BLOCK=1000,pitch=spec.d+0.12,blockW=pitch*10,gap=spec.d*2.2;
-  var blocks=Math.ceil(units/PER_BLOCK),cols=Math.max(1,Math.ceil(Math.sqrt(blocks||1)));
-  var fullStacks=Math.floor(units/STACK),rest=units%STACK;
-  var pos=function(stackIdx){var b=Math.floor(stackIdx/100),s=stackIdx%100,bx=b%cols,bz=Math.floor(b/cols);return [bx*(blockW+gap)+(s%10)*pitch,bz*(blockW+gap)+Math.floor(s/10)*pitch];};
-  var m4=new THREE.Matrix4();
-  if(fullStacks>0&&fullStacks<=20000){
-    var st=v3Stack(spec,STACK),im=new THREE.InstancedMesh(st.geo,st.mats,fullStacks);im.castShadow=im.receiveShadow=true;
-    for(var i=0;i<fullStacks;i++){var p=pos(i);m4.makeTranslation(p[0],spec.t*STACK/2,p[1]);im.setMatrixAt(i,m4);}G.add(im);
-  }else if(fullStacks>20000){   // very large balances: each full block of 1,000 drawn as one solid block of stacks
-    var fb=Math.floor(fullStacks/100),bk=v3Keep('block|'+spec.name+'|'+blockW,function(){var tx=v3CoinEdge(spec,STACK);tx.repeat.x=10;return {geo:new THREE.BoxBufferGeometry(blockW-0.12,spec.t*STACK,blockW-0.12),mats:[v3Shade({map:tx})]};}),bi=new THREE.InstancedMesh(bk.geo,bk.mats[0],fb);bi.castShadow=bi.receiveShadow=true;
-    for(var j=0;j<fb;j++){var q=pos(j*100);m4.makeTranslation(q[0]+blockW/2-pitch/2,spec.t*STACK/2,q[1]+blockW/2-pitch/2);bi.setMatrixAt(j,m4);}G.add(bi);
-    var left=fullStacks-fb*100;if(left>0){var st2=v3Stack(spec,STACK),im2=new THREE.InstancedMesh(st2.geo,st2.mats,left);im2.castShadow=true;for(var k=0;k<left;k++){var r2=pos(fb*100+k);m4.makeTranslation(r2[0],spec.t*STACK/2,r2[1]);im2.setMatrixAt(k,m4);}G.add(im2);}
+/* v0.9.1 E12 (owner, 3 Nov: "as the user puts in their bank type, and current account ... that amount should be in a
+   separate box ... a separate gold tile on the ground plane. With the icon of the bank and the separate value"):
+   every cash account stands on its own gold-edged plate with its own flag post, carrying the bank mark, the balance
+   and the account's rate when it has one (Q6). Money kept at home is its own plate with a wallet mark. The plates
+   wrap into rows and the total flag stays. All the plate tiles are one draw and all the posts another.
+   E13: once a block of 1,000 coins is finished it is drawn as one shape (the owner's "treated as one shape"), so
+   only the part-finished block is still made of single stacks. */
+function v3CashPlates(units){
+  var list=[],rate=window.VI_CURRENCY_RATE||1;
+  ((typeof alState!=='undefined'&&alState.cashAccounts)||[]).forEach(function(a){
+    list.push({id:a.id,name:String(a.name||'Account'),type:a.type||'',rate:(a.rate==null||!isFinite(a.rate))?null:+a.rate,kind:'account',glyph:'bank',raw:Math.max(0,(+a.balance||0)*rate)});});
+  var phys=0;try{phys=Math.max(0,alTotalPhysical()*rate);}catch(e){}
+  if(phys>0)list.push({id:'physical',name:'Physical cash',type:'Notes and coins',rate:null,kind:'physical',glyph:'wallet',raw:phys});
+  var tot=Math.max(0,Math.floor(units)),sum=0;
+  list.forEach(function(p){p.units=Math.floor(p.raw);sum+=p.units;});
+  var extra=tot-sum;   // the coins the rounding dropped go to the biggest fractions first, so the plates always add up to the total
+  if(extra>0)list.slice().sort(function(a,b){return (b.raw-b.units)-(a.raw-a.units);}).slice(0,extra).forEach(function(p){p.units++;});
+  /* an account in the red stands on an empty plate and still counts against the total, so the plate amounts stay
+     each account's own balance and the total flag keeps showing the cash the rest of the app shows. */
+  return list;
+}
+function v3CashPlate(spec,n){   // one plate's coins; finished blocks of 1,000 as one shape each, the rest as stacks
+  var G=new THREE.Group(),STACK=10,PER_BLOCK=1000,pitch=spec.d+0.12,blockW=pitch*10,gap=spec.d*2.2,m4=new THREE.Matrix4();
+  var blocks=Math.max(1,Math.ceil(n/PER_BLOCK)),cols=Math.max(1,Math.ceil(Math.sqrt(blocks)));
+  var pos=function(i){var b=Math.floor(i/100),s=i%100;return [(b%cols)*(blockW+gap)+(s%10)*pitch,Math.floor(b/cols)*(blockW+gap)+Math.floor(s/10)*pitch];};
+  var fullStacks=Math.floor(n/STACK),rest=n%STACK,merged=Math.floor(fullStacks/100),loose=fullStacks-merged*100;
+  if(merged){var bk=v3Keep('block1|'+spec.name+'|'+blockW.toFixed(3),function(){
+      var geo=new THREE.BoxBufferGeometry(blockW-0.12,spec.t*STACK,blockW-0.12),uv=geo.attributes.uv,nr=geo.attributes.normal;
+      for(var i=0;i<uv.count;i++){var cap=Math.abs(nr.getY(i))>0.9,u=uv.getX(i),v=uv.getY(i);uv.setXY(i,cap?0.5+u*0.5:u*0.5,cap?v*0.5:v);}
+      uv.needsUpdate=true;geo.clearGroups();geo.addGroup(0,Infinity,0);
+      return {geo:geo,mats:[v3Shade({map:v3BlockTex(spec,STACK)})]};});
+    var bi=new THREE.InstancedMesh(bk.geo,bk.mats[0],merged);
+    for(var j=0;j<merged;j++){var q=pos(j*100);m4.makeTranslation(q[0]+blockW/2-pitch/2,spec.t*STACK/2,q[1]+blockW/2-pitch/2);bi.setMatrixAt(j,m4);}
+    bi.userData.v3Full=merged;bi.userData.v3Intro=true;G.add(bi);}
+  if(loose>0){var st=v3Stack(spec,STACK),im=new THREE.InstancedMesh(st.geo,st.mats[0],loose);
+    for(var i=0;i<loose;i++){var pp=pos(merged*100+i);m4.makeTranslation(pp[0],spec.t*STACK/2,pp[1]);im.setMatrixAt(i,m4);}
+    im.userData.v3Full=loose;im.userData.v3Intro=true;G.add(im);}
+  if(rest>0){var ps=v3Stack(spec,rest),pm=new THREE.Mesh(ps.geo,ps.mats[0]),rp=pos(fullStacks);pm.position.set(rp[0],spec.t*rest/2,rp[1]);pm.userData.v3Intro=true;G.add(pm);}
+  var usedBlocks=Math.max(1,Math.ceil(n/PER_BLOCK)),wc=Math.min(cols,usedBlocks),rows=Math.ceil(usedBlocks/cols),w,d;
+  if(n<PER_BLOCK){var sN=Math.max(1,fullStacks+(rest?1:0));w=Math.min(10,sN)*pitch;d=Math.ceil(sN/10)*pitch;}
+  else{w=wc*blockW+(wc-1)*gap;d=rows*blockW+(rows-1)*gap;}
+  return {grp:G,w:Math.max(w,spec.d*3),d:Math.max(d,spec.d*3),stacks:fullStacks,rest:rest,merged:merged};
+}
+function v3CashContent(spec,units,cur){var G=new THREE.Group(),PER_BLOCK=1000;
+  var sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return Math.round(n).toLocaleString('en-GB');};
+  var plates=v3CashPlates(units),built=plates.map(function(p){return v3CashPlate(spec,p.units);});
+  var m=spec.d*3,pad=spec.d*6,area=built.reduce(function(s,b){return s+(b.w+pad)*(b.d+pad);},0);
+  var target=Math.max(Math.max.apply(null,built.map(function(b){return b.w;}).concat([0])),Math.sqrt(area)*1.2);
+  var x=0,z=0,rowD=0,rows=1,X0=1e9,X1=-1e9,Z0=1e9,Z1=-1e9;
+  built.forEach(function(b,i){
+    if(x>0&&x+b.w>target){x=0;z+=rowD+pad;rowD=0;rows++;}
+    b.grp.position.set(x,0,z);G.add(b.grp);
+    var r=plates[i].rect=[x-m,z-m,b.w+2*m,b.d+2*m];
+    X0=Math.min(X0,r[0]);X1=Math.max(X1,r[0]+r[2]);Z0=Math.min(Z0,r[1]);Z1=Math.max(Z1,r[1]+r[3]);
+    x+=b.w+pad;rowD=Math.max(rowD,b.d);
+  });
+  if(plates.length){   // the gold tiles: one batch for the surfaces, one for all the edges
+    var tile=v3Keep('plate-tile',function(){var g=new THREE.PlaneBufferGeometry(1,1);g.rotateX(-Math.PI/2);return {geo:g,mats:[]};});
+    var tmat=new THREE.MeshBasicMaterial({color:0x0d2e31,transparent:true,opacity:.96,depthWrite:false,toneMapped:false,fog:false});
+    var ti=new THREE.InstancedMesh(tile.geo,tmat,plates.length),mm=new THREE.Matrix4(),ep=[];
+    plates.forEach(function(p,i){var r=p.rect;mm.makeScale(r[2],1,r[3]);mm.setPosition(r[0]+r[2]/2,0.014,r[1]+r[3]/2);ti.setMatrixAt(i,mm);
+      var x0=r[0],x1=r[0]+r[2],z0=r[1],z1=r[1]+r[3],y=0.022;
+      [[x0,z0,x1,z0],[x1,z0,x1,z1],[x1,z1,x0,z1],[x0,z1,x0,z0]].forEach(function(sg){ep.push(new THREE.Vector3(sg[0],y,sg[1]),new THREE.Vector3(sg[2],y,sg[3]));});});
+    G.add(ti);
+    G.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ep),new THREE.LineBasicMaterial({color:0xE8C56A,toneMapped:false,fog:false})));
   }
-  if(rest>0){var ps=v3Stack(spec,rest),pm=new THREE.Mesh(ps.geo,ps.mats),pp=pos(fullStacks);pm.position.set(pp[0],spec.t*rest/2,pp[1]);pm.castShadow=pm.receiveShadow=true;G.add(pm);}
-  var sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
-  var full=Math.floor(units/PER_BLOCK),part=units%PER_BLOCK;
-  if(units>0){var lb=v3Label('Cash · '+spec.name+' coins',sym+fmt(units),(full?full+' block'+(full>1?'s':'')+' of 1,000':'')+(full&&part?' + ':'')+(part?fmt(part)+' coins':''),Math.max(9,Math.min(60,blockW*(cols>1?1.4:0.9))));
-    var bb=new THREE.Box3().setFromObject(G),cc=bb.getCenter(new THREE.Vector3());v3Plant(lb,bb.min.x-lb.tag.scale.x*0.05,bb.max.y+lb.tag.scale.y*0.5+1,cc.z);G.add(lb);}
-  return {key:cur+'|'+units+'|'+(window.VI_CURRENCY_SYMBOL||'£'),grp:G,stats:{units:units,cur:cur,coin:spec.name,fullStacks:fullStacks,rest:rest,fullBlocks:Math.floor(units/PER_BLOCK),stackHeight:spec.t*STACK}};
+  var posts=[],stackH=spec.t*10;
+  plates.forEach(function(p,i){
+    var l3=p.rate!=null?p.rate+'% AER':'';
+    var lb=v3Label(p.name.length>22?p.name.slice(0,21)+'…':p.name,sym+fmt(p.units),l3,Math.max(30,Math.min(46,p.rect[2]*0.95))*(v3Narrow()?1.6:1),p.glyph);
+    v3Plant(lb,p.rect[0]+lb.tag.scale.x*0.12,stackH+Math.max(4,p.rect[3]*0.5)+(i%2?lb.tag.scale.y*0.8:0),p.rect[1]+p.rect[3]*0.5,posts);G.add(lb);
+  });
+  var plateSum=plates.reduce(function(s,p){return s+p.units;},0),total=Math.max(0,Math.floor(units)),fullBlocks=Math.floor(total/PER_BLOCK),part=total%PER_BLOCK;
+  if(total>0){
+    var lbT=v3Label('Total cash · '+spec.name+' coins',sym+fmt(total),'',Math.max(12,Math.min(60,(X1-X0)*0.4)),'vault');
+    v3Plant(lbT,(X0+X1)/2-lbT.tag.scale.x*0.5,stackH+Math.max(6,(Z1-Z0)*0.16),Z0-spec.d*3,posts);G.add(lbT);   // the total stands behind the plates, clear of the account flags
+  }
+  if(posts.length)G.add(v3Posts(posts));
+  var stacks=built.reduce(function(s,b){return s+b.stacks;},0),restN=built.reduce(function(s,b){return s+b.rest;},0);
+  return {key:v3CashKey().key,grp:G,stats:{units:total,plateSum:plateSum,cur:cur,coin:spec.name,fullStacks:stacks,rest:restN,fullBlocks:fullBlocks,stackHeight:stackH,
+    plates:plates.map(function(p){return {id:p.id,name:p.name,type:p.type,rate:p.rate,units:p.units,kind:p.kind,glyph:p.glyph};}),plateRows:rows}};
+}
+/* v0.9.1: the hook the cash accounts chunk calls when money moves (E16). The next build of the scene plays the
+   coins landing (or lifting, when money came out); with 3D off it does nothing. Safe to call before the stage exists. */
+function v3CashLand(delta,accountId){
+  V3._land={delta:+delta||0,id:accountId==null?null:accountId,at:Date.now()};
+  if(V3.cash){V3.cash._introPlayed=false;V3.cash._introTag=null;}
+  return true;
 }
 function v3Cash(){
   if(!v3Ok()||(V3._flat&&V3._flat.cash))return false;
@@ -21698,8 +21926,10 @@ function v3CashNow(){
   V.clear();V._key=key;
   var C=v3Pre('cash',key)||v3CashContent(spec,units,cur);V.root.add(C.grp);V.stats=C.stats;   // built in the idle warm-up when the balance has not changed since
   var PER_BLOCK=1000,sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
-  V.frame(V3._cashUnits===units&&V3._cashCur===cur);V3._cashUnits=units;V3._cashCur=cur;
-  var cap=document.getElementById('cashCap');if(cap)cap.textContent=units?sym+fmt(units)+' = '+fmt(units)+' '+spec.name+' coins ('+spec.d*10+' mm across, '+(spec.t*10).toFixed(1)+' mm thick) · '+Math.floor(units/PER_BLOCK)+' full block'+(Math.floor(units/PER_BLOCK)===1?'':'s')+' of 1,000'+(units%PER_BLOCK?' + '+fmt(units%PER_BLOCK)+' coins':''):'No cash yet. Add an account or some physical cash.';
+  var kc=V3._cashUnits===units&&V3._cashCur===cur;V.frame(kc);v3Settle(V,kc);V3._cashUnits=units;V3._cashCur=cur;
+  V.introArm('cash|'+key,V3._cashZone||null,V3._cashSilent);V3._cashZone=null;V3._cashSilent=false;   // E14: the coins lay themselves out when the scene is first seen, and again when the balance changes
+  var st=V.stats,plates=(st&&st.plates)||[],laid=(st?st.fullStacks:0)+(st&&st.rest?1:0);
+  var cap=document.getElementById('cashCap');if(cap)cap.textContent=units?sym+fmt(st.units)+' laid · '+plates.length+' plate'+(plates.length===1?'':'s')+' · '+Math.floor(st.units/PER_BLOCK)+' block'+(Math.floor(st.units/PER_BLOCK)===1?'':'s')+' of 1,000'+(st.units%PER_BLOCK?' + '+fmt(st.units%PER_BLOCK):'')+' · '+spec.name+' coins, '+spec.d*10+' mm':'No cash yet. Add an account or some physical cash.';
   return true;
 }
 // a cast-style bar: bevelled block with the weight and fineness stamped on top
@@ -21712,9 +21942,20 @@ function v3BarMake(w,d,h,metal,fmt){
   var c=document.createElement('canvas');c.width=256;c.height=Math.round(256*d/w);var g=c.getContext('2d');g.fillStyle=metal.col;g.fillRect(0,0,c.width,c.height);
   g.strokeStyle='rgba(0,0,0,.28)';g.lineWidth=4;g.strokeRect(14,14,c.width-28,c.height-28);g.fillStyle='rgba(50,36,8,.5)';g.textAlign='center';g.textBaseline='middle';
   var fs=Math.max(14,Math.round(c.height*0.2));g.font='700 '+fs+'px "Share Tech Mono", monospace';g.fillText(metal.label.toUpperCase(),128,c.height*0.33);g.fillText(fmt,128,c.height*0.55);g.font=Math.round(fs*0.8)+'px "Share Tech Mono", monospace';g.fillText('999.9',128,c.height*0.76);
-  var tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;tx.repeat.set(1/w,1/d);tx.offset.set(0.5,0.5);
-  var top=v3Shade({map:tx}),side=v3Shade({color:v3Col(metal.col)});   // baked studio shading (v3Matcap), no reflection map
-  return {geo:geo,mats:[top,side]};
+  /* v0.9.1 E21 (owner: the same work as the coins, for the metals viewport): the stamped top and the plain sides
+     share one texture, so a batch of bars is one draw instead of two. The top is drawn into the lower right quarter
+     and the sides read one point of the flat left half. */
+  var at=document.createElement('canvas');at.width=at.height=256;var ag=at.getContext('2d');
+  ag.fillStyle=metal.col;ag.fillRect(0,0,256,256);
+  ag.drawImage(c,128,128,128,128);
+  var tx=new THREE.CanvasTexture(at);tx.encoding=THREE.sRGBEncoding;
+  var uv=geo.attributes.uv,nr=geo.attributes.normal;
+  for(var i=0;i<uv.count;i++){
+    if(Math.abs(nr.getY(i))>0.9){var u=Math.max(0,Math.min(1,uv.getX(i)/w+0.5)),v=Math.max(0,Math.min(1,uv.getY(i)/d+0.5));uv.setXY(i,0.5+u*0.5,v*0.5);}
+    else uv.setXY(i,0.25,0.5);
+  }
+  uv.needsUpdate=true;geo.clearGroups();geo.addGroup(0,Infinity,0);
+  return {geo:geo,mats:[v3Shade({map:tx})]};
 }
 function v3MetalsContent(key){
   var G=new THREE.Group(),stats={},sym=window.VI_CURRENCY_SYMBOL||'£',rate=window.VI_CURRENCY_RATE||1,x0=0,parts=[],m4=new THREE.Matrix4();
@@ -21725,15 +21966,16 @@ function v3MetalsContent(key){
       var isLast=bi===V3_BARS.length-1,frac=isLast&&left>0.05?left/B.g:0;if(!n&&!frac)return;
       zone.userData.bars=zone.userData.bars||{};zone.userData.bars[B.name]={n:n,h:+((B.g/M.rho)/(B.w*B.d)).toFixed(3)};if(frac)zone.userData.bars.rest_g=+left.toFixed(2);
       var h=(B.g/M.rho)/(B.w*B.d);
-      if(n){var bar=v3Bar(B.w,B.d,h,M,B.name),im=new THREE.InstancedMesh(bar.geo,bar.mats,n);im.castShadow=im.receiveShadow=true;
+      if(n){var bar=v3Bar(B.w,B.d,h,M,B.name),im=new THREE.InstancedMesh(bar.geo,bar.mats[0],n);im.castShadow=im.receiveShadow=true;
         var perRow=Math.max(1,Math.min(10,Math.ceil(Math.sqrt(n/B.pile))));
         for(var i=0;i<n;i++){var pile=Math.floor(i/B.pile),lvl=i%B.pile,cx=(pile%perRow)*(B.w+1),cz=z+Math.floor(pile/perRow)*(B.d+1);m4.makeTranslation(cx+B.w/2,lvl*h,cz+B.d/2);im.setMatrixAt(i,m4);}
+        im.userData.v3Full=n;im.userData.v3Intro=true;im.userData.v3Zone=k;   // E21: this metal's bars arrive the way the coins do
         zone.add(im);zw=Math.max(zw,perRow*(B.w+1));z+=Math.ceil(Math.ceil(n/B.pile)/perRow)*(B.d+1)+1;}
-      if(frac){var fh=Math.max(0.03,h*frac),fb=v3Bar(B.w,B.d,fh,M,(left).toFixed(1)+' g'),fm=new THREE.Mesh(fb.geo,fb.mats);fm.position.set(B.w/2,0,z+B.d/2);fm.castShadow=fm.receiveShadow=true;zone.add(fm);zw=Math.max(zw,B.w+1);z+=B.d+2;}
+      if(frac){var fh=Math.max(0.03,h*frac),fb=v3Bar(B.w,B.d,fh,M,(left).toFixed(1)+' g'),fm=new THREE.Mesh(fb.geo,fb.mats[0]);fm.position.set(B.w/2,0,z+B.d/2);fm.castShadow=fm.receiveShadow=true;fm.userData.v3Intro=true;fm.userData.v3Zone=k;zone.add(fm);zw=Math.max(zw,B.w+1);z+=B.d+2;}
     });
     stats[k]=zone.userData.bars;
     var value=oz*(alState.metalPrices[k]||0);
-    var lb=v3Label(M.label+' · '+oz.toFixed(2)+' oz',sym+Math.round(value*rate).toLocaleString('en-GB'),'at '+sym+Math.round((alState.metalPrices[k]||0)*rate).toLocaleString('en-GB')+' an ounce',Math.max(12,zw*0.9));
+    var lb=v3Label(M.label+' · '+oz.toFixed(2)+' oz',sym+Math.round(value*rate).toLocaleString('en-GB'),'',Math.max(12,zw*0.9));
     v3Plant(lb,zw/2,Math.max(6,z*0.25)+3,-2);zone.add(lb);
     zone.position.x=x0;G.add(zone);parts.push(oz.toFixed(2)+' oz '+M.label.toLowerCase()+' ('+(grams>=1000?(grams/1000).toFixed(2)+' kg':Math.round(grams)+' g')+')');x0+=zw+8;
   });
@@ -21756,7 +21998,8 @@ function v3MetalsNow(){
   var mkey=v3MetalsKey();if(V._key===mkey&&V.root.children.length){V.kick(300);return true;}   // same holdings and prices: redraw, do not rebuild
   V.clear();V._key=mkey;
   var C=v3Pre('metals',mkey)||v3MetalsContent(mkey),parts=C.parts;V.root.add(C.grp);V.stats=C.stats;   // built in the idle warm-up when nothing changed since
-  V.frame(V3._metalsKey===JSON.stringify(alState.metals));V3._metalsKey=JSON.stringify(alState.metals);
+  var km=V3._metalsKey===JSON.stringify(alState.metals);V.frame(km);v3Settle(V,km);V3._metalsKey=JSON.stringify(alState.metals);
+  V.introArm('metals|'+mkey,V3._animZone||null,V3._animSilent);V3._animZone=null;V3._animSilent=false;   // E21 and E22: the bars slide in on a first view, and only the committed metal's bars after a commit
   var cap=document.getElementById('metalsCap');if(cap)cap.textContent=parts.length?parts.join(' · ')+' · real bar sizes from each metal\'s weight · value at the live price':'No metals yet. Add your holdings below.';
   return true;
 }
@@ -21779,10 +22022,17 @@ function v3Warm(){
       if(k===1){   // the objects the real stages draw, at their real settings (same shaders, so the compile is reused)
         var host=document.createElement('div');host.style.cssText='position:absolute;width:0;height:0;overflow:hidden';
         W=new V3Scene(host,'');W._off=true;var cur=(window.VI_CURRENCY||(typeof viSettings!=='undefined'&&viSettings.currency)||'GBP').toUpperCase(),spec=V3_COINS[cur]||V3_COINS.GBP,m4=new THREE.Matrix4();
-        var st=v3Stack(spec,10),im=new THREE.InstancedMesh(st.geo,st.mats,2);im.setMatrixAt(0,m4);im.setMatrixAt(1,m4.makeTranslation(3,0,0));W.root.add(im);
-        var ps=v3Stack(spec,3);W.root.add(new THREE.Mesh(ps.geo,ps.mats));
-        var M=V3_METALS.gold,B=V3_BARS[V3_BARS.length-1],bh=(B.g/M.rho)/(B.w*B.d),bar=v3Bar(B.w,B.d,bh,M,B.name),bi=new THREE.InstancedMesh(bar.geo,bar.mats,1);bi.setMatrixAt(0,new THREE.Matrix4());W.root.add(bi);W.root.add(new THREE.Mesh(bar.geo,bar.mats));
-        var lb=v3Label('Warm','£0','',10);v3Plant(lb,0,2,0);W.root.add(lb);W.frame(false);
+        var st=v3Stack(spec,10),im=new THREE.InstancedMesh(st.geo,st.mats[0],2);im.setMatrixAt(0,m4);im.setMatrixAt(1,m4.makeTranslation(3,0,0));W.root.add(im);
+        var ps=v3Stack(spec,3);W.root.add(new THREE.Mesh(ps.geo,ps.mats[0]));
+        var M=V3_METALS.gold,B=V3_BARS[V3_BARS.length-1],bh=(B.g/M.rho)/(B.w*B.d),bar=v3Bar(B.w,B.d,bh,M,B.name),bi=new THREE.InstancedMesh(bar.geo,bar.mats[0],1);bi.setMatrixAt(0,new THREE.Matrix4());W.root.add(bi);W.root.add(new THREE.Mesh(bar.geo,bar.mats[0]));
+        var lb=v3Label('Warm','£0','',10);v3Plant(lb,0,2,0);W.root.add(lb);
+        /* v0.9.1: the plate tiles, their gold edges and the gold copy that falls ahead of a landing batch, so opening
+           Cash and savings still compiles nothing (E12, E13, E14) */
+        var tl=v3Keep('plate-tile',function(){var g=new THREE.PlaneBufferGeometry(1,1);g.rotateX(-Math.PI/2);return {geo:g,mats:[]};});
+        var tim=new THREE.InstancedMesh(tl.geo,new THREE.MeshBasicMaterial({color:0x123033,transparent:true,opacity:.74,depthWrite:false,toneMapped:false,fog:false}),1);tim.setMatrixAt(0,new THREE.Matrix4());W.root.add(tim);
+        W.root.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0.02,0),new THREE.Vector3(1,0.02,0)]),new THREE.LineBasicMaterial({color:0xE8C56A,transparent:true,opacity:.85,toneMapped:false,fog:false})));
+        var gf=new THREE.InstancedMesh(st.geo,v3Keep('gold-flash',function(){return {mats:[v3Shade({color:v3Col(0xF6CB6A)})]};}).mats[0],1);gf.setMatrixAt(0,new THREE.Matrix4());W.root.add(gf);
+        W.frame(false);
         W.sc.traverse(function(o){if(o.material&&o.visible&&(o.isMesh||o.isLine||o.isSprite))objs.push(o);});W.r.setPixelRatio(1);W.r.setSize(1,1,false);
         // the bars for the metals actually held, the same sizes v3Metals will ask for (kept, so opening Precious metals builds none of them)
         try{['gold','silver','platinum','palladium'].forEach(function(mk){var oz=+((alState.metals||{})[mk]||0);if(!(oz>0))return;var M2=V3_METALS[mk],left=oz*OZ_G;
@@ -21945,11 +22195,16 @@ function renderMetalsInputs(){
   var metals=[{k:'gold',lbl:'Gold',col:'var(--gold)'},{k:'silver',lbl:'Silver',col:'var(--m-silver)'},{k:'platinum',lbl:'Platinum',col:'var(--m-platinum)'},{k:'palladium',lbl:'Palladium',col:'var(--m-palladium)'}];
   // one row per metal: holdings and the price beside it, value at the end (A1)
   var mi=document.getElementById('metals-inputs'),sym=window.VI_CURRENCY_SYMBOL||'\u00a3';
+  // a quiet save (leaving the field, or a change event) keeps the rows as they are: redrawing them would replace the
+  // "Add to vault" button under the user's finger, and the tap would never land (E22).
+  if(window.V3&&V3._keepRows){metals.forEach(function(m){metalValCell(m.k);});mi=null;}
   if(mi)mi.innerHTML=metals.map(function(m){
     return'<div class="metal-row mh-row"><span class="metal-lbl" style="color:'+m.col+'">'+m.lbl+'</span>'
-      +'<label class="mh-cell"><span class="mh-k">Hold</span><input class="metal-inp" type="number" min="0" step="0.01" value="'+(alState.metals[m.k]||0)+'" aria-label="'+m.lbl+' held, troy ounces" onchange="updateMetal(\''+m.k+'\',this.value)"><span class="metal-unit">oz</span></label>'
+      +'<label class="mh-cell"><span class="mh-k">Hold</span><input class="metal-inp" id="metal-hold-'+m.k+'" type="number" min="0" step="0.01" value="'+(alState.metals[m.k]||0)+'" aria-label="'+m.lbl+' held, troy ounces" oninput="metalStage(\''+m.k+'\',this.value)" onchange="metalCommit(\''+m.k+'\',false)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();metalCommit(\''+m.k+'\',true);}" onblur="metalBlur(\''+m.k+'\')"><span class="metal-unit">oz</span></label>'
       +'<label class="mh-cell"><span class="mh-k">Price</span><input class="metal-inp" type="number" min="0" step="0.01" value="'+(alState.metalPrices[m.k]||0)+'" aria-label="'+m.lbl+' price per ounce" onchange="updateMetalPrice(\''+m.k+'\',this.value)"><span class="metal-unit">'+sym+'/oz</span></label>'
-      +'<span class="mh-val" id="metal-val-'+m.k+'" style="color:'+m.col+'">'+sym+Math.round((alState.metals[m.k]||0)*(alState.metalPrices[m.k]||0)).toLocaleString('en-GB')+'</span></div>';
+      +'<button class="btn-add-data metal-commit" data-m="'+m.k+'" onclick="metalCommit(\''+m.k+'\',true)" aria-label="Add your '+m.lbl.toLowerCase()+' to the vault">Add to vault</button>'
+      +'<span class="mh-val" id="metal-val-'+m.k+'" style="color:'+m.col+'">'+sym+Math.round((alState.metals[m.k]||0)*(alState.metalPrices[m.k]||0)).toLocaleString('en-GB')+'</span>'
+      +'<span class="metal-draft" id="metal-draft-'+m.k+'" role="status"></span></div>';
   }).join('');
   var mk=document.getElementById('metals-kpis');
   if(mk)mk.innerHTML=metals.map(function(m){
@@ -21960,7 +22215,48 @@ function renderMetalsInputs(){
   }).join('');
 }
 function metalValCell(k){var e=document.getElementById('metal-val-'+k);if(e)e.textContent=(window.VI_CURRENCY_SYMBOL||'\u00a3')+Math.round((alState.metals[k]||0)*(alState.metalPrices[k]||0)).toLocaleString('en-GB');}
-function updateMetal(k,v){if(viBlockEdit())return;alState.metals[k]=parseFloat(v)||0;metalValCell(k);saveAL();renderMetalsISO();updateKPIs();checkAchievements();}
+/* v0.9.1 E22 (owner, 3 Nov: "where it says you hold troy ounce ... a button that triggers the intro animation ...
+   four commit buttons"; Q9: the typed value always saves, the animation plays only from the button or Enter).
+   Typing stages the number and the row says it is not in the vault yet; the button or Enter commits it and that
+   metal's bars arrive in the 3D scene; leaving the field commits it quietly, so nothing typed is ever lost. */
+var V3_STAGE={};
+var V3_BLUR={};
+function metalBlur(k){   // leaving the field saves what was typed, but a tap on the button blurs it first: wait a moment so the button's own commit wins
+  clearTimeout(V3_BLUR[k]);
+  V3_BLUR[k]=setTimeout(function(){V3_BLUR[k]=null;metalCommit(k,false);},220);
+}
+function metalStage(k,v){
+  V3_STAGE[k]=v;
+  var d=document.getElementById('metal-draft-'+k),n=parseFloat(v);
+  if(!d)return;
+  if(!isFinite(n)||Math.abs(n-(+alState.metals[k]||0))<1e-9){d.textContent='';d.classList.remove('on');return;}
+  d.textContent='Not in your vault yet';d.classList.add('on');
+}
+function metalCommit(k,animate){
+  if(viBlockEdit())return;
+  clearTimeout(V3_BLUR[k]);V3_BLUR[k]=null;
+  var d=document.getElementById('metal-draft-'+k),inp=document.getElementById('metal-hold-'+k);
+  var raw=V3_STAGE[k]!=null?V3_STAGE[k]:(inp?inp.value:null),n=(raw!=null&&String(raw).trim()==='')?0:parseFloat(raw);   // a cleared field means none held, as before E22
+  var was=+alState.metals[k]||0;
+  if(raw==null||!isFinite(n)||n<0||Math.abs(n-was)<1e-9){   // nothing new to save; the button still shows that metal arriving
+    if(d&&d.classList.contains('on')){d.textContent='';d.classList.remove('on');}
+    if(animate&&was>0){   // leaving the field already saved it, so the button just plays that metal's arrival
+      V3._animZone=k;V3._animSilent=false;
+      var V=V3.metals,pending=V3._after&&V3._after.metals;
+      if(!pending&&V&&V.introArm){V3._animZone=null;V.introArm(V._introTag||'metals',k,false);}   // no rebuild on the way: arm it here
+    }
+    return;
+  }
+  delete V3_STAGE[k];
+  alState.metals[k]=n;metalValCell(k);saveAL();
+  if(animate){V3._animZone=k;}else{V3._animSilent=true;V3._keepRows=1;}
+  try{renderMetalsISO();updateKPIs();checkAchievements();}finally{V3._keepRows=0;}
+  var diff=n-was,sym=window.VI_CURRENCY_SYMBOL||'\u00a3',rate=window.VI_CURRENCY_RATE||1;
+  var worth=Math.round(Math.abs(diff)*(alState.metalPrices[k]||0)*rate).toLocaleString('en-GB');
+  d=document.getElementById('metal-draft-'+k);   // the row was redrawn above, so the line goes on the new one
+  if(d){d.textContent=(diff>0?'+':'\u2212')+Math.abs(diff).toFixed(2)+' oz '+k+', '+sym+worth;d.classList.remove('on');}
+}
+function updateMetal(k,v){if(viBlockEdit())return;alState.metals[k]=parseFloat(v)||0;metalValCell(k);V3._animSilent=true;metalValCell(k);saveAL();renderMetalsISO();updateKPIs();checkAchievements();}
 function updateMetalPrice(k,v){if(viBlockEdit())return;alState.metalPrices[k]=parseFloat(v)||0;alState.metalPrices.manualAt=new Date().toISOString();metalValCell(k);saveAL();renderMetalsISO();updateKPIs();}
 // Keep backward compatibility aliases
 function setMetal(m,v){if(viBlockEdit())return;updateMetal(m,v);}
@@ -26576,7 +26872,7 @@ function renderCashISO(){
   // Caption
   var cap=document.getElementById('cashCap');
   if(cap){
-    cap.textContent=gbpFmt(total)+' \u2014 '+fullCubes+' full stacks'+(remainder>0?' + \u00a3'+remainder:'')+' \u00b7 each stack = \u00a31,000';
+    cap.textContent=gbpFmt(total)+' \u00b7 '+fullCubes+' full block'+(fullCubes===1?'':'s')+(remainder>0?' + \u00a3'+remainder:'')+' \u00b7 each block = \u00a31,000';   // the same word as the 3D (Pedro, 3 Nov)
   }
   MS.innerHTML=svgContent;
 }

@@ -19,7 +19,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
         { id: 2, name: 'Monzo pot', type: 'Current', balance: 1000 },
         { id: 3, name: 'Old pot', type: 'Savings', balance: 0.1 }], stockPies: [], metalPrices: {}, crypto: [] }));
     }, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.goto('file://' + (process.env.VI_INDEX || require('path').join(__dirname, '..', 'index.html'))); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', null); }); await p.waitForTimeout(700);
     const T = w + ' ' + theme + ': ';
