@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] (cloud, Marketing) Digital business card at vault-it.co/pete: flips like the debt tracker cards, house builder animation on the front, contact details and links on the back; card image for Google Wallet; bricks removed from the printed card front (owner, 4 Nov evening: "i don't like the bricks ... create this as a digital card i can first add in my google wallet ... allow users to flip card like in the Vault it debt tracker", "add an animation of my house builder").
 - [ ] (cloud, Marketing) Eligent deck v1.1 from the owner's handwritten notes after the Slava call (owner, 4 Nov evening: "Notes to incorporate into v1.1 of pitch deck"): financials focus, seed ask and use of funds, breakeven, ROI, forecast 2027, roadmap, team change and cofounder, B2B/B2C split, scalability and distribution, neurodiverse audience, UoL study, brand deals and affiliates.
 - [ ] (cloud, Marketing) Eligent live pitch prep: full prep plan from the owner's written notes (owner, 4 Nov evening: "he has invited me to pitch at eligent, detail on everything i need to do to prep, stand by for me to upload written notes").
 - [ ] (cloud, Marketing) Business cards for Eligent: NFC + QR cards and paper cards, Vault-It brand, print-ready (owner, 4 Nov evening: "i need NFT QR code business cards and paper business cards").
