@@ -21239,7 +21239,7 @@ V3Scene.prototype.clear=function(){var g=this.root,keep=function(x){return x&&x.
 /* Pedro, 3 Nov: no flag line under 10.5 px on screen. Each label is measured through the camera as framed and any
    label whose smallest line would show under minPx grows (its lower edge stays on the post). Returns true if one grew. */
 // size the flags (labelFloor) and clear them of each other (declutter), re-framing so the raised flags stay in view
-function v3Settle(V,keep){for(var i=0;i<3;i++){var g=V.labelFloor(10.8),m=V.declutter();if(!g&&!m)break;V.frame(keep&&V._framed);}V.labelFloor(10.8);V.declutter();}
+function v3Settle(V,keep){for(var i=0;i<3;i++){var g=V.labelFloor(10.8),c=V.clampFlags(56,8),m=V.declutter();if(!g&&!c&&!m)break;V.frame(keep&&V._framed);}V.labelFloor(10.8);V.clampFlags(56,8);V.declutter();}
 V3Scene.prototype.labelFloor=function(minPx){
   var H=this.host.clientHeight,cam=this.cam;if(!H)return false;
   this.root.updateMatrixWorld(true);cam.updateMatrixWorld();
@@ -21270,6 +21270,20 @@ V3Scene.prototype.declutter=function(){
       else o.children.forEach(function(c){if(c.isLine&&!c.isLineSegments){var a=c.geometry.attributes.position;a.setY(1,top);a.needsUpdate=true;c.geometry.computeBoundingSphere();}});}
     placed.push(o._r);});
   L.forEach(function(o){delete o._r;});
+  return moved;
+};
+/* CoS, 3 Nov: no flag under the zoom controls. Each label slides sideways along the screen so its right edge stays at
+   least `right` px and its left edge `left` px inside the stage; its post stays put. Returns true if any moved. */
+V3Scene.prototype.clampFlags=function(right,left){
+  var W=this.host.clientWidth,cam=this.cam;if(!W)return false;
+  this.root.updateMatrixWorld(true);cam.updateMatrixWorld();
+  var rt=new THREE.Vector3(1,0,0).applyQuaternion(cam.quaternion),p=new THREE.Vector3(),moved=false;
+  this.root.traverse(function(o){var F=o.userData&&o.userData.v3Font,sp=o.tag;if(!F||!sp)return;
+    sp.getWorldPosition(p);
+    var a=p.clone().addScaledVector(rt,-sp.scale.x/2).project(cam),b=p.clone().addScaledVector(rt,sp.scale.x/2).project(cam);
+    var x0=(Math.min(a.x,b.x)+1)/2*W,x1=(Math.max(a.x,b.x)+1)/2*W,wpx=x1-x0;if(!(wpx>0))return;
+    var dx=0;if(x1>W-right)dx=(W-right)-x1;if(x0+dx<left)dx=left-x0;if(!dx)return;
+    var k=dx/wpx*sp.scale.x;sp.position.x+=rt.x*k;sp.position.z+=rt.z*k;moved=true;});   // the flag's group is never rotated, so world and local axes agree
   return moved;
 };
 V3Scene.prototype.frame=function(keep){

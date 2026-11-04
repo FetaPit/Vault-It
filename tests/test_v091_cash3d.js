@@ -34,7 +34,9 @@ const LABEL_PX = () => {
     V.root.updateMatrixWorld(true); V.cam.updateMatrixWorld(); const H = V.r.domElement.clientHeight, up = new THREE.Vector3(0, 1, 0).applyQuaternion(V.cam.quaternion);
     V.root.traverse(o => { const F = o.userData && o.userData.v3Font; if (!F) return; const sp = o.tag || o.children[0], p = new THREE.Vector3(); sp.getWorldPosition(p);
       const a = p.clone().addScaledVector(up, -sp.scale.y / 2).project(V.cam), b = p.clone().addScaledVector(up, sp.scale.y / 2).project(V.cam), sh = Math.abs(b.y - a.y) / 2 * H;
-      const px = F.f.filter(Boolean).map(f => +(f / F.h * sh).toFixed(1)); out.push({ stage: k, tag: o.userData.v3Tag[0], px, min: Math.min(...px) }); }); });
+      const px = F.f.filter(Boolean).map(f => +(f / F.h * sh).toFixed(1)); const rt = new THREE.Vector3(1, 0, 0).applyQuaternion(V.cam.quaternion), W = V.r.domElement.clientWidth;
+      const l = p.clone().addScaledVector(rt, -sp.scale.x / 2).project(V.cam), r = p.clone().addScaledVector(rt, sp.scale.x / 2).project(V.cam);
+      out.push({ stage: k, tag: o.userData.v3Tag[0], px, min: Math.min(...px), x0: Math.round((Math.min(l.x, r.x) + 1) / 2 * W), x1: Math.round((Math.max(l.x, r.x) + 1) / 2 * W), W }); }); });
   return out;
 };
 
@@ -231,6 +233,8 @@ const LABEL_PX = () => {
       const p = await open(ctx, sub, SEED(ACCTS, { gold: 10, silver: 200, platinum: 0, palladium: 0 }));
       const L = await p.evaluate(LABEL_PX);
       const small = L.filter(x => !(x.min >= 10.5));
+      const clip = L.filter(x => x.x1 > x.W - 55 || x.x0 < 0);
+      ok(L.length && !clip.length, w + ' ' + sub + ': every flag is clear of the zoom controls, right edge 56 px or more inside the stage (' + L.map(x => x.tag.slice(0, 10) + ' ' + x.x0 + '-' + x.x1 + '/' + x.W).join('; ') + ')');
       ok(L.length >= (sub === 'cash' ? 5 : 2) && !small.length, w + ' ' + sub + ': every flag line is 10.5 px or more on screen (' + L.map(x => x.tag.slice(0, 14) + ' ' + x.px.join('/')).join('; ') + ')');
       await ctx.close();
     }
