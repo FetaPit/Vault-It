@@ -1,5 +1,7 @@
 # v0.9.1 release checklist (4 Nov 2026, MVP by 16:00)
 
+**PENDING CI, do not push until the Chief of Staff sends READY: release `fce1d89` (v09x/founder-copy). It contains everything above plus the Founding badge wording, and production's 14:37 and 15:01 pitch updates. It is a fast-forward from live e9f1d46 (checked). Command: `git push origin fce1d8906e08d120736e44474fd31e7cb21cd78a:refs/heads/release/pioneer-v2`. Backup already exists at 0e009b3 (backup/release-pioneer-v2-20261104-1430).** Round 2 F item viewer (merged into candidate 4a0ce74 at 14:48) is not in this release.
+
 **HOLD, 14:43: production moved to `0e009b3` at 14:37 (round 2 pitch presenter release), so ca4750d no longer fast-forwards and its push would be rejected.** Merged in again:
 - `1663527` on `candidate/v0.9.1` (ca4750d + 0e009b3);
 - `50a475c` on `v09x/founder-copy` (the same plus the Founding badge wording).
