@@ -42,6 +42,15 @@ body.present #pv-bar{display:flex}
 .live[data-live="trk"] .live-badge{left:auto;right:calc(20px*var(--s))}
 footer{text-align:center;font:14px 'Share Tech Mono',monospace;color:#7FA9A6;padding:8px 16px 32px}
 footer a{color:#E8C56A}
+/* Vault-It tagline neon (owner, 4 Nov 2026): thin neon red stroke on "red", thin gold gradient neon stroke on "home". */
+.vi-neon{position:relative;display:inline-block;isolation:isolate}
+.vi-neon::before,.vi-neon::after{content:attr(data-t);position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap;color:transparent}
+.vi-neon::before{z-index:-1;-webkit-text-stroke:var(--neon-w,.065em) transparent;-webkit-background-clip:text;background-clip:text}
+.vi-neon::after{z-index:-2;-webkit-text-stroke:var(--neon-w,.065em) var(--neon-glow);filter:blur(.07em);opacity:.85}
+.vi-neon-red{--neon-glow:#FF2E4D}
+.vi-neon-red::before{background-image:linear-gradient(#FF4D63,#FF4D63)}
+.vi-neon-gold{--neon-glow:#F2C94C}
+.vi-neon-gold::before{background-image:linear-gradient(100deg,#B8862E 0%,#F5DC4A 38%,#FFF1B0 52%,#E8C56A 68%,#B8862E 100%)}
 </style></head><body>
 <header><b>Vault-It · Pitch</b><button type="button" class="pv-btn" id="pv-open" aria-label="Present: one slide at a time">PRESENT ▶</button></header>
 <main id="pv-stage">
@@ -49,7 +58,7 @@ footer a{color:#E8C56A}
 <div style="flex:1;display:flex;flex-direction:column;gap:40px">
 <p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;letter-spacing:4px;color:#44C0B9">INVESTOR DECK · NOVEMBER 2026</p>
 <h1 style="font-family:'Syne', Arial, sans-serif;font-size:160px;font-weight:800;line-height:1;color:#E8E8E8">Vault-It</h1>
-<h2 style="font-family:'Syne', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#E8E8E8">Get out of the red and into your home.</h2>
+<h2 style="font-family:'Syne', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#E8E8E8">Get out of the <span class="vi-neon vi-neon-red" data-t="red">red</span> and into your <span class="vi-neon vi-neon-gold" data-t="home">home</span>.</h2>
 <p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:32px;color:#E8C56A;background:#12100A;border:1px solid #C9A84C;border-radius:999px;padding:16px 32px;align-self:start">EXAMPLE KEYS DATE: MARCH 2031</p>
 <p style="font-size:32px;color:#B6D8D6">Pete Thickett, Founder · vault-it.co</p>
 </div>
@@ -265,7 +274,7 @@ footer a{color:#E8C56A}
 </div>
 <div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#12100A;border:1px solid #C9A84C;border-radius:18px;padding:32px">
 <h3 style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#E8C56A">Founding</h3>
-<p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:44px;color:#E8C56A">£199 once</p>
+<p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:44px;color:#E8C56A">£149 once</p>
 <p style="font-size:24px;line-height:1.35;color:#E8E8E8">Capped at 100 seats. Perks only, no equity. Never reopened</p>
 </div>
 </div>
@@ -337,7 +346,7 @@ footer a{color:#E8C56A}
 <p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;color:#E8C56A">2 · WEEKS 5 TO 6</p>
 <h3 style="font-family:'Syne', Arial, sans-serif;font-size:44px;font-weight:700;color:#E8E8E8">Founding pre-sale</h3>
 <ul style="font-size:26px;line-height:1.4;color:#B6D8D6">
-<li>100 seats at £199, up to £19,900, no dilution</li>
+<li>100 seats at £149, up to £14,900, no dilution</li>
 <li>Sold to the waitlist through a 5-email sequence</li>
 <li>Live, true counter and a fixed close date</li>
 </ul>
