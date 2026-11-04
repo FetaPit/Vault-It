@@ -195,7 +195,7 @@ const LABEL_PX = () => {
     const c = await p.evaluate(() => { const V = V3.cash; V.r.info.autoReset = true; V.r.render(V.sc, V.cam); return { calls: V.r.info.render.calls, tris: V.r.info.render.triangles, plates: V.stats.plates.length, dpr: V.r.getPixelRatio() }; });
     console.log(JSON.stringify(c));
     ok(c.calls <= c.plates * 3 + 10, 'cash at £250,300: at most three draws a plate plus the fixed floor and flags (' + c.calls + ' for ' + c.plates + ' plates)');
-    ok(c.tris < 120000, 'cash at £250,300: past ' + 12 + ' blocks each block is one painted box, so the triangle count stays low (' + c.tris + ')');
+    ok(c.tris < 120000, 'cash at £250,300: past the stacks\' triangle budget each block is one closed painted box, so the triangle count stays low (' + c.tris + ')');
     ok(c.dpr <= 2 + 1e-9, 'pixel ratio at most 2, the house builder rule (R16 replaced the flat 1.5 cap) (' + c.dpr + ')');
     await p.evaluate(() => showSubtab('assets', 'metals', null));
     await p.evaluate(() => { alState.metals = { gold: 1000, silver: 0, platinum: 0, palladium: 0 }; renderMetalsISO(); });
