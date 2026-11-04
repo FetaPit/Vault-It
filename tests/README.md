@@ -63,7 +63,7 @@ node tests/test_ui_round2.js         # v0.7 UI round 2 (for alpha 0.8), Net wort
 node tests/test_signoff_d.js         # Phone sign-off D: income flow bands get a bright colour stroke and leaders; only two reds, clearly apart, AA text
 node tests/test_signoff_d.js         # Phone sign-off D: income flow bands get a bright colour stroke and leaders; only two reds, clearly apart
 node tests/test_footer.js             # footer: approved disclaimer, Privacy notice / Beta terms links in the app and landing footers, type floors, --footer-h tracks the fixed footer
-node tests/test_v08_chrome.js         # v0.8 chrome: Message the Dev last on every tab, Feedback fixed bottom right, footer collapses to the FCA strip (full on scroll up / page end), compact category pills (below Cash flow), synced scroll rails above and below the flow charts
+node tests/test_v08_chrome.js         # v0.8 chrome: Message the Dev last on Overview and gone from every other tab (v0.9.1), Feedback fixed bottom right, footer collapses to the FCA strip (full on scroll up / page end), compact category pills (below Cash flow), synced scroll rails above and below the flow charts
 node tests/test_csp_report_only.mjs   # Worker: Content-Security-Policy-Report-Only lists every outside host the app calls; enforced CSP unchanged
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width
 node tests/test_nw3d.js            # net worth in 3D (on by default): flag off unchanged, 3D | Graph toggle, same numbers in both views, debts grouped by kind (cards stacked in one column, each in its own colour), zoom buttons / ctrl+wheel / reset (VI_APP=file:///… to test another copy)
@@ -80,12 +80,20 @@ node tests/test_toast_race.js      # shared toast (v0.9.1): the opening build un
 node tests/test_v07_e9.js          # v0.7 E9: budget spending groups folded by default; a saved choice wins
 node tests/test_v07_e10.js         # v0.7 E10: expense bar arrow: sprite chevron 20 px in a 44 px target, down folded, up open
 node tests/test_v08_cards.js        # v0.8 D2: budget cards (no separator, 30-32 px icons, 10 px titles, titles clear of the amount) and the one House progress tile (iconned stats, house-type milestones, no dead columns)
+node tests/test_v091_house_xp_deposit.js  # v0.9.1 G: house milestones pay Wealth Roadmap XP once (E9: 20 to 200, 300 last; silent backfill; latched) and the deposit account note (E26: logo, AER, Lifetime ISA bonus estimate not added to saved, First Time Buyer ISA not open yet)
 node tests/test_v091_debt_cards.js  # v0.9.1 E33: every debt type is a 3D tile with its lender icon (no chip, number or network off cards), pays down right to left, undo, provider field, old saves load
 node tests/test_v091_debt_reverse.js # v0.9.1 E33b: type icon under the logo on debt tiles; the back shows the debt-free date (estimate), interest this month and year, last three payments and paid so far
 node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, on #bd-sankey, Night and Daylight
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
 node tests/test_v091_cash3d.js     # v0.9.1 chunk A: a gold plate and flag per cash account (bank mark, amount, rate), the intro drop, "Add to vault" per metal, the draw budget
 node tests/v3_measure.js           # not a test: prints the cash and metals stages' draw calls, triangles and frame times at 390 px on a 4x CPU, for before and after numbers
+node tests/test_secondhand_server.js  # v0.9.1 E28: secondhand-estimate edge function (junk filter, trimmed median and IQR, haircut, condition factors, minimum 5, cache, flags off means no call), fixtures in tests/fixtures/secondhand
+node tests/test_v091_secondhand.js    # v0.9.1 E28: condition field, estimate needs a tap to apply, "Not available yet" with manual links, old items untouched, wording, 10.5 px floor
+node tests/test_v091_chrome.js      # v0.9.1 chrome: rotating dial mark (turns on load and click, static under reduced motion), bigger desktop menu bar (icons 24 / 22 px, no zoom), pinned Assets sub-menu (one row of six icons on phones), Message the Dev on Overview only, sidebar colours, crowdfund Vaulter card (prices from VI_PLANS, real counts, Open days)
+node tests/test_014.mjs             # migration 014 on pglite: campaign_counts() gives backers per paid plan and nothing personal; anon may call it
+node tests/test_v091_stocks_return.js # v0.9.1 E17: Stocks tiles judged from when a holding was added (entry price kept in addPx, avgCost never rewritten), "Check your average cost" nudge, tiles reconcile
+node tests/test_v091_stocks_map.js # v0.9.1 E19, E20: Stocks tree map is taller, no label clipped or under 10.5px, tiny holdings merge into "Other (n)" with a list, fund names not codes, logos in rows and tiles with initials fallback
 node tests/test_v091_overview_budget.js  # v0.9.1 E4/E23/E5/E6: Cash Flow tile 3D only, Net worth window +20%, Budget pills full width, Budget 3D viewport larger
 node tests/test_v091_inventory_files.js  # v0.9.1 E29: inventory 3D uploads: .glb .gltf .stl .obj .fbx .3mf preview, persist across reload, old glb-only record opens, STL/OBJ tinted, oversize and wrong type error
 - `test_v091_cash_accounts.js`: v0.9.1 E15/E16, cash account interest rate (AER), add and take out with Undo, over-balance refused, old saves load, pence-exact.
+node tests/test_v091_3d_fit.js  # v0.9.1: Net worth plate and Budget tree map never touch the stage edges with real data, at 1100 to 1920 wide, through the idle camera swing

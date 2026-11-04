@@ -10614,6 +10614,7 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .hbc-pre{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .hbc-note{font-size:10.5px;color:var(--t3);line-height:1.55;margin-top:8px}
 #hbm-in{display:grid;grid-template-columns:1fr 1fr;gap:10px}#hbm-in label{display:block;font-size:10.5px;color:var(--t3);margin-bottom:4px}#hbm-in input{width:100%;background:var(--surf);border:1px solid var(--line2);border-radius:8px;color:var(--text);padding:9px 10px;font:600 14px var(--font-mono)}#hbm-in input:focus{border-color:var(--teal);outline:none}@media(max-width:600px){#hbm-in{grid-template-columns:1fr}}
+#hbd-in{display:grid;grid-template-columns:1fr 1fr;gap:10px}#hbd-in label{display:block;font-size:12px;color:var(--t3);margin-bottom:4px}#hbd-in input,#hbd-in select{width:100%;background:var(--surf);border:1px solid var(--line2);border-radius:8px;color:var(--text);padding:9px 10px;font:600 14px var(--font-mono)}#hbd-in input:focus,#hbd-in select:focus{border-color:var(--teal);outline:none}@media(max-width:600px){#hbd-in{grid-template-columns:1fr}}
 .hbc-lump{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:end;margin-top:6px}
 
 .stk-pie{position:relative}
@@ -10722,6 +10723,9 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .stk-inp:focus{outline:none;border-color:var(--em)}
 .stk-val{font-family:'Share Tech Mono',monospace;font-size:max(.62rem,var(--vi-fs-2));color:var(--tx);text-align:right}
 .stk-pl{font-family:'Share Tech Mono',monospace;font-size:max(.56rem,var(--vi-fs-2));text-align:right}
+.stk-chk{font:inherit;font-family:'DM Sans',sans-serif;font-size:max(.56rem,var(--vi-fs-2));line-height:1.25;color:var(--gold);background:rgb(var(--gold-rgb) / .1);border:1px solid rgb(var(--gold-rgb) / .5);border-radius:4px;padding:3px 6px;cursor:pointer;text-align:right;white-space:normal}
+.stk-pl:has(.stk-chk){grid-column:1/-1;text-align:left!important;grid-area:auto}.stk-chk{white-space:nowrap!important}
+.stk-chk:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .stk-src{font-size:max(.4rem,var(--vi-fs-1));color:var(--t3);margin-top:2px;font-family:'Share Tech Mono',monospace}
 .stk-add{display:grid;grid-template-columns:2fr .7fr .8fr 1fr auto;gap:8px;margin-top:12px}
 @media(max-width:700px){.stk-add{grid-template-columns:1fr 1fr}.stk-add>div:first-child{grid-column:1/-1}}
@@ -10743,14 +10747,33 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .stk-grp{border:1px solid rgb(var(--ink-rgb) / .08);border-radius:10px;margin:8px 0;overflow:hidden}
 .stk-gh{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:rgb(var(--ink-rgb) / .03);border:0;color:var(--tx);cursor:pointer;text-align:left;font:600 max(.66rem,var(--vi-fs-2)) 'DM Sans',sans-serif}
 .stk-gh:hover{background:rgb(var(--teal-rgb) / .08)}.stk-gh:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+.stk-gh .stk-plat{position:static;flex-shrink:0}   /* it was positioned against the page and pushed it sideways */
 .stk-chev{width:16px;height:16px;flex:none;transition:transform .2s;transform:rotate(-90deg);color:var(--teal)}.stk-grp.open .stk-chev{transform:none}
 .stk-gn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Syne',sans-serif;font-weight:700}
 .stk-gc{font:max(.5rem,var(--vi-fs-1)) 'Share Tech Mono',monospace;color:var(--t3);white-space:nowrap}
-.stk-gv{font:700 max(.66rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--tx);white-space:nowrap;text-align:right}.stk-gv small{color:var(--t3);font-weight:400}
+.stk-gv{font:700 max(.66rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--tx);white-space:nowrap;text-align:right}.stk-gv small{color:var(--t3);font-weight:400;font-size:max(10.5px,.9em)}
 .stk-gb{overflow-x:auto;padding:0 12px}
 @media(prefers-reduced-motion:reduce){.stk-chev{transition:none}}
 .stk-tm{margin:6px 0 2px}.stk-tm-pie{position:absolute;border:1.5px solid;border-radius:9px;pointer-events:none;opacity:.9}
-.stk-tm-c .dtm-n,.stk-tm-c .dtm-v,.stk-tm-c .dtm-s{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.stk-tm-c .dtm-n,.stk-tm-c .dtm-v,.stk-tm-c .dtm-s{color:inherit;text-shadow:none;opacity:1}
+.stk-tm-c.dtm-cell::after{background:none}
+.c-tk{display:flex;gap:8px;align-items:flex-start;min-width:0}.stk-tkb{min-width:0;flex:1}
+.stk-hl{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:7px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
+.stk-hl img{width:100%;height:100%;object-fit:contain;display:block;padding:2px;box-sizing:border-box}
+.stk-hl .stk-mono{font-size:max(10.5px,var(--vi-fs-1))}.stk-hl-fb{align-items:center;justify-content:center}
+.stk-fundb{display:flex;align-items:center;justify-content:center;width:100%;height:100%}.stk-fundb svg{width:70%;height:70%}
+.stk-tm-c{padding:6px 8px;gap:2px;--tm-fs:12px}
+.stk-tm-c .dtm-hd{display:flex;align-items:flex-start;gap:6px;min-width:0}
+.stk-tm-c .dtm-n{font-size:var(--tm-fs);line-height:1.2;white-space:nowrap;overflow:visible;text-overflow:clip}
+.stk-tm-c .dtm-v{font-size:calc(var(--tm-fs) + .5px);line-height:1.3}
+.stk-tm-c .dtm-s{font-size:var(--tm-fs);margin-top:auto}
+.stk-tm-c .stk-hl{border-radius:5px}
+.dtm-other{cursor:pointer}.dtm-other:focus-visible{outline:2px solid var(--em);outline-offset:-2px}
+.stk-tm .dtm-tip{white-space:normal;max-width:min(280px,calc(100% - 4px))}
+.stk-tm-other{margin:8px 0 2px;font:max(11px,var(--vi-fs-1)) 'DM Sans',sans-serif;color:var(--t2)}.stk-tm-other:empty{display:none}
+.stk-tm-other>b{color:var(--tx);font-weight:700}
+.stk-tm-ol{display:flex;gap:6px;align-items:baseline;margin-top:4px;overflow-wrap:anywhere}.stk-tm-ol i{width:10px;height:10px;border-radius:3px;flex-shrink:0;position:relative;top:1px}.stk-tm-ol em{font:normal 11px 'Share Tech Mono',monospace;color:var(--tx)}
+@media(prefers-reduced-motion:reduce){.stk-tm-c{transition:none}.stk-tm-c:hover{transform:none}}
 .stk-tm-key{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 8px;font:max(.52rem,var(--vi-fs-1)) 'DM Sans',sans-serif;color:var(--t2)}
 .stk-tm-k i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}.stk-tm-k b{font-family:'Share Tech Mono',monospace;color:var(--tx);font-weight:400}
 .stk-bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:max(.52rem,var(--vi-fs-1))}
@@ -11148,6 +11171,65 @@ body.reduced-motion #vt-spot,body.reduced-motion #vt-card,body.reduced-motion .v
 .auth-footer{color:var(--muted)!important;opacity:1!important;font-size:max(.5rem,var(--vi-fs-1))!important;letter-spacing:.04em!important;text-transform:none!important}
 .vi-fca{color:var(--muted);font-family:var(--font-body);font-size:max(.5rem,11px);letter-spacing:0;text-transform:none;margin-left:6px;white-space:nowrap}
 .vi-disc{color:var(--muted);font-family:var(--font-body);font-size:max(.5rem,10px);line-height:1.35;letter-spacing:0;text-transform:none;flex:1 1 100%;margin-top:1px}
+</style>
+<style id="vi-v091-chrome">
+/* ═══ v0.9.1 chrome: E1 mark, E2 bigger desktop menu bar, E24 pinned Assets sub-menu ═══ */
+:root{--vi-hdr-h:60px;--vi-mark-size:28px}
+@media(min-width:600px){:root{--vi-mark-size:36px}}
+@media(min-width:1024px){:root{--vi-mark-size:44px}}
+.vi-mark{width:var(--vi-mark-size);height:var(--vi-mark-size)}
+@media(prefers-reduced-motion:reduce){.vi-mark .ticks{transition:none!important}}
+/* E2: bigger menu bar, set sizes (no zoom). From 1280 px: icons 24, labels 12.5 px, tabs 48 tall. 1100 to 1279: icons 22, labels 11.5 px.
+   The seven labelled tabs are about 1,100 px wide at these sizes, which cannot share a row with the logo, net worth, Back Vault-It and the
+   Night/Daylight switch below roughly 1,900 px, so the two-row header stays (logo row, tab row) and viNavFit uses one row when it does fit. */
+@media(min-width:1024px){
+  body{--r1:50px;--r2:54px}
+  html body #topnav{grid-template-rows:var(--r1) var(--r2)}
+  html body #topnav .nav-brand{height:var(--r1)!important}
+  html body #topnav .vi-tabs{height:var(--r2)}
+  html body.vi-nav1{--nav-row:60px}
+  html body.vi-nav1 #topnav{grid-template-rows:var(--nav-row)}
+  html body.vi-nav1 #topnav .nav-brand{height:var(--nav-row)!important}
+  html body.vi-nav1 #topnav .vi-tabs{height:var(--nav-row)}
+  body.vi-nav1 #left-sidebar{top:var(--vi-hdr-h,60px)!important}
+}
+@media(min-width:1100px){
+  body{--r1:52px;--r2:56px}
+  html body.vi-nav1{--nav-row:64px}
+  html body #topnav .tab-btn,html body.vi-nav1t #topnav .tab-btn{height:44px!important;padding:0 7px!important;gap:6px;letter-spacing:.04em!important;font-size:11.5px!important}
+  html body #topnav .tab-btn .vi-ic.ti{width:22px!important;height:22px!important}
+}
+@media(min-width:1280px){
+  body{--r1:56px;--r2:60px}
+  html body.vi-nav1{--nav-row:72px}
+  html body #topnav .tab-btn,html body.vi-nav1t #topnav .tab-btn{height:48px!important;padding:0 9px!important;gap:8px;letter-spacing:.05em!important;font-size:12.5px!important}
+  html body #topnav .tab-btn .vi-ic.ti{width:24px!important;height:24px!important}
+}
+/* E24: the Assets sub-menu stays pinned under the header while the page scrolls (nothing above it may set overflow) */
+#assets-page .subtab-nav{position:sticky;top:var(--vi-hdr-h,60px);z-index:400;background:var(--bg);border-bottom:1px solid var(--line);margin:0 -20px 12px;padding:8px 20px}
+@media(min-width:600px) and (max-width:1099px){   /* tablet: one row of six, icon over label; the total drops to a slim line beneath */
+  html #assets-page .subtab-nav{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+  html #assets-page .subtab-nav .subtab-btn{flex-direction:column;gap:3px;padding:7px 3px!important;min-height:44px}
+  html #assets-page .subtab-btn .vi-ic.sti{width:26px;height:26px;--vi-sw:1.25;opacity:1}
+  html #assets-page .subtab-nav>div[style*="margin-left:auto"]{padding:0;font-size:max(.66rem,var(--vi-fs-2))}
+}
+@media(max-width:599px){   /* phone: one row of six icons, 44 px targets; the name is the aria-label / long-press title */
+  #assets-page{padding-left:12px!important;padding-right:12px!important}
+  html #assets-page .subtab-nav{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px!important;margin:0 -12px 10px;padding:4px 8px}
+  html #assets-page .subtab-nav .subtab-btn{min-width:44px;height:44px;padding:0!important;justify-content:center!important}
+  #assets-page .subtab-btn>span,#assets-page .subtab-nav>div[style*="margin-left:auto"]{display:none!important}
+  html #assets-page .subtab-btn .vi-ic.sti{width:30px;height:30px;--vi-sw:1.25;opacity:1}   /* E24b: bigger and crisper, the detail (fill, dotted ring, accents) reads at 30 px */
+}
+html body #left-sidebar{top:var(--vi-hdr-h,60px)!important}
+@media(min-width:1100px){   /* E24b: desktop sub-menu icons are 24 px and the buttons keep a 44 px target */
+  html #assets-page .subtab-btn .vi-ic.sti{width:24px;height:24px;--vi-sw:1.25;opacity:1}
+  html #assets-page .subtab-nav .subtab-btn{min-height:44px}
+}
+/* type floor (Pedro, 3 Nov): sidebar labels, crowdfund small labels and the USP / PRO pills are at least 10.5 px; the crowdfund close is a 44 px tap */
+html body .sb-label,html body .sb-field-lbl,html body #vi-campaign-modal .vi-camp-eyebrow,html body #vi-campaign-modal .vi-camp-stat-lbl,html body #vi-campaign-modal .vi-camp-tier-badge{font-size:10.5px}
+html body #topnav .vi-usp,html body #topnav .vi-pro{font-size:10.5px!important}
+@media(min-width:600px) and (max-width:1023px){html body #topnav .vi-usp,html body #topnav .vi-pro{top:-2px;padding:0 2px;letter-spacing:.02em}}   /* icon-only tabs are 44 px wide: the 10.5 px pill sits clear of the icon */
+html body #vi-campaign-modal .vi-camp-close{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 </style>
 <style id="vi-daylight">
 /* ═══ Daylight polish (brand phase 6): ink on paper, no glow, nothing faint. Night is untouched. ═══ */
@@ -11981,7 +12063,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
             <span class="vi-camp-stat-lbl">Funded</span>
           </div>
           <div class="vi-camp-stat">
-            <span class="vi-camp-stat-val" id="camp-days">–</span>
+            <span class="vi-camp-stat-val" id="camp-days">Open</span>
             <span class="vi-camp-stat-lbl">Days left</span>
           </div>
         </div>
@@ -11996,18 +12078,18 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div class="vi-camp-tier">
           <div class="vi-camp-tier-badge"></div>
           <div class="vi-camp-tier-name">Vaulter</div>
-          <div class="vi-camp-tier-price">£0</div>
-          <div class="vi-camp-tier-note">After your 30 days: read-only, nothing lost.</div>
+          <div class="vi-camp-tier-price" id="camp-price-vaulter">£5.99<span> a month</span></div>
+          <div class="vi-camp-tier-note" id="camp-note-vaulter">after the 30-day free trial; £3.99 for testers and early adopters</div>
           <ul class="vi-camp-tier-features">
             <li>Dashboard &amp; KPIs</li>
             <li>Journey map</li>
             <li>House builder</li>
             <li>Debt tracker</li>
-            <li class="vi-dim">Entrepreneur tools</li>
-            <li class="vi-dim">NW History</li>
-            <li class="vi-dim">3D Vault</li>
+            <li>Entrepreneur tools</li>
+            <li>NW History</li>
+            <li>3D Vault</li>
           </ul>
-          <button class="vi-camp-tier-cta vi-camp-cta-ghost" disabled>No commitment needed</button>
+          <button class="vi-camp-tier-cta vi-camp-cta-em" id="camp-cta-vaulter" onclick="showUpgrade('monthly'); document.getElementById('vi-campaign-modal').classList.add('hidden')">Become a Vaulter →</button>
         </div>
         <!-- Pro Backer (featured) -->
         <div class="vi-camp-tier vi-camp-featured">
@@ -12016,7 +12098,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <div class="vi-camp-tier-price">£49.99<span>/yr</span></div>
           <div class="vi-camp-tier-note">Around 30% less than monthly. Beta testers pay £39.99. Renews at the same price as long as you stay subscribed.</div>
           <ul class="vi-camp-tier-features">
-            <li>Everything in Free</li>
+            <li>Everything in Vaulter</li>
             <li>Entrepreneur tab</li>
             <li>NW History</li>
             <li>3D Vault visualization</li>
@@ -12197,7 +12279,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
   </div>
 </div>
 <nav id="topnav">
-  <div class="nav-brand" onclick="showTab('overview')" style="display:flex;align-items:center;gap:7px;padding:0 14px 0 4px;cursor:pointer;flex-shrink:0;border-right:1px solid rgb(var(--teal-rgb) / .12);margin-right:4px;height:48px">
+  <div class="nav-brand" onclick="viMarkTurn();showTab('overview')" style="display:flex;align-items:center;gap:7px;padding:0 14px 0 4px;cursor:pointer;flex-shrink:0;border-right:1px solid rgb(var(--teal-rgb) / .12);margin-right:4px;height:48px">
     <span class="vi-mark" aria-hidden="true"><span class="vi-mark-night"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><circle cx="120" cy="120" r="108" fill="#080808" stroke="#44C0B9" stroke-width="14"/><polygon points="60,76 88,76 120,126.2 152,76 180,76 120,170" fill="#44C0B9"/></svg></span><span class="vi-mark-day"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><circle cx="120" cy="120" r="108" fill="#FFFFFF" stroke="#006B67" stroke-width="14"/><polygon points="60,76 88,76 120,126.2 152,76 180,76 120,170" fill="#006B67"/></svg></span></span>
     <span class="logo wm" style="margin:0" role="img" aria-label="Vault-It">Vault<i class="dot"></i><b>It</b></span>
   </div>
@@ -12705,17 +12787,17 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 <div id="tab-assets" class="tab-panel" style="display:none">
   <div id="assets-page" style="max-width:1100px;margin:0 auto;padding:24px 20px 60px">
     <div class="subtab-nav" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-      <button class="subtab-btn active" data-sub="cash" onclick="showSubtab('assets','cash',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cash"/></svg><span>Cash and savings</span>
+      <button class="subtab-btn active" data-sub="cash" aria-label="Cash and savings" title="Cash and savings" onclick="showSubtab('assets','cash',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cash"/></svg><span>Cash and savings</span>
       </button>
-      <button class="subtab-btn" data-sub="stocks" onclick="showSubtab('assets','stocks',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-candles"/></svg><span>Stocks and shares</span>
+      <button class="subtab-btn" data-sub="stocks" aria-label="Stocks and shares" title="Stocks and shares" onclick="showSubtab('assets','stocks',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-candles"/></svg><span>Stocks and shares</span>
       </button>
-      <button class="subtab-btn" data-sub="metals" onclick="showSubtab('assets','metals',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-metals"/></svg><span>Precious metals</span>
+      <button class="subtab-btn" data-sub="metals" aria-label="Precious metals" title="Precious metals" onclick="showSubtab('assets','metals',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-metals"/></svg><span>Precious metals</span>
       </button>
-      <button class="subtab-btn" data-sub="other" onclick="showSubtab('assets','other',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cube"/></svg><span>Wealth inventory</span>
+      <button class="subtab-btn" data-sub="other" aria-label="Wealth inventory" title="Wealth inventory" onclick="showSubtab('assets','other',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cube"/></svg><span>Wealth inventory</span>
       </button>
-      <button class="subtab-btn" data-sub="crypto" onclick="showSubtab('assets','crypto',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-crypto"/></svg><span>Crypto</span>
+      <button class="subtab-btn" data-sub="crypto" aria-label="Crypto" title="Crypto" onclick="showSubtab('assets','crypto',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-crypto"/></svg><span>Crypto</span>
       </button>
-      <button class="subtab-btn" data-sub="liabilities" onclick="showSubtab('assets','liabilities',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-liabilities"/></svg><span>Liabilities</span>
+      <button class="subtab-btn" data-sub="liabilities" aria-label="Liabilities" title="Liabilities" onclick="showSubtab('assets','liabilities',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-liabilities"/></svg><span>Liabilities</span>
       </button>
       <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));color:var(--em);white-space:nowrap">
         Total: <span id="tab-total-assets" style="font-weight:700">£0</span>
@@ -12908,7 +12990,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
             <div style="position:relative"><input type="text" id="stk-sym" class="al-inp" style="width:100%" placeholder="Search a fund, ETF or share by name, ticker or ISIN" autocomplete="off" oninput="stkSuggest(this.value)" onkeydown="if(event.key==='Enter')stkAdd()"><div id="stk-suggest" class="stk-suggest"></div></div>
             <input type="number" id="stk-units" class="al-inp" placeholder="Units" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
             <input type="number" id="stk-amt" class="al-inp" placeholder="…or £ held" min="0" step="any" title="Don't know the units? Enter the £ value you hold and the units are worked out from the live price" onkeydown="if(event.key==='Enter')stkAdd()">
-            <input type="number" id="stk-cost" class="al-inp" placeholder="Avg cost £ (optional)" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
+            <input type="number" id="stk-cost" class="al-inp" placeholder="Cost per unit £" title="What you paid for one unit, in £. Leave empty and the price when you add it is used" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
             <button class="btn-add-data" onclick="stkAdd()">+ Add holding</button>
           </div>
           <div class="stk-note">UK-listed funds &amp; ETFs end in <b>.L</b> (VUSA.L, VWRL.L). US shares are plain (AAPL, MSFT). Or just <b>search by name or ISIN</b> and pick the fund. Prices convert to £ automatically. Edit units, cost or price any time. Everything here counts towards your net worth.</div>
@@ -13772,7 +13854,16 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wi-link-kinds label{display:flex;gap:8px;align-items:center;cursor:pointer}
 .wi-link-prev{font:max(.6rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--t1);background:rgb(var(--teal-rgb) / .08);border-radius:6px;padding:8px 10px;margin:10px 0;overflow-wrap:anywhere}
 #wi-link-card [hidden]{display:none!important}
-.wi-link-hint{font-size:max(.52rem,var(--vi-fs-1));color:var(--t2);margin:6px 0 0}
+.vi-pop.wi-liab .wi-link-kinds,.vi-pop.wi-liab #wi-link-guess,.vi-pop.wi-liab #wi-link-prev{display:none}
+.wi-link-prev:empty{display:none}
+.wi-mres{margin:10px 0 0;font-size:max(.66rem,var(--vi-fs-2));color:var(--t1);line-height:1.45;overflow-wrap:anywhere}
+.wi-mres p{margin:0 0 6px}
+.wi-mres details{margin:2px 0 8px;color:var(--t2)}.wi-mres summary{cursor:pointer;color:var(--teal);font-weight:600}
+#wl-mapply{margin-top:4px}
+#wl-msearch,#wl-mapply{min-height:44px}
+.wi-mlinks{display:flex;gap:6px 16px;flex-wrap:wrap;margin:10px 0 0}
+.wi-mlinks a{display:inline-flex;align-items:center;min-height:44px;padding:8px 0;font-size:max(.66rem,var(--vi-fs-2));color:var(--teal);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.wi-link-hint{font-size:max(.52rem,var(--vi-fs-1));color:var(--t2);margin:6px 0 8px}
 .wi-del{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.5);border:none;color:rgba(255,80,80,.6);font-size:max(.7rem,var(--vi-fs-3));cursor:pointer;width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;line-height:1}
 .wi-del:hover{color:#ff4444;background:rgba(255,0,0,.15)}
 /* Icon picker */
@@ -14772,8 +14863,31 @@ body.vi-pop-open{overflow:hidden}
 #hb-hud .ms-lbl b{flex:none;min-width:3ch;display:inline;font-family:'Share Tech Mono',monospace;font-weight:400;font-size:18px;color:var(--gold);opacity:1}
 #hb-hud .ms:not(.hit):not(.next) .ms-lbl b{opacity:1}
 #hb-hud .ms-tg{flex:none;white-space:nowrap;font-family:'Share Tech Mono',monospace;font-size:11.5px;color:var(--t2)}
-#hb-hud .ms:not(.next) .ms-tg{display:none}
-@container (max-width:899px){#hb-hud .ms{flex-wrap:wrap}#hb-hud .ms-lbl{flex:1 1 0}#hb-hud .ms-tg{flex:0 0 100%;padding-left:32px;margin-top:-2px}}   /* narrow: "£x to go" sits under its label, not at the row edge */
+#hb-hud .ms:not(.next):not(.hit) .ms-tg{display:none}
+#hb-hud .ms.hit .ms-tg{color:var(--brass)}
+#hb-hud .hb-dacct{margin-top:14px;padding:12px 14px;border:1px solid rgb(var(--teal-rgb) / .22);border-radius:10px;background:rgb(var(--teal-rgb) / .04);min-width:0}
+#hb-hud .hb-da-hd{margin:0 0 8px}
+#hb-hud .hb-da-hd .vi-ic{width:16px;height:16px;vertical-align:-3px}
+#hb-hud .hb-da-q,#hb-hud .hb-da-bonus,#hb-hud .hb-da-rules{margin:0 0 8px;font-size:12px;line-height:1.5;color:var(--t2)}
+#hb-hud .hb-da-bonus b{color:var(--brass);font-family:'Share Tech Mono',monospace;font-weight:400;font-size:13px}
+#hb-hud .hb-da-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;min-width:0}
+#hb-hud .hb-da-row .cash-logo{width:32px;height:32px;border-radius:8px}
+#hb-hud .hb-da-txt{flex:1;min-width:0;display:flex;flex-direction:column}
+#hb-hud .hb-da-txt b{font-family:'Syne',sans-serif;font-size:14px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#hb-hud .hb-da-txt span{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--teal)}
+#hb-hud .hb-da-fca{font-size:11px;color:var(--t3);line-height:1.5}
+.log-entry .hb-da-log{display:inline-flex;align-items:center;gap:5px;margin-left:8px;vertical-align:middle}
+.log-entry .hb-da-log .cash-logo{width:16px;height:16px;border-radius:4px}
+#hb-hud .hb-da-hd,#hb-hud .hb-dacct .hb-da-hd{font-size:11.5px}
+#hb-hud .hb-da-bonus,#hb-hud .hb-da-rules{max-width:70ch}
+#hb-hud .hb-dacct .hb-da-fca{font-size:12px}
+#hb-hud .hb-da-txt .hb-da-rate{white-space:nowrap}
+#hbd-ov .hbc button,#hb-hud .hb-dacct .stk-btn{min-height:44px;min-width:44px}
+#hbd-ov input,#hbd-ov select{min-height:44px}
+#hbd-ov .hbc-note{font-size:11.5px}
+#hbd-ov .stk-btn{font-size:12px}
+#hbd-ov .hbd-x{display:inline-grid;place-items:center;min-width:44px;min-height:44px;padding:10px;cursor:pointer;font-size:20px}
+@container (max-width:899px){#hb-hud .ms.next{flex-wrap:wrap}#hb-hud .ms.next .ms-lbl{flex:1 1 0}#hb-hud .ms.next .ms-tg{flex:0 0 100%;padding-left:32px;margin-top:-2px}}   /* narrow: "£x to go" sits under its label, not at the row edge (chunk F); done rows keep "+n XP" on the line (G) */
 @container (min-width:520px){
   .hb-stx6{grid-template-columns:repeat(3,minmax(0,1fr))}
   .hb-stx6>div{flex-direction:row;text-align:left;justify-content:flex-start;gap:0 10px;padding:12px 12px 10px;flex-wrap:wrap}
@@ -14878,9 +14992,13 @@ function viRoadmapPlace(id){
   slot.appendChild(c);_fireFirstPaint=true;
   if(id==='achievements')setTimeout(function(){try{renderFIREroadmap();}catch(e){}},0);
 }
-// Message the Dev sits at the foot of every tab (owner, 2 Nov: "at the bottom of each tab, not at the top"): one card, moved into the open tab's page as its last block
+// Message the Dev shows on the dashboard only (owner, 3 Nov, v0.9.1: "only needs to be shown on the dashboard, remove it from the rest"):
+// it is the last block of Overview, and on every other tab it is taken out of the page (kept here, not hidden) until Overview opens again
+var _viDevCard=null;
 function viDevCardPlace(panel){
-  var c=document.getElementById('vi-devcard');panel=panel||document.querySelector('.tab-panel.active');if(!c||!panel)return;
+  if(!_viDevCard)_viDevCard=document.getElementById('vi-devcard');
+  var c=_viDevCard;panel=panel||document.querySelector('.tab-panel.active');if(!c||!panel)return;
+  if(panel.id!=='tab-overview'){if(c.parentNode)c.parentNode.removeChild(c);return;}
   var host=panel.firstElementChild&&!/^(SCRIPT|STYLE)$/.test(panel.firstElementChild.tagName)?panel.firstElementChild:panel;
   if(host.lastElementChild!==c)host.appendChild(c);
 }
@@ -14928,6 +15046,7 @@ function showSubtab(group,id,btn){
   const sp=document.getElementById(group+'-'+id);
   if(sp){sp.classList.add('active');sp.style.display='block';}
   if(btn)btn.classList.add('active');
+  if(group==='assets'){var nv=document.querySelector('#assets-page .subtab-nav');if(nv&&sp){var gap=sp.getBoundingClientRect().top-nv.getBoundingClientRect().bottom;if(gap<0)window.scrollBy(0,gap);}}   // v0.9.1: the pinned bar stays put; a new panel starts right under it
   if(group==='assets'&&id==='metals')setTimeout(renderMetalsISO,30);
   if(group==='assets'&&id==='cash')setTimeout(renderCashISO,80);
   if(group==='assets'&&id==='stocks'){try{stkRender();}catch(e){}setTimeout(stkAutoRefresh,100);}
@@ -15193,11 +15312,11 @@ function viRenderLedger(){
   if(typeof bizState!=='undefined'&&bizState.incomeStreams)bizState.incomeStreams.forEach(function(s){biz+=(+s.monthlyIncome||0)});
   var inc=cfTotalIn(),outM=cfTotalOut(),sur=inc+biz-outM;
   sec('Overview');
-  line('nw',nw>=0?'var(--teal)':'var(--red)','Net worth',f(nw),'sb-nw');
-  line('inv','var(--teal)','Total assets',f(assets),'sb-assets');
+  line('nw',nw>=0?'var(--teal)':'var(--red)','Net worth',f(nw),'sb-nw',nw>=0?'var(--teal)':'var(--red)');
+  line('inv','var(--green)','Total assets',f(assets),'sb-assets','var(--green)');
   line('card','var(--red)','Total debt',f(debtOnly),'sb-debt','var(--red)');
   line('warn','var(--amber)',L.liab,f(alLiabAssetTotal()),'sb-liab');
-  line('plus',sur>=0?'var(--teal)':'var(--red)','Monthly surplus',m(sur),'sb-surplus',sur>=0?'':'var(--red)');
+  line('plus',sur>=0?'var(--blue)':'var(--red)','Monthly surplus',m(sur),'sb-surplus',sur>=0?'var(--blue)':'var(--red)');
   sec('What you own');
   line('cash','var(--green)',L.cash,f(alTotalCash()),'sb-cash');
   line('house','var(--teal)',L.deposit,f(state?state.saved:0),'sb-deposit');
@@ -15224,8 +15343,8 @@ function viRenderLedger(){
   CF_GROUP_ORDER.forEach(function(g){var t=(by[g]||[]).reduce(function(a,r){return a+(+r.amount||0)},0);if(t>0)line(g==='sv'?'cash':g==='iv'?'stocks':'out',CF_GROUPS[g].col,CF_GROUPS[g].short,m(t),'sb-bd-'+g)});
   var mdl=cfModel();if(mdl.overflow>0)line('plus','var(--t2)','Not assigned yet',m(mdl.overflow),'sb-unassigned');
   if(biz>0)line('biz','var(--orange)','Business income',m(biz),'sb-biz-income');
-  line('plus',sur>=0?'var(--teal)':'var(--red)','Surplus',m(sur),'sb-surplus-2',sur>=0?'':'var(--red)');
-  line('plus',mdl.surplus>=0?'var(--teal)':'var(--red)','Savings rate',(mdl.tIn>0?Math.max(-999,Math.round((mdl.surplus/mdl.tIn)*100)):0)+'%','sb-savings-rate',mdl.surplus>=0?'':'var(--red)');   /* Budget's Save rate: same surplus, same income, same rounding */
+  line('plus',sur>=0?'var(--blue)':'var(--red)','Surplus',m(sur),'sb-surplus-2',sur>=0?'var(--blue)':'var(--red)');
+  line('plus',mdl.surplus>=0?'var(--blue)':'var(--red)','Savings rate',(mdl.tIn>0?Math.max(-999,Math.round((mdl.surplus/mdl.tIn)*100)):0)+'%','sb-savings-rate',mdl.surplus>=0?'var(--blue)':'var(--red)');   /* Budget's Save rate: same surplus, same income, same rounding */
   var mrr=typeof bizMRR==='function'?bizMRR():0,cl=typeof bizState!=='undefined'?(bizState.clients||[]).filter(function(c){return c.status==='Active'}).length:0;
   if(mrr>0||cl>0){sec('Business');line('biz','var(--orange)','Monthly recurring revenue',m(mrr),'sb-mrr');line('biz','var(--orange)','Active clients',String(cl),'sb-clients');}
   el.innerHTML=out.join('');
@@ -15914,7 +16033,7 @@ function updateUI(){
   if(_ab)_ab.innerHTML=_ai+(_bought?'Pay off the mortgage':'Lay the bricks');if(_al)_al.setAttribute('aria-label',_bought?'Pay off your mortgage':'Lay the bricks');if(_aa)_aa.textContent=_bought?'Amount paid':'Amount to add to your deposit';var _si=document.getElementById('savingsInput');if(_si)_si.setAttribute('aria-label',_aa.textContent);
   const list=document.getElementById('logList');
   if(!state.deposits.length){list.innerHTML='<div style="font-size:max(.58rem,var(--vi-fs-2));color:rgb(var(--ink-rgb) / .18);text-align:center;padding:10px 0">No deposits yet</div>';}
-  else list.innerHTML=(state.payments||[]).slice().reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date} · mortgage</span><span class="la">-${gbpFmt(Number(d.amount))}</span></div>`).join('')+[...state.deposits].reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date}</span><span class="la">+${gbpFmt(Number(d.amount))}</span></div>`).join('');
+  else list.innerHTML=(state.payments||[]).slice().reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date} · mortgage</span><span class="la">-${gbpFmt(Number(d.amount))}</span></div>`).join('')+[...state.deposits].reverse().slice(0,20).map(d=>`<div class="log-entry"><span>${d.date}${d.acct?hbDepLogChip(d.acct):''}</span><span class="la">+${gbpFmt(Number(d.amount))}</span></div>`).join('');
   renderHabitTracker();
   updateFloorSelector();
   redraw();
@@ -16013,7 +16132,9 @@ document.getElementById('btnAdd').addEventListener('click',()=>{
   if(state.houseMode==='purchased'){if(!(+state.mortgageBalance>0)){toast('Your mortgage is already paid off');return;}hbPayMortgage(vBase);document.getElementById('savingsInput').value='';hbBrickLineUpdate();return;}
   const p0=pct();
   state.saved+=vBase;
-  state.deposits.push({amount:vBase,date:new Date().toLocaleDateString('en-GB')});
+  const _dep={amount:vBase,date:new Date().toLocaleDateString('en-GB')},_da=state.depAcct;
+  if(_da&&_da.type){_dep.acct={t:_da.type,n:_da.name||''};if(_da.rate!=null)_dep.acct.r=_da.rate;}   // v0.9.1 E26: which account it went into (a note; the amount is all that counts)
+  state.deposits.push(_dep);
   recordHabitContribution(vBase);
   const brand=hbBrandOn()&&!!hbBrickInfo();
   save();if(brand){prevP=pct();}else{checkMS(pct());}updateUI();
@@ -16219,6 +16340,9 @@ const MS_LABELS={
 };
 const MS_IDS=['1','5','15','30','50','65','80','90','95','100'];
 const MS_PCTS=[1,5,15,30,50,65,80,90,95,100];
+// v0.9.1 E9 (owner, 3 Nov: "these milestones should link into the gamification wealth roadmap. So add XP and stuff"): each milestone
+// pays Wealth Roadmap XP once (owner's Q4: 20 rising to 200, 300 for "Keys are yours"). Game points, not money.
+const HB_MS_XP=[20,40,60,80,100,125,150,175,200,300];
 
 // ═══════════════════════════════════════════════════════════════
 // HOUSE BUILDER — LEVELS, GHOST BUILD, GAMIFICATION
@@ -16237,7 +16361,6 @@ function hbSetDepositPct(v){if(viBlockEdit())return;
   toast('Deposit target: '+state.depositPct+'% = '+gbpFmt(depositTarget()));
 }
 function hbNoEmoji(t){return String(t||'').replace(/\s*[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\uFE0F?/gu,'').trim();}   // the progress tile carries line icons, not emoji (Pedro, v0.8)
-function hbXP(){return (state.deposits||[]).length*20+Math.floor((state.saved||0)/100)+(state.houseMode==='purchased'?500:0);}
 function hbStreak(){var el=document.getElementById('habit-streak-label');return el?(parseInt(String(el.textContent).replace(/\D/g,''))||0):0;}
 // money the Budget could put towards the house: unassigned £ + what is already assigned to savings/investing
 function hbBudget(){
@@ -16323,7 +16446,7 @@ function hbRenderHUD(){
         +_st('target',gbpFmt(rem),'to go','stRemain')
         +_st('vault',gbpFmt(dt),state.depositPct+'% deposit of '+gbpFmt(state.target||0),'stDeposit')
         +_st('house-builder','…','roof tiles','stTiles')
-        +_st('xp',hbXP().toLocaleString('en-GB'),'XP')
+        +_st('xp',(typeof wrTotalXp==='function'?wrTotalXp():0).toLocaleString('en-GB'),'XP','stXP')   // the Wealth Roadmap's XP, so the tile and the Roadmap agree (E9)
         +_st('streak',String(hbStreak()),'streak')
       +'</div>'
       +'<div class="hb-pg-note">'+(_bi?'Each brick ≈ '+_sym+(perBrick*_rate).toFixed(2)+' · real 215 × 102.5 × 65 mm bricks, laid course by course':'Counting bricks…')+'</div>'
@@ -16331,6 +16454,7 @@ function hbRenderHUD(){
       +'<div class="hb-pg-tl"><div class="hb-sub-lbl hb-pg-ms">'+_ic('milestone')+' Milestones</div>'
       +'<div class="mss">'+_mss+'</div></div>'
       +'</div>'
+      +hbDepAcctHtml()
       +'<div style="margin-top:12px"><button class="btn-add-data" onclick="hbOpenCalc()">Preview your mortgage</button></div>'
       +tip;
     try{hbWriteStats();}catch(e){}
@@ -16347,6 +16471,71 @@ function hbBadgeToasts(p){
   if(g.seen===null){g.seen=now;if((state.deposits||[]).length||state.saved>0)save();return;}   // first run: no toast spam for what is already earned (and nothing written for a brand-new user)
   now.forEach(function(n){if(g.seen.indexOf(n)<0){g.seen.push(n);toast('🏅 Badge unlocked: '+n+'!');save();}});
 }
+// ── v0.9.1 E26: the deposit's account (owner, 3 Nov: "select what type of account they have that money in. And treat it separately to
+// the cash and savings ... pull the icon for the bank plus the interest rate ... include amount invested so the user knows which is the
+// 25% government bonus ... give the option for the new bank account"). A note on the deposit only (owner's Q5): it never changes
+// state.saved, the bricks, the levels or Cash and savings, and the bonus is a separate estimate that is never added to saved.
+// state.depAcct = {type, name, rate (AER %, absent = none), paidIn (£ the user put in, absent = none)}; each new deposit copies
+// {t, n, r} as deposit.acct. Old saves have neither and load as they are.
+var HB_DEP_TYPES=[['lisa_cash','Lifetime ISA (cash)'],['lisa_ss','Lifetime ISA (stocks and shares)'],['cash_isa','Cash ISA'],['ss_isa','Stocks and shares ISA'],
+  ['savings','Savings account'],['linked','Linked to another account'],['ftb_isa','First Time Buyer ISA (not open yet)']];
+// Lifetime ISA rules, from gov.uk/lifetime-isa ("How it works", "Buying your first home", "Withdrawing your money"), checked 3 Nov 2026:
+//  - you can put in up to £4,000 each tax year; the government adds a 25% bonus on what you put in (up to £1,000 a year)
+//  - for a first home the property must cost £450,000 or less
+//  - taking money out for anything other than a first home, turning 60 or terminal illness costs a 25% withdrawal charge
+// The First Time Buyer ISA has not opened: no rate, bonus or date is shown until gov.uk publishes them (coverage says April 2029, unconfirmed).
+var HB_LISA={limit:4000,bonus:0.25,cap:450000,charge:0.25,src:'gov.uk/lifetime-isa',checked:'2026-11-03'};
+var HB_FCA='Guidance, not advice. Not regulated by the FCA. Not financial advice.';
+function hbDepTypeName(t){var r=HB_DEP_TYPES.filter(function(x){return x[0]===t;})[0];return r?r[1]:'Account';}
+function hbDepIsLisa(t){return t==='lisa_cash'||t==='lisa_ss';}
+function hbGbp0(v){return '£'+Math.round(v).toLocaleString('en-GB');}   // the gov.uk rules are in pounds, so these stay in pounds
+function hbDepAcctHtml(){
+  var a=state.depAcct,hd='<div class="hb-sub-lbl hb-da-hd"><svg class="vi-ic" aria-hidden="true"><use href="#vi-bank"/></svg> Deposit account</div>';
+  if(!a||!a.type)return '<div class="hb-dacct" id="hb-dacct">'+hd+'<p class="hb-da-q">Where is this deposit held? Note the account to see its logo and rate here. Your saved total and bricks stay the same.</p><button type="button" class="stk-btn" onclick="hbOpenDepAcct()">Add the account</button></div>';
+  var nm=String(a.name||'').trim(),sub=hbEsc(hbDepTypeName(a.type))+(a.rate!=null?' <span class="hb-da-rate">· '+hbEsc(a.rate)+'% AER</span>':''),out='<div class="hb-dacct on" id="hb-dacct">'+hd
+    +'<div class="hb-da-row">'+hbBankLogo(nm)+'<div class="hb-da-txt"><b>'+hbEsc(nm||hbDepTypeName(a.type))+'</b><span>'+sub+'</span></div><button type="button" class="stk-btn" onclick="hbOpenDepAcct()">Edit</button></div>';
+  if(hbDepIsLisa(a.type)){
+    var paid=+a.paidIn>0?+a.paidIn:0,tgt=+state.target||0;
+    out+=paid>0?'<div class="hb-da-bonus"><b>Estimated 25% bonus: '+hbGbp0(paid*HB_LISA.bonus)+'</b> on the '+hbGbp0(paid)+' you paid in. The government pays it through your provider. An estimate, not added to your saved total'+(paid>HB_LISA.limit?', and lower if you paid in more than '+hbGbp0(HB_LISA.limit)+' in a tax year':'')+'.</div>'
+      :'<div class="hb-da-bonus">Add the amount you paid in to see the estimated 25% bonus. It is not added to your saved total.</div>';
+    out+='<div class="hb-da-rules">Lifetime ISA rules (gov.uk): you can pay in up to '+hbGbp0(HB_LISA.limit)+' a tax year and the bonus is 25% of it. For a first home the price must be '+hbGbp0(HB_LISA.cap)+' or less'+(tgt>HB_LISA.cap?' (your target is '+hbGbp0(tgt)+')':'')+'. Taking money out for anything else usually costs a 25% withdrawal charge.</div>';
+  }
+  return out+'<div class="hb-da-fca">'+HB_FCA+'</div></div>';
+}
+// the bank list loads further down the page than the first house paint: until it has, show the plain bank icon
+function hbBankLogo(nm){try{if(typeof STK_PLATFORMS!=='undefined'&&STK_PLATFORMS)return viBankLogo(nm);}catch(e){}return '<span class="cash-logo cash-logo-none" title="Bank account"><svg class="vi-ic" aria-hidden="true"><use href="#vi-bank"/></svg></span>';}
+function hbDepLogChip(a){var nm=String(a.n||'').trim();return ' <span class="hb-da-log">'+hbBankLogo(nm)+hbEsc(nm||hbDepTypeName(a.t))+'</span>';}
+function hbOpenDepAcct(){
+  var o=document.getElementById('hbd-ov');if(o)o.remove();
+  var a=state.depAcct||{},cur=a.type||'lisa_cash';
+  var opts=HB_DEP_TYPES.map(function(t){return '<option value="'+t[0]+'"'+(t[0]==='ftb_isa'?' disabled':'')+(t[0]===cur?' selected':'')+'>'+t[1]+'</option>';}).join('');
+  o=document.createElement('div');o.id='hbd-ov';o.className='hbc-ov';
+  o.innerHTML='<div class="hbc" style="width:min(520px,100%)" role="dialog" aria-label="Deposit account"><div class="hbc-hd"><span>Where your deposit is held</span><span class="hbd-x" onclick="hbCloseDepAcct()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();hbCloseDepAcct();}" role="button" tabindex="0" aria-label="Close">×</span></div>'
+    +'<div class="hbc-body" style="grid-template-columns:1fr"><div id="hbd-in">'
+    +'<p class="hbc-note full" style="margin:0 0 4px">A note on your house deposit. It does not change your saved total, your bricks or Cash and savings.</p>'
+    +'<div class="full"><label for="hbd-type">Account type</label><select id="hbd-type">'+opts+'</select></div>'
+    +'<div class="full"><label for="hbd-name">Bank or provider</label><input id="hbd-name" type="text" maxlength="60" value="'+hbEsc(a.name||'')+'" placeholder="e.g. your bank or app"></div>'
+    +'<div><label for="hbd-rate">Interest rate % AER</label><input id="hbd-rate" type="number" min="0" max="100" step="0.01" value="'+(a.rate!=null?a.rate:'')+'" placeholder="as your provider quotes"></div>'
+    +'<div><label for="hbd-paid">Amount you paid in £</label><input id="hbd-paid" type="number" min="0" step="1" value="'+(a.paidIn!=null?a.paidIn:'')+'" placeholder="your own money"></div>'
+    +'<p class="hbc-note full" style="margin:0">For a Lifetime ISA, the amount you paid in shows the estimated 25% government bonus. The First Time Buyer ISA has not opened yet.</p>'
+    +'<div class="full" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn-add-data" id="hbd-save" onclick="hbSaveDepAcct()">Save the account</button>'
+    +(state.depAcct?'<button type="button" class="stk-btn" id="hbd-clear" onclick="hbClearDepAcct()">Remove</button>':'')+'<button type="button" class="stk-btn" onclick="hbCloseDepAcct()">Cancel</button></div>'
+    +'<div class="hbc-note full">'+HB_FCA+'</div>'
+    +'</div></div></div>';
+  document.body.appendChild(o);
+  var f=document.getElementById('hbd-type');if(f)f.focus();
+}
+function hbCloseDepAcct(){var o=document.getElementById('hbd-ov');if(o)o.remove();}
+function hbSaveDepAcct(){if(viBlockEdit())return;
+  var g=function(id){var e=document.getElementById('hbd-'+id);return e?String(e.value).trim():'';};
+  var t=g('type'),ok=HB_DEP_TYPES.some(function(x){return x[0]===t&&t!=='ftb_isa';});
+  if(!ok){toast('Choose an account type');return;}
+  var a={type:t,name:g('name').slice(0,60)},rs=g('rate'),ps=g('paid');
+  if(rs!==''){var r=parseFloat(rs);if(!(isFinite(r)&&r>=0&&r<=100)){toast('Enter the rate as a percentage, for example 4.5');return;}a.rate=Math.round(r*100)/100;}
+  if(ps!==''){var v=parseFloat(ps);if(!(isFinite(v)&&v>=0)){toast('Enter the amount you paid in');return;}a.paidIn=Math.round(v*100)/100;}
+  state.depAcct=a;save();hbCloseDepAcct();updateUI();toast('Deposit account saved');
+}
+function hbClearDepAcct(){if(viBlockEdit())return;delete state.depAcct;save();hbCloseDepAcct();updateUI();toast('Deposit account removed');}
 // L2 / L3 panels
 function hbSetOver(v){var cur=hbcRead().raw;cur.over=Math.max(0,Math.round(v));state.calc=cur;save();updateUI();toast('Plan: overpay '+hbMoney(cur.over)+' a month');}
 var HB_TRADEOFF='<div class="hb-tradeoff" style="margin-top:8px;font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);line-height:1.5">Money overpaid is not invested or saved. Check your lender\'s overpayment limit (often 10% a year) and any early repayment charges. Illustrative only. Not regulated by the FCA. Not financial advice.</div>';
@@ -17488,6 +17677,7 @@ function hbL3CardDormant(){   // the old unlock card, kept for when Level 3 retu
 // the milestone timeline (v0.9.1 E11): done, next and "£x to go". One place, so the render and every update agree.
 // Chunk G hangs the XP line on the same rows (".ms-tg" holds the right-hand note; a done row can take "+n XP" there).
 function hbPaintMilestones(p){
+  try{hbMsXp(p);}catch(e){}
   var nx=MS_PCTS.findIndex(function(q){return p<q/100;}),dt=depositTarget();
   MS_IDS.forEach(function(id,i){
     var el=document.getElementById('ms'+id); if(!el)return;
@@ -17496,8 +17686,32 @@ function hbPaintMilestones(p){
     var dot=el.querySelector('.ms-dot'),tg=el.querySelector('.ms-tg');
     if(dot){var want=hit?'check':(id==='100'?'trophy':'');
       if(dot.getAttribute('data-ic')!==want){dot.setAttribute('data-ic',want);dot.innerHTML=want?'<svg class="vi-ic" role="img" aria-label="'+(hit?'Done':'Keys are yours')+'"><use href="#vi-'+want+'"/></svg>':'';}}
-    if(tg)tg.textContent=(i===nx)?gbpFmt(Math.max(0,MS_PCTS[i]/100*dt-(state.saved||0)))+' to go':'';
+    if(tg)tg.textContent=hit?'+'+HB_MS_XP[i]+' XP':(i===nx)?gbpFmt(Math.max(0,MS_PCTS[i]/100*dt-(state.saved||0)))+' to go · +'+HB_MS_XP[i]+' XP':'';
   });
+  var xe=document.getElementById('stXP');if(xe&&typeof wrTotalXp==='function')xe.textContent=wrTotalXp().toLocaleString('en-GB');
+}
+// E9: pay each milestone reached its XP once, into the Wealth Roadmap's own store (achState.wr.h, by milestone id), latched like the
+// Roadmap's steps: a lower saved figure, a house reset or a new house type never takes it back or pays it twice. The first time this
+// runs on a device, milestones already passed are paid silently (no toast flood). After that a milestone the user reaches toasts once,
+// only after something they did, and never over another toast: it waits for the house's own milestone toast to clear.
+function hbMsXp(p){
+  if(typeof achState==='undefined'||typeof wrState!=='function'||!window._viAchReady||window._viDeleted)return 0;   // nothing writes back after the account is deleted
+  var w=wrState(),first=!w.h,h=w.h||(w.h={}),gain=0,names=[],lbl=MS_LABELS[state.houseType]||MS_LABELS.terraced;
+  MS_PCTS.forEach(function(q,i){var id=MS_IDS[i];if(p>=q/100&&!h[id]){h[id]=HB_MS_XP[i];gain+=HB_MS_XP[i];names.push(hbNoEmoji(lbl[i]));}});
+  if(!gain)return 0;
+  saveAch();
+  if(!first&&window._viActed){var q=hbXpToast._q||(hbXpToast._q={xp:0,n:0,name:''});q.xp+=gain;q.n+=names.length;q.name=names[names.length-1];hbXpToast(0);}
+  try{if(document.getElementById('tab-achievements').classList.contains('active'))setTimeout(renderAchievements,0);}catch(e){}
+  try{renderOvAch();}catch(e){}
+  return gain;
+}
+function hbXpToast(n){   // one toast for whatever was earned together; tries for about 6 s while another toast is showing
+  clearTimeout(hbXpToast._t);
+  hbXpToast._t=setTimeout(function(){
+    var q=hbXpToast._q,t=document.getElementById('toast');if(!q)return;
+    if(t&&t.classList.contains('show')){if(n<12)hbXpToast(n+1);else hbXpToast._q=null;return;}
+    hbXpToast._q=null;toast('+'+q.xp.toLocaleString('en-GB')+' XP · '+(q.n>1?q.n+' milestones':q.name));
+  },n?500:0);
 }
 function updateMilestoneLabels(){
   const lbl=MS_LABELS[state.houseType]||MS_LABELS.terraced;
@@ -18085,6 +18299,7 @@ try{var _bs=localStorage.getItem(BIZ_KEY);if(_bs)bizState=JSON.parse(_bs);}catch
 if(!bizState.leads)bizState.leads=[];
 // Load Ach state
 try{var _as=localStorage.getItem(ACH_KEY);if(_as){var _ap=JSON.parse(_as);achState=Object.assign(achState,_ap);}}catch(e){}
+window._viAchReady=true;   // the house milestones pay XP (v0.9.1 E9) only once the saved XP is loaded, so a stale copy is never written over it
 // Filter unlocked to valid badge IDs
 var validIds=BADGES.map(function(b){return b.id;});
 if(achState.unlocked)achState.unlocked=achState.unlocked.filter(function(id){return validIds.indexOf(id)!==-1;});
@@ -18523,6 +18738,8 @@ window.addEventListener('load', function() {
 function _supaSync(key) { _markDirty(key); _flushDirty(); }
 
 function _reloadAllState() {
+  // Achievements first: the House Builder redraw below pays milestone XP into achState (v0.9.1 E9) and must not write a stale copy over the restored one
+  try { var _asr=localStorage.getItem(ACH_KEY); if(_asr){ var _asp=JSON.parse(_asr); achState=Object.assign(achState,_asp); } } catch(e) {}
   // House Builder (deposit saved, target, type, mortgage) — was missing from sync + reload
   try {
     var _hs=localStorage.getItem('ht3');
@@ -18532,7 +18749,6 @@ function _reloadAllState() {
   try { var _als=localStorage.getItem(AL_KEY); if(_als){ var _alp=JSON.parse(_als); alState=Object.assign(alState,_alp);alNormalise(); if(_alp.metals)alState.metals=Object.assign(alState.metals,_alp.metals); if(_alp.metalPrices)alState.metalPrices=Object.assign(alState.metalPrices,_alp.metalPrices); if(_alp.crypto)alState.crypto=_alp.crypto; if(_alp.cashAccounts)alState.cashAccounts=_alp.cashAccounts; if(_alp.otherAssets)alState.otherAssets=_alp.otherAssets; if(_alp.liabilities)alState.liabilities=_alp.liabilities; } } catch(e) {}
   try { var _dsr=localStorage.getItem(DEBT_KEY); if(_dsr) debtState=JSON.parse(_dsr); } catch(e) {}
   try { var _bsr=localStorage.getItem(BIZ_KEY); if(_bsr) bizState=JSON.parse(_bsr); if(!bizState.leads)bizState.leads=[]; } catch(e) {}
-  try { var _asr=localStorage.getItem(ACH_KEY); if(_asr){ var _asp=JSON.parse(_asr); achState=Object.assign(achState,_asp); } } catch(e) {}
 }
 
 var _hydrateErr = '', _hydChanged = false, _needPull = false;
@@ -20339,8 +20555,44 @@ function stkEnsure(){
 }
 function stkEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 // Holdings with no live price fall back to cost so net worth never silently drops to £0.
-function stkPrice(h){return (+h.price>0)?+h.price:((+h.avgCost>0)?+h.avgCost:0);}
+function stkPrice(h){return (+h.price>0)?+h.price:stkBasis(h);}
 function stkValue(h){return (+h.units||0)*stkPrice(h);}
+// v0.9.1 E17: returns are judged from when the holding was added (owner, Q8). The basis per unit is the average cost
+// the user typed or imported (avgCost, never rewritten here) or else the price when it was added (addPx, recorded once).
+function stkBasis(h){return (+h.avgCost>0)?+h.avgCost:((+h.addPx>0)?+h.addPx:0);}
+// A basis over 3x today's price is almost always pence typed as pounds or a total typed as a unit cost: nudge, don't show a loss.
+function stkSuspect(h){var b=stkBasis(h),p=+h.price;return b>0&&p>0&&b>3*p;}
+// Value, invested and change over the holdings with a usable basis; the rest are listed in `left` with why.
+function stkReturns(hs){
+  var r={value:0,invested:0,change:0,total:0,counted:[],left:[],leftValue:0,suspect:0,noBasis:0};
+  (hs||[]).forEach(function(h){
+    if(!((+h.units||0)>0))return;
+    var v=stkValue(h);r.total+=v;
+    if(stkSuspect(h)){r.left.push({sym:h.sym,why:'cost'});r.suspect++;r.leftValue+=v;return;}
+    var b=stkBasis(h);
+    if(!(b>0)){r.left.push({sym:h.sym,why:'none'});r.noBasis++;r.leftValue+=v;return;}
+    r.counted.push(h);r.value+=v;r.invested+=h.units*b;
+  });
+  r.change=r.value-r.invested;
+  return r;
+}
+// Tile figures in pence under £10,000, whole pounds above; change is taken from the shown parts so the tiles always add up.
+function stkTileMoney(total,valC,inv){
+  var rate=window.VI_CURRENCY_RATE||1,sym=window.VI_CURRENCY_SYMBOL||'£',dp=Math.abs(total*rate)<10000?2:0,k=dp?100:1;
+  var q=function(n){return Math.round((isNaN(n)||n==null?0:n)*rate*k);};
+  var f=function(u,sign){var a=Math.abs(u)/k;return (u<0?(sign?'−':'-'):(sign&&u>0?'+':''))+sym+a.toLocaleString('en-GB',{minimumFractionDigits:dp,maximumFractionDigits:dp});};
+  var vP=q(valC),iP=q(inv),cP=vP-iP;
+  return{val:f(q(total)),inv:f(iP),chg:f(cP,true),chgN:cP/k/rate,chgP:cP,invP:iP};
+}
+// The first price seen after adding (live or the user's own) becomes the entry price of the units still waiting for one.
+function stkResolveEntry(h){
+  var pu=+h.addPendU||0;if(!(pu>0))return;
+  if(+h.avgCost>0){delete h.addPendU;delete h.addPendAt;return;}
+  var p=+h.price;if(!(p>0)||!(h.manualPrice||(+h.updated||0)>=(+h.addPendAt||0)))return;
+  var u=+h.units||0;pu=Math.min(pu,u);var ku=u-pu;
+  h.addPx=(ku>0&&+h.addPx>0)?(ku*h.addPx+pu*p)/u:p;
+  delete h.addPendU;delete h.addPendAt;
+}
 function alTotalStocks(){return (alState.stocks||[]).reduce(function(s,h){return s+stkValue(h);},0);}
 function stkVisible(){
   stkEnsure();
@@ -20360,19 +20612,19 @@ function stkAgo(ts){
   var m=Math.round((Date.now()-ts)/60000);
   return m<1?'just now':m<60?m+'m ago':m<1440?Math.round(m/60)+'h ago':Math.round(m/1440)+'d ago';
 }
-function stkSave(){if(viBlockEdit())return;saveAL();if(typeof updateKPIs==='function')updateKPIs();stkRender();if(typeof renderSummaryCards==='function')try{renderSummaryCards();}catch(e){}}
+function stkSave(){if(viBlockEdit())return;(alState.stocks||[]).forEach(stkResolveEntry);saveAL();if(typeof updateKPIs==='function')updateKPIs();stkRender();if(typeof renderSummaryCards==='function')try{renderSummaryCards();}catch(e){}}
 
 // ── donut ──
 function stkDonut(slices,total,top,sub,subCol){
-  var R=52,C=2*Math.PI*R,off=0,out='<svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="Portfolio allocation">'
-    +'<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="22"/>';
+  var R=58,C=2*Math.PI*R,off=0,out='<svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="Portfolio allocation">'
+    +'<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="16"/>';
   if(total>0)slices.forEach(function(s){
     var len=s.v/total*C;
-    out+='<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="'+s.c+'" stroke-width="22" stroke-dasharray="'+Math.max(0,len-1.5).toFixed(2)+' '+(C-Math.max(0,len-1.5)).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 75 75)"><title>'+stkEsc(s.t)+' '+(s.v/total*100).toFixed(1)+'%</title></circle>';
+    out+='<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="'+s.c+'" stroke-width="16" stroke-dasharray="'+Math.max(0,len-1.5).toFixed(2)+' '+(C-Math.max(0,len-1.5)).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 75 75)"><title>'+stkEsc(s.t)+' '+(s.v/total*100).toFixed(1)+'%</title></circle>';
     off+=len;
   });
-  out+='<text x="75" y="'+(sub?72:78)+'" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="15" fill="#fff">'+top+'</text>';
-  if(sub)out+='<text x="75" y="90" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="10.5" fill="'+(subCol||'#8fb4b1')+'">'+sub+'</text>';
+  out+='<text x="75" y="'+(sub?71:79)+'" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="14" style="fill:var(--tx,#fff)">'+top+'</text>';
+  if(sub)out+='<text x="75" y="92" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="12" fill="'+(subCol||'#8fb4b1')+'">'+sub+'</text>';
   return out+'</svg>';
 }
 function stkRender(){
@@ -20392,24 +20644,23 @@ function stkRender(){
 
   var hs=stkVisible().slice().sort(function(a,b){return stkValue(b)-stkValue(a);});
   var total=hs.reduce(function(s,h){return s+stkValue(h);},0);
-  // returns: only over holdings that have a cost basis
-  var withCost=hs.filter(function(h){return +h.avgCost>0&&(+h.units||0)>0;});
-  var cost=withCost.reduce(function(s,h){return s+h.units*h.avgCost;},0);
-  var valC=withCost.reduce(function(s,h){return s+stkValue(h);},0);
-  var ret=valC-cost,retPct=cost>0?ret/cost*100:0;
+  // returns (E17): judged from when each holding was added; holdings with no entry price or a doubtful cost are left out and named
+  var rr=stkReturns(hs),tm=stkTileMoney(total,rr.value,rr.invested),ret=tm.chgN,up=ret>=0,hasRet=rr.counted.length>0;
+  var nm=function(w){var l=rr.left.filter(function(x){return x.why===w;});return l.length<=2?l.map(function(x){return stkEsc(x.sym);}).join(' and '):l.length;};
+  var leftTxt=(rr.suspect?nm('cost')+' left out: check '+(rr.suspect===1?'its':'their')+' average cost':'')+(rr.suspect&&rr.noBasis?' · ':'')+(rr.noBasis?nm('none')+(rr.noBasis===1?' has':' have')+' no entry price yet':'');
   var dayChg=hs.reduce(function(s,h){var v=stkValue(h),c=+h.change||0;return s+(c?v-v/(1+c/100):0);},0);
   var dayPct=total>0?dayChg/(total-dayChg)*100:0;
   var slices=hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){return{v:stkValue(h),c:STK_COLORS[i%STK_COLORS.length],t:h.sym};});
   var main=document.getElementById('stk-main');
   if(main){
-    var up=ret>=0,dUp=dayChg>=0;
+    var dUp=dayChg>=0;
     var _ap=alState.activePie!=='all'?alState.stockPies.find(function(x){return x.id===alState.activePie;}):null;
-    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-edit"/></svg> Rename</button><button class="stk-btn" style="border-color:rgb(var(--red-rgb) / .5);color:var(--red)" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>'+stkFundControls(_ap,hs):'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),withCost.length?((up?'+':'')+retPct.toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
+    main.innerHTML=(_ap?'<div class="stk-toolbar"><span class="stk-tb-t">'+(_ap.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(_ap.name)+'</span><button class="stk-btn" onclick="stkPlatformEdit()">🏦 Platform &amp; logo</button><button class="stk-btn" onclick="stkRenamePie()"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-edit"/></svg> Rename</button><button class="stk-btn" style="border-color:rgb(var(--red-rgb) / .5);color:var(--red)" onclick="stkDeletePie()">🗑 Delete '+(_ap.kind==='fund'?'fund':'pie')+'</button></div>'+stkFundControls(_ap,hs):'')+(_ap?stkLogoBadge(_ap,true):'')+'<div>'+stkDonut(slices,total,gbpFmt(total),(hasRet&&tm.invP>0)?((up?'+':'')+(tm.chgP/tm.invP*100).toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c')+'</div>'
       +'<div class="stk-stats">'
-      +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+cfMoney(total)+'</div><div class="s">'+((_ap&&_ap.kind==='fund'&&hs.length===1)?'<b style="color:var(--gold)">'+(+hs[0].units||0).toLocaleString('en-GB',{maximumFractionDigits:4})+' units owned</b>'+(stkPrice(hs[0])>0?' × £'+stkPrice(hs[0]).toFixed(2):''):hs.length+' holding'+(hs.length===1?'':'s'))+' · counts towards net worth</div></div>'
-      +'<div class="stk-stat" style="background:'+(withCost.length?(up?'rgb(var(--green-rgb) / .07)':'rgb(var(--red-rgb) / .08)'):'rgb(var(--teal-rgb) / .06)')+'"><div class="l">Total return</div><div class="v" style="color:'+(withCost.length?(up?'var(--green)':'var(--red)'):'var(--t3)')+'">'+(withCost.length?((up?'+':'−')+cfMoney(Math.abs(ret))):'–')+'</div><div class="s">'+(withCost.length?(withCost.length<hs.length?'on '+withCost.length+' of '+hs.length+' with a cost basis':'vs your average cost'):'add an average cost to see returns')+'</div></div>'
+      +'<div class="stk-stat"><div class="l">Current value</div><div class="v">'+tm.val+'</div><div class="s">'+((_ap&&_ap.kind==='fund'&&hs.length===1)?'<b style="color:var(--gold)">'+(+hs[0].units||0).toLocaleString('en-GB',{maximumFractionDigits:4})+' units owned</b>'+(stkPrice(hs[0])>0?' × £'+stkPrice(hs[0]).toFixed(2):''):hs.length+' holding'+(hs.length===1?'':'s'))+' · counts towards net worth</div></div>'
+      +'<div class="stk-stat"><div class="l">Invested (at the time you added it)</div><div class="v">'+(hasRet?tm.inv:'–')+'</div><div class="s">'+(hasRet?(leftTxt||'what your holdings cost when you added them'):(leftTxt||'add a holding to see what went in'))+'</div></div>'
+      +'<div class="stk-stat" style="background:'+(hasRet?(tm.chgP===0?'rgb(var(--teal-rgb) / .06)':up?'rgb(var(--green-rgb) / .07)':'rgb(var(--red-rgb) / .08)'):'rgb(var(--teal-rgb) / .06)')+'"><div class="l">Change since you added it</div><div class="v" style="color:'+(hasRet&&tm.chgP!==0?(up?'var(--green)':'var(--red)'):'var(--t3)')+'">'+(hasRet?tm.chg:'–')+'</div><div class="s">'+(hasRet?(rr.left.length?'on '+rr.counted.length+' of '+(rr.counted.length+rr.left.length)+' holdings':(tm.invP>0?((tm.chgP>=0?'+':'')+(tm.chgP/tm.invP*100).toFixed(1)+'% on what you put in'):'')):'shows once a holding has a price')+'</div></div>'
       +'<div class="stk-stat"><div class="l">Today</div><div class="v" style="color:'+(dayChg?(dUp?'var(--green)':'var(--red)'):'var(--t3)')+'">'+(dayChg?((dUp?'+':'−')+cfMoney(Math.abs(dayChg))):'–')+'</div><div class="s">'+(dayChg?((dUp?'+':'')+dayPct.toFixed(2)+'% since yesterday'):'refresh for live moves')+'</div></div>'
-      +'<div class="stk-stat"><div class="l">Invested</div><div class="v">'+(withCost.length?cfMoney(cost):'–')+'</div><div class="s">cost basis of tracked holdings</div></div>'
       +'</div>';
   }
   // status
@@ -20431,16 +20682,17 @@ function stkRender(){
       +stkGroups(hs).map(function(g){var open=stkGrpOpen(g.p.id);
         return '<div class="stk-grp'+(open?' open':'')+'"><button type="button" class="stk-gh" aria-expanded="'+open+'" onclick="stkToggleGrp('+g.p.id+')"><svg class="vi-ic stk-chev" aria-hidden="true"><use href="#vi-chevron"/></svg>'+stkLogoBadge(g.p)+'<span class="stk-gn">'+(g.p.kind==='fund'?'<em class="stk-tag">FUND</em>':'')+stkEsc(g.p.name)+'</span><span class="stk-gc">'+g.hs.length+' holding'+(g.hs.length===1?'':'s')+'</span><span class="stk-gv">'+cfMoney(g.v)+(total>0?' <small>'+(g.v/total*100).toFixed(1)+'%</small>':'')+'</span></button>'
           +'<div class="stk-gb"'+(open?'':' hidden')+'>'+g.hs.map(function(h){var i=hs.indexOf(h);
-        var v=stkValue(h),c=(+h.avgCost>0)?(h.units*h.avgCost):0,pl=c>0?(v-c)/c*100:null;
-        var srcTxt=h.manualPrice?'manual price':(h.updated?'live · '+stkAgo(h.updated):(+h.price>0?'saved price':(+h.avgCost>0?'valued at cost':'no price')));
+        var v=stkValue(h),sus=stkSuspect(h),c=sus?0:(h.units*stkBasis(h)),pl=c>0?(v-c)/c*100:null;
+        var srcTxt=h.manualPrice?'manual price':(h.updated?'live · '+stkAgo(h.updated):(+h.price>0?'saved price':(stkBasis(h)>0?'valued at cost':'no price')));
         var ch=+h.change||0;
         return '<div class="stk-row">'
-          +'<div class="c-tk"><div class="stk-tk"><i style="background:'+STK_COLORS[i%STK_COLORS.length]+'"></i>'+stkEsc(h.sym)+(alState.activePie==='all'?' <span style="color:var(--t3);font-weight:400;font-size:max(.44rem,var(--vi-fs-1))">· '+stkEsc(stkPieName(h.pie))+'</span>':'')+'</div><div class="stk-nm">'+stkEsc(h.name||'')+'</div>'+stkHoldMeta(h)+'</div>'
+          +'<div class="c-tk">'+stkHoldLogo(h,24,STK_COLORS[i%STK_COLORS.length])+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+STK_COLORS[i%STK_COLORS.length]+'"></i>'+stkEsc(h.sym)+(alState.activePie==='all'?' <span style="color:var(--t3);font-weight:400;font-size:max(.44rem,var(--vi-fs-1))">· '+stkEsc(stkPieName(h.pie))+'</span>':'')+'</div><div class="stk-nm">'+stkEsc(h.name||'')+'</div>'+stkHoldMeta(h)+'</div></div>'
           +'<div class="c-un"><span class="stk-lb">Units</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.units||0)+'" onchange="stkSet('+h.id+',\'units\',this.value)" title="Units held"></div>'
-          +'<div class="c-av"><span class="stk-lb">Avg cost £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.avgCost>0?(+h.avgCost).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="–" onchange="stkSet('+h.id+',\'avgCost\',this.value)" title="Your average buy price in £"></div>'
+          +'<div class="c-av"><span class="stk-lb">Avg cost £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.avgCost>0?(+h.avgCost).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="'+(+h.addPx>0?(+h.addPx).toFixed(4).replace(/\.?0+$/,''):'–')+'" onchange="stkSet('+h.id+',\'avgCost\',this.value)" title="'+(+h.addPx>0&&!(+h.avgCost>0)?'Empty, so the price when you added it is used. Type what you paid per unit in £ to use that instead':'Your average buy price per unit in £')+'"></div>'
           +'<div class="c-pr"><span class="stk-lb">Price £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+h.price>0?(+h.price).toFixed(4).replace(/\.?0+$/,''):'')+'" placeholder="live" onchange="stkSet('+h.id+',\'price\',this.value)" title="Price in £. Type one to override the live price, clear it to go back to live"><div class="stk-src">'+srcTxt+(ch&&!h.manualPrice?' · <span style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
           +'<div class="stk-val c-va"><span class="stk-lb">Value</span>'+cfMoney(v)+'</div>'
-          +'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'var(--green)':'var(--red)')+'">'+(pl==null?'–':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>'
+          +(sus?'<div class="stk-pl c-pl"><button type="button" class="stk-chk" onclick="stkCheckCost(this)" title="Your average cost is more than 3 times today’s price. It should be the price you paid per unit, in £ (not pence, and not the total)">Check your average cost</button></div>'
+            :'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'var(--green)':'var(--red)')+'" title="'+(pl==null?'':(+h.avgCost>0?'vs your average cost':'since you added it'))+'">'+(pl==null?'–':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>')
           +'<button class="data-item-del c-x" style="width:auto;padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;opacity:1;border:1px solid rgb(var(--red-rgb) / .45);border-radius:4px" onclick="stkRemove('+h.id+')" title="Remove this holding">🗑 Remove</button></div>';
 }).join('')+'</div></div>';
       }).join('')+'</div>';
@@ -20451,13 +20703,14 @@ function stkRender(){
     var av=stkAllocView();
     al.style.display=hs.length?'':'none';
     al.innerHTML='<div class="stk-hd"><span>Allocation</span><div class="nw3d-seg" role="group" aria-label="Allocation view"><button type="button" aria-pressed="'+(av==='bars')+'" onclick="stkSetAlloc(\'bars\')">Bars</button><button type="button" aria-pressed="'+(av==='tree')+'" onclick="stkSetAlloc(\'tree\')">Tree map</button></div></div>'
-    +(av==='tree'?'<div class="stk-tm-key" id="stk-tm-key"></div><div class="dtm stk-tm" id="stk-treemap"></div>':hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){
+    +(av==='tree'?'<div class="stk-tm-key" id="stk-tm-key"></div><div class="dtm stk-tm" id="stk-treemap"></div><div class="stk-tm-other" id="stk-tm-other"></div>':hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){
       var p=total>0?stkValue(h)/total*100:0,c=STK_COLORS[i%STK_COLORS.length];
       return '<div class="stk-bar"><span class="t" title="'+stkEsc(h.name||h.sym)+'">'+stkEsc(h.sym)+'</span><span class="b"><div style="width:'+p.toFixed(1)+'%;background:'+c+'"></div></span><span class="p">'+p.toFixed(1)+'%</span></div>';
     }).join(''));
     if(av==='tree'){stkDrawTreemap();if(!al._ro&&window.ResizeObserver){al._ro=new ResizeObserver(function(){if(stkAllocView()==='tree'&&al.clientWidth!==al._rw){al._rw=al.clientWidth;stkDrawTreemap();}});al._ro.observe(al);}}
   }
 }
+function stkCheckCost(btn){var r=btn.closest('.stk-row'),i=r&&r.querySelector('.c-av input');if(i){i.focus();if(i.select)i.select();}}
 // ── holdings grouped by pie / fund, collapsed by default (owner, 3 Nov) ──
 function stkOpenMap(){try{return JSON.parse(localStorage.getItem('vi-stk-open')||'{}')||{};}catch(e){return {};}}
 function stkGrpOpen(id){return !!stkOpenMap()[id];}
@@ -20469,36 +20722,144 @@ function stkGroups(hs){
 }
 function stkAllocView(){try{return localStorage.getItem('vi-stk-alloc')==='tree'?'tree':'bars';}catch(e){return 'bars';}}
 function stkSetAlloc(v){try{localStorage.setItem('vi-stk-alloc',v);}catch(e){}stkRender();}
+// ── fitted tree map: the layout engine is shared (Stocks now, Crypto next); only stkDrawTreemap knows about holdings ──
+var _dtmCv=null;
+function dtmMeasure(txt,font){try{_dtmCv=_dtmCv||document.createElement('canvas').getContext('2d');_dtmCv.font=font;return _dtmCv.measureText(String(txt)).width*1.06+1;}catch(e){return String(txt).length*9;}}
+// wrap a name into at most maxLines lines that fit maxW; a word that cannot fit on a line fails the whole name (the tile then merges into "Other")
+function dtmWrap(txt,font,maxW,maxLines){
+  var ws=String(txt||'').split(/\s+/).filter(Boolean),lines=[],cur='',i;
+  if(!ws.length)return null;
+  for(i=0;i<ws.length;i++){
+    if(dtmMeasure(ws[i],font)>maxW)return null;
+    var t=cur?cur+' '+ws[i]:ws[i];
+    if(dtmMeasure(t,font)<=maxW)cur=t;else{lines.push(cur);cur=ws[i];}
+  }
+  lines.push(cur);
+  if(lines.length>maxLines){
+    lines=lines.slice(0,maxLines);var w=lines[maxLines-1].split(' ');
+    while(w.length&&dtmMeasure(w.join(' ')+'…',font)>maxW)w.pop();
+    if(!w.length)return null;
+    lines[maxLines-1]=w.join(' ')+'…';
+  }
+  return lines;
+}
+// can this item's label (logo, name, amount, share) sit inside a cw x ch tile? returns what to draw, or null
+function dtmFitCell(it,cw,ch,o){
+  var fs=o.fs,padX=8,padY=6,iw=cw-padX*2,ih=ch-padY*2,
+      nf='700 '+fs+'px Syne,sans-serif',vf='700 '+(fs+.5)+'px "Share Tech Mono",monospace',
+      lh=Math.ceil(fs*1.2),vh=Math.ceil((fs+.5)*1.3);
+  if(iw<30||ih<vh||dtmMeasure(it.val,vf)>iw)return null;
+  for(var k=0;k<2;k++){
+    var logo=k===0&&!it.noLogo,aw=iw-(logo?26:0);if(aw<28)continue;
+    var lines=dtmWrap(it.name,nf,aw,it.other?1:2);if(!lines)continue;
+    var hh=Math.max(logo?20:0,lines.length*lh)+2+vh;if(hh>ih)continue;
+    var room=ih-hh-2,share=null;
+    if(it.other&&room>=Math.ceil(fs*1.25)){var nl=dtmWrap(it.names,fs+'px "Share Tech Mono",monospace',iw,1);if(nl)share=nl[0];}
+    else if(room>=Math.ceil(fs*1.25)){var s1=it.pct+'% of portfolio',sf=fs+'px "Share Tech Mono",monospace';share=dtmMeasure(s1,sf)<=iw?s1:(dtmMeasure(it.pct+'%',sf)<=iw?it.pct+'%':null);}
+    return{logo:logo,lines:lines,share:share};
+  }
+  return null;
+}
+// groups: [{id,col,v,items:[{name,val,v,pct,...}]}]. Squarifies the groups, then each group's items; an item whose label will not fit
+// joins that group's "Other (n)" tile and the group is laid out again. Returns {pies,cells,listed}.
+function dtmFitMap(groups,W,H,o){
+  var gap=3,pad=4,merged={},res,again,guard=0;
+  groups.forEach(function(g){merged[g.id]=[];});
+  do{
+    res={pies:[],cells:[],listed:[]};again=false;guard++;
+    dtmSquarify(groups.map(function(g){return{v:g.v,d:g};}),0,0,W,H).forEach(function(r){
+      var g=r.d;res.pies.push({x:r.x+1,y:r.y+1,w:r.w-2,h:r.h-2,col:g.col});
+      var ix=r.x+pad,iy=r.y+pad,iw=r.w-pad*2,ih=r.h-pad*2;
+      if(iw<10||ih<10){g.items.forEach(function(it){res.listed.push({g:g,it:it});});return;}
+      var list=g.items.filter(function(it){return merged[g.id].indexOf(it)<0;}),mv=merged[g.id],oth=null;
+      if(mv.length){   // the "Other (n)" tile is a shelf along the bottom of its pie, never thinner than a readable label
+        var sv=mv.reduce(function(a,it){return a+it.v;},0),oh=Math.min(ih*.4,Math.max(56,sv/g.v*iw*ih/iw));
+        oth={other:true,items:mv,v:sv,name:mv.length===1?mv[0].name:'Other ('+mv.length+')',val:o.money(sv),pct:o.pct(sv),noLogo:true,names:mv.map(function(x){return x.name;}).join(', ')};
+        var of=dtmFitCell(oth,iw-gap,oh-gap,o);
+        if(of){res.cells.push({x:ix+gap/2,y:iy+ih-oh+gap/2,w:Math.max(2,iw-gap),h:Math.max(2,oh-gap),it:oth,fit:of,g:g,j:9});ih-=oh;}   // no room for a label: they are listed under the map instead
+      }
+      if(ih<10)return;
+      list.sort(function(a,b){return b.v-a.v;});
+      dtmSquarify(list.map(function(it){return{v:it.v,d:it};}),ix,iy,iw,ih).forEach(function(c,j){
+        var it=c.d,fit=dtmFitCell(it,c.w-gap,c.h-gap,o);
+        if(!fit&&guard<40){merged[g.id].push(it);again=true;return;}
+        res.cells.push({x:c.x+gap/2,y:c.y+gap/2,w:Math.max(2,c.w-gap),h:Math.max(2,c.h-gap),it:it,fit:fit,g:g,j:j});
+      });
+    });
+  }while(again);
+  groups.forEach(function(g){merged[g.id].forEach(function(it){res.listed.push({g:g,it:it});});});
+  return res;
+}
+// ── holding logos (owner, 3 Nov: "ticker icons or the company icons") ──
+// Company logo from the favicon service the privacy notice already names; no new host. A round monogram on the pie colour when it
+// cannot load; a fund badge for funds. Ticker domains below are the common UK and US shares; funds use their provider's logo.
+var STK_TICKERS={AAPL:'apple.com',MSFT:'microsoft.com',GOOGL:'google.com',GOOG:'google.com',AMZN:'amazon.com',TSLA:'tesla.com',NVDA:'nvidia.com',META:'meta.com',NFLX:'netflix.com',DIS:'disney.com',KO:'coca-cola.com',PEP:'pepsico.com',JPM:'jpmorganchase.com',V:'visa.com',MA:'mastercard.com',PYPL:'paypal.com',INTC:'intel.com',AMD:'amd.com',BA:'boeing.com',WMT:'walmart.com',NKE:'nike.com',MCD:'mcdonalds.com',SBUX:'starbucks.com',UBER:'uber.com',
+  BP:'bp.com',SHEL:'shell.com',LLOY:'lloydsbankinggroup.com',BARC:'barclays.com',HSBA:'hsbc.com',NWG:'natwestgroup.com',STAN:'sc.com',VOD:'vodafone.com',AZN:'astrazeneca.com',GSK:'gsk.com',ULVR:'unilever.com',DGE:'diageo.com',RIO:'riotinto.com',BHP:'bhp.com',GLEN:'glencore.com',BATS:'bat.com',IMB:'imperialbrandsplc.com',TSCO:'tescoplc.com',SBRY:'about.sainsburys.co.uk',MKS:'marksandspencer.com',BT:'bt.com',RR:'rolls-royce.com',BAE:'baesystems.com',LSEG:'lseg.com',REL:'relx.com',NG:'nationalgrid.com',SSE:'sse.com',AV:'aviva.com',LGEN:'legalandgeneral.com',PRU:'prudentialplc.com',RKT:'reckitt.com',EXPN:'experian.com',CPG:'compass-group.com',WPP:'wpp.com',IAG:'iairgroup.com',EZJ:'easyjet.com',JD:'jdplc.com',OCDO:'ocadogroup.com',AUTO:'autotrader.co.uk',RMV:'rightmove.co.uk',SMT:'scottishmortgageit.com'};
+function stkTickerDomain(sym){var s=String(sym||'').toUpperCase().replace(/\.(L|LON|US|O|N|OQ)$/,'');return Object.prototype.hasOwnProperty.call(STK_TICKERS,s)?STK_TICKERS[s]:null;}
+function stkIsFundCode(sym){var s=String(sym||'');return /^0P/i.test(s)||s.length>8;}
+function stkFundBadge(){return '<span class="stk-fundb"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z" fill="#fff"/><path d="M14 2.2A9 9 0 0 1 21.8 10H14z" fill="#fff" opacity=".7"/></svg></span>';}
+function stkHoldLogo(h,px,col){
+  var sym=String(h.sym||''),fundish=stkIsFundCode(sym)||(h.pie!=null&&(alState.stockPies||[]).some(function(p){return p.id===h.pie&&p.kind==='fund';})),
+      dom=stkTickerDomain(sym),pc=col;
+  if(!dom){var m=stkProviderMatch(h.provider||h.name||'');if(m){dom=m.d;pc=pc||m.c;}}
+  var fb=fundish?stkFundBadge():stkMono(sym||h.name,pc);
+  return '<span class="stk-hl'+(fundish?' is-fund':'')+'" style="width:'+px+'px;height:'+px+'px'+(fundish?';background:'+(pc||'#2b6f6b'):'')+'">'
+    +(dom?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain='+dom+'&sz=64" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="stk-hl-fb" style="display:none;width:100%;height:100%">'+fb+'</span>':fb)+'</span>';
+}
+// the name a tile shows: the ticker, or a fund's name with the share-class noise taken off (never a code like 0P0001O...)
+function stkTmName(h){
+  var s=String(h.sym||'');if(!stkIsFundCode(s))return s||String(h.name||'');
+  var n=String(h.name||'').replace(/\b(GBP|USD|EUR|Acc|Inc|Accumulation|Income|Distributing)\b\.?/gi,'').replace(/\bClass\s+\w+\b/gi,'').replace(/\s+/g,' ').trim();
+  return n||s;
+}
+// Tile colours: the pie colour lightened (never darkened to olive or brown), with dark ink picked so the text is at least 4.5:1.
+function stkHexRgb(h){h=String(h).replace('#','');if(h.length===3)h=h.replace(/./g,'$&$&');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
+function stkLum(c){var f=c.map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});return .2126*f[0]+.7152*f[1]+.0722*f[2];}
+function stkTileCol(col,j,other){
+  var c=stkHexRgb(col),k=other?.58:Math.min(.04+Math.min(j,5)*.035,.22),rgb;
+  for(;;){rgb=c.map(function(v){return Math.round(v+(255-v)*k);});if((stkLum(rgb)+.05)/(stkLum([11,16,24])+.05)>=5.2||k>=.95)break;k+=.04;}   // 5.2 leaves room for the hatch
+  return 'rgb('+rgb.join(',')+')';
+}
 function stkDrawTreemap(){
-  var el=document.getElementById('stk-treemap'),key=document.getElementById('stk-tm-key');if(!el)return;
+  var el=document.getElementById('stk-treemap'),key=document.getElementById('stk-tm-key'),lg=document.getElementById('stk-tm-other');if(!el)return;
   var W=el.parentElement.clientWidth-(parseFloat(getComputedStyle(el.parentElement).paddingLeft)||0)*2;
   if(!(W>80))return;
-  var H=Math.round(Math.max(240,Math.min(460,W*.72)));el.style.height=H+'px';el.style.width=W+'px';
+  var H=Math.round(Math.max(360,Math.min(640,W*.9))),fs=W>=560?12:11;el.style.height=H+'px';el.style.width=W+'px';el.style.setProperty('--tm-fs',fs+'px');
   var all=(alState.stocks||[]).filter(function(h){return stkValue(h)>0;}),tot=all.reduce(function(a,h){return a+stkValue(h);},0);
-  if(!all.length||!(tot>0)){el.innerHTML='<div class="dtm-empty">No priced holdings yet</div>';if(key)key.innerHTML='';return;}
-  var gs=stkGroups(all),gap=3,cells=[],pad=4,out='';
-  var pieCol={};gs.forEach(function(g,i){pieCol[g.p.id]=STK_COLORS[i%STK_COLORS.length];});
+  if(!all.length||!(tot>0)){el.innerHTML='<div class="dtm-empty">No priced holdings yet</div>';if(key)key.innerHTML='';if(lg)lg.innerHTML='';return;}
+  var gs=stkGroups(all),pieCol={};gs.forEach(function(g,i){pieCol[g.p.id]=STK_COLORS[i%STK_COLORS.length];});
   if(key)key.innerHTML=gs.map(function(g){return '<span class="stk-tm-k"><i style="background:'+pieCol[g.p.id]+'"></i>'+stkEsc(g.p.name)+' <b>'+(g.v/tot*100).toFixed(0)+'%</b></span>';}).join('');
-  dtmSquarify(gs.map(function(g){return {v:g.v,d:g};}),0,0,W,H).forEach(function(r){
-    var g=r.d,col=pieCol[g.p.id];
-    out+='<div class="stk-tm-pie" style="left:'+(r.x+1)+'px;top:'+(r.y+1)+'px;width:'+(r.w-2)+'px;height:'+(r.h-2)+'px;border-color:'+col+'"></div>';
-    var ix=r.x+pad,iy=r.y+pad,iw=r.w-pad*2,ih=r.h-pad*2;if(iw<10||ih<10)return;
-    var hs2=g.hs.slice().sort(function(a,b){return stkValue(b)-stkValue(a);});
-    dtmSquarify(hs2.map(function(h){return {v:stkValue(h),d:h};}),ix,iy,iw,ih).forEach(function(c,j){
-      var h=c.d,v=stkValue(h),sm=c.w-gap<56||c.h-gap<44,mid=!sm&&c.w>70&&c.h>46,pct=(v/tot*100).toFixed(1);
-      var nm=h.sym||h.name||'';
-      out+='<div class="dtm-cell stk-tm-c'+(sm?' dtm-sm" tabindex="0" data-n="'+stkEsc(nm)+' · '+stkEsc(g.p.name)+'" data-v="'+stkEsc(cfMoney(v))+' · '+pct+'%"':'"')+' title="'+stkEsc((h.name||nm)+' · '+g.p.name)+' · '+stkEsc(cfMoney(v))+' ('+pct+'%)" style="left:'+(c.x+gap/2)+'px;top:'+(c.y+gap/2)+'px;width:'+Math.max(2,c.w-gap)+'px;height:'+Math.max(2,c.h-gap)+'px;background:color-mix(in srgb,'+col+' '+(86-Math.min(j,5)*9)+'%,#0b1018)">'
-        +(mid?'<b class="dtm-n">'+stkEsc(nm)+'</b><span class="dtm-v">'+cfMoney(v)+'</span>':'')+(mid&&c.h>70?'<span class="dtm-s">'+pct+'% of portfolio</span>':'')+'</div>';
-    });
+  var money=function(v){return cfMoney(v);},pct=function(v){return (v/tot*100).toFixed(1);};
+  var groups=gs.map(function(g){return{id:g.p.id,p:g.p,col:pieCol[g.p.id],v:g.v,items:g.hs.map(function(h){var v=stkValue(h);return{h:h,v:v,name:stkTmName(h),val:money(v),pct:pct(v)};})};});
+  var res=dtmFitMap(groups,W,H,{fs:fs,money:money,pct:pct}),out='';
+  res.pies.forEach(function(r){out+='<div class="stk-tm-pie" style="left:'+r.x+'px;top:'+r.y+'px;width:'+r.w+'px;height:'+r.h+'px;border-color:'+r.col+'"></div>';});
+  res.cells.forEach(function(c){
+    var it=c.it,col=c.g.col,bg;
+    if(it.other){
+      var names=it.items.map(function(x){return x.name+' '+x.val;}).join(', ');
+      bg='repeating-linear-gradient(135deg,rgba(11,16,24,.12) 0 6px,transparent 6px 12px),'+stkTileCol(col,0,true);
+      out+='<div class="dtm-cell stk-tm-c dtm-other" tabindex="0" data-n="'+stkEsc(it.name+' · '+c.g.p.name)+'" data-v="'+stkEsc(names)+'" title="'+stkEsc(it.name+' in '+c.g.p.name+': '+names)+'" style="left:'+c.x+'px;top:'+c.y+'px;width:'+c.w+'px;height:'+c.h+'px;color:#0b1018;background:'+bg+'">'
+        +(c.fit?'<b class="dtm-n">'+stkEsc(it.name)+'</b><span class="dtm-v">'+stkEsc(it.val)+'</span>'+(c.fit.share?'<span class="dtm-s">'+stkEsc(c.fit.share)+'</span>':''):'')+'</div>';
+      return;
+    }
+    var h=it.h,r=stkReturns([h]),chg=r.counted.length?' · '+(r.change>=0?'+':'-')+cfMoney(Math.abs(r.change))+' since added':'';
+    bg=stkTileCol(col,c.j);
+    out+='<div class="dtm-cell stk-tm-c" title="'+stkEsc((h.name||it.name)+' · '+c.g.p.name+' · '+it.val+' ('+it.pct+'%)'+chg)+'" style="left:'+c.x+'px;top:'+c.y+'px;width:'+c.w+'px;height:'+c.h+'px;color:#0b1018;background:'+bg+'">'
+      +'<div class="dtm-hd">'+(c.fit.logo?stkHoldLogo(h,20,col):'')+'<b class="dtm-n">'+c.fit.lines.map(stkEsc).join('<br>')+'</b></div><span class="dtm-v">'+stkEsc(it.val)+'</span>'+(c.fit.share?'<span class="dtm-s">'+stkEsc(c.fit.share)+'</span>':'')+'</div>';
   });
   el.innerHTML=out+'<div class="dtm-tip" aria-live="polite" hidden></div>';
+  if(lg){
+    var by=[];res.listed.forEach(function(x){var b=by.find(function(y){return y.g===x.g;});if(!b){b={g:x.g,xs:[]};by.push(b);}b.xs.push(x.it);});
+    lg.innerHTML=by.length?'<b>Grouped as Other</b> (too small to label)'+by.map(function(b){return '<div class="stk-tm-ol"><i style="background:'+b.g.col+'"></i><span>'+stkEsc(b.g.p.name)+': '+b.xs.map(function(x){return stkEsc(x.name)+' <em>'+stkEsc(x.val)+'</em>';}).join(' · ')+'</span></div>';}).join(''):'';
+  }
   if(!el._dtmTip){el._dtmTip=1;
-    el.addEventListener('pointerover',function(e){if(e.pointerType==='mouse')dtmTip(el,e.target.closest('.dtm-sm'));});
+    el.addEventListener('pointerover',function(e){if(e.pointerType==='mouse')dtmTip(el,e.target.closest('.dtm-other'));});
     el.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')dtmTip(el,null);});
-    el.addEventListener('click',function(e){dtmTip(el,e.target.closest('.dtm-sm'));});
-    el.addEventListener('focusin',function(e){dtmTip(el,e.target.closest('.dtm-sm'));});
+    el.addEventListener('click',function(e){dtmTip(el,e.target.closest('.dtm-other'));});
+    el.addEventListener('focusin',function(e){dtmTip(el,e.target.closest('.dtm-other'));});
     el.addEventListener('focusout',function(){dtmTip(el,null);});
   }
+  if(!window._stkTmFonts&&document.fonts&&document.fonts.ready){window._stkTmFonts=1;document.fonts.ready.then(function(){try{if(stkAllocView()==='tree')stkDrawTreemap();}catch(e){}});}
 }
 
 // ── pies ──
@@ -20567,7 +20928,7 @@ async function stkAddCore(o){if(viBlockEdit())return;
   var sym=String(o.sym||'').trim().toUpperCase(),units=o.units,amt=o.amt,cost=o.cost;
   if(!/^[A-Z0-9.\-^=]{1,15}$/.test(sym))return{err:'Search for a fund or share, or enter a ticker, e.g. VUSA.L or AAPL'};
   if(!(units>0)&&!(amt>0))return{err:'Enter how many units you hold, or the £ value you hold'};
-  var mpx=+o.manualPrice>0?+o.manualPrice:0;
+  var mpx=+o.manualPrice>0?+o.manualPrice:0,entryPx=mpx;   // entryPx: the price at this moment, when we know it (E17)
   if(!(units>0)&&mpx>0)units=+(amt/mpx).toFixed(6);   // your own unit price
   if(!(units>0)){   // worked out from the £ you hold ÷ the live price
     showToast('Looking up the live price…');
@@ -20584,7 +20945,7 @@ async function stkAddCore(o){if(viBlockEdit())return;
         }
       }
       if(!(g>0))return{err:'No live price found for '+sym+((window._stkMisses&&window._stkMisses[sym]&&window._stkMisses[sym][0])?' ('+window._stkMisses[sym][0]+')':'')+'. Enter the units you hold instead (or pick a different listing of the fund)'};
-      units=+(amt/g).toFixed(6);if(note)showToast(note);
+      units=+(amt/g).toFixed(6);if(!(entryPx>0))entryPx=g;if(note)showToast(note);
     }catch(e){return{err:'Could not look up the price. Enter the units instead'};}
   }
   stkEnsure();
@@ -20601,12 +20962,22 @@ async function stkAddCore(o){if(viBlockEdit())return;
   if(platform&&!pie.platform){pie.platform={name:(stkPlatformMatch(platform)||{}).n||platform};delete pie.platformOff;}
   var h=alState.stocks.find(function(x){return x.pie===pie.id&&x.sym===sym;});
   if(h){ // merge into the existing position (weighted average cost)
-    var tc=(h.avgCost>0?h.units*h.avgCost:0)+(cost>0?units*cost:0);
+    var tc=(h.avgCost>0?h.units*h.avgCost:0)+(cost>0?units*cost:0),u0=+h.units||0;
     h.units=+(h.units+units).toFixed(8);
-    if(h.avgCost>0&&cost>0)h.avgCost=tc/h.units;else if(cost>0&&!(h.avgCost>0))h.avgCost=cost;
+    if(h.avgCost>0&&cost>0)h.avgCost=tc/h.units;
+    else if(cost>0&&!(h.avgCost>0)){   // first typed cost: earlier units keep their entry price (E17); units still waiting for a price take this cost
+      var ku=Math.max(0,u0-(+h.addPendU||0));
+      h.avgCost=(ku>0&&+h.addPx>0)?(ku*h.addPx+(h.units-ku)*cost)/h.units:cost;
+      delete h.addPendU;delete h.addPendAt;
+    }
+    else if(!(cost>0)&&!(h.avgCost>0)&&(+h.addPx>0||+h.addPendU>0||!(u0>0))){   // no cost typed: these units go in at today's price (E17)
+      if(entryPx>0&&!(+h.addPendU>0))h.addPx=(u0>0&&+h.addPx>0)?(u0*h.addPx+units*entryPx)/h.units:entryPx;
+      else{h.addPendU=(+h.addPendU||0)+units;h.addPendAt=Date.now();}
+    }
     if(!h.name&&nm)h.name=nm;
   } else {
     h={id:Date.now(),pie:pie.id,sym:sym,name:nm,units:units,avgCost:cost>0?cost:0,price:0};
+    if(!(cost>0)){if(entryPx>0)h.addPx=entryPx;else{h.addPendU=units;h.addPendAt=Date.now();}}
     alState.stocks.push(h);
   }
   if(mpx>0){h.price=mpx;h.manualPrice=true;h.updated=0;}   // your price, kept until you clear it
@@ -20734,7 +21105,14 @@ async function stkFetchQuotes(symbols){
   }
   return null;
 }
+// A refresh asked for while another is running waits for it, then runs: a holding added in that window still gets its price
+// (it used to return at once and the new holding stayed valued at cost until the next automatic refresh).
 async function stkRefresh(silent){
+  if(window._stkBusy&&window._stkP){try{await window._stkP;}catch(e){}}
+  window._stkP=_stkRefreshRun(silent);
+  return window._stkP;
+}
+async function _stkRefreshRun(silent){
   stkEnsure();
   var targets=alState.stocks.filter(function(h){return !h.manualPrice;});
   var syms=[];targets.forEach(function(h){if(syms.indexOf(h.sym)<0)syms.push(h.sym);});
@@ -20788,7 +21166,7 @@ function stkBuildSeries(hs,hist,fromMs){
       var i=ptr[h.sym]||0;while(i+1<d.t.length&&d.t[i+1]<=t)i++;ptr[h.sym]=i;
       var px=stkToGBP(d.c[i],d.currency);if(px==null)return;
       var v=(+h.units||0)*px;val+=v;
-      if(+h.avgCost>0){cost+=h.units*h.avgCost;costVal+=v;}
+      var bs=stkSuspect(h)?0:stkBasis(h);if(bs>0){cost+=h.units*bs;costVal+=v;}
     });
     return{t:t*1000,v:val,ret:cost>0?(costVal-cost)/cost*100:null,cost:cost};
   });
@@ -20830,7 +21208,7 @@ async function stkChartRender(){
   var have=hs.filter(function(h){return hist[h.sym];}),skipped=hs.length-have.length;
   var pts=have.length?stkBuildSeries(have,hist,from):null;
   if(!pts){box.innerHTML=head+'<div class="stk-note" style="text-align:center;padding:24px">Price history is not available right now'+(skipped?' for '+skipped+' holding'+(skipped===1?'':'s'):'')+'. Try again in a moment.</div>';return;}
-  var costKnown=have.every(function(h){return +h.avgCost>0;}),cost=have.reduce(function(s,h){return s+((+h.avgCost>0)?h.units*h.avgCost:0);},0);
+  var costKnown=have.every(function(h){return stkBasis(h)>0&&!stkSuspect(h);}),cost=have.reduce(function(s,h){return s+((stkBasis(h)>0&&!stkSuspect(h))?h.units*stkBasis(h):0);},0);
   var view=_stkCh.view;if(view==='return'&&pts.every(function(p){return p.ret==null;}))view='value';
   var lastP=pts[pts.length-1],firstP=pts[0];
   var chg=view==='value'?(lastP.v-firstP.v):(lastP.ret-firstP.ret);
@@ -22014,6 +22392,8 @@ function renderAlTab(){
           +'</div>'
           +(l.runningCost>0?'<div class="wi-sub">'+gbpFmt(l.runningCost)+'/mo</div>':'')
           +(l.depRate>0?'<div class="wi-sub" style="color:var(--re)">↓'+l.depRate+'%/yr</div>':'')
+          +(l.est&&l.est.v>0?'<div class="wi-sub" style="font-size:max(.55rem,var(--vi-fs-1))">'+(l.est.srcs&&l.est.srcs.length?'Estimate from '+cfEsc(l.est.srcs.join(', '))+': '+cfEsc(wiMoney(l.est.lo))+' to '+cfEsc(wiMoney(l.est.hi))+', '+cfEsc(l.est.cond||'good')+' condition':'Value set from a second-hand estimate, '+cfEsc(wiMoney(l.est.v)))+'</div>':'')
+          +'<button class="wi-link-btn" type="button" onclick="wiLiabOpen('+l.id+')" aria-label="Second-hand prices for '+cfEsc(l.name)+'">Second-hand prices</button>'
           +'<button class="data-item-del" style="margin-top:4px;width:100%" onclick="delLiability('+l.id+')"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg> Remove</button>'
           +'</div>'
           +'</div>';
@@ -22267,6 +22647,15 @@ function wiLinkInfo(a){
     return {v:v2,ok:true,src:sym+(live?' live price':(+h.price>0?' price you typed':' average cost (no live price yet)')),at:live?h.updated:0,
       work:(+u.toFixed(4))+' × '+wiMoney2(px)+' ('+sym+') = '+wiMoney(v2)};
   }
+  if(L.type==='market'){   // a second-hand estimate the user chose to apply (secondhand-estimate); only the derived numbers are kept
+    var mv=+L.v||0;
+    if(!(mv>0))return {v:own,ok:false,src:'Second-hand estimate',note:'No estimate saved: showing your own figure.'};
+    var sd=(L.srcd||[]).map(function(x){return x.l+': '+x.n+' prices, middle '+wiMoney(x.m);}).join('; ');
+    var stale=L.at>0&&Date.now()-L.at>30*864e5;
+    return {v:mv,ok:true,market:true,guide:!(L.n>0),src:'Second-hand estimate ('+((L.srcs||[]).join(', ')||'listings')+')',at:L.at,
+      work:'Estimate from '+(L.n>0?L.n+' current asking prices':'a price guide')+', typically '+wiMoney(L.lo)+' to '+wiMoney(L.hi)+', adjusted for '+(L.cond||'good')+' condition ('+Math.round((+L.haircut||0)*100)+'% allowance for asking prices running above sale prices'+(+L.cf&&+L.cf!==1?', condition factor '+L.cf:'')+')'
+        +(sd?'. '+sd:'')+(L.combine==='largest source'?'. The sources disagreed, so the one with most prices is used':'')+(stale?'. Checked over 30 days ago: search again':'')};
+  }
   return null;
 }
 function wiValue(a){var i=wiLinkInfo(a);return i?i.v:(+a.value||0);}
@@ -22317,11 +22706,12 @@ function wiGuessSource(a){
 }
 function wiLinkHtml(a){
   var i=wiLinkInfo(a),chg=i&&wiSnap(a,i),hist=wiSpark(wiHist(a,i));
-  var btn='<button class="wi-link-btn" type="button" onclick="wiLinkOpen('+a.id+')" aria-label="Value of '+cfEsc(a.name)+': '+(i?'linked':'your own figure')+'. Change">'+(i?(i.ok?'Linked':'Link paused'):'Link to market value')+'</button>';
+  var btn='<button class="wi-link-btn" type="button" onclick="wiLinkOpen('+a.id+')" aria-label="Value of '+cfEsc(a.name)+': '+(i?'linked':'your own figure')+'. Change">'+(i?(i.ok?(i.market?'Estimated':'Linked'):'Link paused'):'Link to market value')+'</button>';
   if(!i)return hist+btn;
   return hist+btn+'<details class="wi-work"><summary>Show working</summary>'
     +(i.ok?'<div>'+cfEsc(i.work)+'</div><div class="wi-src">'+cfEsc(i.src)+(i.at?', checked '+wiWhen(i.at):'')+'</div>'+(chg?'<div class="wi-chg">'+chg+' ('+cfEsc(i.src)+')</div>':''):'<div>'+cfEsc(i.note)+'</div>')
     +'<div class="wi-src">Your own figure: '+wiMoney(a.value)+'</div>'
+    +(i.market?'<div class="wi-src">'+(i.guide?'From a price guide, not a valuation, offer or sale price.':'Estimated from current asking prices, not a valuation, offer or sale price. Real sale prices are usually lower.')+'</div>':'')
     +'<div class="wi-src">Estimated market value, not an offer or a valuation. Not financial advice.</div></details>';
 }
 function wiLinkModal(){
@@ -22333,7 +22723,8 @@ function wiLinkModal(){
     +'<div class="wi-link-kinds" role="radiogroup" aria-label="How this item is valued">'
     +'<label><input type="radio" name="wi-lk" value="manual" onchange="wiLinkKind()"> My own figure</label>'
     +'<label><input type="radio" name="wi-lk" value="metal" onchange="wiLinkKind()"> Precious metal by weight</label>'
-    +'<label><input type="radio" name="wi-lk" value="holding" onchange="wiLinkKind()"> Shares or a fund</label></div>'
+    +'<label><input type="radio" name="wi-lk" value="holding" onchange="wiLinkKind()"> Shares or a fund</label>'
+    +'<label><input type="radio" name="wi-lk" value="market" onchange="wiLinkKind()"> Second-hand prices (estimate)</label></div>'
     +'<p id="wi-link-guess" class="wi-link-hint wi-guess" aria-live="polite"></p>'
     +'<div id="wi-lk-manual" class="g-form" hidden><div><label class="ov-kpi-lbl" for="wl-own">Your figure (£)</label><input type="number" id="wl-own" class="al-inp" min="0" step="any" inputmode="decimal" oninput="wiLinkPreview()"></div></div>'
     +'<div id="wi-lk-metal" class="g-form" hidden>'
@@ -22345,8 +22736,17 @@ function wiLinkModal(){
     +'<div><label class="ov-kpi-lbl" for="wl-stock">Holding</label><select id="wl-stock" class="al-inp" onchange="wiLinkPreview()"></select></div>'
     +'<div><label class="ov-kpi-lbl" for="wl-units">Units</label><input type="number" id="wl-units" class="al-inp" min="0" step="any" inputmode="decimal" oninput="wiLinkPreview()"></div>'
     +'<p class="wi-link-hint">The price comes from that holding in Stocks and shares. Count these units here or there, not in both.</p></div>'
+    +'<div id="wi-lk-market" hidden>'
+    +'<div class="g-form"><div><label class="ov-kpi-lbl" for="wl-mq">Search words</label><input type="text" id="wl-mq" class="al-inp" maxlength="80" autocomplete="off" oninput="wiMkLinks()"></div>'
+    +'<div><label class="ov-kpi-lbl" for="wl-mcat">Kind of item</label><select id="wl-mcat" class="al-inp"><option value="general">Anything else</option><option value="instruments">Guitars and instruments</option><option value="records">Records and music</option><option value="games">Games and consoles</option></select></div>'
+    +'<div><label class="ov-kpi-lbl" for="wl-mcond">Condition</label><select id="wl-mcond" class="al-inp"><option value="new">New</option><option value="excellent">Excellent</option><option value="good">Good</option><option value="fair">Fair</option><option value="poor">Poor</option></select></div></div>'
+    +'<button class="btn-add-data" type="button" id="wl-msearch" onclick="wiMkSearch()" style="margin-top:10px">Search second-hand prices</button>'
+    +'<div id="wl-mres" class="wi-mres" aria-live="polite"></div>'
+    +'<button class="btn-add-data" type="button" id="wl-mapply" onclick="wiMkApply()" hidden>Use this estimate</button>'
+    +'<div id="wl-mlinks" class="wi-mlinks"></div>'
+    +'<p class="wi-link-hint">An estimate from current asking prices, not a valuation or a sale price. It is only used if you tap Use this estimate. The item words, kind and condition go through our server to the price sources named in the Privacy Notice.</p></div>'
     +'<div id="wi-link-prev" class="wi-link-prev" aria-live="polite"></div>'
-    +'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-add-data" type="button" onclick="wiLinkSave()">Save</button>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn-add-data" type="button" onclick="wiLinkSave()">Save</button>'
     +'<button class="btn-add-data" type="button" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="wiLinkClose()">Cancel</button></div>'
     +'<div id="wi-link-msg" class="vi-pop-msg" role="alert"></div>'
     +'<p class="wi-link-hint">Estimated market value, not an offer or a valuation. Not financial advice.</p></div>';
@@ -22359,7 +22759,7 @@ function wiLinkPurity(sel){
 }
 function wiLinkKind(){
   var k=(document.querySelector('input[name="wi-lk"]:checked')||{}).value||'manual';
-  document.getElementById('wi-lk-manual').hidden=k!=='manual';document.getElementById('wi-lk-metal').hidden=k!=='metal';document.getElementById('wi-lk-holding').hidden=k!=='holding';
+  document.getElementById('wi-lk-manual').hidden=k!=='manual';document.getElementById('wi-lk-metal').hidden=k!=='metal';document.getElementById('wi-lk-holding').hidden=k!=='holding';document.getElementById('wi-lk-market').hidden=k!=='market';if(k==='market')wiMkLinks();var gu=document.getElementById('wi-link-guess');if(gu)gu.style.display=k==='market'?'none':'';
   document.getElementById('wi-link-msg').textContent='';wiLinkPreview();
 }
 function wiLinkRead(){
@@ -22367,16 +22767,19 @@ function wiLinkRead(){
   if(k==='metal'){var w=parseFloat(document.getElementById('wl-weight').value),u=document.getElementById('wl-unit').value,ps=document.getElementById('wl-purity');
     return {type:'metal',metal:document.getElementById('wl-metal').value,unit:u,grams:w>0?(u==='oz'?w*wiTroyG():w):0,purity:+ps.value,label:ps.options[ps.selectedIndex]?ps.options[ps.selectedIndex].text:''};}
   if(k==='holding'){var s=document.getElementById('wl-stock').value,un=parseFloat(document.getElementById('wl-units').value);return {type:'holding',stockId:s===''?null:+s,units:un>0?un:0};}
+  if(k==='market'){var cur=invItem(_wiLinkId),pl=_wiMk||(cur&&cur.link&&cur.link.type==='market'?cur.link:null);return pl||{type:'market',v:0};}
   return null;
 }
 function wiLinkPreview(){
   var a=invItem(_wiLinkId),el=document.getElementById('wi-link-prev');if(!a||!el)return;
   var L=wiLinkRead();if(!L){var ow=parseFloat(document.getElementById('wl-own').value);el.textContent='Shown as your own figure: '+wiMoney(ow>0?ow:a.value)+'.';return;}
+  if(L.type==='market'&&_wiMk){el.textContent='';return;}
+  if(L.type==='market'&&!_wiMk&&!(L.v>0)){el.textContent='Search, then tap Use this estimate. Nothing changes until you do.';return;}
   var i=wiLinkInfo({value:a.value,link:L});
   el.textContent=i.ok?i.work+' ('+i.src+(i.at?', checked '+wiWhen(i.at):'')+')':i.note;
 }
 function wiLinkOpen(id){
-  var a=invItem(id);if(!a)return;_wiLinkId=id;_wiLinkReturn=document.activeElement;
+  var a=invItem(id);if(!a)return;_wiLinkId=id;_wiLiab=false;document.getElementById('wi-link-modal')&&document.getElementById('wi-link-modal').classList.remove('wi-liab');_wiLinkReturn=document.activeElement;
   var m=wiLinkModal(),L=a.link||{};
   document.getElementById('wi-link-title').textContent='Value of '+a.name;
   var st=document.getElementById('wl-stock'),hs=alState.stocks||[];
@@ -22386,6 +22789,8 @@ function wiLinkOpen(id){
   document.getElementById('wl-weight').value=L.grams?(L.unit==='oz'?+(L.grams/wiTroyG()).toFixed(4):+(+L.grams).toFixed(3)):'';
   if(L.stockId!=null)st.value=String(L.stockId);document.getElementById('wl-units').value=L.units||'';
   document.getElementById('wl-own').value=+a.value>0?+a.value:'';
+  _wiMk=null;document.getElementById('wl-mq').value=L.q||a.name||'';document.getElementById('wl-mcat').value=L.cat||wiMkGuessCat(a.name);
+  document.getElementById('wl-mcond').value=a.cond||L.cond||'good';document.getElementById('wl-mres').textContent='';document.getElementById('wl-mapply').hidden=true;
   var k=L.type||'manual',gs=document.getElementById('wi-link-guess');gs.textContent='';
   if(!a.link){var g=wiGuessSource(a);k=g.kind;gs.textContent=g.why;
     if(g.kind==='metal'){document.getElementById('wl-metal').value=g.metal;wiLinkPurity();}
@@ -22395,11 +22800,16 @@ function wiLinkOpen(id){
 }
 function wiLinkClose(){
   var m=document.getElementById('wi-link-modal');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');
-  var back=_wiLinkReturn;_wiLinkReturn=null;_wiLinkId=null;if(back&&back.focus)setTimeout(function(){try{back.focus();}catch(e){}},0);
+  var back=_wiLinkReturn;_wiLinkReturn=null;_wiLinkId=null;_wiMk=null;_wiLiab=false;if(m)m.classList.remove('wi-liab');if(back&&back.focus)setTimeout(function(){try{back.focus();}catch(e){}},0);
 }
 function wiLinkSave(){if(viBlockEdit())return;
+  if(_wiLiab){var lb=wiMkItem();if(lb){lb.cond=document.getElementById('wl-mcond').value;saveAL();}wiLinkClose();renderAlTab();showToast('Condition saved');return;}
   var a=invItem(_wiLinkId),msg=document.getElementById('wi-link-msg');if(!a)return;
   var L=wiLinkRead();
+  if(L&&L.type==='market'){   // Save with the market kind keeps the estimate already applied and the condition; a new estimate needs its own tap
+    if(!(a.link&&a.link.type==='market')){msg.textContent='Search, then tap Use this estimate.';return;}
+    a.cond=document.getElementById('wl-mcond').value;saveAL();wiLinkClose();renderAlTab();updateKPIs();showToast(a.cond===a.link.cond?'Condition saved':'Condition saved. Search again to update the estimate');return;
+  }
   if(L&&L.type==='metal'&&!(L.grams>0)){msg.textContent='Enter the weight.';document.getElementById('wl-weight').focus();return;}
   if(L&&L.type==='holding'&&L.stockId==null){msg.textContent='Add the holding in Stocks and shares first.';return;}
   if(L&&L.type==='holding'&&!(L.units>0)){msg.textContent='Enter how many units.';document.getElementById('wl-units').focus();return;}
@@ -22407,6 +22817,70 @@ function wiLinkSave(){if(viBlockEdit())return;
   if(L){a.link=L;a.linkSnap=null;a.linkPrev=null;}else{delete a.link;delete a.linkSnap;delete a.linkPrev;}
   saveAL();wiLinkClose();renderAlTab();updateKPIs();
   showToast(L?'Value linked':'Back to your own figure');
+}
+/* E28 part 1 (v0.9.1): second-hand price estimate. The browser talks to Supabase only (secondhand-estimate); the result is shown,
+   never applied until the user taps "Use this estimate". Only derived numbers are saved on the item (no listings). */
+var _wiMk=null,_wiLiab=false;
+function wiMkItem(){return _wiLiab?(alState.liabilities||[]).find(function(x){return x.id===_wiLinkId;}):invItem(_wiLinkId);}
+/* Liabilities (E28, "as well as the liabilities"): the same search from a liability tile. depreciatedValue() is untouched. A tap sets the
+   item's own value only when the item has no yearly depreciation of its own (otherwise the estimate would be counted twice); with a
+   depreciation rate the estimate is shown for information only. */
+function wiLiabOpen(id){
+  var l=(alState.liabilities||[]).find(function(x){return x.id===id;});if(!l)return;
+  _wiLinkId=id;_wiLiab=true;_wiLinkReturn=document.activeElement;_wiMk=null;
+  var m=wiLinkModal();m.classList.add('wi-liab');
+  document.getElementById('wi-link-title').textContent='Second-hand prices for '+l.name;
+  document.getElementById('wl-mq').value=(l.est&&l.est.q)||l.name||'';document.getElementById('wl-mcat').value=wiMkGuessCat(l.name);
+  document.getElementById('wl-mcond').value=l.cond||'good';document.getElementById('wl-mres').textContent='';document.getElementById('wl-mapply').hidden=true;
+  document.getElementById('wi-link-msg').textContent='';
+  ['wi-lk-manual','wi-lk-metal','wi-lk-holding'].forEach(function(i){document.getElementById(i).hidden=true;});
+  document.getElementById('wi-lk-market').hidden=false;wiMkLinks();
+  m.hidden=false;document.body.classList.add('vi-pop-open');
+  setTimeout(function(){var f=document.getElementById('wl-mq');if(f)f.focus();},30);
+}
+function wiMkGuessCat(n){n=String(n||'').toLowerCase();
+  if(/\b(guitar|les paul|stratocaster|telecaster|strat|bass|amp|amplifier|pedal|synth|synthesi[sz]er|drum|violin|piano|keyboard|ukulele|fender|gibson|marshall|ibanez)\b/.test(n))return 'instruments';
+  if(/\b(vinyl|lp|album|record|cd)\b/.test(n))return 'records';
+  if(/\b(ps[1-5]|playstation|xbox|nintendo|switch|n64|snes|game ?boy|console|mega drive|sega)\b/.test(n))return 'games';
+  return 'general';}
+function wiMkLinks(){
+  var q=encodeURIComponent((document.getElementById('wl-mq').value||'').trim().slice(0,80)),el=document.getElementById('wl-mlinks');if(!el)return;
+  el.innerHTML='<a href="https://www.ebay.co.uk/sch/i.html?LH_Sold=1&LH_Complete=1&_nkw='+q+'" target="_blank" rel="noopener noreferrer">Search eBay sold items</a>'
+    +'<a href="https://www.discogs.com/search/?type=all&q='+q+'" target="_blank" rel="noopener noreferrer">Search Discogs</a>';
+}
+async function wiMkSearch(){
+  var a=wiMkItem();if(!a)return;
+  var q=document.getElementById('wl-mq').value.trim().slice(0,80),cond=document.getElementById('wl-mcond').value,cat=document.getElementById('wl-mcat').value;
+  var res=document.getElementById('wl-mres'),ap=document.getElementById('wl-mapply'),btn=document.getElementById('wl-msearch');
+  _wiMk=null;ap.hidden=true;wiMkLinks();
+  if(q.length<2){res.textContent='Type what the item is first.';return;}
+  btn.disabled=true;res.textContent='Searching…';
+  var r=null;try{r=await _fnInvoke('secondhand-estimate',{q:q,cond:cond,cat:cat},15000);}catch(e){r=null;}
+  btn.disabled=false;
+  if(_wiLinkId!==a.id||!document.getElementById('wl-mres'))return;
+  var d=r&&!r.error?r.data:null;res.textContent='';
+  function line(t){var p=document.createElement('p');p.textContent=t;res.appendChild(p);return p;}
+  if(!d||d.status==='unavailable'){line(_wiLiab?'Not available yet. You can still check prices yourself with the links below. Your figure is unchanged.':'Not available yet. You can still check prices yourself with the links below, then choose My own figure and type it.');return;}
+  if(d.status==='busy'||d.status==='error'){line('Could not get an estimate just now. Try again in a minute, or use the links below.');return;}
+  var ok=d.status==='ok'&&isFinite(d.value)&&d.value>0&&isFinite(d.low)&&isFinite(d.high);
+  if(!ok){line('No reliable match found. Your figure is used. Try adding the model, year or colour, or pick a broader kind of item, or use the links below.');return;}
+  var srcs=(d.sources||[]).concat(d.guides||[]);
+  _wiMk={type:'market',v:Math.round(d.value),lo:Math.round(d.low),hi:Math.round(d.high),n:+d.n||0,at:Date.parse(d.checked)||Date.now(),q:q,cat:cat,cond:cond,haircut:+d.haircut||0,cf:+d.condFactor||1,combine:String(d.combine||''),
+    srcs:srcs.map(function(x){return String(x.label||'').slice(0,40);}),srcd:srcs.map(function(x){return {l:String(x.label||'').slice(0,40),n:+x.n||0,m:Math.round(+x.median||0)};})};
+  var i=wiLinkInfo({value:a.value,link:_wiMk}),when=new Date(_wiMk.at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  line(i.work.split(' (')[0]+'.');
+  line('From '+i.src.replace('Second-hand estimate (','').replace(/\)$/,'')+', checked '+when+'. '+(i.guide?'From a price guide, not a valuation, offer or sale price.':'Estimated from current asking prices, not a valuation, offer or sale price. Real sale prices are usually lower.')+' Not financial advice.');
+  var dt=document.createElement('details');dt.innerHTML='<summary>Show working</summary>';var dv=document.createElement('div');dv.textContent=i.work+'.';dt.appendChild(dv);res.appendChild(dt);
+  if(_wiLiab&&+a.depRate>0){line('This item already loses '+a.depRate+'% a year in your liabilities, so this estimate is for information only and is not applied.');wiLinkPreview();return;}
+  ap.hidden=false;wiLinkPreview();
+}
+function wiMkApply(){if(viBlockEdit())return;
+  var a=wiMkItem();if(!a||!_wiMk)return;
+  if(_wiLiab){if(+a.depRate>0)return;   // never double-count an item that depreciates on its own
+    if(a.estWas==null)a.estWas=+a.value||0;a.value=_wiMk.v;a.est={v:_wiMk.v,lo:_wiMk.lo,hi:_wiMk.hi,n:_wiMk.n,at:_wiMk.at,q:_wiMk.q,cond:_wiMk.cond,srcs:_wiMk.srcs};a.cond=document.getElementById('wl-mcond').value;
+    saveAL();wiLinkClose();renderAlTab();updateKPIs();showToast('Estimate applied');return;}
+  a.link=_wiMk;a.cond=document.getElementById('wl-mcond').value;a.linkSnap=null;a.linkPrev=null;
+  saveAL();wiLinkClose();renderAlTab();updateKPIs();showToast('Estimate applied');
 }
 function invItem(id){return (alState.otherAssets||[]).find(function(x){return x.id===id;});}
 
@@ -23976,7 +24450,7 @@ function wrState(){if(!achState.wr)achState.wr={s:{},q:{},m:{},days:0};var w=ach
 function wrSum(o){var t=0;for(var k in o)t+=+o[k]||0;return t;}
 function wrMonthXp(w){var t=0;for(var k in w.m)t+=Math.min(25,wrSum(w.m[k]));return t;}
 function wrStepXp(key,n){return Math.round(3*WR_TIERS[wrStageTier(key)].xp/Math.max(1,n));}
-function wrTotalXp(){var w=wrState();return (achState.xp||0)+wrSum(w.s)+wrSum(w.q)+wrMonthXp(w);}
+function wrTotalXp(){var w=wrState();return (achState.xp||0)+wrSum(w.s)+wrSum(w.q)+wrMonthXp(w)+wrSum(w.h||{});}   // w.h: House Builder milestones (v0.9.1 E9)
 function wrLevel(xp){if(xp==null)xp=wrTotalXp();var l=WR_LEVELS[0];WR_LEVELS.forEach(function(v){if(xp>=v.xp)l=v;});return l;}
 function wrNextLevel(xp){return WR_LEVELS[wrLevel(xp).n]||null;}
 function wrYm(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
@@ -24042,7 +24516,7 @@ function wrNextGoals(S){
   c.sort(function(a,b){return b.f-a.f;});
   return out.concat(c.slice(0,2));
 }
-function wrSourceSplit(){var w=wrState();return {steps:wrSum(w.s),quests:wrSum(w.q)+wrMonthXp(w),badges:achState.xp||0};}
+function wrSourceSplit(){var w=wrState();return {steps:wrSum(w.s),quests:wrSum(w.q)+wrMonthXp(w),badges:achState.xp||0,house:wrSum(w.h||{})};}
 function renderAchievements(){
   if(!renderAchievements._busy){renderAchievements._busy=1;try{checkAchievements();}catch(e){}renderAchievements._busy=0;}   // badges already met unlock before the tab draws
   var S=null;try{S=renderFIREroadmap._stages||fireBuildStages();}catch(e){}
@@ -24055,7 +24529,7 @@ function renderAchievements(){
     +'<div class="wr-xpbar" role="progressbar" aria-label="XP to the next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pc*100)+'"><i style="width:'+(pc*100).toFixed(1)+'%"></i>'+[1,2,3,4,5,6,7].map(function(k){return '<b style="left:'+(k*12.5)+'%"></b>';}).join('')+'</div>'
     +'<div class="wr-xp" id="wr-xp-label">'+fmt(xp)+' XP'+(nx?' · '+fmt(nx.xp-xp)+' XP to '+nx.name:' · top level')+'</div>'
     +(wrState().recalc?'<p class="wr-recalc">Your level now counts roadmap steps and saving habits as well as badges.</p>':'')
-    +'<div class="wr-split"><span>Roadmap steps <b>'+fmt(src.steps)+'</b></span><span>Side quests <b>'+fmt(src.quests)+'</b></span><span>Badges <b>'+fmt(src.badges)+'</b></span></div></div></div>'+wrRewardHtml();
+    +'<div class="wr-split"><span>Roadmap steps <b>'+fmt(src.steps)+'</b></span><span>Side quests <b>'+fmt(src.quests)+'</b></span><span>Badges <b>'+fmt(src.badges)+'</b></span><span>House milestones <b>'+fmt(src.house)+'</b></span></div></div></div>'+wrRewardHtml();
   if(wrState().recalc&&document.getElementById('tab-achievements').classList.contains('active')){delete wrState().recalc;saveAch();}   // shown once
   var nEl=document.getElementById('wr-next');
   if(nEl)nEl.innerHTML=wrNextGoals(S).map(function(g){return '<div class="wr-goal"'+(g.go?' role="button" tabindex="0" onclick="'+g.go+'"':'')+'>'+wrTokSvg(g.tok,52)+'<div class="wr-g-body"><span class="wr-g-h">'+g.h+'</span><span class="wr-g-l">'+g.l+'</span>'+wrBar(g.f,g.h)+'</div><span class="wr-xpchip">+'+g.xp+' XP</span></div>';}).join('')||'<p class="wr-none">Every stage and quest is done. Nothing left but to enjoy it.</p>';
@@ -24701,13 +25175,40 @@ document.addEventListener('keydown',function(e){
 });
 // ── swipe hints: a soft arrow on the edge of any row/diagram that continues off-screen ──
 
+// E1 (v0.9.1): the header mark is the brand book's dial icon (the V and gold brick still, a ring of ticks that turns 60 degrees on load and on each click).
+// 44 px is small for 60 ticks (about 2 px apart), so the header draws the 12 major ticks, as the owner allowed; reduced motion: no turn.
+function viMarkSVG(lt) {
+  var T = lt ? '#006B67' : '#44C0B9', V = lt ? '#FFFFFF' : '#080808', H = lt ? '#CDE7E4' : '#0C2A30', BZ = lt ? '#EAF3F2' : '#04141A', T2 = lt ? '#00504D' : '#34A9A2', HL = lt ? '#4FB3AD' : '#9BEAE3', GD = lt ? '#C79A1C' : '#E8C56A';
+  var o = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" aria-hidden="true"><circle cx="120" cy="120" r="112" fill="' + V + '" stroke="' + T + '" stroke-width="7"/><circle cx="120" cy="120" r="100" fill="' + BZ + '"/>';
+  o += '<g class="ticks" style="transform-origin:120px 120px;transform-box:view-box;transition:transform 900ms cubic-bezier(.2,.8,.2,1)">';
+  for (var i = 0; i < 12; i++) { var a = i * 30 * Math.PI / 180, sn = Math.sin(a), cs = Math.cos(a);
+    o += '<line x1="' + (120 + 82 * sn).toFixed(2) + '" y1="' + (120 - 82 * cs).toFixed(2) + '" x2="' + (120 + 95 * sn).toFixed(2) + '" y2="' + (120 - 95 * cs).toFixed(2) + '" stroke="' + T + '" stroke-width="' + (i % 3 === 0 ? 9 : 6) + '" stroke-linecap="round"' + (i % 3 === 0 ? '' : ' opacity=".7"') + '/>'; }
+  o += '</g>';
+  [0, 90, 180, 270].forEach(function (d) { o += '<g transform="rotate(' + d + ' 120 120)"><rect x="105" y="2" width="30" height="16" rx="5" fill="' + V + '" stroke="' + T + '" stroke-width="4"/></g>'; });
+  o += '<polygon points="68,80 86,80 120,133.6 154,80 172,80 120,162" fill="' + H + '" stroke="' + H + '" stroke-width="10" stroke-linejoin="miter" stroke-miterlimit="10"/>';
+  o += '<polygon points="68,80 86,80 120,133.6 120,162" fill="' + T + '"/><polygon points="172,80 154,80 120,133.6 120,162" fill="' + T2 + '"/>';
+  o += '<path d="M68 80L120 162L172 80" fill="none" stroke="' + HL + '" stroke-width="1.2" stroke-linejoin="miter" opacity=".75"/><rect x="114" y="108" width="12" height="8" rx="2.5" fill="' + GD + '"/></svg>';
+  return o;
+}
+window.viMarkDial = 0;
+function viMarkTurn() {
+  try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
+  window.viMarkDial += 60;
+  [].forEach.call(document.querySelectorAll('.vi-mark .ticks'), function (g) { g.style.transform = 'rotate(' + window.viMarkDial + 'deg)'; });
+}
+(function () {
+  var go = function () {
+    var n = document.querySelector('.vi-mark-night'), d = document.querySelector('.vi-mark-day'); if (!n || !d) return;
+    n.innerHTML = viMarkSVG(false); d.innerHTML = viMarkSVG(true);
+    setTimeout(viMarkTurn, 450);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+
 // desktop menu bar: choose the largest text size at which every item still fits on one line
 function viFitNav(){
   var n=document.getElementById('topnav');if(!n)return;
-  if(window.innerWidth<1100){n.style.zoom='';return;}
-  var sc=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vi-scale'))||1,z=1.5/sc;
-  n.style.zoom=z;
-  for(var i=0;i<40&&n.scrollWidth>n.clientWidth+1;i++){z*=0.97;n.style.zoom=z;}
+  n.style.zoom='';   // v0.9.1 (E2): the menu bar has set sizes (icons 22 / 24 px, labels 11.5 / 12.5 px, rows 64 / 72 px; see #vi-v091-chrome) instead of a zoom that shrank until it fitted
 }
 viOnWidthResize(viFitNav,120);
 window.addEventListener('load',function(){setTimeout(viFitNav,300);setTimeout(viFitNav,1500);});
@@ -27843,13 +28344,13 @@ var VAULT_NFT_CONTRACT = localStorage.getItem('vi_nft_contract') || '';
 // ── CAMPAIGN CONFIG ────────────────────────────────────────
 // Update these numbers manually after each Stripe dashboard check.
 var VI_CAMPAIGN = {
-  backers:      0,       // total paying backers so far
+  backers:      null,    // paying backers: filled from the server's campaign_counts() (migration 014); null (shown as a dash) until the server answers
   goal:         200,     // founding member target
   raisedGBP:    0,       // total £ raised
   goalGBP:      9980,    // funding target (200 × £49.90 avg)
   founderSlots: 100,     // max founding member places (enforced by the Stripe link's payment limit)
   founderTaken: 0,       // founding member spots taken
-  deadline:     '2026-08-31'
+  deadline:     ''       // an end date (YYYY-MM-DD) when the owner sets one; until then the modal says Open
 };
 
 
@@ -28165,8 +28666,8 @@ function showPrivacy() {
       + '<li><strong>Resend</strong>: delivers your sign-in emails (your email address and the code) and the beta-list emails. If it is unavailable, Supabase’s own mailer is used for sign-in emails instead.</li>'
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
-    '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank and provider logos; it is told the website of each bank, card or investment provider you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
-    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Poly Pizza</strong> supplies free 3D models of everyday items if you pick one from its library for a wealth or liability item: your browser downloads the file straight from Poly Pizza, which sees your IP address and which model you chose, and nothing else. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
+    '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank, provider, company and ticker logos; it is told the website of each bank, card, investment provider or company you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
+    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). <strong>Poly Pizza</strong> supplies free 3D models of everyday items if you pick one from its library for a wealth or liability item: your browser downloads the file straight from Poly Pizza, which sees your IP address and which model you chose, and nothing else. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
     '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or third-party analytics. During the beta the app records how it is used (screens opened, features used, errors and how long a visit lasts, never your figures or what you type) in our own database, to improve it; you can switch this off in Settings (Share usage). Feedback you send from the app is stored by us with the screen you were on, your last few taps and, unless you untick it, a picture of that screen with every figure hidden. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected, and what that does not mean'),
     '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
@@ -28965,36 +29466,43 @@ function viApplyFounderBadge() {
 }
 
 // ── CAMPAIGN MODAL ─────────────────────────────────────────
+function viCampaignPaint() {
+  var c = VI_CAMPAIGN;
+  var known = typeof c.backers === 'number';   // a missing count is a dash, never a zero: 0 only when the server says 0
+  var pct = known && c.goal > 0 ? Math.min(Math.round((c.backers / c.goal) * 100), 100) : 0;
+  var daysLeft = null;
+  if (c.deadline) { var dl = new Date(c.deadline); if (!isNaN(dl)) daysLeft = Math.max(0, Math.ceil((dl - new Date()) / 86400000)); }
+  var set = function (id, t) { var e = document.getElementById(id); if (e) e.textContent = t; };
+  set('camp-backers', known ? c.backers.toLocaleString() : '–');
+  set('camp-pct', known ? pct + '%' : '–');
+  set('camp-days', daysLeft === null ? 'Open' : String(daysLeft));
+  var bar = document.getElementById('camp-bar-fill'); if (bar) setTimeout(function () { bar.style.width = pct + '%'; }, 100);
+  set('camp-bar-lbl', known ? c.backers + ' of ' + c.goal + ' backers' : '');
+  set('camp-founder-slots', Math.max(0, c.founderSlots - c.founderTaken) + ' places');
+}
+// the Vaulter card: both prices come from VI_PLANS, so a price change there is the only edit
+function viCampaignPrices() {
+  var P = VI_PLANS.monthly, pr = document.getElementById('camp-price-vaulter'), nt = document.getElementById('camp-note-vaulter');
+  if (pr) pr.innerHTML = '£' + P.price.toFixed(2) + '<span>' + P.per + '</span>';
+  if (nt) nt.textContent = 'after the 30-day free trial; £' + P.tester.toFixed(2) + ' for testers and early adopters';
+}
+// real counts only: the server's campaign_counts() gives backers per plan and nothing personal; until it is live (or offline) the counts stay 0
+function viCampaignLoad() {
+  try {
+    fetch(_SUPA_URL + '/rest/v1/rpc/campaign_counts', { method: 'POST', headers: { 'content-type': 'application/json', apikey: _SUPA_KEY, authorization: 'Bearer ' + _SUPA_KEY }, body: '{}' })
+      .then(function (r) { if (!r.ok) throw new Error('campaign_counts ' + r.status); return r.json(); })
+      .then(function (rows) {
+        if (!Array.isArray(rows)) return;
+        var total = 0, founders = 0;
+        rows.forEach(function (x) { var n = Math.max(0, parseInt(x && x.backers, 10) || 0); total += n; if (x && x.plan === 'founder') founders += n; });
+        VI_CAMPAIGN.backers = total; VI_CAMPAIGN.founderTaken = founders; viCampaignPaint();
+      }).catch(function () {});
+  } catch (e) {}
+}
 function viShowCampaign() {
   var modal = document.getElementById('vi-campaign-modal');
   if (!modal) return;
-  // Populate live stats from VI_CAMPAIGN config
-  var c = VI_CAMPAIGN;
-  var pct = c.goal > 0 ? Math.min(Math.round((c.backers / c.goal) * 100), 100) : 0;
-  var daysLeft = 0;
-  try {
-    var dl = new Date(c.deadline);
-    var now = new Date();
-    daysLeft = Math.max(0, Math.ceil((dl - now) / 86400000));
-  } catch(e) {}
-  var slotsLeft = Math.max(0, c.founderSlots - c.founderTaken);
-
-  var elB = document.getElementById('camp-backers');
-  var elP = document.getElementById('camp-pct');
-  var elD = document.getElementById('camp-days');
-  var elBar = document.getElementById('camp-bar-fill');
-  var elLbl = document.getElementById('camp-bar-lbl');
-  var elFS = document.getElementById('camp-founder-slots');
-
-  if (elB) elB.textContent = c.backers > 0 ? c.backers.toLocaleString() : '–';
-  if (elP) elP.textContent = c.backers > 0 ? pct + '%' : '–';
-  if (elD) elD.textContent = '–';   // no countdown: there is no real deadline
-  if (elBar) setTimeout(function() { elBar.style.width = (c.backers > 0 ? pct : 0) + '%'; }, 100);
-  if (elLbl) elLbl.textContent = c.backers > 0
-    ? c.backers + ' of ' + c.goal + ' founding backers'
-    : 'Be among the first. Campaign launching soon';
-  if (elFS) elFS.textContent = c.founderSlots + ' places';
-
+  viCampaignPrices(); viCampaignPaint(); viCampaignLoad();
   modal.classList.remove('hidden');
 }
 
@@ -29045,7 +29553,13 @@ function loadDensity() {   // owner, 31 Oct: no Compact / Default / Wide choice;
 }
 // one-row desktop header when everything fits: try one row, then one row without the "NET WORTH" word and the Daylight label,
 // else keep the two rows (labels are never cut off)
-function viNavFit() {
+function viHdrH() {   // one variable for the header's real height: the left sidebar and the pinned Assets sub-menu sit under it (E2, E24)
+  var n = document.getElementById('topnav'); if (!n) return;
+  var h = Math.round(n.getBoundingClientRect().height);
+  if (h > 0 && document.documentElement.style.getPropertyValue('--vi-hdr-h') !== h + 'px') document.documentElement.style.setProperty('--vi-hdr-h', h + 'px');
+}
+function viNavFit() { try { viNavFit0(); } finally { viHdrH(); } }
+function viNavFit0() {
   var b = document.body, t = document.getElementById('vi-tabs'); if (!b || !t) return;
   b.classList.remove('vi-nav1', 'vi-nav1t');
   if ((window.innerWidth || 0) < 1024) return;
@@ -29062,6 +29576,7 @@ function viNavFit() {
   // changes size (each fit starts from the same state and lands on the same answer, so the watcher settles after one extra check)
   var fitT = 0, refit = function () { clearTimeout(fitT); fitT = setTimeout(function () { try { viNavFit(); } catch (e) {} }, 80); };
   var watch = function () { var t = document.getElementById('vi-tabs'); if (!t || typeof ResizeObserver === 'undefined') return;
+    try { new ResizeObserver(viHdrH).observe(document.getElementById('topnav')); } catch (e) {}
     var ro = new ResizeObserver(refit); [].forEach.call(t.querySelectorAll('.tab-btn'), function (x) { ro.observe(x); }); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
 })();
@@ -29372,10 +29887,16 @@ function orbit(cv,st,hooks){
 function niceUnit(mx,cap){var u=1000,s=[1,2,5],k=0;cap=cap||14;while(Math.floor(mx/u+1e-9)>cap&&u<1e12){k++;u=s[k%3]*1000*Math.pow(10,Math.floor(k/3))}return u}
 function split(v,U){var b=Math.floor(v/U+1e-9),r=(v-b*U)/(U/10),s=Math.floor(r+1e-9);if(s>9)s=9;return {b:b,s:s,f:clamp(r-s,0,1)}}
 /* camera distance that fits a set of boxes [x0,x1,y0,y1,z0,z1] on the canvas: project them once at a trial distance and scale (projection goes as 1/distance) */
-function fitDist(st,cw,ch,boxes,yaw,ty,mx,my){
-  var t={yaw:yaw,pitch:st.pitch,dist:400,zoom:1,ty:ty,fit:st.fit},P=new Proj(t,{x:0,y:0,w:cw,h:ch}),ex=1,ey=1;
-  boxes.forEach(function(b){[b[0],b[1]].forEach(function(x){[b[2],b[3]].forEach(function(y){[b[4],b[5]].forEach(function(z){var q=P.pt(x,y,z);ex=Math.max(ex,Math.abs(q[0]-cw/2));ey=Math.max(ey,Math.abs(q[1]-ch/2))})})})});
-  return Math.max(50,400*Math.max(ex/(cw/2*mx),ey/(ch/2*my)));
+function fitDist(st,cw,ch,boxes,yaw,ty,mx,my,z){
+  /* v0.9.1 (Chief of Staff, 3 Nov: the plate was cropped at the bottom at 1440): perspective is not linear in distance, so one measurement at 400 left the
+     near corners outside the stage. Measure, move the camera, and measure again until the whole box sits inside the margins. */
+  var t={yaw:yaw,pitch:st.pitch,dist:400,zoom:z||st.z0||1,ty:ty,fit:st.fit},d=400;   /* the scene's starting zoom (z0: 1.15 to 1.2), which the old fit left out, so they were drawn that much too big; the user's own zoom stays on top of it */
+  for(var it=0;it<6;it++){
+    t.dist=d;var P=new Proj(t,{x:0,y:0,w:cw,h:ch}),ex=1,ey=1;
+    boxes.forEach(function(b){[b[0],b[1]].forEach(function(x){[b[2],b[3]].forEach(function(y){[b[4],b[5]].forEach(function(z){var q=P.pt(x,y,z);ex=Math.max(ex,Math.abs(q[0]-cw/2));ey=Math.max(ey,Math.abs(q[1]-ch/2))})})})});
+    var r=Math.max(ex/(cw/2*mx),ey/(ch/2*my));d=Math.max(50,d*r);if(Math.abs(r-1)<.01)break;
+  }
+  return d;
 }
 function faces(x0,x1,y0,y1,z0,z1){return [[[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1],[0,1,0]],[[x0,y0,z0],[x1,y0,z0],[x1,y0,z1],[x0,y0,z1],[0,-1,0]],[[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1],[0,0,1]],[[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[0,0,-1]],[[x1,y0,z0],[x1,y0,z1],[x1,y1,z1],[x1,y1,z0],[1,0,0]],[[x0,y0,z0],[x0,y0,z1],[x0,y1,z1],[x0,y1,z0],[-1,0,0]]]}
 /* one box, back faces culled, lit from the brand light, fill and edge on the pulse */
@@ -29440,7 +29961,7 @@ function tag(c,cw,l1,l2,red,anchor){
  * New blocks drop 18 units over 700 ms with a 1000 ms gold flash; removed ones rise 16 units over 900 ms, turn gold and fade. */
 function makeNW(cv,o){
   o=o||{};
-  var st={yaw:-.55,pitch:.46,dist:125,zoom:1.2,ty:2,fit:.9},self={st:st},idle=-9999,boxes=[],uid=0,cols=[],byKey={},X={},Z={},LZ={},U=1000,first=true,pendingOpen=false,narrow=null;
+  var st={yaw:-.55,pitch:.46,dist:125,zoom:1.2,z0:1.2,ty:2,fit:.9},self={st:st},idle=-9999,boxes=[],uid=0,cols=[],byKey={},X={},Z={},LZ={},U=1000,first=true,pendingOpen=false,narrow=null;
   var net=0,debt=0,hover=null,tD=125,tTy=2,SP=15,BH=3.2,SM=3.1,fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},PL=.5,box={x:40,z0:-17,z1:17};
   function spawn(k,s,i,born,off){boxes.push({id:uid++,k:k,s:s,i:i,born:born,off:off||0,leave:0,merge:false})}
   /* colour of the piece whose value runs from v0 for len: the segment holding its middle */
@@ -29508,7 +30029,7 @@ function makeNW(cv,o){
     if(!rm&&!ob.isDrag()&&ts-idle>2500)st.yaw=-.55+Math.sin(ts/4200)*.35;
     st.fit=cw<520?1.1:.9;var hx=box.x+2,fb=[[-hx,hx,0,0,box.z0,box.z1]];
     cols.forEach(function(cc){var q=byKey[cc.key],h=q.b*BH+SM,x=X[cc.key],z=Z[cc.key];fb.push(cc.dir>0?[x-5,x+5,0,h,z-5,z+5]:[x-5,x+5,-h,0,z-5,z+5],[x-4,x+4,0,0,LZ[cc.key]-2,LZ[cc.key]+6])});
-    tD=fitDist(st,cw,ch,fb,-.55,tTy,.92,.8);
+    tD=narrow?fitDist(st,cw,ch,fb,-.55,tTy,.92,.8,1):Math.max(fitDist(st,cw,ch,fb,-.9,tTy,.92,.92),fitDist(st,cw,ch,fb,-.55,tTy,.92,.92),fitDist(st,cw,ch,fb,-.2,tTy,.92,.92));   /* the idle camera swings -.55 +/- .35: the plate must stay inside at both ends */
     var k=rm||self._snap?1:Math.min(1,dt*3);self._snap=false;st.dist+=(tD-st.dist)*k;st.ty+=(tTy-st.ty)*k;
     PL=rm?.5:.5+.5*Math.sin(ts*0.002244);
     var P=new Proj(st,{x:0,y:0,w:cw,h:ch});self._P=P;
@@ -29645,7 +30166,7 @@ function makeTracker(cv,o){
  * taking their group's colour as they land. Reduced motion shows the finished map. */
 function makeTreeMap(cv,o){
   o=o||{};
-  var st={yaw:-.5,pitch:.98,dist:125,zoom:1.15,ty:1,fit:.9},self={st:st},idle=-9999,cells=[],groups=[],rects=[],raw=[],total=0,hover=null,first=true,pending=false,PL=.5,
+  var st={yaw:-.5,pitch:.98,dist:125,zoom:1.15,z0:1.15,ty:1,fit:.9},self={st:st},idle=-9999,cells=[],groups=[],rects=[],raw=[],total=0,hover=null,first=true,pending=false,PL=.5,
     fmt=o.fmt||function(v){return "£"+Math.round(v).toLocaleString("en-GB")},U=100,BS=3.3,GG=.035,LG=.02,CH=.85,ext={x:10,z:10},plate={W:20,D:20},pile={x0:0,x1:0},
     T_IN=NW_D.pileMs,T_GO=NW_D.goMs,SPREAD=NW_D.spread,t0=0,sx=0;
   function unitFor(t){var u=100,steps=[100,200,500,1000,2000,5000,10000],k=0;while(t/u>360&&k<steps.length-1){k++;u=steps[k]}return u}
@@ -29717,7 +30238,7 @@ function makeTreeMap(cv,o){
     st.fit=narrow?1.05:.92;if(narrow&&!self._pitchSet&&!ob.engaged()){st.pitch=1.12;self._pitchSet=true}
     /* while the income arrives the camera frames the pile and the map together, then settles on the map */
     var intro=t0>=0&&ts-t0<lastEnd()+600,x0=intro?pile.x0-1:-ext.x-2,cxm=(x0+ext.x+2)/2;
-    var SC=2.4,fb=[[(x0-cxm)*SC,(ext.x+1-cxm)*SC,0,(CH+1)*SC,(-ext.z-1)*SC,(ext.z+1)*SC]],tD=fitDist(st,cw,ch,fb,Y0,1,narrow?.92:.95,narrow?.8:.8);   /* SC: the map is drawn 2.4x larger, so the camera can come close enough */
+    var SC=2.4,fb=[[(x0-cxm)*SC,(ext.x+1-cxm)*SC,0,(CH+1)*SC,(-ext.z-1)*SC,(ext.z+1)*SC]],tD=Math.max.apply(null,[-1,0,1].map(function(m){return fitDist(st,cw,ch,fb,Y0+m*(narrow?.1:.22),1,narrow?.92:.95,narrow?.8:.8)}));   /* the idle camera swings Y0 +/- .22 (.1 narrow): the map stays inside at both ends */   /* SC: the map is drawn 2.4x larger, so the camera can come close enough */
     var k=rm||self._snapD?1:Math.min(1,dt*2.2);if(!self._d0){st.dist=tD;self._d0=true}self._snapD=false;st.dist+=(tD-st.dist)*k;
     sx+=(cxm-sx)*k;
     PL=rm?.5:.5+.5*Math.sin(ts*0.002244);
