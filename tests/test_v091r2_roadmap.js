@@ -164,7 +164,7 @@ const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
       const SC = document.getElementById('fire-timeline-scroll'), S = renderFIREroadmap._stages, gTop = document.getElementById('fire-ground').getBoundingClientRect().top;
       const read = () => { const mid = SC.scrollLeft + SC.clientWidth / 2;
         return [...document.querySelectorAll('#fire-roadmap-svg text.fire-sec')].map(t => { const m = t.transform.baseVal.consolidate(), mx = m && m.matrix, r = t.getBoundingClientRect(), cs = getComputedStyle(t);
-          return { txt: t.textContent, a: mx ? mx.a : 1, c: mx ? mx.c : 0, d: mx ? mx.d : 1, x: +t.getAttribute('data-x'), mid, top: r.top - gTop, w: r.width, h: r.height, font: cs.fontFamily, wt: +cs.fontWeight }; }); };
+          return { txt: t.textContent, a: mx ? mx.a : 1, c: mx ? mx.c : 0, d: mx ? mx.d : 1, x: +t.getAttribute('data-x'), mid, top: r.top - gTop, w: r.width, h: r.height, font: cs.fontFamily, wt: +cs.fontWeight, op: +cs.opacity, l: r.left, r: r.right, cx: (r.left + r.right) / 2, vl: SC.getBoundingClientRect().left, vr: SC.getBoundingClientRect().right }; }); };
       SC.scrollLeft = Math.max(0, S.findIndex(s => s.phase === 1) * FIRE_NODE); SC.dispatchEvent(new Event('scroll')); await new Promise(f => setTimeout(f, 500));
       const r1 = read(); SC.scrollLeft += 200; SC.dispatchEvent(new Event('scroll')); await new Promise(f => setTimeout(f, 500));
       const r2 = read(); return { r1, r2 };
@@ -173,6 +173,10 @@ const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
     ok(sec.r1.length > 0 && sec.r1.every(x => /Syne/.test(x.font) && x.wt >= 800 && x.top >= -2), t + 'section names are Syne lettering on the ground (' + sec.r1.map(x => x.txt + '@' + Math.round(x.top)).join(', ') + ')');
     ok(sec.r1.every(x => x.a >= 1.2 && x.d <= 0.7 && x.w > x.h * 6), t + 'they are wide and lie flat: stretched across, squashed in depth (' + sec.r1.map(x => [x.a.toFixed(2), x.d.toFixed(2)].join('/')).join(' ') + ')');
     ok(s1.length > 0 && s1.every(x => Math.abs(x.c) > 0.05 && Math.sign(x.c) === Math.sign(x.x - x.mid)), t + 'they lean away from the middle, with the ground perspective (' + s1.map(x => (x.x - x.mid).toFixed(0) + ':' + x.c.toFixed(2)).join(' ') + ')');
+    // C3 follow-up (owner, on the shots: "Test it too wide needs to be legible within a mobile screen , drop opacity to 70%")
+    const inView = sec.r1.slice().sort((p, q) => Math.abs(p.cx - (p.vl + p.vr) / 2) - Math.abs(q.cx - (q.vl + q.vr) / 2)).slice(0, 1);   // the name of the section under the middle of the view
+    ok(inView.length > 0 && inView.every(x => x.l >= x.vl - 1 && x.r <= x.vr + 1), t + 'a section name in view fits inside the strip, whole (' + inView.map(x => x.txt + ' ' + Math.round(x.l - x.vl) + '..' + Math.round(x.vr - x.r)).join(', ') + ')');
+    ok(sec.r1.every(x => Math.abs(x.op - 0.7) < 0.01), t + 'section names at 70% opacity (' + sec.r1.map(x => x.op).join(',') + ')');
     const moved = sec.r2.find(x => sec.r1.some(y => y.txt === x.txt && Math.abs(y.c - x.c) > 0.02));
     ok(!!moved, t + 'the lean follows the view as the strip scrolls');
     await p.evaluate(() => { const SC = document.getElementById('fire-timeline-scroll'); SC.scrollLeft = 0; renderFIREroadmap(); });
