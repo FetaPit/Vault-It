@@ -10892,6 +10892,10 @@ button.bd-ic{cursor:pointer}
 .cr-tile .c-pl{grid-area:pl;text-align:right;align-self:end}
 .cr-tile .c-x{grid-area:x;width:100%!important;justify-content:center}
 @media(max-width:600px){.cr-tile .stk-hl{width:84px!important;height:84px!important}}
+/* light eighth-turn on each coin, as the Financial freedom roadmap coins turn (owner, 4 Nov); out of step per tile, still for reduced motion */
+.cr-tile .stk-hl{animation:cr-turn 5s ease-in-out infinite;animation-delay:calc(var(--i,0) * -1.3s)}
+@keyframes cr-turn{0%,100%{transform:perspective(420px) rotateY(0deg)}50%{transform:perspective(420px) rotateY(45deg)}}
+@media(prefers-reduced-motion:reduce){.cr-tile .stk-hl{animation:none}}
 .inv-stage .inv-prev{display:block;max-width:100%;max-height:100%;margin:auto;object-fit:contain;position:absolute;inset:0}
 .inv-stage canvas[hidden]{display:none}
 .wi-img-overlay{pointer-events:none}
@@ -22875,7 +22879,7 @@ function crRender(){
         return '<div class="stk-grp'+(open?' open':'')+'"><button type="button" class="stk-gh" aria-expanded="'+open+'" data-w="'+stkEsc(g.p.id)+'" data-n="'+gs.length+'" onclick="crToggleGrp(this.dataset.w,+this.dataset.n)"><svg class="vi-ic stk-chev" aria-hidden="true"><use href="#vi-chevron"/></svg><span class="stk-gn">'+stkEsc(g.p.name)+'</span><span class="stk-gc">'+g.hs.length+' coin'+(g.hs.length===1?'':'s')+'</span><span class="stk-gv">'+cfMoney(g.v)+(total>0?' <small>'+(g.v/total*100).toFixed(1)+'%</small>':'')+'</span></button>'
           +'<div class="stk-gb"'+(open?'':' hidden')+'><div class="cr-grid">'+g.hs.map(function(h){var c=h._c,i=hs.indexOf(h),col=CR_COLORS[gi%CR_COLORS.length];
             var v=stkValue(h),sus=stkSuspect(h),b=stkBasis(h),pl=(!sus&&b>0)?(stkPrice(h)-b)/b*100:null,cid=c.id,ch=+c.change24h||0;
-            return '<div class="cr-row cr-tile">'
+            return '<div class="cr-row cr-tile" style="--i:'+i+'">'
               +'<div class="c-tk">'+crCoinBadge(h,96,col)+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+CR_COLORS[i%CR_COLORS.length]+'"></i>'+stkEsc(h.sym)+'</div><div class="stk-nm cr-held">'+crQty(h.units)+' '+stkEsc(h.sym)+' held</div></div></div>'
               +'<div class="c-pr"><span class="stk-lb">Price £</span>'+(c.priceSrc==='live'?'<div class="stk-px">£'+(+c.price).toLocaleString('en-GB',{maximumFractionDigits:c.price<1?6:2})+'</div>':'<input class="stk-inp" type="number" min="0" step="any" value="'+(+c.price>0?c.price:'')+'" onchange="updateCryptoPrice('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' price in pounds" title="Your price in £. A live price replaces it when CoinGecko has one">')+'<div class="stk-src cr-src cr-src-'+(c.priceSrc==='live'?'live':c.priceSrc==='stale'?'stale':'own')+'">'+crPriceLine(c)+(ch&&c.priceSrc==='live'?' · <span style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
               +'<div class="cr-ins">'

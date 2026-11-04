@@ -55,7 +55,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
           sym = bb(t.querySelector('.stk-tk')), val = bb(t.querySelector('.c-va')), rm = bb(t.querySelector('.data-item-del'));
         let small = 0; t.querySelectorAll('*').forEach(x => { if ([...x.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) && parseFloat(getComputedStyle(x).fontSize) < 10.5) small++; });
         const inside = [logo, am, co, px, sym, val, rm].every(q => q && q.left >= tb.left - .5 && q.right <= tb.right + .5);
-        return { sym: (t.querySelector('.stk-tk') || {}).textContent, tw: Math.round(tb.width), top: Math.round(tb.top), logoW: logo && Math.round(logo.width),
+        return { sym: (t.querySelector('.stk-tk') || {}).textContent, tw: Math.round(tb.width), top: Math.round(tb.top), logoW: Math.round(t.querySelector('.stk-hl').offsetWidth),
           logoFirst: logo && [am, co, px, sym, val, rm].every(q => q && logo.top <= q.top + .5), logoTop: logo && Math.round(logo.top - tb.top),
           apart: am && co && (am.right <= co.left + .5 || co.right <= am.left + .5 || am.bottom <= co.top + .5 || co.bottom <= am.top + .5), amW: am && Math.round(am.width), coW: co && Math.round(co.width), priceAbove: px && am && px.bottom <= am.top + 1, priceBeside: px && am && px.top < am.bottom - 2 && px.left < am.right && px.right > am.left || (px && am && px.top < am.bottom - 2 && px.bottom > am.top + 2),
           symH: sym && Math.round(sym.height), small, inside, held: (t.querySelector('.cr-held') || {}).textContent, src: !!t.querySelector('.cr-src'), imgOk: !t.querySelector('.stk-hl img') || t.querySelector('.stk-hl img').naturalWidth > 0 };
@@ -73,6 +73,21 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     ok(r.tiles.every(x => x.src && /held/.test(x.held || '') && x.imgOk), t + 'each tile shows tokens held, where the price comes from, and its own logo');
     ok(!r.sideways, t + 'the page does not scroll sideways');
     if (w >= 900) ok(r.across >= 2, t + 'tiles sit side by side on a wide screen (' + r.across + ' across)');
+    // R20b (owner, 4 Nov, "light 1/8 turn animations to the crypto coins like we have on the Financial freedom roadmap"): each coin turns an eighth (45 degrees) and back, slowly, out of step with its neighbours
+    const an = async () => page.evaluate(async () => {
+      const els = [...document.querySelectorAll('#crypto-table .cr-tile .stk-hl')]; const name = els.map(e => getComputedStyle(e).animationName);
+      const tf = () => els.map(e => getComputedStyle(e).transform);
+      const a = tf(); await new Promise(r => setTimeout(r, 1200)); const b = tf();
+      let kf = ''; for (const sh of document.styleSheets) { try { for (const r of sh.cssRules) if (r.name === 'cr-turn') kf = r.cssText; } catch (e) {} }
+      const delays = els.map(e => getComputedStyle(e).animationDelay);
+      return { name, moved: a.some((x, i) => x !== b[i]), kf, staggered: new Set(delays).size > 1, n: els.length };
+    });
+    let am = await an();
+    ok(am.n === 4 && am.name.every(x => x === 'cr-turn'), t + 'every coin carries the cr-turn animation (' + am.name.join(',') + ')');
+    ok(/rotateY\(45deg\)/.test(am.kf), t + 'the turn is an eighth of a turn, 45 degrees (' + am.kf.replace(/\s+/g, ' ').slice(0, 120) + ')');
+    ok(am.moved && am.staggered, t + 'the coins are actually turning, each out of step with the next');
+    await page.emulateMedia({ reducedMotion: 'reduce' }); await page.waitForTimeout(200); am = await an();
+    ok(am.name.every(x => x === 'none') && !am.moved, t + 'with reduced motion the coins stay still');
     ok(!errs.length, t + 'no page errors ' + errs.slice(0, 2).join('|'));
     await ctx.close();
   }
