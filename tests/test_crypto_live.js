@@ -24,13 +24,13 @@ const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const se
     await p.evaluate(() => { showTab('assets'); const b = [...document.querySelectorAll('#assets-page .subtab-btn')].find(x => /crypto/i.test(x.textContent)); showSubtab('assets', 'crypto', b); });
     await p.waitForTimeout(1500);
     let r = await p.evaluate(() => ({ c: alState.crypto.map(c => ({ s: c.sym, p: c.price, src: c.priceSrc })), total: alTotalCrypto(),
-      tiles: [...document.querySelectorAll('#crypto-table .cr-row')].map(t => ({ held: (t.querySelector('.cr-held') || {}).textContent, src: (t.querySelector('.cr-src') || {}).textContent, logo: Math.max(...[...t.querySelectorAll('.stk-hl')].map(e => e.getBoundingClientRect().width), 0), priceIn: !!t.querySelector('[onchange^="updateCryptoPrice"]') })) }));
+      tiles: [...document.querySelectorAll('#crypto-table .cr-row')].map(t => ({ held: (t.querySelector('.cr-held') || {}).textContent, src: (t.querySelector('.cr-src') || {}).textContent, logo: Math.max(...[...t.querySelectorAll('.stk-hl')].map(e => e.offsetWidth), 0), priceIn: !!t.querySelector('[onchange^="updateCryptoPrice"]') })) }));
     ok(calls.length >= 1 && /ids=bitcoin%2Cethereum%2Czzzq&vs_currencies=gbp/.test(calls[0]) && !/0\.25|amount/.test(calls[0]), T + 'opening Crypto fetches the prices by itself, sending only coin names (' + (calls[0] || 'no call').replace(/^.*\?/, '?') + ')');
     ok(r.c[0].p === 52000.5 && r.c[0].src === 'live' && r.c[1].p === 2600 && Math.abs(r.total - (0.25 * 52000.5 + 1.5 * 2600 + 100 * 0.5)) < 0.01, T + 'the live prices are linked to the holdings: total ' + r.total);
     ok(r.c[2].p === 0.5 && r.c[2].src === 'manual' && /Your price · no live price found for ZZZQ/.test(r.tiles[2].src) && r.tiles[2].priceIn && !r.tiles[0].priceIn, T + 'a coin CoinGecko does not list keeps the typed price and says so; live coins have no price box');
     ok(/^0\.25 BTC held$/.test(r.tiles[0].held) && /^1\.5 ETH held$/.test(r.tiles[1].held), T + 'each tile shows the tokens held (' + r.tiles[0].held + ', ' + r.tiles[1].held + ')');
     ok(/Live price · CoinGecko · just now · indicative/.test(r.tiles[0].src), T + 'and where the price comes from (' + r.tiles[0].src + ')');
-    ok(r.tiles[0].logo === 24, T + 'coin badge is 24 px, as in Stocks (' + r.tiles[0].logo + ' px)');
+    ok(r.tiles[0].logo >= (w < 700 ? 72 : 84), T + 'coin badge is large and leads the tile, not the 24 px Stocks size (v0.9.1 R2 R20) (' + r.tiles[0].logo + ' px)');
     // a check that finds the same prices does not save (so it does not upload the account copy every 15 minutes)
     const saves = await p.evaluate(async () => { let n = 0; const o = window.saveAL; window.saveAL = saveAL = function () { n++; return o.apply(this, arguments); }; await fetchCryptoPrices(true); window.saveAL = saveAL = o; return n; });
     ok(saves === 0, T + 'a price check with no change saves nothing (' + saves + ' saves)');
