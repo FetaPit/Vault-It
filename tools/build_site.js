@@ -10,7 +10,12 @@ const SITE = {
   landing: [['landing.html', 'index.html'], ['landing.html', 'sign-up.html'], ['og-image.png', 'og-image.png'],
             ['site/brand-hero.js', 'brand-hero.js'], ['site/email/lockup.gif', 'email/lockup.gif'], ['site/step-1-numbers.jpg', 'img/step-1-numbers.jpg'], ['site/step-2-picture.jpg', 'img/step-2-picture.jpg'], ['site/step-3-house.jpg', 'img/step-3-house.jpg'], ['site/founder.jpg', 'img/founder.jpg'],
             ['site/sign-up/thanks.html', 'sign-up/thanks.html'], ['site/sign-up/confirm.html', 'sign-up/confirm.html'],
-            ['site/sign-up/unsubscribe.html', 'sign-up/unsubscribe.html'], ['site/sign-up/style.css', 'sign-up/style.css']],
+            ['site/sign-up/unsubscribe.html', 'sign-up/unsubscribe.html'], ['site/sign-up/style.css', 'sign-up/style.css'],
+            // investor pitch for the Eligent Club event: vault-it.co/pitch-Eligent (and a lower-case alias)
+            ['site/pitch-eligent/index.html', 'pitch-Eligent.html'], ['site/pitch-eligent/index.html', 'pitch-eligent.html'], ['site/pitch-eligent/presenter.html', 'pitch-Eligent-presenter.html'], ['site/pitch-eligent/presenter.html', 'pitch-eligent-presenter.html'],
+            ['site/pitch-eligent/pitch/house-build.mp4', 'pitch/house-build.mp4'], ['site/pitch-eligent/pitch/house-still.jpg', 'pitch/house-still.jpg'],
+            ['site/pitch-eligent/pitch/nw3d-live.js', 'pitch/nw3d-live.js'], ['site/pitch-eligent/pitch/live-nw.jpg', 'pitch/live-nw.jpg'], ['site/pitch-eligent/pitch/live-trk.jpg', 'pitch/live-trk.jpg'],
+            ['site/pitch-eligent/pitch/logo-full.png', 'pitch/logo-full.png'], ['site/pitch-eligent/pitch/logo-mid.png', 'pitch/logo-mid.png']],
 };
 // the 3D model library (v0.9.1, E30): only what the app reads, same address as the app, so no outside host
 const MODELS = ['catalog.json', 'CREDITS.md'];

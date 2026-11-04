@@ -13,6 +13,8 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
 // the gates are the fixed numbers that make a stage slow: builds, compiles, shader kinds, draw calls and triangles (CoS, 3 Nov)
 const info = m => console.log('info:', m);
 const CASH_CALLS = 16, CASH_TRIS = 2500, METAL_CALLS = 20, METAL_TRIS = 4000;   // measured 13 / 1,756 and 17 / 2,874 on 40c6018 (the old coin stacks drew 121,464 triangles)
+// v0.9.1 cash 3D look: up to 12 blocks of 1,000 each block is its hundred real stacks in one shape; past that (as here at £25,300)
+// a block is the painted box again, so this budget is unchanged.
 const SEED = (cash, metals) => `(function(){if(localStorage.getItem('pos_al1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true,plan:'annual'}));localStorage.setItem('pos_al1',JSON.stringify({cashAccounts:[{id:5,name:'Savings',type:'Savings',balance:${cash}}],physicalCash:[{id:1,where:'Safe',amount:300,date:'2026-10-01'}],metals:${JSON.stringify(metals)},metalPrices:{gold:2000,silver:25,platinum:900,palladium:1000}}));})()`;
 // timed spans of the viewer's own code, long tasks with their start, and every render call's own main-thread cost
 const HOOK = () => {
@@ -71,7 +73,7 @@ const HOOK = () => {
   ok(o.newPrograms === 0, 'the tap compiles no shader: the warm-up already did (' + o.newPrograms + ' compiled on opening)');
   info('opening: the viewer\'s own code on the phone profile (longest ' + o.longest.toFixed(0) + ' ms of JavaScript; time inside WebGL calls and canvas resizes is the software GPU here and is read on the owner\'s phone with ?perf=1: ' + o.spans + ')');
   info('the first draw\'s own JavaScript (' + (o.firstOwn == null ? '-' : o.firstOwn.toFixed(0)) + ' ms; ' + (o.firstRender == null ? '-' : o.firstRender.toFixed(0)) + ' ms with the software GPU)');
-  ok(o.dpr <= 1.5 + 1e-9, 'pixel ratio capped at 1.5 on a touch screen (' + o.dpr + ')');
+  ok(o.dpr <= 2 + 1e-9, 'pixel ratio within the house builder rule on a touch screen: at most 2 at rest, 1.25 while coins land (R16) (' + o.dpr + ')');
 
   // ── 1b. the coin colours: gold coins lifted into the brand gold, silver coins stay silver (QC, 2 Nov: the euro and rupee coins must not turn gold) ──
   const coins = await p.evaluate(() => Object.keys(V3_COINS).map(c => { const sp = V3_COINS[c], h = v3Lift(sp.outer, V3_LIFT), n = parseInt(h.slice(1), 16), r = n >> 16 & 255, b = n & 255;
