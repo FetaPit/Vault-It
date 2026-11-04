@@ -98,6 +98,8 @@ ${links(p.links)}
 const footer = (who, img) => `<a href="https://vault-it.co" style="text-decoration:none;display:block"><img src="${img(who + '-footer.gif')}" width="${W}" alt="${FOOTERS[who].alt}" style="display:block;border:0;outline:none;width:100%;max-width:${W}px;height:auto;background:#080D14;color:#9AA0A6;font-family:${F_B};font-size:13px"></a>`;
 const legal = `<p style="${SMALL}">Vault-It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5 7EQ.</p>
 <p style="${SMALL}">Not regulated by the FCA. Not financial advice.</p>`;
+// Signatures: one compact strip, no taller than the footer graphic above it (owner, 4 Nov).
+const legalStrip = `<p style="margin:0;font-size:10px;line-height:1.45;color:#9AA0A6">Vault-It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5 7EQ. ${nw('Not regulated by the FCA.')} ${nw('Not financial advice.')}</p>`;
 function email(img) {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>{{Subject line}}</title></head>
 <body style="margin:0;padding:0;background:#080808;color:#E8E8E8;font-family:${F_B}">
@@ -133,7 +135,7 @@ function signatureOnly(who, img) {
 <table id="sig" role="presentation" width="${W}" cellpadding="0" cellspacing="0" style="background:#080D14;border:1px solid #15302F;border-radius:14px;max-width:${W}px;width:100%;overflow:hidden">
 <tr><td style="padding:20px 22px 16px">${signature(who, img)}</td></tr>
 <tr><td style="padding:0">${footer(who, img)}</td></tr>
-<tr><td style="padding:12px 22px 14px;border-top:1px solid #15302F">${legal}</td></tr>
+<tr><td style="padding:8px 22px 9px;border-top:1px solid #15302F">${legalStrip}</td></tr>
 </table></body></html>`;
 }
 
