@@ -32,11 +32,11 @@ const open = async (b, w, h, theme, o = {}) => {
       return { w: Math.round(r.width), ticks: !!tk, ang: window.viMarkDial, hdr: Math.round(document.getElementById('topnav').getBoundingClientRect().height), tr: tk && getComputedStyle(tk).transform }; });
     const want = w >= 1024 ? 44 : w >= 600 ? 36 : 28;
     ok(m.ticks && m.w === want, T + 'header mark is the dial icon at ' + want + ' px (got ' + m.w + ', ticks ' + m.ticks + ')');
-    ok(m.ang >= 60 && m.tr && m.tr !== 'none', T + 'the dial has turned once on load (' + m.ang + ')');
+    ok(m.ang !== 0 && m.tr && m.tr !== 'none', T + 'the dial has turned once on load (' + m.ang + ')');   // R1 round 2: it now swings left and right by varying degrees (see test_v091r2_chrome)
     await p.evaluate(() => showTab('budget')); const a0 = await p.evaluate(() => window.viMarkDial);
     await p.click('#topnav .nav-brand'); await p.waitForTimeout(1000);
     const a1 = await p.evaluate(() => ({ a: window.viMarkDial, ov: document.getElementById('tab-overview').classList.contains('active') }));
-    ok(a1.a === a0 + 60 && a1.ov, T + 'a click turns the dial 60 degrees and still goes to Overview');
+    ok(a1.a !== a0 && Math.abs(a1.a) <= 60 && a1.ov, T + 'a click swings the dial and still goes to Overview (' + a0 + ' to ' + a1.a + ')');
 
     // E2: bigger desktop nav
     const n = await p.evaluate(() => { const ic = document.querySelector('#topnav .tab-btn .vi-ic.ti'), lb = document.querySelector('#topnav .tab-btn .nav-tab-label'), tp = document.getElementById('topnav'), t = document.getElementById('vi-tabs');

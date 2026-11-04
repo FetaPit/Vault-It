@@ -10,13 +10,15 @@
 // Theme: Night is the default; the first visit follows the device, then the choice is remembered (never by time of day)
 (function(){try{var t=localStorage.getItem("vi-theme");
 if(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches)t="light";
-document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-theme","dark")}})();
+document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");
+// Daylight shows the Night header bar (owner, 4 Nov, R26); ?hdr=paper or localStorage vi-hdr=paper keeps the paper one so the two can be compared
+var h=(location.search.match(/[?&]hdr=(\w+)/)||[])[1]||localStorage.getItem("vi-hdr");if(h==="paper")document.documentElement.setAttribute("data-hdr","paper")}catch(e){document.documentElement.setAttribute("data-theme","dark")}})();
 </script>
 <style id="vi-tokens">
 /* Vault-It design tokens. Night is the default, Daylight is the light mode.
  * Switch with data-theme="light" on <html>. Generated from vault-it-brand-book.html */
 html{box-sizing:border-box}
-:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge{   /* 3D viewports stay Night in Daylight too (the model badge sits over the Night picture) */
+:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav{   /* 3D viewports stay Night in Daylight too (the model badge sits over the Night picture) */
   color-scheme:dark;
   --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --slate:#1C2420; --line:#102221; --line2:#15302F;
   --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882; --lock:#8C939B;
@@ -44,7 +46,7 @@ html{box-sizing:border-box}
 /* Daylight: deep teal ink on off-white paper with a faint teal blueprint grid (owner, 30 Oct: was too bright). Same hues, darker values, no bloom, blueprint grid instead of scanlines. */
 [data-theme="light"]{
   color-scheme:light;
-  --bg:#C9C7BE; --panel:#DAD8D0; --panel2:#CDD3CE; --slate:#C6CFCA; --line:#AFC2BE; --line2:#8FAFAB;
+  --bg:#D3CCB4; --panel:#DAD8D0; --panel2:#CDD3CE; --slate:#C6CFCA; --line:#AFC2BE; --line2:#8FAFAB;
   --text:#0B1F22; --muted:#3A5052; --faint:#215451; --lock:#39433F;
   --teal:#185550; --teal-deep:#005652; --gold:#60480B; --brass:#5B4A19;
   --green:#135738; --green2:#1C563E; --red:#951919; --blue:#054E88; --purple:#583F81; --orange:#773C11;
@@ -59,7 +61,7 @@ html{box-sizing:border-box}
   --tglow:none; --dglow:none; --popglow:none;
   --btn1:#006B67; --btn2:#00837E; --bshadow:0 6px 16px -8px rgba(0,90,88,.55);
   --glow:0 10px 28px -16px rgba(0,90,88,.35); --elev:0 1px 0 #fff inset,0 10px 28px -18px rgba(0,90,88,.3);
-  --ink-rgb:11 31 34;--bg-rgb:201 199 190;--panel-rgb:218 216 208;--teal-rgb:24 85 80;--teal-deep-rgb:0 86 82;--gold-rgb:96 72 11;--brass-rgb:91 74 25;--green-rgb:19 87 56;--green2-rgb:28 86 62;--red-rgb:149 25 25;--blue-rgb:5 78 136;--purple-rgb:88 63 129;--orange-rgb:119 60 17;--amber-rgb:107 67 3;
+  --ink-rgb:11 31 34;--bg-rgb:211 204 180;--panel-rgb:218 216 208;--teal-rgb:24 85 80;--teal-deep-rgb:0 86 82;--gold-rgb:96 72 11;--brass-rgb:91 74 25;--green-rgb:19 87 56;--green2-rgb:28 86 62;--red-rgb:149 25 25;--blue-rgb:5 78 136;--purple-rgb:88 63 129;--orange-rgb:119 60 17;--amber-rgb:107 67 3;
 }
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
@@ -161,11 +163,6 @@ function viCleanJSON(str) {   // returns the cleaned JSON text, or the original 
 .reduced-motion *{transition:none!important;animation:none!important}
 
 /* ── Night / Daylight toggle ── */
-#vi-theme-btn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;margin-left:8px;flex-shrink:0;background:transparent;border:1px solid var(--line2);border-radius:999px;color:var(--muted);font-family:var(--font-display);font-size:max(.5rem,var(--vi-fs-2));font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
-#vi-theme-btn:hover{color:var(--text);border-color:var(--teal)}
-#vi-theme-btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
-#vi-theme-btn .vi-th-ico{width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:inset -4px -2px 0 0 var(--panel)}
-[data-theme="light"] #vi-theme-btn .vi-th-ico{background:var(--text);box-shadow:inset -4px -2px 0 0 var(--panel)}
 html,body{overflow-x:clip}
 
 /* ── Brand icons (sprite #vi-*) ── */
@@ -7838,7 +7835,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
    PURPOSEOS GLOBAL — 2-tab build: Overview + House
 ═══════════════════════════════════════════════════════ */
 
-:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge {
+:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav {
   /* old names, kept as aliases of the brand tokens for one release */
   --c1: var(--panel); --c2: var(--surf2); --c3: var(--slate); --c4: var(--line2);
   --em: var(--teal); --em2: var(--teal); --em3: var(--faint); --dp: var(--teal-deep);
@@ -11014,7 +11011,6 @@ html body #topnav .vi-usp,html body #topnav .vi-pro{top:0;right:2px;left:auto;wi
 #topnav.compact-nav .nav-tab-label{display:none!important}
 html #topnav.compact-nav .tab-btn{padding:0!important;width:44px}
 @media (min-width:1024px){body.vi-compact #topnav .nav-tab-label{display:none!important}html body.vi-compact #topnav .tab-btn{padding:0!important;width:44px}}
-#vi-theme-btn{height:30px}
 @media (prefers-reduced-motion:reduce){html #topnav .tab-btn.active .vi-ic.ti{animation:none}}
 /* header: row 1 = brand, net worth, Back, Night/Daylight, density; row 2 = the tabs (every width, so labels never get cut off) */
 html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto auto;grid-template-rows:46px 50px;height:auto!important;padding:0 16px!important;overflow:visible!important;align-items:center;column-gap:8px}
@@ -11034,8 +11030,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 @media (max-width:1023px){
   html #topnav{grid-template-columns:auto 1fr auto auto;padding:0 8px!important;column-gap:6px}
   #vi-back-us-btn{display:none!important}
-  #vi-theme-btn{grid-column:3;padding:0 9px!important}
-  #vi-theme-btn .vi-th-lbl{display:none}
+  #vi-theme-btn{grid-column:3}
   #vi-density-btn{grid-column:4}
   #vi-density-btn .vi-d-opt[data-d="default"]{display:none!important}
   #vi-density-btn .vi-d-lbl{display:inline!important}#vi-density-btn .vi-d-ico{display:none!important}
@@ -11059,8 +11054,6 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   body.vi-nav1 #vi-theme-btn{grid-column:5}
   body.vi-nav1 #left-sidebar{top:60px!important}
   body.vi-nav1t #topnav .vi-nw-wrap>span:first-child{display:none!important}
-  body.vi-nav1t #vi-theme-btn .vi-th-lbl{display:none}
-  body.vi-nav1t #vi-theme-btn{padding:0 9px!important}
   html body.vi-nav1t #topnav .tab-btn{padding:0 6px!important;gap:5px;letter-spacing:.03em!important;font-size:.54rem!important}
   body.vi-nav1t #topnav .vi-tabs{padding:0 2px}
 }
@@ -11249,6 +11242,71 @@ html body .sb-label,html body .sb-field-lbl,html body #vi-campaign-modal .vi-cam
 html body #topnav .vi-usp,html body #topnav .vi-pro{font-size:10.5px!important}
 @media(min-width:600px) and (max-width:1023px){html body #topnav .vi-usp,html body #topnav .vi-pro{top:-2px;padding:0 2px;letter-spacing:.02em}}   /* icon-only tabs are 44 px wide: the 10.5 px pill sits clear of the icon */
 html body #vi-campaign-modal .vi-camp-close{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+</style>
+<style id="vi-v091r2-chrome">
+/* ═══ v0.9.1 round 2, chunk A: R1 wordmark in proportion with the dial, R23/R24 credit-card profile card, R26 Night header in Daylight, R27 animated Night/Daylight switch ═══ */
+/* R1: the wordmark scales with the icon (about 64% of it, so the cap height sits near half the icon) */
+#topnav .logo.wm{font-size:calc(var(--vi-mark-size) * .64)!important}
+/* R26: the Night header bar in Daylight (tokens come from the Night block at the top; ?hdr=paper switches back). The mark and the brick need their Night looks too. */
+[data-theme="light"]:not([data-hdr="paper"]) #topnav .vi-mark-night{display:block}
+[data-theme="light"]:not([data-hdr="paper"]) #topnav .vi-mark-day{display:none}
+[data-theme="light"]:not([data-hdr="paper"]) #topnav .wm b{color:var(--teal);-webkit-text-fill-color:var(--teal);text-shadow:var(--tglow)}
+[data-theme="light"]:not([data-hdr="paper"]) #topnav .wm .dot{background:var(--teal);box-shadow:var(--dglow)}
+/* R23: the profile card is credit-card shaped (ID-1, 85.60 x 53.98 mm). The photo sits left and spans the name and role rows, archetypes run on one line, the footer is tight. */
+.pioneer-card-wrap{aspect-ratio:85.6 / 53.98;display:flex}
+.pioneer-card{flex:1;min-width:0;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto auto auto auto;align-content:space-between}
+.pioneer-card .pc-body{display:contents}
+.pioneer-card .pc-header{grid-column:1 / -1;grid-row:1;padding:2px 10px 2px}
+.pioneer-card .pc-avatar-wrap,.pioneer-card .pc-info{position:relative;z-index:3}
+.pioneer-card .pc-avatar-wrap{grid-column:1;grid-row:2 / 4;align-self:center;margin:4px 9px 4px 10px}
+.pioneer-card .pc-info{grid-column:2;grid-row:2;align-self:end;padding:5px 10px 0 0}
+.pioneer-card .pc-roles{grid-column:2;grid-row:3;align-self:start;display:flex;gap:8px;padding:2px 10px 4px 0;border-top:0;overflow:hidden}
+.pioneer-card .pc-roles>div{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0!important}
+.pioneer-card .pc-archetypes{grid-column:1 / -1;grid-row:4;flex-wrap:nowrap;align-items:center;padding:3px 10px}
+.pioneer-card .pc-footer{grid-column:1 / -1;grid-row:5;padding:3px 10px 4px}
+.pioneer-card .pc-footer-meta{line-height:1.15}
+.pioneer-card .pc-level-badge{display:block;max-width:100%;box-sizing:border-box;letter-spacing:.06em;line-height:1.2;padding:2px 6px}   /* a long rank name wraps to two tight lines rather than being cut */
+.pioneer-card .pc-level-row{min-width:0}
+.pioneer-card .pc-archetype{display:block;line-height:1.3;padding:1px 7px;white-space:nowrap}
+/* R24: more room for the photo (52 px to 72 px), and no holographic effect on it (the card edge keeps its foil): a still brass frame, no hue turn, no glow */
+.pc-avatar-wrap{animation:none;filter:none;box-shadow:none;background:linear-gradient(135deg,#b8902e,#f0d878,var(--brass),#b8902e)}
+.pc-avatar-inner{width:72px;height:72px}
+.pc-name,.pc-adoption-num{color:var(--text)}   /* was white: unreadable on the Daylight card */
+/* R27: one animated switch, a pill with a sun in a sky with clouds (Daylight, knob left) and a moon among stars (Night, knob right). Scoped literals: --gold turns brown in Daylight. */
+#vi-theme-btn{--sw-w:48px;--sw-h:26px;--sw-k:20px;--pad:calc((var(--sw-h) - 2px - var(--sw-k)) / 2);--run:calc(var(--sw-w) - 2px - var(--sw-k) - 2 * var(--pad));
+  display:inline-flex;align-items:center;justify-content:center;width:var(--sw-w);height:44px;padding:0;margin:0 0 0 8px;flex:none;background:transparent;border:0;border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+@media(min-width:600px){#vi-theme-btn{--sw-w:56px;--sw-h:30px;--sw-k:24px}}
+@media(min-width:1024px){#vi-theme-btn{--sw-w:64px;--sw-h:32px;--sw-k:26px}}
+#vi-theme-btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+#vi-theme-btn .vi-sw-track{position:relative;display:block;width:var(--sw-w);height:var(--sw-h);box-sizing:border-box;border:1px solid #2D8882;border-radius:999px;overflow:hidden;background-color:#080D14}
+#vi-theme-btn:hover .vi-sw-track{border-color:#44C0B9}
+#vi-theme-btn .vi-sw-scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+#vi-theme-btn .vi-sw-day{opacity:0}
+[data-theme="light"] #vi-theme-btn .vi-sw-track{background-color:#006B67}
+[data-theme="light"] #vi-theme-btn .vi-sw-day{opacity:1}
+[data-theme="light"] #vi-theme-btn .vi-sw-night{opacity:0}
+[data-theme="light"][data-hdr="paper"] #vi-theme-btn .vi-sw-track{border-color:#006B67}
+#vi-theme-btn .vi-sw-knob{position:absolute;top:50%;left:var(--pad);width:var(--sw-k);height:var(--sw-k);margin-top:calc(var(--sw-k) / -2);box-sizing:border-box;border-radius:50%;border:1.5px solid transparent;
+  background-color:#E8E8E8;box-shadow:0 0 8px 1px rgba(68,192,185,.55);transform:translateX(var(--run))}
+#vi-theme-btn .vi-sw-knob svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#vi-theme-btn .vi-sw-sunring{opacity:0}
+[data-theme="light"] #vi-theme-btn .vi-sw-knob{background-color:#E8C56A;border-color:#C9A84C;box-shadow:0 1px 2px rgba(0,0,0,.35);transform:translateX(0)}
+[data-theme="light"] #vi-theme-btn .vi-sw-moon{opacity:0}
+[data-theme="light"] #vi-theme-btn .vi-sw-sunring{opacity:1}
+#vi-theme-btn .vi-sw-clouds{transform:translateY(10px);opacity:0}
+[data-theme="light"] #vi-theme-btn .vi-sw-clouds{transform:none;opacity:1}
+#vi-theme-btn .vi-sw-stars path{transform-box:fill-box}
+[data-theme="light"] #vi-theme-btn .vi-sw-stars{transform:translateY(8px);opacity:0}
+#vi-theme-btn .vi-sw-rings{transform-origin:48px 16px;transform-box:view-box}
+[data-theme="light"] #vi-theme-btn .vi-sw-rings{transform:scale(.8)}
+/* motion only after first paint (.vi-th-anim is added once the page has loaded); reduced motion: instant */
+#vi-theme-btn.vi-th-anim .vi-sw-knob{transition:transform 450ms cubic-bezier(.34,1.25,.5,1),background-color 350ms ease-in-out,border-color 350ms ease-in-out,box-shadow 350ms ease-in-out}
+#vi-theme-btn.vi-th-anim .vi-sw-track{transition:background-color 350ms ease-in-out,border-color 200ms}
+#vi-theme-btn.vi-th-anim .vi-sw-scene,#vi-theme-btn.vi-th-anim .vi-sw-moon,#vi-theme-btn.vi-th-anim .vi-sw-sunring{transition:opacity 350ms ease-in-out}
+#vi-theme-btn.vi-th-anim .vi-sw-clouds,#vi-theme-btn.vi-th-anim .vi-sw-stars{transition:transform 500ms ease-in-out,opacity 500ms ease-in-out}
+#vi-theme-btn.vi-th-anim .vi-sw-stars{transition-delay:40ms}
+#vi-theme-btn.vi-th-anim .vi-sw-rings{transition:transform 350ms ease-in-out}
+@media(prefers-reduced-motion:reduce){#vi-theme-btn,#vi-theme-btn *{transition:none!important;animation:none!important}}
 </style>
 <style id="vi-daylight">
 /* ═══ Daylight polish (brand phase 6): ink on paper, no glow, nothing faint. Night is untouched. ═══ */
@@ -12330,7 +12388,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
   <!-- Back Us campaign button -->
   <button id="vi-back-us-btn" onclick="viShowCampaign()">⚡ Back Vault-It</button>
   <!-- Night / Daylight -->
-  <button id="vi-theme-btn" type="button" aria-pressed="false" onclick="viToggleTheme()"><span class="vi-th-ico" aria-hidden="true"></span><span class="vi-th-lbl">Daylight</span></button>
+  <button id="vi-theme-btn" type="button" role="switch" aria-checked="true" aria-label="Night mode" title="Switch to Daylight" onclick="viToggleTheme()"><span class="vi-sw-track" aria-hidden="true"><svg class="vi-sw-scene vi-sw-day" viewBox="0 0 64 32" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="vi-swsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#006B67"/><stop offset="1" stop-color="#2BA39C"/></linearGradient></defs><rect width="64" height="32" fill="url(#vi-swsky)"/><circle cx="16" cy="16" r="22" fill="#E8C56A" fill-opacity=".12"/><circle cx="16" cy="16" r="15" fill="#E8C56A" fill-opacity=".22"/><g class="vi-sw-clouds"><g fill="#DAD8D0"><circle cx="31" cy="25" r="5"/><circle cx="39" cy="22" r="6"/><circle cx="48" cy="24" r="5.5"/><circle cx="57" cy="21" r="6"/><circle cx="64" cy="24" r="5"/></g><g fill="#D3CCB4"><circle cx="25" cy="28" r="4.5"/><circle cx="34" cy="27" r="5"/><circle cx="43" cy="28" r="4.5"/><circle cx="52" cy="27" r="5"/><circle cx="61" cy="28" r="4.5"/></g><g fill="#fff"><rect x="-2.9" y="27.2" width="5" height="2.4" rx=".8"/><rect x="2.9" y="27.2" width="5" height="2.4" rx=".8"/><rect x="8.7" y="27.2" width="5" height="2.4" rx=".8"/><rect x="14.5" y="27.2" width="5" height="2.4" rx=".8"/><rect x="20.3" y="27.2" width="5" height="2.4" rx=".8"/><rect x="26.1" y="27.2" width="5" height="2.4" rx=".8"/><rect x="31.9" y="27.2" width="5" height="2.4" rx=".8"/><rect x="37.7" y="27.2" width="5" height="2.4" rx=".8"/><rect x="43.5" y="27.2" width="5" height="2.4" rx=".8"/><rect x="49.3" y="27.2" width="5" height="2.4" rx=".8"/><rect x="55.1" y="27.2" width="5" height="2.4" rx=".8"/><rect x="60.9" y="27.2" width="5" height="2.4" rx=".8"/><rect x="0.0" y="29.6" width="5" height="2.4" rx=".8"/><rect x="5.8" y="29.6" width="5" height="2.4" rx=".8"/><rect x="11.6" y="29.6" width="5" height="2.4" rx=".8"/><rect x="17.4" y="29.6" width="5" height="2.4" rx=".8"/><rect x="23.2" y="29.6" width="5" height="2.4" rx=".8"/><rect x="29.0" y="29.6" width="5" height="2.4" rx=".8"/><rect x="34.8" y="29.6" width="5" height="2.4" rx=".8"/><rect x="40.6" y="29.6" width="5" height="2.4" rx=".8"/><rect x="46.4" y="29.6" width="5" height="2.4" rx=".8"/><rect x="52.2" y="29.6" width="5" height="2.4" rx=".8"/><rect x="58.0" y="29.6" width="5" height="2.4" rx=".8"/><rect x="63.8" y="29.6" width="5" height="2.4" rx=".8"/><rect x="0" y="30.5" width="64" height="1.5"/></g></g></svg><svg class="vi-sw-scene vi-sw-night" viewBox="0 0 64 32" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="64" height="32" fill="#080D14"/><g class="vi-sw-rings" fill="#44C0B9"><circle cx="48" cy="16" r="26" fill-opacity=".10"/><circle cx="48" cy="16" r="19" fill-opacity=".18"/><circle cx="48" cy="16" r="13" fill-opacity=".28"/></g><g class="vi-sw-stars"><path transform="translate(9 9) scale(1.1)" d="M0-3 .8-.8 3 0 .8.8 0 3-.8.8-3 0-.8-.8Z" fill="#44C0B9" fill-opacity="1"/><path transform="translate(18 21) scale(0.8)" d="M0-3 .8-.8 3 0 .8.8 0 3-.8.8-3 0-.8-.8Z" fill="#44C0B9" fill-opacity="1"/><path transform="translate(25 8) scale(0.7)" d="M0-3 .8-.8 3 0 .8.8 0 3-.8.8-3 0-.8-.8Z" fill="#44C0B9" fill-opacity="1"/><path transform="translate(31 18) scale(1.0)" d="M0-3 .8-.8 3 0 .8.8 0 3-.8.8-3 0-.8-.8Z" fill="#E8C56A" fill-opacity="1"/><path transform="translate(13 26) scale(0.55)" d="M0-3 .8-.8 3 0 .8.8 0 3-.8.8-3 0-.8-.8Z" fill="#44C0B9" fill-opacity="1"/></g></svg><span class="vi-sw-knob" aria-hidden="true"><svg viewBox="0 0 26 26"><g class="vi-sw-moon" fill="#9AA0A6"><circle cx="9" cy="9" r="2.8"/><circle cx="17" cy="16" r="3.4"/></g><circle class="vi-sw-sunring" cx="13" cy="13" r="7.4" fill="none" stroke="#C9A84C" stroke-width="1.5"/></svg></span></span></button>
   <!-- Help: Ask, FAQs, Tour -->
   <button id="vi-help-btn" type="button" aria-label="Help, FAQs and app tour" title="Help" aria-controls="vi-help" aria-expanded="false" onclick="viHelpToggle()"><b aria-hidden="true">?</b><span>Help</span></button>
   <!-- Density toggle -->
@@ -25710,7 +25768,7 @@ document.addEventListener('keydown',function(e){
 });
 // ── swipe hints: a soft arrow on the edge of any row/diagram that continues off-screen ──
 
-// E1 (v0.9.1): the header mark is the brand book's dial icon (the V and gold brick still, a ring of ticks that turns 60 degrees on load and on each click).
+// E1 (v0.9.1, R1 round 2): the header mark is the brand book's dial icon (the V and gold brick still, a ring of ticks that swings left and right on load, on each click and now and then).
 // 44 px is small for 60 ticks (about 2 px apart), so the header draws the 12 major ticks, as the owner allowed; reduced motion: no turn.
 function viMarkSVG(lt) {
   var T = lt ? '#006B67' : '#44C0B9', V = lt ? '#FFFFFF' : '#080808', H = lt ? '#CDE7E4' : '#0C2A30', BZ = lt ? '#EAF3F2' : '#04141A', T2 = lt ? '#00504D' : '#34A9A2', HL = lt ? '#4FB3AD' : '#9BEAE3', GD = lt ? '#C79A1C' : '#E8C56A';
@@ -25726,16 +25784,19 @@ function viMarkSVG(lt) {
   return o;
 }
 window.viMarkDial = 0;
+// R1 (round 2): the dial swings left and right by varying degrees, like a vault combination being dialled (never more than 60 either way, and the V stays upright).
+var VI_DIAL = [34, -21, 47, -12, 26, -39, 15, -28], _viDialI = 0;
 function viMarkTurn() {
   try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
-  window.viMarkDial += 60;
+  window.viMarkDial = VI_DIAL[_viDialI++ % VI_DIAL.length];
   [].forEach.call(document.querySelectorAll('.vi-mark .ticks'), function (g) { g.style.transform = 'rotate(' + window.viMarkDial + 'deg)'; });
 }
 (function () {
   var go = function () {
     var n = document.querySelector('.vi-mark-night'), d = document.querySelector('.vi-mark-day'); if (!n || !d) return;
     n.innerHTML = viMarkSVG(false); d.innerHTML = viMarkSVG(true);
-    setTimeout(viMarkTurn, 450);
+    setTimeout(viMarkTurn, 450); setTimeout(viMarkTurn, 1450); setTimeout(viMarkTurn, 2450);   // opening: three turns, then it rests
+    setInterval(function () { if (!document.hidden) viMarkTurn(); }, 15000);
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
@@ -26364,7 +26425,7 @@ var VI_DAY_BASE={'030810':'e6f1f0','060d16':'e6f1f0','050c14':'dad8d0','0d1520':
   'b9c4cf':'3a5052','8fb4b1':'3a5052','8f9bab':'3a5052','8fa3b5':'3a5052','8b97a3':'4e5b5d','7d8793':'4e5b5d','6b7780':'4e5b5d','6b8197':'4e5b5d','8a93a6':'4e5b5d','d4c5a9':'3a5052','f1d98b':'60480b'};
 var VI_DAY_BRAND={'44c0b9':'185550','38a09a':'185550','c9a84c':'5b4a19','e8c56a':'60480b','3ecf8e':'135738','3fb585':'1c563e','9b7ec8':'583f81','e0894a':'773c11',
   'e05c5c':'951919','e8a23c':'6b4303','f59e0b':'6b4303','64b5f6':'054e88','e5535f':'911d3a','ee7d7d':'7e3532','f5dc4a':'584c04'};
-var VI_DAY_RGB={'10,18,30':'218,216,208','6,12,22':'201,199,190','4,10,14':'218,216,208','6,18,32':'234,242,241','2,4,8':'200,222,220',
+var VI_DAY_RGB={'10,18,30':'218,216,208','6,12,22':'211,204,180','4,10,14':'218,216,208','6,18,32':'234,242,241','2,4,8':'200,222,220',
   '154,160,166':'78,91,93','110,120,132':'58,80,82','125,135,147':'78,91,93','90,96,104':'78,91,93','150,160,170':'58,80,82','140,150,160':'58,80,82','232,232,232':'11,31,34'};
 var VI_DAY_RGB_BRAND={'68,192,185':'24,85,80','201,168,76':'91,74,25','224,92,92':'149,25,25','62,207,142':'19,87,56','232,197,106':'96,72,11','200,168,64':'91,74,25','232,162,60':'107,67,3'};
 function viDay(str,brand){
@@ -30179,8 +30240,8 @@ function viShowCampaign() {
 function viTheme(){return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';}
 function viSyncTheme(){
   var l=viTheme()==='light',b=document.getElementById('vi-theme-btn');
-  if(b){b.querySelector('.vi-th-lbl').textContent=l?'Night':'Daylight';b.setAttribute('aria-pressed',l?'true':'false');b.setAttribute('aria-label',l?'Switch to Night mode':'Switch to Daylight mode');b.title=b.getAttribute('aria-label');}
-  var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',l?'#C9C7BE':'#080808');
+  if(b){b.setAttribute('aria-checked',l?'false':'true');b.title=l?'Switch to Night':'Switch to Daylight';}   // R27: one switch, fixed label "Night mode", checked = Night
+  var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',(l&&document.documentElement.getAttribute('data-hdr')==='paper')?'#D3CCB4':'#080808');
 }
 function viToggleTheme(){
   var next=viTheme()==='light'?'dark':'light';
@@ -30195,6 +30256,8 @@ function viToggleTheme(){
   if(typeof toast==='function')toast(next==='light'?'Daylight mode':'Night mode');
 }
 document.addEventListener('DOMContentLoaded',viSyncTheme);
+// R27: nothing animates on first paint; the switch starts to slide only once the page has loaded and the state is set
+window.addEventListener('load',function(){requestAnimationFrame(function(){requestAnimationFrame(function(){var b=document.getElementById('vi-theme-btn');if(b)b.classList.add('vi-th-anim');});});});
 
 // ── DENSITY MODE ──────────────────────────────────────────
 function setDensity(mode) {
