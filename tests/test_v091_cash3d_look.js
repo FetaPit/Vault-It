@@ -51,7 +51,7 @@ const meet = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
     ok(I.chips.every(c => c.stroke.replace(/\s/g, '') === c.amtColor.replace(/\s/g, '')), w + ': the stroke and the balance share the brand colour');
     ok(bar && mon && bar.stroke !== mon.stroke, w + ': Barclays and Monzo wear their own brand colours (' + (bar && bar.stroke) + ' / ' + (mon && mon.stroke) + ')');
     ok(I.chips.every(c => contrast(c.amtColor, 'rgb(8,8,8)') >= 4.5), w + ': each brand colour reads at 4.5:1 on the black (' + I.chips.map(c => contrast(c.amtColor, 'rgb(8,8,8)').toFixed(1)).join(', ') + ')');
-    ok(I.chips.every(c => /rgb\((2[2-5]\d), (2[2-5]\d), (2[2-5]\d)\)/.test(c.nameColor)), w + ': the account name is white');
+    ok(I.chips.every(c => c.nameColor === 'rgb(255, 255, 255)'), w + ': the account name is white (' + I.chips.map(c => c.nameColor).join(', ') + ')');
     ok(bar && bar.amount === '£2,000' && mon.amount === '£340' && phys.amount === '£300', w + ': the balance is on the chip (' + I.chips.map(c => c.amount).join(', ') + ')');
     ok(I.chips.filter(c => c.name !== 'Physical cash').every(c => c.logo && c.logo !== 'icon') && phys.logo === 'icon', w + ': a small bank logo on each account chip, the cash icon on physical cash');
     const logoPos = await p.evaluate(() => V3.cash._chips.map(c => { const l = c.el.querySelector('.cash-logo,img'), r = c.el.getBoundingClientRect(), q = l && l.getBoundingClientRect(); return q ? [q.left - r.left, q.width, q.height, r.height] : null; }));
@@ -77,8 +77,8 @@ const meet = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
       ok(!drift.length, 'the lifted colour keeps each bank\'s hue (' + (drift.map(x => x.n + ' ' + x.c + '>' + x.ink).join(', ') || 'all within 12 degrees') + ')');
       // a logo that fails to load falls back to the bank's initial
       const fb = await p.evaluate(async () => { const c = V3.cash._chips.find(x => x.el.querySelector('img')); const img = c.el.querySelector('img'); if (img.complete && img.naturalWidth) img.dispatchEvent(new Event('error'));
-        await new Promise(r => setTimeout(r, 50)); const m = c.el.querySelector('.cash-mono'); return { img: getComputedStyle(img).display, mono: m ? getComputedStyle(m).display : 'none', text: m ? m.textContent : '' }; });
-      ok(fb.img === 'none' && fb.mono !== 'none' && fb.text.length > 0, 'a logo that fails falls back to the initial (' + JSON.stringify(fb) + ')');
+        await new Promise(r => setTimeout(r, 50)); const m = c.el.querySelector('.cash-mono'); return { img: getComputedStyle(img).display, mono: m ? getComputedStyle(m).display : 'none', text: m ? m.textContent : '', fits: !!m && m.scrollWidth <= m.parentNode.clientWidth + 0.5 && m.scrollHeight <= m.parentNode.clientHeight + 0.5, ink: m ? getComputedStyle(m.querySelector('.stk-mono') || m).color : '', chip: getComputedStyle(c.el.querySelector('.v3-chip-a')).color }; });
+      ok(fb.img === 'none' && fb.mono !== 'none' && fb.text.length === 1 && fb.fits && fb.ink === fb.chip, 'a logo that fails falls back to one letter that fits the box, in the brand colour (' + JSON.stringify(fb) + ')');
       // the coins: the £1 has twelve flat sides; a block of 1,000 is one shape built from the hundred stacks of ten
       const g = await p.evaluate(() => { const o = { blocks: [], stacks: [] }; V3.cash.root.traverse(m => { if (!m.isInstancedMesh || !m.userData.v3Intro) return; const pos = m.geometry.attributes.position, nr = m.geometry.attributes.normal, ups = new Set(), sideN = new Set();
         for (let i = 0; i < pos.count; i++) { if (nr.getY(i) > 0.9) ups.add(pos.getX(i).toFixed(2) + ',' + pos.getZ(i).toFixed(2)); else if (Math.abs(nr.getY(i)) < 0.1) sideN.add(nr.getX(i).toFixed(3) + ',' + nr.getZ(i).toFixed(3)); }

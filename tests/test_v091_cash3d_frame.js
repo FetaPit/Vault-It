@@ -42,20 +42,41 @@ const MEASURE = () => {
   return { W, H, flags, pts: pts.length, under, chipCoins: I.coins.filter(q => I.chips.some(c => q[0] > c.r.x0 && q[0] < c.r.x1 && q[1] > c.r.y0 && q[1] < c.r.y1)).length, cam: cam.position.toArray().map(v => +v.toFixed(2)), target: V.ctl.target.toArray().map(v => +v.toFixed(2)) };
 };
 
+// Pedro, 4 Nov: corner points are not enough (a chip can cross a block between them). Each stack or block's eight corners
+// (chipInfo().coins, in groups of 8) make an outline on screen; a chip touches the coins when any point of the chip, on a 3 px grid,
+// falls inside a triangle of that outline. Written here without the app's own geometry code.
+const OUTLINE = () => {
+  const I = V3.cash.chipInfo(), C = I.coins, inTri = (p, a, b, c) => { const s = (u, v, w) => (u[0] - w[0]) * (v[1] - w[1]) - (v[0] - w[0]) * (u[1] - w[1]); const d1 = s(p, a, b), d2 = s(p, b, c), d3 = s(p, c, a); return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0)); };
+  const hit = [];
+  I.chips.forEach(ch => { if (!ch.r) return; let n = 0;
+    for (let g = 0; g + 8 <= C.length; g += 8) { const P = C.slice(g, g + 8), xs = P.map(q => q[0]), ys = P.map(q => q[1]);
+      if (Math.max(...xs) < ch.r.x0 || Math.min(...xs) > ch.r.x1 || Math.max(...ys) < ch.r.y0 || Math.min(...ys) > ch.r.y1) continue;
+      let touched = false;
+      for (let x = ch.r.x0; x <= ch.r.x1 && !touched; x += 3) for (let y = ch.r.y0; y <= ch.r.y1 && !touched; y += 3)
+        for (let i = 0; i < 8 && !touched; i++) for (let j = i + 1; j < 8 && !touched; j++) for (let k = j + 1; k < 8 && !touched; k++) if (inTri([x, y], P[i], P[j], P[k])) touched = true;
+      if (touched) n++; }
+    if (n) hit.push(ch.name + ' on ' + n); });
+  return { hit, chips: I.chips.filter(c => c.r).length, groups: Math.floor(C.length / 8) };
+};
+
 (async () => {
   await new Promise(r => server.listen(0, '127.0.0.1', r)); const URL = 'http://127.0.0.1:' + server.address().port + '/' + PAGE;
   const b = await chromium.launch({ args: GPU_ARGS }); const errs = [];
-  const measure = async (w, h, mobile) => {
+  const measure = async (w, h, mobile, cur, drags) => {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: mobile, hasTouch: mobile, reducedMotion: 'reduce' }); await routeThree(ctx);
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(SEED);
     await p.goto(URL, { waitUntil: 'load' }); await p.waitForTimeout(1400);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.waitForFunction(() => !!window.THREE && !!THREE.OrbitControls, null, { timeout: 30000 }).catch(() => {});
-    await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', null); });
+    await p.evaluate(c => { if (c) { window.VI_CURRENCY = c; _applyCurrency(); } showTab('assets'); showSubtab('assets', 'cash', null); }, cur || null);
     await p.waitForFunction(() => window.V3 && V3.cash && V3.cash.root.children.length, null, { timeout: 60000 }).catch(() => {});
     await p.evaluate(() => document.getElementById('cashSceneCard').scrollIntoView({ block: 'center' })); await p.waitForTimeout(2500);
-    const r = await p.evaluate(MEASURE); r.cam0 = await p.evaluate(() => { const V = V3.cash; return V.cam.position.clone().sub(V.ctl.target).normalize().toArray().map(v => +v.toFixed(3)); }); await ctx.close(); return r;
+    const r = await p.evaluate(MEASURE); r.outline = [await p.evaluate(OUTLINE)];
+    for (const [dx, dy] of drags || []) {   // a real drag on the canvas, then the chips are checked again
+      const bx = await p.locator('#cashSceneCard canvas').first().boundingBox(), x = bx.x + bx.width / 2, y = bx.y + bx.height / 2;
+      await p.mouse.move(x, y); await p.mouse.down(); for (let i = 1; i <= 8; i++) await p.mouse.move(x + dx * i / 8, y + dy * i / 8); await p.mouse.up();
+      await p.waitForTimeout(900); r.outline.push(Object.assign({ drag: dx + ',' + dy }, await p.evaluate(OUTLINE))); } r.cam0 = await p.evaluate(() => { const V = V3.cash; return V.cam.position.clone().sub(V.ctl.target).normalize().toArray().map(v => +v.toFixed(3)); }); await ctx.close(); return r;
   };
 
   // ── phone: the coins show beneath the flags ──
@@ -64,6 +85,11 @@ const MEASURE = () => {
   ok(m.under === 0 && m.chipCoins === 0, '390: no coin sits under a chip (' + m.under + ' of ' + m.pts + ' coin points covered)');
   ok(m.flags.every(f => Math.min(...f.lines) >= 10.5), '390: every flag line is still 10.5 px or more (' + m.flags.map(f => Math.min(...f.lines).toFixed(1)).join(', ') + ')');
   ok(m.flags.every(f => f.x1 <= m.W - 55 && f.x0 >= 0), '390: every flag is still clear of the zoom controls (' + m.flags.map(f => Math.round(f.x0) + '-' + Math.round(f.x1)).join(', ') + ' of ' + m.W + ')');
+
+  ok(m.outline[0].hit.length === 0, '390: no chip touches the outline of any stack or block (' + (m.outline[0].hit.join(', ') || m.outline[0].groups + ' shapes clear') + ')');
+  // dollars (bigger coins) and drags: the chips are placed again whenever the camera moves
+  const u = await measure(390, 844, true, 'USD', [[90, 0], [-180, 0], [40, -70], [0, 90], [0, -160]]);
+  ok(u.outline.length === 6 && u.outline.every(o => o.chips === 4 && o.hit.length === 0), '390 in dollars, after five drags: no chip touches the coins (' + u.outline.map(o => (o.drag || 'start') + ' ' + (o.hit.join('/') || 'clear')).join('; ') + ')');
 
   // ── desktop: the framing does not change ──
   const d = await measure(1280, 800, false);

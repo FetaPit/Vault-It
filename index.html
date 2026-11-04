@@ -14587,8 +14587,9 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .v3-chips{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .35s ease}
 .v3-chips.on{opacity:1}
 .v3-posts{position:absolute;left:0;top:0}
-.v3-chip{position:absolute;left:0;top:0;display:flex;align-items:center;gap:5px;height:20px;padding:0 6px 0 3px;box-sizing:border-box;background:rgba(8,8,8,.97);border:1px solid var(--bc);border-radius:4px;white-space:nowrap;font:600 11px 'DM Sans',sans-serif;color:#E8E8E8;will-change:transform}
-.v3-chip .cash-logo{width:14px;height:14px;border-radius:3px}
+.v3-chip{position:absolute;left:0;top:0;display:flex;align-items:center;gap:5px;height:20px;padding:0 6px 0 3px;box-sizing:border-box;background:rgba(8,8,8,.97);border:1px solid var(--bc);border-radius:4px;white-space:nowrap;font:600 11px 'DM Sans',sans-serif;color:#FFFFFF;will-change:transform}
+.v3-chip .cash-logo{width:14px;height:14px;border-radius:3px;overflow:hidden;flex:none}
+.v3-chip .v3-mono{background:transparent;font:800 11px/14px 'Syne',sans-serif;letter-spacing:0;box-shadow:inset 0 0 0 1px currentColor;border-radius:3px}
 .v3-chip .cash-logo-none{background:transparent;color:var(--bc)}
 .v3-chip .cash-logo-none .vi-ic{width:14px;height:14px}
 .v3-chip-s{color:#8A93A6}
@@ -22009,7 +22010,10 @@ function v3Ink(hex){var c=String(hex||'').replace('#','');if(c.length===3)c=c.sp
 function v3ChipBrand(p){
   if(p.kind==='physical')return {c:'#E8C56A',logo:'<span class="cash-logo cash-logo-none"><svg class="vi-ic" aria-hidden="true"><use href="#vi-cash"/></svg></span>'};
   var m=typeof stkPlatformMatch==='function'?stkPlatformMatch(p.name):null;
-  return {c:v3Ink(m?m.c:'#E8C56A'),logo:typeof viBankLogo==='function'?viBankLogo(p.name):''};}
+  var ink=v3Ink(m?m.c:'#E8C56A'),logo=typeof viBankLogo==='function'?viBankLogo(p.name):'';
+  /* Pedro, 4 Nov: the list's two-letter fallback overflows the chip's 14 px box, so in the chip it is one letter in the brand ink */
+  if(m)logo=logo.replace(/<span class="stk-mono"[^>]*>[^<]*<\/span>/,'<span class="stk-mono v3-mono" style="color:'+ink+'">'+v3ChipEsc(String(m.n||'?').trim().charAt(0).toUpperCase())+'</span>');
+  return {c:ink,logo:logo};}
 function v3ChipEsc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 /* the chips for one built scene: one per plate and the total as a gold corner tag, like Budget's Monthly income. The posts are
    drawn on a canvas under the chips. Every coin's top corners are kept in world space, so a chip is never placed over coins. */
@@ -22023,8 +22027,8 @@ function v3ChipsSet(V,chips,total){
   var pts=[],m=new THREE.Matrix4(),q=new THREE.Vector3();V.root.updateMatrixWorld(true);
   V.root.traverse(function(o){if(!o.userData||!o.userData.v3Intro)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();var bb=o.geometry.boundingBox,n=o.isInstancedMesh?(o.userData.v3Full||o.count):1;
     for(var i=0;i<n;i++){if(o.isInstancedMesh)o.getMatrixAt(i,m);else m.identity();
-      [[bb.min.x,bb.min.z],[bb.max.x,bb.min.z],[bb.min.x,bb.max.z],[bb.max.x,bb.max.z],[(bb.min.x+bb.max.x)/2,(bb.min.z+bb.max.z)/2]].forEach(function(c){q.set(c[0],bb.max.y,c[1]).applyMatrix4(m).applyMatrix4(o.matrixWorld);pts.push(q.x,q.y,q.z);});}});
-  V._coinW=pts;V.onDraw=function(){v3ChipsPlace(V);};V.kick(300);}
+      [bb.max.y,bb.min.y].forEach(function(y){[[bb.min.x,bb.min.z],[bb.max.x,bb.min.z],[bb.max.x,bb.max.z],[bb.min.x,bb.max.z]].forEach(function(c){q.set(c[0],y,c[1]).applyMatrix4(m).applyMatrix4(o.matrixWorld);pts.push(q.x,q.y,q.z);});});}});   // each stack or block as its eight corners: on screen, their outline is the shape a chip must not touch
+  V._coinW=pts;V._chipSig=null;V.onDraw=function(){v3ChipsPlace(V);};V.kick(300);}
 /* place the chips on screen, nearest post first: a chip hangs right of its post (or left), rising a step at a time until it is
    clear of the coins, the other chips, the total tag, the stage's edges and the zoom buttons (56 px on the right). Hidden while
    the coins are still arriving. */
@@ -22032,25 +22036,37 @@ function v3ChipsPlace(V){
   var L=V._chipL,C=V._chips;if(!L||!C)return;
   var W=V.host.clientWidth,H=V.host.clientHeight;if(!W||!H)return;
   var on=!V._introRun&&!V._introWait;L.classList.toggle('on',on);
+  V.cam.updateMatrixWorld();var sig=on+'|'+W+'|'+H+'|'+Array.prototype.map.call(V.cam.matrixWorld.elements,function(x){return x.toFixed(4);}).join(',');if(sig===V._chipSig)return;V._chipSig=sig;   // re-placed whenever the camera moves (a drag, a zoom), not on still frames
   var cv=L.firstChild,dpr=Math.min(2,window.devicePixelRatio||1);
   if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cv.style.width=W+'px';cv.style.height=H+'px';}
   var g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);if(!on)return;
   V.cam.updateMatrixWorld();var v=new THREE.Vector3(),px=function(x,y,z){v.set(x,y,z).project(V.cam);return [(v.x+1)/2*W,(1-v.y)/2*H,v.z];};
   var cp=[],P=V._coinW||[];for(var i=0;i<P.length;i+=3)cp.push(px(P[i],P[i+1],P[i+2]));
+  var hulls=[];for(var hi=0;hi+8<=cp.length;hi+=8)hulls.push(v3Hull(cp.slice(hi,hi+8)));   // Pedro, 4 Nov: a chip could cross a block between its sample points
   var placed=[],RM=56,POST=22;
   if(V._total)placed.push({x:V._total.offsetLeft-4,y:V._total.offsetTop-4,w:V._total.offsetWidth+8,h:V._total.offsetHeight+8});
   var clash=function(r,free){if(r.x<4||r.y<4||r.x+r.w>W-RM||r.y+r.h>H-4)return true;
     for(var j=0;j<placed.length;j++){var b=placed[j];if(r.x<b.x+b.w+3&&b.x<r.x+r.w+3&&r.y<b.y+b.h+2&&b.y<r.y+r.h+2)return true;}
-    if(free)return false;for(var k=0;k<cp.length;k++){var c=cp[k];if(c[0]>r.x-2&&c[0]<r.x+r.w+2&&c[1]>r.y-2&&c[1]<r.y+r.h+2)return true;}return false;};
+    if(free)return false;for(var k=0;k<hulls.length;k++)if(v3HullHit(hulls[k],r.x-2,r.y-2,r.x+r.w+2,r.y+r.h+2))return true;return false;};
   C.map(function(c){if(!c.w){c.w=c.el.offsetWidth;c.h=c.el.offsetHeight;}return {c:c,b:px(c.d.base[0],c.d.base[1],c.d.base[2])};})
    .sort(function(a,b){return b.b[1]-a.b[1];})
    .forEach(function(it){var c=it.c,b=it.b,best=null;
     if(b[2]>1){c.el.style.visibility='hidden';c.r=null;return;}c.el.style.visibility='';
-    for(var pass=0;pass<2&&!best;pass++)for(var k=0;k<(pass?40:16)&&!best;k++)for(var sd=0;sd<3&&!best;sd++){var up=k<16,dy=up?b[1]-POST-k*(c.h+3):b[1]+POST+c.h+(k-16)*(c.h+3),rx=sd===2?Math.max(4,Math.min(W-RM-c.w,b[0]-c.w/2)):sd?b[0]-c.w:b[0],r={x:rx,y:dy-c.h,w:c.w,h:c.h,dot:[Math.max(rx,Math.min(rx+c.w,b[0])),up?dy:dy-c.h]};if(!clash(r,pass))best=r;}   // zoomed right in, the coins fill the stage: then a chip may sit over coins, never over another chip or the total
+    for(var pass=0;pass<2&&!best;pass++)for(var k=0;k<40&&!best;k++)for(var sd=0;sd<3&&!best;sd++){var up=k<16,dy=up?b[1]-POST-k*(c.h+3):b[1]+POST+c.h+(k-16)*(c.h+3),rx=sd===2?Math.max(4,Math.min(W-RM-c.w,b[0]-c.w/2)):sd?b[0]-c.w:b[0],r={x:rx,y:dy-c.h,w:c.w,h:c.h,dot:[Math.max(rx,Math.min(rx+c.w,b[0])),up?dy:dy-c.h]};if(!clash(r,pass))best=r;}   // above the post first, then below it (Pedro, 4 Nov: the last chip had no room left above); zoomed right in, the coins fill the stage: then a chip may sit over coins, never over another chip or the total
     if(!best){var y0=Math.max(4,b[1]-POST-c.h),x0=Math.max(4,Math.min(W-RM-c.w,b[0]));best={x:x0,y:y0,w:c.w,h:c.h,dot:[Math.max(x0,Math.min(x0+c.w,b[0])),y0+c.h]};}   // no room at all: the nearest spot inside the stage
     placed.push(best);c.r=best;c.el.style.transform='translate('+Math.round(best.x)+'px,'+Math.round(best.y)+'px)';
     g.strokeStyle=c.col;g.fillStyle=c.col;g.globalAlpha=.9;g.lineWidth=1;g.beginPath();g.moveTo(b[0],b[1]);g.lineTo(best.dot[0],best.dot[1]);g.stroke();
     g.beginPath();g.arc(b[0],b[1],2,0,Math.PI*2);g.fill();g.beginPath();g.arc(best.dot[0],best.dot[1],1.5,0,Math.PI*2);g.fill();g.globalAlpha=1;});}
+/* a convex outline of screen points (monotone chain), and whether a box touches it */
+function v3Hull(P){P=P.slice().sort(function(a,b){return a[0]-b[0]||a[1]-b[1];});var cr=function(o,a,b){return (a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);},lo=[],up=[];
+  P.forEach(function(p){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p);});
+  for(var i=P.length-1;i>=0;i--){var p=P[i];while(up.length>1&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p);}
+  lo.pop();up.pop();var h=lo.concat(up),b=[1e9,1e9,-1e9,-1e9];h.forEach(function(p){b[0]=Math.min(b[0],p[0]);b[1]=Math.min(b[1],p[1]);b[2]=Math.max(b[2],p[0]);b[3]=Math.max(b[3],p[1]);});h.box=b;return h;}
+function v3HullHit(h,x0,y0,x1,y1){var b=h.box;if(!h.length||b[2]<x0||b[0]>x1||b[3]<y0||b[1]>y1)return false;
+  var ax=[[1,0],[0,1]];for(var i=0;i<h.length;i++){var a=h[i],c=h[(i+1)%h.length];ax.push([c[1]-a[1],a[0]-c[0]]);}   // separating axes: the box's two and each edge's normal
+  var bx=[[x0,y0],[x1,y0],[x1,y1],[x0,y1]];
+  for(var k=0;k<ax.length;k++){var n=ax[k],p0=1e18,p1=-1e18,q0=1e18,q1=-1e18;h.forEach(function(p){var d=p[0]*n[0]+p[1]*n[1];p0=Math.min(p0,d);p1=Math.max(p1,d);});bx.forEach(function(p){var d=p[0]*n[0]+p[1]*n[1];q0=Math.min(q0,d);q1=Math.max(q1,d);});if(p1<q0||q1<p0)return false;}
+  return true;}
 /* what the chips show and where they sit, for the tests */
 V3Scene.prototype.chipInfo=function(){var hr=this.host.getBoundingClientRect();return {total:this._total?{text:this._total.textContent,x0:this._total.offsetLeft,y0:this._total.offsetTop,x1:this._total.offsetLeft+this._total.offsetWidth,y1:this._total.offsetTop+this._total.offsetHeight}:null,W:this.host.clientWidth,H:this.host.clientHeight,on:!!(this._chipL&&this._chipL.classList.contains('on')),
   chips:(this._chips||[]).map(function(c){var cs=getComputedStyle(c.el),a=c.el.querySelector('.v3-chip-a'),n=c.el.querySelector('.v3-chip-n'),img=c.el.querySelector('img');
