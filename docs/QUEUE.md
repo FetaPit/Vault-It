@@ -72,6 +72,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Done (4 Nov 2026)
 
+- [x] v0.9.2 batch 1 released, 4 Nov ~19:52 by the owner from the laptop, live by 19:54: `c07862c` (round 2 A chrome, B labels and flow, F item viewer and F2, G crypto, and the solid cash 3D stacks), a plain fast-forward from fce1d89. CI run 41878633376 all 4 jobs green; Pedro PASS with notes. app.vault-it.co/version.json shows c07862c; vault-it.co/pitch-Eligent and -presenter return 200. From here round 2 (tiers I and the rest) ships from `candidate/v0.9.1` (laptop round 2 CoS); cash 3D and viewport speed ship from `candidate/v0.9.2` (cloud CoS). Owner, 20:00.
 - [x] v0.9.1 MVP released, 4 Nov ~15:45 by the owner from the laptop, live by 16:09 (hard deadline 16:00 to 16:10 UK). Release `fce1d89`: round 1, round 2 C roadmap, D house type, E coins one by one, roadmap follow-ups, cash 3D look, Founding badge copy, and production's pitch updates (presenter view, approved script) merged in so the push was a plain fast-forward from e9f1d46. CI run 41854535512 all 4 jobs green. app.vault-it.co/version.json shows fce1d89; vault-it.co/pitch-Eligent returns 200. Backup `backup/release-pioneer-v2-20261104-1430` (0e009b3).
 - [x] Founding badge copy (owner approved 4 Nov): "100 founding places · Be one of the first" until a real founder pays, then "N of 100 founding places left" from campaign_counts(), never seeded. `v09x/founder-copy`, released in fce1d89.
 
