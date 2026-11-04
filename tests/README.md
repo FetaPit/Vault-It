@@ -87,6 +87,7 @@ node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow dia
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
 node tests/test_v091_cash3d.js     # v0.9.1 chunk A: a gold plate and flag per cash account (bank mark, amount, rate), the intro drop, "Add to vault" per metal, the draw budget
 node tests/v3_measure.js           # not a test: prints the cash and metals stages' draw calls, triangles and frame times at 390 px on a 4x CPU, for before and after numbers
+node tests/test_v091_model_library.js  # v0.9.1 E30: the 3D button opens a search over models/catalog.json (title, tags, item, set), pick attaches and persists, CC-BY credit on the item and in a credits panel, stand-ins say "Close match", files load only when picked or opened, service worker and build handle models/, no new host, 320/390 px
 node tests/test_secondhand_server.js  # v0.9.1 E28: secondhand-estimate edge function (junk filter, trimmed median and IQR, haircut, condition factors, minimum 5, cache, flags off means no call), fixtures in tests/fixtures/secondhand
 node tests/test_v091_secondhand.js    # v0.9.1 E28: condition field, estimate needs a tap to apply, "Not available yet" with manual links, old items untouched, wording, 10.5 px floor
 node tests/test_v091_chrome.js      # v0.9.1 chrome: rotating dial mark (turns on load and click, static under reduced motion), bigger desktop menu bar (icons 24 / 22 px, no zoom), pinned Assets sub-menu (one row of six icons on phones), Message the Dev on Overview only, sidebar colours, crowdfund Vaulter card (prices from VI_PLANS, real counts, Open days)
@@ -97,3 +98,4 @@ node tests/test_v091_overview_budget.js  # v0.9.1 E4/E23/E5/E6: Cash Flow tile 3
 node tests/test_v091_inventory_files.js  # v0.9.1 E29: inventory 3D uploads: .glb .gltf .stl .obj .fbx .3mf preview, persist across reload, old glb-only record opens, STL/OBJ tinted, oversize and wrong type error
 - `test_v091_cash_accounts.js`: v0.9.1 E15/E16, cash account interest rate (AER), add and take out with Undo, over-balance refused, old saves load, pence-exact.
 node tests/test_v091_3d_fit.js  # v0.9.1: Net worth plate and Budget tree map never touch the stage edges with real data, at 1100 to 1920 wide, through the idle camera swing
+node tests/test_v091_model_library_all.js  # v0.9.1 E30: every one of the 233 library models attaches to an item with a preview and no page error (real files, local http)

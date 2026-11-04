@@ -1,5 +1,5 @@
 // v0.9.1 chrome (chunk v09x/chrome): E1 rotating V mark, E2 bigger desktop nav, E24 pinned Assets sub-menu, E27 Message the Dev on the
-// dashboard only, sidebar summary colours, E25 crowdfund Vaulter card (prices from VI_PLANS, real counts, "Open" days left).
+// dashboard only, sidebar summary colours, E25 crowdfund Vaulter card (prices from VI_PLANS) and the Founding badge (N left, from real counts).
 // Run: node tests/test_v091_chrome.js
 const { chromium } = require('playwright');
 const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');   // VI_INDEX points the test at another checkout
@@ -73,7 +73,7 @@ const open = async (b, w, h, theme, o = {}) => {
     // type floor and tap size (Pedro): sidebar labels, crowdfund labels, USP / PRO pills at least 10.5 px; crowdfund close 44 px
     const ty = await p.evaluate(() => { if (!document.getElementById('left-sidebar').classList.contains('open')) toggleSidebar(); viShowCampaign(); const fs = sel => Math.min(...[...document.querySelectorAll(sel)].filter(e => getComputedStyle(e).display !== 'none').map(e => parseFloat(getComputedStyle(e).fontSize)));
       const c = document.querySelector('.vi-camp-close').getBoundingClientRect(); document.getElementById('vi-campaign-modal').classList.add('hidden');
-      return { sb: fs('.sb-label'), camp: fs('#vi-campaign-modal .vi-camp-eyebrow,#vi-campaign-modal .vi-camp-stat-lbl,#vi-campaign-modal .vi-camp-tier-badge'), pill: fs('#topnav .vi-usp,#topnav .vi-pro'), cw: Math.round(c.width), ch: Math.round(c.height) }; });
+      return { sb: fs('.sb-label'), camp: fs('#vi-campaign-modal .vi-camp-eyebrow,#vi-campaign-modal .vi-camp-tier-badge'), pill: fs('#topnav .vi-usp,#topnav .vi-pro'), cw: Math.round(c.width), ch: Math.round(c.height) }; });
     ok(ty.sb >= 10.5 && ty.camp >= 10.5 && ty.pill >= 10.5 && ty.cw >= 44 && ty.ch >= 44, T + 'labels and pills at least 10.5 px, crowdfund close 44 px (' + JSON.stringify(ty) + ')');
     // tapping a sub-tab keeps the new panel's top in view under the bar
     await p.evaluate(() => scrollTo(0, 1500)); await p.waitForTimeout(150);
@@ -105,28 +105,28 @@ const open = async (b, w, h, theme, o = {}) => {
       VI_PLANS.monthly.price = 6.49; VI_PLANS.monthly.tester = 4.49; viShowCampaign(); out.live = document.querySelector('#vi-campaign-modal').innerText.replace(/\s+/g, ' ').indexOf('£6.49 a month after the 30-day free trial; £4.49 for testers') >= 0;
       VI_PLANS.monthly.price = P.price; VI_PLANS.monthly.tester = P.tester;
       const cta = [...card.querySelectorAll('button')].pop(); localStorage.removeItem('vi_beta'); cta.click(); out.tester = window.__opened[0]; localStorage.setItem('vi_beta', 'false'); cta.click(); out.full = window.__opened[1]; localStorage.removeItem('vi_beta');
-      out.links = [VI_STRIPE_LINKS.monthly_tester, VI_STRIPE_LINKS.monthly]; out.days = document.getElementById('camp-days').textContent; out.back = document.getElementById('camp-backers').textContent; return out; });
+      out.links = [VI_STRIPE_LINKS.monthly_tester, VI_STRIPE_LINKS.monthly]; out.badge = document.getElementById('camp-founder-slots').textContent; out.stats = !!document.querySelector('#vi-campaign-modal .vi-camp-stats'); return out; });
     ok(camp.ok, T + 'Vaulter card reads the owner\'s sentence ' + camp.txt);
     ok(camp.live, T + 'both prices come from VI_PLANS (change them and the card follows)');
     ok(camp.tester && camp.tester.indexOf(camp.links[0]) === 0 && camp.full && camp.full.indexOf(camp.links[1]) === 0, T + 'the button opens the existing tester link, or the full-price link when not a tester');
-    ok(camp.days === 'Open' && camp.back === '–', T + 'no deadline: days left "Open"; no count yet: backers a dash, never an invented 0 (' + camp.days + ' / ' + camp.back + ')');
+    ok(camp.badge === '100 places' && !camp.stats, T + 'no counts yet: the Founding badge says "100 places" and the backer and funded stats are gone (' + camp.badge + ')');
     ok(!p.errs.length, T + 'no page errors ' + p.errs.slice(0, 2).join('; '));
     await p.context().close();
   }
   // E25: counts come from the real aggregate function
   { const p = await open(b, 1100, 900, 'dark', { rpc: [{ plan: 'monthly', backers: 2 }, { plan: 'yearly', backers: 1 }, { plan: 'founder', backers: 3 }] });
     await p.evaluate(() => viShowCampaign()); await p.waitForTimeout(800);
-    const r = await p.evaluate(() => ({ b: document.getElementById('camp-backers').textContent, pct: document.getElementById('camp-pct').textContent, lbl: document.getElementById('camp-bar-lbl').textContent }));
-    ok(r.b === '6' && /3%/.test(r.pct) && /6 of 200/.test(r.lbl), 'E25 real counts 2+1+3 show 6 backers, 3% of the 200 goal (' + JSON.stringify(r) + ')');
+    const r = await p.evaluate(() => document.getElementById('camp-founder-slots').textContent);
+    ok(r === '97 left', 'E25 3 real founding backers (plus 2 monthly and 1 yearly, which do not count) show "97 left" (' + r + ')');
     await p.context().close(); }
   { const p = await open(b, 1100, 900, 'dark', { rpc: [] });
     await p.evaluate(() => viShowCampaign()); await p.waitForTimeout(800);
-    const r = await p.evaluate(() => [document.getElementById('camp-backers').textContent, document.getElementById('camp-pct').textContent]);
-    ok(r[0] === '0' && r[1] === '0%', 'E25 the server answers with no paid accounts: a real 0 and 0% (' + r + ')'); await p.context().close(); }
+    const r = await p.evaluate(() => document.getElementById('camp-founder-slots').textContent);
+    ok(r === '100 left', 'E25 the server answers with no paid accounts: "100 left" (' + r + ')'); await p.context().close(); }
   { const p = await open(b, 1100, 900, 'dark', { rpc: 'fail' });
     await p.evaluate(() => viShowCampaign()); await p.waitForTimeout(800);
-    const r = await p.evaluate(() => [document.getElementById('camp-backers').textContent, document.getElementById('camp-pct').textContent]);
-    ok(r[0] === '–' && r[1] === '–', 'E25 function not live yet: backers and funded are dashes, nothing invented (' + r + ')'); await p.context().close(); }
+    const r = await p.evaluate(() => document.getElementById('camp-founder-slots').textContent);
+    ok(r === '100 places', 'E25 function not live yet: "100 places", nothing invented (' + r + ')'); await p.context().close(); }
   // negative surplus turns red
   { const p = await open(b, 1100, 900, 'dark', { neg: true });
     await p.evaluate(() => { if (!document.getElementById('left-sidebar').classList.contains('open')) toggleSidebar(); viRenderLedger(); });
