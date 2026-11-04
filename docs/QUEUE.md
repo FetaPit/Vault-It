@@ -105,6 +105,7 @@ The single list of instructed work. Every session reads it at start and before e
   - C roadmap, R3 to R8 and R22 (1d783d9), and D house type, R12 to R15 (6aa0ccd): merged as 803dec7.
   - E coins one by one, R16 (d4a5ffc): merged as 8aff519.
   - Roadmap follow-ups C2, C3 and C3b (ab2406b): merged as ca4750d.
+  - B labels and flow, R2, R9 to R11: ready for review, `v091r2/labels-flow` 0143c09 (icons on the Net worth 3D and Cash flow 3D labels, income flow 15 to 20% shorter, solid 1.5 px divider; Pedro PASS, rollout-qc PASS, CI running), not merged.
 
 ## Done (3 Nov 2026)
 - [x] Release v0.8 + v0.9 to app.vault-it.co: 5e8b5a5 live 3 Nov 2026 (version.json checked), CI green, backup `backup/release-pioneer-v2-20261103-0203`; replaces Release the MVP and Alpha rollout v0.7 (owner's yes). Server: migration 013 applied; waitlist-join, waitlist-welcome, send-auth-email, tester-feedback, feedback-digest deployed. Still by hand: paste the six email templates from supabase/auth-templates/ into the Supabase dashboard; owner to open the live app once on the phone.
