@@ -49,13 +49,13 @@ const SECURITY = {
 // Inline scripts and styles are allowed because the app is one file; 'self' covers both sites' own files, blob:/data: cover generated models and photos.
 const SB = 'https://legpubblzgknxdtvsant.supabase.co';
 const CONNECT = [SB, 'wss://legpubblzgknxdtvsant.supabase.co', 'https://api.coingecko.com', 'https://open.er-api.com', 'https://api.metals.live', 'https://metals-api.com',
-  'https://www.alphavantage.co', 'https://api.anthropic.com', 'https://api.openverse.org', 'https://static.poly.pizza', 'https://poly.pizza', 'https://corsproxy.io',
+  'https://www.alphavantage.co', 'https://api.anthropic.com', 'https://api.openverse.org', 'https://corsproxy.io',
   'https://api.notion.com', 'https://api.convertkit.com', 'https://www.shibrpc.com', 'https://challenges.cloudflare.com'];
 const REPORT_ONLY = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://challenges.cloudflare.com",
   "connect-src 'self' blob: data: " + CONNECT.join(' '),
-  "img-src 'self' data: blob: https://logo.clearbit.com https://www.google.com https://static.poly.pizza https://poly.pizza",
+  "img-src 'self' data: blob: https://logo.clearbit.com https://www.google.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "frame-src https://challenges.cloudflare.com",

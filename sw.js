@@ -19,6 +19,7 @@ self.addEventListener('fetch', function (e) {
   if (req.method !== 'GET') return;
   var url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+  if (/\/models\//.test(url.pathname)) return;   // the 3D model library (models/glb is large): never precached or cached here, fetched only when someone picks a model
   if (url.pathname.endsWith('/version.json')) return;   // always live: the app uses it to spot a new release
   var page = req.mode === 'navigate' || /\/(index|recover)\.html$/.test(url.pathname);
   if (page) {
