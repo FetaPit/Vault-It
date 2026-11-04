@@ -86,6 +86,7 @@ node tests/test_v091_debt_reverse.js # v0.9.1 E33b: type icon under the logo on 
 node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, on #bd-sankey, Night and Daylight
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
 node tests/test_v091_cash3d.js     # v0.9.1 chunk A: a gold plate and flag per cash account (bank mark, amount, rate), the intro drop, "Add to vault" per metal, the draw budget
+node tests/test_v091_cash3d_frame.js  # v0.9.1 cash 3D phone framing: at 390 no coin sits under a flag (projected), desktop camera unchanged at 1280, flag floor and clamp kept; served over http
 node tests/v3_measure.js           # not a test: prints the cash and metals stages' draw calls, triangles and frame times at 390 px on a 4x CPU, for before and after numbers
 node tests/test_v091_model_library.js  # v0.9.1 E30: the 3D button opens a search over models/catalog.json (title, tags, item, set), pick attaches and persists, CC-BY credit on the item and in a credits panel, stand-ins say "Close match", files load only when picked or opened, service worker and build handle models/, no new host, 320/390 px
 node tests/test_secondhand_server.js  # v0.9.1 E28: secondhand-estimate edge function (junk filter, trimmed median and IQR, haircut, condition factors, minimum 5, cache, flags off means no call), fixtures in tests/fixtures/secondhand

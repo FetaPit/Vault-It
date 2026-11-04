@@ -21635,7 +21635,7 @@ V3Scene.prototype.clear=function(){var g=this.root,keep=function(x){return x&&x.
 /* Pedro, 3 Nov: no flag line under 10.5 px on screen. Each label is measured through the camera as framed and any
    label whose smallest line would show under minPx grows (its lower edge stays on the post). Returns true if one grew. */
 // size the flags (labelFloor) and clear them of each other (declutter), re-framing so the raised flags stay in view
-function v3Settle(V,keep){for(var i=0;i<3;i++){var g=V.labelFloor(10.8),c=V.clampFlags(56,8),m=V.declutter();if(!g&&!c&&!m)break;V.frame(keep&&V._framed);}V.labelFloor(10.8);V.clampFlags(56,8);V.declutter();}
+function v3Settle(V,keep){for(var i=0;i<3;i++){var g=V.labelFloor(10.8),c=V.clampFlags(56,8),m=V.declutter(v3Narrow());if(!g&&!c&&!m)break;V.frame(keep&&V._framed);}V.labelFloor(10.8);V.clampFlags(56,8);V.declutter(v3Narrow());}
 V3Scene.prototype.labelFloor=function(minPx){
   var H=this.host.clientHeight,cam=this.cam;if(!H)return false;
   this.root.updateMatrixWorld(true);cam.updateMatrixWorld();
@@ -21648,7 +21648,7 @@ V3Scene.prototype.labelFloor=function(minPx){
 };
 /* no flag hides another: each label's rectangle is projected on screen and, nearest first, a label that overlaps one
    already placed rises up its post until it is clear. Returns true if any moved. */
-V3Scene.prototype.declutter=function(){
+V3Scene.prototype.declutter=function(coins){   // coins: also keep every flag off the coins (phone width, owner via CoS 4 Nov: "at 390 px wide the cash 3D flags cover the coins")
   var H=this.host.clientHeight,cam=this.cam;if(!H)return false;
   this.root.updateMatrixWorld(true);cam.updateMatrixWorld();
   var up=new THREE.Vector3(0,1,0).applyQuaternion(cam.quaternion),rt=new THREE.Vector3(1,0,0).applyQuaternion(cam.quaternion),gap=8/H,L=[],posts=null,moved=false;
@@ -21657,10 +21657,15 @@ V3Scene.prototype.declutter=function(){
     [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){var q=p.clone().addScaledVector(rt,c[0]*sp.scale.x/2).addScaledVector(up,c[1]*sp.scale.y/2).project(cam);
       if(q.x<x0)x0=q.x;if(q.x>x1)x1=q.x;if(q.y<y0)y0=q.y;if(q.y>y1)y1=q.y;});return [x0,y0,x1,y1];};
   var hit=function(a,b){return a[0]<b[2]+gap&&b[0]<a[2]+gap&&a[1]<b[3]+gap&&b[1]<a[3]+gap;};
+  var cp=[];if(coins)this.root.traverse(function(o){if(!o.isInstancedMesh||!o.userData.v3Intro)return;   // each coin stack's or block's top corners and centre, on screen
+    if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();var bb=o.geometry.boundingBox,m=new THREE.Matrix4(),n=o.userData.v3Full||o.count;
+    var top=[[bb.min.x,bb.min.z],[bb.max.x,bb.min.z],[bb.min.x,bb.max.z],[bb.max.x,bb.max.z],[(bb.min.x+bb.max.x)/2,(bb.min.z+bb.max.z)/2]];
+    for(var i=0;i<n;i++){o.getMatrixAt(i,m);top.forEach(function(t){var q=new THREE.Vector3(t[0],bb.max.y,t[1]).applyMatrix4(m).applyMatrix4(o.matrixWorld).project(cam);cp.push([q.x,q.y]);});}});
+  var onCoin=function(r){for(var j=0;j<cp.length;j++){var q=cp[j];if(q[0]>r[0]-gap&&q[0]<r[2]+gap&&q[1]>r[1]-gap&&q[1]<r[3]+gap)return true;}return false;};
   L.forEach(function(o){o._r=rect(o);});L.sort(function(a,b){return a._r[1]-b._r[1];});   // lowest on screen (nearest) keeps its place
   var placed=[];
   L.forEach(function(o){var sp=o.tag,n=0;
-    while(n<60&&placed.some(function(r){return hit(o._r,r);})){sp.position.y+=sp.scale.y*0.2;sp.updateMatrixWorld();o._r=rect(o);n++;}
+    while(n<60&&(placed.some(function(r){return hit(o._r,r);})||(cp.length&&onCoin(o._r)))){sp.position.y+=sp.scale.y*0.2;sp.updateMatrixWorld();o._r=rect(o);n++;}
     if(n){moved=true;var top=sp.position.y-sp.scale.y*0.4;
       if(posts&&o.userData.v3PostI!=null){var pa=posts.geometry.attributes.position;pa.setY(o.userData.v3PostI,top);pa.needsUpdate=true;posts.geometry.computeBoundingSphere();}
       else o.children.forEach(function(c){if(c.isLine&&!c.isLineSegments){var a=c.geometry.attributes.position;a.setY(1,top);a.needsUpdate=true;c.geometry.computeBoundingSphere();}});}
