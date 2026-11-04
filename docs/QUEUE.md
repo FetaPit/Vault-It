@@ -94,7 +94,7 @@ The single list of instructed work. Every session reads it at start and before e
   - [~] (cloud) ready for review in 39ea35a/0872153: v09x/debt-cards follow-up E33b (owner, 3 Nov ~16:50): "What do we have iconography for these debt types if so let's apply them to the space uner the logo top right. What could we include on the reverse to give the user a reason to rotate and just give the reverse a purpose so its not just a gimmick". Pedro's 3 nits on E33 being cleared first.
   - [~] (cloud) v09x/stocks-return: E17 ready for review, green 1b400d3 (CI 41683290040 / 41687143081), QC PASS (session session_01Koffvyw2o8fx22xCknVKyw)
   - [~] (cloud) v09x/stocks-map: E19, E20 ready for review, green ef95a1b (CI 41702645119), QC PASS (session session_01KoffvwpqBH9vFhCBLx4oSh)
-  - [~] (cloud) v09x/crypto: E32 started, cut from v09x/stocks-map 459f664 (session session_01KoffvwpqBH9vFhCBLx4oSh)
+  - [~] (cloud) v09x/crypto: E32 ready for review, green 80df073 (CI 41740341844), QC PASS (session session_01KoffvwpqBH9vFhCBLx4oSh)
   - [~] (cloud) v09x/cash-accounts: E15, E16 ready for review (green c1a9bf5, CI run 41684441447, session session_01KoffvwhYtD2e8aZcLKS6bj)
   - [~] (cloud) v09x/model-library: E30 picker ready for review (branch v09x/model-library 5aa9340, CI green run 41711339820; session session_01KoffvwvF7z5Yrp72QnsYm4). Owner to decide: privacy notice still names Poly Pizza as a model source.
   - [~] (cloud) v09x/overview-budget: E4, E23, E5, E6 ready for review (cb0ddf9, CI green run 41693208446, rollout-qc PASS; session session_01Koffvym9zCiVwrwgean5Mp)
