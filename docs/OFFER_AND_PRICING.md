@@ -129,3 +129,21 @@ Switched off: the £59.99 yearly link (`plink_1TdPyH9mgKf6Hnty9IT0ARfh`) and the
 ## Decided by Pete (31 Oct 2026, afternoon)
 
 - Testers use the app free for their 30 days in return for detailed feedback. After that: **£3.99 a month, £39.99 a year** (was £21.99) or **Founding Member £99** (£50 off), each shown with the full price struck through. Full prices stay £5.99 / £49.99 / £149. The webhook maps the new links and prices.
+
+## Decided by Pete (4 Nov 2026): tier names, prices and icons (v0.9.1 round 2, chunk I)
+
+Owner's words: "Initial offering to users onboarded for testing is Vaulter 3.99 (normal price £5.99) Pioneer (Pro) billed yearly 49.99 ( will be £59.99) Founding Memeber £99 will be £149." This replaces the 31 Oct tester prices above.
+
+| Tier | Plan | Beta tester price (now) | After the beta | Link the app opens now | Link after the beta |
+|---|---|---|---|---|---|
+| **Vaulter** | monthly | £3.99 a month | £5.99 a month | `monthly_tester` (…VG03) | `monthly` (…VG00) |
+| **Pioneer** (Pro) | yearly | £49.99 a year | £59.99 a year | `annual` (…VG02, the live £49.99 link) | `annual_after_beta`: **empty, no Stripe link yet** |
+| **Founding Member** | once, 100 places | £99 once | £149 once | `founder_tester` (…VG07) | `founder` (…VG05) |
+
+- `VI_PLANS` in `index.html` is the single source: price (after the beta), tester price, and the `VI_STRIPE_LINKS` key for each. Every plan surface (Settings "Your plan", the paywall, the plans pop-up, the crowdfund modal) is painted from it by `viPricePaint()`.
+- While the beta is open (`VI_BETA_OPEN`, every account is a tester) the app shows the tester price with the later price as "£59.99 after the beta" (sentences: "£49.99 a year while in beta, £59.99 after"). Nothing is struck through and there are no "was" prices.
+- The app no longer links the £39.99 tester yearly link (…VG06). It is still active in Stripe; switching it off is the owner's call. The webhook still maps it, so anyone who bought through it stays matched.
+- **Before the beta closes**: create the £59.99 yearly Payment Link and paste it into `VI_STRIPE_LINKS.annual_after_beta`. Until then, with the beta closed, every yearly button is disabled and says "Coming soon"; no button can open a missing link (`tests/test_tier_prices.js`).
+- The after-trial state is plain **read-only** with no tier name. "Vaulter" now names only the monthly plan.
+- Price check, flagged to the owner: at beta prices 12 × £3.99 = £47.88, which is less than £49.99 a year, so the app makes no "save by paying yearly" claim. After the beta, 12 × £5.99 = £71.88 against £59.99.
+- Tier icons (Pedro's brief): Vaulter a vault door (teal), Pioneer a compass (purple), Founding Member a keystone with rank chevrons (brass), drawn as Wealth Roadmap medallions. Source `tools/build_tier_icons.js`; standalone files `brand/vault-it-tier-*.svg`.
