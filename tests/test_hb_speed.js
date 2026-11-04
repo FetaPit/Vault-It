@@ -70,7 +70,7 @@ const fmt = s => `long tasks ${s.longN} (max ${s.longMax.toFixed(0)} ms, blockin
 
   // ── 1. same look, less work ──
   let { p, ctx } = await open(true);
-  const L = await p.evaluate(() => {
+  const COST = () => {
     const v = HB3D.viewer, gl = v.renderer.getContext(), U = v._bU; v.stop();
     const sz = v.renderer.getDrawingBufferSize(new THREE.Vector2()), W = sz.x, H = sz.y;
     const shot = () => { v.renderer.render(v.scene, v.camera); const px = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, px); return px; };
@@ -104,7 +104,21 @@ const fmt = s => `long tasks ${s.longN} (max ${s.longMax.toFixed(0)} ms, blockin
     let diff = 0, maxd = 0; for (let i = 0; i < a.length; i++) { const d = Math.abs(a[i] - bOld[i]); if (d > maxd) maxd = d; if (d > 3) diff++; }
     v.start();
     return { hasStatic, active, laid, instAll, tNew, tOld, vNew, vOld, diff: diff / (W * H * 4), maxd, W, H };
-  });
+  };
+  /* a throttled runner (CoS, 4 Nov): on a normal run the old way's geometry work is about two thirds of its whole frame (64 to 67%
+     measured); on a shared CI runner that was being throttled it came in at 52% and the gates below failed, then passed on a plain re-run.
+     When that share is under 55%, the timing section runs once more and the second set of numbers is used. Every gate and number stays as
+     it is: a real slowdown in the new way is the same on the second run and still fails. HB_SPEED_FORCE_RETRY=1 forces the retry, to
+     check the retry path itself. */
+  const THROTTLED = x => x.hasStatic && x.tOld > 0 && x.vOld / x.tOld < 0.55;
+  let L = await p.evaluate(COST);
+  if (process.env.HB_SPEED_FORCE_RETRY === '1' && L.hasStatic) { console.log('[retry] HB_SPEED_FORCE_RETRY=1: treating the first timing as throttled'); L.forced = true; }
+  if (L.hasStatic && (THROTTLED(L) || L.forced)) {
+    const first = L;
+    console.log(`[retry] old-way baseline looks throttled: geometry ${first.vOld.toFixed(1)} ms is ${Math.round(first.vOld / first.tOld * 100)}% of the old-way frame ${first.tOld.toFixed(1)} ms (usually about two thirds); first run: geometry ${first.vNew.toFixed(1)} against ${first.vOld.toFixed(1)} ms, frame ${first.tNew.toFixed(1)} against ${first.tOld.toFixed(1)} ms. Timing once more.`);
+    L = await p.evaluate(COST);
+    console.log(`[retry] second run: geometry ${L.vNew != null ? L.vNew.toFixed(1) : '-'} against ${L.vOld != null ? L.vOld.toFixed(1) : '-'} ms (${L.tOld ? Math.round(L.vOld / L.tOld * 100) : '-'}% of the old-way frame), frame ${L.tNew.toFixed(1)} against ${L.tOld ? L.tOld.toFixed(1) : '-'} ms${THROTTLED(L) ? '; still looks throttled, the gates judge these numbers as they are' : ''}. The gates below use the second run.`);
+  }
   console.log(`[look] ${L.W} x ${L.H} px · ${L.laid} parts laid · instanced at rest ${L.active} (old way ${L.instAll == null ? '-' : L.instAll}) · a frame ${L.tNew.toFixed(1)} ms (old way ${L.tOld ? L.tOld.toFixed(1) : '-'} ms) · pixels differing ${L.diff != null ? (L.diff * 100).toFixed(3) + '%' : '-'} (max ${L.maxd == null ? '-' : L.maxd})`);
   // machine speed: the old way of drawing a frame cost about 60 ms where the limits below were set; a slower machine gets more room
   const K = Math.max(1, (L.tOld || L.tNew) / 60);
