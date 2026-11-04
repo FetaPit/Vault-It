@@ -11367,6 +11367,13 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wt-ol{fill:none;stroke-width:3.4;stroke-linejoin:round}
 .st-lock .wt-ol,.st-todo .wt-ol,.st-skip .wt-ol{stroke-opacity:.6}
 .wt-grey{fill:#8C939B;fill-opacity:.35;stroke:none;pointer-events:none}
+/* C2: slate names as boxed labels, in the Next goals heading style (.wr-g-h) */
+.fire-lbl{cursor:pointer}
+.fire-lbl rect{fill:var(--panel);fill-opacity:.94;stroke-width:1}
+.fire-lbl text{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;fill:var(--tx)}
+.fire-lbl.s-lock rect,.fire-lbl.s-todo rect{stroke-opacity:.45}
+.fire-lbl.s-lock text,.fire-lbl.s-todo text{fill:var(--t2)}
+.fire-lbl.s-skip text{fill:var(--amber)}
 .st-todo .wt-icon{color:#7d868e}
 .wt-edge{fill:var(--wt-dd);stroke:var(--wt-d);stroke-width:.6}
 .wt-rimline{fill:none;stroke:var(--wt-l);stroke-width:.8;stroke-opacity:.85}
@@ -18166,6 +18173,7 @@ var FIRE_PHASES=[
 // roadmap window geometry + state (declared early: the roadmap is first drawn during start-up)
 var _fireFirstPaint=true,_fireDetailIdx=-1,_fireSkipAsk=-1;
 var FIRE_NODE=128,FIRE_LEFT=70,FIRE_H=300;   // round 3 (owner, 3 Nov): larger tokens need wider spacing and a taller stage
+var FIRE_LBL_MAX=96;   // widest slate name label text (C2), so boxes stay clear of each other at FIRE_NODE spacing
 var FIRE_GH=114,FIRE_GF=1.42;   // the ground plane (v0.9.1 round 2, R3): its height, and how much wider its near edge is than its far edge
 var STK_COLORS=['#44c0b9','#c9a84c','#3ecf8e','#9b7ec8','#64b5f6','#e0894a','#e05c5c','#e8c56a'];
 // ── Budget categories + icons (declared before the init block runs) ──
@@ -26850,7 +26858,12 @@ function renderFIREroadmap(){
     var a=Math.max(x0,sp.x0),b=Math.min(x1,sp.x1);
     if(b<=a)return;
     if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line class="fire-div" x1="'+sp.x0+'" y1="'+GT+'" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="1.2" opacity="0.6" stroke-dasharray="4 3"/>';
-    out+='<text x="'+((a+b)/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.7')+'" letter-spacing="2.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
+    // C3 (owner, 4 Nov: "change to a wider version of the font and project the text for these stages across the ground plane in perspective"):
+    // the section name is painted on the ground: big Syne lettering, stretched wide, squashed in depth and leaning with the grid (fireSecTf).
+    // Follow-up (owner: "Test it too wide needs to be legible within a mobile screen , drop opacity to 70%"): 70% opacity; fireFitLabels
+    // shrinks a word wider than the view, and fireDividers keeps it under the middle of the view while its section is there
+    var scx=(a+b)/2,sby=H-15,vx0=SC.scrollLeft+containerW/2;
+    out+='<text class="fire-sec" data-x0="'+sp.x0+'" data-x1="'+sp.x1+'" data-x="'+scx+'" data-y="'+sby+'" x="'+scx+'" y="'+sby+'" transform="'+fireSecTf(scx,sby,vx0)+'" text-anchor="middle" font-size="26" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="0.7" letter-spacing="8">'+sp.label+(sp.done?' ✓':'')+'</text>';
   });
   var tokW=function(k){return k===nextIdx?80:64;},coinR=function(k){return tokW(k)/2;};   // card widths (owner, 3 Nov round 3: "larger"): 80 px for the stage to work on, 64 px for the rest
   // the path on the ground: solid up to the last passed stage, dashed beyond, running between the light pads (owner, 31 Oct)
@@ -26875,11 +26888,14 @@ function renderFIREroadmap(){
     if(stt==='done'||stt==='next'||stt==='wait')out+='<polygon points="'+(cx-W*.3).toFixed(1)+','+PATH_Y+' '+(cx+W*.3).toFixed(1)+','+PATH_Y+' '+(cx+W*.42).toFixed(1)+','+bot+' '+(cx-W*.42).toFixed(1)+','+bot+'" fill="url(#wt-beam)" opacity="'+(isNext?1:stt==='done'?0.55:0.3)+'"/>';
     else out+='<line x1="'+cx+'" y1="'+(bot+4)+'" x2="'+cx+'" y2="'+(PATH_Y-3)+'" stroke="'+(skipped?'#e8a23c':'#7d8793')+'" stroke-opacity=".45" stroke-dasharray="2 3"/>';
     if(i===_fireDetailIdx)out+='<polygon class="fire-sel" points="'+wrPts(WR_CARD,cx-W/2-W*.08,top-W*.08,W*1.16/100)+'" fill="none" stroke="var(--gold)" style="stroke:var(--gold)" stroke-width="1"/>';   // the tapped stage: a 1 px gold outline (E3)
-    out+='<g class="fire-card"><g transform="translate('+(cx-W/2)+' '+top.toFixed(1)+') scale('+(W/100).toFixed(3)+')">'+wrTok({tier:WR_LOOK_TIER[look],st:stt,bars:sts.length,lit:lit,ic:WR_STAGE_IC[s.key]||s.ic,r:NODE_R,px:W,sc:W/100,chip:stt==='next'||stt==='todo'?'':stt,ol:secCol,grey:done})+'</g></g>';
+    out+='<g class="fire-card"><g transform="translate('+(cx-W/2)+' '+top.toFixed(1)+') scale('+(W/100).toFixed(3)+')">'+wrTok({tier:WR_LOOK_TIER[look],st:stt,bars:sts.length,lit:lit,ic:WR_STAGE_IC[s.key]||s.ic,r:NODE_R,px:W,sc:W/100,chip:stt==='next'||stt==='todo'?'':stt,ol:secCol,grey:stt==='wait'})+'</g></g>';   // C2 (owner, 4 Nov ~12:40): "only grey out ones that have not been achieved yet": achieved in full colour; locked and not-yet slates use the grey card art, a met-but-waiting one a 35% wash
     // the name sits under the card, in the air above the ground (owner, 3 Nov: not on the card at this size)
-    var nameCol=done?secCol:(isNext||waiting)?'#e9f1f1':skipped?'#e8a23c':'rgba(154,160,166,0.75)';
-    var nmFit=s.name.length*8.9>108?' textLength="108" lengthAdjust="spacingAndGlyphs"':'';   // a long name is drawn a little narrower so neighbours never run together (round 2)
-    out+='<text x="'+cx+'" y="'+(bot+(isNext?24:17))+'" text-anchor="middle" font-size="11.5" font-family="Syne,sans-serif" font-weight="800" fill="'+nameCol+'"'+nmFit+click+'>'+s.name+'</text>';
+    /* C2 (owner, 4 Nov ~12:40: "The text underneath need to have more breathing space so move it down ... and treat it as a label with a
+       bounding box with attached font"): the name is a boxed label in the Next goals heading style (Syne bold, light on panel), on one row
+       16 px under the standard slates, edged in the section colour. fireFitLabels sizes each box to its text once drawn */
+    var LY=GY-60+16,lw=Math.min(FIRE_LBL_MAX,s.name.length*7)+14;
+    out+='<g class="fire-lbl s-'+stt+'"'+click+'><rect x="'+(cx-lw/2).toFixed(1)+'" y="'+LY+'" width="'+lw.toFixed(1)+'" height="20" style="stroke:'+secCol+'"/>'
+      +'<text x="'+cx+'" y="'+(LY+14)+'" text-anchor="middle" font-size="11">'+s.name+'</text></g>';
     if(isNext){   // tag for the stage to work on now
       var tag=(s.no===1)?'START HERE':'NEXT UP';
       out+='<rect x="'+(cx-40)+'" y="'+(top-30)+'" width="80" height="16" fill="'+col+'26" stroke="'+col+'" stroke-width="0.8"/>'
@@ -26892,7 +26908,7 @@ function renderFIREroadmap(){
   svgEl.style.left=x0+'px';
   renderFIREroadmap._win={x0:x0,x1:x1,total:TOTAL_W};
   out=viDay(out);
-  if(svgEl.__sig!==out){svgEl.__sig=out;svgEl.innerHTML=out;}   // identical drawing = no repaint
+  if(svgEl.__sig!==out){svgEl.__sig=out;svgEl.innerHTML=out;fireFitLabels(svgEl);}   // identical drawing = no repaint
   fireCarousel();
 }
 /* phones (owner, 31 Oct): the roadmap behaves like a carousel: the coin in the centre is the largest, the others shrink and fade
@@ -26902,6 +26918,27 @@ function renderFIREroadmap(){
 /* v0.9.1 round 2 (owner, 4 Nov, R3: "Increase the two point perspective behind the achievements and decrease perspective height", red
    sketch on the overview): the ground is a plane FIRE_GH tall that starts right under the slates, its far edge inset from both sides and
    its near edge FIRE_GF times wider, so it runs out past the card on both sides; the across lines bunch towards the far edge */
+// size each slate's name box to its text; a name wider than FIRE_LBL_MAX is drawn a little narrower so neighbouring boxes never touch
+function fireFitLabels(svg){
+  var SC=document.getElementById('fire-timeline-scroll'),maxW=SC?SC.clientWidth*.86:1e4;
+  [].forEach.call(svg.querySelectorAll('text.fire-sec'),function(t){
+    t.setAttribute('font-size',26);t.setAttribute('letter-spacing',8);
+    var L=0;try{L=t.getComputedTextLength();}catch(e){}
+    if(!(L>0))return;
+    var W=L*1.35;if(W>maxW){var k=maxW/W;t.setAttribute('font-size',(26*k).toFixed(1));t.setAttribute('letter-spacing',(8*k).toFixed(1));W=maxW;}
+    t.setAttribute('data-w',W.toFixed(1));
+  });
+  if(SC)try{fireDividers(SC);}catch(e){}
+  [].forEach.call(svg.querySelectorAll('.fire-lbl'),function(L){
+    var t=L.querySelector('text'),r=L.querySelector('rect');if(!t||!r)return;
+    t.removeAttribute('textLength');t.removeAttribute('lengthAdjust');
+    var w=0;try{w=t.getComputedTextLength();}catch(e){}
+    if(!(w>0))return;   // not laid out yet: the estimate stays
+    if(w>FIRE_LBL_MAX){t.setAttribute('textLength',FIRE_LBL_MAX);t.setAttribute('lengthAdjust','spacingAndGlyphs');w=FIRE_LBL_MAX;}
+    var cx=+t.getAttribute('x');r.setAttribute('x',(cx-w/2-7).toFixed(1));r.setAttribute('width',(w+14).toFixed(1));
+  });
+}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){var s=document.getElementById('fire-roadmap-svg');if(s)fireFitLabels(s);});   // Syne arrives after the first drawing
 function fireGroundX(x,y,vx){return vx+(x-vx)*(1+(FIRE_GF-1)*y/FIRE_GH);}   // where a point x on the far edge sits at depth y
 function fireGround(){
   var g=document.getElementById('fire-ground'),SC=document.getElementById('fire-timeline-scroll');if(!g||!SC)return;
@@ -26914,10 +26951,20 @@ function fireGround(){
   for(var x=vx-Math.floor((vx-L)/sp)*sp;x<=R+.1;x+=sp)o+='<line class="fg-v" x1="'+x.toFixed(1)+'" y1="0" x2="'+at(x,h)+'" y2="'+h+'"/>';
   g.setAttribute('viewBox','0 0 '+w+' '+h);g.innerHTML=o;
 }
+// lettering lying on the ground (C3): about its baseline point (x,y), 1.35 times wider (the "wider version of the font"), squashed to half
+// its height by the depth, and sheared so its uprights run towards the grid's vanishing point, as the dividers do
+function fireSecTf(x,y,vx){
+  var gy=y-(FIRE_H-FIRE_GH),k=1+(FIRE_GF-1)*gy/FIRE_GH,a=1.35,d=.5,c=(x-vx)*(FIRE_GF-1)/(FIRE_GH*k)*d;
+  return 'matrix('+a+' 0 '+c.toFixed(4)+' '+d+' '+(x-a*x-c*y).toFixed(2)+' '+(y-d*y).toFixed(2)+')';
+}
 // the section dividers lie on the ground, so their near end follows the same perspective as the grid (R6); the view's middle moves as it scrolls
 function fireDividers(SC){
   var vx=SC.scrollLeft+SC.clientWidth/2;
   [].forEach.call(document.querySelectorAll('#fire-roadmap-svg line.fire-div'),function(l){var x=+l.getAttribute('x1');l.setAttribute('x2',fireGroundX(x,FIRE_GH,vx).toFixed(1));});
+  [].forEach.call(document.querySelectorAll('#fire-roadmap-svg text.fire-sec'),function(t){
+    var x0=+t.getAttribute('data-x0'),x1=+t.getAttribute('data-x1'),hw=(+t.getAttribute('data-w')||0)/2+8,x=x1-x0<=2*hw?(x0+x1)/2:Math.max(x0+hw,Math.min(x1-hw,vx));
+    t.setAttribute('x',x.toFixed(1));t.setAttribute('data-x',x.toFixed(1));t.setAttribute('transform',fireSecTf(x,+t.getAttribute('data-y'),vx));
+  });
 }
 function fireCarousel(){
   try{fireGround();}catch(e){}
