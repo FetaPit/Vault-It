@@ -14,7 +14,7 @@ The single list of instructed work. Every session reads it at start and before e
 - [ ] Eligent pitch, Sat 7 Nov (owner). The pitch page is live at vault-it.co/pitch-Eligent. The 17:00 4 Nov Zoom pitch is the item below.
 - [ ] v0.9.2 parked list (owner, 4 Nov, cut for the 16:00 MVP):
   - **Top, owner 4 Nov ~16:25 (live feedback on v0.9.1):** (claimed, cloud: cash 3D session) cash 3D coin stacks look hollow from the side (Monzo grid: one slab with empty curved gaps underneath). Once stacked, each stack must be its own solid model, not the grid as one shape. Builder: cash 3D session, branch `v092/cash3d-solid` off release fce1d89.
-  - **Top, owner 4 Nov ~16:25:** viewports still too slow: cash, gold and precious metals, wealth inventory, liabilities. Measure first (cold load, 390 px, CPU 4x) on live fce1d89 and on candidate 4a0ce74 (round 2 F already targets inventory and liabilities), then fix. Builder: new perf session, branch `v092/viewport-perf`.
+  - **Top, owner 4 Nov ~16:25:** (claimed, cloud: viewport perf session, branch `v092/viewport-perf`) viewports still too slow: cash, gold and precious metals, wealth inventory, liabilities. Measure first (cold load, 390 px, CPU 4x) on live fce1d89 and on candidate 4a0ce74 (round 2 F already targets inventory and liabilities), then fix. Builder: new perf session, branch `v092/viewport-perf`.
   - No production pushes before the owner's 17:00 pitch call (owner, 4 Nov).
   - Round 2 A chrome (R1, R23 to R26), B labels and flow (R2, R9 to R11) and G crypto (R19, R20): sessions paused 4 Nov ~10:15, worktrees kept.
   - Round 2 F item viewer (R17, R18, R21): merged into `candidate/v0.9.1` 4a0ce74 at 14:48 but not in the v0.9.1 release; ships with 0.9.2.
