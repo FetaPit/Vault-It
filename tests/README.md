@@ -76,7 +76,7 @@ node tests/test_v07_e1.js          # v0.7 E1: bottom tab bar at 599 px and under
 node tests/test_v07_e2.js          # v0.7 E2: the roadmap opens centred on the next achievement, each time the tab opens
 node tests/test_v07_e3.js          # v0.7 E3: gold roadmap tile gone; stage detail on tap (Next up, Met. Waiting on, ring, close x/Esc)
 node tests/test_wealth_roadmap.js   # Wealth Roadmap (3 Nov): tab label, one roadmap card mirrored, octagon tokens with studs and tiers, levels, XP, side quests, badge tokens, phone floor
-node tests/test_v091r2_roadmap.js   # v0.9.1 round 2 chunk C (4 Nov): wide ground plane, leaning dividers, section colour outlines, 35% grey on achieved, teal/purple/gold graduation, 50 achievements, profile card reads the roadmap level
+node tests/test_v091r2_roadmap.js   # v0.9.1 round 2 chunk C (4 Nov): wide ground plane, leaning dividers, section colour outlines, grey only on slates not achieved (C2), boxed name labels (C2), teal/purple/gold graduation, 50 achievements, profile card reads the roadmap level
 node tests/test_toast_race.js      # shared toast (v0.9.1): the opening build unlocks badges quietly, showToast() and toast() share one hide timer counted from when it is drawn, so no older timer or long task hides a newer toast
 node tests/test_v07_e9.js          # v0.7 E9: budget spending groups folded by default; a saved choice wins
 node tests/test_v07_e10.js         # v0.7 E10: expense bar arrow: sprite chevron 20 px in a 44 px target, down folded, up open
