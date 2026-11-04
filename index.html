@@ -29012,17 +29012,49 @@ function checkStreak() {
 }
 
 // ── TASK 1: DEMO MODE ────────────────────────────────────────────
+// Every key that holds a person's saved data, or shows this device has been used by someone. Kept in one place: the demo
+// seed may load only when none of these holds anything (v0.9.1: a device with pos_al1 but no pos_ov1 used to boot as empty,
+// was switched into demo mode and its real data was then treated as sample data).
+var _VI_SAVED_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1','pos4','pos_house','ht3','pos_journey',
+  'vi_jrny_events','vi_nw_history','vi_debt','vi_ov','vi_settings','vi_user','vi_session','vi_last_email',
+  'vi_pin_hash','vi_declined_demo'];
+var _VI_SAVED_PREFIX = /^(vi_snap_|sb-.+-auth-token$)/;
+var _VI_BOOKKEEPING = { v: 1, version: 1, ts: 1, updated: 1, lastUpdated: 1 };   // fields that say nothing about the person
+// a key holds data when it has any non-zero number, non-empty text or true in it (the app writes empty defaults such as
+// pos_ach1 {"xp":0,"unlocked":[],...,"v":1} on every first boot; those are not a person's data)
+function _viKeyHasData(k) {
+  var v = null; try { v = localStorage.getItem(k); } catch (e) {}
+  if (v == null || /^\s*$/.test(v)) return false;
+  var j; try { j = JSON.parse(v); } catch (e) { return true; }   // plain text that is not JSON counts as data
+  var deep = function(x) {
+    if (x == null || x === false || x === 0 || x === '') return false;
+    if (typeof x !== 'object') return true;
+    for (var q in x) if (Object.prototype.hasOwnProperty.call(x, q) && !_VI_BOOKKEEPING[q] && deep(x[q])) return true;
+    return false;
+  };
+  return deep(j);
+}
+function _viDeviceHasSavedData() {
+  try {
+    for (var i = 0; i < _VI_SAVED_KEYS.length; i++) if (_viKeyHasData(_VI_SAVED_KEYS[i])) return true;
+    for (var j = 0; j < localStorage.length; j++) { var k = localStorage.key(j); if (_VI_SAVED_PREFIX.test(k) && _viKeyHasData(k)) return true; }
+  } catch (e) { return true; }   // storage that cannot be read is never treated as empty
+  return false;
+}
+function _demoPut(k, v) { if (!_viKeyHasData(k)) localStorage.setItem(k, v); }   // the demo only ever fills empty keys
 function loadDemoData() {
-  localStorage.setItem('vi_demo_mode', 'true');
+  // refuses on any device that holds saved data, and never writes over a key that already has something in it
+  if (_viDeviceHasSavedData()) return false;
+  _demoPut('vi_demo_mode', 'true');
   // Rich UK demo persona — used when no user data exists
   if (!localStorage.getItem('vi_user')) {
-    localStorage.setItem('vi_user', JSON.stringify({
+    _demoPut('vi_user', JSON.stringify({
       name: 'Alex Morgan', email: 'demo@vault-it.app',
       job: 'Senior Product Manager', dream: 'Financial independence by 45',
       saveArch: 'The Strategic Investor', spendArch: 'The Measured Spender',
       joined: new Date().toISOString(), pioneerNum: 7
     }));
-    localStorage.setItem('vi_pioneer', 'true');
+    _demoPut('vi_pioneer', 'true');
   }
   if (!localStorage.getItem('pos_ov1')) {
     // Assets & debts live in their own tabs, so the Overview quick-add lists stay empty here
@@ -29032,7 +29064,7 @@ function loadDemoData() {
       var _m = new Date(_dd.getFullYear(), _dd.getMonth() - _i, 1);
       _dm.push({ month: _m.getFullYear() + '-' + String(_m.getMonth() + 1).padStart(2, '0'), nw: _nw[7 - _i], debt: 32950 + _i * 450, liab: 400, income: 4150 });
     }
-    localStorage.setItem('pos_ov1', JSON.stringify({
+    _demoPut('pos_ov1', JSON.stringify({
       assets: [], debts: [], snapshots: _dm,
       milestones: [10000, 0, 25000, 50000, 100000],
       income: [
@@ -29061,7 +29093,7 @@ function loadDemoData() {
     }));
   }
   if (!localStorage.getItem('pos_al1')) {
-    localStorage.setItem('pos_al1', JSON.stringify({
+    _demoPut('pos_al1', JSON.stringify({
       metals: { gold: 2.5, silver: 15, platinum: 0, palladium: 0 },
       crypto: [{ id: 1, sym: 'ETH', amount: 1.4, price: 2200 }, { id: 2, sym: 'BTC', amount: 0.05, price: 42000 }],
       cashAccounts: [
@@ -29081,7 +29113,7 @@ function loadDemoData() {
   }
   if (!localStorage.getItem('ht3')) {
     // House Builder reads "ht3" (the old demo wrote an unused key, so the house stayed blank)
-    localStorage.setItem('ht3', JSON.stringify({
+    _demoPut('ht3', JSON.stringify({
       saved: 22500, target: 240000, houseType: 'terraced',
       deposits: [
         { date: '01/10/2025', amount: 5000 }, { date: '01/11/2025', amount: 4500 },
@@ -29095,20 +29127,21 @@ function loadDemoData() {
     try { if (typeof state !== 'undefined' && !(+state.saved > 0)) { var _hd = JSON.parse(localStorage.getItem('ht3')); state = Object.assign({}, state, _hd, { prices: Object.assign({}, DEFAULTS, _hd.prices || {}) }); } } catch (e) {}
   }
   if (!localStorage.getItem('pos_journey')) {
-    localStorage.setItem('pos_journey', JSON.stringify({
+    _demoPut('pos_journey', JSON.stringify({
       profile: { monthlyTakeHome: 3800, mortgageTermYears: 25, interestRateEst: 4.5, depositTargetPct: 10, creditHealth: 'good', efMonths: 4 },
       onboarded: true, stageOverride: 1, mortgageActive: false, mortgageBalance: 0, rentMonthly: 1200, rentYears: 3
     }));
   }
   // (QC-3) pos4 removed — it was never read; cashflow reads pos_ov1 / ovState.
   if (!localStorage.getItem('pos_debt1')) {
-    localStorage.setItem('pos_debt1', JSON.stringify({
+    _demoPut('pos_debt1', JSON.stringify({
       debts: [
         { id: 1, name: 'Student Loan Plan 2', balance: 24300, original: 38000, rate: 7.1, minPay: 180, type: 'loan', color: '#c9a84c' },
         { id: 2, name: 'Barclaycard', balance: 1850, original: 3200, rate: 24.9, minPay: 55, type: 'credit', color: '#44c0b9' }
       ]
     }));
   }
+  return true;
 }
 
 function clearDemoData() {
@@ -29118,16 +29151,15 @@ function clearDemoData() {
 }
 
 function initDemoMode() {
-  var hasUser = !!localStorage.getItem('vi_user');
-  var hasData = !!localStorage.getItem('pos_ov1');
-  var declined = localStorage.getItem('vi_declined_demo') === 'true';
   var isDemo  = localStorage.getItem('vi_demo_mode') === 'true';
+  // any saved data (not just pos_ov1), a profile, a sign-in or an earlier "no thanks" means this is not an empty device
+  var hasData = !isDemo && _viDeviceHasSavedData();
   // a device where someone has just signed in (an account switch wipes the old data, keeps the sign-in and reloads) starts clean:
   // loading the demo there used to drop the new sign-in a moment later (found 31 Oct by test_beta_client)
   var session = null; try { session = JSON.parse(localStorage.getItem('vi_session') || 'null'); } catch (e) {}
   var signedIn = !!(session && session.email && session.expiry > Date.now());
-  if (!hasUser && !hasData && !declined && !signedIn) {
-    loadDemoData(); isDemo = true;
+  if (!isDemo && !hasData && !signedIn && loadDemoData()) {
+    isDemo = true;
     // the seed lands after the app's state has loaded: read it back and redraw, so the first visit is not empty until a reload (release chat, 1 Nov)
     try { _reloadAllState(); } catch (e) {}
     try { updateKPIs(); drawChart(); renderCashflow(); renderSummaryCards(); renderFIREroadmap(); } catch (e) {}
