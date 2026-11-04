@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] (cloud, Marketing) Eligent presenter view: add the approved script in the lower right of the presenter (owner, 4 Nov ~15:00: "I actually want the script too in the lower right quarter of the presenter").
 - [~] v0.9.1 MVP release, hard deadline 16:00 UK today (owner via Exec Assistant, 4 Nov).
   - Release build 51b2848, CI green, run 41832893910.
   - Includes the pitch page merge, so the push is a fast-forward from live 6e9c618.
