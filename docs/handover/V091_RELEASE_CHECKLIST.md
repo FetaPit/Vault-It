@@ -1,6 +1,8 @@
 # v0.9.1 release checklist (4 Nov 2026, MVP by 16:00)
 
-**Release candidate: `51b2848` on `candidate/v0.9.1`.** **CI green on that exact SHA: run 41832893910, all 4 jobs, first attempt (13:13).** GO. Release any time from now; 14:30 is the latest comfortable slot.
+**Update 14:38: release `ca4750d` instead (CI green, run 41843436465, all 4 jobs). It is 51b2848 plus round 2 E coins and the roadmap follow-ups, and it still includes the pitch page.** Push command: `git push origin ca4750da6947cf0b531b151515f56faab0b35c6f:refs/heads/release/pioneer-v2`. 51b2848 stays the fallback.
+
+**Earlier candidate: `51b2848` on `candidate/v0.9.1`.** **CI green on that exact SHA: run 41832893910, all 4 jobs, first attempt (13:13).** GO. Release any time from now; 14:30 is the latest comfortable slot.
 
 What is in it:
 - Round 1: all 13 chunks plus follow-ups, the demo-seed data-loss guard, cash 3D phone framing.
