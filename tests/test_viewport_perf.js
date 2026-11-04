@@ -5,7 +5,7 @@
 //  - wealth inventory and liabilities: one WebGL renderer for the tile's live view and the full viewer, however often they open;
 //    the tile hands its model to the full viewer (no second read); one draw per frame; nothing draws after close; draw calls and
 //    triangles under budget; a tap on the live tile still opens the full viewer (its listeners moved off the shared canvas)
-//  - cash and precious metals: each open sets the drawing buffer size at most three times (once to fit, once to the lower pixel
+//  - cash and precious metals: the idle warm-up (renderer and shaders) starts as soon as the 3D engine is in; each open sets the drawing buffer size at most three times (once to fit, once to the lower pixel
 //    ratio while coins land, once back); a pixel ratio change and a resize were two sets each; draw calls and triangles under budget
 // Run: node tests/test_viewport_perf.js     (VI_ROOT=/path/to/checkout to test another copy)
 const { chromium } = require('playwright');
@@ -30,6 +30,7 @@ const SEED = `(function(){if(localStorage.getItem('pos_al1'))return;localStorage
 // every WebGL renderer made, every draw (with the animation frame it fell in and the viewport its canvas sits in), every drawing-buffer size set (the browser clears and reallocates the buffer on each, even to the same size)
 const HOOK = () => {
   const T = window.__P = { made: [], r: [], buf: [], frame: 0 };
+  document.addEventListener('vi-three', () => { T.three = performance.now(); });
   const tick = () => { T.frame++; requestAnimationFrame(tick); }; requestAnimationFrame(tick);
   const lab = cv => !cv.isConnected ? 'off' : cv.closest('#i3d-modal') ? 'modal' : cv.closest('.i3d-live') ? 'tile' : cv.closest('#cashSceneCard') ? 'cash' : cv.closest('#metalsSceneCard') ? 'metals' : 'other';
   const wrap = O => { const W = function (o) { O.call(this, o); T.made.push([performance.now(), !!(o && o.preserveDrawingBuffer)]); const self = this, rr = this.render;
@@ -63,6 +64,9 @@ const last = (p, l) => p.evaluate(l => { const x = __P.r.filter(r => r[2] === l)
   await p.goto(origin + '/index.html', { waitUntil: 'load' }); await p.addStyleTag({ content: HIDE });
   await p.waitForFunction(() => !!window.THREE && !!THREE.OrbitControls && !!THREE.GLTFLoader, null, { timeout: 60000 }).catch(() => {});
   await settle(p, 3000);
+  // the cash and metals warm-up starts as soon as the 3D engine is in: its renderer (the first one made) follows the 'vi-three' event
+  const ws = await p.evaluate(() => ({ three: __P.three, first: (__P.made.find(m => !m[1] && m[0] >= (__P.three || 0)) || [null])[0] }));
+  ok(ws.three != null && ws.first != null && ws.first - ws.three < 1000, 'the cash and metals warm-up starts within 1 s of the 3D engine arriving (' + (ws.first != null && ws.three != null ? Math.round(ws.first - ws.three) + ' ms' : 'not seen') + '; it waited for a 1.5 s poll)');
   await p.evaluate(() => { const f = window.i3dParse; window.__parses = 0; window.i3dParse = function () { window.__parses++; return f.apply(this, arguments); }; });
 
   // ── 1. cash and savings: tab, sub-tab, scroll down to the stage ──
