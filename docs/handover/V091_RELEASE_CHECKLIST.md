@@ -37,6 +37,13 @@ Frozen for the deadline: no more merges into `candidate/v0.9.1` until the releas
    git push --force-with-lease=release/pioneer-v2:51b2848929c8eb016d5f19010930f5a27f8a39d1 origin 6e9c618:refs/heads/release/pioneer-v2
    ```
 
+## Optional second push (only if the Chief of Staff confirms CI green on `ca4750d`)
+At 14:00 the round 2 Chief of Staff merged two more chunks on top of 51b2848: E coins one by one (R16) and roadmap follow-ups (C2, C3, C3b). The candidate is now `ca4750d`, and its CI (run 41843436465) finishes about 14:37. Release 51b2848 first. If ca4750d is confirmed green, run this plain fast-forward push:
+```bash
+git push origin ca4750da6947cf0b531b151515f56faab0b35c6f:refs/heads/release/pioneer-v2
+```
+Then repeat the live check in step 4.
+
 ## Optional, after the pitch (not needed for the MVP)
 - Second-hand prices function. Type the token on the laptop only, never in chat:
   ```bash
