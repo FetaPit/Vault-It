@@ -97,7 +97,7 @@
 @keyframes icglow{0%,100%{box-shadow:0 0 6px color-mix(in srgb,var(--ic) 25%,transparent)}50%{box-shadow:0 0 26px color-mix(in srgb,var(--ic) 65%,transparent)}}
 @keyframes icping{0%{transform:scale(.96);opacity:.8}70%{transform:scale(1.55);opacity:0}100%{transform:scale(1.55);opacity:0}}
 .ic{--vi-sw:1.1}
-.ic.sm{--vi-sw:1.5}
+.ic.sm{--vi-sw:1.5;--vi-d:0} /* icon pack v2: detail lines drop out under 24px */
 .vi-tabs{--ic:var(--tc)}
 .vi-tabs a{--ic:var(--tc,var(--teal))}
 .vi-tabs a .ic{width:18px;height:18px;color:var(--tc,var(--teal))}

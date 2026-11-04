@@ -846,7 +846,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
     <p style="color:var(--muted);font-size:14px;margin-top:14px">Select an icon to copy its SVG. It uses currentColor, so set the colour with CSS.</p>
 
     <h3 style="margin-top:36px">Use it</h3>
-    <pre tabindex="0">&lt;!-- 1. paste vault-it-icons-v2.svg once at the top of the page --&gt;
+    <pre tabindex="0">&lt;!-- 1. paste vault-it-icons.svg once at the top of the page --&gt;
 &lt;!-- 2. then, anywhere: --&gt;
 &lt;svg class="vi-ic" style="color:var(--teal)" aria-hidden="true"&gt;&lt;use href="#vi-house-builder"/&gt;&lt;/svg&gt;
 
@@ -1145,8 +1145,8 @@ pill($("#icTabs"),IGROUPS,function(x){return x[1]},function(i){icGroup=IGROUPS[i
 $("#icSearch").addEventListener("input",function(){icQ=this.value.trim().toLowerCase();icRender()});
 icRender();
 $("#spCopy").addEventListener("click",function(){copy(spriteOut(),"Sprite copied")});
-$("#spSave").addEventListener("click",function(){save("vault-it-icons-v2.svg",spriteOut(),"image/svg+xml")});
-$("#mfSave").addEventListener("click",function(){save("vault-it-icons-v2.json",manifestOut(),"application/json")});
+$("#spSave").addEventListener("click",function(){save("vault-it-icons.svg",spriteOut(),"image/svg+xml")});
+$("#mfSave").addEventListener("click",function(){save("vault-it-icons.json",manifestOut(),"application/json")});
 /* colour code tables */
 (function(){
   function tbl(title,rows){var h='<div class="card"><div class="lbl" style="margin-bottom:10px">'+title+'</div><div class="tablewrap"><table><tbody>';

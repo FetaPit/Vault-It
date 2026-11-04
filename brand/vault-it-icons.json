@@ -4,7 +4,8 @@
     "name": "Coins",
     "group": "income",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       [
         "Universal Credit",
@@ -21,7 +22,8 @@
     "name": "More",
     "group": "income",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       [
         "LCWRA",
@@ -42,7 +44,8 @@
     "name": "Health and care",
     "group": "ve",
     "colour": "--salmon",
-    "hex": "#EE7D7D",
+    "night": "#EE7D7D",
+    "daylight": "#E4645F",
     "uses": [
       [
         "PIP (Care/Mobility)",
@@ -71,7 +74,8 @@
     "name": "Home",
     "group": "ce",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": [
       [
         "UC Housing Element",
@@ -96,7 +100,8 @@
     "name": "Salary",
     "group": "income",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       [
         "Salary",
@@ -109,7 +114,8 @@
     "name": "Side hustle",
     "group": "income",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       [
         "Side hustle / business",
@@ -122,7 +128,8 @@
     "name": "Bank and public",
     "group": "income",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       [
         "Benefits & pensions",
@@ -139,7 +146,8 @@
     "name": "Gift",
     "group": "income",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       [
         "Gifts & other",
@@ -156,7 +164,8 @@
     "name": "Electricity",
     "group": "ce",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": [
       [
         "Electricity",
@@ -177,7 +186,8 @@
     "name": "Gas",
     "group": "ce",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": [
       [
         "Gas",
@@ -190,7 +200,8 @@
     "name": "Phone and internet",
     "group": "ce",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": [
       [
         "Phone & internet",
@@ -203,7 +214,8 @@
     "name": "Card and debt payments",
     "group": "ce",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": [
       [
         "Debt Repayments",
@@ -220,7 +232,8 @@
     "name": "Groceries",
     "group": "ve",
     "colour": "--salmon",
-    "hex": "#EE7D7D",
+    "night": "#EE7D7D",
+    "daylight": "#E4645F",
     "uses": [
       [
         "Monthly Groceries",
@@ -241,7 +254,8 @@
     "name": "Gym",
     "group": "cn",
     "colour": "--amber",
-    "hex": "#F59E0B",
+    "night": "#F59E0B",
+    "daylight": "#BB7808",
     "uses": [
       [
         "Gym / sports / club",
@@ -258,7 +272,8 @@
     "name": "Car and transport",
     "group": "ve",
     "colour": "--salmon",
-    "hex": "#EE7D7D",
+    "night": "#EE7D7D",
+    "daylight": "#E4645F",
     "uses": [
       [
         "Car tax",
@@ -283,7 +298,8 @@
     "name": "Insurance",
     "group": "ce",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": [
       [
         "Car insurance",
@@ -308,7 +324,8 @@
     "name": "Eating out",
     "group": "vn",
     "colour": "--yellow",
-    "hex": "#F5DC4A",
+    "night": "#F5DC4A",
+    "daylight": "#9B8609",
     "uses": [
       [
         "Eating out",
@@ -325,7 +342,8 @@
     "name": "Clothing",
     "group": "vn",
     "colour": "--yellow",
-    "hex": "#F5DC4A",
+    "night": "#F5DC4A",
+    "daylight": "#9B8609",
     "uses": [
       [
         "Clothing",
@@ -338,7 +356,8 @@
     "name": "Coffee",
     "group": "vn",
     "colour": "--yellow",
-    "hex": "#F5DC4A",
+    "night": "#F5DC4A",
+    "daylight": "#9B8609",
     "uses": [
       [
         "Drinks",
@@ -355,7 +374,8 @@
     "name": "Shopping",
     "group": "vn",
     "colour": "--yellow",
-    "hex": "#F5DC4A",
+    "night": "#F5DC4A",
+    "daylight": "#9B8609",
     "uses": [
       [
         "Shopping (Random)",
@@ -372,7 +392,8 @@
     "name": "Emergency fund",
     "group": "sv",
     "colour": "--green",
-    "hex": "#3ECF8E",
+    "night": "#3ECF8E",
+    "daylight": "#207F54",
     "uses": [
       [
         "Emergency fund",
@@ -385,7 +406,8 @@
     "name": "House deposit",
     "group": "inv",
     "colour": "--green2",
-    "hex": "#3FB585",
+    "night": "#3FB585",
+    "daylight": "#2C7D5C",
     "uses": [
       [
         "House deposit",
@@ -402,7 +424,8 @@
     "name": "Investments",
     "group": "inv",
     "colour": "--green2",
-    "hex": "#3FB585",
+    "night": "#3FB585",
+    "daylight": "#2C7D5C",
     "uses": [
       [
         "Investments / ISA",
@@ -415,7 +438,8 @@
     "name": "Childcare",
     "group": "ce",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": [
       [
         "Childcare",
@@ -428,7 +452,8 @@
     "name": "Pets",
     "group": "ve",
     "colour": "--salmon",
-    "hex": "#EE7D7D",
+    "night": "#EE7D7D",
+    "daylight": "#E4645F",
     "uses": [
       [
         "Pets",
@@ -441,7 +466,8 @@
     "name": "Home and garden",
     "group": "ve",
     "colour": "--salmon",
-    "hex": "#EE7D7D",
+    "night": "#EE7D7D",
+    "daylight": "#E4645F",
     "uses": [
       [
         "Home & garden",
@@ -454,7 +480,8 @@
     "name": "Education",
     "group": "ve",
     "colour": "--salmon",
-    "hex": "#EE7D7D",
+    "night": "#EE7D7D",
+    "daylight": "#E4645F",
     "uses": [
       [
         "Education & courses",
@@ -467,7 +494,8 @@
     "name": "Subscriptions",
     "group": "cn",
     "colour": "--amber",
-    "hex": "#F59E0B",
+    "night": "#F59E0B",
+    "daylight": "#BB7808",
     "uses": [
       [
         "Subscriptions",
@@ -480,7 +508,8 @@
     "name": "Entertainment",
     "group": "vn",
     "colour": "--yellow",
-    "hex": "#F5DC4A",
+    "night": "#F5DC4A",
+    "daylight": "#9B8609",
     "uses": [
       [
         "Entertainment",
@@ -493,7 +522,8 @@
     "name": "Holidays",
     "group": "vn",
     "colour": "--yellow",
-    "hex": "#F5DC4A",
+    "night": "#F5DC4A",
+    "daylight": "#9B8609",
     "uses": [
       [
         "Holidays",
@@ -506,7 +536,8 @@
     "name": "Personal care",
     "group": "vn",
     "colour": "--yellow",
-    "hex": "#F5DC4A",
+    "night": "#F5DC4A",
+    "daylight": "#9B8609",
     "uses": [
       [
         "Personal care",
@@ -519,7 +550,8 @@
     "name": "Savings",
     "group": "sv",
     "colour": "--green",
-    "hex": "#3ECF8E",
+    "night": "#3ECF8E",
+    "daylight": "#207F54",
     "uses": [
       [
         "Savings",
@@ -532,7 +564,8 @@
     "name": "Pension",
     "group": "inv",
     "colour": "--green2",
-    "hex": "#3FB585",
+    "night": "#3FB585",
+    "daylight": "#2C7D5C",
     "uses": [
       [
         "Pension",
@@ -545,7 +578,8 @@
     "name": "Overview",
     "group": "nav",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Overview tab"
     ]
@@ -555,7 +589,8 @@
     "name": "Budget",
     "group": "nav",
     "colour": "--blue",
-    "hex": "#64B5F6",
+    "night": "#64B5F6",
+    "daylight": "#0B72C4",
     "uses": [
       "Budget tab"
     ]
@@ -565,7 +600,8 @@
     "name": "House builder",
     "group": "nav",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "House builder tab (USP)"
     ]
@@ -575,7 +611,8 @@
     "name": "Assets and liabilities",
     "group": "nav",
     "colour": "--green",
-    "hex": "#3ECF8E",
+    "night": "#3ECF8E",
+    "daylight": "#207F54",
     "uses": [
       "Assets and liabilities tab"
     ]
@@ -585,7 +622,8 @@
     "name": "Debt tracker",
     "group": "nav",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": [
       "Debt tracker tab"
     ]
@@ -595,7 +633,8 @@
     "name": "Entrepreneur",
     "group": "nav",
     "colour": "--orange",
-    "hex": "#E0894A",
+    "night": "#E0894A",
+    "daylight": "#CF6C24",
     "uses": [
       "Entrepreneur tab (Pro)"
     ]
@@ -605,7 +644,8 @@
     "name": "Achievements",
     "group": "nav",
     "colour": "--brass",
-    "hex": "#C9A84C",
+    "night": "#C9A84C",
+    "daylight": "#A18331",
     "uses": [
       "Achievements tab"
     ]
@@ -615,7 +655,8 @@
     "name": "Connections",
     "group": "nav",
     "colour": "--purple",
-    "hex": "#9B7EC8",
+    "night": "#9B7EC8",
+    "daylight": "#815DBA",
     "uses": [
       "Connections tab"
     ]
@@ -625,7 +666,8 @@
     "name": "Network",
     "group": "nav",
     "colour": "--purple",
-    "hex": "#9B7EC8",
+    "night": "#9B7EC8",
+    "daylight": "#815DBA",
     "uses": [
       "Network sub-tab (replaces the ◈ text glyph)"
     ]
@@ -635,7 +677,8 @@
     "name": "Precious metals",
     "group": "asset",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "Assets sub-tab"
     ]
@@ -645,7 +688,8 @@
     "name": "Crypto",
     "group": "asset",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Assets sub-tab"
     ]
@@ -655,7 +699,8 @@
     "name": "Cash and savings",
     "group": "asset",
     "colour": "--green",
-    "hex": "#3ECF8E",
+    "night": "#3ECF8E",
+    "daylight": "#207F54",
     "uses": [
       "Assets sub-tab"
     ]
@@ -665,7 +710,8 @@
     "name": "Wealth inventory",
     "group": "asset",
     "colour": "--purple",
-    "hex": "#9B7EC8",
+    "night": "#9B7EC8",
+    "daylight": "#815DBA",
     "uses": [
       "Assets sub-tab",
       "Guitars, watches, kit"
@@ -676,7 +722,8 @@
     "name": "Stocks and funds",
     "group": "asset",
     "colour": "--green2",
-    "hex": "#3FB585",
+    "night": "#3FB585",
+    "daylight": "#2C7D5C",
     "uses": [
       "Assets sub-tab",
       "Replaces the trend arrow, which clashed with Net worth"
@@ -687,7 +734,8 @@
     "name": "Net worth",
     "group": "kpi",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Overview card"
     ]
@@ -697,7 +745,8 @@
     "name": "Total assets",
     "group": "kpi",
     "colour": "--green",
-    "hex": "#3ECF8E",
+    "night": "#3ECF8E",
+    "daylight": "#207F54",
     "uses": [
       "Overview card"
     ]
@@ -707,7 +756,8 @@
     "name": "Total debt",
     "group": "kpi",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": [
       "Overview card",
       "Debt tracker"
@@ -718,7 +768,8 @@
     "name": "Liabilities",
     "group": "kpi",
     "colour": "--amber",
-    "hex": "#F59E0B",
+    "night": "#F59E0B",
+    "daylight": "#BB7808",
     "uses": [
       "Overview card",
       "Assets sub-tab"
@@ -729,7 +780,8 @@
     "name": "Monthly surplus",
     "group": "kpi",
     "colour": "--blue",
-    "hex": "#64B5F6",
+    "night": "#64B5F6",
+    "daylight": "#0B72C4",
     "uses": [
       "Overview card",
       "Pay action"
@@ -740,7 +792,8 @@
     "name": "Committed essential",
     "group": "bucket",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": [
       "House + closed lock"
     ]
@@ -750,7 +803,8 @@
     "name": "Variable essential",
     "group": "bucket",
     "colour": "--salmon",
-    "hex": "#EE7D7D",
+    "night": "#EE7D7D",
+    "daylight": "#E4645F",
     "uses": [
       "House + open lock"
     ]
@@ -760,7 +814,8 @@
     "name": "Committed non-essential",
     "group": "bucket",
     "colour": "--amber",
-    "hex": "#F59E0B",
+    "night": "#F59E0B",
+    "daylight": "#BB7808",
     "uses": [
       "Star + closed lock"
     ]
@@ -770,7 +825,8 @@
     "name": "Variable non-essential",
     "group": "bucket",
     "colour": "--yellow",
-    "hex": "#F5DC4A",
+    "night": "#F5DC4A",
+    "daylight": "#9B8609",
     "uses": [
       "Star + open lock"
     ]
@@ -780,7 +836,8 @@
     "name": "Savings",
     "group": "bucket",
     "colour": "--green",
-    "hex": "#3ECF8E",
+    "night": "#3ECF8E",
+    "daylight": "#207F54",
     "uses": [
       "Savings bucket"
     ]
@@ -790,7 +847,8 @@
     "name": "Pay later",
     "group": "debt",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": [
       "Klarna, Zilch, Monzo Flex"
     ]
@@ -800,7 +858,8 @@
     "name": "Loan",
     "group": "debt",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": [
       "Personal loans"
     ]
@@ -810,7 +869,8 @@
     "name": "Overdraft",
     "group": "debt",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": []
   },
   {
@@ -818,7 +878,8 @@
     "name": "Mortgage",
     "group": "debt",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": [
       "Level 2: Delete the mortgage"
     ]
@@ -828,7 +889,8 @@
     "name": "Paid off",
     "group": "debt",
     "colour": "--green",
-    "hex": "#3ECF8E",
+    "night": "#3ECF8E",
+    "daylight": "#207F54",
     "uses": [
       "PAID OFF stamp"
     ]
@@ -838,7 +900,8 @@
     "name": "Snowball",
     "group": "debt",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": [
       "Payoff method"
     ]
@@ -848,7 +911,8 @@
     "name": "Avalanche",
     "group": "debt",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": [
       "Payoff method"
     ]
@@ -858,7 +922,8 @@
     "name": "Water",
     "group": "ce",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": [
       "Water bill"
     ]
@@ -868,7 +933,8 @@
     "name": "XP",
     "group": "goal",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "Experience points"
     ]
@@ -878,7 +944,8 @@
     "name": "Streak",
     "group": "goal",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "Contribution streak"
     ]
@@ -888,7 +955,8 @@
     "name": "Level",
     "group": "goal",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "Level 1, 2, 3"
     ]
@@ -898,7 +966,8 @@
     "name": "Milestone",
     "group": "goal",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "Milestone pills"
     ]
@@ -908,7 +977,8 @@
     "name": "Keys",
     "group": "goal",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "Keys are yours"
     ]
@@ -918,7 +988,8 @@
     "name": "Brick",
     "group": "goal",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Bricks laid"
     ]
@@ -928,7 +999,8 @@
     "name": "Row",
     "group": "goal",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "The gold slice, current row"
     ]
@@ -938,7 +1010,8 @@
     "name": "Pro",
     "group": "goal",
     "colour": "--brass",
-    "hex": "#C9A84C",
+    "night": "#C9A84C",
+    "daylight": "#A18331",
     "uses": [
       "Pro features"
     ]
@@ -948,7 +1021,8 @@
     "name": "Vault",
     "group": "goal",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "The brand dial",
       "ISA wrapper"
@@ -959,7 +1033,8 @@
     "name": "Target",
     "group": "goal",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "Goals"
     ]
@@ -969,7 +1044,8 @@
     "name": "Forecast",
     "group": "goal",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Forecast line"
     ]
@@ -979,7 +1055,8 @@
     "name": "Income in",
     "group": "goal",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Income"
     ]
@@ -989,7 +1066,8 @@
     "name": "Spend out",
     "group": "goal",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": [
       "Spending"
     ]
@@ -999,7 +1077,8 @@
     "name": "Calendar",
     "group": "goal",
     "colour": "--blue",
-    "hex": "#64B5F6",
+    "night": "#64B5F6",
+    "daylight": "#0B72C4",
     "uses": [
       "Dates, payoff timeline"
     ]
@@ -1009,7 +1088,8 @@
     "name": "Zoom in",
     "group": "hud",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": []
   },
   {
@@ -1017,7 +1097,8 @@
     "name": "Zoom out",
     "group": "hud",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": []
   },
   {
@@ -1025,7 +1106,8 @@
     "name": "Orbit",
     "group": "hud",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": []
   },
   {
@@ -1033,7 +1115,8 @@
     "name": "Reset view",
     "group": "hud",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": []
   },
   {
@@ -1041,7 +1124,8 @@
     "name": "Pin",
     "group": "hud",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": [
       "Map pin on the house"
     ]
@@ -1051,7 +1135,8 @@
     "name": "Full screen",
     "group": "hud",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": []
   },
   {
@@ -1059,7 +1144,8 @@
     "name": "Pan",
     "group": "hud",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Drag to pan"
     ]
@@ -1069,7 +1155,8 @@
     "name": "Pinch zoom",
     "group": "hud",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Two fingers"
     ]
@@ -1079,7 +1166,8 @@
     "name": "Scroll",
     "group": "hud",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Scroll to zoom"
     ]
@@ -1089,7 +1177,8 @@
     "name": "Done",
     "group": "act",
     "colour": "--green",
-    "hex": "#3ECF8E",
+    "night": "#3ECF8E",
+    "daylight": "#207F54",
     "uses": [
       "Replaces the ✓ text glyph"
     ]
@@ -1099,7 +1188,8 @@
     "name": "Warning",
     "group": "act",
     "colour": "--amber",
-    "hex": "#F59E0B",
+    "night": "#F59E0B",
+    "daylight": "#BB7808",
     "uses": [
       "Overspend warning"
     ]
@@ -1109,7 +1199,8 @@
     "name": "Info",
     "group": "act",
     "colour": "--blue",
-    "hex": "#64B5F6",
+    "night": "#64B5F6",
+    "daylight": "#0B72C4",
     "uses": []
   },
   {
@@ -1117,7 +1208,8 @@
     "name": "Locked",
     "group": "act",
     "colour": "--lock",
-    "hex": "#5A6068",
+    "night": "#5A6068",
+    "daylight": "#5C6B6D",
     "uses": [
       "Locked levels and stages"
     ]
@@ -1127,7 +1219,8 @@
     "name": "Unlocked",
     "group": "act",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "Level unlocked"
     ]
@@ -1137,7 +1230,8 @@
     "name": "Add",
     "group": "act",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Replaces the ＋ text glyph"
     ]
@@ -1147,7 +1241,8 @@
     "name": "Edit",
     "group": "act",
     "colour": "--blue",
-    "hex": "#64B5F6",
+    "night": "#64B5F6",
+    "daylight": "#0B72C4",
     "uses": [
       "Replaces the ✎ text glyph"
     ]
@@ -1157,7 +1252,8 @@
     "name": "Delete",
     "group": "act",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": [
       "Replaces the ✕ text glyph"
     ]
@@ -1167,7 +1263,8 @@
     "name": "Undo",
     "group": "act",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Replaces the ↩ text glyph"
     ]
@@ -1177,7 +1274,8 @@
     "name": "Expand",
     "group": "act",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": []
   },
   {
@@ -1185,7 +1283,8 @@
     "name": "Colour",
     "group": "act",
     "colour": "--purple",
-    "hex": "#9B7EC8",
+    "night": "#9B7EC8",
+    "daylight": "#815DBA",
     "uses": [
       "Change card colour"
     ]
@@ -1195,7 +1294,8 @@
     "name": "Sync",
     "group": "act",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Updated from your other device"
     ]
@@ -1205,7 +1305,8 @@
     "name": "Install",
     "group": "act",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "Install free banner"
     ]
@@ -1215,7 +1316,8 @@
     "name": "Search",
     "group": "act",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": []
   },
   {
@@ -1223,7 +1325,8 @@
     "name": "Profile",
     "group": "act",
     "colour": "--purple",
-    "hex": "#9B7EC8",
+    "night": "#9B7EC8",
+    "daylight": "#815DBA",
     "uses": []
   },
   {
@@ -1231,7 +1334,8 @@
     "name": "Sun",
     "group": "doc",
     "colour": "--gold",
-    "hex": "#E8C56A",
+    "night": "#E8C56A",
+    "daylight": "#8B6A15",
     "uses": [
       "Daylight mode"
     ]
@@ -1241,7 +1345,8 @@
     "name": "Moon",
     "group": "doc",
     "colour": "--blue",
-    "hex": "#64B5F6",
+    "night": "#64B5F6",
+    "daylight": "#0B72C4",
     "uses": [
       "Night mode"
     ]
@@ -1251,7 +1356,8 @@
     "name": "Type",
     "group": "doc",
     "colour": "--green",
-    "hex": "#3ECF8E",
+    "night": "#3ECF8E",
+    "daylight": "#207F54",
     "uses": [
       "Typography"
     ]
@@ -1261,7 +1367,8 @@
     "name": "Tokens",
     "group": "doc",
     "colour": "--red",
-    "hex": "#E05C5C",
+    "night": "#E05C5C",
+    "daylight": "#D62929",
     "uses": [
       "Design tokens"
     ]
@@ -1271,7 +1378,8 @@
     "name": "Email",
     "group": "contact",
     "colour": "--teal",
-    "hex": "#44C0B9",
+    "night": "#44C0B9",
+    "daylight": "#297B76",
     "uses": [
       "hello@vault-it.co"
     ]
@@ -1281,7 +1389,8 @@
     "name": "WhatsApp",
     "group": "contact",
     "colour": "--green",
-    "hex": "#3ECF8E",
+    "night": "#3ECF8E",
+    "daylight": "#207F54",
     "uses": []
   },
   {
@@ -1289,7 +1398,8 @@
     "name": "LinkedIn",
     "group": "contact",
     "colour": "--blue",
-    "hex": "#64B5F6",
+    "night": "#64B5F6",
+    "daylight": "#0B72C4",
     "uses": []
   },
   {
@@ -1297,7 +1407,8 @@
     "name": "Portfolio",
     "group": "contact",
     "colour": "--brass",
-    "hex": "#C9A84C",
+    "night": "#C9A84C",
+    "daylight": "#A18331",
     "uses": []
   },
   {
@@ -1305,7 +1416,8 @@
     "name": "Instagram",
     "group": "contact",
     "colour": "--coral",
-    "hex": "#E5535F",
+    "night": "#E5535F",
+    "daylight": "#C22A4F",
     "uses": []
   }
 ]

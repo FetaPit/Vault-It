@@ -24,8 +24,9 @@ Put these in the repo under `brand/` (create it). The brand book is the visual r
 | `vault-it-3d-engine.js` | The dependency free 3D engine: to-scale house (WebGL), net worth scene with £1,000 blocks and £100 cubes, and the net worth tracker (graph or 3D blocks). Exposes `window.ViEngine`. Use as is. |
 | `vault-it-tokens.css` | Design tokens for Night (default) and Daylight (light mode). |
 | `vault-it-components.css` | Component rules: menu bar, 3D stage, control rail, status line, pills, stat tiles, icon tiles, built glow. |
-| `vault-it-icons.svg` | SVG sprite of all 112 icons (`#vi-<id>`). |
-| `vault-it-icons.json` | Manifest: id, name, group, colour token, usage notes. |
+| `vault-it-icons.svg` | SVG sprite of all 112 icons, pack v2 (`#vi-<id>`). Built from `icons/icons-v2.src.js` by `node tools/build_icons_v2.js`; do not hand-edit. |
+| `vault-it-icons.json` | Manifest: id, name, group, colour token, Night and Daylight hex, usage notes. |
+| `icons/` | Icon source, `preview-v2.html`, single SVGs per icon (`svg/night`, `svg/daylight`) and the v1 pack in `v1/`. |
 | `vault-it-logo-mark-{full,mid,micro}.svg` | The brand mark in Night. |
 | `vault-it-logo-mark-{full,mid}-daylight.svg` | The brand mark for Daylight. |
 | `vault-it-tokens.json`, `tailwind.vault-it.js` | Same tokens for other toolchains. Only use if the repo needs them. |
@@ -119,8 +120,8 @@ Accepted when: the app renders correctly in both themes, no hard coded dark valu
 ### Phase 3: Iconography
 
 - Inline `vault-it-icons.svg` once at the top of `<body>` (hidden). Use `<svg class="vi-ic" style="color:var(--teal)"><use href="#vi-house-builder"/></svg>`.
-- **Weight:** 1.1 hairline at 24px and above, 1.5 below 24px. The sprite reads `--vi-sw`. Add `.vi-ic.sm{--vi-sw:1.5}` for 16 and 20px (rules are in `vault-it-components.css`).
-- **Fill:** 16% of the same colour under the stroke. **Detail:** optional 0.7 hairlines at 60% opacity, already inside each symbol. Drop detail below 24px by using the `micro` weight rule or by hiding detail groups with CSS.
+- **Weight:** 1.1 hairline at 24px and above, 1.5 below 24px. The sprite reads `--vi-sw` and `--vi-d`. Add `.vi-ic.sm{--vi-sw:1.5;--vi-d:0}` for 16 and 20px (rules are in `vault-it-components.css`).
+- **Layers (pack v2):** 14% body fill, a 42% lit core on the part that names the icon, the hairline, 0.6 detail lines at 55% (ticks, seams, rivets, HUD brackets) and solid signal nodes. Rectangles are chamfered. All five layers are inside each symbol and use `currentColor`. Detail drops out below 24px through `--vi-d:0`; the lit core and nodes stay. In the spending buckets a lit, shut lock means committed and an open, unlit lock means variable.
 - One colour per icon, always from the colour code in Phase 5. Same glyph may take different colours in different buckets (Home is coral for rent, teal for rental income).
 - Replace the app's current icons using the manifest (`vault-it-icons.json`, `uses` field shows where each icon is used). The 33 budget category icons are the app's own drawings, thinned, so they should map one to one.
 - Swap **Stocks and funds** from the trend arrow to `candles` (the trend arrow clashed with Net worth).
