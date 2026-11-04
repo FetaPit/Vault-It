@@ -22464,7 +22464,9 @@ function v3MetalsNow(){
    either stage has already opened, when the device asks to save data, or without WebGL. */
 function v3Warm(){
   if(V3._warm||V3.cash||V3.metals||!window.THREE||!THREE.OrbitControls||!viGlOk())return;V3._warm=1;
-  var idle=function(f){if(window.requestIdleCallback)requestIdleCallback(f,{timeout:4000});else setTimeout(f,200);};
+  /* v0.9.2: several steps share one idle period while it has time left (each step is one small compile), so the warm-up is done
+     sooner after load and a tap on Assets is less likely to find shaders still to compile */
+  var dl=null,idle=function(f){if(dl&&!dl.didTimeout&&dl.timeRemaining()>12)return f();if(window.requestIdleCallback)requestIdleCallback(function(d){dl=d;f();},{timeout:4000});else setTimeout(f,200);};
   var pre=[function(){var K=v3CashKey();if(K.units>0){V3._pre=V3._pre||{};var c=v3CashContent(K.spec,K.units,K.cur);V3._pre.cash=c;}},
     function(){var mk=v3MetalsKey();V3._pre=V3._pre||{};V3._pre.metals=v3MetalsContent(mk);}];
   var W=null,objs=[],bars=[],k=0,busy=function(){return V3.cash||V3.metals;};   // a stage opened meanwhile: stop (it compiles what it needs itself)
@@ -22505,7 +22507,12 @@ function v3Warm(){
   };
   idle(step);
 }
+/* v0.9.2: the warm-up starts the moment both are true, the page has loaded and the 3D engine is in (its 'vi-three' event, which can
+   come before or after 'load'), not on the next 1.5 s poll; the poll stays as a fallback */
+function v3WarmSoon(){if(document.readyState!=='complete'||!window.THREE||!THREE.OrbitControls)return;var saveData=false;try{saveData=!!(navigator.connection&&navigator.connection.saveData);}catch(e){}if(!saveData)setTimeout(v3Warm,50);}
+document.addEventListener('vi-three',function(e){if(e.detail&&e.detail.ok)v3WarmSoon();});
 window.addEventListener('load',function(){var saveData=false;try{saveData=!!(navigator.connection&&navigator.connection.saveData);}catch(e){}if(saveData)return;
+  v3WarmSoon();
   var n=0,wait=function(){if(window.THREE&&THREE.OrbitControls)return v3Warm();if(++n<30)setTimeout(wait,1500);};setTimeout(wait,1500);});
 
 function renderMetalsISO(){
