@@ -17205,10 +17205,10 @@ function setViewFlag(name, on, btn) {   // Settings: 3D or classic net worth cha
       canvas: cv ? cv.width + 'x' + cv.height : null, gl: v && v.renderer ? glInfo(v) : null, bricks: v && v.model ? v.model.counts.bricks : null, bricksTotal: info ? info.bricksTotal : null,
       engine: v ? (v.engine === 'house_gl' ? 'house_gl · one instanced draw' + (v._bCalm ? ' · at rest' : ' · live') : 'three.js r' + (window.THREE ? THREE.REVISION : '?') + (v.brand ? ' · brand shaders' : ' · standard') + (v._bLite ? ' · lite' : (v._bCalm ? ' · at rest' : ' · full'))) : 'not started',
       firstFrameMs: S.firstFrameMs, buildMs: S.build, layMs: S.lay, orbitP95: pct(S.orbit, 0.95), orbitN: S.orbit.length, type: sm.type || (window.state && state.houseType) || null,
-      viewport: S3.last > S.last ? S3.name : 'house builder', stageFrames: S3.frames, stageP50: pct(S3.dts, 0.5), stageP95: pct(S3.dts, 0.95), stageOver33: S3.over33 };
+      viewport: S3.last > S.last ? S3.name : 'house builder', stageFrames: S3.frames, stageP50: pct(S3.dts, 0.5), stageP95: pct(S3.dts, 0.95), stageOver33: S3.over33, stageCalls: S3.calls == null ? null : S3.calls, stageTris: S3.tris == null ? null : S3.tris };
   }
   function lines(k) {
-    var st = k.viewport && k.viewport !== 'house builder' ? ['viewport ' + k.viewport + ' (three.js, matcap) · stage frames ' + k.stageFrames + ' · p50 ' + f1(k.stageP50) + ' · p95 ' + f1(k.stageP95) + ' ms · >33 ms: ' + k.stageOver33, 'house figures below are from its last visit'] : ['viewport house builder'];
+    var st = k.viewport && k.viewport !== 'house builder' ? ['viewport ' + k.viewport + ' (three.js, matcap) · stage frames ' + k.stageFrames + ' · p50 ' + f1(k.stageP50) + ' · p95 ' + f1(k.stageP95) + ' ms · >33 ms: ' + k.stageOver33 + (k.stageCalls == null ? '' : ' · draws ' + k.stageCalls + ' · triangles ' + Number(k.stageTris).toLocaleString('en-GB')), 'house figures below are from its last visit'] : ['viewport house builder'];
     return st.concat(['fps ' + k.fps + '   frames ' + k.frames, 'frame ms p50 ' + f1(k.p50) + ' · p95 ' + f1(k.p95) + ' · max ' + f1(k.max), 'frames >33 ms: ' + k.over33,
       'long tasks ' + k.longN + ' · worst ' + f1(k.longMax) + ' ms', 'JS heap ' + (k.heapMB == null ? 'n/a' : k.heapMB + ' MB'),
       'DPR ' + f1(k.dpr) + ' · canvas ' + (k.canvas || '-'), 'renderer ' + (k.gl || '-'), 'bricks ' + (k.bricks == null ? '-' : k.bricks) + (k.bricksTotal ? ' (' + k.bricksTotal + ' UK)' : ''),
@@ -17220,7 +17220,7 @@ function setViewFlag(name, on, btn) {   // Settings: 3D or classic net worth cha
     return ['Vault-It performance report', 'date ' + new Date().toISOString(), 'userAgent ' + navigator.userAgent, 'viewport ' + innerWidth + 'x' + innerHeight, 'devicePixelRatio ' + window.devicePixelRatio, 'house type ' + (k.type || '-'), ''].concat(lines(k)).join('\n');
   }
   window.VIPERF = { snapshot: snapshot, report: report,
-    stageFrame: function (name) { var t = performance.now(); if (S3.name !== name) { S3.name = name; S3.dts = []; S3.over33 = 0; S3.frames = 0; S3.last = 0; } S3.frames++;
+    stageFrame: function (name, calls, tris) { var t = performance.now(); if (S3.name !== name) { S3.name = name; S3.dts = []; S3.over33 = 0; S3.frames = 0; S3.last = 0; } S3.frames++; S3.calls = calls; S3.tris = tris;   // v0.9.2: the stage's draws and triangles, so the owner can read them on his phone
       if (S3.last) { var dt = t - S3.last; if (dt < 1000) { S3.dts.push(dt); if (S3.dts.length > MAXN) S3.dts.shift(); if (dt > 33) S3.over33++; } } S3.last = t; },
     mark: function (n) { if (n === 'tab') { S.tabAt = performance.now(); S.firstFrameMs = null; } },
     phase: function (n, ms) { S[n] = ms; } };
@@ -21759,7 +21759,7 @@ function V3Scene(host,label){
   // draws only while something moves (orbit, spin, a kick after a change), never off screen or in a background tab
   this._loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;if(self._introRun){self.introStop();self._introPlayed=false;self._introWait=1;}return;}self._attach();var moving=self.ctl.update(),t=performance.now(),busy=moving||!!self._introRun||!!self._drag;
     if(busy){self._busyT=t;if(!self._busy){self._busy=true;self._w=0;}}else if(self._busy&&t-(self._busyT||0)>300){self._busy=false;self._w=0;}   // R16: the house builder's pixel ratio, lower while coins land or a finger is down, full again 300 ms after
-    self.size();if(self._introRun)self._introStep(t);self.r.render(self.sc,self.cam);if(!self._shown&&self.root.children.length){self._shown=1;v3Shown(self.host);}if(self.onDraw)self.onDraw();if(window.VIPERF&&VIPERF.stageFrame)VIPERF.stageFrame(self===V3.metals?'Precious metals bars':'Cash and savings coins');
+    self.size();if(self._introRun)self._introStep(t);self.r.render(self.sc,self.cam);if(!self._shown&&self.root.children.length){self._shown=1;v3Shown(self.host);}if(self.onDraw)self.onDraw();if(window.VIPERF&&VIPERF.stageFrame)VIPERF.stageFrame(self===V3.metals?'Precious metals bars':'Cash and savings coins',self.r.info.render.calls,self.r.info.render.triangles);
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}   // adaptive quality from the measured frame gap
     self._lastT=moving?t:0;
     if(moving||self._spin||self._introRun||self._busy||Date.now()<self._until)self.raf=requestAnimationFrame(self._loop);};
@@ -22008,7 +22008,7 @@ function v3CoinEdge(spec,n){var c=document.createElement('canvas');c.width=64;c.
    and plain, round coins are milled all round. Edge and face still share one texture, so a batch of stacks is still one draw. */
 var V3_FACEA=0.627;   // the default camera looks from about 36 degrees round, so the faces turn that much to stand upright
 var V3_COIN_WORD={GBP:'ONE POUND',USD:'ONE DOLLAR',EUR:'EURO',INR:'RUPEE'};
-function v3CoinSides(spec){return spec.sides>12?32:spec.sides;}   // a round coin's outline in 32 sides: round at any zoom on a phone
+function v3CoinSides(spec){return spec.sides>12?24:spec.sides;}   // a round coin's outline in 24 sides (32 before v0.9.2): round on a phone, and every stack is closed now, so fewer triangles
 function v3StackTex(spec,n){var S=512,H=S/2,c=document.createElement('canvas');c.width=c.height=S;var g=c.getContext('2d');
   var base=v3Lift(spec.outer,V3_LIFT),hi=v3Lift(spec.outer,Math.min(1,V3_LIFT+.18)),sides=v3CoinSides(spec);
   for(var i=0;i<n;i++){var y=S*i/n,h=S/n,k=((i*37)%7)/7;   // each coin a touch lighter or darker than the next, as real coins are
@@ -22036,26 +22036,28 @@ function v3StackTex(spec,n){var S=512,H=S/2,c=document.createElement('canvas');c
   var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;}
 /* the coin shape, built here rather than from three.js's cylinder: flat sides for the 12-sided £1, no hidden bottom face, and the
    option to leave the side off where a neighbour hides it. Pushes triangles onto P (positions), N (normals), U (texture). */
-function v3CoinPart(spec,n,ox,oz,side,P,N,U){var sides=v3CoinSides(spec),r=spec.d/2,h=spec.t*n,y0=-h/2,y1=h/2,flat=sides<=12,a0=flat?Math.PI/12:0,rr=r;
-  var pt=function(j){var a=a0+j*Math.PI*2/sides;return [Math.sin(a)*rr,Math.cos(a)*rr,a];};
+function v3CoinPart(spec,n,ox,oz,side,P,N,U){   // v0.9.2 (owner, 4 Nov: "Each stack must be its own solid model"): every stack is closed, top, side and bottom
+  var sides=v3CoinSides(spec),r=spec.d/2,h=spec.t*n,y0=-h/2,y1=h/2,flat=sides<=12,a0=flat?Math.PI/12:0,rr=r;
+  var pt=function(j){var a=a0+(j%sides)*Math.PI*2/sides;return [Math.sin(a)*rr,Math.cos(a)*rr,a+(j>=sides?Math.PI*2:0)];};   // the last side meets the first exactly: no seam
   var tri=function(a,b,c,na,nb,nc,ua,ub,uc){P.push(a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2]);N.push(na[0],na[1],na[2],nb[0],nb[1],nb[2],nc[0],nc[1],nc[2]);U.push(ua[0],ua[1],ub[0],ub[1],uc[0],uc[1]);};
-  var cf=Math.cos(V3_FACEA),sf=Math.sin(V3_FACEA),fu=function(x,z){var x2=x*cf-z*sf,z2=x*sf+z*cf;return [0.75+0.25*(x2/r),0.25-0.25*(z2/r)];},up=[0,1,0];
+  var cf=Math.cos(V3_FACEA),sf=Math.sin(V3_FACEA),fu=function(x,z){var x2=x*cf-z*sf,z2=x*sf+z*cf;return [0.75+0.25*(x2/r),0.25-0.25*(z2/r)];},up=[0,1,0],dn=[0,-1,0];side=true;
   for(var j=0;j<sides;j++){var p=pt(j),q=pt(j+1);
     tri([ox,y1,oz],[ox+p[0],y1,oz+p[1]],[ox+q[0],y1,oz+q[1]],up,up,up,fu(0,0),fu(p[0],p[1]),fu(q[0],q[1]));
+    tri([ox,y0,oz],[ox+q[0],y0,oz+q[1]],[ox+p[0],y0,oz+p[1]],dn,dn,dn,[0.75,0.75],[0.75,0.75],[0.75,0.75]);   // the bottom, in the shadow tone
     if(side){var na,nb;if(flat){var m=(p[2]+q[2])/2;na=nb=[Math.sin(m),0,Math.cos(m)];}else{na=[Math.sin(p[2]),0,Math.cos(p[2])];nb=[Math.sin(q[2]),0,Math.cos(q[2])];}
       var u0=0.5*j/sides,u1=0.5*(j+1)/sides,A=[ox+p[0],y0,oz+p[1]],B=[ox+q[0],y0,oz+q[1]],C=[ox+q[0],y1,oz+q[1]],D=[ox+p[0],y1,oz+p[1]];
-      tri(A,C,B,na,nb,nb,[u0,0],[u1,1],[u1,0]);tri(A,D,C,na,na,nb,[u0,0],[u0,1],[u1,1]);}}
+      tri(A,B,C,na,nb,nb,[u0,0],[u1,0],[u1,1]);tri(A,C,D,na,nb,na,[u0,0],[u1,1],[u0,1]);}}   // wound to face outwards (they faced in, so the far wall's inside showed through)
 };
 function v3CoinGeo(P,N,U){var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(N,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(U,2));g.computeBoundingBox();g.computeBoundingSphere();return g;}
 function v3Stack(spec,n){
   return v3Keep('stack2|'+spec.name+'|'+spec.d+'|'+n,function(){var P=[],N=[],U=[];v3CoinPart(spec,n,0,0,true,P,N,U);
     return {geo:v3CoinGeo(P,N,U),mats:[v3Shade({map:v3StackTex(spec,n)})]};});
 }
-/* a finished block of 1,000: the hundred stacks of ten as one shape, so it looks exactly like the loose stacks and still draws as
-   one batch. The stacks inside the block show only their tops (their neighbours hide their sides) over a shadow floor. */
-/* a big balance (more than V3_REAL_BLOCKS blocks): each coin is a pixel or two on screen, so a block is one box wearing the same
-   coins painted on (the coin faces copied from the coin texture, the edges ten stacks round), at a fraction of the triangles */
-var V3_REAL_BLOCKS=12;
+/* a big balance (past v3RealBlocks(spec) blocks: about £33,000 in £1 coins, £16,000 in round coins): each coin is a pixel or two on screen, so a block is one
+   closed box wearing the same coins painted on (faces copied from the coin texture, the edges ten stacks round), at a fraction of the
+   triangles. Up to there every block is its hundred closed stacks. */
+var V3_REAL_TRIS=160000;   // the triangle budget for real stacks in one scene
+function v3RealBlocks(spec){var s=v3CoinSides(spec);return Math.floor(V3_REAL_TRIS/(100*s*4));}
 function v3BlockLite(spec,pitch){
   return v3Keep('blocklite|'+spec.name+'|'+pitch.toFixed(3),function(){var w=pitch*10-0.12,h=spec.t*10,geo=new THREE.BoxBufferGeometry(w,h,w),uv=geo.attributes.uv,nr=geo.attributes.normal;
     for(var i=0;i<uv.count;i++){var cap=Math.abs(nr.getY(i))>0.9,u=uv.getX(i),v=uv.getY(i);uv.setXY(i,cap?0.5+u*0.5:u*0.5,cap?v*0.5:v);}
@@ -22067,10 +22069,11 @@ function v3BlockLite(spec,pitch){
     var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return {geo:geo,mats:[v3Shade({map:t})]};});
 }
 function v3Block(spec,pitch){
-  return v3Keep('block2|'+spec.name+'|'+pitch.toFixed(3),function(){var P=[],N=[],U=[],h=spec.t*10,e=pitch*4.5+spec.d/2-0.02,y=h/2-spec.t*0.5,up=[0,1,0],dk=[0.75,0.75];
-    for(var rw=0;rw<10;rw++)for(var cl=0;cl<10;cl++)v3CoinPart(spec,10,(cl-4.5)*pitch,(rw-4.5)*pitch,rw===0||rw===9||cl===0||cl===9,P,N,U);
-    P.push(-e,y,-e,-e,y,e,e,y,e,-e,y,-e,e,y,e,e,y,-e);for(var i=0;i<6;i++){N.push(0,1,0);U.push(dk[0],dk[1]);}
-    return {geo:v3CoinGeo(P,N,U),mats:[v3Shade({map:v3StackTex(spec,10)})]};});
+  /* a finished block of 1,000: the hundred stacks of ten, each its own closed stack (owner, 4 Nov: "Each stack must be its own solid
+     model once stacked, not the grid as a whole"), merged into one shape so a block still draws as one batch */
+  return v3Keep('block3|'+spec.name+'|'+pitch.toFixed(3),function(){var P=[],N=[],U=[],st=[];
+    for(var rw=0;rw<10;rw++)for(var cl=0;cl<10;cl++){v3CoinPart(spec,10,(cl-4.5)*pitch,(rw-4.5)*pitch,true,P,N,U);st.push([(cl-4.5)*pitch,(rw-4.5)*pitch]);}
+    var g=v3CoinGeo(P,N,U);g.userData.stacks=st;return {geo:g,mats:[v3Shade({map:v3StackTex(spec,10)})]};});
 }
 // a label that always faces the camera
 /* the gold tag from Net worth in 3D (owner, 31 Oct: "flag post labels in gold, the same as the dashboard"): what it is in small capitals,
@@ -22145,7 +22148,7 @@ function v3CashPlate(spec,n,lite){   // one plate's coins; finished blocks of 1,
   if(merged){var bk=lite?v3BlockLite(spec,pitch):v3Block(spec,pitch);
     var bi=new THREE.InstancedMesh(bk.geo,bk.mats[0],merged);
     for(var j=0;j<merged;j++){var q=pos(j*100);m4.makeTranslation(q[0]+blockW/2-pitch/2,spec.t*STACK/2,q[1]+blockW/2-pitch/2);bi.setMatrixAt(j,m4);}
-    bi.userData.v3Full=merged;bi.userData.v3Intro=true;G.add(bi);}
+    bi.userData.v3Full=merged;bi.userData.v3Intro=true;if(bk.geo.userData.stacks)bi.userData.v3Stacks=bk.geo.userData.stacks;G.add(bi);}
   if(loose>0){var st=v3Stack(spec,STACK),im=new THREE.InstancedMesh(st.geo,st.mats[0],loose);
     for(var i=0;i<loose;i++){var pp=pos(merged*100+i);m4.makeTranslation(pp[0],spec.t*STACK/2,pp[1]);im.setMatrixAt(i,m4);}
     im.userData.v3Full=loose;im.userData.v3Intro=true;G.add(im);}
@@ -22158,7 +22161,7 @@ function v3CashPlate(spec,n,lite){   // one plate's coins; finished blocks of 1,
 }
 function v3CashContent(spec,units,cur){var G=new THREE.Group(),PER_BLOCK=1000;
   var sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return Math.round(n).toLocaleString('en-GB');};
-  var plates=v3CashPlates(units),lite=plates.reduce(function(s,p){return s+Math.floor(p.units/1000);},0)>V3_REAL_BLOCKS,built=plates.map(function(p){return v3CashPlate(spec,p.units,lite);});
+  var plates=v3CashPlates(units),lite=plates.reduce(function(s,p){return s+Math.floor(p.units/1000);},0)>v3RealBlocks(spec),built=plates.map(function(p){return v3CashPlate(spec,p.units,lite);});
   var m=spec.d*3,pad=spec.d*6,area=built.reduce(function(s,b){return s+(b.w+pad)*(b.d+pad);},0);
   var target=Math.max(Math.max.apply(null,built.map(function(b){return b.w;}).concat([0])),Math.sqrt(area)*1.2);
   var x=0,z=0,rowD=0,rows=1,X0=1e9,X1=-1e9,Z0=1e9,Z1=-1e9;
