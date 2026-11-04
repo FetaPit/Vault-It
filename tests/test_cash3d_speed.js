@@ -73,7 +73,7 @@ const HOOK = () => {
   ok(o.newPrograms === 0, 'the tap compiles no shader: the warm-up already did (' + o.newPrograms + ' compiled on opening)');
   info('opening: the viewer\'s own code on the phone profile (longest ' + o.longest.toFixed(0) + ' ms of JavaScript; time inside WebGL calls and canvas resizes is the software GPU here and is read on the owner\'s phone with ?perf=1: ' + o.spans + ')');
   info('the first draw\'s own JavaScript (' + (o.firstOwn == null ? '-' : o.firstOwn.toFixed(0)) + ' ms; ' + (o.firstRender == null ? '-' : o.firstRender.toFixed(0)) + ' ms with the software GPU)');
-  ok(o.dpr <= 1.5 + 1e-9, 'pixel ratio capped at 1.5 on a touch screen (' + o.dpr + ')');
+  ok(o.dpr <= 2 + 1e-9, 'pixel ratio within the house builder rule on a touch screen: at most 2 at rest, 1.25 while coins land (R16) (' + o.dpr + ')');
 
   // ── 1b. the coin colours: gold coins lifted into the brand gold, silver coins stay silver (QC, 2 Nov: the euro and rupee coins must not turn gold) ──
   const coins = await p.evaluate(() => Object.keys(V3_COINS).map(c => { const sp = V3_COINS[c], h = v3Lift(sp.outer, V3_LIFT), n = parseInt(h.slice(1), 16), r = n >> 16 & 255, b = n & 255;

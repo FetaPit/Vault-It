@@ -196,14 +196,14 @@ const LABEL_PX = () => {
     console.log(JSON.stringify(c));
     ok(c.calls <= c.plates * 3 + 10, 'cash at £250,300: at most three draws a plate plus the fixed floor and flags (' + c.calls + ' for ' + c.plates + ' plates)');
     ok(c.tris < 120000, 'cash at £250,300: past ' + 12 + ' blocks each block is one painted box, so the triangle count stays low (' + c.tris + ')');
-    ok(c.dpr <= 1.5 + 1e-9, 'pixel ratio capped at 1.5 (' + c.dpr + ')');
+    ok(c.dpr <= 2 + 1e-9, 'pixel ratio at most 2, the house builder rule (R16 replaced the flat 1.5 cap) (' + c.dpr + ')');
     await p.evaluate(() => showSubtab('assets', 'metals', null));
     await p.evaluate(() => { alState.metals = { gold: 1000, silver: 0, platinum: 0, palladium: 0 }; renderMetalsISO(); });
     await p.waitForTimeout(2500);
     const m = await p.evaluate(() => { const V = V3.metals; V.r.info.autoReset = true; V.r.render(V.sc, V.cam); return { calls: V.r.info.render.calls, tris: V.r.info.render.triangles, dpr: V.r.getPixelRatio() }; });
     console.log(JSON.stringify(m));
     ok(m.calls <= 16, 'metals at 1,000 oz gold: the bars stay a handful of draws (' + m.calls + ')');
-    ok(m.dpr <= 1.5 + 1e-9, 'metals: pixel ratio capped at 1.5 (' + m.dpr + ')');
+    ok(m.dpr <= 2 + 1e-9, 'metals: pixel ratio at most 2, the house builder rule (' + m.dpr + ')');
     await ctx.close();
   }
 
