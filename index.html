@@ -14891,9 +14891,9 @@ body.vi-pop-open{overflow:hidden}
   .bd-split>.ov-chart-card{background:none!important;border:0!important;box-shadow:none!important;clip-path:none!important;padding-top:4px}
   .bd-split>.bd-inc{padding-right:clamp(16px,2vw,32px)}
   .bd-split>.bd-exp{padding-left:clamp(16px,2vw,32px)}
-  .bd-split::before{content:'';position:absolute;top:-14px;bottom:0;left:var(--bd-split,40%);width:0;margin-left:-1px;border-left:2px dashed var(--bd-line);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--bd-line) 50%,transparent))}
+  .bd-split::before{content:'';position:absolute;top:-14px;bottom:0;left:var(--bd-split,40%);width:1.5px;margin-left:-.75px;background:var(--bd-line);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--bd-line) 50%,transparent))}
   .bd-sankey-card{position:relative;padding-left:0!important;padding-right:0!important}
-  .bd-sankey-card::after{content:'';position:absolute;top:var(--bd-line-top,0px);bottom:0;left:var(--bd-split,40%);width:0;margin-left:-1px;border-left:2px dashed var(--bd-line);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--bd-line) 50%,transparent));pointer-events:none;z-index:3}
+  .bd-sankey-card::after{content:'';position:absolute;top:var(--bd-line-top,0px);bottom:0;left:var(--bd-split,40%);width:1.5px;margin-left:-.75px;background:var(--bd-line);filter:drop-shadow(0 0 6px color-mix(in srgb,var(--bd-line) 50%,transparent));pointer-events:none;z-index:3}   /* solid and 1.5 px, the thickness of the flow lines above (owner, 4 Nov, R11) */
   .bd-sankey-card.bd-is-3d::after{display:none}
   #bd-sankey svg{max-height:none!important;width:100%!important}
 }
@@ -20281,9 +20281,9 @@ function drawCashflowDiagram(){
   }).filter(function(g){return g.sum>0;});
   var nItems=groups.reduce(function(n,g){return n+g.items.length;},0);
   var wide=window.innerWidth>=900;   // on desktop the diagram is condensed vertically so it fits one screen
-  var W=960,padT=42,padB=14,nodeW=14,gapItem=wide?4:6,gapGroup=wide?16:22,gapSrc=6,MINSLOT=36;   // 36: a two-line label chip is 32 px tall, so rows never touch (E4 labels, v0.7)
+  var W=960,padT=42,padB=14,nodeW=14,gapItem=wide?2:3,gapGroup=wide?10:14,gapSrc=4,MINSLOT=32;   // 32: a two-line label chip is 32 px tall, so rows just clear each other; tighter spacing for the owner's "more compact across the Y axis" (4 Nov, v0.9.1 round 2 R10)
   var XS=190,XI=370,XG=535,XT=795;
-  var usable=Math.max(300,60+nItems*(wide?27:34));
+  var usable=Math.max(260,50+nItems*(wide?20:26));
   var gaps=(nItems-groups.length)*gapItem+(groups.length-1)*gapGroup;
   var k=(usable-gaps)/T;
   // item column
@@ -20308,7 +20308,7 @@ function drawCashflowDiagram(){
   var H=Math.max(itemsBottom,incY+incH,srcY+srcTotal)+padB;
   if(wide&&window.innerWidth>=1100){   // widen the canvas (not the text) until the whole diagram fits the window height (under 1100 the diagram is 1:1 in its scroller)
     var host0=hosts.filter(function(h){return h.clientWidth>0;})[0],cw=host0?host0.clientWidth:960;
-    var isBd=host0&&host0.id==='bd-sankey',Hmax=Math.max(380,window.innerHeight-(isBd?150:170));
+    var isBd=host0&&host0.id==='bd-sankey',Hmax=Math.max(380,Math.round((window.innerHeight-(isBd?150:170))*.84),Math.round(H*.51));   // 84% of the free window height: the chart no longer stretches to fill the screen (owner, 4 Nov: more compact on the Y axis)
     var Wv=Math.max(960,cw*H/Hmax),sx=Wv/960;
     if(sx>1.001){XS*=sx;XI*=sx;XG*=sx;XT*=sx;W=Wv;}
   }
@@ -30648,6 +30648,17 @@ function stage(cv,o,draw){
   document.addEventListener("visibilitychange",S.kick);
   size();return S;
 }
+/* icons on the 3D labels (owner, 4 Nov 2026, v0.9.1 round 2 R2 and R9): the app's own category icons, drawn from the page's icon sprite into the canvas.
+   An icon is a small SVG image per symbol, colour and size, made once; until it has loaded the label draws without it and the stage redraws when it arrives. */
+var ICOS={};
+function icoImg(id,col,px,kick){var k=id+"|"+col+"|"+px,e=ICOS[k];if(e)return e.ok?e.im:null;var s=document.getElementById(id);if(!s)return null;
+  e=ICOS[k]={ok:false,im:new Image()};var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="'+px+'" height="'+px+'" color="'+col+'">'+s.innerHTML.replace(/currentColor/g,col)+'</svg>';
+  e.im.onload=function(){e.ok=true;if(kick)kick()};e.im.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);return null}
+var NW_ICO={cash:"vi-cash",deposit:"vi-house-builder",stocks:"vi-candles",metals:"vi-metals",crypto:"vi-crypto",inv:"vi-cube",liabval:"vi-liabilities",owed:"vi-coins",other:"vi-assets-total",debtov:"vi-debt-total",running:"vi-repeat"};
+var NW_DEBT_ICO={credit:"vi-card",personal:"vi-loan",loan:"vi-loan",student:"vi-book",car:"vi-car",bnpl:"vi-bnpl",overdraft:"vi-overdraft",mortgage:"vi-mortgage",other:"vi-loan"};
+function nwIcon(k){k=String(k||"");if(k.indexOf("debt:")===0)return NW_DEBT_ICO[k.slice(5)]||"vi-loan";return NW_ICO[k]||"vi-coin"}
+var CF_ICO={ce:"vi-b-ce",ve:"vi-b-ve",cn:"vi-b-cn",vn:"vi-b-vn",sv:"vi-piggy",iv:"vi-trend-base"};   /* the budget groups' own icons, as on the Budget tiles and the legend chips */
+function cfIcon(k){return CF_ICO[k]||"vi-coin"}
 function tag(c,cw,l1,l2,red,anchor){
   var fs=clamp(cw*.026,11,17);
   c.font=fs+"px 'Share Tech Mono',monospace";var w1=c.measureText(l1).width;c.font=(fs*1.5)+"px 'Share Tech Mono',monospace";var w2=c.measureText(l2).width;
@@ -30751,11 +30762,11 @@ function makeNW(cv,o){
     var lf=clamp(cw*.022,10,12),lines={};
     function names(back){c.font=lf+"px 'Share Tech Mono',monospace";c.textAlign="center";c.textBaseline="alphabetic";
     cols.filter(function(cc){return (LZ[cc.key]<0)===back}).map(function(cc){return {c:cc,q:P.pt(X[cc.key],0,LZ[cc.key])}}).sort(function(a,b){return a.q[0]-b.q[0]}).forEach(function(L){
-      var placed=lines.box=lines.box||[],w=c.measureText(L.c.short).width,r=-1;L.q[0]=clamp(L.q[0],w/2+4,cw-w/2-(L.q[1]>ch*.45?54:4));   /* clear of the zoom buttons */L.q[1]=Math.min(L.q[1],ch-14-2*(lf+3));   /* full names (owner, 31 Oct): up to three staggered lines, never off the stage, never over another name */
-      for(var j=0;j<3&&r<0;j++){var yy=L.q[1]+j*(lf+3),x0=L.q[0]-w/2-3,x1=L.q[0]+w/2+3;if(!placed.some(function(B){return Math.abs(B.y-yy)<lf+2&&x0<B.x1&&x1>B.x0}))r=j}
-      if(r<0)return;placed.push({x0:L.q[0]-w/2-3,x1:L.q[0]+w/2+3,y:L.q[1]+r*(lf+3)});
+      var placed=lines.box=lines.box||[],tw=c.measureText(L.c.short).width,isz=Math.round(lf*1.3),w=tw+isz+4,r=null;L.q[0]=clamp(L.q[0],w/2+4,cw-w/2-(L.q[1]>ch*.45?54:4));   /* clear of the zoom buttons */L.q[1]=Math.min(L.q[1],ch-14-3*(lf+3));   /* full names (owner, 31 Oct): up to three staggered lines, never off the stage, never over another name */
+      var rows=[0,1,2,-1,-2,3];for(var j=0;j<rows.length&&r===null;j++){var yy=L.q[1]+rows[j]*(lf+3),x0=L.q[0]-w/2-3,x1=L.q[0]+w/2+3;if(yy>lf+2&&!placed.some(function(B){return Math.abs(B.y-yy)<lf+2&&x0<B.x1&&x1>B.x0}))r=rows[j]}   /* the icon makes a name wider: when its own three rows are taken it may sit above its column instead (R2) */
+      if(r===null)return;placed.push({x0:L.q[0]-w/2-3,x1:L.q[0]+w/2+3,y:L.q[1]+r*(lf+3)});
       var ly=L.q[1]+r*(lf+3);c.fillStyle="rgba(8,8,8,.72)";c.fillRect(L.q[0]-w/2-3,ly-lf*1.05,w+6,lf*1.5);   /* the income flow's label plate: transparent black behind the name (owner, 31 Oct) */
-      c.fillStyle=labCol(L.c);if(hover===L.c.key)c.fillStyle='#fff';   /* each name in its own column's colour (owner, 2 Nov), lightened only as far as the dark label plate needs to read */c.fillText(L.c.short,L.q[0],ly)})}
+      var lc=labCol(L.c);if(hover===L.c.key)lc='#fff';c.fillStyle=lc;var im=icoImg(nwIcon(L.c.key),lc,isz*2,S.kick);if(im)c.drawImage(im,L.q[0]-w/2,ly-lf*1.05+(lf*1.5-isz)/2,isz,isz);c.textAlign="left";   /* each name in its own column's colour (owner, 2 Nov), lightened only as far as the dark label plate needs to read */c.fillText(L.c.short,L.q[0]-w/2+isz+4,ly)})}
     if(narrow){items.forEach(function(g){if(g.dir>0)paint(g)});names(true);names(false)}   /* phones: names on top of the blocks, so none hides behind a column */
     else{names(true);items.forEach(function(g){if(g.dir>0)paint(g)});names(false)}
     var l1=debt<=0&&net>=0?"OUT OF THE RED":red?"IN THE RED":"NET WORTH";
@@ -30969,7 +30980,7 @@ function makeTreeMap(cv,o){
        (name in DM Sans, amount in Share Tech Mono in the group colour). Projected every frame, so the posts turn with the orbit; only the chip
        faces the screen. A chip that would cover another is raised one chip height at a time (at most three), then shows the amount only; it
        never slides off its post. Reduced motion: the posts stand at full height at once. */
-    var NF="600 11px 'DM Sans',sans-serif",AF="10.5px 'Share Tech Mono',monospace",PX=6,PY=4,HC=19,placed=[],flags=[],todo=[];
+    var NF="600 11px 'DM Sans',sans-serif",AF="10.5px 'Share Tech Mono',monospace",PX=6,PY=4,HC=19,IS=13,IW=IS+4,placed=[],flags=[],todo=[];
     (function(){var fs=clamp(cw*.026,11,17);cx.font=fs+"px 'Share Tech Mono',monospace";var w1=cx.measureText("MONTHLY INCOME").width;cx.font=(fs*1.5)+"px 'Share Tech Mono',monospace";var w2=cx.measureText(fmt(total)).width;
       var tw=Math.max(w1,w2)+fs*1.5,th=fs*3.6;placed.push({x:cw-tw-14-4,y:14-4,w:tw+8,h:th+8});self._tag={x:cw-tw-14,y:14,w:tw,h:th}})();   // the Monthly income tag (drawn last, top right) is in the way too
     var fl=rects.map(function(r){var ix=Math.min(IN,r.w*.25),iz=Math.min(IN,r.d*.25),bx=r.x+ix,bz=r.z+iz;return {r:r,bx:bx,bz:bz,base:Pr.pt(bx,.02,bz),top:Pr.pt(bx,CH*3,bz)}});
@@ -30978,7 +30989,7 @@ function makeTreeMap(cv,o){
       var r=o.r,a=land(r);if(a<=0)return;
       var rise=rm?1:ease3(a),tp=rise>=1?o.top:Pr.pt(o.bx,.02+(CH*3-.02)*rise,o.bz),name=r.g.label,amt=fmt(r.g.sum);
       cx.font=NF;var nw=cx.measureText(name+' \u00b7 ').width;cx.font=AF;var aw=cx.measureText(amt).width;
-      var fit=function(only,k,left){var w=PX*2+(only?0:nw)+aw,dx=tp[0],dy=tp[1]-k*(HC+2),x=left?dx-w:dx;   // the chip hangs right of its post, or left of it, its corner exactly on the dot (Pedro round 1: no gap)
+      var fit=function(only,k,left){var w=PX*2+IW+(only?0:nw)+aw,dx=tp[0],dy=tp[1]-k*(HC+2),x=left?dx-w:dx;   // the chip hangs right of its post, or left of it, its corner exactly on the dot (Pedro round 1: no gap)
         return {x:x,y:dy-HC,w:w,h:HC,dot:[dx,dy],k:k,only:only}};
       var clash=function(c){return c.y<0||c.x<0||c.x+c.w>cw||placed.some(function(b){return c.x<b.x+b.w+3&&b.x<c.x+c.w+3&&c.y<b.y+b.h+2&&b.y<c.y+c.h+2})};
       var c=null;[false,true].some(function(only){for(var k=0;k<=3;k++)for(var sd=0;sd<2;sd++){var t=fit(only,k,sd===1);if(!clash(t)){c=t;return true}}return false});
@@ -30991,9 +31002,10 @@ function makeTreeMap(cv,o){
       if(t.none){flags.push({group:r.g.key,name:name,amount:amt,col:r.g.col.slice(),base:o.base.slice(0,2),dot:c.dot.slice(),chip:null,raise:0,amountOnly:true,worldTop:CH*3,blockH:CH,rise:rise,alpha:a,style:null});return}
       cx.globalAlpha=a;cx.beginPath();if(cx.roundRect)cx.roundRect(c.x+.5,c.y+.5,c.w-1,c.h-1,4);else cx.rect(c.x+.5,c.y+.5,c.w-1,c.h-1);cx.fillStyle='rgba(8,8,8,0.88)';cx.fill();cx.strokeStyle=rgba(r.g.col,.5);cx.lineWidth=1;cx.stroke();
       cx.textBaseline='middle';cx.textAlign='left';var ty=c.y+c.h/2+.5,tx=c.x+PX;
+      var im=icoImg(cfIcon(r.g.key),rgba(r.g.col,1),IS*2,S.kick);if(im)cx.drawImage(im,tx,c.y+(c.h-IS)/2,IS,IS);tx+=IW;   /* the group's own icon, left of the name (owner, 4 Nov, R9) */
       if(!c.only){cx.font=NF;cx.fillStyle='#E8E8E8';cx.fillText(name+' \u00b7 ',tx,ty);tx+=nw}
       cx.font=AF;cx.fillStyle=rgba(r.g.col,1);cx.fillText(amt,tx,ty);cx.beginPath();cx.arc(c.dot[0],c.dot[1],1.5,0,Math.PI*2);cx.fill();cx.globalAlpha=1;   // the dot again on the chip's corner, so the anchor shows
-      flags.push({group:r.g.key,name:name,amount:amt,col:r.g.col.slice(),base:o.base.slice(0,2),dot:c.dot.slice(),chip:{x:c.x,y:c.y,w:c.w,h:c.h},raise:c.k,amountOnly:c.only,
+      flags.push({group:r.g.key,icon:cfIcon(r.g.key),name:name,amount:amt,col:r.g.col.slice(),base:o.base.slice(0,2),dot:c.dot.slice(),chip:{x:c.x,y:c.y,w:c.w,h:c.h},raise:c.k,amountOnly:c.only,
         worldTop:CH*3,blockH:CH,rise:rise,alpha:a,style:{fill:'rgba(8,8,8,0.88)',stroke:.5,radius:4,padX:PX,padY:PY,nameFont:NF,amtFont:AF,nameCol:'#E8E8E8',post:1,dot:3}})});
     self._flags=flags;
     var lf=clamp(cw*.02,9,12);   // the caption's size (it was set by the floor labels this replaces)
@@ -31015,7 +31027,7 @@ function makeTreeMap(cv,o){
   var S=stage(cv,o,draw);self._narrow=S.cw<520;
   return self;
 }
-window.ViNW3D={timing:NW_D,makeNW:makeNW,makeTracker:makeTracker,makeTreeMap:makeTreeMap,niceUnit:niceUnit,split:split,reduceMotion:reduceMotion,lite:function(v){if(v!=null)LITE=!!v;return LITE},coarse:COARSE};
+window.ViNW3D={nwIcon:nwIcon,cfIcon:cfIcon,timing:NW_D,makeNW:makeNW,makeTracker:makeTracker,makeTreeMap:makeTreeMap,niceUnit:niceUnit,split:split,reduceMotion:reduceMotion,lite:function(v){if(v!=null)LITE=!!v;return LITE},coarse:COARSE};
 })();
 </script>
 <script id="vi-nw3d-app">
@@ -31189,7 +31201,7 @@ function disable(){   // back to the classic card exactly as it was built
   chartCard.classList.remove('nw3d-main-3d');if(ttl)ttl.textContent='Net Worth Progress';
   window.drawChart=drawChart=_draw;delete window.nw3d;try{_draw();}catch(e){}
 }
-window.nw3d={timing:{dropMs:ViNW3D.timing.drop,flashMs:ViNW3D.timing.flash,stackMs:ViNW3D.timing.stack,stackStep:ViNW3D.timing.stackStep,budgetPileMs:ViNW3D.timing.pileMs,budgetGoMs:ViNW3D.timing.goMs},hero:heroEng,tracker:trk,setMain:setMain,main:curMain,sceneData:sceneData,trackerData:trackerData,refresh:refresh,disable:disable};
+window.nw3d={iconFor:ViNW3D.nwIcon,timing:{dropMs:ViNW3D.timing.drop,flashMs:ViNW3D.timing.flash,stackMs:ViNW3D.timing.stack,stackStep:ViNW3D.timing.stackStep,budgetPileMs:ViNW3D.timing.pileMs,budgetGoMs:ViNW3D.timing.goMs},hero:heroEng,tracker:trk,setMain:setMain,main:curMain,sceneData:sceneData,trackerData:trackerData,refresh:refresh,disable:disable};
 fcSync();
 if(document.readyState==='complete')setTimeout(refresh,50);else window.addEventListener('load',function(){setTimeout(refresh,50)});
 /* safety net (owner, 31 Oct: the scene was empty on opening the app again). A refresh is forced, and the stage kicked, a moment after
@@ -31253,7 +31265,7 @@ function init(){var seg=el('bd-view');if(!seg)return;
   var saved='flow';try{saved=localStorage.getItem(KEY)==='3d'?'3d':'flow'}catch(e){}show(saved,false);
   try{refresh(true)}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-window.bd3d={show:show,engine:function(){return eng},dashEngine:function(){return dash},data:data,view:function(){return cur}};
+window.bd3d={iconFor:ViNW3D.cfIcon,show:show,engine:function(){return eng},dashEngine:function(){return dash},data:data,view:function(){return cur}};
 })();
 </script>
 <script id="vi-feedback">
