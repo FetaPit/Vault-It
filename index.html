@@ -10892,10 +10892,16 @@ button.bd-ic{cursor:pointer}
 .cr-tile .c-pl{grid-area:pl;text-align:right;align-self:end}
 .cr-tile .c-x{grid-area:x;width:100%!important;justify-content:center}
 @media(max-width:600px){.cr-tile .stk-hl{width:84px!important;height:84px!important}}
-/* light eighth-turn on each coin, as the Financial freedom roadmap coins turn (owner, 4 Nov); out of step per tile, still for reduced motion */
-.cr-tile .stk-hl{animation:cr-turn 5s ease-in-out infinite;animation-delay:calc(var(--i,0) * -1.3s)}
-@keyframes cr-turn{0%,100%{transform:perspective(420px) rotateY(0deg)}50%{transform:perspective(420px) rotateY(45deg)}}
-@media(prefers-reduced-motion:reduce){.cr-tile .stk-hl{animation:none}}
+/* the coin (owner, 4 Nov: "light turn animations like the Financial freedom roadmap", then "a satisfying thickness and light reflections upon rotating, no more than 10 degrees"):
+   a gentle swing of 10 degrees either way; fourteen thin gold discs behind the face give it real edge thickness; a soft light streak sweeps the face as it swings; all still for reduced motion */
+.cr-coin{position:relative;display:flex;flex:none;transform-style:preserve-3d;animation:cr-turn 5s ease-in-out infinite;animation-delay:calc(var(--i,0) * -1.3s)}
+.cr-coin .cr-edge{position:absolute;inset:0;border-radius:50%;transform:translateZ(calc(var(--k) * -3.2px));background:linear-gradient(180deg,#fbefc4,#e0b552 50%,#9a6f22);box-shadow:inset 0 0 0 1px rgba(0,0,0,.28)}
+.cr-coin .cr-edge:nth-child(even){filter:brightness(.88)}
+.cr-tile .stk-hl{position:relative}
+.cr-tile .stk-hl::after{content:'';position:absolute;top:0;bottom:0;left:-60%;width:220%;pointer-events:none;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.55) 49%,rgba(255,255,255,.14) 54%,transparent 60%);transform:translateX(-30%);animation:cr-sheen 5s ease-in-out infinite;animation-delay:calc(var(--i,0) * -1.3s)}
+@keyframes cr-turn{0%,100%{transform:perspective(1200px) rotateY(-10deg)}50%{transform:perspective(1200px) rotateY(10deg)}}
+@keyframes cr-sheen{0%,100%{transform:translateX(-30%)}50%{transform:translateX(30%)}}
+@media(prefers-reduced-motion:reduce){.cr-coin,.cr-tile .stk-hl::after{animation:none}.cr-coin{transform:none}}
 .inv-stage .inv-prev{display:block;max-width:100%;max-height:100%;margin:auto;object-fit:contain;position:absolute;inset:0}
 .inv-stage canvas[hidden]{display:none}
 .wi-img-overlay{pointer-events:none}
@@ -22844,6 +22850,7 @@ function crCoinBadge(h,px,col){
   return '<span class="stk-hl cr-hl" style="width:'+px+'px;height:'+px+'px;border-radius:50%">'
     +(url?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+stkEsc(url)+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="stk-hl-fb" style="display:none;width:100%;height:100%">'+fb+'</span>':fb)+'</span>';
 }
+function crCoin3d(h,px,col){var e='';for(var k=1;k<=14;k++)e+='<i class="cr-edge" style="--k:'+k+'"></i>';return '<span class="cr-coin" aria-hidden="true">'+e+crCoinBadge(h,px,col)+'</span>';}
 function crAllocView(){try{return localStorage.getItem('vi-cr-alloc')==='tree'?'tree':'bars';}catch(e){return 'bars';}}
 function crSetAlloc(v){try{localStorage.setItem('vi-cr-alloc',v);}catch(e){}crRender();}
 function crGrpOpen(w,n){var m=stkOpenMap(),k='cr:'+w;return m[k]===undefined?n<=1:!!m[k];}
@@ -22880,7 +22887,7 @@ function crRender(){
           +'<div class="stk-gb"'+(open?'':' hidden')+'><div class="cr-grid">'+g.hs.map(function(h){var c=h._c,i=hs.indexOf(h),col=CR_COLORS[gi%CR_COLORS.length];
             var v=stkValue(h),sus=stkSuspect(h),b=stkBasis(h),pl=(!sus&&b>0)?(stkPrice(h)-b)/b*100:null,cid=c.id,ch=+c.change24h||0;
             return '<div class="cr-row cr-tile" style="--i:'+i+'">'
-              +'<div class="c-tk">'+crCoinBadge(h,96,col)+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+CR_COLORS[i%CR_COLORS.length]+'"></i>'+stkEsc(h.sym)+'</div><div class="stk-nm cr-held">'+crQty(h.units)+' '+stkEsc(h.sym)+' held</div></div></div>'
+              +'<div class="c-tk">'+crCoin3d(h,96,col)+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+CR_COLORS[i%CR_COLORS.length]+'"></i>'+stkEsc(h.sym)+'</div><div class="stk-nm cr-held">'+crQty(h.units)+' '+stkEsc(h.sym)+' held</div></div></div>'
               +'<div class="c-pr"><span class="stk-lb">Price £</span>'+(c.priceSrc==='live'?'<div class="stk-px">£'+(+c.price).toLocaleString('en-GB',{maximumFractionDigits:c.price<1?6:2})+'</div>':'<input class="stk-inp" type="number" min="0" step="any" value="'+(+c.price>0?c.price:'')+'" onchange="updateCryptoPrice('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' price in pounds" title="Your price in £. A live price replaces it when CoinGecko has one">')+'<div class="stk-src cr-src cr-src-'+(c.priceSrc==='live'?'live':c.priceSrc==='stale'?'stale':'own')+'">'+crPriceLine(c)+(ch&&c.priceSrc==='live'?' · <span style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
               +'<div class="cr-ins">'
               +'<div class="c-un"><span class="stk-lb">Amount</span><input class="stk-inp" type="number" min="0" step="any" value="'+h.units+'" onchange="updateCryptoAmount('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' amount held" title="Editable: how much you hold"></div>'

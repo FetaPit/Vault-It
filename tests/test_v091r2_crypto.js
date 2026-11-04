@@ -73,21 +73,29 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     ok(r.tiles.every(x => x.src && /held/.test(x.held || '') && x.imgOk), t + 'each tile shows tokens held, where the price comes from, and its own logo');
     ok(!r.sideways, t + 'the page does not scroll sideways');
     if (w >= 900) ok(r.across >= 2, t + 'tiles sit side by side on a wide screen (' + r.across + ' across)');
-    // R20b (owner, 4 Nov, "light 1/8 turn animations to the crypto coins like we have on the Financial freedom roadmap"): each coin turns an eighth (45 degrees) and back, slowly, out of step with its neighbours
+    // R20b (owner, 4 Nov): "light 1/8 turn animations to the crypto coins like the Financial freedom roadmap", then "add a satisfying thickness and light reflections upon rotating.
+    //  We do not need to rotate any more than 10 degrees": a gentle swing of at most 10 degrees, a coin with real edge thickness, and a light sheen that sweeps the face as it swings.
     const an = async () => page.evaluate(async () => {
-      const els = [...document.querySelectorAll('#crypto-table .cr-tile .stk-hl')]; const name = els.map(e => getComputedStyle(e).animationName);
-      const tf = () => els.map(e => getComputedStyle(e).transform);
-      const a = tf(); await new Promise(r => setTimeout(r, 1200)); const b = tf();
-      let kf = ''; for (const sh of document.styleSheets) { try { for (const r of sh.cssRules) if (r.name === 'cr-turn') kf = r.cssText; } catch (e) {} }
+      const els = [...document.querySelectorAll('#crypto-table .cr-tile .cr-coin')]; const name = els.map(e => getComputedStyle(e).animationName);
+      const tf = () => els.map(e => getComputedStyle(e).transform), sh = () => els.map(e => getComputedStyle(e.querySelector('.stk-hl'), '::after').transform);
+      const a = tf(), sa = sh(); await new Promise(r => setTimeout(r, 1200)); const b = tf(), sb = sh();
+      let kf = ''; for (const st of document.styleSheets) { try { for (const r of st.cssRules) if (r.name === 'cr-turn') kf = r.cssText; } catch (e) {} }
+      const angles = [...kf.matchAll(/rotate[XYZ]?\((-?[\d.]+)deg/g)].map(m => Math.abs(+m[1]));
       const delays = els.map(e => getComputedStyle(e).animationDelay);
-      return { name, moved: a.some((x, i) => x !== b[i]), kf, staggered: new Set(delays).size > 1, n: els.length };
+      const e0 = els[0], edges = e0 ? [...e0.querySelectorAll('.cr-edge')] : [];
+      const zs = edges.map(x => { const m = getComputedStyle(x).transform; return m && m !== 'none' ? Math.abs(+m.match(/matrix3d\((.*)\)/)[1].split(',')[14]) : 0; });
+      const sheen = e0 ? getComputedStyle(e0.querySelector('.stk-hl'), '::after') : null;
+      return { name, moved: a.some((x, i) => x !== b[i]), sheenMoved: sa.some((x, i) => x !== sb[i]), maxAngle: Math.max(0, ...angles), nAngles: angles.length, staggered: new Set(delays).size > 1, n: els.length,
+        style3d: e0 ? getComputedStyle(e0).transformStyle : '', edges: edges.length, depth: Math.max(0, ...zs), sheenName: sheen ? sheen.animationName : '', sheenBg: sheen ? sheen.backgroundImage : '' };
     });
     let am = await an();
     ok(am.n === 4 && am.name.every(x => x === 'cr-turn'), t + 'every coin carries the cr-turn animation (' + am.name.join(',') + ')');
-    ok(/rotateY\(45deg\)/.test(am.kf), t + 'the turn is an eighth of a turn, 45 degrees (' + am.kf.replace(/\s+/g, ' ').slice(0, 120) + ')');
-    ok(am.moved && am.staggered, t + 'the coins are actually turning, each out of step with the next');
+    ok(am.nAngles >= 2 && am.maxAngle <= 10 && am.maxAngle >= 8, t + 'the swing is gentle: no more than 10 degrees, and enough to read (' + am.maxAngle + ' degrees)');
+    ok(am.moved && am.staggered, t + 'the coins are actually swinging, each out of step with the next');
+    ok(am.style3d === 'preserve-3d' && am.edges >= 8 && am.depth >= 12, t + 'each coin has real thickness: ' + am.edges + ' edge layers, ' + am.depth + ' px deep');
+    ok(am.sheenName === 'cr-sheen' && /gradient/.test(am.sheenBg) && am.sheenMoved, t + 'a light reflection sweeps across the face as the coin swings (' + am.sheenName + ')');
     await page.emulateMedia({ reducedMotion: 'reduce' }); await page.waitForTimeout(200); am = await an();
-    ok(am.name.every(x => x === 'none') && !am.moved, t + 'with reduced motion the coins stay still');
+    ok(am.name.every(x => x === 'none') && !am.moved && !am.sheenMoved && am.sheenName === 'none', t + 'with reduced motion the coins and their reflections stay still');
     ok(!errs.length, t + 'no page errors ' + errs.slice(0, 2).join('|'));
     await ctx.close();
   }
