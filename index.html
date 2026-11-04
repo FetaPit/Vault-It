@@ -12136,7 +12136,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
         <!-- Founding Member -->
         <div class="vi-camp-tier vi-camp-gold-tier">
-          <div class="vi-camp-tier-badge" id="camp-founder-slots">100 places</div>
+          <div class="vi-camp-tier-badge" id="camp-founder-slots">100 founding places · Be one of the first</div>
           <div class="vi-camp-tier-name">Founding Member</div>
           <div class="vi-camp-tier-price" id="camp-price-founder">£149<span> once</span></div>
           <div class="vi-camp-tier-note">One payment for Pro for the life of the Vault-It service. AI extras have a monthly allowance. 14 days to change your mind.</div>
@@ -30119,7 +30119,9 @@ function viApplyFounderBadge() {
 function viCampaignPaint() {   // owner, 3 Nov: the Founding badge says just "N left": the Stripe cap (founderSlots) minus real paid founders from campaign_counts(); "100 places" until the counts load
   var c = VI_CAMPAIGN, e = document.getElementById('camp-founder-slots'); if (!e) return;
   var known = typeof c.founderTaken === 'number';
-  e.textContent = known ? Math.max(0, c.founderSlots - c.founderTaken) + ' left' : c.founderSlots + ' places';
+  // owner, 4 Nov: "100 founding places · Be one of the first" until a real founder has paid; then the real count left. Never seeded.
+  var taken = known ? Math.min(c.founderSlots, Math.max(0, c.founderTaken)) : 0;
+  e.textContent = taken > 0 ? (c.founderSlots - taken) + ' of ' + c.founderSlots + ' founding places left' : c.founderSlots + ' founding places · Be one of the first';
 }
 // the Vaulter card: both prices come from VI_PLANS, so a price change there is the only edit
 function viCampaignPrices() {
