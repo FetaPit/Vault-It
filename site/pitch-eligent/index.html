@@ -477,10 +477,15 @@ footer a{color:#E8C56A}
 var frames=[].slice.call(document.querySelectorAll('.frame')),cur=0,body=document.body,count=document.getElementById('pv-count');
 function fit(){frames.forEach(function(f){var w=f.clientWidth;if(w)f.style.setProperty('--s',w/1920)})}
 function videos(){frames.forEach(function(f,k){f.querySelectorAll('video').forEach(function(v){if(body.classList.contains('present')&&k!==cur)v.pause();else{if(body.classList.contains('present')&&k===cur)v.currentTime=0;var p=v.play();if(p&&p.catch)p.catch(function(){})}})})}
-function show(i){cur=Math.max(0,Math.min(frames.length-1,i));frames.forEach(function(f,k){f.classList.toggle('on',k===cur)});count.textContent=(cur+1)+' / '+frames.length;fit();videos()}
+function show(i){cur=Math.max(0,Math.min(frames.length-1,i));frames.forEach(function(f,k){f.classList.toggle('on',k===cur)});count.textContent=(cur+1)+' / '+frames.length;fit();videos();say()}
 function open(){var start=0,best=-1;for(var k=0;k<frames.length;k++){var r=frames[k].getBoundingClientRect(),seen=Math.min(r.bottom,innerHeight)-Math.max(r.top,0);if(seen>best+1){best=seen;start=k}}body.classList.add('present');show(start);var d=document.documentElement;if(d.requestFullscreen)d.requestFullscreen().catch(function(){})}
-function close(){body.classList.remove('present');frames.forEach(function(f){f.classList.remove('on')});if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(function(){});fit();videos();frames[cur].scrollIntoView({block:'center'});document.getElementById('pv-open').focus()}
+function close(){body.classList.remove('present');frames.forEach(function(f){f.classList.remove('on')});if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(function(){});fit();videos();frames[cur].scrollIntoView({block:'center'});document.getElementById('pv-open').focus();say()}
 document.getElementById('pv-open').addEventListener('click',open);
+/* presenter link: vault-it.co/pitch-Eligent-presenter in another window of the same browser follows and drives this deck */
+var bc=null;try{bc=new BroadcastChannel('vi-pitch-eligent')}catch(e){}
+function say(){if(bc)try{bc.postMessage({t:'at',i:cur,n:frames.length,present:body.classList.contains('present')})}catch(e){}}
+if(bc)bc.onmessage=function(e){var m=e.data||{};if(m.t==='go'&&typeof m.i==='number'){body.classList.add('present');show(m.i)}else if(m.t==='hello')say()};
+if(/[?&]present(=|&|$)/.test(location.search)){body.classList.add('present');show(0)}
 document.getElementById('pv-close').addEventListener('click',close);
 document.getElementById('pv-next').addEventListener('click',function(){show(cur+1)});
 document.getElementById('pv-prev').addEventListener('click',function(){show(cur-1)});
