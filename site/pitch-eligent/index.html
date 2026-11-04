@@ -30,6 +30,16 @@ body.present .frame{display:none}
 body.present .frame.on{display:block;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100vw,177.78vh);height:auto;border:0;border-radius:0}
 body.present #pv-bar{display:flex}
 @media (prefers-reduced-motion:reduce){#pv-bar{transition:none}}
+.live{position:absolute;z-index:2;overflow:hidden;border-radius:calc(18px*var(--s));border:1px solid #15302F;opacity:0;pointer-events:none}
+.live.on{opacity:1;pointer-events:auto;background-color:#080808;background-image:radial-gradient(120% 90% at 50% 100%,#06242A 0%,#00131A 45%,#080808 100%)}
+.live canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:pan-y;outline-offset:-3px}
+.live canvas:focus-visible{outline:2px solid #44C0B9}
+.live-badge{position:absolute;left:calc(20px*var(--s));top:calc(18px*var(--s));font:max(10px,calc(20px*var(--s))) 'Share Tech Mono',monospace;letter-spacing:.1em;color:#E8C56A;background:rgba(8,8,8,.7);border:1px solid #C9A84C;border-radius:999px;padding:.25em .8em;pointer-events:none}
+.live-read{position:absolute;left:calc(20px*var(--s));right:calc(110px*var(--s));bottom:calc(16px*var(--s));margin:0;font:max(10px,calc(22px*var(--s))) 'Share Tech Mono',monospace;line-height:1.35;color:#B6D8D6;text-shadow:0 0 6px #000;pointer-events:none}
+.live-z{position:absolute;right:calc(14px*var(--s));bottom:calc(14px*var(--s));display:flex;flex-direction:column;gap:calc(8px*var(--s))}
+.live-z button{width:max(28px,calc(56px*var(--s)));height:max(28px,calc(56px*var(--s)));border-radius:calc(12px*var(--s));border:1px solid #15302F;background:rgba(8,13,20,.85);color:#E8E8E8;font:max(14px,calc(26px*var(--s))) 'DM Sans',Arial,sans-serif;cursor:pointer;padding:0}
+.live-z button:focus-visible{outline:2px solid #44C0B9}
+.live[data-live="trk"] .live-badge{left:auto;right:calc(20px*var(--s))}
 footer{text-align:center;font:14px 'Share Tech Mono',monospace;color:#7FA9A6;padding:8px 16px 32px}
 footer a{color:#E8C56A}
 </style></head><body>
@@ -136,26 +146,29 @@ footer a{color:#E8C56A}
 <p style="position:absolute;left:128px;bottom:64px;width:1000px;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;color:#7FA9A6">LIVE VAULT-IT 3D ENGINE · NOT FINANCIAL ADVICE</p>
 
 </section></div>
-<div class="frame"><section id="features" style="background:#080808;color:#E8E8E8;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div class="frame"><section id="features" style="background:#080808;color:#E8E8E8;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:24px">
 <div style="display:flex;flex-direction:column;gap:24px">
-<p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;letter-spacing:4px;color:#44C0B9">IN THE 3D VIEWPORT</p>
+<p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;letter-spacing:4px;color:#44C0B9">NET WORTH IN 3D</p>
 <h2 style="font-family:'Syne', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#E8E8E8">Your whole money picture, as a place you can orbit.</h2>
 </div>
-<div style="display:flex;flex-direction:row;gap:48px">
-<div style="flex:1;display:flex;flex-direction:column;gap:20px">
-<img src="/pitch/net-worth.jpg" alt="3D net worth scene: teal deposit blocks, green fund blocks and gold blocks stand on a gold line, with red debt blocks beside them and a net worth label of £9,300" style="width:808px;height:440px;object-fit:cover;border:1px solid #15302F;border-radius:18px">
-<h3 style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#E8E8E8">Net worth scene</h3>
-<p style="font-size:24px;line-height:1.4;color:#B6D8D6">Every £1,000 is a block, every £100 a cube. Savings stack up on the gold line; debt shows in red and lifts away as it is paid.</p>
+<img src="/pitch/live-nw.jpg" data-live="nw" alt="Net worth in 3D, the app's live viewport with demo data: asset columns stand on a gold line, debts hang below it, with a gold net worth tag" style="position:absolute;left:128px;top:376px;width:1080px;height:560px;object-fit:cover;border:1px solid #15302F;border-radius:18px">
+<div style="position:absolute;left:1256px;top:376px;width:536px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:8px;border-left:4px solid #E8C56A;padding:0 0 0 24px">
+<h3 style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#E8E8E8">Own above, owe below</h3>
+<p style="font-size:26px;line-height:1.4;color:#B6D8D6">What you own stands on the gold line. What you owe hangs below it.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:20px">
-<img src="/pitch/tracker.jpg" alt="Net worth tracker: net worth rises in teal while debt falls in red, with a dashed projection beyond today" style="width:808px;height:440px;object-fit:cover;border:1px solid #15302F;border-radius:18px">
-<h3 style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#E8E8E8">Tracker and projection</h3>
-<p style="font-size:24px;line-height:1.4;color:#B6D8D6">Month by month, as a graph or 3D blocks. The dashed line shows where today’s habits lead, so the future is visible, not abstract.</p>
+<div style="display:flex;flex-direction:column;gap:8px;border-left:4px solid #44C0B9;padding:0 0 0 24px">
+<h3 style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#E8E8E8">Every pound is a block</h3>
+<p style="font-size:26px;line-height:1.4;color:#B6D8D6">Each asset class in its own colour. Debt lifts away as it is paid.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-left:4px solid #E05C5C;padding:0 0 0 24px">
+<h3 style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#E8E8E8">Try it</h3>
+<p style="font-size:26px;line-height:1.4;color:#B6D8D6">Live at vault-it.co/pitch-Eligent: drag to turn it, tap a column to read it.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;color:#7FA9A6">LIVE ENGINE CAPTURES FROM THE VAULT-IT BRAND BOOK · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;color:#7FA9A6">THE APP’S OWN 3D ENGINE · DEMO DATA · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
 
-</section></div>
+</section><div class="live" data-live="nw" style="left:calc(128px*var(--s));top:calc(376px*var(--s));width:calc(1080px*var(--s));height:calc(560px*var(--s))"><canvas tabindex="0" role="img" aria-label="Net worth in 3D, live, demo data. Drag to turn it, tap a column to read it, pinch or use the buttons to zoom."></canvas><span class="live-badge">LIVE · DEMO DATA</span><p class="live-read" aria-live="polite"></p><div class="live-z"><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button><button type="button" data-z="reset" aria-label="Reset the view">↺</button></div></div></div>
 <div class="frame"><section id="nd" style="background:#080D14;color:#E8E8E8;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
 <div style="display:flex;flex-direction:column;gap:24px">
 <p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;letter-spacing:4px;color:#9B7EC8">NEURODIVERSITY</p>
@@ -183,32 +196,29 @@ footer a{color:#E8C56A}
 <p style="position:absolute;left:128px;bottom:64px;width:1664px;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;color:#7FA9A6">FULL CITATIONS IN THE BUSINESS PLAN APPENDIX · NOT FINANCIAL ADVICE</p>
 
 </section></div>
-<div class="frame"><section id="evidence" style="background:#0A1A1C;color:#E8E8E8;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div class="frame"><section id="evidence" style="background:#0A1A1C;color:#E8E8E8;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:24px">
 <div style="display:flex;flex-direction:column;gap:24px">
 <p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;letter-spacing:4px;color:#44C0B9">WHY IT GETS MORE PEOPLE HOME</p>
 <h2 style="font-family:'Syne', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#E8E8E8">Seeing the future changes what people do today.</h2>
 </div>
-<div style="display:flex;flex-direction:row;gap:32px">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#080D14;border:1px solid #15302F;border-top:4px solid #44C0B9;border-radius:18px;padding:36px">
-<h3 style="font-family:'Syne', Arial, sans-serif;font-size:36px;font-weight:700;color:#E8E8E8">See your future self</h3>
-<p style="font-size:26px;line-height:1.4;color:#B6D8D6">People shown an aged image of themselves chose to save more for later (Hershfield et al., 2011).</p>
-<p style="font-size:26px;line-height:1.4;color:#E8E8E8">Vault-It shows your future home, and its date.</p>
+<img src="/pitch/live-trk.jpg" data-live="trk" alt="Net worth progress, the app's live viewport with demo data: one column of blocks a month, with six see-through forecast months beyond today" style="position:absolute;left:128px;top:376px;width:1040px;height:560px;object-fit:cover;border:1px solid #15302F;border-radius:18px">
+<div style="position:absolute;left:1216px;top:376px;width:576px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:6px;border-left:4px solid #44C0B9;padding:0 0 0 24px">
+<h3 style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#E8E8E8">See your future self</h3>
+<p style="font-size:24px;line-height:1.4;color:#B6D8D6">People shown an aged image of themselves chose to save more (Hershfield et al., 2011).</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#080D14;border:1px solid #15302F;border-top:4px solid #E8C56A;border-radius:18px;padding:36px">
-<h3 style="font-family:'Syne', Arial, sans-serif;font-size:36px;font-weight:700;color:#E8E8E8">See your progress</h3>
-<p style="font-size:26px;line-height:1.4;color:#B6D8D6">People speed up as they see themselves getting closer to a goal: the goal-gradient effect (Kivetz et al., 2006).</p>
-<p style="font-size:26px;line-height:1.4;color:#E8E8E8">Every pound lays visible bricks.</p>
+<div style="display:flex;flex-direction:column;gap:6px;border-left:4px solid #E8C56A;padding:0 0 0 24px">
+<h3 style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#E8E8E8">See your progress</h3>
+<p style="font-size:24px;line-height:1.4;color:#B6D8D6">People speed up as a goal gets closer (Kivetz et al., 2006). Forecast blocks show it coming.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#080D14;border:1px solid #15302F;border-top:4px solid #3ECF8E;border-radius:18px;padding:36px">
-<h3 style="font-family:'Syne', Arial, sans-serif;font-size:36px;font-weight:700;color:#E8E8E8">See the whole picture</h3>
-<p style="font-size:26px;line-height:1.4;color:#B6D8D6">Every debt itemised, shared with an adviser by permission, shows options neither side saw alone.</p>
-<p style="font-size:26px;line-height:1.4;color:#E8E8E8">Debts cleared sooner, deposits started sooner.</p>
+<div style="display:flex;flex-direction:column;gap:6px;border-left:4px solid #3ECF8E;padding:0 0 0 24px">
+<h3 style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#E8E8E8">We will measure it</h3>
+<p style="font-size:24px;line-height:1.4;color:#B6D8D6">Consented, anonymised journeys: time from Stage 0 to Stage 3.</p>
 </div>
 </div>
-<p style="font-size:28px;line-height:1.4;color:#E8E8E8">We will prove it with consented, anonymised journey data: <span style="color:#E8C56A">time from Stage 0 to Stage 3, and which actions moved keys dates most.</span></p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;color:#7FA9A6">HERSHFIELD ET AL., J. MARKETING RESEARCH 2011 · KIVETZ, URMINSKY &amp; ZHENG, J. MARKETING RESEARCH 2006</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;color:#7FA9A6">NET WORTH PROGRESS, DEMO DATA · HERSHFIELD ET AL., JMR 2011 · KIVETZ, URMINSKY &amp; ZHENG, JMR 2006</p>
 
-</section></div>
+</section><div class="live" data-live="trk" style="left:calc(128px*var(--s));top:calc(376px*var(--s));width:calc(1040px*var(--s));height:calc(560px*var(--s))"><canvas tabindex="0" role="img" aria-label="Net worth progress in 3D blocks, live, demo data. Tap a month to read it, drag to turn it."></canvas><span class="live-badge">LIVE · DEMO DATA</span><p class="live-read" aria-live="polite"></p><div class="live-z"><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button><button type="button" data-z="reset" aria-label="Reset the view">↺</button></div></div></div>
 <div class="frame"><section id="whynow" style="background:#44C0B9;color:#00181A;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
 <div style="display:flex;flex-direction:column;gap:24px">
 <p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:24px;letter-spacing:4px;color:#00181A">WHY NOW</p>
@@ -468,22 +478,23 @@ var frames=[].slice.call(document.querySelectorAll('.frame')),cur=0,body=documen
 function fit(){frames.forEach(function(f){var w=f.clientWidth;if(w)f.style.setProperty('--s',w/1920)})}
 function videos(){frames.forEach(function(f,k){f.querySelectorAll('video').forEach(function(v){if(body.classList.contains('present')&&k!==cur)v.pause();else{if(body.classList.contains('present')&&k===cur)v.currentTime=0;var p=v.play();if(p&&p.catch)p.catch(function(){})}})})}
 function show(i){cur=Math.max(0,Math.min(frames.length-1,i));frames.forEach(function(f,k){f.classList.toggle('on',k===cur)});count.textContent=(cur+1)+' / '+frames.length;fit();videos()}
-function open(){var start=0;for(var k=0;k<frames.length;k++){if(frames[k].getBoundingClientRect().bottom>80){start=k;break}}body.classList.add('present');show(start);var d=document.documentElement;if(d.requestFullscreen)d.requestFullscreen().catch(function(){})}
+function open(){var start=0,best=-1;for(var k=0;k<frames.length;k++){var r=frames[k].getBoundingClientRect(),seen=Math.min(r.bottom,innerHeight)-Math.max(r.top,0);if(seen>best+1){best=seen;start=k}}body.classList.add('present');show(start);var d=document.documentElement;if(d.requestFullscreen)d.requestFullscreen().catch(function(){})}
 function close(){body.classList.remove('present');frames.forEach(function(f){f.classList.remove('on')});if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(function(){});fit();videos();frames[cur].scrollIntoView({block:'center'});document.getElementById('pv-open').focus()}
 document.getElementById('pv-open').addEventListener('click',open);
 document.getElementById('pv-close').addEventListener('click',close);
 document.getElementById('pv-next').addEventListener('click',function(){show(cur+1)});
 document.getElementById('pv-prev').addEventListener('click',function(){show(cur-1)});
-document.addEventListener('keydown',function(e){if(!body.classList.contains('present'))return;var k=e.key;
+document.addEventListener('keydown',function(e){if(!body.classList.contains('present'))return;var k=e.key;if(e.target.closest&&e.target.closest('.live')&&/^Arrow|^[+=-]$/.test(k))return;
  if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault()}
  else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault()}
  else if(k==='Home'){show(0);e.preventDefault()}else if(k==='End'){show(frames.length-1);e.preventDefault()}
  else if(k==='Escape'){close();e.preventDefault()}});
 document.addEventListener('fullscreenchange',function(){if(!document.fullscreenElement&&body.classList.contains('present'))close()});
 var sx=0,sy=0,stage=document.getElementById('pv-stage');
-stage.addEventListener('touchstart',function(e){var t=e.changedTouches[0];sx=t.clientX;sy=t.clientY},{passive:true});
-stage.addEventListener('touchend',function(e){if(!body.classList.contains('present'))return;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))show(cur+(dx<0?1:-1))},{passive:true});
-stage.addEventListener('click',function(e){if(!body.classList.contains('present'))return;show(cur+(e.clientX<innerWidth/3?-1:1))});
+var inLive=false;stage.addEventListener('touchstart',function(e){var t=e.changedTouches[0];sx=t.clientX;sy=t.clientY;inLive=!!(e.target.closest&&e.target.closest('.live'))},{passive:true});
+stage.addEventListener('touchend',function(e){if(!body.classList.contains('present')||inLive)return;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))show(cur+(dx<0?1:-1))},{passive:true});
+stage.addEventListener('click',function(e){if(!body.classList.contains('present')||(e.target.closest&&e.target.closest('.live')))return;show(cur+(e.clientX<innerWidth/3?-1:1))});
 addEventListener('resize',fit);fit();
 })();
-</script></body></html>
+</script><script src="/pitch/nw3d-live.js" defer></script>
+</body></html>

@@ -14,7 +14,7 @@ const SITE = {
             // investor pitch for the Eligent Club event: vault-it.co/pitch-Eligent (and a lower-case alias)
             ['site/pitch-eligent/index.html', 'pitch-Eligent.html'], ['site/pitch-eligent/index.html', 'pitch-eligent.html'],
             ['site/pitch-eligent/pitch/house-build.mp4', 'pitch/house-build.mp4'], ['site/pitch-eligent/pitch/house-still.jpg', 'pitch/house-still.jpg'],
-            ['site/pitch-eligent/pitch/net-worth.jpg', 'pitch/net-worth.jpg'], ['site/pitch-eligent/pitch/tracker.jpg', 'pitch/tracker.jpg'],
+            ['site/pitch-eligent/pitch/nw3d-live.js', 'pitch/nw3d-live.js'], ['site/pitch-eligent/pitch/live-nw.jpg', 'pitch/live-nw.jpg'], ['site/pitch-eligent/pitch/live-trk.jpg', 'pitch/live-trk.jpg'],
             ['site/pitch-eligent/pitch/logo-full.png', 'pitch/logo-full.png'], ['site/pitch-eligent/pitch/logo-mid.png', 'pitch/logo-mid.png']],
 };
 const ROBOTS = { app: 'User-agent: *\nDisallow: /\n', landing: 'User-agent: *\nAllow: /\n' };

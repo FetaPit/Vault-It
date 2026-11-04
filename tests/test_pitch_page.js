@@ -1,6 +1,6 @@
 // vault-it.co/pitch-Eligent in a real browser, served through the real Worker routing from the real build:
-// all 15 slides scroll on a phone with no sideways scroll, and the Present button gives a one-slide view
-// (arrow keys, on-screen buttons, swipe, counter, Esc to leave).
+// all 15 slides scroll on a phone with no sideways scroll, the Present button gives a one-slide view
+// (arrow keys, on-screen buttons, swipe, counter, Esc to leave), and the app's two live 3D viewports draw with demo data.
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path'), http = require('http'), cp = require('child_process'), { pathToFileURL } = require('url');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -9,7 +9,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
 (async () => {
   cp.execFileSync('node', [path.join(ROOT, 'tools', 'build_site.js')], { env: { ...process.env, SITE_OUT: DIST }, stdio: ['ignore', 'ignore', 'inherit'] });
   const { route } = await import(pathToFileURL(path.join(ROOT, 'worker', 'index.mjs')).href);
-  const TYPES = { '.html': 'text/html; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp4': 'video/mp4' };
+  const TYPES = { '.html': 'text/html; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp4': 'video/mp4', '.js': 'text/javascript' };
   const srv = http.createServer((req, res) => {
     const u = new URL(req.url, 'http://x'); const r = route('vault-it.co', u.pathname);
     const f = r.file && path.join(DIST, r.file);
@@ -61,6 +61,39 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   ok((await counter(p)).trim() === '1 / 15', 'Home jumps to the first slide');
   await p.keyboard.press('Escape');
   ok(!(await p.evaluate(() => document.body.classList.contains('present'))) && (await visible(p)).length === 15, 'Esc leaves the one-slide view and shows every slide again');
+
+  // Live 3D viewports: the app's Net worth in 3D and Net worth progress, with the app's demo data
+  p = await open(1280, 800);
+  const hosts = new Set(); p.on('request', (r) => { const u = new URL(r.url()); if (u.hostname !== '127.0.0.1') hosts.add(u.hostname); });
+  for (const [kind, sid, re] of [['nw', 'features', /^Own £[\d,]+ · Owe £[\d,]+ · Net worth £[\d,]+$/], ['trk', 'evidence', /^Today: net worth £[\d,]+ · debt £[\d,]+$/]]) {
+    await p.locator('#' + sid).scrollIntoViewIfNeeded(); await p.waitForTimeout(2500);
+    const st = await p.evaluate((kind) => { const b = document.querySelector('.live[data-live="' + kind + '"]'); if (!b) return null;
+      const cv = b.querySelector('canvas'), r = cv.getBoundingClientRect(), d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let lit = 0;
+      for (let i = 3; i < d.length; i += 4 * 7) if (d[i] > 40) lit++;
+      return { on: b.classList.contains('on'), read: b.querySelector('.live-read').textContent, w: r.width, h: r.height, lit }; }, kind);
+    ok(st && st.on, kind + ': the live viewport is on the ' + sid + ' slide');
+    ok(st && re.test(st.read), kind + ': its readout shows the demo figures: ' + (st && st.read));
+    ok(st && st.lit > 500, kind + ': the 3D scene is drawn (' + (st && st.lit) + ' lit samples)');
+    ok(st && Math.abs(st.w / st.h - (kind === 'nw' ? 1080 / 560 : 1040 / 560)) < 0.02, kind + ': it sits in its slot on the slide: ' + JSON.stringify(st && [st.w, st.h]));
+  }
+  ok([...hosts].every((h) => /^fonts\.(googleapis|gstatic)\.com$/.test(h)), 'no outside hosts besides Google Fonts: ' + [...hosts]);
+  await p.locator('#features').scrollIntoViewIfNeeded(); await p.evaluate(() => document.getElementById('pv-open').click()); await p.waitForTimeout(600);   // a pointer click would first scroll the sticky header's page to the top
+  const c0 = (await counter(p)).trim();
+  const lb = await p.locator('.frame.on .live canvas').boundingBox();
+  ok(!!lb, 'the live viewport shows in the one-slide view');
+  if (lb) { await p.mouse.click(lb.x + lb.width / 2, lb.y + lb.height / 2); await p.mouse.move(lb.x + 10, lb.y + 10); await p.mouse.down(); await p.mouse.move(lb.x + 160, lb.y + 10, { steps: 6 }); await p.mouse.up(); }
+  ok((await counter(p)).trim() === c0 && /^5 \/ 15$/.test(c0), 'clicking or dragging the 3D does not change slide: ' + c0 + ' then ' + (await counter(p)));
+  await p.locator('.frame.on .live [data-z="in"]').click();
+  ok((await counter(p)).trim() === c0, 'the zoom buttons do not change slide either');
+  ok(p.errs.length === 0, 'no page errors with the live viewports: ' + p.errs.join(' | '));
+  await p.keyboard.press('Escape');
+
+  // A phone's scrolling deck is too small for the live 3D: the matching still shows instead
+  p = await open(390, 844);
+  await p.locator('#features').scrollIntoViewIfNeeded(); await p.waitForTimeout(1500);
+  const ph = await p.evaluate(() => [...document.querySelectorAll('.live')].map((b) => { const im = b.parentNode.querySelector('img[data-live="' + b.dataset.live + '"]');
+    return { on: b.classList.contains('on'), op: getComputedStyle(b).opacity, still: !!(im && im.complete && im.naturalWidth > 100) }; }));
+  ok(ph.length === 2 && ph.every((x) => !x.on && x.op === '0' && x.still), 'at 390 px the live viewports stay off and their stills show: ' + JSON.stringify(ph));
 
   // Phone: swipe through the one-slide view
   p = await open(390, 844, true);
