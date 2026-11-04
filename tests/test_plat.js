@@ -1,12 +1,21 @@
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const IMGS=[require('path').join(__dirname,'fixtures','portfolio_screenshot.png')];
+/* served over http://127.0.0.1 from the folder that holds VI_INDEX (CoS, 4 Nov: the 'logo' race). Under file:// headless Chrome can lose
+   localStorage across a reload: about one run in four the reloaded page found no saved data at all, so the seed above wrote the starting
+   data again and the saved platform was gone. Same pattern as the other http-served tests. */
+const http=require('http'),fs=require('fs'),path=require('path');
+const FILE=process.env.VI_INDEX||path.join(__dirname,'..','index.html'),ROOT=path.dirname(FILE),PAGE=path.basename(FILE);
+const TYPES={'.html':'text/html','.js':'text/javascript','.json':'application/json','.webmanifest':'application/manifest+json','.png':'image/png','.svg':'image/svg+xml','.css':'text/css','.woff2':'font/woff2'};
+const server=http.createServer((q,r)=>{const f=path.join(ROOT,decodeURIComponent(q.url.split('?')[0]));if(!f.startsWith(ROOT)){r.writeHead(403);return r.end();}
+  fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end();}r.writeHead(200,{'content-type':TYPES[path.extname(f)]||'application/octet-stream'});r.end(d);});});
 (async()=>{
+  await new Promise(r=>server.listen(0,'127.0.0.1',r)); const URL='http://127.0.0.1:'+server.address().port+'/'+PAGE;
   const b=await chromium.launch(); const page=await (await b.newContext({viewport:{width:1280,height:1000}})).newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message));
   page.on('dialog',d=>d.accept());
   await page.addInitScript(()=>{localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'P',email:'t@t.com'}));localStorage.setItem('vi_fx_rates',JSON.stringify({USD:1.25}));
     if(!localStorage.getItem('pos_al1'))localStorage.setItem('pos_al1',JSON.stringify({stocks:[{id:1,pie:5,sym:'AAPL',units:1,price:100}],stockPies:[{id:5,name:'Trading 212 Pie'},{id:6,name:'Fun money'}],cashAccounts:[],otherAssets:[],crypto:[],liabilities:[],metals:{}}));});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.goto(URL); await page.waitForTimeout(1500);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   await page.evaluate(()=>{showTab('assets');showSubtab('assets','stocks',null);});
   await page.waitForTimeout(300);
@@ -47,5 +56,5 @@ const IMGS=[require('path').join(__dirname,'fixtures','portfolio_screenshot.png'
   await page.evaluate(()=>{alState.stockPies[0].platform={name:'<img src=x onerror=window.__x=1>"'};saveAL();stkRender();}); await page.waitForTimeout(300);
   ok(!(await page.evaluate(()=>window.__x))&&!/</.test(await page.evaluate(()=>JSON.parse(localStorage.getItem('pos_al1')).stockPies[0].platform.name)),'platform name cannot inject script');
   ok(errs.length===0,'no page errors '+errs.join('|'));
-  await page.screenshot({path:'shots/plat.png'}); await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
+  await page.screenshot({path:'shots/plat.png'}); await b.close(); server.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
 })();
