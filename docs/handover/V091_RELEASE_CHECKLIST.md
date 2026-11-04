@@ -14,14 +14,14 @@ Frozen for the deadline: no more merges into `candidate/v0.9.1` until the releas
 - Migration 014 (`campaign_counts`) is applied to production (owner's yes, 3 Nov). The Founding badge shows real counts ("100 left"), never fake backers.
 - No other migrations this round.
 
-## Owner, 14:45 to 15:15 (laptop, Git Bash, then phone)
+## Owner, 14:30 to 14:50 (laptop, Git Bash, then phone)
 1. **Phone look** at the preview of `candidate/v0.9.1` (https://candidate-v0-9-1-vault-it.ptlived.workers.dev). It is look-only and cannot sign in. Check Overview, Budget, cash 3D, Wealth Roadmap, house type and the crowdfund badge, in Night and Daylight.
 2. **Backup:**
    ```bash
    git fetch origin
    ```
    ```bash
-   git push origin origin/release/pioneer-v2:refs/heads/backup/release-pioneer-v2-20261104-1445
+   git push origin origin/release/pioneer-v2:refs/heads/backup/release-pioneer-v2-20261104-1430
    ```
 3. **Release** (fast-forward from 6e9c618):
    ```bash
