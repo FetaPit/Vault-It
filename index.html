@@ -9608,9 +9608,11 @@ body.reduced-motion #app-footer, body.reduced-motion #app-footer * { transition:
 /* roadmap depth (owner, 3 Nov round 2): the perspective is drawn, not tilted: a thin ground strip with a converging grid (#fire-ground)
    and the tokens floating above it; a token lifts a little more on hover, and the stage to work on turns slowly (owner, 31 Oct) */
 .fire-stage{position:relative}
-.fire-ground{position:absolute;left:0;right:0;bottom:0;height:56px;width:100%;pointer-events:none;z-index:0}
-.fire-ground .fg-h,.fire-ground .fg-v{stroke:var(--teal);fill:none;vector-effect:non-scaling-stroke}
+.fire-ground{position:absolute;left:0;right:0;bottom:0;height:114px;width:100%;pointer-events:none;z-index:0}   /* FIRE_GH (v0.9.1 round 2, R3) */
+.fire-ground .fg-h,.fire-ground .fg-v,.fire-ground .fg-edge{stroke:var(--teal);fill:none;vector-effect:non-scaling-stroke}
 .fire-ground .fg-v{stroke-opacity:.16}
+.fire-ground .fg-edge{stroke-opacity:.4}
+.fire-ground .fg-plane{fill:var(--teal);fill-opacity:.05;stroke:none}
 .fire-stage .fire-timeline-scroll{position:relative;z-index:1}
 .fire-coin{transform-box:fill-box;transform-origin:50% 70%;transition:transform .25s var(--ease),opacity .25s}
 .fire-card{transform-box:fill-box;transform-origin:center;transition:transform .25s var(--ease)}
@@ -11360,7 +11362,12 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wt.t-strong{--wt:#9B7EC8;--wt-d:#3b2a5c;--wt-dd:#22183a;--wt-l:#d9c9f2}
 .wt.t-summit{--wt:#C9A84C;--wt-d:#5e4614;--wt-dd:#2e220a;--wt-l:#f3e2a8}
 /* token art keeps the same colours in Night and Daylight: it is an object on the page, like a coin. Only chips follow the theme */
-.wt.st-lock,.wt.st-skip{--wt-d:#232a31;--wt-dd:#151a1f;--wt-l:#5d666e}
+.wt.st-lock,.wt.st-skip,.wt.st-todo{--wt-d:#232a31;--wt-dd:#151a1f;--wt-l:#5d666e}
+/* v0.9.1 round 2: each slate outlined in its section colour (R4), achieved slates greyed by 35% (R5) */
+.wt-ol{fill:none;stroke-width:3.4;stroke-linejoin:round}
+.st-lock .wt-ol,.st-todo .wt-ol,.st-skip .wt-ol{stroke-opacity:.6}
+.wt-grey{fill:#8C939B;fill-opacity:.35;stroke:none;pointer-events:none}
+.st-todo .wt-icon{color:#7d868e}
 .wt-edge{fill:var(--wt-dd);stroke:var(--wt-d);stroke-width:.6}
 .wt-rimline{fill:none;stroke:var(--wt-l);stroke-width:.8;stroke-opacity:.85}
 .st-wait .wt-rimline{stroke-dasharray:4 3}
@@ -12498,7 +12505,10 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-wait"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><path class="wt-cg" d="M8.5 16.5l5 5L24 11"/></g></g></svg>Met, waiting</span>
         <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-skip"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><path class="wt-cg" d="M8 10l6 6-6 6M16 10l6 6-6 6"/></g></g></svg>Skipped</span>
         <span><svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true"><g class="wt t-solid"><g class="wt-chip c-lock"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/><rect class="wt-cgf" x="10" y="15" width="12" height="9.5" rx="1.6"/><path class="wt-cg" d="M12.6 15v-2.6a3.4 3.4 0 0 1 6.8 0V15"/></g></g></svg>Locked: finish earlier stages first</span>
-        <span id="fire-progress-txt" style="margin-left:auto;color:var(--em)">0 of 30 achieved</span>
+        <span><svg width="13" height="17" viewBox="-4 -4 108 140" aria-hidden="true"><polygon points="0,0 72,0 100,28 100,132 14,132 0,118" fill="url(#wtc-solid)"/></svg>Standard</span>
+        <span><svg width="13" height="17" viewBox="-4 -4 108 140" aria-hidden="true"><polygon points="0,0 72,0 100,28 100,132 14,132 0,118" fill="url(#wtc-strong)"/></svg>Big milestone</span>
+        <span><svg width="13" height="17" viewBox="-4 -4 108 140" aria-hidden="true"><polygon points="0,0 72,0 100,28 100,132 14,132 0,118" fill="url(#wtc-summit)"/></svg>Graduation</span>
+        <span id="fire-progress-txt" style="margin-left:auto;color:var(--em)">0 of 50 achieved</span>
       </div>
       <div class="fire-next-step" id="fire-next-step" aria-live="polite"></div>
       <!-- Horizontal scrolling timeline: the SVG is only the window of stages on screen -->
@@ -18128,13 +18138,16 @@ var FIRE_ICONS={
   tree:{f:['M12 3C8.5 3 6 5.5 6 8.5S8 14 12 14s6-2.5 6-5.5S15.5 3 12 3z'],d:['M12 3C8.5 3 6 5.5 6 8.5S8 14 12 14s6-2.5 6-5.5S15.5 3 12 3z','M12 14v7','M12 14l-3-3','M12 12l3-2.5','M9 21h6']}
 };
 var FIRE_LONG=['Record your first net worth snapshot to start your roadmap.','List every debt: amount, interest rate, minimum monthly payment.','Build a zero-based budget: add your income, then give every pound a job (spending, saving or investing) until nothing is left unassigned.','Get your first pound into a savings account.','Build a £500 emergency starter fund.','Build a £1,000 emergency fund before attacking debt harder.','Pay off one debt in full, the smallest balance first.','Clear 50% of total debt by value.','Net worth crosses £1,000 positive.','Reach zero consumer debt.','Save 3 months of expenses in accessible cash.','Save 6 months of expenses, fully buffered against emergencies.','Open a Stocks & Shares ISA or Lifetime ISA.','Save 1% of your house target price.','Save 5% of your house target, halfway to a 10% deposit.','Net worth reaches £5,000.','Full deposit saved. Time to talk to a mortgage broker.','Net worth reaches £10,000.','Submit your mortgage application.','Exchange contracts on your property.','Keys in hand. You own it.','Net worth reaches £25,000.','Net worth reaches £50,000.','Net worth crosses £100,000: six figures.','Investments alone can grow to FI target. Coast from here.','Mortgage paid off. Outright ownership.','Net worth reaches £250,000.','25× annual expenses invested: full financial independence.','33× annual expenses: Fat FIRE.','50× annual expenses: enough for the next generation.'];
+/* section colours (owner, 4 Nov round 2, R4: "Colour code each section of the roadmap"): six brand colours, one per section, on the
+   label, the divider and the outline of every slate in it. Gold and purple also mark slate tiers (R7), so they go last, on Own and Free */
 var FIRE_PHASES=[
-  {label:'FOUNDATION',col:'#44c0b9'},{label:'STABILISE',col:'#c9a84c'},{label:'SAVE',col:'#e8c56a'},
-  {label:'BUY',col:'#9b7ec8'},{label:'OWN',col:'#3ecf8e'},{label:'FREE',col:'#c9a84c'}
+  {label:'FOUNDATION',col:'#44c0b9'},{label:'STABILISE',col:'#e0894a'},{label:'SAVE',col:'#3ecf8e'},
+  {label:'BUY',col:'#64b5f6'},{label:'OWN',col:'#9b7ec8'},{label:'FREE',col:'#e8c56a'}
 ];
 // roadmap window geometry + state (declared early: the roadmap is first drawn during start-up)
 var _fireFirstPaint=true,_fireDetailIdx=-1,_fireSkipAsk=-1;
 var FIRE_NODE=128,FIRE_LEFT=70,FIRE_H=300;   // round 3 (owner, 3 Nov): larger tokens need wider spacing and a taller stage
+var FIRE_GH=114,FIRE_GF=1.42;   // the ground plane (v0.9.1 round 2, R3): its height, and how much wider its near edge is than its far edge
 var STK_COLORS=['#44c0b9','#c9a84c','#3ecf8e','#9b7ec8','#64b5f6','#e0894a','#e05c5c','#e8c56a'];
 // ── Budget categories + icons (declared before the init block runs) ──
 var BD_ICONS={
@@ -18341,7 +18354,18 @@ var achState={xp:0,unlocked:[],connected:{}};
 var WR_TIERS={starter:{n:'Starter',xp:20},solid:{n:'Solid',xp:40},strong:{n:'Strong',xp:80},summit:{n:'Summit',xp:150}};
 var WR_STAGE_TIER={firstLog:'starter',mapDebts:'starter',zeroBudget:'starter',firstSaved:'starter',buf500:'starter',firstCut:'starter',
   buf1k:'solid',debtHalf:'solid',nw1k:'solid',debtFree:'solid',ef3:'solid',isa:'solid',dep1:'solid',dep5:'solid',nw5k:'solid',
-  ef6:'strong',depReady:'strong',nw10k:'strong',applied:'strong',exchanged:'strong',keys:'strong',nw25k:'strong',nw50k:'strong'};   // the rest are Summit
+  ef6:'strong',depReady:'strong',nw10k:'strong',applied:'strong',exchanged:'strong',keys:'strong',nw25k:'strong',nw50k:'strong',
+  // the 20 achievements added in v0.9.1 round 2 (R8): small one-off awards that never hold up the linear stages
+  profile:'starter',history:'starter',incomeIn:'starter',spendMap:'starter',savingLine:'starter',assets3:'starter',week1:'starter',
+  buf250:'starter',firstPay:'starter',debt25:'starter',pay6:'starter',surplus:'starter',ef1:'starter',invest:'starter',firstDep:'starter',
+  bud3:'starter',nw2500:'starter',dep75:'solid',nw75k:'strong',nw500k:'summit'};   // the rest are Summit
+// slate look on the roadmap strip (owner, 4 Nov round 2, R7: "Keep green as main achievement, purple as big milestone and add a gold
+// tier, one for each section which graduates user to the next part"): teal standard, purple big milestone, gold graduation (the last
+// slate in each section). The XP tier above still sets the XP; the look only sets the colour.
+var WR_BIG={zeroBudget:1,debtHalf:1,nw75k:1,nw500k:1};
+var WR_BONUS={profile:1,history:1,incomeIn:1,spendMap:1,savingLine:1,assets3:1,week1:1,buf250:1,firstPay:1,debt25:1,pay6:1,surplus:1,ef1:1,invest:1,firstDep:1,bud3:1,nw2500:1,dep75:1,nw75k:1,nw500k:1};
+var WR_LOOK_TIER={std:'solid',big:'strong',grad:'summit'};
+function fireLook(s){if(!s)return 'std';if(s.grad)return 'grad';var t=wrStageTier(s.key);return WR_BIG[s.key]||t==='strong'||t==='summit'?'big':'std';}
 var WR_RANKS=[{n:'Groundwork',t:'starter'},{n:'Shield',t:'solid'},{n:'Growth',t:'strong'},{n:'Keys',t:'strong'},{n:'Freedom',t:'summit'}];
 var WR_LEVELS=[['Spare Change',0],['Penny Pincher',100],['Budget Builder',250],['Ledger Keeper',400],['Buffer Builder',600],['Debt Breaker',850],['Rate Slayer',1150],['Vault Guard',1550],
   ['Compounder',2050],['Yield Hunter',2650],['Market Rider',3350],['Portfolio Pilot',4150],['Goal Hunter',5050],['Brick Stacker',6000],['Key Holder',7050],['Equity Builder',8150],
@@ -18357,7 +18381,10 @@ var WR_QUESTS=[{id:'q3',ic:'vi-streak',name:'Three in a row',desc:'Save towards 
 var WR_STAGE_IC={firstLog:'vi-net-worth',mapDebts:'vi-debt-tracker',zeroBudget:'vi-budget',firstSaved:'vi-coin',buf500:'vi-lifebuoy',buf1k:'vi-shield',firstCut:'vi-paid-off',
   debtHalf:'vi-snowball',nw1k:'vi-gem',debtFree:'vi-unlock',ef3:'vi-umbrella',ef6:'vi-safe',isa:'vi-piggy',dep1:'vi-brick',dep5:'vi-brick-wall',nw5k:'vi-trend-base',
   depReady:'vi-house-builder',nw10k:'vi-coins',applied:'vi-target',exchanged:'vi-sync',keys:'vi-keys',nw25k:'vi-assets-total',nw50k:'vi-candles',nw100k:'vi-milestone',
-  coastFI:'vi-boat',mortFree:'vi-home',nw250k:'vi-crown',fullFI:'vi-flame',fatFIRE:'vi-sparkle',legacy:'vi-vault'};
+  coastFI:'vi-boat',mortFree:'vi-home',nw250k:'vi-crown',fullFI:'vi-flame',fatFIRE:'vi-sparkle',legacy:'vi-vault',
+  profile:'vi-user',history:'vi-forecast',incomeIn:'vi-income',spendMap:'vi-spend',savingLine:'vi-piggy',assets3:'vi-assets',week1:'vi-calendar',
+  buf250:'vi-coin',firstPay:'vi-check',debt25:'vi-slice',pay6:'vi-repeat',surplus:'vi-trend-base',ef1:'vi-umbrella',invest:'vi-portfolio',
+  firstDep:'vi-brick',bud3:'vi-budget',nw2500:'vi-cash',dep75:'vi-brick-wall',nw75k:'vi-bolt',nw500k:'vi-trophy'};
 var WR_BADGE_IC={nw100:'vi-coin',nw500:'vi-coins',nw1k:'vi-cash',nw2k:'vi-piggy',nw5k:'vi-trend-base',nw10k:'vi-candles',nw25k:'vi-assets-total',nw50k:'vi-gem',nw75k:'vi-bolt',
   nw100k:'vi-milestone',nw150k:'vi-ring',nw200k:'vi-metals',nw250k:'vi-crown',nw500k:'vi-vault',nw750k:'vi-sparkle',nw1m:'vi-trophy',save10:'vi-piggy',save25:'vi-safe',
   save50:'vi-slice',snap1:'vi-camera',snap3:'vi-calendar',snap12:'vi-forecast',debtstart:'vi-debt-tracker',debt50:'vi-snowball',debtfree:'vi-paid-off',home:'vi-home',
@@ -24643,7 +24670,9 @@ function renderBizGoal() {
 // achState declared above init block
 // LVS, BADGES declared above init block
 function saveAch(){try{localStorage.setItem(ACH_KEY,JSON.stringify(achState));}catch(e){}}
-function currentLevel(){var l=LVS.filter(function(v){return achState.xp>=v.xp;});return l[l.length-1]||LVS[0];}
+// one level for the whole app (owner, 4 Nov round 2, R22): the Wealth Roadmap's total XP (badges, roadmap steps, side quests, house
+// milestones). The profile card used badge XP alone, so it said Level 7 where the Wealth Roadmap said Level 8. Nothing saved changes.
+function currentLevel(){var x=wrTotalXp(),l=LVS.filter(function(v){return x>=v.xp;});return l[l.length-1]||LVS[0];}
 function nextLevel(){var i=LVS.findIndex(function(v){return v.n===currentLevel().n;});return LVS[i+1]||null;}
 function tryUnlock(id){
   if(!achState.unlocked.includes(id)){
@@ -24729,13 +24758,14 @@ function wrIcon(id,x,y,s){
   return '<g transform="translate('+x+' '+y+') scale('+(s/24).toFixed(3)+')"><g class="wt-icf">'+ic.f.map(pth).join('')+'</g><g class="wt-ics">'+ic.d.map(pth).join('')+'</g></g>';
 }
 function wrTok(o){
-  var t=o.tier||'starter',st=o.st||'done',px=o.px||100,sc=o.sc||px/118,L=st==='lock',dim=L||st==='skip',K=wrPts(WR_CARD),n=o.bars||0,lit=o.lit==null?n:o.lit,k;
+  var t=o.tier||'starter',st=o.st||'done',px=o.px||100,sc=o.sc||px/118,L=st==='lock',dim=L||st==='skip'||st==='todo',K=wrPts(WR_CARD),n=o.bars||0,lit=o.lit==null?n:o.lit,k;   // todo: an achievement not met yet that nothing locks
   var out='<g class="wt t-'+t+' st-'+st+'">';
   for(k=2;k>=1;k--)out+='<polygon class="wt-edge" points="'+K+'" transform="translate('+(-k*3)+' '+(k*3)+')"/>';   // the stacked card edge
   out+='<polygon class="wt-card fire-face" data-r="'+(o.r||50)+'" points="'+K+'" fill="url(#'+(dim?'wtc-lock':'wtc-'+t)+')"/><g clip-path="url(#wt-clip)">';
   if(!dim)out+='<polygon points="0,0 60,0 0,60" fill="url(#wts-'+t+')"/><polygon points="100,78 100,132 38,132" fill="url(#wth-'+t+')"/>';
   else out+='<rect width="100" height="132" fill="url(#'+(st==='skip'?'wt-hatch':'wth-lock')+')"/>';
   out+='</g><polygon class="wt-rimline" points="'+K+'"/>';
+  if(o.ol)out+='<polygon class="wt-ol" points="'+K+'" style="stroke:'+o.ol+'"/>';   // section colour outline (R4)
   // the medal (round 4): a metal rim with four rivets, a deep tick dial, a tier-edged face, an engraved ring and a glass highlight
   out+='<circle cx="46" cy="74" r="37.5" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/><circle class="wt-mrim" cx="46" cy="74" r="35.8"/>'+WR_DIAL+WR_RIVETS
     +'<circle class="wt-mface" cx="46" cy="74" r="29"/><circle class="wt-mring" cx="46" cy="74" r="26.4"/><circle class="wt-mdots" cx="46" cy="74" r="27.7"/>'
@@ -24745,6 +24775,7 @@ function wrTok(o){
   if(n>0){var bw=2.6,gp=n>4?1.8:2.6,x0=46-(n*bw+(n-1)*gp)/2;for(k=0;k<n;k++)out+='<rect class="fire-stud wt-bar'+(k<lit?' on':'')+'" x="'+(x0+k*(bw+gp)).toFixed(1)+'" y="118" width="'+bw+'" height="8"/>';}
   if(o.tl!=null&&16*sc>=10.5)out+='<text class="wt-tl" x="6" y="18">'+o.tl+'</text>';   // text only where it renders at 10.5 px or more (Pedro, round 2)
   if(o.name&&12.5*sc>=10.5){var nm=String(o.name).toUpperCase();out+='<text class="wt-side" transform="translate(94 102) rotate(-90)"'+(nm.length>9?' textLength="80" lengthAdjust="spacingAndGlyphs"':'')+'>'+nm+'</text>';}
+  if(o.grey)out+='<polygon class="wt-grey" points="'+K+'"/>';   // achieved: greyed by 35% (R5); the tick chip stays on top in full colour
   if(st==='next')out+='<polygon class="wt-halo" points="'+wrPts(WR_CARD,-6,-7,1.12)+'"/>';
   if(o.chip&&WR_CHIP[o.chip])out+='<g class="wt-chip c-'+o.chip+'" transform="translate(72 106)"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/>'+WR_CHIP[o.chip]+'</g>';
   return out+'</g>';
@@ -24756,7 +24787,7 @@ function wrTokSvg(o,px,lbl){o.px=px;return '<svg class="wt-svg" viewBox="-10 -9 
 function wrState(){if(!achState.wr)achState.wr={s:{},q:{},m:{},days:0};var w=achState.wr;w.s=w.s||{};w.q=w.q||{};w.m=w.m||{};return w;}
 function wrSum(o){var t=0;for(var k in o)t+=+o[k]||0;return t;}
 function wrMonthXp(w){var t=0;for(var k in w.m)t+=Math.min(25,wrSum(w.m[k]));return t;}
-function wrStepXp(key,n){return Math.round(3*WR_TIERS[wrStageTier(key)].xp/Math.max(1,n));}
+function wrStepXp(key,n){return Math.round((WR_BONUS[key]?1:3)*WR_TIERS[wrStageTier(key)].xp/Math.max(1,n));}   // a round 2 achievement pays its tier's XP once, a linear stage three times that
 function wrTotalXp(){var w=wrState();return (achState.xp||0)+wrSum(w.s)+wrSum(w.q)+wrMonthXp(w)+wrSum(w.h||{});}   // w.h: House Builder milestones (v0.9.1 E9)
 function wrLevel(xp){if(xp==null)xp=wrTotalXp();var l=WR_LEVELS[0];WR_LEVELS.forEach(function(v){if(xp>=v.xp)l=v;});return l;}
 function wrNextLevel(xp){return WR_LEVELS[wrLevel(xp).n]||null;}
@@ -24773,7 +24804,7 @@ function wrSync(S){
   if(!S||typeof achState==='undefined'||window._viDeleted)return;   // nothing writes back after the account is deleted
   var w=wrState(),first=!w.v,before=wrTotalXp(),lv0=wrLevel(before).n,gain=[],lim=S.nextIdx<0?S.length-1:S.nextIdx;
   S.forEach(function(s,i){
-    if(i>lim||s.skipPass)return;
+    if(s.bonus?!s.done:(i>lim||s.skipPass))return;   // a round 2 achievement pays as soon as it is met, wherever it sits
     var st=s.steps||[];st.forEach(function(x,j){var id=s.key+'.'+j;if(x.met&&!w.s[id]){w.s[id]=wrStepXp(s.key,st.length);gain.push(x.lbl);}});
   });
   WR_QUESTS.forEach(function(q){if(wrQuestDone(q)||!wrQuestMet(q))return;if(q.month){var m=w.m[wrYm()]||(w.m[wrYm()]={});m[q.id]=q.xp;}else w.q[q.id]=q.xp;gain.push(q.name);});
@@ -24816,7 +24847,7 @@ function wrRewardHtml(){
 function wrNextGoals(S){
   var out=[],w=wrState(),nw=0;try{nw=computeNetWorth();}catch(e){}
   if(S&&S.nextIdx>=0){var s=S[S.nextIdx],st=s.steps||[],j=st.findIndex(function(x){return !x.met;});if(j<0)j=st.length-1;
-    out.push({tok:{tier:wrStageTier(s.key),st:'next',ic:WR_STAGE_IC[s.key]||s.ic,bars:st.length,lit:j},h:'Stage '+(S.nextIdx+1)+': '+s.name,l:st[j]?st[j].lbl:s.desc,f:s.prog?s.prog():j/Math.max(1,st.length),xp:wrStepXp(s.key,st.length),go:'fireScrollTo('+S.nextIdx+');fireShowDetail('+S.nextIdx+')'});}
+    out.push({tok:{tier:wrStageTier(s.key),st:'next',ic:WR_STAGE_IC[s.key]||s.ic,bars:st.length,lit:j},h:'Stage '+(s.no||S.nextIdx+1)+': '+s.name,l:st[j]?st[j].lbl:s.desc,f:s.prog?s.prog():j/Math.max(1,st.length),xp:wrStepXp(s.key,st.length),go:'fireScrollTo('+S.nextIdx+');fireShowDetail('+S.nextIdx+')'});}
   var c=[];
   WR_QUESTS.forEach(function(q){if(wrQuestDone(q))return;var f=q.need?Math.min(.99,(typeof hbStreak==='function'?hbStreak():0)/q.need):0.5;c.push({tok:{tier:wrXpTier(q.xp),st:'own',ic:q.ic},h:'Side quest: '+q.name,l:q.desc,f:f,xp:q.xp});});
   BADGES.forEach(function(b){var m=/^nw(\d+)(k|m)?$/.exec(b.id);if(!m||(achState.unlocked||[]).indexOf(b.id)>-1)return;var thr=+m[1]*(m[2]==='k'?1e3:m[2]==='m'?1e6:1);c.push({tok:{tier:wrXpTier(b.xp||50),st:'own',ic:WR_BADGE_IC[b.id]},h:'Badge: '+b.name,l:b.desc,f:Math.max(0,nw/thr),xp:b.xp||50});});
@@ -24829,7 +24860,7 @@ function renderAchievements(){
   var S=null;try{S=renderFIREroadmap._stages||fireBuildStages();}catch(e){}
   try{renderFIREroadmap();}catch(e){}
   var xp=wrTotalXp(),lv=wrLevel(xp),nx=wrNextLevel(xp),rk=WR_RANKS[lv.rank],pc=nx?(xp-lv.xp)/(nx.xp-lv.xp):1,src=wrSourceSplit(),fmt=function(v){return Math.round(v).toLocaleString('en-GB');};
-  var cnt=document.getElementById('wr-count');if(cnt&&S)cnt.textContent=S.doneCount+' of '+S.length+' stages';
+  var cnt=document.getElementById('wr-count');if(cnt&&S)cnt.textContent=(S.doneCount+(S.bonusDone||0))+' of '+S.length+' achieved';
   var rkEl=document.getElementById('wr-rank');
   if(rkEl)rkEl.innerHTML='<div class="wr-rank-main"><div class="wr-rank-tok" id="ach-level-badge">'+wrTokSvg({tier:rk.t,st:'done',bars:8,lit:Math.floor(pc*8),num:lv.n,tl:'LV',name:rk.n},112,'Level '+lv.n+' of 20, '+lv.name+', rank '+rk.n)+'</div>'
     +'<div class="wr-rank-meta"><span class="wr-eyebrow">Rank: '+rk.n+' · Level '+lv.n+' of 20</span><div class="wr-rank-name" id="wr-rank-name">'+lv.name+'</div>'
@@ -26493,6 +26524,46 @@ function fireBuildStages(){
     {key:'fatFIRE',phase:5,ic:'flame2',name:'Fat FIRE',desc:'33× expenses',col:'#c9a84c',check:function(){return nw>=annualExp*33;},prog:function(){return ratio(nw,annualExp*33);},cur:function(){return nw;},target:annualExp*33,why:function(){return['Your net worth is '+gbpFmt(nw)+'. This needs 33× a year of spending ('+gbpFmt(annualExp*33)+').'];},acts:[GO_AL]},
     {key:'legacy',phase:5,ic:'tree',name:'Legacy',desc:'50×, next gen',col:'#c9a84c',check:function(){return nw>=annualExp*50;},prog:function(){return ratio(nw,annualExp*50);},cur:function(){return nw;},target:annualExp*50,why:function(){return['Your net worth is '+gbpFmt(nw)+'. This needs 50× a year of spending ('+gbpFmt(annualExp*50)+').'];},acts:[GO_AL]}
   ];
+  /* 20 more achievements (owner, 4 Nov round 2, R8: "Add more achievements to each section that will help inform the user when they
+     have done something worthy of recognition. 50 in total. Front load the majority in Foundation, stabilise and save"). Each one reads
+     data the user has entered; they sit in their section, count the moment they are met, and never hold up the 30 linear stages, so
+     nobody's current stage moves. `before`: the linear stage each one is drawn in front of. */
+  var pays=debts.reduce(function(n,d){return n+((d.payments||[]).length);},0);
+  var held=(alState.cashAccounts||[]).length+(alState.stocks||[]).length+(alState.crypto||[]).length+(alState.otherAssets||[]).length
+    +['gold','silver','platinum','palladium'].filter(function(k){return +((alState.metals||{})[k])>0;}).length;
+  var invested=0;try{invested=alTotalStocks()+alTotalCrypto()+alTotalMetals();}catch(e){}
+  var budMonths=0;try{var _wm=wrState().m;for(var _k in _wm)if(_wm[_k]&&_wm[_k].bud)budMonths++;}catch(e){}
+  var useDays=0;try{useDays=wrState().days||0;}catch(e){}
+  function bonus(before,key,ic,name,desc,long,check,why,acts,prog){return {before:before,bonus:true,key:key,ic:ic,name:name,desc:desc,long:long,check:check,why:function(){return [why];},acts:acts,prog:prog};}
+  function bNw(before,key,name,v){var o=nwStage(key,0,'gem',name,'NW ≥ '+gbpFmt(v),'#44c0b9',function(){return v;});o.before=before;o.bonus=true;o.long='Net worth reaches '+gbpFmt(v)+'.';return o;}
+  function bCash(before,key,name,desc,v,long){var o=cashStage(key,0,'coin',name,desc,'#44c0b9',v);o.before=before;o.bonus=true;o.long=long;return o;}
+  var B=[
+    bonus('mapDebts','profile','user','Profile Set','Money profile filled in','Your saving and spending profile is filled in.',function(){return !!(_vu.name&&(_vu.saveArch||_vu.spendArch||_vu.dream));},'Answer the profile questions (name, saving and spending style) in your profile.',[]),
+    bonus('mapDebts','history','forecast','History In','Past net worth added','You added your past net worth, so the chart shows where you started.',function(){return fireNwhPoints()>0;},'Add past figures with the net worth history wizard on the Overview chart.',[]),
+    bonus('zeroBudget','incomeIn','flow','Income In','Monthly income added','Your monthly income is in the Budget.',function(){return cfTotalIn()>0;},'Add what comes in each month in the Budget tab.',[GO_BUD]),
+    bonus('zeroBudget','spendMap','flow','Spending In','5 spending lines','Five or more spending, saving or investing lines are in your Budget.',function(){return (ovState.expenses||[]).length>=5;},(ovState.expenses||[]).length+' of 5 budget lines listed so far.',[GO_BUD],function(){return Math.min(1,(ovState.expenses||[]).length/5);}),
+    bonus('firstSaved','savingLine','coin','Saving Set','A saving line set','Your Budget has a saving or investing line.',function(){return !!bud&&bud.m.growth>0;},'Add a saving or investing line in the Budget tab.',[GO_BUD]),
+    bonus('firstSaved','assets3','gem','3 Assets','3 assets listed','Three or more accounts or holdings are listed in Assets.',function(){return held>=3;},held+' of 3 accounts or holdings listed so far.',[GO_AL],function(){return Math.min(1,held/3);}),
+    bonus('firstSaved','week1','snapshot','First Week','Used on 7 days','You opened Vault-It on 7 different days.',function(){return useDays>=7;},useDays+' of 7 days so far.',[],function(){return Math.min(1,useDays/7);}),
+    bCash('buf500','buf250','£250 Buffer','First buffer',250,'£250 in cash and savings.'),
+    bonus('firstCut','firstPay','scissors','1st Payment','First payment logged','You logged a payment against a debt in the Debt Tracker.',function(){return pays>0;},'Log a payment on any debt in the Debt Tracker.',[GO_DEBT]),
+    bonus('debtHalf','debt25','halfPie','Quarter Cut','25% cleared','A quarter of your consumer debt is cleared.',function(){return noDebt||nothingToCut||(cOrig>0&&cTotal<=cOrig*0.75);},Math.round(cleared*100)+'% of your consumer debt is cleared. This needs 25%.',[GO_DEBT],function(){return(noDebt||nothingToCut)?1:Math.min(1,cleared/0.25);}),
+    bonus('nw1k','pay6','scissors','6 Payments','6 payments logged','Six debt payments are logged in the Debt Tracker.',function(){return pays>=6;},pays+' of 6 payments logged so far.',[GO_DEBT],function(){return Math.min(1,pays/6);}),
+    bonus('debtFree','surplus','flow','Surplus','Income above spending','Your Budget shows more coming in each month than going out on spending.',function(){return !!bud&&bud.m.tIn>0&&(ovState.expenses||[]).length>0&&bud.m.tIn>bud.m.spend;},'Your Budget shows spending at or above your income.',[GO_BUD]),
+    bCash('ef3','ef1','1-Month EF','1 month expenses',annualExp/12,'One month of spending in cash and savings.'),
+    bonus('dep1','invest','bars','Invested','Stocks, crypto or metals','You hold stocks, funds, crypto or precious metals.',function(){return invested>0;},'Add a holding in Stocks & Funds, Crypto or Metals in Assets & Liabilities.',[GO_AL]),
+    bonus('dep1','firstDep','foundation','Pot Started','House pot started','The first money is in your house deposit pot.',function(){return owned||(hasState&&(+state.saved||0)>0);},'Log a deposit in the House Builder.',[GO_HB]),
+    bonus('nw5k','bud3','flow','3 Budgets','Budget kept 3 months','Income and spending were filled in for three different months.',function(){return budMonths>=3;},budMonths+' of 3 months so far.',[GO_BUD],function(){return Math.min(1,budMonths/3);}),
+    bNw('nw5k','nw2500','£2.5k Net Worth',2500),
+    bonus('depReady','dep75','house','75% Deposit','75% of deposit','Three quarters of your deposit is saved.',function(){return owned||(hasState&&state.target>0&&dep>=0.75);},Math.round(dep*100)+'% of your deposit is saved. This needs 75%.',[GO_HB],function(){return owned?1:Math.min(1,dep/0.75);}),
+    bNw('nw100k','nw75k','£75k',75000),
+    bNw('fullFI','nw500k','£500k',500000)
+  ];
+  // place each one in front of its linear stage, in its section
+  var _all=[];S.forEach(function(s,i){s.no=i+1;B.forEach(function(b){if(b.before===s.key){b.phase=s.phase;b.col='#44c0b9';_all.push(b);}});_all.push(s);});
+  S=_all;
+  // the last slate in each section is its gold graduation slate (R7)
+  FIRE_PHASES.forEach(function(_,pi){var l=-1;S.forEach(function(s,i){if(s.phase===pi)l=i;});if(l>=0)S[l].grad=true;});
   // sub-milestones (owner, 3 Nov: "a clear linear step by step progression with sub milestones for each achievement"): stages with a
   // target step at 30%, 60% and 100% of it; stages the app can partly measure get their own steps; a confirm-only stage is one step
   var anyListed=nw!==0||cashSaved>0||debts.length>0||libs>0||(alState.cashAccounts||[]).length>0;
@@ -26507,6 +26578,7 @@ function fireBuildStages(){
   S.forEach(function(s,i){
     s.idx=i;
     s.raw=!!s.check();                       // the requirement itself is met (whether or not the stage is unlocked yet)
+    if(s.bonus){s.done=s.raw;s.skip=false;s.skipPass=false;return;}   // a round 2 achievement: counts when met, holds nothing up
     s.skip=fireSkipped(s.key);
     s.skipPass=false;
     if(run&&s.raw){s.done=true;current=i;}
@@ -26521,11 +26593,13 @@ function fireBuildStages(){
     if(s.done)s.steps.forEach(function(x){x.met=true;});
   });
   S.currentIdx=current;
-  S.nextIdx=-1;for(var i=0;i<S.length;i++){if(!S[i].done&&!S[i].skipPass){S.nextIdx=i;break;}}
-  S.doneCount=S.filter(function(s){return s.done;}).length;
+  S.nextIdx=-1;for(var i=0;i<S.length;i++){if(!S[i].bonus&&!S[i].done&&!S[i].skipPass){S.nextIdx=i;break;}}
+  S.doneCount=S.filter(function(s){return !s.bonus&&s.done;}).length;   // the 30 linear stages
+  S.bonusDone=S.filter(function(s){return s.bonus&&s.done;}).length;    // the 20 round 2 achievements
+  S.spineLen=S.filter(function(s){return !s.bonus;}).length;
   S.skipCount=S.filter(function(s){return s.skipPass;}).length;
   S.passedIdx=S.nextIdx<0?S.length-1:S.nextIdx-1;            // rail is solid up to the last stage that was passed
-  S.waiting=S.nextIdx<0?[]:S.filter(function(s,i){return i>S.nextIdx&&s.raw;});   // later stages already met, held back by the next-up stage
+  S.waiting=S.nextIdx<0?[]:S.filter(function(s,i){return i>S.nextIdx&&!s.bonus&&s.raw;});   // later stages already met, held back by the next-up stage
   return S;
 }
 // a sub-milestone's label: money where the stage has a target, otherwise how far along it is
@@ -26574,11 +26648,11 @@ function renderFIREroadmap(){
   var lbl=document.getElementById('fire-current-label');
   if(lbl){
     var ph=phases[focus.phase];
-    lbl.textContent=(nextIdx>=0?'STAGE '+(nextIdx+1)+'/30 · ':'COMPLETE · ')+ph.label;
+    lbl.textContent=(nextIdx>=0?'STAGE '+focus.no+'/'+stages.spineLen+' · ':'COMPLETE · ')+ph.label;
     lbl.style.color=viDay(ph.col);lbl.style.borderColor=viDay(ph.col+'44');lbl.style.background=viDay(ph.col+'11');
   }
   var pt=document.getElementById('fire-progress-txt');
-  if(pt)pt.textContent=doneCount+' of '+stages.length+' achieved'+(skipCount?' · '+skipCount+' skipped':'');
+  if(pt)pt.textContent=(doneCount+stages.bonusDone)+' of '+stages.length+' achieved'+(skipCount?' · '+skipCount+' skipped':'');
   var ns=document.getElementById('fire-next-step');
   if(ns){var nxS=nextIdx>=0?stages[nextIdx]:null,sts=nxS?nxS.steps||[]:[],nj=sts.findIndex(function(x){return !x.met;});
     ns.innerHTML=nxS?'<b>Next step</b> '+nxS.name+': '+(sts[nj<0?sts.length-1:nj]||{lbl:nxS.desc}).lbl+' <span>+'+wrStepXp(nxS.key,sts.length)+' XP</span>':'<b>Every stage done.</b> Your roadmap is complete.';}
@@ -26604,11 +26678,14 @@ function renderFIREroadmap(){
   /* ground plane (owner, 3 Nov round 2: "a steeper perspective so the ground plane takes up less space ... the grid perspective ground
      line ... achievement icons lifted higher above that ground plane"): a thin strip at the foot (its grid is #fire-ground, which stays
      put while the track scrolls); the path runs on the ground and each token floats above it on a light beam with its shadow below */
-  var GY=H-56,PATH_Y=GY+14,out='<rect x="'+x0+'" y="0" width="'+(x1-x0)+'" height="'+GY+'" fill="#030810" opacity=".6"/>';   // the stage behind the tokens (paper in Daylight)
+  /* v0.9.1 round 2 (owner, 4 Nov, R3 and R6, with a red sketch): a wider, flatter ground plane that starts right under the slates
+     (#fire-ground, FIRE_GH tall), and section dividers on it that lean with its perspective (fireCarousel sets their near end). The
+     tokens keep their height: they still float clear of their shadows */
+  var GY=H-56,PATH_Y=GY+14,GT=H-FIRE_GH,out='<rect x="'+x0+'" y="0" width="'+(x1-x0)+'" height="'+GT+'" fill="#030810" opacity=".6"/>';   // the stage behind the tokens (paper in Daylight)
   phaseSpans.forEach(function(sp,pi){
     var a=Math.max(x0,sp.x0),b=Math.min(x1,sp.x1);
     if(b<=a)return;
-    if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line x1="'+sp.x0+'" y1="'+GY+'" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="1" opacity="0.45" stroke-dasharray="3 3"/>';
+    if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line class="fire-div" x1="'+sp.x0+'" y1="'+GT+'" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="1.2" opacity="0.6" stroke-dasharray="4 3"/>';
     out+='<text x="'+((a+b)/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10.5" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="'+(sp.done?'0.95':'0.7')+'" letter-spacing="2.5">'+sp.label+(sp.done?' ✓':'')+'</text>';
   });
   var tokW=function(k){return k===nextIdx?80:64;},coinR=function(k){return tokW(k)/2;};   // card widths (owner, 3 Nov round 3: "larger"): 80 px for the stage to work on, 64 px for the rest
@@ -26620,25 +26697,27 @@ function renderFIREroadmap(){
     var s=stages[i];
     var cx=i*NODE_SPACING+LEFT,W=tokW(i);NODE_R=W/2;
     var done=s.done,isNext=i===nextIdx,skipped=s.skipPass,waiting=s.raw&&!done&&!skipped;
-    var col=s.col||'#44c0b9';
+    var col=s.col||'#44c0b9',secCol=phases[s.phase].col;
     var CH=W*1.32,bot=GY-(isNext?74:60),top=bot-CH;
     var click=' style="cursor:pointer" onclick="fireNodeTap('+i+')"';
-    var tier=wrStageTier(s.key),stt=done?'done':isNext?'next':skipped?'skip':waiting?'wait':'lock';
+    var tier=wrStageTier(s.key),look=fireLook(s),stt=done?'done':isNext?'next':skipped?'skip':waiting?'wait':s.bonus?'todo':'lock';
     var sts=s.steps||[],lit=stt==='done'||stt==='wait'?sts.length:stt==='next'?sts.filter(function(x){return x.met;}).length:0;
-    out+='<g class="fire-coin'+(isNext?' next':'')+(done?' done':'')+'" data-i="'+i+'" data-cx="'+cx+'" data-tier="'+tier+'"'+click+'>'
-      +'<title>Stage '+(i+1)+' of '+stages.length+', '+s.name+', '+WR_TIERS[tier].n+', '+({done:'achieved',next:'next up',skip:'skipped',wait:'met, waiting on earlier stages',lock:'locked'})[stt]+'</title>';
+    var nxtPh=phases[s.phase+1];
+    out+='<g class="fire-coin'+(isNext?' next':'')+(done?' done':'')+'" data-i="'+i+'" data-cx="'+cx+'" data-tier="'+tier+'" data-look="'+look+'"'+click+'>'
+      +'<title>'+(s.bonus?'Achievement':'Stage '+s.no+' of '+stages.spineLen)+', '+s.name+', '+({std:'standard',big:'big milestone',grad:'graduation'+(nxtPh?' to '+nxtPh.label.toLowerCase():'')})[look]+', '+({done:'achieved',next:'next up',skip:'skipped',wait:'met, waiting on earlier stages',lock:'locked',todo:'not yet'})[stt]+'</title>';
     // on the ground: shadow, the glowing pad under the stage to work on, then the beam (or a dotted tether for locked and skipped)
     out+='<ellipse cx="'+cx+'" cy="'+PATH_Y+'" rx="'+(W*.55).toFixed(1)+'" ry="'+(W*.1).toFixed(1)+'" fill="url(#wt-shadow)"/>';
     if(isNext)out+='<ellipse cx="'+cx+'" cy="'+PATH_Y+'" rx="'+(W*.82).toFixed(1)+'" ry="'+(W*.15).toFixed(1)+'" fill="url(#wt-pad)"/><ellipse cx="'+cx+'" cy="'+PATH_Y+'" rx="'+(W*.6).toFixed(1)+'" ry="'+(W*.1).toFixed(1)+'" fill="none" stroke="#44c0b9" stroke-width="1.2"/>';
     if(stt==='done'||stt==='next'||stt==='wait')out+='<polygon points="'+(cx-W*.3).toFixed(1)+','+PATH_Y+' '+(cx+W*.3).toFixed(1)+','+PATH_Y+' '+(cx+W*.42).toFixed(1)+','+bot+' '+(cx-W*.42).toFixed(1)+','+bot+'" fill="url(#wt-beam)" opacity="'+(isNext?1:stt==='done'?0.55:0.3)+'"/>';
     else out+='<line x1="'+cx+'" y1="'+(bot+4)+'" x2="'+cx+'" y2="'+(PATH_Y-3)+'" stroke="'+(skipped?'#e8a23c':'#7d8793')+'" stroke-opacity=".45" stroke-dasharray="2 3"/>';
     if(i===_fireDetailIdx)out+='<polygon class="fire-sel" points="'+wrPts(WR_CARD,cx-W/2-W*.08,top-W*.08,W*1.16/100)+'" fill="none" stroke="var(--gold)" style="stroke:var(--gold)" stroke-width="1"/>';   // the tapped stage: a 1 px gold outline (E3)
-    out+='<g class="fire-card"><g transform="translate('+(cx-W/2)+' '+top.toFixed(1)+') scale('+(W/100).toFixed(3)+')">'+wrTok({tier:tier,st:stt,bars:sts.length,lit:lit,ic:WR_STAGE_IC[s.key]||s.ic,r:NODE_R,px:W,sc:W/100,chip:stt==='next'?'':stt})+'</g></g>';
+    out+='<g class="fire-card"><g transform="translate('+(cx-W/2)+' '+top.toFixed(1)+') scale('+(W/100).toFixed(3)+')">'+wrTok({tier:WR_LOOK_TIER[look],st:stt,bars:sts.length,lit:lit,ic:WR_STAGE_IC[s.key]||s.ic,r:NODE_R,px:W,sc:W/100,chip:stt==='next'||stt==='todo'?'':stt,ol:secCol,grey:done})+'</g></g>';
     // the name sits under the card, in the air above the ground (owner, 3 Nov: not on the card at this size)
-    var nameCol=done?col:(isNext||waiting)?'#e9f1f1':skipped?'#e8a23c':'rgba(154,160,166,0.75)';
-    out+='<text x="'+cx+'" y="'+(bot+(isNext?24:17))+'" text-anchor="middle" font-size="11.5" font-family="Syne,sans-serif" font-weight="800" fill="'+nameCol+'"'+click+'>'+s.name+'</text>';
+    var nameCol=done?secCol:(isNext||waiting)?'#e9f1f1':skipped?'#e8a23c':'rgba(154,160,166,0.75)';
+    var nmFit=s.name.length*8.9>108?' textLength="108" lengthAdjust="spacingAndGlyphs"':'';   // a long name is drawn a little narrower so neighbours never run together (round 2)
+    out+='<text x="'+cx+'" y="'+(bot+(isNext?24:17))+'" text-anchor="middle" font-size="11.5" font-family="Syne,sans-serif" font-weight="800" fill="'+nameCol+'"'+nmFit+click+'>'+s.name+'</text>';
     if(isNext){   // tag for the stage to work on now
-      var tag=(i===0)?'START HERE':'NEXT UP';
+      var tag=(s.no===1)?'START HERE':'NEXT UP';
       out+='<rect x="'+(cx-40)+'" y="'+(top-30)+'" width="80" height="16" fill="'+col+'26" stroke="'+col+'" stroke-width="0.8"/>'
         +'<text x="'+cx+'" y="'+(top-18.5)+'" text-anchor="middle" font-size="10.5" font-family="Share Tech Mono,monospace" fill="'+col+'" letter-spacing="1.2" font-weight="700">'+tag+'</text>';
     }else out+='<text x="'+cx+'" y="'+(top-9)+'" text-anchor="middle" font-size="10.5" font-family="DM Sans,sans-serif" fill="rgba(140,150,160,'+(done?0.95:0.75)+')">'+(waiting?'met · waiting':skipped?'skipped':s.desc)+'</text>';
@@ -26656,17 +26735,30 @@ function renderFIREroadmap(){
    towards the edges, and a swipe settles on the nearest stage */
 // the ground grid: horizontal lines closer together towards the horizon, verticals converging on one point above the middle of the
 // view. It is the environment and stays still while the cards scroll across it (owner, 3 Nov round 5); redrawn only when the width changes
+/* v0.9.1 round 2 (owner, 4 Nov, R3: "Increase the two point perspective behind the achievements and decrease perspective height", red
+   sketch on the overview): the ground is a plane FIRE_GH tall that starts right under the slates, its far edge inset from both sides and
+   its near edge FIRE_GF times wider, so it runs out past the card on both sides; the across lines bunch towards the far edge */
+function fireGroundX(x,y,vx){return vx+(x-vx)*(1+(FIRE_GF-1)*y/FIRE_GH);}   // where a point x on the far edge sits at depth y
 function fireGround(){
   var g=document.getElementById('fire-ground'),SC=document.getElementById('fire-timeline-scroll');if(!g||!SC)return;
-  var w=SC.clientWidth,h=56,vx=w/2,vy=-240,sp=54,off=(w/2)%sp,f=(h-vy)/(0-vy),o='';
+  var w=SC.clientWidth,h=FIRE_GH,vx=w/2,sp=54,ins=Math.max(14,Math.round(w*.07)),L=ins,R=w-ins,o='';
   if(!(w>0)||g.__w===w)return;g.__w=w;
-  [0,3,7,12,19,28,40,55].forEach(function(d,k){o+='<line class="fg-h" x1="0" y1="'+d+'" x2="'+w+'" y2="'+d+'" style="stroke-opacity:'+(k?(.1+k*.025).toFixed(3):.5)+'"/>';});
-  for(var x=off-sp*12;x<w+sp*12;x+=sp){var xb=vx+(x-vx)*f;if(Math.max(x,xb)<-10||Math.min(x,xb)>w+10)continue;o+='<line class="fg-v" x1="'+x.toFixed(1)+'" y1="0" x2="'+xb.toFixed(1)+'" y2="'+h+'"/>';}
+  var at=function(x,y){return fireGroundX(x,y,vx).toFixed(1);};
+  o+='<polygon class="fg-plane" points="'+L+',0 '+R+',0 '+at(R,h)+','+h+' '+at(L,h)+','+h+'"/>';
+  [0,.045,.1,.17,.26,.38,.55,.78].forEach(function(f,k){var y=(f*h).toFixed(1);o+='<line class="fg-h" x1="'+at(L,+y)+'" y1="'+y+'" x2="'+at(R,+y)+'" y2="'+y+'" style="stroke-opacity:'+(k?(.1+k*.025).toFixed(3):.55)+'"/>';});
+  o+='<line class="fg-edge" x1="'+L+'" y1="0" x2="'+at(L,h)+'" y2="'+h+'"/><line class="fg-edge" x1="'+R+'" y1="0" x2="'+at(R,h)+'" y2="'+h+'"/>';
+  for(var x=vx-Math.floor((vx-L)/sp)*sp;x<=R+.1;x+=sp)o+='<line class="fg-v" x1="'+x.toFixed(1)+'" y1="0" x2="'+at(x,h)+'" y2="'+h+'"/>';
   g.setAttribute('viewBox','0 0 '+w+' '+h);g.innerHTML=o;
+}
+// the section dividers lie on the ground, so their near end follows the same perspective as the grid (R6); the view's middle moves as it scrolls
+function fireDividers(SC){
+  var vx=SC.scrollLeft+SC.clientWidth/2;
+  [].forEach.call(document.querySelectorAll('#fire-roadmap-svg line.fire-div'),function(l){var x=+l.getAttribute('x1');l.setAttribute('x2',fireGroundX(x,FIRE_GH,vx).toFixed(1));});
 }
 function fireCarousel(){
   try{fireGround();}catch(e){}
   var SC=document.getElementById('fire-timeline-scroll'),svg=document.getElementById('fire-roadmap-svg');if(!SC||!svg)return;
+  try{fireDividers(SC);}catch(e){}
   var mob=window.innerWidth<=700,mid=SC.scrollLeft+SC.clientWidth/2;
   [].forEach.call(svg.querySelectorAll('.fire-coin'),function(g){
     var cx=(+g.getAttribute('data-i'))*FIRE_NODE+FIRE_LEFT,d=Math.min(1,Math.abs(cx-mid)/(SC.clientWidth*(mob?0.6:0.5)));
@@ -26744,13 +26836,14 @@ function fireShowDetail(idx,opts){
   if(_fireDetailIdx!==idx&&!opts.keepAsk)_fireSkipAsk=-1;
   if(opts.skipAsk)_fireSkipAsk=idx;
   _fireDetailIdx=idx;
-  var ph=FIRE_PHASES[s.phase],col=s.col||ph.col;
-  var seq=String(idx+1).padStart(2,'0');
+  var ph=FIRE_PHASES[s.phase],col=s.col||ph.col,look=fireLook(s),nxtPh=FIRE_PHASES[s.phase+1];
+  var seq=s.bonus?'':String(s.no||idx+1).padStart(2,'0');
   var isNext=idx===S.nextIdx,waiting=s.raw&&!s.done&&!s.skipPass;
   var blk0=S.nextIdx>=0?S[S.nextIdx]:null;
-  var state_=s.done?'Achieved':s.skipPass?'Skipped':isNext?'Next up':(waiting&&blk0)?'Met. Waiting on '+blk0.name:'Locked';
+  var state_=s.done?'Achieved':s.skipPass?'Skipped':isNext?'Next up':(waiting&&blk0)?'Met. Waiting on '+blk0.name:s.bonus?'Not yet':'Locked';
   var stCol=s.done?'#3ecf8e':s.skipPass?'#e8a23c':(isNext||waiting)?col:'#7d8793';
-  var long=(FIRE_LONG[idx]||s.desc);
+  var long=(s.long||FIRE_LONG[(s.no||idx+1)-1]||s.desc)
+    +(look==='grad'?' <b style="color:var(--gold)">Graduation:</b> '+(nxtPh?'finishing it moves you on to '+nxtPh.label.charAt(0)+nxtPh.label.slice(1).toLowerCase()+'.':'the last slate on the roadmap.'):'');
   var progTxt='';
   if(!s.done&&s.cur&&s.target)progTxt='<div style="font-family:\'Share Tech Mono\',monospace;font-size:max(.5rem,var(--vi-fs-1));color:'+col+';margin-top:6px">'+gbpFmt(Math.max(0,s.cur()))+' of '+gbpFmt(s.target)+' · '+Math.round(Math.max(0,Math.min(1,s.prog()))*100)+'%</div>';
   else if(!s.done&&s.prog&&isNext)progTxt='<div style="font-family:\'Share Tech Mono\',monospace;font-size:max(.5rem,var(--vi-fs-1));color:'+col+';margin-top:6px">'+Math.round(Math.max(0,Math.min(1,s.prog()))*100)+'% there</div>';
@@ -26762,7 +26855,8 @@ function fireShowDetail(idx,opts){
     }else{
       var items=(s.why?s.why():[s.hint||'Not met yet.']).filter(Boolean);
       need='<div class="fd-box"><div class="fd-h">WHAT THIS NEEDS</div><ul>'+items.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul>'
-        +(!isNext&&blocker?'<div class="fd-sub">It comes after “'+blocker.name+'”, so stages unlock in order.</div>':'')+'</div>';
+        +(!isNext&&blocker&&!s.bonus?'<div class="fd-sub">It comes after “'+blocker.name+'”, so stages unlock in order.</div>':'')
+        +(s.bonus?'<div class="fd-sub">This one counts as soon as it is met. It does not hold up the stages around it.</div>':'')+'</div>';
     }
   }
   if(isNext&&!s.done&&(S.waiting||[]).length){var wn=S.waiting.length;need+='<div class="fd-box ok"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg>'+wn+' later stage'+(wn>1?'s are':' is')+' already met. '+(wn>1?'They tick':'It ticks')+' when you finish “'+s.name+'”.</div>';}
@@ -26781,14 +26875,14 @@ function fireShowDetail(idx,opts){
     }
   }
   var btn=(acts||skip)?'<div class="fd-acts">'+acts+skip+'</div>':'';
-  var dTier=wrStageTier(s.key),dSt=s.done?'done':s.skipPass?'skip':isNext?'next':waiting?'wait':'lock',dSteps=s.steps||[],dPer=wrStepXp(s.key,dSteps.length),dW=wrState();
+  var dTier=wrStageTier(s.key),dSt=s.done?'done':s.skipPass?'skip':isNext?'next':waiting?'wait':s.bonus?'todo':'lock',dSteps=s.steps||[],dPer=wrStepXp(s.key,dSteps.length),dW=wrState();
   var dLit=dSt==='done'||dSt==='wait'?dSteps.length:dSt==='next'?dSteps.filter(function(x){return x.met;}).length:0;
   var stepsHtml='<div class="fd-h wr-steps-h">STEPS · '+WR_TIERS[dTier].n.toUpperCase()+' TIER</div><ol class="wr-steps">'+dSteps.map(function(x,k){var got=!!dW.s[s.key+'.'+k],cur=!x.met&&dSteps.slice(0,k).every(function(y){return y.met;});
     return '<li class="'+(x.met?'ok':cur?'cur':'')+'"><span class="wr-sdot" aria-hidden="true"></span><span class="wr-slbl">'+x.lbl+(x.met?'<span class="vh"> (done)</span>':'')+'</span><span class="wr-sxp">'+(got?'+'+dPer+' XP earned':'+'+dPer+' XP')+'</span></li>';}).join('')+'</ol>';
-  inner.innerHTML=viDay('<div class="wr-dtok">'+wrTokSvg({tier:dTier,st:dSt,bars:dSteps.length,lit:dLit,ic:WR_STAGE_IC[s.key]||s.ic,chip:dSt==='next'?'':dSt,tl:seq,name:s.name},window.innerWidth<=480?80:100,'Stage '+seq+', '+s.name)+'</div>'
+  inner.innerHTML=viDay('<div class="wr-dtok">'+wrTokSvg({tier:WR_LOOK_TIER[look],st:dSt,bars:dSteps.length,lit:dLit,ic:WR_STAGE_IC[s.key]||s.ic,chip:dSt==='next'||dSt==='todo'?'':dSt,tl:seq||null,name:s.name,ol:ph.col},window.innerWidth<=480?80:100,(s.bonus?'Achievement, ':'Stage '+seq+', ')+s.name)+'</div>'
     +'<div style="flex:1;min-width:0">'
     +'<div style="font-family:\'Syne\',sans-serif;font-size:max(.74rem,var(--vi-fs-3));font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="white-space:nowrap;display:inline-block;font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+state_+'</span></div>'
-    +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));color:var(--t2);letter-spacing:.1em;margin-bottom:4px">'+ph.label+' PHASE · STEP '+seq+' OF 30</div>'
+    +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));color:var(--t2);letter-spacing:.1em;margin-bottom:4px">'+ph.label+' PHASE · '+(s.bonus?'ACHIEVEMENT':'STEP '+seq+' OF '+(S.spineLen||30))+'</div>'
     +'<div style="font-family:\'DM Sans\',sans-serif;font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.5">'+long+'</div>'
     +progTxt+stepsHtml+need+ticks+btn+'</div>');
   panel.style.display='';
@@ -28772,7 +28866,7 @@ function renderPioneerCard() {
       return;
     }
     // ── Level & XP ──
-    var xp      = (typeof achState !== 'undefined') ? (achState.xp || 0) : 0;
+    var xp      = (typeof wrTotalXp === 'function') ? wrTotalXp() : 0;   // the Wealth Roadmap total, as currentLevel() (R22)
     var lv      = (typeof currentLevel === 'function') ? currentLevel() : {n:'Scout',xp:0};
     var nxt     = (typeof nextLevel   === 'function') ? nextLevel()    : null;
     var lvIdx   = (typeof LVS !== 'undefined') ? LVS.findIndex(function(v){return v.n===lv.n;}) + 1 : 1;
