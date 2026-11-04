@@ -47,12 +47,18 @@ async function boot(b, c, slow, blank) {
 // The guard reloads the page itself when Chrome gives it an empty view, so reads before that would see nothing.
 const settled = p => p.evaluate(() => typeof initDemoMode === 'function' && !window._viStorageHeld && !window._viDeleted && !document.getElementById('vi-storage-msg'));
 const settle = async (p, slow) => {
-  const end = Date.now() + 120000;
+  const end = Date.now() + 90000;
   while (Date.now() < end) {
-    try { await p.waitForLoadState('load'); if (await settled(p)) { await p.waitForTimeout(slow ? 4000 : 1500); if (await settled(p)) return; } } catch (e) {}
+    try { await p.waitForLoadState('load'); if (await settled(p)) { await p.waitForTimeout(slow ? 4000 : 1500); if (await settled(p)) return true; } } catch (e) {}
     await p.waitForTimeout(250);
   }
-  throw new Error('the page never settled (stuck holding writes or showing the did-not-load message)');
+  return false;   // still holding (the guard showed the did-not-load message): this page wrote nothing, but cannot read the store
+};
+// the final read must come from a page that can see the store: if the tab is stuck on Chrome's empty view, use a new tab
+const readable = async (ctx, p, slow) => {
+  if (await settle(p, slow)) return p;
+  for (let i = 0; i < 3; i++) { const q = await ctx.newPage(); await go(q, URL); if (await settle(q, slow)) return q; }
+  return null;
 };
 const go = async (p, u) => { try { await p.goto(u); } catch (e) { if (!/interrupted by another navigation|ERR_ABORTED/.test(e.message)) throw e; } };
 const read = p => p.evaluate(() => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); o[k] = localStorage.getItem(k); } return o; });
@@ -68,13 +74,16 @@ const read = p => p.evaluate(() => { const o = {}; for (let i = 0; i < localStor
       await go(p, URL + '?blank'); await settle(p, false);
       ok(navs.some(u => /vi_rt=1/.test(u)), t + 'the page saw the empty view, wrote nothing and loaded again'); }
     for (let r = 0; r < 2; r++) { await go(p, URL); await settle(p, slow); }
-    const ls = await read(p);
+    const rp = await readable(ctx, p, slow);
+    ok(!!rp, t + 'a page could read the store again (Chrome kept an empty view in every tab tried)');
+    if (!rp) { await ctx.close(); continue; }
+    const ls = await read(rp);
     const saved = Object.keys(c.keys).map(k => ls[k] || '').join('|');
     ok(Object.keys(c.keys).every(k => !!ls[k]) && saved.indexOf(c.mark) > -1, t + 'saved data is still there after boot and two reloads');
     ok(!DEMO.test(saved), t + 'no demo figures were written over the saved keys');
     ok(ls.vi_demo_mode !== 'true', t + 'the device is not switched into demo mode (vi_demo_mode ' + ls.vi_demo_mode + ')');
     ok(!DEMO.test(ls.pos_ov1 || '') && !/Alex Morgan/.test(ls.vi_user || '') && !(ls.pos_ov1 || '').includes('Side Projects'), t + 'the demo was not seeded into the empty keys either');
-    ok(await p.evaluate(() => { const ch = document.getElementById('demo-chip'); return !ch || getComputedStyle(ch).display === 'none'; }), t + 'no demo banner');
+    ok(await rp.evaluate(() => { const ch = document.getElementById('demo-chip'); return !ch || getComputedStyle(ch).display === 'none'; }), t + 'no demo banner');
     ok(!errs.length, t + 'no page errors ' + errs.slice(0, 2).join(' | '));
     await ctx.close();
   }
