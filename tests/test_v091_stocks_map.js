@@ -28,8 +28,9 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
       cells.forEach(c => { const cr = c.getBoundingClientRect(); c.querySelectorAll('.dtm-n,.dtm-v,.dtm-s,.dtm-oth').forEach(t => { const tr = t.getBoundingClientRect(); const fs = parseFloat(getComputedStyle(t).fontSize);
         if (t.scrollWidth > t.clientWidth + 1 || t.scrollHeight > t.clientHeight + 1 || tr.right > cr.right + 0.5 || tr.bottom > cr.bottom + 0.5 || tr.left < cr.left - 0.5 || tr.top < cr.top - 0.5) bad.push('clip:' + t.textContent.slice(0, 20));
         if (fs < 10.5) bad.push('small:' + fs + ':' + t.textContent.slice(0, 20)); }); });
+      const emptyPies = [...el.querySelectorAll('.stk-tm-pie')].filter(pi => { const a = pi.getBoundingClientRect(); return ![...el.querySelectorAll('.dtm-cell')].some(c => { const b = c.getBoundingClientRect(); return b.left >= a.left - 1 && b.right <= a.right + 1 && b.top >= a.top - 1 && b.bottom <= a.bottom + 1; }); }).length;
       const other = el.querySelectorAll('.dtm-other');
-      return { h: el.offsetHeight, W, n: cells.length, bad, empty: cells.filter(c => !c.textContent.trim() && !c.querySelector('img,.stk-mono')).length, pebbles: el.querySelectorAll('.dtm-sm').length,
+      return { emptyPies, h: el.offsetHeight, W, n: cells.length, bad, empty: cells.filter(c => !c.textContent.trim() && !c.querySelector('img,.stk-mono')).length, pebbles: el.querySelectorAll('.dtm-sm').length,
         other: [...other].map(o => o.textContent.replace(/\s+/g, ' ').trim()), text: el.textContent, legend: (document.getElementById('stk-tm-other') || {}).textContent || '',
         logos: el.querySelectorAll('.stk-hl').length, rowLogos: document.querySelectorAll('#stk-holdings .stk-row:not(.h) .stk-hl').length, rows: document.querySelectorAll('#stk-holdings .stk-row:not(.h)').length,
         scrollX: document.documentElement.scrollWidth > innerWidth + 1 };
@@ -39,6 +40,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     const oldH = Math.round(Math.max(240, Math.min(460, r.W * .72)));
     ok(r.h >= oldH * 1.25, t + 'map is at least 1.25x today\'s height (' + r.h + ' vs ' + oldH + ')');
     ok(r.bad.length === 0, t + 'no label clipped or under 10.5px ' + JSON.stringify(r.bad.slice(0, 4)));
+    ok(r.emptyPies === 0, t + 'no pie outline encloses nothing (' + r.emptyPies + ')');
     ok(r.pebbles === 0 && r.empty === 0, t + 'no unlabelled pebbles (' + r.pebbles + '/' + r.empty + ')');
     ok(r.other.some(s => /Other \(\d+\)/.test(s)), t + 'small holdings merge into an "Other (n)" tile: ' + JSON.stringify(r.other));
     ok(!/Other \(1\)/.test(r.other.join('|')), t + 'a lone merged holding is not called "Other (1)"');
