@@ -13857,10 +13857,14 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wi-icon-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:599}
 /* Image search modal */
 .wi-search-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:600;background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:10px;padding:16px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.7)}
-.wi-search-results{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px;max-height:200px;overflow-y:auto}
+.wi-search-results{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px;min-height:200px;max-height:200px;overflow-y:auto;align-content:start}   /* fixed height: the window does not jump between searching and results */
 .wi-search-results img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:4px;cursor:pointer;border:2px solid transparent}
 .wi-search-results img:hover{border-color:rgb(var(--teal-rgb) / .5)}
 .wi-search-msg{grid-column:1 / -1;font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);padding:8px}.wi-search-msg.bad{color:var(--re)}.wi-search-credit{padding:4px 2px 0;font-size:max(.5rem,var(--vi-fs-1))}
+.wi-search-busy{display:flex;align-items:center;gap:8px;font-size:max(10.5px,.56rem,var(--vi-fs-2))}
+.wi-spin{width:16px;height:16px;flex:none;border-radius:50%;border:2px solid rgb(var(--teal-rgb) / .25);border-top-color:var(--teal);animation:wi-spin .8s linear infinite}
+@keyframes wi-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.wi-spin{display:none;animation:none}}   /* the static "Searching…" label is enough */
 </style>
 
 <style>
@@ -23233,14 +23237,16 @@ function liabDoSearch(id){imgSearch('li',id);}
 // only ever returned one default photo. The tile keeps the chosen thumbnail link and its credit line.
 var OPENVERSE='https://api.openverse.org/v1/images/';
 var _imgSearchBusy=0;
+/* the one loading spinner for every photo search (Wealth inventory and Liabilities both come through imgSearch): ring plus "Searching…"; the ring is hidden under reduced motion */
+function viSearchBusy(){return '<div class="wi-search-msg wi-search-busy" role="status"><span class="wi-spin" aria-hidden="true"></span><span>Searching…</span></div>';}
 function imgSearch(kind,id){
   var inp=document.getElementById('wi-search-inp'),res=document.getElementById('wi-search-res-'+id);
   if(!inp||!res)return;
   var q=inp.value.trim();if(!q){res.innerHTML='<div class="wi-search-msg">Type what the item is, for example "electric guitar".</div>';return;}
   var gap=1100-(Date.now()-_imgSearchBusy);   // Openverse allows about one search a second without a key: wait, never drop
-  if(gap>0){res.innerHTML='<div class="wi-search-msg">Searching…</div>';clearTimeout(imgSearch._t);imgSearch._t=setTimeout(function(){imgSearch(kind,id);},gap);return;}
+  if(gap>0){res.innerHTML=viSearchBusy();clearTimeout(imgSearch._t);imgSearch._t=setTimeout(function(){imgSearch(kind,id);},gap);return;}
   _imgSearchBusy=Date.now();
-  res.innerHTML='<div class="wi-search-msg">Searching…</div>';
+  res.innerHTML=viSearchBusy();
   fetch(OPENVERSE+'?q='+encodeURIComponent(q)+'&page_size=12&mature=false',{credentials:'omit'}).then(function(r){
     if(r.status===429)throw new Error('Too many searches in a row. Wait a few seconds and try again.');
     if(!r.ok)throw new Error('The photo library answered '+r.status+'. Try again in a moment, or upload your own photo.');
