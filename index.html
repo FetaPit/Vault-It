@@ -22275,14 +22275,14 @@ function v3CashNow(){
   var card=document.getElementById('cashSceneCard'),scene=card&&card.querySelector('.scene');if(!scene)return false;
   var host=v3Host(scene,'cashSvg');if(!host.clientWidth)return true;   // tab hidden: drawn when shown
   var V=V3.cash||(V3.cash=new V3Scene(host,'3D view of your cash as coins'));
-  var K=v3CashKey(),cur=K.cur,spec=K.spec,units=K.units,key=K.key;if(V._key===key&&V.root.children.length){V.kick(300);return true;}   // the same balance again (the tab and its sub-tab both ask on one tap): redraw, do not rebuild
+  var K=v3CashKey(),cur=K.cur,spec=K.spec,units=K.units,key=K.key;if(V._key===key&&V.root.children.length){var c0=document.getElementById('cashCap');if(c0&&V._cap)c0.textContent=V._cap;V.kick(300);return true;}   // v0.9.2: the same balance again: the 3D caption goes back too (the flat drawing may have written its own meanwhile)   // the same balance again (the tab and its sub-tab both ask on one tap): redraw, do not rebuild
   V.clear();V._key=key;
   var C=v3Pre('cash',key)||v3CashContent(spec,units,cur);V.root.add(C.grp);V.stats=C.stats;   // built in the idle warm-up when the balance has not changed since
   var PER_BLOCK=1000,sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
   var kc=V3._cashUnits===units&&V3._cashCur===cur;V.frame(kc);V3._cashUnits=units;V3._cashCur=cur;v3ChipsSet(V,C.chips,C.total);
   V.introArm('cash|'+key,V3._cashZone||null,V3._cashSilent);V3._cashZone=null;V3._cashSilent=false;   // E14: the coins lay themselves out when the scene is first seen, and again when the balance changes
   var st=V.stats,plates=(st&&st.plates)||[],laid=(st?st.fullStacks:0)+(st&&st.rest?1:0);
-  var cap=document.getElementById('cashCap');if(cap)cap.textContent=units?sym+fmt(st.units)+' laid · '+plates.length+' plate'+(plates.length===1?'':'s')+' · '+Math.floor(st.units/PER_BLOCK)+' block'+(Math.floor(st.units/PER_BLOCK)===1?'':'s')+' of 1,000'+(st.units%PER_BLOCK?' + '+fmt(st.units%PER_BLOCK):'')+' · '+spec.name+' coins, '+(+(spec.d*10).toFixed(2))+' mm':'No cash yet. Add an account or some physical cash.';
+  var cap=document.getElementById('cashCap');V._cap=units?sym+fmt(st.units)+' laid · '+plates.length+' plate'+(plates.length===1?'':'s')+' · '+Math.floor(st.units/PER_BLOCK)+' block'+(Math.floor(st.units/PER_BLOCK)===1?'':'s')+' of 1,000'+(st.units%PER_BLOCK?' + '+fmt(st.units%PER_BLOCK):'')+' · '+spec.name+' coins, '+(+(spec.d*10).toFixed(2))+' mm':'No cash yet. Add an account or some physical cash.';if(cap)cap.textContent=V._cap;
   return true;
 }
 // a cast-style bar: bevelled block with the weight and fineness stamped on top
@@ -27330,8 +27330,8 @@ function renderCashISO(){
   }
 
   // Caption
-  var cap=document.getElementById('cashCap');
-  if(cap){
+  var cap=document.getElementById('cashCap'),use3d=false;try{use3d=v3Ok()&&!(V3._flat&&V3._flat.cash);}catch(e){}
+  if(cap&&!use3d){   // v0.9.2 (CoS, 4 Nov): the flat view's caption only when it is the view; while the 3D stage waits for its first frame, its own caption stays
     cap.textContent=gbpFmt(total)+' \u00b7 '+fullCubes+' full block'+(fullCubes===1?'':'s')+(remainder>0?' + \u00a3'+remainder:'')+' \u00b7 each block = \u00a31,000';   // the same word as the 3D (Pedro, 3 Nov)
   }
   MS.innerHTML=svgContent;
