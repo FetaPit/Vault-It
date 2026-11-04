@@ -59,6 +59,18 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     ok(JSON.stringify(r.doge) === JSON.stringify({ id: 4, sym: 'DOGE', amount: 100, price: 0.1 }), t + 'an old DOGE save is untouched: ' + JSON.stringify(r.doge));
     const ph = await page.evaluate(() => [...document.querySelectorAll('#assets-crypto .data-input-row input')].map(i => { const c = document.createElement('canvas').getContext('2d'); c.font = getComputedStyle(i).font; return { p: i.placeholder, fits: c.measureText(i.placeholder).width <= i.clientWidth - 14 }; }));
     ok(ph.length === 5 && ph.every(x => x.fits), t + 'no add-row placeholder is clipped ' + JSON.stringify(ph.filter(x => !x.fits)));
+    const cc = await page.evaluate(() => {
+      const lum = c => { const f = c.map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * f[0] + .7152 * f[1] + .0722 * f[2]; };
+      const nums = s => (s.match(/[\d.]+/g) || []).map(Number);
+      const ratio = (el) => { let bgEl = el, bg = [0, 0, 0, 0]; while (bgEl) { const b = nums(getComputedStyle(bgEl).backgroundColor); if (b.length >= 3 && (b.length === 3 || b[3] > .5)) { bg = b; break; } bgEl = bgEl.parentElement; }
+        if (bg[3] === 0) bg = nums(getComputedStyle(document.body).backgroundColor); const fg = nums(getComputedStyle(el).color); const a = lum(fg) , b2 = lum(bg); return (Math.max(a, b2) + .05) / (Math.min(a, b2) + .05); };
+      const out = {}; const cw = [...document.querySelectorAll('#assets-crypto .btn-add-data')]; out.btns = cw.map(b => ({ t: b.textContent.trim().slice(0, 14), r: +ratio(b).toFixed(2), h: Math.round(b.getBoundingClientRect().height) }));
+      out.monos = [...document.querySelectorAll('#assets-crypto .stk-hl .stk-mono')].filter(m => m.offsetParent).map(m => +ratio(m).toFixed(2));
+      return out; });
+    ok(cc.btns.length >= 3 && cc.btns.every(b => b.r >= 4.5), t + 'Crypto panel buttons read at 4.5:1 or more ' + JSON.stringify(cc.btns.filter(b => b.r < 4.5)));
+    ok(cc.monos.every(x => x >= 4.5), t + 'coin badge letters read at 4.5:1 or more (' + cc.monos.join(',') + ')');
+    const green = await page.evaluate(() => { const g = 'rgb(62, 207, 142)'; return [...document.querySelectorAll('#cr-alloc .stk-tm-k i, #cr-alloc .stk-bar .b div')].filter(e => getComputedStyle(e).backgroundColor === g).length + [...document.querySelectorAll('#cr-main svg circle')].filter(c => /3ecf8e/i.test(c.getAttribute('stroke') || '')).length; });
+    ok(green === 0, t + 'no wallet or coin is green (green means gain) (' + green + ')');
     ok(r.emptyPies === 0, t + 'no pie outline encloses nothing (' + r.emptyPies + ')');
     ok(!r.scrollX, t + 'no sideways scroll');
     if (w === 1100) {
@@ -73,6 +85,19 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
       ok(bars >= 3, t + 'Bars view lists the coins (' + bars + ')');
     }
     ok(errs.length === 0, t + 'no page errors ' + errs.slice(0, 2).join('|'));
+    await ctx.close();
+  }
+  {
+    const ctx = await b.newContext({ viewport: { width: 390, height: 900 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+    const page = await ctx.newPage();
+    await page.addInitScript(() => { if (localStorage.getItem('pos_al1')) return; localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi-cr-alloc', 'tree');
+      localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'P', email: 't@t.com' }));
+      localStorage.setItem('pos_al1', JSON.stringify({ crypto: [{ id: 1, sym: 'BTC', amount: 1, price: 40000, addPx: 30000, wallet: 'A', priceSrc: 'live', priceAt: new Date().toISOString() }], stocks: [], stockPies: [], cashAccounts: [], otherAssets: [], liabilities: [], metals: { gold: 0, silver: 0, platinum: 0, palladium: 0 } })); });
+    await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')); await page.waitForTimeout(1200);
+    await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
+    await page.evaluate(() => { try { _crBusy = true; } catch (e) {} showTab('assets'); showSubtab('assets', 'crypto', null); }); await page.waitForTimeout(600);
+    const hs = await page.evaluate(() => ({ coarse: matchMedia('(pointer:coarse)').matches, h: [...document.querySelectorAll('#assets-crypto .btn-add-data, #cr-alloc .nw3d-seg button, #crypto-table .stk-gh, #crypto-table .data-item-del')].filter(e => e.offsetParent).map(e => Math.round(e.getBoundingClientRect().height)) }));
+    ok(hs.coarse && hs.h.length >= 6 && hs.h.every(x => x >= 44), 'on a touch screen the Crypto buttons are 44 px or taller (' + hs.h.join(',') + ')');
     await ctx.close();
   }
   await b.close();

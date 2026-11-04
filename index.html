@@ -10769,6 +10769,10 @@ html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Dayli
 .stk-tm-other>b{color:var(--tx);font-weight:700}
 .stk-tm-ol{display:flex;gap:6px;align-items:baseline;margin-top:4px;overflow-wrap:anywhere}.stk-tm-ol i{width:10px;height:10px;border-radius:3px;flex-shrink:0;position:relative;top:1px}.stk-tm-ol em{font:normal 11px 'Share Tech Mono',monospace;color:var(--tx)}
 @media(prefers-reduced-motion:reduce){.stk-tm-c{transition:none}.stk-tm-c:hover{transform:none}}
+/* Crypto panel: readable buttons in both themes, and finger-sized targets */
+:root:not([data-theme="light"]) #assets-crypto .btn-add-data:not([style*="transparent"]){background:#0f5a55;border-color:#2b9d95;color:#fff}
+[data-theme="light"] .btn-add-data[style*="background:transparent"]{color:var(--text)!important;background:transparent!important;border-color:var(--lock)!important}
+@media (pointer:coarse){#assets-crypto .btn-add-data,#assets-crypto .data-input-row input,#cr-alloc .nw3d-seg button,#crypto-table .stk-gh,#crypto-table .data-item-del,#crypto-table .stk-chk{min-height:44px}}
 .stk-tm-key{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 8px;font:max(.52rem,var(--vi-fs-1)) 'DM Sans',sans-serif;color:var(--t2)}
 .stk-tm-k i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}.stk-tm-k b{font-family:'Share Tech Mono',monospace;color:var(--tx);font-weight:400}
 .stk-bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:max(.52rem,var(--vi-fs-1))}
@@ -20500,7 +20504,16 @@ function stkHoldMeta(h){
 function stkMonoColor(n){var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))>>>0;return 'hsl('+(h%360)+',55%,38%)';}
 function stkMono(name,color){
   var w=String(name||'?').trim().split(/\s+/).filter(Boolean),ini=(w.length>1?w[0][0]+w[1][0]:String(name||'?').trim().slice(0,2)).toUpperCase();
-  return '<span class="stk-mono" style="background:'+(color||stkMonoColor(String(name||'')))+'">'+stkEsc(ini)+'</span>';
+  var bg=color||stkMonoColor(String(name||''));
+  return '<span class="stk-mono" style="background:'+bg+';color:'+stkInkFor(bg)+'">'+stkEsc(ini)+'</span>';
+}
+// white or dark ink, whichever reads better on this background (hex or hsl(h,s%,l%)); at least 4.5:1 on the colours used here
+function stkInkFor(bg){
+  var rgb=null,m;
+  if(/^#/.test(bg))rgb=stkHexRgb(bg);
+  else if((m=/hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%/.exec(bg))){var h=+m[1]/360,sa=+m[2]/100,l=+m[3]/100,q=l<.5?l*(1+sa):l+sa-l*sa,pp=2*l-q,f=function(t){t=(t+1)%1;return t<1/6?pp+(q-pp)*6*t:t<.5?q:t<2/3?pp+(q-pp)*(2/3-t)*6:pp;};rgb=[f(h+1/3),f(h),f(h-1/3)].map(function(v){return Math.round(v*255);});}
+  if(!rgb)return '#fff';
+  var L=stkLum(rgb);return (1.05/(L+.05))>=((L+.05)/.0559)?'#fff':'#0b1018';
 }
 // the little logo badge for a pie: your uploaded logo, else the platform's own logo, else a coloured monogram
 function stkLogoBadge(pie,full){
@@ -22145,6 +22158,7 @@ function crQty(q){q=+q||0;return q.toLocaleString('en-GB',{maximumFractionDigits
 // A coin is read through stkReturns / stkBasis as if it were a share (units = amount), so the tiles agree with Stocks.
 // Saved coins keep their shape ({sym,amount,price}); wallet, avgCost and addPx are optional and only ever added, never rewritten.
 var CR_DEFAULT_WALLET='My crypto';
+var CR_COLORS=STK_COLORS.filter(function(c){return c!=='#3ecf8e';});   // green is kept for gains, so no wallet or coin is green
 function crAmt(c){return +(c.amount!=null?c.amount:(c.qty!=null?c.qty:0))||0;}
 function crSym(c){return String(c.sym||c.symbol||'').toUpperCase();}
 function crWallet(c){return String(c.wallet||CR_DEFAULT_WALLET);}
@@ -22175,7 +22189,7 @@ function crRender(){
   var nm=function(w){var l=rr.left.filter(function(x){return x.why===w;});return l.length<=2?l.map(function(x){return stkEsc(x.sym);}).join(' and '):l.length;};
   var leftTxt=(rr.suspect?nm('cost')+' left out: check '+(rr.suspect===1?'its':'their')+' cost':'')+(rr.suspect&&rr.noBasis?' · ':'')+(rr.noBasis?nm('none')+(rr.noBasis===1?' has':' have')+' no entry price yet':'');
   var dayChg=hs.reduce(function(s,h){var v=stkValue(h),c=+h.change||0;return s+(c?v-v/(1+c/100):0);},0),dUp=dayChg>=0,dayPct=total>0?dayChg/(total-dayChg)*100:0;
-  var slices=hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){return{v:stkValue(h),c:STK_COLORS[i%STK_COLORS.length],t:h.sym};});
+  var slices=hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){return{v:stkValue(h),c:CR_COLORS[i%CR_COLORS.length],t:h.sym};});
   var main=document.getElementById('cr-main');
   if(main){
     main.innerHTML='<div>'+stkDonut(slices,total,gbpFmt(total),(hasRet&&tm.invP>0)?((up?'+':'')+(tm.chgP/tm.invP*100).toFixed(2)+'%'):'',up?'#3ecf8e':'#e05c5c','Crypto allocation')+'</div>'
@@ -22193,10 +22207,10 @@ function crRender(){
     else ct.innerHTML='<div class="stk-tbl"><div class="stk-row h"><span>Coin</span><span>Amount</span><span>Cost per unit £</span><span>Price £</span><span style="text-align:right">Value</span><span style="text-align:right">Change</span><span></span></div>'
       +gs.map(function(g,gi){var open=crGrpOpen(g.p.id,gs.length);
         return '<div class="stk-grp'+(open?' open':'')+'"><button type="button" class="stk-gh" aria-expanded="'+open+'" data-w="'+stkEsc(g.p.id)+'" data-n="'+gs.length+'" onclick="crToggleGrp(this.dataset.w,+this.dataset.n)"><svg class="vi-ic stk-chev" aria-hidden="true"><use href="#vi-chevron"/></svg><span class="stk-gn">'+stkEsc(g.p.name)+'</span><span class="stk-gc">'+g.hs.length+' coin'+(g.hs.length===1?'':'s')+'</span><span class="stk-gv">'+cfMoney(g.v)+(total>0?' <small>'+(g.v/total*100).toFixed(1)+'%</small>':'')+'</span></button>'
-          +'<div class="stk-gb"'+(open?'':' hidden')+'>'+g.hs.map(function(h){var c=h._c,i=hs.indexOf(h),col=STK_COLORS[gi%STK_COLORS.length];
+          +'<div class="stk-gb"'+(open?'':' hidden')+'>'+g.hs.map(function(h){var c=h._c,i=hs.indexOf(h),col=CR_COLORS[gi%CR_COLORS.length];
             var v=stkValue(h),sus=stkSuspect(h),b=stkBasis(h),pl=(!sus&&b>0)?(stkPrice(h)-b)/b*100:null,cid=c.id,ch=+c.change24h||0;
             return '<div class="stk-row cr-row">'
-              +'<div class="c-tk">'+crCoinBadge(h,24,col)+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+STK_COLORS[i%STK_COLORS.length]+'"></i>'+stkEsc(h.sym)+'</div><div class="stk-nm cr-held">'+crQty(h.units)+' '+stkEsc(h.sym)+' held</div></div></div>'
+              +'<div class="c-tk">'+crCoinBadge(h,24,col)+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+CR_COLORS[i%CR_COLORS.length]+'"></i>'+stkEsc(h.sym)+'</div><div class="stk-nm cr-held">'+crQty(h.units)+' '+stkEsc(h.sym)+' held</div></div></div>'
               +'<div class="c-un"><span class="stk-lb">Amount</span><input class="stk-inp" type="number" min="0" step="any" value="'+h.units+'" onchange="updateCryptoAmount('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' amount held" title="Editable: how much you hold"></div>'
               +'<div class="c-av"><span class="stk-lb">Cost per unit £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+c.avgCost>0?c.avgCost:'')+'" placeholder="'+(+c.addPx>0?(+c.addPx).toFixed(c.addPx<1?6:2).replace(/\.?0+$/,''):'–')+'" onchange="updateCryptoCost('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' cost per unit" title="'+(+c.addPx>0&&!(+c.avgCost>0)?'Empty, so the price when you added it is used. Type what you paid per coin in £ to use that instead':'What you paid for one coin, in £')+'"></div>'
               +'<div class="c-pr"><span class="stk-lb">Price £</span>'+(c.priceSrc==='live'?'<div class="stk-px">£'+(+c.price).toLocaleString('en-GB',{maximumFractionDigits:c.price<1?6:2})+'</div>':'<input class="stk-inp" type="number" min="0" step="any" value="'+(+c.price>0?c.price:'')+'" onchange="updateCryptoPrice('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' price in pounds" title="Your price in £. A live price replaces it when CoinGecko has one">')+'<div class="stk-src cr-src cr-src-'+(c.priceSrc==='live'?'live':c.priceSrc==='stale'?'stale':'own')+'">'+crPriceLine(c)+(ch&&c.priceSrc==='live'?' · <span style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
@@ -22214,7 +22228,7 @@ function crRender(){
     al.style.display=hs.length?'':'none';
     al.innerHTML='<div class="stk-hd"><span>Allocation</span><div class="nw3d-seg" role="group" aria-label="Allocation view"><button type="button" aria-pressed="'+(av==='bars')+'" onclick="crSetAlloc(\'bars\')">Bars</button><button type="button" aria-pressed="'+(av==='tree')+'" onclick="crSetAlloc(\'tree\')">Tree map</button></div></div>'
       +(av==='tree'?'<div class="stk-tm-key" id="cr-tm-key"></div><div class="dtm stk-tm" id="cr-treemap"></div><div class="stk-tm-other" id="cr-tm-other"></div>':hs.filter(function(h){return stkValue(h)>0;}).map(function(h,i){
-        var p=total>0?stkValue(h)/total*100:0,c=STK_COLORS[i%STK_COLORS.length];
+        var p=total>0?stkValue(h)/total*100:0,c=CR_COLORS[i%CR_COLORS.length];
         return '<div class="stk-bar"><span class="t">'+stkEsc(h.sym)+'</span><span class="b"><div style="width:'+p.toFixed(1)+'%;background:'+c+'"></div></span><span class="p">'+p.toFixed(1)+'%</span></div>';
       }).join(''));
     if(av==='tree'){crDrawTreemap();if(!al._ro&&window.ResizeObserver){al._ro=new ResizeObserver(function(){if(crAllocView()==='tree'&&al.clientWidth!==al._rw){al._rw=al.clientWidth;crDrawTreemap();}});al._ro.observe(al);}}
@@ -22227,7 +22241,7 @@ function crDrawTreemap(){
   var H=Math.round(Math.max(360,Math.min(640,W*.9))),fs=W>=560?12:11;el.style.height=H+'px';el.style.width=W+'px';el.style.setProperty('--tm-fs',fs+'px');
   var all=crList().filter(function(h){return stkValue(h)>0;}),tot=all.reduce(function(a,h){return a+stkValue(h);},0);
   if(!all.length||!(tot>0)){el.innerHTML='<div class="dtm-empty">No priced coins yet</div>';if(key)key.innerHTML='';if(lg)lg.innerHTML='';return;}
-  var gs=crGroups(all),col={};gs.forEach(function(g,i){col[g.p.id]=STK_COLORS[i%STK_COLORS.length];});
+  var gs=crGroups(all),col={};gs.forEach(function(g,i){col[g.p.id]=CR_COLORS[i%CR_COLORS.length];});
   if(key)key.innerHTML=gs.map(function(g){return '<span class="stk-tm-k"><i style="background:'+col[g.p.id]+'"></i>'+stkEsc(g.p.name)+' <b>'+(g.v/tot*100).toFixed(0)+'%</b></span>';}).join('');
   var money=function(v){return cfMoney(v);},pct=function(v){return (v/tot*100).toFixed(1);};
   var groups=gs.map(function(g){return{id:g.p.id,p:g.p,col:col[g.p.id],v:g.v,items:g.hs.map(function(h){var v=stkValue(h),r=stkReturns([h]),chg=r.counted.length?' · '+(r.change>=0?'+':'-')+cfMoney(Math.abs(r.change))+' since added':'';
