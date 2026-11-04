@@ -1,4 +1,4 @@
-// Tier icons (owner, 4 Nov 2026, v0.9.1 round 2 chunk I; Pedro's brief): Vaulter a vault door, Pioneer a compass, Founding Member
+// Tier icons (owner, 4 Nov 2026, v0.9.1 round 2 chunk I; Pedro's brief; renamed in I2 the same evening): Founder a vault door, Pioneer a compass, Lifetime licence
 // a keystone with rank chevrons. Drawn as Wealth Roadmap medallions (the token's metal rim, rivets, tick dial, face, engraved ring and
 // glass highlight from wrTok in index.html), scaled to a 100 x 100 box, with more detail inside. Colours are the roadmap tiers and stay
 // the same in Night and Daylight, like the tokens.
@@ -7,9 +7,9 @@
 const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..');
 const T = {
-  vaulter: { c: '#44C0B9', d: '#0f4a47', dd: '#0a2b2a', l: '#a9ece8', title: 'Vaulter' },
+  founder: { c: '#44C0B9', d: '#0f4a47', dd: '#0a2b2a', l: '#a9ece8', title: 'Founder' },
   pioneer: { c: '#9B7EC8', d: '#3b2a5c', dd: '#22183a', l: '#d9c9f2', title: 'Pioneer' },
-  founder: { c: '#C9A84C', d: '#5e4614', dd: '#2e220a', l: '#f3e2a8', title: 'Founding Member' }
+  lifetime: { c: '#C9A84C', d: '#5e4614', dd: '#2e220a', l: '#f3e2a8', title: 'Lifetime licence' }
 };
 const f = (n) => (Math.round(n * 10) / 10).toString();
 const pol = (cx, cy, r, deg) => [cx + r * Math.cos(deg * Math.PI / 180), cy + r * Math.sin(deg * Math.PI / 180)];
@@ -31,13 +31,13 @@ function medal(k) {
 }
 const gloss = '<path d="M21.4 40.2a29.4 29.4 0 0 1 39.3-22.7" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="3.2" stroke-linecap="round"/>';
 
-// Vaulter: a round vault door, eight rim bolts, hinge barrels on the left, a five-spoke handwheel, a bright notch at 12 o'clock
-function vaulter() {
-  const k = T.vaulter;
+// Founder (monthly): a round vault door, eight rim bolts, hinge barrels on the left, a five-spoke handwheel, a bright notch at 12 o'clock
+function founderIcon() {
+  const k = T.founder;
   let s = '<path d="M47.5 4.6h5l-2.5 4.4z" fill="' + k.l + '"/>';   // the notch at 12 on the dial
   s += '<rect x="19.6" y="35.5" width="5.6" height="9" rx="1.8" fill="url(#tier-metal)" stroke="' + k.dd + '" stroke-width=".7"/>'
     + '<rect x="19.6" y="55.5" width="5.6" height="9" rx="1.8" fill="url(#tier-metal)" stroke="' + k.dd + '" stroke-width=".7"/>';
-  s += '<circle cx="50" cy="50" r="26" fill="url(#tier-plate-vaulter)" stroke="' + k.dd + '" stroke-width="1.2"/>'
+  s += '<circle cx="50" cy="50" r="26" fill="url(#tier-plate-founder)" stroke="' + k.dd + '" stroke-width="1.2"/>'
     + '<circle cx="50" cy="50" r="20.5" fill="none" stroke="' + k.dd + '" stroke-opacity=".8" stroke-width="1.1"/>'
     + '<circle cx="50" cy="50" r="19.4" fill="none" stroke="' + k.l + '" stroke-opacity=".55" stroke-width=".6"/>';
   for (let a = 22.5; a < 360; a += 45) { const p = pol(50, 50, 23.3, a); s += '<circle cx="' + f(p[0]) + '" cy="' + f(p[1]) + '" r="1.7" fill="' + k.l + '" stroke="' + k.dd + '" stroke-width=".6"/>'; }
@@ -78,9 +78,9 @@ function pioneer() {
   return s;
 }
 
-// Founding Member: a keystone wedge between shaded arch stones with visible joints, an engraved five-point star, two rank chevrons
-function founder() {
-  const k = T.founder, cx = 50, cy = 64;
+// Lifetime licence: a keystone wedge between shaded arch stones with visible joints, an engraved five-point star, two rank chevrons
+function lifetimeIcon() {
+  const k = T.lifetime, cx = 50, cy = 64;
   const stone = (a0, a1, r0, r1) => { const p = [pol(cx, cy, r1, a0), pol(cx, cy, r1, a1), pol(cx, cy, r0, a1), pol(cx, cy, r0, a0)]; return 'M' + f(p[0][0]) + ' ' + f(p[0][1]) + 'A' + r1 + ' ' + r1 + ' 0 0 1 ' + f(p[1][0]) + ' ' + f(p[1][1]) + 'L' + f(p[2][0]) + ' ' + f(p[2][1]) + 'A' + r0 + ' ' + r0 + ' 0 0 0 ' + f(p[3][0]) + ' ' + f(p[3][1]) + 'Z'; };
   let s = '';
   [[181, 213], [215, 250], [290, 325], [327, 359]].forEach(([a0, a1], i) => {
@@ -88,7 +88,7 @@ function founder() {
   });
   // the keystone stands proud of the arch: wider at the top, a little taller than its neighbours
   const kt = [pol(cx, cy, 31, 251.5), pol(cx, cy, 31, 288.5), pol(cx, cy, 12, 286), pol(cx, cy, 12, 254)];
-  s += '<polygon points="' + P(kt) + '" fill="url(#tier-plate-founder)" stroke="' + k.dd + '" stroke-width="1.1" stroke-linejoin="round"/>'
+  s += '<polygon points="' + P(kt) + '" fill="url(#tier-plate-lifetime)" stroke="' + k.dd + '" stroke-width="1.1" stroke-linejoin="round"/>'
     + '<polyline points="' + P([kt[3], kt[0], kt[1]]) + '" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width=".8" stroke-linejoin="round"/>';
   // engraved star on the keystone face
   const sc = [50, 42.2], star = [];
@@ -100,7 +100,7 @@ function founder() {
   s += '<path d="M21 64.8h58" stroke="' + k.l + '" stroke-opacity=".5" stroke-width=".9" stroke-linecap="round"/>';
   return s;
 }
-const MOTIF = { vaulter, pioneer, founder };
+const MOTIF = { founder: founderIcon, pioneer, lifetime: lifetimeIcon };
 
 function defs() {
   let d = '<linearGradient id="tier-metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".45" stop-color="#9aa3ad"/><stop offset=".55" stop-color="#d7dde2"/><stop offset="1" stop-color="#5c656e"/></linearGradient>';
@@ -140,6 +140,6 @@ fs.writeFileSync(file, html.replace(re, (m, a, b) => a + '\n' + sprite + '\n' + 
 for (const [k, c] of Object.entries(T)) {
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200" height="200" role="img" aria-label="' + c.title + ' tier icon">'
     + '<title>Vault-It ' + c.title + ' tier</title><defs>' + defs() + '</defs>' + medal(k) + MOTIF[k]() + gloss + '</svg>\n';
-  fs.writeFileSync(path.join(ROOT, 'brand', 'vault-it-tier-' + (k === 'founder' ? 'founding-member' : k) + '.svg'), svg);
+  fs.writeFileSync(path.join(ROOT, 'brand', 'vault-it-tier-' + (k === 'lifetime' ? 'lifetime-licence' : k) + '.svg'), svg);
 }
 console.log('tier icons: sprite ' + sprite.length + ' bytes, 3 brand SVGs written');
