@@ -147,3 +147,21 @@ Owner's words: "Initial offering to users onboarded for testing is Vaulter 3.99 
 - The after-trial state is plain **read-only** with no tier name. "Vaulter" now names only the monthly plan.
 - Price check, flagged to the owner: at beta prices 12 × £3.99 = £47.88, which is less than £49.99 a year, so the app makes no "save by paying yearly" claim. After the beta, 12 × £5.99 = £71.88 against £59.99.
 - Tier icons (Pedro's brief): Vaulter a vault door (teal), Pioneer a compass (purple), Founding Member a keystone with rank chevrons (brass), drawn as Wealth Roadmap medallions. Source `tools/build_tier_icons.js`; standalone files `brand/vault-it-tier-*.svg`.
+
+## Decided by Pete (4 Nov 2026, evening): Founder, Pioneer, Lifetime licence, and the alpha trial (I2)
+
+Owner's words (~20:45): "card now charge later for 30 day free trial sign up for Alpha testers specifically, Have the link for founder, pioneer (includes family mode as a feature, not a separate tier) and Lifetime licence charge at checkout with recurring monthly for founder, yearly for pioneer." This replaces the names in the section above; the prices stay.
+
+| Tier | Plan key | Beta price | After the beta | Alpha testers open | Not on the alpha trial (beta open) | After the beta |
+|---|---|---|---|---|---|---|
+| **Founder** | monthly | £3.99 a month | £5.99 a month | `monthly_trial` …VG08: 30 days free, card now, first charge day 31 | `monthly_tester` …VG09: charged at checkout | `monthly` …VG00 (£5.99) |
+| **Pioneer** (Pro, family mode coming soon) | annual | £49.99 a year | £59.99 a year | `annual_trial` …VG0a: 30 days free, card now, first charge day 31 | `annual` …VG02: charged at checkout | `annual_after_beta`: **empty, no link yet**; buttons say "coming soon" |
+| **Lifetime licence** (100 places) | founder | £99 once | £149 once | `founder_tester` …VG0b: charged at checkout, no trial | same | `founder` …VG05 (£149) |
+
+- Links created by the Chief of Staff on 4 Nov evening (plink ids: VG08 `plink_1UYB4b9mgKf6HntyI7G9b61g`, VG09 `plink_1UYB4c9mgKf6HntysTGXUmeH`, VG0a `plink_1UYB4d9mgKf6HntyxEOhC5nM`, VG0b `plink_1UYB4f9mgKf6HntyrxjivlM7`). Each carries Stripe metadata `plan` (monthly / yearly / founder), so the deployed `stripe-webhook` maps them without a redeploy, and it counts `trialing` as paid.
+- No longer used by the app (still in Stripe, the owner's call to switch off): …VG03 (old £3.99 monthly), …VG06 (£39.99 yearly), …VG07 (old £99 Founding).
+- Next to every Founder and Pioneer button, for alpha testers: "Free for 30 days, then £3.99 a month. Your card is taken now and first charged on day 31. Cancel before then and you pay nothing. To cancel, email hello@vault-it.co." (Pioneer: £49.99 a year.) Not on the trial: "£3.99 a month, charged at checkout. To cancel, email hello@vault-it.co." Lifetime: "One payment, charged at checkout."
+- **There is no self-serve cancel in the app**: subscribers email hello@vault-it.co. A Stripe customer portal link would let people cancel themselves; that needs the owner to switch the portal on in Stripe.
+- Family mode is shown on Pioneer only as "Family mode (coming soon)": it is not built.
+- The sign-up page keeps its rule of never saying "lifetime"; it calls the plan the "one-payment licence".
+- Icons: the vault door is now Founder, the keystone Lifetime licence (`brand/vault-it-tier-founder.svg`, `-pioneer.svg`, `-lifetime-licence.svg`).
