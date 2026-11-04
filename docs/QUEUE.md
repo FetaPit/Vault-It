@@ -96,7 +96,7 @@ The single list of instructed work. Every session reads it at start and before e
   - [~] (cloud) v09x/stocks-map: E19, E20 ready for review, green ef95a1b (CI 41702645119), QC PASS (session session_01KoffvwpqBH9vFhCBLx4oSh)
   - [~] (cloud) v09x/crypto: E32 ready for review, green 80df073 (CI 41740341844), QC PASS (session session_01KoffvwpqBH9vFhCBLx4oSh)
   - [~] (cloud) v09x/cash-accounts: E15, E16 ready for review (green c1a9bf5, CI run 41684441447, session session_01KoffvwhYtD2e8aZcLKS6bj)
-  - [~] (cloud) v09x/model-library: E30 picker ready for review (branch v09x/model-library 5aa9340, CI green run 41711339820; session session_01KoffvwvF7z5Yrp72QnsYm4). Owner to decide: privacy notice still names Poly Pizza as a model source.
+  - [~] (cloud) v09x/model-library: E30 picker ready to merge (branch v09x/model-library e734950, merged with candidate/v0.9.1, CI green run 41736494773; session session_01KoffvwvF7z5Yrp72QnsYm4). Privacy notice fixed.
   - [~] (cloud) v09x/overview-budget: E4, E23, E5, E6 ready for review (cb0ddf9, CI green run 41693208446, rollout-qc PASS; session session_01Koffvym9zCiVwrwgean5Mp)
   - [~] (cloud) v09x/inventory-files: E29 started, E31 later (session session_01Koffvxw7ExHqfchhM8xJfE)
   - [~] (cloud) v09x/chrome: E1, E2, E24, E27, sidebar colours, E25 ready for review (round 2 after Pedro's review: 10dc403, CI green run 41718539825, rollout-qc PASS, rollout-qc PASS; migration 014 waits for the owner's yes; session session_01Koffvwit1HEu7dNw8entTf)
