@@ -17,7 +17,7 @@ const SITE = {
             ['site/pitch-eligent/pitch/nw3d-live.js', 'pitch/nw3d-live.js'], ['site/pitch-eligent/pitch/live-nw.jpg', 'pitch/live-nw.jpg'], ['site/pitch-eligent/pitch/live-trk.jpg', 'pitch/live-trk.jpg'],
             ['site/pitch-eligent/pitch/logo-full.png', 'pitch/logo-full.png'], ['site/pitch-eligent/pitch/logo-mid.png', 'pitch/logo-mid.png'],
             // digital business card behind the printed card's QR code and NFC chip: vault-it.co/pete
-            ['site/pete/index.html', 'pete.html']],
+            ['site/pete/index.html', 'pete.html'], ['site/pete/ptlive.png', 'pete/ptlive.png']],
 };
 // the 3D model library (v0.9.1, E30): only what the app reads, same address as the app, so no outside host
 const MODELS = ['catalog.json', 'CREDITS.md'];

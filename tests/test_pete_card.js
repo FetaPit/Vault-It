@@ -52,6 +52,9 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   const back = await p.evaluate(() => document.querySelector('.pc-back').innerText);
   ok(/Pete Thickett/.test(back) && /Founder/i.test(back) && /pete@ptlive\.design/.test(back) && /vault-it\.co/.test(back), 'the back shows name, role, email and website');
   ok(!/\[mobile\]|\[linkedin/i.test(back), 'no placeholder text is published');
+  ok(/\+44 7470 074133/.test(back) && /linkedin\.com\/in\/ptlivedesign/.test(back), 'the back shows the mobile and LinkedIn');
+  ok(await p.locator('.pc-back a[href="tel:+447470074133"]').count() === 1 && await p.locator('.pc-back a[href="https://www.linkedin.com/in/ptlivedesign/"]').count() === 1, 'mobile and LinkedIn are tappable');
+  ok(await p.evaluate(() => { const i = document.querySelector('.pc-pub img'); return !!i && i.complete && i.naturalWidth > 50; }), 'the PT Live Design icon shows in Published by');
   ok(await p.locator('.pc-back svg.pc-qr').count() === 1, 'the back carries the QR code');
   await p.locator('#pc-flip').tap(); await p.waitForTimeout(700);
   ok(await facing(p) === 'front', 'the Flip button turns it back over');
@@ -72,6 +75,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   await p.locator('#pc-save').click(); const d = await dl;
   let vcf = ''; if (d) vcf = fs.readFileSync(await d.path(), 'utf8');
   ok(d && /\.vcf$/.test(d.suggestedFilename()), 'Save contact downloads a contact card: ' + (d && d.suggestedFilename()));
+  ok(/TEL[^:]*:\+447470074133/.test(vcf) && /URL;TYPE=LinkedIn:https:\/\/www\.linkedin\.com\/in\/ptlivedesign\//.test(vcf), 'the contact card holds the mobile and LinkedIn');
   ok(/BEGIN:VCARD/.test(vcf) && /FN:Pete Thickett/.test(vcf) && /EMAIL[^:]*:pete@ptlive\.design/.test(vcf) && /URL[^:]*:https:\/\/vault-it\.co/.test(vcf), 'the contact card holds the right details');
   ok(await p.locator('a[href="/pitch-Eligent"]').count() >= 1 && await p.locator('a[href^="/sign-up"], a[href="/"]').count() >= 1, 'links to the pitch deck and the beta sign-up');
   ok([...p.hosts].every((h) => /^fonts\.(googleapis|gstatic)\.com$/.test(h)), 'no outside hosts besides Google Fonts: ' + [...p.hosts]);
