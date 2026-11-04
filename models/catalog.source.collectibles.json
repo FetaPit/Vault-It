@@ -1,0 +1,1876 @@
+{
+ "generated": "2026-11-03T15:04:19.512Z",
+ "source": "https://poly.pizza",
+ "set": "collectibles",
+ "maxTris": 20000,
+ "found": 52,
+ "standins": 30,
+ "misses": [
+  {
+   "rank": 3,
+   "item": "Rolex Datejust",
+   "terms": [
+    "rolex datejust",
+    "datejust",
+    "wristwatch",
+    "gold watch",
+    "watch"
+   ],
+   "reason": "rejected on review (Armor Golden)"
+  },
+  {
+   "rank": 4,
+   "item": "Rolex GMT-Master II",
+   "terms": [
+    "rolex gmt-master",
+    "gmt master",
+    "rolex",
+    "wristwatch",
+    "watch"
+   ]
+  },
+  {
+   "rank": 5,
+   "item": "Omega Speedmaster",
+   "terms": [
+    "omega speedmaster",
+    "speedmaster",
+    "omega moonwatch",
+    "chronograph watch",
+    "wristwatch"
+   ]
+  },
+  {
+   "rank": 6,
+   "item": "Omega Seamaster",
+   "terms": [
+    "omega seamaster",
+    "seamaster",
+    "dive watch",
+    "wristwatch"
+   ]
+  },
+  {
+   "rank": 7,
+   "item": "Patek Philippe Nautilus",
+   "terms": [
+    "patek philippe",
+    "nautilus watch",
+    "patek",
+    "luxury watch",
+    "wristwatch"
+   ]
+  },
+  {
+   "rank": 8,
+   "item": "Audemars Piguet Royal Oak",
+   "terms": [
+    "audemars piguet",
+    "royal oak",
+    "luxury watch",
+    "wristwatch"
+   ]
+  },
+  {
+   "rank": 9,
+   "item": "Cartier Tank",
+   "terms": [
+    "cartier tank",
+    "cartier watch",
+    "cartier",
+    "luxury watch",
+    "wristwatch"
+   ]
+  },
+  {
+   "rank": 10,
+   "item": "TAG Heuer Carrera",
+   "terms": [
+    "tag heuer",
+    "tag heuer carrera",
+    "carrera watch",
+    "chronograph watch",
+    "wristwatch"
+   ]
+  },
+  {
+   "rank": 11,
+   "item": "Breitling Navitimer",
+   "terms": [
+    "breitling",
+    "navitimer",
+    "pilot watch",
+    "wristwatch"
+   ]
+  },
+  {
+   "rank": 12,
+   "item": "Tudor Black Bay",
+   "terms": [
+    "tudor black bay",
+    "tudor",
+    "dive watch",
+    "wristwatch"
+   ]
+  },
+  {
+   "rank": 13,
+   "item": "Seiko 5 Sports",
+   "terms": [
+    "seiko 5",
+    "seiko watch",
+    "seiko",
+    "automatic watch",
+    "wristwatch"
+   ]
+  },
+  {
+   "rank": 14,
+   "item": "Casio G-Shock",
+   "terms": [
+    "casio g-shock",
+    "g-shock",
+    "gshock",
+    "digital watch",
+    "sports watch"
+   ],
+   "reason": "rejected on review (Sports Car)"
+  },
+  {
+   "rank": 15,
+   "item": "Casio F-91W",
+   "terms": [
+    "casio f-91w",
+    "casio digital",
+    "casio watch",
+    "digital watch"
+   ],
+   "reason": "rejected on review (Digital clock)"
+  },
+  {
+   "rank": 16,
+   "item": "Apple Watch",
+   "terms": [
+    "apple watch",
+    "smartwatch",
+    "smart watch",
+    "wristwatch",
+    "fitness tracker"
+   ],
+   "reason": "rejected on review (Fitness Character)"
+  },
+  {
+   "rank": 17,
+   "item": "Garmin Fenix",
+   "terms": [
+    "garmin fenix",
+    "garmin watch",
+    "garmin",
+    "smartwatch",
+    "sports watch"
+   ]
+  },
+  {
+   "rank": 18,
+   "item": "Pocket watch",
+   "terms": [
+    "pocket watch",
+    "antique pocket watch",
+    "watch",
+    "clock"
+   ],
+   "reason": "rejected on review (Alarm Clock)"
+  },
+  {
+   "rank": 20,
+   "item": "Hermes Birkin",
+   "terms": [
+    "hermes birkin",
+    "birkin bag",
+    "birkin",
+    "hermes",
+    "designer handbag",
+    "handbag"
+   ]
+  },
+  {
+   "rank": 21,
+   "item": "Louis Vuitton Speedy",
+   "terms": [
+    "louis vuitton speedy",
+    "louis vuitton",
+    "speedy bag",
+    "designer handbag",
+    "handbag"
+   ]
+  },
+  {
+   "rank": 23,
+   "item": "Gucci Marmont",
+   "terms": [
+    "gucci bag",
+    "gucci marmont",
+    "gucci",
+    "designer handbag",
+    "handbag"
+   ]
+  },
+  {
+   "rank": 24,
+   "item": "Prada Re-Edition",
+   "terms": [
+    "prada bag",
+    "prada nylon",
+    "prada",
+    "designer handbag",
+    "handbag"
+   ]
+  },
+  {
+   "rank": 27,
+   "item": "Pandora charm bracelet",
+   "terms": [
+    "pandora bracelet",
+    "charm bracelet",
+    "pandora",
+    "bracelet"
+   ]
+  },
+  {
+   "rank": 29,
+   "item": "Nike Air Jordan 1",
+   "terms": [
+    "air jordan 1",
+    "jordan 1",
+    "nike air jordan",
+    "air jordan",
+    "basketball shoe",
+    "sneaker"
+   ],
+   "reason": "rejected on review (Basketball court)"
+  },
+  {
+   "rank": 30,
+   "item": "Nike Dunk",
+   "terms": [
+    "nike dunk",
+    "dunk low",
+    "nike sb dunk",
+    "sneaker",
+    "trainers"
+   ]
+  },
+  {
+   "rank": 31,
+   "item": "Nike Air Force 1",
+   "terms": [
+    "nike air force 1",
+    "air force 1",
+    "nike af1",
+    "sneaker",
+    "trainers"
+   ]
+  },
+  {
+   "rank": 32,
+   "item": "Nike Air Max 90",
+   "terms": [
+    "nike air max",
+    "air max 90",
+    "air max",
+    "sneaker",
+    "trainers"
+   ]
+  },
+  {
+   "rank": 33,
+   "item": "Adidas Yeezy",
+   "terms": [
+    "yeezy",
+    "adidas yeezy",
+    "yeezy boost 350",
+    "sneaker",
+    "trainers"
+   ]
+  },
+  {
+   "rank": 34,
+   "item": "Adidas Stan Smith",
+   "terms": [
+    "adidas stan smith",
+    "stan smith",
+    "adidas samba",
+    "sneaker",
+    "trainers"
+   ]
+  },
+  {
+   "rank": 35,
+   "item": "New Balance 550",
+   "terms": [
+    "new balance",
+    "new balance 550",
+    "new balance 990",
+    "sneaker",
+    "trainers"
+   ]
+  },
+  {
+   "rank": 36,
+   "item": "Converse Chuck Taylor",
+   "terms": [
+    "converse chuck taylor",
+    "chuck taylor",
+    "converse",
+    "high top sneaker",
+    "sneaker"
+   ],
+   "reason": "rejected on review (High Top Chair)"
+  },
+  {
+   "rank": 39,
+   "item": "LEGO Eiffel Tower",
+   "terms": [
+    "lego eiffel tower",
+    "lego architecture",
+    "eiffel tower",
+    "lego tower",
+    "lego building"
+   ],
+   "reason": "rejected on review (Stone Tower)"
+  },
+  {
+   "rank": 40,
+   "item": "LEGO minifigure",
+   "terms": [
+    "lego minifigure",
+    "lego figure",
+    "minifig",
+    "toy figure",
+    "lego man"
+   ],
+   "reason": "rejected on review (Desk Toy)"
+  },
+  {
+   "rank": 43,
+   "item": "Pokemon booster box",
+   "terms": [
+    "pokemon booster",
+    "booster box",
+    "pokemon box",
+    "card box",
+    "box"
+   ],
+   "reason": "rejected on review (Cardboard Boxes)"
+  },
+  {
+   "rank": 44,
+   "item": "Football sticker album (Panini)",
+   "terms": [
+    "panini album",
+    "sticker album",
+    "panini",
+    "sticker book",
+    "book"
+   ],
+   "reason": "rejected on review (Open Book)"
+  },
+  {
+   "rank": 45,
+   "item": "Magic: The Gathering cards",
+   "terms": [
+    "magic the gathering",
+    "mtg card",
+    "mtg",
+    "card",
+    "playing card"
+   ],
+   "reason": "rejected on review (Time Card)"
+  },
+  {
+   "rank": 50,
+   "item": "Action Comics #1",
+   "terms": [
+    "action comics",
+    "superman comic",
+    "superman",
+    "comic book"
+   ],
+   "reason": "rejected on review (Open Book)"
+  },
+  {
+   "rank": 54,
+   "item": "Ceramic figurine (Royal Doulton)",
+   "terms": [
+    "royal doulton",
+    "figurine",
+    "porcelain figure",
+    "statue",
+    "vase"
+   ],
+   "reason": "rejected on review (Horse Statue)"
+  },
+  {
+   "rank": 57,
+   "item": "Antique chest",
+   "terms": [
+    "antique chest",
+    "trunk",
+    "treasure chest",
+    "chest"
+   ],
+   "reason": "rejected on review (Tree Trunk)"
+  },
+  {
+   "rank": 62,
+   "item": "Penny Black stamp",
+   "terms": [
+    "penny black",
+    "stamp",
+    "postage stamp",
+    "stamp",
+    "envelope"
+   ],
+   "reason": "rejected on review (Rubber Stamp)"
+  },
+  {
+   "rank": 65,
+   "item": "Sony PlayStation 5",
+   "terms": [
+    "playstation 5",
+    "ps5",
+    "playstation",
+    "game console",
+    "console"
+   ],
+   "reason": "rejected on review (Handheld videogame console)"
+  },
+  {
+   "rank": 66,
+   "item": "Xbox Series X",
+   "terms": [
+    "xbox series x",
+    "xbox",
+    "xbox console",
+    "game console",
+    "console"
+   ],
+   "reason": "rejected on review (Handheld game console)"
+  },
+  {
+   "rank": 70,
+   "item": "Nintendo 64",
+   "terms": [
+    "nintendo 64",
+    "n64",
+    "game console",
+    "retro console"
+   ],
+   "reason": "rejected on review (Rat n64)"
+  },
+  {
+   "rank": 71,
+   "item": "Sega Mega Drive",
+   "terms": [
+    "sega mega drive",
+    "sega genesis",
+    "mega drive",
+    "game console",
+    "retro console"
+   ],
+   "reason": "rejected on review (Videogame)"
+  },
+  {
+   "rank": 73,
+   "item": "Sony PlayStation 1",
+   "terms": [
+    "playstation 1",
+    "ps1",
+    "playstation one",
+    "game console",
+    "retro console"
+   ],
+   "reason": "rejected on review (Video game)"
+  },
+  {
+   "rank": 77,
+   "item": "Canon EOS",
+   "terms": [
+    "canon eos",
+    "canon camera",
+    "canon dslr",
+    "canon",
+    "dslr camera",
+    "camera"
+   ],
+   "reason": "rejected on review (Simple canon)"
+  },
+  {
+   "rank": 79,
+   "item": "Nikon F",
+   "terms": [
+    "nikon f",
+    "nikon camera",
+    "nikon dslr",
+    "slr camera",
+    "camera"
+   ],
+   "reason": "rejected on review (Instant Camera)"
+  },
+  {
+   "rank": 82,
+   "item": "Road bike (Pinarello)",
+   "terms": [
+    "road bike",
+    "pinarello",
+    "racing bike",
+    "racing bicycle",
+    "road bicycle",
+    "bicycle"
+   ],
+   "reason": "rejected on review (Bike Warning Road Sign)"
+  },
+  {
+   "rank": 90,
+   "item": "Teddy bear (Steiff)",
+   "terms": [
+    "steiff",
+    "teddy bear",
+    "steiff bear",
+    "teddy bear",
+    "toy bear"
+   ],
+   "reason": "rejected on review (Teddy Bear Head)"
+  },
+  {
+   "rank": 93,
+   "item": "Star Wars figure",
+   "terms": [
+    "star wars figure",
+    "stormtrooper",
+    "darth vader",
+    "action figure",
+    "toy robot"
+   ],
+   "reason": "rejected on review (toy robot)"
+  }
+ ],
+ "models": [
+  {
+   "set": "collectibles",
+   "rank": 1,
+   "item": "Rolex Submariner",
+   "slug": "collectibles-rolex-submariner",
+   "kind": "Watches",
+   "group": "collectibles",
+   "query": "watch",
+   "standin": true,
+   "standinFor": "Rolex Submariner",
+   "match": "stand-in",
+   "id": "5MFJqeBgWBn",
+   "title": "Watch",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Watch\" by Poly by Google, https://poly.pizza/m/5MFJqeBgWBn. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 796,
+   "tags": [
+    "clock"
+   ],
+   "download": "https://static.poly.pizza/16f52f6a-bd90-4cca-b97b-f970a15dfdb8.glb",
+   "thumbnail": "https://static.poly.pizza/16f52f6a-bd90-4cca-b97b-f970a15dfdb8.webp",
+   "source": "https://poly.pizza/m/5MFJqeBgWBn"
+  },
+  {
+   "set": "collectibles",
+   "rank": 2,
+   "item": "Rolex Daytona",
+   "slug": "collectibles-rolex-daytona",
+   "kind": "Watches",
+   "group": "collectibles",
+   "query": "chronograph watch",
+   "standin": true,
+   "standinFor": "Rolex Daytona",
+   "match": "stand-in",
+   "id": "6908NHM0OcR",
+   "title": "Wrist Watch",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Wrist Watch\" by Poly by Google, https://poly.pizza/m/6908NHM0OcR. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 1016,
+   "tags": [
+    "accessory",
+    "clock",
+    "timepiece"
+   ],
+   "download": "https://static.poly.pizza/f19112bd-03ad-4f02-9284-2f49ae757fa1.glb",
+   "thumbnail": "https://static.poly.pizza/f19112bd-03ad-4f02-9284-2f49ae757fa1.webp",
+   "source": "https://poly.pizza/m/6908NHM0OcR"
+  },
+  {
+   "set": "collectibles",
+   "rank": 19,
+   "item": "Chanel Classic Flap",
+   "slug": "collectibles-chanel-classic-flap",
+   "kind": "Handbags",
+   "group": "collectibles",
+   "query": "quilted bag",
+   "standin": true,
+   "standinFor": "Chanel Classic Flap",
+   "match": "stand-in",
+   "id": "VRfAODZ0Xk",
+   "title": "Bag",
+   "licence": "CC0 1.0",
+   "attribution": "\"Bag\" by Quaternius, https://poly.pizza/m/VRfAODZ0Xk. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 304,
+   "tags": [
+    "Pillow",
+    "Cushion",
+    "sand bag"
+   ],
+   "download": "https://static.poly.pizza/5c18a372-e0fb-490f-aa90-8bdd04d7e92f.glb",
+   "thumbnail": "https://static.poly.pizza/5c18a372-e0fb-490f-aa90-8bdd04d7e92f.webp",
+   "source": "https://poly.pizza/m/VRfAODZ0Xk"
+  },
+  {
+   "set": "collectibles",
+   "rank": 22,
+   "item": "Louis Vuitton trunk",
+   "slug": "collectibles-louis-vuitton-trunk",
+   "kind": "Handbags",
+   "group": "collectibles",
+   "query": "steamer trunk",
+   "standin": true,
+   "match": "stand-in",
+   "id": "5fq-srYltCL",
+   "title": "Steamer Trunk",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Steamer Trunk\" by Don Carson, https://poly.pizza/m/5fq-srYltCL. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Don Carson",
+   "tris": 4905,
+   "tags": [
+    "hasp",
+    "saloon",
+    "backwater"
+   ],
+   "download": "https://static.poly.pizza/48174f92-c7fd-4163-9a66-f539e87a026e.glb",
+   "thumbnail": "https://static.poly.pizza/48174f92-c7fd-4163-9a66-f539e87a026e.webp",
+   "source": "https://poly.pizza/m/5fq-srYltCL",
+   "standinFor": "Louis Vuitton trunk"
+  },
+  {
+   "set": "collectibles",
+   "rank": 25,
+   "item": "Cartier Love bracelet",
+   "slug": "collectibles-cartier-love-bracelet",
+   "kind": "Jewellery",
+   "group": "collectibles",
+   "query": "bracelet",
+   "standin": true,
+   "standinFor": "Cartier Love bracelet",
+   "match": "stand-in",
+   "id": "9zb8mXYP6J",
+   "title": "Pearl bracelet",
+   "licence": "CC0 1.0",
+   "attribution": "\"Pearl bracelet\" by Armory_3D, https://poly.pizza/m/9zb8mXYP6J. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Armory_3D",
+   "tris": 2414,
+   "tags": [
+    "jewelry",
+    "necklace",
+    "perl",
+    "preciouse",
+    "bracelet",
+    "wearable"
+   ],
+   "download": "https://static.poly.pizza/a15c77e3-80b4-40d1-b57a-74195b276098.glb",
+   "thumbnail": "https://static.poly.pizza/a15c77e3-80b4-40d1-b57a-74195b276098.webp",
+   "source": "https://poly.pizza/m/9zb8mXYP6J"
+  },
+  {
+   "set": "collectibles",
+   "rank": 26,
+   "item": "Tiffany engagement ring",
+   "slug": "collectibles-tiffany-engagement-ring",
+   "kind": "Jewellery",
+   "group": "collectibles",
+   "query": "solitaire ring",
+   "standin": true,
+   "match": "stand-in",
+   "id": "37T8IFe_re3",
+   "title": "Diamond Solitaire  Ring",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Diamond Solitaire  Ring\" by Jarlan Perez, https://poly.pizza/m/37T8IFe_re3. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Jarlan Perez",
+   "tris": 1148,
+   "tags": [
+    "diamonds",
+    "baguette",
+    "marquise"
+   ],
+   "download": "https://static.poly.pizza/2b5e6c5f-5849-4256-b470-ea34858dd24b.glb",
+   "thumbnail": "https://static.poly.pizza/2b5e6c5f-5849-4256-b470-ea34858dd24b.webp",
+   "source": "https://poly.pizza/m/37T8IFe_re3",
+   "standinFor": "Tiffany engagement ring"
+  },
+  {
+   "set": "collectibles",
+   "rank": 28,
+   "item": "Pearl necklace",
+   "slug": "collectibles-pearl-necklace",
+   "kind": "Jewellery",
+   "group": "collectibles",
+   "query": "pearl necklace",
+   "standin": false,
+   "match": "direct",
+   "id": "eyzMh_ozkF4",
+   "title": "Pearl necklace",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Pearl necklace\" by Poly by Google, https://poly.pizza/m/eyzMh_ozkF4. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 6160,
+   "tags": [
+    "jewelry",
+    "accessory",
+    "adornment"
+   ],
+   "download": "https://static.poly.pizza/256badef-5bec-403b-a456-aca6a7dc4f80.glb",
+   "thumbnail": "https://static.poly.pizza/256badef-5bec-403b-a456-aca6a7dc4f80.webp",
+   "source": "https://poly.pizza/m/eyzMh_ozkF4"
+  },
+  {
+   "set": "collectibles",
+   "rank": 37,
+   "item": "LEGO Millennium Falcon",
+   "slug": "collectibles-lego-millennium-falcon",
+   "kind": "LEGO",
+   "group": "collectibles",
+   "query": "spaceship",
+   "standin": true,
+   "standinFor": "LEGO Millennium Falcon",
+   "match": "stand-in",
+   "id": "xNbtFQwirO",
+   "title": "Spaceship",
+   "licence": "CC0 1.0",
+   "attribution": "\"Spaceship\" by Quaternius, https://poly.pizza/m/xNbtFQwirO. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 584,
+   "tags": [
+    "Aircraft",
+    "Vehicle",
+    "Transportation",
+    "Spaceship"
+   ],
+   "download": "https://static.poly.pizza/47bb1015-bbe6-4261-9857-40c9fe6c8048.glb",
+   "thumbnail": "https://static.poly.pizza/47bb1015-bbe6-4261-9857-40c9fe6c8048.webp",
+   "source": "https://poly.pizza/m/xNbtFQwirO"
+  },
+  {
+   "set": "collectibles",
+   "rank": 38,
+   "item": "LEGO Technic car",
+   "slug": "collectibles-lego-technic-car",
+   "kind": "LEGO",
+   "group": "collectibles",
+   "query": "lego car",
+   "standin": true,
+   "standinFor": "LEGO Technic car",
+   "match": "stand-in",
+   "id": "Cz6yDaUcM9",
+   "title": "Car",
+   "licence": "CC0 1.0",
+   "attribution": "\"Car\" by Quaternius, https://poly.pizza/m/Cz6yDaUcM9. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 2102,
+   "tags": [
+    "Sedan",
+    "Car"
+   ],
+   "download": "https://static.poly.pizza/59a67a6c-490e-472e-bae6-5a4d2541f1c7.glb",
+   "thumbnail": "https://static.poly.pizza/59a67a6c-490e-472e-bae6-5a4d2541f1c7.webp",
+   "source": "https://poly.pizza/m/Cz6yDaUcM9"
+  },
+  {
+   "set": "collectibles",
+   "rank": 41,
+   "item": "LEGO Modular building",
+   "slug": "collectibles-lego-modular-building",
+   "kind": "LEGO",
+   "group": "collectibles",
+   "query": "lego building",
+   "standin": true,
+   "standinFor": "LEGO Modular building",
+   "match": "stand-in",
+   "id": "ppwtREejXg",
+   "title": "Large Building",
+   "licence": "CC0 1.0",
+   "attribution": "\"Large Building\" by Kenney, https://poly.pizza/m/ppwtREejXg. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Kenney",
+   "tris": 2364,
+   "tags": [
+    "Furniture",
+    "Housing ",
+    "Building",
+    "city"
+   ],
+   "download": "https://static.poly.pizza/b946d1a0-babe-4249-9964-5c3368f706d5.glb",
+   "thumbnail": "https://static.poly.pizza/b946d1a0-babe-4249-9964-5c3368f706d5.webp",
+   "source": "https://poly.pizza/m/ppwtREejXg"
+  },
+  {
+   "set": "collectibles",
+   "rank": 42,
+   "item": "Pokemon Charizard card",
+   "slug": "collectibles-pokemon-charizard-card",
+   "kind": "Cards",
+   "group": "collectibles",
+   "query": "card",
+   "standin": true,
+   "standinFor": "Pokemon Charizard card",
+   "match": "stand-in",
+   "id": "eNL1vYa4P6b",
+   "title": "Trading Card",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Trading Card\" by Vice Cooper, https://poly.pizza/m/eNL1vYa4P6b. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Vice Cooper",
+   "tris": 92,
+   "tags": [
+    "aang",
+    "era",
+    "baseball card"
+   ],
+   "download": "https://static.poly.pizza/d196919d-410d-4e84-989b-c551ac03b410.glb",
+   "thumbnail": "https://static.poly.pizza/d196919d-410d-4e84-989b-c551ac03b410.webp",
+   "source": "https://poly.pizza/m/eNL1vYa4P6b"
+  },
+  {
+   "set": "collectibles",
+   "rank": 46,
+   "item": "Vinyl LP record",
+   "slug": "collectibles-vinyl-lp-record",
+   "kind": "Music",
+   "group": "collectibles",
+   "query": "vinyl record",
+   "standin": false,
+   "match": "direct",
+   "id": "a_NspNjwTYv",
+   "title": "Vinyl record",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Vinyl record\" by Poly by Google, https://poly.pizza/m/a_NspNjwTYv. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 1664,
+   "tags": [
+    "music"
+   ],
+   "download": "https://static.poly.pizza/c48d8aa2-2681-439f-a835-c8de4d15e284.glb",
+   "thumbnail": "https://static.poly.pizza/c48d8aa2-2681-439f-a835-c8de4d15e284.webp",
+   "source": "https://poly.pizza/m/a_NspNjwTYv"
+  },
+  {
+   "set": "collectibles",
+   "rank": 47,
+   "item": "Beatles Abbey Road vinyl",
+   "slug": "collectibles-beatles-abbey-road-vinyl",
+   "kind": "Music",
+   "group": "collectibles",
+   "query": "record",
+   "standin": true,
+   "standinFor": "Beatles Abbey Road vinyl",
+   "match": "stand-in",
+   "id": "4-d0cvpHjpS",
+   "title": "Record player",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Record player\" by Poly by Google, https://poly.pizza/m/4-d0cvpHjpS. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 5602,
+   "tags": [
+    "record",
+    "music",
+    "party"
+   ],
+   "download": "https://static.poly.pizza/62d90933-fdf6-48df-a0e0-f79a0920fdc4.glb",
+   "thumbnail": "https://static.poly.pizza/62d90933-fdf6-48df-a0e0-f79a0920fdc4.webp",
+   "source": "https://poly.pizza/m/4-d0cvpHjpS"
+  },
+  {
+   "set": "collectibles",
+   "rank": 48,
+   "item": "Record player",
+   "slug": "collectibles-record-player",
+   "kind": "Music",
+   "group": "collectibles",
+   "query": "record player",
+   "standin": false,
+   "match": "direct",
+   "id": "uaz6praPQc",
+   "title": "Record Player",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Record Player\" by Ginsta, https://poly.pizza/m/uaz6praPQc. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Ginsta",
+   "tris": 412,
+   "tags": [
+    "record",
+    "vinyl",
+    "music",
+    "record player",
+    "vinyl player",
+    "vintage",
+    "old",
+    "pastelle"
+   ],
+   "download": "https://static.poly.pizza/a00c63fe-282a-4341-84e4-7fe8492d72d5.glb",
+   "thumbnail": "https://static.poly.pizza/a00c63fe-282a-4341-84e4-7fe8492d72d5.webp",
+   "source": "https://poly.pizza/m/uaz6praPQc"
+  },
+  {
+   "set": "collectibles",
+   "rank": 49,
+   "item": "Marvel comic book",
+   "slug": "collectibles-marvel-comic-book",
+   "kind": "Comics",
+   "group": "collectibles",
+   "query": "book",
+   "standin": true,
+   "standinFor": "Marvel comic book",
+   "match": "stand-in",
+   "id": "h3Wh4fxSQX",
+   "title": "Book",
+   "licence": "CC0 1.0",
+   "attribution": "\"Book\" by Quaternius, https://poly.pizza/m/h3Wh4fxSQX. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 1060,
+   "tags": [
+    "Book"
+   ],
+   "download": "https://static.poly.pizza/e31bd2aa-b898-47a1-9480-9903fc207111.glb",
+   "thumbnail": "https://static.poly.pizza/e31bd2aa-b898-47a1-9480-9903fc207111.webp",
+   "source": "https://poly.pizza/m/h3Wh4fxSQX"
+  },
+  {
+   "set": "collectibles",
+   "rank": 51,
+   "item": "Banksy print",
+   "slug": "collectibles-banksy-print",
+   "kind": "Art",
+   "group": "collectibles",
+   "query": "painting",
+   "standin": true,
+   "standinFor": "Banksy print",
+   "match": "stand-in",
+   "id": "Pi6oReAizt",
+   "title": "Painting",
+   "licence": "CC0 1.0",
+   "attribution": "\"Painting\" by CreativeTrio, https://poly.pizza/m/Pi6oReAizt. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "CreativeTrio",
+   "tris": 164,
+   "tags": [
+    "monke"
+   ],
+   "download": "https://static.poly.pizza/c0fa9c78-2671-49d1-b057-9e974e2e1801.glb",
+   "thumbnail": "https://static.poly.pizza/c0fa9c78-2671-49d1-b057-9e974e2e1801.webp",
+   "source": "https://poly.pizza/m/Pi6oReAizt"
+  },
+  {
+   "set": "collectibles",
+   "rank": 52,
+   "item": "Art print (framed)",
+   "slug": "collectibles-art-print-framed",
+   "kind": "Art",
+   "group": "collectibles",
+   "query": "painting",
+   "standin": true,
+   "standinFor": "Art print (framed)",
+   "match": "stand-in",
+   "id": "fWqUmeGBc-L",
+   "title": "Painting",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Painting\" by Jonathan Granskog, https://poly.pizza/m/fWqUmeGBc-L. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Jonathan Granskog",
+   "tris": 170,
+   "tags": [
+    "picture",
+    "house painting",
+    "painter"
+   ],
+   "download": "https://static.poly.pizza/d2b71c39-d0bf-41bc-86ff-70eb73497184.glb",
+   "thumbnail": "https://static.poly.pizza/d2b71c39-d0bf-41bc-86ff-70eb73497184.webp",
+   "source": "https://poly.pizza/m/fWqUmeGBc-L"
+  },
+  {
+   "set": "collectibles",
+   "rank": 53,
+   "item": "Oil painting",
+   "slug": "collectibles-oil-painting",
+   "kind": "Art",
+   "group": "collectibles",
+   "query": "canvas painting",
+   "standin": false,
+   "match": "direct",
+   "id": "7bj0IgoTsr",
+   "title": "Painting Canvas",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Painting Canvas\" by Zsky, https://poly.pizza/m/7bj0IgoTsr. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Zsky",
+   "tris": 220,
+   "tags": [
+    "Table",
+    "Desk",
+    "Furniture"
+   ],
+   "download": "https://static.poly.pizza/3fb8467b-c831-4687-82c9-72dae8e58307.glb",
+   "thumbnail": "https://static.poly.pizza/3fb8467b-c831-4687-82c9-72dae8e58307.webp",
+   "source": "https://poly.pizza/m/7bj0IgoTsr"
+  },
+  {
+   "set": "collectibles",
+   "rank": 55,
+   "item": "Ming vase",
+   "slug": "collectibles-ming-vase",
+   "kind": "Antiques",
+   "group": "collectibles",
+   "query": "vase",
+   "standin": true,
+   "standinFor": "Ming vase",
+   "match": "stand-in",
+   "id": "fLzSqhcYmKg",
+   "title": "Vase",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Vase\" by Poly by Google, https://poly.pizza/m/fLzSqhcYmKg. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 957,
+   "tags": [
+    "vase",
+    "bowl",
+    "decoration"
+   ],
+   "download": "https://static.poly.pizza/be3ea480-8f2a-49af-a7fb-1cf244ae01f3.glb",
+   "thumbnail": "https://static.poly.pizza/be3ea480-8f2a-49af-a7fb-1cf244ae01f3.webp",
+   "source": "https://poly.pizza/m/fLzSqhcYmKg"
+  },
+  {
+   "set": "collectibles",
+   "rank": 56,
+   "item": "Grandfather clock",
+   "slug": "collectibles-grandfather-clock",
+   "kind": "Antiques",
+   "group": "collectibles",
+   "query": "grandfather clock",
+   "standin": false,
+   "match": "direct",
+   "id": "09YKIkFZnA",
+   "title": "Grandfathers Clock",
+   "licence": "CC0 1.0",
+   "attribution": "\"Grandfathers Clock\" by CreativeTrio, https://poly.pizza/m/09YKIkFZnA. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "CreativeTrio",
+   "tris": 547,
+   "tags": [
+    "Analog Clock",
+    "Clock"
+   ],
+   "download": "https://static.poly.pizza/88145813-946f-4490-abe5-e3938775991a.glb",
+   "thumbnail": "https://static.poly.pizza/88145813-946f-4490-abe5-e3938775991a.webp",
+   "source": "https://poly.pizza/m/09YKIkFZnA"
+  },
+  {
+   "set": "collectibles",
+   "rank": 58,
+   "item": "Sovereign gold coin",
+   "slug": "collectibles-sovereign-gold-coin",
+   "kind": "Coins",
+   "group": "collectibles",
+   "query": "gold coin",
+   "standin": false,
+   "match": "direct",
+   "id": "djfLUAiiZE",
+   "title": "Goldcoin",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Goldcoin\" by Zer0_Time, https://poly.pizza/m/djfLUAiiZE. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Zer0_Time",
+   "tris": 2294,
+   "tags": [
+    "gold",
+    "coin"
+   ],
+   "download": "https://static.poly.pizza/5b588b75-72ad-4fa6-9f93-a0e5aba9df14.glb",
+   "thumbnail": "https://static.poly.pizza/5b588b75-72ad-4fa6-9f93-a0e5aba9df14.webp",
+   "source": "https://poly.pizza/m/djfLUAiiZE"
+  },
+  {
+   "set": "collectibles",
+   "rank": 59,
+   "item": "Britannia gold coin",
+   "slug": "collectibles-britannia-gold-coin",
+   "kind": "Coins",
+   "group": "collectibles",
+   "query": "coin",
+   "standin": true,
+   "standinFor": "Britannia gold coin",
+   "match": "stand-in",
+   "id": "zsScrcPRgW",
+   "title": "Coin",
+   "licence": "CC0 1.0",
+   "attribution": "\"Coin\" by Quaternius, https://poly.pizza/m/zsScrcPRgW. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 1399,
+   "tags": [
+    "Coin",
+    "Currency",
+    "Gold"
+   ],
+   "download": "https://static.poly.pizza/850fae80-54cc-43a8-8cdb-9016425c6c71.glb",
+   "thumbnail": "https://static.poly.pizza/850fae80-54cc-43a8-8cdb-9016425c6c71.webp",
+   "source": "https://poly.pizza/m/zsScrcPRgW"
+  },
+  {
+   "set": "collectibles",
+   "rank": 60,
+   "item": "Krugerrand",
+   "slug": "collectibles-krugerrand",
+   "kind": "Coins",
+   "group": "collectibles",
+   "query": "coin",
+   "standin": true,
+   "standinFor": "Krugerrand",
+   "match": "stand-in",
+   "id": "9OWkKczINo",
+   "title": "Coin Piles",
+   "licence": "CC0 1.0",
+   "attribution": "\"Coin Piles\" by Quaternius, https://poly.pizza/m/9OWkKczINo. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 3220,
+   "tags": [
+    "Coins",
+    "Currency",
+    "Money"
+   ],
+   "download": "https://static.poly.pizza/af8eccc6-bc94-4a31-a4dd-a2d2a1755735.glb",
+   "thumbnail": "https://static.poly.pizza/af8eccc6-bc94-4a31-a4dd-a2d2a1755735.webp",
+   "source": "https://poly.pizza/m/9OWkKczINo"
+  },
+  {
+   "set": "collectibles",
+   "rank": 61,
+   "item": "Silver Britannia coin",
+   "slug": "collectibles-silver-britannia-coin",
+   "kind": "Coins",
+   "group": "collectibles",
+   "query": "silver coin",
+   "standin": false,
+   "match": "direct",
+   "id": "tmptMJF092",
+   "title": "Silver Coin",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Silver Coin\" by Zsky, https://poly.pizza/m/tmptMJF092. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Zsky",
+   "tris": 260,
+   "tags": [
+    "Coin"
+   ],
+   "download": "https://static.poly.pizza/603368ef-ac3d-4ce7-8258-f258f0fe6bab.glb",
+   "thumbnail": "https://static.poly.pizza/603368ef-ac3d-4ce7-8258-f258f0fe6bab.webp",
+   "source": "https://poly.pizza/m/tmptMJF092"
+  },
+  {
+   "set": "collectibles",
+   "rank": 63,
+   "item": "Bank of England banknote",
+   "slug": "collectibles-bank-of-england-banknote",
+   "kind": "Coins",
+   "group": "collectibles",
+   "query": "cash",
+   "standin": true,
+   "standinFor": "Bank of England banknote",
+   "match": "stand-in",
+   "id": "aLp0P2nXJ2",
+   "title": "Cash Stack",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Cash Stack\" by J-Toastie, https://poly.pizza/m/aLp0P2nXJ2. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "J-Toastie",
+   "tris": 2056,
+   "tags": [
+    "Cash",
+    "Money",
+    "Cash Stack",
+    "Stack",
+    "Money Stack"
+   ],
+   "download": "https://static.poly.pizza/f71a571e-7b09-47e5-9124-2636460582ec.glb",
+   "thumbnail": "https://static.poly.pizza/f71a571e-7b09-47e5-9124-2636460582ec.webp",
+   "source": "https://poly.pizza/m/aLp0P2nXJ2"
+  },
+  {
+   "set": "collectibles",
+   "rank": 64,
+   "item": "Gold bar 1kg",
+   "slug": "collectibles-gold-bar-1kg",
+   "kind": "Coins",
+   "group": "collectibles",
+   "query": "gold ingot",
+   "standin": false,
+   "match": "direct",
+   "id": "3jRhAgbc6t",
+   "title": "Gold Ingots",
+   "licence": "CC0 1.0",
+   "attribution": "\"Gold Ingots\" by Quaternius, https://poly.pizza/m/3jRhAgbc6t. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 648,
+   "tags": [
+    "Gold"
+   ],
+   "download": "https://static.poly.pizza/1a8d43b5-9376-442a-84f9-35827779aab6.glb",
+   "thumbnail": "https://static.poly.pizza/1a8d43b5-9376-442a-84f9-35827779aab6.webp",
+   "source": "https://poly.pizza/m/3jRhAgbc6t"
+  },
+  {
+   "set": "collectibles",
+   "rank": 67,
+   "item": "Nintendo Switch",
+   "slug": "collectibles-nintendo-switch",
+   "kind": "Consoles",
+   "group": "collectibles",
+   "query": "nintendo switch",
+   "standin": false,
+   "match": "direct",
+   "id": "600PeFCBopv",
+   "title": "Nintendo Switch",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Nintendo Switch\" by Jasmine Roberts, https://poly.pizza/m/600PeFCBopv. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Jasmine Roberts",
+   "tris": 1202,
+   "tags": [
+    "console",
+    "game"
+   ],
+   "download": "https://static.poly.pizza/659540f1-719d-4044-a3bb-35dadddc10d8.glb",
+   "thumbnail": "https://static.poly.pizza/659540f1-719d-4044-a3bb-35dadddc10d8.webp",
+   "source": "https://poly.pizza/m/600PeFCBopv"
+  },
+  {
+   "set": "collectibles",
+   "rank": 68,
+   "item": "Nintendo Game Boy",
+   "slug": "collectibles-nintendo-game-boy",
+   "kind": "Consoles",
+   "group": "collectibles",
+   "query": "game boy",
+   "standin": false,
+   "match": "direct",
+   "id": "47Wzb8DCUd1",
+   "title": "Gameboy",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Gameboy\" by Rick Companje, https://poly.pizza/m/47Wzb8DCUd1. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Rick Companje",
+   "tris": 2322,
+   "tags": [
+    "console",
+    "retro",
+    "handheld"
+   ],
+   "download": "https://static.poly.pizza/a87b338e-6b8c-43cb-b606-2f1e7d1c27cd.glb",
+   "thumbnail": "https://static.poly.pizza/a87b338e-6b8c-43cb-b606-2f1e7d1c27cd.webp",
+   "source": "https://poly.pizza/m/47Wzb8DCUd1"
+  },
+  {
+   "set": "collectibles",
+   "rank": 69,
+   "item": "Super Nintendo (SNES)",
+   "slug": "collectibles-super-nintendo-snes",
+   "kind": "Consoles",
+   "group": "collectibles",
+   "query": "snes",
+   "standin": false,
+   "match": "direct",
+   "id": "7yVvvpp-ftQ",
+   "title": "SNES",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"SNES\" by Gabriel Valdivia, https://poly.pizza/m/7yVvvpp-ftQ. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Gabriel Valdivia",
+   "tris": 2588,
+   "tags": [
+    "tin",
+    "atomic number 50",
+    "ngs"
+   ],
+   "download": "https://static.poly.pizza/ab1f22df-b1f1-456c-ad5c-80338b71d9a3.glb",
+   "thumbnail": "https://static.poly.pizza/ab1f22df-b1f1-456c-ad5c-80338b71d9a3.webp",
+   "source": "https://poly.pizza/m/7yVvvpp-ftQ"
+  },
+  {
+   "set": "collectibles",
+   "rank": 72,
+   "item": "Atari 2600",
+   "slug": "collectibles-atari-2600",
+   "kind": "Consoles",
+   "group": "collectibles",
+   "query": "atari",
+   "standin": false,
+   "match": "direct",
+   "id": "fjKB62qw6yu",
+   "title": "Atari \"Vader\" VCS - Low Poly",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Atari \"Vader\" VCS - Low Poly\" by Andrew Kreckler, https://poly.pizza/m/fjKB62qw6yu. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Andrew Kreckler",
+   "tris": 3186,
+   "tags": [
+    "polymer",
+    "diet",
+    "round"
+   ],
+   "download": "https://static.poly.pizza/ce9a710b-bafb-4d66-a19e-ee265eddabc8.glb",
+   "thumbnail": "https://static.poly.pizza/ce9a710b-bafb-4d66-a19e-ee265eddabc8.webp",
+   "source": "https://poly.pizza/m/fjKB62qw6yu"
+  },
+  {
+   "set": "collectibles",
+   "rank": 74,
+   "item": "Arcade cabinet",
+   "slug": "collectibles-arcade-cabinet",
+   "kind": "Consoles",
+   "group": "collectibles",
+   "query": "arcade machine",
+   "standin": false,
+   "match": "direct",
+   "id": "GLDkMhiynM",
+   "title": "Arcade Machine",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Arcade Machine\" by J-Toastie, https://poly.pizza/m/GLDkMhiynM. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "J-Toastie",
+   "tris": 686,
+   "tags": [
+    "Arcade",
+    "Arcade Machine",
+    "Video Game",
+    "Technology"
+   ],
+   "download": "https://static.poly.pizza/e45e15cd-7b22-4b5d-ba19-e29fe9d5811a.glb",
+   "thumbnail": "https://static.poly.pizza/e45e15cd-7b22-4b5d-ba19-e29fe9d5811a.webp",
+   "source": "https://poly.pizza/m/GLDkMhiynM"
+  },
+  {
+   "set": "collectibles",
+   "rank": 75,
+   "item": "Pinball machine",
+   "slug": "collectibles-pinball-machine",
+   "kind": "Consoles",
+   "group": "collectibles",
+   "query": "arcade machine",
+   "standin": true,
+   "standinFor": "Pinball machine",
+   "match": "stand-in",
+   "id": "bWFSJHIs8uI",
+   "title": "Arcade Machine",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Arcade Machine\" by Gabriel Valdivia, https://poly.pizza/m/bWFSJHIs8uI. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Gabriel Valdivia",
+   "tris": 944,
+   "tags": [
+    "tilt",
+    "bar",
+    "bars"
+   ],
+   "download": "https://static.poly.pizza/c0cc2755-8aca-4fef-9515-17985b084ec1.glb",
+   "thumbnail": "https://static.poly.pizza/c0cc2755-8aca-4fef-9515-17985b084ec1.webp",
+   "source": "https://poly.pizza/m/bWFSJHIs8uI"
+  },
+  {
+   "set": "collectibles",
+   "rank": 76,
+   "item": "Leica M",
+   "slug": "collectibles-leica-m",
+   "kind": "Cameras",
+   "group": "collectibles",
+   "query": "leica m",
+   "standin": false,
+   "match": "direct",
+   "id": "4mafzKwst8_",
+   "title": "Leica M3",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Leica M3\" by Damon Lam, https://poly.pizza/m/4mafzKwst8_. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Damon Lam",
+   "tris": 10416,
+   "tags": [
+    "canon",
+    "barrow",
+    "acth"
+   ],
+   "download": "https://static.poly.pizza/29d6e444-3a08-491d-957c-fa347f1e4989.glb",
+   "thumbnail": "https://static.poly.pizza/29d6e444-3a08-491d-957c-fa347f1e4989.webp",
+   "source": "https://poly.pizza/m/4mafzKwst8_"
+  },
+  {
+   "set": "collectibles",
+   "rank": 78,
+   "item": "Sony Alpha",
+   "slug": "collectibles-sony-alpha",
+   "kind": "Cameras",
+   "group": "collectibles",
+   "query": "camera",
+   "standin": true,
+   "standinFor": "Sony Alpha",
+   "match": "stand-in",
+   "id": "eAoNPV5bfmK",
+   "title": "Camera",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Camera\" by Gabriel Valdivia, https://poly.pizza/m/eAoNPV5bfmK. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Gabriel Valdivia",
+   "tris": 836,
+   "tags": [
+    "photographic camera",
+    "television camera",
+    "camcorder"
+   ],
+   "download": "https://static.poly.pizza/91dfe80b-e178-4fbe-98ec-1bcae7e0c1ad.glb",
+   "thumbnail": "https://static.poly.pizza/91dfe80b-e178-4fbe-98ec-1bcae7e0c1ad.webp",
+   "source": "https://poly.pizza/m/eAoNPV5bfmK"
+  },
+  {
+   "set": "collectibles",
+   "rank": 80,
+   "item": "Polaroid camera",
+   "slug": "collectibles-polaroid-camera",
+   "kind": "Cameras",
+   "group": "collectibles",
+   "query": "polaroid",
+   "standin": false,
+   "match": "direct",
+   "id": "6BgcoF0LL6y",
+   "title": "Polaroids",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Polaroids\" by Jarlan Perez, https://poly.pizza/m/6BgcoF0LL6y. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Jarlan Perez",
+   "tris": 980,
+   "tags": [
+    "photo",
+    "photographs",
+    "photos"
+   ],
+   "download": "https://static.poly.pizza/0f062490-210f-4ed5-ac68-d216aff93d97.glb",
+   "thumbnail": "https://static.poly.pizza/0f062490-210f-4ed5-ac68-d216aff93d97.webp",
+   "source": "https://poly.pizza/m/6BgcoF0LL6y"
+  },
+  {
+   "set": "collectibles",
+   "rank": 81,
+   "item": "Brompton bike",
+   "slug": "collectibles-brompton-bike",
+   "kind": "Bikes",
+   "group": "collectibles",
+   "query": "bicycle",
+   "standin": true,
+   "standinFor": "Brompton bike",
+   "match": "stand-in",
+   "id": "19VoUuA2pcN",
+   "title": "Bicycle",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Bicycle\" by Poly by Google, https://poly.pizza/m/19VoUuA2pcN. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 1714,
+   "tags": [
+    "bike",
+    "pedal",
+    "bike"
+   ],
+   "download": "https://static.poly.pizza/6048701b-fa87-426b-9242-c786ca25fa3a.glb",
+   "thumbnail": "https://static.poly.pizza/6048701b-fa87-426b-9242-c786ca25fa3a.webp",
+   "source": "https://poly.pizza/m/19VoUuA2pcN"
+  },
+  {
+   "set": "collectibles",
+   "rank": 83,
+   "item": "Mountain bike",
+   "slug": "collectibles-mountain-bike",
+   "kind": "Bikes",
+   "group": "collectibles",
+   "query": "bike",
+   "standin": true,
+   "standinFor": "Mountain bike",
+   "match": "stand-in",
+   "id": "DN6DCPopeH",
+   "title": "Bike",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Bike\" by MiniPoly, https://poly.pizza/m/DN6DCPopeH. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "MiniPoly",
+   "tris": 1962,
+   "tags": [
+    "Bike",
+    "Scooter",
+    "Moped",
+    "Motorbike"
+   ],
+   "download": "https://static.poly.pizza/b8e959fa-9c68-490d-ae95-623ec929c4dd.glb",
+   "thumbnail": "https://static.poly.pizza/b8e959fa-9c68-490d-ae95-623ec929c4dd.webp",
+   "source": "https://poly.pizza/m/DN6DCPopeH"
+  },
+  {
+   "set": "collectibles",
+   "rank": 84,
+   "item": "Penny-farthing",
+   "slug": "collectibles-penny-farthing",
+   "kind": "Bikes",
+   "group": "collectibles",
+   "query": "bicycle",
+   "standin": true,
+   "standinFor": "Penny-farthing",
+   "match": "stand-in",
+   "id": "b6USSQA731J",
+   "title": "Bicycle",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Bicycle\" by Poly by Google, https://poly.pizza/m/b6USSQA731J. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 3712,
+   "tags": [
+    "bike"
+   ],
+   "download": "https://static.poly.pizza/b88ea7fb-e4d2-49fe-a372-448b36fc2a69.glb",
+   "thumbnail": "https://static.poly.pizza/b88ea7fb-e4d2-49fe-a372-448b36fc2a69.webp",
+   "source": "https://poly.pizza/m/b6USSQA731J"
+  },
+  {
+   "set": "collectibles",
+   "rank": 85,
+   "item": "Vespa scooter",
+   "slug": "collectibles-vespa-scooter",
+   "kind": "Bikes",
+   "group": "collectibles",
+   "query": "vespa",
+   "standin": false,
+   "match": "direct",
+   "id": "blGLclvvdEM",
+   "title": "Vespa",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Vespa\" by Jasmine Roberts, https://poly.pizza/m/blGLclvvdEM. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Jasmine Roberts",
+   "tris": 1667,
+   "tags": [
+    "genus vespa",
+    "scooter",
+    "motorbike"
+   ],
+   "download": "https://static.poly.pizza/b771a0df-3c43-42a9-b0dd-6e3d10a83b31.glb",
+   "thumbnail": "https://static.poly.pizza/b771a0df-3c43-42a9-b0dd-6e3d10a83b31.webp",
+   "source": "https://poly.pizza/m/blGLclvvdEM"
+  },
+  {
+   "set": "collectibles",
+   "rank": 86,
+   "item": "Triumph Bonneville",
+   "slug": "collectibles-triumph-bonneville",
+   "kind": "Bikes",
+   "group": "collectibles",
+   "query": "motorcycle",
+   "standin": true,
+   "standinFor": "Triumph Bonneville",
+   "match": "stand-in",
+   "id": "j20srJUjpB",
+   "title": "Cartoony Purple Motorcycle",
+   "licence": "CC0 1.0",
+   "attribution": "\"Cartoony Purple Motorcycle\" by AliceCassie, https://poly.pizza/m/j20srJUjpB. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "AliceCassie",
+   "tris": 1500,
+   "tags": [
+    "cartoon",
+    "motorcycle",
+    "vehicle"
+   ],
+   "download": "https://static.poly.pizza/3ff04d85-dfe6-487c-b01d-5ce92103cf30.glb",
+   "thumbnail": "https://static.poly.pizza/3ff04d85-dfe6-487c-b01d-5ce92103cf30.webp",
+   "source": "https://poly.pizza/m/j20srJUjpB"
+  },
+  {
+   "set": "collectibles",
+   "rank": 87,
+   "item": "Harley-Davidson",
+   "slug": "collectibles-harley-davidson",
+   "kind": "Bikes",
+   "group": "collectibles",
+   "query": "motorcycle",
+   "standin": true,
+   "standinFor": "Harley-Davidson",
+   "match": "stand-in",
+   "id": "cFvmALDjMKw",
+   "title": "Motorcycle",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Motorcycle\" by Poly by Google, https://poly.pizza/m/cFvmALDjMKw. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 5420,
+   "tags": [
+    "motorcycle",
+    "bike",
+    "vehicle",
+    "wheels"
+   ],
+   "download": "https://static.poly.pizza/5f33b17d-c39b-4b5c-97ef-286d34990b09.glb",
+   "thumbnail": "https://static.poly.pizza/5f33b17d-c39b-4b5c-97ef-286d34990b09.webp",
+   "source": "https://poly.pizza/m/cFvmALDjMKw"
+  },
+  {
+   "set": "collectibles",
+   "rank": 88,
+   "item": "Ducati Panigale",
+   "slug": "collectibles-ducati-panigale",
+   "kind": "Bikes",
+   "group": "collectibles",
+   "query": "motorcycle",
+   "standin": true,
+   "standinFor": "Ducati Panigale",
+   "match": "stand-in",
+   "id": "0lBe-ApqJs4",
+   "title": "Motorcycle",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Motorcycle\" by jeremy, https://poly.pizza/m/0lBe-ApqJs4. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "jeremy",
+   "tris": 1934,
+   "tags": [
+    "motorcycle",
+    "bike",
+    "vehicle",
+    "wheels"
+   ],
+   "download": "https://static.poly.pizza/7d230a92-464a-4d1c-874e-712240e2db20.glb",
+   "thumbnail": "https://static.poly.pizza/7d230a92-464a-4d1c-874e-712240e2db20.webp",
+   "source": "https://poly.pizza/m/0lBe-ApqJs4"
+  },
+  {
+   "set": "collectibles",
+   "rank": 89,
+   "item": "Royal Enfield Bullet",
+   "slug": "collectibles-royal-enfield-bullet",
+   "kind": "Bikes",
+   "group": "collectibles",
+   "query": "motorcycle",
+   "standin": true,
+   "standinFor": "Royal Enfield Bullet",
+   "match": "stand-in",
+   "id": "dse64pqMKAR",
+   "title": "Motorcycle",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Motorcycle\" by Poly by Google, https://poly.pizza/m/dse64pqMKAR. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 6361,
+   "tags": [
+    "motorbike"
+   ],
+   "download": "https://static.poly.pizza/f7635710-7cfa-4768-ad70-8366ab485358.glb",
+   "thumbnail": "https://static.poly.pizza/f7635710-7cfa-4768-ad70-8366ab485358.webp",
+   "source": "https://poly.pizza/m/dse64pqMKAR"
+  },
+  {
+   "set": "collectibles",
+   "rank": 91,
+   "item": "Barbie doll",
+   "slug": "collectibles-barbie-doll",
+   "kind": "Toys",
+   "group": "collectibles",
+   "query": "doll",
+   "standin": true,
+   "standinFor": "Barbie doll",
+   "match": "stand-in",
+   "id": "YUAwclCDrF",
+   "title": "Doll",
+   "licence": "CC0 1.0",
+   "attribution": "\"Doll\" by CreativeTrio, https://poly.pizza/m/YUAwclCDrF. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "CreativeTrio",
+   "tris": 1234,
+   "tags": [
+    "Toy"
+   ],
+   "download": "https://static.poly.pizza/6773f7e2-dbd1-432d-8b13-85c4d6406643.glb",
+   "thumbnail": "https://static.poly.pizza/6773f7e2-dbd1-432d-8b13-85c4d6406643.webp",
+   "source": "https://poly.pizza/m/YUAwclCDrF"
+  },
+  {
+   "set": "collectibles",
+   "rank": 92,
+   "item": "Hornby model railway",
+   "slug": "collectibles-hornby-model-railway",
+   "kind": "Toys",
+   "group": "collectibles",
+   "query": "locomotive",
+   "standin": true,
+   "standinFor": "Hornby model railway",
+   "match": "stand-in",
+   "id": "JCwr52pnuO",
+   "title": "Locomotive Wagon",
+   "licence": "CC0 1.0",
+   "attribution": "\"Locomotive Wagon\" by Quaternius, https://poly.pizza/m/JCwr52pnuO. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 7632,
+   "tags": [
+    "Vehicle",
+    "Transportation"
+   ],
+   "download": "https://static.poly.pizza/8d7a23a6-f4b6-4828-9b3a-39ed98511a66.glb",
+   "thumbnail": "https://static.poly.pizza/8d7a23a6-f4b6-4828-9b3a-39ed98511a66.webp",
+   "source": "https://poly.pizza/m/JCwr52pnuO"
+  },
+  {
+   "set": "collectibles",
+   "rank": 94,
+   "item": "Rubik's cube",
+   "slug": "collectibles-rubik-s-cube",
+   "kind": "Toys",
+   "group": "collectibles",
+   "query": "rubik's cube",
+   "standin": false,
+   "match": "direct",
+   "id": "fOzaoeVGlG9",
+   "title": "Rubik's cube",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Rubik's cube\" by Poly by Google, https://poly.pizza/m/fOzaoeVGlG9. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 468,
+   "tags": [
+    "toy"
+   ],
+   "download": "https://static.poly.pizza/e43be19c-d07d-4f3f-9f4f-29701a92feff.glb",
+   "thumbnail": "https://static.poly.pizza/e43be19c-d07d-4f3f-9f4f-29701a92feff.webp",
+   "source": "https://poly.pizza/m/fOzaoeVGlG9"
+  },
+  {
+   "set": "collectibles",
+   "rank": 95,
+   "item": "Whisky (Macallan)",
+   "slug": "collectibles-whisky-macallan",
+   "kind": "Wine and spirits",
+   "group": "collectibles",
+   "query": "bottle",
+   "standin": true,
+   "standinFor": "Whisky (Macallan)",
+   "match": "stand-in",
+   "id": "NxbygmpVwR",
+   "title": "Old Bottle",
+   "licence": "CC0 1.0",
+   "attribution": "\"Old Bottle\" by MiniPoly, https://poly.pizza/m/NxbygmpVwR. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "MiniPoly",
+   "tris": 560,
+   "tags": [
+    "Bottle",
+    "Liquor",
+    "Container"
+   ],
+   "download": "https://static.poly.pizza/2da3d98d-b72f-4934-8816-7000297115f6.glb",
+   "thumbnail": "https://static.poly.pizza/2da3d98d-b72f-4934-8816-7000297115f6.webp",
+   "source": "https://poly.pizza/m/NxbygmpVwR"
+  },
+  {
+   "set": "collectibles",
+   "rank": 96,
+   "item": "Vintage wine (Chateau Lafite)",
+   "slug": "collectibles-vintage-wine-chateau-lafite",
+   "kind": "Wine and spirits",
+   "group": "collectibles",
+   "query": "wine bottle",
+   "standin": false,
+   "match": "direct",
+   "id": "65Hf2EMEo4s",
+   "title": "Bottle of wine",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Bottle of wine\" by Poly by Google, https://poly.pizza/m/65Hf2EMEo4s. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 608,
+   "tags": [
+    "carafe",
+    "decanter",
+    "flagon"
+   ],
+   "download": "https://static.poly.pizza/f2918f5c-1371-440d-9968-cdcba02cfd68.glb",
+   "thumbnail": "https://static.poly.pizza/f2918f5c-1371-440d-9968-cdcba02cfd68.webp",
+   "source": "https://poly.pizza/m/65Hf2EMEo4s"
+  },
+  {
+   "set": "collectibles",
+   "rank": 97,
+   "item": "Champagne (Dom Perignon)",
+   "slug": "collectibles-champagne-dom-perignon",
+   "kind": "Wine and spirits",
+   "group": "collectibles",
+   "query": "champagne",
+   "standin": false,
+   "match": "direct",
+   "id": "3Ho2qOyCsl",
+   "title": "Champagne Bottle",
+   "licence": "CC0 1.0",
+   "attribution": "\"Champagne Bottle\" by MiniPoly, https://poly.pizza/m/3Ho2qOyCsl. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "MiniPoly",
+   "tris": 448,
+   "tags": [
+    "Bottle",
+    "Beverage",
+    "Glass"
+   ],
+   "download": "https://static.poly.pizza/eb23d7c1-349b-45cd-8f2b-63d30029dfd2.glb",
+   "thumbnail": "https://static.poly.pizza/eb23d7c1-349b-45cd-8f2b-63d30029dfd2.webp",
+   "source": "https://poly.pizza/m/3Ho2qOyCsl"
+  },
+  {
+   "set": "collectibles",
+   "rank": 98,
+   "item": "Fountain pen (Montblanc)",
+   "slug": "collectibles-fountain-pen-montblanc",
+   "kind": "Writing",
+   "group": "collectibles",
+   "query": "fountain pen",
+   "standin": false,
+   "match": "direct",
+   "id": "0nyBBKNmXnr",
+   "title": "Fountain pen",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Fountain pen\" by Poly by Google, https://poly.pizza/m/0nyBBKNmXnr. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 600,
+   "tags": [
+    "writing",
+    "letters"
+   ],
+   "download": "https://static.poly.pizza/8c4f358d-8bd0-4093-80c3-36a7e4b66a27.glb",
+   "thumbnail": "https://static.poly.pizza/8c4f358d-8bd0-4093-80c3-36a7e4b66a27.webp",
+   "source": "https://poly.pizza/m/0nyBBKNmXnr"
+  },
+  {
+   "set": "collectibles",
+   "rank": 99,
+   "item": "Typewriter",
+   "slug": "collectibles-typewriter",
+   "kind": "Writing",
+   "group": "collectibles",
+   "query": "typewriter",
+   "standin": false,
+   "match": "direct",
+   "id": "2SmAWPS6_mH",
+   "title": "Typewriter",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Typewriter\" by Naam, https://poly.pizza/m/2SmAWPS6_mH. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Naam",
+   "tris": 2082,
+   "tags": [
+    "typewriter"
+   ],
+   "download": "https://static.poly.pizza/78412faf-a163-4916-b88f-27aaed23d93a.glb",
+   "thumbnail": "https://static.poly.pizza/78412faf-a163-4916-b88f-27aaed23d93a.webp",
+   "source": "https://poly.pizza/m/2SmAWPS6_mH"
+  },
+  {
+   "set": "collectibles",
+   "rank": 100,
+   "item": "FA Cup trophy",
+   "slug": "collectibles-fa-cup-trophy",
+   "kind": "Memorabilia",
+   "group": "collectibles",
+   "query": "trophy",
+   "standin": false,
+   "match": "direct",
+   "id": "fLy8KmmD1t",
+   "title": "Trophy",
+   "licence": "CC0 1.0",
+   "attribution": "\"Trophy\" by CreativeTrio, https://poly.pizza/m/fLy8KmmD1t. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "CreativeTrio",
+   "tris": 518,
+   "tags": [
+    "Trophy"
+   ],
+   "download": "https://static.poly.pizza/b56b0827-c9f6-46e6-9a5d-160225686ee7.glb",
+   "thumbnail": "https://static.poly.pizza/b56b0827-c9f6-46e6-9a5d-160225686ee7.webp",
+   "source": "https://poly.pizza/m/fLy8KmmD1t"
+  }
+ ]
+}

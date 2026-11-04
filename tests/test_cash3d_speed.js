@@ -9,6 +9,13 @@ const routeThree = require('./three_route');
 const INDEX = 'file://' + (process.env.VI_INDEX || require('path').join(__dirname, '..', 'index.html'));
 const GPU_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-gpu-compositing', '--enable-gpu-rasterization'];
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
+// wall-clock times swing with machine load (CI shards run two browsers at once), so they are reported, never gated;
+// the gates are the fixed numbers that make a stage slow: builds, compiles, shader kinds, draw calls and triangles (CoS, 3 Nov)
+const info = m => console.log('info:', m);
+const CASH_CALLS = 16, CASH_TRIS = 130000, METAL_CALLS = 20, METAL_TRIS = 4000;   // measured 13 / 1,756 and 17 / 2,874 on 40c6018 (the old coin stacks drew 121,464 triangles)
+// v0.9.2 cash 3D solid stacks (owner, 4 Nov: "Each stack must be its own solid model once stacked, not the grid as a whole"): every
+// stack is closed (top, side, bottom), so at £25,300 (25 blocks) the scene is 121,450 triangles in the same 9 draws (live v0.9.1:
+// 1,390, painted boxes). Past about 160,000 triangles of stacks (33 blocks in £1) a block is a closed painted box again.
 const SEED = (cash, metals) => `(function(){if(localStorage.getItem('pos_al1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true,plan:'annual'}));localStorage.setItem('pos_al1',JSON.stringify({cashAccounts:[{id:5,name:'Savings',type:'Savings',balance:${cash}}],physicalCash:[{id:1,where:'Safe',amount:300,date:'2026-10-01'}],metals:${JSON.stringify(metals)},metalPrices:{gold:2000,silver:25,platinum:900,palladium:1000}}));})()`;
 // timed spans of the viewer's own code, long tasks with their start, and every render call's own main-thread cost
 const HOOK = () => {
@@ -65,9 +72,9 @@ const HOOK = () => {
   ok(o.programs > 0 && !o.pbr, 'no physically based shaders: matcap and basic ones only (' + o.programs + ' small programs for both stages, tag and floor included)');
   ok(o.contexts === 0 && o.shared, 'the stage uses the shared renderer made in the warm-up: no WebGL context created at the tap (' + o.contexts + ')');
   ok(o.newPrograms === 0, 'the tap compiles no shader: the warm-up already did (' + o.newPrograms + ' compiled on opening)');
-  ok(o.longest < 100, 'opening: the viewer\'s own code never runs 100 ms in one go on the phone profile (longest ' + o.longest.toFixed(0) + ' ms of JavaScript; time inside WebGL calls and canvas resizes is the software GPU here and is read on the owner\'s phone with ?perf=1: ' + o.spans + ')');
-  ok(o.firstOwn != null && o.firstOwn < 50, 'the first draw\'s own JavaScript is under 50 ms (' + (o.firstOwn == null ? '-' : o.firstOwn.toFixed(0)) + ' ms; ' + (o.firstRender == null ? '-' : o.firstRender.toFixed(0)) + ' ms with the software GPU)');
-  ok(o.dpr <= 1.5 + 1e-9, 'pixel ratio capped at 1.5 on a touch screen (' + o.dpr + ')');
+  info('opening: the viewer\'s own code on the phone profile (longest ' + o.longest.toFixed(0) + ' ms of JavaScript; time inside WebGL calls and canvas resizes is the software GPU here and is read on the owner\'s phone with ?perf=1: ' + o.spans + ')');
+  info('the first draw\'s own JavaScript (' + (o.firstOwn == null ? '-' : o.firstOwn.toFixed(0)) + ' ms; ' + (o.firstRender == null ? '-' : o.firstRender.toFixed(0)) + ' ms with the software GPU)');
+  ok(o.dpr <= 2 + 1e-9, 'pixel ratio within the house builder rule on a touch screen: at most 2 at rest, 1.25 while coins land (R16) (' + o.dpr + ')');
 
   // ── 1b. the coin colours: gold coins lifted into the brand gold, silver coins stay silver (QC, 2 Nov: the euro and rupee coins must not turn gold) ──
   const coins = await p.evaluate(() => Object.keys(V3_COINS).map(c => { const sp = V3_COINS[c], h = v3Lift(sp.outer, V3_LIFT), n = parseInt(h.slice(1), 16), r = n >> 16 & 255, b = n & 255;
@@ -85,8 +92,10 @@ const HOOK = () => {
   // ── 3. orbit: main-thread cost of each frame while turning (the GPU's time is read on the owner's phone with ?perf=1) ──
   const orb = await p.evaluate(() => { const V = V3.cash, t = V.ctl.target, c = V.cam.position, r = Math.hypot(c.x - t.x, c.z - t.z), a0 = Math.atan2(c.z - t.z, c.x - t.x), d = [];
     for (let i = 1; i <= 30; i++) { const a = a0 + i * 0.03; c.x = t.x + r * Math.cos(a); c.z = t.z + r * Math.sin(a); V.ctl.update(); const s = performance.now(); V.r.render(V.sc, V.cam); d.push(performance.now() - s); }
-    d.sort((x, y) => x - y); return { p95: d[Math.floor(d.length * 0.95)], max: d[d.length - 1] }; });
-  ok(orb.p95 <= 20, 'orbit frames on the main thread: p95 ' + orb.p95.toFixed(1) + ' ms, max ' + orb.max.toFixed(1) + ' ms (gate p95 20)');
+    d.sort((x, y) => x - y); V.r.info.autoReset = true; V.r.render(V.sc, V.cam); return { p95: d[Math.floor(d.length * 0.95)], max: d[d.length - 1], calls: V.r.info.render.calls, tris: V.r.info.render.triangles }; });
+  info('orbit frames on the main thread: p95 ' + orb.p95.toFixed(1) + ' ms, max ' + orb.max.toFixed(1) + ' ms');
+  ok(orb.calls > 0 && orb.calls <= CASH_CALLS, 'orbit: each frame is ' + orb.calls + ' draw calls (budget ' + CASH_CALLS + ')');
+  ok(orb.tris > 0 && orb.tris <= CASH_TRIS, 'orbit: each frame is ' + orb.tris + ' triangles at £25,300 (budget ' + CASH_TRIS + ')');
 
   // ── 4. precious metals, the same viewer: no reflection map, no shadows, one build ──
   await p.evaluate(() => { window.__tm = performance.now(); showSubtab('assets', 'metals', null); });
@@ -94,12 +103,13 @@ const HOOK = () => {
   await p.waitForTimeout(3000);
   const m = await p.evaluate(() => { const V = V3.metals, ours = __T.spans.filter(s => s[1] >= window.__tm);
     return { gold: !!(V && V.stats.gold), silver: !!(V && V.stats.silver), shadows: !!(V && V.r.shadowMap.enabled), pmrem: __T.pmrem, builds: ours.filter(s => s[0] === 'clear').length,
-      longest: Math.max(0, ...ours.filter(s => s[0] === 'renderMetalsISO' || s[0] === 'v3MetalsNow').map(s => s[2] - s[3])), spans: ours.filter(s => s[0] === 'renderMetalsISO' || s[0] === 'v3MetalsNow').map(s => s[0] + ' ' + s[2].toFixed(0) + ' (GL ' + s[3].toFixed(0) + ')').join(', '), newPrograms: __T.renders.filter(x => x[0] >= window.__tm).reduce((a, x) => a + x[3], 0) }; });
+      longest: Math.max(0, ...ours.filter(s => s[0] === 'renderMetalsISO' || s[0] === 'v3MetalsNow').map(s => s[2] - s[3])), spans: ours.filter(s => s[0] === 'renderMetalsISO' || s[0] === 'v3MetalsNow').map(s => s[0] + ' ' + s[2].toFixed(0) + ' (GL ' + s[3].toFixed(0) + ')').join(', '), newPrograms: __T.renders.filter(x => x[0] >= window.__tm).reduce((a, x) => a + x[3], 0), calls: (V.r.info.autoReset = true, V.r.render(V.sc, V.cam), V.r.info.render.calls), tris: V.r.info.render.triangles }; });
   console.log(JSON.stringify(m));
   ok(m.gold && m.silver, 'precious metals draw gold and silver bars');
   ok(!m.shadows && m.pmrem === 0, 'metals: no shadow pass and no reflection map either');
   ok(m.builds === 1, 'metals: one build per open (' + m.builds + ')');
-  ok(m.longest < 100, 'metals: the viewer\'s own code never runs 100 ms in one go (longest ' + m.longest.toFixed(0) + ' ms of JavaScript: ' + m.spans + ')');
+  info('metals: the viewer\'s own code (longest ' + m.longest.toFixed(0) + ' ms of JavaScript: ' + m.spans + ')');
+  ok(m.calls > 0 && m.calls <= METAL_CALLS && m.tris <= METAL_TRIS, 'metals: ' + m.calls + ' draw calls, ' + m.tris + ' triangles (budget ' + METAL_CALLS + ' and ' + METAL_TRIS + ')');
   ok(m.newPrograms === 0, 'metals: the same renderer and warmed shaders, nothing compiled on opening (' + m.newPrograms + ')');
 
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
@@ -111,8 +121,10 @@ const HOOK = () => {
     await p2.waitForFunction(() => !!window.THREE && !!THREE.OrbitControls, null, { timeout: 30000 }).catch(() => {});
     await p2.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', null); });
     await p2.waitForFunction(() => window.VIPERF && VIPERF.snapshot().stageFrames > 0, null, { timeout: 30000 }).catch(() => {});
-    const k = await p2.evaluate(() => { const k = VIPERF.snapshot(); return { viewport: k.viewport, frames: k.stageFrames, line: VIPERF.report().split('\n').find(l => /^viewport (Cash|Precious|house)/.test(l)) }; });
+    const k = await p2.evaluate(() => { const k = VIPERF.snapshot(), V = V3.cash; V.r.info.autoReset = true; V.r.render(V.sc, V.cam); return { viewport: k.viewport, frames: k.stageFrames, calls: k.stageCalls, tris: k.stageTris, real: [V.r.info.render.calls, V.r.info.render.triangles], line: VIPERF.report().split('\n').find(l => /^viewport (Cash|Precious|house)/.test(l)) }; });
     ok(k.viewport === 'Cash and savings coins' && k.frames > 0 && /Cash and savings/.test(k.line || ''), 'the ?perf=1 overlay names the stage on screen and counts its frames (' + k.line + ')');
+    // v0.9.2 (CoS, 4 Nov): the overlay also reads out the stage's draws and triangles, the same numbers the renderer counts, so the owner can check on his phone
+    ok(k.calls === k.real[0] && k.tris === k.real[1] && /draws \d+ · triangles [\d,]+/.test(k.line || ''), 'the ?perf=1 overlay shows the stage\'s draws and triangles (' + k.calls + ' / ' + k.tris + '; renderer ' + k.real.join(' / ') + ')');
     await p2.evaluate(() => localStorage.removeItem('vi-perf')); await p2.close(); }
   ok(!errs.length, 'no page errors ' + errs.slice(0, 2).join(' | '));
   await b.close();

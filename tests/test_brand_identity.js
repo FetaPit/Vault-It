@@ -30,7 +30,7 @@ ok(mj.name === 'Vault-It' && mj.description === TAG && mj.icons.some(i => i.size
       return { wm: vis(wm) && !!wm.querySelector('.dot') && wm.textContent === 'VaultIt', fca: vis(fca), mark: (getComputedStyle(night).display !== 'none') !== (getComputedStyle(day).display !== 'none'), dayMark: getComputedStyle(day).display !== 'none', spin: getComputedStyle(document.querySelector('.vi-mark')).animationName };
     });
     ok(h.wm, theme + ': header shows the brick wordmark');
-    ok(h.mark && h.dayMark === (theme === 'light') && h.spin === 'none', theme + ': header mark is the ' + (theme === 'light' ? 'Daylight' : 'Night') + ' variant, still');
+    ok(h.mark && h.dayMark === false && h.spin === 'none', theme + ': header mark is the Night variant (the header bar is dark in Daylight too since v0.9.1 round 2, R26), still');
     ok(h.fca, theme + ': FCA line visible in the footer');
   }
   ok(errs.length === 0, 'no page errors ' + errs.join('|'));

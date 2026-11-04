@@ -42,10 +42,10 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   await p.evaluate(() => fireShowDetail(renderFIREroadmap._stages.nextIdx)); const bn = await p.evaluate(() => { const e = document.getElementById('fire-detail-inner'); return { shown: !document.getElementById('fire-block'), txt: e.innerText }; });
   ok(bn.shown && /already met/i.test(bn.txt) && /First Log/.test(bn.txt), 'the next stage panel names what is waiting on it: ' + bn.txt.replace(/\n/g, ' | ').slice(0, 120));
   // a locked-but-met stage says so in its detail panel
-  await p.evaluate(() => fireShowDetail(4));
+  await p.evaluate(() => fireShowDetail(renderFIREroadmap._stages.findIndex(s => s.key === 'buf500')));
   ok(/already meet this/i.test(await p.evaluate(() => document.getElementById('fire-detail-inner').innerText)), 'a met-but-locked stage explains it is waiting on First Log');
   // stage 2's tick is available even while it is locked
-  await p.evaluate(() => fireShowDetail(1));
+  await p.evaluate(() => fireShowDetail(renderFIREroadmap._stages.findIndex(s => s.key === 'mapDebts')));
   const d2 = await p.evaluate(() => ({ tick: !!document.querySelector('#fire-detail-inner input[type=checkbox]'), txt: document.getElementById('fire-detail-inner').innerText }));
   ok(d2.tick && /mapped every debt/i.test(d2.txt), 'Map Debts shows the “I’ve mapped every debt” tick box');
   // ── 3. one tap records the snapshot and unlocks stage 1; stage 2 still needs the tick (debts are listed, not confirmed)
@@ -64,9 +64,9 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
 
   // ── 5. skip the blocker (zero budget not done): later met stages unlock, skipped is not "achieved"
   const before = (await S()).done;
-  await p.evaluate(() => fireShowDetail(2));
+  await p.evaluate(() => fireShowDetail(renderFIREroadmap._stages.findIndex(s => s.key === 'zeroBudget')));
   ok(/skip it/i.test(await p.evaluate(() => document.getElementById('fire-detail-inner').innerText)), 'the blocking stage offers “skip it”');
-  await p.evaluate(() => fireShowDetail(5));
+  await p.evaluate(() => fireShowDetail(renderFIREroadmap._stages.findIndex(s => s.key === 'buf1k')));
   ok(!/skip it/i.test(await p.evaluate(() => document.getElementById('fire-detail-inner').innerText)), 'a stage that is not the blocker does not offer skip');
   await p.evaluate(() => fireSkip('zeroBudget')); r = await S();
   ok(r.skipped === 1 && r.done === before + 3 && r.doneKeys.includes('firstSaved') && r.doneKeys.includes('buf500') && r.doneKeys.includes('buf1k'), 'skipping Zero Budget unlocks the stages already met (' + r.doneKeys.join(',') + ')');
@@ -75,13 +75,13 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   await p.evaluate(() => fireUnskip('zeroBudget')); r = await S();
   ok(r.nextKey === 'zeroBudget' && r.skipped === 0, 'undo skip puts the stage back');
   // the skip needs an explicit confirmation in the panel
-  await p.evaluate(() => fireShowDetail(2, { skipAsk: true }));
+  await p.evaluate(() => fireShowDetail(renderFIREroadmap._stages.findIndex(s => s.key === 'zeroBudget'), { skipAsk: true }));
   ok(/Yes, skip it/.test(await p.evaluate(() => document.getElementById('fire-detail-inner').innerText)), 'skip asks for confirmation first');
 
   // ── 6. no debts at all: “I don’t have any debts”
   await reset(); await p.evaluate(() => fireLogSnapshot());
   r = await S(); ok(r.nextKey === 'mapDebts', 'no debts listed: Map Debts waits');
-  await p.evaluate(() => fireShowDetail(1));
+  await p.evaluate(() => fireShowDetail(renderFIREroadmap._stages.findIndex(s => s.key === 'mapDebts')));
   ok(/don’t have any debts/i.test(await p.evaluate(() => document.getElementById('fire-detail-inner').innerText)), 'with no debts the tick reads “I don’t have any debts”');
   await p.evaluate(() => fireTick('noDebt', true)); r = await S();
   ok(r.doneKeys.includes('mapDebts') && r.doneKeys.includes('firstCut') === false, 'no-debt tick completes Map Debts');
@@ -137,7 +137,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   const g = await p.evaluate(() => { const sv = document.getElementById('fire-roadmap-svg'); return { nodes: sv.querySelectorAll('*').length, filters: sv.querySelectorAll('filter').length, anims: sv.querySelectorAll('animate').length, w: sv.getBoundingClientRect().width, track: document.getElementById('fire-track').offsetWidth }; });
   ok(g.nodes < 540 && g.filters === 0 && g.anims === 0, 'roadmap SVG is light: ' + g.nodes + ' elements, ' + g.filters + ' filters, ' + g.anims + ' animations');
   ok(g.w < g.track * 0.6 && g.track > 3000, 'only a window is drawn (' + Math.round(g.w) + 'px of a ' + g.track + 'px track)');
-  await p.evaluate(() => { document.getElementById('fire-timeline-scroll').scrollLeft = 2600; }); await p.waitForTimeout(400);
+  await p.evaluate(() => { document.getElementById('fire-timeline-scroll').scrollLeft = renderFIREroadmap._stages.findIndex(s => s.key === 'coastFI') * FIRE_NODE - 300; }); await p.waitForTimeout(400);
   const far = await p.evaluate(() => { const sv = document.getElementById('fire-roadmap-svg'); return { left: parseFloat(sv.style.left), txt: sv.textContent }; });
   ok(far.left > 1500 && /Mortgage Free|£100k|Coast FI/.test(far.txt) && !/First Log/.test(far.txt), 'scrolling far right redraws the window there (starts at x=' + far.left + ')');
   await p.evaluate(() => { document.getElementById('fire-timeline-scroll').scrollLeft = 0; }); await p.waitForTimeout(400);
@@ -162,13 +162,13 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   // ── coins (owner, 31 Oct): the rail runs between the coins, the stage to work on is the largest, phones get a carousel
   await p.evaluate(() => { renderFIREroadmap(); const SC = document.getElementById('fire-timeline-scroll'), st = renderFIREroadmap._stages; SC.scrollLeft = Math.max(0, st.nextIdx * FIRE_NODE + FIRE_LEFT - SC.clientWidth / 2); renderFIREroadmap(); fireCarousel(); }); await p.waitForTimeout(400);
   const coins = await p.evaluate(() => { const svg = document.getElementById('fire-roadmap-svg'), SC = document.getElementById('fire-timeline-scroll'), st = renderFIREroadmap._stages;
-    const gs = [...svg.querySelectorAll('g.fire-coin')]; const faces = gs.map(g => { const c = [...g.querySelectorAll('circle')].filter(x => x.getAttribute('fill') === '#071018')[0]; return { i: +g.dataset.i, cx: +c.getAttribute('cx'), r: +c.getAttribute('r'), next: g.classList.contains('next'), sc: g.style.transform }; });
-    const rails = [...svg.querySelectorAll(':scope > line')].filter(l => l.getAttribute('y1') === '148' && l.getAttribute('y2') === '148').map(l => [+l.getAttribute('x1'), +l.getAttribute('x2')]);
+    const gs = [...svg.querySelectorAll('g.fire-coin')]; const faces = gs.map(g => { const c = g.querySelector('.fire-face'); return { i: +g.dataset.i, cx: +g.dataset.cx, r: +c.getAttribute('data-r'), next: g.classList.contains('next'), sc: g.style.transform }; });
+    const rails = [...svg.querySelectorAll('line.fire-rail')].map(l => [+l.getAttribute('x1'), +l.getAttribute('x2')]);
     const crosses = rails.some(([a, b]) => faces.some(f => f.cx > a && f.cx < b));
     const mid = SC.scrollLeft + SC.clientWidth / 2, near = faces.slice().sort((p, q) => Math.abs(p.cx - mid) - Math.abs(q.cx - mid));
     const sc = t => +(t.match(/scale\(([\d.]+)\)/) || [0, 1])[1];
     return { n: gs.length, nextR: (faces.find(f => f.next) || {}).r, otherR: (faces.find(f => !f.next) || {}).r, rails: rails.length, crosses, centred: near[0].i === Math.max(0, Math.min(st.length - 1, Math.round((mid - FIRE_LEFT) / FIRE_NODE))), centreScale: sc(near[0].sc), edgeScale: sc(near[near.length - 1].sc) }; });
-  ok(coins.n > 3 && coins.nextR === 30 && coins.otherR === 22, 'coins drawn; the stage to work on is the largest (r 30 vs 22)');
+  ok(coins.n > 3 && coins.nextR === 40 && coins.otherR === 32, 'tokens drawn; the stage to work on is the largest (80 px vs 64 px)');
   ok(coins.rails > 2 && !coins.crosses, 'the rail runs between the coins, never through one (' + coins.rails + ' segments)');
   ok(coins.centred && coins.centreScale > coins.edgeScale && coins.centreScale > 1.1, 'phone carousel: the current stage sits in the centre, largest, the edges shrink (' + coins.centreScale + ' vs ' + coins.edgeScale + ')');
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED');

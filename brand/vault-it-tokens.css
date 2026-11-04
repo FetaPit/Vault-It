@@ -29,7 +29,7 @@ html{box-sizing:border-box}
 /* Daylight text values darkened (phase 6) so small text reaches 4.5:1 on paper and on tinted chips; same hues. */
 [data-theme="light"]{
   color-scheme:light;
-  --bg:#C9C7BE; --panel:#DAD8D0; --panel2:#CDD3CE; --slate:#C6CFCA; --line:#AFC2BE; --line2:#8FAFAB;
+  --bg:#D3CCB4; --panel:#DAD8D0; --panel2:#CDD3CE; --slate:#C6CFCA; --line:#AFC2BE; --line2:#8FAFAB;
   --text:#0B1F22; --muted:#3A5052; --faint:#215451; --lock:#39433F;
   --teal:#185550; --teal-deep:#005652; --gold:#60480B; --brass:#5B4A19;
   --green:#135738; --green2:#1C563E; --red:#951919; --blue:#054E88; --purple:#583F81; --orange:#773C11;

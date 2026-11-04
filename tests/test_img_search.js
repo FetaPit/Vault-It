@@ -5,9 +5,10 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
 (async () => {
   const b = await chromium.launch(); const errs = []; const ctx = await b.newContext({ viewport: { width: 390, height: 844 } }); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-  let mode = 'ok', lastQ = '';
-  await p.route('https://api.openverse.org/**', r => {
+  let mode = 'ok', lastQ = '', delay = 0;
+  await p.route('https://api.openverse.org/**', async r => {
     const u = new URL(r.request().url());
+    if (delay && !u.pathname.endsWith('/thumb/')) await new Promise(res => setTimeout(res, delay));
     if (u.pathname.endsWith('/thumb/')) return r.fulfill({ status: 200, contentType: 'image/png', body: PNG });
     lastQ = u.searchParams.get('q');
     if (mode === 'busy') return r.fulfill({ status: 429, body: '{}', headers: { 'access-control-allow-origin': '*' } });
@@ -33,6 +34,31 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
     ok(re.test(await p.evaluate(() => document.getElementById('wi-search-res-11').textContent)), label + ' is explained');
     await p.evaluate(() => { document.querySelector('.wi-search-modal').remove(); document.querySelector('.wi-icon-overlay').remove(); });
   }
+  // v0.9.1 E31: a spinner shows from the moment a search starts until results or the error appear; the result area keeps its height
+  const state = (id = 11) => p.evaluate(id => { const r = document.getElementById('wi-search-res-' + id), b = r.querySelector('.wi-search-busy'), sp = r.querySelector('.wi-spin'); return { busy: !!b, label: b ? b.textContent.trim() : '', fs: b ? parseFloat(getComputedStyle(b).fontSize) : 0, anim: sp ? getComputedStyle(sp).animationName : null, shown: sp ? getComputedStyle(sp).display !== 'none' : false, h: Math.round(r.getBoundingClientRect().height), imgs: r.querySelectorAll('img').length, aria: b ? b.getAttribute('role') : null }; }, id);
+  for (const [open, run, id, who] of [['wiSearch', 'wiDoSearch', 11, 'Wealth inventory'], ['liabSearch', 'liabDoSearch', 21, 'Liabilities']])
+  for (const [m, label] of [['ok', 'results'], ['none', 'no photos'], ['down', 'failure']]) {
+    mode = m; delay = 900; await p.waitForTimeout(1200); await p.evaluate(([o, id]) => window[o](id), [open, id]); await p.fill('#wi-search-inp', 'guitar');
+    const h0 = (await state(id)).h;
+    await p.evaluate(([r, id]) => window[r](id), [run, id]); await p.waitForTimeout(250);
+    const during = await state(id);
+    ok(during.busy && /Searching/.test(during.label) && during.shown && during.anim === 'wi-spin' && during.aria === 'status', who + ': spinner and "Searching…" show while the photo library is being asked (' + label + ')');
+    ok(during.fs >= 10.5, who + ': the label is at least 10.5 px (' + during.fs + ')');
+    await p.waitForTimeout(1300);
+    const after = await state(id);
+    ok(!after.busy && (m !== 'ok' || after.imgs === 3), who + ': spinner is gone once the ' + label + ' arrive' + (m === 'ok' ? ' with 3 photos' : ''));
+    ok(h0 === during.h && during.h === after.h, who + ': the result area keeps its height (' + h0 + ' > ' + during.h + ' > ' + after.h + ')');
+    await p.evaluate(() => { document.querySelector('.wi-search-modal').remove(); document.querySelector('.wi-icon-overlay').remove(); });
+  }
+  delay = 0; mode = 'ok';
+  const ctx2 = await b.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' }); const p2 = await ctx2.newPage();
+  await p2.route('https://api.openverse.org/**', async r => { await new Promise(res => setTimeout(res, 800)); r.fulfill({ status: 200, contentType: 'application/json', body: '{"results":[]}', headers: { 'access-control-allow-origin': '*' } }); });
+  await p2.addInitScript(() => { localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' })); localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' })); localStorage.setItem('pos_al1', JSON.stringify({ cashAccounts: [], otherAssets: [{ id: 11, name: 'Gibson Les Paul', value: 2200 }], liabilities: [], stocks: [] })); });
+  await p2.goto('file:///home/user/Vault-It/index.html'); await p2.waitForTimeout(1500);
+  await p2.evaluate(() => { wiSearch(11); document.getElementById('wi-search-inp').value = 'guitar'; wiDoSearch(11); }); await p2.waitForTimeout(250);
+  const rm = await p2.evaluate(() => { const r = document.getElementById('wi-search-res-11'), b = r.querySelector('.wi-search-busy'), sp = r.querySelector('.wi-spin'); return { label: b ? b.textContent.trim() : '', fs: b ? parseFloat(getComputedStyle(b).fontSize) : 0, spin: sp ? getComputedStyle(sp).display : null, anim: sp ? getComputedStyle(sp).animationName : null }; });
+  ok(/Searching/.test(rm.label) && rm.fs >= 10.5 && rm.spin === 'none' && rm.anim === 'none', 'reduced motion: a static "Searching…" label, no spinning ring (' + JSON.stringify(rm) + ')');
+  await ctx2.close();
   ok(errs.length === 0, 'no page errors ' + errs.join('|'));
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED'); process.exit(fails ? 1 : 0);
 })();

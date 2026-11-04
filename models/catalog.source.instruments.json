@@ -1,0 +1,1885 @@
+{
+ "generated": "2026-11-03T14:55:51.889Z",
+ "source": "https://poly.pizza",
+ "set": "instruments",
+ "maxTris": 20000,
+ "found": 55,
+ "standins": 41,
+ "misses": [
+  {
+   "rank": 3,
+   "item": "Fender Telecaster",
+   "terms": [
+    "fender telecaster",
+    "telecaster",
+    "electric guitar",
+    "guitar"
+   ],
+   "reason": "rejected on review (Acoustic guitar)"
+  },
+  {
+   "rank": 7,
+   "item": "Gibson Explorer",
+   "terms": [
+    "gibson explorer",
+    "explorer guitar",
+    "electric guitar"
+   ],
+   "reason": "rejected on review (Stereo Electric Guitar Effects)"
+  },
+  {
+   "rank": 8,
+   "item": "PRS Custom 24",
+   "terms": [
+    "prs custom 24",
+    "prs guitar",
+    "paul reed smith",
+    "electric guitar"
+   ],
+   "reason": "rejected on review (Electric Guitar Effects Pedal)"
+  },
+  {
+   "rank": 9,
+   "item": "Ibanez RG",
+   "terms": [
+    "ibanez rg",
+    "ibanez jem",
+    "ibanez",
+    "electric guitar",
+    "metal guitar"
+   ],
+   "reason": "rejected on review (Bass Guitar)"
+  },
+  {
+   "rank": 10,
+   "item": "Fender Jazzmaster",
+   "terms": [
+    "fender jazzmaster",
+    "jazzmaster",
+    "fender jaguar",
+    "electric guitar",
+    "offset guitar"
+   ],
+   "reason": "rejected on review (Guitar Amp)"
+  },
+  {
+   "rank": 11,
+   "item": "Rickenbacker 330",
+   "terms": [
+    "rickenbacker",
+    "rickenbacker 360",
+    "rickenbacker 4003",
+    "electric guitar"
+   ],
+   "reason": "rejected on review (Guitar pick)"
+  },
+  {
+   "rank": 14,
+   "item": "Squier Stratocaster",
+   "terms": [
+    "squier stratocaster",
+    "squier strat",
+    "squier",
+    "electric guitar",
+    "beginner guitar"
+   ],
+   "reason": "rejected on review (Acoustic Guitar)"
+  },
+  {
+   "rank": 17,
+   "item": "Gibson J-45",
+   "terms": [
+    "gibson j-45",
+    "gibson j45",
+    "gibson hummingbird",
+    "acoustic guitar"
+   ],
+   "reason": "rejected on review (Guitar pick)"
+  },
+  {
+   "rank": 18,
+   "item": "Yamaha FG800",
+   "terms": [
+    "yamaha fg800",
+    "yamaha acoustic",
+    "yamaha fg",
+    "acoustic guitar"
+   ]
+  },
+  {
+   "rank": 19,
+   "item": "Guild D-55",
+   "terms": [
+    "guild d-55",
+    "guild guitar",
+    "acoustic guitar"
+   ]
+  },
+  {
+   "rank": 20,
+   "item": "Ovation Celebrity",
+   "terms": [
+    "ovation guitar",
+    "ovation celebrity",
+    "acoustic guitar",
+    "round back guitar"
+   ]
+  },
+  {
+   "rank": 21,
+   "item": "Classical guitar (Yamaha C40)",
+   "terms": [
+    "classical guitar",
+    "nylon string guitar",
+    "spanish guitar",
+    "acoustic guitar"
+   ]
+  },
+  {
+   "rank": 22,
+   "item": "Ukulele (Kala)",
+   "terms": [
+    "ukulele",
+    "kala ukulele",
+    "small guitar",
+    "guitar"
+   ],
+   "reason": "rejected on review (Electric Guitar Effects Pedal)"
+  },
+  {
+   "rank": 23,
+   "item": "Banjo",
+   "terms": [
+    "banjo"
+   ]
+  },
+  {
+   "rank": 24,
+   "item": "Mandolin",
+   "terms": [
+    "mandolin"
+   ]
+  },
+  {
+   "rank": 25,
+   "item": "Fender Precision Bass",
+   "terms": [
+    "fender precision bass",
+    "precision bass",
+    "p bass",
+    "bass guitar",
+    "electric bass"
+   ],
+   "reason": "rejected on review (Bass Speakers)"
+  },
+  {
+   "rank": 26,
+   "item": "Fender Jazz Bass",
+   "terms": [
+    "fender jazz bass",
+    "jazz bass",
+    "bass guitar",
+    "electric bass"
+   ],
+   "reason": "rejected on review (Bass Violin)"
+  },
+  {
+   "rank": 27,
+   "item": "Hofner Violin Bass",
+   "terms": [
+    "hofner violin bass",
+    "hofner bass",
+    "beatle bass",
+    "bass guitar",
+    "violin bass"
+   ],
+   "reason": "rejected on review (Wah Wah Electric Guitar Pedal)"
+  },
+  {
+   "rank": 28,
+   "item": "Music Man StingRay",
+   "terms": [
+    "music man stingray",
+    "stingray bass",
+    "bass guitar"
+   ]
+  },
+  {
+   "rank": 29,
+   "item": "Upright double bass",
+   "terms": [
+    "double bass",
+    "upright bass",
+    "contrabass"
+   ]
+  },
+  {
+   "rank": 37,
+   "item": "Roland Juno-106",
+   "terms": [
+    "roland juno-106",
+    "roland juno",
+    "juno 106",
+    "synthesizer",
+    "analog synth"
+   ],
+   "reason": "rejected on review (Synth brick)"
+  },
+  {
+   "rank": 38,
+   "item": "Roland Jupiter-8",
+   "terms": [
+    "roland jupiter-8",
+    "roland jupiter",
+    "synthesizer"
+   ]
+  },
+  {
+   "rank": 40,
+   "item": "Roland TB-303",
+   "terms": [
+    "roland tb-303",
+    "tb-303",
+    "303 bass",
+    "bass synthesizer",
+    "synthesizer"
+   ]
+  },
+  {
+   "rank": 43,
+   "item": "Korg MS-20",
+   "terms": [
+    "korg ms-20",
+    "korg ms20",
+    "analog synth",
+    "synthesizer"
+   ]
+  },
+  {
+   "rank": 45,
+   "item": "Moog Minimoog",
+   "terms": [
+    "minimoog",
+    "moog minimoog",
+    "moog synthesizer",
+    "moog",
+    "analog synth",
+    "synthesizer"
+   ]
+  },
+  {
+   "rank": 46,
+   "item": "Moog Subsequent 37",
+   "terms": [
+    "moog subsequent",
+    "moog grandmother",
+    "moog",
+    "analog synth",
+    "synthesizer"
+   ]
+  },
+  {
+   "rank": 47,
+   "item": "Sequential Prophet-5",
+   "terms": [
+    "prophet-5",
+    "sequential prophet",
+    "prophet 5",
+    "analog synth",
+    "synthesizer"
+   ]
+  },
+  {
+   "rank": 48,
+   "item": "Yamaha DX7",
+   "terms": [
+    "yamaha dx7",
+    "dx7",
+    "synthesizer",
+    "fm synth"
+   ]
+  },
+  {
+   "rank": 49,
+   "item": "Hammond B3 organ",
+   "terms": [
+    "hammond b3",
+    "hammond organ",
+    "organ",
+    "electric organ"
+   ],
+   "reason": "rejected on review (Street Organ)"
+  },
+  {
+   "rank": 56,
+   "item": "Ludwig Classic Maple",
+   "terms": [
+    "ludwig drums",
+    "ludwig classic maple",
+    "ludwig",
+    "drum kit",
+    "drums"
+   ],
+   "reason": "rejected on review (Drumstick)"
+  },
+  {
+   "rank": 61,
+   "item": "Snare drum",
+   "terms": [
+    "snare drum",
+    "ludwig supraphonic",
+    "snare",
+    "drum"
+   ],
+   "reason": "rejected on review (Drum sticks)"
+  },
+  {
+   "rank": 67,
+   "item": "Alto saxophone (Yamaha)",
+   "terms": [
+    "alto saxophone",
+    "yamaha saxophone",
+    "alto sax",
+    "saxophone"
+   ]
+  },
+  {
+   "rank": 69,
+   "item": "Trombone",
+   "terms": [
+    "trombone",
+    "slide trombone"
+   ]
+  },
+  {
+   "rank": 70,
+   "item": "French horn",
+   "terms": [
+    "french horn",
+    "horn"
+   ],
+   "reason": "rejected on review (Bullhorn)"
+  },
+  {
+   "rank": 71,
+   "item": "Tuba",
+   "terms": [
+    "tuba",
+    "sousaphone",
+    "euphonium"
+   ]
+  },
+  {
+   "rank": 73,
+   "item": "Clarinet (Buffet)",
+   "terms": [
+    "clarinet",
+    "buffet clarinet",
+    "woodwind"
+   ]
+  },
+  {
+   "rank": 75,
+   "item": "Oboe",
+   "terms": [
+    "oboe",
+    "bassoon",
+    "woodwind"
+   ]
+  },
+  {
+   "rank": 77,
+   "item": "Recorder",
+   "terms": [
+    "recorder",
+    "tin whistle",
+    "penny whistle",
+    "flute"
+   ],
+   "reason": "rejected on review (Reel to Reel Tape Recorder)"
+  },
+  {
+   "rank": 78,
+   "item": "Bagpipes",
+   "terms": [
+    "bagpipes",
+    "bagpipe",
+    "highland pipes"
+   ]
+  },
+  {
+   "rank": 82,
+   "item": "Cello",
+   "terms": [
+    "cello"
+   ]
+  },
+  {
+   "rank": 84,
+   "item": "Electric violin",
+   "terms": [
+    "electric violin",
+    "yamaha silent violin",
+    "violin"
+   ]
+  },
+  {
+   "rank": 89,
+   "item": "Mixing desk (Neve)",
+   "terms": [
+    "neve console",
+    "mixing console",
+    "mixing desk",
+    "mixer",
+    "audio mixer"
+   ],
+   "reason": "rejected on review (Portable Studio Audio Recorder)"
+  },
+  {
+   "rank": 95,
+   "item": "Vox AC30",
+   "terms": [
+    "vox ac30",
+    "vox amp",
+    "guitar amp",
+    "amplifier"
+   ]
+  },
+  {
+   "rank": 96,
+   "item": "Orange amp",
+   "terms": [
+    "orange amp",
+    "orange rockerverb",
+    "orange cabinet",
+    "guitar amp",
+    "amplifier"
+   ]
+  },
+  {
+   "rank": 98,
+   "item": "Pedalboard",
+   "terms": [
+    "pedalboard",
+    "pedal board",
+    "guitar pedal"
+   ]
+  }
+ ],
+ "models": [
+  {
+   "set": "instruments",
+   "rank": 1,
+   "item": "Fender Stratocaster",
+   "slug": "instruments-fender-stratocaster",
+   "kind": "Electric guitar",
+   "group": "instruments",
+   "query": "guitar",
+   "standin": true,
+   "standinFor": "Fender Stratocaster",
+   "match": "stand-in",
+   "id": "5Fp8gpomrb",
+   "title": "Guitar",
+   "licence": "CC0 1.0",
+   "attribution": "\"Guitar\" by Quaternius, https://poly.pizza/m/5Fp8gpomrb. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 2325,
+   "tags": [
+    "Guitar",
+    "Musical Instrument",
+    "Electric Guitar"
+   ],
+   "download": "https://static.poly.pizza/7a272c92-3d46-483d-bf42-ff2c20851a2c.glb",
+   "thumbnail": "https://static.poly.pizza/7a272c92-3d46-483d-bf42-ff2c20851a2c.webp",
+   "source": "https://poly.pizza/m/5Fp8gpomrb"
+  },
+  {
+   "set": "instruments",
+   "rank": 2,
+   "item": "Gibson Les Paul",
+   "slug": "instruments-gibson-les-paul",
+   "kind": "Electric guitar",
+   "group": "instruments",
+   "query": "guitar",
+   "standin": true,
+   "standinFor": "Gibson Les Paul",
+   "match": "stand-in",
+   "id": "HIyVF2jsHR",
+   "title": "Guitar",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Guitar\" by Zsky, https://poly.pizza/m/HIyVF2jsHR. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Zsky",
+   "tris": 1170,
+   "tags": [
+    "Guitar",
+    "Musical Instrument"
+   ],
+   "download": "https://static.poly.pizza/f43e2fc1-ef2f-4e65-acea-588d27c034bd.glb",
+   "thumbnail": "https://static.poly.pizza/f43e2fc1-ef2f-4e65-acea-588d27c034bd.webp",
+   "source": "https://poly.pizza/m/HIyVF2jsHR"
+  },
+  {
+   "set": "instruments",
+   "rank": 4,
+   "item": "Gibson SG",
+   "slug": "instruments-gibson-sg",
+   "kind": "Electric guitar",
+   "group": "instruments",
+   "query": "guitar",
+   "standin": true,
+   "standinFor": "Gibson SG",
+   "match": "stand-in",
+   "id": "kcTMv1yFhr",
+   "title": "Guitar",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Guitar\" by burunduk, https://poly.pizza/m/kcTMv1yFhr. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "burunduk",
+   "tris": 608,
+   "tags": [
+    "Guitar",
+    "Musical Instrument",
+    "Bass Guitar"
+   ],
+   "download": "https://static.poly.pizza/8ec90d6a-8657-4300-9a28-8cb8e9c4e20d.glb",
+   "thumbnail": "https://static.poly.pizza/8ec90d6a-8657-4300-9a28-8cb8e9c4e20d.webp",
+   "source": "https://poly.pizza/m/kcTMv1yFhr"
+  },
+  {
+   "set": "instruments",
+   "rank": 5,
+   "item": "Gibson ES-335",
+   "slug": "instruments-gibson-es-335",
+   "kind": "Electric guitar",
+   "group": "instruments",
+   "query": "electric guitar",
+   "standin": true,
+   "standinFor": "Gibson ES-335",
+   "match": "stand-in",
+   "id": "eoSib2-NN9Y",
+   "title": "Electric guitar",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Electric guitar\" by Poly by Google, https://poly.pizza/m/eoSib2-NN9Y. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 560,
+   "tags": [
+    "string",
+    "instrument",
+    "music\n"
+   ],
+   "download": "https://static.poly.pizza/9e2f770a-9e38-4763-ab8b-fc6a6ec4e166.glb",
+   "thumbnail": "https://static.poly.pizza/9e2f770a-9e38-4763-ab8b-fc6a6ec4e166.webp",
+   "source": "https://poly.pizza/m/eoSib2-NN9Y"
+  },
+  {
+   "set": "instruments",
+   "rank": 6,
+   "item": "Gibson Flying V",
+   "slug": "instruments-gibson-flying-v",
+   "kind": "Electric guitar",
+   "group": "instruments",
+   "query": "electric guitar",
+   "standin": true,
+   "standinFor": "Gibson Flying V",
+   "match": "stand-in",
+   "id": "0hg94uOO-sS",
+   "title": "Electric guitar",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Electric guitar\" by jeremy, https://poly.pizza/m/0hg94uOO-sS. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "jeremy",
+   "tris": 996,
+   "tags": [
+    "Guitar",
+    "Instrument",
+    "Music"
+   ],
+   "download": "https://static.poly.pizza/6e20ad06-f528-41d5-a233-22d49b963858.glb",
+   "thumbnail": "https://static.poly.pizza/6e20ad06-f528-41d5-a233-22d49b963858.webp",
+   "source": "https://poly.pizza/m/0hg94uOO-sS"
+  },
+  {
+   "set": "instruments",
+   "rank": 12,
+   "item": "Gretsch White Falcon",
+   "slug": "instruments-gretsch-white-falcon",
+   "kind": "Electric guitar",
+   "group": "instruments",
+   "query": "hollow body guitar",
+   "standin": true,
+   "standinFor": "Gretsch White Falcon",
+   "match": "stand-in",
+   "id": "elRGCxnNOsb",
+   "title": "guitar",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"guitar\" by thomas kempa, https://poly.pizza/m/elRGCxnNOsb. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "thomas kempa",
+   "tris": 588,
+   "tags": [
+    "bass",
+    "instrument",
+    "knot"
+   ],
+   "download": "https://static.poly.pizza/2d768a9c-df7b-472d-b3d2-69782b9b4f41.glb",
+   "thumbnail": "https://static.poly.pizza/2d768a9c-df7b-472d-b3d2-69782b9b4f41.webp",
+   "source": "https://poly.pizza/m/elRGCxnNOsb"
+  },
+  {
+   "set": "instruments",
+   "rank": 13,
+   "item": "Epiphone Casino",
+   "slug": "instruments-epiphone-casino",
+   "kind": "Electric guitar",
+   "group": "instruments",
+   "query": "hollow body guitar",
+   "standin": true,
+   "standinFor": "Epiphone Casino",
+   "match": "stand-in",
+   "id": "kcGY8EfXDO",
+   "title": "Guitar",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Guitar\" by nudtanunStudent, https://poly.pizza/m/kcGY8EfXDO. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "nudtanunStudent",
+   "tris": 9126,
+   "tags": [
+    "guitar",
+    "instrument"
+   ],
+   "download": "https://static.poly.pizza/f9b41d87-0b6d-4de7-8bbe-3b1c42de076c.glb",
+   "thumbnail": "https://static.poly.pizza/f9b41d87-0b6d-4de7-8bbe-3b1c42de076c.webp",
+   "source": "https://poly.pizza/m/kcGY8EfXDO"
+  },
+  {
+   "set": "instruments",
+   "rank": 15,
+   "item": "Martin D-28",
+   "slug": "instruments-martin-d-28",
+   "kind": "Acoustic guitar",
+   "group": "instruments",
+   "query": "acoustic guitar",
+   "standin": true,
+   "standinFor": "Martin D-28",
+   "match": "stand-in",
+   "id": "6T31WFHAZR",
+   "title": "Acoustic Guitar",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Acoustic Guitar\" by J-Toastie, https://poly.pizza/m/6T31WFHAZR. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "J-Toastie",
+   "tris": 11877,
+   "tags": [
+    "Guitar",
+    "Acoustic"
+   ],
+   "download": "https://static.poly.pizza/637134a8-29a0-4e63-ac46-5adfcd5e4f32.glb",
+   "thumbnail": "https://static.poly.pizza/637134a8-29a0-4e63-ac46-5adfcd5e4f32.webp",
+   "source": "https://poly.pizza/m/6T31WFHAZR"
+  },
+  {
+   "set": "instruments",
+   "rank": 16,
+   "item": "Taylor 814ce",
+   "slug": "instruments-taylor-814ce",
+   "kind": "Acoustic guitar",
+   "group": "instruments",
+   "query": "acoustic guitar",
+   "standin": true,
+   "standinFor": "Taylor 814ce",
+   "match": "stand-in",
+   "id": "ccd__UcZBye",
+   "title": "Acoustic guitar",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Acoustic guitar\" by Poly by Google, https://poly.pizza/m/ccd__UcZBye. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 12829,
+   "tags": [
+    "string",
+    "music",
+    "instrument\n"
+   ],
+   "download": "https://static.poly.pizza/f4a5abbf-f0ee-4761-84e0-c3d2987d7704.glb",
+   "thumbnail": "https://static.poly.pizza/f4a5abbf-f0ee-4761-84e0-c3d2987d7704.webp",
+   "source": "https://poly.pizza/m/ccd__UcZBye"
+  },
+  {
+   "set": "instruments",
+   "rank": 30,
+   "item": "Steinway grand piano",
+   "slug": "instruments-steinway-grand-piano",
+   "kind": "Piano",
+   "group": "instruments",
+   "query": "piano",
+   "standin": true,
+   "standinFor": "Steinway grand piano",
+   "match": "stand-in",
+   "id": "5vbJ5vildOq",
+   "title": "Piano",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Piano\" by Bruno Oliveira, https://poly.pizza/m/5vbJ5vildOq. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Bruno Oliveira",
+   "tris": 1576,
+   "tags": [
+    "grand piano"
+   ],
+   "download": "https://static.poly.pizza/40a2ba70-c3c0-49f3-931a-539f021609bb.glb",
+   "thumbnail": "https://static.poly.pizza/40a2ba70-c3c0-49f3-931a-539f021609bb.webp",
+   "source": "https://poly.pizza/m/5vbJ5vildOq"
+  },
+  {
+   "set": "instruments",
+   "rank": 31,
+   "item": "Yamaha upright piano",
+   "slug": "instruments-yamaha-upright-piano",
+   "kind": "Piano",
+   "group": "instruments",
+   "query": "piano",
+   "standin": true,
+   "standinFor": "Yamaha upright piano",
+   "match": "stand-in",
+   "id": "cqH2tjgBeTj",
+   "title": "Piano",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Piano\" by Armin Noroozi, https://poly.pizza/m/cqH2tjgBeTj. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Armin Noroozi",
+   "tris": 600,
+   "tags": [
+    "pianoforte",
+    "pianissimo",
+    "forte-piano"
+   ],
+   "download": "https://static.poly.pizza/9890cff0-8cdd-4e5b-958a-e63484b7f2da.glb",
+   "thumbnail": "https://static.poly.pizza/9890cff0-8cdd-4e5b-958a-e63484b7f2da.webp",
+   "source": "https://poly.pizza/m/cqH2tjgBeTj"
+  },
+  {
+   "set": "instruments",
+   "rank": 32,
+   "item": "Kawai grand piano",
+   "slug": "instruments-kawai-grand-piano",
+   "kind": "Piano",
+   "group": "instruments",
+   "query": "piano",
+   "standin": true,
+   "standinFor": "Kawai grand piano",
+   "match": "stand-in",
+   "id": "DcLRWpe0YV",
+   "title": "Piano",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Piano\" by daniele100, https://poly.pizza/m/DcLRWpe0YV. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "daniele100",
+   "tris": 1195,
+   "tags": [
+    "pianoforte",
+    "forte-piano",
+    "pianist",
+    "midi",
+    "midi controller",
+    "piano",
+    "music",
+    "electronic"
+   ],
+   "download": "https://static.poly.pizza/89169ac1-5705-494f-b5f9-1d826ef10565.glb",
+   "thumbnail": "https://static.poly.pizza/89169ac1-5705-494f-b5f9-1d826ef10565.webp",
+   "source": "https://poly.pizza/m/DcLRWpe0YV"
+  },
+  {
+   "set": "instruments",
+   "rank": 33,
+   "item": "Baby grand piano",
+   "slug": "instruments-baby-grand-piano",
+   "kind": "Piano",
+   "group": "instruments",
+   "query": "piano",
+   "standin": true,
+   "standinFor": "Baby grand piano",
+   "match": "stand-in",
+   "id": "7U-93vxPOER",
+   "title": "Piano",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Piano\" by jeremy, https://poly.pizza/m/7U-93vxPOER. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "jeremy",
+   "tris": 1936,
+   "tags": [
+    "instrument",
+    "music",
+    "keyboard"
+   ],
+   "download": "https://static.poly.pizza/c217645d-d51f-4b36-8237-7bffe0e49029.glb",
+   "thumbnail": "https://static.poly.pizza/c217645d-d51f-4b36-8237-7bffe0e49029.webp",
+   "source": "https://poly.pizza/m/7U-93vxPOER"
+  },
+  {
+   "set": "instruments",
+   "rank": 34,
+   "item": "Bechstein piano",
+   "slug": "instruments-bechstein-piano",
+   "kind": "Piano",
+   "group": "instruments",
+   "query": "piano",
+   "standin": true,
+   "standinFor": "Bechstein piano",
+   "match": "stand-in",
+   "id": "1YoE664mJTd",
+   "title": "Piano",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Piano\" by Poly by Google, https://poly.pizza/m/1YoE664mJTd. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 1264,
+   "tags": [
+    "instrument",
+    "keyboard",
+    "music"
+   ],
+   "download": "https://static.poly.pizza/475b3f98-4f4f-4cd6-9472-e5f8c04cf050.glb",
+   "thumbnail": "https://static.poly.pizza/475b3f98-4f4f-4cd6-9472-e5f8c04cf050.webp",
+   "source": "https://poly.pizza/m/1YoE664mJTd"
+  },
+  {
+   "set": "instruments",
+   "rank": 35,
+   "item": "Yamaha digital piano (P-125)",
+   "slug": "instruments-yamaha-digital-piano-p-125",
+   "kind": "Piano",
+   "group": "instruments",
+   "query": "keyboard",
+   "standin": true,
+   "standinFor": "Yamaha digital piano (P-125)",
+   "match": "stand-in",
+   "id": "3oFfQCSsUmQ",
+   "title": "Keyboard",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Keyboard\" by Poly by Google, https://poly.pizza/m/3oFfQCSsUmQ. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 1972,
+   "tags": [
+    "typing",
+    "input",
+    "computer"
+   ],
+   "download": "https://static.poly.pizza/8dc7a33e-9ed8-4e01-a7a1-b3717ac35c51.glb",
+   "thumbnail": "https://static.poly.pizza/8dc7a33e-9ed8-4e01-a7a1-b3717ac35c51.webp",
+   "source": "https://poly.pizza/m/3oFfQCSsUmQ"
+  },
+  {
+   "set": "instruments",
+   "rank": 36,
+   "item": "Yamaha Clavinova",
+   "slug": "instruments-yamaha-clavinova",
+   "kind": "Piano",
+   "group": "instruments",
+   "query": "piano",
+   "standin": true,
+   "standinFor": "Yamaha Clavinova",
+   "match": "stand-in",
+   "id": "akGT4Q8Zbwz",
+   "title": "Piano Keys",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Piano Keys\" by Ron Millar, https://poly.pizza/m/akGT4Q8Zbwz. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Ron Millar",
+   "tris": 576,
+   "tags": [
+    "ivory",
+    "ivories",
+    "keyboard"
+   ],
+   "download": "https://static.poly.pizza/b66111c5-4194-4b3b-8632-1c5360143915.glb",
+   "thumbnail": "https://static.poly.pizza/b66111c5-4194-4b3b-8632-1c5360143915.webp",
+   "source": "https://poly.pizza/m/akGT4Q8Zbwz"
+  },
+  {
+   "set": "instruments",
+   "rank": 39,
+   "item": "Roland TR-808",
+   "slug": "instruments-roland-tr-808",
+   "kind": "Keyboard",
+   "group": "instruments",
+   "query": "drum machine",
+   "standin": true,
+   "standinFor": "Roland TR-808",
+   "match": "stand-in",
+   "id": "dFVcqyAnPXE",
+   "title": "Drum Machine (without stand)",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Drum Machine (without stand)\" by Peter Simcoe, https://poly.pizza/m/dFVcqyAnPXE. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Peter Simcoe",
+   "tris": 1752,
+   "tags": [
+    "bowl",
+    "brake",
+    "lag"
+   ],
+   "download": "https://static.poly.pizza/1450e67b-d7ba-4cfb-bf16-c7679dc702ac.glb",
+   "thumbnail": "https://static.poly.pizza/1450e67b-d7ba-4cfb-bf16-c7679dc702ac.webp",
+   "source": "https://poly.pizza/m/dFVcqyAnPXE"
+  },
+  {
+   "set": "instruments",
+   "rank": 41,
+   "item": "Roland Fantom",
+   "slug": "instruments-roland-fantom",
+   "kind": "Keyboard",
+   "group": "instruments",
+   "query": "keyboard",
+   "standin": true,
+   "standinFor": "Roland Fantom",
+   "match": "stand-in",
+   "id": "fOy2zvPJAj-",
+   "title": "Keyboard",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Keyboard\" by Alex Safayan, https://poly.pizza/m/fOy2zvPJAj-. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Alex Safayan",
+   "tris": 612,
+   "tags": [
+    "keypad",
+    "piano",
+    "typing",
+    "computer"
+   ],
+   "download": "https://static.poly.pizza/1f6cf483-4859-4fda-a706-5bbeb005dd45.glb",
+   "thumbnail": "https://static.poly.pizza/1f6cf483-4859-4fda-a706-5bbeb005dd45.webp",
+   "source": "https://poly.pizza/m/fOy2zvPJAj-"
+  },
+  {
+   "set": "instruments",
+   "rank": 42,
+   "item": "Korg Kronos",
+   "slug": "instruments-korg-kronos",
+   "kind": "Keyboard",
+   "group": "instruments",
+   "query": "workstation keyboard",
+   "standin": true,
+   "standinFor": "Korg Kronos",
+   "match": "stand-in",
+   "id": "aPwr5p1dluw",
+   "title": "Keyboard",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Keyboard\" by Poly by Google, https://poly.pizza/m/aPwr5p1dluw. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 2224,
+   "tags": [
+    "input",
+    "computer"
+   ],
+   "download": "https://static.poly.pizza/b924dfb3-e914-4b88-bd2e-84860a9aad86.glb",
+   "thumbnail": "https://static.poly.pizza/b924dfb3-e914-4b88-bd2e-84860a9aad86.webp",
+   "source": "https://poly.pizza/m/aPwr5p1dluw"
+  },
+  {
+   "set": "instruments",
+   "rank": 44,
+   "item": "Nord Stage",
+   "slug": "instruments-nord-stage",
+   "kind": "Keyboard",
+   "group": "instruments",
+   "query": "keyboard",
+   "standin": true,
+   "standinFor": "Nord Stage",
+   "match": "stand-in",
+   "id": "4pzLbWshZ9m",
+   "title": "Keyboard",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Keyboard\" by Poly by Google, https://poly.pizza/m/4pzLbWshZ9m. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 2872,
+   "tags": [
+    "computer"
+   ],
+   "download": "https://static.poly.pizza/45d19ffe-c437-4ee1-9ac6-0361f35b45e8.glb",
+   "thumbnail": "https://static.poly.pizza/45d19ffe-c437-4ee1-9ac6-0361f35b45e8.webp",
+   "source": "https://poly.pizza/m/4pzLbWshZ9m"
+  },
+  {
+   "set": "instruments",
+   "rank": 50,
+   "item": "Fender Rhodes",
+   "slug": "instruments-fender-rhodes",
+   "kind": "Keyboard",
+   "group": "instruments",
+   "query": "keyboard",
+   "standin": true,
+   "standinFor": "Fender Rhodes",
+   "match": "stand-in",
+   "id": "1U29qLrhNs3",
+   "title": "Keyboard",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Keyboard\" by Poly by Google, https://poly.pizza/m/1U29qLrhNs3. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 828,
+   "tags": [
+    "computer",
+    "typing",
+    "accessory",
+    "equipment",
+    "typewriter"
+   ],
+   "download": "https://static.poly.pizza/c2aed932-ae6e-411c-9df1-5747d0e68474.glb",
+   "thumbnail": "https://static.poly.pizza/c2aed932-ae6e-411c-9df1-5747d0e68474.webp",
+   "source": "https://poly.pizza/m/1U29qLrhNs3"
+  },
+  {
+   "set": "instruments",
+   "rank": 51,
+   "item": "Mellotron",
+   "slug": "instruments-mellotron",
+   "kind": "Keyboard",
+   "group": "instruments",
+   "query": "keyboard",
+   "standin": true,
+   "standinFor": "Mellotron",
+   "match": "stand-in",
+   "id": "4GlTQkxc6DR",
+   "title": "Keyboard",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Keyboard\" by Poly by Google, https://poly.pizza/m/4GlTQkxc6DR. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 2557,
+   "tags": [
+    "computer",
+    "typing",
+    "typewriter"
+   ],
+   "download": "https://static.poly.pizza/26cf13b2-24db-4c54-920c-df7cc74c81a0.glb",
+   "thumbnail": "https://static.poly.pizza/26cf13b2-24db-4c54-920c-df7cc74c81a0.webp",
+   "source": "https://poly.pizza/m/4GlTQkxc6DR"
+  },
+  {
+   "set": "instruments",
+   "rank": 52,
+   "item": "Akai MPC",
+   "slug": "instruments-akai-mpc",
+   "kind": "Keyboard",
+   "group": "instruments",
+   "query": "drum machine",
+   "standin": true,
+   "standinFor": "Akai MPC",
+   "match": "stand-in",
+   "id": "eflBcV4gcIl",
+   "title": "Drum Machine 2",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Drum Machine 2\" by Peter Simcoe, https://poly.pizza/m/eflBcV4gcIl. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Peter Simcoe",
+   "tris": 1796,
+   "tags": [
+    "instrument",
+    "music"
+   ],
+   "download": "https://static.poly.pizza/650ad751-d8ac-4927-9b30-897d9b784ffa.glb",
+   "thumbnail": "https://static.poly.pizza/650ad751-d8ac-4927-9b30-897d9b784ffa.webp",
+   "source": "https://poly.pizza/m/eflBcV4gcIl"
+  },
+  {
+   "set": "instruments",
+   "rank": 53,
+   "item": "Ableton Push",
+   "slug": "instruments-ableton-push",
+   "kind": "Keyboard",
+   "group": "instruments",
+   "query": "midi controller",
+   "standin": true,
+   "match": "stand-in",
+   "id": "155LOgjwUy2",
+   "title": "Midi controller",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Midi controller\" by Gabriel Ibias, https://poly.pizza/m/155LOgjwUy2. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Gabriel Ibias",
+   "tris": 1112,
+   "tags": [
+    "piano"
+   ],
+   "download": "https://static.poly.pizza/aa6e638c-eb3e-4660-98c0-71b74ee1ed7d.glb",
+   "thumbnail": "https://static.poly.pizza/aa6e638c-eb3e-4660-98c0-71b74ee1ed7d.webp",
+   "source": "https://poly.pizza/m/155LOgjwUy2",
+   "standinFor": "Ableton Push"
+  },
+  {
+   "set": "instruments",
+   "rank": 54,
+   "item": "Pearl Export drum kit",
+   "slug": "instruments-pearl-export-drum-kit",
+   "kind": "Drums",
+   "group": "instruments",
+   "query": "drum kit",
+   "standin": true,
+   "standinFor": "Pearl Export drum kit",
+   "match": "stand-in",
+   "id": "4l5jRtpTec",
+   "title": "Drumkit",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Drumkit\" by J-Toastie, https://poly.pizza/m/4l5jRtpTec. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "J-Toastie",
+   "tris": 5222,
+   "tags": [
+    "Drumkit",
+    "Drum",
+    "Music",
+    "Instrument"
+   ],
+   "download": "https://static.poly.pizza/144c6d27-9e58-4102-8790-83d0d21140e9.glb",
+   "thumbnail": "https://static.poly.pizza/144c6d27-9e58-4102-8790-83d0d21140e9.webp",
+   "source": "https://poly.pizza/m/4l5jRtpTec"
+  },
+  {
+   "set": "instruments",
+   "rank": 55,
+   "item": "DW Collector's drum kit",
+   "slug": "instruments-dw-collector-s-drum-kit",
+   "kind": "Drums",
+   "group": "instruments",
+   "query": "drum kit",
+   "standin": true,
+   "standinFor": "DW Collector's drum kit",
+   "match": "stand-in",
+   "id": "1HvDgRF7fX",
+   "title": "Full Drum Kit",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Full Drum Kit\" by Batoski, https://poly.pizza/m/1HvDgRF7fX. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Batoski",
+   "tris": 9969,
+   "tags": [
+    "Drum",
+    "Music",
+    "Instrument",
+    "Drumkit",
+    "Cymbals"
+   ],
+   "download": "https://static.poly.pizza/75833e82-6e6b-4ca1-9caa-82b3d9c6b73e.glb",
+   "thumbnail": "https://static.poly.pizza/75833e82-6e6b-4ca1-9caa-82b3d9c6b73e.webp",
+   "source": "https://poly.pizza/m/1HvDgRF7fX"
+  },
+  {
+   "set": "instruments",
+   "rank": 57,
+   "item": "Yamaha Stage Custom drums",
+   "slug": "instruments-yamaha-stage-custom-drums",
+   "kind": "Drums",
+   "group": "instruments",
+   "query": "drum kit",
+   "standin": true,
+   "standinFor": "Yamaha Stage Custom drums",
+   "match": "stand-in",
+   "id": "7FCPjy-3xmz",
+   "title": "Drum Kit",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Drum Kit\" by smoj, https://poly.pizza/m/7FCPjy-3xmz. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "smoj",
+   "tris": 3776,
+   "tags": [
+    "snare",
+    "set",
+    "det"
+   ],
+   "download": "https://static.poly.pizza/56bea38d-cb46-43e2-976b-2ed5d0827ffe.glb",
+   "thumbnail": "https://static.poly.pizza/56bea38d-cb46-43e2-976b-2ed5d0827ffe.webp",
+   "source": "https://poly.pizza/m/7FCPjy-3xmz"
+  },
+  {
+   "set": "instruments",
+   "rank": 58,
+   "item": "Tama Starclassic",
+   "slug": "instruments-tama-starclassic",
+   "kind": "Drums",
+   "group": "instruments",
+   "query": "drum kit",
+   "standin": true,
+   "standinFor": "Tama Starclassic",
+   "match": "stand-in",
+   "id": "qWU9Q4flfQ",
+   "title": "Drum Set",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Drum Set\" by Zsky, https://poly.pizza/m/qWU9Q4flfQ. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Zsky",
+   "tris": 2940,
+   "tags": [
+    "Instrument",
+    "Drum kit",
+    "Drums"
+   ],
+   "download": "https://static.poly.pizza/3d9bbf5f-a7fd-4a6a-ad65-6a012ed6cd6e.glb",
+   "thumbnail": "https://static.poly.pizza/3d9bbf5f-a7fd-4a6a-ad65-6a012ed6cd6e.webp",
+   "source": "https://poly.pizza/m/qWU9Q4flfQ"
+  },
+  {
+   "set": "instruments",
+   "rank": 59,
+   "item": "Roland V-Drums",
+   "slug": "instruments-roland-v-drums",
+   "kind": "Drums",
+   "group": "instruments",
+   "query": "drum kit",
+   "standin": true,
+   "standinFor": "Roland V-Drums",
+   "match": "stand-in",
+   "id": "5Wp2emwd7xw",
+   "title": "Drum",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Drum\" by jeremy, https://poly.pizza/m/5Wp2emwd7xw. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "jeremy",
+   "tris": 720,
+   "tags": [
+    "percussion",
+    "music",
+    "instrument"
+   ],
+   "download": "https://static.poly.pizza/58bd1985-0f3e-47f3-8c36-c19f958eea74.glb",
+   "thumbnail": "https://static.poly.pizza/58bd1985-0f3e-47f3-8c36-c19f958eea74.webp",
+   "source": "https://poly.pizza/m/5Wp2emwd7xw"
+  },
+  {
+   "set": "instruments",
+   "rank": 60,
+   "item": "Zildjian cymbals",
+   "slug": "instruments-zildjian-cymbals",
+   "kind": "Drums",
+   "group": "instruments",
+   "query": "cymbal",
+   "standin": false,
+   "match": "direct",
+   "id": "f8SdBE98BXE",
+   "title": "Cymbal",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Cymbal\" by Poly by Google, https://poly.pizza/m/f8SdBE98BXE. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 1152,
+   "tags": [
+    "percussion",
+    "drum"
+   ],
+   "download": "https://static.poly.pizza/2d44ab30-ffe7-4ad4-8b5b-7f4ff66e1aac.glb",
+   "thumbnail": "https://static.poly.pizza/2d44ab30-ffe7-4ad4-8b5b-7f4ff66e1aac.webp",
+   "source": "https://poly.pizza/m/f8SdBE98BXE"
+  },
+  {
+   "set": "instruments",
+   "rank": 62,
+   "item": "Bongos and congas",
+   "slug": "instruments-bongos-and-congas",
+   "kind": "Percussion",
+   "group": "instruments",
+   "query": "bongo",
+   "standin": false,
+   "match": "direct",
+   "id": "4tAGfJTheb4",
+   "title": "Bongos",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Bongos\" by Poly by Google, https://poly.pizza/m/4tAGfJTheb4. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 2812,
+   "tags": [
+    "instrument",
+    "drums",
+    "music"
+   ],
+   "download": "https://static.poly.pizza/6ed37fd1-9424-4d1f-a364-86448635aef4.glb",
+   "thumbnail": "https://static.poly.pizza/6ed37fd1-9424-4d1f-a364-86448635aef4.webp",
+   "source": "https://poly.pizza/m/4tAGfJTheb4"
+  },
+  {
+   "set": "instruments",
+   "rank": 63,
+   "item": "Cajon",
+   "slug": "instruments-cajon",
+   "kind": "Percussion",
+   "group": "instruments",
+   "query": "drum",
+   "standin": true,
+   "standinFor": "Cajon",
+   "match": "stand-in",
+   "id": "c3RNKJflc4O",
+   "title": "Drum",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Drum\" by Poly by Google, https://poly.pizza/m/c3RNKJflc4O. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 2084,
+   "tags": [
+    "percussion",
+    "music",
+    "instrument"
+   ],
+   "download": "https://static.poly.pizza/b88b0f12-0d04-460d-875d-ef0f9821788f.glb",
+   "thumbnail": "https://static.poly.pizza/b88b0f12-0d04-460d-875d-ef0f9821788f.webp",
+   "source": "https://poly.pizza/m/c3RNKJflc4O"
+  },
+  {
+   "set": "instruments",
+   "rank": 64,
+   "item": "Tambourine",
+   "slug": "instruments-tambourine",
+   "kind": "Percussion",
+   "group": "instruments",
+   "query": "tambourine",
+   "standin": false,
+   "match": "direct",
+   "id": "caYGHrUMU2S",
+   "title": "Tambourine",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Tambourine\" by Poly by Google, https://poly.pizza/m/caYGHrUMU2S. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 118,
+   "tags": [
+    "instrument"
+   ],
+   "download": "https://static.poly.pizza/0b8291b7-caba-46cf-8a1a-5a790449ddcc.glb",
+   "thumbnail": "https://static.poly.pizza/0b8291b7-caba-46cf-8a1a-5a790449ddcc.webp",
+   "source": "https://poly.pizza/m/caYGHrUMU2S"
+  },
+  {
+   "set": "instruments",
+   "rank": 65,
+   "item": "Xylophone",
+   "slug": "instruments-xylophone",
+   "kind": "Percussion",
+   "group": "instruments",
+   "query": "xylophone",
+   "standin": false,
+   "match": "direct",
+   "id": "a-OYg3WVXfV",
+   "title": "Xylophone",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Xylophone\" by Daniel Melchior, https://poly.pizza/m/a-OYg3WVXfV. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Daniel Melchior",
+   "tris": 3448,
+   "tags": [
+    "marimba",
+    "glockenspiel",
+    "percussion instrument"
+   ],
+   "download": "https://static.poly.pizza/f3f55659-b705-4877-ae87-27a5426d4b3e.glb",
+   "thumbnail": "https://static.poly.pizza/f3f55659-b705-4877-ae87-27a5426d4b3e.webp",
+   "source": "https://poly.pizza/m/a-OYg3WVXfV"
+  },
+  {
+   "set": "instruments",
+   "rank": 66,
+   "item": "Tenor saxophone (Selmer)",
+   "slug": "instruments-tenor-saxophone-selmer",
+   "kind": "Wind",
+   "group": "instruments",
+   "query": "saxophone",
+   "standin": false,
+   "match": "direct",
+   "id": "6A2UAKdCNy7",
+   "title": "Saxophone",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Saxophone\" by jeremy, https://poly.pizza/m/6A2UAKdCNy7. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "jeremy",
+   "tris": 812,
+   "tags": [
+    "instrument",
+    "music"
+   ],
+   "download": "https://static.poly.pizza/27a428f2-ffb5-466e-87c5-5cb6e81b3ae4.glb",
+   "thumbnail": "https://static.poly.pizza/27a428f2-ffb5-466e-87c5-5cb6e81b3ae4.webp",
+   "source": "https://poly.pizza/m/6A2UAKdCNy7"
+  },
+  {
+   "set": "instruments",
+   "rank": 68,
+   "item": "Trumpet (Bach Stradivarius)",
+   "slug": "instruments-trumpet-bach-stradivarius",
+   "kind": "Brass",
+   "group": "instruments",
+   "query": "trumpet",
+   "standin": false,
+   "match": "direct",
+   "id": "dXISS4OsDQv",
+   "title": "Trumpet",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Trumpet\" by Anonymous, https://poly.pizza/m/dXISS4OsDQv. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Anonymous",
+   "tris": 720,
+   "tags": [
+    "cornet",
+    "horn",
+    "trumpeter",
+    "instrument"
+   ],
+   "download": "https://static.poly.pizza/ab6b474c-c49a-45f3-83cb-102f87dcf944.glb",
+   "thumbnail": "https://static.poly.pizza/ab6b474c-c49a-45f3-83cb-102f87dcf944.webp",
+   "source": "https://poly.pizza/m/dXISS4OsDQv"
+  },
+  {
+   "set": "instruments",
+   "rank": 72,
+   "item": "Cornet",
+   "slug": "instruments-cornet",
+   "kind": "Brass",
+   "group": "instruments",
+   "query": "trumpet",
+   "standin": true,
+   "standinFor": "Cornet",
+   "match": "stand-in",
+   "id": "dGWXRc1MVuC",
+   "title": "Trumpet",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Trumpet\" by BAS NEGGERS, https://poly.pizza/m/dGWXRc1MVuC. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "BAS NEGGERS",
+   "tris": 1482,
+   "tags": [
+    "horn",
+    "trumpeter"
+   ],
+   "download": "https://static.poly.pizza/8a7a465b-880f-4d53-bec0-c30121a6aaea.glb",
+   "thumbnail": "https://static.poly.pizza/8a7a465b-880f-4d53-bec0-c30121a6aaea.webp",
+   "source": "https://poly.pizza/m/dGWXRc1MVuC"
+  },
+  {
+   "set": "instruments",
+   "rank": 74,
+   "item": "Flute (Yamaha)",
+   "slug": "instruments-flute-yamaha",
+   "kind": "Wind",
+   "group": "instruments",
+   "query": "flute",
+   "standin": false,
+   "match": "direct",
+   "id": "xwXCysotkW",
+   "title": "Flute",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Flute\" by Zsky, https://poly.pizza/m/xwXCysotkW. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Zsky",
+   "tris": 368,
+   "tags": [
+    "Flute",
+    "Musical Instrument"
+   ],
+   "download": "https://static.poly.pizza/d4a4618d-91d2-4948-a8bf-6523337401a5.glb",
+   "thumbnail": "https://static.poly.pizza/d4a4618d-91d2-4948-a8bf-6523337401a5.webp",
+   "source": "https://poly.pizza/m/xwXCysotkW"
+  },
+  {
+   "set": "instruments",
+   "rank": 76,
+   "item": "Harmonica (Hohner)",
+   "slug": "instruments-harmonica-hohner",
+   "kind": "Wind",
+   "group": "instruments",
+   "query": "harmonica",
+   "standin": false,
+   "match": "direct",
+   "id": "8Aw334FnDZE",
+   "title": "Harmonica",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Harmonica\" by Poly by Google, https://poly.pizza/m/8Aw334FnDZE. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 968,
+   "tags": [
+    "harp",
+    "mouth harp",
+    "mouth organ"
+   ],
+   "download": "https://static.poly.pizza/e8f94a73-e848-428d-b847-6a966f867ecd.glb",
+   "thumbnail": "https://static.poly.pizza/e8f94a73-e848-428d-b847-6a966f867ecd.webp",
+   "source": "https://poly.pizza/m/8Aw334FnDZE"
+  },
+  {
+   "set": "instruments",
+   "rank": 79,
+   "item": "Accordion",
+   "slug": "instruments-accordion",
+   "kind": "Wind",
+   "group": "instruments",
+   "query": "concertina",
+   "standin": true,
+   "match": "stand-in",
+   "id": "c6xbxbD6iyQ",
+   "title": "Concertina",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Concertina\" by Don Carson, https://poly.pizza/m/c6xbxbD6iyQ. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Don Carson",
+   "tris": 4464,
+   "tags": [
+    "accordion",
+    "accordian",
+    "melodeon"
+   ],
+   "download": "https://static.poly.pizza/349be87d-b11b-40bc-a64c-fd9166071135.glb",
+   "thumbnail": "https://static.poly.pizza/349be87d-b11b-40bc-a64c-fd9166071135.webp",
+   "source": "https://poly.pizza/m/c6xbxbD6iyQ",
+   "standinFor": "Accordion"
+  },
+  {
+   "set": "instruments",
+   "rank": 80,
+   "item": "Violin (Stradivarius)",
+   "slug": "instruments-violin-stradivarius",
+   "kind": "Strings",
+   "group": "instruments",
+   "query": "violin",
+   "standin": false,
+   "match": "direct",
+   "id": "4yO-XrJiBlc",
+   "title": "Violin",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Violin\" by Poly by Google, https://poly.pizza/m/4yO-XrJiBlc. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 824,
+   "tags": [
+    "string",
+    "music",
+    "instrument\n"
+   ],
+   "download": "https://static.poly.pizza/f8d80576-130a-4d9e-9f54-15872a05a54c.glb",
+   "thumbnail": "https://static.poly.pizza/f8d80576-130a-4d9e-9f54-15872a05a54c.webp",
+   "source": "https://poly.pizza/m/4yO-XrJiBlc"
+  },
+  {
+   "set": "instruments",
+   "rank": 81,
+   "item": "Viola",
+   "slug": "instruments-viola",
+   "kind": "Strings",
+   "group": "instruments",
+   "query": "violin",
+   "standin": true,
+   "standinFor": "Viola",
+   "match": "stand-in",
+   "id": "fhj0GK-0kJu",
+   "title": "Violin",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Violin\" by jeremy, https://poly.pizza/m/fhj0GK-0kJu. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "jeremy",
+   "tris": 560,
+   "tags": [
+    "instrument",
+    "music"
+   ],
+   "download": "https://static.poly.pizza/0a39deee-25d5-47b4-8a1d-305e635c7abe.glb",
+   "thumbnail": "https://static.poly.pizza/0a39deee-25d5-47b4-8a1d-305e635c7abe.webp",
+   "source": "https://poly.pizza/m/fhj0GK-0kJu"
+  },
+  {
+   "set": "instruments",
+   "rank": 83,
+   "item": "Harp",
+   "slug": "instruments-harp",
+   "kind": "Strings",
+   "group": "instruments",
+   "query": "harp",
+   "standin": false,
+   "match": "direct",
+   "id": "102E7hcxEPT",
+   "title": "Harp",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Harp\" by Poly by Google, https://poly.pizza/m/102E7hcxEPT. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 1370,
+   "tags": [
+    "string",
+    "music",
+    "instrument\n"
+   ],
+   "download": "https://static.poly.pizza/bdccab14-4489-48e2-ad91-5d7905109d9a.glb",
+   "thumbnail": "https://static.poly.pizza/bdccab14-4489-48e2-ad91-5d7905109d9a.webp",
+   "source": "https://poly.pizza/m/102E7hcxEPT"
+  },
+  {
+   "set": "instruments",
+   "rank": 85,
+   "item": "Technics SL-1200",
+   "slug": "instruments-technics-sl-1200",
+   "kind": "DJ",
+   "group": "instruments",
+   "query": "record player",
+   "standin": true,
+   "standinFor": "Technics SL-1200",
+   "match": "stand-in",
+   "id": "uaz6praPQc",
+   "title": "Record Player",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Record Player\" by Ginsta, https://poly.pizza/m/uaz6praPQc. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Ginsta",
+   "tris": 412,
+   "tags": [
+    "record",
+    "vinyl",
+    "music",
+    "record player",
+    "vinyl player",
+    "vintage",
+    "old",
+    "pastelle"
+   ],
+   "download": "https://static.poly.pizza/a00c63fe-282a-4341-84e4-7fe8492d72d5.glb",
+   "thumbnail": "https://static.poly.pizza/a00c63fe-282a-4341-84e4-7fe8492d72d5.webp",
+   "source": "https://poly.pizza/m/uaz6praPQc"
+  },
+  {
+   "set": "instruments",
+   "rank": 86,
+   "item": "Pioneer CDJ-3000",
+   "slug": "instruments-pioneer-cdj-3000",
+   "kind": "DJ",
+   "group": "instruments",
+   "query": "pioneer cdj",
+   "standin": false,
+   "match": "direct",
+   "id": "d6zioc9MKjM",
+   "title": "simple pioneer 2000 cdj",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"simple pioneer 2000 cdj\" by Dilan Shah, https://poly.pizza/m/d6zioc9MKjM. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Dilan Shah",
+   "tris": 246,
+   "tags": [
+    "budge",
+    "don budge",
+    "homer a. thompson"
+   ],
+   "download": "https://static.poly.pizza/f8243378-f505-4d0f-bc0d-fbd81092839e.glb",
+   "thumbnail": "https://static.poly.pizza/f8243378-f505-4d0f-bc0d-fbd81092839e.webp",
+   "source": "https://poly.pizza/m/d6zioc9MKjM"
+  },
+  {
+   "set": "instruments",
+   "rank": 87,
+   "item": "Pioneer DJM mixer",
+   "slug": "instruments-pioneer-djm-mixer",
+   "kind": "DJ",
+   "group": "instruments",
+   "query": "mixing desk",
+   "standin": true,
+   "standinFor": "Pioneer DJM mixer",
+   "match": "stand-in",
+   "id": "1_EUPvzknB-",
+   "title": "Digital Audio Mixing Desk",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Digital Audio Mixing Desk\" by Peter Simcoe, https://poly.pizza/m/1_EUPvzknB-. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Peter Simcoe",
+   "tris": 4436,
+   "tags": [
+    "modem",
+    "streaming",
+    "cd-rom"
+   ],
+   "download": "https://static.poly.pizza/f5e1ff1b-4f4e-4130-a5e6-5b991e0fa9cd.glb",
+   "thumbnail": "https://static.poly.pizza/f5e1ff1b-4f4e-4130-a5e6-5b991e0fa9cd.webp",
+   "source": "https://poly.pizza/m/1_EUPvzknB-"
+  },
+  {
+   "set": "instruments",
+   "rank": 88,
+   "item": "DJ controller (Serato)",
+   "slug": "instruments-dj-controller-serato",
+   "kind": "DJ",
+   "group": "instruments",
+   "query": "mixing desk",
+   "standin": true,
+   "standinFor": "DJ controller (Serato)",
+   "match": "stand-in",
+   "id": "4GCowIjU9CG",
+   "title": "Mixing Desk for Audio",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Mixing Desk for Audio\" by Peter Simcoe, https://poly.pizza/m/4GCowIjU9CG. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Peter Simcoe",
+   "tris": 4436,
+   "tags": [
+    "mix",
+    "mixer",
+    "miz"
+   ],
+   "download": "https://static.poly.pizza/a6ee987d-710c-4ff0-bb6a-5d69b06c653b.glb",
+   "thumbnail": "https://static.poly.pizza/a6ee987d-710c-4ff0-bb6a-5d69b06c653b.webp",
+   "source": "https://poly.pizza/m/4GCowIjU9CG"
+  },
+  {
+   "set": "instruments",
+   "rank": 90,
+   "item": "Shure SM58 microphone",
+   "slug": "instruments-shure-sm58-microphone",
+   "kind": "Studio",
+   "group": "instruments",
+   "query": "microphone",
+   "standin": true,
+   "standinFor": "Shure SM58 microphone",
+   "match": "stand-in",
+   "id": "bD-LseANe2b",
+   "title": "Microphone",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Microphone\" by Poly by Google, https://poly.pizza/m/bD-LseANe2b. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 184,
+   "tags": [
+    "mic",
+    "band",
+    "sing"
+   ],
+   "download": "https://static.poly.pizza/67e327c3-3925-4750-9b1a-95794c810c07.glb",
+   "thumbnail": "https://static.poly.pizza/67e327c3-3925-4750-9b1a-95794c810c07.webp",
+   "source": "https://poly.pizza/m/bD-LseANe2b"
+  },
+  {
+   "set": "instruments",
+   "rank": 91,
+   "item": "Neumann U87 microphone",
+   "slug": "instruments-neumann-u87-microphone",
+   "kind": "Studio",
+   "group": "instruments",
+   "query": "microphone",
+   "standin": true,
+   "standinFor": "Neumann U87 microphone",
+   "match": "stand-in",
+   "id": "2cDNCSVfAfv",
+   "title": "Microphone",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Microphone\" by Poly by Google, https://poly.pizza/m/2cDNCSVfAfv. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 68,
+   "tags": [
+    "sound",
+    "handheld",
+    "mike",
+    "transducer"
+   ],
+   "download": "https://static.poly.pizza/067ff722-a3ac-4384-b430-cb28c5ecaf61.glb",
+   "thumbnail": "https://static.poly.pizza/067ff722-a3ac-4384-b430-cb28c5ecaf61.webp",
+   "source": "https://poly.pizza/m/2cDNCSVfAfv"
+  },
+  {
+   "set": "instruments",
+   "rank": 92,
+   "item": "Studio monitors (Yamaha HS8)",
+   "slug": "instruments-studio-monitors-yamaha-hs8",
+   "kind": "Studio",
+   "group": "instruments",
+   "query": "speaker",
+   "standin": true,
+   "standinFor": "Studio monitors (Yamaha HS8)",
+   "match": "stand-in",
+   "id": "zOQOThSpuo",
+   "title": "Speaker",
+   "licence": "CC0 1.0",
+   "attribution": "\"Speaker\" by iPoly3D, https://poly.pizza/m/zOQOThSpuo. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "iPoly3D",
+   "tris": 794,
+   "tags": [
+    "Speaker",
+    "Electronics"
+   ],
+   "download": "https://static.poly.pizza/202d1d68-2821-4482-a349-d86983b02df7.glb",
+   "thumbnail": "https://static.poly.pizza/202d1d68-2821-4482-a349-d86983b02df7.webp",
+   "source": "https://poly.pizza/m/zOQOThSpuo"
+  },
+  {
+   "set": "instruments",
+   "rank": 93,
+   "item": "Marshall stack amp",
+   "slug": "instruments-marshall-stack-amp",
+   "kind": "Amps",
+   "group": "instruments",
+   "query": "guitar amp",
+   "standin": true,
+   "standinFor": "Marshall stack amp",
+   "match": "stand-in",
+   "id": "aNo2sUJR6Vo",
+   "title": "Amp",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Amp\" by Poly by Google, https://poly.pizza/m/aNo2sUJR6Vo. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 3460,
+   "tags": [
+    "speaker",
+    "stereo"
+   ],
+   "download": "https://static.poly.pizza/cb252627-d3fd-4fd5-8362-79ae9c3094df.glb",
+   "thumbnail": "https://static.poly.pizza/cb252627-d3fd-4fd5-8362-79ae9c3094df.webp",
+   "source": "https://poly.pizza/m/aNo2sUJR6Vo"
+  },
+  {
+   "set": "instruments",
+   "rank": 94,
+   "item": "Fender Twin Reverb amp",
+   "slug": "instruments-fender-twin-reverb-amp",
+   "kind": "Amps",
+   "group": "instruments",
+   "query": "guitar amp",
+   "standin": true,
+   "standinFor": "Fender Twin Reverb amp",
+   "match": "stand-in",
+   "id": "8Qzh7Jl1n3V",
+   "title": "Amp",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Amp\" by Poly by Google, https://poly.pizza/m/8Qzh7Jl1n3V. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 1316,
+   "tags": [
+    "sound",
+    "music",
+    "loud"
+   ],
+   "download": "https://static.poly.pizza/03e36168-5bbf-4909-8f1c-05e0ba2d1f21.glb",
+   "thumbnail": "https://static.poly.pizza/03e36168-5bbf-4909-8f1c-05e0ba2d1f21.webp",
+   "source": "https://poly.pizza/m/8Qzh7Jl1n3V"
+  },
+  {
+   "set": "instruments",
+   "rank": 97,
+   "item": "Boss effects pedal",
+   "slug": "instruments-boss-effects-pedal",
+   "kind": "Amps",
+   "group": "instruments",
+   "query": "effects pedal",
+   "standin": false,
+   "match": "direct",
+   "id": "4ByYTgKdZGq",
+   "title": "Valve Overdrive Effects Pedal",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Valve Overdrive Effects Pedal\" by Peter Simcoe, https://poly.pizza/m/4ByYTgKdZGq. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Peter Simcoe",
+   "tris": 3046,
+   "tags": [
+    "accelerator",
+    "gas"
+   ],
+   "download": "https://static.poly.pizza/a789149d-aa05-42c7-97f1-c0fb5812370f.glb",
+   "thumbnail": "https://static.poly.pizza/a789149d-aa05-42c7-97f1-c0fb5812370f.webp",
+   "source": "https://poly.pizza/m/4ByYTgKdZGq"
+  },
+  {
+   "set": "instruments",
+   "rank": 99,
+   "item": "Gramophone",
+   "slug": "instruments-gramophone",
+   "kind": "Vintage",
+   "group": "instruments",
+   "query": "gramophone",
+   "standin": false,
+   "match": "direct",
+   "id": "fs3aTWoMyNw",
+   "title": "Gramophone",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Gramophone\" by Bruno Oliveira, https://poly.pizza/m/fs3aTWoMyNw. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Bruno Oliveira",
+   "tris": 1848,
+   "tags": [
+    "acoustic gramophone",
+    "phonograph",
+    "victrola"
+   ],
+   "download": "https://static.poly.pizza/02aeec4c-a824-4e90-91da-abd24a0577bf.glb",
+   "thumbnail": "https://static.poly.pizza/02aeec4c-a824-4e90-91da-abd24a0577bf.webp",
+   "source": "https://poly.pizza/m/fs3aTWoMyNw"
+  },
+  {
+   "set": "instruments",
+   "rank": 100,
+   "item": "Music stand and sheet music",
+   "slug": "instruments-music-stand-and-sheet-music",
+   "kind": "Accessory",
+   "group": "instruments",
+   "query": "music stand",
+   "standin": false,
+   "match": "direct",
+   "id": "3zlFGH_TJ8h",
+   "title": "Music stand",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Music stand\" by Poly by Google, https://poly.pizza/m/3zlFGH_TJ8h. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 1176,
+   "tags": [
+    "stand",
+    "orchestra",
+    "musicians",
+    "reading"
+   ],
+   "download": "https://static.poly.pizza/f71a7cb7-6af5-4d85-acbd-8a83b606ed20.glb",
+   "thumbnail": "https://static.poly.pizza/f71a7cb7-6af5-4d85-acbd-8a83b606ed20.webp",
+   "source": "https://poly.pizza/m/3zlFGH_TJ8h"
+  }
+ ]
+}

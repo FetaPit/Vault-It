@@ -19,6 +19,8 @@ const SITE = {
             // digital business card behind the printed card's QR code and NFC chip: vault-it.co/pete
             ['site/pete/index.html', 'pete.html']],
 };
+// the 3D model library (v0.9.1, E30): only what the app reads, same address as the app, so no outside host
+const MODELS = ['catalog.json', 'CREDITS.md'];
 const ROBOTS = { app: 'User-agent: *\nDisallow: /\n', landing: 'User-agent: *\nAllow: /\n' };
 
 function sha() {
@@ -35,11 +37,16 @@ for (const [site, files] of Object.entries(SITE)) {
     fs.mkdirSync(path.dirname(path.join(dir, to)), { recursive: true });
     fs.copyFileSync(src, path.join(dir, to));
   }
+  if (site === 'app') {
+    const md = path.join(ROOT, 'models'); fs.mkdirSync(path.join(dir, 'models'), { recursive: true });
+    for (const f of MODELS) fs.copyFileSync(path.join(md, f), path.join(dir, 'models', f));
+    for (const sub of ['glb', 'thumb']) fs.cpSync(path.join(md, sub), path.join(dir, 'models', sub), { recursive: true });
+  }
   fs.writeFileSync(path.join(dir, 'robots.txt'), ROBOTS[site]);
   fs.writeFileSync(path.join(dir, '404.html'), '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Not found · Vault-It</title><body style="margin:0;background:#04090f;color:#9bb0bd;font:16px system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;text-align:center"><div><div style="font-size:2rem;color:#44c0b9;margin-bottom:8px">404</div>That page does not exist. <a style="color:#44c0b9" href="/">Back to Vault-It</a></div>');
 }
 fs.writeFileSync(path.join(OUT, 'app', 'version.json'), JSON.stringify({ sha: sha(), built: new Date().toISOString() }) + '\n');
 // the service worker's cache is named after the commit, so a release never serves a stale shell
 const swPath = path.join(OUT, 'app', 'sw.js'); fs.writeFileSync(swPath, fs.readFileSync(swPath, 'utf8').replace('__SW_VERSION__', sha().slice(0, 12)));
-const list = (d) => fs.readdirSync(path.join(OUT, d), { recursive: true }).map(String).sort().join(', ');
+const list = (d) => fs.readdirSync(path.join(OUT, d), { recursive: true }).map(String).filter((f) => !/^models[\\/](glb|thumb)[\\/]/.test(f)).sort().join(', ');
 console.log('dist/app:     ' + list('app') + '\ndist/landing: ' + list('landing'));
