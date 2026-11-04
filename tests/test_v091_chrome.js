@@ -15,7 +15,8 @@ const open = async (b, w, h, theme, o = {}) => {
   const phone = w < 600;
   const ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: phone, hasTouch: phone, colorScheme: theme === 'light' ? 'light' : 'dark', reducedMotion: o.rm ? 'reduce' : 'no-preference' });
   const p = await ctx.newPage(); p.errs = []; p.on('pageerror', e => p.errs.push(e.message));
-  if (o.rpc) await p.route('**/rest/v1/rpc/campaign_counts', r => o.rpc === 'fail' ? r.abort() : r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o.rpc) }));
+  const rpc = o.rpc === undefined ? 'fail' : o.rpc;   // campaign_counts is always routed: aborted by default (no counts), or the rows the case wants, so the test never depends on the live server
+  await p.route('**/rest/v1/rpc/campaign_counts', r => rpc === 'fail' ? r.abort() : r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(rpc) }));
   await p.addInitScript(seed, { t: theme, neg: !!o.neg });
   await p.goto(INDEX); await p.waitForTimeout(1600);
   await p.addStyleTag({ content: HIDE });
