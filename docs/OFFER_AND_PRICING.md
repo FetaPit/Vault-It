@@ -165,3 +165,26 @@ Owner's words (~20:45): "card now charge later for 30 day free trial sign up for
 - Family mode is shown on Pioneer only as "Family mode (coming soon)": it is not built.
 - The sign-up page keeps its rule of never saying "lifetime"; it calls the plan the "one-payment licence".
 - Icons: the vault door is now Founder, the keystone Lifetime licence (`brand/vault-it-tier-founder.svg`, `-pioneer.svg`, `-lifetime-licence.svg`).
+
+## Decided by Pete (5 Nov 2026): Pioneer covers both monthly and yearly; confirmed full and tester prices
+
+Owner's words: "So let's get clear on the pricing guide for the actual price for the release. £5.99 monthly, £59.99 yearly plan Pioneer with the Pro features, £149 for the founding license. That is then discounted to £3.99 for the testers, £39.99 yearly with the Pro features, the Pioneer build yearly, and £99 discounted for the testers for the founding license. Make sure all comms, products, assets, Stripe links align with this, and the Stripe links are active."
+
+Checked against what is actually live in Stripe before changing anything. Two numbers in the message above needed confirming against what is really charging testers today, because they conflicted with the 4 Nov decision:
+
+| | Full price (after the beta) | Tester price (now) |
+|---|---|---|
+| Pioneer monthly | £5.99 a month — unchanged, matches | £3.99 a month — unchanged, matches |
+| Pioneer yearly | **£59.99 a year** — now wired to a real live Stripe link (below) | **£49.99 a year, confirmed** (the owner's "£39.99" today was the pre-4-Nov price; asked directly, he kept £49.99, which is what is actually charging testers via `…VG02`) |
+| Lifetime licence (Founding Member) | £149 once, 100 places — unchanged, matches | £99 once, 100 places — unchanged, matches |
+
+**Naming.** Asked directly: Stripe's own product has always been called "Vault·It Pioneer" for both the monthly and yearly plan (it never used the word "Founder"). The app alone split this into "Founder" (monthly) and "Pioneer" (yearly). Owner's call: rename the monthly plan's display name from Founder to Pioneer, so "Pioneer" now names both. The icon and colour for the monthly plan are unchanged (still the vault-door icon, internal key `tier:'founder'`) — only the user-facing text changes. The separate "Lifetime licence" plan (`founder` plan key, `VI_STRIPE_LINKS.founder` / `founder_tester`) is untouched; it was never called "Founder" in the app, that name collision was coincidental.
+
+**Stripe housekeeping done today:**
+- The £59.99/yr full-price link already existed in the live account, created but never pasted into the app: `https://buy.stripe.com/cNidR3b5s3IJ0ex2yy2VG0c` (price `price_1TdPyB9mgKf6HntyvjViAMQg`). Wired into `VI_STRIPE_LINKS.annual_after_beta`, which was empty since 4 Nov.
+- `…VG07` (the old, duplicate £99 Founding-tester link flagged as abandoned on 4 Nov but never actually switched off) is now deactivated in Stripe. It was running in parallel with the link the app actually uses (`…VG0b`), each with its own independent 100-place cap — a real risk of 200 places selling instead of 100. The link the app uses is untouched.
+- `…VG06` (the old £39.99 tester-yearly link) stays live and unused, as the owner has not asked to switch it off; still his call per the 4 Nov note.
+
+**Also removed today:** a leftover, unreachable modal (`#waitlist-modal`) carrying "DAO Governance Seat", "Lifelong Contributor Badge" and a hardcoded, stale £49.99 figure that never tracked the real plan price, plus "Alpha pricing locked at signup. It never increases" (false: tester prices do change after the beta). Confirmed nothing in the app could ever show it before deleting it.
+
+**Pitch deck:** the pricing slide's "or £49.99 a year" was the old figure; fixed to "£59.99 a year" to match the confirmed full price (the deck shows the full/investor-facing price, not the beta-tester discount).

@@ -30,6 +30,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   let p = await open(390, 844);
   ok((await p.locator('.frame').count()) === 15, 'the page has the 15 slides');
   { const t = await p.evaluate(() => document.body.innerText); ok(!/£199|19,900/.test(t) && /£149 once/.test(t) && /100 seats at £149, up to £14,900/.test(t), 'Founding Membership matches the live Stripe price: £149, 100 places'); }
+  { const t = await p.evaluate(() => document.body.innerText); ok(!/£49\.99 a year/.test(t) && /£5\.99\/mo/.test(t) && /or £59\.99 a year/.test(t), 'Pioneer yearly matches the full live price: £59.99, not the old £49.99'); }
   { const ne = await p.evaluate(() => { const r = document.querySelector('#cover .vi-neon-red'), g = document.querySelector('#cover .vi-neon-gold'); if (!r || !g) return null;
       const s = (el) => getComputedStyle(el, '::before'); return { r: r.textContent, g: g.textContent, clipR: s(r).webkitBackgroundClip || s(r).backgroundClip, clipG: s(g).webkitBackgroundClip || s(g).backgroundClip, grad: /gradient/.test(s(g).backgroundImage) }; });
     ok(ne && ne.r === 'red' && ne.g === 'home' && /text/.test(ne.clipR) && /text/.test(ne.clipG) && ne.grad, 'the tagline draws red in neon red and home in a gold gradient neon: ' + JSON.stringify(ne)); }
