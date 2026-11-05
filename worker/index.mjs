@@ -48,7 +48,7 @@ const SECURITY = {
 // Report-only for now (nothing is blocked): the outside hosts the app calls, as named in the privacy notice (tests/test_csp_report_only.mjs).
 // Inline scripts and styles are allowed because the app is one file; 'self' covers both sites' own files, blob:/data: cover generated models and photos.
 const SB = 'https://legpubblzgknxdtvsant.supabase.co';
-const CONNECT = [SB, 'wss://legpubblzgknxdtvsant.supabase.co', 'https://api.coingecko.com', 'https://open.er-api.com', 'https://api.metals.live', 'https://metals-api.com',
+const CONNECT = [SB, 'wss://legpubblzgknxdtvsant.supabase.co', 'https://api.coingecko.com', 'https://open.er-api.com', 'https://api.metals.live', 'https://metals-api.com', 
   'https://www.alphavantage.co', 'https://api.anthropic.com', 'https://api.openverse.org', 'https://corsproxy.io',
   'https://api.notion.com', 'https://api.convertkit.com', 'https://www.shibrpc.com', 'https://challenges.cloudflare.com'];
 const REPORT_ONLY = [

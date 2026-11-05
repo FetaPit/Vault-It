@@ -98,9 +98,9 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   await page.evaluate(() => { _supaUser = { id: 'u-1', email: 'pete@example.com' }; showSettings(); }); await page.waitForTimeout(300);
   const set = await page.evaluate(() => ({ dets: [...document.querySelectorAll('#settings-modal details')].map(d => ({ open: d.open, txt: d.querySelector('summary').innerText })), yd: !!document.getElementById('set-yourdata'), del: !!document.getElementById('set-delete-account'),
     }));
-  const ckVisible = await page.locator('#set-ck-form').isVisible(), ejsVisible = await page.locator('#set-ejs-svc').isVisible(), notionVisible = await page.locator('#set-notion-token').isVisible(); set.ckHidden = !ckVisible && !notionVisible; set.ejsHidden = !ejsVisible;
-  ok(set.dets.length === 2 && set.dets.every(d => !d.open), 'owner/admin tools are collapsed by default (' + set.dets.map(d => d.txt.slice(2, 30)).join(' | ') + ')');
-  ok(set.ckHidden && set.ejsHidden, 'ConvertKit / EmailJS / Notion fields are not visible to a tester');
+  const ownerHidden = !(await page.locator('#set-owner-tools').isVisible()), fieldsHidden = !(await page.locator('#set-notion-token').isVisible()) && !(await page.locator('#set-claude-key').isVisible()), goneFields = await page.evaluate(() => ['set-ck-form', 'set-ck-key', 'set-ejs-svc', 'set-cg-key', 'set-av-key', 'set-metals-key'].filter(i => document.getElementById(i)));
+  ok(ownerHidden && fieldsHidden, 'owner and developer tools (Notion, Claude, Meshy, Founding link) are hidden from a tester');
+  ok(!goneFields.length, 'ConvertKit, EmailJS and the price-feed key fields are gone (' + goneFields.join(',') + ')');
   ok(set.yd && set.del, 'Settings has “Your data” and “Delete my account”');
 
   // ── 4. Download my data ──

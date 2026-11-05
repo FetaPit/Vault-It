@@ -67,8 +67,8 @@ const seed = (o) => {
     ({ p, ctx, sent } = await open(w, theme, true)); await p.waitForTimeout(400);
     ok(!(await tourOn(p)), T + 'a returning account does not get the tour on load');
     await p.evaluate(() => showSettings()); await p.waitForTimeout(200);
-    const rb = await p.evaluate(() => { const e = document.getElementById('set-tour-replay'), r = e.getBoundingClientRect(); return { txt: e.textContent, vis: r.width > 40 && r.top >= 0 && r.top < innerHeight }; });
-    ok(rb.txt === 'Replay the app tour' && rb.vis, T + 'Settings shows a clear Replay the app tour button near the top');
+    const rb = await p.evaluate(() => { const e = document.getElementById('set-tour-replay'); e.scrollIntoView({ block: 'center' }); const r = e.getBoundingClientRect(); return { txt: e.textContent, vis: r.width > 40 && r.top >= 0 && r.top < innerHeight }; });
+    ok(rb.txt === 'Replay the app tour' && rb.vis, T + 'Settings shows a clear Replay the app tour button (third section, in view once scrolled to)');
     await p.click('#set-tour-replay'); await p.waitForFunction(() => document.getElementById('vi-tour').classList.contains('on'), null, { timeout: 8000 }).catch(() => {});
     ok(await tourOn(p) && (await p.evaluate(() => document.getElementById('settings-modal').style.display)) === 'none', T + 'it closes Settings and starts the tour');
     const seen = []; let bad = 0, wide = 0;
