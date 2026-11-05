@@ -88,7 +88,11 @@ const tok = (methods) => 'x.' + Buffer.from(JSON.stringify({ amr: methods.map(m 
     await p.click('#wz-back'); await p.waitForTimeout(150);
     s = await scr(); ok(s.at === '1', T + 'B5 Back returns to step 1');
     await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(150);
-    await p.click('#w-opts .welcome-opt[data-val="0"]'); await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(150);
+    await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(100);
+    ok(await p.evaluate(() => { const h = document.getElementById('wz-goal-hint'); return !!h && h.offsetParent !== null && document.querySelector('#wz-s2').offsetParent !== null; }), T + 'Pedro 3: Next with nothing picked shows a cue on the screen, and stays');
+    await p.click('#w-opts .welcome-opt[data-val="0"]');
+    ok(await p.evaluate(() => document.getElementById('wz-goal-hint').hidden), T + 'Pedro 3: picking clears the cue');
+    await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(150);
     s = await scr(); ok(s.at === '3', T + 'B5 picking where you are goes on to your money');
     await p.fill('#w-income', '2000'); await p.fill('#w-expenses', '1500'); await p.click('#wz-s3 .welcome-cta'); await p.waitForTimeout(150);
     s = await scr(); ok(s.at === '4', T + 'B5 then your home');
@@ -104,6 +108,13 @@ const tok = (methods) => 'x.' + Buffer.from(JSON.stringify({ amr: methods.map(m 
     ok(/£2,000/.test(plan.sums) && /£1,500/.test(plan.sums) && /£500/.test(plan.sums), T + 'B7 your own sums: £2,000 in, £1,500 out, about £500 left (' + plan.sums + ')');
     ok(plan.days === 7 && plan.pressed === 1, T + 'B7 a weekly check-in day, one picked (' + plan.days + '/' + plan.pressed + ')');
     ok(!/—/.test(plan.text), T + 'B9 no em dashes on the onboarding screens');
+    const look = await p.evaluate(() => { const f = document.getElementById('w-finish').getBoundingClientRect(), d = [...document.querySelectorAll('#wz-days button')];
+      const on = d.find(x => x.getAttribute('aria-pressed') === 'true'), off = d.find(x => x.getAttribute('aria-pressed') !== 'true'), bg = e => getComputedStyle(e).backgroundColor;
+      const more = document.querySelector('#wz-s5 details.wz-more');
+      return { ctaSeen: f.top >= 0 && f.bottom <= innerHeight + 1, dayDiff: bg(on) !== bg(off), folded: !!more && !more.open && !!more.querySelector('#w-phone-s1') && !!more.querySelector('.w-view-pick') }; });
+    ok(look.ctaSeen, T + "Pedro 1: Start this week's step is on screen without scrolling (" + JSON.stringify(look) + ')');
+    ok(look.folded, T + 'Pedro 1: screen size and phone are folded under Optional');
+    ok(look.dayDiff, T + 'Pedro 2: the picked check-in day has its own fill');
     s = await scr(); ok(s.side <= 1, T + 'B9 no sideways scroll (' + s.side + ')');
     if (w === 390 && theme === 'dark') await p.screenshot({ path: require('path').join(require('./lib/vi').REPO, 'shots/brand/onboarding-plan-dark-390.png') });
     // B8: finish
