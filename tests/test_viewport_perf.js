@@ -77,9 +77,10 @@ async function dragGlide(p, ctx, sel, label) {
   // the warm-up keeps out of the way of a tab change: no warm-up draw (its hidden stage) in the 1.4 s after one, and it still finishes later
   await p.waitForFunction(() => window.__P.three != null, null, { timeout: 60000 }).catch(() => {});
   const tq = await p.evaluate(() => { showTab('budget'); return performance.now(); }); await settle(p, 1400);
-  const quiet = await p.evaluate(tq => __P.r.filter(x => x[0] >= tq + 30 && x[2] === 'off').length + __P.made.filter(m => !m[1] && m[0] >= tq + 30).length, tq);
+  const quiet = await p.evaluate(tq => __P.r.filter(x => x[0] >= tq + 30 && x[0] < tq + 1400 && x[2] === 'off').length + __P.made.filter(m => !m[1] && m[0] >= tq + 30 && m[0] < tq + 1400).length, tq);   // page time: under load the 1.4 s pause can run longer than 1.4 s on the page
   ok(quiet === 0, 'the 3D warm-up does no work (no renderer made, no compile or draw) in the 1.4 s after a tab change (' + quiet + ' warm-up steps seen)');
-  await p.waitForFunction(() => window.V3 && V3._warmed, null, { timeout: 60000 }).catch(() => {});
+  // it does finish; with a software GPU and other browsers on the machine the shader compiles took 56 to 66 s (5 Nov), so allow 180 s
+  await p.waitForFunction(() => window.V3 && V3._warmed, null, { timeout: 180000 }).catch(() => {});
   ok(await p.evaluate(() => !!(window.V3 && V3._warmed)), 'the warm-up still finishes once the page is quiet');
   await p.evaluate(() => showTab('overview'));
   await settle(p, 3000);
@@ -152,21 +153,24 @@ async function dragGlide(p, ctx, sel, label) {
   ok(await p.evaluate(() => !!document.getElementById('i3d-modal')), 'a single tap on the live tile still opens the full viewer');
   await p.waitForFunction(() => window._i3dView && _i3dView.ctl, null, { timeout: 30000 }).catch(() => {}); await settle(p, 400);
   ok(await p.evaluate(() => !document.querySelector('#other-assets-list .i3d-live')), 'the tile goes back to its picture while the full viewer is open');
-  await tap(p, '#i3d-modal .inv-x'); await settle(p, 400);
+  await tap(p, '#i3d-modal .inv-x'); await p.waitForFunction(() => !document.getElementById('i3d-modal'), null, { timeout: 10000 }).catch(() => {}); await settle(p, 400);   // under load the close can outlast a fixed pause
 
   // ── 4. liabilities: expand, close ──
   await p.evaluate(() => scrollTo(0, 0)); await tap(p, '#assets-page .subtab-btn[data-sub="liabilities"]'); await p.waitForSelector('#liabilities-list .inv-exp', { timeout: 20000 }).catch(() => {}); await settle(p, 600);
-  t0 = await p.evaluate(() => performance.now()); await tap(p, '#liabilities-list .inv-exp');
+  // a coordinate tap can miss while the page is still laying out under load: tap again if no viewer opened (the time is from the tap that opened it)
+  for (let k = 0; k < 3; k++) { t0 = await p.evaluate(() => performance.now()); await tap(p, '#liabilities-list .inv-exp');
+    if (await p.waitForFunction(() => !!document.getElementById('i3d-modal'), null, { timeout: 5000 }).then(() => true, () => false)) break; }
   await p.waitForFunction(t0 => __P.r.some(x => x[0] >= t0 && x[2] === 'modal'), t0, { timeout: 30000 }).catch(() => {});
   r = await p.evaluate(t0 => { const f = __P.r.find(x => x[0] >= t0 && x[2] === 'modal'); return f ? Math.round(f[0] - t0) : null; }, t0);
   ok(r != null, 'liabilities: expand opens the full viewer'); info('liabilities full viewer: tap to first frame ' + r + ' ms');
-  await settle(p, 1200); const ll = await last(p, 'modal');
+  await settle(p, 1200); const ll = await p.evaluate(t0 => { const x = __P.r.filter(r => r[0] >= t0 && r[2] === 'modal').pop(); return x ? { calls: x[3], tris: x[4] } : null; }, t0);
   ok(ll && ll.calls <= ITEM_CALLS && ll.tris <= ITEM_TRIS, 'liabilities: ' + (ll && ll.calls) + ' draw calls, ' + (ll && ll.tris) + ' triangles a frame');
   await tap(p, '#i3d-modal .inv-x'); await settle(p, 600);
   ok(await p.evaluate(() => !document.getElementById('i3d-modal')), 'liabilities: X closes the full viewer');
   const made = await p.evaluate(() => __P.made.filter(m => !m[1]).length);
   ok(made <= 2, 'one WebGL renderer for cash and metals and one for every tile and full-viewer open (' + made + ' on the page; it was a new one per open)');
   // ── 5. the kept models: two at most, dropped when an item's file changes or goes, and a read that started before a change is not kept ──
+  await p.evaluate(() => { try { i3dLiveStop(); } catch (e) {} }); await p.waitForFunction(() => !window._i3dSh || !_i3dSh.view || _i3dSh.view.dead, null, { timeout: 10000 }).catch(() => {});   // no live tile still holds the shared stage
   const kc = await p.evaluate(async () => { const mk = () => { const g = new THREE.Group(); g.add(new THREE.Mesh(new THREE.BoxBufferGeometry(1, 1, 1), new THREE.MeshBasicMaterial())); return g; };
     const a = mk(), b = mk(), c = mk(); i3dCachePut('wi', 901, a); i3dCachePut('wi', 902, b); i3dCachePut('wi', 903, c);
     const out = { evicted: i3dCacheGet('wi', 901) === null, kept: i3dCacheGet('wi', 902) === b && i3dCacheGet('wi', 903) === c, size: _i3dKeep.length };
