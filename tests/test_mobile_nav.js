@@ -51,9 +51,9 @@ const seed = (theme) => {
     ok(await p.evaluate(() => document.getElementById('tab-debt').classList.contains('active') && document.querySelector('#vi-tabs [data-tab="debt"]').classList.contains('active')), theme + ' 390: a bar tab opens its panel and lights up');
     // Connections lives in Settings
     await p.evaluate(() => showTab('connections')); await p.waitForTimeout(400);
-    const c = await p.evaluate(() => { const sm = document.getElementById('settings-modal'), sec = document.getElementById('settings-connections'), list = document.getElementById('connections-list');
-      return { open: getComputedStyle(sm).display !== 'none', inSettings: !!(sec && sm.contains(sec) && sec.contains(list)), items: list ? list.querySelectorAll('button,[onclick]').length : 0, panel: getComputedStyle(document.getElementById('tab-connections')).display, debtStill: document.getElementById('tab-debt').classList.contains('active') }; });
-    ok(c.open && c.inSettings && c.items > 0 && c.panel === 'none' && c.debtStill, theme + ' 390: Connections opens Settings with the list rendered (' + c.items + ' controls), the old tab panel stays hidden');
+    const c = await p.evaluate(() => { const sm = document.getElementById('settings-modal'), sec = document.getElementById('set-locked-conns'), list = document.getElementById('set-locked-list');
+      return { open: getComputedStyle(sm).display !== 'none', inSettings: !!(sec && sm.contains(sec) && sec.contains(list)), items: list ? list.querySelectorAll('[data-conn]').length : 0, panel: getComputedStyle(document.getElementById('tab-connections')).display, debtStill: document.getElementById('tab-debt').classList.contains('active') }; });
+    ok(c.open && c.inSettings && c.items > 0 && c.panel === 'none' && c.debtStill, theme + ' 390: Connections opens Settings at the locked group (' + c.items + ' names), the old tab panel stays hidden');
     await p.evaluate(() => closeSettings());
     await p.context().close();
 
