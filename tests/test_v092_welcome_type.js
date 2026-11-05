@@ -58,6 +58,10 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
       await p.evaluate(() => document.getElementById('lnum-probe').remove());
     }
     if (glyph) ok(glyph.zero >= glyph.three * .95, T + 'Syne zero as tall as the 3 (' + glyph.zero + ' vs ' + glyph.three + ' px ink height)'); else console.log('skip: Syne web font not reachable here, glyph check skipped (computed-style check above still runs)');
+    // heading font (Pedro, 5 Nov): sentence-length headings are Syne 700, the wordmark and short titles stay 800
+    const W = await p.evaluate(() => { const g = q => { const e = document.querySelector(q); return e ? getComputedStyle(e).fontWeight : 'missing'; }; return { h2: g('.welcome-h2'), question: g('.welcome-question'), offer: g('#offer-headline'), camp: g('.vi-camp-headline'), congrats: g('.welcome-congrats'), logo: g('.welcome-logo'), section: g('.settings-section-title') }; });
+    ok(W.h2 === '700' && W.question === '700' && W.offer === '700' && W.camp === '700' && W.section === '700', T + 'long headings are Syne 700 (' + JSON.stringify(W) + ')');
+    ok(W.congrats === '800', T + 'short titles (the congrats line) stay Syne 800');
     // plan CTAs: 14 px and 44 px tap height (shown in their own modals, measured as laid out)
     const cta = await p.evaluate(() => { const out = []; for (const m of ['pro-offer-modal', 'vi-campaign-modal']) { const el = document.getElementById(m); if (!el) continue; const was = [el.className, el.style.display]; el.classList.remove('hidden'); el.style.display = 'flex'; el.querySelectorAll('.vi-tier-cta,.vi-camp-tier-cta').forEach(x => { if (x.disabled && /ghost/.test(x.className)) return; const r = x.getBoundingClientRect(); if (r.width > 0) out.push({ m, cls: x.className.split(' ')[0], fs: parseFloat(getComputedStyle(x).fontSize), h: r.height }); }); el.className = was[0]; el.style.display = was[1]; } return out; });
     ok(cta.length > 0, T + 'plan CTAs found (' + cta.length + ')');
