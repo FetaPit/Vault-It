@@ -26,6 +26,26 @@ const SIZES = { 'iPhone 390x664': { viewport: { width: 390, height: 664 }, userA
     ok(!errs.length, name + ': no page errors ' + errs.join('|'));
     await ctx.close();
   }
+  // the code step says each thing once, and the intro and steps belong to the email step only
+  {
+    const ctx = await b.newContext({ viewport: { width: 390, height: 664 }, isMobile: true, hasTouch: true }); await routeThree(ctx); const page = await ctx.newPage();
+    await page.goto(VI.FILE_URL); await page.waitForTimeout(1200);
+    const o = await page.evaluate(() => {
+      _authOTP = { email: 'tester@example.com' }; document.getElementById('auth-otp-email').textContent = 'tester@example.com'; _showAuthStep('otp');
+      const st = document.getElementById('auth-otp-step'), vis = e => !!e && getComputedStyle(e).display !== 'none' && e.getClientRects().length > 0;
+      const btns = [...st.querySelectorAll('button')].map(x => x.textContent.trim());
+      const res = { text: st.innerText.replace(/\s+/g, ' ').trim(), btns, goBack: [...st.querySelectorAll('button')].filter(x => /authGoBack/.test(x.getAttribute('onclick') || '')).length, introShown: vis(document.querySelector('.auth-intro')) || vis(document.querySelector('.auth-steps')), emailShown: vis(document.getElementById('auth-otp-email')) };
+      _pinEnterLen = PIN_LEN; _showAuthStep('pin'); res.introShownPin = vis(document.querySelector('.auth-intro')) || vis(document.querySelector('.auth-steps'));
+      _showAuthStep('email'); res.introShownEmail = vis(document.querySelector('.auth-intro')) && vis(document.querySelector('.auth-steps'));
+      return res;
+    });
+    ok(/^Check your inbox/.test(o.text) && o.emailShown && o.text.includes('tester@example.com'), 'code step: one heading "Check your inbox" with the email shown (' + o.text.slice(0, 60) + ')');
+    ok(!/CODE SENT/i.test(o.text) && !/\u{1F4E7}/u.test(o.text), 'code step: no "CODE SENT" label and no envelope');
+    ok(o.text.includes('Enter the 6-digit code. Not seeing it? Check spam.') && !/from your email below/.test(o.text) && (o.text.match(/inbox/gi) || []).length === 1, 'code step: one hint line, nothing said twice (' + o.text + ')');
+    ok(o.goBack === 1 && o.btns.some(t => /Resend code/.test(t)) && o.btns.some(t => /Verify/.test(t)), 'code step: one "Use a different email" button, plus Verify and Resend (' + o.btns.join(' | ') + ')');
+    ok(!o.introShown && !o.introShownPin && o.introShownEmail, 'the intro and the steps show on the email step only (code ' + o.introShown + ', PIN ' + o.introShownPin + ', email ' + o.introShownEmail + ')');
+    await ctx.close();
+  }
   const ph = probe['iPhone 390x664'], dk = probe['desktop 1440x900'];
   ok(dk.cardW >= 520 && dk.cardW <= 560, 'desktop: the card is 520 to 560 px wide (' + dk.cardW + ')');
   ok(dk.inpH >= 48 && dk.btnH >= 48, 'desktop: the email field and Continue are at least 48 px tall (' + dk.inpH + ', ' + dk.btnH + ')');
