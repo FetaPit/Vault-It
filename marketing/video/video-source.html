@@ -1,0 +1,67 @@
+<html><head>
+<script>
+// controlled clock so every frame is captured smoothly
+window.__T=1000;let __q=[];performance.now=()=>window.__T;
+window.requestAnimationFrame=cb=>{__q.push(cb);return __q.length};window.cancelAnimationFrame=()=>{};
+window.__step=ms=>{window.__T+=ms;const c=__q;__q=[];c.forEach(f=>f(window.__T));};
+Object.defineProperty(window,'innerWidth',{get:()=>1000});
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@500&family=Share+Tech+Mono&display=block" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;width:540px;height:960px;overflow:hidden;background:#080808;color:#E8E8E8;position:relative}
+.stage{position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 72%,#06242A 0%,#00131A 45%,#080808 100%)}
+.scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(68,192,185,.05) 0 1px,transparent 1px 3px);pointer-events:none}
+canvas{position:absolute;left:0;top:250px;width:540px;height:540px}
+.wm{font-family:Syne,sans-serif;font-weight:800;letter-spacing:-.02em;display:inline-flex;align-items:baseline;line-height:1;font-size:24px}
+.wm b{color:#44C0B9;font-weight:800;text-shadow:0 0 12px rgba(68,192,185,.35)}
+.wm .dot{display:inline-block;width:.3em;height:.17em;background:#44C0B9;border-radius:2px;margin:0 .07em;transform:translateY(-.06em);box-shadow:0 0 8px rgba(68,192,185,.6)}
+.top{position:absolute;left:40px;right:40px;top:70px;display:flex;justify-content:space-between;align-items:center}
+.top .url{font:12px "Share Tech Mono",monospace;letter-spacing:.12em;color:#9AA0A6}
+h1{position:absolute;left:40px;right:40px;top:120px;margin:0;font-family:Syne,sans-serif;font-weight:800;font-size:38px;line-height:1.02;letter-spacing:-.02em;transition:none}
+h1 em{font-style:normal;color:#E8C56A}h1 i{font-style:normal;color:#44C0B9}
+.status{position:absolute;left:40px;right:40px;top:800px;font:15px "Share Tech Mono",monospace;letter-spacing:.1em;color:#44C0B9;text-transform:uppercase}
+.cap{position:absolute;left:40px;right:40px;top:832px;font:500 20px/1.3 "DM Sans",sans-serif;color:#E8E8E8}
+.foot{position:absolute;left:40px;right:40px;bottom:30px;font:10px "Share Tech Mono",monospace;letter-spacing:.08em;color:#2D8882}
+.cta{display:inline-block;background:#E8C56A;color:#1A1400;font:700 18px "DM Sans",sans-serif;padding:10px 20px;border-radius:999px}
+</style></head><body>
+<div class="stage"></div>
+<canvas id="cv"></canvas>
+<div class="scan"></div>
+<div class="top"><span class="wm">Vault<span class="dot"></span><b>It</b></span><span class="url">VAULT-IT.CO</span></div>
+<h1 id="h"></h1><div class="status" id="s"></div><div class="cap" id="c"></div>
+<div class="foot">NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</div>
+<script src="../../vault-it-3d-engine.js"></script>
+<script>
+const v=new URLSearchParams(location.search).get('v')||'house';
+const E=window.ViEngine,cv=document.getElementById('cv');
+const H=document.getElementById('h'),Sx=document.getElementById('s'),C=document.getElementById('c');
+let ctl,events=[],dur;
+if(v==='house'){
+  ctl=E.makeStage(cv,{theme:'dark',onFrame:(info,st)=>{Sx.textContent='Row '+info.row+' / 154 · '+Math.round(st.p*100)+'% built'}});
+  ctl.setTarget(0,true);
+  dur=15;
+  events=[
+   [0,()=>{H.innerHTML='Every pound you save lays <i>a brick.</i>';C.textContent='Put in what you owe, what you\'ve saved and what you need.'}],
+   [0.8,()=>ctl.setTarget(.3)],
+   [4.6,()=>{ctl.setTarget(.68);H.innerHTML='Watch your home build, <i>row by row.</i>';C.textContent='Pay off a card and your keys date moves closer.'}],
+   [8.6,()=>{ctl.setTarget(1);H.innerHTML='Debt, then deposit, then <em>keys.</em>';C.textContent='No bank login. You type the numbers in.'}],
+   [12.4,()=>{H.innerHTML='Get out of the red and <em>into your home.</em>';C.innerHTML='<span class="cta">Free beta · vault-it.co</span>'}]
+  ];
+}else{
+  ctl=E.makeNW(cv,{theme:'dark'});
+  dur=16;
+  const act=(spec)=>()=>{const r=ctl.act(spec);if(r&&r.msg)Sx.textContent=r.msg};
+  events=[[0,()=>{H.innerHTML='Debt sits below the line. <i>Savings rise above it.</i>';C.textContent='Every £1,000 is a block. Every £100 is a cube.';Sx.textContent='Debt: £5,600'}]];
+  [1.4,2.2,3.0,3.8,4.6].forEach(t=>events.push([t,act('debt:1000')]));
+  [5.5,5.85,6.2,6.55,6.9,7.25].forEach(t=>events.push([t,act('debt:100')]));
+  events.push([7.6,()=>{H.innerHTML='Out of <em>the red.</em>';C.textContent='Clear what you owe and watch the line turn gold.'}]);
+  events.push([9.2,()=>{H.innerHTML='Then build your deposit, <i>block by block.</i>';C.textContent='Your deposit stack grows every time you save.'}]);
+  [9.6,10.6,11.6].forEach(t=>events.push([t,act('dep:1000')]));
+  [12.3,12.7].forEach(t=>events.push([t,act('dep:100')]));
+  events.push([13.4,()=>{H.innerHTML='See your whole net worth <em>in 3D.</em>';C.innerHTML='<span class="cta">Free beta · vault-it.co</span>'}]);
+}
+window.__tick=(t)=>{events.filter(e=>!e.done&&e[0]<=t+1e-6).forEach(e=>{e.done=1;e[1]()})};
+window.__dur=dur;
+document.fonts.ready.then(()=>setTimeout(()=>document.title='ready',300));
+</script></body></html>
