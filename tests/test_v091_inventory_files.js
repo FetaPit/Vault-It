@@ -230,7 +230,7 @@ const probe = p => p.evaluate(() => { const V = _i3dView; if (!V || !V.obj) retu
     }
     await ctx.close();
   }
-  const outside = [...hosts].filter(h => !/^(cdn\.jsdelivr\.net|fonts\.googleapis\.com|fonts\.gstatic\.com|open\.er-api\.com|)$/.test(h));
+  const outside = [...hosts].filter(h => !/^(cdn\.jsdelivr\.net|fonts\.googleapis\.com|fonts\.gstatic\.com|open\.er-api\.com|127\.0\.0\.1:\d+|)$/.test(h));
   ok(outside.length === 0, 'no new host (only jsDelivr three@0.128.0 plus the fonts and rates hosts the app already names) ' + JSON.stringify(outside));
   ok(errs.length === 0, 'no page errors ' + JSON.stringify(errs.slice(0, 3)));
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED'); process.exit(fails ? 1 : 0);

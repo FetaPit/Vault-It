@@ -24,7 +24,7 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; cha
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
   '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon', '.glb': 'model/gltf-binary', '.gltf': 'model/gltf+json', '.woff': 'font/woff', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8', '.wasm': 'application/wasm' };
 
-let serverP = null;
+let serverP = null, ORIGIN = null;
 function serve() {   // resolves to 'http://127.0.0.1:PORT'
   if (serverP) return serverP;
   serverP = new Promise((resolve, reject) => {
@@ -40,7 +40,7 @@ function serve() {   // resolves to 'http://127.0.0.1:PORT'
       });
     });
     srv.on('error', reject);
-    srv.listen(0, '127.0.0.1', () => { srv.unref(); resolve('http://127.0.0.1:' + srv.address().port); });
+    srv.listen(0, '127.0.0.1', () => { srv.unref(); ORIGIN = 'http://127.0.0.1:' + srv.address().port; resolve(ORIGIN); });
   });
   return serverP;
 }
@@ -70,9 +70,17 @@ function patchPlaywright() {
   if (patched || process.env.VI_FILE) return; let pw; try { pw = require('playwright'); } catch (e) { return; }
   patched = true;
   const wrapGoto = proto => { if (!proto || proto.__viGoto) return; const orig = proto.goto; proto.goto = async function (u, o) { return orig.call(this, await toHttp(u), o); }; proto.__viGoto = true; };
-  const seePage = page => { if (!page) return page; wrapGoto(Object.getPrototypeOf(page)); try { wrapGoto(Object.getPrototypeOf(page.mainFrame())); } catch (e) {} return page; };
+  // "Offline" tests abort every http(s) request. The app now arrives over http from our own server, so an abort aimed at
+  // that server (and only that one) is passed on instead; every other host stays blocked.
+  const wrapRoute = proto => { if (!proto || proto.__viRoute || !proto.route) return; const orig = proto.route; proto.__viRoute = true;
+    proto.route = function (url, handler, opts) { if (typeof handler !== 'function') return orig.call(this, url, handler, opts);
+      const h = function (route, request) { let u = ''; try { u = (request || route.request()).url(); } catch (e) {}
+        if (ORIGIN && u.startsWith(ORIGIN + '/')) route = new Proxy(route, { get(t, k) { return k === 'abort' ? () => t.fallback() : (typeof t[k] === 'function' ? t[k].bind(t) : t[k]); } });
+        return handler.call(this, route, request); };
+      return orig.call(this, url, h, opts); }; };
+  const seePage = page => { if (!page) return page; wrapGoto(Object.getPrototypeOf(page)); wrapRoute(Object.getPrototypeOf(page)); try { wrapGoto(Object.getPrototypeOf(page.mainFrame())); } catch (e) {} return page; };
   const wrapMaker = (proto, name, after) => { if (!proto || !proto[name] || proto[name].__vi) return; const orig = proto[name]; const w = async function () { return after(await orig.apply(this, arguments)); }; w.__vi = true; proto[name] = w; };
-  const seeContext = ctx => { if (!ctx) return ctx; const cp = Object.getPrototypeOf(ctx); wrapMaker(cp, 'newPage', seePage); ctx.pages().forEach(seePage); ctx.on('page', seePage); return ctx; };
+  const seeContext = ctx => { if (!ctx) return ctx; const cp = Object.getPrototypeOf(ctx); wrapRoute(cp); wrapMaker(cp, 'newPage', seePage); ctx.pages().forEach(seePage); ctx.on('page', seePage); return ctx; };
   const seeBrowser = b => { if (!b) return b; const bp = Object.getPrototypeOf(b); wrapMaker(bp, 'newContext', seeContext); wrapMaker(bp, 'newPage', seePage); b.contexts().forEach(seeContext); return b; };
   for (const bt of [pw.chromium, pw.firefox, pw.webkit]) {
     if (!bt) continue; const bp = Object.getPrototypeOf(bt);
