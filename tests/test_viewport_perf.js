@@ -74,6 +74,14 @@ async function dragGlide(p, ctx, sel, label) {
   const cdp = await ctx.newCDPSession(p); await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await p.goto(origin + '/index.html', { waitUntil: 'load' }); await p.addStyleTag({ content: HIDE });
   await p.waitForFunction(() => !!window.THREE && !!THREE.OrbitControls && !!THREE.GLTFLoader, null, { timeout: 60000 }).catch(() => {});
+  // the warm-up keeps out of the way of a tab change: no warm-up draw (its hidden stage) in the 1.4 s after one, and it still finishes later
+  await p.waitForFunction(() => window.__P.three != null, null, { timeout: 60000 }).catch(() => {});
+  const tq = await p.evaluate(() => { showTab('budget'); return performance.now(); }); await settle(p, 1400);
+  const quiet = await p.evaluate(tq => __P.r.filter(x => x[0] >= tq + 30 && x[2] === 'off').length + __P.made.filter(m => !m[1] && m[0] >= tq + 30).length, tq);
+  ok(quiet === 0, 'the 3D warm-up does no work (no renderer made, no compile or draw) in the 1.4 s after a tab change (' + quiet + ' warm-up steps seen)');
+  await p.waitForFunction(() => window.V3 && V3._warmed, null, { timeout: 60000 }).catch(() => {});
+  ok(await p.evaluate(() => !!(window.V3 && V3._warmed)), 'the warm-up still finishes once the page is quiet');
+  await p.evaluate(() => showTab('overview'));
   await settle(p, 3000);
   // the cash and metals warm-up is asked for as soon as the page has loaded and the 3D engine is in (whichever comes last)
   const ws = await p.evaluate(() => { const ld = performance.getEntriesByType('navigation')[0], ready = Math.max(__P.three || 0, ld ? ld.loadEventEnd : 0); return { three: __P.three, ready, first: __P.warmAt == null ? null : __P.warmAt }; });
@@ -173,6 +181,20 @@ async function dragGlide(p, ctx, sel, label) {
   ok(kc.delDrops && kc.putDrops, 'a removed model or a new file drops the kept copy');
   ok(kc.staleRefused, 'a read that started before the file changed is not kept (no old model shown on the next open)');
   ok(kc.fallback && kc.freed, 'a second live view at the same moment gets its own renderer, and closing both frees the shared stage');
+  // ── 6. a card picture redrawn from the saved model (an older look) keeps that model, so opening the item reads nothing again ──
+  const rf = await p.evaluate(async () => { const it = alState.otherAssets.find(x => x.id === 12); it.model.tv = 2; _i3dRe.tried = {}; _i3dKeep.length = 0;
+    i3dRefreshThumbs(); for (let i = 0; i < 200 && (_i3dRe.run || it.model.tv !== 3); i++) await new Promise(r => setTimeout(r, 100));
+    const n0 = window.__parses; await i3dOpen('wi', 12); const opened = !!(window._i3dView && _i3dView.obj); const n1 = window.__parses; i3dClose(); return { redrawn: it.model.tv === 3, opened, reads: n1 - n0 }; });
+  ok(rf.redrawn && rf.opened && rf.reads === 0, 'a card picture just redrawn from the model hands that model to the viewer: opening it reads the file ' + rf.reads + ' times (want 0)');
+  // ── 7. ?perf=1 samples the item viewer's frames, with its draws and triangles ──
+  { const p2 = await ctx.newPage(); p2.on('pageerror', e => errs.push(e.message));
+    await p2.goto(origin + '/index.html?perf=1', { waitUntil: 'load' }); await p2.addStyleTag({ content: HIDE });
+    await p2.waitForFunction(() => !!window.THREE && !!THREE.GLTFLoader && !!window.VIPERF, null, { timeout: 60000 }).catch(() => {});
+    await p2.evaluate(() => { showTab('assets'); i3dOpen('wi', 11); });
+    const seen = await p2.waitForFunction(() => { const k = VIPERF.snapshot(); return k.viewport === 'Item 3D viewer' && k.stageFrames > 3 && k.stageCalls != null; }, null, { timeout: 45000 }).then(() => true).catch(() => false);
+    const k = await p2.evaluate(() => { const k = VIPERF.snapshot(); return { v: k.viewport, f: k.stageFrames, c: k.stageCalls, t: k.stageTris, line: VIPERF.report().split('\n').find(l => /^viewport (Item|Cash|Precious|house)/.test(l)) }; });
+    ok(seen && /Item 3D viewer \(three\.js, lit\)/.test(k.line || '') && k.c > 0 && k.t > 0, 'the ?perf=1 overlay samples the item viewer: ' + (k.line || k.v) + ' (' + k.f + ' frames)');
+    await p2.evaluate(() => { i3dClose(); try { localStorage.removeItem('vi-perf'); } catch (e) {} }); await p2.close(); }
   ok(!errs.length, 'no page errors ' + errs.slice(0, 2).join(' | '));
   await b.close(); srv.close();
   console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED'); process.exit(fails ? 1 : 0);

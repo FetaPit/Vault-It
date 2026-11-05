@@ -1,10 +1,10 @@
 // v0.9.2 baseline: every 3D viewport measured the same way, against the House Builder (CoS brief, 4 Nov: "The House Builder is the
 // benchmark; every viewport must perform like it"). Not pass/fail. Serves the repo over http, Chromium, CPU 4x, outside hosts blocked,
 // the demo data a new device gets. Counts WebGL draws at the context level, so it sees the House Builder's own engine as well as three.js.
-// For each viewport, at 390 px (touch) and 1100 px: tap to first draw, long tasks and blocking time in the first 6 s, steady frames a
+// For each viewport, at 390 px (touch) and 1100 px: tap to first draw, long tasks and blocking time in the first 6 s (and in the first 1.5 s), steady frames a
 // second and frame time while idle (on-demand stages should be near 0), while turning (a drag), draws per frame, canvas size and pixel
 // ratio, and whether it keeps drawing after you leave the tab.
-// Run: node tests/perf_baseline.js   (VI_ROOT=/path/to/checkout, PB_ONLY=house|cash|metals|inventory|liabilities|crypto|roadmap, PB_WIDTHS=390,1100)
+// Run: node tests/perf_baseline.js   (VI_ROOT=/path/to/checkout, PB_ONLY=house|cash|metals|crypto|roadmap|overview, PB_WIDTHS=390,1100, PB_PROFILE=1 prints a CPU profile of the open)
 const { chromium } = require('playwright');
 const http = require('http'), fs = require('fs'), path = require('path');
 const routeThree = require('./three_route');
@@ -49,12 +49,19 @@ async function measure(b, origin, w, name, V) {
   await p.waitForTimeout(4000);
   // start on a tab with no 3D (Budget), so the open below is a cold open of this viewport
   if (name !== 'overview') { await p.evaluate(() => showTab('budget')); await p.waitForTimeout(1500); }
+  if (process.env.PB_PROFILE) { await cdp.send('Profiler.enable'); await cdp.send('Profiler.setSamplingInterval', { interval: 500 }); await cdp.send('Profiler.start'); }
   const t0 = await p.evaluate(go => { const t = performance.now(); (0, eval)(go); return t; }, V.go);
   if (V.scroll) { await p.waitForTimeout(200); await p.evaluate(s => { const e = document.querySelector(s); e && e.scrollIntoView({ block: 'center', behavior: 'instant' }); }, V.scroll); }
   await p.waitForTimeout(6000);
   const open = await p.evaluate(t0 => { const B = __B, vis = B.d.filter(x => x[0] >= t0 && x[3]), lt = B.lt.filter(x => x[0] >= t0 && x[0] < t0 + 6000);
     const canv = [...document.querySelectorAll('canvas')].filter(c => c.offsetParent !== null && c.width * c.height > 20000).map(c => c.width + 'x' + c.height + '@' + (c.width / Math.max(1, c.clientWidth)).toFixed(2));
-    return { first: vis.length ? Math.round(vis[0][0] - t0) : null, longTasks: lt.length, longMax: Math.round(Math.max(0, ...lt.map(x => x[1]))), tbt: Math.round(lt.reduce((a, x) => a + Math.max(0, x[1] - 50), 0)), canvases: canv }; }, t0);
+    return { first: vis.length ? Math.round(vis[0][0] - t0) : null, longTasks: lt.length, longMax: Math.round(Math.max(0, ...lt.map(x => x[1]))), tbt: Math.round(lt.reduce((a, x) => a + Math.max(0, x[1] - 50), 0)), tbt1500: Math.round(lt.filter(x => x[0] < t0 + 1500).reduce((a, x) => a + Math.max(0, x[1] - 50), 0)), canvases: canv }; }, t0);
+  if (process.env.PB_PROFILE) { const { profile } = await cdp.send('Profiler.stop'); const byId = {}, par = {}, cnt = {}; profile.nodes.forEach(n => { byId[n.id] = n; (n.children || []).forEach(c => par[c] = n.id); });
+    profile.samples.forEach((id, i) => cnt[id] = (cnt[id] || 0) + (profile.timeDeltas[i] || 0)); const inc = {}, self = {};
+    profile.nodes.forEach(n => { const t = (cnt[n.id] || 0) / 1000; if (!t) return; const f0 = n.callFrame, k0 = (f0.functionName || '(anon)') + ':' + (f0.lineNumber + 1); self[k0] = (self[k0] || 0) + t;
+      const seen = new Set(); let id = n.id; while (id != null) { const f = byId[id].callFrame, k = (f.functionName || '(anon)') + ':' + (f.lineNumber + 1); if (!seen.has(k)) { inc[k] = (inc[k] || 0) + t; seen.add(k); } id = par[id]; } });
+    const top = o => Object.entries(o).filter(([k]) => !/^\((root|idle|program|garbage collector)\)/.test(k)).sort((a, b) => b[1] - a[1]).slice(0, 18).map(([k, v]) => k + ' ' + v.toFixed(0)).join(', ');
+    console.error('PROFILE ' + name + ' ' + w + '\n  self: ' + top(self) + '\n  incl: ' + top(inc)); }
   // idle: 3 s with nothing touched. An on-demand stage should draw nothing; a continuous loop draws every frame.
   const ti = await p.evaluate(() => performance.now()); await p.waitForTimeout(3000);
   const idle = await p.evaluate(ti => { const B = __B, d = B.d.filter(x => x[0] >= ti && x[3]), fr = new Set(d.map(x => x[1])), ft = B.ft.filter(t => t >= ti), gaps = ft.slice(1).map((t, i) => t - ft[i]).sort((a, b) => a - b);
