@@ -126,7 +126,7 @@ const instrument = p => p.evaluate(() => {
       await p.reload(); await p.waitForTimeout(1500); await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
       await p.waitForFunction(() => window.THREE && THREE.GLTFLoader, null, { timeout: 20000 }).catch(() => {});
       await p.evaluate(() => i3dRefreshThumbs()); await p.waitForFunction(() => { const it = alState.otherAssets.find(x => x.id === 11); return it.model.tv !== 2 && !_i3dRe.run; }, null, { timeout: 20000 }).catch(() => {});
-      const re = await p.evaluate(() => { const m = alState.otherAssets.find(x => x.id === 11).model; return { tv: m.tv, fresh: m.thumb.length > 1000 }; });
+      const re = await p.evaluate(() => { const it = alState.otherAssets.find(x => x.id === 11), m = it && it.model; return m ? { tv: m.tv, fresh: m.thumb.length > 1000 } : { tv: 'model missing after reload', fresh: false }; });
       ok(re.tv === 3 && re.fresh, tag + ': a picture from the earlier look is redrawn once and marked as the new look (tv ' + re.tv + ')');
       await p.reload(); await p.waitForTimeout(1500); await p.waitForFunction(() => window.THREE && THREE.GLTFLoader, null, { timeout: 20000 }).catch(() => {});
       const again = await p.evaluate(() => { const before = alState.otherAssets.find(x => x.id === 11).model.thumb; i3dRefreshThumbs(); return !_i3dRe.run && alState.otherAssets.find(x => x.id === 11).model.thumb === before; });

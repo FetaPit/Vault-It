@@ -8,7 +8,7 @@ const MOCK=(cloud,mode)=>`
     auth:{onAuthStateChange:()=>({}),getSession:async()=>({data:{session:null}}),signOut:async()=>({}),verifyOtp:async()=>({error:{message:'x'}})},
     functions:{invoke:async()=>({data:null,error:{message:'n/a'}})},
     from:(t)=>({
-      upsert:(rows)=>{ if(window._mode==='hang')return new Promise(()=>{}); if(window._mode==='fail')return Promise.resolve({error:{message:'boom'}}); [].concat(rows).forEach(r=>{window._cloud[r.key]={value:r.value,updated_at:r.updated_at};});return Promise.resolve({}); },
+      upsert:(rows)=>{ if(window._mode==='hang')return new Promise(()=>{}); if(window._mode==='fail')return Promise.resolve({error:{message:'boom'}}); [].concat(rows).forEach(r=>{try{sessionStorage.setItem('nd_up',(sessionStorage.getItem('nd_up')||'')+'|'+r.key+'='+JSON.stringify(r.value));}catch(e){} window._cloud[r.key]={value:r.value,updated_at:r.updated_at};});return Promise.resolve({}); },
       select:()=>({eq:()=>window._mode==='nocloud'?new Promise(()=>{}):Promise.resolve({data:Object.keys(window._cloud).map(k=>({key:k,value:window._cloud[k].value,updated_at:window._cloud[k].updated_at}))}),single:async()=>({data:null})})})
   })};`;
 const newCtx=async(b,init,cloud,mode)=>{
@@ -36,7 +36,8 @@ const DEMO_HT3={saved:22500,target:240000,houseType:'terraced',deposits:[{date:'
   // _completeAuth with demo mode still on discards the sample data
   ({ctx,page}=await newCtx(b,`if(!localStorage.getItem('vi_user')){localStorage.setItem('vi_demo_mode','true');localStorage.setItem('vi_user',JSON.stringify({name:'Alex',email:'demo@vault-it.app'}));localStorage.setItem('pos_debt1',${JSON.stringify(JSON.stringify(DEMO_DEBT))});}`,{}));
   await page.evaluate(()=>{_completeAuth('t@t.com');}); await page.waitForTimeout(1500);
-  const d=await page.evaluate(()=>({demo:localStorage.getItem('vi_demo_mode'),debt:localStorage.getItem('pos_debt1')}));
-  ok(d.demo!=='true'&&(!d.debt||!/Student Loan Plan 2/.test(d.debt)),'sign-in with sample data present wipes it instead of adopting it ('+JSON.stringify(d).slice(0,80)+')'); await ctx.close();
+  const d=await page.evaluate(()=>({demo:localStorage.getItem('vi_demo_mode'),debt:localStorage.getItem('pos_debt1'),up:sessionStorage.getItem('nd_up')||''}));
+  ok(d.demo!=='true'&&(!d.debt||!/Student Loan Plan 2/.test(d.debt)),'sign-in with sample data present wipes it instead of adopting it ('+JSON.stringify(d).slice(0,80)+')');
+  ok(!/Student Loan Plan 2|Alex Morgan|demo@vault-it\.app/.test(d.up),'…and no sample figures are uploaded to the account ('+(d.up.slice(0,80)||'nothing uploaded')+')'); await ctx.close();
   await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
 })();
