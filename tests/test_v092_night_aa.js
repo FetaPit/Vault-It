@@ -41,6 +41,11 @@ const MEASURE = () => {
     const rm = await page.evaluate(() => { const gs = [...document.querySelectorAll('#fire-roadmap-svg .fire-coin')]; return { n: gs.length, wordsFaded: gs.filter(g => g.style.opacity !== '' && +g.style.opacity < 1).length, artFaded: gs.filter(g => { const c = g.querySelector('.fire-card'); return c && c.style.opacity !== '' && +c.style.opacity < 1; }).length }; });
     if (night) ok(rm.n > 1 && rm.wordsFaded === 0 && rm.artFaded > 0, T + 'roadmap: only the slate art fades (' + JSON.stringify(rm) + ')');
     else ok(rm.n > 1 && rm.artFaded === 0, T + 'roadmap in Daylight keeps the old whole-stage fade (' + JSON.stringify(rm) + ')');
+    // Pedro's two follow-up lifts: the Metals summary sub text and the VAULT-IT edge label (Night only)
+    await page.evaluate(() => { showTab('assets'); showSubtab('assets', 'metals', null); }); await page.waitForTimeout(600);
+    const lf = await page.evaluate(() => ({ sub: getComputedStyle(document.querySelector('#metals-kpis .ov-kpi-sub')).color, tg: +getComputedStyle(document.querySelector('#sidebar-toggle span:last-child')).opacity }));
+    if (night) { ok(lf.sub === 'rgb(167, 173, 179)', T + 'Metals summary sub text is lifted (' + lf.sub + ')'); ok(lf.tg === 1, T + 'the VAULT-IT edge label is not faded (' + lf.tg + ')'); }
+    else { ok(lf.sub !== 'rgb(167, 173, 179)', T + 'Daylight Metals sub text unchanged (' + lf.sub + ')'); ok(lf.tg < 1, T + 'Daylight edge label keeps its fade (' + lf.tg + ')'); }
     ok(!errs.length, T + 'no page errors ' + errs.join('|'));
     await ctx.close();
   }
