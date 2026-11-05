@@ -150,3 +150,4 @@ node tests/test_pete_card.js       # vault-it.co/pete: digital business card fli
 node tests/perf_baseline.js      # v0.9.2 baseline, not pass/fail: every 3D viewport against the House Builder at 390 and 1100 px, CPU 4x: tap to first draw, blocking time, draws a second idle and while turning, draws per frame, canvas size, drawing after the tab is left (VI_ROOT, PB_ONLY, PB_WIDTHS, PB_OUT)
 - test_v092_coin_rims.js, test_v092_crypto_tiles.js: v0.9.2 polish (every coin's own rim colour; Pedro's chunk G nits on the crypto tiles)
 - test_v092_light_chrome.js: the install banner and the footer keep the Night look in Daylight (real rendered pixels, AA text, theme toggled four times)
+- test_v092_polish2.js: slate prices in full (£200,000) and crypto ticker dots in the coin's own colour
