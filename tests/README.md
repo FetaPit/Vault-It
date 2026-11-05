@@ -154,3 +154,4 @@ node tests/perf_baseline.js      # v0.9.2 baseline, not pass/fail: every 3D view
 - test_v092_polish2.js: slate prices in full (£200,000) and crypto ticker dots in the coin's own colour
 - test_v092_night_aa.js: v0.9.2 Night AA contrast pass (placeholders, white-on-teal buttons, opacity floors, roadmap carousel fades only the art; Daylight unchanged)
 - test_v092_login_reach.js: every way into sign-in (fresh, PIN pad, valid session, demo, welcome, slow PIN check, library not loaded) reaches an enabled email field and Continue at iPhone, Android, keyboard-open and landscape sizes
+- test_v092_login_intro.js: sign-in intro and 3 steps above the email field, email and Continue above the fold at 390x664, bigger card on desktop (520 to 560 px, 48 px controls)
