@@ -51,7 +51,7 @@ button.copy.done{background:var(--teal);color:var(--on-teal)}
 @media(min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips span{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:14px}
-ol.steps{margin:0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:s}
+ol.steps{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:s}
 ol.steps li{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
 ol.steps input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--teal-deep);flex:none}
 ol.steps label{cursor:pointer}
@@ -270,7 +270,106 @@ We're opening our first 90-day pilots now. Message us or email hello@vault-it.co
 </section>
 
 <section>
-  <div><div class="label">05 · Setup</div><h2>Steps in order</h2></div>
+  <div><div class="label">05 · Substack</div><h2>First Substack post</h2></div>
+  <p class="intro">Publish this first, then share the link as your first LinkedIn post. Paste the headings in as Substack headings (the "H" button), the rest as normal text.</p>
+  <div class="field">
+    <div class="fhead"><span class="fname">Publication name</span></div>
+    <pre class="val">One More Brick</pre>
+    <p class="note">From your own line, "how much I need to put in to lay one more brick". Subtitle idea: <b>Building Vault·It in public, from Lincoln.</b></p>
+    <button class="copy" type="button">Copy</button>
+  </div>
+  <div class="field">
+    <div class="fhead"><span class="fname">Post title</span></div>
+    <pre class="val">The thing I needed didn't exist, so I built it</pre>
+    <button class="copy" type="button">Copy</button>
+  </div>
+  <div class="field">
+    <div class="fhead"><span class="fname">Post subtitle</span></div>
+    <pre class="val">Why I'm building Vault·It, and why I'm going to write about it as I go</pre>
+    <button class="copy" type="button">Copy</button>
+  </div>
+  <div class="field">
+    <div class="fhead"><span class="fname">Post body</span><span class="count" id="subWords"></span></div>
+<pre class="val" id="subBody">Someone told me once that authors write the books they needed themselves.
+
+I think about that a lot.
+
+James Clear did it with Atomic Habits. He got badly hurt, rebuilt himself one small habit at a time, then wrote down what worked. There's a line in it I keep coming back to: "You do not rise to the level of your goals. You fall to the level of your systems."
+
+I didn't write a book. I built an app. But it started the same way.
+
+Where it started
+
+I was saving, or trying to. But I couldn't see where any of it was going or what I actually owned. Buying a house felt like this far-off thing with no date on it. Something other people did.
+
+I didn't want another spreadsheet. I wanted to see it. I wanted to know what I was working towards, and exactly how much I needed to put in to lay one more brick.
+
+So I built that.
+
+What Vault·It does
+
+You put your numbers in. What you owe, what you've saved, what you need for a deposit. No bank login, you just type it in.
+
+Every pound you save becomes a brick on a 3D house. You watch it go up row by row. And it gives you a date for your keys. Pay off a card and the date comes closer. Miss a month and you can see that too.
+
+Debt, then deposit, then keys. That's the whole idea.
+
+Why it matters
+
+The average first-time buyer is now 34. In the 1990s it was 29. House prices are 7.6 times average earnings. New StepChange clients owe £16,874 on average before they've even started.
+
+Loads of people want a home. Most of them don't have a date. Without a date it's just a wish.
+
+And if your brain struggles with things that are a long way off, a ten-year goal may as well not exist. Time-blindness is real. So I'd rather put the goal right in front of you, where you can spin it round and see the gap.
+
+A bit about me
+
+I'm a designer from Lincoln. I studied architecture, spent years in brand, interactive and 3D work, and led visual comms in a Ministry of Defence innovation team. I run a small studio, PT Live Design.
+
+I'm not a banker. I'm someone who needed this and couldn't find it.
+
+Where it's at
+
+Vault·It is live in alpha. It's self-funded and I've built it myself. 26 people have saved vaults so far, and the feedback has been brilliant. Not always nice, but that's what I need.
+
+This Saturday I'm pitching it in London at Eligent Club. First time in front of investors with it. I'll let you know how it goes.
+
+Why I'm writing this
+
+I want to write the build down as it happens. The wins, the rubbish bits, what I learn about money, design and starting something from scratch. Partly to keep myself on track. Partly because someone else might be at the start of the same road.
+
+If that's you, subscribe and come along.
+
+And if you want to try it, the beta's free at vault-it.co. Tell me what you think. I read everything.
+
+Pete
+
+Not financial advice. Vault·It is not regulated by the FCA.</pre>
+    <button class="copy" type="button">Copy</button>
+  </div>
+  <div class="field" data-max="3000">
+    <div class="fhead"><span class="when" style="font:13px var(--font-mono);color:var(--gold);letter-spacing:.06em">YOUR FIRST LINKEDIN POST</span><span class="count"></span></div>
+<pre class="val">I've started writing.
+
+First post is up on Substack. Why I'm building Vault·It, a bit about me, and why I think anyone saving for a home deserves a date for their keys.
+
+I'm going to write as I build. The wins, the mistakes, the lot.
+
+Link in the comments 👇</pre>
+    <p class="note">LinkedIn shows posts with links in them to fewer people, so post this, then add your Substack link as the <b>first comment</b> straight away. Post it from your own profile, then reshare from the Vault·It page.</p>
+    <button class="copy" type="button">Copy</button>
+  </div>
+  <ol class="steps" id="substeps">
+    <li><input type="checkbox" id="u1"><label for="u1">Go to <b>substack.com</b>, sign in with ptlived@gmail.com, then <b>Start writing</b> and set the publication name.</label></li>
+    <li><input type="checkbox" id="u2"><label for="u2">Add the Vault·It logo as the publication image and the cover banner as the header.</label></li>
+    <li><input type="checkbox" id="u3"><label for="u3"><b>New post</b>: paste title, subtitle and body. Add a screenshot of the house builder near the top.</label></li>
+    <li><input type="checkbox" id="u4"><label for="u4"><b>Continue → Publish now</b>. Untick "send email" if you have no subscribers yet.</label></li>
+    <li><input type="checkbox" id="u5"><label for="u5">Copy the post link, post the LinkedIn text above, and add the link as the first comment.</label></li>
+  </ol>
+</section>
+
+<section>
+  <div><div class="label">06 · Setup</div><h2>Steps in order</h2></div>
   <ol class="steps" id="steps">
     <li><input type="checkbox" id="s1"><label for="s1">On LinkedIn (desktop is easiest), go to <b>For Business → Create a Company Page → Company</b>.</label></li>
     <li><input type="checkbox" id="s2"><label for="s2">Fill in name, URL, website, industry, size, type, logo and tagline (section 02).</label></li>
@@ -300,9 +399,10 @@ document.querySelectorAll('button.copy').forEach(function(b){
     try{navigator.clipboard.writeText(t).then(ok,fallback)}catch(e){fallback()}
   });
 });
+var sb=document.getElementById('subBody');if(sb)document.getElementById('subWords').textContent=sb.textContent.trim().split(/\s+/).length+' words · about 3 min read';
 var KEY='vi-li-steps';
 var saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
-document.querySelectorAll('#steps input').forEach(function(i){
+document.querySelectorAll('#steps input, #substeps input').forEach(function(i){
   if(saved[i.id]){i.checked=true;i.closest('li').classList.add('ticked')}
   i.addEventListener('change',function(){i.closest('li').classList.toggle('ticked',i.checked);saved[i.id]=i.checked;try{localStorage.setItem(KEY,JSON.stringify(saved))}catch(e){}});
 });
