@@ -5,12 +5,17 @@
 //   founder, yearly for pioneer." Confirmed: Founder £3.99 a month (£5.99 later), Pioneer £49.99 a year (£59.99 later), Lifetime licence
 //   £99 once (£149 later); the alpha trial on monthly and yearly; family mode on Pioneer as "Family mode (coming soon)"; Lifetime always
 //   charged at checkout.
-//   1. VI_PLANS is the single source; the old £3.99, £39.99 and £99 links are gone; the £59.99 slot is empty and named
+//   1. VI_PLANS is the single source; the old £3.99, £39.99 and £99 links are gone; the £59.99 slot is named and (since 5 Nov) holds the live link
 //   2. alpha testers (every account while VI_BETA_OPEN): Founder and Pioneer open the 30-day trial links (card now, first charge on day 31)
 //      with the trial terms and how to cancel next to the button; Lifetime opens the £99 link, charged at checkout
 //   3. not an alpha tester while the beta is open: the same beta prices, charged at checkout, no trial wording
-//   4. beta closed: full prices; Founder £5.99 and Lifetime £149 open their links; Pioneer at £59.99 says "coming soon" and opens nothing
+//   4. beta closed: full prices; Founder £5.99 and Lifetime £149 open their links; Pioneer yearly opens the £59.99 link (5 Nov; it said "coming soon" before)
 //   5. names: Founder, Pioneer, Lifetime licence (read-only after the trial has no tier name); icons on every card
+// Owner, 5 Nov 2026 (answers to the parent session): "Pioneer" now names both the monthly and the yearly plan (Stripe's product has
+//   always been "Vault·It Pioneer" for both); the tier key and icon stay 'founder' for the monthly card. The £59.99 yearly link exists
+//   in Stripe (cNidR3b5s3IJ0ex2yy2VG0c, price_1TdPyB9mgKf6HntyvjViAMQg, £59.99 a year recurring), so once the beta closes Pioneer yearly
+//   opens it instead of saying "coming soon". Hand-worked: beta closed, not a tester, showUpgrade('annual') -> VI_PLANS.annual.link =
+//   'annual_after_beta' -> that URL; the card shows £59.99/yr alone. The "coming soon" guard is still checked with a link blanked in the page.
 // Run: node tests/test_tier_prices.js
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -19,11 +24,11 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
 // the owner's figures and the Stripe links created 4 Nov evening, written out by hand so a slip in the app cannot hide itself
 const L = {
   monthly_trial: 'https://buy.stripe.com/8x2fZbgpMdjjgdv5KK2VG08', monthly_tester: 'https://buy.stripe.com/aFacMZa1odjj1iB3CC2VG09', monthly: 'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',
-  annual_trial: 'https://buy.stripe.com/3cI14hc9w1ABe5na102VG0a', annual: 'https://buy.stripe.com/dRm3cp6Pccff2mFa102VG02', annual_after_beta: '',
+  annual_trial: 'https://buy.stripe.com/3cI14hc9w1ABe5na102VG0a', annual: 'https://buy.stripe.com/dRm3cp6Pccff2mFa102VG02', annual_after_beta: 'https://buy.stripe.com/cNidR3b5s3IJ0ex2yy2VG0c',
   founder_tester: 'https://buy.stripe.com/4gM6oB5L87YZ5yRflk2VG0b', founder: 'https://buy.stripe.com/eVq28l0qO6UV3qJc982VG05'
 };
 const X = {
-  monthly: { now: '£3.99', after: '£5.99', per: 'a month', trial: 'monthly_trial', checkout: 'monthly_tester', full: 'monthly', name: 'Founder', tier: 'founder' },
+  monthly: { now: '£3.99', after: '£5.99', per: 'a month', trial: 'monthly_trial', checkout: 'monthly_tester', full: 'monthly', name: 'Pioneer', tier: 'founder' },
   annual: { now: '£49.99', after: '£59.99', per: 'a year', trial: 'annual_trial', checkout: 'annual', full: 'annual_after_beta', name: 'Pioneer', tier: 'pioneer' },
   founder: { now: '£99', after: '£149', trial: null, checkout: 'founder_tester', full: 'founder', name: 'Lifetime licence', tier: 'lifetime' }
 };
@@ -43,9 +48,10 @@ const seed = () => {
   let P = null; try { P = Function('return ' + plans[1])(); } catch (e) {}
   ok(P && P.monthly.price === 5.99 && P.monthly.tester === 3.99 && P.annual.price === 59.99 && P.annual.tester === 49.99 && P.founder.price === 149 && P.founder.tester === 99,
     'VI_PLANS: monthly 5.99/3.99, annual 59.99/49.99, founder (Lifetime) 149/99 (' + (plans ? plans[1].slice(0, 120) : 'not found') + ')');
-  ok(P && P.monthly.name === 'Founder' && P.annual.name === 'Pioneer' && P.founder.name === 'Lifetime licence', 'VI_PLANS names: Founder, Pioneer, Lifetime licence');
+  ok(P && P.monthly.name === 'Pioneer' && P.monthly.tier === 'founder' && P.annual.name === 'Pioneer' && P.founder.name === 'Lifetime licence', 'VI_PLANS names: Pioneer (monthly, founder icon), Pioneer (yearly), Lifetime licence');
+  ok(!/data-tier-name>Founder<|data-cta="Become a Founder|name: 'Founder'|\? ?'Founder'|Founder at |Founder \(monthly\)|Founder monthly|Everything in Founder|on Founder|plan: Founder|for Founder,|<b>Founder:/.test(src), 'the monthly plan is never shown as "Founder" any more (owner, 5 Nov)');
   ok(!/6oUeV7b5sbbb7GZ6OO2VG03|3cI8wJ0qO9337GZa102VG06|bJe3cpc9w4MN8L31uu2VG07|annual_tester/.test(src), 'the old £3.99, £39.99 and £99 links are no longer in the app');
-  ok(/annual_after_beta:\s*''/.test(src), 'the £59.99 yearly link is an empty, named slot (annual_after_beta)');
+  ok(/annual_after_beta:\s*'https:\/\/buy\.stripe\.com\/cNidR3b5s3IJ0ex2yy2VG0c'/.test(src), 'the £59.99 yearly slot (annual_after_beta) holds the live Stripe link');
   ok(!/Vaulter|VAULTER|Founding Member|FOUNDING MEMBER|Pioneer monthly/.test(src), 'no "Vaulter" or "Founding Member" left in the app, in any case');
   ok(!/<s>£|\(was £|was £/.test(src), 'no struck-through or "was" prices in the markup');
 
@@ -103,18 +109,18 @@ const seed = () => {
       ok(r.icons.includes(X[pl].tier), k + ' ' + pl + ': carries the ' + X[pl].tier + ' icon');
     }
   }
-  ok(R.offer.names.join('|') === 'Read-only|Founder|Pioneer|Lifetime licence', 'plans pop-up columns: Read-only, Founder, Pioneer, Lifetime licence (' + R.offer.names.join('|') + ')');
-  ok(R.camp.names.join('|') === 'Founder|Pioneer|Lifetime licence', 'crowdfund cards: Founder, Pioneer, Lifetime licence (' + R.camp.names.join('|') + ')');
-  ok(R.paywall.names.join('|') === 'Founder|Pioneer' && R.settings.names.join('|') === 'Founder|Pioneer|Lifetime licence', 'paywall and Settings name the tiers (' + R.paywall.names.join('|') + ' / ' + R.settings.names.join('|') + ')');
+  ok(R.offer.names.join('|') === 'Read-only|Pioneer|Pioneer|Lifetime licence', 'plans pop-up columns: Read-only, Pioneer (monthly), Pioneer (yearly), Lifetime licence (' + R.offer.names.join('|') + ')');
+  ok(R.camp.names.join('|') === 'Pioneer|Pioneer|Lifetime licence', 'crowdfund cards: Pioneer (monthly), Pioneer (yearly), Lifetime licence (' + R.camp.names.join('|') + ')');
+  ok(R.paywall.names.join('|') === 'Pioneer|Pioneer' && R.settings.names.join('|') === 'Pioneer|Pioneer|Lifetime licence', 'paywall and Settings name the tiers (' + R.paywall.names.join('|') + ' / ' + R.settings.names.join('|') + ')');
   ok(/Family mode \(coming soon\)/.test(R.offer.pioneer) && /Family mode \(coming soon\)/.test(R.camp.pioneer), 'Pioneer lists "Family mode (coming soon)" in the plans pop-up and the crowdfund');
   ok(R.offer.icons.length === 3, 'the read-only column has no tier icon (' + R.offer.icons.join(',') + ')');
   let C = await clickAll();
   const trialKey = (pl) => X[pl].trial || X[pl].checkout;
-  ok(C.length >= 11 && opens(C, trialKey).length === 0, 'alpha: Founder and Pioneer open the 30-day trial links, Lifetime the £99 link (' + opens(C, trialKey).join(' | ') + ')');
+  ok(C.length >= 11 && opens(C, trialKey).length === 0, 'alpha: Pioneer monthly and yearly open the 30-day trial links, Lifetime the £99 link (' + opens(C, trialKey).join(' | ') + ')');
 
   // ── read-only after the 30 days: no tier name ──
   const RO = await p.evaluate(() => { const d = viTrialDaysLeft; viTrialDaysLeft = () => 0; _refreshPioneerSettingsUI(); const o = { badge: document.getElementById('set-pioneer-badge').textContent, txt: document.getElementById('set-pioneer-inactive').textContent }; viTrialDaysLeft = d; _refreshPioneerSettingsUI(); return o; });
-  ok(/READ-ONLY/.test(RO.badge) && /read-only/.test(RO.txt) && /Founder at £3\.99 a month/.test(RO.txt) && /Lifetime licence/.test(RO.txt), 'read-only state has no tier name; the plans are offered by name (' + RO.badge + ' / ' + RO.txt + ')');
+  ok(/READ-ONLY/.test(RO.badge) && /read-only/.test(RO.txt) && /Pioneer at £3\.99 a month/.test(RO.txt) && /Pioneer at £49\.99 a year/.test(RO.txt) && !/Founder/.test(RO.txt) && /Lifetime licence/.test(RO.txt), 'read-only state has no tier name; the plans are offered by name (' + RO.badge + ' / ' + RO.txt + ')');
 
   // ── 3. not an alpha tester, beta still open: beta prices charged at checkout, no trial wording ──
   await p.evaluate(() => { localStorage.setItem('vi_beta', 'false'); });
@@ -134,13 +140,13 @@ const seed = () => {
   for (const [k, want] of Object.entries(SURF)) for (const pl of want) {
     const pr = R[k].prices.filter(x => x.plan === pl);
     ok(pr.length > 0 && pr.every(x => re(X[pl].after).test(x.text) && !/after the beta/.test(x.text) && !re(X[pl].now).test(x.text)), k + ' ' + pl + ' (beta closed): ' + X[pl].after + ' alone (' + pr.map(x => x.text).join(' / ') + ')');
-    if (pl === 'annual') { const bt = R[k].buttons.filter(x => x.plan === pl); ok(bt.length && bt.every(x => x.disabled && /coming soon/i.test(x.text)), k + ' Pioneer (beta closed): button disabled and says coming soon (' + bt.map(x => x.text).join(' / ') + ')'); }
+    if (pl === 'annual') { const bt = R[k].buttons.filter(x => x.plan === pl); ok(bt.length && bt.every(x => !x.disabled && !/coming soon/i.test(x.text)), k + ' Pioneer yearly (beta closed): button enabled, no "coming soon" (' + bt.map(x => x.text).join(' / ') + ')'); }
   }
   C = await clickAll();
-  ok(C.filter(c => c.plan === 'annual').every(c => !c.url), 'beta closed: no Pioneer button opens a link');
-  ok(opens(C.filter(c => c.plan !== 'annual'), pl => X[pl].full).length === 0, 'beta closed: Founder opens £5.99 and Lifetime £149');
-  const S = await p.evaluate(() => { const o = []; window.open = (u) => { o.push(u); }; const t = window.showToast; let msg = ''; window.showToast = (m) => { msg = m; }; showUpgrade('annual'); window.showToast = t; return { o, msg }; });
-  ok(S.o.length === 0 && /coming soon/i.test(S.msg), 'showUpgrade("annual") with no link opens nothing and says so (' + S.msg + ')');
+  ok(C.filter(c => c.plan === 'annual').length >= 3 && opens(C, pl => X[pl].full).length === 0, 'beta closed: Pioneer monthly opens £5.99, Pioneer yearly £59.99 and Lifetime £149 (' + opens(C, pl => X[pl].full).join(' | ') + ')');
+  // the "never a dead link" guard still holds for a plan whose link is blanked: nothing opens, the button says so
+  const S = await p.evaluate(() => { const keep = VI_STRIPE_LINKS.annual_after_beta; VI_STRIPE_LINKS.annual_after_beta = ''; viPricePaint(); const b = document.getElementById('offer-cta-annual'); const o = []; window.open = (u) => { o.push(u); }; const t = window.showToast; let msg = ''; window.showToast = (m) => { msg = m; }; showUpgrade('annual'); window.showToast = t; const r = { o, msg, dis: b.disabled, txt: b.textContent.trim() }; VI_STRIPE_LINKS.annual_after_beta = keep; viPricePaint(); return r; });
+  ok(S.o.length === 0 && /coming soon/i.test(S.msg) && S.dis && /coming soon/i.test(S.txt), 'a plan with its link blanked opens nothing and says coming soon (' + S.msg + ' / ' + S.txt + ')');
 
   await b.close();
   ok(errs.length === 0, 'no page errors ' + errs.join(' | '));
