@@ -116,3 +116,4 @@ node tests/test_viewport_perf.js  # v0.9.2 viewport speed budgets (cash, metals,
 node tests/perf_viewports.js      # v0.9.2 measurement, not pass/fail: cold open to first 3D frame, long tasks and blocking time in 6 s, tap p95, draw calls, modal open and close, for the four viewports (VI_ROOT to measure another checkout, PERF_ONLY, PERF_OUT, PERF_PROFILE)
 node tests/test_pete_card.js       # vault-it.co/pete: digital business card flips (tap, Flip button, drag in 3D), house build corner on the front (still with reduced motion), Save contact vCard, no placeholders, no outside hosts
 - test_v092_coin_rims.js, test_v092_crypto_tiles.js: v0.9.2 polish (every coin's own rim colour; Pedro's chunk G nits on the crypto tiles)
+- test_v092_night_aa.js: v0.9.2 Night AA contrast pass (placeholders, white-on-teal buttons, opacity floors, roadmap carousel fades only the art; Daylight unchanged)
