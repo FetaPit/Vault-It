@@ -1,6 +1,7 @@
 // Level 3 (plan your next home) is locked for everyone under Pro (owner, 1 Nov 2026). The chip is a locked PRO button, the card says
 // it is coming later as part of Pro, hbSetView(3) and hbUnlockL3() only toast and change nothing, a saved level3 = true still shows Level 2.
 // The upgrade planner's sums are kept for when it returns and are checked in tests/test_hb4_engine.js.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree=require('./three_route');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
@@ -9,7 +10,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   await page.addInitScript(()=>{if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'P',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');
     localStorage.setItem('ht3',JSON.stringify({saved:37500,target:250000,houseType:'semi',houseMode:'purchased',mortgageBalance:212500,valuation:250000,purchase:{price:250000,deposit:37500,date:'2026-10-01'},deposits:[{amount:37500,date:'01/10/2026'}],prices:{semi:250000},calc:{over:300,_set:true,price:250000,dep:37500,bal:212500,val:250000}}));
     localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'Salary',amount:2000}],expenses:[{id:2,name:'Rent',amount:1200,type:'ce'}]}));});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   await page.evaluate(()=>showTab('house')); await page.waitForTimeout(900);
   const MSG='Level 3: plan your next home. Coming later as part of Pro.';

@@ -3,10 +3,11 @@
 // Screen: at 390, 690, 1100 and 1440 no text is under 10 px as drawn (SVG text includes its viewBox scale), apart from the agreed exceptions.
 // The floors make no new clipped or overlapping text: each view is measured with the floors on and then off (tokens set to 0) in the same page.
 // Root size, the tab bar's height and the 3D house stage's size do not change. No sideways page scroll. Run: node tests/test_v08_type_scale.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-const URL_ = 'file:///home/user/Vault-It/index.html?bypass=websummit';
+const URL_ = require('./lib/vi').FILE_URL + '?bypass=websummit';
 const sub = s => `showTab('assets');showSubtab('assets','${s}',document.querySelector('.subtab-btn[onclick*="${s}"]'))`;
 const VIEWS = [
   ['overview', "showTab('overview')"], ['budget', "showTab('budget')"], ['house', "showTab('house')"],
@@ -23,7 +24,7 @@ const OFF = ':root{--vi-fs-0:0px!important;--vi-fs-1:0px!important;--vi-fs-2:0px
 
 // source check: every small font-size in index.html carries its tier floor
 {
-  const src = require('fs').readFileSync('/home/user/Vault-It/index.html', 'utf8');
+  const src = require('fs').readFileSync(require('./lib/vi').INDEX, 'utf8');
   const body = src.slice(0, src.indexOf('// <<HB3D_ENGINE')) + src.slice(src.indexOf('// HB3D_ENGINE>>'));
   const bare = [], wrong = [];
   for (const m of body.matchAll(/font-size\s*:\s*(\d*\.?\d+)(rem|px)(?![\w(])/g)) {
@@ -194,7 +195,7 @@ function measure() {
     await p4.addInitScript(seedFc);
     const st = () => p4.evaluate(() => { const n = document.getElementById('nw-fc-note'), c = n && n.closest('.ov-chart-card'); return { has: !!(n && n.textContent.trim()), is3d: !!(c && c.classList.contains('nw3d-main-3d')), shown: !!(n && n.offsetParent) }; });
     const pick = m => p4.evaluate(m => document.querySelector('#nw3d-main button[data-m="' + m + '"]').click(), m);
-    await p4.goto('file:///home/user/Vault-It/index.html'); await p4.waitForTimeout(2200); await p4.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
+    await p4.goto(require('./lib/vi').FILE_URL); await p4.waitForTimeout(2200); await p4.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await pick('3d'); await p4.waitForTimeout(400); const a3 = await st();
     await pick('graph'); await p4.waitForTimeout(400); const ag = await st();
     await p4.reload(); await p4.waitForTimeout(2200); const ar = await st();

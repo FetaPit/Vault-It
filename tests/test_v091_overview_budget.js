@@ -1,7 +1,8 @@
 // v0.9.1 chunk E (owner, 3 Nov 2026): E4 dashboard Cash Flow tile shows only the 3D version, E23 Net worth 3D window 20% taller on desktop,
 // E5 Budget pills larger and full width on desktop, E6 Budget 3D text gone and viewport larger. Run: node tests/test_v091_overview_budget.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
+const INDEX = require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = theme => () => {
   localStorage.setItem('vi-theme', '%T%'); localStorage.setItem('vi_declined_demo', 'true');

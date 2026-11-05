@@ -3,10 +3,11 @@
 // book"; lazy laying (load = settled shell + one animated course; a deposit lays only the new bricks); a house-type switch must not
 // rebuild per-brick state (no task over 100 ms). The old engine stays behind ?house=legacy for one release.
 // Run: node tests/test_house_gl.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-const INDEX = 'file:///home/user/Vault-It/index.html';
+const INDEX = require('./lib/vi').FILE_URL;
 const SEED = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true,plan:'annual'}));localStorage.setItem('ht3',JSON.stringify(${JSON.stringify(o)}));})()`;
 const DATA = { saved: 20000, target: 250000, houseType: 'terraced', deposits: [{ amount: 20000, date: '01/10/2026' }], prices: { terraced: 250000, semi: 250000, detached: 250000 } };
 const PAL = { brick: [0.267, 0.753, 0.725], trim: [0.46, 0.84, 0.80], tile: [0.2, 0.62, 0.74], frame: [0.78, 0.93, 0.92], glass: [0.02, 0.2, 0.22], glassLit: [0.96, 0.78, 0.42], door: [0.04, 0.24, 0.26], edge: [0.01, 0.1, 0.1], sheen: [0.75, 0.98, 0.96], flash: [0.91, 0.77, 0.42] };

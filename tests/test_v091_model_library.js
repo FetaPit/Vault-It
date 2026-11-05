@@ -2,6 +2,7 @@
 // Search matches title, tags and set; a pick attaches the model and the viewer shows it; CC-BY credit on the item; a credits panel;
 // stand-ins say so; files load only when picked or opened; nothing leaves the site; old Poly Pizza models and uploads still work.
 // Run: node tests/test_v091_model_library.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };

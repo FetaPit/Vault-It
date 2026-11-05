@@ -2,6 +2,7 @@
 //  • why a stage can be stuck and how the user gets unstuck: blocker banner, "already met" stages, debts-mapped tick,
 //    one-tap first snapshot, skip (with undo), homeowner / student-loan / legacy-debt cases
 //  • charts and the roadmap no longer redraw when only the HEIGHT changes (mobile address bar) and the SVG is a light window
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -12,7 +13,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   const p = await ctx.newPage();
   p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/Failed to load|net::/.test(m.text())) errs.push('console: ' + m.text()); });
   await p.addInitScript(seed({ saved: 0, target: 250000, houseType: 'terraced', deposits: [], prices: { terraced: 250000 } }));
-  await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+  await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1800);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await p.evaluate(() => showTab('overview')); await p.waitForTimeout(900);
   // reset everything the roadmap reads, as a post-migration user

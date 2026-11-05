@@ -2,6 +2,7 @@
 // weight and purity at the price in Precious metals, or from a holding's price in Stocks and shares. The user's own
 // figure is kept and used whenever a link cannot be priced; every linked value shows its working.
 // Run: node tests/test_live_value.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const lum = c => { const [r, g, b] = c.match(/[\d.]+/g).map(Number).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
@@ -16,7 +17,7 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
     // seed only on the first load (?seed); a reload must not see an empty store mid-commit and write the seed back over saved data
     await p.addInitScript(t => { if (!/[?&]seed\b/.test(location.search) || localStorage.getItem('pos_al1')) return; localStorage.setItem('vi_theme', t); localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' })); localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' }));
       localStorage.setItem('pos_al1', JSON.stringify({ otherAssets: [{ id: 1, name: 'Wedding ring', value: 300 }], metalPrices: { gold: 2000, silver: 25, platinum: 800, palladium: 900, lastUpdated: new Date().toISOString() }, stocks: [{ id: 7, sym: 'VWRL', name: 'Vanguard FTSE All-World', units: 10, price: 100, updated: Date.now() }] })); }, theme);
-    await p.goto('file:///home/user/Vault-It/index.html?seed'); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL + '?seed'); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.evaluate(t => { if ((document.documentElement.dataset.theme || 'dark') !== t && window.viToggleTheme) viToggleTheme(); showTab('assets'); showSubtab('assets', 'other', null); }, theme); await p.waitForSelector('#other-assets-list .wi-link-btn', { timeout: 20000 }); await p.waitForTimeout(200);
     const tile = () => p.evaluate(() => { const t = document.querySelector('#other-assets-list .wi-tile'); return { val: t.querySelector('.wi-val').textContent, btn: t.querySelector('.wi-link-btn').textContent, work: (t.querySelector('.wi-work') || {}).textContent || '', total: alTotalOther() }; });
@@ -34,7 +35,7 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
     ok(t.val === '£482' && t.btn === 'Linked' && Math.abs(t.total - 10 * 0.75 / 31.1034768 * 2000) < 0.01, w + ': 10 g of 18ct gold at £2,000/oz = £482, counted in the total (' + JSON.stringify(t) + ')');
     ok(/Show working/.test(t.work) && /Gold spot price, checked/.test(t.work) && /Your own figure: £300/.test(t.work) && /Not financial advice/.test(t.work), w + ': show working names the source, the time, the own figure and the guard rail');
     ok(await p.evaluate(() => { const a = JSON.parse(localStorage.getItem('pos_al1')).otherAssets[0]; return a.link.type === 'metal' && a.value === 300; }), w + ': link saved; own figure kept');
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForFunction(() => typeof wiValue === 'function' && typeof showTab === 'function', null, { timeout: 20000 }); await p.waitForTimeout(600); await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForFunction(() => typeof wiValue === 'function' && typeof showTab === 'function', null, { timeout: 20000 }); await p.waitForTimeout(600); await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'other', null); }); await p.waitForSelector('#other-assets-list .wi-link-btn', { timeout: 20000 }); await p.waitForTimeout(200);
     t = await tile(); ok(t.val === '£482' && errs.length === 0, w + ': after a reload the linked value is still worked out (startup order) ' + JSON.stringify(t) + ' ' + JSON.stringify(await p.evaluate(() => ({ link: alState.otherAssets[0] && alState.otherAssets[0].link, mp: alState.metalPrices }))));
     await p.evaluate(() => updateMetalPrice('gold', 2200)); await p.evaluate(() => renderAlTab());

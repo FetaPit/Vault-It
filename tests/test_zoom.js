@@ -1,6 +1,7 @@
 // Zoom on the 3D house builder (the brand build is the only one; the SVG blueprint zoom is gone, owner 1 Nov 2026).
 // Every house type is framed inside the stage at the default zoom (a flat or apartment frames your floor); the + and − buttons (houseZoomIn / houseZoomOut) move the 3D camera
 // (HB3D.viewer.zoom()) and stay within the limits; reset returns to the default. Pinch zoom on touch is in tests/test_hb3d_levels.js.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -9,7 +10,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
   const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
   await page.addInitScript(() => { if (localStorage.getItem('ht3')) return; localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' }));
     localStorage.setItem('ht3', JSON.stringify({ saved: 30000, target: 250000, houseType: 'terraced', deposits: [{ amount: 30000, date: '01/10/2026' }], prices: { terraced: 250000, semi: 300000, detached: 450000, mansion: 900000, flat: 200000, apartment: 220000 } })); });
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
   await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await page.evaluate(() => showTab('house'));
   const ready = t => page.waitForFunction(t => window.HB3D && HB3D.viewer && HB3D.viewer.model && HB3D.viewer.brandInfo && HB3D.viewer.brandInfo() && HB3DAPP.want && HB3DAPP.want.type === t && HB3D.viewer.settled(), t, { timeout: 60000 }).catch(() => {});

@@ -1,6 +1,7 @@
 // vault-it.co/sign-up in a real browser, served through the real Worker routing from the real build:
 // honest content (no fake scarcity, testimonials or false badges), form at the top on a phone, unticked marketing box,
 // campaign tags captured, failures never shown as success, and the confirm / unsubscribe pages.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path'), http = require('http'), cp = require('child_process'), { pathToFileURL } = require('url');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };

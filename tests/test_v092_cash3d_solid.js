@@ -3,6 +3,7 @@
 // Every coin shape on the stage is closed (each edge shared by exactly two triangles: top, side and bottom, no holes), a block of
 // 1,000 is 100 closed stacks, and from a low side camera a ray through the middle height of every stack hits coins (no empty gaps).
 // Served over http://127.0.0.1 from the folder that holds VI_INDEX. Run: node tests/test_v092_cash3d_solid.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const http = require('http'), fs = require('fs'), path = require('path');
 const routeThree = require('./three_route');
 const FILE = process.env.VI_INDEX || path.join(__dirname, '..', 'index.html');

@@ -2,6 +2,7 @@
 // Hand-worked: BTC 0.5 @ 40,000 (added at 30,000), ETH 2 @ 2,000 (added at 2,500), SOL 100 @ 10 (added at 8) -> value 25,000, invested 20,800, change +4,200
 //   DOGE 100 @ 0.1 and SHIB 1000 @ 0.00001 are old saves with no entry price: shown, counted in the total (10.01), left out of invested/change, never rewritten.
 //   Total 25,010.01; BTC is 20,000 / 25,010.01 = 80.0%.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
@@ -20,7 +21,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
         { id: 4, sym: 'DOGE', amount: 100, price: 0.1 }, { id: 5, sym: 'SHIB', qty: 1000, price: 0.00001, name: 'Shiba' }
       ], stocks: [], stockPies: [], cashAccounts: [], otherAssets: [], liabilities: [], metals: { gold: 0, silver: 0, platinum: 0, palladium: 0 } }));
     });
-    await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')); await page.waitForTimeout(1200);
+    await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1200);
     await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await page.evaluate(() => { try { _crBusy = true; } catch (e) {} showTab('assets'); showSubtab('assets', 'crypto', null); });
     await page.waitForTimeout(800);
@@ -93,7 +94,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     await page.addInitScript(() => { if (localStorage.getItem('pos_al1')) return; localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi-cr-alloc', 'tree');
       localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'P', email: 't@t.com' }));
       localStorage.setItem('pos_al1', JSON.stringify({ crypto: [{ id: 1, sym: 'BTC', amount: 1, price: 40000, addPx: 30000, wallet: 'A', priceSrc: 'live', priceAt: new Date().toISOString() }], stocks: [], stockPies: [], cashAccounts: [], otherAssets: [], liabilities: [], metals: { gold: 0, silver: 0, platinum: 0, palladium: 0 } })); });
-    await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')); await page.waitForTimeout(1200);
+    await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1200);
     await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await page.evaluate(() => { try { _crBusy = true; } catch (e) {} showTab('assets'); showSubtab('assets', 'crypto', null); }); await page.waitForTimeout(600);
     const hs = await page.evaluate(() => ({ coarse: matchMedia('(pointer:coarse)').matches, h: [...document.querySelectorAll('#assets-crypto .btn-add-data, #cr-alloc .nw3d-seg button, #crypto-table .stk-gh, #crypto-table .data-item-del')].filter(e => e.offsetParent).map(e => Math.round(e.getBoundingClientRect().height)) }));

@@ -1,8 +1,9 @@
 // v0.7 final round, round 1 item 2 (owner, 2 Nov, fold test): the Net worth in 3D floor labels are colour-coded to their column's block colour.
 // Each label is drawn in a legible tint of its own column's colour (the colour itself, lightened only as far as the dark label plate needs
 // for AA contrast), never one gold or red for all. Run: node tests/test_v07_p3_labels.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_nw3d.js', 'utf8');
 const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const seed = '.length, src.indexOf('// WCAG AA')).trim().replace(/;$/, '') + ')');

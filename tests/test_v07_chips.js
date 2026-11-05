@@ -3,8 +3,9 @@
 // stroke at .5, 4 px radius, 4 px 6 px padding), name DM Sans 600 11 px #E8E8E8, amount Share Tech Mono 10.5 px in the category colour; chips stay black in Daylight;
 // no overlaps, rows at least 30 px apart; the two diagrams carry identical chips. The flow animation is not part of this item.
 // Run: node tests/test_v07_chips.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const parse = html => { const d = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html'), svg = d.querySelector('svg'); if (!svg) return null;
   const chips = [...svg.querySelectorAll('.cf-chip')].map(g => { const r = g.querySelector('rect'), t = [...g.querySelectorAll('text')]; const a = n => r.getAttribute(n);

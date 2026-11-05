@@ -4,9 +4,10 @@
 // shader family with baked shading (no reflection map, no real-time shadows), build once per change, cheap framing, compile up
 // front, render on demand. Measured on a phone profile: 390 px at 3x, touch, CPU 4x, the demo-size balance (£25,300 = 2,530 stacks).
 // Run: node tests/test_cash3d_speed.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || require('path').join(__dirname, '..', 'index.html'));
+const INDEX = require('./lib/vi').FILE_URL;
 const GPU_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-gpu-compositing', '--enable-gpu-rasterization'];
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 // wall-clock times swing with machine load (CI shards run two browsers at once), so they are reported, never gated;
@@ -120,7 +121,11 @@ const HOOK = () => {
     await p2.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p2.waitForFunction(() => !!window.THREE && !!THREE.OrbitControls, null, { timeout: 30000 }).catch(() => {});
     await p2.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', null); });
-    await p2.waitForFunction(() => window.VIPERF && VIPERF.snapshot().stageFrames > 0, null, { timeout: 30000 }).catch(() => {});
+    // the stage draws only once it is in view (below the fold on a phone): scroll to it, then wait until the overlay has settled on it
+    // with its counts (CoS, 4 Nov: the bare "any stage frame" wait could time out silently and read the overlay too early)
+    await p2.evaluate(() => { const c = document.getElementById('cashSceneCard'); if (c) c.scrollIntoView({ block: 'center', behavior: 'instant' }); });
+    const settled = await p2.waitForFunction(() => { if (!window.VIPERF) return false; const k = VIPERF.snapshot(); return k.viewport === 'Cash and savings coins' && k.stageFrames > 0 && k.stageCalls != null; }, null, { timeout: 45000 }).then(() => true).catch(() => false);
+    ok(settled, 'the ?perf=1 overlay settles on the Cash and savings stage once it is on screen');
     const k = await p2.evaluate(() => { const k = VIPERF.snapshot(), V = V3.cash; V.r.info.autoReset = true; V.r.render(V.sc, V.cam); return { viewport: k.viewport, frames: k.stageFrames, calls: k.stageCalls, tris: k.stageTris, real: [V.r.info.render.calls, V.r.info.render.triangles], line: VIPERF.report().split('\n').find(l => /^viewport (Cash|Precious|house)/.test(l)) }; });
     ok(k.viewport === 'Cash and savings coins' && k.frames > 0 && /Cash and savings/.test(k.line || ''), 'the ?perf=1 overlay names the stage on screen and counts its frames (' + k.line + ')');
     // v0.9.2 (CoS, 4 Nov): the overlay also reads out the stage's draws and triangles, the same numbers the renderer counts, so the owner can check on his phone

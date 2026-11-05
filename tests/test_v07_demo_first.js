@@ -1,8 +1,9 @@
 // v0.7 (release chat, 1 Nov): a fresh profile on the app's own demo data shows the Dashboard and Budget cash flow on the FIRST visit, without a reload.
 // The demo is written after the app's state has loaded, so initDemoMode re-reads the state and redraws once the seed exists.
 // Run: node tests/test_v07_demo_first.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
   const b = await chromium.launch();

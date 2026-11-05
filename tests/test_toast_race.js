@@ -4,9 +4,10 @@
 // 3. the hide count starts once the toast is drawn, so a long task (a house rebuild) cannot expire it unseen;
 // 4. after the user has done something, a new badge still toasts; 5. never over a toast already showing.
 // Each check is driven by events and the page's own timers, not by machine speed.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
+const INDEX = require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const o = { saved: 5900, target: 120000, houseType: 'terraced', depositPct: 20, deposits: [{ amount: 5900, date: '01/10/2026' }], prices: { terraced: 120000 } };
 const seed = `(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})()`;

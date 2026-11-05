@@ -1,6 +1,7 @@
 // vault-it.co/pete in a real browser, through the real Worker routing from the real build: the digital business card
 // the printed card's QR code and NFC chip open. It flips like the app's debt tracker cards (tap or the Flip button turns it,
 // dragging turns it in 3D), shows a corner of the house builder animation on the front, saves a contact card, and stays on brand.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path'), http = require('http'), cp = require('child_process'), { pathToFileURL } = require('url');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -44,7 +45,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     const box = el.parentNode.getBoundingClientRect(), card = document.querySelector('.pc-front').getBoundingClientRect();
     return { src: el.currentSrc || el.getAttribute('src'), muted: el.muted, loop: el.loop, inline: el.playsInline,
       right: Math.abs(box.right - card.right) < 2, bottom: Math.abs(box.bottom - card.bottom) < 2, wFrac: box.width / card.width, hFrac: box.height / card.height }; });
-  ok(v && /house-build\.mp4$/.test(v.src) && v.muted && v.loop && v.inline, 'the front plays the house builder animation, muted and looping: ' + JSON.stringify(v));
+  ok(v && /\/pete\/house-corner\.mp4$/.test(v.src) && v.muted && v.loop && v.inline, 'the front plays the house builder animation, muted and looping: ' + JSON.stringify(v));
   ok(v && v.right && v.bottom && v.wFrac < 0.5 && v.hFrac < 0.65, 'only a corner of the house shows, in the bottom right of the front');
   ok(await p.locator('.pc-front .bricks, .pc-front .pc-bricks').count() === 0, 'no brick pattern on the front');
   await p.locator('.pc').tap(); await p.waitForTimeout(700);
@@ -83,8 +84,10 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
 
   // Reduced motion: a still instead of the animation
   p = await open(390, 844, { reducedMotion: 'reduce' });
-  const rm = await p.evaluate(() => { const vd = document.querySelector('.pc-corner video'); return { playing: !!vd && !vd.paused, still: !!document.querySelector('.pc-corner img, .pc-corner video[poster]') }; });
-  ok(!rm.playing && rm.still, 'with reduced motion the corner shows a still: ' + JSON.stringify(rm));
+  await p.waitForTimeout(1200);
+  const rm = await p.evaluate(() => { const vd = document.querySelector('.pc-corner video'), im = document.querySelector('.pc-corner img');
+    return { videoShown: !!vd && getComputedStyle(vd).display !== 'none', loaded: !!vd && (vd.readyState > 0 || !!vd.currentSrc), still: !!im && im.complete && im.naturalWidth > 100 && /house-corner\.jpg$/.test(im.src) && getComputedStyle(im).display !== 'none' }; });
+  ok(!rm.videoShown && !rm.loaded && rm.still, 'with reduced motion the corner shows the 37% still and the film never loads: ' + JSON.stringify(rm));
 
   await b.close(); srv.close();
   console.log(fails ? 'FAILURES ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);

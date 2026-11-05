@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const fs=require('fs');
@@ -11,7 +12,7 @@ const fs=require('fs');
       {id:4,name:'Axis Bank Credit Card',original:222,balance:222,rate:42,min:19,type:'credit'},
       {id:5,name:'Some Visa card',original:900,balance:900,rate:19,min:25,type:'credit'},
       {id:6,name:'Car finance',original:8000,balance:5000,rate:7,min:200,type:'car'}]}));});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   await page.evaluate(()=>showTab('debt')); await page.waitForTimeout(900);
   ok(await page.locator('.cc3').count()===6,'six 3D tiles: five cards and the car finance (E33)');

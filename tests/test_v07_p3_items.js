@@ -3,6 +3,7 @@
 // page still scrolls from anywhere but the tile; and the item tiles are 20% larger than before (wider on tablets and the fold; on a 390 px phone, which
 // fits two across, and on a laptop, three across, 20% taller instead).
 // Run: node tests/test_v07_p3_items.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 function glb() {
@@ -34,7 +35,7 @@ const dist = () => { const v = _i3dLive.view; return v.cam.position.distanceTo(v
 async function load(b, o) {
   const ctx = await b.newContext({ viewport: { width: o.w, height: o.h || 900 }, isMobile: !!o.touch, hasTouch: !!o.touch }); await routeThree(ctx);
   const p = await ctx.newPage(); p.on('pageerror', e => o.errs.push(e.message));
-  await p.addInitScript(seed, 'dark'); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+  await p.addInitScript(seed, 'dark'); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1800);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#trial-banner,#tester-welcome{display:none!important}' });
   await p.evaluate(() => { showTab('assets'); const b = [...document.querySelectorAll('#assets-page .subtab-btn')].find(x => /'other'/.test(x.getAttribute('onclick') || '')); showSubtab('assets', 'other', b); }); await p.waitForTimeout(500);
   return { ctx, p };

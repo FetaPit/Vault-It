@@ -3,9 +3,10 @@
 // gold tile on the ground plane. With the icon of the bank and the separate value"; Q6: each plate gets a flag
 // post in the same style as the other viewports, with the bank icon, amount and interest rate.
 // Run: node tests/test_v091_cash3d.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || require('path').join(__dirname, '..', 'index.html'));
+const INDEX = require('./lib/vi').FILE_URL;
 const GPU_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-gpu-compositing', '--enable-gpu-rasterization'];
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const ACCTS = [

@@ -2,9 +2,10 @@
 // each model in its own colours (no tint, owner 31 Oct), the preview on the tile, the model library (models/catalog.json, answered here because fetch cannot read file:// pages)
 // with a refusal, a CC-BY pick on a liability, remove, and clean-up when an item is deleted.
 // Run: node tests/test_item3d.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
-const INDEX_URL = process.env.VI_INDEX ? 'file://' + process.env.VI_INDEX : 'file:///home/user/Vault-It/index.html';   // VI_INDEX: test another copy of index.html
+const INDEX_URL = require('./lib/vi').FILE_URL;   // VI_INDEX: test another copy of index.html
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 // a tiny red pyramid as a .glb (built here so the test needs no model files)
 function glb() {

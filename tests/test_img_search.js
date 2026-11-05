@@ -1,5 +1,6 @@
 // Photo search on wealth inventory and liability tiles (Openverse, mocked here): results show, a tap saves the
 // photo and its credit, and refusals (too many searches, nothing found, offline) are explained. Run: node tests/test_img_search.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
@@ -18,7 +19,7 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
   });
   await p.addInitScript(() => { localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' }));
     if (!localStorage.getItem('pos_al1')) localStorage.setItem('pos_al1', JSON.stringify({ cashAccounts: [], otherAssets: [{ id: 11, name: 'Gibson Les Paul', value: 2200 }], liabilities: [{ id: 21, name: 'Car', value: 4000, rate: 0, depRate: 10, runningCost: 80, addedDate: '2026-06-01T00:00:00Z' }] })); });
-  await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+  await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
   ok(!(await p.content()).includes('loremflickr.com'), 'LoremFlickr (blocked by Flickr, one default photo only) is gone');
   for (const [kind, id, open] of [['wi', 11, 'wiSearch'], ['li', 21, 'liabSearch']]) {
     mode = 'ok'; await p.evaluate(([o, id]) => window[o](id), [open, id]);
@@ -54,7 +55,7 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
   const ctx2 = await b.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' }); const p2 = await ctx2.newPage();
   await p2.route('https://api.openverse.org/**', async r => { await new Promise(res => setTimeout(res, 800)); r.fulfill({ status: 200, contentType: 'application/json', body: '{"results":[]}', headers: { 'access-control-allow-origin': '*' } }); });
   await p2.addInitScript(() => { localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' })); localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' })); localStorage.setItem('pos_al1', JSON.stringify({ cashAccounts: [], otherAssets: [{ id: 11, name: 'Gibson Les Paul', value: 2200 }], liabilities: [], stocks: [] })); });
-  await p2.goto('file:///home/user/Vault-It/index.html'); await p2.waitForTimeout(1500);
+  await p2.goto(require('./lib/vi').FILE_URL); await p2.waitForTimeout(1500);
   await p2.evaluate(() => { wiSearch(11); document.getElementById('wi-search-inp').value = 'guitar'; wiDoSearch(11); }); await p2.waitForTimeout(250);
   const rm = await p2.evaluate(() => { const r = document.getElementById('wi-search-res-11'), b = r.querySelector('.wi-search-busy'), sp = r.querySelector('.wi-spin'); return { label: b ? b.textContent.trim() : '', fs: b ? parseFloat(getComputedStyle(b).fontSize) : 0, spin: sp ? getComputedStyle(sp).display : null, anim: sp ? getComputedStyle(sp).animationName : null }; });
   ok(/Searching/.test(rm.label) && rm.fs >= 10.5 && rm.spin === 'none' && rm.anim === 'none', 'reduced motion: a static "Searching…" label, no spinning ring (' + JSON.stringify(rm) + ')');

@@ -1,5 +1,6 @@
 // Brand phase 5: the colour code. Liabilities amber with their logged value, Budget ramp on tokens, debts in their lender's colours (red ramp otherwise),
 // chart colours follow Night and Daylight. Run: node tests/test_colour_code.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (theme) => {
@@ -47,7 +48,7 @@ const probe = () => {
     const ctx = await b.newContext({ viewport: { width: 1100, height: 900 } });
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(seed, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     const r = await p.evaluate(probe); const T = r.tok, nm = theme === 'dark' ? 'Night' : 'Daylight';
     ok(r.theme === theme, nm + ': theme is applied');

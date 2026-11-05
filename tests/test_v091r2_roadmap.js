@@ -9,11 +9,12 @@
 //  R8  50 achievements, most in Foundation, Stabilise and Save; the new ones are triggered by data the app holds and never hold
 //      up the linear stages, so nobody's current stage moves
 //  R22 the profile card reads the same level and XP as the Wealth Roadmap; saved badge XP is never rewritten
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'Test User',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})();`;
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 (async () => {
   const b = await chromium.launch(); const errs = [];
   for (const w of [1100, 390]) {
