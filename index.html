@@ -10543,6 +10543,20 @@ input:focus, textarea:focus, select:focus {
 .auth-btn:hover{opacity:.92;transform:translateY(-1px)}
 .auth-btn.secondary{background:transparent;border:1px solid rgb(var(--teal-rgb) / .3);color:var(--em);margin-top:8px}
 .auth-btn{min-height:44px}
+.auth-intro{font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2));line-height:1.45;color:var(--t2);text-align:center;margin:-6px 0 10px}   /* v0.9.2: what Vault-It is, in one line (Pete) */
+.auth-steps{font-family:'Share Tech Mono',monospace;font-size:max(.46rem,var(--vi-fs-1));line-height:1.55;color:var(--t3);text-align:center;margin:0 0 14px}   /* the three steps, as in the beta email */
+/* a wide desktop window (owner, 5 Nov: the card was too small): a bigger card, one step larger text, 48 px+ controls. Phones keep the rules above. */
+@media (min-width:900px){
+  .auth-card{max-width:540px;padding:44px 48px}
+  .auth-sub{font-size:max(.62rem,var(--vi-fs-2));margin-bottom:30px}
+  .auth-intro{font-size:max(.8rem,var(--vi-fs-3));margin:-8px 0 14px}
+  .auth-steps{font-size:max(.58rem,var(--vi-fs-2));margin-bottom:22px}
+  .auth-label{font-size:max(.64rem,var(--vi-fs-2));margin-bottom:8px}
+  .auth-inp{font-size:max(.95rem,var(--vi-fs-3));padding:14px 16px;min-height:52px}
+  .auth-btn{min-height:52px;font-size:max(.72rem,var(--vi-fs-2));margin-top:16px;padding:14px}
+  .auth-info{font-size:max(.52rem,var(--vi-fs-1));margin-top:14px}
+  .auth-footer{font-size:max(.5rem,var(--vi-fs-1))}
+}
 .auth-btn.auth-switch{margin-top:10px}   /* the way back to the email field: a normal full-size button, right under the email shown on the PIN pad */
 @media (max-height:760px){.auth-card{padding:20px 20px}.auth-sub{margin-bottom:12px}.auth-pin-dots{margin:10px 0}.auth-pin-key{padding:10px 0}.auth-footer{margin-top:10px}.auth-divider{margin:10px 0}}
 .auth-code-box{background:rgb(var(--brass-rgb) / .06);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:8px;padding:14px;margin-bottom:14px;text-align:center}
@@ -11849,6 +11863,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 
     <!-- Step 1: email -->
     <div id="auth-email-step" class="auth-step active">
+      <div class="auth-intro">Track your net worth, clear your debt and build towards your house goal, all in one private vault.</div>
+      <div class="auth-steps">1. Enter your email &nbsp;2. Type the 6-digit code we email you &nbsp;3. Choose a 6-digit PIN. Then email + PIN signs you in on any device.</div>
       <div class="auth-label">Your email address</div>
       <input id="auth-email" class="auth-inp" type="email" placeholder="you@example.com" autocomplete="email"
         onkeydown="if(event.key==='Enter')authSubmitEmail()">
