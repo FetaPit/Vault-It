@@ -4,8 +4,15 @@
 // R18 "as its just one 3D model it should run smooth as closing the expanded viewport takes 5 seconds"
 // R21 "Liabilities and Wealth Inventory remove search discogs"
 // Run: node tests/test_v091r2_item_viewer.js   (VI_APP=file:///... to point at another checkout)
+// The app is served over http://127.0.0.1 from the folder VI_APP names (as test_v091_demo_guard): on file:// headless Chrome
+// sometimes reloads a page with an empty localStorage, so the seed below put the guitar back without its model and the
+// redraw check read `.tv` of nothing (CI run 41954233533, 5 Nov). No real user meets that.
 const { chromium } = require('playwright'); const routeThree = require('./three_route'); const fs = require('fs'), path = require('path');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const FILE = (process.env.VI_APP || 'file:///home/user/Vault-It/index.html').replace(/^file:\/\//, ''), ROOT = path.dirname(FILE);
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.css': 'text/css', '.glb': 'model/gltf-binary', '.wasm': 'application/wasm' };
+const server = require('http').createServer((q, r) => { const f = path.join(ROOT, decodeURIComponent(q.url.split('?')[0])); if (!f.startsWith(ROOT)) { r.writeHead(403); return r.end(); }
+  fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': TYPES[path.extname(f)] || 'application/octet-stream' }); r.end(d); }); });
+let APP = '';
 const GLB = fs.readFileSync(path.join(__dirname, '..', 'models', 'glb', 'acoustic-guitar-1ff041bee8.glb'));
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = theme => {
@@ -36,6 +43,7 @@ const instrument = p => p.evaluate(() => {
   window._lt = []; try { new PerformanceObserver(l => l.getEntries().forEach(e => window._lt.push(e.duration))).observe({ entryTypes: ['longtask'] }); } catch (e) { }
 });
 (async () => {
+  await new Promise(r => server.listen(0, '127.0.0.1', r)); APP = 'http://127.0.0.1:' + server.address().port + '/' + path.basename(FILE);
   const b = await chromium.launch(); const T = {};
   for (const [vp, mobile] of [[{ width: 1100, height: 900 }, false], [{ width: 390, height: 844 }, true]]) {
     const tag = vp.width + 'px';
@@ -125,7 +133,7 @@ const instrument = p => p.evaluate(() => {
       await p.reload(); await p.waitForTimeout(1500); await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
       await p.waitForFunction(() => window.THREE && THREE.GLTFLoader, null, { timeout: 20000 }).catch(() => {});
       await p.evaluate(() => i3dRefreshThumbs()); await p.waitForFunction(() => { const it = alState.otherAssets.find(x => x.id === 11); return it.model.tv !== 2 && !_i3dRe.run; }, null, { timeout: 20000 }).catch(() => {});
-      const re = await p.evaluate(() => { const m = alState.otherAssets.find(x => x.id === 11).model; return { tv: m.tv, fresh: m.thumb.length > 1000 }; });
+      const re = await p.evaluate(() => { const it = alState.otherAssets.find(x => x.id === 11), m = it && it.model; return m ? { tv: m.tv, fresh: m.thumb.length > 1000 } : { tv: 'model missing after reload', fresh: false }; });
       ok(re.tv === 3 && re.fresh, tag + ': a picture from the earlier look is redrawn once and marked as the new look (tv ' + re.tv + ')');
       await p.reload(); await p.waitForTimeout(1500); await p.waitForFunction(() => window.THREE && THREE.GLTFLoader, null, { timeout: 20000 }).catch(() => {});
       const again = await p.evaluate(() => { const before = alState.otherAssets.find(x => x.id === 11).model.thumb; i3dRefreshThumbs(); return !_i3dRe.run && alState.otherAssets.find(x => x.id === 11).model.thumb === before; });
@@ -135,6 +143,6 @@ const instrument = p => p.evaluate(() => {
     await ctx.close();
   }
   console.log('TIMINGS ' + JSON.stringify(T));
-  await b.close();
+  await b.close(); server.close();
   console.log(fails ? 'FAILURES ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);
 })();
