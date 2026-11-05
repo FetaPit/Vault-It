@@ -74,6 +74,15 @@ async function dragGlide(p, ctx, sel, label) {
   const cdp = await ctx.newCDPSession(p); await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await p.goto(origin + '/index.html', { waitUntil: 'load' }); await p.addStyleTag({ content: HIDE });
   await p.waitForFunction(() => !!window.THREE && !!THREE.OrbitControls && !!THREE.GLTFLoader, null, { timeout: 60000 }).catch(() => {});
+  // the warm-up keeps out of the way of a tab change: no warm-up draw (its hidden stage) in the 1.4 s after one, and it still finishes later
+  await p.waitForFunction(() => window.__P.three != null, null, { timeout: 60000 }).catch(() => {});
+  const tq = await p.evaluate(() => { showTab('budget'); return performance.now(); }); await settle(p, 1400);
+  const quiet = await p.evaluate(tq => __P.r.filter(x => x[0] >= tq + 30 && x[0] < tq + 1400 && x[2] === 'off').length + __P.made.filter(m => !m[1] && m[0] >= tq + 30 && m[0] < tq + 1400).length, tq);   // page time: under load the 1.4 s pause can run longer than 1.4 s on the page
+  ok(quiet === 0, 'the 3D warm-up does no work (no renderer made, no compile or draw) in the 1.4 s after a tab change (' + quiet + ' warm-up steps seen)');
+  // it does finish; with a software GPU and other browsers on the machine the shader compiles took 56 to 66 s (5 Nov), so allow 180 s
+  await p.waitForFunction(() => window.V3 && V3._warmed, null, { timeout: 180000 }).catch(() => {});
+  ok(await p.evaluate(() => !!(window.V3 && V3._warmed)), 'the warm-up still finishes once the page is quiet');
+  await p.evaluate(() => showTab('overview'));
   await settle(p, 3000);
   // the cash and metals warm-up is asked for as soon as the page has loaded and the 3D engine is in (whichever comes last)
   const ws = await p.evaluate(() => { const ld = performance.getEntriesByType('navigation')[0], ready = Math.max(__P.three || 0, ld ? ld.loadEventEnd : 0); return { three: __P.three, ready, first: __P.warmAt == null ? null : __P.warmAt }; });
@@ -144,21 +153,24 @@ async function dragGlide(p, ctx, sel, label) {
   ok(await p.evaluate(() => !!document.getElementById('i3d-modal')), 'a single tap on the live tile still opens the full viewer');
   await p.waitForFunction(() => window._i3dView && _i3dView.ctl, null, { timeout: 30000 }).catch(() => {}); await settle(p, 400);
   ok(await p.evaluate(() => !document.querySelector('#other-assets-list .i3d-live')), 'the tile goes back to its picture while the full viewer is open');
-  await tap(p, '#i3d-modal .inv-x'); await settle(p, 400);
+  await tap(p, '#i3d-modal .inv-x'); await p.waitForFunction(() => !document.getElementById('i3d-modal'), null, { timeout: 10000 }).catch(() => {}); await settle(p, 400);   // under load the close can outlast a fixed pause
 
   // ── 4. liabilities: expand, close ──
   await p.evaluate(() => scrollTo(0, 0)); await tap(p, '#assets-page .subtab-btn[data-sub="liabilities"]'); await p.waitForSelector('#liabilities-list .inv-exp', { timeout: 20000 }).catch(() => {}); await settle(p, 600);
-  t0 = await p.evaluate(() => performance.now()); await tap(p, '#liabilities-list .inv-exp');
+  // a coordinate tap can miss while the page is still laying out under load: tap again if no viewer opened (the time is from the tap that opened it)
+  for (let k = 0; k < 3; k++) { t0 = await p.evaluate(() => performance.now()); await tap(p, '#liabilities-list .inv-exp');
+    if (await p.waitForFunction(() => !!document.getElementById('i3d-modal'), null, { timeout: 5000 }).then(() => true, () => false)) break; }
   await p.waitForFunction(t0 => __P.r.some(x => x[0] >= t0 && x[2] === 'modal'), t0, { timeout: 30000 }).catch(() => {});
   r = await p.evaluate(t0 => { const f = __P.r.find(x => x[0] >= t0 && x[2] === 'modal'); return f ? Math.round(f[0] - t0) : null; }, t0);
   ok(r != null, 'liabilities: expand opens the full viewer'); info('liabilities full viewer: tap to first frame ' + r + ' ms');
-  await settle(p, 1200); const ll = await last(p, 'modal');
+  await settle(p, 1200); const ll = await p.evaluate(t0 => { const x = __P.r.filter(r => r[0] >= t0 && r[2] === 'modal').pop(); return x ? { calls: x[3], tris: x[4] } : null; }, t0);
   ok(ll && ll.calls <= ITEM_CALLS && ll.tris <= ITEM_TRIS, 'liabilities: ' + (ll && ll.calls) + ' draw calls, ' + (ll && ll.tris) + ' triangles a frame');
   await tap(p, '#i3d-modal .inv-x'); await settle(p, 600);
   ok(await p.evaluate(() => !document.getElementById('i3d-modal')), 'liabilities: X closes the full viewer');
   const made = await p.evaluate(() => __P.made.filter(m => !m[1]).length);
   ok(made <= 2, 'one WebGL renderer for cash and metals and one for every tile and full-viewer open (' + made + ' on the page; it was a new one per open)');
   // ── 5. the kept models: two at most, dropped when an item's file changes or goes, and a read that started before a change is not kept ──
+  await p.evaluate(() => { try { i3dLiveStop(); } catch (e) {} }); await p.waitForFunction(() => !window._i3dSh || !_i3dSh.view || _i3dSh.view.dead, null, { timeout: 10000 }).catch(() => {});   // no live tile still holds the shared stage
   const kc = await p.evaluate(async () => { const mk = () => { const g = new THREE.Group(); g.add(new THREE.Mesh(new THREE.BoxBufferGeometry(1, 1, 1), new THREE.MeshBasicMaterial())); return g; };
     const a = mk(), b = mk(), c = mk(); i3dCachePut('wi', 901, a); i3dCachePut('wi', 902, b); i3dCachePut('wi', 903, c);
     const out = { evicted: i3dCacheGet('wi', 901) === null, kept: i3dCacheGet('wi', 902) === b && i3dCacheGet('wi', 903) === c, size: _i3dKeep.length };
@@ -173,6 +185,20 @@ async function dragGlide(p, ctx, sel, label) {
   ok(kc.delDrops && kc.putDrops, 'a removed model or a new file drops the kept copy');
   ok(kc.staleRefused, 'a read that started before the file changed is not kept (no old model shown on the next open)');
   ok(kc.fallback && kc.freed, 'a second live view at the same moment gets its own renderer, and closing both frees the shared stage');
+  // ── 6. a card picture redrawn from the saved model (an older look) keeps that model, so opening the item reads nothing again ──
+  const rf = await p.evaluate(async () => { const it = alState.otherAssets.find(x => x.id === 12); it.model.tv = 2; _i3dRe.tried = {}; _i3dKeep.length = 0;
+    i3dRefreshThumbs(); for (let i = 0; i < 200 && (_i3dRe.run || it.model.tv !== 3); i++) await new Promise(r => setTimeout(r, 100));
+    const n0 = window.__parses; await i3dOpen('wi', 12); const opened = !!(window._i3dView && _i3dView.obj); const n1 = window.__parses; i3dClose(); return { redrawn: it.model.tv === 3, opened, reads: n1 - n0 }; });
+  ok(rf.redrawn && rf.opened && rf.reads === 0, 'a card picture just redrawn from the model hands that model to the viewer: opening it reads the file ' + rf.reads + ' times (want 0)');
+  // ── 7. ?perf=1 samples the item viewer's frames, with its draws and triangles ──
+  { const p2 = await ctx.newPage(); p2.on('pageerror', e => errs.push(e.message));
+    await p2.goto(origin + '/index.html?perf=1', { waitUntil: 'load' }); await p2.addStyleTag({ content: HIDE });
+    await p2.waitForFunction(() => !!window.THREE && !!THREE.GLTFLoader && !!window.VIPERF, null, { timeout: 60000 }).catch(() => {});
+    await p2.evaluate(() => { showTab('assets'); i3dOpen('wi', 11); });
+    const seen = await p2.waitForFunction(() => { const k = VIPERF.snapshot(); return k.viewport === 'Item 3D viewer' && k.stageFrames > 3 && k.stageCalls != null; }, null, { timeout: 45000 }).then(() => true).catch(() => false);
+    const k = await p2.evaluate(() => { const k = VIPERF.snapshot(); return { v: k.viewport, f: k.stageFrames, c: k.stageCalls, t: k.stageTris, line: VIPERF.report().split('\n').find(l => /^viewport (Item|Cash|Precious|house)/.test(l)) }; });
+    ok(seen && /Item 3D viewer \(three\.js, lit\)/.test(k.line || '') && k.c > 0 && k.t > 0, 'the ?perf=1 overlay samples the item viewer: ' + (k.line || k.v) + ' (' + k.f + ' frames)');
+    await p2.evaluate(() => { i3dClose(); try { localStorage.removeItem('vi-perf'); } catch (e) {} }); await p2.close(); }
   ok(!errs.length, 'no page errors ' + errs.slice(0, 2).join(' | '));
   await b.close(); srv.close();
   console.log(fails ? 'FAILURES ' + fails : 'ALL PASSED'); process.exit(fails ? 1 : 0);

@@ -10911,7 +10911,7 @@ button.bd-ic{cursor:pointer}
 .cr-src{font:400 max(.5rem,var(--vi-fs-1))/1.35 'Share Tech Mono',monospace;margin-bottom:6px}
 .cr-src-live{color:var(--green)}.cr-src-stale{color:var(--amber)}.cr-src-own{color:var(--t2)}
 /* crypto holding tiles (v0.9.1 round 2, owner R20: "as before, more emphasis on the iconography"): a big coin icon leads, then the price, then the inputs in their own row */
-.cr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,236px),1fr));gap:12px;padding:12px 0}
+.cr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,236px),1fr));gap:12px;padding:12px 0}
 .cr-tile{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"tk tk" "pr pr" "ins ins" "va pl" "x x";gap:10px 12px;padding:18px 14px 14px;min-width:0;border:1px solid rgb(var(--teal-rgb) / .2);border-radius:12px;background:rgb(var(--panel-rgb) / .9)}
 .cr-tile .c-tk{grid-area:tk;flex-direction:column;align-items:center;gap:8px;text-align:center}
 .cr-tile .stk-tkb{flex:none;width:100%}
@@ -10929,7 +10929,10 @@ button.bd-ic{cursor:pointer}
 .cr-tile .stk-lb{display:block}
 .cr-tile .c-va{grid-area:va;text-align:left;font-size:max(.8rem,var(--vi-fs-3));font-weight:700}
 .cr-tile .c-pl{grid-area:pl;text-align:right;align-self:end}
-.cr-tile .c-x{grid-area:x;width:100%!important;justify-content:center}
+.cr-tile .c-x{grid-area:x;width:auto!important;justify-self:center;justify-content:center;gap:6px;min-height:36px;padding:4px 14px!important;border-color:rgb(var(--red-rgb) / .3)!important;background:none}   /* v0.9.2: a quiet centred button, not a heavy full-width bar (Pedro, chunk G) */
+.cr-tile .c-x .vi-ic{width:14px;height:14px;flex:none}
+.cr-tile .cr-src{text-wrap:balance;overflow-wrap:anywhere}   /* v0.9.2: the long price line breaks into even lines, not one cramped one (Pedro, chunk G) */
+.cr-tile .cr-src .cr-ch{display:block}
 @media(max-width:600px){.cr-tile .stk-hl{width:84px!important;height:84px!important}}
 /* the coin (owner, 4 Nov: "light turn animations like the Financial freedom roadmap", then "a satisfying thickness and light reflections upon rotating, no more than 10 degrees"):
    a gentle swing of 10 degrees either way; fourteen thin gold discs behind the face give it real edge thickness; a soft light streak sweeps the face as it swings; all still for reduced motion */
@@ -13821,7 +13824,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     </div>
     <div style="font-size:max(.36rem,var(--vi-fs-1));color:var(--t3);margin-top:12px;text-align:center;line-height:1.6">
       Your price stays the same while you stay subscribed<br>
-      Subscriptions via Stripe · To cancel, email hello@vault-it.co
+      Subscriptions via Stripe
     </div>
   </div>
 </div>
@@ -15182,6 +15185,7 @@ body.vi-pop-open{overflow:hidden}
 // TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════
 function showTab(id){
+  window._viNavAt=performance.now();   // v0.9.2: the 3D warm-up keeps out of the way for a moment after every tab change
   if(id==='house'&&window.VIPERF)VIPERF.mark('tab');
   if(id==='connections'){showSettings();var cs=document.getElementById('set-locked-conns');if(cs)setTimeout(function(){try{cs.scrollIntoView({block:'start'})}catch(e){}},60);return;}
   if(id!=='house'&&typeof _threeAnimId!=='undefined'&&_threeAnimId){cancelAnimationFrame(_threeAnimId);_threeAnimId=null;}
@@ -15207,6 +15211,11 @@ function showTab(id){
   if(id==='biz'){renderBizTab();updateProGate();}
   if(id==='achievements')renderAchievements();
   if(id==='connections')renderConnections();
+  if (id === 'overview' && typeof refreshAllLiveConns === 'function' && viLiveOn()) {
+    // Only auto-refresh if at least one live connector was activated on this device (kept as on live)
+    var hasLive = achState && achState.connected && ['coingecko','metals_live','exchangerate','yahoo'].some(function(lid){ return achState.connected[lid]; });
+    if (hasLive) refreshAllLiveConns();
+  }
   if(id==='journey'){jrnyLoadState();renderJourney();}
   if(id==='network')renderNetworkTab();
 }
@@ -15266,6 +15275,7 @@ function nwMoreOpen(){
 }
 function nwMoreSync(){var o=nwMoreOpen();document.querySelectorAll('#nw-more .nw-more-btns button').forEach(function(b){b.setAttribute('aria-expanded',b.getAttribute('data-p')===o?'true':'false');});}
 function showSubtab(group,id,btn){
+  window._viNavAt=performance.now();
   document.querySelectorAll('#'+group+'-page .subtab-panel').forEach(p=>{p.classList.remove('active');p.style.display='none';});
   document.querySelectorAll('#'+group+'-page .subtab-btn').forEach(b=>b.classList.remove('active'));
   const sp=document.getElementById(group+'-'+id);
@@ -17317,7 +17327,7 @@ function viFlagSet(name, on) { try { localStorage.setItem('vi-flag-' + name, on 
       viewport: S3.last > S.last ? S3.name : 'house builder', stageFrames: S3.frames, stageP50: pct(S3.dts, 0.5), stageP95: pct(S3.dts, 0.95), stageOver33: S3.over33, stageCalls: S3.calls == null ? null : S3.calls, stageTris: S3.tris == null ? null : S3.tris };
   }
   function lines(k) {
-    var st = k.viewport && k.viewport !== 'house builder' ? ['viewport ' + k.viewport + ' (three.js, matcap) · stage frames ' + k.stageFrames + ' · p50 ' + f1(k.stageP50) + ' · p95 ' + f1(k.stageP95) + ' ms · >33 ms: ' + k.stageOver33 + (k.stageCalls == null ? '' : ' · draws ' + k.stageCalls + ' · triangles ' + Number(k.stageTris).toLocaleString('en-GB')), 'house figures below are from its last visit'] : ['viewport house builder'];
+    var st = k.viewport && k.viewport !== 'house builder' ? ['viewport ' + k.viewport + (/^Item 3D/.test(k.viewport) ? ' (three.js, lit)' : ' (three.js, matcap)') + ' · stage frames ' + k.stageFrames + ' · p50 ' + f1(k.stageP50) + ' · p95 ' + f1(k.stageP95) + ' ms · >33 ms: ' + k.stageOver33 + (k.stageCalls == null ? '' : ' · draws ' + k.stageCalls + ' · triangles ' + Number(k.stageTris).toLocaleString('en-GB')), 'house figures below are from its last visit'] : ['viewport house builder'];
     return st.concat(['fps ' + k.fps + '   frames ' + k.frames, 'frame ms p50 ' + f1(k.p50) + ' · p95 ' + f1(k.p95) + ' · max ' + f1(k.max), 'frames >33 ms: ' + k.over33,
       'long tasks ' + k.longN + ' · worst ' + f1(k.longMax) + ' ms', 'JS heap ' + (k.heapMB == null ? 'n/a' : k.heapMB + ' MB'),
       'DPR ' + f1(k.dpr) + ' · canvas ' + (k.canvas || '-'), 'renderer ' + (k.gl || '-'), 'bricks ' + (k.bricks == null ? '-' : k.bricks) + (k.bricksTotal ? ' (' + k.bricksTotal + ' UK)' : ''),
@@ -22481,7 +22491,9 @@ function v3Warm(){
   if(V3._warm||V3.cash||V3.metals||!window.THREE||!THREE.OrbitControls||!viGlOk())return;V3._warm=1;
   /* v0.9.2: several steps share one idle period while it has time left (each step is one small compile), so the warm-up is done
      sooner after load and a tap on Assets is less likely to find shaders still to compile */
-  var dl=null,idle=function(f){if(dl&&!dl.didTimeout&&dl.timeRemaining()>12)return f();if(window.requestIdleCallback)requestIdleCallback(function(d){dl=d;f();},{timeout:4000});else setTimeout(f,200);};
+  /* and none runs in the 1.5 s after a tab or sub-tab change (window._viNavAt), so a compile never lands on the tap that opens a tab */
+  var hbBusy=function(){var v=window.HB3DAPP&&HB3DAPP.viewer,t=document.getElementById('tab-house');try{if(t&&t.offsetParent)return true;return !!(v&&v.active&&v.settled&&!v.settled());}catch(e){return false;}};   // the House Builder on screen: wait (a compile there delays the next house type's first frame)   // nor while the House Builder is still building or moving (its own type warm-up waits the same way)
+  var dl=null,idle=function(f){var q=(window._viNavAt||-1e9)+1500-performance.now();if(q<=0&&hbBusy())q=400;if(q>0){dl=null;return setTimeout(function(){idle(f);},q+20);}if(dl&&!dl.didTimeout&&dl.timeRemaining()>12)return f();if(window.requestIdleCallback)requestIdleCallback(function(d){if((window._viNavAt||-1e9)+1500>performance.now()||hbBusy()){dl=null;return idle(f);}dl=d;f();},{timeout:4000});else setTimeout(function(){if((window._viNavAt||-1e9)+1500>performance.now()||hbBusy())return idle(f);f();},200);};
   var pre=[function(){var K=v3CashKey();if(K.units>0){V3._pre=V3._pre||{};var c=v3CashContent(K.spec,K.units,K.cur);V3._pre.cash=c;}},
     function(){var mk=v3MetalsKey();V3._pre=V3._pre||{};V3._pre.metals=v3MetalsContent(mk);}];
   var W=null,objs=[],bars=[],k=0,busy=function(){return V3.cash||V3.metals;};   // a stage opened meanwhile: stop (it compiles what it needs itself)
@@ -22953,7 +22965,7 @@ function crCoinBadge(h,px,col){
   return '<span class="stk-hl cr-hl" style="width:'+px+'px;height:'+px+'px;border-radius:50%">'
     +(url?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+stkEsc(url)+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="stk-hl-fb" style="display:none;width:100%;height:100%">'+fb+'</span>':fb)+'</span>';
 }
-function crCoinHue(sym){var m=VI_COIN_SVG[sym]&&/<circle[^>]*fill='(#[0-9a-fA-F]{6})'/.exec(VI_COIN_SVG[sym]);return m?m[1]:'#d9a93a';}   // the coin's own colour from its logo; gold for a coin with none
+function crCoinHue(sym){var m=VI_COIN_SVG[sym]&&/<circle[^>]*fill='(#[0-9a-fA-F]{3,6})'/.exec(VI_COIN_SVG[sym]);if(!m)return '#d9a93a';var h=m[1].toLowerCase();if(h.length===4)h='#'+h[1]+h[1]+h[2]+h[2]+h[3]+h[3];if(h==='#000000')h='#3a3f4a';return h;}   // the coin's own colour from its logo (3 or 6 digit hex; a pure black logo gets graphite so the rim shows); gold only for a coin with no logo
 function crCoin3d(h,px,col){var e='';for(var k=1;k<=14;k++)e+='<i class="cr-edge" style="--k:'+k+'"></i>';return '<span class="cr-coin" aria-hidden="true" style="--coin:'+crCoinHue(h.sym)+'">'+e+crCoinBadge(h,px,col)+'</span>';}
 function crAllocView(){try{return localStorage.getItem('vi-cr-alloc')==='tree'?'tree':'bars';}catch(e){return 'bars';}}
 function crSetAlloc(v){try{localStorage.setItem('vi-cr-alloc',v);}catch(e){}crRender();}
@@ -22992,7 +23004,7 @@ function crRender(){
             var v=stkValue(h),sus=stkSuspect(h),b=stkBasis(h),pl=(!sus&&b>0)?(stkPrice(h)-b)/b*100:null,cid=c.id,ch=+c.change24h||0;
             return '<div class="cr-row cr-tile" style="--i:'+i+'">'
               +'<div class="c-tk">'+crCoin3d(h,96,col)+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+CR_COLORS[i%CR_COLORS.length]+'"></i>'+stkEsc(h.sym)+'</div><div class="stk-nm cr-held">'+crQty(h.units)+' '+stkEsc(h.sym)+' held</div></div></div>'
-              +'<div class="c-pr"><span class="stk-lb">Price £</span>'+(c.priceSrc==='live'?'<div class="stk-px">£'+(+c.price).toLocaleString('en-GB',{maximumFractionDigits:c.price<1?6:2})+'</div>':'<input class="stk-inp" type="number" min="0" step="any" value="'+(+c.price>0?c.price:'')+'" onchange="updateCryptoPrice('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' price in pounds" title="Your price in £. A live price replaces it when CoinGecko has one">')+'<div class="stk-src cr-src cr-src-'+(c.priceSrc==='live'?'live':c.priceSrc==='stale'?'stale':'own')+'">'+crPriceLine(c)+(ch&&c.priceSrc==='live'?' · <span style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
+              +'<div class="c-pr"><span class="stk-lb">Price £</span>'+(c.priceSrc==='live'?'<div class="stk-px">£'+(+c.price).toLocaleString('en-GB',{maximumFractionDigits:c.price<1?6:2})+'</div>':'<input class="stk-inp" type="number" min="0" step="any" value="'+(+c.price>0?c.price:'')+'" onchange="updateCryptoPrice('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' price in pounds" title="Your price in £. A live price replaces it when CoinGecko has one">')+'<div class="stk-src cr-src cr-src-'+(c.priceSrc==='live'?'live':c.priceSrc==='stale'?'stale':'own')+'">'+crPriceLine(c)+(ch&&c.priceSrc==='live'?' <span class="cr-ch" style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
               +'<div class="cr-ins">'
               +'<div class="c-un"><span class="stk-lb">Amount</span><input class="stk-inp" type="number" min="0" step="any" value="'+h.units+'" onchange="updateCryptoAmount('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' amount held" title="Editable: how much you hold"></div>'
               +'<div class="c-av"><span class="stk-lb">Cost per unit £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+c.avgCost>0?c.avgCost:'')+'" placeholder="'+(+c.addPx>0?(+c.addPx).toFixed(c.addPx<1?6:2).replace(/\.?0+$/,''):'–')+'" onchange="updateCryptoCost('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' cost per unit" title="'+(+c.addPx>0&&!(+c.avgCost>0)?'Empty, so the price when you added it is used. Type what you paid per coin in £ to use that instead':'What you paid for one coin, in £')+'"></div>'
@@ -23000,7 +23012,7 @@ function crRender(){
               +'<div class="stk-val c-va"><span class="stk-lb">Value</span>'+cfMoney(v)+'</div>'
               +(sus?'<div class="stk-pl c-pl"><button type="button" class="stk-chk" onclick="stkCheckCost(this)" title="Your cost per unit is more than 3 times today’s price. It should be the price you paid per coin, in £ (not the total)">Check your cost per unit</button></div>'
                 :'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'var(--green)':'var(--red)')+'">'+(pl==null?'–':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>')
-              +'<button class="data-item-del c-x" style="width:auto;padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;opacity:1;border:1px solid rgb(var(--red-rgb) / .45);border-radius:4px" onclick="delCrypto('+cid+')" title="Remove this coin">🗑 Remove</button></div>';
+              +'<button class="data-item-del c-x" style="width:auto;padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;opacity:1;border:1px solid rgb(var(--red-rgb) / .45);border-radius:4px" onclick="delCrypto('+cid+')" title="Remove this coin"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg> Remove</button></div>';
           }).join('')+'</div></div></div>';
       }).join('')+'</div>';
   }
@@ -23886,6 +23898,7 @@ I3DView.prototype._rest=function(host,w,h,bb,opts){
   this._rw=w;this._rh=h;this._w=w;this._h=h;
   var loop=function(){self.raf=0;if(self.dead||self._lost||(self._sh&&self._sh.lost)||self._off||document.hidden){self._lastT=0;return;}var W=self.ro?self._rw:host.clientWidth,H=self.ro?self._rh:host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setDrawingBufferSize(W,H,self._lite?1:viGlDpr(host));cam.aspect=W/H;self._vo(W,H);cam.updateProjectionMatrix();}
     var moving=ctl.update();var t=performance.now();r.render(sc,cam);
+    if(window.VIPERF&&VIPERF.stageFrame)VIPERF.stageFrame(host.id==='i3d-stage'?'Item 3D viewer':'Item 3D tile',r.info.render.calls,r.info.render.triangles);   // v0.9.2: ?perf=1 samples the item viewer's frames too
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}
     self._lastT=moving?t:0;
     /* R18 (owner, 4 Nov: closing took 5 s): ctl.update() fires 'change', which kicks a frame, so only queue one if none is queued yet.
@@ -24124,8 +24137,8 @@ function i3dRefreshThumbs(){
   if(!todo.length)return;_i3dRe.run=true;
   (async function(){
     for(var i=0;i<todo.length;i++){var k=todo[i][0],it=todo[i][1];_i3dRe.tried[k+it.id]=1;
-      try{var rc=await i3dGetRec(k,it.id);if(!rc)continue;var obj=await i3dParse(rc.buf.slice(0),rc.fmt,k);i3dStyle(obj);
-        it.model.thumb=i3dThumb(obj);it.model.tv=3;saveAL();
+      try{var ver=i3dVer(k,it.id),rc=await i3dGetRec(k,it.id);if(!rc)continue;var obj=await i3dParse(rc.buf.slice(0),rc.fmt,k);i3dStyle(obj);
+        it.model.thumb=i3dThumb(obj);it.model.tv=3;saveAL();i3dCachePut(k,it.id,obj,ver);   // v0.9.2: the model just read for the card's picture is kept, so opening that item reads nothing again
         [].forEach.call(document.querySelectorAll('img.i3d-thumb'),function(im){if((im.getAttribute('onclick')||'').indexOf("'"+k+"',"+it.id+",")>-1)im.src=it.model.thumb});
       }catch(e){}}
     _i3dRe.run=false;
@@ -25299,6 +25312,66 @@ function connectPlatform(id) {
   showToast((c ? c.name : 'That connection') + ' is coming to Pro in a future release');
 }
 
+// ── Free live price feeds (kept as on live: v0.9.2 owner decision, 5 Nov; a server-side feed comes later) ──
+function fetchCoinGeckoFree(cb) {
+  var key = localStorage.getItem('coingecko_api_key') || '';
+  var url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=20&page=1&price_change_percentage=24h';
+  var headers = key ? { 'x-cg-demo-api-key': key } : {};
+  fetch(url, { headers: headers })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (data && data.length) {
+        if (!alState.livePrices) alState.livePrices = {};
+        data.forEach(function(coin) {
+          alState.livePrices[coin.symbol.toUpperCase()] = { gbp: coin.current_price, change24h: coin.price_change_percentage_24h };
+        });
+        saveAL(); updateKPIs();
+        if (cb) cb(true, 'CoinGecko: ' + data.length + ' prices fetched');
+      } else { if (cb) cb(false, 'No data from CoinGecko'); }
+    })
+    .catch(function(e){ if (cb) cb(false, 'CoinGecko error: ' + e.message); });
+}
+
+function fetchMetalsLive(cb) {
+  fetch('https://api.metals.live/v1/spot')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (Array.isArray(data)) {
+        var metals = {};
+        data.forEach(function(m){ metals[m.metal] = m.price; });
+        alState.metalPrices = alState.metalPrices || {};
+        var fxRate = parseFloat(localStorage.getItem('vi_fx_gbpusd') || '0.79');
+        if (metals.gold)      alState.metalPrices.gold      = metals.gold      * fxRate;
+        if (metals.silver)    alState.metalPrices.silver    = metals.silver    * fxRate;
+        if (metals.platinum)  alState.metalPrices.platinum  = metals.platinum  * fxRate;
+        if (metals.palladium) alState.metalPrices.palladium = metals.palladium * fxRate;
+        alState.metalPrices.lastUpdated = new Date().toISOString();
+        saveAL(); updateKPIs();
+        if (cb) cb(true, 'Metals prices updated ✓');
+      } else { if (cb) cb(false, 'Unexpected metals API response'); }
+    })
+    .catch(function(e){
+      var k = localStorage.getItem('metals_api_key');
+      if (k) {
+        fetch('https://metals-api.com/api/latest?access_key='+k+'&base=USD&symbols=XAU,XAG,XPT,XPD')
+          .then(function(r2){ return r2.json(); })
+          .then(function(d2){
+            if (d2.rates) {
+              var fxR = parseFloat(localStorage.getItem('vi_fx_gbpusd')||'0.79');
+              if(d2.rates.XAU) alState.metalPrices.gold      = (1/d2.rates.XAU)*fxR;
+              if(d2.rates.XAG) alState.metalPrices.silver    = (1/d2.rates.XAG)*fxR;
+              if(d2.rates.XPT) alState.metalPrices.platinum  = (1/d2.rates.XPT)*fxR;
+              if(d2.rates.XPD) alState.metalPrices.palladium = (1/d2.rates.XPD)*fxR;
+              alState.metalPrices.lastUpdated = new Date().toISOString();
+              saveAL(); updateKPIs();
+              if(cb) cb(true,'Metals prices updated ✓');
+            } else { if(cb) cb(false,'Metals API error'); }
+          })
+          .catch(function(){ if(cb) cb(false,'Metals unavailable'); });
+      } else { if(cb) cb(false,'api.metals.live unreachable. Add a Metals API key in Settings.'); }
+    });
+}
+
 // ── Exchange rates (used by the stock and metals prices) ───────
 function fetchExchangeRates(cb) {
   fetch('https://open.er-api.com/v6/latest/GBP')
@@ -25313,6 +25386,28 @@ function fetchExchangeRates(cb) {
       } else { if (cb) cb(false, 'Exchange rate API returned no data'); }
     })
     .catch(function(e){ if (cb) cb(false, 'FX error: ' + e.message); });
+}
+
+function fetchYahooFinance(cb) {
+  // Prices now track YOUR holdings (Stocks & Funds) instead of a fixed ticker list.
+  stkEnsure();
+  if (!alState.stocks.length) { if (cb) cb(false, 'Add holdings in Assets → Stocks & Funds first'); return Promise.resolve(); }
+  return stkRefresh(true).then(function() {
+    var n = alState.stocks.filter(function(h){ return h.updated; }).length;
+    if (cb) cb(n > 0, n > 0 ? 'Stock prices updated for ' + n + ' holding' + (n === 1 ? '' : 's') : 'Live prices unavailable right now');
+  });
+}
+
+function refreshAllLiveConns() {
+  var liveFeedMap = { coingecko: fetchCoinGeckoFree, metals_live: fetchMetalsLive, exchangerate: fetchExchangeRates, yahoo: fetchYahooFinance };
+  var count = 0;
+  Object.keys(liveFeedMap).forEach(function(id) {
+    if (achState.connected && achState.connected[id]) {
+      count++;
+      liveFeedMap[id](function(ok, msg){ showToast((ok?'✓ ':'⚠ ') + msg); });
+    }
+  });
+  if (!count) showToast('No live feeds connected yet');
 }
 
 function renderConnections(){
@@ -29192,7 +29287,7 @@ function showPrivacy() {
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
     '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank, provider, company and ticker logos; it is told the website of each bank, card, investment provider or company you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
-    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). The free 3D models you can pick for a wealth or liability item come from a library bundled with Vault-It itself, served from this same address: a model is downloaded only when you pick or open one, no outside service is contacted, and CC-BY models are credited in the item and in the 3D model credits panel. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> is contacted from your browser, with a key, only if an earlier version of the app saved one on this device. The bank, broker and exchange connections in Settings are locked for a future release: they connect to nothing and never ask for your details. Settings also holds owner-only connections (Notion, Claude, Meshy); they do nothing unless someone enters keys for them.</p>',
+    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). The free 3D models you can pick for a wealth or liability item come from a library bundled with Vault-It itself, served from this same address: a model is downloaded only when you pick or open one, no outside service is contacted, and CC-BY models are credited in the item and in the 3D model credits panel. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with a key, only if an earlier version of the app saved one on this device. The bank, broker and exchange connections in Settings are locked for a future release: they connect to nothing and never ask for your details. Settings also holds owner-only connections (Notion, Claude, Meshy); they do nothing unless someone enters keys for them.</p>',
     '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or third-party analytics. During the beta the app records how it is used (screens opened, features used, errors and how long a visit lasts, never your figures or what you type) in our own database, to improve it; you can switch this off in Settings (Share usage). Feedback you send from the app is stored by us with the screen you were on, your last few taps and, unless you untick it, a picture of that screen with every figure hidden. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected, and what that does not mean'),
     '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
