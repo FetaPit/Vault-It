@@ -116,8 +116,11 @@ const data = p => p.evaluate(() => ({ saved: state.saved, debts: debtState.debts
   // first-run welcome: name, biggest challenge, house price
   const welcome = p => p.evaluate(() => getComputedStyle(document.getElementById('welcome-overlay')).display);
   ok(await welcome(phone) === 'flex', 'phone: first run asks for a name and goal');
-  await phone.fill('#w-name', 'One B'); await phone.fill('#w-email', EMAIL); await phone.click('#w-opts .welcome-opt[data-val="1"]'); await phone.click('#w-step-1 .welcome-cta'); await phone.waitForTimeout(600);
-  await phone.fill('#w-house', '250000'); await phone.click('#w-step-2 .welcome-cta'); await phone.waitForTimeout(1000);
+  // the onboarding screens (5 Nov 2026): name and email, where you are, money (skipped), home, the plan
+  await phone.fill('#w-name', 'One B'); if (await phone.isVisible('#w-email')) await phone.fill('#w-email', EMAIL); await phone.click('#wz-s1 .welcome-cta');
+  await phone.click('#w-opts .welcome-opt[data-val="1"]'); await phone.click('#wz-s2 .welcome-cta'); await phone.waitForTimeout(300);
+  await phone.click('#wz-s3 .wz-skip'); await phone.fill('#w-house', '250000'); await phone.click('#wz-s4 .welcome-cta'); await phone.waitForTimeout(300);
+  await phone.click('#w-finish'); await phone.waitForTimeout(1000);
   ok(await welcome(phone) === 'none' && await phone.evaluate(() => JSON.parse(localStorage.getItem('vi_user')).name === 'One B' && state.target === 250000), 'phone: welcome done, name and £250,000 house price saved');
   // Pete's tester note shows once after the welcome flow (31 Oct): a tester reads it and closes it
   await phone.waitForTimeout(900);
