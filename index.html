@@ -16312,8 +16312,9 @@ function updateUI(){
   redraw();
 }
 
+function gbpFull(n){var rate=window.VI_CURRENCY_RATE||1,sym=window.VI_CURRENCY_SYMBOL||'£',v=(isNaN(n)||n==null?0:n)*rate;return(v<0?'-':'')+sym+Math.round(Math.abs(v)).toLocaleString('en-GB');}   // the whole figure, no k or M (owner, 5 Nov: the slate price in full)
 function updatePriceLabels(){
-  Object.entries(state.prices).forEach(([t,pr])=>{const e=document.getElementById('pr-'+t);if(e)e.textContent=gbpFmt(pr);});
+  Object.entries(state.prices).forEach(([t,pr])=>{const e=document.getElementById('pr-'+t);if(e)e.textContent=gbpFull(pr);});
 }
 function updatePriceInput(){document.getElementById('priceInput').value=state.prices[state.houseType]||'';}
 
@@ -23024,7 +23025,7 @@ function crRender(){
           +'<div class="stk-gb"'+(open?'':' hidden')+'><div class="cr-grid">'+g.hs.map(function(h){var c=h._c,i=hs.indexOf(h),col=CR_COLORS[gi%CR_COLORS.length];
             var v=stkValue(h),sus=stkSuspect(h),b=stkBasis(h),pl=(!sus&&b>0)?(stkPrice(h)-b)/b*100:null,cid=c.id,ch=+c.change24h||0;
             return '<div class="cr-row cr-tile" style="--i:'+i+'">'
-              +'<div class="c-tk">'+crCoin3d(h,96,col)+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+CR_COLORS[i%CR_COLORS.length]+'"></i>'+stkEsc(h.sym)+'</div><div class="stk-nm cr-held">'+crQty(h.units)+' '+stkEsc(h.sym)+' held</div></div></div>'
+              +'<div class="c-tk">'+crCoin3d(h,96,col)+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+crCoinHue(h.sym)+'"></i>'+stkEsc(h.sym)+'</div><div class="stk-nm cr-held">'+crQty(h.units)+' '+stkEsc(h.sym)+' held</div></div></div>'
               +'<div class="c-pr"><span class="stk-lb">Price £</span>'+(c.priceSrc==='live'?'<div class="stk-px">£'+(+c.price).toLocaleString('en-GB',{maximumFractionDigits:c.price<1?6:2})+'</div>':'<input class="stk-inp" type="number" min="0" step="any" value="'+(+c.price>0?c.price:'')+'" onchange="updateCryptoPrice('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' price in pounds" title="Your price in £. A live price replaces it when CoinGecko has one">')+'<div class="stk-src cr-src cr-src-'+(c.priceSrc==='live'?'live':c.priceSrc==='stale'?'stale':'own')+'">'+crPriceLine(c)+(ch&&c.priceSrc==='live'?' <span class="cr-ch" style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
               +'<div class="cr-ins">'
               +'<div class="c-un"><span class="stk-lb">Amount</span><input class="stk-inp" type="number" min="0" step="any" value="'+h.units+'" onchange="updateCryptoAmount('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' amount held" title="Editable: how much you hold"></div>'
