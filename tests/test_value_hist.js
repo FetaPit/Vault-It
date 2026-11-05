@@ -2,6 +2,7 @@
 // when linked, otherwise "your figure"), newest 120 kept on the item. The link pop-up suggests a live source from the
 // item's name and stays on the user's own figure when none fits (no guessed figures).
 // Run: node tests/test_value_hist.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
@@ -21,7 +22,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
         metalPrices: { gold: 2000, silver: 25, platinum: 800, palladium: 900, lastUpdated: new Date().toISOString() },
         stocks: [{ id: 7, sym: 'VWRL', name: 'Vanguard FTSE All-World', units: 1, avgCost: 90, price: 100, updated: new Date().toISOString() }] }));
     }, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.evaluate(t => { if ((document.documentElement.dataset.theme || 'dark') !== t && window.viToggleTheme) viToggleTheme(); showTab('assets'); showSubtab('assets', 'other', null); }, theme);
     await p.waitForSelector('#other-assets-list .wi-link-btn', { timeout: 20000 }); await p.waitForTimeout(300);

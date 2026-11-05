@@ -9,6 +9,7 @@
 //      VI_ROOT=/path/to/other/checkout node tests/perf_viewports.js   measures another copy of the app
 //      PERF_ONLY=inventory  one viewport (cash, metals, inventory, liabilities); PERF_OUT=file.jsonl appends each row; PERF_PROFILE=1 prints a CPU profile
 // Not a pass/fail test: the budgets that gate CI are in tests/test_viewport_perf.js.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const http = require('http'), fs = require('fs'), path = require('path');
 const routeThree = require('./three_route');

@@ -22,10 +22,11 @@
 // 1 and 3 run in a browser with GPU compositing (no canvas copy-back) at page scale 1.25, the 3D stage's own cap on a phone. Frame
 // pacing on the full-quality path cannot be timed here (the software GPU, not the app, is the limit), so 1 times one frame's GPU work.
 // VI_INDEX=/path/to/index.html runs it against another copy (the old build, for before and after numbers).
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 const { coldLoad, fmt: fmtCold } = require('./hb_coldload');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
+const INDEX = require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = o => `(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('vi-flag-house','1');localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})()`;
 const semi = { saved: 20000, target: 320000, houseType: 'semi', depositPct: 20, deposits: [{ amount: 20000, date: '01/10/2026' }], prices: { semi: 320000 } };

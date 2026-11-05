@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));
@@ -6,7 +7,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:1,name:'Card',original:2500,balance:2000,rate:20,min:60,type:'credit'}]}));};
 (async()=>{
   const b=await chromium.launch(); const errs=[];
-  const open=async(w,h,mob)=>{const ctx=await b.newContext({viewport:{width:w,height:h},isMobile:!!mob,hasTouch:!!mob});const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));await p.addInitScript(seed);await p.goto('file:///home/user/Vault-It/index.html');await p.waitForTimeout(2000);await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});await p.evaluate(()=>showTab('overview'));await p.waitForTimeout(900);return p;};
+  const open=async(w,h,mob)=>{const ctx=await b.newContext({viewport:{width:w,height:h},isMobile:!!mob,hasTouch:!!mob});const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));await p.addInitScript(seed);await p.goto(require('./lib/vi').FILE_URL);await p.waitForTimeout(2000);await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});await p.evaluate(()=>showTab('overview'));await p.waitForTimeout(900);return p;};
   let p=await open(1600,900);
   await p.evaluate(()=>{if(window.nw3d)nw3d.setMain('graph',true);nwMore('goals');}); await p.waitForTimeout(300);   // goals and snapshots fold into the net worth tile, opened by its Goals button (v0.7 UI round 2)
   const g=await p.evaluate(()=>{const r=id=>document.querySelector(id).getBoundingClientRect();const c=document.getElementById('nwChart').closest('.ov-chart-card').getBoundingClientRect(),cb=(document.getElementById('nw3d-trk-card')||document.getElementById('nwChart').closest('.ov-chart-card')).getBoundingClientRect(),ms=r('#ov-ms-card'),road=r('#fire-roadmap-card'),nwh=document.getElementById('nwh-mini-wrap').closest('.ov-chart-card').getBoundingClientRect();

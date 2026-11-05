@@ -1,6 +1,7 @@
 // Cash and precious metals in 3D, on the Net worth in 3D stage with its gold tags (owner, 30 and 31 Oct). Cash: 1 coin = 1 unit
 // of the chosen currency at its real size, stacks of 10, 10 by 10 per block of 1,000. Metals: standard bars from
 // the weight held, sized by each metal's density, valued at the live price. Run: node tests/test_vault3d.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -10,7 +11,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     const ctx = await b.newContext({ viewport: { width: 1100, height: 900 } }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(t => { localStorage.setItem('vi-theme', t); if (localStorage.getItem('pos_al1')) return; localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' }));
       localStorage.setItem('pos_al1', JSON.stringify({ cashAccounts: [{ id: 5, name: 'Savings', type: 'Savings', balance: 2000 }], physicalCash: [{ id: 1, where: 'Safe', amount: 347, date: '2026-10-01' }], metals: { gold: 40, silver: 20, platinum: 0, palladium: 0 }, metalPrices: { gold: 2000, silver: 25, platinum: 800, palladium: 900 } })); }, theme);
-    await p.goto('file://' + (process.env.VI_INDEX || require('path').join(__dirname, '..', 'index.html'))); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner{display:none!important}' });
     await p.evaluate(() => showTab('assets')); await p.waitForTimeout(1200);
     const c = await p.evaluate(() => { const V = V3.cash; return { canvas: !!document.querySelector('#cashSceneCard canvas.v3-canvas'), svg: getComputedStyle(document.getElementById('cashSvg')).display, st: V.stats, bg: V.sc.background ? V.sc.background.getHexString() : 'none', alpha: V.r.getClearAlpha(), hostBg: getComputedStyle(document.querySelector('#cashSceneCard .v3-host')).backgroundColor, fog: V.sc.fog.color.getHexString(), grid: !!V.grid, deco: !!V.deco, tags: (() => { const i = V.chipInfo(); return i.chips.map(c => [c.name, c.amount]).concat(i.total ? [[i.total.text.replace(/£[\d,]+$/, ''), (i.total.text.match(/£[\d,]+$/) || [''])[0]]] : []); })(), cap: document.getElementById('cashCap').textContent }; });

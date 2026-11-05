@@ -1,9 +1,10 @@
 // Measures the cash and metals 3D stages on a phone profile (390 px, touch, CPU 4x): draw calls, triangles,
 // orbit frame time p95 (real requestAnimationFrame frames while the camera turns), long tasks while opening.
 // Run: node tests/v3_measure.js   (prints one JSON line per case; not a pass/fail test)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || require('path').join(__dirname, '..', 'index.html'));
+const INDEX = require('./lib/vi').FILE_URL;
 const GPU_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-gpu-compositing', '--enable-gpu-rasterization'];
 const SEED = (accts, metals) => `(function(){if(localStorage.getItem('pos_al1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true,plan:'annual'}));localStorage.setItem('pos_al1',JSON.stringify({cashAccounts:${JSON.stringify(accts)},physicalCash:[{id:1,where:'Safe',amount:300,date:'2026-10-01'}],metals:${JSON.stringify(metals)},metalPrices:{gold:2000,silver:25,platinum:900,palladium:1000}}));})()`;
 const CASES = [
@@ -42,7 +43,7 @@ const CASES = [
       const lt = window.__lt.filter(x => x[0] >= t0);
       return { calls, tris, dpr: V.r.getPixelRatio(), rafP95: +d[Math.floor(d.length * .95)].toFixed(1), ownP95: +own[Math.floor(own.length * .95)].toFixed(1), ownP50: +own[Math.floor(own.length * .5)].toFixed(1), longTasks: lt.length, longMax: Math.round(Math.max(0, ...lt.map(x => x[1]))) };
     }, [key, t0]);
-    { const line = JSON.stringify(Object.assign({ case: C.name }, r, { errors: errs.length })); console.log(line); require('fs').appendFileSync(process.env.VI_MEASURE_OUT || '/tmp/v3measure.jsonl', line + '\n'); }
+    { const line = JSON.stringify(Object.assign({ case: C.name }, r, { errors: errs.length })); console.log(line); require('fs').appendFileSync(process.env.VI_MEASURE_OUT || require('path').join(require('os').tmpdir(), 'v3measure.jsonl'), line + '\n'); }
     await ctx.close();
   }
   await b.close();

@@ -3,6 +3,7 @@
 // The flat drawing ran whenever the 3D stage had not drawn its first frame yet (the card off screen), wrote its caption, and the
 // 3D stage, seeing the same balance, did not write its own back. With 3D on, the caption is the 3D one at every step.
 // Served over http://127.0.0.1 from the folder that holds VI_INDEX. Run: node tests/test_v092_cash3d_caption.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const http = require('http'), fs = require('fs'), path = require('path');
 const routeThree = require('./three_route');
 const FILE = process.env.VI_INDEX || path.join(__dirname, '..', 'index.html');

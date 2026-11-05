@@ -4,6 +4,7 @@
 // Coin logos for the common coins are embedded (CC0 set), so they show with no network; other coins still try jsDelivr; no emoji
 // fallback. Inventory and liabilities items show the brand block, blank until the user picks a brand icon; old emoji choices show
 // as the matching brand icon (saved data untouched). Run: node tests/test_icons.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const EMOJI = /\p{Extended_Pictographic}/u;
@@ -22,7 +23,7 @@ const EMOJI = /\p{Extended_Pictographic}/u;
         liabilities: [{ id: 21, name: 'Car on finance', value: 9000, rate: 0, depRate: 10, runningCost: 120, addedDate: new Date().toISOString() }],
         metalPrices: { gold: 2000 }, stocks: [] }));
     }, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.evaluate(t => { if ((document.documentElement.dataset.theme || 'dark') !== t && window.viToggleTheme) viToggleTheme(); showTab('assets'); showSubtab('assets', 'crypto', null); }, theme);
     await p.waitForTimeout(800);

@@ -1,8 +1,9 @@
 // v0.7 E16 (owner, 1 Nov): remove "Add to your savings" from the house builder ("Lay your bricks" already says it).
 // The button says "Lay the bricks" with the brick-wall line icon (no ⊕); the input is labelled "Amount to add to your deposit".
 // Run: node tests/test_v07_e16.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
   const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 390, height: 844 } }); const errs = [];

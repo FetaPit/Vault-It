@@ -2,8 +2,9 @@
 // Pedro A3: #hud-bar-house bottom centre, 12 px up, one row; pill (--rail-bg, 1 px teal border, pill radius); buttons drawn 36 px in a 44 px hit area;
 // 18 px sprite icons in teal (vi-zoom-out, vi-zoom-in, vi-orbit, vi-reset, vi-fullscreen); no emoji fallbacks; orbit on = teal border + glow;
 // nothing over the caption. Run: node tests/test_v07_e18.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
   const b = await chromium.launch();

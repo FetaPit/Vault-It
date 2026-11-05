@@ -4,8 +4,9 @@
 // Tablets and folds (600 to 1023 px, Fold open at 884) keep the menu at the top, icons only from v0.7 E1 (tests/test_v07_e1.js), even with the compact density saved;
 // the Fold closed (344) gets the phone bar; the Settings "Icons only" choice still hides labels.
 // Run: node tests/test_mobile_nav.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (theme) => {
   localStorage.setItem('vi-theme', theme);

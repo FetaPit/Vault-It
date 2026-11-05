@@ -4,8 +4,9 @@
 // R18 "as its just one 3D model it should run smooth as closing the expanded viewport takes 5 seconds"
 // R21 "Liabilities and Wealth Inventory remove search discogs"
 // Run: node tests/test_v091r2_item_viewer.js   (VI_APP=file:///... to point at another checkout)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route'); const fs = require('fs'), path = require('path');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 const GLB = fs.readFileSync(path.join(__dirname, '..', 'models', 'glb', 'acoustic-guitar-1ff041bee8.glb'));
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = theme => {

@@ -1,5 +1,5 @@
 const fs=require('fs'); let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
-const html=fs.readFileSync('/home/user/Vault-It/index.html','utf8');
+const html=fs.readFileSync(require('./lib/vi').INDEX,'utf8');
 const a=html.split('// <<HB_MORTGAGE_ENGINE')[1].split('// HB_MORTGAGE_ENGINE>>')[0];
 const b=html.split('// <<HB_UPGRADE_ENGINE')[1].split('// HB_UPGRADE_ENGINE>>')[0];
 const E=new Function(a+b+';return{hbStampDuty,hbUpgradeAt,hbUpgradeWalk,hbSimulate,hbLetCover};')();

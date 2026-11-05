@@ -8,9 +8,10 @@
 //  4. Your own design locked: the card says it is coming later with Pro, no upload or AI prompt, nothing switches the house.
 //  5. Still picture: with the 3D engine blocked the stage is a drawn 2D picture with the build level, and the HUD figures stay.
 //  6. The old code is gone: no SVG engine, no classic viewer paths.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
+const INDEX = require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (o, extra) => `(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');${extra || ''}localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})()`;
 const L1 = { saved: 20000, target: 320000, houseType: 'semi', depositPct: 20, deposits: [{ amount: 20000, date: '01/10/2026' }], prices: { semi: 320000 } };

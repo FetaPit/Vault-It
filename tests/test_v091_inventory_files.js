@@ -2,6 +2,7 @@
 // Each previews and survives a reload; an old record that only has `glb` still opens; STL is tinted with the item's colour;
 // a file over 25 MB or a wrong type shows a one-line error; no host outside the jsDelivr three@0.128.0 path is used.
 // Run: node tests/test_v091_inventory_files.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fflate = require('./vendor/fflate.min.js');
 const routeThree = require('./three_route');
@@ -127,7 +128,7 @@ const probe = p => p.evaluate(() => { const V = _i3dView; if (!V || !V.obj) retu
   for (const theme of ['dark', 'light']) {
     const ctx = await b.newContext({ viewport: { width: 1100, height: 900 } }); await routeThree(ctx); const p = await ctx.newPage();
     p.on('pageerror', e => errs.push(e.message)); p.on('request', r => { try { const u = new URL(r.url()); if (/^https?:$/.test(u.protocol)) hosts.add(u.host); } catch (e) {} });
-    await p.addInitScript(seed, theme); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+    await p.addInitScript(seed, theme); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await p.evaluate(() => { showTab('assets'); renderAlTab(); }); await p.waitForTimeout(400);
     // the picker says what it takes

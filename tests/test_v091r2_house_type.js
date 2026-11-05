@@ -6,8 +6,9 @@
 //  R15 no house type tiles in the House builder tab cards; the choice moves to the welcome profile step.
 //  Saved data: type, price, deposit and bricks unchanged for an existing user; brick value = depositTarget * 0.77 / bricksTotal.
 // Run: node tests/test_v091r2_house_type.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const KEYS = 'terraced,semi,detached,mansion,flat,apartment';
 const SEED = (theme) => {

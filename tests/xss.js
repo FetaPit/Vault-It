@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 (async()=>{
   const b=await chromium.launch(); const page=await (await b.newContext({viewport:{width:1280,height:1000}})).newPage();
@@ -12,7 +13,7 @@ const { chromium } = require('playwright');
     localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:8,name:P,original:1000,balance:800,rate:20,minPay:30,type:'credit'}]}));
     localStorage.setItem('pos_biz1',JSON.stringify({clients:[{id:9,name:P,monthly:100,status:'Active'}],leads:[{id:10,name:P}],streams:[],incomeStreams:[{id:11,name:P,amount:5}]}));
   },P);
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(2000);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(2000);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   const tabs=await page.evaluate(()=>{const o=new Set();document.querySelectorAll('[onclick]').forEach(e=>{const m=/showTab\('([^']+)'/.exec(e.getAttribute('onclick'));if(m)o.add(m[1]);});return[...o];});
   for(const t of tabs){await page.evaluate(t=>showTab(t),t);await page.waitForTimeout(250);

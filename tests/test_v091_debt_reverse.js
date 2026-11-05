@@ -2,6 +2,7 @@
 // What could we include on the reverse to give the user a reason to rotate and just give the reverse a purpose so its not just a gimmick"
 // Owner picked: type icon under the logo (left); the back shows the debt-free date, the cost of the debt and the payment history.
 // Convention: nominal monthly rate = APR / 100 / 12, interest added monthly, the minimum paid at each month end (estimate).
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const near = (a, b, e) => Math.abs(a - b) <= (e || 0.005);
@@ -22,7 +23,7 @@ const near = (a, b, e) => Math.abs(a - b) <= (e || 0.005);
       { id: 5, name: 'Car finance', original: 8000, balance: 5000, rate: 7, min: 200, type: 'car' },
       { id: 6, name: 'Home', original: 200000, balance: 150000, rate: 4.5, min: 900, type: 'mortgage' }] }));
   });
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
   await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await page.evaluate(() => { showTab('debt'); }); await page.waitForTimeout(900);
 

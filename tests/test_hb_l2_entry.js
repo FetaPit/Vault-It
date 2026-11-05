@@ -1,5 +1,6 @@
 // Level 2 onboarding: on purchase day the mortgage is entered in about a minute (lender, balance, rate, fix end, term), every figure the person's own;
 // the Level 2 panel shows it, runs its what-ifs on those figures and carries the trade-off line. Run: node tests/test_hb_l2_entry.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
@@ -8,7 +9,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
   await p.addInitScript(() => { localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com', pro: true })); localStorage.setItem('vi_pioneer', 'true');
     localStorage.setItem('ht3', JSON.stringify({ saved: 64000, target: 320000, houseType: 'semi', depositPct: 20, deposits: [{ amount: 64000, date: '01/10/2026' }], prices: { semi: 320000 } }));
     localStorage.setItem('pos_ov1', JSON.stringify({ income: [{ id: 1, name: 'Salary', amount: 3000, cat: 'salary' }], expenses: [{ id: 2, name: 'Rent', amount: 900, type: 'ce', cat: 'housing' }, { id: 3, name: 'ISA', amount: 200, type: 'sv', cat: 'savings' }] })); });
-  await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500); await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal{display:none!important}' });
+  await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500); await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal{display:none!important}' });
   await p.evaluate(() => showTab('house')); await p.waitForTimeout(800);
   ok(await p.evaluate(() => !document.getElementById('hbm-ov') && hbLevel() === 1), 'Level 1: no mortgage dialog');
   // purchase day

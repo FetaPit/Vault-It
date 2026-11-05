@@ -2,6 +2,7 @@
 // the MVP). The card only says "Coming later as part of Pro" (no file input, no Meshy prompt), hbDesignOn() is false even with a saved
 // design, loadCustomModel / generateMeshyModel only toast and change nothing, the relay is never called, and the house stays the brand build.
 // (The GLB fixture tests/fixtures/sample_house.glb is kept for when the feature returns.)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const path = require('path');
 const routeThree = require('./three_route');
@@ -15,7 +16,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
   const p = await ctx.newPage(); p.setDefaultTimeout(120000);
   p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/Failed to load|net::/.test(m.text())) errs.push('console: ' + m.text()); });
   await p.addInitScript(seed({ saved: 20000, target: 250000, houseType: 'terraced', deposits: [{ amount: 20000, date: '01/10/2026' }], prices: { terraced: 250000 } }));
-  await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+  await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await p.evaluate(() => showTab('house'));
   await p.waitForFunction(() => window.HB3D && HB3D.viewer && HB3D.viewer.brandInfo && HB3D.viewer.brandInfo() && HB3D.viewer.settled(), null, { timeout: 60000 }).catch(() => {});

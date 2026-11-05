@@ -1,8 +1,9 @@
 // Beta-readiness in the app: honest privacy/terms (and no false “end-to-end encrypted” claim), consent line on sign-in,
 // abuse-limit (429) messages that do NOT fall back to the built-in sender, “Download my data”, and “Delete my account”.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const INDEX_PATH = process.env.VI_INDEX || '/home/user/Vault-It/index.html', REPO = require('path').dirname(INDEX_PATH);
-const INDEX = 'file://' + INDEX_PATH;   // VI_INDEX points the test at another checkout
+const INDEX_PATH = process.env.VI_INDEX || require('./lib/vi').INDEX, REPO = require('path').dirname(INDEX_PATH);
+const INDEX = require('./lib/vi').FILE_URL;   // VI_INDEX points the test at another checkout
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const SHOT = (() => { const d = require('os').tmpdir() + '/vaultit-shots/'; try { require('fs').mkdirSync(d, { recursive: true }); } catch (e) {} return d; })();
 const MOCK = `

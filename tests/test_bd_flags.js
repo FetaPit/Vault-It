@@ -6,8 +6,9 @@
 // name DM Sans 600 11 px #E8E8E8, amount Share Tech Mono 10.5 px in the group colour; collisions raise the post one chip height, up to 3 steps,
 // then amount only, never off the post; the old floor plates are replaced; reduced motion: static posts. Committed essential is --coral.
 // Run: node tests/test_bd_flags.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_nw3d.js', 'utf8');
 const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const seed = '.length, src.indexOf('// WCAG AA')).trim().replace(/;$/, '') + ')');

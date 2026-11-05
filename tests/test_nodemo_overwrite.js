@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const YDAY=new Date(Date.now()-864e5).toISOString();
@@ -13,7 +14,7 @@ const MOCK=(cloud,mode)=>`
 const newCtx=async(b,init,cloud,mode)=>{
   const ctx=await b.newContext({viewport:{width:1100,height:900}}); const page=await ctx.newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message)); page.errs=errs;
   await page.addInitScript(MOCK(cloud,mode)); await page.addInitScript(init);
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1300); return {ctx,page};
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1300); return {ctx,page};
 };
 const REAL_DEBT={debts:[{id:1792143861287,name:'Virgin Credit Card',balance:2502.41,original:2502.41,rate:0,min:60,type:'credit'}]};
 const DEMO_DEBT={debts:[{id:1,name:'Student Loan Plan 2',balance:24300,original:38000,rate:7.1,minPay:180,type:'loan'},{id:2,name:'Barclaycard',balance:1850,original:3200,rate:24.9,minPay:55,type:'credit'}]};

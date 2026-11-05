@@ -2,6 +2,7 @@
 // owner asked for AA, 30 Oct), there is no glow, charts swap to Daylight colours, and 3D viewports keep the Night look.
 // Text on gradients (card artwork, gradient buttons) is skipped: its background cannot be measured reliably.
 // Run: node tests/test_daylight.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = () => {
@@ -47,7 +48,7 @@ const scanInputs = () => {
 (async () => {
   const b = await chromium.launch(); const errs = [];
   const p = await (await b.newContext({ viewport: { width: 1100, height: 900 } })).newPage(); p.on('pageerror', e => errs.push(e.message));
-  await p.addInitScript(seed); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2000);
+  await p.addInitScript(seed); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(2000);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   ok(await p.evaluate(() => viTheme()) === 'light', 'opens in Daylight');
   for (const t of ['overview', 'budget', 'house', 'assets', 'debt', 'entrepreneur', 'achievements', 'connections']) {

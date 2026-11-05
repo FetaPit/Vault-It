@@ -12,9 +12,10 @@
 //   4. beta closed: full prices; Founder £5.99 and Lifetime £149 open their links; Pioneer at £59.99 says "coming soon" and opens nothing
 //   5. names: Founder, Pioneer, Lifetime licence (read-only after the trial has no tier name); icons on every card
 // Run: node tests/test_tier_prices.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 // the owner's figures and the Stripe links created 4 Nov evening, written out by hand so a slip in the app cannot hide itself
 const L = {
@@ -37,7 +38,7 @@ const seed = () => {
   localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com', logins: 3 }));
 };
 (async () => {
-  const src = fs.readFileSync('/home/user/Vault-It/index.html', 'utf8');
+  const src = fs.readFileSync(require('./lib/vi').INDEX, 'utf8');
   // ── 1. the single source ──
   const plans = src.match(/var VI_PLANS = (\{.*\});/);
   let P = null; try { P = Function('return ' + plans[1])(); } catch (e) {}

@@ -4,8 +4,9 @@
 // rectangle filled with £100 blocks (a thinner last row shares the pounds left over); the income arrives as a teal pile on the left and slides right into place (owner,
 // 31 Oct evening); finished at once with reduced motion. The choice is kept per device.
 // Run: node tests/test_bd_flow3d.js   (VI_APP=file:///path/to/index.html to test another copy)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_nw3d.js', 'utf8');
 const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const seed = '.length, src.indexOf('// WCAG AA')).trim().replace(/;$/, '') + ')');

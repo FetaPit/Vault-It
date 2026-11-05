@@ -5,8 +5,9 @@
 //  E11 the milestones become a vertical timeline, earliest first: right column at 1100 and up, under the stats below that;
 //      percentages gold and at least 18 px (desktop); "£x to go" on the next one; done rows full contrast (no opacity dimming).
 // Run: node tests/test_v091_house_look.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const SEED = (theme) => {
   localStorage.setItem('vi-theme', theme); localStorage.setItem('vi_declined_demo', 'true');

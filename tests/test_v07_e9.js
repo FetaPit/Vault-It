@@ -1,7 +1,8 @@
 // v0.7 E9 (owner, 1 Nov): "Spending and saving per month" is collapsed by default; the user expands it. Pedro D5: every group starts folded for everyone;
 // a saved vi_bd_fold choice still wins. Run: node tests/test_v07_e9.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (fold) => {
   localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));

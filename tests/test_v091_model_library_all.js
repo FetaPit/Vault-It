@@ -1,6 +1,7 @@
 // v0.9.1 E30: every model in models/catalog.json can be attached to an item: the real file is fetched, read, styled and previewed with no page error.
 // (A textured model once failed on pick because three r128 textures have no userData; only a real-file sweep finds that kind of fault.)
 // The page is served over local http from the repo, so models/ is the real library. Run: node tests/test_v091_model_library_all.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 const http = require('http'), fs = require('fs'), path = require('path');

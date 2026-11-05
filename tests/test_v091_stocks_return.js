@@ -8,6 +8,7 @@
 //   COSTCO 2 units, typed cost £10, price £12   -> invested £20.00 (typed cost wins), change +£4.00
 //   NOPX  3 units, no live price at add         -> not counted until a price arrives at £7, then invested £21.00
 //   NEWCO +10 units at £6 (entry was £5)       -> entry price (10x5 + 10x6)/20 = £5.50, avgCost untouched
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const money = s => { const m = String(s).replace(/,/g, '').match(/([+\-−]?)£(\d+(?:\.\d+)?)/); return m ? (m[1] === '-' || m[1] === '−' ? -1 : 1) * parseFloat(m[2]) : NaN; };
@@ -26,7 +27,7 @@ const money = s => { const m = String(s).replace(/,/g, '').match(/([+\-−]?)£(
       { id: 3, pie: 1, sym: 'BARE', units: 2, price: 0 }   // an old save: no cost, no price, no new fields
     ], stockPies: [{ id: 1, name: 'ISA' }, { id: 2, name: 'New pie' }], activePie: 1, cashAccounts: [], otherAssets: [], crypto: [], liabilities: [], metals: { gold: 0, silver: 0, platinum: 0, palladium: 0 } }));
   });
-  await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')); await page.waitForTimeout(1200);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1200);
   await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   // wait for the app, not the clock: the tiles have text, no price fetch is running, and the panel has stopped changing
   // (the same text on 4 checks in a row, each on its own animation frame plus 60 ms), so a fetch that has only just started is seen

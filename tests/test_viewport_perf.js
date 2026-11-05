@@ -8,6 +8,7 @@
 //  - cash and precious metals: the idle warm-up (renderer and shaders) starts as soon as the 3D engine is in; each open sets the drawing buffer size at most three times (once to fit, once to the lower pixel
 //    ratio while coins land, once back); a pixel ratio change and a resize were two sets each; draw calls and triangles under budget
 // Run: node tests/test_viewport_perf.js     (VI_ROOT=/path/to/checkout to test another copy)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const http = require('http'), fs = require('fs'), path = require('path');
 const routeThree = require('./three_route');

@@ -1,10 +1,11 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 (async()=>{
   const b=await chromium.launch(); const ctx=await b.newContext({viewport:{width:430,height:900}}); const page=await ctx.newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message)); page.on('dialog',d=>d.accept());
   await page.addInitScript(()=>{localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e9}));localStorage.setItem('vi_user',JSON.stringify({name:'P',email:'t@t.com'}));
     localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'UC',amount:381},{id:2,name:'LCWRA',amount:430}],expenses:[]}));});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(9000);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(9000);
   ok(await page.evaluate(()=>Object.keys(localStorage).some(k=>/^vi_snap_/.test(k))),'a daily copy of the vault is kept on the device');
   // mock account: cloud + history rpc
   await page.evaluate(()=>{

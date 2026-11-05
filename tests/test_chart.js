@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 (async()=>{
@@ -5,7 +6,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   const added=Date.now()-100*864e5;
   await page.addInitScript((added)=>{localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'P',email:'t@t.com'}));localStorage.setItem('vi_fx_rates',JSON.stringify({USD:1.25}));
     localStorage.setItem('pos_al1',JSON.stringify({stocks:[{id:added,pie:5,sym:'AAPL',units:10,avgCost:80,price:100,updated:Date.now()},{id:added+1,pie:5,sym:'VUSA.L',units:20,avgCost:70,price:80,updated:Date.now()},{id:added+2,pie:6,sym:'NOHIST',units:5,avgCost:10,price:12,updated:Date.now()}],stockPies:[{id:5,name:'ISA'},{id:6,name:'Other'}],cashAccounts:[],otherAssets:[],crypto:[],liabilities:[],metals:{}}));},added);
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1200);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1200);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   await page.evaluate(()=>{
     window._hcalls=[];

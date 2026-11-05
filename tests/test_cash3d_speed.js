@@ -4,9 +4,10 @@
 // shader family with baked shading (no reflection map, no real-time shadows), build once per change, cheap framing, compile up
 // front, render on demand. Measured on a phone profile: 390 px at 3x, touch, CPU 4x, the demo-size balance (£25,300 = 2,530 stacks).
 // Run: node tests/test_cash3d_speed.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || require('path').join(__dirname, '..', 'index.html'));
+const INDEX = require('./lib/vi').FILE_URL;
 const GPU_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-gpu-compositing', '--enable-gpu-rasterization'];
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 // wall-clock times swing with machine load (CI shards run two browsers at once), so they are reported, never gated;

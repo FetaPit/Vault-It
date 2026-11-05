@@ -1,5 +1,6 @@
 // v0.7 final round, step 1: the ?perf=1 on-device performance overlay with a Copy report button.
 // Off unless the URL has perf=1 (or the flag it left in localStorage); ?perf=0 turns it off again. Run: node tests/test_perf_overlay.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -10,7 +11,7 @@ const SEED = () => { if (localStorage.getItem('ht3')) return; localStorage.setIt
     const ctx = await b.newContext({ viewport: { width: w, height: 900 } }); await routeThree(ctx);
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); p.on('dialog', d => d.accept());
     await p.addInitScript(SEED);
-    await p.goto('file:///home/user/Vault-It/index.html' + qs); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL + qs); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     return { ctx, p };
   }
@@ -53,10 +54,10 @@ const SEED = () => { if (localStorage.getItem('ht3')) return; localStorage.setIt
   }
   // flag sticks, ?perf=0 clears (own context with no signed-in test session: the app's sign-out wipes device storage by design)
   { const ctx = await b.newContext({ viewport: { width: 390, height: 900 } }); const p = await ctx.newPage();
-    await p.goto('file:///home/user/Vault-It/index.html?perf=1'); await p.waitForTimeout(800);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForSelector('#vi-perf', { timeout: 8000 }).catch(() => {});
+    await p.goto(require('./lib/vi').FILE_URL + '?perf=1'); await p.waitForTimeout(800);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForSelector('#vi-perf', { timeout: 8000 }).catch(() => {});
     ok(await p.evaluate(() => !!document.getElementById('vi-perf') && localStorage.getItem('vi-perf') === '1'), 'flag remembered (localStorage) on the next visit');
-    await p.goto('file:///home/user/Vault-It/index.html?perf=0'); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL + '?perf=0'); await p.waitForTimeout(1500);
     ok(await p.evaluate(() => !document.getElementById('vi-perf') && !localStorage.getItem('vi-perf')), '?perf=0 turns it off');
     await ctx.close(); }
   ok(errs.length === 0, 'no page errors ' + errs.slice(0, 2).join(' | '));

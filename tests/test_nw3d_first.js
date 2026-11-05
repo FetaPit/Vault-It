@@ -3,8 +3,9 @@
 // The test makes every observer deliver a stale "not intersecting" entry before the real ones, which is what the phone did, and
 // checks the hero scene still draws without a toggle, at phone and desktop widths, in Night and Daylight.
 // Run: node tests/test_nw3d_first.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const fs = require('fs'); const shotSrc = fs.readFileSync(__dirname + '/brand_shots.js', 'utf8');
 const seed = eval(shotSrc.slice(shotSrc.indexOf('const seed ='), shotSrc.indexOf('(async')).replace('const seed =', ''));

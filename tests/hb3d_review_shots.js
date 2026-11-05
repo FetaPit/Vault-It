@@ -2,6 +2,7 @@
 // usage: node tests/hb3d_review_shots.js <type> <outdir> [floor]
 // Shots: finished views from 4 sides, build stages, equity, site, and close-ups (door, eaves/roof, corner bonding).
 const path = require('path'), fs = require('fs');
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 (async () => {
   const [type, outdir, floorArg, detailArg] = process.argv.slice(2); const detail = detailArg || 'clean';
@@ -10,7 +11,7 @@ const { chromium } = require('playwright');
   const b = await chromium.launch();
   const pg = await b.newPage({ viewport: { width: 1280, height: 800 } });
   const errs = []; pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
-  await pg.goto('file://' + path.join(__dirname, 'hb3d_harness.html')); await pg.waitForTimeout(300);
+  await pg.goto(require('./lib/vi').fileUrl('tests/hb3d_harness.html')); await pg.waitForTimeout(300);
   // f = fraction of model height for the camera target (close-ups); x = 'front'|'corner'|'mid'
   const SHOTS = [
     { n: '01_complete_front', p: 1, mode: 'complete' },

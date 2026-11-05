@@ -2,8 +2,9 @@
 // the fixed footer collapsing to a slim FCA strip once scrolling stops, compact category pills (below the Cash flow chart),
 // and big synced scroll rails above and below the flow charts. 390 / 690 / 1100 / 1440 px, Night and Daylight.
 // Run: node tests/test_v08_chrome.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');   // VI_INDEX points the test at another checkout
+const INDEX = require('./lib/vi').FILE_URL;   // VI_INDEX points the test at another checkout
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const TABS = ['overview', 'budget', 'house', 'assets', 'debt', 'biz', 'achievements', 'network'];
 const FCA = 'Not regulated by the FCA. Not financial advice.';

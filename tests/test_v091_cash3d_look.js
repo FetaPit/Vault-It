@@ -3,6 +3,7 @@
 // small. ... coins ... should read as actual pounds, euros etc dollars ... groups stacks of ten and groups of 100 ... just performance").
 // Each account's flag is a Budget-style chip; coins are real coin shapes; a block of 1,000 is 100 stacks in one shape.
 // Served over http://127.0.0.1 from the folder that holds VI_INDEX. Run: node tests/test_v091_cash3d_look.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const http = require('http'), fs = require('fs'), path = require('path');
 const routeThree = require('./three_route');
 const FILE = process.env.VI_INDEX || path.join(__dirname, '..', 'index.html');

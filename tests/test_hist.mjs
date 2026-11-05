@@ -1,3 +1,4 @@
+import vi from './lib/vi.js'; import path from 'path';
 import { PGlite } from '@electric-sql/pglite'; import fs from 'fs';
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const db=new PGlite();
@@ -5,7 +6,7 @@ await db.exec(`create role anon nologin; create role authenticated nologin; crea
 create table auth.users(id uuid primary key);
 create or replace function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true),'')::uuid $$;
 create table public.vault_data(user_id uuid, key text, value jsonb, updated_at timestamptz default now(), primary key(user_id,key));`);
-await db.exec(fs.readFileSync('/home/user/Vault-It/supabase/migrations/006_vault_history.sql','utf8')); ok(true,'migration 006 runs');
+await db.exec(fs.readFileSync(path.join(vi.ROOT,'supabase/migrations/006_vault_history.sql'),'utf8')); ok(true,'migration 006 runs');
 const A='11111111-1111-1111-1111-111111111111',B='22222222-2222-2222-2222-222222222222';
 const as=async(u)=>db.exec(`select set_config('request.jwt.claim.sub','${u}',false)`);
 const n=async()=>(await db.query('select count(*)::int n from vault_data_history')).rows[0].n;

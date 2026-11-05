@@ -7,8 +7,9 @@
 //      An optional account note on the deposit (state.depAcct). It never changes saved, bricks or Cash and savings; the 25% bonus
 //      is a separate estimate, not added to saved; the First Time Buyer ISA is listed as not open yet, with no rate, bonus or date.
 // Run: node tests/test_v091_house_xp_deposit.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const SEED = (o) => {
   localStorage.setItem('vi_declined_demo', 'true');

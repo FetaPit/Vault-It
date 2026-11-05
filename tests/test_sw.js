@@ -1,10 +1,11 @@
 // Installable app: the manifest is a real file, the service worker registers over http(s), caches the shell and
 // serves it offline, the build stamps the commit into sw.js, and the Worker never lets sw.js or the manifest go stale.
 // Run: node tests/test_sw.js   (builds the site into a temp folder and serves it on a local port)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path'), http = require('http'), os = require('os'), cp = require('child_process');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-const ROOT = '/home/user/Vault-It';
+const ROOT = require('./lib/vi').ROOT;
 const OUT = fs.mkdtempSync(path.join(os.tmpdir(), 'vi-sw-'));
 
 // ── static checks on the source ──

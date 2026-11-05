@@ -3,7 +3,39 @@
 Run everything with `bash scripts/run-tests.sh` (see CLAUDE.md); the commands below run a single test.
 
 Headless-browser (Playwright) and logic tests written while hardening sync, login and data safety.
-They assume the repository is checked out at `/home/user/Vault-It` (edit the `file:///home/user/Vault-It/` paths otherwise).
+The repository can be anywhere (cloud image, CI, Windows laptop): nothing is tied to `/home/user` or `/tmp`.
+
+## How the browser tests reach the app
+
+- Every browser test starts from `tests/lib/vi.js`. It works out the repo root from `__dirname`, or from `VI_INDEX` (the path of the `index.html` under test; its folder is then the root, so a worktree or a copy can be tested).
+- It starts a small static server on `127.0.0.1` (a free port, one per test process, closed when the test ends) and turns the app's `file://` address into `http://127.0.0.1:PORT/...` at `page.goto`. The live site is http(s), and headless Chrome on `file://` sometimes empties or loses localStorage, so http is the truer test.
+- `VI_FILE=1` opens `file://` pages directly instead (the old way, for comparing). `VI_APP=<url>` still points a test at another address.
+- Temp files and logs use the system temp folder (`LOG_DIR` to choose another). Playwright is not in `package.json`.
+
+## Running on the Windows laptop (Git Bash)
+
+Run these in Git Bash, folder `~/Projects/Vault-It`, one line at a time. First time only:
+
+```
+cd ~/Projects/Vault-It
+npm install
+npm install --no-save playwright@1.56.1
+npx playwright install chromium
+```
+
+Then, each time:
+
+```
+cd ~/Projects/Vault-It
+bash scripts/run-tests.sh test_footer test_overview
+bash scripts/run-tests.sh browser
+bash scripts/run-tests.sh all
+```
+
+- `JOBS=2 bash scripts/run-tests.sh all` sets how many run at once (default 2); `SHARD=1/3` runs a third; `LOG_DIR=$HOME/vi-logs` chooses where logs go (default: your temp folder, `vaultit-test-logs`; a failing test's log is named in the output).
+- Test another copy of the app: `VI_INDEX=~/Projects/other/index.html bash scripts/run-tests.sh test_footer`.
+- Needs Git Bash (bash, `timeout`, `xargs`), Node 22 and Chromium from Playwright. PowerShell and cmd cannot run `run-tests.sh`; use Git Bash.
+- Not run on Windows yet: the paths are built with Node's `path`, `os.tmpdir()` and `file://` URL helpers, and tests that need Linux-only tools would show up in the first run there.
 
 ```
 npm i playwright esbuild @electric-sql/pglite     # + a Chromium (npx playwright install chromium)

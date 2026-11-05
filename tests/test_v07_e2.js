@@ -1,8 +1,9 @@
 // v0.7 E2 (owner, 1 Nov): the Financial freedom roadmap opens at the user's next achievement, not at the start ("for me it's Debt halved").
 // Pedro C1: the next stage is centred on a fresh load, and again each time the Overview tab opens. Seeded here: two stages done, the third is next.
 // Run: node tests/test_v07_e2.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = () => {
   localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
