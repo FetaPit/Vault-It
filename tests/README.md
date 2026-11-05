@@ -151,3 +151,4 @@ node tests/perf_baseline.js      # v0.9.2 baseline, not pass/fail: every 3D view
 - test_v092_coin_rims.js, test_v092_crypto_tiles.js: v0.9.2 polish (every coin's own rim colour; Pedro's chunk G nits on the crypto tiles)
 - test_v092_light_chrome.js: the install banner and the footer keep the Night look in Daylight (real rendered pixels, AA text, theme toggled four times)
 - test_v092_polish2.js: slate prices in full (£200,000) and crypto ticker dots in the coin's own colour
+- test_v092_night_aa.js: v0.9.2 Night AA contrast pass (placeholders, white-on-teal buttons, opacity floors, roadmap carousel fades only the art; Daylight unchanged)

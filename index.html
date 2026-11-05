@@ -11606,6 +11606,43 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .ov-ach-tok{flex:none}
 .ov-ach-badge{width:auto;height:auto;background:none;border:none}
 @media(prefers-reduced-motion:reduce){.wr-xpbar i{transition:none}}
+/* v0.9.2 Night AA contrast pass (Pedro, docs/creative/night-aa): Night only, Daylight untouched */
+/* Night AA contrast pass (candidate). Every rule is Night only; Daylight rules are untouched. */
+/* G1 placeholders */
+[data-theme="dark"] :is(input,textarea)::placeholder{color:#9AA0A6;opacity:1}
+/* G2 buttons: white on the existing teal-deep, dark ink on the hover teal */
+[data-theme="dark"] .btn-add-data{color:#fff}
+[data-theme="dark"] .btn-add-data:hover{color:var(--on-teal)}
+[data-theme="dark"] .btn-add{background:linear-gradient(135deg,#006B67,#00837E);color:#fff}
+[data-theme="dark"] .btn-add:hover{color:var(--on-teal)}
+/* G3 faded labels: raise the opacity floor (Daylight already runs these at 1) */
+[data-theme="dark"] .card-lbl{opacity:.8}
+[data-theme="dark"] .card-lbl .vi-dim{opacity:.9}
+[data-theme="dark"] .ov-ms-title{opacity:.9}
+[data-theme="dark"] .ov-chart-title{opacity:.95}
+[data-theme="dark"] .vi-eyebrow{opacity:.8!important}
+[data-theme="dark"] .vi-eyebrow.vi-sub{opacity:1!important}
+[data-theme="dark"] .hb-lv.lock{opacity:.8}
+[data-theme="dark"] .scene-cap{opacity:.65}
+[data-theme="dark"] .price-edit-row label{opacity:.7}
+/* G5 3D overlay hints */
+[data-theme="dark"] .vp-gi-hd{color:rgb(var(--teal-rgb) / .75)}
+[data-theme="dark"] .vp-gi-lbl{color:rgb(var(--teal-rgb) / .75)}
+[data-theme="dark"] .vp-gi-lbl b{color:rgb(var(--teal-rgb) / .95)}
+[data-theme="dark"] .vp-key{color:rgb(var(--teal-rgb) / .75)}
+/* G6 hard-coded low alpha */
+[data-theme="dark"] #logList>div{color:var(--lock)!important}
+[data-theme="dark"] #btnReset{color:var(--lock)}
+/* G7 locked slate names */
+[data-theme="dark"] .wt.st-lock,[data-theme="dark"] .wt.st-skip,[data-theme="dark"] .wt.st-todo{--wt-l:#8C939B}
+/* G9 social links */
+[data-theme="dark"] .dev-links a[href*="linkedin"]{color:#4CA6DA!important}
+[data-theme="dark"] .dev-links a[href*="instagram"]{color:#F2588C!important}
+/* Pedro's two follow-up lifts (one step, Night only): the Metals summary sub text and the edge handle's label, which sits on a pulsing glow */
+[data-theme="dark"] #metals-kpis .ov-kpi-sub{color:#A7ADB3}
+[data-theme="dark"] #sidebar-toggle span:last-child{opacity:1!important}
+/* footer separators (decorative middots) */
+[data-theme="dark"] .footer-copy>span[style*="opacity:.4"]{opacity:1!important}
 </style>
 </head>
 <body>
@@ -27168,7 +27205,7 @@ function renderFIREroadmap(){
       var tag=(s.no===1)?'START HERE':'NEXT UP';
       out+='<rect x="'+(cx-40)+'" y="'+(top-30)+'" width="80" height="16" fill="'+col+'26" stroke="'+col+'" stroke-width="0.8"/>'
         +'<text x="'+cx+'" y="'+(top-18.5)+'" text-anchor="middle" font-size="10.5" font-family="Share Tech Mono,monospace" fill="'+col+'" letter-spacing="1.2" font-weight="700">'+tag+'</text>';
-    }else out+='<text x="'+cx+'" y="'+(top-9)+'" text-anchor="middle" font-size="10.5" font-family="DM Sans,sans-serif" fill="rgba(140,150,160,'+(done?0.95:0.75)+')">'+(waiting?'met · waiting':skipped?'skipped':s.desc)+'</text>';
+    }else out+='<text x="'+cx+'" y="'+(top-9)+'" text-anchor="middle" font-size="10.5" font-family="DM Sans,sans-serif" fill="'+(viLight()?'rgba(140,150,160,'+(done?0.95:0.75)+')':(done?'#C9CED3':'#9AA0A6'))+'">'+(waiting?'met · waiting':skipped?'skipped':s.desc)+'</text>';
     out+='</g>';
   }
   svgEl.setAttribute('viewBox',x0+' 0 '+(x1-x0)+' '+H);
@@ -27241,7 +27278,10 @@ function fireCarousel(){
   var mob=window.innerWidth<=700,mid=SC.scrollLeft+SC.clientWidth/2;
   [].forEach.call(svg.querySelectorAll('.fire-coin'),function(g){
     var cx=(+g.getAttribute('data-i'))*FIRE_NODE+FIRE_LEFT,d=Math.min(1,Math.abs(cx-mid)/(SC.clientWidth*(mob?0.6:0.5)));
-    g.style.transform='scale('+(1.12-0.12*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */g.style.opacity=(1-(mob?0.72:0.4)*d).toFixed(2);
+    var fade=(1-(mob?0.72:0.4)*d).toFixed(2);
+    g.style.transform='scale('+(1.12-0.12*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */
+    /* v0.9.2 Night contrast: at Night only the slate art fades towards the edges; the name, tag and description keep full strength so they stay readable (WCAG AA). Daylight fades the whole stage as before */
+    if(viLight()){g.style.opacity=fade;}else{g.style.opacity='';var cd=g.querySelector('.fire-card');if(cd)cd.style.opacity=fade;}
   });
 }
 var _fireSnapT=0,_fireSnapping=0;
