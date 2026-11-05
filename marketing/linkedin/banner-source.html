@@ -1,38 +1,36 @@
 <html><head>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&family=Share+Tech+Mono&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Share+Tech+Mono&display=block" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
-body{margin:0;width:1128px;height:191px;overflow:hidden;background:#080808;color:#E8E8E8}
-canvas{position:absolute;left:0;top:0;width:1128px;height:191px}
-.copy{position:absolute;left:296px;top:36px;width:520px}
+body{margin:0;width:1512px;height:256px;overflow:hidden;background:#080808;color:#E8E8E8}
+canvas{position:absolute;left:0;top:0;width:1512px;height:256px}
+.copy{position:absolute;left:340px;top:50%;transform:translateY(-50%);}
 .wm{font-family:Syne,sans-serif;font-weight:800;letter-spacing:-.02em;font-size:44px;display:inline-flex;align-items:baseline;line-height:1}
 .wm b{color:#44C0B9;font-weight:800;text-shadow:0 0 18px rgba(68,192,185,.35)}
 .wm .dot{display:inline-block;width:.3em;height:.17em;background:#44C0B9;border-radius:2px;margin:0 .07em;transform:translateY(-.06em);box-shadow:0 0 10px rgba(68,192,185,.6)}
-h1{font-family:Syne,sans-serif;font-weight:700;font-size:19px;margin:14px 0 0;white-space:nowrap;letter-spacing:-.01em}
+h1{font-family:Syne,sans-serif;font-weight:700;font-size:19px;margin:10px 0 0;white-space:nowrap;letter-spacing:-.01em}
 h1 span{color:#E8C56A}
-.mono{font-family:"Share Tech Mono",monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#2D8882;margin-top:12px}
-.url{position:absolute;right:26px;top:20px;font-family:"Share Tech Mono",monospace;font-size:12px;letter-spacing:.12em;color:#9AA0A6}
+.mono{font-family:"Share Tech Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2D8882;margin-top:9px;white-space:nowrap}
+.guide{position:absolute;border:1px dashed red;pointer-events:none}
 </style></head><body>
-<canvas id="c" width="2256" height="382"></canvas>
+<canvas id="c" width="3024" height="512"></canvas>
 <div class="copy">
  <div class="wm">Vault<span class="dot"></span><b>It</b></div>
  <h1>Get out of the red and <span>into your home.</span></h1>
  <div class="mono">Every pound saved builds your future &nbsp;·&nbsp; vault-it.co</div>
 </div>
-
 <script src="../../vault-it-3d-engine.js"></script>
 <script>
-const P=+(new URLSearchParams(location.search).get('p')||68)/100;
-const X=+(new URLSearchParams(location.search).get('x')||1180);
-const Z=+(new URLSearchParams(location.search).get('z')||1.05);
+const q=new URLSearchParams(location.search),n=(k,d)=>+(q.get(k)||d);
+if(q.get('guides')){[[295,58,922,140],[0,58,1512,140],[295,0,922,256]].forEach(([l,t,w,h])=>{const d=document.createElement('div');d.className='guide';Object.assign(d.style,{left:l+'px',top:t+'px',width:w+'px',height:h+'px'});document.body.appendChild(d)})}
 document.fonts.ready.then(()=>{
- const c=document.getElementById('c'),cx=c.getContext('2d'),W=2256,H=382;
+ const c=document.getElementById('c'),cx=c.getContext('2d'),W=3024,H=512;
  cx.fillStyle='#080808';cx.fillRect(0,0,W,H);
- const Y=+(new URLSearchParams(location.search).get("y")||-30),HH=+(new URLSearchParams(location.search).get("h")||460);const hr={x:X,y:Y,w:W-X,h:HH};
+ const X=n('x',1500)*2/1,hr={x:X,y:n('y',0)*2,w:n('w',1100)*2,h:n('h',256)*2};
  const E=window.ViEngine;
- E.renderHouse(cx,hr,E.houseState({p:P,zoom:Z,theme:'dark',now:0,sweep:false,noPulse:true,noFlash:true,fscale:+(new URLSearchParams(location.search).get("f")||1.3)}));
- const fg=cx.createLinearGradient(X,0,X+hr.w*.22,0);fg.addColorStop(0,'rgba(8,8,8,1)');fg.addColorStop(1,'rgba(8,8,8,0)');
- cx.fillStyle=fg;cx.fillRect(X,0,hr.w*.22,H);
+ E.renderHouse(cx,hr,E.houseState({p:n('p',68)/100,zoom:n('z',0.9),theme:'dark',now:0,sweep:false,noPulse:true,noFlash:true,fscale:n('f',1.4)}));
+ const fg=cx.createLinearGradient(X,0,X+hr.w*.18,0);fg.addColorStop(0,'rgba(8,8,8,1)');fg.addColorStop(1,'rgba(8,8,8,0)');
+ cx.fillStyle=fg;cx.fillRect(X,0,hr.w*.18,H);
  document.title='done';
 });
 </script></body></html>
