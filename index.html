@@ -18,7 +18,7 @@ var h=(location.search.match(/[?&]hdr=(\w+)/)||[])[1]||localStorage.getItem("vi-
 /* Vault-It design tokens. Night is the default, Daylight is the light mode.
  * Switch with data-theme="light" on <html>. Generated from vault-it-brand-book.html */
 html{box-sizing:border-box}
-:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav{   /* 3D viewports stay Night in Daylight too (the model badge sits over the Night picture) */
+:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav,[data-theme="light"] #pwa-install-banner,[data-theme="light"] #app-footer{   /* 3D viewports stay Night in Daylight too (the model badge sits over the Night picture) */
   color-scheme:dark;
   --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --slate:#1C2420; --line:#102221; --line2:#15302F;
   --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882; --lock:#8C939B;
@@ -149,6 +149,8 @@ function viCleanJSON(str) {   // returns the cleaned JSON text, or the original 
 /* ── PWA INSTALL BANNER ──────────────────────────────── */
 #pwa-install-banner{background:rgb(var(--teal-rgb) / .08);border-bottom:1px solid rgb(var(--teal-rgb) / .15);padding:6px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:'Share Tech Mono',monospace;font-size:max(.46rem,var(--vi-fs-1));color:var(--t2)}
 #pwa-install-banner button.install-btn{padding:4px 12px;background:var(--em);border:none;color:#080808;font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:800;cursor:pointer;clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))}
+/* v0.9.2: in Daylight the install banner keeps the Night look (solid dark behind it, as on the dark page) */
+[data-theme="light"] #pwa-install-banner{background:linear-gradient(rgb(var(--teal-rgb) / .08),rgb(var(--teal-rgb) / .08)),var(--bg)}
 #pwa-install-banner button.dismiss-btn{background:none;border:none;color:var(--t3);cursor:pointer;font-size:max(.7rem,var(--vi-fs-3));padding:0 4px}
 /* ── SETTINGS WCAG ───────────────────────────────────── */
 .settings-section{margin-bottom:18px}
@@ -7835,7 +7837,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
    PURPOSEOS GLOBAL — 2-tab build: Overview + House
 ═══════════════════════════════════════════════════════ */
 
-:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav {
+:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav,[data-theme="light"] #pwa-install-banner,[data-theme="light"] #app-footer {
   /* old names, kept as aliases of the brand tokens for one release */
   --c1: var(--panel); --c2: var(--surf2); --c3: var(--slate); --c4: var(--line2);
   --em: var(--teal); --em2: var(--teal); --em3: var(--faint); --dp: var(--teal-deep);
