@@ -123,7 +123,7 @@ The UK market has also shrunk: Money Dashboard closed in 2023 and Moneyhub's con
 | Founding Member, beta tester | £99 once (£50 off), same 100-place cap | `price_1UWeLN9mgKf6Hnty3Rboi2or` (`founding_member_tester`) | https://buy.stripe.com/bJe3cpc9w4MN8L31uu2VG07 | `?founded=1` |
 | Founding Member | £149 once, Stripe stops the link after 100 payments | `price_1UWam79mgKf6HntyipUcP8oo` (`founding_member`, product `prod_VXg87aVvQj3qUJ`) | https://buy.stripe.com/eVq28l0qO6UV3qJc982VG05 | `?founded=1` |
 
-Switched off: the £59.99 yearly link (`plink_1TdPyH9mgKf6Hnty9IT0ARfh`) and the £21.99 tester yearly link (`plink_1UWamF9mgKf6Hnty4WkoKDk4`, 31 Oct pm). Still in the account, unused: the old "Vault·It Pro" £4.99 / £39.99 prices and the "Vault·It Free" product; archive them from the Dashboard when convenient. The app appends `prefilled_email` and `client_reference_id` (the account id) to every link so the webhook (secure paid gateway, live 31 Oct: endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` → Supabase `stripe-webhook`) can match a payment to an account.
+Switched off: that first £59.99 yearly link (`plink_1TdPyH9mgKf6Hnty9IT0ARfh`, a different link from the £59.99 one wired in on 5 Nov, see below) and the £21.99 tester yearly link (`plink_1UWamF9mgKf6Hnty4WkoKDk4`, 31 Oct pm). Still in the account, unused: the old "Vault·It Pro" £4.99 / £39.99 prices and the "Vault·It Free" product; archive them from the Dashboard when convenient. The app appends `prefilled_email` and `client_reference_id` (the account id) to every link so the webhook (secure paid gateway, live 31 Oct: endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK` → Supabase `stripe-webhook`) can match a payment to an account.
 
 
 ## Decided by Pete (31 Oct 2026, afternoon)
