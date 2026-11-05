@@ -9,7 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
-- [~] (cloud, Build) Pricing alignment: Pioneer £5.99/mo, £59.99/yr, Founding £149 once (full); testers £3.99/mo, £39.99/yr, £99 once (discounted) — align all comms, products, assets and Stripe links, confirm Stripe links active (owner, 5 Nov: "Make sure all comms, products, assets, Stripe links align with this, and the Stripe links are active").
+- [ ] (cloud, Build) `submitWaitlist()` (index.html ~28849) is now orphaned JS, left over from deleting `#waitlist-modal` in the pricing-alignment item (5 Nov); it fails safe and can't throw. Owner's call on removing it.
 - [ ] (owner, Admin) Send the Plaza Futura PDF to Steve on LinkedIn (owner, 4 Nov ~20:55: "send to Exec Assistant to remind me to email it on linkedin to steve"). Reminder in Google Calendar Thu 5 Nov 09:10 with the draft message and Drive link.
 - [x] (cloud, Marketing) Card corner: the detached house mid-build (owner's screenshot, ROW 35 / 115, 37.0% of deposit) with a brick-laying animation, in the bottom-right corner of the digital and printed card (owner, 4 Nov ~20:25: "More like this with brick laying animation", "but that image in the corner"). Done: ba8aafe, live 5 Nov 01:41 (backup backup/release-pioneer-v2-20261105-0141).
 - [x] (cloud, Marketing) Tagline style from now on: thin neon red stroke on "red", thin gold gradient neon stroke on "home", in all new comms plus the pitch deck (owner, 4 Nov ~20:30: "add a thin neon red to the word red and i thin gold gradient neon stroke to home in all comms going forward plus pitchdeck"). Done: e97a16c (deck cover, presenter, vault-it.co/pete, brand/vault-it-tagline-neon.css, CLAUDE.md rule); printed card artwork updated in the scratch build.
@@ -112,6 +112,10 @@ The single list of instructed work. Every session reads it at start and before e
 - Night mode: 68 small WCAG AA failures (faded items, white on teal buttons): design call
 - Live market value steps 2 and 3 (Land Registry house price index; eBay estimate): yes or no (`docs/LIVE_MARKET_VALUE.md`)
 - Poly Pizza: commercial plan and an edge function for live search, or self-host a small CC0 set (`docs/WEALTH_INVENTORY_3D_OPTIONS.md`)
+
+## Done (5 Nov 2026)
+
+- [x] (cloud, Build) Pricing alignment: Pioneer £5.99/mo, £59.99/yr, Founding £149 once (full); testers £3.99/mo, £49.99/yr (confirmed keep, not the £39.99 quoted that day), £99 once (discounted) — align all comms, products, assets and Stripe links, confirm Stripe links active (owner, 5 Nov: "Make sure all comms, products, assets, Stripe links align with this, and the Stripe links are active"). Owner also confirmed: rename "Founder" to "Pioneer" for the monthly plan (Pioneer now covers monthly and yearly, matching Stripe's product name); deactivate the orphaned duplicate £99 Founding-tester Stripe link (done directly in Stripe); delete the dead `#waitlist-modal` (DAO Governance Seat etc., unreachable, confirmed before deleting). Done: 9499658 (rollout-qc PASS) — `VI_STRIPE_LINKS.annual_after_beta` wired to the real, already-live £59.99/yr link; "Founder" to "Pioneer" everywhere it was the monthly plan's display text (Lifetime-licence `founder` key/flags untouched); dead modal removed. Webhook checked, not assumed: `stripe-webhook`'s existing `META_PLAN`/interval fallbacks already resolve the new link correctly (`test_stripe_server.js`); no Supabase deploy needed. Pitch deck's "£49.99 a year" fixed to £59.99 too: 51dca00, docs/OFFER_AND_PRICING.md updated. Follow-up: `submitWaitlist()` now orphaned, queued above.
 
 ## Done (4 Nov 2026)
 
