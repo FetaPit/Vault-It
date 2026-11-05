@@ -1,6 +1,7 @@
 // v0.9.2: in Daylight the PWA install banner and the footer keep the Night (dark) look, so they match Night whichever theme is on.
 // Toggles the theme and checks both elements keep a dark background and AA text; Daylight everywhere else stays light.
 // Run: node tests/test_v092_light_chrome.js
+require('./lib/vi');   // serves file:// app URLs over http and maps /home/user/Vault-It onto this checkout (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {

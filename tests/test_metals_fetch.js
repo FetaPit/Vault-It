@@ -1,6 +1,7 @@
 // Metals live fetch (CoS, 5 Nov 2026): fetchMetalPrices() reads https://api.metals.live/v1/spot/... and sets alState.metalPrices
 // (gold, silver, platinum, palladium as USD x 0.79) and lastUpdated; on a failed fetch it toasts and leaves the prices alone.
 // The request is stubbed, so this proves the code path, not that metals.live is up. Run: node tests/test_metals_fetch.js
+require('./lib/vi');   // serves file:// app URLs over http and maps /home/user/Vault-It onto this checkout (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };

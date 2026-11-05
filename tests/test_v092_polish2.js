@@ -1,6 +1,7 @@
 // v0.9.2 polish 2 (owner's yes, 5 Nov): the house type slate prices read in full (£200,000, not £200.0k), and the small square dot beside a crypto
 // ticker follows the coin's own colour (it followed the allocation palette: BTC teal, ETH gold).
 // Run: node tests/test_v092_polish2.js
+require('./lib/vi');   // serves file:// app URLs over http and maps /home/user/Vault-It onto this checkout (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {

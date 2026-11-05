@@ -8,6 +8,7 @@
 //   6. sentence case titles, no sideways scroll at 390, saved settings still readable
 //   7. sidebar ledger colours in Night and Daylight
 // Run: node tests/test_v092_settings.js
+require('./lib/vi');   // serves file:// app URLs over http and maps /home/user/Vault-It onto this checkout (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };

@@ -1,6 +1,7 @@
 // v0.9.2 Night AA contrast pass (Pedro's brief, docs/creative/night-aa): placeholders, white-on-teal buttons, faded-label opacity floors,
 // the Roadmap carousel (only the art fades, the words stay full) and the footer separators reach WCAG AA at Night; Daylight stays as it was.
 // Run: node tests/test_v092_night_aa.js
+require('./lib/vi');   // serves file:// app URLs over http and maps /home/user/Vault-It onto this checkout (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const MEASURE = () => {
