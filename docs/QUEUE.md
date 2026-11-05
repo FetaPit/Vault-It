@@ -73,7 +73,7 @@ The single list of instructed work. Every session reads it at start and before e
   7. The cloud "v0.9.2 viewport performance" session's own work (cash, metals) on candidate/v0.9.2: review against the round 2 fixes before merging; its round 2 chunk merges there are redundant.
   8. Laptop-only files to land: `.claude/agents/stress-doctor.md` and its roster line, and icon pack v2 (577bd43, aabc767), all on claude/bold-carson-tey49m, not pushed.
   9. Parked earlier: extended 3D model library (E34); applying icon pack v2 across the app.
-  - (cloud) Polish: claimed, branch v092/polish (items 3 and 4; CoS go 5 Nov 02:00)
+  - (cloud) Polish: `v092/polish` 7a13400, ready for review (items 3 and 4 in part: coin rims own colour, Pedro chunk G nits, I NIT 2; D, E, F notes were cosmetic or already fixed; Night contrast follow-up not yet received). Not merged.
   - (CoS, 4 Nov ~14:50) F item viewer merged into candidate/v0.9.1 as 4a0ce74 (from 9a23ce8, CI green), on top of 1663527 (the pitch session's production sync). Agent `stress-doctor` written (`.claude/agents/stress-doctor.md`, roster updated, local on the laptop branch); first run on inventory and liabilities in progress.
   - (CoS, 4 Nov) B labels and flow merged into candidate/v0.9.1 as 8f6eb93 (from 0143c09, CI run 41850865916 green). Left: A chrome (fcae04e, CI running), G crypto (fdaeb30, CI queued), I tiers (3842082, CI running).
   - **Owner, 5 Nov ~02:00, answers and go** ("Is the edits running that dont require my input still": taken as go for items 1 to 5 of the CoS list):
