@@ -2,60 +2,37 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&family=Share+Tech+Mono&display=block" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
-body{margin:0;width:1128px;height:191px;overflow:hidden;background:#080808;font-family:"DM Sans",Arial,sans-serif;color:#E8E8E8}
-.stage{position:absolute;inset:0;background:radial-gradient(70% 160% at 72% 120%,#06343A 0%,#00131A 50%,#080808 100%)}
-.scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(68,192,185,.06) 0 1px,transparent 1px 4px)}
+body{margin:0;width:1128px;height:191px;overflow:hidden;background:#080808;color:#E8E8E8}
 canvas{position:absolute;left:0;top:0;width:1128px;height:191px}
-.copy{position:absolute;left:296px;top:38px;width:470px}
+.copy{position:absolute;left:296px;top:36px;width:520px}
 .wm{font-family:Syne,sans-serif;font-weight:800;letter-spacing:-.02em;font-size:44px;display:inline-flex;align-items:baseline;line-height:1}
 .wm b{color:#44C0B9;font-weight:800;text-shadow:0 0 18px rgba(68,192,185,.35)}
 .wm .dot{display:inline-block;width:.3em;height:.17em;background:#44C0B9;border-radius:2px;margin:0 .07em;transform:translateY(-.06em);box-shadow:0 0 10px rgba(68,192,185,.6)}
-h1{font-family:Syne,sans-serif;font-weight:700;font-size:21px;margin:14px 0 0;letter-spacing:-.01em}
+h1{font-family:Syne,sans-serif;font-weight:700;font-size:19px;margin:14px 0 0;white-space:nowrap;letter-spacing:-.01em}
 h1 span{color:#E8C56A}
-.mono{font-family:"Share Tech Mono",monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#44C0B9;margin-top:12px;opacity:.9}
-.url{position:absolute;right:28px;top:22px;font-family:"Share Tech Mono",monospace;font-size:13px;letter-spacing:.12em;color:#9AA0A6}
+.mono{font-family:"Share Tech Mono",monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#2D8882;margin-top:12px}
+.url{position:absolute;right:26px;top:20px;font-family:"Share Tech Mono",monospace;font-size:12px;letter-spacing:.12em;color:#9AA0A6}
 </style></head><body>
-<div class="stage"></div><canvas id="c" width="2256" height="382"></canvas><div class="scan"></div>
+<canvas id="c" width="2256" height="382"></canvas>
 <div class="copy">
  <div class="wm">Vault<span class="dot"></span><b>It</b></div>
  <h1>Get out of the red and <span>into your home.</span></h1>
- <div class="mono">Debt &rarr; deposit &rarr; keys</div>
+ <div class="mono">Every pound saved builds your future &nbsp;·&nbsp; vault-it.co</div>
 </div>
-<div class="url">VAULT-IT.CO</div>
+
+<script src="../../vault-it-3d-engine.js"></script>
 <script>
-document.fonts.load("12px \"Share Tech Mono\"").then(()=>{const c=document.getElementById('c'),x=c.getContext('2d');x.scale(2,2);
-// perspective ground grid on right
-const hx=862,hy=118;
-x.strokeStyle='rgba(68,192,185,.16)';x.lineWidth=1;
-for(let i=-14;i<=14;i++){x.beginPath();x.moveTo(hx+i*6,hy);x.lineTo(hx+i*70,260);x.stroke();}
-for(let j=0;j<8;j++){const t=Math.pow(j/7,1.8);const y=hy+(191-hy+60)*t;x.globalAlpha=.25+.6*t;x.beginPath();x.moveTo(600,y);x.lineTo(1128,y);x.stroke();}
-x.globalAlpha=1;
-// ping ring
-x.strokeStyle='rgba(68,192,185,.35)';x.lineWidth=1.2;x.beginPath();x.ellipse(hx,168,150,22,0,0,Math.PI*2);x.stroke();
-x.strokeStyle='rgba(68,192,185,.15)';x.beginPath();x.ellipse(hx,168,210,32,0,0,Math.PI*2);x.stroke();
-// brick house, isometric-ish front elevation
-const bw=18,bh=8,cols=9,rows=11,left=hx-cols*bw/2,base=166;
-let n=0;const filled=74;
-for(let r=0;r<rows;r++){const off=(r%2)?bw/2:0;
- for(let k=0;k<cols+(r%2?0:0);k++){let bx=left+k*bw-off,w=bw;if(bx<left){w-=left-bx;bx=left}if(bx+w>left+cols*bw)w=left+cols*bw-bx;if(w<=2)continue;
-  const by=base-(r+1)*bh;
-  // door gap
-  if(r<5&&bx+w>hx-12&&bx<hx+12){continue}
-  if(r>=6&&r<=8&&((bx+w>left+18&&bx<left+48)||(bx+w>left+cols*bw-48&&bx<left+cols*bw-18))){continue}
-  n++;const on=n<=filled;const last=n>filled-6&&on;
-  x.fillStyle=last?'rgba(232,197,106,.9)':on?'rgba(0,127,123,.82)':'rgba(68,192,185,.06)';
-  x.strokeStyle=on?'rgba(4,20,26,.9)':'rgba(68,192,185,.28)';x.lineWidth=1;
-  x.fillRect(bx+.5,by+.5,w-1,bh-1);x.strokeRect(bx+.5,by+.5,w-1,bh-1);
-  if(last){x.shadowColor='rgba(232,197,106,.8)';x.shadowBlur=8;x.fillRect(bx+.5,by+.5,w-1,bh-1);x.shadowBlur=0}
- }}
-// roof outline
-const roofY=base-rows*bh;x.strokeStyle='rgba(68,192,185,.55)';x.setLineDash([4,4]);x.lineWidth=1.2;
-x.beginPath();x.moveTo(left-10,roofY);x.lineTo(hx,roofY-46);x.lineTo(left+cols*bw+10,roofY);x.closePath();x.stroke();x.setLineDash([]);
-// door + windows outline
-x.strokeStyle='rgba(68,192,185,.6)';x.strokeRect(hx-12,base-40,24,40);
-x.strokeRect(left+18,base-72,30,24);x.strokeRect(left+cols*bw-48,base-72,30,24);
-// keys date label
-x.font='11px "Share Tech Mono"';x.fillStyle='#E8C56A';x.fillText('KEYS DATE  MAR 2031',hx+100,roofY-14);
-x.strokeStyle='rgba(232,197,106,.6)';x.beginPath();x.moveTo(hx+96,roofY-18);x.lineTo(hx+40,roofY-30);x.stroke();
-x.fillStyle='#9AA0A6';x.fillText('BRICKS LAID  68%',hx+100,roofY+8);
-});</script></body></html>
+const P=+(new URLSearchParams(location.search).get('p')||68)/100;
+const X=+(new URLSearchParams(location.search).get('x')||1180);
+const Z=+(new URLSearchParams(location.search).get('z')||1.05);
+document.fonts.ready.then(()=>{
+ const c=document.getElementById('c'),cx=c.getContext('2d'),W=2256,H=382;
+ cx.fillStyle='#080808';cx.fillRect(0,0,W,H);
+ const Y=+(new URLSearchParams(location.search).get("y")||-30),HH=+(new URLSearchParams(location.search).get("h")||460);const hr={x:X,y:Y,w:W-X,h:HH};
+ const E=window.ViEngine;
+ E.renderHouse(cx,hr,E.houseState({p:P,zoom:Z,theme:'dark',now:0,sweep:false,noPulse:true,noFlash:true,fscale:+(new URLSearchParams(location.search).get("f")||1.3)}));
+ const fg=cx.createLinearGradient(X,0,X+hr.w*.22,0);fg.addColorStop(0,'rgba(8,8,8,1)');fg.addColorStop(1,'rgba(8,8,8,0)');
+ cx.fillStyle=fg;cx.fillRect(X,0,hr.w*.22,H);
+ document.title='done';
+});
+</script></body></html>
