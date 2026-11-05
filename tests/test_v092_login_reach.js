@@ -5,6 +5,7 @@
 // Scenarios: a fresh visit, b repeat visit with a PIN (stubbed), c valid session (no login; Sign out in Settings), d looking around (demo mode),
 // e the welcome overlay present, f slow or failed PIN status and the security-check "please wait" path (Continue never stays disabled).
 // Run: node tests/test_v092_login_reach.js
+const VI = require('./lib/vi');   // serves the app over http from this checkout, wherever it is (tests/lib/vi.js)
 const { chromium, devices } = require('playwright'); const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const DEV = {
@@ -27,7 +28,7 @@ const REACH = (sel) => async (page) => page.evaluate((sel) => {
   for (const [dn, d] of Object.entries(DEV)) for (const [sn, s] of Object.entries(SC)) {
     const ctx = await b.newContext({ ...d, deviceScaleFactor: 1 }); await routeThree(ctx); const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
     await page.addInitScript(ls => { try { for (const k in ls) localStorage.setItem(k, ls[k]); } catch (e) {} }, s.ls || {});
-    await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')); await page.waitForTimeout(1200);
+    await page.goto(VI.FILE_URL); await page.waitForTimeout(1200);
     const T = dn + ' ' + sn + ': ';
     if (s.pin) { await page.evaluate(async () => { window._pinCall = async () => ({ pin: true }); await initQuickLogin(); }); await page.waitForTimeout(400); }
     if (s.slow) await page.evaluate(() => { window._pinStatus = () => new Promise(() => {}); });   // never answers
