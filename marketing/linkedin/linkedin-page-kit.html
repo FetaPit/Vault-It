@@ -1,0 +1,309 @@
+<title>Vault·It LinkedIn Kit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+/* Layout: one reading column, a site-plan feel. Each LinkedIn field is a "plot" with its limit shown like a measurement. */
+:root{
+  --bg:#F3F7F6; --panel:#FFFFFF; --line:#C5DAD8; --text:#0B1F22; --muted:#3F5658;
+  --teal:#297B76; --teal-deep:#006B67; --gold:#8B6A15; --on-teal:#FFFFFF; --warn:#C22A4F;
+  --chip:#EAF2F1; --grid:rgba(0,127,123,.05);
+  --font-display:"Syne","Helvetica Neue",Arial,sans-serif;
+  --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#080808; --panel:#0A1018; --line:#15302F; --text:#E8E8E8; --muted:#9AA0A6;
+  --teal:#44C0B9; --teal-deep:#007F7B; --gold:#E8C56A; --on-teal:#00181A; --warn:#EE7D7D;
+  --chip:#0A1A1C; --grid:rgba(68,192,185,.04); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#080808; --panel:#0A1018; --line:#15302F; --text:#E8E8E8; --muted:#9AA0A6;
+  --teal:#44C0B9; --teal-deep:#007F7B; --gold:#E8C56A; --on-teal:#00181A; --warn:#EE7D7D;
+  --chip:#0A1A1C; --grid:rgba(68,192,185,.04); color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:16px/1.55 var(--font-body);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px}
+.wrap{max-width:760px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:40px}
+.wm{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;display:inline-flex;align-items:baseline;font-size:34px;line-height:1}
+.wm b{color:var(--teal)}
+.wm .dot{display:inline-block;width:.3em;height:.17em;background:var(--teal);border-radius:2px;margin:0 .07em;transform:translateY(-.06em)}
+header p{margin:10px 0 0;color:var(--muted);max-width:60ch}
+.label{font:13px/1.3 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
+h2{font:700 22px/1.2 var(--font-display);margin:4px 0 0;text-wrap:balance}
+section{display:grid;gap:14px;min-width:0}
+.intro{color:var(--muted);margin:0;max-width:62ch}
+.asset{display:grid;gap:8px}
+.asset img{width:100%;border-radius:6px;border:1px solid var(--line);display:block}
+.asset .logo{width:160px}
+.meta{font:13px var(--font-mono);color:var(--muted);letter-spacing:.04em}
+.field{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:8px;min-width:0}
+.fhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.fname{font-weight:700}
+.count{font:13px var(--font-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.count.over{color:var(--warn)}
+.val{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font:inherit}
+.note{font-size:14px;color:var(--muted);margin:0}
+.note b{color:var(--text)}
+button.copy{justify-self:start;font:500 14px var(--font-body);background:var(--teal-deep);color:#fff;border:0;border-radius:999px;padding:7px 16px;cursor:pointer}
+button.copy:focus-visible,input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+button.copy.done{background:var(--teal);color:var(--on-teal)}
+.grid2{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:14px}
+ol.steps{margin:0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:s}
+ol.steps li{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+ol.steps input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--teal-deep);flex:none}
+ol.steps label{cursor:pointer}
+ol.steps li.ticked label{color:var(--muted);text-decoration:line-through}
+.post .when{font:13px var(--font-mono);color:var(--gold);letter-spacing:.06em;text-transform:uppercase}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="label">LinkedIn company page kit</div>
+  <div class="wm" style="margin-top:10px">Vault<span class="dot"></span><b>It</b></div>
+  <p>Everything for the Vault·It company page, in brand voice. Copy each field straight into LinkedIn. Character limits are LinkedIn's own.</p>
+</header>
+
+<section>
+  <div><div class="label">01 · Images</div><h2>Logo and cover</h2></div>
+  <p class="intro">On your phone, press and hold an image to save it. Both are also sent to you in the chat as files.</p>
+  <div class="asset">
+    <img src="__BANNER__" alt="Vault·It cover banner: wordmark, tagline Get out of the red and into your home, and a brick house being built on a grid">
+    <div class="meta">COVER · 2256 × 382 px (LinkedIn asks for 1128 × 191, this is 2x so it stays sharp)</div>
+    <p class="note">The text sits centre-left so your logo doesn't cover it on desktop. On mobile LinkedIn crops the edges, so the house may be trimmed.</p>
+  </div>
+  <div class="asset">
+    <img class="logo" src="__LOGO__" alt="Vault·It logo mark: a teal V inside a vault dial">
+    <div class="meta">LOGO · 400 × 400 px · night colourway</div>
+  </div>
+</section>
+
+<section>
+  <div><div class="label">02 · Page details</div><h2>The setup form</h2></div>
+  <div class="field" data-max="100">
+    <div class="fhead"><span class="fname">Name</span><span class="count"></span></div>
+    <pre class="val">Vault·It</pre>
+    <p class="note">If LinkedIn rejects the dot, use <b>Vault-It</b>. Same as the web address, easy to search.</p>
+    <button class="copy" type="button">Copy</button>
+  </div>
+  <div class="field">
+    <div class="fhead"><span class="fname">LinkedIn public URL</span></div>
+    <pre class="val">vault-it</pre>
+    <p class="note">Gives you linkedin.com/company/vault-it. If it's taken, try <b>vaultit</b> or <b>vault-it-app</b>.</p>
+    <button class="copy" type="button">Copy</button>
+  </div>
+  <div class="field" data-max="120">
+    <div class="fhead"><span class="fname">Tagline</span><span class="count"></span></div>
+    <pre class="val">Get out of the red and into your home. Every pound saved builds your future.</pre>
+    <button class="copy" type="button">Copy</button>
+  </div>
+  <div class="field">
+    <div class="fhead"><span class="fname">Website</span></div>
+    <pre class="val">https://vault-it.co</pre>
+    <button class="copy" type="button">Copy</button>
+  </div>
+  <div class="grid2">
+    <div class="field"><div class="fhead"><span class="fname">Industry</span></div>
+      <pre class="val">Software Development</pre>
+      <p class="note">Not "Financial Services". You're not FCA regulated, so don't let the page look like a regulated adviser.</p></div>
+    <div class="field"><div class="fhead"><span class="fname">Company size</span></div>
+      <pre class="val">0–1 employees</pre>
+      <p class="note">Move to 2–10 when you take someone on.</p></div>
+    <div class="field"><div class="fhead"><span class="fname">Company type</span></div>
+      <pre class="val">Self-employed</pre>
+      <p class="note">Switch to <b>Privately held</b> once Vault It Ltd is incorporated.</p></div>
+    <div class="field"><div class="fhead"><span class="fname">Location</span></div>
+      <pre class="val">Lincoln, England, United Kingdom</pre>
+      <p class="note">Only add a street address if you're happy for it to be public.</p></div>
+    <div class="field"><div class="fhead"><span class="fname">Founded</span></div>
+      <pre class="val">2026</pre>
+      <p class="note">Change it if you started building earlier.</p></div>
+    <div class="field"><div class="fhead"><span class="fname">Custom button</span></div>
+      <pre class="val">Sign up → https://vault-it.co</pre>
+      <p class="note">Edit page → Buttons. Points people at the free beta.</p></div>
+  </div>
+</section>
+
+<section>
+  <div><div class="label">03 · About</div><h2>Overview</h2></div>
+  <div class="field" data-max="2000">
+    <div class="fhead"><span class="fname">Overview</span><span class="count"></span></div>
+<pre class="val">Vault·It shows you the way from debt to your own front door.
+
+Put your numbers in. Your debts, your savings, your deposit. Vault·It turns every pound you save into bricks on a 3D house and gives you a keys date. No bank login. You type the numbers in and you stay in control.
+
+Why it exists
+Most people in debt have no date for owning a home. The average first-time buyer is now 34. New StepChange clients owe £16,874 on average. A goal ten years away feels unreal, especially if your brain finds distant goals hard to hold onto. So we made it something you can see, and build, one brick at a time.
+
+Debt, then deposit, then keys.
+
+Who it's for
+People paying off debt who want to buy a home. And the building societies, brokers and debt charities who help them, through shared dashboards and white label.
+
+Where we are
+Live in alpha. Self-funded and built in Lincoln by Pete Thickett, designer and founder of PT Live Design. Accepted into Web Summit's startup programme and supported by the Business Lincolnshire Growth Hub.
+
+Join the free beta at vault-it.co
+
+Not regulated by the FCA. Not financial advice.</pre>
+    <button class="copy" type="button">Copy</button>
+  </div>
+  <div class="field">
+    <div class="fhead"><span class="fname">Specialties</span><span class="count">14 of 20</span></div>
+    <div class="chips">
+      <span>Personal finance</span><span>Debt freedom</span><span>First-time buyers</span><span>Home ownership</span><span>Savings goals</span><span>Financial wellbeing</span><span>Neurodiversity</span><span>Accessible design</span><span>3D visualisation</span><span>Gamification</span><span>Fintech</span><span>PropTech</span><span>White label</span><span>Behavioural design</span>
+    </div>
+    <pre class="val" hidden>Personal finance, Debt freedom, First-time buyers, Home ownership, Savings goals, Financial wellbeing, Neurodiversity, Accessible design, 3D visualisation, Gamification, Fintech, PropTech, White label, Behavioural design</pre>
+    <p class="note">LinkedIn takes them one at a time. Copy all, then paste and split.</p>
+    <button class="copy" type="button">Copy all</button>
+  </div>
+  <div class="field">
+    <div class="fhead"><span class="fname">Page hashtags</span><span class="count">3 of 3</span></div>
+    <pre class="val">#FirstTimeBuyer #PersonalFinance #Fintech</pre>
+    <p class="note">Edit page → Community hashtags. Lets you follow and join those conversations as the page.</p>
+    <button class="copy" type="button">Copy</button>
+  </div>
+</section>
+
+<section>
+  <div><div class="label">04 · Launch posts</div><h2>First two weeks</h2></div>
+  <p class="intro">Written as the page ("we"). Post one, then reshare it from your own profile with a line of your own. Add a screenshot of the house builder to each where you can, image posts get seen more.</p>
+
+  <div class="field post" data-max="3000">
+    <div class="fhead"><span class="when">Day 1 · Hello</span><span class="count"></span></div>
+<pre class="val">Hello LinkedIn 👋
+
+Vault·It turns every pound you save into a brick on a 3D house.
+
+Put your debts, savings and deposit in. Watch your house build. Get a date for your keys.
+
+No bank login. You type the numbers in, you stay in control.
+
+We're live in alpha and the beta is free. Have a go and tell us what you think 👉 vault-it.co
+
+Not financial advice.</pre>
+    <button class="copy" type="button">Copy</button>
+  </div>
+
+  <div class="field post" data-max="3000">
+    <div class="fhead"><span class="when">Day 2 · Eligent pitch</span><span class="count"></span></div>
+<pre class="val">Big Saturday coming up.
+
+Our founder Pete is pitching Vault·It in London at the Eligent Club event "How to Build a Tech Startup: From Concept to International Markets".
+
+Sat 7th Nov, 1pm, Central London.
+
+If you're there, come and find him. If you work with first-time buyers or people in debt, he'd love a chat.
+
+🎟️ https://lnkd.in/e8wP-siS</pre>
+    <p class="note">Or simply reshare your personal post from the page.</p>
+    <button class="copy" type="button">Copy</button>
+  </div>
+
+  <div class="field post" data-max="3000">
+    <div class="fhead"><span class="when">Day 5 · The number</span><span class="count"></span></div>
+<pre class="val">34.
+
+That's the average age of a first-time buyer now. In the 1990s it was 29.
+
+House prices are 7.6 times average earnings. More than half of first-time buyers need two incomes to buy at all.
+
+Saving for a deposit can feel like pouring money into a hole you can't see the bottom of.
+
+We think you should be able to see it fill up. Brick by brick.
+
+vault-it.co</pre>
+    <p class="note">Sources from your deck: ONS 2025, Skipton Home Affordability Index 2026.</p>
+    <button class="copy" type="button">Copy</button>
+  </div>
+
+  <div class="field post" data-max="3000">
+    <div class="fhead"><span class="when">Day 8 · How it works</span><span class="count"></span></div>
+<pre class="val">Debt, then deposit, then keys.
+
+That's the whole idea.
+
+1. Put in what you owe and what you've saved
+2. Every pound becomes a brick on your house
+3. Vault·It gives you a keys date, and it moves when you do
+
+Pay off a card, the date comes closer. Miss a month, you can see it.
+
+Free beta 👉 vault-it.co
+
+Not financial advice.</pre>
+    <button class="copy" type="button">Copy</button>
+  </div>
+
+  <div class="field post" data-max="3000">
+    <div class="fhead"><span class="when">Day 11 · Built for brains like ours</span><span class="count"></span></div>
+<pre class="val">If a goal is ten years away, for a lot of us it may as well not exist.
+
+Time-blindness is real. If you're neurodivergent, holding onto something that far off and acting on it every month is hard work.
+
+So we stopped asking people to imagine it.
+
+In Vault·It your home is right there in front of you, getting built every time you save. You can spin it round. You can see the gap.
+
+We're working on research with the University of Lincoln to test it properly. Until then, try it and tell us if it helps.
+
+vault-it.co</pre>
+    <p class="note">The University of Lincoln line refers to your planned Innovate UK bid. Drop it if that isn't public yet.</p>
+    <button class="copy" type="button">Copy</button>
+  </div>
+
+  <div class="field post" data-max="3000">
+    <div class="fhead"><span class="when">Day 14 · For partners</span><span class="count"></span></div>
+<pre class="val">Building societies, brokers, debt charities.
+
+Your customers already want to own a home. Most of them can't see the route.
+
+Vault·It gives them a keys date and a house they build every time they save. You get a shared dashboard and a white-label version with your name on it.
+
+We're opening our first 90-day pilots now. Message us or email hello@vault-it.co</pre>
+    <button class="copy" type="button">Copy</button>
+  </div>
+</section>
+
+<section>
+  <div><div class="label">05 · Setup</div><h2>Steps in order</h2></div>
+  <ol class="steps" id="steps">
+    <li><input type="checkbox" id="s1"><label for="s1">On LinkedIn (desktop is easiest), go to <b>For Business → Create a Company Page → Company</b>.</label></li>
+    <li><input type="checkbox" id="s2"><label for="s2">Fill in name, URL, website, industry, size, type, logo and tagline (section 02).</label></li>
+    <li><input type="checkbox" id="s3"><label for="s3">Upload the cover banner and paste the overview, specialties and location.</label></li>
+    <li><input type="checkbox" id="s4"><label for="s4">Add the <b>Sign up</b> button pointing to vault-it.co.</label></li>
+    <li><input type="checkbox" id="s5"><label for="s5">On your own profile, add an Experience entry: Founder at Vault·It, and pick the new page so the logo links.</label></li>
+    <li><input type="checkbox" id="s6"><label for="s6">Post Day 1, then reshare it from your profile with a line of your own.</label></li>
+    <li><input type="checkbox" id="s7"><label for="s7">Invite connections to follow (LinkedIn gives you monthly invite credits). Start with people from Eligent, HelpBnk and Business Lincolnshire.</label></li>
+    <li><input type="checkbox" id="s8"><label for="s8">Add the page link to your email signature next to vault-it.co.</label></li>
+  </ol>
+</section>
+
+<footer>Vault·It is run by PT Live Design, Lincoln. Not regulated by the FCA. Not financial advice.</footer>
+</div>
+
+<script>
+document.querySelectorAll('.field[data-max]').forEach(function(f){
+  var max=+f.dataset.max, v=f.querySelector('.val'), c=f.querySelector('.count');
+  if(!v||!c) return; var n=v.textContent.trim().length;
+  c.textContent=n.toLocaleString()+' / '+max.toLocaleString(); if(n>max) c.classList.add('over');
+});
+document.querySelectorAll('button.copy').forEach(function(b){
+  b.addEventListener('click',function(){
+    var v=b.closest('.field').querySelector('.val'), t=v.textContent.trim(), label=b.textContent;
+    function ok(){b.textContent='Copied';b.classList.add('done');setTimeout(function(){b.textContent=label;b.classList.remove('done')},1600)}
+    function fallback(){v.hidden=false;var r=document.createRange();r.selectNodeContents(v);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected, copy it'}
+    try{navigator.clipboard.writeText(t).then(ok,fallback)}catch(e){fallback()}
+  });
+});
+var KEY='vi-li-steps';
+var saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+document.querySelectorAll('#steps input').forEach(function(i){
+  if(saved[i.id]){i.checked=true;i.closest('li').classList.add('ticked')}
+  i.addEventListener('change',function(){i.closest('li').classList.toggle('ticked',i.checked);saved[i.id]=i.checked;try{localStorage.setItem(KEY,JSON.stringify(saved))}catch(e){}});
+});
+</script>
