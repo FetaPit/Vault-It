@@ -92,14 +92,23 @@ Live since 5 Nov pricing alignment: Pioneer £5.99/month or £59.99/year; Foundi
 - Tagline neon style as v1. Fonts Syne, DM Sans, Share Tech Mono.
 - The live pitch page is production: changing it is a release and needs the owner's sign-off.
 
-## Open decisions for the owner
+## Owner's decisions, 6 Nov 2026
 
-1. Initial B2C buyer: people in debt, or first-time buyers who are already saving? (Chris's point 1.)
-2. The headline ask on Saturday: Stage A £20,000 as in the plan, or a different number?
-3. B2C app and site kept alongside white label, or B2B first? (Chris's question.)
-4. "Team change and cofounder": who, and what can the deck say?
-5. v2 replaces vault-it.co/pitch-Eligent, or goes up at a new address with v1 kept?
+Answered in the laptop session, 6 Nov:
+
+| Question | Owner's answer |
+| --- | --- |
+| The ask | £250,000 under SEIS, now (not plan v2's two stages). "Ensure business plan has been consulted and adjusted if needed." |
+| Close date and valuation | Closing March 2027. "Equity terms on request": no valuation on the slide. |
+| Use of funds | 35% R&D and product, 20% marketing, 15% partnerships and B2B sales, 15% security and compliance, 15% contingency. |
+| First B2C buyer | Savers aiming to buy: first-time buyers already saving, with debt as their starting point. |
+| Break-even | Show both lines: lean (plan v2, Year 2) and with the raise spent. |
+| Cofounder | "Recruiting a technical cofounder, funded from the raise." No name, no equity figure. |
+| UoL study | "250 to 750" is participants. |
+| Address | v2 replaces vault-it.co/pitch-Eligent and the presenter page. Production release needs the owner's sign-off. |
+
+Still open (default used until the owner says otherwise): B2B price points shown as plan v2's ranges; affiliates and brand deals as a channel, no revenue line (plan v2); "Help to Buy? / Hold Bank?" note not used; LinkedIn 80/20 not used; Eligent financial promotion exemption to be asked on the day (verbal).
 
 ## Owner's meeting notes
 
-(To be added: the owner's transcriptions of handwritten notes, verbatim.)
+Recovered from the cloud session that did the 4 Nov work: `docs/briefs/PITCH_DECK_V2_NOTES.md` (the four handwritten pages from the Slava call, transcribed, and the full 4 Nov research brief with its benchmarks and sources).
