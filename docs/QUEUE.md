@@ -107,6 +107,7 @@ The single list of instructed work. Every session reads it at start and before e
 - [~] (cloud, Build) v0.9.2: still image of the finished House Builder house on the sign-in screen, email step only (owner decision via David, cloud Chief of Staff, 6 Nov 2026). No tag, label, headline or brick tag; FCA line stays; WebP under 60 KB loaded after the card; email and Continue unmoved at 390x664. Branch `v092/signin-house` off candidate/v0.9.2 at fd3a031.
 - [~] (cloud, Build) v0.9.2: interactive 3D House Builder house behind the sign-in email step, replacing the still as hero; the still stays as poster and fallback (owner, 6 Nov: "Make the house large zoomed into the background with rotation animations. Allow the cursor to interact with the model subtly expanding and exploding the house upon hover over."). Brief `docs/creative/briefs/signin-house-3d.md` with Pedro amendments; built by Pete T on `v092/signin-house-3d`, asked by David (cloud Chief of Staff).
 - [~] (laptop, Marketing) Instagram video post: the net worth over time forecast animation (owner, 6 Nov 2026: "create a video post of the networth over time forcast animation Too"). Same kit as the intro carousel, `docs/marketing/instagram/` on `marketing/instagram-intro`.
+- [~] (laptop, Marketing) Copy for the owner's personal Instagram post announcing the Eligent club pitch (owner, 6 Nov 2026: "Also give me copy for my instagram post personal announcing Eligent club pitch"). Text only, in chat and `docs/marketing/instagram/`.
 
 ## Waiting on the owner
 
