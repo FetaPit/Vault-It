@@ -108,6 +108,7 @@ function brandShell(title: string, body: string, footer: string): string {
 <tr><td style="padding:16px 36px 26px;border-top:1px solid #102221">
 <p style="margin:0 0 8px;font-size:12px;color:#E8E8E8">Not regulated by the FCA. Not financial advice.</p>
 <p style="margin:0;font-size:11px;line-height:1.6;color:#9AA0A6">${footer}</p>
+<p style="margin:8px 0 0;font-size:11px;line-height:1.6;color:#9AA0A6">© 2026 PT Live Design. All rights reserved.</p>
 </td></tr>
 </table></td></tr></table></body></html>`
 }

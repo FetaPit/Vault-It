@@ -66,6 +66,7 @@ function brandShell(title: string, body: string, footer: string): string {
 <tr><td style="padding:16px 36px 26px;border-top:1px solid #102221">
 <p style="margin:0 0 8px;font-size:12px;color:#E8E8E8">Not regulated by the FCA. Not financial advice.</p>
 <p style="margin:0;font-size:11px;line-height:1.6;color:#9AA0A6">${footer}</p>
+<p style="margin:8px 0 0;font-size:11px;line-height:1.6;color:#9AA0A6">© 2026 PT Live Design. All rights reserved.</p>
 </td></tr>
 </table></td></tr></table></body></html>`
 }
@@ -87,7 +88,7 @@ function welcomeHtml(): string {
   const footer = `You're getting this because this address joined the Vault-It waitlist. To be removed, reply "remove".<br>${TRADER}`
   return brandShell("You're in: your Vault-It beta link", body, footer)
 }
-const welcomeText = () => `You're in.\n\nThanks for joining Vault-It. The beta is open, so you can start now.\n\nOpen the app and sign in with this e-mail address. We'll send you a code, then you choose a PIN.\n\n${APP_URL}\n\nAnything confusing or broken, just reply to this e-mail.\nPete\n\nYou're getting this because this address joined the Vault-It waitlist. To be removed, reply "remove".\n\nNot regulated by the FCA. Not financial advice.\nVault-It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ`
+const welcomeText = () => `You're in.\n\nThanks for joining Vault-It. The beta is open, so you can start now.\n\nOpen the app and sign in with this e-mail address. We'll send you a code, then you choose a PIN.\n\n${APP_URL}\n\nAnything confusing or broken, just reply to this e-mail.\nPete\n\nYou're getting this because this address joined the Vault-It waitlist. To be removed, reply "remove".\n\nNot regulated by the FCA. Not financial advice.\nVault-It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ\n© 2026 PT Live Design. All rights reserved.`
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
