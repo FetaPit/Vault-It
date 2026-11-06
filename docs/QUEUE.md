@@ -120,6 +120,10 @@ The single list of instructed work. Every session reads it at start and before e
 - Live market value steps 2 and 3 (Land Registry house price index; eBay estimate): yes or no (`docs/LIVE_MARKET_VALUE.md`)
 - Poly Pizza: commercial plan and an edge function for live search, or self-host a small CC0 set (`docs/WEALTH_INVENTORY_3D_OPTIONS.md`)
 
+## Done (6 Nov 2026)
+
+- [x] (cloud, Build) Copyright notices: "© 2026 PT Live Design. All rights reserved." on landing, sign-up, pitch and presenter pages and in the auth and waitlist emails; LICENSE, NOTICE, package.json UNLICENSED (owner via David, 6 Nov). Branch v092/copyright, 00369c3. Emails need send-auth-email, waitlist-join and waitlist-welcome redeployed.
+
 ## Done (5 Nov 2026)
 
 - [x] (cloud, Build) Pricing alignment: Pioneer £5.99/mo, £59.99/yr, Founding £149 once (full); testers £3.99/mo, £49.99/yr (confirmed keep, not the £39.99 quoted that day), £99 once (discounted) — align all comms, products, assets and Stripe links, confirm Stripe links active (owner, 5 Nov: "Make sure all comms, products, assets, Stripe links align with this, and the Stripe links are active"). Owner also confirmed: rename "Founder" to "Pioneer" for the monthly plan (Pioneer now covers monthly and yearly, matching Stripe's product name); deactivate the orphaned duplicate £99 Founding-tester Stripe link (done directly in Stripe); delete the dead `#waitlist-modal` (DAO Governance Seat etc., unreachable, confirmed before deleting). Done: 9499658 (rollout-qc PASS) — `VI_STRIPE_LINKS.annual_after_beta` wired to the real, already-live £59.99/yr link; "Founder" to "Pioneer" everywhere it was the monthly plan's display text (Lifetime-licence `founder` key/flags untouched); dead modal removed. Webhook checked, not assumed: `stripe-webhook`'s existing `META_PLAN`/interval fallbacks already resolve the new link correctly (`test_stripe_server.js`); no Supabase deploy needed. Pitch deck's "£49.99 a year" fixed to £59.99 too: 51dca00, docs/OFFER_AND_PRICING.md updated. Follow-up: `submitWaitlist()` now orphaned, queued above.
