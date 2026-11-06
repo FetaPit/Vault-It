@@ -36,7 +36,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   var VS = [
     'attribute vec3 aPos; attribute vec3 aNrm; attribute vec2 aUV;',
     'attribute vec3 aOff; attribute vec3 aSize; attribute vec3 aRot; attribute vec4 aMeta; attribute vec3 aCol; attribute vec2 aTime;',
-    'uniform mat4 uVP; uniform float uNow; uniform float uLast; uniform float uFlash; uniform float uGlaze; uniform float uVc; uniform float uFocal;',
+    'uniform mat4 uVP; uniform float uNow; uniform float uLast; uniform float uFlash; uniform float uGlaze; uniform float uVc; uniform float uFocal; uniform float uExp; uniform float uPush; uniform vec2 uPtr; uniform vec3 uCtr; uniform float uAsp;',
     'varying vec3 vN; varying vec2 vUV; varying vec2 vFS; varying vec3 vW; varying float vFlash; varying float vAlpha; varying float vType; varying float vSeed; varying float vLast; varying vec3 vCol; varying float vColOn; varying float vPx;',
     'void main() {',
     '  float t = aMeta.x, st = aTime.x; float vis = 1.0, fl = 0.0, last = 0.0, drop = 0.0;',
@@ -56,6 +56,11 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     '  mat3 R = mat3(cb * cg, sg, -sb * cg,  sb * sa - cb * sg * ca, cg * ca, sb * sg * ca + cb * sa,  cb * sg * sa + sb * ca, -cg * sa, cb * ca - sb * sg * sa);',   // Ry * Rz * Rx (YZX, as the kit)
     '  vec3 p = aOff + R * (aPos * aSize * (1.0 + 0.14 * last));',
     '  p.y += drop;',
+    '  if (uExp > 0.0 || uPush > 0.0) {',   // sign-in hero only (SigninHouse): the house eases apart, more near the pointer. Never set in the app, so 0 there
+    '    vec3 dv = aOff - uCtr; float dl = length(dv); vec3 dir = dl > 0.01 ? dv / dl : vec3(0.0, 1.0, 0.0);',
+    '    vec4 c0 = uVP * vec4(aOff, 1.0); vec2 q = (c0.xy / max(c0.w, 0.5) - uPtr) * vec2(uAsp, 1.0);',
+    '    p += dv * uExp + dir * uPush * exp(-dot(q, q) / 0.06) * (0.6 + 0.8 * aMeta.z);',
+    '  }',
     '  vFlash = fl; vAlpha = vis; vN = R * aNrm; vUV = aUV; vW = p; vType = t; vLast = last; vSeed = aMeta.z; vCol = aCol;',
     '  vColOn = (uVc >= 0.0 && aMeta.w < uVc) ? 1.0 : 0.0;',
     '  vec3 an = abs(aNrm);',
@@ -135,7 +140,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   }
 
   // ── GL context and program (one for the stage) ──
-  var UNIFORMS = ['uVP', 'uFocal', 'uNow', 'uLast', 'uFlash', 'uGlaze', 'uVc', 'uBrick', 'uTrim', 'uTile', 'uFrame', 'uGlass', 'uGlassLit', 'uDoor', 'uEdge', 'uSheen', 'uFlashCol', 'uPulse', 'uBuilt', 'uSweep', 'uSweepOn', 'uBack', 'uFrontA', 'uBackA', 'uShMin', 'uEdgeK', 'uLit'];
+  var UNIFORMS = ['uVP', 'uFocal', 'uNow', 'uLast', 'uFlash', 'uGlaze', 'uVc', 'uBrick', 'uTrim', 'uTile', 'uFrame', 'uGlass', 'uGlassLit', 'uDoor', 'uEdge', 'uSheen', 'uFlashCol', 'uPulse', 'uBuilt', 'uSweep', 'uSweepOn', 'uBack', 'uFrontA', 'uBackA', 'uShMin', 'uEdgeK', 'uLit', 'uExp', 'uPush', 'uPtr', 'uCtr', 'uAsp'];
   var ATTRS = ['aPos', 'aNrm', 'aUV', 'aOff', 'aSize', 'aRot', 'aMeta', 'aCol', 'aTime'];
   function makeGL(cv) {
     var opts = { alpha: true, antialias: true, premultipliedAlpha: true, preserveDrawingBuffer: false, powerPreference: 'high-performance' };
@@ -655,5 +660,133 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   VP.pingColour = function () { return 'gold'; };   // the owner's E15 words ("gold ground ping"), kept over the brand book's teal (David, 2 Nov 2026)
   VP.brickStamps = function () { var HG = this._hg; if (!HG) return []; var rec = HG.recs.filter(function (r) { return r.type === 1 && r.rank; })[0]; if (!rec) return []; var out = []; for (var k = 0; k < (rec.cnt || 0); k++) out.push(HG.stamp[(rec.base + k) * 2]); return out; };   // lay stamps of the first brick part, in laying order (-1e9 = laid at once)
   VP.laidAll = function () { var HG = this._hg; return !!HG && HG.recs.every(function (r) { return !r.rank || (r.cnt || 0) === r.n; }); };
+
+  // ── sign-in hero (v0.9.2, owner 6 Nov: "Make the house large zoomed into the background with rotation animations. Allow the cursor
+  // to interact with the model subtly expanding and exploding the house upon hover over."). The finished house, large behind the
+  // sign-in card, one slow turn every 50 s. Draw only: one canvas, never focusable, no input of its own (the page passes the pointer
+  // in with point() and tap()), so typing and taps on the form are never slowed. The model is built off the main thread
+  // (H.houseGLData in a worker, about half a second) and handed in with load(). The same shaders and palette as the House Builder;
+  // uExp (whole house eases out) and uPush (stronger near the pointer) are 0 everywhere else.
+  H.houseGLData = function (m) {
+    var HG = buildHouse(m);
+    return { n: HG.n, data: HG.data, ranges: HG.ranges, cx: HG.cx, cz: HG.cz, y0: HG.y0, top: HG.top, big: HG.big, x0: HG.x0, x1: HG.x1, z0: HG.z0, z1: HG.z1 };
+  };
+  function SigninHouse(container, opts) {
+    var self = this; opts = opts || {};
+    var cv = this.cv = document.createElement('canvas');
+    cv.className = 'auth-scene-cv'; cv.setAttribute('aria-hidden', 'true'); cv.tabIndex = -1;
+    cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;outline:none';
+    container.appendChild(cv);
+    this.el = container; this.R = makeGL(cv);
+    if (!this.R) { container.removeChild(cv); throw new Error('house_gl: WebGL with instancing is not available'); }
+    var gl = this.R.gl;
+    this.soft = softGL(gl);
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.enable(gl.CULL_FACE); gl.depthFunc(gl.LEQUAL);
+    this.maxDpr = opts.maxDpr || 1.5; this.turn = opts.turn || 50; this.day = !!opts.day;
+    this.yawA = 32 * Math.PI / 180; this.pitch = 16 * Math.PI / 180; this.dist = 400; this.tgt = [0, 40, 0]; this.pan = [0, 0, 0]; this._radius = 100;
+    this.controls = { target: { x: 0, y: 0, z: 0 } };
+    this.w = 0; this.h = 0; this.dpr = 1; this.frames = 0; this.active = false; this._raf = 0; this.lost = false;
+    this.ptr = null; this.exp = 0; this.push = 0; this.burstTo = 0; this._t = 0; this.maxJs = 0;
+    this._loop = function (ts) {
+      self._raf = 0;
+      if (!self.active || self.lost || document.hidden) { self._t = 0; return; }
+      var t0 = performance.now(); self._frame(t0); var js = performance.now() - t0; if (self.frames > 2 && js > self.maxJs) self.maxJs = js;
+      self._raf = requestAnimationFrame(self._loop);
+    };
+    this._onVis = function () { if (!document.hidden && self.active) self.start(); };   // hidden tab: the loop stops; back: it resumes only if the page still wants it
+    this._sz = true; this._onRs = function () { self._sz = true; }; window.addEventListener('resize', this._onRs);
+    document.addEventListener('visibilitychange', this._onVis);
+    cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); self.lost = true; self.stop(); if (self.onLost) self.onLost(); });
+  }
+  H.SigninHouse = SigninHouse; SigninHouse.supported = supported;
+  var SP = SigninHouse.prototype;
+  SP._camera = VP._camera; SP._vp = VP._vp; SP._focal = VP._focal; SP._pt = VP._pt;
+  SP.load = function (HG) {
+    var gl = this.R.gl;
+    this.HG = HG;
+    this._inst = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this._inst); gl.bufferData(gl.ARRAY_BUFFER, HG.data, gl.STATIC_DRAW);
+    var st = new Float32Array(HG.n * 2); for (var i = 0; i < HG.n; i++) { st[i * 2] = -1e9; st[i * 2 + 1] = -5; }   // every brick laid and settled
+    this._time = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this._time); gl.bufferData(gl.ARRAY_BUFFER, st, gl.STATIC_DRAW);
+    HG.data = null;
+    var Hh = HG.top - HG.y0, w = HG.x1 - HG.x0, d = HG.z1 - HG.z0;
+    this._radius = Math.sqrt(w * w + d * d + Hh * Hh) / 2;
+    this.ctr = [HG.cx, HG.y0 + Hh * 0.45, HG.cz];
+  };
+  SP.resize = function () {   // reads the layout only after a window resize, never in a plain frame
+    if (!this._sz) return this.w > 2;
+    this._sz = false;
+    var r = this.el.getBoundingClientRect(), w = Math.round(r.width), h = Math.round(r.height); if (!(w > 2 && h > 2)) { this._sz = true; return false; }
+    var dpr = Math.min(this.maxDpr, window.devicePixelRatio || 1);
+    this.ox = r.left; this.oy = r.top;
+    if (w !== this.w || h !== this.h || dpr !== this.dpr) { this.w = w; this.h = h; this.dpr = dpr; this.cv.width = Math.round(w * dpr); this.cv.height = Math.round(h * dpr); }
+    // framing: the house large and cropped. Wide screens: it fills the height; phones: the roof and upper storey in the band above
+    // the card, the rest behind it (dimmed by the card)
+    var HG = this.HG, Hh = HG.top - HG.y0, t18 = Math.tan(18 * Math.PI / 180), asp = w / h, wide = w >= 700;
+    var span = wide ? this._radius * 2 * 0.62 : this._radius * 2 * 0.56 / asp;   // the view's height in courses: the house a little taller than a wide screen, wider than a phone
+    this.dist = (span / 2) / t18;
+    this.tgt = [HG.cx, HG.y0 + Hh * (wide ? 0.44 : 0.14), HG.cz];   // aimed low, so the roof stands above the card
+    return true;
+  };
+  SP.start = function () { this.active = true; if (!this._raf && !this.lost) this._raf = requestAnimationFrame(this._loop); };
+  SP.stop = function () { this.active = false; if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; } };
+  SP.running = function () { return this.active && !this.lost; };
+  // the pointer in client pixels (null: it left the window); tap: a gentle burst that eases back
+  SP.point = function (x, y) { this.ptr = x == null ? null : [x, y]; };
+  SP.tap = function (x, y) { this.ptr = [x, y]; this.burstTo = performance.now() + 260; };
+  SP._over = function () {   // is the pointer over the house (its box on screen)?
+    if (!this.ptr || !this.HG) return false;
+    var HG = this.HG, x = this.ptr[0] - (this.ox || 0), y = this.ptr[1] - (this.oy || 0), a = [1e9, 1e9, -1e9, -1e9], self = this;
+    this._cam = null;
+    [HG.x0, HG.x1].forEach(function (X) { [HG.y0, HG.top].forEach(function (Y) { [HG.z0, HG.z1].forEach(function (Z) { var q = self._pt(X, Y, Z); a[0] = Math.min(a[0], q[0]); a[1] = Math.min(a[1], q[1]); a[2] = Math.max(a[2], q[0]); a[3] = Math.max(a[3], q[1]); }); }); });
+    this._ndc = [x / this.w * 2 - 1, 1 - y / this.h * 2];
+    return x >= a[0] && x <= a[2] && y >= a[1] && y <= a[3];
+  };
+  SP._frame = function (now) {
+    var HG = this.HG, R = this.R, gl = R.gl, A = R.A, U = R.U;
+    if (!HG || !this.resize()) return;
+    var el = this._t ? Math.min(0.5, (now - this._t) / 1000) : 0, dt = Math.min(0.1, el); this._t = now;   // the turn never jumps; the easing follows real time
+    var red = reduced();
+    if (!red) this.yawA += dt * 2 * Math.PI / this.turn;
+    var over = !red && this._over(), burst = !red && now < this.burstTo;
+    var k = 1 - Math.exp(-el / 0.14);   // eases in about 400 ms
+    this.exp += ((over || burst ? 0.04 : 0) - this.exp) * k;
+    this.push += ((burst ? 1 : over ? 0.7 : 0) - this.push) * k;
+    var C2 = C, day = this.day;
+    gl.viewport(0, 0, this.cv.width, this.cv.height); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.useProgram(R.pr);
+    this._cam = null;
+    gl.uniformMatrix4fv(U.uVP, false, this._vp()); gl.uniform1f(U.uFocal, this._focal() * this.dpr);
+    gl.uniform1f(U.uNow, 0); gl.uniform1f(U.uLast, -10); gl.uniform1f(U.uFlash, 0); gl.uniform1f(U.uGlaze, 1); gl.uniform1f(U.uVc, -1);
+    gl.uniform3fv(U.uBrick, C2.brick); gl.uniform3fv(U.uTrim, C2.trim); gl.uniform3fv(U.uTile, C2.tile); gl.uniform3fv(U.uFrame, C2.frame); gl.uniform3fv(U.uGlass, C2.glass); gl.uniform3fv(U.uGlassLit, C2.glassLit);
+    gl.uniform3fv(U.uDoor, C2.door); gl.uniform3fv(U.uEdge, C2.edge); gl.uniform3fv(U.uSheen, C2.sheen); gl.uniform3fv(U.uFlashCol, C2.flash);
+    gl.uniform1f(U.uPulse, 0); gl.uniform1f(U.uBuilt, 1); gl.uniform1f(U.uSweep, -1e4); gl.uniform1f(U.uSweepOn, 0);
+    gl.uniform1f(U.uShMin, C2.shMin); gl.uniform1f(U.uEdgeK, C2.edgeK); gl.uniform1f(U.uFrontA, day ? 0.97 : C2.front); gl.uniform1f(U.uBackA, day ? 0.14 : C2.back); gl.uniform2f(U.uLit, 1, 0);
+    gl.uniform1f(U.uExp, this.exp); gl.uniform1f(U.uPush, this.push * HG.big * 0.04);
+    gl.uniform2f(U.uPtr, this._ndc ? this._ndc[0] : 0, this._ndc ? this._ndc[1] : 0); gl.uniform3fv(U.uCtr, this.ctr); gl.uniform1f(U.uAsp, this.w / this.h);
+    var SB = STRIDE * 4, inst = this._inst, time = this._time;
+    var bindGeo = function (name) { gl.bindBuffer(gl.ARRAY_BUFFER, R.geo[name]);
+      gl.enableVertexAttribArray(A.aPos); gl.vertexAttribPointer(A.aPos, 3, gl.FLOAT, false, 32, 0); R.div(A.aPos, 0);
+      gl.enableVertexAttribArray(A.aNrm); gl.vertexAttribPointer(A.aNrm, 3, gl.FLOAT, false, 32, 12); R.div(A.aNrm, 0);
+      gl.enableVertexAttribArray(A.aUV); gl.vertexAttribPointer(A.aUV, 2, gl.FLOAT, false, 32, 24); R.div(A.aUV, 0); };
+    var bindInst = function (start) { var o = start * SB; gl.bindBuffer(gl.ARRAY_BUFFER, inst);
+      gl.enableVertexAttribArray(A.aOff); gl.vertexAttribPointer(A.aOff, 3, gl.FLOAT, false, SB, o); R.div(A.aOff, 1);
+      gl.enableVertexAttribArray(A.aSize); gl.vertexAttribPointer(A.aSize, 3, gl.FLOAT, false, SB, o + 12); R.div(A.aSize, 1);
+      gl.enableVertexAttribArray(A.aRot); gl.vertexAttribPointer(A.aRot, 3, gl.FLOAT, false, SB, o + 24); R.div(A.aRot, 1);
+      gl.enableVertexAttribArray(A.aMeta); gl.vertexAttribPointer(A.aMeta, 4, gl.FLOAT, false, SB, o + 36); R.div(A.aMeta, 1);
+      gl.enableVertexAttribArray(A.aCol); gl.vertexAttribPointer(A.aCol, 3, gl.FLOAT, false, SB, o + 52); R.div(A.aCol, 1);
+      gl.bindBuffer(gl.ARRAY_BUFFER, time); gl.enableVertexAttribArray(A.aTime); gl.vertexAttribPointer(A.aTime, 2, gl.FLOAT, false, 8, start * 8); R.div(A.aTime, 1); };
+    var drawGroups = function (glass) { GROUPS.forEach(function (g) { var rg = HG.ranges[g]; if (!rg || (/glass/.test(g) !== glass)) return; var s = g.replace('-glass', ''); bindGeo(s); bindInst(rg[0]); R.drawInst(0, R.geoN[s], rg[1]); }); };
+    gl.disable(gl.DEPTH_TEST); gl.depthMask(false); gl.cullFace(gl.FRONT); gl.uniform1f(U.uBack, 1); drawGroups(false);
+    gl.enable(gl.DEPTH_TEST); gl.depthMask(true); gl.cullFace(gl.BACK); gl.uniform1f(U.uBack, 0); drawGroups(false);
+    gl.depthMask(false); drawGroups(true); gl.depthMask(true);
+    this.frames++;
+    if (this.frames === 1 && this.onFirstFrame) this.onFirstFrame(this);
+  };
+  SP.dispose = function () {
+    this.stop(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('resize', this._onRs);
+    try { var gl = this.R.gl; if (this._inst) gl.deleteBuffer(this._inst); if (this._time) gl.deleteBuffer(this._time); var lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); } catch (e) {}
+    if (this.cv.parentNode) this.cv.parentNode.removeChild(this.cv);
+    this.HG = null;
+  };
 })(HB3D);
 if (typeof module !== 'undefined') module.exports = HB3D;
