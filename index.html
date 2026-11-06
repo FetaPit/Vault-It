@@ -10570,6 +10570,10 @@ input:focus, textarea:focus, select:focus {
   .auth-footer{font-size:max(.5rem,var(--vi-fs-1))}
 }
 .auth-btn.auth-switch{margin-top:10px}   /* the way back to the email field: a normal full-size button, right under the email shown on the PIN pad */
+.auth-house{position:absolute;left:50%;bottom:calc(100% - 12px);transform:translateX(-50%);width:auto;pointer-events:none;user-select:none;z-index:1;opacity:0;transition:opacity .5s ease}   /* v0.9.2 (owner, 6 Nov): a still of the finished House Builder house standing on the card, email step only. Outside the card's flow, so the form never moves; viSigninHouse() sizes it to the free space above the card and hides it when there is none */
+.auth-house.in{opacity:1}
+.auth-house[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.auth-house{transition:none}}
 @media (max-height:760px){.auth-card{padding:20px 20px}.auth-sub{margin-bottom:12px}.auth-pin-dots{margin:10px 0}.auth-pin-key{padding:10px 0}.auth-footer{margin-top:10px}.auth-divider{margin:10px 0}}
 .auth-code-box{background:rgb(var(--brass-rgb) / .06);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:8px;padding:14px;margin-bottom:14px;text-align:center}
 .auth-code-num{font-family:'Syne',sans-serif;font-weight:900;font-size:1.8rem;letter-spacing:.25em;color:#fff;animation:card-num-pulse 2s ease-in-out infinite}
@@ -19499,6 +19503,29 @@ function viCaptchaReset() {   // a token works once
   _captchaToken = '';
   try { if (_captchaWidget !== null && window.turnstile) window.turnstile.reset(_captchaWidget); } catch (e) {}
 }
+// v0.9.2 (owner, 6 Nov): sign-in house still. Added after the page has loaded (so after the card), only on the email step, in the free space above the card.
+var _ahOn = false;
+function viSigninHouse() {
+  if (!_ahOn) return;
+  var ov = document.getElementById('login-overlay'), card = ov && ov.querySelector('.auth-card'), em = document.getElementById('auth-email-step');
+  if (!card || !em) return;
+  var img = card.querySelector('.auth-house');
+  if (!img) {
+    img = document.createElement('img'); img.className = 'auth-house'; img.alt = "A house built in Vault-It's House Builder";
+    img.loading = 'lazy'; img.decoding = 'async'; img.width = 290; img.height = 300; img.hidden = true;
+    img.onload = function () { img.classList.add('in'); };
+    card.insertBefore(img, card.firstChild);
+  }
+  var src = document.documentElement.getAttribute('data-theme') === 'light' ? 'img/signin-house-day.webp' : 'img/signin-house-night.webp';
+  var room = card.getBoundingClientRect().top - ov.getBoundingClientRect().top + ov.scrollTop - 8 + 12;   // the gap above the card, plus the 12 px the house stands into it
+  var h = Math.min(window.innerWidth >= 900 ? 150 : 100, Math.floor(room));
+  var show = em.classList.contains('active') && getComputedStyle(ov).display !== 'none' && h >= 56;
+  img.hidden = !show;
+  if (show) { img.style.height = h + 'px'; if (img.getAttribute('src') !== src) img.setAttribute('src', src); }
+}
+window.addEventListener('load', function () { setTimeout(function () { _ahOn = true; try { viSigninHouse(); } catch (e) {} }, 0); });
+window.addEventListener('resize', function () { try { viSigninHouse(); } catch (e) {} });
+try { new MutationObserver(function () { try { viSigninHouse(); } catch (e) {} }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); } catch (e) {}
 function _showAuthStep(step) {
   var cap = document.getElementById('auth-captcha'); if (cap) cap.style.display = (viCaptchaOn() && step !== 'setpin') ? 'block' : 'none';
   if (viCaptchaOn() && step !== 'setpin') viCaptchaEnsure();
@@ -19506,6 +19533,7 @@ function _showAuthStep(step) {
     var el = document.getElementById('auth-' + s + '-step');
     if (el) el.classList.toggle('active', s === step);
   });
+  try { viSigninHouse(); } catch (e) {}
   if (step === 'setpin') _renderPinDots('spin-dots', 'spd', PIN_LEN);
   if (step === 'pin') {
     _renderPinDots('pin-dots', 'pd', _pinEnterLen);

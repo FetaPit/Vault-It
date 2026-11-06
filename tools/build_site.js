@@ -6,7 +6,8 @@ const fs = require('fs'), path = require('path'), cp = require('child_process');
 const ROOT = path.join(__dirname, '..'), OUT = process.env.SITE_OUT ? path.resolve(process.env.SITE_OUT) : path.join(ROOT, 'dist');
 
 const SITE = {
-  app:     [['index.html', 'index.html'], ['recover.html', 'recover.html'], ['sw.js', 'sw.js'], ['manifest.webmanifest', 'manifest.webmanifest'], ['logo.png', 'logo.png'], ['og-image.png', 'og-image.png']],
+  app:     [['index.html', 'index.html'], ['recover.html', 'recover.html'], ['sw.js', 'sw.js'], ['manifest.webmanifest', 'manifest.webmanifest'], ['logo.png', 'logo.png'], ['og-image.png', 'og-image.png'],
+           ['img/signin-house-night.webp', 'img/signin-house-night.webp'], ['img/signin-house-day.webp', 'img/signin-house-day.webp']],   // the sign-in house still (v0.9.2)
   landing: [['landing.html', 'index.html'], ['landing.html', 'sign-up.html'], ['og-image.png', 'og-image.png'],
             ['site/brand-hero.js', 'brand-hero.js'], ['site/email/lockup.gif', 'email/lockup.gif'], ['site/step-1-numbers.jpg', 'img/step-1-numbers.jpg'], ['site/step-2-picture.jpg', 'img/step-2-picture.jpg'], ['site/step-3-house.jpg', 'img/step-3-house.jpg'], ['site/founder.jpg', 'img/founder.jpg'],
             ['site/sign-up/thanks.html', 'sign-up/thanks.html'], ['site/sign-up/confirm.html', 'sign-up/confirm.html'],
