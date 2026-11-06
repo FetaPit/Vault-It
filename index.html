@@ -10570,6 +10570,52 @@ input:focus, textarea:focus, select:focus {
   .auth-footer{font-size:max(.5rem,var(--vi-fs-1))}
 }
 .auth-btn.auth-switch{margin-top:10px}   /* the way back to the email field: a normal full-size button, right under the email shown on the PIN pad */
+/* Continue with Google (owner, 5 Nov 2026). Google's own light button in both themes, as its sign-in branding asks; shown only when the Supabase Google provider is on */
+.auth-google{width:100%;min-height:48px;margin:2px 0 0;display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 14px;background:#fff;color:#1f1f1f;border:1px solid #747775;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:max(.78rem,var(--vi-fs-3));font-weight:600;cursor:pointer;transition:box-shadow .15s}
+.auth-google[hidden],.auth-or[hidden]{display:none}
+.auth-google:hover{box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.auth-google:focus-visible{outline:2px solid var(--em);outline-offset:2px}
+.auth-google svg{width:20px;height:20px;flex:0 0 20px}
+.auth-or{display:flex;align-items:center;gap:10px;margin:14px 0 12px;font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);text-transform:uppercase;letter-spacing:.1em}
+.auth-or::before,.auth-or::after{content:'';flex:1;border-top:1px solid rgb(var(--ink-rgb) / .12)}
+@media (min-width:900px){.auth-google{min-height:52px}}
+/* first-run onboarding (owner, 5 Nov 2026, from the Help Bnk feedback): one question per screen, a step count, Back, then a plan */
+.wz-top{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin:-10px 0 6px}
+.wz-back{min-height:44px;padding:0 10px 0 0;background:none;border:none;color:var(--em);font-family:'Syne',sans-serif;font-size:max(.62rem,var(--vi-fs-2));font-weight:700;cursor:pointer}
+.wz-back[hidden]{visibility:hidden;display:block}
+.wz-count{font-family:'Share Tech Mono',monospace;font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);letter-spacing:.06em}
+.wz-bar{display:flex;gap:4px;margin-bottom:18px}
+.wz-bar i{height:4px;flex:1;border-radius:2px;background:rgb(var(--teal-rgb) / .2)}
+.wz-bar i.on{background:var(--em)}
+.wz-screen[hidden]{display:none}
+.wz-screen h2:focus{outline:none}
+.wz-skip{display:block;width:100%;min-height:44px;margin-top:6px;background:none;border:none;color:var(--t2);font-family:'Syne',sans-serif;font-size:max(.58rem,var(--vi-fs-2));text-decoration:underline;cursor:pointer}
+.wz-signed{margin:0 0 12px;padding:10px 12px;border:1px solid var(--bd);background:rgb(var(--teal-rgb) / .06);font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2));color:var(--t2);overflow-wrap:anywhere}
+.wz-signed b{color:var(--tx)}
+.wz-phases{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:6px}
+.wz-phase{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--bd);background:var(--c3)}
+.wz-phase.now{border-color:var(--em);background:rgb(var(--teal-rgb) / .1)}
+.wz-phase-n{flex:0 0 auto;font-family:'Share Tech Mono',monospace;font-size:max(.56rem,var(--vi-fs-1));color:var(--t2);min-width:3.6em}
+.wz-phase.now .wz-phase-n{color:var(--em)}
+.wz-phase-name{font-family:'Syne',sans-serif;font-weight:800;font-size:max(.66rem,var(--vi-fs-2));color:var(--tx)}
+.wz-phase-d{font-family:'DM Sans',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);line-height:1.45;margin-top:2px}
+.wz-week{margin:0 0 12px;padding:12px 14px;border:1px solid rgb(var(--brass-rgb) / .45);background:rgb(var(--brass-rgb) / .08);font-family:'DM Sans',sans-serif;font-size:max(.66rem,var(--vi-fs-2));line-height:1.5;color:var(--tx)}
+.wz-week b{display:block;font-family:'Syne',sans-serif;font-size:max(.56rem,var(--vi-fs-1));letter-spacing:.12em;text-transform:uppercase;color:var(--go);margin-bottom:4px}
+.wz-sums{margin:0 0 14px;font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2));color:var(--t2);line-height:1.5}
+.wz-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:6px 0 6px}
+.wz-days button{min-height:44px;padding:0;background:var(--c3);border:1px solid var(--bd);color:var(--t2);font-family:'Share Tech Mono',monospace;font-size:max(.58rem,var(--vi-fs-1));cursor:pointer}
+.wz-days button[aria-pressed="true"]{border-color:var(--em);background:rgb(var(--teal-rgb) / .14);color:var(--em)}
+.wz-note{font-family:'DM Sans',sans-serif;font-size:max(.56rem,var(--vi-fs-1));color:var(--t2);line-height:1.5;margin:0 0 14px}
+.welcome-opt{min-height:44px}
+#wz-s5 .welcome-field{margin-top:18px}
+.wz-days button[aria-pressed="true"]{background:var(--em);border-color:var(--em);color:rgb(var(--panel-rgb));font-weight:700}
+#w-finish{position:sticky;bottom:0;z-index:2;box-shadow:0 -10px 18px 4px var(--c1)}
+.wz-more{margin:4px 0 6px;border-top:1px solid var(--bd);padding-top:6px}
+.wz-more summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--em)}
+.wz-hint{margin:-6px 0 10px;padding:8px 12px;border-left:3px solid var(--go);background:rgb(var(--brass-rgb) / .1);font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2));color:var(--tx)}
+.wz-hint[hidden]{display:none}
+#w-opts .welcome-opt-icon{width:28px;text-align:center}
+#welcome-overlay .welcome-cta{color:#fff}   /* Daylight: the dark-teal button had dark text */
 @media (max-height:760px){.auth-card{padding:20px 20px}.auth-sub{margin-bottom:12px}.auth-pin-dots{margin:10px 0}.auth-pin-key{padding:10px 0}.auth-footer{margin-top:10px}.auth-divider{margin:10px 0}}
 .auth-code-box{background:rgb(var(--brass-rgb) / .06);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:8px;padding:14px;margin-bottom:14px;text-align:center}
 .auth-code-num{font-family:'Syne',sans-serif;font-weight:900;font-size:1.8rem;letter-spacing:.25em;color:#fff;animation:card-num-pulse 2s ease-in-out infinite}
@@ -11876,6 +11922,12 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     <!-- Step 1: email -->
     <div id="auth-email-step" class="auth-step active">
       <div class="auth-intro">Track your net worth, clear your debt and build towards your house goal, all in one private vault.</div>
+      <!-- Sign up or sign in with Google (owner, 5 Nov 2026): hidden until the Supabase Google provider is switched on (viGoogleCheck) -->
+      <button id="auth-google" class="auth-google" type="button" onclick="authGoogle()" hidden>
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        <span>Continue with Google</span>
+      </button>
+      <div id="auth-google-or" class="auth-or" hidden><span>or use your email</span></div>
       <div class="auth-steps"><span class="nw">1. Enter your email</span> &nbsp;<span class="nw">2. Type the 6-digit code we email you</span> &nbsp;<span class="nw">3. Choose a 6-digit PIN.</span> Then email + PIN signs you in on any device.</div>
       <div class="auth-label">Your email address</div>
       <input id="auth-email" class="auth-inp" type="email" placeholder="you@example.com" autocomplete="email"
@@ -12098,6 +12150,16 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 <div id="welcome-overlay" style="display:flex">
   <div class="welcome-box">
 
+    <!-- Onboarding (owner, 5 Nov 2026, from the Help Bnk feedback: "I feel lost", "no clear follow up", "a cadence"; Help Bnk's
+         My Journey asks a few questions, then gives a plan in phases with easy steps). One question per screen, a step count and
+         Back, never the email twice, then the plan: where you are, one step for this week, and a weekly check-in day. -->
+    <div class="wz-top">
+      <button type="button" class="wz-back" id="wz-back" onclick="wBack()" hidden>&larr; Back</button>
+      <div class="wz-count" id="wz-count" aria-live="polite">Step 1 of 5</div>
+    </div>
+    <div class="wz-bar" id="w-step-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+
+    <div id="wz-hero">
     <!-- Pioneer welcome header -->
     <div class="welcome-head" style="text-align:center;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgb(var(--brass-rgb) / .18)">
       <!-- Large vault icon -->
@@ -12171,31 +12233,26 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         You're among the first to vault, and shaping what this becomes.
       </div>
     </div>
-        <!-- Step indicator -->
-    <div style="display:flex;gap:4px;margin-bottom:18px" id="w-step-dots">
-      <div style="height:3px;flex:1;background:var(--em);border-radius:2px" id="wdot-s1"></div>
-      <div style="height:3px;flex:1;background:rgb(var(--teal-rgb) / .2);border-radius:2px" id="wdot-s2"></div>
-      <div style="height:3px;flex:1;background:rgb(var(--teal-rgb) / .2);border-radius:2px" id="wdot-s3"></div>
     </div>
 
-    <!-- STEP 1: Identity + goal -->
     <div id="w-step-1">
-      <div class="welcome-h2">Your first 30 days are free.<br>The whole app, no card.</div>
-      <div class="welcome-sub">Register to start your 30 days. After that, pick a plan to keep editing; your numbers stay yours either way. Beta testers get first call on the Lifetime licence places.</div>
+      <section class="wz-screen" data-s="1" id="wz-s1">
+        <h2 class="welcome-h2" tabindex="-1">Your first 30 days are free.<br>The whole app, no card.</h2>
+        <div class="welcome-sub">Five quick screens, then your plan. After 30 days, pick a plan to keep editing; your numbers stay yours either way. Beta testers get first call on the Lifetime licence places.</div>
+        <div class="wz-signed" id="wz-signed" hidden>Signed in as <b id="wz-signed-email"></b></div>
       <div class="welcome-field">
         <label>First Name</label>
         <input type="text" class="welcome-inp" id="w-name" placeholder="Your first name" autocomplete="given-name">
       </div>
-      <div class="welcome-field">
+      <div class="welcome-field" id="w-email-field">
         <label>Email Address</label>
         <input type="email" class="welcome-inp" id="w-email" placeholder="you@example.com" autocomplete="email">
       </div>
-      <div class="welcome-field">
-        <label>WhatsApp / Phone <span style="color:rgb(var(--teal-rgb) / .5);font-weight:400;font-size:max(.42rem,var(--vi-fs-1))">(optional)</span></label>
-        <input type="tel" class="welcome-inp" id="w-phone-s1" placeholder="+44 7700 900000" autocomplete="tel">
-        <div style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);margin-top:5px;line-height:1.55">Add your number to receive a <strong style="color:var(--go)">heavily discounted lifetime licence</strong> code when Vault-It launches on beta.</div>
-      </div>
-      <div class="welcome-question" style="margin-top:14px">What is your biggest financial challenge right now?</div>
+        <button class="welcome-cta" onclick="wNext()" style="margin-top:14px">Next &rarr;</button>
+      </section>
+      <section class="wz-screen" data-s="2" id="wz-s2" hidden>
+        <h2 class="welcome-h2" tabindex="-1">Where are you right now?</h2>
+        <div class="welcome-sub">Pick the one closest to you. It sets where your plan starts. You can change it later.</div>
       <div class="welcome-opts" id="w-opts">
         <button class="welcome-opt" data-val="0" onclick="selectWelcomeOpt(this)">
           <span class="welcome-opt-icon">💳</span>
@@ -12214,6 +12271,15 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <span><b>Building wealth</b>: I own a home and want financial freedom</span>
         </button>
       </div>
+        <div class="wz-hint" id="wz-goal-hint" role="alert" hidden>Pick one of these to go on.</div>
+        <button class="welcome-cta" onclick="wStep1Next()">Next &rarr;</button>
+      </section>
+    </div>
+
+    <div id="w-step-2" style="display:none">
+      <section class="wz-screen" data-s="3" id="wz-s3" hidden>
+        <h2 class="welcome-h2" tabindex="-1">Your money each month.</h2>
+        <div class="welcome-sub">Two rough numbers are enough to start. You'll fine-tune them in the Budget.</div>
       <div style="margin-bottom:12px">
         <div class="w-label">Your currency</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -12223,14 +12289,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <button type="button" class="w-curr-btn" data-c="INR" onclick="wSetCurrency('INR')" style="flex:1;padding:8px 4px;background:rgb(var(--teal-rgb) / .05);border:1px solid rgb(var(--teal-rgb) / .15);border-radius:6px;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));cursor:pointer">₹ INR</button>
         </div>
       </div>
-      <div class="welcome-foot"><button class="welcome-cta" onclick="wStep1Next()">Continue →</button></div>
-    </div>
-
-    <!-- STEP 2: Profile setup (new users) -->
-    <div id="w-step-2" style="display:none">
-      <div class="welcome-h2" style="margin-bottom:4px">Set up your profile.</div>
-      <div class="welcome-sub">These numbers power your Journey Map from day one. You can update them any time.</div>
-      <div class="g-form">
+        <div class="g-form">
         <div class="welcome-field" style="margin:0">
           <label>Monthly Take-Home (<span class="w-currency-label">£</span>)</label>
           <input type="number" class="welcome-inp" id="w-income" placeholder="e.g. 2200" min="0">
@@ -12239,6 +12298,15 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <label>Rough Monthly Spending (<span class="w-currency-label">£</span>) <span style="opacity:.55;text-transform:none">· a guide, you’ll budget it line by line next</span></label>
           <input type="number" class="welcome-inp" id="w-expenses" placeholder="e.g. 1600" min="0">
         </div>
+        </div>
+      <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);line-height:1.55;margin-top:10px;text-align:center">Got debts? You'll add each one separately, with its type, interest rate and minimum payment, in the <b style="color:var(--em)">Debt tracker</b>, so your payoff plan is accurate.</div>
+        <button class="welcome-cta" onclick="wNext()" style="margin-top:14px">Next &rarr;</button>
+        <button type="button" class="wz-skip" onclick="wNext()">Skip, I'll add these later</button>
+      </section>
+      <section class="wz-screen" data-s="4" id="wz-s4" hidden>
+        <h2 class="welcome-h2" tabindex="-1">Your home goal.</h2>
+        <div class="welcome-sub">The home you're working towards. It becomes the house you build, brick by brick.</div>
+        <div class="g-form">
         <div class="w-ht-pick">
           <div class="w-ht-lbl" id="w-ht-lbl">Which home are you saving for?</div>
           <div class="w-htypes" id="w-htypes" role="group" aria-labelledby="w-ht-lbl" aria-label="Which home are you saving for?">
@@ -12255,8 +12323,18 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <label>Dream Home Target (<span class="w-currency-label">£</span>)</label>
           <input type="number" class="welcome-inp" id="w-house" placeholder="e.g. 200000" min="0">
         </div>
-      </div>
-      <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);line-height:1.55;margin-top:10px;text-align:center">Got debts? You'll add each one separately, with its type, interest rate and minimum payment, in the <b style="color:var(--em)">Debt Tracker</b>, so your payoff plan is accurate.</div>
+        </div>
+        <button class="welcome-cta" onclick="wNext()" style="margin-top:14px">Next &rarr;</button>
+        <button type="button" class="wz-skip" onclick="wNext()">Skip for now</button>
+      </section>
+      <section class="wz-screen" data-s="5" id="wz-s5" hidden>
+        <h2 class="welcome-h2" tabindex="-1">Your plan.</h2>
+        <div class="welcome-sub">Built from your answers. One step at a time.</div>
+        <div id="wz-plan"></div>
+        <div class="w-label" id="wz-days-lbl">Your weekly check-in</div>
+        <div class="wz-days" id="wz-days" role="group" aria-labelledby="wz-days-lbl"></div>
+        <div class="wz-note">Pick a day. On that day Vault-It shows you your next step. Five minutes is enough.</div>
+        <details class="wz-more"><summary>Optional: how much to show, and your phone number</summary>
       <div class="w-view-pick" role="group" aria-label="How much to show on screen">
         <div class="w-view-lbl">How much do you want on screen?</div>
         <div class="w-view-opts">
@@ -12265,7 +12343,14 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
         <div class="w-view-note">You can switch any time in Settings.</div>
       </div>
-      <div class="welcome-foot"><button class="welcome-cta" onclick="wStep2Submit()">Start Vaulting →</button></div>
+      <div class="welcome-field">
+        <label>WhatsApp / Phone <span style="color:rgb(var(--teal-rgb) / .5);font-weight:400;font-size:max(.42rem,var(--vi-fs-1))">(optional)</span></label>
+        <input type="tel" class="welcome-inp" id="w-phone-s1" placeholder="+44 7700 900000" autocomplete="tel">
+        <div style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);margin-top:5px;line-height:1.55">Add your number to receive a <strong style="color:var(--go)">heavily discounted lifetime licence</strong> code when Vault-It launches on beta.</div>
+      </div>
+        </details>
+        <button class="welcome-cta" id="w-finish" onclick="wStep2Submit()" style="margin-top:14px">Start this week's step &rarr;</button>
+      </section>
     </div>
 
     <!-- STEP 3: First milestone -->
@@ -19095,9 +19180,11 @@ function _initSupabase() {
       await _syncPioneerFromProfile(_supaUser.id);
       if (!hasValidSession()) _createSession(_supaUser.email);
       viMarkOnboardedUI();
+      viCleanAuthUrl();
+      try { viWelcomePrefill(); } catch (e) {}
       var ov = document.getElementById('login-overlay');
       if (ov && ov.style.display !== 'none') {
-        if (_pinPromptNeeded()) {
+        if (_pinPromptNeeded() && !_viViaGoogle(session)) {   // a Google sign-in skips the PIN offer (Google already guards the account)
           _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
           _updatePinDots(0, 'spd');
           var lbl = document.getElementById('auth-setpin-label');
@@ -19290,12 +19377,14 @@ async function _initSupabaseSession() {
       return;
     }
     await _syncPioneerFromProfile(_supaUser.id);
+    viCleanAuthUrl();
+    try { viWelcomePrefill(); } catch (e) {}
     if (!hasValidSession() && _supaUser.email) {
       _createSession(_supaUser.email);
       var ov = document.getElementById('login-overlay');
       if (ov && ov.style.display !== 'none') {
         var pinHash = localStorage.getItem('vi_pin_hash');
-        if (pinHash) {
+        if (pinHash && !_viGoogleJustBack) {   // just back from Google: the user has proved who they are
           if (pinHash === 'srv') { _authOTP = { email: (_supaUser.email || '').toLowerCase() }; _pinMode = 'server'; _pinEnterLen = PIN_LEN; }   // the PIN is checked by the server
           else { _pinMode = 'local'; _pinEnterLen = _localPinLen(); }
           _pinEnterBuf = '';
@@ -19463,7 +19552,8 @@ async function initQuickLogin() {
 }
 
 function signOut() {
-  if (!confirm('Sign out? You can get back in with just your email and PIN.')) return;
+  var _viaG = false; try { _viaG = localStorage.getItem(VI_AUTH_VIA) === 'google'; } catch (e) {}
+  if (!confirm(_viaG ? 'Sign out? You can get back in with Google, or with your email.' : 'Sign out? You can get back in with just your email and PIN.')) return;
   if (_supaClient) _supaClient.auth.signOut().catch(function(){});
   localStorage.removeItem('vi_session');
   location.reload();
@@ -19523,7 +19613,76 @@ function _clearAuthErr() {
   var el = document.getElementById('auth-err'); if (el) { el.textContent = ''; el.style.display = 'none'; }
 }
 
+// ── Google sign-in (owner, 5 Nov 2026: "sign up and sign in ... with google accounts") ──
+// Supabase runs the round trip: the app goes to Supabase's /authorize, Google asks the user, and Supabase sends them back
+// here with a session in the address, which supabase-js reads (SIGNED_IN). A first visit creates the account, so sign up and
+// sign in are the same button; an existing account with the same Google-verified email is the same account.
+// The button only shows while the Google provider is on in Supabase (Authentication → Providers → Google).
+var VI_AUTH_VIA = 'vi_auth_via';   // 'google' or 'email': how this device last chose to sign in
+var _viGoogleJustBack = (function () { try { return /access_token=/.test(location.hash) && localStorage.getItem(VI_AUTH_VIA) === 'google'; } catch (e) { return false; } })();
+async function viGoogleCheck() {
+  var on = window.__vi_google_force === true;
+  if (!on) {
+    try {
+      var r = await _withTimeout(fetch(_SUPA_URL + '/auth/v1/settings', { headers: { apikey: _SUPA_KEY } }), 6000, null);
+      var j = r && r.ok ? await r.json() : null;
+      on = !!(j && j.external && j.external.google === true);
+    } catch (e) { on = false; }
+  }
+  var b = document.getElementById('auth-google'), o = document.getElementById('auth-google-or');
+  if (b) b.hidden = !on;
+  if (o) o.hidden = !on;
+  return on;
+}
+async function authGoogle() {
+  _clearAuthErr();
+  try { localStorage.setItem(VI_AUTH_VIA, 'google'); } catch (e) {}
+  var fail = function () { _authErr('Google sign-in could not start. Try again, or use your email below.'); };
+  if (!_supaClient || !_supaClient.auth || typeof _supaClient.auth.signInWithOAuth !== 'function') { fail(); return; }
+  try {
+    var res = await _supaClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname, queryParams: { prompt: 'select_account' } } });
+    if (res && res.error) fail();
+  } catch (e) { fail(); }
+}
+// did this session come from Google? The access token's "amr" names how the session was made ('oauth' for Google)
+function _viViaGoogle(session) {
+  if (!session) return false;
+  try {
+    var p = String(session.access_token || '').split('.')[1];
+    if (p) {
+      p = p.replace(/-/g, '+').replace(/_/g, '/'); while (p.length % 4) p += '=';
+      var amr = JSON.parse(atob(p)).amr || [];
+      if (amr.length) return amr.some(function (a) { return a && a.method === 'oauth'; });
+    }
+  } catch (e) {}
+  var u = session.user || {};
+  try { return !!(u.app_metadata && u.app_metadata.provider === 'google' && localStorage.getItem(VI_AUTH_VIA) === 'google'); } catch (e) { return false; }
+}
+// back from Google with an error (cancelled, or the provider refused): say so on the sign-in card, clean the address bar
+function viGoogleReturn() {
+  try {
+    if (localStorage.getItem(VI_AUTH_VIA) !== 'google') return false;
+    var h = (location.hash || '').slice(1), q = (location.search || '').slice(1);
+    var src = /(^|&)error(_description)?=/.test(h) ? h : (/(^|&)error(_description)?=/.test(q) ? q : '');
+    if (!src) return false;
+    var ps = new URLSearchParams(src), d = (ps.get('error_description') || ps.get('error') || '').slice(0, 120);
+    try { history.replaceState(null, document.title, location.pathname); } catch (e) {}
+    var show = function () {
+      var ov = document.getElementById('login-overlay'); if (ov) ov.style.display = '';
+      _showAuthStep('email');
+      _authErr('Google sign-in did not finish' + (d ? ' (' + d + ')' : '') + '. Try again, or use your email.');
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', show); else show();
+    return true;
+  } catch (e) { return false; }
+}
+viGoogleReturn();
+// after a Google return the session sits in the address bar: clear it once supabase-js has read it
+function viCleanAuthUrl() { try { if (/access_token=|refresh_token=/.test(location.hash)) history.replaceState(null, document.title, location.pathname + location.search); } catch (e) {} }
+window.addEventListener('load', function () { try { var ov = document.getElementById('login-overlay'); if (ov && getComputedStyle(ov).display !== 'none') viGoogleCheck(); } catch (e) {} });
+
 async function authSubmitEmail() {
+  try { localStorage.setItem(VI_AUTH_VIA, 'email'); } catch (e) {}
   var emailEl = document.getElementById('auth-email');
   var email   = emailEl ? emailEl.value.trim().toLowerCase() : '';
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -28744,6 +28903,7 @@ function selectWelcomeOpt(btn) {
   document.querySelectorAll('.welcome-opt').forEach(function(b){ b.classList.remove('selected'); });
   btn.classList.add('selected');
   _wSelectedVal = btn.getAttribute('data-val');
+  var gh = document.getElementById('wz-goal-hint'); if (gh) gh.hidden = true;
 }
 
 // Step 1 → Step 2
@@ -28759,40 +28919,148 @@ function wSetCurrency(c) {
   var sym = {GBP:'£',USD:'$',EUR:'€',INR:'₹'}[c] || '£';
   document.querySelectorAll('.w-currency-label').forEach(function(el){ el.textContent = sym; });
 }
-function wStep1Next() {
-  var name  = (document.getElementById('w-name')  || {}).value || '';
-  var email = (document.getElementById('w-email') || {}).value || '';
-  var phone = (document.getElementById('w-phone-s1') || {}).value || '';
-  if (!name || name.trim().length < 2) {
-    var el = document.getElementById('w-name');
-    if (el) el.style.borderColor = 'var(--re)';
-    showToast('Please enter your first name');
-    return;
-  }
+// ── Onboarding screens (owner, 5 Nov 2026, from the Help Bnk feedback) ──
+// 1 name (and email when not signed in), 2 where you are, 3 money, 4 home, 5 your plan. w-step-1 holds screens 1-2 and
+// w-step-2 holds 3-5, so wStep1Next / wStep2Submit / wStep2Skip keep their old jobs.
+var _wzAt = 1, WZ_N = 5, _wDay = null, _wCaptured = false;
+function wGo(n) {
+  n = Math.max(1, Math.min(WZ_N, n | 0)); _wzAt = n;
+  document.querySelectorAll('#welcome-overlay .wz-screen').forEach(function (sc) { sc.hidden = +sc.getAttribute('data-s') !== n; });
+  var s1 = document.getElementById('w-step-1'), s2 = document.getElementById('w-step-2');
+  if (s1) s1.style.display = n <= 2 ? '' : 'none';
+  if (s2) s2.style.display = n >= 3 ? '' : 'none';
+  var hero = document.getElementById('wz-hero'); if (hero) hero.hidden = n !== 1;
+  var c = document.getElementById('wz-count'); if (c) c.textContent = 'Step ' + n + ' of ' + WZ_N;
+  document.querySelectorAll('#w-step-dots i').forEach(function (d, i) { d.classList.toggle('on', i < n); });
+  var bk = document.getElementById('wz-back'); if (bk) bk.hidden = n === 1;
+  if (n === 5) wRenderPlan();
+  var ov = document.getElementById('welcome-overlay'), box = ov && ov.querySelector('.welcome-box');
+  if (ov) ov.scrollTop = 0; if (box) box.scrollTop = 0;
+  var h = document.querySelector('#wz-s' + n + ' h2'); if (h && n > 1) { try { h.focus({ preventScroll: true }); } catch (e) {} }
+}
+function wNext() {
+  if (_wzAt === 1) { if (_wCheckId()) wGo(2); return; }
+  if (_wzAt === 2) { wStep1Next(); return; }
+  wGo(_wzAt + 1);
+}
+function wBack() { if (_wzAt > 1) wGo(_wzAt - 1); }
+function _wCheckId() {
+  var n = document.getElementById('w-name'), e = document.getElementById('w-email');
+  var name = ((n && n.value) || '').trim(), email = ((e && e.value) || '').trim();
+  if (name.length < 2) { if (n) n.style.borderColor = 'var(--re)'; showToast('Please enter your first name'); return false; }
   if (!email || !email.includes('@')) {
-    var el2 = document.getElementById('w-email');
-    if (el2) el2.style.borderColor = 'var(--re)';
-    showToast('Please enter a valid email address');
-    return;
+    var f = document.getElementById('w-email-field'); if (f) f.hidden = false;
+    if (e) e.style.borderColor = 'var(--re)'; showToast('Please enter a valid email address'); return false;
   }
+  return true;
+}
+// signed in (Google or an emailed code): the email is known, so it is not asked again; Google also gives the first name
+function viWelcomePrefill() {
+  var u = (typeof _supaUser !== 'undefined' && _supaUser) || null;
+  if (!u || !u.email) return false;
+  var md = u.user_metadata || {};
+  var e = document.getElementById('w-email'); if (e) e.value = u.email;
+  var f = document.getElementById('w-email-field'); if (f) f.hidden = true;
+  var se = document.getElementById('wz-signed-email'); if (se) se.textContent = u.email;
+  var si = document.getElementById('wz-signed'); if (si) si.hidden = false;
+  var n = document.getElementById('w-name');
+  var first = String(md.given_name || md.full_name || md.name || '').trim().split(/\s+/)[0] || '';
+  if (n && !n.value && first) n.value = first.slice(0, 40);
+  return true;
+}
+// the plan: guidance on using the tracker, never a product pick (FCA: information, not advice)
+var VI_PLAN_PHASE_TEXT = [
+  'Get every debt and bill in one place, so nothing takes you by surprise.',
+  'Steady things: keep debts under control and build a small buffer. The Debt tracker shows the order that costs least in interest.',
+  'Build your deposit, brick by brick, in the House builder.',
+  'Get mortgage-ready, with your numbers in one place.',
+  'Deposit done. Track the purchase and your new mortgage.',
+  'Build equity and keep track of what you own.',
+  'Own your home outright.'
+];
+var VI_PLAN_STEP = {
+  0: { tab: 'debt',   text: 'Add each debt in the Debt tracker: who it is with, the interest rate and the minimum payment.' },
+  1: { tab: 'budget', text: 'Give every pound of your take-home a job in the Budget.' },
+  2: { tab: 'house',  text: 'Set your deposit target in the House builder and lay your first bricks.' },
+  5: { tab: 'assets', text: 'Add what you own in Assets, so your net worth is right.' }
+};
+function _wPlanStage() { var v = parseInt(_wSelectedVal, 10); return isNaN(v) ? 0 : Math.max(0, Math.min(6, v)); }
+function _wPlanStep() {
+  var st = VI_PLAN_STEP[_wPlanStage()] || VI_PLAN_STEP[0];
+  return document.getElementById('tab-' + st.tab) ? st : { tab: 'overview', text: 'Add your income and spending on the Overview.' };
+}
+function wRenderPlan() {
+  var el = document.getElementById('wz-plan'); if (!el) return;
+  var stg = _wPlanStage(), names = (typeof JRNY_STAGES !== 'undefined') ? JRNY_STAGES : [];
+  var tags = ['Now', 'Next', 'Then'], li = '';
+  for (var i = 0; i < 3 && stg + i < names.length; i++) {
+    li += '<li class="wz-phase' + (i === 0 ? ' now' : '') + '"><span class="wz-phase-n">' + tags[i] + '</span><span><span class="wz-phase-name">' + names[stg + i].name + '</span>'
+      + '<div class="wz-phase-d">' + VI_PLAN_PHASE_TEXT[stg + i] + '</div></span></li>';
+  }
+  var sym = ((document.querySelector('.w-currency-label') || {}).textContent || '£').trim() || '£';
+  var num = function (id) { var x = document.getElementById(id); var v = x ? parseFloat(x.value) : 0; return isFinite(v) && v > 0 ? v : 0; };
+  var money = function (v) { return sym + Math.round(v).toLocaleString('en-GB'); };
+  var inc = num('w-income'), out = num('w-expenses'), sums = '';
+  if (inc && out) {
+    var left = inc - out;
+    sums = 'You told us ' + money(inc) + ' comes in and about ' + money(out) + ' goes out each month: '
+      + (left >= 0 ? 'about ' + money(left) + ' left.' : 'about ' + money(-left) + ' more goes out than comes in.');
+  } else if (inc) sums = 'You told us ' + money(inc) + ' comes in each month.';
+  var step = _wPlanStep();
+  el.innerHTML = '<ol class="wz-phases">' + li + '</ol>'
+    + '<div class="wz-week"><b>This week: one step</b>' + step.text + '</div>'
+    + (sums ? '<div class="wz-sums">' + sums + ' Rough figures, from what you typed.</div>' : '');
+  var days = document.getElementById('wz-days');
+  if (days) {
+    if (_wDay === null) _wDay = new Date().getDay();
+    var lab = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], full = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], h = '';
+    [1, 2, 3, 4, 5, 6, 0].forEach(function (d) { h += '<button type="button" data-d="' + d + '" aria-label="' + full[d] + '" aria-pressed="' + (d === _wDay) + '" onclick="wPickDay(' + d + ')">' + lab[d] + '</button>'; });
+    days.innerHTML = h;
+  }
+}
+function wPickDay(d) {
+  _wDay = d;
+  document.querySelectorAll('#wz-days button').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-d') === d)); });
+}
+// on the check-in day the app says the next step, once that day (the cadence the owner asked Help Bnk for)
+function viCheckinNudge() {
+  try {
+    if (localStorage.getItem('vi_demo_mode') === 'true') return false;
+    var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
+    if (!u || !u.checkin || typeof u.checkin.day !== 'number') return false;
+    var d = new Date(); if (d.getDay() !== u.checkin.day) return false;
+    var key = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    if (localStorage.getItem('vi_checkin_seen') === key) return false;
+    localStorage.setItem('vi_checkin_seen', key);
+    var next = null; try { next = getCoreTaskStatus().filter(function (t) { return !t.done; })[0]; } catch (e) {}
+    showToast('Weekly check-in. Your next step: ' + (next ? next.label.toLowerCase() : 'bring your figures up to date') + '.', 6000);
+    return true;
+  } catch (e) { return false; }
+}
+window.addEventListener('load', function () { setTimeout(function () {
+  try { var ov = document.getElementById('welcome-overlay'), lo = document.getElementById('login-overlay');
+    if ((!ov || getComputedStyle(ov).display === 'none') && (!lo || getComputedStyle(lo).display === 'none')) viCheckinNudge(); } catch (e) {}
+}, 2500); });
+
+function wStep1Next() {
+  if (!_wCheckId()) { wGo(1); return; }
+  var name  = document.getElementById('w-name').value.trim();
+  var email = document.getElementById('w-email').value.trim();
   if (!_wSelectedVal) {
-    showToast('Pick your biggest financial challenge to personalise your Journey Map');
+    var gh = document.getElementById('wz-goal-hint'); if (gh) gh.hidden = false;
+    showToast('Pick the one closest to you, so your plan starts in the right place');
     return;
   }
-  // Save partial
-  _vaultItUser = { name: name.trim(), email: email.trim(), phone: phone.trim(), goal: _wSelectedVal, joined: new Date().toISOString(), pro: false, logins: 1 };
+  // Save partial (the phone number, if given, is asked on the plan screen)
+  var prev = _vaultItUser || {};
+  _vaultItUser = { name: name, email: email, phone: prev.phone || '', goal: _wSelectedVal, joined: prev.joined || new Date().toISOString(), pro: false, logins: 1 };
   try { localStorage.setItem('vi_user', JSON.stringify(_vaultItUser)); } catch(e) {}
-  captureEmailToList(email, name.trim(), parseInt(_wSelectedVal)||0);
-  captureEmailMailchimp(email, name.trim(), parseInt(_wSelectedVal)||0);
-  // Show step 2
-  var s1 = document.getElementById('w-step-1');
-  var s2 = document.getElementById('w-step-2');
-  var d1 = document.getElementById('wdot-s1');
-  var d2 = document.getElementById('wdot-s2');
-  if (s1) s1.style.display = 'none';
-  if (s2) s2.style.display = '';
-  if (d1) d1.style.background = 'rgb(var(--teal-rgb) / .4)';
-  if (d2) d2.style.background = 'var(--em)';
+  if (!_wCaptured) {
+    _wCaptured = true;
+    captureEmailToList(email, name, parseInt(_wSelectedVal)||0);
+    captureEmailMailchimp(email, name, parseInt(_wSelectedVal)||0);
+  }
+  wGo(3);
 }
 
 // Step 2 — full profile submit
@@ -28800,7 +29068,7 @@ function wStep2Submit() {
   var income   = parseFloat(document.getElementById('w-income')   && document.getElementById('w-income').value)   || 0;
   var expenses = parseFloat(document.getElementById('w-expenses') && document.getElementById('w-expenses').value) || 0;
   var house    = parseFloat(document.getElementById('w-house')    && document.getElementById('w-house').value)    || 0;
-  var phone    = (document.getElementById('w-phone') || {}).value || '';
+  var phone    = (document.getElementById('w-phone-s1') || document.getElementById('w-phone') || {}).value || '';
 
   // Persist profile into app state
   if (income > 0 && typeof ovState !== 'undefined') {
@@ -28820,7 +29088,8 @@ function wStep2Submit() {
   }
   // Update user profile
   if (_vaultItUser) {
-    _vaultItUser.phone    = phone.trim();
+    if (phone.trim()) _vaultItUser.phone = phone.trim();
+    if (_wSelectedVal !== null) _vaultItUser.checkin = { day: _wDay === null ? new Date().getDay() : _wDay, step: _wPlanStep().tab, set: new Date().toISOString() };
     _vaultItUser.income   = income;
     _vaultItUser.expenses = expenses;
     _vaultItUser.house    = house;
@@ -28848,7 +29117,8 @@ function wStep2Submit() {
   applyProgressiveNav();
   checkAchievements();
   showToast('Welcome' + (_vaultItUser && _vaultItUser.name ? ', ' + _vaultItUser.name : '') + '. Let’s get started 🚀');
-  if (income > 0) setTimeout(function(){ try { showTab('budget'); } catch(e) {} }, 250);
+  if (_wSelectedVal !== null) { var _wTab = _wPlanStep().tab; setTimeout(function(){ try { showTab(_wTab); } catch(e) {} }, 250); }   // this week's step from the plan
+  else if (income > 0) setTimeout(function(){ try { showTab('budget'); } catch(e) {} }, 250);
 }
 
 // Step 2 skip — save what we have and enter app
@@ -29337,7 +29607,7 @@ function showLegalModal(title, body) {
   modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(560px,94vw);max-height:86vh;overflow-y:auto;padding:24px 22px;position:relative"><button onclick="document.getElementById(\'legal-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button><div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:14px">'+title+'</div><div style="font-family:\'DM Sans\',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);line-height:1.7">'+body+'</div></div>';
   document.body.appendChild(modal);
 }
-var VI_LEGAL_DATE = '31 October 2026';
+var VI_LEGAL_DATE = '5 November 2026';
 function _lh(t) { return '<p style="color:var(--em);font-weight:700;margin:14px 0 3px">' + t + '</p>'; }
 function showPrivacy() {
   showLegalModal('Privacy notice', [
@@ -29345,7 +29615,7 @@ function showPrivacy() {
     _lh('Who we are'),
     '<p>Vault-It is run by <strong>PT Live Design</strong> (“we”), A57, 11 St Mary’s Street, Lincoln LN5 7EQ. We decide how your personal data is used, which makes us the data controller. For anything about your privacy, email <strong>hello@vault-it.co</strong>.</p>',
     _lh('What we hold, and why'),
-    '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Your email address</strong>: to create your account, send you sign-in codes and send service messages about the beta and your account. We do not send marketing unless you opt in.</li>'
+    '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Your email address</strong>: typed in, or from Google if you choose Continue with Google; to create your account, send you sign-in codes and send service messages about the beta and your account. We do not send marketing unless you opt in.</li>'
       + '<li><strong>Your profile</strong>: your name, phone number, profession and aspirations, goal, and the saving- and spending-style answers from the set-up questions.</li>'
       + '<li><strong>Your plan</strong>: which plan you bought (Pioneer, monthly or yearly, or a Lifetime licence), when you paid and when it renews or ends, whether you are a beta tester (an address confirmed on the beta list gets the tester price), and the Stripe customer and subscription references that link a payment to your account. We never see or store your card details.</li>'
       + '<li><strong>The figures you enter</strong>: income, spending, assets, debts, house plans and net-worth history, and anything else you add: notes, small item photos, and the names and contact details of clients or leads if you use that tab (only add other people’s details if you have a good reason to). This is financial information. We use it only to show you your dashboard, roadmap and House Builder and to keep your devices in step. We do not use it for anything else, and we do not sell it. Full-size photos stay on your device.</li>'
@@ -29357,6 +29627,7 @@ function showPrivacy() {
     _lh('Who else handles it'),
     '<p>These companies process data for us, only to run Vault-It:</p>',
     '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Supabase</strong>: database and sign-in, hosted in the EU (Frankfurt), and the server functions, which run on Supabase’s network and may run outside the EU.</li>'
+      + '<li><strong>Google</strong>: only if you choose <strong>Continue with Google</strong>. Google confirms it is you and sends Supabase your name, email address and the web address of your Google profile picture, which Supabase keeps with your account. The app uses your name and email address; it does not load the picture. We never see your Google password, and ask Google for nothing else in your account.</li>'
       + '<li><strong>Stripe</strong>: takes payments for Pioneer (monthly and yearly) and the Lifetime licence. When you pay, Stripe receives your email address, your card details and your Vault-It account reference, and sends our server a signed record of the payment (the plan, and when it renews or ends).</li>'
       + '<li><strong>Resend</strong>: delivers your sign-in emails (your email address and the code) and the beta-list emails. If it is unavailable, Supabase’s own mailer is used for sign-in emails instead.</li>'
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
@@ -29365,7 +29636,7 @@ function showPrivacy() {
     '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). The free 3D models you can pick for a wealth or liability item come from a library bundled with Vault-It itself, served from this same address: a model is downloaded only when you pick or open one, no outside service is contacted, and CC-BY models are credited in the item and in the 3D model credits panel. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with a key, only if an earlier version of the app saved one on this device. The bank, broker and exchange connections in Settings are locked for a future release: they connect to nothing and never ask for your details. Settings also holds owner-only connections (Notion, Claude, Meshy); they do nothing unless someone enters keys for them.</p>',
     '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or third-party analytics. During the beta the app records how it is used (screens opened, features used, errors and how long a visit lasts, never your figures or what you type) in our own database, to improve it; you can switch this off in Settings (Share usage). Feedback you send from the app is stored by us with the screen you were on, your last few taps and, unless you untick it, a picture of that screen with every figure hidden. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected, and what that does not mean'),
-    '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
+    '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code or your Google account, and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
     _lh('On your device'),
     '<p>The app keeps your data and settings in your browser’s storage so it works quickly and offline. This is essential to how it works and is not used to track you. API keys you type in stay in this browser (sent only to the service they belong to), and photos and 3D designs you add stay in this browser only.</p>',
     _lh('How long we keep it'),
