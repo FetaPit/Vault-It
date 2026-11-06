@@ -1,5 +1,5 @@
 // v0.9.1 chrome (chunk v09x/chrome): E1 rotating V mark, E2 bigger desktop nav, E24 pinned Assets sub-menu, E27 Message the Dev on the
-// dashboard only, sidebar summary colours, E25 crowdfund Founder card (was Vaulter; prices and terms from VI_PLANS) and the Founding badge (N left, from real counts).
+// dashboard only, sidebar summary colours, E25 crowdfund monthly card (was Vaulter, then Founder, now Pioneer; prices and terms from VI_PLANS) and the Founding badge (N left, from real counts).
 // Run: node tests/test_v091_chrome.js
 require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
@@ -99,17 +99,17 @@ const open = async (b, w, h, theme, o = {}) => {
       ok(c.nw.v === c.teal && c.nw.l === c.teal, T + 'Net worth is teal');
     }
 
-    // E25: crowdfund Founder card (Vaulter until the owner's 4 Nov evening rename)
-    const camp = await p.evaluate(() => { const orig = window.open; window.__opened = []; window.open = u => { window.__opened.push(u); return null; };
-      viShowCampaign(); const card = [...document.querySelectorAll('#vi-campaign-modal .vi-camp-tier')].find(x => /Founder/.test(x.querySelector('[data-tier-name]') ? x.querySelector('[data-tier-name]').textContent : '')); const txt = card.innerText.replace(/\s+/g, ' ');
+    // E25: crowdfund monthly card (Vaulter, then Founder from 4 Nov evening, Pioneer from 5 Nov)
+    const camp = await p.evaluate(() => { let out0 = ''; const orig = window.open; window.__opened = []; window.open = u => { window.__opened.push(u); return null; };
+      viShowCampaign(); const card = [...document.querySelectorAll('#vi-campaign-modal .vi-camp-tier')].find(x => x.querySelector('[data-plan="monthly"]')); out0 = card && card.querySelector('[data-tier-name]') ? card.querySelector('[data-tier-name]').textContent.trim() : ''; const txt = card.innerText.replace(/\s+/g, ' ');
       // owner, 4 Nov 2026 (chunk I) replaces the 3 Nov sentence: the tester price, then "£X after the beta"
       const P = VI_PLANS.monthly; const f = v => '£' + v.toFixed(2);
-      const out = { ok: txt.indexOf(f(P.tester) + '/mo ' + f(P.price) + ' after the beta') >= 0 && /Free for 30 days, then £3\.99 a month\. Your card is taken now and first charged on day 31\. Cancel before then and you pay nothing\. To cancel, email hello@vault-it\.co\./.test(txt), txt: txt.slice(0, 260) };
+      const out = { name: out0, ok: out0 === 'Pioneer' && txt.indexOf(f(P.tester) + '/mo ' + f(P.price) + ' after the beta') >= 0 && /Free for 30 days, then £3\.99 a month\. Your card is taken now and first charged on day 31\. Cancel before then and you pay nothing\. To cancel, email hello@vault-it\.co\./.test(txt), txt: txt.slice(0, 260) };
       VI_PLANS.monthly.price = 6.49; VI_PLANS.monthly.tester = 4.49; viShowCampaign(); out.live = document.querySelector('#vi-campaign-modal').innerText.replace(/\s+/g, ' ').indexOf('£4.49/mo £6.49 after the beta') >= 0;
       VI_PLANS.monthly.price = P.price; VI_PLANS.monthly.tester = P.tester;
       const cta = [...card.querySelectorAll('button')].pop(); localStorage.removeItem('vi_beta'); cta.click(); out.tester = window.__opened[0]; localStorage.setItem('vi_beta', 'false'); cta.click(); out.full = window.__opened[1]; localStorage.removeItem('vi_beta');
       out.links = [VI_STRIPE_LINKS.monthly_trial, VI_STRIPE_LINKS.monthly_tester]; out.badge = document.getElementById('camp-founder-slots').textContent; out.stats = !!document.querySelector('#vi-campaign-modal .vi-camp-stats'); return out; });
-    ok(camp.ok, T + 'Founder card shows the tester price, "£5.99 after the beta" and the trial terms (owner, 4 Nov evening) ' + camp.txt);
+    ok(camp.ok, T + 'monthly card is named Pioneer and shows the tester price, "£5.99 after the beta" and the trial terms (owner, 4 Nov evening) ' + camp.txt);
     ok(camp.live, T + 'both prices come from VI_PLANS (change them and the card follows)');
     ok(camp.tester && camp.tester.indexOf(camp.links[0]) === 0 && camp.full && camp.full.indexOf(camp.links[1]) === 0, T + 'the button opens the 30-day trial link for alpha testers, or the £3.99 charge-at-checkout link otherwise');
     ok(camp.badge === '100 founding places · Be one of the first' && !camp.stats, T + 'no counts yet: the Founding badge says "100 founding places · Be one of the first" and the backer and funded stats are gone (' + camp.badge + ')');
