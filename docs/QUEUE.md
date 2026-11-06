@@ -108,6 +108,7 @@ The single list of instructed work. Every session reads it at start and before e
 - [~] (cloud, Build) v0.9.2: interactive 3D House Builder house behind the sign-in email step, replacing the still as hero; the still stays as poster and fallback (owner, 6 Nov: "Make the house large zoomed into the background with rotation animations. Allow the cursor to interact with the model subtly expanding and exploding the house upon hover over."). Brief `docs/creative/briefs/signin-house-3d.md` with Pedro amendments; built by Pete T on `v092/signin-house-3d`, asked by David (cloud Chief of Staff).
 - [~] (laptop, Marketing) Instagram video post: the net worth over time forecast animation (owner, 6 Nov 2026: "create a video post of the networth over time forcast animation Too"). Same kit as the intro carousel, `docs/marketing/instagram/` on `marketing/instagram-intro`.
 - [~] (laptop, Marketing) Copy for the owner's personal Instagram post announcing the Eligent club pitch (owner, 6 Nov 2026: "Also give me copy for my instagram post personal announcing Eligent club pitch"). Text only, in chat and `docs/marketing/instagram/`.
+- [~] (laptop, Marketing) Eligent pitch card: subtle animation on the owner's "I am pitching" image (Eligent Club, 7 Nov, London) and a Vault-It title intro slide to attach to it (owner, 6 Nov 2026: "Add subtle animations to this post and suggest a title intro post for vault it to attach"). Done before the older net worth video because the pitch is 7 Nov.
 
 ## Waiting on the owner
 
