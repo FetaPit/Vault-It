@@ -2,7 +2,7 @@
 
 Owner's ask, 6 Nov 2026: "Instagram video carousel intro post and instagram page creation".
 
-> **On hold for the name.** The open queue item "Brand rename before any public launch" (Venture Control 26.001.33 and 26.001.54) says no social accounts and no brand-name posts until the name is settled. A Swedish company holds a live UK trade mark, VAULTIT. Everything here is a draft. Create the account and post once you say the name is final. If the name changes, change `BRAND` at the top of `slides.js`, re-render, and swap the name in the text below.
+> **Go (owner, 6 Nov 2026: "Name is final, go").** The name stays Vault-It and the social hold is lifted. Usernames checked logged out on 6 Nov: `vaultit`, `vaultit.app`, `vaultit.uk`, `getvaultit` and `vaultit.co` show no profile; `vault_it` is taken. A name that shows nothing can still belong to a deactivated account, so the sign-up screen has the final word. If the name ever changes, change `BRAND` at the top of `slides.js` and re-render.
 
 ## What is in the kit
 
@@ -31,8 +31,8 @@ Every slide carries the wordmark, a slide count and "Not regulated by the FCA. N
 I can't create accounts for you, so these steps are yours. Each one is in the Instagram app unless it says otherwise.
 
 1. **Sign up** with `hello@vault-it.co`. That address forwards to your Gmail, so the code arrives there. Use a new password from your password manager and turn on two-factor authentication straight away (Settings and activity → Accounts Centre → Password and security).
-2. **Username.** Check these in the sign-up screen and take the first one that is free:
-   `vaultit.app` · `vaultit.uk` · `getvaultit` · `vaultit.co`
+2. **Username.** Try these in order in the sign-up screen and take the first one it accepts:
+   `vaultit` · `vaultit.app` · `vaultit.uk` · `getvaultit`
    (Instagram usernames can't contain hyphens, so `vault-it` is not possible.)
 3. **Professional account:** Settings and activity → Account type and tools → Switch to professional account → **Business** → category **App page**.
 4. **Name** (30 characters, and it shows in search): `Vault-It · Debt to deposit`
