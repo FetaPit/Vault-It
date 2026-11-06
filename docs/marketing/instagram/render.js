@@ -2,6 +2,8 @@
 //   node docs/marketing/instagram/render.js            stills only (slide covers, profile picture, highlight covers)
 //   node docs/marketing/instagram/render.js video      also the six MP4 slides (H.264, 1080 x 1350, 30 fps, silent)
 //   node docs/marketing/instagram/render.js video 1 6  only slides 1 and 6
+//   node docs/marketing/instagram/render.js video eligent "<path to the I am pitching card>"
+//                                                       the square Eligent Club post (the card stays outside the repo)
 // Needs Playwright (env PW = path to the playwright package if it is not installed here) and mp4-muxer
 // (env MUXER = path to mp4-muxer/build/mp4-muxer.js). Uses the installed Chrome (or Edge) for its H.264 encoder.
 const fs = require('fs');
@@ -12,8 +14,11 @@ const { chromium } = require(process.env.PW || 'playwright');
 const ROOT = path.resolve(__dirname, '../../..');
 const OUT = path.join(__dirname, 'out');
 const args = process.argv.slice(2);
-const wantVideo = args[0] === 'video';
-const only = args.slice(wantVideo ? 1 : 0).map(Number).filter(Boolean);
+const wantVideo = args.includes('video');
+const setName = args.includes('eligent') ? 'eligent' : 'intro';
+const cardPath = args.find(a => /\.(jpe?g|png|webp)$/i.test(a));
+const only = args.filter(a => /^\d+$/.test(a)).map(Number);
+const prefix = setName === 'intro' ? 'slide' : setName;
 
 function fileUrl(p) { return 'file:///' + p.split(path.sep).join('/'); }
 function save(name, dataUrlOrB64) {
@@ -51,21 +56,27 @@ function save(name, dataUrlOrB64) {
   await page.addScriptTag({ path: path.join(__dirname, 'slides.js') });
   console.log('prepare', JSON.stringify(await page.evaluate(() => window.__IG.prepare())));
 
-  const n = await page.evaluate(() => window.__IG.count());
-  const list = Array.from({ length: n }, (_, i) => i + 1).filter(i => !only.length || only.includes(i));
-  for (const i of list) {
-    const tag = String(i).padStart(2, '0');
+  if (setName === 'eligent') {
+    if (!cardPath) throw new Error('give the path to the pitch card image');
+    const mime = /\.png$/i.test(cardPath) ? 'image/png' : /\.webp$/i.test(cardPath) ? 'image/webp' : 'image/jpeg';
+    console.log('card', await page.evaluate(src => window.__IG.setImage(src), `data:${mime};base64,` + fs.readFileSync(cardPath).toString('base64')));
+  }
+  const sets = await page.evaluate(() => window.__IG.sets);
+  const idx = sets.map((s, i) => [s, i]).filter(x => x[0] === setName).map(x => x[1]);
+  for (let j = 0; j < idx.length; j++) {
+    if (only.length && !only.includes(j + 1)) continue;
+    const i = idx[j] + 1, tag = String(j + 1).padStart(2, '0');
     if (wantVideo) {
       const t0 = Date.now();
       const r = await page.evaluate(k => window.__IG.encode(k), i - 1);
-      save(`slide-${tag}.mp4`, r.mp4);
-      save(`slide-${tag}-cover.png`, r.png);
+      save(`${prefix}-${tag}.mp4`, r.mp4);
+      save(`${prefix}-${tag}-cover.png`, r.png);
       console.log(`  slide ${i}: ${((Date.now() - t0) / 1000).toFixed(1)} s`);
     } else {
-      save(`slide-${tag}-cover.png`, await page.evaluate(k => window.__IG.still('slide', k), i - 1));
+      save(`${prefix}-${tag}-cover.png`, await page.evaluate(k => window.__IG.still('slide', k), i - 1));
     }
   }
-  if (!only.length) {
+  if (!only.length && setName === 'intro') {
     save('profile-picture.png', await page.evaluate(() => window.__IG.still('avatar')));
     const hl = await page.evaluate(() => window.__IG.highlights);
     for (let i = 0; i < hl.length; i++) {

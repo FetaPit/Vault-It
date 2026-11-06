@@ -11,7 +11,13 @@
     red: "#B8403B", redGlow: "rgba(184,64,59,.6)", goldGlow: "rgba(232,197,106,.65)", onGold: "#1A1400"
   };
   var HEAD = "'Oxanium',sans-serif", BODY = "'DM Sans',sans-serif", MONO = "'Share Tech Mono',monospace", MARK = "'Syne',sans-serif";
-  var VI = window.__VI, M = 72;
+  var VI = window.__VI || {}, M = 72;
+  // the brand book's logo mark, so slides can also be drawn inside the app page (net worth post)
+  var drawIcon = VI.drawIcon || function (c, x, y, sz, lt) {
+    var k = sz / 240; c.save(); c.translate(x, y); c.scale(k, k);
+    c.beginPath(); c.arc(120, 120, 108, 0, Math.PI * 2); c.fillStyle = lt ? "#FFFFFF" : "#080808"; c.fill(); c.lineWidth = 14; c.strokeStyle = lt ? "#006B67" : "#44C0B9"; c.stroke();
+    c.beginPath(); c.moveTo(60, 76); c.lineTo(88, 76); c.lineTo(120, 126.2); c.lineTo(152, 76); c.lineTo(180, 76); c.lineTo(120, 170); c.closePath(); c.fillStyle = lt ? "#006B67" : "#44C0B9"; c.fill(); c.restore();
+  };
 
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
   function seg(t, a, b) { return clamp((t - a) / (b - a), 0, 1); }
@@ -79,9 +85,9 @@
     c.fillStyle = "rgba(68,192,185,.022)"; for (var y = 0; y < H; y += 4) c.fillRect(0, y, W, 1);
     var g = c.createRadialGradient(W * .5, H * .78, 40, W * .5, H * .78, W * .75);
     g.addColorStop(0, "rgba(0,127,123,.16)"); g.addColorStop(1, "rgba(0,127,123,0)"); c.fillStyle = g; c.fillRect(0, 0, W, H);
-    VI.drawIcon(c, M, 58, 76, false);
+    drawIcon(c, M, 58, 76, false);
     wordmark(c, M + 76 + 20, 112, 46);
-    mono(c, ("0" + n) + " / 06", W - M, 110, 28, C.teal, "right");
+    mono(c, typeof n === "number" ? ("0" + n) + " / 06" : n, W - M, 110, 28, C.teal, "right");
     c.fillStyle = C.line; c.fillRect(M, H - 92, W - 2 * M, 2);
     mono(c, "NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.", M, H - 46, 23, C.muted);
     mono(c, BRAND.site.toUpperCase(), W - M, H - 46, 23, C.teal, "right");
@@ -300,11 +306,122 @@
     }
   });
 
+  /* ---------- Eligent Club pitch, 7 Nov 2026: a square two-slide post ----------
+     1. The owner's "I am pitching" card (2160 x 2160, passed in by render.js, never committed) with light layered on top:
+        a glint that travels round the photo ring, a shine across the pink label, twinkling dots and city lights.
+        Every effect repeats a whole number of times in 8 s, so the video loops without a jump.
+     2. A Vault-It title slide in the same square format: "The app I'm pitching". */
+  var CARD = null, RING = { x: 1349, y: 1121, r: 623 }, LABEL = [114, 114, 912, 278], ED = 8;
+  function rnd(seed) { return function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+  var DOTS = [], LIGHTS = [];
+  (function () {
+    var r = rnd(7), keep = function (x, y) { return Math.hypot(x - RING.x, y - RING.y) > RING.r + 40; };
+    while (DOTS.length < 26) { // navy band at the foot, clear of the name and the date
+      var x = r() * 2160, y = 1260 + r() * 860;
+      if (!keep(x, y) || (y > 1600 && (x < 1050 || x > 1300))) continue;
+      DOTS.push([x, y, 1 + ((r() * 3) | 0), r() * 6.283, ["#E8509A", "#9B6BFF", "#5B8CFF"][(r() * 3) | 0], 3 + r() * 4]);
+    }
+    while (LIGHTS.length < 30) { // windows in the skyline, clear of the headline blocks
+      var lx = r() * 2160, ly = 520 + r() * 680;
+      if (!keep(lx, ly) || (lx < 1300 && ly < 500)) continue;
+      LIGHTS.push([lx, ly, 1 + ((r() * 2) | 0), r() * 6.283, 2 + r() * 3]);
+    }
+  })();
+  function cardFrame(c, t) {
+    var k = W / 2160, ph = t / ED * Math.PI * 2;
+    c.drawImage(CARD, 0, 0, W, W);
+    c.save(); c.scale(k, k); c.globalCompositeOperation = "lighter";
+    // ring: a soft glint goes once round per loop, and the whole ring breathes a little
+    var a0 = -Math.PI / 2 + ph;
+    for (var s = 0; s < 18; s++) {
+      var f = 1 - s / 18, a = a0 - s * .045;
+      c.beginPath(); c.arc(RING.x, RING.y, RING.r, a - .05, a); c.strokeStyle = "rgba(255,225,245," + (.55 * f * f).toFixed(3) + ")";
+      c.lineWidth = 12; c.shadowColor = "rgba(232,80,154,.9)"; c.shadowBlur = 30 * f; c.stroke();
+    }
+    c.shadowBlur = 0;
+    c.beginPath(); c.arc(RING.x, RING.y, RING.r + 10, 0, Math.PI * 2);
+    c.strokeStyle = "rgba(170,90,255," + (.07 + .05 * Math.sin(ph * 2)).toFixed(3) + ")"; c.lineWidth = 26; c.stroke();
+    // label: one shine sweeps across "I am pitching" early in each loop
+    var sw = seg(t, .8, 2.0);
+    if (sw > 0 && sw < 1) {
+      c.save(); c.beginPath(); c.rect(LABEL[0], LABEL[1], LABEL[2] - LABEL[0], LABEL[3] - LABEL[1]); c.clip();
+      var sx = lerp(LABEL[0] - 300, LABEL[2] + 300, easeIO(sw)), g = c.createLinearGradient(sx - 160, 0, sx + 160, 0);
+      g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(.5, "rgba(255,255,255,.28)"); g.addColorStop(1, "rgba(255,255,255,0)");
+      c.translate(sx, LABEL[1]); c.transform(1, 0, -.35, 1, 0, 0); c.translate(-sx, -LABEL[1]);
+      c.fillStyle = g; c.fillRect(sx - 200, LABEL[1], 400, LABEL[3] - LABEL[1]); c.restore();
+    }
+    // dots and city lights twinkle
+    DOTS.forEach(function (d) {
+      var v = Math.max(0, Math.sin(ph * d[2] + d[3])); v = v * v * v;
+      if (v < .02) return; c.globalAlpha = v * .9; c.fillStyle = d[4]; c.shadowColor = d[4]; c.shadowBlur = 16;
+      c.beginPath(); c.arc(d[0], d[1], d[5], 0, Math.PI * 2); c.fill();
+    });
+    LIGHTS.forEach(function (l) {
+      var v = Math.max(0, Math.sin(ph * l[2] + l[3])); v = Math.pow(v, 6);
+      if (v < .02) return; c.globalAlpha = v * .8; c.fillStyle = "#FFE7B0"; c.shadowColor = "#FFD27A"; c.shadowBlur = 14;
+      c.beginPath(); c.arc(l[0], l[1], l[4], 0, Math.PI * 2); c.fill();
+    });
+    c.restore();
+  }
+  SL.push({ set: "eligent", w: 1080, h: 1080, dur: ED, cover: 1.3, draw: cardFrame });
+
+  SL.push({
+    set: "eligent", w: 1080, h: 1080, dur: ED, cover: 7.5, draw: function (c, t) {
+      c.fillStyle = C.bg; c.fillRect(0, 0, W, H);
+      c.fillStyle = "rgba(68,192,185,.022)"; for (var y0 = 0; y0 < H; y0 += 4) c.fillRect(0, y0, W, 1);
+      var g = c.createRadialGradient(W * .5, H * .72, 40, W * .5, H * .72, W * .7);
+      g.addColorStop(0, "rgba(0,127,123,.18)"); g.addColorStop(1, "rgba(0,127,123,0)"); c.fillStyle = g; c.fillRect(0, 0, W, H);
+      var hy = 470;
+      house(c, "e2", { x: 0, y: hy, w: W, h: H - 96 - hy }, { p: .04 + .7 * easeIO(seg(t, 1.2, 7.0)), yaw: -1.0 + t * .08, now: t * 1000, fscale: 1.5, fit: .95 });
+      mono(c, "THE APP I'M PITCHING  ·  7 NOV  ·  LONDON", M, 104, 26, C.teal, "left", ease(seg(t, .1, .7)));
+      var a = ease(seg(t, .3, 1.0));
+      c.save(); c.globalAlpha = a; c.translate(0, (1 - a) * 16); drawIcon(c, M, 150, 112, false); wordmark(c, M + 112 + 28, 238, 84); c.restore();
+      rich(c, [["Get"], ["out"], ["of"], ["the"], ["red", C.red, C.redGlow]], M, 350, 64, W - 2 * M, t, .9, .07);
+      rich(c, [["and"], ["into"], ["your", C.teal], ["home.", C.gold, C.goldGlow]], M, 420, 64, W - 2 * M, t, 1.25, .07);
+      c.fillStyle = C.line; c.fillRect(M, H - 92, W - 2 * M, 2);
+      mono(c, "NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.", M, H - 46, 21, C.muted);
+      mono(c, "FREE BETA  ·  " + BRAND.site.toUpperCase(), W - M, H - 46, 21, C.teal, "right");
+    }
+  });
+
+  /* ---------- Net worth over time, with the forecast: the app's own progress card ----------
+     networth.js opens the app with example figures on a virtual clock. window.__NW.at(ms) moves that clock and
+     returns the card's canvas, so each frame here is the app's real animation. */
+  function cubeKey(c, x, y, s, col, ghost) {
+    if (ghost) {
+      c.save(); c.setLineDash([4, 4]); c.strokeStyle = C.teal; c.lineWidth = 2;
+      var hx = s * .866, hy = s * .5; c.beginPath(); c.moveTo(x, y); c.lineTo(x - hx, y - hy); c.lineTo(x - hx, y - hy - s); c.lineTo(x, y - 2 * hy - s); c.lineTo(x + hx, y - hy - s); c.lineTo(x + hx, y - hy); c.closePath(); c.stroke(); c.restore();
+    } else cube(c, x, y, s, col, 1, 1);
+  }
+  SL.push({
+    set: "networth", w: 1080, h: 1350, dur: 10, cover: 9.5, draw: function (c, t) {
+      chrome(c, "NET WORTH");
+      var y = rich(c, words("Watch your net worth grow, month by month."), M, 250, 76, W - 2 * M, t, .15, .06);
+      para(c, "Solid blocks are the months behind you. See-through blocks forecast the next six, from your own budget.", M, y + 40, 34, W - 2 * M, C.muted, ease(seg(t, .8, 1.4)));
+      var px = 40, py = 520, pw = W - 80, ph = 610;
+      rr(c, px, py, pw, ph, 26); c.fillStyle = "rgba(8,13,20,.85)"; c.fill(); c.strokeStyle = C.line; c.lineWidth = 2; c.stroke();
+      var src = window.__NW && window.__NW.at(t * 1000);
+      if (src && src.width) {
+        var k = Math.min((pw - 20) / src.width, (ph - 20) / src.height), dw = src.width * k, dh = src.height * k;
+        c.save(); rr(c, px, py, pw, ph, 26); c.clip(); c.drawImage(src, px + (pw - dw) / 2, py + (ph - dh) / 2, dw, dh); c.restore();
+      }
+      var ky = 1186, a = ease(seg(t, 1.2, 1.8));
+      c.save(); c.globalAlpha = a;
+      cubeKey(c, M + 14, ky + 8, 18, C.teal); mono(c, "NET WORTH", M + 38, ky, 22, C.text);
+      cubeKey(c, M + 228, ky + 8, 18, C.red); mono(c, "DEBT", M + 252, ky, 22, C.text);
+      cubeKey(c, M + 352, ky + 8, 18, C.gold); mono(c, "INCOME", M + 376, ky, 22, C.text);
+      cubeKey(c, M + 500, ky + 8, 18, C.teal, true); mono(c, "FORECAST", M + 524, ky, 22, C.text);
+      mono(c, "1 BLOCK = £1,000", W - M, ky, 22, C.muted, "right");
+      c.restore();
+      mono(c, "EXAMPLE FIGURES", px + pw - 24, py + ph - 22, 20, C.muted, "right", .85);
+    }
+  });
+
   /* ---------- stills: profile picture and highlight covers ---------- */
   var HL = [["Start here", "home"], ["How it works", "house-builder"], ["Beta", "rocket"], ["Questions", "info"], ["Founder", "user"]];
   function avatar(c) {
     var S = 1080; c.canvas.width = S; c.canvas.height = S; c.fillStyle = C.bg; c.fillRect(0, 0, S, S);
-    VI.drawIcon(c, 90, 90, 900, false);
+    drawIcon(c, 90, 90, 900, false);
   }
   function highlight(c, i) {
     var w = 1080, h = 1920; c.canvas.width = w; c.canvas.height = h; c.fillStyle = C.bg; c.fillRect(0, 0, w, h);
@@ -330,15 +447,18 @@
     return btoa(s);
   }
 
+  function size(i) { W = SL[i].w || 1080; H = SL[i].h || 1350; }
+  async function setImage(src) { var im = new Image(); im.src = src; await im.decode(); CARD = im; return [im.width, im.height]; }
+
   async function encode(i) {
-    HS = {};
+    HS = {}; size(i);
     var cv = document.createElement("canvas"); cv.width = W; cv.height = H; var c = cv.getContext("2d");
     var target = new Mp4Muxer.ArrayBufferTarget();
     var mux = new Mp4Muxer.Muxer({ target: target, video: { codec: "avc", width: W, height: H, frameRate: FPS }, fastStart: "in-memory" });
     var err = null;
     var enc = new VideoEncoder({ output: function (ch, meta) { mux.addVideoChunk(ch, meta); }, error: function (e) { err = e; } });
     enc.configure({ codec: "avc1.640028", width: W, height: H, bitrate: 12e6, framerate: FPS, avc: { format: "avc" } });
-    var N = FPS * DUR, cover = null, cf = Math.round(SL[i].cover * FPS);
+    var N = FPS * (SL[i].dur || DUR), cover = null, cf = Math.round(SL[i].cover * FPS);
     for (var f = 0; f < N; f++) {
       SL[i].draw(c, f / FPS);
       var vf = new VideoFrame(cv, { timestamp: Math.round(f * 1e6 / FPS), duration: Math.round(1e6 / FPS) });
@@ -354,9 +474,9 @@
   function still(kind, i) {
     var cv = document.createElement("canvas"), c = cv.getContext("2d");
     if (kind === "avatar") avatar(c); else if (kind === "highlight") highlight(c, i);
-    else { HS = {}; cv.width = W; cv.height = H; for (var f = 0; f <= Math.round(SL[i].cover * FPS); f += 3) SL[i].draw(c, f / FPS); }
+    else { HS = {}; size(i); cv.width = W; cv.height = H; for (var f = 0; f <= Math.round(SL[i].cover * FPS); f += 3) SL[i].draw(c, f / FPS); }
     return cv.toDataURL("image/png");
   }
 
-  window.__IG = { prepare: prepare, encode: encode, still: still, count: function () { return SL.length; }, highlights: HL.map(function (h) { return h[0]; }) };
+  window.__IG = { prepare: prepare, encode: encode, still: still, setImage: setImage, sets: SL.map(function (s) { return s.set || "intro"; }), count: function () { return SL.length; }, highlights: HL.map(function (h) { return h[0]; }) };
 })();

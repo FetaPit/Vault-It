@@ -87,6 +87,36 @@ Instagram writes captions for video automatically. If you post the PNG stills in
 
 Boosting counts as an ad. Meta does not ask for FCA verification unless it decides the ad is for a financial product (see `docs/research/rules_platforms.md`, section on Meta). If it is flagged, ask for a review and explain that the app is a tracker people type their own figures into: it holds no money, gives no advice and sells no financial product.
 
+## Net worth over time post (one video)
+
+`out/networth-01.mp4`, 1080 x 1350, 10 s. The app's own "Net worth progress" card with Forecast on, filmed frame by frame from the real app with example figures (the seed from `tests/test_nw3d.js`): solid columns for March to November 2026, a "Today" plane, then six see-through forecast months. Marked "Example figures" on the video.
+
+Caption:
+
+```
+Watch your net worth grow, month by month.
+
+In Vault-It every month is a column of blocks: teal for net worth, red for debt, gold for monthly income. Today is marked, and the next six months appear as see-through blocks, forecast from your own budget.
+
+You type the numbers in. No bank login. Free during the beta, link in bio.
+
+Example figures. Not regulated by the FCA. Not financial advice.
+
+#networth #debtfreejourney #savingmoney #ukpersonalfinance #moneytips #firsttimebuyer
+```
+
+Alt text (if you post the still): "A 3D chart with one column of blocks per month from March 2026 to May 2027: teal net worth, red debt and gold monthly income. A dashed plane marks today; the later months are see-through forecast blocks. Example figures."
+
+Render it (laptop, Git Bash, in `~/Projects/Vault-It`):
+
+```bash
+PW="$HOME/Projects/Vault-It-oxanium/node_modules/playwright" MUXER="$HOME/tools/ig/node_modules/mp4-muxer/build/mp4-muxer.js" node docs/marketing/instagram/networth.js
+```
+
+## Eligent Club pitch post (two square videos)
+
+`out/eligent-01.mp4` (your card with light effects) and `out/eligent-02.mp4` (Vault-It title slide). Captions, title options and posting notes: `ELIGENT_POST.md`.
+
 ## Re-rendering (laptop, Git Bash, in `~/Projects/Vault-It`)
 
 `render.js` loads `brand/vault-it-brand-book.html` in Chrome or Edge, uses the brand book's own 3D house renderer, draws each frame from `slides.js`, and encodes MP4 with Chrome's built-in H.264 encoder. It needs Playwright and the `mp4-muxer` package. Neither is in `package.json`. The Oxanium worktree has Playwright; install mp4-muxer once in a folder outside the repo:
