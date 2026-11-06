@@ -1,6 +1,7 @@
 // v0.9.1 E33 (owner, 3 Nov): "overdrafts belong in debt tracker. The other types of debts should behave like the 3d credit cards
 // with company icon etc like overdraft or personal load etc. but without the credit card chip or *** and should pay down exactly
 // like the credit cards cutting down from right to left / I have just tested personal loan and it doesnt work as described yet."
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const OLD_LOAN = { id: 3, name: 'Old car loan', original: 6000, balance: 4200, rate: 9, min: 180, type: 'car' };
@@ -20,7 +21,7 @@ const seed = (old) => {
     const ctx = await b.newContext({ viewport: { width: 900, height: 1000 }, reducedMotion: motion }); const page = await ctx.newPage();
     const errs = []; page.on('pageerror', e => { errs.push(e.message); console.log('PAGEERR', e.message.slice(0, 200)); });
     await page.addInitScript(seed, OLD_LOAN);
-    await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+    await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
     await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await page.evaluate(() => { window.isPioneer = () => true; showTab('debt'); }); await page.waitForTimeout(900);
     const M = motion === 'reduce' ? 'reduced motion' : 'motion';

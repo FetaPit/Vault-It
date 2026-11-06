@@ -1,9 +1,10 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 (async()=>{
   const b=await chromium.launch(); const page=await (await b.newContext({viewport:{width:1280,height:1000}})).newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message));
   await page.addInitScript(()=>{localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'P',email:'t@t.com'}));localStorage.setItem('vi_fx_rates',JSON.stringify({USD:1.25}));});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1200);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1200);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   await page.evaluate(()=>{window._s=[];
     _supaClient={auth:{},functions:{invoke:async(n,o)=>{ if(o.body.search){_s.push(o.body.search);return{data:{results:[{symbol:'BCHN.L',name:'iShares Blockchain Technology UCITS ETF',exchange:'London',type:'ETF'},{symbol:'IE00BYZK4552',name:'iShares Automation & Robotics <b>x</b>',exchange:'London',type:'MUTUALFUND'}]},error:null};}

@@ -1,3 +1,4 @@
+import vi from './lib/vi.js'; import path from 'path';
 import { PGlite } from '@electric-sql/pglite'; import fs from 'fs';
 const db=new PGlite();
 await db.exec(`create role anon nologin; create role authenticated nologin; create schema auth;
@@ -7,7 +8,7 @@ create table public.profiles(id uuid); alter table public.profiles enable row le
 create table public.nw_history(user_id uuid); alter table public.nw_history enable row level security; create policy "own nw history" on public.nw_history for all using (auth.uid()=user_id);
 grant usage on schema public, auth to anon, authenticated; grant all on all tables in schema public to anon, authenticated;   -- what Supabase grants by default
 create function public.handle_new_user() returns int language sql as $$ select 1 $$; create function public.rls_auto_enable() returns int language sql as $$ select 1 $$; create function public.waitlist_count() returns int language sql as $$ select 1 $$;`);
-await db.exec(fs.readFileSync('/home/user/Vault-It/supabase/migrations/007_security_hardening.sql','utf8')); console.log('007 runs cleanly');
+await db.exec(fs.readFileSync(path.join(vi.ROOT,'supabase/migrations/007_security_hardening.sql'),'utf8')); console.log('007 runs cleanly');
 const q=async s=>(await db.query(s)).rows[0];
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const f=await q(`select has_function_privilege('anon','public.handle_new_user()','execute') a, has_function_privilege('authenticated','public.rls_auto_enable()','execute') b, has_function_privilege('anon','public.waitlist_count()','execute') c, has_function_privilege('authenticated','public.waitlist_count()','execute') d`);

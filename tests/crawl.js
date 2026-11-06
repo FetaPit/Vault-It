@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const MODE=process.argv[2]||'real', W=+(process.argv[3]||1280), H=W<600?900:1000;
 const errs=new Map(); const add=(k,v)=>{const key=k+': '+v; errs.set(key,(errs.get(key)||0)+1);};
@@ -17,7 +18,7 @@ const errs=new Map(); const add=(k,v)=>{const key=k+': '+v; errs.set(key,(errs.g
     }
     if(mode==='new'){ localStorage.setItem('vi_declined_demo','true'); localStorage.setItem('vi_session',JSON.stringify({email:'n@n.com',expiry:Date.now()+1e10})); }
   },MODE);
-  await page.goto(MODE==='demo'?'file:///home/user/Vault-It/example/index.html':'file:///home/user/Vault-It/index.html'); await page.waitForTimeout(2500);
+  await page.goto(MODE==='demo'?require('./lib/vi').fileUrl('example/index.html'):require('./lib/vi').FILE_URL); await page.waitForTimeout(2500);
   // hide overlays that block clicks
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   const tabs=await page.evaluate(()=>{const o=new Set();document.querySelectorAll('[onclick]').forEach(e=>{const m=/showTab\('([^']+)'/.exec(e.getAttribute('onclick'));if(m)o.add(m[1]);});return[...o];});

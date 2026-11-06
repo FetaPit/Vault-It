@@ -4,6 +4,7 @@
 // v0.9.1 cash 3D look: the flags are now Budget-style chips over the canvas (V3.cash.chipInfo()); the same checks apply to them.
 // Served over http://127.0.0.1 from the folder that holds VI_INDEX (file:// can lose localStorage in headless Chrome).
 // Run: node tests/test_v091_cash3d_frame.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const http = require('http'), fs = require('fs'), path = require('path');
 const routeThree = require('./three_route');
 const FILE = process.env.VI_INDEX || path.join(__dirname, '..', 'index.html');

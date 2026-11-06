@@ -3,8 +3,9 @@
 // The viewer now shows that preview and says where the photos are; tapping the tile's picture opens it; photos added on this device
 // still show in the strip and the spin.
 // Run: node tests/test_inv_preview.js   (VI_APP=file:///path/to/index.html to test another copy)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const fs = require('fs'), os = require('os'), path = require('path');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = fs.readFileSync(__dirname + '/test_nw3d.js', 'utf8');
 const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const seed = '.length, src.indexOf('// WCAG AA')).trim().replace(/;$/, '') + ')');

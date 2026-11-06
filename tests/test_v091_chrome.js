@@ -1,8 +1,9 @@
 // v0.9.1 chrome (chunk v09x/chrome): E1 rotating V mark, E2 bigger desktop nav, E24 pinned Assets sub-menu, E27 Message the Dev on the
 // dashboard only, sidebar summary colours, E25 crowdfund monthly card (was Vaulter, then Founder, now Pioneer; prices and terms from VI_PLANS) and the Founding badge (N left, from real counts).
 // Run: node tests/test_v091_chrome.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');   // VI_INDEX points the test at another checkout
+const INDEX = require('./lib/vi').FILE_URL;   // VI_INDEX points the test at another checkout
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const SUBS = ['cash', 'stocks', 'metals', 'other', 'crypto', 'liabilities'];
 const seed = ({ t, neg }) => {

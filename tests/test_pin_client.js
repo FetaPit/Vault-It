@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const OUT=(() => { const d = require('os').tmpdir() + '/vaultit-shots/'; try { require('fs').mkdirSync(d, { recursive: true }); } catch (e) {} return d; })();
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
@@ -34,7 +35,7 @@ const MOCK=`
 const fresh=async(b,state)=>{ // new browser context = a brand-new device
   const ctx=await b.newContext({viewport:{width:430,height:900}}); const page=await ctx.newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message)); page.errs=errs;
   await page.addInitScript(()=>{localStorage.setItem('vi_declined_demo','true');});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1200);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1200);
   await page.evaluate(MOCK); return {ctx,page};
 };
 const pad=async(page,digits)=>{for(const d of digits)await page.evaluate(d=>{const act=document.querySelector('.auth-step.active').id;act==='auth-setpin-step'?_setPinKey(d):_enterPinKey(d);},d); await page.waitForTimeout(500);};

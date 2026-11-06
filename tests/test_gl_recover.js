@@ -13,9 +13,10 @@
 // (the brand build's frames are heavier in software GL, so 'drawn' waits up to 4 s for the frame rather than a fixed 150 ms)
 //   8. cash stage: idle after a second (no frame scheduled), a kick schedules one, shadows use the desktop filter here
 // Run: node tests/test_gl_recover.js   (VI_APP=file:///… to test another copy)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');   // three.js served locally (the sandbox has no CDN)
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 // same seed as the brand screenshots (a house in progress); the brand build is the only house builder
 const shotSrc = require('fs').readFileSync(__dirname + '/brand_shots.js', 'utf8');

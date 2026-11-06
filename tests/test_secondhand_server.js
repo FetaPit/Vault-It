@@ -2,7 +2,7 @@
 // (shapes follow each API's docs; the prices are made up for the test, not market data).
 const fs=require('fs'); const esbuild=require('esbuild');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
-const ROOT=require('path').dirname(process.env.VI_INDEX||'/home/user/Vault-It/index.html');   // VI_INDEX=/path/to/index.html runs against another copy
+const ROOT=require('path').dirname(process.env.VI_INDEX||require('./lib/vi').INDEX);   // VI_INDEX=/path/to/index.html runs against another copy
 const FX=ROOT+'/tests/fixtures/secondhand/', fx=n=>JSON.parse(fs.readFileSync(FX+n+'.json','utf8'));
 const src=fs.readFileSync(ROOT+'/supabase/functions/secondhand-estimate/index.ts','utf8');
 const js=esbuild.transformSync(src,{loader:'ts',format:'cjs'}).code;

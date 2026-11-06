@@ -1,6 +1,7 @@
 // E28 part 1 (v0.9.1): second-hand price estimate in the Wealth inventory value link. Run: node tests/test_v091_secondhand.js
 // The edge function is stubbed (its own maths is in test_secondhand_server.js). The estimate must never be applied without a tap.
-const IDX = process.env.VI_INDEX || '/home/user/Vault-It/index.html';   // VI_INDEX=/path/to/index.html runs against another copy (a worktree)
+const IDX = process.env.VI_INDEX || require('./lib/vi').INDEX;   // VI_INDEX=/path/to/index.html runs against another copy (a worktree)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const EST = { status: 'ok', q: 'Gibson Les Paul', cond: 'excellent', cat: 'instruments', value: 1148, low: 1001, high: 1294, n: 20, basis: 'current asking prices', combine: 'single', haircut: 0.1, condFactor: 1,
@@ -29,7 +30,7 @@ const EST = { status: 'ok', q: 'Gibson Les Paul', cond: 'excellent', cat: 'instr
       await p.waitForSelector('#other-assets-list .wi-link-btn', { timeout: 20000 }); await p.waitForTimeout(200); };
     const tile = () => p.evaluate(() => { const t = document.querySelector('#other-assets-list .wi-tile'); return { val: t.querySelector('.wi-val').textContent, btn: t.querySelector('.wi-link-btn').textContent, work: (t.querySelector('.wi-work') || {}).textContent || '', total: alTotalOther() }; });
     const saved = () => p.evaluate(() => JSON.parse(localStorage.getItem('pos_al1')).otherAssets[0]);
-    await boot('file://'+IDX+'?seed');
+    await boot(require('./lib/vi').FILE_URL + '?seed');
     let t = await tile(); let s = await saved();
     ok(t.val === '£300' && t.btn === 'Link to market value' && s.cond === undefined && s.link === undefined, w + ': an old item loads untouched (own figure, no condition, no link)');
     await p.evaluate(() => wiLinkOpen(1)); await p.waitForTimeout(100);
@@ -55,7 +56,7 @@ const EST = { status: 'ok', q: 'Gibson Les Paul', cond: 'excellent', cat: 'instr
     const sz = await p.evaluate(() => Array.from(document.querySelectorAll('#wi-lk-market label, #wi-lk-market select, #wi-lk-market input, #wi-lk-market button, #wl-mres, #wl-mres *, #wl-mlinks a')).filter(e => e.offsetParent && e.textContent.trim() !== '' || e.matches('select,input')).map(e => parseFloat(getComputedStyle(e).fontSize)).filter(x => x > 0));
     ok(sz.length > 5 && Math.min.apply(null, sz) >= 10.5, w + ': every word in the panel is 10.5 px or more (min ' + Math.min.apply(null, sz) + ')');
     ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1 && document.getElementById('wi-link-card').scrollWidth <= document.getElementById('wi-link-card').clientWidth + 1), w + ': no sideways scroll in the pop-up');
-    await p.screenshot({ path: '/tmp/vaultit-test-logs/secondhand-' + w + '-' + theme + '.png' }).catch(() => {});
+    await p.screenshot({ path: require('path').join(require('./lib/vi').LOG_DIR, 'secondhand-') + '' + w + '-' + theme + '.png' }).catch(() => {});
     await p.click('#wl-mapply'); await p.waitForTimeout(250);
     t = await tile(); s = await saved();
     ok(t.val === '£1,148' && t.btn === 'Estimated' && t.total === 1148 + 80, w + ': after the tap the tile shows £1,148 and counts in the total: ' + JSON.stringify(t));

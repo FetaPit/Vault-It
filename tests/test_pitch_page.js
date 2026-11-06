@@ -1,6 +1,7 @@
 // vault-it.co/pitch-Eligent in a real browser, served through the real Worker routing from the real build:
 // all 15 slides scroll on a phone with no sideways scroll, the Present button gives a one-slide view
 // (arrow keys, on-screen buttons, swipe, counter, Esc to leave), and the app's two live 3D viewports draw with demo data.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path'), http = require('http'), cp = require('child_process'), { pathToFileURL } = require('url');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };

@@ -5,9 +5,10 @@
 // the flat picture stays until the first 3D frame; full pixel ratio at rest, lower while coins land; reduced motion
 // shows everything placed. The metal bars go the same way. Draws at rest are unchanged (one shape per block).
 // Run: node tests/test_v091r2_coins.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || require('path').join(__dirname, '..', 'index.html'));
+const INDEX = require('./lib/vi').FILE_URL;
 const GPU_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-gpu-compositing', '--enable-gpu-rasterization'];
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const ACCTS = [

@@ -1,6 +1,7 @@
 // vault-it.co/pete in a real browser, through the real Worker routing from the real build: the digital business card
 // the printed card's QR code and NFC chip open. It flips like the app's debt tracker cards (tap or the Flip button turns it,
 // dragging turns it in 3D), shows a corner of the house builder animation on the front, saves a contact card, and stays on brand.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path'), http = require('http'), cp = require('child_process'), { pathToFileURL } = require('url');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };

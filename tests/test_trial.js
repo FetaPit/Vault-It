@@ -8,8 +8,9 @@
 //   5. the trial anchor key is local only (not synced), the phone line fits above the tab bar, no sideways scroll, no page errors
 // The clock never starts before VI_TRIAL_EPOCH; the test moves the epoch to 0 so a past anchor means a past start.
 // Run: node tests/test_trial.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const DAY = 86400000;
 const seed = (o) => {

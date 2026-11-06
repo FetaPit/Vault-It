@@ -8,9 +8,10 @@
 //   4. Settings "Your plan" shows the three buttons with the tester prices and the yearly extras
 //   5. the old prices (£4.99, £39.99, £21.99) appear nowhere in the app; phone: the columns stack, no sideways scroll, ✕ on screen
 // Run: node tests/test_plans.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (o) => {
   localStorage.setItem('vi-theme', o.theme); localStorage.setItem('vi_declined_demo', 'true');
@@ -19,7 +20,7 @@ const seed = (o) => {
   localStorage.setItem('pos_ov1', JSON.stringify({ income: [{ id: 1, name: 'Salary', amount: 2400, cat: 'salary' }], expenses: [{ id: 3, name: 'Rent', amount: 700, type: 'ce' }] }));
 };
 (async () => {
-  const src = fs.readFileSync('/home/user/Vault-It/index.html', 'utf8');
+  const src = fs.readFileSync(require('./lib/vi').INDEX, 'utf8');
   ok(!/£4\.99|£39\.99|£21\.99/.test(src), 'the old prices (£4.99, £39.99, £21.99) are gone from the app');
   ok(!/Continue on free tier|Always free\. Core tools forever|free lifetime/i.test(src), 'no free-tier or free-lifetime promise is left in the app');
   const links = src.match(/https:\/\/buy\.stripe\.com\/[A-Za-z0-9]+/g) || [];

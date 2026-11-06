@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 (async()=>{
@@ -11,7 +12,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
     localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'LCWRA',amount:430}],expenses:[]}));
     localStorage.setItem('pos_al1',JSON.stringify({cashAccounts:[{id:1,name:'Cash',balance:9500}],stocks:[],otherAssets:[],crypto:[],liabilities:[]}));
   });
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(7500);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(7500);
   ok(await page.locator('#sync-banner').count()===1,'signed-out device with unsynced edits shows the "not backed up" banner');
   ok(/Sign in to back up/.test(await page.innerText('#sync-banner')),'banner offers sign-in');
   ok(/Not signed in/.test(await page.evaluate(()=>{viSyncStatus();return document.getElementById('sync-status').textContent;})),'Settings status explains it');

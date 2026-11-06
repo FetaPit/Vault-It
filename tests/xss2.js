@@ -1,9 +1,10 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 (async()=>{
   const b=await chromium.launch(); const page=await (await b.newContext({viewport:{width:1280,height:1000}})).newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message));
   await page.addInitScript(()=>{localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:"Pete's",email:'t@t.com'}));});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   ok((await page.evaluate(()=>JSON.parse(localStorage.getItem('vi_user')).name))==='Pete’s','apostrophes kept (as ’), name intact');
   await page.evaluate(()=>showTab('assets'));await page.evaluate(()=>showSubtab('assets','stocks',null));

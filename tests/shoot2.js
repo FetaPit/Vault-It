@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const tag=process.argv[2]||'a';
 (async()=>{
@@ -8,7 +9,7 @@ const tag=process.argv[2]||'a';
     localStorage.setItem('vi_settings',JSON.stringify({fontSize:'large',contrast:'standard',motion:'full',currency:'GBP'}));
     localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'UC',amount:381,cat:'benefits'},{id:2,name:'PIP',amount:778,cat:'benefits'},{id:5,name:'LCWRA',amount:430,cat:'benefits'}],expenses:[{id:3,name:'Rent',amount:700,type:'ce'},{id:4,name:'Food',amount:300,type:'ve'},{id:6,name:'Phone',amount:30,type:'ce'},{id:7,name:'Energy',amount:120,type:'ce'}]}));
     localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:1,name:'Virgin Credit Card',original:2502,balance:2502,rate:0,min:60,type:'credit'},{id:2,name:'Vanquis',original:2600,balance:2600,rate:29,min:125,type:'credit'},{id:3,name:'Car',original:8000,balance:5000,rate:7,min:200,type:'car'}]}));});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   await page.evaluate(()=>showTab('budget')); await page.waitForTimeout(900);
   await page.locator('#bd-sankey').scrollIntoViewIfNeeded(); await page.waitForTimeout(300);

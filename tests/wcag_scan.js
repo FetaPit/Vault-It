@@ -1,5 +1,6 @@
 // WCAG AA text scan for every tab and Assets sub-tab: node tests/wcag_scan.js [tabs]  (THEME=dark for Night). Lists anything under 4.5:1 (3:1 for large text).
 const THEME = process.env.THEME === 'dark' ? 'dark' : 'light';
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const seed = (THEME) => { localStorage.setItem('vi-theme',THEME); if (localStorage.getItem('pos_debt1')) return;
   localStorage.setItem('vi_declined_demo','true'); localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10})); localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'})); localStorage.setItem('vi_pioneer',JSON.stringify({active:true,email:'t@t.com'}));
@@ -32,7 +33,7 @@ const scan = () => {
 };
 (async () => {
   const b = await chromium.launch(); const p = await (await b.newContext({ viewport: { width: 1100, height: 900 } })).newPage();
-  await p.addInitScript(seed, THEME); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2000);
+  await p.addInitScript(seed, THEME); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(2000);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   let all = [];
   for (const t of (process.argv[2] || 'overview,budget,house,assets,debt,entrepreneur,achievements,connections').split(',')) {

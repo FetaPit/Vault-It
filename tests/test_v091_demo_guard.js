@@ -5,8 +5,9 @@
 // The app is served over http://127.0.0.1 from the folder that holds VI_INDEX: on file:// headless Chrome sometimes opens a
 // page with an empty localStorage, or loses it outright (measured 4 Nov: file:// 4 of 144 page loads, http 0 of 432, same
 // load), which no real user meets and which made this kind of test flaky (test_live_value's demo car).
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const http = require('http'), fs = require('fs'), path = require('path');
-const FILE = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
+const FILE = require('./lib/vi').FILE_URL;
 const ROOT = path.dirname(FILE.slice(7)), PAGE = path.basename(FILE.slice(7));
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.css': 'text/css', '.glb': 'model/gltf-binary', '.wasm': 'application/wasm' };
 const server = http.createServer((q, r) => { const f = path.join(ROOT, decodeURIComponent(q.url.split('?')[0])); if (!f.startsWith(ROOT)) { r.writeHead(403); return r.end(); }

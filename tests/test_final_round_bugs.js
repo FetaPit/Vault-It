@@ -1,6 +1,7 @@
 // v0.7 final round, step 2: three bugs from the owner's fold-phone screenshot (22:11, 1 Nov).
 // a) the 3D caption follows the selected house type; b) Level 1 never sticks on "Counting bricks…"; c) "£n lays n bricks" shows at 884 px.
 // Run: node tests/test_final_round_bugs.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -9,7 +10,7 @@ async function open(b, w, type, errs) {
   const ctx = await b.newContext({ viewport: { width: w, height: 900 } }); await routeThree(ctx);
   const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); p.on('dialog', d => d.accept());
   await p.addInitScript(s => { if (localStorage.getItem('ht3')) return; localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' })); localStorage.setItem('vi_pioneer', JSON.stringify({ active: true, email: 't@t.com' })); localStorage.setItem('ht3', JSON.stringify(s)); }, ST(type));
-  await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+  await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
   await p.evaluate(() => showTab('house')); await p.waitForTimeout(4500);
   return { ctx, p };

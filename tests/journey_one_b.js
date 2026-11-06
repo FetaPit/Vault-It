@@ -3,10 +3,11 @@
 // two devices really do talk through it); nothing is e-mailed and no real account is touched.
 // Run: node tests/journey_one_b.js            (local file:///home/user/Vault-It/index.html)
 //      VI_APP=https://app.vault-it.co node tests/journey_one_b.js   (also checks the service worker really registers)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
-const ROOT = '/home/user/Vault-It/';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
+const ROOT = require('./lib/vi').ROOT + '/';
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const EMAIL = 'one.b@example.com', PIN = '482915';
 

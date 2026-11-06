@@ -1,6 +1,7 @@
 // Phone sign-off group D (owner, 31 Oct): Budget "Where your income flows". (6) every band has a bright stroke in its group's colour and every
 // end label has a bright leader from its block; (7) only two reds, clearly told apart (red stays the colour for owed money elsewhere).
 // Run: node tests/test_signoff_d.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_nw3d.js', 'utf8');
@@ -11,7 +12,7 @@ const EXP = [{ id: 3, name: 'Rent', amount: 700, type: 'ce' }, { id: 4, name: 'C
   for (const theme of ['dark', 'light']) for (const w of [390, 1100]) {
     const ph = w < 700, ctx = await b.newContext({ viewport: { width: w, height: 900 }, isMobile: ph, hasTouch: ph }); await ctx.route(/^https?:/, r => r.abort()); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(seed, { theme, flag: true }); await p.addInitScript(e => { const o = JSON.parse(localStorage.getItem('pos_ov1')); if (o.expenses.length < 3) { o.expenses = e; localStorage.setItem('pos_ov1', JSON.stringify(o)); } }, EXP);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#trial-banner,#tester-welcome{display:none!important}' });
     await p.evaluate(() => showTab('budget')); await p.waitForTimeout(900);
     const r = await p.evaluate(() => {

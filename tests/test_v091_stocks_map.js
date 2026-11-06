@@ -1,4 +1,5 @@
 // v0.9.1 E19, E20: Stocks allocation tree map gets more room, never clips a label, merges tiny holdings into "Other (n)", and shows logos.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
@@ -17,7 +18,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
         H(6, 2, '0P0001OXYZ12', 'Vanguard FTSE Global All Cap Index Fund GBP Acc', 60, 180), H(7, 2, 'ZZ', 'Zed', 3, 3), { id: 8, pie: 1, sym: 'OLDX', name: 'Old', units: 10, avgCost: 4200, price: 300, updated: n }, H(9, 3, 'QQ', 'Quill', 1, 1)
       ], stockPies: [{ id: 1, name: 'Trading 212 ISA' }, { id: 2, name: 'Vanguard', kind: 'fund' }, { id: 3, name: 'Tiny pie' }], activePie: 'all', cashAccounts: [], otherAssets: [], crypto: [], liabilities: [], metals: { gold: 0, silver: 0, platinum: 0, palladium: 0 } }));
     });
-    await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')); await page.waitForTimeout(1200);
+    await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1200);
     await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await page.evaluate(() => { showTab('assets'); showSubtab('assets', 'stocks', null); stkSetAlloc('tree'); });
     await page.waitForTimeout(800);

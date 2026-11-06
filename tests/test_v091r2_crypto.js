@@ -3,6 +3,7 @@
 //  R20 "reconfigure the Crypto tiles as before, putting more emphasis on the iconography": each holding is a tile that leads with a large coin icon,
 //      then the figures. The amount and cost inputs and the price block are no longer squeezed side by side (the owner's red marks on screenshot 12).
 // Run: node tests/test_v091r2_crypto.js   (VI_INDEX overrides the page, e.g. /C:/path/index.html on Windows)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
@@ -21,7 +22,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
         { id: 4, sym: 'DOGE', amount: 100, price: 0.1 }
       ], stocks: [], stockPies: [], cashAccounts: [], otherAssets: [], liabilities: [], metals: { gold: 0, silver: 0, platinum: 0, palladium: 0 } }));
     });
-    await page.goto('file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html')); await page.waitForTimeout(1200);
+    await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1200);
     await page.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await page.evaluate(() => { try { _crBusy = true; } catch (e) {} showTab('assets'); showSubtab('assets', 'crypto', null); });
     await page.waitForTimeout(800);

@@ -1,8 +1,9 @@
 // v0.9.1 round 2, chunk A (chrome): R1 wordmark in proportion + swinging dial, R23/R24 profile card (credit-card ratio, bigger photo, no foil on the photo),
 // R25 Daylight page background more saturated, R26 Night header in Daylight (?hdr=paper keeps the paper one), R27 animated Night/Daylight switch.
 // Run: node tests/test_v091r2_chrome.js   (VI_INDEX points the test at another checkout, as in test_v091_chrome.js)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
+const INDEX = require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const seed = ({ t, png, user }) => {

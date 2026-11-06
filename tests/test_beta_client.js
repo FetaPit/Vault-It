@@ -1,8 +1,9 @@
 // Beta-readiness in the app: honest privacy/terms (and no false “end-to-end encrypted” claim), consent line on sign-in,
 // abuse-limit (429) messages that do NOT fall back to the built-in sender, “Download my data”, and “Delete my account”.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const INDEX_PATH = process.env.VI_INDEX || '/home/user/Vault-It/index.html', REPO = require('path').dirname(INDEX_PATH);
-const INDEX = 'file://' + INDEX_PATH;   // VI_INDEX points the test at another checkout
+const INDEX_PATH = process.env.VI_INDEX || require('./lib/vi').INDEX, REPO = require('path').dirname(INDEX_PATH);
+const INDEX = require('./lib/vi').FILE_URL;   // VI_INDEX points the test at another checkout
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const SHOT = (() => { const d = require('os').tmpdir() + '/vaultit-shots/'; try { require('fs').mkdirSync(d, { recursive: true }); } catch (e) {} return d; })();
 const MOCK = `
@@ -97,9 +98,9 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   await page.evaluate(() => { _supaUser = { id: 'u-1', email: 'pete@example.com' }; showSettings(); }); await page.waitForTimeout(300);
   const set = await page.evaluate(() => ({ dets: [...document.querySelectorAll('#settings-modal details')].map(d => ({ open: d.open, txt: d.querySelector('summary').innerText })), yd: !!document.getElementById('set-yourdata'), del: !!document.getElementById('set-delete-account'),
     }));
-  const ckVisible = await page.locator('#set-ck-form').isVisible(), ejsVisible = await page.locator('#set-ejs-svc').isVisible(), notionVisible = await page.locator('#set-notion-token').isVisible(); set.ckHidden = !ckVisible && !notionVisible; set.ejsHidden = !ejsVisible;
-  ok(set.dets.length === 2 && set.dets.every(d => !d.open), 'owner/admin tools are collapsed by default (' + set.dets.map(d => d.txt.slice(2, 30)).join(' | ') + ')');
-  ok(set.ckHidden && set.ejsHidden, 'ConvertKit / EmailJS / Notion fields are not visible to a tester');
+  const ownerHidden = !(await page.locator('#set-owner-tools').isVisible()), fieldsHidden = !(await page.locator('#set-notion-token').isVisible()) && !(await page.locator('#set-claude-key').isVisible()), goneFields = await page.evaluate(() => ['set-ck-form', 'set-ck-key', 'set-ejs-svc', 'set-cg-key', 'set-av-key', 'set-metals-key'].filter(i => document.getElementById(i)));
+  ok(ownerHidden && fieldsHidden, 'owner and developer tools (Notion, Claude, Meshy, Founding link) are hidden from a tester');
+  ok(!goneFields.length, 'ConvertKit, EmailJS and the price-feed key fields are gone (' + goneFields.join(',') + ')');
   ok(set.yd && set.del, 'Settings has “Your data” and “Delete my account”');
 
   // ── 4. Download my data ──

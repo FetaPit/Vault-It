@@ -1,8 +1,9 @@
 // v0.9.1 (Chief of Staff, 3 Nov 2026): the Net worth 3D plate and the Budget tree map were cropped at the bottom at 1440 (and on live) with real data.
 // The camera fit measured once and ignored the idle yaw swing; now it iterates and covers the swing. With real demo data, at 1100 and 1440  no gold plate outline touches the stage's bottom, left or right edge at any point of the swing, and the Budget map's blocks stay inside.
 // Run: node tests/test_v091_3d_fit.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
+const INDEX = require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_nw3d.js', 'utf8');
 const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const seed = '.length, src.indexOf('// WCAG AA')).trim().replace(/;$/, '') + ')');

@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));
@@ -8,7 +9,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
 (async()=>{
   const b=await chromium.launch(); const errs=[];
   const ctx=await b.newContext({viewport:{width:1600,height:900}}); const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(e.message));
-  await p.addInitScript(seed); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2200); await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
+  await p.addInitScript(seed); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(2200); await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   // ---- budget
   await p.evaluate(()=>showTab('budget')); await p.waitForTimeout(900);
   let r=await p.evaluate(()=>{const t=[...document.querySelectorAll('.bd-tile')];const inc=document.querySelector('.bd-inc').getBoundingClientRect(),exp=document.querySelector('.bd-exp').getBoundingClientRect(),sp=document.querySelector('.bd-split').getBoundingClientRect();

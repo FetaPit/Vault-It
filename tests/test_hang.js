@@ -1,9 +1,10 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 (async()=>{
   const b=await chromium.launch(); const ctx=await b.newContext({viewport:{width:430,height:900}}); const page=await ctx.newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message));
   await page.addInitScript(()=>{localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_pin_hash','x');localStorage.setItem('vi_pin_len','6');localStorage.setItem('vi_user',JSON.stringify({name:'P',email:'pete@example.com'}));});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1000);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1000);
   const T0=Date.now();
   await page.evaluate(()=>{
     window._f=[];

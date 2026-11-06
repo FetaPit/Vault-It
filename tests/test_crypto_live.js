@@ -2,8 +2,9 @@
 // named in the privacy notice; only coin names are sent); each tile shows the tokens held, the price and where it came from; coin
 // icons are bigger. A failed fetch keeps the last price and says how old it is; a coin CoinGecko does not list keeps the user's price.
 // CoinGecko is mocked here. Run: node tests/test_crypto_live.js   (VI_APP=file:///path/to/index.html to test another copy)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_nw3d.js', 'utf8');
 const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const seed = '.length, src.indexOf('// WCAG AA')).trim().replace(/;$/, '') + ')');

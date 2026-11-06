@@ -3,6 +3,7 @@
 // Optional `rate` (AER %) and a `moves` list on each cash account; illustrative interest, never added to net worth;
 // a take-out above the balance is refused (Q7: overdrafts belong in the Debt tracker); Undo restores exactly.
 // Run: node tests/test_v091_cash_accounts.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
@@ -19,7 +20,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
         { id: 2, name: 'Monzo pot', type: 'Current', balance: 1000 },
         { id: 3, name: 'Old pot', type: 'Savings', balance: 0.1 }], stockPies: [], metalPrices: {}, crypto: [] }));
     }, theme);
-    await p.goto('file://' + (process.env.VI_INDEX || require('path').join(__dirname, '..', 'index.html'))); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.evaluate(() => { showTab('assets'); showSubtab('assets', 'cash', null); }); await p.waitForTimeout(700);
     const T = w + ' ' + theme + ': ';

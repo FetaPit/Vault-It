@@ -3,7 +3,39 @@
 Run everything with `bash scripts/run-tests.sh` (see CLAUDE.md); the commands below run a single test.
 
 Headless-browser (Playwright) and logic tests written while hardening sync, login and data safety.
-They assume the repository is checked out at `/home/user/Vault-It` (edit the `file:///home/user/Vault-It/` paths otherwise).
+The repository can be anywhere (cloud image, CI, Windows laptop): nothing is tied to `/home/user` or `/tmp`.
+
+## How the browser tests reach the app
+
+- Every browser test starts from `tests/lib/vi.js`. It works out the repo root from `__dirname`, or from `VI_INDEX` (the path of the `index.html` under test; its folder is then the root, so a worktree or a copy can be tested).
+- It starts a small static server on `127.0.0.1` (a free port, one per test process, closed when the test ends) and turns the app's `file://` address into `http://127.0.0.1:PORT/...` at `page.goto`. The live site is http(s), and headless Chrome on `file://` sometimes empties or loses localStorage, so http is the truer test.
+- `VI_FILE=1` opens `file://` pages directly instead (the old way, for comparing). `VI_APP=<url>` still points a test at another address.
+- Temp files and logs use the system temp folder (`LOG_DIR` to choose another). Playwright is not in `package.json`.
+
+## Running on the Windows laptop (Git Bash)
+
+Run these in Git Bash, folder `~/Projects/Vault-It`, one line at a time. First time only:
+
+```
+cd ~/Projects/Vault-It
+npm install
+npm install --no-save playwright@1.56.1
+npx playwright install chromium
+```
+
+Then, each time:
+
+```
+cd ~/Projects/Vault-It
+bash scripts/run-tests.sh test_footer test_overview
+bash scripts/run-tests.sh browser
+bash scripts/run-tests.sh all
+```
+
+- `JOBS=2 bash scripts/run-tests.sh all` sets how many run at once (default 2); `SHARD=1/3` runs a third; `LOG_DIR=$HOME/vi-logs` chooses where logs go (default: your temp folder, `vaultit-test-logs`; a failing test's log is named in the output).
+- Test another copy of the app: `VI_INDEX=~/Projects/other/index.html bash scripts/run-tests.sh test_footer`.
+- Needs Git Bash (bash, `timeout`, `xargs`), Node 22 and Chromium from Playwright. PowerShell and cmd cannot run `run-tests.sh`; use Git Bash.
+- Not run on Windows yet: the paths are built with Node's `path`, `os.tmpdir()` and `file://` URL helpers, and tests that need Linux-only tools would show up in the first run there.
 
 ```
 npm i playwright esbuild @electric-sql/pglite     # + a Chromium (npx playwright install chromium)
@@ -22,7 +54,7 @@ node tests/test_beta_client.js     # privacy/terms wording, 429 handling, Downlo
 node tests/journey_one_b.js        # One B's two-device journey: phone signs up (code + PIN), desktop PINs in with the same data, sync both ways on background/foreground, sign out and back, install readiness (VI_APP=<url> also checks the live service worker)
 node tests/test_hb_l2_entry.js      # Level 2 onboarding: purchase-day mortgage entry (lender, balance, rate, fix end, term), panel summary, what-ifs on those figures
 node tests/test_house_gl.js          # the brand-book renderer (src/hb3d/house_gl.js, no three.js): palette, lazy laying, deposit delta and stagger, type switch under 100 ms, orbit, reduced motion, every house type, ?house=legacy
-node tests/test_hb_speed.js          # house builder speed (phone, CPU 4x): landed bricks drawn as one static mesh, same pixels as the old way at a fraction of the GPU work; page blocked far less while a deposit lays bricks; 30 frames a second at rest; cold load (tests/hb_coldload.js): still picture first, the house below the newest course at once, only that course lays, pixel ratio 1.25 laying / 2 at rest, demo house mid-build on a fresh device, reduced motion final state
+node tests/test_hb_speed.js          # house builder speed (phone, CPU 4x): landed bricks drawn as one static mesh, same pixels as the old way at a fraction of the GPU work (geometry under half the old way; on CI also passes if the new way is under 20 ms, as the old-way baseline swings about 40% between hosts); page blocked far less while a deposit lays bricks; 30 frames a second at rest; cold load (tests/hb_coldload.js): still picture first, the house below the newest course at once, only that course lays, pixel ratio 1.25 laying / 2 at rest, demo house mid-build on a fresh device, reduced motion final state
 node tests/test_hb_one_builder.js    # one house builder: no house flag or switch, old SVG/classic code gone, Level 2 in the brand look (paid line rises, mortgage free lit), Level 3 and own design locked under Pro, still picture without 3D
 node tests/test_hb3d_app.js          # brand 3D build in the app: clean shell, bricks laid = deposit %, ROW tag and gold slice; three.js blocked -> the still picture with the same HUD figures
 node tests/test_hb3d_levels.js       # Level 2 in the brand build (whole house as the hologram, the share you own laid in colour, gold tag MORTGAGE x% PAID / YOU OWN y%, MORTGAGE FREE), Level 3 locked, plot, types, floors, pinch zoom
@@ -91,6 +123,7 @@ node tests/test_v091_cash3d.js     # v0.9.1 chunk A: a gold plate and flag per c
 node tests/test_v091_cash3d_frame.js  # v0.9.1 cash 3D phone framing: at 390 no coin sits under a flag (projected), desktop camera unchanged at 1280, flag floor and clamp kept; served over http
 node tests/test_v091_cash3d_look.js   # v0.9.1 cash 3D look: Budget-style account chips (brand stroke and balance, white name, small logo, 10.5 px floor, off coins, chips and total, same size zoomed), real £1 coin shapes, a block of 1,000 is 100 stacks in one shape; served over http
 node tests/test_v092_cash3d_solid.js  # v0.9.2 cash 3D solid stacks: every coin shape closed (0 open edges), a block is 100 closed stacks, and from low side cameras a ray beside every stack hits its own wall (390, 1280, £ and $); served over http
+node tests/test_v092_cash3d_caption.js  # v0.9.2 cash 3D caption: with 3D on the line under the stage is the 3D one at every step (built, re-drawn off screen, in view, 390 and 1280); without WebGL the flat view keeps its own; served over http
 node tests/test_v091r2_coins.js      # v0.9.1 round 2 R16: coins open like the bricks (newest row one coin at a time, finished stacks at once on a later visit, only new money lays), in view only, flat picture until the first frame, full pixel ratio at rest, reduced motion, bars too
 node tests/v3_measure.js           # not a test: prints the cash and metals stages' draw calls, triangles and frame times at 390 px on a 4x CPU, for before and after numbers
 node tests/test_v091_model_library.js  # v0.9.1 E30: the 3D button opens a search over models/catalog.json (title, tags, item, set), pick attaches and persists, CC-BY credit on the item and in a credits panel, stand-ins say "Close match", files load only when picked or opened, service worker and build handle models/, no new host, 320/390 px
@@ -111,4 +144,15 @@ node tests/test_v091r2_item_viewer.js  # v0.9.1 round 2 R17/R18/R21: item 3D vie
 node tests/test_v091r2_house_type.js  # v0.9.1 round 2 chunk D (R12 to R15): house types as roadmap slates, chip top right of the viewport, panel with build status, compressed stat tiles and type change, no type tiles in the tab, onboarding slate picker; saved type, price, deposit and brick value unchanged
 node tests/test_v091r2_chrome.js  # v0.9.1 round 2 chunk A (R1, R23 to R27): wordmark in proportion with the dial and the dial swinging both ways, credit-card profile card with a bigger still photo, Daylight page background more saturated, Night header in Daylight (?hdr=paper keeps the paper one), the animated Night/Daylight switch (role=switch, sizes, 44 px hit area, keys, contrast, reduced motion, no first-paint animation)
 node tests/test_pitch_page.js      # vault-it.co/pitch-Eligent: 15 slides, no sideways scroll, Present one-slide view (keys, buttons, swipe, Esc), live 3D viewports (Net worth in 3D, Net worth progress) with demo data
+node tests/test_viewport_perf.js  # v0.9.2 viewport speed budgets (cash, metals, wealth inventory, liabilities on a phone profile, CPU 4x): one WebGL renderer for every item tile and full-viewer open, the model read once from tile to full viewer, one draw a frame, nothing drawing after close, at most 3 drawing-buffer size sets per cash or metals open, draw calls and triangles; wall-clock printed, not gated
+node tests/perf_viewports.js      # v0.9.2 measurement, not pass/fail: cold open to first 3D frame, long tasks and blocking time in 6 s, tap p95, draw calls, modal open and close, for the four viewports (VI_ROOT to measure another checkout, PERF_ONLY, PERF_OUT, PERF_PROFILE)
 node tests/test_pete_card.js       # vault-it.co/pete: digital business card flips (tap, Flip button, drag in 3D), house build corner on the front (still with reduced motion), Save contact vCard, no placeholders, no outside hosts
+node tests/test_v092_settings.js  # v0.9.2 Settings cleanup: section order, bank/broker/exchange connectors locked under Pro (no key entry, sign-in or request), Live prices On/Off + Refresh, owner tools hidden behind vi-owner, Theme row, Sign out in the account block, sidebar ledger colours in Night and Daylight
+node tests/perf_baseline.js      # v0.9.2 baseline, not pass/fail: every 3D viewport against the House Builder at 390 and 1100 px, CPU 4x: tap to first draw, blocking time, draws a second idle and while turning, draws per frame, canvas size, drawing after the tab is left (VI_ROOT, PB_ONLY, PB_WIDTHS, PB_OUT)
+- test_v092_coin_rims.js, test_v092_crypto_tiles.js: v0.9.2 polish (every coin's own rim colour; Pedro's chunk G nits on the crypto tiles)
+- test_v092_light_chrome.js: the install banner and the footer keep the Night look in Daylight (real rendered pixels, AA text, theme toggled four times)
+- test_v092_polish2.js: slate prices in full (£200,000) and crypto ticker dots in the coin's own colour
+- test_v092_night_aa.js: v0.9.2 Night AA contrast pass (placeholders, white-on-teal buttons, opacity floors, roadmap carousel fades only the art; Daylight unchanged)
+- test_v092_login_reach.js: every way into sign-in (fresh, PIN pad, valid session, demo, welcome, slow PIN check, library not loaded) reaches an enabled email field and Continue at iPhone, Android, keyboard-open and landscape sizes
+- test_v092_login_intro.js: sign-in intro and 3 steps above the email field, email and Continue above the fold at 390x664, bigger card on desktop (520 to 560 px, 48 px controls)
+node tests/test_v092_welcome_type.js  # welcome screens type: heading 20/24 px, sub text and the 'among the first' line at least body size, plan CTAs 14 px and 44 px tall, the main button stays on screen at 390x664, Night and Daylight

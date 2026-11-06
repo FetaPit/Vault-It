@@ -18,7 +18,8 @@ var h=(location.search.match(/[?&]hdr=(\w+)/)||[])[1]||localStorage.getItem("vi-
 /* Vault-It design tokens. Night is the default, Daylight is the light mode.
  * Switch with data-theme="light" on <html>. Generated from vault-it-brand-book.html */
 html{box-sizing:border-box}
-:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav{   /* 3D viewports stay Night in Daylight too (the model badge sits over the Night picture) */
+*,*::before,*::after{font-variant-numeric:lining-nums}   /* Syne's default zero is a small round o ("30" read as "3o"); lining figures fix it, DM Sans and Share Tech Mono already have them */
+:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav,[data-theme="light"] #pwa-install-banner,[data-theme="light"] #app-footer{   /* 3D viewports stay Night in Daylight too (the model badge sits over the Night picture) */
   color-scheme:dark;
   --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --slate:#1C2420; --line:#102221; --line2:#15302F;
   --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882; --lock:#8C939B;
@@ -149,16 +150,60 @@ function viCleanJSON(str) {   // returns the cleaned JSON text, or the original 
 /* ── PWA INSTALL BANNER ──────────────────────────────── */
 #pwa-install-banner{background:rgb(var(--teal-rgb) / .08);border-bottom:1px solid rgb(var(--teal-rgb) / .15);padding:6px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:'Share Tech Mono',monospace;font-size:max(.46rem,var(--vi-fs-1));color:var(--t2)}
 #pwa-install-banner button.install-btn{padding:4px 12px;background:var(--em);border:none;color:#080808;font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:800;cursor:pointer;clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))}
+/* v0.9.2: in Daylight the install banner keeps the Night look (solid dark behind it, as on the dark page) */
+[data-theme="light"] #pwa-install-banner{background:linear-gradient(rgb(var(--teal-rgb) / .08),rgb(var(--teal-rgb) / .08)),var(--bg)}
 #pwa-install-banner button.dismiss-btn{background:none;border:none;color:var(--t3);cursor:pointer;font-size:max(.7rem,var(--vi-fs-3));padding:0 4px}
 /* ── SETTINGS WCAG ───────────────────────────────────── */
 .settings-section{margin-bottom:18px}
-.settings-section-title{font-family:'Syne',sans-serif;font-size:max(.48rem,var(--vi-fs-0));font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.settings-section-title{font-family:'Syne',sans-serif;font-size:max(.66rem,var(--vi-fs-2));font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
 .settings-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .settings-label{font-family:'DM Sans',sans-serif;font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);min-width:90px;flex-shrink:0}
 .settings-opts{display:flex;gap:4px;flex-wrap:wrap}
 .settings-opts button{padding:4px 10px;background:var(--c3);border:1px solid var(--bd);clip-path:polygon(0 0,calc(100% - 3px) 0,100% 3px,100% 100%,3px 100%,0 calc(100% - 3px));color:var(--t2);font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;cursor:pointer;transition:all .15s}
 .settings-opts button:hover{border-color:var(--em);color:var(--tx)}
 .settings-opts button.active{background:rgb(var(--teal-rgb) / .1);border-color:var(--em);color:var(--em)}
+/* v0.9.2 Settings cleanup: one section heading, one card heading, one primary button per card, destructive actions as red outline only (Pedro 8, 9, 11, 12) */
+.settings-section{margin-bottom:20px}
+.set-box{padding:14px;margin-bottom:16px;background:rgb(var(--teal-rgb) / .04);border:1px solid rgb(var(--teal-rgb) / .2);border-radius:8px}
+.set-btns{display:flex;gap:8px;flex-wrap:wrap}
+.set-btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;min-height:36px;background:transparent;border:1px solid var(--bd2);border-radius:5px;color:var(--tx);font-family:'Syne',sans-serif;font-size:max(.66rem,var(--vi-fs-2));font-weight:700;cursor:pointer;text-decoration:none;line-height:1.2}
+.set-btn:hover{border-color:var(--em);color:var(--em)}
+.set-btn.primary{background:rgb(var(--teal-rgb) / .12);border-color:var(--em);color:var(--em)}
+.set-btn.danger{display:flex;width:100%;margin-bottom:8px;border-color:var(--red);color:var(--red);background:transparent}
+.set-btn.danger:hover{background:rgba(224,92,92,.1)}
+.set-btn:focus-visible,.settings-opts button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.set-acct{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.set-acct-email{font-family:'Share Tech Mono',monospace;font-size:max(.7rem,var(--vi-fs-3));color:var(--tx);overflow-wrap:anywhere}
+.set-plan{padding:16px;background:linear-gradient(135deg,rgb(var(--brass-rgb) / .07),rgb(var(--brass-rgb) / .02));border-radius:10px;border:1px solid rgb(var(--brass-rgb) / .35)}
+.set-plan-h{font-family:'Syne',sans-serif;font-weight:800;font-size:max(.7rem,var(--vi-fs-3));color:var(--tx);letter-spacing:.06em}
+.set-plan-foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.set-foot{display:flex;margin-top:4px}.set-foot .set-btn{flex:1}
+.set-owner-test{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.set-locked-head{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:max(.7rem,var(--vi-fs-3));color:var(--go)}
+.set-locked-head .vi-ic{width:14px;height:14px}
+#set-locked-list .sl-cat{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.66rem,var(--vi-fs-2));letter-spacing:.06em;color:var(--tx);margin:8px 0 4px}
+#set-locked-list .sl-names{display:flex;flex-wrap:wrap;gap:4px}
+#set-locked-list .sl-n{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border:1px solid var(--bd);border-radius:999px;color:var(--t2);font-size:max(.66rem,var(--vi-fs-2));cursor:default;user-select:none}
+#set-locked-list .sl-n .vi-ic{width:10px;height:10px;opacity:.7}
+#settings-modal{z-index:1200!important}
+/* Night contrast (Pedro's audit, 5 Nov): sidebar currency switcher, Settings button, VAULT-IT tab and plan price suffixes reach 4.5:1 on the dark panel. Daylight unchanged. */
+[data-theme="dark"] #left-sidebar button[data-c]{color:rgb(var(--teal-rgb) / .9)!important}
+[data-theme="dark"] #left-sidebar button[data-c].active{color:var(--em)!important}
+[data-theme="dark"] #left-sidebar button[onclick="showSettings()"]{color:var(--muted)!important}
+[data-theme="dark"] #sidebar-toggle,[data-theme="dark"] #sidebar-toggle *{opacity:1!important}
+[data-theme="dark"] .set-tier-price > span:not(.vi-tier-after){opacity:.85}
+.set-plan-foot + .settings-hint{overflow-wrap:normal}
+.set-nb{white-space:nowrap}
+#settings-modal .settings-opts button{min-height:32px}
+@media(max-width:600px){
+  #settings-modal{padding-top:calc(var(--vi-hdr-h,56px) + 8px)!important;padding-bottom:calc(var(--vi-tabbar-h,64px) + env(safe-area-inset-bottom,0px))!important}
+  #settings-modal > div{padding:22px 16px!important}
+  .settings-row{flex-direction:column;align-items:stretch;gap:6px}
+  .settings-opts{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:100%}
+  .settings-opts button{padding:8px 6px}
+  #set-live .settings-row .set-btn{width:100%}
+  .set-btns .set-btn,.set-plan-foot .set-btn{flex:1 1 140px}
+}
 .compact-nav .nav-tab-label{display:none}
 .reduced-motion *{transition:none!important;animation:none!important}
 
@@ -7835,7 +7880,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
    PURPOSEOS GLOBAL — 2-tab build: Overview + House
 ═══════════════════════════════════════════════════════ */
 
-:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav {
+:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav,[data-theme="light"] #pwa-install-banner,[data-theme="light"] #app-footer {
   /* old names, kept as aliases of the brand tokens for one release */
   --c1: var(--panel); --c2: var(--surf2); --c3: var(--slate); --c4: var(--line2);
   --em: var(--teal); --em2: var(--teal); --em3: var(--faint); --dp: var(--teal-deep);
@@ -8852,19 +8897,29 @@ body::before {
 }
 .welcome-h2 {
   font-family: 'Syne', sans-serif;
-  font-size: .9rem;
-  font-weight: 800;
+  font-size: 20px;   /* v0.9.2: 20 px on a phone, 24 px from 700 px up (was 11.7 and 15 px, smaller than the app's body text) */
+  font-weight: 700;   /* Syne 700 for sentence-length headings (Pedro, 5 Nov: 800 is too extended to read easily); 800 stays for the wordmark and short titles */
   color: var(--tx);
   margin-bottom: 6px;
   line-height: 1.3;
 }
 .welcome-sub {
   font-family: 'Syne', sans-serif;
-  font-size: max(.58rem,var(--vi-fs-2));
+  font-size: max(14.5px,var(--vi-fs-3));
   color: var(--t2);
   line-height: 1.6;
   margin-bottom: 18px;
 }
+.welcome-lead{font-family:'DM Sans',sans-serif;font-size:max(14.5px,var(--vi-fs-3));color:var(--t2);line-height:1.6;max-width:340px;margin:0 auto}
+@media(min-width:700px){.welcome-h2{font-size:24px}.welcome-sub,.welcome-lead{font-size:max(1rem,16px)}.welcome-lead{max-width:420px}}
+/* the main button stays on screen: on a short phone it pins to the foot of the card while the form scrolls under it */
+.welcome-foot{position:sticky;bottom:-24px;z-index:2;margin:14px 0 -24px;padding:10px 0 24px;background:var(--c1);border-top:1px solid var(--bd)}   /* -24px = the box's bottom padding, so nothing shows under the pinned button */
+.welcome-foot .welcome-cta{min-height:44px;font-size:max(14px,var(--vi-fs-3));color:#fff}
+.welcome-h2{text-wrap:balance}
+#offer-headline{font-weight:700}
+@media(max-height:720px){.welcome-icon{display:none!important}.welcome-tagline{display:none}.welcome-box{padding-top:18px;margin-top:8px;margin-bottom:8px}.welcome-head{margin-bottom:10px!important;padding-bottom:10px!important}.welcome-intro{margin-bottom:8px!important}#w-step-dots{margin-bottom:10px!important}.welcome-h2{margin-bottom:4px}.welcome-sub{margin-bottom:10px}}   /* a short phone: the form shows above the pinned button */
+.welcome-congrats{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--tx);line-height:1.3;margin-bottom:6px}
+@media(min-width:700px){.welcome-congrats{font-size:20px}}
 .welcome-field {
   margin-bottom: 10px;
 }
@@ -8896,7 +8951,7 @@ body::before {
   margin: 16px 0 10px;
   font-family: 'Syne', sans-serif;
   font-size: max(.7rem,var(--vi-fs-3));
-  font-weight: 800;
+  font-weight: 700;
   color: var(--tx);
 }
 .welcome-opts {
@@ -10486,8 +10541,8 @@ input:focus, textarea:focus, select:focus {
 .pw-usage-pill.at-limit{background:rgba(231,76,60,.1);color:#e74c3c;border-color:rgba(231,76,60,.28)}
 @keyframes pw-pulse{0%,100%{filter:drop-shadow(0 0 4px rgb(var(--brass-rgb) / .5))}50%{filter:drop-shadow(0 0 12px rgb(var(--brass-rgb) / .9))}}
 /* ── LOGIN / AUTH ──────────────────────────────────────────────── */
-#login-overlay{position:fixed;inset:0;z-index:10001;background:radial-gradient(ellipse at 60% 30%,rgb(var(--teal-rgb) / .06) 0%,rgb(var(--panel-rgb) / 1) 70%),var(--panel);display:flex;align-items:center;justify-content:center;padding:16px}
-.auth-card{background:rgb(var(--panel-rgb) / .95);border:1px solid rgb(var(--brass-rgb) / .35);border-radius:16px;padding:32px 28px;max-width:360px;width:100%;position:relative;box-shadow:0 0 60px rgb(var(--brass-rgb) / .08),0 24px 60px rgba(0,0,0,.8)}
+#login-overlay{position:fixed;inset:0;z-index:10001;background:radial-gradient(ellipse at 60% 30%,rgb(var(--teal-rgb) / .06) 0%,rgb(var(--panel-rgb) / 1) 70%),var(--panel);display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}   /* v0.9.2: scrolls when the card is taller than the screen (PIN pad, keyboard open, landscape): it used to be centred and clipped, so the way back to the email field was off screen */
+.auth-card{margin:auto;background:rgb(var(--panel-rgb) / .95);border:1px solid rgb(var(--brass-rgb) / .35);border-radius:16px;padding:32px 28px;max-width:360px;width:100%;position:relative;box-shadow:0 0 60px rgb(var(--brass-rgb) / .08),0 24px 60px rgba(0,0,0,.8)}
 .auth-logo{font-family:'Syne',sans-serif;font-weight:900;font-size:1.3rem;letter-spacing:.25em;background:linear-gradient(90deg,#b8902e,#f0d878,var(--brass));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:4px}
 .auth-sub{font-family:'Share Tech Mono',monospace;font-size:max(.42rem,var(--vi-fs-1));color:var(--t3);letter-spacing:.12em;text-align:center;margin-bottom:24px;text-transform:uppercase}
 .auth-step{display:none}
@@ -10498,6 +10553,24 @@ input:focus, textarea:focus, select:focus {
 .auth-btn{width:100%;margin-top:12px;padding:11px;background:linear-gradient(90deg,rgb(var(--brass-rgb) / .9),rgba(184,144,46,.9));border:none;border-radius:6px;color:#000;font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-2));font-weight:800;letter-spacing:.14em;cursor:pointer;text-transform:uppercase;transition:opacity .2s,transform .1s}
 .auth-btn:hover{opacity:.92;transform:translateY(-1px)}
 .auth-btn.secondary{background:transparent;border:1px solid rgb(var(--teal-rgb) / .3);color:var(--em);margin-top:8px}
+.auth-btn{min-height:44px}
+.auth-intro{font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2));line-height:1.45;color:var(--t2);text-align:center;margin:-6px 0 10px}   /* v0.9.2: what Vault-It is, in one line (Pete) */
+.auth-steps .nw{white-space:nowrap}
+.auth-steps{font-family:'Share Tech Mono',monospace;font-size:max(.46rem,var(--vi-fs-1));line-height:1.55;color:var(--t3);text-align:center;margin:0 0 14px}   /* the three steps, as in the beta email */
+/* a wide desktop window (owner, 5 Nov: the card was too small): a bigger card, one step larger text, 48 px+ controls. Phones keep the rules above. */
+@media (min-width:900px){
+  .auth-card{max-width:540px;padding:44px 48px}
+  .auth-sub{font-size:max(.62rem,var(--vi-fs-2));margin-bottom:30px}
+  .auth-intro{font-size:max(.8rem,var(--vi-fs-3));margin:-8px 0 14px}
+  .auth-steps{font-size:max(.58rem,var(--vi-fs-2));margin-bottom:22px}
+  .auth-label{font-size:max(.64rem,var(--vi-fs-2));margin-bottom:8px}
+  .auth-inp{font-size:max(.95rem,var(--vi-fs-3));padding:14px 16px;min-height:52px}
+  .auth-btn{min-height:52px;font-size:max(.72rem,var(--vi-fs-3));margin-top:16px;padding:14px}
+  .auth-info{font-size:max(.52rem,var(--vi-fs-1));margin-top:14px}
+  .auth-footer{font-size:max(.5rem,var(--vi-fs-1))}
+}
+.auth-btn.auth-switch{margin-top:10px}   /* the way back to the email field: a normal full-size button, right under the email shown on the PIN pad */
+@media (max-height:760px){.auth-card{padding:20px 20px}.auth-sub{margin-bottom:12px}.auth-pin-dots{margin:10px 0}.auth-pin-key{padding:10px 0}.auth-footer{margin-top:10px}.auth-divider{margin:10px 0}}
 .auth-code-box{background:rgb(var(--brass-rgb) / .06);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:8px;padding:14px;margin-bottom:14px;text-align:center}
 .auth-code-num{font-family:'Syne',sans-serif;font-weight:900;font-size:1.8rem;letter-spacing:.25em;color:#fff;animation:card-num-pulse 2s ease-in-out infinite}
 .auth-code-hint{font-family:'Share Tech Mono',monospace;font-size:max(.4rem,var(--vi-fs-1));color:var(--t3);margin-top:4px}
@@ -10869,7 +10942,7 @@ button.bd-ic{cursor:pointer}
 .cr-src{font:400 max(.5rem,var(--vi-fs-1))/1.35 'Share Tech Mono',monospace;margin-bottom:6px}
 .cr-src-live{color:var(--green)}.cr-src-stale{color:var(--amber)}.cr-src-own{color:var(--t2)}
 /* crypto holding tiles (v0.9.1 round 2, owner R20: "as before, more emphasis on the iconography"): a big coin icon leads, then the price, then the inputs in their own row */
-.cr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,236px),1fr));gap:12px;padding:12px 0}
+.cr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,236px),1fr));gap:12px;padding:12px 0}
 .cr-tile{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"tk tk" "pr pr" "ins ins" "va pl" "x x";gap:10px 12px;padding:18px 14px 14px;min-width:0;border:1px solid rgb(var(--teal-rgb) / .2);border-radius:12px;background:rgb(var(--panel-rgb) / .9)}
 .cr-tile .c-tk{grid-area:tk;flex-direction:column;align-items:center;gap:8px;text-align:center}
 .cr-tile .stk-tkb{flex:none;width:100%}
@@ -10887,7 +10960,10 @@ button.bd-ic{cursor:pointer}
 .cr-tile .stk-lb{display:block}
 .cr-tile .c-va{grid-area:va;text-align:left;font-size:max(.8rem,var(--vi-fs-3));font-weight:700}
 .cr-tile .c-pl{grid-area:pl;text-align:right;align-self:end}
-.cr-tile .c-x{grid-area:x;width:100%!important;justify-content:center}
+.cr-tile .c-x{grid-area:x;width:auto!important;justify-self:center;justify-content:center;gap:6px;min-height:36px;padding:4px 14px!important;border-color:rgb(var(--red-rgb) / .3)!important;background:none}   /* v0.9.2: a quiet centred button, not a heavy full-width bar (Pedro, chunk G) */
+.cr-tile .c-x .vi-ic{width:14px;height:14px;flex:none}
+.cr-tile .cr-src{text-wrap:balance;overflow-wrap:anywhere}   /* v0.9.2: the long price line breaks into even lines, not one cramped one (Pedro, chunk G) */
+.cr-tile .cr-src .cr-ch{display:block}
 @media(max-width:600px){.cr-tile .stk-hl{width:84px!important;height:84px!important}}
 /* the coin (owner, 4 Nov: "light turn animations like the Financial freedom roadmap", then "a satisfying thickness and light reflections upon rotating, no more than 10 degrees"):
    a gentle swing of 10 degrees either way; fourteen thin gold discs behind the face give it real edge thickness; a soft light streak sweeps the face as it swings; all still for reduced motion */
@@ -11440,7 +11516,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 [data-theme="light"] .conn-name span{color:var(--text)!important}
 [data-theme="light"] button.on,[data-theme="light"] .chart-filter-btn.on{color:var(--text)!important}
 [data-theme="light"] button[onclick^="resetAllAchievements"]{color:#7A1414!important}
-[data-theme="light"] button[onclick^="refreshAllLiveConns"]{color:var(--text)!important}
 [data-theme="light"] .sym{color:var(--gold)!important}
 /* 3D viewports keep the Night look: their own Night background fills any letterbox around the drawing */
 [data-theme="light"] .scene,[data-theme="light"] .inv-stage{background:var(--bg)}
@@ -11601,6 +11676,43 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .ov-ach-tok{flex:none}
 .ov-ach-badge{width:auto;height:auto;background:none;border:none}
 @media(prefers-reduced-motion:reduce){.wr-xpbar i{transition:none}}
+/* v0.9.2 Night AA contrast pass (Pedro, docs/creative/night-aa): Night only, Daylight untouched */
+/* Night AA contrast pass (candidate). Every rule is Night only; Daylight rules are untouched. */
+/* G1 placeholders */
+[data-theme="dark"] :is(input,textarea)::placeholder{color:#9AA0A6;opacity:1}
+/* G2 buttons: white on the existing teal-deep, dark ink on the hover teal */
+[data-theme="dark"] .btn-add-data{color:#fff}
+[data-theme="dark"] .btn-add-data:hover{color:var(--on-teal)}
+[data-theme="dark"] .btn-add{background:linear-gradient(135deg,#006B67,#00837E);color:#fff}
+[data-theme="dark"] .btn-add:hover{color:var(--on-teal)}
+/* G3 faded labels: raise the opacity floor (Daylight already runs these at 1) */
+[data-theme="dark"] .card-lbl{opacity:.8}
+[data-theme="dark"] .card-lbl .vi-dim{opacity:.9}
+[data-theme="dark"] .ov-ms-title{opacity:.9}
+[data-theme="dark"] .ov-chart-title{opacity:.95}
+[data-theme="dark"] .vi-eyebrow{opacity:.8!important}
+[data-theme="dark"] .vi-eyebrow.vi-sub{opacity:1!important}
+[data-theme="dark"] .hb-lv.lock{opacity:.8}
+[data-theme="dark"] .scene-cap{opacity:.65}
+[data-theme="dark"] .price-edit-row label{opacity:.7}
+/* G5 3D overlay hints */
+[data-theme="dark"] .vp-gi-hd{color:rgb(var(--teal-rgb) / .75)}
+[data-theme="dark"] .vp-gi-lbl{color:rgb(var(--teal-rgb) / .75)}
+[data-theme="dark"] .vp-gi-lbl b{color:rgb(var(--teal-rgb) / .95)}
+[data-theme="dark"] .vp-key{color:rgb(var(--teal-rgb) / .75)}
+/* G6 hard-coded low alpha */
+[data-theme="dark"] #logList>div{color:var(--lock)!important}
+[data-theme="dark"] #btnReset{color:var(--lock)}
+/* G7 locked slate names */
+[data-theme="dark"] .wt.st-lock,[data-theme="dark"] .wt.st-skip,[data-theme="dark"] .wt.st-todo{--wt-l:#8C939B}
+/* G9 social links */
+[data-theme="dark"] .dev-links a[href*="linkedin"]{color:#4CA6DA!important}
+[data-theme="dark"] .dev-links a[href*="instagram"]{color:#F2588C!important}
+/* Pedro's two follow-up lifts (one step, Night only): the Metals summary sub text and the edge handle's label, which sits on a pulsing glow */
+[data-theme="dark"] #metals-kpis .ov-kpi-sub{color:#A7ADB3}
+[data-theme="dark"] #sidebar-toggle span:last-child{opacity:1!important}
+/* footer separators (decorative middots) */
+[data-theme="dark"] .footer-copy>span[style*="opacity:.4"]{opacity:1!important}
 </style>
 </head>
 <body>
@@ -11763,6 +11875,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 
     <!-- Step 1: email -->
     <div id="auth-email-step" class="auth-step active">
+      <div class="auth-intro">Track your net worth, clear your debt and build towards your house goal, all in one private vault.</div>
+      <div class="auth-steps"><span class="nw">1. Enter your email</span> &nbsp;<span class="nw">2. Type the 6-digit code we email you</span> &nbsp;<span class="nw">3. Choose a 6-digit PIN.</span> Then email + PIN signs you in on any device.</div>
       <div class="auth-label">Your email address</div>
       <input id="auth-email" class="auth-inp" type="email" placeholder="you@example.com" autocomplete="email"
         onkeydown="if(event.key==='Enter')authSubmitEmail()">
@@ -11773,17 +11887,14 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 
     <!-- Step 2: OTP code verification -->
     <div id="auth-otp-step" class="auth-step">
-      <div style="text-align:center;margin-bottom:12px">
-        <div style="font-size:1.6rem;margin-bottom:6px">📧</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));color:var(--em);letter-spacing:.1em">CODE SENT</div>
-      </div>
-      <div class="auth-label">Check your inbox at <span id="auth-otp-email" style="color:var(--em)"></span></div>
-      <div style="font-size:max(.45rem,var(--vi-fs-1));color:var(--t3);text-align:center;margin-bottom:14px;line-height:1.5">Enter the 6-digit code from your email below.<br><span style="opacity:.6">Not seeing it? Check your spam folder.</span></div>
+      <div class="auth-label" style="text-align:center;font-size:max(.7rem,var(--vi-fs-3));margin-bottom:4px">Check your inbox</div>
+      <div id="auth-otp-email" style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:max(.56rem,var(--vi-fs-2));color:var(--em);margin-bottom:10px;overflow-wrap:anywhere"></div>
+      <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);text-align:center;margin-bottom:14px;line-height:1.5">Enter the 6-digit code. Not seeing it? Check spam.</div>
       <input id="auth-otp-inp" class="auth-inp" type="text" inputmode="numeric" maxlength="8" placeholder="000000"
         onkeydown="if(event.key==='Enter')authVerifyOTP()">
       <button class="auth-btn" onclick="authVerifyOTP()">Verify Code →</button>
-      <button class="auth-btn secondary" onclick="authGoBack()">← Use different email</button>
-      <button class="auth-btn secondary" onclick="authResendOTP()" style="margin-top:4px;opacity:.6">Resend code</button>
+      <button class="auth-btn secondary" onclick="authGoBack()">← Use a different email</button>
+      <button class="auth-btn secondary" onclick="authResendOTP()" style="margin-top:8px">Resend code</button>
     </div>
 
     <!-- Step 3: Set PIN (shown after first successful auth) -->
@@ -11819,6 +11930,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       </div>
       <div class="auth-label" style="text-align:center">Enter your PIN</div>
       <div id="auth-pin-email" style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));color:var(--em);margin-top:-4px"></div>
+      <button class="auth-btn secondary auth-switch" id="auth-pin-switch" onclick="authGoBack()">← Use a different email</button>
       <div class="auth-pin-dots" id="pin-dots"></div>
       <div id="auth-pin-status" style="text-align:center;font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);min-height:14px"></div>
       <div class="auth-pin-pad">
@@ -11835,8 +11947,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <button class="auth-pin-key" onclick="_enterPinKey('0')">0</button>
         <button class="auth-pin-key del" onclick="_enterPinDel()">⌫</button>
       </div>
-      <button class="auth-btn secondary" onclick="authGoBack()" style="margin-top:10px;opacity:.55;font-size:max(.48rem,var(--vi-fs-1))">← Use a different email</button>
-      <button class="auth-btn secondary" onclick="authForgotPin()" style="margin-top:4px;opacity:.55;font-size:max(.48rem,var(--vi-fs-1))">Forgot PIN? Get an email code</button>
+      <button class="auth-btn secondary" onclick="authForgotPin()" style="margin-top:8px">Forgot PIN? Get an email code</button>
     </div>
 
     <div id="auth-captcha" style="display:none;margin:10px 0;min-height:65px;text-align:center"></div>   <!-- Cloudflare Turnstile, only when a site key is set -->
@@ -11934,7 +12045,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     </div>
   </div>
   <div style="margin-top:auto;padding-top:12px;border-top:1px solid rgb(var(--teal-rgb) / .08)">
-    <button onclick="showSettings()" title="Settings & API Keys" style="width:100%;background:rgb(var(--panel-rgb) / 0.92);border:1px solid rgb(var(--teal-rgb) / 0.25);border-radius:6px;padding:8px 11px;color:rgba(90,96,104,0.9);font-size:max(.62rem,var(--vi-fs-2));cursor:pointer;white-space:nowrap;transition:border-color .2s,color .2s;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em" onmouseover="this.style.borderColor='rgb(var(--teal-rgb) / 0.6)';this.style.color='rgba(232,232,232,0.9)'" onmouseout="this.style.borderColor='rgb(var(--teal-rgb) / 0.25)';this.style.color='rgba(90,96,104,0.9)'">⚙ Settings</button>
+    <button onclick="showSettings()" title="Settings" style="width:100%;background:rgb(var(--panel-rgb) / 0.92);border:1px solid rgb(var(--teal-rgb) / 0.25);border-radius:6px;padding:8px 11px;color:rgba(90,96,104,0.9);font-size:max(.62rem,var(--vi-fs-2));cursor:pointer;white-space:nowrap;transition:border-color .2s,color .2s;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.08em" onmouseover="this.style.borderColor='rgb(var(--teal-rgb) / 0.6)';this.style.color='rgba(232,232,232,0.9)'" onmouseout="this.style.borderColor='rgb(var(--teal-rgb) / 0.25)';this.style.color='rgba(90,96,104,0.9)'">Settings</button>
   </div>
 </div>
 
@@ -11988,9 +12099,9 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
   <div class="welcome-box">
 
     <!-- Pioneer welcome header -->
-    <div style="text-align:center;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgb(var(--brass-rgb) / .18)">
+    <div class="welcome-head" style="text-align:center;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgb(var(--brass-rgb) / .18)">
       <!-- Large vault icon -->
-      <div style="display:flex;justify-content:center;margin-bottom:14px"><div style="width:80px;height:80px"><svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 14px var(--teal))">
+      <div class="welcome-icon" style="display:flex;justify-content:center;margin-bottom:14px"><div style="width:80px;height:80px"><svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 14px var(--teal))">
   <defs>
     <radialGradient id="vaultGlow" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#44c0b9" stop-opacity="0.12"/>
@@ -12052,12 +12163,12 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       </div>
     </div>
     <!-- Pioneer congrats message -->
-    <div style="text-align:center;margin-bottom:16px">
-      <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);line-height:1.3;margin-bottom:6px">
+    <div class="welcome-intro" style="text-align:center;margin-bottom:16px">
+      <div class="welcome-congrats">
         Congrats on becoming<br>a Vault-It Pioneer.
       </div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);line-height:1.6;max-width:340px;margin:0 auto">
-        You're among the first to vault. That means you're getting access before anyone else, and shaping what this becomes.
+      <div class="welcome-lead">
+        You're among the first to vault, and shaping what this becomes.
       </div>
     </div>
         <!-- Step indicator -->
@@ -12112,7 +12223,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <button type="button" class="w-curr-btn" data-c="INR" onclick="wSetCurrency('INR')" style="flex:1;padding:8px 4px;background:rgb(var(--teal-rgb) / .05);border:1px solid rgb(var(--teal-rgb) / .15);border-radius:6px;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));cursor:pointer">₹ INR</button>
         </div>
       </div>
-      <button class="welcome-cta" onclick="wStep1Next()" style="margin-top:14px">Continue →</button>
+      <div class="welcome-foot"><button class="welcome-cta" onclick="wStep1Next()">Continue →</button></div>
     </div>
 
     <!-- STEP 2: Profile setup (new users) -->
@@ -12154,7 +12265,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
         <div class="w-view-note">You can switch any time in Settings.</div>
       </div>
-      <button class="welcome-cta" onclick="wStep2Submit()" style="margin-top:14px">Start Vaulting →</button>
+      <div class="welcome-foot"><button class="welcome-cta" onclick="wStep2Submit()">Start Vaulting →</button></div>
     </div>
 
     <!-- STEP 3: First milestone -->
@@ -12179,7 +12290,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <span><b>Create a second income</b>: one stream changes everything</span>
         </button>
       </div>
-      <button class="welcome-cta" onclick="wStep3Submit()" style="margin-top:14px">Start Vaulting →</button>
+      <div class="welcome-foot"><button class="welcome-cta" onclick="wStep3Submit()">Start Vaulting →</button></div>
       <div style="text-align:center;margin-top:8px">
         <button class="welcome-skip-link" onclick="wStep3Skip()">Skip for now. I'll decide later</button>
       </div>
@@ -12805,7 +12916,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 
         <div id="house-pro-lock" style="position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgb(var(--panel-rgb) / .82);backdrop-filter:blur(6px);text-align:center;padding:24px">
           <div style="font-size:1.8rem;margin-bottom:10px">🔒</div>
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;color:var(--tx);margin-bottom:6px">Your house fills as you save</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--tx);margin-bottom:6px">Your house fills as you save</div>
           <div style="font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.6;max-width:260px;margin-bottom:16px">Every deposit adds bricks. Watch your home being built in real time. Pro only.</div>
           <button onclick="showUpgrade('annual')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:max(.6rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">Upgrade to Pro →</button>
         </div>
@@ -13593,221 +13704,143 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 
 <!-- Settings Modal -->
 
-<div id="settings-modal" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto">
+<div id="settings-modal" role="dialog" aria-modal="true" aria-label="Settings" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto">
   <div style="background:var(--c2);border:1px solid var(--bd2);border-radius:12px;padding:28px 32px;width:500px;max-width:95vw;margin-bottom:40px">
-    <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:20px;color:var(--tx)">⚙ Settings &amp; API Keys</div>
+    <div data-set-title style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:20px;color:var(--tx)">Settings</div>
 
-    <!-- Help and app tour (owner, 1 Nov 2026: "a clear button that can trigger the tour again") -->
-    <div id="set-help" style="margin-bottom:20px;padding:14px;background:rgb(var(--teal-rgb) / .04);border-radius:8px;border:1px solid rgb(var(--teal-rgb) / .2)">
-      <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:700;color:var(--em);margin-bottom:6px;letter-spacing:.06em">Help and app tour</div>
-      <div style="font-size:max(.48rem,var(--vi-fs-1));color:var(--t3);line-height:1.6;margin-bottom:10px">A one-minute look at each tab, or ask a question and browse the FAQs.</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn-add-data" id="set-tour-replay" type="button" onclick="viTourReplay()">Replay the app tour</button>
-        <button class="btn-add-data" type="button" onclick="closeSettings();viHelpOpen('faq')">Open help and FAQs</button>
+    <!-- 1. Account: email, plan (current price only, painted from VI_PLANS by viPricePaint()), manage or cancel, sign out.
+         Plans (owner, 4 Nov 2026 evening, renamed 5 Nov: Pioneer = monthly and yearly (yearly is Pro), Lifetime licence = once; read-only after the 30 days has no tier name. -->
+    <div class="settings-section set-box" id="set-account">
+      <div class="settings-section-title">Account</div>
+      <div class="set-acct">
+        <div><div class="settings-hint">Signed in as</div><div id="set-acct-email" class="set-acct-email">This device only</div></div>
+        <button class="set-btn" type="button" data-signout onclick="signOut()">Sign out</button>
+      </div>
+      <div class="set-plan">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">
+          <span style="font-size:.9rem;animation:pw-pulse 2.5s ease-in-out infinite;display:inline-block" aria-hidden="true">◆</span>
+          <span class="set-plan-h">Your plan</span>
+          <span id="set-pioneer-badge" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:max(.66rem,var(--vi-fs-2))"></span>
+        </div>
+        <div id="set-pioneer-active" style="display:none;font-size:max(.66rem,var(--vi-fs-2));color:var(--gr);margin-bottom:10px;line-height:1.5"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access active. Thank you for backing Vault-It.</div>
+        <div id="set-pioneer-inactive" style="font-size:max(.66rem,var(--vi-fs-2));color:var(--t2);margin-bottom:8px;line-height:1.5"></div>
+        <div id="set-plan-extras" class="settings-hint" style="margin-bottom:10px;line-height:1.55">Pioneer, monthly or yearly, is the whole app with editing on, plus your own 3D house design and the AI house model. Pioneer yearly (Pro) adds early access to new features, roadmap voting and family mode (coming soon). The Lifetime licence (one payment, 100 places, beta testers first) is Pioneer for the life of the service. The six preset houses are in every plan.</div>
+        <div class="set-tiers">
+          <button type="button" class="set-tier" id="set-plan-monthly" data-plan="monthly" onclick="showUpgrade('monthly')"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg><span class="set-tier-name" data-tier-name>Pioneer</span><span class="set-tier-price" data-plan-price="monthly">£5.99<span>/mo</span></span><span class="set-tier-cta" data-cta=""></span></button>
+          <button type="button" class="set-tier" id="set-plan-annual" data-plan="annual" onclick="showUpgrade('annual')"><svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg><span class="set-tier-name" data-tier-name>Pioneer</span><span class="set-tier-price" data-plan-price="annual">£59.99<span>/yr</span></span><span class="set-tier-cta" data-cta=""></span></button>
+          <button type="button" class="set-tier" id="set-plan-founder" data-plan="founder" onclick="showUpgrade('founder')"><svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg><span class="set-tier-name" data-tier-name>Lifetime licence</span><span class="set-tier-price" data-plan-price="founder">£149<span> once</span></span><span class="set-tier-cta" data-cta=""></span></button>
+        </div>
+        <div class="set-tier-terms"><p><b>Pioneer (monthly):</b> <span data-plan-terms="monthly"></span></p><p><b>Pioneer (yearly):</b> <span data-plan-terms="annual"></span></p><p><b>Lifetime licence:</b> <span data-plan-terms="founder"></span></p></div>
+        <div class="set-plan-foot">
+          <a class="set-btn primary" data-manage-sub href="mailto:hello@vault-it.co?subject=Manage%20or%20cancel%20my%20Vault-It%20plan">Manage or cancel my plan</a>
+          <button class="set-btn" type="button" onclick="closeSettings();showPaywall('assets')">Already paid?</button>
+        </div>
+        <div class="settings-hint" style="margin-top:6px">There is no self-service page for plans yet. Email <span class="set-nb">hello@vault-it.co</span> and we will change or cancel it for you.</div>
       </div>
     </div>
 
-    <!-- Display & Accessibility -->
-    <div class="settings-section">
-      <div class="settings-section-title">Display &amp; Accessibility</div>
+    <!-- 2. Appearance and accessibility. Theme reuses viToggleTheme() through viSetTheme(); the header button is untouched. -->
+    <div class="settings-section set-box" id="set-appearance">
+      <div class="settings-section-title">Appearance and accessibility</div>
+      <div class="settings-row"><label class="settings-label">Theme</label><div class="settings-opts" id="set-theme" role="group" aria-label="Theme"><button type="button" data-val="dark" onclick="viSetTheme('dark')">Night</button><button type="button" data-val="light" onclick="viSetTheme('light')">Daylight</button><button type="button" data-val="auto" onclick="viSetTheme('auto')">Follow my device</button></div></div>
       <div class="settings-row"><label class="settings-label">View</label><div class="settings-opts" id="set-view"><button data-val="simple" onclick="setSetting('view','simple',this)">Simplified</button><button data-val="adv" onclick="setSetting('view','adv',this)">Advanced</button></div></div>
       <div class="settings-row" style="margin-top:-6px"><span class="settings-hint" id="set-view-hint">Simplified keeps the essentials on screen. Advanced shows every tile and tab. Nothing is deleted either way.</span></div>
-      <div class="settings-row"><label class="settings-label">Text Size</label><div class="settings-opts" id="set-fontsize"><button data-val="small" onclick="setSetting('fontSize','small',this)">Small</button><button data-val="normal" onclick="setSetting('fontSize','normal',this)" class="active">Normal</button><button data-val="large" onclick="setSetting('fontSize','large',this)">Large</button><button data-val="xl" onclick="setSetting('fontSize','xl',this)">XL</button></div></div>
-      <div class="settings-row"><label class="settings-label">Contrast</label><div class="settings-opts" id="set-contrast"><button data-val="standard" onclick="setSetting('contrast','standard',this)" class="active">Standard</button><button data-val="high" onclick="setSetting('contrast','high',this)">High Contrast</button></div></div>
+      <div class="settings-row"><label class="settings-label">Text size</label><div class="settings-opts" id="set-fontsize"><button data-val="small" onclick="setSetting('fontSize','small',this)">Small</button><button data-val="normal" onclick="setSetting('fontSize','normal',this)" class="active">Normal</button><button data-val="large" onclick="setSetting('fontSize','large',this)">Large</button><button data-val="xl" onclick="setSetting('fontSize','xl',this)">XL</button></div></div>
+      <div class="settings-row"><label class="settings-label">Contrast</label><div class="settings-opts" id="set-contrast"><button data-val="standard" onclick="setSetting('contrast','standard',this)" class="active">Standard</button><button data-val="high" onclick="setSetting('contrast','high',this)">High</button></div></div>
       <div class="settings-row"><label class="settings-label">Motion</label><div class="settings-opts" id="set-motion"><button data-val="full" onclick="setSetting('motion','full',this)" class="active">Full</button><button data-val="reduced" onclick="setSetting('motion','reduced',this)">Reduced</button></div></div>
-      <div class="settings-row"><label class="settings-label">Currency</label><div class="settings-opts" id="set-currency"><button data-val="GBP" onclick="setSetting('currency','GBP',this)" class="active">£ GBP</button><button data-val="USD" onclick="setSetting('currency','USD',this)">$ USD</button><button data-val="EUR" onclick="setSetting('currency','EUR',this)">€ EUR</button><button data-val="INR" onclick="setSetting('currency','INR',this)">₹ INR</button></div></div>
+    </div>
+
+    <!-- 3. Help and app tour (owner, 1 Nov 2026: "a clear button that can trigger the tour again") -->
+    <div class="settings-section set-box" id="set-help">
+      <div class="settings-section-title">Help and app tour</div>
+      <div class="settings-hint" style="margin-bottom:10px">A one-minute look at each tab, or ask a question and browse the FAQs.</div>
+      <div class="set-btns">
+        <button class="set-btn primary" id="set-tour-replay" type="button" onclick="viTourReplay()">Replay the app tour</button>
+        <button class="set-btn" type="button" onclick="closeSettings();viHelpOpen('faq')">Open help and FAQs</button>
+      </div>
+    </div>
+
+    <!-- 4. Live prices: one switch for the free feeds (crypto from CoinGecko, metals, stocks and funds through the stock-quotes function). Typed prices are never changed. -->
+    <div class="settings-section set-box" id="set-live">
+      <div class="settings-section-title">Live prices</div>
+      <div class="settings-row"><label class="settings-label">Live prices</label><div class="settings-opts" id="set-live-opts"><button type="button" data-live="1" onclick="viSetLive(true)">On</button><button type="button" data-live="0" onclick="viSetLive(false)">Off</button></div><button class="set-btn" type="button" data-live-refresh onclick="viRefreshLive()">Refresh now</button></div>
+      <p class="settings-hint" style="margin:0">Crypto prices come from CoinGecko, metals from metals.live, and stocks and funds through Vault-It's own price service. Prices are indicative. Off stops the automatic checks; prices you typed yourself are never changed.</p>
+    </div>
+
+    <!-- Bank, broker, exchange and platform connectors: locked under Pro for a future release (owner, 5 Nov 2026: "Lock bank and platform connectors in pro for future releases").
+         Nothing here connects, asks for a key, signs in or makes a network request. Filled by renderConnections() from CONNS. -->
+    <div class="settings-section set-box" id="set-locked-conns">
+      <div class="settings-section-title">Bank, broker and platform connections</div>
+      <div class="set-locked-head"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-lock"/></svg><span>Pro, coming in a future release</span></div>
+      <p class="settings-hint" style="margin:0 0 10px">Connecting your bank, broker, exchange or platform to bring figures in automatically is planned for Pro in a future release. Nothing is connected today and the app never asks for your bank or exchange details. Add and update your figures yourself in the tabs.</p>
+      <div id="set-locked-list"></div>
+    </div>
+
+    <!-- 5. Cloud sync -->
+    <div class="settings-section set-box" id="set-cloud">
+      <div class="settings-section-title">Cloud sync</div>
+      <div id="sync-status" class="settings-hint" style="color:var(--t2);margin-bottom:10px">Checking…</div>
+      <div class="settings-hint" style="margin-bottom:10px">“Upload everything” sends all the data on this device to your account, so it appears when you sign in anywhere else.</div>
+      <div class="set-btns">
+        <button class="set-btn primary" type="button" onclick="viSyncNow()">Upload everything from this device</button>
+        <button class="set-btn" type="button" onclick="viOpenHistory()">Version history and restore</button>
+      </div>
+    </div>
+
+    <!-- 6. Sign-in PIN -->
+    <div class="settings-section set-box" id="set-pin">
+      <div class="settings-section-title">Sign-in PIN</div>
+      <div class="settings-hint" style="margin-bottom:10px">Set a 6-digit PIN to sign back in on any device with just your email and PIN, no email code needed. Five wrong tries lock it for 15 minutes (an email code always works).</div>
+      <div class="set-btns">
+        <button class="set-btn primary" type="button" onclick="authChangePin()">Set or change PIN</button>
+        <button class="set-btn" type="button" onclick="authRemovePin()">Remove PIN</button>
+      </div>
+    </div>
+
+    <!-- 7. Privacy and usage sharing -->
+    <div class="settings-section set-box" id="set-privacy">
+      <div class="settings-section-title">Privacy and usage sharing</div>
       <div class="settings-row"><label class="settings-label">Share usage</label><div class="settings-opts" id="set-fbact"><button data-val="1" onclick="viFbAct(true,this)">On</button><button data-val="0" onclick="viFbAct(false,this)">Off</button></div></div>
-      <p class="wi-link-hint" style="margin:-4px 0 10px">During the beta the app records which screens and features you use, errors and how long you stay, in our own database, to improve it. Never your figures or what you type.</p>
-      <div class="settings-row"><label class="settings-label">Net worth</label><div class="settings-opts" id="set-nw3d"><button data-val="1" onclick="setViewFlag('nw',true,this)">3D</button><button data-val="0" onclick="setViewFlag('nw',false,this)">Classic chart</button></div></div>
-    </div>
-
-    <!-- Connections (owner, 30 Oct 2026: out of the menu bar, into Settings) -->
-    <div class="settings-section" id="settings-connections">
-      <div class="settings-section-title">Connections</div>
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px">
-        <div style="font-size:max(.58rem,var(--vi-fs-2));color:var(--t3);line-height:1.5">Connect your accounts to sync data automatically. API keys are stored in this browser only.</div>
-        <button onclick="refreshAllLiveConns()" style="flex:none;padding:6px 12px;background:rgb(var(--teal-rgb) / .1);border:1px solid var(--bd2);color:var(--em);font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:700;cursor:pointer;border-radius:4px">↻ Refresh live</button>
-      </div>
-      <div id="connections-list"></div>
-    </div>
-
-    <!-- Claude API Key -->
-    <div style="margin-bottom:16px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--bd)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <label class="ov-kpi-lbl" style="font-size:max(.55rem,var(--vi-fs-1))">Claude API Key</label>
-        <button onclick="testApiKey('claude')" style="padding:2px 8px;background:rgb(var(--teal-rgb) / .12);border:1px solid var(--bd2);border-radius:3px;color:var(--em);font-size:max(.5rem,var(--vi-fs-1));cursor:pointer;font-family:'Syne',sans-serif">Test</button>
-      </div>
-      <input type="password" id="set-claude-key" class="al-inp" placeholder="sk-ant-..." style="width:100%;margin-bottom:6px">
-      <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t3);line-height:1.5">
-        <strong style="color:var(--t2)">How to get it:</strong> Go to <span style="color:var(--em)">console.anthropic.com</span> → Sign up/log in → API Keys → Create Key. Paste it above. Stored locally in your browser only. Used for AI plan generation in Entrepreneur tab.
-      </div>
-      <div id="test-claude-result" style="font-size:max(.52rem,var(--vi-fs-1));margin-top:4px"></div>
-    </div>
-
-    <!-- CoinGecko API Key -->
-    <div style="margin-bottom:16px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--bd)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <label class="ov-kpi-lbl" style="font-size:max(.55rem,var(--vi-fs-1))">CoinGecko API Key <span style="color:var(--t3)">(optional)</span></label>
-        <button onclick="testApiKey('coingecko')" style="padding:2px 8px;background:rgb(var(--teal-rgb) / .12);border:1px solid var(--bd2);border-radius:3px;color:var(--em);font-size:max(.5rem,var(--vi-fs-1));cursor:pointer;font-family:'Syne',sans-serif">Test</button>
-      </div>
-      <input type="password" id="set-cg-key" class="al-inp" placeholder="CG-..." style="width:100%;margin-bottom:6px">
-      <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t3);line-height:1.5">
-        Free tier works <em>without</em> a key. For higher rate limits: go to <span style="color:var(--em)">coingecko.com/en/api</span> → Sign up → Demo API key. Used for live crypto prices.
-      </div>
-      <div id="test-cg-result" style="font-size:max(.52rem,var(--vi-fs-1));margin-top:4px"></div>
-    </div>
-
-    <!-- Metals API Key -->
-    <div style="margin-bottom:16px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--bd)">
-      <label class="ov-kpi-lbl" style="font-size:max(.55rem,var(--vi-fs-1));display:block;margin-bottom:6px">Metals API Key</label>
-      <input type="password" id="set-metals-key" class="al-inp" placeholder="metals.live or metals-api.com key" style="width:100%;margin-bottom:6px">
-      <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t3);line-height:1.5">
-        Go to <span style="color:var(--em)">metals-api.com</span> → Sign up for free tier → Copy your API key. OR use <span style="color:var(--em)">api.metals.live</span> (no key required, free). Used for live gold/silver/platinum/palladium prices.
+      <p class="settings-hint" style="margin:0 0 10px">During the beta the app records which screens and features you use, errors and how long you stay, in our own database, to improve it. Never your figures or what you type.</p>
+      <div class="set-btns">
+        <button class="set-btn primary" type="button" onclick="showPrivacy()">Privacy notice</button>
+        <button class="set-btn" type="button" onclick="showTerms()">Beta terms</button>
       </div>
     </div>
 
-    <!-- Alpha Vantage Key -->
-    <div style="margin-bottom:20px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--bd)">
-      <label class="ov-kpi-lbl" style="font-size:max(.55rem,var(--vi-fs-1));display:block;margin-bottom:6px">Alpha Vantage Key <span style="color:var(--t3)">(stocks)</span></label>
-      <input type="password" id="set-av-key" class="al-inp" placeholder="e.g. FZJD8H..." style="width:100%;margin-bottom:6px">
-      <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t3);line-height:1.5">
-        Go to <span style="color:var(--em)">alphavantage.co</span> → Get Free API Key → Copy key. Used for live stock prices in Wealth Inventory and Yahoo Finance connection.
-      </div>
+    <!-- 8. Your data (UK GDPR: access, portability, erasure) -->
+    <div id="set-yourdata" class="settings-section set-box">
+      <div class="settings-section-title">Your data</div>
+      <div class="settings-hint" style="margin-bottom:10px">Download a copy of your data as a file you can keep: your figures and profile (on this device and in your account) and your latest 200 saved versions. Photos, feedback you sent, the beta usage log and technical security records are not in the file; email us for those. You can also delete your account for good below.</div>
+      <div class="set-btns"><button class="set-btn primary" type="button" onclick="exportMyData()">Download my data</button></div>
     </div>
 
-    <!-- Meshy AI Key -->
-    <div style="margin-bottom:20px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--bd)">
-      <label class="ov-kpi-lbl" style="font-size:max(.55rem,var(--vi-fs-1));display:block;margin-bottom:6px">Meshy AI Key <span style="color:var(--t3)">(3D generation)</span></label>
-      <input type="password" id="set-meshy-key" class="al-inp" placeholder="msy_..." style="width:100%;margin-bottom:6px">
-      <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t3);line-height:1.5">
-        Go to <span style="color:var(--em)">meshy.ai</span> → Sign up → API Keys. Used for AI-generated 3D house models in House Builder.
-      </div>
+    <!-- 9. Danger zone: red outline only -->
+    <div class="settings-section set-box set-danger" id="set-danger">
+      <div class="settings-section-title">Danger zone</div>
+      <button class="set-btn danger" type="button" onclick="resetVaultData()">Reset financial data (keeps profile and plan)</button>
+      <button class="set-btn danger" type="button" id="set-delete-account" onclick="openDeleteAccount()">Delete my account permanently</button>
     </div>
 
-    <details style="margin-bottom:20px"><summary style="cursor:pointer;font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:700;color:var(--t3);letter-spacing:.06em;padding:8px 2px">⚙ Owner integrations (mailing list &amp; Notion), not needed for testing</summary>
-    <!-- ConvertKit -->
-    <div style="margin-bottom:20px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid var(--bd)">
-      <label class="ov-kpi-lbl" style="font-size:max(.55rem,var(--vi-fs-1));display:block;margin-bottom:6px">ConvertKit Form ID <span style="color:var(--t3)">(email list)</span></label>
-      <input type="text" id="set-ck-form" class="al-inp" placeholder="e.g. 1234567" style="width:100%;margin-bottom:10px">
-      <label class="ov-kpi-lbl" style="font-size:max(.55rem,var(--vi-fs-1));display:block;margin-bottom:6px">ConvertKit API Key</label>
-      <input type="password" id="set-ck-key" class="al-inp" placeholder="v3 API key" style="width:100%;margin-bottom:6px">
-      <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t3);line-height:1.5">
-        <span style="color:var(--em)">convertkit.com</span> → Forms → pick your form → copy the numeric ID from the URL. API key from Account Settings → API Keys. Pioneers are added to your list automatically on sign-up.
-      </div>
+    <!-- 10. Owner and developer tools: hidden unless the owner flag is set (?owner=1 once on this device, or localStorage vi-owner=1; ?owner=0 clears it) -->
+    <div class="settings-section set-box" id="set-owner-tools" hidden>
+      <div class="settings-section-title">Owner and developer tools</div>
+      <label class="ov-kpi-lbl" for="set-claude-key">Claude API key</label>
+      <input type="password" id="set-claude-key" class="al-inp" placeholder="sk-ant-..." style="width:100%;margin:4px 0 4px">
+      <div class="set-owner-test"><button class="set-btn" type="button" onclick="testApiKey('claude')">Test</button><span id="test-claude-result" class="settings-hint"></span></div>
+      <label class="ov-kpi-lbl" for="set-meshy-key">Meshy AI key</label>
+      <input type="password" id="set-meshy-key" class="al-inp" placeholder="msy_..." style="width:100%;margin:4px 0 10px">
+      <label class="ov-kpi-lbl" for="set-notion-token">Notion integration token</label>
+      <input type="password" id="set-notion-token" class="al-inp" placeholder="ntn_..." style="width:100%;margin:4px 0 10px">
+      <label class="ov-kpi-lbl" for="set-founding-link">Founding Licence Stripe link</label>
+      <input type="text" id="set-founding-link" class="al-inp" placeholder="https://buy.stripe.com/..." style="width:100%;margin:4px 0 10px">
+      <label class="ov-kpi-lbl" for="set-nft-contract">Pioneer NFT contract address (Shibarium)</label>
+      <input type="text" id="set-nft-contract" class="al-inp" placeholder="0x..." style="width:100%;margin:4px 0 10px">
+      <div class="settings-hint" style="margin-bottom:10px">Keys are stored in this browser only and sent only to the service they belong to.</div>
+      <button class="set-btn primary" type="button" onclick="saveSettings()">Save owner settings</button>
     </div>
 
-    <!-- Notion -->
-    <div style="margin-bottom:20px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid rgb(var(--brass-rgb) / .2)">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--t2)"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg>
-        <span class="ov-kpi-lbl" style="font-size:max(.55rem,var(--vi-fs-1));color:var(--go)">Notion Integration Token</span>
-        <span style="font-size:max(.42rem,var(--vi-fs-1));color:var(--gr);font-family:'Share Tech Mono',monospace;margin-left:auto">Pioneer DB ✓ Created</span>
-      </div>
-      <input type="password" id="set-notion-token" class="al-inp" placeholder="ntn_xxxxxxxxxxxxxxxxxxxxxxxx" style="width:100%;margin-bottom:6px">
-      <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t3);line-height:1.5">
-        1. Go to <span style="color:var(--go)">notion.so/my-integrations</span> → New Integration → give it any name → Submit<br>
-        2. Copy the Internal Integration Token (starts with <code style="color:var(--em)">ntn_</code> or <code style="color:var(--em)">secret_</code>)<br>
-        3. In Notion: open <span style="color:var(--go)">Vault-It Pioneer Signups</span> DB → ··· menu → Add connections → pick your integration<br>
-        All profile saves and sign-ups will auto-populate the database.
-      </div>
-    </div>
-    </details>
-
-    <!-- Your plan (owner, 4 Nov 2026 evening, renamed 5 Nov: Pioneer = monthly and yearly (yearly is Pro), Lifetime licence = once; read-only after the 30 days has no tier name).
-         Prices, later prices and buttons are painted from VI_PLANS by viPricePaint(). -->
-    <div style="margin-bottom:20px;padding:16px;background:linear-gradient(135deg,rgb(var(--brass-rgb) / .07),rgb(var(--brass-rgb) / .02));border-radius:10px;border:1px solid rgb(var(--brass-rgb) / .35)">
-      <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">
-        <span style="font-size:.9rem;animation:pw-pulse 2.5s ease-in-out infinite;display:inline-block">◆</span>
-        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:max(.58rem,var(--vi-fs-2));color:var(--go);letter-spacing:.1em">YOUR PLAN</span>
-        <span id="set-pioneer-badge" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:max(.4rem,var(--vi-fs-1))"></span>
-      </div>
-      <div id="set-pioneer-active" style="display:none;font-size:max(.5rem,var(--vi-fs-1));color:var(--gr);margin-bottom:10px;line-height:1.5"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access active. Thank you for backing Vault-It.</div>
-      <div id="set-pioneer-inactive" style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t2);margin-bottom:8px;line-height:1.5"></div>
-      <div id="set-plan-extras" style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);margin-bottom:10px;line-height:1.55">Pioneer, monthly or yearly, is the whole app with editing on, plus your own 3D house design and the AI house model. Pioneer yearly (Pro) adds early access to new features, roadmap voting and family mode (coming soon). The Lifetime licence (one payment, 100 places, beta testers first) is Pioneer for the life of the service. The six preset houses are in every plan.</div>
-      <div class="set-tiers">
-        <button type="button" class="set-tier" id="set-plan-monthly" data-plan="monthly" onclick="showUpgrade('monthly')"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg><span class="set-tier-name" data-tier-name>Pioneer</span><span class="set-tier-price" data-plan-price="monthly">£5.99<span>/mo</span></span><span class="set-tier-cta" data-cta=""></span></button>
-        <button type="button" class="set-tier" id="set-plan-annual" data-plan="annual" onclick="showUpgrade('annual')"><svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg><span class="set-tier-name" data-tier-name>Pioneer</span><span class="set-tier-price" data-plan-price="annual">£59.99<span>/yr</span></span><span class="set-tier-cta" data-cta=""></span></button>
-        <button type="button" class="set-tier" id="set-plan-founder" data-plan="founder" onclick="showUpgrade('founder')"><svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg><span class="set-tier-name" data-tier-name>Lifetime licence</span><span class="set-tier-price" data-plan-price="founder">£149<span> once</span></span><span class="set-tier-cta" data-cta=""></span></button>
-      </div>
-      <div class="set-tier-terms"><p><b>Pioneer (monthly):</b> <span data-plan-terms="monthly"></span></p><p><b>Pioneer (yearly):</b> <span data-plan-terms="annual"></span></p><p><b>Lifetime licence:</b> <span data-plan-terms="founder"></span></p></div>
-      <div style="margin-top:8px;text-align:right"><button onclick="closeSettings();showPaywall('assets')" style="background:none;border:1px solid var(--bd);border-radius:5px;color:var(--t3);font-size:max(.44rem,var(--vi-fs-1));padding:6px 9px;cursor:pointer">Already paid?</button></div>
-    </div>
-
-    <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);margin-bottom:16px;padding:10px;background:rgb(var(--teal-rgb) / .04);border-radius:6px;border:1px solid var(--bd)">
-      🔒 API keys are stored <strong>only in this browser</strong> and sent only to the service they belong to. (A Meshy key passes through Vault-It's server to reach Meshy; it is not stored there.)
-    </div>
-
-    <details style="margin-bottom:20px"><summary style="cursor:pointer;font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:700;color:var(--t3);letter-spacing:.06em;padding:8px 2px">⚙ Owner &amp; admin tools, not needed for testing</summary>
-    <!-- EmailJS (optional — enables real OTP email delivery) -->
-    <div style="margin-bottom:20px;padding:14px;background:rgba(0,0,0,.3);border-radius:8px;border:1px solid rgb(var(--teal-rgb) / .15)">
-      <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:700;color:var(--em);margin-bottom:8px;letter-spacing:.06em">✉ EmailJS · OTP Email Delivery (optional)</div>
-      <input type="text"     id="set-ejs-svc"  class="al-inp" placeholder="Service ID  (e.g. service_xxxxx)"   style="width:100%;margin-bottom:6px">
-      <input type="text"     id="set-ejs-tpl"  class="al-inp" placeholder="Template ID (e.g. template_xxxxx)"  style="width:100%;margin-bottom:6px">
-      <input type="password" id="set-ejs-key"  class="al-inp" placeholder="Public Key  (e.g. AbC1dEf2GhI3)"    style="width:100%;margin-bottom:6px">
-      <div style="font-size:max(.48rem,var(--vi-fs-1));color:var(--t3);line-height:1.6">Free at <span style="color:var(--em)">emailjs.com</span> (200 emails/mo). Create a template with variables <code style="color:var(--go)">{{otp_code}}</code> and <code style="color:var(--go)">{{to_email}}</code>. Without this, login codes are shown on screen.</div>
-    </div>
-
-    <!-- Vault Network / Founding Licence -->
-    <div style="margin-bottom:20px;padding:14px;background:linear-gradient(135deg,rgb(var(--brass-rgb) / .05),rgb(var(--teal-rgb) / .03));border-radius:8px;border:1px solid rgb(var(--brass-rgb) / .25)">
-      <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:700;color:var(--go);margin-bottom:8px;letter-spacing:.06em">◈ Vault Network · Admin Config</div>
-      <label style="font-size:max(.48rem,var(--vi-fs-1));color:var(--t2);display:block;margin-bottom:4px">Founding Licence Stripe Link (£7.77)</label>
-      <input type="text" id="set-founding-link" class="al-inp" placeholder="https://buy.stripe.com/..." style="width:100%;margin-bottom:8px">
-      <label style="font-size:max(.48rem,var(--vi-fs-1));color:var(--t2);display:block;margin-bottom:4px">Pioneer NFT Contract Address (Shibarium)</label>
-      <input type="text" id="set-nft-contract" class="al-inp" placeholder="0x..." style="width:100%;margin-bottom:6px">
-      <div style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);line-height:1.6">Create a Payment Link in your Stripe Dashboard → set price to £7.77, one-time. Paste the link above. The NFT contract address is populated after deploying an ERC-721 to Shibarium mainnet.</div>
-    </div>
-    </details>
-
-    <!-- Cloud sync -->
-    <div style="margin-bottom:20px;padding:14px;background:rgb(var(--teal-rgb) / .04);border-radius:8px;border:1px solid rgb(var(--teal-rgb) / .2)">
-      <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:700;color:var(--em);margin-bottom:6px;letter-spacing:.06em">☁ Cloud sync</div>
-      <div id="sync-status" style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t2);line-height:1.6;margin-bottom:10px">Checking…</div>
-      <div style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);line-height:1.6;margin-bottom:10px">“Upload everything” sends all the data on this device to your account, so it appears when you sign in anywhere else.</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn-add-data" onclick="viSyncNow()">Upload everything from this device</button>
-        <button class="btn-add-data" style="background:transparent;border-color:var(--em);color:var(--em)" onclick="viOpenHistory()">🕘 Version history &amp; restore</button>
-      </div>
-    </div>
-
-    <!-- Security -->
-    <div style="margin-bottom:20px;padding:14px;background:rgb(var(--teal-rgb) / .04);border-radius:8px;border:1px solid rgb(var(--teal-rgb) / .2)">
-      <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:700;color:var(--em);margin-bottom:6px;letter-spacing:.06em">🔐 Sign-in PIN</div>
-      <div style="font-size:max(.48rem,var(--vi-fs-1));color:var(--t3);line-height:1.6;margin-bottom:10px">Set a 6-digit PIN to sign back in on any device with just your email + PIN, no email code needed. Five wrong tries lock it for 15 minutes (an email code always works).</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn-add-data" onclick="authChangePin()">Set / change PIN</button>
-        <button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="authRemovePin()">Remove PIN</button>
-      </div>
-    </div>
-
-    <!-- Your data (UK GDPR: access, portability, erasure) -->
-    <div id="set-yourdata" style="margin-bottom:20px;padding:14px;background:rgb(var(--teal-rgb) / .04);border-radius:8px;border:1px solid rgb(var(--teal-rgb) / .2)">
-      <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:700;color:var(--em);margin-bottom:6px;letter-spacing:.06em">🗂 Your data</div>
-      <div style="font-size:max(.48rem,var(--vi-fs-1));color:var(--t3);line-height:1.6;margin-bottom:10px">Download a copy of your data as a file you can keep: your figures and profile (on this device and in your account) and your latest 200 saved versions. Photos, feedback you sent, the beta usage log and technical security records are not in the file; email us for those. You can also read how your data is handled, or delete your account for good.</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn-add-data" onclick="exportMyData()">⬇ Download my data</button>
-        <button class="btn-add-data" style="background:transparent;border-color:var(--em);color:var(--em)" onclick="showPrivacy()">Privacy notice</button>
-        <button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="showTerms()">Beta terms</button>
-      </div>
-    </div>
-
-    <!-- Danger zone -->
-    <div style="margin-bottom:20px;padding:14px;background:rgba(231,76,60,.04);border-radius:8px;border:1px solid rgba(231,76,60,.2)">
-      <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:700;color:#e74c3c;margin-bottom:10px;letter-spacing:.06em">⚠ Danger Zone</div>
-      <button onclick="resetVaultData()" style="width:100%;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.35);border-radius:5px;color:#e74c3c;font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;padding:9px;cursor:pointer;margin-bottom:8px;letter-spacing:.06em">
-        🗑 Reset Financial Data (keeps profile &amp; plan)
-      </button>
-      <button id="set-delete-account" onclick="openDeleteAccount()" style="width:100%;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.35);border-radius:5px;color:#e74c3c;font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;padding:9px;cursor:pointer;margin-bottom:8px;letter-spacing:.06em">
-        ⛔ Delete my account permanently
-      </button>
-      <button onclick="signOut()" style="width:100%;background:transparent;border:1px solid rgb(var(--ink-rgb) / .1);border-radius:5px;color:var(--t3);font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;padding:9px;cursor:pointer;letter-spacing:.06em">
-        🔒 Sign Out of this Device
-      </button>
-    </div>
-
-    <div style="display:flex;gap:10px">
-      <button class="btn-add-data" onclick="saveSettings()" style="flex:1">Save Keys</button>
-      <button class="btn-add-data" onclick="document.getElementById('settings-modal').style.display='none'" style="flex:1;background:transparent;border-color:var(--t3);color:var(--t3)">Close</button>
-    </div>
+    <div class="set-foot"><button class="set-btn primary" type="button" onclick="closeSettings()">Done</button></div>
   </div>
 </div>
 
@@ -13858,7 +13891,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     </div>
     <div style="font-size:max(.36rem,var(--vi-fs-1));color:var(--t3);margin-top:12px;text-align:center;line-height:1.6">
       Your price stays the same while you stay subscribed<br>
-      Subscriptions via Stripe · To cancel, email hello@vault-it.co
+      Subscriptions via Stripe
     </div>
   </div>
 </div>
@@ -14431,8 +14464,8 @@ body.vi-wide #nwChart { height: 300px !important; }
 .vi-tier-features li.vi-no::before { content:'✗'; color:var(--t3); }
 .vi-tier-features li.vi-no { color: var(--t3); }
 .vi-tier-cta {
-  width:100%; padding:8px 10px; font-family:'Syne',sans-serif;
-  font-size:max(.48rem,var(--vi-fs-2)); font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  width:100%; padding:8px 10px; font-family:'Syne',sans-serif; min-height:44px;
+  font-size:max(14px,var(--vi-fs-3)); font-weight:700; letter-spacing:.1em; text-transform:uppercase;
   cursor:pointer; border-radius:4px; transition:all .18s; margin-top:4px;
 }
 .vi-tier-cta-ghost { background:transparent; border:1px solid var(--bd); color:var(--t3); cursor:default; }
@@ -14492,7 +14525,7 @@ body.vi-wide #nwChart { height: 300px !important; }
   color: var(--go); margin-bottom:8px;
 }
 .vi-camp-headline {
-  font-family:'Syne',sans-serif; font-weight:800;
+  font-family:'Syne',sans-serif; font-weight:700;
   font-size:clamp(1rem,2.5vw + .6rem,1.5rem);
   color:var(--tx); line-height:1.2; margin-bottom:6px;
 }
@@ -14554,8 +14587,8 @@ body.vi-wide #nwChart { height: 300px !important; }
 .vi-camp-tier-features li.vi-dim { color:var(--t3); }
 .vi-camp-tier-features li.vi-dim::before { content:'·'; color:var(--t3); }
 .vi-camp-tier-cta {
-  margin-top:10px; width:100%; padding:8px 10px;
-  font-family:'Syne',sans-serif; font-size:max(.48rem,var(--vi-fs-2)); font-weight:700;
+  margin-top:10px; width:100%; padding:8px 10px; min-height:44px;
+  font-family:'Syne',sans-serif; font-size:max(14px,var(--vi-fs-3)); font-weight:700;
   letter-spacing:.1em; text-transform:uppercase;
   cursor:pointer; border-radius:4px; transition:all .18s;
 }
@@ -15219,8 +15252,9 @@ body.vi-pop-open{overflow:hidden}
 // TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════
 function showTab(id){
+  window._viNavAt=performance.now();   // v0.9.2: the 3D warm-up keeps out of the way for a moment after every tab change
   if(id==='house'&&window.VIPERF)VIPERF.mark('tab');
-  if(id==='connections'){showSettings();var cs=document.getElementById('settings-connections');if(cs)setTimeout(function(){try{cs.scrollIntoView({block:'start'})}catch(e){}},60);return;}
+  if(id==='connections'){showSettings();var cs=document.getElementById('set-locked-conns');if(cs)setTimeout(function(){try{cs.scrollIntoView({block:'start'})}catch(e){}},60);return;}
   if(id!=='house'&&typeof _threeAnimId!=='undefined'&&_threeAnimId){cancelAnimationFrame(_threeAnimId);_threeAnimId=null;}
   if(id!=='house'&&typeof HB3DAPP!=='undefined'&&HB3DAPP.viewer){try{HB3DAPP.viewer.stop();}catch(e){}}
   // Always collapse the ISO expand when switching tabs
@@ -15244,13 +15278,13 @@ function showTab(id){
   if(id==='biz'){renderBizTab();updateProGate();}
   if(id==='achievements')renderAchievements();
   if(id==='connections')renderConnections();
-  if(id==='journey'){jrnyLoadState();renderJourney();}
-  if(id==='network')renderNetworkTab();
-  if (id === 'overview' && typeof refreshAllLiveConns === 'function') {
-    // Only auto-refresh if at least one live connector is active
+  if (id === 'overview' && typeof refreshAllLiveConns === 'function' && viLiveOn()) {
+    // Only auto-refresh if at least one live connector was activated on this device (kept as on live)
     var hasLive = achState && achState.connected && ['coingecko','metals_live','exchangerate','yahoo'].some(function(lid){ return achState.connected[lid]; });
     if (hasLive) refreshAllLiveConns();
   }
+  if(id==='journey'){jrnyLoadState();renderJourney();}
+  if(id==='network')renderNetworkTab();
 }
 // The Financial Freedom Roadmap is one card: it sits on the dashboard and moves into the Wealth Roadmap tab while that tab is open (owner, 3 Nov), so both always show the same roadmap
 function viRoadmapPlace(id){
@@ -15308,6 +15342,7 @@ function nwMoreOpen(){
 }
 function nwMoreSync(){var o=nwMoreOpen();document.querySelectorAll('#nw-more .nw-more-btns button').forEach(function(b){b.setAttribute('aria-expanded',b.getAttribute('data-p')===o?'true':'false');});}
 function showSubtab(group,id,btn){
+  window._viNavAt=performance.now();
   document.querySelectorAll('#'+group+'-page .subtab-panel').forEach(p=>{p.classList.remove('active');p.style.display='none';});
   document.querySelectorAll('#'+group+'-page .subtab-btn').forEach(b=>b.classList.remove('active'));
   const sp=document.getElementById(group+'-'+id);
@@ -15520,8 +15555,15 @@ function updateFireBanner() {
 
 // ── SIDEBAR ──────────────────────────────────────────────────
 var _sidebarOpen=false;
+/* v0.9.2 (Pedro 2, 3): the side panel starts under the real header and ends above the phone tab bar, whatever their heights are */
+function viSbFit(){var sb=document.getElementById('left-sidebar'),h=document.getElementById('topnav');if(!sb)return;
+  var hb=h?Math.round(h.getBoundingClientRect().bottom):0;if(hb>0&&hb<200)sb.style.setProperty('top',hb+'px','important');
+  var tb=document.getElementById('vi-tabs'),bot=0;if(tb&&innerWidth<700){var r=tb.getBoundingClientRect();if(r.height>0&&r.top>innerHeight/2)bot=Math.round(innerHeight-r.top);}
+  sb.style.setProperty('bottom',bot+'px','important');}
+window.addEventListener('resize',function(){try{viSbFit();}catch(e){}});
 function toggleSidebar(){
   _sidebarOpen=!_sidebarOpen;
+  try{viSbFit();}catch(e){}
   var sb=document.getElementById('left-sidebar');
   var btn=document.getElementById('sidebar-toggle');
   if(sb)sb.classList.toggle('open',_sidebarOpen);
@@ -16307,8 +16349,9 @@ function updateUI(){
   redraw();
 }
 
+function gbpFull(n){var rate=window.VI_CURRENCY_RATE||1,sym=window.VI_CURRENCY_SYMBOL||'£',v=(isNaN(n)||n==null?0:n)*rate;return(v<0?'-':'')+sym+Math.round(Math.abs(v)).toLocaleString('en-GB');}   // the whole figure, no k or M (owner, 5 Nov: the slate price in full)
 function updatePriceLabels(){
-  Object.entries(state.prices).forEach(([t,pr])=>{const e=document.getElementById('pr-'+t);if(e)e.textContent=gbpFmt(pr);});
+  Object.entries(state.prices).forEach(([t,pr])=>{const e=document.getElementById('pr-'+t);if(e)e.textContent=gbpFull(pr);});
 }
 function updatePriceInput(){document.getElementById('priceInput').value=state.prices[state.houseType]||'';}
 
@@ -17320,10 +17363,6 @@ function viFlag(name) {
     var v = localStorage.getItem('vi-flag-' + name); return v == null ? !!VI_FLAG_DEFAULT[name] : v !== '0'; } catch (e) { return !!VI_FLAG_DEFAULT[name]; }
 }
 function viFlagSet(name, on) { try { localStorage.setItem('vi-flag-' + name, on ? '1' : '0'); } catch (e) {} }
-function setViewFlag(name, on, btn) {   // Settings: 3D or classic net worth chart
-  viFlagSet(name, on); var row = btn && btn.parentNode; if (row) [].forEach.call(row.children, function (b) { b.classList.toggle('active', b === btn); });
-  { try { if (on) { if (window.nw3dMount) nw3dMount(); } else if (window.nw3d && nw3d.disable) nw3d.disable(); } catch (e) { console.error('[Vault-It] net worth view', e); } toast(on ? '3D net worth on' : 'Classic net worth chart on'); }
-}
 // ═══════════════════════════════════════════════════════════════
 // ?perf=1 — ON-DEVICE PERFORMANCE OVERLAY (v0.7 final round). Off unless the URL has perf=1 (kept in localStorage 'vi-perf' until ?perf=0).
 // Page level only: it samples the viewer through HB3D.perf.frame (one call per drawn frame), a longtask observer and timing marks here.
@@ -17356,7 +17395,7 @@ function setViewFlag(name, on, btn) {   // Settings: 3D or classic net worth cha
       viewport: S3.last > S.last ? S3.name : 'house builder', stageFrames: S3.frames, stageP50: pct(S3.dts, 0.5), stageP95: pct(S3.dts, 0.95), stageOver33: S3.over33, stageCalls: S3.calls == null ? null : S3.calls, stageTris: S3.tris == null ? null : S3.tris };
   }
   function lines(k) {
-    var st = k.viewport && k.viewport !== 'house builder' ? ['viewport ' + k.viewport + ' (three.js, matcap) · stage frames ' + k.stageFrames + ' · p50 ' + f1(k.stageP50) + ' · p95 ' + f1(k.stageP95) + ' ms · >33 ms: ' + k.stageOver33 + (k.stageCalls == null ? '' : ' · draws ' + k.stageCalls + ' · triangles ' + Number(k.stageTris).toLocaleString('en-GB')), 'house figures below are from its last visit'] : ['viewport house builder'];
+    var st = k.viewport && k.viewport !== 'house builder' ? ['viewport ' + k.viewport + (/^Item 3D/.test(k.viewport) ? ' (three.js, lit)' : ' (three.js, matcap)') + ' · stage frames ' + k.stageFrames + ' · p50 ' + f1(k.stageP50) + ' · p95 ' + f1(k.stageP95) + ' ms · >33 ms: ' + k.stageOver33 + (k.stageCalls == null ? '' : ' · draws ' + k.stageCalls + ' · triangles ' + Number(k.stageTris).toLocaleString('en-GB')), 'house figures below are from its last visit'] : ['viewport house builder'];
     return st.concat(['fps ' + k.fps + '   frames ' + k.frames, 'frame ms p50 ' + f1(k.p50) + ' · p95 ' + f1(k.p95) + ' · max ' + f1(k.max), 'frames >33 ms: ' + k.over33,
       'long tasks ' + k.longN + ' · worst ' + f1(k.longMax) + ' ms', 'JS heap ' + (k.heapMB == null ? 'n/a' : k.heapMB + ' MB'),
       'DPR ' + f1(k.dpr) + ' · canvas ' + (k.canvas || '-'), 'renderer ' + (k.gl || '-'), 'bricks ' + (k.bricks == null ? '-' : k.bricks) + (k.bricksTotal ? ' (' + k.bricksTotal + ' UK)' : ''),
@@ -19523,7 +19562,11 @@ async function authSubmitEmail() {
 
 async function _sendOTP(email) {
   if (!_supaClient) _initSupabase();
-  if (!_supaClient) { _authErr('Connection issue. Check your signal and tap Continue again.'); return; }
+  if (!_supaClient) {   // the sign-in library did not load (blocker, bad signal): say so, and never leave Continue stuck on "Checking…"
+    _authErr('Connection issue. Check your signal and tap Continue again.');
+    var _b0 = document.querySelector('#auth-email-step .auth-btn'); if (_b0) { _b0.textContent = 'Continue →'; _b0.disabled = false; }
+    return;
+  }
   _authOTP = { email: email };
   var emailDisp = document.getElementById('auth-otp-email');
   if (emailDisp) emailDisp.textContent = email;
@@ -21598,6 +21641,7 @@ async function stkChartRender(){
 }
 function stkAutoRefresh(){
   try{
+    if(!viLiveOn())return;
     stkEnsure();
     if(!alState.stocks.length)return;
     var stale=alState.stocks.some(function(h){return !h.manualPrice&&(!h.updated||Date.now()-h.updated>5*60*1000);});
@@ -21910,7 +21954,9 @@ function V3Scene(host,label){
     self.size();if(self._introRun)self._introStep(t);self.r.render(self.sc,self.cam);if(!self._shown&&self.root.children.length){self._shown=1;v3Shown(self.host);}if(self.onDraw)self.onDraw();if(window.VIPERF&&VIPERF.stageFrame)VIPERF.stageFrame(self===V3.metals?'Precious metals bars':'Cash and savings coins',self.r.info.render.calls,self.r.info.render.triangles);
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}   // adaptive quality from the measured frame gap
     self._lastT=moving?t:0;
-    if(moving||self._spin||self._introRun||self._busy||Date.now()<self._until)self.raf=requestAnimationFrame(self._loop);};
+    /* v0.9.2 (the item viewer's R18, here too): ctl.update() above fires 'change', which kicks a frame, so queue one only if none is
+       queued yet. Queuing both doubled the draws every frame after a drag (1,054 draws in one frame on a phone profile) until the glide stopped. */
+    if((moving||self._spin||self._introRun||self._busy||Date.now()<self._until)&&!self.raf)self.raf=requestAnimationFrame(self._loop);};
   if(window.ResizeObserver){this.ro=new ResizeObserver(function(){self.kick();});this.ro.observe(host);}
   ctl.addEventListener('start',function(){self._drag=1;});ctl.addEventListener('end',function(){self._drag=0;self.kick(400);});
   this._off=!!window.IntersectionObserver;   // R16: off until the stage is seen, so the coins start laying only when they can be watched
@@ -22023,7 +22069,7 @@ V3Scene.prototype.introStop=function(done){
   if(done===true)v3Seen(this._stageName(),R.note);
   this.kick(200);
 };
-V3Scene.prototype.size=function(){var w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;if(w!==this._w||h!==this._h||this.r._v3on!==this){this._w=w;this._h=h;this.r._v3on=this;var pr=this._lite?1:this._dpr(w,h);if(this.r.getPixelRatio()!==pr)this.r.setPixelRatio(pr);this.r.setSize(w,h,false);this.cam.aspect=w/h;this.cam.updateProjectionMatrix();}};   // the shared renderer takes this stage's size and pixel ratio
+V3Scene.prototype.size=function(){var w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;if(w!==this._w||h!==this._h||this.r._v3on!==this){this._w=w;this._h=h;this.r._v3on=this;var pr=this._lite?1:this._dpr(w,h),sz=this.r.getDrawingBufferSize(new THREE.Vector2());if(sz.x!==Math.floor(w*pr)||sz.y!==Math.floor(h*pr)||this.r.getPixelRatio()!==pr)this.r.setDrawingBufferSize(w,h,pr);else this.r.setViewport(0,0,w,h);this.cam.aspect=w/h;this.cam.updateProjectionMatrix();}};   // the shared renderer takes this stage's size and pixel ratio in one step: a pixel ratio change and a resize each reallocate the drawing buffer, so they are one call, and none when nothing changed (v0.9.2)
 /* R16 (owner, 4 Nov: "learn from housebuilder viewport"): the house builder's pixel ratio. Full at rest (up to 2, inside the
    same pixel budget) for sharp coin rims; 1.25 on a phone (1.5 wider) while coins land, the camera turns or a finger is down.
    The drawing buffer is resized only when that changes. This replaces the flat 1.5 cap of E13. */
@@ -22426,14 +22472,14 @@ function v3CashNow(){
   var card=document.getElementById('cashSceneCard'),scene=card&&card.querySelector('.scene');if(!scene)return false;
   var host=v3Host(scene,'cashSvg');if(!host.clientWidth)return true;   // tab hidden: drawn when shown
   var V=V3.cash||(V3.cash=new V3Scene(host,'3D view of your cash as coins'));
-  var K=v3CashKey(),cur=K.cur,spec=K.spec,units=K.units,key=K.key;if(V._key===key&&V.root.children.length){V.kick(300);return true;}   // the same balance again (the tab and its sub-tab both ask on one tap): redraw, do not rebuild
+  var K=v3CashKey(),cur=K.cur,spec=K.spec,units=K.units,key=K.key;if(V._key===key&&V.root.children.length){var c0=document.getElementById('cashCap');if(c0&&V._cap)c0.textContent=V._cap;V.kick(300);return true;}   // v0.9.2: the same balance again: the 3D caption goes back too (the flat drawing may have written its own meanwhile)   // the same balance again (the tab and its sub-tab both ask on one tap): redraw, do not rebuild
   V.clear();V._key=key;
   var C=v3Pre('cash',key)||v3CashContent(spec,units,cur);V.root.add(C.grp);V.stats=C.stats;   // built in the idle warm-up when the balance has not changed since
   var PER_BLOCK=1000,sym=window.VI_CURRENCY_SYMBOL||'£',fmt=function(n){return n.toLocaleString('en-GB');};
   var kc=V3._cashUnits===units&&V3._cashCur===cur;V.frame(kc);V3._cashUnits=units;V3._cashCur=cur;v3ChipsSet(V,C.chips,C.total);
   V.introArm('cash|'+key,V3._cashZone||null,V3._cashSilent);V3._cashZone=null;V3._cashSilent=false;   // E14: the coins lay themselves out when the scene is first seen, and again when the balance changes
   var st=V.stats,plates=(st&&st.plates)||[],laid=(st?st.fullStacks:0)+(st&&st.rest?1:0);
-  var cap=document.getElementById('cashCap');if(cap)cap.textContent=units?sym+fmt(st.units)+' laid · '+plates.length+' plate'+(plates.length===1?'':'s')+' · '+Math.floor(st.units/PER_BLOCK)+' block'+(Math.floor(st.units/PER_BLOCK)===1?'':'s')+' of 1,000'+(st.units%PER_BLOCK?' + '+fmt(st.units%PER_BLOCK):'')+' · '+spec.name+' coins, '+(+(spec.d*10).toFixed(2))+' mm':'No cash yet. Add an account or some physical cash.';
+  var cap=document.getElementById('cashCap');V._cap=units?sym+fmt(st.units)+' laid · '+plates.length+' plate'+(plates.length===1?'':'s')+' · '+Math.floor(st.units/PER_BLOCK)+' block'+(Math.floor(st.units/PER_BLOCK)===1?'':'s')+' of 1,000'+(st.units%PER_BLOCK?' + '+fmt(st.units%PER_BLOCK):'')+' · '+spec.name+' coins, '+(+(spec.d*10).toFixed(2))+' mm':'No cash yet. Add an account or some physical cash.';if(cap)cap.textContent=V._cap;
   return true;
 }
 // a cast-style bar: bevelled block with the weight and fineness stamped on top
@@ -22515,7 +22561,11 @@ function v3MetalsNow(){
    either stage has already opened, when the device asks to save data, or without WebGL. */
 function v3Warm(){
   if(V3._warm||V3.cash||V3.metals||!window.THREE||!THREE.OrbitControls||!viGlOk())return;V3._warm=1;
-  var idle=function(f){if(window.requestIdleCallback)requestIdleCallback(f,{timeout:4000});else setTimeout(f,200);};
+  /* v0.9.2: several steps share one idle period while it has time left (each step is one small compile), so the warm-up is done
+     sooner after load and a tap on Assets is less likely to find shaders still to compile */
+  /* and none runs in the 1.5 s after a tab or sub-tab change (window._viNavAt), so a compile never lands on the tap that opens a tab */
+  var hbBusy=function(){var v=window.HB3DAPP&&HB3DAPP.viewer,t=document.getElementById('tab-house');try{if(t&&t.offsetParent)return true;return !!(v&&v.active&&v.settled&&!v.settled());}catch(e){return false;}};   // the House Builder on screen: wait (a compile there delays the next house type's first frame)   // nor while the House Builder is still building or moving (its own type warm-up waits the same way)
+  var dl=null,idle=function(f){var q=(window._viNavAt||-1e9)+1500-performance.now();if(q<=0&&hbBusy())q=400;if(q>0){dl=null;return setTimeout(function(){idle(f);},q+20);}if(dl&&!dl.didTimeout&&dl.timeRemaining()>12)return f();if(window.requestIdleCallback)requestIdleCallback(function(d){if((window._viNavAt||-1e9)+1500>performance.now()||hbBusy()){dl=null;return idle(f);}dl=d;f();},{timeout:4000});else setTimeout(function(){if((window._viNavAt||-1e9)+1500>performance.now()||hbBusy())return idle(f);f();},200);};
   var pre=[function(){var K=v3CashKey();if(K.units>0){V3._pre=V3._pre||{};var c=v3CashContent(K.spec,K.units,K.cur);V3._pre.cash=c;}},
     function(){var mk=v3MetalsKey();V3._pre=V3._pre||{};V3._pre.metals=v3MetalsContent(mk);}];
   var W=null,objs=[],bars=[],k=0,busy=function(){return V3.cash||V3.metals;};   // a stage opened meanwhile: stop (it compiles what it needs itself)
@@ -22556,7 +22606,12 @@ function v3Warm(){
   };
   idle(step);
 }
+/* v0.9.2: the warm-up starts the moment both are true, the page has loaded and the 3D engine is in (its 'vi-three' event, which can
+   come before or after 'load'), not on the next 1.5 s poll; the poll stays as a fallback */
+function v3WarmSoon(){if(document.readyState!=='complete'||!window.THREE||!THREE.OrbitControls)return;var saveData=false;try{saveData=!!(navigator.connection&&navigator.connection.saveData);}catch(e){}if(!saveData)setTimeout(v3Warm,50);}
+document.addEventListener('vi-three',function(e){if(e.detail&&e.detail.ok)v3WarmSoon();});
 window.addEventListener('load',function(){var saveData=false;try{saveData=!!(navigator.connection&&navigator.connection.saveData);}catch(e){}if(saveData)return;
+  v3WarmSoon();
   var n=0,wait=function(){if(window.THREE&&THREE.OrbitControls)return v3Warm();if(++n<30)setTimeout(wait,1500);};setTimeout(wait,1500);});
 
 function renderMetalsISO(){
@@ -22793,6 +22848,7 @@ function fetchCryptoPrices(quiet){
 function crSig(list){return JSON.stringify(list.map(function(c){return [c.price,c.priceSrc,c.change24h,c.addPx]}))}
 /* automatic checks only when the user holds some coin (not on a new device's blank sample, before the cloud copy arrives) */
 function crAutoRefresh(){
+  if(!viLiveOn())return;
   var last=Date.parse(alState.cryptoCheckedAt||0)||0;
   if((alState.crypto||[]).some(function(c){return c&&(+(c.amount!=null?c.amount:c.qty)||0)>0})&&Date.now()-last>VI_CRYPTO_EVERY-5000)fetchCryptoPrices(true);
 }
@@ -22806,6 +22862,17 @@ function updateCryptoPrice(id,val){if(viBlockEdit())return;var c=alState.crypto.
 setTimeout(function(){try{crAutoRefresh()}catch(e){}},4000);
 setInterval(function(){try{var p=document.getElementById('assets-crypto');if(!document.hidden&&p&&p.offsetParent)crAutoRefresh()}catch(e){}},60000);
 function fetchLivePrices(){fetchCryptoPrices(false);} // backward compat
+/* Live prices on / off (v0.9.2 Settings): one switch for the automatic checks of the free feeds. On by default; the choice stays on this device. Refresh now always works. */
+function viLiveOn(){try{return localStorage.getItem('vi_live_prices')!=='0';}catch(e){return true;}}
+function viLivePaint(){var r=document.getElementById('set-live-opts');if(!r)return;var on=viLiveOn();[].forEach.call(r.children,function(b){b.classList.toggle('active',(b.getAttribute('data-live')==='1')===on);b.setAttribute('aria-pressed',(b.getAttribute('data-live')==='1')===on?'true':'false');});}
+function viSetLive(on){try{localStorage.setItem('vi_live_prices',on?'1':'0');}catch(e){}viLivePaint();showToast(on?'Live prices on':'Live prices off. Your own prices are kept');if(on){try{crAutoRefresh();stkAutoRefresh();}catch(e){}}}
+function viRefreshLive(){
+  showToast('Refreshing prices…');
+  try{fetchCryptoPrices(true);}catch(e){}
+  try{fetchMetalPrices();}catch(e){}
+  try{stkRefresh(true);}catch(e){}
+  try{fetchExchangeRates(function(){});}catch(e){}
+}
 function fetchMetalPrices(){
   fetch('https://api.metals.live/v1/spot/gold,silver,platinum,palladium')
     .then(function(r){return r.json();}).then(function(d){
@@ -22970,7 +23037,7 @@ function crCoinBadge(h,px,col){
   return '<span class="stk-hl cr-hl" style="width:'+px+'px;height:'+px+'px;border-radius:50%">'
     +(url?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+stkEsc(url)+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><span class="stk-hl-fb" style="display:none;width:100%;height:100%">'+fb+'</span>':fb)+'</span>';
 }
-function crCoinHue(sym){var m=VI_COIN_SVG[sym]&&/<circle[^>]*fill='(#[0-9a-fA-F]{6})'/.exec(VI_COIN_SVG[sym]);return m?m[1]:'#d9a93a';}   // the coin's own colour from its logo; gold for a coin with none
+function crCoinHue(sym){var m=VI_COIN_SVG[sym]&&/<circle[^>]*fill='(#[0-9a-fA-F]{3,6})'/.exec(VI_COIN_SVG[sym]);if(!m)return '#d9a93a';var h=m[1].toLowerCase();if(h.length===4)h='#'+h[1]+h[1]+h[2]+h[2]+h[3]+h[3];if(h==='#000000')h='#3a3f4a';return h;}   // the coin's own colour from its logo (3 or 6 digit hex; a pure black logo gets graphite so the rim shows); gold only for a coin with no logo
 function crCoin3d(h,px,col){var e='';for(var k=1;k<=14;k++)e+='<i class="cr-edge" style="--k:'+k+'"></i>';return '<span class="cr-coin" aria-hidden="true" style="--coin:'+crCoinHue(h.sym)+'">'+e+crCoinBadge(h,px,col)+'</span>';}
 function crAllocView(){try{return localStorage.getItem('vi-cr-alloc')==='tree'?'tree':'bars';}catch(e){return 'bars';}}
 function crSetAlloc(v){try{localStorage.setItem('vi-cr-alloc',v);}catch(e){}crRender();}
@@ -23008,8 +23075,8 @@ function crRender(){
           +'<div class="stk-gb"'+(open?'':' hidden')+'><div class="cr-grid">'+g.hs.map(function(h){var c=h._c,i=hs.indexOf(h),col=CR_COLORS[gi%CR_COLORS.length];
             var v=stkValue(h),sus=stkSuspect(h),b=stkBasis(h),pl=(!sus&&b>0)?(stkPrice(h)-b)/b*100:null,cid=c.id,ch=+c.change24h||0;
             return '<div class="cr-row cr-tile" style="--i:'+i+'">'
-              +'<div class="c-tk">'+crCoin3d(h,96,col)+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+CR_COLORS[i%CR_COLORS.length]+'"></i>'+stkEsc(h.sym)+'</div><div class="stk-nm cr-held">'+crQty(h.units)+' '+stkEsc(h.sym)+' held</div></div></div>'
-              +'<div class="c-pr"><span class="stk-lb">Price £</span>'+(c.priceSrc==='live'?'<div class="stk-px">£'+(+c.price).toLocaleString('en-GB',{maximumFractionDigits:c.price<1?6:2})+'</div>':'<input class="stk-inp" type="number" min="0" step="any" value="'+(+c.price>0?c.price:'')+'" onchange="updateCryptoPrice('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' price in pounds" title="Your price in £. A live price replaces it when CoinGecko has one">')+'<div class="stk-src cr-src cr-src-'+(c.priceSrc==='live'?'live':c.priceSrc==='stale'?'stale':'own')+'">'+crPriceLine(c)+(ch&&c.priceSrc==='live'?' · <span style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
+              +'<div class="c-tk">'+crCoin3d(h,96,col)+'<div class="stk-tkb"><div class="stk-tk"><i style="background:'+crCoinHue(h.sym)+'"></i>'+stkEsc(h.sym)+'</div><div class="stk-nm cr-held">'+crQty(h.units)+' '+stkEsc(h.sym)+' held</div></div></div>'
+              +'<div class="c-pr"><span class="stk-lb">Price £</span>'+(c.priceSrc==='live'?'<div class="stk-px">£'+(+c.price).toLocaleString('en-GB',{maximumFractionDigits:c.price<1?6:2})+'</div>':'<input class="stk-inp" type="number" min="0" step="any" value="'+(+c.price>0?c.price:'')+'" onchange="updateCryptoPrice('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' price in pounds" title="Your price in £. A live price replaces it when CoinGecko has one">')+'<div class="stk-src cr-src cr-src-'+(c.priceSrc==='live'?'live':c.priceSrc==='stale'?'stale':'own')+'">'+crPriceLine(c)+(ch&&c.priceSrc==='live'?' <span class="cr-ch" style="color:'+(ch>=0?'var(--green)':'var(--red)')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div></div>'
               +'<div class="cr-ins">'
               +'<div class="c-un"><span class="stk-lb">Amount</span><input class="stk-inp" type="number" min="0" step="any" value="'+h.units+'" onchange="updateCryptoAmount('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' amount held" title="Editable: how much you hold"></div>'
               +'<div class="c-av"><span class="stk-lb">Cost per unit £</span><input class="stk-inp" type="number" min="0" step="any" value="'+(+c.avgCost>0?c.avgCost:'')+'" placeholder="'+(+c.addPx>0?(+c.addPx).toFixed(c.addPx<1?6:2).replace(/\.?0+$/,''):'–')+'" onchange="updateCryptoCost('+cid+',this.value)" aria-label="'+stkEsc(h.sym)+' cost per unit" title="'+(+c.addPx>0&&!(+c.avgCost>0)?'Empty, so the price when you added it is used. Type what you paid per coin in £ to use that instead':'What you paid for one coin, in £')+'"></div>'
@@ -23017,7 +23084,7 @@ function crRender(){
               +'<div class="stk-val c-va"><span class="stk-lb">Value</span>'+cfMoney(v)+'</div>'
               +(sus?'<div class="stk-pl c-pl"><button type="button" class="stk-chk" onclick="stkCheckCost(this)" title="Your cost per unit is more than 3 times today’s price. It should be the price you paid per coin, in £ (not the total)">Check your cost per unit</button></div>'
                 :'<div class="stk-pl c-pl" style="color:'+(pl==null?'var(--t3)':pl>=0?'var(--green)':'var(--red)')+'">'+(pl==null?'–':(pl>=0?'+':'')+pl.toFixed(1)+'%')+'</div>')
-              +'<button class="data-item-del c-x" style="width:auto;padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;opacity:1;border:1px solid rgb(var(--red-rgb) / .45);border-radius:4px" onclick="delCrypto('+cid+')" title="Remove this coin">🗑 Remove</button></div>';
+              +'<button class="data-item-del c-x" style="width:auto;padding:4px 8px;font-size:max(.5rem,var(--vi-fs-1));white-space:nowrap;opacity:1;border:1px solid rgb(var(--red-rgb) / .45);border-radius:4px" onclick="delCrypto('+cid+')" title="Remove this coin"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg> Remove</button></div>';
           }).join('')+'</div></div></div>';
       }).join('')+'</div>';
   }
@@ -23722,10 +23789,10 @@ function i3dHintHtml(m){
 }
 function i3dItem(kind,id){return ((kind==='li'?alState.liabilities:alState.otherAssets)||[]).find(function(x){return x.id===id;});}
 function i3dKey(kind,id){return 'm:'+kind+':'+id;}
-function i3dPut(kind,id,buf,fmt){return invTx('readwrite',function(s){return s.put({glb:buf,fmt:fmt||'glb',updated:Date.now()},i3dKey(kind,id));});}   // the bytes stay under `glb` (old records); `fmt` says which format they are
+function i3dPut(kind,id,buf,fmt){i3dCacheDrop(i3dKey(kind,id),true);return invTx('readwrite',function(s){return s.put({glb:buf,fmt:fmt||'glb',updated:Date.now()},i3dKey(kind,id));});}   // the bytes stay under `glb` (old records); `fmt` says which format they are
 function i3dGetRec(kind,id){return invTx('readonly',function(s){return s.get(i3dKey(kind,id));}).then(function(v){return v&&v.glb?{buf:v.glb,fmt:v.fmt||'glb'}:null;});}
 function i3dGetBuf(kind,id){return i3dGetRec(kind,id).then(function(r){return r&&r.buf;});}
-function i3dDel(kind,id){try{return invTx('readwrite',function(s){return s.delete(i3dKey(kind,id));});}catch(e){return Promise.resolve();}}
+function i3dDel(kind,id){i3dCacheDrop(i3dKey(kind,id),true);try{return invTx('readwrite',function(s){return s.delete(i3dKey(kind,id));});}catch(e){return Promise.resolve();}}
 // fetch a library model from our own copy (same origin); a web page or an error is never mistaken for a model
 function i3dFetchLib(file){
   return fetch(I3D_BASE+file,{credentials:'omit'}).then(function(r){
@@ -23823,17 +23890,41 @@ function i3dGrid(half,step,hex,op,y){
   var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
   return new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:i3dCol(hex),transparent:true,opacity:op,depthWrite:false}));
 }
+/* v0.9.2 (owner, 4 Nov: "viewports still too slow"): the tile's live view and the full viewer share one WebGL renderer and one
+   stage (sky, floor, grid, lights), made on the first open and kept. Opening another item, or going from the tile to the full
+   viewer, only swaps the model: no new WebGL context, no shaders compiled again, and closing no longer waits for a context to be
+   torn down. Only one live view is open at a time; a second one at the same moment (never in normal use) gets its own renderer. */
+var _i3dSh=null;
+function i3dRenderer(still){
+  var r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:false,preserveDrawingBuffer:!!still});
+  r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.NoToneMapping;   // the model's own colours, not a film curve (owner, 31 Oct)
+  r.shadowMap.enabled=!still;r.shadowMap.type=THREE.PCFShadowMap;   // the still preview needs no shadows; the cheaper filter everywhere
+  return r;
+}
+function i3dShared(){
+  if(_i3dSh)return _i3dSh;
+  var S=_i3dSh={r:i3dRenderer(false),sc:new THREE.Scene(),view:null,lost:false};
+  i3dStage(S.sc,false);
+  var cv=S.r.domElement;cv.addEventListener('webglcontextlost',function(e){e.preventDefault();S.lost=true;});
+  cv.addEventListener('webglcontextrestored',function(){S.lost=false;if(S.view){S.view._w=0;S.view.kick(400);}});
+  return S;
+}
 function I3DView(host,obj,opts){
   opts=opts||{};var self=this;
   var w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);
-  var r=this.r=new THREE.WebGLRenderer({antialias:!viCoarse(),alpha:false,preserveDrawingBuffer:!!opts.still});
-  r.setPixelRatio(viGlDpr(host));r.setSize(w,h,false);
-  r.domElement.addEventListener('webglcontextlost',function(e){e.preventDefault();self._lost=true;});r.domElement.addEventListener('webglcontextrestored',function(){self._lost=false;});
-  r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.NoToneMapping;   // the model's own colours, not a film curve (owner, 31 Oct)
-  r.shadowMap.enabled=!opts.still;r.shadowMap.type=THREE.PCFShadowMap;   // the still preview needs no shadows; the cheaper filter everywhere
-  var cv=r.domElement;cv.className='i3d-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',opts.label||'3D model');
+  var S=!opts.still&&viGlOk()?i3dShared():null;if(S&&S.view&&!S.view.dead)S=null;   // the shared stage is taken: this one has its own
+  var r=this.r=S?S.r:i3dRenderer(!!opts.still);this._sh=S;
+  if(S){S.view=this;if(S.lite)this._lite=true;}
+  else{r.domElement.addEventListener('webglcontextlost',function(e){e.preventDefault();self._lost=true;});r.domElement.addEventListener('webglcontextrestored',function(){self._lost=false;});}
+  r.setDrawingBufferSize(w,h,S&&S.lite?1:viGlDpr(host));   // size and pixel ratio in one go: each change reallocates the drawing buffer
+  var cv=r.domElement;cv.className='i3d-canvas';cv.setAttribute('role','img');cv.setAttribute('aria-label',opts.label||'3D model');cv.removeAttribute('tabindex');cv.style.touchAction='';
   host.insertBefore(cv,host.firstChild);
-  var sc=this.sc=new THREE.Scene();sc.background=new THREE.Color(0x05101b);sc.fog=new THREE.Fog(0x05101b,9,26);
+  var sc=this.sc=S?S.sc:new THREE.Scene();if(!S)this._gtex=i3dStage(sc,!!opts.still);
+  this.tinted=i3dStyle(obj);var bb=i3dFit(obj);sc.add(obj);this.obj=obj;
+  this._rest(host,w,h,bb,opts);
+}
+// the stage every item stands on (see R17 below); returns the floor texture, which the owner of the scene disposes
+function i3dStage(sc,still){
   /* v0.9.1 R17 (owner, 4 Nov): more contrast in the sky and the floor, sharper floor lines, the environment glows teal while the
      model is lit only by white light. The teal is in the stage itself (sky dome and a pool of light on the floor, both unlit), so no
      coloured light ever reaches the model. The sky runs from near black overhead to a teal horizon; fog melts the floor into it. */
@@ -23845,17 +23936,20 @@ function I3DView(host,obj,opts){
   sky.userData.i3dEnv=hz;sky.renderOrder=-1;sc.add(sky);
   var gcv=document.createElement('canvas');gcv.width=gcv.height=256;var gx=gcv.getContext('2d'),gr=gx.createRadialGradient(128,128,0,128,128,128);
   gr.addColorStop(0,'#15504e');gr.addColorStop(0.07,'#0e3638');gr.addColorStop(0.22,'#081b1f');gr.addColorStop(1,'#030a0d');gx.fillStyle=gr;gx.fillRect(0,0,256,256);
-  var gtex=this._gtex=new THREE.CanvasTexture(gcv);gtex.encoding=THREE.sRGBEncoding;
+  var gtex=new THREE.CanvasTexture(gcv);gtex.encoding=THREE.sRGBEncoding;
   var ground=new THREE.Mesh(new THREE.CircleBufferGeometry(30,64),new THREE.MeshBasicMaterial({map:gtex}));ground.rotation.x=-Math.PI/2;ground.userData.i3dEnv=0x15504e;sc.add(ground);
   sc.add(i3dGrid(12,0.5,0x2c837c,0.45,0.002));sc.add(i3dGrid(12,2,0x5fd6cb,0.6,0.003));   // fine lines every 0.5, bright ones every 2
   /* white light only, so nothing tints the model */
   sc.add(new THREE.HemisphereLight(0xffffff,0x404040,0.9));
-  var key=new THREE.DirectionalLight(0xffffff,1.15);key.position.set(3,6,4);key.castShadow=!opts.still;var kms=viCoarse()?512:1024;key.shadow.mapSize.set(kms,kms);key.shadow.bias=-0.0005;
+  var key=new THREE.DirectionalLight(0xffffff,1.15);key.position.set(3,6,4);key.castShadow=!still;var kms=viCoarse()?512:1024;key.shadow.mapSize.set(kms,kms);key.shadow.bias=-0.0005;
   key.shadow.camera.left=key.shadow.camera.bottom=-2.5;key.shadow.camera.right=key.shadow.camera.top=2.5;sc.add(key);   // the shadow map covers just the model, so it stays crisp
   var fill=new THREE.DirectionalLight(0xffffff,0.35);fill.position.set(-4,3,-2);sc.add(fill);
   var rim=new THREE.DirectionalLight(0xffffff,0.45);rim.position.set(-2,3,-5);sc.add(rim);
-  if(!opts.still){var catcher=new THREE.Mesh(new THREE.PlaneBufferGeometry(6,6),new THREE.ShadowMaterial({opacity:0.55,depthWrite:false}));catcher.rotation.x=-Math.PI/2;catcher.position.y=0.001;catcher.renderOrder=-1;catcher.receiveShadow=true;sc.add(catcher);}
-  this.tinted=i3dStyle(obj);var bb=i3dFit(obj);sc.add(obj);this.obj=obj;
+  if(!still){var catcher=new THREE.Mesh(new THREE.PlaneBufferGeometry(6,6),new THREE.ShadowMaterial({opacity:0.55,depthWrite:false}));catcher.rotation.x=-Math.PI/2;catcher.position.y=0.001;catcher.renderOrder=-1;catcher.receiveShadow=true;sc.add(catcher);}
+  return gtex;
+}
+I3DView.prototype._rest=function(host,w,h,bb,opts){
+  var self=this,r=this.r,sc=this.sc,cv=r.domElement;
   var cam=this.cam=new THREE.PerspectiveCamera(35,w/h,0.02,100);
   /* on a narrow stage the control column (40 px) sits over the model's right edge: slide the picture left so nothing runs under it */
   this._vo=function(W,H){if(host.id==='i3d-stage'&&W<520)cam.setViewOffset(W,H,28,0,W,H);else if(cam.view)cam.clearViewOffset();};this._vo(w,h);
@@ -23873,9 +23967,10 @@ function I3DView(host,obj,opts){
   // draws only while something moves (drag, pinch, auto-rotate, a kick), never off screen or in a background tab
   /* F2 (R18 "it should run smooth"): the stage size comes from the ResizeObserver below; reading clientWidth here forced a style and layout
      pass every frame (about 5 ms a frame on a phone, with decorative animations behind the viewer). Without ResizeObserver it reads as before. */
-  this._rw=w;this._rh=h;
-  var loop=function(){self.raf=0;if(self.dead||self._lost||self._off||document.hidden){self._lastT=0;return;}var W=self.ro?self._rw:host.clientWidth,H=self.ro?self._rh:host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setSize(W,H,false);cam.aspect=W/H;self._vo(W,H);cam.updateProjectionMatrix();}
+  this._rw=w;this._rh=h;this._w=w;this._h=h;
+  var loop=function(){self.raf=0;if(self.dead||self._lost||(self._sh&&self._sh.lost)||self._off||document.hidden){self._lastT=0;return;}var W=self.ro?self._rw:host.clientWidth,H=self.ro?self._rh:host.clientHeight;if(W&&H&&(W!==self._w||H!==self._h)){self._w=W;self._h=H;r.setDrawingBufferSize(W,H,self._lite?1:viGlDpr(host));cam.aspect=W/H;self._vo(W,H);cam.updateProjectionMatrix();}
     var moving=ctl.update();var t=performance.now();r.render(sc,cam);
+    if(window.VIPERF&&VIPERF.stageFrame)VIPERF.stageFrame(host.id==='i3d-stage'?'Item 3D viewer':'Item 3D tile',r.info.render.calls,r.info.render.triangles);   // v0.9.2: ?perf=1 samples the item viewer's frames too
     if(moving&&self._lastT&&!self._lite){var dt=t-self._lastT;if(dt>2&&dt<500){self._ema=self._ema==null?dt:self._ema*0.9+dt*0.1;self._nf=(self._nf||0)+1;if(self._nf>40&&self._ema>70)self.goLite();}}
     self._lastT=moving?t:0;
     /* R18 (owner, 4 Nov: closing took 5 s): ctl.update() fires 'change', which kicks a frame, so only queue one if none is queued yet.
@@ -23886,18 +23981,35 @@ function I3DView(host,obj,opts){
   if(window.IntersectionObserver){this.io=new IntersectionObserver(function(es){var vis=es[es.length-1].isIntersecting;if(vis===!self._off)return;self._off=!vis;if(vis)self.kick(200);},{threshold:.01});this.io.observe(host);}
   this._onVis=function(){if(!document.hidden)self.kick(200);};document.addEventListener('visibilitychange',this._onVis);
   this.kick(600);
-}
+};
 I3DView.prototype.kick=function(ms){this._until=Math.max(this._until||0,Date.now()+(ms||400));if(!this.raf&&!this.dead&&this._loop)this.raf=requestAnimationFrame(this._loop);};
-I3DView.prototype.goLite=function(){if(this._lite)return;this._lite=true;this.r.shadowMap.enabled=false;this.sc.traverse(function(o){if(o.isDirectionalLight)o.castShadow=false;var m=o.material;if(!m)return;(Array.isArray(m)?m:[m]).forEach(function(x){x.needsUpdate=true;});});this.r.setPixelRatio(1);this._w=0;this.kick(300);};
+I3DView.prototype.goLite=function(){if(this._lite)return;this._lite=true;if(this._sh)this._sh.lite=true;   // the shared stage stays lite for the rest of the visit: this phone cannot keep up
+  this.r.shadowMap.enabled=false;this.sc.traverse(function(o){if(o.isDirectionalLight)o.castShadow=false;var m=o.material;if(!m)return;(Array.isArray(m)?m:[m]).forEach(function(x){x.needsUpdate=true;});});this.r.setPixelRatio(1);this._w=0;this.kick(300);};
 I3DView.prototype.zoom=function(f){var c=this.cam,t=this.ctl.target,v=c.position.clone().sub(t),d=Math.min(this.ctl.maxDistance,Math.max(this.ctl.minDistance,v.length()*f));c.position.copy(t).add(v.setLength(d));this.kick();};
 I3DView.prototype.reset=function(){var c=this.ctl,d=c.enableDamping;c.enableDamping=false;c.update();c.enableDamping=d;   // spend any drag momentum first (one update a frame now, R18), so the camera stays home
   this.cam.position.copy(this.home.p);c.target.copy(this.home.t);c.update();this.kick();};
 I3DView.prototype.dispose=function(){
   this.dead=true;cancelAnimationFrame(this.raf);this.raf=0;try{this.ctl&&this.ctl.dispose();}catch(e){}
   try{this.ro&&this.ro.disconnect();this.io&&this.io.disconnect();this._onVis&&document.removeEventListener('visibilitychange',this._onVis);}catch(e){}
+  var S=this._sh;
+  if(S){   // the shared stage stays for the next open: take the model off it and the canvas off the page; the model is freed unless it is kept for a reopen
+    if(this.obj){S.sc.remove(this.obj);if(!i3dCached(this.obj))i3dFree(this.obj);}
+    if(S.view===this)S.view=null;var c0=S.r.domElement;c0.parentNode&&c0.parentNode.removeChild(c0);return;}
+  if(this.obj&&i3dCached(this.obj))this.sc.remove(this.obj);
   this.sc.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(function(m){m&&m.dispose&&m.dispose();});});
   try{this._gtex&&this._gtex.dispose();this.r.dispose();this.r.forceContextLoss();}catch(e){}var cv=this.r.domElement;cv.parentNode&&cv.parentNode.removeChild(cv);
 };
+/* v0.9.2: the last two models read are kept, already parsed, so the tile's live view hands its model to the full viewer and a
+   reopen reads nothing from the device again. A new file or a removed model drops the kept copy (i3dPut, i3dDel). */
+var _i3dKeep=[],_i3dVer={};   // _i3dVer: bumped when an item's file changes or goes, so a read that started before it is not kept
+function i3dCacheGet(kind,id){var k=i3dKey(kind,id);for(var i=0;i<_i3dKeep.length;i++)if(_i3dKeep[i].k===k)return _i3dKeep[i].obj;return null;}
+function i3dCachePut(kind,id,obj,ver){var k=i3dKey(kind,id);if(ver!=null&&ver!==(_i3dVer[k]||0))return false;i3dCacheDrop(k);_i3dKeep.unshift({k:k,obj:obj});
+  while(_i3dKeep.length>2){var old=_i3dKeep.pop();if(!old.obj.parent)i3dFree(old.obj);}return true;}
+function i3dVer(kind,id){return _i3dVer[i3dKey(kind,id)]||0;}
+function i3dCacheDrop(k,changed){if(changed)_i3dVer[k]=(_i3dVer[k]||0)+1;for(var i=_i3dKeep.length-1;i>=0;i--)if(_i3dKeep[i].k===k){var o=_i3dKeep.splice(i,1)[0].obj;if(!o.parent)i3dFree(o);}}
+function i3dCached(obj){return _i3dKeep.some(function(x){return x.obj===obj;});}
+function i3dFree(obj){obj.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(function(m){if(!m)return;
+  ['map','normalMap','roughnessMap','metalnessMap','emissiveMap','aoMap','alphaMap','bumpMap'].forEach(function(t){m[t]&&m[t].dispose&&m[t].dispose();});m.dispose&&m.dispose();});});}
 // small still picture for the tile (one short-lived renderer, so tiles never hold WebGL contexts)
 function i3dThumb(obj){
   var d=document.createElement('div');d.style.cssText='position:fixed;left:-9999px;top:0;width:360px;height:360px';document.body.appendChild(d);
@@ -23941,10 +24053,13 @@ async function i3dOpen(kind,id){
   try{
     var obj=null,pre=_i3dReady;_i3dReady=null;
     if(pre&&pre.kind===kind&&pre.id===id)obj=pre.obj;
-    else{var rec=await i3dGetRec(kind,id),buf=rec&&rec.buf,fmt=(rec&&rec.fmt)||m.fmt||'glb';
-      if(!buf&&(m.src==='lib'||m.src==='pp')){var lf=await i3dFileOf(m);if(lf){i3dMsg('Loading the model from the library…');buf=await i3dFetchLib(lf);await i3dPut(kind,id,buf,'glb');fmt='glb';i3dMsg('');}}
+    else if((obj=i3dCacheGet(kind,id))&&obj.parent)obj=null;   // read already (the tile's live view, or the last open); one in use elsewhere is read again
+    var ver=i3dVer(kind,id);
+    if(!obj){var rec=await i3dGetRec(kind,id),buf=rec&&rec.buf,fmt=(rec&&rec.fmt)||m.fmt||'glb';
+      if(!buf&&(m.src==='lib'||m.src==='pp')){var lf=await i3dFileOf(m);if(lf){i3dMsg('Loading the model from the library…');buf=await i3dFetchLib(lf);await i3dPut(kind,id,buf,'glb');ver=i3dVer(kind,id);fmt='glb';i3dMsg('');}}
       if(!buf)throw new Error('The 3D file is on the device you added it from. Upload it again here to see it on this device.');
       obj=await i3dParse(buf.slice(0),fmt,kind);}
+    i3dCachePut(kind,id,obj,ver);
     var st=document.getElementById('i3d-stage');if(!st)return;
     var w=document.getElementById('i3d-wait');w&&w.remove();
     _i3dView=new I3DView(st,obj,{label:'3D model of '+it.name});
@@ -24045,7 +24160,9 @@ function i3dLive(kind,id,img,force){
   if(!window.matchMedia||!(force||matchMedia('(hover: hover) and (pointer: fine)').matches)||!viGlOk())return;
   var key=kind+':'+id;if(_i3dLive&&_i3dLive.key===key&&_i3dLive.area.isConnected)return;
   i3dLiveStop();var area=img.parentNode,rec={key:key,area:area,img:img};_i3dLive=rec;
-  i3dGetRec(kind,id).then(function(r){return _i3dLive===rec&&r?i3dParse(r.buf.slice(0),r.fmt,kind):null}).then(function(obj){
+  var kept=i3dCacheGet(kind,id),ver=i3dVer(kind,id);if(kept&&kept.parent)kept=null;
+  (kept?Promise.resolve(kept):i3dGetRec(kind,id).then(function(r){return _i3dLive===rec&&r?i3dParse(r.buf.slice(0),r.fmt,kind):null})).then(function(obj){
+    if(obj&&_i3dLive===rec)i3dCachePut(kind,id,obj,ver);
     if(!obj||_i3dLive!==rec||!area.isConnected)return;
     var host=document.createElement('div');host.className='i3d-live';area.appendChild(host);rec.host=host;
     var it=i3dItem(kind,id);rec.view=new I3DView(host,obj,{auto:false,label:'3D model of '+(it?it.name:'the item')+'. Drag to turn it round, click to open it.'});
@@ -24067,19 +24184,19 @@ function i3dLive(kind,id,img,force){
     host.addEventListener('wheel',function(e){if(!engaged&&!e.ctrlKey&&!e.metaKey)ctl.enableZoom=false},{capture:true,passive:true});   // the page keeps this wheel turn
     host.addEventListener('wheel',function(){ctl.enableZoom=true},{passive:true});
     ctl.addEventListener('change',function(){var o=ctl.target.clone().sub(V.home.t);if(o.length()>2.5){o.setLength(2.5);var nt=V.home.t.clone().add(o);V.cam.position.add(nt.clone().sub(ctl.target));ctl.target.copy(nt)}});
-    cv.addEventListener('pointerdown',function(e){engaged=true;ptrs[e.pointerId]=1;if(Object.keys(ptrs).length>1)multi=true;d0=[e.clientX,e.clientY]});
+    host.addEventListener('pointerdown',function(e){engaged=true;ptrs[e.pointerId]=1;if(Object.keys(ptrs).length>1)multi=true;d0=[e.clientX,e.clientY]});
     var up=function(e){delete ptrs[e.pointerId];var none=!Object.keys(ptrs).length,wasMulti=multi;if(none)multi=false;
       if(e.type!=='pointerup'||wasMulti||!d0||Math.hypot(e.clientX-d0[0],e.clientY-d0[1])>=6){if(none)d0=null;return}
       d0=null;var now=Date.now();
       if(tapAt&&now-tapAt<340){clearTimeout(tapTimer);tapAt=0;V.reset()}
       else{tapAt=now;tapTimer=setTimeout(function(){tapAt=0;if(_i3dLive===rec)i3dOpen(kind,id)},350)}};
-    cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
-    cv.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')engaged=false});
+    host.addEventListener('pointerup',up);host.addEventListener('pointercancel',up);   // on the tile's own box, not the canvas: the canvas is shared with the full viewer (v0.9.2)
+    host.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')engaged=false});
     /* a hint chip says the tile can be turned (Pedro's review of v0.8 spec F): it fades on the first touch or after 4 s and does not come back this session. No button stack on a small tile; a tap opens the full viewer, a double tap resets */
     if(!window._i3dHintDone){var hint=document.createElement('div');hint.className='i3d-hint';
       hint.innerHTML='<svg class="vi-ic sm" aria-hidden="true"><use href="#vi-orbit"/></svg><span>Drag to turn</span>';host.appendChild(hint);
       var gone=function(){if(window._i3dHintDone)return;window._i3dHintDone=true;hint.classList.add('off');setTimeout(function(){hint.remove()},300)};
-      setTimeout(gone,4000);cv.addEventListener('pointerdown',gone,{once:true})}
+      setTimeout(gone,4000);host.addEventListener('pointerdown',gone,{once:true})}
     img.style.visibility='hidden';
     window._i3dSeen=true;[].forEach.call(document.querySelectorAll('.i3d-badge'),function(b){b.textContent='3D'});
   }).catch(function(){if(_i3dLive===rec)_i3dLive=null;});
@@ -24092,14 +24209,29 @@ function i3dRefreshThumbs(){
   if(!todo.length)return;_i3dRe.run=true;
   (async function(){
     for(var i=0;i<todo.length;i++){var k=todo[i][0],it=todo[i][1];_i3dRe.tried[k+it.id]=1;
-      try{var rc=await i3dGetRec(k,it.id);if(!rc)continue;var obj=await i3dParse(rc.buf.slice(0),rc.fmt,k);i3dStyle(obj);
-        it.model.thumb=i3dThumb(obj);it.model.tv=3;saveAL();
+      try{var ver=i3dVer(k,it.id),rc=await i3dGetRec(k,it.id);if(!rc)continue;var obj=await i3dParse(rc.buf.slice(0),rc.fmt,k);i3dStyle(obj);
+        it.model.thumb=i3dThumb(obj);it.model.tv=3;saveAL();i3dCachePut(k,it.id,obj,ver);   // v0.9.2: the model just read for the card's picture is kept, so opening that item reads nothing again
         [].forEach.call(document.querySelectorAll('img.i3d-thumb'),function(im){if((im.getAttribute('onclick')||'').indexOf("'"+k+"',"+it.id+",")>-1)im.src=it.model.thumb});
       }catch(e){}}
     _i3dRe.run=false;
   })();
 }
-(function(){var _rat=window.renderAlTab;if(typeof _rat==='function')window.renderAlTab=renderAlTab=function(){i3dLiveStop();var r=_rat.apply(this,arguments);try{setTimeout(i3dRefreshThumbs,400)}catch(e){}return r};})();
+/* v0.9.2: once Assets is open and an item has a 3D model, the shared viewer (renderer, stage, and the model shader in its plain and
+   textured kinds) is made in an idle moment, so the first tap on a tile compiles little. Nothing is drawn on screen; it is drawn once
+   into the hidden canvas. The materials are kept, so three.js keeps their compiled shaders. */
+function i3dWarm(){
+  if(_i3dSh&&_i3dSh.warm)return;if(!window.THREE||!THREE.OrbitControls||!viGlOk())return;
+  var any=[].concat(alState.otherAssets||[],alState.liabilities||[]).some(function(it){return it.model&&it.model.thumb;});if(!any)return;
+  var pg=document.getElementById('assets-page');if(!pg||!pg.offsetParent)return;
+  var go=function(){if(_i3dSh&&_i3dSh.warm)return;try{var S=i3dShared();if(S.view)return;S.warm=1;
+    var tx=new THREE.DataTexture(new Uint8Array([200,200,200,255]),1,1,THREE.RGBAFormat);tx.encoding=THREE.sRGBEncoding;tx.needsUpdate=true;
+    var g=new THREE.BoxBufferGeometry(1,1,1),mk=[new THREE.MeshStandardMaterial({color:0x888888}),new THREE.MeshStandardMaterial({color:0xffffff,map:tx})];S.keep=mk;
+    var grp=new THREE.Group();mk.forEach(function(m){var o=new THREE.Mesh(g,m);o.castShadow=o.receiveShadow=true;grp.add(o);});S.sc.add(grp);
+    var cam=new THREE.PerspectiveCamera(35,1,0.02,100);cam.position.set(2.6,2,3.4);cam.lookAt(0,0.5,0);
+    S.r.setDrawingBufferSize(1,1,1);S.r.render(S.sc,cam);S.sc.remove(grp);g.dispose();}catch(e){}};
+  if(window.requestIdleCallback)requestIdleCallback(go,{timeout:5000});else setTimeout(go,800);
+}
+(function(){var _rat=window.renderAlTab;if(typeof _rat==='function')window.renderAlTab=renderAlTab=function(){i3dLiveStop();var r=_rat.apply(this,arguments);try{setTimeout(i3dRefreshThumbs,400);setTimeout(i3dWarm,600)}catch(e){}return r};})();
 
 function wiSearch(id){
   var a=(alState.otherAssets||[]).find(function(x){return x.id===id;});
@@ -25245,43 +25377,14 @@ function wrFilter(k){var c=document.getElementById('wr-collection');if(c)c.setAt
 // ═══════════════════════════════════════════════════════════════
 // CONNS declared above init block
 
-// ── TrueLayer client ID (loaded from localStorage at startup) ──
-var TRUELAYER_CLIENT_ID = 'YOUR_TRUELAYER_CLIENT_ID';
-(function(){ var id = localStorage.getItem('vi_tl_client_id'); if(id) TRUELAYER_CLIENT_ID = id; })();
-
-// ── Smart connection dispatcher ────────────────────────────────
+// ── Bank, broker, exchange and platform connectors are locked under Pro for a future release (owner, 5 Nov 2026) ──
+// Nothing connects, asks for a key, signs in or makes a request. A saved "connected" flag from an older build is left alone and ignored.
 function connectPlatform(id) {
   var c = CONNS.find(function(x){ return x.id === id; });
-  if (!c) return;
-  if (achState.connected && achState.connected[id]) {
-    if (confirm('Disconnect ' + c.name + '?')) {
-      delete achState.connected[id];
-      localStorage.removeItem('vi_conn_' + id);
-      saveAch(); renderConnections();
-      showToast(c.name + ' disconnected');
-    }
-    return;
-  }
-  switch(id) {
-    case 'coingecko':    connectLiveFeed(id, fetchCoinGeckoFree);  break;
-    case 'metals_live':  connectLiveFeed(id, fetchMetalsLive);     break;
-    case 'exchangerate': connectLiveFeed(id, fetchExchangeRates);  break;
-    case 'yahoo':        connectLiveFeed(id, fetchYahooFinance);   break;
-    case 'alphavantage': showApiKeyModal(id, 'Alpha Vantage', 'alphavantage.co → Get Free API Key', 'alpha_vantage_key'); break;
-    case 'binance':      showCryptoKeyModal(id, 'Binance', 'Create a read-only API key at binance.com → Account → API Management'); break;
-    case 'coinbase':     showCryptoKeyModal(id, 'Coinbase', 'Create a read-only API key at coinbase.com → Settings → API'); break;
-    case 'kraken':       showCryptoKeyModal(id, 'Kraken', 'Create a read-only API key at kraken.com → Security → API'); break;
-    case 'gemini':       showCryptoKeyModal(id, 'Gemini', 'Create an Auditor key at gemini.com → Settings → API'); break;
-    case 'truelayer':    initTrueLayerAuth(); break;
-    default:
-      if (!achState.connected) achState.connected = {};
-      achState.connected[id] = { ts: Date.now(), manual: true };
-      saveAch(); renderConnections();
-      showToast(c.name + ' marked as connected ✓');
-  }
+  showToast((c ? c.name : 'That connection') + ' is coming to Pro in a future release');
 }
 
-// ── Free live price feed functions ─────────────────────────────
+// ── Free live price feeds (kept as on live: v0.9.2 owner decision, 5 Nov; a server-side feed comes later) ──
 function fetchCoinGeckoFree(cb) {
   var key = localStorage.getItem('coingecko_api_key') || '';
   var url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=gbp&order=market_cap_desc&per_page=20&page=1&price_change_percentage=24h';
@@ -25341,6 +25444,7 @@ function fetchMetalsLive(cb) {
     });
 }
 
+// ── Exchange rates (used by the stock and metals prices) ───────
 function fetchExchangeRates(cb) {
   fetch('https://open.er-api.com/v6/latest/GBP')
     .then(function(r){ return r.json(); })
@@ -25366,159 +25470,33 @@ function fetchYahooFinance(cb) {
   });
 }
 
-function connectLiveFeed(id, fetchFn) {
-  showToast('Connecting ' + id + '...');
-  fetchFn(function(ok, msg) {
-    if (ok) {
-      if (!achState.connected) achState.connected = {};
-      achState.connected[id] = { ts: Date.now(), live: true, lastSync: new Date().toISOString() };
-      saveAch(); renderConnections(); checkAchievements();
-      showToast('✓ ' + msg);
-    } else {
-      showToast('⚠ ' + msg);
+function refreshAllLiveConns() {
+  var liveFeedMap = { coingecko: fetchCoinGeckoFree, metals_live: fetchMetalsLive, exchangerate: fetchExchangeRates, yahoo: fetchYahooFinance };
+  var count = 0;
+  Object.keys(liveFeedMap).forEach(function(id) {
+    if (achState.connected && achState.connected[id]) {
+      count++;
+      liveFeedMap[id](function(ok, msg){ showToast((ok?'✓ ':'⚠ ') + msg); });
     }
   });
+  if (!count) showToast('No live feeds connected yet');
 }
 
-// ── API key modals ──────────────────────────────────────────────
-function showApiKeyModal(connId, name, instructions, storageKey) {
-  var existing = document.getElementById('api-key-modal');
-  if (existing) existing.remove();
-  var modal = document.createElement('div');
-  modal.id = 'api-key-modal';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:20000;background:rgb(var(--panel-rgb) / .94);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
-  modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(420px,92vw);padding:24px 22px;position:relative">'
-    + '<button onclick="document.getElementById(\'api-key-modal\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
-    + '<div style="font-family:\'Syne\',sans-serif;font-size:max(.8rem,var(--vi-fs-3));font-weight:800;color:var(--tx);margin-bottom:6px">Connect ' + name + '</div>'
-    + '<div style="font-size:max(.56rem,var(--vi-fs-2));color:var(--t3);margin-bottom:14px;line-height:1.6">' + instructions + '</div>'
-    + '<input id="api-key-inp" type="password" class="al-inp" placeholder="Paste your API key..." style="width:100%;margin-bottom:12px;box-sizing:border-box">'
-    + '<div style="display:flex;gap:8px">'
-    + '<button onclick="saveApiKeyConn(\'' + connId + '\',\'' + storageKey + '\')" class="btn-add-data" style="flex:1">Connect ✓</button>'
-    + '<button onclick="document.getElementById(\'api-key-modal\').remove()" class="btn-add-data" style="flex:1;background:transparent;border-color:var(--t3);color:var(--t3)">Cancel</button>'
-    + '</div>'
-    + '</div>';
-  document.body.appendChild(modal);
-  setTimeout(function(){ var inp=document.getElementById('api-key-inp');if(inp)inp.focus(); }, 100);
-}
-
-function saveApiKeyConn(connId, storageKey) {
-  var inp = document.getElementById('api-key-inp');
-  var key = inp ? inp.value.trim() : '';
-  if (!key) { showToast('Please paste your API key'); return; }
-  localStorage.setItem(storageKey, key);
-  if (!achState.connected) achState.connected = {};
-  achState.connected[connId] = { ts: Date.now(), keyed: true, lastSync: new Date().toISOString() };
-  saveAch(); renderConnections();
-  document.getElementById('api-key-modal').remove();
-  showToast('✓ ' + connId + ' connected');
-}
-
-function showCryptoKeyModal(connId, name, instructions) {
-  var existing = document.getElementById('api-key-modal');
-  if (existing) existing.remove();
-  var modal = document.createElement('div');
-  modal.id = 'api-key-modal';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:20000;background:rgb(var(--panel-rgb) / .94);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
-  modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(440px,92vw);padding:24px 22px;position:relative">'
-    + '<button onclick="document.getElementById(\'api-key-modal\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
-    + '<div style="font-family:\'Syne\',sans-serif;font-size:max(.8rem,var(--vi-fs-3));font-weight:800;color:var(--tx);margin-bottom:6px">Connect ' + name + '</div>'
-    + '<div style="font-size:max(.56rem,var(--vi-fs-2));color:var(--t3);margin-bottom:14px;line-height:1.6">' + instructions + '</div>'
-    + '<label style="font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);display:block;margin-bottom:4px">API Key</label>'
-    + '<input id="crypto-key-inp" type="password" class="al-inp" placeholder="API Key" style="width:100%;margin-bottom:8px;box-sizing:border-box">'
-    + '<label style="font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);display:block;margin-bottom:4px">API Secret <span style="color:var(--t3)">(read-only)</span></label>'
-    + '<input id="crypto-sec-inp" type="password" class="al-inp" placeholder="API Secret" style="width:100%;margin-bottom:12px;box-sizing:border-box">'
-    + '<div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);padding:8px;background:rgb(var(--teal-rgb) / .04);border:1px solid var(--bd);border-radius:4px;margin-bottom:12px">🔒 Keys stored in your browser only. Enable read-only permissions. Never enable withdraw or trade.</div>'
-    + '<div style="display:flex;gap:8px">'
-    + '<button onclick="saveCryptoKeyConn(\'' + connId + '\')" class="btn-add-data" style="flex:1">Connect ✓</button>'
-    + '<button onclick="document.getElementById(\'api-key-modal\').remove()" class="btn-add-data" style="flex:1;background:transparent;border-color:var(--t3);color:var(--t3)">Cancel</button>'
-    + '</div>'
-    + '</div>';
-  document.body.appendChild(modal);
-  setTimeout(function(){ var inp=document.getElementById('crypto-key-inp');if(inp)inp.focus(); }, 100);
-}
-
-function saveCryptoKeyConn(connId) {
-  var key = (document.getElementById('crypto-key-inp')||{}).value || '';
-  var sec = (document.getElementById('crypto-sec-inp')||{}).value || '';
-  if (!key) { showToast('Please paste your API key'); return; }
-  localStorage.setItem('vi_conn_' + connId + '_key', key);
-  if (sec) localStorage.setItem('vi_conn_' + connId + '_secret', sec);
-  if (!achState.connected) achState.connected = {};
-  achState.connected[connId] = { ts: Date.now(), keyed: true, lastSync: new Date().toISOString() };
-  saveAch(); renderConnections();
-  document.getElementById('api-key-modal').remove();
-  showToast('✓ ' + connId + ' connected. Fetching portfolio...');
-  if (connId === 'binance') fetchBinancePortfolio();
-}
-
-// ── TrueLayer PKCE OAuth ────────────────────────────────────────
-async function initTrueLayerAuth() {
-  if (!TRUELAYER_CLIENT_ID || TRUELAYER_CLIENT_ID === 'YOUR_TRUELAYER_CLIENT_ID') {
-    showTrueLayerSetupModal();
-    return;
-  }
-  var verifier = _tlGenVerifier();
-  var challenge = await _tlGenChallenge(verifier);
-  var state = Math.random().toString(36).substring(2);
-  localStorage.setItem('vi_tl_verifier', verifier);
-  localStorage.setItem('vi_tl_state', state);
-  var redirectUri = encodeURIComponent(window.location.href.split('?')[0]);
-  var authUrl = 'https://auth.truelayer.com/?'
-    + 'response_type=code'
-    + '&client_id=' + encodeURIComponent(TRUELAYER_CLIENT_ID)
-    + '&scope=' + encodeURIComponent('accounts balance transactions')
-    + '&redirect_uri=' + redirectUri
-    + '&providers=' + encodeURIComponent('uk-ob-all uk-oauth-all')
-    + '&code_challenge=' + challenge
-    + '&code_challenge_method=S256'
-    + '&state=' + state;
-  window.location.href = authUrl;
-}
-
-function showTrueLayerSetupModal() {
-  var modal = document.createElement('div');
-  modal.style.cssText = 'position:fixed;inset:0;z-index:20000;background:rgb(var(--panel-rgb) / .94);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
-  modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(460px,92vw);padding:28px 24px;position:relative">'
-    + '<button onclick="this.closest(\'[style*=fixed]\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
-    + '<div style="font-family:\'Syne\',sans-serif;font-size:.82rem;font-weight:800;color:var(--tx);margin-bottom:8px">🔗 Open Banking via TrueLayer</div>'
-    + '<div style="font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.7;margin-bottom:14px">Securely connect 40+ UK banks (Monzo, Starling, Lloyds, HSBC, etc.) to pull live balances and transactions into Vault-It.</div>'
-    + '<div style="font-size:max(.56rem,var(--vi-fs-2));color:var(--t3);margin-bottom:14px;padding:10px;background:rgb(var(--teal-rgb) / .04);border:1px solid var(--bd);border-radius:4px;line-height:1.6">'
-    + '<strong style="color:var(--t2)">Setup:</strong><br>'
-    + '1. Go to <span style="color:var(--em)">console.truelayer.com</span> → Create account → New Application<br>'
-    + '2. Copy your Client ID (sandbox is free to test)<br>'
-    + '3. Add your redirect URI: <span style="color:var(--em)">' + (window.location.href.split('?')[0]) + '</span><br>'
-    + '4. Paste Client ID below'
-    + '</div>'
-    + '<input id="tl-client-id-inp" class="al-inp" placeholder="Your TrueLayer Client ID" style="width:100%;margin-bottom:12px;box-sizing:border-box">'
-    + '<div style="display:flex;gap:8px">'
-    + '<button onclick="saveTrueLayerClientId()" class="btn-add-data" style="flex:1">Save &amp; Connect →</button>'
-    + '<button onclick="this.closest(\'[style*=fixed]\').remove()" class="btn-add-data" style="flex:1;background:transparent;border-color:var(--t3);color:var(--t3)">Later</button>'
-    + '</div>'
-    + '</div>';
-  document.body.appendChild(modal);
-}
-
-function saveTrueLayerClientId() {
-  var inp = document.getElementById('tl-client-id-inp');
-  var id = inp ? inp.value.trim() : '';
-  if (!id) { showToast('Paste your TrueLayer Client ID'); return; }
-  localStorage.setItem('vi_tl_client_id', id);
-  TRUELAYER_CLIENT_ID = id;
-  var modal = inp ? inp.closest('[style*="position:fixed"]') : null;
-  if (modal) modal.remove();
-  initTrueLayerAuth();
-}
-
-function _tlGenVerifier() {
-  var arr = new Uint8Array(32);
-  crypto.getRandomValues(arr);
-  return btoa(String.fromCharCode.apply(null, arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-}
-async function _tlGenChallenge(verifier) {
-  var enc = new TextEncoder();
-  var data = enc.encode(verifier);
-  var digest = await crypto.subtle.digest('SHA-256', data);
-  return btoa(String.fromCharCode.apply(null, new Uint8Array(digest))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+function renderConnections(){
+  var el=document.getElementById('set-locked-list');
+  if(!el)return;
+  var cats={},order=[];
+  CONNS.forEach(function(c){
+    if(c.type==='live'||c.id==='alphavantage'||c.cat==='AI Tools')return;   // free price feeds are the Live prices row; the AI keys are owner tools
+    var cat=c.cat||'Other';
+    if(!cats[cat]){cats[cat]=[];order.push(cat);}
+    cats[cat].push(c);
+  });
+  el.innerHTML=order.map(function(cat){
+    return '<div class="sl-cat">'+ccEsc(cat)+'</div><div class="sl-names">'+cats[cat].map(function(c){
+      return '<span class="sl-n" data-conn="'+ccEsc(c.id)+'"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-lock"/></svg>'+ccEsc(c.name)+'</span>';
+    }).join('')+'</div>';
+  }).join('');
 }
 
 // ── PWA Install Prompt ─────────────────────────────────────────
@@ -25606,84 +25584,7 @@ function handleOAuthCallback() {
     viPaymentReturn(pl);
     return;
   }
-  var code = params.get('code');
-  var state = params.get('state');
-  var storedState = localStorage.getItem('vi_tl_state');
-  if (!code) return;
-  if (state !== storedState) { showToast('OAuth state mismatch. Please try again'); return; }
-  window.history.replaceState({}, document.title, window.location.pathname);
-  var verifier = localStorage.getItem('vi_tl_verifier') || '';
-  localStorage.setItem('vi_tl_auth_code', code);
-  localStorage.setItem('vi_tl_code_verifier', verifier);
-  showToast('✓ TrueLayer authorised. Backend token exchange needed to complete (see console)');
-  console.log('[Vault-It] TrueLayer auth code received. Exchange this code + verifier for tokens via your backend proxy.');
-  console.log('[Vault-It] Code:', code, '| Verifier:', verifier);
-  if (!achState.connected) achState.connected = {};
-  achState.connected['truelayer'] = { ts: Date.now(), authCode: true, lastSync: new Date().toISOString() };
-  saveAch(); renderConnections();
-}
-
-// ── Binance portfolio stub ──────────────────────────────────────
-function fetchBinancePortfolio() {
-  showToast('Binance: portfolio sync ready. Wire backend proxy at /api/binance-portfolio');
-  console.log('[Vault-It] Binance key stored. Implement /api/binance-portfolio proxy to fetch holdings.');
-}
-
-// ── Refresh all live connections ───────────────────────────────
-function refreshAllLiveConns() {
-  var liveFeedMap = { coingecko: fetchCoinGeckoFree, metals_live: fetchMetalsLive, exchangerate: fetchExchangeRates, yahoo: fetchYahooFinance };
-  var count = 0;
-  Object.keys(liveFeedMap).forEach(function(id) {
-    if (achState.connected && achState.connected[id]) {
-      count++;
-      liveFeedMap[id](function(ok, msg){ showToast((ok?'✓ ':'⚠ ') + msg); });
-    }
-  });
-  if (!count) showToast('No live feeds connected yet');
-}
-
-function renderConnections(){
-  var el=document.getElementById('connections-list');
-  if(!el)return;
-  var cats={};
-  CONNS.forEach(function(c){
-    var cat=c.cat||'Other';
-    if(!cats[cat])cats[cat]=[];
-    cats[cat].push(c);
-  });
-  el.innerHTML=Object.keys(cats).map(function(cat){
-    return '<div style="margin-bottom:18px">'
-      +'<div style="font-size:max(.52rem,var(--vi-fs-1));font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--em);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgb(var(--teal-rgb) / .12)">'+cat+'</div>'
-      +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">'
-      +cats[cat].map(function(c){
-        var on=achState.connected&&achState.connected[c.id];
-        var connData=on?achState.connected[c.id]:null;
-        return '<div class="conn-item'+(on?' active':'')+'" onclick="connectPlatform(\''+c.id+'\')" style="cursor:pointer;background:var(--c2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;transition:border-color .2s" onmouseover="this.style.borderColor=\'var(--bd2)\'" onmouseout="this.style.borderColor=\'var(--bd)\'">'
-          +'<span class="conn-icon">'+c.icon+'</span>'
-          +'<div class="conn-info" style="flex:1;min-width:0">'
-          +'<div class="conn-name" style="font-family:\'Syne\',sans-serif;font-size:max(.68rem,var(--vi-fs-2));font-weight:700;margin-bottom:2px">'+c.name+'<span style="margin-left:6px;font-size:max(.45rem,var(--vi-fs-1));padding:1px 4px;border-radius:3px;background:'+(c.type==='live'?'rgb(var(--teal-rgb) / .2)':'rgb(var(--ink-rgb) / .07)')+';color:'+(c.type==='live'?'var(--em)':'var(--t3)')+'">'+c.type.toUpperCase()+'</span></div>'
-          +'<div class="conn-desc" style="font-size:max(.57rem,var(--vi-fs-2));color:var(--t3);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+c.desc+'</div>'
-          +'</div>'
-          +'<div style="margin-left:auto;text-align:right;flex-shrink:0">'
-          +'<div style="font-size:max(.8rem,var(--vi-fs-3));color:'+(on?'var(--em)':'var(--t3)')+'">'+(on?'✓':'+')+'</div>'
-          +(on&&connData&&connData.lastSync?'<div style="font-size:max(.42rem,var(--vi-fs-1));color:var(--t3)">'+new Date(connData.lastSync).toLocaleDateString()+'</div>':'')
-          +'</div>'
-          +'</div>';
-      }).join('')
-      +'</div></div>';
-  }).join('');
-}
-function toggleConn(id){
-  if(!achState.connected)achState.connected={};
-  var c=CONNS.find(function(x){return x.id===id;});
-  var name=c?c.name:id;
-  if(achState.connected[id]){delete achState.connected[id];showToast(name+' disconnected');}
-  else{achState.connected[id]={ts:Date.now()};showToast(name+' connected \u2713');}
-  saveAch();renderConnections();
-}
-function testLiveConn(id){
-  if(id==='coingecko')fetchLivePrices();
-  else showToast('Testing '+id+'...');
+  // (the old TrueLayer sign-in return went with the locked connections: a ?code= in the address is not ours to handle)
 }
 
 function setChartRange(btn,range){
@@ -26346,52 +26247,24 @@ function _refreshPioneerSettingsUI(){
 function showSettings(){
   try{renderConnections()}catch(e){}
   (function(){var r=document.getElementById('set-view');if(!r)return;var v=viSimple()?'simple':'adv';[].forEach.call(r.children,function(b){b.classList.toggle('active',b.getAttribute('data-val')===v);});})();
-  [['nw','set-nw3d']].forEach(function(x){var r=document.getElementById(x[1]);if(!r)return;var on=viFlag(x[0]);[].forEach.call(r.children,function(b){b.classList.toggle('active',(b.getAttribute('data-val')==='1')===on);});});
-  document.getElementById('set-claude-key').value=localStorage.getItem('claude_api_key')||'';
-  document.getElementById('set-meshy-key').value=localStorage.getItem('meshy_api_key')||'';
-  var cgEl=document.getElementById('set-cg-key');if(cgEl)cgEl.value=localStorage.getItem('coingecko_api_key')||'';
-  var avEl=document.getElementById('set-av-key');if(avEl)avEl.value=localStorage.getItem('alpha_vantage_key')||'';
-  var mEl=document.getElementById('set-metals-key');if(mEl)mEl.value=localStorage.getItem('metals_api_key')||'';
-  var ckfEl=document.getElementById('set-ck-form');if(ckfEl)ckfEl.value=localStorage.getItem('convertkit_form_id')||'';
-  var ckkEl=document.getElementById('set-ck-key');if(ckkEl)ckkEl.value=localStorage.getItem('convertkit_api_key')||'';
-  var ntEl=document.getElementById('set-notion-token');if(ntEl)ntEl.value=localStorage.getItem('notion_token')||'';
-  var ejsS=document.getElementById('set-ejs-svc');if(ejsS)ejsS.value=localStorage.getItem('emailjs_service_id')||'';
-  var ejsT=document.getElementById('set-ejs-tpl');if(ejsT)ejsT.value=localStorage.getItem('emailjs_template_id')||'';
-  var ejsK=document.getElementById('set-ejs-key');if(ejsK)ejsK.value=localStorage.getItem('emailjs_public_key')||'';
-  var flEl=document.getElementById('set-founding-link');if(flEl)flEl.value=localStorage.getItem('vi_founding_link')||'';
-  var ncEl=document.getElementById('set-nft-contract');if(ncEl)ncEl.value=localStorage.getItem('vi_nft_contract')||'';
+  try{viThemePaint();viLivePaint();}catch(e){}
+  var em=document.getElementById('set-acct-email');
+  if(em){var u={};try{u=JSON.parse(localStorage.getItem('vi_user')||'{}')||{};}catch(e){}em.textContent=u.email||'This device only (not signed in)';}
+  // owner and developer tools: only when the owner flag is set on this device (?owner=1 once; ?owner=0 clears it)
+  var own=viOwner(),ot=document.getElementById('set-owner-tools');if(ot)ot.hidden=!own;
+  if(own){[['set-claude-key','claude_api_key'],['set-meshy-key','meshy_api_key'],['set-notion-token','notion_token'],['set-founding-link','vi_founding_link'],['set-nft-contract','vi_nft_contract']].forEach(function(x){var el=document.getElementById(x[0]);if(el)el.value=localStorage.getItem(x[1])||'';});}
   _refreshPioneerSettingsUI();
   document.getElementById('settings-modal').style.display='flex';
 }
-function saveSettings(){
-  var ck=(document.getElementById('set-claude-key')||{}).value||'';
-  var mk=(document.getElementById('set-meshy-key')||{}).value||'';
-  var cgk=(document.getElementById('set-cg-key')||{}).value||'';
-  var avk=(document.getElementById('set-av-key')||{}).value||'';
-  var metk=(document.getElementById('set-metals-key')||{}).value||'';
-  var ckf=(document.getElementById('set-ck-form')||{}).value||'';
-  var ckk=(document.getElementById('set-ck-key')||{}).value||'';
-  if(ck)localStorage.setItem('claude_api_key',ck.trim());
-  if(mk)localStorage.setItem('meshy_api_key',mk.trim());
-  if(cgk)localStorage.setItem('coingecko_api_key',cgk.trim());
-  if(avk)localStorage.setItem('alpha_vantage_key',avk.trim());
-  if(metk)localStorage.setItem('metals_api_key',metk.trim());
-  if(ckf)localStorage.setItem('convertkit_form_id',ckf.trim());
-  if(ckk)localStorage.setItem('convertkit_api_key',ckk.trim());
-  var ntk=(document.getElementById('set-notion-token')||{}).value||'';
-  if(ntk)localStorage.setItem('notion_token',ntk.trim());
-  var ejsS=(document.getElementById('set-ejs-svc')||{}).value||'';
-  var ejsT=(document.getElementById('set-ejs-tpl')||{}).value||'';
-  var ejsK=(document.getElementById('set-ejs-key')||{}).value||'';
-  if(ejsS)localStorage.setItem('emailjs_service_id',ejsS.trim());
-  if(ejsT)localStorage.setItem('emailjs_template_id',ejsT.trim());
-  if(ejsK)localStorage.setItem('emailjs_public_key',ejsK.trim());
+function viOwner(){try{var q=new URLSearchParams(location.search).get('owner');if(q==='1')localStorage.setItem('vi-owner','1');else if(q==='0')localStorage.removeItem('vi-owner');return localStorage.getItem('vi-owner')==='1';}catch(e){return false;}}
+function saveSettings(){   // owner and developer tools only; the user-facing settings save as you tap them
+  [['set-claude-key','claude_api_key'],['set-meshy-key','meshy_api_key'],['set-notion-token','notion_token']].forEach(function(x){var el=document.getElementById(x[0]),v=el&&el.value?el.value.trim():'';if(v)localStorage.setItem(x[1],v);});
   var fl=(document.getElementById('set-founding-link')||{}).value||'';
   var nc=(document.getElementById('set-nft-contract')||{}).value||'';
   if(fl){localStorage.setItem('vi_founding_link',fl.trim());VI_FOUNDING_LINK=fl.trim();}
   if(nc){localStorage.setItem('vi_nft_contract',nc.trim());VAULT_NFT_CONTRACT=nc.trim();}
-  document.getElementById('settings-modal').style.display='none';
-  showToast('API keys saved \u2713');
+  closeSettings();
+  showToast('Owner settings saved \u2713');
 }
 async function testApiKey(type){
   var resultEl=document.getElementById('test-'+type+'-result');
@@ -26404,11 +26277,6 @@ async function testApiKey(type){
       var d=await r.json();
       if(d.content){if(resultEl)resultEl.innerHTML='<span style="color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Claude API key valid</span>';}
       else{if(resultEl)resultEl.innerHTML='<span style="color:var(--re)">✗ '+( d.error&&d.error.message||'Invalid key')+'</span>';}
-    }else if(type==='coingecko'){
-      var r2=await fetch('https://api.coingecko.com/api/v3/ping');
-      var d2=await r2.json();
-      if(d2.gecko_says){if(resultEl)resultEl.innerHTML='<span style="color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> CoinGecko reachable</span>';}
-      else{if(resultEl)resultEl.innerHTML='<span style="color:var(--re)">✗ CoinGecko unreachable</span>';}
     }
   }catch(e){if(resultEl)resultEl.innerHTML='<span style="color:var(--re)">✗ Error: '+e.message+'</span>';}
 }
@@ -27084,7 +26952,7 @@ function renderFIREroadmap(){
       var tag=(s.no===1)?'START HERE':'NEXT UP';
       out+='<rect x="'+(cx-40)+'" y="'+(top-30)+'" width="80" height="16" fill="'+col+'26" stroke="'+col+'" stroke-width="0.8"/>'
         +'<text x="'+cx+'" y="'+(top-18.5)+'" text-anchor="middle" font-size="10.5" font-family="Share Tech Mono,monospace" fill="'+col+'" letter-spacing="1.2" font-weight="700">'+tag+'</text>';
-    }else out+='<text x="'+cx+'" y="'+(top-9)+'" text-anchor="middle" font-size="10.5" font-family="DM Sans,sans-serif" fill="rgba(140,150,160,'+(done?0.95:0.75)+')">'+(waiting?'met · waiting':skipped?'skipped':s.desc)+'</text>';
+    }else out+='<text x="'+cx+'" y="'+(top-9)+'" text-anchor="middle" font-size="10.5" font-family="DM Sans,sans-serif" fill="'+(viLight()?'rgba(140,150,160,'+(done?0.95:0.75)+')':(done?'#C9CED3':'#9AA0A6'))+'">'+(waiting?'met · waiting':skipped?'skipped':s.desc)+'</text>';
     out+='</g>';
   }
   svgEl.setAttribute('viewBox',x0+' 0 '+(x1-x0)+' '+H);
@@ -27157,7 +27025,10 @@ function fireCarousel(){
   var mob=window.innerWidth<=700,mid=SC.scrollLeft+SC.clientWidth/2;
   [].forEach.call(svg.querySelectorAll('.fire-coin'),function(g){
     var cx=(+g.getAttribute('data-i'))*FIRE_NODE+FIRE_LEFT,d=Math.min(1,Math.abs(cx-mid)/(SC.clientWidth*(mob?0.6:0.5)));
-    g.style.transform='scale('+(1.12-0.12*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */g.style.opacity=(1-(mob?0.72:0.4)*d).toFixed(2);
+    var fade=(1-(mob?0.72:0.4)*d).toFixed(2);
+    g.style.transform='scale('+(1.12-0.12*d).toFixed(3)+')';/* never under 1, so stage names keep their size (v0.8 type scale) */
+    /* v0.9.2 Night contrast: at Night only the slate art fades towards the edges; the name, tag and description keep full strength so they stay readable (WCAG AA). Daylight fades the whole stage as before */
+    if(viLight()){g.style.opacity=fade;}else{g.style.opacity='';var cd=g.querySelector('.fire-card');if(cd)cd.style.opacity=fade;}
   });
 }
 var _fireSnapT=0,_fireSnapping=0;
@@ -27514,8 +27385,8 @@ function renderCashISO(){
   }
 
   // Caption
-  var cap=document.getElementById('cashCap');
-  if(cap){
+  var cap=document.getElementById('cashCap'),use3d=false;try{use3d=v3Ok()&&!(V3._flat&&V3._flat.cash);}catch(e){}
+  if(cap&&!use3d){   // v0.9.2 (CoS, 4 Nov): the flat view's caption only when it is the view; while the 3D stage waits for its first frame, its own caption stays
     cap.textContent=gbpFmt(total)+' \u00b7 '+fullCubes+' full block'+(fullCubes===1?'':'s')+(remainder>0?' + \u00a3'+remainder:'')+' \u00b7 each block = \u00a31,000';   // the same word as the 3D (Pedro, 3 Nov)
   }
   MS.innerHTML=svgContent;
@@ -27848,7 +27719,7 @@ function drawStreamChart(streamId){
 
 async function generateStreamSteps(streamId){
   var key=localStorage.getItem('claude_api_key')||'';
-  if(!key){showToast('Add Claude API key in ⚙ Settings');return;}
+  if(!key){showToast('AI plan steps are not switched on for this account yet');return;}
   var stream=(bizState.incomeStreams||[]).find(function(s){return s.id===streamId;});
   if(!stream)return;
   var stepsEl=document.getElementById('steps-'+streamId);
@@ -29491,7 +29362,7 @@ function showPrivacy() {
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
     '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank, provider, company and ticker logos; it is told the website of each bank, card, investment provider or company you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
-    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). The free 3D models you can pick for a wealth or liability item come from a library bundled with Vault-It itself, served from this same address: a model is downloaded only when you pick or open one, no outside service is contacted, and CC-BY models are credited in the item and in the 3D model credits panel. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with the key you give them, if you add one. Settings also holds owner-only connections (a mailing list, Notion, EmailJS, bank and wallet stubs); they do nothing unless someone enters keys for them.</p>',
+    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). The free 3D models you can pick for a wealth or liability item come from a library bundled with Vault-It itself, served from this same address: a model is downloaded only when you pick or open one, no outside service is contacted, and CC-BY models are credited in the item and in the 3D model credits panel. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with a key, only if an earlier version of the app saved one on this device. The bank, broker and exchange connections in Settings are locked for a future release: they connect to nothing and never ask for your details. Settings also holds owner-only connections (Notion, Claude, Meshy); they do nothing unless someone enters keys for them.</p>',
     '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or third-party analytics. During the beta the app records how it is used (screens opened, features used, errors and how long a visit lasts, never your figures or what you type) in our own database, to improve it; you can switch this off in Settings (Share usage). Feedback you send from the app is stored by us with the screen you were on, your last few taps and, unless you untick it, a picture of that screen with every figure hidden. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected, and what that does not mean'),
     '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
@@ -30372,6 +30243,18 @@ function viToggleTheme(){
   if(typeof toast==='function')toast(next==='light'?'Daylight mode':'Night mode');
 }
 document.addEventListener('DOMContentLoaded',viSyncTheme);
+// v0.9.2 Settings: Night, Daylight or follow my device. Reuses viToggleTheme (storage, redraws, event); the header switch is untouched.
+function viThemeChoice(){var v=null;try{v=localStorage.getItem('vi-theme');}catch(e){}return v==='light'||v==='dark'?v:'auto';}
+function viThemePaint(){var r=document.getElementById('set-theme');if(!r)return;var c=viThemeChoice();[].forEach.call(r.children,function(b){b.classList.toggle('active',b.getAttribute('data-val')===c);b.setAttribute('aria-pressed',b.getAttribute('data-val')===c?'true':'false');});}
+function viSetTheme(choice){
+  var want=choice;
+  if(choice==='auto'){want=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}
+  if(viTheme()!==want)viToggleTheme();
+  if(choice==='auto'){try{localStorage.removeItem('vi-theme');}catch(e){}}   // no saved choice: the device decides, as on a first visit
+  viThemePaint();
+}
+document.addEventListener('vi-theme',viThemePaint);
+try{if(window.matchMedia){var _vmq=matchMedia('(prefers-color-scheme: light)');var _vmf=function(){if(viThemeChoice()==='auto'){var w=_vmq.matches?'light':'dark';if(viTheme()!==w)viToggleTheme();try{localStorage.removeItem('vi-theme');}catch(e){}viThemePaint();}};if(_vmq.addEventListener)_vmq.addEventListener('change',_vmf);}}catch(e){}
 // R27: nothing animates on first paint; the switch starts to slide only once the page has loaded and the state is set
 window.addEventListener('load',function(){requestAnimationFrame(function(){requestAnimationFrame(function(){var b=document.getElementById('vi-theme-btn');if(b)b.classList.add('vi-th-anim');});});});
 
