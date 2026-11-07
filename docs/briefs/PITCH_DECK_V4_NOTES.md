@@ -263,6 +263,29 @@ UK only. Every figure is tagged. The [CHECK] ones were read from search snippets
 - B2B is where the revenue is: £52,500 of £66,900 in Year 1, £625k of £721k in Year 3 [PETE, v3 slide 16].
 - The bridge is the Stage model. A consumer at Stage 2 is a lender's future customer; a consumer at Stage 0 is a charity's current client. Same engine, two buyers.
 
+### 4.4 Round 2 (owner, 7 Nov): the four questions, quantified
+
+Owner's words: "We need to quantify amount of people accessing debt management services. How many users are saving towards a house in a LISA. How many of the population has neurodivergent traits and that may also struggle with money if data availiable. Research a stat of how many overpay on mortgage repayments. Quantify that in uk." Researched 7 Nov 2026; gov.uk, stepchange.org and bsa.org.uk cannot be read from the cloud session, so primary pages were read through search results where noted.
+
+| Question | Figure | Tag and source |
+|---|---|---|
+| People accessing debt services | 729,265 clients seen by MaPS-funded debt advice in 2024/25 (623,466 in 2023/24); £85m extra income found for them | [BENCHMARK] MaPS Debt Advice Impact Report 2024/25, maps.org.uk |
+| | 126,240 people entered an individual insolvency procedure in England and Wales in 2025: 71,841 IVAs, about 37% DROs, 7,460 bankruptcies; 1 in 395 adults | [BENCHMARK] Insolvency Service, December 2025 release, via The Gazette; Statista gives 126,278 |
+| | 163,916 new StepChange clients completed advice in 2025; National Debtline advises more than 100,000 a year | [PETE] StepChange Yearbook 2025; [CHECK] National Debtline, Big Issue, undated |
+| People saving for a home in a LISA | more than 1.1m Lifetime ISA accounts subscribed to in 2024-25, £2.8bn paid in | [BENCHMARK] HMRC Annual Savings Statistics, Sept 2025, via Hargreaves Lansdown |
+| | 87,250 account holders withdrew to buy a first home in 2024-25, a record, average £15,782 | [BENCHMARK] HMRC via PA reporting, 2025 |
+| | over 1.3m LISA accounts open as of 2023/24 | [BENCHMARK] Treasury Committee, government response, parliament.uk |
+| Neurodivergent people who may struggle with money | 15 to 20% of people neurodivergent (v3); 3 to 4% of UK adults have ADHD, about 1.9m | [PETE]; [BENCHMARK] NICE Clinical Knowledge Summaries 2025 via secondary |
+| | 31% of people with ADHD struggle with debt against 11% without; 49% miss bills occasionally or often against 18%; about £1,600 a year extra cost | [BENCHMARK] Monzo and YouGov survey, 2022, monzo.com |
+| | neurodivergent people more likely to be in problem debt; 97% of 278 surveyed find debt sometimes harder to manage | [BENCHMARK] StepChange, Different minds, shared challenges, 2025 (search text; the PDF is not reachable from here) |
+| | ADHD linked to debt default persisting into midlife after adjusting for income and education | [BENCHMARK] Beauchaine et al., Science Advances 2020, Swedish population study of about 11.5m people |
+| Mortgage overpayers, UK | 23% of mortgage holders actively overpay, £221 a month on average (£2,647 a year), cutting about four years off the term | [BENCHMARK] Barclays Property Insights, May 2025, home.barclays |
+| | 34% of mortgage holders overpay (Monzo, 2025, 4,000 adults); 67% of first-time buyers of the last five years overpay (TSB, Oct 2025) | [BENCHMARK] Monzo; TSB press release |
+| | about 8.4m residential mortgages outstanding in the UK | [BENCHMARK] UK Finance mortgage data, 2024 (8,404,000; an earlier page gives 8,501,000) |
+| | about 1.9m households overpaying, roughly £5bn a year | [DERIVED] 8.4m x 23% = 1.93m; x £2,647 = £5.1bn. Monzo's potential-overpayment figure is £5.3bn |
+
+**On the slides:** slide 4 now reads stage by stage (in debt, saving, buying, own to free) with these figures; slide 8 carries the ADHD figures; slide 11 carries the Future London Academy acceptance (Executive Programme for Design Leaders, accepted 13 May 2026 with a Birch Fund grant, place deferred to the 2027 intake at the owner's request on 4 June 2026; the academy said it will be in touch with 2027 details).
+
 ## 5. v4 slide order against v3
 
 | v4 | Slide | From v3 |
