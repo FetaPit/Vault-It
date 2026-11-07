@@ -683,6 +683,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this.soft = softGL(gl);
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.enable(gl.CULL_FACE); gl.depthFunc(gl.LEQUAL);
     this.maxDpr = opts.maxDpr || 1.5; this.turn = opts.turn || 50; this.day = !!opts.day;
+    this.build = !!opts.build && !reduced(); this._be = 0; this._bDone = !this.build; this.buildS = opts.buildS || 4.8;   // v0.9.4: the house lays itself brick by brick over buildS seconds on first load, then settles into the slow turn (reduced motion: the finished house at once)
     this.yawA = 32 * Math.PI / 180; this.pitch = 16 * Math.PI / 180; this.dist = 400; this.tgt = [0, 40, 0]; this.pan = [0, 0, 0]; this._radius = 100;
     this.controls = { target: { x: 0, y: 0, z: 0 } };
     this.w = 0; this.h = 0; this.dpr = 1; this.frames = 0; this.active = false; this._raf = 0; this.lost = false;
@@ -705,13 +706,25 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var gl = this.R.gl;
     this.HG = HG;
     this._inst = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this._inst); gl.bufferData(gl.ARRAY_BUFFER, HG.data, gl.STATIC_DRAW);
-    var st = new Float32Array(HG.n * 2); for (var i = 0; i < HG.n; i++) { st[i * 2] = -1e9; st[i * 2 + 1] = -5; }   // every brick laid and settled
+    var st = new Float32Array(HG.n * 2), i;
+    for (i = 0; i < HG.n; i++) { st[i * 2] = -1e9; st[i * 2 + 1] = -5; }   // every brick laid and settled
+    if (this.build) {   // lay stamps: bottom courses first, a little scatter inside each course; glazing and doors come in together at the end (uGlaze), the flats are not stamped
+      var D = HG.data, SBf = STRIDE, y0 = HG.y0, span = Math.max(1, HG.top - HG.y0), room = this.buildS - 0.76 - 0.5;
+      for (i = 0; i < HG.n; i++) {
+        var t = D[i * SBf + 9]; if (t > 7.5) continue;
+        var f = Math.min(1, Math.max(0, (D[i * SBf + 1] - y0) / span));
+        st[i * 2] = f * room + D[i * SBf + 11] * 0.5;
+      }
+    }
+    this._st = st;
     this._time = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this._time); gl.bufferData(gl.ARRAY_BUFFER, st, gl.STATIC_DRAW);
     HG.data = null;
     var Hh = HG.top - HG.y0, w = HG.x1 - HG.x0, d = HG.z1 - HG.z0;
     this._radius = Math.sqrt(w * w + d * d + Hh * Hh) / 2;
     this.ctr = [HG.cx, HG.y0 + Hh * 0.45, HG.cz];
   };
+  SP.building = function () { return !this._bDone; };
+  SP.layStamps = function () { return this._st; };   // test hook: seconds into the build each instance lands (-1e9: there from the start)
   SP.resize = function () {   // reads the layout only after a window resize, never in a plain frame
     if (!this._sz) return this.w > 2;
     this._sz = false;
@@ -747,7 +760,10 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var el = this._t ? Math.min(0.5, (now - this._t) / 1000) : 0, dt = Math.min(0.1, el); this._t = now;   // the turn never jumps; the easing follows real time
     var red = reduced();
     if (!red) this.yawA += dt * 2 * Math.PI / this.turn;
-    var over = !red && this._over(), burst = !red && now < this.burstTo;
+    if (red && !this._bDone) this._bDone = true;
+    if (!this._bDone) { this._be += el; if (this._be >= this.buildS + 2.4) this._bDone = true; }
+    var be = this._bDone ? (this.build ? this.buildS + 3 : 0) : this._be, bg = this._bDone ? 1 : Math.min(1, Math.max(0, (be - (this.buildS - 1.4)) / 1.2));
+    var over = !red && this._bDone && this._over(), burst = !red && now < this.burstTo;
     var k = 1 - Math.exp(-el / 0.14);   // eases in about 400 ms
     this.exp += ((over || burst ? 0.04 : 0) - this.exp) * k;
     this.push += ((burst ? 1 : over ? 0.7 : 0) - this.push) * k;
@@ -756,7 +772,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     gl.useProgram(R.pr);
     this._cam = null;
     gl.uniformMatrix4fv(U.uVP, false, this._vp()); gl.uniform1f(U.uFocal, this._focal() * this.dpr);
-    gl.uniform1f(U.uNow, 0); gl.uniform1f(U.uLast, -10); gl.uniform1f(U.uFlash, 0); gl.uniform1f(U.uGlaze, 1); gl.uniform1f(U.uVc, -1);
+    gl.uniform1f(U.uNow, be); gl.uniform1f(U.uLast, -10); gl.uniform1f(U.uFlash, this.build ? 1 : 0); gl.uniform1f(U.uGlaze, bg * bg * (3 - 2 * bg)); gl.uniform1f(U.uVc, -1);
     gl.uniform3fv(U.uBrick, C2.brick); gl.uniform3fv(U.uTrim, C2.trim); gl.uniform3fv(U.uTile, C2.tile); gl.uniform3fv(U.uFrame, C2.frame); gl.uniform3fv(U.uGlass, C2.glass); gl.uniform3fv(U.uGlassLit, C2.glassLit);
     gl.uniform3fv(U.uDoor, C2.door); gl.uniform3fv(U.uEdge, C2.edge); gl.uniform3fv(U.uSheen, C2.sheen); gl.uniform3fv(U.uFlashCol, C2.flash);
     gl.uniform1f(U.uPulse, 0); gl.uniform1f(U.uBuilt, 1); gl.uniform1f(U.uSweep, -1e4); gl.uniform1f(U.uSweepOn, 0);

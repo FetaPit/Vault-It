@@ -123,10 +123,10 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
     ok(!errs.length, T + 'no page errors ' + errs.join('|'));
     await ctx.close();
   }
-  // signing in frees the scene
+  // signing in and finishing the welcome screen frees the scene
   { const ctx = await b.newContext({ viewport: { width: 1100, height: 800 }, deviceScaleFactor: 1 }); await routeThree(ctx); const page = await ctx.newPage();
     await page.addInitScript(INIT, { full: true, theme: 'dark' }); await page.goto(VI.FILE_URL); await waitOn(page);
-    await page.evaluate(() => { document.getElementById('login-overlay').style.setProperty('display', 'none', 'important'); }); await page.waitForTimeout(300);
+    await page.evaluate(() => { ['login-overlay', 'welcome-overlay'].forEach(id => document.getElementById(id).style.setProperty('display', 'none', 'important')); }); await page.waitForTimeout(300);   // v0.9.4: the scene now also stays behind the welcome (onboarding) screen, so both close
     const s = await SCENE(page); ok(!s.has && !document_has(s), 'once the sign-in overlay closes, the scene is gone (' + s.state + ')');
     await ctx.close(); }
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASS'); process.exit(fails ? 1 : 0);
