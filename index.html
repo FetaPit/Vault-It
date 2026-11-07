@@ -2069,6 +2069,83 @@ input:focus, textarea:focus, select:focus {
 </style>
 <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Vault·It&quot;,&quot;short_name&quot;:&quot;Vault·It&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23080808&quot;,&quot;theme_color&quot;:&quot;%2344c0b9&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23080808'/><text y='75' x='50' text-anchor='middle' font-size='70'>🔒</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;}]}">
 </head>
+<style>
+/* ══════════════════════════════════════════════════════════════════════
+   USER PROFILE — nav chip, sidebar link, profile card, demo link
+   ══════════════════════════════════════════════════════════════════════ */
+.nav-profile-btn{position:sticky;right:0;z-index:2;display:flex;align-items:center;gap:7px;height:30px;padding:0 10px 0 4px;margin-left:8px;background:rgba(8,8,8,.97);box-shadow:-12px 0 12px rgba(8,8,8,.9);border:1px solid var(--bd);clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:var(--t2);font-family:'Syne',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;flex-shrink:0;transition:all .2s;max-width:180px}
+.nav-profile-btn:hover{background:rgba(20,30,30,.97);border-color:var(--bd2);color:var(--tx)}
+.nav-user-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vp-avatar{position:relative;border-radius:50%;background:conic-gradient(from 210deg,var(--em),var(--go),var(--em));padding:2px;flex-shrink:0;display:inline-flex}
+.vp-avatar>span{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;background:#071012;color:var(--em);font-family:'Syne',sans-serif;font-weight:800;letter-spacing:.04em;overflow:hidden}
+.vp-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.nav-avatar{width:22px;height:22px}
+.nav-avatar>span{font-size:.5rem}
+#profile-modal{display:none;position:fixed;inset:0;z-index:650;background:rgba(2,6,10,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:flex-start;justify-content:center;overflow-y:auto;padding:28px 12px 40px}
+#profile-modal.open{display:flex}
+.vp-box{position:relative;width:min(600px,100%);background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));padding:26px 28px 22px;overflow:hidden}
+.vp-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--go) 0%,rgba(201,168,76,.2) 50%,transparent 100%)}
+.vp-box::after{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--em),transparent)}
+.vp-eyebrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}
+.vp-eyebrow span{font-family:'Syne',sans-serif;font-size:.48rem;font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:var(--go)}
+.vp-close{background:none;border:1px solid transparent;color:var(--t3);font-size:.9rem;line-height:1;cursor:pointer;padding:4px 7px;transition:all .15s}
+.vp-close:hover,.vp-close:focus{color:var(--tx);border-color:var(--bd2);outline:none}
+.vp-hero{display:flex;gap:18px;align-items:center;margin-bottom:20px}
+.vp-hero .vp-avatar{width:76px;height:76px;cursor:pointer}
+.vp-hero .vp-avatar>span{font-size:1.35rem}
+.vp-name{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;letter-spacing:-.01em;color:var(--tx);line-height:1.15;word-break:break-word}
+.vp-email{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--em);opacity:.8;margin-top:3px;word-break:break-all}
+.vp-bio{font-family:'DM Sans',sans-serif;font-size:.7rem;color:var(--t2);line-height:1.5;margin-top:6px}
+.vp-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vp-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;font-family:'Syne',sans-serif;font-size:.46rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--bd2);color:var(--t2);background:rgba(68,192,185,.06);clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px))}
+.vp-pill.gold{color:var(--go);border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.1)}
+.vp-pill.teal{color:var(--em);border-color:var(--bd2);background:rgba(68,192,185,.1)}
+.vp-section{margin-bottom:18px}
+.vp-section-title{display:flex;align-items:center;justify-content:space-between;font-family:'Syne',sans-serif;font-size:.46rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.vp-section-title button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--em);background:none;border:none;cursor:pointer;opacity:.8;padding:0}
+.vp-section-title button:hover{opacity:1;text-decoration:underline}
+.vp-stage{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.vp-stage-dots{display:flex;gap:5px;flex-shrink:0}
+.vp-stage-dots i{display:block;width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}
+.vp-stage-dots i.done{background:var(--em);border-color:var(--em);opacity:.55}
+.vp-stage-dots i.now{background:var(--go);border-color:var(--go);box-shadow:0 0 10px rgba(201,168,76,.6)}
+.vp-stage-lbl{font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;color:var(--tx)}
+.vp-stage-sub{font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--t3);margin-top:2px}
+.vp-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,118px),1fr));gap:8px}
+.vp-stat{padding:10px 12px;background:rgba(6,10,18,.85);border:1px solid var(--bd);clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))}
+.vp-stat-lbl{font-family:'Syne',sans-serif;font-size:.42rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.vp-stat-val{font-family:'Share Tech Mono',monospace;font-size:.92rem;color:var(--em);line-height:1}
+.vp-stat-val.gold{color:var(--go)}.vp-stat-val.red{color:var(--re)}.vp-stat-val.green{color:var(--gr)}
+.vp-stat-sub{font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--t3);margin-top:4px;min-height:.7rem}
+.vp-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:6px;overflow:hidden}
+.vp-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--dp),var(--em));border-radius:2px;transition:width .5s}
+.vp-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vp-fields .full{grid-column:1/-1}
+.vp-field label{display:block;font-family:'Syne',sans-serif;font-size:.42rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.vp-meta{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:var(--t3)}
+.vp-meta b{color:var(--t2);font-weight:400}
+.vp-demo{padding:14px 16px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.28);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.vp-demo-title{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:800;color:var(--tx);margin-bottom:4px}
+.vp-demo-sub{font-family:'DM Sans',sans-serif;font-size:.62rem;color:var(--t2);line-height:1.5;margin-bottom:10px}
+.vp-demo-link{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(0,0,0,.35);border:1px solid rgba(201,168,76,.25);margin-bottom:10px;min-width:0}
+.vp-demo-link a{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--go);text-decoration:underline;text-decoration-color:rgba(201,168,76,.4);text-underline-offset:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.vp-demo-link a:hover{color:#e8c56a}
+.vp-btns{display:flex;flex-wrap:wrap;gap:8px}
+.vp-btn{padding:8px 14px;background:rgba(68,192,185,.1);border:1px solid rgba(68,192,185,.3);color:var(--em);font-family:'Syne',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .2s;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));text-decoration:none;display:inline-flex;align-items:center;gap:6px;min-height:34px}
+.vp-btn:hover{background:rgba(68,192,185,.2)}
+.vp-btn.primary{background:linear-gradient(135deg,var(--dp),var(--em));border-color:rgba(68,192,185,.5);color:#e8f8f7}
+.vp-btn.primary:hover{filter:brightness(1.1)}
+.vp-btn.gold{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.45);color:var(--go)}
+.vp-btn.gold:hover{background:rgba(201,168,76,.22)}
+.vp-btn.ghost{background:transparent;border-color:rgba(255,255,255,.1);color:var(--t2)}
+.vp-btn.ghost:hover{border-color:var(--bd2);color:var(--tx)}
+.vp-foot{margin-top:16px;padding-top:10px;border-top:1px solid var(--bd);font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:.08em;color:var(--t3);text-align:center}
+#sb-profile-section .sb-label{display:flex;align-items:center;justify-content:space-between}
+#sb-profile-section .sb-label button{background:none;border:none;color:var(--em);font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:0;opacity:.85}
+#sb-profile-section .sb-label button:hover{opacity:1;text-decoration:underline}
+@media (max-width:767px){.vp-box{padding:22px 18px 18px}.vp-fields{grid-template-columns:1fr}}
+@media (max-width:479px){.nav-profile-btn .nav-user-name{display:none}.nav-profile-btn{padding:0 4px;gap:0}.vp-hero{flex-direction:column;text-align:center}.vp-pills{justify-content:center}.vp-stats{grid-template-columns:1fr 1fr}#profile-modal{padding:14px 8px 30px}}
+</style>
 <body>
 <div id="demo-chip" class="demo-chip" style="display:none">⚡ DEMO DATA — <button onclick="clearDemoData()">Replace with your data →</button></div>
 <div id="pwa-install-banner" style="display:none">
@@ -2115,7 +2192,7 @@ input:focus, textarea:focus, select:focus {
     <div class="sb-row"><span style="color:var(--t2)">Clients</span><span class="sb-val" id="sb-clients">0</span></div>
   </div>
   <div class="sb-section" id="sb-profile-section">
-    <div class="sb-label">Profile</div>
+    <div class="sb-label"><span>Profile</span><button type="button" onclick="showProfile()" title="Open full profile">Open ↗</button></div>
     <div style="display:flex;justify-content:center;align-items:center;padding:6px 0 2px;opacity:.6"><svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px"><circle cx="14" cy="14" r="13" fill="none" stroke="#44c0b9" stroke-width="0.9" opacity=".8"/><circle cx="14" cy="14" r="11.5" fill="#030c14"/><circle cx="14" cy="14" r="10.5" fill="none" stroke="#44c0b9" stroke-width="0.4" opacity=".3"/><line x1="14" y1="3.2" x2="14" y2="5.8" stroke="#44c0b9" stroke-width="0.8" opacity=".5"/><line x1="24.8" y1="14" x2="22.2" y2="14" stroke="#44c0b9" stroke-width="0.8" opacity=".5"/><line x1="14" y1="24.8" x2="14" y2="22.2" stroke="#44c0b9" stroke-width="0.8" opacity=".5"/><line x1="3.2" y1="14" x2="5.8" y2="14" stroke="#44c0b9" stroke-width="0.8" opacity=".5"/><polyline points="7,9.5 14,18 21,9.5" fill="none" stroke="#44c0b9" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"/></svg></div>
     <div style="text-align:center;margin-bottom:8px">
       <div id="sb-avatar" style="width:48px;height:48px;border-radius:50%;background:rgba(68,192,185,.15);border:2px solid var(--bd2);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer" onclick="document.getElementById('sb-avatar-upload').click()" title="Click to upload avatar">👤</div>
@@ -2428,6 +2505,7 @@ input:focus, textarea:focus, select:focus {
     <span id="nav-nw" style="font-family:'Share Tech Mono',monospace;font-size:.74rem;color:var(--em)">£0</span>
   </div>
   <span style="padding:3px 9px;background:rgba(68,192,185,.1);border:1px solid rgba(68,192,185,.2);border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:.54rem;color:rgba(68,192,185,.7);flex-shrink:0">α&nbsp;0.5</span>
+  <button class="nav-profile-btn" id="nav-profile-btn" type="button" onclick="showProfile()" title="Your profile" aria-label="Open your profile"><span class="vp-avatar nav-avatar" id="nav-avatar"><span>👤</span></span><span class="nav-user-name" id="nav-user-name">Profile</span></button>
 </nav>
 
 <!-- ═══════════════════════════════════════════
@@ -3349,6 +3427,68 @@ input:focus, textarea:focus, select:focus {
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════
+     USER PROFILE — full card + shareable demo link
+══════════════════════════════════════════════════════ -->
+<div id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="vp-name" onclick="if(event.target===this)closeProfile()">
+  <div class="vp-box">
+    <div class="vp-eyebrow"><span>◈ Pioneer profile</span><button class="vp-close" type="button" onclick="closeProfile()" aria-label="Close profile">✕</button></div>
+
+    <div class="vp-hero">
+      <div class="vp-avatar" id="vp-avatar" title="Change photo" onclick="document.getElementById('sb-avatar-upload').click()"><span>👤</span></div>
+      <div style="min-width:0;flex:1">
+        <div class="vp-name" id="vp-name">Pioneer</div>
+        <div class="vp-email" id="vp-email"></div>
+        <div class="vp-bio" id="vp-bio"></div>
+        <div class="vp-pills" id="vp-pills"></div>
+      </div>
+    </div>
+
+    <div class="vp-section">
+      <div class="vp-section-title"><span>Journey</span><button type="button" onclick="closeProfile();showTab('journey')">View map ↗</button></div>
+      <div class="vp-stage">
+        <div class="vp-stage-dots" id="vp-stage-dots"></div>
+        <div><div class="vp-stage-lbl" id="vp-stage-lbl">Stage 0</div><div class="vp-stage-sub" id="vp-stage-sub"></div></div>
+      </div>
+      <div class="vp-stats">
+        <div class="vp-stat"><div class="vp-stat-lbl">Net worth</div><div class="vp-stat-val" id="vp-nw">£0</div><div class="vp-stat-sub" id="vp-nw-sub"></div></div>
+        <div class="vp-stat"><div class="vp-stat-lbl">Deposit saved</div><div class="vp-stat-val gold" id="vp-dep">£0</div><div class="vp-stat-sub" id="vp-dep-sub"></div><div class="vp-bar"><i id="vp-dep-bar" style="width:0%"></i></div></div>
+        <div class="vp-stat"><div class="vp-stat-lbl">Debt left</div><div class="vp-stat-val red" id="vp-debt">£0</div><div class="vp-stat-sub" id="vp-debt-sub"></div></div>
+        <div class="vp-stat"><div class="vp-stat-lbl">Monthly surplus</div><div class="vp-stat-val green" id="vp-surplus">£0</div><div class="vp-stat-sub" id="vp-surplus-sub"></div></div>
+      </div>
+    </div>
+
+    <div class="vp-section">
+      <div class="vp-section-title"><span>Details</span></div>
+      <div class="vp-fields">
+        <div class="vp-field"><label for="vp-in-name">Name</label><input type="text" id="vp-in-name" class="al-inp" placeholder="Your name" autocomplete="name"></div>
+        <div class="vp-field"><label for="vp-in-email">Email</label><input type="email" id="vp-in-email" class="al-inp" placeholder="you@example.com" autocomplete="email"></div>
+        <div class="vp-field full"><label for="vp-in-bio">Bio</label><input type="text" id="vp-in-bio" class="al-inp" placeholder="One line about you and your goal" maxlength="140"></div>
+      </div>
+      <div class="vp-meta" id="vp-meta"></div>
+    </div>
+
+    <div class="vp-section">
+      <div class="vp-demo">
+        <div class="vp-demo-title">⚡ Demo link</div>
+        <div class="vp-demo-sub">Share a live walkthrough. It opens Vault·It as a sample Pioneer with real-looking numbers. Safe to open on any device: your own data is kept and restored when you exit the demo.</div>
+        <div class="vp-demo-link"><span style="color:var(--go);font-size:.7rem">🔗</span><a id="vp-demo-link" href="?demo=1">?demo=1</a></div>
+        <div class="vp-btns">
+          <button class="vp-btn gold" type="button" onclick="copyDemoLink()">Copy link</button>
+          <a class="vp-btn ghost" id="vp-demo-open" href="?demo=1">Open demo ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="vp-btns">
+      <button class="vp-btn primary" type="button" onclick="saveProfileFromModal()">Save profile</button>
+      <button class="vp-btn" type="button" onclick="exportData()">Export backup</button>
+      <button class="vp-btn ghost" type="button" onclick="closeProfile()">Close</button>
+    </div>
+    <div class="vp-foot">Not regulated by the FCA. Not financial advice.</div>
+  </div>
+</div>
+
 <!-- Google Fonts for house-tracker -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
@@ -3595,6 +3735,161 @@ function showSubtab(group,id,btn){
 // ═══════════════════════════════════════════════════════════════
 // OVERVIEW STATE & STORAGE
 // ═══════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+// DEMO LINK — ?demo=1 seeds a sample Pioneer BEFORE any state loads.
+// Existing data on the device is backed up and restored on exit.
+// ════════════════════════════════════════════════════
+var VI_DATA_KEYS = ['vi_user','pos_ov1','pos_debt1','pos_al1','ht3','pos_journey','pos_ach1','pos_biz1','vi_streak','vi_last_visit','vi_visit_count','pos4','pos_house'];
+var VI_DEMO_BACKUP_KEY = 'vi_demo_backup';
+var _viOpenProfileOnLoad = false;
+
+function viDemoDataset() {
+  // Sam Carter: NHS nurse in Leeds, renting, side income, saving for a terraced house.
+  // Every tab and sub-tab reads from one of these keys.
+  var now = new Date();
+  var monthKey = function(back) { var d = new Date(now.getFullYear(), now.getMonth() - back, 1); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2); };
+  var dayStr   = function(back, day) { return new Date(now.getFullYear(), now.getMonth() - back, day || 14).toLocaleDateString('en-GB'); };
+  var isoBack  = function(days) { return new Date(now.getTime() - days * 86400000).toISOString(); };
+  var yesterday = new Date(now.getTime() - 86400000);
+  return {
+    vi_user: {
+      name: 'Sam Carter', email: 'sam.carter@demo.vault-it.co',
+      bio: 'Nurse in Leeds. Clearing the last of my credit card and saving for a terraced place of my own.',
+      goal: 1, joined: isoBack(150), pro: true, logins: 0, demo: true
+    },
+    // Overview: cashflow, extra assets, monthly net worth snapshots
+    pos_ov1: {
+      assets: [{ id: 11, name: 'NHS pension (transfer value)', val: 9400 }],
+      debts: [],
+      income: [{ id: 1, name: 'Salary (NHS Band 5)', amount: 2400, mo: 2400 }],
+      expenses: [
+        { id: 2,  name: 'Rent',                amount: 900, mo: 900, category: 'fixed' },
+        { id: 3,  name: 'Council tax',         amount: 118, mo: 118, category: 'fixed' },
+        { id: 4,  name: 'Energy and water',    amount: 125, mo: 125, category: 'fixed' },
+        { id: 5,  name: 'Food and groceries',  amount: 320, mo: 320, category: 'necessity' },
+        { id: 6,  name: 'Transport',           amount: 110, mo: 110, category: 'necessity' },
+        { id: 7,  name: 'Phone and broadband', amount: 48,  mo: 48,  category: 'fixed' },
+        { id: 8,  name: 'Gym',                 amount: 29,  mo: 29,  category: 'discretionary' },
+        { id: 9,  name: 'Subscriptions',       amount: 45,  mo: 45,  category: 'discretionary' },
+        { id: 10, name: 'Eating out',          amount: 85,  mo: 85,  category: 'discretionary' }
+      ],
+      snapshots: [
+        { month: monthKey(5), nw: 22900, debt: 6900, liab: 0, income: 2400 },
+        { month: monthKey(4), nw: 24100, debt: 6300, liab: 0, income: 2400 },
+        { month: monthKey(3), nw: 25300, debt: 5800, liab: 0, income: 2400 },
+        { month: monthKey(2), nw: 26600, debt: 5300, liab: 0, income: 2400 },
+        { month: monthKey(1), nw: 27800, debt: 4850, liab: 0, income: 2400 },
+        { month: monthKey(0), nw: 29000, debt: 4430, liab: 0, income: 2400 }
+      ]
+    },
+    // Debt tracker
+    pos_debt1: { debts: [
+      { id: 101, name: 'Barclaycard',        original: 5200, balance: 2850, rate: 21.9, min: 85,  type: 'credit' },
+      { id: 102, name: 'Car loan',           original: 4000, balance: 1400, rate: 7.9,  min: 120, type: 'other' },
+      { id: 103, name: 'Klarna (sofa)',      original: 600,  balance: 180,  rate: 0,    min: 60,  type: 'bnpl' }
+    ] },
+    // Assets and liabilities: metals, crypto, cash, other, physical liabilities
+    pos_al1: {
+      metals: { gold: 0.25, silver: 20, platinum: 0, palladium: 0 },
+      metalPrices: { gold: 1950, silver: 23.5, platinum: 1020, palladium: 1100 },
+      crypto: [{ id: 1, sym: 'BTC', amount: 0.012, price: 42000 }, { id: 2, sym: 'ETH', amount: 0.35, price: 2200 }],
+      cashAccounts: [
+        { id: 201, name: 'Monzo current account', type: 'Current', balance: 640 },
+        { id: 202, name: 'Emergency fund (easy access)', type: 'Savings', balance: 1200 }
+      ],
+      otherAssets: [
+        { id: 301, name: 'Road bike', value: 350, image: null, svgIcon: null, imageSearch: null },
+        { id: 302, name: 'Laptop',    value: 600, image: null, svgIcon: null, imageSearch: null }
+      ],
+      liabilities: [
+        { id: 401, name: '2016 Ford Fiesta', value: 4200, rate: 0, depRate: 15, runningCost: 95, addedDate: isoBack(240) }
+      ]
+    },
+    // House builder
+    ht3: { saved: 16000, target: 200000, houseType: 'terraced', apartmentFloor: 5, deposits: [
+      { amount: 3000, date: dayStr(5, 1) }, { amount: 2500, date: dayStr(4, 1) }, { amount: 3000, date: dayStr(3, 1) },
+      { amount: 2500, date: dayStr(2, 1) }, { amount: 2500, date: dayStr(1, 1) }, { amount: 2500, date: dayStr(0, 1) }
+    ], habitLog: [
+      { date: monthKey(5), contributed: true, amount: 3000 }, { date: monthKey(4), contributed: true, amount: 2500 }, { date: monthKey(3), contributed: true, amount: 3000 },
+      { date: monthKey(2), contributed: true, amount: 2500 }, { date: monthKey(1), contributed: true, amount: 2500 }, { date: monthKey(0), contributed: true, amount: 2500 }
+    ] },
+    // Journey map
+    pos_journey: {
+      profile: { monthlyTakeHome: 2400, mortgageTermYears: 25, interestRateEst: 4.5, depositTargetPct: 10, creditHealth: 'fair', efMonths: 3 },
+      onboarded: true, stageOverride: 1, mortgageActive: false, mortgageBalance: 0, rentMonthly: 900, rentYears: 4, selectedNode: -1
+    },
+    // Entrepreneur (Pro): streams, clients, pipeline, income stream builder
+    pos_biz1: {
+      revenueGoal: 1000,
+      streams: [{ id: 501, name: 'Etsy revision guides (pre-launch)', monthly: 0 }],
+      clients: [
+        { id: 601, name: 'Leeds Tutoring Hub',    monthly: 240, status: 'Active',   notes: 'Two GCSE science students, Tuesday and Thursday evenings', email: 'hello@leedstutoringhub.example', phone: '', website: '' },
+        { id: 602, name: 'Oakfield care home',    monthly: 360, status: 'Active',   notes: 'Two Saturday bank shifts a month', email: '', phone: '', website: '' },
+        { id: 603, name: 'Bright Minds Tuition (agency)', monthly: 180, status: 'Prospect', notes: 'Agency wants two more evenings a week from January', email: '', phone: '', website: '' }
+      ],
+      leads: [
+        { id: 701, name: 'Priya Shah',            email: 'priya@example.com', phone: '', website: '', stage: 'hot',  value: 160, notes: 'A-level biology tutoring, wants to start in January' },
+        { id: 702, name: 'St Mary\'s Primary PTA', email: '', phone: '', website: '', stage: 'warm', value: 300, notes: 'First aid workshop for parents' },
+        { id: 703, name: 'Wellbeing podcast',     email: '', phone: '', website: '', stage: 'cold', value: 500, notes: 'Reached out on LinkedIn about a sponsored episode' }
+      ],
+      incomeStreams: [
+        { id: 801, name: 'Private tutoring', icon: '📚', type: 'active', monthlyIncome: 240, status: 'active', progress: 67, totalInvested: 45, monthlyHistory: [120, 180, 240, 240],
+          steps: [{ text: 'Set up DBS check and tutoring profile', done: true }, { text: 'Land the first two students', done: true }, { text: 'Raise the rate to £30 an hour in January', done: false }],
+          tasks: [{ id: 811, text: 'Email Priya a trial lesson slot', stage: 'inprogress' }, { id: 812, text: 'Print revision packs', stage: 'todo' }, { id: 813, text: 'Invoice Leeds Tutoring Hub', stage: 'done' }] },
+        { id: 802, name: 'Nursing revision guides', icon: '📝', type: 'passive', monthlyIncome: 0, status: 'building', progress: 33, totalInvested: 120, monthlyHistory: [],
+          steps: [{ text: 'Write the first three guides', done: true }, { text: 'Design covers', done: false }, { text: 'List on Etsy and Payhip', done: false }],
+          tasks: [{ id: 821, text: 'Finish the pharmacology guide', stage: 'inprogress' }] }
+      ]
+    },
+    // Achievements and connections
+    pos_ach1: {
+      xp: 960,
+      unlocked: ['nw100','nw500','nw1k','nw2k','nw5k','nw10k','nw25k','save10','save25','snap1','snap3','debtstart','debt50','ef1k','stream1'],
+      connected: {
+        monzo:      { ts: Date.now(), manual: true, lastSync: isoBack(1) },
+        nationwide: { ts: Date.now(), manual: true, lastSync: isoBack(1) },
+        coinbase:   { ts: Date.now(), keyed: true,  lastSync: isoBack(2) },
+        royalmint:  { ts: Date.now(), manual: true, lastSync: isoBack(9) }
+      }
+    },
+    vi_streak: '11',
+    vi_last_visit: yesterday.toDateString()
+  };
+}
+
+function viEnterDemo(openProfile) {
+  var data = viDemoDataset();
+  try {
+    if (localStorage.getItem('vi_demo_profile') !== 'true') {
+      // First time in: stash whatever is on this device so "Exit demo" can put it back.
+      var backup = { at: new Date().toISOString(), data: {} }, any = false;
+      VI_DATA_KEYS.forEach(function(k) { var v = localStorage.getItem(k); if (v !== null) { backup.data[k] = v; any = true; } });
+      if (any) localStorage.setItem(VI_DEMO_BACKUP_KEY, JSON.stringify(backup));
+    }
+    VI_DATA_KEYS.forEach(function(k) { localStorage.removeItem(k); });
+    Object.keys(data).forEach(function(k) { var v = data[k]; localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v)); });
+    localStorage.setItem('vi_demo_mode', 'true');
+    localStorage.setItem('vi_demo_profile', 'true');
+  } catch(e) {}
+  _viOpenProfileOnLoad = !!openProfile;
+}
+
+function viDemoUrl() {
+  var base = (location.protocol === 'http:' || location.protocol === 'https:') ? location.origin + location.pathname : 'https://fetapit.github.io/Vault-It/';
+  return base + '?demo=1';
+}
+
+(function viDemoLinkBoot() {
+  try {
+    var p = new URLSearchParams(location.search);
+    if (!p.has('demo')) return;
+    viEnterDemo(true);
+    p.delete('demo');
+    var q = p.toString();
+    history.replaceState({}, document.title, location.pathname + (q ? '?' + q : '') + location.hash);
+  } catch(e) {}
+})();
+
 var OV_KEY = 'pos_ov1';
 
 var ovState = {
@@ -3728,7 +4023,7 @@ function updateSidebar(){
       if (dt && u.bio) dt.value = u.bio;
       // Update nav name if present
       var navName = document.getElementById('nav-user-name');
-      if (navName && u.name) navName.textContent = u.name;
+      if (navName && u.name) navName.textContent = u.name.split(' ')[0];
     }
   } catch(e) {}
 
@@ -8818,6 +9113,8 @@ function jrnyMaxMortgage() {
 }
 
 function jrnyCalcStage() {
+  // Guard: the overview renders once at load, before journeyState is assigned further down this script.
+  if (typeof journeyState === 'undefined' || !journeyState) return 0;
   var J = journeyState;
   if (J.stageOverride !== null && J.stageOverride !== undefined) return J.stageOverride;
   if (J.mortgageBalance === 0 && J.mortgageActive) return 6;
@@ -9458,6 +9755,8 @@ function jrnyWizSkip() {
 
 function initProOffer() {
   try {
+    // Demo link just opened the profile card: keep the upsell out of the way on that load.
+    if (typeof _viOpenProfileOnLoad !== 'undefined' && _viOpenProfileOnLoad) return;
     var user = JSON.parse(localStorage.getItem('vi_user') || 'null');
     if (!user || user.pro) return;
 
@@ -9639,12 +9938,8 @@ function initWelcome() {
   }
 }
 
-// Run after DOM ready — first initWelcome stub (active one is below)
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() { initWelcome(); initProOffer(); });
-} else {
-  initWelcome(); initProOffer();
-}
+// (Earlier duplicate DOM-ready hook removed: the single init chain at the end of this script runs
+//  initWelcome and initProOffer once. Running them twice counted two logins per visit.)
 
 // Hook into showTab
 
@@ -9907,7 +10202,7 @@ function submitWaitlist() {
 
 function exportData() {
   try {
-    var keys = ['pos4', 'pos_house', 'pos_journey', 'vi_user', 'vi_debt', 'vi_ov'];
+    var keys = ['vi_user', 'pos_ov1', 'pos_debt1', 'pos_al1', 'ht3', 'pos_journey', 'pos_ach1', 'pos_biz1', 'vi_settings', 'pos4', 'pos_house', 'vi_debt', 'vi_ov'];
     var bundle = {};
     keys.forEach(function(k) {
       var v = localStorage.getItem(k);
@@ -10078,6 +10373,215 @@ function checkStreak() {
   if (typeof achState !== 'undefined' && achState) { achState.streak = streak; if (typeof saveAch === 'function') saveAch(); }
 }
 
+// ── USER PROFILE CARD ────────────────────────────────────────────
+function viGetUser() { try { return JSON.parse(localStorage.getItem('vi_user') || 'null') || {}; } catch(e) { return {}; } }
+function viInitials(name) {
+  var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '';
+  return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+}
+function viAvatarHtml(user) {
+  if (user && user.avatar && /^data:image\//.test(user.avatar)) return '<img src="' + user.avatar + '" alt="">';
+  var ini = viInitials(user && user.name);
+  return '<span>' + (ini || '👤') + '</span>';
+}
+function viFmtMonthYear(iso) {
+  var d = iso ? new Date(iso) : null;
+  if (!d || isNaN(d)) return '';
+  return d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+}
+function viEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+// Nav chip + sidebar avatar
+function renderProfileChrome() {
+  var u = viGetUser();
+  var nav = document.getElementById('nav-avatar');
+  if (nav) nav.innerHTML = viAvatarHtml(u);
+  var navName = document.getElementById('nav-user-name');
+  if (navName) navName.textContent = u.name ? u.name.split(' ')[0] : 'Profile';
+  var sb = document.getElementById('sb-avatar');
+  if (sb) {
+    if (u.avatar && /^data:image\//.test(u.avatar)) {
+      sb.innerHTML = '<img src="' + u.avatar + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+    } else {
+      var ini = viInitials(u.name);
+      sb.textContent = ini || '👤';
+      sb.style.fontFamily = ini ? "'Syne',sans-serif" : '';
+      sb.style.fontWeight = '800';
+      sb.style.fontSize = ini ? '.95rem' : '1.4rem';
+      sb.style.color = 'var(--em)';
+    }
+  }
+}
+
+function renderProfile() {
+  var u = viGetUser();
+  var fmt = typeof gbpFmt === 'function' ? gbpFmt : function(n) { return '£' + Math.round(n).toLocaleString('en-GB'); };
+  var el  = function(id) { return document.getElementById(id); };
+  var set = function(id, txt) { var e = el(id); if (e) e.textContent = txt; };
+
+  var av = el('vp-avatar'); if (av) av.innerHTML = viAvatarHtml(u);
+  set('vp-name', u.name || 'Pioneer');
+  set('vp-email', u.email || '');
+  set('vp-bio', u.bio || '');
+  var bio = el('vp-bio'); if (bio) bio.style.display = u.bio ? '' : 'none';
+
+  // Journey stage
+  var stage = 0, stageData = null;
+  try { if (typeof jrnyLoadState === 'function') jrnyLoadState(); if (typeof jrnyCalcStage === 'function') stage = jrnyCalcStage() || 0; } catch(e) {}
+  if (typeof JRNY_STAGES !== 'undefined') stageData = JRNY_STAGES[stage] || JRNY_STAGES[0];
+  var dots = el('vp-stage-dots');
+  if (dots) { var h = ''; for (var i = 0; i <= 6; i++) h += '<i class="' + (i < stage ? 'done' : (i === stage ? 'now' : '')) + '"></i>'; dots.innerHTML = h; }
+  set('vp-stage-lbl', 'Stage ' + stage + ' of 6' + (stageData ? ' · ' + stageData.name : ''));
+  var sub = '';
+  try {
+    if (stage >= 6) sub = 'You own it. Outright.';
+    else if (typeof jrnyKeysDate === 'function') {
+      var kd = jrnyKeysDate();
+      if (kd) {
+        var months = (kd.getFullYear() - new Date().getFullYear()) * 12 + (kd.getMonth() - new Date().getMonth());
+        sub = 'Keys in hand: ' + jrnyFmtDate(kd) + (typeof jrnyFmtMonths === 'function' ? ' · ' + jrnyFmtMonths(months) + ' from today' : '');
+      }
+    }
+  } catch(e) {}
+  set('vp-stage-sub', sub || (stageData ? stageData.desc : ''));
+
+  // Stats
+  var nw = 0, dep = 0, tgt = 0, debt = 0, inc = 0, out = 0;
+  try { nw = computeNetWorth(); } catch(e) {}
+  try { if (typeof state !== 'undefined' && state) { dep = +state.saved || 0; tgt = +state.target || 0; } } catch(e) {}
+  try { debt = debtTotal() + totalDebts(); } catch(e) {}
+  try { inc = cfTotalIn(); out = cfTotalOut(); } catch(e) {}
+  set('vp-nw', fmt(nw));
+  var snaps = (typeof ovState !== 'undefined' && ovState.snapshots) || [];
+  var nwSub = '';
+  if (snaps.length >= 2) {
+    var sorted = snaps.slice().sort(function(a, b) { return String(a.month).localeCompare(String(b.month)); });
+    var diff = (+sorted[sorted.length - 1].nw || 0) - (+sorted[sorted.length - 2].nw || 0);
+    nwSub = (diff >= 0 ? '▲ ' : '▼ ') + fmt(Math.abs(diff)) + ' this month';
+  }
+  set('vp-nw-sub', nwSub);
+  var pc = tgt > 0 ? Math.min(dep / tgt, 1) : 0;
+  set('vp-dep', fmt(dep));
+  set('vp-dep-sub', tgt > 0 ? (pc * 100).toFixed(1) + '% of ' + fmt(tgt) : 'No target set');
+  var bar = el('vp-dep-bar'); if (bar) bar.style.width = (pc * 100).toFixed(1) + '%';
+  set('vp-debt', fmt(debt));
+  set('vp-debt-sub', debt > 0 ? (inc > 0 ? (Math.round(debt / inc * 10) / 10) + 'x monthly income' : '') : 'Debt free');
+  var sur = inc - out;
+  var se = el('vp-surplus');
+  if (se) { se.textContent = (sur < 0 ? '-' : '') + fmt(Math.abs(sur)) + '/mo'; se.className = 'vp-stat-val ' + (sur >= 0 ? 'green' : 'red'); }
+  set('vp-surplus-sub', inc > 0 ? Math.round(sur / inc * 100) + '% of take-home' : 'Add income to see this');
+
+  // Pills
+  var pills = ['<span class="vp-pill gold">◈ Pioneer</span>'];
+  pills.push('<span class="vp-pill' + (u.pro ? ' teal' : '') + '">' + (u.pro ? 'Pro' : 'Free plan') + '</span>');
+  if (stageData) pills.push('<span class="vp-pill" style="color:' + stageData.colour + ';border-color:' + stageData.colour + '55;background:' + stageData.colour + '14">' + stageData.icon + ' ' + viEsc(stageData.name) + '</span>');
+  var streak = parseInt(localStorage.getItem('vi_streak') || '0', 10);
+  if (streak > 1) pills.push('<span class="vp-pill">🔥 ' + streak + ' day streak</span>');
+  if (localStorage.getItem('vi_demo_profile') === 'true') pills.push('<span class="vp-pill gold">⚡ Demo</span>');
+  var pe = el('vp-pills'); if (pe) pe.innerHTML = pills.join('');
+
+  // Editable fields
+  var n = el('vp-in-name'), em = el('vp-in-email'), b = el('vp-in-bio');
+  if (n)  n.value  = u.name  || '';
+  if (em) em.value = u.email || '';
+  if (b)  b.value  = u.bio   || '';
+
+  // Meta line
+  var meta = [];
+  if (u.joined) meta.push('Member since <b>' + viEsc(viFmtMonthYear(u.joined)) + '</b>');
+  try { if (typeof currentLevel === 'function') meta.push('Level <b>' + viEsc(currentLevel().n) + '</b> · <b>' + (achState.xp || 0) + ' XP</b> · <b>' + ((achState.unlocked || []).length) + '</b> badges'); } catch(e) {}
+  try { if (typeof getCoreTaskStatus === 'function') { var t = getCoreTaskStatus(); var done = t.filter(function(x) { return x.done; }).length; meta.push('Setup <b>' + done + '/' + t.length + '</b> tasks'); } } catch(e) {}
+  var me = el('vp-meta'); if (me) me.innerHTML = meta.join('<span style="opacity:.4">|</span>');
+
+  // Demo link
+  var url = viDemoUrl();
+  var a = el('vp-demo-link'); if (a) { a.href = url; a.textContent = url; }
+  var o = el('vp-demo-open'); if (o) o.href = url;
+}
+
+function showProfile() {
+  renderProfile();
+  var m = document.getElementById('profile-modal');
+  if (!m) return;
+  m.classList.add('open');
+  document.addEventListener('keydown', _vpEsc);
+  setTimeout(function() { var c = m.querySelector('.vp-close'); if (c) c.focus(); }, 50);
+}
+function closeProfile() {
+  var m = document.getElementById('profile-modal');
+  if (m) m.classList.remove('open');
+  document.removeEventListener('keydown', _vpEsc);
+}
+function _vpEsc(e) { if (e.key === 'Escape') closeProfile(); }
+
+function saveProfileFromModal() {
+  var n  = ((document.getElementById('vp-in-name')  || {}).value || '').trim();
+  var em = ((document.getElementById('vp-in-email') || {}).value || '').trim();
+  var b  = ((document.getElementById('vp-in-bio')   || {}).value || '').trim();
+  if (!em || em.indexOf('@') < 0) { showToast('Please enter a valid email address'); return; }
+  try {
+    var user = viGetUser();
+    user.name = n; user.email = em; user.bio = b;
+    user.joined = user.joined || new Date().toISOString();
+    localStorage.setItem('vi_user', JSON.stringify(user));
+    if (typeof _vaultItUser !== 'undefined') _vaultItUser = user;
+  } catch(e) { showToast('Could not save profile'); return; }
+  if (typeof updateSidebar === 'function') updateSidebar();
+  renderProfileChrome();
+  renderProfile();
+  showToast('Profile saved');
+}
+
+// Avatar upload (sidebar input, shared with the profile card)
+function uploadSbAvatar(input) {
+  var file = input && input.files && input.files[0];
+  if (!file) return;
+  if (!/^image\//.test(file.type)) { showToast('Please choose an image file'); input.value = ''; return; }
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var img = new Image();
+    img.onload = function() {
+      var S = 128, c = document.createElement('canvas'); c.width = S; c.height = S;
+      var ctx = c.getContext('2d');
+      var r = Math.max(S / img.width, S / img.height), w = img.width * r, h = img.height * r;
+      ctx.drawImage(img, (S - w) / 2, (S - h) / 2, w, h);
+      var data = c.toDataURL('image/jpeg', 0.82);
+      try {
+        var u = viGetUser(); u.avatar = data;
+        localStorage.setItem('vi_user', JSON.stringify(u));
+        if (typeof _vaultItUser !== 'undefined') _vaultItUser = u;
+      } catch(e) { showToast('Could not save photo'); return; }
+      renderProfileChrome();
+      var av = document.getElementById('vp-avatar'); if (av) av.innerHTML = viAvatarHtml(viGetUser());
+      showToast('Photo updated');
+    };
+    img.onerror = function() { showToast('Could not read that image'); };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function copyDemoLink() {
+  var url = viDemoUrl();
+  var done = function() { showToast('Demo link copied'); };
+  var fail = function() {
+    var a = document.getElementById('vp-demo-link');
+    if (a && window.getSelection) { var rg = document.createRange(); rg.selectNodeContents(a); var s = window.getSelection(); s.removeAllRanges(); s.addRange(rg); }
+    showToast('Copy failed. Link selected, press Ctrl+C');
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fail);
+  else fail();
+}
+
+function initProfileUI() {
+  // The overview rendered once at script start, before journeyState existed; refresh it now.
+  try { if (typeof updateKPIs === 'function') updateKPIs(); } catch(e) {}
+  renderProfileChrome();
+  if (_viOpenProfileOnLoad) { _viOpenProfileOnLoad = false; setTimeout(showProfile, 500); }
+}
+
 // ── TASK 1: DEMO MODE ────────────────────────────────────────────
 function loadDemoData() {
   localStorage.setItem('vi_demo_mode', 'true');
@@ -10120,10 +10624,25 @@ function loadDemoData() {
 }
 
 function clearDemoData() {
-  localStorage.removeItem('vi_demo_mode');
-  localStorage.removeItem('pos4');
-  localStorage.removeItem('pos_house');
-  localStorage.removeItem('pos_journey');
+  try {
+    if (localStorage.getItem('vi_demo_profile') === 'true') {
+      // Demo profile (from the ?demo=1 link): wipe the sample data, put the device's own data back.
+      var raw = localStorage.getItem(VI_DEMO_BACKUP_KEY);
+      VI_DATA_KEYS.forEach(function(k) { localStorage.removeItem(k); });
+      localStorage.removeItem('vi_demo_profile');
+      localStorage.removeItem('vi_demo_mode');
+      if (raw) {
+        var b = JSON.parse(raw);
+        Object.keys(b.data || {}).forEach(function(k) { localStorage.setItem(k, b.data[k]); });
+        localStorage.removeItem(VI_DEMO_BACKUP_KEY);
+      }
+    } else {
+      localStorage.removeItem('vi_demo_mode');
+      localStorage.removeItem('pos4');
+      localStorage.removeItem('pos_house');
+      localStorage.removeItem('pos_journey');
+    }
+  } catch(e) {}
   location.reload();
 }
 
@@ -10133,7 +10652,13 @@ function initDemoMode() {
   var isDemo  = localStorage.getItem('vi_demo_mode') === 'true';
   if (!hasUser && !hasData) { loadDemoData(); isDemo = true; }
   var chip = document.getElementById('demo-chip');
-  if (chip) chip.style.display = isDemo ? '' : 'none';
+  if (chip) {
+    chip.style.display = isDemo ? '' : 'none';
+    if (localStorage.getItem('vi_demo_profile') === 'true') {
+      var hasBackup = !!localStorage.getItem(VI_DEMO_BACKUP_KEY);
+      chip.innerHTML = '\u26a1 DEMO PROFILE \u00b7 sample data for a walkthrough \u00b7 <button onclick="clearDemoData()">' + (hasBackup ? 'Exit demo and restore my data \u2192' : 'Exit demo \u2192') + '</button>';
+    }
+  }
 }
 
 function initWelcome() {
@@ -10157,9 +10682,9 @@ function initWelcome() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() { initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); });
+  document.addEventListener('DOMContentLoaded', function() { initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); initProfileUI(); });
 } else {
-  initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback();
+  initWelcome(); initProOffer(); initDemoMode(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); initProfileUI();
 }
 
 </script>

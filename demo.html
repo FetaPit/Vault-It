@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vault·It · Pioneer demo</title>
+<meta name="description" content="A sample Vault·It Pioneer profile with a link into the live demo. Every tab is filled in.">
+<meta name="theme-color" content="#080808">
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080808;--c1:#0f0f0f;--c2:#080d14;--c3:#1c2420;--em:#44c0b9;--em2:#38a09a;--dp:#007f7b;--go:#c9a84c;--go2:#e8c56a;--gr:#3ecf8e;--re:#e05c5c;--or:#e0894a;--tx:#e8e8e8;--t2:#9aa0a6;--t3:#5a6068;--bd:rgba(68,192,185,.14);--bd2:rgba(68,192,185,.22)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100%}
+body{background:radial-gradient(900px 420px at 50% -120px,rgba(68,192,185,.10),transparent 70%),var(--bg);overflow-x:hidden}
+a{color:var(--em)}
+.page{width:min(640px,100%);margin:0 auto;padding:28px 16px 48px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none}
+.brand svg{width:28px;height:28px;flex-shrink:0;animation:spin 14s linear infinite}
+.brand b{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;letter-spacing:-.01em;color:var(--tx)}
+.brand b span{color:var(--em)}
+.tag{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(68,192,185,.6)}
+.card{position:relative;background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));padding:26px 26px 22px;margin-bottom:16px;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--go) 0%,rgba(201,168,76,.2) 50%,transparent 100%)}
+.card::after{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--em),transparent)}
+.eyebrow{font-family:'Syne',sans-serif;font-size:.56rem;font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:var(--go);margin-bottom:18px}
+.hero{display:flex;gap:20px;align-items:center;margin-bottom:20px}
+.avatar{width:84px;height:84px;border-radius:50%;background:conic-gradient(from 210deg,var(--em),var(--go),var(--em));padding:2px;flex-shrink:0}
+.avatar span{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;background:#071012;color:var(--em);font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:.04em}
+.name{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.01em;line-height:1.1}
+.role{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--em);opacity:.85;margin-top:5px}
+.bio{font-size:.86rem;color:var(--t2);line-height:1.5;margin-top:8px}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;font-family:'Syne',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--bd2);color:var(--t2);background:rgba(68,192,185,.06);clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px))}
+.pill.gold{color:var(--go);border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.1)}
+.pill.teal{color:var(--em);border-color:var(--bd2);background:rgba(68,192,185,.1)}
+.pill.amber{color:var(--or);border-color:rgba(224,137,74,.4);background:rgba(224,137,74,.1)}
+.section{margin-bottom:18px}
+.section-title{font-family:'Syne',sans-serif;font-size:.56rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.stage{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.dots{display:flex;gap:6px;flex-shrink:0}
+.dots i{display:block;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}
+.dots i.done{background:var(--em);border-color:var(--em);opacity:.55}
+.dots i.now{background:var(--go);border-color:var(--go);box-shadow:0 0 10px rgba(201,168,76,.6)}
+.stage-lbl{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700}
+.stage-sub{font-family:'Share Tech Mono',monospace;font-size:.64rem;color:var(--t3);margin-top:2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,125px),1fr));gap:8px}
+.stat{padding:12px 13px;background:rgba(6,10,18,.85);border:1px solid var(--bd);clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))}
+.stat-lbl{font-family:'Syne',sans-serif;font-size:.5rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.stat-val{font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:var(--em);line-height:1}
+.stat-val.gold{color:var(--go)}.stat-val.red{color:var(--re)}.stat-val.green{color:var(--gr)}
+.stat-sub{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--t3);margin-top:5px}
+.bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:7px;overflow:hidden}
+.bar i{display:block;height:100%;width:80%;background:linear-gradient(90deg,var(--dp),var(--em));border-radius:2px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 20px;font-family:'Syne',sans-serif;font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;cursor:pointer;border:1px solid rgba(68,192,185,.3);background:rgba(68,192,185,.1);color:var(--em);clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));transition:all .2s}
+.btn:hover{background:rgba(68,192,185,.2)}
+.btn.primary{flex:1 1 240px;background:linear-gradient(135deg,var(--dp),var(--em));border-color:rgba(68,192,185,.5);color:#e8f8f7;box-shadow:0 0 24px rgba(68,192,185,.18)}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.gold{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.45);color:var(--go)}
+.btn.gold:hover{background:rgba(201,168,76,.22)}
+.linkbox{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-top:12px;background:rgba(0,0,0,.35);border:1px solid rgba(201,168,76,.25);min-width:0}
+.linkbox a{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--go);text-decoration:underline;text-decoration-color:rgba(201,168,76,.4);text-underline-offset:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.linkbox a:hover{color:var(--go2)}
+.note{font-size:.76rem;color:var(--t2);line-height:1.55;margin-top:12px}
+.tabs{list-style:none}
+.tabs li{display:grid;grid-template-columns:118px 1fr;gap:12px;padding:9px 0;border-bottom:1px solid rgba(68,192,185,.08);font-size:.8rem;color:var(--t2);line-height:1.45}
+.tabs li:last-child{border-bottom:none}
+.tabs b{font-family:'Syne',sans-serif;font-size:.6rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--tx);padding-top:3px;display:flex;align-items:flex-start;gap:6px}
+.tabs b i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0;background:var(--em)}
+.tabs b i.gold{background:var(--go)}.tabs b i.amber{background:var(--or)}.tabs b i.green{background:var(--gr)}.tabs b i.red{background:var(--re)}.tabs b i.purple{background:#9b7ec8}
+.pro{font-size:.46rem;padding:1px 5px;border:1px solid rgba(201,168,76,.45);color:var(--go);margin-left:4px;letter-spacing:.1em}
+.foot{margin-top:6px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.08em;color:var(--t3);line-height:1.8}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(4,10,18,.96);border:1px solid rgba(68,192,185,.45);border-radius:5px;padding:12px 22px;font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--em);z-index:10;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:479px){.card{padding:22px 18px 18px}.hero{flex-direction:column;text-align:center}.pills{justify-content:center}.stats{grid-template-columns:1fr 1fr}.tabs li{grid-template-columns:1fr;gap:3px}.top{flex-direction:column;align-items:flex-start;gap:6px}}
+@media (prefers-reduced-motion:reduce){.brand svg{animation:none}.btn,.toast{transition:none}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="top">
+    <a class="brand" href="index.html" aria-label="Vault·It home">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#0a1a1a" stroke="#44c0b9" stroke-width="1.2"/><circle cx="16" cy="16" r="12" fill="#040c10" stroke="#44c0b9" stroke-width=".5" opacity=".5"/><polyline points="9,11.5 16,21 23,11.5" fill="none" stroke="#44c0b9" stroke-width="2.4" stroke-linecap="square"/><circle cx="16" cy="16" r=".9" fill="#44c0b9" opacity=".5"/></svg>
+      <b>Vault<span>·It</span></b>
+    </a>
+    <span class="tag">Pioneer demo</span>
+  </header>
+
+  <section class="card" aria-labelledby="who">
+    <div class="eyebrow">◈ Pioneer profile · sample data</div>
+    <div class="hero">
+      <div class="avatar" aria-hidden="true"><span>SC</span></div>
+      <div style="min-width:0;flex:1">
+        <h1 class="name" id="who">Sam Carter</h1>
+        <div class="role">NHS nurse · Leeds · renting at £900/mo</div>
+        <p class="bio">Clearing the last of my credit card and saving for a terraced place of my own. Tutoring on the side to get there faster.</p>
+        <div class="pills">
+          <span class="pill gold">◈ Pioneer</span><span class="pill teal">Pro</span><span class="pill amber">🛡 Stabilise</span><span class="pill">🔥 12 day streak</span><span class="pill">Level · Grounded</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Journey</div>
+      <div class="stage">
+        <div class="dots" aria-hidden="true"><i class="done"></i><i class="now"></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div><div class="stage-lbl">Stage 1 of 6 · Stabilise</div><div class="stage-sub" id="stage-sub">Debt free in 8 months · keys in hand in about 18</div></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-lbl">Net worth</div><div class="stat-val" id="st-nw">£29.0k</div><div class="stat-sub" id="st-nw-sub">▲ £1.2k this month</div></div>
+        <div class="stat"><div class="stat-lbl">Deposit saved</div><div class="stat-val gold">£16.0k</div><div class="stat-sub">80% of a £20k deposit</div><div class="bar"><i></i></div></div>
+        <div class="stat"><div class="stat-lbl">Debt left</div><div class="stat-val red">£4.4k</div><div class="stat-sub">3 debts · was £9.8k</div></div>
+        <div class="stat"><div class="stat-lbl">Monthly surplus</div><div class="stat-val green" id="st-sur">£620/mo</div><div class="stat-sub" id="st-sur-sub">26% of take-home</div></div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <a class="btn primary" id="open-demo" href="index.html?demo=1">Open the live demo →</a>
+      <button class="btn gold" type="button" onclick="copyLink()">Copy link</button>
+    </div>
+    <div class="linkbox"><span style="color:var(--go)">🔗</span><a id="demo-url" href="index.html?demo=1">index.html?demo=1</a></div>
+    <p class="note">Opens Vault·It as Sam with every tab filled in. Safe on any device: whatever is already there is backed up and put back when you exit the demo from the gold bar. Opening the link again resets the numbers.</p>
+  </section>
+
+  <section class="card" aria-labelledby="whats-in">
+    <div class="section-title" id="whats-in">What's in the demo</div>
+    <ul class="tabs">
+      <li><b><i></i>Overview</b><span>Six months of net worth climbing from £22.9k to £29.0k, £2,400 take-home against £1,780 of costs, pension and savings breakdown.</span></li>
+      <li><b><i class="gold"></i>Journey</b><span>Stage 1, Stabilise. Keys-in-hand date, mortgage readiness grid and the 4.5x income ceiling, all from the live numbers.</span></li>
+      <li><b><i class="amber"></i>House builder</b><span>£16,000 of a £200,000 terraced target, six deposits logged, walls going up on the build.</span></li>
+      <li><b><i class="green"></i>Assets</b><span>Metals: a quarter ounce of gold and 20 oz of silver. Crypto: 0.012 BTC and 0.35 ETH. Cash: Monzo and an emergency fund. Other: bike and laptop. Liabilities: a 2016 Fiesta with running costs.</span></li>
+      <li><b><i class="red"></i>Debt tracker</b><span>Barclaycard at 21.9%, a car loan and a Klarna balance. Avalanche order and payoff maths.</span></li>
+      <li><b><i class="amber"></i>Entrepreneur <span class="pro">PRO</span></b><span>£600 a month from tutoring and bank shifts, three clients, a hot, warm and cold pipeline, and two income streams with step plans and task boards.</span></li>
+      <li><b><i class="gold"></i>Achievements</b><span>15 badges and 960 XP at Grounded level, 40 XP short of Builder, with a 12 day streak.</span></li>
+      <li><b><i class="purple"></i>Connections</b><span>Monzo, Nationwide, Coinbase and the Royal Mint linked, with last sync dates.</span></li>
+    </ul>
+  </section>
+
+  <footer class="foot">Not regulated by the FCA. Not financial advice.<br>Sam Carter is a fictional Pioneer. Every number is sample data.</footer>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function () {
+  var url = new URL('index.html?demo=1', location.href).href;
+  var a = document.getElementById('demo-url'); a.href = url; a.textContent = url;
+  document.getElementById('open-demo').href = url;
+})();
+var _t;
+function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(_t); _t = setTimeout(function () { t.classList.remove('show'); }, 2600); }
+function copyLink() {
+  var url = document.getElementById('demo-url').href;
+  var fail = function () { var a = document.getElementById('demo-url'); var r = document.createRange(); r.selectNodeContents(a); var s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Copy failed. Link selected, press Ctrl+C'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { toast('Demo link copied'); }, fail); else fail();
+}
+</script>
+</body>
+</html>
