@@ -4,6 +4,8 @@
 <meta name="description" content="Pete Thickett, founder of Vault-It. Get out of the red and into your home.">
 <meta name="theme-color" content="#080808">
 <link rel="icon" href="/pitch/logo-mid.png">
+<link rel="manifest" href="/pete/manifest.webmanifest"><link rel="apple-touch-icon" href="/pete/icon-192.png"><meta name="apple-mobile-web-app-title" content="Vault-It card">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Share+Tech+Mono&family=Syne:wght@700;800&display=swap">
 <style>
@@ -126,6 +128,9 @@ var v=document.querySelector('.pc-corner video'),rm=matchMedia('(prefers-reduced
 function motion(){if(!v)return;if(rm.matches){v.pause()}else{if(!v.getAttribute('src')){v.src=v.dataset.src}var p=v.play();if(p&&p.catch)p.catch(function(){})}}
 motion();if(rm.addEventListener)rm.addEventListener('change',motion);
 /* Save contact is a plain link to /pete/pete-thickett-vault-it.vcf, served as text/vcard: iPhone opens its add-contact screen, Android saves and opens it */
+/* home-screen app: only when opened from the home screen does the card keep an offline copy, so it opens with no signal */
+var app=/[?&]app=1\b/.test(location.search)||matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+if(app&&'serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register('/pete-sw.js',{scope:'/pete'}).catch(function(){})}
 })();
 </script>
 </body></html>

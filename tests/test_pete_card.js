@@ -10,7 +10,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
 (async () => {
   cp.execFileSync('node', [path.join(ROOT, 'tools', 'build_site.js')], { env: { ...process.env, SITE_OUT: DIST }, stdio: ['ignore', 'ignore', 'inherit'] });
   const { route } = await import(pathToFileURL(path.join(ROOT, 'worker', 'index.mjs')).href);
-  const TYPES = { '.html': 'text/html; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp4': 'video/mp4', '.js': 'text/javascript', '.vcf': 'text/vcard; charset=utf-8' };
+  const TYPES = { '.html': 'text/html; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp4': 'video/mp4', '.js': 'text/javascript', '.vcf': 'text/vcard; charset=utf-8', '.webmanifest': 'application/manifest+json' };
   // the house film stays light for venue signal: under 700 KB (was 1.9 MB), and the index (moov) sits before the frames so it starts at once
   const film = fs.readFileSync(path.join(ROOT, 'site', 'pete', 'house-corner.mp4'));
   ok(film.length < 700 * 1024, 'the house film is under 700 KB: ' + Math.round(film.length / 1024) + ' KB');
@@ -97,6 +97,34 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   ok(await p.locator('a[href="/pitch-Eligent"]').count() >= 1 && await p.locator('a[href^="/sign-up"], a[href="/"]').count() >= 1, 'links to the pitch deck and the beta sign-up');
   ok([...p.hosts].every((h) => /^fonts\.(googleapis|gstatic)\.com$/.test(h)), 'no outside hosts besides Google Fonts: ' + [...p.hosts]);
   ok(p.errs.length === 0, 'no page errors: ' + p.errs.join(' | '));
+
+  // Home-screen app (owner, 7 Nov: "give me it in an APK", chose a home-screen app): installable, opens full screen, works with no signal
+  const man = await p.evaluate(async () => { const l = document.querySelector('link[rel="manifest"]'); if (!l) return null; const r = await fetch(l.href); const m = await r.json();
+    const icons = await Promise.all((m.icons || []).map(async (i) => { const q = await fetch(new URL(i.src, l.href)); return { sizes: i.sizes, ok: q.ok, png: /image\/png/.test(q.headers.get('content-type') || '') }; }));
+    return { href: l.getAttribute('href'), name: m.name, short: m.short_name, start: m.start_url, scope: m.scope, display: m.display, icons, apple: !!document.querySelector('link[rel="apple-touch-icon"]') }; });
+  ok(man && man.href === '/pete/manifest.webmanifest' && man.name && man.short && man.start === '/pete?app=1' && man.scope === '/pete' && man.display === 'standalone', 'the card can be added to the home screen and opens full screen: ' + JSON.stringify(man));
+  ok(man && ['192x192', '512x512'].every((s) => man.icons.some((i) => i.sizes === s && i.ok && i.png)) && man.apple, 'the home-screen icon is the Vault-It mark at 192 and 512 px, with an iPhone icon too');
+  ok(man && !/—/.test(man.name + man.short), 'no em dashes in the app name');
+  ok(await p.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length) === 0, 'people who scan the card get nothing stored on their phone (offline copy only in the home-screen app)');
+  const sw = fs.readFileSync(path.join(DIST, 'landing', 'pete-sw.js'), 'utf8');
+  ok([...sw.matchAll(/https?:\/\/([a-z0-9.-]+)/gi)].every((m) => /^fonts\.(googleapis|gstatic)\.com$/.test(m[1])) && !/\bpostMessage|sendBeacon|XMLHttpRequest/.test(sw), 'the offline helper only keeps the card and its fonts, and sends nothing anywhere');
+  const swr = await wk.fetch(new Request('https://vault-it.co/pete-sw.js'), { ASSETS: fakeAssets });
+  ok(swr.status === 200 && /no-cache/.test(swr.headers.get('Cache-Control') || ''), 'the worker never lets the offline helper go stale: ' + swr.headers.get('Cache-Control'));
+  {
+    const actx = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    const ap = await actx.newPage(); const aerr = []; ap.on('pageerror', (e) => aerr.push(e.message));
+    await ap.goto(BASE + '/pete?app=1', { waitUntil: 'load' });
+    const scope = await ap.evaluate(() => Promise.race([navigator.serviceWorker.ready.then((r) => r.scope), new Promise((r) => setTimeout(() => r(null), 8000))]));
+    ok(scope && /\/pete$/.test(scope), 'opened from the home screen, the card keeps an offline copy: ' + scope);
+    await ap.waitForTimeout(1500);
+    await actx.setOffline(true);
+    await ap.reload({ waitUntil: 'load' }).catch(() => {}); await ap.waitForTimeout(600);
+    const off = await ap.evaluate(async () => { const n = document.querySelector('.pc-name'), im = document.querySelector('.pc-corner img'); let vcf = 0; try { vcf = (await fetch('/pete/pete-thickett-vault-it.vcf')).status; } catch (e) {}
+      return { name: n && n.textContent, still: !!im && im.complete && im.naturalWidth > 100, vcf }; });
+    ok(off.name === 'Pete Thickett' && off.still && off.vcf === 200, 'with no signal the home-screen card still opens, shows the house still and saves the contact: ' + JSON.stringify(off));
+    ok(aerr.length === 0, 'no page errors in the home-screen app: ' + aerr.join(' | '));
+    await actx.close();
+  }
 
   // Reduced motion: a still instead of the animation
   p = await open(390, 844, { reducedMotion: 'reduce' });

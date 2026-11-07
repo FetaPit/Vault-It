@@ -71,7 +71,7 @@ function withHeaders(res, { file, prod } = {}) {
     h.set('Content-Type', 'text/vcard; charset=utf-8');
     h.set('Content-Disposition', 'inline; filename="' + file.split('/').pop() + '"');
   }
-  if (file && (file.endsWith('.html') || file.endsWith('/version.json') || file.endsWith('/sw.js') || file.endsWith('.webmanifest'))) h.set('Cache-Control', file.endsWith('.json') ? 'no-store' : 'no-cache');   // the worker script and manifest must never be stale
+  if (file && (file.endsWith('.html') || file.endsWith('/version.json') || file.endsWith('/sw.js') || file.endsWith('/pete-sw.js') || file.endsWith('.webmanifest'))) h.set('Cache-Control', file.endsWith('.json') ? 'no-store' : 'no-cache');   // the worker script and manifest must never be stale
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
 }
 

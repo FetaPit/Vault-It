@@ -1,0 +1,15 @@
+{
+ "id": "/pete",
+ "name": "Pete Thickett · Vault-It",
+ "short_name": "Vault-It card",
+ "description": "Pete Thickett, founder of Vault-It. Get out of the red and into your home.",
+ "start_url": "/pete?app=1",
+ "scope": "/pete",
+ "display": "standalone",
+ "background_color": "#080808",
+ "theme_color": "#080808",
+ "icons": [
+  { "src": "/pete/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+  { "src": "/pete/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+ ]
+}

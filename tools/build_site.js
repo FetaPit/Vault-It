@@ -17,7 +17,9 @@ const SITE = {
             ['site/pitch-eligent/pitch/nw3d-live.js', 'pitch/nw3d-live.js'], ['site/pitch-eligent/pitch/live-nw.jpg', 'pitch/live-nw.jpg'], ['site/pitch-eligent/pitch/live-trk.jpg', 'pitch/live-trk.jpg'],
             ['site/pitch-eligent/pitch/logo-full.png', 'pitch/logo-full.png'], ['site/pitch-eligent/pitch/logo-mid.png', 'pitch/logo-mid.png'],
             // digital business card behind the printed card's QR code and NFC chip: vault-it.co/pete
-            ['site/pete/index.html', 'pete.html'], ['site/pete/ptlive.png', 'pete/ptlive.png'], ['site/pete/house-corner.mp4', 'pete/house-corner.mp4'], ['site/pete/house-corner.jpg', 'pete/house-corner.jpg'], ['site/pete/pete-thickett-vault-it.vcf', 'pete/pete-thickett-vault-it.vcf']],
+            ['site/pete/index.html', 'pete.html'], ['site/pete/ptlive.png', 'pete/ptlive.png'], ['site/pete/house-corner.mp4', 'pete/house-corner.mp4'], ['site/pete/house-corner.jpg', 'pete/house-corner.jpg'], ['site/pete/pete-thickett-vault-it.vcf', 'pete/pete-thickett-vault-it.vcf'],
+            // the card as a home-screen app: manifest, icons and the offline helper (served at /pete-sw.js so it can look after /pete)
+            ['site/pete/manifest.webmanifest', 'pete/manifest.webmanifest'], ['site/pete/icon-192.png', 'pete/icon-192.png'], ['site/pete/icon-512.png', 'pete/icon-512.png'], ['site/pete/sw.js', 'pete-sw.js']],
 };
 // the 3D model library (v0.9.1, E30): only what the app reads, same address as the app, so no outside host
 const MODELS = ['catalog.json', 'CREDITS.md'];
