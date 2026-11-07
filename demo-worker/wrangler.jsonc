@@ -7,7 +7,9 @@
   "workers_dev": true,
   "routes": [
     { "pattern": "vault-it.co/pitch-Eligent*", "zone_name": "vault-it.co" },
-    { "pattern": "vault-it.co/pitch-eligent*", "zone_name": "vault-it.co" }
+    { "pattern": "vault-it.co/pitch-eligent*", "zone_name": "vault-it.co" },
+    { "pattern": "app.vault-it.co/eligent*", "zone_name": "vault-it.co" },
+    { "pattern": "app.vault-it.co/Eligent*", "zone_name": "vault-it.co" }
   ],
   "vars": { "BRANCH": "ccr-66eddb5a-0quey7" }
 }

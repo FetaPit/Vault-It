@@ -4,11 +4,14 @@
 //   /pitch-Eligent            -> 301 to /pitch-Eligent/
 //   /pitch-Eligent/           -> demo.html, the Pioneer profile page with the demo hyperlink
 //   /pitch-Eligent/index.html -> the app; ?demo=1 seeds every tab (handled in the page itself)
+// On any other host the route is attached to (app.vault-it.co/eligent*), every request is a 302 to the demo
+// page, so the short link on the app domain works until the demo lives inside the release app itself.
 // Both pages are read from this public repo on GitHub (branch in env.BRANCH) and cached at the edge for
 // five minutes, so a git push updates the demo without a redeploy. GET and HEAD only. Nothing here reads
 // cookies, bodies or user data.
 const BASE = '/pitch-Eligent';
 const BASE_LC = BASE.toLowerCase();
+const DEMO_HOME = 'https://vault-it.co' + BASE + '/';
 const REPO = 'FetaPit/Vault-It';
 const FILES = { '': 'demo.html', 'demo.html': 'demo.html', 'index.html': 'index.html' };
 const TTL = 300;
@@ -27,6 +30,10 @@ export default {
       return new Response('Method not allowed', { status: 405, headers: { allow: 'GET, HEAD' } });
     }
     const url = new URL(request.url);
+    const host = url.hostname.toLowerCase();
+    if (host !== 'vault-it.co' && host !== 'www.vault-it.co' && !host.endsWith('.workers.dev')) {
+      return Response.redirect(DEMO_HOME, 302);
+    }
     const path = url.pathname.toLowerCase();
     if (path === BASE_LC) {
       url.pathname = BASE + '/';
