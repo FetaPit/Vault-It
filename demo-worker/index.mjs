@@ -1,17 +1,15 @@
-// Serves the pitch demo at vault-it.co/pitch-Eligent as its own Worker, so the main site Worker is untouched.
-// A Worker route (vault-it.co/pitch-Eligent*) takes precedence over the custom-domain Worker on the same host.
-// The path is matched case-insensitively, so pitch-eligent works too.
-//   /pitch-Eligent            -> 301 to /pitch-Eligent/
-//   /pitch-Eligent/           -> demo.html, the Pioneer profile page with the demo hyperlink
-//   /pitch-Eligent/index.html -> the app; ?demo=1 seeds every tab (handled in the page itself)
-// On any other host the route is attached to (app.vault-it.co/eligent*), every request is a 302 to the demo
-// page, so the short link on the app domain works until the demo lives inside the release app itself.
+// Serves the pitch demo on vault-it.co as its own Worker, so the main site Worker is untouched.
+// Worker routes take precedence over the custom-domain Worker on the same host. Paths match case-insensitively.
+//   vault-it.co/eligent-demo            -> 301 to /eligent-demo/
+//   vault-it.co/eligent-demo/           -> demo.html, the Pioneer profile page with the demo hyperlink
+//   vault-it.co/eligent-demo/index.html -> the app; ?demo=1 seeds every tab (handled in the page itself)
+//   vault-it.co/pitch-Eligent...        -> the same three, the address printed on the pitch deck
+//   app.vault-it.co/eligent...          -> 302 to the demo page (any other host on the route does the same)
 // Both pages are read from this public repo on GitHub (branch in env.BRANCH) and cached at the edge for
 // five minutes, so a git push updates the demo without a redeploy. GET and HEAD only. Nothing here reads
 // cookies, bodies or user data.
-const BASE = '/pitch-Eligent';
-const BASE_LC = BASE.toLowerCase();
-const DEMO_HOME = 'https://vault-it.co' + BASE + '/';
+const BASES = ['/eligent-demo', '/pitch-Eligent'];
+const DEMO_HOME = 'https://vault-it.co' + BASES[0] + '/';
 const REPO = 'FetaPit/Vault-It';
 const FILES = { '': 'demo.html', 'demo.html': 'demo.html', 'index.html': 'index.html' };
 const TTL = 300;
@@ -34,18 +32,19 @@ export default {
     if (host !== 'vault-it.co' && host !== 'www.vault-it.co' && !host.endsWith('.workers.dev')) {
       return Response.redirect(DEMO_HOME, 302);
     }
-    const path = url.pathname.toLowerCase();
-    if (path === BASE_LC) {
-      url.pathname = BASE + '/';
+    const lc = url.pathname.toLowerCase();
+    const base = BASES.find((b) => lc === b.toLowerCase() || lc.startsWith(b.toLowerCase() + '/'));
+    if (!base) return notFound();
+    if (lc === base.toLowerCase()) {
+      url.pathname = base + '/';
       return Response.redirect(url.toString(), 301);
     }
-    if (!path.startsWith(BASE_LC + '/')) return notFound();
-    const file = FILES[path.slice(BASE_LC.length + 1)];
+    const file = FILES[lc.slice(base.length + 1)];
     if (!file) return notFound();
 
     const branch = (env && env.BRANCH) || 'main';
     const cache = caches.default;
-    const cacheKey = new Request(url.origin + BASE + '/' + file + '?branch=' + encodeURIComponent(branch));
+    const cacheKey = new Request(url.origin + '/__demo/' + file + '?branch=' + encodeURIComponent(branch));
     let res = await cache.match(cacheKey);
     if (!res) {
       const upstream = await fetch('https://raw.githubusercontent.com/' + REPO + '/' + branch + '/' + file, {
