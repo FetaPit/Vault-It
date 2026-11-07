@@ -109,6 +109,7 @@ The single list of instructed work. Every session reads it at start and before e
 - [~] (laptop, Marketing) Digital business card vault-it.co/pete: improvements and how to use it in person at Eligent (owner, 7 Nov: "I want to improve upon my interactive business card plus understand how i will use it on the day in person"; "do i need a apk installation"). Answered: no app or APK for Pete or the people he meets. Improvement list given in the laptop chat; owner to pick.
   - [~] (laptop, owner reordered, 7 Nov: "Build card fixes now") Save contact serves a real .vcf file (text/vcard) so iPhone opens the add-contact screen (owner, 7 Nov: "Yes, build both").  Built: 9acb0c9 on `card/eligent-fixes` (rollout-qc PASS). Owner signed off 9acb0c9 on the phone preview, 7 Nov ("Signed off"). Next: CI green, then `/release card/eligent-fixes`; afterwards merge it into the candidate branch so a later release keeps it.
   - [~] (laptop, owner reordered, 7 Nov) house-corner.mp4 on the card made smaller than 1.9 MB so it loads fast on venue signal (owner, 7 Nov: "Yes, build both").  Built: 9acb0c9, 593 KB (same branch and release as above).
+  - [~] (laptop, Marketing) Card as an app on the owner's phone: installable from Chrome (Add to Home screen), opens full screen, works with no signal; no APK (owner, 7 Nov: "ok give me it in an APK", then chose "Home-screen app" over a real APK). Same branch `card/eligent-fixes`, same release.
 
 ## Waiting on the owner
 
