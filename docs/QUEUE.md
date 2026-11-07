@@ -119,6 +119,7 @@ The single list of instructed work. Every session reads it at start and before e
   - [ ] (Build) 5. Label income as take-home pay; label the pension line on the roadmap.
   - [ ] 6. Joint bills: parked for later (goes with the Family plan log line above).
 - [ ] (laptop, Marketing) Pitch deck before 16:15, 7 Nov (EA): (a) Household card £19.99/mo or £199.99/yr: owner, 7 Nov: "Keep, coming soon". Open: the 4 Nov decision in `docs/OFFER_AND_PRICING.md` says family mode is a Pioneer feature, "not a separate tier"; a separate Household plan reverses that. The pricing doc gets the line once the owner confirms which. It is the owner's own price (7 Nov, commit c35f2ac, "coming soon") but has no Stripe link and is not in `docs/OFFER_AND_PRICING.md`, and the forecast has no Household line. (b) Source for "Over £250,000 of profit by Year 2": no outside source. It is the owner's 7 Nov drivers (commit 245d669): Partner licences 2 / 10 / 20 at £35k / £200k / £500k plus sponsored licences, giving cumulative £261,390. Business Plan v2 §9 has Year 2 B2B at £26,000 and net £0. Partner delivery costs are not modelled.
+- [~] (cloud, Build) Public privacy and terms pages on vault-it.co (owner, 7 Nov: "go build the privacy and terms pages"), for Google brand verification of the "Continue with Google" screen: vault-it.co/privacy and vault-it.co/terms with the same wording as the app's Privacy notice and Beta terms, linked from the vault-it.co footer. Session session_01Koffvw6TG8kHbawv3e3cib, branch ccr-115a584f-msw0zl.
 
 ## Waiting on the owner
 
