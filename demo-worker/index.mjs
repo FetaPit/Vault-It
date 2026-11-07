@@ -1,12 +1,14 @@
-// Serves the pitch demo at vault-it.co/demo-eligent as its own Worker, so the main site Worker is untouched.
-// A Worker route (vault-it.co/demo-eligent*) takes precedence over the custom-domain Worker on the same host.
-//   /demo-eligent            -> 301 to /demo-eligent/
-//   /demo-eligent/           -> demo.html, the Pioneer profile page with the demo hyperlink
-//   /demo-eligent/index.html -> the app; ?demo=1 seeds every tab (handled in the page itself)
+// Serves the pitch demo at vault-it.co/pitch-Eligent as its own Worker, so the main site Worker is untouched.
+// A Worker route (vault-it.co/pitch-Eligent*) takes precedence over the custom-domain Worker on the same host.
+// The path is matched case-insensitively, so pitch-eligent works too.
+//   /pitch-Eligent            -> 301 to /pitch-Eligent/
+//   /pitch-Eligent/           -> demo.html, the Pioneer profile page with the demo hyperlink
+//   /pitch-Eligent/index.html -> the app; ?demo=1 seeds every tab (handled in the page itself)
 // Both pages are read from this public repo on GitHub (branch in env.BRANCH) and cached at the edge for
 // five minutes, so a git push updates the demo without a redeploy. GET and HEAD only. Nothing here reads
 // cookies, bodies or user data.
-const BASE = '/demo-eligent';
+const BASE = '/pitch-Eligent';
+const BASE_LC = BASE.toLowerCase();
 const REPO = 'FetaPit/Vault-It';
 const FILES = { '': 'demo.html', 'demo.html': 'demo.html', 'index.html': 'index.html' };
 const TTL = 300;
@@ -25,12 +27,13 @@ export default {
       return new Response('Method not allowed', { status: 405, headers: { allow: 'GET, HEAD' } });
     }
     const url = new URL(request.url);
-    if (url.pathname === BASE) {
+    const path = url.pathname.toLowerCase();
+    if (path === BASE_LC) {
       url.pathname = BASE + '/';
       return Response.redirect(url.toString(), 301);
     }
-    if (!url.pathname.startsWith(BASE + '/')) return notFound();
-    const file = FILES[url.pathname.slice(BASE.length + 1)];
+    if (!path.startsWith(BASE_LC + '/')) return notFound();
+    const file = FILES[path.slice(BASE_LC.length + 1)];
     if (!file) return notFound();
 
     const branch = (env && env.BRANCH) || 'main';

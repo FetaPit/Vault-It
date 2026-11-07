@@ -18,7 +18,7 @@ Open `vault-it-brand-book.html` in a browser first. It is the visual and behavio
 
 ## Pitch demo
 
-`demo.html` is a standalone profile page for the sample Pioneer (Sam Carter: NHS nurse in Leeds, three debts, £16k of a £200k terraced target saved, tutoring on the side). It has the demo hyperlink, a copy button and a one-line summary of what each tab shows. On GitHub Pages that is `https://fetapit.github.io/Vault-It/demo.html`.
+`demo.html` is a standalone profile page for the sample Pioneer (Sam Carter: NHS nurse in Leeds, three debts, £16k of a £200k terraced target saved, tutoring on the side). It has the demo hyperlink, a copy button and a one-line summary of what each tab shows. On the main domain it is `https://vault-it.co/pitch-Eligent` (served by the Worker in `demo-worker/`, the address on the pitch deck); on GitHub Pages it is `https://fetapit.github.io/Vault-It/demo.html`.
 
 The link itself is the app with `?demo=1` on the end, for example `https://fetapit.github.io/Vault-It/?demo=1`. It seeds every tab and sub-tab (Overview, Journey, House Builder, Assets with metals, crypto, cash, inventory and liabilities, Debt Tracker, Entrepreneur, Achievements, Connections) and opens the profile card.
 

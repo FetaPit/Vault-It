@@ -1,10 +1,13 @@
 {
-  // Pitch demo on vault-it.co/demo-eligent. Deploy from this folder: npx wrangler deploy
+  // Pitch demo on vault-it.co/pitch-Eligent (matches the pitch deck). Deploy from this folder: npx wrangler deploy
   // BRANCH is the repo branch the Worker reads demo.html and index.html from. Point it at main once merged.
   "name": "vault-it-demo",
   "main": "index.mjs",
   "compatibility_date": "2026-10-26",
   "workers_dev": true,
-  "routes": [{ "pattern": "vault-it.co/demo-eligent*", "zone_name": "vault-it.co" }],
+  "routes": [
+    { "pattern": "vault-it.co/pitch-Eligent*", "zone_name": "vault-it.co" },
+    { "pattern": "vault-it.co/pitch-eligent*", "zone_name": "vault-it.co" }
+  ],
   "vars": { "BRANCH": "ccr-66eddb5a-0quey7" }
 }
