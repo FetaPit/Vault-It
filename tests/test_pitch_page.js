@@ -1,5 +1,5 @@
 // vault-it.co/pitch-Eligent in a real browser, served through the real Worker routing from the real build:
-// all 16 slides scroll on a phone with no sideways scroll, the Present button gives a one-slide view
+// all 17 slides scroll on a phone with no sideways scroll, the Present button gives a one-slide view
 // (arrow keys, on-screen buttons, swipe, counter, Esc to leave), and the app's two live 3D viewports draw with demo data.
 require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
@@ -29,12 +29,12 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
 
   // Phone: the scrolling deck
   let p = await open(390, 844);
-  ok((await p.locator('.frame').count()) === 16, 'the page has the 16 slides');
+  ok((await p.locator('.frame').count()) === 17, 'the page has the 17 slides');
   { const t = await p.evaluate(() => document.body.innerText); ok(!/£199|19,900/.test(t) && /£149 once/.test(t) && /100 seats at £149, up to £14,900/.test(t), 'Founding Membership matches the live Stripe price: £149, 100 places'); }
   { const t = await p.evaluate(() => document.body.innerText); ok(!/£49\.99 a year/.test(t) && /£5\.99\/mo/.test(t) && /or £59\.99 a year/.test(t), 'Pioneer yearly matches the full live price: £59.99, not the old £49.99'); }
   // v2 (owner's decisions, 6 Nov 2026): one ask with its use of funds, a forecast with both break-even lines, B2B prices, the first buyer
   { const ids = await p.evaluate(() => [...document.querySelectorAll('.frame > section')].map((s) => s.id));
-    ok(ids.join() === 'cover,problem,gap,solution,features,nd,evidence,whynow,model,partner,gtm,traction,team,forecast,ask,close', 'v2 slide order, with the forecast before the ask: ' + ids); }
+    ok(ids.join() === 'cover,team,nd,problem,gap,solution,features,evidence,whynow,model,partner,impact,gtm,traction,forecast,ask,close', 'v2 slide order, with the forecast before the ask: ' + ids); }
   const txt = async (id) => p.evaluate((id) => (document.getElementById(id) || {}).innerText || '', id);
   { const a = await txt('ask');
     ok(/£250,000/.test(a) && /SEIS/.test(a) && /March 2027/.test(a) && /equity terms on request/i.test(a), 'the ask: £250,000 under SEIS, closing March 2027, equity terms on request');
@@ -47,9 +47,22 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   { const g = await txt('gtm'); ok(/3,000/.test(g) && /4%/.test(g) && /30%/.test(g) && /30-day/.test(g), 'go to market: funnel, channels and targets'); }
   ok(/sav/i.test(await txt('problem')) && /technical cofounder/i.test(await txt('team')) && /250 to 750 participants/.test(await txt('nd')), 'problem leads with savers, the team slide names the cofounder hire, the ND slide the UoL pilot');
   { const t = await p.evaluate(() => document.body.innerText); ok(!/14-DAY|14-day/.test(t) && /30-DAY/i.test(t), 'the trial is 30 days, as in the app'); }
-  { const ne = await p.evaluate(() => { const r = document.querySelector('#cover .vi-neon-red'), g = document.querySelector('#cover .vi-neon-gold'); if (!r || !g) return null;
-      const s = (el) => getComputedStyle(el, '::before'); return { r: r.textContent, g: g.textContent, clipR: s(r).webkitBackgroundClip || s(r).backgroundClip, clipG: s(g).webkitBackgroundClip || s(g).backgroundClip, grad: /gradient/.test(s(g).backgroundImage) }; });
-    ok(ne && ne.r === 'red' && ne.g === 'home' && /text/.test(ne.clipR) && /text/.test(ne.clipG) && ne.grad, 'the tagline draws red in neon red and home in a gold gradient neon: ' + JSON.stringify(ne)); }
+  // v3 (owner's edits, 7 Nov 2026)
+  { const w = await p.evaluate(() => { const h = document.querySelector('#cover h1'), sp = h && h.querySelector('span'); return h && sp ? { all: h.textContent, it: sp.textContent, col: getComputedStyle(sp).color, rest: getComputedStyle(h).color } : null; });
+    ok(w && w.all === 'Vault-It' && w.it === '-It' && w.col === 'rgb(68, 192, 185)' && w.rest !== w.col, 'the wordmark draws "-It" in teal: ' + JSON.stringify(w)); }
+  { const t = await p.evaluate(() => { const out = {}; document.querySelectorAll('[data-tag] span, #cover h2 span').forEach((s) => { const cs = getComputedStyle(s); out[s.textContent] = { c: cs.color, stroke: cs.webkitTextStrokeWidth }; });
+      const lum = (c) => { const m = c.match(/\d+/g).map(Number).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]; };
+      out.contrast = out.red ? (lum(out.red.c) + 0.05) / (lum('rgb(0, 19, 26)') + 0.05) : 0; return out; });
+    ok(t.red && t.your && t.home && t.red.c === 'rgb(200, 32, 42)' && t.your.c === 'rgb(68, 192, 185)' && t.home.c === 'rgb(232, 197, 106)' && t.red.stroke === '0px' && t.contrast >= 3, 'the tagline: red in dark red fill, your in teal, home in gold fill, still legible (contrast ' + (t.contrast && t.contrast.toFixed(2)) + ')'); }
+  { const w = await p.evaluate(() => [...document.querySelectorAll('.frame > section h2')].filter((h) => h.closest('section').id !== 'cover').map((h) => h.closest('section').id + ':' + getComputedStyle(h).fontWeight).filter((x) => !/:700$/.test(x)));
+    ok(w.length === 0, 'every slide title uses the same Syne weight (700): ' + w); }
+  { const tm = await txt('team'), t3 = await p.evaluate(() => !!document.querySelector('#team [data-banner]'));
+    ok(t3 && ['Malcolm McPhee', 'Business Lincolnshire', 'David Amor', 'Enso Brain', 'Chris Bowser', 'Will Quenby', 'Accelerate Pipeline', 'Carolline Pallu', 'Barbican Creative Hub'].every((x) => tm.includes(x)) && !/Lucas Cox/.test(tm) && /Chris Gueffier/.test(tm) && /Rita Fortes/.test(tm), 'the team slide has the banner and the new people, and Lucas Cox is gone'); }
+  { const im = await txt('impact'), sh = await p.evaluate(() => [...document.querySelectorAll('#impact [data-share]')].map((e) => +e.dataset.share)), br = await p.evaluate(() => !!document.querySelector('#impact svg[data-bridge]'));
+    ok(br && sh.join() === '50,25,25' && sh.reduce((x, y) => x + y, 0) === 100 && /Public debt grants/.test(im) && /The charity/.test(im) && /Vault-It/.test(im) && /bridge/i.test(im) && /window/i.test(im) && ['Assets', 'Income', 'Debts', 'Net worth'].every((x) => im.includes(x)) && /reallocation/i.test(im) && /escalat/i.test(im), 'the Impact licence slide: 50 / 25 / 25 funding and the bridge-and-window graphic: ' + sh); }
+  { const pt = await txt('partner'); ok(/Grant-funded/.test(pt) && /50% public debt grants/.test(pt) && !/Free or at cost/.test(pt), 'the B2B slide shows how the Impact licence is funded'); }
+  { const m = await txt('model'), h3 = await p.evaluate(() => [...document.querySelectorAll('#model h3')].map((h) => h.textContent.trim()));
+    ok(!h3.includes('Free') && !/Household/.test(m) && /30-day free trial/i.test(m) && ['£5.99', '£59.99', '£149', '£3.99', '£49.99', '£99'].every((x) => m.includes(x)) && /limited time/i.test(m) && /100/.test(m), 'business model: no Free tier, a 30-day free trial, the signed-off prices and the testers\' limited-time discount: ' + h3); }
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll on a phone');
   const btn = p.locator('#pv-open');
   ok((await btn.count()) === 1 && await btn.isVisible(), 'a Present button is on the page');
@@ -62,26 +75,26 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   ok(await p.evaluate(() => document.body.classList.contains('present')), 'Present turns on the one-slide view');
   let v = await visible(p);
   ok(v.length === 1 && v[0] === 'cover', 'exactly one slide shows, starting at the cover: ' + v);
-  ok(/^1 \/ 16$/.test((await counter(p)).trim()), 'the counter reads 1 / 16: ' + (await counter(p)));
+  ok(/^1 \/ 17$/.test((await counter(p)).trim()), 'the counter reads 1 / 17: ' + (await counter(p)));
   const fit = await p.evaluate(() => { const r = document.querySelector('.frame.on').getBoundingClientRect(); return { w: r.width, h: r.height, l: r.left, t: r.top }; });
   ok(Math.abs(fit.w - 1280) < 2 && Math.abs(fit.h - 720) < 2 && Math.abs(fit.t - 40) < 2, 'the slide fills the screen at 16:9, centred: ' + JSON.stringify(fit));
   await p.keyboard.press('ArrowRight'); await p.keyboard.press('ArrowRight');
   v = await visible(p);
-  ok(v.length === 1 && v[0] === 'gap' && (await counter(p)).trim() === '3 / 16', 'right arrow moves forward one slide at a time: ' + v + ' ' + (await counter(p)));
+  ok(v.length === 1 && v[0] === 'nd' && (await counter(p)).trim() === '3 / 17', 'right arrow moves forward one slide at a time: ' + v + ' ' + (await counter(p)));
   await p.keyboard.press('ArrowLeft');
-  ok((await counter(p)).trim() === '2 / 16', 'left arrow goes back');
+  ok((await counter(p)).trim() === '2 / 17', 'left arrow goes back');
   await p.click('#pv-next');
-  ok((await counter(p)).trim() === '3 / 16', 'the on-screen next button works');
+  ok((await counter(p)).trim() === '3 / 17', 'the on-screen next button works');
   await p.click('#pv-prev');
-  ok((await counter(p)).trim() === '2 / 16', 'the on-screen back button works');
+  ok((await counter(p)).trim() === '2 / 17', 'the on-screen back button works');
   await p.keyboard.press('End');
-  ok((await counter(p)).trim() === '16 / 16', 'End jumps to the last slide');
+  ok((await counter(p)).trim() === '17 / 17', 'End jumps to the last slide');
   await p.keyboard.press('ArrowRight');
-  ok((await counter(p)).trim() === '16 / 16', 'it stops at the last slide');
+  ok((await counter(p)).trim() === '17 / 17', 'it stops at the last slide');
   await p.keyboard.press('Home');
-  ok((await counter(p)).trim() === '1 / 16', 'Home jumps to the first slide');
+  ok((await counter(p)).trim() === '1 / 17', 'Home jumps to the first slide');
   await p.keyboard.press('Escape');
-  ok(!(await p.evaluate(() => document.body.classList.contains('present'))) && (await visible(p)).length === 16, 'Esc leaves the one-slide view and shows every slide again');
+  ok(!(await p.evaluate(() => document.body.classList.contains('present'))) && (await visible(p)).length === 17, 'Esc leaves the one-slide view and shows every slide again');
 
   // Live 3D viewports: the app's Net worth in 3D and Net worth progress, with the app's demo data
   p = await open(1280, 800);
@@ -103,7 +116,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   const lb = await p.locator('.frame.on .live canvas').boundingBox();
   ok(!!lb, 'the live viewport shows in the one-slide view');
   if (lb) { await p.mouse.click(lb.x + lb.width / 2, lb.y + lb.height / 2); await p.mouse.move(lb.x + 10, lb.y + 10); await p.mouse.down(); await p.mouse.move(lb.x + 160, lb.y + 10, { steps: 6 }); await p.mouse.up(); }
-  ok((await counter(p)).trim() === c0 && /^5 \/ 16$/.test(c0), 'clicking or dragging the 3D does not change slide: ' + c0 + ' then ' + (await counter(p)));
+  ok((await counter(p)).trim() === c0 && /^7 \/ 17$/.test(c0), 'clicking or dragging the 3D does not change slide: ' + c0 + ' then ' + (await counter(p)));
   await p.locator('.frame.on .live [data-z="in"]').click();
   ok((await counter(p)).trim() === c0, 'the zoom buttons do not change slide either');
   ok(p.errs.length === 0, 'no page errors with the live viewports: ' + p.errs.join(' | '));
@@ -126,9 +139,9 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     el.dispatchEvent(new TouchEvent('touchend', { touches: [], changedTouches: [t(200 + dx)], bubbles: true }));
   }, dx);
   await swipe(-120);
-  ok((await counter(p)).trim() === '2 / 16', 'swiping left moves to the next slide');
+  ok((await counter(p)).trim() === '2 / 17', 'swiping left moves to the next slide');
   await swipe(120);
-  ok((await counter(p)).trim() === '1 / 16', 'swiping right goes back');
+  ok((await counter(p)).trim() === '1 / 17', 'swiping right goes back');
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll in the one-slide view on a phone');
   ok(p.errs.length === 0, 'no page errors: ' + p.errs.join(' | '));
 
@@ -140,16 +153,16 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   await pre.goto(BASE + '/pitch-Eligent-presenter', { waitUntil: 'domcontentloaded' }); await pre.waitForTimeout(500);
   const pn = () => pre.evaluate(() => document.getElementById('pr-n').textContent.trim());
   const beat = () => pre.evaluate(() => document.getElementById('pr-beat').textContent.trim());
-  ok(await aud.evaluate(() => document.body.classList.contains('present')) && (await counter(aud)).trim() === '1 / 16', '?present=1 opens the audience deck in the one-slide view');
+  ok(await aud.evaluate(() => document.body.classList.contains('present')) && (await counter(aud)).trim() === '1 / 17', '?present=1 opens the audience deck in the one-slide view');
   ok(/linked/i.test(await pre.evaluate(() => document.getElementById('pr-link').textContent)), 'the presenter view shows it is linked to the audience window');
-  ok(/\b1 \/ 16/.test(await pn()) && (await beat()).length > 3, 'the presenter view starts on slide 1 with its beat: ' + (await pn()) + ' · ' + (await beat()));
+  ok(/\b1 \/ 17/.test(await pn()) && (await beat()).length > 3, 'the presenter view starts on slide 1 with its beat: ' + (await pn()) + ' · ' + (await beat()));
   const b1 = await beat();
   await aud.keyboard.press('ArrowRight'); await pre.waitForTimeout(300);
-  ok(/\b2 \/ 16/.test(await pn()) && (await beat()) !== b1, 'moving the audience deck switches the notes: ' + (await pn()) + ' · ' + (await beat()));
+  ok(/\b2 \/ 17/.test(await pn()) && (await beat()) !== b1, 'moving the audience deck switches the notes: ' + (await pn()) + ' · ' + (await beat()));
   await pre.click('#pr-next'); await pre.waitForTimeout(300);
-  ok((await counter(aud)).trim() === '3 / 16', 'Next in the presenter view moves the audience deck: ' + (await counter(aud)));
-  await pre.keyboard.press('ArrowRight'); await pre.keyboard.press('ArrowRight'); await pre.waitForTimeout(300);
-  ok((await counter(aud)).trim() === '5 / 16' && /\b5 \/ 16/.test(await pn()), 'arrow keys in the presenter view drive the audience deck too');
+  ok((await counter(aud)).trim() === '3 / 17', 'Next in the presenter view moves the audience deck: ' + (await counter(aud)));
+  for (let i = 0; i < 4; i++) await pre.keyboard.press('ArrowRight'); await pre.waitForTimeout(300);
+  ok((await counter(aud)).trim() === '7 / 17' && /\b7 \/ 17/.test(await pn()), 'arrow keys in the presenter view drive the audience deck too');
   ok(/drag/i.test(await pre.evaluate(() => document.getElementById('pr-cues').textContent)), 'the live demo slide carries its DO cue');
   ok((await pre.locator('#pr-cues svg').count()) >= 2, 'the cues carry their icons');
   ok(/^This is the app, live/m.test(await pre.evaluate(() => document.getElementById('pr-script').innerText)), 'the script panel shows this slide\'s script');
@@ -164,9 +177,10 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     ok(lay.sideFits && lay.apart && (w > 820 || lay.scH + 2 >= lay.scS), 'at ' + w + ' px the notes and script do not overlap the mirror and the script shows in full on a phone: ' + JSON.stringify(lay)); }
   {
     const C = await pre.evaluate(() => { const ids = [...document.getElementById('pr-slides').content.querySelectorAll('section')].map((s) => s.id); return { ids, n: ids.length }; });
-    ok(C.n === 16 && C.ids.join() === 'cover,problem,gap,solution,features,nd,evidence,whynow,model,partner,gtm,traction,team,forecast,ask,close', 'the presenter mirror carries the same 16 slides'); }
+    ok(C.n === 17 && C.ids.join() === 'cover,team,nd,problem,gap,solution,features,evidence,whynow,model,partner,impact,gtm,traction,forecast,ask,close', 'the presenter mirror carries the same 17 slides'); }
+  { const src = await pre.content(); ok(!/free or at cost/i.test(src) && /Impact licence: grant-funded/.test(src) && /grant-funded, a split we are proposing/.test(src), 'the presenter notes describe the Impact licence as grant-funded, not free or at cost'); }
   await pre.keyboard.press('End'); await pre.waitForTimeout(200);
-  ok(/\b16 \/ 16/.test(await pn()), 'the presenter view reaches slide 16');
+  ok(/\b17 \/ 17/.test(await pn()), 'the presenter view reaches slide 17');
   await pre.keyboard.press('ArrowLeft'); await pre.waitForTimeout(200);
   ok(/250,000/.test(await pre.evaluate(() => document.getElementById('pr-script').innerText)) && /Start 4:\d\d/.test(await pre.evaluate(() => document.getElementById('pr-win').textContent)), 'the ask has its script and starts before 5:00');
   ok(aud.errs.length === 0 && pre.errs.length === 0, 'no page errors in either window: ' + aud.errs.concat(pre.errs).join(' | '));

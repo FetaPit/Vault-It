@@ -192,7 +192,7 @@ Accepted when: every screen is usable in Daylight with no invisible text, no neo
 
 ### Phase 8: Logo and wordmark
 
-- Wordmark: Syne 800. "Vault" in `--text`, then a small brick, then "It" in `--teal`. The brick sits on the baseline (`translateY(-.06em)`), `.3em` wide, `.17em` tall, radius 2px. In text the name is written Vault-It with a hyphen (owner, 30 Oct 2026); in the logo that hyphen is drawn as the brick. Standardise the logo on the brick.
+- Wordmark: Syne 800. "Vault" in `--text`, then a small brick, then "It" in `--teal`. The brick sits on the baseline (`translateY(-.06em)`), `.3em` wide, `.17em` tall, radius 2px. In text the name is written Vault-It with a hyphen (owner, 30 Oct 2026); in the logo that hyphen is drawn as the brick. Standardise the logo on the brick. Owner, 7 Nov 2026: wherever the name is drawn as a title or lockup, with the brick or with a plain hyphen, "Vault" takes the text colour and "-It" is teal.
 - Mark: use the SVG files. Full (96px and up), Mid (40 to 96px), Micro (under 40px, also the favicon and PWA icon). Clear space is a quarter of the icon height. Use the Daylight variants on light surfaces for the header only; elsewhere the built in dark disc works on any background.
 - Update `<title>`, `og:title`, and the hero H1 to the new tagline: **Get out of the red and into your home.** The current site hero still says "From debt to owning your home outright".
 
