@@ -28,6 +28,7 @@ export function route(hostname, pathname) {
   if (kind === 'root') site = 'landing';
   else if (kind === 'app') site = 'app';
   else if (pathname === '/landing' || pathname.startsWith('/landing/')) { site = 'landing'; rest = pathname.slice('/landing'.length) || '/'; }   // previews: landing under /landing/
+  else if (/^\/pitch(-|\/)/i.test(pathname)) site = 'landing';   // previews: the pitch deck, its presenter and /pitch/ assets at the root, as on vault-it.co, so the presenter's popup and the deck's asset paths work
   else site = 'app';
   if (rest.endsWith('/')) rest += 'index.html';
   else if (!/\.[A-Za-z0-9]+$/.test(rest)) rest += '.html';       // /recover → /recover.html
