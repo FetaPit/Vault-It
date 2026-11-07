@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Vault·It · opening the demo</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#080808;color:#9aa0a6;font:15px/1.5 'DM Sans',system-ui,sans-serif;text-align:center;padding:24px}
+b{display:block;color:#44c0b9;font-size:1.05rem;margin-bottom:8px}
+small{display:block;max-width:420px;margin:0 auto;font-size:.8rem}
+a{color:#c9a84c}
+</style>
+</head>
+<body>
+<div><b>Opening the Vault·It demo…</b><small id="msg">Sample data for Alex Morgan. Anything already on this device is backed up and comes back when you exit the demo.</small></div>
+<script>
+// ── Lifted verbatim from the release index.html by build-seed.mjs. Do not edit here; regenerate. ──
+var _VI_SAVED_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1','pos4','pos_house','ht3','pos_journey',
+  'vi_jrny_events','vi_nw_history','vi_debt','vi_ov','vi_settings','vi_user','vi_session','vi_last_email',
+  'vi_pin_hash','vi_declined_demo'];
+var _VI_SAVED_PREFIX = /^(vi_snap_|sb-.+-auth-token$)/;
+var _VI_BOOKKEEPING = { v: 1, version: 1, ts: 1, updated: 1, lastUpdated: 1 };   // fields that say nothing about the person
+// a key holds data when it has any non-zero number, non-empty text or true in it (the app writes empty defaults such as
+// pos_ach1 {"xp":0,"unlocked":[],...,"v":1} on every first boot; those are not a person's data)
+function _viKeyHasData(k) {
+  var v = null; try { v = localStorage.getItem(k); } catch (e) {}
+  if (v == null || /^\s*$/.test(v)) return false;
+  var j; try { j = JSON.parse(v); } catch (e) { return true; }   // plain text that is not JSON counts as data
+  var deep = function(x) {
+    if (x == null || x === false || x === 0 || x === '') return false;
+    if (typeof x !== 'object') return true;
+    for (var q in x) if (Object.prototype.hasOwnProperty.call(x, q) && !_VI_BOOKKEEPING[q] && deep(x[q])) return true;
+    return false;
+  };
+  return deep(j);
+}
+function _viDeviceHasSavedData() {
+  try {
+    for (var i = 0; i < _VI_SAVED_KEYS.length; i++) if (_viKeyHasData(_VI_SAVED_KEYS[i])) return true;
+    for (var j = 0; j < localStorage.length; j++) { var k = localStorage.key(j); if (_VI_SAVED_PREFIX.test(k) && _viKeyHasData(k)) return true; }
+  } catch (e) { return true; }   // storage that cannot be read is never treated as empty
+  return false;
+}
+function _demoPut(k, v) { if (!_viKeyHasData(k)) localStorage.setItem(k, v); }   // the demo only ever fills empty keys
+function loadDemoData() {
+  // refuses on any device that holds saved data, and never writes over a key that already has something in it
+  if (_viDeviceHasSavedData()) return false;
+  _demoPut('vi_demo_mode', 'true');
+  // Rich UK demo persona — used when no user data exists
+  if (!localStorage.getItem('vi_user')) {
+    _demoPut('vi_user', JSON.stringify({
+      name: 'Alex Morgan', email: 'demo@vault-it.app',
+      job: 'Senior Product Manager', dream: 'Financial independence by 45',
+      saveArch: 'The Strategic Investor', spendArch: 'The Measured Spender',
+      joined: new Date().toISOString(), pioneerNum: 7
+    }));
+    _demoPut('vi_pioneer', 'true');
+  }
+  if (!localStorage.getItem('pos_ov1')) {
+    // Assets & debts live in their own tabs, so the Overview quick-add lists stay empty here
+    // (otherwise the demo would count them twice). Cash flow + history use the real key/shape.
+    var _dm = [], _nw = [38500, 43200, 48100, 53400, 58700, 63900, 68000, 71000], _dd = new Date();
+    for (var _i = 7; _i >= 0; _i--) {
+      var _m = new Date(_dd.getFullYear(), _dd.getMonth() - _i, 1);
+      _dm.push({ month: _m.getFullYear() + '-' + String(_m.getMonth() + 1).padStart(2, '0'), nw: _nw[7 - _i], debt: 32950 + _i * 450, liab: 400, income: 4150 });
+    }
+    _demoPut('pos_ov1', JSON.stringify({
+      assets: [], debts: [], snapshots: _dm,
+      milestones: [10000, 0, 25000, 50000, 100000],
+      income: [
+        { id: 1, name: 'Salary',        amount: 3800, cat: 'salary'   },
+        { id: 2, name: 'Side Projects', amount: 350,  cat: 'business' }
+      ],
+      expenses: [
+        { id: 3, name: 'Rent', amount: 1200, category: 'necessity', cat: 'housing', type: 'ce' },
+        { id: 4, name: 'Groceries', amount: 380, category: 'necessity', cat: 'groceries', type: 've' },
+        { id: 5, name: 'Transport', amount: 130, category: 'necessity', cat: 'transport', type: 've' },
+        { id: 6, name: 'Utilities & bills', amount: 165, category: 'necessity', cat: 'utilities', type: 've' },
+        { id: 7, name: 'Phone & internet', amount: 45, category: 'necessity', cat: 'phone', type: 'ce' },
+        { id: 8, name: 'Insurance', amount: 60, category: 'necessity', cat: 'insurance', type: 'ce' },
+        { id: 9, name: 'Subscriptions', amount: 62, category: 'discretionary', cat: 'subs', type: 'cn' },
+        { id: 10, name: 'Gym & health', amount: 45, category: 'discretionary', cat: 'fitness', type: 'cn' },
+        { id: 11, name: 'Eating out', amount: 95, category: 'discretionary', cat: 'dining', type: 'vn' },
+        { id: 12, name: 'Entertainment', amount: 80, category: 'discretionary', cat: 'fun', type: 'vn' },
+        { id: 13, name: 'Holidays', amount: 200, category: 'discretionary', cat: 'travel', type: 'vn' },
+        { id: 14, name: 'Gifts & giving', amount: 100, category: 'discretionary', cat: 'gifts', type: 'vn' },
+        { id: 15, name: 'House deposit', amount: 258, category: 'investment', cat: 'deposit', type: 'sv' },
+        { id: 16, name: 'ISA / investments', amount: 400, category: 'investment', cat: 'invest', type: 'iv' },
+        { id: 17, name: 'Pension', amount: 190, category: 'investment', cat: 'pension', type: 'iv' },
+        { id: 18, name: 'Emergency fund', amount: 300, category: 'investment', cat: 'emergency', type: 'sv' },
+        { id: 19, name: 'Savings', amount: 440, category: 'investment', cat: 'savings', type: 'sv' }
+      ]
+    }));
+  }
+  if (!localStorage.getItem('pos_al1')) {
+    _demoPut('pos_al1', JSON.stringify({
+      metals: { gold: 2.5, silver: 15, platinum: 0, palladium: 0 },
+      crypto: [{ id: 1, sym: 'ETH', amount: 1.4, price: 2200 }, { id: 2, sym: 'BTC', amount: 0.05, price: 42000 }],
+      cashAccounts: [
+        { id: 1, name: 'Marcus Savings', type: 'Savings', balance: 14800, rate: 4.7 },
+        { id: 2, name: 'Current Account', type: 'Current', balance: 2300, rate: 0 },
+        { id: 3, name: 'Lifetime ISA', type: 'LISA', balance: 8200, rate: 3.5 }
+      ],
+      otherAssets: [{ id: 4, name: 'Car · Honda Civic', value: 12500 }],
+      liabilities: [{ id: 5, name: 'Car Finance', value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z', runningCost: 180, depRate: 12 }],
+      stockPies: [{ id: 1, name: 'Stocks & Shares ISA' }], activePie: 1,
+      stocks: [
+        { id: 1, pie: 1, sym: 'VUSA.L', name: 'Vanguard S&P 500 UCITS ETF',  units: 180, avgCost: 62.4, price: 78.1,  change: 0 },
+        { id: 2, pie: 1, sym: 'VWRL.L', name: 'Vanguard FTSE All-World ETF', units: 95,  avgCost: 98,   price: 108.6, change: 0 },
+        { id: 3, pie: 1, sym: 'AAPL',   name: 'Apple Inc.',                  units: 12,  avgCost: 140,  price: 196.4, change: 0 }
+      ]
+    }));
+  }
+  if (!localStorage.getItem('ht3')) {
+    // House Builder reads "ht3" (the old demo wrote an unused key, so the house stayed blank)
+    _demoPut('ht3', JSON.stringify({
+      saved: 22500, target: 240000, houseType: 'terraced',
+      deposits: [
+        { date: '01/10/2025', amount: 5000 }, { date: '01/11/2025', amount: 4500 },
+        { date: '01/12/2025', amount: 3500 }, { date: '01/01/2026', amount: 4000 },
+        { date: '01/02/2026', amount: 3200 }, { date: '01/03/2026', amount: 2300 }
+      ],
+      prices: { terraced: 240000, semi: 320000, detached: 500000, mansion: 1500000, flat: 80000, apartment: 300000 },
+      apartmentFloor: 5, houseMode: null, mortgageBalance: 0
+    }));
+    // the house code read its state before this seed existed (v0.7, 1 Nov: a fresh device showed an empty plot): read it again now
+    try { if (typeof state !== 'undefined' && !(+state.saved > 0)) { var _hd = JSON.parse(localStorage.getItem('ht3')); state = Object.assign({}, state, _hd, { prices: Object.assign({}, DEFAULTS, _hd.prices || {}) }); } } catch (e) {}
+  }
+  if (!localStorage.getItem('pos_journey')) {
+    _demoPut('pos_journey', JSON.stringify({
+      profile: { monthlyTakeHome: 3800, mortgageTermYears: 25, interestRateEst: 4.5, depositTargetPct: 10, creditHealth: 'good', efMonths: 4 },
+      onboarded: true, stageOverride: 1, mortgageActive: false, mortgageBalance: 0, rentMonthly: 1200, rentYears: 3
+    }));
+  }
+  // (QC-3) pos4 removed — it was never read; cashflow reads pos_ov1 / ovState.
+  if (!localStorage.getItem('pos_debt1')) {
+    _demoPut('pos_debt1', JSON.stringify({
+      debts: [
+        { id: 1, name: 'Student Loan Plan 2', balance: 24300, original: 38000, rate: 7.1, minPay: 180, type: 'loan', color: '#c9a84c' },
+        { id: 2, name: 'Barclaycard', balance: 1850, original: 3200, rate: 24.9, minPay: 55, type: 'credit', color: '#44c0b9' }
+      ]
+    }));
+  }
+  return true;
+}
+
+// ── Demo link glue (demo-worker/app-seed.template.html) ──
+(function () {
+  var APP = 'https://app.vault-it.co/';
+  var DEMO_EMAIL = 'demo@vault-it.app';
+  var BACKUP = 'vi_demo_backup';
+  var now = Date.now();
+  var iso = function (daysAgo) { return new Date(now - daysAgo * 864e5).toISOString(); };
+  var inDemo = function () { try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.email === DEMO_EMAIL); } catch (e) { return false; } };
+  var snapshot = function () { var o = {}; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k !== BACKUP) o[k] = localStorage.getItem(k); } return o; };
+  // Tabs the app's own loader leaves empty: Entrepreneur, Wealth Roadmap badges, Connections. Plus quiet flags for a clean walkthrough.
+  var extras = function () {
+    return {
+      pos_biz1: {
+        revenueGoal: 1000,
+        streams: [{ id: 501, name: 'Notion templates on Etsy (pre-launch)', monthly: 0 }],
+        clients: [
+          { id: 601, name: 'Northline Consulting', monthly: 350, status: 'Active',   notes: 'Product strategy retainer, two calls a month', email: '', phone: '', website: '' },
+          { id: 602, name: 'Bright Minds Tuition', monthly: 180, status: 'Prospect', notes: 'Wants a roadmap workshop in January', email: '', phone: '', website: '' }
+        ],
+        leads: [
+          { id: 701, name: 'Priya Shah',        email: 'priya@example.com', phone: '', website: '', stage: 'hot',  value: 400, notes: 'Fractional PM, three days a month' },
+          { id: 702, name: 'Harbour Coffee Co', email: '', phone: '', website: '', stage: 'warm', value: 250, notes: 'App onboarding audit' },
+          { id: 703, name: 'Wellbeing podcast', email: '', phone: '', website: '', stage: 'cold', value: 500, notes: 'Sponsored episode, reached out on LinkedIn' }
+        ],
+        incomeStreams: [
+          { id: 801, name: 'Side projects', icon: '🚀', type: 'active', monthlyIncome: 350, status: 'active', progress: 67, totalInvested: 120, monthlyHistory: [200, 300, 350, 350],
+            steps: [{ text: 'Land the first retainer client', done: true }, { text: 'Set up invoicing and a contract template', done: true }, { text: 'Raise the day rate in January', done: false }],
+            tasks: [{ id: 811, text: 'Send Priya a proposal', stage: 'inprogress' }, { id: 812, text: 'Publish the case study', stage: 'todo' }, { id: 813, text: 'Invoice Northline', stage: 'done' }] },
+          { id: 802, name: 'Notion templates on Etsy', icon: '📝', type: 'passive', monthlyIncome: 0, status: 'building', progress: 33, totalInvested: 60, monthlyHistory: [],
+            steps: [{ text: 'Build the first three templates', done: true }, { text: 'Design listing images', done: false }, { text: 'List on Etsy and Gumroad', done: false }],
+            tasks: [{ id: 821, text: 'Finish the budget tracker template', stage: 'inprogress' }] }
+        ]
+      },
+      pos_ach1: {
+        xp: 960,
+        unlocked: ['nw100', 'nw500', 'nw1k', 'nw2k', 'nw5k', 'nw10k', 'nw25k', 'nw50k', 'snap1', 'snap3', 'debtstart', 'ef1k', 'stream1', 'gold'],
+        connected: {
+          monzo:      { ts: now, manual: true, lastSync: iso(1) },
+          nationwide: { ts: now, manual: true, lastSync: iso(1) },
+          coinbase:   { ts: now, keyed: true,  lastSync: iso(2) },
+          royalmint:  { ts: now, manual: true, lastSync: iso(9) }
+        }
+      },
+      vi_streak: '11',
+      vi_last_visit: new Date(now - 864e5).toDateString(),
+      vi_tester_note: iso(1),          // no "welcome, alpha tester" card over the demo
+      vi_tour_done: 'done',            // no guided tour over the demo
+      vi_last_sync: String(now),       // keeps the "back up this device" banner quiet until something changes
+      vi_dirty: []
+    };
+  };
+  try {
+    if (!inDemo() && !localStorage.getItem(BACKUP)) {
+      var snap = snapshot();
+      if (Object.keys(snap).length) localStorage.setItem(BACKUP, JSON.stringify({ at: new Date(now).toISOString(), data: snap }));
+    }
+    var keep = localStorage.getItem(BACKUP);
+    localStorage.clear();
+    if (keep) localStorage.setItem(BACKUP, keep);
+    if (!loadDemoData()) throw new Error('the app’s demo loader refused to seed');   // the app's own Alex Morgan persona, every key it seeds
+    localStorage.removeItem('vi_demo_mode');   // open as a returning user: no onboarding wizard or demo bar over the pitch
+    var ex = extras();
+    Object.keys(ex).forEach(function (k) { localStorage.setItem(k, typeof ex[k] === 'string' ? ex[k] : JSON.stringify(ex[k])); });
+    localStorage.setItem('vi_session', JSON.stringify({ email: DEMO_EMAIL, expiry: now + 24 * 3600 * 1000 }));   // what the app's own ?bypass=websummit does
+  } catch (e) {
+    document.getElementById('msg').innerHTML = 'Could not prepare the demo on this device (' + String(e && e.message).replace(/[<>&]/g, '') + '). <a href="' + APP + '">Open the app anyway</a>.';
+    return;
+  }
+  location.replace(APP);
+})();
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vault·It · Pioneer demo</title>
-<meta name="description" content="A sample Vault·It Pioneer profile with a link into the live demo. Every tab is filled in.">
+<meta name="description" content="A sample Vault·It Pioneer profile with a link into the live app demo. Every tab is filled in.">
 <meta name="theme-color" content="#080808">
 <meta name="robots" content="noindex">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -92,13 +92,13 @@ a{color:var(--em)}
   <section class="card" aria-labelledby="who">
     <div class="eyebrow">◈ Pioneer profile · sample data</div>
     <div class="hero">
-      <div class="avatar" aria-hidden="true"><span>SC</span></div>
+      <div class="avatar" aria-hidden="true"><span>AM</span></div>
       <div style="min-width:0;flex:1">
-        <h1 class="name" id="who">Sam Carter</h1>
-        <div class="role">NHS nurse · Leeds · renting at £900/mo</div>
-        <p class="bio">Clearing the last of my credit card and saving for a terraced place of my own. Tutoring on the side to get there faster.</p>
+        <h1 class="name" id="who">Alex Morgan</h1>
+        <div class="role">Senior product manager · renting at £1,200/mo</div>
+        <p class="bio">Financial independence by 45. Clearing the student loan and the card, building the deposit for a terraced place, with side projects paying for the extras.</p>
         <div class="pills">
-          <span class="pill gold">◈ Pioneer</span><span class="pill teal">Pro</span><span class="pill amber">🛡 Stabilise</span><span class="pill">🔥 12 day streak</span><span class="pill">Level · Grounded</span>
+          <span class="pill gold">◈ Pioneer</span><span class="pill amber">🛡 Stabilise</span><span class="pill">🔥 12 day streak</span><span class="pill teal">Level 9 · Compounder</span>
         </div>
       </div>
     </div>
@@ -106,48 +106,43 @@ a{color:var(--em)}
     <div class="section">
       <div class="section-title">Journey</div>
       <div class="stage">
-        <div class="dots" aria-hidden="true"><i class="done"></i><i class="now"></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div><div class="stage-lbl">Stage 1 of 6 · Stabilise</div><div class="stage-sub" id="stage-sub">Debt free in 8 months · keys in hand in about 18</div></div>
+        <div class="dots" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i><i></i></div>
+        <div><div class="stage-lbl">Stage 7 of 30 · Stabilise</div><div class="stage-sub" id="stage-sub">18 of 50 roadmap steps done · next: first debt cut</div></div>
       </div>
       <div class="stats">
-        <div class="stat"><div class="stat-lbl">Net worth</div><div class="stat-val" id="st-nw">£29.0k</div><div class="stat-sub" id="st-nw-sub">▲ £1.2k this month</div></div>
-        <div class="stat"><div class="stat-lbl">Deposit saved</div><div class="stat-val gold">£16.0k</div><div class="stat-sub">80% of a £20k deposit</div><div class="bar"><i></i></div></div>
-        <div class="stat"><div class="stat-lbl">Debt left</div><div class="stat-val red">£4.4k</div><div class="stat-sub">3 debts · was £9.8k</div></div>
-        <div class="stat"><div class="stat-lbl">Monthly surplus</div><div class="stat-val green" id="st-sur">£620/mo</div><div class="stat-sub" id="st-sur-sub">26% of take-home</div></div>
+        <div class="stat"><div class="stat-lbl">Net worth</div><div class="stat-val" id="st-nw">£69.9k</div><div class="stat-sub" id="st-nw-sub">own £102k · owe £32k</div></div>
+        <div class="stat"><div class="stat-lbl">Deposit saved</div><div class="stat-val gold">£22.5k</div><div class="stat-sub">94% of a £24k deposit</div><div class="bar"><i style="width:94%"></i></div></div>
+        <div class="stat"><div class="stat-lbl">Debt left</div><div class="stat-val red">£26.1k</div><div class="stat-sub">student loan and a card</div></div>
+        <div class="stat"><div class="stat-lbl">Monthly surplus</div><div class="stat-val green" id="st-sur">£1.9k/mo</div><div class="stat-sub" id="st-sur-sub">after bills, before investing</div></div>
       </div>
     </div>
 
     <div class="cta">
-      <a class="btn primary" id="open-demo" href="index.html?demo=1">Open the live demo →</a>
+      <a class="btn primary" id="open-demo" href="https://app.vault-it.co/eligent">Open the live demo →</a>
       <button class="btn gold" type="button" onclick="copyLink()">Copy link</button>
     </div>
-    <div class="linkbox"><span style="color:var(--go)">🔗</span><a id="demo-url" href="index.html?demo=1">index.html?demo=1</a></div>
-    <p class="note">Opens Vault·It as Sam with every tab filled in. Safe on any device: whatever is already there is backed up and put back when you exit the demo from the gold bar. Opening the link again resets the numbers.</p>
+    <div class="linkbox"><span style="color:var(--go)">🔗</span><a id="demo-url" href="https://app.vault-it.co/eligent">https://app.vault-it.co/eligent</a></div>
+    <p class="note">Opens the real app as Alex with every tab filled in, no sign-in. Safe on any device: whatever is already there is backed up and put back when you leave through <a href="https://app.vault-it.co/eligent/exit">app.vault-it.co/eligent/exit</a>. Opening the link again resets the numbers.</p>
   </section>
 
   <section class="card" aria-labelledby="whats-in">
     <div class="section-title" id="whats-in">What's in the demo</div>
     <ul class="tabs">
-      <li><b><i></i>Overview</b><span>Six months of net worth climbing from £22.9k to £29.0k, £2,400 take-home against £1,780 of costs, pension and savings breakdown.</span></li>
-      <li><b><i class="gold"></i>Journey</b><span>Stage 1, Stabilise. Keys-in-hand date, mortgage readiness grid and the 4.5x income ceiling, all from the live numbers.</span></li>
-      <li><b><i class="amber"></i>House builder</b><span>£16,000 of a £200,000 terraced target, six deposits logged, walls going up on the build.</span></li>
-      <li><b><i class="green"></i>Assets</b><span>Metals: a quarter ounce of gold and 20 oz of silver. Crypto: 0.012 BTC and 0.35 ETH. Cash: Monzo and an emergency fund. Other: bike and laptop. Liabilities: a 2016 Fiesta with running costs.</span></li>
-      <li><b><i class="red"></i>Debt tracker</b><span>Barclaycard at 21.9%, a car loan and a Klarna balance. Avalanche order and payoff maths.</span></li>
-      <li><b><i class="amber"></i>Entrepreneur <span class="pro">PRO</span></b><span>£600 a month from tutoring and bank shifts, three clients, a hot, warm and cold pipeline, and two income streams with step plans and task boards.</span></li>
-      <li><b><i class="gold"></i>Achievements</b><span>15 badges and 960 XP at Grounded level, 40 XP short of Builder, with a 12 day streak.</span></li>
+      <li><b><i></i>Overview</b><span>Net worth in 3D you can orbit: £102k owned on the gold line, £32k owed below it. Eight months of history, £3,800 salary plus £350 side income against £2,560 of bills.</span></li>
+      <li><b><i class="gold"></i>Budget</b><span>Every line categorised: essentials, lifestyle and £1,590 a month going to the deposit, ISA, pension, emergency fund and savings.</span></li>
+      <li><b><i class="amber"></i>House builder</b><span>£22,500 of a £240,000 terraced target, six deposits logged, the build rising brick by brick.</span></li>
+      <li><b><i class="green"></i>Assets</b><span>Metals: 2.5 oz gold, 15 oz silver. Crypto: 1.4 ETH, 0.05 BTC. Cash: savings, current account and a Lifetime ISA. Stocks: an ISA pie with VUSA, VWRL and Apple. Inventory: a Honda Civic with the finance and running costs against it.</span></li>
+      <li><b><i class="red"></i>Debt tracker</b><span>Student Loan Plan 2 at £24.3k and a Barclaycard at £1.85k, avalanche order and payoff maths.</span></li>
+      <li><b><i class="amber"></i>Entrepreneur <span class="pro">PRO</span></b><span>£350 a month from side projects, two clients, a hot, warm and cold pipeline, and two income streams with step plans and task boards.</span></li>
+      <li><b><i class="gold"></i>Wealth roadmap</b><span>Level 9 Compounder, stage 7 of 30, 18 of 50 steps achieved, 14 badges and a 12 day streak.</span></li>
       <li><b><i class="purple"></i>Connections</b><span>Monzo, Nationwide, Coinbase and the Royal Mint linked, with last sync dates.</span></li>
     </ul>
   </section>
 
-  <footer class="foot">Not regulated by the FCA. Not financial advice.<br>Sam Carter is a fictional Pioneer. Every number is sample data.</footer>
+  <footer class="foot">Not regulated by the FCA. Not financial advice.<br>Alex Morgan is a fictional Pioneer. Every number is sample data.</footer>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
-(function () {
-  var url = new URL('index.html?demo=1', location.href).href;
-  var a = document.getElementById('demo-url'); a.href = url; a.textContent = url;
-  document.getElementById('open-demo').href = url;
-})();
 var _t;
 function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(_t); _t = setTimeout(function () { t.classList.remove('show'); }, 2600); }
 function copyLink() {

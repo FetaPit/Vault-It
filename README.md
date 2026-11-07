@@ -18,10 +18,7 @@ Open `vault-it-brand-book.html` in a browser first. It is the visual and behavio
 
 ## Pitch demo
 
-`demo.html` is a standalone profile page for the sample Pioneer (Sam Carter: NHS nurse in Leeds, three debts, £16k of a £200k terraced target saved, tutoring on the side). It has the demo hyperlink, a copy button and a one-line summary of what each tab shows. On the main domain it is `https://vault-it.co/pitch-Eligent` (served by the Worker in `demo-worker/`, the address on the pitch deck); on GitHub Pages it is `https://fetapit.github.io/Vault-It/demo.html`.
-
-The link itself is the app with `?demo=1` on the end, for example `https://fetapit.github.io/Vault-It/?demo=1`. It seeds every tab and sub-tab (Overview, Journey, House Builder, Assets with metals, crypto, cash, inventory and liabilities, Debt Tracker, Entrepreneur, Achievements, Connections) and opens the profile card.
-
-- Anything already on the device is backed up first and put back when you hit "Exit demo" on the gold bar.
-- Open the link again to reset the demo to its starting numbers.
-- The dataset lives in `viDemoDataset()` in `index.html`. Change numbers there and the page copy in `demo.html` to match.
+- `https://vault-it.co/eligent-demo` (also `vault-it.co/pitch-Eligent`, the address on the deck): `demo.html`, a standalone profile page for the sample Pioneer, Alex Morgan, with the demo hyperlink and a one-line summary of what each tab shows.
+- `https://app.vault-it.co/eligent`: opens the real app, signed in as Alex with every tab filled in. Whatever was in the browser is backed up and put back by `https://app.vault-it.co/eligent/exit`. Opening the link again resets the numbers.
+- How it works, and how to update it, is in `demo-worker/README.md`.
+- `index.html?demo=1` in this repo (the v0.6 build) still seeds its own Sam Carter dataset from `viDemoDataset()`; it is no longer what the links open.

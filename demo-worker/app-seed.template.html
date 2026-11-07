@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Vault·It · opening the demo</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#080808;color:#9aa0a6;font:15px/1.5 'DM Sans',system-ui,sans-serif;text-align:center;padding:24px}
+b{display:block;color:#44c0b9;font-size:1.05rem;margin-bottom:8px}
+small{display:block;max-width:420px;margin:0 auto;font-size:.8rem}
+a{color:#c9a84c}
+</style>
+</head>
+<body>
+<div><b>Opening the Vault·It demo…</b><small id="msg">Sample data for Alex Morgan. Anything already on this device is backed up and comes back when you exit the demo.</small></div>
+<script>
+// ── Lifted verbatim from the release index.html by build-seed.mjs. Do not edit here; regenerate. ──
+/*__LIFTED_FROM_RELEASE__*/
+
+// ── Demo link glue (demo-worker/app-seed.template.html) ──
+(function () {
+  var APP = 'https://app.vault-it.co/';
+  var DEMO_EMAIL = 'demo@vault-it.app';
+  var BACKUP = 'vi_demo_backup';
+  var now = Date.now();
+  var iso = function (daysAgo) { return new Date(now - daysAgo * 864e5).toISOString(); };
+  var inDemo = function () { try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.email === DEMO_EMAIL); } catch (e) { return false; } };
+  var snapshot = function () { var o = {}; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k !== BACKUP) o[k] = localStorage.getItem(k); } return o; };
+  // Tabs the app's own loader leaves empty: Entrepreneur, Wealth Roadmap badges, Connections. Plus quiet flags for a clean walkthrough.
+  var extras = function () {
+    return {
+      pos_biz1: {
+        revenueGoal: 1000,
+        streams: [{ id: 501, name: 'Notion templates on Etsy (pre-launch)', monthly: 0 }],
+        clients: [
+          { id: 601, name: 'Northline Consulting', monthly: 350, status: 'Active',   notes: 'Product strategy retainer, two calls a month', email: '', phone: '', website: '' },
+          { id: 602, name: 'Bright Minds Tuition', monthly: 180, status: 'Prospect', notes: 'Wants a roadmap workshop in January', email: '', phone: '', website: '' }
+        ],
+        leads: [
+          { id: 701, name: 'Priya Shah',        email: 'priya@example.com', phone: '', website: '', stage: 'hot',  value: 400, notes: 'Fractional PM, three days a month' },
+          { id: 702, name: 'Harbour Coffee Co', email: '', phone: '', website: '', stage: 'warm', value: 250, notes: 'App onboarding audit' },
+          { id: 703, name: 'Wellbeing podcast', email: '', phone: '', website: '', stage: 'cold', value: 500, notes: 'Sponsored episode, reached out on LinkedIn' }
+        ],
+        incomeStreams: [
+          { id: 801, name: 'Side projects', icon: '🚀', type: 'active', monthlyIncome: 350, status: 'active', progress: 67, totalInvested: 120, monthlyHistory: [200, 300, 350, 350],
+            steps: [{ text: 'Land the first retainer client', done: true }, { text: 'Set up invoicing and a contract template', done: true }, { text: 'Raise the day rate in January', done: false }],
+            tasks: [{ id: 811, text: 'Send Priya a proposal', stage: 'inprogress' }, { id: 812, text: 'Publish the case study', stage: 'todo' }, { id: 813, text: 'Invoice Northline', stage: 'done' }] },
+          { id: 802, name: 'Notion templates on Etsy', icon: '📝', type: 'passive', monthlyIncome: 0, status: 'building', progress: 33, totalInvested: 60, monthlyHistory: [],
+            steps: [{ text: 'Build the first three templates', done: true }, { text: 'Design listing images', done: false }, { text: 'List on Etsy and Gumroad', done: false }],
+            tasks: [{ id: 821, text: 'Finish the budget tracker template', stage: 'inprogress' }] }
+        ]
+      },
+      pos_ach1: {
+        xp: 960,
+        unlocked: ['nw100', 'nw500', 'nw1k', 'nw2k', 'nw5k', 'nw10k', 'nw25k', 'nw50k', 'snap1', 'snap3', 'debtstart', 'ef1k', 'stream1', 'gold'],
+        connected: {
+          monzo:      { ts: now, manual: true, lastSync: iso(1) },
+          nationwide: { ts: now, manual: true, lastSync: iso(1) },
+          coinbase:   { ts: now, keyed: true,  lastSync: iso(2) },
+          royalmint:  { ts: now, manual: true, lastSync: iso(9) }
+        }
+      },
+      vi_streak: '11',
+      vi_last_visit: new Date(now - 864e5).toDateString(),
+      vi_tester_note: iso(1),          // no "welcome, alpha tester" card over the demo
+      vi_tour_done: 'done',            // no guided tour over the demo
+      vi_last_sync: String(now),       // keeps the "back up this device" banner quiet until something changes
+      vi_dirty: []
+    };
+  };
+  try {
+    if (!inDemo() && !localStorage.getItem(BACKUP)) {
+      var snap = snapshot();
+      if (Object.keys(snap).length) localStorage.setItem(BACKUP, JSON.stringify({ at: new Date(now).toISOString(), data: snap }));
+    }
+    var keep = localStorage.getItem(BACKUP);
+    localStorage.clear();
+    if (keep) localStorage.setItem(BACKUP, keep);
+    if (!loadDemoData()) throw new Error('the app’s demo loader refused to seed');   // the app's own Alex Morgan persona, every key it seeds
+    localStorage.removeItem('vi_demo_mode');   // open as a returning user: no onboarding wizard or demo bar over the pitch
+    var ex = extras();
+    Object.keys(ex).forEach(function (k) { localStorage.setItem(k, typeof ex[k] === 'string' ? ex[k] : JSON.stringify(ex[k])); });
+    localStorage.setItem('vi_session', JSON.stringify({ email: DEMO_EMAIL, expiry: now + 24 * 3600 * 1000 }));   // what the app's own ?bypass=websummit does
+  } catch (e) {
+    document.getElementById('msg').innerHTML = 'Could not prepare the demo on this device (' + String(e && e.message).replace(/[<>&]/g, '') + '). <a href="' + APP + '">Open the app anyway</a>.';
+    return;
+  }
+  location.replace(APP);
+})();
+</script>
+</body>
+</html>
