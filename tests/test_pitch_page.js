@@ -1,5 +1,5 @@
 // vault-it.co/pitch-Eligent in a real browser, served through the real Worker routing from the real build:
-// all 18 slides scroll on a phone with no sideways scroll, the Present button gives a one-slide view
+// all 18 slides (v4: Problem, Solution, Result order) scroll on a phone with no sideways scroll, the Present button gives a one-slide view
 // (arrow keys, on-screen buttons, swipe, counter, Esc to leave), and the app's two live 3D viewports draw with demo data.
 require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
@@ -34,17 +34,19 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   { const t = await p.evaluate(() => document.body.innerText); ok(!/£49\.99 a year/.test(t) && /£5\.99\/mo/.test(t) && /£59\.99\/yr/.test(t), 'Pioneer yearly matches the full live price: £59.99, not the old £49.99'); }
   // v2 (owner's decisions, 6 Nov 2026): one ask with its use of funds, a forecast with both break-even lines, B2B prices, the first buyer
   { const ids = await p.evaluate(() => [...document.querySelectorAll('.frame > section')].map((s) => s.id));
-    ok(ids.join() === 'cover,team,nd,problem,gap,solution,features,evidence,whynow,model,partner,impact,gtm,validation,traction,forecast,ask,close', 'v2 slide order, with the forecast before the ask: ' + ids); }
+    ok(ids.join() === 'cover,team,person,problem,gap,solution,features,nd,evidence,result,traction,model,impact,gtm,whynow,forecast,ask,close', 'v4 slide order: problem (person, how many, why nobody solves it), solution (product, live 3D, who it helps most), result (person, partner, where we are), then money and the ask: ' + ids); }
   const txt = async (id) => p.evaluate((id) => (document.getElementById(id) || {}).innerText || '', id);
   { const a = await txt('ask');
     ok(/£250,000/.test(a) && /SEIS/.test(a) && /March 2027/.test(a) && /equity terms on request/i.test(a), 'the ask: £250,000 under SEIS, closing March 2027, equity terms on request');
-    ok(/What £250,000 unlocks/.test(a) && /£720,975/.test(a) && /cumulative profit/.test(a) && /University of Lincoln/.test(a) && /50% income tax relief/.test(a) && /Barbican Creative Hub studio \(£5,000 \+ VAT a year\)/.test(a) && /One ask of this room/.test(a) && !/18 months/.test(a), 'the ask card shows the upside from the forecast, the funded study, SEIS relief, the studio, and keeps the one ask of the room');
-    ok(/V3/.test(await txt('cover')), 'the cover is stamped V3');
+    ok(/What £250,000 unlocks/.test(a) && /£720,975/.test(a) && /cumulative profit/.test(a) && /University of Lincoln/.test(a) && /50% income tax relief/.test(a) && /Barbican Creative Hub studio \(£5,000 \+ VAT a year\)/.test(a) && /Three asks of this room/.test(a) && !/18 months/.test(a), 'the ask card shows the upside from the forecast, the funded study, SEIS relief, the studio, and the three asks of the room');
+    ok(/V4/.test(await txt('cover')) && !/V3/.test(await txt('cover')), 'the cover is stamped V4');
     const uf = await p.evaluate(() => [...document.querySelectorAll('#ask [data-fund]')].map((e) => [e.dataset.fund, e.innerText]));
     const pct = uf.map((x) => x[0]).join('/'), sum = uf.reduce((s, x) => s + +(x[1].match(/£([\d,]+)/) || [0, '0'])[1].replace(/,/g, ''), 0);
     ok(pct === '35/20/15/15/15' && sum === 250000, 'use of funds 35/20/15/15/15 and the pounds add to £250,000: ' + pct + ' = £' + sum); }
-  { const v = await txt('validation'), cards = await p.locator('#validation [data-card]').count();
-    ok(cards === 3 && /TikTok/.test(v) && /Instagram/.test(v) && /YouTube/.test(v) && /Paid ads/.test(v) && /£50,000/.test(v) && /30-day free trial/.test(v) && /£3\.99/.test(v) && /£149/.test(v) && /Sponsored Pioneer/.test(v) && /Impact licence/.test(v) && /proposed/i.test(v) && /3,000/.test(v) && /4% trial to paid/.test(v) && /30% still active/.test(v) && /NOT REGULATED BY THE FCA/.test(v), 'the market validation slide: early adopters through the subsidised and discounted plans, the TikTok, Instagram and YouTube plan with paid ads, and the gates (owner, 7 Nov 10:27)'); }
+  { const t = await txt('traction'), g = await p.evaluate(() => (document.querySelector('#traction [data-gates]') || {}).innerText || '');
+    ok(/3,000 on the waitlist/.test(g) && /4% trial to paid/.test(g) && /30% still active/.test(g) && /50\+ Founding/.test(g) && /First paid pilot/.test(g) && /26/.test(t) && /442/.test(t) && /£0/.test(t) && /Web Summit/.test(t) && /incorporation submitted 6 Nov/.test(t) && /NOT REGULATED BY THE FCA/.test(t) && !(await p.locator('#validation').count()), 'v4: where we are carries the alpha figures, the next six weeks and the gates (the v3 validation slide is folded in)');
+    const g2 = await txt('gtm');
+    ok(/TikTok/.test(g2) && /Instagram/.test(g2) && /YouTube/.test(g2) && /Paid ads/.test(g2) && /£50,000/.test(g2) && /30-day free trial/.test(g2) && /£3\.99/.test(g2) && /£149/.test(g2) && /Sponsored and Impact/.test(g2), 'v4: the channel plan and the subsidised plans sit on the go-to-market slide'); }
   { const f = await txt('forecast');
     const rows = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('#forecast tr[data-row]')].map((r) => [r.dataset.row, [...r.querySelectorAll('td')].slice(1).map((c) => c.textContent.trim() === '–' ? 0 : +c.textContent.replace(/[£,]/g, ''))])));
     const sum = (...a) => [0, 1, 2].map((i) => a.reduce((t, k) => t + rows[k][i], 0)), eq = (x, y) => x.join() === y.join();
@@ -54,10 +56,26 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     const secs = await p.evaluate(() => [...document.querySelectorAll("#forecast tr[data-section]")].map((r) => r.textContent.trim()));
     ok(secs.join() === "CONSUMER,B2B" && Array.isArray(rows["consumer-sub"]) && Array.isArray(rows["b2b-sub"]) && eq(rows["consumer-sub"], rows.consumer) && eq(rows["b2b-sub"], sum("pilots", "partner", "sponsored")) && eq(rows["b2b-sub"], [52500, 249990, 624975]) && /sub total/i.test(f), "the forecast is in two sections, Consumer and B2B, each with its own sub total line (owner, 7 Nov 10:17)");
     ok(rows.cumulative[1] > 250000 && /£261,390/.test(f) && /November 2028/.test(f) && /Barbican/.test(f) && /December 2027/.test(f) && /£13,900/.test(f) && /illustrative/i.test(f) && /not (yet )?modelled/i.test(f) && !/£16,900|December 2028/.test(f), 'the forecast says cumulative profit passes £250,000 (November 2028), the with-raise line, and what is not modelled'); }
-  { const b2 = await txt('partner'); ok(/£2,500 to £5,000/.test(b2) && /£10k to £25k/.test(b2) && /£1 to £3/.test(b2) && /pen test/i.test(b2), 'the B2B slide prices the four offers and the cost of delivering white label'); }
+  { const b2 = await txt('model'), r2 = await txt('result'); ok(/£2,500 to £5,000/.test(b2) && /£10k to £25k/.test(b2) && /£1 to £3/.test(b2) && /pen test/i.test(r2) && /2p per user/.test(r2) && !(await p.locator('#partner').count()), 'v4: the business model slide prices the four B2B offers; the cost of delivering white label sits on the result-for-the-partner slide'); }
   { const g = await txt('gtm'); ok(/3,000/.test(g) && /4%/.test(g) && /30%/.test(g) && /30-day/.test(g), 'go to market: funnel, channels and targets'); }
   ok(/sav/i.test(await txt('problem')) && /co-?founder, operations/i.test(await txt('team')) && /25% equity/.test(await txt('team')) && /250 to 750 participants/.test(await txt('nd')), 'problem leads with savers, the team slide names the operations co-founder and the 25% equity offer, the ND slide the UoL pilot');
   { const t = await p.evaluate(() => document.body.innerText); ok(!/14-DAY|14-day/.test(t) && /30-DAY/i.test(t), 'the trial is 30 days, as in the app'); }
+  // v4 (owner, 7 Nov 2026: "Deck v4 ... Focus on framework. Problem, solution result. Add potential audience b2b and b2c numbers"; "Build deck v4 from section 5")
+  { const lab = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('.frame > section')].map((s) => [s.id, (s.querySelector('p') || {}).textContent || ''])));
+    ok(/^THE PROBLEM · ONE PERSON/.test(lab.person) && /^THE PROBLEM · HOW MANY/.test(lab.problem) && /^THE PROBLEM · WHY NOBODY/.test(lab.gap) && /^THE SOLUTION/.test(lab.solution) && /^THE SOLUTION/.test(lab.features) && /^THE SOLUTION/.test(lab.nd) && /^THE RESULT · FOR THE PERSON/.test(lab.evidence) && /^THE RESULT · FOR THE PARTNER/.test(lab.result) && /^THE RESULT · WHERE WE ARE/.test(lab.traction), 'every spine slide is labelled Problem, Solution or Result: ' + JSON.stringify(lab)); }
+  { const s3 = await txt('person'), rows = await p.locator('#person [data-sam] p').count();
+    ok(/Sam is 34, rents, owes £16,874/.test(s3) && /None of them says when/.test(s3) && /£2,300/.test(s3) && /£1,850/.test(s3) && /£6,874 at 24\.9%/.test(s3) && /£10,000 at 9\.9%/.test(s3) && /£66 a month/.test(s3) && /EXAMPLE PERSON/.test(s3) && /STEPCHANGE/.test(s3) && rows >= 14, 'slide 3, one person: Sam, the month in numbers, labelled as an example with its sources'); }
+  { const pr = await txt('problem'); ok(/8\.1m/.test(pr) && /19%/.test(pr) && !/1 in 5/.test(pr) && /£16,874/.test(pr) && /52%/.test(pr) && /7\.6 times/.test(pr) && /0\.03% of the 8\.1 million/.test(pr) && /MAPS DEBT NEED SURVEY 2024/.test(pr) && /ENGLISH HOUSING SURVEY 2024-25/.test(pr), 'slide 4, how many: the audience numbers with a named source each, and the sliver line'); }
+  { const gp = await txt('gap'); ok((await p.locator('#gap [data-rivals] p').count()) === 5 && /Moneybox/.test(gp) && /Lifetime ISA and deposit saving/.test(gp) && /Tembo/.test(gp) && /mortgage-ready/.test(gp) && /Emma, Snoop and Plum/.test(gp) && /Mouso/.test(gp) && /Nobody starts below zero/.test(gp), 'slide 5, the competitors named with what each does'); }
+  ok(/StepChange, 2025/.test(await txt('nd')), 'the neurodiversity slide cites StepChange 2025 on debt and money confidence');
+  { const ev = await txt('evidence'), w = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('#evidence [data-worked] [data-row]')].map((r) => [r.dataset.row, r.innerText.replace(/\s+/g, ' ')])));
+    ok(/Keys a year sooner/.test(ev) && /Aug 2031/.test(w.min) && /Aug 2035/.test(w.min) && /Jan 2031/.test(w.plus50) && /Aug 2034/.test(w.plus50) && /Mar 2034/.test(w.lisa) && /17 months sooner/.test(w.lisa) && /APP’S OWN|APP'S OWN/.test(ev) && /Hershfield/.test(ev) && /Kivetz/.test(ev), 'slide 9, the result for the person: Sam\'s worked example from the app\'s journey maths (minimums, £50 more, LISA bonus) with the behaviour evidence: ' + JSON.stringify(w)); }
+  { const rs = await txt('result'); ok(/45 months/.test(rs) && /Stage 0 to Stage 3/.test(rs) && /90 days/.test(rs) && /No bank data/.test(rs) && /Cyber Essentials Plus/.test(rs), 'slide 10, the result for the partner: years earlier, one measure, low risk, what white label costs'); }
+  { const gt = await txt('gtm'), c = await p.evaluate(() => [...document.querySelectorAll('#gtm [data-count]')].map((e) => e.innerText.replace(/\s+/g, ' ')));
+    ok(c.length === 5 && /8\.1m/.test(c[0]) && /^40\+ UK building societies/.test(c[1]) && !/\b4[23] UK building/.test(c[1]) && /36,764/.test(c[2]) && /8,335/.test(c[3]) && /^227 housing associations with 1,000\+ homes/.test(c[4]) && /under 0\.1%/.test(gt) && /BSA 2025/.test(gt) && /DBT BUSINESS POPULATION ESTIMATES 2025/.test(gt) && /3,000/.test(gt) && /4%/.test(gt) && /30%/.test(gt), 'slide 14, go to market: the top of each funnel counted with its source, and the targets: ' + c.join(' | ')); }
+  { const a = await txt('ask'), li = await p.evaluate(() => [...document.querySelectorAll('#ask [data-asks] li')].map((e) => e.innerText));
+    ok(/Three asks of this room/.test(a) && !/One ask of this room/.test(a) && li.length === 3 && /^Invest:/.test(li[0]) && /^Introduce:/.test(li[1]) && /building society, broker or debt charity/.test(li[1]) && /^Mentor:/.test(li[2]), 'slide 17 closes with three calls to action: invest, introduce, mentor: ' + li.join(' | ')); }
+  { const t = await p.evaluate(() => document.body.innerText); ok(!/—/.test(t), 'no em dashes in the deck copy'); }
   // v3 (owner's edits, 7 Nov 2026)
   { const w = await p.evaluate(() => { const h = document.querySelector('#cover h1'), sp = h && h.querySelector('span'); return h && sp ? { all: h.textContent, it: sp.textContent, col: getComputedStyle(sp).color, rest: getComputedStyle(h).color } : null; });
     ok(w && w.all === 'Vault-It' && w.it === '-It' && w.col === 'rgb(68, 192, 185)' && w.rest !== w.col, 'the wordmark draws "-It" in teal: ' + JSON.stringify(w)); }
@@ -71,9 +89,10 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     ok(t3 && ['Malcolm McPhee', 'Business Lincolnshire', 'David Amor', 'Enso Brain', 'Chris Bowser', 'Will Quenby', 'Accelerate Pipeline', 'Carolline Pallu', 'Barbican Creative Hub'].every((x) => tm.includes(x)) && !/Lucas Cox/.test(tm) && /Chris Gueffier/.test(tm) && /Rita Fortes/.test(tm), 'the team slide has the banner and the new people, and Lucas Cox is gone'); }
   { const im = await txt('impact'), sh = await p.evaluate(() => [...document.querySelectorAll('#impact [data-share]')].map((e) => +e.dataset.share)), br = await p.evaluate(() => !!document.querySelector('#impact svg[data-bridge]'));
     ok(br && sh.join() === '50,25,25' && sh.reduce((x, y) => x + y, 0) === 100 && /Public debt grants/.test(im) && /The charity/.test(im) && /Vault-It/.test(im) && /bridge/i.test(im) && /window/i.test(im) && ['Assets', 'Income', 'Debts', 'Net worth'].every((x) => im.includes(x)) && /reallocation/i.test(im) && /escalat/i.test(im), 'the Impact licence slide: 50 / 25 / 25 funding and the bridge-and-window graphic: ' + sh); }
-  { const pt = await txt('partner'); ok(/Grant-funded/.test(pt) && /50% public debt grants/.test(pt) && !/Free or at cost/.test(pt), 'the B2B slide shows how the Impact licence is funded'); }
+  { const pt = await txt('model'); ok(/Grant-funded/.test(pt) && /50% public debt grants/.test(pt) && !/Free or at cost/.test(pt), 'the business model slide shows how the Impact licence is funded'); }
   { const m = await txt('model'), h3 = await p.evaluate(() => [...document.querySelectorAll('#model h3')].map((h) => h.textContent.trim()));
-    ok(!h3.includes('Free') && h3.includes('Pioneer monthly') && h3.includes('Pioneer yearly') && /£59\.99\/yr/.test(m) && /£11\.89/.test(m) && /Household/.test(m) && /£19.99/.test(m) && /£199.99/.test(m) && /up to 8/.test(m) && /coming soon/i.test(m) && /30-day free trial/i.test(m) && ['£5.99', '£59.99', '£149', '£3.99', '£49.99', '£99'].every((x) => m.includes(x)) && /limited time/i.test(m) && /100/.test(m), 'business model: no Free tier, a 30-day free trial, the signed-off prices and the testers\' limited-time discount: ' + h3); }
+    ok(!h3.includes('Free') && h3.includes('Pioneer monthly') && h3.includes('Pioneer yearly') && /£59\.99\/yr/.test(m) && /£11\.89/.test(m) && /Household/.test(m) && /£19.99/.test(m) && /£199.99/.test(m) && /up to 8/.test(m) && /coming soon/i.test(m) && /30-day free trial/i.test(m) && ['£5.99', '£59.99', '£149', '£3.99', '£49.99', '£99'].every((x) => m.includes(x)) && /limited time/i.test(m) && /100/.test(m), 'business model: no Free tier, a 30-day free trial, the signed-off prices and the testers\' limited-time discount: ' + h3);
+    ok(['Paid pilot', 'Partner Edition', 'Impact licence', 'Sponsored tier'].every((x) => h3.includes(x)) && (await p.locator('#model [data-b2b] h3').count()) === 4 && (await p.locator('#model [data-consumer] h3').count()) === 6 && /Can they pay\?/.test(m) && /A partner pays for the people it sends/.test(m), 'v4: revenue streams first: the four B2B cards above the six consumer prices, and who pays for whom'); }
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll on a phone');
   const btn = p.locator('#pv-open');
   ok((await btn.count()) === 1 && await btn.isVisible(), 'a Present button is on the page');
@@ -91,7 +110,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   ok(Math.abs(fit.w - 1280) < 2 && Math.abs(fit.h - 720) < 2 && Math.abs(fit.t - 40) < 2, 'the slide fills the screen at 16:9, centred: ' + JSON.stringify(fit));
   await p.keyboard.press('ArrowRight'); await p.keyboard.press('ArrowRight');
   v = await visible(p);
-  ok(v.length === 1 && v[0] === 'nd' && (await counter(p)).trim() === '3 / 18', 'right arrow moves forward one slide at a time: ' + v + ' ' + (await counter(p)));
+  ok(v.length === 1 && v[0] === 'person' && (await counter(p)).trim() === '3 / 18', 'right arrow moves forward one slide at a time: ' + v + ' ' + (await counter(p)));
   await p.keyboard.press('ArrowLeft');
   ok((await counter(p)).trim() === '2 / 18', 'left arrow goes back');
   await p.click('#pv-next');
@@ -188,12 +207,12 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     ok(lay.sideFits && lay.apart && (w > 820 || lay.scH + 2 >= lay.scS), 'at ' + w + ' px the notes and script do not overlap the mirror and the script shows in full on a phone: ' + JSON.stringify(lay)); }
   {
     const C = await pre.evaluate(() => { const ids = [...document.getElementById('pr-slides').content.querySelectorAll('section')].map((s) => s.id); return { ids, n: ids.length }; });
-    ok(C.n === 18 && C.ids.join() === 'cover,team,nd,problem,gap,solution,features,evidence,whynow,model,partner,impact,gtm,validation,traction,forecast,ask,close', 'the presenter mirror carries the same 18 slides'); }
+    ok(C.n === 18 && C.ids.join() === 'cover,team,person,problem,gap,solution,features,nd,evidence,result,traction,model,impact,gtm,whynow,forecast,ask,close', 'the presenter mirror carries the same 18 slides in the v4 order'); }
   { const src = await pre.content(); ok(!/free or at cost/i.test(src) && /Impact licence: grant-funded/.test(src) && /grant-funded, a split we are proposing/.test(src), 'the presenter notes describe the Impact licence as grant-funded, not free or at cost'); }
   await pre.keyboard.press('End'); await pre.waitForTimeout(200);
   ok(/\b18 \/ 18/.test(await pn()), 'the presenter view reaches slide 18');
   await pre.keyboard.press('ArrowLeft'); await pre.waitForTimeout(200);
-  ok(/250,000/.test(await pre.evaluate(() => document.getElementById('pr-script').innerText)) && /Start 4:\d\d/.test(await pre.evaluate(() => document.getElementById('pr-win').textContent)), 'the ask has its script and starts before 5:00');
+  ok(/250,000/.test(await pre.evaluate(() => document.getElementById('pr-script').innerText)) && /Three asks/.test(await pre.evaluate(() => document.getElementById('pr-script').innerText)) && /Start 4:\d\d/.test(await pre.evaluate(() => document.getElementById('pr-win').textContent)), 'the ask has its script with the three asks, and starts before 5:00');
   ok(aud.errs.length === 0 && pre.errs.length === 0, 'no page errors in either window: ' + aud.errs.concat(pre.errs).join(' | '));
   await ctx2.close();
 

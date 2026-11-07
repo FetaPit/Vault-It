@@ -219,7 +219,7 @@ UK only. Every figure is tagged. The [CHECK] ones were read from search snippets
 |---|---|---|
 | UK adults who need debt advice | 8.1m (15%, one in seven); a further 12.6m at risk | [BENCHMARK] MaPS Debt Need Survey, fieldwork 2023, published 2024, maps.org.uk |
 | New clients completing StepChange debt advice, 2025 | 163,916 (about 450 a day); average unsecured debt £16,874 | [PETE] StepChange Statistics Yearbook 2025, in BP v1 and v3 slide 4 |
-| Private renting households, England | 4.7m (19% of households) | [CHECK] English Housing Survey 2024-25 headline; confirm in the EHS annual report |
+| Private renting households, England | 19% of households (the 4.7m count is unconfirmed) | [BENCHMARK] 19%: EHS 2024-25 headline findings on demographics, gov.uk, Dec 2025 (page text read 7 Nov 2026); [CHECK] the 4.7m count |
 | Private renters who expect to buy | 58% | [BENCHMARK] EHS 2024-25, reported by Mortgage Finance Gazette, Dec 2025 |
 | Private renting households who expect to buy | about 2.7m | [DERIVED] 4.7m x 58% |
 | Social renting households, England | about 4.0m; 25% expect to buy, about 1.0m | [CHECK] EHS; 25% from the previous EHS round via The Intermediary, May 2025 |
@@ -242,7 +242,7 @@ UK only. Every figure is tagged. The [CHECK] ones were read from search snippets
 
 | Segment | Count | Why they pay | Tag and source |
 |---|---|---|---|
-| Building societies | 42 (43 in the Feb 2026 BSA count; sources disagree) | Back one in three first-time buyers; 29% of outstanding mortgages. See savers two years before a broker does | [CHECK] BSA, bsa.org.uk, 2025 and Feb 2026; Mortgage Strategy on the one-in-three figure |
+| Building societies | 40+ on a slide (BSA says 42 in its 2025 release and 43 in a Feb 2026 blog; the count moves with mergers) | Back one in three first-time buyers; 29% of outstanding mortgages. See savers years before a broker does | [BENCHMARK] BSA, bsa.org.uk, 2025 and Feb 2026 (search snippets; the site is not reachable from the cloud session); [CHECK] the exact count; Mortgage Strategy on the one-in-three figure |
 | Mortgage lenders, all types | about 160 active in one broker directory: 17 big banks, 50 building societies, 94 specialist | Partner Edition white label | [BENCHMARK] lenderpanel.com directory, not a regulator count |
 | Share of new lending, biggest six lenders | 75% | Two routes: the big six for scale, specialists for speed | [BENCHMARK] UK Finance 2025 via a broker guide |
 | Mortgage advisers with FCA permissions | 36,764 individuals | Sponsored Pioneer for their pipeline of not-yet-ready clients | [BENCHMARK] ISS Market Intelligence, H1 2026, via Mortgage Solutions, Aug 2026 |
@@ -252,9 +252,9 @@ UK only. Every figure is tagged. The [CHECK] ones were read from search snippets
 | Credit unions | 2.29m members; a few hundred unions | Sponsored Pioneer for members | [BENCHMARK] Bank of England credit union annual statistics 2025; [CHECK] the count of unions |
 | Large employers (250+ staff) | 8,335 employers, 11.2m employees | Financial wellbeing benefit. Only 15% of UK organisations have a formal financial wellbeing policy | [BENCHMARK] DBT Business Population Estimates 2025; CIPD Reward Survey, Feb 2026 |
 | Employees worried about money at work | 78% concerned about the cost of living; 54% say it affects their ability to do the job | The employer's reason to pay | [CHECK] Health Shield *Britain at Work* 2025, n=975, a benefits vendor survey |
-| Housing associations and other registered providers, England | about 1,600 registered providers; 227 large ones own 96% of 3.28m private-provider homes; 4.5m social homes in all | Shared ownership and rent-to-buy pipeline: 25% of social renters expect to buy | [CHECK] Regulator of Social Housing register and 2024-25 stock statistics |
+| Housing associations and other registered providers, England | 227 large private registered providers (1,000+ homes each) own 96% of 3.28m private-provider homes; 4.5m social homes in all; about 1,600 registered providers | Shared ownership and rent-to-buy pipeline: 25% of social renters expect to buy | [BENCHMARK] 227 and 96%: Regulator of Social Housing, private registered provider stock and rents 2024-25, gov.uk (page text read 7 Nov 2026); [CHECK] the 1,600 count and the 25% |
 
-**The slide line:** "42 building societies, about 160 lenders, 37,000 mortgage advisers, 8,300 large employers. We need 20 of them by Year 3."
+**The slide line:** "40+ building societies, 36,764 mortgage advisers, 8,335 large employers, 227 housing associations with 1,000+ homes. We need 20 of them by Year 3."
 - 20 Partner licences in Year 3 [PETE, v3 slide 16] against 42 building societies alone is under half the sector; against lenders plus large employers it is under 0.3% [DERIVED].
 
 ### 4.3 How the two audiences connect
