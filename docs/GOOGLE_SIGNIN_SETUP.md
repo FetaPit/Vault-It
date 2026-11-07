@@ -7,7 +7,7 @@ The app code is ready: the Google button shows on the sign-in card as soon as th
 2. **APIs & Services → OAuth consent screen** (now called **Google Auth Platform → Branding**). User type **External**.
 3. App name **Vault-It**, support email **hello@vault-it.co**, logo optional.
 4. App domain: home page `https://vault-it.co`, privacy policy `https://vault-it.co` (or the privacy page when there is one).
-5. Authorised domains: `vault-it.co` and `supabase.co`.
+5. Authorised domains: `vault-it.co` and `legpubblzgknxdtvsant.supabase.co` (plain `supabase.co` is refused: it is on the public suffix list, like `co.uk`).
 6. Scopes (Data access): `openid`, `.../auth/userinfo.email`, `.../auth/userinfo.profile`. Nothing else.
 7. Audience: **Publish app** (otherwise only test users you list can sign in).
 
