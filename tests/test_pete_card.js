@@ -94,7 +94,12 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   let vcf = ''; if (d) vcf = fs.readFileSync(await d.path(), 'utf8');
   ok(d && /\.vcf$/.test(d.suggestedFilename()), 'Save contact downloads a contact card: ' + (d && d.suggestedFilename()));
   ok(/TEL[^:]*:\+447470074133/.test(vcf) && /URL;TYPE=LinkedIn:https:\/\/www\.linkedin\.com\/in\/ptlivedesign\//.test(vcf), 'the contact card holds the mobile and LinkedIn');
+  ok(/TEL[^:]*:\+447470074133\r\n/.test(vcf) && /(item\d+\.)?URL[^:]*:https:\/\/wa\.me\/447470074133\r\n/.test(vcf) && /X-ABLabel:WhatsApp/.test(vcf), 'the saved contact carries the mobile in +44 form (so WhatsApp finds it) and a WhatsApp link');
   ok(/BEGIN:VCARD/.test(vcf) && /FN:Pete Thickett/.test(vcf) && /EMAIL[^:]*:pete@ptlive\.design/.test(vcf) && /URL[^:]*:https:\/\/vault-it\.co/.test(vcf), 'the contact card holds the right details');
+  // WhatsApp (owner, 7 Nov: "add my number on whatsapp for them"): opens a chat with the same mobile as the card's phone row
+  const wa = await p.evaluate(() => { const a = document.getElementById('pc-wa'), t = document.querySelector('a[href^="tel:"]');
+    return a && { href: a.getAttribute('href'), text: a.textContent.trim(), tel: t && t.getAttribute('href').replace(/\D/g, ''), icon: !!a.querySelector('svg use[href="#vi-chat"]'), main: a.classList.contains('main') }; });
+  ok(wa && wa.href === 'https://wa.me/' + wa.tel && wa.tel === '447470074133' && /WhatsApp/.test(wa.text) && wa.icon && !wa.main, 'a WhatsApp button opens a chat with the card\'s mobile: ' + JSON.stringify(wa));
   ok(await p.locator('a[href="/pitch-Eligent"]').count() >= 1 && await p.locator('a[href^="/sign-up"], a[href="/"]').count() >= 1, 'links to the pitch deck and the beta sign-up');
   ok([...p.hosts].every((h) => /^fonts\.(googleapis|gstatic)\.com$/.test(h)), 'no outside hosts besides Google Fonts: ' + [...p.hosts]);
   ok(p.errs.length === 0, 'no page errors: ' + p.errs.join(' | '));
