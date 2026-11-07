@@ -107,8 +107,8 @@ The single list of instructed work. Every session reads it at start and before e
 - [~] (cloud, Build) v0.9.2: still image of the finished House Builder house on the sign-in screen, email step only (owner decision via David, cloud Chief of Staff, 6 Nov 2026). No tag, label, headline or brick tag; FCA line stays; WebP under 60 KB loaded after the card; email and Continue unmoved at 390x664. Branch `v092/signin-house` off candidate/v0.9.2 at fd3a031.
 - [~] (cloud, Build) v0.9.2: interactive 3D House Builder house behind the sign-in email step, replacing the still as hero; the still stays as poster and fallback (owner, 6 Nov: "Make the house large zoomed into the background with rotation animations. Allow the cursor to interact with the model subtly expanding and exploding the house upon hover over."). Brief `docs/creative/briefs/signin-house-3d.md` with Pedro amendments; built by Pete T on `v092/signin-house-3d`, asked by David (cloud Chief of Staff).
 - [~] (laptop, Marketing) Digital business card vault-it.co/pete: improvements and how to use it in person at Eligent (owner, 7 Nov: "I want to improve upon my interactive business card plus understand how i will use it on the day in person"; "do i need a apk installation"). Answered: no app or APK for Pete or the people he meets. Improvement list given in the laptop chat; owner to pick.
-  - [ ] (laptop, Marketing) Save contact serves a real .vcf file (text/vcard) so iPhone opens the add-contact screen (owner, 7 Nov: "Yes, build both").
-  - [ ] (laptop, Marketing) house-corner.mp4 on the card made smaller than 1.9 MB so it loads fast on venue signal (owner, 7 Nov: "Yes, build both").
+  - [~] (laptop, owner reordered, 7 Nov: "Build card fixes now") Save contact serves a real .vcf file (text/vcard) so iPhone opens the add-contact screen (owner, 7 Nov: "Yes, build both").
+  - [~] (laptop, owner reordered, 7 Nov) house-corner.mp4 on the card made smaller than 1.9 MB so it loads fast on venue signal (owner, 7 Nov: "Yes, build both").
 
 ## Waiting on the owner
 
