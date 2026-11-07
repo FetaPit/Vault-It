@@ -57,7 +57,7 @@ const seed = (o) => {
   ok(s.st === 'trial' && s.day === 25 && s.left === 6 && bn && bn.kind === 'd25' && /6 days left of your free 30/.test(bn.txt) && /trial-warn/.test(bn.cls) && bn.btn === 'See plans', 'day 25: the countdown line says 6 days left (' + (bn && bn.txt) + ')');
   await p.evaluate(() => document.querySelector('#trial-banner .btn-add-data').click()); await p.waitForTimeout(300);
   let m = await p.evaluate(modal);
-  ok(m.open && m.badge === '6 DAYS LEFT' && /before your 30 days end/.test(m.head) && m.ghost === 'Not now' && m.cols.join('|') === 'Read-only|Founder|Pioneer|Lifetime licence' && m.vaulterShown && m.tester, 'See plans opens the prompt: trial wording, read-only / Founder / Pioneer / Lifetime columns, tester price shown (' + JSON.stringify(m) + ')');
+  ok(m.open && m.badge === '6 DAYS LEFT' && /before your 30 days end/.test(m.head) && m.ghost === 'Not now' && m.cols.join('|') === 'Read-only|Pioneer|Pioneer|Lifetime licence' && m.vaulterShown && m.tester, 'See plans opens the prompt: trial wording, read-only / Pioneer monthly / Pioneer yearly / Lifetime columns, tester price shown (' + JSON.stringify(m) + ')');
   ok(!m.founderFirst, 'during the trial the columns keep their order');
   await p.keyboard.press('Escape'); ok(await p.evaluate(() => document.getElementById('pro-offer-modal').classList.contains('hidden')), 'Esc closes it');
   await p.context().close();
@@ -81,7 +81,7 @@ const seed = (o) => {
   bn = await p.evaluate(banner);
   ok(bn && bn.kind === 'ended' && /read-only until you pick a plan/.test(bn.txt), 'the foot line says the vault is read-only (' + (bn && bn.txt) + ')');
   const st = await p.evaluate(() => { _refreshPioneerSettingsUI(); return { badge: document.getElementById('set-pioneer-badge').textContent, txt: document.getElementById('set-pioneer-inactive').textContent }; });
-  ok(/^READ-ONLY$/.test(st.badge.trim()) && /30 days are up/.test(st.txt) && !/Vaulter|Founder:/.test(st.txt) && /Founder at £3\.99 a month while in beta, £5\.99 after/.test(st.txt) && /Pioneer at £49\.99 a year while in beta, £59\.99 after/.test(st.txt) && /£99 once while in beta, £149 after/.test(st.txt), 'Settings says READ-ONLY (no tier name) with the tester prices and the prices after the beta (' + st.badge + ')');
+  ok(/^READ-ONLY$/.test(st.badge.trim()) && /30 days are up/.test(st.txt) && !/Vaulter|Founder/.test(st.txt) && /Pioneer at £3\.99 a month while in beta, £5\.99 after/.test(st.txt) && /Pioneer at £49\.99 a year while in beta, £59\.99 after/.test(st.txt) && /£99 once while in beta, £149 after/.test(st.txt), 'Settings says READ-ONLY (no tier name) with the tester prices and the prices after the beta (' + st.badge + ')');
   const once = await p.evaluate(async () => { localStorage.removeItem('vi_trial_prompt'); initProOffer(); await new Promise(r => setTimeout(r, 1800)); const m = document.getElementById('pro-offer-modal'); const first = !m.classList.contains('hidden'); m.classList.add('hidden'); initProOffer(); await new Promise(r => setTimeout(r, 1800)); return { first, second: !m.classList.contains('hidden'), stamp: localStorage.getItem('vi_trial_prompt') === new Date().toDateString() }; });
   ok(once.first && !once.second && once.stamp, 'on open the prompt shows once a day');
   await p.context().close();

@@ -126,6 +126,8 @@ const data = p => p.evaluate(() => ({ saved: state.saved, debts: debtState.debts
   await phone.waitForTimeout(900);
   ok(await phone.evaluate(() => !document.getElementById('tester-welcome').classList.contains('hidden')), 'phone: the tester welcome note from Pete shows once');
   await phone.click('#tester-welcome .tw-go'); await phone.waitForTimeout(200);
+  // the app tour is offered once, straight after Pete's note: this tester skips it
+  await phone.waitForSelector('#vi-tour.on', { timeout: 3000 }).catch(() => {}); if (await phone.isVisible('#vt-skip')) { await phone.click('#vt-skip'); await phone.waitForTimeout(300); }
 
   // ── 2. phone: save money, then put the app in the background (close / switch app) ──
   await phone.evaluate(() => showTab('house')); await phone.waitForTimeout(800);

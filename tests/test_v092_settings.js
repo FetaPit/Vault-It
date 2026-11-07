@@ -71,7 +71,8 @@ const seed = (o) => {
       const R = await p.evaluate(() => { const ids = ['monzo', 'binance', 'truelayer', 'claude_ai']; ids.forEach(i => { try { connectPlatform(i); } catch (e) {} }); return { conn: JSON.stringify(achState.connected || {}), keys: ['vi_conn_monzo', 'vi_tl_client_id'].map(k => localStorage.getItem(k)), modal: !!document.getElementById('api-key-modal') }; });
       await p.waitForTimeout(500);
       ok(R.conn === '{}' && !R.modal && R.keys.every(k => k == null), tag + 'connectPlatform marks nothing connected, opens no key modal, stores nothing (' + R.conn + ')');
-      ok(hosts.length === before, tag + 'no network call from the locked connectors (' + hosts.slice(before).join(', ') + ')');
+      const extra = hosts.slice(before).filter(h => !/^(cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|fonts\.(googleapis|gstatic)\.com|esm\.sh)/.test(h));   // page assets that load late are not connector calls
+      ok(extra.length === 0, tag + 'no network call from the locked connectors (' + extra.join(', ') + ')');
     }
     // 3. live prices
     const L = await p.evaluate(() => { const r = document.getElementById('set-live'); return { has: !!r, btns: r ? r.querySelectorAll('[data-live]').length : 0, refresh: r ? !!r.querySelector('[data-live-refresh]') : false,

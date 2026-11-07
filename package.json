@@ -1,6 +1,7 @@
 {
   "name": "vault-it",
   "private": true,
+  "license": "UNLICENSED",
   "version": "0.0.0",
   "description": "Vault\u00b7It is a single-file app with no build step. This file only declares the tooling the tests use.",
   "scripts": {

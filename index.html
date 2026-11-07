@@ -18,6 +18,7 @@ var h=(location.search.match(/[?&]hdr=(\w+)/)||[])[1]||localStorage.getItem("vi-
 /* Vault-It design tokens. Night is the default, Daylight is the light mode.
  * Switch with data-theme="light" on <html>. Generated from vault-it-brand-book.html */
 html{box-sizing:border-box}
+*,*::before,*::after{font-variant-numeric:lining-nums}   /* Syne's default zero is a small round o ("30" read as "3o"); lining figures fix it, DM Sans and Share Tech Mono already have them */
 :root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav,[data-theme="light"] #pwa-install-banner,[data-theme="light"] #app-footer{   /* 3D viewports stay Night in Daylight too (the model badge sits over the Night picture) */
   color-scheme:dark;
   --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --slate:#1C2420; --line:#102221; --line2:#15302F;
@@ -154,7 +155,7 @@ function viCleanJSON(str) {   // returns the cleaned JSON text, or the original 
 #pwa-install-banner button.dismiss-btn{background:none;border:none;color:var(--t3);cursor:pointer;font-size:max(.7rem,var(--vi-fs-3));padding:0 4px}
 /* ── SETTINGS WCAG ───────────────────────────────────── */
 .settings-section{margin-bottom:18px}
-.settings-section-title{font-family:'Syne',sans-serif;font-size:max(.66rem,var(--vi-fs-2));font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.settings-section-title{font-family:'Syne',sans-serif;font-size:max(.66rem,var(--vi-fs-2));font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
 .settings-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .settings-label{font-family:'DM Sans',sans-serif;font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);min-width:90px;flex-shrink:0}
 .settings-opts{display:flex;gap:4px;flex-wrap:wrap}
@@ -8896,19 +8897,29 @@ body::before {
 }
 .welcome-h2 {
   font-family: 'Syne', sans-serif;
-  font-size: .9rem;
-  font-weight: 800;
+  font-size: 20px;   /* v0.9.2: 20 px on a phone, 24 px from 700 px up (was 11.7 and 15 px, smaller than the app's body text) */
+  font-weight: 700;   /* Syne 700 for sentence-length headings (Pedro, 5 Nov: 800 is too extended to read easily); 800 stays for the wordmark and short titles */
   color: var(--tx);
   margin-bottom: 6px;
   line-height: 1.3;
 }
 .welcome-sub {
   font-family: 'Syne', sans-serif;
-  font-size: max(.58rem,var(--vi-fs-2));
+  font-size: max(14.5px,var(--vi-fs-3));
   color: var(--t2);
   line-height: 1.6;
   margin-bottom: 18px;
 }
+.welcome-lead{font-family:'DM Sans',sans-serif;font-size:max(14.5px,var(--vi-fs-3));color:var(--t2);line-height:1.6;max-width:340px;margin:0 auto}
+@media(min-width:700px){.welcome-h2{font-size:24px}.welcome-sub,.welcome-lead{font-size:max(1rem,16px)}.welcome-lead{max-width:420px}}
+/* the main button stays on screen: on a short phone it pins to the foot of the card while the form scrolls under it */
+.welcome-foot{position:sticky;bottom:-24px;z-index:2;margin:14px 0 -24px;padding:10px 0 24px;background:var(--c1);border-top:1px solid var(--bd)}   /* -24px = the box's bottom padding, so nothing shows under the pinned button */
+.welcome-foot .welcome-cta{min-height:44px;font-size:max(14px,var(--vi-fs-3));color:#fff}
+.welcome-h2{text-wrap:balance}
+#offer-headline{font-weight:700}
+@media(max-height:720px){.welcome-icon{display:none!important}.welcome-tagline{display:none}.welcome-box{padding-top:18px;margin-top:8px;margin-bottom:8px}.welcome-head{margin-bottom:10px!important;padding-bottom:10px!important}.welcome-intro{margin-bottom:8px!important}#w-step-dots{margin-bottom:10px!important}.welcome-h2{margin-bottom:4px}.welcome-sub{margin-bottom:10px}}   /* a short phone: the form shows above the pinned button */
+.welcome-congrats{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--tx);line-height:1.3;margin-bottom:6px}
+@media(min-width:700px){.welcome-congrats{font-size:20px}}
 .welcome-field {
   margin-bottom: 10px;
 }
@@ -8940,7 +8951,7 @@ body::before {
   margin: 16px 0 10px;
   font-family: 'Syne', sans-serif;
   font-size: max(.7rem,var(--vi-fs-3));
-  font-weight: 800;
+  font-weight: 700;
   color: var(--tx);
 }
 .welcome-opts {
@@ -10554,7 +10565,7 @@ input:focus, textarea:focus, select:focus {
   .auth-steps{font-size:max(.58rem,var(--vi-fs-2));margin-bottom:22px}
   .auth-label{font-size:max(.64rem,var(--vi-fs-2));margin-bottom:8px}
   .auth-inp{font-size:max(.95rem,var(--vi-fs-3));padding:14px 16px;min-height:52px}
-  .auth-btn{min-height:52px;font-size:max(.72rem,var(--vi-fs-2));margin-top:16px;padding:14px}
+  .auth-btn{min-height:52px;font-size:max(.72rem,var(--vi-fs-3));margin-top:16px;padding:14px}
   .auth-info{font-size:max(.52rem,var(--vi-fs-1));margin-top:14px}
   .auth-footer{font-size:max(.5rem,var(--vi-fs-1))}
 }
@@ -10584,17 +10595,17 @@ input:focus, textarea:focus, select:focus {
 .wz-phases{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:6px}
 .wz-phase{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--bd);background:var(--c3)}
 .wz-phase.now{border-color:var(--em);background:rgb(var(--teal-rgb) / .1)}
-.wz-phase-n{flex:0 0 auto;font-family:'Share Tech Mono',monospace;font-size:max(.56rem,var(--vi-fs-1));color:var(--t2);min-width:3.6em}
+.wz-phase-n{flex:0 0 auto;font-family:'Share Tech Mono',monospace;font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);min-width:3.6em}
 .wz-phase.now .wz-phase-n{color:var(--em)}
 .wz-phase-name{font-family:'Syne',sans-serif;font-weight:800;font-size:max(.66rem,var(--vi-fs-2));color:var(--tx)}
 .wz-phase-d{font-family:'DM Sans',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);line-height:1.45;margin-top:2px}
 .wz-week{margin:0 0 12px;padding:12px 14px;border:1px solid rgb(var(--brass-rgb) / .45);background:rgb(var(--brass-rgb) / .08);font-family:'DM Sans',sans-serif;font-size:max(.66rem,var(--vi-fs-2));line-height:1.5;color:var(--tx)}
-.wz-week b{display:block;font-family:'Syne',sans-serif;font-size:max(.56rem,var(--vi-fs-1));letter-spacing:.12em;text-transform:uppercase;color:var(--go);margin-bottom:4px}
+.wz-week b{display:block;font-family:'Syne',sans-serif;font-size:max(.56rem,var(--vi-fs-2));letter-spacing:.12em;text-transform:uppercase;color:var(--go);margin-bottom:4px}
 .wz-sums{margin:0 0 14px;font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2));color:var(--t2);line-height:1.5}
 .wz-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:6px 0 6px}
-.wz-days button{min-height:44px;padding:0;background:var(--c3);border:1px solid var(--bd);color:var(--t2);font-family:'Share Tech Mono',monospace;font-size:max(.58rem,var(--vi-fs-1));cursor:pointer}
+.wz-days button{min-height:44px;padding:0;background:var(--c3);border:1px solid var(--bd);color:var(--t2);font-family:'Share Tech Mono',monospace;font-size:max(.58rem,var(--vi-fs-2));cursor:pointer}
 .wz-days button[aria-pressed="true"]{border-color:var(--em);background:rgb(var(--teal-rgb) / .14);color:var(--em)}
-.wz-note{font-family:'DM Sans',sans-serif;font-size:max(.56rem,var(--vi-fs-1));color:var(--t2);line-height:1.5;margin:0 0 14px}
+.wz-note{font-family:'DM Sans',sans-serif;font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);line-height:1.5;margin:0 0 14px}
 .welcome-opt{min-height:44px}
 #wz-s5 .welcome-field{margin-top:18px}
 .wz-days button[aria-pressed="true"]{background:var(--em);border-color:var(--em);color:rgb(var(--panel-rgb));font-weight:700}
@@ -12150,9 +12161,9 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 
     <div id="wz-hero">
     <!-- Pioneer welcome header -->
-    <div style="text-align:center;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgb(var(--brass-rgb) / .18)">
+    <div class="welcome-head" style="text-align:center;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgb(var(--brass-rgb) / .18)">
       <!-- Large vault icon -->
-      <div style="display:flex;justify-content:center;margin-bottom:14px"><div style="width:80px;height:80px"><svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 14px var(--teal))">
+      <div class="welcome-icon" style="display:flex;justify-content:center;margin-bottom:14px"><div style="width:80px;height:80px"><svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 14px var(--teal))">
   <defs>
     <radialGradient id="vaultGlow" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#44c0b9" stop-opacity="0.12"/>
@@ -12214,12 +12225,12 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       </div>
     </div>
     <!-- Pioneer congrats message -->
-    <div style="text-align:center;margin-bottom:16px">
-      <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);line-height:1.3;margin-bottom:6px">
+    <div class="welcome-intro" style="text-align:center;margin-bottom:16px">
+      <div class="welcome-congrats">
         Congrats on becoming<br>a Vault-It Pioneer.
       </div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);line-height:1.6;max-width:340px;margin:0 auto">
-        You're among the first to vault. That means you're getting access before anyone else, and shaping what this becomes.
+      <div class="welcome-lead">
+        You're among the first to vault, and shaping what this becomes.
       </div>
     </div>
     </div>
@@ -12237,7 +12248,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <label>Email Address</label>
         <input type="email" class="welcome-inp" id="w-email" placeholder="you@example.com" autocomplete="email">
       </div>
-        <button class="welcome-cta" onclick="wNext()" style="margin-top:14px">Next &rarr;</button>
+        <div class="welcome-foot"><button class="welcome-cta" onclick="wNext()">Next &rarr;</button></div>
       </section>
       <section class="wz-screen" data-s="2" id="wz-s2" hidden>
         <h2 class="welcome-h2" tabindex="-1">Where are you right now?</h2>
@@ -12261,7 +12272,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </button>
       </div>
         <div class="wz-hint" id="wz-goal-hint" role="alert" hidden>Pick one of these to go on.</div>
-        <button class="welcome-cta" onclick="wStep1Next()">Next &rarr;</button>
+        <div class="welcome-foot"><button class="welcome-cta" onclick="wStep1Next()">Next &rarr;</button></div>
       </section>
     </div>
 
@@ -12338,7 +12349,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);margin-top:5px;line-height:1.55">Add your number to receive a <strong style="color:var(--go)">heavily discounted lifetime licence</strong> code when Vault-It launches on beta.</div>
       </div>
         </details>
-        <button class="welcome-cta" id="w-finish" onclick="wStep2Submit()" style="margin-top:14px">Start this week's step &rarr;</button>
+        <div class="welcome-foot"><button class="welcome-cta" id="w-finish" onclick="wStep2Submit()">Start this week's step &rarr;</button></div>
       </section>
     </div>
 
@@ -12364,7 +12375,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <span><b>Create a second income</b>: one stream changes everything</span>
         </button>
       </div>
-      <button class="welcome-cta" onclick="wStep3Submit()" style="margin-top:14px">Start Vaulting →</button>
+      <div class="welcome-foot"><button class="welcome-cta" onclick="wStep3Submit()">Start Vaulting →</button></div>
       <div style="text-align:center;margin-top:8px">
         <button class="welcome-skip-link" onclick="wStep3Skip()">Skip for now. I'll decide later</button>
       </div>
@@ -12386,11 +12397,11 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     <div class="vi-camp-body">
       <!-- Tier cards -->
       <div class="vi-camp-tiers">
-        <!-- Founder: the monthly plan (owner, 4 Nov 2026 evening). Prices, terms and buttons are painted from VI_PLANS by viPricePaint() -->
+        <!-- Pioneer (monthly): the monthly plan (owner, 4 Nov 2026 evening; named Founder until 5 Nov, tier key and icon still 'founder'). Prices, terms and buttons are painted from VI_PLANS by viPricePaint() -->
         <div class="vi-camp-tier" data-tier-card="monthly">
           <svg class="vi-tier-ic vi-tier-card" data-tier="founder" viewBox="-8 -2 110 140" aria-hidden="true"><use href="#tier-card-founder"/></svg>
           <div class="vi-camp-tier-badge">Monthly</div>
-          <div class="vi-camp-tier-name" data-tier-name>Founder</div>
+          <div class="vi-camp-tier-name" data-tier-name>Pioneer</div>
           <div class="vi-camp-tier-price" id="camp-price-vaulter" data-plan-price="monthly">£5.99<span> a month</span></div>
           <div class="vi-camp-tier-note vi-plan-terms" id="camp-note-vaulter" data-plan-terms="monthly"></div>
           <ul class="vi-camp-tier-features">
@@ -12402,7 +12413,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
             <li>NW History</li>
             <li>3D Vault</li>
           </ul>
-          <button class="vi-camp-tier-cta vi-camp-cta-em" id="camp-cta-vaulter" data-plan="monthly" data-cta="Become a Founder →" data-cta-trial="Start 30 days free →" onclick="showUpgrade('monthly'); document.getElementById('vi-campaign-modal').classList.add('hidden')">Become a Founder →</button>
+          <button class="vi-camp-tier-cta vi-camp-cta-em" id="camp-cta-vaulter" data-plan="monthly" data-cta="Become a Pioneer →" data-cta-trial="Start 30 days free →" onclick="showUpgrade('monthly'); document.getElementById('vi-campaign-modal').classList.add('hidden')">Become a Pioneer →</button>
         </div>
         <!-- Pioneer: the yearly plan, Pro (owner, 4 Nov 2026) -->
         <div class="vi-camp-tier vi-camp-featured" data-tier-card="annual">
@@ -12413,7 +12424,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <div class="vi-camp-tier-note">Renews at the same price as long as you stay subscribed.</div>
           <div class="vi-camp-tier-note vi-plan-terms" data-plan-terms="annual"></div>
           <ul class="vi-camp-tier-features">
-            <li>Everything in Founder</li>
+            <li>Everything in the monthly plan</li>
             <li class="vi-dim">Family mode (coming soon)</li>
             <li>Entrepreneur tab</li>
             <li>NW History</li>
@@ -12545,11 +12556,11 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
             </ul>
             <button class="vi-tier-cta vi-tier-cta-ghost" disabled>No card, no cost</button>
           </div>
-          <!-- Founder: the monthly plan -->
+          <!-- Pioneer (monthly): the monthly plan -->
           <div class="vi-tier-col vi-tier-monthly" data-tier-card="monthly">
             <svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg>
             <div class="vi-tier-popular">Monthly</div>
-            <div class="vi-tier-name" data-tier-name>Founder</div>
+            <div class="vi-tier-name" data-tier-name>Pioneer</div>
             <div class="vi-tier-price" id="offer-price-monthly" data-plan-price="monthly">£5.99<span>/mo</span></div>
             <div class="vi-tier-saving" id="offer-note-monthly">Cancel any time</div>
             <ul class="vi-tier-features">
@@ -12563,7 +12574,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
               <li>AI screenshot reader, 30 a month</li>
             </ul>
             <div class="vi-tier-terms" data-plan-terms="monthly"></div>
-            <button class="vi-tier-cta vi-tier-cta-secondary" id="offer-cta-monthly" data-plan="monthly" data-cta="Become a Founder" data-cta-trial="Start 30 days free" onclick="showUpgrade('monthly'); document.getElementById('pro-offer-modal').classList.add('hidden')">Become a Founder</button>
+            <button class="vi-tier-cta vi-tier-cta-secondary" id="offer-cta-monthly" data-plan="monthly" data-cta="Become a Pioneer" data-cta-trial="Start 30 days free" onclick="showUpgrade('monthly'); document.getElementById('pro-offer-modal').classList.add('hidden')">Become a Pioneer</button>
           </div>
           <!-- Pioneer: the yearly plan, Pro (featured) -->
           <div class="vi-tier-col vi-tier-featured vi-tier-yearly" data-tier-card="annual">
@@ -12573,7 +12584,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
             <div class="vi-tier-price" id="offer-price-annual" data-plan-price="annual">£59.99<span>/yr</span></div>
             <div class="vi-tier-saving" id="offer-note-annual">One payment a year</div>
             <ul class="vi-tier-features">
-              <li>Everything in Founder</li>
+              <li>Everything in the monthly plan</li>
               <li class="vi-soon">Family mode (coming soon)</li>
               <li>Early access to new features</li>
               <li>Roadmap voting</li>
@@ -12990,7 +13001,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 
         <div id="house-pro-lock" style="position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgb(var(--panel-rgb) / .82);backdrop-filter:blur(6px);text-align:center;padding:24px">
           <div style="font-size:1.8rem;margin-bottom:10px">🔒</div>
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;color:var(--tx);margin-bottom:6px">Your house fills as you save</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--tx);margin-bottom:6px">Your house fills as you save</div>
           <div style="font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.6;max-width:260px;margin-bottom:16px">Every deposit adds bricks. Watch your home being built in real time. Pro only.</div>
           <button onclick="showUpgrade('annual')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:max(.6rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">Upgrade to Pro →</button>
         </div>
@@ -13783,7 +13794,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     <div data-set-title style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:20px;color:var(--tx)">Settings</div>
 
     <!-- 1. Account: email, plan (current price only, painted from VI_PLANS by viPricePaint()), manage or cancel, sign out.
-         Plans (owner, 4 Nov 2026 evening): Founder = monthly, Pioneer = yearly (Pro), Lifetime licence = once; read-only after the 30 days has no tier name. -->
+         Plans (owner, 4 Nov 2026 evening, renamed 5 Nov: Pioneer = monthly and yearly (yearly is Pro), Lifetime licence = once; read-only after the 30 days has no tier name. -->
     <div class="settings-section set-box" id="set-account">
       <div class="settings-section-title">Account</div>
       <div class="set-acct">
@@ -13798,13 +13809,13 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
         <div id="set-pioneer-active" style="display:none;font-size:max(.66rem,var(--vi-fs-2));color:var(--gr);margin-bottom:10px;line-height:1.5"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access active. Thank you for backing Vault-It.</div>
         <div id="set-pioneer-inactive" style="font-size:max(.66rem,var(--vi-fs-2));color:var(--t2);margin-bottom:8px;line-height:1.5"></div>
-        <div id="set-plan-extras" class="settings-hint" style="margin-bottom:10px;line-height:1.55">Founder (monthly) and Pioneer (yearly, Pro) are the whole app with editing on, plus your own 3D house design and the AI house model. Pioneer adds early access to new features, roadmap voting and family mode (coming soon). The Lifetime licence (one payment, 100 places, beta testers first) is Pioneer for the life of the service. The six preset houses are in every plan.</div>
+        <div id="set-plan-extras" class="settings-hint" style="margin-bottom:10px;line-height:1.55">Pioneer, monthly or yearly, is the whole app with editing on, plus your own 3D house design and the AI house model. Pioneer yearly (Pro) adds early access to new features, roadmap voting and family mode (coming soon). The Lifetime licence (one payment, 100 places, beta testers first) is Pioneer for the life of the service. The six preset houses are in every plan.</div>
         <div class="set-tiers">
-          <button type="button" class="set-tier" id="set-plan-monthly" data-plan="monthly" onclick="showUpgrade('monthly')"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg><span class="set-tier-name" data-tier-name>Founder</span><span class="set-tier-price" data-plan-price="monthly">£5.99<span>/mo</span></span><span class="set-tier-cta" data-cta=""></span></button>
+          <button type="button" class="set-tier" id="set-plan-monthly" data-plan="monthly" onclick="showUpgrade('monthly')"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg><span class="set-tier-name" data-tier-name>Pioneer</span><span class="set-tier-price" data-plan-price="monthly">£5.99<span>/mo</span></span><span class="set-tier-cta" data-cta=""></span></button>
           <button type="button" class="set-tier" id="set-plan-annual" data-plan="annual" onclick="showUpgrade('annual')"><svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg><span class="set-tier-name" data-tier-name>Pioneer</span><span class="set-tier-price" data-plan-price="annual">£59.99<span>/yr</span></span><span class="set-tier-cta" data-cta=""></span></button>
           <button type="button" class="set-tier" id="set-plan-founder" data-plan="founder" onclick="showUpgrade('founder')"><svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg><span class="set-tier-name" data-tier-name>Lifetime licence</span><span class="set-tier-price" data-plan-price="founder">£149<span> once</span></span><span class="set-tier-cta" data-cta=""></span></button>
         </div>
-        <div class="set-tier-terms"><p><b>Founder:</b> <span data-plan-terms="monthly"></span></p><p><b>Pioneer:</b> <span data-plan-terms="annual"></span></p><p><b>Lifetime licence:</b> <span data-plan-terms="founder"></span></p></div>
+        <div class="set-tier-terms"><p><b>Pioneer (monthly):</b> <span data-plan-terms="monthly"></span></p><p><b>Pioneer (yearly):</b> <span data-plan-terms="annual"></span></p><p><b>Lifetime licence:</b> <span data-plan-terms="founder"></span></p></div>
         <div class="set-plan-foot">
           <a class="set-btn primary" data-manage-sub href="mailto:hello@vault-it.co?subject=Manage%20or%20cancel%20my%20Vault-It%20plan">Manage or cancel my plan</a>
           <button class="set-btn" type="button" onclick="closeSettings();showPaywall('assets')">Already paid?</button>
@@ -13940,7 +13951,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <a href="#" onclick="showUpgrade('monthly');return false" class="pw-plan" data-plan="monthly">
         <svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg>
-        <div class="pw-tier-name" data-tier-name>Founder</div>
+        <div class="pw-tier-name" data-tier-name>Pioneer</div>
         <div class="pw-tier-price" id="pw-price-monthly" data-plan-price="monthly">£5.99<span>/mo</span></div>
         <div class="pw-tier-note">Monthly</div>
         <div class="pw-tier-terms" data-plan-terms="monthly"></div>
@@ -14538,8 +14549,8 @@ body.vi-wide #nwChart { height: 300px !important; }
 .vi-tier-features li.vi-no::before { content:'✗'; color:var(--t3); }
 .vi-tier-features li.vi-no { color: var(--t3); }
 .vi-tier-cta {
-  width:100%; padding:8px 10px; font-family:'Syne',sans-serif;
-  font-size:max(.48rem,var(--vi-fs-2)); font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  width:100%; padding:8px 10px; font-family:'Syne',sans-serif; min-height:44px;
+  font-size:max(14px,var(--vi-fs-3)); font-weight:700; letter-spacing:.1em; text-transform:uppercase;
   cursor:pointer; border-radius:4px; transition:all .18s; margin-top:4px;
 }
 .vi-tier-cta-ghost { background:transparent; border:1px solid var(--bd); color:var(--t3); cursor:default; }
@@ -14599,7 +14610,7 @@ body.vi-wide #nwChart { height: 300px !important; }
   color: var(--go); margin-bottom:8px;
 }
 .vi-camp-headline {
-  font-family:'Syne',sans-serif; font-weight:800;
+  font-family:'Syne',sans-serif; font-weight:700;
   font-size:clamp(1rem,2.5vw + .6rem,1.5rem);
   color:var(--tx); line-height:1.2; margin-bottom:6px;
 }
@@ -14661,8 +14672,8 @@ body.vi-wide #nwChart { height: 300px !important; }
 .vi-camp-tier-features li.vi-dim { color:var(--t3); }
 .vi-camp-tier-features li.vi-dim::before { content:'·'; color:var(--t3); }
 .vi-camp-tier-cta {
-  margin-top:10px; width:100%; padding:8px 10px;
-  font-family:'Syne',sans-serif; font-size:max(.48rem,var(--vi-fs-2)); font-weight:700;
+  margin-top:10px; width:100%; padding:8px 10px; min-height:44px;
+  font-family:'Syne',sans-serif; font-size:max(14px,var(--vi-fs-3)); font-weight:700;
   letter-spacing:.1em; text-transform:uppercase;
   cursor:pointer; border-radius:4px; transition:all .18s;
 }
@@ -19329,7 +19340,7 @@ function viPaidApply(row) {   // mirror the profile onto this device
   } catch (e) {}
   if (paid) {
     var pend = null; try { pend = localStorage.getItem('vi_pay_pending'); localStorage.removeItem('vi_pay_pending'); } catch (e) {}
-    if (pend && !was) { try { showToast(row.is_founder ? 'Welcome! Your Lifetime licence is confirmed.' : row.plan === 'monthly' ? 'Welcome, Founder. Your plan is confirmed.' : 'Welcome, Pioneer. Your payment is confirmed.'); } catch (e) {} }
+    if (pend && !was) { try { showToast(row.is_founder ? 'Welcome! Your Lifetime licence is confirmed.' : row.plan === 'monthly' ? 'Welcome, Pioneer. Your plan is confirmed.' : 'Welcome, Pioneer. Your payment is confirmed.'); } catch (e) {} }
   }
   if (was !== paid) { try { if (typeof applyPaywall === 'function') applyPaywall(); } catch (e) {} try { if (typeof renderPioneerCard === 'function') renderPioneerCard(); } catch (e) {} try { if (row.is_founder) viApplyFounderBadge(); } catch (e) {} }
 }
@@ -25800,7 +25811,7 @@ function isPioneer(){return localStorage.getItem('vi_pioneer')==='true';}
 // sign-in, so clearing a device cannot restart it), or on a device that has never signed in at its first run, and never before
 // VI_TRIAL_EPOCH, so accounts that existed before the trial went live get their full 30 days from that date. When the days are up
 // the vault turns read-only: every tab opens, every number shows, the cloud copy and Download my data keep working; adding,
-// editing and deleting wait for a plan. Paid accounts (Founder, Pioneer or Lifetime licence) never see any of this.
+// editing and deleting wait for a plan. Paid accounts (Pioneer, monthly or yearly, or Lifetime licence) never see any of this.
 var VI_TRIAL_DAYS = 30, VI_TRIAL_EPOCH = Date.parse('2026-11-01T00:00:00Z');
 function viPaid() { if (isPioneer() || isFounder()) return true; try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.pro); } catch (e) { return false; } }
 function viTrialStart() {
@@ -25824,12 +25835,12 @@ function viPlan() { try { var p = localStorage.getItem('vi_plan'); return (p ===
 function viTier() { var st = viTrialState(); if (st !== 'paid') return st; if (isFounder()) return 'founder'; return viPlan() || 'yearly'; }
 function viCan(f) { if (f === 'design' || f === 'aimodel') return viPaid(); return true; }
 // the AI screenshot reader's monthly allowance, as the server applies it (supabase/functions/portfolio-vision): 3 unpaid, 30 Pioneer, 10 Founding
-function viShotAllowance() { var t = viTier(); return t === 'founder' ? '10 screenshot reads a month' : (t === 'monthly' || t === 'yearly') ? '30 screenshot reads a month' : '3 screenshot reads a month (30 on Founder or Pioneer)'; }
+function viShotAllowance() { var t = viTier(); return t === 'founder' ? '10 screenshot reads a month' : (t === 'monthly' || t === 'yearly') ? '30 screenshot reads a month' : '3 screenshot reads a month (30 on Pioneer)'; }
 // a paid-only design tool: true (and the plans prompt shows) when this account may not use it yet
 function viGateDesign(f) {
   if (viBlockEdit()) return true;
   if (viCan(f)) return false;
-  try { showToast(f === 'aimodel' ? 'Generating a house with AI needs a paid plan: Founder, Pioneer or a Lifetime licence.' : 'Uploading your own 3D house needs a paid plan: Founder, Pioneer or a Lifetime licence.'); } catch (e) {}
+  try { showToast(f === 'aimodel' ? 'Generating a house with AI needs a paid plan: Pioneer (monthly or yearly) or a Lifetime licence.' : 'Uploading your own 3D house needs a paid plan: Pioneer (monthly or yearly) or a Lifetime licence.'); } catch (e) {}
   viShowTrialEnd('design');
   return true;
 }
@@ -26024,7 +26035,7 @@ async function verifyPioneerPurchase(){
     if(!_supaUser){ say('--re','Sign in with the email you paid with, then check again.'); return; }
     say('--t2','Checking your account…');
     var row=await _syncPioneerFromProfile(_supaUser.id);
-    if(row&&(row.is_pioneer||row.is_founder)){ say('--gr','Confirmed: your '+(row.is_founder?'Lifetime licence':row.plan==='monthly'?'Founder':'Pioneer')+' plan is active.'); setTimeout(function(){ closePaywall(); },1400); }
+    if(row&&(row.is_pioneer||row.is_founder)){ say('--gr','Confirmed: your '+(row.is_founder?'Lifetime licence':'Pioneer')+' plan is active.'); setTimeout(function(){ closePaywall(); },1400); }
     else if(row) say('--re','No payment found for this account yet. It can take a minute after checkout. If you paid with a different email, write to hello@vault-it.co and we will link it.');
     else say('--re','Could not reach Vault-It to check. Try again in a moment.');
     return;
@@ -26383,8 +26394,8 @@ function _refreshPioneerSettingsUI(){
   var st=viTrialState(),pioneer=st==='paid',left=viTrialDaysLeft(),day=viTrialDay();
   if(active)active.style.display=pioneer?'block':'none';
   if(inactive){inactive.style.display=pioneer?'none':'block';
-    inactive.textContent=st==='ended'?'Your 30 days are up, so the vault is read-only: every number is safe and still here. Pick a plan to carry on editing: Founder at '+viPlanLabel('monthly')+', Pioneer at '+viPlanLabel('annual')+', or a Lifetime licence at '+viPlanLabel('founder')+'.'
-      :'Day '+day+' of your 30 free days ('+left+(left===1?' day':' days')+' left). Everything is open. After day 30 the vault turns read-only until you pick a plan: Founder at '+viPlanLabel('monthly')+', Pioneer at '+viPlanLabel('annual')+', or a Lifetime licence at '+viPlanLabel('founder')+'.';}
+    inactive.textContent=st==='ended'?'Your 30 days are up, so the vault is read-only: every number is safe and still here. Pick a plan to carry on editing: Pioneer at '+viPlanLabel('monthly')+'; Pioneer at '+viPlanLabel('annual')+'; or a Lifetime licence at '+viPlanLabel('founder')+'.'
+      :'Day '+day+' of your 30 free days ('+left+(left===1?' day':' days')+' left). Everything is open. After day 30 the vault turns read-only until you pick a plan: Pioneer at '+viPlanLabel('monthly')+'; Pioneer at '+viPlanLabel('annual')+'; or a Lifetime licence at '+viPlanLabel('founder')+'.';}
   try{viPricePaint();}catch(e){}
   if(badge)badge.innerHTML=pioneer
     ?'<span style="color:var(--go);background:rgb(var(--brass-rgb) / .12);padding:2px 7px;border-radius:10px;border:1px solid rgb(var(--brass-rgb) / .3)">◆ ACTIVE</span>'
@@ -28852,7 +28863,7 @@ function gateNudge(tabName, features) {
 
 function _isPro() {
   // Trial then paid (31 Oct): the 30 days give the full app, and the read-only vault after them still shows everything that was
-  // built, so no feature is hidden by this check any more. Paid status itself is viPaid(); viTier() names the plan (Founder monthly, Pioneer yearly, Lifetime licence).
+  // built, so no feature is hidden by this check any more. Paid status itself is viPaid(); viTier() names the plan (monthly and yearly are both Pioneer; founder = Lifetime licence).
   return true;
 }
 
@@ -29214,19 +29225,19 @@ function updateProGate() {
 // Links as of 4 Nov 2026 evening (owner: "card now charge later for 30 day free trial sign up for Alpha testers specifically ... Lifetime licence
 // charge at checkout"). Every link carries Stripe metadata plan = monthly / yearly / founder, which the stripe-webhook maps; it counts a trial as paid.
 var VI_STRIPE_LINKS = {
-  monthly_trial:     'https://buy.stripe.com/8x2fZbgpMdjjgdv5KK2VG08',   // Founder £3.99 a month, alpha testers: 30-day free trial, card taken now, first charge on day 31
-  monthly_tester:    'https://buy.stripe.com/aFacMZa1odjj1iB3CC2VG09',   // Founder £3.99 a month, charged at checkout (beta price, not on the alpha trial)
-  monthly:           'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',   // Founder £5.99 a month after the beta (the existing £5.99 monthly link)
+  monthly_trial:     'https://buy.stripe.com/8x2fZbgpMdjjgdv5KK2VG08',   // Pioneer £3.99 a month, alpha testers: 30-day free trial, card taken now, first charge on day 31
+  monthly_tester:    'https://buy.stripe.com/aFacMZa1odjj1iB3CC2VG09',   // Pioneer £3.99 a month, charged at checkout (beta price, not on the alpha trial)
+  monthly:           'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',   // Pioneer £5.99 a month after the beta (the existing £5.99 monthly link)
   annual_trial:      'https://buy.stripe.com/3cI14hc9w1ABe5na102VG0a',   // Pioneer £49.99 a year, alpha testers: 30-day free trial, card taken now, first charge on day 31
   annual:            'https://buy.stripe.com/dRm3cp6Pccff2mFa102VG02',   // Pioneer £49.99 a year, charged at checkout (beta price, not on the alpha trial)
-  annual_after_beta: '',                                                 // Pioneer £59.99 a year after the beta: no Stripe link yet (owner's call). Until it is set, the Pioneer buttons say "coming soon" once the beta closes
+  annual_after_beta: 'https://buy.stripe.com/cNidR3b5s3IJ0ex2yy2VG0c',   // Pioneer £59.99 a year after the beta (price_1TdPyB9mgKf6HntyvjViAMQg, recurring; checked in Stripe 5 Nov 2026), back to ?upgraded=1&plan=yearly
   founder_tester:    'https://buy.stripe.com/4gM6oB5L87YZ5yRflk2VG0b',   // Lifetime licence £99 once, charged at checkout, 100 places
   founder:           'https://buy.stripe.com/eVq28l0qO6UV3qJc982VG05'    // Lifetime licence £149 once after the beta, 100 places
 };
-// The one source for every plan surface (owner, 4 Nov 2026): Founder £3.99 a month (£5.99 after the beta), Pioneer £49.99 a year (£59.99 after),
+// The one source for every plan surface (owner, 4 Nov 2026; monthly renamed Founder -> Pioneer 5 Nov): Pioneer £3.99 a month (£5.99 after the beta) or £49.99 a year (£59.99 after),
 // Lifetime licence £99 once (£149 after). Keys stay monthly / annual / founder: the server and saved plans use them (founder = the Lifetime licence).
 // price = after the beta, tester = beta price; link / testerLink / trialLink = the VI_STRIPE_LINKS key that charges it; tier = the icon.
-var VI_PLANS = { monthly: { price: 5.99, tester: 3.99, per: ' a month', short: '/mo', link: 'monthly', testerLink: 'monthly_tester', trialLink: 'monthly_trial', trialDays: 30, name: 'Founder', tier: 'founder' }, annual: { price: 59.99, tester: 49.99, per: ' a year', short: '/yr', link: 'annual_after_beta', testerLink: 'annual', trialLink: 'annual_trial', trialDays: 30, name: 'Pioneer', tier: 'pioneer' }, founder: { price: 149, tester: 99, per: ' once', short: ' once', link: 'founder', testerLink: 'founder_tester', name: 'Lifetime licence', tier: 'lifetime' } };
+var VI_PLANS = { monthly: { price: 5.99, tester: 3.99, per: ' a month', short: '/mo', link: 'monthly', testerLink: 'monthly_tester', trialLink: 'monthly_trial', trialDays: 30, name: 'Pioneer', tier: 'founder' }, annual: { price: 59.99, tester: 49.99, per: ' a year', short: '/yr', link: 'annual_after_beta', testerLink: 'annual', trialLink: 'annual_trial', trialDays: 30, name: 'Pioneer', tier: 'pioneer' }, founder: { price: 149, tester: 99, per: ' once', short: ' once', link: 'founder', testerLink: 'founder_tester', name: 'Lifetime licence', tier: 'lifetime' } };
 var VI_CANCEL_EMAIL = 'hello@vault-it.co';   // no self-serve cancel in the app yet: subscribers email to cancel
 // The app is in beta, so every account counts as an alpha tester until the profile carries a tester flag (secure paid gateway, queued);
 // a device can also be marked with vi_beta ('false' = not on the alpha trial, still on beta prices while the beta is open).
@@ -29606,7 +29617,7 @@ function showPrivacy() {
     _lh('What we hold, and why'),
     '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Your email address</strong>: typed in, or from Google if you choose Continue with Google; to create your account, send you sign-in codes and send service messages about the beta and your account. We do not send marketing unless you opt in.</li>'
       + '<li><strong>Your profile</strong>: your name, phone number, profession and aspirations, goal, and the saving- and spending-style answers from the set-up questions.</li>'
-      + '<li><strong>Your plan</strong>: which plan you bought (Founder monthly, Pioneer yearly or Lifetime licence), when you paid and when it renews or ends, whether you are a beta tester (an address confirmed on the beta list gets the tester price), and the Stripe customer and subscription references that link a payment to your account. We never see or store your card details.</li>'
+      + '<li><strong>Your plan</strong>: which plan you bought (Pioneer, monthly or yearly, or a Lifetime licence), when you paid and when it renews or ends, whether you are a beta tester (an address confirmed on the beta list gets the tester price), and the Stripe customer and subscription references that link a payment to your account. We never see or store your card details.</li>'
       + '<li><strong>The figures you enter</strong>: income, spending, assets, debts, house plans and net-worth history, and anything else you add: notes, small item photos, and the names and contact details of clients or leads if you use that tab (only add other people’s details if you have a good reason to). This is financial information. We use it only to show you your dashboard, roadmap and House Builder and to keep your devices in step. We do not use it for anything else, and we do not sell it. Full-size photos stay on your device.</li>'
       + '<li><strong>Your PIN</strong>: on our server only as a salted, peppered one-way hash; we cannot read it. Your browser keeps just a marker that a PIN is set, not the PIN or anything derived from it.</li>'
       + '<li><strong>Security records</strong>: sign-in times, IP addresses and failed-attempt counters, and short-lived hashed counters that block abuse. We keep these because it is in our legitimate interest, and yours, to keep accounts safe.</li>'
@@ -29617,7 +29628,7 @@ function showPrivacy() {
     '<p>These companies process data for us, only to run Vault-It:</p>',
     '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Supabase</strong>: database and sign-in, hosted in the EU (Frankfurt), and the server functions, which run on Supabase’s network and may run outside the EU.</li>'
       + '<li><strong>Google</strong>: only if you choose <strong>Continue with Google</strong>. Google confirms it is you and sends Supabase your name, email address and the web address of your Google profile picture, which Supabase keeps with your account. The app uses your name and email address; it does not load the picture. We never see your Google password, and ask Google for nothing else in your account.</li>'
-      + '<li><strong>Stripe</strong>: takes payments for Founder, Pioneer and the Lifetime licence. When you pay, Stripe receives your email address, your card details and your Vault-It account reference, and sends our server a signed record of the payment (the plan, and when it renews or ends).</li>'
+      + '<li><strong>Stripe</strong>: takes payments for Pioneer (monthly and yearly) and the Lifetime licence. When you pay, Stripe receives your email address, your card details and your Vault-It account reference, and sends our server a signed record of the payment (the plan, and when it renews or ends).</li>'
       + '<li><strong>Resend</strong>: delivers your sign-in emails (your email address and the code) and the beta-list emails. If it is unavailable, Supabase’s own mailer is used for sign-in emails instead.</li>'
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
@@ -30678,50 +30689,6 @@ function nwhRenderMini(){
   later();
 })();
 </script>
-
-<!-- ══ ALPHA ACCESS MODAL ══ -->
-<div id="waitlist-modal" class="vi-modal-overlay hidden">
-  <div class="vi-modal-box" style="max-width:460px;padding:32px 28px 28px">
-    <button onclick="document.getElementById('waitlist-modal').classList.add('hidden')" style="position:absolute;top:12px;right:14px;background:transparent;border:none;color:var(--t3);font-size:1rem;cursor:pointer;line-height:1;padding:4px"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;background:rgb(var(--brass-rgb) / .1);border:1px solid rgb(var(--brass-rgb) / .3);clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));margin-bottom:14px">
-        <span style="font-size:max(.75rem,var(--vi-fs-3))">◈</span>
-        <span style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-0));font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--go)">Alpha Founder Access</span>
-      </div>
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:var(--tx);margin-bottom:8px;line-height:1.3">Lock in your founder rate.<br>Shape what Vault-It becomes.</div>
-      <div style="font-size:max(.62rem,var(--vi-fs-2));color:var(--t2);line-height:1.7;margin-bottom:18px">Pro is launching soon. Alpha founders get early access, the lowest price we'll ever offer, and a permanent seat at the table.</div>
-    </div>
-    <!-- Perks -->
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
-      <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:rgb(var(--teal-rgb) / .05);border:1px solid rgb(var(--teal-rgb) / .12);border-radius:4px">
-        <span style="font-size:.85rem;flex-shrink:0">🏛</span>
-        <div><div style="font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--em);margin-bottom:2px">DAO Governance Seat</div><div style="font-size:max(.56rem,var(--vi-fs-2));color:var(--t3);line-height:1.5">Your vote counts on every major product decision. Forever.</div></div>
-      </div>
-      <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:rgb(var(--brass-rgb) / .04);border:1px solid rgb(var(--brass-rgb) / .12);border-radius:4px">
-        <span style="font-size:.85rem;flex-shrink:0">🔓</span>
-        <div><div style="font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--go);margin-bottom:2px">Exclusive Early Releases</div><div style="font-size:max(.56rem,var(--vi-fs-2));color:var(--t3);line-height:1.5">Access every new feature before it goes public.</div></div>
-      </div>
-      <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:rgb(var(--green-rgb) / .04);border:1px solid rgb(var(--green-rgb) / .12);border-radius:4px">
-        <span style="font-size:.85rem;flex-shrink:0">◈</span>
-        <div><div style="font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--gr);margin-bottom:2px">Lifelong Contributor Badge</div><div style="font-size:max(.56rem,var(--vi-fs-2));color:var(--t3);line-height:1.5">Permanently displayed on your profile. You built this with us.</div></div>
-      </div>
-    </div>
-    <!-- Pricing -->
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <div style="flex:1;padding:10px;background:var(--c3);border:1px solid var(--bd2);border-radius:4px;text-align:center">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:var(--em);font-weight:700">£5.99<span style="font-size:max(.6rem,var(--vi-fs-2));color:var(--t3)">/mo</span></div>
-        <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);margin-top:3px;text-transform:uppercase;letter-spacing:.08em">Monthly</div>
-      </div>
-      <div style="flex:1;padding:10px;background:rgb(var(--brass-rgb) / .07);border:1px solid rgb(var(--brass-rgb) / .25);border-radius:4px;text-align:center">
-        <div style="font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:var(--go);font-weight:700">£49.99<span style="font-size:max(.6rem,var(--vi-fs-2));color:var(--t3)">/yr</span></div>
-        <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--go);margin-top:3px;text-transform:uppercase;letter-spacing:.08em">Best Value</div>
-      </div>
-    </div>
-    <input type="email" id="waitlist-email" class="al-inp" placeholder="your@email.com" style="width:100%;margin-bottom:10px">
-    <button onclick="submitWaitlist()" class="vi-cta-primary" style="width:100%;margin-bottom:12px">Secure My Alpha Spot →</button>
-    <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t3);text-align:center;line-height:1.5">No card needed now. We'll contact you when Pro launches.<br>Alpha pricing locked at signup. It never increases.</div>
-  </div>
-</div>
 
 <!-- Email capture handled via ConvertKit API in captureEmailToList() — configure Form ID + API Key in Settings -->
 
@@ -31917,7 +31884,7 @@ var KB=[
 
   {c:'Plans and trial',q:'How long is the free trial?',k:'trial free 30 days how long',a:'You get the full app free for 30 days, no card needed. A countdown shows in the last week.'},
   {c:'Plans and trial',q:'What happens when the trial ends?',k:'trial ends after read only vaulter',a:'Your vault becomes read-only: everything stays visible, your cloud copy and Download my data keep working, but adding and editing stop until you pick a plan.'},
-  {c:'Plans and trial',q:'What plans are there and what do they cost?',k:'price cost pro founder pioneer lifetime licence trial cancel plan subscription upgrade',a:'Founder (monthly), Pioneer (yearly, Pro, with family mode coming soon) and a one-off Lifetime licence. Alpha testers get 30 days free on Founder and Pioneer: the card is taken at sign-up and first charged on day 31. To cancel, email hello@vault-it.co. Beta testers pay a lower price; each plan shows its price after the beta too. Current prices are in Settings, <b>Your plan</b>.',act:[{l:'Open Settings',fn:'showSettings'}]},
+  {c:'Plans and trial',q:'What plans are there and what do they cost?',k:'price cost pro founder pioneer lifetime licence trial cancel plan subscription upgrade',a:'Pioneer, monthly or yearly (the yearly plan is Pro, with family mode coming soon), and a one-off Lifetime licence. Alpha testers get 30 days free on Pioneer, monthly or yearly: the card is taken at sign-up and first charged on day 31. To cancel, email hello@vault-it.co. Beta testers pay a lower price; each plan shows its price after the beta too. Current prices are in Settings, <b>Your plan</b>.',act:[{l:'Open Settings',fn:'showSettings'}]},
 
   {c:'Settings and feedback',q:'How do I send feedback or report a bug?',k:'bug feedback report problem issue idea suggestion broken',a:'Tap <b>Feedback</b> (bottom right, on every screen). Write a sentence and press Send. It adds the screen you are on and a picture of it with every figure hidden. Pete reads every one.',act:[{l:'Send feedback',fn:'viFbOpen'}]},
   {c:'Settings and feedback',q:'Where are Settings?',k:'settings find open menu',a:'Open the side panel (the tab on the left edge of the screen) and tap <b>Settings</b> at the bottom.',act:[{l:'Open Settings',fn:'showSettings'}]},
