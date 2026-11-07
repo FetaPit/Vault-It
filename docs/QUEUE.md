@@ -9,6 +9,7 @@ The single list of instructed work. Every session reads it at start and before e
 
 ## Open
 
+- [~] (cloud, Build) v0.9.4 house intro: on sign-in the House Builder house assembles brick by brick, then keeps one continuous dimmed background behind sign-up and the welcome (onboarding) screen; reduced-motion shows the finished still (owner, 7 Nov: "an intro animation on sign-in where the House Builder house BUILDS behind the sign-up and onboarding screens"). Branch v094/house-intro, no release.
 - [ ] (cloud, Build) `submitWaitlist()` (index.html ~28849) is now orphaned JS, left over from deleting `#waitlist-modal` in the pricing-alignment item (5 Nov); it fails safe and can't throw. Owner's call on removing it.
 - [~] (cloud, Build) Release pricing alignment: commit 74081d5 on branch ccr-979f44d8-pxeak8 to release/pioneer-v2 (owner, 5 Nov 2026, "Release and yes", answering the release question). CI green on 9499658 (run 42018054621); backup branch `backup/release-pioneer-v2-20261105-1208` taken from the pre-release production head (37847a7); push to release/pioneer-v2 confirmed blocked from this cloud session. PR FetaPit/Vault-It#4 opened for the owner to merge. Next: owner's phone sign-off, owner merges #4, live version.json check.
 - [ ] (owner, Admin) Send the Plaza Futura PDF to Steve on LinkedIn (owner, 4 Nov ~20:55: "send to Exec Assistant to remind me to email it on linkedin to steve"). Reminder in Google Calendar Thu 5 Nov 09:10 with the draft message and Drive link.
