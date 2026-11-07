@@ -47,12 +47,13 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     ok(ne && ne.r === 'red' && ne.g === 'home' && /text/.test(ne.clipR) && /text/.test(ne.clipG) && ne.grad, 'the tagline draws red in neon red and home in a gold gradient neon: ' + JSON.stringify(ne)); }
   const v = await p.evaluate(() => { const el = document.querySelector('.pc-front .pc-corner video'); if (!el) return null;
     const box = el.parentNode.getBoundingClientRect(), card = document.querySelector('.pc-front').getBoundingClientRect();
-    return { src: el.currentSrc || el.getAttribute('src'), muted: el.muted, loop: el.loop, inline: el.playsInline,
+    return { src: el.currentSrc || el.src, muted: el.muted, loop: el.loop, inline: el.playsInline,
       right: Math.abs(box.right - card.right) < 2, bottom: Math.abs(box.bottom - card.bottom) < 2, wFrac: box.width / card.width, hFrac: box.height / card.height }; });
   ok(v && /\/pete\/house-corner\.mp4$/.test(v.src) && v.muted && v.loop && v.inline, 'the front plays the house builder animation, muted and looping: ' + JSON.stringify(v));
   ok(v && v.right && v.bottom && v.wFrac < 0.5 && v.hFrac < 0.65, 'only a corner of the house shows, in the bottom right of the front');
-  const fv = await p.evaluate(() => new Promise((res) => { const el = document.querySelector('.pc-corner video'); const done = () => res({ d: el.duration, w: el.videoWidth, h: el.videoHeight });
-    if (el.readyState >= 1) done(); else { el.addEventListener('loadedmetadata', done, { once: true }); setTimeout(done, 4000); } }));
+  // read from the file's own header (mvhd: length, tkhd: picture size), since CI's Chromium cannot decode H.264
+  const fv = (() => { const i = film.indexOf('mvhd'), v1 = film[i + 4] === 1, ts = film.readUInt32BE(i + (v1 ? 24 : 16)), du = v1 ? Number(film.readBigUInt64BE(i + 28)) : film.readUInt32BE(i + 20);
+    const t = film.indexOf('tkhd'), end = t - 4 + film.readUInt32BE(t - 4); return { d: du / ts, w: film.readUInt32BE(end - 8) / 65536, h: film.readUInt32BE(end - 4) / 65536 }; })();
   ok(fv.d > 9 && fv.d < 10 && fv.w >= 480 && Math.abs(fv.w / fv.h - 880 / 780) < 0.02, 'the film keeps its length and shape and is sharp on a 3x phone: ' + JSON.stringify(fv));
   ok(await p.locator('.pc-front .bricks, .pc-front .pc-bricks').count() === 0, 'no brick pattern on the front');
   await p.locator('.pc').tap(); await p.waitForTimeout(700);
@@ -80,7 +81,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   ok(Math.abs(((settled % 180) + 180) % 180) < 1 || Math.abs(settled - y0) < 1, 'letting go settles it on a face: ' + settled);
   await p.keyboard.press('Tab');
   // a real contact file, not one built in the browser: iPhone Safari opens a served text/vcard file in its add-contact screen
-  const save = await p.evaluate(() => { const a = document.getElementById('pc-save'); return { tag: a.tagName, href: a.getAttribute('href'), dlAttr: a.hasAttribute('download'), blob: [...document.scripts].some((s) => /createObjectURL/.test(s.textContent)) }; });
+  const save = await p.evaluate(() => { const a = document.getElementById('pc-save'); return { tag: a.tagName, href: new URL(a.href).pathname, dlAttr: a.hasAttribute('download'), blob: [...document.scripts].some((s) => /createObjectURL/.test(s.textContent)) }; });
   ok(save.tag === 'A' && save.href === '/pete/pete-thickett-vault-it.vcf' && !save.dlAttr && !save.blob, 'Save contact is a plain link to the real contact file: ' + JSON.stringify(save));
   ok(fs.existsSync(path.join(DIST, 'landing', 'pete', 'pete-thickett-vault-it.vcf')), 'the build publishes the contact file');
   const wk = (await import(pathToFileURL(path.join(ROOT, 'worker', 'index.mjs')).href)).default;
@@ -101,11 +102,18 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   // Home-screen app (owner, 7 Nov: "give me it in an APK", chose a home-screen app): installable, opens full screen, works with no signal
   const man = await p.evaluate(async () => { const l = document.querySelector('link[rel="manifest"]'); if (!l) return null; const r = await fetch(l.href); const m = await r.json();
     const icons = await Promise.all((m.icons || []).map(async (i) => { const q = await fetch(new URL(i.src, l.href)); return { sizes: i.sizes, ok: q.ok, png: /image\/png/.test(q.headers.get('content-type') || '') }; }));
-    return { href: l.getAttribute('href'), name: m.name, short: m.short_name, start: m.start_url, scope: m.scope, display: m.display, icons, apple: !!document.querySelector('link[rel="apple-touch-icon"]') }; });
+    const at = (u) => { const x = new URL(u, l.href); return x.pathname + x.search; };
+    return { href: new URL(l.href).pathname, name: m.name, short: m.short_name, start: at(m.start_url), scope: at(m.scope), display: m.display, icons, apple: !!document.querySelector('link[rel="apple-touch-icon"]') }; });
   ok(man && man.href === '/pete/manifest.webmanifest' && man.name && man.short && man.start === '/pete?app=1' && man.scope === '/pete' && man.display === 'standalone', 'the card can be added to the home screen and opens full screen: ' + JSON.stringify(man));
   ok(man && ['192x192', '512x512'].every((s) => man.icons.some((i) => i.sizes === s && i.ok && i.png)) && man.apple, 'the home-screen icon is the Vault-It mark at 192 and 512 px, with an iPhone icon too');
   ok(man && !/—/.test(man.name + man.short), 'no em dashes in the app name');
   ok(await p.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length) === 0, 'people who scan the card get nothing stored on their phone (offline copy only in the home-screen app)');
+  // preview builds (workers.dev) serve the landing site under /landing/: every file the card itself uses must resolve there too,
+  // so the owner can check the card on a phone before release
+  const own = await p.evaluate(() => [...document.querySelectorAll('link[rel~="icon"], link[rel="manifest"], link[rel="apple-touch-icon"], .pc-corner img, .pc-corner video, .pc-pub img, #pc-save')]
+    .flatMap((el) => ['href', 'src', 'poster', 'data-src'].map((k) => el.getAttribute(k)).filter(Boolean)).concat(['pete-sw.js']));
+  const prev = own.map((u) => { const x = new URL(u, 'https://card-x-vault-it.ptlived.workers.dev/landing/pete'); const r = route(x.hostname, x.pathname); return { u, ok: !!r.file && fs.existsSync(path.join(DIST, r.file)) }; });
+  ok(own.length >= 8 && prev.every((x) => x.ok), 'every file the card uses also loads on a preview build: ' + JSON.stringify(prev.filter((x) => !x.ok)));
   const sw = fs.readFileSync(path.join(DIST, 'landing', 'pete-sw.js'), 'utf8');
   ok([...sw.matchAll(/https?:\/\/([a-z0-9.-]+)/gi)].every((m) => /^fonts\.(googleapis|gstatic)\.com$/.test(m[1])) && !/\bpostMessage|sendBeacon|XMLHttpRequest/.test(sw), 'the offline helper only keeps the card and its fonts, and sends nothing anywhere');
   const swr = await wk.fetch(new Request('https://vault-it.co/pete-sw.js'), { ASSETS: fakeAssets });

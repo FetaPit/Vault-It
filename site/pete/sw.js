@@ -3,7 +3,9 @@
 // It keeps the card, its pictures, the contact file and its fonts on the phone so the card opens with no signal.
 // The house film is left to the network (videos ask for byte ranges); offline the still picture shows instead. Nothing is sent anywhere.
 const CACHE = 'pete-card-v1';
-const SHELL = ['/pete', '/pete/house-corner.jpg', '/pete/ptlive.png', '/pete/pete-thickett-vault-it.vcf', '/pete/manifest.webmanifest', '/pete/icon-192.png', '/pete/icon-512.png', '/pitch/logo-mid.png'];
+// '/' on vault-it.co, '/landing/' on preview builds: the folder this helper is served from
+const BASE = new URL('./', self.location).pathname;
+const SHELL = ['pete', 'pete/house-corner.jpg', 'pete/ptlive.png', 'pete/pete-thickett-vault-it.vcf', 'pete/manifest.webmanifest', 'pete/icon-192.png', 'pete/icon-512.png', 'pitch/logo-mid.png'].map((p) => BASE + p);
 const FONTS = /^https:\/\/fonts\.(googleapis|gstatic)\.com$/;
 
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())); });
@@ -28,7 +30,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request; if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin === self.location.origin) {
-    if (url.pathname === '/pete') return e.respondWith(fresh(req, '/pete'));
+    if (url.pathname === BASE + 'pete') return e.respondWith(fresh(req, BASE + 'pete'));
     if (url.pathname.endsWith('.mp4')) return;
     if (SHELL.includes(url.pathname)) return e.respondWith(kept(req));
     return;
