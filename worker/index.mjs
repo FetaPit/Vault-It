@@ -67,6 +67,10 @@ function withHeaders(res, { file, prod } = {}) {
   const h = new Headers(res.headers);
   for (const [k, v] of Object.entries(SECURITY)) h.set(k, v);
   if (!prod) h.set('X-Robots-Tag', 'noindex');
+  if (file && file.endsWith('.vcf') && res.status === 200) {   // contact cards (vault-it.co/pete): iPhone Safari opens text/vcard in its add-contact screen
+    h.set('Content-Type', 'text/vcard; charset=utf-8');
+    h.set('Content-Disposition', 'inline; filename="' + file.split('/').pop() + '"');
+  }
   if (file && (file.endsWith('.html') || file.endsWith('/version.json') || file.endsWith('/sw.js') || file.endsWith('.webmanifest'))) h.set('Cache-Control', file.endsWith('.json') ? 'no-store' : 'no-cache');   // the worker script and manifest must never be stale
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
 }

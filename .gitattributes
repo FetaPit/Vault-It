@@ -1,3 +1,5 @@
 # Shell and Python scripts keep LF endings, or Git Bash on Windows fails on them.
 *.sh text eol=lf
 *.py text eol=lf
+# Contact cards (vCard) keep the CRLF line endings the format requires.
+*.vcf -text

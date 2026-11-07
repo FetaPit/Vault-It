@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Thickett;Pete;;;
+FN:Pete Thickett
+ORG:Vault-It
+TITLE:Founder
+EMAIL;TYPE=WORK,INTERNET:pete@ptlive.design
+TEL;TYPE=CELL:+447470074133
+URL;TYPE=LinkedIn:https://www.linkedin.com/in/ptlivedesign/
+URL:https://vault-it.co
+NOTE:Vault-It: get out of the red and into your home.
+END:VCARD

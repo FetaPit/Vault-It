@@ -10,7 +10,11 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
 (async () => {
   cp.execFileSync('node', [path.join(ROOT, 'tools', 'build_site.js')], { env: { ...process.env, SITE_OUT: DIST }, stdio: ['ignore', 'ignore', 'inherit'] });
   const { route } = await import(pathToFileURL(path.join(ROOT, 'worker', 'index.mjs')).href);
-  const TYPES = { '.html': 'text/html; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp4': 'video/mp4', '.js': 'text/javascript' };
+  const TYPES = { '.html': 'text/html; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp4': 'video/mp4', '.js': 'text/javascript', '.vcf': 'text/vcard; charset=utf-8' };
+  // the house film stays light for venue signal: under 700 KB (was 1.9 MB), and the index (moov) sits before the frames so it starts at once
+  const film = fs.readFileSync(path.join(ROOT, 'site', 'pete', 'house-corner.mp4'));
+  ok(film.length < 700 * 1024, 'the house film is under 700 KB: ' + Math.round(film.length / 1024) + ' KB');
+  ok(film.indexOf('moov') > 0 && film.indexOf('moov') < film.indexOf('mdat'), 'the house film starts playing before it has fully loaded (faststart)');
   const srv = http.createServer((req, res) => {
     const r = route('vault-it.co', new URL(req.url, 'http://x').pathname); const f = r.file && path.join(DIST, r.file);
     if (!f || !fs.existsSync(f)) { res.writeHead(404); return res.end('nf'); }
@@ -47,6 +51,9 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
       right: Math.abs(box.right - card.right) < 2, bottom: Math.abs(box.bottom - card.bottom) < 2, wFrac: box.width / card.width, hFrac: box.height / card.height }; });
   ok(v && /\/pete\/house-corner\.mp4$/.test(v.src) && v.muted && v.loop && v.inline, 'the front plays the house builder animation, muted and looping: ' + JSON.stringify(v));
   ok(v && v.right && v.bottom && v.wFrac < 0.5 && v.hFrac < 0.65, 'only a corner of the house shows, in the bottom right of the front');
+  const fv = await p.evaluate(() => new Promise((res) => { const el = document.querySelector('.pc-corner video'); const done = () => res({ d: el.duration, w: el.videoWidth, h: el.videoHeight });
+    if (el.readyState >= 1) done(); else { el.addEventListener('loadedmetadata', done, { once: true }); setTimeout(done, 4000); } }));
+  ok(fv.d > 9 && fv.d < 10 && fv.w >= 480 && Math.abs(fv.w / fv.h - 880 / 780) < 0.02, 'the film keeps its length and shape and is sharp on a 3x phone: ' + JSON.stringify(fv));
   ok(await p.locator('.pc-front .bricks, .pc-front .pc-bricks').count() === 0, 'no brick pattern on the front');
   await p.locator('.pc').tap(); await p.waitForTimeout(700);
   ok(await facing(p) === 'back', 'tapping the card flips it to the back');
@@ -72,6 +79,15 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   const settled = await ry(p);
   ok(Math.abs(((settled % 180) + 180) % 180) < 1 || Math.abs(settled - y0) < 1, 'letting go settles it on a face: ' + settled);
   await p.keyboard.press('Tab');
+  // a real contact file, not one built in the browser: iPhone Safari opens a served text/vcard file in its add-contact screen
+  const save = await p.evaluate(() => { const a = document.getElementById('pc-save'); return { tag: a.tagName, href: a.getAttribute('href'), dlAttr: a.hasAttribute('download'), blob: [...document.scripts].some((s) => /createObjectURL/.test(s.textContent)) }; });
+  ok(save.tag === 'A' && save.href === '/pete/pete-thickett-vault-it.vcf' && !save.dlAttr && !save.blob, 'Save contact is a plain link to the real contact file: ' + JSON.stringify(save));
+  ok(fs.existsSync(path.join(DIST, 'landing', 'pete', 'pete-thickett-vault-it.vcf')), 'the build publishes the contact file');
+  const wk = (await import(pathToFileURL(path.join(ROOT, 'worker', 'index.mjs')).href)).default;
+  const fakeAssets = { fetch: async (rq) => { const f = path.join(DIST, new URL(rq.url).pathname); return fs.existsSync(f) ? new Response(fs.readFileSync(f), { headers: { 'Content-Type': 'application/octet-stream' } }) : new Response('nf', { status: 404 }); } };
+  const vr = await wk.fetch(new Request('https://vault-it.co/pete/pete-thickett-vault-it.vcf'), { ASSETS: fakeAssets });
+  ok(vr.status === 200 && /^text\/vcard; ?charset=utf-8$/i.test(vr.headers.get('Content-Type') || ''), 'the worker serves the contact file as text/vcard: ' + vr.status + ' ' + vr.headers.get('Content-Type'));
+  ok(/inline; ?filename="pete-thickett-vault-it\.vcf"/.test(vr.headers.get('Content-Disposition') || ''), 'and names it for phones that save it: ' + vr.headers.get('Content-Disposition'));
   const dl = p.waitForEvent('download', { timeout: 5000 }).catch(() => null);
   await p.locator('#pc-save').click(); const d = await dl;
   let vcf = ''; if (d) vcf = fs.readFileSync(await d.path(), 'utf8');

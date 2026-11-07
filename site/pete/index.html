@@ -93,7 +93,7 @@ a{color:inherit}
 </div></div>
 <button type="button" class="pc-flip" id="pc-flip">FLIP CARD</button>
 <div class="pc-acts">
-<button type="button" class="pc-btn main" id="pc-save"><svg class="pc-ic" aria-hidden="true"><use href="#vi-user"/></svg>Save contact</button>
+<a class="pc-btn main" id="pc-save" href="/pete/pete-thickett-vault-it.vcf"><svg class="pc-ic" aria-hidden="true"><use href="#vi-user"/></svg>Save contact</a>
 <a class="pc-btn" href="mailto:pete@ptlive.design"><svg class="pc-ic" aria-hidden="true"><use href="#vi-mail"/></svg>Email Pete</a>
 <a class="pc-btn" href="/pitch-Eligent"><svg class="pc-ic" aria-hidden="true"><use href="#vi-cube"/></svg>See the pitch deck</a>
 <a class="pc-btn" href="/sign-up"><svg class="pc-ic" aria-hidden="true"><use href="#vi-keys"/></svg>Join the beta</a>
@@ -125,12 +125,7 @@ say();
 var v=document.querySelector('.pc-corner video'),rm=matchMedia('(prefers-reduced-motion: reduce)');
 function motion(){if(!v)return;if(rm.matches){v.pause()}else{if(!v.getAttribute('src')){v.src=v.dataset.src}var p=v.play();if(p&&p.catch)p.catch(function(){})}}
 motion();if(rm.addEventListener)rm.addEventListener('change',motion);
-/* save contact */
-var VCF=["BEGIN:VCARD", "VERSION:3.0", "N:Thickett;Pete;;;", "FN:Pete Thickett", "ORG:Vault-It", "TITLE:Founder", "EMAIL;TYPE=WORK,INTERNET:pete@ptlive.design", "TEL;TYPE=CELL:+447470074133", "URL;TYPE=LinkedIn:https://www.linkedin.com/in/ptlivedesign/", "URL:https://vault-it.co", "NOTE:Vault-It: get out of the red and into your home.", "END:VCARD"];
-document.getElementById('pc-save').addEventListener('click',function(){
- var blob=new Blob([VCF.join('\r\n')+'\r\n'],{type:'text/vcard'}),a=document.createElement('a');
- a.href=URL.createObjectURL(blob);a.download='pete-thickett-vault-it.vcf';document.body.appendChild(a);a.click();
- setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500)});
+/* Save contact is a plain link to /pete/pete-thickett-vault-it.vcf, served as text/vcard: iPhone opens its add-contact screen, Android saves and opens it */
 })();
 </script>
 </body></html>
