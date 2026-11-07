@@ -1,6 +1,7 @@
 // Build the publishable site into dist/ — only the files a browser needs, never tests, docs, function code or notes.
 //   dist/app      → https://app.vault-it.co   the app (index.html is self-contained) + the data-recovery page
 //   dist/landing  → https://vault-it.co       the sign-up page (served at / and /sign-up) + its confirm / thanks / unsubscribe pages
+//                                              + /privacy and /terms, built from the app's own notice text (tools/build_legal.js)
 // Run: node tools/build_site.js            (Cloudflare Workers Builds: build command `npm run build:site`)
 const fs = require('fs'), path = require('path'), cp = require('child_process');
 const ROOT = path.join(__dirname, '..'), OUT = process.env.SITE_OUT ? path.resolve(process.env.SITE_OUT) : path.join(ROOT, 'dist');
@@ -41,6 +42,10 @@ for (const [site, files] of Object.entries(SITE)) {
     const md = path.join(ROOT, 'models'); fs.mkdirSync(path.join(dir, 'models'), { recursive: true });
     for (const f of MODELS) fs.copyFileSync(path.join(md, f), path.join(dir, 'models', f));
     for (const sub of ['glb', 'thumb']) fs.cpSync(path.join(md, sub), path.join(dir, 'models', sub), { recursive: true });
+  }
+  if (site === 'landing') {   // vault-it.co/privacy and /terms: the app's own Privacy notice and Beta terms as public pages (tools/build_legal.js)
+    const pages = require('./build_legal').legalPages(fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'));
+    for (const [f, html] of Object.entries(pages)) fs.writeFileSync(path.join(dir, f), html);
   }
   fs.writeFileSync(path.join(dir, 'robots.txt'), ROBOTS[site]);
   fs.writeFileSync(path.join(dir, '404.html'), '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Not found · Vault-It</title><body style="margin:0;background:#04090f;color:#9bb0bd;font:16px system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;text-align:center"><div><div style="font-size:2rem;color:#44c0b9;margin-bottom:8px">404</div>That page does not exist. <a style="color:#44c0b9" href="/">Back to Vault-It</a></div>');

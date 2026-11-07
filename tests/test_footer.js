@@ -11,7 +11,7 @@ const land = fs.readFileSync(require('path').join(require('./lib/vi').ROOT, 'lan
 const lf = land.slice(land.indexOf('<footer>'), land.indexOf('</footer>'));
 const lt = lf.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 ok(lt.includes(FCA) && lt.includes(DISC), 'landing footer carries the approved wording, exactly');
-ok(/href="https:\/\/app\.vault-it\.co\/\?privacy=1">Privacy notice</.test(lf) && /href="https:\/\/app\.vault-it\.co\/\?terms=1">Beta terms</.test(lf), 'landing footer links Privacy notice and Beta terms');
+ok(/href="\/privacy">Privacy notice</.test(lf) && /href="\/terms">Beta terms</.test(lf), 'landing footer links the public Privacy notice and Beta terms pages (vault-it.co/privacy, /terms; 7 Nov 2026)');
 ok(!/[—–]/.test(lt) && !/&mdash;|&ndash;/.test(lf), 'landing footer has no em or en dashes');
 (async () => {
   const b = await chromium.launch();
