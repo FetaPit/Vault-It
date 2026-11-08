@@ -24,6 +24,10 @@ export function route(hostname, pathname) {
   if (kind === 'www') return { redirect: 'https://' + HOSTS.root };
   if (!/^\/[A-Za-z0-9._~\-\/]*$/.test(pathname) || pathname.includes('//') || pathname.split('/').some((s) => s === '.' || s === '..')) return { notFound: true };
 
+  // vault-it.co/demo-a (owner, 8 Nov 2026): the live demo link. Sends the visitor into the app with the Alex Morgan sample loaded
+  // (the app reads ?demo=alex). On a preview host the app is on the same host, so it goes there instead of production.
+  if ((kind === 'root' || kind === 'preview') && /^\/(landing\/)?demo-a\/?$/.test(pathname)) return { demo: '/?demo=alex', site: kind === 'root' ? 'app' : 'preview' };
+
   let site, rest = pathname;
   if (kind === 'root') site = 'landing';
   else if (kind === 'app') site = 'app';
@@ -86,6 +90,7 @@ export default {
     }
     const r = route(url.hostname, url.pathname);
     if (r.redirect) return withHeaders(Response.redirect(r.redirect + url.pathname + url.search, 301), { prod: true });
+    if (r.demo) return withHeaders(Response.redirect((r.site === 'app' ? 'https://' + HOSTS.app : url.origin) + r.demo, 302), { prod: true });   // 302: never cached by the browser, so the target can change
     if (r.notFound) return withHeaders(new Response('Not found', { status: 404 }), { prod: true });
 
     const target = new URL(r.file, url.origin);

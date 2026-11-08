@@ -31,6 +31,7 @@ Project: Supabase `legpubblzgknxdtvsant` (eu-central-1, Frankfurt). Live app: `r
 - Pin the Edge Functions region if you want the "EU" statement to cover them as well as the database (Supabase → Edge Functions settings).
 - Auth logs (Supabase) and Resend delivery logs hold e-mail address and IP for a short period after deletion; set their retention to the minimum.
 - `?bypass=websummit` on the app URL skips the login screen *on that device* and switches to sample data (no cloud access). It is linked from the landing page for demos; remove it before wide release if you do not want it.
+- **vault-it.co/demo-a** (8 Nov 2026) is the live demo link: the Worker sends it to `app.vault-it.co/?demo=alex`, which drops whatever that browser holds (saved data and any sign-in), loads the Alex Morgan sample (£57k salary, semi-detached deposit £18,500 of £32,000, freelance consulting in Entrepreneur) and lands on the dashboard with no wizard and no sign-in, for 24 hours. Every tab is populated; "Start with your own data" clears it. Tests: `tests/test_demo_a.js`, `tests/test_worker_demo_route.mjs`.
 - The housekeeping that clears saved versions older than 180 days and old usage counters runs as part of normal sign-ins (migration 008). After the beta, delete remaining test accounts yourself (Authentication → Users, or `erase_user_data` + delete) — the notice promises an e-mail first.
 
 **Legal**

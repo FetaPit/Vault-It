@@ -12113,6 +12113,20 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     var reset = params.has('reset');
     if (reset) { localStorage.removeItem('vi_user'); localStorage.removeItem('vi_session'); }
 
+    // vault-it.co/demo-a (owner, 8 Nov 2026): the Worker sends it here as ?demo=alex. Always starts from the Alex Morgan sample,
+    // whatever this browser holds: every saved key (and any Supabase sign-in) is dropped first, then initDemoMode() seeds the
+    // sample, opens a 24h demo session and reloads once with a clean address. Both overlays are hidden before first paint.
+    if (!reset && params.get('demo') === 'alex') {
+      try {
+        var _keep = { vi_settings: 1, vi_pwa_dismissed: 1, vi_fx_rates: 1, vi_fx_updated: 1, vi_fx_gbpusd: 1, vi_fx_gbpeur: 1 };
+        var _drop = [];
+        for (var _di = 0; _di < localStorage.length; _di++) { var _dk = localStorage.key(_di); if (/^(pos_|vi_|sb-|ht3$)/.test(_dk) && !_keep[_dk]) _drop.push(_dk); }
+        _drop.forEach(function(k) { localStorage.removeItem(k); });
+        localStorage.setItem('vi_demo_launch', 'a');
+      } catch (e) {}
+      document.write('<style>#login-overlay,#welcome-overlay{display:none!important}</style>');
+    }
+
     // Demo bypass — ?bypass=websummit creates a 24h session from stored profile
     // Use this URL during live demos to skip the login screen
     if (!reset && params.get('bypass') === 'websummit') {
@@ -12134,11 +12148,12 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     // Hide welcome overlay only for real returning users (not demo-mode visitors)
     var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
     var isDemo = localStorage.getItem('vi_demo_mode') === 'true';
-    if (!reset && u && u.name && u.email && !isDemo) {
+    var demoA = localStorage.getItem('vi_demo_variant') === 'a';   // the vault-it.co/demo-a sample lands on the dashboard, not the wizard
+    if (!reset && ((u && u.name && u.email && !isDemo) || (isDemo && demoA))) {
       document.write('<style>#welcome-overlay{display:none!important}</style>');
     }
     // Belt-and-suspenders: also hide via JS after DOM is ready
-    if (!reset && u && u.name && u.email && !isDemo) {
+    if (!reset && ((u && u.name && u.email && !isDemo) || (isDemo && demoA))) {
       document.addEventListener('DOMContentLoaded', function() {
         var ov = document.getElementById('welcome-overlay');
         if (ov) { ov.style.display = 'none'; ov.style.setProperty('display','none','important'); }
@@ -18845,7 +18860,7 @@ function _isDemoSample(key, o) {
   try {
     if (key === 'pos_debt1') return (o.debts || []).some(function(d) { return d && d.name === 'Student Loan Plan 2' && +d.original === 38000; });
     if (key === 'pos_house') return !!(o.deposits && o.deposits[0] && o.deposits[0].amt === 5000 && o.saved === 22500);
-    if (key === 'ht3') return !!(o.deposits && o.deposits.length >= 6 && o.deposits[0].amount === 5000 && o.deposits[1].amount === 4500 && o.deposits[2].amount === 3500);
+    if (key === 'ht3') return !!(o.deposits && o.deposits.length >= 6 && ((o.deposits[0].amount === 5000 && o.deposits[1].amount === 4500 && o.deposits[2].amount === 3500) || (o.deposits[0].amount === 3000 && o.deposits[1].amount === 2500 && o.deposits[2].amount === 2800 && +o.saved === 18500)));
     if (key === 'pos_al1') return (o.crypto || []).some(function(c) { return c && c.sym === 'ETH' && (+c.amount === 1.4 || +c.qty === 1.4); }) && (o.crypto || []).some(function(c) { return c && c.sym === 'BTC' && (+c.amount === 0.05 || +c.qty === 0.05); });
     if (key === 'pos_biz1') return (o.leads || []).some(function(l) { return l && l.name === 'Nova Retail'; });
   } catch (e) {}
@@ -18961,7 +18976,7 @@ function viSyncStatus() {
   var el = document.getElementById('sync-status'); if (el) el.textContent = txt;
   var bn = document.getElementById('sync-banner');
   var unsynced = d > 0 || (!localStorage.getItem('vi_last_sync') && localStorage.getItem('pos_ov1') != null);   // older devices never tracked this
-  var need = !_supaUser && unsynced && !!hasValidSession() && (Date.now() - _pageT0 > 4000) && !_syncBannerOff;
+  var need = !_supaUser && unsynced && !!hasValidSession() && (Date.now() - _pageT0 > 4000) && !_syncBannerOff && localStorage.getItem('vi_demo_mode') !== 'true';   // the sample is never backed up, so the demo never asks
   var lo = document.getElementById('login-overlay'), loginOpen = lo && getComputedStyle(lo).display !== 'none';
   if (need && !loginOpen) {
     if (!bn) {
@@ -19135,7 +19150,7 @@ var _DEMO_DATA_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
 function _wipeDemoData(realEmail){
   try { _DEMO_DATA_KEYS.forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
   try { invClearAll(); } catch(e){}
-  try { localStorage.removeItem('vi_demo_mode'); } catch(e){}
+  try { localStorage.removeItem('vi_demo_mode'); localStorage.removeItem('vi_demo_variant'); localStorage.removeItem('vi_demo_launch'); } catch(e){}
   // Demo sets vi_pioneer; real pioneer status is re-synced from the profile row.
   try { localStorage.removeItem('vi_pioneer'); } catch(e){}
   try {
@@ -29856,15 +29871,17 @@ function _viDeviceHasSavedData() {
   return false;
 }
 function _demoPut(k, v) { if (!_viKeyHasData(k)) localStorage.setItem(k, v); }   // the demo only ever fills empty keys
-function loadDemoData() {
+function loadDemoData(force) {
   // refuses on any device that holds saved data, and never writes over a key that already has something in it
-  if (_viDeviceHasSavedData()) return false;
+  // (force: the vault-it.co/demo-a link, where the pre-paint script has already emptied the browser on purpose)
+  if (!force && _viDeviceHasSavedData()) return false;
   _demoPut('vi_demo_mode', 'true');
-  // Rich UK demo persona — used when no user data exists
+  // Alex Morgan, the sample persona (owner, 8 Nov 2026): £57,000 salary (about £3,635 a month after tax and NI), renting at £1,150,
+  // saving for a semi-detached (£320,000, 10% deposit = £32,000, £18,500 saved), freelance product consulting on the side.
   if (!localStorage.getItem('vi_user')) {
     _demoPut('vi_user', JSON.stringify({
       name: 'Alex Morgan', email: 'demo@vault-it.app',
-      job: 'Senior Product Manager', dream: 'Financial independence by 45',
+      job: 'Senior Product Manager', salary: 57000, dream: 'Keys to a semi-detached by 2028',
       saveArch: 'The Strategic Investor', spendArch: 'The Measured Spender',
       joined: new Date().toISOString(), pioneerNum: 7
     }));
@@ -29873,85 +29890,107 @@ function loadDemoData() {
   if (!localStorage.getItem('pos_ov1')) {
     // Assets & debts live in their own tabs, so the Overview quick-add lists stay empty here
     // (otherwise the demo would count them twice). Cash flow + history use the real key/shape.
-    var _dm = [], _nw = [38500, 43200, 48100, 53400, 58700, 63900, 68000, 71000], _dd = new Date();
+    var _dm = [], _nw = [19400, 21100, 22900, 24500, 26200, 28000, 30100, 32000], _dd = new Date();
     for (var _i = 7; _i >= 0; _i--) {
       var _m = new Date(_dd.getFullYear(), _dd.getMonth() - _i, 1);
-      _dm.push({ month: _m.getFullYear() + '-' + String(_m.getMonth() + 1).padStart(2, '0'), nw: _nw[7 - _i], debt: 32950 + _i * 450, liab: 400, income: 4150 });
+      _dm.push({ month: _m.getFullYear() + '-' + String(_m.getMonth() + 1).padStart(2, '0'), nw: _nw[7 - _i], debt: 23050 + _i * 430, liab: 4200, income: 4835 });
     }
     _demoPut('pos_ov1', JSON.stringify({
       assets: [], debts: [], snapshots: _dm,
-      milestones: [10000, 0, 25000, 50000, 100000],
+      milestones: [10000, 25000, 0, 50000, 100000],
       income: [
-        { id: 1, name: 'Salary',        amount: 3800, cat: 'salary'   },
-        { id: 2, name: 'Side Projects', amount: 350,  cat: 'business' }
+        { id: 1, name: 'Salary (£57k)',          amount: 3635, cat: 'salary'   },
+        { id: 2, name: 'Freelance consulting',   amount: 1200, cat: 'business' }
       ],
       expenses: [
-        { id: 3, name: 'Rent', amount: 1200, category: 'necessity', cat: 'housing', type: 'ce' },
-        { id: 4, name: 'Groceries', amount: 380, category: 'necessity', cat: 'groceries', type: 've' },
-        { id: 5, name: 'Transport', amount: 130, category: 'necessity', cat: 'transport', type: 've' },
-        { id: 6, name: 'Utilities & bills', amount: 165, category: 'necessity', cat: 'utilities', type: 've' },
-        { id: 7, name: 'Phone & internet', amount: 45, category: 'necessity', cat: 'phone', type: 'ce' },
-        { id: 8, name: 'Insurance', amount: 60, category: 'necessity', cat: 'insurance', type: 'ce' },
-        { id: 9, name: 'Subscriptions', amount: 62, category: 'discretionary', cat: 'subs', type: 'cn' },
-        { id: 10, name: 'Gym & health', amount: 45, category: 'discretionary', cat: 'fitness', type: 'cn' },
-        { id: 11, name: 'Eating out', amount: 95, category: 'discretionary', cat: 'dining', type: 'vn' },
-        { id: 12, name: 'Entertainment', amount: 80, category: 'discretionary', cat: 'fun', type: 'vn' },
-        { id: 13, name: 'Holidays', amount: 200, category: 'discretionary', cat: 'travel', type: 'vn' },
-        { id: 14, name: 'Gifts & giving', amount: 100, category: 'discretionary', cat: 'gifts', type: 'vn' },
-        { id: 15, name: 'House deposit', amount: 258, category: 'investment', cat: 'deposit', type: 'sv' },
-        { id: 16, name: 'ISA / investments', amount: 400, category: 'investment', cat: 'invest', type: 'iv' },
-        { id: 17, name: 'Pension', amount: 190, category: 'investment', cat: 'pension', type: 'iv' },
-        { id: 18, name: 'Emergency fund', amount: 300, category: 'investment', cat: 'emergency', type: 'sv' },
-        { id: 19, name: 'Savings', amount: 440, category: 'investment', cat: 'savings', type: 'sv' }
+        { id: 3, name: 'Rent', amount: 1150, category: 'necessity', cat: 'housing', type: 'ce' },
+        { id: 4, name: 'Groceries', amount: 340, category: 'necessity', cat: 'groceries', type: 've' },
+        { id: 5, name: 'Transport', amount: 160, category: 'necessity', cat: 'transport', type: 've' },
+        { id: 6, name: 'Utilities & bills', amount: 170, category: 'necessity', cat: 'utilities', type: 've' },
+        { id: 7, name: 'Phone & internet', amount: 48, category: 'necessity', cat: 'phone', type: 'ce' },
+        { id: 8, name: 'Insurance', amount: 55, category: 'necessity', cat: 'insurance', type: 'ce' },
+        { id: 9, name: 'Subscriptions', amount: 58, category: 'discretionary', cat: 'subs', type: 'cn' },
+        { id: 10, name: 'Gym & health', amount: 42, category: 'discretionary', cat: 'fitness', type: 'cn' },
+        { id: 11, name: 'Eating out', amount: 120, category: 'discretionary', cat: 'dining', type: 'vn' },
+        { id: 12, name: 'Entertainment', amount: 90, category: 'discretionary', cat: 'fun', type: 'vn' },
+        { id: 13, name: 'Holidays', amount: 180, category: 'discretionary', cat: 'travel', type: 'vn' },
+        { id: 14, name: 'Gifts & giving', amount: 80, category: 'discretionary', cat: 'gifts', type: 'vn' },
+        { id: 15, name: 'House deposit', amount: 550, category: 'investment', cat: 'deposit', type: 'sv' },
+        { id: 16, name: 'ISA / investments', amount: 350, category: 'investment', cat: 'invest', type: 'iv' },
+        { id: 17, name: 'Pension (extra)', amount: 150, category: 'investment', cat: 'pension', type: 'iv' },
+        { id: 18, name: 'Emergency fund', amount: 200, category: 'investment', cat: 'emergency', type: 'sv' },
+        { id: 19, name: 'Savings', amount: 250, category: 'investment', cat: 'savings', type: 'sv' }
       ]
     }));
   }
   if (!localStorage.getItem('pos_al1')) {
     _demoPut('pos_al1', JSON.stringify({
-      metals: { gold: 2.5, silver: 15, platinum: 0, palladium: 0 },
+      metals: { gold: 1.5, silver: 10, platinum: 0, palladium: 0 },
       crypto: [{ id: 1, sym: 'ETH', amount: 1.4, price: 2200 }, { id: 2, sym: 'BTC', amount: 0.05, price: 42000 }],
+      // the £18,500 house pot lives in House Builder (ht3) and counts there, so it is not repeated here
       cashAccounts: [
-        { id: 1, name: 'Marcus Savings', type: 'Savings', balance: 14800, rate: 4.7 },
-        { id: 2, name: 'Current Account', type: 'Current', balance: 2300, rate: 0 },
-        { id: 3, name: 'Lifetime ISA', type: 'LISA', balance: 8200, rate: 3.5 }
+        { id: 1, name: 'Marcus Savings (emergency fund)', type: 'Savings', balance: 4800, rate: 4.5 },
+        { id: 2, name: 'Current Account', type: 'Current', balance: 2100, rate: 0 }
       ],
-      otherAssets: [{ id: 4, name: 'Car · Honda Civic', value: 12500 }],
-      liabilities: [{ id: 5, name: 'Car Finance', value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z', runningCost: 180, depRate: 12 }],
+      otherAssets: [{ id: 5, name: 'Car · Honda Civic', value: 9500 }],
+      liabilities: [{ id: 6, name: 'Car Finance', value: 4200, rate: 7.9, addedDate: '2024-06-01T00:00:00.000Z', runningCost: 180, depRate: 12 }],
       stockPies: [{ id: 1, name: 'Stocks & Shares ISA' }], activePie: 1,
       stocks: [
-        { id: 1, pie: 1, sym: 'VUSA.L', name: 'Vanguard S&P 500 UCITS ETF',  units: 180, avgCost: 62.4, price: 78.1,  change: 0 },
-        { id: 2, pie: 1, sym: 'VWRL.L', name: 'Vanguard FTSE All-World ETF', units: 95,  avgCost: 98,   price: 108.6, change: 0 },
-        { id: 3, pie: 1, sym: 'AAPL',   name: 'Apple Inc.',                  units: 12,  avgCost: 140,  price: 196.4, change: 0 }
+        { id: 1, pie: 1, sym: 'VUSA.L', name: 'Vanguard S&P 500 UCITS ETF',  units: 120, avgCost: 62.4, price: 78.1,  change: 0 },
+        { id: 2, pie: 1, sym: 'VWRL.L', name: 'Vanguard FTSE All-World ETF', units: 60,  avgCost: 98,   price: 108.6, change: 0 }
       ]
     }));
   }
   if (!localStorage.getItem('ht3')) {
     // House Builder reads "ht3" (the old demo wrote an unused key, so the house stayed blank)
     _demoPut('ht3', JSON.stringify({
-      saved: 22500, target: 240000, houseType: 'terraced',
+      saved: 18500, target: 320000, houseType: 'semi',
       deposits: [
-        { date: '01/10/2025', amount: 5000 }, { date: '01/11/2025', amount: 4500 },
-        { date: '01/12/2025', amount: 3500 }, { date: '01/01/2026', amount: 4000 },
-        { date: '01/02/2026', amount: 3200 }, { date: '01/03/2026', amount: 2300 }
+        { date: '01/04/2026', amount: 3000 }, { date: '01/05/2026', amount: 2500 },
+        { date: '01/06/2026', amount: 2800 }, { date: '01/07/2026', amount: 2600 },
+        { date: '01/08/2026', amount: 2400 }, { date: '01/09/2026', amount: 2700 },
+        { date: '01/10/2026', amount: 2500 }
       ],
       prices: { terraced: 240000, semi: 320000, detached: 500000, mansion: 1500000, flat: 80000, apartment: 300000 },
-      apartmentFloor: 5, houseMode: null, mortgageBalance: 0
+      depositPct: 10, apartmentFloor: 5, houseMode: null, mortgageBalance: 0
     }));
     // the house code read its state before this seed existed (v0.7, 1 Nov: a fresh device showed an empty plot): read it again now
     try { if (typeof state !== 'undefined' && !(+state.saved > 0)) { var _hd = JSON.parse(localStorage.getItem('ht3')); state = Object.assign({}, state, _hd, { prices: Object.assign({}, DEFAULTS, _hd.prices || {}) }); } } catch (e) {}
   }
   if (!localStorage.getItem('pos_journey')) {
     _demoPut('pos_journey', JSON.stringify({
-      profile: { monthlyTakeHome: 3800, mortgageTermYears: 25, interestRateEst: 4.5, depositTargetPct: 10, creditHealth: 'good', efMonths: 4 },
-      onboarded: true, stageOverride: 1, mortgageActive: false, mortgageBalance: 0, rentMonthly: 1200, rentYears: 3
+      profile: { monthlyTakeHome: 3635, mortgageTermYears: 25, interestRateEst: 4.5, depositTargetPct: 10, creditHealth: 'good', efMonths: 4 },
+      onboarded: true, stageOverride: 1, mortgageActive: false, mortgageBalance: 0, rentMonthly: 1150, rentYears: 4
     }));
   }
   // (QC-3) pos4 removed — it was never read; cashflow reads pos_ov1 / ovState.
   if (!localStorage.getItem('pos_debt1')) {
     _demoPut('pos_debt1', JSON.stringify({
       debts: [
-        { id: 1, name: 'Student Loan Plan 2', balance: 24300, original: 38000, rate: 7.1, minPay: 180, type: 'loan', color: '#c9a84c' },
-        { id: 2, name: 'Barclaycard', balance: 1850, original: 3200, rate: 24.9, minPay: 55, type: 'credit', color: '#44c0b9' }
+        { id: 1, name: 'Student Loan Plan 2', balance: 21800, original: 38000, rate: 7.1, minPay: 214, type: 'loan', color: '#c9a84c' },
+        { id: 2, name: 'Barclaycard', balance: 1250, original: 3200, rate: 24.9, minPay: 45, type: 'credit', color: '#44c0b9' }
+      ]
+    }));
+  }
+  if (!localStorage.getItem('pos_biz1')) {
+    // Entrepreneur tab: freelance product consulting on the side (two retained clients, three leads, one stream building)
+    var _now = Date.now();
+    _demoPut('pos_biz1', JSON.stringify({
+      clients: [
+        { id: _now - 5, name: 'Northgate Health', monthly: 700, status: 'Active', notes: 'Fractional product lead, one day a week', email: 'ops@northgatehealth.example', phone: '', website: 'northgatehealth.example' },
+        { id: _now - 4, name: 'Fernbrook Studio', monthly: 500, status: 'Active', notes: 'Roadmap and discovery sprints', email: 'hello@fernbrook.example', phone: '', website: 'fernbrook.example' }
+      ],
+      leads: [
+        { id: _now - 3, name: 'Nova Retail', email: 'team@novaretail.example', phone: '', website: 'novaretail.example', stage: 'hot', value: 900, notes: 'Checkout redesign discovery, proposal sent' },
+        { id: _now - 2, name: 'Harbour & Co', email: 'jo@harbourco.example', phone: '', website: '', stage: 'warm', value: 600, notes: 'Intro call done, wants a product audit' },
+        { id: _now - 1, name: 'Lumen Fintech', email: '', phone: '', website: 'lumenfintech.example', stage: 'cold', value: 1200, notes: 'Referral from Fernbrook' }
+      ],
+      streams: [{ id: _now, name: 'Consulting day rate', monthly: 1200 }],
+      incomeStreams: [
+        { id: _now + 1, name: 'Product consulting', icon: '💼', type: 'active', monthlyIncome: 1200, status: 'active', steps: [], progress: 100, totalInvested: 350, monthlyHistory: [600, 700, 700, 1200, 1200, 1200],
+          tasks: [{ id: _now + 11, text: 'Send Nova Retail proposal', stage: 'done' }, { id: _now + 12, text: 'Northgate roadmap review', stage: 'inprogress' }, { id: _now + 13, text: 'Harbour & Co product audit quote', stage: 'todo' }, { id: _now + 14, text: 'Invoice Fernbrook for October', stage: 'todo' }] },
+        { id: _now + 2, name: 'Notion templates shop', icon: '📝', type: 'passive', monthlyIncome: 85, status: 'building', steps: [], progress: 40, totalInvested: 120, monthlyHistory: [0, 20, 45, 60],
+          tasks: [{ id: _now + 21, text: 'Design the budget planner template', stage: 'done' }, { id: _now + 22, text: 'Set up the Gumroad page', stage: 'inprogress' }, { id: _now + 23, text: 'Post the launch thread', stage: 'todo' }] }
       ]
     }));
   }
@@ -29965,6 +30004,20 @@ function clearDemoData() {
 }
 
 function initDemoMode() {
+  var launch = null; try { launch = localStorage.getItem('vi_demo_launch'); } catch (e) {}
+  if (launch === 'a') {
+    // vault-it.co/demo-a: the pre-paint script has already emptied this browser. Seed the sample, open a 24h demo session
+    // and reload once on a clean address, so every tab draws from the seeded keys the ordinary way.
+    try { localStorage.removeItem('vi_demo_launch'); } catch (e) {}
+    if (loadDemoData(true)) {
+      try {
+        localStorage.setItem('vi_demo_variant', 'a');
+        localStorage.setItem('vi_session', JSON.stringify({ email: 'demo@vault-it.app', expiry: Date.now() + 24 * 60 * 60 * 1000 }));
+      } catch (e) {}
+    }
+    location.replace(location.pathname);
+    return;
+  }
   var isDemo  = localStorage.getItem('vi_demo_mode') === 'true';
   // any saved data (not just pos_ov1), a profile, a sign-in or an earlier "no thanks" means this is not an empty device
   var hasData = !isDemo && _viDeviceHasSavedData();
