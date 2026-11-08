@@ -31,9 +31,9 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
 
   let p = await open(390, 844, true);
   const n = await p.locator('.frame').count();
-  ok(n === 10, 'ten slides: the four answers, the live deck\'s slides 5 to 8 for question 4, Black Friday and the closing demo link: ' + n);
+  ok(n === 9, 'nine slides: the four answers, the live deck\'s slides 5 to 8 for question 4, and one closing slide with Black Friday and the demo link: ' + n);
   { const ids = await p.evaluate(() => [...document.querySelectorAll('.frame > section')].map((s) => s.id));
-    ok(ids.join() === 'cover,spend,ask,founders,gap,solution,features,evidence,launch,close', 'slide order: ' + ids); }
+    ok(ids.join() === 'cover,spend,ask,founders,gap,solution,features,evidence,launch', 'slide order: ' + ids); }
   ok(p.errs.length === 0, 'no page errors: ' + p.errs.join(' | '));
   const body = await p.evaluate(() => document.body.innerText);
   ok(/Not regulated by the FCA\. Not financial advice\./i.test(body), 'the FCA line is on the page');
@@ -63,8 +63,8 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     const k = await p.evaluate(() => ['gap', 'solution', 'features', 'evidence'].map((id) => document.querySelector('#' + id + ' p').textContent));
     ok(k.every((t) => /^4 · /.test(t)), 'the four product slides are numbered as the answer to question 4: ' + k.join(' | ')); }
   { const links = await p.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')));
-    ok(links.includes('https://vault-it.co/demo-a') && await p.evaluate(() => !!document.querySelector('#close a[href="https://vault-it.co/demo-a"]')), 'the demo link is exactly https://vault-it.co/demo-a, on the closing slide: ' + links.join(' '));
-    ok(links.includes('https://vault-it.co/pitch-Eligent'), 'the full deck link is vault-it.co/pitch-Eligent'); }
+    ok(links.includes('https://vault-it.co/demo-a') && await p.evaluate(() => !!document.querySelector('#launch a[href="https://vault-it.co/demo-a"]')), 'the demo link is exactly https://vault-it.co/demo-a, on the closing slide: ' + links.join(' '));
+    ok(!links.includes('https://vault-it.co/pitch-Eligent') && !/No sign-up/.test(await txt(p, 'launch')), 'the last slide has no full-deck link and no sign-up line (owner, 8 Nov)'); }
   { const bf = await txt(p, 'launch'); ok(/100 places at £149/.test(bf) && /never reopened/.test(bf) && !/£199|£99/.test(bf), 'the Founding pre-sale matches Stripe: 100 places at £149'); }
   // brand marks
   { const w = await p.evaluate(() => { const h = document.querySelector('#cover h1'), sp = h && h.querySelector('span'); return h && sp ? { all: h.textContent, it: sp.textContent, col: getComputedStyle(sp).color, rest: getComputedStyle(h).color } : null; });
