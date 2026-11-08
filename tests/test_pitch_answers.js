@@ -43,6 +43,10 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   { const s = await txt(p, 'spend'); ok(/£3,214\.08/.test(s) && /£2,410\.56/.test(s) && /£2,661\.63/.test(s) && /JANUARY TO NOVEMBER 2026/.test(s) && /own money/i.test(s) && !/£606|£226/.test(s), 'invested to date: the owner\'s three business-account figures, no leftover receipt figures');
     const rows = await p.evaluate(() => [...document.querySelectorAll('#spend table[data-invest] tr[data-row]')].map((r) => r.dataset.row + '=' + r.querySelectorAll('td')[1].textContent.trim()));
     ok(rows.join() === 'invested=£3,214.08,spent=£2,410.56,turnover=£2,661.63', 'the table has the three rows in order: ' + rows.join(' ')); }
+  { const cats = await p.evaluate(() => [...document.querySelectorAll('#spend table[data-spend] tr[data-cat]')].map((r) => [...r.querySelectorAll('td')].map((c) => c.textContent.trim())));
+    const sum = Math.round(cats.reduce((a, c) => a + +c[1].replace(/[£,]/g, ''), 0) * 100) / 100, total = await p.evaluate(() => document.querySelector('#spend tr[data-total] td:last-child').textContent.trim());
+    ok(cats.length === 8 && sum === 2700.71 && total === '£2,700.71', 'the spend table has the 8 categories and they add to the shown total: ' + sum + ' vs ' + total);
+    ok(!/Synthesia|Upwork|Trainline|Facebook|Incogni|Amazon|Wix|Claude/.test(await txt(p, 'spend')), 'categories only, no supplier names'); }
   { const a = await txt(p, 'ask'); ok(/£250,000/.test(a) && /SEIS/.test(a) && /March 2027/.test(a) && /50% income tax relief/.test(a) && /December 2027/.test(a) && /£43,400/.test(a) && /£261,390/.test(a), 'the ask: £250,000 under SEIS, closing March 2027, break-even December 2027');
     const uf = await p.evaluate(() => [...document.querySelectorAll('#ask [data-fund]')].map((e) => [e.dataset.fund, e.innerText]));
     const pct = uf.map((x) => x[0]).join('/'), sum = uf.reduce((s, x) => s + +(x[1].match(/£([\d,]+)/) || [0, '0'])[1].replace(/,/g, ''), 0);
