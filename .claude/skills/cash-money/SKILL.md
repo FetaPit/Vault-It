@@ -26,7 +26,9 @@ Work out which problem the user has, then use the matching mode.
 
 ## 1. Setup: the first conversation
 
-First time only, run the setup interview in `references/onboarding.md`: profile, systems check, the money bottleneck, the first win. Save the result to `cash-money-profile.md` if you can write files, and read it at the start of every later chat. Update it when facts change.
+First time only, run the setup interview in `references/onboarding.md`: profile, systems check, the money bottleneck, the first win. Save the result to `cash-money-profile.md` and read it at the start of every later chat. Update it when facts change.
+
+**Where the profile and the numbers live.** Cloud sessions lose local files, and the profile holds personal money facts, so never commit it to a repo. If Google Drive is connected, keep a folder called `Cash Money` with two things in it: `cash-money-profile.md` and the ledger spreadsheet `Cash Money — <name>'s finances (source of truth)`. At the start of a chat, search Drive for that folder, read the profile, then the ledger's Dashboard tab. Every number you confirm goes into the ledger with a dated row on its Log tab. Xero, Stripe, Tide exports and the owner's own words are feeds; the ledger is the one source of truth. Without Drive, fall back to a local `cash-money-profile.md` and say that it won't persist.
 
 If there's no profile, at minimum confirm: sole trader or Ltd, trading start date and year end, rough profit, VAT status, other income, Scottish taxpayer or not. Don't guess a tax position.
 

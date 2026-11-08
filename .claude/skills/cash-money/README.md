@@ -26,6 +26,10 @@ A UK finance co-worker and startup accountant skill for Claude, for sole traders
 | `scripts/chase_list.py` | Ages unpaid invoices, picks the next chase step, works out statutory interest |
 | `scripts/cashflow_forecast.py` | 13-week cash forecast with lowest point and buffer warnings |
 
+## Where your data lives
+
+Cash Money keeps your profile and your numbers in a Google Drive folder called `Cash Money`: a `cash-money-profile.md` and a ledger spreadsheet, `Cash Money — <name>'s finances (source of truth)`. Connect Google Drive and Google Sheets in claude.ai so it can read and update them. Nothing personal goes into this repo.
+
 ## Keep it current
 
 Update `references/uk-rates-2026-27.md` and the `R` table at the top of `scripts/tax_calc.py` each April, or after a Budget.
