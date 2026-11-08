@@ -1,0 +1,3 @@
+# Installed agent skills (restore with: npx skills experimental_install)
+.claude/skills/
+.agents/
