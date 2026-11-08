@@ -87,6 +87,22 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   }
   ok(p.errs.length === 0, 'no page errors with the live viewports: ' + p.errs.join(' | '));
 
+  // Print (the PDF export): the live viewports are hidden so the stills underneath show, never an empty box over the heading
+  await p.emulateMedia({ media: 'print' });
+  ok(await p.evaluate(() => [...document.querySelectorAll('.live')].every((b) => getComputedStyle(b).display === 'none')), 'in print the live viewports are hidden and the still pictures show');
+  await p.emulateMedia({ media: 'screen' });
+
+  // Tablets in portrait and a phone: in Present mode the live viewports mount from a 400 px box (owner, 8 Nov: "These are static" on a tablet)
+  for (const [w, h, want] of [[768, 1024, true], [834, 1194, true], [1024, 1366, true], [390, 844, false]]) {
+    const ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true });
+    const q = await ctx.newPage(); q.on('pageerror', (e) => p.errs.push(e.message));
+    await q.goto(BASE + '/pitch-Eligent-answers?present', { waitUntil: 'load' }); await q.waitForTimeout(300);
+    await q.keyboard.press('End'); await q.keyboard.press('ArrowLeft'); await q.waitForTimeout(2500);
+    const st = await q.evaluate(() => { const b = document.querySelector('.live[data-live="trk"]'); const r = b.getBoundingClientRect(); return { on: b.classList.contains('on'), w: Math.round(r.width), slide: document.querySelector('.frame.on section').id }; });
+    ok(st.slide === 'evidence' && st.on === want && (want ? st.w >= 400 : st.w < 400), w + 'x' + h + ' portrait, Present: the Net worth progress viewport is ' + (want ? 'live' : 'the still') + ' (box ' + st.w + 'px): ' + JSON.stringify(st));
+    await ctx.close();
+  }
+
   // Laptop: the Present view
   p = await open(1280, 800);
   await p.click('#pv-open');

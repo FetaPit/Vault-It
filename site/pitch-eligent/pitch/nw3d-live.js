@@ -507,9 +507,10 @@ document.querySelectorAll('.live[data-live]').forEach(function(box){
         var x=s.lab+(s.forecast?' (forecast)':'')+': net worth '+fmt(s.v.nw);if(s.sel.debt)x+=' · debt '+fmt(s.v.debt);if(s.sel.inc&&!s.forecast)x+=' · income '+fmt(s.v.inc)+'/mo';read.textContent=x}});
       eng.setData(T);read.textContent=today;
     }
-    /* live only where the 3D has room (480 px and up: laptop, tablet, a phone turned sideways in Present mode);
+    /* live only where the 3D has room (400 px and up: laptop, tablet in either orientation, a large phone turned sideways in
+       Present mode; owner, 8 Nov 2026, a tablet in portrait scaled the box to about 470 px and showed the still: "These are static");
        a smaller box keeps the matching still underneath, since the engine's labels would cover the scene */
-    var sm=function(){box.classList.toggle('on',box.clientWidth>=480)};sm();if('ResizeObserver' in window)new ResizeObserver(sm).observe(box);else addEventListener('resize',sm);
+    var sm=function(){box.classList.toggle('on',box.clientWidth>=400)};sm();if('ResizeObserver' in window)new ResizeObserver(sm).observe(box);else addEventListener('resize',sm);
   }catch(e){box.classList.remove('on');return}
   box.addEventListener('click',function(e){var b=e.target.closest('[data-z]');if(!b)return;e.stopPropagation();
     if(b.getAttribute('data-z')==='reset')eng.reset();else eng.zoom(b.getAttribute('data-z')==='in'?1.25:.8)});
