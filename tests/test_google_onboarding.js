@@ -7,7 +7,7 @@
 //   3. a Google sign-in that comes back with an error says so on the sign-in card and cleans the address bar
 //   4. a session that came from Google skips the PIN prompt; an emailed-code session does not
 //   B. Onboarding
-//   5. one question per screen, "Step n of 5", Back works
+//   5. one question per screen, "Step n of 6" (the deposit pot screen came with v0.95), Back works
 //   6. signed in: the email is never asked again and the first name comes from Google
 //   7. the plan screen: three phases from where you are, one step for this week, your own sums, a weekly check-in day
 //   8. finishing saves the check-in day and opens the step's tab; on check-in day the app says the next step, once
@@ -77,14 +77,14 @@ const tok = (methods) => 'x.' + Buffer.from(JSON.stringify({ amr: methods.map(m 
     const scr = () => p.evaluate(() => { const v = [...document.querySelectorAll('#welcome-overlay .wz-screen')].filter(s => s.offsetParent !== null);
       return { n: v.length, at: v[0] ? v[0].dataset.s : '', count: (document.getElementById('wz-count') || {}).textContent || '', side: document.documentElement.scrollWidth - innerWidth }; });
     let s = await scr();
-    ok(s.n === 1 && s.at === '1' && /Step 1 of 5/.test(s.count), T + 'B5 one screen at a time, Step 1 of 5 (' + JSON.stringify(s) + ')');
+    ok(s.n === 1 && s.at === '1' && /Step 1 of 6/.test(s.count), T + 'B5 one screen at a time, Step 1 of 6 (' + JSON.stringify(s) + ')');
     // B6: signed in with Google: name filled, email not asked
     const pre = await p.evaluate(() => { _supaUser = { id: 'u1', email: 't@t.com', user_metadata: { full_name: 'Tess Test' } }; viWelcomePrefill();
       const f = document.getElementById('w-email-field'), si = document.getElementById('wz-signed');
       return { name: document.getElementById('w-name').value, email: document.getElementById('w-email').value, fHidden: !f || f.offsetParent === null, signed: si && si.offsetParent !== null ? si.textContent : '' }; });
     ok(pre.name === 'Tess' && pre.email === 't@t.com' && pre.fHidden && /t@t\.com/.test(pre.signed), T + 'B6 signed in: first name from Google, email not asked again (' + JSON.stringify(pre) + ')');
     await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(150);
-    s = await scr(); ok(s.at === '2' && /Step 2 of 5/.test(s.count), T + 'B5 Next goes to step 2');
+    s = await scr(); ok(s.at === '2' && /Step 2 of 6/.test(s.count), T + 'B5 Next goes to step 2');
     await p.click('#wz-back'); await p.waitForTimeout(150);
     s = await scr(); ok(s.at === '1', T + 'B5 Back returns to step 1');
     await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(150);
@@ -97,12 +97,14 @@ const tok = (methods) => 'x.' + Buffer.from(JSON.stringify({ amr: methods.map(m 
     await p.fill('#w-income', '2000'); await p.fill('#w-expenses', '1500'); await p.click('#wz-s3 .welcome-cta'); await p.waitForTimeout(150);
     s = await scr(); ok(s.at === '4', T + 'B5 then your home');
     await p.click('#w-htypes .w-ht[data-type="terraced"]'); await p.click('#wz-s4 .welcome-cta'); await p.waitForTimeout(250);
+    s = await scr(); ok(s.at === '5', T + 'B5 then your deposit pot (v0.95; test_v095_onboarding_pot covers it)');
+    await p.click('#w-pot-opts .welcome-opt[data-pot="none"]'); await p.click('#wz-s5 .welcome-cta'); await p.waitForTimeout(250);
     s = await scr();
     const plan = await p.evaluate(() => { const el = document.getElementById('wz-plan'), days = [...document.querySelectorAll('#wz-days button')];
       return { at: '', ph: [...el.querySelectorAll('.wz-phase-name')].map(x => x.textContent.trim()), now: (el.querySelector('.wz-phase.now .wz-phase-name') || {}).textContent || '',
         step: (el.querySelector('.wz-week') || {}).textContent || '', sums: (el.querySelector('.wz-sums') || {}).textContent || '', days: days.length, pressed: days.filter(d => d.getAttribute('aria-pressed') === 'true').length,
         cta: (document.getElementById('w-finish') || {}).textContent || '', text: document.getElementById('welcome-overlay').innerText }; });
-    ok(s.at === '5' && /Step 5 of 5/.test(s.count), T + 'B7 the last screen is your plan');
+    ok(s.at === '6' && /Step 6 of 6/.test(s.count), T + 'B7 the last screen is your plan');
     ok(plan.ph.join(',') === 'Survival,Stabilise,Save' && plan.now === 'Survival', T + 'B7 three phases from where you are, the first marked now (' + plan.ph.join(',') + ')');
     ok(/Debt tracker/.test(plan.step) && /this week/i.test(plan.step), T + 'B7 one step for this week, in the app (' + plan.step.slice(0, 90) + ')');
     ok(/£2,000/.test(plan.sums) && /£1,500/.test(plan.sums) && /£500/.test(plan.sums), T + 'B7 your own sums: £2,000 in, £1,500 out, about £500 left (' + plan.sums + ')');
@@ -110,7 +112,7 @@ const tok = (methods) => 'x.' + Buffer.from(JSON.stringify({ amr: methods.map(m 
     ok(!/—/.test(plan.text), T + 'B9 no em dashes on the onboarding screens');
     const look = await p.evaluate(() => { const f = document.getElementById('w-finish').getBoundingClientRect(), d = [...document.querySelectorAll('#wz-days button')];
       const on = d.find(x => x.getAttribute('aria-pressed') === 'true'), off = d.find(x => x.getAttribute('aria-pressed') !== 'true'), bg = e => getComputedStyle(e).backgroundColor;
-      const more = document.querySelector('#wz-s5 details.wz-more');
+      const more = document.querySelector('#wz-s6 details.wz-more');
       return { ctaSeen: f.top >= 0 && f.bottom <= innerHeight + 1, dayDiff: bg(on) !== bg(off), folded: !!more && !more.open && !!more.querySelector('#w-phone-s1') && !!more.querySelector('.w-view-pick') }; });
     ok(look.ctaSeen, T + "Pedro 1: Start this week's step is on screen without scrolling (" + JSON.stringify(look) + ')');
     ok(look.folded, T + 'Pedro 1: screen size and phone are folded under Optional');

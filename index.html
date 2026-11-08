@@ -7646,9 +7646,12 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this.apply();
   };
   VP.animateTo = function (p1) { p1 = clamp(p1, 0, 1); if (this._pendingOpen != null) { this._pendingOpen = Math.max(this._pendingOpen, p1); this.wake(); return; } this._target = p1; this.wake(); };   // a deposit before the stage is half on screen joins the waiting opening
-  // v0.7 opening: everything up to p0 is in place on the first frame; the bricks between p0 and p1 (the newest course at most) lay themselves
-  VP.openAt = function (p0, p1, onLaid) {
+  // v0.7 opening: everything up to p0 is in place on the first frame; the bricks between p0 and p1 (the newest course at most) lay themselves.
+  // v0.95 entry (opts.slowS, owner 8 Nov): the whole run from p0 lays from the ground over about slowS seconds, 120 ms a brick at most
+  // (the onboarding deposit pot's first open). Reduced motion: everything at once, as every other open.
+  VP.openAt = function (p0, p1, onLaid, opts) {
     p1 = clamp(p1, 0, 1); p0 = clamp(p0, 0, p1);
+    this._openS = opts && +opts.slowS > 0 ? +opts.slowS : 0;
     this.p = p0; this._target = p0; this._primed = false; this._pendingOpen = null;
     this._onLaid = typeof onLaid === 'function' ? onLaid : null; this._openLay = false;   // called once the opening course has actually laid (the app writes its "bricks seen" note then, not at open)
     this.apply();
@@ -7673,7 +7676,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var V = H.brandUnits(P, p), V0 = this._V == null ? -1 : this._V, inst = motion || !this._primed;
     var add = Math.max(0, V - Math.max(V0, 0)), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.24, 1.8 / add) : 0;   // owner, 2 Nov: twice the brand book's min(0.12, 0.9 / n)
     var open = !!this._open; this._open = false;
-    if (open && !inst && add > 0) stp = Math.min(0.08, 2.4 / add);   // the opening course: each brick 80 ms after the last, the whole course started within 2.4 s (owner: twice the v0.7 preview pace)
+    if (open && !inst && add > 0) stp = this._openS > 0 ? Math.min(0.12, this._openS / add) : Math.min(0.08, 2.4 / add);   // v0.95 entry: the run spread over slowS seconds, else   // the opening course: each brick 80 ms after the last, the whole course started within 2.4 s (owner: twice the v0.7 preview pace)
     if (V !== V0) {
       var st = HG.stamp, S = this._stats, n0 = 0;
       HG.recs.forEach(function (rec) {
@@ -7685,11 +7688,11 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         } else if (k1 < k0) { for (var k2 = k1; k2 < k0; k2++) st[(base + k2) * 2] = 1e9; }   // un-laying is instant
         rec.cnt = k1;
       });
-      if (inst) { if (!S.settledAtOpen && this._bDraws) S.settledAtOpen = Math.max(0, Math.min(P.N, V)); } else { S.animated += n0; S.stamped += n0; if (n0 > 0 && !open) { S.gapMs = stp * 1000; S.lastAdd = n0; } }
+      if (inst) { if (!S.settledAtOpen && this._bDraws) S.settledAtOpen = Math.max(0, Math.min(P.N, V)); } else { S.animated += n0; S.stamped += n0; if (n0 > 0 && !open) { S.gapMs = stp * 1000; S.lastAdd = n0; } if (open) { S.openAdd = n0; S.openUnits = add; S.openGapMs = stp * 1000; S.openSlow = this._openS > 0; } }
       if (open) { var Lb = H.brandBricksLaid(P.N, p), cur = Lb > 0 ? P.course[Lb - 1] : 0; S.courseBricks = Lb > 0 ? lowerBound(P.course, cur + 1) - lowerBound(P.course, cur) : 0; }
       this._stampDirty = true; this._V = V; this._lastStampAt = inst ? -1e9 : now + Math.max(0, add - 1) * stp; this._dirty = true;
     }
-    this._primed = true;
+    this._primed = true; if (open) this._openS = 0;   // the slow entry is one open only
     // Level 2: the parts in colour follow the equity share (eased by the frame loop, from 0 when the level opens)
     var eqS = L2 ? (this._bEq == null ? this.eq : this._bEq) : 0;
     var Vc1 = L2 ? H.brandColourUnits(P, eqS) : -1; if (Vc1 !== this._Vc) this._dirty = true; this._Vc = Vc1;
@@ -10607,7 +10610,11 @@ input:focus, textarea:focus, select:focus {
 .wz-days button[aria-pressed="true"]{border-color:var(--em);background:rgb(var(--teal-rgb) / .14);color:var(--em)}
 .wz-note{font-family:'DM Sans',sans-serif;font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);line-height:1.5;margin:0 0 14px}
 .welcome-opt{min-height:44px}
-#wz-s5 .welcome-field{margin-top:18px}
+#wz-s6 .welcome-field{margin-top:18px}
+#w-pot-opts{margin-top:8px}
+#w-pot-fields .welcome-field{margin-top:12px}
+#w-pot-fields label{font-size:var(--vi-fs-1)}
+.w-pot-opts .welcome-opt-icon .vi-ic{width:22px;height:22px;display:block;color:var(--teal)}
 .wz-days button[aria-pressed="true"]{background:var(--em);border-color:var(--em);color:rgb(var(--panel-rgb));font-weight:700}
 #w-finish{position:sticky;bottom:0;z-index:2;box-shadow:0 -10px 18px 4px var(--c1)}
 .wz-more{margin:4px 0 6px;border-top:1px solid var(--bd);padding-top:6px}
@@ -12175,9 +12182,9 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
          Back, never the email twice, then the plan: where you are, one step for this week, and a weekly check-in day. -->
     <div class="wz-top">
       <button type="button" class="wz-back" id="wz-back" onclick="wBack()" hidden>&larr; Back</button>
-      <div class="wz-count" id="wz-count" aria-live="polite">Step 1 of 5</div>
+      <div class="wz-count" id="wz-count" aria-live="polite">Step 1 of 6</div>
     </div>
-    <div class="wz-bar" id="w-step-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+    <div class="wz-bar" id="w-step-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
 
     <div id="wz-hero">
     <!-- Pioneer welcome header -->
@@ -12347,7 +12354,28 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <button class="welcome-cta" onclick="wNext()" style="margin-top:14px">Next &rarr;</button>
         <button type="button" class="wz-skip" onclick="wNext()">Skip for now</button>
       </section>
+      <!-- v0.95 (owner, 8 Nov 2026): "Ensure we ask a question onboarding if they have a lifetime isa or a savings account only for a house
+           deposit and its value and interest rate. Then populate that in the housebuiliding tab." A Yes shows the two fields; the pot lands
+           in the House Builder as a deposit in that account (wPotToHouse). -->
       <section class="wz-screen" data-s="5" id="wz-s5" hidden>
+        <h2 class="welcome-h2" tabindex="-1">Your deposit pot.</h2>
+        <div class="welcome-sub">Money you have already put aside for your home. It lays your first bricks in the House builder.</div>
+        <div class="w-label" id="w-pot-lbl">Do you have a Lifetime ISA or a savings account kept only for your house deposit?</div>
+        <div class="welcome-opts w-pot-opts" id="w-pot-opts" role="group" aria-labelledby="w-pot-lbl">
+          <button type="button" class="welcome-opt" data-pot="lisa_cash" aria-pressed="false" onclick="wPickPot(this)"><span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true"><use href="#vi-bank"/></svg></span><span><b>Yes, a Lifetime ISA</b>: the government adds 25% to what you pay in, up to £1,000 a year</span></button>
+          <button type="button" class="welcome-opt" data-pot="savings" aria-pressed="false" onclick="wPickPot(this)"><span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true"><use href="#vi-piggy"/></svg></span><span><b>Yes, a savings account</b>: kept only for the deposit</span></button>
+          <button type="button" class="welcome-opt" data-pot="none" aria-pressed="false" onclick="wPickPot(this)"><span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true"><use href="#vi-house-builder"/></svg></span><span><b>Not yet</b>: I'll start in the House builder</span></button>
+        </div>
+        <div class="wz-hint" id="w-pot-hint" role="alert" hidden>Enter how much is in it, or pick Not yet.</div>
+        <div id="w-pot-fields" hidden>
+          <div class="welcome-field"><label for="w-pot-value">How much is in it now? (<span class="w-currency-label">£</span>)</label><input type="number" class="welcome-inp" id="w-pot-value" placeholder="e.g. 6000" min="0" step="1" inputmode="decimal" oninput="this.style.borderColor=''"></div>
+          <div class="welcome-field"><label for="w-pot-rate">Interest rate (% AER), if you know it</label><input type="number" class="welcome-inp" id="w-pot-rate" placeholder="e.g. 4.5, as your provider quotes" min="0" max="100" step="0.01" inputmode="decimal"></div>
+          <div class="wz-note" id="w-pot-note">It shows in the House builder as your deposit so far, in that account. You can change it there any time.</div>
+        </div>
+        <button class="welcome-cta" onclick="wNext()" style="margin-top:14px">Next &rarr;</button>
+        <button type="button" class="wz-skip" onclick="wPotSkip()">Skip for now</button>
+      </section>
+      <section class="wz-screen" data-s="6" id="wz-s6" hidden>
         <h2 class="welcome-h2" tabindex="-1">Your plan.</h2>
         <div class="welcome-sub">Built from your answers. One step at a time.</div>
         <div id="wz-plan"></div>
@@ -16588,6 +16616,37 @@ function wPickHouse(b){
   var i=document.getElementById('w-house');
   if(i&&typeof state!=='undefined'&&state&&state.prices&&state.prices[_wHouse])i.placeholder='e.g. '+Math.round(state.prices[_wHouse]*(window.VI_CURRENCY_RATE||1)).toLocaleString('en-GB');
 }
+// v0.95 (owner, 8 Nov): the onboarding asks for a Lifetime ISA or a savings account kept only for the house deposit, its value and its
+// rate. The pot lands in the House Builder the way Lay the bricks records a deposit (the amount is all that counts; the account is a
+// note, state.depAcct), and the House Builder's first open lays those bricks from the ground (vi_hb_entry: a display note, not data).
+var _wPot=null;
+function wPickPot(b){
+  _wPot=b.dataset.pot;
+  document.querySelectorAll('#w-pot-opts .welcome-opt').forEach(function(x){var on=x===b;x.setAttribute('aria-pressed',String(on));x.classList.toggle('selected',on);});
+  var f=document.getElementById('w-pot-fields'),h=document.getElementById('w-pot-hint');if(h)h.hidden=true;
+  if(f){f.hidden=_wPot==='none';if(!f.hidden){var v=document.getElementById('w-pot-value');if(v){v.style.borderColor='';setTimeout(function(){try{v.focus({preventScroll:true});}catch(e){}},50);}}}
+}
+function _wPotVal(){var v=document.getElementById('w-pot-value'),n=v?parseFloat(v.value):0;return isFinite(n)&&n>0?n:0;}
+function _wPotCheck(){   // Next on the pot screen: a Yes needs the amount (the rate is optional); Not yet, or nothing picked, goes on
+  if(!_wPot||_wPot==='none')return true;
+  if(_wPotVal()>0){var r=document.getElementById('w-pot-rate'),rv=r&&r.value!==''?parseFloat(r.value):null;
+    if(rv!==null&&!(isFinite(rv)&&rv>=0&&rv<=100)){showToast('Enter the rate as a percentage, for example 4.5');if(r)r.focus();return false;}return true;}
+  var h=document.getElementById('w-pot-hint');if(h)h.hidden=false;
+  var v=document.getElementById('w-pot-value');if(v){v.style.borderColor='var(--re)';try{v.focus({preventScroll:true});}catch(e){}}
+  showToast('Enter how much is in it, or pick Not yet');return false;
+}
+function wPotSkip(){_wPot=null;var h=document.getElementById('w-pot-hint');if(h)h.hidden=true;wGo(_wzAt+1);}
+function wPotToHouse(type,value,rateStr){
+  if(!(value>0)||typeof state==='undefined'||!state)return false;
+  var vBase=value/(window.VI_CURRENCY_RATE||1),acct={type:type,name:''},r=parseFloat(rateStr);
+  if(isFinite(r)&&r>=0&&r<=100)acct.rate=Math.round(r*100)/100;
+  state.depAcct=acct;
+  var dep={amount:vBase,date:new Date().toLocaleDateString('en-GB'),acct:{t:type,n:''}};if(acct.rate!=null)dep.acct.r=acct.rate;
+  state.saved=(+state.saved||0)+vBase;if(!Array.isArray(state.deposits))state.deposits=[];state.deposits.push(dep);
+  try{localStorage.setItem('vi_hb_entry','1');}catch(e){}   // money already put aside is not this week's saving habit, so no habit contribution (Pedro, 8 Nov)
+  try{prevP=pct();save();updateUI();hbtPaint();}catch(e){}
+  return true;
+}
 window.addEventListener('load',function(){try{hbtPaint();}catch(e){}});
 
 document.getElementById('btnSP').addEventListener('click',()=>{
@@ -16978,7 +17037,7 @@ function hbGbp0(v){return '£'+Math.round(v).toLocaleString('en-GB');}   // the 
 function hbDepAcctHtml(){
   var a=state.depAcct,hd='<div class="hb-sub-lbl hb-da-hd"><svg class="vi-ic" aria-hidden="true"><use href="#vi-bank"/></svg> Deposit account</div>';
   if(!a||!a.type)return '<div class="hb-dacct" id="hb-dacct">'+hd+'<p class="hb-da-q">Where is this deposit held? Note the account to see its logo and rate here. Your saved total and bricks stay the same.</p><button type="button" class="stk-btn" onclick="hbOpenDepAcct()">Add the account</button></div>';
-  var nm=String(a.name||'').trim(),sub=hbEsc(hbDepTypeName(a.type))+(a.rate!=null?' <span class="hb-da-rate">· '+hbEsc(a.rate)+'% AER</span>':''),out='<div class="hb-dacct on" id="hb-dacct">'+hd
+  var nm=String(a.name||'').trim(),sub=(nm?hbEsc(hbDepTypeName(a.type)):'')+(a.rate!=null?(nm?' <span class="hb-da-rate">· ':'<span class="hb-da-rate">')+hbEsc(a.rate)+'% AER</span>':''),out='<div class="hb-dacct on" id="hb-dacct">'+hd
     +'<div class="hb-da-row">'+hbBankLogo(nm)+'<div class="hb-da-txt"><b>'+hbEsc(nm||hbDepTypeName(a.type))+'</b><span>'+sub+'</span></div><button type="button" class="stk-btn" onclick="hbOpenDepAcct()">Edit</button></div>';
   if(hbDepIsLisa(a.type)){
     var paid=+a.paidIn>0?+a.paidIn:0,tgt=+state.target||0;
@@ -17900,6 +17959,11 @@ function hbSeenBricks(key, set) {
   all[key] = set; try { localStorage.setItem('vi_hb_seen', JSON.stringify(all)); } catch (e) {}
   return set;
 }
+// v0.95: set by the onboarding when it records the deposit pot; the House Builder's first open then lays every brick from the ground
+// over about five seconds (a display note like vi_hb_seen, never the user's data; used once)
+function hbEntryPending(set) {
+  try { if (set === false) { localStorage.removeItem('vi_hb_entry'); return false; } return localStorage.getItem('vi_hb_entry') === '1'; } catch (e) { return false; }
+}
 function hb3dRedraw() {
   var el = document.getElementById('house-scene'); if (!el) return false;
   var sm = hbSceneMode(); HB3DAPP.want = sm;
@@ -17956,8 +18020,10 @@ function hb3dRedraw() {
     if (sm.mode === 'build') {   // opening (v0.7, owner 1 Nov): the finished house up to the newest course at once, only the bricks since the last visit lay (one course at most); a deposit eases up; un-laying is instant
       var seen = hbBrandModel(model) ? function () { hbSeenBricks(key2, HB3D.brandStats(model, sm.p).bricksLaid); } : null;
       if (first) {
-        var p0 = hbBrandModel(model) && HB3D.brandOpenFrom ? HB3D.brandOpenFrom(model, sm.p, hbSeenBricks(key2)) : sm.p; v.setState({ mode: 'build', eq: 0, p: p0 });
-        if (v.engine === 'house_gl') v.openAt(p0, sm.p, seen);   // the "bricks seen" note is written once the top course has actually laid, so a user who scrolls away before it lays sees it lay next time (David, 2 Nov)
+        var entry = sm.p > 0 && hbBrandModel(model) && hbEntryPending();   // v0.95: the onboarding pot's first open lays every brick from the ground, slowly
+        var p0 = entry ? 0 : (hbBrandModel(model) && HB3D.brandOpenFrom ? HB3D.brandOpenFrom(model, sm.p, hbSeenBricks(key2)) : sm.p); v.setState({ mode: 'build', eq: 0, p: p0 });
+        if (entry) hbEntryPending(false);
+        if (v.engine === 'house_gl') v.openAt(p0, sm.p, seen, entry ? { slowS: 5 } : null);   // the "bricks seen" note is written once the top course has actually laid, so a user who scrolls away before it lays sees it lay next time (David, 2 Nov)
         else { v.openAt(p0, sm.p); if (seen) seen(); }
       } else { v.setState({ mode: 'build', eq: 0 }); if (sm.p < v.p - 1e-9) v.setState({ p: sm.p }); else v.animateTo(sm.p, 1); if (seen) seen(); }
     } else v.setState({ mode: sm.mode, p: sm.p, eq: sm.eq || 0 });   // site, or Level 2 (the paid line eases up in the frame loop)
@@ -28940,9 +29006,9 @@ function wSetCurrency(c) {
   document.querySelectorAll('.w-currency-label').forEach(function(el){ el.textContent = sym; });
 }
 // ── Onboarding screens (owner, 5 Nov 2026, from the Help Bnk feedback) ──
-// 1 name (and email when not signed in), 2 where you are, 3 money, 4 home, 5 your plan. w-step-1 holds screens 1-2 and
-// w-step-2 holds 3-5, so wStep1Next / wStep2Submit / wStep2Skip keep their old jobs.
-var _wzAt = 1, WZ_N = 5, _wDay = null, _wCaptured = false;
+// 1 name (and email when not signed in), 2 where you are, 3 money, 4 home, 5 deposit pot (v0.95, owner 8 Nov), 6 your plan.
+// w-step-1 holds screens 1-2 and w-step-2 holds 3-6, so wStep1Next / wStep2Submit / wStep2Skip keep their old jobs.
+var _wzAt = 1, WZ_N = 6, _wDay = null, _wCaptured = false;
 function wGo(n) {
   n = Math.max(1, Math.min(WZ_N, n | 0)); _wzAt = n;
   document.querySelectorAll('#welcome-overlay .wz-screen').forEach(function (sc) { sc.hidden = +sc.getAttribute('data-s') !== n; });
@@ -28953,7 +29019,7 @@ function wGo(n) {
   var c = document.getElementById('wz-count'); if (c) c.textContent = 'Step ' + n + ' of ' + WZ_N;
   document.querySelectorAll('#w-step-dots i').forEach(function (d, i) { d.classList.toggle('on', i < n); });
   var bk = document.getElementById('wz-back'); if (bk) bk.hidden = n === 1;
-  if (n === 5) wRenderPlan();
+  if (n === WZ_N) wRenderPlan();
   var ov = document.getElementById('welcome-overlay'), box = ov && ov.querySelector('.welcome-box');
   if (ov) ov.scrollTop = 0; if (box) box.scrollTop = 0;
   var h = document.querySelector('#wz-s' + n + ' h2'); if (h && n > 1) { try { h.focus({ preventScroll: true }); } catch (e) {} }
@@ -28961,6 +29027,7 @@ function wGo(n) {
 function wNext() {
   if (_wzAt === 1) { if (_wCheckId()) wGo(2); return; }
   if (_wzAt === 2) { wStep1Next(); return; }
+  if (_wzAt === 5 && !_wPotCheck()) return;   // v0.95: a Yes on the deposit pot needs the amount
   wGo(_wzAt + 1);
 }
 function wBack() { if (_wzAt > 1) wGo(_wzAt - 1); }
@@ -29106,6 +29173,8 @@ function wStep2Submit() {
     state.target = house;
     if (typeof saveHouse === 'function') saveHouse();
   }
+  // v0.95: the deposit pot from the onboarding lands in the House Builder (after the house, so its bricks count against the right target)
+  if (_wPot && _wPot !== 'none' && _wPotVal() > 0) { try { wPotToHouse(_wPot, _wPotVal(), (document.getElementById('w-pot-rate') || {}).value); } catch (e) {} }
   // Update user profile
   if (_vaultItUser) {
     if (phone.trim()) _vaultItUser.phone = phone.trim();
