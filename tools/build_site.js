@@ -17,6 +17,9 @@ const SITE = {
             ['site/pitch-eligent/pitch/house-build.mp4', 'pitch/house-build.mp4'], ['site/pitch-eligent/pitch/house-still.jpg', 'pitch/house-still.jpg'],
             ['site/pitch-eligent/pitch/nw3d-live.js', 'pitch/nw3d-live.js'], ['site/pitch-eligent/pitch/live-nw.jpg', 'pitch/live-nw.jpg'], ['site/pitch-eligent/pitch/live-trk.jpg', 'pitch/live-trk.jpg'],
             ['site/pitch-eligent/pitch/logo-full.png', 'pitch/logo-full.png'], ['site/pitch-eligent/pitch/logo-mid.png', 'pitch/logo-mid.png'],
+            // the short follow-up deck answering an investor's four questions (owner, 8 Nov 2026): vault-it.co/pitch-Eligent-answers (and a lower-case alias)
+            ['site/pitch-eligent/answers.html', 'pitch-Eligent-answers.html'], ['site/pitch-eligent/answers.html', 'pitch-eligent-answers.html'],
+            ...['overview', 'house-builder', 'budget', 'entrepreneur', 'wealth-roadmap', 'overview-phone'].map((n) => ['site/pitch-eligent/pitch/answers/' + n + '.jpg', 'pitch/answers/' + n + '.jpg']),
             // digital business card behind the printed card's QR code and NFC chip: vault-it.co/pete
             ['site/pete/index.html', 'pete.html'], ['site/pete/ptlive.png', 'pete/ptlive.png'], ['site/pete/house-corner.mp4', 'pete/house-corner.mp4'], ['site/pete/house-corner.jpg', 'pete/house-corner.jpg'], ['site/pete/pete-thickett-vault-it.vcf', 'pete/pete-thickett-vault-it.vcf'],
             // the card as a home-screen app: manifest, icons and the offline helper (served at /pete-sw.js so it can look after /pete)

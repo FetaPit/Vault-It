@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Vault-It · Your four questions, answered</title>
+<meta name="description" content="Vault-It: answers to an investor's four questions after the Eligent pitch, with the live demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&family=Syne:wght@500;600;700;800&display=swap">
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}
+html,body{margin:0;background:#04090f;color:#E8E8E8;font-family:'DM Sans',Arial,sans-serif;overflow-x:hidden}
+main{max-width:1280px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.frame{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:12px;border:1px solid #15302F}
+.frame>section{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;transform:scale(var(--s,.5));overflow:hidden}
+section h1,section h2,section h3,section p,section ul{margin:0}
+section h1{line-height:1.1}section h2{line-height:1.15}section h3{line-height:1.2}section p{line-height:1.4}
+section ul{padding:0 0 0 1.1em;display:flex;flex-direction:column;gap:.3em}
+section img,section video{display:block}
+section a{color:inherit}
+.frame>section>*:not([style*="position:absolute"]){position:relative}
+.kicker{font-family:'Share Tech Mono','Courier New',monospace;font-size:24px;letter-spacing:4px;color:#44C0B9}
+.frame>section>.foot{position:absolute;left:128px;bottom:64px;width:1664px;font-family:'Share Tech Mono','Courier New',monospace;font-size:24px;color:#7FA9A6}
+.mono{font-family:'Share Tech Mono','Courier New',monospace}
+.row{display:flex;flex-direction:row;justify-content:space-between;align-items:baseline;gap:32px;padding:18px 0;border-bottom:1px solid #15302F}
+.row p:first-child{font-size:32px;color:#E8E8E8}.row p:last-child{font-family:'Share Tech Mono','Courier New',monospace;font-size:36px;color:#E8C56A;flex:none}
+.card{border:1px solid #15302F;border-radius:18px;padding:36px 40px;display:flex;flex-direction:column;gap:14px;background:rgba(6,36,42,.35)}
+.shot{display:flex;flex-direction:column;gap:10px;min-width:0}
+.shot img{width:100%;height:200px;object-fit:cover;object-position:top;border-radius:12px;border:1px solid #15302F;background:#000}
+.shot p{font-size:21px;line-height:1.3;color:#B6D8D6}
+header{position:sticky;top:0;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;background:rgba(4,9,15,.88);backdrop-filter:blur(8px);border-bottom:1px solid #15302F}
+header b{font:600 18px 'Syne',Arial,sans-serif;color:#E8E8E8}
+.pv-btn{min-width:44px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid #C9A84C;background:#12100A;color:#E8C56A;font:16px 'Share Tech Mono',monospace;cursor:pointer;letter-spacing:1px}
+.pv-btn:focus-visible{outline:2px solid #44C0B9;outline-offset:2px}
+#pv-bar{display:none;position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:10;gap:8px;align-items:center;padding:6px;border-radius:999px;background:rgba(8,13,20,.82);border:1px solid #15302F;opacity:.6;transition:opacity .2s}
+#pv-bar:hover,#pv-bar:focus-within{opacity:1}
+#pv-count{font:16px 'Share Tech Mono',monospace;color:#B6D8D6;min-width:72px;text-align:center}
+#pv-bar .pv-btn{padding:0 14px;border-color:#15302F;background:#0A1018;color:#E8E8E8}
+body.present{background:#000;overflow:hidden}
+body.present header,body.present footer{display:none}
+body.present main{max-width:none;padding:0}
+body.present .frame{display:none}
+body.present .frame.on{display:block;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100vw,177.78vh);height:auto;border:0;border-radius:0}
+body.present #pv-bar{display:flex}
+@media (prefers-reduced-motion:reduce){#pv-bar{transition:none}}
+footer{text-align:center;font:14px 'Share Tech Mono',monospace;color:#7FA9A6;padding:8px 16px 32px}
+footer a{color:#E8C56A}
+@media print{@page{size:1920px 1080px;margin:0}html,body{background:#000}header,footer,#pv-bar{display:none}main{max-width:none;padding:0;gap:0;display:block}.frame{width:1920px;height:1080px;aspect-ratio:auto;border:0;border-radius:0;break-after:page;page-break-after:always}.frame>section{transform:none}}
+</style></head><body>
+<header><b>Vault-It · Your four questions, answered</b><button type="button" class="pv-btn" id="pv-open" aria-label="Present: one slide at a time">PRESENT ▶</button></header>
+<main id="pv-stage">
+
+<div class="frame"><section id="cover" style="background:radial-gradient(ellipse at 75% 100%, #06242A 0%, #00131A 45%, #080808 100%);color:#E8E8E8;padding:128px 128px 160px;display:flex;flex-direction:row;align-items:center;gap:96px">
+<div style="flex:1;display:flex;flex-direction:column;gap:40px">
+<p class="kicker">INVESTOR DECK · FOLLOW-UP · 8 NOVEMBER 2026</p>
+<h1 style="font-family:'Syne', Arial, sans-serif;font-size:160px;font-weight:800;line-height:1;white-space:nowrap;color:#E8E8E8">Vault<span style="color:#44C0B9">-It</span></h1>
+<p style="font-family:'Syne', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1.1;color:#E8E8E8">Your four questions, answered.</p>
+<h2 style="font-family:'Syne', Arial, sans-serif;font-size:44px;font-weight:600;line-height:1.1;color:#E8E8E8">Get out of the <span style="color:#C8202A">red</span> and into <span style="color:#44C0B9">your</span> <span style="color:#E8C56A">home</span>.</h2>
+<p style="font-size:32px;color:#B6D8D6">Pete Thickett, Founder · vault-it.co</p>
+</div>
+<img src="pitch/logo-full.png" alt="Vault-It mark: a teal V inside a vault dial" style="width:600px;height:600px;object-fit:contain">
+<p class="foot">A PT LIVE DESIGN PRODUCT · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section></div>
+
+<div class="frame"><section id="spend" style="background:#0A1A1C;color:#E8E8E8;padding:96px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p class="kicker">1 · SPENT TO DATE</p>
+<h2 style="font-family:'Syne', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#E8E8E8">About £600, all my own money. Everything else is my time.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:80px;align-items:flex-start">
+<div style="flex:1.1;display:flex;flex-direction:column">
+<div class="row"><p>Claude (AI build tooling), Sep to Nov</p><p>£226</p></div>
+<div class="row"><p>Barbican Creative Hub desk, Lincoln, 3 months</p><p>£117</p></div>
+<div class="row"><p>Companies House incorporation</p><p>£100</p></div>
+<div class="row"><p>Eligent pitch trip to London</p><p>£163</p></div>
+<div class="row" style="border-bottom:0;padding-top:28px"><p style="font-family:'Syne', Arial, sans-serif;font-weight:700">Total</p><p style="font-size:52px">£606</p></div>
+</div>
+<div class="card" style="flex:1;gap:22px">
+<p class="kicker" style="color:#E8C56A">WHAT THE MONEY DID NOT GO ON</p>
+<p style="font-size:30px;line-height:1.35;color:#E8E8E8">Hosting runs on free tiers (Cloudflare, Supabase, Resend).</p>
+<p style="font-size:30px;line-height:1.35;color:#E8E8E8">No agency, no contractors, no ads.</p>
+<p style="font-size:30px;line-height:1.35;color:#E8E8E8">The app, the brand, the 3D engine and the deck are founder-built.</p>
+</div>
+</div>
+<p class="foot">FIGURES FROM RECEIPTS, SEP TO NOV 2026 · DOMAIN REGISTRATION NOT INCLUDED · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section></div>
+
+<div class="frame"><section id="ask" style="background:#E8C56A;color:#1A1400;padding:80px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p class="kicker" style="color:#1A1400">2 · THE ASK</p>
+<h2 style="font-family:'Syne', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#1A1400">£250,000 under SEIS, closing March 2027.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:64px;align-items:stretch">
+<div style="flex:3;display:flex;flex-direction:column;gap:22px">
+<div data-fund="35" style="display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:110px;flex:none;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:44px;color:#1A1400">35%</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;flex-direction:row;justify-content:space-between;gap:16px"><p style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#1A1400">Build it</p><p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:32px;color:#1A1400">£87,500</p></div>
+<div role="presentation" style="height:10px;background:rgba(26,20,0,.15);border-radius:5px"><div style="width:100%;height:10px;background:#1A1400;border-radius:5px"></div></div>
+<p style="font-size:25px;line-height:1.3;color:#3A2E00">The bank version, the ISA planner, an operations co-founder, the neurodiversity study, the Barbican Creative Hub studio (£5,000 + VAT a year)</p>
+</div></div>
+<div data-fund="20" style="display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:110px;flex:none;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:44px;color:#1A1400">20%</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;flex-direction:row;justify-content:space-between;gap:16px"><p style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#1A1400">Reach savers</p><p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:32px;color:#1A1400">£50,000</p></div>
+<div role="presentation" style="height:10px;background:rgba(26,20,0,.15);border-radius:5px"><div style="width:57%;height:10px;background:#1A1400;border-radius:5px"></div></div>
+<p style="font-size:25px;line-height:1.3;color:#3A2E00">Brick-laying videos, creators, local pages and press</p>
+</div></div>
+<div data-fund="15" style="display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:110px;flex:none;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:44px;color:#1A1400">15%</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;flex-direction:row;justify-content:space-between;gap:16px"><p style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#1A1400">Win partners</p><p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:32px;color:#1A1400">£37,500</p></div>
+<div role="presentation" style="height:10px;background:rgba(26,20,0,.15);border-radius:5px"><div style="width:43%;height:10px;background:#1A1400;border-radius:5px"></div></div>
+<p style="font-size:25px;line-height:1.3;color:#3A2E00">Partnerships and B2B sales</p>
+</div></div>
+<div data-fund="15" style="display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:110px;flex:none;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:44px;color:#1A1400">15%</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;flex-direction:row;justify-content:space-between;gap:16px"><p style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#1A1400">Security and compliance</p><p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:32px;color:#1A1400">£37,500</p></div>
+<div role="presentation" style="height:10px;background:rgba(26,20,0,.15);border-radius:5px"><div style="width:43%;height:10px;background:#1A1400;border-radius:5px"></div></div>
+</div></div>
+<div data-fund="15" style="display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:110px;flex:none;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:44px;color:#1A1400">15%</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;flex-direction:row;justify-content:space-between;gap:16px"><p style="font-family:'Syne', Arial, sans-serif;font-size:32px;font-weight:700;color:#1A1400">Contingency</p><p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:32px;color:#1A1400">£37,500</p></div>
+<div role="presentation" style="height:10px;background:rgba(26,20,0,.15);border-radius:5px"><div style="width:43%;height:10px;background:#1A1400;border-radius:5px"></div></div>
+</div></div>
+</div>
+<div style="flex:2;display:flex;flex-direction:column;gap:20px;border-left:2px solid rgba(26,20,0,.25);padding-left:48px">
+<p class="kicker" style="color:#1A1400">WHAT IT CHANGES</p>
+<p style="font-size:32px;line-height:1.35;color:#1A1400"><b>Without the raise:</b> £43,400 net in Year 1.</p>
+<p style="font-size:32px;line-height:1.35;color:#1A1400"><b>With the raise spent:</b> break-even December 2027. Cumulative profit passes £250,000 inside Year 2 (£261,390 by the end of Year 2).</p>
+<p style="font-size:26px;line-height:1.35;color:#3A2E00">We intend to apply for SEIS advance assurance once the company is registered. SEIS gives qualifying investors 50% income tax relief. Investor equity terms on request.</p>
+</div>
+</div>
+<p class="foot" style="color:#1A1400">SUBJECT TO SEIS ADVANCE ASSURANCE · FORECAST IS ILLUSTRATIVE, NOT A PROMISE · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section></div>
+
+<div class="frame"><section id="founders" style="background:#080D14;color:#E8E8E8;padding:96px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p class="kicker">3 · FOUNDERS</p>
+<h2 style="font-family:'Syne', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.1;color:#E8E8E8">One today, two seats open.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:stretch">
+<div class="card" style="flex:1.2;border-color:#44C0B9">
+<p class="kicker" style="letter-spacing:3px">FOUNDER &amp; CREATIVE DIRECTOR</p>
+<p style="font-family:'Syne', Arial, sans-serif;font-size:44px;font-weight:700;color:#E8E8E8">Pete Thickett</p>
+<p style="font-size:26px;line-height:1.35;color:#B6D8D6">PT Live Design, Lincoln. A designer who builds: the app, the brand and the 3D engine are his.</p>
+</div>
+<div class="card" style="flex:1">
+<p class="kicker" style="letter-spacing:3px;color:#E8C56A">SEAT 1 · OPEN</p>
+<p style="font-family:'Syne', Arial, sans-serif;font-size:44px;font-weight:700;color:#E8E8E8">Operations co&#8209;founder</p>
+<p style="font-size:26px;line-height:1.35;color:#B6D8D6">A software developer to run delivery and operations while Pete sells. 25% equity offered, conversations underway. Funded from the raise.</p>
+</div>
+<div class="card" style="flex:1">
+<p class="kicker" style="letter-spacing:3px;color:#E8C56A">SEAT 2 · OPEN</p>
+<p style="font-family:'Syne', Arial, sans-serif;font-size:44px;font-weight:700;color:#E8E8E8">Partnerships lead</p>
+<p style="font-size:26px;line-height:1.35;color:#B6D8D6">To convert pilots into paying partners.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<p class="kicker" style="color:#7FA9A6">ADVISERS IN PLACE</p>
+<p style="font-size:28px;line-height:1.4;color:#E8E8E8">David Amor (Enso Brain, HelpBnk), neurodiversity and performance · Malcolm McPhee (Business Lincolnshire) · Rita Fortes (Web Summit) · Chris Gueffier (NBV Enterprise Solutions)</p>
+</div>
+<p style="font-family:'Syne', Arial, sans-serif;font-size:34px;font-weight:600;line-height:1.3;color:#44C0B9">Solo founder today, and I'd rather say that than pad the slide.</p>
+<p class="foot">VAULT-IT · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section></div>
+
+<div class="frame"><section id="product" style="background:#080808;color:#E8E8E8;padding:72px 128px 150px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:row;justify-content:space-between;align-items:flex-end;gap:48px">
+<div style="display:flex;flex-direction:column;gap:10px">
+<p class="kicker">4 · THE PRODUCT, AS IT IS TODAY</p>
+<h2 style="font-family:'Syne', Arial, sans-serif;font-size:48px;font-weight:700;line-height:1.1;color:#E8E8E8">Real screens from the current build, 8 Nov 2026.</h2>
+</div>
+<p class="mono" style="font-size:22px;color:#7FA9A6;text-align:right;flex:none">SAMPLE ACCOUNT: ALEX MORGAN<br>£57,000 SALARY · SAVING FOR A SEMI</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px 28px">
+<div class="shot"><img src="pitch/answers/overview.jpg" alt="Overview tab: net worth, assets, debt and the 3D net worth viewport" width="1280" height="800"><p><b>Overview.</b> Net worth, assets and debts on one screen, drawn in 3D.</p></div>
+<div class="shot"><img src="pitch/answers/house-builder.jpg" alt="House Builder tab: a 3D semi-detached house built brick by brick from the deposit saved" width="1280" height="800"><p><b>House Builder.</b> Every pound saved lays a brick of the home you are aiming for.</p></div>
+<div class="shot"><img src="pitch/answers/budget.jpg" alt="Budget tab: zero-based budget with a flow chart of where income goes" width="1280" height="800"><p><b>Budget.</b> Zero-based: give every pound a job and watch where income flows.</p></div>
+<div class="shot"><img src="pitch/answers/entrepreneur.jpg" alt="Entrepreneur tab: income stream builder with a task board and investment chart" width="1280" height="800"><p><b>Entrepreneur.</b> Side income streams with a task board and a plan.</p></div>
+<div class="shot"><img src="pitch/answers/wealth-roadmap.jpg" alt="Wealth Roadmap tab: level, XP, badges and the next steps from debt to ownership" width="1280" height="800"><p><b>Wealth Roadmap.</b> One path from the red to your own home, step by step, with XP.</p></div>
+<div class="shot" style="flex-direction:row;gap:24px;align-items:flex-start"><img src="pitch/answers/overview-phone.jpg" alt="The Overview tab on a 390 px wide phone" width="390" height="844" style="width:100px;height:200px;flex:none"><p><b>On a phone.</b> The same app, installable, at 390 px wide.</p></div>
+</div>
+<div style="display:flex;flex-direction:row;align-items:center;gap:40px;margin-top:4px">
+<a href="https://vault-it.co/demo-a" style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:40px;color:#E8C56A;background:#12100A;border:2px solid #C9A84C;border-radius:999px;padding:18px 40px;text-decoration:none;flex:none">TRY IT YOURSELF: vault-it.co/demo-a</a>
+<div style="display:flex;flex-direction:column;gap:6px">
+<p style="font-size:26px;line-height:1.3;color:#E8E8E8">No sign-up. The link opens a pre-filled account so you can judge how easy it is to use.</p>
+<p style="font-size:24px;color:#B6D8D6">Full deck: <a href="https://vault-it.co/pitch-Eligent" style="color:#E8C56A">vault-it.co/pitch-Eligent</a></p>
+</div>
+</div>
+<p class="foot" style="bottom:48px">SCREENSHOTS TAKEN FROM THE APP ON 8 NOV 2026 WITH SAMPLE DATA · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section></div>
+
+<div class="frame"><section id="launch" style="background:radial-gradient(ellipse at 50% 100%, #06242A 0%, #00131A 45%, #080808 100%);color:#E8E8E8;padding:128px 128px 160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;text-align:center">
+<img src="pitch/logo-mid.png" alt="Vault-It mark" style="width:240px;height:240px;object-fit:contain">
+<p class="kicker">BLACK FRIDAY</p>
+<h2 style="font-family:'Syne', Arial, sans-serif;font-size:80px;font-weight:700;line-height:1.1;color:#E8E8E8;max-width:1500px">Founding pre-sale is open now: 100 places at £149, perks only, never reopened.</h2>
+<p style="font-size:40px;line-height:1.3;color:#E8C56A;font-family:'Syne', Arial, sans-serif;font-weight:600">Public launch Black Friday week, 27 November 2026.</p>
+<p style="font-size:32px;color:#B6D8D6">Pete Thickett · pete@ptlive.design · <a href="https://vault-it.co" style="color:#E8C56A;text-decoration:none">vault-it.co</a></p>
+<p class="foot" style="text-align:center">FOUNDING PLACES ARE CAPPED IN STRIPE AT 100 PAYMENTS · PERKS, NOT EQUITY · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section></div>
+
+</main><footer>Vault-It Ltd, incorporation submitted 6 Nov 2026 · <a href="https://vault-it.co">vault-it.co</a> · pete@ptlive.design · Not regulated by the FCA. Not financial advice. · © 2026 PT Live Design. All rights reserved.</footer>
+<div id="pv-bar" role="toolbar" aria-label="Presenter controls"><button type="button" class="pv-btn" id="pv-prev" aria-label="Previous slide">‹</button><span id="pv-count" aria-live="polite">1 / 6</span><button type="button" class="pv-btn" id="pv-next" aria-label="Next slide">›</button><button type="button" class="pv-btn" id="pv-close" aria-label="Leave presenter view">✕</button></div>
+<script>
+(function(){
+var frames=[].slice.call(document.querySelectorAll('.frame')),cur=0,body=document.body,count=document.getElementById('pv-count');
+function fit(){frames.forEach(function(f){var w=f.clientWidth;if(w)f.style.setProperty('--s',w/1920)})}
+function show(i){cur=Math.max(0,Math.min(frames.length-1,i));frames.forEach(function(f,k){f.classList.toggle('on',k===cur)});count.textContent=(cur+1)+' / '+frames.length;fit()}
+function open(){var start=0,best=-1;for(var k=0;k<frames.length;k++){var r=frames[k].getBoundingClientRect(),seen=Math.min(r.bottom,innerHeight)-Math.max(r.top,0);if(seen>best+1){best=seen;start=k}}body.classList.add('present');show(start);var d=document.documentElement;if(d.requestFullscreen)d.requestFullscreen().catch(function(){})}
+function close(){body.classList.remove('present');frames.forEach(function(f){f.classList.remove('on')});if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(function(){});fit();frames[cur].scrollIntoView({block:'center'});document.getElementById('pv-open').focus()}
+document.getElementById('pv-open').addEventListener('click',open);
+if(/[?&]present(=|&|$)/.test(location.search)){body.classList.add('present');show(0)}
+document.getElementById('pv-close').addEventListener('click',close);
+document.getElementById('pv-next').addEventListener('click',function(){show(cur+1)});
+document.getElementById('pv-prev').addEventListener('click',function(){show(cur-1)});
+document.addEventListener('keydown',function(e){if(!body.classList.contains('present'))return;var k=e.key;
+ if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault()}
+ else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault()}
+ else if(k==='Home'){show(0);e.preventDefault()}else if(k==='End'){show(frames.length-1);e.preventDefault()}
+ else if(k==='Escape'){close();e.preventDefault()}});
+document.addEventListener('fullscreenchange',function(){if(!document.fullscreenElement&&body.classList.contains('present'))close()});
+var sx=0,sy=0,stage=document.getElementById('pv-stage');
+stage.addEventListener('touchstart',function(e){var t=e.changedTouches[0];sx=t.clientX;sy=t.clientY},{passive:true});
+stage.addEventListener('touchend',function(e){if(!body.classList.contains('present'))return;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))show(cur+(dx<0?1:-1))},{passive:true});
+stage.addEventListener('click',function(e){if(!body.classList.contains('present')||(e.target.closest&&e.target.closest('a')))return;show(cur+(e.clientX<innerWidth/3?-1:1))});
+addEventListener('resize',fit);fit();
+})();
+</script></body></html>
