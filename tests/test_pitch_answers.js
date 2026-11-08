@@ -1,5 +1,6 @@
 // vault-it.co/pitch-Eligent-answers: the short deck answering the investor's four questions after the Eligent pitch (owner, 8 Nov 2026),
-// served through the real Worker routing from the real build. Six slides or fewer, the figures from the brief, the demo link exact,
+// served through the real Worker routing from the real build. Nine slides (owner, 8 Nov: question 4 is answered by slides 5 to 8 of the
+// live deck, gap, solution, features and evidence, live 3D viewports included), the figures from the brief, the demo link exact,
 // every image resolves, the FCA line visible, the same Present view as the main deck, no sideways scroll on a phone.
 require('./lib/vi');
 const { chromium } = require('playwright');
@@ -30,7 +31,9 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
 
   let p = await open(390, 844, true);
   const n = await p.locator('.frame').count();
-  ok(n > 0 && n <= 6, 'six slides or fewer: ' + n);
+  ok(n === 9, 'nine slides: the four answers plus the live deck\'s slides 5 to 8 for question 4: ' + n);
+  { const ids = await p.evaluate(() => [...document.querySelectorAll('.frame > section')].map((s) => s.id));
+    ok(ids.join() === 'cover,spend,ask,founders,gap,solution,features,evidence,launch', 'slide order: ' + ids); }
   ok(p.errs.length === 0, 'no page errors: ' + p.errs.join(' | '));
   const body = await p.evaluate(() => document.body.innerText);
   ok(/Not regulated by the FCA\. Not financial advice\./i.test(body), 'the FCA line is on the page');
@@ -54,11 +57,12 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     const pct = uf.map((x) => x[0]).join('/'), sum = uf.reduce((s, x) => s + +(x[1].match(/£([\d,]+)/) || [0, '0'])[1].replace(/,/g, ''), 0);
     ok(pct === '35/20/15/15/15' && sum === 250000, 'use of funds 35/20/15/15/15 adds to £250,000: ' + pct + ' = £' + sum); }
   { const f = await txt(p, 'founders'); ok(/Pete Thickett/.test(f) && /Solo founder today/.test(f) && /25% equity/.test(f) && /two seats open/i.test(f) && ['David Amor', 'Malcolm McPhee', 'Rita Fortes', 'Chris Gueffier'].every((x) => f.includes(x)), 'founders: one today, two seats, the four advisers the owner named'); }
-  { const imgs = await p.evaluate(() => [...document.querySelectorAll('#product img')].map((i) => ({ src: i.getAttribute('src'), ok: i.complete && i.naturalWidth > 0 })));
-    ok(imgs.length === 6 && imgs.every((i) => i.ok), 'the product slide shows six real screenshots and every one loads: ' + JSON.stringify(imgs.filter((i) => !i.ok)));
-    ok(imgs.every((i) => /^pitch\/answers\/[a-z-]+\.jpg$/.test(i.src)), 'screenshots come from pitch/answers/ on the same host'); }
+  { const imgs = await p.evaluate(() => [...document.querySelectorAll('img')].map((i) => ({ src: i.getAttribute('src'), ok: i.complete && i.naturalWidth > 0 })));
+    ok(imgs.length >= 4 && imgs.every((i) => i.ok), 'every image on the page loads: ' + JSON.stringify(imgs.filter((i) => !i.ok)));
+    const k = await p.evaluate(() => ['gap', 'solution', 'features', 'evidence'].map((id) => document.querySelector('#' + id + ' p').textContent));
+    ok(k.every((t) => /^4 · /.test(t)), 'the four product slides are numbered as the answer to question 4: ' + k.join(' | ')); }
   { const links = await p.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')));
-    ok(links.includes('https://vault-it.co/demo-a'), 'the demo link is exactly https://vault-it.co/demo-a: ' + links.join(' '));
+    ok(links.includes('https://vault-it.co/demo-a') && await p.evaluate(() => !!document.querySelector('#launch a[href="https://vault-it.co/demo-a"]')), 'the demo link is exactly https://vault-it.co/demo-a, on the last slide: ' + links.join(' '));
     ok(links.includes('https://vault-it.co/pitch-Eligent'), 'the full deck link is vault-it.co/pitch-Eligent'); }
   { const bf = await txt(p, 'launch'); ok(/100 places at £149/.test(bf) && /never reopened/.test(bf) && !/£199|£99/.test(bf), 'the Founding pre-sale matches Stripe: 100 places at £149'); }
   // brand marks
@@ -70,6 +74,15 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     ok(gap > 0, 'slide 2: the note sits above the footer line, no overlap (gap ' + Math.round(gap) + 'px)'); }
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll on a phone');
   ok(misses.length === 0, 'every file the page asks for exists in the build: ' + misses.join(' '));
+
+  // Live 3D viewports from the live deck (features: Net worth in 3D; evidence: Net worth progress) draw with the demo data
+  p = await open(1280, 800);
+  for (const [kind, sid, re] of [['nw', 'features', /^Own £[\d,]+ · Owe £[\d,]+ · Net worth £[\d,]+$/], ['trk', 'evidence', /^Today: net worth £[\d,]+ · debt £[\d,]+$/]]) {
+    await p.locator('#' + sid).scrollIntoViewIfNeeded(); await p.waitForTimeout(2500);
+    const st = await p.evaluate((kind) => { const b = document.querySelector('.live[data-live="' + kind + '"]'); return b ? { on: b.classList.contains('on'), read: b.querySelector('.live-read').textContent } : null; }, kind);
+    ok(st && st.on && re.test(st.read), kind + ': the live viewport is on and reads the demo figures on ' + sid + ': ' + JSON.stringify(st));
+  }
+  ok(p.errs.length === 0, 'no page errors with the live viewports: ' + p.errs.join(' | '));
 
   // Laptop: the Present view
   p = await open(1280, 800);
