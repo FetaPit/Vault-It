@@ -3,7 +3,7 @@
 // replay; no hover explode while it builds; the same scene persists from sign-in to the welcome screen and is dimmed behind the panel
 // (the welcome panel stays solid, so its text keeps its contrast); the welcome screen waits under the sign-in card; code and PIN steps
 // draw nothing; the canvas takes no clicks or focus; no sideways scroll at 390, 690, 1100 and 1440; no frame over 100 ms of script; the
-// scene is freed when sign-in and welcome both close; reduced motion, ?signin3d=0 and a software GPU keep the old opaque overlays and no WebGL.
+// scene is freed when sign-in and welcome both close; ?signin3d=0 and a software GPU keep the old opaque overlays and no WebGL; reduced motion keeps the scene behind sign-in and onboarding as the finished house on a slow drift.
 // Run: node tests/test_v094_house_intro.js
 const VI = require('./lib/vi');
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
@@ -64,7 +64,7 @@ const alpha = (c) => { const m = (c || '').match(/[\d.]+/g) || []; return m.leng
     await ctx.close();
   }
   // fallbacks keep the old opaque overlays and start no WebGL
-  const FB = [['reduced motion', { reducedMotion: 'reduce' }, true, ''], ['?signin3d=0', {}, true, '?signin3d=0'], ['software GPU', {}, false, '']];
+  const FB = [['?signin3d=0', {}, true, '?signin3d=0'], ['software GPU', {}, false, '']];
   for (const [name, opt, full, q] of FB) {
     const ctx = await b.newContext(Object.assign({ viewport: { width: 1100, height: 800 }, deviceScaleFactor: 1 }, opt)); await routeThree(ctx); const page = await ctx.newPage();
     await page.addInitScript(INIT, { full, theme: 'dark' }); await page.goto(VI.FILE_URL + q); await page.waitForTimeout(3500);
@@ -74,5 +74,13 @@ const alpha = (c) => { const m = (c || '').match(/[\d.]+/g) || []; return m.leng
     s = await S(page); ok(!s.has && !s.on && s.welcomeVis === 'visible' && alpha(s.welcomeBg) >= 0.95, name + ': onboarding keeps its solid overlay (' + s.welcomeBg + ')');
     await ctx.close();
   }
+  { // reduced motion: still behind sign-in and onboarding, finished house, slow drift, no build
+    const ctx = await b.newContext({ viewport: { width: 1100, height: 800 }, deviceScaleFactor: 1, reducedMotion: 'reduce' }); await routeThree(ctx); const page = await ctx.newPage();
+    await page.addInitScript(INIT, { full: true, theme: 'dark' }); await page.goto(VI.FILE_URL);
+    ok(await waitOn(page), 'reduced motion: the scene draws behind sign-in');
+    let s = await S(page), y0 = s.yaw; ok(s.building === false && s.on, 'reduced motion: no build, finished house');
+    await page.evaluate(() => document.getElementById('login-overlay').style.setProperty('display', 'none', 'important')); await page.waitForTimeout(1500);
+    s = await S(page); ok(s.has && s.on && s.ah === 'welcome' && s.yaw > y0, 'reduced motion: still behind onboarding and drifting slowly');
+    await ctx.close(); }
   await b.close(); console.log(fails ? 'FAILURES ' + fails : 'ALL PASS'); process.exit(fails ? 1 : 0);
 })();

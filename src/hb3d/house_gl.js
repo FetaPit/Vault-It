@@ -759,7 +759,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     if (!HG || !this.resize()) return;
     var el = this._t ? Math.min(0.5, (now - this._t) / 1000) : 0, dt = Math.min(0.1, el); this._t = now;   // the turn never jumps; the easing follows real time
     var red = reduced();
-    if (!red) this.yawA += dt * 2 * Math.PI / this.turn;
+    this.yawA += dt * 2 * Math.PI / (red ? this.turn * 3 : this.turn);   // reduced motion (owner, 8 Nov: "I want motion on sign in and onboarding"): the finished house, no build, no explode, a third of the speed
     if (red && !this._bDone) this._bDone = true;
     if (!this._bDone) { this._be += el; if (this._be >= this.buildS + 2.4) this._bDone = true; }
     var be = this._bDone ? (this.build ? this.buildS + 3 : 0) : this._be, bg = this._bDone ? 1 : Math.min(1, Math.max(0, (be - (this.buildS - 1.4)) / 1.2));

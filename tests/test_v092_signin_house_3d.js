@@ -1,6 +1,6 @@
 // v0.9.2 (owner, 6 Nov: "Make the house large zoomed into the background with rotation animations. Allow the cursor to interact with
 // the model subtly expanding and exploding the house upon hover over."). The House Builder house, large behind the sign-in card.
-// Checks: reduced motion keeps the still and starts no WebGL; the scene starts only after the page has loaded, built in a worker;
+// Checks: reduced motion keeps the scene as a slow drift of the finished house (no build, no hover); the scene starts only after the page has loaded, built in a worker;
 // the email field and Continue sit where fd3a031 puts them (same browser) and where they are without the scene; the canvas takes no
 // focus or clicks; nothing draws on the code, PIN and set-PIN steps and it resumes on the email step; hover eases the house out and it
 // settles back; a tap gives a burst that settles; pixel ratio 1.5 at most on a phone; no frame or start-up step over 100 ms of script;
@@ -39,12 +39,13 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
     }
   } catch (e) { console.log('skip: fd3a031 is not in this clone (shallow), so the same-browser comparison with it is skipped'); }
 
-  // 1. reduced motion: the still, no WebGL, no worker
+  // 1. reduced motion (owner, 8 Nov: "I want motion on sign in and onboarding"): the scene still runs, as the finished house on a slow drift: no build, no explode
   { const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' }); await routeThree(ctx); const page = await ctx.newPage();
-    await page.addInitScript(INIT, { full: true, theme: 'dark' }); await page.goto(VI.FILE_URL); await page.waitForTimeout(4000);
-    const s = await SCENE(page), still = await page.evaluate(() => { const i = document.querySelector('.auth-house'); return !!(i && !i.hidden && i.complete && i.naturalWidth > 0 && getComputedStyle(i).opacity === '1'); });
-    ok(!s.has && s.gl === 0 && !document_has(s), 'reduced motion: no scene and no WebGL context (' + JSON.stringify({ state: s.state, gl: s.gl }) + ')');
-    ok(still, 'reduced motion: the still shows');
+    await page.addInitScript(INIT, { full: true, theme: 'dark' }); await page.goto(VI.FILE_URL);
+    ok(await waitOn(page), 'reduced motion: the scene still draws');
+    const a = await SCENE(page); await page.mouse.move(400, 300); await page.mouse.move(410, 310); await page.waitForTimeout(1200); const c = await SCENE(page);
+    ok(await page.evaluate(() => !_ahScene.building()), 'reduced motion: no build, the finished house');
+    ok(c.yaw > a.yaw && c.exp < 0.005, 'reduced motion: a slow drift, no hover explode (yaw ' + a.yaw.toFixed(4) + ' to ' + c.yaw.toFixed(4) + ', expand ' + c.exp.toFixed(4) + ')');
     await ctx.close(); }
   function document_has(s) { return s.shown; }
 
