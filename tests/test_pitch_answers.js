@@ -34,18 +34,19 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   ok(p.errs.length === 0, 'no page errors: ' + p.errs.join(' | '));
   const body = await p.evaluate(() => document.body.innerText);
   ok(/Not regulated by the FCA\. Not financial advice\./i.test(body), 'the FCA line is on the page');
+  ok(/Vault-It, published by PT Live Design/.test(body) && !/incorporation submitted/.test(body), 'one owner entity: Vault-It, published by PT Live Design (owner, 8 Nov)');
   ok(!/—/.test(body) && !/—/.test(fs.readFileSync(path.join(ROOT, 'site/pitch-eligent/answers.html'), 'utf8')), 'no em dashes');
   { const html = fs.readFileSync(path.join(ROOT, 'site/pitch-eligent/answers.html'), 'utf8');
     const hosts = [...html.matchAll(/https?:\/\/([a-z0-9.-]+)/gi)].map((m) => m[1]).filter((h, i, a) => a.indexOf(h) === i).sort();
     ok(hosts.join() === 'fonts.googleapis.com,fonts.gstatic.com,vault-it.co', 'no new outside hosts: ' + hosts.join(', '));
     ok(!/font-family:[^;"]*(?!Syne|DM Sans|Share Tech Mono|Arial|Courier New|monospace|sans-serif)(Inter|Roboto|Helvetica|Georgia|Times)/i.test(html), 'fonts are Syne, DM Sans and Share Tech Mono only'); }
   // the four answers
-  { const s = await txt(p, 'spend'); ok(/£3,214\.08/.test(s) && /£2,410\.56/.test(s) && /£2,661\.63/.test(s) && /JANUARY TO NOVEMBER 2026/.test(s) && /own money/i.test(s) && !/£606|£226/.test(s), 'invested to date: the owner\'s three business-account figures, no leftover receipt figures');
+  { const s = await txt(p, 'spend'); ok(/£3,214\.08/.test(s) && /£2,410\.56/.test(s) && /£2,661\.63/.test(s) && /JANUARY TO NOVEMBER 2026/.test(s) && /own money/i.test(s) && /PT Live Design/.test(s) && /whole of PT Live Design, Vault-It included/i.test(s) && !/£606|£226|Everything else/.test(s), 'invested to date: the owner\'s three figures framed as PT Live Design funding Vault-It, no leftover receipt figures');
     const rows = await p.evaluate(() => [...document.querySelectorAll('#spend table[data-invest] tr[data-row]')].map((r) => r.dataset.row + '=' + r.querySelectorAll('td')[1].textContent.trim()));
     ok(rows.join() === 'invested=£3,214.08,spent=£2,410.56,turnover=£2,661.63', 'the table has the three rows in order: ' + rows.join(' ')); }
   { const cats = await p.evaluate(() => [...document.querySelectorAll('#spend table[data-spend] tr[data-cat]')].map((r) => [...r.querySelectorAll('td')].map((c) => c.textContent.trim())));
     const sum = Math.round(cats.reduce((a, c) => a + +c[1].replace(/[£,]/g, ''), 0) * 100) / 100, total = await p.evaluate(() => document.querySelector('#spend tr[data-total] td:last-child').textContent.trim());
-    ok(cats.length === 8 && sum === 2700.71 && total === '£2,700.71', 'the spend table has the 8 categories and they add to the shown total: ' + sum + ' vs ' + total);
+    ok(cats.length === 7 && sum === 2384.08 && total === '£2,384.08' && !cats.some((c) => /to review/i.test(c[0])), 'the spend table has the 7 categories (no "to review" row, owner 8 Nov: "drop") and they add to the shown total: ' + sum + ' vs ' + total);
     ok(!/Synthesia|Upwork|Trainline|Facebook|Incogni|Amazon|Wix|Claude/.test(await txt(p, 'spend')), 'categories only, no supplier names'); }
   { const a = await txt(p, 'ask'); ok(/£250,000/.test(a) && /SEIS/.test(a) && /March 2027/.test(a) && /50% income tax relief/.test(a) && /December 2027/.test(a) && /£43,400/.test(a) && /£261,390/.test(a), 'the ask: £250,000 under SEIS, closing March 2027, break-even December 2027');
     const uf = await p.evaluate(() => [...document.querySelectorAll('#ask [data-fund]')].map((e) => [e.dataset.fund, e.innerText]));
@@ -64,6 +65,8 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     ok(w && w.all === 'Vault-It' && w.it === '-It' && w.col === 'rgb(68, 192, 185)' && w.rest !== w.col, 'the wordmark draws "-It" in teal'); }
   { const t = await p.evaluate(() => { const out = {}; document.querySelectorAll('#cover h2 span').forEach((s) => { out[s.textContent] = getComputedStyle(s).color; }); return out; });
     ok(t.red === 'rgb(200, 32, 42)' && t.your === 'rgb(68, 192, 185)' && t.home === 'rgb(232, 197, 106)', 'the tagline fills: red dark red, your teal, home gold: ' + JSON.stringify(t)); }
+  { const gap = await p.evaluate(() => { const foot = document.querySelector('#spend .foot'), prev = foot.previousElementSibling; return foot.getBoundingClientRect().top - prev.getBoundingClientRect().bottom; });
+    ok(gap > 0, 'slide 2: the note sits above the footer line, no overlap (gap ' + Math.round(gap) + 'px)'); }
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll on a phone');
   ok(misses.length === 0, 'every file the page asks for exists in the build: ' + misses.join(' '));
 
