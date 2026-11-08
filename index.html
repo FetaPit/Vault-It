@@ -12155,7 +12155,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     var sessionOk = !reset && s && s.expiry > Date.now() && s.email;
     if (sessionOk) {
       // Valid session — hide login overlay immediately (no flash)
-      document.write('<style>#login-overlay{display:none!important}</style>');
+      document.write('<style id="vi-login-prepaint">#login-overlay{display:none!important}</style>');
     }
     // Hide welcome overlay only for real returning users (not demo-mode visitors)
     var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
@@ -18914,6 +18914,7 @@ var _authOTP = null; // { code, expiry, email }
 var _supaClient = null;
 var _supaUser   = null;
 var _lsOrig     = Storage.prototype.setItem; // save original before patch
+var _viBootDemo = localStorage.getItem('vi_demo_mode') === 'true';   // v0.95: this page started on the sample; if another tab drops it, this tab must not write the sample back
 var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
   'ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history',
   'vi_settings','vi_user','vi_debt','vi_ov'];
@@ -18961,6 +18962,7 @@ function _markDirty(key) {
 }
 localStorage.setItem = function(key, value) {
   if (window._viDeleted) return;   // the account has been deleted: nothing may write data back
+  if ((window._viDemoWiped || (_viBootDemo && localStorage.getItem('vi_demo_mode') !== 'true')) && _DEMO_DATA_KEYS.indexOf(key) > -1) return;   // v0.95: the sample has been wiped (by this page, about to restart, or by another tab) while this page still holds it in memory
   if (_VAULT_KEYS.indexOf(key) > -1 && typeof value === 'string') value = viCleanJSON(value);
   if (_VAULT_KEYS.indexOf(key) > -1) { try { var _prev = localStorage.getItem(key); if (_prev != null && !_isBlankArea(key, _prev) && _isBlankArea(key, value)) _emptiedByUser[key] = true; else if (!_isBlankArea(key, value)) delete _emptiedByUser[key]; } catch (e) {} }
   _lsOrig.call(localStorage, key, value);
@@ -19219,6 +19221,7 @@ var _DEMO_DATA_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
 // visitor into a signed-up account (keeps them as a real user so demo data
 // can't auto-reload); omit it when a user clicks "start with my own data".
 function _wipeDemoData(realEmail){
+  window._viDemoWiped = true;   // v0.95: from here to the reload, writes to the sample's keys are refused (the tabs still hold the sample in memory)
   try { _DEMO_DATA_KEYS.forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
   try { invClearAll(); } catch(e){}
   try { localStorage.removeItem('vi_demo_mode'); localStorage.removeItem('vi_demo_variant'); localStorage.removeItem('vi_demo_launch'); } catch(e){}
@@ -19255,8 +19258,9 @@ function _initSupabase() {
     if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && session.user) {
       if (_supaUser && _supaUser.id === session.user.id) return;
       _supaUser = session.user;
-      _dropDemoBeforeSync(_supaUser.email);
+      var wiped = _dropDemoBeforeSync(_supaUser.email) || (_viBootDemo && localStorage.getItem('vi_demo_mode') !== 'true');   // v0.95: see _viRestartAfterWipe; also a tab that started on the sample after another tab dropped it
       var hydrated = await _hydrateFromSupabase(_supaUser.id);
+      if (wiped) { _viRestartAfterWipe(_supaUser.email, hydrated); return; }
       if (localStorage.getItem('vi_demo_mode') === 'true' && !hydrated) {
         _wipeDemoData(_supaUser.email);
         try { _createSession(_supaUser.email); } catch(e){}
@@ -19323,9 +19327,33 @@ var _hydrateErr = '', _hydChanged = false, _needPull = false;
 // Signing in on a device that is showing the sample (demo) data: throw the sample away first, so the
 // account's real data is loaded and the sample can never be uploaded over it.
 function _dropDemoBeforeSync(email) {
-  if (localStorage.getItem('vi_demo_mode') !== 'true') return;
+  if (localStorage.getItem('vi_demo_mode') !== 'true') return false;
   try { _wipeDemoData(email); } catch (e) {}
   try { _lsOrig.call(localStorage, 'vi_dirty', '[]'); _lsOrig.call(localStorage, 'vi_ts', '{}'); } catch (e) {}
+  return true;   // v0.95: the caller restarts the page once the account's rows are in storage; the sample is still in every tab's memory until then
+}
+// v0.95 (owner, 8 Nov, "replicated with a tester and new user device and email"): a fresh device loads the Alex Morgan sample, and a
+// sign-in used to wipe it from storage without a reload, so every tab kept the sample in memory and the onboarding's own save wrote
+// it back as the new user's data (House Builder £18,500 and seven dated deposits, budget, assets, achievements), marked for sync.
+// Now: wipe, pull the account's own rows into storage, then start the page again from storage. A returning user lands on their
+// own figures with no welcome screens (vi_user has their name at first paint); a new user lands on the welcome screens with
+// nothing behind them. The sign-in's last words run on the new page from a one-shot marker.
+function _viRestartAfterWipe(email, hydrated) {
+  try { _createSession(email); } catch (e) {}
+  var pin = true; try { pin = _pinPromptNeeded(); } catch (e) {}   // the code check told us whether the account already has a PIN; the new page cannot know
+  try { sessionStorage.setItem('vi_after_wipe', JSON.stringify({ r: hydrated ? 'restored' : 'new', pin: !!pin })); } catch (e) {}
+  location.reload();
+}
+function _viFinishAfterWipe() {   // on the restarted page, once the session has been found and the account read
+  var m = null; try { m = sessionStorage.getItem('vi_after_wipe'); if (m) sessionStorage.removeItem('vi_after_wipe'); } catch (e) {}
+  if (!m || !_supaUser || !_supaUser.email) return false;
+  var o = { r: m, pin: true }; try { o = JSON.parse(m); } catch (e) {}
+  try { viMarkOnboardedUI(); } catch (e) {}
+  // the sign-in's last steps, as the code check would have run them: the PIN offer (shown over the page) and the profile row
+  try { _needPin = !!o.pin; var st = document.getElementById('vi-login-prepaint'); if (st) st.remove(); var ov = document.getElementById('login-overlay'); if (ov) ov.style.display = ''; } catch (e) {}
+  try { _completeAuth(_supaUser.email); } catch (e) {}
+  try { showToast(o.r === 'restored' ? 'Vault restored ✓' : 'Vault ready ✓'); } catch (e) {}
+  return true;
 }
 async function _refreshAuth() {   // an expired access token is the most common reason a read/write is refused
   try { if (_supaClient && _supaClient.auth && _supaClient.auth.refreshSession) { var r = await _withTimeout(_supaClient.auth.refreshSession(), 8000, null); return !!(r && r.data && r.data.session); } } catch (e) {}
@@ -19454,8 +19482,9 @@ async function _initSupabaseSession() {
     var session = res && res.data && res.data.session;
     if (!session || !session.user) return;
     _supaUser = session.user;
-    _dropDemoBeforeSync(_supaUser.email);
+    var wiped = _dropDemoBeforeSync(_supaUser.email);   // v0.95: see _viRestartAfterWipe
     var hydrated = await _hydrateFromSupabase(_supaUser.id);
+    if (wiped) { _viRestartAfterWipe(_supaUser.email, hydrated); return; }
     if (localStorage.getItem('vi_demo_mode') === 'true' && !hydrated) {
       _wipeDemoData(_supaUser.email);
       try { _createSession(_supaUser.email); } catch(e){}
@@ -19464,6 +19493,7 @@ async function _initSupabaseSession() {
     }
     await _syncPioneerFromProfile(_supaUser.id);
     viCleanAuthUrl();
+    try { _viFinishAfterWipe(); } catch (e) {}   // v0.95: the page was restarted after a sample wipe
     try { viWelcomePrefill(); } catch (e) {}
     if (!hasValidSession() && _supaUser.email) {
       _createSession(_supaUser.email);
@@ -19915,8 +19945,9 @@ async function _guardAccountSwitch(email) {
 async function _afterVerified(user, email) {
   _supaUser = user;
   if (!(await _guardAccountSwitch(email))) return;
-  _dropDemoBeforeSync(email);
+  var wiped = _dropDemoBeforeSync(email);   // v0.95 (owner, 8 Nov, tester on a new device): the sample is wiped from storage first; its keys cannot be written again until the page restarts
   var hydrated = await _hydrateFromSupabase(_supaUser.id);
+  if (wiped) { _viRestartAfterWipe(email, hydrated); return; }   // every tab still holds the sample in memory: restart from storage (the account's own rows, or nothing)
   // QC-2: demo visitor signing up for the first time — wipe sample data so
   // the new account starts clean and demo values never sync to Supabase.
   if (localStorage.getItem('vi_demo_mode') === 'true' && !hydrated) {
@@ -30114,7 +30145,7 @@ function initDemoMode() {
   var session = null; try { session = JSON.parse(localStorage.getItem('vi_session') || 'null'); } catch (e) {}
   var signedIn = !!(session && session.email && session.expiry > Date.now());
   if (!isDemo && !hasData && !signedIn && loadDemoData()) {
-    isDemo = true;
+    isDemo = true; try { _viBootDemo = true; } catch (e) {}   // v0.95: this page is on the sample from here on (see the setItem guard)
     // the seed lands after the app's state has loaded: read it back and redraw, so the first visit is not empty until a reload (release chat, 1 Nov)
     try { _reloadAllState(); } catch (e) {}
     try { updateKPIs(); drawChart(); renderCashflow(); renderSummaryCards(); renderFIREroadmap(); } catch (e) {}
