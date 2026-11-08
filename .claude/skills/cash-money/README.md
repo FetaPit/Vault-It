@@ -1,6 +1,6 @@
 # Cash Money
 
-A UK startup accountant skill for Claude. Covers sole traders and small limited companies: bookkeeping, allowable expenses, VAT, Making Tax Digital, Self Assessment, Corporation Tax, salary vs dividends, director's loans, tax pots, runway and deadlines. Rates are for 2026/27.
+A UK finance co-worker and startup accountant skill for Claude, for sole traders and small limited companies. It chases invoices, forecasts cash 13 weeks ahead, runs a Monday money brief and month-end close, and handles bookkeeping, VAT, Making Tax Digital, Self Assessment, Corporation Tax, salary vs dividends, dividend paperwork, director's loans and deadlines. Rates are for 2026/27.
 
 ## Install
 
@@ -17,8 +17,14 @@ A UK startup accountant skill for Claude. Covers sole traders and small limited 
 | `references/deadlines.md` | HMRC, Companies House, VAT and payroll dates |
 | `references/integrations.md` | Tide, Xero, Stripe and others, and whether you need Xero |
 | `references/bookkeeping-categories.md` | Categories mapped to the Self Assessment boxes |
+| `references/onboarding.md` | First-run setup interview, systems check and quick win |
+| `references/credit-control.md` | Chase ladder, Late Payment Act, email and letter templates |
+| `references/routines.md` | Monday money brief, month-end close, quarterly check-in, year-end pack |
+| `references/ltd-paperwork.md` | Dividend minutes and vouchers, director's loan log, annual checklist |
 | `scripts/tax_calc.py` | Sole trader, Ltd, compare, Corporation Tax and s455 maths |
 | `scripts/bank_summary.py` | Turns a Tide (or other bank) CSV into categories, monthly totals and a review list |
+| `scripts/chase_list.py` | Ages unpaid invoices, picks the next chase step, works out statutory interest |
+| `scripts/cashflow_forecast.py` | 13-week cash forecast with lowest point and buffer warnings |
 
 ## Keep it current
 
