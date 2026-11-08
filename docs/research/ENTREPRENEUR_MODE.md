@@ -6,6 +6,19 @@ Research only. No app code was changed. Figures from outside sources are marked 
 
 ---
 
+## Owner decisions, 8 Nov 2026 (these override the sections below)
+
+- **Budget is not touched.** "do not change the income and expenses tool in budget that is more geared towards salary employees." Entrepreneur is the paid (Pro) mode and adds its own income. That income reaches the Dashboard tiles, 3D net worth and net worth over time, never the Budget tab. (Today stream income already adds to the Dashboard "Monthly surplus" tile and the sidebar, separately from Budget: `updateKPIs` and the sidebar both add `bizState.incomeStreams[].monthlyIncome`.)
+- **Business accounts in net worth.** "add Business Current and saving line able to be added." The user can add **Business current** and **Business savings** accounts. Plan: a `kind` field on cash accounts (`alState.cashAccounts`), shown as a Business group. They count through `alTotalCash`, so net worth, the tiles, 3D net worth and the monthly snapshots pick them up with no change to `computeNetWorth`. **Mark paid** on a contract milestone asks which business account it landed in and adds it there, with undo.
+- **Contract cards are built from the Roadmap stage cards, made larger** (the stage cards drawn by `renderFIREroadmap` and the detail panel in `fireShowDetail`), not from the credit card. The user can add the company or contract logo. Flip or click to see the deliverables and the brief.
+- **No client wall.** Section 6's wall and the one-client warning are dropped. The client list stays a list, and clients link to their contracts.
+- **Your Team: yes.** The owner's first ask was "a Your Team Tab", so it opens as a tab inside the Entrepreneur page (no new menu item).
+- **UK reminders: ok.**
+- **Paid plan:** Entrepreneur stays a Pro mode.
+- **Still open:** whether contract files ever sync (the plan is on the device only), and starting values for the tax pot and buffer (left blank for the user to fill in; the app doesn't guess).
+
+---
+
 ## 1. In short
 
 1. **Income goes from "MRR" to "what landed each month".** Today every stream and client is one fixed £ a month figure. Founders' income isn't like that. Record what each stream actually paid, month by month, and show the spread. From that, work out a **safe monthly wage**: the amount you could pay yourself every month based on your worst recent months.
@@ -181,31 +194,26 @@ Team cards hold other people's personal data. Points from ICO-related sources (t
 
 ---
 
-## 9. Suggested build order
+## 9. Build order (revised after the owner's decisions)
 
-Each phase is one queue item and goes through `ship-item` (failing test first, named tests, Night and Daylight shots at 390 and 1100 px, then `rollout-qc`).
+Each phase is one queue item and goes through `ship-item`: failing test first, named tests, Night and Daylight shots at 390 and 1100 px, then `rollout-qc`. In every phase the Budget tab, `cfTotalIn`, `cfTotalOut` and the Budget lines stay exactly as they are, and a test proves it.
 
-| # | Phase | Why first | Size |
-|---|---|---|---|
-| 1 | **Income ledger, month strip, safe wage, tax pot** | it fixes the core problem and feeds the deposit timeline | medium |
-| 2 | **Contract cards: data, brief, fill, states, deck** (no file upload yet) | the owner's headline idea; reuses the credit card build | large |
-| 3 | **Contract files on the device** + privacy notice line | small once phase 2 exists | small |
-| 4 | **Client wall and client sheet, pipeline, next actions** | needs contracts and the ledger for brick sizes | large |
-| 5 | **Your Team cards, team cost, links to contracts** + privacy notice line | uses the same card base | medium |
-| 6 | **UK reminders:** VAT meter, MTD line, payments on account dates, late-payment interest, IR35 note | needs the ledger; one table of figures with "last checked" dates | medium |
-| later | AI contract reader; on-device encryption; a three.js client wall | each needs owner sign-off, and the AI reader needs Supabase work | n/a |
+| # | Phase | Size |
+|---|---|---|
+| 1 | **Business current and savings accounts.** A `kind` on cash accounts (personal by default, so old saves load unchanged). Add and edit them from Assets and from Entrepreneur. A Business group on the Dashboard tiles, in 3D net worth and in the sidebar. Counted in net worth through `alTotalCash`. | small to medium |
+| 2 | **Contract cards.** Larger versions of the Roadmap stage cards. Front: company or contract logo (uploaded, stored on the device like wealth photos, a thumbnail synced), name, client, value, dates, state, gold paid share. Flip or click: the deliverables checklist, then the brief (type, payment milestones, terms, time commitment, expenses, profit, renewal, IR35 note). Mark paid adds to the chosen business account, with undo. Upload the contract file (on the device only). Clients link to their contracts. | large |
+| 3 | **Income that moves, inside Entrepreneur only.** A payment ledger per stream (contract payments log themselves), the 12-month strip, lowest, median and best month, safe monthly wage, buffer and tax pot (values set by the user). The Dashboard surplus tile keeps using Entrepreneur income as it does now. Net worth over time: the snapshots already include business accounts; the dashed forecast adds expected payments from signed contracts into business savings, to the `fintech-engineering` standard. | medium |
+| 4 | **Your Team tab inside Entrepreneur.** Profile cards (same card base as contracts) for employees, contractors, consultants, companies, vendors and suppliers; what you pay them; links to contracts (their cost shows in the contract's expenses); team cost a month. A privacy notice line about contacts users add. | medium |
+| 5 | **UK reminders.** VAT rolling 12-month meter, the MTD line, payments on account dates, statutory late-payment interest on overdue milestones, the IR35 note. One table of figures with "last checked" dates. | medium |
+| later | AI contract reader (needs Supabase work and the owner's yes); on-device encryption of files; syncing files. | n/a |
 
-Tests to add per phase: money maths in a node test (safe wage, buffer, contract profit, statutory interest, rolling 12-month VAT sum) to the `fintech-engineering` standard (pence as integers, rounding at the end); a browser test that old `bizState` saves load unchanged; the sync test with the new keys; and the beta client test (no new hosts).
+Tests per phase: money maths in node tests (safe wage, buffer, contract profit, statutory interest, rolling VAT sum; pence as integers, rounding at the end); old `bizState` and `alState` saves load unchanged; the sync test with the new keys; Budget figures unchanged; `test_beta_client` (no new hosts); `test_nw3d` for the Business group.
 
 ---
 
 ## 10. Decisions for the owner
 
-1. **Plan:** does all of this stay in the paid, Advanced-view Entrepreneur tab, or does the safe wage reach every user who has variable income?
-2. **Your Team:** its own tab in the menu, or a section inside Entrepreneur? (Recommendation: a section inside Entrepreneur, so the menu doesn't grow.)
-3. **Contract files:** on the device only (recommended for now), or synced to the cloud later? Syncing adds storage cost and a privacy notice change.
-4. **Starting values** for the tax pot percentage and the buffer (months), shown as editable.
-5. **Concentration warning:** keep it, and at what share?
+Answered 8 Nov 2026; see the top of this file.
 
 ---
 
