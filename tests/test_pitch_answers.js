@@ -87,6 +87,11 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   }
   ok(p.errs.length === 0, 'no page errors with the live viewports: ' + p.errs.join(' | '));
 
+  // Print (the PDF export): the live viewports are hidden so the stills underneath show, never an empty box over the heading
+  await p.emulateMedia({ media: 'print' });
+  ok(await p.evaluate(() => [...document.querySelectorAll('.live')].every((b) => getComputedStyle(b).display === 'none')), 'in print the live viewports are hidden and the still pictures show');
+  await p.emulateMedia({ media: 'screen' });
+
   // Laptop: the Present view
   p = await open(1280, 800);
   await p.click('#pv-open');
