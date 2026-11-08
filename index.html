@@ -12594,7 +12594,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div id="cash-table"></div>
         <div class="data-input-row" style="margin-top:12px">
           <input type="text" id="ca-name" placeholder="Account name">
-          <select id="ca-type" style="background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;outline:none"><option>Current</option><option>Savings</option><option>ISA</option><option>LISA</option></select>
+          <select id="ca-type" style="background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;outline:none"><option>Current</option><option>Savings</option><option>ISA</option><option>LISA</option><optgroup label="Business"><option value="biz-current">Business current</option><option value="biz-savings">Business savings</option></optgroup></select>
           <input type="number" id="ca-bal" placeholder="Balance £">
           <button class="btn-add-data" onclick="addCashAccount()">+ Add</button>
         </div>
@@ -12819,6 +12819,22 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <div class="pro-gate-sub" style="margin-bottom:16px">Part of every plan. Pick a plan to keep editing after your 30 days.</div>
         <button class="pro-gate-btn" id="pro-gate-main-btn" onclick="viShowTrialEnd('biz')">See plans</button>
       </div>
+    </div>
+
+    <!-- Business accounts (Entrepreneur 1): business current and savings accounts, counted in net worth with your cash -->
+    <div class="ov-chart-card" id="biz-accounts" style="margin-bottom:16px">
+      <div class="ba-hd">
+        <div class="ov-chart-title">Business accounts</div>
+        <div class="ba-tots"><span>Current <b id="biz-acc-current">£0</b></span><span>Savings <b id="biz-acc-savings">£0</b></span></div>
+      </div>
+      <div id="biz-acc-list"></div>
+      <div class="data-input-row ba-add">
+        <input type="text" id="ba-name" placeholder="Account name" aria-label="Business account name">
+        <select id="ba-kind" aria-label="Business account type"><option value="biz-current">Business current</option><option value="biz-savings">Business savings</option></select>
+        <input type="number" id="ba-bal" placeholder="Balance £" aria-label="Balance" step="0.01" inputmode="decimal">
+        <button class="btn-add-data" id="ba-add" onclick="bizAddAccount()">+ Add</button>
+      </div>
+      <div class="ba-note">Counted in your net worth with your cash. Your Budget does not change.</div>
     </div>
 
     <!-- Income Stream Builder -->
@@ -14223,6 +14239,22 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .pc-empty{font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:12px}
 .pc-row select,.pc-row input[type=date]{background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;outline:none}
 .pc-out{background:transparent!important;border-color:var(--re)!important;color:var(--re)!important}
+/* Business accounts (Entrepreneur 1): the type choice in the cash table, and the card on the Entrepreneur tab */
+.cash-type-sel,.ba-add select{background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;outline:none;max-width:100%}
+.cash-type-sel{font-size:max(.62rem,var(--vi-fs-2));padding:4px 6px;color:var(--t2);max-width:10.5em}
+.cash-type-sel:focus-visible,.ba-add select:focus-visible,.ba-bal:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.ba-hd{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;margin-bottom:12px}
+.ba-tots{display:flex;gap:16px;flex-wrap:wrap;font-size:max(.62rem,var(--vi-fs-2));color:var(--t2)}
+.ba-tots b{font-family:'Share Tech Mono',monospace;font-size:max(.74rem,var(--vi-fs-3));color:var(--orange);font-weight:700;margin-left:4px}
+.ba-row{display:grid;grid-template-columns:minmax(0,1fr) auto 8.5em 32px;gap:8px 10px;align-items:center;padding:7px 2px;border-bottom:1px solid var(--bd);font-size:max(.74rem,var(--vi-fs-3))}
+.ba-n{min-width:0}.ba-n>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ba-t{font-size:max(.62rem,var(--vi-fs-2));color:var(--orange);white-space:nowrap}
+.ba-bal{width:100%;min-width:0;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.74rem,var(--vi-fs-3));padding:6px 8px;text-align:right}
+.ba-empty{font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:12px}
+.ba-add{margin-top:12px}
+.ba-note{font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);margin-top:10px;line-height:1.5}
+@media(max-width:600px){.ba-row{grid-template-columns:minmax(0,1fr) 7.5em 32px}.ba-t{grid-column:1;grid-row:2;margin-top:-4px}.ba-add{flex-wrap:wrap}.ba-add>*{flex:1 1 45%;min-width:0}.ba-add #ba-name{flex-basis:100%}
+  #cash-table th,#cash-table td{padding-left:4px!important;padding-right:4px!important}.cash-type-sel{max-width:none;width:100%;padding:4px 2px 4px 4px}#cash-table td:nth-child(2){width:42%}}
 @media(max-width:600px){.pc-row{flex-wrap:wrap}.pc-row>*{flex:1 1 45%}}
 .debt-sides{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid rgb(var(--teal-rgb) / .3);border-radius:12px;overflow:hidden;margin-bottom:16px}
 .debt-sides button{background:none;border:0;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--t2);min-height:48px}
@@ -14892,7 +14924,9 @@ function viRenderLedger(){
   line('warn','var(--amber)',L.liab,f(alLiabAssetTotal()),'sb-liab');
   line('plus',sur>=0?'var(--teal)':'var(--red)','Monthly surplus',m(sur),'sb-surplus',sur>=0?'':'var(--red)');
   sec('What you own');
-  line('cash','var(--green)',L.cash,f(alTotalCash()),'sb-cash');
+  var bizC=alTotalBizCash();
+  line('cash','var(--green)',L.cash,f(alTotalCash()-bizC),'sb-cash');
+  if(bizC>0)line('biz','var(--orange)','Business accounts',f(bizC),'sb-biz-cash');
   line('house','var(--teal)',L.deposit,f(state?state.saved:0),'sb-deposit');
   line('stocks','var(--green2)',L.stocks,f(alTotalStocks()),'sb-stocks','',stale(stkOld));
   line('metals','var(--gold)',L.metals,f(alTotalMetals()),'sb-metals','',alTotalMetals()>0?stale(mtOld):'');
@@ -14920,7 +14954,9 @@ function viRenderLedger(){
   line('plus',sur>=0?'var(--teal)':'var(--red)','Surplus',m(sur),'sb-surplus-2',sur>=0?'':'var(--red)');
   line('plus',mdl.surplus>=0?'var(--teal)':'var(--red)','Savings rate',(mdl.tIn>0?Math.max(-999,Math.round((mdl.surplus/mdl.tIn)*100)):0)+'%','sb-savings-rate',mdl.surplus>=0?'':'var(--red)');   /* Budget's Save rate: same surplus, same income, same rounding */
   var mrr=typeof bizMRR==='function'?bizMRR():0,cl=typeof bizState!=='undefined'?(bizState.clients||[]).filter(function(c){return c.status==='Active'}).length:0;
-  if(mrr>0||cl>0){sec('Business');line('biz','var(--orange)','Monthly recurring revenue',m(mrr),'sb-mrr');line('biz','var(--orange)','Active clients',String(cl),'sb-clients');}
+  if(mrr>0||cl>0||bizC>0){sec('Business');
+    if(mrr>0||cl>0){line('biz','var(--orange)','Monthly recurring revenue',m(mrr),'sb-mrr');line('biz','var(--orange)','Active clients',String(cl),'sb-clients');}
+    if(bizC>0){line('cash','var(--orange)','Business current',f(alTotalBizCash('biz-current')),'sb-biz-current');line('cash','var(--orange)','Business savings',f(alTotalBizCash('biz-savings')),'sb-biz-savings');}}
   el.innerHTML=out.join('');
 }
 
@@ -19733,6 +19769,12 @@ function alTotalCrypto(){return alState.crypto.reduce(function(s,c){var a=(c.amo
 // cash = bank and savings accounts + the physical cash log (notes and coins at home, in a wallet, in a safe)
 function alTotalPhysical(){return (alState.physicalCash||[]).reduce(function(s,e){return s+(+e.amount||0);},0);}
 function alTotalCash(){return alState.cashAccounts.reduce(function(s,a){return s+a.balance;},0)+Math.max(0,alTotalPhysical());}
+// Business accounts (Entrepreneur 1, owner 8 Nov 2026: "add Business Current and saving line able to be added"). A cash account may carry
+// kind 'biz-current' or 'biz-savings'; no kind means personal, so old saves load unchanged. They are cash like any other, so alTotalCash
+// and net worth count them as they are; the Dashboard, sidebar and 3D net worth show them as their own Business line. Budget never reads them.
+function alBizKinds(){return {'biz-current':'Business current','biz-savings':'Business savings'};}   // a function, so start-up code that runs before this line can use it
+function alIsBizAcc(a){return !!(a&&alBizKinds().hasOwnProperty(a.kind));}
+function alTotalBizCash(kind){return (alState.cashAccounts||[]).reduce(function(s,a){return alIsBizAcc(a)&&(!kind||a.kind===kind)?s+(+a.balance||0):s;},0);}
 function alTotalOther(){return (alState.otherAssets||[]).reduce(function(s,a){return s+wiValue(a);},0);}
 // ═══════════════════════════════════════════════════════════════
 // STOCKS & FUNDS — editable portfolios ("pies") with live prices
@@ -21280,7 +21322,8 @@ function renderAlTab(){
   // Cash accounts
   var cas=document.getElementById('cash-table');
   try{renderPhysicalCash();}catch(e){console.error('[Vault-It] physical cash',e);}
-  if(cas)cas.innerHTML=alState.cashAccounts.length?'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="font-size:max(.54rem,var(--vi-fs-1));font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Account</th><th style="font-size:max(.54rem,var(--vi-fs-1));font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Type</th><th style="font-size:max(.54rem,var(--vi-fs-1));font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:right">Balance</th><th></th></tr></thead><tbody>'+alState.cashAccounts.map(function(a){return'<tr><td style="padding:7px 10px;font-size:max(.74rem,var(--vi-fs-3))"><span class="cash-acc">'+viBankLogo(a.name)+'<span>'+cfEsc(a.name)+'</span></span></td><td style="padding:7px 10px;font-size:max(.62rem,var(--vi-fs-2));color:var(--t3)">'+a.type+'</td><td style="padding:7px 10px;font-size:max(.74rem,var(--vi-fs-3));font-family:\'Share Tech Mono\',monospace;color:var(--gr);text-align:right">\u00a3'+a.balance.toLocaleString('en-GB')+'</td><td style="padding:7px 10px"><button class="data-item-del" onclick="delCashAccount('+a.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></td></tr>';}).join('')+'</tbody></table>':'<div style="font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:16px">No accounts added yet</div>';
+  if(cas)cas.innerHTML=alState.cashAccounts.length?'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="font-size:max(.54rem,var(--vi-fs-1));font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Account</th><th style="font-size:max(.54rem,var(--vi-fs-1));font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left">Type</th><th style="font-size:max(.54rem,var(--vi-fs-1));font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:right">Balance</th><th></th></tr></thead><tbody>'+alState.cashAccounts.map(function(a){return'<tr><td style="padding:7px 10px;font-size:max(.74rem,var(--vi-fs-3))"><span class="cash-acc">'+viBankLogo(a.name)+'<span>'+cfEsc(a.name)+'</span></span></td><td style="padding:7px 10px;font-size:max(.62rem,var(--vi-fs-2));color:var(--t3)">'+alCashTypeSel(a)+'</td><td style="padding:7px 10px;font-size:max(.74rem,var(--vi-fs-3));font-family:\'Share Tech Mono\',monospace;color:var(--gr);text-align:right">\u00a3'+a.balance.toLocaleString('en-GB')+'</td><td style="padding:7px 10px"><button class="data-item-del" onclick="delCashAccount('+a.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></td></tr>';}).join('')+'</tbody></table>':'<div style="font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:16px">No accounts added yet</div>';
+  try{renderBizAccounts();}catch(e){console.error('[Vault-It] business accounts',e);}
   // Liabilities
   var ll=document.getElementById('liabilities-list');
   if(ll){
@@ -21382,9 +21425,49 @@ function addCashAccount(){if(viBlockEdit())return;
   var t=document.getElementById('ca-type').value;
   var b=(parseFloat(document.getElementById('ca-bal').value)||0)/(window.VI_CURRENCY_RATE||1);
   if(!n)return;
-  alState.cashAccounts.push({id:Date.now(),name:n,type:t,balance:b});
+  var acc={id:Date.now(),name:n,type:t,balance:b};
+  if(alBizKinds().hasOwnProperty(t)){acc.kind=t;acc.type=alBizKinds()[t];}
+  alState.cashAccounts.push(acc);
   document.getElementById('ca-name').value='';document.getElementById('ca-bal').value='';
-  saveAL();renderAlTab();updateKPIs();renderCashISO();
+  alCashChanged();
+}
+function alCashChanged(){saveAL();renderAlTab();updateKPIs();renderCashISO();}
+function alCashAcc(id){return (alState.cashAccounts||[]).find(function(a){return a.id===id;});}
+// Change an account's type from Assets: a Business type sets its kind, a personal type removes it.
+function alSetCashType(id,v){if(viBlockEdit())return;var a=alCashAcc(id);if(!a)return;
+  if(alBizKinds().hasOwnProperty(v)){a.kind=v;a.type=alBizKinds()[v];}else{delete a.kind;a.type=v;}
+  alCashChanged();
+}
+function alSetCashBalance(id,v){if(viBlockEdit())return;var a=alCashAcc(id);if(!a)return;
+  a.balance=(parseFloat(v)||0)/(window.VI_CURRENCY_RATE||1);alCashChanged();
+}
+// The type cell in the cash table: the four personal types (plus any older one the account already has) and the Business pair.
+function alCashTypeSel(a){
+  var cur=alIsBizAcc(a)?a.kind:String(a.type||'Current'),opts=['Current','Savings','ISA','LISA'];
+  if(!alIsBizAcc(a)&&opts.indexOf(cur)<0)opts.unshift(cur);
+  var o=function(v,t){return '<option value="'+cfEsc(v)+'"'+(v===cur?' selected':'')+'>'+cfEsc(t)+'</option>';};
+  return '<select class="cash-type-sel" id="cash-type-'+a.id+'" aria-label="Type of '+cfEsc(a.name)+'" onchange="alSetCashType('+a.id+',this.value)">'
+    +opts.map(function(v){return o(v,v);}).join('')+'<optgroup label="Business">'+Object.keys(alBizKinds()).map(function(k){return o(k,alBizKinds()[k]);}).join('')+'</optgroup></select>';
+}
+// Entrepreneur tab: the Business accounts card (its two totals, each account with its balance to edit, and the add row).
+function renderBizAccounts(){
+  var el=document.getElementById('biz-acc-list');if(!el)return;
+  var cur=document.getElementById('biz-acc-current'),sav=document.getElementById('biz-acc-savings'),r=window.VI_CURRENCY_RATE||1;
+  if(cur)cur.textContent=gbpFmt(alTotalBizCash('biz-current'));if(sav)sav.textContent=gbpFmt(alTotalBizCash('biz-savings'));
+  var accs=(alState.cashAccounts||[]).filter(alIsBizAcc);
+  el.innerHTML=accs.length?accs.map(function(a){
+    return '<div class="ba-row"><span class="cash-acc ba-n">'+viBankLogo(a.name)+'<span>'+cfEsc(a.name)+'</span></span>'
+      +'<span class="ba-t">'+alBizKinds()[a.kind]+'</span>'
+      +'<input type="number" step="0.01" inputmode="decimal" class="ba-bal" id="ba-bal-'+a.id+'" value="'+(Math.round((+a.balance||0)*r*100)/100)+'" aria-label="Balance of '+cfEsc(a.name)+'" onchange="alSetCashBalance('+a.id+',this.value)" onkeydown="if(event.key===\'Enter\')this.blur()">'
+      +'<button class="data-item-del" onclick="delCashAccount('+a.id+')" aria-label="Remove '+cfEsc(a.name)+'"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-close"/></svg></button></div>';
+  }).join(''):'<div class="ba-empty">No business accounts yet. Add your business current or savings account below.</div>';
+}
+function bizAddAccount(){if(viBlockEdit())return;
+  var ne=document.getElementById('ba-name'),n=ne.value.trim(),k=document.getElementById('ba-kind').value,be=document.getElementById('ba-bal');
+  if(!n){ne.focus();return;}
+  if(!alBizKinds().hasOwnProperty(k))return;
+  alState.cashAccounts.push({id:Date.now(),name:n,type:alBizKinds()[k],kind:k,balance:(parseFloat(be.value)||0)/(window.VI_CURRENCY_RATE||1)});
+  ne.value='';be.value='';alCashChanged();
 }
 // Physical cash log: each line is money put in (+) or taken out (-), with where it is kept and the date.
 function pcAdd(sign){if(viBlockEdit())return;
@@ -23022,6 +23105,7 @@ function renderBizTab(){
   }).join('')||'<div style="font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:16px">No clients yet. Add your first.</div>';
   var sl=document.getElementById('stream-list-el');
   if(sl)sl.innerHTML=bizState.streams.map(function(r){return'<div class="data-item"><span>'+r.name+'</span><span class="data-item-val" style="color:var(--gold)">'+gbpFmt(r.monthly)+'/mo</span><button class="data-item-del" onclick="deleteStream('+r.id+')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>';}).join('')||'';
+  try{renderBizAccounts();}catch(e){console.error('[Vault-It] business accounts',e);}   // start-up can call this before the bank list is ready; Assets redraws it
   renderIncomeStreams();
   renderBizGoal();
 }
@@ -25111,7 +25195,8 @@ function renderSummaryCards(){
   if(aEl){
     var ta=alTotalAssets();
     var rows=[
-      {l:VI_LABELS.cash,v:alTotalCash(),c:'var(--green)',i:'cash'},
+      {l:VI_LABELS.cash,v:alTotalCash()-alTotalBizCash(),c:'var(--green)',i:'cash'},
+      {l:'Business accounts',v:alTotalBizCash(),c:'var(--orange)',i:'biz'},
       {l:VI_LABELS.deposit,v:state?state.saved:0,c:'var(--teal)',i:'house'},
       {l:VI_LABELS.stocks,v:alTotalStocks(),c:'var(--green2)',i:'stocks'},
       {l:VI_LABELS.metals,v:alTotalMetals(),c:'var(--gold)',i:'metals'},
@@ -28960,7 +29045,9 @@ function sceneData(){
   var st=document.getElementById('nw3d-hero-stage'),r=rate(),cols=[];
   function add(key,name,short,col,v,dir){cols.push({key:key,name:name,short:short,col:col,v:Math.max(0,v)*r,dir:dir})}
   var L=window.VI_LABELS||{};   /* the dashboard's own names on the floor (owner, 31 Oct) */
-  add('cash',L.cash,L.cash,tok(st,'green'),n(alTotalCash),1);
+  var bizC=n(function(){return typeof alTotalBizCash==='function'?alTotalBizCash():0});
+  add('cash',L.cash,L.cash,tok(st,'green'),n(alTotalCash)-bizC,1);
+  if(bizC>0)add('bizcash','Business accounts','Business',tok(st,'orange'),bizC,1);
   add('deposit',L.deposit,L.deposit,tok(st,'teal'),n(function(){return state?state.saved:0}),1);
   add('stocks',L.stocks,L.stocks,tok(st,'green2'),n(alTotalStocks),1);
   add('metals',L.metals,L.metals,tok(st,'gold'),n(alTotalMetals),1);
