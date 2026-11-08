@@ -12113,18 +12113,23 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     var reset = params.has('reset');
     if (reset) { localStorage.removeItem('vi_user'); localStorage.removeItem('vi_session'); }
 
-    // vault-it.co/demo-a (owner, 8 Nov 2026): the Worker sends it here as ?demo=alex. Always starts from the Alex Morgan sample,
-    // whatever this browser holds: every saved key (and any Supabase sign-in) is dropped first, then initDemoMode() seeds the
-    // sample, opens a 24h demo session and reloads once with a clean address. Both overlays are hidden before first paint.
+    // vault-it.co/demo-a (owner, 8 Nov 2026): the Worker sends it here as ?demo=alex. Nothing in this browser is ever removed
+    // (owner, 8 Nov: "do not allow any wiping of data"). A browser with no profile, session or sign-in of its own gets the Alex
+    // Morgan sample: initDemoMode() fills the empty keys, opens a 24h demo session and reloads once with a clean address, so both
+    // overlays are hidden before first paint. A browser that holds someone's own data keeps all of it and opens as usual;
+    // initDemoMode() makes the final call with the full saved-data check and says so once.
     if (!reset && params.get('demo') === 'alex') {
+      var _own = false;
       try {
-        var _keep = { vi_settings: 1, vi_pwa_dismissed: 1, vi_fx_rates: 1, vi_fx_updated: 1, vi_fx_gbpusd: 1, vi_fx_gbpeur: 1 };
-        var _drop = [];
-        for (var _di = 0; _di < localStorage.length; _di++) { var _dk = localStorage.key(_di); if (/^(pos_|vi_|sb-|ht3$)/.test(_dk) && !_keep[_dk]) _drop.push(_dk); }
-        _drop.forEach(function(k) { localStorage.removeItem(k); });
-        localStorage.setItem('vi_demo_launch', 'a');
-      } catch (e) {}
-      document.write('<style>#login-overlay,#welcome-overlay{display:none!important}</style>');
+        var _du = JSON.parse(localStorage.getItem('vi_user') || 'null'), _ds = JSON.parse(localStorage.getItem('vi_session') || 'null');
+        var _onSample = localStorage.getItem('vi_demo_mode') === 'true';
+        if (!_onSample && ((_du && _du.email) || (_ds && _ds.email))) _own = true;
+        for (var _di = 0; _di < localStorage.length && !_own; _di++) { if (/^sb-.+-auth-token$/.test(localStorage.key(_di))) _own = true; }
+      } catch (e) { _own = true; }   // storage that cannot be read is never treated as empty
+      if (!_own) {
+        try { localStorage.setItem('vi_demo_launch', 'a'); } catch (e) {}
+        document.write('<style>#login-overlay,#welcome-overlay{display:none!important}</style>');
+      }
     }
 
     // Demo bypass — ?bypass=websummit creates a 24h session from stored profile
@@ -29873,7 +29878,7 @@ function _viDeviceHasSavedData() {
 function _demoPut(k, v) { if (!_viKeyHasData(k)) localStorage.setItem(k, v); }   // the demo only ever fills empty keys
 function loadDemoData(force) {
   // refuses on any device that holds saved data, and never writes over a key that already has something in it
-  // (force: the vault-it.co/demo-a link, where the pre-paint script has already emptied the browser on purpose)
+  // (force: the vault-it.co/demo-a link on a browser already on the sample; _demoPut still fills empty keys only)
   if (!force && _viDeviceHasSavedData()) return false;
   _demoPut('vi_demo_mode', 'true');
   // Alex Morgan, the sample persona (owner, 8 Nov 2026): £57,000 salary (about £3,635 a month after tax and NI), renting at £1,150,
@@ -30005,19 +30010,33 @@ function clearDemoData() {
 
 function initDemoMode() {
   var launch = null; try { launch = localStorage.getItem('vi_demo_launch'); } catch (e) {}
-  if (launch === 'a') {
-    // vault-it.co/demo-a: the pre-paint script has already emptied this browser. Seed the sample, open a 24h demo session
-    // and reload once on a clean address, so every tab draws from the seeded keys the ordinary way.
+  var viaLink = false; try { viaLink = new URLSearchParams(location.search).get('demo') === 'alex'; } catch (e) {}
+  if (launch === 'a' || viaLink) {
+    // vault-it.co/demo-a. Nothing in this browser is ever removed (owner, 8 Nov 2026). The pre-paint script sets the launch flag
+    // only when the browser looks empty; the saved-data check here is the one that counts. An empty browser, or one already on
+    // the sample, gets the Alex Morgan sample (empty keys filled, nothing written over), a 24h demo session and one reload on a
+    // clean address, so every tab draws from the seeded keys the ordinary way. A browser holding someone's own data keeps every
+    // key, gets a clean address and is told once how to see the demo.
     try { localStorage.removeItem('vi_demo_launch'); } catch (e) {}
-    if (loadDemoData(true)) {
-      try {
-        localStorage.setItem('vi_demo_variant', 'a');
-        localStorage.setItem('vi_session', JSON.stringify({ email: 'demo@vault-it.app', expiry: Date.now() + 24 * 60 * 60 * 1000 }));
-      } catch (e) {}
+    var onSample = localStorage.getItem('vi_demo_mode') === 'true';
+    if (launch === 'a' && (onSample || !_viDeviceHasSavedData())) {
+      if (loadDemoData(onSample)) {   // force only on the sample: _demoPut never writes over a key that already holds something
+        try {
+          localStorage.setItem('vi_demo_variant', 'a');
+          var ds = null; try { ds = JSON.parse(localStorage.getItem('vi_session') || 'null'); } catch (e) {}
+          if (!(ds && ds.email && ds.expiry > Date.now())) localStorage.setItem('vi_session', JSON.stringify({ email: 'demo@vault-it.app', expiry: Date.now() + 24 * 60 * 60 * 1000 }));
+        } catch (e) {}
+      }
+      location.replace(location.pathname);
+      return;
     }
-    location.replace(location.pathname);
-    return;
+    // Someone's own data or sign-in lives here: keep every key, clean the address, say so once (below).
+    try { sessionStorage.setItem('vi_demo_kept', '1'); } catch (e) {}
+    if (launch === 'a') { location.replace(location.pathname); return; }   // the pre-paint script hid the overlays for this load: reload so sign-in and welcome show as they should
+    try { history.replaceState({}, document.title, location.pathname); } catch (e) {}
   }
+  var kept = null; try { kept = sessionStorage.getItem('vi_demo_kept'); if (kept) sessionStorage.removeItem('vi_demo_kept'); } catch (e) {}
+  if (kept) setTimeout(function () { try { showToast('You already have Vault-It on this device, so your own data was kept. To see the Alex Morgan demo, open vault-it.co/demo-a in a private window or on another device.', 9000); } catch (e) {} }, 800);
   var isDemo  = localStorage.getItem('vi_demo_mode') === 'true';
   // any saved data (not just pos_ov1), a profile, a sign-in or an earlier "no thanks" means this is not an empty device
   var hasData = !isDemo && _viDeviceHasSavedData();
