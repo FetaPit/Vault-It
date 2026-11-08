@@ -100,7 +100,9 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   const wa = await p.evaluate(() => { const a = document.getElementById('pc-wa'), t = document.querySelector('a[href^="tel:"]');
     return a && { href: a.getAttribute('href'), text: a.textContent.trim(), tel: t && t.getAttribute('href').replace(/\D/g, ''), icon: !!a.querySelector('svg use[href="#vi-chat"]'), main: a.classList.contains('main') }; });
   ok(wa && wa.href === 'https://wa.me/' + wa.tel && wa.tel === '447470074133' && /WhatsApp/.test(wa.text) && wa.icon && !wa.main, 'a WhatsApp button opens a chat with the card\'s mobile: ' + JSON.stringify(wa));
-  ok(await p.locator('a[href="/pitch-Eligent"]').count() >= 1 && await p.locator('a[href^="/sign-up"], a[href="/"]').count() >= 1, 'links to the pitch deck and the beta sign-up');
+  const links = await p.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')).filter((h) => !/^(https?:|mailto:|tel:|#)/.test(h)));
+  const paths = links.map((h) => new URL(h, 'https://vault-it.co/pete').pathname);
+  ok(['/pitch-Eligent', '/sign-up', '/'].every((x) => paths.includes(x)), 'links to the pitch deck, the beta sign-up and vault-it.co: ' + JSON.stringify(paths));
   ok([...p.hosts].every((h) => /^fonts\.(googleapis|gstatic)\.com$/.test(h)), 'no outside hosts besides Google Fonts: ' + [...p.hosts]);
   ok(p.errs.length === 0, 'no page errors: ' + p.errs.join(' | '));
 
@@ -119,6 +121,9 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     .flatMap((el) => ['href', 'src', 'poster', 'data-src'].map((k) => el.getAttribute(k)).filter(Boolean)).concat(['pete-sw.js']));
   const prev = own.map((u) => { const x = new URL(u, 'https://card-x-vault-it.ptlived.workers.dev/landing/pete'); const r = route(x.hostname, x.pathname); return { u, ok: !!r.file && fs.existsSync(path.join(DIST, r.file)) }; });
   ok(own.length >= 8 && prev.every((x) => x.ok), 'every file the card uses also loads on a preview build: ' + JSON.stringify(prev.filter((x) => !x.ok)));
+  // owner, 8 Nov: "join the beta sends to 404", "And so does the pitch deck" (on the preview)
+  const prevLinks = links.map((u) => { const x = new URL(u, 'https://card-x-vault-it.ptlived.workers.dev/landing/pete'); const r = route(x.hostname, x.pathname); return { u, ok: r.site === 'landing' && !!r.file && fs.existsSync(path.join(DIST, r.file)) }; });
+  ok(links.length >= 4 && prevLinks.every((x) => x.ok), 'every link on the card (beta, pitch deck, vault-it.co) opens on a preview build too: ' + JSON.stringify(prevLinks.filter((x) => !x.ok)));
   const sw = fs.readFileSync(path.join(DIST, 'landing', 'pete-sw.js'), 'utf8');
   ok([...sw.matchAll(/https?:\/\/([a-z0-9.-]+)/gi)].every((m) => /^fonts\.(googleapis|gstatic)\.com$/.test(m[1])) && !/\bpostMessage|sendBeacon|XMLHttpRequest/.test(sw), 'the offline helper only keeps the card and its fonts, and sends nothing anywhere');
   const swr = await wk.fetch(new Request('https://vault-it.co/pete-sw.js'), { ASSETS: fakeAssets });
