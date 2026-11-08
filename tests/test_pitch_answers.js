@@ -40,8 +40,9 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
     ok(hosts.join() === 'fonts.googleapis.com,fonts.gstatic.com,vault-it.co', 'no new outside hosts: ' + hosts.join(', '));
     ok(!/font-family:[^;"]*(?!Syne|DM Sans|Share Tech Mono|Arial|Courier New|monospace|sans-serif)(Inter|Roboto|Helvetica|Georgia|Times)/i.test(html), 'fonts are Syne, DM Sans and Share Tech Mono only'); }
   // the four answers
-  { const s = await txt(p, 'spend'); ok(/£600/.test(s) && /£226/.test(s) && /£117/.test(s) && /£100/.test(s) && /£163/.test(s) && /receipts/i.test(s) && /own money/i.test(s), 'spend to date: about £600 from the four receipts');
-    const sum = [...s.matchAll(/£(\d{3})\b/g)].map((m) => +m[1]).filter((v) => [226, 117, 100, 163].includes(v)).reduce((a, v) => a + v, 0); ok(sum === 606, 'the receipts add to £606, "about £600": ' + sum); }
+  { const s = await txt(p, 'spend'); ok(/£3,214\.08/.test(s) && /£2,410\.56/.test(s) && /£2,661\.63/.test(s) && /JANUARY TO NOVEMBER 2026/.test(s) && /own money/i.test(s) && !/£606|£226/.test(s), 'invested to date: the owner\'s three business-account figures, no leftover receipt figures');
+    const rows = await p.evaluate(() => [...document.querySelectorAll('#spend table[data-invest] tr[data-row]')].map((r) => r.dataset.row + '=' + r.querySelectorAll('td')[1].textContent.trim()));
+    ok(rows.join() === 'invested=£3,214.08,spent=£2,410.56,turnover=£2,661.63', 'the table has the three rows in order: ' + rows.join(' ')); }
   { const a = await txt(p, 'ask'); ok(/£250,000/.test(a) && /SEIS/.test(a) && /March 2027/.test(a) && /50% income tax relief/.test(a) && /December 2027/.test(a) && /£43,400/.test(a) && /£261,390/.test(a), 'the ask: £250,000 under SEIS, closing March 2027, break-even December 2027');
     const uf = await p.evaluate(() => [...document.querySelectorAll('#ask [data-fund]')].map((e) => [e.dataset.fund, e.innerText]));
     const pct = uf.map((x) => x[0]).join('/'), sum = uf.reduce((s, x) => s + +(x[1].match(/£([\d,]+)/) || [0, '0'])[1].replace(/,/g, ''), 0);
