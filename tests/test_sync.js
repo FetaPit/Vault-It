@@ -21,7 +21,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   // a realistic session: enter data in every area
   await page.evaluate(()=>{
     ovState.income=[{id:1,name:'Salary',amount:3000,cat:'salary'}];ovState.expenses=[{id:2,name:'Rent',amount:1000,type:'ce',cat:'housing',category:'necessity'}];ovState.customCats=[{k:'c_x',kind:'exp',n:'Dog walker',ic:'paw',t:'cn'}];saveState();
-    alState.cashAccounts.push({id:3,name:'Cash',type:'Savings',balance:500});alState.stocks=[{id:4,pie:1,sym:'AAPL',units:2,avgCost:100,price:150}];alState.stockPies=[{id:1,name:'ISA'}];alState.otherAssets.push({id:5,name:'Watch',value:900,photos:3});saveAL();
+    alState.cashAccounts.push({id:3,name:'Cash',type:'Savings',balance:500});alState.cashAccounts.push({id:8,name:'Starling business',type:'Business current',kind:'biz-current',balance:1500});alState.stocks=[{id:4,pie:1,sym:'AAPL',units:2,avgCost:100,price:150}];alState.stockPies=[{id:1,name:'ISA'}];alState.otherAssets.push({id:5,name:'Watch',value:900,photos:3});saveAL();
     debtState.debts.push({id:6,name:'Card',original:1000,balance:800,rate:20,min:30,type:'credit'});saveDebtState();
     bizState.clients.push({id:7,name:'Acme',monthly:200,status:'Active'});saveBiz();
     state.saved=4200;state.target=240000;state.houseType='semi';state.deposits=[{date:'01/10/2026',amount:4200}];save();
@@ -40,6 +40,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   ok(cloud.house.saved===4200&&cloud.house.houseType==='semi','cloud copy of the house deposit is correct (£'+cloud.house.saved+', '+cloud.house.houseType+')');
   ok(cloud.ov.customCats&&cloud.ov.customCats[0].n==='Dog walker'&&cloud.ov.expenses[0].type==='ce','budget lines, types and custom categories are in the cloud copy');
   ok(cloud.al.stocks.length===1&&cloud.al.otherAssets.some(a=>a.name==='Watch'),'stocks and wealth inventory are in the cloud copy');
+  ok(cloud.al.cashAccounts.some(a=>a.id===8&&a.kind==='biz-current')&&cloud.al.cashAccounts.some(a=>a.id===3&&!('kind' in a)),'a Business current account keeps its kind in the cloud copy; a personal one has none (Entrepreneur 1)');
   ok(cloud.user.name==='Pete','profile (name/job) is in the cloud copy');
   // brand-new device: empty browser, sign in, everything comes back
   const snapshot=await page.evaluate(()=>JSON.stringify(_cloud));
@@ -59,13 +60,13 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
     window._cloud=cloud;
     const before={saved:state.saved,nw:computeNetWorth()};
     const h=await _hydrateFromSupabase('u1');
-    return {h,before,after:{saved:state.saved,type:state.houseType,deposits:state.deposits.length,nw:computeNetWorth(),income:cfTotalIn(),spend:cfTotalOut(),stocks:alTotalStocks(),cash:alTotalCash(),debt:debtTotal(),clients:bizState.clients.length,cats:(ovState.customCats||[]).length,user:JSON.parse(localStorage.getItem('vi_user')).name,xp:achState.xp,pctText:document.getElementById('ppct')&&document.getElementById('ppct').textContent}};
+    return {h,before,after:{saved:state.saved,type:state.houseType,deposits:state.deposits.length,nw:computeNetWorth(),income:cfTotalIn(),spend:cfTotalOut(),stocks:alTotalStocks(),cash:alTotalCash(),bizCash:(typeof alTotalBizCash==='function'?alTotalBizCash():null),debt:debtTotal(),clients:bizState.clients.length,cats:(ovState.customCats||[]).length,user:JSON.parse(localStorage.getItem('vi_user')).name,xp:achState.xp,pctText:document.getElementById('ppct')&&document.getElementById('ppct').textContent}};
   },snapshot);
   ok(restored.h===true&&restored.before.saved===0,'fresh device starts empty, then restores from the cloud');
   const a=restored.after;
   ok(a.saved===4200&&a.type==='semi'&&a.deposits===1,'House Builder restored on the new device (£'+a.saved+', '+a.type+')');
   ok(a.income===3000&&a.spend===1000&&a.cats===1,'budget restored (income, spending, custom category)');
-  ok(a.stocks===300&&a.cash===500&&a.debt===800&&a.clients===1&&a.user==='Pete'&&a.xp===120,'stocks, cash, debts, business, profile and XP restored');
+  ok(a.stocks===300&&a.cash===2000&&a.bizCash===1500&&a.debt===800&&a.clients===1&&a.user==='Pete'&&a.xp===120,'stocks, cash, debts, business, profile and XP restored');
   ok(/%/.test(a.pctText||'')&&a.pctText!=='0.0%','house screen refreshed after restore ('+a.pctText+')');
   console.log('page errors:',errs,errs2); ok(errs.length+errs2.length===0,'no page errors');
   console.log(fails?('\n'+fails+' FAILED'):'\nALL PASSED'); await b.close();
