@@ -2,6 +2,7 @@
 // Hovering a model tile swaps its picture for a live view (one at a time); a drag turns the camera round the item (v0.7: also pinch, pan, double tap or click resets, see test_v07_p3_items); a click without
 // a drag opens the full viewer; the wheel stays with the page. Touch screens keep the picture. Item 14: the model keeps its colours.
 // Run: node tests/test_i3d_live.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 function glb() {
@@ -31,7 +32,7 @@ const seed = theme => {
 (async () => {
   const b = await chromium.launch(); const errs = [];
   const ctx = await b.newContext({ viewport: { width: 1100, height: 900 } }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-  await p.addInitScript(seed, 'dark'); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+  await p.addInitScript(seed, 'dark'); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1800);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await p.evaluate(() => { showTab('assets'); const b = [...document.querySelectorAll('#assets-page .subtab-btn')].find(x => /'other'/.test(x.getAttribute('onclick') || '')); showSubtab('assets', 'other', b); }); await p.waitForTimeout(500);
   // put a model on the item through the normal upload
@@ -58,7 +59,7 @@ const seed = theme => {
   await ctx.close();
   // touch screen: no live view, the picture opens the viewer
   const t = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); await routeThree(t); const q = await t.newPage(); q.on('pageerror', e => errs.push('touch ' + e.message));
-  await q.addInitScript(seed, 'dark'); await q.goto('file:///home/user/Vault-It/index.html'); await q.waitForTimeout(1500);
+  await q.addInitScript(seed, 'dark'); await q.goto(require('./lib/vi').FILE_URL); await q.waitForTimeout(1500);
   ok(await q.evaluate(() => { i3dLive('wi', 11, document.createElement('img')); return !window._i3dLive; }), 'touch screens keep the picture (no live view)');
   await t.close(); await b.close();
   ok(errs.length === 0, 'no page errors ' + errs.join(' | '));

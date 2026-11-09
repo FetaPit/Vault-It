@@ -10,9 +10,10 @@
 //   laidAtFirst how many bricks were already in place on the first frame (the finished house shows at once when this is the plan's count)
 //   animated    bricks that dropped in after the first frame
 // Usage: node tests/hb_coldload.js [runs]   (VI_INDEX=/path/index.html for another build). Also used by test_hb_speed.js.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
+const INDEX = require('./lib/vi').FILE_URL;
 
 const GPU_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-gpu-compositing', '--enable-gpu-rasterization'];
 

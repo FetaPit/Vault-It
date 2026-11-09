@@ -1,5 +1,6 @@
 // Phone sign-off group C (owner, 31 Oct): Cash and savings 3D draws a smaller ground plane (survey grid) that fades out in the scene's fog,
 // so the scene is lighter and the grid has no visible hard edge. Run: node tests/test_signoff_c.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
@@ -8,7 +9,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     const ph = w < 700, ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: ph, hasTouch: ph }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(() => { localStorage.setItem('vi-theme', 'dark'); localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' }));
       localStorage.setItem('pos_al1', JSON.stringify({ cashAccounts: [{ id: 5, name: 'Savings', type: 'Savings', balance: 2000 }], physicalCash: [{ id: 1, where: 'Safe', amount: 347, date: '2026-10-01' }], metals: {} })); });
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner{display:none!important}' });
     await p.evaluate(() => showTab('assets')); await p.waitForTimeout(1500);
     const r = await p.evaluate(() => { const V = V3.cash, g = V.grid; g.geometry.computeBoundingBox(); const bb = g.geometry.boundingBox, side = bb.max.x - bb.min.x, R = V.R;

@@ -1,6 +1,7 @@
 // Screenshots of the item 3D viewer: wealth inventory tile and viewer, liabilities tile, the library picker.
 //   node tests/item3d_shots.js  → shots/brand/item3d-*.png (Night and Daylight, 390px and 1100px)
 // The model is built from three.js shapes in the page (no model files needed).
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 const fs = require('fs'); const OUT = __dirname + '/../shots/brand'; fs.mkdirSync(OUT, { recursive: true });
@@ -21,7 +22,7 @@ const guitar = () => { const g = new THREE.Group(), M = (c) => new THREE.MeshSta
   for (const theme of ['dark', 'light']) for (const w of [390, 1100]) {
     const mob = w < 700, ctx = await b.newContext({ viewport: { width: w, height: mob ? 844 : 900 }, isMobile: mob, hasTouch: mob, deviceScaleFactor: mob ? 2 : 1 });
     await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(theme + w + ': ' + e.message));
-    await p.addInitScript(seed, theme); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2000);
+    await p.addInitScript(seed, theme); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(2000);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await p.evaluate(() => new Promise(r => viThree(r))); await p.evaluate(g => { const mk = eval('(' + g + ')'); showTab('assets'); const it = i3dItem('wi', 11); it.model = { src: 'file', t: 'guitar', thumb: i3dThumb(mk()) }; i3dItem('li', 21).model = { src: 'pp', k: 'car', t: 'Car Hatchback', by: 'Kay Lousberg', lic: 'CC0', thumb: i3dThumb(new THREE.Mesh(new THREE.BoxGeometry(2, .7, 1), new THREE.MeshStandardMaterial({ color: 0x2255aa }))) }; renderAlTab();
       showSubtab('assets', 'other', document.querySelector('[onclick*="\'other\'"]')); }, guitar.toString());

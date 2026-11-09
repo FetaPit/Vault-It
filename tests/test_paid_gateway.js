@@ -4,8 +4,9 @@
 //   upsert no longer sends is_pioneer; tester and founder flags come from the profile; old synced copies of paid status are ignored.
 //   older server (columns missing): everything works as before (the return URL unlocks this device), so the app can ship first.
 // Run: node tests/test_paid_gateway.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const MOCK = (mode, prof, extra) => `
   window.__mode = ${JSON.stringify(mode)}; window.__prof = ${JSON.stringify(prof)}; window.__upserts = []; window.__reads = [];

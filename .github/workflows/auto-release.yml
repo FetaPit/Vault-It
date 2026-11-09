@@ -1,0 +1,125 @@
+name: Auto release
+
+# Moves production (release/pioneer-v2) to a READY commit without the owner running a command.
+# Owner approved this on 5 Nov 2026 ("do it"). Cloudflare Workers Builds deploys whatever lands on
+# release/pioneer-v2, so every gate below must pass or nothing moves.
+#
+# How to release: push a tag named ready/<anything> on the exact candidate commit, after CI is green
+# and Pedro has passed it:   git tag ready/2026-11-05-a1b2c3d <sha> && git push origin ready/2026-11-05-a1b2c3d
+# Pause everything: set the repository variable AUTO_RELEASE_PAUSED to true (Settings, Variables).
+# Needs: secret RELEASE_PUSH_TOKEN (fine-grained token, Contents: read and write on this repo) if
+# release/pioneer-v2 is protected; otherwise the built-in token is used. See docs/AUTO_RELEASE.md.
+
+on:
+  push:
+    tags: ['ready/*']
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Full 40-character commit SHA to release
+        required: true
+
+permissions:
+  contents: write
+  checks: read
+  issues: write
+
+concurrency:
+  group: auto-release
+  cancel-in-progress: false
+
+env:
+  PROD: release/pioneer-v2
+  APP: https://app.vault-it.co
+  SITE: https://vault-it.co
+
+jobs:
+  release:
+    if: ${{ vars.AUTO_RELEASE_PAUSED != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      INPUT_SHA: ${{ inputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_PUSH_TOKEN || github.token }}
+
+      - name: Resolve the commit to release
+        id: sha
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            SHA="$INPUT_SHA"
+          else
+            SHA="$(git rev-list -n 1 "refs/tags/${GITHUB_REF_NAME}")"
+          fi
+          # Validate before the value is used anywhere else: a full 40-character hex SHA, nothing more.
+          if ! [[ "$SHA" =~ ^[0-9a-f]{40}$ ]]; then echo "Not a full commit SHA: refusing."; exit 1; fi
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Releasing $SHA" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Git gates (candidate branch, fast-forward, no server or workflow changes)
+        id: gates
+        run: |
+          set -uo pipefail
+          git fetch origin --prune
+          bash scripts/auto-release-gates.sh "${{ steps.sha.outputs.sha }}" "$PROD" | tee -a "$GITHUB_STEP_SUMMARY"
+          code=${PIPESTATUS[0]}
+          if [ "$code" = "3" ]; then echo "live=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          exit "$code"
+
+      - name: CI must be green on this exact commit (waits up to 40 minutes)
+        if: steps.gates.outputs.live != 'true'
+        run: |
+          set -uo pipefail
+          SHA="${{ steps.sha.outputs.sha }}"
+          for i in $(seq 1 40); do
+            gh api "repos/${GITHUB_REPOSITORY}/commits/${SHA}/check-runs?per_page=100" | bash scripts/auto-release-ci-check.sh | tee -a "$GITHUB_STEP_SUMMARY"
+            code=${PIPESTATUS[1]}
+            [ "$code" = "0" ] && exit 0
+            [ "$code" = "1" ] && { echo "CI failed on $SHA; nothing released." ; exit 1; }
+            sleep 60
+          done
+          echo "CI never finished or never ran on $SHA; nothing released." ; exit 1
+
+      - name: Backup, then move production (plain push, never forced)
+        if: steps.gates.outputs.live != 'true'
+        run: |
+          set -euo pipefail
+          SHA="${{ steps.sha.outputs.sha }}"
+          git fetch origin --prune
+          git merge-base --is-ancestor "origin/$PROD" "$SHA"   # re-check: nothing moved while CI was waited on
+          STAMP="$(date -u +%Y%m%d-%H%M)"
+          git push origin "origin/$PROD:refs/heads/backup/release-pioneer-v2-${STAMP}"
+          git push origin "$SHA:refs/heads/$PROD"
+          echo "Backup: backup/release-pioneer-v2-${STAMP}" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "Pushed $SHA to $PROD" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Live check (Cloudflare builds in a few minutes)
+        id: live
+        if: steps.gates.outputs.live != 'true'
+        run: |
+          set -uo pipefail
+          SHA="${{ steps.sha.outputs.sha }}"
+          for i in $(seq 1 40); do
+            if curl -fsS -m 15 "$APP/version.json" | grep -q "\"sha\":\"$SHA\""; then ok=1; break; fi
+            sleep 30
+          done
+          [ "${ok:-0}" = "1" ] || { echo "version.json never showed $SHA within 20 minutes."; exit 1; }
+          for u in "$APP/" "$SITE/" "$SITE/pitch-Eligent"; do
+            code="$(curl -s -o /dev/null -m 20 -w '%{http_code}' "$u")"
+            echo "$u -> $code" | tee -a "$GITHUB_STEP_SUMMARY"
+            [ "$code" = "200" ] || exit 1
+          done
+          echo "Live and healthy: $SHA" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Tell the owner if anything failed after production moved
+        if: failure() && steps.gates.outputs.live != 'true'
+        run: |
+          SHA="${{ steps.sha.outputs.sha }}"
+          gh issue create --title "Auto release did not finish: ${SHA:0:7}" --body "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+
+          Look at the run summary for the gate that stopped it. If production was already moved and the live check failed, the previous production is on the newest backup/release-pioneer-v2-* branch. Rolling back is a force push and is the owner's call; nothing here does it automatically." || true

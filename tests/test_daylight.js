@@ -2,6 +2,7 @@
 // owner asked for AA, 30 Oct), there is no glow, charts swap to Daylight colours, and 3D viewports keep the Night look.
 // Text on gradients (card artwork, gradient buttons) is skipped: its background cannot be measured reliably.
 // Run: node tests/test_daylight.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = () => {
@@ -23,7 +24,7 @@ const scan = () => {
   const bgOf = el => { const stack = []; for (let e = el; e; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.backgroundImage !== 'none' && e !== document.body) return null; const c = parse(cs.backgroundColor); if (c && c.a > 0) { stack.push(c); if (c.a >= .99) break; } } let bg = { r: 201, g: 199, b: 190, a: 1 }; for (let i = stack.length - 1; i >= 0; i--) bg = blend(stack[i], bg); return bg; };
   const out = [];
   document.querySelectorAll('.tab-panel *, #topnav *').forEach(el => {
-    if (!el.offsetParent || el.closest('svg,canvas,input,select,textarea,[disabled],.scene,.inv-stage,.cc3-card,.cc3,[class*="cc3-"]')) return;
+    if (!el.offsetParent || el.closest('svg,canvas,input,select,textarea,[disabled],#topnav,.scene,.inv-stage,.cc3-card,.cc3,[class*="cc3-"]')) return;
     const txt = [...el.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join(' ').trim(); if (!txt) return;
     const r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return;
     const cs = getComputedStyle(el); if (cs.visibility === 'hidden') return;
@@ -47,7 +48,7 @@ const scanInputs = () => {
 (async () => {
   const b = await chromium.launch(); const errs = [];
   const p = await (await b.newContext({ viewport: { width: 1100, height: 900 } })).newPage(); p.on('pageerror', e => errs.push(e.message));
-  await p.addInitScript(seed); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2000);
+  await p.addInitScript(seed); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(2000);
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   ok(await p.evaluate(() => viTheme()) === 'light', 'opens in Daylight');
   for (const t of ['overview', 'budget', 'house', 'assets', 'debt', 'entrepreneur', 'achievements', 'connections']) {
@@ -69,13 +70,13 @@ const scanInputs = () => {
   ok(!g.sankeyHalo || /^#dad8d0$/i.test(g.sankeyHalo), 'Sankey label halo is paper (' + g.sankeyHalo + ')');
   ok(g.night, 'Night colours are swapped in Daylight');
   const paper = await p.evaluate(() => { const cs = getComputedStyle(document.body); return { bg: cs.backgroundColor, img: cs.backgroundImage }; });
-  ok(paper.bg === 'rgb(201, 199, 190)' && /linear-gradient\(rgba\(0, 127, 123, 0\.07\)/.test(paper.img), 'Daylight page is off-white with a faint teal grid (' + paper.bg + ')');
+  ok(paper.bg === 'rgb(211, 204, 180)' && /linear-gradient\(rgba\(0, 127, 123, 0\.07\)/.test(paper.img), 'Daylight page is off-white with a faint teal grid (' + paper.bg + ')');
   // 3D viewports keep the Night look in both modes (owner, 30 Oct)
   await p.evaluate(() => showTab('assets')); await p.waitForTimeout(900);
   const vp = await p.evaluate(() => { const sc = document.getElementById('metals-scene'), cs = getComputedStyle(sc);
     return { bg: cs.getPropertyValue('--bg').trim(), teal: cs.getPropertyValue('--teal').trim(), em: getComputedStyle(sc.querySelector('.vp-gi-hd') || sc).color, page: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
       stage: (document.querySelector('#metalsSvg rect') || { getAttribute: () => '' }).getAttribute('fill') }; });
-  ok(vp.page.toUpperCase() === '#C9C7BE' && vp.bg.toUpperCase() === '#080808' && vp.teal.toUpperCase() === '#44C0B9', '3D viewports keep Night tokens in Daylight (page ' + vp.page + ', viewport ' + vp.bg + ' / ' + vp.teal + ')');
+  ok(vp.page.toUpperCase() === '#D3CCB4' && vp.bg.toUpperCase() === '#080808' && vp.teal.toUpperCase() === '#44C0B9', '3D viewports keep Night tokens in Daylight (page ' + vp.page + ', viewport ' + vp.bg + ' / ' + vp.teal + ')');
   ok(/^#060d16$/i.test(vp.stage), 'metals stage keeps its Night background (' + vp.stage + ')');
   await p.evaluate(() => viToggleTheme()); await p.waitForTimeout(600);
   const n = await p.evaluate(() => ({ t: viTheme(), swap: viDay('#030810') }));

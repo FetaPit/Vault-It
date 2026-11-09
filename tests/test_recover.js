@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 (async()=>{
@@ -17,7 +18,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
       return R({},404); };
   },[NEW]);
   await page.addInitScript(([o])=>{window._oldov=o;},[OLD]);
-  await page.goto('file:///home/user/Vault-It/recover.html'); await page.waitForTimeout(300);
+  await page.goto(require('./lib/vi').fileUrl('recover.html')); await page.waitForTimeout(300);
   const sum=await page.innerText('#summary');
   ok(/income 2 lines \(£811\.4\/mo\)/.test(sum)&&/spending 1 lines \(£700\/mo\)/.test(sum),'summary shows what this browser holds: '+sum.split('\n').filter(l=>/pos_ov1/.test(l))[0]);
   ok(!/vi_pin_hash|SECRET/.test(await page.content()),'PIN hash is never shown');

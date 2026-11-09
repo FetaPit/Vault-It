@@ -1,8 +1,10 @@
-// v0.8 chrome (stream E2, owner's 2 Nov fold test): Message the Dev at the foot of every tab, the Feedback button fixed bottom right,
+// v0.8 chrome (stream E2, owner's 2 Nov fold test): Message the Dev at the foot of Overview only (v0.9.1, E27: removed from every other tab), the Feedback button fixed bottom right,
 // the fixed footer collapsing to a slim FCA strip once scrolling stops, compact category pills (below the Cash flow chart),
 // and big synced scroll rails above and below the flow charts. 390 / 690 / 1100 / 1440 px, Night and Daylight.
 // Run: node tests/test_v08_chrome.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
+const INDEX = require('./lib/vi').FILE_URL;   // VI_INDEX points the test at another checkout
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const TABS = ['overview', 'budget', 'house', 'assets', 'debt', 'biz', 'achievements', 'network'];
 const FCA = 'Not regulated by the FCA. Not financial advice.';
@@ -19,7 +21,7 @@ const seed = t => {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, isMobile: phone, hasTouch: phone, colorScheme: theme === 'light' ? 'light' : 'dark', reducedMotion: 'no-preference' });
     const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(seed, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1600);
+    await p.goto(INDEX); await p.waitForTimeout(1600);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal,#trial-banner,#tester-welcome,#vi-fb-nudge,#demo-chip,#pwa-install-banner{display:none!important}' });
     const T = w + ' ' + theme + ': ';
 
@@ -28,14 +30,16 @@ const seed = t => {
     for (const tab of TABS) {
       await p.evaluate(t => { showTab(t); scrollTo(0, 0); }, tab); await p.waitForTimeout(250);
       const d = await p.evaluate(() => {
-        const cards = document.querySelectorAll('#vi-devcard'); const c = cards[0]; if (cards.length !== 1) return 'cards ' + cards.length;
+        const cards = document.querySelectorAll('#vi-devcard'); const c = cards[0];
+        if (document.querySelector('.tab-panel.active').id !== 'tab-overview') return cards.length ? 'still on a tab other than Overview (v0.9.1, E27)' : '-';   // gone from the page, not hidden
+        if (cards.length !== 1) return 'cards ' + cards.length;
         const panel = document.querySelector('.tab-panel.active'); if (!panel.contains(c)) return 'not in the open tab';
         const host = c.parentElement, kids = [...host.children].filter(k => !/^(SCRIPT|STYLE)$/.test(k.tagName) && getComputedStyle(k).display !== 'none' && getComputedStyle(k).position !== 'fixed' && getComputedStyle(k).position !== 'absolute');
         if (kids[kids.length - 1] !== c) return 'not last (' + kids.slice(-2).map(k => k.id || k.className).join('|') + ')';
         const r = c.getBoundingClientRect(); if (r.width < 200) return 'too narrow ' + r.width;
         return '';
       });
-      if (d) devBad.push(tab + ': ' + d);
+      if (d && d !== '-') devBad.push(tab + ': ' + d);
       for (const at of ['top', 'mid', 'end']) {
         await p.evaluate(a => { const m = document.documentElement.scrollHeight - innerHeight; scrollTo(0, a === 'top' ? 0 : a === 'mid' ? m / 2 : m); }, at);
         await p.waitForTimeout(450);
@@ -49,7 +53,7 @@ const seed = t => {
         if (!(f.vis && f.w > 0 && (phone ? f.w === 40 : f.h === 32) && f.r <= w && f.r >= w - 30 && f.b <= f.nav - 6 && f.l > w / 2 && !f.cls && !f.top)) fbBad.push(tab + '@' + at + ' ' + JSON.stringify(f));
       }
     }
-    ok(!devBad.length, T + 'one Message the Dev card, the last thing on every tab ' + devBad.join('; '));
+    ok(!devBad.length, T + 'Message the Dev only on Overview (the last thing there), absent from every other tab ' + devBad.join('; '));
     ok(!fbBad.length, T + 'Feedback stays bottom right, clear of the nav, on every tab at top, middle and end ' + fbBad.slice(0, 3).join('; '));
     // over a 3D viewer's controls it fades out in place, and comes back once clear (Pedro's review)
     // start from a clear spot: no real 3D control (.nw3d-hud, .inv-ctl, .hud-bar) under the button, whatever the text size or layout;
@@ -114,7 +118,7 @@ const seed = t => {
     }
 
     // 4: compact pills, below the chart on Cash flow, same style on Budget
-    for (const [tab, lg, sk] of [['overview', 'cf-legend', 'cf-sankey'], ['budget', 'bd-legend', 'bd-sankey']]) {
+    for (const [tab, lg, sk] of [['overview', 'cf-legend', 'cf-3d'], ['budget', 'bd-legend', 'bd-sankey']]) {
       await p.evaluate(t => { showTab(t); }, tab); await p.waitForTimeout(500);
       const L = await p.evaluate(([lg, sk]) => {
         const l = document.getElementById(lg), s = document.getElementById(sk), sp = [...l.children];
@@ -127,15 +131,16 @@ const seed = t => {
         const strong = sp.every(x => { const cs = getComputedStyle(x); return alpha(cs.borderTopColor) >= 0.55 && alpha(cs.backgroundColor) >= 0.08; });
         return { strong, n: sp.length, rows: tops.size, fsz, hh, ic, same, below: l.getBoundingClientRect().top >= s.getBoundingClientRect().bottom, lh: Math.round(l.getBoundingClientRect().height) };
       }, [lg, sk]);
-      ok(L.n === 6 && L.fsz <= 11.5 && L.hh <= 22 && L.ic <= 14 && L.same, T + tab + ' pills are compact, colours unchanged (font ' + L.fsz + ', height ' + L.hh + ', icon ' + L.ic + ')');
-      ok(L.rows <= (w < 600 ? 3 : w < 1000 ? 2 : 1), T + tab + ' six pills fit in ' + L.rows + ' rows (' + L.lh + ' px)');
+      const bigBd = tab === 'budget' && w > 600;   // v0.9.1 E5: larger pills on tablet and desktop
+      ok(L.n === 6 && (bigBd || (L.fsz <= 11.5 && L.hh <= 22 && L.ic <= 14)) && L.same, T + tab + ' pills are compact, colours unchanged (font ' + L.fsz + ', height ' + L.hh + ', icon ' + L.ic + ')');
+      if (!bigBd) ok(L.rows <= (w < 600 ? 3 : w < 1000 ? 2 : 1), T + tab + ' six pills fit in ' + L.rows + ' rows (' + L.lh + ' px)');
       ok(L.strong, T + tab + ' each pill carries its colour: 60% border and a 10% fill (Pedro, review 1)');
       if (tab === 'overview') ok(L.below, T + 'on Cash flow the key sits below the chart');
     }
 
     // 5: rails above and below the flow chart, synced both ways, draggable
-    for (const tab of ['overview', 'budget']) {
-      const sk = tab === 'overview' ? 'cf-sankey' : 'bd-sankey';
+    for (const tab of ['budget']) {
+      const sk = 'bd-sankey';
       await p.evaluate(t => { showTab(t); }, tab); await p.waitForTimeout(600);
       await p.evaluate(s => document.getElementById(s).scrollIntoView({ block: 'center' }), sk); await p.waitForTimeout(300);
       const R = await p.evaluate(s => {
@@ -171,7 +176,7 @@ const seed = t => {
   }
   // reduced motion: the footer still collapses, with no transition
   { const ctx = await b.newContext({ viewport: { width: 1100, height: 900 }, reducedMotion: 'reduce' }); const p = await ctx.newPage();
-    await p.addInitScript(seed, 'dark'); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.addInitScript(seed, 'dark'); await p.goto(INDEX); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     const d = await p.evaluate(() => getComputedStyle(document.getElementById('app-footer')).transitionDuration);
     ok(d.split(',').every(x => parseFloat(x) === 0), '1100 reduced motion: the footer moves without a transition (' + d + ')');

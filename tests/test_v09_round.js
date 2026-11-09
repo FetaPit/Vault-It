@@ -1,5 +1,6 @@
 // v0.9 round (owner, 3 Nov 2026): KPI colours, 3D cash flow on the dashboard, income-flow zoom, no locate icon, grouped holdings + tree map,
 // left-aligned Assets sub-tabs, Liabilities expand. Run: node tests/test_v09_round.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = () => {
@@ -15,7 +16,7 @@ const seed = () => {
   const b = await chromium.launch(); const errs = [];
   for (const w of [390, 1100]) {
     const ctx = await b.newContext({ viewport: { width: w, height: 900 } }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-    await p.addInitScript(seed); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+    await p.addInitScript(seed); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal{display:none!important}' });
     const col = id => p.evaluate(i => { const e = document.getElementById(i), s = getComputedStyle(e).color, t = document.createElement('i'); t.style.color = 'var(--' + ({ 'kpi-nw': 'teal', 'kpi-assets': 'green', 'kpi-debt': 'blue' })[i] + ')'; document.body.appendChild(t); const w = getComputedStyle(t).color; t.remove(); return s === w; }, id);
     ok(await col('kpi-nw'), w + ': net worth is teal'); ok(await col('kpi-assets'), w + ': total assets is green'); ok(await col('kpi-debt'), w + ': monthly surplus is blue');

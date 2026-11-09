@@ -8,8 +8,9 @@
 //   5. the choice is in vi_settings (synced); Settings shows it; the welcome step starts new accounts Simplified or Advanced as picked
 //   6. phones: the five KPIs in two rows (three, then two); the Sankey bands animate, and stop with reduced motion; no sideways scroll
 // Run: node tests/test_view_mode.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (o) => {
   localStorage.setItem('vi-theme', o.theme || 'dark'); localStorage.setItem('vi_declined_demo', 'true');

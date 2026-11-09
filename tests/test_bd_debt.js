@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));
@@ -8,7 +9,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
 (async()=>{
   const b=await chromium.launch(); const errs=[];
   const ctx=await b.newContext({viewport:{width:1600,height:900}}); const p=await ctx.newPage(); p.on('pageerror',e=>errs.push(e.message));
-  await p.addInitScript(seed); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2200); await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
+  await p.addInitScript(seed); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(2200); await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   // ---- budget
   await p.evaluate(()=>showTab('budget')); await p.waitForTimeout(900);
   let r=await p.evaluate(()=>{const t=[...document.querySelectorAll('.bd-tile')];const inc=document.querySelector('.bd-inc').getBoundingClientRect(),exp=document.querySelector('.bd-exp').getBoundingClientRect(),sp=document.querySelector('.bd-split').getBoundingClientRect();
@@ -28,11 +29,11 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   ok(h0>20&&h1.h===0&&/ce/.test(h1.saved),'a tile collapses and remembers it'); await p.evaluate(()=>bdFoldAll(false));
   await p.evaluate(()=>bdFoldAll(true)); ok(await p.evaluate(()=>[...document.querySelectorAll('.bd-tile.folded')].length)===6,'collapse all'); await p.evaluate(()=>bdFoldAll(false));
   // tiles in a row share a height; quick-add fills the spare room; "give every pound a job" copy is gone
-  const th=await p.evaluate(()=>{const t=[...document.querySelectorAll('.bd-tile')].map(x=>Math.round(x.getBoundingClientRect().height));return{rows:[[t[0],t[1]],[t[2],t[3]],[t[4],t[5]]],qa:document.querySelectorAll('.bd-qa').length,txt:/give every pound|give it a job/i.test(document.getElementById('tab-budget').innerText),line:getComputedStyle(document.querySelector('.bd-split'),'::before').borderLeftStyle+' '+getComputedStyle(document.querySelector('.bd-split'),'::before').borderLeftColor}});
+  const th=await p.evaluate(()=>{const t=[...document.querySelectorAll('.bd-tile')].map(x=>Math.round(x.getBoundingClientRect().height));return{rows:[[t[0],t[1]],[t[2],t[3]],[t[4],t[5]]],qa:document.querySelectorAll('.bd-qa').length,txt:/give every pound|give it a job/i.test(document.getElementById('tab-budget').innerText),line:(parseFloat(getComputedStyle(document.querySelector('.bd-split'),'::before').width)===1.5&&getComputedStyle(document.querySelector('.bd-split'),'::before').borderLeftStyle==='none'?'solid':'not-solid')+' '+getComputedStyle(document.querySelector('.bd-split'),'::before').backgroundColor}});
   console.log(JSON.stringify(th));
   ok(th.rows.every(r=>Math.abs(r[0]-r[1])<=1),'tiles side by side have equal heights (no empty space beside the shorter one)');
   ok(th.qa===6,'every tile has a quick-add in its spare room'); ok(!th.txt,'"give every pound a job" copy removed');
-  ok(/dashed/.test(th.line)&&(()=>{const m=(th.line.match(/[\d.]+/g)||[]).map(Number),v=/color\(srgb/.test(th.line)?m.map(x=>x*255):m;return v[1]>v[0]+25&&v[2]>v[0]+25;})(),'divider is dashed and light teal (owner, 31 Oct), Night or Daylight ('+th.line+')');
+  ok(/^solid/.test(th.line)&&(()=>{const m=(th.line.match(/[\d.]+/g)||[]).map(Number),v=/color\(srgb/.test(th.line)?m.map(x=>x*255):m;return v[1]>v[0]+25&&v[2]>v[0]+25;})(),'divider is solid, 1.5 px and light teal (owner, 31 Oct; solid since 4 Nov, v0.9.1 round 2 R11), Night or Daylight ('+th.line+')');
   await p.fill('#bd-qa-n-vn','Cinema'); await p.fill('#bd-qa-a-vn','12'); await p.evaluate(()=>bdQuickAdd('vn')); await p.waitForTimeout(300);
   ok(await p.evaluate(()=>(ovState.expenses||[]).some(e=>e.name==='Cinema'&&e.type==='vn'&&e.amount===12)),'quick-add puts the line in that tile\'s type');
   ok(await p.evaluate(()=>document.querySelectorAll('#bd-per100 .bd-p100-row').length>=4),'"every £100 of income" fills the income column');

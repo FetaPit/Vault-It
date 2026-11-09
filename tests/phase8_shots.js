@@ -1,4 +1,5 @@
 // Screenshots of the grouped cards (phase 8), Night and Daylight at 390px and 1100px → shots/brand/phase8-*.png
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 const fs = require('fs'); const OUT = __dirname + '/../shots/brand'; fs.mkdirSync(OUT, { recursive: true });
@@ -16,7 +17,7 @@ const seed = theme => {
   for (const theme of ['dark', 'light']) for (const w of [390, 1100]) {
     const mob = w < 700, ctx = await b.newContext({ viewport: { width: w, height: mob ? 844 : 900 }, isMobile: mob, hasTouch: mob, deviceScaleFactor: mob ? 2 : 1 });
     await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-    await p.addInitScript(seed, theme); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2000);
+    await p.addInitScript(seed, theme); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(2000);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,.toast,[class*="sync-nudge"],#vi-sync-banner{display:none!important}' });
     const tag = (theme === 'dark' ? 'night' : 'daylight') + '-' + w;
     const shot = async (sel, name) => { const el = p.locator(sel).first(); await el.scrollIntoViewIfNeeded(); await p.waitForTimeout(250); await el.screenshot({ path: `${OUT}/phase8-${name}-${tag}.png` }); };

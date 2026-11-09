@@ -2,8 +2,9 @@
 // 3) Dashboard on mobile: the Assets, Liabilities and Debt cards have room between them and never overlap (390 and 884).
 // 4) The Level 1 / 2 / 3 cards sit side by side on a phone as a swipeable carousel (scroll-snap), so the house stage gets more room: House tab and landing hero.
 // Run: node tests/test_v07_p2_layout.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 const LAND = APP.replace(/index\.html$/, 'landing.html');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_nw3d.js', 'utf8');

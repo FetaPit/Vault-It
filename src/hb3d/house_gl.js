@@ -430,9 +430,12 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this.apply();
   };
   VP.animateTo = function (p1) { p1 = clamp(p1, 0, 1); if (this._pendingOpen != null) { this._pendingOpen = Math.max(this._pendingOpen, p1); this.wake(); return; } this._target = p1; this.wake(); };   // a deposit before the stage is half on screen joins the waiting opening
-  // v0.7 opening: everything up to p0 is in place on the first frame; the bricks between p0 and p1 (the newest course at most) lay themselves
-  VP.openAt = function (p0, p1, onLaid) {
+  // v0.7 opening: everything up to p0 is in place on the first frame; the bricks between p0 and p1 (the newest course at most) lay themselves.
+  // v0.95 entry (opts.slowS, owner 8 Nov): the whole run from p0 lays from the ground over about slowS seconds, 120 ms a brick at most
+  // (the onboarding deposit pot's first open). Reduced motion: everything at once, as every other open.
+  VP.openAt = function (p0, p1, onLaid, opts) {
     p1 = clamp(p1, 0, 1); p0 = clamp(p0, 0, p1);
+    this._openS = opts && +opts.slowS > 0 ? +opts.slowS : 0;
     this.p = p0; this._target = p0; this._primed = false; this._pendingOpen = null;
     this._onLaid = typeof onLaid === 'function' ? onLaid : null; this._openLay = false;   // called once the opening course has actually laid (the app writes its "bricks seen" note then, not at open)
     this.apply();
@@ -457,7 +460,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     var V = H.brandUnits(P, p), V0 = this._V == null ? -1 : this._V, inst = motion || !this._primed;
     var add = Math.max(0, V - Math.max(V0, 0)), stp = (!inst && add > 0 && add <= 60) ? Math.min(0.24, 1.8 / add) : 0;   // owner, 2 Nov: twice the brand book's min(0.12, 0.9 / n)
     var open = !!this._open; this._open = false;
-    if (open && !inst && add > 0) stp = Math.min(0.08, 2.4 / add);   // the opening course: each brick 80 ms after the last, the whole course started within 2.4 s (owner: twice the v0.7 preview pace)
+    if (open && !inst && add > 0) stp = this._openS > 0 ? Math.min(0.12, this._openS / add) : Math.min(0.08, 2.4 / add);   // v0.95 entry: the run spread over slowS seconds, else   // the opening course: each brick 80 ms after the last, the whole course started within 2.4 s (owner: twice the v0.7 preview pace)
     if (V !== V0) {
       var st = HG.stamp, S = this._stats, n0 = 0;
       HG.recs.forEach(function (rec) {
@@ -469,11 +472,11 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
         } else if (k1 < k0) { for (var k2 = k1; k2 < k0; k2++) st[(base + k2) * 2] = 1e9; }   // un-laying is instant
         rec.cnt = k1;
       });
-      if (inst) { if (!S.settledAtOpen && this._bDraws) S.settledAtOpen = Math.max(0, Math.min(P.N, V)); } else { S.animated += n0; S.stamped += n0; if (n0 > 0 && !open) { S.gapMs = stp * 1000; S.lastAdd = n0; } }
+      if (inst) { if (!S.settledAtOpen && this._bDraws) S.settledAtOpen = Math.max(0, Math.min(P.N, V)); } else { S.animated += n0; S.stamped += n0; if (n0 > 0 && !open) { S.gapMs = stp * 1000; S.lastAdd = n0; } if (open) { S.openAdd = n0; S.openUnits = add; S.openGapMs = stp * 1000; S.openSlow = this._openS > 0; } }
       if (open) { var Lb = H.brandBricksLaid(P.N, p), cur = Lb > 0 ? P.course[Lb - 1] : 0; S.courseBricks = Lb > 0 ? lowerBound(P.course, cur + 1) - lowerBound(P.course, cur) : 0; }
       this._stampDirty = true; this._V = V; this._lastStampAt = inst ? -1e9 : now + Math.max(0, add - 1) * stp; this._dirty = true;
     }
-    this._primed = true;
+    this._primed = true; if (open) this._openS = 0;   // the slow entry is one open only
     // Level 2: the parts in colour follow the equity share (eased by the frame loop, from 0 when the level opens)
     var eqS = L2 ? (this._bEq == null ? this.eq : this._bEq) : 0;
     var Vc1 = L2 ? H.brandColourUnits(P, eqS) : -1; if (Vc1 !== this._Vc) this._dirty = true; this._Vc = Vc1;

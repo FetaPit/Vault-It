@@ -2,8 +2,9 @@
 // Pedro B1 to B4: bar at max-width 599 px only (phones 320 to 440, fold cover 344 to 412); from 600 px the top nav: row 1 logo, net worth,
 // Night/Daylight; row 2 the tabs, icons only, 22 px icons in 44 px targets, spread evenly, no sideways scroll; active tab outlined 1 px in its colour, 10 px radius.
 // (B5, landscape single row, is left for a later round.) Run: node tests/test_v07_e1.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
   const b = await chromium.launch();

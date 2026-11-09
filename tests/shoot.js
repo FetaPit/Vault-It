@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const tag=process.argv[2]||'a';
 (async()=>{
@@ -11,7 +12,7 @@ const tag=process.argv[2]||'a';
       localStorage.setItem('ht3',JSON.stringify({saved:8538,target:320000,houseType:'semi',deposits:[{amount:8538,date:'16/10/2026'}],prices:{terraced:250000,semi:320000,detached:450000,mansion:900000,flat:200000,apartment:220000}}));
       localStorage.setItem('pos_ov1',JSON.stringify({income:[{id:1,name:'UC',amount:381,cat:'benefits'},{id:2,name:'PIP',amount:778,cat:'benefits'}],expenses:[{id:3,name:'Rent',amount:700,type:'ce'},{id:4,name:'Food',amount:300,type:'ve'}]}));
       localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:1,name:'Virgin Credit Card',original:2502,balance:2502,rate:0,min:60,type:'credit'},{id:2,name:'Vanquis',original:2600,balance:2600,rate:29,min:125,type:'credit'},{id:3,name:'Car',original:8000,balance:5000,rate:7,min:200,type:'car'}]}));});
-    await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+    await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
     await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
     for(const t of ['overview','budget','house','assets','debt']){
       await page.evaluate(t=>showTab(t),t); await page.waitForTimeout(900);

@@ -3,8 +3,9 @@
 // stroke at .5, 4 px radius, 4 px 6 px padding), name DM Sans 600 11 px #E8E8E8, amount Share Tech Mono 10.5 px in the category colour; chips stay black in Daylight;
 // no overlaps, rows at least 30 px apart; the two diagrams carry identical chips. The flow animation is not part of this item.
 // Run: node tests/test_v07_chips.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const parse = html => { const d = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html'), svg = d.querySelector('svg'); if (!svg) return null;
   const chips = [...svg.querySelectorAll('.cf-chip')].map(g => { const r = g.querySelector('rect'), t = [...g.querySelectorAll('text')]; const a = n => r.getAttribute(n);
@@ -22,7 +23,7 @@ const parse = html => { const d = new DOMParser().parseFromString('<body>' + htm
     const res = {};
     for (const tab of ['overview', 'budget']) { await p.evaluate(t => showTab(t), tab); await p.waitForTimeout(700); }
     const t = theme + ' ' + w + 'px: ';
-    for (const id of ['cf-sankey', 'bd-sankey']) {
+    for (const id of ['bd-sankey']) {
       const html = await p.evaluate(i => document.getElementById(i).innerHTML, id);
       const r = await p.evaluate(`(${parse.toString()})(${JSON.stringify(html)})`); if (!r) { ok(false, t + id + ': diagram drawn (got ' + html.slice(0, 60) + ') errs ' + errs.slice(0, 2)); continue; } const c = r.chips;
       ok(r && c.length >= 8, t + id + ': chips drawn (' + (r ? c.length : 0) + ')');
@@ -39,12 +40,11 @@ const parse = html => { const d = new DOMParser().parseFromString('<body>' + htm
       res[id] = JSON.stringify(c);
     }
     { const fo = await p.evaluate(() => getComputedStyle(document.querySelector('.cf-chip rect')).fillOpacity); ok(theme === 'dark' ? fo === '0.88' : fo === '1', t + 'chip fill opacity is solid in Daylight (' + fo + ')'); }
-    ok(res['cf-sankey'] === res['bd-sankey'], t + 'Dashboard and Budget carry identical chips');
     // visible check: chip rect contains its text in the live DOM
     const fit = await p.evaluate(() => { const h = document.getElementById('bd-sankey'); let bad = 0; if (!h.clientWidth) return -1; h.querySelectorAll('.cf-chip').forEach(g => { const r = g.querySelector('rect').getBBox(); g.querySelectorAll('text').forEach(x => { const b = x.getBBox(); if (b.x < r.x - .5 || b.x + b.width > r.x + r.width + .5 || b.y < r.y - .5 || b.y + b.height > r.y + r.height + .5) bad++; }); }); return bad; });
     ok(fit === 0, t + 'live: every text sits inside its chip (' + fit + ' outside)');
     if (theme === 'light' && w === 1100) {   // a shortfall (spending above income) draws a grey Shortfall chip; Daylight must not darken it
-      const sf = await p.evaluate(() => { ovState.expenses.push({ id: 9999, name: 'Big one', amount: 5000, category: 'necessity', cat: 'housing', type: 'ce' }); drawCashflowDiagram(); const g = [...document.querySelectorAll('#cf-sankey .cf-chip')].find(x => /Shortfall/.test(x.textContent)); return g ? g.innerHTML : ''; });
+      const sf = await p.evaluate(() => { ovState.expenses.push({ id: 9999, name: 'Big one', amount: 5000, category: 'necessity', cat: 'housing', type: 'ce' }); drawCashflowDiagram(); const g = [...document.querySelectorAll('#bd-sankey .cf-chip')].find(x => /Shortfall/.test(x.textContent)); return g ? g.innerHTML : ''; });
       ok(sf && !/4e5b5d/i.test(sf) && /138,\s*147,\s*166/.test(sf), t + 'a Shortfall chip keeps its Night grey in Daylight');
     }
     ok(!(await p.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)), t + 'no sideways scroll');

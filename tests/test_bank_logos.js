@@ -3,6 +3,7 @@
 // the investment platforms already use, named in the privacy notice); an unknown name shows the brand bank icon; offline, the
 // logo falls back to the brand's initials. Investment pies named after a platform get its logo, with more platforms known.
 // Run: node tests/test_bank_logos.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
@@ -21,7 +22,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
         { id: 7, name: 'NS&I Premium Bonds', type: 'Savings', balance: 70 }, { id: 8, name: '<img src=x onerror=alert(1)>', type: 'Savings', balance: 1 }],
         stockPies: [{ id: 1, name: 'InvestEngine ISA', holdings: [] }, { id: 2, name: 'PensionBee', holdings: [] }], metalPrices: {}, crypto: [] }));
     }, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal{display:none!important}' });
     await p.evaluate(t => { if ((document.documentElement.dataset.theme || 'dark') !== t && window.viToggleTheme) viToggleTheme(); showTab('assets'); showSubtab('assets', 'cash', null); }, theme);
     await p.waitForTimeout(900);

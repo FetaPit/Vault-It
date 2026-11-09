@@ -3,10 +3,11 @@
 // two devices really do talk through it); nothing is e-mailed and no real account is touched.
 // Run: node tests/journey_one_b.js            (local file:///home/user/Vault-It/index.html)
 //      VI_APP=https://app.vault-it.co node tests/journey_one_b.js   (also checks the service worker really registers)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
-const ROOT = '/home/user/Vault-It/';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
+const ROOT = require('./lib/vi').ROOT + '/';
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const EMAIL = 'one.b@example.com', PIN = '482915';
 
@@ -115,13 +116,19 @@ const data = p => p.evaluate(() => ({ saved: state.saved, debts: debtState.debts
   // first-run welcome: name, biggest challenge, house price
   const welcome = p => p.evaluate(() => getComputedStyle(document.getElementById('welcome-overlay')).display);
   ok(await welcome(phone) === 'flex', 'phone: first run asks for a name and goal');
-  await phone.fill('#w-name', 'One B'); await phone.fill('#w-email', EMAIL); await phone.click('#w-opts .welcome-opt[data-val="1"]'); await phone.click('#w-step-1 .welcome-cta'); await phone.waitForTimeout(600);
-  await phone.fill('#w-house', '250000'); await phone.click('#w-step-2 .welcome-cta'); await phone.waitForTimeout(1000);
+  // the onboarding screens (5 Nov 2026): name and email, where you are, money (skipped), home, the plan
+  await phone.fill('#w-name', 'One B'); if (await phone.isVisible('#w-email')) await phone.fill('#w-email', EMAIL); await phone.click('#wz-s1 .welcome-cta');
+  await phone.click('#w-opts .welcome-opt[data-val="1"]'); await phone.click('#wz-s2 .welcome-cta'); await phone.waitForTimeout(300);
+  await phone.click('#wz-s3 .wz-skip'); await phone.fill('#w-house', '250000'); await phone.click('#wz-s4 .welcome-cta'); await phone.waitForTimeout(300);
+  await phone.click('#wz-s5 .wz-skip'); await phone.waitForTimeout(300);   // v0.95: the deposit pot screen, skipped here
+  await phone.click('#w-finish'); await phone.waitForTimeout(1000);
   ok(await welcome(phone) === 'none' && await phone.evaluate(() => JSON.parse(localStorage.getItem('vi_user')).name === 'One B' && state.target === 250000), 'phone: welcome done, name and £250,000 house price saved');
   // Pete's tester note shows once after the welcome flow (31 Oct): a tester reads it and closes it
   await phone.waitForTimeout(900);
   ok(await phone.evaluate(() => !document.getElementById('tester-welcome').classList.contains('hidden')), 'phone: the tester welcome note from Pete shows once');
   await phone.click('#tester-welcome .tw-go'); await phone.waitForTimeout(200);
+  // the app tour is offered once, straight after Pete's note: this tester skips it
+  await phone.waitForSelector('#vi-tour.on', { timeout: 3000 }).catch(() => {}); if (await phone.isVisible('#vt-skip')) { await phone.click('#vt-skip'); await phone.waitForTimeout(300); }
 
   // ── 2. phone: save money, then put the app in the background (close / switch app) ──
   await phone.evaluate(() => showTab('house')); await phone.waitForTimeout(800);

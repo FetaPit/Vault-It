@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 (async()=>{
@@ -12,7 +13,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
     })};
   });
   await page.addInitScript(()=>{localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e9}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('vi_declined_demo','true');});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1300);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1300);
   // fake cloud + signed-in user
   await page.evaluate(()=>{
     window._written=[]; _supaUser={id:'u1',email:'t@t.com'};_syncReady=true;
@@ -54,7 +55,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
                  select:()=>({eq:async()=>({data:Object.keys(window._cloud).map(k=>({key:k,value:window._cloud[k]}))}),single:async()=>({data:null})})})
     })};
   });
-  await p2.goto('file:///home/user/Vault-It/index.html'); await p2.waitForTimeout(1300);
+  await p2.goto(require('./lib/vi').FILE_URL); await p2.waitForTimeout(1300);
   const restored=await p2.evaluate(async(snap)=>{
     const cloud=JSON.parse(snap); _supaUser={id:'u1',email:'t@t.com'};_syncReady=true;
     window._cloud=cloud;

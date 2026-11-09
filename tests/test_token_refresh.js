@@ -1,5 +1,6 @@
 // A phone that froze the tab: supabase-js stalls, the app uses the direct REST path, and the access token expires after an hour.
 // The direct path must renew the session with the saved refresh token instead of being refused (401) for ever while looking signed in.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const KEY = 'sb-legpubblzgknxdtvsant-auth-token';
@@ -13,7 +14,7 @@ const OLD = jwt(-600, 'old'), NEW = jwt(3600, 'new');
     localStorage.setItem('vi_declined_demo', 'true');
     localStorage.setItem(k, JSON.stringify({ access_token: oldTok, refresh_token: 'R1', token_type: 'bearer', expires_at: 1, user: { id: 'u1' } }));
   }, [KEY, OLD]);
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1200);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1200);
 
   const setup = (refreshOk) => page.evaluate(([newTok, refreshOk]) => {
     window.__log = [];

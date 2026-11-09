@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const YDAY=new Date(Date.now()-864e5).toISOString();
@@ -7,13 +8,13 @@ const MOCK=(cloud,mode)=>`
     auth:{onAuthStateChange:()=>({}),getSession:async()=>({data:{session:null}}),signOut:async()=>({}),verifyOtp:async()=>({error:{message:'x'}})},
     functions:{invoke:async()=>({data:null,error:{message:'n/a'}})},
     from:(t)=>({
-      upsert:(rows)=>{ if(window._mode==='hang')return new Promise(()=>{}); if(window._mode==='fail')return Promise.resolve({error:{message:'boom'}}); [].concat(rows).forEach(r=>{window._cloud[r.key]={value:r.value,updated_at:r.updated_at};});return Promise.resolve({}); },
+      upsert:(rows)=>{ if(window._mode==='hang')return new Promise(()=>{}); if(window._mode==='fail')return Promise.resolve({error:{message:'boom'}}); [].concat(rows).forEach(r=>{try{sessionStorage.setItem('nd_up',(sessionStorage.getItem('nd_up')||'')+'|'+r.key+'='+JSON.stringify(r.value));}catch(e){} window._cloud[r.key]={value:r.value,updated_at:r.updated_at};});return Promise.resolve({}); },
       select:()=>({eq:()=>window._mode==='nocloud'?new Promise(()=>{}):Promise.resolve({data:Object.keys(window._cloud).map(k=>({key:k,value:window._cloud[k].value,updated_at:window._cloud[k].updated_at}))}),single:async()=>({data:null})})})
   })};`;
 const newCtx=async(b,init,cloud,mode)=>{
   const ctx=await b.newContext({viewport:{width:1100,height:900}}); const page=await ctx.newPage(); const errs=[]; page.on('pageerror',e=>errs.push(e.message)); page.errs=errs;
   await page.addInitScript(MOCK(cloud,mode)); await page.addInitScript(init);
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1300); return {ctx,page};
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1300); return {ctx,page};
 };
 const REAL_DEBT={debts:[{id:1792143861287,name:'Virgin Credit Card',balance:2502.41,original:2502.41,rate:0,min:60,type:'credit'}]};
 const DEMO_DEBT={debts:[{id:1,name:'Student Loan Plan 2',balance:24300,original:38000,rate:7.1,minPay:180,type:'loan'},{id:2,name:'Barclaycard',balance:1850,original:3200,rate:24.9,minPay:55,type:'credit'}]};
@@ -35,7 +36,8 @@ const DEMO_HT3={saved:22500,target:240000,houseType:'terraced',deposits:[{date:'
   // _completeAuth with demo mode still on discards the sample data
   ({ctx,page}=await newCtx(b,`if(!localStorage.getItem('vi_user')){localStorage.setItem('vi_demo_mode','true');localStorage.setItem('vi_user',JSON.stringify({name:'Alex',email:'demo@vault-it.app'}));localStorage.setItem('pos_debt1',${JSON.stringify(JSON.stringify(DEMO_DEBT))});}`,{}));
   await page.evaluate(()=>{_completeAuth('t@t.com');}); await page.waitForTimeout(1500);
-  const d=await page.evaluate(()=>({demo:localStorage.getItem('vi_demo_mode'),debt:localStorage.getItem('pos_debt1')}));
-  ok(d.demo!=='true'&&(!d.debt||!/Student Loan Plan 2/.test(d.debt)),'sign-in with sample data present wipes it instead of adopting it ('+JSON.stringify(d).slice(0,80)+')'); await ctx.close();
+  const d=await page.evaluate(()=>({demo:localStorage.getItem('vi_demo_mode'),debt:localStorage.getItem('pos_debt1'),up:sessionStorage.getItem('nd_up')||''}));
+  ok(d.demo!=='true'&&(!d.debt||!/Student Loan Plan 2/.test(d.debt)),'sign-in with sample data present wipes it instead of adopting it ('+JSON.stringify(d).slice(0,80)+')');
+  ok(!/Student Loan Plan 2|Alex Morgan|demo@vault-it\.app/.test(d.up),'…and no sample figures are uploaded to the account ('+(d.up.slice(0,80)||'nothing uploaded')+')'); await ctx.close();
   await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');
 })();

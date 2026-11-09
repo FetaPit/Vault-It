@@ -5,9 +5,10 @@
 // floor(bricks x seg(p, 0.03, 0.80)), the ROW label, the HUD and the caption agree, per-brick drop and stagger,
 // reduced motion builds instantly, no page errors, no sideways scroll at 390 px.
 // VI_INDEX=/path/to/index.html runs it against another copy (a worktree); the default is the repo the suite expects.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
-const INDEX = 'file://' + (process.env.VI_INDEX || '/home/user/Vault-It/index.html');
+const INDEX = require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (o, flag) => `(function(){if(localStorage.getItem('ht3'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com',pro:true}));localStorage.setItem('vi_pioneer','true');localStorage.setItem('vi-flag-house',${flag?"'1'":"'0'"});localStorage.setItem('ht3',${JSON.stringify(JSON.stringify(o))});})()`;
 const DEFAULTS = { terraced: 200000, semi: 320000, detached: 500000, mansion: 1500000, flat: 80000, apartment: 300000 };

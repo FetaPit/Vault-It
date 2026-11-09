@@ -109,6 +109,7 @@ function brandShell(title: string, body: string, footer: string): string {
 <tr><td style="padding:16px 36px 26px;border-top:1px solid #102221">
 <p style="margin:0 0 8px;font-size:12px;color:#E8E8E8">Not regulated by the FCA. Not financial advice.</p>
 <p style="margin:0;font-size:11px;line-height:1.6;color:#9AA0A6">${footer}</p>
+<p style="margin:8px 0 0;font-size:11px;line-height:1.6;color:#9AA0A6">© 2026 PT Live Design. All rights reserved.</p>
 </td></tr>
 </table></td></tr></table></body></html>`
 }
@@ -172,7 +173,8 @@ Pete
 
 Not regulated by the FCA. Not financial advice.
 Unsubscribe in one click: ${unsub}
-Vault-It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ · hello@vault-it.co`
+Vault-It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ · hello@vault-it.co
+© 2026 PT Live Design. All rights reserved.`
 
 async function sendWelcome(admin: ReturnType<typeof createClient>, id: string, email: string): Promise<boolean> {
   try {
@@ -271,7 +273,7 @@ Deno.serve(async (req: Request) => {
     body: JSON.stringify({
       from: FROM_EMAIL, to: [email], subject: 'Confirm your place on the Vault-It beta list',
       html: confirmHtml(email, link, unsub, testing),
-      text: `Confirm your place on the Vault-It beta list: ${link}\n\nThe link works for 7 days. If you did not ask for this, ignore this e-mail.\nRemove me: ${unsub}\n\nVault-It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ · hello@vault-it.co\nNot regulated by the FCA. Not financial advice.`,
+      text: `Confirm your place on the Vault-It beta list: ${link}\n\nThe link works for 7 days. If you did not ask for this, ignore this e-mail.\nRemove me: ${unsub}\n\nVault-It is run by PT Live Design, A57, 11 St Mary's Street, Lincoln LN5 7EQ · hello@vault-it.co\nNot regulated by the FCA. Not financial advice.\n© 2026 PT Live Design. All rights reserved.`,
       headers: { 'List-Unsubscribe': `<${unsub}>` },
     }),
   })

@@ -4,8 +4,9 @@
 //    no budget = no growth) with a full-width note.
 // 4. History, Goals and Snapshots folded into 28 px pills at the foot of the net worth tile (Pedro's v0.8 spec E), collapsed by default, Pro gate kept.
 // Run: node tests/test_ui_round2.js   (VI_APP=file:///path/to/index.html to test another copy)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_nw3d.js', 'utf8');
 const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const seed = '.length, src.indexOf('// WCAG AA')).trim().replace(/;$/, '') + ')');

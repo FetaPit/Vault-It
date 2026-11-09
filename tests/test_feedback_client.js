@@ -2,6 +2,7 @@
 // rating and a picture of the screen with every figure hidden; context attached (screen, device, last actions, errors) with no
 // figures; a light activity log batched to our own function, switched off in Settings; prompts at good moments, once each.
 // Run: node tests/test_feedback_client.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const noT = o => JSON.stringify(o, (k, v) => (k === 't' || k === 'ms' || k === 'session' || k === 'at') ? undefined : v);
 const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -22,7 +23,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else consol
       window.html2canvas = async (el, o) => { const d = document.implementation.createHTMLDocument(''); d.body.innerHTML = document.body.innerHTML; o.onclone(d);
         window._fbClone = d.body.textContent; window._fbCloneHasFb = !!d.getElementById('vi-fb'); const c = document.createElement('canvas'); c.width = 320; c.height = 200; c.getContext('2d').fillRect(0, 0, 320, 200); return c; };
     }, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1600);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1600);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#pro-offer-modal,#trial-banner,#tester-welcome{display:none!important}' });
     await p.evaluate(t => { if ((document.documentElement.dataset.theme || 'dark') !== t && window.viToggleTheme) viToggleTheme(); }, theme);
     const T = w + ' ' + theme + ': ';

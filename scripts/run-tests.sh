@@ -8,7 +8,7 @@
 #   all      both (default)
 #   <name>   one or more tests by file name, e.g. test_roadmap test_pin_server
 #
-# Environment:  JOBS=2 (parallel tests)   SHARD=1/3 (run every 3rd browser test, offset 1)   LOG_DIR=/tmp/vaultit-test-logs
+# Environment:  JOBS=2 (parallel tests)   SHARD=1/3 (run every 3rd browser test, offset 1)   LOG_DIR=<a folder> (default: the system temp folder, vaultit-test-logs)   VI_INDEX=/path/to/index.html   VI_FILE=1
 #
 # A test passes when it exits 0 and prints no FAIL line (several tests print "FAILURES n" yet exit 0, so the exit code alone is not enough).
 # Anything that fails is re-run once on its own: timing-sensitive tests (test_sync, test_cut, test_hb3d_app) can fail when
@@ -18,16 +18,20 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 JOBS="${JOBS:-2}"
-LOG_DIR="${LOG_DIR:-${TMPDIR:-/tmp}/vaultit-test-logs}"
+LOG_DIR="${LOG_DIR:-${TMPDIR:-${TEMP:-/tmp}}/vaultit-test-logs}"
 mkdir -p "$LOG_DIR"
+export LOG_DIR
 
-# the tests open file:///home/user/Vault-It/index.html: make that path exist when the repo lives elsewhere (CI, other machines)
-if [ "$ROOT" != "/home/user/Vault-It" ] && [ ! -e /home/user/Vault-It/index.html ]; then
-  (mkdir -p /home/user 2>/dev/null && ln -sfn "$ROOT" /home/user/Vault-It) 2>/dev/null \
-    || (sudo mkdir -p /home/user && sudo ln -sfn "$ROOT" /home/user/Vault-It) 2>/dev/null \
-    || { echo "Cannot make /home/user/Vault-It point at $ROOT — the tests expect the repo there." >&2; exit 2; }
+# Browser tests serve the app over http themselves (tests/lib/vi.js starts a small local static server per test and
+# turns the app's file:// URL into http://127.0.0.1:PORT/...). Nothing here needs /home/user or a symlink, so this runs
+# the same on the cloud image, in CI and in Git Bash on Windows.
+#   VI_INDEX=/path/to/index.html   test another copy of index.html (its folder is the repo root for the tests)
+#   VI_FILE=1                      open file:// pages directly, no local server (the old way)
+if [ -n "${VI_INDEX:-}" ]; then
+  command -v cygpath >/dev/null 2>&1 && VI_INDEX="$(cygpath -w "$VI_INDEX")"   # Git Bash: give node a Windows path
+  export VI_INDEX
+  [ -f "$VI_INDEX" ] || { echo "VI_INDEX is not a file: $VI_INDEX" >&2; exit 2; }
 fi
-if [ "$(cd /home/user/Vault-It 2>/dev/null && pwd -P)" != "$(pwd -P)" ]; then echo "Note: the tests open /home/user/Vault-It/index.html, which is $(cd /home/user/Vault-It && pwd -P), not this checkout ($(pwd -P))." >&2; fi
 # Playwright may be installed globally (Claude Code cloud sessions) rather than in node_modules
 if [ -z "${NODE_PATH:-}" ] && [ -d /usr/local/lib/node_modules_global/playwright ]; then export NODE_PATH=/usr/local/lib/node_modules_global; fi
 
@@ -63,8 +67,9 @@ fi
 run_one() {   # prints "name PASS|FAIL reason"
   local t="$1" n; n="$(basename "$t")"; n="${n%.*}"
   local log="$LOG_DIR/$n.log" rc
-  timeout "${TEST_TIMEOUT:-900}" node "$t" > "$log" 2>&1; rc=$?
-  if [ $rc -ne 0 ]; then echo "$n FAIL exit=$rc"; return; fi
+  local t0=$SECONDS; timeout "${TEST_TIMEOUT:-900}" node "$t" > "$log" 2>&1; rc=$?
+  local dt=$((SECONDS-t0)); [ -n "${GITHUB_ACTIONS:-}" ] && [ $dt -ge "${SLOW_NOTE:-240}" ] && echo "::notice title=Slow test::$n took ${dt}s (exit $rc)" >&2   # visible on the run page without signing in
+  if [ $rc -ne 0 ]; then echo "$n FAIL exit=$rc after ${dt}s"; return; fi
   if grep -qE "^FAIL|FAILURES|[0-9]+ FAILED|problems=[1-9]|XSS executed: [1-9]|injected <img> elements in DOM: [1-9]|^errors \[[^]]" "$log"; then
     echo "$n FAIL $(grep -m1 -E '^FAIL|FAILURES|[0-9]+ FAILED|problems=[1-9]|XSS executed: [1-9]|^errors \[[^]]' "$log" | cut -c1-110)"; return
   fi
@@ -84,9 +89,11 @@ while read -r name status rest; do
   grep -E "^FAIL" "$LOG_DIR/$name.attempt1.log" | head -3 | cut -c1-200 | sed 's/^/         first attempt: /'
   t="$(ls tests/$name.js tests/$name.mjs 2>/dev/null | head -1)"
   again="$(run_one "$t")"
-  if [ "${again#* }" = "PASS" ]; then echo "  FLAKY  $name — passed on its own"; FLAKY="$FLAKY $name"
+  if [ "${again#* }" = "PASS" ]; then echo "  FLAKY  $name — passed on its own"; FLAKY="$FLAKY $name"; [ -n "${GITHUB_ACTIONS:-}" ] && echo "::warning title=Flaky test: $name::first attempt: $rest"
   else
     echo "  FAILED $name — ${again#* FAIL }  (log: $LOG_DIR/$name.log)"; FINAL_FAIL=$((FINAL_FAIL+1))
+    [ -n "${GITHUB_ACTIONS:-}" ] && echo "::error title=Test failed: $name::first: $rest / again: ${again#* FAIL } / $(grep -m2 -E '^FAIL' "$LOG_DIR/$name.log" | cut -c1-150 | tr '
+' ' ')"   # the run page shows this without a sign-in
     echo "  ----- last lines of $name.log -----"; grep -E "^FAIL|^ok|Error|error" "$LOG_DIR/$name.log" | tail -${FAIL_LINES:-25} | cut -c1-220 | sed 's/^/  | /'; echo "  -----"
   fi
 done <<< "$RESULTS"
