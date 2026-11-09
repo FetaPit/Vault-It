@@ -3,6 +3,7 @@
 // saves load unchanged). They count in net worth through alTotalCash, show as a Business line on the Dashboard, in the sidebar and in
 // 3D net worth, and can be added and edited from Assets and from the Entrepreneur tab. Budget stays exactly as it was.
 // Run: node tests/test_biz_accounts.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const OLD = { cashAccounts: [{ id: 5, name: 'Savings', type: 'Savings', balance: 2000 }] };
