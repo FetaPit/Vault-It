@@ -2,6 +2,8 @@
 
 Collated 9 Nov 2026 (owner: "ensure that all of the outstanding edits that weren't rolled into 0.94 version are pulled into 0.95. List them in bullet points, suggest more"). Sources: `docs/QUEUE.md` on brand-rollout, the COO's branch audit against `release/pioneer-v2` b8847c8, the Executive Assistant's non-build list, and this session's build notes. Draft until the owner adds his edits and says go.
 
+**Gate (owner, 9 Nov 15:25):** the index split comes first, option 1 (source parts per tab and sub-tab in `src/app/`, stitched into one `index.html` by the build). Session `refactor/index-split` owns it. Order: the four built-not-live branches in section A merge first, then a 24-hour `index.html` freeze, then the split, then the v0.95 edits on the new structure. Nothing in section B starts on the old single file.
+
 Production = `release/pioneer-v2` b8847c8. Every `v091r2/*`, `v092/*` and `v09x/*` branch is live (0 ahead or patch-equivalent). V07 E1 to E19, V091 R1 to R27 shipped, except E18 (dropped) and E34 (parked).
 
 ## A. Built, not yet live (merge in this order)
@@ -26,6 +28,7 @@ Onboarding and sign-in
 - Cloud unreachable at sign-in: a returning user briefly sees the welcome screens until the restored page hydrates (this session's note).
 
 Overview, Roadmap, Budget
+- **Wealth Roadmap medal cards (owner, 9 Nov, first of the owner's v0.95 edits, ahead of Entrepreneur 5):** remove the circle inside each achievement and icon card so the action icon gets more room; the annotated red shape cleaned up with straight lines, treated as a black background on the card; cards keep their design, circle larger, breathing space between the number and the circle. Laptop branch `v095/achievement-cards` off this branch.
 - v0.9.4 item 5: label income as take-home pay; label the pension line on the roadmap.
 - Onboarding income becomes the Budget's starting figure, then the user splits it by source and adds expenses (owner, 8 Nov). Two readings, see D.
 
@@ -79,7 +82,7 @@ Stale lines to close in the queue (already live): Google sign-in (ffe057d), welc
 3. Entrepreneur 2 to 5 in v0.95, or next round?
 4. Port Entrepreneur 1 into v0.95 (marked done, not live)?
 5. Pitch v4 to replace the live v3?
-6. Index split before or after the v0.95 branches?
+6. Index split before or after the v0.95 branches? **Decided 9 Nov 15:25: before, option 1, session `refactor/index-split`.**
 7. Remove `submitWaitlist()`?
 8. Clean the affected testers' Supabase rows: yes, and before or after the fix release?
 9. Laptop to push `brand/oxanium-tagline`?
