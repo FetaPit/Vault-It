@@ -188,3 +188,14 @@ Checked against what is actually live in Stripe before changing anything. Two nu
 **Also removed today:** a leftover, unreachable modal (`#waitlist-modal`) carrying "DAO Governance Seat", "Lifelong Contributor Badge" and a hardcoded, stale £49.99 figure that never tracked the real plan price, plus "Alpha pricing locked at signup. It never increases" (false: tester prices do change after the beta). Confirmed nothing in the app could ever show it before deleting it.
 
 **Pitch deck:** the pricing slide's "or £49.99 a year" was the old figure; fixed to "£59.99 a year" to match the confirmed full price (the deck shows the full/investor-facing price, not the beta-tester discount).
+
+## Decided by Pete (7 Nov 2026): Household is its own plan
+
+Owner's words, 7 Nov: "Also add a Pioneer Household Pricing with up to 8 users within the licence 19.99 a month or 199:99 a year". Asked whether it stays on the pitch deck: "Keep, coming soon". Asked whether it is its own plan or family mode inside Pioneer: "Yes, its own plan".
+
+| Plan | Price | People | Status |
+|---|---|---|---|
+| **Household** | £19.99 a month or £199.99 a year | up to 8 in one licence | Coming soon. Not on sale: no Stripe link, no tester price |
+
+- This replaces the 4 Nov line "pioneer (includes family mode as a feature, not a separate tier)". Pioneer no longer carries "family mode coming soon"; family features belong to Household.
+- Still to do before it is sold: a Stripe product and Payment Link (owner's yes first), a Household line in the pitch deck forecast, and the family plan build (logged 4 Nov as "do not build").
