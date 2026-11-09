@@ -71,6 +71,26 @@ const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
     }
     const dt = await p.evaluate(() => { const d = document.createElement('div'); d.className = 'wr-dtok'; document.body.appendChild(d); const v = d.getBoundingClientRect().width; d.remove(); return v; });
     ok(dt === (phone ? 116 : 140), t + 'the stage detail card is ' + (phone ? 116 : 140) + ' px (' + dt + ')');
+
+    // Side names (owner, 9 Nov: "Yes, fix side names"): a name runs up from y 102 and must end by y 24, below the card's
+    // top-right corner, so its drawn length is 78 units or less; a name that already fits keeps its natural width
+    const names = await p.evaluate(() => {
+      const ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg'), m = document.createElementNS(ns, 'text');
+      m.setAttribute('class', 'wt-side'); s.appendChild(m); document.body.appendChild(s);
+      const nat = (x) => { m.textContent = x; return m.getComputedTextLength(); };
+      const seen = {}, out = [];
+      document.querySelectorAll('#tab-achievements .wt-side').forEach(el => {
+        const tl = el.getAttribute('textLength'), n = nat(el.textContent);
+        if (!seen[el.textContent]) { seen[el.textContent] = 1; out.push({ name: el.textContent, nat: n, drawn: tl ? +tl : n, squeezed: !!tl }); }
+      });
+      const h = document.createElement('div'); h.innerHTML = wrTokSvg({ tier: 'strong', st: 'own', num: 16, tl: 'LV', name: 'Keys' }, 236, 't');
+      document.body.appendChild(h); const k = h.querySelector('.wt-side'); out.push({ name: 'KEYS (level card)', nat: nat('KEYS'), drawn: k.getAttribute('textLength') ? +k.getAttribute('textLength') : nat('KEYS'), squeezed: !!k.getAttribute('textLength') });
+      s.remove(); h.remove(); return out;
+    });
+    const over = names.filter(x => x.drawn > 78), stretched = names.filter(x => x.squeezed && x.nat <= 76);
+    ok(names.length > 20 && over.length === 0, t + 'every side name ends inside the card (' + names.length + ' names; too long: ' + over.slice(0, 4).map(x => x.name + ' ' + x.drawn.toFixed(0)).join(', ') + ')');
+    ok(stretched.length === 0, t + 'names that already fit are not stretched (' + stretched.map(x => x.name).join(', ') + ')');
+    ok(names.some(x => x.name.startsWith('KEYS') && !x.squeezed), t + 'a short name (KEYS) keeps its natural width');
     const side = await p.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
     ok(!side, t + 'no sideways scroll');
     await ctx.close();

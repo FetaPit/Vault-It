@@ -25522,6 +25522,9 @@ function wrIcon(id,x,y,s){
   var ic=FIRE_ICONS[id]||(typeof BD_ICONS!=='undefined'&&BD_ICONS[id])||FIRE_ICONS.gem,pth=function(d){return '<path d="'+d+'"/>';};
   return '<g transform="translate('+x+' '+y+') scale('+(s/24).toFixed(3)+')"><g class="wt-icf">'+ic.f.map(pth).join('')+'</g><g class="wt-ics">'+ic.d.map(pth).join('')+'</g></g>';
 }
+// side name width in card units: Syne 800 at 12.5 px with 1 px letter spacing, measured per character. A name wider than the
+// 76 units beside the medal is squeezed to fit below the card's top corner; one that fits keeps its width (owner, 9 Nov: "Yes, fix side names")
+function wrSideW(s){var W={' ':6,',':5,"'":5,'.':5.5,'-':8.5,'+':11,'I':6.5,'1':7.5,'L':13,'J':13.5,'5':13.5,'S':14,'2':14,'3':14,'7':14,'Y':14.5,'4':14.5,'8':14.5,'£':14.5,'F':15,'T':15,'6':15,'K':16,'Z':16,'R':16.5,'&':16.5,'H':17,'U':17,'%':17,'C':17.5,'D':17.5,'N':17.5,'O':17.5,'Q':17.5,'G':18,'M':21,'W':24.5},w=0;for(var i=0;i<s.length;i++)w+=W[s[i]]||15.5;return w;}
 function wrTok(o){
   var t=o.tier||'starter',st=o.st||'done',px=o.px||100,sc=o.sc||px/118,L=st==='lock',dim=L||st==='skip'||st==='todo',K=wrPts(WR_CARD),n=o.bars||0,lit=o.lit==null?n:o.lit,k;   // todo: an achievement not met yet that nothing locks
   var out='<g class="wt t-'+t+' st-'+st+'">';
@@ -25539,7 +25542,7 @@ function wrTok(o){
   else out+=wrIcon(L?'vi-lock':o.ic,21,49,50);
   if(n>0){var bw=2.6,gp=n>4?1.8:2.6,x0=46-(n*bw+(n-1)*gp)/2;for(k=0;k<n;k++)out+='<rect class="fire-stud wt-bar'+(k<lit?' on':'')+'" x="'+(x0+k*(bw+gp)).toFixed(1)+'" y="118" width="'+bw+'" height="8"/>';}
   if(o.tl!=null&&16*sc>=10.5)out+='<text class="wt-tl" x="6" y="18">'+o.tl+'</text>';   // text only where it renders at 10.5 px or more (Pedro, round 2)
-  if(o.name&&12.5*sc>=10.5){var nm=String(o.name).toUpperCase();out+='<text class="wt-side" transform="translate(94 102) rotate(-90)"'+(nm.length>9?' textLength="80" lengthAdjust="spacingAndGlyphs"':'')+'>'+nm+'</text>';}
+  if(o.name&&12.5*sc>=10.5){var nm=String(o.name).toUpperCase();out+='<text class="wt-side" transform="translate(94 102) rotate(-90)"'+(wrSideW(nm)>76?' textLength="76" lengthAdjust="spacingAndGlyphs"':'')+'>'+nm+'</text>';}
   if(o.grey)out+='<polygon class="wt-grey" points="'+K+'"/>';   // achieved: greyed by 35% (R5); the tick chip stays on top in full colour
   if(st==='next')out+='<polygon class="wt-halo" points="'+wrPts(WR_CARD,-6,-7,1.12)+'"/>';
   if(o.chip&&WR_CHIP[o.chip])out+='<g class="wt-chip c-'+o.chip+'" transform="translate(72 106)"><path class="wt-chipbg" d="M7 0H32V32H0V7Z"/>'+WR_CHIP[o.chip]+'</g>';
