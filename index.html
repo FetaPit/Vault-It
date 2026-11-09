@@ -11639,7 +11639,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .fire-next-step{padding:0 16px 8px;font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2),10.5px);color:var(--t2);line-height:1.5}
 .fire-next-step b{font-family:'Syne',sans-serif;color:var(--tx);margin-right:4px}
 .fire-next-step span{font-family:'Share Tech Mono',monospace;color:var(--brass);white-space:nowrap}
-.wr-dtok{flex:none;width:100px}@media(max-width:480px){.wr-dtok{width:80px}}
+.wr-dtok{flex:none;width:140px}@media(max-width:480px){.wr-dtok{width:116px}}
 .wr-steps-h{margin-top:10px}
 .wr-steps{list-style:none;margin:6px 0 4px;padding:0;display:grid;gap:6px}
 .wr-steps li{display:flex;align-items:center;gap:8px;font-size:max(.58rem,var(--vi-fs-2),10.5px);color:var(--t2)}
@@ -11696,7 +11696,11 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .wr-g-l{font-size:max(.56rem,10.5px);color:var(--t2)}
 .wr-xpchip{font-family:'Share Tech Mono',monospace;font-size:max(.58rem,10.5px);color:var(--brass);white-space:nowrap}
 .wr-none{font-size:max(.6rem,10.5px);color:var(--t2)}
-.wr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.wr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+@media(max-width:900px){.wr-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}}
+/* v0.95 (owner, 9 Nov): larger cards on phone, tablet and desktop; a card fills its tile up to 160 px */
+.wr-tok .wt-svg{width:min(100%,160px);height:auto}
+.wr-rank-tok .wt-svg{width:160px;height:auto}@media(max-width:480px){.wr-rank-tok .wt-svg{width:136px}}
 @media(max-width:480px){.wr-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .wr-tok{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:12px 8px;border:1px solid var(--bd);background:rgb(var(--panel-rgb) / .5);min-width:0}
 .wr-tok.got{border-color:color-mix(in srgb,var(--teal) 35%,transparent)}
@@ -18776,7 +18780,7 @@ var WR_BADGE_IC={nw100:'vi-coin',nw500:'vi-coins',nw1k:'vi-cash',nw2k:'vi-piggy'
   gold:'vi-metals',stream1:'vi-rocket',fullfi:'vi-flame',ef1k:'vi-lifebuoy',coast:'vi-boat'};
 // the token card (Apex-style clipped card, owner's pick A, 3 Nov) in a 100 x 132 box, and its medallion dial
 var WR_CARD=[[0,0],[72,0],[100,28],[100,132],[14,132],[0,118]];
-var WR_DIAL=(function(){var d='';for(var a=0;a<360;a+=10){var r=a%30?32.4:34.4,x=Math.cos(a*Math.PI/180),y=Math.sin(a*Math.PI/180);d+='M'+(46+x*30.2).toFixed(1)+' '+(74+y*30.2).toFixed(1)+'L'+(46+x*r).toFixed(1)+' '+(74+y*r).toFixed(1);}return '<path class="wt-tick" d="'+d+'"/>';})();   // one path, so a rail of tokens stays light
+var WR_DIAL=(function(){var d='';for(var a=0;a<360;a+=10){var r=a%30?33.9:35.1,x=Math.cos(a*Math.PI/180),y=Math.sin(a*Math.PI/180);d+='M'+(46+x*32.4).toFixed(1)+' '+(74+y*32.4).toFixed(1)+'L'+(46+x*r).toFixed(1)+' '+(74+y*r).toFixed(1);}return '<path class="wt-tick" d="'+d+'"/>';})();   // one path, so a rail of tokens stays light
 var WR_CHIP={done:'<path class="wt-cg" d="M8.5 16.5l5 5L24 11"/>',wait:'<path class="wt-cg" d="M8.5 16.5l5 5L24 11"/>',
   skip:'<path class="wt-cg" d="M8 10l6 6-6 6M16 10l6 6-6 6"/>',lock:'<rect class="wt-cgf" x="10" y="15" width="12" height="9.5" rx="1.6"/><path class="wt-cg" d="M12.6 15v-2.6a3.4 3.4 0 0 1 6.8 0V15"/>'};
 var WR_RIVETS=(function(){var d='';[[46,37.6],[82.4,74],[46,110.4],[9.6,74]].forEach(function(p){d+='M'+(p[0]-1.5)+' '+p[1]+'a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0';});return '<path class="wt-rivet" d="'+d+'"/>';})();   // four rivets on the medal rim, one path
@@ -25529,10 +25533,10 @@ function wrTok(o){
   if(o.ol)out+='<polygon class="wt-ol" points="'+K+'" style="stroke:'+o.ol+'"/>';   // section colour outline (R4)
   // the medal (round 4): a metal rim with four rivets, a deep tick dial, a tier-edged face, an engraved ring and a glass highlight
   out+='<circle cx="46" cy="74" r="37.5" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/><circle class="wt-mrim" cx="46" cy="74" r="35.8"/>'+WR_DIAL+WR_RIVETS
-    +'<circle class="wt-mface" cx="46" cy="74" r="29"/><circle class="wt-mring" cx="46" cy="74" r="26.4"/><circle class="wt-mdots" cx="46" cy="74" r="27.7"/>'
-    +'<path class="wt-gloss" d="M22.5 66a24 24 0 0 1 32-18.5"/>';
-  if(o.num!=null)out+='<text class="wt-num" x="46" y="86.5" text-anchor="middle">'+o.num+'</text>';
-  else out+=wrIcon(L?'vi-lock':o.ic,24,52,44);
+    +'<circle class="wt-mface" cx="46" cy="74" r="32"/><circle class="wt-mring" cx="46" cy="74" r="29.4"/><circle class="wt-mdots" cx="46" cy="74" r="30.7"/>'   // v0.95 (owner, 9 Nov): larger inner circle (was 29)
+    +'<path class="wt-gloss" d="M19.8 65.5a27 27 0 0 1 35.4-20.9"/>';
+  if(o.num!=null){var ns=String(o.num),fs=ns.length<=2?26:ns.length===3?16:11;out+='<text class="wt-num" x="46" y="'+(74+fs*.32).toFixed(1)+'" text-anchor="middle" style="font-size:'+fs+'px">'+ns+'</text>';}   // sized so the number clears the inner ring
+  else out+=wrIcon(L?'vi-lock':o.ic,21,49,50);
   if(n>0){var bw=2.6,gp=n>4?1.8:2.6,x0=46-(n*bw+(n-1)*gp)/2;for(k=0;k<n;k++)out+='<rect class="fire-stud wt-bar'+(k<lit?' on':'')+'" x="'+(x0+k*(bw+gp)).toFixed(1)+'" y="118" width="'+bw+'" height="8"/>';}
   if(o.tl!=null&&16*sc>=10.5)out+='<text class="wt-tl" x="6" y="18">'+o.tl+'</text>';   // text only where it renders at 10.5 px or more (Pedro, round 2)
   if(o.name&&12.5*sc>=10.5){var nm=String(o.name).toUpperCase();out+='<text class="wt-side" transform="translate(94 102) rotate(-90)"'+(nm.length>9?' textLength="80" lengthAdjust="spacingAndGlyphs"':'')+'>'+nm+'</text>';}
@@ -25623,7 +25627,7 @@ function renderAchievements(){
   var xp=wrTotalXp(),lv=wrLevel(xp),nx=wrNextLevel(xp),rk=WR_RANKS[lv.rank],pc=nx?(xp-lv.xp)/(nx.xp-lv.xp):1,src=wrSourceSplit(),fmt=function(v){return Math.round(v).toLocaleString('en-GB');};
   var cnt=document.getElementById('wr-count');if(cnt&&S)cnt.textContent=(S.doneCount+(S.bonusDone||0))+' of '+S.length+' achieved';
   var rkEl=document.getElementById('wr-rank');
-  if(rkEl)rkEl.innerHTML='<div class="wr-rank-main"><div class="wr-rank-tok" id="ach-level-badge">'+wrTokSvg({tier:rk.t,st:'done',bars:8,lit:Math.floor(pc*8),num:lv.n,tl:'LV',name:rk.n},112,'Level '+lv.n+' of 20, '+lv.name+', rank '+rk.n)+'</div>'
+  if(rkEl)rkEl.innerHTML='<div class="wr-rank-main"><div class="wr-rank-tok" id="ach-level-badge">'+wrTokSvg({tier:rk.t,st:'done',bars:8,lit:Math.floor(pc*8),num:lv.n,tl:'LV',name:rk.n},160,'Level '+lv.n+' of 20, '+lv.name+', rank '+rk.n)+'</div>'
     +'<div class="wr-rank-meta"><span class="wr-eyebrow">Rank: '+rk.n+' · Level '+lv.n+' of 20</span><div class="wr-rank-name" id="wr-rank-name">'+lv.name+'</div>'
     +'<div class="wr-xpbar" role="progressbar" aria-label="XP to the next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pc*100)+'"><i style="width:'+(pc*100).toFixed(1)+'%"></i>'+[1,2,3,4,5,6,7].map(function(k){return '<b style="left:'+(k*12.5)+'%"></b>';}).join('')+'</div>'
     +'<div class="wr-xp" id="wr-xp-label">'+fmt(xp)+' XP'+(nx?' · '+fmt(nx.xp-xp)+' XP to '+nx.name:' · top level')+'</div>'
@@ -25633,7 +25637,7 @@ function renderAchievements(){
   var nEl=document.getElementById('wr-next');
   if(nEl)nEl.innerHTML=wrNextGoals(S).map(function(g){return '<div class="wr-goal"'+(g.go?' role="button" tabindex="0" onclick="'+g.go+'"':'')+'>'+wrTokSvg(g.tok,52)+'<div class="wr-g-body"><span class="wr-g-h">'+g.h+'</span><span class="wr-g-l">'+g.l+'</span>'+wrBar(g.f,g.h)+'</div><span class="wr-xpchip">+'+g.xp+' XP</span></div>';}).join('')||'<p class="wr-none">Every stage and quest is done. Nothing left but to enjoy it.</p>';
   var qEl=document.getElementById('wr-quests');
-  if(qEl)qEl.innerHTML=WR_QUESTS.map(function(q){var d=wrQuestDone(q),tier=wrXpTier(q.xp);return '<div class="wr-tok wr-quest t-'+tier+(d?' got':'')+'">'+wrTokSvg({tier:tier,st:d?'done':'lock',ic:q.ic,chip:d?'done':'lock',tl:'+'+q.xp,name:q.name},112,q.name+(d?', earned':', not yet'))
+  if(qEl)qEl.innerHTML=WR_QUESTS.map(function(q){var d=wrQuestDone(q),tier=wrXpTier(q.xp);return '<div class="wr-tok wr-quest t-'+tier+(d?' got':'')+'">'+wrTokSvg({tier:tier,st:d?'done':'lock',ic:q.ic,chip:d?'done':'lock',tl:'+'+q.xp,name:q.name},160,q.name+(d?', earned':', not yet'))
     +'<b>'+q.name+'</b><small>+'+q.xp+' XP'+(q.month?' a month':'')+' · '+WR_TIERS[tier].n+'</small><span>'+(d?(q.month?'Done this month':'Earned'):q.desc)+'</span></div>';}).join('');
   var lEl=document.getElementById('wr-ladder');
   if(lEl)lEl.innerHTML=WR_RANKS.map(function(r,ri){var ls=WR_LEVELS.filter(function(l){return l.rank===ri;}),here=lv.rank===ri;
@@ -25644,7 +25648,7 @@ function renderAchievements(){
     tEl.innerHTML='<button type="button" class="wr-chip'+(f==='all'?' on':'')+'" onclick="wrFilter(\'all\')">All '+un.length+'/'+BADGES.length+'</button>'+Object.keys(WR_TIERS).map(function(k){var all=BADGES.filter(function(b){return wrXpTier(b.xp||50)===k;});
       return '<button type="button" class="wr-chip wr-tier t-'+k+(f===k?' on':'')+'" onclick="wrFilter(\''+k+'\')">'+WR_TIERS[k].n+' '+all.filter(function(b){return un.indexOf(b.id)>-1;}).length+'/'+all.length+'</button>';}).join('');}
   if(cEl)cEl.innerHTML=BADGES.map(function(b){var u=un.indexOf(b.id)>-1,tier=wrXpTier(b.xp||50);
-    return '<div class="wr-tok t-'+tier+(u?' got':'')+'">'+wrTokSvg({tier:tier,st:u?'own':'lock',ic:WR_BADGE_IC[b.id]||'vi-gem',chip:u?'':'lock',tl:'+'+(b.xp||50),name:b.name},112,b.name+(u?', earned':', locked'))+'<b>'+b.name+'</b><small>+'+(b.xp||50)+' XP · '+WR_TIERS[tier].n+'</small><span>'+(u?'Earned':b.desc)+'</span></div>';}).join('');
+    return '<div class="wr-tok t-'+tier+(u?' got':'')+'">'+wrTokSvg({tier:tier,st:u?'own':'lock',ic:WR_BADGE_IC[b.id]||'vi-gem',chip:u?'':'lock',tl:'+'+(b.xp||50),name:b.name},160,b.name+(u?', earned':', locked'))+'<b>'+b.name+'</b><small>+'+(b.xp||50)+' XP · '+WR_TIERS[tier].n+'</small><span>'+(u?'Earned':b.desc)+'</span></div>';}).join('');
   if(!_isPro()){document.querySelectorAll('#tab-achievements .wr-pro').forEach(function(e){e.style.filter='blur(5px)';e.style.pointerEvents='none';});}
 }
 function wrFilter(k){var c=document.getElementById('wr-collection');if(c)c.setAttribute('data-f',k);renderAchievements();}
@@ -27421,7 +27425,7 @@ function fireShowDetail(idx,opts){
   var dLit=dSt==='done'||dSt==='wait'?dSteps.length:dSt==='next'?dSteps.filter(function(x){return x.met;}).length:0;
   var stepsHtml='<div class="fd-h wr-steps-h">STEPS · '+WR_TIERS[dTier].n.toUpperCase()+' TIER</div><ol class="wr-steps">'+dSteps.map(function(x,k){var got=!!dW.s[s.key+'.'+k],cur=!x.met&&dSteps.slice(0,k).every(function(y){return y.met;});
     return '<li class="'+(x.met?'ok':cur?'cur':'')+'"><span class="wr-sdot" aria-hidden="true"></span><span class="wr-slbl">'+x.lbl+(x.met?'<span class="vh"> (done)</span>':'')+'</span><span class="wr-sxp">'+(got?'+'+dPer+' XP earned':'+'+dPer+' XP')+'</span></li>';}).join('')+'</ol>';
-  inner.innerHTML=viDay('<div class="wr-dtok">'+wrTokSvg({tier:WR_LOOK_TIER[look],st:dSt,bars:dSteps.length,lit:dLit,ic:WR_STAGE_IC[s.key]||s.ic,chip:dSt==='next'||dSt==='todo'?'':dSt,tl:seq||null,name:s.name,ol:ph.col},window.innerWidth<=480?80:100,(s.bonus?'Achievement, ':'Stage '+seq+', ')+s.name)+'</div>'
+  inner.innerHTML=viDay('<div class="wr-dtok">'+wrTokSvg({tier:WR_LOOK_TIER[look],st:dSt,bars:dSteps.length,lit:dLit,ic:WR_STAGE_IC[s.key]||s.ic,chip:dSt==='next'||dSt==='todo'?'':dSt,tl:seq||null,name:s.name,ol:ph.col},window.innerWidth<=480?116:140,(s.bonus?'Achievement, ':'Stage '+seq+', ')+s.name)+'</div>'
     +'<div style="flex:1;min-width:0">'
     +'<div style="font-family:\'Syne\',sans-serif;font-size:max(.74rem,var(--vi-fs-3));font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="white-space:nowrap;display:inline-block;font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+state_+'</span></div>'
     +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));color:var(--t2);letter-spacing:.1em;margin-bottom:4px">'+ph.label+' PHASE · '+(s.bonus?'ACHIEVEMENT':'STEP '+seq+' OF '+(S.spineLen||30))+'</div>'
