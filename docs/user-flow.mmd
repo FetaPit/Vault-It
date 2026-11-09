@@ -1,0 +1,305 @@
+flowchart TD
+    visitor(["Visitor"])
+
+    subgraph landing ["vault-it.co landing page"]
+        direction LR
+        hero["Hero: 3D house demo"]
+        scroll["How it works, What is in the beta, Why join now, Your data, Founder, FAQ"]
+        join[/"Join the free beta: email"/]
+        joined["Added to the beta list"]
+        openApp["Already testing? Open the app"]
+        privacyPage["Privacy notice page"]
+        termsPage["Beta terms page"]
+        hero --> scroll
+        scroll --> join
+        join --> joined
+        scroll --> openApp
+        scroll --> privacyPage
+        scroll --> termsPage
+    end
+
+    subgraph signin ["app.vault-it.co sign in"]
+        direction LR
+        hasSession{"Session on this device?"}
+        emailStep[/"Email address"/]
+        google[["Continue with Google"]]
+        otpStep[/"6-digit email code"/]
+        setPin["Set a PIN, or skip"]
+        pinStep[/"Enter PIN"/]
+        forgotPin["Forgot PIN: email code"]
+        hasSession -->|"No"| emailStep
+        hasSession -->|"PIN set"| pinStep
+        emailStep --> google
+        emailStep -->|"Continue"| otpStep
+        otpStep -->|"Verify code"| setPin
+        pinStep -->|"Forgot"| forgotPin
+        forgotPin --> otpStep
+    end
+
+    demo["Demo: Alex Morgan sample data"]
+
+    subgraph onboard ["First run onboarding"]
+        direction LR
+        testerWelcome(["Tester welcome: 30 days free"])
+        w1[/"1 First name and email"/]
+        w2["2 Where are you: debt, savings or deposit"]
+        w3[/"3 Your money each month"/]
+        w4[/"4 Your home goal"/]
+        w5["5 Your plan and WhatsApp"]
+        w6["6 Start Vaulting"]
+        testerWelcome -->|"Let's go"| w1
+        w1 --> w2
+        w2 --> w3
+        w3 --> w4
+        w4 --> w5
+        w5 --> w6
+        w3 -.->|"Skip"| w4
+        w4 -.->|"Skip"| w5
+    end
+
+    campaign("Back the build: Pioneer or Lifetime licence")
+    nav["App shell: top nav, sidebar, net worth"]
+    profile["Sidebar profile: name, email, archetypes"]
+
+    subgraph ov ["Overview"]
+        direction TB
+        tabOverview["Overview tab"]
+        ovChart["Net worth chart: All, 1Y, 6M, 3M"]
+        nwHistory("Net worth history modal")
+        addGoal("Add goal")
+        addPoint("Add data point")
+        ffr["Financial Freedom Roadmap card"]
+        wrCard["Wealth Roadmap card"]
+        cfCard["Cash flow card"]
+        ownOwe["Own and owe: assets, liabilities, debt"]
+        ovAch["Achievements strip"]
+        devCard["Message from the Dev"]
+        tabOverview --> ovChart
+        ovChart -->|"View Journey"| nwHistory
+        ovChart --> addGoal
+        ovChart --> addPoint
+        tabOverview --> ffr
+        tabOverview --> wrCard
+        tabOverview --> cfCard
+        tabOverview --> ownOwe
+        tabOverview --> ovAch
+        tabOverview --> devCard
+    end
+
+    subgraph bud ["Budget"]
+        direction TB
+        tabBudget["Budget tab"]
+        sankey["Where your income flows"]
+        incomeList["Income streams: add, expand, collapse"]
+        expenseList["Expenses: add, expand, collapse"]
+        tabBudget --> sankey
+        tabBudget --> incomeList
+        tabBudget --> expenseList
+    end
+
+    subgraph hb ["House builder (USP)"]
+        direction TB
+        tabHouse["House builder tab"]
+        scene["3D house scene: zoom, orbit, reset, full"]
+        levels["Build levels"]
+        lay[/"Lay bricks: add to deposit"/]
+        plan["Plan: set price, deposit target"]
+        hist["Deposit history: monthly, reset tracker"]
+        purchased["House purchased: mortgage complete"]
+        ownDesign["Your own design"]
+        tabHouse --> scene
+        scene --> levels
+        tabHouse --> lay
+        tabHouse --> plan
+        tabHouse --> hist
+        tabHouse --> purchased
+        tabHouse --> ownDesign
+    end
+
+    subgraph al ["Assets and liabilities"]
+        direction TB
+        tabAssets["Assets and liabilities tab"]
+        metals["Precious metals: ISO view, live prices"]
+        crypto["Crypto: holdings, connect wallet"]
+        cash["Cash and savings: accounts, physical cash"]
+        stocks["Stocks: holdings, import CSV or screenshots"]
+        inventory["Wealth inventory"]
+        liabilities["Liabilities"]
+        tabAssets --> metals
+        tabAssets --> crypto
+        tabAssets --> cash
+        tabAssets --> stocks
+        tabAssets --> inventory
+        tabAssets --> liabilities
+    end
+
+    subgraph dt ["Debt tracker"]
+        direction TB
+        tabDebt["Debt tracker tab"]
+        debtPlan["Your plan: debts list"]
+        debtForm("Add or edit debt modal")
+        debtSize["Debts by size"]
+        payoff["Pay-off view: histogram or donut"]
+        owed["Owed to you"]
+        oweForm("Someone owes you modal")
+        tabDebt --> debtPlan
+        debtPlan --> debtForm
+        tabDebt --> debtSize
+        tabDebt --> payoff
+        tabDebt --> owed
+        owed --> oweForm
+    end
+
+    subgraph ent ["Entrepreneur (Pro)"]
+        direction TB
+        tabBiz["Entrepreneur tab"]
+        proGate{"Pro active?"}
+        streams["Income stream builder"]
+        streamForm("Register income stream")
+        mrr["MRR goal progress: set goal"]
+        leads["Leads"]
+        leadForm("Add lead")
+        clients["Active clients"]
+        clientForm("Add client")
+        tabBiz --> proGate
+        proGate -->|"Yes"| streams
+        proGate -->|"Yes"| mrr
+        proGate -->|"Yes"| leads
+        proGate -->|"Yes"| clients
+        streams --> streamForm
+        leads --> leadForm
+        clients --> clientForm
+    end
+
+    subgraph wr ["Wealth Roadmap"]
+        direction TB
+        tabRoadmap["Wealth Roadmap tab"]
+        ffrFull["Financial Freedom Roadmap: 30 stages"]
+        nextSteps["Next steps"]
+        sideQuests["Side quests"]
+        levelsXp["Levels and badge tokens"]
+        xpHow["How XP works"]
+        xpReset["Reset badges and XP"]
+        tabRoadmap --> ffrFull
+        tabRoadmap --> nextSteps
+        tabRoadmap --> sideQuests
+        tabRoadmap --> levelsXp
+        levelsXp --> xpHow
+        levelsXp --> xpReset
+    end
+
+    tabConnections["Connections tab"]
+
+    subgraph net ["Network (Web3)"]
+        direction TB
+        tabNetwork["Network tab"]
+        wallet["Connect wallet"]
+        switchNet["Switch network: Shibarium"]
+        mint["Mint card"]
+        shareProfile["Share profile URL"]
+        optIn["Network profile opt-in"]
+        tabNetwork --> wallet
+        wallet --> switchNet
+        switchNet --> mint
+        tabNetwork --> shareProfile
+        tabNetwork --> optIn
+    end
+
+    subgraph settings ["Settings modal"]
+        direction TB
+        setHome("Settings")
+        setAccount["Account: signed in as, sign out, already paid"]
+        setLook["Appearance: theme, view, text size, contrast, motion"]
+        setHelp["Help and app tour"]
+        setPrices["Live prices: on, off, refresh"]
+        setConns["Bank, broker and platform connections"]
+        setSync["Cloud sync: upload, version history and restore"]
+        setPinRow["Sign-in PIN: set, change, remove"]
+        setPrivacy["Privacy and usage sharing"]
+        deleteAcct("Delete account modal")
+        setHome --> setAccount
+        setHome --> setLook
+        setHome --> setHelp
+        setHome --> setPrices
+        setHome --> setConns
+        setHome --> setSync
+        setHome --> setPinRow
+        setHome --> setPrivacy
+        setAccount --> deleteAcct
+    end
+
+    help("Help panel: Ask, FAQs, Tour")
+    tour["Guided app tour"]
+    legal("Legal modal: privacy notice, beta terms")
+    offer("Pioneer offer modal")
+    trialEnd("Day 30: pick a plan, vault read-only")
+    verify("Verify payment modal")
+    checkout[["Stripe checkout: Pioneer monthly, annual, Lifetime"]]
+
+    %% Entry flows
+    visitor --> hero
+    visitor -.->|"vault-it.co/demo-a"| demo
+    joined -.->|"Invite email"| hasSession
+    openApp --> hasSession
+    google --> testerWelcome
+    setPin --> testerWelcome
+    pinStep -->|"Correct PIN"| nav
+    demo --> nav
+    demo -->|"Start with your own data"| emailStep
+    emailStep -.-> legal
+    w6 --> nav
+    w6 -.->|"Skip for now"| nav
+    w6 -.-> campaign
+    campaign --> checkout
+
+    %% App shell fan-out
+    nav --> profile
+    nav --> tabOverview
+    nav --> tabBudget
+    nav --> tabHouse
+    nav --> tabAssets
+    nav --> tabDebt
+    nav --> tabBiz
+    nav --> tabRoadmap
+    nav --> tabConnections
+    nav --> tabNetwork
+    nav --> setHome
+    nav -->|"Help"| help
+    nav -.->|"Returning user"| offer
+    nav -.->|"Day 30"| trialEnd
+
+    %% Cross links
+    wrCard -->|"Open roadmap"| tabRoadmap
+    cfCard -->|"Open Budget"| tabBudget
+    tabConnections -->|"Opens settings"| setConns
+    ownDesign -->|"Upgrade to Pro"| checkout
+    proGate -->|"No: See plans"| trialEnd
+    trialEnd --> checkout
+    offer --> checkout
+    setAccount -->|"Already paid?"| verify
+    setAccount -->|"Sign out"| emailStep
+    setHelp --> tour
+    setHelp --> help
+    help --> tour
+    tour --> tabOverview
+    setPrivacy --> legal
+
+    %% Styling
+    style landing fill:#C2E5FF,stroke:#3DADFF
+    style signin fill:#DCCCFF,stroke:#874FFF
+    style onboard fill:#C6FAF6,stroke:#5AD8CC
+    style ov fill:#E3F2FD,stroke:#3DADFF
+    style bud fill:#CDF4D3,stroke:#66D575
+    style hb fill:#FFE0C2,stroke:#FF9E42
+    style al fill:#FFECBD,stroke:#FFC943
+    style dt fill:#FFCDC2,stroke:#FF7556
+    style ent fill:#FFC2EC,stroke:#F849C1
+    style wr fill:#FFF4D6,stroke:#FFC943
+    style net fill:#EAE2FF,stroke:#874FFF
+    style settings fill:#EDEDED,stroke:#B3B3B3
+    classDef pro fill:#FFECBD,stroke:#E8A302
+    classDef ext fill:#D9D9D9,stroke:#B3B3B3
+    classDef entry fill:#CDF4D3,stroke:#66D575
+    class ownDesign,proGate,tabBiz,trialEnd,offer,campaign pro
+    class google,checkout,demo ext
+    class visitor,nav entry
