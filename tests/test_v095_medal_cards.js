@@ -90,6 +90,27 @@ const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
     await p.evaluate(() => { try { localStorage.setItem('vi_view', 'advanced'); } catch (e) {} showTab('achievements'); }); await p.waitForTimeout(900);
     const tab = await p.evaluate(() => ({ toks: [...document.querySelectorAll('#tab-achievements g.wt')].filter(g => g.querySelector('.wt-card')).length, panels: document.querySelectorAll('#tab-achievements .wt-panel').length, inner: document.querySelectorAll('.wt-mface,.wt-mring,.wt-mdots').length }));
     ok(tab.toks > 0 && tab.panels === tab.toks && tab.inner === 0, t + 'every token on the Wealth Roadmap tab has the panel and no inner circles (' + tab.toks + ' tokens, ' + tab.panels + ' panels, ' + tab.inner + ' inner)');
+
+    // Side names (owner, 9 Nov: "Yes, fix side names"): each name runs up from y 102 and must end by y 24, below the card's
+    // top-right corner, so its drawn length is 78 units or less; a name that already fits is drawn at its natural width, never stretched
+    const names = await p.evaluate(() => {
+      const ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg'), m = document.createElementNS(ns, 'text');
+      m.setAttribute('class', 'wt-side'); s.appendChild(m); document.body.appendChild(s);
+      const nat = (x) => { m.textContent = x; return m.getComputedTextLength(); };
+      const seen = {}, out = [];
+      document.querySelectorAll('#tab-achievements .wt-side').forEach(el => {
+        const tl = el.getAttribute('textLength'), n = nat(el.textContent), drawn = tl ? +tl : n;
+        if (!seen[el.textContent]) { seen[el.textContent] = 1; out.push({ name: el.textContent, nat: +n.toFixed(1), drawn: +drawn.toFixed(1), squeezed: !!tl }); }
+      });
+      // a short name on a level card
+      const h = document.createElement('div'); h.innerHTML = wrTokSvg({ tier: 'strong', st: 'own', num: 16, tl: 'LV', name: 'Keys' }, 236, 't');
+      document.body.appendChild(h); const k = h.querySelector('.wt-side'); out.push({ name: 'KEYS (level card)', nat: +nat('KEYS').toFixed(1), drawn: k.getAttribute('textLength') ? +k.getAttribute('textLength') : +nat('KEYS').toFixed(1), squeezed: !!k.getAttribute('textLength') });
+      s.remove(); h.remove(); return out;
+    });
+    const over = names.filter(x => x.drawn > 78), stretched = names.filter(x => x.squeezed && x.nat <= 76);
+    ok(names.length > 20 && over.length === 0, t + 'every side name ends inside the card (' + names.length + ' names; too long: ' + over.slice(0, 4).map(x => x.name + ' ' + x.drawn).join(', ') + ')');
+    ok(stretched.length === 0, t + 'names that already fit are not stretched (' + stretched.map(x => x.name).join(', ') + ')');
+    ok(names.some(x => x.name.startsWith('KEYS') && !x.squeezed), t + 'a short name (KEYS) keeps its natural width');
     const side = await p.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
     ok(!side, t + 'no sideways scroll');
     await ctx.close();
