@@ -179,7 +179,7 @@ async function wizard(p, user) {   // signed in, the welcome wizard on screen
     await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(200);
     s = await scr(p);
     ok(s.at === '2' && /Step 2 of 3/.test(s.count), T + '1 no first name typed: Next still goes on (' + JSON.stringify(s) + ')');
-    ok(await vis(p, '#w-income') && await vis(p, '#w-expenses') && await vis(p, '.w-curr-btn') && await vis(p, '#w-pot-opts') && await vis(p, '#wz-s2 .wz-skip'), T + '4 screen 2: currency, take-home, spending and deposit pot, with add later');
+    ok(await vis(p, '#w-income') && await vis(p, '#w-expenses') && !(await p.$('#welcome-overlay .w-curr-btn')) && await vis(p, '#w-pot-opts') && await vis(p, '#wz-s2 .wz-skip'), T + '4 screen 2: take-home, spending and deposit pot, with add later; no currency choice (tester 1, pounds only)');
     await p.click('#wz-back'); await p.waitForTimeout(150);
     ok((await scr(p)).at === '1', T + '4 Back goes to screen 1');
     await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(150);
