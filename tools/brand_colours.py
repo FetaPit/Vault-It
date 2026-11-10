@@ -6,6 +6,7 @@ and el.style.prop = '...' assignments. Canvas and SVG attribute colours are left
 handled by the Daylight phase). The embedded HB3D engine block is skipped (it is rebuilt from src/hb3d).
 
 Usage: python3 tools/brand_colours.py index.html [--dry]
+index.html is built from src/app: after a run on index.html, run `node tools/build_app.js --absorb` to carry the edit into the parts.
 """
 import re, sys
 

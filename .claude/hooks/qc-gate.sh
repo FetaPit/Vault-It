@@ -17,6 +17,10 @@ app=$(git diff --cached --name-only 2>/dev/null | grep -E '^(index\.html|landing
 if printf '%s' "$cmd" | grep -qE ' (-a|--all|-am)\b'; then
   echo "QC gate: commit without -a. Stage the files, run rollout-qc on the staged change, then commit." >&2; exit 2
 fi
+# index.html is built from src/app: a commit touching either must keep them byte for byte in step (docs/APP_SOURCE.md)
+if printf '%s' "$app" | grep -qE '^(index\.html|src/app/)' && [ -f src/app/manifest.json ]; then
+  node tools/build_app.js --check >/dev/null 2>&1 || { echo "Build gate: index.html does not match src/app. Edited the parts? run node tools/build_app.js. Edited index.html? run node tools/build_app.js --absorb. Then stage both." >&2; exit 2; }
+fi
 want=$(git diff --cached --binary | sha256sum | cut -d' ' -f1)
 have=$(cat shots/qc/QC_PASS 2>/dev/null)
 if [ "$want" != "$have" ]; then

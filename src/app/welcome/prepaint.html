@@ -1,0 +1,65 @@
+<!-- ══════════════════════════════════════════════════════
+     VAULT-IT WELCOME — New user onboarding + Returning upsell
+══════════════════════════════════════════════════════ -->
+<script>
+/* Pre-paint: hide overlays for users with valid sessions */
+(function(){
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var reset = params.has('reset');
+    if (reset) { localStorage.removeItem('vi_user'); localStorage.removeItem('vi_session'); }
+
+    // vault-it.co/demo-a (owner, 8 Nov 2026): the Worker sends it here as ?demo=alex. Nothing in this browser is ever removed
+    // (owner, 8 Nov: "do not allow any wiping of data"). A browser with no profile, session or sign-in of its own gets the Alex
+    // Morgan sample: initDemoMode() fills the empty keys, opens a 24h demo session and reloads once with a clean address, so both
+    // overlays are hidden before first paint. A browser that holds someone's own data keeps all of it and opens as usual;
+    // initDemoMode() makes the final call with the full saved-data check and says so once.
+    if (!reset && params.get('demo') === 'alex') {
+      var _own = false;
+      try {
+        var _du = JSON.parse(localStorage.getItem('vi_user') || 'null'), _ds = JSON.parse(localStorage.getItem('vi_session') || 'null');
+        var _onSample = localStorage.getItem('vi_demo_mode') === 'true';
+        if (!_onSample && ((_du && _du.email) || (_ds && _ds.email))) _own = true;
+        for (var _di = 0; _di < localStorage.length && !_own; _di++) { if (/^sb-.+-auth-token$/.test(localStorage.key(_di))) _own = true; }
+      } catch (e) { _own = true; }   // storage that cannot be read is never treated as empty
+      if (!_own) {
+        try { localStorage.setItem('vi_demo_launch', 'a'); } catch (e) {}
+        document.write('<style>#login-overlay,#welcome-overlay{display:none!important}</style>');
+      }
+    }
+
+    // Demo bypass — ?bypass=websummit creates a 24h session from stored profile
+    // Use this URL during live demos to skip the login screen
+    if (!reset && params.get('bypass') === 'websummit') {
+      var _bu = JSON.parse(localStorage.getItem('vi_user') || 'null');
+      var _be = (_bu && _bu.email) ? _bu.email.toLowerCase() : 'demo@vault-it.app';
+      localStorage.setItem('vi_session', JSON.stringify({ email: _be, expiry: Date.now() + 24*60*60*1000 }));
+      localStorage.setItem('vi_demo_mode', 'true');
+      document.write('<style>#login-overlay{display:none!important}</style>');
+      // Strip bypass param from URL without reload
+      window.history && window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    var s = JSON.parse(localStorage.getItem('vi_session') || 'null');
+    var sessionOk = !reset && s && s.expiry > Date.now() && s.email;
+    if (sessionOk) {
+      // Valid session — hide login overlay immediately (no flash)
+      document.write('<style id="vi-login-prepaint">#login-overlay{display:none!important}</style>');
+    }
+    // Hide welcome overlay only for real returning users (not demo-mode visitors)
+    var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
+    var isDemo = localStorage.getItem('vi_demo_mode') === 'true';
+    var demoA = localStorage.getItem('vi_demo_variant') === 'a';   // the vault-it.co/demo-a sample lands on the dashboard, not the wizard
+    if (!reset && ((u && u.email && (u.name || (u.goal != null && u.goal !== '')) && !isDemo) || (isDemo && demoA))) {
+      document.write('<style>#welcome-overlay{display:none!important}</style>');
+    }
+    // Belt-and-suspenders: also hide via JS after DOM is ready
+    if (!reset && ((u && u.email && (u.name || (u.goal != null && u.goal !== '')) && !isDemo) || (isDemo && demoA))) {
+      document.addEventListener('DOMContentLoaded', function() {
+        var ov = document.getElementById('welcome-overlay');
+        if (ov) { ov.style.display = 'none'; ov.style.setProperty('display','none','important'); }
+      });
+    }
+  } catch(e) {}
+})();
+</script>

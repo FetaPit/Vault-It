@@ -1,0 +1,33 @@
+<!-- Help centre: panel (Ask / FAQs / Tour) and the tour layer (owner, 1 Nov 2026) -->
+<div id="vi-help" role="dialog" aria-modal="false" aria-labelledby="vh-title">
+  <div class="vh-head"><div class="vh-title" id="vh-title">Help</div><button class="vh-x" type="button" aria-label="Close help" onclick="viHelpClose()">×</button></div>
+  <div class="vh-tabs" role="tablist">
+    <button class="vh-tab" role="tab" id="vh-tab-ask" aria-selected="true" onclick="viHelpView('ask')">Ask</button>
+    <button class="vh-tab" role="tab" id="vh-tab-faq" aria-selected="false" onclick="viHelpView('faq')">FAQs</button>
+    <button class="vh-tab" role="tab" id="vh-tab-tour" aria-selected="false" onclick="viHelpView('tour')">Tour</button>
+  </div>
+  <div class="vh-view on" id="vh-view-ask" role="tabpanel" aria-labelledby="vh-tab-ask">
+    <div class="vh-scroll" id="vh-log" aria-live="polite"></div>
+    <form class="vh-form" onsubmit="viHelpAsk(event)"><input id="vh-q" type="text" autocomplete="off" maxlength="300" placeholder="Ask about the app or your numbers" aria-label="Your question"><button type="submit">Ask</button></form>
+    <div class="vh-foot">Not regulated by the FCA. Not financial advice.</div>
+  </div>
+  <div class="vh-view" id="vh-view-faq" role="tabpanel" aria-labelledby="vh-tab-faq">
+    <div class="vh-scroll"><input class="vh-search" id="vh-faq-q" type="search" placeholder="Search FAQs" aria-label="Search FAQs" oninput="viHelpRenderFaq(this.value)"><div id="vh-faq-list"></div></div>
+    <div class="vh-foot">Not regulated by the FCA. Not financial advice.</div>
+  </div>
+  <div class="vh-view" id="vh-view-tour" role="tabpanel" aria-labelledby="vh-tab-tour">
+    <div class="vh-scroll">
+      <div class="vh-tour-hero"><h4>Take the full tour</h4><p>A quick look at each tab and what it does. About a minute, and you can skip at any point.</p><button class="vh-big" type="button" onclick="viTourStart()">Start the tour</button></div>
+      <div class="vh-cat">Tour one tab</div><div id="vh-tour-list"></div>
+    </div>
+    <div class="vh-foot">Not regulated by the FCA. Not financial advice.</div>
+  </div>
+</div>
+<div id="vi-tour" aria-hidden="true">
+  <div id="vt-block"></div><div id="vt-spot"></div>
+  <div id="vt-card" role="dialog" aria-modal="true" aria-labelledby="vt-title" aria-describedby="vt-body" tabindex="-1">
+    <div class="vt-step" id="vt-step"></div><div class="vt-bar"><i id="vt-bar"></i></div>
+    <h3 class="vt-title" id="vt-title"></h3><p class="vt-body" id="vt-body"></p>
+    <div class="vt-btns"><button class="vt-skip" type="button" id="vt-skip" onclick="viTourEnd(true)">Skip tour</button><button class="vt-back" type="button" id="vt-back" onclick="viTourMove(-1)">Back</button><button class="vt-next" type="button" id="vt-next" onclick="viTourMove(1)">Next</button></div>
+  </div>
+</div>

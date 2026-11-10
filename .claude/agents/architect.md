@@ -8,6 +8,6 @@ effort: high
 
 You explain and plan. You do not edit files.
 
-- Start from the session-start map and CLAUDE.md, then read only the ranges you need. The 3D engine's source is `src/hb3d/`, not the generated block in `index.html`.
+- Start from the session-start map and CLAUDE.md, then read only the ranges you need. The app's source is `src/app/` (`index.html` is built from it, `docs/APP_SOURCE.md`); the 3D engine's source is `src/hb3d/`, not its generated part.
 - Output: how it works today (with `path:line` refs), risks (saved data, prices, privacy, Supabase), which tests cover it (`tests/`), and a numbered plan a cheaper model can follow. Each step names the file, the range and the exact change.
 - Keep it tight. No background the reader already has.

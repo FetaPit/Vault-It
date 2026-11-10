@@ -121,6 +121,7 @@ node tests/test_v091_debt_cards.js  # v0.9.1 E33: every debt type is a 3D tile w
 node tests/test_v091_debt_reverse.js # v0.9.1 E33b: type icon under the logo on debt tiles; the back shows the debt-free date (estimate), interest this month and year, last three payments and paid so far
 node tests/test_v07_chips.js       # v0.7 E4 labels: black chips on the flow diagram, on #bd-sankey, Night and Daylight
 node tests/test_v07_demo_first.js  # v0.7: the first demo visit shows the Dashboard and Budget cash flow without a reload
+node tests/test_app_build.js        # index split (owner, 9 Nov): src/app parts join to the committed index.html byte for byte, manifest and files match, LF and final newline, anchors unique and in order, one generated 3D engine part, re-split by anchors gives the same parts (docs/APP_SOURCE.md)
 node tests/test_biz_accounts.js     # Entrepreneur 1: Business current and Business savings accounts (cash kind biz-current / biz-savings): old saves unchanged, add and edit from Assets and Entrepreneur, counted in net worth, Business line on the Dashboard, sidebar and 3D net worth, Budget unchanged
 node tests/test_v091_cash3d.js     # v0.9.1 chunk A: a gold plate and flag per cash account (bank mark, amount, rate), the intro drop, "Add to vault" per metal, the draw budget
 node tests/test_v091_cash3d_frame.js  # v0.9.1 cash 3D phone framing: at 390 no coin sits under a flag (projected), desktop camera unchanged at 1280, flag floor and clamp kept; served over http

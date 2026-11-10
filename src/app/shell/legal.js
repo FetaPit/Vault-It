@@ -1,0 +1,92 @@
+// ── TASK 5: PRIVACY + TERMS ─────────────────────────────────────
+function showLegalModal(title, body) {
+  var existing = document.getElementById('legal-modal');
+  if (existing) existing.remove();
+  var modal = document.createElement('div');
+  modal.id = 'legal-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:20000;background:rgb(var(--panel-rgb) / .94);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
+  modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(560px,94vw);max-height:86vh;overflow-y:auto;padding:24px 22px;position:relative"><button onclick="document.getElementById(\'legal-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button><div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:14px">'+title+'</div><div style="font-family:\'DM Sans\',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);line-height:1.7">'+body+'</div></div>';
+  document.body.appendChild(modal);
+}
+var VI_LEGAL_DATE = '5 November 2026';
+function _lh(t) { return '<p style="color:var(--em);font-weight:700;margin:14px 0 3px">' + t + '</p>'; }
+function showPrivacy() {
+  showLegalModal('Privacy notice', [
+    '<p style="color:var(--t3)">Vault-It private beta · last updated ' + VI_LEGAL_DATE + '</p>',
+    _lh('Who we are'),
+    '<p>Vault-It is run by <strong>PT Live Design</strong> (“we”), A57, 11 St Mary’s Street, Lincoln LN5 7EQ. We decide how your personal data is used, which makes us the data controller. For anything about your privacy, email <strong>hello@vault-it.co</strong>.</p>',
+    _lh('What we hold, and why'),
+    '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Your email address</strong>: typed in, or from Google if you choose Continue with Google; to create your account, send you sign-in codes and send service messages about the beta and your account. We do not send marketing unless you opt in.</li>'
+      + '<li><strong>Your profile</strong>: your name, phone number, profession and aspirations, goal, and the saving- and spending-style answers from the set-up questions.</li>'
+      + '<li><strong>Your plan</strong>: which plan you bought (Pioneer, monthly or yearly, or a Lifetime licence), when you paid and when it renews or ends, whether you are a beta tester (an address confirmed on the beta list gets the tester price), and the Stripe customer and subscription references that link a payment to your account. We never see or store your card details.</li>'
+      + '<li><strong>The figures you enter</strong>: income, spending, assets, debts, house plans and net-worth history, and anything else you add: notes, small item photos, and the names and contact details of clients or leads if you use that tab (only add other people’s details if you have a good reason to). This is financial information. We use it only to show you your dashboard, roadmap and House Builder and to keep your devices in step. We do not use it for anything else, and we do not sell it. Full-size photos stay on your device.</li>'
+      + '<li><strong>Your PIN</strong>: on our server only as a salted, peppered one-way hash; we cannot read it. Your browser keeps just a marker that a PIN is set, not the PIN or anything derived from it.</li>'
+      + '<li><strong>Security records</strong>: sign-in times, IP addresses and failed-attempt counters, and short-lived hashed counters that block abuse. We keep these because it is in our legitimate interest, and yours, to keep accounts safe.</li>'
+      + '<li><strong>Saved versions</strong>: earlier copies of your data, including anything you reset or delete, so you can restore a version if something goes wrong. They clear automatically after about 180 days.</li>'
+      + '<li><strong>Beta list</strong>: if you join on vault-it.co, your email address, whether you want to test the app, whether you agreed to product news (with the date and the wording you saw), and the campaign tags and referring website of the link that brought you there. We email once to confirm the address is yours; requests nobody confirms are deleted after 30 days. Tester emails go only to people who ticked that box and news only to people who ticked that one, and every email has a link to leave. If you leave, we keep just your address on a do-not-email list.</li></ul>',
+    '<p>Our lawful bases are: providing the service you asked for (contract), our legitimate interest in security and preventing abuse, and, for optional features that send something to another company (like reading a screenshot), your choice to use them. You can stop using a feature, or withdraw that choice, at any time.</p>',
+    _lh('Who else handles it'),
+    '<p>These companies process data for us, only to run Vault-It:</p>',
+    '<ul style="margin:0 0 0 16px;padding:0"><li><strong>Supabase</strong>: database and sign-in, hosted in the EU (Frankfurt), and the server functions, which run on Supabase’s network and may run outside the EU.</li>'
+      + '<li><strong>Google</strong>: only if you choose <strong>Continue with Google</strong>. Google confirms it is you and sends Supabase your name, email address and the web address of your Google profile picture, which Supabase keeps with your account. The app uses your name and email address; it does not load the picture. We never see your Google password, and ask Google for nothing else in your account.</li>'
+      + '<li><strong>Stripe</strong>: takes payments for Pioneer (monthly and yearly) and the Lifetime licence. When you pay, Stripe receives your email address, your card details and your Vault-It account reference, and sends our server a signed record of the payment (the plan, and when it renews or ends).</li>'
+      + '<li><strong>Resend</strong>: delivers your sign-in emails (your email address and the code) and the beta-list emails. If it is unavailable, Supabase’s own mailer is used for sign-in emails instead.</li>'
+      + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
+      + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
+    '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank, provider, company and ticker logos; it is told the website of each bank, card, investment provider or company you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
+    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). The free 3D models you can pick for a wealth or liability item come from a library bundled with Vault-It itself, served from this same address: a model is downloaded only when you pick or open one, no outside service is contacted, and CC-BY models are credited in the item and in the 3D model credits panel. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with a key, only if an earlier version of the app saved one on this device. The bank, broker and exchange connections in Settings are locked for a future release: they connect to nothing and never ask for your details. Settings also holds owner-only connections (Notion, Claude, Meshy); they do nothing unless someone enters keys for them.</p>',
+    '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or third-party analytics. During the beta the app records how it is used (screens opened, features used, errors and how long a visit lasts, never your figures or what you type) in our own database, to improve it; you can switch this off in Settings (Share usage). Feedback you send from the app is stored by us with the screen you were on, your last few taps and, unless you untick it, a picture of that screen with every figure hidden. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
+    _lh('How it is protected, and what that does not mean'),
+    '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code or your Google account, and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
+    _lh('On your device'),
+    '<p>The app keeps your data and settings in your browser’s storage so it works quickly and offline. This is essential to how it works and is not used to track you. API keys you type in stay in this browser (sent only to the service they belong to), and photos and 3D designs you add stay in this browser only.</p>',
+    _lh('How long we keep it'),
+    '<p>Until you delete your account, or we end the beta (we will email you first so you can download your data, and then remove remaining accounts). In <strong>Settings → Danger Zone → Delete my account</strong> you can erase your account, data, saved versions and PIN straight away, along with the copy on the device you use. Other devices where you have used Vault-It keep their local copy until you clear it there. Our email and hosting providers keep short-lived backups and delivery or access logs (which include your email address and IP address) and these clear out within days.</p>',
+    _lh('Your rights'),
+    '<p>Under UK GDPR you can ask to see your data, correct it, have it erased, restrict or object to its use, withdraw consent, and take a copy with you. Most of this you can do yourself: <strong>Settings → Your data → Download my data</strong> (your figures, profile and latest 200 saved versions; email us for photos and security records), and <strong>Delete my account</strong>. For anything else email hello@vault-it.co and we will reply within one month. You can also complain to the Information Commissioner’s Office (ico.org.uk, 0303 123 1113), though we would like the chance to put things right first.</p>',
+    _lh('Children and changes'),
+    '<p>Vault-It is for people aged 18 and over. If we change this notice we will update the date above and tell you in the app if the change matters.</p>'
+  ].join(''));
+}
+function showTerms() {
+  showLegalModal('Beta terms', [
+    '<p style="color:var(--t3)">Vault-It private beta · last updated ' + VI_LEGAL_DATE + '</p>',
+    _lh('1. This is a beta'),
+    '<p>Vault-It is early-access software run by PT Live Design. Features can change, break or disappear, and data could be lost. Please keep your own copy: <strong>Settings → Your data → Download my data</strong>.</p>',
+    _lh('2. Not financial advice'),
+    '<p>Vault-It is a tracking and organising tool. <strong>Nothing in it is financial, investment, tax or mortgage advice</strong>, or a personal recommendation, under the Financial Services and Markets Act 2000. Projections (deposit dates, debt-free dates, FI numbers and so on) are estimates from the figures you enter and may be wrong. PT Live Design is not authorised or regulated by the Financial Conduct Authority. Speak to a regulated adviser before making significant financial decisions.</p>',
+    _lh('3. Your account'),
+    '<p>You must be 18 or over. Keep your PIN and email account to yourself; you are responsible for what happens under your account, so tell us straight away if you think someone else has got in.</p>',
+    _lh('4. Fair use'),
+    '<p>Use Vault-It for your own finances. Do not try to break, probe, overload or scrape it, get into anyone else’s data, or upload anything unlawful. If you store details of other people (such as clients or leads), you must have a lawful reason to hold them. We can suspend an account that breaks these rules.</p>',
+    _lh('5. Your data and your feedback'),
+    '<p>Your data stays yours. We use it only to run the app for you, as set out in the Privacy Notice. Feedback and ideas you share can be used to improve Vault-It without payment to you.</p>',
+    _lh('6. Paid plans'),
+    '<p>Pioneer is optional. The price and billing period are shown before you pay, payment is taken by Stripe, and a subscription renews until you cancel. You can cancel at any time from your Stripe receipt or portal, or by emailing hello@vault-it.co. Your legal rights as a consumer, including any right to cancel and to a refund that the law gives you, are not affected.</p>',
+    _lh('7. Availability and liability'),
+    '<p>The beta is provided “as is”, and we cannot promise it will always be available or error-free. Nothing in these terms limits liability that cannot lawfully be limited, including for death or personal injury caused by negligence, or for fraud, or affects your statutory rights as a consumer. Subject to that, we are not responsible for losses from decisions you make using the app or for data lost during the beta, and our total liability to you is limited to £100 or, if you have paid for a plan, what you paid us in the last 12 months if that is more.</p>',
+    _lh('8. Ending'),
+    '<p>You can stop at any time and delete your account in Settings. We may end or pause the beta, or an account that breaks these terms; where we can, we will email you first so you can download your data, and we will then remove remaining accounts.</p>',
+    _lh('9. Law and contact'),
+    '<p>These terms are governed by the law of England and Wales. Questions: <strong>hello@vault-it.co</strong>.</p>'
+  ].join(''));
+}
+
+// The app now lives at app.vault-it.co. Anyone still on the old GitHub address is asked to back up first, then move.
+function viMovedBanner(host) {
+  if (host !== 'fetapit.github.io') return false;
+  try { if (sessionStorage.getItem('vi_moved_dismissed')) return false; } catch (e) {}
+  if (document.getElementById('moved-banner')) return true;
+  var b = document.createElement('div'); b.id = 'moved-banner';
+  b.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:10003;background:var(--panel);border-bottom:1px solid var(--teal);color:#cfeeee;padding:10px 14px;font-size:13px;display:flex;gap:10px;align-items:center;flex-wrap:wrap';
+  b.innerHTML = '<span style="flex:1;min-width:220px">📦 Vault-It has moved to <strong>app.vault-it.co</strong>. Back up here first (Settings → Cloud sync → Upload everything), then sign in at the new address. Your account data comes with you. Photos and any 3D design you uploaded stay on this device, so tap Settings → Download my data first.</span>'
+    + '<a class="btn-add-data" href="https://app.vault-it.co/" style="text-decoration:none">Open new address</a>'
+    + '<span style="cursor:pointer;padding:4px" aria-label="Dismiss" onclick="try{sessionStorage.setItem(\'vi_moved_dismissed\',\'1\')}catch(e){}document.getElementById(\'moved-banner\').remove()"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></span>';
+  document.body.appendChild(b); return true;
+}
+window.addEventListener('load', function() { try { viMovedBanner(location.hostname); } catch (e) {} });
+// Deep links from the website: ?privacy=1 / ?terms=1 open the notice or the terms straight away
+window.addEventListener('load', function() {
+  try { if (/[?&]privacy=1(&|$)/.test(location.search)) setTimeout(showPrivacy, 900); else if (/[?&]terms=1(&|$)/.test(location.search)) setTimeout(showTerms, 900); } catch (e) {}
+});
+

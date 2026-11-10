@@ -5,15 +5,15 @@
 cd "${CLAUDE_PROJECT_DIR:-$(pwd)}" || exit 0
 PY=""; for c in python3 python "py -3"; do $c -c "import sys" >/dev/null 2>&1 && { PY=$c; break; }; done
 
-if [ -n "$PY" ] && [ -f index.html ]; then
-  # The embedded 3D engine is build output: point at its sources and leave it off the map.
-  s=$(grep -n '<<HB3D_ENGINE' index.html | head -1 | cut -d: -f1)
-  e=$(grep -n 'HB3D_ENGINE>>' index.html | head -1 | cut -d: -f1)
-  CODEMAP_MAX_ENTRIES=150 $PY tools/codemap.py . index.html src/hb3d/kit.js 2>/dev/null \
-    | awk -F: -v s="${s:-0}" -v e="${e:-0}" '
-        /^## index.html/ { inidx = 1; print; if (s) print s "-" e ": generated 3D engine. Edit src/hb3d/*, then node tools/build_hb3d.js"; next }
-        /^## /           { inidx = 0 }
-        !(inidx && $1 + 0 >= s && $1 + 0 <= e)'
+if [ -f src/app/manifest.json ] && command -v node >/dev/null 2>&1; then
+  # index.html is build output (docs/APP_SOURCE.md): map the parts instead, and never edit or Read index.html itself.
+  echo "# index.html is built from src/app: edit the parts, run node tools/build_app.js, commit both. Grep src/app, not index.html."
+  echo "# The 3D engine part (src/app/hb3d/engine.generated.html) is generated: edit src/hb3d/*, then node tools/build_hb3d.js."
+  node tools/build_app.js --map 2>/dev/null
+  if [ -n "$PY" ]; then
+    big=$(for f in $(find src/app -name '*.*' ! -name 'engine.generated.html' ! -name 'manifest.json'); do [ "$(wc -l < "$f")" -gt 800 ] && echo "$f"; done)
+    [ -n "$big" ] && CODEMAP_MAX_ENTRIES=60 $PY tools/codemap.py . $big src/hb3d/kit.js 2>/dev/null
+  fi
 fi
 
 root=$(git rev-parse --show-toplevel 2>/dev/null || pwd)

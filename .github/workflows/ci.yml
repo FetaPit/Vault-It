@@ -32,6 +32,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - name: index.html is built from src/app (byte for byte)
+        run: node tools/build_app.js --check
       - run: bash scripts/run-tests.sh server
         env:
           LOG_DIR: /tmp/vaultit-test-logs

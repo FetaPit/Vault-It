@@ -1,0 +1,45 @@
+<script>
+// three.js r128 (about 1 MB of script) is fetched on first need, not with the page: the house tab, the 3D cash and metals stages
+// and a 3D item ask for it with viThree(cb); the first paint no longer waits for it. Once the page has loaded and sits idle it is
+// fetched in the background anyway (unless the browser asks to save data), so the house tab opens without a wait.
+var VI_THREE = { urls: ['https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js', 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js', 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js'], state: 0, q: [] };   // state 0 not asked, 1 loading, 2 ready, 3 failed
+function viThreeState() { return VI_THREE.state; }
+function viGlOk() {   // can this browser draw WebGL at all? (checked once; the SVG and canvas fallbacks stay for the rest)
+  if (VI_THREE.gl === undefined) { try { var c = document.createElement('canvas'); VI_THREE.gl = !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))); } catch (e) { VI_THREE.gl = false; } }
+  return VI_THREE.gl;
+}
+function viThreeReady() {
+  VI_THREE.state = 2;
+  try { if (window.HB3D && HB3D._boot) HB3D._boot(); } catch (e) { console.error('[Vault-It] 3D engine', e); }
+  var q = VI_THREE.q; VI_THREE.q = [];
+  q.forEach(function (w) { try { w.ok(); } catch (e) { console.error('[Vault-It] 3D', e); } });
+  try { document.dispatchEvent(new CustomEvent('vi-three', { detail: { ok: true } })); } catch (e) {}
+}
+function viThreeFailed() {
+  VI_THREE.state = 3;
+  var q = VI_THREE.q; VI_THREE.q = [];
+  q.forEach(function (w) { try { if (w.fail) w.fail(); } catch (e) {} });
+  try { document.dispatchEvent(new CustomEvent('vi-three', { detail: { ok: false } })); } catch (e) {}
+}
+function viThree(cb, fail) {   // cb runs once THREE, GLTFLoader and OrbitControls are all here (at once if they already are); fail if the download fails
+  if (VI_THREE.state === 2 || (window.THREE && THREE.OrbitControls && VI_THREE.state === 0)) { if (VI_THREE.state !== 2) VI_THREE.state = 2; if (cb) cb(); return true; }
+  if (VI_THREE.state === 3) { if (fail) fail(); return false; }
+  if (cb || fail) VI_THREE.q.push({ ok: cb || function () {}, fail: fail });
+  if (VI_THREE.state === 1) return false;
+  VI_THREE.state = 1;
+  (function next(i) {
+    if (i >= VI_THREE.urls.length) return viThreeReady();
+    var sc = document.createElement('script'); sc.src = VI_THREE.urls[i]; sc.async = false; sc.setAttribute('data-vi', 'three');
+    sc.onload = function () { next(i + 1); };
+    sc.onerror = function () { console.warn('[Vault-It] 3D engine download failed', VI_THREE.urls[i]); viThreeFailed(); };
+    document.head.appendChild(sc);
+  })(0);
+  return false;
+}
+window.addEventListener('load', function () {   // idle preload: after the page is up and quiet, unless the device asks to save data
+  var saveData = false; try { saveData = !!(navigator.connection && navigator.connection.saveData) || matchMedia('(prefers-reduced-data: reduce)').matches; } catch (e) {}
+  if (saveData || !viGlOk()) return;
+  var go = function () { if (VI_THREE.state === 0) viThree(); };
+  if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 6000 }); else setTimeout(go, 2500);
+});
+</script>

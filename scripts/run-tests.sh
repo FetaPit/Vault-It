@@ -32,6 +32,9 @@ if [ -n "${VI_INDEX:-}" ]; then
   export VI_INDEX
   [ -f "$VI_INDEX" ] || { echo "VI_INDEX is not a file: $VI_INDEX" >&2; exit 2; }
 fi
+# index.html is built from src/app (docs/APP_SOURCE.md). Check only, never rebuild here: a rebuild would overwrite an edit made
+# straight to index.html. On a mismatch: `node tools/build_app.js` (parts edited) or `node tools/build_app.js --absorb` (index.html edited).
+if [ -z "${VI_INDEX:-}" ]; then node "$ROOT/tools/build_app.js" --check || exit 2; fi
 # Playwright may be installed globally (Claude Code cloud sessions) rather than in node_modules
 if [ -z "${NODE_PATH:-}" ] && [ -d /usr/local/lib/node_modules_global/playwright ]; then export NODE_PATH=/usr/local/lib/node_modules_global; fi
 

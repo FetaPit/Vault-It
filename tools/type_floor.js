@@ -66,4 +66,4 @@ function fix(s) {
 const out = fix(src.slice(0, a)) + src.slice(a, b) + fix(src.slice(b));
 const total = counts[0] + counts[1] + counts[2] + counts[3];
 console.log(`font sizes floored: ${total} (10px caps ${counts[0]}, 10.5px ${counts[1]}, 11.5px ${counts[2]}, 12.5px ${counts[3]})`);
-if (!process.argv.includes('--dry')) fs.writeFileSync(file, out);
+if (!process.argv.includes('--dry')) { fs.writeFileSync(file, out); require('child_process').execFileSync(process.execPath, [__dirname + '/build_app.js', '--absorb'], { stdio: 'inherit' }); }   // index.html is built from src/app: carry the edit into the parts

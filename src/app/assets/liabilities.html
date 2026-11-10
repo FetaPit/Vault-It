@@ -1,0 +1,17 @@
+    <div class="subtab-panel" id="assets-liabilities">
+      <div class="ov-chart-card" style="margin-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span class="ov-chart-title">Liabilities</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:max(.68rem,var(--vi-fs-2));color:var(--amber)">Total: <span id="subtab-total-liab" style="font-weight:700">£0</span></span>
+        </div>
+        <div id="liabilities-list"></div>
+        <div class="data-input-row" style="margin-top:8px">
+          <input type="text" id="li-name" placeholder="Name">
+          <input type="number" id="li-val" placeholder="Value £">
+          <input type="number" id="li-rate" placeholder="Rate %" step="0.1" style="max-width:90px">
+          <input type="number" id="li-dep" placeholder="Dep %/yr" min="0" max="100" step="1" style="max-width:90px">
+          <input type="number" id="li-run" placeholder="Run £/mo" min="0" style="max-width:90px">
+          <button class="btn-add-data" onclick="addLiability()">+ Add</button>
+        </div>
+      </div>
+    </div>

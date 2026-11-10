@@ -17,7 +17,7 @@ If any of the three is missing, reply `FIX: evidence missing: <what>` and stop.
 
 ## Steps
 1. **Owner's words first.** Read the item in `docs/QUEUE.md` and any brief it points to (for example `docs/ROUND3_BRIEF.md`), then the intent card. Quote the owner's words. If the intent card narrows, widens or reinterprets them, that is a finding.
-2. **The change.** `git diff --cached --stat`, then read the staged diff in parts (`git diff --cached -- <file>`; for `index.html` read only the hunks). Unstaged edits do not count.
+2. **The change.** `git diff --cached --stat`, then read the staged diff in parts (`git diff --cached -- <file>`; the app's source is `src/app/`: read those hunks, and for `index.html` trust `node tools/build_app.js --check` rather than reading its diff again). Unstaged edits do not count.
 3. **Intent trace.** For each thing the owner asked for, find where the diff does it and what proves it (a test assertion or a screenshot). Mark each one met, partly met or missing. Also list anything the diff does that nobody asked for (scope creep).
 4. **Standing rules** (`CLAUDE.md`, "Owner's standing rules" and "Brand rollout"). Check each one the diff could touch:
    - No guessed or invented figures. Every number on screen comes from the user's data or a named source.

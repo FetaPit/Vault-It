@@ -1,0 +1,143 @@
+<!-- ═══════════════════════════ CONNECTIONS ═══════════════════════════ -->
+<!-- Connections moved into Settings (owner, 30 Oct 2026); showTab('connections') opens Settings at that section -->
+<div id="tab-connections" class="tab-panel" style="display:none"></div>
+
+<!-- ═══════════════════════════════════════════
+     VAULT NETWORK TAB
+════════════════════════════════════════════ -->
+<div id="tab-network" class="tab-panel" style="display:none">
+  <div style="max-width:680px;margin:0 auto;padding:24px 16px 80px">
+
+    <!-- Header -->
+    <div style="margin-bottom:22px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--go);letter-spacing:.08em">◈ VAULT NETWORK</span>
+        <span style="font-family:'Share Tech Mono',monospace;font-size:max(.38rem,var(--vi-fs-1));color:var(--em);background:rgb(var(--teal-rgb) / .1);border:1px solid rgb(var(--teal-rgb) / .25);border-radius:20px;padding:2px 8px">PIONEER EXCLUSIVE</span>
+      </div>
+      <div style="font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);line-height:1.6">Own your slot. Mint your identity. Connect with the first 33 pioneers building wealth on Vault-It.</div>
+    </div>
+
+    <!-- ── Step 1: Founding Licence ───────────────────────────────── -->
+    <div class="nw-founding-card" id="nw-founding-card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span style="font-size:1.1rem">◆</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:max(.62rem,var(--vi-fs-2));color:var(--go);letter-spacing:.1em">FOUNDING MASTER LICENCE</span>
+        <span id="nw-founding-badge" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:max(.4rem,var(--vi-fs-1));color:var(--gr)"></span>
+      </div>
+      <div id="nw-founding-inactive" style="">
+        <div style="display:grid;grid-template-columns:1fr auto;align-items:start;gap:16px;margin-bottom:16px">
+          <div>
+            <div style="font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);line-height:1.7;margin-bottom:10px">
+              One founding slot. One payment. <strong style="color:var(--go)">£7.77</strong> permanently locks in your position as a Vault-It original.
+              Includes a holographic NFT Pioneer card minted on <strong style="color:var(--em)">Shibarium</strong> and access to the live network grid.
+            </div>
+            <ul style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);line-height:1.9;list-style:none;padding:0;margin:0 0 14px">
+              <li>◈ Adoption number: <strong style="color:var(--go)" id="nw-adoption-num">#–</strong> of 33 founding slots</li>
+              <li>◈ Holographic NFT card on Shibarium blockchain</li>
+              <li>◈ Community profile visible to fellow founders</li>
+              <li>◈ Direct collaboration features with other Pioneer users</li>
+              <li>◈ Lifetime access, no recurring fee</li>
+            </ul>
+          </div>
+          <div style="text-align:center;flex-shrink:0">
+            <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:900;color:var(--go);line-height:1">£7.77</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:max(.38rem,var(--vi-fs-1));color:var(--t3)">one-time</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button onclick="purchaseFoundingLicence()" style="flex:1;min-width:160px;background:linear-gradient(90deg,#b8902e,var(--brass));border:none;border-radius:6px;color:#000;font-family:'Syne',sans-serif;font-size:max(.56rem,var(--vi-fs-2));font-weight:800;padding:11px 18px;cursor:pointer;letter-spacing:.08em">
+            ◆ SECURE YOUR SLOT · £7.77
+          </button>
+          <button onclick="verifyFoundingPurchase()" style="background:transparent;border:1px solid rgb(var(--brass-rgb) / .4);border-radius:6px;color:var(--go);font-family:'Syne',sans-serif;font-size:max(.48rem,var(--vi-fs-1));font-weight:700;padding:10px 14px;cursor:pointer;white-space:nowrap">
+            Already purchased?
+          </button>
+        </div>
+        <div style="font-size:max(.44rem,var(--vi-fs-1));color:var(--t3);margin-top:8px">Prepaid GBP cards accepted · Secure Stripe checkout · No subscription</div>
+      </div>
+      <div id="nw-founding-active" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:.9rem;color:var(--go)">◆</span>
+          <span style="font-family:'Syne',sans-serif;font-size:max(.58rem,var(--vi-fs-2));font-weight:800;color:var(--gr)">Founding Licence Active</span>
+          <span id="nw-adoption-display" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:max(.44rem,var(--vi-fs-1));color:var(--go)"></span>
+        </div>
+        <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t2);line-height:1.6">You are a Vault-It founding member. Your Pioneer card is ready to mint on Shibarium.</div>
+      </div>
+    </div>
+
+    <!-- ── Step 2: Mint on Shibarium ─────────────────────────────── -->
+    <div class="nw-mint-card" id="nw-mint-section">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:.85rem">⬡</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:max(.58rem,var(--vi-fs-2));color:var(--em);letter-spacing:.08em">MINT YOUR PIONEER CARD</span>
+        <div class="nw-chain-badge" style="margin-left:auto">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          Shibarium
+        </div>
+      </div>
+
+      <div id="nw-mint-locked" style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);padding:12px 0">
+        Purchase a Founding Licence above to unlock NFT minting.
+      </div>
+
+      <div id="nw-mint-steps" style="display:none">
+        <div id="nw-wallet-status">
+          <div class="nw-step-row" id="nw-step1-row">
+            <div class="nw-step-num">1</div>
+            <div style="flex:1">
+              <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t2);font-weight:600;margin-bottom:4px">Connect Web3 Wallet</div>
+              <div style="font-size:max(.47rem,var(--vi-fs-1));color:var(--t3);margin-bottom:8px">MetaMask or any EVM-compatible wallet. Gas paid in BONE (Shibarium's native token).</div>
+              <button onclick="connectWeb3Wallet()" id="nw-connect-btn" style="background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .35);border-radius:5px;color:var(--em);font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;padding:7px 14px;cursor:pointer">Connect Wallet</button>
+              <div id="nw-wallet-addr" class="nw-wallet-row" style="display:none"></div>
+            </div>
+          </div>
+          <div class="nw-step-row" id="nw-step2-row">
+            <div class="nw-step-num">2</div>
+            <div style="flex:1">
+              <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t2);font-weight:600;margin-bottom:4px">Switch to Shibarium Network</div>
+              <div style="font-size:max(.47rem,var(--vi-fs-1));color:var(--t3);margin-bottom:8px">Chain ID 109 · RPC: shibrpc.com · Gas: BONE</div>
+              <button onclick="switchToShibarium()" id="nw-switch-btn" style="background:rgb(var(--teal-rgb) / .08);border:1px solid var(--bd);border-radius:5px;color:var(--t2);font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;padding:7px 14px;cursor:pointer" disabled>Switch Network</button>
+            </div>
+          </div>
+          <div class="nw-step-row" id="nw-step3-row">
+            <div class="nw-step-num">3</div>
+            <div style="flex:1">
+              <div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--t2);font-weight:600;margin-bottom:4px">Mint Your Pioneer Card NFT</div>
+              <div style="font-size:max(.47rem,var(--vi-fs-1));color:var(--t3);margin-bottom:8px">ERC-721 token encoding your adoption number, name, and Pioneer status.</div>
+              <button onclick="mintOnShibarium()" id="nw-mint-btn" style="background:linear-gradient(90deg,rgba(184,144,46,.15),rgb(var(--brass-rgb) / .15));border:1px solid rgb(var(--brass-rgb) / .3);border-radius:5px;color:var(--go);font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;padding:7px 14px;cursor:pointer" disabled>Mint Card</button>
+              <div id="nw-mint-result" style="font-size:max(.47rem,var(--vi-fs-1));margin-top:6px;color:var(--t3)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Step 3: Vault Network opt-in ──────────────────────────── -->
+    <div class="nw-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:max(.58rem,var(--vi-fs-2));color:var(--tx);margin-bottom:3px">Join the Vault Network</div>
+          <div style="font-size:max(.48rem,var(--vi-fs-1));color:var(--t3)">Show your profile to fellow founders. Opt out any time.</div>
+        </div>
+        <div onclick="toggleNetworkOptIn()" id="nw-optin-toggle" style="width:42px;height:24px;border-radius:12px;background:var(--c3);border:1px solid var(--bd);cursor:pointer;position:relative;transition:background .25s;flex-shrink:0">
+          <div id="nw-optin-thumb" style="width:18px;height:18px;border-radius:50%;background:var(--t3);position:absolute;top:2px;left:2px;transition:all .25s"></div>
+        </div>
+      </div>
+      <div id="nw-optin-msg" style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);margin-bottom:12px">Network opt-in is off. Your profile is private.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="shareNetworkProfile()" style="background:rgb(var(--teal-rgb) / .1);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:5px;color:var(--em);font-family:'Syne',sans-serif;font-size:max(.48rem,var(--vi-fs-1));font-weight:700;padding:7px 13px;cursor:pointer">↗ Share Profile URL</button>
+        <button onclick="loadCommunityProfiles()" style="background:transparent;border:1px solid var(--bd);border-radius:5px;color:var(--t2);font-family:'Syne',sans-serif;font-size:max(.48rem,var(--vi-fs-1));padding:7px 13px;cursor:pointer">↻ Refresh Grid</button>
+      </div>
+    </div>
+
+    <!-- ── Community grid ─────────────────────────────────────────── -->
+    <div class="nw-card">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:max(.58rem,var(--vi-fs-2));color:var(--tx);margin-bottom:6px">◈ Active Founders</div>
+      <div style="font-size:max(.47rem,var(--vi-fs-1));color:var(--t3);margin-bottom:12px">Founders who opted into the network. Click a card to open a direct message.</div>
+      <div id="nw-community-grid">
+        <div style="font-size:max(.48rem,var(--vi-fs-1));color:var(--t3);text-align:center;padding:24px 0">Loading network…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+

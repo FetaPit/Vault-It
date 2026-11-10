@@ -1,0 +1,615 @@
+{
+ "about": "index.html is built from these parts, in this order (tools/build_app.js). Edit the parts, run the build, commit both.",
+ "parts": [
+  {
+   "file": "shell/head.html",
+   "anchor": "<meta charset=\"UTF-8",
+   "offset": 3
+  },
+  {
+   "file": "shell/tokens.css",
+   "anchor": "<style id=\"vi-tokens",
+   "offset": 0
+  },
+  {
+   "file": "shell/head-guards.html",
+   "anchor": "<link rel=\"manifest\"",
+   "offset": 0
+  },
+  {
+   "file": "shell/head-meta.html",
+   "anchor": "<meta name=\"version\"",
+   "offset": 0
+  },
+  {
+   "file": "shell/three-loader.html",
+   "anchor": "// three.js r128 (ab",
+   "offset": 1
+  },
+  {
+   "file": "hb3d/engine.generated.html",
+   "anchor": "<script id=\"hb3d-eng",
+   "offset": 0
+  },
+  {
+   "file": "shell/global.css",
+   "anchor": "   PURPOSEOS GLOBAL ",
+   "offset": 2
+  },
+  {
+   "file": "overview/overview.css",
+   "anchor": "/* KPI strip — intri",
+   "offset": 11
+  },
+  {
+   "file": "shell/subtabs.css",
+   "anchor": "/* ── NEW TABS CSS ─",
+   "offset": 1
+  },
+  {
+   "file": "journey/journey.css",
+   "anchor": "   JOURNEY MAP CSS  ",
+   "offset": 1
+  },
+  {
+   "file": "shell/cyberpunk.css",
+   "anchor": "   CYBERPUNK LAYER —",
+   "offset": 2
+  },
+  {
+   "file": "shell/responsive.css",
+   "anchor": "   2026 INTRINSIC RE",
+   "offset": 1
+  },
+  {
+   "file": "profile/pioneer-card.css",
+   "anchor": "/* ── PIONEER CARD (",
+   "offset": 0
+  },
+  {
+   "file": "welcome/welcome.css",
+   "anchor": "/* ── WELCOME SCREEN ── */",
+   "offset": 0
+  },
+  {
+   "file": "shell/footer.css",
+   "anchor": "/* Readable in both ",
+   "offset": 1
+  },
+  {
+   "file": "overview/milestones.css",
+   "anchor": "/* ── IMPROVED MILES",
+   "offset": 0
+  },
+  {
+   "file": "house/viewport-hud.css",
+   "anchor": "   VIEWPORT HUD CONT",
+   "offset": 2
+  },
+  {
+   "file": "overview/fire-roadmap.css",
+   "anchor": "   FIRE ROADMAP — be",
+   "offset": 1
+  },
+  {
+   "file": "shell/cyberpunk-v2.css",
+   "anchor": "<style>/* ══════════",
+   "offset": 0
+  },
+  {
+   "file": "shell/modals.css",
+   "anchor": "   DUO-TONE MODAL SY",
+   "offset": 2
+  },
+  {
+   "file": "auth/login.css",
+   "anchor": "/* ── LOGIN / AUTH ─",
+   "offset": 0
+  },
+  {
+   "file": "budget/cashflow.css",
+   "anchor": "<style id=\"vi-v3-css",
+   "offset": 0
+  },
+  {
+   "file": "assets/stocks.css",
+   "anchor": "/* ── Stocks & Funds (portfoli",
+   "offset": 0
+  },
+  {
+   "file": "house/levels-mortgage.css",
+   "anchor": "/* ── House Builder ",
+   "offset": 0
+  },
+  {
+   "file": "budget/budget.css",
+   "anchor": "/* ── Budget tab ── ",
+   "offset": 0
+  },
+  {
+   "file": "assets/inventory.css",
+   "anchor": "/* ── Wealth Invento",
+   "offset": 0
+  },
+  {
+   "file": "shell/nav.css",
+   "anchor": "/* ── Brand menu bar",
+   "offset": 1
+  },
+  {
+   "file": "shell/wordmark.css",
+   "anchor": "<style id=\"vi-wordma",
+   "offset": 0
+  },
+  {
+   "file": "shell/chrome-v091.css",
+   "anchor": "<style id=\"vi-v091-c",
+   "offset": 0
+  },
+  {
+   "file": "shell/chrome-v091r2.css",
+   "anchor": "<style id=\"vi-v091r2",
+   "offset": 0
+  },
+  {
+   "file": "shell/daylight.css",
+   "anchor": "<style id=\"vi-daylig",
+   "offset": 0
+  },
+  {
+   "file": "achievements/roadmap.css",
+   "anchor": "/* ══ WEALTH ROADMAP",
+   "offset": 1
+  },
+  {
+   "file": "shell/sprite.html",
+   "anchor": "<!-- Wealth Roadmap ",
+   "offset": 1
+  },
+  {
+   "file": "auth/login.html",
+   "anchor": "<!-- ═══════════════════════════════════════════════════════",
+   "offset": 0
+  },
+  {
+   "file": "shell/sidebar.html",
+   "anchor": "<div id=\"demo-chip\" ",
+   "offset": 0
+  },
+  {
+   "file": "welcome/prepaint.html",
+   "anchor": "     VAULT-IT WELCOM",
+   "offset": 1
+  },
+  {
+   "file": "welcome/welcome.html",
+   "anchor": "<div id=\"welcome-ove",
+   "offset": 0
+  },
+  {
+   "file": "paywall/offer-modals.html",
+   "anchor": "<!-- ══ CAMPAIGN / C",
+   "offset": 0
+  },
+  {
+   "file": "shell/topnav.html",
+   "anchor": "  <div class=\"nav-br",
+   "offset": 1
+  },
+  {
+   "file": "overview/overview.html",
+   "anchor": "<div id=\"tab-overvie",
+   "offset": 3
+  },
+  {
+   "file": "budget/budget.html",
+   "anchor": "<!-- ═══════════════════════════ BUDGET ",
+   "offset": 0
+  },
+  {
+   "file": "house/house.html",
+   "anchor": "<!-- Journey tab rem",
+   "offset": 3
+  },
+  {
+   "file": "assets/assets.html",
+   "anchor": "<!-- ═══════════════════════════ ASSETS ",
+   "offset": 0
+  },
+  {
+   "file": "assets/metals.html",
+   "anchor": "    <div class=\"subtab-panel\" id=\"assets-metals\">",
+   "offset": 0
+  },
+  {
+   "file": "assets/crypto.html",
+   "anchor": "    <div class=\"subtab-panel\" id=\"assets-crypto\">",
+   "offset": 0
+  },
+  {
+   "file": "assets/cash.html",
+   "anchor": "    <div class=\"subtab-panel a",
+   "offset": 0
+  },
+  {
+   "file": "assets/other.html",
+   "anchor": "    <div class=\"subtab-panel\" id=\"assets-other\">",
+   "offset": 0
+  },
+  {
+   "file": "assets/liabilities.html",
+   "anchor": "    <div class=\"subtab-panel\" id=\"assets-liabiliti",
+   "offset": 0
+  },
+  {
+   "file": "assets/stocks.html",
+   "anchor": "    <!-- ── Stocks &",
+   "offset": 0
+  },
+  {
+   "file": "debt/debt.html",
+   "anchor": "<!-- ═══════════════════════════ DEBT TR",
+   "offset": 0
+  },
+  {
+   "file": "biz/biz.html",
+   "anchor": "<!-- ═══════════════════════════ ENTREPR",
+   "offset": 0
+  },
+  {
+   "file": "achievements/achievements.html",
+   "anchor": "<!-- ═══════════════════════════ ACHIEVE",
+   "offset": 0
+  },
+  {
+   "file": "network/network.html",
+   "anchor": "<!-- ═══════════════════════════ CONNECT",
+   "offset": 0
+  },
+  {
+   "file": "shell/bg-toast.html",
+   "anchor": "<!-- Background ambi",
+   "offset": 0
+  },
+  {
+   "file": "settings/settings.html",
+   "anchor": "<!-- Settings Modal ",
+   "offset": 0
+  },
+  {
+   "file": "paywall/paywall.html",
+   "anchor": "<!-- ═══════════════════ PAYWA",
+   "offset": 0
+  },
+  {
+   "file": "house/house-verbatim.css",
+   "anchor": "   VERBATIM CSS from",
+   "offset": 2
+  },
+  {
+   "file": "shell/body.css",
+   "anchor": "/* ══ MICRO ANIMATIO",
+   "offset": 1
+  },
+  {
+   "file": "overview/overview-late.css",
+   "anchor": "/* ═══ Overview: tal",
+   "offset": 0
+  },
+  {
+   "file": "debt/debt.css",
+   "anchor": "/* ═══ Debt tab: cha",
+   "offset": 0
+  },
+  {
+   "file": "budget/budget-late.css",
+   "anchor": "/* ═══ Budget: incom",
+   "offset": 0
+  },
+  {
+   "file": "house/hb3d.css",
+   "anchor": "/* ═══ House Builder",
+   "offset": 0
+  },
+  {
+   "file": "shell/tabs.js",
+   "anchor": "function showTab(id)",
+   "offset": 4
+  },
+  {
+   "file": "overview/overview.js",
+   "anchor": "// OVERVIEW STATE & ",
+   "offset": 1
+  },
+  {
+   "file": "house/tracker.js",
+   "anchor": "// HOUSE TRACKER — V",
+   "offset": 1
+  },
+  {
+   "file": "house/levels.js",
+   "anchor": "// HOUSE BUILDER — L",
+   "offset": 1
+  },
+  {
+   "file": "house/mortgage.js",
+   "anchor": "// MORTGAGE ENGINE —",
+   "offset": 1
+  },
+  {
+   "file": "house/hb3d-app.js",
+   "anchor": "// HOUSE BUILDER 3D ",
+   "offset": 1
+  },
+  {
+   "file": "house/own-design.js",
+   "anchor": "// YOUR OWN DESIGN —",
+   "offset": 1
+  },
+  {
+   "file": "house/upgrade-planner.js",
+   "anchor": "// LEVEL 3 — UPGRADE PLANNER (",
+   "offset": 1
+  },
+  {
+   "file": "house/iso-viewport.js",
+   "anchor": "// HOUSE ISO VIEWPOR",
+   "offset": 1
+  },
+  {
+   "file": "assets/metals-viewport.js",
+   "anchor": "// ── METALS VIEWPOR",
+   "offset": 0
+  },
+  {
+   "file": "shell/state.js",
+   "anchor": "// ── INCOME STREAM BUILDER CO",
+   "offset": 0
+  },
+  {
+   "file": "shell/init.js",
+   "anchor": "try{var _als=localSt",
+   "offset": 2
+  },
+  {
+   "file": "auth/sync.js",
+   "anchor": "// AUTH / SESSION  (",
+   "offset": 1
+  },
+  {
+   "file": "auth/auth.js",
+   "anchor": "function _hashStr(st",
+   "offset": 2
+  },
+  {
+   "file": "auth/your-data.js",
+   "anchor": "// ── DATA RESET ───",
+   "offset": 0
+  },
+  {
+   "file": "budget/budget.js",
+   "anchor": "function cfTotalIn()",
+   "offset": 3
+  },
+  {
+   "file": "assets/totals.js",
+   "anchor": "// ASSETS & LIABILIT",
+   "offset": 1
+  },
+  {
+   "file": "assets/stocks.js",
+   "anchor": "// STOCKS & FUNDS — ",
+   "offset": 1
+  },
+  {
+   "file": "assets/cash-metals-3d.js",
+   "anchor": "// 3D CASH AND PRECI",
+   "offset": 1
+  },
+  {
+   "file": "assets/metals.js",
+   "anchor": "function renderMetalsISO(){",
+   "offset": 0
+  },
+  {
+   "file": "assets/crypto-prices.js",
+   "anchor": "/* crypto prices (ow",
+   "offset": 0
+  },
+  {
+   "file": "assets/assets.js",
+   "anchor": "function renderAlTab",
+   "offset": 0
+  },
+  {
+   "file": "assets/inventory.js",
+   "anchor": "// WEALTH INVENTORY ",
+   "offset": 1
+  },
+  {
+   "file": "assets/item-3d.js",
+   "anchor": "// ITEM 3D MODELS (w",
+   "offset": 1
+  },
+  {
+   "file": "assets/photo-search-liabilities.js",
+   "anchor": "function wiSearch(id",
+   "offset": 0
+  },
+  {
+   "file": "debt/debt.js",
+   "anchor": "// debtState declare",
+   "offset": 3
+  },
+  {
+   "file": "debt/cards-3d.js",
+   "anchor": "// 3D CREDIT CARDS —",
+   "offset": 1
+  },
+  {
+   "file": "biz/biz.js",
+   "anchor": "// bizState declared",
+   "offset": 3
+  },
+  {
+   "file": "achievements/achievements.js",
+   "anchor": "// achState declared",
+   "offset": 3
+  },
+  {
+   "file": "connections/connections.js",
+   "anchor": "// CONNS declared ab",
+   "offset": 3
+  },
+  {
+   "file": "paywall/paywall.js",
+   "anchor": "// PIONEER / PAYWALL",
+   "offset": 1
+  },
+  {
+   "file": "shell/swipe-hints.js",
+   "anchor": "// ── swipe hints: a",
+   "offset": 0
+  },
+  {
+   "file": "network/network.js",
+   "anchor": "// VAULT NETWORK — F",
+   "offset": 1
+  },
+  {
+   "file": "settings/settings-modal.js",
+   "anchor": "function _refreshPio",
+   "offset": 0
+  },
+  {
+   "file": "house/own-design-upload.js",
+   "anchor": "// ── YOUR OWN DESIG",
+   "offset": 0
+  },
+  {
+   "file": "debt/debt-charts.js",
+   "anchor": "// ── SCAFFOLDING HE",
+   "offset": 0
+  },
+  {
+   "file": "assets/depreciation-coins.js",
+   "anchor": "// ── DEPRECIATION ─",
+   "offset": 0
+  },
+  {
+   "file": "overview/fire-roadmap.js",
+   "anchor": "// ── FIRE ROADMAP ─",
+   "offset": 0
+  },
+  {
+   "file": "overview/summary-cards.js",
+   "anchor": "// ── SUMMARY CARDS ",
+   "offset": 0
+  },
+  {
+   "file": "assets/cash-iso.js",
+   "anchor": "// ── CASH ISO COIN ",
+   "offset": 0
+  },
+  {
+   "file": "biz/income-streams.js",
+   "anchor": "// ── INCOME STREAM BUILDER ──",
+   "offset": 0
+  },
+  {
+   "file": "journey/journey.js",
+   "anchor": "// JOURNEY MAP — STA",
+   "offset": 1
+  },
+  {
+   "file": "paywall/pro-offer.js",
+   "anchor": "// Shows on every lo",
+   "offset": 2
+  },
+  {
+   "file": "welcome/welcome.js",
+   "anchor": "// WELCOME SCREEN + ",
+   "offset": 1
+  },
+  {
+   "file": "paywall/stripe-config.js",
+   "anchor": "// ── STRIPE CONFIG ",
+   "offset": 0
+  },
+  {
+   "file": "profile/export-profile.js",
+   "anchor": "// DATA EXPORT / IMP",
+   "offset": 1
+  },
+  {
+   "file": "shell/legal.js",
+   "anchor": "// ── TASK 5: PRIVAC",
+   "offset": 0
+  },
+  {
+   "file": "settings/settings.js",
+   "anchor": "// ── TASK 4: EMAIL ",
+   "offset": 0
+  },
+  {
+   "file": "shell/demo-boot.js",
+   "anchor": "// ── TASK 1: DEMO M",
+   "offset": 0
+  },
+  {
+   "file": "shell/alpha-seed.js",
+   "anchor": "// ─── ALPHA TEST SE",
+   "offset": 0
+  },
+  {
+   "file": "overview/nw-history.js",
+   "anchor": "// NET WORTH HISTORY",
+   "offset": 1
+  },
+  {
+   "file": "paywall/founder-campaign.js",
+   "anchor": "// ── FOUNDER BADGE ",
+   "offset": 0
+  },
+  {
+   "file": "shell/theme-density.js",
+   "anchor": "// ── THEME: Night /",
+   "offset": 0
+  },
+  {
+   "file": "shell/footer.html",
+   "anchor": "<!-- ══ FOOTER ══ --",
+   "offset": 0
+  },
+  {
+   "file": "nw3d/nw3d.css",
+   "anchor": "<!-- ══ NET WORTH IN",
+   "offset": 0
+  },
+  {
+   "file": "nw3d/engine.js",
+   "anchor": "<script id=\"vi-nw3d-engine\">",
+   "offset": 0
+  },
+  {
+   "file": "nw3d/app.js",
+   "anchor": "<script id=\"vi-nw3d-app\">",
+   "offset": 0
+  },
+  {
+   "file": "feedback/feedback.js",
+   "anchor": "<script id=\"vi-feedb",
+   "offset": 0
+  },
+  {
+   "file": "help/help.html",
+   "anchor": "<!-- Help centre: pa",
+   "offset": 0
+  },
+  {
+   "file": "help/help.js",
+   "anchor": "<script id=\"vi-help-",
+   "offset": 0
+  }
+ ]
+}

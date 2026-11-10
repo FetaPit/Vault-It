@@ -3,3 +3,6 @@
 *.py text eol=lf
 # Contact cards (vCard) keep the CRLF line endings the format requires.
 *.vcf -text
+# index.html is joined byte for byte from src/app (tools/build_app.js): keep both LF everywhere, Windows included.
+index.html text eol=lf
+src/app/** text eol=lf

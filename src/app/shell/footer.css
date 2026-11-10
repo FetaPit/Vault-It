@@ -1,0 +1,62 @@
+/* ── FOOTER ── */
+/* Readable in both themes: type never drops under 10px (the QA pass saw a blank light band in Daylight at 832px). */
+:root { --footer-h: 30px; }
+#app-footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  min-height: var(--footer-h);
+  box-sizing: border-box;
+  background: rgb(var(--panel-rgb) / .97);
+  border-top: 1px solid var(--bd);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  padding: 4px 16px calc(4px + env(safe-area-inset-bottom, 0px));
+  z-index: 90;
+}
+.footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: max(.42rem, 10px);
+  line-height: 1.3;
+  color: var(--t3);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 1px 4px;
+}
+.footer-copy button { font-size: inherit !important; }
+@media (max-width: 560px) { .footer-cr { display: none; } :root { --footer-h: 44px; } }
+/* v0.8 (owner, 2 Nov; Pedro's spec E): 600 px and up, the fixed footer folds to one 24 px line with the FCA statement and a More button
+   1.2 s after scrolling stops and on load; scrolling, the page end or More show it in full. Transform only, so the page never jumps; instant with reduced motion.
+   Under 600 it stays at the page end. */
+#app-footer { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 0; padding-top: 0; transition: transform .24s var(--ease, ease); }
+.ft-strip { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 24px; text-align: center; }
+#app-footer .ft-strip .vi-fca { margin: 0; white-space: normal; }
+.ft-more { display: none; align-items: center; gap: 4px; height: 24px; padding: 0 6px; background: none; border: 0; color: var(--muted); font: 500 10px var(--font-body, 'DM Sans'), sans-serif; cursor: pointer; }
+.ft-more .vi-ic { width: 14px; height: 14px; transform: none; transition: transform .24s var(--ease, ease); }
+.ft-more[aria-expanded="false"] .vi-ic { transform: rotate(180deg); }
+.ft-more:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+@media (min-width: 600px) { .ft-more { display: inline-flex; } }
+.ft-body { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 14px; min-width: 0; padding-bottom: 2px; transition: opacity .2s ease; }
+.ft-body .footer-copy { min-width: 0; }
+.ft-body .vi-disc { flex: 1 1 100%; order: 3; }
+#app-footer.vi-ft-min { transform: translateY(var(--ft-hide, 0px)); }
+#app-footer.vi-ft-min .ft-body { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { #app-footer, #app-footer * { transition: none !important; } }
+body.reduced-motion #app-footer, body.reduced-motion #app-footer * { transition: none !important; }
+.footer-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: max(.48rem,var(--vi-fs-1));
+  font-weight: 800;
+  color: var(--em);
+  letter-spacing: -.01em;
+}
+.footer-logo span { color: var(--t3); }
+.footer-version {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: max(.42rem, 10px);
+  color: var(--t3);
+  letter-spacing: .08em;
+}
+

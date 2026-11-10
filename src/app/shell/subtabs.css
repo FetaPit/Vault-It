@@ -1,0 +1,86 @@
+<style>
+/* ── NEW TABS CSS ── */
+.subtab-nav{display:flex;gap:0;border-bottom:1px solid var(--bd);margin-bottom:0;flex-wrap:wrap}
+.subtab-btn{padding:8px 16px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--t3);font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-0));font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-bottom:-1px;white-space:nowrap}
+.subtab-btn:hover{color:var(--tx)}
+.subtab-btn.active{color:var(--em);border-bottom-color:var(--em)}
+.subtab-panel{display:none}
+.subtab-panel.active{display:block}
+/* Shared input */
+.al-inp{width:100%;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:7px 9px;outline:none;box-sizing:border-box}
+.al-inp:focus{border-color:var(--em)}
+/* Debt rows */
+.debt-row{background:var(--c2);border:1px solid var(--bd);border-radius:7px;padding:14px 16px;margin-bottom:8px;transition:border-color .2s}
+.debt-row:hover{border-color:var(--bd2)}
+.debt-row-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+.debt-name{font-family:'Syne',sans-serif;font-size:max(.72rem,var(--vi-fs-3));font-weight:700}
+.debt-bal{font-family:'Share Tech Mono',monospace;font-size:max(.8rem,var(--vi-fs-3));color:var(--re)}
+.debt-bar-wrap{height:4px;background:rgb(var(--ink-rgb) / .06);border-radius:2px;overflow:hidden}
+.debt-bar-fill{height:100%;background:linear-gradient(90deg,var(--re),var(--green));border-radius:2px;transition:width .6s}
+.debt-meta{display:flex;gap:16px;margin-top:7px;font-size:max(.58rem,var(--vi-fs-2));color:var(--t3);font-family:'Share Tech Mono',monospace;flex-wrap:wrap}
+.cc-wrap{display:inline-block;vertical-align:top;margin:10px 12px 10px 0}
+.cc-portrait{position:relative;width:85px;height:135px;border-radius:8px;overflow:hidden;background:linear-gradient(160deg,#1a2a3a,var(--panel));border:1px solid rgb(var(--teal-rgb) / .35);font-family:'Share Tech Mono',monospace}
+.cc-remain{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(160deg,#1e3a4a 0%,var(--panel) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:6px;box-sizing:border-box}
+.cc-cut{position:absolute;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg,rgb(var(--green-rgb) / .9) 0,rgb(var(--green-rgb) / .9) 5px,transparent 5px,transparent 9px);z-index:3}
+.cc-scissors{position:absolute;right:-2px;font-size:13px;transform:translateY(-50%) rotate(90deg);z-index:4;filter:drop-shadow(0 0 3px rgb(var(--green-rgb) / .8))}
+.cc-paid{position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center}
+.cc-chip{width:16px;height:11px;border-radius:2px;background:linear-gradient(135deg,#c8a840,#a07020);margin-bottom:4px}
+.cc-num{font-size:max(5px,var(--vi-fs-1));color:rgb(var(--ink-rgb) / .45);letter-spacing:.05em;margin-bottom:3px}
+.cc-dname{font-size:max(5.5px,var(--vi-fs-1));color:rgb(var(--ink-rgb) / .6);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-paid-pct{font-size:max(7px,var(--vi-fs-1));color:rgb(var(--green-rgb) / .8);font-weight:700}
+/* Client rows */
+.client-row{background:var(--c2);border:1px solid var(--bd);border-radius:7px;padding:12px 14px;margin-bottom:7px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.client-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-Active{background:var(--gr);box-shadow:0 0 6px var(--gr)}
+.dot-Paused{background:var(--go)}
+.dot-Prospect{background:var(--t3)}
+.client-name{font-family:'Syne',sans-serif;font-size:max(.72rem,var(--vi-fs-3));font-weight:700;flex:1}
+.client-mrr{font-family:'Share Tech Mono',monospace;font-size:max(.75rem,var(--vi-fs-3));color:var(--go)}
+/* Badge cards */
+.badge-card{background:var(--c2);border:1px solid var(--bd);border-radius:8px;padding:14px;text-align:center;transition:all .2s}
+.badge-card.unlocked{border-color:var(--bd2);background:var(--c3);box-shadow:0 0 18px rgb(var(--teal-rgb) / .08)}
+.badge-card.locked{opacity:.38;filter:grayscale(70%)}
+.badge-icon{font-size:1.8rem;margin-bottom:6px;display:block}
+.badge-name{font-family:'Syne',sans-serif;font-size:max(.62rem,var(--vi-fs-2));font-weight:700;margin-bottom:3px}
+.badge-desc{font-size:max(.55rem,var(--vi-fs-1));color:var(--t3);line-height:1.4}
+/* Connection cards */
+.conn-card{background:var(--c2);border:1px solid var(--bd);border-radius:8px;padding:16px;transition:all .2s}
+.conn-card:hover{border-color:var(--bd2)}
+.conn-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.conn-icon{font-size:1.4rem;width:36px;text-align:center;flex-shrink:0}
+.conn-name-el{font-family:'Syne',sans-serif;font-size:max(.72rem,var(--vi-fs-3));font-weight:700}
+.conn-stat{font-size:max(.55rem,var(--vi-fs-1));letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.conn-stat.live{color:var(--gr)}
+.conn-stat.off{color:var(--t3)}
+.conn-desc{font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);margin-bottom:10px;line-height:1.5}
+.conn-btn{width:100%;padding:7px;background:var(--td);border:1px solid var(--bd2);border-radius:4px;color:var(--em);font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-2));font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.conn-btn:hover{background:rgb(var(--teal-rgb) / .16)}
+.conn-inp{width:100%;margin-top:6px;background:var(--c3);border:1px solid var(--bd2);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.7rem,var(--vi-fs-3));padding:7px 9px;outline:none}
+.conn-inp:focus{border-color:var(--em)}
+/* Metals */
+.metal-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.metal-lbl{font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);width:78px;flex-shrink:0;text-transform:uppercase;letter-spacing:.08em}
+.metal-inp{flex:1;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.75rem,var(--vi-fs-3));padding:6px 8px;outline:none}
+.metal-inp:focus{border-color:var(--em)}
+.metal-unit{font-size:max(.58rem,var(--vi-fs-2));color:var(--t3);width:22px}
+.mh-head{display:grid;grid-template-columns:78px 1fr 1fr 76px;gap:8px;font-size:max(.48rem,var(--vi-fs-1));letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin:0 0 6px}
+.mh-row{display:grid!important;grid-template-columns:78px 1fr 1fr 76px;gap:8px;align-items:center}
+.mh-cell{display:flex;align-items:center;gap:4px;min-width:0}
+.mh-cell .metal-inp{min-width:0;width:100%;min-height:44px}   /* Pedro, 3 Nov: Hold and Price are 44 px targets like the button */
+.mh-cell .metal-unit{width:34px;flex:none}
+.mh-k{display:none;font-size:max(.48rem,var(--vi-fs-1));color:var(--t2);text-transform:uppercase;letter-spacing:.08em;width:34px;flex:none}
+.mh-val{font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));text-align:right;white-space:nowrap}
+/* v0.9.1 E22: one "Add to vault" button a metal, and the line that says a typed number is not in the vault yet */
+.mh-row{grid-template-columns:78px 1fr 1fr 124px 76px}
+.mh-head{grid-template-columns:78px 1fr 1fr 124px 76px}
+.metal-commit{min-height:44px;padding:0 10px;white-space:nowrap;font-size:max(.66rem,var(--vi-fs-2))}
+.metal-draft{grid-column:1 / -1;font-family:'Share Tech Mono',monospace;font-size:max(.66rem,var(--vi-fs-2));color:var(--t2);min-height:0}
+.metal-draft.on{color:var(--gold)}
+@media(max-width:600px){.mh-head{display:none}.mh-row{grid-template-columns:1fr auto;row-gap:6px;padding-bottom:8px;border-bottom:1px solid rgb(var(--ink-rgb) / .06)}.mh-row .mh-cell{grid-column:1 / -1}.mh-row .mh-val{grid-column:2;grid-row:1}.mh-k{display:inline}.metal-commit{grid-column:1 / -1;width:100%}}
+/* Chart filter/metric buttons */
+.chart-filter-group{display:flex;gap:0;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
+.chart-filter-btn,.chart-metric-btn{padding:4px 10px;background:transparent;border:none;border-right:1px solid var(--bd);color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:max(.55rem,var(--vi-fs-1));cursor:pointer;transition:all .15s;letter-spacing:.06em;text-transform:uppercase}
+.chart-filter-btn:last-child,.chart-metric-btn:last-child{border-right:none}
+.chart-filter-btn.active,.chart-metric-btn.active{background:rgb(var(--teal-rgb) / .15);color:var(--em)}
+.chart-filter-btn:hover,.chart-metric-btn:hover{color:var(--tx)}
+

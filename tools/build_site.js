@@ -34,6 +34,8 @@ function sha() {
   try { return cp.execSync('git rev-parse HEAD', { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch (e) { return 'unknown'; }
 }
 
+// index.html is built from src/app and committed; ship only that committed, tested file, and stop if it is out of date
+if (require('./build_app').check().problems.length) { console.error('build_site: index.html does not match src/app (docs/APP_SOURCE.md)'); process.exit(1); }
 fs.rmSync(OUT, { recursive: true, force: true });
 for (const [site, files] of Object.entries(SITE)) {
   const dir = path.join(OUT, site); fs.mkdirSync(dir, { recursive: true });

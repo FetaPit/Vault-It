@@ -1,0 +1,44 @@
+    <div class="subtab-panel active" id="assets-cash">
+      <div class="ov-chart-card" style="margin-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span class="ov-chart-title">Cash &amp; Savings Accounts</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:max(.68rem,var(--vi-fs-2));color:var(--gr)">Total: <span id="subtab-total-cash" style="font-weight:700">£0</span></span>
+        </div>
+        <div class="ca-head-int" id="ca-int-wrap" hidden>Total interest <span id="ca-int-total"></span></div>
+        <div id="cash-table"></div>
+        <div class="data-input-row" style="margin-top:12px">
+          <input type="text" id="ca-name" placeholder="Account name">
+          <select id="ca-type" style="background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;outline:none"><option>Current</option><option>Savings</option><option>ISA</option><option>LISA</option><optgroup label="Business"><option value="biz-current">Business current</option><option value="biz-savings">Business savings</option></optgroup></select>
+          <input type="number" id="ca-bal" placeholder="Balance £">
+          <input type="number" id="ca-rate" min="0" max="100" step="0.01" inputmode="decimal" placeholder="Interest rate (AER) % (optional)" aria-label="Interest rate (AER), percent, optional">
+          <button class="btn-add-data" onclick="addCashAccount()">+ Add</button>
+        </div>
+        <div class="ca-note">Interest is an estimate from the rate you enter (balance times the rate, before tax). It is not added to your net worth. Not regulated by the FCA. Not financial advice.</div>
+      </div>
+      <div class="ov-chart-card pc-card" id="pc-card" style="margin-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap">
+          <span class="ov-chart-title">Physical cash</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:max(.68rem,var(--vi-fs-2));color:var(--gr)">Total: <span id="pc-total" style="font-weight:700">£0</span></span>
+        </div>
+        <div class="pc-hint">Notes and coins you keep at home, in a wallet or in a safe. Log what goes in and what you take out; it counts in your cash and net worth.</div>
+        <div id="pc-log"></div>
+        <div class="data-input-row pc-row" style="margin-top:10px">
+          <select id="pc-where" aria-label="Where the cash is"><option>Wallet</option><option>At home</option><option>Safe</option><option>Money box</option><option>Other</option></select>
+          <input type="number" id="pc-amt" min="0" step="0.01" placeholder="Amount £" aria-label="Amount">
+          <input type="date" id="pc-date" aria-label="Date">
+          <button class="btn-add-data" onclick="pcAdd(1)">+ Put in</button>
+          <button class="btn-add-data pc-out" onclick="pcAdd(-1)">− Take out</button>
+        </div>
+        <div id="pc-msg" class="vi-pop-msg" role="status"></div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="scene-card" id="cashSceneCard" style="margin-bottom:16px">
+          <div class="scene-lbl">Cash &amp; Savings · ISO Coin Stacks (each coin = £1, stack of 10 = £10, 10×10×10 cube = £1,000)</div>
+          <button class="btn-expand" id="btnCashExpand" onclick="toggleCashExpand()" title="Expand">⛶</button>
+          <button class="btn-reset-view" id="btnCashReset" onclick="resetCashView()" title="Reset view">↺ Reset</button>
+          <div class="orbit-hint">Drag to orbit · Scroll to zoom</div>
+          <div class="scene"><svg id="cashSvg" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;cursor:grab;min-height:360px"></svg></div>
+          <div class="scene-cap" id="cashCap">–</div>
+        </div>
+      </div>
+    </div>
