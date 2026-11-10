@@ -1,0 +1,100 @@
+Ford Fiesta|Supermini|cars|ford fiesta;fiesta~hatchback;small car;hatchback car
+Volkswagen Golf|Small family|cars|volkswagen golf;vw golf;golf gti~hatchback;compact car;sedan
+Vauxhall Corsa|Supermini|cars|vauxhall corsa;opel corsa;corsa~small car;city car;compact car
+Ford Focus|Small family|cars|ford focus;focus rs~family car;hatchback;sedan
+Nissan Qashqai|Family SUV|cars|nissan qashqai;qashqai~suv;crossover;suv car
+Volkswagen Polo|Supermini|cars|volkswagen polo;vw polo~small car;city car;mini car
+Toyota Yaris|Supermini|cars|toyota yaris;yaris~city car;small hatchback;hybrid car
+MINI Cooper|Supermini|cars|mini cooper;mini~classic mini;small car;hatchback
+Vauxhall Astra|Small family|cars|vauxhall astra;opel astra;astra~family car;sedan;hatchback
+BMW 3 Series|Executive|cars|bmw 3 series;bmw m3;bmw~sedan;executive car;sports sedan
+Audi A3|Small family|cars|audi a3;audi~hatchback;sedan;premium car
+BMW 1 Series|Small family|cars|bmw 1 series;bmw~hatchback;compact car;premium car
+Kia Sportage|Family SUV|cars|kia sportage;sportage~suv;crossover;suv car
+Fiat 500|City car|cars|fiat 500;fiat500~city car;mini car;small car
+Nissan Juke|Small SUV|cars|nissan juke;juke~crossover;small suv;suv
+Mercedes-Benz A-Class|Small family|cars|mercedes a class;mercedes a-class~mercedes;hatchback;premium car
+Ford Kuga|Family SUV|cars|ford kuga;kuga~suv;crossover;suv car
+Honda Jazz|Supermini|cars|honda jazz;honda fit~mini van;small car;hatchback
+Volkswagen Tiguan|Family SUV|cars|volkswagen tiguan;vw tiguan~suv;crossover;suv car
+Mercedes-Benz C-Class|Executive|cars|mercedes c class;mercedes c-class~mercedes;sedan;executive car
+Toyota Aygo|City car|cars|toyota aygo;aygo~city car;mini car;small car
+Hyundai i10|City car|cars|hyundai i10;i10~city car;small car;hatchback
+Renault Clio|Supermini|cars|renault clio;clio~small car;hatchback;city car
+Peugeot 208|Supermini|cars|peugeot 208;peugeot 207;peugeot~small car;hatchback
+Vauxhall Mokka|Small SUV|cars|vauxhall mokka;mokka~small suv;crossover;suv
+Audi A1|Supermini|cars|audi a1~small car;hatchback;premium car
+Vauxhall Insignia|Executive|cars|vauxhall insignia;insignia~sedan;saloon car;family car
+Ford Transit|Van|cars|ford transit;transit van~van;delivery van;panel van
+Ford Transit Custom|Van|cars|ford transit custom~van;delivery van;white van
+Volkswagen Transporter|Van|cars|volkswagen transporter;vw transporter;vw t5;vw bus~van;camper van;minibus
+Mercedes-Benz E-Class|Executive|cars|mercedes e class;mercedes e-class~sedan;luxury car;executive car
+Land Rover Discovery|Large SUV|cars|land rover discovery~offroad suv;4x4;suv
+Range Rover Evoque|Small SUV|cars|range rover evoque;evoque~suv;crossover;luxury suv
+Audi A4|Executive|cars|audi a4~sedan;executive car;premium car
+Seat Leon|Small family|cars|seat leon;leon cupra~hatchback;compact car;sports hatch
+Skoda Octavia|Small family|cars|skoda octavia;octavia~estate car;sedan;hatchback
+Skoda Fabia|Supermini|cars|skoda fabia;fabia~small car;hatchback
+Seat Ibiza|Supermini|cars|seat ibiza;ibiza~small car;hatchback
+Citroen C3|Supermini|cars|citroen c3;citroen~small car;hatchback
+Tesla Model 3|Electric|cars|tesla model 3;tesla model3;tesla~electric car;ev car;sedan
+Tesla Model Y|Electric|cars|tesla model y;tesla~electric suv;electric car;ev
+Nissan Leaf|Electric|cars|nissan leaf~electric car;ev car;small car
+Toyota Prius|Hybrid|cars|toyota prius;prius~hybrid car;hatchback
+Toyota RAV4|Family SUV|cars|toyota rav4;rav4~suv;crossover;suv car
+Toyota Corolla|Small family|cars|toyota corolla;corolla~sedan;hatchback;family car
+Honda Civic|Small family|cars|honda civic;civic type r~hatchback;sports hatch;sedan
+Honda CR-V|Family SUV|cars|honda cr-v;honda crv~suv;crossover
+Mazda MX-5|Sports|cars|mazda mx-5;mazda miata;mx5;miata~roadster;convertible;sports car
+Kia Picanto|City car|cars|kia picanto~city car;mini car
+Peugeot 3008|Family SUV|cars|peugeot 3008~suv;crossover
+Renault Captur|Small SUV|cars|renault captur~small suv;crossover
+Dacia Sandero|Supermini|cars|dacia sandero~small car;hatchback
+Volvo XC90|Large SUV|cars|volvo xc90;volvo xc60~large suv;suv;luxury suv
+Volvo V40|Small family|cars|volvo v40;volvo v70~estate car;hatchback
+Jaguar XF|Executive|cars|jaguar xf;jaguar xe;jaguar~sedan;luxury car
+Land Rover Defender|Large SUV|cars|land rover defender;defender 90;defender 110;land rover~offroad truck;4x4;jeep
+Range Rover|Large SUV|cars|range rover;range rover sport~luxury suv;4x4;suv
+Mercedes-Benz GLC|Family SUV|cars|mercedes glc;mercedes gla~suv;luxury suv
+BMW X5|Large SUV|cars|bmw x5;bmw x3;bmw x1~suv;luxury suv
+Audi Q5|Family SUV|cars|audi q5;audi q3~suv;crossover
+Ford Ranger|Pickup|cars|ford ranger~pickup truck;pickup;truck
+Toyota Hilux|Pickup|cars|toyota hilux~pickup truck;pickup;truck
+Mitsubishi L200|Pickup|cars|mitsubishi l200~pickup truck;pickup
+Ford Mustang|Sports|cars|ford mustang;mustang gt;mustang~muscle car;sports car
+Audi TT|Sports|cars|audi tt~coupe;sports car
+BMW M3|Performance|cars|bmw m3;bmw m4;bmw m5~sports sedan;sports car
+Mercedes-AMG GT|Performance|cars|mercedes amg gt;amg gt;mercedes amg~supercar;sports car
+Porsche 911|Performance|cars|porsche 911;porsche carrera;911 turbo;porsche~sports car;supercar;coupe
+Porsche Cayenne|Large SUV|cars|porsche cayenne;porsche macan~luxury suv;suv
+Porsche Boxster|Sports|cars|porsche boxster;porsche cayman~roadster;convertible;sports car
+Jaguar F-Type|Performance|cars|jaguar f-type;jaguar f type~sports car;coupe
+Nissan GT-R|Performance|cars|nissan gt-r;nissan gtr;skyline~sports car;supercar
+Subaru Impreza|Performance|cars|subaru impreza;subaru wrx;impreza wrx~rally car;sports sedan
+Mitsubishi Lancer Evo|Performance|cars|mitsubishi lancer evolution;lancer evo~rally car;sports sedan
+Lotus Elise|Performance|cars|lotus elise;lotus exige;lotus~sports car;roadster
+Aston Martin DB5|Classic|cars|aston martin db5;aston martin db9;aston martin~classic sports car;sports car;coupe
+Aston Martin Vantage|Performance|cars|aston martin vantage;aston martin~sports car;supercar
+Bentley Continental GT|Luxury|cars|bentley continental;bentley~luxury car;grand tourer;coupe
+Rolls-Royce Phantom|Luxury|cars|rolls royce phantom;rolls royce ghost;rolls royce~luxury car;limousine
+Ferrari 458|Supercar|cars|ferrari 458;ferrari f40;ferrari 488;ferrari~supercar;sports car
+Lamborghini Huracan|Supercar|cars|lamborghini huracan;lamborghini aventador;lamborghini~supercar;sports car
+McLaren 720S|Supercar|cars|mclaren 720s;mclaren p1;mclaren~supercar;hypercar
+Maserati Ghibli|Luxury|cars|maserati ghibli;maserati quattroporte;maserati~luxury sedan;sports car
+Alfa Romeo Giulia|Executive|cars|alfa romeo giulia;alfa romeo giulietta;alfa romeo~sports sedan;hatchback
+Morgan Plus 4|Classic|cars|morgan plus 4;morgan~classic roadster;vintage car
+Mini (classic 1959)|Classic|cars|classic mini;austin mini;mini cooper classic~vintage car;small car
+Volkswagen Beetle|Classic|cars|volkswagen beetle;vw beetle;beetle~vintage car;classic car;small car
+VW Camper Van (T2)|Classic|cars|vw camper;volkswagen camper;vw t1;vw type 2~hippie van;camper van
+Jaguar E-Type|Classic|cars|jaguar e-type;jaguar e type~classic sports car;vintage car;roadster
+MG MGB|Classic|cars|mgb;mg roadster;mg midget~classic roadster;vintage car
+Triumph Spitfire|Classic|cars|triumph spitfire;triumph tr6;triumph~classic roadster;vintage car
+Ford Escort Mk2|Classic|cars|ford escort;ford capri;ford cortina~classic car;rally car;vintage car
+Ford GT40|Classic|cars|ford gt40;ford gt~race car;classic sports car;supercar
+Chevrolet Corvette|Classic|cars|chevrolet corvette;corvette stingray;corvette~sports car;muscle car
+Chevrolet Camaro|Classic|cars|chevrolet camaro;camaro~muscle car;sports car
+Dodge Challenger|Classic|cars|dodge challenger;dodge charger~muscle car
+DeLorean DMC-12|Classic|cars|delorean;dmc-12;delorean dmc~retro sports car;sports car;time machine
+Fiat 500 (classic)|Classic|cars|classic fiat 500;fiat 500 vintage;fiat nuova 500~vintage car;small car
+Citroen 2CV|Classic|cars|citroen 2cv;2cv~vintage car;classic car;small car
+Land Rover Series (classic)|Classic|cars|land rover series;land rover series 2;land rover series iii~vintage jeep;offroad truck

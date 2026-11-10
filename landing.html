@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Vault-It: Get out of the red and into your home.</title>
+<meta name="description" content="Join the free Vault-It beta: one map of your debts, savings, house deposit and net worth, and a 3D house that builds as you save. Built in the UK. No bank login." />
+<link rel="canonical" href="https://vault-it.co/sign-up" />
+<meta name="theme-color" content="#080808" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Vault-It" />
+<meta property="og:locale" content="en_GB" />
+<meta property="og:url" content="https://vault-it.co/sign-up" />
+<meta property="og:title" content="Vault-It: Get out of the red and into your home." />
+<meta property="og:description" content="Debts, savings, deposit and net worth on one map, and a 3D house that rises as you save. Free during the beta. No bank login." />
+<meta property="og:image" content="https://vault-it.co/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Vault-It: get out of the red and into your home" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Vault-It: Get out of the red and into your home." />
+<meta name="twitter:description" content="Debts, savings, deposit and net worth on one map, and a 3D house that rises as you save. Free during the beta." />
+<meta name="twitter:image" content="https://vault-it.co/og-image.png" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Ccircle cx='120' cy='120' r='108' fill='%23000810' stroke='%2342C0B8' stroke-width='14'/%3E%3Cpolygon points='60,76 88,76 120,126.2 152,76 180,76 120,170' fill='%2342C0B8'/%3E%3C/svg%3E" />
+<script>(function(){try{var t=localStorage.getItem("vi-theme");if(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches)t="light";if(t==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+<style>
+/* Tokens: the same values as the app and the brand book. Night is the default, Daylight is the light mode. */
+:root,[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --line:#102221; --line2:#15302F;
+  --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882;
+  --teal:#44C0B9; --teal-deep:#007F7B; --gold:#E8C56A; --brass:#C9A84C; --green:#3ECF8E; --red:#E05C5C;
+  --goldf:#E8C56A; --on-teal:#00181A; --on-gold:#1A1400; --pulse:2800ms;
+  --surf:#0A1018; --surf2:#080D14; --track:#13202A; --pillbg:#12100A;
+  --stat:#B6D8D6; --stext:0 0 8px #000; --rail-bg:rgba(0,12,18,.74); --rail-btn:rgba(8,24,28,.85);
+  --stage-bg:radial-gradient(120% 90% at 50% 100%,#06242A 0%,#00131A 45%,#080808 100%);
+  --scan:repeating-linear-gradient(0deg,rgba(68,192,185,.05) 0 1px,transparent 1px 4px);--scan-size:auto;
+  --paper-img:repeating-linear-gradient(0deg,rgba(68,192,185,.025) 0 1px,transparent 1px 4px);--paper-size:auto;
+  --tglow:0 0 18px rgba(68,192,185,.35); --dglow:0 0 10px rgba(68,192,185,.6); --popglow:0 0 14px rgba(232,197,106,.7);
+  --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
+  --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
+  --mk-v:#080808; --mk-t:#44C0B9; --mk-bz:#04141A; --mk-h:#0C2A30; --mk-t2:#34A9A2; --mk-hl:#9BEAE3; --mk-gd:#E8C56A;
+  --font-display:"Syne","Helvetica Neue",Arial,sans-serif;
+  --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r-tile:14px; --r-card:18px; --r-pill:999px;
+  --ease:cubic-bezier(.2,.8,.2,1); --t-fast:240ms; --t-base:600ms;
+}
+/* Daylight: deep teal ink on soft paper. Same hues, darker values, no bloom, blueprint grid instead of scanlines. */
+[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F3F7F6; --panel:#FFFFFF; --panel2:#EAF2F1; --line:#C5DAD8; --line2:#9FC4C1;
+  --text:#0B1F22; --muted:#3F5658; --faint:#2E6F6C;
+  --teal:#297B76; --teal-deep:#006B67; --gold:#8B6A15; --brass:#A18331; --green:#207F54; --red:#D62929;
+  --on-teal:#FFFFFF; --on-gold:#1A1400;
+  --surf:#FFFFFF; --surf2:#FFFFFF; --track:#D9E7E6; --pillbg:#FFF6DD;
+  --stat:#1E4A48; --stext:none; --rail-bg:rgba(255,255,255,.88); --rail-btn:#FFFFFF;
+  --stage-bg:radial-gradient(120% 90% at 50% 100%,#D3E9E7 0%,#E6F2F1 50%,#F6FAF9 100%);
+  --scan:linear-gradient(rgba(0,127,123,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.07) 1px,transparent 1px);--scan-size:26px 26px;
+  --paper-img:linear-gradient(rgba(0,127,123,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.05) 1px,transparent 1px);--paper-size:32px 32px;
+  --tglow:none; --dglow:none; --popglow:none;
+  --btn1:#006B67; --btn2:#00837E; --bshadow:0 6px 16px -8px rgba(0,90,88,.55);
+  --glow:0 10px 28px -16px rgba(0,90,88,.35); --elev:0 1px 0 #fff inset,0 10px 28px -18px rgba(0,90,88,.3);
+  --mk-v:#FFFFFF; --mk-t:#006B67; --mk-bz:#EAF3F2; --mk-h:#CDE7E4; --mk-t2:#00504D; --mk-hl:#4FB3AD; --mk-gd:#C79A1C;
+}
+html{box-sizing:border-box;scroll-behavior:smooth;scroll-padding-top:84px;-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:inherit}
+html,body{overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;background-image:var(--paper-img);background-size:var(--paper-size)}
+img,svg,canvas{max-width:100%}
+h1,h2,h3{font-family:var(--font-display);margin:0;letter-spacing:-.01em;line-height:1.05}
+h2{font-size:clamp(28px,5vw,44px);font-weight:800;margin-bottom:14px}
+h3{font-size:20px;font-weight:700;line-height:1.2;margin-bottom:10px}
+p{margin:0 0 1em}
+a{color:var(--teal)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:var(--panel);color:var(--text);padding:8px;z-index:99}
+.lbl{font-family:var(--font-mono);font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+.lede{color:var(--muted);font-size:18px;max-width:56ch}
+.mono{font-family:var(--font-mono)}
+/* header */
+.hdr{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+@media(max-width:700px){.hdr{backdrop-filter:none;background:var(--bg)}}
+.hdr .wrap{display:flex;align-items:center;gap:12px;height:60px}
+.hdr .grow{flex:1}
+.lockup{display:inline-flex;align-items:center;gap:10px;text-decoration:none}
+.mark{width:32px;height:32px;display:block;flex:none}
+.mark .mk-v{fill:var(--mk-v);stroke:var(--mk-t)} .mark .mk-bz{fill:var(--mk-bz)} .mark .mk-tab rect{fill:var(--mk-v);stroke:var(--mk-t)} .mark .mk-tab circle{fill:var(--mk-t)}
+.mark .mk-h{fill:var(--mk-h);stroke:var(--mk-h)} .mark .mk-t{fill:var(--mk-t)} .mark .mk-t2{fill:var(--mk-t2)} .mark .mk-hl{stroke:var(--mk-hl)} .mark .mk-gd{fill:var(--mk-gd)}
+.wm{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;white-space:nowrap;display:inline-flex;align-items:baseline;color:var(--text);font-size:22px}
+.wm b{font-weight:inherit;color:var(--teal);text-shadow:var(--tglow)}
+.wm .dot{display:inline-block;width:.3em;height:.17em;background:var(--teal);border-radius:2px;margin:0 .07em;transform:translateY(-.06em);box-shadow:var(--dglow)}
+[data-theme="light"] .wm b{color:var(--teal-deep);text-shadow:none}
+[data-theme="light"] .wm .dot{background:var(--teal-deep);box-shadow:none}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:700 13px/1 var(--font-display);letter-spacing:.14em;text-transform:uppercase;border:0;border-radius:10px;padding:15px 22px;cursor:pointer;min-height:48px;text-decoration:none;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast),filter var(--t-fast)}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#fff;box-shadow:var(--bshadow)}
+.btn-primary:hover{filter:brightness(1.12)}
+.btn-gold{background:var(--goldf);color:var(--on-gold)}
+.btn-gold:hover{filter:brightness(1.08)}
+.btn-ghost{background:transparent;color:var(--teal);box-shadow:inset 0 0 0 1.5px var(--line2)}
+.btn-ghost:hover{box-shadow:inset 0 0 0 1.5px var(--teal)}
+.btn-sm{padding:10px 14px;font-size:11px;min-height:38px}
+.btn{white-space:nowrap}
+.theme .ti{display:none}.theme .ti-sun{display:block}[data-theme="light"] .theme .ti-sun{display:none}[data-theme="light"] .theme .ti-moon{display:block}
+@media(max-width:560px){.theme{width:38px;padding:0}.theme .tl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.hdr .wrap{gap:8px}.wm{font-size:20px}}
+.btn[disabled]{opacity:.6;cursor:wait}
+/* hero */
+.hero{padding:40px 0 28px}
+@media(min-width:900px){.hero{padding:56px 0 48px}}
+.hero h1{font-size:clamp(38px,7.2vw,68px);font-weight:800;line-height:1;letter-spacing:-.02em;margin:16px 0 0}
+.hero h1 em{font-style:normal;color:var(--teal)}
+.hero .sub{font-family:var(--font-mono);font-size:18px;letter-spacing:.12em;color:var(--faint);margin:22px 0 0}
+.hero .lede{margin:18px 0 22px}
+/* the form */
+form.join{background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-card);padding:18px;box-shadow:var(--glow)}
+form.join label.f{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.row{display:flex;flex-direction:column;gap:10px}
+@media(min-width:520px){.row{flex-direction:row}.row input{flex:1}}
+input[type=email]{width:100%;min-height:52px;border-radius:12px;border:1px solid var(--line2);background:var(--surf);color:var(--text);font:16px var(--font-body);padding:0 14px}
+input[type=email]:focus{border-color:var(--teal);outline:none}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:.93rem;color:var(--muted);cursor:pointer}
+.check input{width:20px;height:20px;margin-top:2px;flex:0 0 auto;accent-color:var(--teal)}
+.micro{font-size:.85rem;color:var(--muted);margin:12px 0 0}
+.micro a{color:var(--muted)}
+#cf-box{margin-top:12px}#cf-box:empty{margin:0}
+.msg{margin-top:10px;font-size:.95rem;min-height:1.2em}.msg.err{color:var(--red)}.msg.ok{color:var(--teal)}
+/* the 3D stage, as in the brand book */
+.stage3d{position:relative;border:1px solid var(--line2);border-radius:var(--r-card);overflow:hidden;background:var(--stage-bg);box-shadow:var(--glow)}
+.stage3d canvas{display:block;width:100%;aspect-ratio:16/10;cursor:grab;touch-action:pan-y;outline-offset:-3px}
+@media(max-width:640px){.stage3d canvas{aspect-ratio:4/3}.stage3d .rail{top:10px;right:10px;transform:none;grid-auto-flow:column;padding:4px;gap:4px}.stage3d .rail button{width:38px;height:38px}.stage3d .statusline{right:14px;font-size:11px}}
+.stage3d::after{content:"";position:absolute;inset:0;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none}
+[data-theme="light"] .stage3d::after{opacity:.7}
+.stage3d.flash{animation:sflash 800ms var(--ease)}
+@keyframes sflash{0%{box-shadow:0 0 0 0 rgba(232,197,106,0)}25%{box-shadow:0 0 44px 2px rgba(232,197,106,.5);border-color:var(--gold)}100%{box-shadow:var(--glow)}}
+.rail{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:grid;gap:6px;padding:6px;background:var(--rail-bg);border:1px solid var(--line2);border-radius:16px;z-index:2}
+.rail button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--rail-btn);color:var(--teal);cursor:pointer;display:grid;place-items:center;padding:0}
+.rail button:hover{border-color:var(--teal)}
+.rail button[aria-pressed="true"]{background:rgba(68,192,185,.2);border-color:var(--teal);box-shadow:0 0 14px rgba(68,192,185,.35)}
+.statusline{position:absolute;left:14px;bottom:10px;right:78px;font-family:var(--font-mono);font-size:clamp(11px,1.5vw,14px);letter-spacing:.08em;color:var(--stat);text-shadow:var(--stext);z-index:2;pointer-events:none}
+.pops{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
+.pop{position:absolute;left:50%;bottom:20%;font-family:var(--font-mono);color:var(--gold);font-size:clamp(18px,3vw,28px);text-shadow:var(--popglow);animation:popup 1250ms var(--ease) forwards;white-space:nowrap}
+@keyframes popup{0%{opacity:0;transform:translate(-50%,12px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-70px)}}
+.hint{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--faint);text-align:center;margin:10px 0 0}
+/* levels, deposit controls, stats and milestone pills: as in the brand book */
+.levels{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin-top:28px;padding:2px 0 4px;scrollbar-width:none}
+.levels>*{flex:0 0 auto;scroll-snap-align:start}
+.levels::-webkit-scrollbar{display:none}
+.lvl{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.06em;padding:12px 18px;border-radius:var(--r-pill);border:1.5px solid var(--line2);color:var(--muted);white-space:nowrap;display:inline-flex;gap:10px;align-items:center}
+.lvl.on{border-color:var(--gold);color:var(--gold);background:rgba(232,197,106,.07)}
+.lvl.open{border-color:var(--gold);color:var(--gold)}
+.lvl.open .lk{display:none}
+.lvl.unlock{animation:sflash 1000ms var(--ease)}
+.stage3d{margin-top:22px}
+.stage3d canvas.nwc{aspect-ratio:16/9}
+@media(max-width:640px){.stage3d canvas.nwc{aspect-ratio:1/1}}
+.stage3d.flashg{animation:sflashg 900ms var(--ease)}
+@keyframes sflashg{0%{box-shadow:0 0 0 0 rgba(62,207,142,0)}25%{box-shadow:0 0 44px 2px rgba(62,207,142,.5);border-color:var(--green)}100%{box-shadow:var(--glow)}}
+.pop.g{color:var(--green);text-shadow:0 0 14px rgba(62,207,142,.7)}
+.dep{display:grid;gap:12px;grid-template-columns:1fr 1fr;margin-top:20px;align-items:end}
+.depf label{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.depin{display:flex;align-items:center;border:1px solid var(--line2);border-radius:12px;background:var(--surf2);overflow:hidden}
+.depin span{padding:0 4px 0 14px;color:var(--gold);font-family:var(--font-mono);font-size:18px}
+.depin span:last-child{padding:0 14px 0 4px}
+.depin input{flex:1;border:0;background:transparent;color:var(--text);font:600 18px var(--font-mono);padding:13px 8px;min-width:0;outline:none;width:100%}
+.depin:focus-within{border-color:var(--teal)}
+.depout{grid-column:1/-1;font-family:var(--font-mono);font-size:14px;color:var(--muted);letter-spacing:.04em}
+@media(min-width:760px){.depout{grid-column:auto;align-self:center}}
+.types{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tab{font:700 12px var(--font-display);letter-spacing:.12em;text-transform:uppercase;padding:10px 14px;border-radius:var(--r-pill);border:0;background:transparent;color:var(--muted);cursor:pointer;min-height:40px;box-shadow:inset 0 0 0 1.5px var(--line2)}
+.tab[aria-pressed="true"]{background:var(--goldf);color:var(--on-gold);box-shadow:none}
+.ctrl{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:18px 0}
+.lay{display:flex;gap:8px;flex-wrap:wrap}
+.lay .btn{min-width:64px}
+.scrub{flex:1;min-width:220px;display:grid;gap:2px}
+.scrub label{font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+input[type=range]{width:100%;accent-color:var(--gold);height:44px;margin:0}
+.vi-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%}
+@media(max-width:620px){.vi-stats{grid-template-columns:repeat(2,1fr)}}
+.vi-stat{background:var(--surf);border:1px solid var(--line);border-radius:var(--r-tile);padding:18px 8px;text-align:center}
+.vi-stat b{display:block;font-family:var(--font-mono);font-weight:400;font-size:24px;color:var(--text);letter-spacing:.04em}
+.vi-stat span{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.vi-pills{display:flex;flex-wrap:wrap;gap:8px;width:100%}
+.vi-pill{font-family:var(--font-mono);font-size:14px;letter-spacing:.06em;padding:8px 16px;border-radius:var(--r-pill);border:1.5px solid var(--gold);color:var(--gold);background:var(--pillbg)}
+.vi-pill.lock{border:1.5px dashed var(--lockline,#3A4446);color:var(--lockfg,#6A7678);background:transparent}
+.vi-pill.pop{animation:pillpop 900ms var(--ease);position:static}
+@keyframes pillpop{0%{transform:scale(.9);box-shadow:0 0 0 0 rgba(232,197,106,.7)}40%{transform:scale(1.08);box-shadow:0 0 22px 4px rgba(232,197,106,.55)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(232,197,106,0)}}
+.unitkey{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-family:var(--font-mono);font-size:13px;color:var(--muted);margin:10px 0 0}
+.unitkey i{display:inline-block;background:var(--teal);border-radius:2px;vertical-align:middle;margin-right:8px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);background:var(--goldf);color:var(--on-gold);padding:12px 18px;border-radius:var(--r-pill);font-weight:700;opacity:0;pointer-events:none;transition:opacity var(--t-fast),transform var(--t-fast) var(--ease);z-index:70}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.hero .lede{margin:22px 0 0}
+/* "home." pulses in vibrant teal (owner, 30 Oct); still in reduced motion */
+.hero h1 em.pulse{animation:homepulse var(--pulse) ease-in-out infinite}
+@keyframes homepulse{0%,100%{color:var(--teal);text-shadow:0 0 0 rgba(68,192,185,0)}50%{color:#5FE0D8;text-shadow:0 0 26px rgba(68,192,185,.75),0 0 60px rgba(68,192,185,.35)}}
+[data-theme="light"] .hero h1 em.pulse{animation-name:homepulse-day}
+@keyframes homepulse-day{0%,100%{color:var(--teal-deep)}50%{color:#1FA39C}}
+.joinsec{padding-top:48px}
+.joinsec .join{max-width:640px}
+/* sections */
+section{padding:64px 0 24px;border-top:1px solid var(--line)}
+section .lead{color:var(--muted);max-width:56ch;margin-bottom:26px}
+.grid{display:grid;gap:16px;align-items:start}
+@media(min-width:720px){.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-card);padding:22px;min-width:0;position:relative}
+.card p{color:var(--muted);margin:0;font-size:.98rem}
+[data-theme="light"] .card{box-shadow:var(--elev)}
+[data-theme="light"] .card::before{content:"";position:absolute;inset:7px;pointer-events:none;opacity:.55;background:linear-gradient(var(--teal),var(--teal)) left top/9px 1px no-repeat,linear-gradient(var(--teal),var(--teal)) left top/1px 9px no-repeat,linear-gradient(var(--teal),var(--teal)) right bottom/9px 1px no-repeat,linear-gradient(var(--teal),var(--teal)) right bottom/1px 9px no-repeat}
+.num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--gold);color:var(--gold);font-family:var(--font-mono);font-size:15px;margin-bottom:12px;background:var(--pillbg)}
+.shot{margin:16px 0 0;border:1px solid var(--line2);border-radius:var(--r-tile);overflow:hidden;background:var(--stage-bg)}
+.shot img{display:block;width:100%;height:auto}
+/* "How it works" steps: a small real screen each (owner, 31 Oct); step 2 carries the brand icons, pulsing gently */
+.step-img{position:relative}
+.step-icons{position:absolute;left:8px;right:8px;bottom:10px;display:flex;justify-content:center;gap:10px;pointer-events:none}
+.step-icons .si{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;color:var(--c);background:rgb(5 16 27 / .78);border:1px solid color-mix(in srgb,var(--c) 55%,transparent);box-shadow:0 0 0 0 color-mix(in srgb,var(--c) 45%,transparent);animation:siPulse 2.4s ease-in-out var(--d) infinite}
+.step-icons svg{width:22px;height:22px}
+.step-cap{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--muted);text-align:center;padding:8px 6px;border-top:1px solid var(--line2)}
+@keyframes siPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 color-mix(in srgb,var(--c) 40%,transparent)}50%{transform:scale(1.08);box-shadow:0 0 0 6px color-mix(in srgb,var(--c) 0%,transparent)}}
+@media (prefers-reduced-motion:reduce){.step-icons .si{animation:none!important}}
+ul.ticks{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+ul.ticks li{padding-left:28px;position:relative;color:var(--muted)}
+ul.ticks li strong{color:var(--text)}
+ul.ticks li::before{content:"";position:absolute;left:0;top:.55em;width:14px;height:8px;border-radius:2px;background:var(--teal)}
+.founder{display:grid;gap:20px;align-items:center}
+@media(min-width:720px){.founder{grid-template-columns:160px 1fr}}
+.founder img{width:140px;height:140px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)}
+.founder p{color:var(--muted);max-width:60ch}
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+details+details{margin-top:10px}
+summary{cursor:pointer;font-weight:700;font-family:var(--font-display)}
+details p{color:var(--muted);margin:8px 0 0}
+.cta{text-align:center;padding-bottom:64px}
+.cta p{color:var(--muted);margin:0 auto 20px;max-width:34em}
+footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--muted);font-size:14px}
+footer .wm{font-size:26px;margin-bottom:10px}
+footer a{color:var(--muted)}
+footer .fca{color:var(--text);margin-bottom:8px}
+footer .links{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="vi-net-worth" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 17 9 11l4 4 8-9'/><path d='M15 6h6v6'/></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M3 21h18" stroke-dasharray="1 2.2"/><circle cx="9" cy="11" r=".9"/><circle cx="13" cy="15" r=".9"/></g></symbol><symbol id="vi-budget" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><g transform='scale(1.5)'><rect x='1.5' y='3.5' width='13' height='9.5' rx='1.6'/></g></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><rect x='1.5' y='3.5' width='13' height='9.5' rx='1.6'/><path d='M1.5 6.5h13'/><path d='M10.6 9.8h1.9'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M4 14.5h5M4 16.8h3"/><circle cx="18.2" cy="14.7" r=".9"/></g></symbol><symbol id="vi-debt-tracker" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><g transform='scale(1.5)' style='stroke-width:calc(var(--vi-sw,1.1) / 1.5)'><polyline points='1,4.5 5,9.5 9,7 15,13'/><polyline points='11.5,13 15,13 15,9.5'/></g></g><g fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round" opacity=".6" style="stroke-width:calc(var(--vi-sw,1.1) * .64)"><path d="M1.5 22.5h21"/><path d="M1.5 12h21" stroke-dasharray="1 2.2"/></g></symbol><symbol id="vi-trend-base" viewBox="0 0 24 24"><g fill="currentColor" fill-opacity=".16" stroke="none"><path d='M4 16l5-5 4 3 7-8v14.5H4z'/></g><g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="stroke-width:var(--vi-sw,1.1)"><path d='M3 20.5h18'/><path d='M4 16l5-5 4 3 7-8'/><path d='M15 6h5v5'/></g></symbol></svg>
+<a class="skip" href="#join">Skip to the sign-up form</a>
+<header class="hdr"><div class="wrap">
+  <a class="lockup" href="./" aria-label="Vault-It, top of page">
+    <svg class="mark" viewBox="0 0 240 240" aria-hidden="true"><circle cx="120" cy="120" r="112" class="mk-v" stroke-width="7"/><circle cx="120" cy="120" r="100" class="mk-bz"/><g class="mk-tab"><rect x="105" y="2" width="30" height="16" rx="5" stroke-width="4"/><circle cx="120" cy="10" r="2.6" opacity=".45"/><g transform="rotate(90 120 120)"><rect x="105" y="2" width="30" height="16" rx="5" stroke-width="4"/><circle cx="120" cy="10" r="2.6" opacity=".45"/></g><g transform="rotate(180 120 120)"><rect x="105" y="2" width="30" height="16" rx="5" stroke-width="4"/><circle cx="120" cy="10" r="2.6" opacity=".45"/></g><g transform="rotate(270 120 120)"><rect x="105" y="2" width="30" height="16" rx="5" stroke-width="4"/><circle cx="120" cy="10" r="2.6" opacity=".45"/></g></g><polygon points="68,80 86,80 120,133.6 154,80 172,80 120,162" class="mk-h" stroke-width="10" stroke-linejoin="miter" stroke-miterlimit="10"/><polygon points="68,80 86,80 120,133.6 120,162" class="mk-t"/><polygon points="172,80 154,80 120,133.6 120,162" class="mk-t2"/><path d="M68 80L120 162L172 80" class="mk-hl" fill="none" stroke-width="1.2" opacity=".75"/><rect x="114" y="108" width="12" height="8" rx="2.5" class="mk-gd"/></svg>
+    <span class="wm">Vault<i class="dot"></i><b>It</b></span>
+  </a>
+  <span class="grow"></span>
+  <button class="btn btn-ghost btn-sm theme" id="themeBtn" type="button" aria-pressed="false" aria-label="Switch to Daylight"><svg class="ti ti-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="ti ti-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span class="tl">Daylight</span></button>
+  <a class="btn btn-gold btn-sm" href="#join">Join the beta</a>
+</div></header>
+
+<main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<section class="hero" style="border-top:0"><div class="wrap">
+  <span class="lbl">Free private beta · Built in the UK</span>
+  <h1>Get out of the Red and <em class="pulse">into your home.</em></h1>
+  <p class="sub">Every pound saved builds your future</p>
+
+  <div class="levels" aria-label="Levels">
+    <span class="lvl on"><svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true"><rect x="0" y="0" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="10" y="0" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="5" y="5" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="0" y="10" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="10" y="10" width="8" height="4" rx="1" fill="#E05C5C"/></svg>Level 1 · First deposit</span>
+    <span class="lvl" id="lvl2"><svg class="lk" width="16" height="16" viewBox="0 0 24 24" fill="#E8C56A" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1zm2 0h6V8a3 3 0 0 0-6 0v2z"/></svg>Level 2 · Delete the mortgage</span>
+    <span class="lvl"><svg class="lk" width="16" height="16" viewBox="0 0 24 24" fill="#E8C56A" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1zm2 0h6V8a3 3 0 0 0-6 0v2z"/></svg>Level 3 · Upgrade</span>
+  </div>
+
+  <div class="stage3d" id="heroStage">
+    <canvas id="heroCanvas" tabindex="0" role="img" aria-label="A 3D hologram of a Victorian terrace that builds brick by brick as you save. Drag to orbit, arrow keys to rotate."></canvas>
+    <div class="rail" role="group" aria-label="Camera controls">
+      <button type="button" id="rIn" aria-label="Zoom in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button type="button" id="rOut" aria-label="Zoom out"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+      <button type="button" id="rOrb" aria-label="Auto orbit" aria-pressed="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg></button>
+      <button type="button" id="rRst" aria-label="Reset view"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg></button>
+    </div>
+    <div class="statusline" id="heroStatus" aria-live="off"></div>
+    <div class="pops" id="heroPops"></div>
+  </div>
+  <p class="hint">DRAG · ORBIT · ARROW KEYS · + − ZOOM</p>
+  <div class="dep" id="depBox">
+    <div class="depf"><label for="depPrice">Property price</label><div class="depin"><span>£</span><input id="depPrice" type="text" inputmode="numeric" autocomplete="off" value="120000"></div></div>
+    <div class="depf"><label for="depPct">Deposit</label><div class="depin"><input id="depPct" type="text" inputmode="decimal" autocomplete="off" value="20"><span>%</span></div></div>
+    <div class="depout" id="depOut" aria-live="polite"></div>
+  </div>
+  <div class="types" id="depTypes" role="group" aria-label="House type"></div>
+
+  <div class="ctrl">
+    <div class="lay" role="group" aria-label="Lay bricks"><button type="button" class="btn btn-ghost" data-lay="5">+£5</button><button type="button" class="btn btn-ghost" data-lay="50">+£50</button><button type="button" class="btn btn-primary" id="layBtn" data-lay="500">Lay the bricks +£500</button></div>
+    <div class="scrub"><label for="heroRange">Scrub the build</label><input type="range" id="heroRange" min="0" max="100" step="0.1" value="0"></div>
+    <button type="button" class="btn btn-ghost btn-sm" id="heroReset">Reset</button>
+  </div>
+  <div class="vi-stats">
+    <div class="vi-stat"><b id="sBricks">0</b><span>Bricks laid</span></div>
+    <div class="vi-stat"><b id="sToGo">£24.0k</b><span>To go</span></div>
+    <div class="vi-stat"><b id="sXp">5</b><span>XP</span></div>
+    <div class="vi-stat"><b id="sStreak">1</b><span>Streak</span></div>
+  </div>
+  <div class="vi-pills" id="heroPills" style="margin-top:14px"></div>
+
+  <h2 style="margin-top:56px">Net worth in 3D</h2>
+  <p class="lede" style="margin:0">A speed run of the climb: starting in the red with a little saved, paying the debt off block by block, then building wealth in every domain. Big blocks are £1,000. Small cubes are £100. Nine cubes become a block.</p>
+  <div class="stage3d" id="nwStage">
+    <canvas id="nwCanvas" class="nwc" tabindex="0" role="img" aria-label="A 3D scene of assets stacked above a gold line and debt hanging below it, replaying the climb from debt to wealth. Drag to orbit."></canvas>
+    <div class="statusline" id="nwMsg" style="right:14px">Starting in the red</div>
+    <div class="pops" id="nwPops"></div>
+  </div>
+  <div class="ctrl"><p class="unitkey" style="margin:0;flex:1"><span><i style="width:16px;height:6px"></i>1 block = £1,000</span><span><i style="width:7px;height:7px"></i>1 cube = £100</span><span>Nine cubes, then a block</span></p><button type="button" class="btn btn-ghost btn-sm" id="nwReplay">Replay</button></div>
+</div></section>
+
+<section class="joinsec" id="joinsec"><div class="wrap">
+  <h2>Join the free beta</h2>
+  <p class="lede">Vault-It puts your debts, savings, house deposit and net worth on one honest map, then turns every pound you save towards your deposit into bricks on a 3D house. You type the numbers in. No bank login.</p>
+  <form class="join" id="join" novalidate>
+    <label class="f" for="email">Your email address</label>
+    <div class="row">
+      <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required maxlength="254" />
+      <button class="btn btn-gold" type="submit" id="go">Join the beta list</button>
+    </div>
+    <label class="check"><input type="checkbox" id="testing" checked /> <span>I’d like to test the app. Send me the link and tester tips.</span></label>
+    <label class="check"><input type="checkbox" id="marketing" /> <span>Also email me product news and the one-payment licence offer. Optional; unsubscribe any time.</span></label>
+    <div id="cf-box"></div>
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    <p class="micro">Free during the beta · no card · no bank login. We send one email to confirm your address. <a href="/privacy">Privacy notice</a></p>
+  </form>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2>How it works</h2>
+  <p class="lead">Set up in a few minutes. Real screens from the app, shown with sample figures.</p>
+  <div class="grid g3">
+    <div class="card"><div class="num">1</div><h3>Add your numbers</h3><p>Income, spending, debts, savings and what you own. You type them in, so nothing is connected to your bank.</p>
+      <figure class="shot step-shot"><img src="img/step-1-numbers.jpg" width="620" height="399" alt="The Budget tab: income and spending lines sorted into committed, variable, savings and investment groups" loading="lazy" /></figure></div>
+    <div class="card"><div class="num">2</div><h3>See the whole picture</h3><p>Net worth over time, where every pound of income goes, a debt payoff plan (snowball or avalanche) and the next step on your roadmap.</p>
+      <figure class="shot step-shot step-2"><div class="step-img"><img src="img/step-2-picture.jpg" width="620" height="384" alt="The Overview: net worth, assets, debt, liabilities and monthly surplus, above the net worth in 3D scene" loading="lazy" />
+        <div class="step-icons" aria-hidden="true">
+          <span class="si" style="--c:var(--gold);--d:0s"><svg viewBox="0 0 24 24"><use href="#vi-net-worth"/></svg></span>
+          <span class="si" style="--c:var(--teal);--d:.6s"><svg viewBox="0 0 24 24"><use href="#vi-budget"/></svg></span>
+          <span class="si" style="--c:var(--red);--d:1.2s"><svg viewBox="0 0 24 24"><use href="#vi-debt-tracker"/></svg></span>
+          <span class="si" style="--c:var(--green);--d:1.8s"><svg viewBox="0 0 24 24"><use href="#vi-trend-base"/></svg></span>
+        </div></div>
+        <figcaption class="step-cap">Net worth · Budget · Debt plan · Roadmap</figcaption></figure></div>
+    <div class="card"><div class="num">3</div><h3>Build the house</h3><p>Pick a house and a deposit target. It rises as you save, and fills in as you pay the mortgage down.</p>
+      <figure class="shot step-shot"><img src="img/step-3-house.jpg" width="620" height="412" alt="The House Builder: a Victorian terrace part-built in teal bricks, with the row being laid marked in gold" loading="lazy" /></figure></div>
+  </div>
+</div></section>
+
+<section id="inside"><div class="wrap">
+  <h2>What’s in the beta</h2>
+  <div class="grid g3">
+    <div class="card"><h3>Overview</h3><p>Your net worth, assets and debts at a glance, with history as you update it.</p></div>
+    <div class="card"><h3>Budget &amp; cash flow</h3><p>Income and spending by category, with a diagram of where the money goes each month.</p></div>
+    <div class="card"><h3>House Builder</h3><p>The 3D house that grows with your deposit: terraced, semi, detached, flat and more.</p></div>
+    <div class="card"><h3>Assets &amp; liabilities</h3><p>Cash, shares and funds, metals, crypto and possessions, alongside what you owe.</p></div>
+    <div class="card"><h3>Debt tracker</h3><p>Every debt in one list and a payoff order you choose, with a projected debt-free date.</p></div>
+    <div class="card"><h3>Roadmap</h3><p>Stages from clearing debt to owning your home, with milestones as you reach them.</p></div>
+  </div>
+</div></section>
+
+<section id="testers"><div class="wrap grid g2">
+  <div>
+    <h2>Why join now</h2>
+    <ul class="ticks">
+      <li><strong>Free for the whole beta.</strong> No card, nothing to cancel.</li>
+      <li><strong>A direct line to the founder.</strong> Reply to any email and Pete reads it.</li>
+      <li><strong>Shape what gets built.</strong> Tester feedback decides what comes next.</li>
+      <li><strong>First look at one-payment licence pricing</strong>, before it is offered publicly.</li>
+    </ul>
+  </div>
+  <div>
+    <h2>What we ask of testers</h2>
+    <ul class="ticks">
+      <li>Use it on your phone or laptop. Made-up figures are fine.</li>
+      <li>Tell us what is confusing, broken, slow or ugly.</li>
+      <li>Answer the odd short question by email when we ask.</li>
+    </ul>
+  </div>
+</div></section>
+
+<section id="data"><div class="wrap">
+  <h2>Your data, plainly</h2>
+  <div class="grid g2">
+    <div class="card"><h3>No bank login, ever</h3><p>You type everything in. Vault-It does not connect to your bank and never asks for your banking details.</p></div>
+    <div class="card"><h3>Stored in the EU</h3><p>Your account is held by Supabase in Frankfurt, encrypted in transit and at rest. It is not end-to-end encrypted. The <a href="/privacy">privacy notice</a> explains exactly who can see what.</p></div>
+    <div class="card"><h3>Yours to take or delete</h3><p>Download all your data, or delete your account and everything in it, yourself in Settings at any time.</p></div>
+    <div class="card"><h3>How we make money</h3><p>From paid plans after the beta, starting at £5.99 a month. We do not sell your data, and these pages carry no ad trackers.</p></div>
+  </div>
+  <p class="micro">Vault-It is a tracking and planning tool, not financial advice. Its projections are estimates from the figures you enter.</p>
+</div></section>
+
+<section id="founder"><div class="wrap founder">
+  <img src="img/founder.jpg" width="140" height="140" alt="Pete Thickett, founder of Vault-It" loading="lazy" />
+  <div>
+    <h2>Made by someone who needed it</h2>
+    <p>I could not see where my contributions were going, or what value I actually owned. I wanted to see what I am working towards, and exactly how much I need to put in to lay one more brick, with real visual feedback. I could not find that, so I made Vault-It.</p>
+    <p>I’m Pete Thickett, a designer and founder in Lincoln. If you’re on the same climb, I’d love your help making it right.</p>
+  </div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <h2>Questions</h2>
+  <details><summary>What does it cost?</summary><p>Nothing during the beta, and you never enter a card to join. Paid plans after the beta will start at £5.99 a month, and beta testers will hear about one-payment licence pricing first.</p></details>
+  <details><summary>Do I have to connect my bank?</summary><p>No. You type in your own figures, so there is no bank connection to set up or worry about.</p></details>
+  <details><summary>What do I need to use it?</summary><p>A phone, tablet or computer with a modern browser. It runs in the browser, and you can add it to your home screen like an app.</p></details>
+  <details><summary>Is this financial advice?</summary><p>No. Vault-It helps you organise your own numbers and see where they lead. It does not recommend products, and for big decisions you should speak to a regulated adviser.</p></details>
+  <details><summary>What happens to my email address?</summary><p>We send one email to confirm it’s you. After that you get tester emails only if you ticked that box, and news only if you ticked that one. Every email has a link to leave the list. If you never confirm, your request is deleted after 30 days.</p></details>
+  <details><summary>When can I start?</summary><p>Once you confirm your address, you get the link to the beta straight away.</p></details>
+</div></section>
+
+<section class="cta"><div class="wrap">
+  <h2>See the whole road from debt to your own front door</h2>
+  <p>Free during the beta. Two minutes to join.</p>
+  <a class="btn btn-gold" href="#join">Join the beta list</a>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div class="wm">Vault<i class="dot"></i><b>It</b></div>
+  <div class="fca"><strong>Not regulated by the FCA. Not financial advice.</strong></div>
+  <div>Vault-It helps you track and plan your money. Forecasts, dates and values are estimates from what you enter and public prices, and may be wrong. Speak to a regulated adviser before big money decisions.</div>
+  <div>Vault-It is a product of PT Live Design, run by Pete Thickett, A57, 11 St Mary’s Street, Lincoln LN5 7EQ. Contact: <a href="mailto:hello@vault-it.co">hello@vault-it.co</a></div>
+  <div class="links"><a href="/privacy">Privacy notice</a><a href="/terms">Beta terms</a><a href="https://app.vault-it.co/">Already testing? Open the app</a><span>© 2026 PT Live Design. All rights reserved.</span></div>
+</div></footer>
+
+<script src="brand-hero.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+
+  // ── theme: Night by default, Daylight by device preference or the button; remembered on this device
+  var themeBtn = $('#themeBtn'), themeMeta = document.querySelector('meta[name="theme-color"]');
+  function isLight() { return document.documentElement.getAttribute('data-theme') === 'light'; }
+  function syncTheme() { var l = isLight(); themeBtn.querySelector('.tl').textContent = l ? 'Night' : 'Daylight'; themeBtn.setAttribute('aria-label', l ? 'Switch to Night' : 'Switch to Daylight'); themeBtn.setAttribute('aria-pressed', l ? 'true' : 'false'); if (themeMeta) themeMeta.setAttribute('content', l ? '#F3F7F6' : '#080808'); }
+  themeBtn.addEventListener('click', function () {
+    var l = !isLight();
+    if (l) document.documentElement.setAttribute('data-theme', 'light'); else document.documentElement.removeAttribute('data-theme');
+    try { localStorage.setItem('vi-theme', l ? 'light' : 'dark'); } catch (e) {}
+    syncTheme();
+  });
+  syncTheme();
+
+  // ── the hero, as in the brand book: deposit → bricks, lay buttons, scrub, milestones, Level 2 unlock
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  var fmt = function (n) { return '£' + Math.round(n).toLocaleString('en-GB'); };
+  var tt; function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('show'); }, 2600); }
+  if (window.ViBrand && $('#heroCanvas')) {
+    var VB = window.ViBrand, clamp = VB.clamp, popText = VB.popText, flashStage = VB.flashStage;
+    var MS = [[1, 'Site cleared'], [5, 'Foundations'], [10, '10%'], [25, 'Quarter'], [50, 'Halfway'], [75, 'Three-quarters'], [100, 'Deposit ready']];
+    var BT = 14465, DEP = { price: 120000, pct: 20, saved: 8544 }, engaged = false, bonus = 0, msDone = [], lastKey = '', unlocked = false, heroStageEl = $('#heroStage'), pillsHost = $('#heroPills');
+    MS.forEach(function (m) { var sp = document.createElement('span'); sp.className = 'vi-pill lock'; sp.textContent = m[0] + '% · ' + m[1]; pillsHost.appendChild(sp); });
+    function depTarget() { return Math.max(1, DEP.price * DEP.pct / 100); }
+    function perBrick() { return depTarget() * .77 / BT; }
+    function money(n) { return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: n < 10 ? 2 : 0, maximumFractionDigits: n < 100 ? 2 : 0 }); }
+    function fmtK(n) { return n >= 1e6 ? '£' + (n / 1e6).toFixed(2) + 'm' : n >= 1000 ? '£' + (n / 1000).toFixed(1) + 'k' : '£' + Math.round(n); }
+    function heroFrame(info, st) {
+      var p = st.p, bricks = (info.bricks !== undefined ? info.bricks : Math.round(21000 * p)), btot = info.bricksTotal || 21000, key = info.row + '|' + bricks + '|' + info.tiles; BT = btot;
+      if (key !== lastKey) { lastKey = key;
+        $('#heroStatus').textContent = 'Victorian mid-terrace · Row ' + info.row + ' of 154 · ' + bricks.toLocaleString('en-GB') + ' / ' + btot.toLocaleString('en-GB') + ' bricks · ' + money(depTarget() * (info.brickShare || .77) / btot) + ' a brick';
+        $('#sBricks').textContent = bricks.toLocaleString('en-GB'); $('#sToGo').textContent = fmtK(depTarget() * (1 - p)); }
+      var pc = p * 100, done = 0;
+      MS.forEach(function (m, i) { var on = pc >= m[0] - 1e-6, el = pillsHost.children[i];
+        if (on && !msDone[i]) { msDone[i] = true; el.classList.remove('lock'); el.classList.add('pop'); setTimeout(function () { el.classList.remove('pop'); }, 900); if (engaged) toast('Milestone: ' + m[0] + '% ' + m[1]); }
+        else if (!on && msDone[i] && pc < m[0] - .6) { msDone[i] = false; el.classList.add('lock'); }
+        if (msDone[i]) done++; });
+      $('#sXp').textContent = 5 + done * 50 + bonus;
+      if (p >= .999 && !unlocked) { unlocked = true; var l = $('#lvl2'); l.classList.add('open', 'unlock'); setTimeout(function () { l.classList.remove('unlock'); }, 1100); if (engaged) toast('Level 2 unlocked: Delete the Mortgage'); }
+      else if (p < .99 && unlocked) { unlocked = false; $('#lvl2').classList.remove('open'); }
+    }
+    var heroCtl = VB.makeStage($('#heroCanvas'), { railPad: 70, padB: 40, onFrame: heroFrame });
+    function depOut() { var pb = perBrick(); $('#depOut').textContent = 'Deposit target ' + money(depTarget()) + ' · each brick = ' + money(pb) + ' · £500 lays ' + (500 / pb >= 1 ? Math.round(500 / pb) + ' bricks' : (500 / pb).toFixed(2) + ' of a brick'); }
+    function depSync(imm) { var p = clamp(DEP.saved / depTarget(), 0, 1); DEP.saved = Math.min(DEP.saved, depTarget()); heroCtl.setTarget(p, imm); $('#heroRange').value = p * 100; depOut(); }
+    $$('[data-lay]').forEach(function (b) { b.addEventListener('click', function () {
+      engaged = true; var amt = +b.getAttribute('data-lay');
+      if (DEP.saved >= depTarget() - .01) { toast('Deposit full. Reset to build again.'); return; }
+      var nb = amt / perBrick(); DEP.saved = Math.min(depTarget(), DEP.saved + amt); bonus += Math.max(1, Math.round(amt / 20)); depSync();
+      popText($('#heroPops'), '+£' + amt.toLocaleString('en-GB') + ' · ' + (nb >= 1 ? '+' + Math.round(nb) + ' brick' + (Math.round(nb) === 1 ? '' : 's') : nb.toFixed(2) + ' of a brick')); flashStage(heroStageEl);
+    }); });
+    $('#heroRange').addEventListener('input', function () { engaged = true; DEP.saved = (+this.value / 100) * depTarget(); heroCtl.setTarget(+this.value / 100); depOut(); });
+    $('#heroReset').addEventListener('click', function () { bonus = 0; DEP.saved = 0; depSync(); });
+    $('#rIn').addEventListener('click', function () { heroCtl.zoom(1.15); });
+    $('#rOut').addEventListener('click', function () { heroCtl.zoom(1 / 1.15); });
+    $('#rOrb').addEventListener('click', function () { this.setAttribute('aria-pressed', heroCtl.toggleAuto()); });
+    $('#rRst').addEventListener('click', function () { heroCtl.reset(); });
+    var TYPES = [['Small flat', 80000], ['Terraced', 120000], ['Apartment', 300000], ['Semi-detached', 320000], ['Manor house', 1500000]];
+    function depTypesUI() { $$('#depTypes .tab').forEach(function (b, i) { b.setAttribute('aria-pressed', DEP.price === TYPES[i][1] ? 'true' : 'false'); }); }
+    TYPES.forEach(function (t) { var b = document.createElement('button'); b.type = 'button'; b.className = 'tab'; b.textContent = t[0] + ' £' + (t[1] >= 1e6 ? (t[1] / 1e6) + 'm' : (t[1] / 1000) + 'k'); b.addEventListener('click', function () { DEP.price = t[1]; $('#depPrice').value = t[1]; engaged = true; depTypesUI(); depSync(); }); $('#depTypes').appendChild(b); });
+    function depRead() { var pr = parseInt(($('#depPrice').value || '').replace(/[^0-9]/g, ''), 10), pc = parseFloat(($('#depPct').value || '').replace(/[^0-9.]/g, ''));
+      if (isFinite(pr) && pr > 0) DEP.price = clamp(pr, 10000, 50000000); if (isFinite(pc) && pc > 0) DEP.pct = clamp(pc, 1, 100); depTypesUI(); depSync(); }
+    $('#depPrice').addEventListener('input', depRead); $('#depPct').addEventListener('input', depRead);
+    $('#depPrice').addEventListener('blur', function () { this.value = DEP.price; }); $('#depPct').addEventListener('blur', function () { this.value = DEP.pct; });
+    depTypesUI(); depOut();
+    setTimeout(function () { depSync(); }, 350);
+    window.viHero = heroCtl;
+
+    // ── net worth in 3D: a speed run from the red to wealth in every domain (owner, 30 Oct). Runs while on screen, then replays.
+    var nwStageEl = $('#nwStage'), nwMsg = $('#nwMsg'), nwTimer = 0, nwStep = 0, nwOn = false;
+    var nw = VB.makeNW($('#nwCanvas'), { init: { dep: [1, 2], stk: [0, 1], gold: [0, 0], debt: [7, 4] }, onChange: function (t) { nwMsg.textContent = t.net < 0 ? 'In the red: -' + fmt(-t.net) : 'Net worth ' + fmt(t.net); } });
+    var PLAN = []; var k;
+    for (k = 0; k < 7; k++) PLAN.push('debt:1000'); for (k = 0; k < 4; k++) PLAN.push('debt:100');
+    ['dep:1000', 'stk:1000', 'dep:1000', 'gold:1000', 'dep:1000', 'stk:1000', 'dep:1000', 'gold:1000', 'dep:1000', 'stk:1000', 'dep:1000', 'gold:1000', 'dep:1000', 'stk:1000', 'dep:1000', 'dep:100', 'dep:100', 'stk:1000', 'gold:1000', 'dep:1000', 'stk:1000', 'dep:1000', 'gold:1000', 'dep:1000', 'stk:1000'].forEach(function (x) { PLAN.push(x); });
+    function nwNext() {
+      if (nwStep >= PLAN.length) { nwTimer = setTimeout(nwRestart, 5000); return; }
+      var r = nw.act(PLAN[nwStep++]);
+      if (r.ok) { popText($('#nwPops'), r.delta, r.delta.charAt(0) === '-' ? 'g' : ''); flashStage(nwStageEl, r.clear ? 'flashg' : 'flash'); nwMsg.textContent = r.msg; }
+      nwTimer = setTimeout(nwNext, r.clear ? 1800 : 620);
+    }
+    function nwRestart() { clearTimeout(nwTimer); nw.reset(); nwStep = 0; nwMsg.textContent = 'Starting in the red'; if (VB.reduce) { while (nwStep < PLAN.length) nw.act(PLAN[nwStep++]); nwMsg.textContent = 'Out of the red, and building'; return; } nwTimer = setTimeout(nwNext, 1200); }
+    $('#nwReplay').addEventListener('click', nwRestart);
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { var v = es[0].isIntersecting; if (v && !nwOn) { nwOn = true; nwRestart(); } else if (!v && nwOn) { nwOn = false; clearTimeout(nwTimer); } }, { threshold: .05 }).observe($('#nwCanvas'));
+    else nwRestart();
+    window.viNW = nw;
+  }
+
+  // ── the beta list form (unchanged behaviour)
+  var FN_URL = window.__VI_WAITLIST_URL || 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join';
+  var KEY = 'sb_publishable_AZguCFDmQPTnXxwG7CCIXQ_cT3iIWtz';   // public by design
+  var CONSENT_VERSION = 'signup-2026-10-27';                    // bump with the wording of the marketing box (also in the server)
+  var TS_KEY = '0x4AAAAAAFoY-niKQ_Wu-1YM', TS_HOSTS = ['vault-it.co'];
+  var EMAIL_RE = /^[A-Za-z0-9._%+'-]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+  var form = document.getElementById('join'), btn = document.getElementById('go'), msg = document.getElementById('msg');
+  var store = { get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} } };
+
+  // Campaign tags from the link that brought the visitor (first touch in this tab), and the referring site's origin only.
+  var clean = function (v) { return String(v || '').replace(/[^A-Za-z0-9 _.\-+|]/g, '').slice(0, 100); };
+  var utm = {};
+  try { utm = JSON.parse(store.get('vi_utm') || 'null') || {}; } catch (e) { utm = {}; }
+  if (!utm.source && !utm.campaign) {
+    var q = new URLSearchParams(location.search);
+    ['source', 'medium', 'campaign', 'content'].forEach(function (k) { var v = clean(q.get('utm_' + k)); if (v) utm[k] = v; });
+    if (Object.keys(utm).length) store.set('vi_utm', JSON.stringify(utm));
+  }
+  var referrer = '';
+  try { if (document.referrer) { var r = new URL(document.referrer); if (r.host !== location.host) referrer = r.origin; } } catch (e) {}
+  if (!store.get('vi_ref') && referrer) store.set('vi_ref', referrer);
+
+  // Cloudflare's "are you human" check, only on the address the widget is registered for.
+  // Testers are never stuck: if the check errors, fails to load or gives no answer within 8 seconds,
+  // we say so and let the form send without a token (the server then applies a stricter limit).
+  var tsToken = '', tsWidget = null, tsFailed = false, tsTimer = null;
+  var TS_FAIL_MSG = 'The “are you human” check could not load. You can still join with the button below.';
+  function say(text, kind) { msg.textContent = text; msg.className = 'msg' + (kind ? ' ' + kind : ''); }
+  function tsGiveUp() {
+    if (tsFailed || tsToken) return;
+    tsFailed = true; clearTimeout(tsTimer);
+    if (!busy) say(TS_FAIL_MSG);
+  }
+  function tsOn() { return TS_HOSTS.indexOf(location.hostname) > -1 || window.__vi_captcha_force === true; }
+  function tsRender() {
+    if (!tsOn() || tsWidget !== null || !window.turnstile) return;
+    tsWidget = window.turnstile.render('#cf-box', { sitekey: TS_KEY, theme: isLight() ? 'light' : 'dark',
+      callback: function (t) { tsToken = t; tsFailed = false; clearTimeout(tsTimer); },
+      'expired-callback': function () { tsToken = ''; },
+      'error-callback': function () { tsToken = ''; tsGiveUp(); } });
+  }
+  if (tsOn()) {
+    window.viTsLoaded = tsRender;
+    tsTimer = setTimeout(tsGiveUp, 8000);
+    var s = document.createElement('script'); s.async = true; s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=viTsLoaded&render=explicit';
+    s.onerror = tsGiveUp;
+    document.head.appendChild(s);
+  }
+
+  var busy = false;
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (busy) return;
+    var email = document.getElementById('email').value.trim();
+    if (!EMAIL_RE.test(email) || email.length > 254) { say('Please check your email address. It doesn’t look complete.', 'err'); document.getElementById('email').focus(); return; }
+    if (tsOn() && !tsToken && !tsFailed) { say('One moment. The “are you human” check is still running. Try again in a few seconds.', 'err'); return; }
+    busy = true; btn.disabled = true; say('Sending…');
+    var ctrl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 15000);
+    fetch(FN_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, signal: ctrl ? ctrl.signal : undefined,
+      body: JSON.stringify({ action: 'join', email: email, testing: document.getElementById('testing').checked, marketing: document.getElementById('marketing').checked,
+        consentVersion: CONSENT_VERSION, source: /sign-up/.test(location.pathname) ? 'sign-up' : 'home', utm: utm, referrer: store.get('vi_ref') || referrer, captchaToken: tsToken })
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (b) { return { s: res.status, b: b }; });
+    }).then(function (r) {
+      clearTimeout(timer);
+      if (r.s === 200 && r.b.success) {
+        var parts = email.split('@'); store.set('vi_join_to', parts[0].slice(0, 2) + '…@' + parts[1]);
+        location.href = 'sign-up/thanks';
+        return;
+      }
+      if (r.s === 400) say('Please check your email address. It doesn’t look right.', 'err');
+      else if (r.s === 429) say('Too many tries from here for now. Please wait ' + Math.max(1, Math.ceil((r.b.retryAfter || 600) / 60)) + ' minutes and try again.', 'err');
+      else if (r.s === 403) say('The “are you human” check didn’t pass. Please try again.', 'err');
+      else say('Sorry, that didn’t go through and nothing was saved. Please try again, or email hello@vault-it.co.', 'err');
+      throw 0;
+    }).catch(function (err) {
+      clearTimeout(timer);
+      if (err !== 0) say('Sorry, we couldn’t reach the server and nothing was saved. Please check your connection and try again.', 'err');
+      busy = false; btn.disabled = false;
+      if (tsWidget !== null && window.turnstile) { try { window.turnstile.reset(tsWidget); } catch (e) {} tsToken = ''; }
+    });
+  });
+})();
+</script>
+</body>
+</html>

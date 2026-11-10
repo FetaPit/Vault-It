@@ -1,8 +1,8 @@
-# Vault·It — Claude Code Handover
+# Vault-It — Claude Code Handover
 ## v0.3 Alpha · Ready for GitHub · FetaPit/Pareto-/Vault-It/
 
 **Owner:** Pete Thickett (FetaPit)  
-**Product:** Vault·It — Personal finance app. Mission: get the average person in debt to owning their home outright.  
+**Product:** Vault-It — Personal finance app. Mission: get the average person in debt to owning their home outright.  
 **Repo target:** `github.com/FetaPit/Pareto-` → subfolder `Vault-It/`  
 **Deploy:** GitHub Pages (`index.html` at root of subfolder)  
 **Date:** 27 May 2026  
@@ -264,6 +264,6 @@ Vault-It/
 
 ---
 
-*Vault·It v0.3 Alpha · PT Live Design · 27 May 2026*  
+*Vault-It v0.3 Alpha · PT Live Design · 27 May 2026*  
 *Single file · 9,083 lines · 275 functions · 8 tabs · localStorage only*  
 *Mission: From debt to owning your home outright.*

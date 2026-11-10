@@ -1,0 +1,1660 @@
+{
+ "generated": "2026-11-03T14:55:19.883Z",
+ "source": "https://poly.pizza",
+ "set": "cars",
+ "maxTris": 20000,
+ "found": 37,
+ "standins": 29,
+ "misses": [
+  {
+   "rank": 3,
+   "item": "Vauxhall Corsa",
+   "terms": [
+    "vauxhall corsa",
+    "opel corsa",
+    "corsa",
+    "small car",
+    "city car",
+    "compact car"
+   ],
+   "reason": "rejected on review (VIP Susanne's car)"
+  },
+  {
+   "rank": 4,
+   "item": "Ford Focus",
+   "terms": [
+    "ford focus",
+    "focus rs",
+    "family car",
+    "hatchback",
+    "sedan"
+   ],
+   "reason": "rejected on review (Broken Car)"
+  },
+  {
+   "rank": 8,
+   "item": "MINI Cooper",
+   "terms": [
+    "mini cooper",
+    "mini",
+    "classic mini",
+    "small car",
+    "hatchback"
+   ],
+   "reason": "rejected on review (Minion A)"
+  },
+  {
+   "rank": 14,
+   "item": "Fiat 500",
+   "terms": [
+    "fiat 500",
+    "fiat500",
+    "city car",
+    "mini car",
+    "small car"
+   ],
+   "reason": "rejected on review (Small Ship)"
+  },
+  {
+   "rank": 15,
+   "item": "Nissan Juke",
+   "terms": [
+    "nissan juke",
+    "juke",
+    "crossover",
+    "small suv",
+    "suv"
+   ]
+  },
+  {
+   "rank": 17,
+   "item": "Ford Kuga",
+   "terms": [
+    "ford kuga",
+    "kuga",
+    "suv",
+    "crossover",
+    "suv car"
+   ]
+  },
+  {
+   "rank": 18,
+   "item": "Honda Jazz",
+   "terms": [
+    "honda jazz",
+    "honda fit",
+    "mini van",
+    "small car",
+    "hatchback"
+   ],
+   "reason": "rejected on review (Van)"
+  },
+  {
+   "rank": 19,
+   "item": "Volkswagen Tiguan",
+   "terms": [
+    "volkswagen tiguan",
+    "vw tiguan",
+    "suv",
+    "crossover",
+    "suv car"
+   ]
+  },
+  {
+   "rank": 21,
+   "item": "Toyota Aygo",
+   "terms": [
+    "toyota aygo",
+    "aygo",
+    "city car",
+    "mini car",
+    "small car"
+   ],
+   "reason": "rejected on review (Caravan)"
+  },
+  {
+   "rank": 25,
+   "item": "Vauxhall Mokka",
+   "terms": [
+    "vauxhall mokka",
+    "mokka",
+    "small suv",
+    "crossover",
+    "suv"
+   ]
+  },
+  {
+   "rank": 32,
+   "item": "Land Rover Discovery",
+   "terms": [
+    "land rover discovery",
+    "offroad suv",
+    "4x4",
+    "suv"
+   ]
+  },
+  {
+   "rank": 33,
+   "item": "Range Rover Evoque",
+   "terms": [
+    "range rover evoque",
+    "evoque",
+    "suv",
+    "crossover",
+    "luxury suv"
+   ]
+  },
+  {
+   "rank": 34,
+   "item": "Audi A4",
+   "terms": [
+    "audi a4",
+    "sedan",
+    "executive car",
+    "premium car"
+   ],
+   "reason": "rejected on review (Executive Chair)"
+  },
+  {
+   "rank": 36,
+   "item": "Skoda Octavia",
+   "terms": [
+    "skoda octavia",
+    "octavia",
+    "estate car",
+    "sedan",
+    "hatchback"
+   ],
+   "reason": "rejected on review (House & Car)"
+  },
+  {
+   "rank": 37,
+   "item": "Skoda Fabia",
+   "terms": [
+    "skoda fabia",
+    "fabia",
+    "small car",
+    "hatchback"
+   ]
+  },
+  {
+   "rank": 38,
+   "item": "Seat Ibiza",
+   "terms": [
+    "seat ibiza",
+    "ibiza",
+    "small car",
+    "hatchback"
+   ]
+  },
+  {
+   "rank": 39,
+   "item": "Citroen C3",
+   "terms": [
+    "citroen c3",
+    "citroen",
+    "small car",
+    "hatchback"
+   ]
+  },
+  {
+   "rank": 41,
+   "item": "Tesla Model Y",
+   "terms": [
+    "tesla model y",
+    "tesla",
+    "electric suv",
+    "electric car",
+    "ev"
+   ],
+   "reason": "rejected on review (Golf cart)"
+  },
+  {
+   "rank": 42,
+   "item": "Nissan Leaf",
+   "terms": [
+    "nissan leaf",
+    "electric car",
+    "ev car",
+    "small car"
+   ],
+   "reason": "rejected on review (Golf cart)"
+  },
+  {
+   "rank": 44,
+   "item": "Toyota RAV4",
+   "terms": [
+    "toyota rav4",
+    "rav4",
+    "suv",
+    "crossover",
+    "suv car"
+   ]
+  },
+  {
+   "rank": 45,
+   "item": "Toyota Corolla",
+   "terms": [
+    "toyota corolla",
+    "corolla",
+    "sedan",
+    "hatchback",
+    "family car"
+   ]
+  },
+  {
+   "rank": 46,
+   "item": "Honda Civic",
+   "terms": [
+    "honda civic",
+    "civic type r",
+    "hatchback",
+    "sports hatch",
+    "sedan"
+   ],
+   "reason": "rejected on review (Sportster)"
+  },
+  {
+   "rank": 47,
+   "item": "Honda CR-V",
+   "terms": [
+    "honda cr-v",
+    "honda crv",
+    "suv",
+    "crossover"
+   ]
+  },
+  {
+   "rank": 48,
+   "item": "Mazda MX-5",
+   "terms": [
+    "mazda mx-5",
+    "mazda miata",
+    "mx5",
+    "miata",
+    "roadster",
+    "convertible",
+    "sports car"
+   ],
+   "reason": "rejected on review (Sports Car Armored)"
+  },
+  {
+   "rank": 49,
+   "item": "Kia Picanto",
+   "terms": [
+    "kia picanto",
+    "city car",
+    "mini car"
+   ]
+  },
+  {
+   "rank": 50,
+   "item": "Peugeot 3008",
+   "terms": [
+    "peugeot 3008",
+    "suv",
+    "crossover"
+   ]
+  },
+  {
+   "rank": 51,
+   "item": "Renault Captur",
+   "terms": [
+    "renault captur",
+    "small suv",
+    "crossover"
+   ]
+  },
+  {
+   "rank": 52,
+   "item": "Dacia Sandero",
+   "terms": [
+    "dacia sandero",
+    "small car",
+    "hatchback"
+   ]
+  },
+  {
+   "rank": 53,
+   "item": "Volvo XC90",
+   "terms": [
+    "volvo xc90",
+    "volvo xc60",
+    "large suv",
+    "suv",
+    "luxury suv"
+   ]
+  },
+  {
+   "rank": 54,
+   "item": "Volvo V40",
+   "terms": [
+    "volvo v40",
+    "volvo v70",
+    "estate car",
+    "hatchback"
+   ]
+  },
+  {
+   "rank": 55,
+   "item": "Jaguar XF",
+   "terms": [
+    "jaguar xf",
+    "jaguar xe",
+    "jaguar",
+    "sedan",
+    "luxury car"
+   ],
+   "reason": "rejected on review (Jaguar)"
+  },
+  {
+   "rank": 57,
+   "item": "Range Rover",
+   "terms": [
+    "range rover",
+    "range rover sport",
+    "luxury suv",
+    "4x4",
+    "suv"
+   ]
+  },
+  {
+   "rank": 58,
+   "item": "Mercedes-Benz GLC",
+   "terms": [
+    "mercedes glc",
+    "mercedes gla",
+    "suv",
+    "luxury suv"
+   ]
+  },
+  {
+   "rank": 59,
+   "item": "BMW X5",
+   "terms": [
+    "bmw x5",
+    "bmw x3",
+    "bmw x1",
+    "suv",
+    "luxury suv"
+   ]
+  },
+  {
+   "rank": 60,
+   "item": "Audi Q5",
+   "terms": [
+    "audi q5",
+    "audi q3",
+    "suv",
+    "crossover"
+   ]
+  },
+  {
+   "rank": 64,
+   "item": "Ford Mustang",
+   "terms": [
+    "ford mustang",
+    "mustang gt",
+    "mustang",
+    "muscle car",
+    "sports car"
+   ]
+  },
+  {
+   "rank": 65,
+   "item": "Audi TT",
+   "terms": [
+    "audi tt",
+    "coupe",
+    "sports car"
+   ]
+  },
+  {
+   "rank": 66,
+   "item": "BMW M3",
+   "terms": [
+    "bmw m3",
+    "bmw m4",
+    "bmw m5",
+    "sports sedan",
+    "sports car"
+   ]
+  },
+  {
+   "rank": 67,
+   "item": "Mercedes-AMG GT",
+   "terms": [
+    "mercedes amg gt",
+    "amg gt",
+    "mercedes amg",
+    "supercar",
+    "sports car"
+   ]
+  },
+  {
+   "rank": 68,
+   "item": "Porsche 911",
+   "terms": [
+    "porsche 911",
+    "porsche carrera",
+    "911 turbo",
+    "porsche",
+    "sports car",
+    "supercar",
+    "coupe"
+   ]
+  },
+  {
+   "rank": 69,
+   "item": "Porsche Cayenne",
+   "terms": [
+    "porsche cayenne",
+    "porsche macan",
+    "luxury suv",
+    "suv"
+   ]
+  },
+  {
+   "rank": 71,
+   "item": "Jaguar F-Type",
+   "terms": [
+    "jaguar f-type",
+    "jaguar f type",
+    "sports car",
+    "coupe"
+   ]
+  },
+  {
+   "rank": 72,
+   "item": "Nissan GT-R",
+   "terms": [
+    "nissan gt-r",
+    "nissan gtr",
+    "skyline",
+    "sports car",
+    "supercar"
+   ],
+   "reason": "rejected on review (Quick City Skyline)"
+  },
+  {
+   "rank": 73,
+   "item": "Subaru Impreza",
+   "terms": [
+    "subaru impreza",
+    "subaru wrx",
+    "impreza wrx",
+    "rally car",
+    "sports sedan"
+   ]
+  },
+  {
+   "rank": 74,
+   "item": "Mitsubishi Lancer Evo",
+   "terms": [
+    "mitsubishi lancer evolution",
+    "lancer evo",
+    "rally car",
+    "sports sedan"
+   ]
+  },
+  {
+   "rank": 77,
+   "item": "Aston Martin Vantage",
+   "terms": [
+    "aston martin vantage",
+    "aston martin",
+    "sports car",
+    "supercar"
+   ]
+  },
+  {
+   "rank": 78,
+   "item": "Bentley Continental GT",
+   "terms": [
+    "bentley continental",
+    "bentley",
+    "luxury car",
+    "grand tourer",
+    "coupe"
+   ]
+  },
+  {
+   "rank": 81,
+   "item": "Lamborghini Huracan",
+   "terms": [
+    "lamborghini huracan",
+    "lamborghini aventador",
+    "lamborghini",
+    "supercar",
+    "sports car"
+   ]
+  },
+  {
+   "rank": 82,
+   "item": "McLaren 720S",
+   "terms": [
+    "mclaren 720s",
+    "mclaren p1",
+    "mclaren",
+    "supercar",
+    "hypercar"
+   ]
+  },
+  {
+   "rank": 83,
+   "item": "Maserati Ghibli",
+   "terms": [
+    "maserati ghibli",
+    "maserati quattroporte",
+    "maserati",
+    "luxury sedan",
+    "sports car"
+   ]
+  },
+  {
+   "rank": 84,
+   "item": "Alfa Romeo Giulia",
+   "terms": [
+    "alfa romeo giulia",
+    "alfa romeo giulietta",
+    "alfa romeo",
+    "sports sedan",
+    "hatchback"
+   ]
+  },
+  {
+   "rank": 85,
+   "item": "Morgan Plus 4",
+   "terms": [
+    "morgan plus 4",
+    "morgan",
+    "classic roadster",
+    "vintage car"
+   ]
+  },
+  {
+   "rank": 86,
+   "item": "Mini (classic 1959)",
+   "terms": [
+    "classic mini",
+    "austin mini",
+    "mini cooper classic",
+    "vintage car",
+    "small car"
+   ]
+  },
+  {
+   "rank": 88,
+   "item": "VW Camper Van (T2)",
+   "terms": [
+    "vw camper",
+    "volkswagen camper",
+    "vw t1",
+    "vw type 2",
+    "hippie van",
+    "camper van"
+   ],
+   "reason": "rejected on review (Caravan)"
+  },
+  {
+   "rank": 89,
+   "item": "Jaguar E-Type",
+   "terms": [
+    "jaguar e-type",
+    "jaguar e type",
+    "classic sports car",
+    "vintage car",
+    "roadster"
+   ]
+  },
+  {
+   "rank": 90,
+   "item": "MG MGB",
+   "terms": [
+    "mgb",
+    "mg roadster",
+    "mg midget",
+    "classic roadster",
+    "vintage car"
+   ]
+  },
+  {
+   "rank": 91,
+   "item": "Triumph Spitfire",
+   "terms": [
+    "triumph spitfire",
+    "triumph tr6",
+    "triumph",
+    "classic roadster",
+    "vintage car"
+   ]
+  },
+  {
+   "rank": 92,
+   "item": "Ford Escort Mk2",
+   "terms": [
+    "ford escort",
+    "ford capri",
+    "ford cortina",
+    "classic car",
+    "rally car",
+    "vintage car"
+   ]
+  },
+  {
+   "rank": 93,
+   "item": "Ford GT40",
+   "terms": [
+    "ford gt40",
+    "ford gt",
+    "race car",
+    "classic sports car",
+    "supercar"
+   ],
+   "reason": "rejected on review (Race Track)"
+  },
+  {
+   "rank": 94,
+   "item": "Chevrolet Corvette",
+   "terms": [
+    "chevrolet corvette",
+    "corvette stingray",
+    "corvette",
+    "sports car",
+    "muscle car"
+   ]
+  },
+  {
+   "rank": 98,
+   "item": "Fiat 500 (classic)",
+   "terms": [
+    "classic fiat 500",
+    "fiat 500 vintage",
+    "fiat nuova 500",
+    "vintage car",
+    "small car"
+   ]
+  },
+  {
+   "rank": 99,
+   "item": "Citroen 2CV",
+   "terms": [
+    "citroen 2cv",
+    "2cv",
+    "vintage car",
+    "classic car",
+    "small car"
+   ]
+  },
+  {
+   "rank": 100,
+   "item": "Land Rover Series (classic)",
+   "terms": [
+    "land rover series",
+    "land rover series 2",
+    "land rover series iii",
+    "vintage jeep",
+    "offroad truck"
+   ],
+   "reason": "rejected on review (Space Truck)"
+  }
+ ],
+ "models": [
+  {
+   "set": "cars",
+   "rank": 1,
+   "item": "Ford Fiesta",
+   "slug": "cars-ford-fiesta",
+   "kind": "Supermini",
+   "group": "cars",
+   "query": "hatchback",
+   "standin": true,
+   "standinFor": "Ford Fiesta",
+   "match": "stand-in",
+   "id": "BG0KAhmGDt",
+   "title": "Car Hatchback",
+   "licence": "CC0 1.0",
+   "attribution": "\"Car Hatchback\" by Kay Lousberg, https://poly.pizza/m/BG0KAhmGDt. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Kay Lousberg",
+   "tris": 1194,
+   "tags": [
+    "Car",
+    "Vehicle",
+    "Sedan"
+   ],
+   "download": "https://static.poly.pizza/7dc33135-12c6-4de4-b5f9-cf445fd35994.glb",
+   "thumbnail": "https://static.poly.pizza/7dc33135-12c6-4de4-b5f9-cf445fd35994.webp",
+   "source": "https://poly.pizza/m/BG0KAhmGDt"
+  },
+  {
+   "set": "cars",
+   "rank": 2,
+   "item": "Volkswagen Golf",
+   "slug": "cars-volkswagen-golf",
+   "kind": "Small family",
+   "group": "cars",
+   "query": "hatchback",
+   "standin": true,
+   "standinFor": "Volkswagen Golf",
+   "match": "stand-in",
+   "id": "DobtD8JyoW",
+   "title": "Sports Hatchback",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Sports Hatchback\" by ReppenThe303, https://poly.pizza/m/DobtD8JyoW. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "ReppenThe303",
+   "tris": 18302,
+   "tags": [
+    "vehicle",
+    "car",
+    "hatchback",
+    "mazda",
+    "sports car",
+    "drifting car",
+    "stylized "
+   ],
+   "download": "https://static.poly.pizza/61b05999-8b17-4af1-a70c-8725e822f1e5.glb",
+   "thumbnail": "https://static.poly.pizza/61b05999-8b17-4af1-a70c-8725e822f1e5.webp",
+   "source": "https://poly.pizza/m/DobtD8JyoW"
+  },
+  {
+   "set": "cars",
+   "rank": 5,
+   "item": "Nissan Qashqai",
+   "slug": "cars-nissan-qashqai",
+   "kind": "Family SUV",
+   "group": "cars",
+   "query": "suv",
+   "standin": true,
+   "standinFor": "Nissan Qashqai",
+   "match": "stand-in",
+   "id": "xsMtZhBkxL",
+   "title": "SUV",
+   "licence": "CC0 1.0",
+   "attribution": "\"SUV\" by Quaternius, https://poly.pizza/m/xsMtZhBkxL. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 2444,
+   "tags": [
+    "Sedan",
+    "Car",
+    "Vehicle",
+    "Transportation"
+   ],
+   "download": "https://static.poly.pizza/e5fbf2ee-5c9e-47d5-8ab6-80cacd463baa.glb",
+   "thumbnail": "https://static.poly.pizza/e5fbf2ee-5c9e-47d5-8ab6-80cacd463baa.webp",
+   "source": "https://poly.pizza/m/xsMtZhBkxL"
+  },
+  {
+   "set": "cars",
+   "rank": 6,
+   "item": "Volkswagen Polo",
+   "slug": "cars-volkswagen-polo",
+   "kind": "Supermini",
+   "group": "cars",
+   "query": "mini car",
+   "standin": true,
+   "standinFor": "Volkswagen Polo",
+   "match": "stand-in",
+   "id": "eNH2gURnsVB",
+   "title": "Mini Car !",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Mini Car !\" by Romain Revert, https://poly.pizza/m/eNH2gURnsVB. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Romain Revert",
+   "tris": 3570,
+   "tags": [
+    "cam",
+    "van",
+    "toy"
+   ],
+   "download": "https://static.poly.pizza/2a595da2-5c86-4b00-965e-b7fe783eff0c.glb",
+   "thumbnail": "https://static.poly.pizza/2a595da2-5c86-4b00-965e-b7fe783eff0c.webp",
+   "source": "https://poly.pizza/m/eNH2gURnsVB"
+  },
+  {
+   "set": "cars",
+   "rank": 7,
+   "item": "Toyota Yaris",
+   "slug": "cars-toyota-yaris",
+   "kind": "Supermini",
+   "group": "cars",
+   "query": "city car",
+   "standin": true,
+   "standinFor": "Toyota Yaris",
+   "match": "stand-in",
+   "id": "OyqKvX9xNh",
+   "title": "Sports Car",
+   "licence": "CC0 1.0",
+   "attribution": "\"Sports Car\" by Quaternius, https://poly.pizza/m/OyqKvX9xNh. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 2216,
+   "tags": [
+    "Car",
+    "Vehicle"
+   ],
+   "download": "https://static.poly.pizza/e6410e19-a88f-4158-bc91-c19fccf85028.glb",
+   "thumbnail": "https://static.poly.pizza/e6410e19-a88f-4158-bc91-c19fccf85028.webp",
+   "source": "https://poly.pizza/m/OyqKvX9xNh"
+  },
+  {
+   "set": "cars",
+   "rank": 9,
+   "item": "Vauxhall Astra",
+   "slug": "cars-vauxhall-astra",
+   "kind": "Small family",
+   "group": "cars",
+   "query": "family car",
+   "standin": true,
+   "standinFor": "Vauxhall Astra",
+   "match": "stand-in",
+   "id": "Cz6yDaUcM9",
+   "title": "Car",
+   "licence": "CC0 1.0",
+   "attribution": "\"Car\" by Quaternius, https://poly.pizza/m/Cz6yDaUcM9. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 2102,
+   "tags": [
+    "Sedan",
+    "Car"
+   ],
+   "download": "https://static.poly.pizza/59a67a6c-490e-472e-bae6-5a4d2541f1c7.glb",
+   "thumbnail": "https://static.poly.pizza/59a67a6c-490e-472e-bae6-5a4d2541f1c7.webp",
+   "source": "https://poly.pizza/m/Cz6yDaUcM9"
+  },
+  {
+   "set": "cars",
+   "rank": 10,
+   "item": "BMW 3 Series",
+   "slug": "cars-bmw-3-series",
+   "kind": "Executive",
+   "group": "cars",
+   "query": "executive car",
+   "standin": true,
+   "standinFor": "BMW 3 Series",
+   "match": "stand-in",
+   "id": "1mkmFkAz5v",
+   "title": "Sports Car",
+   "licence": "CC0 1.0",
+   "attribution": "\"Sports Car\" by Quaternius, https://poly.pizza/m/1mkmFkAz5v. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 2298,
+   "tags": [
+    "Car"
+   ],
+   "download": "https://static.poly.pizza/34db1344-31cc-49ac-bc46-c055f68e39ca.glb",
+   "thumbnail": "https://static.poly.pizza/34db1344-31cc-49ac-bc46-c055f68e39ca.webp",
+   "source": "https://poly.pizza/m/1mkmFkAz5v"
+  },
+  {
+   "set": "cars",
+   "rank": 11,
+   "item": "Audi A3",
+   "slug": "cars-audi-a3",
+   "kind": "Small family",
+   "group": "cars",
+   "query": "premium car",
+   "standin": true,
+   "standinFor": "Audi A3",
+   "match": "stand-in",
+   "id": "Gzj704DXdr",
+   "title": "Sports Car",
+   "licence": "CC0 1.0",
+   "attribution": "\"Sports Car\" by Quaternius, https://poly.pizza/m/Gzj704DXdr. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 3890,
+   "tags": [
+    "Car",
+    "Vehicle",
+    "Yellow"
+   ],
+   "download": "https://static.poly.pizza/1847cc66-801a-42fd-9a87-47e86c7a5435.glb",
+   "thumbnail": "https://static.poly.pizza/1847cc66-801a-42fd-9a87-47e86c7a5435.webp",
+   "source": "https://poly.pizza/m/Gzj704DXdr"
+  },
+  {
+   "set": "cars",
+   "rank": 12,
+   "item": "BMW 1 Series",
+   "slug": "cars-bmw-1-series",
+   "kind": "Small family",
+   "group": "cars",
+   "query": "compact car",
+   "standin": true,
+   "standinFor": "BMW 1 Series",
+   "match": "stand-in",
+   "id": "e9mZ3KfkO6l",
+   "title": "Car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Car\" by Ray Alez, https://poly.pizza/m/e9mZ3KfkO6l. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Ray Alez",
+   "tris": 2930,
+   "tags": [
+    "auto",
+    "automobile"
+   ],
+   "download": "https://static.poly.pizza/cac03da0-fd82-405d-8deb-5ec6554deb40.glb",
+   "thumbnail": "https://static.poly.pizza/cac03da0-fd82-405d-8deb-5ec6554deb40.webp",
+   "source": "https://poly.pizza/m/e9mZ3KfkO6l"
+  },
+  {
+   "set": "cars",
+   "rank": 13,
+   "item": "Kia Sportage",
+   "slug": "cars-kia-sportage",
+   "kind": "Family SUV",
+   "group": "cars",
+   "query": "suv car",
+   "standin": true,
+   "standinFor": "Kia Sportage",
+   "match": "stand-in",
+   "id": "5zUWP5UsLg-",
+   "title": "CAR Model",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"CAR Model\" by Ignition Labs, https://poly.pizza/m/5zUWP5UsLg-. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Ignition Labs",
+   "tris": 7396,
+   "tags": [
+    "lamborghini",
+    "sports car",
+    "racing"
+   ],
+   "download": "https://static.poly.pizza/f8c6bcd5-92a2-4f88-b821-64935a00216f.glb",
+   "thumbnail": "https://static.poly.pizza/f8c6bcd5-92a2-4f88-b821-64935a00216f.webp",
+   "source": "https://poly.pizza/m/5zUWP5UsLg-"
+  },
+  {
+   "set": "cars",
+   "rank": 16,
+   "item": "Mercedes-Benz A-Class",
+   "slug": "cars-mercedes-benz-a-class",
+   "kind": "Small family",
+   "group": "cars",
+   "query": "premium car",
+   "standin": true,
+   "standinFor": "Mercedes-Benz A-Class",
+   "match": "stand-in",
+   "id": "75h3mi6uHuC",
+   "title": "Car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Car\" by Poly by Google, https://poly.pizza/m/75h3mi6uHuC. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 2050,
+   "tags": [
+    "vehicle",
+    "automobile",
+    "driving"
+   ],
+   "download": "https://static.poly.pizza/0455317d-26c3-40cd-8a7d-de547ffdb9df.glb",
+   "thumbnail": "https://static.poly.pizza/0455317d-26c3-40cd-8a7d-de547ffdb9df.webp",
+   "source": "https://poly.pizza/m/75h3mi6uHuC"
+  },
+  {
+   "set": "cars",
+   "rank": 20,
+   "item": "Mercedes-Benz C-Class",
+   "slug": "cars-mercedes-benz-c-class",
+   "kind": "Executive",
+   "group": "cars",
+   "query": "executive car",
+   "standin": true,
+   "standinFor": "Mercedes-Benz C-Class",
+   "match": "stand-in",
+   "id": "Uj7i2vlmir",
+   "title": "Police Car",
+   "licence": "CC0 1.0",
+   "attribution": "\"Police Car\" by Kay Lousberg, https://poly.pizza/m/Uj7i2vlmir. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Kay Lousberg",
+   "tris": 1316,
+   "tags": [
+    "Police",
+    "Car",
+    "Emergency"
+   ],
+   "download": "https://static.poly.pizza/f4360b72-9d2a-4e62-b3ff-2b3e05f0254d.glb",
+   "thumbnail": "https://static.poly.pizza/f4360b72-9d2a-4e62-b3ff-2b3e05f0254d.webp",
+   "source": "https://poly.pizza/m/Uj7i2vlmir"
+  },
+  {
+   "set": "cars",
+   "rank": 22,
+   "item": "Hyundai i10",
+   "slug": "cars-hyundai-i10",
+   "kind": "City car",
+   "group": "cars",
+   "query": "small car",
+   "standin": true,
+   "standinFor": "Hyundai i10",
+   "match": "stand-in",
+   "id": "7h-gfgCLPVO",
+   "title": "Red Car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Red Car\" by Jarlan Perez, https://poly.pizza/m/7h-gfgCLPVO. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Jarlan Perez",
+   "tris": 5708,
+   "tags": [
+    "cab",
+    "auto"
+   ],
+   "download": "https://static.poly.pizza/46a7f18c-f3e4-4c27-addb-92d288d596d2.glb",
+   "thumbnail": "https://static.poly.pizza/46a7f18c-f3e4-4c27-addb-92d288d596d2.webp",
+   "source": "https://poly.pizza/m/7h-gfgCLPVO"
+  },
+  {
+   "set": "cars",
+   "rank": 23,
+   "item": "Renault Clio",
+   "slug": "cars-renault-clio",
+   "kind": "Supermini",
+   "group": "cars",
+   "query": "small car",
+   "standin": true,
+   "standinFor": "Renault Clio",
+   "match": "stand-in",
+   "id": "Uap8uBrkU8",
+   "title": "Car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Car\" by iloem, https://poly.pizza/m/Uap8uBrkU8. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "iloem",
+   "tris": 2300,
+   "tags": [
+    "Car"
+   ],
+   "download": "https://static.poly.pizza/e4cc82be-5c53-4718-b6dd-59f49eda3d30.glb",
+   "thumbnail": "https://static.poly.pizza/e4cc82be-5c53-4718-b6dd-59f49eda3d30.webp",
+   "source": "https://poly.pizza/m/Uap8uBrkU8"
+  },
+  {
+   "set": "cars",
+   "rank": 24,
+   "item": "Peugeot 208",
+   "slug": "cars-peugeot-208",
+   "kind": "Supermini",
+   "group": "cars",
+   "query": "small car",
+   "standin": true,
+   "standinFor": "Peugeot 208",
+   "match": "stand-in",
+   "id": "7tPSW5UYD20",
+   "title": "80s Car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"80s Car\" by Nick Ladd, https://poly.pizza/m/7tPSW5UYD20. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Nick Ladd",
+   "tris": 3735,
+   "tags": [
+    "car"
+   ],
+   "download": "https://static.poly.pizza/31c953b7-83c1-4b89-8a6b-08615e0a6567.glb",
+   "thumbnail": "https://static.poly.pizza/31c953b7-83c1-4b89-8a6b-08615e0a6567.webp",
+   "source": "https://poly.pizza/m/7tPSW5UYD20"
+  },
+  {
+   "set": "cars",
+   "rank": 26,
+   "item": "Audi A1",
+   "slug": "cars-audi-a1",
+   "kind": "Supermini",
+   "group": "cars",
+   "query": "premium car",
+   "standin": true,
+   "standinFor": "Audi A1",
+   "match": "stand-in",
+   "id": "HQ0hvRM2XR",
+   "title": "Car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Car\" by Quaternius, https://poly.pizza/m/HQ0hvRM2XR. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Quaternius",
+   "tris": 2854,
+   "tags": [
+    "car"
+   ],
+   "download": "https://static.poly.pizza/098ec278-73b6-4ef8-a825-338cb06b675f.glb",
+   "thumbnail": "https://static.poly.pizza/098ec278-73b6-4ef8-a825-338cb06b675f.webp",
+   "source": "https://poly.pizza/m/HQ0hvRM2XR"
+  },
+  {
+   "set": "cars",
+   "rank": 27,
+   "item": "Vauxhall Insignia",
+   "slug": "cars-vauxhall-insignia",
+   "kind": "Executive",
+   "group": "cars",
+   "query": "saloon car",
+   "standin": true,
+   "standinFor": "Vauxhall Insignia",
+   "match": "stand-in",
+   "id": "EMcTJiXibv",
+   "title": "Racing car",
+   "licence": "CC0 1.0",
+   "attribution": "\"Racing car\" by scaranto, https://poly.pizza/m/EMcTJiXibv. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "scaranto",
+   "tris": 1120,
+   "tags": [
+    "race car",
+    "racer",
+    "touring car",
+    "crime car",
+    "hire car"
+   ],
+   "download": "https://static.poly.pizza/4eff7c3a-3821-4951-8377-c1a0c7c3a733.glb",
+   "thumbnail": "https://static.poly.pizza/4eff7c3a-3821-4951-8377-c1a0c7c3a733.webp",
+   "source": "https://poly.pizza/m/EMcTJiXibv"
+  },
+  {
+   "set": "cars",
+   "rank": 28,
+   "item": "Ford Transit",
+   "slug": "cars-ford-transit",
+   "kind": "Van",
+   "group": "cars",
+   "query": "van",
+   "standin": true,
+   "standinFor": "Ford Transit",
+   "match": "stand-in",
+   "id": "BbRojf2v3H",
+   "title": "Generic Van",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Generic Van\" by PuKkBuMXDD, https://poly.pizza/m/BbRojf2v3H. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "PuKkBuMXDD",
+   "tris": 2423,
+   "tags": [
+    "racing",
+    "race",
+    "van",
+    "car",
+    "vehicle",
+    "game"
+   ],
+   "download": "https://static.poly.pizza/233b6797-9ce6-4369-8458-0b7fe16444ef.glb",
+   "thumbnail": "https://static.poly.pizza/233b6797-9ce6-4369-8458-0b7fe16444ef.webp",
+   "source": "https://poly.pizza/m/BbRojf2v3H"
+  },
+  {
+   "set": "cars",
+   "rank": 29,
+   "item": "Ford Transit Custom",
+   "slug": "cars-ford-transit-custom",
+   "kind": "Van",
+   "group": "cars",
+   "query": "van",
+   "standin": true,
+   "standinFor": "Ford Transit Custom",
+   "match": "stand-in",
+   "id": "akcsFuPMt3b",
+   "title": "Van",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Van\" by Poly by Google, https://poly.pizza/m/akcsFuPMt3b. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 5434,
+   "tags": [
+    "vehicle",
+    "car",
+    "automobile"
+   ],
+   "download": "https://static.poly.pizza/e573341b-c2f3-4cc5-b0e9-73b293725b63.glb",
+   "thumbnail": "https://static.poly.pizza/e573341b-c2f3-4cc5-b0e9-73b293725b63.webp",
+   "source": "https://poly.pizza/m/akcsFuPMt3b"
+  },
+  {
+   "set": "cars",
+   "rank": 30,
+   "item": "Volkswagen Transporter",
+   "slug": "cars-volkswagen-transporter",
+   "kind": "Van",
+   "group": "cars",
+   "query": "van",
+   "standin": true,
+   "standinFor": "Volkswagen Transporter",
+   "match": "stand-in",
+   "id": "9hUUD2DWk1v",
+   "title": "Van",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Van\" by jeremy, https://poly.pizza/m/9hUUD2DWk1v. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "jeremy",
+   "tris": 3814,
+   "tags": [
+    "automobile",
+    "car",
+    "wagon",
+    "",
+    "vehicle"
+   ],
+   "download": "https://static.poly.pizza/3f2dc62d-0f61-4bfc-bb36-5bf5c7d70305.glb",
+   "thumbnail": "https://static.poly.pizza/3f2dc62d-0f61-4bfc-bb36-5bf5c7d70305.webp",
+   "source": "https://poly.pizza/m/9hUUD2DWk1v"
+  },
+  {
+   "set": "cars",
+   "rank": 31,
+   "item": "Mercedes-Benz E-Class",
+   "slug": "cars-mercedes-benz-e-class",
+   "kind": "Executive",
+   "group": "cars",
+   "query": "luxury car",
+   "standin": true,
+   "standinFor": "Mercedes-Benz E-Class",
+   "match": "stand-in",
+   "id": "dVLJ5CjB0h",
+   "title": "Red Car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Red Car\" by J-Toastie, https://poly.pizza/m/dVLJ5CjB0h. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "J-Toastie",
+   "tris": 1688,
+   "tags": [
+    "Car",
+    "Red",
+    "Red Car"
+   ],
+   "download": "https://static.poly.pizza/a061b874-2c4d-4f08-8c6f-eb24bd8dfcb5.glb",
+   "thumbnail": "https://static.poly.pizza/a061b874-2c4d-4f08-8c6f-eb24bd8dfcb5.webp",
+   "source": "https://poly.pizza/m/dVLJ5CjB0h"
+  },
+  {
+   "set": "cars",
+   "rank": 35,
+   "item": "Seat Leon",
+   "slug": "cars-seat-leon",
+   "kind": "Small family",
+   "group": "cars",
+   "query": "compact car",
+   "standin": true,
+   "standinFor": "Seat Leon",
+   "match": "stand-in",
+   "id": "cvKjiD6ysLh",
+   "title": "Car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Car\" by Poly by Google, https://poly.pizza/m/cvKjiD6ysLh. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 2152,
+   "tags": [
+    "car",
+    "vehicle",
+    "auto",
+    "automobile"
+   ],
+   "download": "https://static.poly.pizza/95eb6e6f-6cfc-4b11-967d-c82ae26ecbb7.glb",
+   "thumbnail": "https://static.poly.pizza/95eb6e6f-6cfc-4b11-967d-c82ae26ecbb7.webp",
+   "source": "https://poly.pizza/m/cvKjiD6ysLh"
+  },
+  {
+   "set": "cars",
+   "rank": 40,
+   "item": "Tesla Model 3",
+   "slug": "cars-tesla-model-3",
+   "kind": "Electric",
+   "group": "cars",
+   "query": "electric car",
+   "standin": true,
+   "standinFor": "Tesla Model 3",
+   "match": "stand-in",
+   "id": "eRu2kPYOCa7",
+   "title": "Car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Car\" by Poly by Google, https://poly.pizza/m/eRu2kPYOCa7. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 2152,
+   "tags": [
+    "automobile",
+    "vehicle"
+   ],
+   "download": "https://static.poly.pizza/fe529cc7-70cc-4482-b26a-a6a8cee0edc7.glb",
+   "thumbnail": "https://static.poly.pizza/fe529cc7-70cc-4482-b26a-a6a8cee0edc7.webp",
+   "source": "https://poly.pizza/m/eRu2kPYOCa7"
+  },
+  {
+   "set": "cars",
+   "rank": 43,
+   "item": "Toyota Prius",
+   "slug": "cars-toyota-prius",
+   "kind": "Hybrid",
+   "group": "cars",
+   "query": "hybrid car",
+   "standin": true,
+   "standinFor": "Toyota Prius",
+   "match": "stand-in",
+   "id": "csi46jKTLGH",
+   "title": "Car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Car\" by Poly by Google, https://poly.pizza/m/csi46jKTLGH. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 14090,
+   "tags": [
+    "automotive",
+    "sedan",
+    "retro",
+    "automobile",
+    "drive"
+   ],
+   "download": "https://static.poly.pizza/e97ece02-d502-46af-86a4-faa73f28e38d.glb",
+   "thumbnail": "https://static.poly.pizza/e97ece02-d502-46af-86a4-faa73f28e38d.webp",
+   "source": "https://poly.pizza/m/csi46jKTLGH"
+  },
+  {
+   "set": "cars",
+   "rank": 56,
+   "item": "Land Rover Defender",
+   "slug": "cars-land-rover-defender",
+   "kind": "Large SUV",
+   "group": "cars",
+   "query": "jeep",
+   "standin": true,
+   "standinFor": "Land Rover Defender",
+   "match": "stand-in",
+   "id": "AcSdGGrgYP",
+   "title": "Jeep",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Jeep\" by Zsky, https://poly.pizza/m/AcSdGGrgYP. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Zsky",
+   "tris": 1930,
+   "tags": [
+    "Car",
+    "Transportation",
+    "Jeep"
+   ],
+   "download": "https://static.poly.pizza/1c0f14fb-d3db-41e8-941b-f10fb7aa9681.glb",
+   "thumbnail": "https://static.poly.pizza/1c0f14fb-d3db-41e8-941b-f10fb7aa9681.webp",
+   "source": "https://poly.pizza/m/AcSdGGrgYP"
+  },
+  {
+   "set": "cars",
+   "rank": 61,
+   "item": "Ford Ranger",
+   "slug": "cars-ford-ranger",
+   "kind": "Pickup",
+   "group": "cars",
+   "query": "pickup truck",
+   "standin": true,
+   "standinFor": "Ford Ranger",
+   "match": "stand-in",
+   "id": "qn4grQgHm8",
+   "title": "Pickup Truck",
+   "licence": "CC0 1.0",
+   "attribution": "\"Pickup Truck\" by Quaternius, https://poly.pizza/m/qn4grQgHm8. Licence at https://creativecommons.org/publicdomain/zero/1.0/",
+   "creator": "Quaternius",
+   "tris": 4160,
+   "tags": [
+    "Pickup Truck",
+    "Vehicle",
+    "Classic Car"
+   ],
+   "download": "https://static.poly.pizza/4e925a01-dbb8-4aab-848b-221306b835ea.glb",
+   "thumbnail": "https://static.poly.pizza/4e925a01-dbb8-4aab-848b-221306b835ea.webp",
+   "source": "https://poly.pizza/m/qn4grQgHm8"
+  },
+  {
+   "set": "cars",
+   "rank": 62,
+   "item": "Toyota Hilux",
+   "slug": "cars-toyota-hilux",
+   "kind": "Pickup",
+   "group": "cars",
+   "query": "toyota hilux",
+   "standin": false,
+   "match": "direct",
+   "id": "8-0nFArehjd",
+   "title": "Toyota Hilux 97",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Toyota Hilux 97\" by Muhammad Reyhan, https://poly.pizza/m/8-0nFArehjd. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Muhammad Reyhan",
+   "tris": 958,
+   "tags": [
+    "camry",
+    "car"
+   ],
+   "download": "https://static.poly.pizza/bf727d4a-f5ad-4b53-ac33-272a477d19f4.glb",
+   "thumbnail": "https://static.poly.pizza/bf727d4a-f5ad-4b53-ac33-272a477d19f4.webp",
+   "source": "https://poly.pizza/m/8-0nFArehjd"
+  },
+  {
+   "set": "cars",
+   "rank": 63,
+   "item": "Mitsubishi L200",
+   "slug": "cars-mitsubishi-l200",
+   "kind": "Pickup",
+   "group": "cars",
+   "query": "mitsubishi l200",
+   "standin": false,
+   "match": "direct",
+   "id": "4qjS9tFhsJg",
+   "title": "Mitsubishi L200",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Mitsubishi L200\" by Muhammad Reyhan, https://poly.pizza/m/4qjS9tFhsJg. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Muhammad Reyhan",
+   "tris": 2899,
+   "tags": [
+    "car",
+    "truck",
+    "ute"
+   ],
+   "download": "https://static.poly.pizza/ecae441a-cba8-4dd6-9795-207a72d7e88e.glb",
+   "thumbnail": "https://static.poly.pizza/ecae441a-cba8-4dd6-9795-207a72d7e88e.webp",
+   "source": "https://poly.pizza/m/4qjS9tFhsJg"
+  },
+  {
+   "set": "cars",
+   "rank": 70,
+   "item": "Porsche Boxster",
+   "slug": "cars-porsche-boxster",
+   "kind": "Sports",
+   "group": "cars",
+   "query": "convertible",
+   "standin": true,
+   "standinFor": "Porsche Boxster",
+   "match": "stand-in",
+   "id": "dggOiBLYyuR",
+   "title": "Convertible",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Convertible\" by Poly by Google, https://poly.pizza/m/dggOiBLYyuR. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 1671,
+   "tags": [
+    "car",
+    "vehicle"
+   ],
+   "download": "https://static.poly.pizza/c434a5e4-0232-4a96-a008-f1152ff6b4fa.glb",
+   "thumbnail": "https://static.poly.pizza/c434a5e4-0232-4a96-a008-f1152ff6b4fa.webp",
+   "source": "https://poly.pizza/m/dggOiBLYyuR"
+  },
+  {
+   "set": "cars",
+   "rank": 75,
+   "item": "Lotus Elise",
+   "slug": "cars-lotus-elise",
+   "kind": "Performance",
+   "group": "cars",
+   "query": "lotus",
+   "standin": false,
+   "match": "direct",
+   "id": "bunaVqCTDSZ",
+   "title": "Lotus",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Lotus\" by Nadja Haldimann, https://poly.pizza/m/bunaVqCTDSZ. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Nadja Haldimann",
+   "tris": 2304,
+   "tags": [
+    "egyptian water lily",
+    "genus lotus",
+    "indian lotus"
+   ],
+   "download": "https://static.poly.pizza/08350e3f-4f9a-475a-84c5-b90beed4efcc.glb",
+   "thumbnail": "https://static.poly.pizza/08350e3f-4f9a-475a-84c5-b90beed4efcc.webp",
+   "source": "https://poly.pizza/m/bunaVqCTDSZ"
+  },
+  {
+   "set": "cars",
+   "rank": 76,
+   "item": "Aston Martin DB5",
+   "slug": "cars-aston-martin-db5",
+   "kind": "Classic",
+   "group": "cars",
+   "query": "classic sports car",
+   "standin": true,
+   "standinFor": "Aston Martin DB5",
+   "match": "stand-in",
+   "id": "coSYdjhglCZ",
+   "title": "Retro car",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Retro car\" by Mark Joseph Sabaco, https://poly.pizza/m/coSYdjhglCZ. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Mark Joseph Sabaco",
+   "tris": 944,
+   "tags": [
+    "beetle",
+    "diner",
+    "neon"
+   ],
+   "download": "https://static.poly.pizza/122ab001-8dca-49f8-ba34-f7c88ed0a8a8.glb",
+   "thumbnail": "https://static.poly.pizza/122ab001-8dca-49f8-ba34-f7c88ed0a8a8.webp",
+   "source": "https://poly.pizza/m/coSYdjhglCZ"
+  },
+  {
+   "set": "cars",
+   "rank": 79,
+   "item": "Rolls-Royce Phantom",
+   "slug": "cars-rolls-royce-phantom",
+   "kind": "Luxury",
+   "group": "cars",
+   "query": "rolls royce",
+   "standin": false,
+   "match": "direct",
+   "id": "3DtJTlxgO_U",
+   "title": "Rolls Royce",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Rolls Royce\" by David Sirera, https://poly.pizza/m/3DtJTlxgO_U. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "David Sirera",
+   "tris": 1168,
+   "tags": [
+    "tyre",
+    "car"
+   ],
+   "download": "https://static.poly.pizza/1d9ec236-045a-44e6-8805-048378d618d8.glb",
+   "thumbnail": "https://static.poly.pizza/1d9ec236-045a-44e6-8805-048378d618d8.webp",
+   "source": "https://poly.pizza/m/3DtJTlxgO_U"
+  },
+  {
+   "set": "cars",
+   "rank": 80,
+   "item": "Ferrari 458",
+   "slug": "cars-ferrari-458",
+   "kind": "Supercar",
+   "group": "cars",
+   "query": "ferrari f40",
+   "standin": true,
+   "match": "stand-in",
+   "id": "RTwim9bhNd",
+   "title": "Ferrari F40",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Ferrari F40\" by PuKkBuMXDD, https://poly.pizza/m/RTwim9bhNd. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "PuKkBuMXDD",
+   "tris": 4724,
+   "tags": [
+    "ferrari",
+    "car",
+    "vehicle",
+    "racing",
+    "race"
+   ],
+   "download": "https://static.poly.pizza/95b46627-afff-4b11-95a8-c19e903c01e3.glb",
+   "thumbnail": "https://static.poly.pizza/95b46627-afff-4b11-95a8-c19e903c01e3.webp",
+   "source": "https://poly.pizza/m/RTwim9bhNd",
+   "standinFor": "Ferrari 458"
+  },
+  {
+   "set": "cars",
+   "rank": 87,
+   "item": "Volkswagen Beetle",
+   "slug": "cars-volkswagen-beetle",
+   "kind": "Classic",
+   "group": "cars",
+   "query": "beetle",
+   "standin": false,
+   "match": "direct",
+   "id": "4yufxgZ1QQ2",
+   "title": "Beetle",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Beetle\" by Poly by Google, https://poly.pizza/m/4yufxgZ1QQ2. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Poly by Google",
+   "tris": 904,
+   "tags": [
+    "insect",
+    "critter",
+    "bug",
+    "shell"
+   ],
+   "download": "https://static.poly.pizza/3c130437-d1cb-48ee-86a6-0beeeb60f784.glb",
+   "thumbnail": "https://static.poly.pizza/3c130437-d1cb-48ee-86a6-0beeeb60f784.webp",
+   "source": "https://poly.pizza/m/4yufxgZ1QQ2"
+  },
+  {
+   "set": "cars",
+   "rank": 95,
+   "item": "Chevrolet Camaro",
+   "slug": "cars-chevrolet-camaro",
+   "kind": "Classic",
+   "group": "cars",
+   "query": "chevrolet camaro",
+   "standin": false,
+   "match": "direct",
+   "id": "kVcKsd2dEk",
+   "title": "Chevrolet Camaro",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"Chevrolet Camaro\" by PuKkBuMXDD, https://poly.pizza/m/kVcKsd2dEk. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "PuKkBuMXDD",
+   "tris": 3290,
+   "tags": [
+    "car",
+    "camaro",
+    "chevrolet",
+    "vehicle"
+   ],
+   "download": "https://static.poly.pizza/b99378ae-e2af-4eae-bb60-1c9f8ab09573.glb",
+   "thumbnail": "https://static.poly.pizza/b99378ae-e2af-4eae-bb60-1c9f8ab09573.webp",
+   "source": "https://poly.pizza/m/kVcKsd2dEk"
+  },
+  {
+   "set": "cars",
+   "rank": 96,
+   "item": "Dodge Challenger",
+   "slug": "cars-dodge-challenger",
+   "kind": "Classic",
+   "group": "cars",
+   "query": "dodge challenger",
+   "standin": false,
+   "match": "direct",
+   "id": "1jB8I4t5w4",
+   "title": "2015 Dodge Challenger",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"2015 Dodge Challenger\" by Grzybek, https://poly.pizza/m/1jB8I4t5w4. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "Grzybek",
+   "tris": 6857,
+   "tags": [
+    "Car",
+    "Racing",
+    "Muscle"
+   ],
+   "download": "https://static.poly.pizza/c2ae6507-7a82-4b1c-a8cd-d7bfa6378a21.glb",
+   "thumbnail": "https://static.poly.pizza/c2ae6507-7a82-4b1c-a8cd-d7bfa6378a21.webp",
+   "source": "https://poly.pizza/m/1jB8I4t5w4"
+  },
+  {
+   "set": "cars",
+   "rank": 97,
+   "item": "DeLorean DMC-12",
+   "slug": "cars-delorean-dmc-12",
+   "kind": "Classic",
+   "group": "cars",
+   "query": "delorean",
+   "standin": false,
+   "match": "direct",
+   "id": "1uZKezeldGG",
+   "title": "DeLorean DMC-12",
+   "licence": "CC-BY 3.0",
+   "attribution": "\"DeLorean DMC-12\" by David Sirera, https://poly.pizza/m/1uZKezeldGG. Licence at https://creativecommons.org/licenses/by/3.0",
+   "creator": "David Sirera",
+   "tris": 3544,
+   "tags": [
+    "car",
+    "machine"
+   ],
+   "download": "https://static.poly.pizza/286c45cb-ffe7-47f4-94aa-f80267416164.glb",
+   "thumbnail": "https://static.poly.pizza/286c45cb-ffe7-47f4-94aa-f80267416164.webp",
+   "source": "https://poly.pizza/m/1uZKezeldGG"
+  }
+ ]
+}
