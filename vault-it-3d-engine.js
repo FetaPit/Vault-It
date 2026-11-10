@@ -3,7 +3,7 @@
  * makeStage(canvas,{railPad,padB,padT,theme,fps,onFrame})   the to-scale house builder, bricks laid one at a time
  * makeNW(canvas,{theme,fps,onChange})                        net worth scene with £1,000 blocks and £100 cubes
  * makeTracker(canvas,{theme,fps,onChange})                   tracker with Graph and 3D blocks views (setView, setRange, setSeries, setData)
- * makeForecast({target,saved,monthly,rate,topUp,windfalls})   projection model. Stage gets attachForecast, scrub, play, stop. Bricks follow projected money.
+ * makeForecast({target,saved,monthly,rate,topUp,windfalls})   projection model. Stage gets attachForecast, scrub, play, stop, setProjection (gold hatched ghost bricks for a what-if).
  * Falls back to a flat canvas 2D house if WebGL is unavailable (ViEngine.glr() returns null).
  */
 (function(){
@@ -318,16 +318,18 @@ var GLR=null;
 var VS_SRC=[
 "attribute vec3 aPos;attribute vec3 aNrm;attribute vec2 aUV;attribute vec3 aOff;attribute vec3 aSize;attribute vec2 aMeta;attribute vec2 aTime;",
 "uniform mat4 uVP;uniform vec4 uAmt;uniform vec4 uWin;uniform float uFlash;uniform float uTF;uniform float uNow;uniform float uLast;",
-"varying vec3 vN;varying vec2 vUV;varying vec2 vFS;varying vec3 vW;varying float vFlash;varying float vAlpha;varying float vType;varying float vSeed;varying float vLast;",
+"varying vec3 vN;varying vec2 vUV;varying vec2 vFS;varying vec3 vW;varying float vFlash;varying float vAlpha;varying float vType;varying float vSeed;varying float vLast;varying float vGhost;",
 "void main(){",
-" float t=aMeta.y;float key=aMeta.x;float vis=1.;float fl=0.;float last=0.;float drop=0.;",
+" float t=aMeta.y;float key=aMeta.x;float vis=1.;float fl=0.;float last=0.;float drop=0.;float ghost=0.;",
 " if(t<2.5){",
-"  if(aTime.x>1e8){gl_Position=vec4(2.,2.,2.,1.);return;}",
+"  if(aTime.x>4e8){gl_Position=vec4(2.,2.,2.,1.);return;}",
+"  if(aTime.x>1e8){ghost=1.;}else{",
 "  float age=uNow-aTime.x;",
 "  if(age<0.){gl_Position=vec4(2.,2.,2.,1.);return;}",
 "  float d=clamp(age/.38,0.,1.);vis=smoothstep(0.,.5,d);float e=1.-d;drop=e*e*e*6.;",
 "  fl=uFlash*(1.-clamp(age/1.1,0.,1.));",
 "  if(abs(aTime.y-uLast)<.5)last=1.;",
+"  }",
 " }else if(t<3.5){",
 "  if(uAmt.x<key+1.){gl_Position=vec4(2.,2.,2.,1.);return;}",
 " }else if(t<4.5){",
@@ -339,7 +341,7 @@ var VS_SRC=[
 " }",
 " vec3 p=aOff+aPos*aSize*(1.+.14*last);",
 " p.y+=drop;",
-" vFlash=fl;vAlpha=vis;vN=aNrm;vUV=aUV;vW=p;vType=t;vLast=last;",
+" vFlash=fl;vAlpha=vis;vN=aNrm;vUV=aUV;vW=p;vType=t;vLast=last;vGhost=ghost;",
 " vec3 an=abs(aNrm);",
 " if(t>3.5&&t<4.5)vFS=vec2(4.,3.);else if(t>4.5)vFS=vec2(9.,9.);else vFS=an.x>.5?aSize.zy:(an.y>.5?aSize.xz:aSize.xy);",
 " vSeed=fract(sin(dot(aOff.xz+vec2(aOff.y*1.3,aOff.x*.7),vec2(12.9898,78.233)))*43758.5453);",
@@ -347,13 +349,24 @@ var VS_SRC=[
 "}"].join("\n");
 var FS_SRC=[
 "precision mediump float;",
-"varying vec3 vN;varying vec2 vUV;varying vec2 vFS;varying vec3 vW;varying float vFlash;varying float vAlpha;varying float vType;varying float vSeed;varying float vLast;",
+"varying vec3 vN;varying vec2 vUV;varying vec2 vFS;varying vec3 vW;varying float vFlash;varying float vAlpha;varying float vType;varying float vSeed;varying float vLast;varying float vGhost;",
 "uniform vec3 uBrick;uniform vec3 uTrim;uniform vec3 uTile;uniform vec3 uFrame;uniform vec3 uGlass;uniform vec3 uGlassLit;uniform vec3 uDoor;uniform vec3 uEdge;uniform vec3 uSheen;uniform vec3 uFlashCol;",
-"uniform float uPulse;uniform float uBuilt;uniform float uSweep;uniform float uSweepOn;uniform float uBack;uniform float uFrontA;uniform float uBackA;uniform float uShMin;uniform float uEdgeK;uniform vec2 uLit;",
+"uniform vec3 uGhostCol;uniform float uGhostMo;uniform float uGNow;uniform float uPulse;uniform float uBuilt;uniform float uSweep;uniform float uSweepOn;uniform float uBack;uniform float uFrontA;uniform float uBackA;uniform float uShMin;uniform float uEdgeK;uniform vec2 uLit;",
 "void main(){",
 " vec3 L=normalize(vec3(-.45,.7,.55));float lt=max(0.,dot(vN,L));float sh=uShMin+(1.-uShMin)*lt;",
 " vec3 base;float t=vType;",
 " if(t<2.5)base=uBrick*(.9+.2*vSeed);else if(t<3.5)base=uTrim;else if(t<4.5)base=uTile*(.94+.12*vSeed);else if(t<5.5)base=mix(uGlass,uGlassLit,uLit.x);else if(t<6.5)base=mix(uDoor,uFlashCol,uLit.y);else base=uFrame;",
+" if(vGhost>.5){",
+"  float ed0=min(min(vUV.x,1.-vUV.x)*vFS.x,min(vUV.y,1.-vUV.y)*vFS.y);",
+"  float hat=step(.5,fract((vW.x+vW.y*1.7+vW.z)*.42-uGNow*.35*uGhostMo));",
+"  float dash=step(.45,fract((vUV.x+vUV.y)*vFS.x*.16-uGNow*.5*uGhostMo));",
+"  float edge=(1.-smoothstep(.0,.07,ed0))*(.35+.65*dash);",
+"  float shim=uGhostMo*.5*(.5+.5*sin(vW.y*.35-uGNow*2.2));",
+"  float ga=.14+.12*hat+.5*edge+.12*shim;",
+"  if(uBack>.5)ga*=.5;",
+"  vec3 gc=mix(uGhostCol*(.7+.3*sh),vec3(1.,.95,.7),edge*.4);",
+"  gl_FragColor=vec4(gc*ga,ga);return;",
+" }",
 " vec3 col=base*sh;",
 " vec2 dd=min(vUV,1.-vUV)*vFS;float ed=min(dd.x,dd.y);float bev=smoothstep(0.,.07,ed);",
 " col=mix(col,uEdge*(.6+.4*sh),(1.-bev)*uEdgeK);",
@@ -378,7 +391,7 @@ function glr(){
     if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));
     var R={cv:cv,gl:gl,pr:pr,g2:g2,ext:ext,A:{},U:{},cube:null,inst:null,tile:null,glass:null,hg:null};
     ["aPos","aNrm","aUV","aOff","aSize","aMeta","aTime"].forEach(function(n){R.A[n]=gl.getAttribLocation(pr,n)});
-    ["uVP","uAmt","uWin","uFlash","uTF","uNow","uLast","uBrick","uTrim","uTile","uFrame","uGlass","uGlassLit","uDoor","uEdge","uSheen","uFlashCol","uPulse","uBuilt","uSweep","uSweepOn","uBack","uFrontA","uBackA","uShMin","uEdgeK","uLit"].forEach(function(n){R.U[n]=gl.getUniformLocation(pr,n)});
+    ["uVP","uAmt","uWin","uFlash","uTF","uNow","uLast","uBrick","uTrim","uTile","uFrame","uGlass","uGlassLit","uDoor","uEdge","uSheen","uFlashCol","uPulse","uBuilt","uSweep","uSweepOn","uBack","uFrontA","uBackA","uShMin","uEdgeK","uLit","uGhostCol","uGhostMo","uGNow"].forEach(function(n){R.U[n]=gl.getUniformLocation(pr,n)});
     /* unit cube, 36 verts, pos nrm uv, counter clockwise from outside */
     var cb=[],fs=[[[1,0,0],[0,1,0],[0,0,1]],[[-1,0,0],[0,0,-1],[0,1,0]],[[0,1,0],[0,0,1],[1,0,0]],[[0,-1,0],[1,0,0],[0,0,1]],[[0,0,1],[1,0,0],[0,1,0]],[[0,0,-1],[0,1,0],[1,0,0]]];
     fs.forEach(function(f){var n=f[0],a=f[1],b=f[2],P=[[-1,-1],[1,-1],[1,1],[-1,1]].map(function(q){return [(n[0]+a[0]*q[0]+b[0]*q[1])*.5,(n[1]+a[1]*q[0]+b[1]*q[1])*.5,(n[2]+a[2]*q[0]+b[2]*q[1])*.5]}),UV=[[0,0],[1,0],[1,1],[0,1]];
@@ -420,6 +433,14 @@ function renderHouseGL(ctx,rect,st){
       for(o2=n0;o2<n1;o2++)st.stamp[2*maps[gi][o2]]=inst?-1000:tnow+(o2-n0)*stp;dirty=true}
     else if(n1<n0){for(o2=n1;o2<n0;o2++)st.stamp[2*maps[gi][o2]]=1e9;dirty=true}
     st.cnt[gi]=n1}
+  /* projection ghost: the next bricks in build order after the laid ones, up to what a what-if plan would have laid by now */
+  var gTot=st.ghostP>0?Math.floor(H.bricks*seg(st.ghostP,.03,.80)+1e-6):0,glo=tot,ghi=Math.max(tot,Math.min(H.bricks,gTot));
+  if(!st.gR)st.gR=[0,0];
+  function ordAt(k){return k<H.nW?H.ordW[k]:(k<H.nW+H.nG?H.ordG[k-H.nW]:H.ordC[k-H.nW-H.nG])}
+  if(st.gR[0]!==glo||st.gR[1]!==ghi||dirty){
+    for(o2=st.gR[0];o2<st.gR[1];o2++){if(o2>=glo&&o2<ghi)continue;if(o2>=tot&&st.stamp[2*ordAt(o2)]>1e8)st.stamp[2*ordAt(o2)]=1e9}
+    for(o2=glo;o2<ghi;o2++){if(st.stamp[2*ordAt(o2)]>1e8)st.stamp[2*ordAt(o2)]=2e8}
+    st.gR=[glo,ghi];dirty=true}
   if(dirty){var bi=-1,bt=-1e9;for(gi=0;gi<3;gi++){if(cnt[gi]>0){var ix=maps[gi][cnt[gi]-1],tt=st.stamp[2*ix];if(tt>=bt){bt=tt;bi=ix}}}st.lastIdx=bi}
   var laidN=cnt[0]+cnt[1]+cnt[2];
   var wa=seg(p,.88,.93),lit=seg(p,.93,.96),dec=seg(p,.96,1),tm=seg(p,.60,.80);
@@ -461,6 +482,7 @@ function renderHouseGL(ctx,rect,st){
   gl.uniform4f(U.uAmt,cnt[0],cnt[1],cnt[2],tileN);
   gl.uniform4f(U.uWin,wa,lit,dec,0);gl.uniform1f(U.uFlash,(st.noFlash||reduce)?0:1);gl.uniform1f(U.uTF,act);gl.uniform1f(U.uNow,tnow);gl.uniform1f(U.uLast,st.noFlash?-1:st.lastIdx);
   gl.uniform3fv(U.uBrick,T.brick);gl.uniform3fv(U.uTrim,T.trim);gl.uniform3fv(U.uTile,T.tile);gl.uniform3fv(U.uFrame,T.frame);gl.uniform3fv(U.uGlass,T.glass);gl.uniform3fv(U.uGlassLit,T.glassLit);gl.uniform3fv(U.uDoor,T.door);gl.uniform3fv(U.uEdge,T.edge);gl.uniform3fv(U.uSheen,T.sheen);gl.uniform3fv(U.uFlashCol,T.flash);
+  gl.uniform3fv(U.uGhostCol,st.ghostCol||[.91,.77,.42]);gl.uniform1f(U.uGhostMo,(st.noPulse||reduce)?0:1);gl.uniform1f(U.uGNow,tnow%20);
   gl.uniform1f(U.uPulse,pulse);gl.uniform1f(U.uBuilt,built);
   var sw=((now/1000*20)%(H.TOP+40))-10;gl.uniform1f(U.uSweep,sw);gl.uniform1f(U.uSweepOn,st.sweep?1:0);
   gl.uniform1f(U.uShMin,T.shMin);gl.uniform1f(U.uEdgeK,T.edgeK);gl.uniform1f(U.uFrontA,T.front);gl.uniform1f(U.uBackA,T.back);gl.uniform2f(U.uLit,lit,dec);
@@ -524,6 +546,16 @@ function renderHouseGL(ctx,rect,st){
     if(T.planeBlur){ctx.shadowColor=rgba([232,197,106],.55);ctx.shadowBlur=18}else{ctx.shadowColor="rgba(0,60,58,.25)";ctx.shadowBlur=10;ctx.shadowOffsetY=3}
     ctx.beginPath();if(ctx.roundRect)ctx.roundRect(tx,ty,tw,th,fs*.4);else ctx.rect(tx,ty,tw,th);ctx.fillStyle="#E8C56A";ctx.fill();ctx.restore();
     ctx.fillStyle="#1A1400";ctx.textBaseline="alphabetic";ctx.fillText(l1,tx+fs*.75,ty+fs*1.2);ctx.fillText(l2,tx+fs*.75,ty+fs*2.3)}
+  if(st.ghostP>0&&ghi>glo&&st.ghostLabel){
+    /* projection key: gold dashed swatch with hatch, so it never reads as the white "still to build" wireframe */
+    var gf=clamp(rect.w*.022,10,13),gt="PROJECTION  "+st.ghostLabel,gx=rect.x+12,gy=rect.y+rect.h-(st.padB||0)-14;
+    ctx.save();ctx.font=gf+"px 'Share Tech Mono',monospace";var gw2=ctx.measureText(gt).width+gf*3.2;
+    gx=Math.min(gx,rect.x+rect.w-gw2-10);
+    ctx.fillStyle=st.theme==="light"?"rgba(255,255,255,.92)":"rgba(8,8,8,.78)";ctx.beginPath();if(ctx.roundRect)ctx.roundRect(gx,gy-gf-6,gw2,gf*2+6,5);else ctx.rect(gx,gy-gf-6,gw2,gf*2+6);ctx.fill();
+    var sx=gx+8,sy=gy-gf-1,sz=gf;ctx.setLineDash([3,2]);ctx.strokeStyle=rgba(T.planeS,1);ctx.lineWidth=1.2;ctx.fillStyle=rgba(T.planeS,.22);ctx.fillRect(sx,sy,sz,sz);ctx.strokeRect(sx,sy,sz,sz);ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(sx,sy+sz);ctx.lineTo(sx+sz,sy);ctx.moveTo(sx,sy+sz*.5);ctx.lineTo(sx+sz*.5,sy);ctx.moveTo(sx+sz*.5,sy+sz);ctx.lineTo(sx+sz,sy+sz*.5);ctx.stroke();
+    ctx.fillStyle=rgba(T.planeS,1);ctx.textBaseline="alphabetic";ctx.fillText(gt,sx+sz+8,sy+sz-1);
+    ctx.fillStyle=st.theme==="light"?"rgba(40,40,40,.8)":"rgba(255,255,255,.62)";ctx.fillText("ILLUSTRATIVE ONLY. NOT FINANCIAL ADVICE.",sx,sy+sz+gf+1);ctx.restore()}
   st.primed=true;ctx.restore();return info;
 }
 
@@ -562,7 +594,7 @@ function makeStage(cv,o){
   function frame(ts){
     raf=0;if(!vis)return;if(o.fps&&last&&ts-last<1000/o.fps-2){raf=requestAnimationFrame(frame);return}
     var dt=Math.min(.05,(ts-(last||ts))/1000);last=ts;
-    if(play&&fc){play.m=Math.min(play.to,play.m+dt*play.rate);month=play.m;target=fc.progressAt(month);if(o.onMonth)o.onMonth(month,target,fc);if(play.m>=play.to){var pd=play.done;play=null;if(pd)pd(month)}}
+    if(play&&fc){play.m=Math.min(play.to,play.m+dt*play.rate);month=play.m;target=fc.progressAt(month);applyGhost();if(o.onMonth)o.onMonth(month,target,fc);if(play.m>=play.to){var pd=play.done;play=null;if(pd)pd(month)}}
     if(reduce)st.p=target;else{st.p+=(target-st.p)*Math.min(1,dt*1.7);if(Math.abs(target-st.p)<.0003)st.p=target}
     if(auto&&!ob.isDrag()&&ts-idle>2500)st.yaw+=dt*.12;
     st.now=ts;st.fit=cw<520?1.1:.85;st.theme=o.theme||rootTheme();st.padT=cw<520&&o.railPad?52:0;st.railPad=cw<520?0:(o.railPad||0);c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,cw,ch);
@@ -577,8 +609,20 @@ function makeStage(cv,o){
   self.setTarget=function(p,imm){target=clamp(p,0,1);if(imm){st.p=target}start()};
   self.getTarget=function(){return target};
   /* live-data build: attach a makeForecast model, then scrub or play through time. The bricks follow the money. */
-  self.attachForecast=function(m){fc=m;play=null;month=0;return self};
-  self.scrub=function(m,imm){if(!fc)return;play=null;month=Math.max(0,m);self.setTarget(fc.progressAt(month),imm);if(o.onMonth)o.onMonth(month,fc.progressAt(month),fc)};
+  var alt=null;
+  function applyGhost(){
+    if(!alt||!fc){st.ghostP=0;st.ghostLabel="";return}
+    st.ghostP=Math.max(fc.progressAt(month),alt.progressAt(month))>fc.progressAt(month)+1e-4?alt.progressAt(month):0}
+  /* projection ghost: pass a what-if model from forecast.whatIf(...).model. Gold hatched bricks show what that plan adds by the same month. */
+  self.setProjection=function(m,opt){alt=m||null;opt=opt||{};
+    if(alt&&fc){var a=fc.monthsToGoal(),b=alt.monthsToGoal(),dm=alt.config().monthly-fc.config().monthly,parts=[];
+      if(opt.label)parts.push(opt.label);else{
+        if(dm)parts.push((dm>0?"+":"-")+"\u00A3"+Math.abs(Math.round(dm)).toLocaleString("en-GB")+" A MONTH");
+        if(isFinite(a)&&isFinite(b)&&a!==b)parts.push(Math.abs(a-b)+" MONTH"+(Math.abs(a-b)===1?"":"S")+(b<a?" SOONER":" LATER"))}
+      st.ghostLabel=parts.join(" . ")||"WHAT IF"}
+    applyGhost();start();return self};
+  self.attachForecast=function(m){fc=m;play=null;month=0;alt=null;st.ghostP=0;return self};
+  self.scrub=function(m,imm){if(!fc)return;play=null;month=Math.max(0,m);self.setTarget(fc.progressAt(month),imm);applyGhost();if(o.onMonth)o.onMonth(month,fc.progressAt(month),fc)};
   self.play=function(opt){if(!fc)return;opt=opt||{};var to=opt.to!==undefined?opt.to:fc.monthsToGoal();if(!isFinite(to))to=120;if(reduce){self.scrub(to,true);if(opt.done)opt.done(to);return}play={m:opt.from!==undefined?opt.from:month,to:to,rate:opt.monthsPerSecond||6,done:opt.done};start()};
   self.stop=function(){play=null};
   self.month=function(){return month};

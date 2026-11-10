@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en-GB" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vault·It projection demo</title>
+<link rel="stylesheet" href="vault-it-tokens.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg,#0a0a0a);color:var(--text,#e8f4f3);font-family:var(--font-body,system-ui,sans-serif);overflow-x:hidden}
+main{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:1.3rem;margin:.2em 0 .6em}
+#stage{display:block;width:100%;height:56vh;min-height:320px;background:var(--stage-bg,#0d1414);border-radius:10px;cursor:grab;touch-action:none}
+.panel{display:grid;gap:14px;margin-top:14px}
+@media(min-width:720px){.panel{grid-template-columns:1fr 1fr}}
+label{display:block;font-size:.85rem;opacity:.85;margin-bottom:4px}
+.row{display:flex;align-items:center;gap:10px}
+input[type=range]{width:100%;accent-color:#e8c56a;min-height:28px}
+input[type=number]{width:110px;padding:6px;border-radius:6px;border:1px solid #2a3a3a;background:#101a1a;color:inherit}
+button{padding:8px 14px;border-radius:6px;border:1px solid #44c0b9;background:transparent;color:#44c0b9;font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid #e8c56a;outline-offset:2px}
+.out{font-family:var(--font-mono,monospace);font-size:.9rem;line-height:1.6}
+.out b{color:#e8c56a}
+small{opacity:.7}
+</style>
+</head>
+<body>
+<main>
+<h1>Vault·It. What if I saved a bit more?</h1>
+<canvas id="stage" tabindex="0" aria-label="3D house built from your projected savings. Drag to rotate."></canvas>
+<div class="panel">
+ <div>
+  <label for="extra">Extra per month: <b id="extraV">£0</b></label>
+  <input id="extra" type="range" min="0" max="500" step="10" value="0">
+  <label for="lump" style="margin-top:10px">One-off lump sum (optional), paid in month 6</label>
+  <div class="row"><input id="lump" type="number" min="0" step="100" value="0"><span><small>£</small></span></div>
+ </div>
+ <div>
+  <label for="when">Month: <b id="whenV">0</b></label>
+  <input id="when" type="range" min="0" max="60" step="1" value="12">
+  <div class="row" style="margin-top:10px"><button id="play" type="button">Play</button></div>
+ </div>
+</div>
+<p class="out" id="out" aria-live="polite"></p>
+<p><small>Illustrative projection from the figures above. Not regulated by the FCA. Not financial advice.</small></p>
+</main>
+<script src="vault-it-3d-engine.js"></script>
+<script>
+(function(){
+var E=window.ViEngine,$=function(i){return document.getElementById(i)};
+var base=E.makeForecast({target:30000,saved:2000,monthly:400,rate:.04,topUp:.25,startDate:new Date()});
+var st=E.makeStage($("stage"),{padB:44,onMonth:function(m){$("when").value=Math.min(60,Math.round(m));$("whenV").textContent=Math.round(m)}});
+st.attachForecast(base);
+function fmt(d){return d.toLocaleDateString("en-GB",{month:"short",year:"numeric"})}
+function update(){
+  var x=+$("extra").value,l=+$("lump").value||0;$("extraV").textContent="£"+x;
+  var ch={monthlyDelta:x};if(l>0)ch.windfalls=[{month:6,amount:l}];
+  var w=base.whatIf(ch),b=base.monthsToGoal();
+  st.setProjection(x>0||l>0?w.model:null);
+  st.scrub(+$("when").value,true);
+  var a=fmt(base.dateAt(b));
+  $("out").innerHTML="Current plan: home deposit by <b>"+a+"</b> ("+b+" months)."+(x>0||l>0?"<br>With this change: <b>"+fmt(w.model.dateAt(w.months))+"</b>, "+Math.abs(w.monthsDelta)+" month"+(Math.abs(w.monthsDelta)===1?"":"s")+" sooner.":"");
+}
+$("extra").addEventListener("input",update);$("lump").addEventListener("input",update);
+$("when").addEventListener("input",function(){$("whenV").textContent=this.value;update()});
+$("play").addEventListener("click",function(){st.play({from:0,to:60,monthsPerSecond:8})});
+$("whenV").textContent=$("when").value;update();
+window.__st=st;
+})();
+</script>
+</body>
+</html>
