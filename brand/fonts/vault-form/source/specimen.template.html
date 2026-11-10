@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__FAMILY__ specimen</title>
+<link rel="stylesheet" href="__SLUG__.css">
+<style>
+  :root {
+    --teal: #44C0B9; --deep-teal: #007F7B; --gold: #E8C56A; --red: #E05C5C;
+    --night: #080808; --night-ink: #E6EEED; --night-dim: #8FA3A1; --night-line: #1B2424;
+    --paper: #F3F7F6; --day-ink: #0B1F22; --day-dim: #4A6266; --day-line: #CFDCDA;
+    --body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--night); color: var(--night-ink); font-family: var(--body); font-size: 16px; line-height: 1.5; overflow-x: hidden; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  section { padding: 48px 0; border-top: 1px solid var(--night-line); }
+  .night { background: var(--night); color: var(--night-ink); }
+  .day { background: var(--paper); color: var(--day-ink); border-top-color: var(--day-line); }
+  .night .dim { color: var(--night-dim); }
+  .day .dim { color: var(--day-dim); }
+  .tag { font-family: var(--font-vf-label); text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; color: var(--teal); margin: 0 0 16px; }
+  .day .tag { color: var(--deep-teal); }
+  h2 { font-family: var(--font-vf-display); font-weight: 700; font-size: clamp(24px, 4vw, 40px); line-height: 1.1; margin: 0 0 8px; }
+  p { margin: 0 0 12px; max-width: 62ch; }
+  .vf { font-family: var(--font-vf-display); }
+  .vfc { font-family: var(--font-vf-condensed); }
+  .any { overflow-wrap: anywhere; }
+  .w300 { font-weight: 300; } .w400 { font-weight: 400; } .w700 { font-weight: 700; }
+
+  /* header */
+  header { padding: 28px 0 20px; }
+  .brand { font-family: var(--font-vf-display); font-weight: 700; font-size: 22px; letter-spacing: 0.02em; }
+  .brand b { color: var(--teal); font-weight: 700; }
+  .meta { font-size: 13px; color: var(--night-dim); margin-top: 4px; }
+
+  /* hero */
+  .hero h1 { font-family: var(--font-vf-display); font-weight: 700; font-size: clamp(36px, 8vw, 96px); line-height: 1.04; margin: 0 0 20px; overflow-wrap: anywhere; }
+  .hero h1 em { font-style: normal; color: var(--red); }
+  .hero h1 span { color: var(--teal); }
+  .day.hero h1 span { color: var(--deep-teal); }
+
+  /* heading vs DM Sans body, as in the app */
+  .pair h3 { font-family: var(--font-vf-display); font-weight: 700; font-size: clamp(32px, 6vw, 64px); line-height: 1.05; margin: 0 0 14px; }
+  .pair p { font-size: 18px; color: #A9B6B4; line-height: 1.65; }
+  .day.pair p { color: var(--day-dim); }
+
+  /* overview mock */
+  .card { border: 1px solid #22302F; border-radius: 14px; padding: 20px; background: linear-gradient(180deg, #0D1313, #090B0B); }
+  .day .card { border-color: var(--day-line); background: #FFFFFF; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--font-vf-condensed); font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--night-dim); border-bottom: 1px solid #22302F; padding-bottom: 10px; margin-bottom: 18px; }
+  .day .tabs { border-bottom-color: var(--day-line); color: var(--day-dim); }
+  .tabs .on { color: var(--teal); }
+  .day .tabs .on { color: var(--deep-teal); }
+  .nw-label { font-family: var(--font-vf-condensed); text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; color: var(--night-dim); }
+  .nw { font-family: var(--font-vf-hatch); font-weight: 700; font-size: clamp(48px, 13vw, 120px); line-height: 1; margin: 6px 0 16px; color: var(--gold); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .day .nw { color: var(--deep-teal); }
+  .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .stat { border-top: 1px solid #22302F; padding-top: 10px; }
+  .day .stat { border-top-color: var(--day-line); }
+  .stat .k { font-family: var(--font-vf-condensed); text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px; color: var(--night-dim); }
+  .day .stat .k { color: var(--day-dim); }
+  .stat .v { font-family: var(--font-vf-condensed); font-weight: 700; font-size: clamp(20px, 5.4vw, 26px); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .neg { color: var(--red); }
+  .pos { color: var(--teal); }
+  .day .pos { color: var(--deep-teal); }
+
+  /* styles list */
+  .styles { display: grid; gap: 14px; }
+  .style { border-bottom: 1px solid var(--night-line); padding-bottom: 14px; }
+  .style .n { font-size: 12px; color: var(--night-dim); font-family: var(--body); }
+  .style .s { font-size: clamp(22px, 4vw, 36px); line-height: 1.15; overflow-wrap: anywhere; }
+
+  /* glyph set */
+  .glyphs { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 2px; font-family: var(--font-vf-display); font-size: 30px; }
+  .glyphs span { display: flex; align-items: center; justify-content: center; height: 58px; background: #0E1414; border-radius: 4px; }
+  .day .glyphs span { background: #FFFFFF; }
+  .alpha { font-size: clamp(24px, 5vw, 48px); line-height: 1.2; overflow-wrap: anywhere; margin: 0 0 8px; }
+
+  /* figures */
+  .figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
+  .col { text-align: right; font-variant-numeric: tabular-nums; font-size: 24px; line-height: 1.4; }
+  .col .h { font-family: var(--body); font-size: 12px; color: var(--night-dim); text-align: left; }
+  .day .col .h { color: var(--day-dim); }
+
+  /* readability */
+  .read { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .read div p { margin: 0 0 4px; }
+  .caps { text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* waterfall */
+  .fall { margin-bottom: 28px; }
+  .fall .row { display: flex; gap: 12px; align-items: baseline; }
+  .fall .px { flex: 0 0 44px; font-size: 11px; color: var(--night-dim); font-family: var(--body); text-align: right; }
+  .fall .t { min-width: 0; overflow-wrap: anywhere; line-height: 1.2; }
+
+  /* hatch */
+  .scan { background-color: var(--night); background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(68,192,185,.05) 2px, rgba(68,192,185,.05) 4px); }
+  .grid { background-color: var(--paper); background-image: repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(0,127,123,.10) 19px, rgba(0,127,123,.10) 20px), repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(0,127,123,.10) 19px, rgba(0,127,123,.10) 20px); }
+  .hatch .h { font-family: var(--font-vf-hatch); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
+  .hatch .hc { font-family: var(--font-vf-hatch-condensed); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
+
+  ul.rules { padding-left: 18px; margin: 0; max-width: 70ch; }
+  ul.rules li { margin-bottom: 6px; }
+  footer { padding: 32px 0 48px; font-size: 13px; color: var(--night-dim); border-top: 1px solid var(--night-line); }
+</style>
+</head>
+<body>
+
+<header class="night">
+  <div class="wrap">
+    <div class="brand">__FAMILY__ <b>/</b> Vault-It brand typeface</div>
+    <div class="meta">Version __VERSION__. PT Live Design. SIL Open Font License 1.1. Six styles plus two Hatch display cuts.</div>
+  </div>
+</header>
+
+<section class="night hero">
+  <div class="wrap">
+    <p class="tag">Bold, Night</p>
+    <h1>Get out of the <em>red</em> and into your <span>home.</span></h1>
+    <p class="dim">A squared techno sans built from straight edges and 45 degree chamfers. The big chamfers sit top-left and bottom-right, so every cut runs forward like a "/". Upright letters, forward lean.</p>
+  </div>
+</section>
+
+<section class="night pair">
+  <div class="wrap">
+    <p class="tag">Heading over DM Sans body</p>
+    <h3>Net worth in 3D</h3>
+    <p>A speed run of the climb: starting in the red with a little saved, paying the debt off block by block, then building wealth in every domain. Big blocks are £1,000. Small cubes are £100. Nine cubes become a block.</p>
+  </div>
+</section>
+
+<section class="night">
+  <div class="wrap">
+    <p class="tag">In-app mock: overview</p>
+    <div class="card">
+      <div class="tabs"><span class="on">Overview</span><span>Goals</span><span>House</span><span>Debts</span><span>Wealth</span></div>
+      <div class="nw-label">Net worth</div>
+      <div class="nw">£48,215</div>
+      <div class="strip">
+        <div class="stat"><div class="k">Assets</div><div class="v pos">£61,400.00</div></div>
+        <div class="stat"><div class="k">Debts</div><div class="v neg">−£13,185.00</div></div>
+        <div class="stat"><div class="k">Saved this month</div><div class="v">£640.50</div></div>
+        <div class="stat"><div class="k">House deposit</div><div class="v">38%</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="night">
+  <div class="wrap">
+    <p class="tag">Styles</p>
+    <div class="styles">
+      <div class="style"><div class="n">__FAMILY__ Light 300</div><div class="s vf w300">Get out of the red and into your home.</div></div>
+      <div class="style"><div class="n">__FAMILY__ Regular 400</div><div class="s vf w400">Get out of the red and into your home.</div></div>
+      <div class="style"><div class="n">__FAMILY__ Bold 700</div><div class="s vf w700">Get out of the red and into your home.</div></div>
+      <div class="style"><div class="n">__FAMILY__ Condensed Light 300</div><div class="s vfc w300">Get out of the red and into your home.</div></div>
+      <div class="style"><div class="n">__FAMILY__ Condensed Regular 400</div><div class="s vfc w400">Get out of the red and into your home.</div></div>
+      <div class="style"><div class="n">__FAMILY__ Condensed Bold 700</div><div class="s vfc w700">Get out of the red and into your home.</div></div>
+      <div class="style"><div class="n">__FAMILY__ Hatch Bold 700 (display, 48 px and up)</div><div class="s" style="font-family: var(--font-vf-hatch); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
+      <div class="style"><div class="n">__FAMILY__ Condensed Hatch Bold 700 (display, 48 px and up)</div><div class="s" style="font-family: var(--font-vf-hatch-condensed); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="night">
+  <div class="wrap">
+    <p class="tag">Alphabet</p>
+    <p class="alpha vf w700">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
+    <p class="alpha vf w700">abcdefghijklmnopqrstuvwxyz</p>
+    <p class="alpha vf w400">0123456789 £€$¢¥ %‰ &amp;@#</p>
+    <p class="alpha vfc w700">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz</p>
+    <p class="tag" style="margin-top: 28px;">Full character set, Regular</p>
+    <div class="glyphs w400" id="glyphs"></div>
+  </div>
+</section>
+
+<section class="night">
+  <div class="wrap">
+    <p class="tag">Figures: tabular by default</p>
+    <div class="figs">
+      <div class="col vf w400"><div class="h">Regular</div>£1,234.56<br>£9,999.99<br>£0.00<br>−£300.00<br>-£300.00</div>
+      <div class="col vf w700"><div class="h">Bold</div>£1,234.56<br>£9,999.99<br>£0.00<br>−£300.00<br>-£300.00</div>
+      <div class="col vfc w700"><div class="h">Condensed Bold</div>£1,234.56<br>£9,999.99<br>£0.00<br>−£300.00<br>-£300.00</div>
+      <div class="col vfc w400"><div class="h">Condensed Regular</div>£1,234.56<br>£9,999.99<br>£0.00<br>−£300.00<br>-£300.00</div>
+    </div>
+    <p class="dim" style="margin-top: 16px;">The last two lines compare the minus sign (U+2212) with the hyphen. Proportional figures in running text: <span class="vf w400" style="font-variant-numeric: proportional-nums;">11 July 2026, 1,117 savers</span> against tabular <span class="vf w400">11 July 2026, 1,117 savers</span>.</p>
+  </div>
+</section>
+
+<section class="night">
+  <div class="wrap">
+    <p class="tag">Readability checks</p>
+    <div class="read">
+      <div>
+        <p class="dim" style="font-size: 12px;">Regular 14 px</p>
+        <p class="vf w400" style="font-size: 14px;">Il1 O0 rn m · Ill legal 1001 · modern burn</p>
+        <p class="dim" style="font-size: 12px;">Bold Condensed 14 px</p>
+        <p class="vfc w700" style="font-size: 14px;">Il1 O0 rn m · Ill legal 1001 · modern burn</p>
+        <p class="dim" style="font-size: 12px;">Bold Condensed 12 px, counters</p>
+        <p class="vfc w700" style="font-size: 12px;">a e s g 8 3 · passages 3,838 · seeds aged</p>
+        <p class="dim" style="font-size: 12px;">Bold Condensed 10.5 px</p>
+        <p class="vfc w700" style="font-size: 10.5px;">a e s g 8 3 · passages 3,838 · Il1 O0 rn m</p>
+      </div>
+      <div>
+        <p class="dim" style="font-size: 12px;">All caps labels, 11 px, +0.06 em</p>
+        <p class="vfc w400 caps" style="font-size: 11px;">Net worth · Savings · Debt · ISA · IL1 O0</p>
+        <p class="vfc w700 caps" style="font-size: 11px;">Net worth · Savings · Debt · ISA · IL1 O0</p>
+        <p class="vf w400 caps" style="font-size: 11px;">Net worth · Savings · Debt · ISA · IL1 O0</p>
+        <p class="dim" style="font-size: 12px;">Money glyphs at 12 px</p>
+        <p class="vf w400" style="font-size: 12px;">£147 £714 £471 −£300 €1,040</p>
+        <p class="dim" style="font-size: 12px;">Light at 20 px</p>
+        <p class="vf w300" style="font-size: 20px; color: var(--teal);">Light on Night in teal</p>
+        <p class="vf w300" style="font-size: 20px; color: var(--gold);">Light on Night in gold</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="night">
+  <div class="wrap">
+    <p class="tag">Size waterfall</p>
+    <div id="falls"></div>
+  </div>
+</section>
+
+<section class="night scan hatch">
+  <div class="wrap">
+    <p class="tag">Hatch cut on Night scanlines</p>
+    <p class="h" style="font-size: 24px;">At 24 px the hatch fills in and reads as plain Bold.</p>
+    <p class="h" style="font-size: 48px; color: var(--teal);">Into your home</p>
+    <p class="h" style="font-size: clamp(48px, 15vw, 72px); color: var(--gold);">£48,215</p>
+    <p class="hc" style="font-size: clamp(64px, 24vw, 120px);">VAULT</p>
+  </div>
+</section>
+
+<section class="day grid hatch">
+  <div class="wrap">
+    <p class="tag">Hatch cut on the Daylight blueprint grid</p>
+    <p class="h" style="font-size: 24px;">At 24 px the hatch fills in and reads as plain Bold.</p>
+    <p class="h" style="font-size: 48px; color: var(--deep-teal);">Into your home</p>
+    <p class="h" style="font-size: clamp(48px, 15vw, 72px);">£48,215</p>
+    <p class="hc" style="font-size: clamp(64px, 24vw, 120px); color: var(--deep-teal);">VAULT</p>
+  </div>
+</section>
+
+<section class="day hero">
+  <div class="wrap">
+    <p class="tag">Bold, Daylight</p>
+    <h1>Get out of the <em>red</em> and into your <span>home.</span></h1>
+  </div>
+</section>
+
+<section class="day pair">
+  <div class="wrap">
+    <p class="tag">Heading over DM Sans body</p>
+    <h3>Net worth in 3D</h3>
+    <p>A speed run of the climb: starting in the red with a little saved, paying the debt off block by block, then building wealth in every domain. Big blocks are £1,000. Small cubes are £100.</p>
+  </div>
+</section>
+
+<section class="day">
+  <div class="wrap">
+    <p class="tag">In-app mock: overview, Daylight</p>
+    <div class="card">
+      <div class="tabs"><span class="on">Overview</span><span>Goals</span><span>House</span><span>Debts</span><span>Wealth</span></div>
+      <div class="nw-label dim">Net worth</div>
+      <div class="nw">£48,215</div>
+      <div class="strip">
+        <div class="stat"><div class="k">Assets</div><div class="v pos">£61,400.00</div></div>
+        <div class="stat"><div class="k">Debts</div><div class="v neg">−£13,185.00</div></div>
+        <div class="stat"><div class="k">Saved this month</div><div class="v">£640.50</div></div>
+        <div class="stat"><div class="k">House deposit</div><div class="v">38%</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="day">
+  <div class="wrap">
+    <p class="tag">Readability, Daylight</p>
+    <div class="read">
+      <div>
+        <p class="vf w400" style="font-size: 14px;">Il1 O0 rn m · Ill legal 1001 · modern burn</p>
+        <p class="vfc w700" style="font-size: 14px;">Il1 O0 rn m · Ill legal 1001 · modern burn</p>
+        <p class="vfc w700" style="font-size: 12px;">a e s g 8 3 · passages 3,838 · seeds aged</p>
+      </div>
+      <div>
+        <p class="vf w300" style="font-size: 20px; color: var(--deep-teal);">Light on paper in deep teal</p>
+        <p class="vf w300" style="font-size: 20px;">Light on paper in ink</p>
+        <p class="vfc w400 caps" style="font-size: 11px;">Net worth · Savings · Debt · ISA · IL1 O0</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="night">
+  <div class="wrap">
+    <p class="tag">Where it goes</p>
+    <ul class="rules">
+      <li>Use for display headings, the net worth hero, stat-strip figures, tab labels at 12 px and up, deck and comms headlines.</li>
+      <li>Keep DM Sans for body copy, the FCA disclaimer line, form inputs and dense tables of text.</li>
+      <li>Hatch cuts only at 48 px and up: the hero number, one headline per screen, the tagline on decks. Never in tables, buttons or labels.</li>
+      <li>The wordmark and brick hyphen stay as artwork. Do not reset the logo in this font.</li>
+      <li>Use the minus sign (−) for debt so "−£300" reads as money owed.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">__FAMILY__ __VERSION__. Copyright 2026 PT Live Design (Vault-It). SIL Open Font License 1.1, Reserved Font Name "__FAMILY__".</div>
+</footer>
+
+<script>
+  (function () {
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" +
+      "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" +
+      "¡¢£¥¦§¨©ª«¬®¯°±´µ¶·¸º»¿×÷" +
+      "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞß" +
+      "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿıŒœŠšŽžŸ" +
+      "–—‘’‚“”„†•…‰‹›⁄€−";
+    var g = document.getElementById("glyphs");
+    for (var i = 0; i < chars.length; i++) {
+      var s = document.createElement("span");
+      s.textContent = chars[i];
+      g.appendChild(s);
+    }
+    var styles = [
+      ["Light", "vf w300"], ["Regular", "vf w400"], ["Bold", "vf w700"],
+      ["Condensed Light", "vfc w300"], ["Condensed Regular", "vfc w400"], ["Condensed Bold", "vfc w700"]
+    ];
+    var sizes = [10.5, 12, 14, 16, 24, 48, 96];
+    var falls = document.getElementById("falls");
+    styles.forEach(function (st) {
+      var box = document.createElement("div");
+      box.className = "fall";
+      var h = document.createElement("p");
+      h.className = "dim";
+      h.style.fontSize = "12px";
+      h.textContent = "__FAMILY__ " + st[0];
+      box.appendChild(h);
+      sizes.forEach(function (px) {
+        var row = document.createElement("div");
+        row.className = "row";
+        var l = document.createElement("span");
+        l.className = "px";
+        l.textContent = px + " px";
+        var t = document.createElement("span");
+        t.className = "t " + st[1];
+        t.style.fontSize = px + "px";
+        t.textContent = px >= 96 ? "Vault 26" : px >= 48 ? "Into your home" : "Get out of the red and into your home. £1,234.56 Il1 O0 rn m";
+        row.appendChild(l);
+        row.appendChild(t);
+        box.appendChild(row);
+      });
+      falls.appendChild(box);
+    });
+  })();
+</script>
+</body>
+</html>
