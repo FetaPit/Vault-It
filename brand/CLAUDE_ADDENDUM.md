@@ -10,6 +10,6 @@ A new brand is being applied. Design files are in `brand/`. Open `brand/vault-it
 - The new house builder and net worth scene ship behind flags (`?house=new`, `?nw=new`, or `localStorage` `vi-flag-house` and `vi-flag-nw`). The current builder stays the default until the owner says otherwise.
 - Do not change how deposits, prices, house types, levels or saved data work. Brick value comes from the app's own price and deposit: `depositTarget * 0.77 / bricksTotal`.
 - Do not touch Supabase, secrets, migrations or the edge functions.
-- No new outside hosts. Fonts: Syne, DM Sans, Share Tech Mono only.
+- No new outside hosts. Fonts: Vault-form (headings and display; self-hosted in `brand/fonts/vault-form/`, replaced Syne, owner 10 Nov 2026), DM Sans (body), Share Tech Mono (small labels) only.
 - British English, sentence case, **no em dashes**. Keep "Not regulated by the FCA. Not financial advice." visible. Respect `prefers-reduced-motion`. Pages must never scroll sideways.
 - Tagline: **Get out of the red and into your home.** Name is written **Vault-It** with a hyphen (owner, 30 Oct 2026). In the logo wordmark the hyphen is drawn as the brand brick.

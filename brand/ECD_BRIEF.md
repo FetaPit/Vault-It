@@ -95,7 +95,7 @@ Type, price, deposit %, floor (flats only), the amount to add, and the brick val
 ## 5. Brand system (from the handover, unchanged)
 
 - **Tokens, Night and Daylight.** Daylight is a designed mode: paper ground, ink text, white panels with corner brackets, and blueprint 3D.
-- **Fonts:** Syne, DM Sans and Share Tech Mono only. Icons come from the sprite with a 1.1 hairline. The colour code applies: gold means now, brass means achievement, teal means built or owned, red means owed, green means cleared.
+- **Fonts:** Vault-form for headings and display (the brand's own typeface, self-hosted, replaced Syne: owner, 10 Nov 2026), DM Sans for body and Share Tech Mono for small labels, only. Hatch cuts of Vault-form only at 32 px and up. Icons come from the sprite with a 1.1 hairline. The colour code applies: gold means now, brass means achievement, teal means built or owned, red means owed, green means cleared.
 - **Wordmark:** Vault-It. In the logo the hyphen is drawn as the brick; in text it is a plain hyphen (owner, 30 Oct 2026). Tagline: **Get out of the red and into your home.**
 
 ## 6. Done means
