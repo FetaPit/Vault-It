@@ -11325,6 +11325,23 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 .vt-next{background:var(--btn1);border:none;color:var(--on-teal);border-radius:8px;padding:8px 14px;font-family:var(--font-display);font-weight:800;font-size:max(.66rem,var(--vi-fs-2));cursor:pointer;min-height:40px}
 @media(prefers-reduced-motion:reduce){#vt-spot,#vt-card,.vt-bar i{transition:none}.vh-typing i{animation:none;opacity:.8}}
 body.reduced-motion #vt-spot,body.reduced-motion #vt-card,body.reduced-motion .vt-bar i{transition:none}
+/* v0.95, tester 1 (9 Nov 2026): text too small on the Pioneer welcome, profile set-up and tour (owner, 10 Nov 06:40). Nothing on these
+   screens under 12 px: eyebrows and field labels 12 px; notes, options and secondary buttons 13 px; main buttons 14 px. The tour text
+   matches the welcome sub-lines (14.5 px phone, 16 px desktop). !important only where an inline style sets the size. */
+#welcome-overlay .wz-back,#welcome-overlay .wz-count,#welcome-overlay .welcome-field label,#welcome-overlay .welcome-field label span,#welcome-overlay .wz-phase-n{font-size:12px!important}
+#welcome-overlay .welcome-head>div[style],#welcome-overlay .welcome-head span[style]{font-size:12px!important}
+#welcome-overlay .welcome-opt span,#welcome-overlay .welcome-opt b,#welcome-overlay .wz-skip,#welcome-overlay .wz-note,#welcome-overlay .w-ht-lbl,#welcome-overlay .w-ht-note,
+#welcome-overlay .wz-phase-name,#welcome-overlay .wz-phase-d,#welcome-overlay .wz-week,#welcome-overlay .wz-week b,#welcome-overlay .wz-days button,#welcome-overlay .wz-more summary,
+#welcome-overlay .w-view-lbl,#welcome-overlay .w-view-opt b,#welcome-overlay .w-view-opt span,#welcome-overlay .w-view-note,
+#welcome-overlay .wz-screen>div[style],#welcome-overlay .wz-screen>div[style] b,#welcome-overlay .welcome-field>div[style],#welcome-overlay .welcome-field>div[style] strong{font-size:13px!important}
+#welcome-overlay .welcome-cta{font-size:max(14px,var(--vi-fs-3))}
+#vt-card .vt-step{font-size:12px}
+#vt-card .vt-title{font-size:17px}
+#vt-card .vt-body{font-size:max(14.5px,var(--vi-fs-3))}
+#vt-card .vt-skip,#vt-card .vt-back,#vt-card .vt-next{font-size:14px}
+#vt-card .vt-skip{font-family:inherit}
+#welcome-overlay .welcome-field label span{letter-spacing:.02em;font-weight:400;font-family:'DM Sans',sans-serif}   /* the hint after a label reads as a note, not a second label */
+@media(min-width:700px){#vt-card{width:min(380px,calc(100vw - 32px))}#vt-card .vt-title{font-size:18px}#vt-card .vt-body{font-size:16px}}
 @media print{#vi-help,#vi-tour,#vi-help-btn{display:none}}
 #vi-help-btn{grid-row:1;grid-column:5}
 @media(max-width:1023px){#vi-help-btn{grid-column:4}}
@@ -12017,6 +12034,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 </div>
 
 <div id="demo-chip" class="demo-chip" style="display:none"><span class="demo-chip-left">⚡ DEMO MODE &mdash; You&rsquo;re viewing sample data. <button onclick="clearDemoData()">Start with your own data</button></span><a class="demo-signup-btn" href="https://app.vault-it.co/" onclick="localStorage.removeItem('vi_demo_mode');localStorage.removeItem('vi_session');">Sign up free &rarr;</a></div>
+<div id="sample-chip" class="demo-chip" role="status" style="display:none"><span class="demo-chip-left">Sample figures from the demo are still in your data. <button type="button" onclick="viClearSample()">Clear sample figures</button></span></div>
 <div id="pwa-install-banner" style="display:none">
   <span>⬇ Install Vault-It: works offline, opens like an app</span>
   <div style="display:flex;gap:6px;align-items:center">
@@ -12307,22 +12325,13 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <section class="wz-screen" data-s="3" id="wz-s3" hidden>
         <h2 class="welcome-h2" tabindex="-1">Your money each month.</h2>
         <div class="welcome-sub">Two rough numbers are enough to start. You'll fine-tune them in the Budget.</div>
-      <div style="margin-bottom:12px">
-        <div class="w-label">Your currency</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button type="button" class="w-curr-btn active" data-c="GBP" onclick="wSetCurrency('GBP')" style="flex:1;padding:8px 4px;background:rgb(var(--teal-rgb) / .15);border:1px solid rgb(var(--teal-rgb) / .4);border-radius:6px;color:var(--em);font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));cursor:pointer">£ GBP</button>
-          <button type="button" class="w-curr-btn" data-c="USD" onclick="wSetCurrency('USD')" style="flex:1;padding:8px 4px;background:rgb(var(--teal-rgb) / .05);border:1px solid rgb(var(--teal-rgb) / .15);border-radius:6px;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));cursor:pointer">$ USD</button>
-          <button type="button" class="w-curr-btn" data-c="EUR" onclick="wSetCurrency('EUR')" style="flex:1;padding:8px 4px;background:rgb(var(--teal-rgb) / .05);border:1px solid rgb(var(--teal-rgb) / .15);border-radius:6px;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));cursor:pointer">€ EUR</button>
-          <button type="button" class="w-curr-btn" data-c="INR" onclick="wSetCurrency('INR')" style="flex:1;padding:8px 4px;background:rgb(var(--teal-rgb) / .05);border:1px solid rgb(var(--teal-rgb) / .15);border-radius:6px;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));cursor:pointer">₹ INR</button>
-        </div>
-      </div>
         <div class="g-form">
         <div class="welcome-field" style="margin:0">
-          <label>Monthly Take-Home (<span class="w-currency-label">£</span>)</label>
+          <label>Monthly Take-Home (£)</label>
           <input type="number" class="welcome-inp" id="w-income" placeholder="e.g. 2200" min="0">
         </div>
         <div class="welcome-field" style="margin:0">
-          <label>Rough Monthly Spending (<span class="w-currency-label">£</span>) <span style="opacity:.55;text-transform:none">· a guide, you’ll budget it line by line next</span></label>
+          <label>Rough Monthly Spending (£) <span style="opacity:.55;text-transform:none">· a guide, you’ll budget it line by line next</span></label>
           <input type="number" class="welcome-inp" id="w-expenses" placeholder="e.g. 1600" min="0">
         </div>
         </div>
@@ -12347,7 +12356,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <div class="w-ht-note">Pick one to build it in the House builder. You can change it later from the house itself.</div>
         </div>
         <div class="welcome-field" style="margin:0">
-          <label>Dream Home Target (<span class="w-currency-label">£</span>)</label>
+          <label>Dream Home Target (£)</label>
           <input type="number" class="welcome-inp" id="w-house" placeholder="e.g. 200000" min="0">
         </div>
         </div>
@@ -12368,7 +12377,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
         <div class="wz-hint" id="w-pot-hint" role="alert" hidden>Enter how much is in it, or pick Not yet.</div>
         <div id="w-pot-fields" hidden>
-          <div class="welcome-field"><label for="w-pot-value">How much is in it now? (<span class="w-currency-label">£</span>)</label><input type="number" class="welcome-inp" id="w-pot-value" placeholder="e.g. 6000" min="0" step="1" inputmode="decimal" oninput="this.style.borderColor=''"></div>
+          <div class="welcome-field"><label for="w-pot-value">How much is in it now? (£)</label><input type="number" class="welcome-inp" id="w-pot-value" placeholder="e.g. 6000" min="0" step="1" inputmode="decimal" oninput="this.style.borderColor=''"></div>
           <div class="welcome-field"><label for="w-pot-rate">Interest rate (% AER), if you know it</label><input type="number" class="welcome-inp" id="w-pot-rate" placeholder="e.g. 4.5, as your provider quotes" min="0" max="100" step="0.01" inputmode="decimal"></div>
           <div class="wz-note" id="w-pot-note">It shows in the House builder as your deposit so far, in that account. You can change it there any time.</div>
         </div>
@@ -16650,7 +16659,7 @@ function wPickHouse(b){
   _wHouse=b.dataset.type;
   document.querySelectorAll('#w-htypes .w-ht').forEach(function(x){var on=x===b;x.setAttribute('aria-pressed',String(on));x.classList.toggle('on',on);});
   var i=document.getElementById('w-house');
-  if(i&&typeof state!=='undefined'&&state&&state.prices&&state.prices[_wHouse])i.placeholder='e.g. '+Math.round(state.prices[_wHouse]*(window.VI_CURRENCY_RATE||1)).toLocaleString('en-GB');
+  if(i&&typeof state!=='undefined'&&state&&state.prices&&state.prices[_wHouse])i.placeholder='e.g. '+Math.round(state.prices[_wHouse]).toLocaleString('en-GB');   // in £, like the label (v0.95, tester 1)
 }
 // v0.95 (owner, 8 Nov): the onboarding asks for a Lifetime ISA or a savings account kept only for the house deposit, its value and its
 // rate. The pot lands in the House Builder the way Lay the bricks records a deposit (the amount is all that counts; the account is a
@@ -16674,7 +16683,7 @@ function _wPotCheck(){   // Next on the pot screen: a Yes needs the amount (the 
 function wPotSkip(){_wPot=null;var h=document.getElementById('w-pot-hint');if(h)h.hidden=true;wGo(_wzAt+1);}
 function wPotToHouse(type,value,rateStr){
   if(!(value>0)||typeof state==='undefined'||!state)return false;
-  var vBase=value/(window.VI_CURRENCY_RATE||1),acct={type:type,name:''},r=parseFloat(rateStr);
+  var vBase=value,acct={type:type,name:''},r=parseFloat(rateStr);   // typed in £ on the welcome screens (its only caller), stored in £
   if(isFinite(r)&&r>=0&&r<=100)acct.rate=Math.round(r*100)/100;
   state.depAcct=acct;
   var dep={amount:vBase,date:new Date().toLocaleDateString('en-GB'),acct:{t:type,n:''}};if(acct.rate!=null)dep.acct.r=acct.rate;
@@ -18962,6 +18971,18 @@ var VI_SERVER_KEYS = ['vi_pioneer','vi_founder','vi_plan'];
 // Every edit to a vault key is time-stamped (vi_ts) and queued (vi_dirty) until the cloud confirms it.
 // Signing in never overwrites newer local work: see _hydrateFromSupabase.
 var _cloudSeen = {}, _emptiedByUser = {};   // _emptiedByUser: areas the user deliberately emptied this session (so an empty result may be uploaded)   // what the cloud held when we last read/wrote it
+// v0.95 (tester 1, 9 Nov: zeroed figures came back): an "emptied" mark is also kept on the device until its upload lands, so a reload
+// before then cannot let the older cloud copy bring the deleted rows back. It is tied to the email it was made under, so another
+// account signing in on this device never inherits it.
+function _viEmail() { try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return u && u.email ? String(u.email).toLowerCase() : ''; } catch (e) { return ''; } }
+function _viEmptiedList() { try { var m = JSON.parse(localStorage.getItem('vi_emptied') || 'null'), e = _viEmail(); return m && e && m.e === e && Array.isArray(m.k) ? m.k.filter(function (k) { return _VAULT_KEYS.indexOf(k) > -1; }) : []; } catch (e) { return []; } }
+function _viEmptiedPut(list) { try { var e = _viEmail(); if (e && list.length) _lsOrig.call(localStorage, 'vi_emptied', JSON.stringify({ e: e, k: list })); else localStorage.removeItem('vi_emptied'); } catch (e) {} }
+function _viEmptiedMark(key, on) {
+  if (on) _emptiedByUser[key] = true; else delete _emptiedByUser[key];
+  var l = _viEmptiedList().filter(function (k) { return k !== key; }); if (on) l.push(key); _viEmptiedPut(l);
+}
+function _viEmptiedSent(keys) { var l = _viEmptiedList(), n = l.filter(function (k) { return keys.indexOf(k) < 0; }); if (n.length !== l.length) _viEmptiedPut(n); }
+_viEmptiedList().forEach(function (k) { _emptiedByUser[k] = true; });
 // Fingerprints of the built-in sample (demo) data. If it ever ends up outside demo mode (e.g. a stale device) it counts as "nothing here",
 // so it can neither upload over the account's real figures nor win when the account's data is pulled down.
 function _isDemoSample(key, o) {
@@ -18978,6 +18999,7 @@ function _isBlankArea(key, v) {   // an area with nothing in it (new-device defa
   try {
     var o = typeof v === 'string' ? JSON.parse(v) : v; if (!o) return true;
     if (_isDemoSample(key, o)) return true;   // the built-in sample persona is never the user's own data: it must not replace real figures
+    var _st = _viSampleStrip(key, o); if (_st) o = _st;   // v0.95: judged without the sample's rows, so a device still holding them cannot upload them over a cleared account
     var n = function(a) { return a && a.length; };
     if (key === 'pos_ov1') return !(n(o.income) || n(o.expenses));
     if (key === 'pos_al1') return !(n(o.cashAccounts) || n(o.physicalCash) || n(o.stocks) || n(o.otherAssets) || n(o.crypto) || n(o.liabilities) || (o.metals && Object.keys(o.metals).some(function(m) { return +o.metals[m] > 0; })));
@@ -18986,6 +19008,99 @@ function _isBlankArea(key, v) {   // an area with nothing in it (new-device defa
     if (key === 'pos_biz1') return !(n(o.clients) || n(o.leads) || n(o.streams));
   } catch (e) {}
   return false;
+}
+// v0.95, tester 1 (9 Nov 2026: "I can't seem to start off afresh and add data"): an account that signed up on a device showing the
+// sample, before d2a368a, kept the sample's rows as its own and the cloud copy brought them back on every sign-in. The demo chip
+// (and its "start with your own data") had gone with demo mode, and zeroing the Assets lines left the sample's House Builder pot.
+// These are the sample's own rows (loadDemoData), matched by name and figure, so clearing never touches a row the user added or edited.
+// Each row is [name, figure, the sample's own id]: user rows get Date.now() ids, so a row the user added with a preset name
+// ("Savings", "Current Account") never matches. Entrepreneur rows have time ids in the sample too, so that area is only touched
+// when it carries the sample's fingerprint (_isDemoSample: the Nova Retail lead).
+var VI_SAMPLE_ROWS = {
+  pos_ov1: [['income', 'name', 'amount', [['Salary (£57k)', 3635, 1], ['Freelance consulting', 1200, 2]]],
+    ['expenses', 'name', 'amount', [['Rent', 1150, 3], ['Groceries', 340, 4], ['Transport', 160, 5], ['Utilities & bills', 170, 6], ['Phone & internet', 48, 7],
+      ['Insurance', 55, 8], ['Subscriptions', 58, 9], ['Gym & health', 42, 10], ['Eating out', 120, 11], ['Entertainment', 90, 12], ['Holidays', 180, 13],
+      ['Gifts & giving', 80, 14], ['House deposit', 550, 15], ['ISA / investments', 350, 16], ['Pension (extra)', 150, 17], ['Emergency fund', 200, 18], ['Savings', 250, 19]]]],
+  pos_al1: [['cashAccounts', 'name', 'balance', [['Marcus Savings (emergency fund)', 4800, 1], ['Current Account', 2100, 2]]],
+    ['otherAssets', 'name', 'value', [['Car · Honda Civic', 9500, 5]]], ['liabilities', 'name', 'value', [['Car Finance', 4200, 6]]],
+    ['stocks', 'sym', 'units', [['VUSA.L', 120, 1], ['VWRL.L', 60, 2]]]],
+  pos_debt1: [['debts', 'name', 'original', [['Student Loan Plan 2', 38000, 1], ['Barclaycard', 3200, 2]]]],
+  pos_biz1: [['clients', 'name', 'monthly', [['Northgate Health', 700], ['Fernbrook Studio', 500]]],
+    ['leads', 'name', 'value', [['Nova Retail', 900], ['Harbour & Co', 600], ['Lumen Fintech', 1200]]],
+    ['streams', 'name', 'monthly', [['Consulting day rate', 1200]]],
+    ['incomeStreams', 'name', 'monthlyIncome', [['Product consulting', 1200], ['Notion templates shop', 85]]]]
+};
+// the sample's seven House Builder deposits (date, amount): a welcome pot or the user's own deposits on top of them stay
+var VI_SAMPLE_DEPOSITS = [['01/04/2026', 3000], ['01/05/2026', 2500], ['01/06/2026', 2800], ['01/07/2026', 2600], ['01/08/2026', 2400], ['01/09/2026', 2700], ['01/10/2026', 2500]];
+function _viSame(a, b) { return Math.abs((+a || 0) - b) < 1e-9; }   // figures compared with a tolerance, never ===
+// the area without the sample's rows, or null when it does not hold the sample
+function _viSampleStrip(key, o) {
+  if (!o || typeof o !== 'object') return null;
+  var fp = _isDemoSample(key, o);
+  if (key === 'pos_biz1' && !fp) return null;
+  var c = JSON.parse(JSON.stringify(o)), n = 0;
+  if (typeof VI_SAMPLE_ROWS === 'undefined') return null;   // asked before this block has run
+  (VI_SAMPLE_ROWS[key] || []).forEach(function (spec) {
+    if (!Array.isArray(c[spec[0]])) return;
+    c[spec[0]] = c[spec[0]].filter(function (r) {
+      var hit = !!r && spec[3].some(function (x) { return r[spec[1]] === x[0] && _viSame(r[spec[2]], x[1]) && (x[2] == null || r.id === x[2]); });
+      if (hit) n++; return !hit;
+    });
+  });
+  if (key === 'ht3' && Array.isArray(c.deposits)) {
+    var took = 0, left = VI_SAMPLE_DEPOSITS.slice();
+    var keep = c.deposits.filter(function (d) {
+      var i = d ? left.findIndex(function (x) { return d.date === x[0] && _viSame(d.amount, x[1]) && !d.acct; }) : -1;
+      if (i < 0) return true; took += left[i][1]; left.splice(i, 1); return false;
+    });
+    if (VI_SAMPLE_DEPOSITS.length - left.length >= 5) {   // five or more of the seven: this is the sample's log
+      c.deposits = keep; c.saved = Math.max(0, Math.round(((+c.saved || 0) - took) * 100) / 100); n += 2;
+    }
+  }
+  if ((key === 'ht3' || key === 'pos_house') && fp && n < 2) { c.saved = 0; c.deposits = []; n += 2; }   // an older sample: all of it is the sample's
+  if (!(n >= 2 || fp)) return null;
+  if (key === 'pos_ov1' && Array.isArray(c.snapshots)) c.snapshots = c.snapshots.filter(function (sn) { return !(sn && _viSame(sn.liab, 4200) && _viSame(sn.income, 4835)); });   // the sample's made-up history
+  if (key === 'pos_al1') {
+    (c.crypto || []).forEach(function (x) { if (x && ((x.sym === 'ETH' && (_viSame(x.amount, 1.4) || _viSame(x.qty, 1.4))) || (x.sym === 'BTC' && (_viSame(x.amount, 0.05) || _viSame(x.qty, 0.05))))) { x.amount = 0; if ('qty' in x) x.qty = 0; } });   // back to the empty default rows
+    if (c.metals && _viSame(c.metals.gold, 1.5) && _viSame(c.metals.silver, 10)) { c.metals.gold = 0; c.metals.silver = 0; }
+  }
+  return c;
+}
+function viSampleAreas() {
+  if (localStorage.getItem('vi_demo_mode') === 'true') return [];   // on the demo the sample is meant to be there (its own chip clears it)
+  var out = [];
+  ['pos_ov1', 'pos_al1', 'pos_debt1', 'pos_biz1', 'ht3', 'pos_house'].forEach(function (k) {
+    var o = null; try { o = JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) {}
+    var c = _viSampleStrip(k, o); if (c) out.push({ key: k, value: c });
+  });
+  return out;
+}
+function viSampleChip() {   // signed in and read from the cloud first, so the clear is uploaded and the cloud copy cannot win it back
+  var el = document.getElementById('sample-chip'); if (!el) return;
+  var show = false; try { show = !!(_supaUser && _syncReady && _viEmail()) && viSampleAreas().length > 0; } catch (e) {}
+  el.style.display = show ? 'flex' : 'none';
+}
+async function viClearSample() {
+  var areas = viSampleAreas(); if (!areas.length) { viSampleChip(); return; }
+  if (window._viDemoWiped || (_viBootDemo && localStorage.getItem('vi_demo_mode') !== 'true')) { location.reload(); return; }   // this page started on the sample: its writes to those areas are refused, so restart first
+  if (!confirm('Clear the sample figures? Only the demo\'s own rows are removed. Anything you added stays.')) return;
+  areas.forEach(function (a) {
+    var before = localStorage.getItem(a.key);
+    try { _lsOrig.call(localStorage, 'vi_bak_' + a.key, JSON.stringify({ at: Date.now(), value: before })); } catch (e) {}   // never lose what we replace
+    localStorage.setItem(a.key, JSON.stringify(a.value));   // through the wrapper: time-stamped and queued for upload
+    if (localStorage.getItem(a.key) !== before && _isBlankArea(a.key, a.value)) _viEmptiedMark(a.key, true);   // empty now on purpose: the older cloud copy must not win
+  });
+  if (areas.some(function (a) { return a.key === 'pos_ov1'; })) {   // the sample's take-home and rent in the Journey profile
+    try { var j = JSON.parse(localStorage.getItem('pos_journey') || 'null');
+      if (j && j.profile) { var ch = false;
+        if (_viSame(j.profile.monthlyTakeHome, 3635)) { j.profile.monthlyTakeHome = 0; ch = true; }
+        if (_viSame(j.rentMonthly, 1150) && _viSame(j.rentYears, 4)) { j.rentMonthly = 0; j.rentYears = 0; ch = true; }
+        if (ch) localStorage.setItem('pos_journey', JSON.stringify(j)); } } catch (e) {}
+  }
+  window._viDemoWiped = true;   // until the restart, the tabs (still holding the sample in memory) cannot write it back
+  clearTimeout(_flushT);
+  try { if (_supaUser) await _flushDirty(); } catch (e) {}   // anything not sent now goes on the next start (queued, and the emptied marks are kept)
+  location.reload();   // every tab redraws from storage
 }
 var _hydrating = false, _flushT = null, _flushing = false, _syncReady = false;   // _syncReady: this session has read the cloud copy, so uploading can no longer clobber it
 var _devEstablished = (function() {   // a device that already belongs to a real user (decided before anything runs)
@@ -19000,7 +19115,7 @@ localStorage.setItem = function(key, value) {
   if (window._viDeleted) return;   // the account has been deleted: nothing may write data back
   if ((window._viDemoWiped || (_viBootDemo && localStorage.getItem('vi_demo_mode') !== 'true')) && _DEMO_DATA_KEYS.indexOf(key) > -1) return;   // v0.95: the sample has been wiped (by this page, about to restart, or by another tab) while this page still holds it in memory
   if (_VAULT_KEYS.indexOf(key) > -1 && typeof value === 'string') value = viCleanJSON(value);
-  if (_VAULT_KEYS.indexOf(key) > -1) { try { var _prev = localStorage.getItem(key); if (_prev != null && !_isBlankArea(key, _prev) && _isBlankArea(key, value)) _emptiedByUser[key] = true; else if (!_isBlankArea(key, value)) delete _emptiedByUser[key]; } catch (e) {} }
+  if (_VAULT_KEYS.indexOf(key) > -1) { try { var _prev = localStorage.getItem(key); if (_prev != null && !_isBlankArea(key, _prev) && _isBlankArea(key, value)) _viEmptiedMark(key, true); else if (!_isBlankArea(key, value) && _emptiedByUser[key]) _viEmptiedMark(key, false); } catch (e) {} }
   _lsOrig.call(localStorage, key, value);
   if (!_hydrating && _VAULT_KEYS.indexOf(key) > -1 && localStorage.getItem('vi_demo_mode') !== 'true') {   // sample (demo) data is never treated as the user's
     try { var ts = _lsJSON('vi_ts', {}); ts[key] = Date.now(); _lsOrig.call(localStorage, 'vi_ts', JSON.stringify(ts)); } catch (e) {}
@@ -19066,6 +19181,7 @@ async function _flushDirty() {
     if (await _upsertRows(rows)) {
       rows.forEach(function(r) { _cloudSeen[r.key] = r.value; });
       var ts = _lsJSON('vi_ts', {}), sent = rows.map(function(r) { return r.key; });
+      _viEmptiedSent(sent.filter(function(k) { return !((ts[k] || 0) > t0); }));   // the cloud has the emptied copy now (unless edited again since): the mark is no longer needed
       var left = _lsJSON('vi_dirty', []).filter(function(k) { return sent.indexOf(k) < 0 || (ts[k] || 0) > t0; });
       _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(left));
       try { _lsOrig.call(localStorage, 'vi_last_sync', String(Date.now())); } catch (e) {}
@@ -19357,6 +19473,7 @@ function _reloadAllState() {
   try { var _als=localStorage.getItem(AL_KEY); if(_als){ var _alp=JSON.parse(_als); alState=Object.assign(alState,_alp);alNormalise(); if(_alp.metals)alState.metals=Object.assign(alState.metals,_alp.metals); if(_alp.metalPrices)alState.metalPrices=Object.assign(alState.metalPrices,_alp.metalPrices); if(_alp.crypto)alState.crypto=_alp.crypto; if(_alp.cashAccounts)alState.cashAccounts=_alp.cashAccounts; if(_alp.otherAssets)alState.otherAssets=_alp.otherAssets; if(_alp.liabilities)alState.liabilities=_alp.liabilities; } } catch(e) {}
   try { var _dsr=localStorage.getItem(DEBT_KEY); if(_dsr) debtState=JSON.parse(_dsr); } catch(e) {}
   try { var _bsr=localStorage.getItem(BIZ_KEY); if(_bsr) bizState=JSON.parse(_bsr); if(!bizState.leads)bizState.leads=[]; } catch(e) {}
+  try { viSampleChip(); } catch(e) {}   // v0.95: the account's own rows may still hold the sample (tester 1)
 }
 
 var _hydrateErr = '', _hydChanged = false, _needPull = false;
@@ -19456,6 +19573,7 @@ async function _hydrateFromSupabase(uid) {
       });
       // what the cloud already has (and we just adopted) is not an unsent edit: this stops a new device's blank defaults from being uploaded over it
       try { _lsOrig.call(localStorage, 'vi_dirty', JSON.stringify(_lsJSON('vi_dirty', []).filter(function(k) { return cloudWon.indexOf(k) < 0; }))); } catch (e) {}
+      cloudWon.forEach(function(k) { if (_emptiedByUser[k]) _viEmptiedMark(k, false); });   // the cloud copy won: an emptied mark from before must not outlive it
       _VAULT_KEYS.forEach(function(k) { if (!have[k] && localStorage.getItem(k) != null) _markDirty(k); });   // local-only → push up
       _lsOrig.call(localStorage, 'vi_last_pull', String(Date.now()));
     } finally { _hydrating = false; }
@@ -29108,18 +29226,6 @@ function selectWelcomeOpt(btn) {
 }
 
 // Step 1 → Step 2
-function wSetCurrency(c) {
-  document.querySelectorAll('.w-curr-btn').forEach(function(b) {
-    var isActive = b.getAttribute('data-c') === c;
-    b.style.background = isActive ? 'rgba(68,192,185,.15)' : 'rgba(68,192,185,.05)';
-    b.style.borderColor = isActive ? 'rgba(68,192,185,.4)' : 'rgba(68,192,185,.15)';
-    b.style.color = isActive ? 'var(--em)' : 'var(--t3)';
-  });
-  switchCurrency(c);
-  // Update Step 2 labels to show correct symbol
-  var sym = {GBP:'£',USD:'$',EUR:'€',INR:'₹'}[c] || '£';
-  document.querySelectorAll('.w-currency-label').forEach(function(el){ el.textContent = sym; });
-}
 // ── Onboarding screens (owner, 5 Nov 2026, from the Help Bnk feedback) ──
 // 1 name (and email when not signed in), 2 where you are, 3 money, 4 home, 5 deposit pot (v0.95, owner 8 Nov), 6 your plan.
 // w-step-1 holds screens 1-2 and w-step-2 holds 3-6, so wStep1Next / wStep2Submit / wStep2Skip keep their old jobs.
@@ -29199,7 +29305,7 @@ function wRenderPlan() {
     li += '<li class="wz-phase' + (i === 0 ? ' now' : '') + '"><span class="wz-phase-n">' + tags[i] + '</span><span><span class="wz-phase-name">' + names[stg + i].name + '</span>'
       + '<div class="wz-phase-d">' + VI_PLAN_PHASE_TEXT[stg + i] + '</div></span></li>';
   }
-  var sym = ((document.querySelector('.w-currency-label') || {}).textContent || '£').trim() || '£';
+  var sym = '£';   // the welcome screens work in pounds (v0.95, tester 1: ₹ on Dream Home Target)
   var num = function (id) { var x = document.getElementById(id); var v = x ? parseFloat(x.value) : 0; return isFinite(v) && v > 0 ? v : 0; };
   var money = function (v) { return sym + Math.round(v).toLocaleString('en-GB'); };
   var inc = num('w-income'), out = num('w-expenses'), sums = '';
@@ -29281,7 +29387,7 @@ function wStep2Submit() {
   if (_wHouse && typeof state !== 'undefined' && state && state.prices && _wHouse in state.prices) {
     // a picked house type (v0.9.1 round 2, R15): saved the way the House builder saves it; a typed target becomes that type's price, as Set price does
     state.houseType = _wHouse;
-    if (house > 0) state.prices[_wHouse] = Math.round(house / (window.VI_CURRENCY_RATE || 1));
+    if (house > 0) state.prices[_wHouse] = Math.round(house);   // typed in £ (the welcome screens are pounds only), stored in £
     state.target = state.prices[_wHouse];
     try { prevP = pct(); updatePriceLabels(); updatePriceInput(); updateMilestoneLabels(); updateFloorSelector(); save(); updateUI(); hbtPaint(); } catch (e) {}
   } else if (house > 0 && typeof state !== 'undefined' && state) {
@@ -30236,6 +30342,7 @@ function initDemoMode() {
   }
   var chip = document.getElementById('demo-chip');
   if (chip) chip.style.display = isDemo ? 'flex' : 'none';
+  try { viSampleChip(); } catch (e) {}
 }
 
 function initWelcome() {
@@ -32084,7 +32191,7 @@ window.viFb={flush:flush,context:context,trail:function(){return TRAIL.slice()},
 //    screen (Simplified view hides some). when(): the step only runs when true.
 var simple=function(){return document.body.classList.contains('vi-simple')};
 var STEPS=[
-  {id:'welcome',title:'Welcome to Vault-It',body:'Want a 60-second look around? You can skip it and go straight to the app. The tour is always in Settings and under the ? button if you want it later.',first:true},
+  {id:'welcome',title:'Welcome to Vault-It',body:'Want a 60-second tour? You can skip it now and access it later under ? Help.',first:true},
   {id:'nav',sel:'#vi-tabs',title:'Your tabs',body:'Each tab is one part of the road from debt to your own front door. On a phone they sit along the bottom of the screen.'},
   {id:'ov-kpis',tab:'overview',sel:'#tab-overview .ov-kpis',title:'Your numbers at a glance',body:'Net worth is everything you own minus everything you owe. These figures update as you add things anywhere in the app.'},
   {id:'ov-nw',tab:'overview',find:function(){return document.getElementById('nw3d-hero')||(document.getElementById('nwChart')&&document.getElementById('nwChart').closest('.ov-chart-card'))},optional:true,title:'Net worth in 3D',body:'What you own stands on the gold line and what you owe hangs below it. Tap a column to read it, drag to turn it.'},
