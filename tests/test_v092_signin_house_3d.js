@@ -1,7 +1,7 @@
 // v0.9.2 (owner, 6 Nov: "Make the house large zoomed into the background with rotation animations. Allow the cursor to interact with
 // the model subtly expanding and exploding the house upon hover over."). The House Builder house, large behind the sign-in card.
 // Checks: reduced motion keeps the scene as a slow drift of the finished house (no build, no hover); the scene starts only after the page has loaded, built in a worker;
-// the email field and Continue sit where 9c62f8f puts them (same browser) and where they are without the scene; the canvas takes no
+// the email field and Continue sit where 5519bd1 puts them (same browser) and where they are without the scene; the canvas takes no
 // focus or clicks; nothing draws on the code, PIN and set-PIN steps and it resumes on the email step; hover eases the house out and it
 // settles back; a tap gives a burst that settles; pixel ratio 1.5 at most on a phone; no frame or start-up step over 100 ms of script;
 // no outside host the page did not already use; no sideways scroll; the card text keeps AA contrast over the scene.
@@ -28,16 +28,16 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
   ok(/<script id="hb3d-engine">/.test(html), 'the engine script is marked so the worker can be built from it');
   ok(!/class="auth-scene/.test(html.replace(/<script[\s\S]*?<\/script>/g, '')), 'the scene is not in the page markup, so it cannot load before the card');
   const b = await chromium.launch();
-  let BASE = null;   // 9c62f8f measured in this same browser (shallow clones, as on CI, lack it: skipped)
+  let BASE = null;   // 5519bd1 measured in this same browser (shallow clones, as on CI, lack it: skipped)
   try {
-    const old = require('child_process').execFileSync('git', ['show', '9c62f8f:index.html'], { cwd: path.join(__dirname, '..'), stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1 << 28 });
+    const old = require('child_process').execFileSync('git', ['show', '5519bd1:index.html'], { cwd: path.join(__dirname, '..'), stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1 << 28 });
     const f = path.join(fs.mkdtempSync(path.join(require('os').tmpdir(), 'vi-signin3d-base-')), 'index.html'); fs.writeFileSync(f, old); BASE = {};
     for (const [w, h] of [[390, 664], [1440, 900]]) {
       const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1 }); await routeThree(ctx); const page = await ctx.newPage();
       await page.goto(require('url').pathToFileURL(f).href); await page.waitForTimeout(1500);
       BASE[w] = [await BOX('#auth-email')(page), await BOX('#auth-email-step .auth-btn')(page)]; await ctx.close();
     }
-  } catch (e) { console.log('skip: 9c62f8f is not in this clone (shallow), so the same-browser comparison with it is skipped'); }
+  } catch (e) { console.log('skip: 5519bd1 is not in this clone (shallow), so the same-browser comparison with it is skipped'); }
 
   // 1. reduced motion (owner, 8 Nov: "I want motion on sign in and onboarding"): the scene still runs, as the finished house on a slow drift: no build, no explode
   { const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' }); await routeThree(ctx); const page = await ctx.newPage();
@@ -67,9 +67,9 @@ const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
     ok(s.stats && s.stats.ctorMs >= 0 && s.stats.ctorMs < 100 && s.stats.loadMs < 100, T + 'starting the scene costs the main thread under 100 ms a step (' + JSON.stringify(s.stats) + ')');
     ok(s.pe === 'none' && s.tab === -1, T + 'the canvas takes no clicks and no focus (pointer-events ' + s.pe + ', tabIndex ' + s.tab + ')');
     ok(s.dpr <= (phone ? 1.5 : 2) && (!phone || s.dpr === 1.5), T + 'pixel ratio ' + s.dpr + (phone ? ' (a 3x phone capped at 1.5)' : ''));
-    // the form: where 9c62f8f puts it, and where it is without the scene
+    // the form: where 5519bd1 puts it, and where it is without the scene
     const em = await BOX('#auth-email')(page), co = await BOX('#auth-email-step .auth-btn')(page);
-    if (BASE && BASE[w]) ok(JSON.stringify([em, co]) === JSON.stringify(BASE[w]), T + 'email field and Continue are where 9c62f8f puts them in this browser (' + JSON.stringify([em, co]) + ' vs ' + JSON.stringify(BASE[w]) + ')');
+    if (BASE && BASE[w]) ok(JSON.stringify([em, co]) === JSON.stringify(BASE[w]), T + 'email field and Continue are where 5519bd1 puts them in this browser (' + JSON.stringify([em, co]) + ' vs ' + JSON.stringify(BASE[w]) + ')');
     // clicks and focus go to the form, never the canvas
     const hit = await page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e ? (e.tagName + '.' + e.className) : ''; }, [Math.round(w * 0.05), Math.round(h * 0.5)]);
     ok(!/CANVAS/.test(hit), T + 'a click beside the card lands on the page, not the canvas (' + hit + ')');

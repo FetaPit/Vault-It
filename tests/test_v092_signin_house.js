@@ -18,10 +18,10 @@ const HOUSE = (page) => page.evaluate(() => { const e = document.querySelector('
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   ok(!/<img[^>]*auth-house/.test(html), 'the picture is not in the page markup, so it cannot load before the card');
   const b = await chromium.launch();
-  // 9c62f8f (Continue with Google, no sign-in house) measured in this same browser, so font differences between machines cancel out. Shallow clones (CI) lack it: skip.
+  // 5519bd1 (the onboarding-friction card: Google first, no sign-in house) measured in this same browser, so font differences between machines cancel out. Shallow clones (CI) lack it: skip.
   let BASE = null;
   try {
-    const old = require('child_process').execFileSync('git', ['show', '9c62f8f:index.html'], { cwd: path.join(__dirname, '..'), stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1 << 28 });
+    const old = require('child_process').execFileSync('git', ['show', '5519bd1:index.html'], { cwd: path.join(__dirname, '..'), stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1 << 28 });
     const f = path.join(fs.mkdtempSync(path.join(require('os').tmpdir(), 'vi-signin-base-')), 'index.html'); fs.writeFileSync(f, old); BASE = {};
     for (const [w, h] of [[390, 664], [1440, 900]]) for (const theme of ['dark', 'light']) {
       const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1 }); await routeThree(ctx); const page = await ctx.newPage();
@@ -29,7 +29,7 @@ const HOUSE = (page) => page.evaluate(() => { const e = document.querySelector('
       await page.goto(require('url').pathToFileURL(f).href); await page.waitForTimeout(1500);
       BASE[w + 'x' + h + theme] = [await BOX('#auth-email')(page), await BOX('#auth-email-step .auth-btn')(page)]; await ctx.close();
     }
-  } catch (e) { console.log('skip: 9c62f8f is not in this clone (shallow), so the same-browser comparison with it is skipped; the with/without-picture check still runs'); }
+  } catch (e) { console.log('skip: 5519bd1 is not in this clone (shallow), so the same-browser comparison with it is skipped; the with/without-picture check still runs'); }
   for (const [w, h] of [[390, 664], [1440, 900]]) for (const theme of ['dark', 'light']) {
     const T = w + 'x' + h + ' ' + (theme === 'dark' ? 'Night' : 'Daylight') + ': ';
     const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1 }); await routeThree(ctx); const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
@@ -53,7 +53,7 @@ const HOUSE = (page) => page.evaluate(() => { const e = document.querySelector('
     await page.evaluate(() => { _ahOn = false; const i = document.querySelector('.auth-house'); if (i) i.remove(); }); await page.waitForTimeout(100);
     const card0 = await BOX('.auth-card')(page), em0 = await BOX('#auth-email')(page), co0 = await BOX('#auth-email-step .auth-btn')(page);
     ok(JSON.stringify([card, em, co]) === JSON.stringify([card0, em0, co0]), T + 'card, email field and Continue are exactly where they are without the picture (' + JSON.stringify([em, co]) + ' vs ' + JSON.stringify([em0, co0]) + ')');
-    if (BASE && BASE[w + 'x' + h + theme]) ok(JSON.stringify([em, co]) === JSON.stringify(BASE[w + 'x' + h + theme]), T + 'email field and Continue are where 9c62f8f puts them in this same browser (' + JSON.stringify([em, co]) + ' vs ' + JSON.stringify(BASE[w + 'x' + h + theme]) + ')');
+    if (BASE && BASE[w + 'x' + h + theme]) ok(JSON.stringify([em, co]) === JSON.stringify(BASE[w + 'x' + h + theme]), T + 'email field and Continue are where 5519bd1 puts them in this same browser (' + JSON.stringify([em, co]) + ' vs ' + JSON.stringify(BASE[w + 'x' + h + theme]) + ')');
     await page.evaluate(() => { _ahOn = true; viSigninHouse(); }); await page.waitForTimeout(300);
     for (const step of ['otp', 'pin', 'setpin']) {
       await page.evaluate((s) => _showAuthStep(s), step); await page.waitForTimeout(100);

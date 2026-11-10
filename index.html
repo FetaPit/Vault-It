@@ -10751,6 +10751,17 @@ input:focus, textarea:focus, select:focus {
 .auth-or{display:flex;align-items:center;gap:10px;margin:14px 0 12px;font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);text-transform:uppercase;letter-spacing:.1em}
 .auth-or::before,.auth-or::after{content:'';flex:1;border-top:1px solid rgb(var(--ink-rgb) / .12)}
 @media (min-width:900px){.auth-google{min-height:52px}}
+/* Google first (owner, 10 Nov 2026): with Google on, its button is the main option and the email Continue turns secondary (viGoogleCheck) */
+.auth-pinlater{margin:0 0 12px;padding:10px 12px;border-left:3px solid var(--em);background:rgb(var(--teal-rgb) / .08);font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2));line-height:1.45;color:var(--tx)}
+.auth-pinlater[hidden],#auth-pinlater-cancel[hidden]{display:none}
+#auth-email-step.pinlater .auth-intro,#auth-email-step.pinlater .auth-steps,#auth-email-step.pinlater .auth-google,#auth-email-step.pinlater .auth-or{display:none}
+/* the later "set a PIN" card (viPinOfferShow): over the app, under the sign-in overlay */
+.vi-pin-offer{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:900;width:min(380px,calc(100vw - 32px));box-sizing:border-box;padding:14px 16px;background:var(--c2);border:1px solid var(--em);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);color:var(--tx)}
+.vi-pin-offer[hidden]{display:none}
+.vi-pin-offer-h{font-family:'Syne',sans-serif;font-weight:800;font-size:max(.7rem,var(--vi-fs-3));margin-bottom:4px}
+.vi-pin-offer p{margin:0 0 12px;font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2));line-height:1.45;color:var(--t2)}
+.vi-pin-offer .set-btns .set-btn{min-height:44px;flex:1}
+@media (max-width:899px){.vi-pin-offer{bottom:calc(84px + env(safe-area-inset-bottom))}}
 /* first-run onboarding (owner, 5 Nov 2026, from the Help Bnk feedback): one question per screen, a step count, Back, then a plan */
 .wz-top{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin:-10px 0 6px}
 .wz-back{min-height:44px;padding:0 10px 0 0;background:none;border:none;color:var(--em);font-family:'Syne',sans-serif;font-size:max(.62rem,var(--vi-fs-2));font-weight:700;cursor:pointer}
@@ -10779,7 +10790,10 @@ input:focus, textarea:focus, select:focus {
 .wz-days button[aria-pressed="true"]{border-color:var(--em);background:rgb(var(--teal-rgb) / .14);color:var(--em)}
 .wz-note{font-family:'DM Sans',sans-serif;font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);line-height:1.5;margin:0 0 14px}
 .welcome-opt{min-height:44px}
-#wz-s6 .welcome-field{margin-top:18px}
+.w-opt-tag{text-transform:none;font-weight:400;opacity:.7}
+.wz-q{margin-top:22px;margin-bottom:6px;font-family:'Syne',sans-serif;font-weight:800;font-size:max(.78rem,var(--vi-fs-3));color:var(--tx);line-height:1.25}
+.wz-q-sub{margin-bottom:10px}
+.wz-home{margin-top:18px}
 #w-pot-opts{margin-top:8px}
 #w-pot-fields .welcome-field{margin-top:12px}
 #w-pot-fields label{font-size:var(--vi-fs-1)}
@@ -12113,6 +12127,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 
     <!-- Step 1: email -->
     <div id="auth-email-step" class="auth-step active">
+      <!-- PIN offered later (owner, 10 Nov 2026): a first PIN needs a fresh sign-in (pin-auth), so "Set a PIN" on a later visit proves the email with a code first -->
+      <div id="auth-pinlater-note" class="auth-pinlater" hidden>To set your PIN, first confirm it is you with a code we email you.</div>
       <div class="auth-intro">Track your net worth, clear your debt and build towards your house goal, all in one private vault.</div>
       <!-- Sign up or sign in with Google (owner, 5 Nov 2026): hidden until the Supabase Google provider is switched on (viGoogleCheck) -->
       <button id="auth-google" class="auth-google" type="button" onclick="authGoogle()" hidden>
@@ -12120,11 +12136,12 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         <span>Continue with Google</span>
       </button>
       <div id="auth-google-or" class="auth-or" hidden><span>or use your email</span></div>
-      <div class="auth-steps"><span class="nw">1. Enter your email</span> &nbsp;<span class="nw">2. Type the 6-digit code we email you</span> &nbsp;<span class="nw">3. Choose a 6-digit PIN.</span> Then email + PIN signs you in on any device.</div>
+      <div class="auth-steps"><span class="nw">1. Enter your email</span> &nbsp;<span class="nw">2. Type the 6-digit code we email you.</span> You can add a 6-digit PIN later; then email + PIN signs you in on any device.</div>
       <div class="auth-label">Your email address</div>
       <input id="auth-email" class="auth-inp" type="email" placeholder="you@example.com" autocomplete="email"
         onkeydown="if(event.key==='Enter')authSubmitEmail()">
       <button class="auth-btn" onclick="authSubmitEmail()">Continue →</button>
+      <button id="auth-pinlater-cancel" class="auth-btn secondary" type="button" onclick="viPinLaterCancel()" hidden>Not now</button>
       <div class="auth-info">Private beta · your data is private to your account · synced across your devices</div>
       <div class="auth-info" style="margin-top:6px;opacity:.85">By continuing you accept the <a href="#" onclick="showTerms();return false" style="color:var(--em)">Beta Terms</a>. See how we use your data in the <a href="#" onclick="showPrivacy();return false" style="color:var(--em)">Privacy Notice</a>.</div>
     </div>
@@ -12346,11 +12363,11 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
     var isDemo = localStorage.getItem('vi_demo_mode') === 'true';
     var demoA = localStorage.getItem('vi_demo_variant') === 'a';   // the vault-it.co/demo-a sample lands on the dashboard, not the wizard
-    if (!reset && ((u && u.name && u.email && !isDemo) || (isDemo && demoA))) {
+    if (!reset && ((u && u.email && (u.name || (u.goal != null && u.goal !== '')) && !isDemo) || (isDemo && demoA))) {
       document.write('<style>#welcome-overlay{display:none!important}</style>');
     }
     // Belt-and-suspenders: also hide via JS after DOM is ready
-    if (!reset && ((u && u.name && u.email && !isDemo) || (isDemo && demoA))) {
+    if (!reset && ((u && u.email && (u.name || (u.goal != null && u.goal !== '')) && !isDemo) || (isDemo && demoA))) {
       document.addEventListener('DOMContentLoaded', function() {
         var ov = document.getElementById('welcome-overlay');
         if (ov) { ov.style.display = 'none'; ov.style.setProperty('display','none','important'); }
@@ -12367,9 +12384,9 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
          Back, never the email twice, then the plan: where you are, one step for this week, and a weekly check-in day. -->
     <div class="wz-top">
       <button type="button" class="wz-back" id="wz-back" onclick="wBack()" hidden>&larr; Back</button>
-      <div class="wz-count" id="wz-count" aria-live="polite">Step 1 of 6</div>
+      <div class="wz-count" id="wz-count" aria-live="polite">Step 1 of 3</div>
     </div>
-    <div class="wz-bar" id="w-step-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="wz-bar" id="w-step-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
 
     <div id="wz-hero">
     <!-- Pioneer welcome header -->
@@ -12448,23 +12465,23 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
     </div>
 
     <div id="w-step-1">
+      <!-- Onboarding friction (owner, 10 Nov 2026: "Do all but 5"): 3 screens, not 6. 1: where you are and your home goal;
+           2: your money and deposit pot, each can be added later; 3: your plan. The check-in day, Simplified or Advanced view and
+           phone take their defaults (today, Simplified, none) and live in Settings. Every answer is saved exactly as before. -->
       <section class="wz-screen" data-s="1" id="wz-s1">
         <h2 class="welcome-h2" tabindex="-1">Your first 30 days are free.<br>The whole app, no card.</h2>
-        <div class="welcome-sub">Five quick screens, then your plan. After 30 days, pick a plan to keep editing; your numbers stay yours either way. Beta testers get first call on the Lifetime licence places.</div>
+        <div class="welcome-sub">Two quick screens, then your plan. After 30 days, pick a plan to keep editing; your numbers stay yours either way. Beta testers get first call on the Lifetime licence places.</div>
         <div class="wz-signed" id="wz-signed" hidden>Signed in as <b id="wz-signed-email"></b></div>
       <div class="welcome-field">
-        <label>First Name</label>
+        <label for="w-name">First name <span class="w-opt-tag">(optional)</span></label>
         <input type="text" class="welcome-inp" id="w-name" placeholder="Your first name" autocomplete="given-name">
       </div>
       <div class="welcome-field" id="w-email-field">
-        <label>Email Address</label>
+        <label for="w-email">Email address</label>
         <input type="email" class="welcome-inp" id="w-email" placeholder="you@example.com" autocomplete="email">
       </div>
-        <div class="welcome-foot"><button class="welcome-cta" onclick="wNext()">Next &rarr;</button></div>
-      </section>
-      <section class="wz-screen" data-s="2" id="wz-s2" hidden>
-        <h2 class="welcome-h2" tabindex="-1">Where are you right now?</h2>
-        <div class="welcome-sub">Pick the one closest to you. It sets where your plan starts. You can change it later.</div>
+        <div class="w-label wz-q">Where are you right now?</div>
+        <div class="welcome-sub wz-q-sub">Pick the one closest to you. It sets where your plan starts. You can change it later.</div>
       <div class="welcome-opts" id="w-opts">
         <button class="welcome-opt" data-val="0" onclick="selectWelcomeOpt(this)">
           <span class="welcome-opt-icon">💳</span>
@@ -12484,14 +12501,32 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </button>
       </div>
         <div class="wz-hint" id="wz-goal-hint" role="alert" hidden>Pick one of these to go on.</div>
-        <div class="welcome-foot"><button class="welcome-cta" onclick="wStep1Next()">Next &rarr;</button></div>
+        <div class="g-form wz-home">
+        <div class="w-ht-pick">
+          <div class="w-ht-lbl" id="w-ht-lbl">Which home are you saving for?</div>
+          <div class="w-htypes" id="w-htypes" role="group" aria-labelledby="w-ht-lbl" aria-label="Which home are you saving for?">
+            <button type="button" class="w-ht" data-type="terraced" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Terraced</span></button>
+            <button type="button" class="w-ht" data-type="semi" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Semi-detached</span></button>
+            <button type="button" class="w-ht" data-type="detached" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Detached</span></button>
+            <button type="button" class="w-ht" data-type="mansion" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Manor house</span></button>
+            <button type="button" class="w-ht" data-type="flat" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Small flat</span></button>
+            <button type="button" class="w-ht" data-type="apartment" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Apartment</span></button>
+          </div>
+          <div class="w-ht-note">Pick one to build it in the House builder. You can change it later from the house itself.</div>
+        </div>
+        <div class="welcome-field" style="margin:0">
+          <label>Dream Home Target (<span class="w-currency-label">£</span>)</label>
+          <input type="number" class="welcome-inp" id="w-house" placeholder="e.g. 200000" min="0">
+        </div>
+        </div>
+        <div class="welcome-foot"><button class="welcome-cta" onclick="wNext()">Next &rarr;</button></div>
       </section>
     </div>
 
     <div id="w-step-2" style="display:none">
-      <section class="wz-screen" data-s="3" id="wz-s3" hidden>
+      <section class="wz-screen" data-s="2" id="wz-s2" hidden>
         <h2 class="welcome-h2" tabindex="-1">Your money each month.</h2>
-        <div class="welcome-sub">Two rough numbers are enough to start. You'll fine-tune them in the Budget.</div>
+        <div class="welcome-sub">Rough numbers are enough to start. You'll fine-tune them in the Budget. Leave any of them for later.</div>
       <div style="margin-bottom:12px">
         <div class="w-label">Your currency</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -12512,39 +12547,10 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
         </div>
         </div>
       <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);line-height:1.55;margin-top:10px;text-align:center">Got debts? You'll add each one separately, with its type, interest rate and minimum payment, in the <b style="color:var(--em)">Debt tracker</b>, so your payoff plan is accurate.</div>
-        <button class="welcome-cta" onclick="wNext()" style="margin-top:14px">Next &rarr;</button>
-        <button type="button" class="wz-skip" onclick="wNext()">Skip, I'll add these later</button>
-      </section>
-      <section class="wz-screen" data-s="4" id="wz-s4" hidden>
-        <h2 class="welcome-h2" tabindex="-1">Your home goal.</h2>
-        <div class="welcome-sub">The home you're working towards. It becomes the house you build, brick by brick.</div>
-        <div class="g-form">
-        <div class="w-ht-pick">
-          <div class="w-ht-lbl" id="w-ht-lbl">Which home are you saving for?</div>
-          <div class="w-htypes" id="w-htypes" role="group" aria-labelledby="w-ht-lbl" aria-label="Which home are you saving for?">
-            <button type="button" class="w-ht" data-type="terraced" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Terraced</span></button>
-            <button type="button" class="w-ht" data-type="semi" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Semi-detached</span></button>
-            <button type="button" class="w-ht" data-type="detached" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Detached</span></button>
-            <button type="button" class="w-ht" data-type="mansion" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Manor house</span></button>
-            <button type="button" class="w-ht" data-type="flat" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Small flat</span></button>
-            <button type="button" class="w-ht" data-type="apartment" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Apartment</span></button>
-          </div>
-          <div class="w-ht-note">Pick one to build it in the House builder. You can change it later from the house itself.</div>
-        </div>
-        <div class="welcome-field" style="margin:0">
-          <label>Dream Home Target (<span class="w-currency-label">£</span>)</label>
-          <input type="number" class="welcome-inp" id="w-house" placeholder="e.g. 200000" min="0">
-        </div>
-        </div>
-        <button class="welcome-cta" onclick="wNext()" style="margin-top:14px">Next &rarr;</button>
-        <button type="button" class="wz-skip" onclick="wNext()">Skip for now</button>
-      </section>
       <!-- v0.95 (owner, 8 Nov 2026): "Ensure we ask a question onboarding if they have a lifetime isa or a savings account only for a house
            deposit and its value and interest rate. Then populate that in the housebuiliding tab." A Yes shows the two fields; the pot lands
            in the House Builder as a deposit in that account (wPotToHouse). -->
-      <section class="wz-screen" data-s="5" id="wz-s5" hidden>
-        <h2 class="welcome-h2" tabindex="-1">Your deposit pot.</h2>
-        <div class="welcome-sub">Money you have already put aside for your home. It lays your first bricks in the House builder.</div>
+        <div class="w-label wz-q">Your deposit pot</div>
         <div class="w-label" id="w-pot-lbl">Do you have a Lifetime ISA or a savings account kept only for your house deposit?</div>
         <div class="welcome-opts w-pot-opts" id="w-pot-opts" role="group" aria-labelledby="w-pot-lbl">
           <button type="button" class="welcome-opt" data-pot="lisa_cash" aria-pressed="false" onclick="wPickPot(this)"><span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true"><use href="#vi-bank"/></svg></span><span><b>Yes, a Lifetime ISA</b>: the government adds 25% to what you pay in, up to £1,000 a year</span></button>
@@ -12557,31 +12563,14 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <div class="welcome-field"><label for="w-pot-rate">Interest rate (% AER), if you know it</label><input type="number" class="welcome-inp" id="w-pot-rate" placeholder="e.g. 4.5, as your provider quotes" min="0" max="100" step="0.01" inputmode="decimal"></div>
           <div class="wz-note" id="w-pot-note">It shows in the House builder as your deposit so far, in that account. You can change it there any time.</div>
         </div>
-        <button class="welcome-cta" onclick="wNext()" style="margin-top:14px">Next &rarr;</button>
-        <button type="button" class="wz-skip" onclick="wPotSkip()">Skip for now</button>
+        <div class="welcome-foot"><button class="welcome-cta" onclick="wNext()">Next &rarr;</button>
+        <button type="button" class="wz-skip" onclick="wPotSkip()">Skip, I'll add these later</button></div>
       </section>
-      <section class="wz-screen" data-s="6" id="wz-s6" hidden>
+      <section class="wz-screen" data-s="3" id="wz-s3" hidden>
         <h2 class="welcome-h2" tabindex="-1">Your plan.</h2>
         <div class="welcome-sub">Built from your answers. One step at a time.</div>
         <div id="wz-plan"></div>
-        <div class="w-label" id="wz-days-lbl">Your weekly check-in</div>
-        <div class="wz-days" id="wz-days" role="group" aria-labelledby="wz-days-lbl"></div>
-        <div class="wz-note">Pick a day. On that day Vault-It shows you your next step. Five minutes is enough.</div>
-        <details class="wz-more"><summary>Optional: how much to show, and your phone number</summary>
-      <div class="w-view-pick" role="group" aria-label="How much to show on screen">
-        <div class="w-view-lbl">How much do you want on screen?</div>
-        <div class="w-view-opts">
-          <button type="button" class="w-view-opt active" data-v="simple" aria-pressed="true" onclick="wPickView('simple',this)"><b>Simplified</b><span>The essentials. Recommended to start.</span></button>
-          <button type="button" class="w-view-opt" data-v="adv" aria-pressed="false" onclick="wPickView('adv',this)"><b>Advanced</b><span>Every tile and tab.</span></button>
-        </div>
-        <div class="w-view-note">You can switch any time in Settings.</div>
-      </div>
-      <div class="welcome-field">
-        <label>WhatsApp / Phone <span style="color:rgb(var(--teal-rgb) / .5);font-weight:400;font-size:max(.42rem,var(--vi-fs-1))">(optional)</span></label>
-        <input type="tel" class="welcome-inp" id="w-phone-s1" placeholder="+44 7700 900000" autocomplete="tel">
-        <div style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);margin-top:5px;line-height:1.55">Add your number to receive a <strong style="color:var(--go)">heavily discounted lifetime licence</strong> code when Vault-It launches on beta.</div>
-      </div>
-        </details>
+        <div class="wz-note">Your weekly check-in day: <b id="wz-day-name"></b>. On that day Vault-It shows you your next step. You can change the day, the view and your phone number in Settings.</div>
         <div class="welcome-foot"><button class="welcome-cta" id="w-finish" onclick="wStep2Submit()">Start this week's step &rarr;</button></div>
       </section>
     </div>
@@ -14084,6 +14073,16 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       <div class="settings-row"><label class="settings-label">Motion</label><div class="settings-opts" id="set-motion"><button data-val="full" onclick="setSetting('motion','full',this)" class="active">Full</button><button data-val="reduced" onclick="setSetting('motion','reduced',this)">Reduced</button></div></div>
     </div>
 
+    <!-- Weekly check-in and phone (owner, 10 Nov 2026: moved out of the welcome to cut onboarding friction). Same saved fields as the
+         welcome used: vi_user.checkin.day and vi_user.phone. Painted by viCheckinPaint(). -->
+    <div class="settings-section set-box" id="set-checkin">
+      <div class="settings-section-title">Weekly check-in and phone</div>
+      <div class="settings-hint" id="set-checkin-lbl" style="margin-bottom:6px">Your check-in day. On that day Vault-It shows you your next step. Five minutes is enough.</div>
+      <div class="wz-days" id="set-checkin-days" role="group" aria-labelledby="set-checkin-lbl"></div>
+      <label class="settings-hint" for="set-phone" style="display:block;margin:12px 0 4px">WhatsApp or phone (optional)</label>
+      <input type="tel" id="set-phone" class="al-inp" placeholder="+44 7700 900000" autocomplete="tel" style="width:100%" onchange="viSetPhone(this.value)">
+      <div class="settings-hint" style="margin-top:6px">Add your number to receive a heavily discounted lifetime licence code when Vault-It launches on beta.</div>
+    </div>
     <!-- 3. Help and app tour (owner, 1 Nov 2026: "a clear button that can trigger the tour again") -->
     <div class="settings-section set-box" id="set-help">
       <div class="settings-section-title">Help and app tour</div>
@@ -18843,7 +18842,7 @@ var _bdSel={inc:null,exp:null},_bdAuto={inc:'',exp:''},_bdEdit=null,_bdIconFor=n
 var INV_MAX=36,INV_SIZE=800,INV_THUMB=320;
 var _invDB=null,_invCache={},_invViews=[],_invSpin=null,_invOpen=null;
 var PIN_LEN=6,_SETPIN_LABEL='Set a 6-digit PIN, then sign in anywhere with just your email + PIN';
-var _authForgot=false,_needPin=null,_pinMode='local',_pinEnterLen=4,_pinBusy=false,_pinChange=false;
+var _authForgot=false,_needPin=null,_pinMode='local',_pinEnterLen=4,_pinBusy=false,_pinChange=false,_pinLater=false,_viSignedInAt=0;   // _pinLater: proving the email with a code to set a first PIN later; _viSignedInAt: an email code was accepted on this page
 var AL_KEY='pos_al1';
 var alState={metals:{gold:0,silver:0,platinum:0,palladium:0},metalPrices:{gold:1950,silver:23.5,platinum:1020,palladium:1100},crypto:[{id:1,sym:'BTC',amount:0,price:42000},{id:2,sym:'ETH',amount:0,price:2200}],cashAccounts:[],physicalCash:[],otherAssets:[],liabilities:[]};
 var DEBT_KEY='pos_debt1';
@@ -19174,7 +19173,7 @@ function _isBlankArea(key, v) {   // an area with nothing in it (new-device defa
 }
 var _hydrating = false, _flushT = null, _flushing = false, _syncReady = false;   // _syncReady: this session has read the cloud copy, so uploading can no longer clobber it
 var _devEstablished = (function() {   // a device that already belongs to a real user (decided before anything runs)
-  try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.name && u.email) && localStorage.getItem('vi_demo_mode') !== 'true'; } catch (e) { return false; }
+  try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); return !!(u && u.email && (u.name || (u.goal != null && u.goal !== ''))) && localStorage.getItem('vi_demo_mode') !== 'true'; } catch (e) { return false; }
 })();
 function _lsJSON(k, d) { try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } }
 function _markDirty(key) {
@@ -19495,7 +19494,8 @@ function _initSupabase() {
       try { viWelcomePrefill(); } catch (e) {}
       var ov = document.getElementById('login-overlay');
       if (ov && ov.style.display !== 'none') {
-        if (_pinPromptNeeded() && !_viViaGoogle(session)) {   // a Google sign-in skips the PIN offer (Google already guards the account)
+        var askPin = _pinPromptNeeded() && !_viViaGoogle(session);   // a Google sign-in skips the PIN offer (Google already guards the account)
+        if (askPin && (_authForgot || _pinLater)) {   // the PIN pad straight after the code only when the user came for a PIN (Forgot PIN, or Set a PIN later)
           _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
           _updatePinDots(0, 'spd');
           var lbl = document.getElementById('auth-setpin-label');
@@ -19503,6 +19503,7 @@ function _initSupabase() {
           _showAuthStep('setpin');
         } else {
           ov.style.display = 'none';
+          if (askPin) viPinOfferAfterSignIn();   // owner, 10 Nov 2026: the PIN is offered later, not at sign-up
         }
       }
       if (hydrated) {
@@ -19740,6 +19741,7 @@ async function _initSupabaseSession() {
       try { if(typeof renderAlTab==='function') renderAlTab(); } catch(e) {}
       try { if(typeof renderPioneerCard==='function') renderPioneerCard(); } catch(e) {}
     }
+    setTimeout(function () { try { viPinOfferMaybe(false); } catch (e) {} }, 2500);   // the PIN, offered on a later visit
   } catch(e) {}
 }
 // ─────────────────────────────────────────────────────────────
@@ -19861,7 +19863,7 @@ function _createSession(email) {
 function viMarkOnboardedUI() {
   try {
     var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
-    if (!u || !u.name || !u.email || localStorage.getItem('vi_demo_mode') === 'true') return false;
+    if (!viUserOnboarded(u) || localStorage.getItem('vi_demo_mode') === 'true') return false;
     _vaultItUser = u;
     var ov = document.getElementById('welcome-overlay');
     if (ov) ov.style.setProperty('display', 'none', 'important');
@@ -20080,6 +20082,7 @@ async function viGoogleCheck() {
   var b = document.getElementById('auth-google'), o = document.getElementById('auth-google-or');
   if (b) b.hidden = !on;
   if (o) o.hidden = !on;
+  var c = document.querySelector('#auth-email-step .auth-btn'); if (c) c.classList.toggle('secondary', on);   // Google first: email is the second option
   try { viSigninHouse(); } catch (e) {}   // the card just changed height: re-place the sign-in house
   return on;
 }
@@ -20276,7 +20279,7 @@ async function _guardAccountSwitch(email) {
   return false;
 }
 async function _afterVerified(user, email) {
-  _supaUser = user;
+  _supaUser = user; _viSignedInAt = Date.now();
   if (!(await _guardAccountSwitch(email))) return;
   var wiped = _dropDemoBeforeSync(email);   // v0.95 (owner, 8 Nov, tester on a new device): the sample is wiped from storage first; its keys cannot be written again until the page restarts
   var hydrated = await _hydrateFromSupabase(_supaUser.id);
@@ -20521,6 +20524,8 @@ async function _finishSetPin(pin) {
   _lsOrig.call(localStorage, 'vi_pin_len', String(PIN_LEN));
   _needPin = false; _authForgot = false; _pinBusy = false;
   _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
+  try { _lsOrig.call(localStorage, VI_PIN_OFFER, 'off'); } catch (e) {}
+  if (_pinLater) { viPinLaterEnd(); _hideAuthOverlay(); showToast(onServer ? 'PIN set ✓ Sign in anywhere with just your email + PIN' : 'PIN saved on this device only. The PIN service could not be reached'); return; }
   showToast(onServer ? 'PIN set ✓ Sign in anywhere with just your email + PIN' : 'PIN saved on this device only. The PIN service could not be reached');
   if (_pinChange) { _pinChange = false; _hideAuthOverlay(); return; }
   if (email) { _completeAuth(email); } else { _skipPin(); }
@@ -20534,6 +20539,80 @@ function _hideAuthOverlay() {
 }
 function _skipPin() {
   _pinChange = false;
+  if (_pinLater) viPinLaterEnd();
+  _hideAuthOverlay();
+}
+
+// ── The PIN, offered later (owner, 10 Nov 2026: "less friction"; the PIN is not asked for at sign-up) ──
+// vi_pin_offer (this device only, never synced or exported): 'due:<time>' once an account without a PIN has signed in here,
+// 'off' once the user set a PIN or said Not now. The card shows on the next visit, or straight after the sign-in when the
+// account already existed (its first open on this device). pin-auth lets an account without a PIN set one only within
+// 15 minutes of a sign-in, so after that "Set a PIN" proves the email with a code first, as Forgot PIN does.
+var VI_PIN_OFFER = 'vi_pin_offer', _pinOfferBusy = false;
+function viUserOnboarded(u) { return !!(u && u.email && (u.name || (u.goal != null && u.goal !== ''))); }   // finished the welcome (the first name is optional)
+function viPinOfferAfterSignIn() {
+  try {
+    if (localStorage.getItem('vi_pin_hash') || localStorage.getItem('vi_demo_mode') === 'true') return;
+    var st = localStorage.getItem(VI_PIN_OFFER) || '';
+    if (st === 'off') return;
+    if (!/^due:\d+$/.test(st)) _lsOrig.call(localStorage, VI_PIN_OFFER, 'due:' + Date.now());
+    var u = null; try { u = JSON.parse(localStorage.getItem('vi_user') || 'null'); } catch (e) {}
+    if (viUserOnboarded(u)) setTimeout(function () { viPinOfferMaybe(true); }, 1500);   // an account that already existed: its first open on this device
+  } catch (e) {}
+}
+async function viPinOfferMaybe(now) {   // now: show even if it became due on this page
+  try {
+    if (_pinOfferBusy || !_supaUser || !_supaUser.email) return false;
+    if (localStorage.getItem('vi_demo_mode') === 'true' || localStorage.getItem('vi_pin_hash')) return false;
+    var m = /^due:(\d+)$/.exec(localStorage.getItem(VI_PIN_OFFER) || ''); if (!m) return false;
+    if (!now && +m[1] >= _pageT0) return false;   // the sign-up visit itself: from the next visit on
+    var lo = document.getElementById('login-overlay'), wo = document.getElementById('welcome-overlay');
+    if ((lo && getComputedStyle(lo).display !== 'none') || (wo && getComputedStyle(wo).display !== 'none')) return false;
+    _pinOfferBusy = true;
+    var st = await _pinStatus(String(_supaUser.email).toLowerCase());
+    _pinOfferBusy = false;
+    if (st.pin === true) { _lsOrig.call(localStorage, VI_PIN_OFFER, 'off'); return false; }   // set on another device already
+    if (st.pin !== false) return false;   // not known (service slow or limited): try on another visit
+    viPinOfferShow(); return true;
+  } catch (e) { _pinOfferBusy = false; return false; }
+}
+function viPinOfferShow() {
+  var el = document.getElementById('vi-pin-offer');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'vi-pin-offer'; el.className = 'vi-pin-offer'; el.setAttribute('role', 'region'); el.setAttribute('aria-label', 'Sign-in PIN');
+    el.innerHTML = '<div class="vi-pin-offer-h">Sign in faster next time</div>'
+      + '<p>Set a 6-digit PIN, then sign in on any device with your email and PIN, without waiting for a code.</p>'
+      + '<div class="set-btns"><button type="button" class="set-btn primary" data-pin-offer="set">Set a PIN</button><button type="button" class="set-btn" data-pin-offer="later">Not now</button></div>';
+    el.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-pin-offer]'); if (b) viPinOfferAct(b.getAttribute('data-pin-offer')); });
+    document.body.appendChild(el);
+  }
+  el.hidden = false;
+}
+function viPinOfferAct(kind) {
+  var el = document.getElementById('vi-pin-offer'); if (el) el.hidden = true;
+  try { _lsOrig.call(localStorage, VI_PIN_OFFER, 'off'); } catch (e) {}
+  if (kind === 'set') viPinSetStart();
+}
+function viPinSetStart() {
+  if (!_supaUser || !_supaUser.email) { showToast('Sign in with an email code first, then set your PIN'); return; }
+  var last = Math.max(_viSignedInAt || 0, Date.parse(_supaUser.last_sign_in_at || '') || 0);
+  if (Date.now() - last < 14 * 60 * 1000) { authChangePin(); return; }   // signed in just now: straight to the PIN pad
+  var email = String(_supaUser.email).toLowerCase();
+  _pinLater = true; _authOTP = null; _authForgot = false; _needPin = null;
+  var inp = document.getElementById('auth-email'); if (inp) inp.value = email;
+  var n = document.getElementById('auth-pinlater-note'), c = document.getElementById('auth-pinlater-cancel'), st = document.getElementById('auth-email-step');
+  if (n) n.hidden = false; if (c) c.hidden = false; if (st) st.classList.add('pinlater');
+  var ov = document.getElementById('login-overlay'); if (ov) ov.style.setProperty('display', 'flex', 'important');
+  _showAuthStep('email');
+}
+function viPinLaterEnd() {
+  _pinLater = false;
+  var n = document.getElementById('auth-pinlater-note'), c = document.getElementById('auth-pinlater-cancel'), st = document.getElementById('auth-email-step');
+  if (n) n.hidden = true; if (c) c.hidden = true; if (st) st.classList.remove('pinlater');
+}
+function viPinLaterCancel() {   // Not now on the code step: back to the app, still signed in
+  viPinLaterEnd(); _authOTP = null; _needPin = null; _clearAuthErr();
+  var btn = document.querySelector('#auth-email-step .auth-btn'); if (btn) { btn.textContent = 'Continue →'; btn.disabled = false; }
   _hideAuthOverlay();
 }
 
@@ -20690,7 +20769,7 @@ function _completeAuth(email) {
   }
   var overlay = document.getElementById('login-overlay');
   var _askPin = _pinPromptNeeded(); _needPin = null;
-  if (_askPin) {
+  if (_askPin && (_authForgot || _pinLater)) {   // owner, 10 Nov 2026: no PIN at sign-up; the pad comes only for Forgot PIN or a later Set a PIN
     _pinSetBuf = ''; _pinSetFirst = ''; _pinSetPhase = 'enter';
     _updatePinDots(0, 'spd');
     var lbl = document.getElementById('auth-setpin-label');
@@ -20698,6 +20777,7 @@ function _completeAuth(email) {
     _showAuthStep('setpin');
   } else {
     if (overlay) overlay.style.display = 'none';
+    if (_askPin) viPinOfferAfterSignIn();
   }
   // Re-render UI with restored data
   setTimeout(function() {
@@ -26913,8 +26993,27 @@ function showSettings(){
   var own=viOwner(),ot=document.getElementById('set-owner-tools');if(ot)ot.hidden=!own;
   if(own){[['set-claude-key','claude_api_key'],['set-meshy-key','meshy_api_key'],['set-notion-token','notion_token'],['set-founding-link','vi_founding_link'],['set-nft-contract','vi_nft_contract']].forEach(function(x){var el=document.getElementById(x[0]);if(el)el.value=localStorage.getItem(x[1])||'';});}
   _refreshPioneerSettingsUI();
+  try{viCheckinPaint();}catch(e){}
   document.getElementById('settings-modal').style.display='flex';
 }
+// Settings: the weekly check-in day and phone (moved from the welcome, owner 10 Nov 2026). Writes the same fields the welcome wrote.
+function _viUserRead(){try{return JSON.parse(localStorage.getItem('vi_user')||'null');}catch(e){return null;}}
+function _viUserWrite(u){try{localStorage.setItem('vi_user',JSON.stringify(u));}catch(e){}if(typeof _vaultItUser!=='undefined')_vaultItUser=u;}
+function viCheckinPaint(){
+  var u=_viUserRead()||{},box=document.getElementById('set-checkin-days'),ph=document.getElementById('set-phone');
+  var d=(u.checkin&&typeof u.checkin.day==='number')?u.checkin.day:new Date().getDay();
+  if(box){var lab=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],full=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],h='';
+    [1,2,3,4,5,6,0].forEach(function(x){h+='<button type="button" data-d="'+x+'" aria-label="'+full[x]+'" aria-pressed="'+(x===d)+'" onclick="viSetCheckinDay('+x+')">'+lab[x]+'</button>';});box.innerHTML=h;}
+  if(ph&&document.activeElement!==ph)ph.value=u.phone||'';
+}
+function viSetCheckinDay(d){
+  var u=_viUserRead();if(!u){showToast('Finish the welcome first, then pick your check-in day');return;}
+  var c=u.checkin||{};
+  if(!c.step){var g=parseInt(u.goal,10);c.step=((typeof VI_PLAN_STEP!=='undefined'&&VI_PLAN_STEP[isNaN(g)?0:g])||{tab:'overview'}).tab;}
+  if(!c.set)c.set=new Date().toISOString();
+  c.day=d;u.checkin=c;_viUserWrite(u);viCheckinPaint();
+}
+function viSetPhone(v){var u=_viUserRead();if(!u)return;u.phone=String(v||'').trim();_viUserWrite(u);}
 function viOwner(){try{var q=new URLSearchParams(location.search).get('owner');if(q==='1')localStorage.setItem('vi-owner','1');else if(q==='0')localStorage.removeItem('vi-owner');return localStorage.getItem('vi-owner')==='1';}catch(e){return false;}}
 function saveSettings(){   // owner and developer tools only; the user-facing settings save as you tap them
   [['set-claude-key','claude_api_key'],['set-meshy-key','meshy_api_key'],['set-notion-token','notion_token']].forEach(function(x){var el=document.getElementById(x[0]),v=el&&el.value?el.value.trim():'';if(v)localStorage.setItem(x[1],v);});
@@ -29422,14 +29521,14 @@ function wSetCurrency(c) {
 }
 // ── Onboarding screens (owner, 5 Nov 2026, from the Help Bnk feedback) ──
 // 1 name (and email when not signed in), 2 where you are, 3 money, 4 home, 5 deposit pot (v0.95, owner 8 Nov), 6 your plan.
-// w-step-1 holds screens 1-2 and w-step-2 holds 3-6, so wStep1Next / wStep2Submit / wStep2Skip keep their old jobs.
-var _wzAt = 1, WZ_N = 6, _wDay = null, _wCaptured = false;
+// w-step-1 holds screen 1 and w-step-2 holds 2-3, so wStep1Next / wStep2Submit / wStep2Skip keep their old jobs (3 screens since 10 Nov 2026).
+var _wzAt = 1, WZ_N = 3, _wDay = null, _wCaptured = false;
 function wGo(n) {
   n = Math.max(1, Math.min(WZ_N, n | 0)); _wzAt = n;
   document.querySelectorAll('#welcome-overlay .wz-screen').forEach(function (sc) { sc.hidden = +sc.getAttribute('data-s') !== n; });
   var s1 = document.getElementById('w-step-1'), s2 = document.getElementById('w-step-2');
-  if (s1) s1.style.display = n <= 2 ? '' : 'none';
-  if (s2) s2.style.display = n >= 3 ? '' : 'none';
+  if (s1) s1.style.display = n <= 1 ? '' : 'none';
+  if (s2) s2.style.display = n >= 2 ? '' : 'none';
   var hero = document.getElementById('wz-hero'); if (hero) hero.hidden = n !== 1;
   var c = document.getElementById('wz-count'); if (c) c.textContent = 'Step ' + n + ' of ' + WZ_N;
   document.querySelectorAll('#w-step-dots i').forEach(function (d, i) { d.classList.toggle('on', i < n); });
@@ -29440,16 +29539,14 @@ function wGo(n) {
   var h = document.querySelector('#wz-s' + n + ' h2'); if (h && n > 1) { try { h.focus({ preventScroll: true }); } catch (e) {} }
 }
 function wNext() {
-  if (_wzAt === 1) { if (_wCheckId()) wGo(2); return; }
-  if (_wzAt === 2) { wStep1Next(); return; }
-  if (_wzAt === 5 && !_wPotCheck()) return;   // v0.95: a Yes on the deposit pot needs the amount
+  if (_wzAt === 1) { wStep1Next(); return; }
+  if (_wzAt === 2 && !_wPotCheck()) return;   // v0.95: a Yes on the deposit pot needs the amount
   wGo(_wzAt + 1);
 }
 function wBack() { if (_wzAt > 1) wGo(_wzAt - 1); }
 function _wCheckId() {
   var n = document.getElementById('w-name'), e = document.getElementById('w-email');
-  var name = ((n && n.value) || '').trim(), email = ((e && e.value) || '').trim();
-  if (name.length < 2) { if (n) n.style.borderColor = 'var(--re)'; showToast('Please enter your first name'); return false; }
+  var email = ((e && e.value) || '').trim();   // the first name is optional (owner, 10 Nov 2026); signed in, the email comes from the session
   if (!email || !email.includes('@')) {
     var f = document.getElementById('w-email-field'); if (f) f.hidden = false;
     if (e) e.style.borderColor = 'var(--re)'; showToast('Please enter a valid email address'); return false;
@@ -29512,6 +29609,8 @@ function wRenderPlan() {
   el.innerHTML = '<ol class="wz-phases">' + li + '</ol>'
     + '<div class="wz-week"><b>This week: one step</b>' + step.text + '</div>'
     + (sums ? '<div class="wz-sums">' + sums + ' Rough figures, from what you typed.</div>' : '');
+  var dn = document.getElementById('wz-day-name');   // the check-in day now defaults to today and is changed in Settings
+  if (dn) dn.textContent = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][_wDay === null ? new Date().getDay() : _wDay];
   var days = document.getElementById('wz-days');
   if (days) {
     if (_wDay === null) _wDay = new Date().getDay();
@@ -29549,7 +29648,7 @@ function wStep1Next() {
   var name  = document.getElementById('w-name').value.trim();
   var email = document.getElementById('w-email').value.trim();
   if (!_wSelectedVal) {
-    var gh = document.getElementById('wz-goal-hint'); if (gh) gh.hidden = false;
+    var gh = document.getElementById('wz-goal-hint'); if (gh) { gh.hidden = false; try { gh.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); } catch (e) {} }   // screen 1 is longer now: bring the cue into view
     showToast('Pick the one closest to you, so your plan starts in the right place');
     return;
   }
@@ -29562,7 +29661,7 @@ function wStep1Next() {
     captureEmailToList(email, name, parseInt(_wSelectedVal)||0);
     captureEmailMailchimp(email, name, parseInt(_wSelectedVal)||0);
   }
-  wGo(3);
+  wGo(2);
 }
 
 // Step 2 — full profile submit
@@ -30543,7 +30642,7 @@ function initWelcome() {
     var overlay = document.getElementById('welcome-overlay');
     var user = JSON.parse(localStorage.getItem('vi_user') || 'null');
     var isDemo = localStorage.getItem('vi_demo_mode') === 'true';
-    if (user && user.name && user.email && !isDemo) {
+    if (viUserOnboarded(user) && !isDemo) {   // the first name is optional (owner, 10 Nov 2026)
       // RETURNING REAL USER — hide overlay, restore app state
       _vaultItUser = user;
       if (overlay) overlay.style.display = 'none';
@@ -32413,7 +32512,7 @@ var KB=[
   {c:'Getting started',q:'Can I take the tour again?',k:'walkthrough guide replay tutorial onboarding',a:'Yes. Open <b>Settings</b> and tap <b>Replay the app tour</b>, or tap <b>?</b> then <b>Tour</b>. You can replay the whole tour or one tab.',act:[{l:'Start the tour',fn:'viTourStart'}]},
   {c:'Getting started',q:'Can I install it on my phone?',k:'install home screen app offline iphone android pwa',a:'Yes. On Android, tap <b>Install</b> when the banner appears. On iPhone, open the app in Safari, tap Share, then <b>Add to Home Screen</b>. Once installed it opens full screen and the app itself opens without a connection.'},
 
-  {c:'Sign-in and your data',q:'How do I sign in?',k:'login log in email code pin account',a:'Enter your email and we send a 6-digit code. You can then set a 6-digit PIN, so next time you sign in on any device with your email and PIN.'},
+  {c:'Sign-in and your data',q:'How do I sign in?',k:'login log in email code pin account',a:'Use Continue with Google where it shows, or enter your email and type the 6-digit code we send. That is all you need to get in. Later you can set a 6-digit PIN (we offer it on your next visit, or use Settings, Sign-in PIN), so you sign in on any device with your email and PIN.'},
   {c:'Sign-in and your data',q:'I forgot my PIN',k:'forgot pin locked lockout wrong',a:'Tap <b>Forgot PIN? Get an email code</b> on the sign-in screen. Five wrong PINs lock PIN sign-in for 15 minutes, but an email code always works. You can change or remove your PIN in Settings, Sign-in PIN.'},
   {c:'Sign-in and your data',q:'Does my data sync between devices?',k:'sync device phone laptop cloud backup second',a:'Yes. Your data is saved to your account and follows you when you sign in on another device, with a copy kept on the device you use. Settings, Cloud sync also has version history so you can restore an earlier copy.'},
   {c:'Sign-in and your data',q:'Where is my data stored and is it safe?',k:'data stored privacy secure safe encrypted server where',a:'It is kept in your account on servers in the EU (Frankfurt), private to you, and encrypted in transit and at rest. It is <b>not</b> end-to-end encrypted. The full details are in Settings, Your data, Privacy notice.',act:[{l:'Open Settings',fn:'showSettings'}]},
