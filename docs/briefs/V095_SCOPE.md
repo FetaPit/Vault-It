@@ -77,16 +77,19 @@ Stale lines to close in the queue (already live): Google sign-in (ffe057d), welc
 
 ## D. Owner decisions before the round starts
 
-1. 3D sign-in house with hover (inside house-intro): yes, or the still only?
-2. Onboarding income into Budget: (a) a new split-by-source step in Budget, or (b) only pre-fill the existing income line?
-3. Entrepreneur 2 to 5 in v0.95, or next round?
-4. Port Entrepreneur 1 into v0.95 (marked done, not live)?
-5. Pitch v4 to replace the live v3?
-6. Index split before or after the v0.95 branches? **Decided 9 Nov 15:25: before, option 1, session `refactor/index-split`.**
-7. Remove `submitWaitlist()`?
-8. Clean the affected testers' Supabase rows: yes, and before or after the fix release?
-9. Laptop to push `brand/oxanium-tagline`?
-10. E34, PostHog, joint bills stay parked: confirm.
+**All answered 10 Nov 2026:**
+
+1. 3D sign-in house: **the building house fills the whole background at every size, large and close, with the sign-in card on a translucent dark panel.** Nothing is hidden on short phones, and the card is not redesigned. This replaces the held `v094/house-intro` placement, where the taller Continue with Google card left the house no room.
+2. Onboarding income into Budget: **everything the user answers pre-fills, and Budget then lets them split that income into separate income streams** (owner: "All pre fill from onboarding but then all user to split that into separate income streams in budget tabs"). The split step is in scope, on top of the pre-fill.
+3. Entrepreneur 2 to 5: **in v0.95.**
+4. Entrepreneur 1: **ported and merged** to brand-rollout 9 Nov (9c62f8f) onto the v0.9.1 cash table.
+5. Pitch v4: **merged** to brand-rollout 9 Nov (e7673e8).
+6. Index split: **before the v0.95 edits, option 1.** Order confirmed 10 Nov: the v0.9.4 items finish on the single file, then a 24-hour `index.html` freeze, then the split, then every v0.95 edit on the new structure.
+7. `submitWaitlist()`: **remove it**, with its `#waitlist-modal` lookup.
+8. Affected testers' cloud rows: **yes, clear them.** List the profiles created since 8 Nov, clear only rows that still hold the sample figures, report each one. Production is still b8847c8 without the fix, so rows can come back until the fix is released.
+9. Tester 1's 25 points: **the top three only join v0.95** (sample figures that would not clear after zeroing, the rupee sign on Dream Home Target, the welcome and tour type and copy). The rest stay logged.
+10. Laptop to push `brand/oxanium-tagline`: still open.
+11. E34, PostHog and joint bills: still parked.
 
 ## E. Non-build, owner (Executive Assistant's list)
 
