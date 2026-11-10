@@ -2,7 +2,8 @@
 
 A single connected map of the live site, from the first visit to every tab, sub-tab and modal.
 
-- FigJam board: https://www.figma.com/board/4snyHH3tVOtTUXnxAMhgEA
+- FigJam board (the flow): https://www.figma.com/board/4snyHH3tVOtTUXnxAMhgEA
+- Figma design file (editable screens): https://www.figma.com/design/L1XqC5LMcbv2QmBstCkp9Z
 - Source: `docs/user-flow.mmd` (Mermaid flowchart). Regenerate with the Figma MCP `generate_diagram` tool, or paste into any Mermaid renderer.
 - Mapped from the live app at app.vault-it.co (v0.9.2 Alpha, build flow-dash-1) and the vault-it.co landing page on 8 Nov 2026. The `index.html` in this repo is the older v0.6 build, so the flow follows production, not this file.
 
@@ -25,6 +26,14 @@ A single connected map of the live site, from the first visit to every tab, sub-
 | Network (Web3) | Connect wallet, switch network, mint card, share profile, opt-in |
 | Settings modal | Account, appearance, help and tour, live prices, connections, cloud sync, PIN, privacy, delete account |
 | Global | Help panel, guided tour, legal modal, Pioneer offer, day 30 plan prompt, verify payment, Stripe checkout |
+
+## Editable screens
+
+Every box on the FigJam board links to an editable screen in the design file (click the box text). The screens were captured from the live app in the Alex Morgan demo (Night theme, 390 px wide) on 10 Nov 2026 and imported as real Figma layers: live text in Syne, DM Sans and Share Tech Mono, vector shapes for cards and buttons, SVG icons as vectors. Page 09 holds flat reference screenshots (mobile and 1280 px desktop) to check against.
+
+Known gaps: the 3D house and metals scenes are placeholder boxes (WebGL does not render in the capture), Connections has no screen of its own because the tab opens Settings, and Stripe checkout is off-site.
+
+To refresh after a release: `node docs/user-flow-capture/capture.js shots spec`, then `node docs/user-flow-capture/svg.js spec svg`, then upload the SVGs to the design file with the Figma MCP `upload_assets` tool (one upload URL per screen, multipart with the layer name as the filename).
 
 ## Legend
 

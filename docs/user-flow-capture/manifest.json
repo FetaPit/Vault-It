@@ -1,0 +1,17 @@
+{"pages":{"01":"4:2","02":"4:3","03":"4:4","04":"4:5","05":"4:6","09":"4:7"},
+ "groups":{
+  "01":["landing","landing-privacy","landing-terms","signin-email","signin-otp","signin-setpin","signin-pin"],
+  "02":["onboard-tester-welcome","onboard-1-name-email","onboard-2-where-are-you","onboard-3-money-each-month","onboard-4-home-goal","onboard-5-your-plan","onboard-6-start-vaulting","modal-campaign-pioneer"],
+  "03":["tab-overview","tab-budget","tab-house","tab-assets-metals","tab-debt","tab-biz-gate","tab-biz-unlocked","tab-wealth-roadmap","tab-network"],
+  "04":["tab-assets-metals","tab-assets-crypto","tab-assets-cash","tab-assets-stocks","tab-assets-other","tab-assets-liabilities"],
+  "05":["modal-settings","modal-day30-plans","modal-verify-payment","modal-nw-history","modal-legal-privacy","modal-legal-terms","modal-delete-account","help-ask","help-faq","help-tour","debt-form-add-debt","debt-form-owed-to-you","biz-form-income-stream","biz-form-add-lead","biz-form-add-client"]},
+ "labels":{
+  "landing":"Landing · vault-it.co","landing-privacy":"Landing · Privacy notice","landing-terms":"Landing · Beta terms",
+  "signin-email":"Sign in · Email address","signin-otp":"Sign in · 6-digit email code","signin-setpin":"Sign in · Set a PIN","signin-pin":"Sign in · Enter PIN",
+  "onboard-tester-welcome":"Onboarding · Tester welcome","onboard-1-name-email":"Onboarding 1 · First name and email","onboard-2-where-are-you":"Onboarding 2 · Where are you","onboard-3-money-each-month":"Onboarding 3 · Your money each month","onboard-4-home-goal":"Onboarding 4 · Your home goal","onboard-5-your-plan":"Onboarding 5 · Your plan","onboard-6-start-vaulting":"Onboarding 6 · Start Vaulting","modal-campaign-pioneer":"Modal · Back the build · Pioneer or Lifetime",
+  "tab-overview":"Tab · Overview","tab-budget":"Tab · Budget","tab-house":"Tab · House builder","tab-assets-metals":"Tab · Assets and liabilities","tab-debt":"Tab · Debt tracker","tab-biz-gate":"Tab · Entrepreneur · Pro gate","tab-biz-unlocked":"Tab · Entrepreneur · unlocked","tab-wealth-roadmap":"Tab · Wealth Roadmap","tab-network":"Tab · Network",
+  "tab-assets-crypto":"Assets · Crypto","tab-assets-cash":"Assets · Cash and savings","tab-assets-stocks":"Assets · Stocks","tab-assets-other":"Assets · Wealth inventory","tab-assets-liabilities":"Assets · Liabilities",
+  "modal-settings":"Modal · Settings","modal-day30-plans":"Modal · Day 30 · pick a plan","modal-verify-payment":"Modal · Verify payment","modal-nw-history":"Modal · Net worth history","modal-legal-privacy":"Modal · Privacy notice","modal-legal-terms":"Modal · Beta terms","modal-delete-account":"Modal · Delete account",
+  "help-ask":"Help · Ask","help-faq":"Help · FAQs","help-tour":"Help · Tour",
+  "debt-form-add-debt":"Debt · Add or edit debt","debt-form-owed-to-you":"Debt · Someone owes you",
+  "biz-form-income-stream":"Entrepreneur · Register income stream","biz-form-add-lead":"Entrepreneur · Add lead","biz-form-add-client":"Entrepreneur · Add client"}}
