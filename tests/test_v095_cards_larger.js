@@ -89,7 +89,9 @@ const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
     });
     const over = names.filter(x => x.drawn > 78), stretched = names.filter(x => x.squeezed && x.nat <= 76);
     ok(names.length > 20 && over.length === 0, t + 'every side name ends inside the card (' + names.length + ' names; too long: ' + over.slice(0, 4).map(x => x.name + ' ' + x.drawn.toFixed(0)).join(', ') + ')');
-    ok(stretched.length === 0, t + 'names that already fit are not stretched (' + stretched.map(x => x.name).join(', ') + ')');
+    // the app's fit table (wrSideW) is Syne's own widths; CI blocks Google Fonts, so a fallback font there measures narrower and the comparison means nothing
+    if (await p.evaluate(() => document.fonts.check("12px 'Syne'") && [...document.fonts].some(f => /Syne/.test(f.family) && f.status === 'loaded'))) ok(stretched.length === 0, t + 'names that already fit are not stretched (' + stretched.map(x => x.name).join(', ') + ')');
+    else console.log('skip: ' + t + 'Syne is not loaded here (outside hosts blocked), so natural widths are a fallback font\'s');
     ok(names.some(x => x.name.startsWith('KEYS') && !x.squeezed), t + 'a short name (KEYS) keeps its natural width');
     const side = await p.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
     ok(!side, t + 'no sideways scroll');
