@@ -92,5 +92,5 @@
 /* Headings. Bold is wide, so tighten slightly from 40 px up. Go no further
    than about -0.05em in total or words start to fuse. */
 .vf-heading { font-family: var(--font-vf-display); font-weight: 700; line-height: 1.15; }
-.vf-heading-lg { letter-spacing: -0.01em; word-spacing: -0.05em; } /* add at 40 px and up */
+.vf-heading-lg { letter-spacing: -0.01em; word-spacing: -0.03em; } /* add at 40 px and up */
 .vf-hatch { font-family: var(--font-vf-hatch); font-weight: 700; } /* 32 px and up only */
