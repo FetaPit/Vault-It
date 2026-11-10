@@ -1,6 +1,6 @@
 // v0.95 (owner, 8 Nov 2026): "Ensure we ask a question onboarding if they have a lifetime isa or a savings account only for a
 // house deposit and its value and interest rate. Then populate that in the housebuiliding tab. With a ground up slow entry animation".
-//   1. the onboarding has a deposit pot screen (Step 5 of 6): Lifetime ISA / savings account / Not yet; a Yes shows value and rate;
+//   1. the onboarding has a deposit pot on the money screen (Step 2 of 3 since 10 Nov 2026): Lifetime ISA / savings account / Not yet; a Yes shows value and rate;
 //      Next on a Yes with no amount says so and stays; Skip and Not yet go on to the plan; Back works
 //   2. finishing with a pot records it like Lay the bricks: saved, one dated deposit with its account note, state.depAcct type and
 //      rate, the brick value unchanged; Not yet records nothing
@@ -30,10 +30,9 @@ const scr = (p) => p.evaluate(() => { const v = [...document.querySelectorAll('#
   return { n: v.length, at: v[0] ? v[0].dataset.s : '', count: (document.getElementById('wz-count') || {}).textContent || '', side: document.documentElement.scrollWidth - innerWidth }; });
 async function toPot(p) {   // signed in (name from Google), where you are, money, home: lands on the deposit pot screen
   await p.evaluate(() => { _supaUser = { id: 'u1', email: 't@t.com', user_metadata: { full_name: 'Tess Test' } }; viWelcomePrefill(); });
+  await p.click('#w-opts .welcome-opt[data-val="2"]'); await p.click('#w-htypes .w-ht[data-type="terraced"]'); await p.fill('#w-house', '200000');
   await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(150);
-  await p.click('#w-opts .welcome-opt[data-val="2"]'); await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(150);
-  await p.fill('#w-income', '2000'); await p.fill('#w-expenses', '1500'); await p.click('#wz-s3 .welcome-cta'); await p.waitForTimeout(150);
-  await p.click('#w-htypes .w-ht[data-type="terraced"]'); await p.fill('#w-house', '200000'); await p.click('#wz-s4 .welcome-cta'); await p.waitForTimeout(200);
+  await p.fill('#w-income', '2000'); await p.fill('#w-expenses', '1500'); await p.waitForTimeout(100);
 }
 const USER = [['vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })], ['vi_user', JSON.stringify({ name: 'Tess', email: 't@t.com', logins: 2 })]];
 async function houseStats(p) {   // open the House Builder and read the renderer's opening figures
@@ -51,11 +50,11 @@ async function houseStats(p) {   // open the House Builder and read the renderer
   for (const [w, theme] of [[390, 'dark'], [1100, 'light']]) {
     const T = w + ' ' + theme + ': ';
     const p = await open(b, w, theme);
-    let s = await scr(p); ok(/Step 1 of 6/.test(s.count), T + '1 six steps now (' + s.count + ')');
+    let s = await scr(p); ok(/Step 1 of 3/.test(s.count), T + '1 three steps now (' + s.count + ')');
     await toPot(p); s = await scr(p);
-    ok(s.n === 1 && s.at === '5' && /Step 5 of 6/.test(s.count), T + '1 after the home comes the deposit pot, Step 5 of 6 (' + JSON.stringify(s) + ')');
-    const q = await p.evaluate(() => ({ q: document.getElementById('w-pot-lbl').textContent, opts: [...document.querySelectorAll('#w-pot-opts .welcome-opt')].map(x => x.dataset.pot), fields: document.getElementById('w-pot-fields').hidden, text: document.getElementById('wz-s5').innerText,
-      cta: (() => { const r = document.querySelector('#wz-s5 .welcome-cta').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight + 1; })() }));
+    ok(s.n === 1 && s.at === '2' && /Step 2 of 3/.test(s.count), T + '1 after the home comes your money and the deposit pot, Step 2 of 3 (' + JSON.stringify(s) + ')');
+    const q = await p.evaluate(() => ({ q: document.getElementById('w-pot-lbl').textContent, opts: [...document.querySelectorAll('#w-pot-opts .welcome-opt')].map(x => x.dataset.pot), fields: document.getElementById('w-pot-fields').hidden, text: document.getElementById('wz-s2').innerText,
+      cta: (() => { const r = document.querySelector('#wz-s2 .welcome-cta').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight + 1; })() }));
     ok(/Lifetime ISA/.test(q.q) && /savings account/.test(q.q) && /house deposit/.test(q.q), T + '1 the question names a Lifetime ISA or a savings account kept only for the house deposit (' + q.q + ')');
     ok(q.opts.join(',') === 'lisa_cash,savings,none' && q.fields, T + '1 three answers; value and rate hidden until a Yes');
     ok(q.cta, T + '1 Next is on screen without scrolling');
@@ -67,26 +66,26 @@ async function houseStats(p) {   // open the House Builder and read the renderer
     ok(shown.f && shown.pressed === 'true' && /How much/.test(shown.labels[0]) && /Interest rate/.test(shown.labels[1]) && shown.side <= 1, T + '1 a Yes reveals how much is in it and its interest rate (' + shown.labels.join(' | ') + ')');
     const lab = await p.evaluate(() => Math.min(...[...document.querySelectorAll('#w-pot-fields label')].map(l => parseFloat(getComputedStyle(l).fontSize))));
     ok(lab >= 10.5, T + '1 the field labels sit on the type floor (Pedro: ' + lab + ' px, floor 10.5)');
-    await p.click('#wz-s5 .welcome-cta'); await p.waitForTimeout(150); s = await scr(p);
-    ok(s.at === '5' && (await p.evaluate(() => !document.getElementById('w-pot-hint').hidden)), T + '1 Next with no amount stays and says what is missing');
+    await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(150); s = await scr(p);
+    ok(s.at === '2' && (await p.evaluate(() => !document.getElementById('w-pot-hint').hidden)), T + '1 Next with no amount stays and says what is missing');
     await p.fill('#w-pot-value', '50'); await p.waitForTimeout(60);
     ok(await p.evaluate(() => document.getElementById('w-pot-value').style.borderColor === ''), T + '1 typing an amount clears the red border (Pedro)');
     await p.fill('#w-pot-value', '');
-    await p.click('#wz-back'); await p.waitForTimeout(150); s = await scr(p); ok(s.at === '4', T + '1 Back returns to the home screen');
-    await p.click('#wz-s4 .welcome-cta'); await p.waitForTimeout(150);
+    await p.click('#wz-back'); await p.waitForTimeout(150); s = await scr(p); ok(s.at === '1', T + '1 Back returns to the home screen');
+    await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(150);
     await p.click('#w-pot-opts .welcome-opt[data-pot="none"]'); await p.waitForTimeout(100);
     ok(await p.evaluate(() => document.getElementById('w-pot-fields').hidden && document.getElementById('w-pot-hint').hidden), T + '1 Not yet hides the fields and the hint');
-    await p.click('#wz-s5 .wz-skip'); await p.waitForTimeout(300); s = await scr(p);
-    ok(s.at === '6' && /Step 6 of 6/.test(s.count) && (await p.evaluate(() => !!document.querySelector('#wz-s6 #wz-plan .wz-phase'))), T + '1 Skip goes on to the plan, Step 6 of 6');
+    await p.click('#wz-s2 .wz-skip'); await p.waitForTimeout(300); s = await scr(p);
+    ok(s.at === '3' && /Step 3 of 3/.test(s.count) && (await p.evaluate(() => !!document.querySelector('#wz-s3 #wz-plan .wz-phase'))), T + '1 Skip goes on to the plan, Step 3 of 3');
     if (p._errs.length) errs.push(T + p._errs.join(' | '));
     await p.context().close();
   }
 
   // ── 2, 3 and 4: a Lifetime ISA pot of £6,000 at 4.5%, then the House Builder ──
   let p = await open(b, 1100, 'dark'); await toPot(p);
-  await p.click('#w-pot-opts .welcome-opt[data-pot="lisa_cash"]'); await p.fill('#w-pot-value', '6000'); await p.fill('#w-pot-rate', '4.5');
-  await p.click('#wz-s5 .welcome-cta'); await p.waitForTimeout(250);
-  ok((await scr(p)).at === '6', '2 a filled Yes goes on to the plan');
+  await p.click('#w-pot-opts .welcome-opt[data-pot="lisa_cash"]'); await p.waitForTimeout(500); await p.fill('#w-pot-value', '6000'); await p.fill('#w-pot-rate', '4.5');
+  await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(250);
+  ok((await scr(p)).at === '3', '2 a filled Yes goes on to the plan');
   await p.click('#w-finish');
   const entry0 = await p.evaluate(() => localStorage.getItem('vi_hb_entry'));   // read at once: the plan's step opens the House Builder 250 ms later, which uses the note
   await p.waitForTimeout(900);
@@ -119,7 +118,7 @@ async function houseStats(p) {   // open the House Builder and read the renderer
 
   // ── 2b: Not yet records nothing ──
   p = await open(b, 390, 'dark'); await toPot(p);
-  await p.click('#w-pot-opts .welcome-opt[data-pot="none"]'); await p.click('#wz-s5 .welcome-cta'); await p.waitForTimeout(250);
+  await p.click('#w-pot-opts .welcome-opt[data-pot="none"]'); await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(250);
   await p.click('#w-finish'); await p.waitForTimeout(900);
   const none = await p.evaluate(() => { const h = JSON.parse(localStorage.getItem('ht3') || '{}'); return { saved: h.saved, n: (h.deposits || []).length, acct: h.depAcct, entry: localStorage.getItem('vi_hb_entry') }; });
   ok(none.saved === 0 && none.n === 0 && !none.acct && none.entry === null, '2 Not yet: no deposit, no account note, no entry (' + JSON.stringify(none) + ')');

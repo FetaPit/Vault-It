@@ -75,10 +75,10 @@ const seed = (o) => {
   ok(ha, 'back to Advanced: the level card, progress and History return');
   await p.context().close();
 
-  // ── 5. welcome step: new accounts start Simplified, or Advanced if picked ──
+  // ── 5. welcome: new accounts start Simplified (the view picker moved to Settings, owner 10 Nov 2026) ──
   p = await open({});
-  const w = await p.evaluate(() => { localStorage.removeItem('vi_settings'); viSettings = {}; const st = {}; wStep2Skip(); st.def = viSettings.view; wPickView('adv'); wStep2Skip(); st.adv = viSettings.view; st.pressed = document.querySelector('.w-view-opt[data-v="adv"]').getAttribute('aria-pressed'); return st; });
-  ok(w.def === 'simple' && w.adv === 'adv' && w.pressed === 'true', 'welcome: Simplified by default, Advanced when picked (' + JSON.stringify(w) + ')');
+  const w = await p.evaluate(() => { localStorage.removeItem('vi_settings'); viSettings = {}; const st = {}; wStep2Skip(); st.def = viSettings.view; wPickView('adv'); wStep2Skip(); st.adv = viSettings.view; st.picker = !!document.querySelector('#welcome-overlay .w-view-opt'); return st; });
+  ok(w.def === 'simple' && w.adv === 'adv' && !w.picker, 'welcome: Simplified by default; the view is chosen in Settings, not the welcome (10 Nov 2026) (' + JSON.stringify(w) + ')');
   await p.context().close();
 
   // ── 6. phone, Simplified ──
