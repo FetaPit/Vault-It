@@ -10,8 +10,8 @@ What to try on real devices, in order, and what "working" looks like. Everything
 ## 1. Phone: make the account
 1. Open https://app.vault-it.co in Safari (iPhone) or Chrome (Android). Expect: sign-in card, tagline, FCA line.
 2. Enter your e-mail, tap Continue. Expect: "check your e-mail" step; the code arrives within a minute. If not, check spam, then the Resend dashboard.
-3. Enter the 6-digit code. Expect: "set a PIN" pad. Choose a 6-digit PIN, enter it twice.
-4. First-run welcome: first name, your biggest challenge, house price. Expect: the app opens on the Overview.
+3. Enter the 6-digit code. Expect: straight into the welcome (3 screens), no PIN pad. On the next visit a "Sign in faster next time" card offers a PIN: Set a PIN, confirm the emailed code, choose a 6-digit PIN and enter it twice.
+4. First-run welcome, 3 screens: where you are, home type and price; your money and deposit pot (or skip); your plan. Expect: the app opens on this week's step.
 5. House builder: enter an amount, tap "Lay the Bricks". Expect: bricks animate, the amount shows under the house.
 6. Switch to another app or lock the phone for a few seconds, then come back. (This is when the app pushes to your account.)
 
