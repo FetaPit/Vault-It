@@ -113,11 +113,11 @@ const OVL = '#welcome-overlay{display:none!important}';
     const ctx = await b.newContext({ viewport: { width: w, height: 900 }, isMobile: mob, hasTouch: mob }); await routeThree(ctx); await ctx.route(/open\.er-api\.com/, r => r.abort());
     const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(FRESH, 'dark'); await p.goto(APP); await p.waitForTimeout(1800); await p.addStyleTag({ content: HIDE });
-    await p.evaluate(() => { const o = document.getElementById('welcome-overlay'); o.style.display = 'flex'; document.querySelectorAll('[id^="w-step-"]').forEach(s => s.style.display = 'none'); document.getElementById('w-step-2').style.display = ''; if (typeof wGo === 'function') wGo(4); });   // the home screen of the onboarding (5 Nov 2026)
+    await p.evaluate(() => { const o = document.getElementById('welcome-overlay'); o.style.display = 'flex'; document.querySelectorAll('[id^="w-step-"]').forEach(s => s.style.display = 'none'); document.getElementById('w-step-1').style.display = ''; if (typeof wGo === 'function') wGo(1); });   // 3 screens since 10 Nov 2026: home type is on screen 1   // the home screen of the onboarding (5 Nov 2026)
     await p.waitForTimeout(300);
     const ob = await p.evaluate(() => { const g = document.getElementById('w-htypes'), ts = g ? [...g.querySelectorAll('.w-ht')] : [], R = e => e.getBoundingClientRect();
       return { n: ts.length, keys: ts.map(x => x.dataset.type).join(','), slate: ts.every(x => x.querySelector('svg.wt-svg use[href^="#vi-ht-"]')), q: g ? g.getAttribute('aria-label') || '' : '',
-        inStep: !!document.querySelector('#w-step-2 #w-htypes'), pressed: ts.filter(x => x.getAttribute('aria-pressed') === 'true').length, side: document.documentElement.scrollWidth - innerWidth,
+        inStep: !!document.querySelector('#w-step-1 #w-htypes'), pressed: ts.filter(x => x.getAttribute('aria-pressed') === 'true').length, side: document.documentElement.scrollWidth - innerWidth,
         fit: ts.every(x => R(x).right <= innerWidth && R(x).left >= 0), hbtn: ts.filter(x => x.classList.contains('hbtn')).length }; });
     ok(ob.inStep && ob.n === 6 && ob.keys === KEYS && ob.slate, t + 'R15 six house type slates in the profile step (' + ob.keys + ')');
     ok(ob.pressed === 0 && ob.hbtn === 0 && /home/i.test(ob.q), t + 'R15 nothing picked until the user picks; a labelled group');

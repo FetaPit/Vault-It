@@ -106,7 +106,9 @@ const data = p => p.evaluate(() => ({ saved: state.saved, debts: debtState.debts
   await phone.fill('#auth-email', EMAIL); await phone.click('#auth-email-step .auth-btn'); await phone.waitForTimeout(900);
   ok(await step(phone) === 'auth-otp-step' && cloud.mail === 1, 'phone: no PIN on file, so one e-mail code is sent');
   await phone.fill('#auth-otp-inp', '123456'); await phone.click('#auth-otp-step .auth-btn'); await phone.waitForTimeout(1500);
-  ok(await step(phone) === 'auth-setpin-step', 'phone: code accepted, asked to set a PIN');
+  ok(await step(phone) !== 'auth-setpin-step', 'phone: code accepted, straight in (the PIN is offered later, owner 10 Nov 2026)');
+  await phone.evaluate(() => { window.__c = authChangePin(); }); await phone.waitForTimeout(800);   // Set a PIN just after signing in: straight to the pad
+  ok(await step(phone) === 'auth-setpin-step', 'phone: Set a PIN just after signing in opens the PIN pad');
   await pad(phone, PIN); await pad(phone, PIN); await phone.waitForTimeout(800);
   ok(cloud.pins[EMAIL] === PIN && await overlay(phone) === 'none', 'phone: PIN saved to the account and the app opens');
   let d = await data(phone);
@@ -116,11 +118,10 @@ const data = p => p.evaluate(() => ({ saved: state.saved, debts: debtState.debts
   // first-run welcome: name, biggest challenge, house price
   const welcome = p => p.evaluate(() => getComputedStyle(document.getElementById('welcome-overlay')).display);
   ok(await welcome(phone) === 'flex', 'phone: first run asks for a name and goal');
-  // the onboarding screens (5 Nov 2026): name and email, where you are, money (skipped), home, the plan
-  await phone.fill('#w-name', 'One B'); if (await phone.isVisible('#w-email')) await phone.fill('#w-email', EMAIL); await phone.click('#wz-s1 .welcome-cta');
-  await phone.click('#w-opts .welcome-opt[data-val="1"]'); await phone.click('#wz-s2 .welcome-cta'); await phone.waitForTimeout(300);
-  await phone.click('#wz-s3 .wz-skip'); await phone.fill('#w-house', '250000'); await phone.click('#wz-s4 .welcome-cta'); await phone.waitForTimeout(300);
-  await phone.click('#wz-s5 .wz-skip'); await phone.waitForTimeout(300);   // v0.95: the deposit pot screen, skipped here
+  // the onboarding screens (3 since 10 Nov 2026): name, where you are and the home; money and deposit pot (skipped); the plan
+  await phone.fill('#w-name', 'One B'); if (await phone.isVisible('#w-email')) await phone.fill('#w-email', EMAIL);
+  await phone.click('#w-opts .welcome-opt[data-val="1"]'); await phone.fill('#w-house', '250000'); await phone.click('#wz-s1 .welcome-cta'); await phone.waitForTimeout(300);
+  await phone.click('#wz-s2 .wz-skip'); await phone.waitForTimeout(300);
   await phone.click('#w-finish'); await phone.waitForTimeout(1000);
   ok(await welcome(phone) === 'none' && await phone.evaluate(() => JSON.parse(localStorage.getItem('vi_user')).name === 'One B' && state.target === 250000), 'phone: welcome done, name and £250,000 house price saved');
   // Pete's tester note shows once after the welcome flow (31 Oct): a tester reads it and closes it

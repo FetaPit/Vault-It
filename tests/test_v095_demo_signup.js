@@ -43,11 +43,10 @@ const fake = (p, email, withSession) => p.evaluate(([e, ws]) => { window._fakeCl
   window.supabase = { createClient: () => window._fakeClient }; return true; }, [email, !!withSession]);
 async function onboard(p) {
   await p.addStyleTag({ content: '#login-overlay,#sync-banner,#trial-banner{display:none!important}' });
-  await p.fill('#w-name', 'Tess'); if (await p.isVisible('#w-email')) await p.fill('#w-email', EMAIL); await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(200);
-  await p.click('#w-opts .welcome-opt[data-val="2"]'); await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(200);
-  await p.fill('#w-income', '2000'); await p.fill('#w-expenses', '1500'); await p.click('#wz-s3 .welcome-cta'); await p.waitForTimeout(200);
-  await p.click('#w-htypes .w-ht[data-type="terraced"]'); await p.click('#wz-s4 .welcome-cta'); await p.waitForTimeout(200);
-  if (await p.isVisible('#wz-s5 .wz-skip')) { await p.click('#w-pot-opts .welcome-opt[data-pot="none"]'); await p.click('#wz-s5 .welcome-cta'); await p.waitForTimeout(300); }
+  await p.fill('#w-name', 'Tess'); if (await p.isVisible('#w-email')) await p.fill('#w-email', EMAIL);
+  await p.click('#w-opts .welcome-opt[data-val="2"]'); await p.click('#w-htypes .w-ht[data-type="terraced"]'); await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(200);
+  await p.fill('#w-income', '2000'); await p.fill('#w-expenses', '1500');
+  await p.click('#w-pot-opts .welcome-opt[data-pot="none"]'); await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(300);
   await p.click('#w-finish'); await p.waitForTimeout(1500);
 }
 
@@ -75,8 +74,9 @@ async function onboard(p) {
     const ov = document.getElementById('login-overlay'), st = document.getElementById('auth-setpin-step');
     return { before, after: sessionStorage.getItem('vi_after_wipe'), login: getComputedStyle(ov).display, setpin: !!(st && st.classList.contains('active')), toast: (document.getElementById('toast') || {}).textContent || '', welcome: getComputedStyle(document.getElementById('welcome-overlay')).display }; });
   ok(fin2.before && /"pin":true/.test(fin2.before) && fin2.after === null, '6 the restart marker carries the PIN decision and is used once (' + fin2.before + ')');
-  ok(fin2.login !== 'none' && fin2.setpin, '6 the new account is offered to set a PIN, as the code check used to (' + JSON.stringify({ login: fin2.login, setpin: fin2.setpin }) + ')');
-  ok(/ready/i.test(fin2.toast) && fin2.welcome !== 'none', '6 Vault ready, and the welcome screens still wait behind the PIN step (' + fin2.toast + ')');
+  const due = await p.evaluate(() => localStorage.getItem('vi_pin_offer'));
+  ok(fin2.login === 'none' && !fin2.setpin && /^due:\d+$/.test(due || ''), '6 the new account goes straight in; a PIN is offered on the next visit, as after the code check (' + JSON.stringify({ login: fin2.login, setpin: fin2.setpin, due }) + ')');
+  ok(/ready/i.test(fin2.toast) && fin2.welcome !== 'none', '6 Vault ready, and the welcome screens show (' + fin2.toast + ')');
   // ── 3: onboarding, then the House Builder ──
   await onboard(p);
   d = await dump(p);

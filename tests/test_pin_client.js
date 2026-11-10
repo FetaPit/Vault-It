@@ -44,13 +44,15 @@ const overlay=page=>page.evaluate(()=>getComputedStyle(document.getElementById('
 const err=page=>page.evaluate(()=>document.getElementById('auth-err').textContent);
 (async()=>{
   const b=await chromium.launch();
-  // ── 1. brand-new user: email code, then set a PIN ──
+  // ── 1. brand-new user: email code, straight in; the PIN is offered later (owner, 10 Nov 2026), here straight after sign-in ──
   let {ctx,page}=await fresh(b);
   ok(await overlay(page)==='flex','login overlay shows for a new visitor');
   await page.fill('#auth-email','Pete@Example.com'); await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(700);
   ok(await step(page)==='auth-otp-step','no PIN on file → email code is sent');
   await page.fill('#auth-otp-inp','123456'); await page.click('#auth-otp-step .auth-btn'); await page.waitForTimeout(900);
-  ok(await step(page)==='auth-setpin-step','after the code, the user is asked to set a PIN');
+  ok(await step(page)!=='auth-setpin-step'&&await overlay(page)==='none','after the code, the user goes straight in: no PIN step at sign-up');
+  await page.evaluate(()=>{window.__c=authChangePin();}); await page.waitForTimeout(600);   // Set a PIN (Settings, or the later card) just after signing in
+  ok(await step(page)==='auth-setpin-step'&&await overlay(page)==='flex','Set a PIN just after signing in opens the PIN pad, no second code');
   ok(await page.evaluate(()=>document.querySelectorAll('#spin-dots .auth-pin-dot').length)===6,'PIN pad has 6 dots');
   await pad(page,'482915'); await pad(page,'482915'); await page.waitForTimeout(500);
   const srvPins=await page.evaluate(()=>JSON.stringify(_srv.pins));
@@ -114,7 +116,8 @@ const err=page=>page.evaluate(()=>document.getElementById('auth-err').textConten
   await page.fill('#auth-email','late@example.com'); await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(900);
   ok(await step(page)==='auth-otp-step','PIN service down → falls back to the email code');
   await page.fill('#auth-otp-inp','123456'); await page.click('#auth-otp-step .auth-btn'); await page.waitForTimeout(900);
-  ok(await step(page)==='auth-setpin-step','…and still offers a PIN');
+  ok(await step(page)!=='auth-setpin-step'&&await overlay(page)==='none','…and signs straight in, the PIN offered later');
+  await page.evaluate(()=>{window.__c=authChangePin();}); await page.waitForTimeout(600);
   await pad(page,'999111'); await pad(page,'999111'); await page.waitForTimeout(500);
   ok(await overlay(page)==='none'&&await page.evaluate(()=>localStorage.getItem('vi_pin_len')==='6'),'PIN falls back to this device only; sign-in is not blocked');
   await ctx.close();

@@ -7,9 +7,9 @@
 //   3. a Google sign-in that comes back with an error says so on the sign-in card and cleans the address bar
 //   4. a session that came from Google skips the PIN prompt; an emailed-code session does not
 //   B. Onboarding
-//   5. one question per screen, "Step n of 6" (the deposit pot screen came with v0.95), Back works
+//   5. three screens, "Step n of 3" (owner, 10 Nov 2026: less friction; was 6), Back works
 //   6. signed in: the email is never asked again and the first name comes from Google
-//   7. the plan screen: three phases from where you are, one step for this week, your own sums, a weekly check-in day
+//   7. the plan screen: three phases from where you are, one step for this week, your own sums, the check-in day (today; Settings changes it)
 //   8. finishing saves the check-in day and opens the step's tab; on check-in day the app says the next step, once
 //   9. phone and Daylight: no sideways scroll; no em dashes; privacy notice names Google sign-in; no page errors
 // Run: node tests/test_google_onboarding.js
@@ -77,54 +77,44 @@ const tok = (methods) => 'x.' + Buffer.from(JSON.stringify({ amr: methods.map(m 
     const scr = () => p.evaluate(() => { const v = [...document.querySelectorAll('#welcome-overlay .wz-screen')].filter(s => s.offsetParent !== null);
       return { n: v.length, at: v[0] ? v[0].dataset.s : '', count: (document.getElementById('wz-count') || {}).textContent || '', side: document.documentElement.scrollWidth - innerWidth }; });
     let s = await scr();
-    ok(s.n === 1 && s.at === '1' && /Step 1 of 6/.test(s.count), T + 'B5 one screen at a time, Step 1 of 6 (' + JSON.stringify(s) + ')');
+    ok(s.n === 1 && s.at === '1' && /Step 1 of 3/.test(s.count), T + 'B5 one screen at a time, Step 1 of 3 (' + JSON.stringify(s) + ')');
     // B6: signed in with Google: name filled, email not asked
     const pre = await p.evaluate(() => { _supaUser = { id: 'u1', email: 't@t.com', user_metadata: { full_name: 'Tess Test' } }; viWelcomePrefill();
       const f = document.getElementById('w-email-field'), si = document.getElementById('wz-signed');
       return { name: document.getElementById('w-name').value, email: document.getElementById('w-email').value, fHidden: !f || f.offsetParent === null, signed: si && si.offsetParent !== null ? si.textContent : '' }; });
     ok(pre.name === 'Tess' && pre.email === 't@t.com' && pre.fHidden && /t@t\.com/.test(pre.signed), T + 'B6 signed in: first name from Google, email not asked again (' + JSON.stringify(pre) + ')');
+    await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(100);
+    ok(await p.evaluate(() => { const h = document.getElementById('wz-goal-hint'); return !!h && h.offsetParent !== null && document.querySelector('#wz-s1').offsetParent !== null; }), T + 'Pedro 3: Next with nothing picked shows a cue on the screen, and stays');
+    await p.click('#w-opts .welcome-opt[data-val="0"]');
+    ok(await p.evaluate(() => document.getElementById('wz-goal-hint').hidden), T + 'Pedro 3: picking clears the cue');
+    await p.click('#w-htypes .w-ht[data-type="terraced"]');
     await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(150);
-    s = await scr(); ok(s.at === '2' && /Step 2 of 6/.test(s.count), T + 'B5 Next goes to step 2');
+    s = await scr(); ok(s.at === '2' && /Step 2 of 3/.test(s.count), T + 'B5 where you are and your home, then your money and deposit pot (Step 2 of 3)');
     await p.click('#wz-back'); await p.waitForTimeout(150);
     s = await scr(); ok(s.at === '1', T + 'B5 Back returns to step 1');
     await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(150);
-    await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(100);
-    ok(await p.evaluate(() => { const h = document.getElementById('wz-goal-hint'); return !!h && h.offsetParent !== null && document.querySelector('#wz-s2').offsetParent !== null; }), T + 'Pedro 3: Next with nothing picked shows a cue on the screen, and stays');
-    await p.click('#w-opts .welcome-opt[data-val="0"]');
-    ok(await p.evaluate(() => document.getElementById('wz-goal-hint').hidden), T + 'Pedro 3: picking clears the cue');
-    await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(150);
-    s = await scr(); ok(s.at === '3', T + 'B5 picking where you are goes on to your money');
-    await p.fill('#w-income', '2000'); await p.fill('#w-expenses', '1500'); await p.click('#wz-s3 .welcome-cta'); await p.waitForTimeout(150);
-    s = await scr(); ok(s.at === '4', T + 'B5 then your home');
-    await p.click('#w-htypes .w-ht[data-type="terraced"]'); await p.click('#wz-s4 .welcome-cta'); await p.waitForTimeout(250);
-    s = await scr(); ok(s.at === '5', T + 'B5 then your deposit pot (v0.95; test_v095_onboarding_pot covers it)');
-    await p.click('#w-pot-opts .welcome-opt[data-pot="none"]'); await p.click('#wz-s5 .welcome-cta'); await p.waitForTimeout(250);
+    await p.fill('#w-income', '2000'); await p.fill('#w-expenses', '1500');
+    await p.click('#w-pot-opts .welcome-opt[data-pot="none"]'); await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(250);
     s = await scr();
-    const plan = await p.evaluate(() => { const el = document.getElementById('wz-plan'), days = [...document.querySelectorAll('#wz-days button')];
-      return { at: '', ph: [...el.querySelectorAll('.wz-phase-name')].map(x => x.textContent.trim()), now: (el.querySelector('.wz-phase.now .wz-phase-name') || {}).textContent || '',
-        step: (el.querySelector('.wz-week') || {}).textContent || '', sums: (el.querySelector('.wz-sums') || {}).textContent || '', days: days.length, pressed: days.filter(d => d.getAttribute('aria-pressed') === 'true').length,
+    const plan = await p.evaluate(() => { const el = document.getElementById('wz-plan');
+      return { ph: [...el.querySelectorAll('.wz-phase-name')].map(x => x.textContent.trim()), now: (el.querySelector('.wz-phase.now .wz-phase-name') || {}).textContent || '',
+        step: (el.querySelector('.wz-week') || {}).textContent || '', sums: (el.querySelector('.wz-sums') || {}).textContent || '', day: (document.getElementById('wz-day-name') || {}).textContent || '',
         cta: (document.getElementById('w-finish') || {}).textContent || '', text: document.getElementById('welcome-overlay').innerText }; });
-    ok(s.at === '6' && /Step 6 of 6/.test(s.count), T + 'B7 the last screen is your plan');
+    ok(s.at === '3' && /Step 3 of 3/.test(s.count), T + 'B7 the last screen is your plan');
     ok(plan.ph.join(',') === 'Survival,Stabilise,Save' && plan.now === 'Survival', T + 'B7 three phases from where you are, the first marked now (' + plan.ph.join(',') + ')');
     ok(/Debt tracker/.test(plan.step) && /this week/i.test(plan.step), T + 'B7 one step for this week, in the app (' + plan.step.slice(0, 90) + ')');
     ok(/£2,000/.test(plan.sums) && /£1,500/.test(plan.sums) && /£500/.test(plan.sums), T + 'B7 your own sums: £2,000 in, £1,500 out, about £500 left (' + plan.sums + ')');
-    ok(plan.days === 7 && plan.pressed === 1, T + 'B7 a weekly check-in day, one picked (' + plan.days + '/' + plan.pressed + ')');
+    ok(plan.day === ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()] && /Settings/.test(plan.text), T + 'B7 the weekly check-in day is today, changed in Settings (' + plan.day + ')');
     ok(!/—/.test(plan.text), T + 'B9 no em dashes on the onboarding screens');
-    const look = await p.evaluate(() => { const f = document.getElementById('w-finish').getBoundingClientRect(), d = [...document.querySelectorAll('#wz-days button')];
-      const on = d.find(x => x.getAttribute('aria-pressed') === 'true'), off = d.find(x => x.getAttribute('aria-pressed') !== 'true'), bg = e => getComputedStyle(e).backgroundColor;
-      const more = document.querySelector('#wz-s6 details.wz-more');
-      return { ctaSeen: f.top >= 0 && f.bottom <= innerHeight + 1, dayDiff: bg(on) !== bg(off), folded: !!more && !more.open && !!more.querySelector('#w-phone-s1') && !!more.querySelector('.w-view-pick') }; });
+    const look = await p.evaluate(() => { const f = document.getElementById('w-finish').getBoundingClientRect(); return { ctaSeen: f.top >= 0 && f.bottom <= innerHeight + 1 }; });
     ok(look.ctaSeen, T + "Pedro 1: Start this week's step is on screen without scrolling (" + JSON.stringify(look) + ')');
-    ok(look.folded, T + 'Pedro 1: screen size and phone are folded under Optional');
-    ok(look.dayDiff, T + 'Pedro 2: the picked check-in day has its own fill');
     s = await scr(); ok(s.side <= 1, T + 'B9 no sideways scroll (' + s.side + ')');
     if (w === 390 && theme === 'dark') await p.screenshot({ path: require('path').join(require('./lib/vi').REPO, 'shots/brand/onboarding-plan-dark-390.png') });
     // B8: finish
-    await p.click('#wz-days button[data-d="3"]');
     await p.click('#w-finish'); await p.waitForTimeout(900);
     const fin = await p.evaluate(() => { const u = JSON.parse(localStorage.getItem('vi_user') || '{}'), act = document.querySelector('.tab-panel.active');
       return { day: u.checkin && u.checkin.day, step: u.checkin && u.checkin.step, hidden: getComputedStyle(document.getElementById('welcome-overlay')).display === 'none', tab: act ? act.id : '' }; });
-    ok(fin.day === 3 && fin.step === 'debt' && fin.hidden, T + 'B8 finishing saves the check-in day and closes the onboarding (' + JSON.stringify(fin) + ')');
+    ok(fin.day === new Date().getDay() && fin.step === 'debt' && fin.hidden, T + 'B8 finishing saves the check-in day (today) and closes the onboarding (' + JSON.stringify(fin) + ')');
     ok(fin.tab === 'tab-debt', T + "B8 and opens this week's step (" + fin.tab + ')');
     await p.context().close();
   }
