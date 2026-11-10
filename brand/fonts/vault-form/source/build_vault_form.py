@@ -84,6 +84,14 @@ STYLES = [
 # read upright or leaning back in proofs.)
 HATCH_DIR = "/"     # stripes run parallel to the big chamfer edges
 
+# r3 flags (proof only until the owner signs off; defaults build what ships).
+# VF_HATCH_MODE=counter  Hatch styles use the Elons-style counter hatch
+#                        (counter_hatch) instead of the stroke cut (hatch).
+# VF_CHARACTER=1         letterform nudges: wider Bold and small notch and
+#                        step details on G e a t S 3.
+HATCH_MODE = os.environ.get("VF_HATCH_MODE", "cut")
+CHARACTER = os.environ.get("VF_CHARACTER") == "1"
+
 BIGNUM = 4000
 
 
@@ -198,6 +206,7 @@ class G:
         self.sbT = round(sb * 0.35)          # overhanging bar
         self.sbC = round(sb * 1.14)          # capital straight side
         self.cache = {}
+        self.character = CHARACTER           # r3 variant C nudges (proof only)
 
     # width of a shape with n vertical stems whose Regular-wide outer width is base
     def w(self, base, n=2):
@@ -207,6 +216,8 @@ class G:
         c = base - n * REG_S - n * (self.S - REG_S) * shrink
         if not self.cond:
             c *= WIDE
+        if self.character and self.weight == "Bold":
+            c *= 1.03 if self.cond else 1.10     # r3 C: wider Bold, more horizontal
         return round(n * self.S + c * self.cf)
 
     def big(self, w, h=None):
@@ -246,6 +257,19 @@ class G:
     @property
     def t(self):            # diagonal stroke weight
         return round(self.S * 0.98)
+
+    def beak(self, x0, x1, y, down, ch="r", h=None):
+        """r3 C: a small step on an open terminal, 0.4 of a bar deep, with a
+        45 degree cut on its counter side (ch 'l' or 'r')."""
+        h = round(0.42 * self.H) if h is None else h
+        c = round(0.6 * h)
+        if down:
+            return octa(x0, y - h, x1, y + 1, (c if ch == "l" else 0, c if ch == "r" else 0, 0, 0))
+        return octa(x0, y - 1, x1, y + h, (0, 0, c if ch == "r" else 0, c if ch == "l" else 0))
+
+    @property
+    def bw(self):          # beak width
+        return round(0.55 * self.S)
 
     def hook(self, x0, x1, ytop, bc=None):
         """Descender hook shared by g, y, j: right stem down, bar to the left."""
@@ -288,6 +312,8 @@ def _a(g):
     top = g.ring(0, 0, W, X, (0, 0, g.sm(W, X), 0), sy=H3, open="lb")
     top = top.difference(box(-10, -10, W - S, bt))
     bowl = g.ring(0, 0, W, bt, (g.sm(W, bt), 0, 0, g.big(W, bt)), sy=H3)
+    if g.character:
+        top = U(top, g.beak(0, g.bw, X - H3, True, "r"))
     return U(top, bowl), W, g.sbO, g.sbV
 
 
@@ -326,7 +352,12 @@ def _e(g):
     yb0 = round(X * (0.47 if g.weight == "Bold" else 0.485) - H3 / 2)
     bar = box(0, yb0, W, yb0 + H3)
     cut = box(W - S - g.big(W, X) - 10, H3, W + 10, yb0)
-    return U(r, bar).difference(cut), W, g.sbO, g.sbO
+    e = U(r, bar).difference(cut)
+    if g.character:
+        xr = W - max(0, g.big(W, X) - H3)
+        outer = octa(0, 0, W, X, (g.sm(W, X), g.big(W, X), g.sm(W, X), g.big(W, X)))
+        e = U(e, g.beak(xr - g.bw - 20, W, H3, False, "l", h=round(0.5 * H3)).intersection(outer))
+    return e, W, g.sbO, g.sbO
 
 
 @gl("f", 0x66)
@@ -472,12 +503,16 @@ def _t(g):
     S, H, X = g.S, g.H, g.X
     ov = round(0.42 * S + 34)
     foot = round((0.5 * S + 92) * (0.88 if g.cond else 1))
+    if g.character:
+        foot = round(foot * 1.5)
     W = ov + S + foot
     tH = X + round(0.62 * (g.A - X))
     st = octa(ov, 0, ov + S, tH, (g.sm(), 0, 0, round(0.75 * S)))
     footb = octa(ov, 0, W, H, (g.sm(), round(0.85 * H), 0, 0))
     st = U(st, footb)
     cross = box(0, X - H, W, X)
+    if g.character:
+        st = U(st, g.beak(W - round(0.45 * S), W, H, False, "l", h=round(0.8 * H)))
     return U(st, cross), W, g.sbT, g.sbT
 
 
@@ -602,6 +637,10 @@ def _G(g):
     yb = round(0.47 * C)
     r = r.difference(box(W - S - 10, yb, W + 10, round(0.72 * C)))
     spur = box(round(0.5 * W), yb - H, W, yb)
+    if g.character:
+        # a step at the foot of the top-right stub, pointing into the counter
+        ys = round(0.72 * C)
+        spur = U(spur, octa(W - S - g.bw, ys, W - S + 1, ys + round(0.42 * H), (round(0.25 * H), 0, 0, 0)))
     return U(r, spur), W, g.sbO, g.sbV
 
 
@@ -714,6 +753,9 @@ def _S(g):
     up = up.difference(box(W - S - 10, ym0 + H3, W + 10, C - H3))
     lo = g.ring(0, 0, W, ym1, (g.sm(W, C), g.big(W, ym1), g.sm(W, ym1), 0), sy=H3)
     lo = lo.difference(box(-10, H3, S + 10, ym1 - H3))
+    if g.character:
+        up = U(up, g.beak(W - g.bw, W, C - H3, True, "l"))
+        lo = U(lo, g.beak(0, g.bw, H3, False, "r"))
     return U(up, lo), W, g.sbO, g.sbO
 
 
@@ -829,6 +871,12 @@ def d_three(g, W):
     r = r.difference(box(-10, H3, W - S, C - H3))
     ym = round(0.52 * C)
     mid = box(round(0.28 * W), ym - H3 / 2, W, ym + H3 / 2)
+    if g.character:
+        B = g.big(W, C)
+        outer = octa(0, 0, W, C, (g.sm(W, C), B, g.sm(W, C), B))
+        xl = max(0, B - H3)
+        r = U(r, g.beak(xl - 20, xl + g.bw, C - H3, True, "r").intersection(outer),
+              g.beak(0, g.bw, H3, False, "r"))
     return U(r, mid)
 
 
@@ -1939,6 +1987,240 @@ def hatch(g, geom):
 
 
 # ==========================================================================
+# Counter hatch (r3, behind a flag; the cut above stays for comparison)
+# ==========================================================================
+# Learnt from the Elons sample. The hatch never cuts the stroke: it lives in
+# the counter, hugging the inside edge of a horizontal bar, as if the bar had
+# a bevelled face drawn in engraving. Each detail is a hairline rule along
+# the bar (a hairline gap away from it) that turns into a panel of fine 45
+# degree lines. The panel sits in one corner of the counter, follows that
+# corner's wall or chamfer, and its free end tapers away from the bar at 45
+# degrees, with the lines parallel to that end. Under a top bar the panel
+# sits top left (our big chamfer corner), on a bottom bar it sits bottom
+# right, so every free end and line runs "/" like the chamfers. One or two
+# panels per glyph: the topmost ceiling and the bottommost floor.
+#
+# All sizes are fractions of the bar thickness H.
+CH = dict(
+    gap=0.16,      # clear space between bar and hairline (and walls)
+    lw=0.06,       # hairline and hatch line weight
+    pitch=0.13,    # line pitch, measured square to the lines (about 2x lw)
+    depth=0.64,    # panel depth
+    span=0.6,      # panel share of the counter width
+    min_w=0.9,     # shortest bar edge that gets a detail
+    narrow=3.0,    # counters narrower than this x depth get a full-width panel
+)
+CH_COND = dict(depth=0.5)    # Condensed: shallower panels in the tighter counters
+CH_OVERRIDES = {
+    # name: dict(skip=True) | dict(ceil=False) | dict(floor=False)
+    #       | dict(side_c="r") | dict(one_wall=True) ...
+    "t": dict(ceil=False),        # only with the C beak (a wall for the panel)
+    "f": dict(skip=True),
+    "y": dict(skip=True),
+    "one": dict(skip=True),
+    "L": dict(ceil=False, one_wall=True, side_f="r"),
+}
+
+
+def _h_edges(C, geom, below):
+    """Horizontal edges of counter C with ink on the far side.
+
+    below=False: ceilings (ink above, counter below).
+    below=True:  floors (ink below, counter above)."""
+    from shapely.geometry import Point
+    out = []
+    for ring in [C.exterior] + list(C.interiors):
+        cs = list(ring.coords)
+        for (x0, y0), (x1, y1) in zip(cs, cs[1:]):
+            if abs(y1 - y0) > 0.5:
+                continue
+            xa, xb = sorted((x0, x1))
+            if xb - xa < 4:
+                continue
+            xm, y = (xa + xb) / 2, (y0 + y1) / 2
+            s = -3 if below else 3
+            if Point(xm, y + s).within(geom.buffer(0.01)) and Point(xm, y - s).within(C):
+                out.append((y, xa, xb))
+    return out
+
+
+def _is_outer(geom, y, xa, xb, up):
+    """True when the bar over (up) or under the edge is an outer bar of the glyph."""
+    xm = (xa + xb) / 2
+    y0, y1 = geom.bounds[1], geom.bounds[3]
+    ray = LineString([(xm, y + (1 if up else -1)), (xm, (y1 + 50) if up else (y0 - 50))])
+    hit = ray.intersection(geom)
+    pieces = polys(hit.buffer(0.1)) if not hit.is_empty else []
+    return len(pieces) <= 1
+
+
+def _stripes(poly, k0, slope, lw, pitch):
+    """Lines of weight lw, pitch 'pitch' (square to the lines), one of them
+    flush with the line  x - y = k0  ("/", slope=+1) or  x + y = k0  ("\\")."""
+    if poly.is_empty:
+        return poly
+    x0, y0, x1, y1 = poly.bounds
+    r2 = math.sqrt(2)
+    w, P = lw * r2, pitch * r2
+    if slope > 0:
+        lo, hi = x0 - y1, x1 - y0
+    else:
+        lo, hi = x0 + y0, x1 + y1
+    bands = []
+    n0 = int(math.floor((lo - k0) / P)) - 1
+    n1 = int(math.ceil((hi - k0) / P)) + 1
+    for n in range(n0, n1 + 1):
+        a, b = k0 + n * P - w, k0 + n * P
+        if b < lo - P or a > hi + P:
+            continue
+        Y0, Y1 = y0 - 10, y1 + 10
+        if slope > 0:   # a <= x - y <= b
+            bands.append(Polygon([(a + Y0, Y0), (b + Y0, Y0), (b + Y1, Y1), (a + Y1, Y1)]))
+        else:           # a <= x + y <= b
+            bands.append(Polygon([(a - Y0, Y0), (b - Y0, Y0), (b - Y1, Y1), (a - Y1, Y1)]))
+    out = poly.intersection(U(*bands))
+    # drop crumbs (a line clipped to a dot reads as noise)
+    keep = [p for p in polys(out) if p.area > lw * lw * 3]
+    return U(*keep)
+
+
+def _half(k, slope, le, B=6000):
+    """Half plane  x - y <= k  (slope +1, "/") or  x + y <= k  (slope -1, "\\");
+    le=False gives the other side."""
+    if slope > 0:
+        a, b = (-B + k, -B), (B + k, B)
+    else:
+        a, b = (k + B, -B), (k - B, B)
+    far = -3 * B if le else 3 * B
+    return Polygon([a, b, (far, B), (far, -B)]).buffer(0)
+
+
+def _panel(g, C, geom, edge, kind, P, side=None, one_wall=False, closed=False):
+    """One hairline + hatched panel along a ceiling (kind='c') or floor ('f')."""
+    H = g.H
+    y, xa, xb = edge
+    gap, lw, pitch = P["gap"] * H, P["lw"] * H, P["pitch"] * H
+    Cg = C.buffer(-gap, join_style="mitre", mitre_limit=10)
+    if Cg.is_empty:
+        return None
+    depth = P["depth"] * H
+    BIG = 5000
+    if kind == "c":
+        ybar = y - gap
+        band = box(-BIG, ybar - depth, BIG, ybar + 1).intersection(Cg)
+    else:
+        ybar = y + gap
+        band = box(-BIG, ybar - 1, BIG, ybar + depth).intersection(Cg)
+    pcs = [p for p in polys(band) if p.area > 1]
+    if not pcs:
+        return None
+    band = max(pcs, key=lambda p: max(0, min(p.bounds[2], xb) - max(p.bounds[0], xa)))
+    bx0, _, bx1, _ = band.bounds
+    width = bx1 - bx0
+    if width < P["min_w"] * H:
+        return None
+
+    def wall(x, dirn):
+        from shapely.geometry import Point
+        ym = ybar - depth / 2 if kind == "c" else ybar + depth / 2
+        return Point(x + dirn * (gap + 3), ym).within(geom.buffer(1))
+    wl, wr = wall(bx0, -1), wall(bx1, 1)
+    # a counter, not open space: walls both ends, or one wall when the
+    # counter also has a bar on the far side (e and G apertures, the top of
+    # a), or when the glyph opts in. Keeps it off T, h, r and friends.
+    if not (wl and wr) and not ((one_wall or closed) and (wl or wr)):
+        return None
+    if side is None:
+        side = "l" if kind == "c" else "r"
+        if side == "l" and not wall(bx0, -1) and wall(bx1, 1):
+            side = "r"
+        elif side == "r" and not wall(bx1, 1) and wall(bx0, -1):
+            side = "l"
+    pw = max(P["span"] * width, 1.9 * depth)
+    pw = min(pw, width - 0.6 * depth)
+    if width < P["narrow"] * depth:
+        # narrow counter (Condensed): the panel fills it, wall to wall, and
+        # the chamfers give it its 45 degree ends; no room for a hairline
+        pw = width + 2 * depth
+    # free end: tapers away from the bar, at 45 degrees
+    if kind == "c" and side == "l":          # "/"  keep x - y <= k
+        xf = bx0 + pw
+        k, slope, le = xf - ybar, 1, True
+        rule = box(xf, ybar - lw, BIG, ybar)
+    elif kind == "c":                        # back slash, keep x + y >= k
+        xf = bx1 - pw
+        k, slope, le = xf + ybar, -1, False
+        rule = box(-BIG, ybar - lw, xf, ybar)
+    elif side == "r":                        # floor, "/"  keep x - y >= k
+        xf = bx1 - pw
+        k, slope, le = xf - ybar, 1, False
+        rule = box(-BIG, ybar, xf, ybar + lw)
+    else:                                    # floor, back slash, keep x + y <= k
+        xf = bx0 + pw
+        k, slope, le = xf + ybar, -1, True
+        rule = box(xf, ybar, BIG, ybar + lw)
+    keep = _half(k, slope, le)
+    panel = band.intersection(keep)
+    lines = _stripes(panel, k, slope, lw, pitch)
+    hair = rule.intersection(Cg)
+    # the hairline must not run on past the band (into an open counter)
+    hair = hair.intersection(box(bx0, -BIG, bx1, BIG))
+    return U(lines, hair)
+
+
+def counter_hatch(g, geom, name=None, params=None):
+    """Elons-style counter hatch for one glyph: the detail geometry only.
+
+    Union it with the glyph for a one-colour font, or keep it apart for a
+    colour layer (COLR) or an overlay 'hatch layer' font."""
+    if geom.is_empty:
+        return Polygon()
+    P = dict(CH)
+    if g.cond:
+        P.update(CH_COND)
+    if params:
+        P.update(params)
+    ov = CH_OVERRIDES.get(name, {})
+    if name == "t" and not g.character:
+        ov = dict(skip=True)                # foot too short without the beak
+    if ov.get("skip"):
+        return Polygon()
+    H = g.H
+    space = geom.convex_hull.difference(geom)
+    counters = [c for c in polys(space) if c.area > (0.9 * H) ** 2]
+    ceils, floors = [], []
+    for ci, C in enumerate(counters):
+        for e in _h_edges(C, geom, below=False):
+            if e[2] - e[1] >= P["min_w"] * H:
+                ceils.append((e, ci))
+        for e in _h_edges(C, geom, below=True):
+            if e[2] - e[1] >= P["min_w"] * H:
+                floors.append((e, ci))
+    pick = []
+    if ceils and ov.get("ceil", True):
+        pick.append(("c",) + max(ceils, key=lambda t: (t[0][0], -t[0][1])))
+    if floors and ov.get("floor", True):
+        pick.append(("f",) + min(floors, key=lambda t: (t[0][0], t[0][1])))
+    if len(pick) == 2 and pick[0][2] == pick[1][2]:
+        # same counter: both only if it is tall enough, else keep the one
+        # on an outer bar (the ceiling if both are)
+        hc = pick[0][1][0] - pick[1][1][0]
+        need = 2 * (P["gap"] + P["depth"]) * H + 0.35 * H
+        if hc < need:
+            c_out = _is_outer(geom, *pick[0][1], up=True)
+            f_out = _is_outer(geom, *pick[1][1], up=False)
+            pick = [pick[1]] if (f_out and not c_out) else [pick[0]]
+    out = []
+    for kind, edge, ci in pick:
+        side = ov.get("side_" + kind)
+        closed = any(c == ci for _, c in ceils) and any(c == ci for _, c in floors)
+        p = _panel(g, counters[ci], geom, edge, kind, P, side, ov.get("one_wall", False), closed)
+        if p is not None and not p.is_empty:
+            out.append(p)
+    return U(*out) if out else Polygon()
+
+
+# ==========================================================================
 # Build
 # ==========================================================================
 def finalize(geom):
@@ -1982,7 +2264,13 @@ def build_glyphs(weight, cond, hatched):
     for name in out:
         geom = out[name][0]
         if hatched and not geom.is_empty and name not in (".notdef",):
-            geom = hatch(g, geom)
+            mode = hatched if isinstance(hatched, str) else HATCH_MODE
+            if mode == "counter":       # r3: counter hatch drawn into the glyph
+                geom = U(geom, counter_hatch(g, geom, name))
+            elif mode == "layer":       # r3: hatch only, for an overlay or COLR layer
+                geom = counter_hatch(g, geom, name)
+            else:                       # r1/r2: stripes cut into the stroke
+                geom = hatch(g, geom)
         out[name][0] = finalize(geom)
     return g, out, raw
 
