@@ -33,7 +33,7 @@ Every box on the FigJam board links to an editable screen in the design file (cl
 
 Known gaps: the 3D house and metals scenes are placeholder boxes (WebGL does not render in the capture), Connections has no screen of its own because the tab opens Settings, and Stripe checkout is off-site.
 
-To refresh after a release: `node docs/user-flow-capture/capture.js shots spec`, then `node docs/user-flow-capture/svg.js spec svg`, then upload the SVGs to the design file with the Figma MCP `upload_assets` tool. Save the returned upload URLs as JSON and run `SVGDIR=svg node docs/user-flow-capture/post.js urls.json 03` to post one page group (keys are in manifest.json); it writes placed.json with the new frame ids, which the FigJam boxes and the read-me index must then be re-pointed at.
+To refresh after a release: `node docs/user-flow-capture/capture.js shots spec`, then `node docs/user-flow-capture/svg.js spec svg`, then upload the SVGs to the design file with the Figma MCP `upload_assets` tool. Save the returned upload URLs as JSON and run `SVGDIR=svg node docs/user-flow-capture/post.js urls.json 03` to post one page group (keys are in manifest.json); it writes placed.json with the new frame ids. `node docs/user-flow-capture/gen-links.js <keys>` then prints the maps for re-pointing the FigJam boxes (figjam-map.json holds box id per screen) and the read-me index at the new frames.
 
 ## Legend
 

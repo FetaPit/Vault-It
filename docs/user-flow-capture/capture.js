@@ -18,7 +18,7 @@ function EXTRACT(opts) {
   const col = (c) => { const m = c && c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(',').map(parseFloat); return { h: hex2(p[0]) + hex2(p[1]) + hex2(p[2]), a: p.length > 3 ? Math.round(p[3] * 100) / 100 : 1 }; };
   const R = v => Math.round(v);
   const fontCode = (ff) => { const f = (ff || '').toLowerCase(); if (f.includes('syne')) return 'S'; if (f.includes('dm sans')) return 'D'; if (f.includes('share tech')) return 'M'; if (f.includes('archivo')) return 'A'; if (f.includes('space mono')) return 'P'; return 'I'; };
-  const visible = (cs, r) => cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity) > 0.02 && r.width >= 1 && r.height >= 1 && (r.bottom + sy - oy) > -5 && (r.top + sy - oy) < docH + 5;
+  const visible = (cs, r) => cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity) > (cs.animationName && cs.animationName !== 'none' ? 0.5 : 0.02) && r.width >= 1 && r.height >= 1 && (r.bottom + sy - oy) > -5 && (r.top + sy - oy) < docH + 5 && (r.right + sx - ox) > 0 && (r.left + sx - ox) < docW;
   const svgOut = (svg) => {
     const clone = svg.cloneNode(true); const live = svg.querySelectorAll('*'), cl = clone.querySelectorAll('*');
     for (let i = 0; i < live.length && i < cl.length; i++) { const cs = getComputedStyle(live[i]); for (const p of ['fill', 'stroke']) { const v = cs[p]; if (v) cl[i].setAttribute(p, v); } if (cs.strokeWidth) cl[i].setAttribute('stroke-width', cs.strokeWidth); if (cs.opacity !== '1') cl[i].setAttribute('opacity', cs.opacity); cl[i].removeAttribute('class'); cl[i].removeAttribute('style'); }
@@ -29,11 +29,12 @@ function EXTRACT(opts) {
   };
   const inter = (a, b) => !a ? b : { l: Math.max(a.l, b.l), t: Math.max(a.t, b.t), r: Math.min(a.r, b.r), b: Math.min(a.b, b.b) };
   const outside = (c, X, Y, W, H) => c && (X + W <= c.l + 1 || X >= c.r - 1 || Y + H <= c.t + 1 || Y >= c.b - 1);
-  const walk = (el, clip) => {
+  const walk = (el, clip, dyIn) => {
     if (items.length >= MAX) { skipped++; return; }
     const tag = el.tagName ? el.tagName.toLowerCase() : ''; if (!tag || ['script', 'style', 'noscript', 'template', 'link', 'meta', 'br'].includes(tag)) return;
     const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); if (!visible(cs, r)) return;
-    const X = R(r.left + sx - ox), Y = R(r.top + sy - oy), W = R(r.width), H = R(r.height);
+    let dy = dyIn || 0; if (!dy && cs.position === 'fixed' && r.bottom >= innerHeight - 2 && r.top > innerHeight * 0.5 && docH > innerHeight) dy = R(docH - innerHeight);
+    const X = R(r.left + sx - ox), Y = R(r.top + sy - oy) + dy, W = R(r.width), H = R(r.height);
     if (outside(clip, X, Y, W, H)) return;
     const ov = cs.overflowY + ' ' + cs.overflowX; const clips = /hidden|clip|auto|scroll/.test(ov) && !(el === root || el === document.body || el === document.documentElement);
     const myClip = clips ? inter(clip, { l: X, t: Y, r: X + W, b: Y + H }) : clip;
@@ -69,7 +70,7 @@ function EXTRACT(opts) {
         const rg = document.createRange(); rg.setStart(node, m.index); rg.setEnd(node, m.index + m[0].length);
         const rects = rg.getClientRects(); if (!rects.length) continue; const wr = rects[0];
         if (wr.width < 0.5 || wr.height < 0.5) continue;
-        const top = R(wr.top + sy - oy); let L = lines[lines.length - 1];
+        const top = R(wr.top + sy - oy) + dy; let L = lines[lines.length - 1];
         if (!L || Math.abs(L.top - top) > Math.max(3, wr.height * 0.5)) { L = { top, left: wr.left + sx - ox, right: wr.right + sx - ox, h: wr.height, words: [] }; lines.push(L); }
         L.words.push(m[0]); L.right = Math.max(L.right, wr.right + sx - ox); L.left = Math.min(L.left, wr.left + sx - ox); L.h = Math.max(L.h, wr.height);
       }
@@ -81,7 +82,7 @@ function EXTRACT(opts) {
       }
       if (items.length >= MAX) break;
     }
-    for (const ch of el.children) walk(ch, myClip);
+    const closed = tag === 'details' && !el.open; for (const ch of el.children) { if (closed && ch.tagName.toLowerCase() !== 'summary') continue; walk(ch, myClip, dy); }
   };
   walk(root, null);
   let bg = null; for (const e of [root, document.body, document.documentElement]) { const c = col(getComputedStyle(e).backgroundColor); if (c && c.a > 0.02) { bg = c; break; } }
