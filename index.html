@@ -12034,7 +12034,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 </div>
 
 <div id="demo-chip" class="demo-chip" style="display:none"><span class="demo-chip-left">⚡ DEMO MODE &mdash; You&rsquo;re viewing sample data. <button onclick="clearDemoData()">Start with your own data</button></span><a class="demo-signup-btn" href="https://app.vault-it.co/" onclick="localStorage.removeItem('vi_demo_mode');localStorage.removeItem('vi_session');">Sign up free &rarr;</a></div>
-<div id="sample-chip" class="demo-chip" role="status" style="display:none"><span class="demo-chip-left">Sample figures from the demo are still in your data. <button type="button" onclick="viClearSample()">Clear sample figures</button></span></div>
 <div id="pwa-install-banner" style="display:none">
   <span>⬇ Install Vault-It: works offline, opens like an app</span>
   <div style="display:flex;gap:6px;align-items:center">
@@ -19075,15 +19074,23 @@ function viSampleAreas() {
   });
   return out;
 }
-function viSampleChip() {   // signed in and read from the cloud first, so the clear is uploaded and the cloud copy cannot win it back
-  var el = document.getElementById('sample-chip'); if (!el) return;
-  var show = false; try { show = !!(_supaUser && _syncReady && _viEmail()) && viSampleAreas().length > 0; } catch (e) {}
-  el.style.display = show ? 'flex' : 'none';
+// Owner, 10 Nov 2026: "Yes, make it automatic and remove the button" (every profile starts blank, filled only from onboarding).
+// Once signed in and the account's cloud copy has been read, an account still holding the sample has the sample's own rows
+// removed, once per tab, with no question; the page then restarts. Accounts without the sample are never touched.
+function viSampleAuto() {
+  setTimeout(function () {   // after the caller finishes (hydration sets _syncReady just after it redraws)
+    try {
+      if (!(_supaUser && _syncReady && _viEmail()) || window._viDeleted) return;
+      if (sessionStorage.getItem('vi_sample_auto')) return;   // one try per tab: never a reload loop
+      if (!viSampleAreas().length) return;
+      sessionStorage.setItem('vi_sample_auto', '1');
+      viClearSample();
+    } catch (e) {}
+  }, 0);
 }
 async function viClearSample() {
-  var areas = viSampleAreas(); if (!areas.length) { viSampleChip(); return; }
-  if (window._viDemoWiped || (_viBootDemo && localStorage.getItem('vi_demo_mode') !== 'true')) { location.reload(); return; }   // this page started on the sample: its writes to those areas are refused, so restart first
-  if (!confirm('Clear the sample figures? Only the demo\'s own rows are removed. Anything you added stays.')) return;
+  var areas = viSampleAreas(); if (!areas.length) return;
+  if (window._viDemoWiped || (_viBootDemo && localStorage.getItem('vi_demo_mode') !== 'true')) { try { sessionStorage.removeItem('vi_sample_auto'); } catch (e) {} location.reload(); return; }   // this page started on the sample: its writes to those areas are refused, so restart first and try again there
   areas.forEach(function (a) {
     var before = localStorage.getItem(a.key);
     try { _lsOrig.call(localStorage, 'vi_bak_' + a.key, JSON.stringify({ at: Date.now(), value: before })); } catch (e) {}   // never lose what we replace
@@ -19099,6 +19106,7 @@ async function viClearSample() {
   }
   window._viDemoWiped = true;   // until the restart, the tabs (still holding the sample in memory) cannot write it back
   clearTimeout(_flushT);
+  for (var w = 0; w < 30 && _flushing; w++) await new Promise(function (r) { setTimeout(r, 100); });   // the upload that follows sign-in may still be running
   try { if (_supaUser) await _flushDirty(); } catch (e) {}   // anything not sent now goes on the next start (queued, and the emptied marks are kept)
   location.reload();   // every tab redraws from storage
 }
@@ -19473,7 +19481,7 @@ function _reloadAllState() {
   try { var _als=localStorage.getItem(AL_KEY); if(_als){ var _alp=JSON.parse(_als); alState=Object.assign(alState,_alp);alNormalise(); if(_alp.metals)alState.metals=Object.assign(alState.metals,_alp.metals); if(_alp.metalPrices)alState.metalPrices=Object.assign(alState.metalPrices,_alp.metalPrices); if(_alp.crypto)alState.crypto=_alp.crypto; if(_alp.cashAccounts)alState.cashAccounts=_alp.cashAccounts; if(_alp.otherAssets)alState.otherAssets=_alp.otherAssets; if(_alp.liabilities)alState.liabilities=_alp.liabilities; } } catch(e) {}
   try { var _dsr=localStorage.getItem(DEBT_KEY); if(_dsr) debtState=JSON.parse(_dsr); } catch(e) {}
   try { var _bsr=localStorage.getItem(BIZ_KEY); if(_bsr) bizState=JSON.parse(_bsr); if(!bizState.leads)bizState.leads=[]; } catch(e) {}
-  try { viSampleChip(); } catch(e) {}   // v0.95: the account's own rows may still hold the sample (tester 1)
+  try { viSampleAuto(); } catch(e) {}   // v0.95: the account's own rows may still hold the sample (tester 1)
 }
 
 var _hydrateErr = '', _hydChanged = false, _needPull = false;
@@ -30342,7 +30350,7 @@ function initDemoMode() {
   }
   var chip = document.getElementById('demo-chip');
   if (chip) chip.style.display = isDemo ? 'flex' : 'none';
-  try { viSampleChip(); } catch (e) {}
+  try { viSampleAuto(); } catch (e) {}
 }
 
 function initWelcome() {

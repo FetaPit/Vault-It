@@ -3,11 +3,13 @@
 // (d2a368a stops that for new sign-ups). Zeroing every Assets line still left the sample's £18,500 House Builder pot in Assets,
 // the demo chip with its "start with your own data" button had gone (demo mode was off), and the cloud copy brought the sample
 // back on every sign-in. Owner, 10 Nov 06:40: zeroing or clearing the sample must really clear it, and it must never come back.
-//   1. an account holding the sample's rows (demo mode off), signed in: a "Clear sample figures" chip shows; Assets still counts the house pot
-//   2. clearing removes only the sample's own rows (matched by name and amount): the user's own rows, house type and price stay;
-//      House Builder £0 saved, no deposits; Assets is the user's own figure; a backup of each replaced area is kept; chip gone
-//   3. a reload keeps it cleared, and the sample does not load again
-//   4. signed in: the cleared areas are uploaded, and nothing of the sample is in what goes to the cloud
+// Owner, 10 Nov: "Yes, make it automatic and remove the button": every profile starts blank, filled only from onboarding.
+//   1. an account holding the sample's rows (demo mode off): signed out, nothing is touched; Assets still counts the house pot
+//   2. at sign-in, once the account's cloud copy is read, the sample's own rows go with no button or question, and the page
+//      restarts: the user's own rows, house type and price stay; House Builder £0 saved, no deposits; Assets is the user's own
+//      figure; a backup of each replaced area is kept; there is no "Clear sample figures" button anywhere
+//   3. a reload and a second sign-in keep it cleared, with no further restart, and the sample does not load again
+//   4. the cloud holds the sample: the cleared areas are uploaded, and nothing of the sample is in what goes to the cloud
 //   5. a House Builder the user reset stays reset after a reload even when the upload had not landed (the older cloud copy used
 //      to win and bring the deposit back); a mark left by another account on the device is not used
 //   6. sign-in on a sample device, then the welcome screens skipped: nothing of the sample anywhere, Assets £0
@@ -34,14 +36,13 @@ const state = (p) => p.evaluate((names) => {
   const j = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
   const blob = ['pos_ov1', 'pos_al1', 'pos_debt1', 'pos_biz1'].map(k => localStorage.getItem(k) || '').join(' ');
   const al = j('pos_al1') || {}, h = j('ht3') || {};
-  const chip = document.getElementById('sample-chip');
   return { left: names.filter(n => blob.indexOf(JSON.stringify(n).slice(1, -1)) >= 0),
     eth: (al.crypto || []).some(c => c.sym === 'ETH' && +c.amount === 1.4), gold: al.metals ? al.metals.gold : null,
     snaps: ((j('pos_ov1') || {}).snapshots || []).length,
     own: (al.cashAccounts || []).map(c => c.name), ownDebt: ((j('pos_debt1') || {}).debts || []).map(d => d.name),
     ht3: { saved: h.saved, n: (h.deposits || []).length, type: h.houseType, price: h.prices && h.prices.terraced },
     mem: { saved: state.saved, assets: Math.round(alTotalAssets()) }, kpi: (document.getElementById('kpi-assets') || {}).textContent,
-    chip: chip ? getComputedStyle(chip).display : 'missing', demo: localStorage.getItem('vi_demo_mode'),
+    button: !!document.getElementById('sample-chip') || /clear sample figures/i.test(document.body.innerText), demo: localStorage.getItem('vi_demo_mode'),
     baks: Object.keys(localStorage).filter(k => /^vi_bak_/.test(k)) };
 }, SAMPLE_NAMES);
 // the tester's device after signing up on the live build: the sample is their data, demo mode is off, plus rows of their own
@@ -61,53 +62,49 @@ async function adopted(b) {
   return p;
 }
 
-// signed in and read from the cloud (the chip waits for both): a stand-in client whose uploads are kept in sessionStorage
-const signIn = (p, cloud) => p.evaluate(([e, cloud]) => {
-  _supaClient = { auth: { getSession: async () => ({ data: { session: null } }) },
-    from: () => ({ select: () => ({ eq: async () => ({ data: cloud || [] }) }), upsert: async (rows) => { sessionStorage.setItem('ups', JSON.stringify(rows)); return {}; } }) };
-  _supaUser = { id: 'u-t', email: e }; _syncReady = true; _flushing = false; viSampleChip(); return true;
-}, [EMAIL, cloud || null]);
+// sign-in as the app does it: the account's cloud copy is read (_hydrateFromSupabase), which is when the clean-up may run.
+// A stand-in client keeps every upload in sessionStorage. Returns whether the page restarted within 6 s.
+async function signIn(p, cloud) {
+  const nav = p.waitForNavigation({ timeout: 6000 }).then(() => true, () => false);
+  await p.evaluate(async ([e, cloud]) => {
+    _supaClient = { auth: { getSession: async () => ({ data: { session: null } }) },
+      from: () => ({ select: () => ({ eq: async () => ({ data: cloud || [] }) }), upsert: async (rows) => { const u = JSON.parse(sessionStorage.getItem('ups') || '[]'); sessionStorage.setItem('ups', JSON.stringify(u.concat([rows]))); return {}; } }) };
+    _supaUser = { id: 'u-t', email: e }; _flushing = false;
+    await _hydrateFromSupabase('u-t');
+  }, [EMAIL, cloud || null]).catch(() => null);   // the restart can cut the evaluate short
+  const restarted = await nav; await p.waitForTimeout(restarted ? 2500 : 0);
+  return restarted;
+}
+const cloudOf = (p) => p.evaluate(() => ['pos_ov1', 'pos_al1', 'pos_debt1', 'pos_biz1', 'ht3'].map(k => ({ key: k, value: JSON.parse(localStorage.getItem(k)), updated_at: new Date(Date.now() - 864e5).toISOString() })));
 
 (async () => {
   const b = await chromium.launch();
   // ── 1 to 3 ──
   let p = await adopted(b);
-  ok(await p.evaluate(() => getComputedStyle(document.getElementById('sample-chip')).display === 'none'), '1 signed out (nothing read from the cloud yet): no chip');
-  await signIn(p);
   let s = await state(p);
-  ok(s.demo === null && s.left.length > 5 && s.mem.saved === 18500, '1 the account holds the sample as its own: ' + s.left.length + ' sample rows, House Builder £' + s.mem.saved);
-  ok(s.chip !== 'none' && s.chip !== 'missing', '1 a "Clear sample figures" chip shows (' + s.chip + ')');
-  const btnText = await p.evaluate(() => { const b = document.querySelector('#sample-chip button'); return b ? b.textContent.trim() : ''; });
-  ok(/clear sample figures/i.test(btnText), '1 its button says Clear sample figures (' + btnText + ')');
-  await p.evaluate(() => { window.confirm = () => true; });
-  if (btnText) await Promise.all([p.waitForNavigation({ timeout: 8000 }).catch(() => null), p.click('#sample-chip button')]);
-  await p.waitForTimeout(3000); await signIn(p);
+  ok(s.demo === null && s.left.length > 5 && s.mem.saved === 18500, '1 signed out, nothing is touched: the account holds the sample as its own, ' + s.left.length + ' sample rows, House Builder £' + s.mem.saved);
+  ok(!s.button, '1 no "Clear sample figures" button');
+  let restarted = await signIn(p, await cloudOf(p));
+  ok(restarted, '2 at sign-in the clean-up runs by itself and the page restarts');
   s = await state(p);
   ok(s.left.length === 0 && !s.eth && !s.gold && s.snaps === 0, '2 no sample row is left in any area (' + JSON.stringify({ left: s.left, eth: s.eth, gold: s.gold, snaps: s.snaps }) + ')');
   ok(s.own.join() === 'My ISA' && s.ownDebt.join() === 'My card', '2 the user\'s own rows stay (' + JSON.stringify({ own: s.own, debt: s.ownDebt }) + ')');
   ok(s.ht3.saved === 0 && s.ht3.n === 0 && s.ht3.type === 'terraced' && s.ht3.price === 210000, '2 House Builder: £0 saved, no deposits; their house type and price stay (' + JSON.stringify(s.ht3) + ')');
   ok(s.mem.saved === 0 && s.mem.assets === 1000 && /1,000|1\.0k/.test(s.kpi || ''), '2 Assets is the user\'s own £1,000 (' + JSON.stringify(s.mem) + ' ' + s.kpi + ')');
   ok(s.baks.indexOf('vi_bak_ht3') >= 0 && s.baks.indexOf('vi_bak_pos_al1') >= 0, '2 a backup of each replaced area is kept (' + s.baks.join(',') + ')');
-  ok(s.chip === 'none', '2 the chip has gone');
-  await p.reload(); await p.waitForTimeout(3000); await signIn(p);
+  ok(!s.button, '2 no button or question was shown');
+  await p.reload(); await p.waitForTimeout(3000);
+  restarted = await signIn(p, JSON.parse(await p.evaluate(() => { const u = JSON.parse(sessionStorage.getItem('ups') || '[]'); const last = {}; u.forEach(b => b.forEach(r => { last[r.key] = r; })); return JSON.stringify(Object.values(last)); })));
   s = await state(p);
-  ok(s.left.length === 0 && s.mem.saved === 0 && s.demo === null && s.chip === 'none', '3 after a reload it stays cleared and the sample does not load again (' + JSON.stringify({ left: s.left, saved: s.mem.saved, demo: s.demo }) + ')');
+  ok(!restarted, '3 a second sign-in has nothing to clean: no restart');
+  ok(s.left.length === 0 && s.mem.saved === 0 && s.demo === null, '3 after a reload it stays cleared and the sample does not load again (' + JSON.stringify({ left: s.left, saved: s.mem.saved, demo: s.demo }) + ')');
   ok(p._errs.length === 0, '1-3 no page errors' + (p._errs.length ? ': ' + p._errs.join(' | ') : ''));
   await p.context().close();
 
   // ── 4: signed in, the cloud holds the sample ──
   p = await adopted(b);
-  const nav4 = p.waitForNavigation({ timeout: 10000 }).then(() => true, () => false);
-  await p.evaluate((e) => {
-    const cloud = ['pos_ov1', 'pos_al1', 'pos_debt1', 'pos_biz1', 'ht3'].map(k => ({ key: k, value: JSON.parse(localStorage.getItem(k)), updated_at: new Date(Date.now() - 864e5).toISOString() }));
-    _supaClient = { auth: { getSession: async () => ({ data: { session: null } }) },
-      from: () => ({ select: () => ({ eq: async () => ({ data: cloud }) }), upsert: async (rows) => { sessionStorage.setItem('ups', JSON.stringify(rows)); return {}; } }) };
-    _supaUser = { id: 'u-t', email: e }; _syncReady = true; _flushing = false;
-    window.confirm = () => true;
-    viClearSample();   // uploads, then restarts the page
-  }, EMAIL);
-  const reloaded = await nav4; await p.waitForTimeout(1500);
-  const up = { rows: JSON.parse(await p.evaluate(() => sessionStorage.getItem('ups') || '[]')), reloaded };
+  const reloaded = await signIn(p, await cloudOf(p));
+  const up = { rows: JSON.parse(await p.evaluate(() => { const u = JSON.parse(sessionStorage.getItem('ups') || '[]'); const last = {}; u.forEach(b => b.forEach(r => { last[r.key] = r; })); return JSON.stringify(Object.values(last)); })), reloaded };
   const keys = up.rows.map(r => r.key).sort();
   const blob = JSON.stringify(up.rows.map(r => r.value));
   ok(['ht3', 'pos_al1', 'pos_debt1'].every(k => keys.indexOf(k) >= 0), '4 the cleared areas are uploaded (' + keys.join(',') + ')');
@@ -157,7 +154,7 @@ const signIn = (p, cloud) => p.evaluate(([e, cloud]) => {
   await p.waitForTimeout(1500);
   s = await state(p);
   ok(s.left.length === 0 && s.mem.saved === 0 && s.mem.assets === 0 && s.ht3.saved !== 18500, '6 after skipping the welcome screens: nothing of the sample, House Builder £0, Assets £0 (' + JSON.stringify({ left: s.left, mem: s.mem }) + ')');
-  ok(s.chip === 'none' && s.demo === null, '6 no sample chip and no demo mode');
+  ok(!s.button && s.demo === null, '6 no button and no demo mode');
   await p.context().close();
 
 
@@ -169,18 +166,18 @@ const signIn = (p, cloud) => p.evaluate(([e, cloud]) => {
     set('pos_ov1', JSON.stringify({ income: [{ id: t, name: 'Salary', amount: 2000 }], expenses: [{ id: t + 1, name: 'Savings', amount: 250, cat: 'savings', type: 'sv' }, { id: t + 2, name: 'Emergency fund', amount: 200, cat: 'emergency', type: 'sv' }, { id: t + 3, name: 'Rent', amount: 1150 }] }));
     set('pos_al1', JSON.stringify({ cashAccounts: [{ id: t + 4, name: 'Current Account', balance: 2100 }], crypto: [{ id: 1, sym: 'BTC', amount: 0.05, price: 42000 }, { id: 2, sym: 'ETH', amount: 0, price: 2200 }] }));
   }, EMAIL);
-  await p.reload(); await p.waitForTimeout(2500); await signIn(p);
-  const r7 = await p.evaluate(() => ({ areas: viSampleAreas().map(a => a.key), chip: getComputedStyle(document.getElementById('sample-chip')).display }));
-  ok(r7.areas.length === 0 && r7.chip === 'none', '7 rows of the user\'s own with preset names (Savings £250, Emergency fund £200, Rent £1,150, Current Account £2,100) are not the sample: no chip (' + JSON.stringify(r7) + ')');
+  await p.reload(); await p.waitForTimeout(2500);
+  const r7restart = await signIn(p);
+  const r7 = await p.evaluate(() => ({ areas: viSampleAreas().map(a => a.key), restarted: false, rows: JSON.parse(localStorage.getItem('pos_ov1')).expenses.length + JSON.parse(localStorage.getItem('pos_al1')).cashAccounts.length }));
+  r7.restarted = r7restart;
+  ok(r7.areas.length === 0 && !r7.restarted && r7.rows === 4, '7 rows of the user\'s own with preset names (Savings £250, Emergency fund £200, Rent £1,150, Current Account £2,100) are not the sample: nothing removed, no restart (' + JSON.stringify(r7) + ')');
   await p.context().close();
 
   // ── 8: the welcome pot was added on top of the sample's House Builder ──
   p = await adopted(b);
   await p.evaluate(() => { const h = JSON.parse(localStorage.getItem('ht3')); h.deposits.push({ amount: 6000, date: '09/11/2026', acct: { t: 'savings', n: '' } }); h.saved = 24500; _lsOrig.call(localStorage, 'ht3', JSON.stringify(h)); });
-  await p.reload(); await p.waitForTimeout(3000); await signIn(p);
-  await p.evaluate(() => { window.confirm = () => true; });
-  await Promise.all([p.waitForNavigation({ timeout: 10000 }).catch(() => null), p.evaluate(() => { viClearSample(); })]);
-  await p.waitForTimeout(2500);
+  await p.reload(); await p.waitForTimeout(3000);
+  await signIn(p, await cloudOf(p));
   s = await state(p);
   ok(s.ht3.saved === 6000 && s.ht3.n === 1, '8 the sample\'s seven deposits go, the £6,000 welcome pot stays: £6,000 saved, one deposit (' + JSON.stringify(s.ht3) + ')');
   await p.context().close();
@@ -188,6 +185,7 @@ const signIn = (p, cloud) => p.evaluate(([e, cloud]) => {
   // ── 9: a second device still holding the sample cannot bring it back ──
   p = await adopted(b);
   const r9 = await p.evaluate(async (e) => {
+    sessionStorage.setItem('vi_sample_auto', '1');   // this case is about sync alone: the automatic clean-up is covered by 1-4
     const sampleOv = localStorage.getItem('pos_ov1');
     const blankNow = _isBlankArea('pos_ov1', sampleOv);
     // this device has the sample (synced long ago, not edited here); the account was cleared on another device since
