@@ -37,7 +37,7 @@
   .meta { font-size: 13px; color: var(--night-dim); margin-top: 4px; }
 
   /* hero */
-  .hero h1 { font-family: var(--font-vf-display); font-weight: 700; font-size: clamp(36px, 8vw, 96px); line-height: 1.04; margin: 0 0 20px; overflow-wrap: anywhere; }
+  .hero h1 { font-family: var(--font-vf-display); font-weight: 700; letter-spacing: -0.01em; word-spacing: -0.05em; font-size: clamp(36px, 8vw, 96px); line-height: 1.04; margin: 0 0 20px; overflow-wrap: anywhere; }
   .hero h1 em { font-style: normal; color: var(--red); }
   .hero h1 span { color: var(--teal); }
   .day.hero h1 span { color: var(--deep-teal); }
@@ -127,7 +127,7 @@
 <section class="night pair">
   <div class="wrap">
     <p class="tag">Heading over DM Sans body</p>
-    <h3>Net worth in 3D</h3>
+    <h3 style="letter-spacing: -0.01em; word-spacing: -0.05em;">Net worth in 3D</h3>
     <p>A speed run of the climb: starting in the red with a little saved, paying the debt off block by block, then building wealth in every domain. Big blocks are £1,000. Small cubes are £100. Nine cubes become a block.</p>
   </div>
 </section>
@@ -159,8 +159,8 @@
       <div class="style"><div class="n">__FAMILY__ Condensed Light 300</div><div class="s vfc w300">Get out of the red and into your home.</div></div>
       <div class="style"><div class="n">__FAMILY__ Condensed Regular 400</div><div class="s vfc w400">Get out of the red and into your home.</div></div>
       <div class="style"><div class="n">__FAMILY__ Condensed Bold 700</div><div class="s vfc w700">Get out of the red and into your home.</div></div>
-      <div class="style"><div class="n">__FAMILY__ Hatch Bold 700 (display, 48 px and up)</div><div class="s" style="font-family: var(--font-vf-hatch); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
-      <div class="style"><div class="n">__FAMILY__ Condensed Hatch Bold 700 (display, 48 px and up)</div><div class="s" style="font-family: var(--font-vf-hatch-condensed); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
+      <div class="style"><div class="n">__FAMILY__ Hatch Bold 700 (display, 32 px and up)</div><div class="s" style="font-family: var(--font-vf-hatch); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
+      <div class="style"><div class="n">__FAMILY__ Condensed Hatch Bold 700 (display, 32 px and up)</div><div class="s" style="font-family: var(--font-vf-hatch-condensed); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
     </div>
   </div>
 </section>
@@ -229,7 +229,7 @@
 <section class="night scan hatch">
   <div class="wrap">
     <p class="tag">Hatch cut on Night scanlines</p>
-    <p class="h" style="font-size: 24px;">At 24 px the hatch fills in and reads as plain Bold.</p>
+    <p class="h" style="font-size: 24px;">At 24 px the hatch greys the lower half but still reads as Bold.</p>
     <p class="h" style="font-size: 48px; color: var(--teal);">Into your home</p>
     <p class="h" style="font-size: clamp(48px, 15vw, 72px); color: var(--gold);">£48,215</p>
     <p class="hc" style="font-size: clamp(64px, 24vw, 120px);">VAULT</p>
@@ -239,7 +239,7 @@
 <section class="day grid hatch">
   <div class="wrap">
     <p class="tag">Hatch cut on the Daylight blueprint grid</p>
-    <p class="h" style="font-size: 24px;">At 24 px the hatch fills in and reads as plain Bold.</p>
+    <p class="h" style="font-size: 24px;">At 24 px the hatch greys the lower half but still reads as Bold.</p>
     <p class="h" style="font-size: 48px; color: var(--deep-teal);">Into your home</p>
     <p class="h" style="font-size: clamp(48px, 15vw, 72px);">£48,215</p>
     <p class="hc" style="font-size: clamp(64px, 24vw, 120px); color: var(--deep-teal);">VAULT</p>
@@ -256,7 +256,7 @@
 <section class="day pair">
   <div class="wrap">
     <p class="tag">Heading over DM Sans body</p>
-    <h3>Net worth in 3D</h3>
+    <h3 style="letter-spacing: -0.01em; word-spacing: -0.05em;">Net worth in 3D</h3>
     <p>A speed run of the climb: starting in the red with a little saved, paying the debt off block by block, then building wealth in every domain. Big blocks are £1,000. Small cubes are £100.</p>
   </div>
 </section>
@@ -302,7 +302,7 @@
     <ul class="rules">
       <li>Use for display headings, the net worth hero, stat-strip figures, tab labels at 12 px and up, deck and comms headlines.</li>
       <li>Keep DM Sans for body copy, the FCA disclaimer line, form inputs and dense tables of text.</li>
-      <li>Hatch cuts only at 48 px and up: the hero number, one headline per screen, the tagline on decks. Never in tables, buttons or labels.</li>
+      <li>Hatch cuts only at 32 px and up: the hero number, one headline per screen, the tagline on decks. Never in tables, buttons or labels.</li>
       <li>The wordmark and brick hyphen stay as artwork. Do not reset the logo in this font.</li>
       <li>Use the minus sign (−) for debt so "−£300" reads as money owed.</li>
     </ul>
@@ -317,7 +317,7 @@
   (function () {
     var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" +
       "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" +
-      "¡¢£¥¦§¨©ª«¬®¯°±´µ¶·¸º»¿×÷" +
+      "¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿×÷" +
       "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞß" +
       "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿıŒœŠšŽžŸ" +
       "–—‘’‚“”„†•…‰‹›⁄€−";

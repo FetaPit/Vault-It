@@ -76,11 +76,11 @@
 
 :root {
   /* Fallback stacks per use. DM Sans stays the body face. */
-  --font-vf-display: "Vault-form", "Syne", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-vf-display: "Vault-form", "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-vf-condensed: "Vault-form Condensed", "Vault-form", "Arial Narrow", "Segoe UI", system-ui, sans-serif;
   --font-vf-figures: "Vault-form", "Share Tech Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --font-vf-label: "Vault-form Condensed", "Share Tech Mono", ui-monospace, monospace;
-  --font-vf-hatch: "Vault-form Hatch", "Vault-form", "Syne", system-ui, sans-serif;
+  --font-vf-hatch: "Vault-form Hatch", "Vault-form", system-ui, sans-serif;
   --font-vf-hatch-condensed: "Vault-form Condensed Hatch", "Vault-form Condensed", "Vault-form", system-ui, sans-serif;
 }
 
@@ -89,4 +89,8 @@
 .vf-figures { font-family: var(--font-vf-figures); font-variant-numeric: tabular-nums lining-nums; }
 .vf-pnum { font-variant-numeric: proportional-nums; }
 .vf-label { font-family: var(--font-vf-label); font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; }
-.vf-hatch { font-family: var(--font-vf-hatch); font-weight: 700; } /* 48 px and up only */
+/* Headings. Bold is wide, so tighten slightly from 40 px up. Go no further
+   than about -0.05em in total or words start to fuse. */
+.vf-heading { font-family: var(--font-vf-display); font-weight: 700; line-height: 1.15; }
+.vf-heading-lg { letter-spacing: -0.01em; word-spacing: -0.05em; } /* add at 40 px and up */
+.vf-hatch { font-family: var(--font-vf-hatch); font-weight: 700; } /* 32 px and up only */

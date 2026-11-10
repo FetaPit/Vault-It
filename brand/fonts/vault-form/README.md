@@ -41,6 +41,7 @@ Then use the custom properties it defines:
 
 ```css
 h1, h2, h3     { font-family: var(--font-vf-display); font-weight: 700; }
+h1, .display   { letter-spacing: -0.01em; word-spacing: -0.05em; } /* 40 px and up; go no tighter */
 .hero-number   { font-family: var(--font-vf-figures); font-weight: 700; font-variant-numeric: tabular-nums; }
 .tab-label     { font-family: var(--font-vf-label); text-transform: uppercase; letter-spacing: 0.06em; }
 .deck-headline { font-family: var(--font-vf-hatch); font-weight: 700; font-size: clamp(48px, 8vw, 120px); }
@@ -57,13 +58,13 @@ Use for: display headings (it replaces Syne), the net worth hero, stat-strip fig
 
 Do not use for: long body copy, the FCA disclaimer line, form inputs, dense tables of text. DM Sans stays the body face. Share Tech Mono stays for labels under 12 px.
 
-Hatch cuts: only at 48 px and up, for the hero number, one headline per screen, or the tagline on decks. Never in tables, buttons or labels. The hatch is cut out of the letter, so it takes whatever colour or ground sits behind it. Below 48 px it fills in and reads as plain Bold, by design.
+Hatch cuts: only at 32 px and up, for the hero number, one headline per screen, or the tagline on decks. Never in tables, buttons or labels. The hatch is cut out of the letter, so it takes whatever colour or ground sits behind it. Below 32 px the lower half turns slightly grey but still reads as Bold; the stripes show clearly from 48 px.
 
 The Vault-It wordmark and brick hyphen stay as artwork. Do not reset the logo in this font.
 
 ## Character set
 
-219 glyphs: full printable ASCII, £ € ¢ ¥, curly quotes, ellipsis, bullet, minus, en and em dash, × ÷ ± °, © ®, guillemets, non-breaking space, and Western European accented letters (Latin-1 plus Œ œ Š š Ž ž Ÿ). Proportional figure alternates (`pnum`) and kerning (`kern`) are built in.
+226 glyphs: full printable ASCII and the whole Latin-1 supplement (including soft hyphen, ¤, ¹ ² ³ and ¼ ½ ¾), plus € ‰ † • …, curly and low quotes, single guillemets, minus, en and em dash, and Œ œ Š š Ž ž Ÿ ı. Proportional figure alternates (`pnum`) and kerning (`kern`) are built in.
 
 ## Rebuild
 

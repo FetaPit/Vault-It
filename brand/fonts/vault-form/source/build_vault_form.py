@@ -304,7 +304,9 @@ def _c(g):
     S, H, X = g.S, g.H, g.X
     W = g.w(520, 2)
     r = g.ring(0, 0, W, X, (g.sm(W, X), g.big(W, X), g.sm(W, X), g.big(W, X)))
-    r = r.difference(box(W - S - 10, round(0.30 * X), W + 10, round(0.70 * X)))
+    # open the whole right side between the bars, wide enough to take the
+    # counter's inner chamfer with it (no spur on the foot)
+    r = r.difference(box(W - S - g.big(W, X) - 10, g.H, W + 10, X - g.H))
     return r, W, g.sbO, g.sbT + 6
 
 
@@ -323,7 +325,7 @@ def _e(g):
     r = g.ring(0, 0, W, X, (g.sm(W, X), g.big(W, X), g.sm(W, X), g.big(W, X)), sy=H3)
     yb0 = round(X * (0.47 if g.weight == "Bold" else 0.485) - H3 / 2)
     bar = box(0, yb0, W, yb0 + H3)
-    cut = box(W - max(S, g.big(W, X)) - 10, H3, W + 10, yb0)
+    cut = box(W - S - g.big(W, X) - 10, H3, W + 10, yb0)
     return U(r, bar).difference(cut), W, g.sbO, g.sbO
 
 
@@ -919,7 +921,8 @@ HY = 285            # hyphen centre
 
 @gl("space", 0x20)
 def _space(g):
-    return Polygon(), 0, round((260 + (g.S - REG_S) * 0.3) * (0.86 if g.cond else 1)), 0
+    # heavier weights get a tighter word space (Bold 240, Regular 260, Light 270)
+    return Polygon(), 0, round((260 - (g.S - REG_S) * 0.3) * (0.86 if g.cond else 1)), 0
 
 
 @gl("uni00A0", 0xA0)
@@ -976,11 +979,11 @@ def _question(g):
     W = g.w(560, 2)
     yq = round(0.38 * C)
     r = g.ring(0, yq, W, C, (0, g.big(W, C - yq), g.sm(W, C - yq), g.big(W, C)))
-    r = r.difference(box(-10, yq - 10, S + 10, C - H))
+    r = r.difference(box(-10, yq - 10, S + g.big(W, C) + 10, C - H))
     xs = round((W - S) / 2)
     r = r.difference(box(-10, yq - 10, xs, yq + H + 1))
     st = box(xs, g.dh + round(0.12 * C), xs + S, yq + H)
-    return U(r, st, g.dot(xs + (S - g.dw) / 2, 0)), W, g.sbV, g.sbO
+    return U(r, st, g.dot(xs + (S - g.dw) / 2, 0)), W, round(g.sbV * 0.6), g.sbO
 
 
 @gl("questiondown", 0xBF)
@@ -1054,7 +1057,7 @@ def _quotedblbase(g):
     return s, W, l, r
 
 
-@gl("hyphen", 0x2D)
+@gl("hyphen", 0x2D, 0xAD)
 def _hyphen(g):
     W = round((300 + (g.S - REG_S) * 0.6) * (0.85 if g.cond else 1))
     return box(0, HY - g.H / 2, W, HY + g.H / 2), W, g.sbT + 6, g.sbT + 6
@@ -1062,14 +1065,14 @@ def _hyphen(g):
 
 @gl("endash", 0x2013)
 def _endash(g):
-    W = round(500 * (0.85 if g.cond else 1))
-    return box(0, HY - g.H / 2, W, HY + g.H / 2), W, 0, 0
+    W = round(500 * (0.85 if g.cond else 1)) - 80
+    return box(0, HY - g.H / 2, W, HY + g.H / 2), W, 40, 40
 
 
 @gl("emdash", 0x2014)
 def _emdash(g):
-    W = round(1000 * (0.85 if g.cond else 1))
-    return box(0, HY - g.H / 2, W, HY + g.H / 2), W, 0, 0
+    W = round(1000 * (0.85 if g.cond else 1)) - 80
+    return box(0, HY - g.H / 2, W, HY + g.H / 2), W, 40, 40
 
 
 def math_w(g):
@@ -1320,8 +1323,8 @@ def _dollar(g):
 def _percent(g):
     S = g.S
     W = g.w(820, 3)
-    sx = round(S * 0.8)
-    rw = round(0.36 * W)
+    sx = round(S * 0.58)
+    rw = round(0.38 * W)
     rh = round(0.42 * g.C)
     a = g.ring(0, g.C - rh, rw, g.C, (0, g.big(rw, rh), 0, g.big(rw, rh)), sx=sx, sy=sx)
     b = g.ring(W - rw, 0, W, rh, (0, g.big(rw, rh), 0, g.big(rw, rh)), sx=sx, sy=sx)
@@ -1334,16 +1337,19 @@ def _percent(g):
 @gl("ampersand", 0x26)
 def _ampersand(g):
     S, H, C, t = g.S, g.H3, g.C, g.t
-    W = g.w(700, 2)
+    W = g.w(760, 2) if not g.cond else g.w(820, 2)
+    if g.weight == "Bold":
+        S = round(S * 0.86)
+        H = round(H * 0.86)
     yu = round(0.54 * C)
     xu0, xu1 = round(0.06 * W), round(0.66 * W)
-    up = g.ring(xu0, yu, xu1, C, (0, 0, g.sm(), g.big(xu1 - xu0, C - yu)), sy=H)
+    up = g.ring(xu0, yu, xu1, C, (0, 0, g.sm(), g.big(xu1 - xu0, C - yu)), sx=S, sy=H)
     up = up.difference(box(xu0 + S, yu - 10, xu1 + 10, yu + H))
-    lo = g.ring(0, 0, round(0.86 * W), yu + H, (g.sm(), g.big(W, yu), 0, 0), sy=H, open="t")
+    lo = g.ring(0, 0, round(0.86 * W), yu + H, (g.sm(), g.big(W, yu), 0, 0), sx=S, sy=H, open="t")
     lo = lo.difference(box(S, yu - H, round(0.86 * W) + 10, yu + H + 10))
     lo = lo.difference(box(round(0.86 * W) - S - 10, round(0.40 * C), W + 10, yu + 10))
     tw = t / math.sin(math.atan2(yu + H, W - xu0)) / 2
-    leg = diag(xu0 + S + tw * 0.2, yu + H, W - tw, 0, round(t * 0.95)).intersection(box(0, 0, W, C))
+    leg = diag(xu0 + S + tw * 0.2, yu + H, W - tw, 0, round(t * 0.72)).intersection(box(0, 0, W, C))
     arm = box(round(0.86 * W) - S, round(0.40 * C) - 2, W, round(0.40 * C) + H)
     return U(up, lo, leg, arm), W, g.sbO, g.sbD
 
@@ -1551,10 +1557,11 @@ def _mu(g):
 @gl("paragraph", 0xB6)
 def _paragraph(g):
     S, C = g.S, g.C
-    W = g.w(600, 2)
-    st1 = box(W - S, g.D, W, C)
+    ts = round(S * 0.72)
+    W = max(g.w(600, 2), round(2.3 * ts / 0.5))
+    st1 = box(W - ts, g.D, W, C)
     xs = round(W * 0.5)
-    st2 = box(xs, g.D, xs + round(S * 0.8), C)
+    st2 = box(xs, g.D, xs + ts, C)
     bowl = octa(0, round(0.42 * C), xs + 1, C, (g.sm(), 0, 0, g.big(xs, C * 0.5)))
     return U(st1, st2, bowl, box(xs, C - g.H, W, C)), W, g.sbO, g.sbV
 
@@ -1571,11 +1578,78 @@ def _dagger(g):
 def _perthousand(g):
     s, W, l, r = get(g, "percent")
     S = g.S
-    rw = round(0.36 * W)
+    rw = round(0.38 * W)
     rh = round(0.42 * g.C)
-    sx = round(S * 0.8)
+    sx = round(S * 0.58)
     extra = g.ring(W + round(0.08 * W), 0, W + round(0.08 * W) + rw, rh, (0, g.big(rw, rh), 0, g.big(rw, rh)), sx=sx, sy=sx)
     return U(s, extra), W + round(0.08 * W) + rw, l, r
+
+
+# ---------------- superiors, fractions, currency sign ----------------
+SUP_K = 0.6          # superior figures are drawn at full size, then scaled
+
+
+def sup_digit(g, i):
+    """Superior figure, drawn with heavier stems so it keeps colour once scaled."""
+    gs = G(g.weight, g.cond)
+    gs.S = round(g.S * 0.74 / SUP_K)
+    gs.H = round(g.H * 0.74 / SUP_K)
+    gs.H3 = round(g.H3 * 0.74 / SUP_K)
+    W = digit_w(gs)
+    geom = d_one(gs, W, base=False) if i == 1 else DIGIT_FN[i](gs, W)
+    geom = affinity.scale(geom, SUP_K, SUP_K, origin=(0, 0))
+    x0, _, x1, _ = geom.bounds
+    return T(geom, -x0), round(x1 - x0)
+
+
+def make_superior(i):
+    def fn(g):
+        geom, W = sup_digit(g, i)
+        return T(geom, 0, g.C - SUP_K * g.C), W, round(g.sbV * 0.7), round(g.sbV * 0.7)
+    return fn
+
+
+gl("onesuperior", 0xB9)(make_superior(1))
+gl("twosuperior", 0xB2)(make_superior(2))
+gl("threesuperior", 0xB3)(make_superior(3))
+
+
+def make_fraction(a, b):
+    def fn(g):
+        na, wa = sup_digit(g, a)
+        nb, wb = sup_digit(g, b)
+        t = round(g.S * 0.7)
+        ws = round(0.36 * g.C)
+        hw = t / math.sin(math.atan2(g.C, ws)) / 2
+        xs = round(wa * 0.8)
+        sl = diag(xs + hw, 0, xs + ws - hw, g.C, t)
+        num = T(na, 0, g.C - SUP_K * g.C)
+        den = T(nb, xs + round(ws * 0.78), 0)
+        geom = U(num, sl, den)
+        return geom, round(geom.bounds[2]), g.sbV, g.sbV
+    return fn
+
+
+gl("onequarter", 0xBC)(make_fraction(1, 4))
+gl("onehalf", 0xBD)(make_fraction(1, 2))
+gl("threequarters", 0xBE)(make_fraction(3, 4))
+
+
+@gl("currency", 0xA4)
+def _currency(g):
+    S = g.S
+    sz = round(0.44 * g.C)
+    th = round(min(S * 0.7, 0.2 * sz))
+    tk = round(0.13 * g.C)
+    x0, y0 = tk, AXIS - sz / 2
+    r = g.ring(x0, y0, x0 + sz, y0 + sz, (g.sm(), g.big(sz), g.sm(), g.big(sz)), sx=th, sy=th)
+    W = sz + 2 * tk
+    hw = th / math.sin(math.radians(45)) / 2
+    ticks = U(diag(hw, y0 - tk, tk + hw + th * 0.4, y0 + th * 0.4, th),
+              diag(W - tk - hw - th * 0.4, y0 + sz - th * 0.4, W - hw, y0 + sz + tk, th),
+              diag(W - hw, y0 - tk, W - tk - hw - th * 0.4, y0 + th * 0.4, th),
+              diag(tk + hw + th * 0.4, y0 + sz - th * 0.4, hw, y0 + sz + tk, th))
+    return U(r, ticks).intersection(box(0, y0 - tk, W, y0 + sz + tk)), W, g.sbV, g.sbV
 
 
 # ==========================================================================
@@ -1602,14 +1676,18 @@ def _AE(g):
 
 @gl("oe", 0x153)
 def _oe(g):
-    o, Wo, l, _ = get(g, "o")
+    _o, Wo, l, _ = get(g, "o")
+    B, s_ = g.big(Wo, g.X), g.sm(Wo, g.X)
+    o = g.ring(0, 0, Wo, g.X, (s_, 0, 0, B))      # square join on the right
     e, We, _, r = get(g, "e")
     return U(o, T(e, Wo - g.S)), Wo - g.S + We, l, r
 
 
 @gl("OE", 0x152)
 def _OE(g):
-    o, Wo, l, _ = get(g, "O")
+    _o, Wo, l, _ = get(g, "O")
+    B, s_ = g.big(Wo, g.C), g.sm(Wo, g.C)
+    o = g.ring(0, 0, Wo, g.C, (s_, 0, 0, B))      # square join on the right
     E, We, _, r = get(g, "E")
     o = o.difference(box(Wo - g.S, -1, Wo + 10, g.C + 1))
     return U(o, T(E, Wo - g.S)), Wo - g.S + We, l, r
@@ -1625,8 +1703,9 @@ def _germandbls(g):
     up = up.difference(box(S, ym - H3, round(0.42 * W), ym + H3))
     up = U(up, box(round(0.42 * W), ym - H3 // 2, Wu, ym + H3 // 2))
     lo = g.ring(0, 0, W, ym + H3 // 2, (0, g.big(W, ym), g.sm(W, ym), 0), sy=H3)
-    lo = lo.difference(box(-10, -10, round(0.42 * W), ym + H3))
-    return U(up, lo, box(0, 0, S, A - 20)), W, g.sbV, g.sbO
+    lo = lo.difference(box(-10, -10, S, ym + H3))
+    stem = box(0, 0, S, ym)          # the upper bowl carries the top-left chamfer
+    return U(up, lo, stem), W, g.sbV, g.sbO
 
 
 @gl("eth", 0xF0)
@@ -1635,9 +1714,9 @@ def _eth(g):
     W = g.w(570, 2)
     B, s = g.big(W, X), g.sm(W, X)
     o = g.ring(0, 0, W, X, (s, B, 0, B))
-    st = octa(W - S, X - H, W, A, (0, 0, 0, round(0.7 * S)))
+    st = box(W - S, X - H, W, A)
     yc = round(X + 0.45 * (A - X))
-    cross = diag(W - S * 1.6, yc - 60, W + S * 0.3, yc + 60, round(H * 0.8))
+    cross = box(W - S * 1.5, yc - round(H * 0.4), W + S * 0.3, yc + round(H * 0.4))
     return U(o, st, cross).intersection(box(-10, 0, W + S * 0.3, A)), W, g.sbO, g.sbV - 10
 
 
@@ -1825,8 +1904,8 @@ def hatch(g, geom):
     if geom.is_empty:
         return geom
     S = g.S
-    period, gap = 56, 21
-    t_in = round(0.2 * S)
+    period, gap = 56, 18          # lighter than r1 (21): less grey at 24 px
+    t_in = round(0.24 * S)
     inner = geom.buffer(-t_in, join_style="mitre", mitre_limit=10)
     zone = inner.intersection(box(-2000, -2000, 4000, WATER))
     if zone.is_empty:
@@ -2309,11 +2388,11 @@ def write_css():
     F = FAMILY
     out += [":root {",
             "  /* Fallback stacks per use. DM Sans stays the body face. */",
-            f'  --font-vf-display: "{F}", "Syne", "Segoe UI", system-ui, -apple-system, sans-serif;',
+            f'  --font-vf-display: "{F}", "Segoe UI", system-ui, -apple-system, sans-serif;',
             f'  --font-vf-condensed: "{F} Condensed", "{F}", "Arial Narrow", "Segoe UI", system-ui, sans-serif;',
             f'  --font-vf-figures: "{F}", "Share Tech Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;',
             f'  --font-vf-label: "{F} Condensed", "Share Tech Mono", ui-monospace, monospace;',
-            f'  --font-vf-hatch: "{F} Hatch", "{F}", "Syne", system-ui, sans-serif;',
+            f'  --font-vf-hatch: "{F} Hatch", "{F}", system-ui, sans-serif;',
             f'  --font-vf-hatch-condensed: "{F} Condensed Hatch", "{F} Condensed", "{F}", system-ui, sans-serif;',
             "}", "",
             "/* Helpers. Figures are tabular by default; .vf-pnum switches to proportional. */",
@@ -2321,7 +2400,11 @@ def write_css():
             ".vf-figures { font-family: var(--font-vf-figures); font-variant-numeric: tabular-nums lining-nums; }",
             ".vf-pnum { font-variant-numeric: proportional-nums; }",
             ".vf-label { font-family: var(--font-vf-label); font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; }",
-            ".vf-hatch { font-family: var(--font-vf-hatch); font-weight: 700; } /* 48 px and up only */",
+            "/* Headings. Bold is wide, so tighten slightly from 40 px up. Go no further",
+            "   than about -0.05em in total or words start to fuse. */",
+            ".vf-heading { font-family: var(--font-vf-display); font-weight: 700; line-height: 1.15; }",
+            ".vf-heading-lg { letter-spacing: -0.01em; word-spacing: -0.05em; } /* add at 40 px and up */",
+            ".vf-hatch { font-family: var(--font-vf-hatch); font-weight: 700; } /* 32 px and up only */",
             ""]
     (ROOT / f"{SLUG}.css").write_text("\n".join(out))
 
