@@ -2009,6 +2009,7 @@ CH = dict(
     span=0.6,      # panel share of the counter width
     min_w=0.9,     # shortest bar edge that gets a detail
     narrow=3.0,    # counters narrower than this x depth get a full-width panel
+    seam=0.075,    # D: engraved seam width
 )
 CH_COND = dict(depth=0.5)    # Condensed: shallower panels in the tighter counters
 CH_OVERRIDES = {
@@ -2142,6 +2143,7 @@ def _panel(g, C, geom, edge, kind, P, side=None, one_wall=False, closed=False):
         # narrow counter (Condensed): the panel fills it, wall to wall, and
         # the chamfers give it its 45 degree ends; no room for a hairline
         pw = width + 2 * depth
+        P = dict(P, seam=0)                  # and no seam (no free end to carry on)
     # free end: tapers away from the bar, at 45 degrees
     if kind == "c" and side == "l":          # "/"  keep x - y <= k
         xf = bx0 + pw
@@ -2165,16 +2167,29 @@ def _panel(g, C, geom, edge, kind, P, side=None, one_wall=False, closed=False):
     hair = rule.intersection(Cg)
     # the hairline must not run on past the band (into an open counter)
     hair = hair.intersection(box(bx0, -BIG, bx1, BIG))
-    return U(lines, hair)
+    # D: an engraved seam, the free end's 45 degree line carried on through
+    # the bar, like a panel join on machined metal. A hairline gap only.
+    sw = P["seam"] * H
+    if sw <= 0:
+        return U(lines, hair), Polygon()
+    seam = _half(k + sw * 0.7, slope, True).difference(_half(k - sw * 0.7, slope, True))
+    if kind == "c":
+        run = box(-BIG, y - 1, BIG, y + 2.5 * H)
+    else:
+        run = box(-BIG, y - 2.5 * H, BIG, y + 1)
+    # only the bar the panel hangs from (or stands on), not anything beyond it
+    bar = [p for p in polys(geom.intersection(run)) if p.intersects(box(xf - 2 * gap, y - 2, xf + 2 * gap, y + 2))]
+    seam = seam.intersection(U(*bar)).intersection(box(xf - H, -BIG, xf + H, BIG)) if bar else Polygon()
+    return U(lines, hair), seam
 
 
-def counter_hatch(g, geom, name=None, params=None):
+def counter_hatch(g, geom, name=None, params=None, with_seams=False):
     """Elons-style counter hatch for one glyph: the detail geometry only.
 
     Union it with the glyph for a one-colour font, or keep it apart for a
     colour layer (COLR) or an overlay 'hatch layer' font."""
     if geom.is_empty:
-        return Polygon()
+        return (Polygon(), Polygon()) if with_seams else Polygon()
     P = dict(CH)
     if g.cond:
         P.update(CH_COND)
@@ -2184,7 +2199,7 @@ def counter_hatch(g, geom, name=None, params=None):
     if name == "t" and not g.character:
         ov = dict(skip=True)                # foot too short without the beak
     if ov.get("skip"):
-        return Polygon()
+        return (Polygon(), Polygon()) if with_seams else Polygon()
     H = g.H
     space = geom.convex_hull.difference(geom)
     counters = [c for c in polys(space) if c.area > (0.9 * H) ** 2]
@@ -2215,8 +2230,13 @@ def counter_hatch(g, geom, name=None, params=None):
         side = ov.get("side_" + kind)
         closed = any(c == ci for _, c in ceils) and any(c == ci for _, c in floors)
         p = _panel(g, counters[ci], geom, edge, kind, P, side, ov.get("one_wall", False), closed)
-        if p is not None and not p.is_empty:
+        if p is not None and not p[0].is_empty:
             out.append(p)
+    if with_seams:
+        hs = [o[0] for o in out]
+        ss = [o[1] for o in out if not o[1].is_empty][:1]   # one seam per glyph: restraint
+        return (U(*hs) if hs else Polygon()), (U(*ss) if ss else Polygon())
+    out = [o[0] for o in out]
     return U(*out) if out else Polygon()
 
 
@@ -2267,6 +2287,9 @@ def build_glyphs(weight, cond, hatched):
             mode = hatched if isinstance(hatched, str) else HATCH_MODE
             if mode == "counter":       # r3: counter hatch drawn into the glyph
                 geom = U(geom, counter_hatch(g, geom, name))
+            elif mode == "detail":      # r3 D: counter hatch plus one engraved seam
+                h, sm = counter_hatch(g, geom, name, with_seams=True)
+                geom = U(geom, h).difference(sm)
             elif mode == "layer":       # r3: hatch only, for an overlay or COLR layer
                 geom = counter_hatch(g, geom, name)
             else:                       # r1/r2: stripes cut into the stroke
