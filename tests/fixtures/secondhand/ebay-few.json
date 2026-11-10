@@ -1,0 +1,25 @@
+{
+ "itemSummaries": [
+  {
+   "title": "Gibson Les Paul Standard 0",
+   "price": {
+    "value": "900",
+    "currency": "GBP"
+   }
+  },
+  {
+   "title": "Gibson Les Paul Standard 1",
+   "price": {
+    "value": "950",
+    "currency": "GBP"
+   }
+  },
+  {
+   "title": "Gibson Les Paul Standard 2",
+   "price": {
+    "value": "980",
+    "currency": "GBP"
+   }
+  }
+ ]
+}

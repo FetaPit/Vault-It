@@ -1,0 +1,13 @@
+/* Vault-It tagline neon (owner, 4 Nov 2026): thin neon red stroke on "red", thin gold gradient neon stroke on "home". */
+.vi-neon{position:relative;display:inline-block;isolation:isolate}
+.vi-neon::before,.vi-neon::after{content:attr(data-t);position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap;color:transparent}
+.vi-neon::before{z-index:-1;-webkit-text-stroke:var(--neon-w,.065em) transparent;-webkit-background-clip:text;background-clip:text}
+.vi-neon::after{z-index:-2;-webkit-text-stroke:var(--neon-w,.065em) var(--neon-glow);filter:blur(.07em);opacity:.85}
+.vi-neon-red{--neon-glow:#FF2E4D}
+.vi-neon-red::before{background-image:linear-gradient(#FF4D63,#FF4D63)}
+.vi-neon-gold{--neon-glow:#F2C94C}
+.vi-neon-gold::before{background-image:linear-gradient(100deg,#B8862E 0%,#F5DC4A 38%,#FFF1B0 52%,#E8C56A 68%,#B8862E 100%)}
+/* Markup: Get out of the <span class="vi-neon vi-neon-red" data-t="red">red</span> and into your <span class="vi-neon vi-neon-gold" data-t="home">home</span>.
+   The word keeps its normal fill; ::before draws the thin outline (background-image clipped to the text stroke), ::after a soft glow.
+   Use background-image, not the background shorthand: the shorthand resets background-clip and paints a solid block.
+   Where an outline is not possible (plain-text email, the Slides deck format, SMS), colour the words instead: red #FF4D63, home #F5DC4A. */

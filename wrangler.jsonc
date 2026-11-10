@@ -1,0 +1,25 @@
+{
+  // Cloudflare Workers project "vault-it": the Worker's name here must match the project name in the Cloudflare dashboard.
+  // Build command: npm run build:site        Deploy command: npx wrangler deploy
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vault-it",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-10-26",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "not_found_handling": "none",
+    "run_worker_first": true
+  },
+  "workers_dev": true,
+  "preview_urls": true,
+  "previews": {},   // needed by `wrangler preview` (Workers Builds preview links for non-production branches); empty = same settings as production
+  "observability": { "enabled": false },   // request URLs and IPs are not logged by the Worker (the privacy notice relies on this)
+  // Custom domains (the vault-it.co zone is Active on Cloudflare; Cloudflare creates the DNS records on deploy)
+  "routes": [
+    { "pattern": "app.vault-it.co", "custom_domain": true },
+    { "pattern": "vault-it.co", "custom_domain": true },
+    { "pattern": "www.vault-it.co", "custom_domain": true }
+  ]
+}

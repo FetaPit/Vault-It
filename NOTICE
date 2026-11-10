@@ -1,0 +1,26 @@
+Vault-It: notices for third-party pieces
+
+Vault-It itself is proprietary (see LICENSE). The pieces below belong to their
+authors and are used under their own licences.
+
+Used by the app (loaded from a CDN, or embedded)
+- three.js r128 (core, OrbitControls, GLTFLoader), MIT. https://threejs.org
+- Supabase JavaScript client (supabase-js 2.50.0), MIT. https://github.com/supabase/supabase-js
+- ethers 6.13.5, MIT. https://github.com/ethers-io/ethers.js
+- html2canvas 1.4.1, MIT. https://html2canvas.hertzen.com
+- EmailJS browser SDK 4, MIT. https://github.com/emailjs-com/emailjs-sdk
+- Cryptocurrency icons (spothq, v0.18.1), CC0 1.0. Embedded in index.html for the common coins. https://github.com/spothq/cryptocurrency-icons
+- Coin logos (simplr-sh/coin-logos), loaded for other coins. https://github.com/simplr-sh/coin-logos
+- Fonts from Google Fonts, SIL Open Font License 1.1: Syne, DM Sans, Share Tech Mono. https://fonts.google.com
+- Cloudflare Turnstile (a hosted service, not copied into this repository).
+
+Vendored in this repository (tests only, under tests/vendor)
+- three.min.js, OrbitControls.js, GLTFLoader.js (three.js r128), MIT.
+- fflate 0.6.9, MIT. https://github.com/101arrowz/fflate
+
+3D models (models/)
+- Models from Poly Pizza, CC0 1.0 or CC-BY 3.0. Each model's author, link and
+  licence are listed in models/CREDITS.md. CC-BY models must keep that credit.
+
+Development tools (not shipped)
+- esbuild (MIT), PGlite (Apache-2.0) and Playwright (Apache-2.0), installed with npm.
