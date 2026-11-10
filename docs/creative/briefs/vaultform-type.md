@@ -1,4 +1,4 @@
-# Brief: Vault-It brand typeface (working name Brickform)
+# Brief: Vault-It brand typeface, Vault-form (owner named it 10 Nov; working name was Brickform)
 
 Owner, in their words: "Create me a unique custom font for Vault-It's brand so users do not think the app is stock AI Vibe coded slop." Also: "future focussed with a cyberpunk subtle infuence with background hatching", "Need to balance style with easy to read", "3 font family weights with Condensed and regular options", "Create a openfont file so it can be installed and used in any software".
 Pedro with Pete T (head designer). Judged by specimen shots at 390 and 1100 px, Night and Daylight, and by 100% zoom proofs.
@@ -9,7 +9,7 @@ Pedro with Pete T (head designer). Judged by specimen shots at 390 and 1100 px, 
 
 ## 1. Concept
 1.1 One idea: a squared techno sans built from straight edges and chamfered corners, like a brick or a vault door. Done = a stranger says "techno, finance, solid" within 5 seconds of the specimen.
-1.2 Signature: asymmetric chamfers (large top-right and bottom-left, small top-left and bottom-right), a forward "/" lean without italics. Judged: the lean is visible in "Get out of the red" at 48 px and does not tip into costume at 16 px.
+1.2 Signature: asymmetric chamfers (large top-left and bottom-right, small top-right and bottom-left; amended after review r1, 10 Nov, because the first corners leant backwards), a forward "/" lean without italics. Judged: the lean is visible in "Get out of the red" at 48 px and does not tip into costume at 16 px.
 1.3 Cyberpunk is a hairline, not a floodlight (ECD rule 5). Done = no glitch cuts, no spurs, no stencil gaps in the body cuts; the only decoration is the chamfer and the Hatch cut.
 1.4 Must not read as GEAR8, Prototype or Elons. Done = overlay at 72 px shows different letter shapes in at least 10 of 26 capitals. No outlines traced from the references.
 
