@@ -32,24 +32,24 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
   ok(await p.evaluate(() => document.querySelectorAll('#welcome-overlay .w-curr-btn, #welcome-overlay [onclick*="wSetCurrency"]').length === 0), '1 no currency choice on the welcome screens');
 
   await p.fill('#w-name', 'Gita'); if (await p.isVisible('#w-email')) await p.fill('#w-email', 'g@example.com');
-  await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(200);
-  await p.click('#w-opts .welcome-opt[data-val="2"]'); await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(200);
+  // the onboarding is two screens since onboarding/less-friction (10 Nov): name, goal and home on screen 1; money and pot on screen 2; then the plan
   const money = (id) => p.evaluate((id) => { const sc = document.getElementById(id);
     const labels = [...sc.querySelectorAll('label')].filter(l => /\(.\)/.test(l.textContent)).map(l => l.textContent.replace(/\s+/g, ' ').trim());
     return { labels, foreign: /[₹$€]/.test(sc.innerText) }; }, id);
-  let m3 = await money('wz-s3');
-  ok(m3.labels.length >= 2 && m3.labels.every(l => /\(£\)/.test(l)) && !m3.foreign, '2 money screen: every money label says £ (' + m3.labels.join(' | ') + ')');
-  await p.fill('#w-income', '2000'); await p.fill('#w-expenses', '1500'); await p.click('#wz-s3 .welcome-cta'); await p.waitForTimeout(200);
-  let m4 = await money('wz-s4');
-  ok(m4.labels.some(l => /^Dream Home Target \(£\)/i.test(l)) && m4.labels.every(l => /\(£\)/.test(l)) && !m4.foreign, '2 home screen: Dream Home Target (£), nothing in ₹, $ or € (' + m4.labels.join(' | ') + ')');
+  await p.click('#w-opts .welcome-opt[data-val="2"]');
+  let m4 = await money('wz-s1');
+  ok(m4.labels.some(l => /^Dream Home Target \(£\)/i.test(l)) && m4.labels.every(l => /\(£\)/.test(l)) && !m4.foreign, '2 home: Dream Home Target (£), nothing in ₹, $ or € (' + m4.labels.join(' | ') + ')');
   await p.click('#w-htypes .w-ht[data-type="terraced"]');
   const ph = await p.evaluate(() => ({ ph: document.getElementById('w-house').placeholder, price: Math.round(state.prices.terraced) }));
-  ok(ph.ph === 'e.g. ' + ph.price.toLocaleString('en-GB') && ph.price < 1e7, '2 home screen: the example under "Dream Home Target (£)" is the £ price, not a rupee figure (' + ph.ph + ')');
-  await p.fill('#w-house', '250000'); await p.click('#wz-s4 .welcome-cta'); await p.waitForTimeout(200);
+  ok(ph.ph === 'e.g. ' + ph.price.toLocaleString('en-GB') && ph.price < 1e7, '2 home: the example under "Dream Home Target (£)" is the £ price, not a rupee figure (' + ph.ph + ')');
+  await p.fill('#w-house', '250000'); await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(200);
+  let m3 = await money('wz-s2');
+  ok(m3.labels.length >= 2 && m3.labels.every(l => /\(£\)/.test(l)) && !m3.foreign, '2 money screen: every money label says £ (' + m3.labels.join(' | ') + ')');
+  await p.fill('#w-income', '2000'); await p.fill('#w-expenses', '1500');
   await p.click('#w-pot-opts .welcome-opt[data-pot="savings"]'); await p.waitForTimeout(150);
-  let m5 = await money('wz-s5');
-  ok(m5.labels.length >= 1 && m5.labels.every(l => /\(£\)/.test(l)) && !m5.foreign, '2 deposit pot screen: every money label says £ (' + m5.labels.join(' | ') + ')');
-  await p.fill('#w-pot-value', '6000'); await p.click('#wz-s5 .welcome-cta'); await p.waitForTimeout(300);
+  let m5 = await money('wz-s2');
+  ok(m5.labels.length >= 1 && m5.labels.every(l => /\(£\)/.test(l)) && !m5.foreign, '2 deposit pot: every money label says £ (' + m5.labels.join(' | ') + ')');
+  await p.fill('#w-pot-value', '6000'); await p.click('#wz-s2 .welcome-cta'); await p.waitForTimeout(300);
   const m6 = await p.evaluate(() => { const t = (document.getElementById('wz-plan') || {}).innerText || ''; return { foreign: /[₹$€]/.test(t), pound: /£2,000/.test(t) }; });
   ok(!m6.foreign && m6.pound, '2 plan screen: the figures typed read back in £ (' + JSON.stringify(m6) + ')');
   await p.click('#w-finish'); await p.waitForTimeout(1500);
