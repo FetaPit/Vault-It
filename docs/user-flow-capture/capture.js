@@ -27,11 +27,16 @@ function EXTRACT(opts) {
     clone.removeAttribute('class'); clone.removeAttribute('style'); clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     return clone.outerHTML.replace(/>\s+</g, '><');
   };
-  const walk = (el) => {
+  const inter = (a, b) => !a ? b : { l: Math.max(a.l, b.l), t: Math.max(a.t, b.t), r: Math.min(a.r, b.r), b: Math.min(a.b, b.b) };
+  const outside = (c, X, Y, W, H) => c && (X + W <= c.l + 1 || X >= c.r - 1 || Y + H <= c.t + 1 || Y >= c.b - 1);
+  const walk = (el, clip) => {
     if (items.length >= MAX) { skipped++; return; }
     const tag = el.tagName ? el.tagName.toLowerCase() : ''; if (!tag || ['script', 'style', 'noscript', 'template', 'link', 'meta', 'br'].includes(tag)) return;
     const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); if (!visible(cs, r)) return;
     const X = R(r.left + sx - ox), Y = R(r.top + sy - oy), W = R(r.width), H = R(r.height);
+    if (outside(clip, X, Y, W, H)) return;
+    const ov = cs.overflowY + ' ' + cs.overflowX; const clips = /hidden|clip|auto|scroll/.test(ov) && !(el === root || el === document.body || el === document.documentElement);
+    const myClip = clips ? inter(clip, { l: X, t: Y, r: X + W, b: Y + H }) : clip;
     if (tag === 'svg') {
       const s = svgOut(el);
       if (s.length <= MAX_SVG && svgBytes + s.length <= MAX_SVG_TOTAL) { svgBytes += s.length; items.push({ t: 's', x: X, y: Y, w: W, h: H, svg: s }); }
@@ -69,15 +74,16 @@ function EXTRACT(opts) {
         L.words.push(m[0]); L.right = Math.max(L.right, wr.right + sx - ox); L.left = Math.min(L.left, wr.left + sx - ox); L.h = Math.max(L.h, wr.height);
       }
       for (const L of lines) {
+        if (outside(myClip, R(L.left), L.top, R(L.right - L.left), R(L.h))) continue;
         let txt = L.words.join(' '); if (up) txt = txt.toUpperCase();
         const it = Object.assign({ t: 'x', x: R(L.left), y: L.top, w: R(L.right - L.left), h: R(L.h), s: txt.slice(0, 500) }, base);
         items.push(it); if (items.length >= MAX) break;
       }
       if (items.length >= MAX) break;
     }
-    for (const ch of el.children) walk(ch);
+    for (const ch of el.children) walk(ch, myClip);
   };
-  walk(root);
+  walk(root, null);
   let bg = null; for (const e of [root, document.body, document.documentElement]) { const c = col(getComputedStyle(e).backgroundColor); if (c && c.a > 0.02) { bg = c; break; } }
   return { w: docW, h: docH, bg, items, skipped };
 }
