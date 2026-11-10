@@ -3,6 +3,7 @@
  * makeStage(canvas,{railPad,padB,padT,theme,fps,onFrame})   the to-scale house builder, bricks laid one at a time
  * makeNW(canvas,{theme,fps,onChange})                        net worth scene with £1,000 blocks and £100 cubes
  * makeTracker(canvas,{theme,fps,onChange})                   tracker with Graph and 3D blocks views (setView, setRange, setSeries, setData)
+ * makeForecast({target,saved,monthly,rate,topUp,windfalls})   projection model. Stage gets attachForecast, scrub, play, stop. Bricks follow projected money.
  * Falls back to a flat canvas 2D house if WebGL is unavailable (ViEngine.glr() returns null).
  */
 (function(){
@@ -555,12 +556,13 @@ function orbit(cv,st,hooks){
 function makeStage(cv,o){
   o=o||{};
   var c=cv.getContext("2d"),st=houseState({railPad:o.railPad||0,padB:o.padB||0});
-  var target=0,cw=300,ch=200,dpr=1,vis=false,raf=0,last=0,idle=-9999,auto=!reduce,self={st:st};
+  var target=0,cw=300,ch=200,dpr=1,vis=false,raf=0,last=0,idle=-9999,auto=!reduce,self={st:st},fc=null,play=null,month=0;
   function size(){var r=cv.getBoundingClientRect();cw=Math.max(2,r.width);ch=Math.max(2,r.height);dpr=Math.min(window.innerWidth<700?1.5:2,window.devicePixelRatio||1);cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr)}
   var ob=orbit(cv,st,{touch:function(){idle=performance.now()}});
   function frame(ts){
     raf=0;if(!vis)return;if(o.fps&&last&&ts-last<1000/o.fps-2){raf=requestAnimationFrame(frame);return}
     var dt=Math.min(.05,(ts-(last||ts))/1000);last=ts;
+    if(play&&fc){play.m=Math.min(play.to,play.m+dt*play.rate);month=play.m;target=fc.progressAt(month);if(o.onMonth)o.onMonth(month,target,fc);if(play.m>=play.to){var pd=play.done;play=null;if(pd)pd(month)}}
     if(reduce)st.p=target;else{st.p+=(target-st.p)*Math.min(1,dt*1.7);if(Math.abs(target-st.p)<.0003)st.p=target}
     if(auto&&!ob.isDrag()&&ts-idle>2500)st.yaw+=dt*.12;
     st.now=ts;st.fit=cw<520?1.1:.85;st.theme=o.theme||rootTheme();st.padT=cw<520&&o.railPad?52:0;st.railPad=cw<520?0:(o.railPad||0);c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,cw,ch);
@@ -574,6 +576,12 @@ function makeStage(cv,o){
   if("IntersectionObserver" in window)new IntersectionObserver(function(es){vis=es[0].isIntersecting;start()},{threshold:.01}).observe(cv);else{vis=true;start()}
   self.setTarget=function(p,imm){target=clamp(p,0,1);if(imm){st.p=target}start()};
   self.getTarget=function(){return target};
+  /* live-data build: attach a makeForecast model, then scrub or play through time. The bricks follow the money. */
+  self.attachForecast=function(m){fc=m;play=null;month=0;return self};
+  self.scrub=function(m,imm){if(!fc)return;play=null;month=Math.max(0,m);self.setTarget(fc.progressAt(month),imm);if(o.onMonth)o.onMonth(month,fc.progressAt(month),fc)};
+  self.play=function(opt){if(!fc)return;opt=opt||{};var to=opt.to!==undefined?opt.to:fc.monthsToGoal();if(!isFinite(to))to=120;if(reduce){self.scrub(to,true);if(opt.done)opt.done(to);return}play={m:opt.from!==undefined?opt.from:month,to:to,rate:opt.monthsPerSecond||6,done:opt.done};start()};
+  self.stop=function(){play=null};
+  self.month=function(){return month};
   self.toggleAuto=function(){auto=!auto;return auto};
   self.zoom=function(f){st.zoom=clamp(st.zoom*f,.7,1.6)};
   self.reset=function(){st.yaw=-.62;st.pitch=.32;st.zoom=1;idle=performance.now()};
@@ -794,5 +802,39 @@ function makeTracker(cv,o){
 
 var HOUSE=null,HOUSE_G=null;
 
-window.ViEngine={buildHouseGL:buildHouseGL,renderHouse:renderHouse,houseState:houseState,makeStage:makeStage,makeNW:makeNW,makeTracker:makeTracker,orbit:orbit,Proj:Proj,rootTheme:rootTheme,glr:glr};
+
+/* ===== Forecast: the live-data build model. One model drives the bricks, the panels and the what-if sliders. =====
+ * makeForecast({target,saved,monthly,rate,topUp,windfalls:[{month,amount}],startDate})
+ *   rate = annual growth as a fraction (0.04), topUp = extra on each contribution as a fraction. Both optional.
+ * .balanceAt(m) .progressAt(m) .monthsToGoal() .dateAt(m) .whatIf(changes) .series(n)
+ * Illustrative projection only. Not regulated by the FCA. Not financial advice. */
+function makeForecast(o){
+  o=o||{};
+  var cap=600,cache=null,self={};
+  var cfg={target:Math.max(1,+o.target||1),saved:Math.max(0,+o.saved||0),monthly:Math.max(0,+o.monthly||0),rate:+o.rate||0,topUp:+o.topUp||0,windfalls:(o.windfalls||[]).slice(),startDate:o.startDate?new Date(o.startDate):new Date()};
+  function build(){
+    var b=[cfg.saved],i,wf={};
+    cfg.windfalls.forEach(function(w){wf[w.month|0]=(wf[w.month|0]||0)+(+w.amount||0)});
+    for(i=1;i<=cap;i++){
+      var v=b[i-1]*(1+cfg.rate/12)+cfg.monthly*(1+cfg.topUp)+(wf[i]||0);
+      b.push(v);
+      if(v>=cfg.target&&b.length>2&&i>=1){break}
+    }
+    return b}
+  function bal(){return cache||(cache=build())}
+  self.config=function(){return {target:cfg.target,saved:cfg.saved,monthly:cfg.monthly,rate:cfg.rate,topUp:cfg.topUp,windfalls:cfg.windfalls.slice()}};
+  self.balanceAt=function(m){var b=bal();if(m<=0)return b[0];var i=Math.floor(m),f=m-i;if(i>=b.length-1)return b[b.length-1];return b[i]+(b[i+1]-b[i])*f};
+  self.progressAt=function(m){return clamp(self.balanceAt(m)/cfg.target,0,1)};
+  /* whole months until the target is reached, or Infinity if it is not reached inside 50 years */
+  self.monthsToGoal=function(){var b=bal();if(b[0]>=cfg.target)return 0;var last=b[b.length-1];return last>=cfg.target?b.length-1:Infinity};
+  self.dateAt=function(m){var d=new Date(cfg.startDate.getTime());d.setMonth(d.getMonth()+Math.round(m));return d};
+  self.series=function(n){var out=[],i,N=n||Math.min(isFinite(self.monthsToGoal())?self.monthsToGoal():120,cap);for(i=0;i<=N;i++)out.push(self.balanceAt(i));return out};
+  /* what-if: returns the changed model plus the difference against this one (negative monthsDelta = sooner) */
+  self.whatIf=function(ch){
+    var n=makeForecast({target:ch.target!==undefined?ch.target:cfg.target,saved:ch.saved!==undefined?ch.saved:cfg.saved,monthly:ch.monthly!==undefined?ch.monthly:cfg.monthly+(ch.monthlyDelta||0),rate:ch.rate!==undefined?ch.rate:cfg.rate,topUp:ch.topUp!==undefined?ch.topUp:cfg.topUp,windfalls:cfg.windfalls.concat(ch.windfalls||[]),startDate:cfg.startDate});
+    var a=self.monthsToGoal(),b=n.monthsToGoal();
+    return {model:n,months:b,monthsDelta:(isFinite(a)&&isFinite(b))?b-a:(isFinite(b)?-Infinity:(isFinite(a)?Infinity:0))}};
+  return self}
+
+window.ViEngine={buildHouseGL:buildHouseGL,renderHouse:renderHouse,houseState:houseState,makeStage:makeStage,makeNW:makeNW,makeTracker:makeTracker,makeForecast:makeForecast,orbit:orbit,Proj:Proj,rootTheme:rootTheme,glr:glr};
 })();
