@@ -421,7 +421,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
 
     <div class="levels" aria-label="Levels">
       <span class="lvl on"><svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true"><rect x="0" y="0" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="10" y="0" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="5" y="5" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="0" y="10" width="8" height="4" rx="1" fill="#E05C5C"/><rect x="10" y="10" width="8" height="4" rx="1" fill="#E05C5C"/></svg>Level 1 · First deposit</span>
-      <span class="lvl" id="lvl2"><svg class="lk" width="16" height="16" viewBox="0 0 24 24" fill="#E8C56A" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1zm2 0h6V8a3 3 0 0 0-6 0v2z"/></svg>Level 2 · Delete the mortgage</span>
+      <span class="lvl open" id="lvl2"><svg class="lk" width="16" height="16" viewBox="0 0 24 24" fill="#E8C56A" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1zm2 0h6V8a3 3 0 0 0-6 0v2z"/></svg>Level 2 · Delete the mortgage</span>
       <span class="lvl"><svg class="lk" width="16" height="16" viewBox="0 0 24 24" fill="#E8C56A" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1zm2 0h6V8a3 3 0 0 0-6 0v2z"/></svg>Level 3 · Upgrade</span>
     </div>
 
@@ -535,7 +535,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
       <div class="card" style="--c:var(--teal)"><h3><i></i>Savings goal</h3><p style="color:var(--muted);margin:0">A house that builds brick by brick. A gold slice marks the row you are on. What is not built yet stays as wireframe, so the goal is always in view.</p></div>
       <div class="card" style="--c:var(--red)"><h3><i></i>Debt</h3><p style="color:var(--muted);margin:0">Weight under the ground. Each payment lifts a red block away until the ground is clear.</p></div>
       <div class="card" style="--c:var(--green)"><h3><i></i>Assets</h3><p style="color:var(--muted);margin:0">Savings and funds stack as blocks above the line. Precious metals are gold bars.</p></div>
-      <div class="card" style="--c:var(--gold)"><h3><i></i>Net worth</h3><p style="color:var(--muted);margin:0">A gold plane marks zero. Above it is yours, below it is owed. The tag reads the difference.</p></div>
+      <div class="card" style="--c:var(--teal)"><h3><i></i>Net worth</h3><p style="color:var(--muted);margin:0">Teal is net worth, as in the app, with green for assets, amber for liabilities and red for debt. A gold plane still marks zero in 3D. Above it is yours, below it is owed. The tag reads the difference.</p></div>
     </div>
 
     <h3 style="margin-top:44px">Brickwork, to scale</h3>
@@ -544,7 +544,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
     <div class="card tablewrap spec" style="margin-top:16px"><table>
       <tbody>
         <tr><td>Brick</td><td>215 × 102.5 × 65 mm, drawn as 2.87 × 1.37 × 0.87 units</td></tr>
-        <tr><td>Joint</td><td>10 mm, shown as a dark mortar line in Night and white in Daylight</td></tr>
+        <tr><td>Joint</td><td>10 mm, shown as a dark mortar line (the 3D stage stays Night)</td></tr>
         <tr><td>Course</td><td>75 mm. 1 unit. 154 courses reach the top of the chimney, 11.55 m</td></tr>
         <tr><td>Bond</td><td>Flemish: stretcher, header, repeating. Every header sits over the middle of the stretcher below it</td></tr>
         <tr><td>Corners</td><td>Long and short returns swap every course, so corners interlock like real quoins</td></tr>
@@ -561,6 +561,28 @@ footer .wm{font-size:26px;margin-bottom:10px}
     <h3 style="margin-top:28px">What a brick is worth</h3>
     <p style="color:var(--muted);max-width:64ch">Every house has the same bricks, so a dearer property or a bigger deposit makes each brick worth more. This table is live: the same maths drives the hero above.</p>
     <div class="card tablewrap"><table><thead><tr><th>Property</th><th>Price</th><th>Deposit at 20%</th><th>One brick</th><th>£500 lays</th></tr></thead><tbody id="brickVal"></tbody></table></div>
+
+    <h3 style="margin-top:44px">The house builder in the app</h3>
+    <div class="grid2">
+      <div class="card">
+        <div class="lbl" style="margin-bottom:12px">What is live</div>
+        <ul class="rules ok">
+          <li>The brand build is the only one. The classic viewer, its settings switch and the house flag are gone.</li>
+          <li>Six house types: terraced, semi-detached, detached, manor, flat and apartment, each with its own icon.</li>
+          <li>Level 1 is the first deposit. Level 2 is delete the mortgage, with a cockpit that compares overpayments and what-ifs against the baseline plan. Both are drawn in the brand look.</li>
+          <li>One plan card holds the type, price and deposit. Reset tracker and "Not bought yet? Back to Level 1" ask first. Your savings log, house type, price and deposit % are kept when you go back to Level 1.</li>
+          <li>If WebGL is off, a still picture of the house at its current build level shows instead.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="lbl" style="margin-bottom:12px">Locked and unchanged</div>
+        <ul class="rules">
+          <li>Level 3 and Your own design are locked under Pro for everyone, with the lock state shown in Components.</li>
+          <li>The 3D net worth view is on by default and the first view is the 3D blocks. Settings has the switch.</li>
+          <li>Do not change how deposits, prices, house types, levels or saved data work. Brick value is the deposit target times 0.77, over the brick count.</li>
+        </ul>
+      </div>
+    </div>
 
     <h3 style="margin-top:44px">Try it: net worth in 3D</h3>
     <p style="color:var(--muted);max-width:62ch">Add savings, buy gold, or pay down debt and watch the blocks answer. Big blocks are £1,000. Small cubes are £100, so you can see every pound count. Nine cubes become a block.</p>
@@ -610,7 +632,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
           <tr><td>Pay debt</td><td>A red block lifts, turns gold, dissolves</td><td>"Debt down £1,000"</td></tr>
           <tr><td>Add £100</td><td>A cube drops onto the stack. The ninth cube merges into a block</td><td>"Cube laid. +£100."</td></tr>
           <tr><td>Cross a milestone</td><td>The pill snaps gold with a pulse</td><td>"Milestone: Foundations"</td></tr>
-          <tr><td>Finish a level</td><td>The next level pill unlocks</td><td>"Level 2 unlocked"</td></tr>
+          <tr><td>Mark the house bought</td><td>Level 1 hands over to Level 2, the mortgage house. Levels 1 and 2 are drawn in the brand look. Level 3 and Your own design stay locked under Pro</td><td>"Level 2 unlocked"</td></tr>
           <tr><td>Clear all debt</td><td>The red is gone, the stage flashes green</td><td>"Out of the red."</td></tr>
           <tr><td>Reach 100%</td><td>Windows light gold, the door glints</td><td>"Keys are yours."</td></tr>
         </tbody>
@@ -970,7 +992,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
           <nav class="vi-tabs" id="mbTabs" aria-label="Menu bar example"><a href="#components" style="--tc:var(--teal)" class="on"><span class="ic" data-ic="overview" data-col="teal" style="width:18px;height:18px"></span>Overview</a><a href="#components" style="--tc:var(--blue)"><span class="ic" data-ic="budget" data-col="blue" style="width:18px;height:18px"></span>Budget</a><a href="#components" style="--tc:var(--gold)"><span class="ic" data-ic="house-builder" data-col="gold" style="width:18px;height:18px"></span>House builder<span class="vi-usp">USP</span></a><a href="#components" style="--tc:var(--green)"><span class="ic" data-ic="assets" data-col="green" style="width:18px;height:18px"></span>Assets and liabilities</a><a href="#components" style="--tc:var(--red)"><span class="ic" data-ic="debt-tracker" data-col="red" style="width:18px;height:18px"></span>Debt tracker</a><a href="#components" style="--tc:var(--orange)"><span class="ic" data-ic="entrepreneur" data-col="orange" style="width:18px;height:18px"></span>Entrepreneur<span class="vi-pro">PRO</span></a><a href="#components" style="--tc:var(--brass)"><span class="ic" data-ic="trophy" data-col="brass" style="width:18px;height:18px"></span>Achievements</a><a href="#components" style="--tc:var(--purple)"><span class="ic" data-ic="connections" data-col="purple" style="width:18px;height:18px"></span>Connections</a></nav>
           <div class="vi-subs" id="mbSubs" role="group" aria-label="Sub-tab example"><button type="button" class="vi-sub on" style="--tc:var(--gold)"><span class="ic" data-ic="metals" data-col="gold" style="width:18px;height:18px"></span>Precious metals</button><button type="button" class="vi-sub" style="--tc:var(--teal)"><span class="ic" data-ic="crypto" data-col="teal" style="width:18px;height:18px"></span>Crypto</button><button type="button" class="vi-sub" style="--tc:var(--green)"><span class="ic" data-ic="cash" data-col="green" style="width:18px;height:18px"></span>Cash and savings</button><button type="button" class="vi-sub" style="--tc:var(--purple)"><span class="ic" data-ic="cube" data-col="purple" style="width:18px;height:18px"></span>Wealth inventory</button><button type="button" class="vi-sub" style="--tc:var(--green2)"><span class="ic" data-ic="candles" data-col="green2" style="width:18px;height:18px"></span>Stocks and funds</button><button type="button" class="vi-sub" style="--tc:var(--amber)"><span class="ic" data-ic="liabilities" data-col="amber" style="width:18px;height:18px"></span>Liabilities</button></div>
         </div>
-        <p style="color:var(--muted);font-size:14px;margin:10px 0 0;max-width:70ch">Each tab owns one colour. The icon and a 1px outline both use it, with a soft glow in Night and a crisp line in Daylight. The dot is gone: the icon now carries the colour. The active tab breathes on the 2.8 second beat. Sub-tabs follow the asset class colours.</p>
+        <p style="color:var(--muted);font-size:14px;margin:10px 0 0;max-width:70ch">Each tab owns one colour. The icon and a 1px outline both use it, with a soft glow in Night and a crisp line in Daylight. The icon carries the colour. The active tab breathes on the 2.8 second beat. Sub-tabs follow the asset class colours.</p>
       </div>
 
       <div class="demo-wrap">
