@@ -9,7 +9,7 @@ module.exports = {
         "lintel": "#E8E8E8",
         "mortar": "#9AA0A6",
         "signal": "#2D8882",
-        "lock": "#5A6068",
+        "lock": "#8C939B",
         "teal": "#44C0B9",
         "deep-teal": "#007F7B",
         "gold": "#E8C56A",
@@ -21,7 +21,7 @@ module.exports = {
         "violet": "#9B7EC8",
         "ember": "#E0894A",
         "coral": "#E5535F",
-        "salmon": "#EE7D7D",
+        "salmon": "#FFA38A",
         "amber": "#F59E0B",
         "yellow": "#F5DC4A"
 },

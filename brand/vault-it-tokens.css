@@ -7,8 +7,8 @@ html{box-sizing:border-box}
   --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882; --lock:#8C939B;
   --teal:#44C0B9; --teal-deep:#007F7B; --gold:#E8C56A; --brass:#C9A84C;
   --green:#3ECF8E; --green2:#3FB585; --red:#E05C5C; --blue:#64B5F6; --purple:#9B7EC8; --orange:#E0894A;
-  --coral:#E5535F; --salmon:#EE7D7D; --amber:#F59E0B; --yellow:#F5DC4A;
-  --goldf:#E8C56A; --on-teal:#00181A; --on-gold:#1A1400; --pulse:2800ms;
+  --coral:#E5535F; --salmon:#FFA38A; --amber:#F59E0B; --yellow:#F5DC4A;
+  --goldf:#E8C56A; --on-teal:#00181A; --m-silver:#C0C8D0; --m-platinum:#E0E8F0; --m-palladium:#D0D8E0; --on-gold:#1A1400; --pulse:2800ms;
   --surf:#0A1018; --surf2:#080D14; --track:#13202A; --pillbg:#12100A; --lib:#0A1618; --doneb:#0A1F22; --toastbg:#08181C;
   --lockline:#3A4446; --lockfg:#6A7678; --dotoff:#2A3638;
   --stat:#B6D8D6; --stext:0 0 8px #000; --rail-bg:rgba(0,12,18,.74); --rail-btn:rgba(8,24,28,.85);
@@ -33,8 +33,8 @@ html{box-sizing:border-box}
   --text:#0B1F22; --muted:#3A5052; --faint:#215451; --lock:#39433F;
   --teal:#185550; --teal-deep:#005652; --gold:#60480B; --brass:#5B4A19;
   --green:#135738; --green2:#1C563E; --red:#951919; --blue:#054E88; --purple:#583F81; --orange:#773C11;
-  --coral:#911D3A; --salmon:#7E3532; --amber:#6B4303; --yellow:#584C04;
-  --on-teal:#FFFFFF; --on-gold:#1A1400;
+  --coral:#4F0A1E; --salmon:#8A3510; --amber:#6B4303; --yellow:#584C04;
+  --on-teal:#FFFFFF; --m-silver:#444D55; --m-platinum:#414E56; --m-palladium:#464D53; --on-gold:#1A1400;
   --surf:#DAD8D0; --surf2:#DAD8D0; --track:#BCC6C1; --pillbg:#FFF6DD; --lib:#D3D2CA; --doneb:#E1F3F1; --toastbg:#DAD8D0;
   --lockline:#9AB0B1; --lockfg:#39433F; --dotoff:#A9BAB8;
   --stat:#1E4A48; --stext:none; --rail-bg:rgba(218,216,208,.94); --rail-btn:#DAD8D0;

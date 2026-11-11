@@ -82,7 +82,7 @@ Tasks:
 
 | Old | New |
 | --- | --- |
-| `--bg` | `--bg` (#080808, Daylight #F3F7F6) |
+| `--bg` | `--bg` (#080808, Daylight #D3CCB4) |
 | `--c1`, `--c2` | `--panel`, `--surf2` |
 | `--c3`, `--c4` | `--slate` and `--line2` |
 | `--em`, `--em2`, `--em3` | `--teal` (use `--faint` for the dim teal) |
@@ -136,14 +136,14 @@ Anatomy of a tab: icon (18px) + label (Syne 600, 12px, +0.14em tracking, upperca
 
 | Tab | Icon id | Colour token | Dark | Daylight |
 | --- | --- | --- | --- | --- |
-| Overview | `overview` | `--teal` | #44C0B9 | #297B76 |
-| Budget | `budget` | `--blue` | #64B5F6 | #0B72C4 |
-| House builder (USP badge) | `house-builder` | `--gold` | #E8C56A | #8B6A15 |
-| Assets and liabilities | `assets` | `--green` | #3ECF8E | #207F54 |
-| Debt tracker | `debt-tracker` | `--red` | #E05C5C | #D62929 |
-| Entrepreneur (PRO badge) | `entrepreneur` | `--orange` | #E0894A | #CF6C24 |
-| Achievements | `trophy` | `--brass` | #C9A84C | #A18331 |
-| Connections | `connections` | `--purple` | #9B7EC8 | #815DBA |
+| Overview | `overview` | `--teal` | #44C0B9 | #185550 |
+| Budget | `budget` | `--blue` | #64B5F6 | #054E88 |
+| House builder (USP badge) | `house-builder` | `--gold` | #E8C56A | #60480B |
+| Assets and liabilities | `assets` | `--green` | #3ECF8E | #135738 |
+| Debt tracker | `debt-tracker` | `--red` | #E05C5C | #951919 |
+| Entrepreneur (PRO badge) | `entrepreneur` | `--orange` | #E0894A | #773C11 |
+| Achievements | `trophy` | `--brass` | #C9A84C | #5B4A19 |
+| Connections | `connections` | `--purple` | #9B7EC8 | #583F81 |
 
 Sub-tabs (Assets and liabilities), shown as bordered 12px radius buttons with a 18px icon:
 
@@ -181,7 +181,7 @@ See section 6. This is the heart of the work.
 
 Daylight is a designed mode, not an inversion. It exists for people who struggle with dark screens.
 
-- Ground is Paper `#F3F7F6` (never pure white). Text is Ink `#0B1F22`. Panels are white with a hairline border and small corner brackets (`[data-theme="light"] .card::before` in the brand book).
+- Ground is Paper `#D3CCB4` (never pure white). Text is Ink `#0B1F22`. Panels are white with a hairline border and small corner brackets (`[data-theme="light"] .card::before` in the brand book).
 - No bloom. Glow tokens become soft shadows: `--glow`, `--tglow`, `--dglow`, `--popglow` are already set for this.
 - Scanlines are replaced by a faint blueprint grid (`--paper-img`, `--scan`).
 - Colours keep their hue and get darker values so text reaches 4.5:1 and icons 3:1.
