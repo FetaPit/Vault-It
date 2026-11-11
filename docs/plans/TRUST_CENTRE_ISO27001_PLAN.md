@@ -95,7 +95,21 @@ Going through `ship-item` applies: intent card, failing test first, element shot
 A UK scheme with a lighter, cheaper assessment. Useful as a first badge and as evidence for partners. Check it suits a one-person company on the laptop and phone setup before committing.
 
 ### 7. Tooling
-Options: a compliance platform (Vanta was the meeting), another platform, or a spreadsheet plus the repo. At our size the policies and risk work is the same either way. A platform saves evidence chasing and gives a hosted trust page. Decide after the Vanta meeting with a written quote and the answers to the integration questions (Supabase, Cloudflare, GitHub, Stripe, Resend).
+Options: a compliance platform (Vanta, below), another platform, or a spreadsheet plus the repo. At our size the policies and risk work is the same either way. A platform saves evidence chasing and gives a hosted trust page.
+
+What Vanta (Cian Whyte, account executive) told us by email on 11 Nov 2026, after the call. These are a salesperson's statements, not a quote or a contract. Check each in writing before relying on it:
+- **FCA is separate.** Vanta does not help with FCA authorisation. That is an application to the regulator, handled by compliance consultants or law firms, with its own budget. ISO 27001 covers information security only. Keep the two apart in every pitch.
+- **SOC 2:** park it unless US customers are a goal in the next 12 months. About 80% of the evidence is shared with ISO 27001, so it can follow.
+- **DORA:** applies to EU financial entities, not to a UK company. It matters only if we later supply EU financial institutions and they pass terms down. No budget.
+- **Stack:** Supabase, Cloudflare, Stripe and Sentry are supported integrations. Google Workspace likely scopes out because nothing customer facing lives there. That is decided at a scoping session, not assumed. GitHub and Resend were not mentioned; ask.
+- **Effort and timing:** about 60 to 75 hours with our stack (300 to 400 hours done by hand). At 2 to 3 hours a week from a start now, audit ready around March 2027. A live trust centre within a week of starting.
+- **Implementation support:** 30 days with their partner Workstreet at no cost. Week 1 integrations, week 2 policies and trust centre, week 3 gap analysis, week 4 the internal audit ISO requires, done by someone independent of us. Workstreet also runs a grey box CREST penetration test.
+- **Price quoted in the email:** $10,500 a year (about £8,000) list for one framework, described as a ceiling with room to negotiate. The certification audit is separate and paid direct to the certification body: about £4,000 for initial certification and about half that for each surveillance audit in years two and three. They take no commission on the audit. Not a written quote.
+- **Letter of engagement:** offered once we are a customer, and Cian can ask an auditor to give one too. Not available before buying.
+
+Open questions for Vanta, in writing: a written quote with term and renewal terms; what the free 30 days includes and what happens after; whether the pen test is inside or on top of the price; where Vanta and Workstreet store our data and their own data processing terms; GitHub and Resend integrations; whether a hosted trust page can sit on a vault-it.co address.
+
+Do not quote any of these prices or dates on the trust page or to investors as fact until a written quote is in hand. The email gives us a safe planning line (up to about £8,000 a year plus about £4,000 for the audit) and nothing more.
 
 ## Suggested order
 
@@ -119,10 +133,11 @@ Rough elapsed time for a small team is months, not weeks. Get a certification bo
 1. Confirm MSA means master services agreement.
 2. Legal entity and trading name (PT Live Design now; Voxel Foundry was David's recommendation for the product design company). It must be settled before the MSA, the DPIA sign-off and the certificate scope.
 3. Scope for ISO 27001: the Vault-It app only, or PT Live Design as a whole.
-4. Tooling after the Vanta meeting: platform or spreadsheet.
-5. Pen test budget ceiling and the window for testing production.
+4. Tooling: Vanta (ask for a written quote first) or a spreadsheet plus the repo.
+5. Pen test budget ceiling and the window for testing production. Vanta's partner offers a grey box CREST test; get the price and scope in writing before accepting.
 6. Who is the independent reviewer (an adviser, not a family member) for internal audit.
-7. Is the first trust page in the beta window or after launch.
+7. Is the first trust page in the beta window or after launch. The December pitch is the date Vanta pointed at.
+8. FCA route: separate from this plan. Who advises on it, and when.
 
 ## Not covered here
 
