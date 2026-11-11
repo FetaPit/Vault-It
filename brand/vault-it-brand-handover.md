@@ -197,6 +197,8 @@ Accepted when: every screen is usable in Daylight with no invisible text, no neo
 - Mark: use the SVG files. Full (96px and up), Mid (40 to 96px), Micro (under 40px, also the favicon and PWA icon). Clear space is a quarter of the icon height. Use the Daylight variants on light surfaces for the header only; elsewhere the built in dark disc works on any background.
 - Update `<title>`, `og:title`, and the hero H1 to the new tagline: **Get out of the red and into your home.** The current site hero still says "From debt to owning your home outright".
 
+**Tagline treatments (owner, 4 and 7 Nov 2026).** The tagline is "Get out of the red and into your home." Comms use the neon: a thin neon red stroke on **red** and a thin gold gradient neon stroke on **home** (`brand/vault-it-tagline-neon.css`, copy it, do not retype it). The pitch deck uses fills instead of the stroke: **red** dark red `#C8202A`, **your** teal `#44C0B9`, **home** gold `#E8C56A`. Where a stroke cannot be drawn (Slides format, email clients that drop CSS), colour the words: red `#FF4D63`, home `#F5DC4A`. In SMS and plain-text email, type the line with no colour. The brand book shows all three under Brand story and voice.
+
 ### Phase 9: Social and OG images (optional, after the rest)
 
 The brand book has a social kit that renders the 3D house to a canvas for Instagram, Story, X and LinkedIn, and Open Graph, in Night and Daylight. If the owner wants OG images generated, reuse `renderHouse` with `noPulse:true, noFlash:true, sweep:false` as the book does.

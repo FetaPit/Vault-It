@@ -143,6 +143,19 @@ section{padding:72px 0 24px;border-top:1px solid var(--line)}
 .readout span{color:var(--muted);font-size:15px;font-family:var(--font-mono);letter-spacing:.06em}
 input[type=range]{width:100%;accent-color:var(--gold);height:44px;margin:0}
 .grid2{display:grid;gap:20px;grid-template-columns:1fr}
+/* Tagline treatments: neon is brand/vault-it-tagline-neon.css, embedded as is. */
+.vi-neon{position:relative;display:inline-block;isolation:isolate}
+.vi-neon::before,.vi-neon::after{content:attr(data-t);position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap;color:transparent}
+.vi-neon::before{z-index:-1;-webkit-text-stroke:var(--neon-w,.065em) transparent;-webkit-background-clip:text;background-clip:text}
+.vi-neon::after{z-index:-2;-webkit-text-stroke:var(--neon-w,.065em) var(--neon-glow);filter:blur(.07em);opacity:.85}
+.vi-neon-red{--neon-glow:#FF2E4D}
+.vi-neon-red::before{background-image:linear-gradient(#FF4D63,#FF4D63)}
+.vi-neon-gold{--neon-glow:#F2C94C}
+.vi-neon-gold::before{background-image:linear-gradient(100deg,#B8862E 0%,#F5DC4A 38%,#FFF1B0 52%,#E8C56A 68%,#B8862E 100%)}
+.tag-line{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;line-height:1.15;font-size:clamp(24px,4.4vw,38px);margin:0}
+.tag-fill-red{color:#C8202A}.tag-fill-your{color:#44C0B9}.tag-fill-home{color:#E8C56A}
+.tag-plain-red{color:#FF4D63}.tag-plain-home{color:#F5DC4A}
+.tag-stage{background:#080808;color:#E8E8E8;border:1px solid var(--line2);border-radius:var(--r-card);padding:24px}
 .grid2>*,.card,.demo,.mode{min-width:0}
 html,body{overflow-x:clip}
 .tablewrap table{min-width:420px}
@@ -449,6 +462,39 @@ footer .wm{font-size:26px;margin-bottom:10px}
           <li>UK spelling, pounds first, real numbers over adjectives.</li>
           <li>Short sentences. Active verbs. Sentence case, except labels.</li>
           <li>Progress is physical: bricks, rows, walls, keys.</li>
+        </ul>
+      </div>
+    </div>
+    <h3 style="margin-top:40px">The tagline, drawn</h3>
+    <p style="color:var(--muted);max-width:62ch">Get out of the red and into your home. Two words carry the colour: <b>red</b> and <b>home</b>. Three treatments, one for each place. The tagline stays on a dark ground for the neon and the deck fills.</p>
+    <div class="grid2">
+      <div class="tag-stage">
+        <div class="lbl" style="margin-bottom:12px">Neon, for every new comm (owner, 4 Nov)</div>
+        <p class="tag-line">Get out of the <span class="vi-neon vi-neon-red" data-t="red">red</span> and into your <span class="vi-neon vi-neon-gold" data-t="home">home</span>.</p>
+        <p style="color:#9AA0A6;margin:14px 0 0;font-size:14px">A thin neon red stroke on red. A thin gold gradient neon stroke on home. The words keep their normal fill.</p>
+      </div>
+      <div class="tag-stage">
+        <div class="lbl" style="margin-bottom:12px">Pitch deck fills (owner, 7 Nov)</div>
+        <p class="tag-line">Get out of the <span class="tag-fill-red">red</span> and into <span class="tag-fill-your">your</span> <span class="tag-fill-home">home</span>.</p>
+        <p style="color:#9AA0A6;margin:14px 0 0;font-size:14px">No stroke. <b>red</b> dark red #C8202A, <b>your</b> teal #44C0B9, <b>home</b> gold #E8C56A. The deck uses these until the owner says otherwise.</p>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:20px">
+      <div class="tag-stage">
+        <div class="lbl" style="margin-bottom:12px">Plain-text fallback</div>
+        <p class="tag-line">Get out of the <span class="tag-plain-red">red</span> and into your <span class="tag-plain-home">home</span>.</p>
+        <p style="color:#9AA0A6;margin:14px 0 0;font-size:14px">Where a stroke cannot be drawn (the Slides deck format, email clients that drop the CSS): colour the words, red #FF4D63 and home #F5DC4A. In SMS and plain-text email just type the line.</p>
+      </div>
+      <div class="card">
+        <div class="lbl" style="margin-bottom:12px">Rules</div>
+        <ul class="rules ok">
+          <li>Copy the CSS from <code>brand/vault-it-tagline-neon.css</code>. Do not retype it.</li>
+          <li>Use <code>background-image</code> for the stroke fill, never the <code>background</code> shorthand.</li>
+          <li>Respect reduced motion: the neon is static, nothing animates.</li>
+        </ul>
+        <ul class="rules" style="margin-top:12px">
+          <li>No neon on a light ground. Keep the tagline on a dark ground, even inside a Daylight page.</li>
+          <li>No other word gets a colour or a stroke.</li>
         </ul>
       </div>
     </div>
