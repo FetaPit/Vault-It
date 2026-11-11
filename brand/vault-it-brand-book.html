@@ -63,7 +63,10 @@ html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bott
 }
 [data-theme="light"] .card{position:relative;box-shadow:var(--elev)}
 [data-theme="light"] .card::before{content:"";position:absolute;inset:7px;pointer-events:none;opacity:.55;background:linear-gradient(var(--teal),var(--teal)) left top/9px 1px no-repeat,linear-gradient(var(--teal),var(--teal)) left top/1px 9px no-repeat,linear-gradient(var(--teal),var(--teal)) right bottom/9px 1px no-repeat,linear-gradient(var(--teal),var(--teal)) right bottom/1px 9px no-repeat}
-[data-theme="light"] .stage3d::after{opacity:.7}
+/* 3D viewports stay Night in Daylight (owner, 30 Oct), as in the app (tokens.css, daylight.css). */
+[data-theme="light"] .stage3d{--stage-bg:radial-gradient(120% 90% at 50% 100%,#06242A 0%,#00131A 45%,#080808 100%);--scan:repeating-linear-gradient(0deg,rgba(68,192,185,.05) 0 1px,transparent 1px 4px);--scan-size:auto}
+[data-theme="light"] .stage3d::after{opacity:1}
+[data-theme="light"] .stage3d .statusline{color:#B6D8D6;text-shadow:0 0 8px #000}
 .hdr{will-change:transform}
 @media(max-width:700px){.hdr{backdrop-filter:none;background:var(--bg)}}
 .mode{background:var(--bg);color:var(--text);border:1px solid var(--line2);border-radius:var(--r-card);padding:16px;display:grid;gap:14px;align-content:start}
@@ -652,7 +655,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
   <div class="wrap">
     <div class="lbl">Daylight</div>
     <h2 style="margin-top:10px">A light mode that is still the future.</h2>
-    <p class="lede">For people who struggle with dark screens. Bright text on black can blur, smear or ghost. Daylight swaps neon on night for deep teal ink on soft paper, keeps every colour in its place and draws the 3D house as a blueprint.</p>
+    <p class="lede">For people who struggle with dark screens. Bright text on black can blur, smear or ghost. Daylight swaps neon on night for deep teal ink on soft paper, keeps every colour in its place and leaves the 3D house on its Night stage.</p>
 
     <div class="grid2" style="margin-top:32px">
       <div class="card">
@@ -667,8 +670,8 @@ footer .wm{font-size:26px;margin-bottom:10px}
         <div class="lbl" style="margin-bottom:12px">How it stays on brand</div>
         <ul class="rules ok">
           <li>Same hues as Night, just darker. Teal still builds, gold still means now, red is still owed.</li>
-          <li>Blueprint grid replaces scanlines. Hairline rules and corner brackets replace bloom.</li>
-          <li>The house reads as a blueprint: deep teal brick, white mortar, amber slice.</li>
+          <li>Blueprint grid replaces scanlines. Hairline rules replace bloom.</li>
+          <li>The 3D house stays on its Night stage, teal brick on black, so the build always reads the same (owner, 30 Oct). The page around it is Daylight.</li>
           <li>Same icons, same beat, same feedback.</li>
         </ul>
       </div>
@@ -687,7 +690,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
       </div>
       <div class="mode" data-theme="light">
         <div class="lbl">Daylight</div>
-        <div class="stage3d"><canvas id="mLight" class="mc" tabindex="0" role="img" aria-label="The 3D house in Daylight mode"></canvas><div class="statusline" style="right:14px">Daylight · blueprint on paper</div></div>
+        <div class="stage3d"><canvas id="mLight" class="mc" tabindex="0" role="img" aria-label="The 3D house on its Night stage inside a Daylight page"></canvas><div class="statusline" style="right:14px">Daylight page · Night 3D stage</div></div>
         <div class="vi-stats"><div class="vi-stat"><b>£8.5k</b><span>Saved</span></div><div class="vi-stat"><b>£15.5k</b><span>To go</span></div></div>
         <div class="vi-pills"><span class="vi-pill">25% · Quarter</span><span class="vi-pill lock">50% · Halfway</span></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-primary btn-sm">Lay the bricks</button><button class="btn btn-gold btn-sm">Update</button><button class="btn btn-ghost btn-sm">Reset</button></div>
@@ -703,23 +706,23 @@ footer .wm{font-size:26px;margin-bottom:10px}
     <div class="card tablewrap"><table>
       <thead><tr><th>Part</th><th>Night</th><th>Daylight</th></tr></thead>
       <tbody>
-        <tr><td>Ground</td><td>Void #080808</td><td>Paper #D3CCB4, never pure white or bright</td></tr>
+        <tr><td>Ground</td><td>Void #080808</td><td>Paper #D3CCB4, never pure white or bright (owner, 30 Oct: it was too bright)</td></tr>
         <tr><td>Text</td><td>Lintel on Void</td><td>Ink #0B1F22 on Paper</td></tr>
         <tr><td>Colour</td><td>Bright neon values</td><td>Same hues, darker values that pass contrast</td></tr>
         <tr><td>Glow</td><td>Bloom and neon edges</td><td>Soft shadows and hairlines, no bloom</td></tr>
         <tr><td>Texture</td><td>Scanlines</td><td>Blueprint grid</td></tr>
-        <tr><td>Panels</td><td>Dark glass, teal hairline</td><td>White glass, hairline with corner brackets</td></tr>
-        <tr><td>3D house</td><td>Teal hologram on black</td><td>Deep teal brick, white mortar, amber slice</td></tr>
-        <tr><td>Gold</td><td>#E8C56A everywhere</td><td>Ink #8B6A15 for text, #E8C56A kept for fills and the tag</td></tr>
+        <tr><td>Panels</td><td>Dark glass, teal hairline</td><td>Paper-tone panel #DAD8D0, hairline, clipped corner as in Night</td></tr>
+        <tr><td>3D house</td><td>Teal hologram on black</td><td>Unchanged: the 3D stage stays Night inside the Daylight page</td></tr>
+        <tr><td>Gold</td><td>#E8C56A everywhere</td><td>Ink #60480B for text, #E8C56A kept for fills and the tag</td></tr>
         <tr><td>Icons</td><td>Thin teal lines</td><td>Same drawings in darker ink</td></tr>
         <tr><td>Pulse</td><td>Light breathes</td><td>Ring and shadow breathe, same 2.8s beat</td></tr>
       </tbody></table></div>
 
     <div class="grid2" style="margin-top:20px">
       <div class="card"><div class="lbl" style="margin-bottom:12px">Switching</div>
-        <ul class="rules ok"><li>Follows the device setting on first visit.</li><li>One switch in the header, remembered after.</li><li>Never switches by time of day.</li><li>Three D scenes, charts and exports follow the mode.</li></ul></div>
+        <ul class="rules ok"><li>Follows the device setting on first visit.</li><li>One switch in the header, remembered after.</li><li>Never switches by time of day.</li><li>Charts and exports follow the mode. 3D scenes stay Night.</li></ul></div>
       <div class="card"><div class="lbl" style="margin-bottom:12px">Reading comfort</div>
-        <ul class="rules ok"><li>Body text 16px or larger, weight 400 or more.</li><li>Colour never carries meaning alone: shapes and labels back it up.</li><li>Reduced motion removes orbit, sweep and pulse.</li><li>Focus rings stay visible in both modes.</li></ul></div>
+        <ul class="rules ok"><li>Body text 16px or larger, weight 400 or more.</li><li>Colour never carries meaning alone: shapes and labels back it up.</li><li>Reduced motion removes orbit, sweep, ring and pulse.</li><li>Focus rings stay visible in both modes.</li></ul></div>
     </div>
   </div>
 </section>
@@ -1749,7 +1752,7 @@ function makeStage(cv,o){
     var dt=Math.min(.05,(ts-(last||ts))/1000);last=ts;
     if(reduce)st.p=target;else{st.p+=(target-st.p)*Math.min(1,dt*1.7);if(Math.abs(target-st.p)<.0003)st.p=target}
     if(auto&&!ob.isDrag()&&ts-idle>2500)st.yaw+=dt*.12;
-    st.now=ts;st.fit=cw<520?1.1:.85;st.theme=o.theme||rootTheme();st.padT=cw<520&&o.railPad?52:0;st.railPad=cw<520?0:(o.railPad||0);c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,cw,ch);
+    st.now=ts;st.fit=cw<520?1.1:.85;st.theme="dark";st.padT=cw<520&&o.railPad?52:0;st.railPad=cw<520?0:(o.railPad||0);c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,cw,ch);
     var info=renderHouse(c,{x:0,y:0,w:cw,h:ch},st);
     if(o.onFrame)o.onFrame(info,st);
     raf=requestAnimationFrame(frame);
@@ -1846,7 +1849,7 @@ function makeNW(cv,o){
   var ob=orbit(cv,st,{touch:function(){idle=performance.now()}});
   function frame(ts){raf=0;if(!vis)return;if(last&&ts-last<1000/(o.fps||30)-2){raf=requestAnimationFrame(frame);return}var dt=Math.min(.05,(ts-(last||ts))/1000);last=ts;
     if(auto&&!ob.isDrag()&&ts-idle>2500)st.yaw=-.55+Math.sin(ts/4200)*.35;
-    st.now=ts;st.theme=o.theme||rootTheme();c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,cw,ch);render(ts);raf=requestAnimationFrame(frame)}
+    st.now=ts;st.theme="dark";c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,cw,ch);render(ts);raf=requestAnimationFrame(frame)}
   function start(){if(vis&&!raf){last=0;raf=requestAnimationFrame(frame)}}
   if("ResizeObserver" in window)new ResizeObserver(size).observe(cv);else window.addEventListener("resize",size);
   size();
@@ -1969,7 +1972,7 @@ function makeTracker(cv,o){
   var ob=orbit(cv,st,{touch:function(){idle=performance.now()}});
   function frame(ts){raf=0;if(!vis)return;if(last&&ts-last<1000/(o.fps||30)-2){raf=requestAnimationFrame(frame);return}last=ts;
     if(view==="bars"&&auto&&!ob.isDrag()&&ts-idle>2500)st.yaw=-.3+Math.sin(ts/4600)*.18;
-    st.now=ts;st.theme=o.theme||rootTheme();c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,cw,ch);render(ts);raf=requestAnimationFrame(frame)}
+    st.now=ts;st.theme="dark";c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,cw,ch);render(ts);raf=requestAnimationFrame(frame)}
   function start(){if(vis&&!raf){last=0;raf=requestAnimationFrame(frame)}}
   if("ResizeObserver" in window)new ResizeObserver(size).observe(cv);else window.addEventListener("resize",size);
   size();t0=performance.now();
@@ -2187,7 +2190,7 @@ renderLogos();
 $$("[data-svg]").forEach(function(b){b.addEventListener("click",function(){copy(iconSVG(b.getAttribute("data-svg")),"SVG copied")})});
 var dial=0;function turnDial(){dial+=60;$$("#iconXL .ticks").forEach(function(g){g.style.transform="rotate("+dial+"deg)"})}
 /* Daylight: live previews and measured contrast */
-var mD=makeStage($("#mDark"),{theme:"dark",fps:30,padB:30}),mL=makeStage($("#mLight"),{theme:"light",fps:30,padB:30});
+var mD=makeStage($("#mDark"),{theme:"dark",fps:30,padB:30}),mL=makeStage($("#mLight"),{theme:"dark",fps:30,padB:30});
 mD.setTarget(.72,true);mL.setTarget(.72,true);
 (function(){
   var pairs=[["Body text","#E8E8E8","#080808","#0B1F22","#D3CCB4"],["Secondary text","#9AA0A6","#080808","#3A5052","#D3CCB4"],["Labels (Signal)","#2D8882","#080808","#215451","#D3CCB4"],["Teal links and actions","#44C0B9","#080808","#185550","#D3CCB4"],["Gold values","#E8C56A","#080808","#60480B","#D3CCB4"],["Debt red","#E05C5C","#080808","#951919","#D3CCB4"],["Cleared green","#3ECF8E","#080808","#135738","#D3CCB4"],["Info blue","#64B5F6","#080808","#054E88","#D3CCB4"],["Primary button text","#FFFFFF","#007F7B","#FFFFFF","#005652"],["Gold button text","#1A1400","#E8C56A","#1A1400","#E8C56A"]];

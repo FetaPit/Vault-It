@@ -181,15 +181,15 @@ See section 6. This is the heart of the work.
 
 Daylight is a designed mode, not an inversion. It exists for people who struggle with dark screens.
 
-- Ground is Paper `#D3CCB4` (never pure white). Text is Ink `#0B1F22`. Panels are white with a hairline border and small corner brackets (`[data-theme="light"] .card::before` in the brand book).
+- Ground is Paper `#D3CCB4` (never pure white). Text is Ink `#0B1F22`. Panels are Paper-tone (`#DAD8D0`) with a hairline border and the same clipped corner as Night.
 - No bloom. Glow tokens become soft shadows: `--glow`, `--tglow`, `--dglow`, `--popglow` are already set for this.
 - Scanlines are replaced by a faint blueprint grid (`--paper-img`, `--scan`).
 - Colours keep their hue and get darker values so text reaches 4.5:1 and icons 3:1.
 - Gold buttons keep the bright fill `--goldf` (#E8C56A) with dark text. Gold text uses the darker ink.
-- 3D scenes switch to the Daylight palette automatically (the engine reads `data-theme` every frame). See 6.8.
+- 3D scenes stay Night in Daylight (owner, 30 Oct 2026): `tokens.css` keeps the Night values on `.scene`, `.inv-stage`, `.nw3d-stage` and the 3D badges. The page around them is Daylight. See 6.9.
 - Primary buttons use `--btn1` and `--btn2` with white text.
 
-Accepted when: every screen is usable in Daylight with no invisible text, no neon on paper, and the 3D house reads as a blueprint (deep teal brick, white mortar, amber slice).
+Accepted when: every screen is usable in Daylight with no invisible text, no neon on paper, and the 3D stage stays on its Night look.
 
 ### Phase 8: Logo and wordmark
 
@@ -375,9 +375,11 @@ Every action answers three ways at once, within about 250 ms: something moves, a
 
 Milestone thresholds: 1, 5, 10, 25, 50, 75, 100 (percent). Toasts only fire after the person has interacted, never during the opening build. XP: 5 base plus 50 per milestone reached plus 25 per deposit action.
 
-### 6.9 Daylight rendering of the 3D scenes
+### 6.9 Daylight and the 3D scenes
 
-The engine has two palettes (`THG.dark`, `THG.light`; `nwPal`). In Daylight:
+**Current rule (owner, 30 Oct 2026): 3D stays Night in Daylight.** The Daylight palette below is kept as a record of the earlier blueprint design and is not used by the app (`src/hb3d/brand.js`). Only restore it if the owner says so.
+
+The engine has two palettes (`THG.dark`, `THG.light`; `nwPal`). The retired Daylight look:
 
 - Bricks are deep teal with **white mortar** and 97% opacity. Tiles are a darker blue. Sills and lintels are pale stone. Glass is pale blue and warms to amber when lit.
 - Slice is amber with a darker amber outline and no blur. The tag has a soft drop shadow instead of a glow.
