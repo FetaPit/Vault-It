@@ -27,6 +27,8 @@ export function route(hostname, pathname) {
   // vault-it.co/demo-a (owner, 8 Nov 2026): the live demo link. Sends the visitor into the app with the Alex Morgan sample loaded
   // (the app reads ?demo=alex). On a preview host the app is on the same host, so it goes there instead of production.
   if ((kind === 'root' || kind === 'preview') && /^\/(landing\/)?demo-a\/?$/.test(pathname)) return { demo: '/?demo=alex', site: kind === 'root' ? 'app' : 'preview' };
+  // app.vault-it.co/demo-a (owner, 11 Nov 2026): the same link typed on the app host opens the demo too, instead of a 404.
+  if (kind === 'app' && /^\/demo-a\/?$/.test(pathname)) return { demo: '/?demo=alex', site: 'app' };
 
   let site, rest = pathname;
   if (kind === 'root') site = 'landing';
