@@ -134,7 +134,7 @@ Accepted when: no inline hand-drawn icon remains where a pack icon exists, every
 
 This is the main navigation. The dot before each icon is removed: the icon now carries the tab colour.
 
-Anatomy of a tab: icon (18px) + label (Syne 600, 12px, +0.14em tracking, uppercase) + optional badge. Underline 2px in the tab colour. Active tab: label becomes `--text`, underline and soft shadow in the tab colour, icon breathes on the 2.8 second beat (`tabglow` keyframes). In Daylight the icon glow animation is off, underline stays.
+Anatomy of a tab: icon (18px) + label (Syne 600, 12px, +0.14em tracking, uppercase) + optional badge. Selected tab only: a 1px inset outline in the tab colour with a soft glow in Night, and a crisp outline in Daylight. Active tab: label becomes `--text`, icon breathes on the 2.8 second beat (`vi-tabglow` keyframes). In Daylight the icon glow animation is off, the outline stays.
 
 | Tab | Icon id | Colour token | Dark | Daylight |
 | --- | --- | --- | --- | --- |
@@ -352,7 +352,7 @@ These sell the "hologram in a room" feel. Keep all of them. All distances are in
 4. **Ring ping.** See 6.5. The main moving grid element.
 5. **Sweep band.** A bright horizontal band rises through the house at **20 world units per second**, repeating every 194 units (about 9.7 s). Bricks within 6 units of the band blend toward a sheen colour by `(1 - distance / 6) * 0.5`. It reads as a scan line passing through the model. Off for reduced motion and for static exports.
 6. **Scanlines (Night).** `.stage3d::after` draws 1px teal lines every 4px at 5% over the stage. The page body has the same at 2.5%.
-7. **Blueprint grid (Daylight).** The same layer becomes a 26px square grid at 7% (page body: 32px at 5%).
+7. **Blueprint grid (Daylight, page only).** On the page body the paper carries a 32px square grid at 5%. The 3D stage keeps scanlines in both modes, because 3D stays Night (owner, 30 Oct).
 8. **Auto orbit.** The model drifts around slowly (`yaw += dt * 0.12` radians per second) and stops the moment someone touches it, resuming after 2.5 s idle. The net worth scene sways instead of spinning: `yaw = -0.55 + sin(t / 4200) * 0.35`. The tracker sways `-0.3 + sin(t / 4600) * 0.18` in 3D view.
 
 ### 6.7 Camera and interaction
@@ -475,7 +475,7 @@ Run every item in both themes, at 390px and 1100px wide.
 - [ ] Every icon comes from the sprite, uses a token colour and looks right at 16, 24 and 48px.
 - [ ] House builder: opening build animates from 0 to the saved percentage. Adding £500 flashes new bricks gold and they settle. Scrubbing backwards un-lays bricks.
 - [ ] Pulse: complete a build (set `p` to 1). Windows breathe, a ring leaves the base every 2.8 s, bricks brighten and dim by only a few percent.
-- [ ] Grid: the ground grid fades toward the edges, the sweep band rises through the model, scanlines (Night) or blueprint grid (Daylight) sit over the stage.
+- [ ] Grid: the ground grid fades toward the edges, the sweep band rises through the model, scanlines sit over the stage in both modes.
 - [ ] Orbit works by mouse, touch and keyboard. Vertical page scroll still works on touch. The rail does not cover the model on a phone.
 - [ ] Scrolling: at 320, 360, 390 and 412px wide the page never scrolls sideways (`document.documentElement.scrollWidth` equals the viewport width), and a steady swipe moves the page smoothly with no jumps while canvases are on screen.
 - [ ] Reduced motion: no orbit, no sweep, no ring, builds are instant, tab glow is off.

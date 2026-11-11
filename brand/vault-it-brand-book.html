@@ -1080,7 +1080,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
             <b>Pioneer</b>
             <div class="p">£5.99<small>/mo</small></div>
             <small style="color:#8A9696">or £49.99 a year.</small>
-            <ul><li>Unlimited debts and assets</li><li>Precious metals at live spot</li><li>House builder with projections</li></ul>
+            <ul><li>Unlimited assets and liabilities</li><li>Unlimited debt tracking with payoff charts</li><li>Data export (CSV)</li></ul>
             <button class="btn btn-primary" style="width:100%">Get Pioneer</button>
           </div>
         </div>
@@ -1240,7 +1240,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
   <div class="wrap">
     <div class="wm">Vault<i class="dot"></i><b>It</b></div>
     <p style="margin:0 0 6px">Get out of the red and into your home.</p>
-    <p style="margin:0">Not regulated by the FCA. Not financial advice. Vault-It is a personal finance tracking tool only. © 2026 Vault-It. A PT Live Design product. Future products live under PT Live Design as sister brands, not in this book.</p>
+    <p style="margin:0">Not regulated by the FCA. Not financial advice. Vault-It is a personal finance tracking tool only. © 2026 PT Live Design. Future products live under PT Live Design as sister brands, not in this book.</p>
   </div>
 </footer>
 
@@ -2278,7 +2278,8 @@ function draw(){
   var u=Math.min(w,h*1.2)/1080,m=72*u*(w>h?.9:1),LT=smode===1,BGc=LT?[211,204,180]:[8,8,8],BGh=LT?"#D3CCB4":"#080808",INK=LT?"#0B1F22":"#E8E8E8",SUB=LT?"#215451":"#2D8882",ACC=LT?"#005652":"#44C0B9";
   cx.fillStyle=BGh;cx.fillRect(0,0,w,h);
   var foot=42*u,hr=w>h?{x:w*.46,y:0,w:w*.54,h:h-foot}:(fi===1?{x:0,y:h*.5,w:w,h:h*.5-foot}:{x:0,y:h*.45,w:w,h:h*.55-foot});
-  renderHouse(cx,hr,houseState({p:(+$("#sPct").value)/100,zoom:(w>h?1.05:1.2),theme:LT?"light":"dark",now:0,sweep:false,noPulse:true,noFlash:true,fscale:Math.max(1,w/760)}));
+  if(LT){cx.fillStyle="#080808";cx.fillRect(hr.x,hr.y,hr.w,hr.h)}/* 3D stays Night in Daylight (owner, 30 Oct): the house sits on a Night stage */
+  renderHouse(cx,hr,houseState({p:(+$("#sPct").value)/100,zoom:(w>h?1.05:1.2),theme:"dark",now:0,sweep:false,noPulse:true,noFlash:true,fscale:Math.max(1,w/760)}));
   var fg=w>h?cx.createLinearGradient(hr.x,0,hr.x+hr.w*.2,0):cx.createLinearGradient(0,hr.y,0,hr.y+hr.h*.16);
   fg.addColorStop(0,rgba(BGc,1));fg.addColorStop(1,rgba(BGc,0));cx.fillStyle=fg;cx.fillRect(hr.x,hr.y,hr.w,hr.h);
   cx.fillStyle=BGh;cx.fillRect(0,h-foot,w,foot);

@@ -6,7 +6,7 @@ Status: the new typeface ("Vault-form", queue line "Vault-form brand typeface") 
 - `brand/vault-it-brand-book.html`: `--font-display` in `:root` (about line 37); the Google Fonts link at the top (replace with an `@font-face` for `brand/fonts/vault-form/` WOFF2, no new outside host; DM Sans and Share Tech Mono stay); the export generators `cssOut`, `jsonOut`, `twOut`; the social canvas fonts (`800 ... 'Syne'`).
 - Type section: rewrite the lede, the display specimen note and the table rows (new weights; add Condensed and the hatch display cuts for hero and decks only, never below the size where the hatch breaks). Add the licence line and an "Install the font" download.
 - `brand/vault-it-tokens.css`, `brand/vault-it-tokens.json`, `brand/tailwind.vault-it.js`: font family.
-- `brand/ECD_BRIEF.md` fonts rule, `brand/vault-it-brand-handover.md` sections 3 and 5.2.
+- `brand/ECD_BRIEF.md` fonts rule, `brand/vault-it-brand-handover.md` section 3 and Phase 2.
 - The wordmark is drawn artwork: change it only if the owner says so.
 
 ## App and site (stage 2, needs ship-item and rollout-qc)
