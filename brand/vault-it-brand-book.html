@@ -805,6 +805,27 @@ footer .wm{font-size:26px;margin-bottom:10px}
         </tbody>
       </table>
     </div>
+    <h3 style="margin-top:40px">The scale in the app</h3>
+    <p style="color:var(--muted);max-width:62ch">What the app actually ships, from <code>src/app/shell/body.css</code> and <code>tokens.css</code>. Small text never drops below the floor, at any width.</p>
+    <div class="grid2">
+      <div class="card tablewrap"><table>
+        <thead><tr><th>Token</th><th>Size</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">--vi-fs-0</td><td>10px</td><td>Disclaimer line under the footer</td></tr>
+          <tr><td class="mono">--vi-fs-1</td><td>10.5px</td><td>The floor for any other text, and for the USP and PRO badges</td></tr>
+          <tr><td class="mono">--vi-fs-2</td><td>11.5px</td><td>Buttons (Syne 700), small labels</td></tr>
+          <tr><td class="mono">--vi-fs-3</td><td>12.5px</td><td>Secondary values and sublines</td></tr>
+        </tbody></table></div>
+      <div class="card">
+        <div class="lbl" style="margin-bottom:12px">Scaling and figures</div>
+        <ul class="rules ok">
+          <li>Root size is the person's Text Size setting, 13px by default, times a scale that grows with the screen: 1.12 from 1100px, 1.28 from 1400px, 1.45 from 1700px, 1.7 from 2100px.</li>
+          <li>Figures use lining numerals everywhere. Syne's default zero reads as a small round o, so the app sets <code>font-variant-numeric: lining-nums</code>.</li>
+          <li>Money and milestones stay in Share Tech Mono.</li>
+        </ul>
+      </div>
+    </div>
+    <!-- TYPEFACE SWAP POINT: the Vault-form brand typeface is not signed off. Do not replace Syne here until the owner approves. See docs/BRAND_TYPEFACE_SWAP.md for the one-line swap list. -->
   </div>
 </section>
 
