@@ -395,3 +395,4 @@ The single list of instructed work. Every session reads it at start and before e
 - [x] FCA line on the sign-up pages (`753cccd`)
 - [x] Live market value step 1: metal by weight and purity, link to a holding (`ab7cb41`)
 - [x] House builder stuck in Level 2: reset and "Not bought yet" return to Level 1 (`e8b71a9`); Level 2 owner's rule (`66eaaa2`)
+- [~] (cloud, Admin) HexaTown free dev hours (owner, 11 Nov 2026: "what do you think Hexa Towns criteria is to win the 200 free dev hours", then the link https://www.thehexatown.com). Read the invite and Ahmad Zabir's emails and the site; say what the criteria likely are, labelled as inference. Note: the invite says 100 hours, not 200. Call was 11 Nov 18:00 GMT.
