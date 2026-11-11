@@ -1217,22 +1217,19 @@ footer .wm{font-size:26px;margin-bottom:10px}
       <button class="btn btn-ghost" id="tokSave">Download file</button>
     </div>
     <div class="card" style="margin-top:36px">
-      <div class="lbl" style="margin-bottom:12px">Fix before roll-out</div>
-      <ul class="rules gaps">
-        <li>Site hero still reads "From debt to owning your home outright". Change the H1, meta title and og:title to the new tagline.</li>
-        <li>Done (owner, 7 Nov): the app wordmark is one colourway, Vault in the text colour and -It in teal, with the brick as the hyphen.</li>
-        <li>The app shows ROW 55 / 154 at 35.6% but 10,479 / 21,000 bricks (50%). Make the brick count follow the same percentage as the row.</li>
-        <li>The app's tagline "Every pound saved builds your future" becomes the hero subline. Keep it.</li>
-        <li>Debt reds appear in three values in the app. Standardise on Overdraft #E05C5C.</li>
-        <li>Footer reads "Alpha" with a build string. Hide the build string on public pages.</li>
-        <li>Stocks and funds and Wealth inventory both use purple. Move Stocks and funds to Green 2.</li>
-        <li>Liabilities is red on its sub-tab and gold on the overview. Use Amber everywhere. Red means debt only.</li>
-        <li>The debt histogram and treemap use issuer colours. Use a red ramp in charts and keep issuer colours on the card art.</li>
-        <li>Two golds are used without a rule. Gold means now. Brass means achievement.</li>
-        <li>Text characters stand in for icons (✎ ✕ ＋ ◈ ✓ ↩). Swap them for the pack.</li>
-        <li>Icon stroke weights vary between 1.6, 1.7 and 1.9. Standardise on a 1.1 hairline, 1.5 under 24px.</li>
-        <li>There is no light mode yet. Ship Daylight as a second token set, switched with data-theme.</li>
-        <li>Playfair Display is loaded but never used. DM Mono is used in three rules. Drop Playfair and move DM Mono to Share Tech Mono.</li>
+      <div class="lbl" style="margin-bottom:12px">Roll-out log: done and open</div>
+      <ul class="rules ok gaps">
+        <li>Done: the Daylight light mode ships as a second token set, switched with <code>data-theme</code>.</li>
+        <li>Done: Stocks and funds use Green 2 (Wealth inventory keeps violet) and Liabilities use Amber.</li>
+        <li>Done: the brick count follows the same percentage as the row.</li>
+        <li>Done: icons come from the sprite, not text characters.</li>
+        <li>Done: the app wordmark is one colourway, Vault in the text colour and -It in teal, with the brick as the hyphen (owner, 7 Nov).</li>
+        <li>Done: Playfair Display and DM Mono are gone. Fonts are Syne, DM Sans and Share Tech Mono.</li>
+      </ul>
+      <ul class="rules gaps" style="margin-top:12px">
+        <li>Open: the app footer still shows a version and build string ("v0.9.2 Alpha · build flow-dash-1"). Hide it on public pages.</li>
+        <li>Open: the new brand typeface is not signed off. Syne stays until it is (see docs/BRAND_TYPEFACE_SWAP.md).</li>
+        <li>Open: the footer and disclaimer text is 10px, below the 10.5px floor.</li>
       </ul>
     </div>
   </div>

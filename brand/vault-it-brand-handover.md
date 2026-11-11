@@ -35,11 +35,11 @@ Put these in the repo under `brand/` (create it). The brand book is the visual r
 
 These were read from the live repo, so use them instead of guessing.
 
-- **Repo:** `FetaPit/Vault-It` on GitHub (public). Its default branch `main` is an old v0.3 alpha and is **not** production.
+- **Repo:** `FetaPit/Vault-It` on GitHub (going private). Its default branch `main` is an old v0.3 alpha and is **not** production.
 - **Production branch:** `release/pioneer-v2`. **A push to it goes live.** Cloudflare Workers Builds deploys it (build `npm run build:site`, deploy `npx wrangler deploy`) to `app.vault-it.co`, `vault-it.co` and `www.vault-it.co`, and GitHub Pages still publishes it at the older `fetapit.github.io/Vault-It/` address. The Cloudflare Worker is named `vault-it` (`wrangler.jsonc`, `worker/index.mjs`). The domain stays registered at Wix, with its nameservers on Cloudflare (`docs/CUTOVER.md`).
 - **Develop on `Pioneer_v3`** (or the branch the session names). **Cloudflare's build trigger lists only `release/pioneer-v2`** (checked through the Cloudflare API: repo connection `FetaPit/Vault-It`, branch include `release/pioneer-v2`, and the latest builds were started manually). So do not assume other branches get a preview build. Check before relying on one, and never add a working branch to that trigger: `npx wrangler deploy` from it would go live.
 - **Release process (owner only, when asked):** run the tests, create `backup/release-pioneer-v2-YYYYMMDD-HHMM`, then fast-forward `release/pioneer-v2` to the tested commit.
-- **App:** `index.html` is the whole app (CSS, JS, markup), about 1.7 MB. Marketing is `landing.html` (vault-it.co). Also `recover.html`.
+- **App:** `index.html` is the whole app (CSS, JS, markup) but it is **built** from about 120 parts in `src/app/` by `node tools/build_app.js`: edit the parts, never `index.html` (`docs/APP_SOURCE.md`). Marketing is `landing.html` (vault-it.co). Also `recover.html`.
 - **House builder:** the current 3D House Builder lives in `src/hb3d/` (`kit.js`, `viewer.js`, `models/`) and is embedded into `index.html` by `node tools/build_hb3d.js`. Never hand edit the embedded block. Edit `src/hb3d` and re-run the build.
 - **Backend:** Supabase project `legpubblzgknxdtvsant` (edge functions in `supabase/functions`). A GitHub Action deploys `send-auth-email` when `supabase/functions/**` changes on `release/pioneer-v2`. The brand work must not touch Supabase, secrets or migrations.
 - **Tests:** `bash scripts/run-tests.sh [all|server|browser|<name>]`. Relevant ones: `test_hb3d_app`, the 3D kit scale test, and `tests/test_beta_client.js`, which fails if the app talks to an outside host the privacy notice does not name. Update any scale based expectations on purpose, do not delete tests.
@@ -111,6 +111,8 @@ document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark")}c
 Accepted when: the app renders correctly in both themes, no hard coded dark values remain in components, the toggle persists across reloads, and contrast in Daylight meets the table in the brand book (body text 15.8:1, all brand colours 4.6:1 or better for text).
 
 ### Phase 2: Fonts and clean-up
+
+**Status: done.** Kept here as a record. The only open item is the build string in the footer.
 
 - Remove `Playfair Display` (loaded, never used).
 - Move the three `DM Mono` rules to `Share Tech Mono`, then remove the DM Mono load.
@@ -498,8 +500,8 @@ Do not swap everything in one release. Order the work so the app is always shipp
 
 1. **Branching.** Work on `Pioneer_v3` or a branch off it (for example `brand-rollout`), as the repo's `CLAUDE.md` says. Do not push to `release/pioneer-v2`: that branch is production. **Staging:** build locally (`npm run build:site`) and serve it with `npx wrangler dev` on your network so you can open it on a phone. If the owner turns on non-production builds in Cloudflare (Settings, Builds, branch control, with the command `npx wrangler versions upload`), preview URLs can be used instead. Confirm which one is available before the first phase.
 2. **One phase, one commit, one staging check.** Phases 1 to 5 and 7 to 8 (tokens and theme, fonts, icons, menu bar, colour code, Daylight, logo) go first and in order. Post screenshots of each staging check.
-3. **The house builder goes behind a switch.** Read the flag from `?house=new` and from `localStorage["vi-flag-house"]`. Default stays the current `src/hb3d` builder. Keep price, deposit, house type and level logic exactly as it is: only the drawing and the brick value maths change. Add the new engine through the same build pipeline (`tools/build_hb3d.js`) so tests keep working, and update the kit scale test deliberately because the brick scale changes.
-4. **Net worth scene and tracker toggle** come after, behind `vi-flag-nw`. The Graph view stays the default of the tracker. Feed it the app's own series with `setData`.
+3. **The house builder (done, owner 1 Nov 2026).** The brand build is the only one: the classic viewer, its Settings switch and the house flag are deleted. Levels 1 and 2 are drawn in the brand look. Level 3 and "Your own design" are locked under Pro. Without 3D a still picture of the house shows. Originally this was behind a switch: `?house=new` and `localStorage["vi-flag-house"]`. Keep price, deposit, house type and level logic exactly as it is: only the drawing and the brick value maths change. Add the new engine through the same build pipeline (`tools/build_hb3d.js`) so tests keep working, and update the kit scale test deliberately because the brick scale changes.
+4. **Net worth scene and tracker toggle (done).** `vi-flag-nw` is on by default and the first view is the 3D blocks; `?nw=old` or `localStorage` `vi-flag-nw` overrides per device and Settings has the switch. Do not change the default without the owner. Originally the Graph view was the default. Feed it the app's own series with `setData`.
 5. **Landing page.** `landing.html` (vault-it.co) gets the same tokens, icons, wordmark and tagline in its own phase after the app.
 6. **Offline and caching.** Bump the cache or version string the PWA uses with every release so installed copies update, and include the new `brand/` assets in whatever precache list the app has.
 7. **Tests every phase:** `bash scripts/run-tests.sh all`. Also confirm `tests/test_beta_client.js` still passes: the brand work must add no new outside hosts (the fonts stay Syne, DM Sans, Share Tech Mono, and Playfair and DM Mono are removed).
