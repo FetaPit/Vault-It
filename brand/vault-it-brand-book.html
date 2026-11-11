@@ -2257,17 +2257,20 @@ var FORMATS=[{k:"Instagram",w:1080,h:1080},{k:"Story",w:1080,h:1920},{k:"X and L
 var TPL=[
   {k:"Tagline",h:"Get out of the red and into your home.",s:"Every pound saved builds your future.",p:36,c:"Get out of the red and into your home. Every pound saved builds your future. vault-it.co"},
   {k:"Milestone",h:"Foundations laid. Row by row.",s:"Lay the bricks. vault-it.co",p:50,c:"Foundations laid. Row by row. Lay the bricks. vault-it.co"},
-  {k:"Pioneer",h:"Lock in £5.99 a month. For good.",s:"Pioneer spots are limited. vault-it.co",p:25,c:"Lock in £5.99 a month. For good. Pioneer spots are limited. vault-it.co"}
+  {k:"Pioneer",h:"Pioneer from £5.99 a month.",s:"Or £49.99 a year. vault-it.co",p:25,c:"Pioneer from £5.99 a month, or £49.99 a year. vault-it.co"},
+  {k:"Founding Member",h:"Founding Member: £149 once.",s:"Lifetime access. vault-it.co",p:25,c:"Founding Member: £149 once. Lifetime access. vault-it.co"}
 ];
 var fi=0,smode=0,cv=$("#socialCanvas"),cx=cv.getContext("2d");
 function pill(wrap,list,get,onpick){
   list.forEach(function(it,i){var b=document.createElement("button");b.type="button";b.className="tab";b.textContent=get(it);b.setAttribute("aria-pressed",i===0);
     b.addEventListener("click",function(){$$(".tab",wrap).forEach(function(x,j){x.setAttribute("aria-pressed",j===i)});onpick(i)});wrap.appendChild(b)});
 }
-function wrapText(c,t,x,y,maxW,lh){
+function wrapText(c,t,x,y,maxW,lh,cm){
   var words=t.split(/\s+/),line="",lines=[];
   words.forEach(function(w){var test=line?line+" "+w:w;if(c.measureText(test).width>maxW&&line){lines.push(line);line=w}else line=test});
-  lines.push(line);lines.forEach(function(l,i){c.fillText(l,x,y+i*lh)});return y+lines.length*lh;
+  lines.push(line);lines.forEach(function(l,i){
+    if(!cm){c.fillText(l,x,y+i*lh);return}
+    var cx0=x,base=c.fillStyle;l.split(" ").forEach(function(wd,k){var key=wd.replace(/[^a-z]/gi,"").toLowerCase(),t=(k?" ":"")+wd;c.fillStyle=cm[key]||base;c.fillText(t,cx0,y+i*lh);cx0+=c.measureText(t).width});c.fillStyle=base});return y+lines.length*lh;
 }
 function rr(c,x,y,w,h,r){c.beginPath();if(c.roundRect)c.roundRect(x,y,w,h,r);else c.rect(x,y,w,h)}
 function drawIcon(c,x,y,sz,lt){var k=sz/240;c.save();c.translate(x,y);c.scale(k,k);
@@ -2294,7 +2297,8 @@ function draw(){
   var hs=(fi===0?76:fi===1?100:80)*u*(head.length>40?.88:1),tw=w>h?w*.47-m:w-2*m;
   cx.font="800 "+hs+"px 'Syne',Arial,sans-serif";cx.fillStyle=INK;
   var hy=ty+(w>h?hs*1.35:hs*1.7);
-  var ey=wrapText(cx,head,m,hy,tw,hs*1.02);
+  var tagCm=/^get out of the red/i.test(head)?(LT?{red:"#C8202A",home:"#60480B"}:{red:"#FF4D63",home:"#F5DC4A"}):null;/* plain-text tagline colours (see Brand story); the neon stroke is for HTML comms */
+  var ey=wrapText(cx,head,m,hy,tw,hs*1.02,tagCm);
   var ss=(w>h?26:30)*u;cx.font=ss+"px 'Share Tech Mono',monospace";cx.fillStyle=SUB;
   wrapText(cx,sub,m,ey+ss*.7,tw,ss*1.4);
 }
