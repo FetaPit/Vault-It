@@ -2241,6 +2241,166 @@ def counter_hatch(g, geom, name=None, params=None, with_seams=False):
 
 
 # ==========================================================================
+# Extrusion hatch (r4, behind a flag): the hatch as the side faces of a
+# solid, extruded letter, drawn as engraving
+# ==========================================================================
+# One extrusion vector for the whole family, like a light source: down and
+# to the right at 45 degrees, depth 0.4 of the Bold stem. Down-right puts the
+# visible faces on the bottoms and right-hand sides, the classic "lit from
+# top left" solid, and it sits square to our big "/" chamfers, so every big
+# chamfer gets a face of its own and folds; the small "\\" chamfers run with
+# the vector and stay clean edges. (Down-left would run along the big
+# chamfers and flatten them.)
+#
+# A face is an edge of the letter swept along the vector. A face shows only
+# where nothing nearer the viewer (the letter, or a face in front of it)
+# covers it: a point on a face is hidden when the ray from its edge, along
+# the vector, passes back through the letter first. Faces stand a hairline
+# off the letter, carry fine lines parallel to the vector (fewer and finer
+# than r3), and their far edges and folds are drawn as hairlines.
+EX_DEPTH = 0.40          # x Bold stem, length of the extrusion vector
+EX = dict(
+    gap=0.07,            # x H: hairline gap between letter and face
+    lw=0.032,            # x H: hatch line and hairline weight
+    pitch=0.27,          # x H: line pitch (square to the lines) on right-facing faces
+    dark=0.70,           # bottom-facing faces: pitch factor (denser, in shadow)
+    seam=0.06,           # x H: engraved seam (panel join) width
+)
+
+
+def ex_vec():
+    d = EX_DEPTH * WEIGHTS["Bold"]["S"] / math.sqrt(2)
+    return round(d), -round(d)
+
+
+def _sweep(poly_or_multi, vx, vy):
+    """Minkowski sum of a shape with the segment [0, v]."""
+    parts = [poly_or_multi, T(poly_or_multi, vx, vy)]
+    for p in polys(poly_or_multi):
+        for ring in [p.exterior] + list(p.interiors):
+            cs = list(ring.coords)
+            for a, b in zip(cs, cs[1:]):
+                q = Polygon([a, b, (b[0] + vx, b[1] + vy), (a[0] + vx, a[1] + vy)])
+                if q.area > 0.01:
+                    parts.append(q.buffer(0))
+    return U(*parts)
+
+
+def extrusion_faces(g, geom):
+    """Visible side faces of the extruded glyph: [(face polygon, normal)]."""
+    vx, vy = ex_vec()
+    L = math.hypot(vx, vy)
+    faces = []
+    for p in polys(geom):
+        p = orient(p, 1.0)
+        for ring in [p.exterior] + list(p.interiors):
+            cs = list(ring.coords)
+            for a, b in zip(cs, cs[1:]):
+                dx, dy = b[0] - a[0], b[1] - a[1]
+                el = math.hypot(dx, dy)
+                if el < 1:
+                    continue
+                nx, ny = dy / el, -dx / el            # outward normal
+                if (nx * vx + ny * vy) / L < 0.05:    # faces away, or runs with v
+                    continue
+                F = Polygon([a, b, (b[0] + vx, b[1] + vy), (a[0] + vx, a[1] + vy)]).buffer(0)
+                blk = geom.intersection(F)
+                blk = U(*[q for q in polys(blk) if q.area > 0.5])
+                vis = F.difference(_sweep(blk, vx, vy)) if not blk.is_empty else F
+                vis = vis.difference(geom)
+                if vis.area > 4:
+                    faces.append((vis, (nx, ny)))
+    return faces
+
+
+def extrude(g, geom, name=None, contain="counters", with_seam=True):
+    """Engraved extrusion for one glyph. Returns (detail, seam_cut).
+
+    contain='counters': faces only inside counters and open bays (inside the
+    glyph's convex hull), so silhouette and spacing do not change.
+    contain='full': every face, outer edges too (widen the advance by vx)."""
+    if geom.is_empty:
+        return Polygon(), Polygon()
+    H = g.H
+    gap, lw, pitch = EX["gap"] * H, EX["lw"] * H, EX["pitch"] * H
+    vx, vy = ex_vec()
+    keepout = geom.buffer(gap, join_style="mitre", mitre_limit=10)
+    region = None
+    if contain == "counters":
+        region = geom.convex_hull.difference(geom)
+    out = []
+    for vis, (nx, ny) in extrusion_faces(g, geom):
+        f = vis.difference(keepout)
+        f = U(*[q for q in polys(f) if q.area > 2 * lw * lw])
+        if f.is_empty:
+            continue
+        # far edges and folds: a hairline frame, but not along the letter
+        frame = f.difference(f.buffer(-lw, join_style="mitre", mitre_limit=10))
+        frame = frame.difference(geom.buffer(gap + 1.6 * lw, join_style="mitre", mitre_limit=10))
+        # tone: right-facing faces lit (sparse), bottom-facing in shadow (dense)
+        pf = 1.0 - (1.0 - EX["dark"]) * max(0.0, -ny)
+        inner = f.buffer(-1.6 * lw, join_style="mitre", mitre_limit=10)
+        lines = _stripes(inner, 0.0, -1, lw, pitch * pf) if not inner.is_empty else Polygon()
+        d = U(frame, lines)
+        if region is not None:
+            # counters only: a face that spills out of the counter is left
+            # out whole rather than sliced along the hull
+            if f.intersection(region).area < 0.88 * f.area:
+                continue
+            d = d.intersection(region)
+        out.append(d)
+    detail = U(*out) if out else Polygon()
+    seam = Polygon()
+    if with_seam:
+        seam, seam_face = _ex_seam(g, geom, region, gap, lw)
+        if not seam_face.is_empty:
+            detail = U(detail.difference(seam_face.buffer(1.5 * lw)), seam_face)
+    detail = U(*[q for q in polys(detail) if q.area > lw * lw * 2])
+    return detail, seam
+
+
+def _ex_seam(g, geom, region, gap, lw):
+    """D's panel join, lined up with the extrusion: a hairline cut straight
+    across the topmost bar that shows an underside face, carried on down
+    that face as a line along the vector (from front edge to back edge)."""
+    H = g.H
+    vx, vy = ex_vec()
+    sw = EX["seam"] * H
+    cands = []
+    for p in polys(geom):
+        p = orient(p, 1.0)
+        for ring in [p.exterior] + list(p.interiors):
+            cs = list(ring.coords)
+            for a, b in zip(cs, cs[1:]):
+                if abs(a[1] - b[1]) > 0.5 or b[0] <= a[0]:
+                    continue                      # undersides (ink above) run left to right
+                xa, xb, y = a[0], b[0], a[1]
+                if xb - xa < 2.2 * H:
+                    continue
+                x = round(xa + 0.6 * (xb - xa))
+                probe = box(x - 1, y - 0.5 * abs(vy), x + 1, y - 2)
+                if region is not None and not probe.within(region.buffer(1)):
+                    continue
+                if probe.intersects(geom.buffer(-0.5)):
+                    continue
+                cands.append((y, x))
+    if not cands:
+        return Polygon(), Polygon()
+    y, x = max(cands)
+    # the cut: through the bar above the edge, only that bar
+    run = box(x - sw / 2, y - 1, x + sw / 2, y + 2.5 * H)
+    bar = [q for q in polys(geom.intersection(run)) if q.bounds[1] <= y + 1]
+    cut = U(*bar)
+    # the join on the underside face: a line along the vector
+    k = x + (y - gap)                           # x + y = k, the "\\" line through the edge point
+    face_line = _half(k + lw * 0.75, -1, True).difference(_half(k - lw * 0.75, -1, True))
+    face_line = face_line.intersection(box(x - 2, y + vy - 2, x + vx + 2, y - gap))
+    if region is not None:
+        face_line = face_line.intersection(region)
+    return cut, face_line
+
+
+# ==========================================================================
 # Build
 # ==========================================================================
 def finalize(geom):
@@ -2290,6 +2450,12 @@ def build_glyphs(weight, cond, hatched):
             elif mode == "detail":      # r3 D: counter hatch plus one engraved seam
                 h, sm = counter_hatch(g, geom, name, with_seams=True)
                 geom = U(geom, h).difference(sm)
+            elif mode in ("extrude-i", "extrude-ii"):   # r4: engraved extrusion
+                full = mode == "extrude-ii"
+                d, sm = extrude(g, geom, name, contain="full" if full else "counters")
+                geom = U(geom.difference(sm), d)
+                if full:
+                    out[name][1] += ex_vec()[0]        # faces stay inside the advance
             elif mode == "layer":       # r3: hatch only, for an overlay or COLR layer
                 geom = counter_hatch(g, geom, name)
             else:                       # r1/r2: stripes cut into the stroke
