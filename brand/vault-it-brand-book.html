@@ -1166,6 +1166,18 @@ footer .wm{font-size:26px;margin-bottom:10px}
         </ul>
       </div>
     </div>
+    <h3 style="margin-top:40px">Reduced motion, in full</h3>
+    <p style="color:var(--muted);max-width:62ch">With <code>prefers-reduced-motion: reduce</code> the app does this. The brand book follows the same rules.</p>
+    <div class="card tablewrap"><table>
+      <thead><tr><th>Part</th><th>Normal</th><th>Reduced</th></tr></thead>
+      <tbody>
+        <tr><td>House build</td><td>Course by course over 1800ms</td><td>Jumps to the end state</td></tr>
+        <tr><td>3D scenes</td><td>Auto orbit, rising sweep, ring ping</td><td>No orbit, no sweep, no ping. Drag still works</td></tr>
+        <tr><td>Pulse</td><td>Light breathes on the 2800ms beat</td><td>Frozen at its midpoint</td></tr>
+        <tr><td>Active tab</td><td>Icon breathes (<code>vi-tabglow</code>)</td><td>Outline stays, animation off</td></tr>
+        <tr><td>Transitions</td><td>240ms to 600ms</td><td>Effectively none</td></tr>
+        <tr><td>Tagline neon</td><td>Static stroke</td><td>Unchanged, nothing animates</td></tr>
+      </tbody></table></div>
   </div>
 </section>
 
