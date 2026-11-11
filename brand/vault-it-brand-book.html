@@ -384,6 +384,22 @@ footer .wm{font-size:26px;margin-bottom:10px}
 .depout{grid-column:1/-1;font-family:var(--font-mono);font-size:14px;color:var(--muted);letter-spacing:.04em}
 @media(min-width:760px){.depout{grid-column:auto;align-self:center}}
 .types{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+/* Components as the app draws them (cyberpunk-v2.css, nav.css): clipped corner cards, 4px buttons, outline tab. */
+.demo .vi-stat,.demo .vi-kpi,.demo .vi-debt,.demo .vi-price,.mode .vi-stat,.mode .vi-debt{border-radius:0;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.demo .vi-price{border-width:1px}
+.btn{border-radius:4px;font-size:11.5px}
+.btn-sm{font-size:11.5px}
+.vi-tabs{border-bottom:0}
+.vi-tabs a{border-bottom:0;border-radius:0;color:var(--muted)}
+.vi-tabs a.on{color:var(--text);border-bottom:0;background:rgb(var(--teal-rgb,68 192 185)/.09);box-shadow:inset 0 0 0 1px var(--tc,var(--teal)),0 0 14px -3px var(--tc,var(--teal))}
+[data-theme="light"] .vi-tabs a.on{box-shadow:inset 0 0 0 1px var(--tc,var(--teal))}
+.badge-usp,.badge-pro{font-family:var(--font-display);font-weight:700;font-size:10.5px;letter-spacing:.08em;padding:2px 6px;border:1px solid currentColor;margin-left:4px}
+.badge-usp{color:var(--gold)}.badge-pro{color:var(--orange)}
+.ft-demo{background:var(--surf2);border:1px solid var(--line);padding:12px 16px;display:grid;gap:8px;width:100%;color:var(--muted);font-size:12.5px}
+.ft-demo .ft-fca{color:var(--text);font-size:12.5px}
+.ft-demo small{font-size:10.5px;line-height:1.35}
+.lock-demo{position:relative;background:var(--surf2);border:1px solid var(--lockline);padding:22px;text-align:center;max-width:340px;width:100%;color:var(--text);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.lock-demo .lk{color:var(--brass);width:28px;height:28px}
 </style>
 </head>
 <body>
@@ -954,7 +970,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
           <nav class="vi-tabs" id="mbTabs" aria-label="Menu bar example"><a href="#components" style="--tc:var(--teal)" class="on"><span class="ic" data-ic="overview" data-col="teal" style="width:18px;height:18px"></span>Overview</a><a href="#components" style="--tc:var(--blue)"><span class="ic" data-ic="budget" data-col="blue" style="width:18px;height:18px"></span>Budget</a><a href="#components" style="--tc:var(--gold)"><span class="ic" data-ic="house-builder" data-col="gold" style="width:18px;height:18px"></span>House builder<span class="vi-usp">USP</span></a><a href="#components" style="--tc:var(--green)"><span class="ic" data-ic="assets" data-col="green" style="width:18px;height:18px"></span>Assets and liabilities</a><a href="#components" style="--tc:var(--red)"><span class="ic" data-ic="debt-tracker" data-col="red" style="width:18px;height:18px"></span>Debt tracker</a><a href="#components" style="--tc:var(--orange)"><span class="ic" data-ic="entrepreneur" data-col="orange" style="width:18px;height:18px"></span>Entrepreneur<span class="vi-pro">PRO</span></a><a href="#components" style="--tc:var(--brass)"><span class="ic" data-ic="trophy" data-col="brass" style="width:18px;height:18px"></span>Achievements</a><a href="#components" style="--tc:var(--purple)"><span class="ic" data-ic="connections" data-col="purple" style="width:18px;height:18px"></span>Connections</a></nav>
           <div class="vi-subs" id="mbSubs" role="group" aria-label="Sub-tab example"><button type="button" class="vi-sub on" style="--tc:var(--gold)"><span class="ic" data-ic="metals" data-col="gold" style="width:18px;height:18px"></span>Precious metals</button><button type="button" class="vi-sub" style="--tc:var(--teal)"><span class="ic" data-ic="crypto" data-col="teal" style="width:18px;height:18px"></span>Crypto</button><button type="button" class="vi-sub" style="--tc:var(--green)"><span class="ic" data-ic="cash" data-col="green" style="width:18px;height:18px"></span>Cash and savings</button><button type="button" class="vi-sub" style="--tc:var(--purple)"><span class="ic" data-ic="cube" data-col="purple" style="width:18px;height:18px"></span>Wealth inventory</button><button type="button" class="vi-sub" style="--tc:var(--green2)"><span class="ic" data-ic="candles" data-col="green2" style="width:18px;height:18px"></span>Stocks and funds</button><button type="button" class="vi-sub" style="--tc:var(--amber)"><span class="ic" data-ic="liabilities" data-col="amber" style="width:18px;height:18px"></span>Liabilities</button></div>
         </div>
-        <p style="color:var(--muted);font-size:14px;margin:10px 0 0;max-width:70ch">Each tab owns one colour. The icon, the underline and the glow all use it. The dot is gone: the icon now carries the colour. The active tab breathes on the 2.8 second beat. Sub-tabs follow the asset class colours.</p>
+        <p style="color:var(--muted);font-size:14px;margin:10px 0 0;max-width:70ch">Each tab owns one colour. The icon and a 1px outline both use it, with a soft glow in Night and a crisp line in Daylight. The dot is gone: the icon now carries the colour. The active tab breathes on the 2.8 second beat. Sub-tabs follow the asset class colours.</p>
       </div>
 
       <div class="demo-wrap">
@@ -1041,10 +1057,51 @@ footer .wm{font-size:26px;margin-bottom:10px}
           <div class="vi-price">
             <b>Pioneer</b>
             <div class="p">£5.99<small>/mo</small></div>
-            <small style="color:#8A9696">or £59.99 a year. Lock in this rate for good.</small>
+            <small style="color:#8A9696">or £49.99 a year.</small>
             <ul><li>Unlimited debts and assets</li><li>Precious metals at live spot</li><li>House builder with projections</li></ul>
             <button class="btn btn-primary" style="width:100%">Get Pioneer</button>
           </div>
+        </div>
+      </div>
+
+      <div class="demo-wrap">
+        <div class="demo-bar"><h3>Founding Member card</h3><button class="btn btn-ghost btn-sm" data-copy>Copy code</button></div>
+        <div class="demo">
+          <div class="vi-price">
+            <b>Founding Member</b>
+            <div class="p">£149<small> once</small></div>
+            <small style="color:#8A9696">Lifetime access, sold through Stripe only.</small>
+            <ul><li>One payment, no renewal</li></ul>
+            <button class="btn btn-primary" style="width:100%">Become a Founding Member</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-wrap">
+        <div class="demo-bar"><h3>Tab badges</h3><button class="btn btn-ghost btn-sm" data-copy>Copy code</button></div>
+        <div class="demo">
+          <span class="mono" style="display:inline-flex;align-items:center">House builder <span class="badge-usp">USP</span></span>
+          <span class="mono" style="display:inline-flex;align-items:center">Entrepreneur <span class="badge-pro">PRO</span></span>
+        </div>
+        <p style="color:var(--muted);font-size:14px;margin:10px 0 0;max-width:70ch">Syne 700, 10.5px, the type floor. The tab bar is icon-only on phones and tablets (compact) and shows labels on wide screens. House builder is only highlighted when it is the selected tab.</p>
+      </div>
+
+      <div class="demo-wrap">
+        <div class="demo-bar"><h3>Footer and disclaimer</h3><button class="btn btn-ghost btn-sm" data-copy>Copy code</button></div>
+        <div class="demo" style="display:block">
+          <div class="ft-demo">
+            <span class="ft-fca">Not regulated by the FCA. Not financial advice.</span>
+            <span>© 2026 PT Live Design. All rights reserved. Privacy notice</span>
+            <small>Vault-It helps you track and plan your money. Forecasts, dates and values are estimates from what you enter and public prices, and may be wrong. Speak to a regulated adviser before big money decisions.</small>
+          </div>
+        </div>
+        <p style="color:var(--muted);font-size:14px;margin:10px 0 0;max-width:70ch">One line, always visible: the FCA line never folds away. Copyright and the estimates note sit behind the Less and More fold. The wording must match what the app does (see docs/BETA_RUNBOOK.md).</p>
+      </div>
+
+      <div class="demo-wrap">
+        <div class="demo-bar"><h3>Pro lock</h3><button class="btn btn-ghost btn-sm" data-copy>Copy code</button></div>
+        <div class="demo">
+          <div class="lock-demo"><span class="ic" data-ic="lock" data-col="brass" style="width:28px;height:28px;display:inline-block"></span><p style="margin:8px 0 14px"><b>Level 3 and Your own design</b><br><span style="color:var(--muted);font-size:13px">Locked under Pro. Levels 1 and 2 stay open.</span></p><button class="btn btn-primary btn-sm">See Pioneer</button></div>
         </div>
       </div>
     </div>
