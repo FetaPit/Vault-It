@@ -2183,7 +2183,7 @@ def _panel(g, C, geom, edge, kind, P, side=None, one_wall=False, closed=False):
     return U(lines, hair), seam
 
 
-def counter_hatch(g, geom, name=None, params=None, with_seams=False):
+def counter_hatch(g, geom, name=None, params=None, with_seams=False, info=None):
     """Elons-style counter hatch for one glyph: the detail geometry only.
 
     Union it with the glyph for a one-colour font, or keep it apart for a
@@ -2232,6 +2232,8 @@ def counter_hatch(g, geom, name=None, params=None, with_seams=False):
         p = _panel(g, counters[ci], geom, edge, kind, P, side, ov.get("one_wall", False), closed)
         if p is not None and not p[0].is_empty:
             out.append(p)
+            if info is not None:
+                info.setdefault("counters", []).append(counters[ci])
     if with_seams:
         hs = [o[0] for o in out]
         ss = [o[1] for o in out if not o[1].is_empty][:1]   # one seam per glyph: restraint
@@ -2265,11 +2267,13 @@ EX = dict(
     pitch=0.27,          # x H: line pitch (square to the lines) on right-facing faces
     dark=0.70,           # bottom-facing faces: pitch factor (denser, in shadow)
     seam=0.06,           # x H: engraved seam (panel join) width
+    min_dot=0.3,         # faces seen nearly edge-on (a sliver that reads as a
+                         # stray line, e.g. the inner arms of W) are left out
 )
 
 
-def ex_vec():
-    d = EX_DEPTH * WEIGHTS["Bold"]["S"] / math.sqrt(2)
+def ex_vec(depth=None):
+    d = (EX_DEPTH if depth is None else depth) * WEIGHTS["Bold"]["S"] / math.sqrt(2)
     return round(d), -round(d)
 
 
@@ -2286,9 +2290,9 @@ def _sweep(poly_or_multi, vx, vy):
     return U(*parts)
 
 
-def extrusion_faces(g, geom):
+def extrusion_faces(g, geom, depth=None):
     """Visible side faces of the extruded glyph: [(face polygon, normal)]."""
-    vx, vy = ex_vec()
+    vx, vy = ex_vec(depth)
     L = math.hypot(vx, vy)
     faces = []
     for p in polys(geom):
@@ -2301,7 +2305,7 @@ def extrusion_faces(g, geom):
                 if el < 1:
                     continue
                 nx, ny = dy / el, -dx / el            # outward normal
-                if (nx * vx + ny * vy) / L < 0.05:    # faces away, or runs with v
+                if (nx * vx + ny * vy) / L < EX["min_dot"]:   # faces away, or too edge-on
                     continue
                 F = Polygon([a, b, (b[0] + vx, b[1] + vy), (a[0] + vx, a[1] + vy)]).buffer(0)
                 blk = geom.intersection(F)
@@ -2313,7 +2317,7 @@ def extrusion_faces(g, geom):
     return faces
 
 
-def extrude(g, geom, name=None, contain="counters", with_seam=True):
+def extrude(g, geom, name=None, contain="counters", with_seam=True, depth=None, exclude=None):
     """Engraved extrusion for one glyph. Returns (detail, seam_cut).
 
     contain='counters': faces only inside counters and open bays (inside the
@@ -2323,13 +2327,13 @@ def extrude(g, geom, name=None, contain="counters", with_seam=True):
         return Polygon(), Polygon()
     H = g.H
     gap, lw, pitch = EX["gap"] * H, EX["lw"] * H, EX["pitch"] * H
-    vx, vy = ex_vec()
+    vx, vy = ex_vec(depth)
     keepout = geom.buffer(gap, join_style="mitre", mitre_limit=10)
     region = None
     if contain == "counters":
         region = geom.convex_hull.difference(geom)
     out = []
-    for vis, (nx, ny) in extrusion_faces(g, geom):
+    for vis, (nx, ny) in extrusion_faces(g, geom, depth):
         f = vis.difference(keepout)
         f = U(*[q for q in polys(f) if q.area > 2 * lw * lw])
         if f.is_empty:
@@ -2348,6 +2352,11 @@ def extrude(g, geom, name=None, contain="counters", with_seam=True):
             if f.intersection(region).area < 0.88 * f.area:
                 continue
             d = d.intersection(region)
+        if exclude is not None and not exclude.is_empty:
+            # leave out faces whose counter already carries an engraved panel
+            if f.intersection(exclude).area > 0.5 * f.area:
+                continue
+            d = d.difference(exclude)
         out.append(d)
     detail = U(*out) if out else Polygon()
     seam = Polygon()
@@ -2398,6 +2407,132 @@ def _ex_seam(g, geom, region, gap, lw):
     if region is not None:
         face_line = face_line.intersection(region)
     return cut, face_line
+
+
+# ==========================================================================
+# Cyber detail (r5, behind a flag): D pushed further, for the display cut
+# ==========================================================================
+# A fixed grammar so the alphabet reads as one system, not random damage:
+#
+#   D+   1 inside   up to two engraved bevel panels in the counters (D)
+#        2 inside   one seam: the panel's 45 degree end carried through the bar
+#        3 outside  extrusion faces on the down-right edges, outside the
+#                   panelled counters (from r4 ii), depth 0.4 stem
+#        4 form     steps on G e a S 3 and the raised t foot (C)
+#   D++  adds
+#        5 inside   one vent: two short chamfered slots in the longest stem
+#        6 outside  one HUD mark: a detached hairline bracket off the big
+#                   top-left chamfer (a corner tick where that corner is square)
+#        7 outside  deeper extrusion, 0.55 stem
+CY = {
+    "dplus": dict(depth=0.40, vent=False, hud=False),
+    "dplusplus": dict(depth=0.55, vent=True, hud=True),
+}
+CY_PANEL = dict(lw=0.045, pitch=0.17)     # finer, more open than r3
+
+
+def _vent(g, geom):
+    """Two stacked slots in the longest straight vertical stem."""
+    S, H = g.S, g.H
+    x0, y0, x1, y1 = geom.bounds
+    best = None
+    for x in np.arange(x0 + 0.2 * S, x1 - 0.2 * S, 8):
+        seg = LineString([(x, y0 - 5), (x, y1 + 5)]).intersection(geom)
+        for ln in (getattr(seg, "geoms", None) or [seg]):
+            if ln.is_empty or ln.length < 2.6 * S:
+                continue
+            ya, yb = ln.bounds[1], ln.bounds[3]
+            ym = (ya + yb) / 2
+            hz = LineString([(x0 - 5, ym), (x1 + 5, ym)]).intersection(geom)
+            for h in (getattr(hz, "geoms", None) or [hz]):
+                if h.is_empty or not (h.bounds[0] - 1 <= x <= h.bounds[2] + 1):
+                    continue
+                w = h.bounds[2] - h.bounds[0]
+                if 0.8 * S <= w <= 1.35 * S:
+                    xc = (h.bounds[0] + h.bounds[2]) / 2
+                    key = (round(yb - ya), -xc)
+                    if best is None or key > best[0]:
+                        best = (key, xc, ya, yb, w)
+    if best is None:
+        return Polygon()
+    _, xc, ya, yb, w = best
+    sw = round(0.2 * w)
+    sh = round(0.42 * S)
+    gp = round(0.2 * S)
+    ym = ya + 0.56 * (yb - ya)
+    c = round(0.45 * sw)
+    out = []
+    for k in (0, 1):
+        yb0 = ym + (k - 1) * (sh + gp) + gp / 2
+        out.append(octa(xc - sw / 2, yb0, xc + sw / 2, yb0 + sh, (0, c, 0, c)))
+    v = U(*out)
+    # only where the slot sits wholly in ink, with a margin
+    return v if v.within(geom.buffer(-0.18 * w)) else Polygon()
+
+
+def _hud(g, geom):
+    """A detached hairline bracket off the top-left of the glyph."""
+    H = g.H
+    off, lw, tk = 0.17 * H, 0.05 * H, 0.16 * H
+    x0, y0, x1, y1 = geom.bounds
+    if x0 < off + lw + 12:                  # no room inside the left side bearing
+        return Polygon()
+    # only on a full-size letter whose top is its main body (not the dot of
+    # i or j, not a comma), or the bracket reads as a stray fragment
+    top_piece = max(polys(geom), key=lambda p: p.bounds[3])
+    if y1 - y0 < 0.85 * g.X or top_piece.area < 0.4 * geom.area:
+        return Polygon()
+    # big top-left chamfer: an edge with outward normal up-left
+    best = None
+    for p in polys(geom):
+        p = orient(p, 1.0)
+        cs = list(p.exterior.coords)
+        for a, b in zip(cs, cs[1:]):
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            L = math.hypot(dx, dy)
+            if L < 0.5 * g.S:
+                continue
+            nx, ny = dy / L, -dx / L
+            if nx < -0.6 and ny > 0.6:
+                if best is None or L > best[0]:
+                    best = (L, a, b, nx, ny)
+    if best is not None:
+        L, a, b, nx, ny = best
+        ox, oy = nx * off, ny * off
+        t0, t1 = 0.15, 0.85
+        pa = (a[0] + (b[0] - a[0]) * t0 + ox, a[1] + (b[1] - a[1]) * t0 + oy)
+        pb = (a[0] + (b[0] - a[0]) * t1 + ox, a[1] + (b[1] - a[1]) * t1 + oy)
+        # bracket: the rule plus two ticks turning back towards the letter
+        ta = (pa[0] - nx * tk, pa[1] - ny * tk)
+        tb = (pb[0] - nx * tk, pb[1] - ny * tk)
+        br = LineString([ta, pa, pb, tb]).buffer(lw / 2, cap_style="flat", join_style="mitre")
+    else:
+        # square top-left corner: an L tick
+        top = max(y for p in polys(geom) for _, y in p.exterior.coords)
+        xl = x0
+        arm = 0.45 * g.S
+        br = LineString([(xl - off, top - arm), (xl - off, top + off), (xl - off + arm, top + off)]).buffer(
+            lw / 2, cap_style="flat", join_style="mitre")
+    # never touch the letter
+    return br.difference(geom.buffer(0.1 * H))
+
+
+def cyber(g, geom, name=None, level="dplus"):
+    """D+ / D++ detail for one glyph. Returns (add, cut, advance_extra)."""
+    if geom.is_empty:
+        return Polygon(), Polygon(), 0
+    cfg = CY[level]
+    info = {}
+    panels, seam = counter_hatch(g, geom, name, params=CY_PANEL, with_seams=True, info=info)
+    used = U(*[c.buffer(1) for c in info.get("counters", [])]) if info.get("counters") else None
+    faces, _ = extrude(g, geom, name, contain="full", with_seam=False, depth=cfg["depth"], exclude=used)
+    cut = seam
+    add = [panels, faces]
+    if cfg["vent"]:
+        cut = U(cut, _vent(g, geom))
+    if cfg["hud"]:
+        add.append(_hud(g, geom))
+    return U(*add), cut, ex_vec(cfg["depth"])[0]
 
 
 # ==========================================================================
@@ -2456,6 +2591,10 @@ def build_glyphs(weight, cond, hatched):
                 geom = U(geom.difference(sm), d)
                 if full:
                     out[name][1] += ex_vec()[0]        # faces stay inside the advance
+            elif mode in ("dplus", "dplusplus"):     # r5: cyber display detail
+                a, c, extra = cyber(g, geom, name, mode)
+                geom = U(geom.difference(c), a)
+                out[name][1] += extra
             elif mode == "layer":       # r3: hatch only, for an overlay or COLR layer
                 geom = counter_hatch(g, geom, name)
             else:                       # r1/r2: stripes cut into the stroke
