@@ -57,18 +57,36 @@
 }
 
 @font-face {
-  font-family: "Vault-form Hatch";
-  src: url("woff2/vault-form-hatch-bold.woff2") format("woff2"),
-       url("ttf/vault-form-hatch-bold.ttf") format("truetype");
+  font-family: "Vault-form Heading";
+  src: url("woff2/vault-form-heading-bold.woff2") format("woff2"),
+       url("ttf/vault-form-heading-bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Vault-form Condensed Hatch";
-  src: url("woff2/vault-form-condensed-hatch-bold.woff2") format("woff2"),
-       url("ttf/vault-form-condensed-hatch-bold.ttf") format("truetype");
+  font-family: "Vault-form Heading Condensed";
+  src: url("woff2/vault-form-heading-condensed-bold.woff2") format("woff2"),
+       url("ttf/vault-form-heading-condensed-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vault-form Hero";
+  src: url("woff2/vault-form-hero-bold.woff2") format("woff2"),
+       url("ttf/vault-form-hero-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vault-form Hero Condensed";
+  src: url("woff2/vault-form-hero-condensed-bold.woff2") format("woff2"),
+       url("ttf/vault-form-hero-condensed-bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -80,8 +98,12 @@
   --font-vf-condensed: "Vault-form Condensed", "Vault-form", "Arial Narrow", "Segoe UI", system-ui, sans-serif;
   --font-vf-figures: "Vault-form", "Share Tech Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --font-vf-label: "Vault-form Condensed", "Share Tech Mono", ui-monospace, monospace;
-  --font-vf-hatch: "Vault-form Hatch", "Vault-form", system-ui, sans-serif;
-  --font-vf-hatch-condensed: "Vault-form Condensed Hatch", "Vault-form Condensed", "Vault-form", system-ui, sans-serif;
+  /* Display cuts. Heading (D+) from 48 px, Hero (D++) from 96 px; below those
+     sizes use plain Bold. Each falls back to the plain face. */
+  --font-vf-heading: "Vault-form Heading", "Vault-form", "Segoe UI", system-ui, sans-serif;
+  --font-vf-heading-condensed: "Vault-form Heading Condensed", "Vault-form Condensed", "Vault-form", system-ui, sans-serif;
+  --font-vf-hero: "Vault-form Hero", "Vault-form Heading", "Vault-form", "Segoe UI", system-ui, sans-serif;
+  --font-vf-hero-condensed: "Vault-form Hero Condensed", "Vault-form Heading Condensed", "Vault-form Condensed", "Vault-form", system-ui, sans-serif;
 }
 
 /* Helpers. Figures are tabular by default; .vf-pnum switches to proportional. */
@@ -93,4 +115,5 @@
    than about -0.05em in total or words start to fuse. */
 .vf-heading { font-family: var(--font-vf-display); font-weight: 700; line-height: 1.15; }
 .vf-heading-lg { letter-spacing: -0.01em; word-spacing: -0.03em; } /* add at 40 px and up */
-.vf-hatch { font-family: var(--font-vf-hatch); font-weight: 700; } /* 32 px and up only */
+.vf-cut-heading { font-family: var(--font-vf-heading); font-weight: 700; } /* 48 px and up only */
+.vf-cut-hero { font-family: var(--font-vf-hero); font-weight: 700; }       /* 96 px and up only */

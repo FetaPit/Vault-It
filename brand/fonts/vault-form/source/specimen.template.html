@@ -55,7 +55,7 @@
   .tabs .on { color: var(--teal); }
   .day .tabs .on { color: var(--deep-teal); }
   .nw-label { font-family: var(--font-vf-condensed); text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; color: var(--night-dim); }
-  .nw { font-family: var(--font-vf-hatch); font-weight: 700; font-size: clamp(48px, 13vw, 120px); line-height: 1; margin: 6px 0 16px; color: var(--gold); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .nw { font-family: var(--font-vf-heading); font-weight: 700; font-size: clamp(48px, 13vw, 120px); line-height: 1; margin: 6px 0 16px; color: var(--gold); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
   .day .nw { color: var(--deep-teal); }
   .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
   .stat { border-top: 1px solid #22302F; padding-top: 10px; }
@@ -96,11 +96,13 @@
   .fall .px { flex: 0 0 44px; font-size: 11px; color: var(--night-dim); font-family: var(--body); text-align: right; }
   .fall .t { min-width: 0; overflow-wrap: anywhere; line-height: 1.2; }
 
-  /* hatch */
+  /* display cuts: Heading (D+) from 48 px, Hero (D++) from 96 px */
   .scan { background-color: var(--night); background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(68,192,185,.05) 2px, rgba(68,192,185,.05) 4px); }
   .grid { background-color: var(--paper); background-image: repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(0,127,123,.10) 19px, rgba(0,127,123,.10) 20px), repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(0,127,123,.10) 19px, rgba(0,127,123,.10) 20px); }
-  .hatch .h { font-family: var(--font-vf-hatch); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
-  .hatch .hc { font-family: var(--font-vf-hatch-condensed); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
+  .hatch .h { font-family: var(--font-vf-heading); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
+  .hatch .hc { font-family: var(--font-vf-heading-condensed); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
+  .hatch .hero { font-family: var(--font-vf-hero); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
+  .hatch .heroc { font-family: var(--font-vf-hero-condensed); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
 
   ul.rules { padding-left: 18px; margin: 0; max-width: 70ch; }
   ul.rules li { margin-bottom: 6px; }
@@ -112,7 +114,7 @@
 <header class="night">
   <div class="wrap">
     <div class="brand">__FAMILY__ <b>/</b> Vault-It brand typeface</div>
-    <div class="meta">Version __VERSION__. PT Live Design. SIL Open Font License 1.1. Six styles plus two Hatch display cuts.</div>
+    <div class="meta">Version __VERSION__. PT Live Design. SIL Open Font License 1.1. Six text styles plus four display cuts (Heading and Hero).</div>
   </div>
 </header>
 
@@ -159,8 +161,10 @@
       <div class="style"><div class="n">__FAMILY__ Condensed Light 300</div><div class="s vfc w300">Get out of the red and into your home.</div></div>
       <div class="style"><div class="n">__FAMILY__ Condensed Regular 400</div><div class="s vfc w400">Get out of the red and into your home.</div></div>
       <div class="style"><div class="n">__FAMILY__ Condensed Bold 700</div><div class="s vfc w700">Get out of the red and into your home.</div></div>
-      <div class="style"><div class="n">__FAMILY__ Hatch Bold 700 (display, 32 px and up)</div><div class="s" style="font-family: var(--font-vf-hatch); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
-      <div class="style"><div class="n">__FAMILY__ Condensed Hatch Bold 700 (display, 32 px and up)</div><div class="s" style="font-family: var(--font-vf-hatch-condensed); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
+      <div class="style"><div class="n">__FAMILY__ Heading Bold 700 (display, 48 px and up)</div><div class="s" style="font-family: var(--font-vf-heading); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
+      <div class="style"><div class="n">__FAMILY__ Heading Condensed Bold 700 (display, 48 px and up)</div><div class="s" style="font-family: var(--font-vf-heading-condensed); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
+      <div class="style"><div class="n">__FAMILY__ Hero Bold 700 (hero, 96 px and up)</div><div class="s" style="font-family: var(--font-vf-hero); font-weight: 700; font-size: 96px; overflow-wrap: anywhere;">Home</div></div>
+      <div class="style"><div class="n">__FAMILY__ Hero Condensed Bold 700 (hero, 96 px and up)</div><div class="s" style="font-family: var(--font-vf-hero-condensed); font-weight: 700; font-size: 96px; overflow-wrap: anywhere;">Home</div></div>
     </div>
   </div>
 </section>
@@ -228,21 +232,19 @@
 
 <section class="night scan hatch">
   <div class="wrap">
-    <p class="tag">Hatch cut on Night scanlines</p>
-    <p class="h" style="font-size: 24px;">At 24 px the hatch greys the lower half but still reads as Bold.</p>
+    <p class="tag">Heading and Hero cuts on Night scanlines</p>
     <p class="h" style="font-size: 48px; color: var(--teal);">Into your home</p>
     <p class="h" style="font-size: clamp(48px, 15vw, 72px); color: var(--gold);">£48,215</p>
-    <p class="hc" style="font-size: clamp(64px, 24vw, 120px);">VAULT</p>
+    <p class="heroc" style="font-size: 120px;">VAULT</p>
   </div>
 </section>
 
 <section class="day grid hatch">
   <div class="wrap">
-    <p class="tag">Hatch cut on the Daylight blueprint grid</p>
-    <p class="h" style="font-size: 24px;">At 24 px the hatch greys the lower half but still reads as Bold.</p>
+    <p class="tag">Heading and Hero cuts on the Daylight blueprint grid</p>
     <p class="h" style="font-size: 48px; color: var(--deep-teal);">Into your home</p>
     <p class="h" style="font-size: clamp(48px, 15vw, 72px);">£48,215</p>
-    <p class="hc" style="font-size: clamp(64px, 24vw, 120px); color: var(--deep-teal);">VAULT</p>
+    <p class="heroc" style="font-size: 120px; color: var(--deep-teal);">VAULT</p>
   </div>
 </section>
 
@@ -302,7 +304,7 @@
     <ul class="rules">
       <li>Use for display headings, the net worth hero, stat-strip figures, tab labels at 12 px and up, deck and comms headlines.</li>
       <li>Keep DM Sans for body copy, the FCA disclaimer line, form inputs and dense tables of text.</li>
-      <li>Hatch cuts only at 32 px and up: the hero number, one headline per screen, the tagline on decks. Never in tables, buttons or labels.</li>
+      <li>Display cuts only at size: Heading from 48 px (section headings, deck titles), Hero from 96 px (one hero headline per page). Below those sizes use plain Bold. Never in tables, buttons or labels.</li>
       <li>The wordmark and brick hyphen stay as artwork. Do not reset the logo in this font.</li>
       <li>Use the minus sign (−) for debt so "−£300" reads as money owed.</li>
     </ul>

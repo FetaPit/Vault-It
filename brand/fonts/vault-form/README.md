@@ -14,8 +14,10 @@ Version 1.000. Licensed under the SIL Open Font License 1.1 (see `OFL.txt`), wit
 | Vault-form Condensed | Light | 300 | Condensed (about 78%) | `vault-form-condensed-light` |
 | Vault-form Condensed | Regular | 400 | Condensed | `vault-form-condensed-regular` |
 | Vault-form Condensed | Bold | 700 | Condensed | `vault-form-condensed-bold` |
-| Vault-form Hatch | Bold | 700 | Normal | `vault-form-hatch-bold` |
-| Vault-form Condensed Hatch | Bold | 700 | Condensed | `vault-form-condensed-hatch-bold` |
+| Vault-form Heading | Bold | 700 | Normal | `vault-form-heading-bold` |
+| Vault-form Heading Condensed | Bold | 700 | Condensed | `vault-form-heading-condensed-bold` |
+| Vault-form Hero | Bold | 700 | Normal | `vault-form-hero-bold` |
+| Vault-form Hero Condensed | Bold | 700 | Condensed | `vault-form-hero-condensed-bold` |
 
 Each style ships as `otf/` (CFF outlines, best for design apps), `ttf/` (TrueType, autohinted, best for Windows and Office) and `woff2/` (web). The OTF and TTF outlines are the same points.
 
@@ -23,11 +25,11 @@ Regular and Bold are style-linked inside each family, so the Bold button and CSS
 
 ## Install on a computer
 
-**macOS.** Double-click each `.otf` file in `otf/` and press Install Font in Font Book. Or select all eight and drag them into Font Book.
+**macOS.** Double-click each `.otf` file in `otf/` and press Install Font in Font Book. Or select all ten and drag them into Font Book.
 
 **Windows 10 and 11.** Select the `.ttf` files in `ttf/`, right-click and choose Install for all users (or Install). Restart Office or Figma desktop so the new fonts appear.
 
-**Figma.** On the desktop app, install the files as above. In the browser, install the Figma font helper first. The families appear as Vault-form, Vault-form Condensed, Vault-form Hatch and Vault-form Condensed Hatch.
+**Figma.** On the desktop app, install the files as above. In the browser, install the Figma font helper first. The families appear as Vault-form, Vault-form Condensed, Vault-form Heading, Vault-form Heading Condensed, Vault-form Hero and Vault-form Hero Condensed.
 
 ## Use on the web
 
@@ -44,7 +46,9 @@ h1, h2, h3     { font-family: var(--font-vf-display); font-weight: 700; }
 h1, .display   { letter-spacing: -0.01em; word-spacing: -0.05em; } /* 40 px and up; go no tighter */
 .hero-number   { font-family: var(--font-vf-figures); font-weight: 700; font-variant-numeric: tabular-nums; }
 .tab-label     { font-family: var(--font-vf-label); text-transform: uppercase; letter-spacing: 0.06em; }
-.deck-headline { font-family: var(--font-vf-hatch); font-weight: 700; font-size: clamp(48px, 8vw, 120px); }
+.section-title { font-family: var(--font-vf-display); font-weight: 700; }  /* plain Bold below 48 px */
+@media (min-width: 900px) { .section-title { font-family: var(--font-vf-heading); font-size: 56px; } } /* Heading only once it renders at 48 px+ */
+.hero-title    { font-family: var(--font-vf-hero); font-weight: 700; font-size: 120px; }  /* Hero only at 96 px+ */
 body           { font-family: "DM Sans", system-ui, sans-serif; } /* body copy stays DM Sans */
 ```
 
@@ -58,7 +62,11 @@ Use for: display headings (it replaces Syne), the net worth hero, stat-strip fig
 
 Do not use for: long body copy, the FCA disclaimer line, form inputs, dense tables of text. DM Sans stays the body face. Share Tech Mono stays for labels under 12 px.
 
-Hatch cuts: only at 32 px and up, for the hero number, one headline per screen, or the tagline on decks. Never in tables, buttons or labels. The hatch is cut out of the letter, so it takes whatever colour or ground sits behind it. Below 32 px the lower half turns slightly grey but still reads as Bold; the stripes show clearly from 48 px.
+Display cuts (owner, 11 Nov 2026: "D++ for hero, D+ for headings"). Both are Bold only, slightly wider than the text Bold, with small steps on G e a S 3 and a raised t foot. Never in body copy, tables, buttons, labels or the app UI.
+
+- **Vault-form Heading (D+): 48 px and up.** Section headings, deck titles, comms headlines. Engraved bevel panels in the counters, one 45 degree seam, and hatched extrusion faces down-right.
+- **Vault-form Hero (D++): 96 px and up.** One hero headline per page or slide. Adds a vent (two small slots in the main stem), a hairline HUD bracket off the top-left, and a deeper extrusion.
+- Below the floor, use plain Vault-form Bold. Size the switch to the rendered size with media queries or `clamp()`, so a Hero headline that shrinks on a phone drops to Heading (48 px and up) or to plain Bold. The detail is drawn into the letters in the text colour, so one colour works on any ground. The extrusion widens each letter slightly to the right; tracking is built in, so do not tighten these cuts.
 
 The Vault-It wordmark and brick hyphen stay as artwork. Do not reset the logo in this font.
 

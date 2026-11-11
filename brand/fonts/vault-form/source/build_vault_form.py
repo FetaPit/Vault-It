@@ -65,16 +65,20 @@ WEIGHTS = {
 }
 
 STYLES = [
-    # key,                weight,   cond,  hatch
+    # key,                weight,   cond,  display cut (False = plain text face)
     ("Light",             "Light",   False, False),
     ("Regular",           "Regular", False, False),
     ("Bold",              "Bold",    False, False),
     ("CondensedLight",    "Light",   True,  False),
     ("CondensedRegular",  "Regular", True,  False),
     ("CondensedBold",     "Bold",    True,  False),
-    ("HatchBold",         "Bold",    False, True),
-    ("CondensedHatchBold", "Bold",   True,  True),
+    # display cuts (r5, owner 11 Nov 2026: "D++ for hero, D+ for headings")
+    ("HeadingBold",          "Bold", False, "dplus"),       # D+,  48 px and up
+    ("HeadingCondensedBold", "Bold", True,  "dplus"),
+    ("HeroBold",             "Bold", False, "dplusplus"),   # D++, 96 px and up
+    ("HeroCondensedBold",    "Bold", True,  "dplusplus"),
 ]
+DISPLAY = {"dplus": "Heading", "dplusplus": "Hero"}
 
 # Chamfer signature (brief 1.2): big 45 degree chamfers top-left and
 # bottom-right, small ones top-right and bottom-left, square where a stem runs
@@ -2569,6 +2573,8 @@ def draw(pen, cs):
 
 def build_glyphs(weight, cond, hatched):
     g = G(weight, cond)
+    if hatched in DISPLAY:
+        g.character = True          # the display cuts carry the C letterforms
     out = {}
     for name in ORDER:
         geom, W, l, r = get(g, name)
@@ -2756,6 +2762,14 @@ def fea_text(g, names, pairs):
 
 def style_names(key, weight, cond, hatched):
     sub = weight
+    if hatched in DISPLAY:
+        cut = DISPLAY[hatched]
+        fam_typo = f"{FAMILY} {cut}" + (" Condensed" if cond else "")
+        ps_fam = f"{PS_FAMILY}{cut}" + ("Condensed" if cond else "")
+        fslug = f"{SLUG}-{cut.lower()}-" + ("condensed-" if cond else "") + weight.lower()
+        full = f"{fam_typo} {weight}"
+        return dict(familyName=fam_typo, styleName=weight, typographicFamily=fam_typo, typographicSubfamily=sub,
+                    fullName=full, psName=f"{ps_fam}-{weight}", file=fslug)
     if hatched:
         fam_typo = f"{FAMILY} Condensed Hatch" if cond else f"{FAMILY} Hatch"
         ps_fam = f"{PS_FAMILY}CondensedHatch" if cond else f"{PS_FAMILY}Hatch"
@@ -3008,8 +3022,12 @@ def write_css():
             f'  --font-vf-condensed: "{F} Condensed", "{F}", "Arial Narrow", "Segoe UI", system-ui, sans-serif;',
             f'  --font-vf-figures: "{F}", "Share Tech Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;',
             f'  --font-vf-label: "{F} Condensed", "Share Tech Mono", ui-monospace, monospace;',
-            f'  --font-vf-hatch: "{F} Hatch", "{F}", system-ui, sans-serif;',
-            f'  --font-vf-hatch-condensed: "{F} Condensed Hatch", "{F} Condensed", "{F}", system-ui, sans-serif;',
+            "  /* Display cuts. Heading (D+) from 48 px, Hero (D++) from 96 px; below those",
+            "     sizes use plain Bold. Each falls back to the plain face. */",
+            f'  --font-vf-heading: "{F} Heading", "{F}", "Segoe UI", system-ui, sans-serif;',
+            f'  --font-vf-heading-condensed: "{F} Heading Condensed", "{F} Condensed", "{F}", system-ui, sans-serif;',
+            f'  --font-vf-hero: "{F} Hero", "{F} Heading", "{F}", "Segoe UI", system-ui, sans-serif;',
+            f'  --font-vf-hero-condensed: "{F} Hero Condensed", "{F} Heading Condensed", "{F} Condensed", "{F}", system-ui, sans-serif;',
             "}", "",
             "/* Helpers. Figures are tabular by default; .vf-pnum switches to proportional. */",
             ".vf-display { font-family: var(--font-vf-display); font-weight: 700; }",
@@ -3020,7 +3038,8 @@ def write_css():
             "   than about -0.05em in total or words start to fuse. */",
             ".vf-heading { font-family: var(--font-vf-display); font-weight: 700; line-height: 1.15; }",
             ".vf-heading-lg { letter-spacing: -0.01em; word-spacing: -0.03em; } /* add at 40 px and up */",
-            ".vf-hatch { font-family: var(--font-vf-hatch); font-weight: 700; } /* 32 px and up only */",
+            ".vf-cut-heading { font-family: var(--font-vf-heading); font-weight: 700; } /* 48 px and up only */",
+            ".vf-cut-hero { font-family: var(--font-vf-hero); font-weight: 700; }       /* 96 px and up only */",
             ""]
     (ROOT / f"{SLUG}.css").write_text("\n".join(out))
 
