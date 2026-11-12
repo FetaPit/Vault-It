@@ -6,6 +6,8 @@
 //  3. each icon renders with a real size (not empty) at 390 and 1100, and the colour code still comes from the button
 //  4. the active tile has the bevel; reduced motion still stops the active glow
 //  5. no sideways scroll, no page errors
+//  Round 2 (owner, 12 Nov): "Rotate them more to the left showing more depth": each symbol is drawn turned (a v3-turn group whose
+//  matrix narrows the front and lifts it towards the right), and nothing spills past the 24 box
 require('./lib/vi');
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -34,7 +36,9 @@ const TAB = { overview: 'overview', budget: 'budget', house: 'house-builder', as
         if (sym && !out.syms[id]) out.syms[id] = {
           tag: sym.tagName.toLowerCase(), vb: sym.getAttribute('viewBox'),
           shadow: !!sym.querySelector('.v3-sh'), side: !!sym.querySelector('.v3-sd'), face: !!sym.querySelector('.v3-fc'), hi: !!sym.querySelector('.v3-hi'),
-          current: /currentColor/.test(sym.innerHTML), n: sym.querySelectorAll('path,rect,circle,ellipse,polygon,polyline,line').length };
+          current: /currentColor/.test(sym.innerHTML), n: sym.querySelectorAll('path,rect,circle,ellipse,polygon,polyline,line').length,
+          turn: (sym.querySelector('.v3-turn') || { getAttribute: () => '' }).getAttribute('transform') || '',
+          bb: (() => { const ns = 'http://www.w3.org/2000/svg', t = document.createElementNS(ns, 'svg'), u = document.createElementNS(ns, 'use'); t.setAttribute('viewBox', '0 0 24 24'); t.style.cssText = 'position:absolute;width:24px;height:24px;left:0;top:0'; u.setAttribute('href', '#' + id); t.appendChild(u); document.body.appendChild(t); const b = u.getBBox(); t.remove(); return [b.x, b.y, b.x + b.width, b.y + b.height].map(v => Math.round(v * 10) / 10); })() };
       };
       Object.keys(SUB).forEach(k => look('#assets-page .subtab-btn[data-sub="' + k + '"]', 'sub:' + k, SUB[k]));
       Object.keys(TAB).forEach(k => look('#topnav .tab-btn[data-tab="' + k + '"]', 'tab:' + k, TAB[k]));
@@ -54,6 +58,11 @@ const TAB = { overview: 'overview', budget: 'budget', house: 'house-builder', as
     // 2. layers
     const flat = Object.keys(r.syms).filter(id => { const s = r.syms[id]; return !(s.tag === 'symbol' && s.vb === '0 0 24 24' && s.shadow && s.side && s.face && s.hi && s.current && s.n >= 5); });
     ok(Object.keys(r.syms).length >= 15 && !flat.length, w + ': each symbol has shadow, side, lit face and highlight in the tier colour (' + Object.keys(r.syms).length + ' symbols' + (flat.length ? '; flat: ' + flat.join(', ') : '') + ')');
+    // round 2: turned further left, with nothing clipped
+    const flatOn = Object.keys(r.syms).filter(id => { const m = (r.syms[id].turn.match(/matrix\(([^)]*)\)/) || [, ''])[1].split(/[ ,]+/).map(Number); return !(m.length === 6 && m[0] <= .86 && m[1] <= -.12); });
+    ok(!flatOn.length, w + ': every symbol is turned to the left, front narrowed and receding (' + (flatOn.join(', ') || 'all') + ')');
+    const spill = Object.keys(r.syms).filter(id => { const b = r.syms[id].bb; return b[0] < -.2 || b[1] < -.2 || b[2] > 24.2 || b[3] > 24.2; }).map(id => id + ' ' + r.syms[id].bb.join(','));
+    ok(!spill.length, w + ': nothing spills past the 24 box (' + (spill.join('; ') || 'ok') + ')');
     // 3. drawn with a real size where visible, colour from the button
     const vis = r.slots.filter(s => s.w > 0);
     ok(vis.length >= (phone ? 11 : 10) && vis.every(s => s.w >= 18), w + ': visible icons draw at 18 px or more (' + vis.map(s => s.key + ':' + s.w).join(' ') + ')');

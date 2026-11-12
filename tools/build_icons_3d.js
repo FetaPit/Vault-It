@@ -6,7 +6,11 @@
 const fs = require('fs'), path = require('path');
 const FILE = path.join(__dirname, '..', 'src', 'app', 'shell', 'sprite.html');
 const START = '<!-- vi3:start (tools/build_icons_3d.js writes this block) -->', END = '<!-- vi3:end -->';
-const DX = 1, DY = -0.6;                 // one unit of depth
+const DX = 1.5, DY = -0.55;              // one unit of depth (round 2: deeper)
+// Round 2 (owner, 12 Nov: "Rotate them more to the left showing more depth"): every icon is drawn through one turn that narrows
+// the front face and lifts its right edge, so the object reads as turned left with its right side and top coming into view.
+const TURN = { a: .84, b: -.16, s: .97, e: 1.6, f: 1.9 };
+const turn = c => `<g class="v3-turn" transform="matrix(${r(TURN.a * TURN.s)} ${r(TURN.b * TURN.s)} 0 ${TURN.s} ${TURN.e} ${TURN.f})">${c}</g>`;
 const r = n => +n.toFixed(2);
 const pts = a => a.map(p => r(p[0]) + ',' + r(p[1])).join(' ');
 const LN = 'stroke="#000" stroke-opacity=".3" stroke-width=".45" stroke-linejoin="round"';
@@ -154,7 +158,7 @@ const defs = '<defs>' +
   '<radialGradient id="v3-sph" cx=".36" cy=".32" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".62"/><stop offset=".38" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></radialGradient>' +
   '<radialGradient id="v3-shg"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>' +
   '</defs>';
-const block = [START, defs].concat(Object.keys(ICONS).map(k => `<symbol id="vi3-${k}" viewBox="0 0 24 24">${ICONS[k]()}</symbol>`)).concat([END]).join('\n');
+const block = [START, defs].concat(Object.keys(ICONS).map(k => `<symbol id="vi3-${k}" viewBox="0 0 24 24">${turn(ICONS[k]())}</symbol>`)).concat([END]).join('\n');
 
 if (require.main === module) {
   let s = fs.readFileSync(FILE, 'utf8');
