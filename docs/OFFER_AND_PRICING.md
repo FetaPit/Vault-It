@@ -41,7 +41,7 @@ The UK market has also shrunk: Money Dashboard closed in 2023 and Moneyhub's con
 
 | Plan | Recommendation | Why |
 |---|---|---|
-| **Beta** | Free, no card | Lead with zero effort; the paid plans come after the beta |
+| **Beta** | Was: free with no card asked for. From 12 Nov 2026 a plan and a card are needed from the start (the last section of this file) | Was: lead with zero effort; the paid plans come after the beta |
 | **Pioneer monthly** | **£5.99 / month** (unchanged) | Top of the UK entry band, equal to Snoop Plus, which also has net worth |
 | **Pioneer annual** | **£49.99 / year** (≈30% off monthly) | Matches the UK leaders' discount and sits next to Snoop's £47.99. The cost model says it's safe while you are not VAT-registered (threshold £90,000); revisit at registration (then £59.99) |
 | **Founding Member** (lifetime, for testers first) | **£149 once**, a **real, enforced cap** you choose, sold only via Stripe | 3.0× the £49.99 annual, inside the evidenced band; within the cost floor *only with* the AI cap below |
@@ -144,7 +144,7 @@ Owner's words: "Initial offering to users onboarded for testing is Vaulter 3.99 
 - While the beta is open (`VI_BETA_OPEN`, every account is a tester) the app shows the tester price with the later price as "£59.99 after the beta" (sentences: "£49.99 a year while in beta, £59.99 after"). Nothing is struck through and there are no "was" prices.
 - The app no longer links the £39.99 tester yearly link (…VG06). It is still active in Stripe; switching it off is the owner's call. The webhook still maps it, so anyone who bought through it stays matched.
 - **Before the beta closes**: create the £59.99 yearly Payment Link and paste it into `VI_STRIPE_LINKS.annual_after_beta`. Until then, with the beta closed, every yearly button is disabled and says "Coming soon"; no button can open a missing link (`tests/test_tier_prices.js`).
-- The after-trial state is plain **read-only** with no tier name. "Vaulter" now names only the monthly plan.
+- The after-trial state is plain **read-only** with no tier name. "Vaulter" now names only the monthly plan. (Replaced on 12 Nov 2026: there is no after-trial state any more; see the last section.)
 - Price check, flagged to the owner: at beta prices 12 × £3.99 = £47.88, which is less than £49.99 a year, so the app makes no "save by paying yearly" claim. After the beta, 12 × £5.99 = £71.88 against £59.99.
 - Tier icons (Pedro's brief): Vaulter a vault door (teal), Pioneer a compass (purple), Founding Member a keystone with rank chevrons (brass), drawn as Wealth Roadmap medallions. Source `tools/build_tier_icons.js`; standalone files `brand/vault-it-tier-*.svg`.
 
@@ -199,3 +199,23 @@ Owner's words, 7 Nov: "Also add a Pioneer Household Pricing with up to 8 users w
 
 - This replaces the 4 Nov line "pioneer (includes family mode as a feature, not a separate tier)". Pioneer no longer carries "family mode coming soon"; family features belong to Household.
 - Still to do before it is sold: a Stripe product and Payment Link (owner's yes first), a Household line in the pitch deck forecast, and the family plan build (logged 4 Nov as "do not build").
+
+## Decided by Pete (12 Nov 2026): the card wall, Vaulter monthly and Pioneer yearly
+
+Owner's words, to David (brief `docs/briefs/CARD_WALL.md`): "We want to make sure the nnew sign ups see the pricing structure subscription model and that if they sign up to the monthly vaulter plan they will be sign up on stripe with a method of payment and charged after 30 days". Asked whether a card is required to get in: "Card required". Existing testers: "Card wall for everyone". Names: "Vaulter monthly, Pioneer yearly". Where: "After the questions".
+
+This replaces the 30 free days with no card, the countdown and the read-only state described above and in `docs/MONETISATION_DECISION.md`. The prices and the Stripe links do not change.
+
+| Plan | Plan key | Beta price | After the beta | What the button opens while the beta is open |
+|---|---|---|---|---|
+| **Vaulter** | monthly | £3.99 a month | £5.99 a month | `monthly_trial` …VG08: 30 days free, card taken at checkout, first charged on day 31 |
+| **Pioneer** (Pro, family mode coming soon) | annual | £49.99 a year | £59.99 a year | `annual_trial` …VG0a: 30 days free, card taken at checkout, first charged on day 31 |
+| **Lifetime licence** (100 places) | founder | £99 once | £149 once | `founder_tester` …VG0b: charged at checkout, no free period |
+
+- **Nobody uses the app without a plan.** After the set-up questions (and for an existing account at its next visit) the plans screen covers the app. The only ways off it are a plan, Sign out, Download my data and Help. The sample at vault-it.co/demo-a needs no account and no card.
+- **The server decides.** The app opens only when the account's profile, as written by the Stripe webhook, says it is on a plan (a Stripe trial counts). Flags on the device and the return address from Stripe open nothing.
+- **A plan that ends or fails to renew** goes back to the plans screen. Nothing the person entered is deleted, and Download my data works from that screen.
+- **One plan per account.** An account on a plan cannot start a second checkout from the app; changes and cancelling are by e-mail to hello@vault-it.co (there is still no self-serve cancel).
+- **The words everywhere:** "30 days free, then £3.99 a month. Your card is taken now and first charged on day 31. Cancel before then and you pay nothing. To cancel, email hello@vault-it.co." No page says the beta is free or that no card is needed: the app, the sign-up page (`landing.html`), its confirm page and the terms (`tests/test_copy.js`, `tests/test_signup_page.js`, `tests/test_card_wall_wording.js`).
+- **Names:** `VI_PLANS` is the one source and paints every plan name. Stripe's own product names still say Pioneer for both subscriptions until the owner says to rename them.
+- **Still to do before it goes live (the owner):** a solicitor's read of the trial wording (the plans screen, Terms section 6, the sign-up page); the note to the nine existing testers (`docs/marketing/tester-card-wall-note.md`, a draft, not sent); one real purchase to prove the paid path end to end.

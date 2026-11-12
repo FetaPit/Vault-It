@@ -88,6 +88,12 @@ const UNPAID = { is_pioneer: false, is_founder: false, plan: null, paid_until: n
   await p.evaluate(async () => { await verifyPioneerPurchase(); });
   s = await state(p);
   ok(!s.paid && /No payment found/.test(await p.evaluate(() => document.getElementById('pw-verify-msg').textContent)), '"Check my account" asks the server; nothing typed unlocks');
+  // "Check my account" names the plan the server records: Vaulter for monthly, Pioneer for yearly (card wall, 12 Nov)
+  for (const [plan, name] of [['monthly', 'Vaulter'], ['yearly', 'Pioneer']]) {
+    await p.evaluate(async (pl) => { const keep = window.__prof; window.__prof = { is_pioneer: true, is_founder: false, plan: pl, paid_until: '2027-11-04T00:00:00Z', is_beta: true, stripe_synced_at: '2026-11-01T12:00:00Z' }; await verifyPioneerPurchase(); window.__said = document.getElementById('pw-verify-msg').textContent; window.__prof = keep; await _syncPioneerFromProfile(_supaUser.id); }, plan);
+    ok(new RegExp('Confirmed: your ' + name + ' plan is active').test(await p.evaluate(() => window.__said)), '"Check my account" on a ' + plan + ' plan says ' + name + ' (' + await p.evaluate(() => window.__said) + ')');
+  }
+  ok(!(await state(p)).paid, 'and the device is back to unpaid once the profile says so');
   // the sign-in profile upsert no longer claims paid status
   await p.evaluate(() => { localStorage.setItem('vi_pioneer', 'true'); window.__upserts = []; try { _completeAuth('t@t.com'); } catch (e) {} });
   await p.waitForTimeout(300);

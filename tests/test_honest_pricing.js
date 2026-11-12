@@ -16,6 +16,13 @@ ok(/founderSlots: 100,/.test(app), 'founding cap is 100');
 ok(/function captureEmailToList\(/.test(app), 'captureEmailToList() stays (real sign-up flows use it)');
 // Prices are amounts with a billing period or a one-off. The hero demo's lay buttons (£5, £50, £500), the deposit figure and the block key (£1,000, £100) are illustrations, not prices.
 const priced = page.match(/£[\d,.]+k?\s*(a month|\/mo\b|per month|a year|\/yr\b|per year|once|one-off)/g) || [];
-ok(priced.length > 0 && priced.every((m) => /^£5\.99 a month$/.test(m)) && !/£49\.99|£149|£59\.99/.test(page), 'the sign-up page names no price except the £5.99 starting price (' + [...new Set(priced)].join(', ') + ')');
+// Until 12 Nov 2026 the beta was free and the page named one price, the £5.99 starting price after it. With the card wall (owner, 12 Nov:
+// "Card required") the page leads to a card, so it names what the plans cost: the beta prices the Stripe trial links charge and the
+// prices after the beta, exactly as VI_PLANS holds them. No other price, and no one-off price (the page never says "lifetime").
+const planPrices = (k) => (app.match(new RegExp(k + ': \\{ price: ([\\d.]+), tester: ([\\d.]+)')) || []).slice(1);
+const [mAfter, mNow] = planPrices('monthly'), [aAfter, aNow] = planPrices('annual');
+const pence = [...new Set(page.match(/£\d+\.\d\d/g) || [])];
+ok(mNow && aNow && priced.length > 0 && priced.every((m) => m === '£' + mNow + ' a month' || m === '£' + aNow + ' a year') && pence.every((x) => ['£' + mNow, '£' + mAfter, '£' + aNow, '£' + aAfter].includes(x)) && !/£149|£99\b/.test(page),
+  'the sign-up page names only the plan prices the app charges: £' + mNow + ' a month and £' + aNow + ' a year, £' + mAfter + ' and £' + aAfter + ' after the beta (' + [...new Set(priced)].concat(pence).join(', ') + ')');
 ok(/A57, 11 St Mary’s Street, Lincoln LN5 7EQ/.test(page) && /Lincoln LN5 7EQ/.test(app), 'trader address on the sign-up page and in the privacy notice');
 console.log(fails ? '\n' + fails + ' FAILED' : '\nALL PASSED'); process.exit(fails ? 1 : 0);

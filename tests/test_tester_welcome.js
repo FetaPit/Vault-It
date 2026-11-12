@@ -26,7 +26,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
   await p.evaluate(() => wStep2Skip()); await p.waitForTimeout(1000);
   const t = await p.evaluate(() => ({ on: !document.getElementById('tester-welcome').classList.contains('hidden'), msg: document.getElementById('tw-msg').textContent, sign: document.querySelector('.tw-sign').textContent, mail: document.querySelector('.tw-mail').getAttribute('href'), stamp: !!localStorage.getItem('vi_tester_note') }));
   ok(t.on && t.stamp, 'after the welcome flow the tester note shows, and is marked as seen');
-  ok(t.msg === 'Welcome to the Vault-It beta. Your first 30 days are free, no card needed. Type your numbers in, made-up ones are fine, and watch your deposit build your house. Anything confusing or broken, tell me. Your feedback decides what gets built next.' && t.sign === 'Pete', 'the agreed wording, 30-day first sentence, signed Pete');
+  ok(t.msg === 'Welcome to the Vault-It beta. Your first 30 days are free. Type your numbers in, made-up ones are fine, and watch your deposit build your house. Anything confusing or broken, tell me. Your feedback decides what gets built next.' && t.sign === 'Pete', 'the agreed wording without "no card needed" (card wall, 12 Nov), 30-day first sentence, signed Pete');
   ok(/^mailto:hello@vault-it\.co/.test(t.mail), 'the mail link goes to hello@vault-it.co');
   ok(!/—/.test(t.msg), 'no em dashes');
   await p.keyboard.press('Escape'); ok(!(await p.evaluate(vis)), 'Esc closes it');

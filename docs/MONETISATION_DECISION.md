@@ -148,3 +148,14 @@ The old caps (3 assets, 2 liabilities, 1 debt) go. The house build is never behi
 
 - **Tester prices:** free for the 30 days in exchange for detailed feedback, then £3.99 a month, **£39.99 a year** (replaces £21.99) or **Founding Member £99** (replaces £149 for testers). Full prices unchanged. Every tester price shows the full price struck through (pop-up, campaign page, Settings).
 - The £21.99 link is switched off in Stripe; the webhook knows the new links and prices.
+
+## 13. Decided by Pete (12 Nov 2026): the card wall replaces the no-card trial
+
+Owner, to David: "Card required". "Card wall for everyone". "Vaulter monthly, Pioneer yearly". "After the questions". Brief: `docs/briefs/CARD_WALL.md`.
+
+- This replaces sections 2, 7, 9 and 10 where they describe 30 days of the full app with no card, the countdown, and the read-only vault after the 30 days. None of those exist in the app any more.
+- An account is on a plan and the app is open, or it is not and the plans screen covers the app. The server's record decides, never the device.
+- The free period is Stripe's: on Vaulter (monthly) and Pioneer (yearly) the card is taken at checkout and first charged on day 31. The Lifetime licence is charged at checkout.
+- A plan that ends or fails to renew goes back to the plans screen; the figures stay on the device and in the account, and Download my data works from there.
+- The tester welcome note keeps its first sentence without the words about a card; its full reword is a later build.
+- The current table of plans, prices and links is the last section of `docs/OFFER_AND_PRICING.md`.

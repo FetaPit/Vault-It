@@ -44,6 +44,9 @@
   margin-bottom: 6px;
   line-height: 1.3;
 }
+/* the first screen's offer: teal, with "free" in gold; same heading font, size and weight (owner, 12 Nov 2026) */
+.welcome-h2.wz-offer { color: var(--teal); }
+.welcome-h2.wz-offer .wz-free { color: var(--gold); }
 .welcome-sub {
   font-family: 'Syne', sans-serif;
   font-size: max(14.5px,var(--vi-fs-3));

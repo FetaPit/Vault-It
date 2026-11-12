@@ -9075,6 +9075,9 @@ body::before {
   margin-bottom: 6px;
   line-height: 1.3;
 }
+/* the first screen's offer: teal, with "free" in gold; same heading font, size and weight (owner, 12 Nov 2026) */
+.welcome-h2.wz-offer { color: var(--teal); }
+.welcome-h2.wz-offer .wz-free { color: var(--gold); }
 .welcome-sub {
   font-family: 'Syne', sans-serif;
   font-size: max(14.5px,var(--vi-fs-3));
@@ -12220,11 +12223,11 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
   </div>
 </div>
 
-<div id="demo-chip" class="demo-chip" style="display:none"><span class="demo-chip-left">⚡ DEMO MODE &mdash; You&rsquo;re viewing sample data. <button onclick="clearDemoData()">Start with your own data</button></span><a class="demo-signup-btn" href="https://app.vault-it.co/" onclick="localStorage.removeItem('vi_demo_mode');localStorage.removeItem('vi_session');">Sign up free &rarr;</a></div>
+<div id="demo-chip" class="demo-chip" style="display:none"><span class="demo-chip-left">⚡ DEMO MODE &mdash; You&rsquo;re viewing sample data. <button onclick="clearDemoData()">Start with your own data</button></span><a class="demo-signup-btn" href="https://app.vault-it.co/" onclick="localStorage.removeItem('vi_demo_mode');localStorage.removeItem('vi_session');">Sign up &rarr;</a></div>
 <div id="pwa-install-banner" style="display:none">
   <span>⬇ Install Vault-It: works offline, opens like an app</span>
   <div style="display:flex;gap:6px;align-items:center">
-    <button class="install-btn" onclick="triggerPwaInstall()">Install Free</button>
+    <button class="install-btn" onclick="triggerPwaInstall()">Install</button>
     <button class="dismiss-btn" onclick="dismissPwaBanner()"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
   </div>
 </div>
@@ -12484,8 +12487,9 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
            2: your money and deposit pot, each can be added later; 3: your plan. The check-in day, Simplified or Advanced view and
            phone take their defaults (today, Simplified, none) and live in Settings. Every answer is saved exactly as before. -->
       <section class="wz-screen" data-s="1" id="wz-s1">
-        <h2 class="welcome-h2" tabindex="-1">Your first 30 days are free.<br>The whole app, no card.</h2>
-        <div class="welcome-sub">Two quick screens, then your plan. After 30 days, pick a plan to keep editing; your numbers stay yours either way. Beta testers get first call on the Lifetime licence places.</div>
+        <!-- owner, 12 Nov 2026: "Remove whole app no card as we are asking for card details now." "add 30 days free in header font in teal with free in gold" -->
+        <h2 class="welcome-h2 wz-offer" tabindex="-1">30 days <span class="wz-free">free</span></h2>
+        <div class="welcome-sub">Two quick screens, then you choose a plan. On the monthly and yearly plans your card is taken at checkout and first charged on day 31. Cancel before then and you pay nothing. Beta testers get first call on the Lifetime licence places.</div>
         <div class="wz-signed" id="wz-signed" hidden>Signed in as <b id="wz-signed-email"></b></div>
       <div class="welcome-field">
         <label for="w-name">First name <span class="w-opt-tag">(optional)</span></label>
@@ -12692,7 +12696,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
   <div class="vi-modal-box tw-box">
     <div class="vi-modal-eyebrow">BETA TESTER</div>
     <div class="vi-modal-title" id="tw-title">A note from Pete</div>
-    <p class="tw-msg" id="tw-msg">Welcome to the Vault-It beta. Your first 30 days are free, no card needed. Type your numbers in, made-up ones are fine, and watch your deposit build your house. Anything confusing or broken, tell me. Your feedback decides what gets built next.</p>
+    <p class="tw-msg" id="tw-msg">Welcome to the Vault-It beta. Your first 30 days are free. Type your numbers in, made-up ones are fine, and watch your deposit build your house. Anything confusing or broken, tell me. Your feedback decides what gets built next.</p>
     <p class="tw-sign">Pete</p>
     <div class="tw-row">
       <button class="btn-add-data tw-go" onclick="viTesterWelcomeClose()">Let’s go</button>
@@ -12774,7 +12778,7 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
             <div><div class="wall-plan-when">Monthly</div><div class="wall-plan-name" data-plan-name="monthly" data-tier-name></div></div></div>
           <div class="wall-plan-price" data-plan-price="monthly"></div>
           <p class="wall-plan-terms" data-plan-terms="monthly"></p>
-          <ul class="wall-plan-list"><li>The whole app, editing on</li><li>All six house types, Levels 1 to 3</li><li>Your own 3D house design and AI house model</li><li>AI screenshot reader, 30 a month</li></ul>
+          <ul class="wall-plan-list"><li>The whole app</li><li>All six house types, Levels 1 to 3</li><li>Your own 3D house design and AI house model</li><li>AI screenshot reader, 30 a month</li></ul>
           <button class="wall-cta" type="button" data-plan="monthly" data-cta="Choose monthly" data-cta-trial="Start 30 days free" onclick="viWallChoose('monthly')">Choose monthly</button>
         </div>
         <div class="wall-plan" data-tier-card="annual">
@@ -30497,7 +30501,7 @@ function showLegalModal(title, body) {
   modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(560px,94vw);max-height:86vh;overflow-y:auto;padding:24px 22px;position:relative"><button onclick="document.getElementById(\'legal-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button><div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:14px">'+title+'</div><div style="font-family:\'DM Sans\',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);line-height:1.7">'+body+'</div></div>';
   document.body.appendChild(modal);
 }
-var VI_LEGAL_DATE = '5 November 2026';
+var VI_LEGAL_DATE = '12 November 2026';
 function _lh(t) { return '<p style="color:var(--em);font-weight:700;margin:14px 0 3px">' + t + '</p>'; }
 function showPrivacy() {
   showLegalModal('Privacy notice', [
@@ -30523,7 +30527,7 @@ function showPrivacy() {
       + '<li><strong>Cloudflare</strong>: serves the app’s web pages and our domain’s DNS, and runs the “are you human” check (Turnstile) when you ask for a sign-in code or join the beta list. It sees your IP address. <strong>GitHub Pages</strong> serves the older address in the same way.</li>'
       + '<li><strong>jsDelivr, cdnjs (Cloudflare) and Google Fonts</strong>: deliver code libraries and fonts to your browser, and see your IP address.</li></ul>',
     '<p>Some screens fetch things straight from your browser, so the company sees your IP address: <strong>Google</strong> (small bank, provider, company and ticker logos; it is told the website of each bank, card, investment provider or company you add), <strong>Clearbit</strong> (logos for well-known card providers), <strong>ExchangeRate-API</strong> (exchange rates, each time you open the app), <strong>CoinGecko</strong> and <strong>metals.live</strong> (live prices, only if you use Live Prices; CoinGecko learns which coins you hold), and <strong>Openverse</strong> (run by WordPress.org; only if you use photo search, which sends your search words).</p>',
-    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). The free 3D models you can pick for a wealth or liability item come from a library bundled with Vault-It itself, served from this same address: a model is downloaded only when you pick or open one, no outside service is contacted, and CC-BY models are credited in the item and in the 3D model credits panel. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment if you upgrade; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with a key, only if an earlier version of the app saved one on this device. The bank, broker and exchange connections in Settings are locked for a future release: they connect to nothing and never ask for your details. Settings also holds owner-only connections (Notion, Claude, Meshy); they do nothing unless someone enters keys for them.</p>',
+    '<p>Only if you use these features: <strong>Anthropic (Claude)</strong> reads the feedback you send (your words, your rating, the screen you were on and your last few taps; never your figures) to sort it for us; answers questions you ask the in-app help guide when it has no ready answer (your question with amounts removed and the guide\u2019s own text; never your figures); and receives the whole screenshot you upload to read your holdings (so crop out names and account numbers first) and may keep it for a limited period under its own terms; Vault-It does not store it. <strong>Yahoo Finance</strong> supplies share prices via our server (ticker symbols and search words are sent, never your name or email). <strong>Discogs</strong> supplies asking prices for records when you tap Search second-hand prices on a wealth item: the item words you can edit, its kind and its condition are sent via our server (never your name, email or figures; item names can be personal, so keep them general if you prefer), and we keep only the resulting numbers, not the listings. We may switch on <strong>eBay</strong>, <strong>Reverb</strong> and <strong>PriceCharting</strong> for the same search once their approval is in, in the same way. The \u201cSearch eBay sold items\u201d and \u201cSearch Discogs\u201d links open those sites in a new tab with the item words in the address. <strong>Meshy</strong> creates 3D house designs from text you type (sent via our server, along with your Meshy key, which we do not store). The free 3D models you can pick for a wealth or liability item come from a library bundled with Vault-It itself, served from this same address: a model is downloaded only when you pick or open one, no outside service is contacted, and CC-BY models are credited in the item and in the 3D model credits panel. 3D files you upload stay on your device; only a small preview picture is saved with the item. <strong>Stripe</strong> handles payment when you choose a plan; we never see your card. <strong>Alpha Vantage</strong> and <strong>metals-api.com</strong> are contacted from your browser, with a key, only if an earlier version of the app saved one on this device. The bank, broker and exchange connections in Settings are locked for a future release: they connect to nothing and never ask for your details. Settings also holds owner-only connections (Notion, Claude, Meshy); they do nothing unless someone enters keys for them.</p>',
     '<p>Some of these companies are in the United States. Where data goes outside the UK it relies on the safeguards those companies provide, such as approved contract terms. Our website and app contain no advertising trackers, pixels or third-party analytics. During the beta the app records how it is used (screens opened, features used, errors and how long a visit lasts, never your figures or what you type) in our own database, to improve it; you can switch this off in Settings (Share usage). Feedback you send from the app is stored by us with the screen you were on, your last few taps and, unless you untick it, a picture of that screen with every figure hidden. If we advertise on social media, the link only carries a campaign tag, which we store with your beta-list sign-up.</p>',
     _lh('How it is protected, and what that does not mean'),
     '<p>Your data is encrypted in transit (HTTPS) and at rest by our database provider, and database rules stop one user reading another’s data. Sign-in is by emailed code or your Google account, and an optional PIN with lock-outs against guessing. <strong>It is not end-to-end encrypted</strong>: the person running Vault-It has technical access to the database for support and security. We do not look at individual accounts unless you ask us to help, or we are investigating abuse or a security problem.</p>',
@@ -30551,7 +30555,7 @@ function showTerms() {
     _lh('5. Your data and your feedback'),
     '<p>Your data stays yours. We use it only to run the app for you, as set out in the Privacy Notice. Feedback and ideas you share can be used to improve Vault-It without payment to you.</p>',
     _lh('6. Paid plans'),
-    '<p>Pioneer is optional. The price and billing period are shown before you pay, payment is taken by Stripe, and a subscription renews until you cancel. You can cancel at any time from your Stripe receipt or portal, or by emailing hello@vault-it.co. Your legal rights as a consumer, including any right to cancel and to a refund that the law gives you, are not affected.</p>',
+    '<p>Using Vault-It needs a plan: Vaulter (monthly), Pioneer (yearly) or a Lifetime licence (one payment). The sample needs no plan. The price, the billing period and the date of the first charge are shown before you give your card, and payment is taken by Stripe. While the beta is open, Vaulter and Pioneer start with 30 days free: your card is taken at checkout and first charged on day 31, and if you cancel before then you pay nothing. A subscription renews until you cancel. You can cancel at any time by emailing hello@vault-it.co. If a plan ends or a payment fails, the app closes until you choose a plan again; nothing you entered is deleted and you can still download it. Your legal rights as a consumer, including any right to cancel and to a refund that the law gives you, are not affected.</p>',
     _lh('7. Availability and liability'),
     '<p>The beta is provided “as is”, and we cannot promise it will always be available or error-free. Nothing in these terms limits liability that cannot lawfully be limited, including for death or personal injury caused by negligence, or for fraud, or affects your statutory rights as a consumer. Subject to that, we are not responsible for losses from decisions you make using the app or for data lost during the beta, and our total liability to you is limited to £100 or, if you have paid for a plan, what you paid us in the last 12 months if that is more.</p>',
     _lh('8. Ending'),
