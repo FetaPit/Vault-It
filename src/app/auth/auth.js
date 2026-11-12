@@ -144,11 +144,16 @@ async function initQuickLogin() {
   } catch(e) {}
 }
 
-function signOut() {
+// Sign out of this browser. supabase-js removes its stored session only after its network call has come back, so the page must
+// not restart before then: it used to, the session stayed behind, and the next page let the previous person straight back in
+// (owner, 12 Nov 2026: a different e-mail on the same browser must not land in the last account). Wait for it briefly, then
+// remove whatever is left ourselves, so it holds with the network down too. This device only; other devices stay signed in.
+async function signOut() {
   var _viaG = false; try { _viaG = localStorage.getItem(VI_AUTH_VIA) === 'google'; } catch (e) {}
   if (!confirm(_viaG ? 'Sign out? You can get back in with Google, or with your email.' : 'Sign out? You can get back in with just your email and PIN.')) return;
-  if (_supaClient) _supaClient.auth.signOut().catch(function(){});
   localStorage.removeItem('vi_session');
+  try { if (_supaClient) await _withTimeout(_supaClient.auth.signOut({ scope: 'local' }).catch(function () {}), 2500, null); } catch (e) {}
+  try { for (var k = _localSessionKey(), n = 0; k && n < 5; k = _localSessionKey(), n++) localStorage.removeItem(k); } catch (e) {}
   location.reload();
 }
 
