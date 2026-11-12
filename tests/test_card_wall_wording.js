@@ -4,7 +4,7 @@
 // 30 days free, card taken now, first charged on day 31, how to cancel.
 //   1. first welcome screen: the heading reads "30 days free", in the heading font (family unchanged: Syne), teal with "free"
 //      in gold, Night and Daylight, phone and desktop; the line under it says when the card is taken and first charged
-//   2. the tester note is the agreed note without "no card needed" (the rest is test_tester_welcome.js)
+//   2. the tester note makes no "no card" promise (its wording, reworded the same day, is test_founder_box.js)
 //   3. Terms section 6 no longer says a plan is optional; it states the free period, the first charge and how to cancel;
 //      the terms carry today's date
 //   4. the plans screen no longer sells "editing on" (there is no read-only state to compare it with)
@@ -46,7 +46,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     if (theme === 'dark' && w === 390) {
       // ── 2  the tester note ──
       const note = await p.evaluate(() => document.getElementById('tw-msg').textContent.replace(/\s+/g, ' ').trim());
-      ok(!/no card/i.test(note) && /^Welcome to the Vault-It beta\. Your first 30 days are free\. Type your numbers in/.test(note), '2 the tester note no longer says "no card needed"; the rest of it stands (' + note.slice(0, 70) + ')');
+      ok(!/no card/i.test(note) && /^Thank you, personally, for becoming a Vault-It Pioneer\. Your first 30 days are on me\./.test(note), '2 the tester note makes no "no card" promise (its wording is test_founder_box.js) (' + note.slice(0, 70) + ')');
       // ── 3  the terms ──
       const terms = await p.evaluate(() => { showTerms(); const t = document.getElementById('legal-modal').textContent.replace(/\s+/g, ' '); document.getElementById('legal-modal').remove(); return t; });
       const s6 = (terms.match(/6\. Paid plans(.*?)7\. Availability/) || [])[1] || '';

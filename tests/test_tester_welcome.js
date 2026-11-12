@@ -24,10 +24,10 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
   // ── 1 + 2 ──
   let p = await open(1100, 'dark', false);
   await p.evaluate(() => wStep2Skip()); await p.waitForTimeout(1000);
-  const t = await p.evaluate(() => ({ on: !document.getElementById('tester-welcome').classList.contains('hidden'), msg: document.getElementById('tw-msg').textContent, sign: document.querySelector('.tw-sign').textContent, mail: document.querySelector('.tw-mail').getAttribute('href'), stamp: !!localStorage.getItem('vi_tester_note') }));
+  const t = await p.evaluate(() => ({ on: !document.getElementById('tester-welcome').classList.contains('hidden'), msg: document.getElementById('tw-msg').textContent, sign: document.querySelector('.tw-sign').textContent, mail: !!document.querySelector('.tw-mail') || /Tell Pete/.test(document.getElementById('tester-welcome').textContent), buttons: document.querySelectorAll('#tester-welcome .tw-row button, #tester-welcome .tw-row a').length, stamp: !!localStorage.getItem('vi_tester_note') }));
   ok(t.on && t.stamp, 'after the welcome flow the tester note shows, and is marked as seen');
-  ok(t.msg === 'Welcome to the Vault-It beta. Your first 30 days are free. Type your numbers in, made-up ones are fine, and watch your deposit build your house. Anything confusing or broken, tell me. Your feedback decides what gets built next.' && t.sign === 'Pete', 'the agreed wording without "no card needed" (card wall, 12 Nov), 30-day first sentence, signed Pete');
-  ok(/^mailto:hello@vault-it\.co/.test(t.mail), 'the mail link goes to hello@vault-it.co');
+  ok(t.msg === 'Thank you, personally, for becoming a Vault-It Pioneer. Your first 30 days are on me. You keep your discounted Pioneer price forever while you stay subscribed, and you get first call on the 100 Lifetime licences before launch.' && t.sign === 'Pete', 'the reworded note (owner, 12 Nov; the founder box and the rest are test_founder_box.js), signed Pete');
+  ok(!t.mail && t.buttons === 1, 'the note has one button, "Let\'s go": "Tell Pete something" is gone (owner, 12 Nov: "this can wait until they are in the app")');
   ok(!/—/.test(t.msg), 'no em dashes');
   await p.keyboard.press('Escape'); ok(!(await p.evaluate(vis)), 'Esc closes it');
   const again = await p.evaluate(() => viTesterWelcome()); ok(again === false && !(await p.evaluate(vis)), 'it shows once per device');

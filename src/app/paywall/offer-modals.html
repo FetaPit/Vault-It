@@ -71,17 +71,62 @@
   </div>
 </div>
 
-<!-- Tester welcome note (wording agreed with Pete, 31 Oct 2026; first sentence in its 30-day form now the trial clock is in). Shown once,
-     after a beta account finishes the welcome flow. -->
-<div id="tester-welcome" class="vi-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tw-title">
+<!-- Tester welcome note. Shown once, when the app first opens for a beta account. Owner, 12 Nov 2026: "We need to add a meet the Founder
+     box above this with my portrait and few deats. Reword by just encouraging to send any testing data to me. say a personal thanks
+     becoming a Vault-it Pioneer and have 30 days on me plus lifetime discounted subscriptions and a limited lifetime license pre launch."
+     Wording: Pedro's (docs/briefs/ONBOARDING_FEEDBACK_12NOV.md). Every promise is true of the app: 30 days = the Stripe trial on the monthly
+     and yearly links, the price is kept while subscribed, 100 = the Lifetime link's limit. #tw-sub (the subscription sentences) is hidden
+     for an account on a Lifetime licence (viTesterWelcome). The founder's details are only what the sign-up page already says.
+     Owner, 12 Nov 2026, on the first screenshots: "It needs to have a gold outline like the meet the dev tile but say from the founder":
+     the tile takes the brass border and the gold bar of the dashboard's Message the Dev tile, and its eyebrow reads "From the founder".
+     On the second: "remove designer Lincoln": the line under his name is "Founder, Vault-It."
+     On the third: "change the Note from Pete to Vault-orm font": the heading "A note from Pete" is written with var(--font-display), the
+     token the typeface work points at Vault-form Heading, in place of the font the shared modal title names by hand.
+     On the note: "you keep your discounted Pioneer subscription price forever": the price sentence takes his words; "as long as you stay
+     subscribed" stays after them, as the plans screen says ("Renews at the same price as long as you stay subscribed").
+     Later: "Make it more concice and bold the important phrases like vault-it pioneer  forever  1100 lifetime licences  Remove the last para
+     from Try it with your...": the note is shortened, the key phrases are bold, and everything from "Try it with your own numbers" on is
+     gone. The number is 100: the Lifetime link's limit in Stripe.
+     And: "make the font a note from Pete Vaultform condensed": the heading takes --font-vf-heading-condensed, the token named in the
+     typeface work's README, when the app defines it; until then it falls back to var(--font-display).
+     And: "Capitalise a note from pete".
+     Last: "justr remove a note from Pete": the heading is gone from the note (so the asks about its font, Vault-form Condensed and
+     capitals went with it); the dialog keeps its accessible name by aria-label, since a dialog needs one and nothing visible says it now.
+     Then: "text not bold but teal highlighted on both light and dark mode": the key phrases are teal (the --teal token) in the regular weight.
+     Then: "add a subtle glow to the teal words": they take the brand's text glow, the --tglow token.
+     Then: "remove tell Pete something, this can wait until they are in the app": the "Tell Pete something" link is gone; the note keeps
+     "Let's go". Feedback is reached in the app (the Message the Dev tile on the dashboard, the Feedback button). -->
+<style id="vi-founder-style">
+/* Meet the founder: the compact strip on welcome screen 1 (welcome/welcome.html) and the box above the tester note. Tokens only. */
+.vi-founder-pic{display:block;flex:none;box-sizing:border-box;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--c2)}
+.vi-founder-name{font-family:var(--font-display);font-weight:700;color:var(--tx);line-height:1.2;font-size:max(15px,var(--vi-fs-3))}
+.vi-founder-thanks,.vi-founder-role{font-family:var(--font-body);color:var(--t2);line-height:1.4;font-size:max(13.5px,var(--vi-fs-2));margin-top:2px}
+.vi-founder-strip{display:flex;align-items:center;gap:12px;margin:0 0 14px;text-align:left}
+.vi-founder-strip .vi-founder-pic{width:44px;height:44px}
+@media(max-height:720px){.vi-founder-strip{gap:10px;margin-bottom:6px}.vi-founder-strip .vi-founder-pic{width:36px;height:36px}}   /* short phones: the first field stays above the pinned button */
+.vi-founder{margin:0 0 16px;text-align:left}
+.vi-founder-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 4px}
+/* the gold outline of the dashboard's Message the Dev tile: the same brass border, and a gold bar down the left edge */
+.vi-founder-row{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;padding:12px 14px 12px 17px;border:1px solid rgb(var(--brass-rgb) / .35);background:rgb(var(--ink-rgb) / .03);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.vi-founder-row::before{content:"";position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--brass),var(--gold),var(--brass))}
+.vi-founder .vi-founder-pic{width:56px;height:56px}
+@media(min-width:700px){.vi-founder .vi-founder-pic{width:72px;height:72px}}
+#tester-welcome .tw-sign{font-family:var(--font-display)}
+#tester-welcome .tw-msg strong{font-weight:inherit;color:var(--teal);text-shadow:var(--tglow)}   /* owner, 12 Nov: "text not bold but teal highlighted on both light and dark mode", "add a subtle glow to the teal words": --teal is the brand teal in Night and the dark teal in Daylight; --tglow is the brand's soft text glow (none in Daylight) */
+</style>
+<div id="tester-welcome" class="vi-modal-overlay hidden" role="dialog" aria-modal="true" aria-label="A note from Pete">
   <div class="vi-modal-box tw-box">
+    <div class="vi-founder" id="tw-founder">
+      <div class="vi-founder-row">
+        <img class="vi-founder-pic" src="img/founder.jpg" width="72" height="72" alt="Pete Thickett, founder of Vault-It" decoding="async">
+        <div class="vi-founder-who"><div class="vi-founder-eyebrow">From the founder</div><div class="vi-founder-name">Pete Thickett</div><div class="vi-founder-role">Founder, Vault-It.</div></div>
+      </div>
+    </div>
     <div class="vi-modal-eyebrow">BETA TESTER</div>
-    <div class="vi-modal-title" id="tw-title">A note from Pete</div>
-    <p class="tw-msg" id="tw-msg">Welcome to the Vault-It beta. Your first 30 days are free. Type your numbers in, made-up ones are fine, and watch your deposit build your house. Anything confusing or broken, tell me. Your feedback decides what gets built next.</p>
+    <p class="tw-msg" id="tw-msg">Thank you, personally, for becoming a <strong>Vault-It Pioneer</strong>.<span class="tw-sub" id="tw-sub"> Your first <strong>30 days</strong> are on me. You keep your discounted Pioneer price <strong>forever</strong> while you stay subscribed, and you get first call on the <strong>100 Lifetime licences</strong> before launch.</span></p>
     <p class="tw-sign">Pete</p>
     <div class="tw-row">
       <button class="btn-add-data tw-go" onclick="viTesterWelcomeClose()">Let’s go</button>
-      <a class="tw-mail" href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback" onclick="viTesterWelcomeClose()">Tell Pete something</a>
     </div>
   </div>
 </div>

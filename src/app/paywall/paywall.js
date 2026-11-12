@@ -52,6 +52,8 @@ function viBlockEdit() {
 function viTesterWelcome() {
   try { if (localStorage.getItem('vi_tester_note')) return false; if (typeof viBetaTester === 'function' && !viBetaTester()) return false; } catch (e) { return false; }
   var m = document.getElementById('tester-welcome'); if (!m) return false;
+  // the sentences about the free first month and the subscription price are true of the monthly and yearly plans only
+  var sub = document.getElementById('tw-sub'); if (sub) sub.style.display = (typeof isFounder === 'function' && isFounder()) ? 'none' : '';
   m.classList.remove('hidden');
   try { localStorage.setItem('vi_tester_note', new Date().toISOString()); } catch (e) {}
   setTimeout(function () { var g = m.querySelector('.tw-go'); if (g) try { g.focus(); } catch (e) {} }, 50);
