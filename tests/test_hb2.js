@@ -48,6 +48,7 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   let hud=await page.innerText('#hb-hud'); console.log(hud.replace(/\n+/g,' | ').slice(0,300));
   ok(/LEVEL 2/.test(hud)&&/Paid off £0 of £200,000/.test(hud)&&/You own £50,000 of your home \(20\.0%\)/.test(hud),'Level 2 HUD (owner rule, 30 Oct): £200,000 left to pay is the Level 2 house, nothing paid yet; you own £50,000 (20.0%)');
   ok(/interest slain/i.test(hud)&&/Open mortgage calculator/.test(hud),'interest slain meter + calculator button');
+  ok(/interest slain · £[\d,]+ left/.test(hud.replace(/\s+/g,' ')),'interest slain tile also shows the interest left to pay (owner, 12 Nov)');
   ok(/What your Budget could do/.test(hud),'budget prompt on Level 2');
   await page.evaluate(()=>hbSetOver(700)); await page.waitForTimeout(300);
   ok(await page.evaluate(()=>state.calc.over)===700,'"Plan: overpay £700" stored');

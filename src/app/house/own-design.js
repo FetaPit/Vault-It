@@ -112,7 +112,6 @@ function hb3dOverlayEls() {
   if (!ov && el) {
     ov = document.createElement('div'); ov.id = 'hb3d-ov';
     ov.innerHTML = '<div id="hb3d-ownlabel"></div>'
-      + '<div id="hb3d-intbar"><div class="ib-hd">INTEREST<span>to pay</span></div><div class="ib-track"><div class="ib-seg ib-slain"></div><div class="ib-seg ib-rem"></div></div><div class="ib-ft"></div></div>'
       + '<div id="hb3d-upglabel"></div><div id="hb3d-plotlabel">YOUR PLOT<span>add a deposit to break ground</span></div>'
       + '<svg id="hb3d-lead" aria-hidden="true"><line class="ld"/><circle class="dot" r="3"/><circle class="ring"/><path class="ticks"/><path class="keys"/></svg><div id="hb3d-bpill"></div>'
       + '<div id="hb3d-rowlabel"></div><div id="hb3d-loading">Building your house…</div><div id="hb3d-cap"></div>';
@@ -124,18 +123,10 @@ function hb3dOverlays(sm) {
   var ov = hb3dOverlayEls(); if (!ov) return;
   var $ = function (id) { return document.getElementById(id); };
   $('hb3d-plotlabel').style.display = sm.mode === 'site' ? 'block' : 'none';
-  var own = $('hb3d-ownlabel'), ib = $('hb3d-intbar'), up = $('hb3d-upglabel');
+  var own = $('hb3d-ownlabel'), up = $('hb3d-upglabel');
   own.style.display = (sm.mode === 'equity' || sm.mode === 'complete') ? 'block' : 'none';
   own.textContent = sm.mode === 'complete' ? 'MORTGAGE FREE' : 'MORTGAGE ' + (Math.floor((sm.eq || 0) * 1000) / 10) + '% PAID';
-  ib.style.display = sm.mode === 'equity' ? 'flex' : 'none';
-  if (sm.mode === 'equity') {
-    try {
-      var S2 = hbL2Sims(), tot = Math.max(1, S2.base.totalInterest), rem = Math.min(tot, S2.scn.totalInterest), slain = Math.max(0, tot - rem);
-      ib.querySelector('.ib-slain').style.height = (slain / tot * 100).toFixed(1) + '%';
-      ib.querySelector('.ib-rem').style.height = (rem / tot * 100).toFixed(1) + '%';
-      ib.querySelector('.ib-ft').innerHTML = '<b class="ib-r">' + hbMoney(rem) + '</b><span>left</span>' + (slain > 0.5 ? '<b class="ib-s">−' + hbMoney(slain) + '</b><span>slain</span>' : '');
-    } catch (e) {}
-  }
+  // The interest bar over the house was removed (owner, 12 Nov 2026: it covered the screen); interest left now shows in the interest slain tile.
   up.style.display = sm.upgrade ? 'block' : 'none';
   if (sm.upgrade) up.innerHTML = '<b>UPGRADE ' + Math.round((sm.ready || 0) * 100) + '% FUNDED</b><span>' + (sm.u.mode === 'sell' ? 'sell &amp; move' : 'keep &amp; let') + ' · target ' + hbMoney(sm.u.price) + '</span>';
   hb3dPlaceOverlays();

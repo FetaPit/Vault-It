@@ -116,7 +116,7 @@ Flats/apartments: the same stages per floor, the frame rising floor by floor; th
 - Neighbours (terraced/semi) are always ghosts.
 
 ## 7. Viewer
-- Canvas inside `#house-scene` (the SVG is hidden while 3D is active). Overlays are DOM elements in `#hb3d-ov` (pointer-events none): `#hb-ownlabel`, `#hb-intbar`, `#hb-upglabel`, `#hb-plotlabel`, `#hb3d-cap` (stage caption, e.g. "Course 23 of 72 · 4,312 / 8,640 bricks").
+- Canvas inside `#house-scene` (the SVG is hidden while 3D is active). Overlays are DOM elements in `#hb3d-ov` (pointer-events none): `#hb-ownlabel`, `#hb-upglabel`, `#hb-plotlabel`, `#hb3d-cap` (stage caption, e.g. "Course 23 of 72 · 4,312 / 8,640 bricks").
 - OrbitControls: drag = orbit, right-drag / two fingers = pan, wheel / pinch = zoom; damping; polar angle limited above ground; distance clamped.
 - Existing HUD buttons keep working: `houseZoomIn/Out` (×1.2 dolly), `resetView`, `toggleOrbitMode` (switches one-finger/left drag between orbit and pan), `toggleExpand` (resizes renderer). `_houseZoom` is kept in sync as `_HZ_DEFAULT × fitDistance / distance`.
 - Render on demand (dirty flag + damping), paused when the House tab or the page is hidden. `setPixelRatio(min(dpr, 2))`, shadows on desktop only, antialias.
