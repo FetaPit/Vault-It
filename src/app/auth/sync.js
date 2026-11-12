@@ -467,6 +467,9 @@ function _initSupabase() {
     if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && session.user) {
       if (_supaUser && _supaUser.id === session.user.id) return;
       _supaUser = session.user;
+      // A Google or magic-link return lands here, not in _afterVerified: a different person on a device that still holds someone
+      // else's data is asked first, before anything is read from or written to their account (owner, 12 Nov 2026).
+      if (!(await _guardAccountSwitch(session.user.email || '', _signInKey(session.user)))) return;
       var wiped = _dropDemoBeforeSync(_supaUser.email) || (_viBootDemo && localStorage.getItem('vi_demo_mode') !== 'true');   // v0.95: see _viRestartAfterWipe; also a tab that started on the sample after another tab dropped it
       var hydrated = await _hydrateFromSupabase(_supaUser.id);
       if (wiped) { _viRestartAfterWipe(_supaUser.email, hydrated); return; }
@@ -695,6 +698,7 @@ async function _initSupabaseSession() {
     var session = res && res.data && res.data.session;
     if (!session || !session.user) return;
     _supaUser = session.user;
+    if (!(await _guardAccountSwitch(session.user.email || '', _signInKey(session.user)))) return;   // a session found at start (the page a Google return opens): the same question as the auth-state path, before any read or upload
     var wiped = _dropDemoBeforeSync(_supaUser.email);   // v0.95: see _viRestartAfterWipe
     var hydrated = await _hydrateFromSupabase(_supaUser.id);
     if (wiped) { _viRestartAfterWipe(_supaUser.email, hydrated); return; }
