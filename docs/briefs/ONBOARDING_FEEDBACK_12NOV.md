@@ -61,6 +61,36 @@ This build does **not** edit the `<h2 class="welcome-h2">` and `.welcome-sub` li
 - Run the `stress-doctor` agent on the welcome screen at phone-class load before the commit: time to first paint of the screen must not get worse than before the change by more than its noise, and the screen must stay responsive while the tiles load. If it cannot be met with six live tiles, report with the numbers and the nearest thing that can (for example stills that become live on touch) rather than shipping a slow first screen.
 - Keyboard: tiles stay buttons, focus visible, arrow keys turn the focused model.
 
+## Chunk 3: Meet the founder box and the note reworded (separate commit, ship-item)
+
+Owner, 12 Nov, with a screenshot of the tester note (`#tester-welcome` in `src/app/paywall/offer-modals.html`):
+
+> We need to add a meet the Founder box above this with my portrait and few deats. Reword by just encouraging to send any testing data to me. say a personal thanks becoming a Vault-it Pioneer and have 30 days on me plus lifetime discounted subscriptions and a limited lifetime license pre launch.
+
+- **The box**, above the note: eyebrow "Meet the founder", the portrait (round, gold ring, as on the landing page), "Pete Thickett", "Founder, Vault-It", "Designer, Lincoln". Portrait file: `site/founder.jpg` (the landing page serves it as `img/founder.jpg`); it must be served from the app's own address, so add it to the app build. No new outside host. Details are only what the landing page already says about him: nothing invented.
+- **The note, David's draft (the owner approves it on the screenshots before it ships):**
+
+  > Thank you, personally, for becoming a Vault-It Pioneer. Your first 30 days are on me. As one of the first in, you keep the beta price for as long as you stay subscribed, and you get first call on the 100 Lifetime licences before launch. Put your numbers in, made-up ones are fine, then tell me what you find: what is confusing, what is broken, what you wish it did. I read every message.
+  >
+  > Pete
+
+- **Every promise checked against what is real:** "30 days on me" is the 30-day trial on the Stripe links; "the beta price for as long as you stay subscribed" is what the paywall already says ("Your price stays the same while you stay subscribed", `paywall.html:47`); "100 Lifetime licences" is the real limit on the `founder_tester` link. No other figure, no countdown, no "only N left" unless it is read from Stripe.
+- "Send any testing data to me" is worded as "tell me what you find": the note must never read as asking people to send their own financial figures by email.
+- Buttons stay: "Let's go" and "Tell Pete something" (mailto hello@vault-it.co).
+- The line "no card needed" in this note is removed by the card wall build (its chunk 5). This chunk starts only after that wording has landed on `brand-rollout`, or is built on top of the card wall branch, so the two never edit the same line.
+- **Where it shows (the owner's call, asked 12 Nov):** as asked, above the note once the app opens. David's recommendation: show the box at the top of the first welcome screen as well, before the questions, because a face and a personal thank you earn trust before the card is asked for, not after.
+
+## Where the plans show in the onboarding (owner asked 12 Nov; David's recommendation)
+
+1. Sign up (Google or email).
+2. Founder welcome: the box, the thank you, "30 days on me". No ask.
+3. The two question screens.
+4. Your plan: their own numbers, their house, their first bricks.
+5. The plans straight after it: Vaulter monthly, Pioneer yearly, Lifetime licence, with the day 31 sentence. Card through Stripe. This is where the card wall already sits ("After the questions", owner, 12 Nov).
+6. The app opens with the tour and the note from Pete.
+
+Reason: the person has just put the work in and is looking at something made from their own answers. Before the questions they have seen nothing worth a card; later is not possible with a card wall for everyone. The demo stays open for anyone who wants to look first. No change to the card wall build is needed for this.
+
 ## Rules that apply (from CLAUDE.md)
 
 British English, sentence case, no em dashes. No new outside hosts. Fonts: Syne, DM Sans, Share Tech Mono only. "Not regulated by the FCA. Not financial advice." stays visible. Pages never scroll sideways. Never clear data on a device. No Supabase, secrets, migrations or edge function changes. Screenshots of the changed elements at 390 and 1100 px, Night and Daylight, sent to the owner. No release from this build: it merges to `brand-rollout` only on the owner's word, one chunk at a time.
