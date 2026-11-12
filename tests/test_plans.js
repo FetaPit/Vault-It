@@ -40,7 +40,7 @@ const seed = (o) => {
   // ── 2. prices, tester view (Settings) ──
   let p = await open({ w: 1100, theme: 'dark' });
   const m = await p.evaluate(() => { showSettings(); return { monthlyHtml: document.querySelector('#settings-modal [data-plan-price="monthly"]').innerHTML, annualHtml: document.querySelector('#settings-modal [data-plan-price="annual"]').innerHTML, founderTxt: document.querySelector('#settings-modal [data-plan-price="founder"]').textContent }; });
-  ok(/^£3\.99/.test(m.monthlyHtml) && /£5\.99 after the beta/.test(m.monthlyHtml) && !/<s>/.test(m.monthlyHtml), 'Pioneer monthly shows £3.99 for beta testers and "£5.99 after the beta", nothing struck through');
+  ok(/^£3\.99/.test(m.monthlyHtml) && /£5\.99 after the beta/.test(m.monthlyHtml) && !/<s>/.test(m.monthlyHtml), 'Vaulter (monthly) shows £3.99 for beta testers and "£5.99 after the beta", nothing struck through');
   ok(/^£49\.99/.test(m.annualHtml) && /£59\.99 after the beta/.test(m.annualHtml) && !/<s>/.test(m.annualHtml), 'Pioneer shows £49.99 for beta testers and "£59.99 after the beta"');
   ok(/^£99 once£149 after the beta$/.test(m.founderTxt), 'Lifetime licence: £99 once for testers, £149 after the beta (' + m.founderTxt + ')');
 
@@ -58,9 +58,9 @@ const seed = (o) => {
 
   // ── 4. Settings ──
   const S = await p.evaluate(() => { VI_BETA_OPEN = true; _refreshPioneerSettingsUI(); return { m: document.getElementById('set-plan-monthly').textContent, a: document.getElementById('set-plan-annual').textContent, f: document.getElementById('set-plan-founder').textContent, extras: document.getElementById('set-plan-extras').textContent, txt: document.getElementById('set-pioneer-inactive').textContent, badge: document.getElementById('set-pioneer-badge').textContent }; });
-  ok(S.m === 'Pioneer£3.99/mo£5.99 after the beta' && S.a === 'Pioneer£49.99/yr£59.99 after the beta' && S.f === 'Lifetime licence£99 once£149 after the beta', 'Settings buttons carry the tester prices (' + S.m + ' / ' + S.a + ' / ' + S.f + ')');
+  ok(S.m === 'Vaulter£3.99/mo£5.99 after the beta' && S.a === 'Pioneer£49.99/yr£59.99 after the beta' && S.f === 'Lifetime licence£99 once£149 after the beta', 'Settings buttons carry the tester prices (' + S.m + ' / ' + S.a + ' / ' + S.f + ')');
   ok(/own 3D house design/.test(S.extras) && /early access/.test(S.extras) && /six preset houses/.test(S.extras) && /Lifetime licence \(one payment, 100 places, beta testers first\)/.test(S.extras) && /family mode \(coming soon\)/.test(S.extras), 'Settings names the design tools, the Pioneer extras and the Lifetime terms');
-  ok(/NO PLAN/.test(S.badge) && !/TRIAL|READ-ONLY|DAYS LEFT/.test(S.badge + S.txt) && /Pioneer at £3\.99 a month while in beta, £5\.99 after/.test(S.txt) && !/Founder/.test(S.txt + S.extras), 'Settings status line (no plan on the device) has no trial wording and uses the tester price (' + S.badge + ')');
+  ok(/NO PLAN/.test(S.badge) && !/TRIAL|READ-ONLY|DAYS LEFT/.test(S.badge + S.txt) && /Vaulter at £3\.99 a month while in beta, £5\.99 after; Pioneer at £49\.99 a year while in beta, £59\.99 after/.test(S.txt) && !/Founder/.test(S.txt + S.extras), 'Settings status line (no plan on the device) has no trial wording and uses the tester price (' + S.badge + ')');
   await p.context().close();
 
   await b.close();

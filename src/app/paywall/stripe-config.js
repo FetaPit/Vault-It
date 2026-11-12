@@ -7,19 +7,20 @@
 // Links as of 4 Nov 2026 evening (owner: "card now charge later for 30 day free trial sign up for Alpha testers specifically ... Lifetime licence
 // charge at checkout"). Every link carries Stripe metadata plan = monthly / yearly / founder, which the stripe-webhook maps; it counts a trial as paid.
 var VI_STRIPE_LINKS = {
-  monthly_trial:     'https://buy.stripe.com/8x2fZbgpMdjjgdv5KK2VG08',   // Pioneer £3.99 a month, alpha testers: 30-day free trial, card taken now, first charge on day 31
-  monthly_tester:    'https://buy.stripe.com/aFacMZa1odjj1iB3CC2VG09',   // Pioneer £3.99 a month, charged at checkout (beta price, not on the alpha trial)
-  monthly:           'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',   // Pioneer £5.99 a month after the beta (the existing £5.99 monthly link)
+  monthly_trial:     'https://buy.stripe.com/8x2fZbgpMdjjgdv5KK2VG08',   // Vaulter £3.99 a month, alpha testers: 30-day free trial, card taken now, first charge on day 31
+  monthly_tester:    'https://buy.stripe.com/aFacMZa1odjj1iB3CC2VG09',   // Vaulter £3.99 a month, charged at checkout (beta price, not on the alpha trial)
+  monthly:           'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',   // Vaulter £5.99 a month after the beta (the existing £5.99 monthly link)
   annual_trial:      'https://buy.stripe.com/3cI14hc9w1ABe5na102VG0a',   // Pioneer £49.99 a year, alpha testers: 30-day free trial, card taken now, first charge on day 31
   annual:            'https://buy.stripe.com/dRm3cp6Pccff2mFa102VG02',   // Pioneer £49.99 a year, charged at checkout (beta price, not on the alpha trial)
   annual_after_beta: 'https://buy.stripe.com/cNidR3b5s3IJ0ex2yy2VG0c',   // Pioneer £59.99 a year after the beta (price_1TdPyB9mgKf6HntyvjViAMQg, recurring; checked in Stripe 5 Nov 2026), back to ?upgraded=1&plan=yearly
   founder_tester:    'https://buy.stripe.com/4gM6oB5L87YZ5yRflk2VG0b',   // Lifetime licence £99 once, charged at checkout, 100 places
   founder:           'https://buy.stripe.com/eVq28l0qO6UV3qJc982VG05'    // Lifetime licence £149 once after the beta, 100 places
 };
-// The one source for every plan surface (owner, 4 Nov 2026; monthly renamed Founder -> Pioneer 5 Nov): Pioneer £3.99 a month (£5.99 after the beta) or £49.99 a year (£59.99 after),
+// The one source for every plan surface and every plan name (owner, 12 Nov 2026: the monthly plan is Vaulter, the yearly plan is Pioneer, the one-off
+// stays Lifetime licence; from 5 Nov until then both subscriptions were called Pioneer): Vaulter £3.99 a month (£5.99 after the beta), Pioneer £49.99 a year (£59.99 after),
 // Lifetime licence £99 once (£149 after). Keys stay monthly / annual / founder: the server and saved plans use them (founder = the Lifetime licence).
 // price = after the beta, tester = beta price; link / testerLink / trialLink = the VI_STRIPE_LINKS key that charges it; tier = the icon.
-var VI_PLANS = { monthly: { price: 5.99, tester: 3.99, per: ' a month', short: '/mo', link: 'monthly', testerLink: 'monthly_tester', trialLink: 'monthly_trial', trialDays: 30, name: 'Pioneer', tier: 'founder' }, annual: { price: 59.99, tester: 49.99, per: ' a year', short: '/yr', link: 'annual_after_beta', testerLink: 'annual', trialLink: 'annual_trial', trialDays: 30, name: 'Pioneer', tier: 'pioneer' }, founder: { price: 149, tester: 99, per: ' once', short: ' once', link: 'founder', testerLink: 'founder_tester', name: 'Lifetime licence', tier: 'lifetime' } };
+var VI_PLANS = { monthly: { price: 5.99, tester: 3.99, per: ' a month', short: '/mo', link: 'monthly', testerLink: 'monthly_tester', trialLink: 'monthly_trial', trialDays: 30, name: 'Vaulter', tier: 'founder' }, annual: { price: 59.99, tester: 49.99, per: ' a year', short: '/yr', link: 'annual_after_beta', testerLink: 'annual', trialLink: 'annual_trial', trialDays: 30, name: 'Pioneer', tier: 'pioneer' }, founder: { price: 149, tester: 99, per: ' once', short: ' once', link: 'founder', testerLink: 'founder_tester', name: 'Lifetime licence', tier: 'lifetime' } };
 var VI_CANCEL_EMAIL = 'hello@vault-it.co';   // no self-serve cancel in the app yet: subscribers email to cancel
 // The app is in beta, so every account counts as an alpha tester until the profile carries a tester flag (secure paid gateway, queued);
 // a device can also be marked with vi_beta ('false' = not on the alpha trial, still on beta prices while the beta is open).
@@ -41,10 +42,11 @@ function viPlanTerms(plan) {
   if (viPlanTrial(plan)) return 'Free for ' + P.trialDays + ' days, then ' + now + P.per + '. Your card is taken now and first charged on day ' + (P.trialDays + 1) + '. Cancel before then and you pay nothing. ' + cancel;
   return now + P.per + ', charged at checkout. ' + cancel;
 }
-// paints every plan price ([data-plan-price]), terms line ([data-plan-terms]) and button ([data-plan]) on every surface: the price this
+// paints every plan name ([data-plan-name]), price ([data-plan-price]), terms line ([data-plan-terms]) and button ([data-plan]) on every surface: the price this
 // account pays now, for beta prices the later price as "£X after the beta" (never struck through), and the trial or checkout terms.
 // A plan with no link yet is disabled and says so.
 function viPricePaint() {
+  [].forEach.call(document.querySelectorAll('[data-plan-name]'), function (el) { var P = VI_PLANS[el.getAttribute('data-plan-name')]; if (P) el.textContent = P.name; });
   [].forEach.call(document.querySelectorAll('[data-plan-price]'), function (el) {
     var plan = el.getAttribute('data-plan-price'), P = VI_PLANS[plan]; if (!P) return;
     el.innerHTML = viPlanPrice(plan) + '<span>' + P.short + '</span>' + (viPlanTester(plan) ? '<span class="vi-tier-after">' + viMoney(P.price) + ' after the beta</span>' : '');

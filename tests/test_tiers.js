@@ -79,7 +79,7 @@ const seed = (o) => {
   await p.context().close();
   p = await open({ paid: true, plan: 'monthly' });
   pl = await p.evaluate(() => ({ tier: viTier(), can: viCan('design') }));
-  ok(pl.tier === 'monthly' && pl.can, 'monthly Pioneer: tier monthly, design tools open');
+  ok(pl.tier === 'monthly' && pl.can, 'Vaulter (the monthly plan): tier monthly, design tools open');
   await p.context().close();
 
   await b.close();

@@ -672,7 +672,7 @@ function viPaidApply(row) {   // mirror the profile onto this device
   } catch (e) {}
   if (paid) {
     var pend = null; try { pend = localStorage.getItem('vi_pay_pending'); localStorage.removeItem('vi_pay_pending'); } catch (e) {}
-    if (pend && !was) { try { showToast(row.is_founder ? 'Welcome! Your Lifetime licence is confirmed.' : row.plan === 'monthly' ? 'Welcome, Pioneer. Your plan is confirmed.' : 'Welcome, Pioneer. Your payment is confirmed.'); } catch (e) {} }
+    if (pend && !was) { try { showToast(row.is_founder ? 'Welcome! Your ' + VI_PLANS.founder.name + ' is confirmed.' : 'Welcome, ' + VI_PLANS[row.plan === 'monthly' ? 'monthly' : 'annual'].name + '. Your plan is confirmed.'); } catch (e) {} }
   }
   if (was !== paid) { try { if (typeof applyPaywall === 'function') applyPaywall(); } catch (e) {} try { if (typeof renderPioneerCard === 'function') renderPioneerCard(); } catch (e) {} try { if (row.is_founder) viApplyFounderBadge(); } catch (e) {} }
 }

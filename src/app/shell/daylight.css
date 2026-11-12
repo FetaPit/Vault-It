@@ -12,7 +12,6 @@
 /* secondary buttons (Cancel and the like): outline, ink text, AA on paper */
 [data-theme="light"] .btn-add-data[style*="color:var(--t3)"]{color:var(--text)!important;background:transparent!important;border-color:var(--lock)!important}
 [data-theme="light"] #sync-banner{color:var(--text)!important;border-color:var(--amber)!important}
-/* trial then paid: the plans prompt (no free column, Lifetime licence first) and the foot-of-page trial line */
 /* brand build (owner, 31 Oct: the screen recording is the target): the view controls sit in a row at the top right, in the
    recording's order (+, −, auto-orbit, reset); "show my row" and full screen follow, so nothing is lost */
 /* Brand build camera rail (brand book .rail + 31 Oct recording): line icons, vertical on the right at desktop, a row top right on phones. The stage keeps the Night look in Daylight too. */

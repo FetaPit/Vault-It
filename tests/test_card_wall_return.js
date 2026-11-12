@@ -70,7 +70,7 @@ const open_ = (s) => !s.wall && s.nav && s.tab, shut = (s) => s.wall && !s.nav &
   };
 
   // ── 1 and 2  the return address alone opens nothing; the server's word does ──
-  for (const [query, plan, row, word] of [['?upgraded=1&plan=monthly', 'monthly', TRIAL, /plan is confirmed|payment is confirmed/i], ['?founded=1', 'founder', LIFETIME, /Lifetime licence is confirmed/i]]) {
+  for (const [query, plan, row, word] of [['?upgraded=1&plan=monthly', 'monthly', TRIAL, /Welcome, Vaulter\. Your plan is confirmed/], ['?founded=1', 'founder', LIFETIME, /Lifetime licence is confirmed/i]]) {
     let p = await open({ prof: UNPAID }, query);
     let s = await look(p);
     ok(shut(s) && s.state === 'paying' && /Checking your payment/.test(s.text) && s.plans === 0, query + ' 1 back from Stripe: "Checking your payment", the app stays shut, no plan buttons (' + JSON.stringify({ wall: s.wall, state: s.state, nav: s.nav }) + ')');

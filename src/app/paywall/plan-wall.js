@@ -127,9 +127,8 @@ function viPlanGate() {
 function _viWallSay(msg) { var st = document.getElementById('wall-status'); if (st) st.textContent = msg || ''; }
 // names, prices, terms and buttons from the one source (VI_PLANS); who is signed in
 function viWallPaint() {
-  try { viPricePaint(); } catch (e) {}
+  try { viPricePaint(); } catch (e) {}   // names, prices, terms and buttons, all from VI_PLANS
   try {
-    [].forEach.call(document.querySelectorAll('#plan-wall [data-plan-name]'), function (el) { var P = VI_PLANS[el.getAttribute('data-plan-name')]; if (P) el.textContent = P.name; });
     var lead = document.getElementById('wall-lead'), M = VI_PLANS.monthly;
     if (lead) lead.textContent = (viPlanTrial('monthly') && viPlanTrial('annual'))
       ? 'The monthly and yearly plans are free for ' + M.trialDays + ' days. Your card is taken at checkout and first charged on day ' + (M.trialDays + 1) + '. Cancel before then and you pay nothing.'

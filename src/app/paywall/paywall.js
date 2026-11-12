@@ -33,13 +33,13 @@ function viAccountDay() {
 function viPlan() { try { var p = localStorage.getItem('vi_plan'); return (p === 'monthly' || p === 'yearly' || p === 'founder') ? p : null; } catch (e) { return null; } }
 function viTier() { if (!viPaid()) return 'none'; if (isFounder()) return 'founder'; return viPlan() || 'yearly'; }
 function viCan(f) { if (f === 'design' || f === 'aimodel') return viPaid(); return true; }
-// the AI screenshot reader's monthly allowance, as the server applies it (supabase/functions/portfolio-vision): 3 with no plan, 30 Pioneer, 10 Lifetime
-function viShotAllowance() { var t = viTier(); return t === 'founder' ? '10 screenshot reads a month' : (t === 'monthly' || t === 'yearly') ? '30 screenshot reads a month' : '3 screenshot reads a month (30 on Pioneer)'; }
+// the AI screenshot reader's monthly allowance, as the server applies it (supabase/functions/portfolio-vision): 3 with no plan, 30 Vaulter or Pioneer, 10 Lifetime
+function viShotAllowance() { var t = viTier(); return t === 'founder' ? '10 screenshot reads a month' : (t === 'monthly' || t === 'yearly') ? '30 screenshot reads a month' : '3 screenshot reads a month (30 on ' + VI_PLANS.monthly.name + ' or ' + VI_PLANS.annual.name + ')'; }
 // a design tool: true (and it says why) when this account may not use it
 function viGateDesign(f) {
   if (viBlockEdit()) return true;
   if (viCan(f)) return false;
-  try { showToast(f === 'aimodel' ? 'Generating a house with AI needs a plan: Pioneer (monthly or yearly) or a Lifetime licence.' : 'Uploading your own 3D house needs a plan: Pioneer (monthly or yearly) or a Lifetime licence.'); } catch (e) {}
+  try { var names = VI_PLANS.monthly.name + ', ' + VI_PLANS.annual.name + ' or a ' + VI_PLANS.founder.name; showToast(f === 'aimodel' ? 'Generating a house with AI needs a plan: ' + names + '.' : 'Uploading your own 3D house needs a plan: ' + names + '.'); } catch (e) {}
   return true;
 }
 // The first line of every add / edit / delete handler. The card wall already keeps an account without a plan away from every

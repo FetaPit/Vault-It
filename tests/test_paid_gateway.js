@@ -67,7 +67,7 @@ const UNPAID = { is_pioneer: false, is_founder: false, plan: null, paid_until: n
   await p.waitForTimeout(3600);
   s = await state(p);
   ok(s.paid && s.pioneer === 'true' && s.plan === 'yearly' && s.tier === 'yearly' && s.pro === true, 'once the webhook marks the profile paid, the plan appears on its own');
-  ok(s.pending === null && /Welcome, Pioneer/.test(s.toast), 'with a welcome, and nothing left pending');
+  ok(s.pending === null && /Welcome, Pioneer\. Your plan is confirmed/.test(s.toast), 'with a welcome by the plan\'s name (yearly: Pioneer), and nothing left pending');
   ok(await p.evaluate(() => viBetaTester() && localStorage.getItem('vi_beta') === 'true'), 'the tester flag comes from the profile');
   await p.context().close();
 

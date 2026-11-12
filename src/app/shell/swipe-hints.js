@@ -109,7 +109,7 @@ async function verifyPioneerPurchase(){
     if(!_supaUser){ say('--re','Sign in with the email you paid with, then check again.'); return; }
     say('--t2','Checking your account…');
     var row=await _syncPioneerFromProfile(_supaUser.id);
-    if(row&&(row.is_pioneer||row.is_founder)){ say('--gr','Confirmed: your '+(row.is_founder?'Lifetime licence':'Pioneer')+' plan is active.'); setTimeout(function(){ closePaywall(); },1400); }
+    if(row&&(row.is_pioneer||row.is_founder)){ say('--gr','Confirmed: '+(row.is_founder?'your '+VI_PLANS.founder.name:'your '+VI_PLANS[row.plan==='monthly'?'monthly':'annual'].name+' plan')+' is active.'); setTimeout(function(){ closePaywall(); },1400); }
     else if(row) say('--re','No payment found for this account yet. It can take a minute after checkout. If you paid with a different email, write to hello@vault-it.co and we will link it.');
     else say('--re','Could not reach Vault-It to check. Try again in a moment.');
     return;

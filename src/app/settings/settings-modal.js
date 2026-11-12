@@ -8,7 +8,7 @@ function _refreshPioneerSettingsUI(){
   if(active)active.style.display=paid?'block':'none';
   if(line)line.textContent=key?'You are on '+VI_PLANS[key].name+(key==='monthly'?' (monthly)':key==='annual'?' (yearly)':'')+'. Thank you for backing Vault-It.':'Your plan is active. Thank you for backing Vault-It.';
   if(inactive){inactive.style.display=paid?'none':'block';
-    inactive.textContent='This account is not on a plan. The plans: Pioneer at '+viPlanLabel('monthly')+'; Pioneer at '+viPlanLabel('annual')+'; or a Lifetime licence at '+viPlanLabel('founder')+'.';}
+    inactive.textContent='This account is not on a plan. The plans: '+VI_PLANS.monthly.name+' at '+viPlanLabel('monthly')+'; '+VI_PLANS.annual.name+' at '+viPlanLabel('annual')+'; or a '+VI_PLANS.founder.name+' at '+viPlanLabel('founder')+'.';}
   // one plan per account: on a plan the buy buttons and their terms are not shown; changing or cancelling goes by email
   [].forEach.call(document.querySelectorAll('#settings-modal .set-tiers, #settings-modal .set-tier-terms, #settings-modal [data-plan-buy]'),function(el){el.style.display=paid?'none':'';});
   try{viPricePaint();}catch(e){}
