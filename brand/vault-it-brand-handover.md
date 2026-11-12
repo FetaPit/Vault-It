@@ -49,7 +49,7 @@ These were read from the live repo, so use them instead of guessing.
 
 - **No new framework or build step** unless the repo already has one. The app looks like a single large HTML file with inline CSS and JS (the saved page was about 570 KB). Confirm in Step 0 and keep the same architecture.
 - **No new dependencies.** The engine uses plain WebGL and canvas 2D. Do not introduce three.js.
-- **Fonts stay:** Syne (display), DM Sans (body), Share Tech Mono (numbers, labels). Remove unused fonts (see 5.2).
+- **Fonts stay:** Vault-form (headings and the logo only; the brand's own typeface, self-hosted, replaced Syne: owner, 10 Nov 2026; from 12 Nov only the display cuts ship: Heading (D+) for every heading, Hero (D++) for the hero line from 96 px), DM Sans (body), Share Tech Mono (numbers, labels). Remove unused fonts (see 5.2).
 - **British English, sentence case**, no em dashes in any copy.
 - **Compliance line stays visible:** "Not regulated by the FCA. Not financial advice."
 - **Never break existing user data or saved state.** This is a visual and behavioural refresh.
@@ -132,7 +132,7 @@ Accepted when: no inline hand-drawn icon remains where a pack icon exists, every
 
 This is the main navigation. The dot before each icon is removed: the icon now carries the tab colour.
 
-Anatomy of a tab: icon (18px) + label (Syne 600, 12px, +0.14em tracking, uppercase) + optional badge. Underline 2px in the tab colour. Active tab: label becomes `--text`, underline and soft shadow in the tab colour, icon breathes on the 2.8 second beat (`tabglow` keyframes). In Daylight the icon glow animation is off, underline stays.
+Anatomy of a tab: icon (18px) + label (DM Sans 700, 12px, +0.14em tracking, uppercase; owner, 12 Nov 2026: Vault-form is for headings and the logo only) + optional badge. Underline 2px in the tab colour. Active tab: label becomes `--text`, underline and soft shadow in the tab colour, icon breathes on the 2.8 second beat (`tabglow` keyframes). In Daylight the icon glow animation is off, underline stays.
 
 | Tab | Icon id | Colour token | Dark | Daylight |
 | --- | --- | --- | --- | --- |
@@ -193,7 +193,7 @@ Accepted when: every screen is usable in Daylight with no invisible text, no neo
 
 ### Phase 8: Logo and wordmark
 
-- Wordmark: Syne 800. "Vault" in `--text`, then a small brick, then "It" in `--teal`. The brick sits on the baseline (`translateY(-.06em)`), `.3em` wide, `.17em` tall, radius 2px. In text the name is written Vault-It with a hyphen (owner, 30 Oct 2026); in the logo that hyphen is drawn as the brick. Standardise the logo on the brick. Owner, 7 Nov 2026: wherever the name is drawn as a title or lockup, with the brick or with a plain hyphen, "Vault" takes the text colour and "-It" is teal.
+- Wordmark: Vault-form Heading 700 (D+) in text; the drawn wordmark in the same cut is in `brand/logo/` (owner, 12 Nov 2026). The older logo marks and the e-mail lockup keep their own letters until replaced. "Vault" in `--text`, then a small brick, then "It" in `--teal`. The brick sits on the baseline (`translateY(-.06em)`), `.3em` wide, `.17em` tall, radius 2px. In text the name is written Vault-It with a hyphen (owner, 30 Oct 2026); in the logo that hyphen is drawn as the brick. Standardise the logo on the brick. Owner, 7 Nov 2026: wherever the name is drawn as a title or lockup, with the brick or with a plain hyphen, "Vault" takes the text colour and "-It" is teal.
 - Mark: use the SVG files. Full (96px and up), Mid (40 to 96px), Micro (under 40px, also the favicon and PWA icon). Clear space is a quarter of the icon height. Use the Daylight variants on light surfaces for the header only; elsewhere the built in dark disc works on any background.
 - Update `<title>`, `og:title`, and the hero H1 to the new tagline: **Get out of the red and into your home.** The current site hero still says "From debt to owning your home outright".
 
@@ -498,7 +498,7 @@ Do not swap everything in one release. Order the work so the app is always shipp
 4. **Net worth scene and tracker toggle** come after, behind `vi-flag-nw`. The Graph view stays the default of the tracker. Feed it the app's own series with `setData`.
 5. **Landing page.** `landing.html` (vault-it.co) gets the same tokens, icons, wordmark and tagline in its own phase after the app.
 6. **Offline and caching.** Bump the cache or version string the PWA uses with every release so installed copies update, and include the new `brand/` assets in whatever precache list the app has.
-7. **Tests every phase:** `bash scripts/run-tests.sh all`. Also confirm `tests/test_beta_client.js` still passes: the brand work must add no new outside hosts (the fonts stay Syne, DM Sans, Share Tech Mono, and Playfair and DM Mono are removed).
+7. **Tests every phase:** `bash scripts/run-tests.sh all`. Also confirm `tests/test_beta_client.js` still passes: the brand work must add no new outside hosts (the fonts stay Vault-form (self-hosted), DM Sans, Share Tech Mono, and Playfair and DM Mono are removed).
 8. **Release (owner only, when asked).** Run all tests, create `backup/release-pioneer-v2-YYYYMMDD-HHMM`, then fast-forward `release/pioneer-v2`. Cloudflare then deploys it. Rollback is to fast-forward back to the backup branch, or switch the flag off.
 9. **Device matrix before the default flips:** a phone with a real GPU, a low end phone, desktop Chrome and Safari, Night and Daylight on each, reduced motion on, and one run with WebGL disabled to confirm the flat fallback still shows a house.
 10. **Watch after release:** console errors, frame rate on the house builder, and any report of text that is hard to read in Daylight.

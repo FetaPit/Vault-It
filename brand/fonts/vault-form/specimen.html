@@ -15,98 +15,127 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body { background: var(--night); color: var(--night-ink); font-family: var(--body); font-size: 16px; line-height: 1.5; overflow-x: hidden; }
+  img { max-width: 100%; height: auto; display: block; }
   .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
   section { padding: 48px 0; border-top: 1px solid var(--night-line); }
   .night { background: var(--night); color: var(--night-ink); }
   .day { background: var(--paper); color: var(--day-ink); border-top-color: var(--day-line); }
   .night .dim { color: var(--night-dim); }
   .day .dim { color: var(--day-dim); }
-  .tag { font-family: var(--font-vf-label); text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; color: var(--teal); margin: 0 0 16px; }
+  /* small labels are DM Sans: Vault-form is for headings and the logo only */
+  .tag { font-family: var(--body); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; color: var(--teal); margin: 0 0 16px; }
   .day .tag { color: var(--deep-teal); }
-  h2 { font-family: var(--font-vf-display); font-weight: 700; font-size: clamp(24px, 4vw, 40px); line-height: 1.1; margin: 0 0 8px; }
-  p { margin: 0 0 12px; max-width: 62ch; }
-  .vf { font-family: var(--font-vf-display); }
-  .vfc { font-family: var(--font-vf-condensed); }
-  .any { overflow-wrap: anywhere; }
-  .w300 { font-weight: 300; } .w400 { font-weight: 400; } .w700 { font-weight: 700; }
+  p { margin: 0 0 12px; max-width: 62ch; overflow-wrap: break-word; }
+  .note { font-size: 13px; }
+
+  /* the four display cuts, all Bold 700 */
+  .cut-h, .cut-hc, .cut-hero, .cut-heroc { font-weight: 700; overflow-wrap: anywhere; }
+  .cut-h { font-family: var(--font-vf-heading); }
+  .cut-hc { font-family: var(--font-vf-heading-condensed); }
+  .cut-hero { font-family: var(--font-vf-hero); }
+  .cut-heroc { font-family: var(--font-vf-hero-condensed); }
+  .tight { letter-spacing: -0.01em; word-spacing: -0.03em; } /* same as .vf-heading-lg: 40 px and up */
+  h1, h2, h3, h4 { font-family: var(--font-vf-heading); font-weight: 700; overflow-wrap: break-word; }
+  h2 { font-size: clamp(24px, 4vw, 40px); line-height: 1.1; margin: 0 0 8px; }
 
   /* header */
   header { padding: 28px 0 20px; }
-  .brand { font-family: var(--font-vf-display); font-weight: 700; font-size: 22px; letter-spacing: 0.02em; }
+  .brand { font-family: var(--font-vf-heading); font-weight: 700; font-size: 22px; line-height: 1.2; overflow-wrap: break-word; }
   .brand b { color: var(--teal); font-weight: 700; }
-  .meta { font-size: 13px; color: var(--night-dim); margin-top: 4px; }
+  .meta { font-size: 13px; color: var(--night-dim); margin-top: 6px; max-width: 70ch; }
 
-  /* hero */
-  .hero h1 { font-family: var(--font-vf-display); font-weight: 700; letter-spacing: -0.01em; word-spacing: -0.03em; font-size: clamp(36px, 8vw, 96px); line-height: 1.04; margin: 0 0 20px; overflow-wrap: anywhere; }
+  /* wordmark */
+  .marks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+  .mark { border-radius: 14px; padding: clamp(16px, 4vw, 32px); }
+  .mark.on-night { background: #080808; border: 1px solid #22302F; color: var(--night-dim); }
+  .mark.on-day { background: #F3F7F6; border: 1px solid var(--day-line); color: var(--day-dim); }
+  .mark img.big { width: 100%; }
+  .mark img.small { height: 32px; width: auto; margin-top: 20px; }
+  .mark .cap { font-size: 12px; margin: 12px 0 0; }
+
+  /* hero line: Heading until it renders at 96 px, then the Hero cut */
+  .hero h1 { letter-spacing: -0.01em; word-spacing: -0.03em; font-size: clamp(36px, 9vw, 112px); line-height: 1.06; margin: 0 0 20px; overflow-wrap: anywhere; }
+  @media (min-width: 1067px) { .hero h1 { font-family: var(--font-vf-hero); } } /* 9vw is 96 px from here */
   .hero h1 em { font-style: normal; color: var(--red); }
   .hero h1 span { color: var(--teal); }
+  .day.hero h1 em { color: #C8202A; }
   .day.hero h1 span { color: var(--deep-teal); }
 
-  /* heading vs DM Sans body, as in the app */
-  .pair h3 { font-family: var(--font-vf-display); font-weight: 700; font-size: clamp(32px, 6vw, 64px); line-height: 1.05; margin: 0 0 14px; }
-  .pair p { font-size: 18px; color: #A9B6B4; line-height: 1.65; }
-  .day.pair p { color: var(--day-dim); }
+  /* headings in place beside DM Sans body */
+  .doc { max-width: 68ch; }
+  .doc h2 { font-size: clamp(28px, 5vw, 40px); line-height: 1.1; margin: 0 0 12px; }
+  .doc h3 { font-size: 24px; line-height: 1.15; margin: 28px 0 8px; }
+  .doc h4 { font-size: 18px; line-height: 1.2; margin: 24px 0 6px; }
+  .doc p { font-size: 16px; line-height: 1.65; color: #A9B6B4; }
+  .day .doc p { color: var(--day-dim); }
+  .doc .sz { font-family: var(--body); font-weight: 400; font-size: 11px; letter-spacing: 0.04em; color: var(--night-dim); margin-left: 8px; white-space: nowrap; vertical-align: middle; }
+  .day .doc .sz { color: var(--day-dim); }
 
   /* overview mock */
-  .card { border: 1px solid #22302F; border-radius: 14px; padding: 20px; background: linear-gradient(180deg, #0D1313, #090B0B); }
+  .card { border: 1px solid #22302F; border-radius: 14px; padding: clamp(16px, 4vw, 20px); background: linear-gradient(180deg, #0D1313, #090B0B); }
   .day .card { border-color: var(--day-line); background: #FFFFFF; }
-  .tabs { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--font-vf-condensed); font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--night-dim); border-bottom: 1px solid #22302F; padding-bottom: 10px; margin-bottom: 18px; }
+  .card h3 { font-size: 20px; line-height: 1.2; margin: 0 0 14px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--body); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--night-dim); border-bottom: 1px solid #22302F; padding-bottom: 10px; margin-bottom: 18px; }
   .day .tabs { border-bottom-color: var(--day-line); color: var(--day-dim); }
   .tabs .on { color: var(--teal); }
   .day .tabs .on { color: var(--deep-teal); }
-  .nw-label { font-family: var(--font-vf-condensed); text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; color: var(--night-dim); }
-  .nw { font-family: var(--font-vf-heading); font-weight: 700; font-size: clamp(48px, 13vw, 120px); line-height: 1; margin: 6px 0 16px; color: var(--gold); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .nw-label { font-family: var(--body); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; color: var(--night-dim); }
+  .nw { font-family: var(--font-vf-heading); font-weight: 700; letter-spacing: -0.01em; font-size: clamp(36px, 12vw, 120px); line-height: 1; margin: 8px 0 18px; color: var(--gold); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
   .day .nw { color: var(--deep-teal); }
-  .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap: 12px; }
   .stat { border-top: 1px solid #22302F; padding-top: 10px; }
   .day .stat { border-top-color: var(--day-line); }
-  .stat .k { font-family: var(--font-vf-condensed); text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px; color: var(--night-dim); }
+  .stat .k { font-family: var(--body); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px; color: var(--night-dim); }
   .day .stat .k { color: var(--day-dim); }
-  .stat .v { font-family: var(--font-vf-condensed); font-weight: 700; font-size: clamp(20px, 5.4vw, 26px); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .stat .v { font-family: var(--body); font-weight: 700; font-size: clamp(18px, 5vw, 22px); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .neg { color: var(--red); }
+  .day .neg { color: #C8202A; }
   .pos { color: var(--teal); }
   .day .pos { color: var(--deep-teal); }
 
-  /* styles list */
+  /* cuts list */
   .styles { display: grid; gap: 14px; }
   .style { border-bottom: 1px solid var(--night-line); padding-bottom: 14px; }
-  .style .n { font-size: 12px; color: var(--night-dim); font-family: var(--body); }
-  .style .s { font-size: clamp(22px, 4vw, 36px); line-height: 1.15; overflow-wrap: anywhere; }
+  .style .n { font-size: 12px; color: var(--night-dim); font-family: var(--body); margin-bottom: 4px; }
+  .style .s { line-height: 1.1; }
+  .style .s.at-heading { font-size: clamp(32px, 7vw, 56px); }
+  .style .s.at-hero { font-size: clamp(56px, 20vw, 128px); }
 
-  /* glyph set */
-  .glyphs { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 2px; font-family: var(--font-vf-display); font-size: 30px; }
-  .glyphs span { display: flex; align-items: center; justify-content: center; height: 58px; background: #0E1414; border-radius: 4px; }
+  /* character set */
+  .alpha { font-size: clamp(26px, 5vw, 48px); line-height: 1.2; margin: 0 0 10px; max-width: none; }
+  .glyphs { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 2px; font-family: var(--font-vf-heading); font-weight: 700; font-size: 32px; }
+  .glyphs span { display: flex; align-items: center; justify-content: center; height: 64px; background: #0E1414; border-radius: 4px; }
   .day .glyphs span { background: #FFFFFF; }
-  .alpha { font-size: clamp(24px, 5vw, 48px); line-height: 1.2; overflow-wrap: anywhere; margin: 0 0 8px; }
 
-  /* figures */
-  .figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
-  .col { text-align: right; font-variant-numeric: tabular-nums; font-size: 24px; line-height: 1.4; }
-  .col .h { font-family: var(--body); font-size: 12px; color: var(--night-dim); text-align: left; }
-  .day .col .h { color: var(--day-dim); }
-
-  /* readability */
-  .read { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-  .read div p { margin: 0 0 4px; }
-  .caps { text-transform: uppercase; letter-spacing: 0.06em; }
+  /* money figures at display size */
+  .money { display: grid; gap: 8px; margin-bottom: 28px; }
+  .money .m { line-height: 1.05; margin: 0; max-width: none; font-variant-numeric: tabular-nums; }
+  .money .lab { font-size: 12px; color: var(--night-dim); margin: 10px 0 0; }
+  .figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 24px; }
+  .col { text-align: right; font-variant-numeric: tabular-nums; font-size: clamp(32px, 7vw, 40px); line-height: 1.25; overflow-wrap: anywhere; }
+  .col .cap { font-family: var(--body); font-weight: 400; font-size: 12px; line-height: 1.5; color: var(--night-dim); text-align: left; margin-bottom: 6px; }
+  .day .col .cap { color: var(--day-dim); }
 
   /* waterfall */
-  .fall { margin-bottom: 28px; }
-  .fall .row { display: flex; gap: 12px; align-items: baseline; }
-  .fall .px { flex: 0 0 44px; font-size: 11px; color: var(--night-dim); font-family: var(--body); text-align: right; }
-  .fall .t { min-width: 0; overflow-wrap: anywhere; line-height: 1.2; }
+  .fall { margin-bottom: 32px; }
+  .fall .row { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; align-items: baseline; margin-bottom: 6px; }
+  .fall .px { font-size: 11px; color: var(--night-dim); font-family: var(--body); text-align: right; white-space: nowrap; }
+  .day .fall .px { color: var(--day-dim); }
+  .fall .t { min-width: 0; overflow-wrap: anywhere; line-height: 1.15; }
+  @media (max-width: 600px) {
+    .fall .row { grid-template-columns: minmax(0, 1fr); gap: 2px; margin-bottom: 10px; }
+    .fall .px { text-align: left; }
+  }
 
-  /* display cuts: Heading (D+) from 48 px, Hero (D++) from 96 px */
+  /* grounds: Night scanlines, Daylight blueprint grid */
   .scan { background-color: var(--night); background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(68,192,185,.05) 2px, rgba(68,192,185,.05) 4px); }
   .grid { background-color: var(--paper); background-image: repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(0,127,123,.10) 19px, rgba(0,127,123,.10) 20px), repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(0,127,123,.10) 19px, rgba(0,127,123,.10) 20px); }
-  .hatch .h { font-family: var(--font-vf-heading); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
-  .hatch .hc { font-family: var(--font-vf-heading-condensed); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
-  .hatch .hero { font-family: var(--font-vf-hero); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
-  .hatch .heroc { font-family: var(--font-vf-hero-condensed); font-weight: 700; line-height: 1.05; margin: 0 0 10px; overflow-wrap: anywhere; }
+  .ground p.cut-h, .ground p.cut-hc, .ground p.cut-hero, .ground p.cut-heroc { line-height: 1.05; margin: 0 0 10px; max-width: none; }
 
   ul.rules { padding-left: 18px; margin: 0; max-width: 70ch; }
-  ul.rules li { margin-bottom: 6px; }
-  footer { padding: 32px 0 48px; font-size: 13px; color: var(--night-dim); border-top: 1px solid var(--night-line); }
+  ul.rules li { margin-bottom: 6px; overflow-wrap: break-word; }
+  code { font-size: 0.92em; overflow-wrap: anywhere; }
+  footer { padding: 32px 0 48px; font-size: 13px; color: var(--night-dim); border-top: 1px solid var(--night-line); overflow-wrap: break-word; }
 </style>
 </head>
 <body>
@@ -114,23 +143,48 @@
 <header class="night">
   <div class="wrap">
     <div class="brand">Vault-form <b>/</b> Vault-It brand typeface</div>
-    <div class="meta">Version 1.000. PT Live Design. SIL Open Font License 1.1. Six text styles plus four display cuts (Heading and Hero).</div>
+    <div class="meta">Version 1.000. PT Live Design. SIL Open Font License 1.1. Display cuts only, for headings and the logo: Heading (D+) and Hero (D++), each in normal and condensed width, all Bold 700. DM Sans is the body face.</div>
   </div>
 </header>
 
-<section class="night hero">
+<section class="night">
   <div class="wrap">
-    <p class="tag">Bold, Night</p>
-    <h1>Get out of the <em>red</em> and into your <span>home.</span></h1>
-    <p class="dim">A squared techno sans built from straight edges and 45 degree chamfers. The big chamfers sit top-left and bottom-right, so every cut runs forward like a "/". Upright letters, forward lean.</p>
+    <p class="tag">The wordmark, drawn in Heading (D+)</p>
+    <div class="marks">
+      <div class="mark on-night">
+        <img class="big" src="../../logo/vault-it-wordmark-night.svg" alt="Vault-It wordmark, Night" width="5422" height="1025">
+        <img class="small" src="../../logo/vault-it-wordmark-night-transparent.svg" alt="Vault-It wordmark at 32 px tall, Night" width="169" height="32">
+        <p class="cap">Night. Vault in the text colour, the brick hyphen and It in teal. Shown full width and at 32 px tall.</p>
+      </div>
+      <div class="mark on-day">
+        <img class="big" src="../../logo/vault-it-wordmark-daylight.svg" alt="Vault-It wordmark, Daylight" width="5422" height="1025">
+        <img class="small" src="../../logo/vault-it-wordmark-daylight-transparent.svg" alt="Vault-It wordmark at 32 px tall, Daylight" width="169" height="32">
+        <p class="cap">Daylight. Same lockup on paper, with deep teal for the brick and It.</p>
+      </div>
+    </div>
+    <p class="dim note" style="margin-top: 14px;">The wordmark is artwork: use the SVG files in <code>brand/logo/</code>, never retype it in the font. Below about 32 px tall the hatching softens into a thin edge.</p>
   </div>
 </section>
 
-<section class="night pair">
+<section class="night hero">
   <div class="wrap">
-    <p class="tag">Heading over DM Sans body</p>
-    <h3 style="letter-spacing: -0.01em; word-spacing: -0.03em;">Net worth in 3D</h3>
-    <p>A speed run of the climb: starting in the red with a little saved, paying the debt off block by block, then building wealth in every domain. Big blocks are £1,000. Small cubes are £100. Nine cubes become a block.</p>
+    <p class="tag">Hero line, Night</p>
+    <h1>Get out of the <em>red</em> and into your <span>home.</span></h1>
+    <p class="dim">A squared techno sans built from straight edges and 45 degree chamfers, with hatched extrusion faces running down and to the right. The big chamfers sit top-left and bottom-right, so every cut runs forward like a "/". This line is set in Heading and switches to the Hero cut once it renders at 96 px or more.</p>
+  </div>
+</section>
+
+<section class="night">
+  <div class="wrap">
+    <p class="tag">Headings in place, beside DM Sans body</p>
+    <article class="doc">
+      <h2 class="tight">Your house deposit<span class="sz">40 px</span></h2>
+      <p>Body copy stays in DM Sans at 16 px. Every heading above it takes the Heading cut, whatever its size, so a page reads as one voice from the title down to the smallest card.</p>
+      <h3>Level 2: the starter home<span class="sz">24 px</span></h3>
+      <p>Each brick stands for part of your deposit. Save, and the house goes up brick by brick. Under 32 px the hatching reads as a thin shadow edge rather than full detail.</p>
+      <h4>Bricks laid this month<span class="sz">18 px</span></h4>
+      <p>About as small as a heading should go. Below 18 px, use DM Sans for the label instead.</p>
+    </article>
   </div>
 </section>
 
@@ -139,6 +193,7 @@
     <p class="tag">In-app mock: overview</p>
     <div class="card">
       <div class="tabs"><span class="on">Overview</span><span>Goals</span><span>House</span><span>Debts</span><span>Wealth</span></div>
+      <h3>Your money today</h3>
       <div class="nw-label">Net worth</div>
       <div class="nw">£48,215</div>
       <div class="strip">
@@ -148,118 +203,98 @@
         <div class="stat"><div class="k">House deposit</div><div class="v">38%</div></div>
       </div>
     </div>
+    <p class="dim note" style="margin-top: 14px;">The card title and the net worth hero figure are Heading. Tabs, labels and the stat strip are DM Sans.</p>
   </div>
 </section>
 
 <section class="night">
   <div class="wrap">
-    <p class="tag">Styles</p>
+    <p class="tag">The four cuts</p>
     <div class="styles">
-      <div class="style"><div class="n">Vault-form Light 300</div><div class="s vf w300">Get out of the red and into your home.</div></div>
-      <div class="style"><div class="n">Vault-form Regular 400</div><div class="s vf w400">Get out of the red and into your home.</div></div>
-      <div class="style"><div class="n">Vault-form Bold 700</div><div class="s vf w700">Get out of the red and into your home.</div></div>
-      <div class="style"><div class="n">Vault-form Condensed Light 300</div><div class="s vfc w300">Get out of the red and into your home.</div></div>
-      <div class="style"><div class="n">Vault-form Condensed Regular 400</div><div class="s vfc w400">Get out of the red and into your home.</div></div>
-      <div class="style"><div class="n">Vault-form Condensed Bold 700</div><div class="s vfc w700">Get out of the red and into your home.</div></div>
-      <div class="style"><div class="n">Vault-form Heading Bold 700 (display, 48 px and up)</div><div class="s" style="font-family: var(--font-vf-heading); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
-      <div class="style"><div class="n">Vault-form Heading Condensed Bold 700 (display, 48 px and up)</div><div class="s" style="font-family: var(--font-vf-heading-condensed); font-weight: 700; font-size: clamp(48px, 9vw, 72px);">Into your home</div></div>
-      <div class="style"><div class="n">Vault-form Hero Bold 700 (hero, 96 px and up)</div><div class="s" style="font-family: var(--font-vf-hero); font-weight: 700; font-size: 96px; overflow-wrap: anywhere;">Home</div></div>
-      <div class="style"><div class="n">Vault-form Hero Condensed Bold 700 (hero, 96 px and up)</div><div class="s" style="font-family: var(--font-vf-hero-condensed); font-weight: 700; font-size: 96px; overflow-wrap: anywhere;">Home</div></div>
+      <div class="style"><div class="n">Vault-form Heading, Bold 700 (D+). Every heading, legible from about 18 px.</div><div class="s at-heading cut-h tight">Into your home</div></div>
+      <div class="style"><div class="n">Vault-form Heading Condensed, Bold 700 (D+). Headings in narrow spaces.</div><div class="s at-heading cut-hc tight">Into your home</div></div>
+      <div class="style"><div class="n">Vault-form Hero, Bold 700 (D++). The hero line, 96 px and up.</div><div class="s at-hero cut-hero">Home</div></div>
+      <div class="style"><div class="n">Vault-form Hero Condensed, Bold 700 (D++). The hero line in narrow spaces, 96 px and up.</div><div class="s at-hero cut-heroc">Home</div></div>
     </div>
+    <p class="dim note" style="margin-top: 14px;">On a phone the Hero samples shrink below 96 px only so they fit this page. In real layouts, switch Hero to Heading when it renders under 96 px.</p>
   </div>
 </section>
 
 <section class="night">
   <div class="wrap">
-    <p class="tag">Alphabet</p>
-    <p class="alpha vf w700">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
-    <p class="alpha vf w700">abcdefghijklmnopqrstuvwxyz</p>
-    <p class="alpha vf w400">0123456789 £€$¢¥ %‰ &amp;@#</p>
-    <p class="alpha vfc w700">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz</p>
-    <p class="tag" style="margin-top: 28px;">Full character set, Regular</p>
-    <div class="glyphs w400" id="glyphs"></div>
+    <p class="tag">Alphabet and full character set, Heading</p>
+    <p class="alpha cut-h">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
+    <p class="alpha cut-h">abcdefghijklmnopqrstuvwxyz</p>
+    <p class="alpha cut-h">0123456789 £€$¢¥ %‰ &amp;@#</p>
+    <p class="alpha cut-hc">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz</p>
+    <p class="dim note" style="margin-top: 20px;">Every glyph in Heading at 32 px.</p>
+    <div class="glyphs" id="glyphs"></div>
   </div>
 </section>
 
 <section class="night">
   <div class="wrap">
-    <p class="tag">Figures: tabular by default</p>
+    <p class="tag">Money figures at display size, Heading</p>
+    <div class="money">
+      <p class="lab">Up to 96 px</p>
+      <p class="m cut-h tight" style="font-size: clamp(40px, 14vw, 96px); color: var(--gold);">£48,215</p>
+      <p class="lab">Up to 64 px</p>
+      <p class="m cut-h tight" style="font-size: clamp(36px, 12vw, 64px); color: var(--red);">−£13,185</p>
+      <p class="lab">Up to 48 px</p>
+      <p class="m cut-h tight" style="font-size: clamp(36px, 13vw, 48px); color: var(--teal);">£61,400</p>
+    </div>
     <div class="figs">
-      <div class="col vf w400"><div class="h">Regular</div>£1,234.56<br>£9,999.99<br>£0.00<br>−£300.00<br>-£300.00</div>
-      <div class="col vf w700"><div class="h">Bold</div>£1,234.56<br>£9,999.99<br>£0.00<br>−£300.00<br>-£300.00</div>
-      <div class="col vfc w700"><div class="h">Condensed Bold</div>£1,234.56<br>£9,999.99<br>£0.00<br>−£300.00<br>-£300.00</div>
-      <div class="col vfc w400"><div class="h">Condensed Regular</div>£1,234.56<br>£9,999.99<br>£0.00<br>−£300.00<br>-£300.00</div>
+      <div class="col cut-h"><div class="cap">Heading, tabular by default, up to 40 px</div>£1,234.56<br>£9,999.99<br>£0.00<br>−£300.00<br>-£300.00</div>
+      <div class="col cut-hc"><div class="cap">Heading Condensed, up to 40 px</div>£1,234.56<br>£9,999.99<br>£0.00<br>−£300.00<br>-£300.00</div>
     </div>
-    <p class="dim" style="margin-top: 16px;">The last two lines compare the minus sign (U+2212) with the hyphen. Proportional figures in running text: <span class="vf w400" style="font-variant-numeric: proportional-nums;">11 July 2026, 1,117 savers</span> against tabular <span class="vf w400">11 July 2026, 1,117 savers</span>.</p>
-  </div>
-</section>
-
-<section class="night">
-  <div class="wrap">
-    <p class="tag">Readability checks</p>
-    <div class="read">
-      <div>
-        <p class="dim" style="font-size: 12px;">Regular 14 px</p>
-        <p class="vf w400" style="font-size: 14px;">Il1 O0 rn m · Ill legal 1001 · modern burn</p>
-        <p class="dim" style="font-size: 12px;">Bold Condensed 14 px</p>
-        <p class="vfc w700" style="font-size: 14px;">Il1 O0 rn m · Ill legal 1001 · modern burn</p>
-        <p class="dim" style="font-size: 12px;">Bold Condensed 12 px, counters</p>
-        <p class="vfc w700" style="font-size: 12px;">a e s g 8 3 · passages 3,838 · seeds aged</p>
-        <p class="dim" style="font-size: 12px;">Bold Condensed 10.5 px</p>
-        <p class="vfc w700" style="font-size: 10.5px;">a e s g 8 3 · passages 3,838 · Il1 O0 rn m</p>
-      </div>
-      <div>
-        <p class="dim" style="font-size: 12px;">All caps labels, 11 px, +0.06 em</p>
-        <p class="vfc w400 caps" style="font-size: 11px;">Net worth · Savings · Debt · ISA · IL1 O0</p>
-        <p class="vfc w700 caps" style="font-size: 11px;">Net worth · Savings · Debt · ISA · IL1 O0</p>
-        <p class="vf w400 caps" style="font-size: 11px;">Net worth · Savings · Debt · ISA · IL1 O0</p>
-        <p class="dim" style="font-size: 12px;">Money glyphs at 12 px</p>
-        <p class="vf w400" style="font-size: 12px;">£147 £714 £471 −£300 €1,040</p>
-        <p class="dim" style="font-size: 12px;">Light at 20 px</p>
-        <p class="vf w300" style="font-size: 20px; color: var(--teal);">Light on Night in teal</p>
-        <p class="vf w300" style="font-size: 20px; color: var(--gold);">Light on Night in gold</p>
-      </div>
-    </div>
+    <p class="dim" style="margin-top: 16px;">The last two lines compare the minus sign (U+2212) with the hyphen: use the minus sign for debt. In a headline, proportional figures (<code>font-variant-numeric: proportional-nums</code>) close up the gaps: <span class="cut-h" style="font-size: 32px; font-variant-numeric: proportional-nums;">£1,117</span> against tabular <span class="cut-h" style="font-size: 32px;">£1,117</span>.</p>
   </div>
 </section>
 
 <section class="night">
   <div class="wrap">
     <p class="tag">Size waterfall</p>
+    <p class="dim note">Heading stays legible down to about 18 px. Below about 32 px the hatching softens into a thin shadow edge. Hero starts at 96 px. Every row is at its true size, so on a narrow screen the biggest rows show a shorter word.</p>
     <div id="falls"></div>
   </div>
 </section>
 
-<section class="night scan hatch">
+<section class="night scan ground">
   <div class="wrap">
     <p class="tag">Heading and Hero cuts on Night scanlines</p>
-    <p class="h" style="font-size: 48px; color: var(--teal);">Into your home</p>
-    <p class="h" style="font-size: clamp(48px, 15vw, 72px); color: var(--gold);">£48,215</p>
-    <p class="heroc" style="font-size: 120px;">VAULT</p>
+    <p class="cut-h" style="font-size: clamp(32px, 9vw, 48px); color: var(--teal);">Into your home</p>
+    <p class="cut-h tight" style="font-size: clamp(40px, 14vw, 72px); color: var(--gold);">£48,215</p>
+    <p class="cut-heroc" style="font-size: clamp(64px, 24vw, 120px);">VAULT</p>
   </div>
 </section>
 
-<section class="day grid hatch">
+<section class="day grid ground">
   <div class="wrap">
     <p class="tag">Heading and Hero cuts on the Daylight blueprint grid</p>
-    <p class="h" style="font-size: 48px; color: var(--deep-teal);">Into your home</p>
-    <p class="h" style="font-size: clamp(48px, 15vw, 72px);">£48,215</p>
-    <p class="heroc" style="font-size: 120px; color: var(--deep-teal);">VAULT</p>
+    <p class="cut-h" style="font-size: clamp(32px, 9vw, 48px); color: var(--deep-teal);">Into your home</p>
+    <p class="cut-h tight" style="font-size: clamp(40px, 14vw, 72px);">£48,215</p>
+    <p class="cut-heroc" style="font-size: clamp(64px, 24vw, 120px); color: var(--deep-teal);">VAULT</p>
   </div>
 </section>
 
 <section class="day hero">
   <div class="wrap">
-    <p class="tag">Bold, Daylight</p>
+    <p class="tag">Hero line, Daylight</p>
     <h1>Get out of the <em>red</em> and into your <span>home.</span></h1>
   </div>
 </section>
 
-<section class="day pair">
+<section class="day">
   <div class="wrap">
-    <p class="tag">Heading over DM Sans body</p>
-    <h3 style="letter-spacing: -0.01em; word-spacing: -0.03em;">Net worth in 3D</h3>
-    <p>A speed run of the climb: starting in the red with a little saved, paying the debt off block by block, then building wealth in every domain. Big blocks are £1,000. Small cubes are £100.</p>
+    <p class="tag">Headings in place, Daylight</p>
+    <article class="doc">
+      <h2 class="tight">Your house deposit<span class="sz">40 px</span></h2>
+      <p>Body copy stays in DM Sans at 16 px. Every heading above it takes the Heading cut, whatever its size.</p>
+      <h3>Level 2: the starter home<span class="sz">24 px</span></h3>
+      <p>Each brick stands for part of your deposit. Save, and the house goes up brick by brick.</p>
+      <h4>Bricks laid this month<span class="sz">18 px</span></h4>
+      <p>About as small as a heading should go on paper too.</p>
+    </article>
   </div>
 </section>
 
@@ -268,6 +303,7 @@
     <p class="tag">In-app mock: overview, Daylight</p>
     <div class="card">
       <div class="tabs"><span class="on">Overview</span><span>Goals</span><span>House</span><span>Debts</span><span>Wealth</span></div>
+      <h3>Your money today</h3>
       <div class="nw-label dim">Net worth</div>
       <div class="nw">£48,215</div>
       <div class="strip">
@@ -282,19 +318,8 @@
 
 <section class="day">
   <div class="wrap">
-    <p class="tag">Readability, Daylight</p>
-    <div class="read">
-      <div>
-        <p class="vf w400" style="font-size: 14px;">Il1 O0 rn m · Ill legal 1001 · modern burn</p>
-        <p class="vfc w700" style="font-size: 14px;">Il1 O0 rn m · Ill legal 1001 · modern burn</p>
-        <p class="vfc w700" style="font-size: 12px;">a e s g 8 3 · passages 3,838 · seeds aged</p>
-      </div>
-      <div>
-        <p class="vf w300" style="font-size: 20px; color: var(--deep-teal);">Light on paper in deep teal</p>
-        <p class="vf w300" style="font-size: 20px;">Light on paper in ink</p>
-        <p class="vfc w400 caps" style="font-size: 11px;">Net worth · Savings · Debt · ISA · IL1 O0</p>
-      </div>
-    </div>
+    <p class="tag">Size waterfall, Daylight</p>
+    <div id="falls-day"></div>
   </div>
 </section>
 
@@ -302,11 +327,12 @@
   <div class="wrap">
     <p class="tag">Where it goes</p>
     <ul class="rules">
-      <li>Use for display headings, the net worth hero, stat-strip figures, tab labels at 12 px and up, deck and comms headlines.</li>
-      <li>Keep DM Sans for body copy, the FCA disclaimer line, form inputs and dense tables of text.</li>
-      <li>Display cuts only at size: Heading from 48 px (section headings, deck titles), Hero from 96 px (one hero headline per page). Below those sizes use plain Bold. Never in tables, buttons or labels.</li>
-      <li>The wordmark and brick hyphen stay as artwork. Do not reset the logo in this font.</li>
-      <li>Use the minus sign (−) for debt so "−£300" reads as money owed.</li>
+      <li>Heading (D+) for every heading, whatever its size (owner, 12 Nov 2026): page and section titles, card titles, deck and comms headlines, and the net worth hero figure. It stays legible down to about 18 px.</li>
+      <li>Hero (D++) for the hero line only, 96 px and up, one per page or slide. When the line renders under 96 px, switch it to Heading with a media query or <code>clamp()</code>.</li>
+      <li>From 40 px add <code>.vf-heading-lg</code> (letter-spacing -0.01em, word-spacing -0.03em). Go no tighter.</li>
+      <li>DM Sans for everything else: body copy, labels, buttons, form inputs, tables, small figures and the FCA disclaimer line. Share Tech Mono stays for small labels where the site already uses it.</li>
+      <li>The wordmark is artwork drawn from Heading. Use the files in <code>brand/logo/</code> and do not retype it.</li>
+      <li>Use the minus sign (−) for debt so <span style="white-space: nowrap;">"−£300"</span> reads as money owed.</li>
     </ul>
   </div>
 </section>
@@ -322,43 +348,70 @@
       "¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿×÷" +
       "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞß" +
       "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿıŒœŠšŽžŸ" +
-      "–—‘’‚“”„†•…‰‹›⁄€−";
+      "\u2013\u2014‘’‚“”„†•…‰‹›⁄€−";
     var g = document.getElementById("glyphs");
     for (var i = 0; i < chars.length; i++) {
       var s = document.createElement("span");
       s.textContent = chars[i];
       g.appendChild(s);
     }
-    var styles = [
-      ["Light", "vf w300"], ["Regular", "vf w400"], ["Bold", "vf w700"],
-      ["Condensed Light", "vfc w300"], ["Condensed Regular", "vfc w400"], ["Condensed Bold", "vfc w700"]
+    // Display cuts only (owner, 12 Nov 2026): Heading from 18 px, Hero from 96 px.
+    var cuts = [
+      ["Heading (D+)", "cut-h", [18, 24, 28, 32, 40, 48, 64, 96]],
+      ["Hero (D++)", "cut-hero", [96, 128]]
     ];
-    var sizes = [10.5, 12, 14, 16, 24, 48, 96];
-    var falls = document.getElementById("falls");
-    styles.forEach(function (st) {
-      var box = document.createElement("div");
-      box.className = "fall";
-      var h = document.createElement("p");
-      h.className = "dim";
-      h.style.fontSize = "12px";
-      h.textContent = "Vault-form " + st[0];
-      box.appendChild(h);
-      sizes.forEach(function (px) {
-        var row = document.createElement("div");
-        row.className = "row";
-        var l = document.createElement("span");
-        l.className = "px";
-        l.textContent = px + " px";
-        var t = document.createElement("span");
-        t.className = "t " + st[1];
-        t.style.fontSize = px + "px";
-        t.textContent = px >= 96 ? "Vault 26" : px >= 48 ? "Into your home" : "Get out of the red and into your home. £1,234.56 Il1 O0 rn m";
-        row.appendChild(l);
-        row.appendChild(t);
-        box.appendChild(row);
+    // Sizes are true sizes, so on a narrow screen the big rows take the
+    // longest word that fits on one line rather than shrinking.
+    function samples(px) {
+      if (px >= 96) return ["Home", "£48", "Go"];
+      if (px >= 64) return ["Your home", "Home", "£48"];
+      if (px >= 32) return ["Into your home"];
+      return ["Get out of the red and into your home. £1,234"];
+    }
+    function fit(t, list) {
+      if (list.length < 2) return;
+      t.style.whiteSpace = "nowrap";
+      for (var i = 0; i < list.length; i++) {
+        t.textContent = list[i];
+        if (t.scrollWidth <= t.clientWidth + 1) break;
+      }
+      t.style.whiteSpace = "";
+    }
+    var toFit = [];
+    function build(id) {
+      var falls = document.getElementById(id);
+      if (!falls) return;
+      cuts.forEach(function (c) {
+        var box = document.createElement("div");
+        box.className = "fall";
+        var h = document.createElement("p");
+        h.className = "dim note";
+        h.textContent = "Vault-form " + c[0];
+        box.appendChild(h);
+        c[2].forEach(function (px) {
+          var row = document.createElement("div");
+          row.className = "row";
+          var l = document.createElement("span");
+          l.className = "px";
+          l.textContent = px + " px";
+          var t = document.createElement("span");
+          t.className = "t " + c[1] + (px >= 40 ? " tight" : "");
+          t.style.fontSize = px + "px";
+          var list = samples(px);
+          t.textContent = list[0];
+          row.appendChild(l);
+          row.appendChild(t);
+          toFit.push([t, list]);
+          box.appendChild(row);
+        });
+        falls.appendChild(box);
       });
-      falls.appendChild(box);
-    });
+    }
+    build("falls");
+    build("falls-day");
+    function fitAll() { toFit.forEach(function (f) { fit(f[0], f[1]); }); }
+    fitAll();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
   })();
 </script>
 </body>

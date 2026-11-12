@@ -64,7 +64,11 @@ WEIGHTS = {
     "Bold":    dict(cls=700, S=160, hr=0.80, h3=0.88, cf=0.58),
 }
 
-STYLES = [
+# Owner, 12 Nov 2026: the six plain text styles are dropped ("Drop them").
+# Vault-form ships only as the two display cuts below; DM Sans covers body
+# text, labels and figures. The plain drawings stay in this file because the
+# display cuts are built on them; VF_PLAIN=1 still builds them for proofs.
+PLAIN_STYLES = [
     # key,                weight,   cond,  display cut (False = plain text face)
     ("Light",             "Light",   False, False),
     ("Regular",           "Regular", False, False),
@@ -72,12 +76,17 @@ STYLES = [
     ("CondensedLight",    "Light",   True,  False),
     ("CondensedRegular",  "Regular", True,  False),
     ("CondensedBold",     "Bold",    True,  False),
-    # display cuts (r5, owner 11 Nov 2026: "D++ for hero, D+ for headings")
-    ("HeadingBold",          "Bold", False, "dplus"),       # D+,  48 px and up
+]
+STYLES = [
+    # display cuts (r5, owner 11 Nov 2026: "D++ for hero, D+ for headings";
+    # 12 Nov: D+ for every heading, whatever its size)
+    ("HeadingBold",          "Bold", False, "dplus"),       # D+,  all headings
     ("HeadingCondensedBold", "Bold", True,  "dplus"),
-    ("HeroBold",             "Bold", False, "dplusplus"),   # D++, 96 px and up
+    ("HeroBold",             "Bold", False, "dplusplus"),   # D++, hero, 96 px and up
     ("HeroCondensedBold",    "Bold", True,  "dplusplus"),
 ]
+if os.environ.get("VF_PLAIN") == "1":
+    STYLES = PLAIN_STYLES + STYLES
 DISPLAY = {"dplus": "Heading", "dplusplus": "Hero"}
 
 # Chamfer signature (brief 1.2): big 45 degree chamfers top-left and
@@ -3016,30 +3025,21 @@ def write_css():
                 "  font-display: swap;",
                 "}", ""]
     F = FAMILY
+    body = '"DM Sans", "Segoe UI", system-ui, -apple-system, sans-serif'
     out += [":root {",
-            "  /* Fallback stacks per use. DM Sans stays the body face. */",
-            f'  --font-vf-display: "{F}", "Segoe UI", system-ui, -apple-system, sans-serif;',
-            f'  --font-vf-condensed: "{F} Condensed", "{F}", "Arial Narrow", "Segoe UI", system-ui, sans-serif;',
-            f'  --font-vf-figures: "{F}", "Share Tech Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;',
-            f'  --font-vf-label: "{F} Condensed", "Share Tech Mono", ui-monospace, monospace;',
-            "  /* Display cuts. Heading (D+) from 48 px, Hero (D++) from 96 px; below those",
-            "     sizes use plain Bold. Each falls back to the plain face. */",
-            f'  --font-vf-heading: "{F} Heading", "{F}", "Segoe UI", system-ui, sans-serif;',
-            f'  --font-vf-heading-condensed: "{F} Heading Condensed", "{F} Condensed", "{F}", system-ui, sans-serif;',
-            f'  --font-vf-hero: "{F} Hero", "{F} Heading", "{F}", "Segoe UI", system-ui, sans-serif;',
-            f'  --font-vf-hero-condensed: "{F} Hero Condensed", "{F} Heading Condensed", "{F} Condensed", "{F}", system-ui, sans-serif;',
+            "  /* Vault-form is for headings and the logo only (owner, 12 Nov 2026).",
+            "     Body text, labels and figures stay DM Sans. */",
+            f'  --font-vf-heading: "{F} Heading", {body};',
+            f'  --font-vf-heading-condensed: "{F} Heading Condensed", "{F} Heading", {body};',
+            f'  --font-vf-hero: "{F} Hero", "{F} Heading", {body};',
+            f'  --font-vf-hero-condensed: "{F} Hero Condensed", "{F} Heading Condensed", "{F} Heading", {body};',
             "}", "",
-            "/* Helpers. Figures are tabular by default; .vf-pnum switches to proportional. */",
-            ".vf-display { font-family: var(--font-vf-display); font-weight: 700; }",
-            ".vf-figures { font-family: var(--font-vf-figures); font-variant-numeric: tabular-nums lining-nums; }",
-            ".vf-pnum { font-variant-numeric: proportional-nums; }",
-            ".vf-label { font-family: var(--font-vf-label); font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; }",
-            "/* Headings. Bold is wide, so tighten slightly from 40 px up. Go no further",
-            "   than about -0.05em in total or words start to fuse. */",
-            ".vf-heading { font-family: var(--font-vf-display); font-weight: 700; line-height: 1.15; }",
+            "/* Every heading takes the Heading cut (D+); the hero line can take the Hero",
+            "   cut (D++) from 96 px. The cuts are wide, so tighten slightly from 40 px. */",
+            ".vf-heading { font-family: var(--font-vf-heading); font-weight: 700; line-height: 1.15; }",
             ".vf-heading-lg { letter-spacing: -0.01em; word-spacing: -0.03em; } /* add at 40 px and up */",
-            ".vf-cut-heading { font-family: var(--font-vf-heading); font-weight: 700; } /* 48 px and up only */",
-            ".vf-cut-hero { font-family: var(--font-vf-hero); font-weight: 700; }       /* 96 px and up only */",
+            ".vf-cut-heading { font-family: var(--font-vf-heading); font-weight: 700; }",
+            ".vf-cut-hero { font-family: var(--font-vf-hero); font-weight: 700; } /* 96 px and up */",
             ""]
     (ROOT / f"{SLUG}.css").write_text("\n".join(out))
 
