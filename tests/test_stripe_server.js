@@ -74,6 +74,16 @@ const last = () => calls[calls.length - 1];
   r = await post(evt('customer.subscription.deleted', { id: 'sub_1', customer: 'cus_1', status: 'canceled', ended_at: NOW - 10, items: { data: [{ current_period_end: NOW + 99 }] } }));
   a = last()[1]; ok(a.p_status === 'canceled' && +new Date(a.p_paid_until) === (NOW - 10) * 1000, 'a deleted subscription ends at its end date');
 
+  // the 30-day trial links (card taken at checkout, nothing charged until day 31): as they are in Stripe, read 12 Nov 2026
+  r = await post(evt('checkout.session.completed', session({ payment_link: 'plink_1UYB4b9mgKf6HntyI7G9b61g', payment_status: 'no_payment_required', amount_total: 0, subscription: 'sub_trial', metadata: { plan: 'monthly', variant: 'founder_monthly_alpha_trial' } })));
+  a = last()[1]; ok(r.s === 200 && a.p_kind === 'checkout' && a.p_plan === 'monthly' && a.p_user === U && a.p_sub === 'sub_trial', 'a monthly trial checkout (no payment yet) is applied to the account: a trial counts as on a plan');
+  r = await post(evt('checkout.session.completed', session({ payment_link: 'plink_1UYB4d9mgKf6HntyxEOhC5nM', payment_status: 'no_payment_required', amount_total: 0, metadata: { plan: 'yearly', variant: 'pioneer_yearly_alpha_trial' } })));
+  ok(r.s === 200 && last()[1].p_plan === 'yearly', 'a yearly trial checkout is applied as yearly');
+  r = await post(evt('checkout.session.completed', session({ payment_link: 'plink_1UYB4f9mgKf6HntyrxjivlM7', mode: 'payment', subscription: null, amount_total: 9900, metadata: { plan: 'founder', variant: 'lifetime_licence_tester' } })));
+  ok(r.s === 200 && last()[1].p_plan === 'founder' && last()[1].p_paid_until === null, 'the Lifetime licence link in use today is applied as founder, no end date');
+  r = await post(evt('customer.subscription.created', { id: 'sub_trial', customer: 'cus_1', status: 'trialing', metadata: { plan: 'monthly' }, items: { data: [{ current_period_end: NOW + 30 * 86400, price: { id: 'price_trial_unlisted', recurring: { interval: 'month' } } }] } }));
+  a = last()[1]; ok(a.p_status === 'trialing' && a.p_plan === 'monthly' && +new Date(a.p_paid_until) === (NOW + 30 * 86400) * 1000, 'a trialing subscription passes its status, plan and the day the trial ends');
+
   // everything else
   c0 = calls.length;
   r = await post(evt('invoice.created', { id: 'in_1' })); ok(r.s === 200 && calls.length === c0, 'other event types are acknowledged and ignored');

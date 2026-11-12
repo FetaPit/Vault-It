@@ -241,7 +241,7 @@ function wStep2Submit() {
   // Hide overlay immediately — user is in the app
   var ov = document.getElementById('welcome-overlay'); if (ov) ov.style.display = 'none';
   viSetView(_wView);   // the view chosen on this step (Simplified unless they picked Advanced)
-  setTimeout(function(){ if (window.viAfterWelcome) viAfterWelcome(); else viTesterWelcome(); }, 700);   // Pete's note for beta testers, once, then the tour, once
+  setTimeout(function(){ viWhenOpen(function(){ if (window.viAfterWelcome) viAfterWelcome(); else viTesterWelcome(); }); }, 700);   // Pete's note for beta testers, once, then the tour, once
   applyPaywall();
   updateSidebar();
   if (typeof renderJourney === 'function') renderJourney();
@@ -257,7 +257,7 @@ function wStep2Submit() {
 function wStep2Skip() {
   var ov=document.getElementById('welcome-overlay'); if(ov) ov.style.display='none';
   viSetView(_wView);
-  setTimeout(function(){ if (window.viAfterWelcome) viAfterWelcome(); else viTesterWelcome(); }, 700);
+  setTimeout(function(){ viWhenOpen(function(){ if (window.viAfterWelcome) viAfterWelcome(); else viTesterWelcome(); }); }, 700);
   if (typeof journeyState !== 'undefined' && _wSelectedVal) {
     journeyState.stageOverride = parseInt(_wSelectedVal) || 0;
     jrnySaveState();
@@ -320,6 +320,7 @@ function getCoreTaskStatus() {
 }
 
 function applyPaywall() {
+  try { viPlanGate(); } catch (e) {}   // the card wall: after the questions, and whenever paid status changes
   var pioneer = _isPro();
   var bizGate = document.getElementById('pro-gate-biz');
   if (bizGate) bizGate.style.display = pioneer ? 'none' : '';

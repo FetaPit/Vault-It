@@ -192,6 +192,11 @@
    "offset": 0
   },
   {
+   "file": "paywall/plan-wall.html",
+   "anchor": "<!-- ══ PLAN WALL: nobody uses the app",
+   "offset": 0
+  },
+  {
    "file": "shell/topnav.html",
    "anchor": "  <div class=\"nav-br",
    "offset": 1
@@ -465,6 +470,11 @@
    "file": "paywall/paywall.js",
    "anchor": "// PIONEER / PAYWALL",
    "offset": 1
+  },
+  {
+   "file": "paywall/plan-wall.js",
+   "anchor": "// ── PLAN WALL (owner, 12 Nov 2026",
+   "offset": 0
   },
   {
    "file": "shell/swipe-hints.js",

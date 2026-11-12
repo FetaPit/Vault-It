@@ -556,6 +556,7 @@ async function _askAccountSwitch(owner, now, email) {
 async function _afterVerified(user, email) {
   _supaUser = user; _viSignedInAt = Date.now();
   if (!(await _guardAccountSwitch(email, _signInKey(user)))) return;
+  try { viPlanReset(); viPlanCheck(); } catch (e) {}   // the card wall: ask the server about this account's plan
   var wiped = _dropDemoBeforeSync(email);   // v0.95 (owner, 8 Nov, tester on a new device): the sample is wiped from storage first; its keys cannot be written again until the page restarts
   var hydrated = await _hydrateFromSupabase(_supaUser.id);
   if (wiped) { _viRestartAfterWipe(email, hydrated); return; }   // every tab still holds the sample in memory: restart from storage (the account's own rows, or nothing)

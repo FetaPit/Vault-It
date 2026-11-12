@@ -1,0 +1,121 @@
+<!-- ══ PLAN WALL: nobody uses the app on an account without a plan (owner, 12 Nov 2026: "Card required", "Card wall for everyone",
+     "After the questions"; docs/briefs/CARD_WALL.md). It covers the whole app until the server says the account is on a plan
+     (src/app/paywall/plan-wall.js). The only ways on: a plan, Check again, Sign out, Download my data, Help. No close button. ══ -->
+<style id="vi-plan-wall-css">
+#plan-wall{display:none;position:fixed;inset:0;z-index:9400;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--bg);background-image:var(--paper-img);background-size:var(--paper-size);color:var(--text);font-family:var(--font-body);outline:none}
+html.vi-walled #plan-wall{display:block}
+/* behind the wall nothing of the app can be seen, tapped, tabbed to or read out; sign-in, the questions, Help and toasts stay */
+html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):not(#toast):not(#vi-help):not(script):not(style){visibility:hidden!important}
+.wall-box{box-sizing:border-box;max-width:1040px;margin:0 auto;padding:26px 20px calc(30px + env(safe-area-inset-bottom,0px))}
+.wall-logo.wm{font-size:1.45rem}
+.wall-view{display:none}
+#plan-wall[data-state="checking"] .wall-view[data-view="checking"],#plan-wall[data-state="plans"] .wall-view[data-view="plans"],
+#plan-wall[data-state="offline"] .wall-view[data-view="offline"],#plan-wall[data-state="signin"] .wall-view[data-view="signin"]{display:block}
+.wall-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:22px 0 8px}
+.wall-title{font-family:var(--font-display);font-weight:800;font-size:clamp(1.5rem,4.4vw,2.15rem);line-height:1.15;letter-spacing:-.01em;margin:0 0 12px;color:var(--text)}
+.wall-lead{font-size:15px;line-height:1.55;color:var(--text);max-width:64ch;margin:0 0 8px}
+.wall-safe{font-size:14px;line-height:1.55;color:var(--muted);max-width:64ch;margin:0 0 20px}
+.wall-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 18px}
+.wall-plan{box-sizing:border-box;display:flex;flex-direction:column;min-width:0;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-tile);padding:18px 16px 16px;box-shadow:var(--elev)}
+.wall-plan[data-tier-card="founder"]{border-color:rgb(var(--brass-rgb) / .55)}
+.wall-plan-top{display:flex;align-items:center;gap:12px;margin:0 0 10px}
+.wall-plan .vi-tier-ic{width:48px;height:48px;margin:0}
+.wall-plan-when{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.wall-plan-name{font-family:var(--font-display);font-weight:800;font-size:1.25rem;line-height:1.2;color:var(--text)}
+.wall-plan-price{font-family:var(--font-display);font-weight:800;font-size:1.7rem;line-height:1.1;color:var(--teal);margin:0 0 8px}
+.wall-plan[data-tier-card="founder"] .wall-plan-price{color:var(--gold)}
+.wall-plan-price>span{font-family:var(--font-body);font-weight:500;font-size:14px;color:var(--muted);margin-left:2px}
+.wall-plan-price .vi-tier-after{font-size:13px!important;color:var(--muted)!important}
+.wall-plan-terms{font-size:13.5px;line-height:1.5;color:var(--text);margin:0 0 12px}
+.wall-plan-list{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:5px;font-size:13.5px;line-height:1.4;color:var(--muted)}
+.wall-plan-list li{display:flex;gap:7px;align-items:flex-start}
+.wall-plan-list li::before{content:'✓';color:var(--green);flex:none}
+.wall-cta{box-sizing:border-box;margin-top:auto;width:100%;min-height:48px;padding:10px 14px;border-radius:10px;border:1px solid var(--teal);background:var(--teal);color:var(--on-teal);font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:.02em;cursor:pointer;transition:filter var(--t-fast) var(--ease)}
+.wall-cta:hover:not(:disabled){filter:brightness(1.08)}
+.wall-cta:disabled{opacity:.55;cursor:not-allowed}
+.wall-cta.wall-cta-gold{background:transparent;border-color:var(--gold);color:var(--gold)}
+.wall-cta.wall-cta-line{width:auto;margin-top:0;background:transparent;color:var(--teal)}
+.wall-cta:focus-visible,.wall-link:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wall-again{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;font-size:14px;color:var(--muted);margin:0 0 6px}
+.wall-status{min-height:1.5em;font-size:14px;line-height:1.5;color:var(--text);margin:0 0 14px}
+.wall-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px 18px;border-top:1px solid var(--line2);padding-top:14px;margin-top:10px}
+.wall-who{flex:1 1 200px;min-width:0;font-size:13.5px;color:var(--muted);overflow-wrap:anywhere}
+.wall-link{min-height:44px;padding:6px 4px;background:none;border:none;color:var(--teal);font-family:var(--font-body);font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.wall-fca{font-size:13px;color:var(--muted);margin:14px 0 0}
+.wall-spin{width:26px;height:26px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--teal);margin:6px 0 14px;animation:wallSpin 900ms linear infinite}
+@keyframes wallSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.wall-spin{animation:none}.wall-cta{transition:none}}
+@media (max-width:820px){.wall-plans{grid-template-columns:1fr}.wall-box{padding-top:18px}.wall-who{flex-basis:100%}}
+</style>
+<div id="plan-wall" data-state="checking" role="dialog" aria-modal="true" aria-labelledby="wall-title" tabindex="-1">
+  <div class="wall-box">
+    <div class="wall-logo wm" role="img" aria-label="Vault-It">Vault<i class="dot"></i><b>It</b></div>
+
+    <div class="wall-view" data-view="checking">
+      <div class="wall-eyebrow">Your plan</div>
+      <h1 class="wall-title" id="wall-title">Checking your plan</h1>
+      <div class="wall-spin" aria-hidden="true"></div>
+      <p class="wall-lead" role="status">One moment while Vault-It checks this account.</p>
+    </div>
+
+    <div class="wall-view" data-view="plans">
+      <div class="wall-eyebrow">Plans</div>
+      <h1 class="wall-title">Choose a plan to open your vault</h1>
+      <p class="wall-lead" id="wall-lead"></p>
+      <p class="wall-safe">Your figures are safe. They stay on this device and in your account, and you can download them below at any time.</p>
+      <!-- Names, prices, terms and buttons are painted from VI_PLANS (src/app/paywall/stripe-config.js) by viWallPaint() and viPricePaint(): never typed here. -->
+      <div class="wall-plans">
+        <div class="wall-plan" data-tier-card="monthly">
+          <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg>
+            <div><div class="wall-plan-when">Monthly</div><div class="wall-plan-name" data-plan-name="monthly"></div></div></div>
+          <div class="wall-plan-price" data-plan-price="monthly"></div>
+          <p class="wall-plan-terms" data-plan-terms="monthly"></p>
+          <ul class="wall-plan-list"><li>The whole app, editing on</li><li>All six house types, Levels 1 to 3</li><li>Your own 3D house design and AI house model</li><li>AI screenshot reader, 30 a month</li></ul>
+          <button class="wall-cta" type="button" data-plan="monthly" data-cta="Choose monthly" data-cta-trial="Start 30 days free" onclick="viWallChoose('monthly')">Choose monthly</button>
+        </div>
+        <div class="wall-plan" data-tier-card="annual">
+          <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg>
+            <div><div class="wall-plan-when">Yearly</div><div class="wall-plan-name" data-plan-name="annual"></div></div></div>
+          <div class="wall-plan-price" data-plan-price="annual"></div>
+          <p class="wall-plan-terms" data-plan-terms="annual"></p>
+          <ul class="wall-plan-list"><li>Everything in the monthly plan</li><li>One payment a year</li><li>Early access to new features</li><li>Roadmap voting</li></ul>
+          <button class="wall-cta" type="button" data-plan="annual" data-cta="Choose yearly" data-cta-trial="Start 30 days free" onclick="viWallChoose('annual')">Choose yearly</button>
+        </div>
+        <div class="wall-plan" data-tier-card="founder">
+          <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg>
+            <div><div class="wall-plan-when">One payment</div><div class="wall-plan-name" data-plan-name="founder"></div></div></div>
+          <div class="wall-plan-price" data-plan-price="founder"></div>
+          <p class="wall-plan-terms" data-plan-terms="founder"></p>
+          <ul class="wall-plan-list"><li>The whole app for the life of the service</li><li>Lifetime badge and name in credits</li><li>Priority requests</li><li>AI screenshot reader, 10 a month</li></ul>
+          <button class="wall-cta wall-cta-gold" type="button" data-plan="founder" data-cta="Get a Lifetime licence" onclick="viWallChoose('founder')">Get a Lifetime licence</button>
+        </div>
+      </div>
+      <div class="wall-again"><span>Already paid? It can take a minute to reach us.</span><button class="wall-cta wall-cta-line" type="button" id="wall-check" onclick="viWallCheck(this)">Check again</button></div>
+    </div>
+
+    <div class="wall-view" data-view="offline">
+      <div class="wall-eyebrow">Your plan</div>
+      <h1 class="wall-title">We could not check your plan</h1>
+      <p class="wall-lead">Vault-It could not reach its server, so it cannot tell whether this account is on a plan. Check your connection and try again.</p>
+      <p class="wall-safe">Your figures are safe on this device.</p>
+      <div class="wall-again"><button class="wall-cta wall-cta-line" type="button" id="wall-retry" onclick="viWallCheck(this)">Try again</button></div>
+    </div>
+
+    <div class="wall-view" data-view="signin">
+      <div class="wall-eyebrow">Your plan</div>
+      <h1 class="wall-title">Sign in again to open your vault</h1>
+      <p class="wall-lead">The sign-in on this device has run out, so Vault-It cannot check your plan. Sign in again with the same email.</p>
+      <p class="wall-safe">Your figures are safe on this device.</p>
+      <div class="wall-again"><button class="wall-cta wall-cta-line" type="button" id="wall-signin" onclick="viWallSignIn()">Sign in again</button></div>
+    </div>
+
+    <p class="wall-status" id="wall-status" role="status" aria-live="polite"></p>
+    <div class="wall-foot">
+      <span class="wall-who" id="wall-who"></span>
+      <button class="wall-link" type="button" id="wall-signout" onclick="signOut()">Sign out</button>
+      <button class="wall-link" type="button" id="wall-export" onclick="viWallExport(this)">Download my data</button>
+      <button class="wall-link" type="button" id="wall-help" onclick="viWallHelp()">Help</button>
+    </div>
+    <p class="wall-fca">Not regulated by the FCA. Not financial advice.</p>
+  </div>
+</div>

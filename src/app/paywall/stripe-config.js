@@ -69,7 +69,8 @@ function showUpgrade(plan) {
   var q = [];
   if (user.email) q.push('prefilled_email=' + encodeURIComponent(user.email));   // Payment Links read prefilled_email from the query
   // the account id rides along as client_reference_id, so the payment can be matched to this account on the server (secure paid gateway, queued)
-  try { if (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) q.push('client_reference_id=' + encodeURIComponent(_supaUser.id)); } catch (e) {}
+  // (_viPlanUid: the signed-in account, also when supabase-js is not answering and the plan was read with the saved sign-in)
+  try { var acct = typeof _viPlanUid === 'function' ? _viPlanUid() : (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id); if (acct) q.push('client_reference_id=' + encodeURIComponent(acct)); } catch (e) {}
   var checkoutUrl = link + (q.length ? '?' + q.join('&') : '');
   window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
   showToast(plan === 'founder' ? 'Opening the Lifetime licence checkout…' : 'Opening secure checkout…');
