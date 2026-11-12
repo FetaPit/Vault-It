@@ -517,10 +517,26 @@ function _wipeIdb(name) {
   return new Promise(function(res) { try { var rq = indexedDB.deleteDatabase(name); rq.onsuccess = rq.onerror = function() { res(true); }; rq.onblocked = function() { res(false); }; setTimeout(function() { res(false); }, 2500); } catch (e) { res(false); } });
 }
 // A different person signing in on a device that still holds someone else's data must not see it, export it, or upload it to their own account.
-async function _guardAccountSwitch(email) {
-  if (localStorage.getItem('vi_demo_mode') === 'true') return true;
-  var owner = (localStorage.getItem('vi_last_email') || '').toLowerCase(), now = email.toLowerCase();
-  if (!owner || owner === now) return true;
+// Asked from every path a sign-in can arrive on: the e-mail code and PIN (_afterVerified), and in sync.js the auth-state handler
+// and the session found at start, which is where a Google or magic-link return lands (owner, 12 Nov 2026: a new address opened
+// the previous person's figures and they were uploaded into the new account, because those paths never asked). One sign-in can
+// be reported by two of them, so an answer is remembered for that sign-in only (the account plus the moment it signed in);
+// a new attempt, even a second later, is asked again.
+var _switchAsk = null;
+function _signInKey(user) { return (user && user.id && user.last_sign_in_at) ? user.id + '|' + user.last_sign_in_at : ''; }
+function _guardAccountSwitch(email, key) {
+  if (localStorage.getItem('vi_demo_mode') === 'true') return Promise.resolve(true);
+  var owner = (localStorage.getItem('vi_last_email') || '').toLowerCase(), now = String(email || '').toLowerCase();
+  if (!owner || !now || owner === now) return Promise.resolve(true);
+  if (key && _switchAsk && _switchAsk.key === key) {   // this very sign-in was already answered on the other path
+    return _switchAsk.p.then(function (ok) { if (!ok) { _supaUser = null; _authOTP = null; } return ok; });   // refused (or restarting): nobody stays signed in on this page
+  }
+  var p = _askAccountSwitch(owner, now, email);
+  _switchAsk = key ? { key: key, p: p } : null;
+  return p;
+}
+async function _askAccountSwitch(owner, now, email) {
+  _syncReady = false;   // nothing is uploaded while the question is open or the device is being cleared
   var unsent = _lsJSON('vi_dirty', []).length;
   var ok = confirm('This device still holds data saved for ' + owner + '.\n\nSigning in as ' + now + ' removes it from this device, so it cannot be seen by someone else, or uploaded to their account.'
     + (unsent ? '\n\n⚠ It has changes that were never uploaded to ' + owner + '’s account. They would be lost.' : '\n\nIt stays safe in that account.') + '\n\nContinue?');
@@ -534,7 +550,7 @@ async function _guardAccountSwitch(email) {
 }
 async function _afterVerified(user, email) {
   _supaUser = user; _viSignedInAt = Date.now();
-  if (!(await _guardAccountSwitch(email))) return;
+  if (!(await _guardAccountSwitch(email, _signInKey(user)))) return;
   var wiped = _dropDemoBeforeSync(email);   // v0.95 (owner, 8 Nov, tester on a new device): the sample is wiped from storage first; its keys cannot be written again until the page restarts
   var hydrated = await _hydrateFromSupabase(_supaUser.id);
   if (wiped) { _viRestartAfterWipe(email, hydrated); return; }   // every tab still holds the sample in memory: restart from storage (the account's own rows, or nothing)

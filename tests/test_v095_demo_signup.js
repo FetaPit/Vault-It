@@ -112,6 +112,7 @@ async function onboard(p) {
     await _afterVerified({ id: 'u-ret', email: e }, e); }, EMAIL);
   await p.waitForLoadState('load').catch(() => {}); await p.waitForTimeout(400);
   ok(p._navs > n2, '5 the page restarts after the wipe (' + (p._navs - n2) + ' navigation)');
+  await p.waitForSelector('#welcome-overlay', { state: 'attached', timeout: 15000 });   // the restarted page may still be parsing on a busy runner (CI, 12 Nov: getComputedStyle on a missing element)
   const early = await p.evaluate(() => getComputedStyle(document.getElementById('welcome-overlay')).display);
   await p.waitForTimeout(2500);
   d = await dump(p);
