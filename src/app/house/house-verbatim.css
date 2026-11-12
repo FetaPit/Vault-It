@@ -35,6 +35,12 @@
 /* contribution streak: the dots, labels and links grow with the card (owner, 31 Oct: 11 px dots were unreadable on a desktop) */
 #habit-circles{--hc:clamp(12px,1.9vw,22px);--hf:max(clamp(.34rem,.9vw,.6rem),var(--vi-fs-1));--hy:max(clamp(.42rem,1vw,.66rem),var(--vi-fs-0));--hl:clamp(2px,.6vw,10px);gap:clamp(1px,.3vw,4px)}
 @media(max-width:700px){#habit-circles{--hc:14px;--hf:max(.4rem,var(--vi-fs-1));--hy:max(.48rem,var(--vi-fs-0));--hl:3px}}   /* two rows of three on every screen (owner, 31 Oct) */
+#habit-circles .hc-year{display:contents}
+/* a phone: each year is its own wrapping block, so every month shows inside the card (owner, 11 Nov: the strip clipped at "Nov" at 390 px) */
+@media(max-width:700px){#habit-circles{flex-direction:column!important;align-items:flex-start!important;overflow-x:visible!important;gap:10px}
+#habit-circles .hc-year{display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 4px;width:100%}
+#habit-circles .hc-ylbl{flex:0 0 100%;align-items:flex-start!important;margin:0!important}
+#habit-circles .hc-sep,#habit-circles .hc-line{display:none!important}}
 .hbtn{background:rgb(var(--panel-rgb) / .7);border:1px solid rgb(var(--teal-rgb) / .14);border-radius:4px;padding:10px 8px;color:#8fa8a6;font-family:'Share Tech Mono',monospace;font-size:max(.6rem,var(--vi-fs-2));cursor:pointer;text-align:center;transition:all .18s;line-height:1.5}
 .hbtn:hover{border-color:rgb(var(--teal-rgb) / .5);color:var(--teal);background:rgb(var(--teal-rgb) / .07)}
 .hbtn.active{border-color:rgb(var(--teal-rgb) / .5);background:rgb(var(--teal-rgb) / .1);color:var(--teal);box-shadow:0 0 12px rgb(var(--teal-rgb) / .1)}

@@ -476,12 +476,13 @@ function renderHabitTracker(){
 
     // Year separator
     if(yi>0){
-      html+='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 6px;flex-shrink:0">'
+      html+='<div class="hc-sep" style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 6px;flex-shrink:0">'
         +'<div style="width:1px;height:18px;background:rgb(var(--teal-rgb) / .2)"></div>'
         +'</div>';
     }
     // Year label
-    html+='<div style="display:flex;flex-direction:column;align-items:center;margin-right:4px;flex-shrink:0">'
+    html+='<div class="hc-year">';   // one group per year: a plain row on desktop, a wrapping block on a phone (see house-verbatim.css)
+    html+='<div class="hc-ylbl" style="display:flex;flex-direction:column;align-items:center;margin-right:4px;flex-shrink:0">'
       +'<span style="font-size:var(--hy,.4rem);font-weight:700;letter-spacing:.08em;color:var(--em);font-family:\'Syne\',sans-serif;writing-mode:horizontal-tb;white-space:nowrap">'+yr+'</span>'
       +'</div>';
 
@@ -504,8 +505,9 @@ function renderHabitTracker(){
         +'<div style="'+cs+'" title="'+pk+(entry?' · £'+Math.round(entry.amount||0):'')+'"></div>'
         +'<span style="font-size:var(--hf,.32rem);color:var(--t3);font-family:\'Share Tech Mono\',monospace;white-space:nowrap">'+lbl+'</span>'
         +'</div>'
-        +(p<periods.length-1?'<div style="width:var(--hl,2px);height:1px;background:'+lineC+';align-self:center;margin-bottom:12px;flex-shrink:0"></div>':'');
+        +(p<periods.length-1?'<div class="hc-line" style="width:var(--hl,2px);height:1px;background:'+lineC+';align-self:center;margin-bottom:12px;flex-shrink:0"></div>':'');
     }
+    html+='</div>';
   }
   circlesEl.innerHTML=html;
 }
