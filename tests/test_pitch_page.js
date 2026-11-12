@@ -1,0 +1,225 @@
+// vault-it.co/pitch-Eligent in a real browser, served through the real Worker routing from the real build:
+// all 18 slides (v4: Problem, Solution, Result order) scroll on a phone with no sideways scroll, the Present button gives a one-slide view
+// (arrow keys, on-screen buttons, swipe, counter, Esc to leave), and the app's two live 3D viewports draw with demo data.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
+const { chromium } = require('playwright');
+const fs = require('fs'), path = require('path'), http = require('http'), cp = require('child_process'), { pathToFileURL } = require('url');
+let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
+const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require('os').tmpdir(), 'vaultit-pitch-'));
+
+(async () => {
+  cp.execFileSync('node', [path.join(ROOT, 'tools', 'build_site.js')], { env: { ...process.env, SITE_OUT: DIST }, stdio: ['ignore', 'ignore', 'inherit'] });
+  const { route } = await import(pathToFileURL(path.join(ROOT, 'worker', 'index.mjs')).href);
+  const TYPES = { '.html': 'text/html; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp4': 'video/mp4', '.js': 'text/javascript' };
+  const srv = http.createServer((req, res) => {
+    const u = new URL(req.url, 'http://x'); const r = route('vault-it.co', u.pathname);
+    const f = r.file && path.join(DIST, r.file);
+    if (!f || !fs.existsSync(f)) { res.writeHead(404); return res.end('nf'); }
+    res.writeHead(200, { 'Content-Type': TYPES[path.extname(f)] || 'application/octet-stream' }); res.end(fs.readFileSync(f));
+  }).listen(0);
+  const BASE = 'http://127.0.0.1:' + srv.address().port;
+  const b = await chromium.launch();
+  const open = async (w, h, touch) => {
+    const ctx = await b.newContext({ viewport: { width: w, height: h }, hasTouch: !!touch });
+    const page = await ctx.newPage(); page.errs = []; page.on('pageerror', (e) => page.errs.push(e.message));
+    await page.goto(BASE + '/pitch-Eligent', { waitUntil: 'domcontentloaded' }); await page.waitForTimeout(300); return page;
+  };
+  const visible = (page) => page.evaluate(() => [...document.querySelectorAll('.frame')].filter((f) => getComputedStyle(f).display !== 'none').map((f) => f.querySelector('section').id));
+  const counter = (page) => page.evaluate(() => (document.querySelector('#pv-count') || {}).textContent || '');
+
+  // Phone: the scrolling deck
+  let p = await open(390, 844);
+  ok((await p.locator('.frame').count()) === 18, 'the page has the 18 slides');
+  { const t = await p.evaluate(() => document.body.innerText); ok(!/£199(?!.99)|19,900/.test(t) && /£149 once/.test(t) && /100 seats at £149, up to £14,900/.test(t), 'Founding Membership matches the live Stripe price: £149, 100 places'); }
+  { const t = await p.evaluate(() => document.body.innerText); ok(!/£49\.99 a year/.test(t) && /£5\.99\/mo/.test(t) && /£59\.99\/yr/.test(t), 'Pioneer yearly matches the full live price: £59.99, not the old £49.99'); }
+  // v2 (owner's decisions, 6 Nov 2026): one ask with its use of funds, a forecast with both break-even lines, B2B prices, the first buyer
+  { const ids = await p.evaluate(() => [...document.querySelectorAll('.frame > section')].map((s) => s.id));
+    ok(ids.join() === 'cover,team,person,problem,gap,solution,features,nd,evidence,result,traction,model,impact,gtm,whynow,forecast,ask,close', 'v4 slide order: problem (person, how many, why nobody solves it), solution (product, live 3D, who it helps most), result (person, partner, where we are), then money and the ask: ' + ids); }
+  const txt = async (id) => p.evaluate((id) => (document.getElementById(id) || {}).innerText || '', id);
+  { const a = await txt('ask');
+    ok(/£250,000/.test(a) && /SEIS/.test(a) && /March 2027/.test(a) && /equity terms on request/i.test(a), 'the ask: £250,000 under SEIS, closing March 2027, equity terms on request');
+    ok(/What £250,000 unlocks/.test(a) && /£720,975/.test(a) && /cumulative profit/.test(a) && /University of Lincoln/.test(a) && /50% income tax relief/.test(a) && /Barbican Creative Hub studio \(£5,000 \+ VAT a year\)/.test(a) && /Three asks of this room/.test(a) && !/18 months/.test(a), 'the ask card shows the upside from the forecast, the funded study, SEIS relief, the studio, and the three asks of the room');
+    ok(/V4/.test(await txt('cover')) && !/V3/.test(await txt('cover')), 'the cover is stamped V4');
+    const uf = await p.evaluate(() => [...document.querySelectorAll('#ask [data-fund]')].map((e) => [e.dataset.fund, e.innerText]));
+    const pct = uf.map((x) => x[0]).join('/'), sum = uf.reduce((s, x) => s + +(x[1].match(/£([\d,]+)/) || [0, '0'])[1].replace(/,/g, ''), 0);
+    ok(pct === '35/20/15/15/15' && sum === 250000, 'use of funds 35/20/15/15/15 and the pounds add to £250,000: ' + pct + ' = £' + sum); }
+  { const t = await txt('traction'), g = await p.evaluate(() => (document.querySelector('#traction [data-gates]') || {}).innerText || '');
+    ok(/3,000 on the waitlist/.test(g) && /4% trial to paid/.test(g) && /30% still active/.test(g) && /50\+ Founding/.test(g) && /First paid pilot/.test(g) && /26/.test(t) && /442/.test(t) && /£0/.test(t) && /Web Summit/.test(t) && /incorporation submitted 6 Nov/.test(t) && /NOT REGULATED BY THE FCA/.test(t) && !(await p.locator('#validation').count()), 'v4: where we are carries the alpha figures, the next six weeks and the gates (the v3 validation slide is folded in)');
+    const g2 = await txt('gtm');
+    ok(/TikTok/.test(g2) && /Instagram/.test(g2) && /YouTube/.test(g2) && /Paid ads/.test(g2) && /£50,000/.test(g2) && /30-day free trial/.test(g2) && /£3\.99/.test(g2) && /£149/.test(g2) && /Sponsored and Impact/.test(g2), 'v4: the channel plan and the subsidised plans sit on the go-to-market slide'); }
+  { const f = await txt('forecast');
+    const rows = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('#forecast tr[data-row]')].map((r) => [r.dataset.row, [...r.querySelectorAll('td')].slice(1).map((c) => c.textContent.trim() === '–' ? 0 : +c.textContent.replace(/[£,]/g, ''))])));
+    const sum = (...a) => [0, 1, 2].map((i) => a.reduce((t, k) => t + rows[k][i], 0)), eq = (x, y) => x.join() === y.join();
+    const total = sum('consumer', 'pilots', 'partner', 'sponsored'), net = total.map((t, i) => t - rows.costs[i]), cum = net.map((_, i) => net.slice(0, i + 1).reduce((x, y) => x + y, 0));
+    ok(eq(rows.pilots, [12500, 0, 0]) && eq(rows.partner, [35000, 200000, 500000]) && rows.sponsored[0] === 5000 && rows.sponsored[1] === 49990 && rows.sponsored[2] > rows.sponsored[1], 'the forecast has one line per B2B stream: 5 paid pilots, Partner licences, sponsored Pioneer: ' + JSON.stringify(rows));
+    ok(eq(rows.total, total) && eq(rows.net, net) && eq(rows.cumulative, cum) && eq(rows.total, [66900, 282990, 720975]) && eq(rows.costs, [23500, 65000, 196000]) && eq(rows.cumulative, [43400, 261390, 786365]), 'the totals, net and cumulative profit add up: ' + total + ' | ' + net + ' | ' + cum);
+    const secs = await p.evaluate(() => [...document.querySelectorAll("#forecast tr[data-section]")].map((r) => r.textContent.trim()));
+    ok(secs.join() === "CONSUMER,B2B" && Array.isArray(rows["consumer-sub"]) && Array.isArray(rows["b2b-sub"]) && eq(rows["consumer-sub"], rows.consumer) && eq(rows["b2b-sub"], sum("pilots", "partner", "sponsored")) && eq(rows["b2b-sub"], [52500, 249990, 624975]) && /sub total/i.test(f), "the forecast is in two sections, Consumer and B2B, each with its own sub total line (owner, 7 Nov 10:17)");
+    ok(rows.cumulative[1] > 250000 && /£261,390/.test(f) && /November 2028/.test(f) && /Barbican/.test(f) && /December 2027/.test(f) && /£13,900/.test(f) && /illustrative/i.test(f) && /not (yet )?modelled/i.test(f) && !/£16,900|December 2028/.test(f), 'the forecast says cumulative profit passes £250,000 (November 2028), the with-raise line, and what is not modelled'); }
+  { const b2 = await txt('model'), r2 = await txt('result'); ok(/£2,500 to £5,000/.test(b2) && /£10k to £25k/.test(b2) && /£1 to £3/.test(b2) && /pen test/i.test(r2) && /2p per user/.test(r2) && !(await p.locator('#partner').count()), 'v4: the business model slide prices the four B2B offers; the cost of delivering white label sits on the result-for-the-partner slide'); }
+  { const g = await txt('gtm'); ok(/3,000/.test(g) && /4%/.test(g) && /30%/.test(g) && /30-day/.test(g), 'go to market: funnel, channels and targets'); }
+  ok(/sav/i.test(await txt('problem')) && /co-?founder, operations/i.test(await txt('team')) && /25% equity/.test(await txt('team')) && /250 to 750 participants/.test(await txt('nd')), 'problem leads with savers, the team slide names the operations co-founder and the 25% equity offer, the ND slide the UoL pilot');
+  { const t = await p.evaluate(() => document.body.innerText); ok(!/14-DAY|14-day/.test(t) && /30-DAY/i.test(t), 'the trial is 30 days, as in the app'); }
+  // v4 (owner, 7 Nov 2026: "Deck v4 ... Focus on framework. Problem, solution result. Add potential audience b2b and b2c numbers"; "Build deck v4 from section 5")
+  { const lab = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('.frame > section')].map((s) => [s.id, (s.querySelector('p') || {}).textContent || ''])));
+    ok(/^THE PROBLEM · ONE PERSON/.test(lab.person) && /^THE PROBLEM · HOW MANY/.test(lab.problem) && /^THE PROBLEM · WHY NOBODY/.test(lab.gap) && /^THE SOLUTION/.test(lab.solution) && /^THE SOLUTION/.test(lab.features) && /^THE SOLUTION/.test(lab.nd) && /^THE RESULT · FOR THE PERSON/.test(lab.evidence) && /^THE RESULT · FOR THE PARTNER/.test(lab.result) && /^THE RESULT · WHERE WE ARE/.test(lab.traction), 'every spine slide is labelled Problem, Solution or Result: ' + JSON.stringify(lab)); }
+  { const s3 = await txt('person'), rows = await p.locator('#person [data-sam] p').count();
+    ok(/Sam is 34, rents, owes £16,874/.test(s3) && /None of them says when/.test(s3) && /£2,300/.test(s3) && /£1,850/.test(s3) && /£6,874 at 24\.9%/.test(s3) && /£10,000 at 9\.9%/.test(s3) && /£66 a month/.test(s3) && /EXAMPLE PERSON/.test(s3) && /STEPCHANGE/.test(s3) && rows >= 14, 'slide 3, one person: Sam, the month in numbers, labelled as an example with its sources'); }
+  { const pr = await txt('problem'), st = await p.evaluate(() => [...document.querySelectorAll('#problem [data-stage]')].map((e) => e.innerText.replace(/\s+/g, ' ')));
+    ok(st.length === 4 && /^STAGES 0 TO 1/.test(st[0]) && /8\.1m/.test(st[0]) && /729,265/.test(st[0]) && /126,240/.test(st[0]) && /163,916/.test(st[0]) && /^STAGES 2 TO 3/.test(st[1]) && /1\.1m/.test(st[1]) && /87,250/.test(st[1]) && /19%/.test(st[1]) && /^STAGE 4/.test(st[2]) && /341,068/.test(st[2]) && /52%/.test(st[2]) && /7\.6 times/.test(st[2]) && /^STAGES 5 TO 6/.test(st[3]) && /8\.4m/.test(st[3]) && /23% overpay/.test(st[3]) && /£221/.test(st[3]) && /1\.9m/.test(st[3]) && /£5bn/.test(st[3]), 'slide 4, how many, stage by stage (owner, 7 Nov round 2): debt services, LISA savers, buyers, mortgage overpayers, each with a figure: ' + st.join(' | '));
+    ok(!/1 in 5/.test(pr) && /0\.03% of the 8\.1 million/.test(pr) && /MAPS 2024 AND IMPACT REPORT 2024\/25/.test(pr) && /INSOLVENCY SERVICE 2025/.test(pr) && /HMRC ANNUAL SAVINGS STATISTICS 2025/.test(pr) && /UK FINANCE 2024/.test(pr) && /BARCLAYS MAY 2025/.test(pr) && /OUR ARITHMETIC/.test(pr), 'slide 4 names a source for every figure and marks the derived ones as our arithmetic'); }
+  ok(/Monzo and YouGov, 2022/.test(await txt('nd')) && /1\.9 million/.test(await txt('nd')) && /31% of people with ADHD/.test(await txt('nd')), 'the neurodiversity slide sizes the ADHD population and its debt struggle with sources (owner, 7 Nov round 2)');
+  ok(/Future London Academy/.test(await txt('traction')) && /Birch Fund/.test(await txt('traction')) && /2027 intake/.test(await txt('traction')), 'where we are lists the part-funded Future London Academy place, deferred to 2027 (owner, 7 Nov round 2)');
+  { const gp = await txt('gap'); ok((await p.locator('#gap [data-rivals] p').count()) === 5 && /Moneybox/.test(gp) && /Lifetime ISA and deposit saving/.test(gp) && /Tembo/.test(gp) && /mortgage-ready/.test(gp) && /Emma, Snoop and Plum/.test(gp) && /Mouso/.test(gp) && /Nobody starts below zero/.test(gp), 'slide 5, the competitors named with what each does'); }
+  ok(/StepChange, 2025/.test(await txt('nd')), 'the neurodiversity slide cites StepChange 2025 on debt and money confidence');
+  { const ev = await txt('evidence'), w = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('#evidence [data-worked] [data-row]')].map((r) => [r.dataset.row, r.innerText.replace(/\s+/g, ' ')])));
+    ok(/Keys a year sooner/.test(ev) && /Aug 2031/.test(w.min) && /Aug 2035/.test(w.min) && /Jan 2031/.test(w.plus50) && /Aug 2034/.test(w.plus50) && /Mar 2034/.test(w.lisa) && /17 months sooner/.test(w.lisa) && /APP’S OWN|APP'S OWN/.test(ev) && /Hershfield/.test(ev) && /Kivetz/.test(ev), 'slide 9, the result for the person: Sam\'s worked example from the app\'s journey maths (minimums, £50 more, LISA bonus) with the behaviour evidence: ' + JSON.stringify(w)); }
+  { const rs = await txt('result'); ok(/45 months/.test(rs) && /Stage 0 to Stage 3/.test(rs) && /90 days/.test(rs) && /No bank data/.test(rs) && /Cyber Essentials Plus/.test(rs), 'slide 10, the result for the partner: years earlier, one measure, low risk, what white label costs'); }
+  { const gt = await txt('gtm'), c = await p.evaluate(() => [...document.querySelectorAll('#gtm [data-count]')].map((e) => e.innerText.replace(/\s+/g, ' ')));
+    ok(c.length === 5 && /8\.1m/.test(c[0]) && /^40\+ UK building societies/.test(c[1]) && !/\b4[23] UK building/.test(c[1]) && /36,764/.test(c[2]) && /8,335/.test(c[3]) && /^227 housing associations with 1,000\+ homes/.test(c[4]) && /under 0\.1%/.test(gt) && /BSA 2025/.test(gt) && /DBT BUSINESS POPULATION ESTIMATES 2025/.test(gt) && /3,000/.test(gt) && /4%/.test(gt) && /30%/.test(gt), 'slide 14, go to market: the top of each funnel counted with its source, and the targets: ' + c.join(' | ')); }
+  { const a = await txt('ask'), li = await p.evaluate(() => [...document.querySelectorAll('#ask [data-asks] li')].map((e) => e.innerText));
+    ok(/Three asks of this room/.test(a) && !/One ask of this room/.test(a) && li.length === 3 && /^Invest:/.test(li[0]) && /^Introduce:/.test(li[1]) && /building society, broker or debt charity/.test(li[1]) && /^Mentor:/.test(li[2]), 'slide 17 closes with three calls to action: invest, introduce, mentor: ' + li.join(' | ')); }
+  { const t = await p.evaluate(() => document.body.innerText); ok(!/—/.test(t), 'no em dashes in the deck copy'); }
+  // v3 (owner's edits, 7 Nov 2026)
+  { const w = await p.evaluate(() => { const h = document.querySelector('#cover h1'), sp = h && h.querySelector('span'); return h && sp ? { all: h.textContent, it: sp.textContent, col: getComputedStyle(sp).color, rest: getComputedStyle(h).color } : null; });
+    ok(w && w.all === 'Vault-It' && w.it === '-It' && w.col === 'rgb(68, 192, 185)' && w.rest !== w.col, 'the wordmark draws "-It" in teal: ' + JSON.stringify(w)); }
+  { const t = await p.evaluate(() => { const out = {}; document.querySelectorAll('[data-tag] span, #cover h2 span').forEach((s) => { const cs = getComputedStyle(s); out[s.textContent] = { c: cs.color, stroke: cs.webkitTextStrokeWidth }; });
+      const lum = (c) => { const m = c.match(/\d+/g).map(Number).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]; };
+      out.contrast = out.red ? (lum(out.red.c) + 0.05) / (lum('rgb(0, 19, 26)') + 0.05) : 0; return out; });
+    ok(t.red && t.your && t.home && t.red.c === 'rgb(200, 32, 42)' && t.your.c === 'rgb(68, 192, 185)' && t.home.c === 'rgb(232, 197, 106)' && t.red.stroke === '0px' && t.contrast >= 3, 'the tagline: red in dark red fill, your in teal, home in gold fill, still legible (contrast ' + (t.contrast && t.contrast.toFixed(2)) + ')'); }
+  { const w = await p.evaluate(() => [...document.querySelectorAll('.frame > section h2')].filter((h) => h.closest('section').id !== 'cover').map((h) => h.closest('section').id + ':' + getComputedStyle(h).fontWeight).filter((x) => !/:700$/.test(x)));
+    ok(w.length === 0, 'every slide title uses the same Syne weight (700): ' + w); }
+  { const tm = await txt('team'), t3 = await p.evaluate(() => !!document.querySelector('#team [data-banner]'));
+    ok(t3 && ['Malcolm McPhee', 'Business Lincolnshire', 'David Amor', 'Enso Brain', 'Chris Bowser', 'Will Quenby', 'Accelerate Pipeline', 'Carolline Pallu', 'Barbican Creative Hub'].every((x) => tm.includes(x)) && !/Lucas Cox/.test(tm) && /Chris Gueffier/.test(tm) && /Rita Fortes/.test(tm), 'the team slide has the banner and the new people, and Lucas Cox is gone'); }
+  { const im = await txt('impact'), sh = await p.evaluate(() => [...document.querySelectorAll('#impact [data-share]')].map((e) => +e.dataset.share)), br = await p.evaluate(() => !!document.querySelector('#impact svg[data-bridge]'));
+    ok(br && sh.join() === '50,25,25' && sh.reduce((x, y) => x + y, 0) === 100 && /Public debt grants/.test(im) && /The charity/.test(im) && /Vault-It/.test(im) && /bridge/i.test(im) && /window/i.test(im) && ['Assets', 'Income', 'Debts', 'Net worth'].every((x) => im.includes(x)) && /reallocation/i.test(im) && /escalat/i.test(im), 'the Impact licence slide: 50 / 25 / 25 funding and the bridge-and-window graphic: ' + sh); }
+  { const pt = await txt('model'); ok(/Grant-funded/.test(pt) && /50% public debt grants/.test(pt) && !/Free or at cost/.test(pt), 'the business model slide shows how the Impact licence is funded'); }
+  { const m = await txt('model'), h3 = await p.evaluate(() => [...document.querySelectorAll('#model h3')].map((h) => h.textContent.trim()));
+    ok(!h3.includes('Free') && h3.includes('Pioneer monthly') && h3.includes('Pioneer yearly') && /£59\.99\/yr/.test(m) && /£11\.89/.test(m) && /Household/.test(m) && /£19.99/.test(m) && /£199.99/.test(m) && /up to 8/.test(m) && /coming soon/i.test(m) && /30-day free trial/i.test(m) && ['£5.99', '£59.99', '£149', '£3.99', '£49.99', '£99'].every((x) => m.includes(x)) && /limited time/i.test(m) && /100/.test(m), 'business model: no Free tier, a 30-day free trial, the signed-off prices and the testers\' limited-time discount: ' + h3);
+    ok(['Paid pilot', 'Partner Edition', 'Impact licence', 'Sponsored tier'].every((x) => h3.includes(x)) && (await p.locator('#model [data-b2b] h3').count()) === 4 && (await p.locator('#model [data-consumer] h3').count()) === 6 && /Can they pay\?/.test(m) && /A partner pays for the people it sends/.test(m), 'v4: revenue streams first: the four B2B cards above the six consumer prices, and who pays for whom'); }
+  ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll on a phone');
+  const btn = p.locator('#pv-open');
+  ok((await btn.count()) === 1 && await btn.isVisible(), 'a Present button is on the page');
+  const box = await btn.boundingBox();
+  ok(box && box.height >= 44 && box.width >= 44, 'the Present button is at least 44 px to tap: ' + JSON.stringify(box));
+
+  // Laptop: one-slide view by button and keys
+  p = await open(1280, 800);
+  await p.click('#pv-open');
+  ok(await p.evaluate(() => document.body.classList.contains('present')), 'Present turns on the one-slide view');
+  let v = await visible(p);
+  ok(v.length === 1 && v[0] === 'cover', 'exactly one slide shows, starting at the cover: ' + v);
+  ok(/^1 \/ 18$/.test((await counter(p)).trim()), 'the counter reads 1 / 18: ' + (await counter(p)));
+  const fit = await p.evaluate(() => { const r = document.querySelector('.frame.on').getBoundingClientRect(); return { w: r.width, h: r.height, l: r.left, t: r.top }; });
+  ok(Math.abs(fit.w - 1280) < 2 && Math.abs(fit.h - 720) < 2 && Math.abs(fit.t - 40) < 2, 'the slide fills the screen at 16:9, centred: ' + JSON.stringify(fit));
+  await p.keyboard.press('ArrowRight'); await p.keyboard.press('ArrowRight');
+  v = await visible(p);
+  ok(v.length === 1 && v[0] === 'person' && (await counter(p)).trim() === '3 / 18', 'right arrow moves forward one slide at a time: ' + v + ' ' + (await counter(p)));
+  await p.keyboard.press('ArrowLeft');
+  ok((await counter(p)).trim() === '2 / 18', 'left arrow goes back');
+  await p.click('#pv-next');
+  ok((await counter(p)).trim() === '3 / 18', 'the on-screen next button works');
+  await p.click('#pv-prev');
+  ok((await counter(p)).trim() === '2 / 18', 'the on-screen back button works');
+  await p.keyboard.press('End');
+  ok((await counter(p)).trim() === '18 / 18', 'End jumps to the last slide');
+  await p.keyboard.press('ArrowRight');
+  ok((await counter(p)).trim() === '18 / 18', 'it stops at the last slide');
+  await p.keyboard.press('Home');
+  ok((await counter(p)).trim() === '1 / 18', 'Home jumps to the first slide');
+  await p.keyboard.press('Escape');
+  ok(!(await p.evaluate(() => document.body.classList.contains('present'))) && (await visible(p)).length === 18, 'Esc leaves the one-slide view and shows every slide again');
+
+  // Live 3D viewports: the app's Net worth in 3D and Net worth progress, with the app's demo data
+  p = await open(1280, 800);
+  const hosts = new Set(); p.on('request', (r) => { const u = new URL(r.url()); if (u.hostname !== '127.0.0.1') hosts.add(u.hostname); });
+  for (const [kind, sid, re] of [['nw', 'features', /^Own £[\d,]+ · Owe £[\d,]+ · Net worth £[\d,]+$/], ['trk', 'evidence', /^Today: net worth £[\d,]+ · debt £[\d,]+$/]]) {
+    await p.locator('#' + sid).scrollIntoViewIfNeeded(); await p.waitForTimeout(2500);
+    const st = await p.evaluate((kind) => { const b = document.querySelector('.live[data-live="' + kind + '"]'); if (!b) return null;
+      const cv = b.querySelector('canvas'), r = cv.getBoundingClientRect(), d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let lit = 0;
+      for (let i = 3; i < d.length; i += 4 * 7) if (d[i] > 40) lit++;
+      return { on: b.classList.contains('on'), read: b.querySelector('.live-read').textContent, w: r.width, h: r.height, lit }; }, kind);
+    ok(st && st.on, kind + ': the live viewport is on the ' + sid + ' slide');
+    ok(st && re.test(st.read), kind + ': its readout shows the demo figures: ' + (st && st.read));
+    ok(st && st.lit > 500, kind + ': the 3D scene is drawn (' + (st && st.lit) + ' lit samples)');
+    ok(st && Math.abs(st.w / st.h - (kind === 'nw' ? 1080 / 560 : 1040 / 560)) < 0.02, kind + ': it sits in its slot on the slide: ' + JSON.stringify(st && [st.w, st.h]));
+  }
+  ok([...hosts].every((h) => /^fonts\.(googleapis|gstatic)\.com$/.test(h)), 'no outside hosts besides Google Fonts: ' + [...hosts]);
+  await p.locator('#features').scrollIntoViewIfNeeded(); await p.evaluate(() => document.getElementById('pv-open').click()); await p.waitForTimeout(600);   // a pointer click would first scroll the sticky header's page to the top
+  const c0 = (await counter(p)).trim();
+  const lb = await p.locator('.frame.on .live canvas').boundingBox();
+  ok(!!lb, 'the live viewport shows in the one-slide view');
+  if (lb) { await p.mouse.click(lb.x + lb.width / 2, lb.y + lb.height / 2); await p.mouse.move(lb.x + 10, lb.y + 10); await p.mouse.down(); await p.mouse.move(lb.x + 160, lb.y + 10, { steps: 6 }); await p.mouse.up(); }
+  ok((await counter(p)).trim() === c0 && /^7 \/ 18$/.test(c0), 'clicking or dragging the 3D does not change slide: ' + c0 + ' then ' + (await counter(p)));
+  await p.locator('.frame.on .live [data-z="in"]').click();
+  ok((await counter(p)).trim() === c0, 'the zoom buttons do not change slide either');
+  ok(p.errs.length === 0, 'no page errors with the live viewports: ' + p.errs.join(' | '));
+  await p.keyboard.press('Escape');
+
+  // A phone's scrolling deck is too small for the live 3D: the matching still shows instead
+  p = await open(390, 844);
+  await p.locator('#features').scrollIntoViewIfNeeded(); await p.waitForTimeout(1500);
+  const ph = await p.evaluate(() => [...document.querySelectorAll('.live')].map((b) => { const im = b.parentNode.querySelector('img[data-live="' + b.dataset.live + '"]');
+    return { on: b.classList.contains('on'), op: getComputedStyle(b).opacity, still: !!(im && im.complete && im.naturalWidth > 100) }; }));
+  ok(ph.length === 2 && ph.every((x) => !x.on && x.op === '0' && x.still), 'at 390 px the live viewports stay off and their stills show: ' + JSON.stringify(ph));
+
+  // Phone: swipe through the one-slide view
+  p = await open(390, 844, true);
+  await p.click('#pv-open');
+  const swipe = async (dx) => p.evaluate((dx) => {
+    const el = document.querySelector('#pv-stage') || document.body;
+    const t = (x) => new Touch({ identifier: 1, target: el, clientX: x, clientY: 400 });
+    el.dispatchEvent(new TouchEvent('touchstart', { touches: [t(200)], changedTouches: [t(200)], bubbles: true }));
+    el.dispatchEvent(new TouchEvent('touchend', { touches: [], changedTouches: [t(200 + dx)], bubbles: true }));
+  }, dx);
+  await swipe(-120);
+  ok((await counter(p)).trim() === '2 / 18', 'swiping left moves to the next slide');
+  await swipe(120);
+  ok((await counter(p)).trim() === '1 / 18', 'swiping right goes back');
+  ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll in the one-slide view on a phone');
+  ok(p.errs.length === 0, 'no page errors: ' + p.errs.join(' | '));
+
+  // Presenter view: a private second window with beats and cues that follows the audience deck, and drives it
+  const ctx2 = await b.newContext({ viewport: { width: 1280, height: 800 } });
+  const aud = await ctx2.newPage(); aud.errs = []; aud.on('pageerror', (e) => aud.errs.push(e.message));
+  const pre = await ctx2.newPage(); pre.errs = []; pre.on('pageerror', (e) => pre.errs.push(e.message));
+  await aud.goto(BASE + '/pitch-Eligent?present=1', { waitUntil: 'domcontentloaded' });
+  await pre.goto(BASE + '/pitch-Eligent-presenter', { waitUntil: 'domcontentloaded' }); await pre.waitForTimeout(500);
+  const pn = () => pre.evaluate(() => document.getElementById('pr-n').textContent.trim());
+  const beat = () => pre.evaluate(() => document.getElementById('pr-beat').textContent.trim());
+  ok(await aud.evaluate(() => document.body.classList.contains('present')) && (await counter(aud)).trim() === '1 / 18', '?present=1 opens the audience deck in the one-slide view');
+  ok(/linked/i.test(await pre.evaluate(() => document.getElementById('pr-link').textContent)), 'the presenter view shows it is linked to the audience window');
+  ok(/\b1 \/ 18/.test(await pn()) && (await beat()).length > 3, 'the presenter view starts on slide 1 with its beat: ' + (await pn()) + ' · ' + (await beat()));
+  const b1 = await beat();
+  await aud.keyboard.press('ArrowRight'); await pre.waitForTimeout(300);
+  ok(/\b2 \/ 18/.test(await pn()) && (await beat()) !== b1, 'moving the audience deck switches the notes: ' + (await pn()) + ' · ' + (await beat()));
+  await pre.click('#pr-next'); await pre.waitForTimeout(300);
+  ok((await counter(aud)).trim() === '3 / 18', 'Next in the presenter view moves the audience deck: ' + (await counter(aud)));
+  for (let i = 0; i < 4; i++) await pre.keyboard.press('ArrowRight'); await pre.waitForTimeout(300);
+  ok((await counter(aud)).trim() === '7 / 18' && /\b7 \/ 18/.test(await pn()), 'arrow keys in the presenter view drive the audience deck too');
+  ok(/drag/i.test(await pre.evaluate(() => document.getElementById('pr-cues').textContent)), 'the live demo slide carries its DO cue');
+  ok((await pre.locator('#pr-cues svg').count()) >= 2, 'the cues carry their icons');
+  ok(/^This is the app, live/m.test(await pre.evaluate(() => document.getElementById('pr-script').innerText)), 'the script panel shows this slide\'s script');
+  { const r = await pre.evaluate(() => { const a = document.querySelector('.pr-sc').getBoundingClientRect(), s = document.querySelector('.pr-side').getBoundingClientRect(); return { l: a.left > innerWidth / 2, below: a.top >= s.bottom - 1 }; });
+    ok(r.l && r.below, 'the script sits in the lower right, under the notes: ' + JSON.stringify(r)); }
+  ok(await pre.evaluate(() => document.querySelector('#pr-cur .frame, #pr-cur section') !== null && document.querySelector('#pr-nxt section') !== null), 'the mirror shows the current and next slide');
+  ok(!/pr-|presenter/.test(await aud.evaluate(() => document.body.innerText)), 'nothing from the presenter view shows in the audience window');
+  for (const [w, h] of [[1280, 800], [390, 844]]) { await pre.setViewportSize({ width: w, height: h }); await pre.waitForTimeout(200);
+    ok(await pre.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'presenter view has no sideways scroll at ' + w + ' px');
+    const lay = await pre.evaluate(() => { const sc = document.querySelector('.pr-sc'), sd = document.querySelector('.pr-side'), m = document.querySelector('.pr-mir').getBoundingClientRect(), a = sc.getBoundingClientRect(), b = sd.getBoundingClientRect();
+      return { sideFits: sd.scrollHeight <= sd.clientHeight + 2, scFits: w => true, apart: a.bottom <= m.top + 1 || a.left >= m.right - 1, scH: sc.clientHeight, scS: sc.scrollHeight }; });
+    ok(lay.sideFits && lay.apart && (w > 820 || lay.scH + 2 >= lay.scS), 'at ' + w + ' px the notes and script do not overlap the mirror and the script shows in full on a phone: ' + JSON.stringify(lay)); }
+  {
+    const C = await pre.evaluate(() => { const ids = [...document.getElementById('pr-slides').content.querySelectorAll('section')].map((s) => s.id); return { ids, n: ids.length }; });
+    ok(C.n === 18 && C.ids.join() === 'cover,team,person,problem,gap,solution,features,nd,evidence,result,traction,model,impact,gtm,whynow,forecast,ask,close', 'the presenter mirror carries the same 18 slides in the v4 order'); }
+  { const src = await pre.content(); ok(!/free or at cost/i.test(src) && /Impact licence: grant-funded/.test(src) && /grant-funded, a split we are proposing/.test(src), 'the presenter notes describe the Impact licence as grant-funded, not free or at cost'); }
+  await pre.keyboard.press('End'); await pre.waitForTimeout(200);
+  ok(/\b18 \/ 18/.test(await pn()), 'the presenter view reaches slide 18');
+  await pre.keyboard.press('ArrowLeft'); await pre.waitForTimeout(200);
+  ok(/250,000/.test(await pre.evaluate(() => document.getElementById('pr-script').innerText)) && /Three asks/.test(await pre.evaluate(() => document.getElementById('pr-script').innerText)) && /Start 4:\d\d/.test(await pre.evaluate(() => document.getElementById('pr-win').textContent)), 'the ask has its script with the three asks, and starts before 5:00');
+  ok(aud.errs.length === 0 && pre.errs.length === 0, 'no page errors in either window: ' + aud.errs.concat(pre.errs).join(' | '));
+  await ctx2.close();
+
+  await b.close(); srv.close();
+  console.log(fails ? 'FAILURES ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);
+})().catch((e) => { console.log('FAIL:', e.message); process.exit(1); });

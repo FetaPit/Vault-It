@@ -1,0 +1,100 @@
+Car (family hatchback)|Vehicle|assets|car;sports car;taxi;hatchback;sedan
+Smartphone|Electronics|assets|smartphone;mobile phone;phone
+Laptop|Electronics|assets|laptop;notebook computer
+Sofa|Furniture|assets|sofa;couch
+Bed (double)|Furniture|assets|bed;double bed
+Television|Electronics|assets|television;tv;flat screen tv
+Fridge freezer|Appliance|assets|fridge;refrigerator
+Washing machine|Appliance|assets|washing machine;washer
+Dining table|Furniture|assets|dining table;table
+Wardrobe|Furniture|assets|wardrobe;closet
+Bicycle|Vehicle|assets|bicycle;bike
+Tablet|Electronics|assets|tablet;ipad
+Games console|Electronics|assets|game console;playstation;controller
+Wristwatch|Jewellery|assets|watch;wristwatch
+Ring (jewellery)|Jewellery|assets|wedding ring;diamond ring;engagement ring;jewelry ring
+Necklace|Jewellery|assets|necklace;pendant
+Van|Vehicle|assets|van;delivery van
+Motorbike|Vehicle|assets|motorcycle;motorbike
+E-bike|Vehicle|assets|electric bike;e-bike;scooter
+Desktop computer|Electronics|assets|desktop computer;pc;monitor
+Camera|Electronics|assets|dslr camera;photo camera;camcorder;camera
+Headphones|Electronics|assets|headphones;earbuds
+Acoustic guitar|Instruments|collectibles|acoustic guitar;guitar
+Electric guitar|Instruments|collectibles|electric guitar;bass guitar;rock guitar
+Piano|Instruments|collectibles|piano;upright piano
+Keyboard (musical)|Instruments|collectibles|synthesizer;keytar;digital piano;piano keys
+Drum kit|Instruments|collectibles|drum kit;drums
+Oven and hob|Appliance|assets|oven;cooker;stove
+Dishwasher|Appliance|assets|dishwasher
+Tumble dryer|Appliance|assets|clothes dryer;dryer machine;laundry;washing
+Microwave|Appliance|assets|microwave
+Armchair|Furniture|assets|armchair;chair
+Bookcase|Furniture|assets|bookshelf;bookcase
+Desk|Furniture|assets|desk;office desk
+Office chair|Furniture|assets|office chair
+Coffee table|Furniture|assets|coffee table
+Chest of drawers|Furniture|assets|dresser;drawers
+Lawn mower|Garden|assets|lawn mower;lawnmower
+Power drill and tools|Tools|assets|power drill;drill;toolbox
+Toolbox|Tools|assets|toolbox;tool box;hammer
+Garden shed|Garden|assets|shed;garden shed
+Barbecue|Garden|assets|barbecue;bbq grill
+Caravan|Vehicle|assets|caravan;camper trailer;mobile home;travel trailer
+Campervan|Vehicle|assets|camper van;campervan;rv
+Boat (motor)|Boat|assets|motorboat;speedboat;boat
+Sailing yacht|Boat|assets|yacht;sailboat
+Trailer|Vehicle|assets|trailer;car trailer;cargo trailer;flatbed
+Handbag|Fashion|collectibles|handbag;purse;bag
+Trainers|Fashion|collectibles|sneaker;trainers;shoe
+Designer sunglasses|Fashion|collectibles|sunglasses;glasses
+Gold bar|Precious metal|assets|gold bar;gold ingot;ingot
+Gold coins|Precious metal|assets|coin;gold coin;sovereign
+Silver bar|Precious metal|assets|silver bar;silver ingot;metal bar;ingot
+Diamond|Jewellery|assets|diamond;gem
+Earrings|Jewellery|assets|earrings;earring
+Bracelet|Jewellery|assets|bracelet;bangle
+Artwork (framed painting)|Art|collectibles|painting;framed picture;picture frame
+Sculpture|Art|collectibles|statue;sculpture;bust
+Vase|Art|collectibles|vase;ceramic vase
+Antique clock|Antiques|collectibles|clock;grandfather clock
+Wine collection|Wine and spirits|collectibles|wine bottle;wine rack
+Whisky bottle|Wine and spirits|collectibles|whisky;whiskey bottle;bottle
+Vinyl records|Music|collectibles|vinyl record;record player;turntable
+Books|Books|collectibles|book;stack of books
+Trading cards|Collectibles|collectibles|baseball card;playing card;trading card;pokemon card
+Lego or toys|Toys|collectibles|lego;toy brick;building blocks;toy car
+Action figure|Toys|collectibles|action figure;figurine;toy robot;doll
+Model railway|Toys|collectibles|train;toy train;locomotive
+Football memorabilia|Memorabilia|collectibles|football;trophy
+Golf clubs|Sport|assets|golf club;golf
+Treadmill and gym kit|Sport|assets|treadmill;dumbbell;exercise bike
+Dumbbells|Sport|assets|dumbbell;weights;kettlebell
+Surfboard|Sport|assets|surfboard
+Skis and snowboard|Sport|assets|snowboard;skis
+Fishing rod|Sport|assets|fishing rod
+Tent and camping kit|Sport|assets|tent;camping
+Pushchair|Family|assets|pram;stroller;baby carriage;baby buggy
+Cot|Family|assets|baby crib;cot;baby bed;nursery
+Smartwatch|Electronics|assets|smart watch;smartwatch;fitness tracker;watch
+Printer|Electronics|assets|printer
+Router and smart speaker|Electronics|assets|router;smart speaker;speaker
+Drone|Electronics|assets|drone;quadcopter
+Games PC|Electronics|assets|gaming pc;computer tower
+Hi-fi system|Electronics|assets|hifi;stereo;speaker
+Projector|Electronics|assets|projector;video projector;beamer;cinema
+Vacuum cleaner|Appliance|assets|vacuum cleaner;hoover
+Coffee machine|Appliance|assets|coffee machine;coffee maker
+Boiler|Appliance|assets|boiler;water heater;radiator;furnace
+Solar panels|Home improvement|liabilities|solar panel;solar
+Hot tub|Garden|assets|hot tub;jacuzzi;spa;swimming pool
+Garden furniture|Garden|assets|garden furniture;patio set;bench
+Greenhouse|Garden|assets|greenhouse
+Safe|Valuables|assets|safe;vault
+Chest of valuables|Valuables|assets|treasure chest;chest
+Banknotes|Valuables|assets|money;banknote;cash;dollar
+Piggy bank|Debt|liabilities|piggy bank
+Credit card|Credit card|liabilities|credit card;bank card;payment card;debit card
+Student loan (graduation cap)|Student loan|liabilities|graduation cap;mortarboard
+Mortgage (house)|Property|liabilities|house;home;cottage;family house
+Flat or apartment|Property|assets|apartment;apartment building;flats

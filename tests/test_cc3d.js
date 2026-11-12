@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const fs=require('fs');
@@ -11,10 +12,11 @@ const fs=require('fs');
       {id:4,name:'Axis Bank Credit Card',original:222,balance:222,rate:42,min:19,type:'credit'},
       {id:5,name:'Some Visa card',original:900,balance:900,rate:19,min:25,type:'credit'},
       {id:6,name:'Car finance',original:8000,balance:5000,rate:7,min:200,type:'car'}]}));});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   await page.evaluate(()=>showTab('debt')); await page.waitForTimeout(900);
-  ok(await page.locator('.cc3').count()===5,'five 3D cards (loan has none)');
+  ok(await page.locator('.cc3').count()===6,'six 3D tiles: five cards and the car finance (E33)');
+  ok(await page.locator('.cc3[data-id="6"] .cc3-chip').count()===0&&await page.locator('.cc3[data-id="1"] .cc3-chip').count()>=1,'car finance has no chip; cards keep theirs');
   const r=await page.evaluate(()=>{const e=document.querySelector('.cc3').getBoundingClientRect();return e.width/e.height;});
   ok(Math.abs(r-85.6/53.98)<0.02,'card is in ID-1 proportion ('+r.toFixed(3)+' vs 1.586)');
   const brand=await page.evaluate(()=>[1,2,3,4,5].map(i=>{const d=debtState.debts.find(x=>x.id===i);const b=ccBrand(d);return(b&&b.n)+'/'+ccNetwork(d,b);}));

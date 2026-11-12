@@ -2,6 +2,7 @@
 // Brand phase 8: cards that affect each other are grouped (brand/AUDIT_AND_PLAN.md section 4). Nothing is removed:
 // every control keeps its id and still works. Overview O1 and O2 are checked in test_overview.js.
 // Run: node tests/test_groupings.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -19,14 +20,14 @@ const seed = () => {
   const b = await chromium.launch(); const errs = [];
   for (const w of [1100, 390]) {
     const ctx = await b.newContext({ viewport: { width: w, height: 900 } }); await routeThree(ctx); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-    await p.addInitScript(seed); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+    await p.addInitScript(seed); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     // House
     await p.evaluate(() => showTab('house')); await p.waitForTimeout(2500);
     const h = await p.evaluate(() => {
       const plan = document.getElementById('hb-plan'), prog = document.getElementById('hb-hud'), hist = document.getElementById('hb-hist'), own = document.getElementById('hb-own-design');
       const inn = (c, ids) => ids.every(id => c && c.contains(document.getElementById(id)));
-      return { h1: inn(plan, ['htypes', 'priceInput', 'depositPctInput', 'floor-selector-card']), lay: inn(document.getElementById('houseSceneCard'), ['savingsInput', 'btnAdd']) && document.getElementById('hb-lay').compareDocumentPosition(document.getElementById('sceneCap')) & 4, brick: /Each brick is worth about £\d/.test((document.getElementById('hb-plan-brick') || {}).textContent || ''),
+      return { h1: inn(plan, ['priceInput', 'depositPctInput', 'floor-selector-card']) && !plan.contains(document.getElementById('htypes')), lay: inn(document.getElementById('houseSceneCard'), ['savingsInput', 'btnAdd']) && document.getElementById('hb-lay').compareDocumentPosition(document.getElementById('sceneCap')) & 4, brick: /Each brick is worth about £\d/.test((document.getElementById('hb-plan-brick') || {}).textContent || ''),
         h2: inn(prog, ['savedAmt', 'pbarFill', 'stBricks', 'stRemain', 'ms1', 'ms100']),
         h3: inn(hist, ['habit-circles', 'logList', 'btnReset']) && hist.querySelector('#habit-circles').compareDocumentPosition(hist.querySelector('#logList')) & 4 && hist.querySelector('#logList').compareDocumentPosition(hist.querySelector('#btnReset')) & 4,
         h4: own && own.tagName === 'DETAILS' && !own.open && !own.querySelector('input,textarea,button') && /Coming later as part of Pro/.test(own.textContent),

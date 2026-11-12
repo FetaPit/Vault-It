@@ -77,7 +77,7 @@ Tests: `node tests/test_hb3d_scale.js <type>` runs the full-model checks and the
 - **Level 2** (owner, 1 Nov 2026). `equity` (paying the mortgage): the whole house laid at once, the paid share solid below a gold line at `waterline()` (the `uCut` uniform; fragments above it are discarded) and a faint hologram pass above it (`BRAND_HOLO`, `VP._brandHolo`, sharing the same meshes); the line eases up as payments come in with a gold flash band under it (`uRise`, 1.1 s); gold tag "MORTGAGE x% PAID". `complete` (mortgage free): all solid, windows lit, door gold, tag "MORTGAGE FREE".
 - **Speed** (owner, 31 Oct 2026). Parts that have landed move into one static mesh per part (`BRAND_STATIC`, baked in 4 ms idle slices, page copy dropped after upload, at most 640,000 vertices a house; bigger parts stay instanced); the overlays write only what changed; 30 frames a second at rest. `tests/test_hb_speed.js`.
 - **Level 3 and uploaded designs** are locked under Pro for everyone (owner, 1 Nov 2026); their code is dormant and nothing draws them.
-- **No 3D** (no WebGL, old device, three.js blocked or offline): `hbStill()` in index.html draws a still picture of the same house at its current build level on a 2D canvas from `brandPlan` (no three.js), with the same HUD figures.
+- **No 3D** (no WebGL, old device, three.js blocked or offline): `hbStill()` in the app (`src/app/house/`, built into index.html) draws a still picture of the same house at its current build level on a 2D canvas from `brandPlan` (no three.js), with the same HUD figures.
 - Tests: `tests/test_hb_brand.js`, `tests/test_hb_one_builder.js`, `tests/test_hb_speed.js` (`VI_INDEX=/path/index.html` runs them against another copy).
 
 ## The brand-book renderer (v0.7, the default since 2 Nov 2026)

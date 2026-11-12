@@ -1,8 +1,9 @@
 // v0.7 E10 (owner, 1 Nov): the expand arrow on each expense bar (e.g. Committed essentials) is larger and points down.
 // Pedro D6: the ▾ glyph becomes vi-chevron 20 px, stroke 2, in a 44 px target; down when folded, turns up over 240 ms when open; the -90 degree rule is gone.
 // Run: node tests/test_v07_e10.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
   const b = await chromium.launch();

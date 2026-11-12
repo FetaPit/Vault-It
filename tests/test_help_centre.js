@@ -6,8 +6,9 @@
 //      (moment help_unanswered); if help-ask is down, the best FAQ is used; signed out, misses stay on the device
 //   5. phone and desktop, Night and Daylight; Esc closes; no page errors
 // Run: node tests/test_help_centre.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (o) => {
   localStorage.setItem('vi-theme', o.theme); localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi-flag-house', '0');
@@ -66,8 +67,8 @@ const seed = (o) => {
     ({ p, ctx, sent } = await open(w, theme, true)); await p.waitForTimeout(400);
     ok(!(await tourOn(p)), T + 'a returning account does not get the tour on load');
     await p.evaluate(() => showSettings()); await p.waitForTimeout(200);
-    const rb = await p.evaluate(() => { const e = document.getElementById('set-tour-replay'), r = e.getBoundingClientRect(); return { txt: e.textContent, vis: r.width > 40 && r.top >= 0 && r.top < innerHeight }; });
-    ok(rb.txt === 'Replay the app tour' && rb.vis, T + 'Settings shows a clear Replay the app tour button near the top');
+    const rb = await p.evaluate(() => { const e = document.getElementById('set-tour-replay'); e.scrollIntoView({ block: 'center' }); const r = e.getBoundingClientRect(); return { txt: e.textContent, vis: r.width > 40 && r.top >= 0 && r.top < innerHeight }; });
+    ok(rb.txt === 'Replay the app tour' && rb.vis, T + 'Settings shows a clear Replay the app tour button (third section, in view once scrolled to)');
     await p.click('#set-tour-replay'); await p.waitForFunction(() => document.getElementById('vi-tour').classList.contains('on'), null, { timeout: 8000 }).catch(() => {});
     ok(await tourOn(p) && (await p.evaluate(() => document.getElementById('settings-modal').style.display)) === 'none', T + 'it closes Settings and starts the tour');
     const seen = []; let bad = 0, wide = 0;
@@ -76,7 +77,7 @@ const seed = (o) => {
       const s = await p.evaluate(() => { const c = document.getElementById('vt-card').getBoundingClientRect(), sp = document.getElementById('vt-spot');
         return { t: document.getElementById('vt-title').textContent, inView: c.left >= 0 && c.top >= 0 && c.right <= innerWidth + 1 && c.bottom <= innerHeight + 1, spot: !sp.classList.contains('none') }; });
       seen.push(s.t + (s.spot ? '' : ' (no spot)')); if (!s.inView) bad++; if (!(await noSideways(p))) wide++;
-      if (i === 5) await p.screenshot({ path: '/home/user/Vault-It/shots/help-tour-' + w + '-' + theme + '.png' });
+      if (i === 5) await p.screenshot({ path: require('path').join(require('./lib/vi').REPO, 'shots/help-tour-') + w + '-' + theme + '.png' });
       await p.click('#vt-next');
     }
     console.log('      steps: ' + seen.join(' | '));
@@ -129,7 +130,7 @@ const seed = (o) => {
     await p.evaluate(() => { const b = [...document.querySelectorAll('#vh-log .vh-rate button[data-r="down"]')][0]; b.click(); }); await p.waitForTimeout(400);
     ok(sent.fb.some((x) => x.moment === 'help_unanswered'), T + 'Not helpful also files the question');
     ok(await noSideways(p), T + 'no sideways scroll with Help open');
-    await p.screenshot({ path: '/home/user/Vault-It/shots/help-chat-' + w + '-' + theme + '.png' });
+    await p.screenshot({ path: require('path').join(require('./lib/vi').REPO, 'shots/help-chat-') + w + '-' + theme + '.png' });
     await p.keyboard.press('Escape'); ok(await p.evaluate(() => !document.getElementById('vi-help').classList.contains('open')), T + 'Esc closes Help');
     const copy = await p.evaluate(() => JSON.stringify(viHelp.kb) + JSON.stringify(viHelp.steps) + document.getElementById('vi-help').textContent);
     ok(!/—/.test(copy) && /Not regulated by the FCA\. Not financial advice\./.test(copy), T + 'no em dashes; the FCA line is shown');

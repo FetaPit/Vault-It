@@ -1,10 +1,13 @@
 name: CI
 
-# Runs the whole suite on every push and pull request. Nothing here deploys anything.
+# Runs the whole suite on pushes and pull requests. Nothing here deploys anything.
+# Queue and docs-only pushes skip the suite (owner, 3 Nov 2026). Any other file in the push runs it.
 on:
   push:
     branches-ignore: ['backup/**']
+    paths-ignore: ['docs/**', '**/*.md']
   pull_request:
+    paths-ignore: ['docs/**', '**/*.md']
   workflow_dispatch:
 
 permissions:
@@ -29,7 +32,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - name: index.html is built from src/app (byte for byte)
+        run: node tools/build_app.js --check
       - run: bash scripts/run-tests.sh server
+        env:
+          LOG_DIR: /tmp/vaultit-test-logs
       - name: Cloudflare config is valid (builds the site and bundles the Worker; deploys nothing)
         run: npm run deploy:dry
         env:
@@ -42,7 +49,8 @@ jobs:
 
   browser:
     name: Browser tests (${{ matrix.shard }})
-    runs-on: ubuntu-latest
+    # pinned (8 Nov 2026): ubuntu-latest is moving to Ubuntu 26, where playwright install --with-deps fails before any test runs
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     strategy:
       fail-fast: false
@@ -68,6 +76,7 @@ jobs:
         env:
           SHARD: ${{ matrix.shard }}
           JOBS: 2
+          LOG_DIR: /tmp/vaultit-test-logs
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

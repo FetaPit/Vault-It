@@ -1,0 +1,182 @@
+<!-- ═══════════════════════════════════════════
+     JOURNEY MAP TAB
+═══════════════════════════════════════════ -->
+<!-- Journey tab removed -->
+
+
+
+<!-- ═══════════════════════════════════════════
+     HOUSE TAB — DIRECT COPY from house-tracker.html
+     Exact HTML, exact CSS, exact JS
+═══════════════════════════════════════════ -->
+<!-- House type panel (v0.9.1 round 2, R13 to R15): opened from the viewport chip. Build status, compressed copies of the
+     stat tiles under the viewport (R14) and the six house types as roadmap slates (R12). Moved to <body> on first open. -->
+<div id="hbt-pan" class="vi-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="hbt-title" onclick="if(event.target===this)hbtClose()">
+  <div class="vi-modal-box hbt-box">
+    <div class="hbt-hd"><span class="hbt-hd-tok" aria-hidden="true"></span><div class="hbt-hd-txt"><div class="hbt-eyebrow">Your house</div><h2 class="hbt-title" id="hbt-title">Terraced</h2></div><button type="button" class="hbt-x" id="hbt-close" aria-label="Close" onclick="hbtClose()"><svg class="vi-ic" aria-hidden="true"><use href="#vi-close"/></svg></button></div>
+    <div class="hbt-sec"><div class="hbt-sub">Build status</div><div class="hbt-status" id="hbt-status"></div></div>
+    <div class="hbt-sec"><div class="hbt-sub">Snapshot</div><div id="hbt-stats"></div></div>
+    <div class="hbt-sec"><div class="hbt-sub">Change house type</div><p class="hbt-note">Your savings and bricks laid stay the same. Each type keeps its own price, set in Your house plan.</p>
+    <div class="htypes hbt-types" id="htypes" role="group" aria-label="House type">
+      <button type="button" class="hbtn active" data-type="terraced" aria-pressed="true"><span class="ico" aria-hidden="true"></span><span class="nm">Terraced</span><span class="pr" id="pr-terraced">£0</span></button>
+      <button type="button" class="hbtn" data-type="semi" aria-pressed="false"><span class="ico" aria-hidden="true"></span><span class="nm">Semi-detached</span><span class="pr" id="pr-semi">£0</span></button>
+      <button type="button" class="hbtn" data-type="detached" aria-pressed="false"><span class="ico" aria-hidden="true"></span><span class="nm">Detached</span><span class="pr" id="pr-detached">£0</span></button>
+      <button type="button" class="hbtn" data-type="mansion" aria-pressed="false"><span class="ico" aria-hidden="true"></span><span class="nm">Manor house</span><span class="pr" id="pr-mansion">£0</span></button>
+      <button type="button" class="hbtn" data-type="flat" aria-pressed="false"><span class="ico" aria-hidden="true"></span><span class="nm">Small flat</span><span class="pr" id="pr-flat">£0</span></button>
+      <button type="button" class="hbtn" data-type="apartment" aria-pressed="false"><span class="ico" aria-hidden="true"></span><span class="nm">Apartment</span><span class="pr" id="pr-apartment">£0</span></button>
+    </div></div>
+  </div>
+</div>
+<div id="tab-house" class="tab-panel">
+<div id="house-tab-inner">
+
+<!-- VERBATIM house-tracker.html content starts here -->
+<div class="wrap" style="max-width:1140px;margin:0 auto;padding:0 20px">
+  <header style="text-align:center;margin-bottom:44px">
+    <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-0));letter-spacing:.35em;text-transform:uppercase;color:var(--teal);opacity:.65;margin-bottom:8px" class="vi-eyebrow">Vault-It · House Builder</div>
+    <h1 style="font-family:'Syne',sans-serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:800;color:var(--text);letter-spacing:-.02em">Build Your <span style="color:var(--teal)">Dream Home</span></h1>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));color:#5a8888;opacity:.7;margin-top:5px;letter-spacing:.08em" class="vi-eyebrow vi-sub">Every pound saved builds your future</div>
+  </header>
+  <div id="hb-levels" class="hb-levels"></div>
+  <div class="grid">
+    <div class="scene-card" id="houseSceneCard">
+      <div class="scene-lbl" id="sceneLabel" style="display:none"></div>
+
+      <div class="scene" id="house-scene" style="position:relative">
+        <canvas id="hbStill" role="img" aria-label="Still picture of your house" style="width:100%;height:100%;display:block"></canvas>
+
+        <div id="house-pro-lock" style="position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgb(var(--panel-rgb) / .82);backdrop-filter:blur(6px);text-align:center;padding:24px">
+          <div style="font-size:1.8rem;margin-bottom:10px">🔒</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--tx);margin-bottom:6px">Your house fills as you save</div>
+          <div style="font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.6;max-width:260px;margin-bottom:16px">Every deposit adds bricks. Watch your home being built in real time. Pro only.</div>
+          <button onclick="showUpgrade('annual')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:max(.6rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">Upgrade to Pro →</button>
+        </div>
+        <!-- Left-edge collapsible guide -->
+        <div class="vp-guide" id="vp-guide-house">
+          <div class="vp-guide-tab" onclick="toggleVpGuide('house')" title="Controls guide">
+            <svg width="10" height="9" viewBox="0 0 10 9" fill="none"><line x1="1" y1="1.5" x2="9" y2="1.5" stroke="#44c0b9" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="4.5" x2="9" y2="4.5" stroke="#44c0b9" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="7.5" x2="9" y2="7.5" stroke="#44c0b9" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="vp-guide-panel">
+            <div class="vp-gi">
+              <div class="vp-gi-hd">CONTROLS</div>
+              <div class="vp-gi-row">
+                <div class="vp-gi-ico"><svg width="16" height="20" viewBox="0 0 16 20" fill="none"><path d="M8 10 L8 3 Q8 1.5 9.2 1.5 Q10.5 1.5 10.5 3 L10.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5.5 10 L5.5 5 Q5.5 3.8 6.8 3.8 Q8 3.8 8 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M10.5 8 L10.5 6 Q10.5 4.8 11.8 4.8 Q13 4.8 13 6 L13 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13 10 L13 8 Q13 7 14 7 Q15 7 15 8 L15 12 Q15 17 8 18 Q1 18 1 12 L1 10 Q1 8.5 3.2 8.5 Q5.5 8.5 5.5 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 0 L7 1.5 M8 0 L9 1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+                <div class="vp-gi-lbl"><b>DRAG</b>pan view</div>
+              </div>
+              <div class="vp-gi-sep"></div>
+              <div class="vp-gi-row">
+                <div class="vp-gi-ico"><svg width="18" height="20" viewBox="0 0 18 20" fill="none"><path d="M5 10 L5 3 Q5 1.5 6.5 1.5 Q8 1.5 8 3 L8 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M10 10 L10 3 Q10 1.5 11.5 1.5 Q13 1.5 13 3 L13 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M3 10 Q3 8.5 5 8.5 L8 8.5 L10 8.5 L13 8.5 Q15 8.5 15 10 L15 13 Q15 17.5 9 18 Q3 18 3 13 Z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M0.5 7 Q-0.5 10 1 13" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M0.5 7 L1.5 8 M0.5 7 L1.8 7.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+                <div class="vp-gi-lbl"><b>2 FINGERS</b>orbit angle</div>
+              </div>
+              <div class="vp-gi-sep"></div>
+              <div class="vp-gi-row">
+                <div class="vp-gi-ico"><svg width="18" height="16" viewBox="0 0 18 16" fill="none"><path d="M3 12 L3 4 Q3 2 5 2 Q7 2 7 4 L7 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M15 12 L15 4 Q15 2 13 2 Q11 2 11 4 L11 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8.2 9 L5.5 9" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M6.5 8 L5.5 9 L6.5 10" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.8 9 L12.5 9" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M11.5 8 L12.5 9 L11.5 10" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="vp-gi-lbl"><b>PINCH</b>zoom in/out</div>
+              </div>
+              <div class="vp-gi-sep"></div>
+              <div class="vp-gi-row">
+                <div class="vp-gi-ico"><svg width="12" height="17" viewBox="0 0 12 17" fill="none"><rect x="1" y="1" width="10" height="15" rx="5" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="4" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.5 3 L6 1.5 L7.5 3" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 8.5 L6 10 L7.5 8.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="vp-gi-lbl"><b>SCROLL</b>zoom in/out</div>
+              </div>
+              <div class="vp-gi-sep"></div>
+              <div class="vp-gi-row">
+                <div class="vp-gi-ico" style="font-size:.9rem;color:rgb(var(--teal-rgb) / .72)">✥</div>
+                <div class="vp-gi-lbl"><b>✥ BUTTON</b>orbit mode</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- the chosen house type, top right of the viewport; tap for the snapshot and to change it (v0.9.1 round 2, R13) -->
+        <button type="button" class="hbt-chip" id="hbt-chip" aria-haspopup="dialog" aria-expanded="false" aria-controls="hbt-pan" onclick="hbtOpen()"><span class="hbt-chip-tok" aria-hidden="true"></span><span class="hbt-chip-txt"><small>House type</small><b id="hbt-chip-nm">Terraced</b></span><svg class="vi-ic hbt-chip-chev" aria-hidden="true"><use href="#vi-chevron"/></svg></button>
+        <div class="pops" id="hb-pops" aria-hidden="true"></div>
+        <!-- HUD control buttons — inside scene, positioned correctly relative to it -->
+        <div class="hud-bar" id="hud-bar-house" role="toolbar" aria-label="Camera">
+          <button class="hud-btn" id="hud-zoom-out" onclick="houseZoomOut()" title="Zoom out" aria-label="Zoom out"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-zoom-out"/></svg></button>
+          <button class="hud-btn" id="hud-zoom-in" onclick="houseZoomIn()" title="Zoom in" aria-label="Zoom in"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-zoom-in"/></svg></button>
+          <button class="hud-btn hud-toggle" id="hud-orbit-toggle" onclick="toggleOrbitMode()" title="Toggle orbit mode" aria-label="Toggle orbit mode"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-orbit"/></svg></button>
+          <button class="hud-btn" id="hud-reset" onclick="resetView()" title="Reset camera" aria-label="Reset camera"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-reset"/></svg></button>
+          <button class="hud-btn" id="hud-full" onclick="toggleExpand()" title="Full screen" aria-label="Full screen"><svg class="vi-ic sm" aria-hidden="true"><use href="#vi-fullscreen"/></svg></button>
+        </div>
+      </div>
+      <!-- Lay the bricks sits right under the viewport so the laying is seen (owner, 30 Oct 2026) -->
+      <div class="hb-lay" id="hb-lay" role="group" aria-label="Lay the bricks">
+        <div class="hb-lay-row"><label for="savingsInput" id="hb-add-amt" class="vi-sr">Amount to add to your deposit</label><div class="iw"><span class="sym">£</span><input type="number" id="savingsInput" inputmode="decimal" placeholder="2,000" min="0" step="100" aria-label="Amount to add to your deposit"></div><button class="btn-add" id="btnAdd"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick-wall"/></svg> Lay the bricks</button></div>
+        <div class="hb-brick-line" id="hb-brick-line" aria-live="polite"></div>
+      </div>
+      <div class="vp-key">☝ DRAG TO PAN &nbsp;·&nbsp; ✌ DRAG TO ORBIT &nbsp;·&nbsp; ⊕ SCROLL / PINCH TO ZOOM</div>
+      <div class="scene-cap" id="sceneCap" style="display:none"></div>
+      <!-- House Purchased CTA — shown when deposit goal reached -->
+      <div id="house-purchased-banner" style="display:none;text-align:center;padding:16px 20px;background:linear-gradient(135deg,rgb(var(--brass-rgb) / .12),rgb(var(--teal-rgb) / .06));border:1px solid rgb(var(--brass-rgb) / .3);border-radius:10px;margin-top:12px">
+        <div style="font-size:1.3rem;margin-bottom:5px">🎉</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:max(.72rem,var(--vi-fs-3));color:var(--brass);letter-spacing:.06em;margin-bottom:4px">Deposit Goal Reached!</div>
+        <div style="font-size:max(.5rem,var(--vi-fs-1));color:rgb(var(--ink-rgb) / .45);margin-bottom:12px;line-height:1.5">Your house is fully funded. Time to make it official.</div>
+        <button onclick="markHousePurchased()" style="padding:10px 26px;background:linear-gradient(135deg,var(--brass),#e0bb6a);border:none;border-radius:8px;color:#04090f;font-family:'Syne',sans-serif;font-weight:800;font-size:max(.62rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">House Purchased →</button>
+      </div>
+      <!-- Mortgage complete banner — shown when mortgage is paid off -->
+      <div id="house-mortgage-complete" style="display:none;text-align:center;padding:16px 20px;background:linear-gradient(135deg,rgb(var(--teal-rgb) / .12),rgb(var(--brass-rgb) / .06));border:1px solid rgb(var(--teal-rgb) / .35);border-radius:10px;margin-top:12px">
+        <div style="font-size:1.3rem;margin-bottom:5px">🏠</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:max(.72rem,var(--vi-fs-3));color:var(--teal);letter-spacing:.06em;margin-bottom:4px">Mortgage Free!</div>
+        <div style="font-size:max(.5rem,var(--vi-fs-1));color:rgb(var(--ink-rgb) / .45);line-height:1.5">Your home is truly yours: debt free and fully owned.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="card" id="hb-hud"></div>
+      <div class="card hb-plan" id="hb-plan">
+        <div class="card-lbl">Your house plan</div>
+        <div class="price-edit-row">
+          <label>Set Price</label>
+          <div class="price-iw"><span class="sym">£</span><input type="number" id="priceInput" placeholder="e.g. 250000" min="1000" step="1000"></div>
+          <button class="btn-sp" id="btnSP">Update</button>
+        </div>
+        <div class="price-edit-row" style="margin-top:8px">
+          <label>Deposit target</label>
+          <div class="price-iw"><input type="number" id="depositPctInput" min="1" max="60" step="1" value="20" onchange="hbSetDepositPct(this.value)"><span class="sym" style="border-right:none;border-left:1px solid rgb(var(--ink-rgb) / .08)">%</span></div>
+          <span id="depositPctAmt" style="font-family:'Share Tech Mono',monospace;font-size:max(.6rem,var(--vi-fs-2));color:var(--go)"></span>
+        </div>
+        <!-- Floor selector for flat/apartment -->
+        <div id="floor-selector-card" style="display:none;margin-top:10px;padding:10px 12px;background:rgb(var(--teal-rgb) / .05);border:1px solid rgb(var(--teal-rgb) / .18);border-radius:8px">
+          <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-0));font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--em);margin-bottom:8px">Your Floor</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="range" id="floor-slider" min="1" max="10" value="5" oninput="setApartmentFloor(this.value)" style="flex:1;accent-color:var(--em)">
+            <span id="floor-display" style="font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));color:var(--em);min-width:58px;font-weight:700">Floor 5</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);margin-top:3px">
+            <span>Floor 1</span><span id="floor-max-lbl">Floor 10</span>
+          </div>
+          <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);margin-top:5px">Savings build bricks on your selected floor. Other floors shown as structure.</div>
+        </div>
+        <div class="hb-plan-note" id="hb-plan-brick" style="margin-top:14px"></div>
+      </div>
+    </div>
+    <!-- History: contribution streak, savings log, reset -->
+    <div class="card hb-hist" id="hb-hist" data-adv>
+      <div class="card-lbl">History</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div style="font-family:'Syne',sans-serif;font-size:max(.62rem,var(--vi-fs-0));font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--em)">Contribution Streak</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <button id="habit-mode-btn" onclick="toggleHabitMode()" style="font-size:max(.52rem,var(--vi-fs-1));padding:3px 10px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:4px;color:var(--em);cursor:pointer;font-family:'Syne',sans-serif;font-weight:700">Monthly</button>
+          <span style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);font-family:'Share Tech Mono',monospace">From:</span>
+          <select id="habit-year-sel" onchange="renderHabitTracker()" style="font-size:max(.52rem,var(--vi-fs-1));padding:3px 8px;background:rgb(var(--teal-rgb) / .08);border:1px solid rgb(var(--teal-rgb) / .25);border-radius:4px;color:var(--em);cursor:pointer;font-family:'Share Tech Mono',monospace"></select>
+        </div>
+      </div>
+      <div id="habit-streak-label" style="font-family:'Share Tech Mono',monospace;font-size:max(.75rem,var(--vi-fs-3));color:var(--go);margin-bottom:10px">🔥 0 streak</div>
+      <div id="habit-circles" style="display:flex;align-items:flex-end;gap:1px;overflow-x:auto;padding-bottom:8px;min-height:52px;scrollbar-width:thin;scrollbar-color:rgb(var(--teal-rgb) / .2) transparent"></div>
+        <div class="hb-sub-lbl">Savings log</div>
+        <div class="log-list" id="logList"><div style="font-size:max(.58rem,var(--vi-fs-2));color:rgb(var(--ink-rgb) / .18);text-align:center;padding:10px 0">No deposits yet</div></div>
+        <button class="btn-reset" id="btnReset">⟳ Reset Tracker</button>
+    </div>
+  </div>
+</div>
+<!-- VERBATIM house-tracker.html content ends here -->
+
+<!-- Your own design: upload a 3D model or generate one with AI (one collapsed card) -->
+<div style="max-width:1140px;margin:16px auto 0;padding:0 20px">
+<details class="ov-chart-card hb-own" id="hb-own-design" data-adv>
+<summary class="ov-chart-title hb-own-sum">Your own design <span class="hb-own-pro">PRO</span><span class="hb-own-hint">🔒 Coming later as part of Pro</span></summary>
+<p class="hb-own-locked" style="font-size:max(.62rem,var(--vi-fs-2));color:var(--t2);margin-top:10px">Upload a 3D model or describe one for AI to build, and it becomes your House Builder house. Coming later as part of Pro.</p>
+</details>
+</div>
+
+</div>
+</div><!-- /tab-house -->
+

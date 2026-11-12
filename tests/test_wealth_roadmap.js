@@ -6,6 +6,7 @@
 //  3. roadmap stages draw as tokens (hex face, rim studs, number plate), not round coins; the stage to work on is the largest
 //  4. the levelling panel: rank token, level, XP to next, XP from stages plus badges, tier counts, token collection, next goals
 //  5. phone 390: no sideways scroll; no page errors
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -18,7 +19,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
     const p = await ctx.newPage();
     p.on('pageerror', e => errs.push(w + ': ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/Failed to load|net::/.test(m.text())) errs.push('console: ' + m.text()); });
     await p.addInitScript(seed({ saved: 0, target: 250000, houseType: 'terraced', deposits: [], prices: { terraced: 250000 } }));
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1800);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1800);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#pro-offer-modal,#tester-welcome{display:none!important}' });
     await p.evaluate(() => { try { localStorage.setItem('vi_view', 'advanced'); } catch (e) {} showTab('overview'); }); await p.waitForTimeout(700);
 
@@ -91,9 +92,9 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
       // free month guard (owner: 30 different days; Pedro: two devices on one day count once)
       const days = await p.evaluate(() => { const w0 = JSON.stringify(achState.wr); achState.wr.days = 3; achState.wr.last = ''; localStorage.removeItem('vi_last_visit'); checkStreak(); const a = achState.wr.days; localStorage.removeItem('vi_last_visit'); checkStreak(); const b = achState.wr.days; achState.wr = JSON.parse(w0); return [a, b]; });
       ok(days[0] === 4 && days[1] === 4, 'days of use: a new day counts once, a second device on the same day does not (' + days + ')');
-      // linear: a stage met further along the path earns nothing until it is reached
+      // linear: a linear stage met further along the path earns nothing until it is reached (the round 2 achievements, such as £250 Buffer, pay at once by design)
       const lin = await p.evaluate(() => { alState.cashAccounts = [{ id: 9, name: 'Savings', type: 'Savings', balance: 1200 }]; renderFIREroadmap(); const S = renderFIREroadmap._stages, b = S.findIndex(s => s.key === 'buf500');
-        return { next: S.nextIdx, b, waiting: S[b].raw && !S[b].done, earned: Object.keys(achState.wr.s).filter(k => /^buf/.test(k)) }; });
+        return { next: S.nextIdx, b, waiting: S[b].raw && !S[b].done, earned: Object.keys(achState.wr.s).filter(k => /^buf(500|1k)./.test(k)) }; });
       ok(lin.b > lin.next && lin.waiting && lin.earned.length === 0, 'steps beyond the stage being worked on earn no XP yet (next ' + lin.next + ', buf500 ' + lin.b + ', earned ' + lin.earned + ')');
       // latched: XP never goes down when a figure falls
       const lat = await p.evaluate(() => { const a = wrTotalXp(); ovState.snapshots = []; alState.cashAccounts = []; renderFIREroadmap(); return [a, wrTotalXp()]; });
@@ -103,7 +104,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
         const calls = []; window._fnInvoke = (fn, body) => { calls.push([fn, body.moment]); return Promise.resolve({ data: { ok: true } }); }; _supaUser = { id: 't' };
         const btn = () => !!document.querySelector('#wr-rank .wr-claim'), base = () => wrTotalXp() - (achState.xp || 0);
         const r = {};
-        achState.wr.claim = null; achState.wr.days = 30; achState.xp = Math.max(0, 1549 - base()); renderAchievements(); r.l7 = [wrLevel().n, btn()];
+        achState.wr.claim = null; achState.wr.days = 30; renderAchievements(); achState.xp = Math.max(0, 1549 - base()); renderAchievements(); r.l7 = [wrLevel().n, btn()];
         achState.xp = Math.max(0, 1600 - base()); achState.wr.days = 29; renderAchievements(); r.d29 = [wrLevel().n, btn()];
         achState.wr.days = 30; renderAchievements(); r.ready = btn();
         wrClaim(document.querySelector('#wr-rank .wr-claim')); await new Promise(f => setTimeout(f, 50)); wrClaim(); await new Promise(f => setTimeout(f, 50));

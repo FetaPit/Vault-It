@@ -99,6 +99,6 @@ for (const [name, from, to] of E) {
   if (n !== 1) { bad++; console.log(`NOT APPLIED (${n} matches): ${name}`); continue; }
   s = s.replace(from, to);
 }
-fs.writeFileSync(file, s);
+fs.writeFileSync(file, s); require('child_process').execFileSync(process.execPath, [__dirname + '/build_app.js', '--absorb'], { stdio: 'inherit' });   // index.html is built from src/app: carry the edit into the parts
 console.log(bad ? `${bad} edit(s) need a look` : `hand edits applied (${E.length})`);
 process.exit(bad ? 1 : 0);

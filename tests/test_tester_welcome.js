@@ -4,8 +4,9 @@
 //   3. an account that is not a beta tester (beta closed) does not see it; a returning account never sees it on load
 //   4. phone, Daylight: fits the screen, no sideways scroll
 // Run: node tests/test_tester_welcome.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
   const b = await chromium.launch(); const errs = [];
@@ -44,7 +45,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
   await p.evaluate(() => wStep2Skip()); await p.waitForTimeout(1000);
   const ph = await p.evaluate(() => { const r = document.querySelector('#tester-welcome .tw-box').getBoundingClientRect(); return { on: !document.getElementById('tester-welcome').classList.contains('hidden'), fits: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight, sx: document.documentElement.scrollWidth - innerWidth }; });
   ok(ph.on && ph.fits && ph.sx <= 1, 'phone, Daylight: the note fits the screen, no sideways scroll (' + JSON.stringify(ph) + ')');
-  await p.screenshot({ path: '/home/user/Vault-It/shots/brand/tester-welcome-daylight-390.png' });
+  await p.screenshot({ path: require('path').join(require('./lib/vi').REPO, 'shots/brand/tester-welcome-daylight-390.png') });
   await p.context().close();
 
   await b.close();

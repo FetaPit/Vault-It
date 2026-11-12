@@ -29,7 +29,7 @@
       "role": "Labels and sublines"
     },
     "lock": {
-      "value": "#5A6068",
+      "value": "#8C939B",
       "role": "Locked and disabled"
     },
     "teal": {
@@ -77,7 +77,7 @@
       "role": "Committed essential"
     },
     "salmon": {
-      "value": "#EE7D7D",
+      "value": "#FFA38A",
       "role": "Variable essential"
     },
     "amber": {

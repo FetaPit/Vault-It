@@ -1,0 +1,65 @@
+<style id="vi-v091r2-chrome">
+/* ═══ v0.9.1 round 2, chunk A: R1 wordmark in proportion with the dial, R23/R24 credit-card profile card, R26 Night header in Daylight, R27 animated Night/Daylight switch ═══ */
+/* R1: the wordmark scales with the icon (about 64% of it, so the cap height sits near half the icon) */
+#topnav .logo.wm{font-size:calc(var(--vi-mark-size) * .64)!important}
+/* R26: the Night header bar in Daylight (tokens come from the Night block at the top; ?hdr=paper switches back). The mark and the brick need their Night looks too. */
+[data-theme="light"]:not([data-hdr="paper"]) #topnav .vi-mark-night{display:block}
+[data-theme="light"]:not([data-hdr="paper"]) #topnav .vi-mark-day{display:none}
+[data-theme="light"]:not([data-hdr="paper"]) #topnav .wm b{color:var(--teal);-webkit-text-fill-color:var(--teal);text-shadow:var(--tglow)}
+[data-theme="light"]:not([data-hdr="paper"]) #topnav .wm .dot{background:var(--teal);box-shadow:var(--dglow)}
+/* R23: the profile card is credit-card shaped (ID-1, 85.60 x 53.98 mm). The photo sits left and spans the name and role rows, archetypes run on one line, the footer is tight. */
+.pioneer-card-wrap{aspect-ratio:85.6 / 53.98;display:flex}
+.pioneer-card{flex:1;min-width:0;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto auto auto auto;align-content:space-between}
+.pioneer-card .pc-body{display:contents}
+.pioneer-card .pc-header{grid-column:1 / -1;grid-row:1;padding:2px 10px 2px}
+.pioneer-card .pc-avatar-wrap,.pioneer-card .pc-info{position:relative;z-index:3}
+.pioneer-card .pc-avatar-wrap{grid-column:1;grid-row:2 / 4;align-self:center;margin:4px 9px 4px 10px}
+.pioneer-card .pc-info{grid-column:2;grid-row:2;align-self:end;padding:5px 10px 0 0}
+.pioneer-card .pc-roles{grid-column:2;grid-row:3;align-self:start;display:flex;gap:8px;padding:2px 10px 4px 0;border-top:0;overflow:hidden}
+.pioneer-card .pc-roles>div{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0!important}
+.pioneer-card .pc-archetypes{grid-column:1 / -1;grid-row:4;flex-wrap:nowrap;align-items:center;padding:3px 10px}
+.pioneer-card .pc-footer{grid-column:1 / -1;grid-row:5;padding:3px 10px 4px}
+.pioneer-card .pc-footer-meta{line-height:1.15}
+.pioneer-card .pc-level-badge{display:block;max-width:100%;box-sizing:border-box;letter-spacing:.06em;line-height:1.2;padding:2px 6px}   /* a long rank name wraps to two tight lines rather than being cut */
+.pioneer-card .pc-level-row{min-width:0}
+.pioneer-card .pc-archetype{display:block;line-height:1.3;padding:1px 7px;white-space:nowrap}
+/* R24: more room for the photo (52 px to 72 px), and no holographic effect on it (the card edge keeps its foil): a still brass frame, no hue turn, no glow */
+.pc-avatar-wrap{animation:none;filter:none;box-shadow:none;background:linear-gradient(135deg,#b8902e,#f0d878,var(--brass),#b8902e)}
+.pc-avatar-inner{width:72px;height:72px}
+.pc-name,.pc-adoption-num{color:var(--text)}   /* was white: unreadable on the Daylight card */
+/* R27: one animated switch, a pill with a sun in a sky with clouds (Daylight, knob left) and a moon among stars (Night, knob right). Scoped literals: --gold turns brown in Daylight. */
+#vi-theme-btn{--sw-w:48px;--sw-h:26px;--sw-k:20px;--pad:calc((var(--sw-h) - 2px - var(--sw-k)) / 2);--run:calc(var(--sw-w) - 2px - var(--sw-k) - 2 * var(--pad));
+  display:inline-flex;align-items:center;justify-content:center;width:var(--sw-w);height:44px;padding:0;margin:0 0 0 8px;flex:none;background:transparent;border:0;border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+@media(min-width:600px){#vi-theme-btn{--sw-w:56px;--sw-h:30px;--sw-k:24px}}
+@media(min-width:1024px){#vi-theme-btn{--sw-w:64px;--sw-h:32px;--sw-k:26px}}
+#vi-theme-btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+#vi-theme-btn .vi-sw-track{position:relative;display:block;width:var(--sw-w);height:var(--sw-h);box-sizing:border-box;border:1px solid #2D8882;border-radius:999px;overflow:hidden;background-color:#080D14}
+#vi-theme-btn:hover .vi-sw-track{border-color:#44C0B9}
+#vi-theme-btn .vi-sw-scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+#vi-theme-btn .vi-sw-day{opacity:0}
+[data-theme="light"] #vi-theme-btn .vi-sw-track{background-color:#006B67}
+[data-theme="light"] #vi-theme-btn .vi-sw-day{opacity:1}
+[data-theme="light"] #vi-theme-btn .vi-sw-night{opacity:0}
+[data-theme="light"][data-hdr="paper"] #vi-theme-btn .vi-sw-track{border-color:#006B67}
+#vi-theme-btn .vi-sw-knob{position:absolute;top:50%;left:var(--pad);width:var(--sw-k);height:var(--sw-k);margin-top:calc(var(--sw-k) / -2);box-sizing:border-box;border-radius:50%;border:1.5px solid transparent;
+  background-color:#E8E8E8;box-shadow:0 0 8px 1px rgba(68,192,185,.55);transform:translateX(var(--run))}
+#vi-theme-btn .vi-sw-knob svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#vi-theme-btn .vi-sw-sunring{opacity:0}
+[data-theme="light"] #vi-theme-btn .vi-sw-knob{background-color:#E8C56A;border-color:#C9A84C;box-shadow:0 1px 2px rgba(0,0,0,.35);transform:translateX(0)}
+[data-theme="light"] #vi-theme-btn .vi-sw-moon{opacity:0}
+[data-theme="light"] #vi-theme-btn .vi-sw-sunring{opacity:1}
+#vi-theme-btn .vi-sw-clouds{transform:translateY(10px);opacity:0}
+[data-theme="light"] #vi-theme-btn .vi-sw-clouds{transform:none;opacity:1}
+#vi-theme-btn .vi-sw-stars path{transform-box:fill-box}
+[data-theme="light"] #vi-theme-btn .vi-sw-stars{transform:translateY(8px);opacity:0}
+#vi-theme-btn .vi-sw-rings{transform-origin:48px 16px;transform-box:view-box}
+[data-theme="light"] #vi-theme-btn .vi-sw-rings{transform:scale(.8)}
+/* motion only after first paint (.vi-th-anim is added once the page has loaded); reduced motion: instant */
+#vi-theme-btn.vi-th-anim .vi-sw-knob{transition:transform 450ms cubic-bezier(.34,1.25,.5,1),background-color 350ms ease-in-out,border-color 350ms ease-in-out,box-shadow 350ms ease-in-out}
+#vi-theme-btn.vi-th-anim .vi-sw-track{transition:background-color 350ms ease-in-out,border-color 200ms}
+#vi-theme-btn.vi-th-anim .vi-sw-scene,#vi-theme-btn.vi-th-anim .vi-sw-moon,#vi-theme-btn.vi-th-anim .vi-sw-sunring{transition:opacity 350ms ease-in-out}
+#vi-theme-btn.vi-th-anim .vi-sw-clouds,#vi-theme-btn.vi-th-anim .vi-sw-stars{transition:transform 500ms ease-in-out,opacity 500ms ease-in-out}
+#vi-theme-btn.vi-th-anim .vi-sw-stars{transition-delay:40ms}
+#vi-theme-btn.vi-th-anim .vi-sw-rings{transition:transform 350ms ease-in-out}
+@media(prefers-reduced-motion:reduce){#vi-theme-btn,#vi-theme-btn *{transition:none!important;animation:none!important}}
+</style>

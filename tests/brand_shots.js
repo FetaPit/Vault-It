@@ -2,6 +2,7 @@
 //   node tests/brand_shots.js [tab ...]      → shots/brand/<tab>-<theme>-<width>.png
 //   FULL=1 node tests/brand_shots.js house  → whole page instead of the first screen
 // Uses the same seed as test_overview plus a house in progress. Prints page errors and sideways scroll.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs');
 const routeThree = require('./three_route');   // three.js served locally (the sandbox has no CDN), so the house is the 3D one
@@ -26,7 +27,7 @@ const seed = (theme) => {
     await routeThree(ctx);
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(theme + w + ': ' + e.message));
     await p.addInitScript(seed, theme);
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(2000);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(2000);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     for (const t of TABS) {
       await p.evaluate(t => showTab(t), t); await p.waitForTimeout(900);

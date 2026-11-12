@@ -1,0 +1,216 @@
+/* ═══ Overview: taller chart, milestones under it, full-width roadmap, bigger colour-coded summaries ═══ */
+body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,34vh,560px)!important}
+@media(max-width:600px){body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(220px,32vh,320px)!important}}
+.ov-ms-wide{padding:clamp(12px,1.6vw,20px)}
+.ms-grid{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:820px){.ms-grid{grid-template-columns:1.1fr 1fr;gap:28px}}
+.ms-col-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.62rem,var(--vi-fs-2));letter-spacing:.1em;color:var(--tx);margin-bottom:10px}
+.ms-ic{font-size:1.05rem;flex:none}
+.ms-chk{color:var(--em);font-size:max(.7rem,var(--vi-fs-3));margin-left:2px}
+.ms-row label{font-size:max(.7rem,var(--vi-fs-3))!important;color:var(--t2)!important}
+.ms-row input[type=number]{font-size:max(.78rem,var(--vi-fs-3))!important;width:clamp(90px,9vw,130px)!important}
+.ms-x{flex:none;background:none;border:1px solid rgb(var(--ink-rgb) / .14);color:var(--t3);border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:max(.7rem,var(--vi-fs-3))}
+.ms-x:hover{color:var(--re);border-color:var(--re)}
+.ms-snapv{font-family:'Share Tech Mono',monospace;font-size:max(.74rem,var(--vi-fs-3));color:var(--em)}
+.ms-empty{font-size:max(.58rem,var(--vi-fs-2));color:var(--t3);padding:6px 2px 10px}
+.ms-add{margin-top:10px;border:1px dashed rgb(var(--teal-rgb) / .4);border-radius:10px;background:rgb(var(--teal-rgb) / .04)}
+.ms-add>summary{cursor:pointer;padding:12px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:max(.64rem,var(--vi-fs-2));letter-spacing:.06em;color:var(--em);list-style:none}
+.ms-add>summary::-webkit-details-marker{display:none}
+.ms-add[open]>summary{border-bottom:1px dashed rgb(var(--teal-rgb) / .25)}
+.ms-add-body{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+.ms-add-body input{min-width:0;background:var(--c3);border:1px solid var(--bd2);border-radius:6px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.76rem,var(--vi-fs-3));padding:9px 10px}
+.ms-add-body input:first-child{grid-column:1/-1}
+.ms-add-body .btn-add-data{grid-column:1/-1}
+#fire-roadmap-card{width:100%}
+.ms-row.x5{grid-template-columns:20px 24px minmax(0,1fr) clamp(86px,9vw,120px) 30px!important}
+.ms-row.snap{grid-template-columns:24px minmax(0,1fr) auto 30px!important}
+#ms-list .ms-row:not(.x5){grid-template-columns:20px 24px minmax(0,1fr) clamp(86px,9vw,120px)!important}
+.ms-row input[type=number]{width:100%!important;min-width:0}
+/* menu bar items never overlap: they keep their width and the bar scrolls if it must */
+@media(min-width:1100px){
+  #vi-density-btn .vi-d-lbl{display:none!important}#vi-density-btn .vi-d-ico{display:inline!important}
+  #vi-back-us-btn{padding-left:10px!important;padding-right:10px!important}
+  #topnav>div[style*="margin-left:auto"]>span:first-child{display:none}
+  #topnav .tab-btn{letter-spacing:.03em!important;gap:4px!important}
+}
+@media(min-width:1100px) and (max-width:1699px){#topnav .tab-btn .ti{display:none!important}}
+@media(min-width:1100px){#topnav .tab-btn{min-width:max-content!important;flex-shrink:0!important;padding:0 clamp(5px,.7vw,16px)!important}}
+@media(max-width:699px){.ov-kpis>.ov-kpi:last-child:nth-child(odd){grid-column:1/-1}}
+/* cash-flow diagram: the whole thing fits one screen on desktop */
+@media(min-width:900px){.cf-scroll{display:flex;justify-content:center}.cf-scroll svg{width:100%!important;height:auto;margin:0 auto}}
+/* v0.9.1 E4: the dashboard tile is 3D only; display:flex above must not beat the hidden attribute */
+#cf-sankey[hidden]{display:none!important}
+/* KPI tiles + summaries: bigger, icon-led, colour-coded */
+.ov-kpi-lbl{display:flex;align-items:center;gap:6px;font-size:max(.58rem,var(--vi-fs-2))!important}
+.ov-kpi-ic{width:15px;height:15px;flex:none}
+.ov-kpi-val{font-size:clamp(1.15rem,1.9vw,1.7rem)!important}
+.ov-kpi-sub{font-size:max(.54rem,var(--vi-fs-1))!important}
+.ov-kpi-nw{border-top:2px solid var(--teal)}.ov-kpi-nw .ov-kpi-lbl{color:var(--teal)}
+.ov-kpi-as{border-top:2px solid var(--green)}.ov-kpi-as .ov-kpi-lbl{color:var(--green)}
+.ov-kpi-db{border-top:2px solid var(--red)}.ov-kpi-db .ov-kpi-lbl{color:var(--red)}
+.ov-kpi-li{border-top:2px solid var(--amber)}.ov-kpi-li .ov-kpi-lbl{color:var(--amber)}
+.ov-kpi-su{border-top:2px solid var(--blue)}.ov-kpi-su .ov-kpi-lbl{color:var(--blue)}
+.ov-sum{--sc:var(--teal);border-left:3px solid var(--sc)!important;background:linear-gradient(135deg,color-mix(in srgb,var(--sc) 9%,var(--c2)),var(--c2) 60%)!important}
+.debt-strip{grid-template-columns:repeat(4,minmax(0,1fr))!important;background:rgb(var(--panel-rgb) / .85);border:1px solid rgb(var(--teal-rgb) / .14);border-radius:12px;padding:6px;gap:0!important}
+.debt-strip .ov-kpi{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+.debt-strip .ov-kpi::before,.debt-strip .ov-kpi::after{display:none!important}
+.debt-strip .ov-kpi+.ov-kpi{border-left:1px solid rgb(var(--ink-rgb) / .08)!important}
+@media(max-width:600px){.debt-strip{grid-template-columns:1fr 1fr!important}.debt-strip .ov-kpi:nth-child(3){border-left:0!important}.debt-strip .ov-kpi:nth-child(n+3){border-top:1px solid rgb(var(--ink-rgb) / .08)!important}}
+#debt-charts[data-chart="hist"] .debt-donut-only,#debt-charts[data-chart="donut"] .debt-hist-only{display:none!important}#debt-charts-tree .dtm{display:block}
+.pc-hint{font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);margin-bottom:10px;line-height:1.5}
+.pc-places{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.pc-place{font-size:max(.56rem,var(--vi-fs-2));padding:3px 8px;border-radius:99px;border:1px solid rgb(var(--green-rgb) / .35);color:var(--t2)}.pc-place b{color:var(--gr);font-family:'Share Tech Mono',monospace}
+.pc-list{max-height:220px;overflow:auto;border-top:1px solid var(--bd)}
+.pc-line{display:grid;grid-template-columns:90px 1fr auto 26px;gap:8px;align-items:center;padding:6px 2px;border-bottom:1px solid var(--bd);font-size:max(.62rem,var(--vi-fs-2))}
+.pc-d{font-family:'Share Tech Mono',monospace;color:var(--t2);font-size:max(.56rem,var(--vi-fs-2))}.pc-a{font-family:'Share Tech Mono',monospace;text-align:right}.pc-a.in{color:var(--gr)}.pc-a.out{color:var(--re)}
+.pc-empty{font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:12px}
+.pc-row select,.pc-row input[type=date]{background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;outline:none}
+.pc-out{background:transparent!important;border-color:var(--re)!important;color:var(--re)!important}
+/* Business accounts (Entrepreneur 1): the type choice in the cash table, and the card on the Entrepreneur tab */
+.cash-type-sel,.ba-add select{background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));padding:6px 9px;outline:none;max-width:100%}
+.cash-type-sel{font-size:max(.62rem,var(--vi-fs-2));padding:4px 6px;color:var(--t2);max-width:13em}
+.cash-type-sel:focus-visible,.ba-add select:focus-visible,.ba-bal:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.ba-hd{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;margin-bottom:12px}
+.ba-tots{display:flex;gap:16px;flex-wrap:wrap;font-size:max(.62rem,var(--vi-fs-2));color:var(--t2)}
+.ba-tots b{font-family:'Share Tech Mono',monospace;font-size:max(.74rem,var(--vi-fs-3));color:var(--orange);font-weight:700;margin-left:4px}
+.ba-row{display:grid;grid-template-columns:minmax(0,1fr) auto 8.5em 32px;gap:8px 10px;align-items:center;padding:7px 2px;border-bottom:1px solid var(--bd);font-size:max(.74rem,var(--vi-fs-3))}
+.ba-n{min-width:0}.ba-n>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ba-t{font-size:max(.62rem,var(--vi-fs-2));color:var(--orange);white-space:nowrap}
+.ba-bal{width:100%;min-width:0;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.74rem,var(--vi-fs-3));padding:6px 8px;text-align:right}
+.ba-empty{font-size:max(.6rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:12px}
+.ba-add{margin-top:12px}
+.ba-note{font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);margin-top:10px;line-height:1.5}
+@media(max-width:600px){.ba-row{grid-template-columns:minmax(0,1fr) 7.5em 32px}.ba-t{grid-column:1;grid-row:2;margin-top:-4px}.ba-add{flex-wrap:wrap}.ba-add>*{flex:1 1 45%;min-width:0}.ba-add #ba-name{flex-basis:100%}
+  #cash-table th,#cash-table td{padding-left:4px!important;padding-right:4px!important}.cash-type-sel{max-width:none;width:100%;min-width:10.2em;padding:4px 2px 4px 4px}#cash-table td:nth-child(2){width:42%}}
+@media(max-width:600px){.pc-row{flex-wrap:wrap}.pc-row>*{flex:1 1 45%}}
+.debt-sides{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid rgb(var(--teal-rgb) / .3);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.debt-sides button{background:none;border:0;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--t2);min-height:48px}
+.debt-sides button span{font-family:'Syne',sans-serif;font-weight:800;font-size:max(.72rem,var(--vi-fs-3));letter-spacing:.06em;text-transform:uppercase}
+.debt-sides button small{font-size:max(.54rem,var(--vi-fs-1))}
+.debt-sides button[aria-selected="true"]{color:var(--tx);background:rgb(var(--teal-rgb) / .14)}
+#debt-side-btn-creditors[aria-selected="true"] span{color:var(--re)}#debt-side-btn-debtors[aria-selected="true"] span{color:var(--blue)}
+#debt-side-btn-creditors[aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--re)}#debt-side-btn-debtors[aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--blue)}
+[data-theme="light"] #debt-side-btn-creditors[aria-selected="true"] span,[data-theme="light"] #debt-side-btn-debtors[aria-selected="true"] span{color:var(--text)}
+.debt-sides button+button{border-left:1px solid rgb(var(--teal-rgb) / .3)}
+.owe-hint{font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.5;margin-bottom:12px}
+.owe-empty{font-size:max(.62rem,var(--vi-fs-2));color:var(--t3);text-align:center;padding:18px}
+.owe-row{position:relative;border:1px solid var(--bd);border-left:3px solid var(--blue);border-radius:10px;padding:12px;margin-bottom:10px;background:rgb(var(--blue-rgb) / .04)}
+.owe-row.doubt{border-left-color:var(--t3)}.owe-row.done{opacity:.75;border-left-color:var(--green)}
+.owe-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.owe-who{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.78rem,var(--vi-fs-3));color:var(--tx)}.owe-what{font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);margin-top:2px}
+.owe-amt{font-family:'Share Tech Mono',monospace;font-size:.95rem;color:var(--blue);text-align:right;white-space:nowrap}.owe-amt small{display:block;font-size:max(.52rem,var(--vi-fs-1));color:var(--t2)}
+.owe-row.done .owe-amt{color:var(--gr)}
+.owe-bar{height:4px;border-radius:2px;background:rgb(var(--ink-rgb) / .08);margin:10px 0 8px;overflow:hidden}.owe-bar div{height:100%;background:var(--green)}
+.owe-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:max(.56rem,var(--vi-fs-2));color:var(--t2)}.owe-meta .late{color:var(--re)}
+.owe-sure select{background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-size:max(.56rem,var(--vi-fs-2));padding:4px 6px}
+.owe-pay{display:flex;gap:6px;margin-top:8px}.owe-pay input{flex:1;min-width:0;background:var(--c3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.7rem,var(--vi-fs-3));padding:6px 8px}
+.owe-del{margin-top:8px}
+.v3-host{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;background-color:#080808;background-image:var(--stage-bg)}
+.v3-host.v3-wait{visibility:hidden}
+/* cash account flags in the Budget chips' style (owner, 4 Nov: "a similar asset as expense labels in budget ... bank logo ... stroke
+   color to bank or account provider brand color black bg ... related text in white and balance in brand colour. Logo top left of box
+   small"). Screen-space chips over the 3D stage: a fixed size at any zoom, the bank's real logo as a plain image. */
+.v3-chips{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .35s ease}
+.v3-chips.on{opacity:1}
+.v3-posts{position:absolute;left:0;top:0}
+.v3-chip{position:absolute;left:0;top:0;display:flex;align-items:center;gap:5px;height:20px;padding:0 6px 0 3px;box-sizing:border-box;background:rgba(8,8,8,.97);border:1px solid var(--bc);border-radius:4px;white-space:nowrap;font:600 11px 'DM Sans',sans-serif;color:#FFFFFF;will-change:transform}
+.v3-chip .cash-logo{width:14px;height:14px;border-radius:3px;overflow:hidden;flex:none}
+.v3-chip .v3-mono{background:transparent;font:800 11px/14px 'Syne',sans-serif;letter-spacing:0;box-shadow:inset 0 0 0 1px currentColor;border-radius:3px}
+.v3-chip .cash-logo-none{background:transparent;color:var(--bc)}
+.v3-chip .cash-logo-none .vi-ic{width:14px;height:14px}
+.v3-chip-s{color:#8A93A6}
+.v3-chip-a{font:10.5px 'Share Tech Mono',monospace;color:var(--bc)}
+.v3-chip-r{font:10.5px 'Share Tech Mono',monospace;color:#E8E8E8;opacity:.85}
+.v3-total{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:1px;padding:6px 10px 7px;background:#E8C56A;color:#1A1400;border-radius:4px;font-family:'Share Tech Mono',monospace;box-shadow:0 0 14px rgba(232,197,106,.35)}
+.v3-total-l{font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.v3-total-a{font-size:18px;line-height:1.1}
+@media (prefers-reduced-motion:reduce){.v3-chips{transition:none}}
+.v3-host::after{content:"";position:absolute;inset:0;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none;z-index:1}
+.scene.v3-on{position:relative;min-height:380px}
+#cashSceneCard .scene.v3-on{min-height:420px}
+#cashSceneCard .orbit-hint{z-index:2}
+/* Tester feedback (docs/TESTER_FEEDBACK.md) */
+#vi-fb-btn{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));left:auto;top:auto;bottom:calc(var(--footer-h,30px) + 12px);z-index:450;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 12px;box-sizing:border-box;border-radius:999px;background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .5);color:var(--teal);font:700 10px 'Syne',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer}
+#vi-fb-btn .vi-ic{width:16px;height:16px}
+/* v0.8 (owner, 2 Nov): "It should stay bottom right." Fixed there on every tab and width, above the footer or the phone tab bar; nothing moves it */
+#vi-fb-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+/* it never moves, but fades out while it sits over a 3D viewer's controls (Pedro's review of v0.8 E2) */
+#vi-fb-btn{transition:opacity .24s var(--ease,ease)}
+#vi-fb-btn.vi-fb-fade{opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){#vi-fb-btn{transition:none}}
+body.reduced-motion #vi-fb-btn{transition:none}
+@media(max-width:599px){#vi-fb-btn span{display:none}#vi-fb-btn{width:40px;height:40px;padding:0}#vi-fb-btn .vi-ic{width:18px;height:18px}}
+/* hidden while a pop-up or the help panel is open (Pedro, v0.8 spec E) */
+body:has(#vi-help.open) #vi-fb-btn,body:has(.vi-modal-overlay:not(.hidden):not([style*="display: none"]):not([style*="display:none"])) #vi-fb-btn,body:has(#vi-fb:not([hidden])) #vi-fb-btn{visibility:hidden}
+.vi-fb-card{max-width:440px;width:100%}
+.vi-fb-q{display:block;font-size:max(.72rem,var(--vi-fs-3));color:var(--text);margin:6px 0}
+#vi-fb-text{width:100%;resize:vertical;min-height:84px;box-sizing:border-box}
+.vi-fb-rate{display:flex;align-items:center;gap:6px;margin:10px 0;flex-wrap:wrap}.vi-fb-rate span{font-size:max(.62rem,var(--vi-fs-2));color:var(--t2);margin-right:4px}
+.vi-fb-rate button{width:36px;height:36px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--text);font-family:'Share Tech Mono',monospace;cursor:pointer}
+.vi-fb-rate button[aria-pressed="true"]{background:rgb(var(--teal-rgb) / .18);border-color:var(--teal);color:var(--teal)}
+.vi-fb-pic{display:flex;align-items:center;gap:8px;font-size:max(.64rem,var(--vi-fs-2));color:var(--text)}
+.vi-fb-picrow{display:flex;gap:10px;align-items:center;margin-top:6px;min-width:0}
+#vi-fb-shot{width:110px;max-height:90px;object-fit:cover;object-position:top;border-radius:6px;border:1px solid var(--bd2);flex:none}
+#vi-fb-nudge{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--footer-h,30px) + 64px);z-index:450;display:flex;align-items:center;gap:10px;width:max-content;max-width:min(460px,calc(100vw - 24px));padding:10px 12px;border-radius:12px;background:var(--panel);border:1px solid rgb(var(--gold-rgb) / .5);color:var(--text);font-size:max(.68rem,var(--vi-fs-2));box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#vi-fb-nudge[hidden]{display:none}
+.vi-fbq-step{font-family:'Share Tech Mono',monospace;font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);margin-top:2px}
+.vi-fbq-ch{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.vi-fbq-ch button{padding:8px 12px;border-radius:999px;border:1px solid var(--bd2);background:transparent;color:var(--text);font-size:max(.66rem,var(--vi-fs-2));cursor:pointer;min-height:36px}
+.vi-fbq-ch button[aria-pressed="true"]{background:rgb(var(--teal-rgb) / .18);border-color:var(--teal);color:var(--teal)}
+.vi-fbq-score button{width:36px;padding:0;border-radius:8px;font-family:'Share Tech Mono',monospace}
+.vi-fbq-ends{display:flex;justify-content:space-between;width:100%;font-size:max(.56rem,var(--vi-fs-2));color:var(--t2)}
+#vi-fbq-text{width:100%;resize:vertical;min-height:64px;box-sizing:border-box}
+#vi-fbq-text[hidden]{display:none}
+#vi-fb-nudge .btn-add-data{white-space:nowrap}
+@media print{#vi-fb-btn,#vi-fb-nudge{display:none}}
+.vi-pop{position:fixed;inset:0;z-index:9000;background:rgb(var(--bg-rgb) / .78);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px}
+.vi-pop[hidden]{display:none}
+.vi-pop-card{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;margin:0!important;box-shadow:0 18px 50px -20px rgba(0,0,0,.6)}
+.vi-pop-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.vi-pop-hd .ov-data-title{margin:0!important}
+.vi-pop-msg{font-size:max(.58rem,var(--vi-fs-2));color:var(--re);min-height:1em;margin-top:8px}
+body.vi-pop-open{overflow:hidden}
+.debt-cost{margin:0 0 14px;padding:12px;border:1px solid rgb(var(--ink-rgb) / .07);border-radius:10px;background:rgb(var(--ink-rgb) / .02)}
+.debt-cost-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.56rem,var(--vi-fs-0));letter-spacing:.12em;text-transform:uppercase;color:var(--t2);margin-bottom:8px}
+.ov-sum-a{--sc:var(--teal)}.ov-sum-li{--sc:var(--amber)}.ov-sum-d{--sc:var(--red)}
+.ov-own .ov-sum{border-radius:10px;padding:12px 12px 10px;min-width:0;overflow:hidden}
+.ov-own-hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.ov-own-sub{font-size:max(.56rem,var(--vi-fs-2));color:var(--t2)}
+.ov-sum-go{width:100%;background:none;border:0;padding:0;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.ov-sum-go:hover .ov-chart-title,.ov-sum-go:focus-visible .ov-chart-title{text-decoration:underline;text-underline-offset:3px}
+.ov-sum-arr{margin-left:auto;color:var(--sc);font-size:1.1rem;line-height:1}
+.ov-ms-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.ov-ms-top .ov-ms-title{margin:0!important}
+.ov-ms-tabs{display:inline-flex;border:1px solid rgb(var(--teal-rgb) / .3);border-radius:8px;overflow:hidden}
+.ov-ms-tabs button{background:none;border:0;padding:6px 12px;font-family:'Syne',sans-serif;font-weight:700;font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);cursor:pointer;min-height:32px}
+.ov-ms-tabs button[aria-selected="true"]{background:rgb(var(--teal-rgb) / .16);color:var(--tx)}
+.ov-ms-card .ms-grid{grid-template-columns:1fr!important}
+.ov-ms-card[data-tab="goals"] .ms-col[data-p="snaps"],.ov-ms-card[data-tab="snaps"] .ms-col[data-p="goals"]{display:none}
+.ms-col-hint{font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);margin-bottom:8px}
+.ov-sum-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ov-sum-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,transparent);border:1px solid color-mix(in srgb,var(--sc) 45%,transparent);flex:none}
+.ov-sum .ov-chart-title{font-size:max(.72rem,var(--vi-fs-3))!important;color:var(--sc)!important;margin:0!important}
+.ov-sum-total{font-family:'Share Tech Mono',monospace;font-size:clamp(1.3rem,2vw,1.9rem);font-weight:700;margin-bottom:10px;letter-spacing:-.01em}
+.ov-sum-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:max(.78rem,var(--vi-fs-3))}
+.ov-sum-ri{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:6px;background:rgb(var(--ink-rgb) / .05)}
+.ov-sum-ri svg{width:14px;height:14px}
+.ov-sum-l{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'DM Sans',sans-serif;font-weight:500}
+.ov-sum-v{font-family:'Share Tech Mono',monospace;color:var(--tx);font-size:max(.8rem,var(--vi-fs-3))}
+.ov-sum-empty{font-size:max(.66rem,var(--vi-fs-2));color:var(--t3)}
+.ov-sum-drow{margin-bottom:4px}
+.ov-sum-bar{height:4px;background:rgb(var(--ink-rgb) / .07);border-radius:2px;margin:0 0 6px 30px}
+.ov-sum-bar div{height:100%;background:var(--gr);border-radius:2px}
+/* own and owe bars (owner, 31 Oct): assets and liabilities on one scale per card; debt shows what is left (soft red, from the left)
+   and what is paid off (green, from the right) */
+.ov-sum-sbar{height:5px;background:rgb(var(--ink-rgb) / .07);border-radius:3px;margin:-3px 0 7px 30px;overflow:hidden}
+.ov-sum-sbar span{display:block;height:100%;border-radius:3px;opacity:.85}
+.ov-sum-axis{display:flex;justify-content:space-between;margin:2px 0 4px 30px;padding-top:3px;border-top:1px solid rgb(var(--ink-rgb) / .12);font:400 max(.5rem,var(--vi-fs-1))/1 'Share Tech Mono',monospace;color:var(--t2)}
+.ov-sum-dbar{display:flex;height:7px;border-radius:4px;overflow:hidden;margin:-2px 0 3px 30px;background:rgb(var(--ink-rgb) / .06)}
+.ov-dbar-rem{background:rgb(var(--red-rgb) / .28)}
+.ov-dbar-paid{background:var(--green)}
+.ov-sum-dlab{display:flex;justify-content:space-between;gap:8px;margin:0 0 8px 30px;font:400 max(.52rem,var(--vi-fs-1))/1.2 'Share Tech Mono',monospace}
+.ov-dlab-rem{color:var(--red)}
+.ov-dlab-paid{color:var(--green)}
+.ov-dlab-none{color:var(--t2)}
+#ov-summary-row [id$="-next"]{font-size:max(.62rem,var(--vi-fs-2))!important;line-height:1.5}
+

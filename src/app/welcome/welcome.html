@@ -1,0 +1,222 @@
+<div id="welcome-overlay" style="display:flex">
+  <div class="welcome-box">
+
+    <!-- Onboarding (owner, 5 Nov 2026, from the Help Bnk feedback: "I feel lost", "no clear follow up", "a cadence"; Help Bnk's
+         My Journey asks a few questions, then gives a plan in phases with easy steps). One question per screen, a step count and
+         Back, never the email twice, then the plan: where you are, one step for this week, and a weekly check-in day. -->
+    <div class="wz-top">
+      <button type="button" class="wz-back" id="wz-back" onclick="wBack()" hidden>&larr; Back</button>
+      <div class="wz-count" id="wz-count" aria-live="polite">Step 1 of 3</div>
+    </div>
+    <div class="wz-bar" id="w-step-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+
+    <div id="wz-hero">
+    <!-- Pioneer welcome header -->
+    <div class="welcome-head" style="text-align:center;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgb(var(--brass-rgb) / .18)">
+      <!-- Large vault icon -->
+      <div class="welcome-icon" style="display:flex;justify-content:center;margin-bottom:14px"><div style="width:80px;height:80px"><svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 14px var(--teal))">
+  <defs>
+    <radialGradient id="vaultGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#44c0b9" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#44c0b9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Ambient glow -->
+  <circle cx="40.0" cy="40.0" r="41.4" fill="url(#vaultGlow)"/>
+  <!-- Outer bezel -->
+  <circle cx="40.0" cy="40.0" r="37.6" fill="#0a1a1a" stroke="#44c0b9" stroke-width="1.4"/>
+  <!-- Bezel inner shadow ring -->
+  <circle cx="40.0" cy="40.0" r="34.4" fill="none" stroke="rgba(0,0,0,.6)" stroke-width="1.5"/>
+  <!-- Rivets -->
+  <circle cx="40.0" cy="4.2" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="57.9" cy="9.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="71.0" cy="22.1" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="75.8" cy="40.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="71.0" cy="57.9" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="57.9" cy="71.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="40.0" cy="75.8" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="22.1" cy="71.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="9.0" cy="57.9" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="4.2" cy="40.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="9.0" cy="22.1" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="22.1" cy="9.0" r="1.4" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/>
+  <!-- Mounting tabs -->
+  
+    <rect x="37.2" y="1.6" width="5.6" height="4.0" rx="1" fill="#0d1f1f" stroke="#44c0b9" stroke-width="0.8" opacity="0.85"/>
+    <rect x="37.2" y="74.4" width="5.6" height="4.0" rx="1" fill="#0d1f1f" stroke="#44c0b9" stroke-width="0.8" opacity="0.85"/>
+    <rect x="1.6" y="37.2" width="4.0" height="5.6" rx="1" fill="#0d1f1f" stroke="#44c0b9" stroke-width="0.8" opacity="0.85"/>
+    <rect x="74.4" y="37.2" width="4.0" height="5.6" rx="1" fill="#0d1f1f" stroke="#44c0b9" stroke-width="0.8" opacity="0.85"/>
+    
+  <!-- Main face — dark -->
+  <circle cx="40.0" cy="40.0" r="31.2" fill="#040c10"/>
+  <!-- Inner ring 1 -->
+  <circle cx="40.0" cy="40.0" r="31.2" fill="none" stroke="#44c0b9" stroke-width="0.6" opacity="0.35"/>
+  <!-- Inner ring 2 -->
+  <circle cx="40.0" cy="40.0" r="30.0" fill="none" stroke="#44c0b9" stroke-width="0.4" opacity="0.2"/>
+  <!-- Tick marks -->
+  <line x1="40.0" y1="8.7" x2="40.0" y2="10.8" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="43.3" y1="8.7" x2="43.1" y2="10.4" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="46.6" y1="9.2" x2="46.2" y2="10.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="49.7" y1="10.0" x2="49.2" y2="11.7" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="52.8" y1="11.2" x2="52.1" y2="12.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="55.6" y1="12.9" x2="54.6" y2="14.8" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="58.5" y1="14.5" x2="57.5" y2="15.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="61.1" y1="16.6" x2="59.9" y2="17.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="63.4" y1="18.9" x2="62.1" y2="20.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="65.5" y1="21.5" x2="64.1" y2="22.5" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="67.1" y1="24.4" x2="65.2" y2="25.4" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="68.8" y1="27.2" x2="67.2" y2="27.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="70.0" y1="30.3" x2="68.3" y2="30.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="70.8" y1="33.4" x2="69.1" y2="33.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="71.3" y1="36.7" x2="69.6" y2="36.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="71.3" y1="40.0" x2="69.2" y2="40.0" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="71.3" y1="43.3" x2="69.6" y2="43.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="70.8" y1="46.6" x2="69.1" y2="46.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="70.0" y1="49.7" x2="68.3" y2="49.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="68.8" y1="52.8" x2="67.2" y2="52.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="67.1" y1="55.6" x2="65.2" y2="54.6" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="65.5" y1="58.5" x2="64.1" y2="57.5" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="63.4" y1="61.1" x2="62.1" y2="59.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="61.1" y1="63.4" x2="59.9" y2="62.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="58.5" y1="65.5" x2="57.5" y2="64.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="55.6" y1="67.1" x2="54.6" y2="65.2" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="52.8" y1="68.8" x2="52.1" y2="67.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="49.7" y1="70.0" x2="49.2" y2="68.3" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="46.6" y1="70.8" x2="46.2" y2="69.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="43.3" y1="71.3" x2="43.1" y2="69.6" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="40.0" y1="71.3" x2="40.0" y2="69.2" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="36.7" y1="71.3" x2="36.9" y2="69.6" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="33.4" y1="70.8" x2="33.8" y2="69.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="30.3" y1="70.0" x2="30.8" y2="68.3" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="27.2" y1="68.8" x2="27.9" y2="67.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="24.4" y1="67.1" x2="25.4" y2="65.2" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="21.5" y1="65.5" x2="22.5" y2="64.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="18.9" y1="63.4" x2="20.1" y2="62.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="16.6" y1="61.1" x2="17.9" y2="59.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="14.5" y1="58.5" x2="15.9" y2="57.5" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="12.9" y1="55.6" x2="14.8" y2="54.6" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="11.2" y1="52.8" x2="12.8" y2="52.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="10.0" y1="49.7" x2="11.7" y2="49.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="9.2" y1="46.6" x2="10.9" y2="46.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="8.7" y1="43.3" x2="10.4" y2="43.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="8.7" y1="40.0" x2="10.8" y2="40.0" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="8.7" y1="36.7" x2="10.4" y2="36.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="9.2" y1="33.4" x2="10.9" y2="33.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="10.0" y1="30.3" x2="11.7" y2="30.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="11.2" y1="27.2" x2="12.8" y2="27.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="12.9" y1="24.4" x2="14.8" y2="25.4" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="14.5" y1="21.5" x2="15.9" y2="22.5" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="16.6" y1="18.9" x2="17.9" y2="20.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="18.9" y1="16.6" x2="20.1" y2="17.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="21.5" y1="14.5" x2="22.5" y2="15.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="24.4" y1="12.9" x2="25.4" y2="14.8" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="27.2" y1="11.2" x2="27.9" y2="12.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="30.3" y1="10.0" x2="30.8" y2="11.7" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="33.4" y1="9.2" x2="33.8" y2="10.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="36.7" y1="8.7" x2="36.9" y2="10.4" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/>
+  <!-- V chevron glow (soft) -->
+  <polyline 
+    points="22.4,28.8 40.0,52.8 57.6,28.8"
+    fill="none" stroke="#44c0b9" 
+    stroke-width="9.7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.18"/>
+  <!-- V chevron sharp -->
+  <polyline 
+      points="22.4,28.8 40.0,52.8 57.6,28.8"
+      fill="none" stroke="#44c0b9" 
+      stroke-width="4.4" 
+      stroke-linecap="square" 
+      stroke-linejoin="miter"/>
+  <!-- Centre dot -->
+  <circle cx="40.0" cy="40.0" r="2.0" fill="#44c0b9" opacity="0.4"/>
+</svg></div>
+      </div>
+      <!-- Wordmark -->
+      <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-.02em;color:var(--tx);margin-bottom:4px">
+        VAULT<span style="color:var(--em)">·IT</span>
+      </div>
+      <!-- Tagline -->
+      <div style="font-family:'Share Tech Mono',monospace;font-size:max(.46rem,var(--vi-fs-1));letter-spacing:.22em;text-transform:uppercase;color:rgb(var(--teal-rgb) / .45);margin-bottom:14px">TO VAULT · OWN IT · OUTRIGHT</div>
+      <!-- Pioneer badge -->
+      <div style="display:inline-flex;align-items:center;gap:7px;padding:6px 16px;background:rgb(var(--brass-rgb) / .1);border:1px solid rgb(var(--brass-rgb) / .35);clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))">
+        <span style="font-size:.85rem">◈</span>
+        <span style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-0));font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--go)">Vault-It Pioneer</span>
+      </div>
+    </div>
+    <!-- Pioneer congrats message -->
+    <div class="welcome-intro" style="text-align:center;margin-bottom:16px">
+      <div class="welcome-congrats">
+        Congrats on becoming<br>a Vault-It Pioneer.
+      </div>
+      <div class="welcome-lead">
+        You're among the first to vault, and shaping what this becomes.
+      </div>
+    </div>
+    </div>
+
+    <div id="w-step-1">
+      <!-- Onboarding friction (owner, 10 Nov 2026: "Do all but 5"): 3 screens, not 6. 1: where you are and your home goal;
+           2: your money and deposit pot, each can be added later; 3: your plan. The check-in day, Simplified or Advanced view and
+           phone take their defaults (today, Simplified, none) and live in Settings. Every answer is saved exactly as before. -->
+      <section class="wz-screen" data-s="1" id="wz-s1">
+        <h2 class="welcome-h2" tabindex="-1">Your first 30 days are free.<br>The whole app, no card.</h2>
+        <div class="welcome-sub">Two quick screens, then your plan. After 30 days, pick a plan to keep editing; your numbers stay yours either way. Beta testers get first call on the Lifetime licence places.</div>
+        <div class="wz-signed" id="wz-signed" hidden>Signed in as <b id="wz-signed-email"></b></div>
+      <div class="welcome-field">
+        <label for="w-name">First name <span class="w-opt-tag">(optional)</span></label>
+        <input type="text" class="welcome-inp" id="w-name" placeholder="Your first name" autocomplete="given-name">
+      </div>
+      <div class="welcome-field" id="w-email-field">
+        <label for="w-email">Email address</label>
+        <input type="email" class="welcome-inp" id="w-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+        <div class="w-label wz-q">Where are you right now?</div>
+        <div class="welcome-sub wz-q-sub">Pick the one closest to you. It sets where your plan starts. You can change it later.</div>
+      <div class="welcome-opts" id="w-opts">
+        <button class="welcome-opt" data-val="0" onclick="selectWelcomeOpt(this)">
+          <span class="welcome-opt-icon">💳</span>
+          <span><b>Paying off debt</b>: I owe more than I am comfortable with</span>
+        </button>
+        <button class="welcome-opt" data-val="1" onclick="selectWelcomeOpt(this)">
+          <span class="welcome-opt-icon">◈</span>
+          <span><b>Building savings</b>: debt is fine, I need a financial buffer</span>
+        </button>
+        <button class="welcome-opt" data-val="2" onclick="selectWelcomeOpt(this)">
+          <span class="welcome-opt-icon">⌂</span>
+          <span><b>Saving a deposit</b>: I want to buy my first home</span>
+        </button>
+        <button class="welcome-opt" data-val="5" onclick="selectWelcomeOpt(this)">
+          <span class="welcome-opt-icon">◉</span>
+          <span><b>Building wealth</b>: I own a home and want financial freedom</span>
+        </button>
+      </div>
+        <div class="wz-hint" id="wz-goal-hint" role="alert" hidden>Pick one of these to go on.</div>
+        <div class="g-form wz-home">
+        <div class="w-ht-pick">
+          <div class="w-ht-lbl" id="w-ht-lbl">Which home are you saving for?</div>
+          <div class="w-htypes" id="w-htypes" role="group" aria-labelledby="w-ht-lbl" aria-label="Which home are you saving for?">
+            <button type="button" class="w-ht" data-type="terraced" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Terraced</span></button>
+            <button type="button" class="w-ht" data-type="semi" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Semi-detached</span></button>
+            <button type="button" class="w-ht" data-type="detached" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Detached</span></button>
+            <button type="button" class="w-ht" data-type="mansion" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Manor house</span></button>
+            <button type="button" class="w-ht" data-type="flat" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Small flat</span></button>
+            <button type="button" class="w-ht" data-type="apartment" aria-pressed="false" onclick="wPickHouse(this)"><span class="ico" aria-hidden="true"></span><span class="nm">Apartment</span></button>
+          </div>
+          <div class="w-ht-note">Pick one to build it in the House builder. You can change it later from the house itself.</div>
+        </div>
+        <div class="welcome-field" style="margin:0">
+          <label>Dream Home Target (<span class="w-currency-label">£</span>)</label>
+          <input type="number" class="welcome-inp" id="w-house" placeholder="e.g. 200000" min="0">
+        </div>
+        </div>
+        <div class="welcome-foot"><button class="welcome-cta" onclick="wNext()">Next &rarr;</button></div>
+      </section>
+    </div>
+
+    <div id="w-step-2" style="display:none">
+      <section class="wz-screen" data-s="2" id="wz-s2" hidden>
+        <h2 class="welcome-h2" tabindex="-1">Your money each month.</h2>
+        <div class="welcome-sub">Rough numbers are enough to start. You'll fine-tune them in the Budget. Leave any of them for later.</div>
+        <div class="g-form">
+        <div class="welcome-field" style="margin:0">
+          <label>Monthly Take-Home (£)</label>
+          <input type="number" class="welcome-inp" id="w-income" placeholder="e.g. 2200" min="0">
+        </div>
+        <div class="welcome-field" style="margin:0">
+          <label>Rough Monthly Spending (£) <span style="opacity:.55;text-transform:none">· a guide, you’ll budget it line by line next</span></label>
+          <input type="number" class="welcome-inp" id="w-expenses" placeholder="e.g. 1600" min="0">
+        </div>
+        </div>
+      <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);line-height:1.55;margin-top:10px;text-align:center">Got debts? You'll add each one separately, with its type, interest rate and minimum payment, in the <b style="color:var(--em)">Debt tracker</b>, so your payoff plan is accurate.</div>
+      <!-- v0.95 (owner, 8 Nov 2026): "Ensure we ask a question onboarding if they have a lifetime isa or a savings account only for a house
+           deposit and its value and interest rate. Then populate that in the housebuiliding tab." A Yes shows the two fields; the pot lands
+           in the House Builder as a deposit in that account (wPotToHouse). -->
+        <div class="w-label wz-q">Your deposit pot</div>
+        <div class="w-label" id="w-pot-lbl">Do you have a Lifetime ISA or a savings account kept only for your house deposit?</div>
+        <div class="welcome-opts w-pot-opts" id="w-pot-opts" role="group" aria-labelledby="w-pot-lbl">
+          <button type="button" class="welcome-opt" data-pot="lisa_cash" aria-pressed="false" onclick="wPickPot(this)"><span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true"><use href="#vi-bank"/></svg></span><span><b>Yes, a Lifetime ISA</b>: the government adds 25% to what you pay in, up to £1,000 a year</span></button>
+          <button type="button" class="welcome-opt" data-pot="savings" aria-pressed="false" onclick="wPickPot(this)"><span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true"><use href="#vi-piggy"/></svg></span><span><b>Yes, a savings account</b>: kept only for the deposit</span></button>
+          <button type="button" class="welcome-opt" data-pot="none" aria-pressed="false" onclick="wPickPot(this)"><span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true"><use href="#vi-house-builder"/></svg></span><span><b>Not yet</b>: I'll start in the House builder</span></button>
+        </div>
+        <div class="wz-hint" id="w-pot-hint" role="alert" hidden>Enter how much is in it, or pick Not yet.</div>
+        <div id="w-pot-fields" hidden>
+          <div class="welcome-field"><label for="w-pot-value">How much is in it now? (£)</label><input type="number" class="welcome-inp" id="w-pot-value" placeholder="e.g. 6000" min="0" step="1" inputmode="decimal" oninput="this.style.borderColor=''"></div>
+          <div class="welcome-field"><label for="w-pot-rate">Interest rate (% AER), if you know it</label><input type="number" class="welcome-inp" id="w-pot-rate" placeholder="e.g. 4.5, as your provider quotes" min="0" max="100" step="0.01" inputmode="decimal"></div>
+          <div class="wz-note" id="w-pot-note">It shows in the House builder as your deposit so far, in that account. You can change it there any time.</div>
+        </div>
+        <div class="welcome-foot"><button class="welcome-cta" onclick="wNext()">Next &rarr;</button>
+        <button type="button" class="wz-skip" onclick="wPotSkip()">Skip, I'll add these later</button></div>
+      </section>
+      <section class="wz-screen" data-s="3" id="wz-s3" hidden>
+        <h2 class="welcome-h2" tabindex="-1">Your plan.</h2>
+        <div class="welcome-sub">Built from your answers. One step at a time.</div>
+        <div id="wz-plan"></div>
+        <div class="wz-note">Your weekly check-in day: <b id="wz-day-name"></b>. On that day Vault-It shows you your next step. You can change the day, the view and your phone number in Settings.</div>
+        <div class="welcome-foot"><button class="welcome-cta" id="w-finish" onclick="wStep2Submit()">Start this week's step &rarr;</button></div>
+      </section>
+    </div>
+
+    <!-- STEP 3: First milestone -->
+    <div id="w-step-3" style="display:none">
+      <div class="welcome-h2" style="margin-bottom:4px">Your first milestone.</div>
+      <div class="welcome-sub">Pick the one thing you most want to achieve in the next 12 months.</div>
+      <div class="welcome-opts" id="w-ms-opts" style="margin-top:14px">
+        <button class="welcome-opt" data-ms="debt" onclick="selectMsOpt(this)">
+          <span class="welcome-opt-icon">✂️</span>
+          <span><b>Eliminate a debt</b>: clear the highest-interest cage first</span>
+        </button>
+        <button class="welcome-opt" data-ms="ef" onclick="selectMsOpt(this)">
+          <span class="welcome-opt-icon">🛡</span>
+          <span><b>Build emergency fund</b>: 3 months of expenses as a safety net</span>
+        </button>
+        <button class="welcome-opt" data-ms="deposit" onclick="selectMsOpt(this)">
+          <span class="welcome-opt-icon">🏠</span>
+          <span><b>Save for a deposit</b>: first step to owning outright</span>
+        </button>
+        <button class="welcome-opt" data-ms="income" onclick="selectMsOpt(this)">
+          <span class="welcome-opt-icon">🚀</span>
+          <span><b>Create a second income</b>: one stream changes everything</span>
+        </button>
+      </div>
+      <div class="welcome-foot"><button class="welcome-cta" onclick="wStep3Submit()">Start Vaulting →</button></div>
+      <div style="text-align:center;margin-top:8px">
+        <button class="welcome-skip-link" onclick="wStep3Skip()">Skip for now. I'll decide later</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+

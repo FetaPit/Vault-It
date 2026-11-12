@@ -24,8 +24,9 @@ Put these in the repo under `brand/` (create it). The brand book is the visual r
 | `vault-it-3d-engine.js` | The dependency free 3D engine: to-scale house (WebGL), net worth scene with £1,000 blocks and £100 cubes, and the net worth tracker (graph or 3D blocks). Exposes `window.ViEngine`. Use as is. |
 | `vault-it-tokens.css` | Design tokens for Night (default) and Daylight (light mode). |
 | `vault-it-components.css` | Component rules: menu bar, 3D stage, control rail, status line, pills, stat tiles, icon tiles, built glow. |
-| `vault-it-icons.svg` | SVG sprite of all 112 icons (`#vi-<id>`). |
-| `vault-it-icons.json` | Manifest: id, name, group, colour token, usage notes. |
+| `vault-it-icons.svg` | SVG sprite of all 112 icons, pack v2 (`#vi-<id>`). Built from `icons/icons-v2.src.js` by `node tools/build_icons_v2.js`; do not hand-edit. |
+| `vault-it-icons.json` | Manifest: id, name, group, colour token, Night and Daylight hex, usage notes. |
+| `icons/` | Icon source, `preview-v2.html`, single SVGs per icon (`svg/night`, `svg/daylight`) and the v1 pack in `v1/`. |
 | `vault-it-logo-mark-{full,mid,micro}.svg` | The brand mark in Night. |
 | `vault-it-logo-mark-{full,mid}-daylight.svg` | The brand mark for Daylight. |
 | `vault-it-tokens.json`, `tailwind.vault-it.js` | Same tokens for other toolchains. Only use if the repo needs them. |
@@ -34,11 +35,11 @@ Put these in the repo under `brand/` (create it). The brand book is the visual r
 
 These were read from the live repo, so use them instead of guessing.
 
-- **Repo:** `FetaPit/Vault-It` on GitHub (public). Its default branch `main` is an old v0.3 alpha and is **not** production.
+- **Repo:** `FetaPit/Vault-It` on GitHub (going private). Its default branch `main` is an old v0.3 alpha and is **not** production.
 - **Production branch:** `release/pioneer-v2`. **A push to it goes live.** Cloudflare Workers Builds deploys it (build `npm run build:site`, deploy `npx wrangler deploy`) to `app.vault-it.co`, `vault-it.co` and `www.vault-it.co`, and GitHub Pages still publishes it at the older `fetapit.github.io/Vault-It/` address. The Cloudflare Worker is named `vault-it` (`wrangler.jsonc`, `worker/index.mjs`). The domain stays registered at Wix, with its nameservers on Cloudflare (`docs/CUTOVER.md`).
 - **Develop on `Pioneer_v3`** (or the branch the session names). **Cloudflare's build trigger lists only `release/pioneer-v2`** (checked through the Cloudflare API: repo connection `FetaPit/Vault-It`, branch include `release/pioneer-v2`, and the latest builds were started manually). So do not assume other branches get a preview build. Check before relying on one, and never add a working branch to that trigger: `npx wrangler deploy` from it would go live.
 - **Release process (owner only, when asked):** run the tests, create `backup/release-pioneer-v2-YYYYMMDD-HHMM`, then fast-forward `release/pioneer-v2` to the tested commit.
-- **App:** `index.html` is the whole app (CSS, JS, markup), about 1.7 MB. Marketing is `landing.html` (vault-it.co). Also `recover.html`.
+- **App:** `index.html` is the whole app (CSS, JS, markup) but it is **built** from about 120 parts in `src/app/` by `node tools/build_app.js`: edit the parts, never `index.html` (`docs/APP_SOURCE.md`). Marketing is `landing.html` (vault-it.co). Also `recover.html`.
 - **House builder:** the current 3D House Builder lives in `src/hb3d/` (`kit.js`, `viewer.js`, `models/`) and is embedded into `index.html` by `node tools/build_hb3d.js`. Never hand edit the embedded block. Edit `src/hb3d` and re-run the build.
 - **Backend:** Supabase project `legpubblzgknxdtvsant` (edge functions in `supabase/functions`). A GitHub Action deploys `send-auth-email` when `supabase/functions/**` changes on `release/pioneer-v2`. The brand work must not touch Supabase, secrets or migrations.
 - **Tests:** `bash scripts/run-tests.sh [all|server|browser|<name>]`. Relevant ones: `test_hb3d_app`, the 3D kit scale test, and `tests/test_beta_client.js`, which fails if the app talks to an outside host the privacy notice does not name. Update any scale based expectations on purpose, do not delete tests.
@@ -81,7 +82,7 @@ Tasks:
 
 | Old | New |
 | --- | --- |
-| `--bg` | `--bg` (#080808, Daylight #F3F7F6) |
+| `--bg` | `--bg` (#080808, Daylight #D3CCB4) |
 | `--c1`, `--c2` | `--panel`, `--surf2` |
 | `--c3`, `--c4` | `--slate` and `--line2` |
 | `--em`, `--em2`, `--em3` | `--teal` (use `--faint` for the dim teal) |
@@ -111,6 +112,8 @@ Accepted when: the app renders correctly in both themes, no hard coded dark valu
 
 ### Phase 2: Fonts and clean-up
 
+**Status: done.** Kept here as a record. The only open item is the build string in the footer.
+
 - Remove `Playfair Display` (loaded, never used).
 - Move the three `DM Mono` rules to `Share Tech Mono`, then remove the DM Mono load.
 - Replace text glyph icons with sprite icons: `✎` to `edit`, `✕` to `close`, `＋` to `plus`, `◈` to `network`, `✓` to `check`, `↩` to `undo`, `‹ ›` to `chevron` rotated.
@@ -119,8 +122,8 @@ Accepted when: the app renders correctly in both themes, no hard coded dark valu
 ### Phase 3: Iconography
 
 - Inline `vault-it-icons.svg` once at the top of `<body>` (hidden). Use `<svg class="vi-ic" style="color:var(--teal)"><use href="#vi-house-builder"/></svg>`.
-- **Weight:** 1.1 hairline at 24px and above, 1.5 below 24px. The sprite reads `--vi-sw`. Add `.vi-ic.sm{--vi-sw:1.5}` for 16 and 20px (rules are in `vault-it-components.css`).
-- **Fill:** 16% of the same colour under the stroke. **Detail:** optional 0.7 hairlines at 60% opacity, already inside each symbol. Drop detail below 24px by using the `micro` weight rule or by hiding detail groups with CSS.
+- **Weight:** 1.1 hairline at 24px and above, 1.5 below 24px. The sprite reads `--vi-sw` and `--vi-d`. Add `.vi-ic.sm{--vi-sw:1.5;--vi-d:0}` for 16 and 20px (rules are in `vault-it-components.css`).
+- **Layers (pack v2):** 14% body fill, a 42% lit core on the part that names the icon, the hairline, 0.6 detail lines at 55% (ticks, seams, rivets, HUD brackets) and solid signal nodes. Rectangles are chamfered. All five layers are inside each symbol and use `currentColor`. Detail drops out below 24px through `--vi-d:0`; the lit core and nodes stay. In the spending buckets a lit, shut lock means committed and an open, unlit lock means variable.
 - One colour per icon, always from the colour code in Phase 5. Same glyph may take different colours in different buckets (Home is coral for rent, teal for rental income).
 - Replace the app's current icons using the manifest (`vault-it-icons.json`, `uses` field shows where each icon is used). The 33 budget category icons are the app's own drawings, thinned, so they should map one to one.
 - Swap **Stocks and funds** from the trend arrow to `candles` (the trend arrow clashed with Net worth).
@@ -131,18 +134,18 @@ Accepted when: no inline hand-drawn icon remains where a pack icon exists, every
 
 This is the main navigation. The dot before each icon is removed: the icon now carries the tab colour.
 
-Anatomy of a tab: icon (18px) + label (Syne 600, 12px, +0.14em tracking, uppercase) + optional badge. Underline 2px in the tab colour. Active tab: label becomes `--text`, underline and soft shadow in the tab colour, icon breathes on the 2.8 second beat (`tabglow` keyframes). In Daylight the icon glow animation is off, underline stays.
+Anatomy of a tab: icon (18px) + label (Syne 600, 12px, +0.14em tracking, uppercase) + optional badge. Selected tab only: a 1px inset outline in the tab colour with a soft glow in Night, and a crisp outline in Daylight. Active tab: label becomes `--text`, icon breathes on the 2.8 second beat (`vi-tabglow` keyframes). In Daylight the icon glow animation is off, the outline stays.
 
 | Tab | Icon id | Colour token | Dark | Daylight |
 | --- | --- | --- | --- | --- |
-| Overview | `overview` | `--teal` | #44C0B9 | #297B76 |
-| Budget | `budget` | `--blue` | #64B5F6 | #0B72C4 |
-| House builder (USP badge) | `house-builder` | `--gold` | #E8C56A | #8B6A15 |
-| Assets and liabilities | `assets` | `--green` | #3ECF8E | #207F54 |
-| Debt tracker | `debt-tracker` | `--red` | #E05C5C | #D62929 |
-| Entrepreneur (PRO badge) | `entrepreneur` | `--orange` | #E0894A | #CF6C24 |
-| Achievements | `trophy` | `--brass` | #C9A84C | #A18331 |
-| Connections | `connections` | `--purple` | #9B7EC8 | #815DBA |
+| Overview | `overview` | `--teal` | #44C0B9 | #185550 |
+| Budget | `budget` | `--blue` | #64B5F6 | #054E88 |
+| House builder (USP badge) | `house-builder` | `--gold` | #E8C56A | #60480B |
+| Assets and liabilities | `assets` | `--green` | #3ECF8E | #135738 |
+| Debt tracker | `debt-tracker` | `--red` | #E05C5C | #951919 |
+| Entrepreneur (PRO badge) | `entrepreneur` | `--orange` | #E0894A | #773C11 |
+| Achievements | `trophy` | `--brass` | #C9A84C | #5B4A19 |
+| Connections | `connections` | `--purple` | #9B7EC8 | #583F81 |
 
 Sub-tabs (Assets and liabilities), shown as bordered 12px radius buttons with a 18px icon:
 
@@ -180,21 +183,23 @@ See section 6. This is the heart of the work.
 
 Daylight is a designed mode, not an inversion. It exists for people who struggle with dark screens.
 
-- Ground is Paper `#F3F7F6` (never pure white). Text is Ink `#0B1F22`. Panels are white with a hairline border and small corner brackets (`[data-theme="light"] .card::before` in the brand book).
+- Ground is Paper `#D3CCB4` (never pure white). Text is Ink `#0B1F22`. Panels are Paper-tone (`#DAD8D0`) with a hairline border and the same clipped corner as Night.
 - No bloom. Glow tokens become soft shadows: `--glow`, `--tglow`, `--dglow`, `--popglow` are already set for this.
 - Scanlines are replaced by a faint blueprint grid (`--paper-img`, `--scan`).
 - Colours keep their hue and get darker values so text reaches 4.5:1 and icons 3:1.
 - Gold buttons keep the bright fill `--goldf` (#E8C56A) with dark text. Gold text uses the darker ink.
-- 3D scenes switch to the Daylight palette automatically (the engine reads `data-theme` every frame). See 6.8.
+- 3D scenes stay Night in Daylight (owner, 30 Oct 2026): `tokens.css` keeps the Night values on `.scene`, `.inv-stage`, `.nw3d-stage` and the 3D badges. The page around them is Daylight. See 6.9.
 - Primary buttons use `--btn1` and `--btn2` with white text.
 
-Accepted when: every screen is usable in Daylight with no invisible text, no neon on paper, and the 3D house reads as a blueprint (deep teal brick, white mortar, amber slice).
+Accepted when: every screen is usable in Daylight with no invisible text, no neon on paper, and the 3D stage stays on its Night look.
 
 ### Phase 8: Logo and wordmark
 
-- Wordmark: Syne 800. "Vault" in `--text`, then a small brick, then "It" in `--teal`. The brick sits on the baseline (`translateY(-.06em)`), `.3em` wide, `.17em` tall, radius 2px. In text the name is written Vault-It with a hyphen (owner, 30 Oct 2026); in the logo that hyphen is drawn as the brick. Standardise the logo on the brick.
+- Wordmark: Syne 800. "Vault" in `--text`, then a small brick, then "It" in `--teal`. The brick sits on the baseline (`translateY(-.06em)`), `.3em` wide, `.17em` tall, radius 2px. In text the name is written Vault-It with a hyphen (owner, 30 Oct 2026); in the logo that hyphen is drawn as the brick. Standardise the logo on the brick. Owner, 7 Nov 2026: wherever the name is drawn as a title or lockup, with the brick or with a plain hyphen, "Vault" takes the text colour and "-It" is teal.
 - Mark: use the SVG files. Full (96px and up), Mid (40 to 96px), Micro (under 40px, also the favicon and PWA icon). Clear space is a quarter of the icon height. Use the Daylight variants on light surfaces for the header only; elsewhere the built in dark disc works on any background.
 - Update `<title>`, `og:title`, and the hero H1 to the new tagline: **Get out of the red and into your home.** The current site hero still says "From debt to owning your home outright".
+
+**Tagline treatments (owner, 4 and 7 Nov 2026).** The tagline is "Get out of the red and into your home." Comms use the neon: a thin neon red stroke on **red** and a thin gold gradient neon stroke on **home** (`brand/vault-it-tagline-neon.css`, copy it, do not retype it). The pitch deck uses fills instead of the stroke: **red** dark red `#C8202A`, **your** teal `#44C0B9`, **home** gold `#E8C56A`. Where a stroke cannot be drawn (Slides format, email clients that drop CSS), colour the words: red `#FF4D63`, home `#F5DC4A`. In SMS and plain-text email, type the line with no colour. The brand book shows all three under Brand story and voice.
 
 ### Phase 9: Social and OG images (optional, after the rest)
 
@@ -347,7 +352,7 @@ These sell the "hologram in a room" feel. Keep all of them. All distances are in
 4. **Ring ping.** See 6.5. The main moving grid element.
 5. **Sweep band.** A bright horizontal band rises through the house at **20 world units per second**, repeating every 194 units (about 9.7 s). Bricks within 6 units of the band blend toward a sheen colour by `(1 - distance / 6) * 0.5`. It reads as a scan line passing through the model. Off for reduced motion and for static exports.
 6. **Scanlines (Night).** `.stage3d::after` draws 1px teal lines every 4px at 5% over the stage. The page body has the same at 2.5%.
-7. **Blueprint grid (Daylight).** The same layer becomes a 26px square grid at 7% (page body: 32px at 5%).
+7. **Blueprint grid (Daylight, page only).** On the page body the paper carries a 32px square grid at 5%. The 3D stage keeps scanlines in both modes, because 3D stays Night (owner, 30 Oct).
 8. **Auto orbit.** The model drifts around slowly (`yaw += dt * 0.12` radians per second) and stops the moment someone touches it, resuming after 2.5 s idle. The net worth scene sways instead of spinning: `yaw = -0.55 + sin(t / 4200) * 0.35`. The tracker sways `-0.3 + sin(t / 4600) * 0.18` in 3D view.
 
 ### 6.7 Camera and interaction
@@ -374,9 +379,11 @@ Every action answers three ways at once, within about 250 ms: something moves, a
 
 Milestone thresholds: 1, 5, 10, 25, 50, 75, 100 (percent). Toasts only fire after the person has interacted, never during the opening build. XP: 5 base plus 50 per milestone reached plus 25 per deposit action.
 
-### 6.9 Daylight rendering of the 3D scenes
+### 6.9 Daylight and the 3D scenes
 
-The engine has two palettes (`THG.dark`, `THG.light`; `nwPal`). In Daylight:
+**Current rule (owner, 30 Oct 2026): 3D stays Night in Daylight.** The Daylight palette below is kept as a record of the earlier blueprint design and is not used by the app (`src/hb3d/brand.js`). Only restore it if the owner says so.
+
+The engine has two palettes (`THG.dark`, `THG.light`; `nwPal`). The retired Daylight look:
 
 - Bricks are deep teal with **white mortar** and 97% opacity. Tiles are a darker blue. Sills and lintels are pale stone. Glass is pale blue and warms to amber when lit.
 - Slice is amber with a darker amber outline and no blur. The tag has a soft drop shadow instead of a glow.
@@ -468,7 +475,7 @@ Run every item in both themes, at 390px and 1100px wide.
 - [ ] Every icon comes from the sprite, uses a token colour and looks right at 16, 24 and 48px.
 - [ ] House builder: opening build animates from 0 to the saved percentage. Adding £500 flashes new bricks gold and they settle. Scrubbing backwards un-lays bricks.
 - [ ] Pulse: complete a build (set `p` to 1). Windows breathe, a ring leaves the base every 2.8 s, bricks brighten and dim by only a few percent.
-- [ ] Grid: the ground grid fades toward the edges, the sweep band rises through the model, scanlines (Night) or blueprint grid (Daylight) sit over the stage.
+- [ ] Grid: the ground grid fades toward the edges, the sweep band rises through the model, scanlines sit over the stage in both modes.
 - [ ] Orbit works by mouse, touch and keyboard. Vertical page scroll still works on touch. The rail does not cover the model on a phone.
 - [ ] Scrolling: at 320, 360, 390 and 412px wide the page never scrolls sideways (`document.documentElement.scrollWidth` equals the viewport width), and a steady swipe moves the page smoothly with no jumps while canvases are on screen.
 - [ ] Reduced motion: no orbit, no sweep, no ring, builds are instant, tab glow is off.
@@ -493,8 +500,8 @@ Do not swap everything in one release. Order the work so the app is always shipp
 
 1. **Branching.** Work on `Pioneer_v3` or a branch off it (for example `brand-rollout`), as the repo's `CLAUDE.md` says. Do not push to `release/pioneer-v2`: that branch is production. **Staging:** build locally (`npm run build:site`) and serve it with `npx wrangler dev` on your network so you can open it on a phone. If the owner turns on non-production builds in Cloudflare (Settings, Builds, branch control, with the command `npx wrangler versions upload`), preview URLs can be used instead. Confirm which one is available before the first phase.
 2. **One phase, one commit, one staging check.** Phases 1 to 5 and 7 to 8 (tokens and theme, fonts, icons, menu bar, colour code, Daylight, logo) go first and in order. Post screenshots of each staging check.
-3. **The house builder goes behind a switch.** Read the flag from `?house=new` and from `localStorage["vi-flag-house"]`. Default stays the current `src/hb3d` builder. Keep price, deposit, house type and level logic exactly as it is: only the drawing and the brick value maths change. Add the new engine through the same build pipeline (`tools/build_hb3d.js`) so tests keep working, and update the kit scale test deliberately because the brick scale changes.
-4. **Net worth scene and tracker toggle** come after, behind `vi-flag-nw`. The Graph view stays the default of the tracker. Feed it the app's own series with `setData`.
+3. **The house builder (done, owner 1 Nov 2026).** The brand build is the only one: the classic viewer, its Settings switch and the house flag are deleted. Levels 1 and 2 are drawn in the brand look. Level 3 and "Your own design" are locked under Pro. Without 3D a still picture of the house shows. Originally this was behind a switch: `?house=new` and `localStorage["vi-flag-house"]`. Keep price, deposit, house type and level logic exactly as it is: only the drawing and the brick value maths change. Add the new engine through the same build pipeline (`tools/build_hb3d.js`) so tests keep working, and update the kit scale test deliberately because the brick scale changes.
+4. **Net worth scene and tracker toggle (done).** `vi-flag-nw` is on by default and the first view is the 3D blocks; `?nw=old` or `localStorage` `vi-flag-nw` overrides per device and Settings has the switch. Do not change the default without the owner. Originally the Graph view was the default. Feed it the app's own series with `setData`.
 5. **Landing page.** `landing.html` (vault-it.co) gets the same tokens, icons, wordmark and tagline in its own phase after the app.
 6. **Offline and caching.** Bump the cache or version string the PWA uses with every release so installed copies update, and include the new `brand/` assets in whatever precache list the app has.
 7. **Tests every phase:** `bash scripts/run-tests.sh all`. Also confirm `tests/test_beta_client.js` still passes: the brand work must add no new outside hosts (the fonts stay Syne, DM Sans, Share Tech Mono, and Playfair and DM Mono are removed).

@@ -1,6 +1,7 @@
 // Assets sub-tab order (owner, 30 Oct): Cash and savings, Stocks and shares, Precious metals, Wealth inventory, Crypto,
 // Liabilities; Cash opens first. Physical cash has its own log (put in / take out, where it is kept) and counts in cash
 // and net worth. Run: node tests/test_assets_order.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
@@ -9,7 +10,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     const p = await (await b.newContext({ viewport: { width: w, height: 900 } })).newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(() => { if (localStorage.getItem('pos_al1')) return; localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' }));
       localStorage.setItem('pos_al1', JSON.stringify({ cashAccounts: [{ id: 5, name: 'Savings', type: 'Savings', balance: 1000 }] })); });
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await p.evaluate(() => showTab('assets')); await p.waitForTimeout(600);
     const o = await p.evaluate(() => ({ order: [...document.querySelectorAll('#assets-page .subtab-btn')].map(b => b.dataset.sub), active: document.querySelector('#assets-page .subtab-btn.active').dataset.sub, panel: document.querySelector('#assets-page .subtab-panel.active').id, card: !!document.getElementById('pc-card').offsetParent }));

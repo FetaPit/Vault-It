@@ -42,7 +42,7 @@ Every change keeps its tests (new behaviour gets a test that fails on the old co
 
 ## 6. Bigger options (need the owner's yes)
 
-- **Split `index.html` into source parts** (`src/app/*.css`, `*.js`, `*.html`) that `tools/build_site.js` stitches back into the same single file. Reads, greps and diffs get much smaller and parallel sessions conflict less. It is a large refactor: do it between rounds, with the full suite and a visual pass before and after, and keep the shipped file byte-for-byte equivalent at first.
+- **Split `index.html` into source parts**: done 10 Nov 2026 (owner reordered it first). About 120 parts in `src/app/` built by `tools/build_app.js`; see `docs/APP_SOURCE.md`.
 - ~~A `ship-item` project skill~~: built 31 Oct (`.claude/skills/ship-item/`, `.claude/agents/rollout-qc.md`, `.claude/hooks/qc-gate.sh`, `tools/shot.js`).
 
 ## Quick reference
@@ -50,7 +50,7 @@ Every change keeps its tests (new behaviour gets a test that fails on the old co
 | Want | Type |
 | --- | --- |
 | Find something | `use scout to find where the deposit target is set` |
-| A simple, exact edit | `use grunt to rename depositTarget to depositGoal in index.html` |
+| A simple, exact edit | `use grunt to rename depositTarget to depositGoal in src/app, then node tools/build_app.js` |
 | Understand a part before changing it | `use architect to explain how cloud sync works` |
 | Plan a feature (CLI) | Shift+Tab twice, then describe it |
 | Quick questions | `/caveman`, then short prompts. `/caveman off` to stop |

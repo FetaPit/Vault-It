@@ -1,0 +1,20 @@
+<!-- ═══════════════════════════ ASSETS & LIABILITIES ═══════════════════════════ -->
+<div id="tab-assets" class="tab-panel" style="display:none">
+  <div id="assets-page" style="max-width:1100px;margin:0 auto;padding:24px 20px 60px">
+    <div class="subtab-nav" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <button class="subtab-btn active" data-sub="cash" aria-label="Cash and savings" title="Cash and savings" onclick="showSubtab('assets','cash',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cash"/></svg><span>Cash and savings</span>
+      </button>
+      <button class="subtab-btn" data-sub="stocks" aria-label="Stocks and shares" title="Stocks and shares" onclick="showSubtab('assets','stocks',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-candles"/></svg><span>Stocks and shares</span>
+      </button>
+      <button class="subtab-btn" data-sub="metals" aria-label="Precious metals" title="Precious metals" onclick="showSubtab('assets','metals',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-metals"/></svg><span>Precious metals</span>
+      </button>
+      <button class="subtab-btn" data-sub="other" aria-label="Wealth inventory" title="Wealth inventory" onclick="showSubtab('assets','other',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-cube"/></svg><span>Wealth inventory</span>
+      </button>
+      <button class="subtab-btn" data-sub="crypto" aria-label="Crypto" title="Crypto" onclick="showSubtab('assets','crypto',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-crypto"/></svg><span>Crypto</span>
+      </button>
+      <button class="subtab-btn" data-sub="liabilities" aria-label="Liabilities" title="Liabilities" onclick="showSubtab('assets','liabilities',this)"><svg class="vi-ic sti" aria-hidden="true"><use href="#vi-liabilities"/></svg><span>Liabilities</span>
+      </button>
+      <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));color:var(--em);white-space:nowrap">
+        Total: <span id="tab-total-assets" style="font-weight:700">£0</span>
+      </div>
+    </div>

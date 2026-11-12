@@ -3,8 +3,8 @@
  * Names, groups, colours and uses come from the frozen v1 pack (brand/icons/icons-v1.json), so ids stay the same (vi-<id>).
  * Writes:
  *   brand/vault-it-brand-book.html     its ICONS data becomes v2 (plus ICONS_V1 for the Weight comparison)
- *   brand/vault-it-icons-v2.svg        sprite, currentColor, paste once per page
- *   brand/vault-it-icons-v2.json       manifest (id, name, group, colour token, Night and Daylight hex, uses)
+ *   brand/vault-it-icons.svg           sprite, currentColor, paste once per page (v1 is kept in brand/icons/v1/)
+ *   brand/vault-it-icons.json          manifest (id, name, group, colour token, Night and Daylight hex, uses)
  *   brand/icons/svg/night/vi-*.svg     one file per icon in its Night colour (for decks, Canva, print)
  *   brand/icons/svg/daylight/vi-*.svg  the same in its Daylight colour
  *   brand/icons/preview-v2.html        v1 and v2 side by side, Night and Daylight, small sizes
@@ -67,10 +67,10 @@ const save = (rel, s) => { write(path.join(ROOT, rel), s); out.push(rel); };
 // Sprite
 let sprite = '<svg xmlns="http://www.w3.org/2000/svg" style="display:none">\n<!-- Vault-It icon pack v2. Use: <svg class="vi" viewBox="0 0 24 24"><use href="#vi-home"/></svg>, colour with CSS color. -->\n';
 list.forEach((ic) => (sprite += `<symbol id="vi-${ic.id}" viewBox="0 0 24 24">${inner(ic.v2)}</symbol>\n`));
-save('brand/vault-it-icons-v2.svg', sprite + '</svg>\n');
+save('brand/vault-it-icons.svg', sprite + '</svg>\n');
 
 // Manifest
-save('brand/vault-it-icons-v2.json', JSON.stringify(list.map((ic) => ({ id: 'vi-' + ic.id, name: ic.n, group: ic.g, colour: ic.tok, night: TOK[ic.tok].hex, daylight: TOK[ic.tok].lt, uses: ic.u })), null, 2) + '\n');
+save('brand/vault-it-icons.json', JSON.stringify(list.map((ic) => ({ id: 'vi-' + ic.id, name: ic.n, group: ic.g, colour: ic.tok, night: TOK[ic.tok].hex, daylight: TOK[ic.tok].lt, uses: ic.u })), null, 2) + '\n');
 
 // Single files, coloured, for tools that do not take currentColor
 for (const [theme, key] of [['night', 'hex'], ['daylight', 'lt']]) {
@@ -212,8 +212,8 @@ if (oi > 0 && process.argv[oi + 1]) {
     if (st.isDirectory()) fs.readdirSync(src).forEach((f) => cp(path.join(src, f), path.join(rel, f)));
     else write(path.join(dst, rel), fs.readFileSync(src));
   };
-  cp(path.join(ROOT, 'brand/vault-it-icons-v2.svg'), 'vault-it-icons-v2.svg');
-  cp(path.join(ROOT, 'brand/vault-it-icons-v2.json'), 'vault-it-icons-v2.json');
+  cp(path.join(ROOT, 'brand/vault-it-icons.svg'), 'vault-it-icons.svg');
+  cp(path.join(ROOT, 'brand/vault-it-icons.json'), 'vault-it-icons.json');
   cp(path.join(ROOT, 'brand/icons/preview-v2.html'), 'preview-v2.html');
   cp(path.join(ROOT, 'brand/icons/svg'), 'svg');
   out.push('copied to ' + dst);

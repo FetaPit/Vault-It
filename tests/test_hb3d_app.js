@@ -1,5 +1,6 @@
 // The 3D house builder in the app: the brand build is the only one (owner, 1 Nov 2026); its finer checks are in tests/test_hb_brand.js.
 // Without three.js (CDN blocked or offline) the House tab shows a still picture with the same HUD figures.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree=require('./three_route');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
@@ -8,7 +9,7 @@ const seed=(o)=>`(function(){if(localStorage.getItem('ht3'))return;localStorage.
   const b=await chromium.launch(); const errs=[];
   const open=async(o,w,h,route=true,qs='')=>{const ctx=await b.newContext({viewport:{width:w||1280,height:h||900},reducedMotion:'reduce'}); if(route)await routeThree(ctx); else await ctx.route(/cdn\.jsdelivr\.net/,r=>r.abort()); const p=await ctx.newPage();
     p.on('pageerror',e=>errs.push(e.message)); p.on('console',m=>{if(m.type()==='error'&&!/Failed to load|net::/.test(m.text()))errs.push('console: '+m.text());});
-    await p.addInitScript(seed(o)); await p.goto('file:///home/user/Vault-It/index.html'+qs); await p.waitForTimeout(1500);
+    await p.addInitScript(seed(o)); await p.goto(require('./lib/vi').FILE_URL+qs); await p.waitForTimeout(1500);
     await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'}); await p.evaluate(()=>showTab('house')); await p.waitForTimeout(800); if(route)await p.waitForFunction(()=>window.HB3D&&HB3D.viewer&&HB3D.viewer.brandInfo&&HB3D.viewer.brandInfo()&&HB3D.viewer.settled(),null,{timeout:60000}).catch(()=>{}); else await p.waitForFunction(()=>document.getElementById('house-scene').getAttribute('data-engine')==='still',null,{timeout:20000}).catch(()=>{}); return p;};
   // Level 1 build
   let p=await open({saved:20000,target:250000,houseType:'terraced',deposits:[{amount:20000,date:'01/10/2026'}],prices:{terraced:250000}});

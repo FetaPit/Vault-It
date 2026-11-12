@@ -1,0 +1,1311 @@
+[
+  {
+    "id": "vi-coins",
+    "name": "Coins",
+    "group": "income",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      [
+        "Universal Credit",
+        "teal"
+      ],
+      [
+        "Interest & dividends",
+        "teal"
+      ]
+    ]
+  },
+  {
+    "id": "vi-dots",
+    "name": "More",
+    "group": "income",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      [
+        "LCWRA",
+        "teal"
+      ],
+      [
+        "Other",
+        "teal"
+      ],
+      [
+        "Other",
+        "salmon"
+      ]
+    ]
+  },
+  {
+    "id": "vi-heart",
+    "name": "Health and care",
+    "group": "ve",
+    "colour": "--salmon",
+    "hex": "#EE7D7D",
+    "uses": [
+      [
+        "PIP (Care/Mobility)",
+        "teal"
+      ],
+      [
+        "Haircut",
+        "yellow"
+      ],
+      [
+        "Dental",
+        "yellow"
+      ],
+      [
+        "Opticians",
+        "yellow"
+      ],
+      [
+        "Health",
+        "salmon"
+      ]
+    ]
+  },
+  {
+    "id": "vi-home",
+    "name": "Home",
+    "group": "ce",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": [
+      [
+        "UC Housing Element",
+        "teal"
+      ],
+      [
+        "Rental income",
+        "teal"
+      ],
+      [
+        "Rent",
+        "coral"
+      ],
+      [
+        "Rent / Mortgage",
+        "coral"
+      ]
+    ]
+  },
+  {
+    "id": "vi-briefcase",
+    "name": "Salary",
+    "group": "income",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      [
+        "Salary",
+        "teal"
+      ]
+    ]
+  },
+  {
+    "id": "vi-rocket",
+    "name": "Side hustle",
+    "group": "income",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      [
+        "Side hustle / business",
+        "teal"
+      ]
+    ]
+  },
+  {
+    "id": "vi-bank",
+    "name": "Bank and public",
+    "group": "income",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      [
+        "Benefits & pensions",
+        "teal"
+      ],
+      [
+        "Council tax",
+        "coral"
+      ]
+    ]
+  },
+  {
+    "id": "vi-gift",
+    "name": "Gift",
+    "group": "income",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      [
+        "Gifts & other",
+        "teal"
+      ],
+      [
+        "Gifts & giving",
+        "yellow"
+      ]
+    ]
+  },
+  {
+    "id": "vi-bolt",
+    "name": "Electricity",
+    "group": "ce",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": [
+      [
+        "Electricity",
+        "coral"
+      ],
+      [
+        "Water",
+        "coral"
+      ],
+      [
+        "Utilities & bills",
+        "salmon"
+      ]
+    ]
+  },
+  {
+    "id": "vi-flame",
+    "name": "Gas",
+    "group": "ce",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": [
+      [
+        "Gas",
+        "coral"
+      ]
+    ]
+  },
+  {
+    "id": "vi-wifi",
+    "name": "Phone and internet",
+    "group": "ce",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": [
+      [
+        "Phone & internet",
+        "coral"
+      ]
+    ]
+  },
+  {
+    "id": "vi-card",
+    "name": "Card and debt payments",
+    "group": "ce",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": [
+      [
+        "Debt Repayments",
+        "salmon"
+      ],
+      [
+        "Debt payments",
+        "coral"
+      ]
+    ]
+  },
+  {
+    "id": "vi-basket",
+    "name": "Groceries",
+    "group": "ve",
+    "colour": "--salmon",
+    "hex": "#EE7D7D",
+    "uses": [
+      [
+        "Monthly Groceries",
+        "salmon"
+      ],
+      [
+        "Groceries top-up",
+        "salmon"
+      ],
+      [
+        "Groceries",
+        "salmon"
+      ]
+    ]
+  },
+  {
+    "id": "vi-dumbbell",
+    "name": "Gym",
+    "group": "cn",
+    "colour": "--amber",
+    "hex": "#F59E0B",
+    "uses": [
+      [
+        "Gym / sports / club",
+        "amber"
+      ],
+      [
+        "Gym & fitness",
+        "amber"
+      ]
+    ]
+  },
+  {
+    "id": "vi-car",
+    "name": "Car and transport",
+    "group": "ve",
+    "colour": "--salmon",
+    "hex": "#EE7D7D",
+    "uses": [
+      [
+        "Car tax",
+        "amber"
+      ],
+      [
+        "Petrol",
+        "yellow"
+      ],
+      [
+        "Car repairs",
+        "yellow"
+      ],
+      [
+        "Transport & fuel",
+        "salmon"
+      ]
+    ]
+  },
+  {
+    "id": "vi-shield",
+    "name": "Insurance",
+    "group": "ce",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": [
+      [
+        "Car insurance",
+        "amber"
+      ],
+      [
+        "Monzo Max",
+        "amber"
+      ],
+      [
+        "House & contents insurance",
+        "amber"
+      ],
+      [
+        "Insurance",
+        "coral"
+      ]
+    ]
+  },
+  {
+    "id": "vi-cutlery",
+    "name": "Eating out",
+    "group": "vn",
+    "colour": "--yellow",
+    "hex": "#F5DC4A",
+    "uses": [
+      [
+        "Eating out",
+        "yellow"
+      ],
+      [
+        "Eating out & takeaways",
+        "yellow"
+      ]
+    ]
+  },
+  {
+    "id": "vi-shirt",
+    "name": "Clothing",
+    "group": "vn",
+    "colour": "--yellow",
+    "hex": "#F5DC4A",
+    "uses": [
+      [
+        "Clothing",
+        "yellow"
+      ]
+    ]
+  },
+  {
+    "id": "vi-cup",
+    "name": "Coffee",
+    "group": "vn",
+    "colour": "--yellow",
+    "hex": "#F5DC4A",
+    "uses": [
+      [
+        "Drinks",
+        "yellow"
+      ],
+      [
+        "Coffee & lunches",
+        "yellow"
+      ]
+    ]
+  },
+  {
+    "id": "vi-bag",
+    "name": "Shopping",
+    "group": "vn",
+    "colour": "--yellow",
+    "hex": "#F5DC4A",
+    "uses": [
+      [
+        "Shopping (Random)",
+        "yellow"
+      ],
+      [
+        "Shopping",
+        "yellow"
+      ]
+    ]
+  },
+  {
+    "id": "vi-lifebuoy",
+    "name": "Emergency fund",
+    "group": "sv",
+    "colour": "--green",
+    "hex": "#3ECF8E",
+    "uses": [
+      [
+        "Emergency fund",
+        "green"
+      ]
+    ]
+  },
+  {
+    "id": "vi-brick-wall",
+    "name": "House deposit",
+    "group": "inv",
+    "colour": "--green2",
+    "hex": "#3FB585",
+    "uses": [
+      [
+        "House deposit",
+        "green2"
+      ],
+      [
+        "House deposit",
+        "green"
+      ]
+    ]
+  },
+  {
+    "id": "vi-trend-base",
+    "name": "Investments",
+    "group": "inv",
+    "colour": "--green2",
+    "hex": "#3FB585",
+    "uses": [
+      [
+        "Investments / ISA",
+        "green2"
+      ]
+    ]
+  },
+  {
+    "id": "vi-child",
+    "name": "Childcare",
+    "group": "ce",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": [
+      [
+        "Childcare",
+        "coral"
+      ]
+    ]
+  },
+  {
+    "id": "vi-paw",
+    "name": "Pets",
+    "group": "ve",
+    "colour": "--salmon",
+    "hex": "#EE7D7D",
+    "uses": [
+      [
+        "Pets",
+        "salmon"
+      ]
+    ]
+  },
+  {
+    "id": "vi-wrench",
+    "name": "Home and garden",
+    "group": "ve",
+    "colour": "--salmon",
+    "hex": "#EE7D7D",
+    "uses": [
+      [
+        "Home & garden",
+        "salmon"
+      ]
+    ]
+  },
+  {
+    "id": "vi-book",
+    "name": "Education",
+    "group": "ve",
+    "colour": "--salmon",
+    "hex": "#EE7D7D",
+    "uses": [
+      [
+        "Education & courses",
+        "salmon"
+      ]
+    ]
+  },
+  {
+    "id": "vi-repeat",
+    "name": "Subscriptions",
+    "group": "cn",
+    "colour": "--amber",
+    "hex": "#F59E0B",
+    "uses": [
+      [
+        "Subscriptions",
+        "amber"
+      ]
+    ]
+  },
+  {
+    "id": "vi-ticket",
+    "name": "Entertainment",
+    "group": "vn",
+    "colour": "--yellow",
+    "hex": "#F5DC4A",
+    "uses": [
+      [
+        "Entertainment",
+        "yellow"
+      ]
+    ]
+  },
+  {
+    "id": "vi-plane",
+    "name": "Holidays",
+    "group": "vn",
+    "colour": "--yellow",
+    "hex": "#F5DC4A",
+    "uses": [
+      [
+        "Holidays",
+        "yellow"
+      ]
+    ]
+  },
+  {
+    "id": "vi-sparkle",
+    "name": "Personal care",
+    "group": "vn",
+    "colour": "--yellow",
+    "hex": "#F5DC4A",
+    "uses": [
+      [
+        "Personal care",
+        "yellow"
+      ]
+    ]
+  },
+  {
+    "id": "vi-piggy",
+    "name": "Savings",
+    "group": "sv",
+    "colour": "--green",
+    "hex": "#3ECF8E",
+    "uses": [
+      [
+        "Savings",
+        "green"
+      ]
+    ]
+  },
+  {
+    "id": "vi-umbrella",
+    "name": "Pension",
+    "group": "inv",
+    "colour": "--green2",
+    "hex": "#3FB585",
+    "uses": [
+      [
+        "Pension",
+        "green2"
+      ]
+    ]
+  },
+  {
+    "id": "vi-overview",
+    "name": "Overview",
+    "group": "nav",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Overview tab"
+    ]
+  },
+  {
+    "id": "vi-budget",
+    "name": "Budget",
+    "group": "nav",
+    "colour": "--blue",
+    "hex": "#64B5F6",
+    "uses": [
+      "Budget tab"
+    ]
+  },
+  {
+    "id": "vi-house-builder",
+    "name": "House builder",
+    "group": "nav",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "House builder tab (USP)"
+    ]
+  },
+  {
+    "id": "vi-assets",
+    "name": "Assets and liabilities",
+    "group": "nav",
+    "colour": "--green",
+    "hex": "#3ECF8E",
+    "uses": [
+      "Assets and liabilities tab"
+    ]
+  },
+  {
+    "id": "vi-debt-tracker",
+    "name": "Debt tracker",
+    "group": "nav",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": [
+      "Debt tracker tab"
+    ]
+  },
+  {
+    "id": "vi-entrepreneur",
+    "name": "Entrepreneur",
+    "group": "nav",
+    "colour": "--orange",
+    "hex": "#E0894A",
+    "uses": [
+      "Entrepreneur tab (Pro)"
+    ]
+  },
+  {
+    "id": "vi-trophy",
+    "name": "Achievements",
+    "group": "nav",
+    "colour": "--brass",
+    "hex": "#C9A84C",
+    "uses": [
+      "Achievements tab"
+    ]
+  },
+  {
+    "id": "vi-connections",
+    "name": "Connections",
+    "group": "nav",
+    "colour": "--purple",
+    "hex": "#9B7EC8",
+    "uses": [
+      "Connections tab"
+    ]
+  },
+  {
+    "id": "vi-network",
+    "name": "Network",
+    "group": "nav",
+    "colour": "--purple",
+    "hex": "#9B7EC8",
+    "uses": [
+      "Network sub-tab (replaces the ◈ text glyph)"
+    ]
+  },
+  {
+    "id": "vi-metals",
+    "name": "Precious metals",
+    "group": "asset",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "Assets sub-tab"
+    ]
+  },
+  {
+    "id": "vi-crypto",
+    "name": "Crypto",
+    "group": "asset",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Assets sub-tab"
+    ]
+  },
+  {
+    "id": "vi-cash",
+    "name": "Cash and savings",
+    "group": "asset",
+    "colour": "--green",
+    "hex": "#3ECF8E",
+    "uses": [
+      "Assets sub-tab"
+    ]
+  },
+  {
+    "id": "vi-cube",
+    "name": "Wealth inventory",
+    "group": "asset",
+    "colour": "--purple",
+    "hex": "#9B7EC8",
+    "uses": [
+      "Assets sub-tab",
+      "Guitars, watches, kit"
+    ]
+  },
+  {
+    "id": "vi-candles",
+    "name": "Stocks and funds",
+    "group": "asset",
+    "colour": "--green2",
+    "hex": "#3FB585",
+    "uses": [
+      "Assets sub-tab",
+      "Replaces the trend arrow, which clashed with Net worth"
+    ]
+  },
+  {
+    "id": "vi-net-worth",
+    "name": "Net worth",
+    "group": "kpi",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Overview card"
+    ]
+  },
+  {
+    "id": "vi-assets-total",
+    "name": "Total assets",
+    "group": "kpi",
+    "colour": "--green",
+    "hex": "#3ECF8E",
+    "uses": [
+      "Overview card"
+    ]
+  },
+  {
+    "id": "vi-debt-total",
+    "name": "Total debt",
+    "group": "kpi",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": [
+      "Overview card",
+      "Debt tracker"
+    ]
+  },
+  {
+    "id": "vi-liabilities",
+    "name": "Liabilities",
+    "group": "kpi",
+    "colour": "--amber",
+    "hex": "#F59E0B",
+    "uses": [
+      "Overview card",
+      "Assets sub-tab"
+    ]
+  },
+  {
+    "id": "vi-coin",
+    "name": "Monthly surplus",
+    "group": "kpi",
+    "colour": "--blue",
+    "hex": "#64B5F6",
+    "uses": [
+      "Overview card",
+      "Pay action"
+    ]
+  },
+  {
+    "id": "vi-b-ce",
+    "name": "Committed essential",
+    "group": "bucket",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": [
+      "House + closed lock"
+    ]
+  },
+  {
+    "id": "vi-b-ve",
+    "name": "Variable essential",
+    "group": "bucket",
+    "colour": "--salmon",
+    "hex": "#EE7D7D",
+    "uses": [
+      "House + open lock"
+    ]
+  },
+  {
+    "id": "vi-b-cn",
+    "name": "Committed non-essential",
+    "group": "bucket",
+    "colour": "--amber",
+    "hex": "#F59E0B",
+    "uses": [
+      "Star + closed lock"
+    ]
+  },
+  {
+    "id": "vi-b-vn",
+    "name": "Variable non-essential",
+    "group": "bucket",
+    "colour": "--yellow",
+    "hex": "#F5DC4A",
+    "uses": [
+      "Star + open lock"
+    ]
+  },
+  {
+    "id": "vi-safe",
+    "name": "Savings",
+    "group": "bucket",
+    "colour": "--green",
+    "hex": "#3ECF8E",
+    "uses": [
+      "Savings bucket"
+    ]
+  },
+  {
+    "id": "vi-bnpl",
+    "name": "Pay later",
+    "group": "debt",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": [
+      "Klarna, Zilch, Monzo Flex"
+    ]
+  },
+  {
+    "id": "vi-loan",
+    "name": "Loan",
+    "group": "debt",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": [
+      "Personal loans"
+    ]
+  },
+  {
+    "id": "vi-overdraft",
+    "name": "Overdraft",
+    "group": "debt",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": []
+  },
+  {
+    "id": "vi-mortgage",
+    "name": "Mortgage",
+    "group": "debt",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": [
+      "Level 2: Delete the mortgage"
+    ]
+  },
+  {
+    "id": "vi-paid-off",
+    "name": "Paid off",
+    "group": "debt",
+    "colour": "--green",
+    "hex": "#3ECF8E",
+    "uses": [
+      "PAID OFF stamp"
+    ]
+  },
+  {
+    "id": "vi-snowball",
+    "name": "Snowball",
+    "group": "debt",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": [
+      "Payoff method"
+    ]
+  },
+  {
+    "id": "vi-avalanche",
+    "name": "Avalanche",
+    "group": "debt",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": [
+      "Payoff method"
+    ]
+  },
+  {
+    "id": "vi-water",
+    "name": "Water",
+    "group": "ce",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": [
+      "Water bill"
+    ]
+  },
+  {
+    "id": "vi-xp",
+    "name": "XP",
+    "group": "goal",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "Experience points"
+    ]
+  },
+  {
+    "id": "vi-streak",
+    "name": "Streak",
+    "group": "goal",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "Contribution streak"
+    ]
+  },
+  {
+    "id": "vi-level",
+    "name": "Level",
+    "group": "goal",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "Level 1, 2, 3"
+    ]
+  },
+  {
+    "id": "vi-milestone",
+    "name": "Milestone",
+    "group": "goal",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "Milestone pills"
+    ]
+  },
+  {
+    "id": "vi-keys",
+    "name": "Keys",
+    "group": "goal",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "Keys are yours"
+    ]
+  },
+  {
+    "id": "vi-brick",
+    "name": "Brick",
+    "group": "goal",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Bricks laid"
+    ]
+  },
+  {
+    "id": "vi-slice",
+    "name": "Row",
+    "group": "goal",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "The gold slice, current row"
+    ]
+  },
+  {
+    "id": "vi-crown",
+    "name": "Pro",
+    "group": "goal",
+    "colour": "--brass",
+    "hex": "#C9A84C",
+    "uses": [
+      "Pro features"
+    ]
+  },
+  {
+    "id": "vi-vault",
+    "name": "Vault",
+    "group": "goal",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "The brand dial",
+      "ISA wrapper"
+    ]
+  },
+  {
+    "id": "vi-target",
+    "name": "Target",
+    "group": "goal",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "Goals"
+    ]
+  },
+  {
+    "id": "vi-forecast",
+    "name": "Forecast",
+    "group": "goal",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Forecast line"
+    ]
+  },
+  {
+    "id": "vi-income",
+    "name": "Income in",
+    "group": "goal",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Income"
+    ]
+  },
+  {
+    "id": "vi-spend",
+    "name": "Spend out",
+    "group": "goal",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": [
+      "Spending"
+    ]
+  },
+  {
+    "id": "vi-calendar",
+    "name": "Calendar",
+    "group": "goal",
+    "colour": "--blue",
+    "hex": "#64B5F6",
+    "uses": [
+      "Dates, payoff timeline"
+    ]
+  },
+  {
+    "id": "vi-zoom-in",
+    "name": "Zoom in",
+    "group": "hud",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": []
+  },
+  {
+    "id": "vi-zoom-out",
+    "name": "Zoom out",
+    "group": "hud",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": []
+  },
+  {
+    "id": "vi-orbit",
+    "name": "Orbit",
+    "group": "hud",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": []
+  },
+  {
+    "id": "vi-reset",
+    "name": "Reset view",
+    "group": "hud",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": []
+  },
+  {
+    "id": "vi-pin",
+    "name": "Pin",
+    "group": "hud",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": [
+      "Map pin on the house"
+    ]
+  },
+  {
+    "id": "vi-fullscreen",
+    "name": "Full screen",
+    "group": "hud",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": []
+  },
+  {
+    "id": "vi-pan",
+    "name": "Pan",
+    "group": "hud",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Drag to pan"
+    ]
+  },
+  {
+    "id": "vi-pinch",
+    "name": "Pinch zoom",
+    "group": "hud",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Two fingers"
+    ]
+  },
+  {
+    "id": "vi-mouse",
+    "name": "Scroll",
+    "group": "hud",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Scroll to zoom"
+    ]
+  },
+  {
+    "id": "vi-check",
+    "name": "Done",
+    "group": "act",
+    "colour": "--green",
+    "hex": "#3ECF8E",
+    "uses": [
+      "Replaces the ✓ text glyph"
+    ]
+  },
+  {
+    "id": "vi-alert",
+    "name": "Warning",
+    "group": "act",
+    "colour": "--amber",
+    "hex": "#F59E0B",
+    "uses": [
+      "Overspend warning"
+    ]
+  },
+  {
+    "id": "vi-info",
+    "name": "Info",
+    "group": "act",
+    "colour": "--blue",
+    "hex": "#64B5F6",
+    "uses": []
+  },
+  {
+    "id": "vi-lock",
+    "name": "Locked",
+    "group": "act",
+    "colour": "--lock",
+    "hex": "#5A6068",
+    "uses": [
+      "Locked levels and stages"
+    ]
+  },
+  {
+    "id": "vi-unlock",
+    "name": "Unlocked",
+    "group": "act",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "Level unlocked"
+    ]
+  },
+  {
+    "id": "vi-plus",
+    "name": "Add",
+    "group": "act",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Replaces the ＋ text glyph"
+    ]
+  },
+  {
+    "id": "vi-edit",
+    "name": "Edit",
+    "group": "act",
+    "colour": "--blue",
+    "hex": "#64B5F6",
+    "uses": [
+      "Replaces the ✎ text glyph"
+    ]
+  },
+  {
+    "id": "vi-close",
+    "name": "Delete",
+    "group": "act",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": [
+      "Replaces the ✕ text glyph"
+    ]
+  },
+  {
+    "id": "vi-undo",
+    "name": "Undo",
+    "group": "act",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Replaces the ↩ text glyph"
+    ]
+  },
+  {
+    "id": "vi-chevron",
+    "name": "Expand",
+    "group": "act",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": []
+  },
+  {
+    "id": "vi-palette",
+    "name": "Colour",
+    "group": "act",
+    "colour": "--purple",
+    "hex": "#9B7EC8",
+    "uses": [
+      "Change card colour"
+    ]
+  },
+  {
+    "id": "vi-sync",
+    "name": "Sync",
+    "group": "act",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Updated from your other device"
+    ]
+  },
+  {
+    "id": "vi-download",
+    "name": "Install",
+    "group": "act",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "Install free banner"
+    ]
+  },
+  {
+    "id": "vi-search",
+    "name": "Search",
+    "group": "act",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": []
+  },
+  {
+    "id": "vi-user",
+    "name": "Profile",
+    "group": "act",
+    "colour": "--purple",
+    "hex": "#9B7EC8",
+    "uses": []
+  },
+  {
+    "id": "vi-sun",
+    "name": "Sun",
+    "group": "doc",
+    "colour": "--gold",
+    "hex": "#E8C56A",
+    "uses": [
+      "Daylight mode"
+    ]
+  },
+  {
+    "id": "vi-moon",
+    "name": "Moon",
+    "group": "doc",
+    "colour": "--blue",
+    "hex": "#64B5F6",
+    "uses": [
+      "Night mode"
+    ]
+  },
+  {
+    "id": "vi-type",
+    "name": "Type",
+    "group": "doc",
+    "colour": "--green",
+    "hex": "#3ECF8E",
+    "uses": [
+      "Typography"
+    ]
+  },
+  {
+    "id": "vi-code",
+    "name": "Tokens",
+    "group": "doc",
+    "colour": "--red",
+    "hex": "#E05C5C",
+    "uses": [
+      "Design tokens"
+    ]
+  },
+  {
+    "id": "vi-mail",
+    "name": "Email",
+    "group": "contact",
+    "colour": "--teal",
+    "hex": "#44C0B9",
+    "uses": [
+      "hello@vault-it.co"
+    ]
+  },
+  {
+    "id": "vi-chat",
+    "name": "WhatsApp",
+    "group": "contact",
+    "colour": "--green",
+    "hex": "#3ECF8E",
+    "uses": []
+  },
+  {
+    "id": "vi-linkedin",
+    "name": "LinkedIn",
+    "group": "contact",
+    "colour": "--blue",
+    "hex": "#64B5F6",
+    "uses": []
+  },
+  {
+    "id": "vi-portfolio",
+    "name": "Portfolio",
+    "group": "contact",
+    "colour": "--brass",
+    "hex": "#C9A84C",
+    "uses": []
+  },
+  {
+    "id": "vi-camera",
+    "name": "Instagram",
+    "group": "contact",
+    "colour": "--coral",
+    "hex": "#E5535F",
+    "uses": []
+  }
+]

@@ -1,7 +1,7 @@
 // waitlist-join: double opt-in, consent record, signed unsubscribe, limits, Turnstile order, no address probing, no injection into the e-mail.
 const fs = require('fs'); const esbuild = require('esbuild'); const crypto = require('crypto');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-let src = fs.readFileSync('/home/user/Vault-It/supabase/functions/waitlist-join/index.ts', 'utf8');
+let src = fs.readFileSync(require('path').join(require('./lib/vi').ROOT, 'supabase/functions/waitlist-join/index.ts'), 'utf8');
 src = src.replace(/import \{ createClient \} from [^\n]+\n/, 'const createClient=globalThis.__createClient;\n');
 const js = esbuild.transformSync(src, { loader: 'ts', format: 'cjs' }).code;
 

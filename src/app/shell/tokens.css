@@ -1,0 +1,51 @@
+<style id="vi-tokens">
+/* Vault-It design tokens. Night is the default, Daylight is the light mode.
+ * Switch with data-theme="light" on <html>. Generated from vault-it-brand-book.html */
+html{box-sizing:border-box}
+*,*::before,*::after{font-variant-numeric:lining-nums}   /* Syne's default zero is a small round o ("30" read as "3o"); lining figures fix it, DM Sans and Share Tech Mono already have them */
+:root,[data-theme="dark"],[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav,[data-theme="light"] #pwa-install-banner,[data-theme="light"] #app-footer{   /* 3D viewports stay Night in Daylight too (the model badge sits over the Night picture) */
+  color-scheme:dark;
+  --bg:#080808; --panel:#080D14; --panel2:#0A1A1C; --slate:#1C2420; --line:#102221; --line2:#15302F;
+  --text:#E8E8E8; --muted:#9AA0A6; --faint:#2D8882; --lock:#8C939B;
+  --teal:#44C0B9; --teal-deep:#007F7B; --gold:#E8C56A; --brass:#C9A84C;
+  --green:#3ECF8E; --green2:#3FB585; --red:#E05C5C; --blue:#64B5F6; --purple:#9B7EC8; --orange:#E0894A;
+  --coral:#E5535F; --salmon:#FFA38A; --amber:#F59E0B; --yellow:#F5DC4A;
+  --goldf:#E8C56A; --on-teal:#00181A; --m-silver:#C0C8D0; --m-platinum:#E0E8F0; --m-palladium:#D0D8E0; --on-gold:#1A1400; --pulse:2800ms;
+  --surf:#0A1018; --surf2:#080D14; --track:#13202A; --pillbg:#12100A; --lib:#0A1618; --doneb:#0A1F22; --toastbg:#08181C;
+  --lockline:#3A4446; --lockfg:#6A7678; --dotoff:#2A3638;
+  --stat:#B6D8D6; --stext:0 0 8px #000; --rail-bg:rgba(0,12,18,.74); --rail-btn:rgba(8,24,28,.85);
+  --stage-bg:radial-gradient(120% 90% at 50% 100%,#06242A 0%,#00131A 45%,#080808 100%);
+  --scan:repeating-linear-gradient(0deg,rgba(68,192,185,.05) 0 1px,transparent 1px 4px);--scan-size:auto;
+  --paper-img:repeating-linear-gradient(0deg,rgba(68,192,185,.025) 0 1px,transparent 1px 4px);--paper-size:auto;
+  --tglow:0 0 18px rgba(68,192,185,.35); --dglow:0 0 10px rgba(68,192,185,.6); --popglow:0 0 14px rgba(232,197,106,.7);
+  --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
+  --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
+  --font-display:"Syne","Helvetica Neue",Arial,sans-serif;
+  --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r-brick:4px; --r-tile:14px; --r-card:18px; --r-pill:999px;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --t-fast:240ms; --t-base:600ms; --t-build:1800ms;
+  --ink-rgb:255 255 255;--bg-rgb:8 8 8;--panel-rgb:8 13 20;--teal-rgb:68 192 185;--teal-deep-rgb:0 127 123;--gold-rgb:232 197 106;--brass-rgb:201 168 76;--green-rgb:62 207 142;--green2-rgb:63 181 133;--red-rgb:224 92 92;--blue-rgb:100 181 246;--purple-rgb:155 126 200;--orange-rgb:224 137 74;--amber-rgb:245 158 11;
+}
+/* Daylight: deep teal ink on off-white paper with a faint teal blueprint grid (owner, 30 Oct: was too bright). Same hues, darker values, no bloom, blueprint grid instead of scanlines. */
+[data-theme="light"]{
+  color-scheme:light;
+  --bg:#D3CCB4; --panel:#DAD8D0; --panel2:#CDD3CE; --slate:#C6CFCA; --line:#AFC2BE; --line2:#8FAFAB;
+  --text:#0B1F22; --muted:#3A5052; --faint:#215451; --lock:#39433F;
+  --teal:#185550; --teal-deep:#005652; --gold:#60480B; --brass:#5B4A19;
+  --green:#135738; --green2:#1C563E; --red:#951919; --blue:#054E88; --purple:#583F81; --orange:#773C11;
+  --coral:#4F0A1E; --salmon:#8A3510; --amber:#6B4303; --yellow:#584C04;
+  --on-teal:#FFFFFF; --m-silver:#444D55; --m-platinum:#414E56; --m-palladium:#464D53; --on-gold:#1A1400;
+  --surf:#DAD8D0; --surf2:#DAD8D0; --track:#BCC6C1; --pillbg:#FFF6DD; --lib:#D3D2CA; --doneb:#E1F3F1; --toastbg:#DAD8D0;
+  --lockline:#9AB0B1; --lockfg:#39433F; --dotoff:#A9BAB8;
+  --stat:#1E4A48; --stext:none; --rail-bg:rgba(218,216,208,.94); --rail-btn:#DAD8D0;
+  --stage-bg:radial-gradient(120% 90% at 50% 100%,#D3E9E7 0%,#E6F2F1 50%,#F6FAF9 100%);
+  --scan:linear-gradient(rgba(0,127,123,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.07) 1px,transparent 1px);--scan-size:26px 26px;
+  --paper-img:linear-gradient(rgba(0,127,123,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,127,123,.07) 1px,transparent 1px);--paper-size:32px 32px;
+  --tglow:none; --dglow:none; --popglow:none;
+  --btn1:#006B67; --btn2:#00837E; --bshadow:0 6px 16px -8px rgba(0,90,88,.55);
+  --glow:0 10px 28px -16px rgba(0,90,88,.35); --elev:0 1px 0 #fff inset,0 10px 28px -18px rgba(0,90,88,.3);
+  --ink-rgb:11 31 34;--bg-rgb:211 204 180;--panel-rgb:218 216 208;--teal-rgb:24 85 80;--teal-deep-rgb:0 86 82;--gold-rgb:96 72 11;--brass-rgb:91 74 25;--green-rgb:19 87 56;--green2-rgb:28 86 62;--red-rgb:149 25 25;--blue-rgb:5 78 136;--purple-rgb:88 63 129;--orange-rgb:119 60 17;--amber-rgb:107 67 3;
+}
+</style>

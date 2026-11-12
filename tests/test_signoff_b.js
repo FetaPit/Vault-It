@@ -1,6 +1,7 @@
 // Phone sign-off group B (owner, 31 Oct): item 3D models. (1) a picture saved with the old green tint is redrawn in the model's own colours;
 // (2) on a touch screen, tapping a model tile turns it into a live 3D view with orbit (a second tap opens the full viewer).
 // Run: node tests/test_signoff_b.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_i3d_live.js', 'utf8');
@@ -15,7 +16,7 @@ const seed = theme => {
 (async () => {
   const b = await chromium.launch(); const errs = [];
   const t = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); await routeThree(t); const q = await t.newPage(); q.on('pageerror', e => errs.push(e.message));
-  await q.addInitScript(seed, 'dark'); await q.goto('file:///home/user/Vault-It/index.html'); await q.waitForTimeout(1800);
+  await q.addInitScript(seed, 'dark'); await q.goto(require('./lib/vi').FILE_URL); await q.waitForTimeout(1800);
   await q.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
   await q.evaluate(() => { showTab('assets'); const b = [...document.querySelectorAll('#assets-page .subtab-btn')].find(x => /'other'/.test(x.getAttribute('onclick') || '')); showSubtab('assets', 'other', b); }); await q.waitForTimeout(500);
   await q.evaluate(() => i3dPick('wi', 11)); await q.waitForTimeout(300);

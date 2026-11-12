@@ -1,6 +1,9 @@
 // Beta-readiness in the app: honest privacy/terms (and no false “end-to-end encrypted” claim), consent line on sign-in,
 // abuse-limit (429) messages that do NOT fall back to the built-in sender, “Download my data”, and “Delete my account”.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
+const INDEX_PATH = process.env.VI_INDEX || require('./lib/vi').INDEX, REPO = require('path').dirname(INDEX_PATH);
+const INDEX = require('./lib/vi').FILE_URL;   // VI_INDEX points the test at another checkout
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const SHOT = (() => { const d = require('os').tmpdir() + '/vaultit-shots/'; try { require('fs').mkdirSync(d, { recursive: true }); } catch (e) {} return d; })();
 const MOCK = `
@@ -30,7 +33,7 @@ const fresh = async (b, seed) => {
   const ctx = await b.newContext({ viewport: { width: 430, height: 900 }, acceptDownloads: true }); const page = await ctx.newPage(); const errs = []; page.errs = errs;
   page.on('pageerror', e => errs.push(e.message));
   await page.addInitScript((seed) => { if (window.name === '__seeded') return; window.name = '__seeded'; localStorage.setItem('vi_declined_demo', 'true'); if (seed) for (const k in seed) localStorage.setItem(k, seed[k]); }, seed || null);
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1200);
+  await page.goto(INDEX); await page.waitForTimeout(1200);
   await page.evaluate(MOCK); return { ctx, page };
 };
 const err = page => page.evaluate(() => document.getElementById('auth-err').textContent);
@@ -54,9 +57,10 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   const hostsOf = (txt) => [...new Set([...txt.matchAll(/https?:\/\/([A-Za-z0-9.-]+\.[a-z]{2,})/g)].map(m => m[1]))];
   const COVERED = { 'logo.clearbit.com': /Clearbit/, 'www.google.com': /Google/, 'cdn.jsdelivr.net': /jsDelivr/, 'cdnjs.cloudflare.com': /cdnjs/, 'open.er-api.com': /ExchangeRate-API/, 'api.coingecko.com': /CoinGecko/,
     'api.metals.live': /metals\.live/, 'fonts.googleapis.com': /Google Fonts/, 'api.anthropic.com': /Anthropic/, 'www.alphavantage.co': /Alpha Vantage/, 'metals-api.com': /metals-api\.com/, 'buy.stripe.com': /Stripe/, 'legpubblzgknxdtvsant.supabase.co': /Supabase/, 'fetapit.github.io': /GitHub/,
-    'api.resend.com': /Resend/, 'query1.finance.yahoo.com': /Yahoo/, 'query2.finance.yahoo.com': /Yahoo/, 'api.meshy.ai': /Meshy/, 'api.openverse.org': /Openverse/, 'static.poly.pizza': /Poly Pizza/, 'poly.pizza': /Poly Pizza/, 'esm.sh': /Supabase/, 'challenges.cloudflare.com': /Turnstile/ };
+    'api.resend.com': /Resend/, 'query1.finance.yahoo.com': /Yahoo/, 'query2.finance.yahoo.com': /Yahoo/, 'api.meshy.ai': /Meshy/, 'api.openverse.org': /Openverse/, 'esm.sh': /Supabase/, 'challenges.cloudflare.com': /Turnstile/,
+    'api.discogs.com': /Discogs/, 'www.discogs.com': /Discogs/, 'api.ebay.com': /eBay/, 'www.ebay.co.uk': /eBay/, 'api.reverb.com': /Reverb/, 'www.pricecharting.com': /PriceCharting/ };
   const NOT_USED_FOR_TESTERS = ['www.w3.org', 'creativecommons.org', 'vault-it.uk', 'vault-it.co', 'app.vault-it.co', 'wa.me', 'www.linkedin.com', 'instagram.com', 'ptlive.my.canva.site', 'shibariumscan.io', 'corsproxy.io', 'api.notion.com', 'api.convertkit.com', 'www.shibrpc.com', 'auth.truelayer.com'];   // links, or owner-only connections that do nothing without keys (the notice says so)
-  const found = hostsOf(fsx.readFileSync('/home/user/Vault-It/index.html', 'utf8')).concat(...fsx.readdirSync('/home/user/Vault-It/supabase/functions').filter(d => fsx.existsSync('/home/user/Vault-It/supabase/functions/' + d + '/index.ts')).map(d => hostsOf(fsx.readFileSync('/home/user/Vault-It/supabase/functions/' + d + '/index.ts', 'utf8'))));
+  const found = hostsOf(fsx.readFileSync(INDEX_PATH, 'utf8')).concat(...fsx.readdirSync(REPO + '/supabase/functions').filter(d => fsx.existsSync(REPO + '/supabase/functions/' + d + '/index.ts')).map(d => hostsOf(fsx.readFileSync(REPO + '/supabase/functions/' + d + '/index.ts', 'utf8'))));
   const unlisted = [...new Set(found)].filter(h => !COVERED[h] && !NOT_USED_FOR_TESTERS.includes(h));
   ok(unlisted.length === 0, 'no outside host is missing from this check' + (unlisted.length ? ' — NEW: ' + unlisted.join(', ') + ' (add it to the privacy notice, then to COVERED)' : ''));
   const missing = Object.keys(COVERED).filter(h => !COVERED[h].test(lg)); ok(missing.length === 0, 'the privacy notice names every outside company in use' + (missing.length ? ' — missing: ' + missing.join(', ') : ''));
@@ -94,9 +98,9 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   await page.evaluate(() => { _supaUser = { id: 'u-1', email: 'pete@example.com' }; showSettings(); }); await page.waitForTimeout(300);
   const set = await page.evaluate(() => ({ dets: [...document.querySelectorAll('#settings-modal details')].map(d => ({ open: d.open, txt: d.querySelector('summary').innerText })), yd: !!document.getElementById('set-yourdata'), del: !!document.getElementById('set-delete-account'),
     }));
-  const ckVisible = await page.locator('#set-ck-form').isVisible(), ejsVisible = await page.locator('#set-ejs-svc').isVisible(), notionVisible = await page.locator('#set-notion-token').isVisible(); set.ckHidden = !ckVisible && !notionVisible; set.ejsHidden = !ejsVisible;
-  ok(set.dets.length === 2 && set.dets.every(d => !d.open), 'owner/admin tools are collapsed by default (' + set.dets.map(d => d.txt.slice(2, 30)).join(' | ') + ')');
-  ok(set.ckHidden && set.ejsHidden, 'ConvertKit / EmailJS / Notion fields are not visible to a tester');
+  const ownerHidden = !(await page.locator('#set-owner-tools').isVisible()), fieldsHidden = !(await page.locator('#set-notion-token').isVisible()) && !(await page.locator('#set-claude-key').isVisible()), goneFields = await page.evaluate(() => ['set-ck-form', 'set-ck-key', 'set-ejs-svc', 'set-cg-key', 'set-av-key', 'set-metals-key'].filter(i => document.getElementById(i)));
+  ok(ownerHidden && fieldsHidden, 'owner and developer tools (Notion, Claude, Meshy, Founding link) are hidden from a tester');
+  ok(!goneFields.length, 'ConvertKit, EmailJS and the price-feed key fields are gone (' + goneFields.join(',') + ')');
   ok(set.yd && set.del, 'Settings has “Your data” and “Delete my account”');
 
   // ── 4. Download my data ──
@@ -275,7 +279,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   const rc = await page.evaluate(() => { let m = ''; window.confirm = (x) => { m = x; return false; }; resetVaultData(); return m; });
   ok(/Earlier versions stay in Version history & restore for up to 180 days/.test(rc) && !/permanently delete/i.test(rc), 'Reset no longer claims to "permanently delete" — it says earlier versions stay restorable');
   // deep links from the website
-  await page.goto('file:///home/user/Vault-It/index.html?privacy=1'); await page.waitForTimeout(2500);
+  await page.goto(INDEX + '?privacy=1'); await page.waitForTimeout(2500);
   ok(await page.evaluate(() => /Privacy notice/.test((document.getElementById('legal-modal') || {}).innerText || '')), '?privacy=1 opens the privacy notice (linked from the website sign-up)');
   ok(page.errs.length === 0, 'no page errors ' + page.errs.slice(0, 2).join(' | '));
   await ctx.close();
@@ -289,7 +293,7 @@ const step = page => page.evaluate(() => document.querySelector('.auth-step.acti
   // a key on the real address: the widget starts as soon as the sign-in screen shows, before anyone taps Continue
   ctx = await b.newContext({ viewport: { width: 430, height: 900 } }); page = await ctx.newPage(); page.errs = []; page.on('pageerror', e => page.errs.push(e.message));
   await page.addInitScript(() => { window.__VI_TS_KEY = '1x00000000000000000000AA'; window.__vi_captcha_force = true; window.__reset = 0; window.turnstile = { render: (sel, o) => { window.__ts = o; window.__sel = sel; window.__renders = (window.__renders || 0) + 1; return 'w1'; }, reset: () => { window.__reset++; } }; localStorage.setItem('vi_declined_demo', 'true'); });
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500); await page.evaluate(MOCK);
+  await page.goto(INDEX); await page.waitForTimeout(1500); await page.evaluate(MOCK);
   ok(await page.evaluate(() => window.__renders === 1 && window.__ts.sitekey === '1x00000000000000000000AA' && window.__sel === '#auth-captcha' && getComputedStyle(document.getElementById('auth-captcha')).display === 'block'), 'the check is drawn as soon as the sign-in screen appears (not on the first Continue tap)');
   await page.fill('#auth-email', 'pete@example.com'); await page.evaluate(() => { _m.calls.length = 0; });
   await page.click('#auth-email-step .auth-btn'); await page.waitForTimeout(500);

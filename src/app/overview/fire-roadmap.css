@@ -1,0 +1,301 @@
+/* ══════════════════════════════════════════════════════════════
+   FIRE ROADMAP — bento grid style, brand-precise
+══════════════════════════════════════════════════════════════ */
+
+#fire-svg-wrap {
+  display: none !important; /* replaced by bento grid */
+}
+
+#fire-bento-wrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 12px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--teal-rgb) / .2) transparent;
+}
+
+.fire-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px;
+}
+
+@media (max-width: 767px) {
+  .fire-bento-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 5px; }
+}
+@media (max-width: 400px) {
+  .fire-bento-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+}
+
+.fire-node {
+  background: rgb(var(--panel-rgb) / .9);
+  border: 1px solid rgb(var(--teal-rgb) / .1);
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  padding: 10px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+  position: relative;
+  transition: border-color .2s, background .2s;
+  min-height: 84px;
+}
+
+.fire-node.hit {
+  background: rgb(var(--panel-rgb) / .92);
+  border-color: rgb(var(--green-rgb) / .3);
+}
+
+.fire-node.next {
+  background: rgb(var(--panel-rgb) / .95);
+  border-color: rgb(var(--teal-rgb) / .45);
+  box-shadow: 0 0 12px rgb(var(--teal-rgb) / .1);
+}
+
+.fire-node.locked {
+  opacity: .45;
+}
+
+.fire-node-seq {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: max(.36rem,var(--vi-fs-1));
+  color: rgb(var(--teal-rgb) / .3);
+  letter-spacing: .06em;
+}
+
+.fire-node-icon {
+  font-size: .9rem;  /* small icon */
+  line-height: 1;
+  margin-top: 4px;
+}
+
+.fire-node.hit .fire-node-icon {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+.fire-node-name {
+  font-family: 'Syne', sans-serif;
+  font-size: max(.48rem,var(--vi-fs-1));
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.fire-node-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: max(.42rem,var(--vi-fs-1));
+  color: var(--t3);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.fire-node-target {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: max(.42rem,var(--vi-fs-1));
+  letter-spacing: .04em;
+  margin-top: 2px;
+}
+
+/* Progress arc drawn via CSS border trick on next node */
+.fire-node-arc {
+  position: absolute;
+  inset: -3px;
+  border-radius: 0;
+  pointer-events: none;
+}
+
+/* Tick mark on completed */
+.fire-node-tick {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: max(.5rem,var(--vi-fs-1));
+  color: var(--gr);
+  font-weight: 900;
+}
+
+/* YOU ARE HERE chip */
+.fire-you-here {
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgb(var(--teal-rgb) / .18);
+  border: 1px solid rgb(var(--teal-rgb) / .45);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: max(.35rem,var(--vi-fs-1));
+  color: var(--em);
+  padding: 1px 5px;
+  white-space: nowrap;
+  letter-spacing: .08em;
+}
+
+/* Chapter dividers */
+.fire-chapter {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  margin-top: 4px;
+}
+
+.fire-chapter-label {
+  font-family: 'Syne', sans-serif;
+  font-size: max(.44rem,var(--vi-fs-0));
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fire-chapter-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, currentColor, transparent);
+  opacity: .25;
+}
+
+/* Journey stage progress bar inside next node */
+.fire-node-prog {
+  width: 100%;
+  height: 2px;
+  background: rgb(var(--ink-rgb) / .06);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.fire-node-prog-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition: width .5s ease;
+}
+</style>
+<style>
+/* ══ FIRE ROADMAP — FULL WIDTH HORIZONTAL TIMELINE ══ */
+
+.fire-roadmap-card {
+  padding: 16px 0 0 !important;
+  overflow: hidden;
+}
+
+.fire-rm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 20px 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fire-timeline-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--teal-rgb) / .2) rgba(8,14,24,.5);
+  cursor: grab;
+  user-select: none;
+}
+.fire-timeline-scroll:active { cursor: grabbing; }
+.fire-timeline-scroll::-webkit-scrollbar { height: 4px; }
+.fire-timeline-scroll::-webkit-scrollbar-track { background: rgb(var(--panel-rgb) / .5); }
+.fire-timeline-scroll::-webkit-scrollbar-thumb { background: rgb(var(--teal-rgb) / .2); border-radius: 2px; }
+
+.fire-timeline-svg {
+  display: block;
+  height: 300px;
+  position: absolute;
+  top: 0; left: 0;
+}
+.fire-timeline-scroll { contain: layout paint; overscroll-behavior-x: contain; }
+/* roadmap depth (owner, 3 Nov round 2): the perspective is drawn, not tilted: a thin ground strip with a converging grid (#fire-ground)
+   and the tokens floating above it; a token lifts a little more on hover, and the stage to work on turns slowly (owner, 31 Oct) */
+.fire-stage{position:relative}
+.fire-ground{position:absolute;left:0;right:0;bottom:0;height:114px;width:100%;pointer-events:none;z-index:0}   /* FIRE_GH (v0.9.1 round 2, R3) */
+.fire-ground .fg-h,.fire-ground .fg-v,.fire-ground .fg-edge{stroke:var(--teal);fill:none;vector-effect:non-scaling-stroke}
+.fire-ground .fg-v{stroke-opacity:.16}
+.fire-ground .fg-edge{stroke-opacity:.4}
+.fire-ground .fg-plane{fill:var(--teal);fill-opacity:.05;stroke:none}
+.fire-stage .fire-timeline-scroll{position:relative;z-index:1}
+.fire-coin{transform-box:fill-box;transform-origin:50% 70%;transition:transform .25s var(--ease),opacity .25s}
+.fire-card{transform-box:fill-box;transform-origin:center;transition:transform .25s var(--ease)}
+.fire-coin:hover .fire-card{transform:translateY(-5px)}
+.fire-coin.next .fire-card{animation:fire-spin 3.4s ease-in-out infinite}
+@keyframes fire-spin{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.84)}}
+@media(max-width:700px){.fire-coin.next .fire-card{animation:none}}
+@media(prefers-reduced-motion:reduce){.fire-coin.next .fire-card{animation:none}.fire-coin,.fire-card{transition:none}}
+.fd-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.54rem,var(--vi-fs-1));letter-spacing:.04em;padding:7px 12px;border-radius:6px;cursor:pointer;color:var(--gold);background:rgb(var(--gold-rgb) / .12);border:1px solid rgb(var(--gold-rgb) / .55)}
+.fd-btn.ghost{color:var(--t2);background:transparent;border-color:var(--bd)}
+.fd-box{margin-top:8px;padding:9px 11px;border:1px solid rgb(var(--teal-rgb) / .25);border-radius:7px;background:rgb(var(--teal-rgb) / .05);font-size:max(.56rem,var(--vi-fs-2));color:var(--t2);line-height:1.5}
+.fd-box.ok{border-color:rgb(var(--green-rgb) / .5);background:rgb(var(--green-rgb) / .07);color:#bfe9d3}
+html[data-theme="light"] .fd-box.ok{color:var(--t1);background:rgb(var(--green-rgb) / .12);border-color:rgb(var(--green-rgb) / .6)}
+.fd-box.warn{border-color:rgb(var(--amber-rgb) / .55);background:rgb(var(--amber-rgb) / .07)}
+.fd-box .fd-h{font-family:'Share Tech Mono',monospace;font-size:max(.42rem,var(--vi-fs-1));letter-spacing:.14em;color:var(--t3);margin-bottom:3px}
+.fd-box ul{margin:0;padding-left:16px}.fd-box li{margin:2px 0}
+.fd-box .fd-sub{margin-top:6px;color:var(--t3)}
+.fd-box .fd-btn{margin-top:8px}
+.fd-tick,.map-tick{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:9px 11px;border:1px solid rgb(var(--teal-rgb) / .3);border-radius:7px;background:rgb(var(--teal-rgb) / .06);cursor:pointer;font-size:max(.6rem,var(--vi-fs-2));color:var(--tx);line-height:1.4}
+.fd-tick input,.map-tick input{flex:none;appearance:none;-webkit-appearance:none;width:24px;height:24px;margin:0;border:2px solid rgb(var(--teal-rgb) / .65);border-radius:6px;background:rgb(var(--panel-rgb) / .9);display:grid;place-content:center;cursor:pointer}
+.fd-tick input:checked,.map-tick input:checked{background:var(--teal);border-color:var(--teal)}
+.fd-tick input:checked::after,.map-tick input:checked::after{content:'';width:6px;height:12px;border:solid var(--line2);border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.fd-tick input:focus-visible,.map-tick input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.fd-tick small,.map-tick small{display:block;color:var(--t3);font-size:max(.52rem,var(--vi-fs-1));margin-top:2px}
+.fd-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.fd-link{background:none;border:none;color:var(--t3);font-size:max(.52rem,var(--vi-fs-1));text-decoration:underline;cursor:pointer;padding:4px 2px}
+
+/* Stage detail pop-up panel */
+.fire-detail-panel {
+  margin: 0 20px 16px;
+  background: rgb(var(--panel-rgb) / .95);
+  border: 1px solid rgb(var(--teal-rgb) / .25);
+  clip-path: polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  padding: 12px 16px;
+  position: relative;
+}
+.fire-detail-inner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 12px;
+}
+.fire-detail-close {
+  position: absolute;
+  top: 8px; right: 10px;
+  background: none; border: none;
+  color: var(--t3); font-size: max(.7rem,var(--vi-fs-3));
+  cursor: pointer; padding: 2px 6px;
+  transition: color .15s;
+}
+.fire-detail-close:hover { color: var(--em); }
+.fire-detail-close{top:0!important;right:0!important;width:44px;height:44px;display:grid;place-items:center;padding:0!important}
+.fire-detail-close .vi-ic{width:18px;height:18px}
+.fire-detail-inner{padding-right:30px}
+.fd-box.ok .vi-ic{margin-right:6px}
+@keyframes fdIn{from{opacity:0;max-height:0}to{opacity:1;max-height:1200px}}
+.fire-detail-panel{overflow:hidden}
+.fire-detail-panel:not([style*="display: none"]):not([style*="display:none"]){animation:fdIn .24s ease-out}
+@media (prefers-reduced-motion:reduce){.fire-detail-panel{animation:none!important}}
+
+/* Hide old bento wrap */
+#fire-bento-wrap { display: none !important; }
+#fire-svg-wrap   { display: none !important; }
+
+/* Remove old fire css that conflicts */
+.fire-roadmap-card .ov-chart-card::before { display: none; }
+</style>
+<style>
+@keyframes proFlash {
+  0%,100% { background: rgb(var(--brass-rgb) / .15); color: var(--go); }
+  50%      { background: rgb(var(--brass-rgb) / .4);  color: #fff;      box-shadow: 0 0 8px rgb(var(--brass-rgb) / .5); }
+}
+</style>

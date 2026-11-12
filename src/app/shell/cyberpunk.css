@@ -1,0 +1,152 @@
+<style>
+/* ══════════════════════════════════════════════════════════════
+   CYBERPUNK LAYER — form follows function follows intent
+   Sharp edges. Neon precision. Never decorative for its own sake.
+══════════════════════════════════════════════════════════════ */
+
+/* Scan-line overlay — subtle, doesn't obscure content */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgb(var(--teal-rgb) / .018) 2px,
+    rgb(var(--teal-rgb) / .018) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Clipped-corner card treatment — every bento box */
+.ov-chart-card,
+.ov-kpi,
+.ov-ms-card,
+.ov-data-card,
+.debt-row,
+.conn-card,
+.client-row,
+.badge-card,
+.ov-chart-card {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  border-radius: 0 !important;
+}
+
+/* Corner accent — top-right + bottom-left neon tick */
+.ov-chart-card::before,
+.ov-kpi::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 8px; height: 8px;
+  background: var(--em);
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+  opacity: .45;
+}
+.ov-chart-card { position: relative; }
+.ov-kpi        { position: relative; }
+
+/* Enhanced card glow on hover */
+.ov-chart-card:hover {
+  border-color: rgb(var(--teal-rgb) / .32) !important;
+  box-shadow: 0 0 0 1px rgb(var(--teal-rgb) / .12), 0 0 20px rgb(var(--teal-rgb) / .06);
+}
+
+/* ── TAB COLOUR CODING ── */
+/* Each tab gets a bottom-border colour + left accent on active */
+
+/* Overview — teal */
+.tab-btn[data-tab="overview"].active,
+.tab-btn[onclick*="overview"].active {
+  color: var(--teal) !important;
+  border-bottom-color: var(--teal) !important;
+  text-shadow: 0 0 12px rgb(var(--teal-rgb) / .6);
+}
+
+/* Journey — gold */
+.tab-btn[onclick*="journey"].active {
+  color: var(--brass) !important;
+  border-bottom-color: var(--brass) !important;
+  text-shadow: 0 0 12px rgb(var(--brass-rgb) / .6);
+}
+
+/* House — warm amber */
+.tab-btn[onclick*="house"].active {
+  color: var(--gold) !important;
+  border-bottom-color: var(--gold) !important;
+  text-shadow: 0 0 12px rgb(var(--gold-rgb) / .5);
+}
+
+/* Assets — green */
+.tab-btn[onclick*="assets"].active {
+  color: var(--green) !important;
+  border-bottom-color: var(--green) !important;
+  text-shadow: 0 0 12px rgb(var(--green-rgb) / .5);
+}
+
+/* Debt — red */
+.tab-btn[onclick*="debt"].active {
+  color: var(--red) !important;
+  border-bottom-color: var(--red) !important;
+  text-shadow: 0 0 12px rgb(var(--red-rgb) / .5);
+}
+
+/* Entrepreneur — orange */
+.tab-btn[onclick*="biz"].active {
+  color: var(--orange) !important;
+  border-bottom-color: var(--orange) !important;
+  text-shadow: 0 0 12px rgb(var(--orange-rgb) / .5);
+}
+
+/* Achievements — gold */
+.tab-btn[onclick*="achievements"].active {
+  color: var(--brass) !important;
+  border-bottom-color: var(--brass) !important;
+  text-shadow: 0 0 12px rgb(var(--brass-rgb) / .5);
+}
+
+/* Connections — purple */
+.tab-btn[onclick*="connections"].active {
+  color: var(--purple) !important;
+  border-bottom-color: var(--purple) !important;
+  text-shadow: 0 0 12px rgb(var(--purple-rgb) / .5);
+}
+
+/* Coloured dot before each tab label */
+.tab-btn::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+  opacity: .4;
+  transition: opacity .2s;
+  flex-shrink: 0;
+}
+.tab-btn.active::before { opacity: 1; }
+.tab-btn[onclick*="overview"]::before   { background: var(--teal); }
+.tab-btn[onclick*="journey"]::before    { background: var(--brass); }
+.tab-btn[onclick*="house"]::before      { background: var(--gold); }
+.tab-btn[onclick*="assets"]::before     { background: var(--green); }
+.tab-btn[onclick*="debt"]::before       { background: var(--red); }
+.tab-btn[onclick*="biz"]::before        { background: var(--orange); }
+.tab-btn[onclick*="achievements"]::before { background: var(--brass); }
+.tab-btn[onclick*="connections"]::before  { background: var(--purple); }
+
+/* Tab hover: show dot colour as border hint */
+.tab-btn:hover { color: var(--tx); opacity: 1; }
+.tab-btn:hover::before { opacity: .85; }
+
+/* Nav scrollable on small screens */
+#topnav {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+#topnav::-webkit-scrollbar { display: none; }
+

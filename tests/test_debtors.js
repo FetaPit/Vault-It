@@ -1,6 +1,7 @@
 // Debt Tracker: Creditors (you owe) and Debtors (owed to you) sub-tabs (owner, 30 Oct). Money you expect back counts
 // in total assets and net worth; doubtful money is shown but left out; repayments reduce it; the choice of side is
 // remembered; sync never treats a device holding only debtors as empty. Run: node tests/test_debtors.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 (async () => {
@@ -9,7 +10,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     const ctx = await b.newContext({ viewport: { width: w, height: 900 } }); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(() => { if (localStorage.getItem('pos_debt1')) return; localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 })); localStorage.setItem('vi_user', JSON.stringify({ name: 'T', email: 't@t.com' }));
       localStorage.setItem('pos_debt1', JSON.stringify({ debts: [{ id: 1, name: 'Card', original: 1000, balance: 800, rate: 20, min: 30, type: 'credit' }] })); localStorage.setItem('pos_al1', JSON.stringify({ cashAccounts: [{ id: 5, name: 'Savings', type: 'Savings', balance: 2000 }] })); });
-    await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: '#welcome-overlay,#login-overlay{display:none!important}' });
     await p.evaluate(() => showTab('debt')); await p.waitForTimeout(600);
     const t = await p.evaluate(() => ({ tabs: [...document.querySelectorAll('.debt-sides [role=tab]')].map(b => b.textContent.trim()), cred: !document.getElementById('debt-side-creditors').hidden, debt: document.getElementById('debt-side-debtors').hidden }));

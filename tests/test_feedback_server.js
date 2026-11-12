@@ -5,7 +5,7 @@
 // The database side (limits, checks, RLS, retention) is tested on a real Postgres in test_012.mjs.
 const fs = require('fs'); const esbuild = require('esbuild');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-const ROOT = '/home/user/Vault-It/supabase/functions/';
+const ROOT = require('path').join(require('./lib/vi').ROOT, 'supabase/functions/');
 const compile = (name) => {
   let src = fs.readFileSync(ROOT + name + '/index.ts', 'utf8');
   src = src.replace(/import \{ createClient \} from [^\n]+\n/, 'const createClient=globalThis.__createClient;\n');

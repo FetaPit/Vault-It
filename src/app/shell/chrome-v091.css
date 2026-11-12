@@ -1,0 +1,59 @@
+<style id="vi-v091-chrome">
+/* ═══ v0.9.1 chrome: E1 mark, E2 bigger desktop menu bar, E24 pinned Assets sub-menu ═══ */
+:root{--vi-hdr-h:60px;--vi-mark-size:28px}
+@media(min-width:600px){:root{--vi-mark-size:36px}}
+@media(min-width:1024px){:root{--vi-mark-size:44px}}
+.vi-mark{width:var(--vi-mark-size);height:var(--vi-mark-size)}
+@media(prefers-reduced-motion:reduce){.vi-mark .ticks{transition:none!important}}
+/* E2: bigger menu bar, set sizes (no zoom). From 1280 px: icons 24, labels 12.5 px, tabs 48 tall. 1100 to 1279: icons 22, labels 11.5 px.
+   The seven labelled tabs are about 1,100 px wide at these sizes, which cannot share a row with the logo, net worth, Back Vault-It and the
+   Night/Daylight switch below roughly 1,900 px, so the two-row header stays (logo row, tab row) and viNavFit uses one row when it does fit. */
+@media(min-width:1024px){
+  body{--r1:50px;--r2:54px}
+  html body #topnav{grid-template-rows:var(--r1) var(--r2)}
+  html body #topnav .nav-brand{height:var(--r1)!important}
+  html body #topnav .vi-tabs{height:var(--r2)}
+  html body.vi-nav1{--nav-row:60px}
+  html body.vi-nav1 #topnav{grid-template-rows:var(--nav-row)}
+  html body.vi-nav1 #topnav .nav-brand{height:var(--nav-row)!important}
+  html body.vi-nav1 #topnav .vi-tabs{height:var(--nav-row)}
+  body.vi-nav1 #left-sidebar{top:var(--vi-hdr-h,60px)!important}
+}
+@media(min-width:1100px){
+  body{--r1:52px;--r2:56px}
+  html body.vi-nav1{--nav-row:64px}
+  html body #topnav .tab-btn,html body.vi-nav1t #topnav .tab-btn{height:44px!important;padding:0 7px!important;gap:6px;letter-spacing:.04em!important;font-size:11.5px!important}
+  html body #topnav .tab-btn .vi-ic.ti{width:22px!important;height:22px!important}
+}
+@media(min-width:1280px){
+  body{--r1:56px;--r2:60px}
+  html body.vi-nav1{--nav-row:72px}
+  html body #topnav .tab-btn,html body.vi-nav1t #topnav .tab-btn{height:48px!important;padding:0 9px!important;gap:8px;letter-spacing:.05em!important;font-size:12.5px!important}
+  html body #topnav .tab-btn .vi-ic.ti{width:24px!important;height:24px!important}
+}
+/* E24: the Assets sub-menu stays pinned under the header while the page scrolls (nothing above it may set overflow) */
+#assets-page .subtab-nav{position:sticky;top:var(--vi-hdr-h,60px);z-index:400;background:var(--bg);border-bottom:1px solid var(--line);margin:0 -20px 12px;padding:8px 20px}
+@media(min-width:600px) and (max-width:1099px){   /* tablet: one row of six, icon over label; the total drops to a slim line beneath */
+  html #assets-page .subtab-nav{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+  html #assets-page .subtab-nav .subtab-btn{flex-direction:column;gap:3px;padding:7px 3px!important;min-height:44px}
+  html #assets-page .subtab-btn .vi-ic.sti{width:26px;height:26px;--vi-sw:1.25;opacity:1}
+  html #assets-page .subtab-nav>div[style*="margin-left:auto"]{padding:0;font-size:max(.66rem,var(--vi-fs-2))}
+}
+@media(max-width:599px){   /* phone: one row of six icons, 44 px targets; the name is the aria-label / long-press title */
+  #assets-page{padding-left:12px!important;padding-right:12px!important}
+  html #assets-page .subtab-nav{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px!important;margin:0 -12px 10px;padding:4px 8px}
+  html #assets-page .subtab-nav .subtab-btn{min-width:44px;height:44px;padding:0!important;justify-content:center!important}
+  #assets-page .subtab-btn>span,#assets-page .subtab-nav>div[style*="margin-left:auto"]{display:none!important}
+  html #assets-page .subtab-btn .vi-ic.sti{width:30px;height:30px;--vi-sw:1.25;opacity:1}   /* E24b: bigger and crisper, the detail (fill, dotted ring, accents) reads at 30 px */
+}
+html body #left-sidebar{top:var(--vi-hdr-h,60px)!important}
+@media(min-width:1100px){   /* E24b: desktop sub-menu icons are 24 px and the buttons keep a 44 px target */
+  html #assets-page .subtab-btn .vi-ic.sti{width:24px;height:24px;--vi-sw:1.25;opacity:1}
+  html #assets-page .subtab-nav .subtab-btn{min-height:44px}
+}
+/* type floor (Pedro, 3 Nov): sidebar labels, crowdfund small labels and the USP / PRO pills are at least 10.5 px; the crowdfund close is a 44 px tap */
+html body .sb-label,html body .sb-field-lbl,html body #vi-campaign-modal .vi-camp-eyebrow,html body #vi-campaign-modal .vi-camp-stat-lbl,html body #vi-campaign-modal .vi-camp-tier-badge{font-size:10.5px}
+html body #topnav .vi-usp,html body #topnav .vi-pro{font-size:10.5px!important}
+@media(min-width:600px) and (max-width:1023px){html body #topnav .vi-usp,html body #topnav .vi-pro{top:-2px;padding:0 2px;letter-spacing:.02em}}   /* icon-only tabs are 44 px wide: the 10.5 px pill sits clear of the icon */
+html body #vi-campaign-modal .vi-camp-close{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+</style>

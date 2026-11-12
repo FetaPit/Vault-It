@@ -1,3 +1,4 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));
@@ -6,7 +7,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:1,name:'Card',original:2500,balance:2000,rate:20,min:60,type:'credit'}]}));};
 (async()=>{
   const b=await chromium.launch(); const errs=[];
-  const open=async(w,h,mob)=>{const ctx=await b.newContext({viewport:{width:w,height:h},isMobile:!!mob,hasTouch:!!mob});const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));await p.addInitScript(seed);await p.goto('file:///home/user/Vault-It/index.html');await p.waitForTimeout(2000);await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});await p.evaluate(()=>showTab('overview'));await p.waitForTimeout(900);return p;};
+  const open=async(w,h,mob)=>{const ctx=await b.newContext({viewport:{width:w,height:h},isMobile:!!mob,hasTouch:!!mob});const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));await p.addInitScript(seed);await p.goto(require('./lib/vi').FILE_URL);await p.waitForTimeout(2000);await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});await p.evaluate(()=>showTab('overview'));await p.waitForTimeout(900);return p;};
   let p=await open(1600,900);
   await p.evaluate(()=>{if(window.nw3d)nw3d.setMain('graph',true);nwMore('goals');}); await p.waitForTimeout(300);   // goals and snapshots fold into the net worth tile, opened by its Goals button (v0.7 UI round 2)
   const g=await p.evaluate(()=>{const r=id=>document.querySelector(id).getBoundingClientRect();const c=document.getElementById('nwChart').closest('.ov-chart-card').getBoundingClientRect(),cb=(document.getElementById('nw3d-trk-card')||document.getElementById('nwChart').closest('.ov-chart-card')).getBoundingClientRect(),ms=r('#ov-ms-card'),road=r('#fire-roadmap-card'),nwh=document.getElementById('nwh-mini-wrap').closest('.ov-chart-card').getBoundingClientRect();
@@ -16,8 +17,7 @@ const seed=()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem
   ok(g.msIn&&g.msTop>=g.cvBottom-1,'milestone targets open inside the net worth tile, under the chart (v0.7 UI round 2)');
   ok(g.roadTop>g.msBottom,'roadmap comes after the milestone targets');
   ok(Math.abs(g.roadW-g.chartW)<2&&Math.abs(g.roadLeft-g.chartLeft)<2,'roadmap is exactly as wide as the chart ('+Math.round(g.roadW)+' vs '+Math.round(g.chartW)+')');
-  const cf=await p.evaluate(()=>{const s=document.querySelector('#cf-sankey svg');const r=s.getBoundingClientRect();return{h:r.height,vh:innerHeight};});
-  ok(cf.h<=cf.vh-100,'cash-flow diagram fits on one screen ('+Math.round(cf.h)+'px high in a '+cf.vh+'px window)');
+  // v0.9.1 E4: the dashboard has no flow diagram any more; the Budget diagram fit is checked in test_sankey_fit
   const fs=await p.evaluate(()=>({row:parseFloat(getComputedStyle(document.querySelector('.ov-sum-row')).fontSize),tot:parseFloat(getComputedStyle(document.querySelector('.ov-sum-total')).fontSize),icon:document.querySelectorAll('.ov-sum-ic svg').length,col:[...document.querySelectorAll('.ov-sum')].map(e=>getComputedStyle(e).borderLeftColor)}));
   console.log(JSON.stringify(fs)); ok(fs.row>=12&&fs.tot>=20,'summary text is larger ('+fs.row.toFixed(1)+'px rows, '+fs.tot.toFixed(1)+'px totals)'); ok(fs.icon===3&&new Set(fs.col).size===3,'each summary has an icon and its own colour');
   const own=await p.evaluate(()=>({cards:document.querySelectorAll('#ov-own-card .ov-sum').length,inOne:!document.querySelector('.ov-sum.ov-chart-card')}));

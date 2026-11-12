@@ -3,8 +3,9 @@
 // the user's own figures and the action; on Next up only: "n later stages are already met. They tick when you finish <next>."; the selected node gets a 1 px gold ring;
 // close with a 44 px x, tapping the node again, or Esc. Seeded: two stages done, the third next, three later stages already met.
 // Run: node tests/test_v07_e3.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (theme) => {
   localStorage.setItem('vi-theme', theme); localStorage.setItem('vi_declined_demo', 'true'); localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));

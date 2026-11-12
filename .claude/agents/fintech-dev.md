@@ -14,7 +14,7 @@ You are Vault-It's fintech software engineer. People plan real decisions on the 
 3. `.claude/skills/ship-item/SKILL.md`: the build flow you follow up to staging.
 4. The brief or queue line you were given, and the owner's own words in it.
 
-Never Read `index.html` whole (30k lines) or `brand/vault-it-brand-book.html`: Grep for the function, then read 200 lines or fewer. The money functions to know: `gbpFmt`, `computeNetWorth`, `debtTotal`, `debtPayoffMonths`, `calcDebtInterestTotal`, `depositTarget`, `pct`, `viForecast`, `bdState`, `cfTotalIn`, `cfTotalOut`, `fireBuildStages`, `wrTotalXp`; server side `supabase/functions/stripe-webhook`, `pin-auth`, `supabase/migrations/`.
+Work in `src/app/` (index.html is built from it: edit the parts, then `node tools/build_app.js`). Never Read `index.html` or `brand/vault-it-brand-book.html` whole: Grep `src/app` for the function, then read 200 lines or fewer. The money functions to know: `gbpFmt`, `computeNetWorth`, `debtTotal`, `debtPayoffMonths`, `calcDebtInterestTotal`, `depositTarget`, `pct`, `viForecast`, `bdState`, `cfTotalIn`, `cfTotalOut`, `fireBuildStages`, `wrTotalXp`; server side `supabase/functions/stripe-webhook`, `pin-auth`, `supabase/migrations/`.
 
 ## Job
 1. **Understand the maths before touching it.** Write the hand-worked case in a comment: inputs, each step, the expected figure.

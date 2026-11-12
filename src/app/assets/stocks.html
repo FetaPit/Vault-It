@@ -1,0 +1,38 @@
+    <!-- ── Stocks & Funds subtab ─────────────────────────────────────── -->
+    <div class="subtab-panel" id="assets-stocks">
+      <div style="display:flex;justify-content:flex-end;margin:10px 0 2px">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:max(.68rem,var(--vi-fs-2));color:var(--purple)">Stocks &amp; Funds: <span id="subtab-total-stocks" style="font-weight:700">£0</span></span>
+      </div>
+      <div class="stk-wrap">
+        <div class="stk-pies" id="stk-pies"></div>
+        <div class="stk-main" id="stk-main"></div>
+        <div class="stk-card" id="stk-chart"></div>
+        <div class="stk-status" id="stk-status"></div>
+        <div class="stk-card">
+          <div class="stk-hd">
+            <span>Holdings</span>
+            <span class="stk-actions">
+              <button class="stk-btn" onclick="stkRefresh(false)" title="Fetch the latest prices">↻ Refresh prices</button>
+              <button class="stk-btn" onclick="stkShotStart()" title="Upload screenshots of your pie or portfolio, no platform connection needed">📷 Import screenshots</button><span id="stk-shot-allow" class="stk-allow" aria-live="polite"></span>
+              <button class="stk-btn" onclick="document.getElementById('stk-csv').click()" title="Import holdings from a CSV (Trading 212 history export or ticker,units,avg cost)">⇪ Import CSV</button>
+            </span>
+          </div>
+          <div id="stk-holdings"></div>
+          <div class="stk-add">
+            <div style="position:relative"><input type="text" id="stk-sym" class="al-inp" style="width:100%" placeholder="Search a fund, ETF or share by name, ticker or ISIN" autocomplete="off" oninput="stkSuggest(this.value)" onkeydown="if(event.key==='Enter')stkAdd()"><div id="stk-suggest" class="stk-suggest"></div></div>
+            <input type="number" id="stk-units" class="al-inp" placeholder="Units" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
+            <input type="number" id="stk-amt" class="al-inp" placeholder="…or £ held" min="0" step="any" title="Don't know the units? Enter the £ value you hold and the units are worked out from the live price" onkeydown="if(event.key==='Enter')stkAdd()">
+            <input type="number" id="stk-cost" class="al-inp" placeholder="Cost per unit £" title="What you paid for one unit, in £. Leave empty and the price when you add it is used" min="0" step="any" onkeydown="if(event.key==='Enter')stkAdd()">
+            <button class="btn-add-data" onclick="stkAdd()">+ Add holding</button>
+          </div>
+          <div class="stk-note">UK-listed funds &amp; ETFs end in <b>.L</b> (VUSA.L, VWRL.L). US shares are plain (AAPL, MSFT). Or just <b>search by name or ISIN</b> and pick the fund. Prices convert to £ automatically. Edit units, cost or price any time. Everything here counts towards your net worth.</div>
+          <input type="file" id="stk-csv" accept=".csv,text/csv" style="display:none" onchange="stkImportCSV(this)">
+          <input type="file" id="stk-shot" accept="image/*" multiple style="display:none" onchange="stkShotPicked(this)">
+        </div>
+        <div class="stk-card" id="stk-alloc"></div>
+        <div class="stk-note" style="text-align:center">Not financial advice · Prices may be delayed · Past performance ≠ future results</div>
+      </div>
+    </div>
+  </div>
+</div>
+

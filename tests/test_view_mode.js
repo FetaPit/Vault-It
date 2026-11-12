@@ -8,8 +8,9 @@
 //   5. the choice is in vi_settings (synced); Settings shows it; the welcome step starts new accounts Simplified or Advanced as picked
 //   6. phones: the five KPIs in two rows (three, then two); the Sankey bands animate, and stop with reduced motion; no sideways scroll
 // Run: node tests/test_view_mode.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const seed = (o) => {
   localStorage.setItem('vi-theme', o.theme || 'dark'); localStorage.setItem('vi_declined_demo', 'true');
@@ -74,10 +75,10 @@ const seed = (o) => {
   ok(ha, 'back to Advanced: the level card, progress and History return');
   await p.context().close();
 
-  // ── 5. welcome step: new accounts start Simplified, or Advanced if picked ──
+  // ── 5. welcome: new accounts start Simplified (the view picker moved to Settings, owner 10 Nov 2026) ──
   p = await open({});
-  const w = await p.evaluate(() => { localStorage.removeItem('vi_settings'); viSettings = {}; const st = {}; wStep2Skip(); st.def = viSettings.view; wPickView('adv'); wStep2Skip(); st.adv = viSettings.view; st.pressed = document.querySelector('.w-view-opt[data-v="adv"]').getAttribute('aria-pressed'); return st; });
-  ok(w.def === 'simple' && w.adv === 'adv' && w.pressed === 'true', 'welcome: Simplified by default, Advanced when picked (' + JSON.stringify(w) + ')');
+  const w = await p.evaluate(() => { localStorage.removeItem('vi_settings'); viSettings = {}; const st = {}; wStep2Skip(); st.def = viSettings.view; wPickView('adv'); wStep2Skip(); st.adv = viSettings.view; st.picker = !!document.querySelector('#welcome-overlay .w-view-opt'); return st; });
+  ok(w.def === 'simple' && w.adv === 'adv' && !w.picker, 'welcome: Simplified by default; the view is chosen in Settings, not the welcome (10 Nov 2026) (' + JSON.stringify(w) + ')');
   await p.context().close();
 
   // ── 6. phone, Simplified ──

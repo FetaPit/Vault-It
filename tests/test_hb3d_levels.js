@@ -1,5 +1,6 @@
 // Levels on the 3D house builder (the brand build is the only one; its finer checks are in tests/test_hb_brand.js).
 // Level 2 = paying the mortgage (the whole house as the Level 1 hologram, the share you own laid in colour, gold tag MORTGAGE x% PAID / YOU OWN y%); Level 3 is locked under Pro.
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const routeThree=require('./three_route');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
@@ -9,7 +10,7 @@ const seedFn=(o,pro)=>`(function(){if(localStorage.getItem('ht3'))return;localSt
   const settle=async p=>{await p.waitForTimeout(300);await p.waitForFunction(()=>hb3dState().settled,null,{timeout:20000}).catch(()=>{});};
   const open=async(o,opt)=>{opt=opt||{};const ctx=await b.newContext({viewport:{width:opt.w||1280,height:opt.h||900},hasTouch:!!opt.touch,reducedMotion:'reduce'}); await routeThree(ctx); const p=await ctx.newPage();
     p.on('pageerror',e=>errs.push(e.message)); p.on('console',m=>{if(m.type()==='error'&&!/Failed to load|net::/.test(m.text()))errs.push('console: '+m.text());});
-    await p.addInitScript(seedFn(o,opt.pro)); await p.goto('file:///home/user/Vault-It/index.html'); await p.waitForTimeout(1500);
+    await p.addInitScript(seedFn(o,opt.pro)); await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1500);
     await p.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'}); await p.evaluate(()=>showTab('house')); await settle(p); return p;};
   const L2={saved:37500,target:250000,houseType:'terraced',houseMode:'purchased',depositPct:15,mortgageBalance:191250,valuation:250000,purchase:{price:250000,deposit:37500,depositTarget:37500,date:'2026-10-01'},deposits:[{amount:37500,date:'01/10/2026'}],prices:{terraced:250000},calc:{over:300,_set:true,price:250000,dep:37500,bal:212500,val:250000}};
   // ── Level 2: equity clip ──

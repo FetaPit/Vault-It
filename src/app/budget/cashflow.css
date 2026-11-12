@@ -1,0 +1,38 @@
+<style id="vi-v3-css">
+/* ── Cash flow v3 ── */
+.cf-legend{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 6px;font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));color:var(--t2)}
+.cf-legend span{display:inline-flex;align-items:center;gap:6px}
+.cf-legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.cf-legend em{font-style:normal;color:var(--t3)}
+.cf-scroll{overflow-x:auto;border-radius:8px;background:rgb(var(--panel-rgb) / .45);-webkit-overflow-scrolling:touch}
+.cf-scroll svg{display:block}
+.cf-scroll svg.cf-1to1{width:960px!important;min-width:960px!important;max-width:none!important;height:auto!important}   /* phones: 1:1 (v0.8 type scale) */
+/* v0.8 (owner, 2 Nov): "make the scroll bar larger and more obvious at the bottom, and add a scroll bar at the top as well".
+   The flow charts hide the thin native bar and get two rails, one above and a bigger one below, synced with the chart and draggable by touch or mouse. */
+.cf-scroll{scrollbar-width:none}
+.cf-scroll::-webkit-scrollbar{display:none}
+.cf-rail{position:relative;height:20px;margin:0;cursor:pointer;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.cf-rail[hidden]{display:none}
+.cf-rail.cf-rail-t{margin-bottom:-1px}
+.cf-rail.cf-rail-b{margin-top:2px}
+.cf-rail::before{content:"";position:absolute;left:0;right:0;top:5px;height:10px;border-radius:5px;background:var(--track)}
+.cf-rail .cf-thumb{position:absolute;top:7px;left:0;height:6px;min-width:40px;border-radius:5px;background:rgb(var(--teal-rgb) / .5);cursor:grab;transition:top .15s,height .15s,background .15s}
+.cf-rail:hover .cf-thumb,.cf-rail.drag .cf-thumb{top:5px;height:10px;background:rgb(var(--teal-rgb) / .8)}
+.cf-rail.drag .cf-thumb{cursor:grabbing}
+@media (prefers-reduced-motion:reduce){.cf-rail .cf-thumb{transition:none}}
+html[data-theme="light"] .cf-chip{--teal:#44C0B9;--green:#3ECF8E;--green2:#3FB585;--coral:#E5535F;--salmon:#FFA38A;--amber:#F59E0B;--yellow:#F5DC4A}
+html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Daylight so the paper does not show through (AA for the coral amounts); the chips stay black in Daylight, so their text keeps the Night colours */
+.cf-sub{font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:800;letter-spacing:.16em;color:var(--t3);margin:14px 0 6px}
+.cf-empty{padding:34px 12px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:max(.6rem,var(--vi-fs-2));color:var(--t3)}
+.cf-presets{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.cf-chip{font-family:'Syne',sans-serif;font-size:max(.46rem,var(--vi-fs-1));font-weight:700;padding:3px 8px;border-radius:99px;cursor:pointer;background:transparent;border:1px solid;letter-spacing:.03em;transition:background .15s}
+.cf-chip:hover{background:rgb(var(--ink-rgb) / .07)}
+.cf-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;cursor:pointer;border:0;padding:0;box-shadow:0 0 0 2px rgba(255,255,255,.06)}
+.cf-row{display:flex;align-items:center;gap:8px}
+.cf-row .cf-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cf-edit{background:none;border:none;color:var(--t3);cursor:pointer;font-size:max(.7rem,var(--vi-fs-3));padding:0 3px}
+.cf-edit:hover{color:var(--em)}
+.cf-nudge{margin:8px 0;padding:9px 12px;background:rgb(var(--amber-rgb) / .08);border:1px solid rgb(var(--amber-rgb) / .3);border-radius:8px;font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);line-height:1.5}
+.cf-nudge b{color:var(--amber)}
+.fr-legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:6px 4px 8px;font-family:'Share Tech Mono',monospace;font-size:max(.48rem,var(--vi-fs-1));color:var(--t2)}
+.fr-legend span{display:inline-flex;align-items:center;gap:6px}

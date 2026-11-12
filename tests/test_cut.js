@@ -1,10 +1,11 @@
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
 (async()=>{
   const b=await chromium.launch(); const page=await (await b.newContext({viewport:{width:900,height:1000}})).newPage(); const errs=[]; page.on('pageerror',e=>{errs.push(e.message);console.log('PAGEERR',e.message.slice(0,150));});
   await page.addInitScript(()=>{if(localStorage.getItem('pos_debt1'))return;localStorage.setItem('vi_declined_demo','true');localStorage.setItem('vi_session',JSON.stringify({email:'t@t.com',expiry:Date.now()+1e10}));localStorage.setItem('vi_user',JSON.stringify({name:'T',email:'t@t.com'}));
     localStorage.setItem('pos_debt1',JSON.stringify({debts:[{id:1,name:'Barclaycard Platinum',original:2000,balance:1100,rate:21.9,min:40,type:'credit'},{id:2,name:'Monzo Flex',original:500,balance:500,rate:0,min:20,type:'credit'}]}));});
-  await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+  await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
   await page.addStyleTag({content:'#welcome-overlay,#login-overlay{display:none!important}'});
   await page.evaluate(()=>showTab('debt')); await page.waitForTimeout(700);
   const sel='.cc3[data-id="1"]';

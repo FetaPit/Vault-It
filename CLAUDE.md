@@ -3,7 +3,7 @@
 UK personal-finance single-file PWA. Owner: Pete (FetaPit). App: **https://app.vault-it.co**, landing page: https://vault-it.co (Cloudflare — see `docs/CUTOVER.md` for the state of the move; the older address https://fetapit.github.io/Vault-It/ is GitHub Pages).
 
 ## Where things are
-- `index.html` — the whole app (CSS, JS, markup). The 3D House Builder engine is embedded from `src/hb3d/*` by `node tools/build_hb3d.js` (re-run after editing `src/hb3d`).
+- `index.html` — the whole app (CSS, JS, markup), served as one page but **built** from about 120 parts in `src/app/` (one folder per tab plus `shell/`): edit `src/app/*`, run `node tools/build_app.js`, commit both; never edit `index.html` directly (`docs/APP_SOURCE.md`). The 3D House Builder engine part is generated from `src/hb3d/*` by `node tools/build_hb3d.js` (re-run after editing `src/hb3d`).
 - `landing.html` = the sign-up page served at vault-it.co and vault-it.co/sign-up; its confirm / thanks / unsubscribe pages and images are in `site/`; beta list = `waitlist-join` function + migration 009 (double opt-in). Offer, prices and funnel decisions: `docs/OFFER_AND_PRICING.md` (research with sources in `docs/research/`). `recover.html`.
 - `supabase/functions/*` — Deno edge functions (`pin-auth`, `send-auth-email`, `waitlist-join`, `waitlist-welcome` (the older single-step join, kept until the double opt-in page is live), `portfolio-vision`, `stock-quotes`, `house-3d`); `supabase/migrations/*.sql`; `supabase/functions/README.md`.
 - `tests/` — Playwright/logic tests (`tests/README.md`). `docs/` — specs, `BETA_RUNBOOK.md`, `TESTER_GUIDE.md`.
@@ -26,7 +26,7 @@ bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scri
 - Run everything before a release, plus `node tools/build_hb3d.js` if `src/hb3d` changed. Screenshots land in `shots/` (git-ignored build output — do not commit them).
 
 ## Supabase and secrets
-- Never commit keys. The publishable key in `index.html` is public by design; the service-role key, `RESEND_API_KEY`, `PIN_PEPPER` (never change it — every PIN would stop working), `ANTHROPIC_API_KEY` live only in Supabase secrets.
+- Never commit keys. The publishable key in `index.html` (`src/app/auth/auth.js`) is public by design; the service-role key, `RESEND_API_KEY`, `PIN_PEPPER` (never change it — every PIN would stop working), `ANTHROPIC_API_KEY` live only in Supabase secrets.
 - Changes to the shared production database or functions (apply a migration, deploy a function, set a secret) need the owner's explicit yes first. Apply migrations **before** deploying functions that use them (`send-auth-email` / `pin-auth` fail open without migration 008). Check what is applied with the Supabase connector's `list_migrations` rather than assuming.
 - The GitHub Action "Deploy Supabase Edge Functions" needs a valid `SUPABASE_ACCESS_TOKEN` repo secret; otherwise deploy with the Supabase connector or `supabase functions deploy <name> --no-verify-jwt`.
 
@@ -49,7 +49,7 @@ bash scripts/run-tests.sh [all|server|browser|<test name>...]   # e.g. bash scri
 - Before starting any task and before any release, run the `queue-keeper` agent with the task; obey a STOP or ADD. "Release" is a queue item, not a reset of the queue.
 - Laptop, phone and cloud sessions share the queue: claim an item (`[~] (laptop)` / `[~] (cloud)`) and push the claim before building; one item per session and branch; releases only from the laptop. Full rules: `docs/MULTI_SESSION.md`.
 - Session titles: once the purpose is clear, rename the session to `Vault-It · <Build|Ops|Setup|Research|Marketing>: <purpose>` (cloud: `set_session_title`; CLI: `/rename`), again when the purpose changes; name child sessions the same way.
-- Every item that changes app code (`index.html`, `landing.html`, `src/`, `site/`, `worker/`, `supabase/`) goes through the `ship-item` skill: intent card from the owner's own words, failing test first, named tests, `node tools/shot.js` element shots, then the read-only `rollout-qc` agent. `.claude/hooks/qc-gate.sh` blocks a commit of staged app code without its PASS. Docs, tests and queue commits pass straight through.
+- Every item that changes app code (`src/app/` and so `index.html`, `landing.html`, `src/`, `site/`, `worker/`, `supabase/`) goes through the `ship-item` skill: intent card from the owner's own words, failing test first, named tests, `node tools/shot.js` element shots, then the read-only `rollout-qc` agent. `.claude/hooks/qc-gate.sh` blocks a commit of staged app code without its PASS. Docs, tests and queue commits pass straight through.
 
 ## Brand rollout
 
@@ -63,14 +63,14 @@ A new brand is being applied. Design files are in `brand/`. Open `brand/vault-it
 - Do not touch Supabase, secrets, migrations or the edge functions.
 - No new outside hosts. Fonts: Syne, DM Sans, Share Tech Mono only.
 - British English, sentence case, **no em dashes**. Keep "Not regulated by the FCA. Not financial advice." visible. Respect `prefers-reduced-motion`. Pages must never scroll sideways.
-- Tagline: **Get out of the red and into your home.** Name is written **Vault-It** with a hyphen (owner, 30 Oct 2026: easy to type, matches vault-it.co). In the logo wordmark the hyphen is drawn as the brand brick.
+- Tagline: **Get out of the red and into your home.** From 4 Nov 2026 (owner) every new comm and the pitch deck draw **red** with a thin neon red stroke and **home** with a thin gold gradient neon stroke: `brand/vault-it-tagline-neon.css`. Name is written **Vault-It** with a hyphen (owner, 30 Oct 2026: easy to type, matches vault-it.co). In the logo wordmark the hyphen is drawn as the brand brick. **Owner, 7 Nov 2026:** in every wordmark and logo lockup, **-It** is teal and **Vault** takes the text colour (decks, comms, emails, signatures, new assets); and the pitch deck draws the tagline with fills instead of the neon stroke: **red** dark red (`#C8202A`), **your** teal, **home** gold. Other comms keep the neon stroke until the owner says otherwise.
 - One phase per session. Read only that phase's part of `brand/vault-it-brand-handover.md` (list its sections with `grep -n '^#' brand/vault-it-brand-handover.md`). Never Read `brand/vault-it-brand-book.html` (227 KB) whole: grep it.
 
 ## Token budget (full playbook: `docs/CLAUDE_EFFICIENCY.md`; never trade a test, screenshot or rule for tokens)
 - One queue item per fresh session, started from its brief; `/handoff` when it is done. Independent items can run as parallel sessions on their own branches, merged one at a time.
 - Cloud sessions keep the model they were created with (`opusplan` is CLI only): Sonnet for building, Opus for planning, 3D engine, money logic and hard bugs. Never switch model mid-session.
-- `index.html` is 25k lines; `Vault-It_v0.3_Alpha.html` is a legacy build (ignore unless asked). Never Read either without `offset`/`limit` (200 lines or fewer). A line-numbered map is added at session start (`.claude/hooks/map.sh`); otherwise Grep first. Don't re-read a file you just edited.
-- `index.html` between `<<HB3D_ENGINE` and `HB3D_ENGINE>>` is generated: edit `src/hb3d/*`, then `node tools/build_hb3d.js`.
+- `index.html` (about 33k lines) is build output: work in `src/app/` (the session-start map lists the parts; `node tools/build_app.js --where N` maps an `index.html` line to its part). `Vault-It_v0.3_Alpha.html` is a legacy build (ignore unless asked). Never Read `index.html`, the legacy file or a part over 800 lines without `offset`/`limit` (200 lines or fewer). Don't re-read a file you just edited.
+- `src/app/hb3d/engine.generated.html` (the `<<HB3D_ENGINE` block) is generated: edit `src/hb3d/*`, then `node tools/build_hb3d.js`.
 - Run the tests you need by name (`bash scripts/run-tests.sh test_x`). For the full suite, push and read CI with `mcp__github__actions_list` / `get_job_logs` (failing job only); a release still needs it green on the exact commit. Read failures from `/tmp/vaultit-test-logs` rather than pasting whole runs.
 - Screenshots: shoot the changed element at 390 and 1100 px, Night and Daylight; open only the images needed to judge the change, send the set to the owner with `SendUserFile`.
 - Trim command output (`| tail -40`, `| grep`, `cut -c1-200`). Use `rtk` if installed.

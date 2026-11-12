@@ -3,7 +3,7 @@
 // The database side (stripe_apply: once only, stale events, founders, testers) is tested on a real Postgres in test_011.mjs.
 const fs = require('fs'); const esbuild = require('esbuild'); const crypto = require('crypto');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-let src = fs.readFileSync('/home/user/Vault-It/supabase/functions/stripe-webhook/index.ts', 'utf8');
+let src = fs.readFileSync(require('path').join(require('./lib/vi').ROOT, 'supabase/functions/stripe-webhook/index.ts'), 'utf8');
 src = src.replace(/import \{ createClient \} from [^\n]+\n/, 'const createClient=globalThis.__createClient;\n');
 const js = esbuild.transformSync(src, { loader: 'ts', format: 'cjs' }).code;
 

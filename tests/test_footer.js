@@ -1,23 +1,24 @@
 // Footer disclaimer + privacy/terms links: exact approved wording in the app (#app-footer) and the landing footer, no em dashes,
 // type floors (10 px, FCA line 11 px), the fixed footer's height drives --footer-h so the page and toasts clear it, no sideways scroll.
 // Run: node tests/test_footer.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright');
 const fs = require('fs');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const FCA = 'Not regulated by the FCA. Not financial advice.';
 const DISC = 'Vault-It helps you track and plan your money. Forecasts, dates and values are estimates from what you enter and public prices, and may be wrong. Speak to a regulated adviser before big money decisions.';
-const land = fs.readFileSync('/home/user/Vault-It/landing.html', 'utf8');
+const land = fs.readFileSync(require('path').join(require('./lib/vi').ROOT, 'landing.html'), 'utf8');
 const lf = land.slice(land.indexOf('<footer>'), land.indexOf('</footer>'));
 const lt = lf.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 ok(lt.includes(FCA) && lt.includes(DISC), 'landing footer carries the approved wording, exactly');
-ok(/href="https:\/\/app\.vault-it\.co\/\?privacy=1">Privacy notice</.test(lf) && /href="https:\/\/app\.vault-it\.co\/\?terms=1">Beta terms</.test(lf), 'landing footer links Privacy notice and Beta terms');
+ok(/href="\/privacy">Privacy notice</.test(lf) && /href="\/terms">Beta terms</.test(lf), 'landing footer links the public Privacy notice and Beta terms pages (vault-it.co/privacy, /terms; 7 Nov 2026)');
 ok(!/[—–]/.test(lt) && !/&mdash;|&ndash;/.test(lf), 'landing footer has no em or en dashes');
 (async () => {
   const b = await chromium.launch();
   for (const [w, h] of [[390, 800], [1100, 800]]) {
     const ctx = await b.newContext({ viewport: { width: w, height: h } }); const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
     await page.addInitScript(() => { localStorage.setItem('vi_declined_demo', 'true'); });
-    await page.goto('file:///home/user/Vault-It/index.html'); await page.waitForTimeout(1500);
+    await page.goto(require('./lib/vi').FILE_URL); await page.waitForTimeout(1500);
     const r = await page.evaluate(() => {
       const f = document.getElementById('app-footer'); const txt = f.textContent.replace(/\s+/g, ' ');
       const btn = t => [...f.querySelectorAll('button')].find(x => x.textContent.trim() === t);

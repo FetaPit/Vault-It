@@ -1,12 +1,15 @@
 {
   "name": "vault-it",
   "private": true,
+  "license": "UNLICENSED",
   "version": "0.0.0",
-  "description": "Vault\u00b7It is a single-file app with no build step. This file only declares the tooling the tests use.",
+  "description": "Vault-It is a single-file app: index.html is joined from src/app by tools/build_app.js and committed. This file only declares the tooling the tests and builds use.",
   "scripts": {
     "test": "bash scripts/run-tests.sh all",
     "test:server": "bash scripts/run-tests.sh server",
     "test:browser": "bash scripts/run-tests.sh browser",
+    "build:app": "node tools/build_app.js",
+    "check:app": "node tools/build_app.js --check",
     "build:hb3d": "node tools/build_hb3d.js",
     "build:site": "node tools/build_site.js",
     "dev:site": "npm run build:site && wrangler dev",

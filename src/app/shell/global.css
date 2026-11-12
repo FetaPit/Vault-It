@@ -1,0 +1,99 @@
+<style>
+/* ═══════════════════════════════════════════════════════
+   PURPOSEOS GLOBAL — 2-tab build: Overview + House
+═══════════════════════════════════════════════════════ */
+
+:root,[data-theme="light"] .scene,[data-theme="light"] .inv-stage,[data-theme="light"] .nw3d-stage,[data-theme="light"] .i3d-live,[data-theme="light"] .i3d-badge,[data-theme="light"]:not([data-hdr="paper"]) #topnav,[data-theme="light"] #pwa-install-banner,[data-theme="light"] #app-footer {
+  /* old names, kept as aliases of the brand tokens for one release */
+  --c1: var(--panel); --c2: var(--surf2); --c3: var(--slate); --c4: var(--line2);
+  --em: var(--teal); --em2: var(--teal); --em3: var(--faint); --dp: var(--teal-deep);
+  --go: var(--brass); --go2: var(--brass); --gr: var(--green); --re: var(--red);
+  --tx: var(--text); --t2: var(--muted); --t3: var(--lock);
+  --bd: rgb(var(--teal-rgb) / .14); --bd2: rgb(var(--teal-rgb) / .22); --td: rgb(var(--teal-rgb) / .06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+/* body must GROW with its content (min-height, not height) — otherwise the sticky top nav's containing
+   block ends after one screenful and the whole nav scrolls away on long tabs. */
+body { min-height: 100%; padding-bottom: var(--footer-h, 30px); }  /* room above the fixed footer */
+html, body { background: var(--bg); color: var(--tx); font-family: var(--font-body); }
+
+/* ── TOP NAV ── */
+#topnav {
+  display: flex; align-items: center; gap: 0;
+  height: 48px; background: rgb(var(--panel-rgb) / .97);
+  border-bottom: 1px solid var(--bd);
+  position: sticky; top: 0; z-index: 100;
+  padding: 0 16px;
+}
+.logo {
+  font-family: 'Syne', sans-serif; font-size: .85rem; font-weight: 800;
+  color: var(--em); letter-spacing: -.01em; margin-right: 20px; flex-shrink: 0;
+}
+.logo span { color: var(--t3); }
+.tab-btn {
+  padding: 0 18px; height: 48px; background: transparent; border: none;
+  font-family: 'Syne', sans-serif; font-size: max(.65rem,var(--vi-fs-0)); font-weight: 700;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--t3);
+  cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s;
+  flex-shrink: 0;
+}
+.tab-btn:hover { color: var(--tx); }
+.tab-btn.active { color: var(--em); border-bottom-color: var(--em); }
+
+/* ── TAB PANELS ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── COLLAPSIBLE LEFT SIDEBAR ── */
+#sidebar-toggle {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+  z-index: 200; width: 26px; height: 130px;
+  background: rgb(var(--teal-rgb) / .22); border: 1px solid rgb(var(--teal-rgb) / .5);
+  border-left: none; border-radius: 0 10px 10px 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background .2s, width .2s, box-shadow .2s;
+  flex-direction: column; gap: 6px;
+  box-shadow: 2px 0 16px rgb(var(--teal-rgb) / .18);
+}
+#sidebar-toggle:hover { background: rgb(var(--teal-rgb) / .38); width: 30px; box-shadow: 2px 0 24px rgb(var(--teal-rgb) / .35); }
+@keyframes sb-pulse {
+  0%,100% { box-shadow: 2px 0 16px rgb(var(--teal-rgb) / .18); }
+  50% { box-shadow: 2px 0 28px rgb(var(--teal-rgb) / .5), 0 0 18px rgb(var(--teal-rgb) / .18); }
+}
+#sidebar-toggle:not(.open) { animation: sb-pulse 2.8s ease-in-out infinite; }
+#left-sidebar {
+  position: fixed; left: -240px; top: 48px; bottom: 0; width: 240px;
+  background: rgb(var(--panel-rgb) / .97); border-right: 1px solid var(--bd);
+  z-index: 199; transition: left .25s ease; overflow-y: auto;
+  padding: 16px 14px 40px;
+}
+#left-sidebar.open { left: 0; }
+#sidebar-toggle.open { left: 240px; }
+/* the ledger (owner, 31 Oct): a wider side bar, icon, name and value on each line */
+#left-sidebar{width:min(320px,calc(100vw - 24px));left:calc(-1 * min(320px,calc(100vw - 24px)))}
+#left-sidebar.open{left:0}
+#sidebar-toggle.open{left:min(320px,calc(100vw - 24px))}
+.sb-ledger .sb-lg{display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:8px;padding:3px 0}
+.sb-ledger .sb-lg .ov-sum-ri{width:22px;height:22px}
+.sb-ledger .sb-lg .ov-sum-ri svg{width:16px;height:16px}
+.sb-ledger .sb-lg-n{grid-column:2/-1;font:400 max(.5rem,10px)/1.3 'DM Sans',sans-serif;color:var(--amber);margin-top:-2px}
+.sb-ledger .sb-lg-l{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 max(.62rem,var(--vi-fs-2))/1.3 'DM Sans',sans-serif}
+.sb-ledger .sb-val{font-family:'Share Tech Mono',monospace;font-size:max(.66rem,var(--vi-fs-2));color:var(--text)}
+.sb-ledger .sb-lg-h{margin-top:12px}
+.sb-section { margin-bottom: 16px; }
+.sb-label {
+  font-family: 'Syne', sans-serif; font-size: max(.46rem,var(--vi-fs-0)); font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--t3);
+  margin-bottom: 6px; padding-bottom: 4px;
+  border-bottom: 1px solid rgb(var(--teal-rgb) / .08);
+}
+.sb-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: max(.55rem,var(--vi-fs-1)); margin-bottom: 4px;
+}
+.sb-val { font-family: 'Share Tech Mono', monospace; color: var(--em); }
+.sb-bar-wrap { height: 4px; background: rgb(var(--ink-rgb) / .06); border-radius: 2px; margin: 3px 0 6px; }
+.sb-bar-fill { height: 100%; background: var(--em); border-radius: 2px; transition: width .4s; }
+

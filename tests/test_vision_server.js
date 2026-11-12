@@ -1,6 +1,6 @@
 const fs=require('fs'); const esbuild=require('esbuild');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
-let src=fs.readFileSync('/home/user/Vault-It/supabase/functions/portfolio-vision/index.ts','utf8');
+let src=fs.readFileSync(require('path').join(require('./lib/vi').ROOT, 'supabase/functions/portfolio-vision/index.ts'),'utf8');
 src=src.replace(/import \{ createClient \} from [^\n]+\n/,'const createClient=globalThis.__createClient;\n');
 const js=esbuild.transformSync(src,{loader:'ts',format:'cjs'}).code;
 let spent=0,cap=30,plan={is_pioneer:true,is_founder:false},anthropicCalls=0,lastBody=null,env={SUPABASE_URL:'http://x',SUPABASE_SERVICE_ROLE_KEY:'svc',ANTHROPIC_API_KEY:'sk-test'};

@@ -1,11 +1,12 @@
 // Round 3, items 5 to 7 (owner, 31 Oct 2026): on the Budget tab "Where your income flows" sits at the top, straight above the
-// income | spending split; the dashed divider is light teal and runs on from the flow chart's income block down between the columns;
+// income | spending split; the divider (solid since v0.9.1 round 2) is light teal and runs on from the flow chart's income block down between the columns;
 // a Flow | 3D switch shows the same budget in 3D as a tree map: one clean rectangle like the debt tree map, each colour group and each line an exact
 // rectangle filled with £100 blocks (a thinner last row shares the pounds left over); the income arrives as a teal pile on the left and slides right into place (owner,
 // 31 Oct evening); finished at once with reduced motion. The choice is kept per device.
 // Run: node tests/test_bd_flow3d.js   (VI_APP=file:///path/to/index.html to test another copy)
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const src = require('fs').readFileSync(__dirname + '/test_nw3d.js', 'utf8');
 const seed = eval('(' + src.slice(src.indexOf('const seed = (o) =>') + 'const seed = '.length, src.indexOf('// WCAG AA')).trim().replace(/;$/, '') + ')');
@@ -24,10 +25,10 @@ const EXP = [{ id: 3, name: 'Rent', amount: 700, type: 'ce' }, { id: 4, name: 'C
     let r = await p.evaluate(() => { const card = document.querySelector('.bd-sankey-card'), split = document.querySelector('.bd-split'), kids = [...document.querySelector('.bd-page').children];
       const bf = getComputedStyle(split, '::before'), af = getComputedStyle(card, '::after');
       return { order: kids.indexOf(card) < kids.indexOf(split) && kids.indexOf(card) <= 5, gap: Math.round(split.getBoundingClientRect().top - card.getBoundingClientRect().bottom),
-        before: { c: bf.borderLeftColor, s: bf.borderLeftStyle, top: parseFloat(bf.top), x: split.getBoundingClientRect().left + parseFloat(bf.left) }, after: { c: af.borderLeftColor, s: af.borderLeftStyle, x: card.getBoundingClientRect().left + parseFloat(getComputedStyle(card).borderLeftWidth) + parseFloat(af.left) }, teal: getComputedStyle(document.documentElement).getPropertyValue('--teal').trim() }; });
+        before: { c: bf.backgroundColor, s: (bf.borderLeftStyle === 'none' && parseFloat(bf.width) === 1.5) ? 'solid' : 'not solid 1.5 px', top: parseFloat(bf.top), x: split.getBoundingClientRect().left + parseFloat(bf.left) }, after: { c: af.backgroundColor, s: (af.borderLeftStyle === 'none' && parseFloat(af.width) === 1.5) ? 'solid' : 'not solid 1.5 px', x: card.getBoundingClientRect().left + parseFloat(getComputedStyle(card).borderLeftWidth) + parseFloat(af.left) }, teal: getComputedStyle(document.documentElement).getPropertyValue('--teal').trim() }; });
     ok(r.order, T + 'the income flow is at the top of the tab, above the income and spending columns');
     if (w >= 1000) {
-      ok(r.before.s === 'dashed' && r.after.s === 'dashed' && r.before.c === r.after.c && Math.abs(r.before.x - r.after.x) < 1.5, T + 'one dashed divider, the same colour and position in the flow chart and between the columns (' + r.before.c + ' at x ' + r.before.x.toFixed(1) + ' / ' + r.after.x.toFixed(1) + ')');
+      ok(r.before.s === 'solid' && r.after.s === 'solid' && r.before.c === r.after.c && Math.abs(r.before.x - r.after.x) < 1.5, T + 'one solid 1.5 px divider (v0.9.1 round 2 R11, was dashed), the same colour and position in the flow chart and between the columns (' + r.before.c + ' at x ' + r.before.x.toFixed(1) + ' / ' + r.after.x.toFixed(1) + ')');
       ok(r.before.top <= -r.gap, T + 'the divider reaches up across the gap to the flow chart (top ' + r.before.top + ', gap ' + r.gap + ')');
       const lum = await p.evaluate((c) => { const m = c.match(/[\d.]+/g).map(Number); const v = /color\(srgb/.test(c) ? m.map(x => x * 255) : m; return [v[0], v[1], v[2]]; }, r.before.c);
       ok(lum[1] > lum[0] && lum[2] > lum[0] && (theme === 'light' || lum[1] > 150), T + 'the divider is light teal (' + lum.map(Math.round).join(',') + ')');

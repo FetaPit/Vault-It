@@ -1,0 +1,49 @@
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vault-It">
+<meta name="mobile-web-app-capable" content="yes">
+<script>
+// After "Delete my account" the page reloads here (?deleted=1): nothing may be written, the browser databases are removed
+// before the app opens them, and the confirmation is shown. Closing it starts a normal, empty app.
+(function () {
+  if (!/[?&]deleted=1(&|$)/.test(location.search)) return;
+  window._viDeleted = true;
+  try { indexedDB.deleteDatabase('vi_photos'); indexedDB.deleteDatabase('vaultit-house'); } catch (e) {}
+  try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  document.addEventListener('DOMContentLoaded', function () {
+    var d = document.createElement('div'); d.id = 'delete-done';
+    d.style.cssText = 'position:fixed;inset:0;z-index:20002;background:var(--panel);display:flex;align-items:center;justify-content:center;padding:20px;text-align:center';
+    d.innerHTML = '<div style="max-width:420px;font-family:\'DM Sans\',sans-serif"><div style="font-size:2rem;margin-bottom:10px;color:var(--teal)"><svg class="vi-ic g" role="img" aria-label="Done"><use href="#vi-check"/></svg></div><div style="font-family:\'Syne\',sans-serif;font-size:1rem;font-weight:800;color:var(--teal);margin-bottom:10px">Your account has been deleted</div><div style="font-size:max(.65rem,var(--vi-fs-2));color:#9bb0bd;line-height:1.7;margin-bottom:18px">Your account and everything stored in it have been erased, and so has the data Vault-It kept on this device (including photos). Other devices where you used Vault-It still hold a local copy. Clear it there too (browser settings → site data). Our hosting providers may keep short-lived backups and logs for a few days. Thank you for testing Vault-It.</div><button class="btn-add-data" onclick="location.replace(location.pathname)">Close</button></div>';
+    document.body.appendChild(d);
+  });
+})();
+// Offline shell: sw.js (a real file; a blob: URL worker was refused by browsers, so the installed app had no offline cache
+// until 30 Oct 2026). Only over http(s): file:// and the tests have no worker.
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js').catch(function () {}); });
+}
+</script>
+<script>
+// ── Input safety: user-entered text is rendered into the page in many places, so markup characters are
+// neutralised on the way IN (typing, imports, cloud sync, already-saved data) — nothing can inject script.
+var VI_KEYS_EARLY = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1','ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history','vi_settings','vi_user','vi_pioneer','vi_founder','vi_plan','vi_debt','vi_ov'];
+function viClean(t) { return String(t).replace(/[<>`]/g, '').replace(/"/g, '\u201D').replace(/'/g, '\u2019'); }
+function viCleanDeep(o) {
+  if (typeof o === 'string') return /^data:(image|application)\//.test(o) ? o : viClean(o);
+  if (Array.isArray(o)) { for (var i = 0; i < o.length; i++) o[i] = viCleanDeep(o[i]); return o; }
+  if (o && typeof o === 'object') { Object.keys(o).forEach(function(k) { o[k] = viCleanDeep(o[k]); }); return o; }
+  return o;
+}
+function viCleanJSON(str) {   // returns the cleaned JSON text, or the original if it is not JSON
+  try { var j = JSON.parse(str); var c = JSON.stringify(viCleanDeep(j)); return c; } catch (e) { return typeof str === 'string' ? viClean(str) : str; }
+}
+(function() {
+  try { VI_KEYS_EARLY.forEach(function(k) { var v = localStorage.getItem(k); if (v != null && /[<>`"']/.test(v.replace(/"[^"\\]*"\s*:/g, ''))) { var c = viCleanJSON(v); if (c !== v) Storage.prototype.setItem.call(localStorage, k, c); } }); } catch (e) {}
+  document.addEventListener('input', function(e) {
+    var t = e.target; if (!t || (t.tagName !== 'INPUT' && t.tagName !== 'TEXTAREA')) return;
+    var ty = (t.type || 'text').toLowerCase(); if (ty !== 'text' && ty !== 'search' && ty !== 'url' && ty !== 'tel' && ty !== 'email' && t.tagName !== 'TEXTAREA') return;
+    if (/[<>`]/.test(t.value)) { var p = t.selectionStart; t.value = t.value.replace(/[<>`]/g, ''); try { t.setSelectionRange(p - 1, p - 1); } catch (x) {} }
+  }, true);
+})();
+</script>

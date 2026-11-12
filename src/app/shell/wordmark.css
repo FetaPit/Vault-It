@@ -1,0 +1,20 @@
+<style id="vi-wordmark">
+/* ═══ Wordmark and mark (brand phase 7): Vault, a brick, It. Never a hyphen. ═══ */
+.wm{font-family:var(--font-display)!important;font-weight:800!important;letter-spacing:-.02em!important;white-space:nowrap;display:inline-flex;align-items:baseline;color:var(--text)!important;text-transform:none!important;background:none!important;-webkit-text-fill-color:currentColor!important}
+.wm b{font-weight:inherit;color:var(--teal);-webkit-text-fill-color:var(--teal);text-shadow:var(--tglow)}
+.wm .dot{display:inline-block;width:.3em;height:.17em;background:var(--teal);border-radius:2px;margin:0 .07em;transform:translateY(-.06em);box-shadow:var(--dglow)}
+[data-theme="light"] .wm b{color:var(--teal-deep);-webkit-text-fill-color:var(--teal-deep);text-shadow:none}
+[data-theme="light"] .wm .dot{background:var(--teal-deep);box-shadow:none}
+#topnav .logo.wm{font-size:1.02rem;text-shadow:none!important}
+.auth-logo.wm{font-size:1.9rem;letter-spacing:-.02em!important;justify-content:center;width:100%}
+.pc-logo.wm{font-size:max(.62rem,var(--vi-fs-2))}
+.vi-mark{display:inline-flex;width:26px;height:26px;flex:none;margin-right:6px}   /* clear space: a quarter of the icon each side */
+.vi-mark svg{width:100%;height:100%;display:block}
+.vi-mark-day{display:none}
+[data-theme="light"] .vi-mark-night{display:none}
+[data-theme="light"] .vi-mark-day{display:block}
+.auth-sub{font-family:var(--font-body)!important;font-size:max(.72rem,var(--vi-fs-3))!important;letter-spacing:0!important;text-transform:none!important;color:var(--muted)!important;margin-top:4px}
+.auth-footer{color:var(--muted)!important;opacity:1!important;font-size:max(.5rem,var(--vi-fs-1))!important;letter-spacing:.04em!important;text-transform:none!important}
+.vi-fca{color:var(--muted);font-family:var(--font-body);font-size:max(.5rem,11px);letter-spacing:0;text-transform:none;margin-left:6px;white-space:nowrap}
+.vi-disc{color:var(--muted);font-family:var(--font-body);font-size:max(.5rem,10px);line-height:1.35;letter-spacing:0;text-transform:none;flex:1 1 100%;margin-top:1px}
+</style>

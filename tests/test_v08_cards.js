@@ -6,8 +6,9 @@
 //    icon, one milestone set with the house-type names, earned and unearned. ROW card, "Show it on the house",
 //    "Preview your mortgage" stay. No dead columns: stats 2 across at 390, 4 to 6 across on tablet and desktop.
 // Run: node tests/test_v08_cards.js
+require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
-const APP = process.env.VI_APP || 'file:///home/user/Vault-It/index.html';
+const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const SEED = (theme) => {
   localStorage.setItem('vi-theme', theme); localStorage.setItem('vi_declined_demo', 'true');
@@ -76,7 +77,7 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
     ok(!h.prog && h.panelBars === 1 && h.bars === 1, t + 'one progress tile with one bar (old PROGRESS tile gone: ' + !h.prog + ', bars ' + h.panelBars + ')');
     ok(h.stats >= 6 && h.icons, t + 'six or more stats, each with a line icon (' + h.stats + ')');
     ok(['uk bricks', 'to go', 'deposit', 'roof tiles', 'xp', 'streak'].every(k => h.labels.some(l => l.includes(k))), t + 'stats: bricks, to go, deposit, roof tiles, XP, streak (' + h.labels.join(' / ') + ')');
-    ok(w < 600 ? h.perRow === 2 : h.perRow >= 4 && h.perRow <= 6, t + 'stats ' + h.perRow + ' across');
+    ok(w < 600 ? h.perRow === 2 : h.perRow === 3, t + 'stats (v0.9.1 E7: three by two, Pedro) ' + h.perRow + ' across');
     ok(!h.overlap && !h.textOver, t + 'stats never overlap');
     ok(h.ms === 10 && h.badges === 0 && /Shared Foundation Poured/.test(h.msTxt.join('|')) && h.hit === 2, t + 'one milestone set, house-type names, 2 earned of 10 (' + h.ms + ', ' + h.hit + ')');
     ok(h.row && h.show && h.mort, t + 'ROW card, "Show it on the house" and "Preview your mortgage" stay');

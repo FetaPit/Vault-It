@@ -1,6 +1,6 @@
 const fs=require('fs'); const esbuild=require('esbuild');
 let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else console.log('ok  :',m); };
-const js=esbuild.transformSync(fs.readFileSync('/home/user/Vault-It/supabase/functions/stock-quotes/index.ts','utf8'),{loader:'ts',format:'cjs'}).code;
+const js=esbuild.transformSync(fs.readFileSync(require('path').join(require('./lib/vi').ROOT, 'supabase/functions/stock-quotes/index.ts'),'utf8'),{loader:'ts',format:'cjs'}).code;
 globalThis.Deno={serve:h=>{globalThis.__h=h;}};
 const urls=[];
 globalThis.fetch=async(u)=>{urls.push(String(u));
