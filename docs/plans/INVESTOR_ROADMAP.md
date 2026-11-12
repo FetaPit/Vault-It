@@ -26,7 +26,8 @@ Read this first:
 |---|---|---|
 | Done | Live MVP, Stripe payments, double opt-in sign-up list, Cloudflare hosting, data download and delete, sign-in rate limiting, first security review (31 Oct 2026) | Plan v2 section 7, trust centre plan |
 | Done | Accepted into Web Summit's startup programme; enrolled with the Business Lincolnshire Growth Hub; investor pitch and answers page live | Plan v2 |
-| Now (Nov 2026) | v0.95 round: deposit reset, month strip, onboarding, house intro, Roadmap cards. Two v0.95 branches are not green in CI yet | `docs/QUEUE.md`, CI runs 940 and 964 |
+| Done, 10 Nov 2026 | v0.95 released to production (`fde0997`, CI green): onboarding deposit pot, sample-data leak fix, house intro behind sign-in, shorter onboarding, larger Roadmap cards, deposit reset fix, Entrepreneur 1 (business accounts), pitch deck v4. Google sign-in on since 7 Nov | `release/pioneer-v2` and `docs/QUEUE.md` |
+| Next release (A) | Small and low risk: the index split into source parts (output identical to live), the app-host demo route, the month strip fix at 390px, the sign-in toast fix, removing the unused waitlist code. Needs a backup of current production first, then your phone check and a PR you merge | COO delivery view |
 | Now | Trust centre v1 planned; Vanta scoping call held; written quote not yet received | Trust centre plan |
 | Dec 2026 | Founding Member pre-sale opens (plan: weeks 5 to 6 of launch; first income in December). Trust page is the date Vanta pointed at for the December pitch | Plan v2, trust centre plan |
 | Dec 2026 to Jan 2027 | **Gate 1:** accounts and payments open to the public only after an independent security review | Plan v2 section 7 |
@@ -42,15 +43,19 @@ Read this first:
 
 **Live and shipped.** See A2. The calculation engine, seven-stage journey, to-scale 3D house engine and brand system are founder-built.
 
-**Built but not live.** Deposit reset on the House Builder page (`v095/deposit-reset`, `a29cbab`), month strip fix (`v095/month-strip`, `e19d8c6`), Roadmap cards larger (preview sent, uncommitted). Merged to `brand-rollout` and waiting for the next release: the index split, house intro behind sign-in, onboarding friction, tester 1 clean-up, the `/demo-a` demo link.
+**Live (v0.95, `fde0997`, 10 Nov).** Onboarding deposit pot and ground-up bricks, the sample-data leak fix, the house that builds brick by brick behind sign-in, onboarding cut to Google first with PIN later and a three-screen welcome, larger Roadmap cards, the deposit reset button made visible on the phone, tester 1's top three fixes, Entrepreneur 1 (business current and savings accounts), pitch deck v4. The 3D engine items E12 to E15 are live.
 
-**Next, in the order the plan gives it.**
-1. Finish v0.95 and release it (laptop release, CI green on the exact commit, phone sign-off, backup branch).
-2. Accounts and saved state, the ISA switch planner (Lifetime ISA to First Time Buyer ISA), the shareable "keys date" card. Funded first by the £20,000 bridge, then by the round.
-3. Entrepreneur mode, items 2 to 5 (contract cards, income that moves, Your Team tab, UK reminders). Queued, not started.
+**Built, not live.** On `brand-rollout` (CI green on `a7d11ca`): the index split into `src/app` (output identical to what is live), the `app.vault-it.co/demo-a` route, a CI build check. On a branch: the month strip fix (`v095/month-strip`, `e19d8c6`, CI state not confirmed; the last run failed at the Playwright install step, not in a test). In proofs: the Vault-form typeface, awaiting your sign-off.
+
+**Next, in the order the COO gives it.**
+1. **Release A (small, low risk):** take the missing backup of current production, then ship `brand-rollout` plus the month strip fix, the sign-in toast fix and the unused waitlist code removal, each with CI green. Phone check, then a PR you merge. No Supabase steps.
+2. **Release B (v0.96):** onboarding answers feed the tools and the house, the open onboarding items, My account with the Stripe manage and cancel link, one deposit figure (money logic), then Entrepreneur 2 to 5 behind Pro, one chunk each. The typeface only after your sign-off. If B gets too big, Entrepreneur becomes its own release C so the onboarding fixes reach testers sooner.
+3. Accounts and saved state, the ISA switch planner (Lifetime ISA to First Time Buyer ISA), the shareable "keys date" card. Funded first by the £20,000 bridge, then by the round.
 4. Household plan (lane 2).
 5. Partner Edition: white-label build for lenders, with the security pack from lane 3 ready first.
-6. Engine IP: make the 3D engine protectable; UK IP questions are listed for a solicitor.
+6. Engine IP: make the 3D engine protectable; UK IP questions are listed for a solicitor. Research note only so far.
+
+**Delivery risks the COO flags.** Everything waits on one person (phone sign-off, production push, Supabase changes, trust centre decisions). Entrepreneur 2 to 5 were promised for v0.95 and have not started. Release records have a gap: no backup branch of the pre-v0.95 production and no recorded sign-off. Money logic (one deposit figure) and sign-in changes are high risk, so each gets a failing test first. The laptop cannot run two tests (`test_beta_client`, `test_legal_pages`) and it is the only release machine.
 
 **Not before:** bank sync (needs a penetration test and an aggregator contract first, see lane 4).
 
@@ -216,8 +221,10 @@ These are conflicts and open points I found between the files. Each needs your w
 7. **Scope for ISO.** The Vault-It app only, or PT Live Design as a whole? I suggest the app only.
 8. **Independent reviewer.** Someone who is not a family member for the internal audit.
 9. **Sending to investors.** Selling shares is a regulated activity. Ask a solicitor how the deck, this roadmap and any email to an investor should be worded and who may receive them before sending. Your own deck wording ("a target, not an offer") already points the right way.
-10. **Things I could not check from here.** CI on the two v0.95 branches is red (one infrastructure failure, one real test failure). The Vanta items are statements from a salesperson. FCA annual fees were not retrieved.
-11. **Open from the plan.** What each named adviser agreed to be named as; the Future London Academy detail; "free while in beta" wording on the sign-up page; two plan clean-ups already queued.
+10. **Things I could not check from here.** The Vanta items are statements from a salesperson. FCA annual fees were not retrieved. CI on the month strip branch never reached its tests (the Playwright install step failed), so it needs a re-run. The release record for v0.95 (backup branch, your phone sign-off) is not in the docs; add it so the "gates are met every time" line in the investor version is true.
+11. **Release route.** `docs/MULTI_SESSION.md` says releases go from the laptop only, but on 8 Nov they went through pull requests you merged from cloud sessions. Which is the rule? Investors will read the gates; say the one you use.
+12. **Release A needs the backup first** and a phone check on the exact commit.
+13. **Open from the plan.** What each named adviser agreed to be named as; the Future London Academy detail; "free while in beta" wording on the sign-up page; two plan clean-ups already queued.
 
 ## Sources
 
