@@ -1,0 +1,32 @@
+<!-- ═══════════════════════════ ACHIEVEMENTS ═══════════════════════════ -->
+<div id="tab-achievements" class="tab-panel" style="display:none">
+  <!-- Wealth Roadmap (owner, 3 Nov 2026): the same roadmap card as the Overview moves in here, plus the levelling system -->
+  <div class="wr-wrap">
+    <div class="wr-head">
+      <div><h2 class="wr-title">Wealth Roadmap</h2><p class="wr-sub">One path from the red to your own home, step by step. Every step, badge and saving habit earns XP.</p></div>
+      <span class="wr-count" id="wr-count"></span>
+    </div>
+    <div class="wr-top">
+      <div class="ov-chart-card wr-card" id="wr-rank"></div>
+      <div class="ov-chart-card wr-card wr-pro"><div class="ov-chart-title">Next steps</div><div id="wr-next"></div></div>
+    </div>
+    <div id="wr-roadmap-slot"></div>
+    <div class="ov-chart-card wr-card wr-pro"><div class="ov-chart-title">Side quests</div><p class="wr-note">Habits that count in any order. Saving streaks come from the House Builder; the monthly ones reset each month, up to 25 XP a month.</p><div class="wr-grid" id="wr-quests"></div></div>
+    <div class="ov-chart-card wr-card wr-pro"><div class="ov-chart-title">Levels</div><div class="wr-ladder" id="wr-ladder"></div></div>
+    <div class="ov-chart-card wr-card wr-pro">
+      <div class="wr-coll-hd"><div class="ov-chart-title">Badge tokens</div><div class="wr-tiers" id="wr-tiers"></div></div>
+      <div class="wr-grid" id="wr-collection" data-f="all"></div>
+    </div>
+    <details class="ov-chart-card wr-card wr-how"><summary>How XP works</summary><ul>
+      <li>The roadmap is one path of 30 stages in order. Each stage has up to three steps, and every step earns XP: Starter 20, Solid 40, Strong 80, Summit 150.</li>
+      <li>Steps count once you reach their stage, so the path stays in order. A skipped stage earns nothing and costs nothing.</li>
+      <li>Badges and saving habits are side quests. They count in any order.</li>
+      <li>XP you earn stays earned, even if a figure drops later.</li>
+      <li>Twenty levels in five ranks: Groundwork, Shield, Growth, Keys and Freedom.</li>
+      <li>Reach Level 8, Vault Guard, and use Vault-It on 30 different days to claim one free month. We add it to your account by hand.</li>
+    </ul></details>
+    <div class="wr-foot"><p class="wr-fca">Illustrative only. Not regulated by the FCA. Not financial advice.</p>
+      <button type="button" class="wr-reset" onclick="resetAllAchievements()">Reset badges and XP</button></div>
+  </div>
+</div>
+

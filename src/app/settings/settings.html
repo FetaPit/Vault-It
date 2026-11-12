@@ -1,0 +1,152 @@
+<!-- Settings Modal -->
+
+<div id="settings-modal" role="dialog" aria-modal="true" aria-label="Settings" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.88);align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto">
+  <div style="background:var(--c2);border:1px solid var(--bd2);border-radius:12px;padding:28px 32px;width:500px;max-width:95vw;margin-bottom:40px">
+    <div data-set-title style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:20px;color:var(--tx)">Settings</div>
+
+    <!-- 1. Account: email, plan (current price only, painted from VI_PLANS by viPricePaint()), manage or cancel, sign out.
+         Plans (owner, 4 Nov 2026 evening, renamed 5 Nov: Pioneer = monthly and yearly (yearly is Pro), Lifetime licence = once; read-only after the 30 days has no tier name. -->
+    <div class="settings-section set-box" id="set-account">
+      <div class="settings-section-title">Account</div>
+      <div class="set-acct">
+        <div><div class="settings-hint">Signed in as</div><div id="set-acct-email" class="set-acct-email">This device only</div></div>
+        <button class="set-btn" type="button" data-signout onclick="signOut()">Sign out</button>
+      </div>
+      <div class="set-plan">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">
+          <span style="font-size:.9rem;animation:pw-pulse 2.5s ease-in-out infinite;display:inline-block" aria-hidden="true">◆</span>
+          <span class="set-plan-h">Your plan</span>
+          <span id="set-pioneer-badge" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:max(.66rem,var(--vi-fs-2))"></span>
+        </div>
+        <div id="set-pioneer-active" style="display:none;font-size:max(.66rem,var(--vi-fs-2));color:var(--gr);margin-bottom:10px;line-height:1.5"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access active. Thank you for backing Vault-It.</div>
+        <div id="set-pioneer-inactive" style="font-size:max(.66rem,var(--vi-fs-2));color:var(--t2);margin-bottom:8px;line-height:1.5"></div>
+        <div id="set-plan-extras" class="settings-hint" style="margin-bottom:10px;line-height:1.55">Pioneer, monthly or yearly, is the whole app with editing on, plus your own 3D house design and the AI house model. Pioneer yearly (Pro) adds early access to new features, roadmap voting and family mode (coming soon). The Lifetime licence (one payment, 100 places, beta testers first) is Pioneer for the life of the service. The six preset houses are in every plan.</div>
+        <div class="set-tiers">
+          <button type="button" class="set-tier" id="set-plan-monthly" data-plan="monthly" onclick="showUpgrade('monthly')"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg><span class="set-tier-name" data-tier-name>Pioneer</span><span class="set-tier-price" data-plan-price="monthly">£5.99<span>/mo</span></span><span class="set-tier-cta" data-cta=""></span></button>
+          <button type="button" class="set-tier" id="set-plan-annual" data-plan="annual" onclick="showUpgrade('annual')"><svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg><span class="set-tier-name" data-tier-name>Pioneer</span><span class="set-tier-price" data-plan-price="annual">£59.99<span>/yr</span></span><span class="set-tier-cta" data-cta=""></span></button>
+          <button type="button" class="set-tier" id="set-plan-founder" data-plan="founder" onclick="showUpgrade('founder')"><svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg><span class="set-tier-name" data-tier-name>Lifetime licence</span><span class="set-tier-price" data-plan-price="founder">£149<span> once</span></span><span class="set-tier-cta" data-cta=""></span></button>
+        </div>
+        <div class="set-tier-terms"><p><b>Pioneer (monthly):</b> <span data-plan-terms="monthly"></span></p><p><b>Pioneer (yearly):</b> <span data-plan-terms="annual"></span></p><p><b>Lifetime licence:</b> <span data-plan-terms="founder"></span></p></div>
+        <div class="set-plan-foot">
+          <a class="set-btn primary" data-manage-sub href="mailto:hello@vault-it.co?subject=Manage%20or%20cancel%20my%20Vault-It%20plan">Manage or cancel my plan</a>
+          <button class="set-btn" type="button" onclick="closeSettings();showPaywall('assets')">Already paid?</button>
+        </div>
+        <div class="settings-hint" style="margin-top:6px">There is no self-service page for plans yet. Email <span class="set-nb">hello@vault-it.co</span> and we will change or cancel it for you.</div>
+      </div>
+    </div>
+
+    <!-- 2. Appearance and accessibility. Theme reuses viToggleTheme() through viSetTheme(); the header button is untouched. -->
+    <div class="settings-section set-box" id="set-appearance">
+      <div class="settings-section-title">Appearance and accessibility</div>
+      <div class="settings-row"><label class="settings-label">Theme</label><div class="settings-opts" id="set-theme" role="group" aria-label="Theme"><button type="button" data-val="dark" onclick="viSetTheme('dark')">Night</button><button type="button" data-val="light" onclick="viSetTheme('light')">Daylight</button><button type="button" data-val="auto" onclick="viSetTheme('auto')">Follow my device</button></div></div>
+      <div class="settings-row"><label class="settings-label">View</label><div class="settings-opts" id="set-view"><button data-val="simple" onclick="setSetting('view','simple',this)">Simplified</button><button data-val="adv" onclick="setSetting('view','adv',this)">Advanced</button></div></div>
+      <div class="settings-row" style="margin-top:-6px"><span class="settings-hint" id="set-view-hint">Simplified keeps the essentials on screen. Advanced shows every tile and tab. Nothing is deleted either way.</span></div>
+      <div class="settings-row"><label class="settings-label">Text size</label><div class="settings-opts" id="set-fontsize"><button data-val="small" onclick="setSetting('fontSize','small',this)">Small</button><button data-val="normal" onclick="setSetting('fontSize','normal',this)" class="active">Normal</button><button data-val="large" onclick="setSetting('fontSize','large',this)">Large</button><button data-val="xl" onclick="setSetting('fontSize','xl',this)">XL</button></div></div>
+      <div class="settings-row"><label class="settings-label">Contrast</label><div class="settings-opts" id="set-contrast"><button data-val="standard" onclick="setSetting('contrast','standard',this)" class="active">Standard</button><button data-val="high" onclick="setSetting('contrast','high',this)">High</button></div></div>
+      <div class="settings-row"><label class="settings-label">Motion</label><div class="settings-opts" id="set-motion"><button data-val="full" onclick="setSetting('motion','full',this)" class="active">Full</button><button data-val="reduced" onclick="setSetting('motion','reduced',this)">Reduced</button></div></div>
+    </div>
+
+    <!-- Weekly check-in and phone (owner, 10 Nov 2026: moved out of the welcome to cut onboarding friction). Same saved fields as the
+         welcome used: vi_user.checkin.day and vi_user.phone. Painted by viCheckinPaint(). -->
+    <div class="settings-section set-box" id="set-checkin">
+      <div class="settings-section-title">Weekly check-in and phone</div>
+      <div class="settings-hint" id="set-checkin-lbl" style="margin-bottom:6px">Your check-in day. On that day Vault-It shows you your next step. Five minutes is enough.</div>
+      <div class="wz-days" id="set-checkin-days" role="group" aria-labelledby="set-checkin-lbl"></div>
+      <label class="settings-hint" for="set-phone" style="display:block;margin:12px 0 4px">WhatsApp or phone (optional)</label>
+      <input type="tel" id="set-phone" class="al-inp" placeholder="+44 7700 900000" autocomplete="tel" style="width:100%" onchange="viSetPhone(this.value)">
+      <div class="settings-hint" style="margin-top:6px">Add your number to receive a heavily discounted lifetime licence code when Vault-It launches on beta.</div>
+    </div>
+    <!-- 3. Help and app tour (owner, 1 Nov 2026: "a clear button that can trigger the tour again") -->
+    <div class="settings-section set-box" id="set-help">
+      <div class="settings-section-title">Help and app tour</div>
+      <div class="settings-hint" style="margin-bottom:10px">A one-minute look at each tab, or ask a question and browse the FAQs.</div>
+      <div class="set-btns">
+        <button class="set-btn primary" id="set-tour-replay" type="button" onclick="viTourReplay()">Replay the app tour</button>
+        <button class="set-btn" type="button" onclick="closeSettings();viHelpOpen('faq')">Open help and FAQs</button>
+      </div>
+    </div>
+
+    <!-- 4. Live prices: one switch for the free feeds (crypto from CoinGecko, metals, stocks and funds through the stock-quotes function). Typed prices are never changed. -->
+    <div class="settings-section set-box" id="set-live">
+      <div class="settings-section-title">Live prices</div>
+      <div class="settings-row"><label class="settings-label">Live prices</label><div class="settings-opts" id="set-live-opts"><button type="button" data-live="1" onclick="viSetLive(true)">On</button><button type="button" data-live="0" onclick="viSetLive(false)">Off</button></div><button class="set-btn" type="button" data-live-refresh onclick="viRefreshLive()">Refresh now</button></div>
+      <p class="settings-hint" style="margin:0">Crypto prices come from CoinGecko, metals from metals.live, and stocks and funds through Vault-It's own price service. Prices are indicative. Off stops the automatic checks; prices you typed yourself are never changed.</p>
+    </div>
+
+    <!-- Bank, broker, exchange and platform connectors: locked under Pro for a future release (owner, 5 Nov 2026: "Lock bank and platform connectors in pro for future releases").
+         Nothing here connects, asks for a key, signs in or makes a network request. Filled by renderConnections() from CONNS. -->
+    <div class="settings-section set-box" id="set-locked-conns">
+      <div class="settings-section-title">Bank, broker and platform connections</div>
+      <div class="set-locked-head"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-lock"/></svg><span>Pro, coming in a future release</span></div>
+      <p class="settings-hint" style="margin:0 0 10px">Connecting your bank, broker, exchange or platform to bring figures in automatically is planned for Pro in a future release. Nothing is connected today and the app never asks for your bank or exchange details. Add and update your figures yourself in the tabs.</p>
+      <div id="set-locked-list"></div>
+    </div>
+
+    <!-- 5. Cloud sync -->
+    <div class="settings-section set-box" id="set-cloud">
+      <div class="settings-section-title">Cloud sync</div>
+      <div id="sync-status" class="settings-hint" style="color:var(--t2);margin-bottom:10px">Checking…</div>
+      <div class="settings-hint" style="margin-bottom:10px">“Upload everything” sends all the data on this device to your account, so it appears when you sign in anywhere else.</div>
+      <div class="set-btns">
+        <button class="set-btn primary" type="button" onclick="viSyncNow()">Upload everything from this device</button>
+        <button class="set-btn" type="button" onclick="viOpenHistory()">Version history and restore</button>
+      </div>
+    </div>
+
+    <!-- 6. Sign-in PIN -->
+    <div class="settings-section set-box" id="set-pin">
+      <div class="settings-section-title">Sign-in PIN</div>
+      <div class="settings-hint" style="margin-bottom:10px">Set a 6-digit PIN to sign back in on any device with just your email and PIN, no email code needed. Five wrong tries lock it for 15 minutes (an email code always works).</div>
+      <div class="set-btns">
+        <button class="set-btn primary" type="button" onclick="authChangePin()">Set or change PIN</button>
+        <button class="set-btn" type="button" onclick="authRemovePin()">Remove PIN</button>
+      </div>
+    </div>
+
+    <!-- 7. Privacy and usage sharing -->
+    <div class="settings-section set-box" id="set-privacy">
+      <div class="settings-section-title">Privacy and usage sharing</div>
+      <div class="settings-row"><label class="settings-label">Share usage</label><div class="settings-opts" id="set-fbact"><button data-val="1" onclick="viFbAct(true,this)">On</button><button data-val="0" onclick="viFbAct(false,this)">Off</button></div></div>
+      <p class="settings-hint" style="margin:0 0 10px">During the beta the app records which screens and features you use, errors and how long you stay, in our own database, to improve it. Never your figures or what you type.</p>
+      <div class="set-btns">
+        <button class="set-btn primary" type="button" onclick="showPrivacy()">Privacy notice</button>
+        <button class="set-btn" type="button" onclick="showTerms()">Beta terms</button>
+      </div>
+    </div>
+
+    <!-- 8. Your data (UK GDPR: access, portability, erasure) -->
+    <div id="set-yourdata" class="settings-section set-box">
+      <div class="settings-section-title">Your data</div>
+      <div class="settings-hint" style="margin-bottom:10px">Download a copy of your data as a file you can keep: your figures and profile (on this device and in your account) and your latest 200 saved versions. Photos, feedback you sent, the beta usage log and technical security records are not in the file; email us for those. You can also delete your account for good below.</div>
+      <div class="set-btns"><button class="set-btn primary" type="button" onclick="exportMyData()">Download my data</button></div>
+    </div>
+
+    <!-- 9. Danger zone: red outline only -->
+    <div class="settings-section set-box set-danger" id="set-danger">
+      <div class="settings-section-title">Danger zone</div>
+      <button class="set-btn danger" type="button" onclick="resetVaultData()">Reset financial data (keeps profile and plan)</button>
+      <button class="set-btn danger" type="button" id="set-delete-account" onclick="openDeleteAccount()">Delete my account permanently</button>
+    </div>
+
+    <!-- 10. Owner and developer tools: hidden unless the owner flag is set (?owner=1 once on this device, or localStorage vi-owner=1; ?owner=0 clears it) -->
+    <div class="settings-section set-box" id="set-owner-tools" hidden>
+      <div class="settings-section-title">Owner and developer tools</div>
+      <label class="ov-kpi-lbl" for="set-claude-key">Claude API key</label>
+      <input type="password" id="set-claude-key" class="al-inp" placeholder="sk-ant-..." style="width:100%;margin:4px 0 4px">
+      <div class="set-owner-test"><button class="set-btn" type="button" onclick="testApiKey('claude')">Test</button><span id="test-claude-result" class="settings-hint"></span></div>
+      <label class="ov-kpi-lbl" for="set-meshy-key">Meshy AI key</label>
+      <input type="password" id="set-meshy-key" class="al-inp" placeholder="msy_..." style="width:100%;margin:4px 0 10px">
+      <label class="ov-kpi-lbl" for="set-notion-token">Notion integration token</label>
+      <input type="password" id="set-notion-token" class="al-inp" placeholder="ntn_..." style="width:100%;margin:4px 0 10px">
+      <label class="ov-kpi-lbl" for="set-founding-link">Founding Licence Stripe link</label>
+      <input type="text" id="set-founding-link" class="al-inp" placeholder="https://buy.stripe.com/..." style="width:100%;margin:4px 0 10px">
+      <label class="ov-kpi-lbl" for="set-nft-contract">Pioneer NFT contract address (Shibarium)</label>
+      <input type="text" id="set-nft-contract" class="al-inp" placeholder="0x..." style="width:100%;margin:4px 0 10px">
+      <div class="settings-hint" style="margin-bottom:10px">Keys are stored in this browser only and sent only to the service they belong to.</div>
+      <button class="set-btn primary" type="button" onclick="saveSettings()">Save owner settings</button>
+    </div>
+
+    <div class="set-foot"><button class="set-btn primary" type="button" onclick="closeSettings()">Done</button></div>
+  </div>
+</div>
+

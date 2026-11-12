@@ -1,0 +1,525 @@
+<style>/* ══════════════════════════════════════════════════════════════════════
+   VAULT-IT — CYBERPUNK COSMETIC LAYER v2
+   Form follows function follows intent.
+   Thin sharp edges. Duo-tone icon treatment. Accent line frames.
+   Zero functionality changes.
+══════════════════════════════════════════════════════════════════════ */
+
+/* ── BENTO CARD BASE — sharp edges, accent frame, corner ticks ─── */
+
+/* Remove all border-radius from every bento surface */
+.ov-chart-card,
+.ov-kpi,
+.jrny-cell,
+.jrny-panel,
+.jrny-gary-card,
+.debt-row,
+.badge-card,
+.conn-card,
+.hb-section,
+.hb-kpi,
+.al-metal-card,
+.al-crypto-card,
+.al-cash-card,
+.al-other-card,
+.biz-client-card,
+.biz-lead-card,
+.biz-stream-card,
+.al-section,
+.fire-detail-panel,
+.welcome-box,
+.welcome-opt,
+.pro-gate-overlay {
+  border-radius: 0 !important;
+}
+
+/* Clip-path on all bento cards — asymmetric cut top-right + bottom-left */
+.ov-chart-card {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)) !important;
+}
+
+.ov-kpi {
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px)) !important;
+}
+
+.jrny-cell {
+  clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px)) !important;
+}
+
+.debt-row,
+.badge-card,
+.conn-card,
+.hb-kpi,
+.hb-section {
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px)) !important;
+}
+
+.jrny-gary-card {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px)) !important;
+}
+
+/* ── ACCENT LINE — thin coloured top edge per bento ─────────────── */
+
+.ov-chart-card,
+.ov-kpi,
+.jrny-cell,
+.jrny-panel,
+.jrny-gary-card,
+.debt-row,
+.badge-card,
+.conn-card,
+.hb-kpi,
+.hb-section {
+  position: relative;
+}
+
+/* Top accent line — single pixel, accent color */
+.ov-chart-card::before,
+.ov-kpi::before,
+.jrny-panel::before,
+.jrny-gary-card::before,
+.debt-row::before,
+.badge-card::before,
+.conn-card::before,
+.hb-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--em) 0%, rgb(var(--teal-rgb) / .4) 40%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* KPI top line uses value colour — set inline via CSS var cascade */
+.ov-kpi::before {
+  background: linear-gradient(90deg, var(--em) 0%, rgb(var(--teal-rgb) / .25) 50%, transparent 100%);
+}
+
+/* Journey cells — left accent edge instead of top */
+.jrny-cell::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, var(--em) 0%, rgb(var(--teal-rgb) / .2) 60%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── CORNER TICK MARKS — bottom-right accent ─────────────────────── */
+/* A small L-shaped bracket in the corner using ::after */
+
+.ov-chart-card::after,
+.ov-kpi::after,
+.jrny-cell::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 8px; height: 8px;
+  border-bottom: 1px solid rgb(var(--teal-rgb) / .35);
+  border-right:  1px solid rgb(var(--teal-rgb) / .35);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── CARD BACKGROUND — subtle circuit board texture ─────────────── */
+.ov-chart-card,
+.jrny-panel,
+.jrny-gary-card,
+.hb-section {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 19px,
+      rgb(var(--teal-rgb) / .018) 19px,
+      rgb(var(--teal-rgb) / .018) 20px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 19px,
+      rgb(var(--teal-rgb) / .012) 19px,
+      rgb(var(--teal-rgb) / .012) 20px
+    ) !important;
+}
+
+/* KPI cards — lighter micro-grid */
+.ov-kpi {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 11px,
+      rgb(var(--teal-rgb) / .016) 11px,
+      rgb(var(--teal-rgb) / .016) 12px
+    ) !important;
+}
+
+/* ── HOVER STATES — neon border intensify ───────────────────────── */
+.ov-chart-card:hover {
+  border-color: rgb(var(--teal-rgb) / .28) !important;
+  box-shadow:
+    0 0 0 1px rgb(var(--teal-rgb) / .08),
+    inset 0 0 30px rgb(var(--teal-rgb) / .025) !important;
+}
+
+.ov-kpi:hover {
+  border-color: rgb(var(--teal-rgb) / .3) !important;
+  box-shadow: inset 0 0 12px rgb(var(--teal-rgb) / .04) !important;
+}
+
+.jrny-cell:hover {
+  background: rgb(var(--teal-rgb) / .035) !important;
+}
+
+.debt-row:hover,
+.badge-card:hover,
+.conn-card:hover {
+  border-color: rgb(var(--teal-rgb) / .25) !important;
+}
+
+/* ── DUO-TONE ICON TREATMENT ─────────────────────────────────────── */
+/*
+  Duo-tone: emoji + glyph icons rendered with two-colour shadow stack.
+  Primary tone  = var(--em) teal.
+  Secondary tone = var(--go) gold (warm shadow offset).
+  Applied to high-visibility icons across the app.
+*/
+
+/* Tab bar emoji icons */
+.tab-btn .tab-emoji,
+.tab-btn::before { /* the dot already has correct color */ }
+
+/* Stage icon emoji in FIRE roadmap */
+.fire-node-icon {
+  text-shadow:
+    0 0 6px currentColor,
+    1px 1px 0 rgb(var(--brass-rgb) / .25);
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* Journey Map stage icons in SVG panels */
+.jrny-panel-icon {
+  display: block;
+  text-shadow:
+    0 0 8px rgb(var(--teal-rgb) / .7),
+    2px 2px 0 rgb(var(--brass-rgb) / .3);
+}
+
+/* KPI value numbers — teal glow with gold undertone */
+.ov-kpi-val {
+  text-shadow:
+    0 0 12px currentColor,
+    1px 1px 0 rgb(var(--brass-rgb) / .15);
+}
+
+/* Sidebar live price values */
+.sb-val {
+  text-shadow: 0 0 8px rgb(var(--teal-rgb) / .4);
+}
+
+/* Journey Map keys-in-hand date (the north star number) */
+.jrny-keys-date {
+  text-shadow:
+    0 0 20px rgb(var(--teal-rgb) / .6),
+    2px 2px 0 rgb(var(--brass-rgb) / .2) !important;
+}
+
+/* Trio values */
+.jrny-gary-val {
+  text-shadow:
+    0 0 10px currentColor,
+    1px 1px 0 rgb(var(--teal-rgb) / .25);
+}
+
+/* Nav logo */
+.logo {
+  text-shadow:
+    0 0 14px rgb(var(--teal-rgb) / .5),
+    1px 1px 0 rgb(var(--brass-rgb) / .2);
+}
+
+/* Badge chips — e.g. LIVE, PRO, stage badges */
+.jrny-stage-badge,
+.jrny-you-here,
+.fire-you-here,
+.pro-badge {
+  box-shadow: 0 0 6px rgb(var(--teal-rgb) / .15);
+}
+
+/* Debt row colour-coded left edge */
+.debt-row::before {
+  background: linear-gradient(90deg, var(--re) 0%, rgb(var(--red-rgb) / .2) 50%, transparent 100%) !important;
+}
+
+/* Gary trio card accent colours */
+.jrny-gary-card.trap::before  { background: linear-gradient(90deg, var(--re) 0%, rgb(var(--red-rgb) / .2) 50%, transparent 100%) !important; }
+.jrny-gary-card.wait::before  { background: linear-gradient(90deg, var(--go) 0%, rgb(var(--brass-rgb) / .2) 50%, transparent 100%) !important; }
+.jrny-gary-card.system::before{ background: linear-gradient(90deg, var(--em) 0%, rgb(var(--teal-rgb) / .2) 50%, transparent 100%) !important; }
+
+/* Achievements badge cards — duo-tone icon glow */
+.badge-card {
+  overflow: hidden;
+}
+.badge-card:hover .badge-icon-txt {
+  text-shadow:
+    0 0 10px rgb(var(--brass-rgb) / .8),
+    0 0 20px rgb(var(--teal-rgb) / .4);
+  transform: scale(1.08);
+  transition: all .2s;
+}
+.badge-icon-txt {
+  transition: all .2s;
+  display: block;
+}
+
+/* Connections card platform icons */
+.conn-platform-icon {
+  text-shadow:
+    0 0 8px rgb(var(--teal-rgb) / .5),
+    1px 1px 0 rgb(var(--brass-rgb) / .3);
+}
+
+/* ── PER-TAB ACCENT COLOUR on cards ─────────────────────────────── */
+/* When inside a specific tab panel, cards get that tab's accent tint */
+
+/* House Builder tab — gold accent */
+#tab-house .ov-chart-card::before,
+#tab-house .hb-section::before,
+#tab-house .hb-kpi::before {
+  background: linear-gradient(90deg, var(--go) 0%, rgb(var(--brass-rgb) / .3) 50%, transparent 100%);
+}
+#tab-house .ov-chart-card::after,
+#tab-house .hb-kpi::after {
+  border-color: rgb(var(--brass-rgb) / .3);
+}
+
+/* Assets tab — green accent */
+#tab-assets .ov-chart-card::before { background: linear-gradient(90deg, var(--gr) 0%, rgb(var(--green-rgb) / .2) 50%, transparent 100%); }
+#tab-assets .ov-chart-card::after  { border-color: rgb(var(--green-rgb) / .25); }
+
+/* Debt tab — red accent */
+#tab-debt .ov-chart-card::before { background: linear-gradient(90deg, var(--re) 0%, rgb(var(--red-rgb) / .2) 50%, transparent 100%); }
+#tab-debt .ov-chart-card::after  { border-color: rgb(var(--red-rgb) / .25); }
+
+/* Entrepreneur tab — orange accent */
+#tab-biz .ov-chart-card::before { background: linear-gradient(90deg, var(--or) 0%, rgb(var(--orange-rgb) / .2) 50%, transparent 100%); }
+#tab-biz .ov-chart-card::after  { border-color: rgb(var(--orange-rgb) / .25); }
+
+/* Achievements tab — gold accent */
+#tab-achievements .ov-chart-card::before,
+#tab-achievements .badge-card::before {
+  background: linear-gradient(90deg, var(--go) 0%, rgb(var(--brass-rgb) / .2) 50%, transparent 100%);
+}
+#tab-achievements .ov-chart-card::after,
+#tab-achievements .badge-card::after {
+  border-color: rgb(var(--brass-rgb) / .3);
+}
+
+/* Connections tab — purple accent */
+#tab-connections .ov-chart-card::before,
+#tab-connections .conn-card::before {
+  background: linear-gradient(90deg, var(--pu) 0%, rgb(var(--purple-rgb) / .2) 50%, transparent 100%);
+}
+#tab-connections .ov-chart-card::after,
+#tab-connections .conn-card::after {
+  border-color: rgb(var(--purple-rgb) / .3);
+}
+
+/* Network tab — teal/gold hybrid */
+#tab-network .ov-chart-card::before,
+#tab-network .nw-card::before {
+  background: linear-gradient(90deg, var(--em) 0%, rgb(var(--brass-rgb) / .25) 50%, transparent 100%);
+}
+#tab-network .ov-chart-card::after,
+#tab-network .nw-card::after {
+  border-color: rgb(var(--teal-rgb) / .3);
+}
+.nw-card {
+  background: var(--c2);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.nw-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--em), rgb(var(--brass-rgb) / .6), transparent);
+}
+.nw-founding-card {
+  background: linear-gradient(135deg, rgb(var(--brass-rgb) / .06), rgb(var(--teal-rgb) / .04));
+  border: 1px solid rgb(var(--brass-rgb) / .35);
+  border-radius: 12px;
+  padding: 22px 20px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.nw-founding-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--go), var(--em), transparent);
+}
+.nw-mint-card {
+  background: linear-gradient(135deg, rgb(var(--teal-rgb) / .05), rgb(var(--teal-rgb) / .02));
+  border: 1px solid rgb(var(--teal-rgb) / .25);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.nw-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.nw-profile-chip {
+  background: var(--c2);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  padding: 12px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.nw-profile-chip:hover { border-color: var(--em); background: rgb(var(--teal-rgb) / .06); }
+.nw-profile-chip .nw-pc-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--em), rgb(var(--brass-rgb) / .7));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: max(.7rem,var(--vi-fs-3));
+  color: #000; margin: 0 auto 6px;
+}
+.nw-profile-chip .nw-pc-name {
+  font-family: 'Syne', sans-serif; font-size: max(.48rem,var(--vi-fs-1)); font-weight: 700;
+  color: var(--tx); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nw-profile-chip .nw-pc-num {
+  font-family: 'Share Tech Mono', monospace; font-size: max(.4rem,var(--vi-fs-1)); color: var(--go); margin-top: 2px;
+}
+.nw-step-row {
+  display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;
+}
+.nw-step-num {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background: rgb(var(--teal-rgb) / .15); border: 1px solid rgb(var(--teal-rgb) / .3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Share Tech Mono', monospace; font-size: max(.44rem,var(--vi-fs-1)); color: var(--em);
+}
+.nw-step-done .nw-step-num { background: rgb(var(--teal-rgb) / .25); border-color: var(--em); color: var(--em); }
+.nw-chain-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgb(var(--teal-rgb) / .1); border: 1px solid rgb(var(--teal-rgb) / .25);
+  border-radius: 20px; padding: 3px 10px;
+  font-family: 'Share Tech Mono', monospace; font-size: max(.44rem,var(--vi-fs-1)); color: var(--em);
+}
+.nw-wallet-row {
+  background: rgba(0,0,0,.3); border: 1px solid var(--bd); border-radius: 6px;
+  padding: 8px 12px; font-family: 'Share Tech Mono', monospace; font-size: max(.44rem,var(--vi-fs-1));
+  color: var(--t2); word-break: break-all; margin: 8px 0;
+}
+
+/* Journey tab — gold accent (it leads to the house) */
+#tab-journey .jrny-panel::before,
+#tab-journey .jrny-gary-card::before {
+  /* already set per card type above, just intensify */
+}
+
+/* ── HUD BAR — sharper clip-path on buttons ──────────────────────── */
+.hud-btn {
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px)) !important;
+}
+
+/* ── SIDE BAR — thin accent on each section ─────────────────────── */
+.sb-section {
+  position: relative;
+  border-radius: 0 !important;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+}
+.sb-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--em) 0%, transparent 70%);
+  opacity: .4;
+}
+
+/* ── FIRE ROADMAP phase bands — crisper dividers ────────────────── */
+.fire-timeline-scroll {
+  border-top: 1px solid rgb(var(--teal-rgb) / .08);
+}
+
+/* ── WELCOME SCREEN — cyberpunk refinements ─────────────────────── */
+.welcome-opt {
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+.welcome-opt.selected {
+  box-shadow: inset 0 0 0 1px var(--em), 0 0 12px rgb(var(--teal-rgb) / .12);
+}
+.welcome-cta {
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px)) !important;
+  box-shadow: 0 0 20px rgb(var(--teal-rgb) / .15);
+}
+
+/* ── NAV TAB refinements ─────────────────────────────────────────── */
+/* Active tab: thin bottom accent line (override the coloured border-bottom) */
+.tab-btn.active {
+  position: relative;
+}
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 10%; right: 10%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 0;
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* ── FOOTER — thin accent ────────────────────────────────────────── */
+#app-footer {
+  border-top: 1px solid rgb(var(--teal-rgb) / .15) !important;
+  background-image: linear-gradient(90deg, rgb(var(--teal-rgb) / .04) 0%, transparent 30%) !important;
+}
+
+/* ── JOURNEY MILESTONE ROWS ──────────────────────────────────────── */
+.ms-row {
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px)) !important;
+}
+
+/* ── SCROLLBAR — thin cyberpunk treatment across whole app ───────── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--teal-rgb) / .2);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--teal-rgb) / .45); }
+
+/* ── INPUT FIELDS — sharp with accent focus ──────────────────────── */
+input[type="text"], input[type="email"], input[type="number"],
+input[type="password"], input[type="month"], textarea, select {
+  border-radius: 0 !important;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px)) !important;
+}
+input:focus, textarea:focus, select:focus {
+  box-shadow: 0 0 0 1px var(--em), 0 0 8px rgb(var(--teal-rgb) / .12) !important;
+  outline: none !important;
+}
+
+/* ── PRO OFFER MODAL ─────────────────────────────────────────────── */
+#pro-offer-modal > div {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)) !important;
+  box-shadow: 0 0 40px rgb(var(--brass-rgb) / .1), 0 0 80px rgb(var(--teal-rgb) / .05);
+}
+
+</style>

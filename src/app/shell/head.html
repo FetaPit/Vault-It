@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vault-It: Get out of the red and into your home.</title>
+<meta name="description" content="Vault-It turns every pound you save into a brick. Track net worth, clear debt and save your deposit, one stage at a time. Get out of the red and into your home.">
+<meta name="theme-color" content="#080808">
+<script>
+// Theme: Night is the default; the first visit follows the device, then the choice is remembered (never by time of day)
+(function(){try{var t=localStorage.getItem("vi-theme");
+if(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches)t="light";
+document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");
+// Daylight shows the Night header bar (owner, 4 Nov, R26); ?hdr=paper or localStorage vi-hdr=paper keeps the paper one so the two can be compared
+var h=(location.search.match(/[?&]hdr=(\w+)/)||[])[1]||localStorage.getItem("vi-hdr");if(h==="paper")document.documentElement.setAttribute("data-hdr","paper")}catch(e){document.documentElement.setAttribute("data-theme","dark")}})();
+</script>

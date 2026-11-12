@@ -1,0 +1,241 @@
+<style id="vi-nav">
+/* ── Brand menu bar: icon carries the tab colour, thin neon outline on the selected tab only ── */
+.tab-btn[data-tab="overview"]{--tc:var(--teal);--tc-rgb:var(--teal-rgb)}
+.tab-btn[data-tab="budget"]{--tc:var(--blue);--tc-rgb:var(--blue-rgb)}
+.tab-btn[data-tab="house"]{--tc:var(--gold);--tc-rgb:var(--gold-rgb)}
+.tab-btn[data-tab="assets"]{--tc:var(--green);--tc-rgb:var(--green-rgb)}
+.tab-btn[data-tab="debt"]{--tc:var(--red);--tc-rgb:var(--red-rgb)}
+.tab-btn[data-tab="biz"]{--tc:var(--orange);--tc-rgb:var(--orange-rgb)}
+.tab-btn[data-tab="achievements"]{--tc:var(--brass);--tc-rgb:var(--brass-rgb)}
+.tab-btn[data-tab="connections"],.tab-btn[data-tab="network"]{--tc:var(--purple);--tc-rgb:var(--purple-rgb)}
+html #topnav{background:var(--bg)!important;border-bottom:1px solid var(--line)!important;animation:none!important;backdrop-filter:none!important}
+#topnav .vi-tabs{position:relative;display:flex;align-items:center;gap:2px;flex:1 1 auto;min-width:0;height:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:0 4px}
+#topnav .vi-tabs::-webkit-scrollbar{display:none}
+html #topnav .tab-btn{position:relative;display:inline-flex!important;align-items:center;justify-content:center;gap:7px;flex:0 0 auto!important;height:36px!important;min-width:44px!important;margin:0!important;padding:0 12px!important;border:0!important;border-radius:10px;background:transparent!important;color:var(--muted)!important;font:600 .62rem/1 var(--font-display)!important;letter-spacing:.14em!important;text-transform:uppercase;text-shadow:none!important;box-shadow:none!important;opacity:1!important;cursor:pointer;transition:color var(--t-fast),background-color var(--t-fast),box-shadow var(--t-fast)}
+html #topnav .tab-btn[hidden]{display:none!important}
+#topnav .tab-btn::before,#topnav .tab-btn::after{content:none!important;display:none!important}
+#topnav .tab-btn .nav-tab-label{white-space:nowrap;color:inherit!important}
+html #topnav .tab-btn .vi-ic.ti{--vi-sw:1.5;width:18px!important;height:18px!important;display:block!important;color:var(--tc)!important;opacity:.8;transform:none!important;filter:none!important;stroke:none!important;fill:none!important}
+html #topnav .tab-btn:hover{color:var(--text)!important;background:rgb(var(--tc-rgb) / .07)!important}
+html #topnav .tab-btn:hover .vi-ic.ti{opacity:1}
+html #topnav .tab-btn.active{color:var(--text)!important;background:rgb(var(--tc-rgb) / .09)!important;box-shadow:inset 0 0 0 1px var(--tc),0 0 14px -3px rgb(var(--tc-rgb) / .7)!important}
+html[data-theme="light"] #topnav .tab-btn.active{box-shadow:inset 0 0 0 1px var(--tc)!important}
+html #topnav .tab-btn.active .vi-ic.ti{opacity:1;animation:vi-tabglow var(--pulse) ease-in-out infinite}
+html[data-theme="light"] #topnav .tab-btn.active .vi-ic.ti{animation:none}
+/* ── Assets and liabilities sub-tabs: each in its own colour (shared with the 3D net worth blocks) ── */
+html .subtab-btn[data-sub="metals"]{--sa:var(--gold);--sa-rgb:var(--gold-rgb)}
+html .subtab-btn[data-sub="crypto"]{--sa:var(--teal);--sa-rgb:var(--teal-rgb)}
+html .subtab-btn[data-sub="cash"]{--sa:var(--green);--sa-rgb:var(--green-rgb)}
+html .subtab-btn[data-sub="other"]{--sa:var(--purple);--sa-rgb:var(--purple-rgb)}
+html .subtab-btn[data-sub="liabilities"]{--sa:var(--amber);--sa-rgb:var(--amber-rgb)}
+html .subtab-btn[data-sub="stocks"]{--sa:var(--green2);--sa-rgb:var(--green2-rgb)}
+html #assets-page .subtab-btn{gap:8px;border-radius:12px;font:600 max(.62rem,var(--vi-fs-0))/1.2 var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)!important;background:var(--panel)!important;border:1px solid var(--line2)!important;box-shadow:none}
+html #assets-page .subtab-btn .vi-ic.sti{--vi-sw:1.5;width:18px;height:18px;color:var(--sa)!important;opacity:.75;transform:none!important;fill:none!important;stroke:none!important}
+html #assets-page .subtab-btn:hover{color:var(--text)!important;border-color:rgb(var(--sa-rgb) / .6)!important}
+html #assets-page .subtab-btn.active{color:var(--text)!important;border-color:var(--sa)!important;background:rgb(var(--sa-rgb) / .1)!important;box-shadow:0 0 14px -4px rgb(var(--sa-rgb) / .7)!important}
+html[data-theme="light"] #assets-page .subtab-btn.active{box-shadow:none!important}
+html #assets-page .subtab-btn.active .vi-ic.sti{opacity:1}
+html #assets-page .subtab-btn:focus-visible{outline:2px solid var(--sa);outline-offset:2px}
+/* owner, 3 Nov: Assets & liabilities sub-tab icons all sit on the left edge, labels beside them, every icon fully visible */
+html #assets-page .subtab-btn{justify-content:flex-start!important;text-align:left!important;padding-left:14px!important}
+html #assets-page .subtab-btn .vi-ic.sti{opacity:1!important;flex:none}
+
+@keyframes vi-tabglow{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 4px currentColor)}}
+html #topnav .tab-btn:focus-visible{outline:2px solid var(--tc)!important;outline-offset:2px}
+#topnav .vi-usp,#topnav .vi-pro{position:absolute;top:1px;right:2px;padding:1px 4px;border-radius:3px;font:800 9px/1.2 var(--font-display);letter-spacing:.08em;animation:none!important;display:inline-block!important}
+#topnav .vi-usp{background:var(--goldf);color:var(--on-gold)}
+#topnav .vi-pro{background:rgb(var(--orange-rgb) / .16);color:var(--orange);border:1px solid rgb(var(--orange-rgb) / .5)}
+/* v0.8 type scale, Pedro review 1: a badge never sits on its tab's icon or label (it sits on the tab's top edge, above both) */
+html body #topnav .vi-usp,html body #topnav .vi-pro{top:0;right:2px;left:auto;width:auto;line-height:1;padding:1px 3px}html body #topnav .vi-pro{padding:0 3px}   /* about 11 px tall: clears the icon (11 px down) and the label (13 px down) */
+#ov-page .ov-kpi-lbl{display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em!important}#ov-page .ov-kpi-lbl .ov-kpi-ic{display:inline-block;vertical-align:-3px;margin-right:4px}@media (max-width:459.98px){#ov-page .ov-kpi-lbl .ov-kpi-ic{display:none}}#tab-biz .ov-kpi-lbl{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;letter-spacing:.06em!important}@media (max-width:767.98px){html #tab-biz .ov-kpis:not(.debt-strip){grid-template-columns:repeat(2,minmax(0,1fr))!important}html #tab-biz .ov-kpis:not(.debt-strip)>.ov-kpi{grid-column:auto!important}}@media (min-width:768px){html #tab-biz .ov-kpis:not(.debt-strip){grid-template-columns:repeat(4,minmax(0,1fr))!important}html #tab-biz .ov-kpis:not(.debt-strip)>.ov-kpi{grid-column:auto!important}}@media (max-width:379.98px){#tab-biz .ov-kpis:not(.debt-strip)>.ov-kpi{padding-left:6px!important;padding-right:6px!important}#tab-biz .ov-kpi-lbl{letter-spacing:.03em!important}}   /* KPI labels on one line; under 460 the tile's coloured top edge stands in for the icon */
+.vp-key{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.45;text-wrap:balance}   /* the 3D key wraps onto centred lines rather than losing its end */
+/* v0.8 type scale, Pedro review 1: a badge never sits on its tab's icon or label (it sits on the tab's top edge, above both) */
+html body #topnav .vi-usp,html body #topnav .vi-pro{top:0;right:2px;left:auto;width:auto;line-height:1;padding:1px 3px}html body #topnav .vi-pro{padding:0 3px}   /* about 11 px tall: clears the icon (11 px down) and the label (13 px down) */
+#ov-page .ov-kpi-lbl{display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em!important}#ov-page .ov-kpi-lbl .ov-kpi-ic{display:inline-block;vertical-align:-3px;margin-right:4px}@media (max-width:459.98px){#ov-page .ov-kpi-lbl .ov-kpi-ic{display:none}}#tab-biz .ov-kpi-lbl{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;letter-spacing:.06em!important}@media (max-width:459.98px){html #tab-biz .ov-kpis:not(.debt-strip){grid-template-columns:repeat(2,minmax(0,1fr))!important}html #tab-biz .ov-kpis:not(.debt-strip)>.ov-kpi{grid-column:auto!important}}@media (max-width:379.98px){#tab-biz .ov-kpis:not(.debt-strip)>.ov-kpi{padding-left:6px!important;padding-right:6px!important}#tab-biz .ov-kpi-lbl{letter-spacing:.03em!important}}   /* KPI labels on one line; under 460 the tile's coloured top edge stands in for the icon */
+.vp-key{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.45;text-wrap:balance}   /* the 3D key wraps onto centred lines rather than losing its end */
+/* v0.8 type scale, Pedro review 1: a badge never sits on its tab's icon or label (it sits on the tab's top edge, above both) */
+html body #topnav .vi-usp,html body #topnav .vi-pro{top:0;right:2px;left:auto;width:auto;line-height:1;padding:1px 3px}html body #topnav .vi-pro{padding:0 3px}   /* about 11 px tall: clears the icon (11 px down) and the label (13 px down) */
+.ov-kpi-lbl{display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em!important}.ov-kpi-lbl .ov-kpi-ic{display:inline-block;vertical-align:-3px;margin-right:4px}@media (max-width:459.98px){.ov-kpi-lbl .ov-kpi-ic{display:none}}   /* KPI labels on one line; under 460 the tile's coloured top edge stands in for the icon */
+.vp-key{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.45;text-wrap:balance}   /* the 3D key wraps onto centred lines rather than losing its end */
+#topnav #budget-badge{position:absolute;top:5px;right:5px;margin:0}
+/* compact: icons only on desktop (also the older "Icons only" setting, at every width). Tablets and folds keep the labels
+   (owner, 31 Oct): only phones get the icon bar, at the bottom. */
+#topnav.compact-nav .nav-tab-label{display:none!important}
+html #topnav.compact-nav .tab-btn{padding:0!important;width:44px}
+@media (min-width:1024px){body.vi-compact #topnav .nav-tab-label{display:none!important}html body.vi-compact #topnav .tab-btn{padding:0!important;width:44px}}
+@media (prefers-reduced-motion:reduce){html #topnav .tab-btn.active .vi-ic.ti{animation:none}}
+/* header: row 1 = brand, net worth, Back, Night/Daylight, density; row 2 = the tabs (every width, so labels never get cut off) */
+html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto auto;grid-template-rows:46px 50px;height:auto!important;padding:0 16px!important;overflow:visible!important;align-items:center;column-gap:8px}
+#topnav .nav-brand{grid-row:1;grid-column:1;height:46px!important;border-right:0!important}
+#topnav .nav-brand .logo{display:inline!important}
+#topnav .vi-nw-wrap{grid-row:1;grid-column:2;justify-self:end;padding-left:0!important}
+#topnav .vi-nw-wrap>span:first-child{display:inline!important}
+#topnav .vi-nw-wrap>span:first-child{white-space:nowrap}   /* v0.8: the label never wraps; under 380 px it reads NW (Pedro, 2 Nov) */
+@media (max-width:379.98px){#topnav .vi-nw-wrap>span:first-child{font-size:0!important;letter-spacing:0!important}#topnav .vi-nw-wrap>span:first-child::after{content:'NW';font-size:max(.44rem,var(--vi-fs-0));letter-spacing:.22em}}
+#vi-back-us-btn{grid-row:1;grid-column:3}
+#vi-theme-btn{grid-row:1;grid-column:4;margin-left:0!important}
+#vi-density-btn{grid-row:1;grid-column:5;margin-left:0!important}
+#topnav .vi-tabs{grid-row:2;grid-column:1/-1;height:50px;border-top:1px solid var(--line);margin:0 -16px;padding:0 12px;justify-content:center}
+#left-sidebar{top:96px!important}
+@media (min-width:1024px) and (max-width:1439px){html #topnav .tab-btn{padding:0 8px!important;gap:6px;letter-spacing:.06em!important;font-size:.56rem!important}}
+@media (min-width:1024px) and (max-width:1279px){html #topnav .tab-btn{padding:0 6px!important;gap:5px;letter-spacing:.03em!important;font-size:.54rem!important}#topnav .vi-tabs{padding:0 2px;gap:0}}
+@media (max-width:1023px){
+  html #topnav{grid-template-columns:auto 1fr auto auto;padding:0 8px!important;column-gap:6px}
+  #vi-back-us-btn{display:none!important}
+  #vi-theme-btn{grid-column:3}
+  #vi-density-btn{grid-column:4}
+  #vi-density-btn .vi-d-opt[data-d="default"]{display:none!important}
+  #vi-density-btn .vi-d-lbl{display:inline!important}#vi-density-btn .vi-d-ico{display:none!important}
+  #topnav .vi-tabs{margin:0 -8px;padding:0 2px;gap:0;justify-content:safe center}
+  html #topnav .tab-btn{padding:0 6px!important;gap:5px;letter-spacing:.03em!important;font-size:.54rem!important}   /* all seven labelled tabs fit from 701 px */
+  html #topnav.compact-nav .vi-tabs{justify-content:space-between}
+  html #topnav.compact-nav .tab-btn{flex:1 1 0!important;width:auto;max-width:64px}
+}
+/* desktop menu (owner, 31 Oct): the tabs spread across the full width; when everything fits on one line (viNavFit decides from the
+   real widths) the header is a single row: logo, tabs, net worth, Back Vault-It, Night/Daylight. No density switch: width decides. */
+#vi-density-btn{display:none!important}
+.vi-fc-note{margin:8px 0 0 auto;max-width:62ch;text-align:right;font:400 max(.5rem,var(--vi-fs-1))/1.45 'Share Tech Mono',monospace;color:var(--t2);letter-spacing:.01em}
+.vi-fc-note[hidden]{display:none}
+@media (min-width:1024px){
+  #topnav .vi-tabs{justify-content:space-evenly}
+  html body.vi-nav1 #topnav{grid-template-columns:auto 1fr auto auto auto;grid-template-rows:60px}
+  body.vi-nav1 #topnav .nav-brand{height:60px!important}
+  body.vi-nav1 #topnav .vi-tabs{grid-row:1;grid-column:2;height:60px;border-top:0;margin:0;padding:0 6px}
+  body.vi-nav1 #topnav .vi-nw-wrap{grid-column:3}
+  body.vi-nav1 #vi-back-us-btn{grid-column:4}
+  body.vi-nav1 #vi-theme-btn{grid-column:5}
+  body.vi-nav1 #left-sidebar{top:60px!important}
+  body.vi-nav1t #topnav .vi-nw-wrap>span:first-child{display:none!important}
+  html body.vi-nav1t #topnav .tab-btn{padding:0 6px!important;gap:5px;letter-spacing:.03em!important;font-size:.54rem!important}
+  body.vi-nav1t #topnav .vi-tabs{padding:0 2px}
+}
+/* phones (owner, 30 Oct 2026): the tab icons sit in a bar fixed to the bottom of the screen, always visible; the header keeps one row.
+   The nav drops to z-index 500 here so pop-ups (Settings at 600 and above) cover the bar; the footer flows at the end of the page instead. */
+@media (max-width:599px){
+  :root{--footer-h:calc(56px + env(safe-area-inset-bottom,0px))}
+  html #topnav{grid-template-rows:46px;z-index:500!important}
+  #topnav .vi-tabs{position:fixed;left:0;right:0;bottom:0;top:auto;grid-row:auto;grid-column:auto;height:calc(56px + env(safe-area-inset-bottom,0px));margin:0;padding:0 4px env(safe-area-inset-bottom,0px);background:rgb(var(--panel-rgb) / .97);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;gap:0;overflow:visible}
+  html #topnav .tab-btn,html body.vi-compact #topnav .tab-btn,html #topnav.compact-nav .tab-btn{flex:1 1 0!important;width:auto;max-width:76px;min-width:44px;height:52px!important;padding:0!important}
+  #topnav .tab-btn .nav-tab-label{display:none!important}
+  html #topnav .tab-btn .vi-ic.ti{width:22px!important;height:22px!important}
+  #topnav .vi-usp,#topnav .vi-pro{top:4px;right:4px}
+  #left-sidebar{top:46px!important}
+  #app-footer{position:static;margin-top:16px;padding-right:64px}   /* v0.8: the text wraps clear of the fixed Feedback button */
+  html body #sync-banner,html body #trial-banner{bottom:calc(var(--footer-h) + 6px)!important}
+}
+/* tablets, unfolded folds and wider (v0.7 E1, owner 1 Nov; Pedro B): from 600 px the tabs sit at the top as on desktop, icons only,
+   22 px icons in 44 px targets, spread evenly; the active tab is outlined in its own colour. Phones (599 and under) keep the bottom bar. */
+@media (min-width:600px) and (max-width:1023px){
+  #topnav .vi-tabs{justify-content:space-evenly!important}
+  html #topnav .tab-btn,html #topnav.compact-nav .tab-btn,html body.vi-compact #topnav .tab-btn{flex:0 0 44px!important;width:44px!important;min-width:44px;max-width:44px;height:44px!important;padding:0!important;border-radius:10px!important}
+  html #topnav .tab-btn .nav-tab-label,#topnav .tab-btn .nav-tab-label{display:none!important}
+  html #topnav .tab-btn .vi-ic.ti{width:22px!important;height:22px!important}
+}
+/* ===== Help centre: guided tour, FAQs, help chat (owner, 1 Nov 2026; tests/test_help_centre.js) ===== */
+#vi-help-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:28px;min-width:28px;padding:0 10px;margin-left:8px;flex-shrink:0;background:transparent;border:1px solid var(--line2);border-radius:999px;color:var(--muted);font-family:var(--font-display);font-size:max(.5rem,var(--vi-fs-2));font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+#vi-help-btn b{font-size:max(.8rem,var(--vi-fs-3));line-height:1;color:var(--teal);font-weight:800;letter-spacing:0}
+#vi-help-btn:hover,#vi-help-btn[aria-expanded="true"]{color:var(--text);border-color:var(--teal)}
+#vi-help-btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+@media(max-width:599px){#vi-help-btn{width:34px;height:34px;padding:0;margin-left:6px}#vi-help-btn span{display:none}#vi-help-btn b{font-size:.95rem}}
+
+#vi-help{position:fixed;z-index:9500;right:16px;bottom:calc(var(--footer-h,30px) + 16px);width:min(400px,calc(100vw - 32px));height:min(620px,calc(100dvh - var(--footer-h,30px) - 170px));background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .35);border-radius:var(--r-tile,14px);box-shadow:0 18px 60px rgba(0,0,0,.45);display:none;flex-direction:column;overflow:hidden;font-family:var(--font-body);color:var(--text)}
+#vi-help.open{display:flex}
+@media(max-width:600px){#vi-help{left:0;right:0;top:auto;bottom:0;width:100%;height:min(88dvh,calc(100dvh - 40px));border-radius:16px 16px 0 0;border-bottom:none;padding-bottom:env(safe-area-inset-bottom,0px)}}
+.vh-head{display:flex;align-items:center;gap:8px;padding:12px 14px 0}
+.vh-title{font-family:var(--font-display);font-weight:800;font-size:.95rem;flex:1}
+.vh-x{background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;min-width:40px;min-height:40px;border-radius:8px}
+.vh-x:hover{color:var(--text)}
+.vh-tabs{display:flex;gap:4px;padding:8px 14px 0;border-bottom:1px solid var(--line2)}
+.vh-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--font-display);font-weight:700;font-size:max(.62rem,var(--vi-fs-0));letter-spacing:.12em;text-transform:uppercase;padding:10px 4px;cursor:pointer;min-height:44px}
+.vh-tab[aria-selected="true"]{color:var(--teal);border-bottom-color:var(--teal)}
+.vh-view{flex:1;min-height:0;display:none;flex-direction:column}
+.vh-view.on{display:flex}
+.vh-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:12px 14px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.vh-foot{padding:6px 14px 10px;font-size:max(.62rem,var(--vi-fs-2));color:var(--muted);text-align:center;border-top:1px solid var(--line2)}
+.vh-msg{max-width:88%;margin:0 0 10px;padding:9px 12px;border-radius:12px;font-size:max(.8rem,var(--vi-fs-3));line-height:1.5;overflow-wrap:anywhere}
+.vh-msg.bot{background:rgb(var(--teal-rgb) / .08);border:1px solid rgb(var(--teal-rgb) / .2);border-top-left-radius:4px}
+.vh-msg.me{margin-left:auto;background:rgb(var(--gold-rgb) / .12);border:1px solid rgb(var(--gold-rgb) / .3);border-top-right-radius:4px}
+.vh-msg b{color:var(--teal);font-weight:700}
+.vh-src{display:block;margin-top:6px;font-size:max(.64rem,var(--vi-fs-2));color:var(--muted)}
+.vh-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.vh-act{background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .4);color:var(--teal);border-radius:999px;padding:7px 12px;font-family:var(--font-display);font-weight:700;font-size:max(.62rem,var(--vi-fs-2));cursor:pointer;min-height:36px}
+.vh-act:hover{background:rgb(var(--teal-rgb) / .2)}
+.vh-chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 10px}
+.vh-chip{background:transparent;border:1px solid var(--line2);color:var(--muted);border-radius:999px;padding:7px 12px;font-size:max(.72rem,var(--vi-fs-3));cursor:pointer;font-family:var(--font-body);min-height:36px;text-align:left}
+.vh-chip:hover{color:var(--text);border-color:var(--teal)}
+.vh-rate{display:flex;gap:4px;margin-top:6px}
+.vh-rate button{background:none;border:1px solid var(--line2);border-radius:6px;color:var(--muted);font-size:max(.66rem,var(--vi-fs-2));padding:4px 9px;cursor:pointer;min-height:30px}
+.vh-rate button[aria-pressed="true"]{color:var(--teal);border-color:var(--teal)}
+.vh-typing{display:inline-flex;gap:4px}
+.vh-typing i{width:5px;height:5px;border-radius:50%;background:var(--teal);opacity:.4;animation:vhDot 1s infinite}
+.vh-typing i:nth-child(2){animation-delay:.15s}.vh-typing i:nth-child(3){animation-delay:.3s}
+@keyframes vhDot{50%{opacity:1}}
+.vh-form{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--line2)}
+.vh-form input,.vh-search{flex:1;min-width:0;background:var(--surf);border:1px solid var(--line2);border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:.82rem;padding:9px 12px}
+.vh-search{width:100%;margin-bottom:10px}
+.vh-form input:focus,.vh-search:focus{outline:none;border-color:var(--teal)}
+@media(max-width:600px){.vh-form input,.vh-search{font-size:16px}}
+.vh-form button,.vh-big{background:var(--btn1);border:none;color:var(--on-teal);border-radius:10px;padding:0 16px;font-family:var(--font-display);font-weight:800;font-size:max(.68rem,var(--vi-fs-2));cursor:pointer;min-height:44px}
+.vh-cat{font-family:var(--font-display);font-weight:700;font-size:max(.58rem,var(--vi-fs-0));letter-spacing:.16em;text-transform:uppercase;color:var(--teal);margin:14px 0 6px}
+.vh-cat:first-child{margin-top:0}
+.vh-faq{border:1px solid var(--line2);border-radius:10px;margin-bottom:6px}
+.vh-faq summary{cursor:pointer;list-style:none;padding:11px 34px 11px 12px;font-size:max(.78rem,var(--vi-fs-3));font-weight:600;position:relative;min-height:44px;box-sizing:border-box}
+.vh-faq summary::-webkit-details-marker{display:none}
+.vh-faq summary::after{content:'+';position:absolute;right:12px;top:9px;color:var(--teal);font-size:1rem}
+.vh-faq[open] summary::after{content:'\2212'}
+.vh-ans{padding:0 12px 12px;font-size:max(.76rem,var(--vi-fs-3));line-height:1.55;color:var(--muted)}
+.vh-ans b{color:var(--text)}
+.vh-empty{font-size:max(.76rem,var(--vi-fs-3));color:var(--muted);text-align:center;padding:20px 0}
+.vh-tour-hero{border:1px solid rgb(var(--teal-rgb) / .35);border-radius:12px;padding:14px;margin-bottom:14px;background:rgb(var(--teal-rgb) / .06)}
+.vh-tour-hero h4{font-family:var(--font-display);font-size:.86rem;margin:0 0 4px}
+.vh-tour-hero p{font-size:max(.74rem,var(--vi-fs-3));color:var(--muted);margin:0 0 10px;line-height:1.5}
+.vh-row{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:none;border:1px solid var(--line2);border-radius:10px;color:var(--text);padding:10px 12px;margin-bottom:6px;font-family:var(--font-body);font-size:max(.76rem,var(--vi-fs-3));cursor:pointer;text-align:left;min-height:44px}
+.vh-row:hover{border-color:var(--teal)}
+.vh-row span{color:var(--muted);font-size:max(.66rem,var(--vi-fs-2))}
+
+#vi-tour{position:fixed;inset:0;z-index:9550;display:none}
+#vi-tour.on{display:block}
+#vt-block{position:absolute;inset:0}
+#vt-spot{position:fixed;border-radius:10px;border:2px solid var(--teal);box-shadow:0 0 0 9999px rgba(2,6,10,.72);pointer-events:none;transition:all .28s var(--ease,ease)}
+#vt-spot.none{width:0!important;height:0!important;left:50%!important;top:40%!important;border-color:transparent}
+#vt-card{position:fixed;width:min(340px,calc(100vw - 32px));background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .45);border-radius:12px;padding:14px 14px 12px;box-shadow:0 14px 44px rgba(0,0,0,.5);font-family:var(--font-body);color:var(--text);transition:top .28s var(--ease,ease),left .28s var(--ease,ease)}
+#vt-card:focus{outline:none}
+.vt-step{font-family:var(--font-mono);font-size:max(.62rem,var(--vi-fs-2));color:var(--teal);letter-spacing:.12em;margin-bottom:4px}
+.vt-title{font-family:var(--font-display);font-weight:800;font-size:.95rem;margin:0 0 6px}
+.vt-body{font-size:max(.8rem,var(--vi-fs-3));line-height:1.55;color:var(--muted);margin:0 0 12px}
+.vt-bar{height:3px;background:var(--track);border-radius:2px;margin-bottom:12px;overflow:hidden}
+.vt-bar i{display:block;height:100%;background:var(--teal);transition:width .28s}
+.vt-btns{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.vt-skip{background:none;border:none;color:var(--muted);font-size:max(.72rem,var(--vi-fs-3));cursor:pointer;padding:8px 4px;margin-right:auto;min-height:40px;text-decoration:underline;text-underline-offset:3px}
+.vt-back{background:none;border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:8px 12px;font-family:var(--font-display);font-weight:700;font-size:max(.66rem,var(--vi-fs-2));cursor:pointer;min-height:40px}
+.vt-next{background:var(--btn1);border:none;color:var(--on-teal);border-radius:8px;padding:8px 14px;font-family:var(--font-display);font-weight:800;font-size:max(.66rem,var(--vi-fs-2));cursor:pointer;min-height:40px}
+@media(prefers-reduced-motion:reduce){#vt-spot,#vt-card,.vt-bar i{transition:none}.vh-typing i{animation:none;opacity:.8}}
+body.reduced-motion #vt-spot,body.reduced-motion #vt-card,body.reduced-motion .vt-bar i{transition:none}
+/* v0.95, tester 1 (9 Nov 2026): text too small on the Pioneer welcome, profile set-up and tour (owner, 10 Nov 06:40). Nothing on these
+   screens under 12 px: eyebrows and field labels 12 px; notes, options and secondary buttons 13 px; main buttons 14 px. The tour text
+   matches the welcome sub-lines (14.5 px phone, 16 px desktop). !important only where an inline style sets the size. */
+#welcome-overlay .wz-back,#welcome-overlay .wz-count,#welcome-overlay .welcome-field label,#welcome-overlay .welcome-field label span,#welcome-overlay .wz-phase-n{font-size:12px!important}
+#welcome-overlay .welcome-head>div[style],#welcome-overlay .welcome-head span[style]{font-size:12px!important}
+#welcome-overlay .welcome-opt span,#welcome-overlay .welcome-opt b,#welcome-overlay .wz-skip,#welcome-overlay .wz-note,#welcome-overlay .w-ht-lbl,#welcome-overlay .w-ht-note,
+#welcome-overlay .wz-phase-name,#welcome-overlay .wz-phase-d,#welcome-overlay .wz-week,#welcome-overlay .wz-week b,#welcome-overlay .wz-days button,#welcome-overlay .wz-more summary,
+#welcome-overlay .w-view-lbl,#welcome-overlay .w-view-opt b,#welcome-overlay .w-view-opt span,#welcome-overlay .w-view-note,
+#welcome-overlay .wz-screen>div[style],#welcome-overlay .wz-screen>div[style] b,#welcome-overlay .welcome-field>div[style],#welcome-overlay .welcome-field>div[style] strong{font-size:13px!important}
+#welcome-overlay .welcome-cta{font-size:max(14px,var(--vi-fs-3))}
+#vt-card .vt-step{font-size:12px}
+#vt-card .vt-title{font-size:17px}
+#vt-card .vt-body{font-size:max(14.5px,var(--vi-fs-3))}
+#vt-card .vt-skip,#vt-card .vt-back,#vt-card .vt-next{font-size:14px}
+#vt-card .vt-skip{font-family:inherit}
+#welcome-overlay .welcome-field label span{letter-spacing:.02em;font-weight:400;font-family:'DM Sans',sans-serif}   /* the hint after a label reads as a note, not a second label */
+@media(min-width:700px){#vt-card{width:min(380px,calc(100vw - 32px))}#vt-card .vt-title{font-size:18px}#vt-card .vt-body{font-size:16px}}
+@media print{#vi-help,#vi-tour,#vi-help-btn{display:none}}
+#vi-help-btn{grid-row:1;grid-column:5}
+@media(max-width:1023px){#vi-help-btn{grid-column:4}}
+@media(min-width:1024px){body.vi-nav1 #vi-help-btn{grid-column:6}}
+/* 3D icons (owner, 12 Nov 2026: "more 3D and refined"): the vi3 symbols carry their own light and shadow; the active tile gets a soft bevel to match */
+html[data-theme="light"]{--vi3-sh:.55}
+html body #assets-page .subtab-btn.active{box-shadow:inset 0 1px 0 rgb(255 255 255 / .1),inset 0 -3px 8px -3px rgb(0 0 0 / .55),0 0 14px -4px rgb(var(--sa-rgb) / .7)!important}
+html body #topnav .tab-btn.active{box-shadow:inset 0 0 0 1px var(--tc),inset 0 2px 0 -1px rgb(255 255 255 / .12),inset 0 -4px 8px -4px rgb(0 0 0 / .6),0 0 14px -3px rgb(var(--tc-rgb) / .7)!important}
+html[data-theme="light"] body #assets-page .subtab-btn.active{box-shadow:inset 0 1px 0 rgb(255 255 255 / .9),inset 0 -3px 6px -3px rgb(0 0 0 / .14)!important}
+html[data-theme="light"] body #topnav .tab-btn.active{box-shadow:inset 0 0 0 1px var(--tc),inset 0 2px 0 -1px rgb(255 255 255 / .9),inset 0 -4px 6px -4px rgb(0 0 0 / .16)!important}
+</style>

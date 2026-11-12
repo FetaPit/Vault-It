@@ -1,0 +1,103 @@
+<style id="vi-daylight">
+/* ═══ Daylight polish (brand phase 6): ink on paper, no glow, nothing faint. Night is untouched. ═══ */
+/* no bloom: glows become nothing on paper */
+[data-theme="light"] *:not(.scene *):not(.inv-stage *){text-shadow:none!important}
+[data-theme="light"] .ov-kpi-val,[data-theme="light"] .sb-val{filter:none!important}
+/* titles and eyebrows dimmed for Night read at full strength on paper */
+[data-theme="light"] .ov-chart-title,[data-theme="light"] .ov-ms-title,[data-theme="light"] .card-lbl,[data-theme="light"] .vi-eyebrow{opacity:1!important}
+[data-theme="light"] .vi-sub{color:var(--muted)!important}
+/* primary buttons: white on teal */
+[data-theme="light"] .btn-add-data{color:var(--on-teal)!important;background:var(--btn1);border-color:var(--btn1)}
+[data-theme="light"] .btn-add-data:hover{background:var(--btn2)}
+/* secondary buttons (Cancel and the like): outline, ink text, AA on paper */
+[data-theme="light"] .btn-add-data[style*="color:var(--t3)"]{color:var(--text)!important;background:transparent!important;border-color:var(--lock)!important}
+[data-theme="light"] #sync-banner{color:var(--text)!important;border-color:var(--amber)!important}
+/* trial then paid: the plans prompt (no free column, Lifetime licence first) and the foot-of-page trial line */
+#pro-offer-modal.vi-trial-end .vi-tier-founder{order:-1}
+/* brand build (owner, 31 Oct: the screen recording is the target): the view controls sit in a row at the top right, in the
+   recording's order (+, −, auto-orbit, reset); "show my row" and full screen follow, so nothing is lost */
+/* Brand build camera rail (brand book .rail + 31 Oct recording): line icons, vertical on the right at desktop, a row top right on phones. The stage keeps the Night look in Daylight too. */
+.hud-btn .hb-ico{display:none}
+/* camera pill (v0.7 E18, owner 1 Nov): one row, bottom centre, 12 px up; buttons drawn 36 px inside a 44 px hit area; 18 px line icons in teal */
+html #house-scene.hb-brand .hud-bar{position:absolute;left:50%;right:auto;top:auto;bottom:12px;transform:translateX(-50%);flex-direction:row;align-items:center;gap:4px;padding:4px;max-width:calc(100% - 16px);background:var(--rail-bg);border:1px solid rgba(68,192,185,.3);border-radius:var(--r-pill);box-shadow:none}
+html #house-scene.hb-brand .hud-bar .hud-sep{display:none}
+html #house-scene.hb-brand .hud-btn{position:relative;box-sizing:border-box;width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;font-size:0!important;line-height:0;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:#44c0b9;box-shadow:none}
+html #house-scene.hb-brand .hud-btn::before{content:"";position:absolute;inset:4px;box-sizing:border-box;border-radius:50%;border:1px solid rgba(68,192,185,.22);background:var(--rail-btn);transition:border-color .15s,box-shadow .15s}
+html #house-scene.hb-brand .hud-btn svg{position:relative;width:18px;height:18px;display:block}
+html #house-scene.hb-brand .hud-btn:hover::before,html #house-scene.hb-brand .hud-btn:focus-visible::before{border-color:#44c0b9}
+html #house-scene.hb-brand .hud-btn.hud-toggle.orbit-active{background:transparent!important;box-shadow:none!important;border:0!important}
+html #house-scene.hb-brand .hud-btn.hud-toggle.orbit-active::before{border-color:#44c0b9;box-shadow:var(--dglow);background:var(--rail-btn)}
+html #house-scene.hb-brand #hb3d-cap{left:14px;right:14px;bottom:72px;font-family:'Share Tech Mono',monospace;font-size:clamp(11px,1.5vw,14px);letter-spacing:.08em;color:#B6D8D6;text-shadow:0 0 8px #000;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35;z-index:2}
+@media(max-width:640px){html #house-scene.hb-brand #hb3d-cap{font-size:11px}}
+@media(max-width:599.98px){html #house-scene.hb-brand #hb3d-cap{left:44px}}   /* v0.8 (Pete, 2 Nov): clear of the left-hand controls on phones; caption only */
+/* Simplified / Advanced view (owner, 31 Oct) */
+body.vi-simple [data-adv],html body.vi-simple #topnav .tab-btn[data-adv]{display:none!important}
+body:not(.vi-simple) [data-simple]{display:none!important}
+body.vi-simple #house-tab-inner[data-lvl="1"] #hb-hud{display:none!important}
+body.vi-simple .bd-page{display:flex;flex-direction:column}
+body.vi-simple .bd-page>*{order:2}
+body.vi-simple .bd-page>:first-child{order:0}
+body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
+.settings-hint{font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);line-height:1.5}
+.w-view-pick{margin-top:14px;text-align:left}
+#tester-welcome .tw-box{max-width:440px;padding:24px 24px 20px}
+.tw-msg{font-size:max(.66rem,var(--vi-fs-2));line-height:1.65;color:var(--t2);margin:12px 0 6px}
+.tw-sign{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.66rem,var(--vi-fs-2));color:var(--gold);margin:0 0 16px}
+.tw-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.tw-go{flex:1;min-width:140px;min-height:44px;margin:0!important;font-size:max(.62rem,var(--vi-fs-2))!important}
+.tw-mail{font-size:max(.56rem,var(--vi-fs-2));color:var(--teal);text-decoration:underline;text-underline-offset:3px;padding:10px 4px;min-height:44px;display:inline-flex;align-items:center}
+.w-view-lbl{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.56rem,var(--vi-fs-2));color:var(--tx);margin-bottom:8px}
+.w-view-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.w-view-opt{display:flex;flex-direction:column;gap:3px;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--bd2);background:var(--c3);color:var(--t2);cursor:pointer;min-height:44px}
+.w-view-opt b{font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--tx)}
+.w-view-opt span{font-size:max(.48rem,var(--vi-fs-1));line-height:1.4}
+.w-view-opt.active{border-color:var(--teal);background:rgb(var(--teal-rgb) / .1);box-shadow:inset 0 0 0 1px rgb(var(--teal-rgb) / .4)}
+.w-view-note{font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);margin-top:6px}
+.ov-ach-all{background:none;border:1px solid var(--bd2);border-radius:6px;color:var(--t2);font-size:max(.5rem,var(--vi-fs-1));padding:6px 10px;cursor:pointer;min-height:32px}
+.ov-ach-top{display:flex;align-items:center;gap:14px;padding:4px 2px 10px}
+.ov-ach-lv{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:'Share Tech Mono',monospace;font-size:1rem;color:var(--brass);border:1.5px solid var(--brass);background:rgb(var(--brass-rgb) / .08)}
+.ov-ach-meta{flex:1;min-width:0}.ov-ach-meta b{font-family:'Syne',sans-serif;font-size:max(.66rem,var(--vi-fs-2));color:var(--tx)}.ov-ach-meta small{display:block;font-size:max(.48rem,var(--vi-fs-1));color:var(--t3);margin-top:4px}
+.ov-ach-bar{height:6px;border-radius:3px;background:rgb(var(--ink-rgb) / .08);margin-top:6px;overflow:hidden}.ov-ach-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--brass),var(--gold))}
+.ov-ach-streak{flex:none;text-align:center}.ov-ach-streak b{display:block;font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:var(--gold)}.ov-ach-streak small{font-size:max(.44rem,var(--vi-fs-1));color:var(--t3)}
+.ov-ach-badges{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.ov-ach-badge{font-size:1.1rem;width:34px;height:34px;display:grid;place-items:center;border-radius:8px;background:rgb(var(--brass-rgb) / .08);border:1px solid rgb(var(--brass-rgb) / .25)}
+.ov-ach-none{font-size:max(.52rem,var(--vi-fs-1));color:var(--t2);flex:1;min-width:180px}.ov-ach-count{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:max(.46rem,var(--vi-fs-1));color:var(--t3)}
+/* the Sankey's bands breathe in a wave from left to right; never with reduced motion */
+@keyframes cfFlow{0%,100%{opacity:1}50%{opacity:.62}}
+@media (prefers-reduced-motion:no-preference){body:not(.reduced-motion) .cf-ln{animation:cfFlow 3.6s ease-in-out infinite}}
+/* KPIs: one row on desktop, two rows on phones (three then two) */
+@media (max-width:699px) and (min-width:321px){.ov-kpis:not(.debt-strip){grid-template-columns:repeat(6,minmax(0,1fr))!important}.ov-kpis:not(.debt-strip)>.ov-kpi{grid-column:span 2!important}.ov-kpis:not(.debt-strip)>.ov-kpi:nth-child(n+4){grid-column:span 3!important}}   /* once the days are up, the Lifetime licence (testers first) leads */
+#trial-banner{position:fixed;left:8px;right:8px;bottom:8px;z-index:10001;background:var(--panel);color:var(--text);border:1px solid var(--teal);border-radius:10px;padding:10px 12px;font-size:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 8px 24px rgb(0 0 0 / .25)}
+#trial-banner.trial-warn{border-color:var(--amber)}
+#trial-banner .trial-msg{flex:1;min-width:180px;line-height:1.45}
+#trial-banner .trial-x{background:none;border:0;color:var(--t2);font-size:14px;cursor:pointer;padding:2px 6px;min-width:32px;min-height:32px}
+/* House builder: parchment text from the old tracker becomes ink */
+[data-theme="light"] .price-edit-row label,[data-theme="light"] .igrp label,[data-theme="light"] .tgt-amt,[data-theme="light"] .sl,[data-theme="light"] .log-entry,[data-theme="light"] .scene-cap:not(.scene *){color:var(--muted)!important;opacity:1!important}
+[data-theme="light"] .ms-lbl{color:var(--lock)!important;opacity:1!important}
+[data-theme="light"] .hbtn{color:var(--muted)}
+[data-theme="light"] .hbtn .pr{opacity:1!important}
+[data-theme="light"] .hb-lv.on,[data-theme="light"] .hb-bd.got,[data-theme="light"] .hb-tip td:last-child{color:var(--gold)!important}
+[data-theme="light"] .hb-lv.lock{opacity:.75!important}
+[data-theme="light"] .ms{opacity:1!important}
+[data-theme="light"] .bd-qa-t{opacity:1!important}
+.vi-dim{opacity:.6}[data-theme="light"] .vi-dim{opacity:1;color:var(--muted)}
+[data-theme="light"] .hb-row-n b{color:var(--text)}
+[data-theme="light"] .data-item-del{opacity:1;color:#7A1414!important}
+/* WCAG AA (30 Oct): small chips and badges on tinted backgrounds reach 4.5:1 in Daylight */
+[data-theme="light"] .pro-badge{color:#5A2C0C!important}
+[data-theme="light"] .vi-d-opt.active{color:var(--on-teal)}
+[data-theme="light"] .stk-pie.on{color:var(--text)}
+[data-theme="light"] .hb-lv.lock{opacity:1!important}
+[data-theme="light"] .dev-links a{color:var(--text)!important}
+.dev-links{grid-template-columns:repeat(auto-fill,minmax(min(100%,124px),1fr))!important}   /* v0.8 type scale: the five links wrap rather than clip */
+.iso-cap{position:absolute;left:4%;right:4%;bottom:2%;text-align:center;font:400 10.5px/1.2 'Share Tech Mono',monospace;letter-spacing:.04em;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}   /* v0.8 type scale follow-up */
+[data-theme="light"] .conn-name span{color:var(--text)!important}
+[data-theme="light"] button.on,[data-theme="light"] .chart-filter-btn.on{color:var(--text)!important}
+[data-theme="light"] button[onclick^="resetAllAchievements"]{color:#7A1414!important}
+[data-theme="light"] .sym{color:var(--gold)!important}
+/* 3D viewports keep the Night look: their own Night background fills any letterbox around the drawing */
+[data-theme="light"] .scene,[data-theme="light"] .inv-stage{background:var(--bg)}
+[data-theme="light"] body{background-color:var(--bg);background-image:var(--paper-img);background-size:var(--paper-size);background-position:-1px -1px}   /* off-white paper, faint teal grid */
+[data-theme="light"] .vp-key:not(.scene *){color:var(--teal-deep)!important}
+[data-theme="light"] #nw-zoom-hint{color:var(--muted)!important}
+/* outside brand colours on paper */
+[data-theme="light"] a[href*="wa.me"]{color:#08502C!important}
+</style>

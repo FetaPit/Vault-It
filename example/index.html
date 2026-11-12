@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vault-It — Loading demo</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#04090f;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+  .wrap{text-align:center;padding:40px}
+  .logo{font-size:28px;font-weight:800;letter-spacing:.12em;color:#c9a84c;margin-bottom:8px}
+  .logo span{color:#44c0b9}
+  .sub{font-size:12px;letter-spacing:.18em;color:rgba(68,192,185,.6);text-transform:uppercase;margin-bottom:40px}
+  .bar-wrap{width:220px;height:3px;background:rgba(68,192,185,.12);border-radius:2px;margin:0 auto}
+  .bar{height:100%;background:linear-gradient(90deg,#44c0b9,#c9a84c);border-radius:2px;animation:fill 1.1s ease-out forwards}
+  @keyframes fill{from{width:0}to{width:100%}}
+  .msg{margin-top:20px;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">VAULT<span>·IT</span></div>
+  <div class="sub">Pioneer Edition</div>
+  <div class="bar-wrap"><div class="bar"></div></div>
+  <div class="msg">Loading your vault&hellip;</div>
+</div>
+
+<script>
+(function(){
+  var now = new Date().toISOString();
+  var expiry = Date.now() + 7 * 24 * 60 * 60 * 1000;
+
+  // ── Clear any stale demo / onboarding flags from a previous visit ─
+  // Alex Morgan is presented as a real returning user, so the welcome
+  // questionnaire and demo chip must NOT show.
+  localStorage.removeItem('vi_demo_mode');
+
+  // ── Session (7 days, no auth needed) ─────────────────────────────
+  localStorage.setItem('vi_session', JSON.stringify({ email: 'alex@vault-it.app', expiry: expiry }));
+
+  // ── User profile ──────────────────────────────────────────────────
+  localStorage.setItem('vi_user', JSON.stringify({
+    name: 'Alex Morgan',
+    email: 'alex@vault-it.app',
+    job: 'Senior Product Manager',
+    dream: 'Financial independence by 45',
+    saveArch: 'The Strategic Investor',
+    spendArch: 'The Measured Spender',
+    joined: now,
+    pioneerNum: 7
+  }));
+
+  // ── Pioneer access ────────────────────────────────────────────────
+  localStorage.setItem('vi_pioneer', 'true');
+
+  // ── Overview: cash flow + net-worth history (this is the key the app actually reads) ──
+  // Assets & debts live in their own tabs (Assets & Liabilities, Debt Tracker), so the
+  // Overview quick-add lists stay empty — otherwise they would be counted twice.
+  var months = [], snaps = [], d = new Date();
+  var nwSeries = [38500, 43200, 48100, 53400, 58700, 63900, 68000, 71000];
+  for (var i = 7; i >= 0; i--) {
+    var m = new Date(d.getFullYear(), d.getMonth() - i, 1);
+    var ym = m.getFullYear() + '-' + String(m.getMonth() + 1).padStart(2, '0');
+    snaps.push({ month: ym, nw: nwSeries[7 - i] || nwSeries[0], debt: 32950 + i * 450, liab: 400, income: 4150 });
+  }
+  localStorage.setItem('pos_ov1', JSON.stringify({
+    assets: [], debts: [],
+    snapshots: snaps,
+    milestones: [10000, 0, 25000, 50000, 100000],
+    income: [
+      { id: 1, name: 'Salary',        amount: 3800, cat: 'salary'   },
+      { id: 2, name: 'Side Projects', amount: 350,  cat: 'business' }
+    ],
+    expenses: [
+      { id: 3, name: 'Rent', amount: 1200, category: 'necessity', cat: 'housing', type: 'ce' },
+      { id: 4, name: 'Groceries', amount: 380, category: 'necessity', cat: 'groceries', type: 've' },
+      { id: 5, name: 'Transport', amount: 130, category: 'necessity', cat: 'transport', type: 've' },
+      { id: 6, name: 'Utilities & bills', amount: 165, category: 'necessity', cat: 'utilities', type: 've' },
+      { id: 7, name: 'Phone & internet', amount: 45, category: 'necessity', cat: 'phone', type: 'ce' },
+      { id: 8, name: 'Insurance', amount: 60, category: 'necessity', cat: 'insurance', type: 'ce' },
+      { id: 9, name: 'Subscriptions', amount: 62, category: 'discretionary', cat: 'subs', type: 'cn' },
+      { id: 10, name: 'Gym & health', amount: 45, category: 'discretionary', cat: 'fitness', type: 'cn' },
+      { id: 11, name: 'Eating out', amount: 95, category: 'discretionary', cat: 'dining', type: 'vn' },
+      { id: 12, name: 'Entertainment', amount: 80, category: 'discretionary', cat: 'fun', type: 'vn' },
+      { id: 13, name: 'Holidays', amount: 200, category: 'discretionary', cat: 'travel', type: 'vn' },
+      { id: 14, name: 'Gifts & giving', amount: 100, category: 'discretionary', cat: 'gifts', type: 'vn' },
+      { id: 15, name: 'House deposit', amount: 258, category: 'investment', cat: 'deposit', type: 'sv' },
+      { id: 16, name: 'ISA / investments', amount: 400, category: 'investment', cat: 'invest', type: 'iv' },
+      { id: 17, name: 'Pension', amount: 190, category: 'investment', cat: 'pension', type: 'iv' },
+      { id: 18, name: 'Emergency fund', amount: 300, category: 'investment', cat: 'emergency', type: 'sv' },
+      { id: 19, name: 'Savings', amount: 440, category: 'investment', cat: 'savings', type: 'sv' }
+    ]
+  }));
+
+  // ── Assets tab: metals / crypto / cash / inventory / liabilities / stocks ──
+  localStorage.setItem('pos_al1', JSON.stringify({
+    metals: { gold: 2.5, silver: 15, platinum: 0, palladium: 0 },
+    crypto: [
+      { id: 1, sym: 'ETH', amount: 1.4,  price: 2200  },
+      { id: 2, sym: 'BTC', amount: 0.05, price: 42000 },
+      { id: 3, sym: 'SOL', amount: 8,    price: 110   }
+    ],
+    cashAccounts: [
+      { id: 1, name: 'Marcus Savings', type: 'Savings', balance: 14800, rate: 4.7 },
+      { id: 2, name: 'Monzo Current',  type: 'Current', balance: 2300,  rate: 0   },
+      { id: 3, name: 'Lifetime ISA',   type: 'LISA',    balance: 8200,  rate: 3.5 }
+    ],
+    otherAssets: [
+      { id: 4, name: 'Car — Honda Civic', value: 12500, image: null, svgIcon: null, imageSearch: null },
+      { id: 5, name: 'MacBook Pro 16"',   value: 1800,  image: null, svgIcon: null, imageSearch: null }
+    ],
+    liabilities: [
+      { id: 6, name: 'Car Finance',  value: 6800, rate: 7.9, addedDate: '2024-01-01T00:00:00.000Z', runningCost: 180, depRate: 12 },
+      { id: 7, name: 'MacBook Loan', value: 1200, rate: 0,   addedDate: '2025-01-01T00:00:00.000Z', runningCost: 0,   depRate: 25 }
+    ],
+    stockPies: [ { id: 1, name: 'Stocks & Shares ISA' }, { id: 2, name: 'Trading 212 Pie' } ],
+    activePie: 1,
+    stocks: [
+      { id: 1, pie: 1, sym: 'VUSA.L', name: 'Vanguard S&P 500 UCITS ETF',  units: 180, avgCost: 62.4, price: 78.1,  change: 0 },
+      { id: 2, pie: 1, sym: 'VWRL.L', name: 'Vanguard FTSE All-World ETF', units: 95,  avgCost: 98,   price: 108.6, change: 0 },
+      { id: 3, pie: 1, sym: 'AAPL',   name: 'Apple Inc.',                  units: 12,  avgCost: 140,  price: 196.4, change: 0 },
+      { id: 4, pie: 1, sym: 'MSFT',   name: 'Microsoft Corp.',             units: 6,   avgCost: 270,  price: 330,   change: 0 },
+      { id: 5, pie: 2, sym: 'NVDA',   name: 'NVIDIA Corp.',                units: 14,  avgCost: 82,   price: 120,   change: 0 },
+      { id: 6, pie: 2, sym: 'AIQ',    name: 'Global X AI & Tech ETF',      units: 40,  avgCost: 24,   price: 32.5,  change: 0 }
+    ]
+  }));
+
+  // ── House Builder (the app reads "ht3") ──
+  localStorage.setItem('ht3', JSON.stringify({
+    saved: 22500, target: 240000, houseType: 'terraced',
+    deposits: [
+      { date: '01/10/2025', amount: 5000 }, { date: '01/11/2025', amount: 4500 },
+      { date: '01/12/2025', amount: 3500 }, { date: '01/01/2026', amount: 4000 },
+      { date: '01/02/2026', amount: 3200 }, { date: '01/03/2026', amount: 2300 }
+    ],
+    prices: { terraced: 240000, semi: 320000, detached: 500000, mansion: 1500000, flat: 80000, apartment: 300000 },
+    apartmentFloor: 5, houseMode: null, mortgageBalance: 0
+  }));
+
+  // ── Journey / life stage ──────────────────────────────────────────
+  localStorage.setItem('pos_journey', JSON.stringify({
+    profile: {
+      monthlyTakeHome: 3800, mortgageTermYears: 25,
+      interestRateEst: 4.5, depositTargetPct: 10,
+      creditHealth: 'good', efMonths: 4
+    },
+    onboarded: true, stageOverride: 2,
+    mortgageActive: false, mortgageBalance: 0,
+    rentMonthly: 1200, rentYears: 3
+  }));
+
+  // ── Debt Tracker ──────────────────────────────────────────────────
+  localStorage.setItem('pos_debt1', JSON.stringify({
+    debts: [
+      { id: 1, name: 'Student Loan Plan 2', balance: 24300, original: 38000, rate: 7.1,  minPay: 180, type: 'loan',   color: '#c9a84c' },
+      { id: 2, name: 'Barclaycard',         balance: 1850,  original: 3200,  rate: 24.9, minPay: 55,  type: 'credit', color: '#44c0b9' },
+      { id: 3, name: 'Car Finance',         balance: 6800,  original: 9500,  rate: 7.9,  minPay: 180, type: 'loan',   color: '#e05c5c' }
+    ]
+  }));
+
+  // ── Entrepreneur / Business tab (pos_biz1) ────────────────────────
+  localStorage.setItem('pos_biz1', JSON.stringify({
+    revenueGoal: 1500,
+    clients: [
+      { id: 1, name: 'Acme Tech Ltd',   monthly: 600, status: 'Active',   notes: 'Product consultancy retainer', email: 'cto@acmetech.co.uk', phone: '', website: 'acmetech.co.uk' },
+      { id: 2, name: 'BlueSkye Agency', monthly: 350, status: 'Active',   notes: 'UX audit & roadmap',           email: 'hello@blueskye.co',  phone: '', website: 'blueskye.co'    },
+      { id: 3, name: 'FinEdge Capital', monthly: 200, status: 'Prospect', notes: 'Pitch deck delivered',         email: 'hello@finedge.co.uk',phone: '', website: ''               }
+    ],
+    leads: [
+      { id: 4, name: 'Nova Retail', email: 'ops@novaretail.co.uk', phone: '', website: 'novaretail.co.uk', stage: 'warm', value: 400, notes: 'Intro call booked' },
+      { id: 5, name: 'DataPulse',   email: '',                     phone: '', website: 'datapulse.io',     stage: 'cold', value: 250, notes: 'LinkedIn connection' }
+    ],
+    streams: [
+      { id: 6, name: 'Gumroad — PM Templates', monthly: 95 },
+      { id: 7, name: 'Affiliate — Notion',      monthly: 28 }
+    ],
+    incomeStreams: [
+      { id: 8,  name: 'PM Templates Pack', type: 'passive',   monthlyIncome: 95,  status: 'active',   steps: ['Build template','Upload to Gumroad','Market on LinkedIn'], progress: 100 },
+      { id: 9,  name: 'Notion Affiliates', type: 'passive',   monthlyIncome: 28,  status: 'active',   steps: ['Sign up','Share link'], progress: 100 },
+      { id: 10, name: 'YouTube — Finance', type: 'active',    monthlyIncome: 0,   status: 'building', steps: ['Script 3 videos','Record','Publish'], progress: 30  },
+      { id: 11, name: 'Dividends (ISA)',   type: 'portfolio', monthlyIncome: 14,  status: 'active',   steps: ['Open account','Invest monthly'], progress: 100 }
+    ]
+  }));
+
+  // ── Achievements (pos_ach1) ───────────────────────────────────────
+  localStorage.setItem('pos_ach1', JSON.stringify({
+    xp: 850,
+    unlocked: ['first_asset', 'first_debt', 'cashflow_complete', 'house_started', 'stream1'],
+    connected: {},
+    snapshots: [],
+    streak: 5
+  }));
+
+  // ── Redirect to main app ──────────────────────────────────────────
+  setTimeout(function(){ window.location.replace('../'); }, 1200);
+})();
+</script>
+</body>
+</html>

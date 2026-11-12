@@ -1,0 +1,141 @@
+<!-- ═══════════════════════════ ENTREPRENEUR ═══════════════════════════ -->
+<div id="tab-biz" class="tab-panel" style="display:none">
+  <div style="max-width:1000px;margin:0 auto;padding:24px 20px 60px">
+
+    <div id="pro-gate-biz" style="display:none">
+      <div class="pro-gate-overlay" style="padding:28px 24px">
+        <div class="pro-gate-icon">🚀</div>
+        <div class="pro-gate-title">Entrepreneur tools</div>
+        <div class="pro-gate-sub" style="margin-bottom:16px">Part of every plan. Pick a plan to keep editing after your 30 days.</div>
+        <button class="pro-gate-btn" id="pro-gate-main-btn" onclick="viShowTrialEnd('biz')">See plans</button>
+      </div>
+    </div>
+
+    <!-- Business accounts (Entrepreneur 1): business current and savings accounts, counted in net worth with your cash -->
+    <div class="ov-chart-card" id="biz-accounts" style="margin-bottom:16px">
+      <div class="ba-hd">
+        <div class="ov-chart-title">Business accounts</div>
+        <div class="ba-tots"><span>Current <b id="biz-acc-current">£0</b></span><span>Savings <b id="biz-acc-savings">£0</b></span></div>
+      </div>
+      <div id="biz-acc-list"></div>
+      <div class="data-input-row ba-add">
+        <input type="text" id="ba-name" placeholder="Account name" aria-label="Business account name">
+        <select id="ba-kind" aria-label="Business account type"><option value="biz-current">Business current</option><option value="biz-savings">Business savings</option></select>
+        <input type="number" id="ba-bal" placeholder="Balance £" aria-label="Balance" step="0.01" inputmode="decimal">
+        <button class="btn-add-data" id="ba-add" onclick="bizAddAccount()">+ Add</button>
+      </div>
+      <div class="ba-note">Counted in your net worth with your cash. Your Budget does not change.</div>
+    </div>
+
+    <!-- Income Stream Builder -->
+    <div class="ov-chart-card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="ov-chart-title">Income Stream Builder</div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));color:var(--gold)">MRR: <span id="tab-total-biz" style="font-weight:700">£0/mo</span></span>
+          <button class="btn-add-data" onclick="showStreamForm()">+ New Stream</button>
+        </div>
+      </div>
+      <div id="income-streams-list"></div>
+    </div>
+    <div id="stream-form-card" class="ov-chart-card" style="display:none;margin-bottom:16px;border-color:var(--em)">
+      <div class="ov-chart-title" style="margin-bottom:12px">Register Income Stream</div>
+      <div class="g-form">
+        <div><label class="ov-kpi-lbl">Stream Name</label><input type="text" id="isb-name" class="al-inp" placeholder="e.g. YouTube channel"></div>
+        <div><label class="ov-kpi-lbl">Type</label>
+          <select id="isb-type" class="al-inp">
+            <option value="passive">Passive</option>
+            <option value="active">Active / Freelance</option>
+            <option value="portfolio">Portfolio / Dividend</option>
+          </select>
+        </div>
+        <div><label class="ov-kpi-lbl">Target Monthly £</label><input type="number" id="isb-income" class="al-inp" placeholder="500"></div>
+        <div><label class="ov-kpi-lbl">Status</label>
+          <select id="isb-status" class="al-inp">
+            <option value="idea">Idea</option>
+            <option value="building">Building</option>
+            <option value="active">Active</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-add-data" onclick="saveIncomeStream()" style="flex:1">Save Stream</button>
+        <button class="btn-add-data" onclick="document.getElementById('stream-form-card').style.display='none'" style="flex:1;background:transparent;border-color:var(--t3);color:var(--t3)">Cancel</button>
+      </div>
+    </div>
+
+    <div class="ov-kpis">
+      <div class="ov-kpi"><div class="ov-kpi-lbl">Monthly Recurring Revenue</div><div class="ov-kpi-val" id="biz-mrr" style="color:var(--gold)">£0/mo</div></div>
+      <div class="ov-kpi"><div class="ov-kpi-lbl">Active Clients</div><div class="ov-kpi-val" id="biz-clients-kpi" style="color:var(--em)">0</div></div>
+      <div class="ov-kpi"><div class="ov-kpi-lbl">Pipeline Value</div><div class="ov-kpi-val" id="biz-pipeline" style="color:var(--t2)">£0/mo</div></div>
+      <div class="ov-kpi">
+        <div class="ov-kpi-lbl">Monthly Goal</div>
+        <div class="ov-kpi-val" id="biz-goal-kpi" style="color:var(--or)">Not set</div>
+        <div class="ov-kpi-sub" id="biz-goal-sub">click to set target</div>
+      </div>
+    </div>
+    <div id="biz-goal-card" class="ov-chart-card" style="margin-bottom:16px;display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="ov-chart-title">MRR Goal Progress</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" id="biz-goal-inp" class="al-inp" placeholder="Target £/mo" style="width:120px">
+          <button class="btn-add-data" onclick="saveBizGoal()">Set Goal</button>
+        </div>
+      </div>
+      <div style="background:rgb(var(--ink-rgb) / .04);border-radius:4px;overflow:hidden;height:8px;margin-bottom:8px">
+        <div id="biz-goal-bar" style="height:100%;background:linear-gradient(90deg,var(--or),var(--go));border-radius:4px;transition:width .5s ease;width:0%"></div>
+      </div>
+      <div id="biz-goal-desc" style="font-size:max(.55rem,var(--vi-fs-1));color:var(--t2);text-align:center"></div>
+    </div>
+    <!-- Leads -->
+    <div class="ov-chart-card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span class="ov-chart-title">Leads</span>
+        <button class="btn-add-data" onclick="showLeadForm()">+ Add Lead</button>
+      </div>
+      <div id="leads-list-el"></div>
+    </div>
+    <div id="lead-form-card" class="ov-data-card" style="display:none;margin-bottom:16px">
+      <div class="ov-data-title">Add Lead</div>
+      <div class="g-form">
+        <div><label class="ov-kpi-lbl">Contact Name</label><input type="text" id="ld-name" class="al-inp"></div>
+        <div><label class="ov-kpi-lbl">Email</label><input type="email" id="ld-email" class="al-inp"></div>
+        <div><label class="ov-kpi-lbl">Phone</label><input type="text" id="ld-phone" class="al-inp"></div>
+        <div><label class="ov-kpi-lbl">Website</label><input type="text" id="ld-website" class="al-inp" placeholder="https://"></div>
+        <div><label class="ov-kpi-lbl">Stage</label><select id="ld-stage" class="al-inp"><option value="cold">Cold</option><option value="warm">Warm</option><option value="hot">Hot</option></select></div>
+        <div><label class="ov-kpi-lbl">Est. Value £/mo</label><input type="number" id="ld-value" class="al-inp"></div>
+        <div style="grid-column:1/-1"><label class="ov-kpi-lbl">Notes</label><input type="text" id="ld-notes" class="al-inp" placeholder="Optional"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-add-data" onclick="saveLead()">Save Lead</button>
+        <button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="document.getElementById('lead-form-card').style.display='none'">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Active Clients -->
+    <div class="ov-chart-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span class="ov-chart-title">Active Clients</span>
+        <button class="btn-add-data" onclick="showClientForm()">+ Add Client</button>
+      </div>
+      <div id="client-list-el"></div>
+    </div>
+    <div id="client-form-card" class="ov-data-card" style="display:none;margin-top:16px">
+      <div class="ov-data-title">Add Client</div>
+      <div class="g-form">
+        <div><label class="ov-kpi-lbl">Client Name</label><input type="text" id="cl-name" class="al-inp"></div>
+        <div><label class="ov-kpi-lbl">Monthly Value £</label><input type="number" id="cl-mo" class="al-inp"></div>
+        <div><label class="ov-kpi-lbl">Status</label><select id="cl-status" class="al-inp"><option>Active</option><option>Paused</option><option>Prospect</option></select></div>
+        <div><label class="ov-kpi-lbl">Email</label><input type="email" id="cl-email" class="al-inp" placeholder="Optional"></div>
+        <div><label class="ov-kpi-lbl">Phone</label><input type="text" id="cl-phone" class="al-inp" placeholder="Optional"></div>
+        <div><label class="ov-kpi-lbl">Website</label><input type="text" id="cl-website" class="al-inp" placeholder="Optional"></div>
+        <div style="grid-column:1/-1"><label class="ov-kpi-lbl">Notes</label><input type="text" id="cl-notes" class="al-inp" placeholder="Optional"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-add-data" onclick="saveClient()">Save Client</button>
+        <button class="btn-add-data" style="background:transparent;border-color:var(--t3);color:var(--t3)" onclick="document.getElementById('client-form-card').style.display='none'">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+

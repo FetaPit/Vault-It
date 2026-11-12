@@ -1,0 +1,25 @@
+    <div class="subtab-panel" id="assets-crypto">
+      <div class="ov-chart-card" style="margin-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span class="ov-chart-title">Crypto Holdings</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:max(.68rem,var(--vi-fs-2));color:var(--t2)">Total: <span id="subtab-total-crypto" style="font-weight:700;color:var(--em)">£0</span></span>
+        </div>
+        <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-add-data" onclick="fetchLivePrices()">↻ Refresh live prices</button>
+          <button class="btn-add-data" onclick="showToast('Wallet connect coming soon: paste your wallet address to auto-import holdings')" style="background:transparent;border-color:var(--go);color:var(--go)">🔗 Connect Wallet</button>
+        </div>
+        <div class="stk-main" id="cr-main"></div>
+        <div id="crypto-table"></div>
+        <div class="data-input-row" style="margin-top:12px">
+          <input type="text" id="cr-sym" placeholder="Coin, e.g. SOL" title="Coin symbol, for example SOL" style="max-width:120px">
+          <input type="number" id="cr-amt" placeholder="Amount" step="0.0001">
+          <input type="number" id="cr-price" placeholder="Price £" title="Only needed if there is no live price. Live prices come from CoinGecko; type a price only for a coin it does not list">
+          <input type="number" id="cr-cost" min="0" step="any" placeholder="Cost per unit £" title="Optional. What you paid for one coin, in £. Leave empty and the price when you add it is used">
+          <input type="text" id="cr-wallet" list="cr-wallets" maxlength="40" placeholder="Wallet or exchange" title="Optional. Groups your coins, for example Coinbase or Ledger">
+          <datalist id="cr-wallets"></datalist>
+          <button class="btn-add-data" onclick="addCrypto()">+ Add</button>
+        </div>
+        <div class="ca-note">Prices are indicative, from CoinGecko. The figures use what you enter. Not regulated by the FCA. Not financial advice.</div>
+      </div>
+      <div class="stk-card" id="cr-alloc" style="margin-top:12px"></div>
+    </div>

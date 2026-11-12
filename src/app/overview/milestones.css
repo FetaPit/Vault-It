@@ -1,0 +1,44 @@
+/* ── IMPROVED MILESTONE / FIRE ROADMAP ── */
+/* Node labels always readable */
+#fire-roadmap-svg text { pointer-events: none; }
+
+/* Overview milestone compact row */
+.ms-row {
+  display: grid;
+  grid-template-columns: 20px 22px 1fr 100px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+  padding: 4px 6px;
+  background: var(--c3);
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+  transition: background .15s;
+}
+.ms-row:hover { background: var(--c4); }
+.ms-row label {
+  font-size: max(.56rem,var(--vi-fs-2)) !important;
+  color: var(--t2) !important;
+  cursor: default;
+}
+.ms-row input[type="number"] {
+  width: 100% !important;
+  font-size: max(.62rem,var(--vi-fs-2)) !important;
+  padding: 4px 6px !important;
+  clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 3px 100%, 0 calc(100% - 3px)) !important;
+  border-radius: 0 !important;
+}
+
+/* Pro badge in nav */
+.pro-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: max(.38rem,var(--vi-fs-1));
+  padding: 1px 4px;
+  background: rgb(var(--brass-rgb) / .15);
+  color: var(--go);
+  border: 1px solid rgb(var(--brass-rgb) / .3);
+  border-radius: 2px;
+  margin-left: 4px;
+  vertical-align: middle;
+  letter-spacing: .06em;
+}
+</style>

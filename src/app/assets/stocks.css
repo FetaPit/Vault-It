@@ -1,0 +1,8 @@
+/* ── Stocks & Funds (portfolio pies) ── */
+.stk-wrap{margin-top:12px;display:flex;flex-direction:column;gap:12px}
+.stk-pies{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.stk-pie{font-family:'Syne',sans-serif;font-size:max(.54rem,var(--vi-fs-1));font-weight:700;padding:6px 12px;border-radius:99px;cursor:pointer;background:rgb(var(--teal-rgb) / .05);border:1px solid rgb(var(--teal-rgb) / .22);color:var(--t2);display:inline-flex;gap:8px;align-items:center}
+.stk-pie span{font-family:'Share Tech Mono',monospace;font-weight:400;color:var(--t3);font-size:max(.5rem,var(--vi-fs-1))}
+.stk-pie.on{background:rgb(var(--purple-rgb) / .16);border-color:var(--purple);color:#d9c9f2}
+.stk-pie.add{border-style:dashed;color:var(--em)}
+

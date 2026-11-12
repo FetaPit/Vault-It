@@ -1,0 +1,93 @@
+{
+  "model": "opusplan",
+  "effortLevel": "medium",
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "60",
+    "BASH_MAX_OUTPUT_LENGTH": "15000"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/statusline.sh\""
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/map.sh\"",
+            "timeout": 20
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/queue.sh\" start",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/queue.sh\" prompt",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/qc-gate.sh\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  },
+  "extraKnownMarketplaces": {
+    "cloudflare": {
+      "source": {
+        "source": "github",
+        "repo": "cloudflare/skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "cloudflare@cloudflare": true
+  },
+  "permissions": {
+    "allow": [
+      "mcp__Supabase__query_logs",
+      "mcp__Supabase__get_advisors",
+      "mcp__Supabase__list_edge_functions",
+      "mcp__Supabase__list_migrations",
+      "mcp__Supabase__get_project",
+      "mcp__github__actions_list",
+      "mcp__github__actions_get",
+      "mcp__github__get_job_logs",
+      "mcp__Cloudflare_Developer_Platform__search_cloudflare_documentation",
+      "mcp__Exa__web_fetch_exa",
+      "mcp__Exa__web_search_exa",
+      "mcp__Claude_Code_Remote__read_documentation"
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+<!-- ═══════════════════════════ BUDGET (zero-based) ═══════════════════════════ -->
+<div id="tab-budget" class="tab-panel" style="display:none">
+  <div class="bd-page" style="max-width:1040px;margin:0 auto;padding:24px 20px 60px">
+    <div style="margin-bottom:14px">
+      <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-0));letter-spacing:.3em;text-transform:uppercase;color:var(--blue);opacity:.8;margin-bottom:6px" class="vi-eyebrow">Vault-It · Budget</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:max(.55rem,var(--vi-fs-1));color:var(--t3);letter-spacing:.08em;margin-top:4px">ZERO-BASED BUDGET &nbsp;·&nbsp; INCOME − SPENDING − SAVING = £0</div>
+    </div>
+    <div class="ov-chart-card" style="margin-bottom:14px"><div id="bd-zero"></div></div>
+    <div id="bd-nudge"></div>
+    <div class="cf-legend" id="bd-legend"></div>
+    <!-- owner, 31 Oct: the income flow sits at the top, straight above the income | spending split, so the dashed divider runs on from it -->
+    <div class="ov-chart-card bd-sankey-card" style="margin:4px 0 0">
+      <div class="ov-chart-hd bd-flow-hd" style="flex-wrap:wrap;gap:10px;padding:0 16px"><span class="ov-chart-title">Where your income flows</span>
+        <div class="nw3d-seg" id="bd-view" role="group" aria-label="Income flow view"><button type="button" data-v="flow" aria-pressed="true"><svg class="vi-ic" aria-hidden="true"><use href="#vi-forecast"/></svg>Flow</button><button type="button" data-v="3d" aria-pressed="false"><svg class="vi-ic" aria-hidden="true"><use href="#vi-brick"/></svg>3D</button></div>
+        <div class="nw3d-seg" id="bd-fz" role="group" aria-label="Zoom the income flow"><button type="button" data-fz="out" aria-label="Zoom out" title="Zoom out">&minus;</button><button type="button" data-fz="fit" aria-label="Fit the whole flow on screen" title="Fit the whole flow on screen">Fit</button><button type="button" data-fz="in" aria-label="Zoom in" title="Zoom in">+</button></div></div>
+      <div id="bd-sankey" class="cf-scroll"></div>
+      <div id="bd-3d" hidden>
+        <div class="nw3d-stage" id="bd3d-stage"><canvas id="bd3d-cv" tabindex="0" role="img" aria-label="Your monthly budget as a tree map of £100 blocks, one area per type of spending or saving. Tap a block to read it, drag to turn it."></canvas><div class="nw3d-hud" role="group" aria-label="View controls"><button type="button" data-z="in" aria-label="Zoom in" title="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out" title="Zoom out">&minus;</button><button type="button" data-z="reset" aria-label="Reset view" title="Reset view">&#8634;</button></div></div>
+        <p class="nw3d-read" id="bd3d-read" aria-live="polite"></p>
+      </div>
+    </div>
+    <div class="bd-split" style="margin-top:14px">
+      <div class="ov-chart-card bd-inc">
+        <div class="ov-ms-title" style="color:var(--gr);margin-bottom:10px">Income <span style="color:var(--t3);font-weight:400">· per month</span></div>
+        <div id="cf-income-list" class="data-list"></div>
+        <div class="bd-pick-lbl">Choose a category</div>
+        <div id="bd-pick-inc" class="bd-picks"></div>
+        <div id="bd-new-inc" class="bd-new" style="display:none"></div>
+        <div class="data-input-row" style="margin-top:8px">
+          <input type="text" id="cf-inc-name" placeholder="Name (e.g. Salary)" onkeydown="if(event.key==='Enter')addIncome()">
+          <input type="number" id="cf-inc-amt" placeholder="£/mo" min="0" onkeydown="if(event.key==='Enter')addIncome()">
+          <button class="btn-add-data" onclick="addIncome()">+ Add</button>
+        </div>
+        <div class="bd-per100"><div class="bd-p100-t">EVERY £100 OF INCOME</div><div id="bd-per100"></div></div>
+        <div class="bd-mix">
+          <div style="font-size:max(.64rem,var(--vi-fs-2));font-weight:700;color:var(--t2);margin:18px 0 10px;letter-spacing:.06em">SPENDING MIX vs INCOME</div>
+          <div id="cf-categories"></div>
+        </div>
+      </div>
+      <div class="ov-chart-card bd-exp">
+        <div class="ov-ms-title bd-exp-hd" style="color:var(--t2);margin-bottom:10px"><span>Spending &amp; saving <span style="color:var(--t3);font-weight:400">· per month</span></span><span class="bd-fold-btns"><button type="button" onclick="bdFoldAll(true)">Collapse all</button><button type="button" onclick="bdFoldAll(false)">Expand all</button></span></div>
+        <div id="cf-expense-list" class="data-list"></div>
+        <div class="bd-pick-lbl">Choose a category</div>
+        <div id="bd-pick-exp" class="bd-picks"></div>
+        <div id="bd-new-exp" class="bd-new" style="display:none"></div>
+        <div class="data-input-row" style="margin-top:8px">
+          <input type="text" id="cf-exp-name" placeholder="Name (e.g. Groceries)" onkeydown="if(event.key==='Enter')addExpense()">
+          <input type="number" id="cf-exp-amt" placeholder="£/mo" min="0" onkeydown="if(event.key==='Enter')addExpense()">
+          <select id="cf-exp-cat" class="al-inp" style="max-width:190px" onchange="this.dataset.touched=1" title="Spending type: committed (same every month) or variable, essential or not, savings or investments"><option value="ce">Committed essential</option><option value="ve">Variable essential</option><option value="cn">Committed non-essential</option><option value="vn">Variable non-essential</option><option value="sv">Savings</option><option value="iv">Investments</option></select>
+          <button class="btn-add-data" onclick="addExpense()">+ Add</button>
+        </div>
+        <div style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);margin-top:6px;line-height:1.6">Every line has its own <b>category</b> and <b>type</b> drop-downs. Tap a line’s icon to give it a different icon; ✎ edits its name or amount. <b style="color:var(--tx)">Committed</b> = same every month · <b style="color:var(--tx)">Variable</b> = changes month to month.</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-budget -->
+
+
