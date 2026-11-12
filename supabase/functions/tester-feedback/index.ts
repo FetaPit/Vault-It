@@ -346,16 +346,16 @@ export function urgentText(id: number | string, t: Triage, who: string, screen: 
     (t.steps.length ? `Likely steps:\n${t.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n` : '') +
     `\nWhat they wrote:\n${text || '(rating only)'}\n\nFeedback #${id}${link ? ': ' + link : ''}`
 }
-/** The brand lockup for e-mail: the mid icon and the Syne wordmark as a picture (mail clients cannot load Syne). Drawn by tools/build_email_lockup.js from the brand book; served from the landing site. */
-const LOCKUP = `<img src="https://vault-it.co/email/lockup.gif" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">`
+/** The brand lockup for e-mail: the mid icon and the wordmark as a picture (the logo is drawn artwork, and many mail clients ignore web fonts). Drawn by tools/build_email_lockup.js from the brand book; served from the landing site. */
+const LOCKUP = `<img src="https://vault-it.co/email/lockup.gif" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">`
 export function urgentHtml(id: number | string, t: Triage, who: string, screen: string, text: string, link: string): string {
   const row = (k: string, v: string) => `<tr><td style="padding:4px 12px 4px 0;color:#9AA0A6;font-size:13px;vertical-align:top">${k}</td><td style="padding:4px 0;font-size:14px;color:#E8E8E8">${esc(v)}</td></tr>`
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Urgent tester feedback</title></head>
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Urgent tester feedback</title><style>@font-face{font-family:'Vault-form Heading';src:url('https://vault-it.co/fonts/vault-form-heading-bold.woff2') format('woff2');font-weight:700;font-style:normal}</style></head>
 <body style="margin:0;padding:24px 16px;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
 <div style="max-width:560px;margin:0 auto;background:#080D14;border:1px solid #15302F;border-radius:18px;padding:24px 28px">
 <div style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #102221">${LOCKUP}<div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div></div>
 <p style="margin:0 0 6px;font-family:'Share Tech Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#E8C56A">Urgent: severity 4</p>
-<h1 style="margin:0 0 16px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8">${esc(t.summary)}</h1>
+<h1 style="margin:0 0 16px;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8">${esc(t.summary)}</h1>
 <table role="presentation" cellpadding="0" cellspacing="0">${row('Type', t.type)}${row('Area', t.area)}${row('Tester', who)}${row('Screen', screen || 'not given')}</table>
 ${t.steps.length ? `<p style="margin:16px 0 6px;color:#9AA0A6;font-size:13px">Likely steps</p><ol style="margin:0;padding-left:20px;font-size:14px;line-height:1.6">${t.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
 <p style="margin:16px 0 6px;color:#9AA0A6;font-size:13px">What they wrote</p>
@@ -392,12 +392,12 @@ export function helpText(id: number | string, who: string, screen: string, quest
 }
 export function helpHtml(id: number | string, who: string, screen: string, question: string, link: string): string {
   const row = (k: string, v: string) => `<tr><td style="padding:4px 12px 4px 0;color:#9AA0A6;font-size:13px;vertical-align:top">${k}</td><td style="padding:4px 0;font-size:14px;color:#E8E8E8">${esc(v)}</td></tr>`
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Unanswered help question</title></head>
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>Unanswered help question</title><style>@font-face{font-family:'Vault-form Heading';src:url('https://vault-it.co/fonts/vault-form-heading-bold.woff2') format('woff2');font-weight:700;font-style:normal}</style></head>
 <body style="margin:0;padding:24px 16px;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
 <div style="max-width:560px;margin:0 auto;background:#080D14;border:1px solid #15302F;border-radius:18px;padding:24px 28px">
 <div style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #102221">${LOCKUP}<div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div></div>
 <p style="margin:0 0 6px;font-family:'Share Tech Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#44C0B9">Help question not answered</p>
-<h1 style="margin:0 0 16px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8;white-space:pre-wrap">${esc(question)}</h1>
+<h1 style="margin:0 0 16px;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8;white-space:pre-wrap">${esc(question)}</h1>
 <table role="presentation" cellpadding="0" cellspacing="0">${row('Tester', who)}${row('Screen', screen || 'not given')}</table>
 <p style="margin:16px 0 0;font-size:13px;line-height:1.6;color:#9AA0A6">Add an answer to the help guide (VI_KB in index.html) so the next tester gets one.</p>
 <p style="margin:12px 0 0;font-size:13px;color:#9AA0A6">Feedback #${esc(id)}${link ? ` · <a href="${esc(link)}" style="color:#44C0B9">view</a>` : ''}</p>

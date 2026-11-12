@@ -2,6 +2,7 @@
 //   dist/app      → https://app.vault-it.co   the app (index.html is self-contained) + the data-recovery page
 //   dist/landing  → https://vault-it.co       the sign-up page (served at / and /sign-up) + its confirm / thanks / unsubscribe pages
 //                                              + /privacy and /terms, built from the app's own notice text (tools/build_legal.js)
+//                                              + /fonts/vault-form-*.woff2, the brand's heading face, for the e-mails
 // Run: node tools/build_site.js            (Cloudflare Workers Builds: build command `npm run build:site`)
 const fs = require('fs'), path = require('path'), cp = require('child_process');
 const ROOT = path.join(__dirname, '..'), OUT = process.env.SITE_OUT ? path.resolve(process.env.SITE_OUT) : path.join(ROOT, 'dist');
@@ -23,7 +24,10 @@ const SITE = {
             // digital business card behind the printed card's QR code and NFC chip: vault-it.co/pete
             ['site/pete/index.html', 'pete.html'], ['site/pete/ptlive.png', 'pete/ptlive.png'], ['site/pete/house-corner.mp4', 'pete/house-corner.mp4'], ['site/pete/house-corner.jpg', 'pete/house-corner.jpg'], ['site/pete/pete-thickett-vault-it.vcf', 'pete/pete-thickett-vault-it.vcf'],
             // the card as a home-screen app: manifest, icons and the offline helper (served at /pete-sw.js so it can look after /pete)
-            ['site/pete/manifest.webmanifest', 'pete/manifest.webmanifest'], ['site/pete/icon-192.png', 'pete/icon-192.png'], ['site/pete/icon-512.png', 'pete/icon-512.png'], ['site/pete/sw.js', 'pete-sw.js']],
+            ['site/pete/manifest.webmanifest', 'pete/manifest.webmanifest'], ['site/pete/icon-192.png', 'pete/icon-192.png'], ['site/pete/icon-512.png', 'pete/icon-512.png'], ['site/pete/sw.js', 'pete-sw.js'],
+            // Vault-form, the brand's own heading face (owner, 10 Nov 2026; display cuts only from 12 Nov), at vault-it.co/fonts/: the e-mails load the Heading cut from here (the web pages embed theirs)
+            ...['heading-bold', 'heading-condensed-bold', 'hero-bold', 'hero-condensed-bold']
+              .map((w) => ['brand/fonts/vault-form/woff2/vault-form-' + w + '.woff2', 'fonts/vault-form-' + w + '.woff2'])],
 };
 // the 3D model library (v0.9.1, E30): only what the app reads, same address as the app, so no outside host
 const MODELS = ['catalog.json', 'CREDITS.md'];

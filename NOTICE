@@ -11,7 +11,10 @@ Used by the app (loaded from a CDN, or embedded)
 - EmailJS browser SDK 4, MIT. https://github.com/emailjs-com/emailjs-sdk
 - Cryptocurrency icons (spothq, v0.18.1), CC0 1.0. Embedded in index.html for the common coins. https://github.com/spothq/cryptocurrency-icons
 - Coin logos (simplr-sh/coin-logos), loaded for other coins. https://github.com/simplr-sh/coin-logos
-- Fonts from Google Fonts, SIL Open Font License 1.1: Syne, DM Sans, Share Tech Mono. https://fonts.google.com
+- Fonts from Google Fonts, SIL Open Font License 1.1: DM Sans, Share Tech Mono. https://fonts.google.com
+  Syne (same licence) survives only as drawn letters in the logo artwork and the e-mail lockup picture.
+- Vault-form, the brand's own heading typeface by PT Live Design, SIL Open Font License 1.1.
+  Self-hosted and embedded (brand/fonts/vault-form, licence in OFL.txt there).
 - Cloudflare Turnstile (a hosted service, not copied into this repository).
 
 Vendored in this repository (tests only, under tests/vendor)

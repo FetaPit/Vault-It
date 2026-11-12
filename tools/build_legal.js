@@ -25,7 +25,7 @@ function page(slug, n, other) {
     + '<script>(function(){try{var t=localStorage.getItem("vi-theme");if(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches)t="light";if(t==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}})();</script>'
     + '<title>' + esc(n.title) + ' · Vault-It</title><link rel="canonical" href="https://vault-it.co/' + slug + '">'
     + '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-    + '<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Share+Tech+Mono&display=swap" rel="stylesheet">'
+    + '<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Share+Tech+Mono&display=swap" rel="stylesheet">'
     + '<link rel="stylesheet" href="sign-up/style.css">'
     // the notice's own markup colours itself with the app's names (--em, --t3): map them to the site's tokens
     + '<style>:root{--em:var(--teal);--t3:var(--muted)}.legal{overflow-wrap:anywhere}.legal p,.legal li{margin:0 0 12px}.legal ul{margin:0 0 12px 22px!important}.legal strong{color:var(--text)}'

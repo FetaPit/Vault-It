@@ -23,7 +23,7 @@ for (const [f, html, txt] of [['send-auth-email', 1, 0], ['waitlist-join', 1, 2]
   ok(/Not regulated by the FCA\. Not financial advice\./.test(s), 'supabase/functions/' + f + ': the FCA line is still there');
 }
 const lic = rd('LICENSE') || ''; ok(/proprietary/i.test(lic) && /all rights reserved/i.test(lic) && /PT Live Design/.test(lic) && /no licen[cs]e/i.test(lic), 'LICENSE: proprietary, all rights reserved, PT Live Design, no licence granted');
-const note = rd('NOTICE') || ''; ok(/three\.js/i.test(note) && /MIT/.test(note) && /Syne/.test(note) && /DM Sans/.test(note) && /Share Tech Mono/.test(note) && /OFL|Open Font Licen[cs]e/i.test(note), 'NOTICE: names three.js (MIT) and the three Google Fonts (OFL)');
+const note = rd('NOTICE') || ''; ok(/three\.js/i.test(note) && /MIT/.test(note) && /Vault-form/.test(note) && /DM Sans/.test(note) && /Share Tech Mono/.test(note) && /OFL|Open Font Licen[cs]e/i.test(note), 'NOTICE: names three.js (MIT), Vault-form and the Google Fonts (OFL)');
 const pkg = JSON.parse(rd('package.json') || '{}'); ok(pkg.license === 'UNLICENSED' && pkg.private === true, 'package.json: "license": "UNLICENSED" and "private": true');
 ok(!/[—]/.test(lic + note), 'LICENSE and NOTICE have no em dashes');
 console.log(fails ? 'FAILURES ' + fails : 'ALL PASS'); process.exit(fails ? 1 : 0);

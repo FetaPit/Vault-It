@@ -274,14 +274,14 @@ export function groupBySeverity(rows: Row[]): Record<string, Row[]> {
   return g
 }
 
-/** The brand lockup for e-mail: the mid icon and the Syne wordmark as a picture (mail clients cannot load Syne). Drawn by tools/build_email_lockup.js from the brand book; served from the landing site. */
-const LOCKUP = `<img src="https://vault-it.co/email/lockup.gif" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">`
+/** The brand lockup for e-mail: the mid icon and the wordmark as a picture (the logo is drawn artwork, and many mail clients ignore web fonts). Drawn by tools/build_email_lockup.js from the brand book; served from the landing site. */
+const LOCKUP = `<img src="https://vault-it.co/email/lockup.gif" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">`
 function shell(title: string, body: string): string {
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>${esc(title)}</title></head>
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>${esc(title)}</title><style>@font-face{font-family:'Vault-form Heading';src:url('https://vault-it.co/fonts/vault-form-heading-bold.woff2') format('woff2');font-weight:700;font-style:normal}</style></head>
 <body style="margin:0;padding:24px 16px;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
 <div style="max-width:620px;margin:0 auto;background:#080D14;border:1px solid #15302F;border-radius:18px;padding:24px 28px">
 <div style="padding-bottom:16px;border-bottom:1px solid #102221">${LOCKUP}<div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div></div>
-<h1 style="margin:18px 0 4px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8">${esc(title)}</h1>
+<h1 style="margin:18px 0 4px;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8">${esc(title)}</h1>
 ${body}
 <div style="margin-top:22px;padding-top:14px;border-top:1px solid #102221"><p style="margin:0 0 6px;font-size:12px;color:#E8E8E8">Not regulated by the FCA. Not financial advice.</p>
 <p style="margin:0;font-size:11px;line-height:1.6;color:#9AA0A6">Sent by the feedback-digest function. Tester figures never leave their devices; screenshots have them hidden.</p></div>
