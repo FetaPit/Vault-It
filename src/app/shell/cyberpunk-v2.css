@@ -516,10 +516,4 @@ input:focus, textarea:focus, select:focus {
   outline: none !important;
 }
 
-/* ── PRO OFFER MODAL ─────────────────────────────────────────────── */
-#pro-offer-modal > div {
-  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)) !important;
-  box-shadow: 0 0 40px rgb(var(--brass-rgb) / .1), 0 0 80px rgb(var(--teal-rgb) / .05);
-}
-
 </style>

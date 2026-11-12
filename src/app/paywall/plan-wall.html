@@ -14,7 +14,7 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
 #plan-wall[data-state="paying"] .wall-view[data-view="paying"],#plan-wall[data-state="late"] .wall-view[data-view="late"]{display:block}
 .wall-mail{color:var(--teal);font-weight:600;text-underline-offset:3px;white-space:nowrap}
 .wall-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:22px 0 8px}
-.wall-title{font-family:var(--font-display);font-weight:800;font-size:clamp(1.5rem,4.4vw,2.15rem);line-height:1.15;letter-spacing:-.01em;margin:0 0 12px;color:var(--text)}
+.wall-title{font-family:var(--font-display);font-weight:700;font-size:clamp(1.5rem,4.4vw,2.15rem);line-height:1.15;letter-spacing:-.01em;margin:0 0 12px;color:var(--text)}
 .wall-lead{font-size:15px;line-height:1.55;color:var(--text);max-width:64ch;margin:0 0 8px}
 .wall-safe{font-size:14px;line-height:1.55;color:var(--muted);max-width:64ch;margin:0 0 20px}
 .wall-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 18px}
@@ -69,7 +69,7 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
       <div class="wall-plans">
         <div class="wall-plan" data-tier-card="monthly">
           <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg>
-            <div><div class="wall-plan-when">Monthly</div><div class="wall-plan-name" data-plan-name="monthly"></div></div></div>
+            <div><div class="wall-plan-when">Monthly</div><div class="wall-plan-name" data-plan-name="monthly" data-tier-name></div></div></div>
           <div class="wall-plan-price" data-plan-price="monthly"></div>
           <p class="wall-plan-terms" data-plan-terms="monthly"></p>
           <ul class="wall-plan-list"><li>The whole app, editing on</li><li>All six house types, Levels 1 to 3</li><li>Your own 3D house design and AI house model</li><li>AI screenshot reader, 30 a month</li></ul>
@@ -77,7 +77,7 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
         </div>
         <div class="wall-plan" data-tier-card="annual">
           <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg>
-            <div><div class="wall-plan-when">Yearly</div><div class="wall-plan-name" data-plan-name="annual"></div></div></div>
+            <div><div class="wall-plan-when">Yearly</div><div class="wall-plan-name" data-plan-name="annual" data-tier-name></div></div></div>
           <div class="wall-plan-price" data-plan-price="annual"></div>
           <p class="wall-plan-terms" data-plan-terms="annual"></p>
           <ul class="wall-plan-list"><li>Everything in the monthly plan</li><li>One payment a year</li><li>Early access to new features</li><li>Roadmap voting</li></ul>
@@ -85,7 +85,7 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
         </div>
         <div class="wall-plan" data-tier-card="founder">
           <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg>
-            <div><div class="wall-plan-when">One payment</div><div class="wall-plan-name" data-plan-name="founder"></div></div></div>
+            <div><div class="wall-plan-when">One payment</div><div class="wall-plan-name" data-plan-name="founder" data-tier-name></div></div></div>
           <div class="wall-plan-price" data-plan-price="founder"></div>
           <p class="wall-plan-terms" data-plan-terms="founder"></p>
           <ul class="wall-plan-list"><li>The whole app for the life of the service</li><li>Lifetime badge and name in credits</li><li>Priority requests</li><li>AI screenshot reader, 10 a month</li></ul>

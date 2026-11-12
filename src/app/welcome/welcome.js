@@ -3,8 +3,8 @@
 // ══════════════════════════════════════════════════════════════
 
 function _isPro() {
-  // Trial then paid (31 Oct): the 30 days give the full app, and the read-only vault after them still shows everything that was
-  // built, so no feature is hidden by this check any more. Paid status itself is viPaid(); viTier() names the plan (monthly and yearly are both Pioneer; founder = Lifetime licence).
+  // Every plan is the whole app (and with the card wall, 12 Nov 2026, an account in the app is on a plan), so no feature is hidden
+  // by this check. Paid status itself is viPaid(); viTier() names the plan (founder = Lifetime licence).
   return true;
 }
 

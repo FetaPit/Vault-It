@@ -10,7 +10,7 @@
 //      with the trial terms and how to cancel next to the button; Lifetime opens the £99 link, charged at checkout
 //   3. not an alpha tester while the beta is open: the same beta prices, charged at checkout, no trial wording
 //   4. beta closed: full prices; Founder £5.99 and Lifetime £149 open their links; Pioneer yearly opens the £59.99 link (5 Nov; it said "coming soon" before)
-//   5. names: Founder, Pioneer, Lifetime licence (read-only after the trial has no tier name); icons on every card
+//   5. names: Pioneer, Pioneer, Lifetime licence; icons on every card
 // Owner, 5 Nov 2026 (answers to the parent session): "Pioneer" now names both the monthly and the yearly plan (Stripe's product has
 //   always been "Vault·It Pioneer" for both); the tier key and icon stay 'founder' for the monthly card. The £59.99 yearly link exists
 //   in Stripe (cNidR3b5s3IJ0ex2yy2VG0c, price_1TdPyB9mgKf6HntyvjViAMQg, £59.99 a year recurring), so once the beta closes Pioneer yearly
@@ -35,8 +35,9 @@ const X = {
 };
 const TRIAL = (pl) => 'Free for 30 days, then ' + X[pl].now + ' ' + X[pl].per + '. Your card is taken now and first charged on day 31. Cancel before then and you pay nothing.';
 const CANCEL = 'To cancel, email hello@vault-it.co.';
-const SURF = { settings: ['monthly', 'annual', 'founder'], paywall: ['monthly', 'annual'], offer: ['monthly', 'annual', 'founder'], camp: ['monthly', 'annual', 'founder'] };
-const ROOT = { settings: '#settings-modal', paywall: '#paywall-modal', offer: '#pro-offer-modal', camp: '#vi-campaign-modal' };
+// (the plans pop-up went with the in-app trial, 12 Nov 2026; the wall's own plan cards are checked in test_card_wall.js)
+const SURF = { settings: ['monthly', 'annual', 'founder'], paywall: ['monthly', 'annual'], camp: ['monthly', 'annual', 'founder'] };
+const ROOT = { settings: '#settings-modal', paywall: '#paywall-modal', camp: '#vi-campaign-modal' };
 const seed = () => {
   localStorage.setItem('vi-theme', 'dark'); localStorage.setItem('vi_declined_demo', 'true');
   localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
@@ -63,7 +64,8 @@ const seed = () => {
   await p.addStyleTag({ content: '#welcome-overlay,#login-overlay,#sync-banner,#trial-banner{display:none!important}' });
   const openAll = () => p.evaluate(() => {
     window.__opened = []; window.open = function (u) { window.__opened.push(u); return null; };
-    showSettings(); viShowTrialEnd('banner'); showPaywall('assets');
+    _supaUser = { id: '11111111-1111-4111-8111-111111111111', email: 't@t.com' };   // every checkout belongs to an account
+    showSettings(); showPaywall('assets');
     document.getElementById('vi-campaign-modal').classList.remove('hidden'); try { viCampaignPrices(); } catch (e) {}
   });
   const read = () => p.evaluate((ROOT) => {
@@ -110,18 +112,20 @@ const seed = () => {
       ok(r.icons.includes(X[pl].tier), k + ' ' + pl + ': carries the ' + X[pl].tier + ' icon');
     }
   }
-  ok(R.offer.names.join('|') === 'Read-only|Pioneer|Pioneer|Lifetime licence', 'plans pop-up columns: Read-only, Pioneer (monthly), Pioneer (yearly), Lifetime licence (' + R.offer.names.join('|') + ')');
   ok(R.camp.names.join('|') === 'Pioneer|Pioneer|Lifetime licence', 'crowdfund cards: Pioneer (monthly), Pioneer (yearly), Lifetime licence (' + R.camp.names.join('|') + ')');
   ok(R.paywall.names.join('|') === 'Pioneer|Pioneer' && R.settings.names.join('|') === 'Pioneer|Pioneer|Lifetime licence', 'paywall and Settings name the tiers (' + R.paywall.names.join('|') + ' / ' + R.settings.names.join('|') + ')');
-  ok(/Family mode \(coming soon\)/.test(R.offer.pioneer) && /Family mode \(coming soon\)/.test(R.camp.pioneer), 'Pioneer lists "Family mode (coming soon)" in the plans pop-up and the crowdfund');
-  ok(R.offer.icons.length === 3, 'the read-only column has no tier icon (' + R.offer.icons.join(',') + ')');
+  ok(/Family mode \(coming soon\)/.test(R.camp.pioneer), 'Pioneer lists "Family mode (coming soon)" on the crowdfund');
   let C = await clickAll();
   const trialKey = (pl) => X[pl].trial || X[pl].checkout;
-  ok(C.length >= 11 && opens(C, trialKey).length === 0, 'alpha: Pioneer monthly and yearly open the 30-day trial links, Lifetime the £99 link (' + opens(C, trialKey).join(' | ') + ')');
+  ok(C.length >= 8 && opens(C, trialKey).length === 0, 'alpha: Pioneer monthly and yearly open the 30-day trial links, Lifetime the £99 link (' + opens(C, trialKey).join(' | ') + ')');
 
-  // ── read-only after the 30 days: no tier name ──
-  const RO = await p.evaluate(() => { const d = viTrialDaysLeft; viTrialDaysLeft = () => 0; _refreshPioneerSettingsUI(); const o = { badge: document.getElementById('set-pioneer-badge').textContent, txt: document.getElementById('set-pioneer-inactive').textContent }; viTrialDaysLeft = d; _refreshPioneerSettingsUI(); return o; });
-  ok(/READ-ONLY/.test(RO.badge) && /read-only/.test(RO.txt) && /Pioneer at £3\.99 a month/.test(RO.txt) && /Pioneer at £49\.99 a year/.test(RO.txt) && !/Founder/.test(RO.txt) && /Lifetime licence/.test(RO.txt), 'read-only state has no tier name; the plans are offered by name (' + RO.badge + ' / ' + RO.txt + ')');
+  // ── no plan on the device: Settings names the plans, with no trial or read-only wording; on a plan it says so and hides the buy buttons ──
+  const RO = await p.evaluate(() => { _refreshPioneerSettingsUI(); const o = { badge: document.getElementById('set-pioneer-badge').textContent, txt: document.getElementById('set-pioneer-inactive').textContent };
+    localStorage.setItem('vi_pioneer', 'true'); localStorage.setItem('vi_plan', 'monthly'); _refreshPioneerSettingsUI();
+    o.paidBadge = document.getElementById('set-pioneer-badge').textContent; o.line = document.getElementById('set-plan-line').textContent; o.buy = getComputedStyle(document.querySelector('#settings-modal .set-tiers')).display;
+    localStorage.removeItem('vi_pioneer'); localStorage.removeItem('vi_plan'); _refreshPioneerSettingsUI(); return o; });
+  ok(/NO PLAN/.test(RO.badge) && !/read-only|TRIAL|days/i.test(RO.badge + RO.txt) && /Pioneer at £3\.99 a month/.test(RO.txt) && /Pioneer at £49\.99 a year/.test(RO.txt) && !/Founder/.test(RO.txt) && /Lifetime licence/.test(RO.txt), 'no plan: no trial or read-only wording; the plans are offered by name (' + RO.badge + ' / ' + RO.txt + ')');
+  ok(/ACTIVE/.test(RO.paidBadge) && /You are on Pioneer \(monthly\)/.test(RO.line) && RO.buy === 'none', 'on a plan: Settings says which, and the buy buttons are hidden (' + RO.paidBadge + ' / ' + RO.line + ')');
 
   // ── 3. not an alpha tester, beta still open: beta prices charged at checkout, no trial wording ──
   await p.evaluate(() => { localStorage.setItem('vi_beta', 'false'); });
@@ -146,7 +150,7 @@ const seed = () => {
   C = await clickAll();
   ok(C.filter(c => c.plan === 'annual').length >= 3 && opens(C, pl => X[pl].full).length === 0, 'beta closed: Pioneer monthly opens £5.99, Pioneer yearly £59.99 and Lifetime £149 (' + opens(C, pl => X[pl].full).join(' | ') + ')');
   // the "never a dead link" guard still holds for a plan whose link is blanked: nothing opens, the button says so
-  const S = await p.evaluate(() => { const keep = VI_STRIPE_LINKS.annual_after_beta; VI_STRIPE_LINKS.annual_after_beta = ''; viPricePaint(); const b = document.getElementById('offer-cta-annual'); const o = []; window.open = (u) => { o.push(u); }; const t = window.showToast; let msg = ''; window.showToast = (m) => { msg = m; }; showUpgrade('annual'); window.showToast = t; const r = { o, msg, dis: b.disabled, txt: b.textContent.trim() }; VI_STRIPE_LINKS.annual_after_beta = keep; viPricePaint(); return r; });
+  const S = await p.evaluate(() => { const keep = VI_STRIPE_LINKS.annual_after_beta; VI_STRIPE_LINKS.annual_after_beta = ''; viPricePaint(); const b = document.getElementById('camp-cta-pioneer'); const o = []; window.open = (u) => { o.push(u); }; const t = window.showToast; let msg = ''; window.showToast = (m) => { msg = m; }; showUpgrade('annual'); window.showToast = t; const r = { o, msg, dis: b.disabled, txt: b.textContent.trim() }; VI_STRIPE_LINKS.annual_after_beta = keep; viPricePaint(); return r; });
   ok(S.o.length === 0 && /coming soon/i.test(S.msg) && S.dis && /coming soon/i.test(S.txt), 'a plan with its link blanked opens nothing and says coming soon (' + S.msg + ' / ' + S.txt + ')');
 
   await b.close();

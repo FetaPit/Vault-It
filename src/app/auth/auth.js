@@ -152,6 +152,7 @@ async function signOut() {
   var _viaG = false; try { _viaG = localStorage.getItem(VI_AUTH_VIA) === 'google'; } catch (e) {}
   if (!confirm(_viaG ? 'Sign out? You can get back in with Google, or with your email.' : 'Sign out? You can get back in with just your email and PIN.')) return;
   localStorage.removeItem('vi_session');
+  try { localStorage.removeItem('vi_pay_pending'); } catch (e) {}   // a remembered return from Stripe is this person's, not the next one's
   try { if (_supaClient) await _withTimeout(_supaClient.auth.signOut({ scope: 'local' }).catch(function () {}), 2500, null); } catch (e) {}
   try { for (var k = _localSessionKey(), n = 0; k && n < 5; k = _localSessionKey(), n++) localStorage.removeItem(k); } catch (e) {}
   location.reload();

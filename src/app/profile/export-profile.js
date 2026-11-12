@@ -126,7 +126,7 @@ function renderPioneerCard() {
     // ── Rarity ──
     var pioneer = isPioneer();
     var rarityStars = pioneer ? '✦✦✦' : '✦';
-    var rarityLabel = pioneer ? 'GENESIS' : (typeof viTrialState === 'function' && viTrialState() === 'ended' ? 'READ-ONLY' : 'TRIAL');
+    var rarityLabel = pioneer ? 'GENESIS' : 'SAMPLE';   // with the card wall an account in the app is on a plan; without one this card is only seen on the sample
     var joined = u.joined ? new Date(u.joined).getFullYear() : new Date().getFullYear();
     var saveArch  = u.saveArch  || '';
     var spendArch = u.spendArch || '';

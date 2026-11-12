@@ -112,12 +112,12 @@ const shut = (s) => s.wall && s.covered && !s.nav && !s.tab && !s.side && !s.foo
     ok(s.buttons.length === allowed.length && s.buttons.every((x) => allowed.indexOf(x) > -1), T + '1 the only ways on are a plan, Check again, Sign out, Download my data and Help (' + s.buttons.join() + ')');
     // nothing gets past it
     await p.keyboard.press('Escape'); await p.mouse.click(4, 4); await p.waitForTimeout(200);
-    await p.evaluate(() => { try { showTab('budget'); } catch (e) {} try { showSettings(); } catch (e) {} try { document.getElementById('pro-offer-modal').classList.remove('hidden'); } catch (e) {} });
+    await p.evaluate(() => { try { showTab('budget'); } catch (e) {} try { showSettings(); } catch (e) {} try { document.getElementById('vi-campaign-modal').classList.remove('hidden'); } catch (e) {} });
     for (let i = 0; i < 40; i++) await p.keyboard.press('Tab');
     const focus = await p.evaluate(() => { const a = document.activeElement, w = document.getElementById('plan-wall'); return !a || a === document.body || w.contains(a); });
     s = await look(p);
     ok(shut(s) && s.state === 'plans' && focus, T + '1 Esc, a tap outside, the Tab key and a tab switch behind it all leave the wall up and the app out of reach (focus inside: ' + focus + ')');
-    ok(await p.evaluate(() => ['settings-modal', 'pro-offer-modal', 'tab-budget'].every((id) => getComputedStyle(document.getElementById(id)).visibility === 'hidden')), T + '1 anything opened behind the wall stays hidden');
+    ok(await p.evaluate(() => ['settings-modal', 'vi-campaign-modal', 'tab-budget'].every((id) => getComputedStyle(document.getElementById(id)).visibility === 'hidden')), T + '1 anything opened behind the wall stays hidden');
 
     // ── 2  the monthly plan goes to Stripe with the trial link, the account and the e-mail ──
     await p.click('#plan-wall [data-plan="monthly"]'); await p.waitForTimeout(200);

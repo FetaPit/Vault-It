@@ -61,6 +61,8 @@ function viWallApplies() {
     return !_viOnSample();                  // vault-it.co/demo-a: no account, no wall
   } catch (e) { return true; }
 }
+// the wall is up: an account, no "on a plan" from the server yet, and neither sign-in nor the questions in front (viBlockEdit follows this)
+function viWallUp() { if (_viPlanStub() === 'on') return false; return viWallApplies() && _viPlanState !== 'on' && !_viWallBlocked(); }
 function _viWallBlocked() {   // sign-in or the questions are on screen: they come first ("After the questions")
   return ['login-overlay', 'welcome-overlay'].some(function (id) { var el = document.getElementById(id); return !!(el && getComputedStyle(el).display !== 'none'); });
 }
@@ -158,14 +160,17 @@ async function viWallExport(btn) {
 function _viPayPending() {   // the remembered return: { plan, t }, for half an hour
   try {
     var raw = localStorage.getItem('vi_pay_pending'); if (!raw) return null;
-    var p = JSON.parse(raw), age = p && typeof p.t === 'number' ? Date.now() - p.t : -1;
-    if (age >= -60000 && age < VI_PAY_KEEP_MS) return p;
+    var p = JSON.parse(raw), age = p && typeof p.t === 'number' ? Date.now() - p.t : NaN, cur = _viPlanUid();
+    if (age >= -60000 && age < VI_PAY_KEEP_MS && !(p.u && cur && p.u !== cur)) {            // in time, and not another account's
+      if (!p.u && cur) { p.u = cur; localStorage.setItem('vi_pay_pending', JSON.stringify(p)); }   // the page came back before the sign-in was found: it is this account's
+      return p;
+    }
     localStorage.removeItem('vi_pay_pending');
   } catch (e) { try { localStorage.removeItem('vi_pay_pending'); } catch (e2) {} }
   return null;
 }
-function viPaymentReturn(plan) {   // called for ?upgraded=1 / ?founded=1 (handleOAuthCallback): remember it, show it, ask the server
-  try { localStorage.setItem('vi_pay_pending', JSON.stringify({ plan: plan, t: Date.now() })); } catch (e) {}
+function viPaymentReturn(plan) {   // called for ?upgraded=1 / ?founded=1 (handleOAuthCallback): remember it (for the signed-in account), show it, ask the server
+  try { localStorage.setItem('vi_pay_pending', JSON.stringify({ plan: plan, t: Date.now(), u: _viPlanUid() })); } catch (e) {}
   if (!hasValidSession()) { try { showToast('Sign in to finish. Your plan is linked to your account, so it appears once you are signed in. Questions: ' + VI_CANCEL_EMAIL, 9000); } catch (e) {} }
   viPlanGate(); _viPayWatch();
 }

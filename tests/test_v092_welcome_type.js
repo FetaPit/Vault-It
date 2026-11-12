@@ -48,7 +48,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     ok(!phone || X.inputBottom <= X.footTop, T + 'the first field is visible above the pinned button (input bottom ' + Math.round(X.inputBottom) + ', button area top ' + Math.round(X.footTop) + ')');
     ok(X.leadText === "You're among the first to vault, and shaping what this becomes.", T + 'lead wording (Pedro approved Pradeep\'s line)');
     // lining figures: Syne's default zero is a small round o ("30" read as "3o"); the headline must ask for lining figures everywhere it is drawn
-    const N = await p.evaluate(() => ['.welcome-h2', '.welcome-sub', '.welcome-lead', '.vi-tier-cta', '.vi-camp-tier-cta', '.set-tier-price', '.welcome-cta'].map(q => { const e = document.querySelector(q); if (!e) return [q, 'missing']; const cs = getComputedStyle(e); return [q, /lining-nums/.test(cs.fontVariantNumeric)]; }));
+    const N = await p.evaluate(() => ['.welcome-h2', '.welcome-sub', '.welcome-lead', '.wall-cta', '.vi-camp-tier-cta', '.set-tier-price', '.welcome-cta'].map(q => { const e = document.querySelector(q); if (!e) return [q, 'missing']; const cs = getComputedStyle(e); return [q, /lining-nums/.test(cs.fontVariantNumeric)]; }));
     ok(N.every(x => x[1] === true), T + 'lining figures on the welcome text, plan buttons and prices (' + JSON.stringify(N.filter(x => x[1] !== true)) + ')');
     // real rendering: a "3" and a "0" drawn with the welcome heading's CSS, ink heights read from a screenshot (needs the Syne web font, so it is skipped where Google Fonts is blocked)
     const loaded = await p.evaluate(async () => { try { await document.fonts.load('800 40px Syne', '30'); } catch (e) {} return document.fonts.check('800 40px Syne', '30'); });
@@ -61,7 +61,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     }
     if (glyph) ok(glyph.zero >= glyph.three * .95, T + 'Syne zero as tall as the 3 (' + glyph.zero + ' vs ' + glyph.three + ' px ink height)'); else console.log('skip: Syne web font not reachable here, glyph check skipped (computed-style check above still runs)');
     // heading font (Pedro, 5 Nov): sentence-length headings are Syne 700, the wordmark and short titles stay 800
-    const W = await p.evaluate(() => { const g = q => { const e = document.querySelector(q); return e ? getComputedStyle(e).fontWeight : 'missing'; }; return { h2: g('.welcome-h2'), question: g('.welcome-question'), offer: g('#offer-headline'), camp: g('.vi-camp-headline'), congrats: g('.welcome-congrats'), logo: g('.welcome-logo'), section: g('.settings-section-title') }; });
+    const W = await p.evaluate(() => { const g = q => { const e = document.querySelector(q); return e ? getComputedStyle(e).fontWeight : 'missing'; }; return { h2: g('.welcome-h2'), question: g('.welcome-question'), offer: g('#plan-wall .wall-view[data-view="plans"] .wall-title'), camp: g('.vi-camp-headline'), congrats: g('.welcome-congrats'), logo: g('.welcome-logo'), section: g('.settings-section-title') }; });
     ok(W.h2 === '700' && (W.question === '700' || W.question === 'missing') && W.offer === '700' && W.camp === '700' && W.section === '700', T + 'long headings are Syne 700 (' + JSON.stringify(W) + ')');
     ok(W.congrats === '800', T + 'short titles (the congrats line) stay Syne 800');
     // plan CTAs: 14 px and 44 px tap height (shown in their own modals, measured as laid out)

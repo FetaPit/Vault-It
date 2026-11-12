@@ -64,13 +64,20 @@ function viPricePaint() {
 function showUpgrade(plan) {
   var link = VI_PLANS[plan] ? viPlanLink(plan) : '';   // never a dead link: a plan with no Stripe link yet only says so
   if (!link) { showToast((VI_PLANS[plan] ? VI_PLANS[plan].name : 'That plan') + ' is coming soon.'); return; }
+  // Every checkout belongs to an account, and an account has one plan (card wall, 12 Nov 2026). With no account (the sample) a
+  // payment could not be matched to anyone; on a plan already, a second checkout would be a second subscription.
+  var acct = null; try { acct = typeof _viPlanUid === 'function' ? _viPlanUid() : (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id); } catch (e) {}
+  if (!acct) { showToast('Sign in or create your account first: a plan belongs to an account.', 6000); return; }
+  // (the server's plain "no plan" beats a paid flag left on this device: the wall's own buttons always reach the checkout)
+  var serverNo = false; try { serverNo = typeof _viPlanState !== 'undefined' && _viPlanState === 'off'; } catch (e) {}
+  if (viPaid() && !serverNo) { showToast('This account is already on a plan. To change or cancel it, email ' + VI_CANCEL_EMAIL + '.', 7000); return; }
   var user = {};
   try { user = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
   var q = [];
   if (user.email) q.push('prefilled_email=' + encodeURIComponent(user.email));   // Payment Links read prefilled_email from the query
   // the account id rides along as client_reference_id, so the payment can be matched to this account on the server (secure paid gateway, queued)
   // (_viPlanUid: the signed-in account, also when supabase-js is not answering and the plan was read with the saved sign-in)
-  try { var acct = typeof _viPlanUid === 'function' ? _viPlanUid() : (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id); if (acct) q.push('client_reference_id=' + encodeURIComponent(acct)); } catch (e) {}
+  q.push('client_reference_id=' + encodeURIComponent(acct));
   var checkoutUrl = link + (q.length ? '?' + q.join('&') : '');
   window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
   showToast(plan === 'founder' ? 'Opening the Lifetime licence checkout…' : 'Opening secure checkout…');

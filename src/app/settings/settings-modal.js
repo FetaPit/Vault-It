@@ -2,16 +2,19 @@ function _refreshPioneerSettingsUI(){
   var active=document.getElementById('set-pioneer-active');
   var inactive=document.getElementById('set-pioneer-inactive');
   var badge=document.getElementById('set-pioneer-badge');
-  var st=viTrialState(),pioneer=st==='paid',left=viTrialDaysLeft(),day=viTrialDay();
-  if(active)active.style.display=pioneer?'block':'none';
-  if(inactive){inactive.style.display=pioneer?'none':'block';
-    inactive.textContent=st==='ended'?'Your 30 days are up, so the vault is read-only: every number is safe and still here. Pick a plan to carry on editing: Pioneer at '+viPlanLabel('monthly')+'; Pioneer at '+viPlanLabel('annual')+'; or a Lifetime licence at '+viPlanLabel('founder')+'.'
-      :'Day '+day+' of your 30 free days ('+left+(left===1?' day':' days')+' left). Everything is open. After day 30 the vault turns read-only until you pick a plan: Pioneer at '+viPlanLabel('monthly')+'; Pioneer at '+viPlanLabel('annual')+'; or a Lifetime licence at '+viPlanLabel('founder')+'.';}
+  var line=document.getElementById('set-plan-line');
+  // on a plan, or not (card wall, 12 Nov 2026): no trial day, no countdown. With no plan the wall is up, so this side is only seen on the sample.
+  var paid=viPaid(),key=!paid?null:isFounder()?'founder':viPlan()==='monthly'?'monthly':viPlan()==='yearly'?'annual':null;
+  if(active)active.style.display=paid?'block':'none';
+  if(line)line.textContent=key?'You are on '+VI_PLANS[key].name+(key==='monthly'?' (monthly)':key==='annual'?' (yearly)':'')+'. Thank you for backing Vault-It.':'Your plan is active. Thank you for backing Vault-It.';
+  if(inactive){inactive.style.display=paid?'none':'block';
+    inactive.textContent='This account is not on a plan. The plans: Pioneer at '+viPlanLabel('monthly')+'; Pioneer at '+viPlanLabel('annual')+'; or a Lifetime licence at '+viPlanLabel('founder')+'.';}
+  // one plan per account: on a plan the buy buttons and their terms are not shown; changing or cancelling goes by email
+  [].forEach.call(document.querySelectorAll('#settings-modal .set-tiers, #settings-modal .set-tier-terms, #settings-modal [data-plan-buy]'),function(el){el.style.display=paid?'none':'';});
   try{viPricePaint();}catch(e){}
-  if(badge)badge.innerHTML=pioneer
+  if(badge)badge.innerHTML=paid
     ?'<span style="color:var(--go);background:rgb(var(--brass-rgb) / .12);padding:2px 7px;border-radius:10px;border:1px solid rgb(var(--brass-rgb) / .3)">◆ ACTIVE</span>'
-    :st==='ended'?'<span style="color:var(--amber);background:rgb(var(--amber-rgb) / .12);padding:2px 7px;border-radius:10px;border:1px solid rgb(var(--amber-rgb) / .35)">READ-ONLY</span>'
-    :'<span style="color:var(--t3);background:var(--c3);padding:2px 7px;border-radius:10px;border:1px solid var(--bd)">TRIAL · '+left+' DAYS LEFT</span>';
+    :'<span style="color:var(--t3);background:var(--c3);padding:2px 7px;border-radius:10px;border:1px solid var(--bd)">NO PLAN</span>';
 }
 
 function showSettings(){

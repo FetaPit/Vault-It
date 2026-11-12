@@ -225,8 +225,8 @@ function initWelcome() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() { _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); viTrialBoot(); initDemoMode(); viPlanBoot(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); initQuickLogin(); setTimeout(stkAutoRefresh, 4000); });
+  document.addEventListener('DOMContentLoaded', function() { _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); viPlanBoot(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); initQuickLogin(); setTimeout(stkAutoRefresh, 4000); });
 } else {
-  _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); viTrialBoot(); initDemoMode(); viPlanBoot(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); initQuickLogin(); setTimeout(stkAutoRefresh, 4000);
+  _initSupabase(); _initSupabaseSession(); initWelcome(); initProOffer(); initDemoMode(); viPlanBoot(); loadViSettings(); checkStreak(); applyProgressiveNav(); handleOAuthCallback(); nwhRenderMini(); loadDensity(); viApplyFounderBadge(); _checkAlphaTestSeed(); initQuickLogin(); setTimeout(stkAutoRefresh, 4000);
 }
 

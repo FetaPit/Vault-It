@@ -719,7 +719,7 @@ async function _syncPioneerFromProfile(uid) {
     else if (res.old) _viGateway = false;   // a server without the paid columns cannot say who is on a plan: nothing is copied down, the wall stays shut
   } catch(e) {}
   try { viPlanAnswer(uid, res && res.old ? null : res); } catch (e) {}   // the card wall follows the server's answer (an older server cannot answer: closed)
-  try { viTrialRefresh(); } catch (e) {}   // the account date is known now: the trial line and Settings follow it
+  try { _refreshPioneerSettingsUI(); } catch (e) {}   // Settings follows the server's answer
   return row;
 }
 
