@@ -9,7 +9,7 @@ This file holds questions only. It contains no new figures. Where a number appea
 - Answer under each question in this file, or in chat by code ("B4: building societies first, because ..."). Voice notes are fine. Short answers are fine.
 - Tag each answer **K** (I know this, I have evidence), **B** (I believe this, no evidence yet) or **G** (a guess). The B and G answers become the research and interview list.
 - "Don't know" is a useful answer. Do not fill a gap with a figure you cannot source.
-- First pass: answer only the questions marked **[core]** (about 40). They are enough for a first route-to-market draft. Come back for the rest.
+- First pass: answer only the questions marked **[core]** (31 of 206). They are enough for a first route-to-market draft. Come back for the rest.
 - Where a question touches law or regulation it is a prompt for a specialist, not a statement of what the law says.
 
 ## What the repo already says (so you can confirm or correct it)
