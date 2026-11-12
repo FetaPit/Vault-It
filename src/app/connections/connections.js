@@ -164,44 +164,10 @@ function dismissPwaBanner() {
   if (banner) banner.style.display = 'none';
 }
 
-// Back from checkout (see handleOAuthCallback). vi_pay_pending remembers it until the server confirms, across reloads and sign-in.
-function viPaymentReturn(plan) {
-  try { localStorage.setItem('vi_pay_pending', JSON.stringify({ plan: plan, t: Date.now() })); } catch (e) {}
-  viPaymentConfirm(plan, 0);
-}
-async function viPaymentConfirm(plan, n) {
-  var gw = await viGatewayCheck();
-  if (gw === false) { try { localStorage.removeItem('vi_pay_pending'); } catch (e) {} return viPaymentLegacy(plan); }
-  if (n === 0) showToast('Thank you. Confirming your payment with Stripe…');
-  if (gw === true && _supaClient && _supaUser) {
-    var row = await _syncPioneerFromProfile(_supaUser.id);
-    if (row && (row.is_pioneer || row.is_founder)) return;   // viPaidApply has welcomed them
-  }
-  if (n < 20) { setTimeout(function () { viPaymentConfirm(plan, n + 1); }, 3000); return; }
-  showToast(_supaUser ? 'Your payment is still being confirmed. Your plan appears here as soon as Stripe tells us, usually within a minute. Questions: hello@vault-it.co'
-                      : 'Sign in with the email you paid with and your plan appears. Questions: hello@vault-it.co', 9000);
-}
-function viPaymentLegacy(plan) {   // older server only (no migration 011): the device flag, copied to the profile
-  var u = {};
-  try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
-  u.pro = true; if (plan === 'founder') { u.founder = true; u.founderSince = new Date().toISOString(); }
-  try { localStorage.setItem('vi_user', JSON.stringify(u)); } catch(e) {}
-  try { if (plan) localStorage.setItem('vi_plan', plan); } catch (e) {}
-  localStorage.setItem('vi_pioneer', 'true');
-  if (plan === 'founder') localStorage.setItem('vi_founder', 'true');
-  if (_supaClient && _supaUser) {
-    try { _supaClient.from('profiles').upsert({ id: _supaUser.id, is_pioneer: true, updated_at: new Date().toISOString() }, { onConflict: 'id' }).then(function(){}, function(){}); } catch (e) {}
-  }
-  if (typeof _vaultItUser !== 'undefined') { _vaultItUser = u; }
-  if (typeof applyPaywall === 'function') applyPaywall();
-  if (typeof renderPioneerCard === 'function') renderPioneerCard();
-  if (plan === 'founder') { viApplyFounderBadge(); showToast('⚡ Your Lifetime licence is active: Pioneer for the life of the service.'); }
-  else showToast('🎉 Welcome, Pioneer! All modules unlocked.');
-}
-
+// Back from checkout: viPaymentReturn (paywall/plan-wall.js) remembers the return and the card wall waits for the server's record.
 function handleOAuthCallback() {
-  // Back from a Stripe Payment Link. The URL alone proves nothing (anyone can type it): once the server keeps paid status the
-  // app waits for the stripe-webhook to mark the account paid; on an older server it unlocks this device as before.
+  // Back from a Stripe Payment Link. The URL alone proves nothing (anyone can type it): the app waits for the stripe-webhook
+  // to mark the account on the server, and only that record opens it.
   var params = new URLSearchParams(window.location.search);
   if (params.get('upgraded') === '1' || params.get('founded') === '1') {
     var pl = params.get('founded') === '1' ? 'founder' : params.get('plan');

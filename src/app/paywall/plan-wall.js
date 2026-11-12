@@ -9,9 +9,13 @@
 //   'off'          the server says: not on a plan      → the wall shows the plans
 //   'unreachable'  the server could not be asked       → the wall says so (never the plans: nobody is asked to pay twice)
 //   'signin'       the sign-in on this device ran out  → the wall asks to sign in again
+// Back from Stripe (?upgraded=1 / ?founded=1) the address proves nothing: anyone can type it. The return is only remembered
+// (vi_pay_pending), the wall says "Checking your payment" and asks the server every few seconds; after a minute with no record
+// it says so plainly, with the support address, and keeps asking. Only the server's record opens the app.
 // The sample (vault-it.co/demo-a, or an empty browser on the sample) has no account and no wall.
 var _viPlanState = 'unknown', _viPlanAt = 0, _viPlanBusy = null, _viPlanTimer = null, _viPlanQueue = [];
 var VI_PLAN_PATIENCE_MS = 15000, VI_PLAN_RECHECK_MS = 10 * 60 * 1000;
+var VI_PAY_WAIT_MS = 60000, VI_PAY_POLL_MS = 3000, VI_PAY_KEEP_MS = 30 * 60 * 1000, _viPayTimer = null, _viPayTicks = 0;
 
 // Tests have no server. On a loopback or file address only (a developer's own machine, never a deployed address) a test may
 // stand in for the server's answer: window.__viPlanStub = 'on' | 'off' | 'unreachable' (tests/lib/vi.js sets 'on').
@@ -109,6 +113,8 @@ function viPlanGate() {
   if (_viPlanState === 'unknown') viPlanCheck();                                             // also while the questions are up, so the answer is ready when they end
   if (!show) return;
   var view = _viPlanState === 'off' ? 'plans' : _viPlanState === 'unreachable' ? 'offline' : _viPlanState === 'signin' ? 'signin' : 'checking';
+  var pend = (_viPlanState === 'off' || _viPlanState === 'unknown') ? _viPayPending() : null;   // just back from Stripe
+  if (pend) { view = Date.now() - pend.t < VI_PAY_WAIT_MS ? 'paying' : 'late'; _viPayWatch(); }
   if (wall.getAttribute('data-state') !== view) { wall.setAttribute('data-state', view); wall.scrollTop = 0; _viWallSay(''); }
   viWallPaint();
   if (_viPlanState === 'unknown' && !_viPlanTimer) _viPlanTimer = setTimeout(function () {    // no answer in good time: say so instead of spinning
@@ -148,6 +154,35 @@ async function viWallExport(btn) {
   btn.disabled = false; btn.textContent = label;
   _viWallSay(!b ? 'Could not prepare your data. Try again.' : b.problems.length ? 'Downloaded, with a note inside the file: ' + b.problems.join(' · ') : 'Downloaded. Check your Downloads folder.');
 }
+// ── Back from Stripe ──
+function _viPayPending() {   // the remembered return: { plan, t }, for half an hour
+  try {
+    var raw = localStorage.getItem('vi_pay_pending'); if (!raw) return null;
+    var p = JSON.parse(raw), age = p && typeof p.t === 'number' ? Date.now() - p.t : -1;
+    if (age >= -60000 && age < VI_PAY_KEEP_MS) return p;
+    localStorage.removeItem('vi_pay_pending');
+  } catch (e) { try { localStorage.removeItem('vi_pay_pending'); } catch (e2) {} }
+  return null;
+}
+function viPaymentReturn(plan) {   // called for ?upgraded=1 / ?founded=1 (handleOAuthCallback): remember it, show it, ask the server
+  try { localStorage.setItem('vi_pay_pending', JSON.stringify({ plan: plan, t: Date.now() })); } catch (e) {}
+  if (!hasValidSession()) { try { showToast('Sign in to finish. Your plan is linked to your account, so it appears once you are signed in. Questions: ' + VI_CANCEL_EMAIL, 9000); } catch (e) {} }
+  viPlanGate(); _viPayWatch();
+}
+function _viPayWatch() {   // ask every few seconds for the first minute, then every fourth tick, until the record arrives or the return is forgotten
+  if (_viPayTimer) return;
+  _viPayTicks = 0;
+  _viPayTimer = setInterval(function () {
+    var pend = _viPayPending();
+    if (!pend || _viPlanState === 'on') { clearInterval(_viPayTimer); _viPayTimer = null; viPlanGate(); return; }
+    _viPayTicks++;
+    var late = Date.now() - pend.t >= VI_PAY_WAIT_MS;
+    if (document.visibilityState !== 'hidden' && viWallApplies() && (!late || _viPayTicks % 4 === 0)) viPlanCheck();
+    viPlanGate();   // the minute may have just passed
+  }, VI_PAY_POLL_MS);
+}
+function viWallForgetPay() { try { localStorage.removeItem('vi_pay_pending'); } catch (e) {} viPlanGate(); }   // "Back to the plans": for someone who did not finish the checkout
+
 function viWallHelp() { try { viHelpOpen('faq'); } catch (e) { _viWallSay('Questions: ' + VI_CANCEL_EMAIL); } }
 function viWallSignIn() { try { viReauth(); } catch (e) {} }
 
@@ -170,4 +205,5 @@ function viPlanBoot() {
   window.addEventListener('online', _viPlanRecheck);
   window.addEventListener('pageshow', _viPlanRecheck);
   viPlanGate();
+  if (_viPayPending()) _viPayWatch();
 }

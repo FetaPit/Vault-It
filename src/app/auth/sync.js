@@ -649,9 +649,9 @@ async function _hydrateFromSupabase(uid) {
 }
 
 // ── Paid status from the server (secure paid gateway: migration 011 + the stripe-webhook function) ──
-// Once the server keeps paid status (the profile has the Stripe columns), the profile is the only source: the device mirrors it,
-// up or down, and nothing the browser sets (a URL, an e-mail typed in, a storage flag) makes an account paid. On an older server
-// (the columns are missing) everything works as before, so the app can ship before or after the migration.
+// The profile is the only source of paid status (migration 011, applied in production): the device mirrors it, up or down, and
+// nothing the browser sets (a URL, an e-mail typed in, a storage flag) makes an account paid. A server without the paid columns
+// cannot answer, so nothing is unlocked (the device-side unlocks for an "older server" went with the card wall, 12 Nov 2026).
 var _viGateway = null;   // null = not known yet · true = the server keeps paid status · false = older server
 var VI_PAID_COLS = 'is_pioneer,is_founder,plan,paid_until,is_beta,stripe_synced_at';
 function _viColumnMissing(err) { return !!err && (err.code === '42703' || err.code === 'PGRST204' || /does not exist|could not find .*column/i.test(err.message || '')); }
@@ -716,11 +716,7 @@ async function _syncPioneerFromProfile(uid) {
   try {
     res = await _viProfileRead(uid);
     if (res.row) { _viGateway = true; row = res.row; viPaidApply(row); }
-    else if (res.old) {
-      _viGateway = false;   // older server: as before, a paid flag on the profile is copied down
-      var old = _supaClient ? await _supaClient.from('profiles').select('is_pioneer').eq('id', uid).single() : null;
-      if (old && old.data && old.data.is_pioneer && localStorage.getItem('vi_pioneer') !== 'true') _lsOrig.call(localStorage, 'vi_pioneer', 'true');
-    }
+    else if (res.old) _viGateway = false;   // a server without the paid columns cannot say who is on a plan: nothing is copied down, the wall stays shut
   } catch(e) {}
   try { viPlanAnswer(uid, res && res.old ? null : res); } catch (e) {}   // the card wall follows the server's answer (an older server cannot answer: closed)
   try { viTrialRefresh(); } catch (e) {}   // the account date is known now: the trial line and Settings follow it

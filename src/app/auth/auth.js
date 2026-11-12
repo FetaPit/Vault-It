@@ -1038,7 +1038,6 @@ function _completeAuth(email) {
         currency: s.currency || 'GBP',
         updated_at: new Date().toISOString()
       };
-      if (_viGateway !== true) prow.is_pioneer = localStorage.getItem('vi_pioneer') === 'true';   // older server only: the server ignores it once it keeps paid status
       _supaClient.from('profiles').upsert(prow, { onConflict: 'id' });
       _flushDirty();   // push anything not yet confirmed by the cloud
     } catch(e) {}

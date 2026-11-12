@@ -1,10 +1,11 @@
 // Secure paid gateway, the app's side (migration 011 + stripe-webhook). With a stand-in Supabase:
 //   live server (the profile has the Stripe columns): the Stripe return URL alone unlocks nothing; the plan appears when the profile
 //   says paid (the webhook arrived); the device mirrors the profile up AND down; a typed checkout e-mail proves nothing; the sign-in
-//   upsert no longer sends is_pioneer; tester and founder flags come from the profile; old synced copies of paid status are ignored.
-//   older server (columns missing): everything works as before (the return URL unlocks this device), so the app can ship first.
+//   upsert never sends is_pioneer; tester and founder flags come from the profile; old synced copies of paid status are ignored.
+//   a server without the paid columns: the return URL unlocks nothing either (the device-side unlocks went with the card wall, 12 Nov 2026).
+// The card wall itself is tested in test_card_wall.js and test_card_wall_return.js; here the server's answer is the stand-in profile.
 // Run: node tests/test_paid_gateway.js
-require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
+require('./lib/vi').planStub(null);   // serves file:// app URLs over http (tests/lib/vi.js); this test answers the profile read itself
 const { chromium } = require('playwright');
 const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
@@ -83,9 +84,10 @@ const UNPAID = { is_pioneer: false, is_founder: false, plan: null, paid_until: n
   ok(!(await state(p)).paid, 'and a profile cleared by Pete (reconciled) clears the device too');
 
   // a typed e-mail proves nothing
-  await p.evaluate(async () => { document.getElementById('pw-verify-email').value = 't@t.com'; await verifyPioneerPurchase(); });
+  ok(await p.evaluate(() => !document.getElementById('pw-verify-email')), 'the paywall no longer asks for a checkout e-mail');
+  await p.evaluate(async () => { await verifyPioneerPurchase(); });
   s = await state(p);
-  ok(!s.paid && /No payment found/.test(await p.evaluate(() => document.getElementById('pw-verify-msg').textContent)), '"Verify your purchase" asks the server; a matching e-mail alone no longer unlocks');
+  ok(!s.paid && /No payment found/.test(await p.evaluate(() => document.getElementById('pw-verify-msg').textContent)), '"Check my account" asks the server; nothing typed unlocks');
   // the sign-in profile upsert no longer claims paid status
   await p.evaluate(() => { localStorage.setItem('vi_pioneer', 'true'); window.__upserts = []; try { _completeAuth('t@t.com'); } catch (e) {} });
   await p.waitForTimeout(300);
@@ -101,16 +103,19 @@ const UNPAID = { is_pioneer: false, is_founder: false, plan: null, paid_until: n
   ok(!s.paid && s.pioneer === null && s.plan === null, 'a vault row saying vi_pioneer = true does not make the device paid');
   await p.context().close();
 
-  // ── older server: as before ──
+  // ── a server without the paid columns: nothing is unlocked from the device (the old "as before" path is gone) ──
   p = await open('old', null, {}, '?upgraded=1&plan=yearly');
-  await p.waitForTimeout(800);
+  await p.evaluate(() => { _supaUser = { id: '11111111-1111-1111-1111-111111111111', email: 't@t.com' }; });
+  await p.waitForTimeout(3600);
   s = await state(p);
-  ok(s.gw === false && s.paid && s.plan === 'yearly' && s.tier === 'yearly' && s.url === '', 'older server (no migration 011): the Stripe return unlocks this device as before (' + JSON.stringify(s) + ')');
+  ok(s.gw === false && !s.paid && s.pioneer === null && s.plan === null && !s.pro && s.url === '', 'a server without the paid columns: the Stripe return unlocks nothing on this device (' + JSON.stringify(s) + ')');
   await p.context().close();
   p = await open('old', null, {}, '?founded=1');
-  await p.waitForTimeout(800);
+  await p.evaluate(() => { _supaUser = { id: '11111111-1111-1111-1111-111111111111', email: 't@t.com' }; });
+  await p.waitForTimeout(3600);
   s = await state(p);
-  ok(s.paid && s.tier === 'founder', 'older server: ?founded=1 records the Founding plan as before');
+  ok(!s.paid && s.founder === null && s.tier !== 'founder', 'nor does ?founded=1');
+  ok(await p.evaluate(() => window.__upserts.every((u) => !(u.t === 'profiles' && 'is_pioneer' in u.row))), 'and the browser writes no paid flag to the profile');
   await p.context().close();
 
   ok(errs.length === 0, 'no page errors ' + errs.slice(0, 3).join(' | '));

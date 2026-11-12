@@ -10,7 +10,9 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
 .wall-logo.wm{font-size:1.45rem}
 .wall-view{display:none}
 #plan-wall[data-state="checking"] .wall-view[data-view="checking"],#plan-wall[data-state="plans"] .wall-view[data-view="plans"],
-#plan-wall[data-state="offline"] .wall-view[data-view="offline"],#plan-wall[data-state="signin"] .wall-view[data-view="signin"]{display:block}
+#plan-wall[data-state="offline"] .wall-view[data-view="offline"],#plan-wall[data-state="signin"] .wall-view[data-view="signin"],
+#plan-wall[data-state="paying"] .wall-view[data-view="paying"],#plan-wall[data-state="late"] .wall-view[data-view="late"]{display:block}
+.wall-mail{color:var(--teal);font-weight:600;text-underline-offset:3px;white-space:nowrap}
 .wall-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:22px 0 8px}
 .wall-title{font-family:var(--font-display);font-weight:800;font-size:clamp(1.5rem,4.4vw,2.15rem);line-height:1.15;letter-spacing:-.01em;margin:0 0 12px;color:var(--text)}
 .wall-lead{font-size:15px;line-height:1.55;color:var(--text);max-width:64ch;margin:0 0 8px}
@@ -91,6 +93,23 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
         </div>
       </div>
       <div class="wall-again"><span>Already paid? It can take a minute to reach us.</span><button class="wall-cta wall-cta-line" type="button" id="wall-check" onclick="viWallCheck(this)">Check again</button></div>
+    </div>
+
+    <!-- Back from Stripe (?upgraded=1 / ?founded=1): the address proves nothing, so this waits for the server's record; after a minute it says so plainly -->
+    <div class="wall-view" data-view="paying">
+      <div class="wall-eyebrow">Your payment</div>
+      <h1 class="wall-title">Checking your payment</h1>
+      <div class="wall-spin" aria-hidden="true"></div>
+      <p class="wall-lead" role="status">Thank you. Vault-It is waiting for Stripe to confirm your plan. This usually takes less than a minute, and your vault opens by itself when it arrives.</p>
+      <p class="wall-safe">Keep this page open. You do not need to pay again.</p>
+    </div>
+
+    <div class="wall-view" data-view="late">
+      <div class="wall-eyebrow">Your payment</div>
+      <h1 class="wall-title">Your payment has not reached us yet</h1>
+      <p class="wall-lead">It has been more than a minute and Stripe has not confirmed a plan for this account. If you finished the checkout, you do not need to pay again: it can take a little longer, and your vault opens by itself when the confirmation arrives.</p>
+      <p class="wall-lead">Still waiting after ten minutes? Email <a class="wall-mail" href="mailto:hello@vault-it.co">hello@vault-it.co</a> from the address you paid with and we will put it right.</p>
+      <div class="wall-again"><button class="wall-cta wall-cta-line" type="button" id="wall-late-check" onclick="viWallCheck(this)">Check again</button><button class="wall-link" type="button" id="wall-late-plans" onclick="viWallForgetPay()">Back to the plans</button></div>
     </div>
 
     <div class="wall-view" data-view="offline">

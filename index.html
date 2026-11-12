@@ -12868,7 +12868,9 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
 .wall-logo.wm{font-size:1.45rem}
 .wall-view{display:none}
 #plan-wall[data-state="checking"] .wall-view[data-view="checking"],#plan-wall[data-state="plans"] .wall-view[data-view="plans"],
-#plan-wall[data-state="offline"] .wall-view[data-view="offline"],#plan-wall[data-state="signin"] .wall-view[data-view="signin"]{display:block}
+#plan-wall[data-state="offline"] .wall-view[data-view="offline"],#plan-wall[data-state="signin"] .wall-view[data-view="signin"],
+#plan-wall[data-state="paying"] .wall-view[data-view="paying"],#plan-wall[data-state="late"] .wall-view[data-view="late"]{display:block}
+.wall-mail{color:var(--teal);font-weight:600;text-underline-offset:3px;white-space:nowrap}
 .wall-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:22px 0 8px}
 .wall-title{font-family:var(--font-display);font-weight:800;font-size:clamp(1.5rem,4.4vw,2.15rem);line-height:1.15;letter-spacing:-.01em;margin:0 0 12px;color:var(--text)}
 .wall-lead{font-size:15px;line-height:1.55;color:var(--text);max-width:64ch;margin:0 0 8px}
@@ -12949,6 +12951,23 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
         </div>
       </div>
       <div class="wall-again"><span>Already paid? It can take a minute to reach us.</span><button class="wall-cta wall-cta-line" type="button" id="wall-check" onclick="viWallCheck(this)">Check again</button></div>
+    </div>
+
+    <!-- Back from Stripe (?upgraded=1 / ?founded=1): the address proves nothing, so this waits for the server's record; after a minute it says so plainly -->
+    <div class="wall-view" data-view="paying">
+      <div class="wall-eyebrow">Your payment</div>
+      <h1 class="wall-title">Checking your payment</h1>
+      <div class="wall-spin" aria-hidden="true"></div>
+      <p class="wall-lead" role="status">Thank you. Vault-It is waiting for Stripe to confirm your plan. This usually takes less than a minute, and your vault opens by itself when it arrives.</p>
+      <p class="wall-safe">Keep this page open. You do not need to pay again.</p>
+    </div>
+
+    <div class="wall-view" data-view="late">
+      <div class="wall-eyebrow">Your payment</div>
+      <h1 class="wall-title">Your payment has not reached us yet</h1>
+      <p class="wall-lead">It has been more than a minute and Stripe has not confirmed a plan for this account. If you finished the checkout, you do not need to pay again: it can take a little longer, and your vault opens by itself when the confirmation arrives.</p>
+      <p class="wall-lead">Still waiting after ten minutes? Email <a class="wall-mail" href="mailto:hello@vault-it.co">hello@vault-it.co</a> from the address you paid with and we will put it right.</p>
+      <div class="wall-again"><button class="wall-cta wall-cta-line" type="button" id="wall-late-check" onclick="viWallCheck(this)">Check again</button><button class="wall-link" type="button" id="wall-late-plans" onclick="viWallForgetPay()">Back to the plans</button></div>
     </div>
 
     <div class="wall-view" data-view="offline">
@@ -14355,10 +14374,10 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
       </a>
     </div>
     <div style="border-top:1px solid rgb(var(--ink-rgb) / .06);padding-top:14px">
-      <div style="font-size:max(.45rem,var(--vi-fs-1));color:var(--t3);margin-bottom:8px">Already upgraded? Verify your purchase:</div>
+      <!-- asks the server about the signed-in account; no e-mail is typed, because a typed e-mail proves nothing (card wall, 12 Nov 2026) -->
+      <div style="font-size:max(.45rem,var(--vi-fs-1));color:var(--t3);margin-bottom:8px">Already paid? Check this account:</div>
       <div style="display:flex;gap:6px">
-        <input type="email" id="pw-verify-email" class="al-inp" placeholder="Email used at checkout" style="flex:1;font-size:max(.56rem,var(--vi-fs-2))">
-        <button onclick="verifyPioneerPurchase()" style="background:linear-gradient(90deg,#b8902e,var(--brass));border:none;border-radius:5px;color:#000;font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:800;padding:7px 13px;cursor:pointer;white-space:nowrap;letter-spacing:.05em">VERIFY</button>
+        <button onclick="verifyPioneerPurchase()" style="background:linear-gradient(90deg,#b8902e,var(--brass));border:none;border-radius:5px;color:#000;font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:800;padding:7px 13px;cursor:pointer;white-space:nowrap;letter-spacing:.05em">Check my account</button>
       </div>
       <div id="pw-verify-msg" style="font-size:max(.44rem,var(--vi-fs-1));margin-top:7px;min-height:14px;line-height:1.4"></div>
     </div>
@@ -19924,9 +19943,9 @@ async function _hydrateFromSupabase(uid) {
 }
 
 // ── Paid status from the server (secure paid gateway: migration 011 + the stripe-webhook function) ──
-// Once the server keeps paid status (the profile has the Stripe columns), the profile is the only source: the device mirrors it,
-// up or down, and nothing the browser sets (a URL, an e-mail typed in, a storage flag) makes an account paid. On an older server
-// (the columns are missing) everything works as before, so the app can ship before or after the migration.
+// The profile is the only source of paid status (migration 011, applied in production): the device mirrors it, up or down, and
+// nothing the browser sets (a URL, an e-mail typed in, a storage flag) makes an account paid. A server without the paid columns
+// cannot answer, so nothing is unlocked (the device-side unlocks for an "older server" went with the card wall, 12 Nov 2026).
 var _viGateway = null;   // null = not known yet · true = the server keeps paid status · false = older server
 var VI_PAID_COLS = 'is_pioneer,is_founder,plan,paid_until,is_beta,stripe_synced_at';
 function _viColumnMissing(err) { return !!err && (err.code === '42703' || err.code === 'PGRST204' || /does not exist|could not find .*column/i.test(err.message || '')); }
@@ -19991,11 +20010,7 @@ async function _syncPioneerFromProfile(uid) {
   try {
     res = await _viProfileRead(uid);
     if (res.row) { _viGateway = true; row = res.row; viPaidApply(row); }
-    else if (res.old) {
-      _viGateway = false;   // older server: as before, a paid flag on the profile is copied down
-      var old = _supaClient ? await _supaClient.from('profiles').select('is_pioneer').eq('id', uid).single() : null;
-      if (old && old.data && old.data.is_pioneer && localStorage.getItem('vi_pioneer') !== 'true') _lsOrig.call(localStorage, 'vi_pioneer', 'true');
-    }
+    else if (res.old) _viGateway = false;   // a server without the paid columns cannot say who is on a plan: nothing is copied down, the wall stays shut
   } catch(e) {}
   try { viPlanAnswer(uid, res && res.old ? null : res); } catch (e) {}   // the card wall follows the server's answer (an older server cannot answer: closed)
   try { viTrialRefresh(); } catch (e) {}   // the account date is known now: the trial line and Settings follow it
@@ -21091,7 +21106,6 @@ function _completeAuth(email) {
         currency: s.currency || 'GBP',
         updated_at: new Date().toISOString()
       };
-      if (_viGateway !== true) prow.is_pioneer = localStorage.getItem('vi_pioneer') === 'true';   // older server only: the server ignores it once it keeps paid status
       _supaClient.from('profiles').upsert(prow, { onConflict: 'id' });
       _flushDirty();   // push anything not yet confirmed by the cloud
     } catch(e) {}
@@ -26606,44 +26620,10 @@ function dismissPwaBanner() {
   if (banner) banner.style.display = 'none';
 }
 
-// Back from checkout (see handleOAuthCallback). vi_pay_pending remembers it until the server confirms, across reloads and sign-in.
-function viPaymentReturn(plan) {
-  try { localStorage.setItem('vi_pay_pending', JSON.stringify({ plan: plan, t: Date.now() })); } catch (e) {}
-  viPaymentConfirm(plan, 0);
-}
-async function viPaymentConfirm(plan, n) {
-  var gw = await viGatewayCheck();
-  if (gw === false) { try { localStorage.removeItem('vi_pay_pending'); } catch (e) {} return viPaymentLegacy(plan); }
-  if (n === 0) showToast('Thank you. Confirming your payment with Stripe…');
-  if (gw === true && _supaClient && _supaUser) {
-    var row = await _syncPioneerFromProfile(_supaUser.id);
-    if (row && (row.is_pioneer || row.is_founder)) return;   // viPaidApply has welcomed them
-  }
-  if (n < 20) { setTimeout(function () { viPaymentConfirm(plan, n + 1); }, 3000); return; }
-  showToast(_supaUser ? 'Your payment is still being confirmed. Your plan appears here as soon as Stripe tells us, usually within a minute. Questions: hello@vault-it.co'
-                      : 'Sign in with the email you paid with and your plan appears. Questions: hello@vault-it.co', 9000);
-}
-function viPaymentLegacy(plan) {   // older server only (no migration 011): the device flag, copied to the profile
-  var u = {};
-  try { u = JSON.parse(localStorage.getItem('vi_user') || '{}'); } catch(e) {}
-  u.pro = true; if (plan === 'founder') { u.founder = true; u.founderSince = new Date().toISOString(); }
-  try { localStorage.setItem('vi_user', JSON.stringify(u)); } catch(e) {}
-  try { if (plan) localStorage.setItem('vi_plan', plan); } catch (e) {}
-  localStorage.setItem('vi_pioneer', 'true');
-  if (plan === 'founder') localStorage.setItem('vi_founder', 'true');
-  if (_supaClient && _supaUser) {
-    try { _supaClient.from('profiles').upsert({ id: _supaUser.id, is_pioneer: true, updated_at: new Date().toISOString() }, { onConflict: 'id' }).then(function(){}, function(){}); } catch (e) {}
-  }
-  if (typeof _vaultItUser !== 'undefined') { _vaultItUser = u; }
-  if (typeof applyPaywall === 'function') applyPaywall();
-  if (typeof renderPioneerCard === 'function') renderPioneerCard();
-  if (plan === 'founder') { viApplyFounderBadge(); showToast('⚡ Your Lifetime licence is active: Pioneer for the life of the service.'); }
-  else showToast('🎉 Welcome, Pioneer! All modules unlocked.');
-}
-
+// Back from checkout: viPaymentReturn (paywall/plan-wall.js) remembers the return and the card wall waits for the server's record.
 function handleOAuthCallback() {
-  // Back from a Stripe Payment Link. The URL alone proves nothing (anyone can type it): once the server keeps paid status the
-  // app waits for the stripe-webhook to mark the account paid; on an older server it unlocks this device as before.
+  // Back from a Stripe Payment Link. The URL alone proves nothing (anyone can type it): the app waits for the stripe-webhook
+  // to mark the account on the server, and only that record opens it.
   var params = new URLSearchParams(window.location.search);
   if (params.get('upgraded') === '1' || params.get('founded') === '1') {
     var pl = params.get('founded') === '1' ? 'founder' : params.get('plan');
@@ -26844,9 +26824,13 @@ document.addEventListener('keydown',function(e){
 //   'off'          the server says: not on a plan      → the wall shows the plans
 //   'unreachable'  the server could not be asked       → the wall says so (never the plans: nobody is asked to pay twice)
 //   'signin'       the sign-in on this device ran out  → the wall asks to sign in again
+// Back from Stripe (?upgraded=1 / ?founded=1) the address proves nothing: anyone can type it. The return is only remembered
+// (vi_pay_pending), the wall says "Checking your payment" and asks the server every few seconds; after a minute with no record
+// it says so plainly, with the support address, and keeps asking. Only the server's record opens the app.
 // The sample (vault-it.co/demo-a, or an empty browser on the sample) has no account and no wall.
 var _viPlanState = 'unknown', _viPlanAt = 0, _viPlanBusy = null, _viPlanTimer = null, _viPlanQueue = [];
 var VI_PLAN_PATIENCE_MS = 15000, VI_PLAN_RECHECK_MS = 10 * 60 * 1000;
+var VI_PAY_WAIT_MS = 60000, VI_PAY_POLL_MS = 3000, VI_PAY_KEEP_MS = 30 * 60 * 1000, _viPayTimer = null, _viPayTicks = 0;
 
 // Tests have no server. On a loopback or file address only (a developer's own machine, never a deployed address) a test may
 // stand in for the server's answer: window.__viPlanStub = 'on' | 'off' | 'unreachable' (tests/lib/vi.js sets 'on').
@@ -26944,6 +26928,8 @@ function viPlanGate() {
   if (_viPlanState === 'unknown') viPlanCheck();                                             // also while the questions are up, so the answer is ready when they end
   if (!show) return;
   var view = _viPlanState === 'off' ? 'plans' : _viPlanState === 'unreachable' ? 'offline' : _viPlanState === 'signin' ? 'signin' : 'checking';
+  var pend = (_viPlanState === 'off' || _viPlanState === 'unknown') ? _viPayPending() : null;   // just back from Stripe
+  if (pend) { view = Date.now() - pend.t < VI_PAY_WAIT_MS ? 'paying' : 'late'; _viPayWatch(); }
   if (wall.getAttribute('data-state') !== view) { wall.setAttribute('data-state', view); wall.scrollTop = 0; _viWallSay(''); }
   viWallPaint();
   if (_viPlanState === 'unknown' && !_viPlanTimer) _viPlanTimer = setTimeout(function () {    // no answer in good time: say so instead of spinning
@@ -26983,6 +26969,35 @@ async function viWallExport(btn) {
   btn.disabled = false; btn.textContent = label;
   _viWallSay(!b ? 'Could not prepare your data. Try again.' : b.problems.length ? 'Downloaded, with a note inside the file: ' + b.problems.join(' · ') : 'Downloaded. Check your Downloads folder.');
 }
+// ── Back from Stripe ──
+function _viPayPending() {   // the remembered return: { plan, t }, for half an hour
+  try {
+    var raw = localStorage.getItem('vi_pay_pending'); if (!raw) return null;
+    var p = JSON.parse(raw), age = p && typeof p.t === 'number' ? Date.now() - p.t : -1;
+    if (age >= -60000 && age < VI_PAY_KEEP_MS) return p;
+    localStorage.removeItem('vi_pay_pending');
+  } catch (e) { try { localStorage.removeItem('vi_pay_pending'); } catch (e2) {} }
+  return null;
+}
+function viPaymentReturn(plan) {   // called for ?upgraded=1 / ?founded=1 (handleOAuthCallback): remember it, show it, ask the server
+  try { localStorage.setItem('vi_pay_pending', JSON.stringify({ plan: plan, t: Date.now() })); } catch (e) {}
+  if (!hasValidSession()) { try { showToast('Sign in to finish. Your plan is linked to your account, so it appears once you are signed in. Questions: ' + VI_CANCEL_EMAIL, 9000); } catch (e) {} }
+  viPlanGate(); _viPayWatch();
+}
+function _viPayWatch() {   // ask every few seconds for the first minute, then every fourth tick, until the record arrives or the return is forgotten
+  if (_viPayTimer) return;
+  _viPayTicks = 0;
+  _viPayTimer = setInterval(function () {
+    var pend = _viPayPending();
+    if (!pend || _viPlanState === 'on') { clearInterval(_viPayTimer); _viPayTimer = null; viPlanGate(); return; }
+    _viPayTicks++;
+    var late = Date.now() - pend.t >= VI_PAY_WAIT_MS;
+    if (document.visibilityState !== 'hidden' && viWallApplies() && (!late || _viPayTicks % 4 === 0)) viPlanCheck();
+    viPlanGate();   // the minute may have just passed
+  }, VI_PAY_POLL_MS);
+}
+function viWallForgetPay() { try { localStorage.removeItem('vi_pay_pending'); } catch (e) {} viPlanGate(); }   // "Back to the plans": for someone who did not finish the checkout
+
 function viWallHelp() { try { viHelpOpen('faq'); } catch (e) { _viWallSay('Questions: ' + VI_CANCEL_EMAIL); } }
 function viWallSignIn() { try { viReauth(); } catch (e) {} }
 
@@ -27005,6 +27020,7 @@ function viPlanBoot() {
   window.addEventListener('online', _viPlanRecheck);
   window.addEventListener('pageshow', _viPlanRecheck);
   viPlanGate();
+  if (_viPayPending()) _viPayWatch();
 }
 // ── swipe hints: a soft arrow on the edge of any row/diagram that continues off-screen ──
 
@@ -27108,7 +27124,7 @@ function closeSettings(){
   var sm=document.getElementById('settings-modal');if(sm)sm.style.display='none';
 }
 
-// "Already upgraded?": once the server keeps paid status this asks it (the account's profile, set by Stripe); a typed e-mail proves nothing.
+// "Already upgraded?": asks the server (the account's profile, set by Stripe). A typed e-mail proves nothing and unlocks nothing.
 async function verifyPioneerPurchase(){
   var msg=document.getElementById('pw-verify-msg');
   var say=function(c,t){ if(msg) msg.innerHTML='<span style="color:var('+c+')">'+t+'</span>'; };
@@ -27122,42 +27138,7 @@ async function verifyPioneerPurchase(){
     else say('--re','Could not reach Vault-It to check. Try again in a moment.');
     return;
   }
-  if(gw===null&&_supaClient){ say('--re','Could not reach Vault-It to check. Try again in a moment.'); return; }
-  verifyPioneerPurchaseLegacy();
-}
-function verifyPioneerPurchaseLegacy(){   // older server only (no migration 011)
-  var inp=document.getElementById('pw-verify-email');
-  var msg=document.getElementById('pw-verify-msg');
-  var entered=(inp?inp.value.trim().toLowerCase():'');
-  if(!entered){if(msg)msg.innerHTML='<span style="color:var(--re)">Please enter your checkout email.</span>';return;}
-  var u=null;try{u=JSON.parse(localStorage.getItem('vi_user')||'null');}catch(e){}
-  var profileEmail=(u&&u.email)?u.email.toLowerCase():'';
-  if(!profileEmail){
-    if(msg)msg.innerHTML='<span style="color:var(--re)">Complete your profile with the email you used at checkout first.</span>';
-    return;
-  }
-  if(profileEmail===entered){
-    localStorage.setItem('vi_pioneer','true');
-    localStorage.setItem('vi_pioneer_email',entered);
-    // Stamp vi_user.pro so _isPro() also resolves true via the legacy check
-    try { var _pu=JSON.parse(localStorage.getItem('vi_user')||'{}'); _pu.pro=true; localStorage.setItem('vi_user',JSON.stringify(_pu)); } catch(e){}
-    // Sync to Supabase profiles so other devices pick this up via _syncPioneerFromProfile
-    if (_supaClient && _supaUser) {
-      _supaClient.from('profiles').upsert(
-        { id: _supaUser.id, is_pioneer: true, updated_at: new Date().toISOString() },
-        { onConflict: 'id' }
-      ).catch(function(){});
-    }
-    if(msg)msg.innerHTML='<span style="color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access unlocked. Welcome to the vault!</span>';
-    setTimeout(function(){
-      closePaywall();
-      if (typeof applyPaywall === 'function') applyPaywall();
-      renderPioneerCard();
-      showToast('◆ PIONEER unlocked. Thank you! 🎉');
-    },1400);
-  }else{
-    if(msg)msg.innerHTML='<span style="color:var(--re)">Email doesn\'t match your profile ('+profileEmail+'). Update your profile email to match your checkout email.</span>';
-  }
+  say('--re','Could not reach Vault-It to check. Try again in a moment.');
 }
 
 // ═══════════════════════════════════════════════════════════════
