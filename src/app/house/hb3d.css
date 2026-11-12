@@ -139,19 +139,12 @@
 #hb3d-bpill{position:absolute;display:none;padding:2px 6px;border-radius:4px;background:rgba(8,8,8,.72);color:#E8C56A;font-size:11px;letter-spacing:.04em;white-space:nowrap;z-index:1}
 #hb3d-loading{position:absolute;left:50%;top:42%;transform:translateX(-50%);display:none;color:#8fe0da;font-size:12px;letter-spacing:.16em;padding:8px 14px;background:rgb(var(--panel-rgb) / .7);border:1px solid rgb(var(--teal-rgb) / .35);border-radius:6px}
 #hb3d-ownlabel{position:absolute;display:none;color:var(--gold);font-size:12px;letter-spacing:.14em;padding:2px 6px;border-bottom:1px dashed var(--gold);background:rgb(var(--panel-rgb) / .55);white-space:nowrap;text-shadow:0 0 6px rgba(0,0,0,.9)}
-#hb3d-intbar{position:absolute;display:none;right:64px;top:14%;height:62%;width:58px;flex-direction:column;align-items:center;gap:6px;color:#c9d6e3;font-size:max(9.5px,var(--vi-fs-1));text-align:center;letter-spacing:.08em}
-#hb3d-intbar .ib-hd span,#hb3d-intbar .ib-ft span{display:block;color:var(--muted);font-size:max(8.5px,var(--vi-fs-1))}
-#hb3d-intbar .ib-track{flex:1;width:22px;border:1px solid rgb(var(--ink-rgb) / .2);border-radius:5px;overflow:hidden;display:flex;flex-direction:column;background:rgb(var(--ink-rgb) / .05)}
-#hb3d-intbar .ib-slain{background:rgb(var(--green-rgb) / .6)}
-#hb3d-intbar .ib-rem{background:rgb(var(--red-rgb) / .68)}
-#hb3d-intbar .ib-ft b{display:block;font-size:10.5px;font-weight:400}
-#hb3d-intbar .ib-r{color:var(--red)}#hb3d-intbar .ib-s{color:var(--green)}
 #hb3d-upglabel{position:absolute;display:none;left:34px;top:14px;color:var(--gold);font-size:13px;letter-spacing:.12em;text-shadow:0 1px 6px #000}
 #hb3d-upglabel span{display:block;color:#9fb3c2;font-size:max(10px,var(--vi-fs-1));letter-spacing:.06em;margin-top:2px}
 #hb3d-plotlabel{position:absolute;display:none;left:50%;top:40%;transform:translate(-50%,-50%);text-align:center;color:rgb(var(--teal-rgb) / .8);font:800 22px 'Syne',sans-serif;letter-spacing:.22em;text-shadow:0 2px 12px #000}
 #hb3d-plotlabel span{display:block;font:400 11px 'Share Tech Mono',monospace;letter-spacing:.08em;color:rgba(232,240,239,.55);margin-top:6px}
 #hb3d-cap{position:absolute;left:34px;bottom:10px;right:72px;color:#a9c0c7;font-size:10.5px;letter-spacing:.05em;text-shadow:0 1px 4px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:700px){#hb3d-intbar{right:52px;width:48px;font-size:max(8px,var(--vi-fs-1))}#hb3d-cap{font-size:max(9px,var(--vi-fs-1));right:56px;left:26px}#hb3d-upglabel{left:26px;font-size:11px}}
+@media(max-width:700px){#hb3d-cap{font-size:max(9px,var(--vi-fs-1));right:56px;left:26px}#hb3d-upglabel{left:26px;font-size:11px}}
 /* ── pop-ups can always be left: scrolls inside the screen, close button stays in view ── */
 .paywall-overlay{align-items:flex-start!important;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .paywall-card{margin:auto;max-height:none}

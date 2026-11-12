@@ -20,12 +20,13 @@ const seedFn=(o,pro)=>`(function(){if(localStorage.getItem('ht3'))return;localSt
   ok(Math.abs(s.clipY/s.height-0.235)<0.01&&await p.evaluate(()=>Math.abs(HB3D.viewer.eq-hbL2Own())<1e-9),'colour line at the share of the home you own: (£250,000 - £191,250) / £250,000 = 23.5% of the height ('+(s.clipY/s.height*100).toFixed(1)+'%)');
   const tag=()=>p.evaluate(()=>{const rl=document.getElementById('hb3d-rowlabel');return{txt:rl.textContent,vis:getComputedStyle(rl).display,brand:rl.classList.contains('brand')};});
   await p.waitForFunction(()=>/MORTGAGE/.test(document.getElementById('hb3d-rowlabel').textContent),null,{timeout:20000}).catch(()=>{});
-  let ov=await p.evaluate(()=>{const up=document.getElementById('hb3d-upglabel'),v=HB3D.viewer;return{ownVis:getComputedStyle(document.getElementById('hb3d-ownlabel')).display,ib:document.getElementById('hb3d-intbar').innerText,ibVis:getComputedStyle(document.getElementById('hb3d-intbar')).display,segs:document.querySelectorAll('#hb3d-intbar .ib-seg').length,up:up?getComputedStyle(up).display:'none',brand:!!v.brandInfo(),bi:v.brandInfo()};});
+  let ov=await p.evaluate(()=>{const up=document.getElementById('hb3d-upglabel'),v=HB3D.viewer;return{ownVis:getComputedStyle(document.getElementById('hb3d-ownlabel')).display,ibGone:!document.getElementById('hb3d-intbar'),tile:(document.querySelector('#hb-hud .hb-stx4')||{innerText:''}).innerText.replace(/\s+/g,' '),left:(function(){try{return hbMoney(hbL2Sims().scn.totalInterest);}catch(e){return 'none';}})(),up:up?getComputedStyle(up).display:'none',brand:!!v.brandInfo(),bi:v.brandInfo()};});
   let tg=await tag();
   ok(ov.brand&&ov.bi.bricks===ov.bi.bricksTotal&&ov.bi.colour>0&&Math.abs(ov.bi.colour/ov.bi.colourTotal-0.235)<0.01,'Level 2 is drawn by the brand build: whole house laid, '+(ov.bi&&ov.bi.colour)+' of '+(ov.bi&&ov.bi.colourTotal)+' parts in colour (23.5%)');
   ok(tg.txt==='MORTGAGE 10% PAIDYOU OWN 23.5%'&&tg.vis!=='none'&&tg.brand,'gold tag reads "MORTGAGE 10% PAID" / "YOU OWN 23.5%" ('+tg.txt+')');
   ok(ov.ownVis==='none','the old owned label is hidden (the gold tag replaces it)');
-  ok(ov.ibVis!=='none'&&/INTEREST/.test(ov.ib)&&/slain/.test(ov.ib)&&ov.segs>=2,'interest bar with slain/remaining segments');
+  ok(ov.ibGone,'no interest bar over the 3D house in Level 2 (owner, 12 Nov: it covers the screen)');
+  ok(ov.tile.includes('interest slain · '+ov.left+' left'),'the interest slain tile shows the interest left to pay: "interest slain · '+ov.left+' left" ('+ov.tile+')');
   ok(ov.up==='none','no upgrade label in Level 2');
   await p.screenshot({path:'shots/hb3d/app_l2.png'});
   await p.evaluate(()=>{state.mortgageBalance=127500;save();updateUI();}); await settle(p);
@@ -36,7 +37,7 @@ const seedFn=(o,pro)=>`(function(){if(localStorage.getItem('ht3'))return;localSt
   s=await p.evaluate(()=>hb3dState()); ok(s.mode==='complete'&&!!s.brand,'mortgage free → complete house in the brand build');
   await p.waitForFunction(()=>document.getElementById('hb3d-rowlabel').textContent==='MORTGAGE FREE',null,{timeout:20000}).catch(()=>{});
   ok((await tag()).txt==='MORTGAGE FREE','gold tag reads MORTGAGE FREE');
-  ok(await p.evaluate(()=>getComputedStyle(document.getElementById('hb3d-intbar')).display)==='none','no interest bar once mortgage-free');
+  ok(await p.evaluate(()=>!document.getElementById('hb3d-intbar')),'no interest bar once mortgage-free');
   // ── Level 3: locked under Pro for everyone (owner, 1 Nov 2026) ──
   await p.evaluate(()=>{state.mortgageBalance=180000;save();updateUI();hbUnlockL3();}); await settle(p);
   s=await p.evaluate(()=>hb3dState()); let l3=await p.evaluate(()=>({lv:hbLevel(),l3:!!state.level3,toast:document.getElementById('toast').textContent,up:(document.getElementById('hb3d-upglabel')||{style:{}}).style.display}));
