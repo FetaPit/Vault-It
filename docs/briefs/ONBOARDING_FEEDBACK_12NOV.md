@@ -1,6 +1,8 @@
 # Onboarding screen: rollout feedback (owner, 12 Nov 2026)
 
-Brief by David (ops). Build session: one, on its own branch off `brand-rollout`. Screen: the first welcome screen (`src/app/welcome/welcome.html` `#wz-s1`, `welcome.js`, `welcome.css`). `index.html` is generated: edit `src/app/*`, then `node tools/build_app.js`.
+Brief by David (ops). Screen: the first welcome screen (`src/app/welcome/welcome.html` `#wz-s1`, `welcome.js`, `welcome.css`). `index.html` is generated: edit `src/app/*`, then `node tools/build_app.js`.
+
+**The plan of record (section "Plan of record, 12 Nov evening" at the end) replaces "Who builds what", "Open decisions" and anything else it contradicts.**
 
 ## The owner's words (with a screenshot of the screen at phone width)
 
@@ -99,3 +101,35 @@ British English, sentence case, no em dashes. No new outside hosts. Fonts: Syne,
 
 - Chunk 1: named tests green (new ones plus `test_welcome*`, `test_v095_demo_signup`, `test_hb_brand`, `test_beta_client`, `test_signup_page` where touched), shots sent, `pedro` and `rollout-qc` PASS, commit on the build branch, queue line updated on `brand-rollout`.
 - Chunk 2: the same, plus the `stress-doctor` numbers in the commit message.
+
+## Plan of record, 12 Nov evening
+
+Owner, 12 Nov: "Restart this analysis of this round of edits, understanding intent and what is needed, Plan effectively with relevant agents, then push to existing or new sessions if needed to work in tandem". Reviews behind it: an architect on the data (pull-through, email, deposit), an architect on the 3D tiles, Pedro on the screen, the founder box and the plans placement.
+
+### Owner's decisions (12 Nov)
+- Expenses: **yes, one rough row**. The welcome expenses answer pre-fills Budget as "Monthly spending (rough) £X"; each real expense added comes off it until it is gone. Income works the same way. Nothing is ever counted twice.
+- Heading font: **"Use the custom font we are building Vault-form"**. Vault-form (D+ Heading cut) is built in the brand typeface session (branch `claude/great-hopper-xtzoi8`), which owns the app-wide swap. This round never hard-codes `'Syne'`: every heading it writes or touches uses `var(--font-display)` (`src/app/shell/tokens.css:23`), so it changes to Vault-form in the same pass as the rest of the app. Replace the 13 hard-coded `'Syne'` in `welcome.css` with the variable.
+- Founder box: **both places**. A compact strip at the top of welcome screen 1 and the full box above the note.
+- Target Deposit Value: **exact pounds** (`state.depositPct` kept unrounded when it comes from this field; shown to one decimal place).
+- Plans: after "Your plan", where the card wall already puts them. No build change.
+
+### Findings that are now in scope (architect, file:line on brand-rollout 60e2330)
+- A home value typed with no house type picked is lost: `welcome.js:217` calls `saveHouse`, which does not exist; and `shell/init.js:48` resets `target` from `prices[houseType]` on load. Fix: write `state.prices[state.houseType]` and `target`, then `save()`.
+- The email field shows on every route because the only prefill (`viWelcomePrefill`) runs after network work (`sync.js:486`, `:714`), and never on the local PIN route (`auth.js:903-925`). Fix: `viKnownEmail()` in `welcome.js` read synchronously at load from `_supaUser`, `_authOTP`, the `sb-*-auth-token` session, an unexpired non-demo `vi_session`, then a non-demo `vi_user`; never `vi_last_email` (shared devices). The registered address wins over anything typed.
+- Adding an income stream in Budget adds on top of the onboarding row (double count). Fix: draw the onboarding row down (`budget.js` `addIncome`, and the same in `addExpense` for the new expenses row), plus a nudge in `bdRender`.
+- The welcome expenses answer is saved only to `vi_user.expenses`; the phone fields no longer exist (leave phone alone).
+- Deposit display needs one decimal at `house/levels.js:61`, `:101`, `fire-roadmap.js:104`, and `step="any"` at `house.html:133`.
+- Type: `.welcome-sub` and `.welcome-opt` use the heading font (should be DM Sans); `.welcome-field label` is under the 10.5 px floor (raise to `--vi-fs-1`); inputs 16 px at 390 px.
+- Stage icons (Pedro): debt `vi-debt-tracker` (`--red`), savings `vi-piggy` (`--green`), deposit `vi-house-builder` (`--gold`), wealth `vi-net-worth` (`--teal`); icon colour never changes on selection.
+- Pedro's final note wording (owner approves on the screenshots): "Thank you, personally, for becoming a Vault-It Pioneer. Your first 30 days are on me. You keep your subscription price for as long as you stay subscribed, and you get first call on the 100 Lifetime licences before launch. Try it with your own numbers or made-up ones. Then tell me what is confusing, what is broken and what you wish it did. Please don't email me your real figures. I read every message. Pete"
+
+### Who builds what (three sessions, in tandem, each on its own branch cut from `origin/feat/card-wall`)
+The card wall branch already changes `welcome.html`, `welcome.css`, `welcome.js`, `offer-modals.html` and `manifest.json`, so both new branches start from it to avoid conflicts. Nothing merges to `brand-rollout` without the owner's word. Merge order: card wall, then A, then B.
+
+| Session | Owns (only these) | Builds |
+|---|---|---|
+| **Card wall** (existing, `feat/card-wall`) | heading lines at the top of `#wz-s1`; a new founder strip above them; `#tester-welcome` in `offer-modals.html`; founder styles inside `offer-modals.html` (a `<style>` block), never `welcome.css`; the portrait asset in the app build | Chunk 6: Meet the founder strip (screen 1) and box (above the note), Pedro's note wording, both shown to the owner on screenshots before the commit |
+| **A: onboarding data and form** (new) | `welcome.js` (except `viWhenOpen`/`initWelcome`/the card wall's lines), the rest of `welcome.html` `#wz-s1` to `#wz-s3` except the six tile buttons (lines 129-136 on brand-rollout) and the heading/founder lines, `welcome.css`, `budget.js`, `house/levels.js`, `fire-roadmap.js`, `house.html:133`, new tests | 1) Answers feed the tools (older queue item) with the expenses and income rough rows and draw-down; 2) email never asked when known; 3) Target Home Value label, Target Deposit Value field (exact pounds), one-decimal display; 4) stage icons and type fixes |
+| **B: 3D house tiles** (new) | `src/hb3d/house_gl.js` (new `H.TileHouses`) then `node tools/build_hb3d.js`; new parts `src/app/welcome/house-tiles.js` and `house-tiles.css`; their two entries in `src/app/manifest.json`; optionally `.w-ht .ico` in the Night selector at `tokens.css:6` | One WebGL canvas over `#w-htypes`, scissored viewport per tile; the six houses built in a Worker; draws on demand; still slate until the first frame and wherever WebGL is weak or missing; drag sideways or arrow keys turn, vertical scroll untouched, reduced motion no idle spin; pauses the sign-in house while live; disposed when the overlay closes. Measured build cost: about 1.4 s for all six on the laptop, so 4 to 7 s on a phone, all off the main thread. Optional last commit: the sign-in house follows the picked house type |
+
+No session edits another session's lines. If one needs a change in another's area, it asks David (the ops session) instead.
