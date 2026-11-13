@@ -19,6 +19,7 @@ html{box-sizing:border-box}
   --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
   --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
   --font-display:"Syne","Helvetica Neue",Arial,sans-serif;
+  --font-head:"Chakra Petch","Helvetica Neue",Arial,sans-serif;
   --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
   --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
   --r-brick:4px; --r-tile:14px; --r-card:18px; --r-pill:999px;

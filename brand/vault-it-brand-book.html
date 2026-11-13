@@ -12,7 +12,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Ccircle cx='120' cy='120' r='108' fill='%23000810' stroke='%2342C0B8' stroke-width='14'/%3E%3Cpolygon points='60,76 88,76 120,126.2 152,76 180,76 120,170' fill='%2342C0B8'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;600;700&family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 
 /* Tokens read from the app's own CSS (app.vault-it.co). Night is the default, Daylight is the light mode. */
@@ -35,6 +35,7 @@ html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bott
   --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
   --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
   --font-display:"Syne","Helvetica Neue",Arial,sans-serif;
+  --font-head:"Chakra Petch","Helvetica Neue",Arial,sans-serif;
   --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
   --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
   --r-brick:4px; --r-tile:14px; --r-card:18px; --r-pill:999px;
@@ -79,8 +80,8 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body
   background-image:var(--paper-img);background-size:var(--paper-size)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
 img,svg,canvas{max-width:100%}
-h1,h2,h3{font-family:var(--font-display);margin:0;letter-spacing:-.01em;line-height:1.05}
-h2{font-size:clamp(28px,5vw,44px);font-weight:800}
+h1,h2,h3{font-family:var(--font-head);margin:0;letter-spacing:0;line-height:1.1}
+h2{font-size:clamp(28px,5vw,44px);font-weight:700}
 h3{font-size:20px;font-weight:700;line-height:1.2;margin-bottom:12px}
 p{margin:0 0 1em;max-width:62ch}
 a{color:var(--teal)}
@@ -128,7 +129,7 @@ section{padding:72px 0 24px;border-top:1px solid var(--line)}
 .hero{border-top:0;padding-top:56px}
 .hero-grid{display:grid;gap:36px;grid-template-columns:1fr;align-items:center}
 @media(min-width:900px){.hero-grid{grid-template-columns:1.05fr 1fr}}
-.hero h1{font-size:clamp(38px,7.2vw,76px);font-weight:800;line-height:1;letter-spacing:-.02em}
+.hero h1{font-size:clamp(38px,7.2vw,76px);font-weight:700;line-height:1;letter-spacing:-.01em}
 .hero h1 em{font-style:normal;color:var(--teal)}
 .hero .sub{font-family:var(--font-mono);font-size:18px;letter-spacing:.12em;color:var(--faint);margin:22px 0 0}
 .hud{background:var(--surf2);border:1px solid var(--line2);border-radius:var(--r-card);padding:16px;box-shadow:var(--glow);position:relative}
@@ -815,11 +816,11 @@ footer .wm{font-size:26px;margin-bottom:10px}
 <section id="type">
   <div class="wrap">
     <div class="lbl">Type</div>
-    <h2 style="margin-top:10px">Wide, humane, technical.</h2>
-    <p class="lede">Three voices. Syne for statements and navigation. DM Sans for reading. Share Tech Mono for numbers, labels and the hologram HUD feel. Edit the specimens.</p>
+    <h2 style="margin-top:10px">Clear, humane, technical.</h2>
+    <p class="lede">Headlines and titles are Chakra Petch (owner, 13 Nov: Syne was too wide and hard to read). Syne stays for navigation, buttons and the logo. DM Sans for reading. Share Tech Mono for numbers, labels and the hologram HUD feel. Edit the specimens.</p>
     <div class="card glow" style="margin-top:32px">
-      <div class="spec" contenteditable="true" spellcheck="false" style="font-family:var(--font-display);font-weight:800" aria-label="Editable display specimen">Build your <span style="color:var(--teal)">dream home</span></div>
-      <p style="color:var(--muted);margin:14px 0 0;font-size:15px">Syne 800. Headlines, the wordmark, button and navigation labels.</p>
+      <div class="spec" contenteditable="true" spellcheck="false" style="font-family:var(--font-head);font-weight:700" aria-label="Editable display specimen">Build your <span style="color:var(--teal)">dream home</span></div>
+      <p style="color:var(--muted);margin:14px 0 0;font-size:15px">Chakra Petch 700. Headlines and titles. Syne 700 stays on navigation and button labels, and the wordmark is drawn artwork.</p>
     </div>
     <div class="grid2" style="margin-top:20px">
       <div class="card">
@@ -835,8 +836,9 @@ footer .wm{font-size:26px;margin-bottom:10px}
       <table>
         <thead><tr><th>Role</th><th>Family</th><th>Size and tracking</th></tr></thead>
         <tbody>
-          <tr><td style="font-family:var(--font-display);font-weight:800;font-size:26px">Display</td><td>Syne 800</td><td>38 to 76, tight</td></tr>
-          <tr><td style="font-family:var(--font-display);font-weight:800;font-size:22px">Heading</td><td>Syne 800</td><td>28 to 44</td></tr>
+          <tr><td style="font-family:var(--font-head);font-weight:700;font-size:26px">Display</td><td>Chakra Petch 700</td><td>38 to 76, tight</td></tr>
+          <tr><td style="font-family:var(--font-head);font-weight:700;font-size:22px">Heading</td><td>Chakra Petch 700</td><td>28 to 44</td></tr>
+          <tr><td style="font-family:var(--font-head);font-weight:300;font-size:18px">Level pills (to try)</td><td>Chakra Petch 300</td><td>13. A Light cut is being tried on the Level pills (owner, 13 Nov)</td></tr>
           <tr><td style="font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase">Navigation and buttons</td><td>Syne 600 to 700</td><td>12 to 13, +0.14em, uppercase</td></tr>
           <tr><td>Body</td><td>DM Sans 400</td><td>17 to 18, 1.55</td></tr>
           <tr><td class="lbl">Label</td><td>Share Tech Mono</td><td>13, +0.22em, uppercase</td></tr>
@@ -865,7 +867,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
       </div>
     </div>
     <h3 style="margin-top:40px">Dashboard figures: Vault-form</h3>
-    <p style="color:var(--muted);max-width:62ch">Owner rule, 13 Nov 2026: the new typeface, Vault-form, is for dashboard figures only. It narrows the earlier plan to use it on headings and the logo. The font files are not in this book yet and the typeface is still to be signed off, so Syne stays everywhere until then.</p>
+    <p style="color:var(--muted);max-width:62ch">Owner rule, 13 Nov 2026: the new typeface, Vault-form, is for dashboard figures only. It narrows the earlier plan to use it on headings and the logo. The font files are not in this book yet and the typeface is still to be signed off, so figures keep their current fonts until then.</p>
     <div class="grid2">
       <div class="card tablewrap"><table>
         <thead><tr><th>Where</th><th>Type</th></tr></thead>
@@ -2337,7 +2339,7 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
 
 function cssOut(){
   var s="/* Night, the default */\n:root,[data-theme=\"dark\"]{\n";TOK.forEach(function(t){s+="  "+t.v+": "+t.hex+"; /* "+t.name+" */\n"});
-  s+="  --goldf: #E8C56A;\n  --on-teal: #00181A;\n  --on-gold: #1A1400;\n  --font-display: \"Syne\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-body: \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-mono: \"Share Tech Mono\", ui-monospace, Menlo, monospace;\n  --r-brick: 4px;\n  --r-tile: 14px;\n  --r-card: 18px;\n  --r-pill: 999px;\n  --ease: cubic-bezier(.2,.8,.2,1);\n  --t-fast: 240ms;\n  --t-base: 600ms;\n  --t-build: 1800ms;\n  --pulse: 2800ms;\n  --vi-sw: 1.1; /* icon stroke, 1.5 under 24px */\n}\n\n/* Daylight, the light mode */\n[data-theme=\"light\"]{\n  color-scheme: light;\n";
+  s+="  --goldf: #E8C56A;\n  --on-teal: #00181A;\n  --on-gold: #1A1400;\n  --font-display: \"Syne\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-head: \"Chakra Petch\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-body: \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-mono: \"Share Tech Mono\", ui-monospace, Menlo, monospace;\n  --r-brick: 4px;\n  --r-tile: 14px;\n  --r-card: 18px;\n  --r-pill: 999px;\n  --ease: cubic-bezier(.2,.8,.2,1);\n  --t-fast: 240ms;\n  --t-base: 600ms;\n  --t-build: 1800ms;\n  --pulse: 2800ms;\n  --vi-sw: 1.1; /* icon stroke, 1.5 under 24px */\n}\n\n/* Daylight, the light mode */\n[data-theme=\"light\"]{\n  color-scheme: light;\n";
   TOK.forEach(function(t){s+="  "+t.v+": "+t.lt+";\n"});
   s+="  --on-teal: #FFFFFF;\n}\n\n/* Follow the device unless the person has chosen: read localStorage vi-theme, else prefers-color-scheme, and set data-theme on html. */\n";return s}
 function jsonOut(){
