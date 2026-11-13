@@ -41,8 +41,10 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
   // the card wall (owner, 12 Nov 2026, "Card required"): no "free, no card" promise; what happens instead; prices that match the app's Stripe links
   const full = await page.evaluate(() => { const c = document.body.cloneNode(true); c.querySelectorAll('script,style').forEach((e) => e.remove()); return c.textContent.replace(/\s+/g, ' '); });
   const cfg = fs.readFileSync(path.join(ROOT, 'src/app/paywall/stripe-config.js'), 'utf8');
-  const PL = (k) => { const m = cfg.match(new RegExp(k + ': \\{ price: ([\\d.]+), tester: ([\\d.]+)')); return m ? { price: m[1], tester: m[2] } : {}; };
-  const PM = PL('monthly'), PA = PL('annual'), allowed = [PM.price, PM.tester, PA.price, PA.tester];
+  // five plans since 13 Nov 2026 (Vaulter and Pioneer, monthly and yearly); the page leads with Vaulter monthly and Pioneer yearly
+  const PL = (k) => { const m = cfg.match(new RegExp(k + ':\\s+\\{ tierId: \\S+ billing: \\S+\\s+price: ([\\d.]+),\\s+tester: ([\\d.]+)')); return m ? { price: m[1], tester: m[2] } : {}; };
+  const PM = PL('vaulter_month'), PA = PL('pioneer_year'), PVY = PL('vaulter_year'), PPM = PL('pioneer_month');
+  const allowed = [PM.price, PM.tester, PA.price, PA.tester, PVY.price, PVY.tester, PPM.price, PPM.tester];
   const pence = (full.match(/£\d+\.99\b/g) || []).concat([...full.matchAll(/(£\d+(?:\.\d\d)?) a (?:month|year)/g)].map((m) => m[1])).map((x) => x.slice(1));   // plan prices: every £x.99 and every "£x a month / a year"
   ok(!/no card|free beta|free private beta|free during the beta|free for the whole beta|never enter a card/i.test(full + ' ' + await page.content()), 'no "free, no card" promise is left on the sign-up page, its title or its share text (card wall, 12 Nov)');
   ok(/30 days free/i.test(full) && /first charged on day 31/.test(full) && /Cancel before then and you pay nothing/.test(full) && /to cancel, email hello@vault-it\.co/i.test(full), 'it says what happens instead: 30 days free, card taken when a plan is chosen, first charged on day 31, how to cancel');

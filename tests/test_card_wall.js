@@ -1,6 +1,6 @@
 // The card wall (owner, 12 Nov 2026: "Card required", "Card wall for everyone", "After the questions"; docs/briefs/CARD_WALL.md).
 // Nobody uses the app on an account without a plan. With a stand-in Supabase that answers the profile read:
-//   1  a new sign-up, after the questions, sees the three plans with prices and terms and cannot reach any tab
+//   1  a new sign-up, after the questions, sees Vaulter, Pioneer and the Lifetime licence (yearly first, a Monthly toggle, Household coming soon) and cannot reach any tab
 //   2  choosing the monthly plan opens the Stripe link with the 30-day trial, the account id and the e-mail
 //   3  the server's answer decides: on a plan (a trial counts) opens the app on any device; not on a plan shows the wall
 //   4  the device's own paid flags, set by hand, open nothing; nor does the app show before the server has answered
@@ -99,18 +99,27 @@ const shut = (s) => s.wall && s.covered && !s.nav && !s.tab && !s.side && !s.foo
     await p.click('#wz-s2 .wz-skip'); await p.waitForTimeout(250); await p.click('#w-finish'); await p.waitForTimeout(1600);
     s = await look(p);
     ok(shut(s) && s.state === 'plans', T + '1 after the questions the plans screen covers the app: no tab, no menu, no footer (' + JSON.stringify({ wall: s.wall, state: s.state, covered: s.covered, nav: s.nav, tab: s.tab, side: s.side, footer: s.footer }) + ')');
-    ok(s.plans.join() === 'monthly,annual,founder', T + '1 the three plans are offered (' + s.plans.join() + ')');
-    const cards = await p.evaluate(() => ['monthly', 'annual', 'founder'].map((k) => ({ name: (document.querySelector('#plan-wall [data-plan-name="' + k + '"]') || {}).textContent, price: (document.querySelector('#plan-wall [data-plan-price="' + k + '"]') || {}).textContent,
-      terms: (document.querySelector('#plan-wall [data-plan-terms="' + k + '"]') || {}).textContent, want: { name: VI_PLANS[k].name, price: viPlanPrice(k), terms: viPlanTerms(k) } })));
+    ok(s.plans.join() === 'vaulter_year,pioneer_year,founder', T + '1 the plans are offered, yearly first: Vaulter, Pioneer and the Lifetime licence (' + s.plans.join() + ')');
+    const readCards = (keys) => p.evaluate((ks) => ks.map((k) => { const card = document.querySelector('#plan-wall [data-tier-card="' + (k === 'founder' ? 'founder' : k.split('_')[0]) + '"]');
+      return { name: (card.querySelector('[data-plan-name]') || {}).textContent, price: (card.querySelector('[data-wall-price],[data-plan-price]') || {}).textContent, sub: (card.querySelector('[data-wall-sub]') || {}).textContent,
+        terms: (card.querySelector('[data-plan-terms]') || {}).textContent, want: { name: VI_PLANS[k].name, price: viPlanPrice(k), terms: viPlanTerms(k) } }; }), keys);
+    const cards = await readCards(['vaulter_year', 'pioneer_year', 'founder']);
     ok(cards.every((c) => c.name === c.want.name && c.price.indexOf(c.want.price) === 0 && c.terms === c.want.terms), T + '1 each plan shows its name, price and terms from the one source (' + JSON.stringify(cards.map((c) => [c.name, c.price])) + ')');
-    ok(cards[0].name === 'Vaulter' && cards[1].name === 'Pioneer' && cards[2].name === 'Lifetime licence', T + '1 the plans are named Vaulter (monthly), Pioneer (yearly) and Lifetime licence (' + cards.map((c) => c.name).join(', ') + ')');
-    ok(/£3\.99/.test(cards[0].price) && /£49\.99/.test(cards[1].price) && /£99/.test(cards[2].price), T + '1 prices are the Stripe links\' prices: £3.99 a month, £49.99 a year, £99 once');
-    ok(/^Free for 30 days, then £3\.99 a month\. Your card is taken now and first charged on day 31\. Cancel before then and you pay nothing\. To cancel, email hello@vault-it\.co\.$/.test(cards[0].terms), T + '1 the monthly terms say it plainly: free for 30 days, card taken now, charged on day 31, how to cancel (' + cards[0].terms + ')');
+    ok(cards[0].name === 'Vaulter' && cards[1].name === 'Pioneer' && cards[2].name === 'Lifetime licence', T + '1 the plans are named Vaulter, Pioneer and Lifetime licence (' + cards.map((c) => c.name).join(', ') + ')');
+    ok(/^£39\.99 a year, billed once$/.test(cards[0].price) && /^£49\.99 a year, billed once$/.test(cards[1].price) && /£99/.test(cards[2].price), T + '1 yearly total first: £39.99 a year and £49.99 a year, billed once; Lifetime £99 once (' + cards.map((c) => c.price).join(' | ') + ')');
+    ok(/Works out at £3\.33 a month Save 16%/.test(cards[0].sub) && /Works out at £4\.17 a month Save 30%/.test(cards[1].sub) && /Beta price until 31 December 2026, then £49\.99 a year\./.test(cards[0].sub) && /Beta price until 31 December 2026, then £79\.99 a year\./.test(cards[1].sub) && /^Beta price until 31 December 2026\.$/.test(cards[2].sub), T + '1 the monthly equivalent, the true saving (16% and 30%), and the beta end date beside every beta price (' + cards.map((c) => c.sub).join(' | ') + ')');
+    ok(/^Free for 30 days, then £39\.99 a year\. Your card is taken now and first charged on day 31\. Cancel before then and you pay nothing\. To cancel, email hello@vault-it\.co\.$/.test(cards[0].terms), T + '1 the terms say it plainly: free for 30 days, card taken now, charged on day 31, how to cancel (' + cards[0].terms + ')');
     ok(/One payment, charged at checkout/.test(cards[2].terms), T + '1 the Lifetime licence is charged at checkout');
+    ok(/You keep your discounted first movers’ price forever while you stay subscribed\./.test(s.text) && /Household/i.test(s.text) && /Coming soon/i.test(s.text) && !(await p.evaluate(() => !!document.querySelector('#plan-wall [data-tier-card="household"] button, #plan-wall [data-tier-card="household"] [data-plan]'))), T + '1 the first movers’ price promise is on the wall, and Household is coming soon with no button');
     ok(/Not regulated by the FCA\. Not financial advice\./.test(s.text), T + '1 "Not regulated by the FCA. Not financial advice." is on the wall');
     ok(!s.sideways, T + '1 no sideways scroll');
-    const allowed = ['monthly', 'annual', 'founder', 'wall-check', 'wall-signout', 'wall-export', 'wall-help'];
-    ok(s.buttons.length === allowed.length && s.buttons.every((x) => allowed.indexOf(x) > -1), T + '1 the only ways on are a plan, Check again, Sign out, Download my data and Help (' + s.buttons.join() + ')');
+    // the monthly side of the toggle
+    await p.click('#plan-wall .wall-bill-btn[data-bill="month"]'); await p.waitForTimeout(150);
+    const mcards = await readCards(['vaulter_month', 'pioneer_month', 'founder']);
+    ok(mcards.every((c) => c.name === c.want.name && c.price.indexOf(c.want.price) === 0 && c.terms === c.want.terms) && /^£3\.99 a month$/.test(mcards[0].price) && /^£5\.99 a month$/.test(mcards[1].price) && !/Save|Works out/.test(mcards[0].sub + mcards[1].sub), T + '1 Monthly: Vaulter £3.99 a month, Pioneer £5.99 a month, no saving claimed (' + mcards.map((c) => c.price).join(' | ') + ')');
+    ok((await look(p)).plans.join() === 'vaulter_month,pioneer_month,founder', T + '1 the buttons follow the toggle (' + (await look(p)).plans.join() + ')');
+    const allowed = ['year', 'month', 'Yearly', 'Monthly', 'vaulter_year', 'vaulter_month', 'pioneer_year', 'pioneer_month', 'founder', 'wall-check', 'wall-signout', 'wall-export', 'wall-help'];
+    ok(s.buttons.length === 9 && s.buttons.every((x) => allowed.indexOf(x) > -1), T + '1 the only ways on are Yearly, Monthly, a plan, Check again, Sign out, Download my data and Help (' + s.buttons.join() + ')');
     // nothing gets past it
     await p.keyboard.press('Escape'); await p.mouse.click(4, 4); await p.waitForTimeout(200);
     await p.evaluate(() => { try { showTab('budget'); } catch (e) {} try { showSettings(); } catch (e) {} try { document.getElementById('vi-campaign-modal').classList.remove('hidden'); } catch (e) {} });
@@ -121,7 +130,7 @@ const shut = (s) => s.wall && s.covered && !s.nav && !s.tab && !s.side && !s.foo
     ok(await p.evaluate(() => ['settings-modal', 'vi-campaign-modal', 'tab-budget'].every((id) => getComputedStyle(document.getElementById(id)).visibility === 'hidden')), T + '1 anything opened behind the wall stays hidden');
 
     // ── 2  the monthly plan goes to Stripe with the trial link, the account and the e-mail ──
-    await p.click('#plan-wall [data-plan="monthly"]'); await p.waitForTimeout(200);
+    await p.click('#plan-wall [data-plan="vaulter_month"]'); await p.waitForTimeout(200);
     const url = await p.evaluate(() => window.__opened[0] || '');
     ok(url.indexOf(MONTHLY_TRIAL + '?') === 0, T + '2 the monthly plan opens the Stripe link with the 30-day trial (' + url.slice(0, 60) + ')');
     ok(url.indexOf('client_reference_id=' + UID) > 0 && url.indexOf('prefilled_email=' + encodeURIComponent('t@t.com')) > 0, T + '2 with the account id and the e-mail');

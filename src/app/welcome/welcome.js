@@ -321,10 +321,16 @@ function getCoreTaskStatus() {
 
 function applyPaywall() {
   try { viPlanGate(); } catch (e) {}   // the card wall: after the questions, and whenever paid status changes
-  var pioneer = _isPro();
-  var bizGate = document.getElementById('pro-gate-biz');
-  if (bizGate) bizGate.style.display = pioneer ? 'none' : '';
+  viBizGate();
   updateProGate();
+}
+// The Entrepreneur tab is a Pro feature (owner, 13 Nov 2026, "Gate, testers keep"): Pioneer, Lifetime and the testers who keep it see the tab, a Vaulter sees the gate
+// and nothing under it. Only the screen is covered: nothing saved is changed or removed.
+function viBizGate() {
+  var locked = false; try { locked = typeof viPro === 'function' && !viPro() && typeof viPaid === 'function' && viPaid(); } catch (e) {}
+  var bizGate = document.getElementById('pro-gate-biz');
+  if (bizGate) bizGate.style.display = locked ? '' : 'none';
+  var tab = document.getElementById('tab-biz'); if (tab) tab.classList.toggle('vi-biz-locked', locked);
 }
 function updateProGate() {
   var tl = document.getElementById('pro-gate-tasklist');

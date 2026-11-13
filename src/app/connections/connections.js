@@ -171,7 +171,8 @@ function handleOAuthCallback() {
   var params = new URLSearchParams(window.location.search);
   if (params.get('upgraded') === '1' || params.get('founded') === '1') {
     var pl = params.get('founded') === '1' ? 'founder' : params.get('plan');
-    if (pl !== 'monthly' && pl !== 'yearly' && pl !== 'founder') pl = null;
+    // the plan the link says (13 Nov 2026: vaulter_monthly | vaulter_yearly | pioneer_monthly | pioneer_yearly, and the older monthly | yearly); only a label, the server's record decides
+    if (['monthly', 'yearly', 'founder', 'vaulter_monthly', 'vaulter_yearly', 'pioneer_monthly', 'pioneer_yearly'].indexOf(pl) < 0) pl = null;
     window.history.replaceState({}, document.title, window.location.pathname);
     viPaymentReturn(pl);
     return;

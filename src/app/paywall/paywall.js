@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 // PIONEER / PAYWALL
 // ═══════════════════════════════════════════════════════════════
-var _STRIPE_MONTHLY='https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00';
 var _STRIPE_ANNUAL ='';   // see VI_STRIPE_LINKS.annual (the old annual link is retired)
 // the old item caps (3 assets, 2 liabilities, 1 debt) went on 31 Oct 2026: every plan tracks as many as it likes
 
@@ -32,14 +31,38 @@ function viAccountDay() {
 // viCan(feature): the design tools ('design' = upload your own 3D house, 'aimodel' = generate one with AI) need a plan.
 function viPlan() { try { var p = localStorage.getItem('vi_plan'); return (p === 'monthly' || p === 'yearly' || p === 'founder') ? p : null; } catch (e) { return null; } }
 function viTier() { if (!viPaid()) return 'none'; if (isFounder()) return 'founder'; return viPlan() || 'yearly'; }
-function viCan(f) { if (f === 'design' || f === 'aimodel') return viPaid(); return true; }
+// Tier and billing period (migration 015, owner 13 Nov 2026): viTierId() = 'vaulter' | 'pioneer' | 'founder' | 'none', viBilling() = 'month' | 'year' | 'once' | null.
+// They are the device's mirror of profiles.tier / profiles.billing (viPaidApply); with no such columns yet (a server before migration 015) they are read from the
+// old plan name: monthly = Vaulter, yearly = Pioneer, founder = Lifetime licence, and a paid account with no plan recorded counts as Pioneer, as viTier() does.
+function viTierId() {
+  if (!viPaid()) return 'none';
+  if (isFounder()) return 'founder';
+  try { var t = localStorage.getItem('vi_tier'); if (t === 'vaulter' || t === 'pioneer' || t === 'founder') return t; } catch (e) {}
+  var p = viPlan(); return p === 'monthly' ? 'vaulter' : 'pioneer';
+}
+function viBilling() {
+  if (!viPaid()) return null;
+  try { var b = localStorage.getItem('vi_billing'); if (b === 'month' || b === 'year' || b === 'once') return b; } catch (e) {}
+  var p = viPlan(); return p === 'monthly' ? 'month' : p === 'founder' ? 'once' : 'year';
+}
+// viPro(): the Pro features (your own 3D house design, the AI house model, the Entrepreneur tab) belong to Pioneer, to a Lifetime licence, and to the beta testers who
+// were on Vaulter when the tiers split and keep them while they stay subscribed (owner, 13 Nov: "Gate, testers keep"; profiles.pro_kept, set by migration 015). A server
+// that cannot say which tier an account is on (no tier column yet) takes nothing away: Pro stays open for every plan until it can.
+// Not the same as _isPro() (welcome.js), which means "on a plan, the whole app" for everything else.
+function viPro() {
+  if (!viPaid()) return false;
+  try { if (localStorage.getItem('vi_tier') === null && localStorage.getItem('vi_pro_kept') === null) return true; } catch (e) { return true; }
+  var t = viTierId(); if (t === 'pioneer' || t === 'founder') return true;
+  try { return localStorage.getItem('vi_pro_kept') === 'true'; } catch (e) { return false; }
+}
+function viCan(f) { if (f === 'design' || f === 'aimodel') return viPro(); return true; }
 // the AI screenshot reader's monthly allowance, as the server applies it (supabase/functions/portfolio-vision): 3 with no plan, 30 Vaulter or Pioneer, 10 Lifetime
 function viShotAllowance() { var t = viTier(); return t === 'founder' ? '10 screenshot reads a month' : (t === 'monthly' || t === 'yearly') ? '30 screenshot reads a month' : '3 screenshot reads a month (30 on ' + VI_PLANS.monthly.name + ' or ' + VI_PLANS.annual.name + ')'; }
 // a design tool: true (and it says why) when this account may not use it
 function viGateDesign(f) {
   if (viBlockEdit()) return true;
   if (viCan(f)) return false;
-  try { var names = VI_PLANS.monthly.name + ', ' + VI_PLANS.annual.name + ' or a ' + VI_PLANS.founder.name; showToast(f === 'aimodel' ? 'Generating a house with AI needs a plan: ' + names + '.' : 'Uploading your own 3D house needs a plan: ' + names + '.'); } catch (e) {}
+  try { var names = VI_PLANS.pioneer_year.name + ' or a ' + VI_PLANS.founder.name; showToast(f === 'aimodel' ? 'Generating a house with AI is part of ' + names + '.' : 'Uploading your own 3D house is part of ' + names + '.'); } catch (e) {}
   return true;
 }
 // The first line of every add / edit / delete handler. The card wall already keeps an account without a plan away from every

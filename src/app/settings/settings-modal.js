@@ -6,7 +6,9 @@ function _refreshPioneerSettingsUI(){
   // on a plan, or not (card wall, 12 Nov 2026): no trial day, no countdown. With no plan the wall is up, so this side is only seen on the sample.
   var paid=viPaid(),key=!paid?null:isFounder()?'founder':viPlan()==='monthly'?'monthly':viPlan()==='yearly'?'annual':null;
   if(active)active.style.display=paid?'block':'none';
-  if(line)line.textContent=key?'You are on '+VI_PLANS[key].name+(key==='monthly'?' (monthly)':key==='annual'?' (yearly)':'')+'. Thank you for backing Vault-It.':'Your plan is active. Thank you for backing Vault-It.';
+  // the name and billing period come from the recorded tier and billing (a Vaulter yearly buyer is not on "Vaulter (monthly)")
+  var tid=viTierId(),bil=viBilling(),pname=tid==='founder'?VI_PLANS.founder.name:tid==='vaulter'?VI_PLANS.vaulter_month.name:tid==='pioneer'?VI_PLANS.pioneer_year.name:null;
+  if(line)line.textContent=key&&pname?'You are on '+pname+(bil==='month'?' (monthly)':bil==='year'?' (yearly)':'')+'. Thank you for backing Vault-It.':'Your plan is active. Thank you for backing Vault-It.';
   if(inactive){inactive.style.display=paid?'none':'block';
     inactive.textContent='This account is not on a plan. The plans: '+VI_PLANS.monthly.name+' at '+viPlanLabel('monthly')+'; '+VI_PLANS.annual.name+' at '+viPlanLabel('annual')+'; or a '+VI_PLANS.founder.name+' at '+viPlanLabel('founder')+'.';}
   // one plan per account: on a plan the buy buttons and their terms are not shown; changing or cancelling goes by email

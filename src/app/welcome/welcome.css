@@ -200,4 +200,7 @@
 }
 .pro-gate-btn:hover { transform: scale(1.03); box-shadow: 0 0 20px rgb(var(--brass-rgb) / .4); }
 .tab-panel.gated { position: relative; overflow: hidden; min-height: 300px; }
+/* Entrepreneur is a Pro feature (viBizGate, welcome.js): a Vaulter sees the gate and nothing under it. Only the screen is covered, nothing saved is touched. */
+#tab-biz.vi-biz-locked > div > :not(#pro-gate-biz) { display: none !important; }
+#tab-biz.vi-biz-locked .pro-gate-overlay { margin: 0 auto; max-width: 420px; text-align: center; display: flex; flex-direction: column; align-items: center; }
 

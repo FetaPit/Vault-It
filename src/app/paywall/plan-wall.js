@@ -126,13 +126,37 @@ function viPlanGate() {
 }
 function _viWallSay(msg) { var st = document.getElementById('wall-status'); if (st) st.textContent = msg || ''; }
 // names, prices, terms and buttons from the one source (VI_PLANS); who is signed in
+// The cards (owner, 13 Nov 2026): Vaulter and Pioneer each in yearly or monthly (a toggle, yearly first), the Lifetime licence, and Household as coming soon with no button.
+// A yearly price leads with the yearly total, then the monthly figure it works out at; "Save X%" only where it is true (viPlanSave); a beta price carries the date the beta
+// closes beside it and the price after it (never struck through).
+var _viWallBill = 'year';
+function viWallBilling(b) { _viWallBill = b === 'month' ? 'month' : 'year'; viWallPaint(); }
+function _viWallCard(card) {
+  var tier = card.getAttribute('data-tier-card'), key = tier === 'founder' ? 'founder' : tier + '_' + _viWallBill, P = VI_PLANS[key]; if (!P) return;
+  var q = function (sel) { return card.querySelector(sel); };
+  var beta = viPlanTester(key), sub = q('[data-wall-sub]'), html = [];
+  if (tier !== 'founder') {
+    var nm = q('[data-plan-name]'), tm = q('[data-plan-terms]'), btn = q('[data-plan]'), when = q('[data-wall-when]'), pr = q('[data-wall-price]');
+    if (nm) nm.setAttribute('data-plan-name', key); if (tm) tm.setAttribute('data-plan-terms', key); if (btn) btn.setAttribute('data-plan', key);
+    if (when) when.textContent = P.billing === 'year' ? 'Yearly' : 'Monthly';
+    if (pr) pr.innerHTML = viPlanPrice(key) + '<span>' + P.per + (P.billing === 'year' ? ', billed once' : '') + '</span>';
+    if (P.billing === 'year') { var save = viPlanSave(key); html.push('Works out at <b>' + viPlanPerMonth(key) + ' a month</b>' + (save ? ' <span class="wall-save">Save ' + save + '%</span>' : '')); }
+  }
+  // the Lifetime card already says "£199 after the beta" under its price (viPricePaint), so it only adds the date
+  if (beta) html.push('Beta price until ' + VI_BETA_ENDS_ON + (P.billing === 'once' ? '.' : ', then ' + viMoney(P.price) + P.per + '.'));
+  if (sub) { sub.innerHTML = html.join('<br>'); sub.style.display = html.length ? '' : 'none'; }
+}
 function viWallPaint() {
+  try { [].forEach.call(document.querySelectorAll('#plan-wall .wall-plan[data-tier-card]'), _viWallCard); } catch (e) {}
+  try { [].forEach.call(document.querySelectorAll('.wall-bill-btn'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-bill') === _viWallBill ? 'true' : 'false'); }); } catch (e) {}
   try { viPricePaint(); } catch (e) {}   // names, prices, terms and buttons, all from VI_PLANS
   try {
-    var lead = document.getElementById('wall-lead'), M = VI_PLANS.monthly;
-    if (lead) lead.textContent = (viPlanTrial('monthly') && viPlanTrial('annual'))
-      ? 'The monthly and yearly plans are free for ' + M.trialDays + ' days. Your card is taken at checkout and first charged on day ' + (M.trialDays + 1) + '. Cancel before then and you pay nothing.'
+    var lead = document.getElementById('wall-lead'), M = VI_PLANS.vaulter_month;
+    if (lead) lead.textContent = (viPlanTrial('vaulter_month') && viPlanTrial('vaulter_year') && viPlanTrial('pioneer_month') && viPlanTrial('pioneer_year'))
+      ? 'Vaulter and Pioneer are free for ' + M.trialDays + ' days. Your card is taken at checkout and first charged on day ' + (M.trialDays + 1) + '. Cancel before then and you pay nothing.'
       : 'Every plan opens the whole app. You pay at checkout.';
+    var keep = document.getElementById('wall-keep');
+    if (keep) { keep.textContent = VI_BETA_OPEN ? 'You keep your discounted first movers’ price forever while you stay subscribed. Beta prices are open until ' + VI_BETA_ENDS_ON + '.' : ''; keep.style.display = VI_BETA_OPEN ? '' : 'none'; }
     var who = document.getElementById('wall-who'), s = JSON.parse(localStorage.getItem('vi_session') || 'null');
     if (who) who.textContent = s && s.email ? 'Signed in as ' + s.email : '';
   } catch (e) {}

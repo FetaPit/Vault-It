@@ -27,7 +27,7 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
 <script>
 // ── Input safety: user-entered text is rendered into the page in many places, so markup characters are
 // neutralised on the way IN (typing, imports, cloud sync, already-saved data) — nothing can inject script.
-var VI_KEYS_EARLY = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1','ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history','vi_settings','vi_user','vi_pioneer','vi_founder','vi_plan','vi_debt','vi_ov'];
+var VI_KEYS_EARLY = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1','ht3','pos_house','pos_journey','vi_jrny_events','vi_nw_history','vi_settings','vi_user','vi_pioneer','vi_founder','vi_plan','vi_tier','vi_billing','vi_pro_kept','vi_debt','vi_ov'];
 function viClean(t) { return String(t).replace(/[<>`]/g, '').replace(/"/g, '\u201D').replace(/'/g, '\u2019'); }
 function viCleanDeep(o) {
   if (typeof o === 'string') return /^data:(image|application)\//.test(o) ? o : viClean(o);

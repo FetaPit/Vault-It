@@ -13,7 +13,7 @@ var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
   'vi_settings','vi_user','vi_debt','vi_ov'];
 // Paid status is not user data: it comes from the profile (the server, set by Stripe), never from the synced vault, so an old
 // vault row or a restored version cannot make an account paid (secure paid gateway, migration 011).
-var VI_SERVER_KEYS = ['vi_pioneer','vi_founder','vi_plan'];
+var VI_SERVER_KEYS = ['vi_pioneer','vi_founder','vi_plan','vi_tier','vi_billing','vi_pro_kept'];
 
 // ── SAFE SYNC ─────────────────────────────────────────────────
 // Every edit to a vault key is time-stamped (vi_ts) and queued (vi_dirty) until the cloud confirms it.
@@ -653,7 +653,11 @@ async function _hydrateFromSupabase(uid) {
 // nothing the browser sets (a URL, an e-mail typed in, a storage flag) makes an account paid. A server without the paid columns
 // cannot answer, so nothing is unlocked (the device-side unlocks for an "older server" went with the card wall, 12 Nov 2026).
 var _viGateway = null;   // null = not known yet · true = the server keeps paid status · false = older server
-var VI_PAID_COLS = 'is_pioneer,is_founder,plan,paid_until,is_beta,stripe_synced_at';
+// tier / billing / pro_kept arrive with migration 015 (tier and billing period recorded separately, owner 13 Nov 2026). A server that has not had it yet answers
+// "column does not exist": the read is then repeated with the older columns and the app behaves as before (_viProfileRead).
+var VI_PAID_COLS_OLD = 'is_pioneer,is_founder,plan,paid_until,is_beta,stripe_synced_at';
+var VI_PAID_COLS = VI_PAID_COLS_OLD + ',tier,billing,pro_kept';
+var _viPaidCols = VI_PAID_COLS;
 function _viColumnMissing(err) { return !!err && (err.code === '42703' || err.code === 'PGRST204' || /does not exist|could not find .*column/i.test(err.message || '')); }
 async function viGatewayCheck() {   // works signed out too: an unknown column is an error whatever the row rules return
   if (_viGateway !== null || !_supaClient) return _viGateway;
@@ -666,6 +670,10 @@ function viPaidApply(row) {   // mirror the profile onto this device
     if (paid) localStorage.setItem('vi_pioneer', 'true'); else localStorage.removeItem('vi_pioneer');
     if (row.is_founder) localStorage.setItem('vi_founder', 'true'); else localStorage.removeItem('vi_founder');
     if (row.plan === 'monthly' || row.plan === 'yearly' || row.plan === 'founder') localStorage.setItem('vi_plan', row.plan); else if (!paid) localStorage.removeItem('vi_plan');
+    // tier, billing period and the testers' Pro flag: a mirror of the profile, up and down. Absent columns (an older server) remove them, which leaves Pro open (viPro).
+    if (row.tier === 'vaulter' || row.tier === 'pioneer' || row.tier === 'founder') localStorage.setItem('vi_tier', row.tier); else localStorage.removeItem('vi_tier');
+    if (row.billing === 'month' || row.billing === 'year' || row.billing === 'once') localStorage.setItem('vi_billing', row.billing); else localStorage.removeItem('vi_billing');
+    if (typeof row.pro_kept === 'boolean') localStorage.setItem('vi_pro_kept', row.pro_kept ? 'true' : 'false'); else localStorage.removeItem('vi_pro_kept');
     if (row.is_beta) localStorage.setItem('vi_beta', 'true');
     var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
     if (u && !!u.pro !== paid) { u.pro = paid; localStorage.setItem('vi_user', JSON.stringify(u)); if (typeof _vaultItUser !== 'undefined') _vaultItUser = u; }
@@ -674,6 +682,7 @@ function viPaidApply(row) {   // mirror the profile onto this device
     var pend = null; try { pend = localStorage.getItem('vi_pay_pending'); localStorage.removeItem('vi_pay_pending'); } catch (e) {}
     if (pend && !was) { try { showToast(row.is_founder ? 'Welcome! Your ' + VI_PLANS.founder.name + ' is confirmed.' : 'Welcome, ' + VI_PLANS[row.plan === 'monthly' ? 'monthly' : 'annual'].name + '. Your plan is confirmed.'); } catch (e) {} }
   }
+  try { if (typeof viBizGate === 'function') viBizGate(); } catch (e) {}   // the tier may have changed with no change of paid status
   if (was !== paid) { try { if (typeof applyPaywall === 'function') applyPaywall(); } catch (e) {} try { if (typeof renderPioneerCard === 'function') renderPioneerCard(); } catch (e) {} try { if (row.is_founder) viApplyFounderBadge(); } catch (e) {} }
 }
 
@@ -682,9 +691,14 @@ function viPaidApply(row) {   // mirror the profile onto this device
 // outcome is told apart:  { row } the profile · { none } signed in, no profile row · { auth } no usable sign-in on this device ·
 // { old } an older server without the paid columns · { err } no answer.
 async function _viProfileRead(uid) {
+  var r = await _viProfileReadCols(uid);
+  if (r && r.old && _viPaidCols === VI_PAID_COLS) { _viPaidCols = VI_PAID_COLS_OLD; r = await _viProfileReadCols(uid); }   // no tier columns yet: ask for the older ones
+  return r;
+}
+async function _viProfileReadCols(uid) {
   var why = '', lost = false;
   if (_supaClient && !_sjsStalled) {
-    var ask = function () { return _withTimeout(_supaClient.from('profiles').select(VI_PAID_COLS).eq('id', uid).single().then(function (x) { return x; }, function (e) { return { error: e }; }), 8000, null); };
+    var ask = function () { return _withTimeout(_supaClient.from('profiles').select(_viPaidCols).eq('id', uid).single().then(function (x) { return x; }, function (e) { return { error: e }; }), 8000, null); };
     var r; try { r = await ask(); } catch (e) { r = { error: e }; }
     if (r && r.error && /jwt|expired|401/i.test(String(r.error.message || r.error.code || '')) && await _refreshAuth()) { try { r = await ask(); } catch (e) { r = { error: e }; } }
     if (r && !r.error && r.data) return { row: r.data };
@@ -699,7 +713,7 @@ async function _viProfileRead(uid) {
     var tok = await _freshAccessToken(); if (!tok) return (lost || !_supaClient) ? { auth: true } : { err: why || 'no saved session on this device' };
     var get = async function (tk) {
       var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 12000);
-      var res = await fetch(_SUPA_URL + '/rest/v1/profiles?select=' + VI_PAID_COLS + '&id=eq.' + encodeURIComponent(uid), { headers: { apikey: _SUPA_KEY, authorization: 'Bearer ' + tk }, signal: ctl.signal });
+      var res = await fetch(_SUPA_URL + '/rest/v1/profiles?select=' + _viPaidCols + '&id=eq.' + encodeURIComponent(uid), { headers: { apikey: _SUPA_KEY, authorization: 'Bearer ' + tk }, signal: ctl.signal });
       clearTimeout(t); return res;
     };
     var res = await get(tok);

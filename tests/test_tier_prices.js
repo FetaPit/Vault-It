@@ -28,12 +28,13 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
 const L = {
   monthly_trial: 'https://buy.stripe.com/8x2fZbgpMdjjgdv5KK2VG08', monthly_tester: 'https://buy.stripe.com/aFacMZa1odjj1iB3CC2VG09', monthly: 'https://buy.stripe.com/4gM9AN3D0gvv5yR7SS2VG00',
   annual_trial: 'https://buy.stripe.com/3cI14hc9w1ABe5na102VG0a', annual: 'https://buy.stripe.com/dRm3cp6Pccff2mFa102VG02', annual_after_beta: 'https://buy.stripe.com/cNidR3b5s3IJ0ex2yy2VG0c',
+  vaulter_year_beta: 'https://buy.stripe.com/aFa3cpddAa774uN5KK2VG0d', vaulter_year: 'https://buy.stripe.com/fZu8wJ0qOcff9P7flk2VG0e', vaulter_month_after: 'https://buy.stripe.com/eVq7sF2yWdjje5n4GG2VG0f', pioneer_month_beta: 'https://buy.stripe.com/8x2cMZflI3IJ0ex1uu2VG0g', pioneer_month: 'https://buy.stripe.com/cNi28l4H46UV7GZa102VG0h', pioneer_year_after: 'https://buy.stripe.com/cNi00da1o1AB0ex0qq2VG0i', founder_after_beta: 'https://buy.stripe.com/4gM7sF7Tg5QR8L3c982VG0j',
   founder_tester: 'https://buy.stripe.com/4gM6oB5L87YZ5yRflk2VG0b', founder: 'https://buy.stripe.com/eVq28l0qO6UV3qJc982VG05'
 };
 const X = {
-  monthly: { now: '£3.99', after: '£5.99', per: 'a month', trial: 'monthly_trial', checkout: 'monthly_tester', full: 'monthly', name: 'Vaulter', tier: 'founder' },
-  annual: { now: '£49.99', after: '£59.99', per: 'a year', trial: 'annual_trial', checkout: 'annual', full: 'annual_after_beta', name: 'Pioneer', tier: 'pioneer' },
-  founder: { now: '£99', after: '£149', trial: null, checkout: 'founder_tester', full: 'founder', name: 'Lifetime licence', tier: 'lifetime' }
+  monthly: { now: '£3.99', after: '£5.99', per: 'a month', trial: 'monthly_trial', checkout: 'monthly_tester', full: 'vaulter_month_after', name: 'Vaulter', tier: 'founder' },
+  annual: { now: '£49.99', after: '£79.99', per: 'a year', trial: 'annual_trial', checkout: 'annual', full: 'pioneer_year_after', name: 'Pioneer', tier: 'pioneer' },
+  founder: { now: '£99', after: '£199', trial: null, checkout: 'founder_tester', full: 'founder_after_beta', name: 'Lifetime licence', tier: 'lifetime' }
 };
 const TRIAL = (pl) => 'Free for 30 days, then ' + X[pl].now + ' ' + X[pl].per + '. Your card is taken now and first charged on day 31. Cancel before then and you pay nothing.';
 const CANCEL = 'To cancel, email hello@vault-it.co.';
@@ -48,19 +49,19 @@ const seed = () => {
 (async () => {
   const src = fs.readFileSync(require('./lib/vi').INDEX, 'utf8');
   // ── 1. the single source ──
-  const plans = src.match(/var VI_PLANS = (\{.*\});/);
-  let P = null; try { P = Function('return ' + plans[1])(); } catch (e) {}
-  ok(P && P.monthly.price === 5.99 && P.monthly.tester === 3.99 && P.annual.price === 59.99 && P.annual.tester === 49.99 && P.founder.price === 149 && P.founder.tester === 99,
-    'VI_PLANS: monthly 5.99/3.99, annual 59.99/49.99, founder (Lifetime) 149/99 (' + (plans ? plans[1].slice(0, 120) : 'not found') + ')');
+  const plans = src.match(/var VI_PLANS = (\{[\s\S]*?\n\});/);
+  let P = null; try { P = Function('return ' + plans[1])(); P.monthly = P.vaulter_month; P.annual = P.pioneer_year; } catch (e) {}
+  ok(P && P.monthly.price === 5.99 && P.monthly.tester === 3.99 && P.annual.price === 79.99 && P.annual.tester === 49.99 && P.founder.price === 199 && P.founder.tester === 99,
+    'VI_PLANS: monthly 5.99/3.99, annual (Pioneer yearly) 79.99/49.99, founder (Lifetime) 199/99 (' + (plans ? plans[1].slice(0, 120) : 'not found') + ')');
   ok(P && P.monthly.name === 'Vaulter' && P.monthly.tier === 'founder' && P.annual.name === 'Pioneer' && P.founder.name === 'Lifetime licence', 'VI_PLANS names: Vaulter (monthly, founder icon), Pioneer (yearly), Lifetime licence');
   ok(!/data-tier-name>Founder<|data-cta="Become a Founder|name: 'Founder'|\? ?'Founder'|Founder at |Founder \(monthly\)|Founder monthly|Everything in Founder|on Founder|plan: Founder|for Founder,|<b>Founder:/.test(src), 'the monthly plan is never shown as "Founder" any more (owner, 5 Nov)');
   ok(!/6oUeV7b5sbbb7GZ6OO2VG03|3cI8wJ0qO9337GZa102VG06|bJe3cpc9w4MN8L31uu2VG07|annual_tester/.test(src), 'the old £3.99, £39.99 and £99 links are no longer in the app');
-  ok(/annual_after_beta:\s*'https:\/\/buy\.stripe\.com\/cNidR3b5s3IJ0ex2yy2VG0c'/.test(src), 'the £59.99 yearly slot (annual_after_beta) holds the live Stripe link');
+  ok(/pioneer_year_after:\s*'https:\/\/buy\.stripe\.com\/cNi00da1o1AB0ex0qq2VG0i'/.test(src), 'the £79.99 yearly Pioneer slot (pioneer_year_after) holds the 13 Nov Stripe link');
   ok(!/Founding Member|FOUNDING MEMBER/.test(src), 'no "Founding Member" left in the app, in any case');
   // nothing in the built app calls the monthly plan Pioneer any more (comments that tell the history say "both subscriptions were called Pioneer")
-  const stale = src.match(/Pioneer \(monthly|Pioneer,? monthly|Pioneer monthly|monthly Pioneer|Pioneer at £[35]\.99|Pioneer £[35]\.99 a month|Become a Pioneer →" data-cta-trial="Start 30 days free →" onclick="showUpgrade\('monthly'\)/g) || [];
+  const stale = src.match(/Pioneer at £3\.99|Pioneer £3\.99 a month|Become a Pioneer →" data-cta-trial="Start 30 days free →" onclick="showUpgrade\('monthly'\)/g) || [];
   ok(stale.length === 0, 'no sentence, label or button in the app calls the monthly plan Pioneer (' + stale.slice(0, 4).join(' | ') + ')');
-  ok(/Vaulter is the monthly plan and Pioneer the yearly one/.test(src) && /takes payments for Vaulter \(monthly\), Pioneer \(yearly\) and the Lifetime licence/.test(src), 'the help answer and the privacy notice name the plans the same way');
+  ok(/Vaulter is the whole app and Pioneer is Pro/.test(src) && /takes payments for Vaulter and Pioneer \(each monthly or yearly\) and the Lifetime licence/.test(src), 'the help answer and the privacy notice name the plans the same way');
   ok(!/<s>£|\(was £|was £/.test(src), 'no struck-through or "was" prices in the markup');
 
   const b = await chromium.launch(); const errs = [];
@@ -124,8 +125,8 @@ const seed = () => {
   const ONE = await p.evaluate(() => { const keep = VI_PLANS.monthly.name; VI_PLANS.monthly.name = 'Zzz'; viPricePaint(); try { viWallPaint(); } catch (e) {} _refreshPioneerSettingsUI();
     const o = { cards: [...document.querySelectorAll('[data-plan-name="monthly"]')].map(e => e.textContent), n: document.querySelectorAll('[data-plan-name="monthly"]').length, tierNames: [...document.querySelectorAll('[data-tier-name]')].every(e => e.hasAttribute('data-plan-name')), inactive: document.getElementById('set-pioneer-inactive').textContent, allow: viShotAllowance() };
     VI_PLANS.monthly.name = keep; viPricePaint(); _refreshPioneerSettingsUI(); return o; });
-  ok(ONE.n >= 5 && ONE.cards.every(t => t === 'Zzz') && ONE.tierNames && /Zzz at £3\.99/.test(ONE.inactive) && /30 on Zzz or Pioneer/.test(ONE.allow), 'VI_PLANS is the one source of every plan name: the wall, Settings, the paywall, the crowdfund, the status line and the allowance line follow it (' + ONE.n + ' places)');
-  ok(/Family mode \(coming soon\)/.test(R.camp.pioneer), 'Pioneer lists "Family mode (coming soon)" on the crowdfund');
+  ok(ONE.n >= 4 && ONE.cards.every(t => t === 'Zzz') && ONE.tierNames && /Zzz at £3\.99/.test(ONE.inactive) && /30 on Zzz or Pioneer/.test(ONE.allow), 'VI_PLANS is the one source of every plan name: the wall, Settings, the paywall, the crowdfund, the status line and the allowance line follow it (' + ONE.n + ' places)');
+  ok(/House builder Level 3 \(coming\)/.test(R.camp.pioneer) && /Your own 3D house design and AI house model/.test(R.camp.pioneer) && !/Family mode/.test(R.camp.pioneer), 'Pioneer lists the Pro features, with Level 3 as coming, on the crowdfund (family mode is Household now)');
   let C = await clickAll();
   const trialKey = (pl) => X[pl].trial || X[pl].checkout;
   ok(C.length >= 8 && opens(C, trialKey).length === 0, 'alpha: Vaulter and Pioneer open the 30-day trial links, Lifetime the £99 link (' + opens(C, trialKey).join(' | ') + ')');
@@ -160,9 +161,9 @@ const seed = () => {
     if (pl === 'annual') { const bt = R[k].buttons.filter(x => x.plan === pl); ok(bt.length && bt.every(x => !x.disabled && !/coming soon/i.test(x.text)), k + ' Pioneer yearly (beta closed): button enabled, no "coming soon" (' + bt.map(x => x.text).join(' / ') + ')'); }
   }
   C = await clickAll();
-  ok(C.filter(c => c.plan === 'annual').length >= 3 && opens(C, pl => X[pl].full).length === 0, 'beta closed: Vaulter opens £5.99, Pioneer £59.99 and Lifetime £149 (' + opens(C, pl => X[pl].full).join(' | ') + ')');
+  ok(C.filter(c => c.plan === 'annual').length >= 3 && opens(C, pl => X[pl].full).length === 0, 'beta closed: Vaulter opens £5.99, Pioneer £79.99 and Lifetime £199 (' + opens(C, pl => X[pl].full).join(' | ') + ')');
   // the "never a dead link" guard still holds for a plan whose link is blanked: nothing opens, the button says so
-  const S = await p.evaluate(() => { const keep = VI_STRIPE_LINKS.annual_after_beta; VI_STRIPE_LINKS.annual_after_beta = ''; viPricePaint(); const b = document.getElementById('camp-cta-pioneer'); const o = []; window.open = (u) => { o.push(u); }; const t = window.showToast; let msg = ''; window.showToast = (m) => { msg = m; }; showUpgrade('annual'); window.showToast = t; const r = { o, msg, dis: b.disabled, txt: b.textContent.trim() }; VI_STRIPE_LINKS.annual_after_beta = keep; viPricePaint(); return r; });
+  const S = await p.evaluate(() => { const keep = VI_STRIPE_LINKS.pioneer_year_after; VI_STRIPE_LINKS.pioneer_year_after = ''; viPricePaint(); const b = document.getElementById('camp-cta-pioneer'); const o = []; window.open = (u) => { o.push(u); }; const t = window.showToast; let msg = ''; window.showToast = (m) => { msg = m; }; showUpgrade('annual'); window.showToast = t; const r = { o, msg, dis: b.disabled, txt: b.textContent.trim() }; VI_STRIPE_LINKS.pioneer_year_after = keep; viPricePaint(); return r; });
   ok(S.o.length === 0 && /coming soon/i.test(S.msg) && S.dis && /coming soon/i.test(S.txt), 'a plan with its link blanked opens nothing and says coming soon (' + S.msg + ' / ' + S.txt + ')');
 
   await b.close();
