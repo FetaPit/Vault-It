@@ -119,6 +119,8 @@ Accepted when: the app renders correctly in both themes, no hard coded dark valu
 - Replace text glyph icons with sprite icons: `✎` to `edit`, `✕` to `close`, `＋` to `plus`, `◈` to `network`, `✓` to `check`, `↩` to `undo`, `‹ ›` to `chevron` rotated.
 - Hide the build string ("v0.9.2 Alpha . build flow-dash-1") on public pages.
 
+**Vault-form scope (owner, 13 Nov 2026).** The new typeface is for dashboard figures only, once it is signed off: the Heading cut (D+) for money and number readouts at 18px and up (Overview KPI tiles, Assets, Liabilities and Debt totals, net worth), the Hero cut (D++) only for numbers about 64px and up. Headings, labels, body, nav, figures under 18px and the logo wordmark stay as they are. Tabular figures, U+2212 minus for debt, no glow or text-shadow on figures. Until sign-off the fonts remain Syne, DM Sans and Share Tech Mono.
+
 ### Phase 3: Iconography
 
 - Inline `vault-it-icons.svg` once at the top of `<body>` (hidden). Use `<svg class="vi-ic" style="color:var(--teal)"><use href="#vi-house-builder"/></svg>`.

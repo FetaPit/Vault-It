@@ -2,6 +2,8 @@
 
 Status: the new typeface ("Vault-form", queue line "Vault-form brand typeface") is **not final**. Fonts stay Syne, DM Sans and Share Tech Mono until the owner signs it off. This is the checklist for the swap, so it is one pass when the word comes.
 
+**Scope update (owner, 13 Nov 2026): Vault-form is for dashboard figures only** (Heading cut at 18px and up, Hero cut at about 64px and up). Headings, labels, body, nav and the logo are not swapped, so most of the list below shrinks to the figure styles. The app build is its own queue item.
+
 ## Brand files (stage 1, brand and docs only)
 - `brand/vault-it-brand-book.html`: `--font-display` in `:root` (about line 37); the Google Fonts link at the top (replace with an `@font-face` for `brand/fonts/vault-form/` WOFF2, no new outside host; DM Sans and Share Tech Mono stay); the export generators `cssOut`, `jsonOut`, `twOut`; the social canvas fonts (`800 ... 'Syne'`).
 - Type section: rewrite the lede, the display specimen note and the table rows (new weights; add Condensed and the hatch display cuts for hero and decks only, never below the size where the hatch breaks). Add the licence line and an "Install the font" download.
