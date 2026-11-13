@@ -1,4 +1,4 @@
-// Branded emails: the feedback digest, weekly themes and urgent alert carry the brand lockup (Vault, brick, teal It; drawn artwork), Vault-form headings,
+// Branded emails: the feedback digest, weekly themes and urgent alert carry the brand lockup (Vault, brick, teal It, Syne),
 // Night colours (#080808 page, #080D14 panel, #15302F border), the tagline and the FCA line, and no em dashes. The
 // other four emails (sign-in code, beta confirm, welcome) are checked for the same lockup so they cannot drift.
 const fs = require('fs'); const esbuild = require('esbuild');
@@ -15,7 +15,7 @@ const DG = load('feedback-digest'), FB = load('tester-feedback');
 const BRICK = /<img src="https:\/\/vault-it\.co\/email\/lockup\.gif"[^>]*alt="Vault-It"/;
 const checkBrand = (name, html) => {
   ok(BRICK.test(html), name + ': logo is the brand lockup picture');
-  ok(/font-family:'Vault-form Heading'/.test(html) && /font-family:'DM Sans'/.test(html) && !/Syne/.test(html) && html.includes("url('https://vault-it.co/fonts/vault-form-heading-bold.woff2')"), name + ': Vault-form headings (loaded from vault-it.co/fonts) and DM Sans body, no Syne');
+  ok(/font-family:'Syne'/.test(html) && /font-family:'DM Sans'/.test(html), name + ': Syne headings and DM Sans body');
   ok(/background:#080808/.test(html) && /background:#080D14/.test(html) && /#15302F/.test(html), name + ': Night page, panel and border');
   ok(html.includes('Get out of the red and into your home.'), name + ': tagline');
   ok(html.includes('Not regulated by the FCA. Not financial advice.'), name + ': FCA line');
@@ -40,7 +40,7 @@ ok(gif.length < 150 * 1024, 'lockup.gif is under 150 KB (' + Math.round(gif.leng
 // frame one is the finished still (Outlook desktop shows only frame one); the loop count is 2, so it comes to rest
 ok(gif.includes(Buffer.from('NETSCAPE2.0')) && gif.indexOf(Buffer.from('NETSCAPE2.0')) > 0 && gif[gif.indexOf(Buffer.from('NETSCAPE2.0')) + 13] === 1, 'GIF plays twice (one repeat), then rests on the still');
 ok(/site\/email\/lockup\.gif/.test(fs.readFileSync(__dirname + '/../tools/build_site.js', 'utf8')), 'build_site ships lockup.gif to vault-it.co/email/');
-ok(/Syne/.test(fs.readFileSync(__dirname + '/../tools/build_email_lockup.js', 'utf8')) && /vault-it-logo-mark-mid\.svg/.test(fs.readFileSync(__dirname + '/../tools/build_email_lockup.js', 'utf8')), 'lockup is built from the brand book mid icon and Syne (the logo stays drawn artwork)');
+ok(/Syne/.test(fs.readFileSync(__dirname + '/../tools/build_email_lockup.js', 'utf8')) && /vault-it-logo-mark-mid\.svg/.test(fs.readFileSync(__dirname + '/../tools/build_email_lockup.js', 'utf8')), 'lockup is built from the brand book mid icon and Syne');
  // plain-text parts must not carry HTML entities
 for (const f of ['waitlist-join', 'waitlist-welcome']) { const s = fs.readFileSync(ROOT + f + '/index.ts', 'utf8'); const lines = s.split('\n').filter((l) => /\btext:|welcomeText = /.test(l)); ok(lines.length > 0 && lines.every((l) => !l.includes('&nbsp;')), f + ': plain-text part has no &nbsp;'); }
 const txt = FB.ex.helpHtml ? 1 : 0; void txt;
@@ -49,6 +49,6 @@ for (const f of ['send-auth-email', 'waitlist-join', 'waitlist-welcome']) {
   const s = fs.readFileSync(ROOT + f + '/index.ts', 'utf8');
   ok(BRICK.test(s), f + ': logo is the brand lockup picture');
   ok(s.includes('Not regulated by the FCA. Not financial advice.'), f + ': FCA line');
-  ok(s.includes('Get out of the red and into your home.') && /font-family:'Vault-form Heading'/.test(s) && !/Syne/.test(s) && /font-family:'DM Sans'/.test(s) && /background:#080808/.test(s) && /background:#080D14/.test(s) && /#15302F/.test(s), f + ': tagline, Vault-form and DM Sans, Night page, panel and border (owner, 1 Nov: OTP, confirm and welcome mails carry the same brand)');
+  ok(s.includes('Get out of the red and into your home.') && /font-family:'Syne'/.test(s) && /font-family:'DM Sans'/.test(s) && /background:#080808/.test(s) && /background:#080D14/.test(s) && /#15302F/.test(s), f + ': tagline, Syne and DM Sans, Night page, panel and border (owner, 1 Nov: OTP, confirm and welcome mails carry the same brand)');
 }
 console.log(fails ? 'FAILURES ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);

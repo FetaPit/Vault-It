@@ -42,7 +42,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
   { const html = fs.readFileSync(path.join(ROOT, 'site/pitch-eligent/answers.html'), 'utf8');
     const hosts = [...html.matchAll(/https?:\/\/([a-z0-9.-]+)/gi)].map((m) => m[1]).filter((h, i, a) => a.indexOf(h) === i).sort();
     ok(hosts.join() === 'fonts.googleapis.com,fonts.gstatic.com,vault-it.co', 'no new outside hosts: ' + hosts.join(', '));
-    ok(!/font-family:[^;"]*(?!Vault-form|DM Sans|Share Tech Mono|Arial|Courier New|monospace|sans-serif)(Inter|Roboto|Helvetica(?! Neue)|Georgia|Times)/i.test(html), 'fonts are Vault-form, DM Sans and Share Tech Mono only (Helvetica Neue and Arial as fallbacks)'); }
+    ok(!/font-family:[^;"]*(?!Syne|DM Sans|Share Tech Mono|Arial|Courier New|monospace|sans-serif)(Inter|Roboto|Helvetica|Georgia|Times)/i.test(html), 'fonts are Syne, DM Sans and Share Tech Mono only'); }
   // the four answers
   { const s = await txt(p, 'spend'); ok(/£3,214\.08/.test(s) && /£2,410\.56/.test(s) && /£2,661\.63/.test(s) && /JANUARY TO NOVEMBER 2026/.test(s) && /own money/i.test(s) && /PT Live Design/.test(s) && /whole of PT Live Design, Vault-It included/i.test(s) && !/£606|£226|Everything else/.test(s), 'invested to date: the owner\'s three figures framed as PT Live Design funding Vault-It, no leftover receipt figures');
     const rows = await p.evaluate(() => [...document.querySelectorAll('#spend table[data-invest] tr[data-row]')].map((r) => r.dataset.row + '=' + r.querySelectorAll('td')[1].textContent.trim()));

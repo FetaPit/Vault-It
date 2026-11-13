@@ -95,14 +95,14 @@ async function verifyTurnstile(token: string, ip: string): Promise<'ok' | 'fail'
   } catch (e) { console.error('turnstile siteverify failed:', e); return 'unreachable' }
 }
 
-// Brand shell for e-mails (Night palette from the brand book, inline styles, tables). Opening it fetches only from vault-it.co: the lockup picture and Vault-form Bold for the headings; mail clients that ignore web fonts (Gmail, Outlook) show the Helvetica Neue / Arial fallback.
+// Brand shell for e-mails (Night palette from the brand book, inline styles, tables; no web fonts or images, so nothing is fetched when the e-mail opens).
 function brandShell(title: string, body: string, footer: string): string {
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>${title}</title><style>@font-face{font-family:'Vault-form Heading';src:url('https://vault-it.co/fonts/vault-form-heading-bold.woff2') format('woff2');font-weight:700;font-style:normal}</style></head>
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>${title}</title></head>
 <body style="margin:0;padding:0;background:#080808;color:#E8E8E8;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#080808;padding:36px 16px"><tr><td align="center">
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:#080D14;border:1px solid #15302F;border-radius:18px;max-width:520px;width:100%">
 <tr><td style="padding:28px 36px 18px;border-bottom:1px solid #102221">
-<img src="https://vault-it.co/email/lockup.gif" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">
+<img src="https://vault-it.co/email/lockup.gif" width="190" alt="Vault-It" style="display:block;border:0;outline:none;height:auto;width:190px;max-width:100%;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:800;color:#E8E8E8">
 <div style="margin-top:8px;font-size:12px;letter-spacing:.04em;color:#9AA0A6">Get out of the red and into your home.</div>
 </td></tr>
 <tr><td style="padding:26px 36px 10px">${body}</td></tr>
@@ -114,10 +114,10 @@ function brandShell(title: string, body: string, footer: string): string {
 </table></td></tr></table></body></html>`
 }
 const EYEBROW = "margin:0 0 8px;font-family:'Share Tech Mono',Menlo,Consolas,'Courier New',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#44C0B9"
-const H1 = "margin:0 0 14px;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8"
+const H1 = "margin:0 0 14px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8"
 const P = "margin:0 0 18px;font-size:15px;line-height:1.6;color:#9AA0A6"
 const SMALL = "margin:0 0 8px;font-size:12px;line-height:1.6;color:#9AA0A6"
-const BTN = "display:inline-block;background:#E8C56A;color:#1A1400;text-decoration:none;font-family:'DM Sans','Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:15px 24px;border-radius:10px"
+const BTN = "display:inline-block;background:#E8C56A;color:#1A1400;text-decoration:none;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:15px 24px;border-radius:10px"
 const TRADER = 'Vault-It is run by PT Live Design, A57, 11 St Mary&#39;s Street, Lincoln LN5&nbsp;7EQ · <a href="mailto:hello@vault-it.co" style="color:#44C0B9">hello@vault-it.co</a>'
 
 function confirmHtml(email: string, link: string, unsub: string, testing: boolean): string {
@@ -136,16 +136,16 @@ function confirmHtml(email: string, link: string, unsub: string, testing: boolea
 function welcomeHtml(unsub: string): string {
   const u = esc(unsub)
   const body = `<p style="margin:0 0 8px;font-family:'Share Tech Mono',Menlo,Consolas,'Courier New',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#44C0B9">Welcome</p>
-<h1 style="margin:0 0 14px;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8">Why Vault-It exists</h1>
+<h1 style="margin:0 0 14px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800;line-height:1.25;color:#E8E8E8">Why Vault-It exists</h1>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">Hi there,</p>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">Thanks for joining. I&#39;m Pete, the person behind Vault-It.</p>
-<h2 style="margin:22px 0 8px;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:800;line-height:1.3;color:#E8E8E8">The story</h2>
+<h2 style="margin:22px 0 8px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:800;line-height:1.3;color:#E8E8E8">The story</h2>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">I could not see where my contributions were going, or what value I actually owned. I looked for a whole strategy for building wealth and could not find one. So I made one.</p>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">I wanted to see what I was working towards, and exactly how much I needed to put in to lay one more brick, with real visual feedback.</p>
-<h2 style="margin:22px 0 8px;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:800;line-height:1.3;color:#E8E8E8">What it is for</h2>
+<h2 style="margin:22px 0 8px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:800;line-height:1.3;color:#E8E8E8">What it is for</h2>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">Vault-It puts your debts, savings and house deposit on one map. You type in your own figures, and we never ask for your bank login. Every pound you save lays a brick on your house. What you owe sits below the ground, so being in debt is a starting line, not a failure screen. The aim: give anyone, even someone in debt, a live date for when they will hold the keys to their own home.</p>
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr><td><a href="https://app.vault-it.co" style="display:inline-block;background:#E8C56A;color:#1A1400;text-decoration:none;font-family:'DM Sans','Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:15px 24px;border-radius:12px">Open Vault-It</a></td></tr></table>
-<h2 style="margin:22px 0 8px;font-family:'Vault-form Heading','Helvetica Neue',Arial,sans-serif;font-size:16px;font-weight:800;line-height:1.3;color:#E8E8E8">Who is behind it</h2>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr><td><a href="https://app.vault-it.co" style="display:inline-block;background:#E8C56A;color:#1A1400;text-decoration:none;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:15px 24px;border-radius:12px">Open Vault-It</a></td></tr></table>
+<h2 style="margin:22px 0 8px;font-family:'Syne','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:800;line-height:1.3;color:#E8E8E8">Who is behind it</h2>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">I&#39;m a designer and founder. I run PT Live Design in Lincoln, where I have worked on branding and design since 2019. I have been a multimedia designer, including producing training resources for the Royal Air Force Officer Training Academy at Cranwell. I hold a Certified Professional in Psychology of Design from the London School of International Business, and I am a local leader for the Interaction Design Foundation.</p>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">When there is news I will send a short note: what is new, what I fixed, what got better. Reply to this e-mail any time. I read every reply.</p>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#9AA0A6">Thanks,<br>Pete</p>`

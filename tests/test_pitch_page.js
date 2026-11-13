@@ -88,7 +88,7 @@ const ROOT = path.join(__dirname, '..'), DIST = fs.mkdtempSync(path.join(require
       out.contrast = out.red ? (lum(out.red.c) + 0.05) / (lum('rgb(0, 19, 26)') + 0.05) : 0; return out; });
     ok(t.red && t.your && t.home && t.red.c === 'rgb(200, 32, 42)' && t.your.c === 'rgb(68, 192, 185)' && t.home.c === 'rgb(232, 197, 106)' && t.red.stroke === '0px' && t.contrast >= 3, 'the tagline: red in dark red fill, your in teal, home in gold fill, still legible (contrast ' + (t.contrast && t.contrast.toFixed(2)) + ')'); }
   { const w = await p.evaluate(() => [...document.querySelectorAll('.frame > section h2')].filter((h) => h.closest('section').id !== 'cover').map((h) => h.closest('section').id + ':' + getComputedStyle(h).fontWeight).filter((x) => !/:700$/.test(x)));
-    ok(w.length === 0, 'every slide title uses the same Vault-form weight (700): ' + w); }
+    ok(w.length === 0, 'every slide title uses the same Syne weight (700): ' + w); }
   { const tm = await txt('team'), t3 = await p.evaluate(() => !!document.querySelector('#team [data-banner]'));
     ok(t3 && ['Malcolm McPhee', 'Business Lincolnshire', 'David Amor', 'Enso Brain', 'Chris Bowser', 'Will Quenby', 'Accelerate Pipeline', 'Carolline Pallu', 'Barbican Creative Hub'].every((x) => tm.includes(x)) && !/Lucas Cox/.test(tm) && /Chris Gueffier/.test(tm) && /Rita Fortes/.test(tm), 'the team slide has the banner and the new people, and Lucas Cox is gone'); }
   { const im = await txt('impact'), sh = await p.evaluate(() => [...document.querySelectorAll('#impact [data-share]')].map((e) => +e.dataset.share)), br = await p.evaluate(() => !!document.querySelector('#impact svg[data-bridge]'));

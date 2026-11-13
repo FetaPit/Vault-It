@@ -50,6 +50,7 @@ node tests/test_hist.mjs; node tests/test_007.mjs; node tests/test_008.mjs   # S
 node tests/test_authmail_server.js # send-auth-email: validation, HTML escaping, per-address / per-IP / global limits, fail-open
 node tests/test_009.mjs; node tests/test_waitlist_server.js   # beta list: migration 009 on Postgres, and the waitlist-join function (double opt-in, signed unsubscribe, limits)
 node tests/test_signup_page.js       # vault-it.co/sign-up and its confirm / thanks / unsubscribe pages in a browser, served through the Worker routing
+node tests/test_landing_brand_hero.js # landing hero (owner, 13 Nov): Chakra Petch headings embedded from brand/fonts, Light pills, red/home tagline, brand book icons
 node tests/test_beta_client.js     # privacy/terms wording, 429 handling, Download my data, Delete my account
 node tests/journey_one_b.js        # One B's two-device journey: phone signs up (code + PIN), desktop PINs in with the same data, sync both ways on background/foreground, sign out and back, install readiness (VI_APP=<url> also checks the live service worker)
 node tests/test_hb_l2_entry.js      # Level 2 onboarding: purchase-day mortgage entry (lender, balance, rate, fix end, term), panel summary, what-ifs on those figures
@@ -102,7 +103,7 @@ node tests/test_v08_chrome.js         # v0.8 chrome: Message the Dev last on Ove
 node tests/test_csp_report_only.mjs   # Worker: Content-Security-Policy-Report-Only lists every outside host the app calls; enforced CSP unchanged
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width
 node tests/test_nw3d.js            # net worth in 3D (on by default): flag off unchanged, 3D | Graph toggle, same numbers in both views, debts grouped by kind (cards stacked in one column, each in its own colour), zoom buttons / ctrl+wheel / reset (VI_APP=file:///… to test another copy)
-node tests/test_email_brand.js   # every e-mail the functions send: brand lockup (Vault, brick, teal It), Night colours, Vault-form headings, tagline, FCA line
+node tests/test_email_brand.js   # every e-mail the functions send: brand lockup (Vault, brick, teal It), Night colours, Syne, tagline, FCA line
 ```
 node tests/test_v07_e16.js         # v0.7 E16: "Add to your savings" gone, button "Lay the bricks" with the brick-wall icon, input aria-label
 node tests/test_v07_e17.js         # v0.7 E17: amount box 56 px, 24 px mono digits, gold pound, 599/600 px layout, live "£n lays n bricks" line
@@ -170,4 +171,3 @@ node tests/test_v095_cards_larger.js  # v0.95 (owner, 9 Nov): Wealth Roadmap car
 - test_v092_copyright.js: the exact copyright line on the landing, sign-up and pitch pages, in the email HTML and plain text; LICENSE, NOTICE and package.json licence
 - test_demo_a.js: vault-it.co/demo-a (8 Nov 2026): an empty browser gets the Alex Morgan sample on the dashboard with no sign-in or wizard and every tab populated; a browser with its own data or sign-in keeps every key exactly as it was and is told once how to see the demo; a browser already on the sample is topped up, nothing removed.
 - test_worker_demo_route.mjs: the Worker answers vault-it.co/demo-a with a 302 to app.vault-it.co/?demo=alex (same host on a preview build), never cached.
-- test_vault_form_site.js: Vault-form replaces Syne on the website and in the comms (owner, 10 Nov 2026). From 12 Nov only the display cuts ship: every page embeds Vault-form Heading (D+), the pitch deck also Hero (D++); every landing heading is D+, buttons, tabs and pills DM Sans; e-mails load vault-form-heading-bold.woff2; the four woff2 files are published and served as font/woff2

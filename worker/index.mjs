@@ -76,11 +76,6 @@ function withHeaders(res, { file, prod } = {}) {
     h.set('Content-Type', 'text/vcard; charset=utf-8');
     h.set('Content-Disposition', 'inline; filename="' + file.split('/').pop() + '"');
   }
-  if (file && file.endsWith('.woff2') && res.status === 200) {   // vault-it.co/fonts/: Vault-form for the e-mails. Readable from any origin (webmail, other pages), kept a week
-    h.set('Content-Type', 'font/woff2');
-    h.set('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
-    h.set('Access-Control-Allow-Origin', '*');
-  }
   if (file && (file.endsWith('.html') || file.endsWith('/version.json') || file.endsWith('/sw.js') || file.endsWith('/pete-sw.js') || file.endsWith('.webmanifest'))) h.set('Cache-Control', file.endsWith('.json') ? 'no-store' : 'no-cache');   // the worker script and manifest must never be stale
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
 }
