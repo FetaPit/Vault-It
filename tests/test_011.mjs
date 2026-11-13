@@ -2,7 +2,7 @@
 // confirmed waitlist addresses are beta testers, existing paid rows are kept, erasing an account unlinks its events.
 // Run: node tests/test_011.mjs   (needs @electric-sql/pglite)
 import { PGlite } from '@electric-sql/pglite'; import fs from 'fs';
-const dir = new URL('../supabase/migrations/', import.meta.url).pathname;
+import { fileURLToPath } from 'url'; const dir = fileURLToPath(new URL('../supabase/migrations/', import.meta.url));   // fileURLToPath, so it also runs on Windows
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const db = new PGlite();
 const U = '11111111-1111-1111-1111-111111111111', V = '22222222-2222-2222-2222-222222222222', W = '33333333-3333-3333-3333-333333333333', X = '44444444-4444-4444-4444-444444444444';
