@@ -199,3 +199,56 @@ Owner's words, 7 Nov: "Also add a Pioneer Household Pricing with up to 8 users w
 
 - This replaces the 4 Nov line "pioneer (includes family mode as a feature, not a separate tier)". Pioneer no longer carries "family mode coming soon"; family features belong to Household.
 - Still to do before it is sold: a Stripe product and Payment Link (owner's yes first), a Household line in the pitch deck forecast, and the family plan build (logged 4 Nov as "do not build").
+
+## Decided by Pete (13 Nov 2026): price points and pricing model
+
+Owner's ask: "let us work out our price point and pricing model, looking at competitors and tried and tested successful pricing structures for subscriptions and years options billed up front". Evidence and sources: `docs/research/PRICING_MODEL_NOV2026.md`. Owner's answers, given in the pricing session on 13 Nov to the seven decisions in that doc's section 3: Vaulter "Recommended", Pioneer "Recommended", Household "Recommended", £39.99 "Vaulter yearly beta", Founding Member "£99 / £199", beta end "Fixed date now" with the date "31 December 2026", cancelling "Self-serve by 1 Jan". This replaces the 4 Nov and 5 Nov tier tables above and the 7 Nov Household price.
+
+| Plan | Beta price (first movers' price, kept while subscribed) | After the beta |
+|---|---|---|
+| **Vaulter monthly** (standard) | £3.99 a month | £5.99 a month |
+| **Vaulter yearly** | £39.99 a year | £49.99 a year |
+| **Pioneer monthly** (Pro) | £5.99 a month | £9.99 a month |
+| **Pioneer yearly** (Pro) | £49.99 a year | £79.99 a year |
+| **Partner** | One partner joins free on any paid plan | Free |
+| **Household** (up to 8 people, Pioneer for all, one member buys and invites) | Not on sale until built (coming soon) | £14.99 a month or £119.99 a year |
+| **Founding Member** (one payment, 100 places, Pioneer features) | £99 once | £199 once |
+
+- **The beta closes on 31 December 2026.** That is the last day the beta prices are on sale. The date is shown next to every beta price and is not moved. Anyone who subscribes by then keeps their price for as long as they stay subscribed. On 1 January 2027 the prices above really rise (a time-limited price that does not end is a banned practice, DMCC Act Sch. 20 para 7).
+- **£39.99 is the Vaulter yearly beta price**, the owner's "limited time discount": it ends with the beta.
+- **Yearly is shown with its total first**: "£49.99 a year, billed once (works out at £4.17 a month)". "Save X%" only where true against the monthly price at the same stage: at beta prices Vaulter yearly saves 16% and Pioneer yearly 30%; after the beta 30% and 33%. No "was" prices, no countdowns.
+- **Trial**: 30 days, card taken up front, first charge on day 31 (unchanged).
+- **Cancelling**: before 1 January 2027, self-serve cancelling online (Stripe customer portal) and a reminder e-mail before day 31 of the trial and before each yearly renewal. The draft subscription rules due to apply from that date say an e-mail address alone is not enough.
+- Pioneer after the beta moves from £59.99 to £79.99 a year, and Founding Member after the beta from £149 to £199. The app's "£59.99 after the beta" wording changes with the plan cards.
+
+**Not done yet (each needs the owner's yes on exact names and descriptions before any live Stripe change):**
+1. Stripe: new prices and Payment Links for Vaulter yearly (£39.99 beta, £49.99 after), Pioneer monthly (£5.99 beta, £9.99 after), Pioneer yearly after the beta (£79.99, replacing the £59.99 link …VG0c) and Founding Member after the beta (£199, replacing the £149 link …VG05); a £5.99 Vaulter monthly price on the Vaulter product; the customer portal switched on. The yearly product name and description fix from the 13 Nov "Plan tiers and Stripe product names" queue line goes in the same pass.
+2. App: the plan cards (card wall session), the free partner link, the beta close date beside the prices, self-serve cancel and the reminder e-mails.
+3. Household: no Stripe product until it is built.
+
+## Stripe as set up on 13 Nov 2026 (live): the agreed prices
+
+Owner, 13 Nov: "Yes to linking stripe to agreed prices", then "Yes, create all" to the exact list below. Created in the live account (PT Live Design). **Every new link is switched off.** The webhook, the database and the app know one plan value (`monthly` = Vaulter, `yearly` = Pioneer, `founder`), so a Vaulter yearly or a Pioneer monthly payment would today be charged but not matched. The new links therefore carry no `plan` metadata (the deployed webhook ignores them) and instead carry `tier` (vaulter, pioneer, founder), `interval` (month, year, once) and `stage` (beta, after_beta), on the link and on the subscription. They are switched on once the webhook and the app read tier and billing period.
+
+| Plan | Price | Stripe price (lookup key) | Payment Link (switched off) | Trial |
+|---|---|---|---|---|
+| Vaulter yearly, beta | £39.99 a year | `price_1UbPba9mgKf6HntyQlYl332s` (`vaulter_yearly_beta`) | `plink_1UbPcb9mgKf6HntypiCAPDqz` https://buy.stripe.com/aFa3cpddAa774uN5KK2VG0d | 30 days, card up front |
+| Vaulter yearly | £49.99 a year | `price_1UbPbs9mgKf6HntyDoAyhjYq` (`vaulter_yearly`) | `plink_1UbPcd9mgKf6Hntyr33CGVez` https://buy.stripe.com/fZu8wJ0qOcff9P7flk2VG0e | 30 days |
+| Vaulter monthly | £5.99 a month | `price_1UbPbt9mgKf6HntyB1fL72qQ` (`vaulter_monthly`) | `plink_1UbPce9mgKf6HntyylLXRFg6` https://buy.stripe.com/eVq7sF2yWdjje5n4GG2VG0f | 30 days |
+| Pioneer monthly, beta | £5.99 a month | `price_1UbPbu9mgKf6HntyyTMlEK8Y` (`pioneer_pro_monthly_beta`) | `plink_1UbPcf9mgKf6HntyGNqI1QJ3` https://buy.stripe.com/8x2cMZflI3IJ0ex1uu2VG0g | 30 days |
+| Pioneer monthly | £9.99 a month | `price_1UbPbv9mgKf6HntyGcpvBozA` (`pioneer_pro_monthly`) | `plink_1UbPcg9mgKf6HntyYjN02YOU` https://buy.stripe.com/cNi28l4H46UV7GZa102VG0h | 30 days |
+| Pioneer yearly | £79.99 a year | `price_1UbPbw9mgKf6HntyJ3es3svT` (`pioneer_pro_yearly`) | `plink_1UbPch9mgKf6Hnty5BRJAvVP` https://buy.stripe.com/cNi00da1o1AB0ex0qq2VG0i | 30 days |
+| Founding Member | £199 once | `price_1UbPbx9mgKf6HntyjUxaM42U` (`founding_member_199`, product `prod_VXg87aVvQj3qUJ`) | `plink_1UbPci9mgKf6HntyJ3SnYk84` https://buy.stripe.com/4gM7sF7Tg5QR8L3c982VG0j, Stripe cap 100 | none |
+
+Vaulter prices sit on product `prod_VZJh9EodBSlCMi` ("Vault-It Vaulter"), Pioneer prices on `prod_UcfIYdfNJ2R1Us`. Already live and unchanged: Vaulter monthly beta £3.99 (…VG08 with trial, …VG09 without), Pioneer yearly beta £49.99 (…VG0a with trial, …VG02 without), Founding Member beta £99 (…VG0b, cap 100). No tax collected (not VAT-registered), as on the existing links. Return addresses: `?upgraded=1&plan=vaulter_yearly`, `vaulter_monthly`, `pioneer_monthly`, `pioneer_yearly`, and `?founded=1`.
+
+Product text changed (shown at checkout, so also on the existing links of these products):
+- `prod_UcfIYdfNJ2R1Us`: name "Vault·It Pioneer" is now "Vault-It Pioneer"; description now "Vault-It Pro: everything in Vaulter, plus the Entrepreneur tab and your own house design, with house builder level 3 coming. Monthly or yearly." (the untrue "Lifetime Beta licence. Locked-in at 50% off for life" is gone). First set on 13 Nov to a line naming level 3 as included; the card wall session then found level 3 is locked for everyone and Pro is not yet enforced, so the owner chose these words the same day ("Level 3 as coming"), in line with his Pro gating choice in David's session, "Gate, testers keep".
+- `prod_VZJh9EodBSlCMi`: description now "The Vault-It standard plan, monthly or yearly."
+
+Nothing was switched off and no existing price changed. **Still to do, in this order:**
+1. Webhook (`supabase/functions/stripe-webhook`) and database: record tier and billing period separately (read `metadata.tier` and `metadata.interval`, and add the seven new link ids and price ids to the maps); the app's Pro check reads the tier, not "yearly".
+2. App: `VI_PLANS` and `VI_STRIPE_LINKS` get Vaulter yearly and Pioneer monthly; the plan cards show the 13 Nov prices and the 31 December 2026 close date.
+3. Then switch the seven links on (the after-beta ones from 1 January 2027 only, or switched on but not linked from the app until then).
+4. On 1 January 2027: switch off the beta links (…VG08, …VG09, …VG0a, …VG02, …VG0b and the new beta links …VG0d and …VG0g), and retire the old after-beta links …VG0c (£59.99 yearly), …VG05 (£149) and …VG00 (£5.99 monthly on the Pioneer product, whose checkout now reads "Vault-It Pioneer", so it must not be used for Vaulter). Founding Member: before switching the £199 link on, set its cap to 100 minus the £99 places sold, so the total stays 100.
+5. Stripe customer portal for self-serve cancelling, and the reminder e-mails, before 1 January 2027.
