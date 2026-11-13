@@ -95,7 +95,11 @@
      Then: "text not bold but teal highlighted on both light and dark mode": the key phrases are teal (the --teal token) in the regular weight.
      Then: "add a subtle glow to the teal words": they take the brand's text glow, the --tglow token.
      Then: "remove tell Pete something, this can wait until they are in the app": the "Tell Pete something" link is gone; the note keeps
-     "Let's go". Feedback is reached in the app (the Message the Dev tile on the dashboard, the Feedback button). -->
+     "Let's go". Feedback is reached in the app (the Message the Dev tile on the dashboard, the Feedback button).
+     13 Nov, the owner's answers on the open points: "2. first movers prive": the price sentence says first movers’ price in place of
+     Pioneer price; "3. yes": no feedback line in the note; "7. adjust the teal for daylight so i contrasts better": the key phrases take
+     --teal-deep in Daylight (Night keeps --teal); asked which way to make it stand out more, "medium": in Daylight they are also the medium
+     weight (500). The price sentence is also in the terms, section 6 (legal.js), word for word. -->
 <style id="vi-founder-style">
 /* Meet the founder: the compact strip on welcome screen 1 (welcome/welcome.html) and the box above the tester note. Tokens only. */
 .vi-founder-pic{display:block;flex:none;box-sizing:border-box;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--c2)}
@@ -112,7 +116,8 @@
 .vi-founder .vi-founder-pic{width:56px;height:56px}
 @media(min-width:700px){.vi-founder .vi-founder-pic{width:72px;height:72px}}
 #tester-welcome .tw-sign{font-family:var(--font-display)}
-#tester-welcome .tw-msg strong{font-weight:inherit;color:var(--teal);text-shadow:var(--tglow)}   /* owner, 12 Nov: "text not bold but teal highlighted on both light and dark mode", "add a subtle glow to the teal words": --teal is the brand teal in Night and the dark teal in Daylight; --tglow is the brand's soft text glow (none in Daylight) */
+#tester-welcome .tw-msg strong{font-weight:inherit;color:var(--teal);text-shadow:var(--tglow)}
+[data-theme="light"] #tester-welcome .tw-msg strong{color:var(--teal-deep);font-weight:500}   /* owner, 13 Nov: "adjust the teal for daylight so i contrasts better", then "medium" to the options: the purer Daylight teal (the lighter ones fail 4.5:1) in the medium weight, not bold */   /* owner, 12 Nov: "text not bold but teal highlighted on both light and dark mode", "add a subtle glow to the teal words": --teal is the brand teal in Night and the dark teal in Daylight; --tglow is the brand's soft text glow (none in Daylight) */
 </style>
 <div id="tester-welcome" class="vi-modal-overlay hidden" role="dialog" aria-modal="true" aria-label="A note from Pete">
   <div class="vi-modal-box tw-box">
@@ -123,7 +128,7 @@
       </div>
     </div>
     <div class="vi-modal-eyebrow">BETA TESTER</div>
-    <p class="tw-msg" id="tw-msg">Thank you, personally, for becoming a <strong>Vault-It Pioneer</strong>.<span class="tw-sub" id="tw-sub"> Your first <strong>30 days</strong> are on me. You keep your discounted Pioneer price <strong>forever</strong> while you stay subscribed, and you get first call on the <strong>100 Lifetime licences</strong> before launch.</span></p>
+    <p class="tw-msg" id="tw-msg">Thank you, personally, for becoming a <strong>Vault-It Pioneer</strong>.<span class="tw-sub" id="tw-sub"> Your first <strong>30 days</strong> are on me. You keep your discounted first movers’ price <strong>forever</strong> while you stay subscribed, and you get first call on the <strong>100 Lifetime licences</strong> before launch.</span></p>
     <p class="tw-sign">Pete</p>
     <div class="tw-row">
       <button class="btn-add-data tw-go" onclick="viTesterWelcomeClose()">Let’s go</button>

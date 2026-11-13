@@ -12719,7 +12719,11 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
      Then: "text not bold but teal highlighted on both light and dark mode": the key phrases are teal (the --teal token) in the regular weight.
      Then: "add a subtle glow to the teal words": they take the brand's text glow, the --tglow token.
      Then: "remove tell Pete something, this can wait until they are in the app": the "Tell Pete something" link is gone; the note keeps
-     "Let's go". Feedback is reached in the app (the Message the Dev tile on the dashboard, the Feedback button). -->
+     "Let's go". Feedback is reached in the app (the Message the Dev tile on the dashboard, the Feedback button).
+     13 Nov, the owner's answers on the open points: "2. first movers prive": the price sentence says first movers’ price in place of
+     Pioneer price; "3. yes": no feedback line in the note; "7. adjust the teal for daylight so i contrasts better": the key phrases take
+     --teal-deep in Daylight (Night keeps --teal); asked which way to make it stand out more, "medium": in Daylight they are also the medium
+     weight (500). The price sentence is also in the terms, section 6 (legal.js), word for word. -->
 <style id="vi-founder-style">
 /* Meet the founder: the compact strip on welcome screen 1 (welcome/welcome.html) and the box above the tester note. Tokens only. */
 .vi-founder-pic{display:block;flex:none;box-sizing:border-box;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--c2)}
@@ -12736,7 +12740,8 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 .vi-founder .vi-founder-pic{width:56px;height:56px}
 @media(min-width:700px){.vi-founder .vi-founder-pic{width:72px;height:72px}}
 #tester-welcome .tw-sign{font-family:var(--font-display)}
-#tester-welcome .tw-msg strong{font-weight:inherit;color:var(--teal);text-shadow:var(--tglow)}   /* owner, 12 Nov: "text not bold but teal highlighted on both light and dark mode", "add a subtle glow to the teal words": --teal is the brand teal in Night and the dark teal in Daylight; --tglow is the brand's soft text glow (none in Daylight) */
+#tester-welcome .tw-msg strong{font-weight:inherit;color:var(--teal);text-shadow:var(--tglow)}
+[data-theme="light"] #tester-welcome .tw-msg strong{color:var(--teal-deep);font-weight:500}   /* owner, 13 Nov: "adjust the teal for daylight so i contrasts better", then "medium" to the options: the purer Daylight teal (the lighter ones fail 4.5:1) in the medium weight, not bold */   /* owner, 12 Nov: "text not bold but teal highlighted on both light and dark mode", "add a subtle glow to the teal words": --teal is the brand teal in Night and the dark teal in Daylight; --tglow is the brand's soft text glow (none in Daylight) */
 </style>
 <div id="tester-welcome" class="vi-modal-overlay hidden" role="dialog" aria-modal="true" aria-label="A note from Pete">
   <div class="vi-modal-box tw-box">
@@ -12747,7 +12752,7 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
       </div>
     </div>
     <div class="vi-modal-eyebrow">BETA TESTER</div>
-    <p class="tw-msg" id="tw-msg">Thank you, personally, for becoming a <strong>Vault-It Pioneer</strong>.<span class="tw-sub" id="tw-sub"> Your first <strong>30 days</strong> are on me. You keep your discounted Pioneer price <strong>forever</strong> while you stay subscribed, and you get first call on the <strong>100 Lifetime licences</strong> before launch.</span></p>
+    <p class="tw-msg" id="tw-msg">Thank you, personally, for becoming a <strong>Vault-It Pioneer</strong>.<span class="tw-sub" id="tw-sub"> Your first <strong>30 days</strong> are on me. You keep your discounted first movers’ price <strong>forever</strong> while you stay subscribed, and you get first call on the <strong>100 Lifetime licences</strong> before launch.</span></p>
     <p class="tw-sign">Pete</p>
     <div class="tw-row">
       <button class="btn-add-data tw-go" onclick="viTesterWelcomeClose()">Let’s go</button>
@@ -30553,7 +30558,7 @@ function showLegalModal(title, body) {
   modal.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));width:min(560px,94vw);max-height:86vh;overflow-y:auto;padding:24px 22px;position:relative"><button onclick="document.getElementById(\'legal-modal\').remove()" aria-label="Close" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);font-size:.9rem;cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button><div style="font-family:\'Syne\',sans-serif;font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:14px">'+title+'</div><div style="font-family:\'DM Sans\',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--t2);line-height:1.7">'+body+'</div></div>';
   document.body.appendChild(modal);
 }
-var VI_LEGAL_DATE = '12 November 2026';
+var VI_LEGAL_DATE = '13 November 2026';
 function _lh(t) { return '<p style="color:var(--em);font-weight:700;margin:14px 0 3px">' + t + '</p>'; }
 function showPrivacy() {
   showLegalModal('Privacy notice', [
@@ -30607,7 +30612,7 @@ function showTerms() {
     _lh('5. Your data and your feedback'),
     '<p>Your data stays yours. We use it only to run the app for you, as set out in the Privacy Notice. Feedback and ideas you share can be used to improve Vault-It without payment to you.</p>',
     _lh('6. Paid plans'),
-    '<p>Using Vault-It needs a plan: Vaulter (monthly), Pioneer (yearly) or a Lifetime licence (one payment). The sample needs no plan. The price, the billing period and the date of the first charge are shown before you give your card, and payment is taken by Stripe. While the beta is open, Vaulter and Pioneer start with 30 days free: your card is taken at checkout and first charged on day 31, and if you cancel before then you pay nothing. A subscription renews until you cancel. You can cancel at any time by emailing hello@vault-it.co. If a plan ends or a payment fails, the app closes until you choose a plan again; nothing you entered is deleted and you can still download it. Your legal rights as a consumer, including any right to cancel and to a refund that the law gives you, are not affected.</p>',
+    '<p>Using Vault-It needs a plan: Vaulter (monthly), Pioneer (yearly) or a Lifetime licence (one payment). The sample needs no plan. The price, the billing period and the date of the first charge are shown before you give your card, and payment is taken by Stripe. While the beta is open, Vaulter and Pioneer start with 30 days free: your card is taken at checkout and first charged on day 31, and if you cancel before then you pay nothing. A subscription renews until you cancel. If you subscribe while the beta is open, you pay a discounted first movers’ price. You keep your discounted first movers’ price forever while you stay subscribed. If you cancel and subscribe again later, the price on sale then applies. You can cancel at any time by emailing hello@vault-it.co. If a plan ends or a payment fails, the app closes until you choose a plan again; nothing you entered is deleted and you can still download it. Your legal rights as a consumer, including any right to cancel and to a refund that the law gives you, are not affected.</p>',
     _lh('7. Availability and liability'),
     '<p>The beta is provided “as is”, and we cannot promise it will always be available or error-free. Nothing in these terms limits liability that cannot lawfully be limited, including for death or personal injury caused by negligence, or for fraud, or affects your statutory rights as a consumer. Subject to that, we are not responsible for losses from decisions you make using the app or for data lost during the beta, and our total liability to you is limited to £100 or, if you have paid for a plan, what you paid us in the last 12 months if that is more.</p>',
     _lh('8. Ending'),

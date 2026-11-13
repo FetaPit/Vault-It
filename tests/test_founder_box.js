@@ -21,6 +21,11 @@
 //      Owner, 12 Nov 2026, then: "text not bold but teal highlighted on both light and dark mode": the key phrases are teal (the
 //      --teal token, so Night and Daylight each get their own teal) in the regular weight, readable on the note (4.5:1 or better)
 //      Owner, 12 Nov 2026, then: "remove tell Pete something, this can wait until they are in the app": the note keeps one button
+//      Owner, 13 Nov 2026, answering the open points: "2. first movers prive" (the note says first movers’ price, not Pioneer price),
+//      "3. yes" (no feedback line in the note), "7. adjust the teal for daylight so i contrasts better" (Night keeps --teal; Daylight
+//      takes the purer --teal-deep, 4.5:1 or better against the tile and the note: every lighter Daylight teal fails 4.5:1)
+//      Then, to the three options for the Daylight teal (keep, faint marker, medium weight): "medium": in Daylight the phrases are the
+//      medium weight (500, not bold) as well as --teal-deep; Night stays the regular weight
 //      Owner, 12 Nov 2026, then: "add a subtle glow to the teal words": the brand's text glow, the --tglow token (a soft teal halo in
 //      Night; the token is none in Daylight, where the brand draws no glows)
 //   6. an account on a Lifetime licence is not told about 30 free days or a subscription price: those sentences are left out
@@ -29,7 +34,7 @@ const vi = require('./lib/vi');   // serves file:// app URLs over http; every co
 const fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
-const NOTE = 'Thank you, personally, for becoming a Vault-It Pioneer. Your first 30 days are on me. You keep your discounted Pioneer price forever while you stay subscribed, and you get first call on the 100 Lifetime licences before launch.';
+const NOTE = 'Thank you, personally, for becoming a Vault-It Pioneer. Your first 30 days are on me. You keep your discounted first movers’ price forever while you stay subscribed, and you get first call on the 100 Lifetime licences before launch.';
 const LIFETIME_NOTE = 'Thank you, personally, for becoming a Vault-It Pioneer.';
 
 (async () => {
@@ -80,7 +85,12 @@ const LIFETIME_NOTE = 'Thank you, personally, for becoming a Vault-It Pioneer.';
         bar: (function () { const b = getComputedStyle(panel, '::before'); return { w: b.width, img: b.backgroundImage, pos: b.position, left: b.left }; })(), clip: ps.clipPath, fits: mb.bottom <= innerHeight + 1 && mb.top >= -1, sideways: document.documentElement.scrollWidth > innerWidth,
         swap: (function () { const r = document.documentElement; r.style.setProperty('--font-display', '"Vault-form Heading", serif');
           const f = [name, m.querySelector('.tw-sign')].map(e => getComputedStyle(e).fontFamily).join(' | '); r.style.removeProperty('--font-display'); return f; })(),
-        bold: [...document.getElementById('tw-msg').querySelectorAll('strong, b')].map(e => e.textContent.replace(/\s+/g, ' ').trim() + ':' + (parseInt(getComputedStyle(e).fontWeight, 10) >= 600 ? 'bold' : 'regular') + ':' + (getComputedStyle(e).color === tok('--teal').color ? 'teal' : 'other') + ':' + (getComputedStyle(e).textShadow === (function () { const d = document.createElement('i'); d.style.textShadow = 'var(--tglow)'; document.body.appendChild(d); const g = getComputedStyle(d).textShadow; d.remove(); return g; })() && getComputedStyle(e).backgroundColor === 'rgba(0, 0, 0, 0)' ? 'glow' : 'effect')).join(' | '),
+        tileContrast: (function () { const lum = (c) => { const v = c.map(x => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+          const rgba = (c) => (c.match(/[\d.]+/g) || []).map(Number); const row = document.querySelector('#tester-welcome .vi-founder-row'), st = document.querySelector('#tw-msg strong'); if (!row || !st) return 0;
+          let base = null; for (let e = row.parentElement; e && !base; e = e.parentElement) { const a = rgba(getComputedStyle(e).backgroundColor); if (a.length >= 3 && (a.length < 4 || a[3] === 1)) base = a.slice(0, 3); }
+          const t = rgba(getComputedStyle(row).backgroundColor), al = t.length > 3 ? t[3] : 1; const tile = base.map((b, i) => t[i] * al + b * (1 - al)); const fg = rgba(getComputedStyle(st).color).slice(0, 3);
+          const L1 = lum(fg), L2 = lum(tile); return Math.round((Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05) * 100) / 100; })(),
+        bold: [...document.getElementById('tw-msg').querySelectorAll('strong, b')].map(e => e.textContent.replace(/\s+/g, ' ').trim() + ':' + (parseInt(getComputedStyle(e).fontWeight, 10) >= 600 ? 'bold' : parseInt(getComputedStyle(e).fontWeight, 10) >= 500 ? 'medium' : 'regular') + ':' + (getComputedStyle(e).color === tok(document.documentElement.getAttribute('data-theme') === 'light' ? '--teal-deep' : '--teal').color ? 'teal' : 'other') + ':' + (getComputedStyle(e).textShadow === (function () { const d = document.createElement('i'); d.style.textShadow = 'var(--tglow)'; document.body.appendChild(d); const g = getComputedStyle(d).textShadow; d.remove(); return g; })() && getComputedStyle(e).backgroundColor === 'rgba(0, 0, 0, 0)' ? 'glow' : 'effect')).join(' | '),
         glowSeen: (function () { const d = document.createElement('i'); d.style.textShadow = 'var(--tglow)'; document.body.appendChild(d); const g = getComputedStyle(d).textShadow; d.remove(); return g; })(),
         contrast: (function () { const lum = (c) => { const v = c.match(/[\d.]+/g).slice(0, 3).map(Number).map(x => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
           let bg = null; for (let e = document.getElementById('tw-msg'); e && !bg; e = e.parentElement) { const c = getComputedStyle(e).backgroundColor; const a = c.match(/[\d.]+/g); if (a && (a.length < 4 || parseFloat(a[3]) === 1)) bg = c; }
@@ -102,11 +112,13 @@ const LIFETIME_NOTE = 'Thank you, personally, for becoming a Vault-It Pioneer.';
       ok(B.msg === NOTE && B.sign === 'Pete' && B.signFont === B.display, T + '3 the note reads the agreed wording, signed Pete in the heading font (' + B.msg.slice(0, 60) + ')');
       ok(B.swap.split(' | ').length === 2 && B.swap.split(' | ').every(f => /^"?Vault-form Heading/.test(f)), T + '3 the name and the signature are in the heading font by the token: both take Vault-form once the token points at it (' + B.swap.slice(0, 40) + ')');
       ok(/Let.s go/.test(B.go || '') && !B.mail && B.buttons === 1, T + '3 one button, "Let\'s go": "Tell Pete something" is gone (owner, 12 Nov: "remove tell Pete something, this can wait until they are in the app")');
-      ok(/You keep your discounted Pioneer price forever while you stay subscribed/.test(B.msg), T + '3 the price sentence keeps the owner\'s "discounted Pioneer" and "forever", with the condition the paywall states');
-      ok(B.bold === 'Vault-It Pioneer:regular:teal:glow | 30 days:regular:teal:glow | forever:regular:teal:glow | 100 Lifetime licences:regular:teal:glow', T + '3 the key phrases are teal, not bold, with the brand\'s text glow (owner: "text not bold but teal highlighted on both light and dark mode", "add a subtle glow to the teal words"): Vault-It Pioneer, 30 days, forever, 100 Lifetime licences (' + B.bold + ')');
+      ok(/You keep your discounted first movers’ price forever while you stay subscribed/.test(B.msg), T + '3 the price sentence says "first movers\u2019 price" (owner, 13 Nov: "first movers prive"), keeps "discounted" and "forever", with the condition the paywall states');
+      const WT = theme === 'light' ? 'medium' : 'regular';   // owner, 13 Nov: "medium" for the Daylight teal; Night stays regular
+      ok(B.bold === ['Vault-It Pioneer', '30 days', 'forever', '100 Lifetime licences'].map(x => x + ':' + WT + ':teal:glow').join(' | '), T + '3 the key phrases are teal, not bold, with the brand\'s text glow (owner: "text not bold but teal highlighted on both light and dark mode", "add a subtle glow to the teal words"): Vault-It Pioneer, 30 days, forever, 100 Lifetime licences (' + B.bold + ')');
       ok((theme === 'dark') === (B.glowSeen !== 'none'), T + '3 the glow is the --tglow token: a soft halo in Night (' + B.glowSeen.slice(0, 44) + '), none in Daylight by the brand\'s own rule');
-      ok(B.contrast >= 4.5, T + '3 the teal phrases read on the note: contrast ' + B.contrast + ':1 (4.5:1 or better)');
+      ok(B.contrast >= 4.5 && B.tileContrast >= 4.5, T + '3 the teal phrases read on the note and on the tile: contrast ' + B.contrast + ':1 and ' + B.tileContrast + ':1 (4.5:1 or better)');
       ok(/before launch\.$/.test(B.msg) && !/Try it with your|tell me what|real figures|I read every message/i.test(B.msg) && B.msg.split(' ').length <= 45, T + '3 concise: nothing follows the Lifetime licences sentence ("Try it with your..." to the end is gone; ' + B.msg.split(' ').length + ' words)');
+      ok(!/Pioneer price/.test(B.msg), T + '3 the note no longer says "Pioneer price"');
       ok(!/—/.test(B.msg) && !/no card|free beta/i.test(B.msg) && !/1100/.test(B.msg), T + '3 no em dash, no "no card", and the number of Lifetime licences is 100');
     }
     // ── 4  no outside host ──

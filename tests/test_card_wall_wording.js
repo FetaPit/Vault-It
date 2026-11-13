@@ -6,7 +6,8 @@
 //      in gold, Night and Daylight, phone and desktop; the line under it says when the card is taken and first charged
 //   2. the tester note makes no "no card" promise (its wording, reworded the same day, is test_founder_box.js)
 //   3. Terms section 6 no longer says a plan is optional; it states the free period, the first charge and how to cancel;
-//      the terms carry today's date
+//      the terms carry today's date; since 13 Nov it carries the price promise word for word with the note, and docs/OFFER_AND_PRICING.md
+//      no longer says a subscriber's price changes after the beta
 //   4. the plans screen no longer sells "editing on" (there is no read-only state to compare it with)
 //   5. the help answers about the free period say the card is taken at checkout and first charged on day 31
 // The sweep for "no card" over the built app and the sign-up pages is tests/test_copy.js; the landing page's prices are
@@ -52,7 +53,13 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
       const s6 = (terms.match(/6\. Paid plans(.*?)7\. Availability/) || [])[1] || '';
       ok(s6 && !/is optional/i.test(s6), '3 the terms no longer call a plan optional');
       ok(/Vaulter/.test(s6) && /Pioneer/.test(s6) && /Lifetime licence/.test(s6) && /30 days free/.test(s6) && /first charged on day 31/.test(s6) && /hello@vault-it\.co/.test(s6) && /legal rights as a consumer/.test(s6), '3 section 6 names the plans, the free period, the first charge and how to cancel, and keeps the consumer rights sentence (' + s6.slice(0, 90) + ')');
-      ok(/last updated 12 November 2026/.test(terms), '3 the terms carry the date of this change');
+      ok(/last updated 13 November 2026/.test(terms), '3 the terms carry the date of this change');
+      // the price promise: the note and the terms say it in the same words (owner, 13 Nov: "1. Yes add" to the terms)
+      const SENT = 'You keep your discounted first movers\u2019 price forever while you stay subscribed';
+      ok(note.indexOf(SENT) > -1 && s6.indexOf(SENT) > -1, '3 the note and terms section 6 carry the price promise word for word (' + SENT.slice(0, 40) + '...)');
+      ok(/If you cancel and subscribe again later, the price on sale then applies/.test(s6) && !/Pioneer price/.test(s6), '3 section 6 says where the promise ends: cancel and come back, and the price on sale then applies');
+      const doc = require('fs').readFileSync(require('path').join(__dirname, '..', 'docs', 'OFFER_AND_PRICING.md'), 'utf8');
+      ok(!/false: tester prices do change after the beta/.test(doc) && /13 Nov/.test(doc.split('\n').filter(l => /Alpha pricing locked at signup/.test(l)).join(' ')), '3 docs/OFFER_AND_PRICING.md no longer says a subscriber\'s tester price changes after the beta (corrected 13 Nov)');
       // ── 4  the plans screen ──
       const wall = await p.evaluate(() => document.getElementById('plan-wall').textContent.replace(/\s+/g, ' '));
       ok(!/editing on/i.test(wall) && /The whole app/.test(wall), '4 the plans screen offers the whole app, with no "editing on"');
