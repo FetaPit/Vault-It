@@ -243,7 +243,7 @@ Owner, 13 Nov: "Yes to linking stripe to agreed prices", then "Yes, create all" 
 Vaulter prices sit on product `prod_VZJh9EodBSlCMi` ("Vault-It Vaulter"), Pioneer prices on `prod_UcfIYdfNJ2R1Us`. Already live and unchanged: Vaulter monthly beta £3.99 (…VG08 with trial, …VG09 without), Pioneer yearly beta £49.99 (…VG0a with trial, …VG02 without), Founding Member beta £99 (…VG0b, cap 100). No tax collected (not VAT-registered), as on the existing links. Return addresses: `?upgraded=1&plan=vaulter_yearly`, `vaulter_monthly`, `pioneer_monthly`, `pioneer_yearly`, and `?founded=1`.
 
 Product text changed (shown at checkout, so also on the existing links of these products):
-- `prod_UcfIYdfNJ2R1Us`: name "Vault·It Pioneer" is now "Vault-It Pioneer"; description now "Vault-It Pro: everything in Vaulter, plus the Entrepreneur tab, house builder level 3 and your own house design. Monthly or yearly." (the untrue "Lifetime Beta licence. Locked-in at 50% off for life" is gone).
+- `prod_UcfIYdfNJ2R1Us`: name "Vault·It Pioneer" is now "Vault-It Pioneer"; description now "Vault-It Pro: everything in Vaulter, plus the Entrepreneur tab and your own house design, with house builder level 3 coming. Monthly or yearly." (the untrue "Lifetime Beta licence. Locked-in at 50% off for life" is gone). First set on 13 Nov to a line naming level 3 as included; the card wall session then found level 3 is locked for everyone and Pro is not yet enforced, so the owner chose these words the same day ("Level 3 as coming"), in line with his Pro gating choice in David's session, "Gate, testers keep".
 - `prod_VZJh9EodBSlCMi`: description now "The Vault-It standard plan, monthly or yearly."
 
 Nothing was switched off and no existing price changed. **Still to do, in this order:**
