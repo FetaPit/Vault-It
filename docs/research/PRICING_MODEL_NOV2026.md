@@ -2,7 +2,7 @@
 
 Owner's ask, 13 Nov 2026: "let us work out our price point and pricing model, looking at competitors and tried and tested successful pricing structures for subscriptions and years options billed up front".
 
-**Status: recommendation only.** Nothing here is decided. Pete sets every figure. No Stripe change, no app code and no edit to `docs/OFFER_AND_PRICING.md` until he does.
+**Status: decided by Pete on 13 Nov 2026.** He chose the recommended option on all seven decisions in section 3 and set the beta close date as 31 December 2026. The decision is recorded in `docs/OFFER_AND_PRICING.md` ("Decided by Pete (13 Nov 2026): price points and pricing model"), which is the source of truth from now on. No Stripe change and no app code made yet.
 
 Builds on the 27 Oct research (`docs/research/pricing_uk_eu.md`, `pricing_global.md`, `cost_to_serve.md`, `lifetime_crowdfunding.md`, `trial_length.md`, `rules_uk_law.md`) rather than repeating it. New sources below were read on 13 Nov 2026. Figures marked *estimate* are arithmetic or judgement, not facts.
 
@@ -14,7 +14,7 @@ Builds on the 27 Oct research (`docs/research/pricing_uk_eu.md`, `pricing_global
 
 Two tiers, each monthly or yearly paid up front, with a 30-day trial. **Vaulter** is the standard plan. **Pioneer** is the Pro plan at roughly 1.7 times Vaulter. The yearly price is about 30% below 12 monthly payments, which is the UK leaders' norm. **Your partner joins free on any paid plan**, because couples saving for a home together are the core customer. **Household** is a separate licence that one member buys and shares by invite with up to 8 people. **Founding Member** is a capped one-payment licence. The beta prices are the "first movers' price": they end on a published date, and anyone who subscribes before then keeps their price for as long as they stay subscribed.
 
-### 1.2 Price table (recommended, not decided)
+### 1.2 Price table (recommended on 13 Nov, then decided as shown)
 
 | Plan | Beta price (first movers, kept while subscribed) | After the beta | Yearly saving against 12 monthly payments | What changes against today |
 |---|---|---|---|---|
