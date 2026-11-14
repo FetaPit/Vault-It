@@ -137,14 +137,16 @@ const OVL = '#welcome-overlay{display:none!important}';
     ok(errs.length === 0, t + 'no page errors (' + errs.slice(0, 2).join(' | ') + ')');
     await ctx.close();
   }
-  // skip path: no pick keeps today's behaviour (type and prices unchanged, target as typed)
+  // skip path: no pick keeps the type; the typed value becomes that type's price, as Set price does, so it survives a reload
+  // (owner, 12 Nov 2026 session A: before, only the target changed and shell/init.js reset it from the price on the next load)
   {
     const ctx = await b.newContext({ viewport: { width: 390, height: 900 } }); await routeThree(ctx); await ctx.route(/open\.er-api\.com/, r => r.abort());
     const p = await ctx.newPage(); await p.addInitScript(FRESH, 'dark'); await p.goto(APP); await p.waitForTimeout(1800); await p.addStyleTag({ content: HIDE });
-    const before = await p.evaluate(() => ({ type: state.houseType, prices: JSON.stringify(state.prices) }));
+    const before = await p.evaluate(() => ({ type: state.houseType, prices: Object.assign({}, state.prices) }));
     await p.evaluate(() => { document.getElementById('w-house').value = '250000'; wStep2Submit(); }); await p.waitForTimeout(600);
-    const af = await p.evaluate(() => ({ type: state.houseType, prices: JSON.stringify(state.prices), target: state.target }));
-    ok(af.type === before.type && af.prices === before.prices && af.target === 250000, 'onboarding skip: no pick keeps type and prices, target as typed (' + af.type + ' ' + af.target + ')');
+    const af = await p.evaluate(() => ({ type: state.houseType, prices: Object.assign({}, state.prices), target: state.target }));
+    const others = Object.keys(before.prices).filter(k => k !== before.type).every(k => af.prices[k] === before.prices[k]);
+    ok(af.type === before.type && af.prices[af.type] === 250000 && others && af.target === 250000, 'onboarding skip: no pick keeps the type, its price and the target become the £250,000 typed, other prices unchanged (' + af.type + ' ' + af.target + ')');
     await ctx.close();
   }
   await b.close();
