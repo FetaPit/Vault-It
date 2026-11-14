@@ -17217,7 +17217,7 @@ var HB_L3_LOCKED='Level 3: plan your next home. Coming later as part of Pro.';
 function hbSetView(n){if(n>=3){toast(HB_L3_LOCKED);return;}if(n>hbLevel()){toast('Finish Level '+(n-1)+' to unlock Level '+n);return;}state.viewLevel=n;save();updateUI();}
 function hbSetDepositPct(v){if(viBlockEdit())return;
   v=parseFloat(v);var inp=document.getElementById('depositPctInput');
-  if(!(v>=1&&v<=60)){toast('Choose a deposit between 1% and 60%');if(inp)inp.value=state.depositPct;return;}
+  if(!(v>=1&&v<=60)){toast('Choose a deposit between 1% and 60%');if(inp)inp.value=Math.round((+state.depositPct||0)*10)/10;return;}   // one decimal, as updateUI shows it (an exact-pounds deposit keeps its full share underneath)
   state.depositPct=Math.round(v*10)/10;save();updateUI();
   toast('Deposit target: '+state.depositPct+'% = '+gbpFmt(depositTarget()));
 }

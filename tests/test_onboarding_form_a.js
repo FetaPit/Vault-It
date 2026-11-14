@@ -134,6 +134,8 @@ const ht3 = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('ht3') || '{
     await p.evaluate(() => { try { setSetting('view', 'adv'); } catch (e) {} showTab('house'); try { updateUI(); } catch (e) {} }); await p.waitForTimeout(500);
     const hb = await p.evaluate(() => ({ pct: (document.getElementById('depositPctInput') || {}).value, amt: (document.getElementById('depositPctAmt') || {}).textContent || '', brick: (typeof bricksTotal !== 'undefined') }));
     ok(hb.pct === '10.5' && /£25,000|£25\.0k/.test(hb.amt), '4 the House builder shows 10.5% = £25,000 (gbpFmt may shorten it to £25.0k) (' + hb.pct + ' ' + hb.amt + ')');
+    const bad = await p.evaluate(() => { hbSetDepositPct('0'); return { pct: document.getElementById('depositPctInput').value, dt: depositTarget() }; });
+    ok(bad.pct === '10.5' && Math.abs(bad.dt - 25000) < 0.005, '4 an invalid entry in the House builder puts back 10.5, not the long figure, and keeps the £25,000 (' + bad.pct + ')');
     const ov = await p.evaluate(() => ({ inc: ovState.income.map(r => [r.name, r.amount, !!r._onboarding]), exp: ovState.expenses.map(r => [r.name, r.amount, !!r._onboarding]),
       u: JSON.parse(localStorage.getItem('vi_user') || '{}'), stage: journeyState.stageOverride }));
     ok(ov.inc.length === 1 && ov.inc[0][1] === 2400 && ov.inc[0][2], '6 income pre-fills one take-home row of £2,400 (' + JSON.stringify(ov.inc) + ')');
