@@ -1,5 +1,7 @@
-// Copy check: no em dash (—) in user-facing text. Brand rule (brand/vault-it-brand-handover.md): British English,
+// Copy check 1: no em dash (—) in user-facing text. Brand rule (brand/vault-it-brand-handover.md): British English,
 // sentence case, no em dashes. Comments and the generated HB3D engine block are ignored. Run: node tests/test_copy.js
+// Copy check 2 (card wall, owner 12 Nov 2026: "Card required"; docs/briefs/CARD_WALL.md: "No page or e-mail says 'no card'"):
+// the app and the sign-up pages make no "free, no card" promise, and the pages that offer the beta say when the card is first charged.
 const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..');
 const FILES = ['index.html', 'landing.html'].concat(
@@ -55,6 +57,21 @@ for (const rel of FILES) {
   const hits = findDashes(src);
   hits.forEach(n => console.log('FAIL: ' + rel + ':' + n + ' em dash in copy: ' + lines[n - 1].trim().slice(0, 140)));
   if (hits.length) fails += hits.length; else console.log('ok  : ' + rel + ' has no em dash in user-facing copy');
+}
+// ── no "free, no card" promise (comments are dropped first: they tell the history of the trial) ──
+const NO_CARD = /\bno card\b|sign up free|install free|needs no card|never enter a card|free during the beta|free for the whole beta|the free beta|free private beta|join the free|it.s free\b/i;
+const strip = s => s.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/[^\n]*/g, '$1');
+for (const rel of FILES) {
+  const file = path.join(ROOT, rel); if (!fs.existsSync(file)) continue;
+  const bad = strip(fs.readFileSync(file, 'utf8')).split('\n').filter(l => NO_CARD.test(l)).map(l => (l.match(new RegExp('.{0,50}(' + NO_CARD.source + ').{0,50}', 'i')) || [l.slice(0, 120)])[0].trim());
+  bad.forEach(t => console.log('FAIL: ' + rel + ' still promises it is free with no card: ' + t));
+  if (bad.length) fails += bad.length; else console.log('ok  : ' + rel + ' makes no "free, no card" promise');
+}
+for (const rel of ['landing.html', 'site/sign-up/confirm.html']) {
+  const file = path.join(ROOT, rel); if (!fs.existsSync(file)) continue;
+  const t = strip(fs.readFileSync(file, 'utf8'));
+  if (/30 days/i.test(t) && /first charged on day 31/.test(t)) console.log('ok  : ' + rel + ' says the first 30 days are free and the card is first charged on day 31');
+  else { fails++; console.log('FAIL: ' + rel + ' does not say when the card is first charged (30 days free, first charged on day 31)'); }
 }
 if (fails) { console.log('FAILURES ' + fails); process.exit(1); }
 console.log('ALL PASSED');

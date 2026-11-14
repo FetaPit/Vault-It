@@ -12,8 +12,6 @@
 /* secondary buttons (Cancel and the like): outline, ink text, AA on paper */
 [data-theme="light"] .btn-add-data[style*="color:var(--t3)"]{color:var(--text)!important;background:transparent!important;border-color:var(--lock)!important}
 [data-theme="light"] #sync-banner{color:var(--text)!important;border-color:var(--amber)!important}
-/* trial then paid: the plans prompt (no free column, Lifetime licence first) and the foot-of-page trial line */
-#pro-offer-modal.vi-trial-end .vi-tier-founder{order:-1}
 /* brand build (owner, 31 Oct: the screen recording is the target): the view controls sit in a row at the top right, in the
    recording's order (+, −, auto-orbit, reset); "show my row" and full screen follow, so nothing is lost */
 /* Brand build camera rail (brand book .rail + 31 Oct recording): line icons, vertical on the right at desktop, a row top right on phones. The stage keeps the Night look in Daylight too. */
@@ -65,10 +63,6 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
 @media (prefers-reduced-motion:no-preference){body:not(.reduced-motion) .cf-ln{animation:cfFlow 3.6s ease-in-out infinite}}
 /* KPIs: one row on desktop, two rows on phones (three then two) */
 @media (max-width:699px) and (min-width:321px){.ov-kpis:not(.debt-strip){grid-template-columns:repeat(6,minmax(0,1fr))!important}.ov-kpis:not(.debt-strip)>.ov-kpi{grid-column:span 2!important}.ov-kpis:not(.debt-strip)>.ov-kpi:nth-child(n+4){grid-column:span 3!important}}   /* once the days are up, the Lifetime licence (testers first) leads */
-#trial-banner{position:fixed;left:8px;right:8px;bottom:8px;z-index:10001;background:var(--panel);color:var(--text);border:1px solid var(--teal);border-radius:10px;padding:10px 12px;font-size:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 8px 24px rgb(0 0 0 / .25)}
-#trial-banner.trial-warn{border-color:var(--amber)}
-#trial-banner .trial-msg{flex:1;min-width:180px;line-height:1.45}
-#trial-banner .trial-x{background:none;border:0;color:var(--t2);font-size:14px;cursor:pointer;padding:2px 6px;min-width:32px;min-height:32px}
 /* House builder: parchment text from the old tracker becomes ink */
 [data-theme="light"] .price-edit-row label,[data-theme="light"] .igrp label,[data-theme="light"] .tgt-amt,[data-theme="light"] .sl,[data-theme="light"] .log-entry,[data-theme="light"] .scene-cap:not(.scene *){color:var(--muted)!important;opacity:1!important}
 [data-theme="light"] .ms-lbl{color:var(--lock)!important;opacity:1!important}

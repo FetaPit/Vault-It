@@ -2,7 +2,7 @@
 // confirmed waitlist addresses are beta testers, existing paid rows are kept, erasing an account unlinks its events.
 // Run: node tests/test_011.mjs   (needs @electric-sql/pglite)
 import { PGlite } from '@electric-sql/pglite'; import fs from 'fs';
-const dir = new URL('../supabase/migrations/', import.meta.url).pathname;
+import { fileURLToPath } from 'url'; const dir = fileURLToPath(new URL('../supabase/migrations/', import.meta.url));   // fileURLToPath, so it also runs on Windows
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else console.log('ok  :', m); };
 const db = new PGlite();
 const U = '11111111-1111-1111-1111-111111111111', V = '22222222-2222-2222-2222-222222222222', W = '33333333-3333-3333-3333-333333333333', X = '44444444-4444-4444-4444-444444444444';
@@ -69,6 +69,14 @@ ok(await apply({ ev: 'evt_8', at: t(80), kind: 'checkout', email: 'nobody@exampl
 ok((await q(`select email, result from public.stripe_events where id = 'evt_8'`))[0].email === 'nobody@example.com', 'with the checkout e-mail kept so Pete can reconcile');
 ok(await apply({ ev: 'evt_9', at: t(90), kind: 'checkout', user: V, plan: 'gold-plated' }) === 'applied' && (await prof(V)).plan === 'founder', 'an unknown plan name is ignored');
 let threw = false; try { await apply({ ev: 'evt_10', at: t(95), kind: 'refund', user: V }); } catch (e) { threw = true; } ok(threw, 'unknown event kinds are refused');
+
+// the 30-day trial that takes a card (the card wall, owner 12 Nov 2026: "Card required"; trialing counts as on a plan)
+ok(await apply({ ev: 'evt_T1', at: t(100), kind: 'checkout', user: U, cus: 'cus_U', sub: 'sub_U2', plan: 'monthly', until: '2026-12-05T12:00:00Z' }) === 'applied' && (await prof(U)).is_pioneer === true && (await prof(U)).stripe_subscription_id === 'sub_U2', 'a trial checkout (card taken, nothing charged yet) puts the account on a plan');
+ok(await apply({ ev: 'evt_T2', at: t(110), kind: 'subscription', sub: 'sub_U2', cus: 'cus_U', status: 'trialing', plan: 'monthly', until: '2026-12-01T12:01:50Z' }) === 'applied' && (await prof(U)).is_pioneer === true && +new Date((await prof(U)).paid_until) === +new Date('2026-12-01T12:01:50Z'), 'a trialing subscription counts as on a plan, until the day the trial ends');
+ok(await apply({ ev: 'evt_T3', at: t(120), kind: 'subscription', sub: 'sub_U2', cus: 'cus_U', status: 'active', until: '2027-01-01T12:01:50Z' }) === 'applied' && (await prof(U)).is_pioneer === true, 'the first charge on day 31 (active) keeps it on');
+ok(await apply({ ev: 'evt_T4', at: t(130), kind: 'subscription', sub: 'sub_U2', cus: 'cus_U', status: 'unpaid' }) === 'applied' && (await prof(U)).is_pioneer === false, 'a subscription Stripe gives up on (unpaid) takes the account off its plan');
+ok(await apply({ ev: 'evt_T5', at: t(140), kind: 'checkout', user: U, cus: 'cus_U', sub: 'sub_U3', plan: 'yearly', until: '2027-11-05T12:00:00Z' }) === 'applied' && (await prof(U)).is_pioneer === true && (await prof(U)).plan === 'yearly', 'and choosing a plan again puts it back on');
+ok(await apply({ ev: 'evt_T6', at: t(150), kind: 'subscription', sub: 'sub_U3', cus: 'cus_U', status: 'canceled', until: t(150) }) === 'applied' && (await prof(U)).is_pioneer === false, 'a trial cancelled before day 31 ends the plan');
 
 // beta testers
 await db.exec(`insert into auth.users values ('${W}','Wes@Example.com'), ('${X}','pend@example.com')`);

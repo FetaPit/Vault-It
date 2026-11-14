@@ -20,7 +20,7 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <a href="#" onclick="showUpgrade('monthly');return false" class="pw-plan" data-plan="monthly">
         <svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg>
-        <div class="pw-tier-name" data-tier-name>Pioneer</div>
+        <div class="pw-tier-name" data-tier-name data-plan-name="monthly">Vaulter</div>
         <div class="pw-tier-price" id="pw-price-monthly" data-plan-price="monthly">£5.99<span>/mo</span></div>
         <div class="pw-tier-note">Monthly</div>
         <div class="pw-tier-terms" data-plan-terms="monthly"></div>
@@ -28,7 +28,7 @@
       </a>
       <a href="#" onclick="showUpgrade('annual');return false" class="pw-plan pw-plan-annual" data-plan="annual">
         <svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg>
-        <div class="pw-tier-name" data-tier-name>Pioneer</div>
+        <div class="pw-tier-name" data-tier-name data-plan-name="annual">Pioneer</div>
         <div class="pw-tier-price" id="pw-price-annual" data-plan-price="annual">£59.99<span>/yr</span></div>
         <div class="pw-tier-note">Pro · billed yearly</div>
         <div class="pw-tier-terms" data-plan-terms="annual"></div>
@@ -36,10 +36,10 @@
       </a>
     </div>
     <div style="border-top:1px solid rgb(var(--ink-rgb) / .06);padding-top:14px">
-      <div style="font-size:max(.45rem,var(--vi-fs-1));color:var(--t3);margin-bottom:8px">Already upgraded? Verify your purchase:</div>
+      <!-- asks the server about the signed-in account; no e-mail is typed, because a typed e-mail proves nothing (card wall, 12 Nov 2026) -->
+      <div style="font-size:max(.45rem,var(--vi-fs-1));color:var(--t3);margin-bottom:8px">Already paid? Check this account:</div>
       <div style="display:flex;gap:6px">
-        <input type="email" id="pw-verify-email" class="al-inp" placeholder="Email used at checkout" style="flex:1;font-size:max(.56rem,var(--vi-fs-2))">
-        <button onclick="verifyPioneerPurchase()" style="background:linear-gradient(90deg,#b8902e,var(--brass));border:none;border-radius:5px;color:#000;font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:800;padding:7px 13px;cursor:pointer;white-space:nowrap;letter-spacing:.05em">VERIFY</button>
+        <button onclick="verifyPioneerPurchase()" style="background:linear-gradient(90deg,#b8902e,var(--brass));border:none;border-radius:5px;color:#000;font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:800;padding:7px 13px;cursor:pointer;white-space:nowrap;letter-spacing:.05em">Check my account</button>
       </div>
       <div id="pw-verify-msg" style="font-size:max(.44rem,var(--vi-fs-1));margin-top:7px;min-height:14px;line-height:1.4"></div>
     </div>

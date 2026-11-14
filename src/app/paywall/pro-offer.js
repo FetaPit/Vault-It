@@ -1,17 +1,13 @@
 // ══════════════════════════════════════════════════════════════
-// PRO OFFER SYSTEM
-// Shows on every login. Discount increases to 40% after 30 days.
+// VISIT COUNTER (the plans prompt that lived here went with the in-app trial)
 // ══════════════════════════════════════════════════════════════
 
 function initProOffer() {
-  // Trial then paid (31 Oct): the 30 days carry no upgrade pop-up (the banner counts the days). Once they are up, the plans
-  // prompt shows once a day on open, and whenever an edit is tried. Paid accounts never see it.
+  // The plans prompt went with the in-app trial (card wall, 12 Nov 2026): an account without a plan meets the wall instead.
+  // What is left here is the visit counter kept on the profile.
   try {
     var user = JSON.parse(localStorage.getItem('vi_user') || 'null');
     if (user) { user.logins = (user.logins || 0) + 1; localStorage.setItem('vi_user', JSON.stringify(user)); }
-    if (viTrialState() !== 'ended') return;
-    if (localStorage.getItem('vi_trial_prompt') === new Date().toDateString()) return;
-    setTimeout(function () { if (viTrialState() === 'ended') viShowTrialEnd('open'); }, 1500);   // after the app has loaded
   } catch(e) {}
 }
 

@@ -100,7 +100,7 @@ function closeSettings(){
   var sm=document.getElementById('settings-modal');if(sm)sm.style.display='none';
 }
 
-// "Already upgraded?": once the server keeps paid status this asks it (the account's profile, set by Stripe); a typed e-mail proves nothing.
+// "Already upgraded?": asks the server (the account's profile, set by Stripe). A typed e-mail proves nothing and unlocks nothing.
 async function verifyPioneerPurchase(){
   var msg=document.getElementById('pw-verify-msg');
   var say=function(c,t){ if(msg) msg.innerHTML='<span style="color:var('+c+')">'+t+'</span>'; };
@@ -109,46 +109,11 @@ async function verifyPioneerPurchase(){
     if(!_supaUser){ say('--re','Sign in with the email you paid with, then check again.'); return; }
     say('--t2','Checking your account…');
     var row=await _syncPioneerFromProfile(_supaUser.id);
-    if(row&&(row.is_pioneer||row.is_founder)){ say('--gr','Confirmed: your '+(row.is_founder?'Lifetime licence':'Pioneer')+' plan is active.'); setTimeout(function(){ closePaywall(); },1400); }
+    if(row&&(row.is_pioneer||row.is_founder)){ say('--gr','Confirmed: '+(row.is_founder?'your '+VI_PLANS.founder.name:'your '+VI_PLANS[row.plan==='monthly'?'monthly':'annual'].name+' plan')+' is active.'); setTimeout(function(){ closePaywall(); },1400); }
     else if(row) say('--re','No payment found for this account yet. It can take a minute after checkout. If you paid with a different email, write to hello@vault-it.co and we will link it.');
     else say('--re','Could not reach Vault-It to check. Try again in a moment.');
     return;
   }
-  if(gw===null&&_supaClient){ say('--re','Could not reach Vault-It to check. Try again in a moment.'); return; }
-  verifyPioneerPurchaseLegacy();
-}
-function verifyPioneerPurchaseLegacy(){   // older server only (no migration 011)
-  var inp=document.getElementById('pw-verify-email');
-  var msg=document.getElementById('pw-verify-msg');
-  var entered=(inp?inp.value.trim().toLowerCase():'');
-  if(!entered){if(msg)msg.innerHTML='<span style="color:var(--re)">Please enter your checkout email.</span>';return;}
-  var u=null;try{u=JSON.parse(localStorage.getItem('vi_user')||'null');}catch(e){}
-  var profileEmail=(u&&u.email)?u.email.toLowerCase():'';
-  if(!profileEmail){
-    if(msg)msg.innerHTML='<span style="color:var(--re)">Complete your profile with the email you used at checkout first.</span>';
-    return;
-  }
-  if(profileEmail===entered){
-    localStorage.setItem('vi_pioneer','true');
-    localStorage.setItem('vi_pioneer_email',entered);
-    // Stamp vi_user.pro so _isPro() also resolves true via the legacy check
-    try { var _pu=JSON.parse(localStorage.getItem('vi_user')||'{}'); _pu.pro=true; localStorage.setItem('vi_user',JSON.stringify(_pu)); } catch(e){}
-    // Sync to Supabase profiles so other devices pick this up via _syncPioneerFromProfile
-    if (_supaClient && _supaUser) {
-      _supaClient.from('profiles').upsert(
-        { id: _supaUser.id, is_pioneer: true, updated_at: new Date().toISOString() },
-        { onConflict: 'id' }
-      ).catch(function(){});
-    }
-    if(msg)msg.innerHTML='<span style="color:var(--gr)"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access unlocked. Welcome to the vault!</span>';
-    setTimeout(function(){
-      closePaywall();
-      if (typeof applyPaywall === 'function') applyPaywall();
-      renderPioneerCard();
-      showToast('◆ PIONEER unlocked. Thank you! 🎉');
-    },1400);
-  }else{
-    if(msg)msg.innerHTML='<span style="color:var(--re)">Email doesn\'t match your profile ('+profileEmail+'). Update your profile email to match your checkout email.</span>';
-  }
+  say('--re','Could not reach Vault-It to check. Try again in a moment.');
 }
 

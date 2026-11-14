@@ -91,8 +91,14 @@
            2: your money and deposit pot, each can be added later; 3: your plan. The check-in day, Simplified or Advanced view and
            phone take their defaults (today, Simplified, none) and live in Settings. Every answer is saved exactly as before. -->
       <section class="wz-screen" data-s="1" id="wz-s1">
-        <h2 class="welcome-h2" tabindex="-1">Your first 30 days are free.<br>The whole app, no card.</h2>
-        <div class="welcome-sub">Two quick screens, then your plan. After 30 days, pick a plan to keep editing; your numbers stay yours either way. Beta testers get first call on the Lifetime licence places.</div>
+        <!-- Meet the founder, compact (owner, 12 Nov 2026: a founder box in "Both places"). Styles: #vi-founder-style in paywall/offer-modals.html -->
+        <div class="vi-founder-strip" id="wz-founder">
+          <img class="vi-founder-pic" src="img/founder.jpg" width="44" height="44" alt="Pete Thickett, founder of Vault-It" decoding="async">
+          <div class="vi-founder-who"><div class="vi-founder-name">Pete Thickett</div><div class="vi-founder-thanks">Thank you for joining Vault-It this early.</div></div>
+        </div>
+        <!-- owner, 12 Nov 2026: "Remove whole app no card as we are asking for card details now." "add 30 days free in header font in teal with free in gold" -->
+        <h2 class="welcome-h2 wz-offer" tabindex="-1">30 days <span class="wz-free">free</span></h2>
+        <div class="welcome-sub">Two quick screens, then your plan. Monthly and yearly: your card is taken at checkout and first charged on day 31. Cancel before then and you pay nothing.</div>
         <div class="wz-signed" id="wz-signed" hidden>Signed in as <b id="wz-signed-email"></b></div>
       <div class="welcome-field">
         <label for="w-name">First name <span class="w-opt-tag">(optional)</span></label>

@@ -38,9 +38,20 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
   ok(!/Sarah M|James T|Priya K|From our pioneers|already on the climb/i.test(text), 'no unsourced testimonials');
   ok(!/works offline|seven modules|live spot|most popular|invest once|lifetime/i.test(text), 'none of the false or risky badges from the old page');
   ok(/Not regulated by the FCA\. Not financial advice\./.test(text), 'FCA line is shown (owner, 30 Oct)');
+  // the card wall (owner, 12 Nov 2026, "Card required"): no "free, no card" promise; what happens instead; prices that match the app's Stripe links
+  const full = await page.evaluate(() => { const c = document.body.cloneNode(true); c.querySelectorAll('script,style').forEach((e) => e.remove()); return c.textContent.replace(/\s+/g, ' '); });
+  const cfg = fs.readFileSync(path.join(ROOT, 'src/app/paywall/stripe-config.js'), 'utf8');
+  // five plans since 13 Nov 2026 (Vaulter and Pioneer, monthly and yearly); the page leads with Vaulter monthly and Pioneer yearly
+  const PL = (k) => { const m = cfg.match(new RegExp(k + ':\\s+\\{ tierId: \\S+ billing: \\S+\\s+price: ([\\d.]+),\\s+tester: ([\\d.]+)')); return m ? { price: m[1], tester: m[2] } : {}; };
+  const PM = PL('vaulter_month'), PA = PL('pioneer_year'), PVY = PL('vaulter_year'), PPM = PL('pioneer_month');
+  const allowed = [PM.price, PM.tester, PA.price, PA.tester, PVY.price, PVY.tester, PPM.price, PPM.tester];
+  const pence = (full.match(/£\d+\.99\b/g) || []).concat([...full.matchAll(/(£\d+(?:\.\d\d)?) a (?:month|year)/g)].map((m) => m[1])).map((x) => x.slice(1));   // plan prices: every £x.99 and every "£x a month / a year"
+  ok(!/no card|free beta|free private beta|free during the beta|free for the whole beta|never enter a card/i.test(full + ' ' + await page.content()), 'no "free, no card" promise is left on the sign-up page, its title or its share text (card wall, 12 Nov)');
+  ok(/30 days free/i.test(full) && /first charged on day 31/.test(full) && /Cancel before then and you pay nothing/.test(full) && /to cancel, email hello@vault-it\.co/i.test(full), 'it says what happens instead: 30 days free, card taken when a plan is chosen, first charged on day 31, how to cancel');
+  ok(PM.tester && PA.tester && pence.length >= 2 && pence.every((x) => allowed.includes(x)) && full.includes('£' + PM.tester + ' a month') && full.includes('£' + PA.tester + ' a year'), 'every plan price on the page is one the app charges through its Stripe links (' + [...new Set(pence)].join(', ') + ' against ' + allowed.join(', ') + ')');
   ok(/not end-to-end encrypted/i.test(text) && /not financial advice/i.test(text) && /PT Live Design/.test(text) && /hello@vault-it\.co/.test(text), 'trust block is honest; trader identity and contact are shown');
   const founder = (await page.textContent('#founder')).replace(/\s+/g, ' ');
-  ok(!/built every line|UK developer|myself/i.test(founder) && /see what I am working towards/i.test(founder) && /one more brick/i.test(founder) && /visual feedback/i.test(founder), 'founder block does not brag about building and says why it was made (owner, 1 Nov)');
+  ok(!/built every line|UK developer|myself|a designer|founder in Lincoln/i.test(founder) && /see what I am working towards/i.test(founder) && /one more brick/i.test(founder) && /visual feedback/i.test(founder), 'founder block does not brag about building and says why it was made (owner, 1 Nov)');
   ok(!/Buffett|Munger|Stevenson|Squibb|bypass=/.test(await page.content()), 'no links to the demo with the celebrity advisor cards');
   // owner (30 Oct): the hero is the brand book's demo, so the form sits after it; the sticky header button jumps to it
   ok(await page.evaluate(() => { const a = document.querySelector('header a.btn[href="#join"]'), f = document.getElementById('join'); return !!a && !!f && a.getBoundingClientRect().top >= 0 && a.getBoundingClientRect().bottom < 80; }), 'the header keeps a Join the beta button on screen that jumps to the form');
@@ -168,6 +179,7 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
   await page.goto(BASE + '/sign-up/confirm?t=' + 'A'.repeat(43)); await page.waitForTimeout(500);
   ok(page.posts[0] && page.posts[0].action === 'confirm' && page.posts[0].token === 'A'.repeat(43), 'the confirm page sends the token');
   ok(await page.isVisible('#done') && /app\.vault-it\.co/.test(await page.getAttribute('#done a.btn', 'href')) && await page.isVisible('#leave'), 'confirmed: the beta link and a leave link are shown');
+  { const done = (await page.textContent('#done')).replace(/\s+/g, ' '); ok(!/no card|It.s free/i.test(done) && /first 30 days are free/.test(done) && /first charged on day 31/.test(done), 'the confirm page no longer says "free, needs no card"; it says when the card is taken and first charged'); }
   ok(!page.url().includes('t='), 'the token is removed from the address bar after use');
   page.reply = { status: 410, body: { error: 'invalid_link' } };
   await page.goto(BASE + '/sign-up/confirm?t=' + 'B'.repeat(43)); await page.waitForTimeout(500);

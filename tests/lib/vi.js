@@ -24,6 +24,14 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; cha
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
   '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon', '.glb': 'model/gltf-binary', '.gltf': 'model/gltf+json', '.woff': 'font/woff', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8', '.wasm': 'application/wasm' };
 
+// The card wall (owner, 12 Nov 2026): the app opens only when the server says the account is on a plan. Tests have no server,
+// so on a loopback or file address (never a deployed one) the app lets a test stand in for that answer: window.__viPlanStub
+// ('on' | 'off' | 'unreachable', see src/app/paywall/plan-wall.js). Every browser context a test opens gets 'on', so the rest of
+// the suite meets the app as an account on a plan does. A test of the wall itself calls planStub(null) before it opens a
+// context and answers the profile read with its own stand-in Supabase.
+let PLAN_STUB = 'on';
+function planStub(v) { PLAN_STUB = v || null; }
+
 let serverP = null, ORIGIN = null;
 function serve() {   // resolves to 'http://127.0.0.1:PORT'
   if (serverP) return serverP;
@@ -80,7 +88,9 @@ function patchPlaywright() {
       return orig.call(this, url, h, opts); }; };
   const seePage = page => { if (!page) return page; wrapGoto(Object.getPrototypeOf(page)); wrapRoute(Object.getPrototypeOf(page)); try { wrapGoto(Object.getPrototypeOf(page.mainFrame())); } catch (e) {} return page; };
   const wrapMaker = (proto, name, after) => { if (!proto || !proto[name] || proto[name].__vi) return; const orig = proto[name]; const w = async function () { return after(await orig.apply(this, arguments)); }; w.__vi = true; proto[name] = w; };
-  const seeContext = ctx => { if (!ctx) return ctx; const cp = Object.getPrototypeOf(ctx); wrapRoute(cp); wrapMaker(cp, 'newPage', seePage); ctx.pages().forEach(seePage); ctx.on('page', seePage); return ctx; };
+  const seeContext = ctx => { if (!ctx) return ctx; const cp = Object.getPrototypeOf(ctx); wrapRoute(cp); wrapMaker(cp, 'newPage', seePage); ctx.pages().forEach(seePage); ctx.on('page', seePage);
+    if (PLAN_STUB && !ctx.__viPlanStub) { ctx.__viPlanStub = true; return ctx.addInitScript('if (typeof window.__viPlanStub === "undefined") window.__viPlanStub = ' + JSON.stringify(PLAN_STUB) + ';').then(() => ctx, () => ctx); }
+    return ctx; };
   const seeBrowser = b => { if (!b) return b; const bp = Object.getPrototypeOf(b); wrapMaker(bp, 'newContext', seeContext); wrapMaker(bp, 'newPage', seePage); b.contexts().forEach(seeContext); return b; };
   for (const bt of [pw.chromium, pw.firefox, pw.webkit]) {
     if (!bt) continue; const bp = Object.getPrototypeOf(bt);
@@ -89,4 +99,4 @@ function patchPlaywright() {
 }
 patchPlaywright();
 
-module.exports = { REPO, ROOT, INDEX, FILE_URL, TMP, LOG_DIR, serve, toHttp, fileUrl: rel => pathToFileURL(path.join(ROOT, rel)).href };
+module.exports = { REPO, ROOT, INDEX, FILE_URL, TMP, LOG_DIR, serve, toHttp, planStub, fileUrl: rel => pathToFileURL(path.join(ROOT, rel)).href };

@@ -5,7 +5,7 @@
     <div data-set-title style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:20px;color:var(--tx)">Settings</div>
 
     <!-- 1. Account: email, plan (current price only, painted from VI_PLANS by viPricePaint()), manage or cancel, sign out.
-         Plans (owner, 4 Nov 2026 evening, renamed 5 Nov: Pioneer = monthly and yearly (yearly is Pro), Lifetime licence = once; read-only after the 30 days has no tier name. -->
+         Plans (owner, 12 Nov 2026: Vaulter = monthly, Pioneer = yearly (Pro), Lifetime licence = once; every name is painted from VI_PLANS). On a plan the buy buttons are hidden (card wall, 12 Nov 2026: one plan per account). -->
     <div class="settings-section set-box" id="set-account">
       <div class="settings-section-title">Account</div>
       <div class="set-acct">
@@ -18,18 +18,18 @@
           <span class="set-plan-h">Your plan</span>
           <span id="set-pioneer-badge" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:max(.66rem,var(--vi-fs-2))"></span>
         </div>
-        <div id="set-pioneer-active" style="display:none;font-size:max(.66rem,var(--vi-fs-2));color:var(--gr);margin-bottom:10px;line-height:1.5"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> Pioneer access active. Thank you for backing Vault-It.</div>
+        <div id="set-pioneer-active" style="display:none;font-size:max(.66rem,var(--vi-fs-2));color:var(--gr);margin-bottom:10px;line-height:1.5"><svg class="vi-ic g" aria-hidden="true"><use href="#vi-check"/></svg> <span id="set-plan-line">Your plan is active. Thank you for backing Vault-It.</span></div>
         <div id="set-pioneer-inactive" style="font-size:max(.66rem,var(--vi-fs-2));color:var(--t2);margin-bottom:8px;line-height:1.5"></div>
-        <div id="set-plan-extras" class="settings-hint" style="margin-bottom:10px;line-height:1.55">Pioneer, monthly or yearly, is the whole app with editing on, plus your own 3D house design and the AI house model. Pioneer yearly (Pro) adds early access to new features, roadmap voting and family mode (coming soon). The Lifetime licence (one payment, 100 places, beta testers first) is Pioneer for the life of the service. The six preset houses are in every plan.</div>
+        <div id="set-plan-extras" class="settings-hint" style="margin-bottom:10px;line-height:1.55">Vaulter, monthly or yearly, is the whole app with the six preset houses. Pioneer, monthly or yearly, is Pro: it adds the Entrepreneur tab, your own 3D house design and the AI house model, early access to new features and roadmap voting, with house builder Level 3 coming. The Lifetime licence (one payment, 100 places, beta testers first) is Pioneer for the life of the service. Household, for up to 8 people, is coming soon.</div>
         <div class="set-tiers">
-          <button type="button" class="set-tier" id="set-plan-monthly" data-plan="monthly" onclick="showUpgrade('monthly')"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg><span class="set-tier-name" data-tier-name>Pioneer</span><span class="set-tier-price" data-plan-price="monthly">£5.99<span>/mo</span></span><span class="set-tier-cta" data-cta=""></span></button>
-          <button type="button" class="set-tier" id="set-plan-annual" data-plan="annual" onclick="showUpgrade('annual')"><svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg><span class="set-tier-name" data-tier-name>Pioneer</span><span class="set-tier-price" data-plan-price="annual">£59.99<span>/yr</span></span><span class="set-tier-cta" data-cta=""></span></button>
-          <button type="button" class="set-tier" id="set-plan-founder" data-plan="founder" onclick="showUpgrade('founder')"><svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg><span class="set-tier-name" data-tier-name>Lifetime licence</span><span class="set-tier-price" data-plan-price="founder">£149<span> once</span></span><span class="set-tier-cta" data-cta=""></span></button>
+          <button type="button" class="set-tier" id="set-plan-monthly" data-plan="monthly" onclick="showUpgrade('monthly')"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg><span class="set-tier-name" data-tier-name data-plan-name="monthly">Vaulter</span><span class="set-tier-price" data-plan-price="monthly">£5.99<span>/mo</span></span><span class="set-tier-cta" data-cta=""></span></button>
+          <button type="button" class="set-tier" id="set-plan-annual" data-plan="annual" onclick="showUpgrade('annual')"><svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg><span class="set-tier-name" data-tier-name data-plan-name="annual">Pioneer</span><span class="set-tier-price" data-plan-price="annual">£59.99<span>/yr</span></span><span class="set-tier-cta" data-cta=""></span></button>
+          <button type="button" class="set-tier" id="set-plan-founder" data-plan="founder" onclick="showUpgrade('founder')"><svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg><span class="set-tier-name" data-tier-name data-plan-name="founder">Lifetime licence</span><span class="set-tier-price" data-plan-price="founder">£149<span> once</span></span><span class="set-tier-cta" data-cta=""></span></button>
         </div>
-        <div class="set-tier-terms"><p><b>Pioneer (monthly):</b> <span data-plan-terms="monthly"></span></p><p><b>Pioneer (yearly):</b> <span data-plan-terms="annual"></span></p><p><b>Lifetime licence:</b> <span data-plan-terms="founder"></span></p></div>
+        <div class="set-tier-terms"><p><b><span data-plan-name="monthly">Vaulter</span> (monthly):</b> <span data-plan-terms="monthly"></span></p><p><b><span data-plan-name="annual">Pioneer</span> (yearly):</b> <span data-plan-terms="annual"></span></p><p><b><span data-plan-name="founder">Lifetime licence</span>:</b> <span data-plan-terms="founder"></span></p></div>
         <div class="set-plan-foot">
           <a class="set-btn primary" data-manage-sub href="mailto:hello@vault-it.co?subject=Manage%20or%20cancel%20my%20Vault-It%20plan">Manage or cancel my plan</a>
-          <button class="set-btn" type="button" onclick="closeSettings();showPaywall('assets')">Already paid?</button>
+          <button class="set-btn" type="button" data-plan-buy onclick="closeSettings();showPaywall('assets')">Already paid?</button>
         </div>
         <div class="settings-hint" style="margin-top:6px">There is no self-service page for plans yet. Email <span class="set-nb">hello@vault-it.co</span> and we will change or cancel it for you.</div>
       </div>

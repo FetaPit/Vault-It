@@ -10,11 +10,11 @@
     <div class="vi-camp-body">
       <!-- Tier cards -->
       <div class="vi-camp-tiers">
-        <!-- Pioneer (monthly): the monthly plan (owner, 4 Nov 2026 evening; named Founder until 5 Nov, tier key and icon still 'founder'). Prices, terms and buttons are painted from VI_PLANS by viPricePaint() -->
+        <!-- Vaulter: the monthly plan (owner, 12 Nov 2026; Founder until 5 Nov, then Pioneer; tier key and icon still 'founder'). Names, prices, terms and buttons are painted from VI_PLANS by viPricePaint() -->
         <div class="vi-camp-tier" data-tier-card="monthly">
           <svg class="vi-tier-ic vi-tier-card" data-tier="founder" viewBox="-8 -2 110 140" aria-hidden="true"><use href="#tier-card-founder"/></svg>
           <div class="vi-camp-tier-badge">Monthly</div>
-          <div class="vi-camp-tier-name" data-tier-name>Pioneer</div>
+          <div class="vi-camp-tier-name" data-tier-name data-plan-name="monthly">Vaulter</div>
           <div class="vi-camp-tier-price" id="camp-price-vaulter" data-plan-price="monthly">£5.99<span> a month</span></div>
           <div class="vi-camp-tier-note vi-plan-terms" id="camp-note-vaulter" data-plan-terms="monthly"></div>
           <ul class="vi-camp-tier-features">
@@ -22,27 +22,25 @@
             <li>Journey map</li>
             <li>House builder</li>
             <li>Debt tracker</li>
-            <li>Entrepreneur tools</li>
             <li>NW History</li>
             <li>3D Vault</li>
           </ul>
-          <button class="vi-camp-tier-cta vi-camp-cta-em" id="camp-cta-vaulter" data-plan="monthly" data-cta="Become a Pioneer →" data-cta-trial="Start 30 days free →" onclick="showUpgrade('monthly'); document.getElementById('vi-campaign-modal').classList.add('hidden')">Become a Pioneer →</button>
+          <button class="vi-camp-tier-cta vi-camp-cta-em" id="camp-cta-vaulter" data-plan="monthly" data-cta="Become a Vaulter →" data-cta-trial="Start 30 days free →" onclick="showUpgrade('monthly'); document.getElementById('vi-campaign-modal').classList.add('hidden')">Become a Vaulter →</button>
         </div>
         <!-- Pioneer: the yearly plan, Pro (owner, 4 Nov 2026) -->
         <div class="vi-camp-tier vi-camp-featured" data-tier-card="annual">
           <svg class="vi-tier-ic vi-tier-card" data-tier="pioneer" viewBox="-8 -2 110 140" aria-hidden="true"><use href="#tier-card-pioneer"/></svg>
-          <div class="vi-camp-tier-badge">Pro · yearly</div>
-          <div class="vi-camp-tier-name" data-tier-name>Pioneer</div>
+          <div class="vi-camp-tier-badge">Pro</div>
+          <div class="vi-camp-tier-name" data-tier-name data-plan-name="annual">Pioneer</div>
           <div class="vi-camp-tier-price" id="camp-price-pioneer" data-plan-price="annual">£59.99<span> a year</span></div>
           <div class="vi-camp-tier-note">Renews at the same price as long as you stay subscribed.</div>
           <div class="vi-camp-tier-note vi-plan-terms" data-plan-terms="annual"></div>
           <ul class="vi-camp-tier-features">
-            <li>Everything in the monthly plan</li>
-            <li class="vi-dim">Family mode (coming soon)</li>
+            <li>Everything in Vaulter</li>
             <li>Entrepreneur tab</li>
-            <li>NW History</li>
-            <li>3D Vault visualization</li>
-            <li>Full analytics suite</li>
+            <li>Your own 3D house design and AI house model</li>
+            <li class="vi-dim">House builder Level 3 (coming)</li>
+            <li>Early access and roadmap voting</li>
             <li>Backer credit</li>
           </ul>
           <button class="vi-camp-tier-cta vi-camp-cta-em" id="camp-cta-pioneer" data-plan="annual" data-cta="Become a Pioneer →" data-cta-trial="Start 30 days free →" onclick="showUpgrade('annual'); document.getElementById('vi-campaign-modal').classList.add('hidden')">Become a Pioneer →</button>
@@ -51,7 +49,7 @@
         <div class="vi-camp-tier vi-camp-gold-tier" data-tier-card="founder">
           <svg class="vi-tier-ic vi-tier-card" data-tier="lifetime" viewBox="-8 -2 110 140" aria-hidden="true"><use href="#tier-card-lifetime"/></svg>
           <div class="vi-camp-tier-badge" id="camp-founder-slots">100 places</div>
-          <div class="vi-camp-tier-name" data-tier-name>Lifetime licence</div>
+          <div class="vi-camp-tier-name" data-tier-name data-plan-name="founder">Lifetime licence</div>
           <div class="vi-camp-tier-price" id="camp-price-founder" data-plan-price="founder">£149<span> once</span></div>
           <div class="vi-camp-tier-note">One payment for Pro for the life of the Vault-It service. AI extras have a monthly allowance. 14 days to change your mind.</div>
           <div class="vi-camp-tier-note vi-plan-terms" data-plan-terms="founder"></div>
@@ -71,160 +69,67 @@
   </div>
 </div>
 
-<!-- ══ PRO OFFER MODAL — returning user upsell ══ -->
-<!-- Tester welcome note (wording agreed with Pete, 31 Oct 2026; first sentence in its 30-day form now the trial clock is in). Shown once,
-     after a beta account finishes the welcome flow. -->
-<div id="tester-welcome" class="vi-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tw-title">
+<!-- Tester welcome note. Shown once, when the app first opens for a beta account. Owner, 12 Nov 2026: "We need to add a meet the Founder
+     box above this with my portrait and few deats. Reword by just encouraging to send any testing data to me. say a personal thanks
+     becoming a Vault-it Pioneer and have 30 days on me plus lifetime discounted subscriptions and a limited lifetime license pre launch."
+     Wording: Pedro's (docs/briefs/ONBOARDING_FEEDBACK_12NOV.md). Every promise is true of the app: 30 days = the Stripe trial on the monthly
+     and yearly links, the price is kept while subscribed, 100 = the Lifetime link's limit. #tw-sub (the subscription sentences) is hidden
+     for an account on a Lifetime licence (viTesterWelcome). The founder's details are only what the sign-up page already says.
+     Owner, 12 Nov 2026, on the first screenshots: "It needs to have a gold outline like the meet the dev tile but say from the founder":
+     the tile takes the brass border and the gold bar of the dashboard's Message the Dev tile, and its eyebrow reads "From the founder".
+     On the second: "remove designer Lincoln": the line under his name is "Founder, Vault-It."
+     On the third: "change the Note from Pete to Vault-orm font": the heading "A note from Pete" is written with var(--font-display), the
+     token the typeface work points at Vault-form Heading, in place of the font the shared modal title names by hand.
+     On the note: "you keep your discounted Pioneer subscription price forever": the price sentence takes his words; "as long as you stay
+     subscribed" stays after them, as the plans screen says ("Renews at the same price as long as you stay subscribed").
+     Later: "Make it more concice and bold the important phrases like vault-it pioneer  forever  1100 lifetime licences  Remove the last para
+     from Try it with your...": the note is shortened, the key phrases are bold, and everything from "Try it with your own numbers" on is
+     gone. The number is 100: the Lifetime link's limit in Stripe.
+     And: "make the font a note from Pete Vaultform condensed": the heading takes --font-vf-heading-condensed, the token named in the
+     typeface work's README, when the app defines it; until then it falls back to var(--font-display).
+     And: "Capitalise a note from pete".
+     Last: "justr remove a note from Pete": the heading is gone from the note (so the asks about its font, Vault-form Condensed and
+     capitals went with it); the dialog keeps its accessible name by aria-label, since a dialog needs one and nothing visible says it now.
+     Then: "text not bold but teal highlighted on both light and dark mode": the key phrases are teal (the --teal token) in the regular weight.
+     Then: "add a subtle glow to the teal words": they take the brand's text glow, the --tglow token.
+     Then: "remove tell Pete something, this can wait until they are in the app": the "Tell Pete something" link is gone; the note keeps
+     "Let's go". Feedback is reached in the app (the Message the Dev tile on the dashboard, the Feedback button).
+     13 Nov, the owner's answers on the open points: "2. first movers prive": the price sentence says first movers’ price in place of
+     Pioneer price; "3. yes": no feedback line in the note; "7. adjust the teal for daylight so i contrasts better": the key phrases take
+     --teal-deep in Daylight (Night keeps --teal); asked which way to make it stand out more, "medium": in Daylight they are also the medium
+     weight (500). The price sentence is also in the terms, section 6 (legal.js), word for word. -->
+<style id="vi-founder-style">
+/* Meet the founder: the compact strip on welcome screen 1 (welcome/welcome.html) and the box above the tester note. Tokens only. */
+.vi-founder-pic{display:block;flex:none;box-sizing:border-box;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--c2)}
+.vi-founder-name{font-family:var(--font-display);font-weight:700;color:var(--tx);line-height:1.2;font-size:max(15px,var(--vi-fs-3))}
+.vi-founder-thanks,.vi-founder-role{font-family:var(--font-body);color:var(--t2);line-height:1.4;font-size:max(13.5px,var(--vi-fs-2));margin-top:2px}
+.vi-founder-strip{display:flex;align-items:center;gap:12px;margin:0 0 14px;text-align:left}
+.vi-founder-strip .vi-founder-pic{width:44px;height:44px}
+@media(max-height:720px){.vi-founder-strip{gap:10px;margin-bottom:6px}.vi-founder-strip .vi-founder-pic{width:36px;height:36px}}   /* short phones: the first field stays above the pinned button */
+.vi-founder{margin:0 0 16px;text-align:left}
+.vi-founder-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 4px}
+/* the gold outline of the dashboard's Message the Dev tile: the same brass border, and a gold bar down the left edge */
+.vi-founder-row{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;padding:12px 14px 12px 17px;border:1px solid rgb(var(--brass-rgb) / .35);background:rgb(var(--ink-rgb) / .03);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.vi-founder-row::before{content:"";position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--brass),var(--gold),var(--brass))}
+.vi-founder .vi-founder-pic{width:56px;height:56px}
+@media(min-width:700px){.vi-founder .vi-founder-pic{width:72px;height:72px}}
+#tester-welcome .tw-sign{font-family:var(--font-display)}
+#tester-welcome .tw-msg strong{font-weight:inherit;color:var(--teal);text-shadow:var(--tglow)}
+[data-theme="light"] #tester-welcome .tw-msg strong{color:var(--teal-deep);font-weight:500}   /* owner, 13 Nov: "adjust the teal for daylight so i contrasts better", then "medium" to the options: the purer Daylight teal (the lighter ones fail 4.5:1) in the medium weight, not bold */   /* owner, 12 Nov: "text not bold but teal highlighted on both light and dark mode", "add a subtle glow to the teal words": --teal is the brand teal in Night and the dark teal in Daylight; --tglow is the brand's soft text glow (none in Daylight) */
+</style>
+<div id="tester-welcome" class="vi-modal-overlay hidden" role="dialog" aria-modal="true" aria-label="A note from Pete">
   <div class="vi-modal-box tw-box">
+    <div class="vi-founder" id="tw-founder">
+      <div class="vi-founder-row">
+        <img class="vi-founder-pic" src="img/founder.jpg" width="72" height="72" alt="Pete Thickett, founder of Vault-It" decoding="async">
+        <div class="vi-founder-who"><div class="vi-founder-eyebrow">From the founder</div><div class="vi-founder-name">Pete Thickett</div><div class="vi-founder-role">Founder, Vault-It.</div></div>
+      </div>
+    </div>
     <div class="vi-modal-eyebrow">BETA TESTER</div>
-    <div class="vi-modal-title" id="tw-title">A note from Pete</div>
-    <p class="tw-msg" id="tw-msg">Welcome to the Vault-It beta. Your first 30 days are free, no card needed. Type your numbers in, made-up ones are fine, and watch your deposit build your house. Anything confusing or broken, tell me. Your feedback decides what gets built next.</p>
+    <p class="tw-msg" id="tw-msg">Thank you, personally, for becoming a <strong>Vault-It Pioneer</strong>.<span class="tw-sub" id="tw-sub"> Your first <strong>30 days</strong> are on me. You keep your discounted first movers’ price <strong>forever</strong> while you stay subscribed, and you get first call on the <strong>100 Lifetime licences</strong> before launch.</span></p>
     <p class="tw-sign">Pete</p>
     <div class="tw-row">
       <button class="btn-add-data tw-go" onclick="viTesterWelcomeClose()">Let’s go</button>
-      <a class="tw-mail" href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback" onclick="viTesterWelcomeClose()">Tell Pete something</a>
-    </div>
-  </div>
-</div>
-<div id="pro-offer-modal" class="vi-modal-overlay hidden">
-  <div class="vi-modal-box vi-modal-duo">
-
-    <!-- Duo-tone header bar -->
-    <div class="vi-modal-duo-hdr">
-      <div style="width:32px;height:32px;flex-shrink:0"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="">
-  <defs>
-    <radialGradient id="vaultGlow2" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#44c0b9" stop-opacity="0.12"/>
-      <stop offset="100%" stop-color="#44c0b9" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <!-- Ambient glow -->
-  <circle cx="16.0" cy="16.0" r="16.5" fill="url(#vaultGlow2)"/>
-  <!-- Outer bezel -->
-  <circle cx="16.0" cy="16.0" r="15.0" fill="#0a1a1a" stroke="#44c0b9" stroke-width="0.6"/>
-  <!-- Bezel inner shadow ring -->
-  <circle cx="16.0" cy="16.0" r="13.8" fill="none" stroke="rgba(0,0,0,.6)" stroke-width="0.6"/>
-  <!-- Rivets -->
-  <circle cx="16.0" cy="1.7" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="23.2" cy="3.6" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="28.4" cy="8.8" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="30.3" cy="16.0" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="28.4" cy="23.2" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="23.2" cy="28.4" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="16.0" cy="30.3" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="8.8" cy="28.4" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="3.6" cy="23.2" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="1.7" cy="16.0" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="3.6" cy="8.8" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/><circle cx="8.8" cy="3.6" r="0.6" fill="#1a2a2a" stroke="#44c0b9" stroke-width="0.6" opacity="0.7"/>
-  <!-- Mounting tabs -->
-  
-    <rect x="14.9" y="0.6" width="2.2" height="1.6" rx="1" fill="#0d1f1f" stroke="#44c0b9" stroke-width="0.8" opacity="0.85"/>
-    <rect x="14.9" y="29.8" width="2.2" height="1.6" rx="1" fill="#0d1f1f" stroke="#44c0b9" stroke-width="0.8" opacity="0.85"/>
-    <rect x="0.6" y="14.9" width="1.6" height="2.2" rx="1" fill="#0d1f1f" stroke="#44c0b9" stroke-width="0.8" opacity="0.85"/>
-    <rect x="29.8" y="14.9" width="1.6" height="2.2" rx="1" fill="#0d1f1f" stroke="#44c0b9" stroke-width="0.8" opacity="0.85"/>
-    
-  <!-- Main face — dark -->
-  <circle cx="16.0" cy="16.0" r="12.5" fill="#040c10"/>
-  <!-- Inner ring 1 -->
-  <circle cx="16.0" cy="16.0" r="12.5" fill="none" stroke="#44c0b9" stroke-width="0.3" opacity="0.35"/>
-  <!-- Inner ring 2 -->
-  <circle cx="16.0" cy="16.0" r="12.0" fill="none" stroke="#44c0b9" stroke-width="0.2" opacity="0.2"/>
-  <!-- Tick marks -->
-  <line x1="16.0" y1="3.5" x2="16.0" y2="4.3" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="17.3" y1="3.5" x2="17.2" y2="4.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="18.6" y1="3.7" x2="18.5" y2="4.4" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="19.9" y1="4.0" x2="19.7" y2="4.7" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="21.1" y1="4.5" x2="20.8" y2="5.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="22.3" y1="5.2" x2="21.8" y2="5.9" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="23.4" y1="5.8" x2="23.0" y2="6.4" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="24.4" y1="6.6" x2="24.0" y2="7.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="25.4" y1="7.6" x2="24.8" y2="8.0" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="26.2" y1="8.6" x2="25.6" y2="9.0" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="26.8" y1="9.7" x2="26.1" y2="10.2" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="27.5" y1="10.9" x2="26.9" y2="11.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="28.0" y1="12.1" x2="27.3" y2="12.3" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="28.3" y1="13.4" x2="27.6" y2="13.5" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="28.5" y1="14.7" x2="27.8" y2="14.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="28.5" y1="16.0" x2="27.7" y2="16.0" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="28.5" y1="17.3" x2="27.8" y2="17.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="28.3" y1="18.6" x2="27.6" y2="18.5" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="28.0" y1="19.9" x2="27.3" y2="19.7" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="27.5" y1="21.1" x2="26.9" y2="20.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="26.8" y1="22.3" x2="26.1" y2="21.8" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="26.2" y1="23.4" x2="25.6" y2="23.0" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="25.4" y1="24.4" x2="24.8" y2="24.0" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="24.4" y1="25.4" x2="24.0" y2="24.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="23.4" y1="26.2" x2="23.0" y2="25.6" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="22.3" y1="26.8" x2="21.8" y2="26.1" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="21.1" y1="27.5" x2="20.8" y2="26.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="19.9" y1="28.0" x2="19.7" y2="27.3" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="18.6" y1="28.3" x2="18.5" y2="27.6" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="17.3" y1="28.5" x2="17.2" y2="27.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="16.0" y1="28.5" x2="16.0" y2="27.7" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="14.7" y1="28.5" x2="14.8" y2="27.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="13.4" y1="28.3" x2="13.5" y2="27.6" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="12.1" y1="28.0" x2="12.3" y2="27.3" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="10.9" y1="27.5" x2="11.2" y2="26.9" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="9.7" y1="26.8" x2="10.2" y2="26.1" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="8.6" y1="26.2" x2="9.0" y2="25.6" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="7.6" y1="25.4" x2="8.0" y2="24.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="6.6" y1="24.4" x2="7.2" y2="24.0" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="5.8" y1="23.4" x2="6.4" y2="23.0" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="5.2" y1="22.3" x2="5.9" y2="21.8" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="4.5" y1="21.1" x2="5.1" y2="20.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="4.0" y1="19.9" x2="4.7" y2="19.7" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="3.7" y1="18.6" x2="4.4" y2="18.5" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="3.5" y1="17.3" x2="4.2" y2="17.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="3.5" y1="16.0" x2="4.3" y2="16.0" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="3.5" y1="14.7" x2="4.2" y2="14.8" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="3.7" y1="13.4" x2="4.4" y2="13.5" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="4.0" y1="12.1" x2="4.7" y2="12.3" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="4.5" y1="10.9" x2="5.1" y2="11.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="5.2" y1="9.7" x2="5.9" y2="10.2" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="5.8" y1="8.6" x2="6.4" y2="9.0" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="6.6" y1="7.6" x2="7.2" y2="8.0" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="7.6" y1="6.6" x2="8.0" y2="7.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="8.6" y1="5.8" x2="9.0" y2="6.4" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="9.7" y1="5.2" x2="10.2" y2="5.9" stroke="#44c0b9" stroke-width="1.2" opacity="0.6"/><line x1="10.9" y1="4.5" x2="11.2" y2="5.1" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="12.1" y1="4.0" x2="12.3" y2="4.7" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="13.4" y1="3.7" x2="13.5" y2="4.4" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/><line x1="14.7" y1="3.5" x2="14.8" y2="4.2" stroke="#44c0b9" stroke-width="0.7" opacity="0.3"/>
-  <!-- V chevron glow (soft) -->
-  <polyline 
-    points="9.0,11.5 16.0,21.1 23.0,11.5"
-    fill="none" stroke="#44c0b9" 
-    stroke-width="3.9"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    opacity="0.18"/>
-  <!-- V chevron sharp -->
-  <polyline 
-      points="9.0,11.5 16.0,21.1 23.0,11.5"
-      fill="none" stroke="#44c0b9" 
-      stroke-width="1.5" 
-      stroke-linecap="square" 
-      stroke-linejoin="miter"/>
-  <!-- Centre dot -->
-  <circle cx="16.0" cy="16.0" r="0.8" fill="#44c0b9" opacity="0.4"/>
-</svg></div>
-      <div>
-        <div class="vi-modal-eyebrow" id="offer-badge">PLANS</div>
-        <div class="vi-modal-title" id="offer-headline">Pick a plan to keep editing.</div>
-      </div>
-      <button class="vi-modal-close" onclick="document.getElementById('pro-offer-modal').classList.add('hidden')"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>
-    </div>
-
-    <div class="vi-modal-body">
-      <p class="vi-modal-desc" id="offer-body">Your numbers stay yours either way. After day 30 the vault turns read-only until you choose a plan.</p>
-
-      <!-- Plans (owner, 31 Oct 2026: docs/MONETISATION_DECISION.md sections 8 and 9; names and prices owner, 4 Nov 2026). Prices and buttons are painted
-           from VI_PLANS by viPricePaint(): beta testers see the beta price with the later price as "£X after the beta". -->
-      <div class="vi-tier-wrap">
-        <div class="vi-tier-table">
-          <!-- Read-only: what you have after the 30 days without paying (no tier name, owner 4 Nov) -->
-          <div class="vi-tier-col vi-tier-readonly">
-            <svg class="vi-tier-lock" viewBox="0 0 24 24" aria-hidden="true"><use href="#vi-lock"/></svg>
-            <div class="vi-tier-popular">After your 30 days</div>
-            <div class="vi-tier-name" data-tier-name>Read-only</div>
-            <div class="vi-tier-price">£0</div>
-            <div class="vi-tier-saving">Read-only. Nothing you built is lost.</div>
-            <ul class="vi-tier-features">
-              <li>Every tab and number still shows</li>
-              <li>Your house as you left it, any of the six</li>
-              <li>Cloud copy and Download my data</li>
-              <li class="vi-no">Adding and editing</li>
-              <li class="vi-no">Your own 3D design and AI model</li>
-            </ul>
-            <button class="vi-tier-cta vi-tier-cta-ghost" disabled>No card, no cost</button>
-          </div>
-          <!-- Pioneer (monthly): the monthly plan -->
-          <div class="vi-tier-col vi-tier-monthly" data-tier-card="monthly">
-            <svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg>
-            <div class="vi-tier-popular">Monthly</div>
-            <div class="vi-tier-name" data-tier-name>Pioneer</div>
-            <div class="vi-tier-price" id="offer-price-monthly" data-plan-price="monthly">£5.99<span>/mo</span></div>
-            <div class="vi-tier-saving" id="offer-note-monthly">Cancel any time</div>
-            <ul class="vi-tier-features">
-              <li>The whole app, editing on</li>
-              <li>All six house types, Levels 1 to 3</li>
-              <li>Your own 3D house design</li>
-              <li>AI house model</li>
-              <li>Net worth history, projections, Connections</li>
-              <li>Version history and restore</li>
-              <li>Entrepreneur</li>
-              <li>AI screenshot reader, 30 a month</li>
-            </ul>
-            <div class="vi-tier-terms" data-plan-terms="monthly"></div>
-            <button class="vi-tier-cta vi-tier-cta-secondary" id="offer-cta-monthly" data-plan="monthly" data-cta="Become a Pioneer" data-cta-trial="Start 30 days free" onclick="showUpgrade('monthly'); document.getElementById('pro-offer-modal').classList.add('hidden')">Become a Pioneer</button>
-          </div>
-          <!-- Pioneer: the yearly plan, Pro (featured) -->
-          <div class="vi-tier-col vi-tier-featured vi-tier-yearly" data-tier-card="annual">
-            <svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg>
-            <div class="vi-tier-popular">Pro · yearly</div>
-            <div class="vi-tier-name" data-tier-name>Pioneer</div>
-            <div class="vi-tier-price" id="offer-price-annual" data-plan-price="annual">£59.99<span>/yr</span></div>
-            <div class="vi-tier-saving" id="offer-note-annual">One payment a year</div>
-            <ul class="vi-tier-features">
-              <li>Everything in the monthly plan</li>
-              <li class="vi-soon">Family mode (coming soon)</li>
-              <li>Early access to new features</li>
-              <li>Roadmap voting</li>
-            </ul>
-            <div class="vi-tier-terms" data-plan-terms="annual"></div>
-            <button class="vi-tier-cta vi-tier-cta-primary" id="offer-cta-annual" data-plan="annual" data-cta="Become a Pioneer" data-cta-trial="Start 30 days free" onclick="showUpgrade('annual'); document.getElementById('pro-offer-modal').classList.add('hidden')">Become a Pioneer</button>
-          </div>
-          <!-- Lifetime licence -->
-          <div class="vi-tier-col vi-tier-founder" data-tier-card="founder">
-            <svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg>
-            <div class="vi-tier-popular" style="color:var(--go)">100 places · testers first</div>
-            <div class="vi-tier-name" data-tier-name>Lifetime licence</div>
-            <div class="vi-tier-price" id="offer-price-founder" data-plan-price="founder" style="color:var(--go)">£149<span> once</span></div>
-            <div class="vi-tier-saving">Pioneer for the life of the service</div>
-            <ul class="vi-tier-features">
-              <li>Everything in Pioneer, for good</li>
-              <li>Lifetime badge and name in credits</li>
-              <li>Priority requests</li>
-              <li>Founders channel</li>
-              <li>AI screenshot reader, 10 a month</li>
-            </ul>
-            <div class="vi-tier-terms" data-plan-terms="founder"></div>
-            <button class="vi-tier-cta vi-tier-cta-founder" id="offer-cta-founder" data-plan="founder" data-cta="Take a place" onclick="showUpgrade('founder'); document.getElementById('pro-offer-modal').classList.add('hidden')">Take a place</button>
-          </div>
-        </div>
-      </div>
-      <button class="vi-cta-ghost" id="offer-ghost" onclick="document.getElementById('pro-offer-modal').classList.add('hidden')">Not now</button>
     </div>
   </div>
 </div>

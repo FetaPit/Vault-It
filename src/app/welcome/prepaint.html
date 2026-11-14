@@ -28,11 +28,19 @@
       }
     }
 
-    // Demo bypass — ?bypass=websummit creates a 24h session from stored profile
-    // Use this URL during live demos to skip the login screen
-    if (!reset && params.get('bypass') === 'websummit') {
-      var _bu = JSON.parse(localStorage.getItem('vi_user') || 'null');
-      var _be = (_bu && _bu.email) ? _bu.email.toLowerCase() : 'demo@vault-it.app';
+    // Demo bypass — ?bypass=websummit opens the sample for 24h with no sign-in (live demos, screenshots).
+    // Only in a browser that holds nothing of its own (owner, 8 Nov 2026: nothing in a browser is ever removed; and the card
+    // wall, 12 Nov: an account's figures never open without its plan): with a profile, a session, a sign-in or a last e-mail
+    // that is not the sample's, the link does nothing and the browser opens as usual.
+    var _bOwn = false;
+    try {
+      var _bMine = function (e) { return !!e && String(e).toLowerCase() !== 'demo@vault-it.app'; };
+      var _bU = JSON.parse(localStorage.getItem('vi_user') || 'null'), _bS = JSON.parse(localStorage.getItem('vi_session') || 'null');
+      if (_bMine(_bU && _bU.email) || _bMine(_bS && _bS.email) || _bMine(localStorage.getItem('vi_last_email'))) _bOwn = true;
+      for (var _bi = 0; _bi < localStorage.length && !_bOwn; _bi++) { if (/^sb-.+-auth-token$/.test(localStorage.key(_bi))) _bOwn = true; }
+    } catch (e) { _bOwn = true; }   // storage that cannot be read is never treated as empty
+    if (!reset && params.get('bypass') === 'websummit' && !_bOwn) {
+      var _be = 'demo@vault-it.app';
       localStorage.setItem('vi_session', JSON.stringify({ email: _be, expiry: Date.now() + 24*60*60*1000 }));
       localStorage.setItem('vi_demo_mode', 'true');
       document.write('<style>#login-overlay{display:none!important}</style>');
@@ -53,6 +61,11 @@
     if (!reset && ((u && u.email && (u.name || (u.goal != null && u.goal !== '')) && !isDemo) || (isDemo && demoA))) {
       document.write('<style>#welcome-overlay{display:none!important}</style>');
     }
+    // The card wall (paywall/plan-wall.js): a signed-in account that has answered the questions is covered from the first paint,
+    // until the server says it is on a plan. (On a developer's own machine a test may stand in for the server.)
+    var _stubOn = false; try { var _h = location.hostname; _stubOn = (location.protocol === 'file:' || _h === 'localhost' || _h === '127.0.0.1' || _h === '[::1]') && window.__viPlanStub === 'on'; } catch (e) {}
+    var _sample = isDemo && !_bOwn && String(s && s.email || '').toLowerCase() === 'demo@vault-it.app';   // the sample itself, not an account's device with the demo flag set
+    if (sessionOk && !_sample && !_stubOn && u && u.email && (u.name || (u.goal != null && u.goal !== ''))) document.documentElement.classList.add('vi-walled');
     // Belt-and-suspenders: also hide via JS after DOM is ready
     if (!reset && ((u && u.email && (u.name || (u.goal != null && u.goal !== '')) && !isDemo) || (isDemo && demoA))) {
       document.addEventListener('DOMContentLoaded', function() {

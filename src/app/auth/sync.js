@@ -13,7 +13,7 @@ var _VAULT_KEYS = ['pos_ov1','pos_al1','pos_debt1','pos_biz1','pos_ach1',
   'vi_settings','vi_user','vi_debt','vi_ov'];
 // Paid status is not user data: it comes from the profile (the server, set by Stripe), never from the synced vault, so an old
 // vault row or a restored version cannot make an account paid (secure paid gateway, migration 011).
-var VI_SERVER_KEYS = ['vi_pioneer','vi_founder','vi_plan'];
+var VI_SERVER_KEYS = ['vi_pioneer','vi_founder','vi_plan','vi_tier','vi_billing','vi_pro_kept'];
 
 // ── SAFE SYNC ─────────────────────────────────────────────────
 // Every edit to a vault key is time-stamped (vi_ts) and queued (vi_dirty) until the cloud confirms it.
@@ -460,6 +460,7 @@ function _initSupabase() {
   _supaClient.auth.onAuthStateChange(async function(event, session) {
     if (event === 'SIGNED_OUT') {
       _supaUser = null; _syncReady = false;
+      try { viPlanReset(); } catch (e) {}   // the next person to sign in on this page is asked about their own plan
       var ov = document.getElementById('login-overlay');
       if (ov) { ov.style.display = ''; _showAuthStep('email'); }
       return;
@@ -470,6 +471,7 @@ function _initSupabase() {
       // A Google or magic-link return lands here, not in _afterVerified: a different person on a device that still holds someone
       // else's data is asked first, before anything is read from or written to their account (owner, 12 Nov 2026).
       if (!(await _guardAccountSwitch(session.user.email || '', _signInKey(session.user)))) return;
+      try { viPlanReset(); viPlanCheck(); } catch (e) {}   // the card wall: ask the server about this account's plan now, not after the data has loaded
       var wiped = _dropDemoBeforeSync(_supaUser.email) || (_viBootDemo && localStorage.getItem('vi_demo_mode') !== 'true');   // v0.95: see _viRestartAfterWipe; also a tab that started on the sample after another tab dropped it
       var hydrated = await _hydrateFromSupabase(_supaUser.id);
       if (wiped) { _viRestartAfterWipe(_supaUser.email, hydrated); return; }
@@ -647,11 +649,15 @@ async function _hydrateFromSupabase(uid) {
 }
 
 // ── Paid status from the server (secure paid gateway: migration 011 + the stripe-webhook function) ──
-// Once the server keeps paid status (the profile has the Stripe columns), the profile is the only source: the device mirrors it,
-// up or down, and nothing the browser sets (a URL, an e-mail typed in, a storage flag) makes an account paid. On an older server
-// (the columns are missing) everything works as before, so the app can ship before or after the migration.
+// The profile is the only source of paid status (migration 011, applied in production): the device mirrors it, up or down, and
+// nothing the browser sets (a URL, an e-mail typed in, a storage flag) makes an account paid. A server without the paid columns
+// cannot answer, so nothing is unlocked (the device-side unlocks for an "older server" went with the card wall, 12 Nov 2026).
 var _viGateway = null;   // null = not known yet · true = the server keeps paid status · false = older server
-var VI_PAID_COLS = 'is_pioneer,is_founder,plan,paid_until,is_beta,stripe_synced_at';
+// tier / billing / pro_kept arrive with migration 015 (tier and billing period recorded separately, owner 13 Nov 2026). A server that has not had it yet answers
+// "column does not exist": the read is then repeated with the older columns and the app behaves as before (_viProfileRead).
+var VI_PAID_COLS_OLD = 'is_pioneer,is_founder,plan,paid_until,is_beta,stripe_synced_at';
+var VI_PAID_COLS = VI_PAID_COLS_OLD + ',tier,billing,pro_kept';
+var _viPaidCols = VI_PAID_COLS;
 function _viColumnMissing(err) { return !!err && (err.code === '42703' || err.code === 'PGRST204' || /does not exist|could not find .*column/i.test(err.message || '')); }
 async function viGatewayCheck() {   // works signed out too: an unknown column is an error whatever the row rules return
   if (_viGateway !== null || !_supaClient) return _viGateway;
@@ -664,41 +670,82 @@ function viPaidApply(row) {   // mirror the profile onto this device
     if (paid) localStorage.setItem('vi_pioneer', 'true'); else localStorage.removeItem('vi_pioneer');
     if (row.is_founder) localStorage.setItem('vi_founder', 'true'); else localStorage.removeItem('vi_founder');
     if (row.plan === 'monthly' || row.plan === 'yearly' || row.plan === 'founder') localStorage.setItem('vi_plan', row.plan); else if (!paid) localStorage.removeItem('vi_plan');
+    // tier, billing period and the testers' Pro flag: a mirror of the profile, up and down. Absent columns (an older server) remove them, which leaves Pro open (viPro).
+    if (row.tier === 'vaulter' || row.tier === 'pioneer' || row.tier === 'founder') localStorage.setItem('vi_tier', row.tier); else localStorage.removeItem('vi_tier');
+    if (row.billing === 'month' || row.billing === 'year' || row.billing === 'once') localStorage.setItem('vi_billing', row.billing); else localStorage.removeItem('vi_billing');
+    if (typeof row.pro_kept === 'boolean') localStorage.setItem('vi_pro_kept', row.pro_kept ? 'true' : 'false'); else localStorage.removeItem('vi_pro_kept');
     if (row.is_beta) localStorage.setItem('vi_beta', 'true');
     var u = JSON.parse(localStorage.getItem('vi_user') || 'null');
     if (u && !!u.pro !== paid) { u.pro = paid; localStorage.setItem('vi_user', JSON.stringify(u)); if (typeof _vaultItUser !== 'undefined') _vaultItUser = u; }
   } catch (e) {}
   if (paid) {
     var pend = null; try { pend = localStorage.getItem('vi_pay_pending'); localStorage.removeItem('vi_pay_pending'); } catch (e) {}
-    if (pend && !was) { try { showToast(row.is_founder ? 'Welcome! Your Lifetime licence is confirmed.' : row.plan === 'monthly' ? 'Welcome, Pioneer. Your plan is confirmed.' : 'Welcome, Pioneer. Your payment is confirmed.'); } catch (e) {} }
+    if (pend && !was) { try { showToast(row.is_founder ? 'Welcome! Your ' + VI_PLANS.founder.name + ' is confirmed.' : 'Welcome, ' + VI_PLANS[row.plan === 'monthly' ? 'monthly' : 'annual'].name + '. Your plan is confirmed.'); } catch (e) {} }
   }
+  try { if (typeof viBizGate === 'function') viBizGate(); } catch (e) {}   // the tier may have changed with no change of paid status
   if (was !== paid) { try { if (typeof applyPaywall === 'function') applyPaywall(); } catch (e) {} try { if (typeof renderPioneerCard === 'function') renderPioneerCard(); } catch (e) {} try { if (row.is_founder) viApplyFounderBadge(); } catch (e) {} }
 }
 
-async function _syncPioneerFromProfile(uid) {
-  if (!_supaClient) return null;
-  var row = null;
+// Read this account's paid columns from the server: supabase-js first, then a direct request with the saved sign-in (a frozen
+// phone tab can leave supabase-js stalled). The card wall opens on this answer and nothing else (paywall/plan-wall.js), so every
+// outcome is told apart:  { row } the profile · { none } signed in, no profile row · { auth } no usable sign-in on this device ·
+// { old } an older server without the paid columns · { err } no answer.
+async function _viProfileRead(uid) {
+  var r = await _viProfileReadCols(uid);
+  if (r && r.old && _viPaidCols === VI_PAID_COLS) { _viPaidCols = VI_PAID_COLS_OLD; r = await _viProfileReadCols(uid); }   // no tier columns yet: ask for the older ones
+  return r;
+}
+async function _viProfileReadCols(uid) {
+  var why = '', lost = false;
+  if (_supaClient && !_sjsStalled) {
+    var ask = function () { return _withTimeout(_supaClient.from('profiles').select(_viPaidCols).eq('id', uid).single().then(function (x) { return x; }, function (e) { return { error: e }; }), 8000, null); };
+    var r; try { r = await ask(); } catch (e) { r = { error: e }; }
+    if (r && r.error && /jwt|expired|401/i.test(String(r.error.message || r.error.code || '')) && await _refreshAuth()) { try { r = await ask(); } catch (e) { r = { error: e }; } }
+    if (r && !r.error && r.data) return { row: r.data };
+    if (r && _viColumnMissing(r.error)) return { old: true };
+    if (r && r.error && r.error.code === 'PGRST116') {   // no row came back: the account has none, or supabase-js has lost its sign-in and asked as nobody
+      var g = null; try { g = await _withTimeout(_supaClient.auth.getSession(), 3000, null); } catch (e) {}
+      if (g && g.data && g.data.session && g.data.session.user && g.data.session.user.id === uid) return { none: true };
+      lost = true;
+    } else { why = !r ? 'connection stalled' : String((r.error && (r.error.message || r.error.code)) || 'no data'); if (!r) _sjsStalled = true; }
+  }
   try {
-    var res = await _supaClient.from('profiles').select(VI_PAID_COLS).eq('id', uid).single();
-    if (res && !res.error && res.data) { _viGateway = true; row = res.data; viPaidApply(row); }
-    else if (res && _viColumnMissing(res.error)) {
-      _viGateway = false;   // older server: as before, a paid flag on the profile is copied down
-      var old = await _supaClient.from('profiles').select('is_pioneer').eq('id', uid).single();
-      if (old.data && old.data.is_pioneer && localStorage.getItem('vi_pioneer') !== 'true') _lsOrig.call(localStorage, 'vi_pioneer', 'true');
-    }
+    var tok = await _freshAccessToken(); if (!tok) return (lost || !_supaClient) ? { auth: true } : { err: why || 'no saved session on this device' };
+    var get = async function (tk) {
+      var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 12000);
+      var res = await fetch(_SUPA_URL + '/rest/v1/profiles?select=' + _viPaidCols + '&id=eq.' + encodeURIComponent(uid), { headers: { apikey: _SUPA_KEY, authorization: 'Bearer ' + tk }, signal: ctl.signal });
+      clearTimeout(t); return res;
+    };
+    var res = await get(tok);
+    if (res.status === 401) { var nt = await _directRefresh(); if (!nt) return { auth: true }; res = await get(nt); if (res.status === 401) return { auth: true }; }
+    if (res.status === 400) { var bj = null; try { bj = await res.json(); } catch (e) {} if (_viColumnMissing(bj)) return { old: true }; }
+    if (!res.ok) return { err: (why ? why + '; ' : '') + 'server said ' + res.status };
+    var j = await res.json(); if (!Array.isArray(j)) return { err: 'unexpected reply' };
+    return j.length ? { row: j[0] } : { none: true };
+  } catch (e) { return { err: (why ? why + '; ' : '') + 'no connection' }; }
+}
+async function _syncPioneerFromProfile(uid) {
+  if (!uid) return null;
+  var row = null, res = null;
+  try {
+    res = await _viProfileRead(uid);
+    if (res.row) { _viGateway = true; row = res.row; viPaidApply(row); }
+    else if (res.old) _viGateway = false;   // a server without the paid columns cannot say who is on a plan: nothing is copied down, the wall stays shut
   } catch(e) {}
-  try { viTrialRefresh(); } catch (e) {}   // the account date is known now: the trial line and Settings follow it
+  try { viPlanAnswer(uid, res && res.old ? null : res); } catch (e) {}   // the card wall follows the server's answer (an older server cannot answer: closed)
+  try { _refreshPioneerSettingsUI(); } catch (e) {}   // Settings follows the server's answer
   return row;
 }
 
 async function _initSupabaseSession() {
-  if (!_supaClient) return;
+  if (!_supaClient) { if (document.readyState === 'complete') { try { viPlanNoSession(); } catch (e) {} } return; }   // the library never loaded: the card wall asks with the saved sign-in, or says to sign in again
   try {
     var res = await _withTimeout(_supaClient.auth.getSession(), 6000, null);
     var session = res && res.data && res.data.session;
-    if (!session || !session.user) return;
+    if (!session || !session.user) { try { viPlanNoSession(); } catch (e) {} return; }
     _supaUser = session.user;
     if (!(await _guardAccountSwitch(session.user.email || '', _signInKey(session.user)))) return;   // a session found at start (the page a Google return opens): the same question as the auth-state path, before any read or upload
+    try { viPlanCheck(); } catch (e) {}   // the card wall: ask the server about this account's plan now, not after the data has loaded
     var wiped = _dropDemoBeforeSync(_supaUser.email);   // v0.95: see _viRestartAfterWipe
     var hydrated = await _hydrateFromSupabase(_supaUser.id);
     if (wiped) { _viRestartAfterWipe(_supaUser.email, hydrated); return; }

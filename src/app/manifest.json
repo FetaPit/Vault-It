@@ -192,6 +192,11 @@
    "offset": 0
   },
   {
+   "file": "paywall/plan-wall.html",
+   "anchor": "<!-- ══ PLAN WALL: nobody uses the app",
+   "offset": 0
+  },
+  {
    "file": "shell/topnav.html",
    "anchor": "  <div class=\"nav-br",
    "offset": 1
@@ -467,6 +472,11 @@
    "offset": 1
   },
   {
+   "file": "paywall/plan-wall.js",
+   "anchor": "// ── PLAN WALL (owner, 12 Nov 2026",
+   "offset": 0
+  },
+  {
    "file": "shell/swipe-hints.js",
    "anchor": "// ── swipe hints: a",
    "offset": 0
@@ -523,8 +533,8 @@
   },
   {
    "file": "paywall/pro-offer.js",
-   "anchor": "// Shows on every lo",
-   "offset": 2
+   "anchor": "// VISIT COUNTER (the plans prompt",
+   "offset": 1
   },
   {
    "file": "welcome/welcome.js",

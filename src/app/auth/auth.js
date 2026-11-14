@@ -152,6 +152,7 @@ async function signOut() {
   var _viaG = false; try { _viaG = localStorage.getItem(VI_AUTH_VIA) === 'google'; } catch (e) {}
   if (!confirm(_viaG ? 'Sign out? You can get back in with Google, or with your email.' : 'Sign out? You can get back in with just your email and PIN.')) return;
   localStorage.removeItem('vi_session');
+  try { localStorage.removeItem('vi_pay_pending'); } catch (e) {}   // a remembered return from Stripe is this person's, not the next one's
   try { if (_supaClient) await _withTimeout(_supaClient.auth.signOut({ scope: 'local' }).catch(function () {}), 2500, null); } catch (e) {}
   try { for (var k = _localSessionKey(), n = 0; k && n < 5; k = _localSessionKey(), n++) localStorage.removeItem(k); } catch (e) {}
   location.reload();
@@ -556,6 +557,7 @@ async function _askAccountSwitch(owner, now, email) {
 async function _afterVerified(user, email) {
   _supaUser = user; _viSignedInAt = Date.now();
   if (!(await _guardAccountSwitch(email, _signInKey(user)))) return;
+  try { viPlanReset(); viPlanCheck(); } catch (e) {}   // the card wall: ask the server about this account's plan
   var wiped = _dropDemoBeforeSync(email);   // v0.95 (owner, 8 Nov, tester on a new device): the sample is wiped from storage first; its keys cannot be written again until the page restarts
   var hydrated = await _hydrateFromSupabase(_supaUser.id);
   if (wiped) { _viRestartAfterWipe(email, hydrated); return; }   // every tab still holds the sample in memory: restart from storage (the account's own rows, or nothing)
@@ -1037,7 +1039,6 @@ function _completeAuth(email) {
         currency: s.currency || 'GBP',
         updated_at: new Date().toISOString()
       };
-      if (_viGateway !== true) prow.is_pioneer = localStorage.getItem('vi_pioneer') === 'true';   // older server only: the server ignores it once it keeps paid status
       _supaClient.from('profiles').upsert(prow, { onConflict: 'id' });
       _flushDirty();   // push anything not yet confirmed by the cloud
     } catch(e) {}

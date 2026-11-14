@@ -34,15 +34,11 @@ let fails=0; const ok=(c,m)=>{ if(!c){fails++;console.log('FAIL:',m);} else cons
   await p.evaluate(()=>showTab('budget')); await p.waitForTimeout(700);
   const sk=await p.evaluate(()=>{const w=document.getElementById('bd-sankey').parentElement;return{arrow:w.querySelector('.swipe-arrow.r').classList.contains('on'),cap:getComputedStyle(w.querySelector('.swipe-cap')).display,sx:document.documentElement.scrollWidth-innerWidth};});
   console.log(JSON.stringify(sk)); ok(sk.arrow&&sk.cap!=='none','cash-flow diagram: swipe arrow and caption'); ok(sk.sx<=1,'no horizontal page scroll on mobile');
-  // subscription pop-up can be left
-  await p.evaluate(()=>{document.getElementById('pro-offer-modal').classList.remove('hidden');}); await p.waitForTimeout(400);
-  const hdr=await p.evaluate(()=>{const c=document.querySelector('#pro-offer-modal .vi-modal-close').getBoundingClientRect();return{top:c.top,bottom:c.bottom,vis:c.top>=0&&c.bottom<=innerHeight};});
-  await p.evaluate(()=>{document.getElementById('pro-offer-modal').scrollTop=2000;}); await p.waitForTimeout(200);
-  const hdr2=await p.evaluate(()=>{const c=document.querySelector('#pro-offer-modal .vi-modal-close').getBoundingClientRect();return c.top>=0&&c.bottom<=innerHeight;});
-  ok(hdr.vis&&hdr2,'upgrade pop-up: ✕ stays on screen even when scrolled to the bottom');
-  await p.keyboard.press('Escape'); ok(await p.evaluate(()=>document.getElementById('pro-offer-modal').classList.contains('hidden')),'Esc closes it');
-  await p.evaluate(()=>{document.getElementById('pro-offer-modal').classList.remove('hidden');}); await p.mouse.click(5,300);
-  ok(await p.evaluate(()=>document.getElementById('pro-offer-modal').classList.contains('hidden')),'tapping outside closes it');
+  // a pop-up can be left (the tester note; the plans pop-up went with the in-app trial, 12 Nov 2026)
+  await p.evaluate(()=>{document.getElementById('tester-welcome').classList.remove('hidden');}); await p.waitForTimeout(300);
+  await p.keyboard.press('Escape'); ok(await p.evaluate(()=>document.getElementById('tester-welcome').classList.contains('hidden')),'Esc closes a pop-up');
+  await p.evaluate(()=>{document.getElementById('tester-welcome').classList.remove('hidden');}); await p.mouse.click(5,300);
+  ok(await p.evaluate(()=>document.getElementById('tester-welcome').classList.contains('hidden')),'tapping outside closes it');
   await p.context().close();
   ok(errs.length===0,'no page errors '+errs.join('|'));
   await b.close(); console.log(fails?'FAILURES '+fails:'ALL PASSED');

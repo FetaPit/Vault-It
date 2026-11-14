@@ -121,7 +121,7 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
   #topnav .vi-usp,#topnav .vi-pro{top:4px;right:4px}
   #left-sidebar{top:46px!important}
   #app-footer{position:static;margin-top:16px;padding-right:64px}   /* v0.8: the text wraps clear of the fixed Feedback button */
-  html body #sync-banner,html body #trial-banner{bottom:calc(var(--footer-h) + 6px)!important}
+  html body #sync-banner{bottom:calc(var(--footer-h) + 6px)!important}
 }
 /* tablets, unfolded folds and wider (v0.7 E1, owner 1 Nov; Pedro B): from 600 px the tabs sit at the top as on desktop, icons only,
    22 px icons in 44 px targets, spread evenly; the active tab is outlined in its own colour. Phones (599 and under) keep the bottom bar. */

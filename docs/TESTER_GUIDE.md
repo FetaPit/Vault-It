@@ -11,6 +11,20 @@ Thanks for trying Vault-It, a UK personal-finance app that turns your numbers in
 3. You are in. No PIN is asked for at sign-up. On your next visit (or in Settings, Sign-in PIN) you can set a **6-digit PIN** (not something easy to guess like 123456 or 000000); from then on you sign in on any device with just your **email + PIN**, no code needed.
    - Five wrong PINs lock sign-in for 15 minutes. An email code always works as a fallback ("Forgot PIN?").
 
+## Plans and paying
+
+After the set-up questions you choose a plan. Nobody uses the app without one.
+
+- **Vaulter** (monthly): £3.99 a month while the beta is open, £5.99 after.
+- **Pioneer** (yearly): £49.99 a year while the beta is open, £59.99 after.
+- **Lifetime licence**: one payment of £99 while the beta is open (100 places), charged at checkout.
+
+Vaulter and Pioneer start with **30 days free**. Your card is taken at checkout by Stripe and first charged on day 31. Cancel before then and you pay nothing. To cancel, email **hello@vault-it.co**. We never see or store your card details.
+
+If a plan ends, the app closes until you choose a plan again. Nothing you entered is deleted, and you can download it from the plans screen.
+
+Want to look before you choose? The sample at https://vault-it.co/demo-a needs no account and no card.
+
 ## What to try
 
 - **Set-up questions** — answer honestly, but use figures you are comfortable with. Test data is fine.

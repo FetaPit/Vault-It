@@ -3,8 +3,8 @@
 // ══════════════════════════════════════════════════════════════
 
 function _isPro() {
-  // Trial then paid (31 Oct): the 30 days give the full app, and the read-only vault after them still shows everything that was
-  // built, so no feature is hidden by this check any more. Paid status itself is viPaid(); viTier() names the plan (monthly and yearly are both Pioneer; founder = Lifetime licence).
+  // Every plan is the whole app (and with the card wall, 12 Nov 2026, an account in the app is on a plan), so no feature is hidden
+  // by this check. Paid status itself is viPaid(); viTier() names the plan (founder = Lifetime licence).
   return true;
 }
 
@@ -241,7 +241,7 @@ function wStep2Submit() {
   // Hide overlay immediately — user is in the app
   var ov = document.getElementById('welcome-overlay'); if (ov) ov.style.display = 'none';
   viSetView(_wView);   // the view chosen on this step (Simplified unless they picked Advanced)
-  setTimeout(function(){ if (window.viAfterWelcome) viAfterWelcome(); else viTesterWelcome(); }, 700);   // Pete's note for beta testers, once, then the tour, once
+  setTimeout(function(){ viWhenOpen(function(){ if (window.viAfterWelcome) viAfterWelcome(); else viTesterWelcome(); }); }, 700);   // Pete's note for beta testers, once, then the tour, once
   applyPaywall();
   updateSidebar();
   if (typeof renderJourney === 'function') renderJourney();
@@ -257,7 +257,7 @@ function wStep2Submit() {
 function wStep2Skip() {
   var ov=document.getElementById('welcome-overlay'); if(ov) ov.style.display='none';
   viSetView(_wView);
-  setTimeout(function(){ if (window.viAfterWelcome) viAfterWelcome(); else viTesterWelcome(); }, 700);
+  setTimeout(function(){ viWhenOpen(function(){ if (window.viAfterWelcome) viAfterWelcome(); else viTesterWelcome(); }); }, 700);
   if (typeof journeyState !== 'undefined' && _wSelectedVal) {
     journeyState.stageOverride = parseInt(_wSelectedVal) || 0;
     jrnySaveState();
@@ -320,10 +320,17 @@ function getCoreTaskStatus() {
 }
 
 function applyPaywall() {
-  var pioneer = _isPro();
-  var bizGate = document.getElementById('pro-gate-biz');
-  if (bizGate) bizGate.style.display = pioneer ? 'none' : '';
+  try { viPlanGate(); } catch (e) {}   // the card wall: after the questions, and whenever paid status changes
+  viBizGate();
   updateProGate();
+}
+// The Entrepreneur tab is a Pro feature (owner, 13 Nov 2026, "Gate, testers keep"): Pioneer, Lifetime and the testers who keep it see the tab, a Vaulter sees the gate
+// and nothing under it. Only the screen is covered: nothing saved is changed or removed.
+function viBizGate() {
+  var locked = false; try { locked = typeof viPro === 'function' && !viPro() && typeof viPaid === 'function' && viPaid(); } catch (e) {}
+  var bizGate = document.getElementById('pro-gate-biz');
+  if (bizGate) bizGate.style.display = locked ? '' : 'none';
+  var tab = document.getElementById('tab-biz'); if (tab) tab.classList.toggle('vi-biz-locked', locked);
 }
 function updateProGate() {
   var tl = document.getElementById('pro-gate-tasklist');

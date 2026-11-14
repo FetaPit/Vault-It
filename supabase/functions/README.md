@@ -171,8 +171,17 @@ Stripe ids on its profile: a trigger silently keeps the server's values.
 
 Handled: `checkout.session.completed` and `checkout.session.async_payment_succeeded` (the account comes from `client_reference_id`,
 which the app adds to every Payment Link; else the Stripe customer; else the checkout e-mail), `customer.subscription.created`,
-`.updated`, `.deleted` (renewals, late payments, cancellations). The plan comes from the Payment Link id, then the link's
-`metadata.plan`, then the price. Test-mode events are ignored unless `STRIPE_ALLOW_TEST=1`.
+`.updated`, `.deleted` (renewals, late payments, cancellations). A payment says its **tier** (`vaulter`, `pioneer`, `founder`) and **billing**
+(`month`, `year`, `once`), read from our own Payment Link and price ids, then `metadata.tier` + `metadata.interval` (what the 13 Nov 2026 links,
+prices and subscriptions carry), then the old `metadata.plan` names (monthly = Vaulter monthly, yearly = Pioneer yearly). The interval alone is
+never used to guess a tier. A checkout whose tier cannot be told changes nothing; a subscription event whose tier cannot be told still updates
+status and dates and leaves the tier as recorded. Test-mode events are ignored unless `STRIPE_ALLOW_TEST=1`.
+
+**Tier and billing (migration 015, 13 Nov 2026; written and tested, not applied).** `profiles.tier`, `profiles.billing` and `profiles.pro_kept`;
+`plan` stays as a mirror for older app builds (vaulter = monthly, pioneer = yearly, founder = founder). `pro_kept` is true for an account already on
+Vaulter when 015 is applied (owner, 13 Nov: "Gate, testers keep"): it keeps the Pro features while it stays on that subscription. Run order, needs
+Pete's yes for each production step: apply `015_plan_tier.sql`, then deploy `stripe-webhook` (an older database refuses the new arguments, so the
+function must not go first), then release the app, then switch the new Payment Links on (they are inactive in Stripe until then).
 
 **Go-live order (needs Pete's yes; production database and functions).** Done 31 Oct 2026: steps 1 to 3 (endpoint `we_1UWd6t9mgKf6Hntyhibk3fEK`) and 5; step 4 (the secret) is Pete's, in the Supabase dashboard.
 1. Apply `supabase/migrations/011_paid_gateway.sql`.
@@ -183,9 +192,9 @@ which the app adds to every Payment Link; else the Stripe customer; else the che
 4. `supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_…` (comma-separate two while rotating).
 5. Release the app (it detects the new columns and switches to the profile by itself; on an older server it behaves as before).
 6. Check: `select id, kind, result, received_at from stripe_events order by received_at desc limit 20;` A `no_user` row has the
-   checkout e-mail so it can be linked by hand: `update profiles set is_pioneer = true, plan = 'monthly' where id = '…';`
+   checkout e-mail so it can be linked by hand: `update profiles set is_pioneer = true, plan = 'monthly', tier = 'vaulter', billing = 'month' where id = '…';` (Pioneer yearly: `plan = 'yearly', tier = 'pioneer', billing = 'year'`; Lifetime: `is_founder = true, plan = 'founder', tier = 'founder', billing = 'once'`)
 
-Tests: `tests/test_011.mjs` (database, real Postgres), `tests/test_stripe_server.js` (function), `tests/test_paid_gateway.js` (app).
+Tests: `tests/test_011.mjs` and `tests/test_015.mjs` (database, real Postgres), `tests/test_stripe_server.js` (function), `tests/test_paid_gateway.js` (app).
 
 ## Tester feedback (tester-feedback, feedback-digest)
 

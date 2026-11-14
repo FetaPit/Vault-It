@@ -44,6 +44,9 @@
   margin-bottom: 6px;
   line-height: 1.3;
 }
+/* the first screen's offer: teal, with "free" in gold; same heading font, size and weight (owner, 12 Nov 2026) */
+.welcome-h2.wz-offer { color: var(--teal); }
+.welcome-h2.wz-offer .wz-free { color: var(--gold); }
 .welcome-sub {
   font-family: 'Syne', sans-serif;
   font-size: max(14.5px,var(--vi-fs-3));
@@ -57,7 +60,6 @@
 .welcome-foot{position:sticky;bottom:-24px;z-index:2;margin:14px 0 -24px;padding:10px 0 24px;background:var(--c1);border-top:1px solid var(--bd)}   /* -24px = the box's bottom padding, so nothing shows under the pinned button */
 .welcome-foot .welcome-cta{min-height:44px;font-size:max(14px,var(--vi-fs-3));color:#fff}
 .welcome-h2{text-wrap:balance}
-#offer-headline{font-weight:700}
 @media(max-height:720px){.welcome-icon{display:none!important}.welcome-tagline{display:none}.welcome-box{padding-top:18px;margin-top:8px;margin-bottom:8px}.welcome-head{margin-bottom:10px!important;padding-bottom:10px!important}.welcome-intro{margin-bottom:8px!important}#w-step-dots{margin-bottom:10px!important}.welcome-h2{margin-bottom:4px}.welcome-sub{margin-bottom:10px}}   /* a short phone: the form shows above the pinned button */
 .welcome-congrats{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--tx);line-height:1.3;margin-bottom:6px}
 @media(min-width:700px){.welcome-congrats{font-size:20px}}
@@ -198,4 +200,7 @@
 }
 .pro-gate-btn:hover { transform: scale(1.03); box-shadow: 0 0 20px rgb(var(--brass-rgb) / .4); }
 .tab-panel.gated { position: relative; overflow: hidden; min-height: 300px; }
+/* Entrepreneur is a Pro feature (viBizGate, welcome.js): a Vaulter sees the gate and nothing under it. Only the screen is covered, nothing saved is touched. */
+#tab-biz.vi-biz-locked > div > :not(#pro-gate-biz) { display: none !important; }
+#tab-biz.vi-biz-locked .pro-gate-overlay { margin: 0 auto; max-width: 420px; text-align: center; display: flex; flex-direction: column; align-items: center; }
 

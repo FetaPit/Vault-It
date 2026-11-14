@@ -39,7 +39,7 @@ function context(){
   return {build:document.lastModified,host:location.host,tab:TAB,viewport:innerWidth+'x'+innerHeight,dpr:window.devicePixelRatio||1,touch:'ontouchstart' in window,
     theme:document.documentElement.dataset.theme||'dark',flags:flags,standalone:!!(window.matchMedia&&matchMedia('(display-mode: standalone)').matches),online:navigator.onLine,
     sync:(function(){try{return JSON.parse(localStorage.getItem('vi_dirty')||'[]').length?'waiting':'ok'}catch(e){return '?'}})(),
-    trialDay:(function(){try{return viTrialDay()}catch(e){return null}})(),ua:navigator.userAgent.slice(0,160),errors:ERRS.slice(-20),trail:TRAIL.slice(-50)};
+    trialDay:(function(){try{return viAccountDay()}catch(e){return null}})(),ua:navigator.userAgent.slice(0,160),errors:ERRS.slice(-20),trail:TRAIL.slice(-50)};
 }
 /* ---- the activity log: batched, sent every minute and when the page is hidden ---- */
 var _tok=null;
@@ -149,8 +149,8 @@ var VI_FB_SURVEYS={
     {q:'who',t:'Who do you think would get the most from it?',x:'Type your answer'},
     {q:'improve',t:'What one thing would make it more useful to you?',x:'Type your answer'},
     {q:'distrust',t:'Is there anything you do not trust about it?',c:['No','Yes'],x:'What? (optional)'}]},
-  day25:{t:'Your free 30 days end soon',n:'Two minutes, five questions. Honest answers help most, the critical ones especially.',q:[
-    {q:'keep',t:'Will you keep using Vault-It after your free 30 days?',c:['Yes','Not sure','No']},
+  day25:{t:'A few weeks in',n:'Two minutes, five questions. Honest answers help most, the critical ones especially.',q:[
+    {q:'keep',t:'Will you keep using Vault-It?',c:['Yes','Not sure','No']},
     {q:'change_mind',t:'What would change your mind, or make it a clear yes?',x:'Type your answer'},
     {q:'price',t:'At the tester price of £3.99 a month, Vault-It feels:',c:['Too cheap to trust','A bargain','About right','Getting expensive','Too expensive']},
     {q:'recommend',t:'How likely are you to recommend it to a friend?',s:1},
@@ -224,9 +224,9 @@ window.viFbAskNext=async function(skip){
   if(r&&!r.error&&r.data&&r.data.ok){rec('question_sent',a.k);viFbAskClose();try{showToast('Thank you. That really helps.')}catch(e){}return}
   msg.innerHTML='Could not send just now. Try again in a moment, or email <a href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback">hello@vault-it.co</a>.';
 };
-/* when to ask: check-ins on trial days 3, 14 and 25 come first; otherwise the oldest waiting question */
+/* when to ask: check-ins on the account's days 3, 14 and 25 come first; otherwise the oldest waiting question */
 function askDue(){
-  if(!signedIn()||_asked)return;var day=0;try{day=viTrialDay()}catch(e){}
+  if(!signedIn()||_asked)return;var day=0;try{day=viAccountDay()}catch(e){}
   var sv=day>=25&&day<=30?'day25':day>=14&&day<=18?'day14':day>=3&&day<=7?'day3':null;
   if(sv&&!done(sv)){viFbMoment(sv,true);return}
   var pq=pendingGet().filter(function(k){return !done(k)});if(pq.length)viFbMoment(pq[0],true);
