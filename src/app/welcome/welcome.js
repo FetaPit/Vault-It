@@ -75,7 +75,8 @@ function wNext() {
 function wBack() { if (_wzAt > 1) wGo(_wzAt - 1); }
 function _wCheckId() {
   var n = document.getElementById('w-name'), e = document.getElementById('w-email');
-  var email = ((e && e.value) || '').trim();   // the first name is optional (owner, 10 Nov 2026); signed in, the email comes from the session
+  var known = viWelcomeEmailSync();   // signed in: the registered address, whatever is in the box
+  var email = known || ((e && e.value) || '').trim();   // the first name is optional (owner, 10 Nov 2026); signed in, the email comes from the session
   if (!email || !email.includes('@')) {
     var f = document.getElementById('w-email-field'); if (f) f.hidden = false;
     if (e) e.style.borderColor = 'var(--re)'; showToast('Please enter a valid email address'); return false;
@@ -85,17 +86,51 @@ function _wCheckId() {
 // signed in (Google or an emailed code): the email is known, so it is not asked again; Google also gives the first name
 function viWelcomePrefill() {
   var u = (typeof _supaUser !== 'undefined' && _supaUser) || null;
-  if (!u || !u.email) return false;
+  if (!u || !u.email) { viWelcomeEmailSync(); return false; }
   var md = u.user_metadata || {};
-  var e = document.getElementById('w-email'); if (e) e.value = u.email;
-  var f = document.getElementById('w-email-field'); if (f) f.hidden = true;
-  var se = document.getElementById('wz-signed-email'); if (se) se.textContent = u.email;
-  var si = document.getElementById('wz-signed'); if (si) si.hidden = false;
+  viWelcomeEmailSync();
   var n = document.getElementById('w-name');
   var first = String(md.given_name || md.full_name || md.name || '').trim().split(/\s+/)[0] || '';
   if (n && !n.value && first) n.value = first.slice(0, 40);
   return true;
 }
+// The address this person signed in or registered with, read at once from what the page already holds (owner, 12 Nov 2026: "Do not ask
+// for email address as it should auto populate from registering before"). Never vi_last_email (a shared device remembers the last
+// person), never the sample's address. Empty when nothing is known: then, and only then, the welcome asks for it.
+function viKnownEmail() {
+  var good = function (e) { e = String(e || '').trim(); return e.indexOf('@') > 0 && e.toLowerCase() !== 'demo@vault-it.app' ? e : ''; };
+  try { if (typeof _supaUser !== 'undefined' && _supaUser && good(_supaUser.email)) return good(_supaUser.email); } catch (e) {}
+  try { if (typeof _authOTP !== 'undefined' && _authOTP && good(_authOTP.email)) return good(_authOTP.email); } catch (e) {}
+  try { var k = typeof _localSessionKey === 'function' ? _localSessionKey() : null, s = k ? JSON.parse(localStorage.getItem(k) || 'null') : null;
+    if (s && s.user && good(s.user.email)) return good(s.user.email); } catch (e) {}
+  try { if (localStorage.getItem('vi_demo_mode') === 'true') return ''; } catch (e) {}
+  try { var v = JSON.parse(localStorage.getItem('vi_session') || 'null'); if (v && v.expiry > Date.now() && good(v.email)) return good(v.email); } catch (e) {}
+  try { var u = JSON.parse(localStorage.getItem('vi_user') || 'null'); if (u && good(u.email)) return good(u.email); } catch (e) {}
+  return '';
+}
+// shows "Signed in as" with the known address, or the e-mail box when none is known; returns the address
+function viWelcomeEmailSync() {
+  var known = viKnownEmail();
+  var e = document.getElementById('w-email'), f = document.getElementById('w-email-field');
+  var se = document.getElementById('wz-signed-email'), si = document.getElementById('wz-signed');
+  if (known) { if (e) e.value = known; if (se) se.textContent = known; }
+  if (f) f.hidden = !!known;
+  if (si) si.hidden = !known;
+  return known;
+}
+// the sign-in card closing (Google, an e-mailed code, a PIN, a kept session) is when the address becomes known on this page
+(function () {
+  var run = function () { try { viWelcomeEmailSync(); } catch (e) {} };
+  var watch = function () {
+    run();
+    try {
+      var mo = new MutationObserver(run), lo = document.getElementById('login-overlay');
+      if (lo) mo.observe(lo, { attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+      mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-ah'] });
+    } catch (e) {}
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
+})();
 // the plan: guidance on using the tracker, never a product pick (FCA: information, not advice)
 var VI_PLAN_PHASE_TEXT = [
   'Get every debt and bill in one place, so nothing takes you by surprise.',
@@ -193,6 +228,33 @@ function wStep1Next() {
   wGo(2);
 }
 
+// Target Deposit Value: the typed pounds as a share of the typed Target Home Value, kept unrounded; null when it cannot be used
+// (empty, no home value, or outside the House builder's 1% to 60%), and then nothing is saved for it
+function _wDepNums() {
+  var f = function (id) { var x = document.getElementById(id), v = x ? parseFloat(x.value) : NaN; return isFinite(v) && v > 0 ? v : 0; };
+  return { home: Math.round(f('w-house')), dep: Math.round(f('w-deposit') * 100) / 100 };
+}
+function _wDepPct() {
+  var n = _wDepNums(); if (!n.home || !n.dep) return null;
+  var p = n.dep / n.home * 100;
+  return (p >= 1 && p <= 60) ? p : null;
+}
+function wDepHint() {
+  var h = document.getElementById('w-dep-hint'); if (!h) return;
+  var n = _wDepNums(), one = function (p) { return (Math.round(p * 10) / 10).toLocaleString('en-GB'); };
+  var def = (typeof state !== 'undefined' && state && +state.depositPct > 0) ? +state.depositPct : 20;
+  var money = function (v) { return '£' + Math.round(v).toLocaleString('en-GB'); };
+  var t;
+  if (!n.dep) t = 'Leave it empty and the House builder uses a ' + one(def) + '% deposit' + (n.home ? ': ' + money(n.home * def / 100) + '.' : ' of the home value.');
+  else if (!n.home) t = 'Add the Target Home Value too, so the deposit can be set.';
+  else {
+    var p = n.dep / n.home * 100;
+    t = (p >= 1 && p <= 60) ? 'That is ' + one(p) + '% of the home value. You can change it in the House builder.'
+      : 'That is ' + one(p) + '% of the home value. Choose between 1% and 60%, or leave it empty.';
+  }
+  h.textContent = t; h.hidden = false;
+}
+
 // Step 2 — full profile submit
 function wStep2Submit() {
   var income   = parseFloat(document.getElementById('w-income')   && document.getElementById('w-income').value)   || 0;
@@ -201,21 +263,31 @@ function wStep2Submit() {
   var phone    = (document.getElementById('w-phone-s1') || document.getElementById('w-phone') || {}).value || '';
 
   // Persist profile into app state
+  // Income is the starting figure (owner, 8 and 10 Nov 2026): one take-home row; each income stream added in the Budget comes off it (bdDrawRough)
   if (income > 0 && typeof ovState !== 'undefined') {
     if (!ovState.income) ovState.income = [];
-    if (ovState.income.length === 0) ovState.income.push({ id: Date.now(), name: 'Salary / take-home', amount: income, cat: 'salary', _onboarding: true });
+    if (ovState.income.length === 0) ovState.income.push({ id: Date.now(), name: 'Salary / take-home', amount: Math.round(income * 100) / 100, cat: 'salary', _onboarding: true });
   }
-  // Expenses are NOT pre-filled: the Budget tab walks the user through giving every pound a job.
+  // Expenses pre-fill as one rough row (owner, 12 Nov 2026): each real expense added in the Budget comes off it until it is gone (bdDrawRough)
+  if (expenses > 0 && typeof ovState !== 'undefined') {
+    if (!ovState.expenses) ovState.expenses = [];
+    if (ovState.expenses.length === 0) ovState.expenses.push({ id: Date.now() + 1, name: 'Monthly spending (rough)', amount: Math.round(expenses * 100) / 100, type: 've', category: 'necessity', cat: 'other', _onboarding: true });
+  }
   if (_wHouse && typeof state !== 'undefined' && state && state.prices && _wHouse in state.prices) {
     // a picked house type (v0.9.1 round 2, R15): saved the way the House builder saves it; a typed target becomes that type's price, as Set price does
     state.houseType = _wHouse;
     if (house > 0) state.prices[_wHouse] = Math.round(house);   // typed in £ (the welcome screens are pounds only), stored in £
     state.target = state.prices[_wHouse];
     try { prevP = pct(); updatePriceLabels(); updatePriceInput(); updateMilestoneLabels(); updateFloorSelector(); save(); updateUI(); hbtPaint(); } catch (e) {}
-  } else if (house > 0 && typeof state !== 'undefined' && state) {
-    state.target = house;
-    if (typeof saveHouse === 'function') saveHouse();
+  } else if (house > 0 && typeof state !== 'undefined' && state && state.prices) {
+    // no house type picked: the value becomes the current type's price, as Set price does, so it survives the reload (shell/init.js sets target from prices)
+    state.prices[state.houseType] = Math.round(house); state.target = state.prices[state.houseType];
+    try { prevP = pct(); updatePriceLabels(); updatePriceInput(); save(); updateUI(); } catch (e) {}
   }
+  // Target Deposit Value in exact pounds (owner, 12 Nov 2026): saved as the share of the home value it is, unrounded, through the field the
+  // House builder's own deposit control sets (state.depositPct), so the deposit target there is the pounds typed. No new saved field.
+  var depPct = _wDepPct();
+  if (depPct !== null && typeof state !== 'undefined' && state) { state.depositPct = depPct; try { prevP = pct(); save(); updateUI(); } catch (e) {} }
   // v0.95: the deposit pot from the onboarding lands in the House Builder (after the house, so its bricks count against the right target)
   if (_wPot && _wPot !== 'none' && _wPotVal() > 0) { try { wPotToHouse(_wPot, _wPotVal(), (document.getElementById('w-pot-rate') || {}).value); } catch (e) {} }
   // Update user profile

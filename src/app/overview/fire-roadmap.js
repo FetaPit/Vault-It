@@ -101,7 +101,7 @@ function fireBuildStages(){
     nwStage('nw5k',2,'gem2','£5k Net Worth','NW ≥ £5,000','#44c0b9',function(){return 5000;}),
     // P4 Buy
     {key:'depReady',phase:3,ic:'house',name:'Deposit Ready',desc:'Full deposit saved',col:'#9b7ec8',check:function(){return owned||(hasState&&state.target>0&&pct()>=1);},prog:function(){return owned?1:dep;},
-      why:function(){return(hasState&&state.target>0)?[Math.round(dep*100)+'% of your '+state.depositPct+'% deposit ('+gbpFmt(depositTarget())+') is saved.']:['No house target set. Set one in the House Builder, or skip this stage if you aren’t buying.'];},acts:[GO_HB]},
+      why:function(){return(hasState&&state.target>0)?[Math.round(dep*100)+'% of your '+(Math.round((+state.depositPct||0)*10)/10)+'% deposit ('+gbpFmt(depositTarget())+') is saved.']:['No house target set. Set one in the House Builder, or skip this stage if you aren’t buying.'];},acts:[GO_HB]},
     nwStage('nw10k',3,'coins','£10k Net Worth','NW ≥ £10,000','#44c0b9',function(){return 10000;}),
     {key:'applied',phase:3,ic:'doc',name:'Applied',desc:'Mortgage application',col:'#9b7ec8',check:function(){return owned||fireMan('applied');},confirms:[{k:'applied',lbl:'My mortgage application has been submitted'}],
       why:function(){return['Tick when you’ve submitted your mortgage application. Not buying? Skip this stage.'];}},

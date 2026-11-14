@@ -58,7 +58,7 @@ function hbRenderHUD(){
   if(_bi)window._hbHudTries=0;else if((window._hbHudTries=(window._hbHudTries||0)+1)<=30)window._hbHudRetry=setTimeout(function(){try{hbRenderHUD();hbWriteStats();}catch(e){}},500);
   var _pb=document.getElementById('hb-plan-brick');if(_pb)_pb.textContent=_bi?'Each brick is worth about '+(window.VI_CURRENCY_SYMBOL||'£')+(perBrick*(window.VI_CURRENCY_RATE||1)).toFixed(2)+' of your deposit.':'';
   var _bLaid=_bi?Math.min(brickTotal,(hbBrandModel(_bi.model)?HB3D.brandStats(_bi.model,_isPro()?p:0.04):_bi.model.stats(_isPro()?p:0.04)).bricksLaid):0,_sym=window.VI_CURRENCY_SYMBOL||'£',_rate=window.VI_CURRENCY_RATE||1;
-  var inp=document.getElementById('depositPctInput');if(inp&&document.activeElement!==inp)inp.value=state.depositPct;
+  var inp=document.getElementById('depositPctInput');if(inp&&document.activeElement!==inp)inp.value=Math.round((+state.depositPct||0)*10)/10;   // one decimal: an exact-pounds deposit from the welcome keeps its full share underneath
   var amt=document.getElementById('depositPctAmt');if(amt)amt.textContent='= '+gbpFmt(dt);
   if(view===1){
     var bud=hbBudget(),cur=+state.monthly>0?+state.monthly:0;
@@ -98,7 +98,7 @@ function hbRenderHUD(){
       +'<div class="hb-stx hb-stx6">'
         +_st('brick',_bi?_bLaid.toLocaleString('en-GB'):'…','of '+(_bi?brickTotal.toLocaleString('en-GB'):'…')+' UK bricks','stBricks')
         +_st('target',gbpFmt(rem),'to go','stRemain')
-        +_st('vault',gbpFmt(dt),state.depositPct+'% deposit of '+gbpFmt(state.target||0),'stDeposit')
+        +_st('vault',gbpFmt(dt),(Math.round((+state.depositPct||0)*10)/10)+'% deposit of '+gbpFmt(state.target||0),'stDeposit')
         +_st('house-builder','…','roof tiles','stTiles')
         +_st('xp',(typeof wrTotalXp==='function'?wrTotalXp():0).toLocaleString('en-GB'),'XP','stXP')   // the Wealth Roadmap's XP, so the tile and the Roadmap agree (E9)
         +_st('streak',String(hbStreak()),'streak')

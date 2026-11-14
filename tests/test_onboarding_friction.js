@@ -10,6 +10,7 @@
 //   4. the wizard is 3 screens (goal + home type + price, money + deposit pot, plan), "Step n of 3", Back works; check-in day, view
 //      and phone take today's defaults and live in Settings; what finishing saves matches the 6-screen wizard exactly
 //      (tests/fixtures/onboarding_saved_golden.json, captured from the old wizard before the change)
+//      One deliberate change since (owner, 12 Nov 2026, "expenses one rough row"): the spending answer now saves one "Monthly spending (rough)" row in pos_ov1.expenses (tests/test_onboarding_form_a.js)
 //   5. phone and Daylight: no sideways scroll, no page errors
 // Run: node tests/test_onboarding_friction.js
 require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)

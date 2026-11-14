@@ -38,10 +38,10 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     return { labels, foreign: /[₹$€]/.test(sc.innerText) }; }, id);
   await p.click('#w-opts .welcome-opt[data-val="2"]');
   let m4 = await money('wz-s1');
-  ok(m4.labels.some(l => /^Dream Home Target \(£\)/i.test(l)) && m4.labels.every(l => /\(£\)/.test(l)) && !m4.foreign, '2 home: Dream Home Target (£), nothing in ₹, $ or € (' + m4.labels.join(' | ') + ')');
+  ok(m4.labels.some(l => /^Target Home Value \(£\)/i.test(l)) && m4.labels.some(l => /^Target Deposit Value \(£\)/i.test(l)) && m4.labels.every(l => /\(£\)/.test(l)) && !m4.foreign, '2 home: Target Home Value (£) and Target Deposit Value (£) (owner, 12 Nov), nothing in ₹, $ or € (' + m4.labels.join(' | ') + ')');
   await p.click('#w-htypes .w-ht[data-type="terraced"]');
   const ph = await p.evaluate(() => ({ ph: document.getElementById('w-house').placeholder, price: Math.round(state.prices.terraced) }));
-  ok(ph.ph === 'e.g. ' + ph.price.toLocaleString('en-GB') && ph.price < 1e7, '2 home: the example under "Dream Home Target (£)" is the £ price, not a rupee figure (' + ph.ph + ')');
+  ok(ph.ph === 'e.g. ' + ph.price.toLocaleString('en-GB') && ph.price < 1e7, '2 home: the example under "Target Home Value (£)" is the £ price, not a rupee figure (' + ph.ph + ')');
   await p.fill('#w-house', '250000'); await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(200);
   let m3 = await money('wz-s2');
   ok(m3.labels.length >= 2 && m3.labels.every(l => /\(£\)/.test(l)) && !m3.foreign, '2 money screen: every money label says £ (' + m3.labels.join(' | ') + ')');

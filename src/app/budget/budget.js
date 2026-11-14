@@ -112,15 +112,29 @@ function bdDelCat(kind,key){if(viBlockEdit())return;
   saveState();bdRender();
 }
 // ── add income / spending ──
+// The welcome's rough figures (owner, 8, 10 and 12 Nov 2026): income is the starting figure and spending one rough row; each real income
+// stream or expense added comes off the rough row of its kind until it is gone, so nothing is counted twice. Pence arithmetic.
+function bdDrawRough(kind,amt){
+  var list=kind==='exp'?ovState.expenses:ovState.income;if(!list||!(amt>0))return null;
+  var r=list.find(function(x){return x&&x._onboarding;});if(!r)return null;
+  var have=Math.round((+r.amount||0)*100),take=Math.min(have,Math.round(amt*100)),left=have-take;
+  if(left<=0)list.splice(list.indexOf(r),1);else r.amount=left/100;
+  return{took:take/100,gone:left<=0};
+}
+function bdRoughToast(kind,d){
+  if(!d||!(d.took>0))return;
+  showToast(cfMoney(d.took)+' came off the rough '+(kind==='exp'?'spending':'take-home')+(d.gone?', which is now used up.':'.'));
+}
 function addIncome(){if(viBlockEdit())return;
   var nEl=document.getElementById('cf-inc-name'),aEl=document.getElementById('cf-inc-amt');
   var a=parseFloat(aEl.value),n=nEl.value.trim();
   if(!n&&_bdSel.inc)n=bdFind('inc',_bdSel.inc).n;
   if(!n||!(a>0)){showToast('Pick a category (or type a name) and enter a monthly amount');return;}
   if(!ovState.income)ovState.income=[];
+  var dr=bdDrawRough('inc',a/(window.VI_CURRENCY_RATE||1));
   ovState.income.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),cat:_bdSel.inc||bdGuess('inc',n)});
   nEl.value='';aEl.value='';_bdSel.inc=null;_bdAuto.inc='';
-  saveState();renderCashflow();updateKPIs();
+  saveState();renderCashflow();updateKPIs();bdRoughToast('inc',dr);
 }
 function addExpense(){if(viBlockEdit())return;
   var nEl=document.getElementById('cf-exp-name'),aEl=document.getElementById('cf-exp-amt');
@@ -132,10 +146,11 @@ function addExpense(){if(viBlockEdit())return;
   var sel=document.getElementById('cf-exp-cat');
   // the type the user left in the dropdown wins; otherwise the category's default
   var t=(sel&&CF_GROUPS[sel.value]&&(_bdSel.exp||sel.dataset.touched))?sel.value:(bdFind('exp',key).t||'ve');
+  var dr=bdDrawRough('exp',a/(window.VI_CURRENCY_RATE||1));
   ovState.expenses.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),category:cfGroupToCat(t),type:t,cat:key});
   nEl.value='';aEl.value='';_bdSel.exp=null;_bdAuto.exp='';
   if(sel){sel.value='ce';delete sel.dataset.touched;}
-  saveState();renderCashflow();updateKPIs();
+  saveState();renderCashflow();updateKPIs();bdRoughToast('exp',dr);
 }
 function delIncome(id){if(viBlockEdit())return;ovState.income=(ovState.income||[]).filter(function(r){return r.id!==id;});saveState();renderCashflow();updateKPIs();}
 function delExpense(id){if(viBlockEdit())return;ovState.expenses=(ovState.expenses||[]).filter(function(r){return r.id!==id;});saveState();renderCashflow();updateKPIs();}
@@ -376,8 +391,9 @@ function bdQuickAdd(g){if(viBlockEdit())return;
   if(!n||!(a>0)){showToast('Enter a name and a monthly amount');return;}
   n=viClean(n).slice(0,40);
   if(!ovState.expenses)ovState.expenses=[];
+  var dr=bdDrawRough('exp',a/(window.VI_CURRENCY_RATE||1));
   ovState.expenses.push({id:Date.now(),name:n,amount:a/(window.VI_CURRENCY_RATE||1),category:cfGroupToCat(g),type:g,cat:bdGuess('exp',n)});
-  saveState();renderCashflow();updateKPIs();showToast('Added to '+CF_GROUPS[g].short);
+  saveState();renderCashflow();updateKPIs();if(dr&&dr.took>0)bdRoughToast('exp',dr);else showToast('Added to '+CF_GROUPS[g].short);
 }
 function bdIsFolded(g){return Object.prototype.hasOwnProperty.call(_bdFold,g)?!!_bdFold[g]:true;}   // every group starts folded for everyone; a saved choice still wins (owner, 1 Nov, E9)
 function bdFold(g){_bdFold[g]=!bdIsFolded(g);try{localStorage.setItem('vi_bd_fold',JSON.stringify(_bdFold));}catch(e){}bdRenderLists();}
@@ -457,9 +473,12 @@ function bdRender(){
   bdRenderZero();bdRenderLists();bdRenderPickers();bdRenderNew();renderCashflowCategories();
   var nd=document.getElementById('bd-nudge');
   if(nd){
-    var exp=ovState.expenses||[];
-    var lump=exp.length===1&&(exp[0]._onboarding||/^monthly expenses$/i.test(exp[0].name||''));
-    nd.innerHTML=lump?'<div class="cf-nudge"><b>One lump-sum so far.</b> Break “'+cfEsc(exp[0].name)+'” down by category below, then remove the lump sum.</div>':'';
+    var exp=ovState.expenses||[],ri=(ovState.income||[]).find(function(r){return r._onboarding;}),re=exp.find(function(r){return r._onboarding;});
+    var lump=!re&&exp.length===1&&/^monthly expenses$/i.test(exp[0].name||'');
+    var rough=(ri?'Add where your income comes from, one stream at a time, and each one comes off the rough take-home ('+cfMoney(ri.amount)+'). ':'')
+      +(re?'Add your spending line by line and each line comes off the rough spending ('+cfMoney(re.amount)+'). ':'');
+    nd.innerHTML=rough?'<div class="cf-nudge"><b>Rough figures from your welcome answers.</b> '+rough+'Nothing is counted twice.</div>'
+      :lump?'<div class="cf-nudge"><b>One lump-sum so far.</b> Break “'+cfEsc(exp[0].name)+'” down by category below, then remove the lump sum.</div>':'';
   }
 }
 function renderCashflow(){

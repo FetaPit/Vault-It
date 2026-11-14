@@ -104,7 +104,7 @@
         <label for="w-name">First name <span class="w-opt-tag">(optional)</span></label>
         <input type="text" class="welcome-inp" id="w-name" placeholder="Your first name" autocomplete="given-name">
       </div>
-      <div class="welcome-field" id="w-email-field">
+      <div class="welcome-field" id="w-email-field" hidden>
         <label for="w-email">Email address</label>
         <input type="email" class="welcome-inp" id="w-email" placeholder="you@example.com" autocomplete="email">
       </div>
@@ -112,19 +112,19 @@
         <div class="welcome-sub wz-q-sub">Pick the one closest to you. It sets where your plan starts. You can change it later.</div>
       <div class="welcome-opts" id="w-opts">
         <button class="welcome-opt" data-val="0" onclick="selectWelcomeOpt(this)">
-          <span class="welcome-opt-icon">💳</span>
+          <span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true" style="color:var(--red)"><use href="#vi-debt-tracker"/></svg></span>
           <span><b>Paying off debt</b>: I owe more than I am comfortable with</span>
         </button>
         <button class="welcome-opt" data-val="1" onclick="selectWelcomeOpt(this)">
-          <span class="welcome-opt-icon">◈</span>
+          <span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true" style="color:var(--green)"><use href="#vi-piggy"/></svg></span>
           <span><b>Building savings</b>: debt is fine, I need a financial buffer</span>
         </button>
         <button class="welcome-opt" data-val="2" onclick="selectWelcomeOpt(this)">
-          <span class="welcome-opt-icon">⌂</span>
+          <span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true" style="color:var(--gold)"><use href="#vi-house-builder"/></svg></span>
           <span><b>Saving a deposit</b>: I want to buy my first home</span>
         </button>
         <button class="welcome-opt" data-val="5" onclick="selectWelcomeOpt(this)">
-          <span class="welcome-opt-icon">◉</span>
+          <span class="welcome-opt-icon"><svg class="vi-ic" aria-hidden="true" style="color:var(--teal)"><use href="#vi-net-worth"/></svg></span>
           <span><b>Building wealth</b>: I own a home and want financial freedom</span>
         </button>
       </div>
@@ -142,10 +142,17 @@
           </div>
           <div class="w-ht-note">Pick one to build it in the House builder. You can change it later from the house itself.</div>
         </div>
+        <!-- owner, 12 Nov 2026: "Instead of dream home target, put Target Home Value. Add Target Deposit Value." The deposit is kept in exact
+             pounds (owner's decision, 12 Nov): saved as its share of the home value, unrounded (wStep2Submit) -->
         <div class="welcome-field" style="margin:0">
-          <label>Dream Home Target (<span class="w-currency-label">£</span>)</label>
-          <input type="number" class="welcome-inp" id="w-house" placeholder="e.g. 200000" min="0">
+          <label for="w-house">Target Home Value (<span class="w-currency-label">£</span>)</label>
+          <input type="number" class="welcome-inp" id="w-house" placeholder="e.g. 200000" min="0" inputmode="numeric" oninput="wDepHint()">
         </div>
+        <div class="welcome-field" style="margin:0">
+          <label for="w-deposit">Target Deposit Value (<span class="w-currency-label">£</span>)</label>
+          <input type="number" class="welcome-inp" id="w-deposit" placeholder="e.g. 20000" min="0" step="any" inputmode="decimal" oninput="wDepHint()">
+        </div>
+        <div class="wz-note w-dep-hint" id="w-dep-hint" aria-live="polite">Leave it empty and the House builder uses a 20% deposit of the home value.</div>
         </div>
         <div class="welcome-foot"><button class="welcome-cta" onclick="wNext()">Next &rarr;</button></div>
       </section>
