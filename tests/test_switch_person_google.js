@@ -104,6 +104,10 @@ const bob = bobAt('2026-11-12T09:53:00Z');   // one sign-in; bobAt(another time)
   await p.waitForTimeout(1500);
   s = await state(p);
   ok(s.supa === 'bob@example.com' && !s.cloud.writes.some(w => /Pay|Alice|07000|msy_alice/.test(w.rows)), '4 on the restarted page the newcomer is signed in with no question, and nothing of the previous person is uploaded (' + s.cloud.writes.length + ' write(s))');
+  // owner, 14 Nov 2026: "ensure users that are new create new blank accounts for onboarding": the newcomer lands on the welcome questions, with an empty vault behind them
+  const ui4 = await p.evaluate(() => { const vis = (id) => { const e = document.getElementById(id); return !!(e && getComputedStyle(e).display !== 'none'); }; return { welcome: vis('welcome-overlay'), login: vis('login-overlay'), ov: localStorage.getItem('pos_ov1'), al: localStorage.getItem('pos_al1'), debt: localStorage.getItem('pos_debt1'), demo: localStorage.getItem('vi_demo_mode') }; });
+  ok(ui4.welcome && !ui4.login, '4 the newcomer sees the onboarding questions, not the sign-in screen or the app (' + JSON.stringify({ welcome: ui4.welcome, login: ui4.login }) + ')');
+  ok(!/Pay|Alice/.test((ui4.ov || '') + (ui4.al || '') + (ui4.debt || '')) && ui4.demo !== 'true', '4 the new account starts blank: no budget, assets or debts from the previous person, and not the sample (' + JSON.stringify(ui4) + ')');
   ok(p._errs.length === 0, '4 no page errors' + (p._errs.length ? ': ' + p._errs.join(' | ') : ''));
   await p.context().close();
 
