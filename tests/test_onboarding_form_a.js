@@ -20,6 +20,8 @@
 //      skipped questions: no rows at all, no sample figure
 //   7. "30 days free": heading font, teal, "free" gold; headings in var(--font-display), sub text and options in DM Sans
 //   8. 390 Night and 1100 Daylight: no sideways scroll, no em dashes, no page errors
+//   9. Pedro's two notes (owner, 15 Nov: "Fix both"): the spending label stays on one line with "A guide..." as a note under the field;
+//      in Daylight the red debt icon, the only one with no tinted fill, is drawn heavier so it is not the faintest of the four
 // Run: node tests/test_onboarding_form_a.js
 require('./lib/vi');   // serves file:// app URLs over http (tests/lib/vi.js)
 const { chromium } = require('playwright'); const routeThree = require('./three_route');
@@ -83,6 +85,9 @@ const ht3 = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('ht3') || '{
     ok(ic.map(x => x.id).join(',') === 'vi-debt-tracker,vi-piggy,vi-house-builder,vi-net-worth', T + '2 the four stages use the pack icons the menu uses (' + ic.map(x => x.id).join(',') + ')');
     ok(ic.every(x => x.glyph === ''), T + '2 no emoji or text glyph left (' + ic.map(x => x.glyph).join('') + ')');
     ok(ic[0].col === tok.red && ic[1].col === tok.green && ic[2].col === tok.gold && ic[3].col === tok.teal, T + '2 one colour per icon from the code: red, green, gold, teal (' + ic.map(x => x.col).join(' ') + ')');
+    const sw = await p.evaluate(() => [...document.querySelectorAll('#w-opts .welcome-opt-icon svg')].map(x => parseFloat(getComputedStyle(x).getPropertyValue('--vi-sw')) || 1.1));
+    if (theme === 'light') ok(sw[0] >= 1.5 && sw.slice(1).every(x => x < sw[0]), T + '9 Pedro: in Daylight the red debt icon (outline only, no tint) is drawn heavier so it reads as strongly as the other three (' + sw.join(',') + ')');
+    else ok(sw.every(x => x === sw[1]), T + '9 Night: the four icons keep one weight (' + sw.join(',') + ')');
     await p.click('#w-opts .welcome-opt[data-val="0"]');
     ok(await p.evaluate(() => getComputedStyle(document.querySelector('#w-opts .welcome-opt[data-val="0"] .welcome-opt-icon svg')).color) === tok.red, T + '2 the icon keeps its colour when picked');
 
@@ -113,6 +118,12 @@ const ht3 = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('ht3') || '{
     ok((await side(p)) <= 1, T + '8 screen 1: no sideways scroll');
     await p.fill('#w-deposit', ''); await p.click('#wz-s1 .welcome-cta'); await p.waitForTimeout(200);
     ok((await side(p)) <= 1, T + '8 screen 2: no sideways scroll');
+    const sp = await p.evaluate(() => { const lab = (id) => document.getElementById(id).closest('.welcome-field').querySelector('label'), r = (e) => e.getBoundingClientRect().height,
+      n = document.getElementById('w-spend-note'), lh = parseFloat(getComputedStyle(n || document.body).lineHeight) || 20;
+      return { inc: r(lab('w-income')), exp: r(lab('w-expenses')), txt: lab('w-expenses').textContent, note: n ? n.textContent.trim() : '', nh: n ? r(n) : 0, lh, op: n ? getComputedStyle(n).opacity : '' }; });
+    ok(!/a guide/i.test(sp.txt) && Math.abs(sp.exp - sp.inc) <= 1, T + '9 Pedro: the spending label is one line, the same height as the take-home label (' + sp.exp + ' vs ' + sp.inc + ')');
+    // phone: the field is full width, so the note is one line; desktop: two fields share the row, so it may take two lines in its column
+    ok(/^A guide/.test(sp.note) && sp.nh > 0 && sp.nh <= sp.lh * (w < 600 ? 1.6 : 2.6) && sp.op === '1', T + '9 Pedro: "A guide..." sits under the field as a full-strength note, ' + (w < 600 ? 'one line' : 'at most two lines') + ' (' + sp.note + ', ' + sp.nh + 'px)');
     await p.click('#wz-s2 .wz-skip'); await p.waitForTimeout(200);
     ok((await side(p)) <= 1, T + '8 screen 3: no sideways scroll');
     if (p._errs.length) errs.push(T + p._errs.join(' | ')); await p.context().close();
