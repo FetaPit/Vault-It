@@ -120,10 +120,10 @@ const ht3 = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('ht3') || '{
     ok((await side(p)) <= 1, T + '8 screen 2: no sideways scroll');
     const sp = await p.evaluate(() => { const lab = (id) => document.getElementById(id).closest('.welcome-field').querySelector('label'), r = (e) => e.getBoundingClientRect().height,
       n = document.getElementById('w-spend-note'), lh = parseFloat(getComputedStyle(n || document.body).lineHeight) || 20;
-      return { inc: r(lab('w-income')), exp: r(lab('w-expenses')), txt: lab('w-expenses').textContent, note: n ? n.textContent.trim() : '', nh: n ? r(n) : 0, lh, op: n ? getComputedStyle(n).opacity : '' }; });
-    ok(!/a guide/i.test(sp.txt) && Math.abs(sp.exp - sp.inc) <= 1, T + '9 Pedro: the spending label is one line, the same height as the take-home label (' + sp.exp + ' vs ' + sp.inc + ')');
-    // phone: the field is full width, so the note is one line; desktop: two fields share the row, so it may take two lines in its column
-    ok(/^A guide/.test(sp.note) && sp.nh > 0 && sp.nh <= sp.lh * (w < 600 ? 1.6 : 2.6) && sp.op === '1', T + '9 Pedro: "A guide..." sits under the field as a full-strength note, ' + (w < 600 ? 'one line' : 'at most two lines') + ' (' + sp.note + ', ' + sp.nh + 'px)');
+      return { fs: parseFloat(getComputedStyle(lab('w-expenses')).fontSize), inc: r(lab('w-income')), exp: r(lab('w-expenses')), txt: lab('w-expenses').textContent, note: n ? n.textContent.trim() : '', nh: n ? r(n) : 0, lh, op: n ? getComputedStyle(n).opacity : '' }; });
+    ok(!/a guide/i.test(sp.txt) && Math.abs(sp.exp - sp.inc) <= 1 && sp.exp < sp.fs * 1.9, T + '9 Pedro: the spending label is one line, the same height as the take-home label, whatever the fonts (' + sp.exp + ' vs ' + sp.inc + ', font ' + sp.fs + 'px)');
+    // the two money fields stack at every width (side by side at 1100 the longer label wrapped on CI's fonts and the boxes no longer lined up)
+    ok(/^A guide/.test(sp.note) && sp.nh > 0 && sp.nh <= sp.lh * 1.6 && sp.op === '1', T + '9 Pedro: "A guide..." sits under the field as a full-strength note on one line (' + sp.note + ', ' + sp.nh + 'px)');
     await p.click('#wz-s2 .wz-skip'); await p.waitForTimeout(200);
     ok((await side(p)) <= 1, T + '8 screen 3: no sideways scroll');
     if (p._errs.length) errs.push(T + p._errs.join(' | ')); await p.context().close();
