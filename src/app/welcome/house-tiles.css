@@ -1,0 +1,13 @@
+/* ── HOUSE TYPE TILES IN 3D (onboarding chunk 2) ── */
+/* owner, 12 Nov 2026: "miniature 3D models ... with the same viewport background"; 15 Nov: "Go with the 3D house tiles". Each icon box is
+   a small House builder viewport (its background and scan lines); the slate still sits in it until that tile's first 3D frame, and stays
+   wherever there is no 3D. One canvas over the whole grid draws the six houses (house-tiles.js, HB3D.TileHouses). */
+#w-htypes{position:relative}
+#w-htypes .w-ht{touch-action:pan-y}
+#w-htypes .w-ht .ico{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:4/3;max-height:118px;margin:0 0 4px;border-radius:7px;background:var(--stage-bg);overflow:hidden;touch-action:pan-y}
+#w-htypes .w-ht .ico::after{content:"";position:absolute;inset:0;z-index:2;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none}   /* over the 3D canvas (z-index 1), as the House builder's scan lines lie over its house */
+#w-htypes .w-ht .ico svg{position:relative;z-index:1;width:52px;height:auto;transition:opacity .25s linear}
+#w-htypes .w-ht.live .ico svg{opacity:0}
+#w-htypes .w-ht.live .ico{cursor:grab}
+#w-htypes .w-ht.live .ico:active{cursor:grabbing}
+@media(prefers-reduced-motion:reduce){#w-htypes .w-ht .ico svg{transition:none}}

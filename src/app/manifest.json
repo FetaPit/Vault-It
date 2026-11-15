@@ -72,6 +72,11 @@
    "offset": 0
   },
   {
+   "file": "welcome/house-tiles.css",
+   "anchor": "/* ── HOUSE TYPE TILES IN 3D (onboarding",
+   "offset": 0
+  },
+  {
    "file": "shell/footer.css",
    "anchor": "/* Readable in both ",
    "offset": 1
@@ -540,6 +545,11 @@
    "file": "welcome/welcome.js",
    "anchor": "// WELCOME SCREEN + ",
    "offset": 1
+  },
+  {
+   "file": "welcome/house-tiles.js",
+   "anchor": "// ── HOUSE TYPE TILES IN 3D (welcome",
+   "offset": 0
   },
   {
    "file": "paywall/stripe-config.js",
