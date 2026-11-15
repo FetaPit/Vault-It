@@ -12,8 +12,11 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Ccircle cx='120' cy='120' r='108' fill='%23000810' stroke='%2342C0B8' stroke-width='14'/%3E%3Cpolygon points='60,76 88,76 120,126.2 152,76 180,76 120,170' fill='%2342C0B8'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;600;700&family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
+/* Chakra Petch, self-hosted (SIL OFL 1.1, brand/fonts/chakra-petch/OFL.txt): headlines and titles, Light on the Level pills */
+@font-face{font-family:"Chakra Petch";font-style:normal;font-weight:100 349;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-300.woff2") format("woff2")}@font-face{font-family:"Chakra Petch";font-style:normal;font-weight:350 549;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-400.woff2") format("woff2")}@font-face{font-family:"Chakra Petch";font-style:normal;font-weight:550 1000;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-700.woff2") format("woff2")}
+
 
 /* Tokens read from the app's own CSS (app.vault-it.co). Night is the default, Daylight is the light mode. */
 html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -497,6 +500,11 @@ footer .wm{font-size:26px;margin-bottom:10px}
         <p style="color:#9AA0A6;margin:14px 0 0;font-size:14px">No stroke. <b>red</b> dark red #C8202A, <b>your</b> teal #44C0B9, <b>home</b> gold #E8C56A. The deck uses these until the owner says otherwise.</p>
       </div>
     </div>
+    <div class="tag-stage" style="margin-top:20px">
+      <div class="lbl" style="margin-bottom:12px">Website hero (owner, 13 Nov: "go with red but a shade or 2 lighter")</div>
+      <p class="tag-line" style="font-family:var(--font-head);font-weight:700">Get out of the <span style="color:#C8202A">red</span> and <span style="color:#44C0B9">into your</span> <span style="color:#E8C56A;text-shadow:0 0 .18em rgb(232 197 106 / .4)">home</span>.</p>
+      <p style="color:#9AA0A6;margin:14px 0 0;font-size:14px">Chakra Petch 700. <b>red</b> a solid red fill, #C8202A in Night and #B0141F in Daylight. <b>into your</b> teal. <b>home</b> gold with a faint glow (#A8781F in Daylight); the glow pulses gently and holds still under reduced motion. Built into the landing page (<code>landing.html</code>), not yet released.</p>
+    </div>
     <div class="grid2" style="margin-top:20px">
       <div class="tag-stage">
         <div class="lbl" style="margin-bottom:12px">Plain-text fallback</div>
@@ -512,7 +520,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
         </ul>
         <ul class="rules" style="margin-top:12px">
           <li>No neon on a light ground. Keep the tagline on a dark ground, even inside a Daylight page.</li>
-          <li>No other word gets a colour or a stroke.</li>
+          <li>No other word gets a colour or a stroke, except "into your" in teal on the website hero and "your" in the deck.</li>
         </ul>
       </div>
     </div>
