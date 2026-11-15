@@ -7093,18 +7093,32 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   // ── GL context and program (one for the stage) ──
   var UNIFORMS = ['uVP', 'uFocal', 'uNow', 'uLast', 'uFlash', 'uGlaze', 'uVc', 'uBrick', 'uTrim', 'uTile', 'uFrame', 'uGlass', 'uGlassLit', 'uDoor', 'uEdge', 'uSheen', 'uFlashCol', 'uPulse', 'uBuilt', 'uSweep', 'uSweepOn', 'uBack', 'uFrontA', 'uBackA', 'uShMin', 'uEdgeK', 'uLit', 'uExp', 'uPush', 'uPtr', 'uCtr', 'uAsp'];
   var ATTRS = ['aPos', 'aNrm', 'aUV', 'aOff', 'aSize', 'aRot', 'aMeta', 'aCol', 'aTime'];
-  function makeGL(cv) {
+  // lazy (the house tiles): the shaders compile while the page goes on (KHR_parallel_shader_compile); the caller polls R.pending() in its
+  // frames and calls R.finish() once it is false. Asking for the result straight away makes the main thread wait for the whole compile
+  // (stress-doctor, 15 Nov 2026: 250 to 435 ms at phone-class load on the welcome screen).
+  function makeGL(cv, lazy) {
     var opts = { alpha: true, antialias: true, premultipliedAlpha: true, preserveDrawingBuffer: false, powerPreference: 'high-performance' };
     var gl = cv.getContext('webgl2', opts) || cv.getContext('webgl', opts) || cv.getContext('experimental-webgl', opts);
     if (!gl) return null;
     var g2 = (typeof WebGL2RenderingContext !== 'undefined') && (gl instanceof WebGL2RenderingContext), ext = g2 ? null : gl.getExtension('ANGLE_instanced_arrays');
     if (!g2 && !ext) return null;
-    function sh(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error('house_gl shader: ' + gl.getShaderInfoLog(s)); return s; }
-    var pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr);
-    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw new Error('house_gl program: ' + gl.getProgramInfoLog(pr));
-    var R = { gl: gl, pr: pr, g2: g2, ext: ext, A: {}, U: {}, geo: {}, geoN: {} };
-    ATTRS.forEach(function (n) { R.A[n] = gl.getAttribLocation(pr, n); });
-    UNIFORMS.forEach(function (n) { R.U[n] = gl.getUniformLocation(pr, n); });
+    var par = lazy ? gl.getExtension('KHR_parallel_shader_compile') : null;
+    function sh(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+    var vs = sh(gl.VERTEX_SHADER, VS), fs = sh(gl.FRAGMENT_SHADER, FS), pr = gl.createProgram(); gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
+    var R = { gl: gl, pr: pr, g2: g2, ext: ext, A: {}, U: {}, geo: {}, geoN: {}, ok: false };
+    R.pending = function () { return !R.ok && !!par && !gl.getProgramParameter(pr, par.COMPLETION_STATUS_KHR); };
+    R.finish = function () {
+      if (R.ok) return true;
+      if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) {
+        if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS)) throw new Error('house_gl shader: ' + gl.getShaderInfoLog(vs));
+        if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) throw new Error('house_gl shader: ' + gl.getShaderInfoLog(fs));
+        throw new Error('house_gl program: ' + gl.getProgramInfoLog(pr));
+      }
+      ATTRS.forEach(function (n) { R.A[n] = gl.getAttribLocation(pr, n); });
+      UNIFORMS.forEach(function (n) { R.U[n] = gl.getUniformLocation(pr, n); });
+      R.ok = true; return true;
+    };
+    if (!lazy) R.finish();
     var S = shapes();
     Object.keys(S).forEach(function (k) { var b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, S[k], gl.STATIC_DRAW); R.geo[k] = b; R.geoN[k] = S[k].length / 8; });
     R.div = function (loc, d) { if (loc < 0) return; if (g2) gl.vertexAttribDivisor(loc, d); else ext.vertexAttribDivisorANGLE(loc, d); };
@@ -7623,7 +7637,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
   // uExp (whole house eases out) and uPush (stronger near the pointer) are 0 everywhere else.
   H.houseGLData = function (m) {
     var HG = buildHouse(m);
-    return { n: HG.n, data: HG.data, ranges: HG.ranges, cx: HG.cx, cz: HG.cz, y0: HG.y0, top: HG.top, big: HG.big, x0: HG.x0, x1: HG.x1, z0: HG.z0, z1: HG.z1 };
+    var F = m.focus;   // flats: the user's own floor (the house tiles frame it, as the House Builder does)
+    return { n: HG.n, data: HG.data, ranges: HG.ranges, cx: HG.cx, cz: HG.cz, y0: HG.y0, top: HG.top, big: HG.big, x0: HG.x0, x1: HG.x1, z0: HG.z0, z1: HG.z1, fy0: F ? F.y0 * K : null, fy1: F ? F.y1 * K : null };
   };
   function SigninHouse(container, opts) {
     var self = this; opts = opts || {};
@@ -7777,6 +7792,199 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     try { var gl = this.R.gl; if (this._inst) gl.deleteBuffer(this._inst); if (this._time) gl.deleteBuffer(this._time); var lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); } catch (e) {}
     if (this.cv.parentNode) this.cv.parentNode.removeChild(this.cv);
     this.HG = null;
+  };
+
+  // ── house type tiles (onboarding chunk 2; owner, 12 Nov 2026: "Make the icons for the house type in the app minuture 3D models of
+  // our exisiting models that we use in the house builder that can be rotated with the same viewport background"; 15 Nov: "Go with the
+  // 3D house tiles"). Six finished houses, small, in ONE canvas over the tile grid (phones cap WebGL contexts): each tile is a scissored
+  // viewport of its own, with its own turn. No DOM here: it draws on any canvas, normally an OffscreenCanvas in a worker (H.tilesWorker),
+  // so making the WebGL context, compiling the shaders and every frame stay off the page's main thread (stress-doctor, 15 Nov 2026: on the
+  // main thread the context alone blocked the welcome for 200 to 340 ms at phone-class load). The page measures the tiles and sends
+  // setRects(); it turns a model with turn(). Each house is H.houseGLData from the build worker, handed in with load(key, data). The same
+  // shaders and palette as the House Builder, the finished house (every brick settled, windows lit); only the near faces and the glass (no
+  // faint far-face pass: at this size it cannot be seen and it would double the cost). The buffer is kept between frames, so a frame
+  // redraws only the tiles that moved. Idle spin only for the picked tile (setSpin; stress-doctor, 15 Nov: six spinning tiles kept the GPU
+  // busy enough to slow the page's taps at phone-class load; a still tile costs nothing), one turn every 30 s, 30 frames a second at most,
+  // none with reduced motion; a device whose tile loop runs slower than 10 frames a second (median over 2 s) stops the idle spin. Turning
+  // any tile by hand always works.
+  function TileHouses(cv, opts) {
+    var self = this; opts = opts || {};
+    this.cv = cv;
+    var o = { alpha: true, antialias: true, premultipliedAlpha: true, preserveDrawingBuffer: true, powerPreference: 'low-power' };
+    var gl = cv.getContext('webgl2', o) || cv.getContext('webgl', o) || cv.getContext('experimental-webgl', o);
+    var g2 = gl && (typeof WebGL2RenderingContext !== 'undefined') && (gl instanceof WebGL2RenderingContext);
+    if (!gl || (!g2 && !gl.getExtension('ANGLE_instanced_arrays'))) throw new Error('house_gl: WebGL with instancing is not available');
+    this.R = makeGL(cv, true);   // the context made above (getContext hands back the same one), now with the program; it compiles while we go on
+    if (!this.R) throw new Error('house_gl: WebGL with instancing is not available');
+    this.soft = softGL(gl);
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.enable(gl.CULL_FACE); gl.depthFunc(gl.LEQUAL);
+    this.turnS = opts.turn || 30; this.day = !!opts.day; this.red = !!opts.reduced;
+    this.tiles = {}; this.order = [];
+    (opts.keys || []).forEach(function (k) { self.tiles[k] = { key: k, HG: null, yaw: 32 * Math.PI / 180, pitch: 18 * Math.PI / 180, touch: -1e9, frames: 0, dirty: false, rect: null }; self.order.push(k); });
+    this.w = 0; this.h = 0; this.dpr = 1; this.active = false; this.lost = false; this._raf = 0; this._t = 0; this._last = 0; this._clear = false;
+    this.spin = true; this.keepSpin = !!opts.keepSpin; this._gaps = []; this._loadAt = 0; this.spinKey = opts.spinKey || null;
+    var raf = typeof requestAnimationFrame === 'function' ? function (f) { return requestAnimationFrame(f); } : function (f) { return setTimeout(f, 16); };
+    var caf = typeof cancelAnimationFrame === 'function' ? function (h) { cancelAnimationFrame(h); } : function (h) { clearTimeout(h); };
+    this._rafFn = raf; this._cafFn = caf;
+    this._loop = function () {
+      self._raf = 0;
+      if (!self.active || self.lost) { self._t = 0; return; }
+      var now = performance.now();
+      if (now - self._last < 32) { self._raf = raf(self._loop); return; }   // 30 frames a second is plenty for a tile
+      var gap = self._t ? now - self._t : 0; self._t = now; self._last = now;
+      var more = self._frame(now, Math.min(0.1, gap / 1000));
+      if (gap > 0 && self._spinning && now - self._loadAt > 600 && !self.keepSpin) {   // the median gap of the tile loop over 2 s: an odd slow frame, or a house just handed in, does not count
+        var sa = self._gaps; sa.push([now, gap]); while (sa.length && now - sa[0][0] > 2000) sa.shift();
+        if (sa.length >= 8 && now - sa[0][0] > 1500) { var gs = sa.map(function (q) { return q[1]; }).sort(function (a, b) { return a - b; }); if (gs[gs.length >> 1] > 100) { self.spin = false; if (self.onState) self.onState(); } }
+      }
+      if (more) self._raf = raf(self._loop);   // nothing turning (reduced motion, no spin): sleep until turn() or load()
+      else self._t = 0;
+    };
+    if (cv.addEventListener) cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); self.lost = true; self.stop(); if (self.onLost) self.onLost(); });
+  }
+  H.TileHouses = TileHouses; TileHouses.supported = supported;
+  var TP = TileHouses.prototype;
+  TP.load = function (key, HG) {
+    var t = this.tiles[key]; if (!t || this.lost) return;
+    var gl = this.R.gl;
+    if (HG.fy0 != null) {   // a flat: the user's floor with one faint storey above and below it, not the whole block cut off at the tile's edges (Pedro, 15 Nov)
+      var sh = HG.fy1 - HG.fy0, b0 = HG.fy0 - sh - 1, b1 = HG.fy1 + sh + 1, src = HG.data, keep = new Float32Array(src.length), at = 0, rg = {};
+      GROUPS.forEach(function (g) {
+        var r = HG.ranges[g]; if (!r) return; var s0 = at;
+        for (var i = r[0]; i < r[0] + r[1]; i++) { var j = i * STRIDE; if (src[j + 9] > 7.5 && (src[j + 1] < b0 || src[j + 1] > b1)) continue; keep.set(src.subarray(j, j + STRIDE), at * STRIDE); at++; }
+        if (at > s0) rg[g] = [s0, at - s0];
+      });
+      HG.data = keep.subarray(0, at * STRIDE); HG.n = at; HG.ranges = rg; HG.y0 = b0; HG.top = b1;
+    }
+    t.inst = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, t.inst); gl.bufferData(gl.ARRAY_BUFFER, HG.data, gl.STATIC_DRAW);
+    var st = new Float32Array(HG.n * 2); for (var i = 0; i < HG.n; i++) { st[i * 2] = -1e9; st[i * 2 + 1] = -5; }   // every brick laid and settled
+    t.time = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, t.time); gl.bufferData(gl.ARRAY_BUFFER, st, gl.STATIC_DRAW);
+    HG.data = null; t.HG = HG; t.n = HG.n; this._loadAt = performance.now();
+    var Hh = HG.top - HG.y0, w = HG.x1 - HG.x0, d = HG.z1 - HG.z0;
+    t.rad = Math.sqrt(w * w + d * d + Hh * Hh) / 2;
+    t.tgt = [HG.cx, HG.y0 + Hh * 0.45, HG.cz];
+    if (HG.fy0 != null) t.tgt = [HG.cx, (HG.fy0 + HG.fy1) / 2, HG.cz];   // a flat: framed on its own floor, in the middle of the three storeys kept above
+    t.dirty = true; this.wake();
+  };
+  // the page measures: the grid's size in CSS pixels, the pixel ratio, and each tile's icon box relative to the grid
+  TP.setRects = function (W, Hh, dpr, rects) {
+    var self = this;
+    if (W !== this.w || Hh !== this.h || dpr !== this.dpr) { this.w = W; this.h = Hh; this.dpr = dpr; this.cv.width = Math.max(1, Math.round(W * dpr)); this.cv.height = Math.max(1, Math.round(Hh * dpr)); }
+    Object.keys(rects || {}).forEach(function (k) { if (self.tiles[k]) self.tiles[k].rect = rects[k]; });
+    this._clear = true; this._all(); this.wake();
+  };
+  TP.setDay = function (day) { if (this.day !== !!day) { this.day = !!day; this._all(); this.wake(); } };
+  TP.setReduced = function (r) { this.red = !!r; this.wake(); };
+  TP.setSpin = function (key) { this.spinKey = key || null; this._gaps = []; this.wake(); };   // the picked tile turns on its own; null: none
+  TP._all = function () { var self = this; this.order.forEach(function (k) { self.tiles[k].dirty = true; }); };
+  TP.turn = function (key, dYaw, dPitch) {   // by hand: drag, swipe or the arrow keys
+    var t = this.tiles[key]; if (!t) return;
+    t.yaw += dYaw || 0; if (dPitch) t.pitch = clamp(t.pitch + dPitch, 0.05, 1.1);
+    t.touch = performance.now(); t.dirty = true; this.wake();
+  };
+  TP.hold = function (key, on) { var t = this.tiles[key]; if (t) { t.held = !!on; t.touch = performance.now(); this.wake(); } };   // a finger is on this tile: no idle spin under it
+  TP.yaw = function (key) { var t = this.tiles[key]; return t ? t.yaw : 0; };
+  TP.frames = function (key) { var t = this.tiles[key]; return t ? t.frames : 0; };
+  TP.state = function () { var self = this, o = { yaw: {}, frames: {}, n: {}, spin: this.spin && !this.red }; this.order.forEach(function (k) { var t = self.tiles[k]; o.yaw[k] = t.yaw; o.frames[k] = t.frames; o.n[k] = t.n || 0; }); return o; };
+  TP.start = function () { this.active = true; this.wake(); };
+  TP.wake = function () { if (this.active && !this._raf && !this.lost) this._raf = this._rafFn(this._loop); };
+  TP.stop = function () { this.active = false; if (this._raf) { this._cafFn(this._raf); this._raf = 0; } };
+  TP.running = function () { return this.active && !this.lost; };
+  TP._frame = function (now, dt) {
+    if (!this.R.ok) {   // the shaders are still compiling: look again next frame, never wait for them
+      if (this.R.pending()) return true;
+      try { this.R.finish(); } catch (e) { this.lost = true; this.stop(); if (this.onLost) this.onLost(); return false; }
+    }
+    if (!(this.w > 2 && this.h > 2)) return false;   // no layout yet: setRects() wakes us
+    var spin = this.spin && !this.red, self = this, R = this.R, gl = R.gl, more = false;
+    if (this._clear) { this._clear = false; gl.disable(gl.SCISSOR_TEST); gl.viewport(0, 0, this.cv.width, this.cv.height); gl.clearColor(0, 0, 0, 0); gl.depthMask(true); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); }
+    this._spinning = false;
+    this.order.forEach(function (k) {
+      var t = self.tiles[k]; if (!t.HG) return;
+      var sp = spin && k === self.spinKey;
+      if (sp && !t.held && now - t.touch > 2500) { t.yaw += dt * 2 * Math.PI / self.turnS; t.dirty = true; self._spinning = true; }
+      if (t.held || sp) more = true;
+    });
+    var any = this.order.some(function (k) { return self.tiles[k].dirty && self.tiles[k].HG; });
+    if (!any) return more;
+    var C2 = C, day = this.day, A = R.A, U = R.U, SB = STRIDE * 4, dpr = this.dpr, CH2 = this.cv.height;
+    gl.useProgram(R.pr); gl.enable(gl.SCISSOR_TEST);
+    gl.uniform1f(U.uNow, 0); gl.uniform1f(U.uLast, -10); gl.uniform1f(U.uFlash, 0); gl.uniform1f(U.uGlaze, 1); gl.uniform1f(U.uVc, -1);
+    gl.uniform3fv(U.uBrick, C2.brick); gl.uniform3fv(U.uTrim, C2.trim); gl.uniform3fv(U.uTile, C2.tile); gl.uniform3fv(U.uFrame, C2.frame); gl.uniform3fv(U.uGlass, C2.glass); gl.uniform3fv(U.uGlassLit, C2.glassLit);
+    gl.uniform3fv(U.uDoor, C2.door); gl.uniform3fv(U.uEdge, C2.edge); gl.uniform3fv(U.uSheen, C2.sheen); gl.uniform3fv(U.uFlashCol, C2.flash);
+    gl.uniform1f(U.uPulse, 0); gl.uniform1f(U.uBuilt, 1); gl.uniform1f(U.uSweep, -1e4); gl.uniform1f(U.uSweepOn, 0);
+    gl.uniform1f(U.uShMin, C2.shMin); gl.uniform1f(U.uEdgeK, C2.edgeK); gl.uniform1f(U.uFrontA, day ? 0.97 : C2.front); gl.uniform1f(U.uBackA, C2.back); gl.uniform2f(U.uLit, 1, 0);
+    gl.uniform1f(U.uExp, 0); gl.uniform1f(U.uPush, 0); gl.uniform2f(U.uPtr, 0, 0); gl.uniform3fv(U.uCtr, [0, 0, 0]); gl.uniform1f(U.uAsp, 1); gl.uniform1f(U.uBack, 0);
+    gl.enable(gl.DEPTH_TEST); gl.cullFace(gl.BACK);
+    var bindGeo = function (name) { gl.bindBuffer(gl.ARRAY_BUFFER, R.geo[name]);
+      gl.enableVertexAttribArray(A.aPos); gl.vertexAttribPointer(A.aPos, 3, gl.FLOAT, false, 32, 0); R.div(A.aPos, 0);
+      gl.enableVertexAttribArray(A.aNrm); gl.vertexAttribPointer(A.aNrm, 3, gl.FLOAT, false, 32, 12); R.div(A.aNrm, 0);
+      gl.enableVertexAttribArray(A.aUV); gl.vertexAttribPointer(A.aUV, 2, gl.FLOAT, false, 32, 24); R.div(A.aUV, 0); };
+    var firsts = [];
+    this.order.forEach(function (k) {
+      var t = self.tiles[k], q = t.rect; if (!t.HG || !t.dirty || !q || q.w < 4 || q.h < 4) return;
+      var x = Math.round(q.x * dpr), y = Math.round(CH2 - (q.y + q.h) * dpr), w = Math.round(q.w * dpr), h = Math.round(q.h * dpr);
+      gl.viewport(x, y, w, h); gl.scissor(x, y, w, h);
+      gl.clearColor(0, 0, 0, 0); gl.depthMask(true); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      // camera: the finished house fills the tile, seen a little from above, turning about its own centre
+      var cam = { tgt: t.tgt, pan: [0, 0, 0], pitch: t.pitch, yawA: t.yaw, w: q.w, h: q.h, _radius: t.rad, controls: { target: {} }, _camera: VP._camera, _focal: VP._focal };
+      var asp = q.w / q.h, sn = Math.sin(18 * Math.PI / 180);
+      cam.dist = t.rad / sn * (asp < 1 ? 0.9 / asp : 0.9);   // the bounding sphere is generous: 0.9 still keeps every house inside its tile at any turn
+      gl.uniformMatrix4fv(U.uVP, false, VP._vp.call(cam)); gl.uniform1f(U.uFocal, VP._focal.call(cam) * dpr);
+      var inst = t.inst, time = t.time;
+      var bindInst = function (start) { var o = start * SB; gl.bindBuffer(gl.ARRAY_BUFFER, inst);
+        gl.enableVertexAttribArray(A.aOff); gl.vertexAttribPointer(A.aOff, 3, gl.FLOAT, false, SB, o); R.div(A.aOff, 1);
+        gl.enableVertexAttribArray(A.aSize); gl.vertexAttribPointer(A.aSize, 3, gl.FLOAT, false, SB, o + 12); R.div(A.aSize, 1);
+        gl.enableVertexAttribArray(A.aRot); gl.vertexAttribPointer(A.aRot, 3, gl.FLOAT, false, SB, o + 24); R.div(A.aRot, 1);
+        gl.enableVertexAttribArray(A.aMeta); gl.vertexAttribPointer(A.aMeta, 4, gl.FLOAT, false, SB, o + 36); R.div(A.aMeta, 1);
+        gl.enableVertexAttribArray(A.aCol); gl.vertexAttribPointer(A.aCol, 3, gl.FLOAT, false, SB, o + 52); R.div(A.aCol, 1);
+        gl.bindBuffer(gl.ARRAY_BUFFER, time); gl.enableVertexAttribArray(A.aTime); gl.vertexAttribPointer(A.aTime, 2, gl.FLOAT, false, 8, start * 8); R.div(A.aTime, 1); };
+      var draw = function (glass) { GROUPS.forEach(function (g) { var rg = t.HG.ranges[g]; if (!rg || (/glass/.test(g) !== glass)) return; var s = g.replace('-glass', ''); bindGeo(s); bindInst(rg[0]); R.drawInst(0, R.geoN[s], rg[1]); }); };
+      draw(false); gl.depthMask(false); draw(true); gl.depthMask(true);
+      t.dirty = false; t.frames++;
+      if (t.frames === 1) firsts.push(k);
+    });
+    gl.disable(gl.SCISSOR_TEST);
+    if (firsts.length && this.onFirstFrame) firsts.forEach(function (k) { try { self.onFirstFrame(k); } catch (e) {} });
+    if (this.onState) this.onState();
+    return more;
+  };
+  TP.dispose = function () {
+    this.stop();
+    var self = this;
+    try { var gl = this.R.gl; this.order.forEach(function (k) { var t = self.tiles[k]; if (t.inst) gl.deleteBuffer(t.inst); if (t.time) gl.deleteBuffer(t.time); t.HG = null; }); var lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); } catch (e) {}
+  };
+  // the worker side (house-tiles.js runs it from the engine text on an OffscreenCanvas): messages in, first frames and state out
+  H.tilesWorker = function (scope) {
+    var th = null, lastPost = 0, timer = 0;
+    var post = function (force) {   // the turn of each tile, for the page's tests and info(); a few times a second at most
+      if (!th) return; var now = performance.now();
+      if (!force && now - lastPost < 100) { if (!timer) timer = setTimeout(function () { timer = 0; post(true); }, 100); return; }
+      lastPost = now; scope.postMessage({ t: 'state', s: th.state() });
+    };
+    scope.onmessage = function (e) {
+      var m = e.data || {};
+      try {
+        if (m.t === 'init') {
+          try { th = new TileHouses(m.canvas, m.opts); } catch (err) { th = null; scope.postMessage({ t: 'fail', why: String((err && err.message) || err) }); return; }
+          if (th.soft && !m.opts.forced) { th.dispose(); th = null; scope.postMessage({ t: 'fail', why: 'soft' }); return; }   // a software GPU: the slates
+          th.onFirstFrame = function (k) { scope.postMessage({ t: 'first', k: k }); };
+          th.onLost = function () { scope.postMessage({ t: 'lost' }); };
+          th.onState = function () { post(false); };
+          scope.postMessage({ t: 'ready' });
+        } else if (!th) return;
+        else if (m.t === 'load') th.load(m.k, m.d);
+        else if (m.t === 'rects') th.setRects(m.w, m.h, m.dpr, m.rects);
+        else if (m.t === 'turn') th.turn(m.k, m.dy, m.dp);
+        else if (m.t === 'hold') th.hold(m.k, m.on);
+        else if (m.t === 'start') th.start();
+        else if (m.t === 'stop') th.stop();
+        else if (m.t === 'day') th.setDay(m.on);
+        else if (m.t === 'reduced') th.setReduced(m.on);
+        else if (m.t === 'spin') th.setSpin(m.k);
+        else if (m.t === 'dispose') { th.dispose(); th = null; }
+      } catch (err) { scope.postMessage({ t: 'lost' }); }
+    };
   };
 })(HB3D);
 

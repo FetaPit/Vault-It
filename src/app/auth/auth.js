@@ -237,7 +237,8 @@ function viSigninScene() {
     var el = _ahScene.el, de = document.documentElement;
     if (!sf) { _ahSceneOff(); return; }   // signed in and onboarded: free the GPU
     el.hidden = !want;
-    if (want && _ahScene.HG) _ahScene.start(); else _ahScene.stop();
+    var tiles = typeof viTiles3DLive === 'function' && viTiles3DLive();   // the welcome's 3D house tiles are turning: the sign-in house holds still behind them (house-tiles.js)
+    if (want && _ahScene.HG && !tiles) _ahScene.start(); else _ahScene.stop();
     _ahScene.day = de.getAttribute('data-theme') === 'light';
     de.setAttribute('data-ah', sf); de.classList.toggle('vi-scene-on', want && _ahScene.frames > 0);
     if (img) img.classList.toggle('under3d', want && _ahScene.frames > 0);
