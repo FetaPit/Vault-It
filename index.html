@@ -9154,6 +9154,12 @@ body::before {
 .welcome-opt-icon { font-size: 1.1rem; flex-shrink: 0; }
 /* "Where are you right now": pack v2 icons in the colour each stage has across the app, never changed by the pick (owner, 12 Nov 2026: "up to date iconography from brand book") */
 #w-opts .welcome-opt-icon .vi-ic { width: 24px; height: 24px; display: block; margin: 0 auto; }
+/* Pedro, 15 Nov (owner: "Fix both"): the debt icon is outline only (the other three carry a tinted fill), so in Daylight it read
+   as the faintest of the four; a heavier line there evens them out. Night is unchanged. */
+[data-theme="light"] #w-opts .welcome-opt[data-val="0"] .welcome-opt-icon .vi-ic { --vi-sw: 1.6; }
+.w-spend-note { margin: 4px 0 0; }
+/* Take-home and spending stack at every width: side by side in the 1100 px card the longer label wrapped (font-dependent) and the boxes no longer lined up. */
+#wz-s2 .g-form { grid-template-columns: 1fr; }
 .welcome-inp[type="number"] { font-family: var(--font-mono); font-variant-numeric: lining-nums tabular-nums; }
 .w-dep-hint { margin: 2px 0 0; grid-column: 1 / -1; }   /* the whole row under the two figures on a wide screen */
 .welcome-cta {
@@ -12571,8 +12577,9 @@ body.vi-simple .bd-page>.bd-sankey-card{order:1;margin:0 0 14px!important}
           <input type="number" class="welcome-inp" id="w-income" placeholder="e.g. 2200" min="0">
         </div>
         <div class="welcome-field" style="margin:0">
-          <label>Rough Monthly Spending (£) <span style="opacity:.55;text-transform:none">· a guide, you’ll budget it line by line next</span></label>
-          <input type="number" class="welcome-inp" id="w-expenses" placeholder="e.g. 1600" min="0">
+          <label for="w-expenses">Rough Monthly Spending (£)</label>
+          <input type="number" class="welcome-inp" id="w-expenses" placeholder="e.g. 1600" min="0" aria-describedby="w-spend-note">
+          <div class="wz-note w-spend-note" id="w-spend-note">A guide. You’ll budget it line by line next.</div>
         </div>
         </div>
       <div style="font-size:max(.5rem,var(--vi-fs-1));color:var(--t3);line-height:1.55;margin-top:10px;text-align:center">Got debts? You'll add each one separately, with its type, interest rate and minimum payment, in the <b style="color:var(--em)">Debt tracker</b>, so your payoff plan is accurate.</div>
