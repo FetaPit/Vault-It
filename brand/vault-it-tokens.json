@@ -90,7 +90,9 @@
     }
   },
   "font": {
-    "display": "Syne",
+    "head": "Chakra Petch",
+    "wordmark": "Syne",
+    "figures": "Vault-form Heading",
     "body": "DM Sans",
     "mono": "Share Tech Mono"
   },

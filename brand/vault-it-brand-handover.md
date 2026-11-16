@@ -49,7 +49,7 @@ These were read from the live repo, so use them instead of guessing.
 
 - **No new framework or build step** unless the repo already has one. The app looks like a single large HTML file with inline CSS and JS (the saved page was about 570 KB). Confirm in Step 0 and keep the same architecture.
 - **No new dependencies.** The engine uses plain WebGL and canvas 2D. Do not introduce three.js.
-- **Fonts stay:** Syne (display), DM Sans (body), Share Tech Mono (numbers, labels). Remove unused fonts (see 5.2).
+- **Fonts (owner, 13 to 16 Nov 2026):** Chakra Petch for headlines, titles, nav tabs and buttons (Light 300 on the Level pills). Syne only for the logo wordmark. DM Sans for body. Share Tech Mono for labels and small figures. Vault-form for dashboard figures at 18px and up (Hero cut at about 64px and up). All self-hosted from `brand/fonts/`, no outside font host. Remove unused fonts (see Phase 2).
 - **British English, sentence case**, no em dashes in any copy.
 - **Compliance line stays visible:** "Not regulated by the FCA. Not financial advice."
 - **Never break existing user data or saved state.** This is a visual and behavioural refresh.
@@ -112,7 +112,7 @@ Accepted when: the app renders correctly in both themes, no hard coded dark valu
 
 ### Phase 2: Fonts and clean-up
 
-**Status: done.** Kept here as a record. The only open item is the build string in the footer.
+**Status: done for the first pass.** Kept as a record. Fonts have since moved on: see the fonts line in section 3. The open items are the build string in the footer and the Syne to Chakra Petch swap in the app (stage 2).
 
 - Remove `Playfair Display` (loaded, never used).
 - Move the three `DM Mono` rules to `Share Tech Mono`, then remove the DM Mono load.
@@ -136,7 +136,7 @@ Accepted when: no inline hand-drawn icon remains where a pack icon exists, every
 
 This is the main navigation. The dot before each icon is removed: the icon now carries the tab colour.
 
-Anatomy of a tab: icon (18px) + label (Syne 600, 12px, +0.14em tracking, uppercase) + optional badge. Selected tab only: a 1px inset outline in the tab colour with a soft glow in Night, and a crisp outline in Daylight. Active tab: label becomes `--text`, icon breathes on the 2.8 second beat (`vi-tabglow` keyframes). In Daylight the icon glow animation is off, the outline stays.
+Anatomy of a tab: icon (18px) + label (Chakra Petch 600 to 700, 11.5 to 12.5px, +0.14em tracking in the book, uppercase) + optional badge. Selected tab only: a 1px inset outline in the tab colour with a soft glow in Night, and a crisp outline in Daylight. Active tab: label becomes `--text`, icon breathes on the 2.8 second beat (`vi-tabglow` keyframes). In Daylight the icon glow animation is off, the outline stays.
 
 | Tab | Icon id | Colour token | Dark | Daylight |
 | --- | --- | --- | --- | --- |
@@ -506,7 +506,7 @@ Do not swap everything in one release. Order the work so the app is always shipp
 4. **Net worth scene and tracker toggle (done).** `vi-flag-nw` is on by default and the first view is the 3D blocks; `?nw=old` or `localStorage` `vi-flag-nw` overrides per device and Settings has the switch. Do not change the default without the owner. Originally the Graph view was the default. Feed it the app's own series with `setData`.
 5. **Landing page.** `landing.html` (vault-it.co) gets the same tokens, icons, wordmark and tagline in its own phase after the app.
 6. **Offline and caching.** Bump the cache or version string the PWA uses with every release so installed copies update, and include the new `brand/` assets in whatever precache list the app has.
-7. **Tests every phase:** `bash scripts/run-tests.sh all`. Also confirm `tests/test_beta_client.js` still passes: the brand work must add no new outside hosts (the fonts stay Syne, DM Sans, Share Tech Mono, and Playfair and DM Mono are removed).
+7. **Tests every phase:** `bash scripts/run-tests.sh all`. Also confirm `tests/test_beta_client.js` still passes: the brand work must add no new outside hosts (fonts are Chakra Petch, Syne for the wordmark, DM Sans, Share Tech Mono and Vault-form, all self-hosted; Playfair and DM Mono are removed).
 8. **Release (owner only, when asked).** Run all tests, create `backup/release-pioneer-v2-YYYYMMDD-HHMM`, then fast-forward `release/pioneer-v2`. Cloudflare then deploys it. Rollback is to fast-forward back to the backup branch, or switch the flag off.
 9. **Device matrix before the default flips:** a phone with a real GPU, a low end phone, desktop Chrome and Safari, Night and Daylight on each, reduced motion on, and one run with WebGL disabled to confirm the flat fallback still shows a house.
 10. **Watch after release:** console errors, frame rate on the house builder, and any report of text that is hard to read in Daylight.

@@ -18,8 +18,10 @@ html{box-sizing:border-box}
   --tglow:0 0 18px rgba(68,192,185,.35); --dglow:0 0 10px rgba(68,192,185,.6); --popglow:0 0 14px rgba(232,197,106,.7);
   --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
   --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
-  --font-display:"Syne","Helvetica Neue",Arial,sans-serif;
-  --font-head:"Chakra Petch","Helvetica Neue",Arial,sans-serif;
+  --font-head:"Chakra Petch","Helvetica Neue",Arial,sans-serif;   /* headlines, titles, nav tabs, buttons (owner, 13 to 16 Nov) */
+  --font-display:var(--font-head);   /* alias kept for old code */
+  --font-wm:"Syne","Helvetica Neue",Arial,sans-serif;   /* the logo wordmark only */
+  --font-fig:"Vault-form Heading","Chakra Petch",sans-serif;   /* dashboard figures, 18px and up (Hero cut at about 64px and up) */
   --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
   --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
   --r-brick:4px; --r-tile:14px; --r-card:18px; --r-pill:999px;
