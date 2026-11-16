@@ -18,6 +18,9 @@
 /* Vault-form, self-hosted (SIL OFL 1.1, brand/fonts/vault-form/OFL.txt): dashboard figures only */
 @font-face{font-family:"Vault-form Heading";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/vault-form/woff2/vault-form-heading-bold.woff2") format("woff2")}
 @font-face{font-family:"Vault-form Hero";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/vault-form/woff2/vault-form-hero-bold.woff2") format("woff2")}
+/* Chakra Petch Figures: fixed-width digits, for dashboard figures (trial, owner 16 Nov) */
+@font-face{font-family:"Chakra Petch Figures";font-style:normal;font-weight:100 549;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-figures-400.woff2") format("woff2")}
+@font-face{font-family:"Chakra Petch Figures";font-style:normal;font-weight:550 1000;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-figures-700.woff2") format("woff2")}
 @font-face{font-family:"Chakra Petch";font-style:normal;font-weight:100 349;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-300.woff2") format("woff2")}@font-face{font-family:"Chakra Petch";font-style:normal;font-weight:350 549;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-400.woff2") format("woff2")}@font-face{font-family:"Chakra Petch";font-style:normal;font-weight:550 1000;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-700.woff2") format("woff2")}
 
 
@@ -41,7 +44,7 @@ html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bott
   --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
   --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
   --font-head:"Chakra Petch","Helvetica Neue",Arial,sans-serif;
-  --font-fig:"Chakra Petch","Helvetica Neue",Arial,sans-serif;   /* dashboard figures, 18px and up: Chakra Petch on trial (owner, 16 Nov); Vault-form on hold */
+  --font-fig:"Chakra Petch Figures","Chakra Petch","Helvetica Neue",Arial,sans-serif;   /* dashboard figures, 18px and up: Chakra Petch on trial (owner, 16 Nov); Vault-form on hold */
   --font-hero:"Vault-form Hero","Vault-form Heading","Chakra Petch",sans-serif;   /* very large figures, about 64px and up */
   --font-wm:"Syne","Helvetica Neue",Arial,sans-serif;   /* the logo wordmark only */
   --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
@@ -920,7 +923,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
         <div class="fig" style="font-size:18px">£6,900 <span style="color:var(--red)">−£5,600</span></div>
         <div class="fig" style="font-size:34px">£6,900</div>
         <div class="fig" style="font-size:48px;color:var(--teal)">£15,500</div>
-        <div class="mono" style="color:var(--muted);font-size:13px">Chakra Petch has no tabular figures of its own, so a fixed-width-digit version is being made (OFL, can be modified).</div>
+        <div class="mono" style="color:var(--muted);font-size:13px">Chakra Petch has no tabular figures of its own, so these use Chakra Petch Figures, a fixed-width-digit version made for the brand (OFL, <code>brand/fonts/chakra-petch/</code>).</div>
       </div>
       <div class="mode" data-theme="light"><div class="lbl">Daylight, Chakra Petch (trial)</div>
         <div class="fig" style="font-size:18px">£6,900 <span style="color:var(--red)">−£5,600</span></div>
@@ -2403,15 +2406,15 @@ if(document.fonts&&document.fonts.load)Promise.all([document.fonts.load('700 40p
 
 function cssOut(){
   var s="/* Night, the default */\n:root,[data-theme=\"dark\"]{\n";TOK.forEach(function(t){s+="  "+t.v+": "+t.hex+"; /* "+t.name+" */\n"});
-  s+="  --goldf: #E8C56A;\n  --on-teal: #00181A;\n  --on-gold: #1A1400;\n  --font-head: \"Chakra Petch\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-display: var(--font-head);\n  --font-wm: \"Syne\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-fig: \"Chakra Petch\", sans-serif;\n  --font-body: \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-mono: \"Share Tech Mono\", ui-monospace, Menlo, monospace;\n  --r-brick: 4px;\n  --r-tile: 14px;\n  --r-card: 18px;\n  --r-pill: 999px;\n  --ease: cubic-bezier(.2,.8,.2,1);\n  --t-fast: 240ms;\n  --t-base: 600ms;\n  --t-build: 1800ms;\n  --pulse: 2800ms;\n  --vi-sw: 1.1; /* icon stroke, 1.5 under 24px */\n}\n\n/* Daylight, the light mode */\n[data-theme=\"light\"]{\n  color-scheme: light;\n";
+  s+="  --goldf: #E8C56A;\n  --on-teal: #00181A;\n  --on-gold: #1A1400;\n  --font-head: \"Chakra Petch\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-display: var(--font-head);\n  --font-wm: \"Syne\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-fig: \"Chakra Petch Figures\", \"Chakra Petch\", sans-serif;\n  --font-body: \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-mono: \"Share Tech Mono\", ui-monospace, Menlo, monospace;\n  --r-brick: 4px;\n  --r-tile: 14px;\n  --r-card: 18px;\n  --r-pill: 999px;\n  --ease: cubic-bezier(.2,.8,.2,1);\n  --t-fast: 240ms;\n  --t-base: 600ms;\n  --t-build: 1800ms;\n  --pulse: 2800ms;\n  --vi-sw: 1.1; /* icon stroke, 1.5 under 24px */\n}\n\n/* Daylight, the light mode */\n[data-theme=\"light\"]{\n  color-scheme: light;\n";
   TOK.forEach(function(t){s+="  "+t.v+": "+t.lt+";\n"});
   s+="  --on-teal: #FFFFFF;\n}\n\n/* Follow the device unless the person has chosen: read localStorage vi-theme, else prefers-color-scheme, and set data-theme on html. */\n";return s}
 function jsonOut(){
-  var o={color:{},font:{head:"Chakra Petch",wordmark:"Syne",figures:"Chakra Petch",body:"DM Sans",mono:"Share Tech Mono"},radius:{brick:"4px",tile:"14px",card:"18px",pill:"999px"},space:[4,8,12,16,24,40,64],motion:{fast:"240ms",base:"600ms",build:"1800ms",ease:"cubic-bezier(.2,.8,.2,1)"}};
+  var o={color:{},font:{head:"Chakra Petch",wordmark:"Syne",figures:"Chakra Petch Figures",body:"DM Sans",mono:"Share Tech Mono"},radius:{brick:"4px",tile:"14px",card:"18px",pill:"999px"},space:[4,8,12,16,24,40,64],motion:{fast:"240ms",base:"600ms",build:"1800ms",ease:"cubic-bezier(.2,.8,.2,1)"}};
   TOK.forEach(function(t){o.color[t.name.toLowerCase().replace(/\s+/g,"-")]={value:t.hex,role:t.role}});return JSON.stringify(o,null,2)}
 function twOut(){
   var c={};TOK.forEach(function(t){c[t.name.toLowerCase().replace(/\s+/g,"-")]=t.hex});
-  return "module.exports = {\n  theme: {\n    extend: {\n      colors: "+JSON.stringify(c,null,8).replace(/\n {6}\}/,"\n      }")+",\n      fontFamily: {\n        head: ['\"Chakra Petch\"', 'Arial', 'sans-serif'],\n        wordmark: ['Syne', 'Arial', 'sans-serif'],\n        figures: ['\"Chakra Petch\"', 'sans-serif'],\n        body: ['\"DM Sans\"', 'Arial', 'sans-serif'],\n        mono: ['\"Share Tech Mono\"', 'monospace']\n      },\n      borderRadius: { brick: '4px', tile: '14px', card: '18px' },\n      transitionDuration: { fast: '240ms', base: '600ms', build: '1800ms' },\n      transitionTimingFunction: { vault: 'cubic-bezier(.2,.8,.2,1)' }\n    }\n  }\n};\n"}
+  return "module.exports = {\n  theme: {\n    extend: {\n      colors: "+JSON.stringify(c,null,8).replace(/\n {6}\}/,"\n      }")+",\n      fontFamily: {\n        head: ['\"Chakra Petch\"', 'Arial', 'sans-serif'],\n        wordmark: ['Syne', 'Arial', 'sans-serif'],\n        figures: ['\"Chakra Petch Figures\"', '\"Chakra Petch\"', 'sans-serif'],\n        body: ['\"DM Sans\"', 'Arial', 'sans-serif'],\n        mono: ['\"Share Tech Mono\"', 'monospace']\n      },\n      borderRadius: { brick: '4px', tile: '14px', card: '18px' },\n      transitionDuration: { fast: '240ms', base: '600ms', build: '1800ms' },\n      transitionTimingFunction: { vault: 'cubic-bezier(.2,.8,.2,1)' }\n    }\n  }\n};\n"}
 var OUT=[{k:"CSS variables",f:"vault-it-tokens.css",t:"text/css",g:cssOut},{k:"JSON",f:"vault-it-tokens.json",t:"application/json",g:jsonOut},{k:"Tailwind config",f:"tailwind.vault-it.js",t:"text/javascript",g:twOut},{k:"Icon sprite",f:"vault-it-icons.svg",t:"image/svg+xml",g:spriteOut},{k:"Icon manifest",f:"vault-it-icons.json",t:"application/json",g:manifestOut}],oi=0;
 function tokRender(){$("#tokOut").textContent=OUT[oi].g()}
 pill($("#tokTabs"),OUT,function(o){return o.k},function(i){oi=i;tokRender()});

@@ -21,7 +21,7 @@ html{box-sizing:border-box}
   --font-head:"Chakra Petch","Helvetica Neue",Arial,sans-serif;   /* headlines, titles, nav tabs, buttons (owner, 13 to 16 Nov) */
   --font-display:var(--font-head);   /* alias kept for old code */
   --font-wm:"Syne","Helvetica Neue",Arial,sans-serif;   /* the logo wordmark only */
-  --font-fig:"Chakra Petch",sans-serif;   /* dashboard figures, 18px and up: on trial (owner, 16 Nov), Vault-form on hold */
+  --font-fig:"Chakra Petch Figures","Chakra Petch",sans-serif;   /* dashboard figures, 18px and up: on trial (owner, 16 Nov), Vault-form on hold */
   --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
   --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
   --r-brick:4px; --r-tile:14px; --r-card:18px; --r-pill:999px;
