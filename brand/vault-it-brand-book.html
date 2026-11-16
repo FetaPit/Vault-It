@@ -12,7 +12,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Ccircle cx='120' cy='120' r='108' fill='%23000810' stroke='%2342C0B8' stroke-width='14'/%3E%3Cpolygon points='60,76 88,76 120,126.2 152,76 180,76 120,170' fill='%2342C0B8'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 /* Chakra Petch, self-hosted (SIL OFL 1.1, brand/fonts/chakra-petch/OFL.txt): headlines and titles, Light on the Level pills */
 @font-face{font-family:"Chakra Petch";font-style:normal;font-weight:100 349;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-300.woff2") format("woff2")}@font-face{font-family:"Chakra Petch";font-style:normal;font-weight:350 549;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-400.woff2") format("woff2")}@font-face{font-family:"Chakra Petch";font-style:normal;font-weight:550 1000;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-700.woff2") format("woff2")}
@@ -37,8 +37,8 @@ html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bott
   --tglow:0 0 18px rgba(68,192,185,.35); --dglow:0 0 10px rgba(68,192,185,.6); --popglow:0 0 14px rgba(232,197,106,.7);
   --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
   --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
-  --font-display:"Syne","Helvetica Neue",Arial,sans-serif;
   --font-head:"Chakra Petch","Helvetica Neue",Arial,sans-serif;
+  --font-display:"Syne","Helvetica Neue",Arial,sans-serif;   /* the logo wordmark only */
   --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
   --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
   --r-brick:4px; --r-tile:14px; --r-card:18px; --r-pill:999px;
@@ -98,7 +98,7 @@ section{padding:72px 0 24px;border-top:1px solid var(--line)}
 .hdr .wrap{display:flex;align-items:center;gap:18px;height:60px}
 .hdr nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1}
 .hdr nav::-webkit-scrollbar{display:none}
-.hdr nav a{display:flex;align-items:center;gap:8px;color:var(--muted);text-decoration:none;padding:8px 12px;font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;border-bottom:2px solid transparent}
+.hdr nav a{display:flex;align-items:center;gap:8px;color:var(--muted);text-decoration:none;padding:8px 12px;font-family:var(--font-head);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;border-bottom:2px solid transparent}
 .hdr nav a i{width:6px;height:6px;border-radius:50%;background:var(--c,var(--teal));opacity:.8}
 .hdr nav a:hover{color:var(--text);border-bottom-color:var(--gold)}
 .wm{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;white-space:nowrap;display:inline-flex;align-items:baseline;color:var(--text)}
@@ -117,10 +117,10 @@ section{padding:72px 0 24px;border-top:1px solid var(--line)}
 .ladder .well{min-height:170px;display:flex;align-items:center;justify-content:center;gap:18px;background:#080808;border-radius:12px;padding:16px}
 .ladder .well.lt{background:#EEF4F4}
 .ladder figcaption{font-size:14px;color:var(--muted)}
-.ladder figcaption b{display:block;color:var(--text);font-family:var(--font-display);font-size:16px;margin-bottom:2px}
+.ladder figcaption b{display:block;color:var(--text);font-family:var(--font-head);font-size:16px;margin-bottom:2px}
 .tile{width:112px;height:112px;border-radius:27%;background:radial-gradient(circle at 50% 38%,#0A2A2E,#080808 72%);display:grid;place-items:center;box-shadow:inset 0 0 0 1px #15302F,0 10px 30px -10px rgba(68,192,185,.45)}
 .hdr .wm{font-size:22px}
-.btn{font:700 13px/1 var(--font-display);letter-spacing:.14em;text-transform:uppercase;border:0;border-radius:10px;padding:15px 22px;cursor:pointer;min-height:44px;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast),filter var(--t-fast)}
+.btn{font:700 13px/1 var(--font-head);letter-spacing:.14em;text-transform:uppercase;border:0;border-radius:10px;padding:15px 22px;cursor:pointer;min-height:44px;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast),filter var(--t-fast)}
 .btn:active{transform:translateY(1px)}
 .btn-primary{background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#fff;box-shadow:var(--bshadow)}
 .btn-primary:hover{filter:brightness(1.12)}
@@ -128,7 +128,7 @@ section{padding:72px 0 24px;border-top:1px solid var(--line)}
 .btn-gold:hover{filter:brightness(1.08)}
 .btn-ghost{background:transparent;color:var(--teal);box-shadow:inset 0 0 0 1.5px var(--line2)}
 .btn-ghost:hover{box-shadow:inset 0 0 0 1.5px var(--teal)}
-.btn-sm{padding:10px 14px;font-size:11px;min-height:38px}
+.btn-sm{padding:10px 14px;font-size:11.5px;min-height:38px}
 .hero{border-top:0;padding-top:56px}
 .hero-grid{display:grid;gap:36px;grid-template-columns:1fr;align-items:center}
 @media(min-width:900px){.hero-grid{grid-template-columns:1.05fr 1fr}}
@@ -156,7 +156,7 @@ input[type=range]{width:100%;accent-color:var(--gold);height:44px;margin:0}
 .vi-neon-red::before{background-image:linear-gradient(#FF4D63,#FF4D63)}
 .vi-neon-gold{--neon-glow:#F2C94C}
 .vi-neon-gold::before{background-image:linear-gradient(100deg,#B8862E 0%,#F5DC4A 38%,#FFF1B0 52%,#E8C56A 68%,#B8862E 100%)}
-.tag-line{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;line-height:1.15;font-size:clamp(24px,4.4vw,38px);margin:0}
+.tag-line{font-family:var(--font-head);font-weight:800;letter-spacing:-.02em;line-height:1.15;font-size:clamp(24px,4.4vw,38px);margin:0}
 .tag-fill-red{color:#C8202A}.tag-fill-your{color:#44C0B9}.tag-fill-home{color:#E8C56A}
 .tag-plain-red{color:#FF4D63}.tag-plain-home{color:#F5DC4A}
 .tag-stage{background:#080808;color:#E8E8E8;border:1px solid var(--line2);border-radius:var(--r-card);padding:24px}
@@ -191,7 +191,7 @@ td.mono{white-space:nowrap;overflow-wrap:normal}
 .sw{all:unset;cursor:pointer;display:block;border-radius:var(--r-tile);overflow:hidden;border:1px solid var(--line);background:var(--panel)}
 .sw:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .sw:hover{border-color:var(--teal)}
-.sw .chip{height:92px;display:flex;align-items:flex-end;padding:12px;font-family:var(--font-display);font-weight:800;font-size:18px}
+.sw .chip{height:92px;display:flex;align-items:flex-end;padding:12px;font-family:var(--font-head);font-weight:800;font-size:18px}
 .sw .meta{padding:12px 14px;font-size:14px;color:var(--muted);display:grid;gap:3px;font-variant-numeric:tabular-nums}
 .sw .meta b{color:var(--text);font-weight:700;font-family:var(--font-mono);letter-spacing:.06em;font-size:16px}
 .badge{display:inline-block;padding:2px 8px;border-radius:var(--r-pill);font-size:12px;font-weight:700;margin-right:4px}
@@ -214,7 +214,7 @@ th{color:var(--faint);font-weight:400;font-family:var(--font-mono);letter-spacin
 .vi-stat span{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:6px}
 .vi-kpi{background:var(--surf2);border:1px solid var(--line);border-radius:var(--r-tile);padding:16px;min-width:200px;flex:1;color:var(--text)}
 .vi-kpi .lbl{display:flex;align-items:center;gap:8px;color:var(--teal)}
-.vi-kpi .n{font-family:var(--font-display);font-size:34px;font-weight:800;margin:6px 0 2px;color:var(--text);font-variant-numeric:tabular-nums}
+.vi-kpi .n{font-family:var(--font-head);font-size:34px;font-weight:800;margin:6px 0 2px;color:var(--text);font-variant-numeric:tabular-nums}
 .vi-kpi .n.red{color:var(--red)}.vi-kpi small{color:var(--muted);font-family:var(--font-mono);font-size:13px}
 .vi-pills{display:flex;flex-wrap:wrap;gap:8px;width:100%}
 .vi-pill{font-family:var(--font-mono);font-size:14px;letter-spacing:.06em;padding:8px 16px;border-radius:var(--r-pill);border:1.5px solid var(--gold);color:var(--gold);background:var(--pillbg)}
@@ -235,19 +235,19 @@ th{color:var(--faint);font-weight:400;font-family:var(--font-mono);letter-spacin
 .vi-ms li .ck{margin-left:auto;color:var(--teal)}
 .vi-ms li.todo{color:var(--muted)}
 .vi-tabs{display:flex;gap:4px;width:100%;overflow-x:auto;border-bottom:1px solid var(--line)}
-.vi-tabs a{display:flex;align-items:center;gap:8px;padding:12px 14px;color:var(--muted);font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;border-bottom:2px solid transparent;text-decoration:none}
+.vi-tabs a{display:flex;align-items:center;gap:8px;padding:12px 14px;color:var(--muted);font-family:var(--font-head);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;border-bottom:2px solid transparent;text-decoration:none}
 .vi-tabs a i{width:6px;height:6px;border-radius:50%}
 .vi-tabs a.on{color:var(--gold);border-bottom-color:var(--gold)}
 .vi-toast{border:1px solid var(--teal);background:var(--toastbg);color:var(--teal);font-family:var(--font-mono);padding:14px 18px;border-radius:12px;box-shadow:0 0 22px rgba(68,192,185,.25)}
 .vi-price{background:var(--surf2);border:1px solid var(--gold);border-radius:var(--r-card);padding:24px;max-width:340px;width:100%;color:var(--text);box-shadow:0 0 28px rgba(232,197,106,.12)}
-.vi-price .p{font-family:var(--font-display);font-size:44px;font-weight:800;color:var(--gold)}
+.vi-price .p{font-family:var(--font-head);font-size:44px;font-weight:800;color:var(--gold)}
 .vi-price .p small{font-size:16px;font-weight:600;color:var(--muted)}
 .vi-price ul{padding-left:20px;margin:14px 0 20px;color:var(--muted)}
-.vi-usp{display:inline-block;background:var(--goldf);color:var(--on-gold);font:800 10px var(--font-display);letter-spacing:.14em;padding:3px 8px;border-radius:6px}
+.vi-usp{display:inline-block;background:var(--goldf);color:var(--on-gold);font:700 10.5px var(--font-head);letter-spacing:.14em;padding:3px 8px;border-radius:6px}
 .motion-grid{display:grid;gap:20px;grid-template-columns:1fr}
 @media(min-width:760px){.motion-grid{grid-template-columns:1.2fr 1fr}}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
-.tab{font:700 12px var(--font-display);letter-spacing:.12em;text-transform:uppercase;padding:10px 14px;border-radius:var(--r-pill);border:0;background:transparent;color:var(--muted);cursor:pointer;min-height:40px;box-shadow:inset 0 0 0 1.5px var(--line2)}
+.tab{font:700 12px var(--font-head);letter-spacing:.12em;text-transform:uppercase;padding:10px 14px;border-radius:var(--r-pill);border:0;background:transparent;color:var(--muted);cursor:pointer;min-height:40px;box-shadow:inset 0 0 0 1.5px var(--line2)}
 .tab[aria-pressed="true"]{background:var(--goldf);color:var(--on-gold);box-shadow:none}
 .field{display:grid;gap:6px;margin-bottom:14px}
 .field label{font-size:13px;color:var(--faint);font-family:var(--font-mono);letter-spacing:.14em;text-transform:uppercase}
@@ -284,7 +284,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
 @keyframes popup{0%{opacity:0;transform:translate(-50%,12px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-70px)}}
 .levels{display:flex;gap:8px;overflow-x:auto;margin-top:28px;padding:2px 0 4px;scrollbar-width:none}
 .levels::-webkit-scrollbar{display:none}
-.lvl{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.06em;padding:12px 18px;border-radius:var(--r-pill);border:1.5px solid var(--line2);color:var(--muted);white-space:nowrap;display:inline-flex;gap:10px;align-items:center}
+.lvl{font-family:var(--font-head);font-weight:700;font-size:13px;letter-spacing:.06em;padding:12px 18px;border-radius:var(--r-pill);border:1.5px solid var(--line2);color:var(--muted);white-space:nowrap;display:inline-flex;gap:10px;align-items:center}
 .lvl.on{border-color:var(--gold);color:var(--gold);background:rgba(232,197,106,.07)}
 .lvl.open{border-color:var(--gold);color:var(--gold)}
 .lvl.open .lk{display:none}
@@ -356,9 +356,9 @@ footer .wm{font-size:26px;margin-bottom:10px}
 .vi-tabs a.on .ic{animation:tabglow var(--pulse) ease-in-out infinite}
 @keyframes tabglow{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 6px var(--tc,var(--teal)))}}
 [data-theme="light"] .vi-tabs a.on .ic{animation:none}
-.vi-pro{display:inline-block;border:1px solid var(--brass);color:var(--brass);font:800 9px var(--font-display);letter-spacing:.14em;padding:2px 6px;border-radius:6px}
+.vi-pro{display:inline-block;border:1px solid var(--brass);color:var(--brass);font:700 10.5px var(--font-head);letter-spacing:.14em;padding:2px 6px;border-radius:6px}
 .vi-subs{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;width:100%}
-.vi-sub{display:inline-flex;align-items:center;gap:9px;padding:11px 16px;border-radius:12px;border:1px solid var(--line2);background:var(--surf2);color:var(--muted);font:600 12px var(--font-display);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;min-height:44px}
+.vi-sub{display:inline-flex;align-items:center;gap:9px;padding:11px 16px;border-radius:12px;border:1px solid var(--line2);background:var(--surf2);color:var(--muted);font:600 12px var(--font-head);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;min-height:44px}
 .vi-sub .ic{width:18px;height:18px;color:var(--tc)}
 .vi-sub:hover{border-color:var(--tc)}
 .vi-sub.on{color:var(--text);border-color:var(--tc);background:color-mix(in srgb,var(--tc) 10%,var(--surf2));box-shadow:0 0 18px -6px color-mix(in srgb,var(--tc) 60%,transparent)}
@@ -366,7 +366,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
 .trkbar{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:14px 0 6px}
 .trkbar .tabs{margin:0}
 .seg{display:inline-flex;border:1px solid var(--line2);border-radius:var(--r-pill);overflow:hidden}
-.seg button{font:700 12px var(--font-display);letter-spacing:.12em;text-transform:uppercase;padding:11px 16px;border:0;background:transparent;color:var(--muted);cursor:pointer;min-height:42px;display:inline-flex;align-items:center;gap:8px}
+.seg button{font:700 12px var(--font-head);letter-spacing:.12em;text-transform:uppercase;padding:11px 16px;border:0;background:transparent;color:var(--muted);cursor:pointer;min-height:42px;display:inline-flex;align-items:center;gap:8px}
 .seg button .ic{width:16px;height:16px}
 .seg button[aria-pressed="true"]{background:var(--goldf);color:var(--on-gold)}
 .seg button[aria-pressed="true"] .ic{color:var(--on-gold)!important}
@@ -397,7 +397,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
 .vi-tabs a{border-bottom:0;border-radius:0;color:var(--muted)}
 .vi-tabs a.on{color:var(--text);border-bottom:0;background:rgb(var(--teal-rgb,68 192 185)/.09);box-shadow:inset 0 0 0 1px var(--tc,var(--teal)),0 0 14px -3px var(--tc,var(--teal))}
 [data-theme="light"] .vi-tabs a.on{box-shadow:inset 0 0 0 1px var(--tc,var(--teal))}
-.badge-usp,.badge-pro{font-family:var(--font-display);font-weight:700;font-size:10.5px;letter-spacing:.08em;padding:2px 6px;border:1px solid currentColor;margin-left:4px}
+.badge-usp,.badge-pro{font-family:var(--font-head);font-weight:700;font-size:10.5px;letter-spacing:.08em;padding:2px 6px;border:1px solid currentColor;margin-left:4px}
 .badge-usp{color:var(--gold)}.badge-pro{color:var(--orange)}
 .ft-demo{background:var(--surf2);border:1px solid var(--line);padding:12px 16px;display:grid;gap:8px;width:100%;color:var(--muted);font-size:12.5px}
 .ft-demo .ft-fca{color:var(--text);font-size:12.5px}
@@ -847,7 +847,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
           <tr><td style="font-family:var(--font-head);font-weight:700;font-size:26px">Display</td><td>Chakra Petch 700</td><td>38 to 76, tight</td></tr>
           <tr><td style="font-family:var(--font-head);font-weight:700;font-size:22px">Heading</td><td>Chakra Petch 700</td><td>28 to 44</td></tr>
           <tr><td style="font-family:var(--font-head);font-weight:300;font-size:18px">Level pills (to try)</td><td>Chakra Petch 300</td><td>13. A Light cut is being tried on the Level pills (owner, 13 Nov)</td></tr>
-          <tr><td style="font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase">Navigation and buttons</td><td>Syne 600 to 700</td><td>12 to 13, +0.14em, uppercase</td></tr>
+          <tr><td style="font-family:var(--font-head);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase">Navigation and buttons</td><td>Syne 600 to 700</td><td>12 to 13, +0.14em, uppercase</td></tr>
           <tr><td>Body</td><td>DM Sans 400</td><td>17 to 18, 1.55</td></tr>
           <tr><td class="lbl">Label</td><td>Share Tech Mono</td><td>13, +0.22em, uppercase</td></tr>
           <tr><td class="mono" style="color:var(--gold);font-size:20px">£8.5k</td><td>Share Tech Mono</td><td>20 to 30, tabular</td></tr>
@@ -2325,7 +2325,7 @@ function draw(){
   cx.fillText("It",dx+dw+wf*.07,ty);
   var head=$("#sHead").value||"",sub=$("#sSub").value||"";
   var hs=(fi===0?76:fi===1?100:80)*u*(head.length>40?.88:1),tw=w>h?w*.47-m:w-2*m;
-  cx.font="800 "+hs+"px 'Syne',Arial,sans-serif";cx.fillStyle=INK;
+  cx.font="700 "+hs+"px 'Chakra Petch',Arial,sans-serif";cx.fillStyle=INK;
   var hy=ty+(w>h?hs*1.35:hs*1.7);
   var tagCm=/^get out of the red/i.test(head)?(LT?{red:"#C8202A",home:"#60480B"}:{red:"#FF4D63",home:"#F5DC4A"}):null;/* plain-text tagline colours (see Brand story); the neon stroke is for HTML comms */
   var ey=wrapText(cx,head,m,hy,tw,hs*1.02,tagCm);
@@ -2343,19 +2343,19 @@ $("#sSave").addEventListener("click",function(){
 });
 $("#sCopy").addEventListener("click",function(){copy($("#sHead").value+" "+$("#sSub").value,"Caption copied")});
 loadTpl(0);
-if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
+if(document.fonts&&document.fonts.load)Promise.all([document.fonts.load('700 40px "Chakra Petch"'),document.fonts.load('800 40px "Syne"')]).then(draw,draw);else if(document.fonts&&document.fonts.ready)document.fonts.ready.then(draw);
 
 function cssOut(){
   var s="/* Night, the default */\n:root,[data-theme=\"dark\"]{\n";TOK.forEach(function(t){s+="  "+t.v+": "+t.hex+"; /* "+t.name+" */\n"});
-  s+="  --goldf: #E8C56A;\n  --on-teal: #00181A;\n  --on-gold: #1A1400;\n  --font-display: \"Syne\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-head: \"Chakra Petch\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-body: \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-mono: \"Share Tech Mono\", ui-monospace, Menlo, monospace;\n  --r-brick: 4px;\n  --r-tile: 14px;\n  --r-card: 18px;\n  --r-pill: 999px;\n  --ease: cubic-bezier(.2,.8,.2,1);\n  --t-fast: 240ms;\n  --t-base: 600ms;\n  --t-build: 1800ms;\n  --pulse: 2800ms;\n  --vi-sw: 1.1; /* icon stroke, 1.5 under 24px */\n}\n\n/* Daylight, the light mode */\n[data-theme=\"light\"]{\n  color-scheme: light;\n";
+  s+="  --goldf: #E8C56A;\n  --on-teal: #00181A;\n  --on-gold: #1A1400;\n  --font-head: \"Chakra Petch\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-display: var(--font-head);\n  --font-wm: \"Syne\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-fig: \"Vault-form Heading\", \"Chakra Petch\", sans-serif;\n  --font-body: \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif;\n  --font-mono: \"Share Tech Mono\", ui-monospace, Menlo, monospace;\n  --r-brick: 4px;\n  --r-tile: 14px;\n  --r-card: 18px;\n  --r-pill: 999px;\n  --ease: cubic-bezier(.2,.8,.2,1);\n  --t-fast: 240ms;\n  --t-base: 600ms;\n  --t-build: 1800ms;\n  --pulse: 2800ms;\n  --vi-sw: 1.1; /* icon stroke, 1.5 under 24px */\n}\n\n/* Daylight, the light mode */\n[data-theme=\"light\"]{\n  color-scheme: light;\n";
   TOK.forEach(function(t){s+="  "+t.v+": "+t.lt+";\n"});
   s+="  --on-teal: #FFFFFF;\n}\n\n/* Follow the device unless the person has chosen: read localStorage vi-theme, else prefers-color-scheme, and set data-theme on html. */\n";return s}
 function jsonOut(){
-  var o={color:{},font:{display:"Syne",body:"DM Sans",mono:"Share Tech Mono"},radius:{brick:"4px",tile:"14px",card:"18px",pill:"999px"},space:[4,8,12,16,24,40,64],motion:{fast:"240ms",base:"600ms",build:"1800ms",ease:"cubic-bezier(.2,.8,.2,1)"}};
+  var o={color:{},font:{head:"Chakra Petch",wordmark:"Syne",figures:"Vault-form Heading",body:"DM Sans",mono:"Share Tech Mono"},radius:{brick:"4px",tile:"14px",card:"18px",pill:"999px"},space:[4,8,12,16,24,40,64],motion:{fast:"240ms",base:"600ms",build:"1800ms",ease:"cubic-bezier(.2,.8,.2,1)"}};
   TOK.forEach(function(t){o.color[t.name.toLowerCase().replace(/\s+/g,"-")]={value:t.hex,role:t.role}});return JSON.stringify(o,null,2)}
 function twOut(){
   var c={};TOK.forEach(function(t){c[t.name.toLowerCase().replace(/\s+/g,"-")]=t.hex});
-  return "module.exports = {\n  theme: {\n    extend: {\n      colors: "+JSON.stringify(c,null,8).replace(/\n {6}\}/,"\n      }")+",\n      fontFamily: {\n        display: ['Syne', 'Arial', 'sans-serif'],\n        body: ['\"DM Sans\"', 'Arial', 'sans-serif'],\n        mono: ['\"Share Tech Mono\"', 'monospace']\n      },\n      borderRadius: { brick: '4px', tile: '14px', card: '18px' },\n      transitionDuration: { fast: '240ms', base: '600ms', build: '1800ms' },\n      transitionTimingFunction: { vault: 'cubic-bezier(.2,.8,.2,1)' }\n    }\n  }\n};\n"}
+  return "module.exports = {\n  theme: {\n    extend: {\n      colors: "+JSON.stringify(c,null,8).replace(/\n {6}\}/,"\n      }")+",\n      fontFamily: {\n        head: ['\"Chakra Petch\"', 'Arial', 'sans-serif'],\n        wordmark: ['Syne', 'Arial', 'sans-serif'],\n        figures: ['\"Vault-form Heading\"', '\"Chakra Petch\"', 'sans-serif'],\n        body: ['\"DM Sans\"', 'Arial', 'sans-serif'],\n        mono: ['\"Share Tech Mono\"', 'monospace']\n      },\n      borderRadius: { brick: '4px', tile: '14px', card: '18px' },\n      transitionDuration: { fast: '240ms', base: '600ms', build: '1800ms' },\n      transitionTimingFunction: { vault: 'cubic-bezier(.2,.8,.2,1)' }\n    }\n  }\n};\n"}
 var OUT=[{k:"CSS variables",f:"vault-it-tokens.css",t:"text/css",g:cssOut},{k:"JSON",f:"vault-it-tokens.json",t:"application/json",g:jsonOut},{k:"Tailwind config",f:"tailwind.vault-it.js",t:"text/javascript",g:twOut},{k:"Icon sprite",f:"vault-it-icons.svg",t:"image/svg+xml",g:spriteOut},{k:"Icon manifest",f:"vault-it-icons.json",t:"application/json",g:manifestOut}],oi=0;
 function tokRender(){$("#tokOut").textContent=OUT[oi].g()}
 pill($("#tokTabs"),OUT,function(o){return o.k},function(i){oi=i;tokRender()});
