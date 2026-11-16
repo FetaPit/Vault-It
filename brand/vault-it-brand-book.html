@@ -412,6 +412,17 @@ footer .wm{font-size:26px;margin-bottom:10px}
 .ft-demo small{font-size:10.5px;line-height:1.35}
 .lock-demo{position:relative;background:var(--surf2);border:1px solid var(--lockline);padding:22px;text-align:center;max-width:340px;width:100%;color:var(--text);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
 .lock-demo .lk{color:var(--brass);width:28px;height:28px}
+@media print{
+  @page{size:A4;margin:10mm}
+  html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hdr,#themeBtn,.rail,.demo-bar button,[data-copy],#sSave,#sCopy,#tokCopy,#tokSave,#spCopy,#spSave,#mfSave,.tabs button:not([aria-pressed="true"]){display:none!important}
+  .hdr{position:static}
+  section{break-inside:auto;padding-top:24px!important;padding-bottom:24px!important}
+  .card,.demo-wrap,.mode,.tag-stage,figure,table,.stage3d,canvas{break-inside:avoid}
+  h2,h3{break-after:avoid}
+  *{animation:none!important;transition:none!important}
+  .wrap{max-width:none!important}
+}
 </style>
 </head>
 <body>
@@ -504,14 +515,14 @@ footer .wm{font-size:26px;margin-bottom:10px}
       </div>
       <div class="tag-stage">
         <div class="lbl" style="margin-bottom:12px">Pitch deck fills (owner, 7 Nov)</div>
-        <p class="tag-line">Get out of the <span class="tag-fill-red">red</span> and into <span class="tag-fill-your">your</span> <span class="tag-fill-home">home</span>.</p>
-        <p style="color:#9AA0A6;margin:14px 0 0;font-size:14px">No stroke. <b>red</b> dark red #C8202A, <b>your</b> teal #44C0B9, <b>home</b> gold #E8C56A. The deck uses these until the owner says otherwise.</p>
+        <p class="tag-line">Get out of the <span class="tag-fill-red">red</span> and <span class="tag-fill-your">into your</span> <span class="tag-fill-home">home</span>.</p>
+        <p style="color:#9AA0A6;margin:14px 0 0;font-size:14px">No stroke. <b>red</b> dark red #C8202A, <b>into your</b> teal #44C0B9, <b>home</b> gold #E8C56A. The deck and the website now share one rule: "into your" in teal.</p>
       </div>
     </div>
     <div class="tag-stage" style="margin-top:20px">
       <div class="lbl" style="margin-bottom:12px">Website hero (owner, 13 Nov: "go with red but a shade or 2 lighter")</div>
       <p class="tag-line" style="font-family:var(--font-head);font-weight:700">Get out of the <span style="color:#C8202A">red</span> and <span style="color:#44C0B9">into your</span> <span style="color:#E8C56A;text-shadow:0 0 .18em rgb(232 197 106 / .4)">home</span>.</p>
-      <p style="color:#9AA0A6;margin:14px 0 0;font-size:14px">Chakra Petch 700. <b>red</b> a solid red fill, #C8202A in Night and #B0141F in Daylight. <b>into your</b> teal. <b>home</b> gold with a faint glow (#A8781F in Daylight); the glow pulses gently and holds still under reduced motion. Built on the website branch <code>claude/great-hopper-xtzoi8</code> (7a0e7cd), not yet merged: <code>landing.html</code> on <code>brand-rollout</code> still has the older treatment. Open for the owner: one rule for both, "into your" teal as on the site or "your" teal as in the deck.</p>
+      <p style="color:#9AA0A6;margin:14px 0 0;font-size:14px">Chakra Petch 700. <b>red</b> a solid red fill, #C8202A in Night and #B0141F in Daylight. <b>into your</b> teal. <b>home</b> gold with a faint glow (#A8781F in Daylight); the glow pulses gently and holds still under reduced motion. Built on the website branch <code>claude/great-hopper-xtzoi8</code> (7a0e7cd), not yet merged: <code>landing.html</code> on <code>brand-rollout</code> still has the older treatment. One rule for both the site and the deck: "into your" in teal (owner, 16 Nov).</p>
     </div>
     <div class="grid2" style="margin-top:20px">
       <div class="tag-stage">
@@ -528,7 +539,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
         </ul>
         <ul class="rules" style="margin-top:12px">
           <li>No neon on a light ground. Keep the tagline on a dark ground, even inside a Daylight page.</li>
-          <li>No other word gets a colour or a stroke, except "into your" in teal on the website hero and "your" in the deck.</li>
+          <li>No other word gets a colour or a stroke, except "into your" in teal on the website hero and the deck.</li>
         </ul>
       </div>
     </div>
