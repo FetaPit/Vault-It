@@ -43,7 +43,7 @@ html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bott
   --font-head:"Chakra Petch","Helvetica Neue",Arial,sans-serif;
   --font-fig:"Chakra Petch","Helvetica Neue",Arial,sans-serif;   /* dashboard figures, 18px and up: Chakra Petch on trial (owner, 16 Nov); Vault-form on hold */
   --font-hero:"Vault-form Hero","Vault-form Heading","Chakra Petch",sans-serif;   /* very large figures, about 64px and up */
-  --font-display:"Syne","Helvetica Neue",Arial,sans-serif;   /* the logo wordmark only */
+  --font-wm:"Syne","Helvetica Neue",Arial,sans-serif;   /* the logo wordmark only */
   --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
   --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
   --r-brick:4px; --r-tile:14px; --r-card:18px; --r-pill:999px;
@@ -106,7 +106,7 @@ section{padding:72px 0 24px;border-top:1px solid var(--line)}
 .hdr nav a{display:flex;align-items:center;gap:8px;color:var(--muted);text-decoration:none;padding:8px 12px;font-family:var(--font-head);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;border-bottom:2px solid transparent}
 .hdr nav a i{width:6px;height:6px;border-radius:50%;background:var(--c,var(--teal));opacity:.8}
 .hdr nav a:hover{color:var(--text);border-bottom-color:var(--gold)}
-.wm{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;white-space:nowrap;display:inline-flex;align-items:baseline;color:var(--text)}
+.wm{font-family:var(--font-wm);font-weight:800;letter-spacing:-.02em;white-space:nowrap;display:inline-flex;align-items:baseline;color:var(--text)}
 .wm b{font-weight:inherit;color:var(--teal);text-shadow:var(--tglow)}
 .wm .dot{display:inline-block;width:.3em;height:.17em;background:var(--teal);border-radius:2px;margin:0 .07em;transform:translateY(-.06em);box-shadow:var(--dglow)}
 :root[data-theme="light"] .wm b{color:var(--teal-deep);text-shadow:none}
@@ -605,12 +605,15 @@ footer .wm{font-size:26px;margin-bottom:10px}
     </div>
 
     <h3 style="margin-top:44px">Onboarding</h3>
-    <p style="color:var(--muted);max-width:62ch">The first run is a short wizard, as built in <code>src/app/welcome/</code>. One question per screen, a step count and a progress bar, Back on every step after the first, and never the email twice. It ends with a plan: where you are, one step for this week and a weekly check-in day.</p>
+    <p style="color:var(--muted);max-width:62ch">The first run is a short wizard, as built in <code>src/app/welcome/</code>. Step 1 starts with first name, email and "Where are you right now?", then the home tiles and the target values. One question per screen, a step count and a progress bar, Back on every step after the first, and never the email twice. It ends with a plan: where you are, one step for this week and a weekly check-in day.</p>
     <div class="grid2">
       <div class="card">
         <div class="ob-top"><span class="mono">Step 1 of 3</span><span class="ob-bar" aria-hidden="true"><i class="on"></i><i></i><i></i></span></div>
+        <div class="lbl" style="margin:0 0 8px">Where are you right now? (four options, with brand icons)</div>
         <div class="lbl" style="margin:14px 0 8px">Pick your home</div>
-        <div class="ob-grid"><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-terraced"/></svg></div><span>Terraced</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-semi"/></svg></div><span>Semi</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-detached"/></svg></div><span>Detached</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-mansion"/></svg></div><span>Manor</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-flat"/></svg></div><span>Flat</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-apartment"/></svg></div><span>Apartment</span></div></div>
+        <div class="ob-grid"><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-terraced"/></svg></div><span>Terraced</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-semi"/></svg></div><span>Semi-detached</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-detached"/></svg></div><span>Detached</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-mansion"/></svg></div><span>Manor house</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-flat"/></svg></div><span>Small flat</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-apartment"/></svg></div><span>Apartment</span></div></div>
+        <div class="lbl" style="margin:14px 0 6px">Target home value</div>
+        <div class="ob-field">e.g. 200000</div>
         <div class="lbl" style="margin:14px 0 6px">Target deposit value</div>
         <div class="ob-field">e.g. 20000</div>
         <p class="ob-note">Leave it empty and the House builder uses a 20% deposit of the home value.</p>
@@ -2041,7 +2044,7 @@ function makeNW(cv,o){
       else{var s=topOf("debt",1);
         if(!s){var big=topOf("debt",0);big.leave=performance.now();for(var k=0;k<9;k++)spawn("debt",1,k,false);s=topOf("debt",1)}
         s.leave=performance.now()}
-      var tt=self.totals();return {ok:true,msg:tt.debt===0?"Out of the red.":"Debt down £"+amt.toLocaleString("en-GB")+". Net worth up £"+amt.toLocaleString("en-GB")+".",delta:"-£"+amt.toLocaleString("en-GB"),clear:tt.debt===0}}
+      var tt=self.totals();return {ok:true,msg:tt.debt===0?"Out of the red.":"Debt down £"+amt.toLocaleString("en-GB")+". Net worth up £"+amt.toLocaleString("en-GB")+".",delta:"\u2212£"+amt.toLocaleString("en-GB"),clear:tt.debt===0}}
     if(!small){if(live(t,0)>=CAP[t])return {ok:false,msg:"That stack is full. Try another."};spawn(t,0,live(t,0),true);return {ok:true,msg:(t==="gold"?"Gold bar laid. ":"Block laid. ")+"+£1,000.",delta:"+£1,000"}}
     if(live(t,1)>=9){boxes.forEach(function(b){if(b.t===t&&b.s===1&&!b.leave){b.leave=performance.now();b.merge=true}});
       if(live(t,0)>=CAP[t])return {ok:false,msg:"That stack is full. Try another."};spawn(t,0,live(t,0),true);return {ok:true,msg:"Nine cubes made a block. +£100.",delta:"+£100"}}
@@ -2086,7 +2089,7 @@ function makeNW(cv,o){
     c.save();c.shadowColor=rgba(CS,.7);c.shadowBlur=NPL.blur;c.beginPath();c.moveTo(pq[0][0],pq[0][1]);for(i=1;i<4;i++)c.lineTo(pq[i][0],pq[i][1]);c.closePath();
     c.fillStyle=rgba(CF,NPL.planeFA);c.fill();c.strokeStyle=rgba(CS,.9);c.lineWidth=1.5;c.stroke();c.restore();
     if(!reduce){var pg=(ts%2800)/2800,ge=pg*16,rq=[P.pt(-42-ge,0,-17-ge),P.pt(42+ge,0,-17-ge),P.pt(42+ge,0,17+ge),P.pt(-42-ge,0,17+ge)];c.beginPath();c.moveTo(rq[0][0],rq[0][1]);for(i=1;i<4;i++)c.lineTo(rq[i][0],rq[i][1]);c.closePath();c.strokeStyle=rgba(CS,(1-pg)*.45);c.lineWidth=1.4;c.stroke()}
-    var lf=clamp(cw*.022,9,13);c.font=lf+"px 'Share Tech Mono',monospace";c.textAlign="center";
+    var lf=clamp(cw*.022,10.5,13);c.font=lf+"px 'Share Tech Mono',monospace";c.textAlign="center";
     ["dep","stk","gold","debt"].forEach(function(t){var q=P.pt(XC[t],0,22);c.fillStyle=t==="debt"?rgba(NPL.debt,.95):NPL.label;c.fillText(NAMES[t],q[0],q[1])});
     c.textAlign="left";
     items.forEach(function(g){if(g.b.t!=="debt")drawBox(P,g)});
@@ -2304,7 +2307,7 @@ function nwUI(t){$("#nwAssets").textContent=fmt(t.assets);$("#nwDebt").textConte
 var nw=makeNW($("#nwCanvas"),{onChange:nwUI});
 $$("[data-nw]").forEach(function(b){b.addEventListener("click",function(){
   var r=nw.act(b.getAttribute("data-nw"));$("#nwMsg").textContent=r.msg;
-  if(r.ok){nwXp+=b.getAttribute("data-nw").indexOf(":100")>0?5:20;nwUI(nw.totals());popText($("#nwPops"),r.delta,r.delta.charAt(0)==="-"?"g":"");flashStage(nwStageEl,r.clear?"flashg":"flash");if(r.clear)toast("Out of the red.")}
+  if(r.ok){nwXp+=b.getAttribute("data-nw").indexOf(":100")>0?5:20;nwUI(nw.totals());popText($("#nwPops"),r.delta,r.delta.charAt(0)==="\u2212"?"g":"");flashStage(nwStageEl,r.clear?"flashg":"flash");if(r.clear)toast("Out of the red.")}
 })});
 $("#nwReset").addEventListener("click",function(){nwXp=0;nw.reset();$("#nwMsg").textContent="Net worth £9,300"});
 nwUI(nw.totals());
