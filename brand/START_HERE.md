@@ -22,7 +22,7 @@ From the root of your local clone: `bash setup-brand-rollout.sh /path/to/vault-i
 
 Approve each phase with: "Go with phase N. Commit, push to brand-rollout, run the tests, and send screenshots from a local build."
 
-Suggested order: 1 tokens and theme, 2 fonts and clean-up, 3 icons, 4 menu bar, 5 colour code, 7 Daylight, 8 logo. Then the house builder behind `?house=new`, then the net worth scene and tracker behind `?nw=new`, then `landing.html`.
+Suggested order: 1 tokens and theme, 2 fonts and clean-up, 3 icons, 4 menu bar, 5 colour code, 7 Daylight, 8 logo. The house builder and the net worth scene are now live and on by default (owner, 1 Nov 2026), so there is no `?house=new` switch. What is left is the type swap in the app (Chakra Petch for headlines, nav and buttons, Vault-form for dashboard figures, Syne on the wordmark only) and the website and e-mails.
 
 ## Releasing
 
