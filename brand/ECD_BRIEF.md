@@ -95,7 +95,7 @@ Type, price, deposit %, floor (flats only), the amount to add, and the brick val
 ## 5. Brand system (from the handover, unchanged)
 
 - **Tokens, Night and Daylight.** Daylight is a designed mode: paper ground, ink text, white panels with corner brackets, and blueprint 3D.
-- **Fonts:** Chakra Petch for headlines, titles, nav tabs and buttons (owner, 13, 14 and 16 Nov 2026), Syne for the logo wordmark only, DM Sans for body, Share Tech Mono for small labels, Vault-form for dashboard figures only. No other fonts. Icons come from the sprite with a 1.1 hairline. The colour code applies: gold means now, brass means achievement, teal means built or owned, red means owed, green means cleared.
+- **Fonts:** Chakra Petch for headlines, titles, nav tabs and buttons, and Chakra Petch Figures (fixed-width digits) for dashboard figures 18 px and up (owner, 13 to 16 Nov 2026); Syne for the logo wordmark only; DM Sans for body; Share Tech Mono for small labels and small figures. No other fonts; Vault-form is dropped. Icons come from the sprite with a 1.1 hairline. The colour code applies: gold means now, brass means achievement, teal means built or owned, red means owed, green means cleared.
 - **Wordmark:** Vault-It. In the logo the hyphen is drawn as the brick; in text it is a plain hyphen (owner, 30 Oct 2026). Tagline: **Get out of the red and into your home.**
 
 ## 6. Done means
