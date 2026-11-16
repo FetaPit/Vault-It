@@ -5,7 +5,7 @@ Open `vault-it-brand-book.html` in a browser first. It is the visual and behavio
 | File | Use |
 | --- | --- |
 | `vault-it-brand-book.html` | The interactive brand book. Source of truth |
-| `fonts/` | Self-hosted fonts: `chakra-petch/` (headlines, nav, buttons) and `vault-form/` (dashboard figures). Each with its OFL licence |
+| `fonts/` | Self-hosted fonts: `chakra-petch/` (headlines, nav, buttons, and the fixed-width figures). Each with its OFL licence |
 | `vault-it-brand-handover.md` | The full build brief, phase by phase, with acceptance criteria |
 | `vault-it-3d-engine.js` | The 3D engine: to-scale house, net worth scene, tracker. Use as is |
 | `vault-it-tokens.css` | Colour, type, radius, motion tokens for Night and Daylight |

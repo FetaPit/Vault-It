@@ -1,4 +1,6 @@
-# Brand typeface swap list (held until the owner signs off Vault-form)
+> **Update 16 Nov 2026 (owner: "use Chakra Petch for figures going forward").** Vault-form is dropped. The decided set is Chakra Petch (headlines, titles, nav, buttons, Level pills Light 300), Chakra Petch Figures (dashboard figures at 18px and up), Syne (wordmark only), DM Sans (body), Share Tech Mono (small labels). The list below is the record of the old plan; the app swap (about 251 Syne references under `src/app/`) is the stage 2 rollout.
+
+# Brand typeface swap list (Chakra Petch decided, Vault-form dropped)
 
 Status: the new typeface ("Vault-form", queue line "Vault-form brand typeface") is **not final**. Fonts stay Syne, DM Sans and Share Tech Mono until the owner signs it off. This is the checklist for the swap, so it is one pass when the word comes.
 

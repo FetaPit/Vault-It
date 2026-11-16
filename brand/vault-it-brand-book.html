@@ -15,9 +15,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 /* Chakra Petch, self-hosted (SIL OFL 1.1, brand/fonts/chakra-petch/OFL.txt): headlines and titles, Light on the Level pills */
-/* Vault-form, self-hosted (SIL OFL 1.1, brand/fonts/vault-form/OFL.txt): dashboard figures only */
-@font-face{font-family:"Vault-form Heading";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/vault-form/woff2/vault-form-heading-bold.woff2") format("woff2")}
-@font-face{font-family:"Vault-form Hero";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/vault-form/woff2/vault-form-hero-bold.woff2") format("woff2")}
 /* Chakra Petch Figures: fixed-width digits, for dashboard figures (trial, owner 16 Nov) */
 @font-face{font-family:"Chakra Petch Figures";font-style:normal;font-weight:100 549;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-figures-400.woff2") format("woff2")}
 @font-face{font-family:"Chakra Petch Figures";font-style:normal;font-weight:550 1000;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-figures-700.woff2") format("woff2")}
@@ -44,8 +41,7 @@ html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bott
   --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
   --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
   --font-head:"Chakra Petch","Helvetica Neue",Arial,sans-serif;
-  --font-fig:"Chakra Petch Figures","Chakra Petch","Helvetica Neue",Arial,sans-serif;   /* dashboard figures, 18px and up: Chakra Petch on trial (owner, 16 Nov); Vault-form on hold */
-  --font-hero:"Vault-form Hero","Vault-form Heading","Chakra Petch",sans-serif;   /* very large figures, about 64px and up */
+  --font-fig:"Chakra Petch Figures","Chakra Petch","Helvetica Neue",Arial,sans-serif;   /* dashboard figures, 18px and up (owner, 16 Nov) */
   --font-wm:"Syne","Helvetica Neue",Arial,sans-serif;   /* the logo wordmark only */
   --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
   --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -165,8 +161,6 @@ input[type=range]{width:100%;accent-color:var(--gold);height:44px;margin:0}
 .vi-neon-gold{--neon-glow:#F2C94C}
 .vi-neon-gold::before{background-image:linear-gradient(100deg,#B8862E 0%,#F5DC4A 38%,#FFF1B0 52%,#E8C56A 68%,#B8862E 100%)}
 .fig{font-family:var(--font-fig);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:0;text-shadow:none;line-height:1.05}
-.fig-vf{font-family:"Vault-form Heading","Chakra Petch",sans-serif}
-.fig-hero{font-family:var(--font-hero)}
 .wall-bill-demo{display:inline-flex;border:1px solid var(--line2);border-radius:10px;overflow:hidden;margin:0 0 14px}.wall-bill-demo button{min-height:44px;min-width:104px;padding:8px 18px;background:transparent;border:0;color:var(--muted);font:700 15px var(--font-head);cursor:pointer}.wall-bill-demo button.on{background:var(--teal);color:var(--on-teal)}
 .wall-demo{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;width:100%}.wall-plan-d{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-tile);padding:18px 16px 16px;color:var(--text)}.wall-plan-d.gold{border-color:rgb(var(--brass-rgb,201 168 76)/.55)}.wall-plan-d.soon{border-style:dashed;opacity:.85}.wall-plan-d .top{display:flex;align-items:center;gap:12px}.wall-plan-d b{font:700 20px var(--font-head)}.wall-plan-d .wh{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.wall-plan-d .pr{font:700 22px var(--font-head);color:var(--teal)}.wall-plan-d.gold .pr{color:var(--gold)}.wall-plan-d small{color:var(--muted);font-size:13.5px;line-height:1.5}
 .ob-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.ob-bar{display:inline-flex;gap:4px}.ob-bar i{width:34px;height:4px;border-radius:2px;background:var(--line2)}.ob-bar i.on{background:var(--teal)}.ob-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.ob-tile{display:grid;gap:6px;text-align:center;font-size:13px;color:var(--muted)}.ob-tile .ico{position:relative;display:grid;place-items:center;aspect-ratio:4/3;border-radius:7px;background:radial-gradient(120% 90% at 50% 100%,#06242A 0%,#00131A 45%,#080808 100%);overflow:hidden;color:var(--teal)}.ob-tile .ico::after{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(68,192,185,.05) 0 1px,transparent 1px 4px);pointer-events:none}.ob-tile svg{width:52px;height:auto;position:relative;z-index:1}.ob-field{border:1px solid var(--line2);border-radius:var(--r-brick);padding:12px 14px;color:var(--muted);font-family:var(--font-body)}.ob-note{color:var(--muted);font-size:13px;margin:8px 0 0}
@@ -866,7 +860,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
   <div class="wrap">
     <div class="lbl">Type</div>
     <h2 style="margin-top:10px">Clear, humane, technical.</h2>
-    <p class="lede">Chakra Petch for headlines, titles, navigation, buttons and, on trial, dashboard figures (owner, 13 to 16 Nov: Syne was too wide and hard to read). DM Sans for reading. Share Tech Mono for labels and small figures. Syne survives only in the logo wordmark. Vault-form is on hold. Edit the specimens.</p>
+    <p class="lede">Chakra Petch for headlines, titles, navigation, buttons and, as Chakra Petch Figures, dashboard figures (owner, 13 to 16 Nov: Syne was too wide and hard to read). DM Sans for reading. Share Tech Mono for labels and small figures. Syne survives only in the logo wordmark. Edit the specimens.</p>
     <div class="card glow" style="margin-top:32px">
       <div class="spec" contenteditable="true" spellcheck="false" style="font-family:var(--font-head);font-weight:700" aria-label="Editable display specimen">Build your <span style="color:var(--teal)">dream home</span></div>
       <p style="color:var(--muted);margin:14px 0 0;font-size:15px">Chakra Petch 700. Headlines, titles, navigation and button labels. Syne is kept only for the logo wordmark.</p>
@@ -891,7 +885,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
           <tr><td style="font-family:var(--font-head);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase">Navigation and buttons</td><td>Chakra Petch 600 to 700</td><td>11.5 to 13, +0.14em, uppercase (the app tightens tracking on narrow screens)</td></tr>
           <tr><td>Body</td><td>DM Sans 400</td><td>17 to 18, 1.55</td></tr>
           <tr><td class="lbl">Label</td><td>Share Tech Mono</td><td>13, +0.22em, uppercase</td></tr>
-          <tr><td class="fig" style="color:var(--gold);font-size:22px">£8,500</td><td>Chakra Petch 700 (trial)</td><td>18 and up, tabular. Vault-form on hold</td></tr>
+          <tr><td class="fig" style="color:var(--gold);font-size:22px">£8,500</td><td>Chakra Petch Figures 700</td><td>18 and up, fixed-width digits</td></tr>
           <tr><td class="mono" style="color:var(--gold);font-size:14px">£8.5k</td><td>Share Tech Mono</td><td>Small figures under 18, tabular</td></tr>
         </tbody>
       </table>
@@ -917,55 +911,41 @@ footer .wm{font-size:26px;margin-bottom:10px}
       </div>
     </div>
     <h3 style="margin-top:40px">Dashboard figures</h3>
-    <p style="color:var(--muted);max-width:62ch"><b>Under review.</b> Owner, 13 Nov: Vault-form for dashboard figures only. Owner, 16 Nov: "Try Chakra Petch for the numbers. I do not like Vaultform." So the book now sets figures in Chakra Petch 700 with tabular figures, as a trial, and keeps the Vault-form specimen below on hold until he confirms. The files stay in <code>brand/fonts/vault-form/</code> under the SIL Open Font License.</p>
-    <div class="grid2 modes" style="margin-bottom:20px">
-      <div class="mode" data-theme="dark"><div class="lbl">Night, Chakra Petch (trial)</div>
-        <div class="fig" style="font-size:18px">£6,900 <span style="color:var(--red)">−£5,600</span></div>
-        <div class="fig" style="font-size:34px">£6,900</div>
-        <div class="fig" style="font-size:48px;color:var(--teal)">£15,500</div>
-        <div class="mono" style="color:var(--muted);font-size:13px">Chakra Petch has no tabular figures of its own, so these use Chakra Petch Figures, a fixed-width-digit version made for the brand (OFL, <code>brand/fonts/chakra-petch/</code>).</div>
-      </div>
-      <div class="mode" data-theme="light"><div class="lbl">Daylight, Chakra Petch (trial)</div>
-        <div class="fig" style="font-size:18px">£6,900 <span style="color:var(--red)">−£5,600</span></div>
-        <div class="fig" style="font-size:34px">£6,900</div>
-        <div class="fig" style="font-size:48px;color:var(--teal)">£15,500</div>
-        <div class="mono" style="color:var(--muted);font-size:13px">No glow, true minus sign, 10.5px floor for small figures.</div>
-      </div>
-    </div>
+    <p style="color:var(--muted);max-width:62ch">Owner, 16 Nov 2026: "use Chakra Petch for figures going forward". Money and number readouts at 18px and up use <b>Chakra Petch Figures</b>, the brand's Chakra Petch with fixed-width digits so columns line up (Chakra Petch has none of its own). It is the same drawing, modified under the SIL Open Font License, and lives in <code>brand/fonts/chakra-petch/</code>. Vault-form is dropped for figures.</p>
     <div class="grid2 modes">
-      <div class="mode" data-theme="dark"><div class="lbl">Night, Vault-form (on hold)</div>
-        <div class="fig fig-vf" style="font-size:18px">£6,900 <span style="color:var(--red)">−£5,600</span></div>
-        <div class="fig fig-vf" style="font-size:34px">£6,900</div>
-        <div class="fig fig-vf" style="font-size:48px;color:var(--teal)">£15,500</div>
-        <div class="fig fig-hero" style="font-size:64px;line-height:1.05">£6,900</div>
-        <div class="mono" style="color:var(--muted);font-size:13px">Heading cut 18, 34 and 48px. Hero cut at 64px.</div>
+      <div class="mode" data-theme="dark"><div class="lbl">Night</div>
+        <div class="fig" style="font-size:18px">£6,900 <span style="color:var(--red)">−£5,600</span></div>
+        <div class="fig" style="font-size:34px">£6,900</div>
+        <div class="fig" style="font-size:48px;color:var(--teal)">£15,500</div>
+        <div class="fig" style="font-size:64px">£6,900</div>
+        <div class="mono" style="color:var(--muted);font-size:13px">Chakra Petch Figures 700, 18 to 64px.</div>
       </div>
-      <div class="mode" data-theme="light"><div class="lbl">Daylight, Vault-form (on hold)</div>
-        <div class="fig fig-vf" style="font-size:18px">£6,900 <span style="color:var(--red)">−£5,600</span></div>
-        <div class="fig fig-vf" style="font-size:34px">£6,900</div>
-        <div class="fig fig-vf" style="font-size:48px;color:var(--teal)">£15,500</div>
-        <div class="fig fig-hero" style="font-size:64px;line-height:1.05">£6,900</div>
-        <div class="mono" style="color:var(--muted);font-size:13px">One colour works on any ground: the detail is drawn in the text colour.</div>
+      <div class="mode" data-theme="light"><div class="lbl">Daylight</div>
+        <div class="fig" style="font-size:18px">£6,900 <span style="color:var(--red)">−£5,600</span></div>
+        <div class="fig" style="font-size:34px">£6,900</div>
+        <div class="fig" style="font-size:48px;color:var(--teal)">£15,500</div>
+        <div class="fig" style="font-size:64px">£6,900</div>
+        <div class="mono" style="color:var(--muted);font-size:13px">No glow, true minus sign, same weights in both modes.</div>
       </div>
     </div>
     <div class="grid2" style="margin-top:20px">
       <div class="card tablewrap"><table>
         <thead><tr><th>Where</th><th>Type</th></tr></thead>
         <tbody>
-          <tr><td>Money and number readouts at 18px and up: Overview KPI tiles, Assets, Liabilities and Debt totals, net worth</td><td>Chakra Petch 700 (trial). Vault-form Heading on hold</td></tr>
-          <tr><td>Very large numbers, about 64px and up (at 30px the Hero cut overflows a 390px tile)</td><td>Chakra Petch 700. Vault-form Hero on hold</td></tr>
-          <tr><td>Plan prices and other money that is not a dashboard figure</td><td>Chakra Petch</td></tr>
-          <tr><td>Headings, labels, body, nav, and figures under 18px</td><td>Chakra Petch, DM Sans, Share Tech Mono</td></tr>
+          <tr><td>Money and number readouts at 18px and up: Overview KPI tiles, Assets, Liabilities and Debt totals, net worth, house readouts</td><td>Chakra Petch Figures 700</td></tr>
+          <tr><td>Plan prices and other money that is not a dashboard figure</td><td>Chakra Petch 700</td></tr>
+          <tr><td>Figures under 18px, milestones, status lines</td><td>Share Tech Mono</td></tr>
+          <tr><td>Headings, nav, buttons</td><td>Chakra Petch</td></tr>
           <tr><td>The logo wordmark</td><td>Syne, unchanged</td></tr>
         </tbody></table></div>
       <div class="card">
         <div class="lbl" style="margin-bottom:12px">Figure rules</div>
         <ul class="rules ok">
-          <li>Tabular figures, so columns line up.</li>
+          <li>Fixed-width digits, so columns line up.</li>
           <li>Debt uses the true minus sign (U+2212), not a hyphen.</li>
           <li>No glow and no text-shadow on figures, in Night or Daylight.</li>
           <li>The 10.5px type floor still holds for everything small.</li>
-          <li>Chakra Petch 700 for the figures. Vault-form is Bold 700 only if it comes back.</li>
+          <li>Weights 400 and 700 only. Use 700 for figures.</li>
         </ul>
         <p style="color:var(--muted);font-size:14px;margin:12px 0 0">Open: on a 390px phone the Overview KPI values are 12.5px, below the 18px threshold, so they keep their current face there until the owner decides whether to raise them. Putting figures into the app is a separate queue item.</p>
       </div>
@@ -1316,11 +1296,11 @@ footer .wm{font-size:26px;margin-bottom:10px}
         <li>Done: the brick count follows the same percentage as the row.</li>
         <li>Done: icons come from the sprite, not text characters.</li>
         <li>Done: the app wordmark is one colourway, Vault in the text colour and -It in teal, with the brick as the hyphen (owner, 7 Nov).</li>
-        <li>Done: Playfair Display and DM Mono are gone. Fonts are now Chakra Petch, DM Sans, Share Tech Mono and Vault-form, with Syne on the wordmark only.</li>
+        <li>Done: Playfair Display and DM Mono are gone. Fonts are now Chakra Petch (and Chakra Petch Figures), DM Sans and Share Tech Mono, with Syne on the wordmark only.</li>
       </ul>
       <ul class="rules gaps" style="margin-top:12px">
         <li>Open: the app footer still shows a version and build string ("v0.9.2 Alpha · build flow-dash-1"). Hide it on public pages.</li>
-        <li>Open: the live app is still all Syne. The swap to Chakra Petch and Vault-form is the stage 2 rollout (see docs/BRAND_TYPEFACE_SWAP.md).</li>
+        <li>Open: the live app is still all Syne. The swap to Chakra Petch and Chakra Petch Figures is the stage 2 rollout (see docs/BRAND_TYPEFACE_SWAP.md).</li>
         <li>Open: the footer and disclaimer text is 10px, below the 10.5px floor.</li>
       </ul>
     </div>
