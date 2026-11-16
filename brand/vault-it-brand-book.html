@@ -165,6 +165,7 @@ input[type=range]{width:100%;accent-color:var(--gold);height:44px;margin:0}
 .fig-hero{font-family:var(--font-hero)}
 .wall-bill-demo{display:inline-flex;border:1px solid var(--line2);border-radius:10px;overflow:hidden;margin:0 0 14px}.wall-bill-demo button{min-height:44px;min-width:104px;padding:8px 18px;background:transparent;border:0;color:var(--muted);font:700 15px var(--font-head);cursor:pointer}.wall-bill-demo button.on{background:var(--teal);color:var(--on-teal)}
 .wall-demo{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;width:100%}.wall-plan-d{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-tile);padding:18px 16px 16px;color:var(--text)}.wall-plan-d.gold{border-color:rgb(var(--brass-rgb,201 168 76)/.55)}.wall-plan-d.soon{border-style:dashed;opacity:.85}.wall-plan-d .top{display:flex;align-items:center;gap:12px}.wall-plan-d b{font:700 20px var(--font-head)}.wall-plan-d .wh{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.wall-plan-d .pr{font:700 22px var(--font-head);color:var(--teal)}.wall-plan-d.gold .pr{color:var(--gold)}.wall-plan-d small{color:var(--muted);font-size:13.5px;line-height:1.5}
+.ob-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.ob-bar{display:inline-flex;gap:4px}.ob-bar i{width:34px;height:4px;border-radius:2px;background:var(--line2)}.ob-bar i.on{background:var(--teal)}.ob-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.ob-tile{display:grid;gap:6px;text-align:center;font-size:13px;color:var(--muted)}.ob-tile .ico{position:relative;display:grid;place-items:center;aspect-ratio:4/3;border-radius:7px;background:radial-gradient(120% 90% at 50% 100%,#06242A 0%,#00131A 45%,#080808 100%);overflow:hidden;color:var(--teal)}.ob-tile .ico::after{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(68,192,185,.05) 0 1px,transparent 1px 4px);pointer-events:none}.ob-tile svg{width:52px;height:auto;position:relative;z-index:1}.ob-field{border:1px solid var(--line2);border-radius:var(--r-brick);padding:12px 14px;color:var(--muted);font-family:var(--font-body)}.ob-note{color:var(--muted);font-size:13px;margin:8px 0 0}
 .tag-line{font-family:var(--font-head);font-weight:700;letter-spacing:-.02em;line-height:1.15;font-size:clamp(24px,4.4vw,38px);margin:0}
 .tag-fill-red{color:#C8202A}.tag-fill-your{color:#44C0B9}.tag-fill-home{color:#E8C56A}
 .tag-plain-red{color:#FF4D63}.tag-plain-home{color:#F5DC4A}
@@ -598,6 +599,30 @@ footer .wm{font-size:26px;margin-bottom:10px}
           <li>Level 3 and Your own design are locked under Pro for everyone, with the lock state shown in Components.</li>
           <li>The 3D net worth view is on by default and the first view is the 3D blocks. Settings has the switch.</li>
           <li>Do not change how deposits, prices, house types, levels or saved data work. Brick value is the deposit target times 0.77, over the brick count.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px">Onboarding</h3>
+    <p style="color:var(--muted);max-width:62ch">The first run is a short wizard, as built in <code>src/app/welcome/</code>. One question per screen, a step count and a progress bar, Back on every step after the first, and never the email twice. It ends with a plan: where you are, one step for this week and a weekly check-in day.</p>
+    <div class="grid2">
+      <div class="card">
+        <div class="ob-top"><span class="mono">Step 1 of 3</span><span class="ob-bar" aria-hidden="true"><i class="on"></i><i></i><i></i></span></div>
+        <div class="lbl" style="margin:14px 0 8px">Pick your home</div>
+        <div class="ob-grid"><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-terraced"/></svg></div><span>Terraced</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-semi"/></svg></div><span>Semi</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-detached"/></svg></div><span>Detached</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-mansion"/></svg></div><span>Manor</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-flat"/></svg></div><span>Flat</span></div><div class="ob-tile"><div class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#vi-ht-apartment"/></svg></div><span>Apartment</span></div></div>
+        <div class="lbl" style="margin:14px 0 6px">Target deposit value</div>
+        <div class="ob-field">e.g. 20000</div>
+        <p class="ob-note">Leave it empty and the House builder uses a 20% deposit of the home value.</p>
+      </div>
+      <div class="card">
+        <div class="lbl" style="margin-bottom:12px">Rules</div>
+        <ul class="rules ok">
+          <li>Six house types, each tile a small House builder viewport: the stage background and the scan lines sit over the house. Where there is no 3D the slate drawing stays.</li>
+          <li>The tile shows the slate until its first 3D frame, then the miniature house takes over. Vertical scrolling still works over the tiles.</li>
+          <li>Guidance sits as a note under the field, never as a pop-up.</li>
+          <li>Brand icons from the sprite on every choice, never text characters.</li>
+          <li>Reduced motion: no fade between the slate and the 3D tile.</li>
+          <li>Target home value and target deposit value are the user's own entries. No figures are suggested.</li>
         </ul>
       </div>
     </div>
