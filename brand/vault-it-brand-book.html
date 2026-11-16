@@ -15,6 +15,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 /* Chakra Petch, self-hosted (SIL OFL 1.1, brand/fonts/chakra-petch/OFL.txt): headlines and titles, Light on the Level pills */
+/* Vault-form, self-hosted (SIL OFL 1.1, brand/fonts/vault-form/OFL.txt): dashboard figures only */
+@font-face{font-family:"Vault-form Heading";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/vault-form/woff2/vault-form-heading-bold.woff2") format("woff2")}
+@font-face{font-family:"Vault-form Hero";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/vault-form/woff2/vault-form-hero-bold.woff2") format("woff2")}
 @font-face{font-family:"Chakra Petch";font-style:normal;font-weight:100 349;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-300.woff2") format("woff2")}@font-face{font-family:"Chakra Petch";font-style:normal;font-weight:350 549;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-400.woff2") format("woff2")}@font-face{font-family:"Chakra Petch";font-style:normal;font-weight:550 1000;font-display:swap;src:url("fonts/chakra-petch/chakra-petch-700.woff2") format("woff2")}
 
 
@@ -38,6 +41,8 @@ html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bott
   --btn1:#007F7B; --btn2:#44C0B9; --bshadow:0 0 0 1px rgba(68,192,185,.5),0 8px 22px -8px rgba(68,192,185,.5);
   --glow:0 0 24px rgba(68,192,185,.18); --elev:none;
   --font-head:"Chakra Petch","Helvetica Neue",Arial,sans-serif;
+  --font-fig:"Vault-form Heading","Chakra Petch","Helvetica Neue",Arial,sans-serif;   /* dashboard figures, 18px and up */
+  --font-hero:"Vault-form Hero","Vault-form Heading","Chakra Petch",sans-serif;   /* very large figures, about 64px and up */
   --font-display:"Syne","Helvetica Neue",Arial,sans-serif;   /* the logo wordmark only */
   --font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
   --font-mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -143,7 +148,7 @@ section{padding:72px 0 24px;border-top:1px solid var(--line)}
 .wall .b.cur{fill:var(--gold);stroke:var(--gold)}
 .wall .b.open{fill:transparent;stroke:var(--line2);stroke-dasharray:4 3}
 .readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:14px 0 6px;font-variant-numeric:tabular-nums}
-.readout strong{font-family:var(--font-mono);font-size:30px;font-weight:400;color:var(--gold)}
+.readout strong{font-family:var(--font-fig);font-size:30px;font-weight:700;color:var(--gold);text-shadow:none}
 .readout span{color:var(--muted);font-size:15px;font-family:var(--font-mono);letter-spacing:.06em}
 input[type=range]{width:100%;accent-color:var(--gold);height:44px;margin:0}
 .grid2{display:grid;gap:20px;grid-template-columns:1fr}
@@ -156,6 +161,8 @@ input[type=range]{width:100%;accent-color:var(--gold);height:44px;margin:0}
 .vi-neon-red::before{background-image:linear-gradient(#FF4D63,#FF4D63)}
 .vi-neon-gold{--neon-glow:#F2C94C}
 .vi-neon-gold::before{background-image:linear-gradient(100deg,#B8862E 0%,#F5DC4A 38%,#FFF1B0 52%,#E8C56A 68%,#B8862E 100%)}
+.fig{font-family:var(--font-fig);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:0;text-shadow:none;line-height:1.05}
+.fig-hero{font-family:var(--font-hero)}
 .tag-line{font-family:var(--font-head);font-weight:800;letter-spacing:-.02em;line-height:1.15;font-size:clamp(24px,4.4vw,38px);margin:0}
 .tag-fill-red{color:#C8202A}.tag-fill-your{color:#44C0B9}.tag-fill-home{color:#E8C56A}
 .tag-plain-red{color:#FF4D63}.tag-plain-home{color:#F5DC4A}
@@ -210,11 +217,11 @@ th{color:var(--faint);font-weight:400;font-family:var(--font-mono);letter-spacin
 .vi-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%}
 @media(max-width:620px){.vi-stats{grid-template-columns:repeat(2,1fr)}}
 .vi-stat{background:var(--surf);border:1px solid var(--line);border-radius:var(--r-tile);padding:18px 8px;text-align:center}
-.vi-stat b{display:block;font-family:var(--font-mono);font-weight:400;font-size:24px;color:var(--text);letter-spacing:.04em}
+.vi-stat b{display:block;font-family:var(--font-fig);font-weight:700;font-size:24px;color:var(--text);letter-spacing:0;font-variant-numeric:tabular-nums;text-shadow:none}
 .vi-stat span{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:6px}
 .vi-kpi{background:var(--surf2);border:1px solid var(--line);border-radius:var(--r-tile);padding:16px;min-width:200px;flex:1;color:var(--text)}
 .vi-kpi .lbl{display:flex;align-items:center;gap:8px;color:var(--teal)}
-.vi-kpi .n{font-family:var(--font-head);font-size:34px;font-weight:800;margin:6px 0 2px;color:var(--text);font-variant-numeric:tabular-nums}
+.vi-kpi .n{font-family:var(--font-fig);font-size:34px;font-weight:700;margin:6px 0 2px;color:var(--text);font-variant-numeric:tabular-nums;text-shadow:none}
 .vi-kpi .n.red{color:var(--red)}.vi-kpi small{color:var(--muted);font-family:var(--font-mono);font-size:13px}
 .vi-pills{display:flex;flex-wrap:wrap;gap:8px;width:100%}
 .vi-pill{font-family:var(--font-mono);font-size:14px;letter-spacing:.06em;padding:8px 16px;border-radius:var(--r-pill);border:1.5px solid var(--gold);color:var(--gold);background:var(--pillbg)}
@@ -226,7 +233,7 @@ th{color:var(--faint);font-weight:400;font-family:var(--font-mono);letter-spacin
 .vi-track.debt>b{background:linear-gradient(90deg,var(--teal-deep),var(--green))}
 .vi-debt{background:var(--surf2);border:1px solid var(--line);border-radius:var(--r-tile);padding:18px;width:100%;max-width:440px;color:var(--text)}
 .vi-debt .row{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums;margin-bottom:6px}
-.vi-debt .row .v{font-family:var(--font-mono);font-size:20px;color:var(--red)}
+.vi-debt .row .v{font-family:var(--font-fig);font-weight:700;font-size:20px;color:var(--red);font-variant-numeric:tabular-nums;text-shadow:none}
 .vi-ms{list-style:none;margin:0;padding:0;display:grid;gap:8px;width:100%;max-width:440px}
 .vi-ms li{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:var(--lib);border:1px solid var(--line);color:var(--text)}
 .vi-ms li.done{border-color:var(--teal);background:var(--doneb)}
@@ -850,7 +857,8 @@ footer .wm{font-size:26px;margin-bottom:10px}
           <tr><td style="font-family:var(--font-head);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase">Navigation and buttons</td><td>Chakra Petch 600 to 700</td><td>11.5 to 13, +0.14em, uppercase (the app tightens tracking on narrow screens)</td></tr>
           <tr><td>Body</td><td>DM Sans 400</td><td>17 to 18, 1.55</td></tr>
           <tr><td class="lbl">Label</td><td>Share Tech Mono</td><td>13, +0.22em, uppercase</td></tr>
-          <tr><td class="mono" style="color:var(--gold);font-size:20px">£8.5k</td><td>Share Tech Mono</td><td>20 to 30, tabular</td></tr>
+          <tr><td class="fig" style="color:var(--gold);font-size:22px">£8,500</td><td>Vault-form Heading</td><td>18 and up, tabular. Hero cut from about 64 up</td></tr>
+          <tr><td class="mono" style="color:var(--gold);font-size:14px">£8.5k</td><td>Share Tech Mono</td><td>Small figures under 18, tabular</td></tr>
         </tbody>
       </table>
     </div>
@@ -875,15 +883,32 @@ footer .wm{font-size:26px;margin-bottom:10px}
       </div>
     </div>
     <h3 style="margin-top:40px">Dashboard figures: Vault-form</h3>
-    <p style="color:var(--muted);max-width:62ch">Owner rule, 13 Nov 2026: the new typeface, Vault-form, is for dashboard figures only. It narrows the earlier plan to use it on headings and the logo. The font files are not in this book yet and the typeface is still to be signed off, so figures keep their current fonts until then.</p>
-    <div class="grid2">
+    <p style="color:var(--muted);max-width:62ch">Vault-form is the brand's own typeface, by PT Live Design: squared, chamfered and built like a vault door. Owner rule, 13 Nov 2026: it is for dashboard figures only. Headings stay Chakra Petch and the wordmark stays Syne. The files live in <code>brand/fonts/vault-form/</code> under the SIL Open Font License.</p>
+    <div class="grid2 modes">
+      <div class="mode" data-theme="dark"><div class="lbl">Night</div>
+        <div class="fig" style="font-size:18px">£6,900 <span style="color:var(--red)">−£5,600</span></div>
+        <div class="fig" style="font-size:34px">£6,900</div>
+        <div class="fig" style="font-size:48px;color:var(--teal)">£15,500</div>
+        <div class="fig fig-hero" style="font-size:64px;line-height:1.05">£6,900</div>
+        <div class="mono" style="color:var(--muted);font-size:13px">Heading cut 18, 34 and 48px. Hero cut at 64px.</div>
+      </div>
+      <div class="mode" data-theme="light"><div class="lbl">Daylight</div>
+        <div class="fig" style="font-size:18px">£6,900 <span style="color:var(--red)">−£5,600</span></div>
+        <div class="fig" style="font-size:34px">£6,900</div>
+        <div class="fig" style="font-size:48px;color:var(--teal)">£15,500</div>
+        <div class="fig fig-hero" style="font-size:64px;line-height:1.05">£6,900</div>
+        <div class="mono" style="color:var(--muted);font-size:13px">One colour works on any ground: the detail is drawn in the text colour.</div>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:20px">
       <div class="card tablewrap"><table>
         <thead><tr><th>Where</th><th>Type</th></tr></thead>
         <tbody>
-          <tr><td>Money and number readouts at 18px and up: Overview KPI tiles, Assets, Liabilities and Debt totals, net worth</td><td>Vault-form Heading cut (D+)</td></tr>
-          <tr><td>Very large numbers, about 64px and up (at 30px it overflows a 390px tile)</td><td>Vault-form Hero cut (D++)</td></tr>
-          <tr><td>Headings, labels, body, nav, and figures under 18px</td><td>Unchanged: Chakra Petch, DM Sans, Share Tech Mono</td></tr>
-          <tr><td>The logo wordmark</td><td>Unchanged</td></tr>
+          <tr><td>Money and number readouts at 18px and up: Overview KPI tiles, Assets, Liabilities and Debt totals, net worth</td><td>Vault-form Heading (D+)</td></tr>
+          <tr><td>Very large numbers, about 64px and up (at 30px the Hero cut overflows a 390px tile)</td><td>Vault-form Hero (D++)</td></tr>
+          <tr><td>Plan prices and other money that is not a dashboard figure</td><td>Chakra Petch</td></tr>
+          <tr><td>Headings, labels, body, nav, and figures under 18px</td><td>Chakra Petch, DM Sans, Share Tech Mono</td></tr>
+          <tr><td>The logo wordmark</td><td>Syne, unchanged</td></tr>
         </tbody></table></div>
       <div class="card">
         <div class="lbl" style="margin-bottom:12px">Figure rules</div>
@@ -892,11 +917,11 @@ footer .wm{font-size:26px;margin-bottom:10px}
           <li>Debt uses the true minus sign (U+2212), not a hyphen.</li>
           <li>No glow and no text-shadow on figures, in Night or Daylight.</li>
           <li>The 10.5px type floor still holds for everything small.</li>
+          <li>Vault-form Heading and Hero are Bold 700 only. Do not fake other weights.</li>
         </ul>
-        <p style="color:var(--muted);font-size:14px;margin:12px 0 0">Specimen to be added when the font files land on <code>brand-rollout</code> (<code>brand/fonts/vault-form/</code>). Building it into the app is a separate queue item.</p>
+        <p style="color:var(--muted);font-size:14px;margin:12px 0 0">Open: on a 390px phone the Overview KPI values are 12.5px, below the 18px threshold, so they keep their current face there until the owner decides whether to raise them. Putting Vault-form into the app is a separate queue item.</p>
       </div>
     </div>
-    <!-- TYPEFACE SWAP POINT: the Vault-form brand typeface is not signed off. Do not replace Syne here until the owner approves. See docs/BRAND_TYPEFACE_SWAP.md for the one-line swap list. -->
   </div>
 </section>
 
@@ -1043,7 +1068,7 @@ footer .wm{font-size:26px;margin-bottom:10px}
         <div class="demo-bar"><h3>KPI card</h3><button class="btn btn-ghost btn-sm" data-copy>Copy code</button></div>
         <div class="demo">
           <div class="vi-kpi"><div class="lbl">Net worth</div><div class="n" data-tick="6900">£6,900</div><small>assets minus liabilities</small></div>
-          <div class="vi-kpi"><div class="lbl" style="color:var(--red)">Total debt</div><div class="n red" data-tick="5600">£5,600</div><small>credit, loans, bnpl</small></div>
+          <div class="vi-kpi"><div class="lbl" style="color:var(--red)">Total debt</div><div class="n red" data-tick="5600" data-neg>−£5,600</div><small>credit, loans, bnpl</small></div>
         </div>
       </div>
 
@@ -2231,7 +2256,7 @@ depTypesUI();depOut();
 setTimeout(function(){depSync()},350);
 
 
-function tick(el){var to=+el.getAttribute("data-tick");tween(0,to,900,function(v){el.textContent=fmt(v)})}
+function tick(el){var to=+el.getAttribute("data-tick"),ng=el.hasAttribute("data-neg")?"\u2212":"";tween(0,to,900,function(v){el.textContent=ng+fmt(v)})}
 $$("[data-tick]").forEach(function(el){el.textContent=fmt(+el.getAttribute("data-tick"))});
 
 /* motion: replayable build */
