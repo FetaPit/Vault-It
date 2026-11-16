@@ -49,7 +49,7 @@ These were read from the live repo, so use them instead of guessing.
 
 - **No new framework or build step** unless the repo already has one. The app looks like a single large HTML file with inline CSS and JS (the saved page was about 570 KB). Confirm in Step 0 and keep the same architecture.
 - **No new dependencies.** The engine uses plain WebGL and canvas 2D. Do not introduce three.js.
-- **Fonts (owner, 13 to 16 Nov 2026):** Chakra Petch for headlines, titles, nav tabs and buttons (Light 300 on the Level pills). Syne only for the logo wordmark. DM Sans for body. Share Tech Mono for labels and small figures. Vault-form for dashboard figures at 18px and up (Hero cut at about 64px and up). All self-hosted from `brand/fonts/`, no outside font host. Remove unused fonts (see Phase 2).
+- **Fonts (owner, 13 to 16 Nov 2026):** Chakra Petch for headlines, titles, nav tabs and buttons (Light 300 on the Level pills). Syne only for the logo wordmark. DM Sans for body. Share Tech Mono for labels and small figures. Dashboard figures at 18px and up: Chakra Petch on trial (owner, 16 Nov: "Try Chakra Petch for the numbers. I do not like Vaultform"); Vault-form is on hold. All self-hosted from `brand/fonts/`, no outside font host. Remove unused fonts (see Phase 2).
 - **British English, sentence case**, no em dashes in any copy.
 - **Compliance line stays visible:** "Not regulated by the FCA. Not financial advice."
 - **Never break existing user data or saved state.** This is a visual and behavioural refresh.
@@ -119,7 +119,7 @@ Accepted when: the app renders correctly in both themes, no hard coded dark valu
 - Replace text glyph icons with sprite icons: `✎` to `edit`, `✕` to `close`, `＋` to `plus`, `◈` to `network`, `✓` to `check`, `↩` to `undo`, `‹ ›` to `chevron` rotated.
 - Hide the build string ("v0.9.2 Alpha . build flow-dash-1") on public pages.
 
-**Vault-form scope (owner, 13 Nov 2026).** The new typeface is for dashboard figures only, once it is signed off: the Heading cut (D+) for money and number readouts at 18px and up (Overview KPI tiles, Assets, Liabilities and Debt totals, net worth), the Hero cut (D++) only for numbers about 64px and up. Headings, labels, body, nav, figures under 18px and the logo wordmark stay as they are. Tabular figures, U+2212 minus for debt, no glow or text-shadow on figures. Until sign-off the fonts remain Syne, DM Sans and Share Tech Mono.
+**Vault-form scope (owner, 13 Nov 2026; ON HOLD 16 Nov, he does not like it, Chakra Petch for figures is on trial).** The new typeface is for dashboard figures only, once it is signed off: the Heading cut (D+) for money and number readouts at 18px and up (Overview KPI tiles, Assets, Liabilities and Debt totals, net worth), the Hero cut (D++) only for numbers about 64px and up. Headings, labels, body, nav, figures under 18px and the logo wordmark stay as they are. Tabular figures, U+2212 minus for debt, no glow or text-shadow on figures. Until sign-off the fonts remain Syne, DM Sans and Share Tech Mono.
 
 ### Phase 3: Iconography
 

@@ -28,7 +28,7 @@ module.exports = {
       fontFamily: {
         head: ['"Chakra Petch"', 'Arial', 'sans-serif'],
         wordmark: ['Syne', 'Arial', 'sans-serif'],
-        figures: ['"Vault-form Heading"', '"Chakra Petch"', 'sans-serif'],
+        figures: ['"Chakra Petch"', 'sans-serif'],
         body: ['"DM Sans"', 'Arial', 'sans-serif'],
         mono: ['"Share Tech Mono"', 'monospace']
       },
