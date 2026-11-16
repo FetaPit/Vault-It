@@ -163,6 +163,8 @@ input[type=range]{width:100%;accent-color:var(--gold);height:44px;margin:0}
 .vi-neon-gold::before{background-image:linear-gradient(100deg,#B8862E 0%,#F5DC4A 38%,#FFF1B0 52%,#E8C56A 68%,#B8862E 100%)}
 .fig{font-family:var(--font-fig);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:0;text-shadow:none;line-height:1.05}
 .fig-hero{font-family:var(--font-hero)}
+.wall-bill-demo{display:inline-flex;border:1px solid var(--line2);border-radius:10px;overflow:hidden;margin:0 0 14px}.wall-bill-demo button{min-height:44px;min-width:104px;padding:8px 18px;background:transparent;border:0;color:var(--muted);font:700 15px var(--font-head);cursor:pointer}.wall-bill-demo button.on{background:var(--teal);color:var(--on-teal)}
+.wall-demo{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;width:100%}.wall-plan-d{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-tile);padding:18px 16px 16px;color:var(--text)}.wall-plan-d.gold{border-color:rgb(var(--brass-rgb,201 168 76)/.55)}.wall-plan-d.soon{border-style:dashed;opacity:.85}.wall-plan-d .top{display:flex;align-items:center;gap:12px}.wall-plan-d b{font:700 20px var(--font-head)}.wall-plan-d .wh{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.wall-plan-d .pr{font:700 22px var(--font-head);color:var(--teal)}.wall-plan-d.gold .pr{color:var(--gold)}.wall-plan-d small{color:var(--muted);font-size:13.5px;line-height:1.5}
 .tag-line{font-family:var(--font-head);font-weight:700;letter-spacing:-.02em;line-height:1.15;font-size:clamp(24px,4.4vw,38px);margin:0}
 .tag-fill-red{color:#C8202A}.tag-fill-your{color:#44C0B9}.tag-fill-home{color:#E8C56A}
 .tag-plain-red{color:#FF4D63}.tag-plain-home{color:#F5DC4A}
@@ -1131,29 +1133,16 @@ footer .wm{font-size:26px;margin-bottom:10px}
       </div>
 
       <div class="demo-wrap">
-        <div class="demo-bar"><h3>Pricing card</h3><button class="btn btn-ghost btn-sm" data-copy>Copy code</button></div>
-        <div class="demo">
-          <div class="vi-price">
-            <b>Pioneer</b>
-            <div class="p">£5.99<small>/mo</small></div>
-            <small style="color:#8A9696">or £49.99 a year.</small>
-            <ul><li>Unlimited assets and liabilities</li><li>Unlimited debt tracking with payoff charts</li><li>Data export (CSV)</li></ul>
-            <button class="btn btn-primary" style="width:100%">Get Pioneer</button>
+        <div class="demo-bar"><h3>Plan card and plan wall</h3><button class="btn btn-ghost btn-sm" data-copy>Copy code</button></div>
+        <div class="demo" style="display:block">
+          <div class="wall-bill-demo" role="group" aria-label="Billing toggle example"><button class="on" type="button">Yearly</button><button type="button">Monthly</button></div>
+          <div class="wall-demo">
+            <div class="wall-plan-d"><div class="top"><img src="vault-it-tier-pioneer.svg" alt="" width="48" height="48"><div><div class="mono wh">Yearly</div><b>Pioneer</b></div></div><div class="pr">Price from the offer doc</div><small>Works out at a monthly figure. "Save" only where it is true.</small><button class="btn btn-primary btn-sm" type="button">Choose Pioneer</button></div>
+            <div class="wall-plan-d gold"><div class="top"><img src="vault-it-tier-lifetime-licence.svg" alt="" width="48" height="48"><div><div class="mono wh">Once</div><b>Lifetime licence</b></div></div><div class="pr">Price from the offer doc</div><small>One payment, no renewal.</small><button class="btn btn-primary btn-sm" type="button">Choose Lifetime</button></div>
+            <div class="wall-plan-d soon"><div class="top"><div><div class="mono wh">Coming soon</div><b>Household</b></div></div><small>No button until it exists.</small></div>
           </div>
         </div>
-      </div>
-
-      <div class="demo-wrap">
-        <div class="demo-bar"><h3>Founding Member card</h3><button class="btn btn-ghost btn-sm" data-copy>Copy code</button></div>
-        <div class="demo">
-          <div class="vi-price">
-            <b>Founding Member</b>
-            <div class="p">£149<small> once</small></div>
-            <small style="color:#8A9696">Lifetime access, sold through Stripe only.</small>
-            <ul><li>One payment, no renewal</li></ul>
-            <button class="btn btn-primary" style="width:100%">Become a Founding Member</button>
-          </div>
-        </div>
+        <p style="color:var(--muted);font-size:14px;margin:10px 0 0;max-width:70ch">As built in <code>src/app/paywall/plan-wall.html</code>: Vaulter and Pioneer each in yearly or monthly (a toggle, yearly first), the Lifetime licence, and Household as coming soon with no button. Each card has a 48px tier icon (<code>brand/vault-it-tier-*.svg</code>). A yearly price leads with the yearly total, then the monthly figure it works out at. Never strike a price through. The wall covers the whole app until the account is on a plan and has no close button. <b>Prices, tier names and beta dates are not set in this book.</b> They come from <code>docs/OFFER_AND_PRICING.md</code> and the app's plan source, so they cannot drift. Plan prices are money but not dashboard figures, so they stay Chakra Petch, not Vault-form.</p>
       </div>
 
       <div class="demo-wrap">
@@ -2311,8 +2300,7 @@ var FORMATS=[{k:"Instagram",w:1080,h:1080},{k:"Story",w:1080,h:1920},{k:"X and L
 var TPL=[
   {k:"Tagline",h:"Get out of the red and into your home.",s:"Every pound saved builds your future.",p:36,c:"Get out of the red and into your home. Every pound saved builds your future. vault-it.co"},
   {k:"Milestone",h:"Foundations laid. Row by row.",s:"Lay the bricks. vault-it.co",p:50,c:"Foundations laid. Row by row. Lay the bricks. vault-it.co"},
-  {k:"Pioneer",h:"Pioneer from £5.99 a month.",s:"Or £49.99 a year. vault-it.co",p:25,c:"Pioneer from £5.99 a month, or £49.99 a year. vault-it.co"},
-  {k:"Founding Member",h:"Founding Member: £149 once.",s:"Lifetime access. vault-it.co",p:25,c:"Founding Member: £149 once. Lifetime access. vault-it.co"}
+  {k:"Plans",h:"Choose your plan.",s:"Prices at vault-it.co",p:25,c:"Choose your plan. Prices at vault-it.co"}
 ];
 var fi=0,smode=0,cv=$("#socialCanvas"),cx=cv.getContext("2d");
 function pill(wrap,list,get,onpick){
