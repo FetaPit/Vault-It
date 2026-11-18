@@ -20,7 +20,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else consol
       localStorage.setItem('vi_session', JSON.stringify({ email: 't@t.com', expiry: Date.now() + 1e10 }));
       if (!localStorage.getItem('pos_ov1')) localStorage.setItem('pos_ov1', JSON.stringify({ income: [{ id: 1, name: 'Salary', amount: 3217, cat: 'salary' }], expenses: [{ id: 2, name: 'Rent', amount: 987, type: 'ce' }] }));
       /* stand-in for html2canvas: renders nothing, but runs the app's onclone so the masking can be checked */
-      window.html2canvas = async (el, o) => { const d = document.implementation.createHTMLDocument(''); d.body.innerHTML = document.body.innerHTML; o.onclone(d);
+      window.html2canvas = async (el, o) => { window.__h2c = (window.__h2c || 0) + 1; for (const t0 = Date.now(); Date.now() - t0 < 800;); /* the real library holds the page for seconds on a big screen (owner, 18 Nov 2026) */ const d = document.implementation.createHTMLDocument(''); d.body.innerHTML = document.body.innerHTML; o.onclone(d);
         window._fbClone = d.body.textContent; window._fbCloneHasFb = !!d.getElementById('vi-fb'); const c = document.createElement('canvas'); c.width = 320; c.height = 200; c.getContext('2d').fillRect(0, 0, 320, 200); return c; };
     }, theme);
     await p.goto(require('./lib/vi').FILE_URL); await p.waitForTimeout(1600);
@@ -48,11 +48,14 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else consol
     await p.waitForTimeout(300);
     await p.click('#vi-fb-btn'); await p.waitForTimeout(500);
     ok(await p.evaluate(() => !document.getElementById('vi-fb').hidden && document.activeElement.id === 'vi-fb-text'), T + 'the sheet opens with the cursor in the box');
-    ok(await p.evaluate(() => typeof window._fbClone === 'string' && window._fbClone.length > 200 && !/\d/.test(window._fbClone) && !window._fbCloneHasFb), T + 'the picture is taken with every digit hidden and without the sheet');
-    ok(await p.evaluate(() => { const i = document.getElementById('vi-fb-shot'); return !i.hidden && /^data:image\/jpeg/.test(i.src); }) && /figures are hidden/.test(await p.textContent('#vi-fb-picst')), T + 'a preview of the picture shows, saying the figures are hidden');
+    // the freeze (owner, 18 Nov 2026, phone screenshot: the sheet sat on "Taking the picture…" and nothing could be typed): opening takes no picture; typing works at once
+    const tFill = Date.now(); await p.fill('#vi-fb-text', 'typing right away'); const dFill = Date.now() - tFill; await p.fill('#vi-fb-text', '');
+    ok(await p.evaluate(() => !window.__h2c) && dFill < 500, T + 'opening the sheet takes no picture and the box takes typing at once (' + dFill + ' ms)');
+    ok(/taken when you press Send/.test(await p.textContent('#vi-fb-picst')) && await p.evaluate(() => document.getElementById('vi-fb-shot').hidden), T + 'the sheet says the picture is taken when you press Send');
     await p.click('#vi-fb-send'); ok(/Write a sentence or pick a number/.test(await p.textContent('#vi-fb-msg')) && !sent.some(x => x.kind === 'feedback'), T + 'an empty send is stopped');
-    await p.fill('#vi-fb-text', 'The cash total confused me'); await p.click('#vi-fb .vi-fb-rate button[data-r="4"]'); await p.click('#vi-fb-send'); await p.waitForTimeout(700);
+    await p.fill('#vi-fb-text', 'The cash total confused me'); await p.click('#vi-fb .vi-fb-rate button[data-r="4"]'); await p.click('#vi-fb-send'); await p.waitForTimeout(2200);
     const fb = sent.find(x => x.kind === 'feedback');
+    ok(await p.evaluate(() => typeof window._fbClone === 'string' && window._fbClone.length > 200 && !/\d/.test(window._fbClone) && !window._fbCloneHasFb), T + 'the picture is taken at Send with every digit hidden and without the sheet');
     ok(fb && fb.text === 'The cash total confused me' && fb.rating === 4 && /^data:image\/jpeg;base64,/.test(fb.screenshot || '') && fb.context && fb.context.tab === 'assets/cash', T + 'sends the words, the rating, the picture and the screen (' + (fb && fb.context && fb.context.tab) + ')');
     const cj = noT(fb && fb.context || {});
     ok(fb && Array.isArray(fb.context.trail) && fb.context.trail.length >= 3 && !/3217|987|£/.test(cj) && fb.context.trail.every(e => !/\d/.test(e.el || '')), T + 'the context carries the last actions and no figures');
@@ -61,11 +64,12 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m); } else consol
     await p.click('#vi-fb-btn'); await p.waitForTimeout(400); await p.uncheck('#vi-fb-pic'); await p.fill('#vi-fb-text', 'No picture please'); await p.click('#vi-fb-send'); await p.waitForTimeout(600);
     ok(sent.filter(x => x.kind === 'feedback').pop().screenshot === null, T + 'unticked: no picture is sent');
     // too many: a kind message
-    status = 429; await p.click('#vi-fb-btn'); await p.waitForTimeout(400); await p.fill('#vi-fb-text', 'Again'); await p.click('#vi-fb-send'); await p.waitForTimeout(600);
+    status = 429; await p.click('#vi-fb-btn'); await p.waitForTimeout(400); await p.fill('#vi-fb-text', 'Again'); await p.click('#vi-fb-send'); await p.waitForTimeout(2200);
     ok(/a lot of feedback for one day/.test(await p.textContent('#vi-fb-msg')), T + 'over the daily limit it says so kindly'); status = 200; await p.evaluate(() => viFbClose());
-    // no picture possible (the picture library cannot load): the box is unticked and it says so; words still send
-    await p.evaluate(() => { window.html2canvas = undefined; }); await p.click('#vi-fb-btn'); await p.waitForTimeout(1200);
-    ok(await p.evaluate(() => { const c = document.getElementById('vi-fb-pic'); return !c.checked && c.disabled && /not available here/.test(document.getElementById('vi-fb-picst').textContent); }), T + 'when no picture can be taken, the box is unticked and says so');
+    // no picture possible (the picture library cannot load): the words still send, with no picture
+    await p.evaluate(() => { window.html2canvas = undefined; }); await p.click('#vi-fb-btn'); await p.waitForTimeout(400); await p.fill('#vi-fb-text', 'Words only'); await p.click('#vi-fb-send'); await p.waitForTimeout(2200);
+    const wo = sent.filter(x => x.kind === 'feedback').pop();
+    ok(wo && wo.text === 'Words only' && wo.screenshot === null, T + 'when no picture can be taken, the words still send without one');
     await p.evaluate(() => viFbClose());
     // activity log
     await p.evaluate(() => { showTab('debt'); showTab('overview'); }); const n0 = sent.length; await p.evaluate(() => viFb.flush()); await p.waitForTimeout(400);

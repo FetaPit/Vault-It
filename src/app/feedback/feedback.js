@@ -68,19 +68,26 @@ function pixelate(out,scale){   /* charts and 3D scenes are pictures, so their f
     var x=Math.max(0,r.left)*scale,y=Math.max(0,r.top)*scale,w=(Math.min(innerWidth,r.right)-Math.max(0,r.left))*scale,h=(Math.min(innerHeight,r.bottom)-Math.max(0,r.top))*scale;if(w<2||h<2)return;
     var t=document.createElement('canvas'),k=14;t.width=Math.max(1,Math.round(w/k));t.height=Math.max(1,Math.round(h/k));var tc=t.getContext('2d');tc.drawImage(out,x,y,w,h,0,0,t.width,t.height);c.drawImage(t,0,0,t.width,t.height,x,y,w,h)});
 }
+/* html2canvas copies the computed style of every element it is given, which on this app (about 8,000 elements across all tabs) held the page for 10 to 15 seconds in a test browser.
+ * Hidden tabs and anything off screen are skipped before they are copied (stylesheets and anything outside the body are always kept). Roughly halves the cost; the real fix is that it now runs at Send. */
+function skipEl(el){
+  if(el.id==='vi-fb'||el.id==='vi-fb-btn')return true;
+  try{if(!document.body.contains(el)||/^(STYLE|LINK|SCRIPT)$/.test(el.tagName))return false;
+    var cs=getComputedStyle(el);if(cs.display==='none')return true;
+    if(cs.position!=='fixed'){var r=el.getBoundingClientRect();if(r.width>0&&r.height>0&&(r.bottom<-40||r.top>innerHeight+40||r.right<-40||r.left>innerWidth+40))return true}}catch(e){}
+  return false}
 function capture(){
   if(shotBusy)return shotBusy;
   shotBusy=loadH2C().then(function(h2c){var scale=Math.min(1,960/innerWidth);
     return h2c(document.body,{x:scrollX,y:scrollY,width:innerWidth,height:innerHeight,windowWidth:innerWidth,windowHeight:innerHeight,scale:scale,logging:false,useCORS:false,
-      backgroundColor:getComputedStyle(document.body).backgroundColor,ignoreElements:function(el){return el.id==='vi-fb'||el.id==='vi-fb-btn'},onclone:function(d){maskDoc(d)}})
+      backgroundColor:getComputedStyle(document.body).backgroundColor,ignoreElements:skipEl,onclone:function(d){maskDoc(d)}})
       .then(function(out){pixelate(out,out.width/innerWidth);var q=.62,u=out.toDataURL('image/jpeg',q);while(u.length>680000&&q>.25){q-=.12;u=out.toDataURL('image/jpeg',q)}return u.length>680000?null:u})})
     .catch(function(e){console.warn('[Vault-It] feedback picture',e);return null}).then(function(u){shot=u;shotBusy=null;paintShot();return u});
   return shotBusy;
 }
-function paintShot(){var p=document.getElementById('vi-fb-shot'),cb=document.getElementById('vi-fb-pic'),st=document.getElementById('vi-fb-picst');if(!p)return;
-  if(shot){p.src=shot;p.hidden=false;if(st)st.textContent='Your figures are hidden in the picture.';if(cb)cb.disabled=false}
-  else if(shotBusy){p.hidden=true;if(st)st.textContent='Taking the picture…'}
-  else{p.hidden=true;if(cb){cb.checked=false;cb.disabled=true}if(st)st.textContent='A picture of the screen is not available here; your words are enough.'}}
+function paintShot(){var p=document.getElementById('vi-fb-shot'),st=document.getElementById('vi-fb-picst');if(!p)return;
+  /* owner, 18 Nov 2026: the sheet froze on "Taking the picture…" and nothing could be typed. The picture is now taken when Send is pressed, never when the sheet opens. */
+  p.hidden=true;if(st)st.textContent=shotBusy?'Taking the picture…':'The picture is taken when you press Send, with every figure hidden.'}
 /* ---- the sheet ---- */
 function sheet(){
   var m=document.getElementById('vi-fb');if(m)return m;
@@ -106,7 +113,7 @@ window.viFbOpen=function(mo){
   [].forEach.call(m.querySelectorAll('.vi-fb-rate button'),function(b){b.setAttribute('aria-pressed','false')});
   var cb=document.getElementById('vi-fb-pic');cb.checked=true;cb.disabled=false;
   shot=null;rec('feedback_open',mo||'button',null,false);
-  m.hidden=false;document.body.classList.add('vi-pop-open');capture();paintShot();
+  m.hidden=false;document.body.classList.add('vi-pop-open');paintShot();
   if(!signedIn())document.getElementById('vi-fb-msg').innerHTML='Sign in to send feedback from here, or email <a href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback">hello@vault-it.co</a>.';
   setTimeout(function(){var t=document.getElementById('vi-fb-text');if(t)t.focus()},40);
 };
@@ -116,9 +123,13 @@ window.viFbSend=async function(){
   var msg=document.getElementById('vi-fb-msg'),txt=document.getElementById('vi-fb-text').value.trim(),btn=document.getElementById('vi-fb-send');
   if(!signedIn()){msg.innerHTML='Sign in to send feedback from here, or email <a href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback">hello@vault-it.co</a>.';return}
   if(!txt&&!rating){msg.textContent='Write a sentence or pick a number first.';document.getElementById('vi-fb-text').focus();return}
-  btn.disabled=true;msg.textContent='Sending…';
-  if(document.getElementById('vi-fb-pic').checked&&shotBusy){try{await shotBusy}catch(e){}}
-  var body={kind:'feedback',text:txt.slice(0,4000),rating:rating,moment:moment||null,screenshot:document.getElementById('vi-fb-pic').checked?shot:null,context:context()};
+  btn.disabled=true;var wantPic=document.getElementById('vi-fb-pic').checked;
+  if(wantPic){msg.textContent='Taking the picture, one moment…';
+    /* let that line paint before the page is busy */
+    await new Promise(function(r){var d=false,f=function(){if(!d){d=true;r()}};requestAnimationFrame(function(){setTimeout(f,30)});setTimeout(f,150)});
+    try{await capture()}catch(e){}}
+  msg.textContent='Sending…';
+  var body={kind:'feedback',text:txt.slice(0,4000),rating:rating,moment:moment||null,screenshot:wantPic?shot:null,context:context()};
   var r=null;try{r=await _fnInvoke(FN,body,20000)}catch(e){r={error:e}}
   btn.disabled=false;
   if(r&&!r.error&&r.data&&r.data.ok){rec('feedback_sent',moment||'button');viFbClose();try{showToast('Thank you. Pete reads every one.')}catch(e){}flush(false);return}
