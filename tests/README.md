@@ -83,6 +83,7 @@ node tests/test_inv_preview.js         # Round 3: the item viewer shows the save
 node tests/test_value_hist.js         # Round 3 (8): each wealth item keeps one value reading a day with its source; the link suggests a source from the name, else stays manual
 node tests/test_icons.js              # Icons: embedded coin logos work offline, no emoji fallback; inventory and liability items are the brand block, blank until a brand icon is picked; old emoji choices map to brand icons
 node tests/test_bank_logos.js         # Bank and platform logos: cash accounts get their bank's logo from the name (initials offline, brand bank icon when unknown); more platforms for pies
+node tests/test_feedback_capture.js    # Feedback picture with the real html2canvas on every tab, button always tappable, 3D sleeps behind the sheet, words send without a picture (needs html2canvas via H2C_FILE or node_modules)
 node tests/test_feedback_client.js     # Tester feedback in the app: button, sheet, picture with figures hidden, context without figures, activity log and its Settings switch, moment prompts, privacy notice
 node tests/test_help_centre.js       # Help centre: ? in the header, tour once after the welcome and Pete's note with a skip, Settings replay, FAQs, chat from FAQs and own numbers, help-ask and unanswered questions filed
 node tests/test_help_server.js       # help-ask (Haiku, guide only, amounts stripped, limits, unsure) and tester-feedback e-mailing each unanswered help question
