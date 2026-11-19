@@ -9,7 +9,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
 const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 
 (async () => {
-  const b = await chromium.launch(); const errs = [];
+  const b = await chromium.launch({ args: ['--font-render-hinting=full'] }); const errs = [];
   for (const w of [1100, 768, 390]) {
     const phone = w <= 480, t = w + 'px: ';
     const ctx = await b.newContext({ viewport: { width: w, height: phone ? 844 : 900 }, deviceScaleFactor: 1, isMobile: phone, hasTouch: phone }); await routeThree(ctx);
