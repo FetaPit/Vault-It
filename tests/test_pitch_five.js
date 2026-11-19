@@ -84,9 +84,10 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
   // Slide 7: where it is today
   { const s = await txt(p, 'proof');
     const t = await p.evaluate(() => [...document.querySelectorAll('#proof [data-now]')].map((e) => e.dataset.now + '=' + e.querySelector('b').textContent.trim()).join());
-    ok(t === 'people=26,saved=11,waitlist=9,paying=0', 'traction on 19 Nov 2026, the user count the owner gave that day (26): ' + t);
-    ok(/founder's count/i.test(s) && !/\b14 accounts\b/.test(s), 'the slide says whose count the 26 is');
-    ok(/since the 7 november pitch/i.test(s) && /v0\.95/.test(s) && /10 November/.test(s) && /vault-it\.co\/demo-a/.test(s) && /business plan v3/i.test(s) && /36-month/.test(s) && !/Web Summit/i.test(s), 'progress since the 7 Nov pitch: v0.95 released 10 Nov, the live demo, plan v3 and its 36-month model (owner, 19 Nov: "other progression to highlight")');
+    ok(t === 'accounts=14,saved=11,waitlist=9,paying=0', 'traction as the database has it on 19 Nov 2026 (owner, 19 Nov: "Go" on database counts in place of 26): ' + t);
+    ok(/counts from the vault-it database, 19 nov 2026/i.test(s) && !/founder's count/i.test(s) && !/\b26\b/.test(s), 'the slide says where the counts come from, and 26 is gone');
+    ok(/since the 7 november pitch/i.test(s) && /v0\.95/.test(s) && /10 November/.test(s) && /live demo/i.test(s) && /follow-up deck/i.test(s) && /four questions/i.test(s) && /business plan v3/i.test(s) && /36-month/.test(s), 'progress since the 7 Nov pitch: v0.95 released 10 Nov, the live demo, the follow-up deck, plan v3 and its 36-month model');
+    ok(/HelpBnk Starter Kit/.test(s) && !/Web Summit|Vanta|Greenborough|uptime/i.test(s), 'the HelpBnk Starter Kit is named; Web Summit, Vanta, Greenborough and the uptime monitor stay off (owner, 19 Nov)');
     ok(/trust centre in development/i.test(s) && /HexaTown/.test(s) && /security and compliance/i.test(s) && /NDA signed/i.test(s) && !/ISO 27001 certified|certified to ISO|SOC 2/i.test(s), 'the trust centre is in development and HexaTown is named, with no certificate claimed (owner, 19 Nov)');
     ok(/19 November 2026/i.test(s) && /pre-revenue/i.test(s) && /15 to 20% equity/.test(s) && !/25%/.test(s) && /February 2027/i.test(s) && /September 2028/i.test(s), 'dated, pre-revenue, the open seats and the two dated milestones'); }
   // Slide 8: the two asks
@@ -122,7 +123,7 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
   await p.evaluate(() => document.getElementById('nv-open').click());
   ok(await p.evaluate(() => document.body.classList.contains('notes') && getComputedStyle(document.getElementById('nv')).display !== 'none'), 'Notes opens the script panel');
   ok(/Pete Thickett/.test(await txt(p, 'nv-text')), 'the panel shows the cover\'s part of the script');
-  { const say = await p.evaluate(() => document.querySelector('.frame:has(#proof) .say').textContent); ok(/26 people/.test(say) && /HexaTown/.test(say) && /trust centre/i.test(say) && !/\b14 accounts\b/.test(say), 'the script says 26 people and names the trust centre and HexaTown');
+  { const say = await p.evaluate(() => document.querySelector('.frame:has(#proof) .say').textContent); ok(/14 accounts/.test(say) && /HexaTown/.test(say) && /trust centre/i.test(say) && !/\b26\b/.test(say), 'the script says 14 accounts and names the trust centre and HexaTown');
     ok(/7 November/.test(say) && /version 0\.95/.test(say), 'the script says what has moved since the 7 November pitch'); }
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll on a phone with Notes open');
   ok(misses.length === 0, 'every file the page asks for exists in the build: ' + misses.join(' '));
