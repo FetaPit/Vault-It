@@ -97,6 +97,7 @@ node tests/test_ui_round2.js         # v0.7 UI round 2 (for alpha 0.8), Net wort
 node tests/test_signoff_d.js         # Phone sign-off D: income flow bands get a bright colour stroke and leaders; only two reds, clearly apart, AA text
 node tests/test_signoff_d.js         # Phone sign-off D: income flow bands get a bright colour stroke and leaders; only two reds, clearly apart
 node tests/test_footer.js             # footer: approved disclaimer, Privacy notice / Beta terms links in the app and landing footers, type floors, --footer-h tracks the fixed footer
+node tests/test_landing_brand.js       # landing: Chakra Petch headlines and buttons, Chakra Petch Figures for figures, Syne wordmark only, solid-red tagline, Daylight tokens, 3D stage stays Night, prices unchanged
 node tests/test_v08_chrome.js         # v0.8 chrome: Message the Dev last on Overview and gone from every other tab (v0.9.1), Feedback fixed bottom right, footer collapses to the FCA strip (full on scroll up / page end), compact category pills (below Cash flow), synced scroll rails above and below the flow charts
 node tests/test_csp_report_only.mjs   # Worker: Content-Security-Policy-Report-Only lists every outside host the app calls; enforced CSP unchanged
 node tests/test_mobile_nav.js       # phones: tab bar fixed to the bottom of the screen, seven tabs at 44px, header one row, footer in flow; Connections out of the menu bar and into Settings at every width
