@@ -273,7 +273,7 @@ function stkDonut(slices,total,top,sub,subCol,label){
     out+='<circle cx="75" cy="75" r="'+R+'" fill="none" stroke="'+s.c+'" stroke-width="16" stroke-dasharray="'+Math.max(0,len-1.5).toFixed(2)+' '+(C-Math.max(0,len-1.5)).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 75 75)"><title>'+stkEsc(s.t)+' '+(s.v/total*100).toFixed(1)+'%</title></circle>';
     off+=len;
   });
-  out+='<text x="75" y="'+(sub?71:79)+'" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="14" style="fill:var(--tx,#fff)">'+top+'</text>';
+  out+='<text x="75" y="'+(sub?71:79)+'" text-anchor="middle" font-family="Chakra Petch,sans-serif" font-weight="800" font-size="14" style="fill:var(--tx,#fff)">'+top+'</text>';
   if(sub)out+='<text x="75" y="92" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="12" fill="'+(subCol||'#8fb4b1')+'">'+sub+'</text>';
   return out+'</svg>';
 }
@@ -396,7 +396,7 @@ function dtmWrap(txt,font,maxW,maxLines){
 // can this item's label (logo, name, amount, share) sit inside a cw x ch tile? returns what to draw, or null
 function dtmFitCell(it,cw,ch,o){
   var fs=o.fs,padX=8,padY=6,iw=cw-padX*2,ih=ch-padY*2,
-      nf='700 '+fs+'px Syne,sans-serif',vf='700 '+(fs+.5)+'px "Share Tech Mono",monospace',
+      nf='700 '+fs+'px Chakra Petch,sans-serif',vf='700 '+(fs+.5)+'px "Share Tech Mono",monospace',
       lh=Math.ceil(fs*1.2),vh=Math.ceil((fs+.5)*1.3);
   if(iw<30||ih<vh||dtmMeasure(it.val,vf)>iw)return null;
   for(var k=0;k<2;k++){

@@ -33,7 +33,7 @@ function context(s, i) {
   return s.slice(open < 0 ? Math.max(0, i - 400) : open, end);
 }
 function capsSyne(ctx) {
-  if (!/text-transform\s*:\s*uppercase/.test(ctx) || !/Syne|--font-display/.test(ctx)) return false;
+  if (!/text-transform\s*:\s*uppercase/.test(ctx) || !/Syne|Chakra Petch|--font-display/.test(ctx)) return false;
   const m = ctx.match(/letter-spacing\s*:\s*(\d*\.?\d+)em/); return !!m && +m[1] >= 0.08;
 }
 // an actual button (Pedro, 2 Nov): CSS selector naming a button, or an inline style on a <button> tag. Tabs keep the 10 px caps.

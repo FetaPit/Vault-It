@@ -395,11 +395,11 @@
   border-radius: 50%;
   background: linear-gradient(135deg, var(--em), rgb(var(--brass-rgb) / .7));
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif; font-weight: 800; font-size: max(.7rem,var(--vi-fs-3));
+  font-family: 'Chakra Petch', sans-serif; font-weight: 800; font-size: max(.7rem,var(--vi-fs-3));
   color: #000; margin: 0 auto 6px;
 }
 .nw-profile-chip .nw-pc-name {
-  font-family: 'Syne', sans-serif; font-size: max(.48rem,var(--vi-fs-1)); font-weight: 700;
+  font-family: 'Chakra Petch', sans-serif; font-size: max(.48rem,var(--vi-fs-1)); font-weight: 700;
   color: var(--tx); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .nw-profile-chip .nw-pc-num {

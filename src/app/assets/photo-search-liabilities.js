@@ -4,7 +4,7 @@ function wiSearch(id){
   var modal=document.createElement('div');
   modal.className='wi-search-modal';
   modal.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-    +'<div style="font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--em);font-family:Syne,sans-serif">SEARCH IMAGE</div>'
+    +'<div style="font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--em);font-family:Chakra Petch,sans-serif">SEARCH IMAGE</div>'
     +'<button onclick="this.closest(\'.wi-search-modal\').remove();document.querySelector(\'.wi-icon-overlay\').remove()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:max(.8rem,var(--vi-fs-3))"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
     +'</div>'
     +'<div style="display:flex;gap:6px">'
@@ -33,7 +33,7 @@ function liabSearch(id){
   var modal=document.createElement('div');
   modal.className='wi-search-modal';
   modal.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-    +'<div style="font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--em);font-family:Syne,sans-serif">SEARCH IMAGE</div>'
+    +'<div style="font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--em);font-family:Chakra Petch,sans-serif">SEARCH IMAGE</div>'
     +'<button onclick="this.closest(\'.wi-search-modal\').remove();document.querySelector(\'.wi-icon-overlay\').remove()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:max(.8rem,var(--vi-fs-3))"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button>'
     +'</div>'
     +'<div style="display:flex;gap:6px">'
@@ -220,7 +220,7 @@ function wiIcon(id,targetList){
   var tl=targetList==='liab'?'liab':'';
   var opt=function(k,n){return '<button type="button" class="wi-icon-opt" data-k="'+k+'" data-n="'+n.toLowerCase()+'" title="'+n+'" onclick="wiSetIcon('+id+',\''+k+'\',\''+tl+'\')"><svg class="vi-ic" aria-hidden="true"><use href="#vi-'+k+'"/></svg><span>'+n+'</span></button>';};
   modal.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-    +'<div style="font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--em);font-family:Syne,sans-serif">Choose an icon</div>'
+    +'<div style="font-size:max(.6rem,var(--vi-fs-2));font-weight:700;color:var(--em);font-family:Chakra Petch,sans-serif">Choose an icon</div>'
     +'<button type="button" onclick="wiIconClose()" style="background:none;border:none;color:var(--t3);cursor:pointer"><svg class="vi-ic g" role="img" aria-label="Close"><use href="#vi-close"/></svg></button></div>'
     +'<input class="al-inp" placeholder="Filter icons" aria-label="Filter icons" style="margin-bottom:8px;font-size:max(.62rem,var(--vi-fs-2))" oninput="wiFilterIcons(this)">'
     +'<div class="wi-icon-grid"><button type="button" class="wi-icon-opt" data-k="" data-n="no icon blank" onclick="wiSetIcon('+id+',\'\',\''+tl+'\')">No icon</button></div>'
