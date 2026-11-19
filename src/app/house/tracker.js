@@ -223,14 +223,21 @@ function hbTypeSlate(t,px,st){
   if(typeof wrTokSvg!=='function'||typeof WR_CARD==='undefined'||!WR_CARD)return '';
   var r=HB_TYPES[t]||HB_TYPES.terraced;return wrTokSvg({tier:r[1],st:st||'done',ic:'vi-ht-'+(HB_TYPES[t]?t:'terraced')},px);
 }
+// the house type as its round medallion alone, no token card (owner, 14 Nov: "Remove the card from the outside and just focus on the circle,
+// circle kind of medallion"; 19 Nov: "make the circle the whole design remove the outer card"): the Change house type grid and the welcome picker
+function hbTypeMedal(t,px){
+  if(typeof wrMedal!=='function'||typeof wrIcon!=='function'||typeof WR_DIAL==='undefined')return '';
+  var r=HB_TYPES[t]||HB_TYPES.terraced;
+  return '<svg class="wt-svg hbt-medal" viewBox="7.5 35.5 77 77" width="'+px+'" height="'+px+'" aria-hidden="true"><g class="wt t-'+r[1]+' st-done">'+wrMedal(false)+wrIcon('vi-ht-'+(HB_TYPES[t]?t:'terraced'),21,49,50)+'</g></svg>';
+}
 function hbtPaint(){
   var t=(typeof state!=='undefined'&&state&&state.houseType)||'terraced',nm=hbTypeName(t);
   document.querySelectorAll('#htypes .hbtn').forEach(function(b){
-    var on=b.dataset.type===t,ic=b.querySelector('.ico'),k=on?'on':'off';
+    var on=b.dataset.type===t,ic=b.querySelector('.ico');
     b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));
-    if(ic&&ic.getAttribute('data-k')!==k){var h=hbTypeSlate(b.dataset.type,64,on?'next':'done');if(h){ic.innerHTML=h;ic.setAttribute('data-k',k);}}
+    if(ic&&!ic.getAttribute('data-m')){var h=hbTypeMedal(b.dataset.type,64);if(h){ic.innerHTML=h;ic.setAttribute('data-m','1');}}   // the picked one is ringed in CSS
   });
-  document.querySelectorAll('#w-htypes .w-ht .ico').forEach(function(ic){if(!ic.firstChild)ic.innerHTML=hbTypeSlate(ic.parentNode.dataset.type,56,'done');});
+  document.querySelectorAll('#w-htypes .w-ht .ico').forEach(function(ic){if(!ic.firstChild)ic.innerHTML=hbTypeMedal(ic.parentNode.dataset.type,56);});
   var c=document.getElementById('hbt-chip');
   if(c){var cn=document.getElementById('hbt-chip-nm'),ct=c.querySelector('.hbt-chip-tok');if(cn)cn.textContent=nm;c.setAttribute('aria-label','House type: '+nm+'. Open the snapshot and change it');
     if(ct&&ct.getAttribute('data-t')!==t){var s=hbTypeSlate(t,34,'done');if(s){ct.innerHTML=s;ct.setAttribute('data-t',t);}}}

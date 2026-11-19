@@ -9471,9 +9471,13 @@ body::before {
    wherever there is no 3D. One canvas over the whole grid draws the six houses (house-tiles.js, HB3D.TileHouses). */
 #w-htypes{position:relative}
 #w-htypes .w-ht{touch-action:pan-y}
-#w-htypes .w-ht .ico{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:4/3;max-height:118px;margin:0 0 4px;border-radius:7px;background:var(--stage-bg);overflow:hidden;touch-action:pan-y}
+/* 19 Nov (owner: "make the circle the whole design remove the outer card"): the icon box is a circle, the House builder viewport inside it;
+   the 3D canvas is masked to the six circles (house-tiles.js), the tile has no card (house-verbatim.css) */
+#w-htypes .w-ht .ico{position:relative;display:grid;place-items:center;width:100%;max-width:124px;aspect-ratio:1/1;margin:0 auto 6px;border-radius:50%;background:var(--stage-bg);overflow:hidden;touch-action:pan-y;box-shadow:inset 0 0 0 1px rgb(var(--teal-rgb) / .22)}
+@media(hover:hover){#w-htypes .w-ht:hover .ico{box-shadow:inset 0 0 0 1px rgb(var(--teal-rgb) / .22),0 0 0 2px rgb(var(--teal-rgb) / .4)}}
+#w-htypes .w-ht.on .ico{box-shadow:0 0 0 2px var(--teal)}
 #w-htypes .w-ht .ico::after{content:"";position:absolute;inset:0;z-index:2;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none}   /* over the 3D canvas (z-index 1), as the House builder's scan lines lie over its house */
-#w-htypes .w-ht .ico svg{position:relative;z-index:1;width:52px;height:auto;transition:opacity .25s linear}
+#w-htypes .w-ht .ico svg{position:relative;z-index:1;width:62%;height:auto;transition:opacity .25s linear}
 #w-htypes .w-ht.live .ico svg{opacity:0}
 #w-htypes .w-ht.live .ico{cursor:grab}
 #w-htypes .w-ht.live .ico:active{cursor:grabbing}
@@ -14664,20 +14668,24 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
 #hbt-stats .hb-stx4>div{padding:7px 8px}
 /* R12: the six house types as roadmap slates */
 .hbt-types{grid-template-columns:repeat(3,minmax(0,1fr))}
-.hbt-types .hbtn,.w-ht{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;min-height:44px;padding:10px 4px 8px;border:1px solid rgb(var(--teal-rgb) / .16);border-radius:10px;background:rgb(var(--panel-rgb) / .5);color:var(--t2);font-family:'Chakra Petch',sans-serif;line-height:1.3;cursor:pointer;text-align:center}
-.hbt-types .hbtn .ico,.w-ht .ico{display:block;width:64px;height:auto;margin:0 0 2px}
+/* no card round a house type: the round medallion (or the welcome's 3D circle) is the whole tile, the name under it (owner, 14 Nov: "Remove the
+   card from the outside and just focus on the circle"; 19 Nov: "make the circle the whole design remove the outer card"). The picked one is ringed on its circle. */
+.hbt-types .hbtn,.w-ht{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;min-height:44px;padding:6px 2px 6px;border:0;border-radius:10px;background:none;box-shadow:none;color:var(--t2);font-family:'Chakra Petch',sans-serif;line-height:1.3;cursor:pointer;text-align:center}
+.hbt-types .hbtn .ico,.w-ht .ico{display:block;width:64px;height:auto;margin:0 0 4px;border-radius:50%;transition:box-shadow .18s}
+.hbt-types .hbtn .ico{aspect-ratio:1/1;line-height:0}.hbt-types .hbtn .ico svg{display:block}
 .w-ht .ico{width:52px}
 .hbt-types .hbtn .ico svg,.w-ht .ico svg{width:100%;height:auto}
 .hbt-types .hbtn .nm,.w-ht .nm{font-size:12.5px;font-weight:700;color:var(--text);overflow-wrap:anywhere}
 .hbt-types .hbtn .pr{opacity:1;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--brass)}
-.hbt-types .hbtn:hover,.w-ht:hover{border-color:rgb(var(--teal-rgb) / .5);background:rgb(var(--teal-rgb) / .06)}
-.hbt-types .hbtn.active,.w-ht.on{border-color:var(--teal);background:rgb(var(--teal-rgb) / .1);box-shadow:inset 0 0 0 1px var(--teal)}
+.hbt-types .hbtn:hover,.w-ht:hover,.hbt-types .hbtn.active,.w-ht.on{background:none;box-shadow:none}
+@media(hover:hover){.hbt-types .hbtn:hover .ico,.w-ht:hover .ico{box-shadow:0 0 0 2px rgb(var(--teal-rgb) / .4)}}
+.hbt-types .hbtn.active .ico,.w-ht.on .ico{box-shadow:0 0 0 2px var(--teal)}
 .hbt-types .hbtn.active .nm,.w-ht.on .nm{color:var(--teal)}
 .w-ht-pick{grid-column:1/-1}
 .w-ht-lbl{margin-bottom:6px;font-family:'Chakra Petch',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t2)}
 .w-htypes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .w-ht-note{margin-top:6px;font-size:12px;line-height:1.5;color:var(--t2)}
-@media(prefers-reduced-motion:reduce){.hbt-types .hbtn,.w-ht,.hbt-chip{transition:none}}
+@media(prefers-reduced-motion:reduce){.hbt-types .hbtn,.w-ht,.hbt-chip,.hbt-types .hbtn .ico,.w-ht .ico{transition:none}}
 .price-edit-row{display:flex;align-items:center;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid rgb(var(--ink-rgb) / .06)}
 .price-edit-row label{font-size:max(.52rem,var(--vi-fs-1));letter-spacing:.15em;text-transform:uppercase;color:#D4C5A9;opacity:.5;white-space:nowrap}
 .price-iw{display:flex;align-items:center;background:rgb(var(--ink-rgb) / .05);border:1px solid rgb(var(--ink-rgb) / .1);border-radius:3px;overflow:hidden;flex:1;transition:border-color .2s}
@@ -17118,14 +17126,21 @@ function hbTypeSlate(t,px,st){
   if(typeof wrTokSvg!=='function'||typeof WR_CARD==='undefined'||!WR_CARD)return '';
   var r=HB_TYPES[t]||HB_TYPES.terraced;return wrTokSvg({tier:r[1],st:st||'done',ic:'vi-ht-'+(HB_TYPES[t]?t:'terraced')},px);
 }
+// the house type as its round medallion alone, no token card (owner, 14 Nov: "Remove the card from the outside and just focus on the circle,
+// circle kind of medallion"; 19 Nov: "make the circle the whole design remove the outer card"): the Change house type grid and the welcome picker
+function hbTypeMedal(t,px){
+  if(typeof wrMedal!=='function'||typeof wrIcon!=='function'||typeof WR_DIAL==='undefined')return '';
+  var r=HB_TYPES[t]||HB_TYPES.terraced;
+  return '<svg class="wt-svg hbt-medal" viewBox="7.5 35.5 77 77" width="'+px+'" height="'+px+'" aria-hidden="true"><g class="wt t-'+r[1]+' st-done">'+wrMedal(false)+wrIcon('vi-ht-'+(HB_TYPES[t]?t:'terraced'),21,49,50)+'</g></svg>';
+}
 function hbtPaint(){
   var t=(typeof state!=='undefined'&&state&&state.houseType)||'terraced',nm=hbTypeName(t);
   document.querySelectorAll('#htypes .hbtn').forEach(function(b){
-    var on=b.dataset.type===t,ic=b.querySelector('.ico'),k=on?'on':'off';
+    var on=b.dataset.type===t,ic=b.querySelector('.ico');
     b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));
-    if(ic&&ic.getAttribute('data-k')!==k){var h=hbTypeSlate(b.dataset.type,64,on?'next':'done');if(h){ic.innerHTML=h;ic.setAttribute('data-k',k);}}
+    if(ic&&!ic.getAttribute('data-m')){var h=hbTypeMedal(b.dataset.type,64);if(h){ic.innerHTML=h;ic.setAttribute('data-m','1');}}   // the picked one is ringed in CSS
   });
-  document.querySelectorAll('#w-htypes .w-ht .ico').forEach(function(ic){if(!ic.firstChild)ic.innerHTML=hbTypeSlate(ic.parentNode.dataset.type,56,'done');});
+  document.querySelectorAll('#w-htypes .w-ht .ico').forEach(function(ic){if(!ic.firstChild)ic.innerHTML=hbTypeMedal(ic.parentNode.dataset.type,56);});
   var c=document.getElementById('hbt-chip');
   if(c){var cn=document.getElementById('hbt-chip-nm'),ct=c.querySelector('.hbt-chip-tok');if(cn)cn.textContent=nm;c.setAttribute('aria-label','House type: '+nm+'. Open the snapshot and change it');
     if(ct&&ct.getAttribute('data-t')!==t){var s=hbTypeSlate(t,34,'done');if(s){ct.innerHTML=s;ct.setAttribute('data-t',t);}}}
@@ -26525,6 +26540,13 @@ function wrIcon(id,x,y,s){
 // side name width in card units: Chakra Petch 800 at 12.5 px with 1 px letter spacing, measured per character. A name wider than the
 // 76 units beside the medal is squeezed to fit below the card's top corner; one that fits keeps its width (owner, 9 Nov: "Yes, fix side names")
 function wrSideW(s){var W={' ':6,',':5,"'":5,'.':5.5,'-':8.5,'+':11,'I':6.5,'1':7.5,'L':13,'J':13.5,'5':13.5,'S':14,'2':14,'3':14,'7':14,'Y':14.5,'4':14.5,'8':14.5,'£':14.5,'F':15,'T':15,'6':15,'K':16,'Z':16,'R':16.5,'&':16.5,'H':17,'U':17,'%':17,'C':17.5,'D':17.5,'N':17.5,'O':17.5,'Q':17.5,'G':18,'M':21,'W':24.5},w=0;for(var i=0;i<s.length;i++)w+=W[s[i]]||15.5;return w;}
+// the medal on its own (round 4): a metal rim with four rivets, a deep tick dial, a tier-edged face, an engraved ring and a glass highlight,
+// centred at 46,74 in card units, radius 37.5. wrTok draws it on the card; the house type pickers draw it alone (owner, 14 and 19 Nov: the circle only)
+function wrMedal(dim){
+  return '<circle cx="46" cy="74" r="37.5" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/><circle class="wt-mrim" cx="46" cy="74" r="35.8"/>'+WR_DIAL+WR_RIVETS
+    +'<circle class="wt-mface" cx="46" cy="74" r="32"/><circle class="wt-mring" cx="46" cy="74" r="29.4"/><circle class="wt-mdots" cx="46" cy="74" r="30.7"/>'   // v0.95 (owner, 9 Nov): larger inner circle (was 29)
+    +'<path class="wt-gloss" d="M19.8 65.5a27 27 0 0 1 35.4-20.9"/>';
+}
 function wrTok(o){
   var t=o.tier||'starter',st=o.st||'done',px=o.px||100,sc=o.sc||px/118,L=st==='lock',dim=L||st==='skip'||st==='todo',K=wrPts(WR_CARD),n=o.bars||0,lit=o.lit==null?n:o.lit,k;   // todo: an achievement not met yet that nothing locks
   var out='<g class="wt t-'+t+' st-'+st+'">';
@@ -26535,9 +26557,7 @@ function wrTok(o){
   out+='</g><polygon class="wt-rimline" points="'+K+'"/>';
   if(o.ol)out+='<polygon class="wt-ol" points="'+K+'" style="stroke:'+o.ol+'"/>';   // section colour outline (R4)
   // the medal (round 4): a metal rim with four rivets, a deep tick dial, a tier-edged face, an engraved ring and a glass highlight
-  out+='<circle cx="46" cy="74" r="37.5" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/><circle class="wt-mrim" cx="46" cy="74" r="35.8"/>'+WR_DIAL+WR_RIVETS
-    +'<circle class="wt-mface" cx="46" cy="74" r="32"/><circle class="wt-mring" cx="46" cy="74" r="29.4"/><circle class="wt-mdots" cx="46" cy="74" r="30.7"/>'   // v0.95 (owner, 9 Nov): larger inner circle (was 29)
-    +'<path class="wt-gloss" d="M19.8 65.5a27 27 0 0 1 35.4-20.9"/>';
+  out+=wrMedal(dim);
   if(o.num!=null){var ns=String(o.num),fs=ns.length<=2?26:ns.length===3?16:11;out+='<text class="wt-num" x="46" y="'+(74+fs*.32).toFixed(1)+'" text-anchor="middle" style="font-size:'+fs+'px">'+ns+'</text>';}   // sized so the number clears the inner ring
   else out+=wrIcon(L?'vi-lock':o.ic,21,49,50);
   if(n>0){var bw=2.6,gp=n>4?1.8:2.6,x0=46-(n*bw+(n-1)*gp)/2;for(k=0;k<n;k++)out+='<rect class="fire-stud wt-bar'+(k<lit?' on':'')+'" x="'+(x0+k*(bw+gp)).toFixed(1)+'" y="118" width="'+bw+'" height="8"/>';}
@@ -30656,6 +30676,10 @@ function _wt3Measure() {   // the grid and each icon box, in CSS pixels relative
   var g = _wt3Host(); if (!g || !_wt3) return;
   var r = g.getBoundingClientRect(), rects = {};
   g.querySelectorAll('.w-ht').forEach(function (b) { var i = b.querySelector('.ico'); if (!i) return; var q = i.getBoundingClientRect(); rects[b.dataset.type] = { x: q.left - r.left, y: q.top - r.top, w: q.width, h: q.height }; });
+  // the icon boxes are circles (owner, 19 Nov): the one canvas shows only inside them, so no roof or chimney pokes past a circle's edge
+  var mk = Object.keys(rects).map(function (k) { var q = rects[k], rr = Math.min(q.w, q.h) / 2; return 'radial-gradient(circle ' + rr.toFixed(1) + 'px at ' + (q.x + q.w / 2).toFixed(1) + 'px ' + (q.y + q.h / 2).toFixed(1) + 'px,#000 ' + Math.max(0, rr - 1).toFixed(1) + 'px,transparent ' + rr.toFixed(1) + 'px)'; }).join(',');
+  var cs = _wt3.cv && _wt3.cv.style; if (cs && mk) { cs.webkitMaskImage = mk; cs.maskImage = mk; cs.webkitMaskRepeat = cs.maskRepeat = 'no-repeat'; }
+  Object.keys(rects).forEach(function (k) { var q = rects[k], d = Math.min(q.w, q.h) * 0.07; rects[k] = { x: q.x + d, y: q.y + d, w: q.w - 2 * d, h: q.h - 2 * d }; });   // each house drawn a little inside its circle, so its roof clears the rim
   var dpr = Math.min(window.innerWidth < 700 ? 1.5 : 2, window.devicePixelRatio || 1);
   if (r.width > 2 && r.height > 2) _wt3.send('rects', { w: Math.round(r.width), h: Math.round(r.height), dpr: dpr, rects: rects });
 }
@@ -32556,6 +32580,15 @@ function ground(c,P,st,halfX,z0,z1,red,ts,rm,spacing){
     c.beginPath();c.moveTo(rq[0][0],rq[0][1]);for(i=1;i<4;i++)c.lineTo(rq[i][0],rq[i][1]);c.closePath();c.strokeStyle=rgba(CS,(1-pg)*.45);c.lineWidth=1.4;c.stroke()}
   return CS;
 }
+/* a full-screen overlay in front (sign-in, or the welcome with its house selector): the scenes behind it hold still and draw again when it
+   closes (owner, 19 Nov 2026: "the house selector dialogue box also slows the tool down"; at 6x CPU the Overview scene drew 23 frames a
+   second under the selector). Read at most every 250 ms; an observer on the two overlays wakes the scenes at once when they close. */
+var COVER={at:-1e9,on:false,ss:[],mo:false};
+function coverRead(){var ids=['login-overlay','welcome-overlay'];for(var i=0;i<ids.length;i++){var e=document.getElementById(ids[i]);if(e&&e.style.display!=='none'&&getComputedStyle(e).display!=='none')return true}return false}
+function covered(){var now=performance.now();if(now-COVER.at>250){COVER.at=now;COVER.on=coverRead()}
+  if(!COVER.mo&&typeof MutationObserver!=='undefined'){COVER.mo=true;try{var mo=new MutationObserver(function(){var was=COVER.on;COVER.at=performance.now();COVER.on=coverRead();if(was&&!COVER.on)COVER.ss.forEach(function(S){S.kick()})});
+    ['login-overlay','welcome-overlay'].forEach(function(id){var e=document.getElementById(id);if(e)mo.observe(e,{attributes:true,attributeFilter:['style','class']})})}catch(e){}}
+  return COVER.on}
 function stage(cv,o,draw){
   /* sizing, pixel ratio cap, visible-only rendering, frame cap: shared by both scenes */
   var c=cv.getContext("2d"),S={c:c,cw:300,ch:200,dpr:1,vis:false,mid:false,raf:0,last:0};
@@ -32563,7 +32596,8 @@ function stage(cv,o,draw){
   function size(){var r=cv.getBoundingClientRect();S.cw=Math.max(2,r.width);S.ch=Math.max(2,r.height);S.dpr=Math.max(1,Math.min(window.innerWidth<700?1.5:2,window.devicePixelRatio||1,Math.sqrt(1.6e6/(S.cw*S.ch)),LITE?1.25:9));cv.width=Math.round(S.cw*S.dpr);cv.height=Math.round(S.ch*S.dpr);S.kick()}
   /* 'mid': the canvas is about half on screen (a tall one, half the screen); once true it stays true. Intros start on it, not at the first pixel (owner, 2 Nov) */
   function midNow(){var r=cv.getBoundingClientRect(),vh=window.innerHeight||0,seen=Math.min(r.bottom,vh)-Math.max(r.top,0);return r.height>2&&seen>=Math.min(.55*r.height,.55*vh)}
-  function frame(ts){S.raf=0;if(!S.vis||document.hidden||document.body.classList.contains('vi-fb-open'))return;if(!S.mid&&midNow())S.mid=true;var fps=LITE?30:(o.fps||30);if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
+  function frame(ts){S.raf=0;if(!S.vis||document.hidden||document.body.classList.contains('vi-fb-open'))return;
+    if(covered()){clearTimeout(S.cto);S.cto=setTimeout(S.kick,700);return}   /* under the sign-in or the welcome: no drawing; look again in 0.7 s (the observer wakes it sooner) */if(!S.mid&&midNow())S.mid=true;var fps=LITE?30:(o.fps||30);if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
     var dt=Math.min(.05,(ts-(S.last||ts))/1000);S.last=ts;c.setTransform(S.dpr,0,0,S.dpr,0,0);c.clearRect(0,0,S.cw,S.ch);var t0=performance.now();draw(ts,dt,S);
     var cost=performance.now()-t0;S.ema=S.ema==null?cost:S.ema*.85+cost*.15;S.n=(S.n||0)+1;if(!LITE&&S.n>12&&S.ema>16){LITE=true;size()}   // frames over ~16 ms of drawing: go lite for good
     if(!S.raf)S.raf=requestAnimationFrame(frame)}   // size() may already have queued the next frame: never run two loops
@@ -32573,7 +32607,7 @@ function stage(cv,o,draw){
   S.kick=function(){if(!S.vis&&onScreen()){S.vis=true;if(o.onShow)o.onShow()}if(S.vis&&!S.raf){S.last=0;S.raf=requestAnimationFrame(frame)}};
   if("ResizeObserver" in window)new ResizeObserver(size).observe(cv);else window.addEventListener("resize",size);
   if("IntersectionObserver" in window)new IntersectionObserver(function(es){var was=S.vis;S.vis=es[es.length-1].isIntersecting;if(!S.mid&&midNow())S.mid=true;if(S.vis&&!was&&o.onShow)o.onShow();S.kick()},{threshold:[.01,.3,.55,.8]}).observe(cv);else{S.vis=true}
-  document.addEventListener("visibilitychange",S.kick);document.addEventListener("vi-fb-closed",S.kick);
+  document.addEventListener("visibilitychange",S.kick);document.addEventListener("vi-fb-closed",S.kick);COVER.ss.push(S);
   size();return S;
 }
 /* icons on the 3D labels (owner, 4 Nov 2026, v0.9.1 round 2 R2 and R9): the app's own category icons, drawn from the page's icon sprite into the canvas.

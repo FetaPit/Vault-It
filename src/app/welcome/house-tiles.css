@@ -4,9 +4,13 @@
    wherever there is no 3D. One canvas over the whole grid draws the six houses (house-tiles.js, HB3D.TileHouses). */
 #w-htypes{position:relative}
 #w-htypes .w-ht{touch-action:pan-y}
-#w-htypes .w-ht .ico{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:4/3;max-height:118px;margin:0 0 4px;border-radius:7px;background:var(--stage-bg);overflow:hidden;touch-action:pan-y}
+/* 19 Nov (owner: "make the circle the whole design remove the outer card"): the icon box is a circle, the House builder viewport inside it;
+   the 3D canvas is masked to the six circles (house-tiles.js), the tile has no card (house-verbatim.css) */
+#w-htypes .w-ht .ico{position:relative;display:grid;place-items:center;width:100%;max-width:124px;aspect-ratio:1/1;margin:0 auto 6px;border-radius:50%;background:var(--stage-bg);overflow:hidden;touch-action:pan-y;box-shadow:inset 0 0 0 1px rgb(var(--teal-rgb) / .22)}
+@media(hover:hover){#w-htypes .w-ht:hover .ico{box-shadow:inset 0 0 0 1px rgb(var(--teal-rgb) / .22),0 0 0 2px rgb(var(--teal-rgb) / .4)}}
+#w-htypes .w-ht.on .ico{box-shadow:0 0 0 2px var(--teal)}
 #w-htypes .w-ht .ico::after{content:"";position:absolute;inset:0;z-index:2;background-image:var(--scan);background-size:var(--scan-size);pointer-events:none}   /* over the 3D canvas (z-index 1), as the House builder's scan lines lie over its house */
-#w-htypes .w-ht .ico svg{position:relative;z-index:1;width:52px;height:auto;transition:opacity .25s linear}
+#w-htypes .w-ht .ico svg{position:relative;z-index:1;width:62%;height:auto;transition:opacity .25s linear}
 #w-htypes .w-ht.live .ico svg{opacity:0}
 #w-htypes .w-ht.live .ico{cursor:grab}
 #w-htypes .w-ht.live .ico:active{cursor:grabbing}
