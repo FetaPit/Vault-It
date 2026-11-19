@@ -26515,7 +26515,7 @@ function wrIcon(id,x,y,s){
 }
 // side name width in card units: Chakra Petch 800 at 12.5 px with 1 px letter spacing, measured per character. A name wider than the
 // 76 units beside the medal is squeezed to fit below the card's top corner; one that fits keeps its width (owner, 9 Nov: "Yes, fix side names")
-function wrSideW(s){var W={' ':6,',':5,"'":5,'.':5.5,'-':8.5,'+':11,'I':6.5,'1':7.5,'L':13,'J':13.5,'5':13.5,'S':14,'2':14,'3':14,'7':14,'Y':14.5,'4':14.5,'8':14.5,'£':14.5,'F':15,'T':15,'6':15,'K':16,'Z':16,'R':16.5,'&':16.5,'H':17,'U':17,'%':17,'C':17.5,'D':17.5,'N':17.5,'O':17.5,'Q':17.5,'G':18,'M':21,'W':24.5},w=0;for(var i=0;i<s.length;i++)w+=W[s[i]]||15.5;return w;}
+function wrSideW(s){var W={' ':4.4,',':4,"'":4.2,'.':4,'-':6.4,'+':8,'I':4.5,'1':5.8,'L':8,'J':8.3,'5':8.6,'S':9,'2':8.2,'3':8.5,'7':7.5,'Y':8.9,'4':8.2,'8':9,'£':8.9,'F':8.2,'T':8.3,'6':8.8,'K':9.1,'Z':8.4,'R':9.4,'&':9.3,'H':9.7,'U':9.8,'%':11.9,'C':9.2,'D':9.6,'N':9.7,'O':9.8,'Q':9.8,'G':9.5,'M':11,'W':12,'0':9.1,'9':8.8,'A':9.1,'B':9.4,'E':8.6,'P':9.1,'V':9.1,'X':9.1},w=0;for(var i=0;i<s.length;i++)w+=W[s[i]]||9.2;return w*.985;}   // measured: Chakra Petch 700, 12.5px, 1px letter-spacing (the .wt-side style), 19 Nov 2026
 function wrTok(o){
   var t=o.tier||'starter',st=o.st||'done',px=o.px||100,sc=o.sc||px/118,L=st==='lock',dim=L||st==='skip'||st==='todo',K=wrPts(WR_CARD),n=o.bars||0,lit=o.lit==null?n:o.lit,k;   // todo: an achievement not met yet that nothing locks
   var out='<g class="wt t-'+t+' st-'+st+'">';
