@@ -57,7 +57,7 @@ const seed = (o) => {
     ok(first.skip === 'Skip, go to the app' && first.done === 'offered', T + 'it offers to skip straight into the app, and is marked as offered');
     await p.click('#vt-skip'); await p.waitForTimeout(300);
     ok(!(await tourOn(p)) && (await p.evaluate(() => localStorage.getItem('vi_tour_done'))) === 'skipped', T + 'skip goes straight to the app');
-    ok(await p.evaluate(() => document.getElementById('tab-budget').classList.contains('active')), T + 'skipping leaves them where the welcome put them (Budget)');
+    ok(await p.evaluate(() => document.getElementById('tab-overview').classList.contains('active')), T + 'skipping the tour lands on the dashboard (Overview), owner 19 Nov 2026');
     await p.evaluate(() => { localStorage.removeItem('vi_tester_note'); viAfterWelcome(); }); await p.waitForTimeout(400);
     await p.keyboard.press('Escape'); await p.waitForTimeout(800);
     ok(!(await tourOn(p)), T + 'the tour never runs on its own a second time');

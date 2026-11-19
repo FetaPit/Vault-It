@@ -11687,6 +11687,11 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 .vh-tabs{display:flex;gap:4px;padding:8px 14px 0;border-bottom:1px solid var(--line2)}
 .vh-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--font-display);font-weight:700;font-size:max(.62rem,var(--vi-fs-0));letter-spacing:.12em;text-transform:uppercase;padding:10px 4px;cursor:pointer;min-height:44px}
 .vh-tab[aria-selected="true"]{color:var(--teal);border-bottom-color:var(--teal)}
+.vh-fb{display:flex;align-items:center;gap:10px;margin:8px 14px 0;padding:0 14px;min-height:44px;background:rgb(var(--teal-rgb) / .08);border:1px solid rgb(var(--teal-rgb) / .35);border-radius:10px;color:var(--text);cursor:pointer;text-align:left;font-family:var(--font-display);font-weight:700;font-size:max(.74rem,var(--vi-fs-3))}
+.vh-fb .vi-ic{width:18px;height:18px;color:var(--teal);flex:none}
+.vh-fb em{margin-left:auto;font-style:normal;font-family:var(--font-body,inherit);font-weight:400;font-size:max(.64rem,var(--vi-fs-2));color:var(--muted)}
+.vh-fb:hover{border-color:var(--teal)}
+@media(max-width:420px){.vh-fb em{display:none}}
 .vh-view{flex:1;min-height:0;display:none;flex-direction:column}
 .vh-view.on{display:flex}
 .vh-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:12px 14px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
@@ -30460,8 +30465,7 @@ function wStep2Submit() {
   applyProgressiveNav();
   checkAchievements();
   showToast('Welcome' + (_vaultItUser && _vaultItUser.name ? ', ' + _vaultItUser.name : '') + '. Let’s get started 🚀');
-  if (_wSelectedVal !== null) { var _wTab = _wPlanStep().tab; setTimeout(function(){ try { showTab(_wTab); } catch(e) {} }, 250); }   // this week's step from the plan
-  else if (income > 0) setTimeout(function(){ try { showTab('budget'); } catch(e) {} }, 250);
+  setTimeout(function(){ try { showTab('overview'); window.scrollTo(0, 0); } catch(e) {} }, 250);   // the app opens on the dashboard (owner, 19 Nov 2026)
 }
 
 // Step 2 skip — save what we have and enter app
@@ -33463,6 +33467,7 @@ window.viFb={flush:flush,context:context,trail:function(){return TRAIL.slice()},
     <button class="vh-tab" role="tab" id="vh-tab-faq" aria-selected="false" onclick="viHelpView('faq')">FAQs</button>
     <button class="vh-tab" role="tab" id="vh-tab-tour" aria-selected="false" onclick="viHelpView('tour')">Tour</button>
   </div>
+  <button class="vh-fb" id="vh-fb" type="button" onclick="viHelpFeedback()"><svg class="vi-ic" aria-hidden="true"><use href="#vi-chat"/></svg><span>Send feedback</span><em>Tell us what to fix or add</em></button>
   <div class="vh-view on" id="vh-view-ask" role="tabpanel" aria-labelledby="vh-tab-ask">
     <div class="vh-scroll" id="vh-log" aria-live="polite"></div>
     <form class="vh-form" onsubmit="viHelpAsk(event)"><input id="vh-q" type="text" autocomplete="off" maxlength="300" placeholder="Ask about the app or your numbers" aria-label="Your question"><button type="submit">Ask</button></form>
@@ -33593,7 +33598,7 @@ function end(skipped){
   if(!VT.active)return;VT.active=false;VT.busy=false;
   var root=document.getElementById('vi-tour');root.classList.remove('on');root.setAttribute('aria-hidden','true');
   document.removeEventListener('keydown',key,true);window.removeEventListener('resize',queue);window.removeEventListener('scroll',queue,true);
-  if(VT.full){LS('vi_tour_done',skipped?'skipped':'done');if(VT.i>0)try{showTab('overview');window.scrollTo(0,0)}catch(e){}}
+  if(VT.full){LS('vi_tour_done',skipped?'skipped':'done');try{showTab('overview');window.scrollTo(0,0)}catch(e){}}
   if(VT.full&&!skipped){try{showToast('Tour done. Tap ? any time for help.')}catch(e){}}
   if(VT.afterHelp)setTimeout(function(){openHelp()},150);else{var b=document.getElementById('vi-help-btn');if(b&&visible(b))try{b.focus({preventScroll:true})}catch(e){}}
 }
@@ -33805,7 +33810,7 @@ window.viTourStart=function(){start(null)};
 window.viTourReplay=replay;
 window.viAfterWelcome=afterWelcome;
 window.viHelpToggle=function(){var p=document.getElementById('vi-help');if(p&&p.classList.contains('open'))closeHelp();else openHelp()};
-window.viHelpOpen=openHelp;window.viHelpClose=function(){closeHelp()};window.viHelpView=setView;window.viTourMove=move;window.viTourEnd=end;
+window.viHelpOpen=openHelp;window.viHelpClose=function(){closeHelp()};window.viHelpFeedback=function(){closeHelp();setTimeout(function(){try{viFbOpen('help')}catch(e){}},60)};window.viHelpView=setView;window.viTourMove=move;window.viTourEnd=end;
 window.viHelpAsk=function(e){if(e)e.preventDefault();var i=document.getElementById('vh-q'),q=(i.value||'').trim();if(!q||VH.busy)return;i.value='';ask(q)};
 window.viHelpRenderFaq=renderFaq;
 window.viHelp={kb:KB,steps:STEPS,search:search,local:local,guide:guide,tour:VT};

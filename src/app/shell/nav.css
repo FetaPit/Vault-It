@@ -148,6 +148,11 @@ html #topnav{display:grid!important;grid-template-columns:auto 1fr auto auto aut
 .vh-tabs{display:flex;gap:4px;padding:8px 14px 0;border-bottom:1px solid var(--line2)}
 .vh-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--font-display);font-weight:700;font-size:max(.62rem,var(--vi-fs-0));letter-spacing:.12em;text-transform:uppercase;padding:10px 4px;cursor:pointer;min-height:44px}
 .vh-tab[aria-selected="true"]{color:var(--teal);border-bottom-color:var(--teal)}
+.vh-fb{display:flex;align-items:center;gap:10px;margin:8px 14px 0;padding:0 14px;min-height:44px;background:rgb(var(--teal-rgb) / .08);border:1px solid rgb(var(--teal-rgb) / .35);border-radius:10px;color:var(--text);cursor:pointer;text-align:left;font-family:var(--font-display);font-weight:700;font-size:max(.74rem,var(--vi-fs-3))}
+.vh-fb .vi-ic{width:18px;height:18px;color:var(--teal);flex:none}
+.vh-fb em{margin-left:auto;font-style:normal;font-family:var(--font-body,inherit);font-weight:400;font-size:max(.64rem,var(--vi-fs-2));color:var(--muted)}
+.vh-fb:hover{border-color:var(--teal)}
+@media(max-width:420px){.vh-fb em{display:none}}
 .vh-view{flex:1;min-height:0;display:none;flex-direction:column}
 .vh-view.on{display:flex}
 .vh-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:12px 14px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}

@@ -103,7 +103,7 @@ function end(skipped){
   if(!VT.active)return;VT.active=false;VT.busy=false;
   var root=document.getElementById('vi-tour');root.classList.remove('on');root.setAttribute('aria-hidden','true');
   document.removeEventListener('keydown',key,true);window.removeEventListener('resize',queue);window.removeEventListener('scroll',queue,true);
-  if(VT.full){LS('vi_tour_done',skipped?'skipped':'done');if(VT.i>0)try{showTab('overview');window.scrollTo(0,0)}catch(e){}}
+  if(VT.full){LS('vi_tour_done',skipped?'skipped':'done');try{showTab('overview');window.scrollTo(0,0)}catch(e){}}
   if(VT.full&&!skipped){try{showToast('Tour done. Tap ? any time for help.')}catch(e){}}
   if(VT.afterHelp)setTimeout(function(){openHelp()},150);else{var b=document.getElementById('vi-help-btn');if(b&&visible(b))try{b.focus({preventScroll:true})}catch(e){}}
 }
@@ -315,7 +315,7 @@ window.viTourStart=function(){start(null)};
 window.viTourReplay=replay;
 window.viAfterWelcome=afterWelcome;
 window.viHelpToggle=function(){var p=document.getElementById('vi-help');if(p&&p.classList.contains('open'))closeHelp();else openHelp()};
-window.viHelpOpen=openHelp;window.viHelpClose=function(){closeHelp()};window.viHelpView=setView;window.viTourMove=move;window.viTourEnd=end;
+window.viHelpOpen=openHelp;window.viHelpClose=function(){closeHelp()};window.viHelpFeedback=function(){closeHelp();setTimeout(function(){try{viFbOpen('help')}catch(e){}},60)};window.viHelpView=setView;window.viTourMove=move;window.viTourEnd=end;
 window.viHelpAsk=function(e){if(e)e.preventDefault();var i=document.getElementById('vh-q'),q=(i.value||'').trim();if(!q||VH.busy)return;i.value='';ask(q)};
 window.viHelpRenderFaq=renderFaq;
 window.viHelp={kb:KB,steps:STEPS,search:search,local:local,guide:guide,tour:VT};

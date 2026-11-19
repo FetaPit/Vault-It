@@ -6,6 +6,7 @@
     <button class="vh-tab" role="tab" id="vh-tab-faq" aria-selected="false" onclick="viHelpView('faq')">FAQs</button>
     <button class="vh-tab" role="tab" id="vh-tab-tour" aria-selected="false" onclick="viHelpView('tour')">Tour</button>
   </div>
+  <button class="vh-fb" id="vh-fb" type="button" onclick="viHelpFeedback()"><svg class="vi-ic" aria-hidden="true"><use href="#vi-chat"/></svg><span>Send feedback</span><em>Tell us what to fix or add</em></button>
   <div class="vh-view on" id="vh-view-ask" role="tabpanel" aria-labelledby="vh-tab-ask">
     <div class="vh-scroll" id="vh-log" aria-live="polite"></div>
     <form class="vh-form" onsubmit="viHelpAsk(event)"><input id="vh-q" type="text" autocomplete="off" maxlength="300" placeholder="Ask about the app or your numbers" aria-label="Your question"><button type="submit">Ask</button></form>
