@@ -78,9 +78,10 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
   // Slide 6: consumers and partners together, base and best
   { const read = () => p.evaluate(() => { const o = { on: (document.querySelector('#growth [data-case][aria-pressed="true"]') || {}).dataset.case }; document.querySelectorAll('#growth [data-g]').forEach((e) => { o[e.dataset.g] = e.textContent.trim(); }); return o; });
     let g = await read();
-    ok(g.on === 'base' && [g['subs-1'], g['subs-2'], g['subs-3']].join() === '37,113,203' && [g['partner-1'], g['partner-2'], g['partner-3']].join('|') === '0|833|4,500' && [g['rev-1'], g['rev-2'], g['rev-3']].join('|') === '£4,498|£46,256|£100,166', 'base case: subscribers, partner-funded users and revenue by year: ' + JSON.stringify(g));
-    ok(/27 months/.test(await txt(p, 'growth')) && /does not break even/i.test(await txt(p, 'growth')), 'base case says it plainly: 27 months, no break-even inside three years');
-    ok(/£148,698/.test(await txt(p, 'growth')) && /£2,500 pilot/.test(await txt(p, 'growth')), 'base case shows year-3 costs beside revenue and explains year 1\'s partner share');
+    ok(g.on === 'base' && [g['subs-1'], g['subs-2'], g['subs-3']].join() === '101,318,580' && [g['partner-1'], g['partner-2'], g['partner-3']].join('|') === '0|833|4,500' && [g['rev-1'], g['rev-2'], g['rev-3']].join('|') === '£6,160|£55,068|£118,270', 'base case (the middle case, owner 19 Nov: "Adopt middle"): subscribers, partner-funded users and revenue by year: ' + JSON.stringify(g));
+    ok(/lasts all three years/i.test(await txt(p, 'growth')) && /does not break even/i.test(await txt(p, 'growth')) && !/27 months|£100,166|203/.test(await txt(p, 'growth')), 'base case says it plainly: the money lasts the three years of the model, with no break-even inside them');
+    ok(/600 sign-ups a month/.test(await txt(p, 'growth')) && /4% of them paying/.test(await txt(p, 'growth')), 'the base case states the sign-up and conversion assumptions it rests on');
+    ok(/£149,822/.test(await txt(p, 'growth')) && /£2,500 pilot/.test(await txt(p, 'growth')), 'base case shows year-3 costs beside revenue and explains year 1\'s partner share');
     { const b = await p.evaluate(() => ({ bars: [1, 2, 3].map((y) => Math.round(document.querySelector('#growth [data-b="rev-' + y + '"]').getBoundingClientRect().height * 1920 / document.querySelector('.frame').clientWidth)), ghost: getComputedStyle(document.querySelector('#growth [data-h="rev-3"]')).display !== 'none', tag: document.querySelector('#growth [data-ghost]').innerText }));
       ok(b.bars[2] > b.bars[1] && b.bars[1] > b.bars[0] && b.ghost && /£429,814/.test(b.tag), 'the bars plot revenue and the best case shows as a dashed outline with its figure in the base view: ' + JSON.stringify(b)); }
     await p.evaluate(() => document.querySelector('#growth [data-case="best"]').click()); g = await read();
@@ -100,7 +101,7 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
     ok(/19 November 2026/i.test(s) && /pre-revenue/i.test(s) && /15 to 20% equity/.test(s) && !/25%/.test(s) && /February 2027/i.test(s) && /September 2028/i.test(s), 'dated, pre-revenue, the open seats and the two dated milestones'); }
   // Slide 8: the two asks
   { const a = await txt(p, 'ask');
-    ok(/£250,000/.test(a) && /SEIS/.test(a) && /March 2027/.test(a) && /27 months/.test(a) && /advance assurance/i.test(a), 'ask one: £250,000 under SEIS, closing March 2027, 27 months');
+    ok(/£250,000/.test(a) && /SEIS/.test(a) && /March 2027/.test(a) && /32 months/.test(a) && !/27 months/.test(a) && /advance assurance/i.test(a), 'ask one: £250,000 under SEIS, closing March 2027, at least 32 months in the base case');
     const uf = await p.evaluate(() => [...document.querySelectorAll('#ask [data-fund]')].map((e) => [e.dataset.fund, e.innerText]));
     const pct = uf.map((x) => x[0]).join('/'), sum = uf.reduce((s, x) => s + +(x[1].match(/£([\d,]+)/) || [0, '0'])[1].replace(/,/g, ''), 0);
     ok(pct === '63/10/9/5/13' && sum === 250000, 'use of funds is the plan\'s and adds to £250,000: ' + pct + ' = £' + sum);
@@ -136,7 +137,8 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
   await p.evaluate(() => document.getElementById('nv-open').click());
   ok(await p.evaluate(() => document.body.classList.contains('notes') && getComputedStyle(document.getElementById('nv')).display !== 'none'), 'Notes opens the script panel');
   ok(/Pete Thickett/.test(await txt(p, 'nv-text')), 'the panel shows the cover\'s part of the script');
-  { const say = await p.evaluate(() => document.querySelector('.frame:has(#proof) .say').textContent); ok(/14 accounts/.test(say) && /HexaTown/.test(say) && /trust centre/i.test(say) && !/\b26\b/.test(say), 'the script says 14 accounts and names the trust centre and HexaTown');
+  { const say = await p.evaluate(() => document.querySelector('.frame:has(#proof) .say').textContent); { const all = await p.evaluate(() => [...document.querySelectorAll('.say')].map((e) => e.textContent).join(' ')); ok(!/27 months|£100,000|88%/.test(all) && /£118,000/.test(all) && /32 months/.test(all), 'the script uses the revised base case: £118,000 in year three, 32 months'); }
+    ok(/14 accounts/.test(say) && /HexaTown/.test(say) && /trust centre/i.test(say) && !/\b26\b/.test(say), 'the script says 14 accounts and names the trust centre and HexaTown');
     ok(/7 November/.test(say) && /version 0\.95/.test(say), 'the script says what has moved since the 7 November pitch'); }
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scroll on a phone with Notes open');
   ok(misses.length === 0, 'every file the page asks for exists in the build: ' + misses.join(' '));
