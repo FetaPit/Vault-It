@@ -74,6 +74,7 @@ const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 
     // Side names (owner, 9 Nov: "Yes, fix side names"): a name runs up from y 102 and must end by y 24, below the card's
     // top-right corner, so its drawn length is 78 units or less; a name that already fits keeps its natural width
+    await p.evaluate(async () => { await document.fonts.load("700 12.5px 'Chakra Petch'"); await document.fonts.ready; });   // the embedded face loads on first use: measure natural widths only once it is in, as a fallback face is wider
     const names = await p.evaluate(() => {
       const ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg'), m = document.createElementNS(ns, 'text');
       m.setAttribute('class', 'wt-side'); s.appendChild(m); document.body.appendChild(s);
