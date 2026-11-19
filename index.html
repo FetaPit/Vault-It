@@ -13037,7 +13037,9 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
 .wall-mail{color:var(--teal);font-weight:600;text-underline-offset:3px;white-space:nowrap}
 .wall-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:22px 0 8px}
 .wall-title{font-family:var(--font-display);font-weight:700;font-size:clamp(1.5rem,4.4vw,2.15rem);line-height:1.15;letter-spacing:-.01em;margin:0 0 12px;color:var(--text)}
-.wall-lead{font-size:15px;line-height:1.55;color:var(--text);max-width:64ch;margin:0 0 8px}
+.wall-lead{font-size:15px;line-height:1.55;color:var(--text);max-width:64ch;margin:0 0 10px}
+/* owner, 19 Nov 2026: the free-trial sentence is a larger sub title in Chakra Petch; the lines under it stay body text */
+.wall-lead-title{display:block;font-family:var(--font-display);font-weight:600;font-size:clamp(18px,2.6vw,24px);line-height:1.25;margin:0 0 6px}
 .wall-safe{font-size:14px;line-height:1.55;color:var(--muted);max-width:64ch;margin:0 0 20px}
 .wall-bill{display:inline-flex;gap:8px;margin:0 0 14px}
 /* owner, 19 Nov 2026: the Yearly tab gold with a gold border, the Monthly tab teal; the chosen one is filled, the other keeps its colour as an outline */
@@ -13057,13 +13059,15 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
 .wall-plan-soon .wall-plan-terms{margin:4px 0 0;color:var(--muted)}
 .wall-plan{box-sizing:border-box;display:flex;flex-direction:column;min-width:0;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-tile);padding:18px 16px 16px;box-shadow:var(--elev)}
 .wall-plan[data-tier-card="founder"]{border-color:rgb(var(--brass-rgb) / .55)}
-.wall-plan-top{display:flex;align-items:center;gap:12px;margin:0 0 10px}
+.wall-plan-top{display:flex;align-items:flex-start;gap:16px;margin:0 0 16px}
+.wall-plan-top>div:not(.wall-plan-price){flex:1 1 auto;min-width:0}
 .wall-plan .vi-tier-ic{width:48px;height:48px;margin:0}
 .wall-plan-when{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .wall-plan-name{font-family:var(--font-display);font-weight:800;font-size:1.25rem;line-height:1.2;color:var(--text)}
-.wall-plan-price{font-family:var(--font-display);font-weight:800;font-size:1.7rem;line-height:1.1;color:var(--teal);margin:0 0 8px}
+/* owner, 19 Nov 2026: the price top right of each tile, the first size (1.7rem) with more room around it */
+.wall-plan-price{flex:none;margin-left:auto;padding-left:8px;text-align:right;font-family:var(--font-display);font-weight:800;font-size:1.7rem;line-height:1.15;color:var(--teal)}
 .wall-plan[data-tier-card="founder"] .wall-plan-price{color:var(--gold)}
-.wall-plan-price>span{font-family:var(--font-body);font-weight:500;font-size:14px;color:var(--muted);margin-left:2px}
+.wall-plan-price>span{display:block;font-family:var(--font-body);font-weight:500;font-size:13px;line-height:1.35;color:var(--muted);margin:6px 0 0}
 .wall-plan-price .vi-tier-after{font-size:13px!important;color:var(--muted)!important}
 .wall-plan-terms{font-size:13.5px;line-height:1.5;color:var(--text);margin:0 0 12px}
 .wall-plan-list{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:5px;font-size:13.5px;line-height:1.4;color:var(--muted)}
@@ -13110,8 +13114,7 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
       <div class="wall-plans">
         <div class="wall-plan" data-tier-card="vaulter">
           <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg>
-            <div><div class="wall-plan-when" data-wall-when></div><div class="wall-plan-name" data-plan-name="vaulter_year" data-tier-name></div></div></div>
-          <div class="wall-plan-price" data-wall-price></div>
+            <div><div class="wall-plan-when" data-wall-when></div><div class="wall-plan-name" data-plan-name="vaulter_year" data-tier-name></div></div><div class="wall-plan-price" data-wall-price></div></div>
           <p class="wall-plan-sub" data-wall-sub></p>
           <p class="wall-plan-terms" data-plan-terms="vaulter_year"></p>
           <ul class="wall-plan-list"><li>The whole app</li><li>All six house types, Levels 1 and 2</li><li>AI screenshot reader, 30 a month</li></ul>
@@ -13119,8 +13122,7 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
         </div>
         <div class="wall-plan" data-tier-card="pioneer">
           <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg>
-            <div><div class="wall-plan-when" data-wall-when></div><div class="wall-plan-name" data-plan-name="pioneer_year" data-tier-name></div></div></div>
-          <div class="wall-plan-price" data-wall-price></div>
+            <div><div class="wall-plan-when" data-wall-when></div><div class="wall-plan-name" data-plan-name="pioneer_year" data-tier-name></div></div><div class="wall-plan-price" data-wall-price></div></div>
           <p class="wall-plan-sub" data-wall-sub></p>
           <p class="wall-plan-terms" data-plan-terms="pioneer_year"></p>
           <ul class="wall-plan-list"><li>Everything in Vaulter</li><li>The Entrepreneur tab</li><li>Your own 3D house design and AI house model</li><li>House builder Level 3 (coming)</li><li>Early access to new features and roadmap voting</li></ul>
@@ -13128,8 +13130,7 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
         </div>
         <div class="wall-plan" data-tier-card="founder">
           <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg>
-            <div><div class="wall-plan-when">One payment</div><div class="wall-plan-name" data-plan-name="founder" data-tier-name></div></div></div>
-          <div class="wall-plan-price" data-plan-price="founder"></div>
+            <div><div class="wall-plan-when">One payment</div><div class="wall-plan-name" data-plan-name="founder" data-tier-name></div></div><div class="wall-plan-price" data-plan-price="founder"></div></div>
           <p class="wall-plan-sub" data-wall-sub></p>
           <p class="wall-plan-terms" data-plan-terms="founder"></p>
           <ul class="wall-plan-list"><li>The whole app for the life of the service, Pioneer features included</li><li>Lifetime badge and name in credits</li><li>Priority requests</li><li>AI screenshot reader, 10 a month</li><li>100 places</li></ul>
@@ -27179,7 +27180,7 @@ function viWallPaint() {
   try {
     var lead = document.getElementById('wall-lead'), M = VI_PLANS.vaulter_month;
     if (lead) { var trial = (viPlanTrial('vaulter_month') && viPlanTrial('vaulter_year') && viPlanTrial('pioneer_month') && viPlanTrial('pioneer_year'));
-      if (trial) lead.innerHTML = 'Vaulter and Pioneer are <span class="vi-trial">free for ' + M.trialDays + ' days</span>. You are not charged today. Your card is taken at checkout and first charged on day ' + (M.trialDays + 1) + '. Cancel any time before then and you pay nothing.';
+      if (trial) lead.innerHTML = '<span class="wall-lead-title">Vaulter and Pioneer are <span class="vi-trial">free for ' + M.trialDays + ' days</span>.</span> You are not charged today. Your card is taken at checkout and first charged on day ' + (M.trialDays + 1) + '. Cancel any time before then and you pay nothing.';
       else lead.textContent = 'Every plan opens the whole app. You pay at checkout.'; }
     var keep = document.getElementById('wall-keep');
     if (keep) { keep.textContent = VI_BETA_OPEN ? 'You keep your discounted first movers’ price forever while you stay subscribed. Beta prices are open until ' + VI_BETA_ENDS_ON + '.' : ''; keep.style.display = VI_BETA_OPEN ? '' : 'none'; }

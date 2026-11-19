@@ -5,6 +5,8 @@
 //   2  every trial card's terms line has "Free for 30 days" in gold (the sentence itself is unchanged)
 //   3  Yearly tab: gold border and gold text, filled gold when chosen; Monthly tab: teal border and teal text, filled teal when chosen
 //   4  no sideways scroll, no page errors
+//   5  the lead is a larger sub title in Chakra Petch (owner, 19 Nov 2026: "Make the 30 day free trial sentence a larger sub title in Chakra Petch")
+//   6  on every plan card the price sits top right in the card's top row, at its first size (1.7rem) with room around it, clear of the name (owner, 19 Nov: "Move the price top right of each tile", then "First size was right ... more breathing space")
 // Run: node tests/test_card_wall_trial_emphasis.js
 const vi = require('./lib/vi'); vi.planStub(null);
 const { chromium } = require('playwright');
@@ -34,14 +36,27 @@ const MOCK = (sess) => `
       const tab = (k) => { const e = document.querySelector('.wall-bill-btn[data-bill="' + k + '"]'), s = getComputedStyle(e); return { pressed: e.getAttribute('aria-pressed'), border: s.borderTopColor, bw: s.borderTopWidth, color: s.color, bg: s.backgroundColor }; };
       return { gold: col('--gold'), teal: col('--teal'), ongold: col('--on-gold'), ontealc: col('--on-teal'), lead: lead.textContent.replace(/\s+/g, ' ').trim(), hot: hot ? hot.textContent : '', hotCol: hot ? getComputedStyle(hot).color : '', terms, year: tab('year'), month: tab('month'), sideways: document.documentElement.scrollWidth > innerWidth };
     });
-    const A = await grab();
+    const layout = () => p.evaluate(() => {
+      const lead = document.querySelector('#wall-lead .wall-lead-title') || document.getElementById('wall-lead'), ls = getComputedStyle(lead), body = parseFloat(getComputedStyle(document.getElementById('wall-lead')).fontSize);
+      const cards = [].map.call(document.querySelectorAll('#plan-wall .wall-plan[data-tier-card="vaulter"], #plan-wall .wall-plan[data-tier-card="pioneer"], #plan-wall .wall-plan[data-tier-card="founder"]'), (c) => {
+        const pr = c.querySelector('.wall-plan-price'), top = c.querySelector('.wall-plan-top'), name = c.querySelector('.wall-plan-name'), cr = c.getBoundingClientRect(), r = pr.getBoundingClientRect(), nr = name.getBoundingClientRect(), s = getComputedStyle(pr);
+        return { tier: c.getAttribute('data-tier-card'), inTop: !!pr.closest('.wall-plan-top'), rightGap: Math.round(cr.right - r.right), topGap: Math.round(r.top - cr.top), clear: r.left >= nr.right - 1, inside: r.left >= cr.left && r.right <= cr.right + 1, size: parseFloat(s.fontSize), text: pr.textContent.replace(/\s+/g, ' ').trim() };
+      });
+      return { fam: ls.fontFamily, size: parseFloat(ls.fontSize), body, isTitle: !!document.querySelector('#wall-lead .wall-lead-title'), weight: parseInt(ls.fontWeight, 10), title: parseFloat(getComputedStyle(document.querySelector('.wall-title')).fontSize), rem: parseFloat(getComputedStyle(document.documentElement).fontSize), cards };
+    });
+    const A = await grab(), LA = await layout();
     ok(A.hot === 'free for 30 days' && A.hotCol === A.gold, T + '1 the lead paragraph has "free for 30 days" in gold (' + A.hot + ' / ' + A.hotCol + ')');
     ok(/not charged today/i.test(A.lead) && /first charged on day 31/.test(A.lead) && /Cancel (any time )?before then and you pay nothing/i.test(A.lead), T + '1 and says nothing is charged today, first charge on day 31, cancel before then and pay nothing (' + A.lead.slice(0, 120) + ')');
     const tr = A.terms.filter((t) => /^Free for 30 days, then/.test(t.text));
     ok(tr.length >= 2 && tr.every((t) => t.hot === 'Free for 30 days' && t.col === A.gold), T + '2 every trial card has "Free for 30 days" in gold in its terms (' + tr.length + ' cards)');
     ok(A.year.pressed === 'true' && A.year.border === A.gold && parseFloat(A.year.bw) >= 1 && A.year.bg === A.gold, T + '3 Yearly (chosen): gold border, filled gold (' + A.year.border + ' / ' + A.year.bg + ')');
     ok(A.month.pressed === 'false' && A.month.border === A.teal && A.month.color === A.teal && parseFloat(A.month.bw) >= 1, T + '3 Monthly (not chosen): teal border and teal text (' + A.month.border + ' / ' + A.month.color + ')');
+    ok(/Chakra Petch/.test(LA.fam) && LA.isTitle && LA.size >= 18 && LA.size > LA.body + 2 && LA.weight >= 600 && LA.size < LA.title, T + '5 the free-trial sentence is a larger sub title in Chakra Petch, the lines under it body text (' + LA.fam.slice(0, 14) + ', ' + LA.size + 'px, weight ' + LA.weight + ', title ' + LA.title + 'px)');
+    ok(LA.cards.length === 3 && LA.cards.every((c) => c.inTop && c.rightGap >= 0 && c.rightGap <= 24 && c.topGap >= 0 && c.topGap <= 40 && c.clear && c.inside), T + '6 each price is in the top row, top right of its card, clear of the name (' + LA.cards.map((c) => c.tier + ' gap ' + c.rightGap + '/' + c.topGap + (c.inTop ? '' : ' NOT IN TOP')).join(', ') + ')');
+    ok(LA.cards.every((c) => Math.abs(c.size - 1.7 * LA.rem) < 0.6), T + '6 the price keeps its first size, 1.7rem (' + LA.cards.map((c) => c.size).join(', ') + 'px; ' + (1.7 * LA.rem).toFixed(1) + ' expected)');
     await p.click('.wall-bill-btn[data-bill="month"]'); await p.waitForTimeout(200);
+    const LB = await layout();
+    ok(LB.cards.every((c) => c.inTop && c.rightGap >= 0 && c.rightGap <= 24 && c.clear && c.inside), T + '6 the same with the monthly cards (' + LB.cards.map((c) => c.text.slice(0, 16)).join(' | ') + ')');
     const B = await grab();
     ok(B.month.pressed === 'true' && B.month.border === B.teal && B.month.bg === B.teal, T + '3 Monthly (chosen): teal border, filled teal');
     ok(B.year.pressed === 'false' && B.year.border === B.gold && B.year.color === B.gold, T + '3 Yearly (not chosen): gold border and gold text (' + B.year.border + ' / ' + B.year.color + ')');
