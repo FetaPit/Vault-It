@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Vault-It · The five-minute pitch</title>
+<meta name="description" content="Vault-It in five minutes: the problem, the app that answers it, who pays, and two asks.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Share+Tech+Mono&family=Syne:wght@500;600;700;800&display=swap">
+<style>
+:root{color-scheme:dark;--nv:400px}*{box-sizing:border-box}
+html,body{margin:0;background:#04090f;color:#E8E8E8;font-family:'DM Sans',Arial,sans-serif;overflow-x:hidden}
+main{max-width:1280px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.frame{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:12px;border:1px solid #15302F}
+.frame>section{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;transform:scale(var(--s,.5));overflow:hidden}
+section h1,section h2,section h3,section p,section ul{margin:0}
+section h1{line-height:1.1}section h2{line-height:1.1;font-family:'Syne',Arial,sans-serif;font-weight:700;color:#E8E8E8}section h3{line-height:1.2;font-family:'Syne',Arial,sans-serif;font-weight:700;color:#E8E8E8}section p{line-height:1.4}
+section img,section video{display:block}
+section a{color:inherit}
+.frame>section>*:not([style*="position:absolute"]):not(.foot){position:relative}
+.say{display:none}.nb{white-space:nowrap}
+.kicker{font-family:'Share Tech Mono','Courier New',monospace;font-size:24px;letter-spacing:4px;color:#44C0B9}
+.frame>section>.foot{position:absolute;left:128px;bottom:64px;width:1664px;font-family:'Share Tech Mono','Courier New',monospace;font-size:24px;line-height:1.4;color:#7FA9A6}
+.mono{font-family:'Share Tech Mono','Courier New',monospace}
+.src{font-family:'Share Tech Mono','Courier New',monospace;font-size:19px;line-height:1.35;color:#7FA9A6}
+.row{display:flex;flex-direction:row;justify-content:space-between;align-items:baseline;gap:32px;padding:15px 0;border-bottom:1px solid #15302F}
+.row p:first-child{font-size:30px;color:#E8E8E8}.row p:last-child{font-family:'Share Tech Mono','Courier New',monospace;font-size:34px;color:#E8C56A;flex:none}
+.card{border:1px solid #15302F;border-radius:18px;padding:30px 34px;display:flex;flex-direction:column;gap:14px;background:rgba(6,36,42,.35);min-width:0}
+.pt{display:flex;flex-direction:column;gap:8px;padding:0 0 0 28px;border-left:4px solid #44C0B9}
+.pt h3{font-size:36px}.pt p{font-size:26px;color:#B6D8D6}
+.tog{cursor:pointer}
+.sw{display:flex;flex-direction:row;gap:16px}
+.sw button{flex:1;min-height:72px;padding:0 18px;border-radius:999px;border:1px solid #15302F;background:#0A1018;color:#B6D8D6;font:24px 'Share Tech Mono','Courier New',monospace;letter-spacing:1px;cursor:pointer}
+.sw button[aria-pressed="true"]{border-color:#C9A84C;background:#12100A;color:#E8C56A}
+.sw button:focus-visible{outline:3px solid #44C0B9;outline-offset:3px}
+.chart{display:flex;flex-direction:row;gap:36px;align-items:flex-end}
+.yr{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.bars{height:400px;display:flex;flex-direction:row;gap:24px;align-items:flex-end;border-bottom:2px solid #2A5552;padding:0 20px}
+.bars div{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;height:100%}
+.bars span{font-family:'Share Tech Mono','Courier New',monospace;font-size:30px}
+.bars i{display:block;width:100%;min-height:3px;border-radius:8px 8px 0 0;transition:height .35s ease}
+.bars em{position:absolute;left:0;right:0;bottom:0;border:2px dashed #3E7A76;border-bottom:0;border-radius:8px 8px 0 0;pointer-events:none}
+#growth.best .bars em,#growth.best .ghost{display:none}
+.c2c span{color:#44C0B9}.c2c i{background:#44C0B9}.c2b span{color:#E8C56A}.c2b i{background:#E8C56A}
+.yr h3{font-size:28px;margin-top:8px}.yr .rev{font-family:'Share Tech Mono','Courier New',monospace;font-size:36px;color:#E8E8E8}.yr .shr{font-size:22px;color:#B6D8D6}
+.key{display:flex;flex-direction:row;align-items:center;gap:14px;font-size:24px;color:#B6D8D6}.key i{flex:none;width:28px;height:28px;border-radius:6px}
+.now{flex:1;border:1px solid #15302F;border-radius:18px;padding:22px 30px;background:rgba(6,36,42,.35);display:flex;flex-direction:column;gap:2px}
+.now b{font-family:'Share Tech Mono','Courier New',monospace;font-weight:400;font-size:104px;line-height:1;color:#E8C56A}.now span{font-size:26px;color:#B6D8D6}
+.fund{display:flex;flex-direction:row;align-items:baseline;gap:24px;padding:11px 0;border-bottom:1px solid rgba(26,20,0,.25)}
+.fund b{font-family:'Share Tech Mono','Courier New',monospace;font-weight:400;font-size:42px;width:104px;flex:none}
+.fund strong{font-family:'Syne',Arial,sans-serif;font-size:27px;line-height:1.2;font-weight:700;width:470px;flex:none;display:flex;flex-direction:column;gap:2px;white-space:nowrap}.fund em{font-style:normal;font-family:'Share Tech Mono','Courier New',monospace;font-weight:400;font-size:28px}.fund span{font-size:21px;line-height:1.3}
+header{position:sticky;top:0;z-index:4;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:10px 16px;background:rgba(4,9,15,.88);backdrop-filter:blur(8px);border-bottom:1px solid #15302F}
+header b{font:600 18px 'Syne',Arial,sans-serif;color:#E8E8E8;min-width:0}
+header span{display:flex;gap:8px}
+.pv-btn{min-width:44px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #C9A84C;background:#12100A;color:#E8C56A;font:16px 'Share Tech Mono',monospace;cursor:pointer;letter-spacing:1px}
+.pv-btn:focus-visible{outline:2px solid #44C0B9;outline-offset:2px}
+.pv-btn.q{border-color:#15302F;background:#0A1018;color:#E8E8E8}
+#pv-bar{display:none;position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:10;gap:8px;align-items:center;padding:6px;border-radius:999px;background:rgba(8,13,20,.82);border:1px solid #15302F;opacity:.6;transition:opacity .2s}
+#pv-bar:hover,#pv-bar:focus-within{opacity:1}
+#pv-count{font:16px 'Share Tech Mono',monospace;color:#B6D8D6;min-width:72px;text-align:center}
+#pv-bar .pv-btn{padding:0 14px;border-color:#15302F;background:#0A1018;color:#E8E8E8}
+body.present{background:#000;overflow:hidden}
+body.present header,body.present footer{display:none}
+body.present main{max-width:none;padding:0}
+body.present .frame{display:none}
+body.present .frame.on{display:block;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100vw,177.78vh);height:auto;border:0;border-radius:0}
+body.present #pv-bar{display:flex}
+/* Notes: the spoken script for the slide in view and the five-minute timer */
+#nv{display:none;position:fixed;z-index:9;right:0;top:0;bottom:0;width:var(--nv);flex-direction:column;gap:12px;padding:16px 18px;background:#080D14;border-left:1px solid #15302F;overflow:auto}
+body.notes #nv{display:flex}
+#nv-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#nv-where{font:14px 'Share Tech Mono',monospace;letter-spacing:1px;color:#44C0B9}
+#nv-timer{font:44px 'Share Tech Mono',monospace;line-height:1;color:#E8C56A}
+#nv-timer.late{color:#E05C5C}
+#nv-goal{font:14px 'Share Tech Mono',monospace;color:#B6D8D6;margin:0}
+#nv-goal.late{color:#E05C5C}
+#nv-text{font-size:19px;line-height:1.5;color:#E8E8E8}
+#nv-text p{margin:0 0 .7em}#nv-text i{font-style:normal;font-family:'Share Tech Mono',monospace;font-size:15px;color:#E8C56A;border:1px solid #C9A84C;border-radius:6px;padding:1px 6px;white-space:nowrap}
+#nv-tools{display:flex;flex-wrap:wrap;gap:8px}
+#nv-tools .pv-btn{font-size:14px;padding:0 12px}
+#nv-help{font:13px 'Share Tech Mono',monospace;line-height:1.5;color:#7FA9A6;margin:0}
+body.notes:not(.present) main{margin-right:var(--nv);margin-left:0;max-width:none}
+body.notes:not(.present) header{margin-right:var(--nv)}
+body.notes:not(.present) footer{margin-right:var(--nv)}
+body.present.notes .frame.on{left:calc((100vw - var(--nv))/2);width:min(calc(100vw - var(--nv)),177.78vh)}
+body.present.notes #pv-bar{left:calc((100vw - var(--nv))/2)}
+@media (max-width:899px){
+ #nv{left:0;top:auto;width:auto;height:44vh;border-left:0;border-top:1px solid #15302F}
+ body.notes:not(.present) main,body.notes:not(.present) header,body.notes:not(.present) footer{margin-right:0}
+ body.notes:not(.present) footer{padding-bottom:46vh}
+ body.present.notes .frame.on{left:50%;top:28vh;width:min(100vw,99.5vh)}
+ body.present.notes #pv-bar{left:50%;bottom:calc(44vh + 8px)}
+ #nv-timer{font-size:32px}#nv-text{font-size:17px}
+}
+@media (prefers-reduced-motion:reduce){#pv-bar,.bars i{transition:none}}
+footer{text-align:center;font:14px 'Share Tech Mono',monospace;color:#7FA9A6;padding:8px 16px 32px}
+footer a{color:#E8C56A}
+@media print{@page{size:1920px 1080px;margin:0}html,body{background:#000}header,footer,#pv-bar,#nv,body.notes #nv{display:none}main,body.notes:not(.present) main{max-width:none;margin:0;padding:0;gap:0;display:block}.frame{width:1920px;height:1080px;aspect-ratio:auto;border:0;border-radius:0;break-after:page;page-break-after:always}.frame>section{transform:none}}
+</style></head><body>
+<header><b>Vault-It · The five-minute pitch</b><span><button type="button" class="pv-btn q" id="nv-open" aria-pressed="false" aria-controls="nv" aria-label="Notes: the spoken script and a five-minute timer">NOTES</button><button type="button" class="pv-btn" id="pv-open" aria-label="Present: one slide at a time">PRESENT ▶</button></span></header>
+<main id="pv-stage">
+
+<div class="frame" data-secs="20"><section id="cover" style="background:radial-gradient(ellipse at 75% 100%, #06242A 0%, #00131A 45%, #080808 100%);color:#E8E8E8;padding:128px 128px 160px;display:flex;flex-direction:row;align-items:center;gap:96px">
+<div style="flex:1;display:flex;flex-direction:column;gap:36px">
+<p class="kicker">INVESTOR DECK · FIVE MINUTES · NOVEMBER 2026</p>
+<h1 style="font-family:'Syne', Arial, sans-serif;font-size:160px;font-weight:800;line-height:1;white-space:nowrap;color:#E8E8E8">Vault<span style="color:#44C0B9">-It</span></h1>
+<h2 style="font-size:52px;font-weight:600">Get out of the <span style="color:#C8202A">red</span> and into <span style="color:#44C0B9">your</span> <span style="color:#E8C56A">home</span>.</h2>
+<p style="font-size:34px;color:#B6D8D6;max-width:900px">A problem 8.4 million people have. The app that answers it. Who pays. Two asks.</p>
+<p style="font-size:30px;color:#B6D8D6">Pete Thickett, Founder · vault-it.co</p>
+</div>
+<img src="pitch/logo-full.png" alt="Vault-It mark: a teal V inside a vault dial" style="width:560px;height:560px;object-fit:contain">
+<p class="foot">VAULT-IT, PUBLISHED BY PT LIVE DESIGN · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section>
+<div class="say"><p>I'm Pete Thickett. I designed and built <span class="nb">Vault-It</span>.</p><p>In the next five minutes: a problem 8.4 million people have, the app that answers it, who pays for it, and two things I'd like from you.</p></div></div>
+
+<div class="frame" data-secs="50"><section id="sam" style="background:#080D14;color:#E8E8E8;padding:88px 128px 160px;display:flex;flex-direction:row;align-items:center;gap:80px">
+<div style="flex:1;display:flex;flex-direction:column;gap:22px;min-width:0">
+<p class="kicker">THE PROBLEM · ONE PERSON</p>
+<h2 style="font-size:64px">Sam wants a home. Nobody can tell Sam when.</h2>
+<div>
+<div class="row"><p>Sam, 34, rents</p><p>owes £16,874</p></div>
+<div class="row"><p>Credit card at 24.9%</p><p>£6,874</p></div>
+<div class="row"><p>Loan at 9.9%</p><p>£10,000</p></div>
+<div class="row"><p>Take-home pay a month</p><p>£2,300</p></div>
+<div class="row"><p>Rent, bills and food</p><p>£1,850</p></div>
+<div class="row"><p>Left after minimum payments</p><p>£66 a month</p></div>
+</div>
+</div>
+<div class="card tog" data-tog="sam" style="width:760px;flex:none;padding:40px 44px;gap:22px;border-color:#2A5552">
+<p class="kicker" style="color:#E8C56A">RUN THROUGH VAULT-IT</p>
+<div class="sw" role="group" aria-label="Sam's payments"><button type="button" data-sam="min" aria-pressed="true">MINIMUMS ONLY</button><button type="button" data-sam="plus" aria-pressed="false">£50 A MONTH MORE</button></div>
+<div class="row" id="sam-free-row" style="border-bottom:0;padding:6px 0 0"><p style="font-size:30px;color:#B6D8D6">Debt-free</p><p id="sam-free" style="font-size:40px;color:#44C0B9">August 2031</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:30px;color:#B6D8D6">Keys in hand</p>
+<p id="sam-keys" aria-live="polite" style="font-family:'Syne', Arial, sans-serif;font-weight:700;font-size:78px;line-height:1.1;color:#E8C56A;white-space:nowrap">August 2035</p></div>
+<p id="sam-note" style="font-size:28px;color:#E8E8E8;min-height:1.4em">The first date anyone has given Sam.</p>
+</div>
+<p class="foot">EXAMPLE BUILT FROM PUBLISHED AVERAGES (STEPCHANGE, 2025) · DATES FROM THE VAULT-IT ENGINE, RUN 7 NOV 2026 · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section>
+<div class="say"><p>Meet Sam. Sam is 34 and rents. Sam owes £16,874 on a credit card and a loan. That is the average for someone who goes to StepChange for help.</p><p>After rent, bills, food and the minimum payments, Sam has £66 a month left.</p><p>Sam wants to own a home. Ask when, and Sam has no answer. Five years? Never? Every money app shows Sam last month. None gives a date.</p><p>So I ran Sam through <span class="nb">Vault-It</span>. Debt-free in August 2031. Keys in hand in August 2035.</p><p>Now one change: £50 a month more. <i>press T</i> Keys in August 2034. A year sooner. That is the first time anyone has shown Sam what £50 does.</p></div></div>
+
+<div class="frame" data-secs="40"><section id="scale" style="background:#0A1A1C;color:#E8E8E8;padding:88px 128px 160px;display:flex;flex-direction:column;gap:30px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p class="kicker">THE PROBLEM · HOW MANY</p>
+<h2 style="font-size:62px">Millions are where Sam is. Nobody starts below zero and gives them a date.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px;align-items:stretch">
+<div class="card" style="flex:1"><p class="mono" style="font-size:76px;line-height:1;color:#E8C56A">8.4m</p><p style="font-size:26px">UK adults need debt advice</p><p class="src">MaPS MoneyView, March 2026</p></div>
+<div class="card" style="flex:1"><p class="mono" style="font-size:76px;line-height:1;color:#E8C56A">2.7m</p><p style="font-size:26px">renting households in England expect to buy</p><p class="src">English Housing Survey 2024-25</p></div>
+<div class="card" style="flex:1"><p class="mono" style="font-size:76px;line-height:1;color:#E8C56A">£36,500</p><p style="font-size:26px">the median first-time buyer deposit</p><p class="src">English Housing Survey 2024-25</p></div>
+<div class="card" style="flex:1"><p class="mono" style="font-size:76px;line-height:1;color:#E8C56A">9.7 <span style="font-size:40px">years</span></p><p style="font-size:26px">to clear £9,999 of debt and save that deposit at £400 a month, before interest</p><p class="src">Our sum on the two medians (StepChange 2025)</p></div>
+</div>
+<div style="display:flex;flex-direction:row;gap:36px">
+<div class="pt" style="flex:1;border-color:#E05C5C"><p><b style="color:#E8E8E8">Moneybox</b> does a Lifetime ISA and deposit saving. It assumes you have money to put in.</p></div>
+<div class="pt" style="flex:1;border-color:#E05C5C"><p><b style="color:#E8E8E8">Tembo</b> does first-time buyer mortgages and a LISA. It assumes you are mortgage-ready.</p></div>
+<div class="pt" style="flex:1;border-color:#E05C5C"><p><b style="color:#E8E8E8">Emma, Snoop and Plum</b> do budgeting. They show the past or today.</p></div>
+</div>
+<p class="foot">THE SOURCE IS UNDER EACH FIGURE · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section>
+<div class="say"><p>Sam is not rare. 8.4 million adults in the UK need debt advice. 2.7 million renting households in England expect to buy.</p><p>The typical first-time buyer puts down £36,500. Clear a typical debt and save that deposit at £400 a month, and it takes nearly ten years. Nobody shows people that sum.</p><p>Moneybox and Tembo start once you have money, or are mortgage-ready. Budgeting apps show the past.</p><p>Nobody starts below zero and gives you a date.</p></div></div>
+
+<div class="frame" data-secs="45"><section id="solution" style="background:#080808;color:#E8E8E8;padding:112px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<video src="pitch/house-build.mp4" poster="pitch/house-still.jpg" aria-label="The Vault-It 3D engine building a Victorian terrace brick by brick in teal hologram bricks, with a gold row marker showing the percentage of deposit saved" autoplay muted loop playsinline style="position:absolute;left:560px;top:0px;width:1360px;height:1080px;object-fit:cover"></video>
+<div class="fade" style="position:absolute;left:520px;top:0px;width:420px;height:1080px;background:linear-gradient(90deg, #080808 0%, rgba(8,8,8,0) 100%)"></div>
+<div style="width:700px;display:flex;flex-direction:column;gap:22px">
+<p class="kicker">THE SOLUTION</p>
+<h2 style="font-size:70px">One live date. A home built brick by brick.</h2>
+</div>
+<div style="width:700px;display:flex;flex-direction:column;gap:26px">
+<div class="pt" style="border-color:#E05C5C"><h3>Starts below zero</h3><p>Stage 0 is a starting line, not a failure screen.</p></div>
+<div class="pt" style="border-color:#E8C56A"><h3>One forward date</h3><p>The keys date recalculates with every payment, saving or debt cleared.</p></div>
+<div class="pt"><h3>Progress you can see</h3><p>Each pound saved lays real-scale bricks: 14,465 of them in a Victorian terrace.</p></div>
+</div>
+<p style="position:absolute;left:1240px;top:836px;width:552px;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:28px;text-align:center;color:#E8C56A;background:#12100A;border:1px solid #C9A84C;border-radius:999px;padding:14px 24px">SAM'S KEYS DATE: AUGUST 2035</p>
+<p class="foot" style="width:1000px">THE APP'S OWN 3D ENGINE · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section>
+<div class="say"><p>So I built it. <span class="nb">Vault-It</span> starts below zero. Being in debt is stage 0 of seven. A starting line, not a failure screen.</p><p>It gives one forward date, keys in hand, and it moves the moment a number changes.</p><p>And you can see progress. Every pound saved lays a brick in a to-scale 3D house. 14,465 bricks in a Victorian terrace. That is the app's own engine building it.</p><p>Research shows people save more when the future feels concrete. Whether our date changes what our users save is the first thing this round measures.</p></div></div>
+
+<div class="frame" data-secs="50"><section id="whopays" style="background:#080D14;color:#E8E8E8;padding:80px 128px 160px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:18px">
+<p class="kicker">WHO PAYS</p>
+<h2 style="font-size:58px">Sam can pay £5.99 a month. The firms that want Sam later pay more.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px;align-items:stretch">
+<div class="card" style="flex:1"><p class="kicker" style="font-size:21px;letter-spacing:3px">MORTGAGE BROKER</p><h3 style="font-size:34px">A ready buyer, not a cold lead</h3><p style="font-size:24px;color:#B6D8D6">Earns £738 to £936 on a first-time buyer mortgage and pays £18 to £40 for a lead today. We hand over, with consent, income, debts, deposit and saving history.</p><p class="mono" style="font-size:26px;color:#E8C56A;margin-top:auto">Pays us £185 to £234 per completed mortgage</p></div>
+<div class="card" style="flex:1"><p class="kicker" style="font-size:21px;letter-spacing:3px">BUILDING SOCIETY</p><h3 style="font-size:34px">A branded Vault-It for its savers</h3><p style="font-size:24px;color:#B6D8D6">A mortgage sold direct to a member saves the £738 to £936 it would pay a broker. It meets the saver years before the application.</p><p class="mono" style="font-size:26px;color:#E8C56A;margin-top:auto">Pays us £10,000 to £25,000 set&#8209;up, then £1 to £3 per active user a month</p></div>
+<div class="card" style="flex:1"><p class="kicker" style="font-size:21px;letter-spacing:3px">DEBT ADVICE, WITH A SPONSOR</p><h3 style="font-size:34px">What comes after the repayment plan</h3><p style="font-size:24px;color:#B6D8D6">Creditors already fund debt advice: about 10% of what StepChange clients repay. A plan people keep to is worth money to them.</p><p class="mono" style="font-size:26px;color:#E8C56A;margin-top:auto">About £1 per active user a month, paid by the sponsor</p></div>
+</div>
+<div style="display:flex;flex-direction:row;gap:36px;align-items:flex-start">
+<div class="pt" style="flex:1"><p style="color:#E8E8E8">For Sam: £5.99 a month or £59.99 a year.</p></div>
+<div class="pt" style="flex:2;border-color:#E05C5C"><p style="color:#E8E8E8">No partner has been approached with this offer yet. Every partner price is an assumption the first three pilots test.</p></div>
+</div>
+<p class="foot">BROKER FEES: MORTGAGE STRATEGY, FEB 2026 · LEAD PRICES: LURVO, APR 2026 · STEPCHANGE ANNUAL REPORT 2025 · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section>
+<div class="say"><p>Who pays? Sam can. £5.99 a month. But subscriptions alone will not carry this, and I won't pretend they will. The money is with the firms that want Sam later.</p><p>A mortgage broker earns £738 to £936 on a first-time buyer mortgage, and pays £18 to £40 for a cold lead. We hand over a ready buyer, with consent, with income, debts, deposit and saving history filled in. They pay us £185 to £234 when it completes.</p><p>A building society saves that whole broker fee on a direct mortgage, so it licenses a branded <span class="nb">Vault-It</span> for its savers.</p><p>And creditors already fund debt advice, so a sponsor pays about £1 a user a month.</p><p>No partner has seen this offer yet. The pilots test those prices.</p></div></div>
+
+<div class="frame" data-secs="40"><section id="growth" style="background:#0A1A1C;color:#E8E8E8;padding:80px 128px 160px;display:flex;flex-direction:row;gap:72px;align-items:flex-start">
+<div style="flex:1;display:flex;flex-direction:column;gap:26px;min-width:0">
+<div style="display:flex;flex-direction:column;gap:18px">
+<p class="kicker">GROWTH · CONSUMERS AND PARTNERS TOGETHER</p>
+<h2 style="font-size:58px">Three pilots are the difference between these two cases.</h2>
+</div>
+<div class="chart">
+<div class="yr"><div class="bars"><div class="c2c"><span data-g="subs-1">37</span><i data-b="subs-1"></i><em data-h="subs-1"></em></div><div class="c2b"><span data-g="partner-1">0</span><i data-b="partner-1"></i><em data-h="partner-1"></em></div></div><h3>Year 1</h3><p class="src">REVENUE</p><p class="rev" data-g="rev-1">£4,498</p><p class="shr"><span data-s="1">56</span>% from partners</p></div>
+<div class="yr"><div class="bars"><div class="c2c"><span data-g="subs-2">113</span><i data-b="subs-2"></i><em data-h="subs-2"></em></div><div class="c2b"><span data-g="partner-2">833</span><i data-b="partner-2"></i><em data-h="partner-2"></em></div></div><h3>Year 2</h3><p class="src">REVENUE</p><p class="rev" data-g="rev-2">£46,256</p><p class="shr"><span data-s="2">86</span>% from partners</p></div>
+<div class="yr"><div class="bars"><div class="c2c"><span data-g="subs-3">203</span><i data-b="subs-3"></i><em data-h="subs-3"></em></div><div class="c2b"><span data-g="partner-3">4,500</span><i data-b="partner-3"></i><em data-h="partner-3"></em></div></div><h3>Year 3</h3><p class="src">REVENUE</p><p class="rev" data-g="rev-3">£100,166</p><p class="shr"><span data-s="3">88</span>% from partners</p></div>
+</div>
+</div>
+<div class="card tog" data-tog="case" style="width:520px;flex:none;padding:34px 36px;gap:22px;border-color:#2A5552;margin-top:44px">
+<div class="sw" role="group" aria-label="Which case"><button type="button" data-case="base" aria-pressed="true">BASE CASE</button><button type="button" data-case="best" aria-pressed="false">BEST CASE</button></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p class="key"><i style="background:#44C0B9"></i>Paying subscribers (consumers)</p>
+<p class="key"><i style="background:#E8C56A"></i>Users paid for by partners</p>
+<p class="key ghost"><i style="background:none;border:2px dashed #7FA9A6"></i>Dashed: the best case</p>
+</div>
+<p id="g-sum" aria-live="polite" style="font-size:27px;line-height:1.4;color:#E8E8E8;min-height:8.6em">£250,000 lasts 27 months. The business does not break even inside three years: a seed round or a second Partner Edition is needed by early 2029.</p>
+</div>
+<p class="foot">MODEL OUTPUTS FROM STATED ASSUMPTIONS (BUSINESS PLAN V3), NOT TRADING DATA · YEAR 1 IS DEC 2026 TO NOV 2027 · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section>
+<div class="say"><p>Here are consumers and partners together.</p><p>Base case, year three: 203 paying subscribers, 4,500 users paid for by partners, £100,000 of revenue, 88% of it from partners. That does not break even, and I would rather show you that than a hockey stick.</p><p><i>press T</i> Best case, the pilots convert: about 2,000 subscribers, 14,667 partner users, £430,000, and a profit in year three.</p><p>The gap between those two cases is three pilots. That is what the money buys.</p></div></div>
+
+<div class="frame" data-secs="35"><section id="proof" style="background:#080D14;color:#E8E8E8;padding:88px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:18px">
+<p class="kicker">WHERE IT IS · 19 NOVEMBER 2026</p>
+<h2 style="font-size:62px">Live, built by one person, pre-revenue.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px">
+<div class="now" data-now="accounts"><b>14</b><span>accounts</span></div>
+<div class="now" data-now="saved"><b>11</b><span>with their own figures saved</span></div>
+<div class="now" data-now="waitlist"><b>9</b><span>on the waiting list</span></div>
+<div class="now" data-now="paying"><b>0</b><span>paying yet</span></div>
+</div>
+<div style="display:flex;flex-direction:row;gap:56px">
+<div style="flex:1;display:flex;flex-direction:column;gap:30px">
+<div class="pt" style="border-color:#E8C56A"><p class="mono" style="font-size:24px;color:#E8C56A">BY FEBRUARY 2027</p><p style="color:#E8E8E8;font-size:29px">A measured first cohort, a public trust page with Cyber Essentials, 30 named partner targets.</p></div>
+<div class="pt" style="border-color:#E8C56A"><p class="mono" style="font-size:24px;color:#E8C56A">BY SEPTEMBER 2028</p><p style="color:#E8E8E8;font-size:29px">Three paid pilots, one funded debt-advice programme, ISO&nbsp;27001, the first Partner Edition signed.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:30px">
+<div class="pt"><p class="mono" style="font-size:24px;color:#44C0B9">FOUNDER</p><p style="color:#E8E8E8;font-size:29px">Pete Thickett. A designer who builds: the app, the brand and the 3D engine are his. Own money in, January to November 2026: £3,214.08.</p></div>
+<div class="pt"><p class="mono" style="font-size:24px;color:#44C0B9">TWO SEATS OPEN</p><p style="color:#E8E8E8;font-size:29px">An operations-focused technical co-founder, 15 to 20% equity offered, and a partnerships lead.</p></div>
+</div>
+</div>
+<p class="foot">COUNTS FROM THE VAULT-IT DATABASE, 19 NOV 2026 · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section>
+<div class="say"><p>Where it is today. The app is live. I built it alone, with £3,214 of my own money.</p><p>14 accounts, 11 with their own figures saved, 9 on the waiting list, nobody paying yet. Pre-seed, pre-revenue.</p><p>By February: a measured first cohort, a public trust page and 30 named partner targets. By September 2028: three paid pilots, one funded debt-advice programme, ISO 27001 and the first Partner Edition.</p><p>Two seats are open: a technical co-founder and a partnerships lead.</p></div></div>
+
+<div class="frame" data-secs="20"><section id="ask" style="background:#E8C56A;color:#1A1400;padding:72px 128px 160px;display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<p class="kicker" style="color:#5A4A10">THE ASK · ONE</p>
+<h2 style="font-size:64px;color:#1A1400">£250,000 under SEIS, closing March 2027.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:64px;align-items:flex-start">
+<div style="flex:1;display:flex;flex-direction:column;gap:18px;min-width:0">
+<div>
+<div class="fund" data-fund="63"><b>63%</b><strong>People<em>£158,000</em></strong><span>Founder full time, an engineer or technical co-founder, then a partnerships lead</span></div>
+<div class="fund" data-fund="10"><b>10%</b><strong>Marketing and partner sales<em>£25,000</em></strong><span>Calculator pages, video, partner travel and events</span></div>
+<div class="fund" data-fund="9"><b>9%</b><strong>Security<em>£22,000</em></strong><span>Cyber Essentials, the ISO&nbsp;27001 audit, penetration tests</span></div>
+<div class="fund" data-fund="5"><b>5%</b><strong>Regulatory and legal<em>£12,000</em></strong><span>Regulated-route provision, investment documents, pilot contracts</span></div>
+<div class="fund" data-fund="13"><b>13%</b><strong>Running costs and contingency<em>£33,000</em></strong><span>Accounts, insurance, hosting, a 10% contingency</span></div>
+</div>
+<p style="font-size:30px;font-weight:700">It buys 27 months in the base case, and three paid pilots by September 2028.</p>
+<p style="font-size:21px;line-height:1.35">We intend to apply for SEIS advance assurance once the company is registered. SEIS gives qualifying investors 50% income tax relief. Investor equity terms on request.</p>
+</div>
+<div style="width:540px;flex:none;display:flex;flex-direction:column;gap:20px;background:#12100A;color:#E8E8E8;border-radius:22px;padding:36px 38px 40px">
+<p class="kicker" style="color:#E8C56A;letter-spacing:3px">ASK TWO · ONE INTRODUCTION</p>
+<h3 style="font-size:42px">A mortgage broker, a building society or a debt charity.</h3>
+<p style="font-size:26px;color:#B6D8D6">One 90-day pilot with each is how the partner prices get tested.</p>
+<p class="mono" style="font-size:22px;letter-spacing:3px;color:#44C0B9;margin-top:8px">SEE IT NOW</p>
+<p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:38px;color:#E8C56A"><a href="https://vault-it.co/demo-a">vault-it.co/demo-a</a></p>
+<p style="font-family:'Syne', Arial, sans-serif;font-weight:600;font-size:30px;line-height:1.2;margin-top:8px">Get out of the <span style="color:#E05C5C">red</span> and into <span style="color:#44C0B9">your</span> <span style="color:#E8C56A">home</span>.</p>
+</div>
+</div>
+<p class="foot" style="color:#5A4A10">SUBJECT TO SEIS ADVANCE ASSURANCE · FORECAST IS ILLUSTRATIVE, NOT A PROMISE · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+</section>
+<div class="say"><p>Two asks.</p><p>One: £250,000 under SEIS, closing March 2027. It buys 27 months and those three pilots.</p><p>Two: one introduction, to a mortgage broker, a building society or a debt charity.</p><p><span class="nb">Vault-It</span>. Get out of the red and into your home.</p></div></div>
+
+</main>
+<footer>Vault-It, published by PT Live Design · Not regulated by the FCA. Not financial advice. · <a href="https://vault-it.co/demo-a">Open the demo</a></footer>
+<aside id="nv" aria-label="Notes: the spoken script and timer">
+<div id="nv-head"><span id="nv-where">SLIDE 1 OF 8</span><span id="nv-timer" role="timer" aria-label="Time left">5:00</span></div>
+<p id="nv-goal">This slide: 0:20. Finish it with 4:40 left.</p>
+<div id="nv-text" aria-live="polite"></div>
+<div id="nv-tools"><button type="button" class="pv-btn q" id="nv-go" aria-label="Start or pause the timer">START</button><button type="button" class="pv-btn q" id="nv-reset" aria-label="Reset the timer to five minutes">RESET</button><button type="button" class="pv-btn q" id="nv-room" aria-label="Open a second window for the audience that follows this one">AUDIENCE WINDOW</button><button type="button" class="pv-btn q" id="nv-close" aria-label="Close notes">✕</button></div>
+<p id="nv-help">N notes · T flips the switch on the slide · arrows or space move · the timer starts when you leave the cover</p>
+</aside>
+<div id="pv-bar" role="toolbar" aria-label="Presenter controls"><button type="button" class="pv-btn" id="pv-prev" aria-label="Previous slide">‹</button><span id="pv-count" aria-live="polite">1 / 8</span><button type="button" class="pv-btn" id="pv-next" aria-label="Next slide">›</button><button type="button" class="pv-btn" id="pv-notes" aria-label="Notes">N</button><button type="button" class="pv-btn" id="pv-close" aria-label="Leave presenter view">✕</button></div>
+<script>
+(function(){
+var $=function(id){return document.getElementById(id)},frames=[].slice.call(document.querySelectorAll('.frame')),cur=0,body=document.body,count=$('pv-count');
+var still=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var bc=null;try{bc=new BroadcastChannel('vi-pitch-five')}catch(e){}
+function tell(m){if(bc)try{bc.postMessage(m)}catch(e){}}
+function on(){return body.classList.contains('present')}
+function fit(){frames.forEach(function(f){var w=f.clientWidth;if(w)f.style.setProperty('--s',w/1920)})}
+function videos(){frames.forEach(function(f,k){f.querySelectorAll('video').forEach(function(v){if(still||(on()&&k!==cur))v.pause();else{if(on()&&k===cur)v.currentTime=0;var p=v.play();if(p&&p.catch)p.catch(function(){})}})})}
+function show(i,quiet){cur=Math.max(0,Math.min(frames.length-1,i));frames.forEach(function(f,k){f.classList.toggle('on',k===cur)});count.textContent=(cur+1)+' / '+frames.length;fit();videos();if(cur>0&&t0===null&&!held)start();notes();if(!quiet)tell({t:'at',i:cur})}
+function inView(){var at=0,best=-1;for(var k=0;k<frames.length;k++){var r=frames[k].getBoundingClientRect(),seen=Math.min(r.bottom,innerHeight)-Math.max(r.top,0);if(seen>best+1){best=seen;at=k}}return at}
+function open(){var at=inView();body.classList.add('present');show(at);var d=document.documentElement;if(d.requestFullscreen&&!body.classList.contains('notes'))d.requestFullscreen().catch(function(){})}
+function close(){body.classList.remove('present');frames.forEach(function(f){f.classList.remove('on')});if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(function(){});fit();videos();frames[cur].scrollIntoView({block:'center'});$('pv-open').focus()}
+
+/* the two switches: Sam's £50 and base / best. Figures: the live deck's engine run (7 Nov 2026) and the v3 plan's model */
+var SAM={min:{keys:'August 2035',note:'The first date anyone has given Sam.'},plus:{keys:'August 2034',note:'One year sooner, for £50 a month.'}},sam='min';
+function setSam(v,quiet){sam=v==='plus'?'plus':'min';$('sam-keys').textContent=SAM[sam].keys;$('sam-note').textContent=SAM[sam].note;$('sam-free-row').style.visibility=sam==='min'?'visible':'hidden';
+ document.querySelectorAll('[data-sam]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.sam===sam?'true':'false')});if(!quiet)tell({t:'sam',v:sam})}
+var G={base:{subs:[37,113,203],partner:[0,833,4500],rev:[4498,46256,100166],b2b:[2500,39900,88600],sum:'£250,000 lasts 27 months. The business does not break even inside three years: a seed round or a second Partner Edition is needed by early 2029.'},
+       best:{subs:[172,809,1997],partner:[0,4667,14667],rev:[20793,141137,429814],b2b:[12917,108235,349052],sum:'If the pilots convert and the consumer targets are met: cash never falls below £108,281 (July 2028) and year 3 makes a profit of £257,058.'}},kase='base',TOP=14667;
+function n(x){return String(x).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+function setCase(v,quiet){kase=v==='best'?'best':'base';var d=G[kase];
+ for(var y=0;y<3;y++){['subs','partner'].forEach(function(k){var id=k+'-'+(y+1),val=d[k][y];document.querySelector('[data-g="'+id+'"]').textContent=n(val);document.querySelector('[data-b="'+id+'"]').style.height=(val?Math.max(4,Math.round(val/TOP*330)):0)+'px';document.querySelector('[data-h="'+id+'"]').style.height=(G.best[k][y]?Math.round(G.best[k][y]/TOP*330):0)+'px'});
+  document.querySelector('[data-g="rev-'+(y+1)+'"]').textContent='£'+n(d.rev[y]);document.querySelector('[data-s="'+(y+1)+'"]').textContent=Math.round(d.b2b[y]/d.rev[y]*100)}
+ $('g-sum').textContent=d.sum;$('growth').classList.toggle('best',kase==='best');document.querySelectorAll('[data-case]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.case===kase?'true':'false')});if(!quiet)tell({t:'case',v:kase})}
+function flip(which){if(which==='sam')setSam(sam==='min'?'plus':'min');else if(which==='case')setCase(kase==='base'?'best':'base')}
+document.querySelectorAll('.tog').forEach(function(c){c.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('button');if(b&&b.dataset.sam)setSam(b.dataset.sam);else if(b&&b.dataset.case)setCase(b.dataset.case);else flip(c.dataset.tog)})});
+setCase('base',true);
+
+/* notes: the script for the slide in view, and five minutes on the clock */
+var TOTAL=frames.reduce(function(s,f){return s+(+f.dataset.secs||0)},0),t0=null,spent=0,held=false,tick=null;
+function mmss(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
+function used(){return spent+(t0===null?0:(Date.now()-t0)/1000)}
+function clock(){var left=TOTAL-used(),due=0;for(var k=0;k<=cur;k++)due+=+frames[k].dataset.secs;$('nv-timer').textContent=(left<0?'+':'')+mmss(Math.abs(left));$('nv-timer').classList.toggle('late',left<0);
+ $('nv-goal').textContent='This slide: '+mmss(+frames[cur].dataset.secs)+'. Finish it with '+mmss(TOTAL-due)+' left.';$('nv-goal').classList.toggle('late',left<TOTAL-due-1);$('nv-go').textContent=t0===null?(spent?'RESUME':'START'):'PAUSE'}
+function start(){if(t0!==null)return;held=false;t0=Date.now();if(!tick)tick=setInterval(clock,250);clock()}
+function pause(){if(t0===null)return;spent=used();t0=null;held=true;clock()}
+function reset(){spent=0;t0=null;held=false;clock()}
+function notes(){$('nv-where').textContent='SLIDE '+(cur+1)+' OF '+frames.length;var s=frames[cur].querySelector('.say');$('nv-text').innerHTML=s?s.innerHTML:'';clock()}
+function setNotes(v){body.classList.toggle('notes',v);$('nv-open').setAttribute('aria-pressed',v?'true':'false');if(v&&!on())cur=inView();notes();fit();setTimeout(fit,60)}
+$('nv-open').addEventListener('click',function(){setNotes(!body.classList.contains('notes'))});
+$('nv-close').addEventListener('click',function(){setNotes(false)});
+$('pv-notes').addEventListener('click',function(){setNotes(!body.classList.contains('notes'))});
+$('nv-go').addEventListener('click',function(){if(t0===null)start();else pause()});
+$('nv-reset').addEventListener('click',reset);
+$('nv-room').addEventListener('click',function(){window.open(location.pathname+'?present','vi-five-room','popup,width=1280,height=760');if(!on()){body.classList.add('present');show(cur)}setTimeout(function(){tell({t:'at',i:cur});tell({t:'sam',v:sam});tell({t:'case',v:kase})},1500)});
+var st=0;addEventListener('scroll',function(){if(on()||!body.classList.contains('notes'))return;var now=Date.now();if(now-st<150)return;st=now;var k=inView();if(k!==cur){cur=k;notes()}},{passive:true});
+if(bc)bc.onmessage=function(e){var m=e.data||{};if(m.t==='at'&&typeof m.i==='number'){if(on()&&m.i!==cur)show(m.i,true)}else if(m.t==='sam')setSam(m.v,true);else if(m.t==='case')setCase(m.v,true)};
+
+$('pv-open').addEventListener('click',open);
+$('pv-close').addEventListener('click',close);
+$('pv-next').addEventListener('click',function(){show(cur+1)});
+$('pv-prev').addEventListener('click',function(){show(cur-1)});
+document.addEventListener('keydown',function(e){var k=e.key;if(e.metaKey||e.ctrlKey||e.altKey)return;
+ if(k==='n'||k==='N'){setNotes(!body.classList.contains('notes'));e.preventDefault();return}
+ if(k==='t'||k==='T'){if(!on())cur=inView();var c=frames[cur].querySelector('.tog');if(c){flip(c.dataset.tog);e.preventDefault()}return}
+ if(!on())return;
+ if((k===' '||k==='Enter')&&e.target.closest&&e.target.closest('button,a'))return;
+ if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault()}
+ else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault()}
+ else if(k==='Home'){show(0);e.preventDefault()}else if(k==='End'){show(frames.length-1);e.preventDefault()}
+ else if(k==='Escape'){close();e.preventDefault()}});
+document.addEventListener('fullscreenchange',function(){if(!document.fullscreenElement&&on()&&!body.classList.contains('notes'))close()});
+var sx=0,sy=0,stage=$('pv-stage'),inTog=false;
+stage.addEventListener('touchstart',function(e){var t=e.changedTouches[0];sx=t.clientX;sy=t.clientY;inTog=!!(e.target.closest&&e.target.closest('.tog,a'))},{passive:true});
+stage.addEventListener('touchend',function(e){if(!on())return;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))show(cur+(dx<0?1:-1))},{passive:true});
+stage.addEventListener('click',function(e){if(!on()||(e.target.closest&&e.target.closest('.tog,a')))return;var r=frames[cur].getBoundingClientRect();show(cur+(e.clientX<r.left+r.width/3?-1:1))});
+addEventListener('resize',fit);fit();
+var q=location.search;if(/[?&]notes(=|&|$)/.test(q))setNotes(true);
+if(/[?&]present(=|&|$)/.test(q)){body.classList.add('present');show(0);fit()}else notes();
+})();
+</script></body></html>
