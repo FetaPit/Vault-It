@@ -6130,7 +6130,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this._idle = 0;
     this._loop = function () {
       self._raf = 0;
-      if (!self.active || self.offscreen || document.hidden) { self._lastT = 0; return; }   // off screen or in a background tab: sleep (woken when seen again)
+      if (!self.active || self.offscreen || document.hidden || document.body.classList.contains('vi-fb-open')) { self._lastT = 0; return; }   // also asleep behind the Feedback sheet (19 Nov 2026)   // off screen or in a background tab: sleep (woken when seen again)
       // brand: what a drawn frame really cost is the gap until the browser gives us the next frame (the GPU work lands after render() returns)
       if (self.brand && self._bDrewAt) { var fc = performance.now() - self._bDrewAt; self._bCost = self._bCost == null ? fc : self._bCost * 0.6 + fc * 0.4; self._bDrewAt = 0; self._bGap = Math.max(80, Math.min(1500, self._bCost * 2.2)); }
       // v0.7 cold start: while the still picture covers the stage, draw one part a frame into the hidden canvas so each shader program
@@ -6168,6 +6168,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     }
     this._onVis = function () { if (!document.hidden) { self.dirty = true; self.wake(); } };
     document.addEventListener('visibilitychange', this._onVis);
+    this._onFb = function () { self.dirty = true; self.wake(); };
+    document.addEventListener('vi-fb-closed', this._onFb);
     cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); self.lost = true; self.stop(); if (self.onLost) self.onLost(); });
     cv.addEventListener('webglcontextrestored', function () { self.lost = false; self._shadowDirty = true; if (self.model) self.show(self.model, true); self.start(); if (self.onRestored) self.onRestored(); });
     this.start();
@@ -6376,6 +6378,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     if (this._ro) this._ro.disconnect();
     if (this._io) this._io.disconnect();
     if (this._onVis) document.removeEventListener('visibilitychange', this._onVis);
+    if (this._onFb) document.removeEventListener('vi-fb-closed', this._onFb);
     if (this._bIO) this._bIO.disconnect();
     this.controls.dispose(); this.renderer.dispose();
     if (this.renderer.domElement.parentNode) this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
@@ -15565,7 +15568,8 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 #vi-fb-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* it never moves, but fades out while it sits over a 3D viewer's controls (Pedro's review of v0.8 E2) */
 #vi-fb-btn{transition:opacity .24s var(--ease,ease)}
-#vi-fb-btn.vi-fb-fade{opacity:0;pointer-events:none}
+/* owner, 19 Nov 2026: the button must always be tappable. Over 3D controls it dims, it never stops taking taps. */
+#vi-fb-btn.vi-fb-fade{opacity:.45}
 @media (prefers-reduced-motion:reduce){#vi-fb-btn{transition:none}}
 body.reduced-motion #vi-fb-btn{transition:none}
 @media(max-width:599px){#vi-fb-btn span{display:none}#vi-fb-btn{width:40px;height:40px;padding:0}#vi-fb-btn .vi-ic{width:18px;height:18px}}
@@ -32546,7 +32550,7 @@ function stage(cv,o,draw){
   function size(){var r=cv.getBoundingClientRect();S.cw=Math.max(2,r.width);S.ch=Math.max(2,r.height);S.dpr=Math.max(1,Math.min(window.innerWidth<700?1.5:2,window.devicePixelRatio||1,Math.sqrt(1.6e6/(S.cw*S.ch)),LITE?1.25:9));cv.width=Math.round(S.cw*S.dpr);cv.height=Math.round(S.ch*S.dpr);S.kick()}
   /* 'mid': the canvas is about half on screen (a tall one, half the screen); once true it stays true. Intros start on it, not at the first pixel (owner, 2 Nov) */
   function midNow(){var r=cv.getBoundingClientRect(),vh=window.innerHeight||0,seen=Math.min(r.bottom,vh)-Math.max(r.top,0);return r.height>2&&seen>=Math.min(.55*r.height,.55*vh)}
-  function frame(ts){S.raf=0;if(!S.vis||document.hidden)return;if(!S.mid&&midNow())S.mid=true;var fps=LITE?30:(o.fps||30);if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
+  function frame(ts){S.raf=0;if(!S.vis||document.hidden||document.body.classList.contains('vi-fb-open'))return;if(!S.mid&&midNow())S.mid=true;var fps=LITE?30:(o.fps||30);if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
     var dt=Math.min(.05,(ts-(S.last||ts))/1000);S.last=ts;c.setTransform(S.dpr,0,0,S.dpr,0,0);c.clearRect(0,0,S.cw,S.ch);var t0=performance.now();draw(ts,dt,S);
     var cost=performance.now()-t0;S.ema=S.ema==null?cost:S.ema*.85+cost*.15;S.n=(S.n||0)+1;if(!LITE&&S.n>12&&S.ema>16){LITE=true;size()}   // frames over ~16 ms of drawing: go lite for good
     if(!S.raf)S.raf=requestAnimationFrame(frame)}   // size() may already have queued the next frame: never run two loops
@@ -32556,7 +32560,7 @@ function stage(cv,o,draw){
   S.kick=function(){if(!S.vis&&onScreen()){S.vis=true;if(o.onShow)o.onShow()}if(S.vis&&!S.raf){S.last=0;S.raf=requestAnimationFrame(frame)}};
   if("ResizeObserver" in window)new ResizeObserver(size).observe(cv);else window.addEventListener("resize",size);
   if("IntersectionObserver" in window)new IntersectionObserver(function(es){var was=S.vis;S.vis=es[es.length-1].isIntersecting;if(!S.mid&&midNow())S.mid=true;if(S.vis&&!was&&o.onShow)o.onShow();S.kick()},{threshold:[.01,.3,.55,.8]}).observe(cv);else{S.vis=true}
-  document.addEventListener("visibilitychange",S.kick);
+  document.addEventListener("visibilitychange",S.kick);document.addEventListener("vi-fb-closed",S.kick);
   size();return S;
 }
 /* icons on the 3D labels (owner, 4 Nov 2026, v0.9.1 round 2 R2 and R9): the app's own category icons, drawn from the page's icon sprite into the canvas.
@@ -33240,7 +33244,28 @@ document.addEventListener('visibilitychange',function(){if(document.hidden){rec(
 /* ---- the picture of the screen, every figure hidden before it leaves the device ---- */
 function loadH2C(){if(window.html2canvas)return Promise.resolve(window.html2canvas);
   return new Promise(function(res,rej){var s=document.createElement('script');s.src=H2C;s.onload=function(){res(window.html2canvas)};s.onerror=rej;document.head.appendChild(s);setTimeout(function(){rej(new Error('timeout'))},8000)})}
+/* html2canvas 1.4.1 cannot read CSS color-mix() (owner, 19 Nov 2026: the picture failed on Overview and Budget). In the copy only, never in the app,
+ * each color-mix(...) becomes a plain translucent grey, so the library can parse every rule. The picture is for finding bugs and is pixelated and masked anyway. */
+function plainMix(t){var o='',i=0,k;while((k=t.indexOf('color-mix(',i))>=0){o+=t.slice(i,k);var d=0,j=k+9;for(;j<t.length;j++){if(t[j]==='(')d++;else if(t[j]===')'){d--;if(!d)break}}o+='rgba(136,153,170,.3)';i=j+1}return o+t.slice(i)}
+function plainColours(doc){
+  [].forEach.call(doc.querySelectorAll('style'),function(st){var t=st.textContent;if(t&&t.indexOf('color-mix(')>=0)st.textContent=plainMix(t)});
+  [].forEach.call(doc.querySelectorAll('[style*="color-mix"]'),function(e){e.setAttribute('style',plainMix(e.getAttribute('style')))});
+}
+/* Pseudo-elements (::before, ::after) are read from the LIVE page, not the copy, so a colour variable defined with color-mix() must be plain while the picture is taken.
+ * For that moment only, each such variable gets its resolved colour as a !important override, removed again straight after. */
+function liveFlat(){
+  var st=null;try{var cv=document.createElement('canvas');cv.width=cv.height=1;var cx=cv.getContext('2d',{willReadFrequently:true}),pr=document.createElement('i'),css='';pr.style.cssText='position:absolute;visibility:hidden';document.body.appendChild(pr);
+    var seen={};
+    [].forEach.call(document.styleSheets,function(ss){var rs;try{rs=ss.cssRules}catch(e){return}
+      [].forEach.call(rs||[],function(r){if(!r.style||!r.selectorText)return;
+        for(var i=0;i<r.style.length;i++){var n=r.style[i];if(n.indexOf('--')!==0)continue;var v=r.style.getPropertyValue(n);if(v.indexOf('color-mix(')<0)continue;
+          var k=r.selectorText+'|'+n;if(seen[k])continue;seen[k]=1;pr.style.color='';pr.style.color=v;if(!pr.style.color)continue;
+          var c=getComputedStyle(pr).color;cx.clearRect(0,0,1,1);cx.fillStyle='#000';cx.fillStyle=c;cx.fillRect(0,0,1,1);var d=cx.getImageData(0,0,1,1).data;
+          css+=r.selectorText+'{'+n+':rgba('+d[0]+','+d[1]+','+d[2]+','+(d[3]/255).toFixed(3)+')!important}'}})});
+    pr.remove();if(css){st=document.createElement('style');st.id='vi-fb-flat';st.textContent=css;document.head.appendChild(st)}}catch(e){}
+  return function(){if(st&&st.parentNode)st.remove()}}
 function maskDoc(doc){
+  try{plainColours(doc)}catch(e){}
   var w=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT),n;while((n=w.nextNode()))if(/\d/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace(/\d/g,'•');
   [].forEach.call(doc.querySelectorAll('input,textarea'),function(i){if(/checkbox|radio|button|submit/.test(i.type))return;var v=String(i.value||'').replace(/\d/g,'•');i.value=v;i.setAttribute('value',v);if(i.placeholder)i.placeholder=i.placeholder.replace(/\d/g,'•')});
   var fb=doc.getElementById('vi-fb');if(fb)fb.remove();var bt=doc.getElementById('vi-fb-btn');if(bt)bt.remove();
@@ -33261,11 +33286,12 @@ function skipEl(el){
   return false}
 function capture(){
   if(shotBusy)return shotBusy;
-  shotBusy=loadH2C().then(function(h2c){var scale=Math.min(1,960/innerWidth);
+  var unflat=null;
+  shotBusy=loadH2C().then(function(h2c){var scale=Math.min(1,960/innerWidth);unflat=liveFlat();
     return h2c(document.body,{x:scrollX,y:scrollY,width:innerWidth,height:innerHeight,windowWidth:innerWidth,windowHeight:innerHeight,scale:scale,logging:false,useCORS:false,
       backgroundColor:getComputedStyle(document.body).backgroundColor,ignoreElements:skipEl,onclone:function(d){maskDoc(d)}})
       .then(function(out){pixelate(out,out.width/innerWidth);var q=.62,u=out.toDataURL('image/jpeg',q);while(u.length>680000&&q>.25){q-=.12;u=out.toDataURL('image/jpeg',q)}return u.length>680000?null:u})})
-    .catch(function(e){console.warn('[Vault-It] feedback picture',e);return null}).then(function(u){shot=u;shotBusy=null;paintShot();return u});
+    .catch(function(e){console.warn('[Vault-It] feedback picture',e);return null}).then(function(u){if(unflat)unflat();shot=u;shotBusy=null;paintShot();return u});
   return shotBusy;
 }
 function paintShot(){var p=document.getElementById('vi-fb-shot'),st=document.getElementById('vi-fb-picst');if(!p)return;
@@ -33296,11 +33322,11 @@ window.viFbOpen=function(mo){
   [].forEach.call(m.querySelectorAll('.vi-fb-rate button'),function(b){b.setAttribute('aria-pressed','false')});
   var cb=document.getElementById('vi-fb-pic');cb.checked=true;cb.disabled=false;
   shot=null;rec('feedback_open',mo||'button',null,false);
-  m.hidden=false;document.body.classList.add('vi-pop-open');paintShot();
+  m.hidden=false;document.body.classList.add('vi-pop-open','vi-fb-open');paintShot();
   if(!signedIn())document.getElementById('vi-fb-msg').innerHTML='Sign in to send feedback from here, or email <a href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback">hello@vault-it.co</a>.';
   setTimeout(function(){var t=document.getElementById('vi-fb-text');if(t)t.focus()},40);
 };
-window.viFbClose=function(){var m=document.getElementById('vi-fb');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');var b=returnTo;returnTo=null;if(b&&b.focus)setTimeout(function(){try{b.focus()}catch(e){}},0)};
+window.viFbClose=function(){var m=document.getElementById('vi-fb');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open','vi-fb-open');try{document.dispatchEvent(new Event('vi-fb-closed'))}catch(e){}var b=returnTo;returnTo=null;if(b&&b.focus)setTimeout(function(){try{b.focus()}catch(e){}},0)};
 window.viFbRate=function(n){rating=n;[].forEach.call(document.querySelectorAll('#vi-fb .vi-fb-rate button'),function(b){b.setAttribute('aria-pressed',String(+b.dataset.r===n))})};
 window.viFbSend=async function(){
   var msg=document.getElementById('vi-fb-msg'),txt=document.getElementById('vi-fb-text').value.trim(),btn=document.getElementById('vi-fb-send');

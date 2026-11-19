@@ -136,7 +136,8 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 #vi-fb-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* it never moves, but fades out while it sits over a 3D viewer's controls (Pedro's review of v0.8 E2) */
 #vi-fb-btn{transition:opacity .24s var(--ease,ease)}
-#vi-fb-btn.vi-fb-fade{opacity:0;pointer-events:none}
+/* owner, 19 Nov 2026: the button must always be tappable. Over 3D controls it dims, it never stops taking taps. */
+#vi-fb-btn.vi-fb-fade{opacity:.45}
 @media (prefers-reduced-motion:reduce){#vi-fb-btn{transition:none}}
 body.reduced-motion #vi-fb-btn{transition:none}
 @media(max-width:599px){#vi-fb-btn span{display:none}#vi-fb-btn{width:40px;height:40px;padding:0}#vi-fb-btn .vi-ic{width:18px;height:18px}}
