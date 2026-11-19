@@ -321,8 +321,7 @@ function wStep2Submit() {
   applyProgressiveNav();
   checkAchievements();
   showToast('Welcome' + (_vaultItUser && _vaultItUser.name ? ', ' + _vaultItUser.name : '') + '. Let’s get started 🚀');
-  if (_wSelectedVal !== null) { var _wTab = _wPlanStep().tab; setTimeout(function(){ try { showTab(_wTab); } catch(e) {} }, 250); }   // this week's step from the plan
-  else if (income > 0) setTimeout(function(){ try { showTab('budget'); } catch(e) {} }, 250);
+  setTimeout(function(){ try { showTab('overview'); window.scrollTo(0, 0); } catch(e) {} }, 250);   // the app opens on the dashboard (owner, 19 Nov 2026)
 }
 
 // Step 2 skip — save what we have and enter app
