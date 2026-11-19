@@ -4,7 +4,7 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .ov-ms-wide{padding:clamp(12px,1.6vw,20px)}
 .ms-grid{display:grid;grid-template-columns:1fr;gap:18px}
 @media(min-width:820px){.ms-grid{grid-template-columns:1.1fr 1fr;gap:28px}}
-.ms-col-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.62rem,var(--vi-fs-2));letter-spacing:.1em;color:var(--tx);margin-bottom:10px}
+.ms-col-hd{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:max(.62rem,var(--vi-fs-2));letter-spacing:.1em;color:var(--tx);margin-bottom:10px}
 .ms-ic{font-size:1.05rem;flex:none}
 .ms-chk{color:var(--em);font-size:max(.7rem,var(--vi-fs-3));margin-left:2px}
 .ms-row label{font-size:max(.7rem,var(--vi-fs-3))!important;color:var(--t2)!important}
@@ -14,7 +14,7 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .ms-snapv{font-family:'Share Tech Mono',monospace;font-size:max(.74rem,var(--vi-fs-3));color:var(--em)}
 .ms-empty{font-size:max(.58rem,var(--vi-fs-2));color:var(--t3);padding:6px 2px 10px}
 .ms-add{margin-top:10px;border:1px dashed rgb(var(--teal-rgb) / .4);border-radius:10px;background:rgb(var(--teal-rgb) / .04)}
-.ms-add>summary{cursor:pointer;padding:12px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:max(.64rem,var(--vi-fs-2));letter-spacing:.06em;color:var(--em);list-style:none}
+.ms-add>summary{cursor:pointer;padding:12px 14px;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:max(.64rem,var(--vi-fs-2));letter-spacing:.06em;color:var(--em);list-style:none}
 .ms-add>summary::-webkit-details-marker{display:none}
 .ms-add[open]>summary{border-bottom:1px dashed rgb(var(--teal-rgb) / .25)}
 .ms-add-body{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
@@ -85,7 +85,7 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 @media(max-width:600px){.pc-row{flex-wrap:wrap}.pc-row>*{flex:1 1 45%}}
 .debt-sides{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid rgb(var(--teal-rgb) / .3);border-radius:12px;overflow:hidden;margin-bottom:16px}
 .debt-sides button{background:none;border:0;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--t2);min-height:48px}
-.debt-sides button span{font-family:'Syne',sans-serif;font-weight:800;font-size:max(.72rem,var(--vi-fs-3));letter-spacing:.06em;text-transform:uppercase}
+.debt-sides button span{font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:max(.72rem,var(--vi-fs-3));letter-spacing:.06em;text-transform:uppercase}
 .debt-sides button small{font-size:max(.54rem,var(--vi-fs-1))}
 .debt-sides button[aria-selected="true"]{color:var(--tx);background:rgb(var(--teal-rgb) / .14)}
 #debt-side-btn-creditors[aria-selected="true"] span{color:var(--re)}#debt-side-btn-debtors[aria-selected="true"] span{color:var(--blue)}
@@ -97,7 +97,7 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .owe-row{position:relative;border:1px solid var(--bd);border-left:3px solid var(--blue);border-radius:10px;padding:12px;margin-bottom:10px;background:rgb(var(--blue-rgb) / .04)}
 .owe-row.doubt{border-left-color:var(--t3)}.owe-row.done{opacity:.75;border-left-color:var(--green)}
 .owe-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.owe-who{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.78rem,var(--vi-fs-3));color:var(--tx)}.owe-what{font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);margin-top:2px}
+.owe-who{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:max(.78rem,var(--vi-fs-3));color:var(--tx)}.owe-what{font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);margin-top:2px}
 .owe-amt{font-family:'Share Tech Mono',monospace;font-size:.95rem;color:var(--blue);text-align:right;white-space:nowrap}.owe-amt small{display:block;font-size:max(.52rem,var(--vi-fs-1));color:var(--t2)}
 .owe-row.done .owe-amt{color:var(--gr)}
 .owe-bar{height:4px;border-radius:2px;background:rgb(var(--ink-rgb) / .08);margin:10px 0 8px;overflow:hidden}.owe-bar div{height:100%;background:var(--green)}
@@ -115,7 +115,7 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 .v3-posts{position:absolute;left:0;top:0}
 .v3-chip{position:absolute;left:0;top:0;display:flex;align-items:center;gap:5px;height:20px;padding:0 6px 0 3px;box-sizing:border-box;background:rgba(8,8,8,.97);border:1px solid var(--bc);border-radius:4px;white-space:nowrap;font:600 11px 'DM Sans',sans-serif;color:#FFFFFF;will-change:transform}
 .v3-chip .cash-logo{width:14px;height:14px;border-radius:3px;overflow:hidden;flex:none}
-.v3-chip .v3-mono{background:transparent;font:800 11px/14px 'Syne',sans-serif;letter-spacing:0;box-shadow:inset 0 0 0 1px currentColor;border-radius:3px}
+.v3-chip .v3-mono{background:transparent;font:800 11px/14px 'Chakra Petch',sans-serif;letter-spacing:0;box-shadow:inset 0 0 0 1px currentColor;border-radius:3px}
 .v3-chip .cash-logo-none{background:transparent;color:var(--bc)}
 .v3-chip .cash-logo-none .vi-ic{width:14px;height:14px}
 .v3-chip-s{color:#8A93A6}
@@ -130,7 +130,7 @@ body #nwChart,body.vi-compact #nwChart,body.vi-wide #nwChart{height:clamp(240px,
 #cashSceneCard .scene.v3-on{min-height:420px}
 #cashSceneCard .orbit-hint{z-index:2}
 /* Tester feedback (docs/TESTER_FEEDBACK.md) */
-#vi-fb-btn{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));left:auto;top:auto;bottom:calc(var(--footer-h,30px) + 12px);z-index:450;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 12px;box-sizing:border-box;border-radius:999px;background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .5);color:var(--teal);font:700 10px 'Syne',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer}
+#vi-fb-btn{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));left:auto;top:auto;bottom:calc(var(--footer-h,30px) + 12px);z-index:450;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 12px;box-sizing:border-box;border-radius:999px;background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .5);color:var(--teal);font:700 10px 'Chakra Petch',sans-serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer}
 #vi-fb-btn .vi-ic{width:16px;height:16px}
 /* v0.8 (owner, 2 Nov): "It should stay bottom right." Fixed there on every tab and width, above the footer or the phone tab bar; nothing moves it */
 #vi-fb-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
@@ -171,7 +171,7 @@ body:has(#vi-help.open) #vi-fb-btn,body:has(.vi-modal-overlay:not(.hidden):not([
 .vi-pop-msg{font-size:max(.58rem,var(--vi-fs-2));color:var(--re);min-height:1em;margin-top:8px}
 body.vi-pop-open{overflow:hidden}
 .debt-cost{margin:0 0 14px;padding:12px;border:1px solid rgb(var(--ink-rgb) / .07);border-radius:10px;background:rgb(var(--ink-rgb) / .02)}
-.debt-cost-hd{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.56rem,var(--vi-fs-0));letter-spacing:.12em;text-transform:uppercase;color:var(--t2);margin-bottom:8px}
+.debt-cost-hd{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:max(.56rem,var(--vi-fs-0));letter-spacing:.12em;text-transform:uppercase;color:var(--t2);margin-bottom:8px}
 .ov-sum-a{--sc:var(--teal)}.ov-sum-li{--sc:var(--amber)}.ov-sum-d{--sc:var(--red)}
 .ov-own .ov-sum{border-radius:10px;padding:12px 12px 10px;min-width:0;overflow:hidden}
 .ov-own-hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap}
@@ -182,7 +182,7 @@ body.vi-pop-open{overflow:hidden}
 .ov-ms-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .ov-ms-top .ov-ms-title{margin:0!important}
 .ov-ms-tabs{display:inline-flex;border:1px solid rgb(var(--teal-rgb) / .3);border-radius:8px;overflow:hidden}
-.ov-ms-tabs button{background:none;border:0;padding:6px 12px;font-family:'Syne',sans-serif;font-weight:700;font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);cursor:pointer;min-height:32px}
+.ov-ms-tabs button{background:none;border:0;padding:6px 12px;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);cursor:pointer;min-height:32px}
 .ov-ms-tabs button[aria-selected="true"]{background:rgb(var(--teal-rgb) / .16);color:var(--tx)}
 .ov-ms-card .ms-grid{grid-template-columns:1fr!important}
 .ov-ms-card[data-tab="goals"] .ms-col[data-p="snaps"],.ov-ms-card[data-tab="snaps"] .ms-col[data-p="goals"]{display:none}
@@ -190,7 +190,7 @@ body.vi-pop-open{overflow:hidden}
 .ov-sum-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .ov-sum-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,transparent);border:1px solid color-mix(in srgb,var(--sc) 45%,transparent);flex:none}
 .ov-sum .ov-chart-title{font-size:max(.72rem,var(--vi-fs-3))!important;color:var(--sc)!important;margin:0!important}
-.ov-sum-total{font-family:'Share Tech Mono',monospace;font-size:clamp(1.3rem,2vw,1.9rem);font-weight:700;margin-bottom:10px;letter-spacing:-.01em}
+.ov-sum-total{font-family:var(--font-fig);font-size:clamp(1.3rem,2vw,1.9rem);font-weight:700;margin-bottom:10px;letter-spacing:-.01em}
 .ov-sum-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:max(.78rem,var(--vi-fs-3))}
 .ov-sum-ri{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:6px;background:rgb(var(--ink-rgb) / .05)}
 .ov-sum-ri svg{width:14px;height:14px}

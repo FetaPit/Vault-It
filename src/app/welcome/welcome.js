@@ -11,9 +11,9 @@ function _isPro() {
 function _proLockOverlay(title, subtitle) {
   return '<div style="position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgb(var(--panel-rgb) / .82);backdrop-filter:blur(6px);text-align:center;padding:24px">'
     + '<div style="font-size:1.8rem;margin-bottom:10px">🔒</div>'
-    + '<div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:.82rem;color:var(--tx);margin-bottom:6px">' + title + '</div>'
+    + '<div style="font-family:\'Chakra Petch\',sans-serif;font-weight:800;font-size:.82rem;color:var(--tx);margin-bottom:6px">' + title + '</div>'
     + '<div style="font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.6;max-width:260px;margin-bottom:16px">' + subtitle + '</div>'
-    + '<button onclick="showUpgrade(\'annual\')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:\'Syne\',sans-serif;font-weight:800;font-size:max(.6rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">Upgrade to Pro →</button>'
+    + '<button onclick="showUpgrade(\'annual\')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:\'Chakra Petch\',sans-serif;font-weight:800;font-size:max(.6rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">Upgrade to Pro →</button>'
     + '</div>';
 }
 

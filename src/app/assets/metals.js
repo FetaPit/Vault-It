@@ -108,7 +108,7 @@ function renderMetalsISO(){
   // Labels
   function mlabel(x,y,z,text,col,fs){
     var p3=mIso(x,y,z);
-    mE('text',{x:p3.x.toFixed(1),y:p3.y.toFixed(1),'font-size':fs||9,'font-family':'Syne,sans-serif','font-weight':'700',style:'fill:'+col,'text-anchor':'start','pointer-events':'none'},MS).textContent=text;
+    mE('text',{x:p3.x.toFixed(1),y:p3.y.toFixed(1),'font-size':fs||9,'font-family':'Chakra Petch,sans-serif','font-weight':'700',style:'fill:'+col,'text-anchor':'start','pointer-events':'none'},MS).textContent=text;
   }
   if(alState.metals.gold>0)      mlabel(-0.8,-0.8,GH+0.4,'GOLD: '+alState.metals.gold.toFixed(2)+' oz · 1oz bars','var(--gold)',8);
   if(alState.metals.silver>0)    mlabel(silverStartCol-0.5,-0.8,SH+0.4,'SILVER: '+alState.metals.silver.toFixed(2)+' oz · 1oz bars','var(--m-silver)',8);

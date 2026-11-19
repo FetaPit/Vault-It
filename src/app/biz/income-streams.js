@@ -109,7 +109,7 @@ function renderIncomeStreams(){
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
       +'<div>'
       +'<span style="font-size:1.1rem;margin-right:6px">'+(s.icon||_autoStreamIcon(s.name))+'</span>'
-      +'<span style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:max(.72rem,var(--vi-fs-3));color:var(--t1)">'+s.name+'</span>'
+      +'<span style="font-family:\'Chakra Petch\',sans-serif;font-weight:700;font-size:max(.72rem,var(--vi-fs-3));color:var(--t1)">'+s.name+'</span>'
       +'<span style="margin-left:8px;font-size:max(.5rem,var(--vi-fs-1));padding:2px 6px;border-radius:3px;background:rgb(var(--teal-rgb) / .15);color:var(--em);font-weight:700;letter-spacing:.08em">'+(_ISB_TYPES[s.type]||s.type).toUpperCase()+'</span>'
       +'</div>'
       +'<div style="display:flex;align-items:center;gap:10px">'

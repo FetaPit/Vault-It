@@ -91,7 +91,7 @@ function wrIcon(id,x,y,s){
   var ic=FIRE_ICONS[id]||(typeof BD_ICONS!=='undefined'&&BD_ICONS[id])||FIRE_ICONS.gem,pth=function(d){return '<path d="'+d+'"/>';};
   return '<g transform="translate('+x+' '+y+') scale('+(s/24).toFixed(3)+')"><g class="wt-icf">'+ic.f.map(pth).join('')+'</g><g class="wt-ics">'+ic.d.map(pth).join('')+'</g></g>';
 }
-// side name width in card units: Syne 800 at 12.5 px with 1 px letter spacing, measured per character. A name wider than the
+// side name width in card units: Chakra Petch 800 at 12.5 px with 1 px letter spacing, measured per character. A name wider than the
 // 76 units beside the medal is squeezed to fit below the card's top corner; one that fits keeps its width (owner, 9 Nov: "Yes, fix side names")
 function wrSideW(s){var W={' ':6,',':5,"'":5,'.':5.5,'-':8.5,'+':11,'I':6.5,'1':7.5,'L':13,'J':13.5,'5':13.5,'S':14,'2':14,'3':14,'7':14,'Y':14.5,'4':14.5,'8':14.5,'£':14.5,'F':15,'T':15,'6':15,'K':16,'Z':16,'R':16.5,'&':16.5,'H':17,'U':17,'%':17,'C':17.5,'D':17.5,'N':17.5,'O':17.5,'Q':17.5,'G':18,'M':21,'W':24.5},w=0;for(var i=0;i<s.length;i++)w+=W[s[i]]||15.5;return w;}
 function wrTok(o){

@@ -4,7 +4,7 @@
 .tab-btn[onclick*="budget"]{--ta:var(--blue)}
 #budget-badge{display:none;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-left:5px;box-shadow:0 0 8px var(--amber);vertical-align:middle}
 .bd-zero-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
-.bd-big{font-family:'Syne',sans-serif;font-size:clamp(1.3rem,3.2vw,2rem);font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.bd-big{font-family:var(--font-fig);font-size:clamp(1.3rem,3.2vw,2rem);font-weight:700;letter-spacing:-.01em;line-height:1.15}
 .bd-msg{font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);margin-top:6px;max-width:520px;line-height:1.55}
 .bd-stats{display:flex;gap:18px}
 .bd-stats label{display:block;font-family:'Share Tech Mono',monospace;font-size:max(.42rem,var(--vi-fs-1));color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
@@ -14,7 +14,7 @@
 .bd-assign{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));color:var(--t2)}
 .bd-picks{display:flex;flex-wrap:wrap;gap:6px}
 .bd-pick-lbl{font-family:'Share Tech Mono',monospace;font-size:max(.44rem,var(--vi-fs-1));letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin:12px 0 6px}
-.bd-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 6px;border-radius:99px;cursor:pointer;background:transparent;border:1px solid color-mix(in srgb,var(--c) 40%,transparent);color:var(--t2);font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;transition:background .15s,border-color .15s}
+.bd-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px 4px 6px;border-radius:99px;cursor:pointer;background:transparent;border:1px solid color-mix(in srgb,var(--c) 40%,transparent);color:var(--t2);font-family:'Chakra Petch',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;transition:background .15s,border-color .15s}
 .bd-chip:hover{background:color-mix(in srgb,var(--c) 14%,transparent)}
 .bd-chip.on{background:color-mix(in srgb,var(--c) 20%,transparent);border-color:var(--c);color:var(--tx)}
 .bd-row{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid rgb(var(--ink-rgb) / .05)}
@@ -24,7 +24,7 @@ button.bd-ic{cursor:pointer}
 .bd-cat{display:block;font-size:max(.44rem,var(--vi-fs-1));color:var(--t3)}
 .bd-amt{font-family:'Share Tech Mono',monospace;font-size:max(.66rem,var(--vi-fs-2));font-weight:700;white-space:nowrap}
 .bd-amt em{font-style:normal;font-weight:400;color:var(--t3);font-size:max(.46rem,var(--vi-fs-1));margin-left:2px}
-.bd-grp{display:flex;justify-content:space-between;margin:12px 0 2px;padding-left:8px;border-left:3px solid var(--c);font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-0));font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
+.bd-grp{display:flex;justify-content:space-between;margin:12px 0 2px;padding-left:8px;border-left:3px solid var(--c);font-family:'Chakra Petch',sans-serif;font-size:max(.5rem,var(--vi-fs-0));font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
 .bd-grp span:last-child{font-family:'Share Tech Mono',monospace;font-weight:400;color:var(--t2);letter-spacing:0}
 .bd-grp:first-child{margin-top:0}
 .bd-empty{font-size:max(.58rem,var(--vi-fs-2));color:var(--t3);padding:10px 0;line-height:1.5}
@@ -60,7 +60,7 @@ button.bd-ic{cursor:pointer}
 .bd-x{margin-left:2px;padding:0 3px;border-radius:50%;color:var(--t3);font-size:max(.7rem,var(--vi-fs-3));line-height:1}
 .bd-x:hover{color:var(--red)}
 .bd-new{margin-top:10px;padding:12px;border:1px dashed rgb(var(--blue-rgb) / .4);border-radius:10px;background:rgb(var(--blue-rgb) / .04)}
-.bd-new-t{font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-2));font-weight:800;color:var(--blue);margin-bottom:8px}
+.bd-new-t{font-family:'Chakra Petch',sans-serif;font-size:max(.6rem,var(--vi-fs-2));font-weight:800;color:var(--blue);margin-bottom:8px}
 .bd-new-row{display:flex;gap:8px;flex-wrap:wrap}
 .bd-new-row .al-inp{flex:1 1 150px;min-width:0}
 .bd-new-lbl{font-family:'Share Tech Mono',monospace;font-size:max(.44rem,var(--vi-fs-1));letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin:10px 0 6px}

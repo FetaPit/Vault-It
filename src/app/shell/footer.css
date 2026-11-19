@@ -46,7 +46,7 @@
 @media (prefers-reduced-motion: reduce) { #app-footer, #app-footer * { transition: none !important; } }
 body.reduced-motion #app-footer, body.reduced-motion #app-footer * { transition: none !important; }
 .footer-logo {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Chakra Petch', sans-serif;
   font-size: max(.48rem,var(--vi-fs-1));
   font-weight: 800;
   color: var(--em);

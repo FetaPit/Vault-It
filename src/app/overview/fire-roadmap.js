@@ -286,11 +286,11 @@ function renderFIREroadmap(){
     if(b<=a)return;
     if(pi>0&&sp.x0>=x0&&sp.x0<=x1)out+='<line class="fire-div" x1="'+sp.x0+'" y1="'+GT+'" x2="'+sp.x0+'" y2="'+H+'" stroke="'+sp.col+'" stroke-width="1.2" opacity="0.6" stroke-dasharray="4 3"/>';
     // C3 (owner, 4 Nov: "change to a wider version of the font and project the text for these stages across the ground plane in perspective"):
-    // the section name is painted on the ground: big Syne lettering, stretched wide, squashed in depth and leaning with the grid (fireSecTf).
+    // the section name is painted on the ground: big Chakra Petch lettering, stretched wide, squashed in depth and leaning with the grid (fireSecTf).
     // Follow-up (owner: "Test it too wide needs to be legible within a mobile screen , drop opacity to 70%"): 70% opacity; fireFitLabels
     // shrinks a word wider than the view, and fireDividers keeps it under the middle of the view while its section is there
     var scx=(a+b)/2,sby=H-15,vx0=SC.scrollLeft+containerW/2;
-    out+='<text class="fire-sec" data-x0="'+sp.x0+'" data-x1="'+sp.x1+'" data-x="'+scx+'" data-y="'+sby+'" x="'+scx+'" y="'+sby+'" transform="'+fireSecTf(scx,sby,vx0)+'" text-anchor="middle" font-size="26" font-family="Syne,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="0.7" letter-spacing="8">'+sp.label+(sp.done?' ✓':'')+'</text>';
+    out+='<text class="fire-sec" data-x0="'+sp.x0+'" data-x1="'+sp.x1+'" data-x="'+scx+'" data-y="'+sby+'" x="'+scx+'" y="'+sby+'" transform="'+fireSecTf(scx,sby,vx0)+'" text-anchor="middle" font-size="26" font-family="Chakra Petch,sans-serif" font-weight="800" fill="'+sp.col+'" opacity="0.7" letter-spacing="8">'+sp.label+(sp.done?' ✓':'')+'</text>';
   });
   var tokW=function(k){return k===nextIdx?80:64;},coinR=function(k){return tokW(k)/2;};   // card widths (owner, 3 Nov round 3: "larger"): 80 px for the stage to work on, 64 px for the rest
   // the path on the ground: solid up to the last passed stage, dashed beyond, running between the light pads (owner, 31 Oct)
@@ -318,7 +318,7 @@ function renderFIREroadmap(){
     out+='<g class="fire-card"><g transform="translate('+(cx-W/2)+' '+top.toFixed(1)+') scale('+(W/100).toFixed(3)+')">'+wrTok({tier:WR_LOOK_TIER[look],st:stt,bars:sts.length,lit:lit,ic:WR_STAGE_IC[s.key]||s.ic,r:NODE_R,px:W,sc:W/100,chip:stt==='next'||stt==='todo'?'':stt,ol:secCol,grey:stt==='wait'})+'</g></g>';   // C2 (owner, 4 Nov ~12:40): "only grey out ones that have not been achieved yet": achieved in full colour; locked and not-yet slates use the grey card art, a met-but-waiting one a 35% wash
     // the name sits under the card, in the air above the ground (owner, 3 Nov: not on the card at this size)
     /* C2 (owner, 4 Nov ~12:40: "The text underneath need to have more breathing space so move it down ... and treat it as a label with a
-       bounding box with attached font"): the name is a boxed label in the Next goals heading style (Syne bold, light on panel), on one row
+       bounding box with attached font"): the name is a boxed label in the Next goals heading style (Chakra Petch bold, light on panel), on one row
        16 px under the standard slates, edged in the section colour. fireFitLabels sizes each box to its text once drawn */
     var LY=GY-60+16,lw=Math.min(FIRE_LBL_MAX,s.name.length*7)+14;
     out+='<g class="fire-lbl s-'+stt+'"'+click+'><rect x="'+(cx-lw/2).toFixed(1)+'" y="'+LY+'" width="'+lw.toFixed(1)+'" height="20" style="stroke:'+secCol+'"/>'
@@ -365,7 +365,7 @@ function fireFitLabels(svg){
     var cx=+t.getAttribute('x');r.setAttribute('x',(cx-w/2-7).toFixed(1));r.setAttribute('width',(w+14).toFixed(1));
   });
 }
-if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){var s=document.getElementById('fire-roadmap-svg');if(s)fireFitLabels(s);});   // Syne arrives after the first drawing
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){var s=document.getElementById('fire-roadmap-svg');if(s)fireFitLabels(s);});   // Chakra Petch arrives after the first drawing
 function fireGroundX(x,y,vx){return vx+(x-vx)*(1+(FIRE_GF-1)*y/FIRE_GH);}   // where a point x on the far edge sits at depth y
 function fireGround(){
   var g=document.getElementById('fire-ground'),SC=document.getElementById('fire-timeline-scroll');if(!g||!SC)return;
@@ -522,7 +522,7 @@ function fireShowDetail(idx,opts){
     return '<li class="'+(x.met?'ok':cur?'cur':'')+'"><span class="wr-sdot" aria-hidden="true"></span><span class="wr-slbl">'+x.lbl+(x.met?'<span class="vh"> (done)</span>':'')+'</span><span class="wr-sxp">'+(got?'+'+dPer+' XP earned':'+'+dPer+' XP')+'</span></li>';}).join('')+'</ol>';
   inner.innerHTML=viDay('<div class="wr-dtok">'+wrTokSvg({tier:WR_LOOK_TIER[look],st:dSt,bars:dSteps.length,lit:dLit,ic:WR_STAGE_IC[s.key]||s.ic,chip:dSt==='next'||dSt==='todo'?'':dSt,tl:seq||null,name:s.name,ol:ph.col},window.innerWidth<=480?116:140,(s.bonus?'Achievement, ':'Stage '+seq+', ')+s.name)+'</div>'
     +'<div style="flex:1;min-width:0">'
-    +'<div style="font-family:\'Syne\',sans-serif;font-size:max(.74rem,var(--vi-fs-3));font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="white-space:nowrap;display:inline-block;font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+state_+'</span></div>'
+    +'<div style="font-family:\'Chakra Petch\',sans-serif;font-size:max(.74rem,var(--vi-fs-3));font-weight:800;color:'+col+';margin-bottom:3px">'+s.name+' <span style="white-space:nowrap;display:inline-block;font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));font-weight:700;letter-spacing:.12em;color:'+stCol+';border:1px solid '+stCol+'66;padding:1px 6px;margin-left:6px;vertical-align:middle">'+state_+'</span></div>'
     +'<div style="font-family:\'Share Tech Mono\',monospace;font-size:max(.42rem,var(--vi-fs-1));color:var(--t2);letter-spacing:.1em;margin-bottom:4px">'+ph.label+' PHASE · '+(s.bonus?'ACHIEVEMENT':'STEP '+seq+' OF '+(S.spineLen||30))+'</div>'
     +'<div style="font-family:\'DM Sans\',sans-serif;font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.5">'+long+'</div>'
     +progTxt+stepsHtml+need+ticks+btn+'</div>');

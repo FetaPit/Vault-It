@@ -22,10 +22,10 @@
 @media (prefers-reduced-motion:reduce){.cf-rail .cf-thumb{transition:none}}
 html[data-theme="light"] .cf-chip{--teal:#44C0B9;--green:#3ECF8E;--green2:#3FB585;--coral:#E5535F;--salmon:#FFA38A;--amber:#F59E0B;--yellow:#F5DC4A}
 html[data-theme="light"] .cf-chip rect{fill-opacity:1}   /* solid black in Daylight so the paper does not show through (AA for the coral amounts); the chips stay black in Daylight, so their text keeps the Night colours */
-.cf-sub{font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:800;letter-spacing:.16em;color:var(--t3);margin:14px 0 6px}
+.cf-sub{font-family:'Chakra Petch',sans-serif;font-size:max(.52rem,var(--vi-fs-1));font-weight:800;letter-spacing:.16em;color:var(--t3);margin:14px 0 6px}
 .cf-empty{padding:34px 12px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:max(.6rem,var(--vi-fs-2));color:var(--t3)}
 .cf-presets{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
-.cf-chip{font-family:'Syne',sans-serif;font-size:max(.46rem,var(--vi-fs-1));font-weight:700;padding:3px 8px;border-radius:99px;cursor:pointer;background:transparent;border:1px solid;letter-spacing:.03em;transition:background .15s}
+.cf-chip{font-family:'Chakra Petch',sans-serif;font-size:max(.46rem,var(--vi-fs-1));font-weight:700;padding:3px 8px;border-radius:99px;cursor:pointer;background:transparent;border:1px solid;letter-spacing:.03em;transition:background .15s}
 .cf-chip:hover{background:rgb(var(--ink-rgb) / .07)}
 .cf-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;cursor:pointer;border:0;padding:0;box-shadow:0 0 0 2px rgba(255,255,255,.06)}
 .cf-row{display:flex;align-items:center;gap:8px}

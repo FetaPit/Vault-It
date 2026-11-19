@@ -483,7 +483,7 @@ function renderHabitTracker(){
     // Year label
     html+='<div class="hc-year">';   // one group per year: a plain row on desktop, a wrapping block on a phone (see house-verbatim.css)
     html+='<div class="hc-ylbl" style="display:flex;flex-direction:column;align-items:center;margin-right:4px;flex-shrink:0">'
-      +'<span style="font-size:var(--hy,.4rem);font-weight:700;letter-spacing:.08em;color:var(--em);font-family:\'Syne\',sans-serif;writing-mode:horizontal-tb;white-space:nowrap">'+yr+'</span>'
+      +'<span style="font-size:var(--hy,.4rem);font-weight:700;letter-spacing:.08em;color:var(--em);font-family:\'Chakra Petch\',sans-serif;writing-mode:horizontal-tb;white-space:nowrap">'+yr+'</span>'
       +'</div>';
 
     for(var p=0;p<periods.length;p++){

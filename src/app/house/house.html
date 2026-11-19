@@ -33,8 +33,8 @@
 <!-- VERBATIM house-tracker.html content starts here -->
 <div class="wrap" style="max-width:1140px;margin:0 auto;padding:0 20px">
   <header style="text-align:center;margin-bottom:44px">
-    <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-0));letter-spacing:.35em;text-transform:uppercase;color:var(--teal);opacity:.65;margin-bottom:8px" class="vi-eyebrow">Vault-It · House Builder</div>
-    <h1 style="font-family:'Syne',sans-serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:800;color:var(--text);letter-spacing:-.02em">Build Your <span style="color:var(--teal)">Dream Home</span></h1>
+    <div style="font-family:'Chakra Petch',sans-serif;font-size:max(.52rem,var(--vi-fs-0));letter-spacing:.35em;text-transform:uppercase;color:var(--teal);opacity:.65;margin-bottom:8px" class="vi-eyebrow">Vault-It · House Builder</div>
+    <h1 style="font-family:'Chakra Petch',sans-serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:800;color:var(--text);letter-spacing:-.02em">Build Your <span style="color:var(--teal)">Dream Home</span></h1>
     <div style="font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));color:#5a8888;opacity:.7;margin-top:5px;letter-spacing:.08em" class="vi-eyebrow vi-sub">Every pound saved builds your future</div>
   </header>
   <div id="hb-levels" class="hb-levels"></div>
@@ -47,9 +47,9 @@
 
         <div id="house-pro-lock" style="position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgb(var(--panel-rgb) / .82);backdrop-filter:blur(6px);text-align:center;padding:24px">
           <div style="font-size:1.8rem;margin-bottom:10px">🔒</div>
-          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--tx);margin-bottom:6px">Your house fills as you save</div>
+          <div style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:.82rem;color:var(--tx);margin-bottom:6px">Your house fills as you save</div>
           <div style="font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.6;max-width:260px;margin-bottom:16px">Every deposit adds bricks. Watch your home being built in real time. Pro only.</div>
-          <button onclick="showUpgrade('annual')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Syne',sans-serif;font-weight:800;font-size:max(.6rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">Upgrade to Pro →</button>
+          <button onclick="showUpgrade('annual')" style="padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:max(.6rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">Upgrade to Pro →</button>
         </div>
         <!-- Left-edge collapsible guide -->
         <div class="vp-guide" id="vp-guide-house">
@@ -108,14 +108,14 @@
       <!-- House Purchased CTA — shown when deposit goal reached -->
       <div id="house-purchased-banner" style="display:none;text-align:center;padding:16px 20px;background:linear-gradient(135deg,rgb(var(--brass-rgb) / .12),rgb(var(--teal-rgb) / .06));border:1px solid rgb(var(--brass-rgb) / .3);border-radius:10px;margin-top:12px">
         <div style="font-size:1.3rem;margin-bottom:5px">🎉</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:max(.72rem,var(--vi-fs-3));color:var(--brass);letter-spacing:.06em;margin-bottom:4px">Deposit Goal Reached!</div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:max(.72rem,var(--vi-fs-3));color:var(--brass);letter-spacing:.06em;margin-bottom:4px">Deposit Goal Reached!</div>
         <div style="font-size:max(.5rem,var(--vi-fs-1));color:rgb(var(--ink-rgb) / .45);margin-bottom:12px;line-height:1.5">Your house is fully funded. Time to make it official.</div>
-        <button onclick="markHousePurchased()" style="padding:10px 26px;background:linear-gradient(135deg,var(--brass),#e0bb6a);border:none;border-radius:8px;color:#04090f;font-family:'Syne',sans-serif;font-weight:800;font-size:max(.62rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">House Purchased →</button>
+        <button onclick="markHousePurchased()" style="padding:10px 26px;background:linear-gradient(135deg,var(--brass),#e0bb6a);border:none;border-radius:8px;color:#04090f;font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:max(.62rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">House Purchased →</button>
       </div>
       <!-- Mortgage complete banner — shown when mortgage is paid off -->
       <div id="house-mortgage-complete" style="display:none;text-align:center;padding:16px 20px;background:linear-gradient(135deg,rgb(var(--teal-rgb) / .12),rgb(var(--brass-rgb) / .06));border:1px solid rgb(var(--teal-rgb) / .35);border-radius:10px;margin-top:12px">
         <div style="font-size:1.3rem;margin-bottom:5px">🏠</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:max(.72rem,var(--vi-fs-3));color:var(--teal);letter-spacing:.06em;margin-bottom:4px">Mortgage Free!</div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:max(.72rem,var(--vi-fs-3));color:var(--teal);letter-spacing:.06em;margin-bottom:4px">Mortgage Free!</div>
         <div style="font-size:max(.5rem,var(--vi-fs-1));color:rgb(var(--ink-rgb) / .45);line-height:1.5">Your home is truly yours: debt free and fully owned.</div>
       </div>
     </div>
@@ -135,7 +135,7 @@
         </div>
         <!-- Floor selector for flat/apartment -->
         <div id="floor-selector-card" style="display:none;margin-top:10px;padding:10px 12px;background:rgb(var(--teal-rgb) / .05);border:1px solid rgb(var(--teal-rgb) / .18);border-radius:8px">
-          <div style="font-family:'Syne',sans-serif;font-size:max(.52rem,var(--vi-fs-0));font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--em);margin-bottom:8px">Your Floor</div>
+          <div style="font-family:'Chakra Petch',sans-serif;font-size:max(.52rem,var(--vi-fs-0));font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--em);margin-bottom:8px">Your Floor</div>
           <div style="display:flex;align-items:center;gap:10px">
             <input type="range" id="floor-slider" min="1" max="10" value="5" oninput="setApartmentFloor(this.value)" style="flex:1;accent-color:var(--em)">
             <span id="floor-display" style="font-family:'Share Tech Mono',monospace;font-size:max(.72rem,var(--vi-fs-3));color:var(--em);min-width:58px;font-weight:700">Floor 5</span>
@@ -152,9 +152,9 @@
     <div class="card hb-hist" id="hb-hist" data-adv>
       <div class="card-lbl">History</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-        <div style="font-family:'Syne',sans-serif;font-size:max(.62rem,var(--vi-fs-0));font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--em)">Contribution Streak</div>
+        <div style="font-family:'Chakra Petch',sans-serif;font-size:max(.62rem,var(--vi-fs-0));font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--em)">Contribution Streak</div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <button id="habit-mode-btn" onclick="toggleHabitMode()" style="font-size:max(.52rem,var(--vi-fs-1));padding:3px 10px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:4px;color:var(--em);cursor:pointer;font-family:'Syne',sans-serif;font-weight:700">Monthly</button>
+          <button id="habit-mode-btn" onclick="toggleHabitMode()" style="font-size:max(.52rem,var(--vi-fs-1));padding:3px 10px;background:rgb(var(--teal-rgb) / .12);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:4px;color:var(--em);cursor:pointer;font-family:'Chakra Petch',sans-serif;font-weight:700">Monthly</button>
           <span style="font-size:max(.46rem,var(--vi-fs-1));color:var(--t3);font-family:'Share Tech Mono',monospace">From:</span>
           <select id="habit-year-sel" onchange="renderHabitTracker()" style="font-size:max(.52rem,var(--vi-fs-1));padding:3px 8px;background:rgb(var(--teal-rgb) / .08);border:1px solid rgb(var(--teal-rgb) / .25);border-radius:4px;color:var(--em);cursor:pointer;font-family:'Share Tech Mono',monospace"></select>
         </div>

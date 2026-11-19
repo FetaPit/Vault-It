@@ -329,7 +329,7 @@ function v3StackTex(spec,n){var S=512,H=S/2,c=document.createElement('canvas');c
   if(word){g.save();g.font='bold 19px "DM Sans", sans-serif';g.textAlign='center';g.textBaseline='middle';var rr=spec.inner?R*0.76:R*0.7,step=0.105,a0=Math.PI/2+(word.length-1)*step/2;
     for(var w=0;w<word.length;w++){var a=a0-w*step;g.save();g.translate(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);g.rotate(a-Math.PI/2);
       g.fillStyle='rgba(255,250,230,.45)';g.fillText(word[w],-0.8,-0.8);g.fillStyle='rgba(40,28,6,.6)';g.fillText(word[w],0.8,0.8);g.restore();}g.restore();}
-  g.font='bold '+(spec.inner?86:104)+'px Syne, sans-serif';g.textAlign='center';g.textBaseline='middle';var sy=cy+(spec.inner?2:-6);
+  g.font='bold '+(spec.inner?86:104)+'px Chakra Petch, sans-serif';g.textAlign='center';g.textBaseline='middle';var sy=cy+(spec.inner?2:-6);
   g.fillStyle='rgba(30,20,4,.55)';g.fillText(spec.sym,cx+2.5,sy+3);g.fillStyle='rgba(255,252,236,.6)';g.fillText(spec.sym,cx-2,sy-2);   // the symbol in relief: lit from the top left
   g.fillStyle=ic?v3Lift(ic,.15):hi;g.fillText(spec.sym,cx,sy);
   var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;}
