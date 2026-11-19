@@ -59,7 +59,7 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
   ok(await page.evaluate(() => !!document.querySelector('label[for=email]')), 'the email field has a label');
   ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scrolling on a phone');
   // brand pass (30 Oct 2026): tagline, brick wordmark, tokens, the 3D house standing complete, Daylight toggle
-  ok((await page.textContent('h1')).replace(/\s+/g, ' ').trim() === 'Get out of the Red and into your home.' && await page.evaluate(() => { const e = document.querySelector('h1 em.pulse'); return !!e && getComputedStyle(e).animationName === 'homepulse'; }), 'the hero carries the brand tagline, capital Red, pulsing teal home');
+  ok((await page.textContent('h1')).replace(/\s+/g, ' ').trim() === 'Get out of the red and into your home.' && await page.evaluate(() => { const e = document.querySelector('h1 em.pulse'); return !!e && getComputedStyle(e).animationName === 'homepulse'; }), 'the hero carries the brand tagline, solid red, teal into your, gold pulsing home');
   ok(await page.evaluate(() => !!document.querySelector('header .wm .dot') && !/·|-/.test(document.querySelector('header .wm').textContent) && !!document.querySelector('header .mark')), 'wordmark draws the hyphen as the brick (no middle dot) next to the mark');
   ok(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--teal').trim().toUpperCase() === '#44C0B9' && getComputedStyle(document.body).backgroundColor === 'rgb(8, 8, 8)' && /Share Tech Mono/.test(getComputedStyle(document.getElementById('heroStatus')).fontFamily)), 'brand tokens: Night page, teal, mono statusline');
   await page.evaluate(() => document.getElementById('heroStage').scrollIntoView());   // the stage only renders while on screen
@@ -72,7 +72,7 @@ const FN = 'https://legpubblzgknxdtvsant.supabase.co/functions/v1/waitlist-join'
   const nw1 = await page.evaluate(() => viNW.totals());
   ok(nw0.net < 0 && nw0.debt === 7400 && nw1.debt < nw0.debt && /red|worth/i.test(await page.textContent('#nwMsg')), 'the net worth speed run starts in the red (debt £' + nw0.debt + ', net £' + nw0.net + ') and pays it down on screen (debt now £' + nw1.debt + ')');
   await page.click('#themeBtn'); await page.waitForTimeout(250);
-  ok(await page.evaluate(() => document.documentElement.getAttribute('data-theme') === 'light' && localStorage.getItem('vi-theme') === 'light' && getComputedStyle(document.body).backgroundColor === 'rgb(243, 247, 246)' && document.querySelector('meta[name=theme-color]').content === '#F3F7F6'), 'Daylight toggle applies, persists and recolours the browser chrome');
+  ok(await page.evaluate(() => document.documentElement.getAttribute('data-theme') === 'light' && localStorage.getItem('vi-theme') === 'light' && getComputedStyle(document.body).backgroundColor === 'rgb(211, 204, 180)' && document.querySelector('meta[name=theme-color]').content === '#D3CCB4'), 'Daylight toggle applies, persists and recolours the browser chrome');
   ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'no sideways scrolling in Daylight either');
   await page.click('#themeBtn'); await page.waitForTimeout(100);
   ok(await page.evaluate(async () => { for (const i of document.images) { i.loading = 'eager'; if (!i.complete) await new Promise((r) => { i.onload = i.onerror = r; }); } return [...document.images].every((i) => i.naturalWidth > 0); }), 'every image loads');
