@@ -89,20 +89,24 @@
 #hbt-stats .hb-stx4>div{padding:7px 8px}
 /* R12: the six house types as roadmap slates */
 .hbt-types{grid-template-columns:repeat(3,minmax(0,1fr))}
-.hbt-types .hbtn,.w-ht{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;min-height:44px;padding:10px 4px 8px;border:1px solid rgb(var(--teal-rgb) / .16);border-radius:10px;background:rgb(var(--panel-rgb) / .5);color:var(--t2);font-family:'Syne',sans-serif;line-height:1.3;cursor:pointer;text-align:center}
-.hbt-types .hbtn .ico,.w-ht .ico{display:block;width:64px;height:auto;margin:0 0 2px}
+/* no card round a house type: the round medallion (or the welcome's 3D circle) is the whole tile, the name under it (owner, 14 Nov: "Remove the
+   card from the outside and just focus on the circle"; 19 Nov: "make the circle the whole design remove the outer card"). The picked one is ringed on its circle. */
+.hbt-types .hbtn,.w-ht{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;min-height:44px;padding:6px 2px 6px;border:0;border-radius:10px;background:none;box-shadow:none;color:var(--t2);font-family:'Syne',sans-serif;line-height:1.3;cursor:pointer;text-align:center}
+.hbt-types .hbtn .ico,.w-ht .ico{display:block;width:64px;height:auto;margin:0 0 4px;border-radius:50%;transition:box-shadow .18s}
+.hbt-types .hbtn .ico{aspect-ratio:1/1;line-height:0}.hbt-types .hbtn .ico svg{display:block}
 .w-ht .ico{width:52px}
 .hbt-types .hbtn .ico svg,.w-ht .ico svg{width:100%;height:auto}
 .hbt-types .hbtn .nm,.w-ht .nm{font-size:12.5px;font-weight:700;color:var(--text);overflow-wrap:anywhere}
 .hbt-types .hbtn .pr{opacity:1;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--brass)}
-.hbt-types .hbtn:hover,.w-ht:hover{border-color:rgb(var(--teal-rgb) / .5);background:rgb(var(--teal-rgb) / .06)}
-.hbt-types .hbtn.active,.w-ht.on{border-color:var(--teal);background:rgb(var(--teal-rgb) / .1);box-shadow:inset 0 0 0 1px var(--teal)}
+.hbt-types .hbtn:hover,.w-ht:hover,.hbt-types .hbtn.active,.w-ht.on{background:none;box-shadow:none}
+@media(hover:hover){.hbt-types .hbtn:hover .ico,.w-ht:hover .ico{box-shadow:0 0 0 2px rgb(var(--teal-rgb) / .4)}}
+.hbt-types .hbtn.active .ico,.w-ht.on .ico{box-shadow:0 0 0 2px var(--teal)}
 .hbt-types .hbtn.active .nm,.w-ht.on .nm{color:var(--teal)}
 .w-ht-pick{grid-column:1/-1}
 .w-ht-lbl{margin-bottom:6px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t2)}
 .w-htypes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .w-ht-note{margin-top:6px;font-size:12px;line-height:1.5;color:var(--t2)}
-@media(prefers-reduced-motion:reduce){.hbt-types .hbtn,.w-ht,.hbt-chip{transition:none}}
+@media(prefers-reduced-motion:reduce){.hbt-types .hbtn,.w-ht,.hbt-chip,.hbt-types .hbtn .ico,.w-ht .ico{transition:none}}
 .price-edit-row{display:flex;align-items:center;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid rgb(var(--ink-rgb) / .06)}
 .price-edit-row label{font-size:max(.52rem,var(--vi-fs-1));letter-spacing:.15em;text-transform:uppercase;color:#D4C5A9;opacity:.5;white-space:nowrap}
 .price-iw{display:flex;align-items:center;background:rgb(var(--ink-rgb) / .05);border:1px solid rgb(var(--ink-rgb) / .1);border-radius:3px;overflow:hidden;flex:1;transition:border-color .2s}

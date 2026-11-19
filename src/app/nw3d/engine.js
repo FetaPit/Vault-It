@@ -102,6 +102,15 @@ function ground(c,P,st,halfX,z0,z1,red,ts,rm,spacing){
     c.beginPath();c.moveTo(rq[0][0],rq[0][1]);for(i=1;i<4;i++)c.lineTo(rq[i][0],rq[i][1]);c.closePath();c.strokeStyle=rgba(CS,(1-pg)*.45);c.lineWidth=1.4;c.stroke()}
   return CS;
 }
+/* a full-screen overlay in front (sign-in, or the welcome with its house selector): the scenes behind it hold still and draw again when it
+   closes (owner, 19 Nov 2026: "the house selector dialogue box also slows the tool down"; at 6x CPU the Overview scene drew 23 frames a
+   second under the selector). Read at most every 250 ms; an observer on the two overlays wakes the scenes at once when they close. */
+var COVER={at:-1e9,on:false,ss:[],mo:false};
+function coverRead(){var ids=['login-overlay','welcome-overlay'];for(var i=0;i<ids.length;i++){var e=document.getElementById(ids[i]);if(e&&e.style.display!=='none'&&getComputedStyle(e).display!=='none')return true}return false}
+function covered(){var now=performance.now();if(now-COVER.at>250){COVER.at=now;COVER.on=coverRead()}
+  if(!COVER.mo&&typeof MutationObserver!=='undefined'){COVER.mo=true;try{var mo=new MutationObserver(function(){var was=COVER.on;COVER.at=performance.now();COVER.on=coverRead();if(was&&!COVER.on)COVER.ss.forEach(function(S){S.kick()})});
+    ['login-overlay','welcome-overlay'].forEach(function(id){var e=document.getElementById(id);if(e)mo.observe(e,{attributes:true,attributeFilter:['style','class']})})}catch(e){}}
+  return COVER.on}
 function stage(cv,o,draw){
   /* sizing, pixel ratio cap, visible-only rendering, frame cap: shared by both scenes */
   var c=cv.getContext("2d"),S={c:c,cw:300,ch:200,dpr:1,vis:false,mid:false,raf:0,last:0};
@@ -109,7 +118,8 @@ function stage(cv,o,draw){
   function size(){var r=cv.getBoundingClientRect();S.cw=Math.max(2,r.width);S.ch=Math.max(2,r.height);S.dpr=Math.max(1,Math.min(window.innerWidth<700?1.5:2,window.devicePixelRatio||1,Math.sqrt(1.6e6/(S.cw*S.ch)),LITE?1.25:9));cv.width=Math.round(S.cw*S.dpr);cv.height=Math.round(S.ch*S.dpr);S.kick()}
   /* 'mid': the canvas is about half on screen (a tall one, half the screen); once true it stays true. Intros start on it, not at the first pixel (owner, 2 Nov) */
   function midNow(){var r=cv.getBoundingClientRect(),vh=window.innerHeight||0,seen=Math.min(r.bottom,vh)-Math.max(r.top,0);return r.height>2&&seen>=Math.min(.55*r.height,.55*vh)}
-  function frame(ts){S.raf=0;if(!S.vis||document.hidden)return;if(!S.mid&&midNow())S.mid=true;var fps=LITE?30:(o.fps||30);if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
+  function frame(ts){S.raf=0;if(!S.vis||document.hidden)return;
+    if(covered()){clearTimeout(S.cto);S.cto=setTimeout(S.kick,700);return}   /* under the sign-in or the welcome: no drawing; look again in 0.7 s (the observer wakes it sooner) */if(!S.mid&&midNow())S.mid=true;var fps=LITE?30:(o.fps||30);if(S.last&&ts-S.last<1000/fps-2){S.raf=requestAnimationFrame(frame);return}
     var dt=Math.min(.05,(ts-(S.last||ts))/1000);S.last=ts;c.setTransform(S.dpr,0,0,S.dpr,0,0);c.clearRect(0,0,S.cw,S.ch);var t0=performance.now();draw(ts,dt,S);
     var cost=performance.now()-t0;S.ema=S.ema==null?cost:S.ema*.85+cost*.15;S.n=(S.n||0)+1;if(!LITE&&S.n>12&&S.ema>16){LITE=true;size()}   // frames over ~16 ms of drawing: go lite for good
     if(!S.raf)S.raf=requestAnimationFrame(frame)}   // size() may already have queued the next frame: never run two loops
@@ -119,7 +129,7 @@ function stage(cv,o,draw){
   S.kick=function(){if(!S.vis&&onScreen()){S.vis=true;if(o.onShow)o.onShow()}if(S.vis&&!S.raf){S.last=0;S.raf=requestAnimationFrame(frame)}};
   if("ResizeObserver" in window)new ResizeObserver(size).observe(cv);else window.addEventListener("resize",size);
   if("IntersectionObserver" in window)new IntersectionObserver(function(es){var was=S.vis;S.vis=es[es.length-1].isIntersecting;if(!S.mid&&midNow())S.mid=true;if(S.vis&&!was&&o.onShow)o.onShow();S.kick()},{threshold:[.01,.3,.55,.8]}).observe(cv);else{S.vis=true}
-  document.addEventListener("visibilitychange",S.kick);
+  document.addEventListener("visibilitychange",S.kick);COVER.ss.push(S);
   size();return S;
 }
 /* icons on the 3D labels (owner, 4 Nov 2026, v0.9.1 round 2 R2 and R9): the app's own category icons, drawn from the page's icon sprite into the canvas.

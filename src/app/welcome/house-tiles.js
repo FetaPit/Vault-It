@@ -71,6 +71,10 @@ function _wt3Measure() {   // the grid and each icon box, in CSS pixels relative
   var g = _wt3Host(); if (!g || !_wt3) return;
   var r = g.getBoundingClientRect(), rects = {};
   g.querySelectorAll('.w-ht').forEach(function (b) { var i = b.querySelector('.ico'); if (!i) return; var q = i.getBoundingClientRect(); rects[b.dataset.type] = { x: q.left - r.left, y: q.top - r.top, w: q.width, h: q.height }; });
+  // the icon boxes are circles (owner, 19 Nov): the one canvas shows only inside them, so no roof or chimney pokes past a circle's edge
+  var mk = Object.keys(rects).map(function (k) { var q = rects[k], rr = Math.min(q.w, q.h) / 2; return 'radial-gradient(circle ' + rr.toFixed(1) + 'px at ' + (q.x + q.w / 2).toFixed(1) + 'px ' + (q.y + q.h / 2).toFixed(1) + 'px,#000 ' + Math.max(0, rr - 1).toFixed(1) + 'px,transparent ' + rr.toFixed(1) + 'px)'; }).join(',');
+  var cs = _wt3.cv && _wt3.cv.style; if (cs && mk) { cs.webkitMaskImage = mk; cs.maskImage = mk; cs.webkitMaskRepeat = cs.maskRepeat = 'no-repeat'; }
+  Object.keys(rects).forEach(function (k) { var q = rects[k], d = Math.min(q.w, q.h) * 0.07; rects[k] = { x: q.x + d, y: q.y + d, w: q.w - 2 * d, h: q.h - 2 * d }; });   // each house drawn a little inside its circle, so its roof clears the rim
   var dpr = Math.min(window.innerWidth < 700 ? 1.5 : 2, window.devicePixelRatio || 1);
   if (r.width > 2 && r.height > 2) _wt3.send('rects', { w: Math.round(r.width), h: Math.round(r.height), dpr: dpr, rects: rects });
 }
