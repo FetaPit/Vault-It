@@ -5,6 +5,8 @@
 //   2  every trial card's terms line has "Free for 30 days" in gold (the sentence itself is unchanged)
 //   3  Yearly tab: gold border and gold text, filled gold when chosen; Monthly tab: teal border and teal text, filled teal when chosen
 //   4  no sideways scroll, no page errors
+//   7  less text (owner, 19 Nov: "cut down on text a little"): the line under the sub title and the "figures are safe" line are short; the full trial terms stay on every card
+//   8  Vaulter's first bullet reads "Full access to Vault-It base app"; the bullets are more distinct: body-colour text and a teal ringed tick ("Make the bullet points more distinct")
 //   5  the lead is a larger sub title in Chakra Petch (owner, 19 Nov 2026: "Make the 30 day free trial sentence a larger sub title in Chakra Petch")
 //   6  on every plan card the price sits top right in the card's top row, at its first size (1.7rem) with room around it, clear of the name (owner, 19 Nov: "Move the price top right of each tile", then "First size was right ... more breathing space")
 // Run: node tests/test_card_wall_trial_emphasis.js
@@ -42,11 +44,14 @@ const MOCK = (sess) => `
         const pr = c.querySelector('.wall-plan-price'), top = c.querySelector('.wall-plan-top'), name = c.querySelector('.wall-plan-name'), cr = c.getBoundingClientRect(), r = pr.getBoundingClientRect(), nr = name.getBoundingClientRect(), s = getComputedStyle(pr);
         return { tier: c.getAttribute('data-tier-card'), inTop: !!pr.closest('.wall-plan-top'), rightGap: Math.round(cr.right - r.right), topGap: Math.round(r.top - cr.top), clear: r.left >= nr.right - 1, inside: r.left >= cr.left && r.right <= cr.right + 1, size: parseFloat(s.fontSize), text: pr.textContent.replace(/\s+/g, ' ').trim() };
       });
-      return { fam: ls.fontFamily, size: parseFloat(ls.fontSize), body, isTitle: !!document.querySelector('#wall-lead .wall-lead-title'), weight: parseInt(ls.fontWeight, 10), title: parseFloat(getComputedStyle(document.querySelector('.wall-title')).fontSize), rem: parseFloat(getComputedStyle(document.documentElement).fontSize), cards };
+      const lis = [].map.call(document.querySelectorAll('#plan-wall .wall-plan-list li'), (li) => { const b = getComputedStyle(li, '::before'), c = getComputedStyle(li); return { text: li.textContent.trim(), color: c.color, tickBorder: b.borderTopColor, tickBw: parseFloat(b.borderTopWidth), tickW: parseFloat(b.width), tickRadius: b.borderTopLeftRadius }; });
+      const colv = (v) => { const e = document.createElement('i'); e.style.color = 'var(' + v + ')'; document.body.appendChild(e); const c = getComputedStyle(e).color; e.remove(); return c; };
+      const safe = document.querySelector('#plan-wall .wall-safe');
+      return { lis, textCol: colv('--text'), tealCol: colv('--teal'), safe: safe ? safe.textContent.replace(/\s+/g, ' ').trim() : '', fam: ls.fontFamily, size: parseFloat(ls.fontSize), body, isTitle: !!document.querySelector('#wall-lead .wall-lead-title'), weight: parseInt(ls.fontWeight, 10), title: parseFloat(getComputedStyle(document.querySelector('.wall-title')).fontSize), rem: parseFloat(getComputedStyle(document.documentElement).fontSize), cards };
     });
     const A = await grab(), LA = await layout();
     ok(A.hot === 'free for 30 days' && A.hotCol === A.gold, T + '1 the lead paragraph has "free for 30 days" in gold (' + A.hot + ' / ' + A.hotCol + ')');
-    ok(/not charged today/i.test(A.lead) && /first charged on day 31/.test(A.lead) && /Cancel (any time )?before then and you pay nothing/i.test(A.lead), T + '1 and says nothing is charged today, first charge on day 31, cancel before then and pay nothing (' + A.lead.slice(0, 120) + ')');
+    ok(/nothing is charged today/i.test(A.lead) && /Cancel any time before day 31 and you pay nothing/i.test(A.lead) && A.lead.length <= 140, T + '1 and says in few words that nothing is charged today and cancelling before day 31 costs nothing (' + A.lead.length + ' characters: ' + A.lead + ')');
     const tr = A.terms.filter((t) => /^Free for 30 days, then/.test(t.text));
     ok(tr.length >= 2 && tr.every((t) => t.hot === 'Free for 30 days' && t.col === A.gold), T + '2 every trial card has "Free for 30 days" in gold in its terms (' + tr.length + ' cards)');
     ok(A.year.pressed === 'true' && A.year.border === A.gold && parseFloat(A.year.bw) >= 1 && A.year.bg === A.gold, T + '3 Yearly (chosen): gold border, filled gold (' + A.year.border + ' / ' + A.year.bg + ')');
@@ -54,6 +59,10 @@ const MOCK = (sess) => `
     ok(/Chakra Petch/.test(LA.fam) && LA.isTitle && LA.size >= 18 && LA.size > LA.body + 2 && LA.weight >= 600 && LA.size < LA.title, T + '5 the free-trial sentence is a larger sub title in Chakra Petch, the lines under it body text (' + LA.fam.slice(0, 14) + ', ' + LA.size + 'px, weight ' + LA.weight + ', title ' + LA.title + 'px)');
     ok(LA.cards.length === 3 && LA.cards.every((c) => c.inTop && c.rightGap >= 0 && c.rightGap <= 24 && c.topGap >= 0 && c.topGap <= 40 && c.clear && c.inside), T + '6 each price is in the top row, top right of its card, clear of the name (' + LA.cards.map((c) => c.tier + ' gap ' + c.rightGap + '/' + c.topGap + (c.inTop ? '' : ' NOT IN TOP')).join(', ') + ')');
     ok(LA.cards.every((c) => Math.abs(c.size - 1.7 * LA.rem) < 0.6), T + '6 the price keeps its first size, 1.7rem (' + LA.cards.map((c) => c.size).join(', ') + 'px; ' + (1.7 * LA.rem).toFixed(1) + ' expected)');
+    ok(LA.safe.length > 0 && LA.safe.length <= 70 && /figures are safe/i.test(LA.safe) && /download/i.test(LA.safe), T + '7 the "figures are safe" line is short and still says they can be downloaded (' + LA.safe.length + ' characters: ' + LA.safe + ')');
+    const v1 = LA.lis.find((l) => /Vault-It base app|whole app/i.test(l.text));
+    ok(!!v1 && v1.text === 'Full access to Vault-It base app' && !LA.lis.some((l) => l.text === 'The whole app'), T + '8 the Vaulter bullet reads "Full access to Vault-It base app" (' + (v1 ? v1.text : 'none') + ')');
+    ok(LA.lis.length >= 8 && LA.lis.every((l) => l.color === LA.textCol && l.tickBw >= 1 && l.tickBorder === LA.tealCol && l.tickW >= 16 && l.tickRadius !== '0px'), T + '8 every bullet has body-colour text and a teal ringed round tick (' + LA.lis.length + ' bullets; text ' + (LA.lis[0] && LA.lis[0].color) + ', tick ' + (LA.lis[0] && LA.lis[0].tickW) + 'px, ring ' + (LA.lis[0] && LA.lis[0].tickBw) + 'px)');
     await p.click('.wall-bill-btn[data-bill="month"]'); await p.waitForTimeout(200);
     const LB = await layout();
     ok(LB.cards.every((c) => c.inTop && c.rightGap >= 0 && c.rightGap <= 24 && c.clear && c.inside), T + '6 the same with the monthly cards (' + LB.cards.map((c) => c.text.slice(0, 16)).join(' | ') + ')');
