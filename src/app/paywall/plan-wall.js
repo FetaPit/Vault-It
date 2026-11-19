@@ -152,9 +152,9 @@ function viWallPaint() {
   try { viPricePaint(); } catch (e) {}   // names, prices, terms and buttons, all from VI_PLANS
   try {
     var lead = document.getElementById('wall-lead'), M = VI_PLANS.vaulter_month;
-    if (lead) lead.textContent = (viPlanTrial('vaulter_month') && viPlanTrial('vaulter_year') && viPlanTrial('pioneer_month') && viPlanTrial('pioneer_year'))
-      ? 'Vaulter and Pioneer are free for ' + M.trialDays + ' days. Your card is taken at checkout and first charged on day ' + (M.trialDays + 1) + '. Cancel before then and you pay nothing.'
-      : 'Every plan opens the whole app. You pay at checkout.';
+    if (lead) { var trial = (viPlanTrial('vaulter_month') && viPlanTrial('vaulter_year') && viPlanTrial('pioneer_month') && viPlanTrial('pioneer_year'));
+      if (trial) lead.innerHTML = 'Vaulter and Pioneer are <span class="vi-trial">free for ' + M.trialDays + ' days</span>. You are not charged today. Your card is taken at checkout and first charged on day ' + (M.trialDays + 1) + '. Cancel any time before then and you pay nothing.';
+      else lead.textContent = 'Every plan opens the whole app. You pay at checkout.'; }
     var keep = document.getElementById('wall-keep');
     if (keep) { keep.textContent = VI_BETA_OPEN ? 'You keep your discounted first movers’ price forever while you stay subscribed. Beta prices are open until ' + VI_BETA_ENDS_ON + '.' : ''; keep.style.display = VI_BETA_OPEN ? '' : 'none'; }
     var who = document.getElementById('wall-who'), s = JSON.parse(localStorage.getItem('vi_session') || 'null');

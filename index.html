@@ -13039,10 +13039,15 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
 .wall-title{font-family:var(--font-display);font-weight:700;font-size:clamp(1.5rem,4.4vw,2.15rem);line-height:1.15;letter-spacing:-.01em;margin:0 0 12px;color:var(--text)}
 .wall-lead{font-size:15px;line-height:1.55;color:var(--text);max-width:64ch;margin:0 0 8px}
 .wall-safe{font-size:14px;line-height:1.55;color:var(--muted);max-width:64ch;margin:0 0 20px}
-.wall-bill{display:inline-flex;gap:0;margin:0 0 14px;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
-.wall-bill-btn{min-height:44px;min-width:104px;padding:8px 18px;background:transparent;border:0;color:var(--muted);font-family:var(--font-display);font-weight:700;font-size:15px;cursor:pointer}
-.wall-bill-btn[aria-pressed="true"]{background:var(--teal);color:var(--on-teal)}
-.wall-bill-btn:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.wall-bill{display:inline-flex;gap:8px;margin:0 0 14px}
+/* owner, 19 Nov 2026: the Yearly tab gold with a gold border, the Monthly tab teal; the chosen one is filled, the other keeps its colour as an outline */
+.wall-bill-btn{min-height:44px;min-width:104px;padding:8px 18px;background:transparent;border:2px solid var(--teal);border-radius:10px;color:var(--teal);font-family:var(--font-display);font-weight:700;font-size:15px;cursor:pointer}
+.wall-bill-btn[data-bill="year"]{border-color:var(--gold);color:var(--gold)}
+.wall-bill-btn[data-bill="month"][aria-pressed="true"]{background:var(--teal);color:var(--on-teal)}
+.wall-bill-btn[data-bill="year"][aria-pressed="true"]{background:var(--gold);color:var(--on-teal)}
+/* "free for 30 days" in gold in the lead and in each trial card's terms (owner, 19 Nov 2026) */
+#plan-wall .vi-trial{color:var(--gold);font-weight:700}
+.wall-bill-btn:focus-visible{outline:2px solid var(--text);outline-offset:2px}
 .wall-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 12px}
 .wall-plan-sub{font-size:13.5px;line-height:1.5;color:var(--muted);margin:0 0 8px}
 .wall-plan-sub b{color:var(--text);font-weight:600}
@@ -27173,9 +27178,9 @@ function viWallPaint() {
   try { viPricePaint(); } catch (e) {}   // names, prices, terms and buttons, all from VI_PLANS
   try {
     var lead = document.getElementById('wall-lead'), M = VI_PLANS.vaulter_month;
-    if (lead) lead.textContent = (viPlanTrial('vaulter_month') && viPlanTrial('vaulter_year') && viPlanTrial('pioneer_month') && viPlanTrial('pioneer_year'))
-      ? 'Vaulter and Pioneer are free for ' + M.trialDays + ' days. Your card is taken at checkout and first charged on day ' + (M.trialDays + 1) + '. Cancel before then and you pay nothing.'
-      : 'Every plan opens the whole app. You pay at checkout.';
+    if (lead) { var trial = (viPlanTrial('vaulter_month') && viPlanTrial('vaulter_year') && viPlanTrial('pioneer_month') && viPlanTrial('pioneer_year'));
+      if (trial) lead.innerHTML = 'Vaulter and Pioneer are <span class="vi-trial">free for ' + M.trialDays + ' days</span>. You are not charged today. Your card is taken at checkout and first charged on day ' + (M.trialDays + 1) + '. Cancel any time before then and you pay nothing.';
+      else lead.textContent = 'Every plan opens the whole app. You pay at checkout.'; }
     var keep = document.getElementById('wall-keep');
     if (keep) { keep.textContent = VI_BETA_OPEN ? 'You keep your discounted first movers’ price forever while you stay subscribed. Beta prices are open until ' + VI_BETA_ENDS_ON + '.' : ''; keep.style.display = VI_BETA_OPEN ? '' : 'none'; }
     var who = document.getElementById('wall-who'), s = JSON.parse(localStorage.getItem('vi_session') || 'null');
@@ -30909,7 +30914,9 @@ function viPricePaint() {
   });
   [].forEach.call(document.querySelectorAll('[data-plan-terms]'), function (el) {
     var plan = el.getAttribute('data-plan-terms'); if (!VI_PLANS[plan]) return;
-    el.textContent = viPlanLink(plan) ? viPlanTerms(plan) : '';
+    var terms = viPlanLink(plan) ? viPlanTerms(plan) : '';   // built from constants only (money, days, the cancel address): safe as markup
+    if (/^Free for \d+ days/.test(terms)) el.innerHTML = terms.replace(/^Free for \d+ days/, '<span class="vi-trial">$&</span>');   // the wall paints .vi-trial in gold
+    else el.textContent = terms;
   });
   [].forEach.call(document.querySelectorAll('[data-plan]'), function (el) {
     var plan = el.getAttribute('data-plan'); if (!VI_PLANS[plan]) return;
