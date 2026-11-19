@@ -9,7 +9,7 @@ const seed = (o) => `(function(){if(localStorage.getItem('ht3'))return;localStor
 const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 
 (async () => {
-  const b = await chromium.launch(); const errs = [];
+  const b = await chromium.launch({ args: ['--font-render-hinting=full'] }); const errs = [];
   for (const w of [1100, 768, 390]) {
     const phone = w <= 480, t = w + 'px: ';
     const ctx = await b.newContext({ viewport: { width: w, height: phone ? 844 : 900 }, deviceScaleFactor: 1, isMobile: phone, hasTouch: phone }); await routeThree(ctx);
@@ -74,6 +74,7 @@ const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
 
     // Side names (owner, 9 Nov: "Yes, fix side names"): a name runs up from y 102 and must end by y 24, below the card's
     // top-right corner, so its drawn length is 78 units or less; a name that already fits keeps its natural width
+    await p.evaluate(async () => { await document.fonts.load("700 12.5px 'Chakra Petch'"); await document.fonts.ready; });   // the embedded face loads on first use: measure natural widths only once it is in, as a fallback face is wider
     const names = await p.evaluate(() => {
       const ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg'), m = document.createElementNS(ns, 'text');
       m.setAttribute('class', 'wt-side'); s.appendChild(m); document.body.appendChild(s);
@@ -88,10 +89,12 @@ const APP = process.env.VI_APP || require('./lib/vi').FILE_URL;
       s.remove(); h.remove(); return out;
     });
     const over = names.filter(x => x.drawn > 78), stretched = names.filter(x => x.squeezed && x.nat <= 76);
-    ok(names.length > 20 && over.length === 0, t + 'every side name ends inside the card (' + names.length + ' names; too long: ' + over.slice(0, 4).map(x => x.name + ' ' + x.drawn.toFixed(0)).join(', ') + ')');
-    // the app's fit table (wrSideW) is Syne's own widths; CI blocks Google Fonts, so a fallback font there measures narrower and the comparison means nothing
-    if (await p.evaluate(() => document.fonts.check("12px 'Syne'") && [...document.fonts].some(f => /Syne/.test(f.family) && f.status === 'loaded'))) ok(stretched.length === 0, t + 'names that already fit are not stretched (' + stretched.map(x => x.name).join(', ') + ')');
-    else console.log('skip: ' + t + 'Syne is not loaded here (outside hosts blocked), so natural widths are a fallback font\'s');
+    let diag = '';
+    if (over.length) diag = ' DIAG ' + await p.evaluate((nm) => { const NS = 'http://www.w3.org/2000/svg', sv = document.createElementNS(NS, 'svg'), m = document.createElementNS(NS, 'text'); m.setAttribute('class', 'wt-side'); sv.appendChild(m); document.body.appendChild(sv); const cs = getComputedStyle(m), per = []; for (const c of nm) { m.textContent = c; per.push(c + '=' + m.getComputedTextLength().toFixed(1)); } m.textContent = nm; const w = m.getComputedTextLength(), css = { fontFamily: cs.fontFamily, fontWeight: cs.fontWeight, letterSpacing: cs.letterSpacing }; sv.remove(); return 'nat=' + w.toFixed(1) + ' table=' + wrSideW(nm.toUpperCase()).toFixed(1) + ' ff=' + css.fontFamily.slice(0, 30) + ' fw=' + css.fontWeight + ' ls=' + css.letterSpacing + ' loaded700=' + document.fonts.check("700 12.5px 'Chakra Petch'") + ' faces=' + [...document.fonts].filter(f => f.status === 'loaded').length + ' per[' + per.join(' ') + '] ' + navigator.userAgent.replace(/.*(Chrome\/[\d.]+).*/, '$1'); }, over[0].name);
+    ok(names.length > 20 && over.length === 0, t + 'every side name ends inside the card (' + names.length + ' names; too long: ' + over.slice(0, 4).map(x => x.name + ' ' + x.drawn.toFixed(0)).join(', ') + ')' + diag);
+    // the app's fit table (wrSideW) is Chakra Petch's own widths (embedded in the app)
+    if (await p.evaluate(async () => (await document.fonts.load("700 12.5px 'Chakra Petch'").catch(() => []), document.fonts.check("700 12.5px 'Chakra Petch'")))) ok(stretched.length === 0, t + 'names that already fit are not stretched (' + stretched.map(x => x.name).join(', ') + ')');
+    else console.log('skip: ' + t + 'Chakra Petch is not loaded, so natural widths are a fallback font\'s');
     ok(names.some(x => x.name.startsWith('KEYS') && !x.squeezed), t + 'a short name (KEYS) keeps its natural width');
     const side = await p.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
     ok(!side, t + 'no sideways scroll');

@@ -82,7 +82,7 @@ const HIDE = '#welcome-overlay,#login-overlay,#pro-offer-modal,#sync-banner,#tri
     ok(h.ms === 10 && h.badges === 0 && /Shared Foundation Poured/.test(h.msTxt.join('|')) && h.hit === 2, t + 'one milestone set, house-type names, 2 earned of 10 (' + h.ms + ', ' + h.hit + ')');
     ok(h.row && h.show && h.mort, t + 'ROW card, "Show it on the house" and "Preview your mortgage" stay');
     ok(!h.emoji && h.pin, t + 'no emoji in the tile, Budget tip included; "Show it on the house" has the pin icon (' + h.emoji + ')');
-    ok(/Syne/.test(h.hero.f) && h.hero.px >= 23 && +h.hero.w >= 700, t + 'the saved figure is the hero: Syne 700, about 24 px (' + h.hero.px + ')');
+    ok(/Chakra Petch Figures/.test(h.hero.f) && h.hero.px >= 23 && +h.hero.w >= 700, t + 'the saved figure is the hero: Chakra Petch Figures 700, about 24 px (' + h.hero.px + ')');
     ok(h.noteW <= 52, t + 'prose lines capped at 72ch ('  + Math.round(h.noteW) + ' em)');
     ok(h.ids, t + 'the bar, stats and milestones keep their ids, inside the one tile');
     ok(!h.dead, t + 'no dead columns beside the cards (' + h.ncards + ' cards)');

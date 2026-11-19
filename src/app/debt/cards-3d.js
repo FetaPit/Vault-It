@@ -304,7 +304,7 @@ function renderDebtTab(){
       var isCard=ccIsCard(d);
       // every debt is a real-proportion 3D tile (drag to rotate, double-tap to flip); cards add the chip and number (E33)
       return '<div data-did="'+d.id+'" style="background:var(--c2);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px">'
-          +'<div style="font-size:max(.55rem,var(--vi-fs-1));font-weight:700;color:var(--t1);font-family:\'Syne\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px">'+_rankBadge(d)+'<span style="overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</span></div>'
+          +'<div style="font-size:max(.55rem,var(--vi-fs-1));font-weight:700;color:var(--t1);font-family:\'Chakra Petch\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px">'+_rankBadge(d)+'<span style="overflow:hidden;text-overflow:ellipsis">'+ccEsc(d.name)+'</span></div>'
           +cc3dHTML(d,pctNum,ccReduced()?pctNum:(_ccPct[d.id]!=null?_ccPct[d.id]:0))
           +'<div style="font-size:max(.52rem,var(--vi-fs-1));color:var(--re);font-family:\'Share Tech Mono\',monospace;font-weight:700;display:flex;justify-content:space-between"><span>'+gbpFmt(d.balance)+'</span><span style="color:var(--gr);font-weight:400">'+pctNum+'% paid</span></div>'
           +'<div style="display:flex;align-items:center;gap:4px">'

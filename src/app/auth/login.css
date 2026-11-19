@@ -5,10 +5,10 @@
 .auth-sub{font-family:'Share Tech Mono',monospace;font-size:max(.42rem,var(--vi-fs-1));color:var(--t3);letter-spacing:.12em;text-align:center;margin-bottom:24px;text-transform:uppercase}
 .auth-step{display:none}
 .auth-step.active{display:block}
-.auth-label{font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;color:var(--t2);margin-bottom:6px;letter-spacing:.06em}
+.auth-label{font-family:'Chakra Petch',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;color:var(--t2);margin-bottom:6px;letter-spacing:.06em}
 .auth-inp{width:100%;background:rgb(var(--ink-rgb) / .04);border:1px solid rgb(var(--teal-rgb) / .25);border-radius:6px;color:var(--tx);font-family:'Share Tech Mono',monospace;font-size:max(.78rem,var(--vi-fs-3));padding:10px 12px;outline:none;box-sizing:border-box;letter-spacing:.12em;transition:border-color .2s}
 .auth-inp:focus{border-color:var(--em);box-shadow:0 0 0 2px rgb(var(--teal-rgb) / .1)}
-.auth-btn{width:100%;margin-top:12px;padding:11px;background:linear-gradient(90deg,rgb(var(--brass-rgb) / .9),rgba(184,144,46,.9));border:none;border-radius:6px;color:#000;font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-2));font-weight:800;letter-spacing:.14em;cursor:pointer;text-transform:uppercase;transition:opacity .2s,transform .1s}
+.auth-btn{width:100%;margin-top:12px;padding:11px;background:linear-gradient(90deg,rgb(var(--brass-rgb) / .9),rgba(184,144,46,.9));border:none;border-radius:6px;color:#000;font-family:'Chakra Petch',sans-serif;font-size:max(.6rem,var(--vi-fs-2));font-weight:800;letter-spacing:.14em;cursor:pointer;text-transform:uppercase;transition:opacity .2s,transform .1s}
 .auth-btn:hover{opacity:.92;transform:translateY(-1px)}
 .auth-btn.secondary{background:transparent;border:1px solid rgb(var(--teal-rgb) / .3);color:var(--em);margin-top:8px}
 .auth-btn{min-height:44px}
@@ -44,7 +44,7 @@
 /* the later "set a PIN" card (viPinOfferShow): over the app, under the sign-in overlay */
 .vi-pin-offer{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:900;width:min(380px,calc(100vw - 32px));box-sizing:border-box;padding:14px 16px;background:var(--c2);border:1px solid var(--em);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);color:var(--tx)}
 .vi-pin-offer[hidden]{display:none}
-.vi-pin-offer-h{font-family:'Syne',sans-serif;font-weight:800;font-size:max(.7rem,var(--vi-fs-3));margin-bottom:4px}
+.vi-pin-offer-h{font-family:'Chakra Petch',sans-serif;font-weight:800;font-size:max(.7rem,var(--vi-fs-3));margin-bottom:4px}
 .vi-pin-offer p{margin:0 0 12px;font-family:'DM Sans',sans-serif;font-size:max(.62rem,var(--vi-fs-2));line-height:1.45;color:var(--t2)}
 .vi-pin-offer .set-btns .set-btn{min-height:44px;flex:1}
 @media (max-width:899px){.vi-pin-offer{bottom:calc(84px + env(safe-area-inset-bottom))}}
@@ -106,7 +106,7 @@ html.vi-scene-on[data-ah="welcome"] #welcome-overlay{background:rgb(var(--panel-
 @media (prefers-reduced-motion:reduce){.auth-house{transition:none}}
 @media (max-height:760px){.auth-card{padding:20px 20px}.auth-sub{margin-bottom:12px}.auth-pin-dots{margin:10px 0}.auth-pin-key{padding:10px 0}.auth-footer{margin-top:10px}.auth-divider{margin:10px 0}}
 .auth-code-box{background:rgb(var(--brass-rgb) / .06);border:1px solid rgb(var(--brass-rgb) / .3);border-radius:8px;padding:14px;margin-bottom:14px;text-align:center}
-.auth-code-num{font-family:'Syne',sans-serif;font-weight:900;font-size:1.8rem;letter-spacing:.25em;color:#fff;animation:card-num-pulse 2s ease-in-out infinite}
+.auth-code-num{font-family:'Chakra Petch',sans-serif;font-weight:900;font-size:1.8rem;letter-spacing:.25em;color:#fff;animation:card-num-pulse 2s ease-in-out infinite}
 .auth-code-hint{font-family:'Share Tech Mono',monospace;font-size:max(.4rem,var(--vi-fs-1));color:var(--t3);margin-top:4px}
 .auth-err{font-family:'Share Tech Mono',monospace;font-size:max(.44rem,var(--vi-fs-1));color:#e74c3c;margin-top:8px;min-height:14px;text-align:center;display:none}
 .auth-info{font-family:'Share Tech Mono',monospace;font-size:max(.42rem,var(--vi-fs-1));color:var(--t3);text-align:center;margin-top:10px;line-height:1.6}
@@ -116,7 +116,7 @@ html.vi-scene-on[data-ah="welcome"] #welcome-overlay{background:rgb(var(--panel-
 .auth-pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid rgb(var(--teal-rgb) / .35);background:transparent;transition:all .15s}
 .auth-pin-dot.filled{background:var(--em);border-color:var(--em);box-shadow:0 0 6px rgb(var(--teal-rgb) / .4)}
 .auth-pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
-.auth-pin-key{background:rgb(var(--ink-rgb) / .04);border:1px solid rgb(var(--teal-rgb) / .15);border-radius:8px;color:var(--tx);font-family:'Syne',sans-serif;font-size:max(.75rem,var(--vi-fs-3));font-weight:700;padding:14px 0;cursor:pointer;transition:background .1s,transform .08s;letter-spacing:.06em}
+.auth-pin-key{background:rgb(var(--ink-rgb) / .04);border:1px solid rgb(var(--teal-rgb) / .15);border-radius:8px;color:var(--tx);font-family:'Chakra Petch',sans-serif;font-size:max(.75rem,var(--vi-fs-3));font-weight:700;padding:14px 0;cursor:pointer;transition:background .1s,transform .08s;letter-spacing:.06em}
 .auth-pin-key:active{background:rgb(var(--teal-rgb) / .15);transform:scale(.96)}
 .auth-pin-key.del{color:var(--em);font-size:max(.6rem,var(--vi-fs-2))}
 </style>

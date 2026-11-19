@@ -10,7 +10,7 @@
 //   5. three screens, "Step n of 3" (owner, 10 Nov 2026: less friction; was 6), Back works
 //   6. signed in: the email is never asked again and the first name comes from Google
 //   7. the plan screen: three phases from where you are, one step for this week, your own sums, the check-in day (today; Settings changes it)
-//   8. finishing saves the check-in day and opens the step's tab; on check-in day the app says the next step, once
+//   8. finishing saves the check-in day and opens the dashboard (Overview, owner 19 Nov 2026); on check-in day the app says the next step, once
 //   9. phone and Daylight: no sideways scroll; no em dashes; privacy notice names Google sign-in; no page errors
 // Run: node tests/test_google_onboarding.js
 require('./lib/vi');
@@ -115,7 +115,8 @@ const tok = (methods) => 'x.' + Buffer.from(JSON.stringify({ amr: methods.map(m 
     const fin = await p.evaluate(() => { const u = JSON.parse(localStorage.getItem('vi_user') || '{}'), act = document.querySelector('.tab-panel.active');
       return { day: u.checkin && u.checkin.day, step: u.checkin && u.checkin.step, hidden: getComputedStyle(document.getElementById('welcome-overlay')).display === 'none', tab: act ? act.id : '' }; });
     ok(fin.day === new Date().getDay() && fin.step === 'debt' && fin.hidden, T + 'B8 finishing saves the check-in day (today) and closes the onboarding (' + JSON.stringify(fin) + ')');
-    ok(fin.tab === 'tab-debt', T + "B8 and opens this week's step (" + fin.tab + ')');
+    // owner, 19 Nov 2026: "the first screen the app lands on should be the dashboard after the tour" (was: the plan step's tab)
+    ok(fin.tab === 'tab-overview', T + 'B8 and opens on the dashboard, Overview (' + fin.tab + ')');
     await p.context().close();
   }
 

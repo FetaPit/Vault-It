@@ -60,8 +60,8 @@ function nwhRenderWizard(step){
   }
   html+='<input class="nwh-input" type="'+s.type+'" id="nwh-v" placeholder="'+s.ph+'" value="'+(_nwhWizData[s.id]!==undefined?_nwhWizData[s.id]:'')+'">';
   html+='<div style="display:flex;gap:10px;margin-top:16px">';
-  if(step>0) html+='<button onclick="nwhWizBack('+step+')" style="padding:9px 18px;background:none;border:1px solid var(--bd);color:var(--t2);font-family:\'Syne\',sans-serif;font-weight:700;font-size:max(.58rem,var(--vi-fs-2));cursor:pointer">← Back</button>';
-  html+='<button onclick="nwhWizNext('+step+')" style="flex:1;padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:\'Syne\',sans-serif;font-weight:800;font-size:max(.6rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">'+(step<4?'Next →':'Build My Journey →')+'</button>';
+  if(step>0) html+='<button onclick="nwhWizBack('+step+')" style="padding:9px 18px;background:none;border:1px solid var(--bd);color:var(--t2);font-family:\'Chakra Petch\',sans-serif;font-weight:700;font-size:max(.58rem,var(--vi-fs-2));cursor:pointer">← Back</button>';
+  html+='<button onclick="nwhWizNext('+step+')" style="flex:1;padding:9px 22px;background:linear-gradient(135deg,var(--go),var(--go2));border:none;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));color:#080808;font-family:\'Chakra Petch\',sans-serif;font-weight:800;font-size:max(.6rem,var(--vi-fs-2));cursor:pointer;letter-spacing:.06em">'+(step<4?'Next →':'Build My Journey →')+'</button>';
   html+='</div></div>';
   body.innerHTML=html;
   setTimeout(function(){ var el=document.getElementById('nwh-v'); if(el)el.focus(); },80);

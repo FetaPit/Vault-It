@@ -89,7 +89,9 @@ function viPricePaint() {
   });
   [].forEach.call(document.querySelectorAll('[data-plan-terms]'), function (el) {
     var plan = el.getAttribute('data-plan-terms'); if (!VI_PLANS[plan]) return;
-    el.textContent = viPlanLink(plan) ? viPlanTerms(plan) : '';
+    var terms = viPlanLink(plan) ? viPlanTerms(plan) : '';   // built from constants only (money, days, the cancel address): safe as markup
+    if (/^Free for \d+ days/.test(terms)) el.innerHTML = terms.replace(/^Free for \d+ days/, '<span class="vi-trial">$&</span>');   // the wall paints .vi-trial in gold
+    else el.textContent = terms;
   });
   [].forEach.call(document.querySelectorAll('[data-plan]'), function (el) {
     var plan = el.getAttribute('data-plan'); if (!VI_PLANS[plan]) return;

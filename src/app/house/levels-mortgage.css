@@ -1,6 +1,6 @@
 /* ── House Builder levels ── */
 .hb-levels{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:-18px 0 22px}
-.hb-lv{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:99px;border:1px solid rgb(var(--teal-rgb) / .25);background:rgb(var(--panel-rgb) / .7);color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;font-size:max(.58rem,var(--vi-fs-2));letter-spacing:.04em;cursor:pointer}
+.hb-lv{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:99px;border:1px solid rgb(var(--teal-rgb) / .25);background:rgb(var(--panel-rgb) / .7);color:var(--muted);font-family:'Chakra Petch',sans-serif;font-weight:300;font-size:max(.58rem,var(--vi-fs-2));letter-spacing:.04em;cursor:pointer}
 .hb-lv b{font-family:'Share Tech Mono',monospace;font-weight:400;opacity:.7}
 .hb-lv.on{border-color:var(--brass);color:#f1d98b;background:rgb(var(--brass-rgb) / .12);box-shadow:0 0 14px rgb(var(--brass-rgb) / .18)}
 .hb-lv.done{border-color:rgb(var(--green-rgb) / .5);color:var(--green)}
@@ -27,11 +27,11 @@
 /* ── Mortgage calculator ── */
 .hbc-ov{position:fixed;inset:0;z-index:10050;background:rgb(var(--panel-rgb) / .88);display:flex;align-items:flex-start;justify-content:center;padding:14px;overflow:auto}
 .hbc{background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:12px;width:min(1120px,100%);color:#cfdbe8;font-size:12px}
-.hbc-hd{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid rgb(var(--teal-rgb) / .16);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--em);position:sticky;top:0;background:var(--panel);z-index:2;border-radius:12px 12px 0 0}
+.hbc-hd{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid rgb(var(--teal-rgb) / .16);font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;color:var(--em);position:sticky;top:0;background:var(--panel);z-index:2;border-radius:12px 12px 0 0}
 .hbc-body{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:16px;padding:14px 16px}
 @media(max-width:860px){.hbc-body{grid-template-columns:1fr}}
 .hbc details{border:1px solid rgb(var(--ink-rgb) / .08);border-radius:8px;margin-bottom:8px;background:rgb(var(--panel-rgb) / .6)}
-.hbc summary{cursor:pointer;padding:9px 12px;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8fe0da}
+.hbc summary{cursor:pointer;padding:9px 12px;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8fe0da}
 .hbc details>div{padding:4px 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .hbc label{display:block;font-size:max(10px,var(--vi-fs-1));color:var(--t3);margin-bottom:3px;letter-spacing:.03em}
 .hbc input[type=number],.hbc input[type=text],.hbc input[type=date],.hbc select{width:100%;background:rgb(var(--panel-rgb) / .85);border:1px solid rgb(var(--teal-rgb) / .25);border-radius:5px;color:var(--text);font-size:13px;padding:7px 8px}
@@ -102,7 +102,7 @@
 .stk-mini-logo img{width:100%;height:100%;object-fit:contain}
 .stk-mini-logo .stk-mono{font-size:max(6px,var(--vi-fs-1))}
 .stk-ch-hd{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
-.stk-ch-hd b{font-family:'Syne',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--em);letter-spacing:.04em}
+.stk-ch-hd b{font-family:'Chakra Petch',sans-serif;font-size:max(.6rem,var(--vi-fs-2));color:var(--em);letter-spacing:.04em}
 .stk-seg{display:inline-flex;border:1px solid rgb(var(--teal-rgb) / .28);border-radius:6px;overflow:hidden}
 .stk-seg button{background:none;border:none;color:var(--t3);font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));padding:5px 9px;cursor:pointer}
 .stk-seg button.on{background:rgb(var(--teal-rgb) / .18);color:var(--em)}
@@ -110,14 +110,14 @@
 .stk-ch-tip{position:absolute;top:4px;left:60px;pointer-events:none;font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));color:var(--text);background:rgb(var(--panel-rgb) / .92);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:5px;padding:4px 7px;display:none;white-space:nowrap}
 .stk-plat{position:absolute;top:-8px;right:-4px;width:22px;height:22px;border-radius:7px;overflow:hidden;background:#fff;border:1px solid rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .stk-plat img{width:100%;height:100%;object-fit:contain;display:block}
-.stk-mono{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:max(9px,var(--vi-fs-1));letter-spacing:-.02em;font-family:'Syne',sans-serif}
+.stk-mono{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:max(9px,var(--vi-fs-1));letter-spacing:-.02em;font-family:'Chakra Petch',sans-serif}
 .stk-main{position:relative}
 .stk-fundset{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end}
 .stk-fundset label{display:block;font-family:'Share Tech Mono',monospace;font-size:max(.4rem,var(--vi-fs-1));color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
 .stk-fs-btns{display:flex;gap:6px;flex-wrap:wrap}
 @media(max-width:700px){.stk-fundset{grid-template-columns:1fr 1fr}.stk-fs-btns{grid-column:1/-1}}
 .stk-toolbar{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-right:130px}
-.stk-toolbar .stk-tb-t{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.6rem,var(--vi-fs-2));color:var(--t);margin-right:auto}
+.stk-toolbar .stk-tb-t{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:max(.6rem,var(--vi-fs-2));color:var(--t);margin-right:auto}
 .stk-main-logo{top:50px}
 .stk-main-logo{position:absolute;top:12px;right:14px;display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:max(.5rem,var(--vi-fs-1));font-weight:700;color:var(--t2)}
 .stk-main-logo .stk-plat{position:static;width:42px;height:42px;border-radius:11px}
@@ -130,17 +130,17 @@
 .stk-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
 .stk-stat{background:rgb(var(--teal-rgb) / .06);border-radius:6px;padding:8px 10px}
 .stk-stat .l{font-family:'Share Tech Mono',monospace;font-size:max(.4rem,var(--vi-fs-1));color:var(--t3);letter-spacing:.06em;margin-bottom:3px;text-transform:uppercase}
-.stk-stat .v{font-family:'Syne',sans-serif;font-size:max(.78rem,var(--vi-fs-3));font-weight:800;color:var(--tx)}
+.stk-stat .v{font-family:'Chakra Petch',sans-serif;font-size:max(.78rem,var(--vi-fs-3));font-weight:800;color:var(--tx)}
 .stk-stat .s{font-size:max(.4rem,var(--vi-fs-1));color:var(--t3);margin-top:1px}
 .stk-status{font-family:'Share Tech Mono',monospace;font-size:max(.5rem,var(--vi-fs-1));color:var(--t2);display:flex;gap:8px;align-items:center;flex-wrap:wrap;line-height:1.5}
 .stk-status i{width:7px;height:7px;border-radius:50%;display:inline-block}
-.stk-hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-family:'Syne',sans-serif;font-size:max(.62rem,var(--vi-fs-2));font-weight:800;color:var(--tx);margin-bottom:10px}
+.stk-hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-family:'Chakra Petch',sans-serif;font-size:max(.62rem,var(--vi-fs-2));font-weight:800;color:var(--tx);margin-bottom:10px}
 .stk-actions{display:flex;gap:6px;flex-wrap:wrap}
-.stk-btn{font-family:'Syne',sans-serif;font-size:max(.48rem,var(--vi-fs-1));font-weight:700;padding:4px 10px;border-radius:4px;cursor:pointer;background:rgb(var(--teal-rgb) / .08);border:1px solid rgb(var(--teal-rgb) / .3);color:var(--em)}
+.stk-btn{font-family:'Chakra Petch',sans-serif;font-size:max(.48rem,var(--vi-fs-1));font-weight:700;padding:4px 10px;border-radius:4px;cursor:pointer;background:rgb(var(--teal-rgb) / .08);border:1px solid rgb(var(--teal-rgb) / .3);color:var(--em)}
 .stk-btn:hover{background:rgb(var(--teal-rgb) / .16)}
 .stk-shot-ov{position:fixed;inset:0;z-index:10050;background:rgb(var(--panel-rgb) / .82);display:flex;align-items:center;justify-content:center;padding:14px}
 .stk-shot{background:var(--panel);border:1px solid rgb(var(--teal-rgb) / .3);border-radius:12px;width:min(760px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
-.stk-shot-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgb(var(--teal-rgb) / .16);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--em)}
+.stk-shot-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgb(var(--teal-rgb) / .16);font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:14px;color:var(--em)}
 .stk-shot-bd{padding:14px 16px;overflow:auto;font-size:12px;color:var(--t2,#9fb3c8);line-height:1.5}
 .stk-shot-ft{font-size:12px;color:var(--t2,#9fb3c8);display:flex;gap:8px;justify-content:flex-end;align-items:center;padding:12px 16px;border-top:1px solid rgb(var(--teal-rgb) / .16)}
 .stk-shot-tbl{width:100%;border-collapse:collapse;margin-top:8px}
@@ -187,7 +187,7 @@
 .stk-gh:hover{background:rgb(var(--teal-rgb) / .08)}.stk-gh:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
 .stk-gh .stk-plat{position:static;flex-shrink:0}   /* it was positioned against the page and pushed it sideways */
 .stk-chev{width:16px;height:16px;flex:none;transition:transform .2s;transform:rotate(-90deg);color:var(--teal)}.stk-grp.open .stk-chev{transform:none}
-.stk-gn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Syne',sans-serif;font-weight:700}
+.stk-gn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Chakra Petch',sans-serif;font-weight:700}
 .stk-gc{font:max(.5rem,var(--vi-fs-1)) 'Share Tech Mono',monospace;color:var(--t3);white-space:nowrap}
 .stk-gv{font:700 max(.66rem,var(--vi-fs-2)) 'Share Tech Mono',monospace;color:var(--tx);white-space:nowrap;text-align:right}.stk-gv small{color:var(--t3);font-weight:400;font-size:max(10.5px,.9em)}
 .stk-gb{overflow-x:auto;padding:0 12px}

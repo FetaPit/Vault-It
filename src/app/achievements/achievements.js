@@ -91,9 +91,16 @@ function wrIcon(id,x,y,s){
   var ic=FIRE_ICONS[id]||(typeof BD_ICONS!=='undefined'&&BD_ICONS[id])||FIRE_ICONS.gem,pth=function(d){return '<path d="'+d+'"/>';};
   return '<g transform="translate('+x+' '+y+') scale('+(s/24).toFixed(3)+')"><g class="wt-icf">'+ic.f.map(pth).join('')+'</g><g class="wt-ics">'+ic.d.map(pth).join('')+'</g></g>';
 }
-// side name width in card units: Syne 800 at 12.5 px with 1 px letter spacing, measured per character. A name wider than the
+// side name width in card units: Chakra Petch 800 at 12.5 px with 1 px letter spacing, measured per character. A name wider than the
 // 76 units beside the medal is squeezed to fit below the card's top corner; one that fits keeps its width (owner, 9 Nov: "Yes, fix side names")
-function wrSideW(s){var W={' ':6,',':5,"'":5,'.':5.5,'-':8.5,'+':11,'I':6.5,'1':7.5,'L':13,'J':13.5,'5':13.5,'S':14,'2':14,'3':14,'7':14,'Y':14.5,'4':14.5,'8':14.5,'£':14.5,'F':15,'T':15,'6':15,'K':16,'Z':16,'R':16.5,'&':16.5,'H':17,'U':17,'%':17,'C':17.5,'D':17.5,'N':17.5,'O':17.5,'Q':17.5,'G':18,'M':21,'W':24.5},w=0;for(var i=0;i<s.length;i++)w+=W[s[i]]||15.5;return w;}
+function wrSideW(s){var W={' ':4.4,',':4,"'":4.2,'.':4,'-':6.4,'+':8,'I':4.5,'1':5.8,'L':8,'J':8.3,'5':8.6,'S':9,'2':8.2,'3':8.5,'7':7.5,'Y':8.9,'4':8.2,'8':9,'£':8.9,'F':8.2,'T':8.3,'6':8.8,'K':9.1,'Z':8.4,'R':9.4,'&':9.3,'H':9.7,'U':9.8,'%':11.9,'C':9.2,'D':9.6,'N':9.7,'O':9.8,'Q':9.8,'G':9.5,'M':11,'W':12,'0':9.1,'9':8.8,'A':9.1,'B':9.4,'E':8.6,'P':9.1,'V':9.1,'X':9.1},w=0;for(var i=0;i<s.length;i++)w+=W[s[i]]||9.2;return w*.985;}   // measured: Chakra Petch 700, 12.5px, 1px letter-spacing (the .wt-side style), 19 Nov 2026
+// the medal on its own (round 4): a metal rim with four rivets, a deep tick dial, a tier-edged face, an engraved ring and a glass highlight,
+// centred at 46,74 in card units, radius 37.5. wrTok draws it on the card; the house type pickers draw it alone (owner, 14 and 19 Nov: the circle only)
+function wrMedal(dim){
+  return '<circle cx="46" cy="74" r="37.5" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/><circle class="wt-mrim" cx="46" cy="74" r="35.8"/>'+WR_DIAL+WR_RIVETS
+    +'<circle class="wt-mface" cx="46" cy="74" r="32"/><circle class="wt-mring" cx="46" cy="74" r="29.4"/><circle class="wt-mdots" cx="46" cy="74" r="30.7"/>'   // v0.95 (owner, 9 Nov): larger inner circle (was 29)
+    +'<path class="wt-gloss" d="M19.8 65.5a27 27 0 0 1 35.4-20.9"/>';
+}
 function wrTok(o){
   var t=o.tier||'starter',st=o.st||'done',px=o.px||100,sc=o.sc||px/118,L=st==='lock',dim=L||st==='skip'||st==='todo',K=wrPts(WR_CARD),n=o.bars||0,lit=o.lit==null?n:o.lit,k;   // todo: an achievement not met yet that nothing locks
   var out='<g class="wt t-'+t+' st-'+st+'">';
@@ -104,9 +111,7 @@ function wrTok(o){
   out+='</g><polygon class="wt-rimline" points="'+K+'"/>';
   if(o.ol)out+='<polygon class="wt-ol" points="'+K+'" style="stroke:'+o.ol+'"/>';   // section colour outline (R4)
   // the medal (round 4): a metal rim with four rivets, a deep tick dial, a tier-edged face, an engraved ring and a glass highlight
-  out+='<circle cx="46" cy="74" r="37.5" class="wt-metal" fill="url(#wtm'+(dim?'-lock':'')+')"/><circle class="wt-mrim" cx="46" cy="74" r="35.8"/>'+WR_DIAL+WR_RIVETS
-    +'<circle class="wt-mface" cx="46" cy="74" r="32"/><circle class="wt-mring" cx="46" cy="74" r="29.4"/><circle class="wt-mdots" cx="46" cy="74" r="30.7"/>'   // v0.95 (owner, 9 Nov): larger inner circle (was 29)
-    +'<path class="wt-gloss" d="M19.8 65.5a27 27 0 0 1 35.4-20.9"/>';
+  out+=wrMedal(dim);
   if(o.num!=null){var ns=String(o.num),fs=ns.length<=2?26:ns.length===3?16:11;out+='<text class="wt-num" x="46" y="'+(74+fs*.32).toFixed(1)+'" text-anchor="middle" style="font-size:'+fs+'px">'+ns+'</text>';}   // sized so the number clears the inner ring
   else out+=wrIcon(L?'vi-lock':o.ic,21,49,50);
   if(n>0){var bw=2.6,gp=n>4?1.8:2.6,x0=46-(n*bw+(n-1)*gp)/2;for(k=0;k<n;k++)out+='<rect class="fire-stud wt-bar'+(k<lit?' on':'')+'" x="'+(x0+k*(bw+gp)).toFixed(1)+'" y="118" width="'+bw+'" height="8"/>';}
