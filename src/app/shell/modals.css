@@ -59,7 +59,7 @@
 }
 
 .vi-modal-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Chakra Petch', sans-serif;
   font-size: .85rem;
   font-weight: 800;
   color: var(--tx);
@@ -93,7 +93,7 @@
 
 /* Task gate */
 .vi-modal-task-hdr {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Chakra Petch', sans-serif;
   font-size: max(.5rem,var(--vi-fs-0));
   font-weight: 800;
   letter-spacing: .12em;
@@ -142,7 +142,7 @@
 }
 .vi-modal-price-annual { color: var(--go); }
 .vi-modal-price-note {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Chakra Petch', sans-serif;
   font-size: max(.46rem,var(--vi-fs-1));
   font-weight: 800;
   color: var(--gr);
@@ -163,7 +163,7 @@
   border: none;
   clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
   color: #060c14;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Chakra Petch', sans-serif;
   font-size: max(.62rem,var(--vi-fs-2));
   font-weight: 800;
   letter-spacing: .08em;
@@ -186,7 +186,7 @@
   border: 1px solid rgb(var(--teal-rgb) / .3);
   clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
   color: var(--em);
-  font-family: 'Syne', sans-serif;
+  font-family: 'Chakra Petch', sans-serif;
   font-size: max(.56rem,var(--vi-fs-2));
   font-weight: 700;
   cursor: pointer;
@@ -255,12 +255,12 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Chakra Petch', sans-serif;
   font-size: max(.52rem,var(--vi-fs-1));
   font-weight: 800;
 }
 .advisor-card{background:rgb(var(--teal-rgb) / .05);border:1px solid rgb(var(--teal-rgb) / .15);border-left:3px solid var(--em);border-radius:6px;padding:12px 16px;margin:16px 0;font-size:max(.72rem,var(--vi-fs-3));color:var(--t2);line-height:1.6}
-.advisor-name{font-family:'Syne',sans-serif;font-weight:700;font-size:max(.6rem,var(--vi-fs-0));letter-spacing:.18em;text-transform:uppercase;color:var(--em);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.advisor-name{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:max(.6rem,var(--vi-fs-0));letter-spacing:.18em;text-transform:uppercase;color:var(--em);margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .advisor-card.gold{border-left-color:var(--go);background:rgb(var(--brass-rgb) / .04)}
 .advisor-card.gold .advisor-name{color:var(--go)}
 .advisor-card.orange{border-left-color:var(--or);background:rgb(var(--orange-rgb) / .04)}
@@ -271,7 +271,7 @@
 .pw-plan{background:var(--c3);border-radius:10px;padding:14px;border:1px solid var(--bd);text-decoration:none;display:flex;flex-direction:column;gap:3px;transition:border-color .2s,box-shadow .2s,transform .15s}
 .pw-plan:hover{border-color:var(--go);box-shadow:0 0 20px rgb(var(--brass-rgb) / .22);transform:translateY(-1px)}
 .pw-plan-annual{border-color:rgb(var(--brass-rgb) / .35);background:linear-gradient(135deg,rgb(var(--brass-rgb) / .06),rgb(var(--brass-rgb) / .02))}
-.pw-best-badge{background:linear-gradient(90deg,#b8902e,#f0d878,var(--brass));color:#000;font-family:'Syne',sans-serif;font-size:max(.34rem,var(--vi-fs-0));font-weight:900;letter-spacing:.15em;padding:2px 8px;border-radius:20px;width:fit-content;text-transform:uppercase}
+.pw-best-badge{background:linear-gradient(90deg,#b8902e,#f0d878,var(--brass));color:#000;font-family:'Chakra Petch',sans-serif;font-size:max(.34rem,var(--vi-fs-0));font-weight:900;letter-spacing:.15em;padding:2px 8px;border-radius:20px;width:fit-content;text-transform:uppercase}
 .pw-usage-pill{font-family:'Share Tech Mono',monospace;font-size:max(.38rem,var(--vi-fs-1));padding:2px 7px;border-radius:10px;background:rgb(var(--teal-rgb) / .08);color:var(--em);border:1px solid rgb(var(--teal-rgb) / .2);vertical-align:middle}
 .pw-usage-pill.at-limit{background:rgba(231,76,60,.1);color:#e74c3c;border-color:rgba(231,76,60,.28)}
 @keyframes pw-pulse{0%,100%{filter:drop-shadow(0 0 4px rgb(var(--brass-rgb) / .5))}50%{filter:drop-shadow(0 0 12px rgb(var(--brass-rgb) / .9))}}

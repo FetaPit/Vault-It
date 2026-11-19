@@ -15,12 +15,19 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
 .wall-mail{color:var(--teal);font-weight:600;text-underline-offset:3px;white-space:nowrap}
 .wall-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:22px 0 8px}
 .wall-title{font-family:var(--font-display);font-weight:700;font-size:clamp(1.5rem,4.4vw,2.15rem);line-height:1.15;letter-spacing:-.01em;margin:0 0 12px;color:var(--text)}
-.wall-lead{font-size:15px;line-height:1.55;color:var(--text);max-width:64ch;margin:0 0 8px}
+.wall-lead{font-size:15px;line-height:1.55;color:var(--text);max-width:64ch;margin:0 0 10px}
+/* owner, 19 Nov 2026: the free-trial sentence is a larger sub title in Chakra Petch; the lines under it stay body text */
+.wall-lead-title{display:block;font-family:var(--font-display);font-weight:600;font-size:clamp(18px,2.6vw,24px);line-height:1.25;margin:0 0 6px}
 .wall-safe{font-size:14px;line-height:1.55;color:var(--muted);max-width:64ch;margin:0 0 20px}
-.wall-bill{display:inline-flex;gap:0;margin:0 0 14px;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
-.wall-bill-btn{min-height:44px;min-width:104px;padding:8px 18px;background:transparent;border:0;color:var(--muted);font-family:var(--font-display);font-weight:700;font-size:15px;cursor:pointer}
-.wall-bill-btn[aria-pressed="true"]{background:var(--teal);color:var(--on-teal)}
-.wall-bill-btn:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.wall-bill{display:inline-flex;gap:8px;margin:0 0 14px}
+/* owner, 19 Nov 2026: the Yearly tab gold with a gold border, the Monthly tab teal; the chosen one is filled, the other keeps its colour as an outline */
+.wall-bill-btn{min-height:44px;min-width:104px;padding:8px 18px;background:transparent;border:2px solid var(--teal);border-radius:10px;color:var(--teal);font-family:var(--font-display);font-weight:700;font-size:15px;cursor:pointer}
+.wall-bill-btn[data-bill="year"]{border-color:var(--gold);color:var(--gold)}
+.wall-bill-btn[data-bill="month"][aria-pressed="true"]{background:var(--teal);color:var(--on-teal)}
+.wall-bill-btn[data-bill="year"][aria-pressed="true"]{background:var(--gold);color:var(--on-teal)}
+/* "free for 30 days" in gold in the lead and in each trial card's terms (owner, 19 Nov 2026) */
+#plan-wall .vi-trial{color:var(--gold);font-weight:700}
+.wall-bill-btn:focus-visible{outline:2px solid var(--text);outline-offset:2px}
 .wall-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 12px}
 .wall-plan-sub{font-size:13.5px;line-height:1.5;color:var(--muted);margin:0 0 8px}
 .wall-plan-sub b{color:var(--text);font-weight:600}
@@ -30,18 +37,21 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
 .wall-plan-soon .wall-plan-terms{margin:4px 0 0;color:var(--muted)}
 .wall-plan{box-sizing:border-box;display:flex;flex-direction:column;min-width:0;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-tile);padding:18px 16px 16px;box-shadow:var(--elev)}
 .wall-plan[data-tier-card="founder"]{border-color:rgb(var(--brass-rgb) / .55)}
-.wall-plan-top{display:flex;align-items:center;gap:12px;margin:0 0 10px}
+.wall-plan-top{display:flex;align-items:flex-start;gap:16px;margin:0 0 16px}
+.wall-plan-top>div:not(.wall-plan-price){flex:1 1 auto;min-width:0}
 .wall-plan .vi-tier-ic{width:48px;height:48px;margin:0}
 .wall-plan-when{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .wall-plan-name{font-family:var(--font-display);font-weight:800;font-size:1.25rem;line-height:1.2;color:var(--text)}
-.wall-plan-price{font-family:var(--font-display);font-weight:800;font-size:1.7rem;line-height:1.1;color:var(--teal);margin:0 0 8px}
+/* owner, 19 Nov 2026: the price top right of each tile, the first size (1.7rem) with more room around it */
+.wall-plan-price{flex:none;margin-left:auto;padding-left:8px;text-align:right;font-family:var(--font-display);font-weight:800;font-size:1.7rem;line-height:1.15;color:var(--teal)}
 .wall-plan[data-tier-card="founder"] .wall-plan-price{color:var(--gold)}
-.wall-plan-price>span{font-family:var(--font-body);font-weight:500;font-size:14px;color:var(--muted);margin-left:2px}
+.wall-plan-price>span{display:block;font-family:var(--font-body);font-weight:500;font-size:13px;line-height:1.35;color:var(--muted);margin:6px 0 0}
 .wall-plan-price .vi-tier-after{font-size:13px!important;color:var(--muted)!important}
 .wall-plan-terms{font-size:13.5px;line-height:1.5;color:var(--text);margin:0 0 12px}
-.wall-plan-list{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:5px;font-size:13.5px;line-height:1.4;color:var(--muted)}
-.wall-plan-list li{display:flex;gap:7px;align-items:flex-start}
-.wall-plan-list li::before{content:'✓';color:var(--green);flex:none}
+/* owner, 19 Nov 2026: "Make the bullet points more distinct": body-colour text, a teal ringed round tick */
+.wall-plan-list{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:9px;font-size:14px;line-height:1.35;color:var(--text)}
+.wall-plan-list li{display:flex;gap:10px;align-items:flex-start;color:var(--text)}
+.wall-plan-list li::before{content:'✓';flex:none;box-sizing:border-box;width:18px;height:18px;margin-top:0;border:1.5px solid var(--teal);border-radius:50%;background:rgb(var(--teal-rgb) / .14);color:var(--teal);font-size:11px;font-weight:800;line-height:15px;text-align:center}
 .wall-cta{box-sizing:border-box;margin-top:auto;width:100%;min-height:48px;padding:10px 14px;border-radius:10px;border:1px solid var(--teal);background:var(--teal);color:var(--on-teal);font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:.02em;cursor:pointer;transition:filter var(--t-fast) var(--ease)}
 .wall-cta:hover:not(:disabled){filter:brightness(1.08)}
 .wall-cta:disabled{opacity:.55;cursor:not-allowed}
@@ -74,7 +84,7 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
       <div class="wall-eyebrow">Plans</div>
       <h1 class="wall-title">Choose a plan to open your vault</h1>
       <p class="wall-lead" id="wall-lead"></p>
-      <p class="wall-safe">Your figures are safe. They stay on this device and in your account, and you can download them below at any time.</p>
+      <p class="wall-safe">Your figures are safe. You can download them below at any time.</p>
       <!-- Names, prices, terms and buttons are painted from VI_PLANS (src/app/paywall/stripe-config.js) by viWallPaint() and viPricePaint(): never typed here. -->
       <div class="wall-bill" role="group" aria-label="Billing period">
         <button type="button" class="wall-bill-btn" data-bill="year" aria-pressed="true" onclick="viWallBilling('year')">Yearly</button>
@@ -83,17 +93,15 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
       <div class="wall-plans">
         <div class="wall-plan" data-tier-card="vaulter">
           <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="founder" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-founder"/></svg>
-            <div><div class="wall-plan-when" data-wall-when></div><div class="wall-plan-name" data-plan-name="vaulter_year" data-tier-name></div></div></div>
-          <div class="wall-plan-price" data-wall-price></div>
+            <div><div class="wall-plan-when" data-wall-when></div><div class="wall-plan-name" data-plan-name="vaulter_year" data-tier-name></div></div><div class="wall-plan-price" data-wall-price></div></div>
           <p class="wall-plan-sub" data-wall-sub></p>
           <p class="wall-plan-terms" data-plan-terms="vaulter_year"></p>
-          <ul class="wall-plan-list"><li>The whole app</li><li>All six house types, Levels 1 and 2</li><li>AI screenshot reader, 30 a month</li></ul>
+          <ul class="wall-plan-list"><li>Full access to Vault-It base app</li><li>All six house types, Levels 1 and 2</li><li>AI screenshot reader, 30 a month</li></ul>
           <button class="wall-cta" type="button" data-plan="vaulter_year" data-cta="Choose Vaulter" data-cta-trial="Start 30 days free" onclick="viWallChoose(this.getAttribute('data-plan'))">Choose Vaulter</button>
         </div>
         <div class="wall-plan" data-tier-card="pioneer">
           <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="pioneer" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-pioneer"/></svg>
-            <div><div class="wall-plan-when" data-wall-when></div><div class="wall-plan-name" data-plan-name="pioneer_year" data-tier-name></div></div></div>
-          <div class="wall-plan-price" data-wall-price></div>
+            <div><div class="wall-plan-when" data-wall-when></div><div class="wall-plan-name" data-plan-name="pioneer_year" data-tier-name></div></div><div class="wall-plan-price" data-wall-price></div></div>
           <p class="wall-plan-sub" data-wall-sub></p>
           <p class="wall-plan-terms" data-plan-terms="pioneer_year"></p>
           <ul class="wall-plan-list"><li>Everything in Vaulter</li><li>The Entrepreneur tab</li><li>Your own 3D house design and AI house model</li><li>House builder Level 3 (coming)</li><li>Early access to new features and roadmap voting</li></ul>
@@ -101,8 +109,7 @@ html.vi-walled body>:not(#plan-wall):not(#login-overlay):not(#welcome-overlay):n
         </div>
         <div class="wall-plan" data-tier-card="founder">
           <div class="wall-plan-top"><svg class="vi-tier-ic" data-tier="lifetime" viewBox="0 0 100 100" aria-hidden="true"><use href="#tier-lifetime"/></svg>
-            <div><div class="wall-plan-when">One payment</div><div class="wall-plan-name" data-plan-name="founder" data-tier-name></div></div></div>
-          <div class="wall-plan-price" data-plan-price="founder"></div>
+            <div><div class="wall-plan-when">One payment</div><div class="wall-plan-name" data-plan-name="founder" data-tier-name></div></div><div class="wall-plan-price" data-plan-price="founder"></div></div>
           <p class="wall-plan-sub" data-wall-sub></p>
           <p class="wall-plan-terms" data-plan-terms="founder"></p>
           <ul class="wall-plan-list"><li>The whole app for the life of the service, Pioneer features included</li><li>Lifetime badge and name in credits</li><li>Priority requests</li><li>AI screenshot reader, 10 a month</li><li>100 places</li></ul>

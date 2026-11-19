@@ -701,7 +701,7 @@ function viAskCurrentPin(title, text) {
     var m = document.createElement('div'); m.id = 'askpin-modal';
     m.style.cssText = 'position:fixed;inset:0;z-index:20003;background:rgb(var(--panel-rgb) / .95);display:flex;align-items:center;justify-content:center;padding:12px';
     m.innerHTML = '<div style="background:var(--c1);border:1px solid var(--bd2);border-radius:10px;width:min(380px,94vw);padding:20px 18px;font-family:\'DM Sans\',sans-serif">'
-      + '<div style="font-family:\'Syne\',sans-serif;font-size:max(.8rem,var(--vi-fs-3));font-weight:800;color:var(--tx);margin-bottom:8px">' + title + '</div>'
+      + '<div style="font-family:\'Chakra Petch\',sans-serif;font-size:max(.8rem,var(--vi-fs-3));font-weight:800;color:var(--tx);margin-bottom:8px">' + title + '</div>'
       + '<div style="font-size:max(.58rem,var(--vi-fs-2));color:var(--t2);line-height:1.6;margin-bottom:10px">' + text + '</div>'
       + '<input id="askpin-inp" class="al-inp" type="password" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="Current 6-digit PIN" style="width:100%;margin-bottom:12px">'
       + '<div style="display:flex;gap:8px"><button class="btn-add-data" id="askpin-no" style="flex:1;background:transparent;border-color:var(--t3);color:var(--t3)">Cancel</button><button class="btn-add-data" id="askpin-ok" style="flex:1">Continue</button></div></div>';

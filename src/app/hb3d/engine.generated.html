@@ -5865,7 +5865,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     this._idle = 0;
     this._loop = function () {
       self._raf = 0;
-      if (!self.active || self.offscreen || document.hidden) { self._lastT = 0; return; }   // off screen or in a background tab: sleep (woken when seen again)
+      if (!self.active || self.offscreen || document.hidden || document.body.classList.contains('vi-fb-open')) { self._lastT = 0; return; }   // also asleep behind the Feedback sheet (19 Nov 2026)   // off screen or in a background tab: sleep (woken when seen again)
       // brand: what a drawn frame really cost is the gap until the browser gives us the next frame (the GPU work lands after render() returns)
       if (self.brand && self._bDrewAt) { var fc = performance.now() - self._bDrewAt; self._bCost = self._bCost == null ? fc : self._bCost * 0.6 + fc * 0.4; self._bDrewAt = 0; self._bGap = Math.max(80, Math.min(1500, self._bCost * 2.2)); }
       // v0.7 cold start: while the still picture covers the stage, draw one part a frame into the hidden canvas so each shader program
@@ -5903,6 +5903,8 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     }
     this._onVis = function () { if (!document.hidden) { self.dirty = true; self.wake(); } };
     document.addEventListener('visibilitychange', this._onVis);
+    this._onFb = function () { self.dirty = true; self.wake(); };
+    document.addEventListener('vi-fb-closed', this._onFb);
     cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); self.lost = true; self.stop(); if (self.onLost) self.onLost(); });
     cv.addEventListener('webglcontextrestored', function () { self.lost = false; self._shadowDirty = true; if (self.model) self.show(self.model, true); self.start(); if (self.onRestored) self.onRestored(); });
     this.start();
@@ -6111,6 +6113,7 @@ var HB3D = (typeof HB3D !== 'undefined' && HB3D) || {};
     if (this._ro) this._ro.disconnect();
     if (this._io) this._io.disconnect();
     if (this._onVis) document.removeEventListener('visibilitychange', this._onVis);
+    if (this._onFb) document.removeEventListener('vi-fb-closed', this._onFb);
     if (this._bIO) this._bIO.disconnect();
     this.controls.dispose(); this.renderer.dispose();
     if (this.renderer.domElement.parentNode) this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);

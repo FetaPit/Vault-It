@@ -529,7 +529,7 @@ function drawChart() {
     ctx.beginPath(); ctx.moveTo(mid, PAD.t); ctx.lineTo(mid, H-PAD.b); ctx.stroke();
     ctx.setLineDash([]);
     ctx.fillStyle = viRgba('gold',.9);
-    ctx.font = "bold 9px 'Syne',sans-serif";
+    ctx.font = "bold 9px 'Chakra Petch',sans-serif";
     ctx.textAlign = NOW_FRAC >= 1 ? 'right' : 'center';
     ctx.fillText('TODAY', NOW_FRAC >= 1 ? mid + 2 : mid, PAD.t - 4);
     var tw = ctx.measureText('TODAY').width, tx = NOW_FRAC >= 1 ? mid + 2 - tw : mid - tw / 2;
@@ -550,7 +550,7 @@ function drawChart() {
         ctx.beginPath(); ctx.moveTo(qx, PAD.t); ctx.lineTo(qx, H-PAD.b); ctx.stroke();
         ctx.setLineDash([]);
         ctx.fillStyle = viLight() ? viCss('teal') : 'rgba(68,192,185,0.4)';
-        ctx.font = "bold 8px 'Syne',sans-serif";
+        ctx.font = "bold 8px 'Chakra Petch',sans-serif";
         ctx.textAlign = 'center';
         var qLabel = 'Q'+(Math.floor(q.getMonth()/3)+1)+' \'' +String(q.getFullYear()).slice(2);
         var qw = ctx.measureText(qLabel).width, q0 = qx - qw / 2, q1 = qx + qw / 2, tops = canvas._topLabels || [];
@@ -600,7 +600,7 @@ function drawChart() {
   // label moves below its line, so labels never overlap. canvas._msLabels keeps the plates for the tests.
   var msShown=msAll.filter(function(it){return it.m>0&&it.m>=minV&&it.m<=maxV;}).map(function(it){return{it:it,y:yp(it.m)};}).sort(function(a,b){return a.y-b.y;});
   canvas._msLabels=[];
-  ctx.save(); ctx.font="10px 'Syne',sans-serif";
+  ctx.save(); ctx.font="10px 'Chakra Petch',sans-serif";
   var LH=14, placed=[];
   msShown.forEach(function(o,i){
     var it=o.it,my=o.y,txt=it.label+' '+gbpFmt(it.m),tw=Math.ceil(ctx.measureText(txt).width),pw=tw+6;

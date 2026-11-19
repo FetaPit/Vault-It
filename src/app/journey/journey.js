@@ -369,7 +369,7 @@ function renderJrnySVG(currentStage, selectedNode) {
   out += '<text x="' + branchX + '" y="' + (branchY - 8) + '" text-anchor="middle" font-size="12"'
     + ' fill="' + bTxtMain + '" style="pointer-events:none">💡</text>';
   out += '<text x="' + branchX + '" y="' + (branchY + 7) + '" text-anchor="middle" font-size="5.8"'
-    + ' fill="' + bTxtMain + '" font-family="Syne,sans-serif" font-weight="800" style="pointer-events:none">SIDE INCOME</text>';
+    + ' fill="' + bTxtMain + '" font-family="Chakra Petch,sans-serif" font-weight="800" style="pointer-events:none">SIDE INCOME</text>';
   out += '<text x="' + branchX + '" y="' + (branchY + 18) + '" text-anchor="middle" font-size="5.5"'
     + ' fill="' + bTxtSub + '" font-family="Share Tech Mono,monospace" style="pointer-events:none">'
     + (debtDone ? 'Unlocked ✓' : 'Clr debt 1st') + '</text>';
@@ -433,7 +433,7 @@ function renderJrnySVG(currentStage, selectedNode) {
       out += '<rect x="' + (mainX + r + 4) + '" y="' + (cy - r - 1) + '" width="70" height="11" rx="2.5"'
         + ' fill="' + col + '18" stroke="' + col + '44" stroke-width="0.8"/>';
       out += '<text x="' + (mainX + r + 39) + '" y="' + (cy - r + 7) + '" text-anchor="middle"'
-        + ' font-size="5.8" fill="' + col + '" font-family="Syne,sans-serif" font-weight="800"'
+        + ' font-size="5.8" fill="' + col + '" font-family="Chakra Petch,sans-serif" font-weight="800"'
         + ' style="pointer-events:none">YOU ARE HERE</text>';
     }
 
@@ -442,7 +442,7 @@ function renderJrnySVG(currentStage, selectedNode) {
     var nameCol = isPast ? col : isCurrent ? '#f0f4f8' : 'rgba(100,108,118,.6)';
     out += '<text x="' + lx + '" y="' + (cy - 5) + '"'
       + ' font-size="' + (isMilestone && (isPast || isCurrent) ? '11' : '10') + '"'
-      + ' fill="' + nameCol + '" font-family="Syne,sans-serif"'
+      + ' fill="' + nameCol + '" font-family="Chakra Petch,sans-serif"'
       + ' font-weight="' + (isMilestone ? '800' : '700') + '"'
       + ' onclick="jrnySelectNode(' + i + ')" style="cursor:pointer">' + st.name + '</text>';
 

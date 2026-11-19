@@ -57,7 +57,28 @@ document.addEventListener('visibilitychange',function(){if(document.hidden){rec(
 /* ---- the picture of the screen, every figure hidden before it leaves the device ---- */
 function loadH2C(){if(window.html2canvas)return Promise.resolve(window.html2canvas);
   return new Promise(function(res,rej){var s=document.createElement('script');s.src=H2C;s.onload=function(){res(window.html2canvas)};s.onerror=rej;document.head.appendChild(s);setTimeout(function(){rej(new Error('timeout'))},8000)})}
+/* html2canvas 1.4.1 cannot read CSS color-mix() (owner, 19 Nov 2026: the picture failed on Overview and Budget). In the copy only, never in the app,
+ * each color-mix(...) becomes a plain translucent grey, so the library can parse every rule. The picture is for finding bugs and is pixelated and masked anyway. */
+function plainMix(t){var o='',i=0,k;while((k=t.indexOf('color-mix(',i))>=0){o+=t.slice(i,k);var d=0,j=k+9;for(;j<t.length;j++){if(t[j]==='(')d++;else if(t[j]===')'){d--;if(!d)break}}o+='rgba(136,153,170,.3)';i=j+1}return o+t.slice(i)}
+function plainColours(doc){
+  [].forEach.call(doc.querySelectorAll('style'),function(st){var t=st.textContent;if(t&&t.indexOf('color-mix(')>=0)st.textContent=plainMix(t)});
+  [].forEach.call(doc.querySelectorAll('[style*="color-mix"]'),function(e){e.setAttribute('style',plainMix(e.getAttribute('style')))});
+}
+/* Pseudo-elements (::before, ::after) are read from the LIVE page, not the copy, so a colour variable defined with color-mix() must be plain while the picture is taken.
+ * For that moment only, each such variable gets its resolved colour as a !important override, removed again straight after. */
+function liveFlat(){
+  var st=null;try{var cv=document.createElement('canvas');cv.width=cv.height=1;var cx=cv.getContext('2d',{willReadFrequently:true}),pr=document.createElement('i'),css='';pr.style.cssText='position:absolute;visibility:hidden';document.body.appendChild(pr);
+    var seen={};
+    [].forEach.call(document.styleSheets,function(ss){var rs;try{rs=ss.cssRules}catch(e){return}
+      [].forEach.call(rs||[],function(r){if(!r.style||!r.selectorText)return;
+        for(var i=0;i<r.style.length;i++){var n=r.style[i];if(n.indexOf('--')!==0)continue;var v=r.style.getPropertyValue(n);if(v.indexOf('color-mix(')<0)continue;
+          var k=r.selectorText+'|'+n;if(seen[k])continue;seen[k]=1;pr.style.color='';pr.style.color=v;if(!pr.style.color)continue;
+          var c=getComputedStyle(pr).color;cx.clearRect(0,0,1,1);cx.fillStyle='#000';cx.fillStyle=c;cx.fillRect(0,0,1,1);var d=cx.getImageData(0,0,1,1).data;
+          css+=r.selectorText+'{'+n+':rgba('+d[0]+','+d[1]+','+d[2]+','+(d[3]/255).toFixed(3)+')!important}'}})});
+    pr.remove();if(css){st=document.createElement('style');st.id='vi-fb-flat';st.textContent=css;document.head.appendChild(st)}}catch(e){}
+  return function(){if(st&&st.parentNode)st.remove()}}
 function maskDoc(doc){
+  try{plainColours(doc)}catch(e){}
   var w=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT),n;while((n=w.nextNode()))if(/\d/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace(/\d/g,'•');
   [].forEach.call(doc.querySelectorAll('input,textarea'),function(i){if(/checkbox|radio|button|submit/.test(i.type))return;var v=String(i.value||'').replace(/\d/g,'•');i.value=v;i.setAttribute('value',v);if(i.placeholder)i.placeholder=i.placeholder.replace(/\d/g,'•')});
   var fb=doc.getElementById('vi-fb');if(fb)fb.remove();var bt=doc.getElementById('vi-fb-btn');if(bt)bt.remove();
@@ -78,11 +99,12 @@ function skipEl(el){
   return false}
 function capture(){
   if(shotBusy)return shotBusy;
-  shotBusy=loadH2C().then(function(h2c){var scale=Math.min(1,960/innerWidth);
+  var unflat=null;
+  shotBusy=loadH2C().then(function(h2c){var scale=Math.min(1,960/innerWidth);unflat=liveFlat();
     return h2c(document.body,{x:scrollX,y:scrollY,width:innerWidth,height:innerHeight,windowWidth:innerWidth,windowHeight:innerHeight,scale:scale,logging:false,useCORS:false,
       backgroundColor:getComputedStyle(document.body).backgroundColor,ignoreElements:skipEl,onclone:function(d){maskDoc(d)}})
       .then(function(out){pixelate(out,out.width/innerWidth);var q=.62,u=out.toDataURL('image/jpeg',q);while(u.length>680000&&q>.25){q-=.12;u=out.toDataURL('image/jpeg',q)}return u.length>680000?null:u})})
-    .catch(function(e){console.warn('[Vault-It] feedback picture',e);return null}).then(function(u){shot=u;shotBusy=null;paintShot();return u});
+    .catch(function(e){console.warn('[Vault-It] feedback picture',e);return null}).then(function(u){if(unflat)unflat();shot=u;shotBusy=null;paintShot();return u});
   return shotBusy;
 }
 function paintShot(){var p=document.getElementById('vi-fb-shot'),st=document.getElementById('vi-fb-picst');if(!p)return;
@@ -113,11 +135,11 @@ window.viFbOpen=function(mo){
   [].forEach.call(m.querySelectorAll('.vi-fb-rate button'),function(b){b.setAttribute('aria-pressed','false')});
   var cb=document.getElementById('vi-fb-pic');cb.checked=true;cb.disabled=false;
   shot=null;rec('feedback_open',mo||'button',null,false);
-  m.hidden=false;document.body.classList.add('vi-pop-open');paintShot();
+  m.hidden=false;document.body.classList.add('vi-pop-open','vi-fb-open');paintShot();
   if(!signedIn())document.getElementById('vi-fb-msg').innerHTML='Sign in to send feedback from here, or email <a href="mailto:hello@vault-it.co?subject=Vault-It%20beta%20feedback">hello@vault-it.co</a>.';
   setTimeout(function(){var t=document.getElementById('vi-fb-text');if(t)t.focus()},40);
 };
-window.viFbClose=function(){var m=document.getElementById('vi-fb');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open');var b=returnTo;returnTo=null;if(b&&b.focus)setTimeout(function(){try{b.focus()}catch(e){}},0)};
+window.viFbClose=function(){var m=document.getElementById('vi-fb');if(m)m.hidden=true;document.body.classList.remove('vi-pop-open','vi-fb-open');try{document.dispatchEvent(new Event('vi-fb-closed'))}catch(e){}var b=returnTo;returnTo=null;if(b&&b.focus)setTimeout(function(){try{b.focus()}catch(e){}},0)};
 window.viFbRate=function(n){rating=n;[].forEach.call(document.querySelectorAll('#vi-fb .vi-fb-rate button'),function(b){b.setAttribute('aria-pressed',String(+b.dataset.r===n))})};
 window.viFbSend=async function(){
   var msg=document.getElementById('vi-fb-msg'),txt=document.getElementById('vi-fb-text').value.trim(),btn=document.getElementById('vi-fb-send');

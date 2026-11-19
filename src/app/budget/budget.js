@@ -227,7 +227,7 @@ function drawCashflowDiagram(){
   }
   try{document.documentElement.style.setProperty('--bd-split',((XI+nodeW)/W*100).toFixed(2)+'%');}catch(e){}   // the Budget page's income | spending divider follows the diagram's income block
   var one=window.innerWidth<1100;   // phones and tablets: 1:1, scrolled sideways, so the chips draw at their real size (v0.8 type scale)
-  var out='<svg viewBox="0 0 '+W+' '+H.toFixed(0)+'" width="'+(one?W:'100%')+'"'+(one?' height="'+H.toFixed(0)+'" class="cf-1to1"':'')+' style="min-width:'+(one?W+'px':wide?'0':'640px')+'" font-family="Syne,DM Sans,sans-serif" role="img" aria-label="Cash flow diagram">';
+  var out='<svg viewBox="0 0 '+W+' '+H.toFixed(0)+'" width="'+(one?W:'100%')+'"'+(one?' height="'+H.toFixed(0)+'" class="cf-1to1"':'')+' style="min-width:'+(one?W+'px':wide?'0':'640px')+'" font-family="Chakra Petch,DM Sans,sans-serif" role="img" aria-label="Cash flow diagram">';
   // -- links
   var sy=srcY,io=0;
   sources.forEach(function(s){

@@ -39,7 +39,7 @@
 .welcome-h2 {
   font-family: var(--font-display);   /* owner, 12 Nov 2026: headings in the brand display face, whatever it is set to in shell/tokens.css */
   font-size: 20px;   /* v0.9.2: 20 px on a phone, 24 px from 700 px up (was 11.7 and 15 px, smaller than the app's body text) */
-  font-weight: 700;   /* Syne 700 for sentence-length headings (Pedro, 5 Nov: 800 is too extended to read easily); 800 stays for the wordmark and short titles */
+  font-weight: 700;   /* Chakra Petch 700 for sentence-length headings (Pedro, 5 Nov: 800 is too extended to read easily); 800 stays for the wordmark and short titles */
   color: var(--tx);
   margin-bottom: 6px;
   line-height: 1.3;

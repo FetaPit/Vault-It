@@ -9,7 +9,7 @@
 /* the net worth tile's foot: History, Goals, Snapshots bottom right, each panel opens under the chart at full tile width (owner, 2 Nov; Pedro's v0.8 spec E) */
 .nw-more{margin-top:10px}
 .nw-more .nw-more-btns{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px}
-.nw-more-btns button{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 9px 0 8px;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted);font:700 10px/1 'Syne',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.nw-more-btns button{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 9px 0 8px;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted);font:700 10px/1 'Chakra Petch',sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
 .nw-more-btns button .vi-ic{width:14px;height:14px}
 .nw-more-btns button .nw-more-chev{width:12px;height:12px;transition:transform .2s}
 .nw-more-btns button[aria-expanded="true"]{border-color:var(--teal);color:var(--teal)}
@@ -17,7 +17,7 @@
 .nw-more-btns button:hover{color:var(--text)}.nw-more-btns button[aria-expanded="true"]:hover{color:var(--teal)}
 .nw-more-btns button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.nw-more-btns button .nw-more-chev{transition:none}}
-@media (max-width:420px){.nw-more .nw-more-btns{gap:4px}.nw-more-btns button{letter-spacing:.04em;padding:0 7px 0 6px}}   /* one row at 390 with the real Syne loaded (Pedro review 2) */
+@media (max-width:420px){.nw-more .nw-more-btns{gap:4px}.nw-more-btns button{letter-spacing:.04em;padding:0 7px 0 6px}}   /* one row at 390 with the real Chakra Petch loaded (Pedro review 2) */
 .nw-more-panel{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd)}
 .nw-more-panel[hidden]{display:none!important}
 .nw-more-hist{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -68,7 +68,7 @@
 .bd-tile.folded .bd-tile-hd{border-bottom-color:transparent}
 .bd-tile-ic{flex:none;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--t);background:color-mix(in srgb,var(--c) 22%,transparent);border:1px solid color-mix(in srgb,var(--c) 55%,transparent)}
 .bd-tile-tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.bd-tile-tt b{font:800 .77rem/1.25 'Syne',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--t);text-wrap:balance;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}   /* two lines at most, never under the amount (owner, 2 Nov, v0.8) */
+.bd-tile-tt b{font:800 .77rem/1.25 'Chakra Petch',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--t);text-wrap:balance;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}   /* two lines at most, never under the amount (owner, 2 Nov, v0.8) */
 .bd-tile-tt em{font:normal max(.56rem,var(--vi-fs-2)) 'DM Sans',sans-serif;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bd-tile-sum{flex:none;display:flex;flex-direction:column;align-items:flex-end;font:700 .92rem 'Share Tech Mono',monospace;color:var(--tx);white-space:nowrap}
 .bd-tile-sum small{font:max(.5rem,var(--vi-fs-1))/1.2 'Share Tech Mono',monospace;color:var(--t3);font-weight:400;white-space:normal;max-width:7ch;text-align:right}
@@ -92,12 +92,12 @@
 .bd-tile.folded{align-self:start}
 .bd-tile-body{flex:1;display:flex;flex-direction:column}
 .bd-qa{margin-top:auto;padding-top:12px}
-.bd-qa-t{font:700 max(.56rem,var(--vi-fs-2)) 'Syne',sans-serif;letter-spacing:.08em;color:var(--t);margin-bottom:6px;text-transform:uppercase;opacity:.85}
+.bd-qa-t{font:700 max(.56rem,var(--vi-fs-2)) 'Chakra Petch',sans-serif;letter-spacing:.08em;color:var(--t);margin-bottom:6px;text-transform:uppercase;opacity:.85}
 .bd-qa-row{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) auto;gap:6px}
 .bd-qa-row input{min-width:0;background:rgba(0,0,0,.28);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);border-radius:7px;color:var(--tx);font:max(.74rem,var(--vi-fs-3)) 'Share Tech Mono',monospace;padding:8px 9px}
 .bd-qa-row .btn-add-data{padding:8px 14px}
 .bd-per100{margin-top:6px}
-.bd-p100-t{font:700 max(.64rem,var(--vi-fs-2)) 'Syne',sans-serif;letter-spacing:.08em;color:var(--t2);margin:16px 0 10px}
+.bd-p100-t{font:700 max(.64rem,var(--vi-fs-2)) 'Chakra Petch',sans-serif;letter-spacing:.08em;color:var(--t2);margin:16px 0 10px}
 .bd-p100-row{display:grid;grid-template-columns:22px minmax(0,9.5em) 1fr 3.2em;align-items:center;gap:8px;margin-bottom:8px;font-size:max(.72rem,var(--vi-fs-3));color:var(--t1)}
 .bd-p100-ic{color:var(--t);display:flex}
 .bd-p100-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

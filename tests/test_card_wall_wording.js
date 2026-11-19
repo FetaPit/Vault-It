@@ -2,7 +2,7 @@
 // Owner: "Remove whole app no card as we are asking for card details now." and "Update font and add 30 days free in header
 // font in teal with free in gold" (first welcome screen). Brief: remove "no card" wherever it appears and say what happens:
 // 30 days free, card taken now, first charged on day 31, how to cancel.
-//   1. first welcome screen: the heading reads "30 days free", in the heading font (family unchanged: Syne), teal with "free"
+//   1. first welcome screen: the heading reads "30 days free", in the heading font (family unchanged: Chakra Petch), teal with "free"
 //      in gold, Night and Daylight, phone and desktop; the line under it says when the card is taken and first charged
 //   2. the tester note makes no "no card" promise (its wording, reworded the same day, is test_founder_box.js)
 //   3. Terms section 6 no longer says a plan is optional; it states the free period, the first charge and how to cancel;
@@ -39,7 +39,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL:', m)
     });
     ok(W.text === '30 days free' && W.free === 'free' && W.seen, T + '1 the first welcome heading reads "30 days free" (' + W.text + ')');
     ok(W.col === W.teal && W.freeCol === W.gold && W.teal !== W.gold, T + '1 it is teal with "free" in gold (' + W.col + ' / ' + W.freeCol + ')');
-    ok(/Syne/.test(W.font) && W.font === W.freeFont && (!W.otherFont || W.font === W.otherFont) && W.weight === W.freeWeight, T + '1 in the screen\'s heading font, family unchanged (' + W.font.slice(0, 30) + ', ' + W.weight + ')');
+    ok(/Chakra Petch/.test(W.font) && W.font === W.freeFont && (!W.otherFont || W.font === W.otherFont) && W.weight === W.freeWeight, T + '1 in the screen\'s heading font, family unchanged (' + W.font.slice(0, 30) + ', ' + W.weight + ')');
     ok(!/no card|whole app/i.test(W.text + ' ' + W.sub), T + '1 "The whole app, no card" is gone');
     ok(/card is taken/i.test(W.sub) && /first charged on day 31/.test(W.sub) && /cancel before then and you pay nothing/i.test(W.sub), T + '1 the line under it says when the card is taken and first charged, and that cancelling before then costs nothing (' + W.sub + ')');
     ok(!/keep editing|After 30 days, pick a plan/i.test(W.sub), T + '1 no promise of using the app before a plan is chosen');

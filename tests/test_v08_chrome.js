@@ -70,7 +70,7 @@ const seed = t => {
     const fd = await p.evaluate(async () => { const b = document.getElementById('vi-fb-btn'), r0 = b.getBoundingClientRect(), h = document.createElement('div');
       h.className = window.__hudCls || 'nw3d-hud'; h.style.cssText = 'position:fixed;z-index:1;left:' + (r0.left + 4) + 'px;top:' + (r0.top + 2) + 'px;width:30px;height:28px'; document.body.appendChild(h);
       const until = async f => { for (let i = 0; i < 30 && !f(); i++) { window.dispatchEvent(new Event('scroll')); await new Promise(r => setTimeout(r, 100)); } return f(); };
-      const over = await until(() => getComputedStyle(b).opacity === '0' && getComputedStyle(b).pointerEvents === 'none');
+      const over = await until(() => parseFloat(getComputedStyle(b).opacity) < .6 && getComputedStyle(b).pointerEvents !== 'none');
       const r1 = b.getBoundingClientRect(); h.remove(); const back = await until(() => getComputedStyle(b).opacity === '1');
       return { over, back, still: Math.abs(r1.right - r0.right) < 1 && Math.abs(r1.top - r0.top) < 1 }; });
     ok(fd.over && fd.back && fd.still, T + 'over 3D controls the button fades out without moving, and returns when clear ' + JSON.stringify(fd));
@@ -78,7 +78,7 @@ const seed = t => {
     const fd2 = await p.evaluate(async () => { const b = document.getElementById('vi-fb-btn'), r0 = b.getBoundingClientRect(), h = document.createElement('div');
       h.className = window.__hudCls || 'nw3d-hud'; h.style.cssText = 'position:fixed;z-index:1;left:' + (r0.left + 4) + 'px;top:' + (r0.top + 2) + 'px;width:30px;height:28px'; document.body.appendChild(h);
       const until = async f => { for (let i = 0; i < 30 && !f(); i++) { window.dispatchEvent(new Event('scroll')); await new Promise(r => setTimeout(r, 100)); } return f(); };
-      const over = await until(() => getComputedStyle(b).opacity === '0' && getComputedStyle(b).pointerEvents === 'none');
+      const over = await until(() => parseFloat(getComputedStyle(b).opacity) < .6 && getComputedStyle(b).pointerEvents !== 'none');
       const r1 = b.getBoundingClientRect(); h.remove(); const back = await until(() => getComputedStyle(b).opacity === '1');
       return { over, back, still: Math.abs(r1.right - r0.right) < 1 && Math.abs(r1.top - r0.top) < 1 }; });
     ok(fd2.over && fd2.back && fd2.still, T + 'over a viewer zoom bar (.hud-bar) the button fades out without moving, and returns when clear ' + JSON.stringify(fd2));
