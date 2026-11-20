@@ -1,5 +1,5 @@
 // vault-it.co/pitch-Eligent-five: the five-minute pitch (owner, 19 Nov 2026: "a new pitch deck refined from all feedback deliverable in 5 mins
-// verbally ... interacive"), served through the real Worker routing from the real build. Eight slides, problem first; the figures are the v3
+// verbally ... interacive"), served through the real Worker routing from the real build. Nine slides, problem first, a detailed roadmap before the ask; the figures are the v3
 // business plan's (base and best case, consumers and partners together) and the live decks'; two switches (Sam's £50, base / best), a Notes
 // view with the spoken script and a five-minute timer, the same Present view as the other decks; ends on £250,000 under SEIS plus one introduction.
 require('./lib/vi');
@@ -34,9 +34,9 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
 
   let p = await open(390, 844, true);
   const n = await p.locator('.frame').count();
-  ok(n === 8, 'eight slides for five minutes: ' + n);
+  ok(n === 9, 'nine slides for five minutes: ' + n);
   { const ids = await p.evaluate(() => [...document.querySelectorAll('.frame > section')].map((s) => s.id));
-    ok(ids.join() === 'cover,sam,scale,solution,whopays,growth,proof,ask', 'problem first, the ask last: ' + ids); }
+    ok(ids.join() === 'cover,sam,scale,solution,whopays,growth,proof,roadmap,ask', 'problem first, the ask last: ' + ids); }
   ok(p.errs.length === 0, 'no page errors: ' + p.errs.join(' | '));
   const body = await p.evaluate(() => document.body.innerText);
   ok(/Not regulated by the FCA\. Not financial advice\./i.test(body), 'the FCA line is on the page');
@@ -99,7 +99,19 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
     ok(/HelpBnk Starter Kit/.test(s) && !/Web Summit|Vanta|Greenborough|uptime/i.test(s), 'the HelpBnk Starter Kit is named; Web Summit, Vanta, Greenborough and the uptime monitor stay off (owner, 19 Nov)');
     ok(/trust centre in development/i.test(s) && /HexaTown/.test(s) && /security and compliance/i.test(s) && /NDA signed/i.test(s) && !/ISO 27001 certified|certified to ISO|SOC 2/i.test(s), 'the trust centre is in development and HexaTown is named, with no certificate claimed (owner, 19 Nov)');
     ok(/19 November 2026/i.test(s) && /pre-revenue/i.test(s) && /15 to 20% equity/.test(s) && !/25%/.test(s) && /February 2027/i.test(s) && /September 2028/i.test(s), 'dated, pre-revenue, the open seats and the two dated milestones'); }
-  // Slide 8: the two asks
+  // Slide 8: the detailed roadmap (owner, 20 Nov 2026: "Add a detailed roadmap slide."), milestones and dates from business plan v3's Roadmap tab
+  { const r = await txt(p, 'roadmap');
+    const g = await p.evaluate(() => ({ cols: [...document.querySelectorAll('#roadmap [data-when]')].map((e) => e.dataset.when).join(), lanes: [...document.querySelectorAll('#roadmap [data-lane]')].map((e) => e.dataset.lane).join(), cells: document.querySelectorAll('#roadmap .rm > div.c').length, items: document.querySelectorAll('#roadmap .rm > div.c p').length, empty: [...document.querySelectorAll('#roadmap .rm > div.c')].filter((c) => !c.textContent.trim()).length }));
+    ok(g.cols === '2026,q1-2027,2027,2028' && g.lanes === 'funding,product,partners,trust', 'the roadmap is four periods by four workstreams: ' + g.cols + ' / ' + g.lanes);
+    ok(g.cells === 16 && g.empty === 0 && g.items >= 28, 'it is detailed: every cell is filled, 28 milestones or more: ' + JSON.stringify(g));
+    ok(/advance assurance/i.test(r) && /round closes/i.test(r) && /SEIS certificates/i.test(r) && /seed round/i.test(r) && /£1m to £1\.5m/.test(r) && /Start Up Loan/i.test(r), 'funding: Start Up Loan, advance assurance, the close, certificates, the seed round');
+    ok(/30 named targets/i.test(r) && /three letters of intent/i.test(r) && /first broker pilot/i.test(r) && /building society pilot/i.test(r) && /Partner Edition/.test(r) && /paid broker introductions/i.test(r) && /debt-advice programme/i.test(r), 'partners: targets, letters of intent, the three pilots, the debt-advice programme, the Partner Edition, paid introductions');
+    ok(/public launch/i.test(r) && /100 seats at £149/.test(r) && /first cohort judged/i.test(r) && /founder full time/i.test(r) && /engineer or co-founder/i.test(r) && /partnerships lead/i.test(r) && /bank-verified/i.test(r), 'product and team: launch, Founding Member offer, the cohort, the hires, the bank-verified record');
+    ok(/security review/i.test(r) && /Cyber Essentials/.test(r) && /perimeter opinion/i.test(r) && /Trust Centre live/i.test(r) && /ISO 27001/.test(r) && /penetration test/i.test(r), 'security and regulation: review, Cyber Essentials, the perimeter opinion, the Trust Centre, ISO 27001, the penetration test');
+    ok(!/Vanta|Web Summit|trade ?mark/i.test(r), 'nothing pending or on hold is named on the roadmap (Vanta, Web Summit, the trade mark)');
+    ok(/business plan v3/i.test(r) && /assume the round closes on time/i.test(r) && /Not regulated by the FCA\. Not financial advice\./i.test(r), 'it says it is the plan, that later dates assume the round closes on time, and carries the FCA line');
+    ok(await p.evaluate(() => { const f = [...document.querySelectorAll('.frame > section')].map((s) => s.id); return f.indexOf('roadmap') === f.indexOf('proof') + 1 && f.indexOf('ask') === f.length - 1; }), 'the roadmap follows "where it is" and the ask is still last'); }
+  // Slide 9: the two asks
   { const a = await txt(p, 'ask');
     ok(/£250,000/.test(a) && /SEIS/.test(a) && /March 2027/.test(a) && /32 months/.test(a) && !/27 months/.test(a) && /advance assurance/i.test(a), 'ask one: £250,000 under SEIS, closing March 2027, at least 32 months in the base case');
     const uf = await p.evaluate(() => [...document.querySelectorAll('#ask [data-fund]')].map((e) => [e.dataset.fund, e.innerText]));
@@ -113,8 +125,8 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
   { const say = await p.evaluate(() => [...document.querySelectorAll('.frame')].map((f) => ({ secs: +f.dataset.secs, words: ((f.querySelector('.say') || {}).textContent || '').trim().split(/\s+/).filter(Boolean).length })));
     const secs = say.reduce((s, x) => s + x.secs, 0), words = say.reduce((s, x) => s + x.words, 0);
     ok(say.every((x) => x.secs > 0 && x.words >= 20), 'every slide has its part of the script and a time budget: ' + JSON.stringify(say));
-    ok(secs === 240, 'the script is budgeted at 4:00, leaving a minute of the five for talking: ' + secs + 's');
-    ok(words >= 470 && words <= 560, 'the script is a four-minute read, 470 to 560 words: ' + words);
+    ok(secs === 265, 'the script is budgeted at 4:25, leaving 35 seconds of the five minutes for talking: ' + secs + 's');
+    ok(words >= 520 && words <= 600, 'the script is a 4:25 read, 520 to 600 words: ' + words);
     ok(say.every((x) => x.words / x.secs <= 2.5), 'no slide asks for more than 150 words a minute: ' + say.map((x) => Math.round(x.words / x.secs * 60)).join(' '));
     ok(await p.evaluate(() => [...document.querySelectorAll('.say')].every((e) => getComputedStyle(e).display === 'none')), 'the script never shows on the slides themselves'); }
   // brand marks
