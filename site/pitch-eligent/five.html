@@ -30,7 +30,7 @@ section a{color:inherit}
 .sw button{flex:1;min-height:72px;padding:0 18px;border-radius:999px;border:1px solid #15302F;background:#0A1018;color:#B6D8D6;font:24px 'Share Tech Mono','Courier New',monospace;letter-spacing:1px;cursor:pointer}
 .sw button[aria-pressed="true"]{border-color:#C9A84C;background:#12100A;color:#E8C56A}
 .sw button:focus-visible{outline:3px solid #44C0B9;outline-offset:3px}
-.chart{display:flex;flex-direction:row;gap:36px;align-items:flex-end}
+.chart{display:flex;flex-direction:row;gap:36px;align-items:flex-start}
 .yr{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
 .bars{height:400px;display:flex;flex-direction:row;gap:24px;align-items:flex-end;border-bottom:2px solid #2A5552;padding:0 20px}
 .bars div{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;height:100%}
@@ -45,12 +45,23 @@ section a{color:inherit}
 .key{display:flex;flex-direction:row;align-items:center;gap:14px;font-size:24px;color:#B6D8D6}.key i{flex:none;width:28px;height:28px;border-radius:6px}
 .now{flex:1;border:1px solid #15302F;border-radius:18px;padding:16px 30px;background:rgba(6,36,42,.35);display:flex;flex-direction:column;gap:2px}
 .now b{font-family:'Share Tech Mono','Courier New',monospace;font-weight:400;font-size:84px;line-height:1;color:#E8C56A}.now span{font-size:26px;color:#B6D8D6}
-.rm{display:grid;grid-template-columns:232px repeat(4,1fr);border-top:1px solid #1E4442}
-.rm>div{display:flex;flex-direction:column;gap:5px;min-width:0;padding:13px 16px;border-bottom:1px solid #1E4442}
-.rm>div.c,.rm>div.h{border-left:1px solid #1E4442}
-.rm>div.h{gap:2px;background:rgba(6,36,42,.45)}.rm>div.h b{font-family:'Share Tech Mono','Courier New',monospace;font-weight:400;font-size:24px;letter-spacing:2px;color:#E8C56A}.rm>div.h span{font-family:'Syne',Arial,sans-serif;font-weight:700;font-size:26px;line-height:1.2;color:#E8E8E8}
-.rm>div.l{padding-left:0;font-family:'Syne',Arial,sans-serif;font-weight:700;font-size:26px;line-height:1.2;color:#44C0B9}
-.rm .c p{font-size:24px;line-height:1.25;color:#E8E8E8}.rm .c p b{font-family:'Share Tech Mono','Courier New',monospace;font-weight:400;color:#7FA9A6;margin-right:10px}.rm .c p.g{color:#E8C56A}.rm .c p.g b{color:#E8C56A}
+.rdkey{display:flex;flex-direction:row;gap:34px;align-items:center;padding-bottom:10px}.rdkey span{display:flex;flex-direction:row;align-items:center;gap:12px;font-size:24px;color:#B6D8D6}.rdkey i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--c)}
+#roadmap [data-kind="funding"]{--c:#E8C56A}#roadmap [data-kind="partners"]{--c:#44C0B9}#roadmap [data-kind="company"]{--c:#E8E8E8}
+.rd{position:relative;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:250px 250px;margin:auto 0}
+.rd .line{position:absolute;left:0;right:0;top:50%;height:8px;margin-top:-4px;border-radius:4px;background:linear-gradient(90deg,#2A5552,#44C0B9 60%,#E8C56A)}
+.rd .line:after{content:'';position:absolute;left:100%;top:50%;margin-top:-16px;border:16px solid transparent;border-left:24px solid #E8C56A}
+.rd .m{display:flex;flex-direction:row;min-width:0}
+.rd .m.a{grid-row:1;justify-content:flex-end;align-items:flex-end;margin-left:-48px;padding-right:calc(25% - 2px)}
+.rd .m.b{grid-row:2;justify-content:flex-start;align-items:flex-start;margin-right:-48px;padding-left:calc(25% - 2px)}
+.rd .f{position:relative;display:flex;flex-direction:column;gap:4px}
+.rd .m.a .f{text-align:right;align-items:flex-end;padding:0 20px 46px 0;border-right:4px solid var(--c)}
+.rd .m.b .f{padding:46px 0 0 20px;border-left:4px solid var(--c)}
+.rd .f b{font-family:'Share Tech Mono','Courier New',monospace;font-weight:400;font-size:24px;letter-spacing:2px;color:var(--c)}
+.rd .f span{font-size:30px;line-height:1.2;font-weight:500;color:#E8E8E8}
+.rd .m.big .f span{font-family:'Syne',Arial,sans-serif;font-weight:700;font-size:34px;line-height:1.15;color:#E8C56A}
+.rd .dot{position:absolute;width:28px;height:28px;border-radius:50%;background:var(--c);border:5px solid #0A1A1C;box-sizing:content-box}
+.rd .m.a .dot{right:-21px;bottom:-19px}.rd .m.b .dot{left:-21px;top:-19px}
+.rd .m.big .dot{width:44px;height:44px}.rd .m.big.a .dot{right:-29px;bottom:-27px}.rd .m.big.b .dot{left:-29px;top:-27px}
 .fund{display:flex;flex-direction:row;align-items:baseline;gap:24px;padding:7px 0;border-bottom:1px solid rgba(26,20,0,.25)}
 .fund b{font-family:'Share Tech Mono','Courier New',monospace;font-weight:400;font-size:42px;width:104px;flex:none}
 .fund strong{font-family:'Syne',Arial,sans-serif;font-size:27px;line-height:1.2;font-weight:700;width:490px;flex:none;display:flex;flex-direction:column;gap:2px;white-space:nowrap}.fund em{font-style:normal;font-family:'Share Tech Mono','Courier New',monospace;font-weight:400;font-size:28px}
@@ -111,7 +122,7 @@ footer a{color:#E8C56A}
 
 <div class="frame" data-secs="15"><section id="cover" style="background:radial-gradient(ellipse at 75% 100%, #06242A 0%, #00131A 45%, #080808 100%);color:#E8E8E8;padding:128px 128px 160px;display:flex;flex-direction:row;align-items:center;gap:96px">
 <div style="flex:1;display:flex;flex-direction:column;gap:36px">
-<p class="kicker">INVESTOR DECK · FIVE MINUTES · NOVEMBER 2026</p>
+<p class="kicker">INVESTOR DECK · NOVEMBER 2026</p>
 <h1 style="font-family:'Syne', Arial, sans-serif;font-size:160px;font-weight:800;line-height:1;white-space:nowrap;color:#E8E8E8">Vault<span style="color:#44C0B9">-It</span></h1>
 <h2 style="font-size:52px;font-weight:600">Get out of the <span style="color:#C8202A">red</span> and into <span style="color:#44C0B9">your</span> <span style="color:#E8C56A">home</span>.</h2>
 <p style="font-size:36px;line-height:1.3;color:#E8E8E8;max-width:940px">Vault-It gives renters in debt one date for owning a home, and shows what brings it closer.</p>
@@ -128,7 +139,6 @@ footer a{color:#E8C56A}
 <h2 style="font-size:64px">Sam wants a home. Nobody can tell Sam when.</h2>
 <div>
 <div class="row"><p>Sam, 34, rents</p><p>owes £16,874</p></div>
-<div class="row"><p>Card at 24.9%, loan at 9.9%</p><p>£6,874 + £10,000</p></div>
 <div class="row"><p>Take-home pay a month</p><p>£2,300</p></div>
 <div class="row"><p>Rent, bills and food</p><p>£1,850</p></div>
 <div class="row"><p>Left after minimum payments</p><p>£66 a month</p></div>
@@ -154,11 +164,10 @@ footer a{color:#E8C56A}
 <div style="display:flex;flex-direction:row;gap:28px;align-items:stretch">
 <div class="card" style="flex:1"><p class="mono" style="font-size:76px;line-height:1;color:#E8C56A">8.4m</p><p style="font-size:28px">UK adults need debt advice</p><p class="src">MaPS, March 2026</p></div>
 <div class="card" style="flex:1"><p class="mono" style="font-size:76px;line-height:1;color:#E8C56A">2.7m</p><p style="font-size:28px">renting households in England expect to buy</p><p class="src">English Housing Survey 2024-25</p></div>
-<div class="card" style="flex:1"><p class="mono" style="font-size:76px;line-height:1;color:#E8C56A">£36,500</p><p style="font-size:28px">the median first-time buyer deposit</p><p class="src">English Housing Survey 2024-25</p></div>
-<div class="card" style="flex:1;border-color:#C9A84C"><p class="mono" style="font-size:76px;line-height:1;color:#E8C56A">9.7 <span style="font-size:40px">years</span></p><p style="font-size:28px">the typical case: £9,999 of debt (the median) and that deposit, at £400 a month</p><p class="src">Our sum, before interest</p></div>
+<div class="card" style="flex:1;border-color:#C9A84C"><p class="mono" style="font-size:76px;line-height:1;color:#E8C56A">9.7 <span style="font-size:40px">years</span></p><p style="font-size:28px">the typical case: the median debt (£9,999) cleared and the median deposit (£36,500) saved, at £400 a month</p><p class="src">Our sum, before interest · deposit: English Housing Survey 2024-25</p></div>
 </div>
 <div style="display:flex;flex-direction:row;gap:36px">
-<div class="pt" style="flex:1;border-color:#E05C5C"><p style="font-size:28px;color:#E8E8E8">Moneybox and Tembo start once you have money or are mortgage-ready. Budgeting apps show the past.</p></div>
+<div class="pt" style="flex:1;border-color:#E05C5C"><p style="font-size:28px;color:#E8E8E8">Moneybox and Tembo start once you have money. Budgeting apps show the past.</p></div>
 <div class="pt" style="flex:1;border-color:#E8C56A"><p style="font-size:28px;color:#E8E8E8"><b style="color:#E8C56A">Why now:</b> a First Time Buyer ISA replaces the Lifetime ISA for new savers from April 2029 (Budget, October 2026).</p></div>
 </div>
 <p class="foot">NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
@@ -174,8 +183,8 @@ footer a{color:#E8C56A}
 </div>
 <div style="width:700px;display:flex;flex-direction:column;gap:26px">
 <div class="pt" style="border-color:#E05C5C"><h3>Starts below zero</h3><p>Stage 0 is a starting line, not a failure screen.</p></div>
-<div class="pt" style="border-color:#E8C56A"><h3>One forward date</h3><p>The keys date recalculates with every payment, saving or debt cleared.</p></div>
-<div class="pt"><h3>Progress you can see</h3><p>Each pound saved lays real-scale bricks: 14,465 of them in a Victorian terrace.</p></div>
+<div class="pt" style="border-color:#E8C56A"><h3>One forward date</h3><p>The keys date moves with every payment.</p></div>
+<div class="pt"><h3>Progress you can see</h3><p>Every pound saved lays a brick in a to-scale 3D house.</p></div>
 </div>
 <p style="position:absolute;left:1240px;top:836px;width:552px;font-family:'Share Tech Mono', 'Courier New', monospace;font-size:28px;text-align:center;color:#E8C56A;background:#12100A;border:1px solid #C9A84C;border-radius:999px;padding:14px 24px">SAM'S KEYS DATE: AUGUST 2035</p>
 <p class="foot" style="width:1000px">THE APP'S OWN 3D ENGINE · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
@@ -188,11 +197,11 @@ footer a{color:#E8C56A}
 <h2 style="font-size:58px">Sam can pay £5.99 a month. The firms that want Sam later pay more.</h2>
 </div>
 <div style="display:flex;flex-direction:row;gap:28px;align-items:stretch">
-<div class="card" style="flex:1;gap:18px;min-height:400px"><p class="kicker">MORTGAGE BROKER</p><p style="font-size:28px;color:#B6D8D6">Earns £738 to £936 on a first-time buyer mortgage and pays £18 to £40 for a cold lead today.</p><p class="pay">Pays us £185 to £234 per completed mortgage</p></div>
-<div class="card" style="flex:1;gap:18px;min-height:400px"><p class="kicker">BUILDING SOCIETY</p><p style="font-size:28px;color:#B6D8D6">A mortgage sold direct to a member saves the £738 to £936 it would pay a broker.</p><p class="pay">£10,000 to £25,000 set&#8209;up, then £1 to £3 per active user a month</p></div>
-<div class="card" style="flex:1;gap:18px;min-height:400px"><p class="kicker">DEBT ADVICE, SPONSORED</p><p style="font-size:28px;color:#B6D8D6">Creditors already fund advice: about 10% of what StepChange clients repay.</p><p class="pay">About £1 per active user a month, paid by the sponsor</p></div>
+<div class="card" style="flex:1;gap:18px;min-height:300px"><p class="kicker">MORTGAGE BROKER</p><p style="font-size:28px;color:#B6D8D6">Pays £18 to £40 for a cold lead today.</p><p class="pay">Pays us £185 to £234 per completed mortgage</p></div>
+<div class="card" style="flex:1;gap:18px;min-height:300px"><p class="kicker">BUILDING SOCIETY</p><p style="font-size:28px;color:#B6D8D6">Selling direct saves the £738 to £936 broker fee.</p><p class="pay">£10,000 to £25,000 set&#8209;up, then £1 to £3 per active user a month</p></div>
+<div class="card" style="flex:1;gap:18px;min-height:300px"><p class="kicker">DEBT ADVICE, SPONSORED</p><p style="font-size:28px;color:#B6D8D6">Creditors already fund debt advice.</p><p class="pay">About £1 per active user a month, paid by the sponsor</p></div>
 </div>
-<div class="pt" style="border-color:#E05C5C"><p style="font-size:30px;color:#E8E8E8">No partner has been approached with this offer yet. Every partner price is an assumption the first three pilots test.</p></div>
+<div class="pt" style="border-color:#E05C5C"><p style="font-size:30px;color:#E8E8E8">No partner has been approached yet. Every partner price is an assumption the first three pilots test.</p></div>
 <p class="foot">MORTGAGE STRATEGY, FEB 2026 · LURVO, APR 2026 · STEPCHANGE ANNUAL REPORT 2025 · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
 </section>
 <div class="say"><p>Who pays? Sam can, £5.99 a month. But subscriptions alone will not carry this. The money is with the firms that want Sam later.</p><p>A mortgage broker earns £738 to £936 on a first-time buyer mortgage and pays £18 to £40 for a cold lead. We hand over a ready buyer, with consent and the figures filled in, for £185 to £234 on completion.</p><p>Building societies and creditor-funded debt advice are on the slide.</p><p>No partner has seen this yet. The pilots test those prices.</p></div></div>
@@ -200,29 +209,25 @@ footer a{color:#E8C56A}
 <div class="frame" data-secs="30"><section id="growth" style="background:#0A1A1C;color:#E8E8E8;padding:80px 128px 160px;display:flex;flex-direction:row;gap:72px;align-items:flex-start">
 <div style="flex:1;display:flex;flex-direction:column;gap:22px;min-width:0">
 <div style="display:flex;flex-direction:column;gap:18px">
-<p class="kicker">GROWTH · CONSUMERS AND PARTNERS TOGETHER</p>
+<p class="kicker">GROWTH · REVENUE, CONSUMERS AND PARTNERS TOGETHER</p>
 <h2 style="font-size:58px">Three pilots are the difference between these two cases.</h2>
 </div>
 <div class="chart">
-<div class="yr"><div class="bars"><div class="c2b"><span data-g="rev-1">£6,160</span><i data-b="rev-1"></i><em data-h="rev-1"></em></div></div><h3>Year 1</h3><p class="who"><b data-g="subs-1">101</b> subscribers<br><b data-g="partner-1">0</b> partner-funded users</p><p class="shr"><span data-s="1">41</span>% from partners</p></div>
-<div class="yr"><div class="bars"><div class="c2b"><span data-g="rev-2">£55,068</span><i data-b="rev-2"></i><em data-h="rev-2"></em></div></div><h3>Year 2</h3><p class="who"><b data-g="subs-2">318</b> subscribers<br><b data-g="partner-2">833</b> partner-funded users</p><p class="shr"><span data-s="2">72</span>% from partners</p></div>
+<div class="yr"><div class="bars"><div class="c2b"><span data-g="rev-1">£6,160</span><i data-b="rev-1"></i><em data-h="rev-1"></em></div></div><h3>Year 1</h3><p class="who"><b data-g="subs-1">101</b> subscribers<br><b data-g="partner-1">0</b> partner-funded users</p></div>
+<div class="yr"><div class="bars"><div class="c2b"><span data-g="rev-2">£55,068</span><i data-b="rev-2"></i><em data-h="rev-2"></em></div></div><h3>Year 2</h3><p class="who"><b data-g="subs-2">318</b> subscribers<br><b data-g="partner-2">833</b> partner-funded users</p></div>
 <div class="yr"><div class="bars"><div class="c2b"><b data-ghost class="ghost" style="bottom:338px">BEST CASE £429,814</b><span data-g="rev-3">£118,270</span><i data-b="rev-3"></i><em data-h="rev-3"></em></div></div><h3>Year 3</h3><p class="who"><b data-g="subs-3">580</b> subscribers<br><b data-g="partner-3">4,500</b> partner-funded users</p><p class="shr"><span data-s="3">75</span>% from partners</p></div>
 </div>
 </div>
 <div class="card tog" data-tog="case" style="width:540px;flex:none;padding:34px 36px;gap:22px;border-color:#2A5552;margin-top:44px">
 <div class="sw" role="group" aria-label="Which case"><button type="button" data-case="base" aria-pressed="true">BASE CASE</button><button type="button" data-case="best" aria-pressed="false">BEST CASE</button></div>
-<div style="display:flex;flex-direction:column;gap:12px">
-<p class="key"><i style="background:#E8C56A"></i>Revenue in the year</p>
-<p class="key ghost"><i style="background:none;border:2px dashed #7FA9A6"></i>Dashed: the best case</p>
-</div>
 <p id="g-lead" style="font-size:32px;line-height:1.3;font-weight:700;color:#E8E8E8">£250,000 lasts all three years of the model.</p>
-<p id="g-sum" aria-live="polite" style="font-size:27px;line-height:1.4;color:#E8E8E8;min-height:9.8em">It still does not break even: year 3 is £118,270 of revenue against £149,822 of costs. Assumes 600 sign-ups a month by the end of year 1 and 4% of them paying. Year 1's partner revenue is one £2,500 pilot fee.</p>
+<p id="g-sum" aria-live="polite" style="font-size:27px;line-height:1.4;color:#E8E8E8;min-height:6.4em">It still does not break even: year 3 is £118,270 of revenue against £149,822 of costs. Assumes 600 sign-ups a month by the end of year 1 and 4% of them paying.</p>
 </div>
-<p class="foot">MODEL OUTPUTS FROM STATED ASSUMPTIONS (BUSINESS PLAN V3, BASE CASE REVISED 19 NOV 2026), NOT TRADING DATA · YEAR 1 IS DEC 2026 TO NOV 2027 · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
+<p class="foot">MODEL OUTPUTS, NOT TRADING DATA (BUSINESS PLAN V3, BASE CASE REVISED 19 NOV 2026) · YEAR 1 IS DEC 2026 TO NOV 2027 · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
 </section>
 <div class="say"><p>Here is the revenue, consumers and partners together.</p><p>Base case, year three: £118,000, three quarters of it from partners. That does not break even, and I would rather show you that than a hockey stick.</p><p>The dashed line is the best case, if the pilots convert: £430,000 and a profit in year three.</p><p>The gap is three pilots. That is what the money buys.</p></div></div>
 
-<div class="frame" data-secs="30"><section id="proof" style="background:#080D14;color:#E8E8E8;padding:80px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div class="frame" data-secs="25"><section id="proof" style="background:#080D14;color:#E8E8E8;padding:80px 128px 160px;display:flex;flex-direction:column;gap:36px">
 <div style="display:flex;flex-direction:column;gap:18px">
 <p class="kicker">WHERE IT IS · 19 NOVEMBER 2026</p>
 <h2 style="font-size:62px">Live, built by one person, pre-revenue.</h2>
@@ -233,35 +238,39 @@ footer a{color:#E8C56A}
 <div class="now" data-now="waitlist"><b>9</b><span>on the waiting list</span></div>
 <div class="now" data-now="paying"><b>0</b><span>paying yet</span></div>
 </div>
-<div style="display:flex;flex-direction:row;gap:56px">
-<div style="flex:1;display:flex;flex-direction:column;gap:26px">
-<div class="pt" style="border-color:#E8C56A"><p class="kicker" style="color:#E8C56A">SINCE THE 7 NOVEMBER PITCH</p><p style="color:#E8E8E8;font-size:28px">v0.95 released on 10 November. Live demo and investor follow-up deck. Business plan v3 drafted, with a 36-month model. Pete is on the HelpBnk Starter Kit.</p></div>
-<div class="pt" style="border-color:#E8C56A"><p class="kicker" style="color:#E8C56A">SECURITY, NOW</p><p style="color:#E8E8E8;font-size:28px">Trust centre in development. Working with HexaTown on security and compliance: NDA signed, audit being scoped.</p></div>
-</div>
-<div style="flex:1;display:flex;flex-direction:column;gap:26px">
-<div class="pt"><p class="kicker">NEXT</p><p style="color:#E8E8E8;font-size:28px">By February 2027: a measured first cohort and 30 named partner targets. By September 2028: three paid pilots and the first Partner Edition signed.</p></div>
-<div class="pt"><p class="kicker">FOUNDER, AND TWO SEATS OPEN</p><p style="color:#E8E8E8;font-size:28px">Pete Thickett designed and built the app, the brand and the 3D engine. Open: a technical co-founder, 15 to 20% equity offered, and a partnerships lead.</p></div>
-</div>
+<div style="display:flex;flex-direction:row;gap:48px;margin-top:28px">
+<div class="pt" style="flex:1;border-color:#E8C56A"><p class="kicker" style="color:#E8C56A">SINCE THE 7 NOVEMBER PITCH</p><p style="color:#E8E8E8;font-size:30px">v0.95 released on 10 November. Live demo and investor follow-up deck. Business plan v3 drafted, with a 36-month model. Pete is on the HelpBnk Starter Kit.</p></div>
+<div class="pt" style="flex:1;border-color:#E8C56A"><p class="kicker" style="color:#E8C56A">SECURITY, NOW</p><p style="color:#E8E8E8;font-size:30px">Trust centre in development. Working with HexaTown on security and compliance: NDA signed, audit being scoped.</p></div>
+<div class="pt" style="flex:1"><p class="kicker">FOUNDER, AND TWO SEATS OPEN</p><p style="color:#E8E8E8;font-size:30px">Pete Thickett designed and built the app, the brand and the 3D engine. Open: a technical co-founder (15 to 20% equity) and a partnerships lead.</p></div>
 </div>
 <p class="foot">COUNTS FROM THE VAULT-IT DATABASE, 19 NOV 2026 · NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
 </section>
-<div class="say"><p>Where it is today. Live. Built alone. 14 accounts, 11 with their own figures saved, nobody paying yet.</p><p>Since the 7 November pitch, version 0.95 is live.</p><p>The trust centre is in development, and I'm working with HexaTown on security and compliance.</p><p>By September 2028: three paid pilots and the first Partner Edition. Two seats are open: a technical co-founder and a partnerships lead.</p></div></div>
+<div class="say"><p>Where it is today. Live. Built alone. 14 accounts, 11 with their own figures saved, nobody paying yet.</p><p>Since the 7 November pitch, version 0.95 is live.</p><p>The trust centre is in development, and I'm working with HexaTown on security and compliance.</p><p>Two seats are open: a technical co-founder and a partnerships lead.</p></div></div>
 
-<div class="frame" data-secs="25"><section id="roadmap" style="background:#0A1A1C;color:#E8E8E8;padding:64px 128px 160px;display:flex;flex-direction:column;gap:22px">
-<div style="display:flex;flex-direction:column;gap:12px">
-<p class="kicker">ROADMAP · TODAY TO THE SEED ROUND</p>
-<h2 style="font-size:56px">The plan, milestone by milestone.</h2>
+<div class="frame" data-secs="25"><section id="roadmap" style="background:#0A1A1C;color:#E8E8E8;padding:72px 128px 160px;display:flex;flex-direction:column;gap:0">
+<div style="display:flex;flex-direction:row;justify-content:space-between;align-items:flex-end;gap:40px">
+<div style="display:flex;flex-direction:column;gap:14px">
+<p class="kicker">ROADMAP</p>
+<h2 style="font-size:60px">From today to the seed round.</h2>
 </div>
-<div class="rm">
-<div class="l"></div><div class="h" data-when="2026"><b>NOW TO DEC 2026</b><span>Foundations</span></div><div class="h" data-when="q1-2027"><b>JAN TO MAR 2027</b><span>The round</span></div><div class="h" data-when="2027"><b>APR TO DEC 2027</b><span>First pilots</span></div><div class="h" data-when="2028"><b>2028</b><span>Scale and seed</span></div>
-<div class="l" data-lane="funding">Company and funding</div><div class="c"><p>Company registered</p><p>IP assigned to the company</p><p>Start Up Loan applied for</p></div><div class="c"><p><b>JAN</b>SEIS advance assurance</p><p class="g"><b>MAR</b>Round closes</p></div><div class="c"><p><b>JUL</b>SEIS certificates issued</p><p><b>AUTUMN</b>Knowledge Transfer Partnership bid</p></div><div class="c"><p><b>JUL</b>EIS advance assurance</p><p class="g"><b>DEC</b>Seed round, £1m to £1.5m</p></div>
-<div class="l" data-lane="product">Product and team</div><div class="c"><p>Analytics live</p><p>Public launch</p></div><div class="c"><p><b>JAN</b>Founding Member offer: 100 seats at £149</p></div><div class="c"><p><b>APR</b>Founder full time; first cohort judged</p><p><b>JUN</b>Engineer or co-founder</p><p><b>OCT</b>Partnerships lead</p></div><div class="c"><p><b>MAR</b>Bank-data provider chosen</p><p><b>SEP</b>Bank-verified record</p></div>
-<div class="l" data-lane="partners">Partners</div><div class="c"><p>30 named targets</p><p>First ten conversations</p></div><div class="c"><p><b>JAN</b>Three letters of intent</p><p>Broker, building society, debt advice</p></div><div class="c"><p><b>JUL</b>First broker pilot</p><p><b>DEC</b>First building society pilot</p></div><div class="c"><p><b>JAN</b>Debt-advice programme</p><p><b>MAR</b>Second society pilot</p><p><b>JUN</b>First Partner Edition</p><p><b>SEP</b>Paid broker introductions</p></div>
-<div class="l" data-lane="trust">Security and regulation</div><div class="c"><p>Independent security review</p></div><div class="c"><p><b>JAN</b>Cyber Essentials, public trust page</p><p><b>FEB</b>FCA perimeter opinion</p></div><div class="c"><p><b>APR</b>Trust Centre live</p><p><b>OCT</b>ISO 27001 certification</p></div><div class="c"><p><b>MID-YEAR</b>Penetration test</p><p><b>DEC</b>Decide on bank-data registration</p></div>
+<p class="rdkey"><span data-kind="funding"><i></i>Funding</span><span data-kind="partners"><i></i>Partners</span><span data-kind="company"><i></i>Company, team, security</span></p>
+</div>
+<div class="rd">
+<div class="line"></div>
+<div class="m b" data-m="2026-12" data-kind="company" data-side="b" style="grid-column:1"><div class="f"><b>DEC 2026</b><span>Public launch</span><i class="dot"></i></div></div>
+<div class="m a" data-m="2027-01" data-kind="partners" data-side="a" style="grid-column:1"><div class="f"><b>JAN 2027</b><span>Three letters of intent</span><i class="dot"></i></div></div>
+<div class="m b big" data-m="2027-03" data-kind="funding" data-side="b" style="grid-column:2"><div class="f"><b>MAR 2027</b><span>£250,000 SEIS round closes</span><i class="dot"></i></div></div>
+<div class="m a" data-m="2027-06" data-kind="company" data-side="a" style="grid-column:2"><div class="f"><b>JUN 2027</b><span>Engineer or co-founder joins</span><i class="dot"></i></div></div>
+<div class="m b" data-m="2027-07" data-kind="partners" data-side="b" style="grid-column:3"><div class="f"><b>JUL 2027</b><span>First broker pilot signed</span><i class="dot"></i></div></div>
+<div class="m a" data-m="2027-10" data-kind="company" data-side="a" style="grid-column:3"><div class="f"><b>OCT 2027</b><span>ISO 27001 certification</span><i class="dot"></i></div></div>
+<div class="m b" data-m="2027-12" data-kind="partners" data-side="b" style="grid-column:4"><div class="f"><b>DEC 2027</b><span>First building society pilot</span><i class="dot"></i></div></div>
+<div class="m a" data-m="2028-06" data-kind="partners" data-side="a" style="grid-column:4"><div class="f"><b>JUN 2028</b><span>First Partner Edition signed</span><i class="dot"></i></div></div>
+<div class="m b" data-m="2028-09" data-kind="partners" data-side="b" style="grid-column:5"><div class="f"><b>SEP 2028</b><span>Paid broker introductions live</span><i class="dot"></i></div></div>
+<div class="m a big" data-m="2028-12" data-kind="funding" data-side="a" style="grid-column:5"><div class="f"><b>DEC 2028</b><span>Seed round, £1m to £1.5m</span><i class="dot"></i></div></div>
 </div>
 <p class="foot">FROM BUSINESS PLAN V3 · A PLAN, NOT A PROMISE · DATES AFTER MARCH 2027 ASSUME THE ROUND CLOSES ON TIME<br>NOT REGULATED BY THE FCA. NOT FINANCIAL ADVICE.</p>
 </section>
-<div class="say"><p>The roadmap.</p><p>Before the round closes in March: the company registered, the IP assigned, and three letters of intent.</p><p>After it: I go full time, an engineer joins, and the first broker pilot is signed in July. A building society pilot follows in December.</p><p>In 2028: a Partner Edition, paid broker introductions, and the seed round.</p></div></div>
+<div class="say"><p>The roadmap.</p><p>Launch and three letters of intent before the round closes in March.</p><p>From April I go full time, an engineer or co-founder joins in June, and the first broker pilot is signed in July. ISO 27001 in October, a building society pilot in December.</p><p>In 2028: a Partner Edition, paid broker introductions, and the seed round.</p></div></div>
 <div class="frame" data-secs="20"><section id="ask" style="background:#E8C56A;color:#1A1400;padding:64px 128px 160px;display:flex;flex-direction:column;gap:18px">
 <div style="display:flex;flex-direction:column;gap:12px">
 <p class="kicker" style="color:#5A4A10">THE ASK · ONE</p>
@@ -270,19 +279,18 @@ footer a{color:#E8C56A}
 <div style="display:flex;flex-direction:row;gap:64px;align-items:flex-start">
 <div style="flex:1;display:flex;flex-direction:column;gap:18px;min-width:0">
 <div>
-<div class="fund" data-fund="63"><b>63%</b><strong>People<em>£158,000</em></strong><span>Founder, an engineer or co-founder, a partnerships lead</span></div>
-<div class="fund" data-fund="10"><b>10%</b><strong>Marketing and partner sales<em>£25,000</em></strong><span>Video, partner travel and events</span></div>
-<div class="fund" data-fund="9"><b>9%</b><strong>Security<em>£22,000</em></strong><span>Cyber Essentials, ISO&nbsp;27001, penetration tests</span></div>
-<div class="fund" data-fund="5"><b>5%</b><strong>Regulatory and legal<em>£12,000</em></strong><span>Regulated route, pilot contracts</span></div>
-<div class="fund" data-fund="13"><b>13%</b><strong>Running costs and contingency<em>£33,000</em></strong><span>Accounts, hosting, 10% contingency</span></div>
+<div class="fund" data-fund="63"><b>63%</b><strong>People<em>£158,000</em></strong></div>
+<div class="fund" data-fund="10"><b>10%</b><strong>Marketing and partner sales<em>£25,000</em></strong></div>
+<div class="fund" data-fund="9"><b>9%</b><strong>Security<em>£22,000</em></strong></div>
+<div class="fund" data-fund="5"><b>5%</b><strong>Regulatory and legal<em>£12,000</em></strong></div>
+<div class="fund" data-fund="13"><b>13%</b><strong>Running costs and contingency<em>£33,000</em></strong></div>
 </div>
 <p style="font-size:28px;font-weight:700">It buys at least 32 months in the base case, and three paid pilots by September 2028.</p>
-<p style="font-size:24px;line-height:1.3">Ordinary shares under SEIS. Valuation to be agreed with the lead investor. We intend to apply for SEIS advance assurance once the company is registered; SEIS gives qualifying investors 50% income tax relief.</p>
+<p style="font-size:24px;line-height:1.3">Ordinary shares under SEIS. Valuation to be agreed with the lead investor. We intend to apply for SEIS advance assurance once the company is registered.</p>
 </div>
 <div style="width:540px;flex:none;display:flex;flex-direction:column;gap:20px;background:#12100A;color:#E8E8E8;border-radius:22px;padding:36px 38px 40px">
 <p class="kicker" style="color:#E8C56A;letter-spacing:3px">ASK TWO · ONE INTRODUCTION</p>
 <h3 style="font-size:42px">A mortgage broker, a building society or a debt charity.</h3>
-<p style="font-size:26px;color:#B6D8D6">One 90-day pilot with each is how the partner prices get tested.</p>
 <p class="mono" style="font-size:24px;letter-spacing:3px;color:#44C0B9;margin-top:8px">SEE IT NOW</p>
 <p style="font-family:'Share Tech Mono', 'Courier New', monospace;font-size:38px;color:#E8C56A"><a href="https://vault-it.co/demo-a">vault-it.co/demo-a</a></p>
 <p style="font-family:'Syne', Arial, sans-serif;font-weight:600;font-size:30px;line-height:1.2;margin-top:8px">Get out of the <span style="color:#C8202A">red</span> and into <span style="color:#44C0B9">your</span> <span style="color:#E8C56A">home</span>.</p>
@@ -320,13 +328,13 @@ function close(){body.classList.remove('present');frames.forEach(function(f){f.c
 var SAM={min:{keys:'August 2035',note:'The first date anyone has given Sam.'},plus:{keys:'August 2034',note:'One year sooner, for £50 a month.'}},sam='min';
 function setSam(v,quiet){sam=v==='plus'?'plus':'min';$('sam-keys').textContent=SAM[sam].keys;$('sam-note').textContent=SAM[sam].note;$('sam-free-row').style.visibility=sam==='min'?'visible':'hidden';
  document.querySelectorAll('[data-sam]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.sam===sam?'true':'false')});if(!quiet)tell({t:'sam',v:sam})}
-var G={base:{subs:[101,318,580],partner:[0,833,4500],rev:[6160,55068,118270],b2b:[2500,39900,88600],lead:'£250,000 lasts all three years of the model.',sum:"It still does not break even: year 3 is £118,270 of revenue against £149,822 of costs. Assumes 600 sign-ups a month by the end of year 1 and 4% of them paying. Year 1's partner revenue is one £2,500 pilot fee."},
-       best:{subs:[172,809,1997],partner:[0,4667,14667],rev:[20793,141137,429814],b2b:[12917,108235,349052],lead:'If the pilots convert.',sum:'With the consumer targets met as well, cash never falls below £108,281 (July 2028) and year 3 makes a profit of £257,058. Partner revenue in year 1 is pilot fees.'}},kase='base',TOP=429814;
+var G={base:{subs:[101,318,580],partner:[0,833,4500],rev:[6160,55068,118270],b2b:[2500,39900,88600],lead:'£250,000 lasts all three years of the model.',sum:"It still does not break even: year 3 is £118,270 of revenue against £149,822 of costs. Assumes 600 sign-ups a month by the end of year 1 and 4% of them paying."},
+       best:{subs:[172,809,1997],partner:[0,4667,14667],rev:[20793,141137,429814],b2b:[12917,108235,349052],lead:'If the pilots convert.',sum:'Cash never falls below £108,281 and year 3 makes a profit of £257,058.'}},kase='base',TOP=429814;
 function n(x){return String(x).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
 function setCase(v,quiet){kase=v==='best'?'best':'base';var d=G[kase];
  for(var y=0;y<3;y++){var id='rev-'+(y+1);['subs','partner'].forEach(function(k){document.querySelector('[data-g="'+k+'-'+(y+1)+'"]').textContent=n(d[k][y])});
   document.querySelector('[data-g="'+id+'"]').textContent='£'+n(d.rev[y]);document.querySelector('[data-b="'+id+'"]').style.height=Math.max(4,Math.round(d.rev[y]/TOP*320))+'px';document.querySelector('[data-h="'+id+'"]').style.height=Math.round(G.best.rev[y]/TOP*320)+'px';
-  document.querySelector('[data-s="'+(y+1)+'"]').textContent=Math.round(d.b2b[y]/d.rev[y]*100)}
+  var sh=document.querySelector('[data-s="'+(y+1)+'"]');if(sh)sh.textContent=Math.round(d.b2b[y]/d.rev[y]*100)}
  $('g-lead').textContent=d.lead;$('g-sum').textContent=d.sum;$('growth').classList.toggle('best',kase==='best');document.querySelectorAll('[data-case]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.case===kase?'true':'false')});if(!quiet)tell({t:'case',v:kase})}
 function flip(which){if(which==='sam')setSam(sam==='min'?'plus':'min');else if(which==='case')setCase(kase==='base'?'best':'base')}
 document.querySelectorAll('.tog').forEach(function(c){c.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('button');if(b&&b.dataset.sam)setSam(b.dataset.sam);else if(b&&b.dataset.case)setCase(b.dataset.case);else flip(c.dataset.tog)})});

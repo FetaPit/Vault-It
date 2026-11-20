@@ -53,7 +53,7 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
   { const c = await txt(p, 'cover'); ok(/gives renters in debt one date for owning a home/i.test(c), 'the cover says what Vault-It does in one sentence'); }
   // Slide 2: Sam, from the live deck's example, with the £50 switch
   { const s = await txt(p, 'sam');
-    ok(/34/.test(s) && /£16,874/.test(s) && /£6,874/.test(s) && /24\.9%/.test(s) && /£10,000/.test(s) && /9\.9%/.test(s) && /£2,300/.test(s) && /£1,850/.test(s) && /£66/.test(s), 'Sam\'s figures are the live deck\'s example');
+    ok(/34/.test(s) && /£16,874/.test(s) && !/24\.9%|9\.9%/.test(s) && /£2,300/.test(s) && /£1,850/.test(s) && /£66/.test(s), 'Sam\'s figures are the live deck\'s example');
     ok(/StepChange/i.test(s) && /7 Nov(ember)? 2026/i.test(s), 'Sam names the source of the averages and the date of the engine run');
     const read = () => p.evaluate(() => ({ keys: document.getElementById('sam-keys').textContent.trim(), free: document.getElementById('sam-free').textContent.trim(), on: (document.querySelector('#sam [data-sam][aria-pressed="true"]') || {}).dataset.sam }));
     let r = await read(); ok(r.on === 'min' && r.keys === 'August 2035' && r.free === 'August 2031', 'minimums only: debt-free August 2031, keys August 2035: ' + JSON.stringify(r));
@@ -67,12 +67,12 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
     ok(/Moneybox/.test(s) && /Tembo/.test(s) && /below zero/i.test(s), 'competitors are named and the gap is stated');
     ok(/why now/i.test(s) && /First Time Buyer ISA/.test(s) && /April 2029/.test(s) && /Budget/.test(s), 'why now is on the problem slide: the First Time Buyer ISA from April 2029 (review, 19 Nov)');
     ok(/typical case/i.test(s) && /median/i.test(s), 'the 9.7 years sum is labelled as the typical case, not Sam\'s'); }
-  { const s = await txt(p, 'solution'); ok(/below zero/i.test(s) && /14,465/.test(s) && /August 2035/i.test(s) && !/March 2031/.test(s), 'the solution slide keeps Sam\'s date, one example through the deck');
+  { const s = await txt(p, 'solution'); ok(/below zero/i.test(s) && !/14,465/.test(s) && /August 2035/i.test(s) && !/March 2031/.test(s), 'the solution slide keeps Sam\'s date, one example through the deck');
     ok(await p.evaluate(() => !!document.querySelector('#solution video[src="pitch/house-build.mp4"][poster="pitch/house-still.jpg"][muted][playsinline]')), 'the 3D house builds on the solution slide'); }
   // Slide 5: who pays, B2B first, prices match Stripe and the plan
   { const s = await txt(p, 'whopays');
     ok(/£5\.99 a month/.test(s) && !/£7\.99|£6\.99/.test(s), 'the consumer price matches Stripe');
-    ok(await p.evaluate(() => document.querySelectorAll('#whopays .card').length === 3 && [...document.querySelectorAll('#whopays .card p:not(.kicker):not(.pay)')].every((e) => e.textContent.split(/\s+/).length <= 22)), 'three partner cards, one short sentence each');
+    ok(await p.evaluate(() => document.querySelectorAll('#whopays .card').length === 3 && [...document.querySelectorAll('#whopays .card p:not(.kicker):not(.pay)')].every((e) => e.textContent.split(/\s+/).length <= 10)), 'three partner cards, one short line each (ten words or fewer)');
     ok(/£738 to £936/.test(s) && /£18 to £40/.test(s) && /£185 to £234/.test(s) && /£10,000 to £25,000/.test(s) && /£1 to £3/.test(s) && /about £1/i.test(s), 'the three partner offers carry the plan\'s figures');
     ok(/No partner has been approached/i.test(s) && /assumption/i.test(s), 'it says the partner prices are untested'); }
   // Slide 6: consumers and partners together, base and best
@@ -81,8 +81,10 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
     ok(g.on === 'base' && [g['subs-1'], g['subs-2'], g['subs-3']].join() === '101,318,580' && [g['partner-1'], g['partner-2'], g['partner-3']].join('|') === '0|833|4,500' && [g['rev-1'], g['rev-2'], g['rev-3']].join('|') === '£6,160|£55,068|£118,270', 'base case (the middle case, owner 19 Nov: "Adopt middle"): subscribers, partner-funded users and revenue by year: ' + JSON.stringify(g));
     ok(/lasts all three years/i.test(await txt(p, 'growth')) && /does not break even/i.test(await txt(p, 'growth')) && !/27 months|£100,166|203/.test(await txt(p, 'growth')), 'base case says it plainly: the money lasts the three years of the model, with no break-even inside them');
     ok(/600 sign-ups a month/.test(await txt(p, 'growth')) && /4% of them paying/.test(await txt(p, 'growth')), 'the base case states the sign-up and conversion assumptions it rests on');
-    ok(/£149,822/.test(await txt(p, 'growth')) && /£2,500 pilot/.test(await txt(p, 'growth')), 'base case shows year-3 costs beside revenue and explains year 1\'s partner share');
-    { const b = await p.evaluate(() => ({ bars: [1, 2, 3].map((y) => Math.round(document.querySelector('#growth [data-b="rev-' + y + '"]').getBoundingClientRect().height * 1920 / document.querySelector('.frame').clientWidth)), ghost: getComputedStyle(document.querySelector('#growth [data-h="rev-3"]')).display !== 'none', tag: document.querySelector('#growth [data-ghost]').innerText }));
+    ok(/£149,822/.test(await txt(p, 'growth')) && !/pilot fee/i.test(await txt(p, 'growth')) && await p.evaluate(() => document.querySelectorAll('#growth .shr').length === 1 && document.querySelectorAll('#growth .key').length === 0 && /75% from partners/.test(document.querySelector('#growth .shr').textContent)), 'base case shows year-3 costs beside revenue; only year 3 carries the partner share and the legend rows are gone');
+    { const base = await p.evaluate(() => [1, 2, 3].map((y) => Math.round(document.querySelector('#growth [data-b="rev-' + y + '"]').getBoundingClientRect().bottom)));
+      ok(Math.max(...base) - Math.min(...base) <= 1, 'the three bars stand on one baseline: ' + base.join());
+      const b = await p.evaluate(() => ({ bars: [1, 2, 3].map((y) => Math.round(document.querySelector('#growth [data-b="rev-' + y + '"]').getBoundingClientRect().height * 1920 / document.querySelector('.frame').clientWidth)), ghost: getComputedStyle(document.querySelector('#growth [data-h="rev-3"]')).display !== 'none', tag: document.querySelector('#growth [data-ghost]').innerText }));
       ok(b.bars[2] > b.bars[1] && b.bars[1] > b.bars[0] && b.ghost && /£429,814/.test(b.tag), 'the bars plot revenue and the best case shows as a dashed outline with its figure in the base view: ' + JSON.stringify(b)); }
     await p.evaluate(() => document.querySelector('#growth [data-case="best"]').click()); g = await read();
     ok(g.on === 'best' && [g['subs-1'], g['subs-2'], g['subs-3']].join('|') === '172|809|1,997' && [g['partner-1'], g['partner-2'], g['partner-3']].join('|') === '0|4,667|14,667' && [g['rev-1'], g['rev-2'], g['rev-3']].join('|') === '£20,793|£141,137|£429,814', 'best case: ' + JSON.stringify(g));
@@ -95,19 +97,21 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
     ok(t === 'accounts=14,saved=11,waitlist=9,paying=0', 'traction as the database has it on 19 Nov 2026 (owner, 19 Nov: "Go" on database counts in place of 26): ' + t);
     ok(/counts from the vault-it database, 19 nov 2026/i.test(s) && !/founder's count/i.test(s) && !/\b26\b/.test(s), 'the slide says where the counts come from, and 26 is gone');
     ok(/since the 7 november pitch/i.test(s) && /v0\.95/.test(s) && /10 November/.test(s) && /live demo/i.test(s) && /follow-up deck/i.test(s) && /business plan v3/i.test(s) && /36-month/.test(s), 'progress since the 7 Nov pitch: v0.95 released 10 Nov, the live demo, the follow-up deck, plan v3 and its 36-month model');
-    ok(await p.evaluate(() => document.querySelectorAll('#proof .now').length === 4 && document.querySelectorAll('#proof .pt').length <= 4), 'slide 7 is thinned: four tiles and no more than four blocks');
+    ok(await p.evaluate(() => document.querySelectorAll('#proof .now').length === 4 && document.querySelectorAll('#proof .pt').length === 3), 'slide 7 is thinned: four tiles and three blocks (the roadmap slide carries what is next)');
     ok(/HelpBnk Starter Kit/.test(s) && !/Web Summit|Vanta|Greenborough|uptime/i.test(s), 'the HelpBnk Starter Kit is named; Web Summit, Vanta, Greenborough and the uptime monitor stay off (owner, 19 Nov)');
     ok(/trust centre in development/i.test(s) && /HexaTown/.test(s) && /security and compliance/i.test(s) && /NDA signed/i.test(s) && !/ISO 27001 certified|certified to ISO|SOC 2/i.test(s), 'the trust centre is in development and HexaTown is named, with no certificate claimed (owner, 19 Nov)');
-    ok(/19 November 2026/i.test(s) && /pre-revenue/i.test(s) && /15 to 20% equity/.test(s) && !/25%/.test(s) && /February 2027/i.test(s) && /September 2028/i.test(s), 'dated, pre-revenue, the open seats and the two dated milestones'); }
-  // Slide 8: the detailed roadmap (owner, 20 Nov 2026: "Add a detailed roadmap slide."), milestones and dates from business plan v3's Roadmap tab
+    ok(/19 November 2026/i.test(s) && /pre-revenue/i.test(s) && /15 to 20% equity/.test(s) && !/25%/.test(s) && !/February 2027|September 2028/i.test(s), 'dated, pre-revenue and the open seats; the dated milestones live on the roadmap slide'); }
+  // Slide 8: the roadmap as a timeline infographic (owner, 20 Nov 2026: "Add a detailed roadmap slide.", then "Make the roadmap a clear infographic"); milestones and months from business plan v3's Roadmap tab
   { const r = await txt(p, 'roadmap');
-    const g = await p.evaluate(() => ({ cols: [...document.querySelectorAll('#roadmap [data-when]')].map((e) => e.dataset.when).join(), lanes: [...document.querySelectorAll('#roadmap [data-lane]')].map((e) => e.dataset.lane).join(), cells: document.querySelectorAll('#roadmap .rm > div.c').length, items: document.querySelectorAll('#roadmap .rm > div.c p').length, empty: [...document.querySelectorAll('#roadmap .rm > div.c')].filter((c) => !c.textContent.trim()).length }));
-    ok(g.cols === '2026,q1-2027,2027,2028' && g.lanes === 'funding,product,partners,trust', 'the roadmap is four periods by four workstreams: ' + g.cols + ' / ' + g.lanes);
-    ok(g.cells === 16 && g.empty === 0 && g.items >= 28, 'it is detailed: every cell is filled, 28 milestones or more: ' + JSON.stringify(g));
-    ok(/advance assurance/i.test(r) && /round closes/i.test(r) && /SEIS certificates/i.test(r) && /seed round/i.test(r) && /£1m to £1\.5m/.test(r) && /Start Up Loan/i.test(r), 'funding: Start Up Loan, advance assurance, the close, certificates, the seed round');
-    ok(/30 named targets/i.test(r) && /three letters of intent/i.test(r) && /first broker pilot/i.test(r) && /building society pilot/i.test(r) && /Partner Edition/.test(r) && /paid broker introductions/i.test(r) && /debt-advice programme/i.test(r), 'partners: targets, letters of intent, the three pilots, the debt-advice programme, the Partner Edition, paid introductions');
-    ok(/public launch/i.test(r) && /100 seats at £149/.test(r) && /first cohort judged/i.test(r) && /founder full time/i.test(r) && /engineer or co-founder/i.test(r) && /partnerships lead/i.test(r) && /bank-verified/i.test(r), 'product and team: launch, Founding Member offer, the cohort, the hires, the bank-verified record');
-    ok(/security review/i.test(r) && /Cyber Essentials/.test(r) && /perimeter opinion/i.test(r) && /Trust Centre live/i.test(r) && /ISO 27001/.test(r) && /penetration test/i.test(r), 'security and regulation: review, Cyber Essentials, the perimeter opinion, the Trust Centre, ISO 27001, the penetration test');
+    const g = await p.evaluate(() => { const sec = document.getElementById('roadmap'), k = sec.getBoundingClientRect().width / 1920; const ms = [...sec.querySelectorAll('.rd [data-m]')]; const dots = [...sec.querySelectorAll('.rd .dot')].map((d) => { const b = d.getBoundingClientRect(); return Math.round((b.left + b.width / 2 - sec.getBoundingClientRect().left) / k); }); const line = sec.querySelector('.rd .line').getBoundingClientRect();
+      return { n: ms.length, when: ms.map((e) => e.dataset.m).join(), kinds: ms.map((e) => e.dataset.kind).join(), sides: ms.map((e) => e.dataset.side).join(''), words: ms.map((e) => e.innerText.trim().split(/\s+/).length), dots: dots, lineW: Math.round(line.width / k), big: [...sec.querySelectorAll('.rd [data-m].big')].map((e) => e.dataset.m).join(), key: [...sec.querySelectorAll('.rdkey span')].map((e) => e.textContent.trim()).join(), table: sec.querySelectorAll('.rm,table').length }; });
+    ok(g.n === 10 && g.when === '2026-12,2027-01,2027-03,2027-06,2027-07,2027-10,2027-12,2028-06,2028-09,2028-12', 'ten milestones in date order, today to the seed round: ' + g.when);
+    ok(g.table === 0 && g.lineW > 1500 && g.dots.length === 10 && g.dots.every((x, i) => i === 0 || x > g.dots[i - 1] + 100), 'it is a timeline, not a table: one line across the slide with ten points along it, left to right: ' + JSON.stringify(g.dots));
+    ok(g.sides === 'babababababa'.slice(0, 10) && g.words.every((w) => w <= 9), 'milestones alternate below and above the line, nine words or fewer each: ' + g.sides + ' ' + g.words.join());
+    ok(g.big === '2027-03,2028-12' && /£250,000/.test(r) && /SEIS round closes/i.test(r) && /seed round/i.test(r) && /£1m to £1\.5m/.test(r), 'the two funding events are drawn largest: the £250,000 close and the seed round');
+    ok(g.key === 'Funding,Partners,Company, team, security' && g.kinds.split(',').every((k) => ['funding', 'partners', 'company'].includes(k)), 'coloured by kind, with a key: ' + g.key);
+    ok(/public launch/i.test(r) && /three letters of intent/i.test(r) && /first broker pilot signed/i.test(r) && /ISO 27001/.test(r) && /building society pilot/i.test(r) && /Partner Edition/.test(r) && /paid broker introductions/i.test(r) && /engineer or co-founder joins/i.test(r) && !/founder full time/i.test(r), 'the milestones are the plan\'s: launch, letters of intent, the pilots, ISO 27001, the Partner Edition, paid introductions, the engineer or co-founder in June');
+    ok(/From April I go full time/.test(await p.evaluate(() => document.querySelector('.frame:has(#roadmap) .say').textContent)), 'the script gives the founder\'s own date as the plan has it: full time from April');
     ok(!/Vanta|Web Summit|trade ?mark/i.test(r), 'nothing pending or on hold is named on the roadmap (Vanta, Web Summit, the trade mark)');
     ok(/business plan v3/i.test(r) && /assume the round closes on time/i.test(r) && /Not regulated by the FCA\. Not financial advice\./i.test(r), 'it says it is the plan, that later dates assume the round closes on time, and carries the FCA line');
     ok(await p.evaluate(() => { const f = [...document.querySelectorAll('.frame > section')].map((s) => s.id); return f.indexOf('roadmap') === f.indexOf('proof') + 1 && f.indexOf('ask') === f.length - 1; }), 'the roadmap follows "where it is" and the ask is still last'); }
@@ -119,14 +123,21 @@ const SRC = path.join(ROOT, 'site/pitch-eligent/five.html');
     ok(pct === '63/10/9/5/13' && sum === 250000, 'use of funds is the plan\'s and adds to £250,000: ' + pct + ' = £' + sum);
     ok(/Ordinary shares under SEIS/.test(a) && /valuation to be agreed with the lead investor/i.test(a) && !/terms on request/i.test(a), 'the terms line: ordinary shares under SEIS, valuation agreed with the lead (owner, 19 Nov)');
     ok(await p.evaluate(() => { const sp = [...document.querySelectorAll('#ask span')].find((e) => e.textContent === 'red'); return !!sp && getComputedStyle(sp).color === 'rgb(200, 32, 42)'; }), 'the tagline red on the last slide is the brand red');
+    ok(await p.evaluate(() => document.querySelectorAll('#ask .fund span').length === 0) && !/90-day/i.test(a) && !/income tax relief/i.test(a), 'the ask is thinned: no third column on the use of funds, no pilot sentence, no tax relief clause');
     ok(/one introduction/i.test(a) && /mortgage broker/i.test(a) && /building society/i.test(a) && /debt charity/i.test(a), 'ask two: one introduction to a broker, building society or debt charity');
     ok(await p.evaluate(() => !!document.querySelector('#ask a[href="https://vault-it.co/demo-a"]')), 'the demo link is exactly https://vault-it.co/demo-a, on the last slide'); }
+  // Clearer (owner, 20 Nov 2026: "make the deck more clear by removing superflous info"): fewer words on the slides, nothing asked for or required removed
+  { const wc = await p.evaluate(() => [...document.querySelectorAll('.frame > section')].map((s) => [s.id, s.innerText.trim().split(/\s+/).filter((w) => /[A-Za-z0-9]/.test(w)).length]));
+    const tot = wc.reduce((a, x) => a + x[1], 0);
+    ok(tot <= 900 && wc.every((x) => x[1] <= 130), 'the nine slides carry 900 words or fewer (1,117 before), none over 130: ' + tot + ' ' + wc.map((x) => x.join(':')).join(' '));
+    ok(await p.evaluate(() => [...document.querySelectorAll('.frame > section')].every((s) => /Not regulated by the FCA\. Not financial advice\./i.test(s.innerText))), 'every slide still carries the FCA line');
+    ok(await p.evaluate(() => document.querySelectorAll('#scale .card').length === 3) && /£36,500/.test(await txt(p, 'scale')), 'slide 3 has three tiles; the deposit figure sits in the 9.7 years tile'); }
   // The spoken script: one part per slide, five minutes
   { const say = await p.evaluate(() => [...document.querySelectorAll('.frame')].map((f) => ({ secs: +f.dataset.secs, words: ((f.querySelector('.say') || {}).textContent || '').trim().split(/\s+/).filter(Boolean).length })));
     const secs = say.reduce((s, x) => s + x.secs, 0), words = say.reduce((s, x) => s + x.words, 0);
     ok(say.every((x) => x.secs > 0 && x.words >= 20), 'every slide has its part of the script and a time budget: ' + JSON.stringify(say));
-    ok(secs === 265, 'the script is budgeted at 4:25, leaving 35 seconds of the five minutes for talking: ' + secs + 's');
-    ok(words >= 520 && words <= 600, 'the script is a 4:25 read, 520 to 600 words: ' + words);
+    ok(secs === 260, 'the script is budgeted at 4:20, leaving 40 seconds of the five minutes for talking: ' + secs + 's');
+    ok(words >= 490 && words <= 570, 'the script is a 4:20 read, 490 to 570 words: ' + words);
     ok(say.every((x) => x.words / x.secs <= 2.5), 'no slide asks for more than 150 words a minute: ' + say.map((x) => Math.round(x.words / x.secs * 60)).join(' '));
     ok(await p.evaluate(() => [...document.querySelectorAll('.say')].every((e) => getComputedStyle(e).display === 'none')), 'the script never shows on the slides themselves'); }
   // brand marks
